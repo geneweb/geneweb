@@ -1,9 +1,9 @@
 #ifdef API
 
-module MLink = Api_link_tree_piqi
-module MLinkext = Api_link_tree_piqi_ext
+module MLink = Lia_api_link_tree_piqi
+module MLinkext = Lia_api_link_tree_piqi_ext
 
-
+open Geneweb
 open Config
 
 (**/**) (* Hashtbl pour gérer le cache. *)

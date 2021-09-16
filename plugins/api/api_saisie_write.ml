@@ -244,7 +244,7 @@ let print_config conf base =
     List.map
       (fun evt ->
         let (pos, sval) =
-          ( Piqi_util.piqi_fevent_name_of_fevent_name evt
+          ( Api_piqi_util.piqi_fevent_name_of_fevent_name evt
           , Util.string_of_fevent_name conf base evt )
         in
         Mwrite.Transl_fevent_name.({
@@ -265,7 +265,7 @@ let print_config conf base =
     List.map
       (fun evt ->
         let (pos, sval) =
-          ( Piqi_util.piqi_pevent_name_of_pevent_name evt
+          ( Api_piqi_util.piqi_pevent_name_of_pevent_name evt
           , Util.string_of_pevent_name conf base evt )
         in
         Mwrite.Transl_pevent_name.({
@@ -278,7 +278,7 @@ let print_config conf base =
     List.map
       (fun evt ->
         let (pos, sval) =
-          ( Piqi_util.piqi_pevent_name_of_pevent_name evt
+          ( Api_piqi_util.piqi_pevent_name_of_pevent_name evt
           , Util.string_of_pevent_name conf base evt )
         in
         Mwrite.Transl_pevent_name.({
@@ -310,7 +310,7 @@ let print_config conf base =
     List.map
       (fun evt ->
         let (pos, sval) =
-          ( Piqi_util.piqi_pevent_name_of_pevent_name evt
+          ( Api_piqi_util.piqi_pevent_name_of_pevent_name evt
           , Util.string_of_pevent_name conf base evt )
         in
         Mwrite.Transl_pevent_name.({

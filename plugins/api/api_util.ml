@@ -17,8 +17,8 @@ open Api_def
 
 (* ... utils ... *)
 
-let p_getenvbin = Piqi_util.p_getenvbin
-let get_params = Piqi_util.get_params
+let p_getenvbin = Api_piqi_util.p_getenvbin
+let get_params = Api_piqi_util.get_params
 
 let is_empty_or_quest_name p =
   is_empty_string (get_surname p) || is_quest_string (get_surname p) ||
@@ -580,9 +580,9 @@ let apply_filters_p conf filters compute_sosa p =
 
 (**/**) (* Fonctions IO *)
 
-module Filter = Piqi_util.Filter (M) (Mext)
+module Filter = Api_piqi_util.Filter (M) (Mext)
 
-module ReferencePerson = Piqi_util.ReferencePerson (M)
+module ReferencePerson = Api_piqi_util.ReferencePerson (M)
 
 let person_to_reference_person = ReferencePerson.person_to_reference_person
 
@@ -590,7 +590,7 @@ let empty_reference_person = ReferencePerson.empty_reference_person
 
 let get_filters = Filter.get_filters
 
-let print_result = Piqi_util.print_result
+let print_result = Api_piqi_util.print_result
 
 let date_to_opt_string d =
   match Adef.od_of_cdate d with
@@ -1633,5 +1633,15 @@ let print_error conf code msg =
   Output.status conf (from_piqi_status code) ;
   print_result conf data ;
   raise Exit
+
+
+let chop_base_prefix base_prefix =
+  let len = String.length base_prefix in
+  if len > 2 &&
+     (base_prefix.[len-1] = 'w' || base_prefix.[len-1] = 'f') &&
+     base_prefix.[len-2] = '_'
+  then
+    String.sub base_prefix 0 (len - 2)
+  else base_prefix
 
 #endif

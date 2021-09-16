@@ -1,9 +1,10 @@
 #ifdef API
 
-module MLink = Api_link_tree_piqi
-module MLinkext = Api_link_tree_piqi_ext
+module MLink = Lia_api_link_tree_piqi
+module MLinkext = Lia_api_link_tree_piqi_ext
 module RC = Redis_sync.Client
 
+open Geneweb
 open Config
 open Def
 open Gwdb
@@ -562,7 +563,7 @@ let get_link_tree_curl =
   end;
   Curl.global_cleanup ();
   let output_encoding =
-    match Piqi_util.p_getenvbin conf.env "output" with
+    match Plugin_api_lib.Api_piqi_util.p_getenvbin conf.env "output" with
      | Some "pb" -> `pb
      | Some "json" -> `json
      | Some "xml" -> `xml
@@ -571,7 +572,7 @@ let get_link_tree_curl =
   MLinkext.parse_link_tree !res output_encoding
 
 let print_link_tree conf base =
-  let params = Piqi_util.get_params conf MLinkext.parse_link_tree_params in
+  let params = Plugin_api_lib.Api_piqi_util.get_params conf MLinkext.parse_link_tree_params in
   let basename = params.MLink.Link_tree_params.basename in
   let ip = params.MLink.Link_tree_params.ip in
   let ref_person = params.MLink.Link_tree_params.ref_person in
@@ -592,7 +593,7 @@ let print_link_tree conf base =
     match ref_person with
     | Some s ->
         begin
-          match Link.ip_of_ref_person base s with
+          match Lia_link.ip_of_ref_person base s with
           | Some ip -> ip
           | None -> Gwdb.dummy_iper
         end
@@ -612,7 +613,7 @@ let print_link_tree conf base =
     match ref_person2 with
     | Some s when s <> "" ->
         begin
-          match Link.ip_of_ref_person base s with
+          match Lia_link.ip_of_ref_person base s with
           | Some ip -> ip
           | None -> Gwdb.dummy_iper
         end
@@ -931,6 +932,6 @@ let print_link_tree conf base =
     })
   in
   let data = MLinkext.gen_link_tree data in
-  Piqi_util.print_result conf data
+  Plugin_api_lib.Api_piqi_util.print_result conf data
 
 #endif

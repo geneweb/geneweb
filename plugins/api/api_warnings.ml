@@ -59,14 +59,14 @@ let add_error_to_piqi_warning_list base (w : M.Base_warnings.t) = function
 let fevent_to_warning_event e =
   { M.Warning_event.pevent = None
   ; fevent =
-      try Some (Piqi_util.piqi_fevent_name_of_fevent_name e.efam_name)
+      try Some (Api_piqi_util.piqi_fevent_name_of_fevent_name e.efam_name)
       with _ -> None
   }
 
 let pevent_to_warning_event e =
   { M.Warning_event.fevent = None
   ; pevent =
-      try Some (Piqi_util.piqi_pevent_name_of_pevent_name e.epers_name)
+      try Some (Api_piqi_util.piqi_pevent_name_of_pevent_name e.epers_name)
       with _ -> None
   }
 
@@ -241,15 +241,15 @@ let add_warning_to_piqi_warning_list conf base =
                  M.Warning_event_order.{
                    person = p2wp base p
                  ; pevents = []
-                 ; fevents = [ Piqi_util.piqi_fevent_name_of_fevent_name e1.efam_name
-                             ; Piqi_util.piqi_fevent_name_of_fevent_name e2.efam_name ]
+                 ; fevents = [ Api_piqi_util.piqi_fevent_name_of_fevent_name e1.efam_name
+                             ; Api_piqi_util.piqi_fevent_name_of_fevent_name e2.efam_name ]
                  } :: w.warning_event_order }
     | PEventOrder (p, e1, e2) ->
       { w with warning_event_order =
                  M.Warning_event_order.{
                    person = p2wp base p
-                 ; pevents = [ Piqi_util.piqi_pevent_name_of_pevent_name e1.epers_name
-                             ; Piqi_util.piqi_pevent_name_of_pevent_name e2.epers_name ]
+                 ; pevents = [ Api_piqi_util.piqi_pevent_name_of_pevent_name e1.epers_name
+                             ; Api_piqi_util.piqi_pevent_name_of_pevent_name e2.epers_name ]
                  ; fevents = []
                  } :: w.warning_event_order }
     (* Not included in api *)
