@@ -51,22 +51,36 @@ let ps =
     V7_place.print_all_places_surnames conf base ;
     true
   end
+
+let tp =
+  w_base begin fun conf base ->
+    match Util.p_getenv conf.env "v" with
+    | Some f ->
+      begin match Util.find_person_in_env conf base "" with
+      | Some p -> !V7_interp.templ ("tp_" ^ f) conf base p
+      | _ ->
+          !V7_interp.templ ("tp0_" ^ f) conf base
+            (Gwdb.empty_person base Gwdb.dummy_iper)
+      end ;
+      true
+    | None -> false
+  end
  
 let a =
   w_base begin fun conf base ->
-   match Util.find_person_in_env conf base "" with
-  | Some p ->
+    match Util.find_person_in_env conf base "" with
+    | Some p ->
       if Util.p_getenv conf.env "t" = Some  "FC"
       then (!V7_interp.templ "fanchart" conf base p ; true)
       else false
-  | _ -> false
+    | _ -> false
   end
 
 let c =
   w_base begin fun conf base ->
-   match Util.find_person_in_env conf base "" with
-  | Some p -> V7_cousins.print conf base p ; true
-  | _ -> false
+    match Util.find_person_in_env conf base "" with
+    | Some p -> V7_cousins.print conf base p ; true
+    | _ -> false
   end
 
 let doc =
@@ -102,4 +116,5 @@ let _ =
     ; "L", aux l
     ; "P", aux p
     ; "PS", aux ps
+    ; "TP", aux tp
     ]
