@@ -2,6 +2,14 @@
 
 (ocamllex (modules templ_parser))
 
+#ifdef API
+(rule
+  (deps api_link_tree.piqi)
+  (targets api_link_tree_piqi.ml api_link_tree_piqi_ext.ml)
+  (action (run piqic-ocaml --ext api_link_tree.piqi))
+)
+#endif
+
 (library
  (name geneweb)
  (public_name geneweb)

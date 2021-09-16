@@ -93,19 +93,7 @@ GENERATED_FILES_DEP = \
 
 generated: $(GENERATED_FILES_DEP)
 
-ifdef API_D
-piqi:
-	$(foreach p, $(wildcard lib/*.proto), \
-		piqi of-proto --normalize $(p) ; \
-		piqic-ocaml -C lib/ --ext $(p).piqi ; \
-	  )
-	$(RM) lib/*.piqi
-else
-piqi:
-endif
-.PHONY: piqi
-
-install uninstall build: $(GENERATED_FILES_DEP) piqi
+install uninstall build: $(GENERATED_FILES_DEP)
 
 ###### [BEGIN] Installation / Distribution section
 

@@ -1,43 +1,27 @@
 #ifdef API
 
 (rule
-  (deps api.proto)
+  (deps api.piqi)
   (targets api_piqi.ml api_piqi_ext.ml)
-  (action (progn
-            (run piqi of-proto --normalize api.proto)
-            (run piqic-ocaml --ext api.proto.piqi)
-          )
-  )
+  (action (run piqic-ocaml --ext api.piqi))
 )
 
 (rule
-  (deps api_saisie_read.proto)
+  (deps api_saisie_read.piqi)
   (targets api_saisie_read_piqi.ml api_saisie_read_piqi_ext.ml)
-  (action (progn
-            (run piqi of-proto --normalize api_saisie_read.proto)
-            (run piqic-ocaml --ext api_saisie_read.proto.piqi)
-          )
-  )
+  (action (run piqic-ocaml --ext api_saisie_read.piqi))
 )
 
 (rule
-  (deps api_saisie_write.proto)
+  (deps api_saisie_write.piqi)
   (targets api_saisie_write_piqi.ml api_saisie_write_piqi_ext.ml)
-  (action (progn
-            (run piqi of-proto --normalize api_saisie_write.proto)
-            (run piqic-ocaml --ext api_saisie_write.proto.piqi)
-          )
-  )
+  (action (run piqic-ocaml --ext api_saisie_write.piqi))
 )
 
 (rule
-  (deps api_stats.proto)
+  (deps api_stats.piqi)
   (targets api_stats_piqi.ml api_stats_piqi_ext.ml)
-  (action (progn
-            (run piqi of-proto --normalize api_stats.proto)
-            (run piqic-ocaml --ext api_stats.proto.piqi)
-          )
-  )
+  (action (run piqic-ocaml --ext api_stats.piqi))
 )
 
 (library

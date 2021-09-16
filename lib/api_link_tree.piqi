@@ -1,0 +1,591 @@
+.protobuf-package "geneweb.api.link_tree.object"
+
+.record [
+    .name dmy
+    .field [
+        .name day
+        .type protobuf-int32
+        .optional
+        .code 1
+    ]
+    .field [
+        .name month
+        .type protobuf-int32
+        .optional
+        .code 2
+    ]
+    .field [
+        .name year
+        .type int32
+        .optional
+        .code 3
+    ]
+    .field [
+        .name delta
+        .type protobuf-int32
+        .optional
+        .code 4
+    ]
+]
+
+.record [
+    .name date
+    .field [
+        .name cal
+        .type calendar
+        .optional
+        .code 1
+    ]
+    .field [
+        .name prec
+        .type precision
+        .optional
+        .code 2
+    ]
+    .field [
+        .name dmy
+        .type dmy
+        .optional
+        .code 3
+    ]
+    .field [
+        .name dmy2
+        .type dmy
+        .optional
+        .code 4
+    ]
+    .field [
+        .name text
+        .type string
+        .optional
+        .code 5
+    ]
+]
+
+.record [
+    .name title
+    .field [
+        .name title-type
+        .type title-type
+        .code 1
+    ]
+    .field [
+        .name name
+        .type string
+        .code 2
+    ]
+    .field [
+        .name title
+        .type string
+        .code 3
+    ]
+    .field [
+        .name fief
+        .type string
+        .code 4
+    ]
+    .field [
+        .name date-begin
+        .type string
+        .code 5
+    ]
+    .field [
+        .name date-end
+        .type string
+        .code 6
+    ]
+    .field [
+        .name nth
+        .type protobuf-int32
+        .code 7
+    ]
+]
+
+.record [
+    .name connection
+    .field [
+        .name from-baseprefix
+        .type string
+        .code 1
+    ]
+    .field [
+        .name from-ref
+        .type string
+        .code 2
+    ]
+    .field [
+        .name to-baseprefix
+        .type string
+        .code 3
+    ]
+    .field [
+        .name to-ref
+        .type string
+        .code 4
+    ]
+]
+
+.record [
+    .name family-link
+    .field [
+        .name baseprefix
+        .type string
+        .code 1
+    ]
+    .field [
+        .name ifam
+        .type protobuf-int32
+        .code 2
+    ]
+]
+
+.record [
+    .name person-link
+    .field [
+        .name baseprefix
+        .type string
+        .code 1
+    ]
+    .field [
+        .name ip
+        .type protobuf-int32
+        .code 2
+    ]
+]
+
+.record [
+    .name person
+    .field [
+        .name baseprefix
+        .type string
+        .code 1
+    ]
+    .field [
+        .name ip
+        .type protobuf-int32
+        .code 2
+    ]
+    .field [
+        .name n
+        .type string
+        .code 3
+    ]
+    .field [
+        .name p
+        .type string
+        .code 4
+    ]
+    .field [
+        .name oc
+        .type protobuf-int32
+        .code 5
+    ]
+    .field [
+        .name lastname
+        .type string
+        .code 6
+    ]
+    .field [
+        .name firstname
+        .type string
+        .code 7
+    ]
+    .field [
+        .name image
+        .type string
+        .optional
+        .code 8
+    ]
+    .field [
+        .name occupation
+        .type string
+        .optional
+        .code 9
+    ]
+    .field [
+        .name public-name
+        .type string
+        .optional
+        .code 10
+    ]
+    .field [
+        .name qualifiers
+        .type string
+        .repeated
+        .code 11
+    ]
+    .field [
+        .name titles
+        .type string
+        .repeated
+        .code 12
+    ]
+    .field [
+        .name aliases
+        .type string
+        .repeated
+        .code 13
+    ]
+    .field [
+        .name sex
+        .type sex
+        .code 14
+    ]
+    .field [
+        .name birth-date
+        .type date
+        .optional
+        .code 15
+    ]
+    .field [
+        .name birth-place
+        .type string
+        .optional
+        .code 16
+    ]
+    .field [
+        .name baptism-date
+        .type date
+        .optional
+        .code 17
+    ]
+    .field [
+        .name baptism-place
+        .type string
+        .optional
+        .code 18
+    ]
+    .field [
+        .name death-type
+        .type death-type
+        .code 19
+    ]
+    .field [
+        .name death-date
+        .type date
+        .optional
+        .code 20
+    ]
+    .field [
+        .name death-place
+        .type string
+        .optional
+        .code 21
+    ]
+    .field [
+        .name burial-date
+        .type date
+        .optional
+        .code 22
+    ]
+    .field [
+        .name burial-place
+        .type string
+        .optional
+        .code 23
+    ]
+    .field [
+        .name families
+        .type family-link
+        .repeated
+        .code 24
+    ]
+]
+
+.record [
+    .name family
+    .field [
+        .name baseprefix
+        .type string
+        .code 1
+    ]
+    .field [
+        .name ifam
+        .type protobuf-int32
+        .code 2
+    ]
+    .field [
+        .name ifath
+        .type protobuf-int32
+        .code 3
+    ]
+    .field [
+        .name imoth
+        .type protobuf-int32
+        .code 4
+    ]
+    .field [
+        .name marriage-type
+        .type marriage-type
+        .code 5
+    ]
+    .field [
+        .name marriage-date
+        .type date
+        .optional
+        .code 6
+    ]
+    .field [
+        .name marriage-place
+        .type string
+        .optional
+        .code 7
+    ]
+    .field [
+        .name divorce-type
+        .type divorce-type
+        .code 8
+    ]
+    .field [
+        .name divorce-date
+        .type date
+        .optional
+        .code 9
+    ]
+    .field [
+        .name children
+        .type person-link
+        .repeated
+        .code 10
+    ]
+]
+
+.record [
+    .name link-tree
+    .field [
+        .name families
+        .type family
+        .repeated
+        .code 1
+    ]
+    .field [
+        .name persons
+        .type person
+        .repeated
+        .code 2
+    ]
+    .field [
+        .name connections
+        .type connection
+        .repeated
+        .code 3
+    ]
+]
+
+.record [
+    .name link-tree-params
+    .field [
+        .name basename
+        .type string
+        .code 1
+    ]
+    .field [
+        .name ip
+        .type protobuf-int32
+        .optional
+        .code 2
+    ]
+    .field [
+        .name ref-person
+        .type string
+        .optional
+        .code 3
+    ]
+    .field [
+        .name ref-person2
+        .type string
+        .optional
+        .code 4
+    ]
+    .field [
+        .name nb-asc
+        .type protobuf-int32
+        .code 5
+    ]
+    .field [
+        .name from-gen-desc
+        .type protobuf-int32
+        .code 6
+    ]
+    .field [
+        .name nb-desc
+        .type protobuf-int32
+        .code 7
+    ]
+]
+
+.enum [
+    .name calendar
+    .option [
+        .name gregorian
+        .code 0
+    ]
+    .option [
+        .name julian
+        .code 1
+    ]
+    .option [
+        .name french
+        .code 2
+    ]
+    .option [
+        .name hebrew
+        .code 3
+    ]
+]
+
+.enum [
+    .name precision
+    .option [
+        .name sure
+        .code 0
+    ]
+    .option [
+        .name about
+        .code 1
+    ]
+    .option [
+        .name maybe
+        .code 2
+    ]
+    .option [
+        .name before
+        .code 3
+    ]
+    .option [
+        .name after
+        .code 4
+    ]
+    .option [
+        .name oryear
+        .code 5
+    ]
+    .option [
+        .name yearint
+        .code 6
+    ]
+]
+
+.enum [
+    .name sex
+    .option [
+        .name male
+        .code 0
+    ]
+    .option [
+        .name female
+        .code 1
+    ]
+    .option [
+        .name unknown
+        .code 2
+    ]
+]
+
+.enum [
+    .name death-type
+    .option [
+        .name not-dead
+        .code 0
+    ]
+    .option [
+        .name dead
+        .code 1
+    ]
+    .option [
+        .name dead-young
+        .code 2
+    ]
+    .option [
+        .name dead-dont-know-when
+        .code 3
+    ]
+    .option [
+        .name dont-know-if-dead
+        .code 4
+    ]
+    .option [
+        .name of-course-dead
+        .code 5
+    ]
+]
+
+.enum [
+    .name title-type
+    .option [
+        .name title-main
+        .code 0
+    ]
+    .option [
+        .name title-name
+        .code 1
+    ]
+    .option [
+        .name title-none
+        .code 2
+    ]
+]
+
+.enum [
+    .name marriage-type
+    .option [
+        .name married
+        .code 0
+    ]
+    .option [
+        .name not-married
+        .code 1
+    ]
+    .option [
+        .name engaged
+        .code 2
+    ]
+    .option [
+        .name no-sexes-check-not-married
+        .code 3
+    ]
+    .option [
+        .name no-mention
+        .code 4
+    ]
+    .option [
+        .name no-sexes-check-married
+        .code 5
+    ]
+    .option [
+        .name marriage-bann
+        .code 6
+    ]
+    .option [
+        .name marriage-contract
+        .code 7
+    ]
+    .option [
+        .name marriage-license
+        .code 8
+    ]
+    .option [
+        .name pacs
+        .code 9
+    ]
+    .option [
+        .name residence
+        .code 10
+    ]
+]
+
+.enum [
+    .name divorce-type
+    .option [
+        .name not-divorced
+        .code 0
+    ]
+    .option [
+        .name divorced
+        .code 1
+    ]
+    .option [
+        .name separated
+        .code 2
+    ]
+]
