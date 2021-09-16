@@ -2,8 +2,6 @@
 
 module Mread = Api_saisie_read_piqi
 module Mext_read = Api_saisie_read_piqi_ext
-module MLink = Geneweb.Api_link_tree_piqi
-module MLinkext = Geneweb.Api_link_tree_piqi_ext
 
 open Geneweb
 open Config
@@ -298,10 +296,10 @@ let convert_wiki_notes_to_html_notes conf base env wiki_notes separator_string =
 let event_to_piqi_event pevt_name fevt_name =
   match pevt_name with
   | Some (Epers_Name _) -> `epers_custom
-  | Some pevt -> Piqi_util.piqi_pevent_name_of_pevent_name pevt
+  | Some pevt -> Api_piqi_util.piqi_pevent_name_of_pevent_name pevt
   | None -> match fevt_name with
     | Some (Efam_Name _) -> `efam_custom
-    | Some fevt -> Piqi_util.piqi_fevent_name_of_fevent_name fevt
+    | Some fevt -> Api_piqi_util.piqi_fevent_name_of_fevent_name fevt
     | None -> failwith "event_to_piqi_event"
 
 (* ************************************************************************** *)
@@ -343,7 +341,7 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
       | Neuter -> `unknown
     in
     let sosa =
-      if conf.bname <> Link.chop_base_prefix base_prefix then `no_sosa
+      if conf.bname <> chop_base_prefix base_prefix then `no_sosa
       else
         let sosa_nb = Perso.get_sosa_person p in
         if Sosa.eq sosa_nb Sosa.zero then `no_sosa
@@ -610,8 +608,7 @@ let pers_to_piqi_simple_person conf base p base_prefix =
       - Family : Retourne une famille dont tous les champs sont complétés.
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let fam_to_piqi_family_link conf base (ifath : Gwdb.iper) imoth sp ifam fam fam_link spouse_to_piqi_callback witness_to_piqi_callback child_to_piqi_callback family_link_constructor =
-  let base_prefix = fam_link.MLink.Family.baseprefix in
+let fam_to_piqi_family_link conf base (ifath : Gwdb.iper) imoth sp ifam fam base_prefix spouse_to_piqi_callback witness_to_piqi_callback child_to_piqi_callback family_link_constructor =
   let spouse = spouse_to_piqi_callback conf base sp base_prefix in
   let p_auth = true in
   let m_auth = true in
@@ -684,11 +681,8 @@ let fam_to_piqi_family_link conf base (ifath : Gwdb.iper) imoth sp ifam fam fam_
   in
   let children =
     List.map
-      (fun c_link ->
-        let base_prefix = c_link.MLink.Person.baseprefix in
-        let (p, _) = Perso_link.make_ep_link base c_link in
-        child_to_piqi_callback conf base p base_prefix)
-      (Perso_link.get_children_of_parents base_prefix ifam ifath imoth)
+      (fun (p, base_prefix) -> child_to_piqi_callback conf base p base_prefix)
+      (!GWPARAM_ITL.get_children_of_parents base base_prefix ifam ifath imoth)
   in
   family_link_constructor index spouse marriage_date marriage_date_long marriage_date_raw marriage_date_conv marriage_date_conv_long
     marriage_cal marriage_date_text marriage_place marriage_src marriage_type divorce_type divorce_date divorce_date_long divorce_date_raw divorce_date_conv
@@ -955,29 +949,12 @@ let get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witness
   in
   (* lien inter arbre *)
   let children_link =
-    let family_link =
-      Perso_link.get_families_of_parents
-        conf.command (get_iper p) (get_iper sp)
-    in
-    List.fold_right
-      (fun fam_link accu ->
-         List.fold_right
-           (fun c_link accu ->
-              let baseprefix = c_link.MLink.Person_link.baseprefix in
-              let ip_c = Gwdb.iper_of_string @@ Int32.to_string c_link.MLink.Person_link.ip in
-              match Perso_link.get_person_link baseprefix ip_c with
-              | Some c_link ->
-                  let can_merge =
-                    Perso_link.can_merge_child conf.command
-                       (get_children fam) c_link
-                  in
-                  if can_merge then accu
-                  else
-                    let (p, _) = Perso_link.make_ep_link base c_link in
-                    child_to_piqi_callback conf base p baseprefix :: accu
-              | None -> accu)
-           fam_link.MLink.Family.children accu)
-      family_link []
+    List.fold_right begin fun (_, _, children) acc ->
+      List.fold_right begin fun ((p, _), baseprefix, can_merge) acc ->
+        if can_merge then acc
+        else child_to_piqi_callback conf base p baseprefix :: acc
+      end children acc
+    end (!GWPARAM_ITL.get_children' conf base (get_iper p) fam (get_iper sp)) []
   in
   let children = children @ children_link in
     family_constructor index spouse marriage_date marriage_date_long marriage_date_raw marriage_date_conv marriage_date_conv_long
@@ -1009,48 +986,11 @@ let get_families_piqi base conf p base_prefix spouse_to_piqi_callback witnesses_
   in
   (* lien inter arbre *)
   let families_link =
-    let ip = get_iper p in
-    let families = Perso_link.get_family_link base_prefix ip in
-    List.fold_right
-      (fun fam_link accu ->
-         let (_, fam, _, _) =
-           Perso_link.make_efam_link conf base fam_link
-         in
-         let (ifath, imoth, ifam) =
-           (Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifath,
-            Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.imoth,
-            Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam)
-         in
-         let cpl =
-           let ip = get_iper p in
-           if ip <> ifath && ip <> imoth then
-             match
-               Perso_link.get_person_link_with_base
-                 conf.command ip fam_link.MLink.Family.baseprefix
-             with
-             | Some p ->
-                 let ip = Gwdb.iper_of_string @@ Int32.to_string p.MLink.Person.ip in
-                 (ifath, imoth, if ip = ifath then imoth else ifath)
-             | None -> (ifath, imoth, if ip = ifath then imoth else ifath)
-           else (ifath, imoth, if ip = ifath then imoth else ifath)
-         in
-         let can_merge =
-           let fam = Mutil.array_to_list_map (foi base) (get_family p) in
-           Perso_link.can_merge_family conf.command (get_iper p) fam fam_link cpl
-         in
-         if can_merge then accu
-         else
-           let (ifath, imoth, isp) = cpl in
-           match
-             (Perso_link.get_person_link fam_link.MLink.Family.baseprefix ifath,
-              Perso_link.get_person_link fam_link.MLink.Family.baseprefix imoth,
-              Perso_link.get_person_link fam_link.MLink.Family.baseprefix isp)
-           with
-           | (Some _, Some _, Some sp) ->
-               let (sp, _) = Perso_link.make_ep_link base sp in
-               fam_to_piqi_family_link conf base ifath imoth sp ifam fam fam_link spouse_to_piqi_callback witnesses_to_piqi_callback child_to_piqi_callback family_constructor :: accu
-           | _ -> accu)
-      families []
+    List.fold_right begin fun (ifam, fam, (ifath, imoth, isp), baseprefix, can_merge ) acc ->
+      if can_merge then acc
+      else
+        fam_to_piqi_family_link conf base ifath imoth isp ifam fam baseprefix spouse_to_piqi_callback witnesses_to_piqi_callback child_to_piqi_callback family_constructor :: acc
+    end (!GWPARAM_ITL.get_families conf base p) []
   in
     families @ families_link
 
@@ -1369,94 +1309,54 @@ let fill_parents conf base p base_prefix =
   | None ->
     (* lien inter arbre *)
     let ip = get_iper p in
-    match Perso_link.get_parents_link base_prefix ip with
-    | Some family ->
-        begin
-          let ifath = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.ifath in
-          let imoth = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.imoth in
-          let fam_base_prefix = family.MLink.Family.baseprefix in
-          match
-            (Perso_link.get_person_link fam_base_prefix ifath,
-             Perso_link.get_person_link fam_base_prefix imoth,
-             Perso_link.get_person_link base_prefix ip)
-          with
-          | (Some pfath, Some pmoth, Some _) ->
-              let (fath, _) = Perso_link.make_ep_link base pfath in
-              let (moth, _) = Perso_link.make_ep_link base pmoth in
-              let father =
-                Some (pers_to_piqi_simple_person conf base fath fam_base_prefix)
-              in
-              let mother =
-                Some (pers_to_piqi_simple_person conf base moth fam_base_prefix)
-              in
-              (father, mother)
-          | _ -> (None, None)
-        end
-    | None -> (None, None)
+    let aux fn =
+      match fn conf base base_prefix ip with
+      | Some ((p, _), base_prefix) -> Some (pers_to_piqi_simple_person conf base p base_prefix)
+      | None -> None
+    in
+    (aux !GWPARAM_ITL.get_father, aux !GWPARAM_ITL.get_mother)
 
 let fill_fiche_parents conf base p base_prefix nb_asc nb_asc_max with_parent_families pers_to_piqi_person simple_graph_info no_event =
   if nb_asc_max > nb_asc
   then
     match get_parents p with
     | Some ifam ->
-        let cpl = foi base ifam in
-        let ifath = get_father cpl in
-        let imoth = get_mother cpl in
-        let father =
-          if ifath = Gwdb.dummy_iper then None
+      let cpl = foi base ifam in
+      let ifath = get_father cpl in
+      let imoth = get_mother cpl in
+      let father =
+        if ifath = Gwdb.dummy_iper then None
+        else
+          let father = poi base ifath in
+          if with_parent_families then
+            Some (pers_to_piqi_person conf base father base_prefix false (nb_asc+1) nb_asc_max 0 2 true simple_graph_info no_event)
           else
-            let father = poi base ifath in
-            if with_parent_families then
-                Some (pers_to_piqi_person conf base father base_prefix false (nb_asc+1) nb_asc_max 0 2 true simple_graph_info no_event)
-            else
-                Some (pers_to_piqi_person conf base father base_prefix false (nb_asc+1) nb_asc_max 0 0 false simple_graph_info no_event)
-        in
-        let mother =
-          if imoth = Gwdb.dummy_iper then None
+            Some (pers_to_piqi_person conf base father base_prefix false (nb_asc+1) nb_asc_max 0 0 false simple_graph_info no_event)
+      in
+      let mother =
+        if imoth = Gwdb.dummy_iper then None
+        else
+          let mother = poi base imoth in
+          if with_parent_families then
+            Some (pers_to_piqi_person conf base mother base_prefix false (nb_asc+1) nb_asc_max 0 2 true simple_graph_info no_event)
           else
-            let mother = poi base imoth in
-            if with_parent_families then
-              Some (pers_to_piqi_person conf base mother base_prefix false (nb_asc+1) nb_asc_max 0 2 true simple_graph_info no_event)
-            else
-              Some (pers_to_piqi_person conf base mother base_prefix false (nb_asc+1) nb_asc_max 0 0 false simple_graph_info no_event)
-        in
-        (father, mother)
+            Some (pers_to_piqi_person conf base mother base_prefix false (nb_asc+1) nb_asc_max 0 0 false simple_graph_info no_event)
+      in
+      (father, mother)
     | None ->
-        (* lien inter arbre *)
-        let ip = get_iper p in
-        let base_prefix = conf.command in
-        match Perso_link.get_parents_link base_prefix ip with
-        | Some family ->
-            begin
-              let ifath = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.ifath in
-              let imoth = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.imoth in
-              let fam_base_prefix = family.MLink.Family.baseprefix in
-              match
-                (Perso_link.get_person_link fam_base_prefix ifath,
-                 Perso_link.get_person_link fam_base_prefix imoth,
-                 Perso_link.get_person_link base_prefix ip)
-              with
-              | (Some pfath, Some pmoth, Some _) ->
-                  let (fath, _) = Perso_link.make_ep_link base pfath in
-                  let (moth, _) = Perso_link.make_ep_link base pmoth in
-                  let father =
-                    if with_parent_families then
-                      Some (pers_to_piqi_person conf base fath fam_base_prefix false (nb_asc+1) nb_asc_max 0 1 true simple_graph_info no_event)
-                    else
-                      Some (pers_to_piqi_person conf base fath fam_base_prefix false (nb_asc+1) nb_asc_max 0 0 false simple_graph_info no_event)
-                  in
-                  let mother =
-                    if with_parent_families then
-                      Some (pers_to_piqi_person conf base moth fam_base_prefix false (nb_asc+1) nb_asc_max 0 1 true simple_graph_info no_event)
-                    else
-                      Some (pers_to_piqi_person conf base moth fam_base_prefix false (nb_asc+1) nb_asc_max 0 0 false simple_graph_info no_event)
-                  in
-                  (father, mother)
-              | _ -> (None, None)
-            end
-        | None -> (None, None)
-      else
-        (None, None)
+      (* lien inter arbre *)
+      let ip = get_iper p in
+      let aux fn =
+        match fn conf base base_prefix ip with
+        | Some ((p, _), baseprefix) ->
+          if with_parent_families
+          then Some (pers_to_piqi_person conf base p baseprefix false (nb_asc + 1) nb_asc_max 0 1 true simple_graph_info no_event)
+          else Some (pers_to_piqi_person conf base p baseprefix false (nb_asc + 1) nb_asc_max 0 0 false simple_graph_info no_event)
+        | None -> None
+      in
+      (aux !GWPARAM_ITL.get_father, aux !GWPARAM_ITL.get_mother)
+  else
+    (None, None)
 
 let has_relations conf base p p_auth is_main_person =
   if p_auth && conf.use_restrict && is_main_person  then
@@ -2015,7 +1915,7 @@ let print_person_tree conf base =
     in
   let p = poi base ip in
   (* cache lien inter arbre *)
-  let () = Perso_link.init_cache conf base ip 1 1 1 in
+  let () = !GWPARAM_ITL.init_cache conf base ip 1 1 1 in
   let pers_piqi = pers_to_piqi_person conf base p conf.command true in
   let data = Mext_read.gen_person pers_piqi in
   print_result conf data
@@ -2077,7 +1977,7 @@ let print_result_fiche_person conf base ip nb_asc_max nb_desc_max simple_graph_i
     let () = Perso.build_sosa_ht conf base in
     let p = poi base ip in
     (* cache lien inter arbre *)
-    let () = Perso_link.init_cache conf base ip 1 1 1 in
+    let () = !GWPARAM_ITL.init_cache conf base ip 1 1 1 in
     let pers_piqi = pers_to_piqi_fiche_person conf base p conf.command true 0 nb_asc_max 0 nb_desc_max true simple_graph_info no_event in
     let data = Mext_read.gen_person pers_piqi in
     print_result conf data
@@ -2259,99 +2159,82 @@ let build_graph_asc_v2 conf base p max_gen =
     match l with
     | [] -> ()
     | (p, gen) :: l ->
-        if gen >= max_gen then loop l
-        else
-          begin
-            match get_parents p with
-            | Some ifam ->
-                let factor =
-                  try Hashtbl.find ht (get_iper p) with Not_found -> 1
-                in
-                let cpl = foi base ifam in
-                let fath = poi base (get_father cpl) in
-                let moth = poi base (get_mother cpl) in
-                let fath_factor =
-                  try
-                    let i = Hashtbl.find ht (get_iper fath) + 1 in
-                    Hashtbl.replace ht (get_iper fath) i;
-                    i
-                  with Not_found -> Hashtbl.add ht (get_iper fath) 1; 1
-                in
-                let moth_factor =
-                  try
-                    let i = Hashtbl.find ht (get_iper moth) + 1 in
-                    Hashtbl.replace ht (get_iper moth) i;
-                    i
-                  with Not_found -> Hashtbl.add ht (get_iper moth) 1; 1
-                in
-                nodes := create_node fath gen Ancestor conf.command fath_factor :: !nodes;
-                nodes := create_node moth gen Ancestor conf.command moth_factor :: !nodes;
-                edges := create_edge factor conf.command p fath_factor conf.command fath :: !edges;
-                edges := create_edge factor conf.command p moth_factor conf.command moth :: !edges;
-                (*create_family ifam families;*)
-                loop ((fath, gen + 1) :: (moth, gen + 1) :: l)
-            | None ->
-                (* lien inter arbre *)
-                let ip = get_iper p in
-                let () =
-                  Perso_link.init_cache conf base ip (max_gen - gen) 0 0
-                in
-                let () =
-                  let ht = Hashtbl.create 42 in
-                  let rec loop_parents l =
-                    match l with
-                    | [] -> ()
-                    | (base_prefix, p, gen) :: l ->
-                        if gen >= max_gen then loop_parents l
-                        else
-                          let factor =
-                            try Hashtbl.find ht (base_prefix, get_iper p) with Not_found -> 1
-                          in
-                          let ip = get_iper p in
-                          match Perso_link.get_parents_link base_prefix ip with
-                          | Some family ->
-                              begin
-                                let ifath = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.ifath in
-                                let imoth = Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.imoth in
-                                let fam_base_prefix = family.MLink.Family.baseprefix in
-                                match
-                                  (Perso_link.get_person_link fam_base_prefix ifath,
-                                   Perso_link.get_person_link fam_base_prefix imoth,
-                                   Perso_link.get_person_link base_prefix ip)
-                                with
-                                | (Some pfath, Some pmoth, Some _) ->
-                                    let (fath, _) = Perso_link.make_ep_link base pfath in
-                                    let (moth, _) = Perso_link.make_ep_link base pmoth in
-                                    let fath_factor =
-                                      try
-                                        let i = Hashtbl.find ht (fam_base_prefix, get_iper fath) + 1 in
-                                        Hashtbl.replace ht (fam_base_prefix, get_iper fath) i;
-                                        i
-                                      with Not_found -> Hashtbl.add ht (fam_base_prefix, get_iper fath) 1; 1
-                                    in
-                                    let moth_factor =
-                                      try
-                                        let i = Hashtbl.find ht (fam_base_prefix, get_iper moth) + 1 in
-                                        Hashtbl.replace ht (fam_base_prefix, get_iper moth) i;
-                                        i
-                                      with Not_found -> Hashtbl.add ht (fam_base_prefix, get_iper moth) 1; 1
-                                    in
-                                    nodes := create_node fath gen Ancestor pfath.MLink.Person.baseprefix fath_factor :: !nodes;
-                                    nodes := create_node moth gen Ancestor pmoth.MLink.Person.baseprefix moth_factor :: !nodes;
-                                    edges := create_edge factor base_prefix p fath_factor pfath.MLink.Person.baseprefix fath :: !edges;
-                                    edges := create_edge factor base_prefix p moth_factor pmoth.MLink.Person.baseprefix moth :: !edges;
-                                    let l =
-                                      ((fam_base_prefix, fath, gen + 1) :: (fam_base_prefix, moth, gen + 1) :: l)
-                                    in
-                                    loop_parents l
-                                | _ -> loop_parents l
-                              end
-                          | None -> loop_parents l
-                  in
-                  loop_parents [(conf.command, p, gen)]
-                in
-                loop l
-          end
+      if gen >= max_gen then loop l
+      else
+        begin
+          match get_parents p with
+          | Some ifam ->
+            let factor =
+              try Hashtbl.find ht (get_iper p) with Not_found -> 1
+            in
+            let cpl = foi base ifam in
+            let fath = poi base (get_father cpl) in
+            let moth = poi base (get_mother cpl) in
+            let fath_factor =
+              try
+                let i = Hashtbl.find ht (get_iper fath) + 1 in
+                Hashtbl.replace ht (get_iper fath) i;
+                i
+              with Not_found -> Hashtbl.add ht (get_iper fath) 1; 1
+            in
+            let moth_factor =
+              try
+                let i = Hashtbl.find ht (get_iper moth) + 1 in
+                Hashtbl.replace ht (get_iper moth) i;
+                i
+              with Not_found -> Hashtbl.add ht (get_iper moth) 1; 1
+            in
+            nodes := create_node fath gen Ancestor conf.command fath_factor :: !nodes;
+            nodes := create_node moth gen Ancestor conf.command moth_factor :: !nodes;
+            edges := create_edge factor conf.command p fath_factor conf.command fath :: !edges;
+            edges := create_edge factor conf.command p moth_factor conf.command moth :: !edges;
+            (*create_family ifam families;*)
+            loop ((fath, gen + 1) :: (moth, gen + 1) :: l)
+          | None ->
+            (* lien inter arbre *)
+            let ip = get_iper p in
+            let () = !GWPARAM_ITL.init_cache conf base ip (max_gen - gen) 0 0 in
+            let () =
+              let ht = Hashtbl.create 0 in
+              let rec loop_parents l =
+                match l with
+                | [] -> ()
+                | (base_prefix, p, gen) :: l ->
+                  if gen >= max_gen then loop_parents l
+                  else
+                    let factor =
+                      try Hashtbl.find ht (base_prefix, get_iper p) with Not_found -> 1
+                    in
+                    let ip = get_iper p in
+                    match !GWPARAM_ITL.get_father conf base base_prefix ip
+                        , !GWPARAM_ITL.get_mother conf base base_prefix ip with
+                    | (Some ((fath, _), bpf), Some ((moth, _), bpm)) ->
+                      let fath_factor =
+                        try
+                          let i = Hashtbl.find ht (bpf, get_iper fath) + 1 in
+                          Hashtbl.replace ht (bpf, get_iper fath) i ;
+                          i
+                        with Not_found -> Hashtbl.add ht (bpf, get_iper fath) 1 ; 1
+                      in
+                      let moth_factor =
+                        try
+                          let i = Hashtbl.find ht (bpm, get_iper moth) + 1 in
+                          Hashtbl.replace ht (bpm, get_iper moth) i ;
+                          i
+                        with Not_found -> Hashtbl.add ht (bpm, get_iper moth) 1; 1
+                      in
+                      nodes := create_node fath gen Ancestor bpf fath_factor :: !nodes;
+                      nodes := create_node moth gen Ancestor bpm moth_factor :: !nodes;
+                      edges := create_edge factor base_prefix p fath_factor bpf fath :: !edges;
+                      edges := create_edge factor base_prefix p moth_factor bpm moth :: !edges;
+                      let l = (bpf, fath, gen + 1) :: (bpm, moth, gen + 1) :: l in
+                      loop_parents l
+                    | _ -> loop_parents l
+              in
+              loop_parents [ (conf.command, p, gen) ]
+            in
+            loop l
+        end
   in
   nodes := create_node p 1 Root conf.command 1 :: !nodes;
   loop [(p, 1)];
@@ -2417,7 +2300,7 @@ let build_graph_desc_v2 conf base p max_gen =
             let ifam = get_family p in
             let l =
               Array.fold_left
-                (fun accu ifam  ->
+                (fun acc ifam  ->
                   let fam = foi base ifam in
                   let sp = poi base (Gutil.spouse (get_iper p) fam) in
                   let sp_factor =
@@ -2434,117 +2317,75 @@ let build_graph_desc_v2 conf base p max_gen =
                   edges := create_edge factor conf.command p sp_factor conf.command sp :: !edges;
                   if gen <> max_gen then
                     begin
-                      List.iter
-                        (fun c ->
-                          let c_factor =
-                            try
-                              let i = Hashtbl.find ht (get_iper c) + 1 in
-                              Hashtbl.replace ht (get_iper c) i;
-                              i
-                            with Not_found -> Hashtbl.add ht (get_iper c) 1; 1
-                          in
-                          nodes := create_node c ifam gen Children conf.command c_factor :: !nodes;
-                          edges := create_edge factor conf.command p c_factor conf.command c :: !edges;
-                          edges := create_edge sp_factor conf.command sp c_factor conf.command c :: !edges)
-                        children;
+                      List.iter begin fun c ->
+                        let c_factor =
+                          try
+                            let i = Hashtbl.find ht (get_iper c) + 1 in
+                            Hashtbl.replace ht (get_iper c) i;
+                            i
+                          with Not_found -> Hashtbl.add ht (get_iper c) 1; 1
+                        in
+                        nodes := create_node c ifam gen Children conf.command c_factor :: !nodes;
+                        edges := create_edge factor conf.command p c_factor conf.command c :: !edges;
+                        edges := create_edge sp_factor conf.command sp c_factor conf.command c :: !edges
+                      end children;
                       (*create_family ifam families;*)
                       let child_local =
-                        List.fold_left
-                          (fun accu c -> (c, gen + 1) :: accu)
-                          accu children
+                        List.fold_left (fun acc c -> (c, gen + 1) :: acc) acc children
                       in
-
                       (* lien inter arbre *)
+                      let () = !GWPARAM_ITL.init_cache conf base (get_iper p) 1 1 (max_gen - gen) in
                       let () =
-                        Perso_link.init_cache conf base (get_iper p) 1 1 (max_gen - gen)
-                      in
-                      let () =
-                        let ht = Hashtbl.create 42 in
+                        let ht = Hashtbl.create 0 in
                         let rec loop_child fam_link =
                           match fam_link with
                           | [] -> ()
                           | (base_prefix, p, gen) :: l ->
                               if gen >= max_gen then loop_child l
-                              else
-                                begin
-                                  let factor =
-                                    try Hashtbl.find ht (base_prefix, get_iper p) with Not_found -> 1
-                                  in
-                                  let family_link =
-                                    Perso_link.get_families_of_parents
-                                      base_prefix (get_iper p) (get_iper sp)
-                                  in
-                                  let children_link =
-                                    List.fold_left
-                                      (fun accu fam_link ->
-                                        let (ifath, imoth, ifam) =
-                                          (Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifath,
-                                           Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.imoth,
-                                           Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam)
-                                        in
-                                        let cpl =
-                                          let ip = get_iper p in
-                                          if ip <> ifath && ip <> imoth then
-                                          match
-                                            Perso_link.get_person_link_with_base
-                                              conf.command ip fam_link.MLink.Family.baseprefix
-                                          with
-                                          | Some p ->
-                                              let ip = Gwdb.iper_of_string @@ Int32.to_string p.MLink.Person.ip in
-                                              (ifath, imoth, if ip = ifath then imoth else ifath)
-                                          | None -> (ifath, imoth, if ip = ifath then imoth else ifath)
-                                          else (ifath, imoth, if ip = ifath then imoth else ifath)
-                                        in
-                                        let (_, _, isp) = cpl in
-                                        let sp_factor =
+                              else begin
+                                let factor =
+                                  try Hashtbl.find ht (base_prefix, get_iper p) with Not_found -> 1
+                                in
+                                let l =
+                                  List.fold_left begin fun acc (fam_bp, (_, _, isp), children) ->
+                                    let sp_factor =
+                                      try
+                                        let i = Hashtbl.find ht (fam_bp, isp) + 1 in
+                                        Hashtbl.replace ht (fam_bp, isp) i ;
+                                        i
+                                      with Not_found -> Hashtbl.add ht (fam_bp, isp) 1 ; 1
+                                    in
+                                    List.fold_left begin fun acc ((c, _), baseprefix, can_merge) ->
+                                      if can_merge then acc
+                                      else
+                                        let c_factor =
                                           try
-                                            let i = Hashtbl.find ht (fam_link.MLink.Family.baseprefix, isp) + 1 in
-                                            Hashtbl.replace ht (fam_link.MLink.Family.baseprefix, isp) i;
+                                            let i = Hashtbl.find ht (baseprefix, get_iper c) + 1 in
+                                            Hashtbl.replace ht (baseprefix, get_iper c) i;
                                             i
-                                          with Not_found -> Hashtbl.add ht (fam_link.MLink.Family.baseprefix, isp) 1; 1
+                                          with Not_found -> Hashtbl.add ht (baseprefix, get_iper c) 1; 1
                                         in
-                                        List.fold_left
-                                          (fun accu c_link ->
-                                            let baseprefix = c_link.MLink.Person_link.baseprefix in
-                                            let ip_c = Gwdb.iper_of_string @@ Int32.to_string c_link.MLink.Person_link.ip in
-                                            match Perso_link.get_person_link baseprefix ip_c with
-                                            | Some c_link ->
-                                                let can_merge =
-                                                  Perso_link.can_merge_child base_prefix
-                                                    (get_children fam) c_link
-                                                in
-                                                if can_merge then accu
-                                                else
-                                                  let (c, _) = Perso_link.make_ep_link base c_link in
-                                                  let c_factor =
-                                                    try
-                                                      let i = Hashtbl.find ht (baseprefix, get_iper c) + 1 in
-                                                      Hashtbl.replace ht (baseprefix, get_iper c) i;
-                                                      i
-                                                    with Not_found -> Hashtbl.add ht (baseprefix, get_iper c) 1; 1
-                                                  in
-                                                  nodes := create_node c ifam gen Children baseprefix c_factor :: !nodes;
-                                                  edges := create_edge factor base_prefix p c_factor baseprefix c :: !edges;
-                                                  edges := create_edge sp_factor baseprefix sp c_factor baseprefix c :: !edges;
-                                                  (baseprefix, c, gen + 1) :: accu
-                                            | None -> accu)
-                                          accu fam_link.MLink.Family.children)
-                                      l family_link
-                                  in
-                                  loop_child children_link;
-                                end
+                                        nodes := create_node c ifam gen Children baseprefix c_factor :: !nodes;
+                                        edges := create_edge factor base_prefix p c_factor baseprefix c :: !edges;
+                                        edges := create_edge sp_factor baseprefix sp c_factor baseprefix c :: !edges;
+                                        (baseprefix, c, gen + 1) :: acc
+                                    end acc children
+                                  end l (!GWPARAM_ITL.get_children' conf base (get_iper p) fam (get_iper sp))
+                                in
+                                loop_child l
+                              end
                         in
                         loop_child [(conf.command, p, gen)]
                       in
                       child_local
                     end
-                  else accu)
+                  else acc)
                 l ifam
             in
 
             (* lien inter arbre *)
             let () =
-              Perso_link.init_cache conf base (get_iper p) 1 1 (max_gen - gen)
+              !GWPARAM_ITL.init_cache conf base (get_iper p) 1 1 (max_gen - gen)
             in
             let () =
               let ht = Hashtbl.create 42 in
@@ -2552,88 +2393,38 @@ let build_graph_desc_v2 conf base p max_gen =
                 match l with
                 | [] -> ()
                 | (base_prefix, p, gen) :: l ->
-                    if gen >= max_gen then loop_desc l
-                    else
-                      begin
-                        let ip = get_iper p in
-                        let families = Perso_link.get_family_link base_prefix ip in
-                        let l =
-                          List.fold_left
-                            (fun accu fam_link ->
-                               let (ifath, imoth, _) =
-                                 (Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifath,
-                                  Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.imoth,
-                                  Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam)
-                               in
-                               let cpl =
-                                 let ip = get_iper p in
-                                 if ip <> ifath && ip <> imoth then
-                                   match
-                                     Perso_link.get_person_link_with_base
-                                       conf.command ip fam_link.MLink.Family.baseprefix
-                                   with
-                                   | Some p ->
-                                       let ip = Gwdb.iper_of_string @@ Int32.to_string p.MLink.Person.ip in
-                                       (ifath, imoth, if ip = ifath then imoth else ifath)
-                                   | None -> (ifath, imoth, if ip = ifath then imoth else ifath)
-                                 else (ifath, imoth, if ip = ifath then imoth else ifath)
-                               in
-                               let can_merge =
-                                 let fam = Mutil.array_to_list_map (foi base) (get_family p) in
-                                 Perso_link.can_merge_family conf.command (get_iper p) fam fam_link cpl
-                               in
-                               if can_merge then accu
-                               else
-                                 let (_, _, isp) = cpl in
-                                 match Perso_link.get_person_link fam_link.MLink.Family.baseprefix isp with
-                                 | Some sp ->
-                                     let (sp, _) = Perso_link.make_ep_link base sp in
-                                     let baseprefix = fam_link.MLink.Family.baseprefix in
-                                     let ifam = Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam in
-                                     let sp_factor =
-                                       try
-                                         let i = Hashtbl.find ht (baseprefix, get_iper sp) + 1 in
-                                         Hashtbl.replace ht (baseprefix, get_iper sp) i;
-                                         i
-                                       with Not_found -> Hashtbl.add ht (baseprefix, get_iper sp) 1; 1
-                                     in
-                                     nodes := create_node sp ifam gen Spouse baseprefix sp_factor :: !nodes;
-                                     edges := create_edge factor base_prefix p sp_factor baseprefix sp :: !edges;
-                                     if gen <> max_gen then
-                                       begin
-                                         let family_link =
-                                           Perso_link.get_families_of_parents baseprefix ifath imoth
-                                         in
-                                         List.fold_left
-                                           (fun accu fam_link ->
-                                              List.fold_left
-                                                (fun accu c_link ->
-                                                   let baseprefix = c_link.MLink.Person_link.baseprefix in
-                                                   let ip_c = Gwdb.iper_of_string @@ Int32.to_string c_link.MLink.Person_link.ip in
-                                                   match Perso_link.get_person_link baseprefix ip_c with
-                                                   | Some c_link ->
-                                                     let (c, _) = Perso_link.make_ep_link base c_link in
-                                                     let c_factor =
-                                                       try
-                                                         let i = Hashtbl.find ht (baseprefix, get_iper c) + 1 in
-                                                         Hashtbl.replace ht (baseprefix, get_iper c) i;
-                                                         i
-                                                       with Not_found -> Hashtbl.add ht (baseprefix, get_iper c) 1; 1
-                                                     in
-                                                     nodes := create_node c ifam gen Children baseprefix c_factor :: !nodes;
-                                                     edges := create_edge factor base_prefix p c_factor baseprefix c :: !edges;
-                                                     edges := create_edge sp_factor baseprefix sp c_factor baseprefix c :: !edges;
-                                                     (baseprefix, c, gen + 1) :: accu
-                                                   | None -> accu)
-                                                accu fam_link.MLink.Family.children)
-                                           accu family_link
-                                       end
-                                     else accu
-                                 | None -> accu)
-                            l families
-                        in
-                        loop_desc l
-                      end
+                  if gen >= max_gen then loop_desc l
+                  else
+                    let l =
+                      List.fold_left begin fun acc (ifam, fam, (ifath, imoth, sp), baseprefix, can_merge) ->
+                        if can_merge then acc
+                        else
+                          let sp_factor =
+                            try
+                              let i = Hashtbl.find ht (baseprefix, get_iper sp) + 1 in
+                              Hashtbl.replace ht (baseprefix, get_iper sp) i;
+                              i
+                            with Not_found -> Hashtbl.add ht (baseprefix, get_iper sp) 1; 1
+                          in
+                          nodes := create_node sp ifam gen Spouse baseprefix sp_factor :: !nodes;
+                          edges := create_edge factor base_prefix p sp_factor baseprefix sp :: !edges;
+                          List.fold_left begin fun acc (_baseprefix, _cpl, children) ->
+                            List.fold_left begin fun acc ((c, _), _, _) ->
+                              let c_factor =
+                                try
+                                  let i = Hashtbl.find ht (baseprefix, get_iper c) + 1 in
+                                  Hashtbl.replace ht (baseprefix, get_iper c) i;
+                                  i
+                                with Not_found -> Hashtbl.add ht (baseprefix, get_iper c) 1; 1
+                              in
+                              nodes := create_node c ifam gen Children baseprefix c_factor :: !nodes;
+                              edges := create_edge factor base_prefix p c_factor baseprefix c :: !edges;
+                              edges := create_edge sp_factor baseprefix sp c_factor baseprefix c :: !edges;
+                              (baseprefix, c, gen + 1) :: acc
+                            end acc children
+                          end acc (!GWPARAM_ITL.get_children' conf base (get_iper p) fam (get_iper sp))
+                      end l (!GWPARAM_ITL.get_families conf base p)
+                    in loop_desc l
               in
               loop_desc [(conf.command, p, gen)]
             in
@@ -2675,7 +2466,7 @@ let print_result_graph_tree_v2 conf base ip =
     | None -> max_asc
   in
   (* cache lien inter arbre *)
-  let () = Perso_link.init_cache conf base ip 1 1 1 in
+  let () = !GWPARAM_ITL.init_cache conf base ip 1 1 1 in
   let (nodes_asc, edges_asc) = build_graph_asc_v2 conf base p nb_asc in
   (*
   let nodes_asc =
@@ -2703,8 +2494,8 @@ let print_result_graph_tree_v2 conf base ip =
     | Some ifam ->
         let fam = foi base ifam in
         Array.fold_right
-          (fun ic accu ->
-            if ic = ip then accu
+          (fun ic acc ->
+            if ic = ip then acc
             else
               let c = poi base ic in
               (* Pour les liens inter arbres, on rend l'id unique avec *)
@@ -2718,7 +2509,7 @@ let print_result_graph_tree_v2 conf base ip =
                 ; ifam = None
                 }
               in
-              node :: accu)
+              node :: acc)
           (get_children fam) []
     | None -> []
   in

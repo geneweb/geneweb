@@ -30,9 +30,11 @@
   (libraries geneweb geneweb.gwd_lib geneweb.util)
   (modules
     api
+    api_def
     api_graph
     api_marshal_dico_place
     api_piqi
+    api_piqi_util
     api_piqi_ext
     api_saisie_autocomplete
     api_saisie_read

@@ -1,9 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-#ifdef API
-module MLink = Api_link_tree_piqi
-#endif
-
 open Config
 open Def
 open Gwdb
@@ -679,11 +675,8 @@ let get_cremation_text conf p p_auth =
 let max_ancestor_level conf base ip max_lev =
   let x = ref 0 in
   let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
-#ifdef API
-  (* Charge le cache des LIA. *)
-  (* On limite à 10 le nombre de générations ascendantes à charger pour les LIA. *)
-  let () = Perso_link.init_cache conf base ip 10 0 0 in
-#endif
+  (* Loading ITL cache, up to 10 generations. *)
+  let () = !GWPARAM_ITL.init_cache conf base ip 10 0 0 in
   let rec loop level ip =
     (* Ne traite pas l'index s'il a déjà été traité. *)
     (* Pose surement probleme pour des implexes. *)
@@ -698,29 +691,7 @@ let max_ancestor_level conf base ip max_lev =
               loop (succ level) (get_father cpl);
               loop (succ level) (get_mother cpl)
           | _ ->
-#ifdef API
-              (* lia *)
-              let rec loop_lia level (ip, base_prefix) =
-                x := max !x level;
-                if !x = max_lev then ()
-                else
-                  match Perso_link.get_parents_link base_prefix ip with
-                    Some family ->
-                      let (ifath, imoth, base_prefix) =
-                        Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.ifath,
-                        Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.imoth,
-                        family.MLink.Family.baseprefix
-                      in
-                      if Perso_link.get_person_link base_prefix ifath <> None
-                      then loop_lia (succ level) (ifath, base_prefix) ;
-                      if Perso_link.get_person_link base_prefix imoth <> None
-                      then loop_lia (succ level) (imoth, base_prefix)
-                  | None -> ()
-              in
-              loop_lia level (ip, conf.bname)
-#else
- ()
-#endif
+            x := max !x (!GWPARAM_ITL.max_ancestor_level conf base ip conf.bname max_lev level)
       end
   in
   loop 0 ip; !x
@@ -997,115 +968,45 @@ let rec enrich_tree lst =
     p: person *)
 let tree_generation_list conf base gv p =
   let next_gen pol =
-    List.fold_right
-      (fun po list ->
-         match po with
-           Empty -> Empty :: list
-         | Cell (p, _, _, _, _, base_prefix) ->
-             match get_parents p with
-               Some ifam ->
-                 let cpl = foi base ifam in
-                 let fath =
-                   let p = pget conf base (get_father cpl) in
-                   if not @@ is_empty_name p then Some p else None
-                 in
-                 let moth =
-                   let p = pget conf base (get_mother cpl) in
-                   if not @@ is_empty_name p then Some p else None
-                 in
-                 let fo = Some ifam in
-                 let base_prefix = conf.bname in
-                 begin match fath, moth with
-                   Some f, Some m ->
-                     Cell (f, fo, Left, true, 1, base_prefix) ::
-                     Cell (m, fo, Right, true, 1, base_prefix) :: list
-                 | Some f, None ->
-                     Cell (f, fo, Alone, true, 1, base_prefix) :: list
-                 | None, Some m ->
-                     Cell (m, fo, Alone, true, 1, base_prefix) :: list
-                 | None, None -> Empty :: list
-                 end
-             | _ ->
-#ifdef API
-                 match
-                   Perso_link.get_parents_link base_prefix (get_iper p)
-                 with
-                   Some family ->
-                     let (ifath, imoth, ifam) =
-                       Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.ifath,
-                       Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.imoth,
-                       Gwdb.ifam_of_string @@ Int32.to_string family.MLink.Family.ifam
-                     in
-                     begin match
-                       Perso_link.get_person_link
-                         family.MLink.Family.baseprefix ifath,
-                       Perso_link.get_person_link
-                         family.MLink.Family.baseprefix imoth
-                     with
-                       Some fath, Some moth ->
-                         let (fath, _) =
-                           Perso_link.make_ep_link base fath
-                         in
-                         let fath =
-                           if not @@ is_empty_name fath then Some fath else None
-                         in
-                         let (moth, _) =
-                           Perso_link.make_ep_link base moth
-                         in
-                         let moth =
-                           if not @@ is_empty_name moth then Some moth else None
-                         in
-                         let fo = Some ifam in
-                         let base_prefix = family.MLink.Family.baseprefix in
-                         begin match fath, moth with
-                           Some f, Some m ->
-                             Cell (f, fo, Left, true, 1, base_prefix) ::
-                             Cell (m, fo, Right, true, 1, base_prefix) :: list
-                         | Some f, None ->
-                             Cell (f, fo, Alone, true, 1, base_prefix) :: list
-                         | None, Some m ->
-                             Cell (m, fo, Alone, true, 1, base_prefix) :: list
-                         | None, None -> Empty :: list
-                         end
-                     | Some fath, None ->
-                         let (fath, _) =
-                           Perso_link.make_ep_link base fath
-                         in
-                         let fath =
-                           if not @@ is_empty_name fath then Some fath else None
-                         in
-                         let fo = Some ifam in
-                         let base_prefix = family.MLink.Family.baseprefix in
-                         begin match fath with
-                           Some f ->
-                             Cell (f, fo, Alone, true, 1, base_prefix) :: list
-                         | None -> Empty :: list
-                         end
-                     | None, Some moth ->
-                         let (moth, _) =
-                           Perso_link.make_ep_link base moth
-                         in
-                         let moth =
-                           if not @@ is_empty_name moth then Some moth else None
-                         in
-                         let fo = Some ifam in
-                         let base_prefix = family.MLink.Family.baseprefix in
-                         begin match moth with
-                           Some f ->
-                             Cell (f, fo, Alone, true, 1, base_prefix) :: list
-                         | None -> Empty :: list
-                         end
-                     | None, None -> Empty :: list
-                     end
-                 | None -> Empty :: list
-#else
-               Empty :: list
-#endif
-)
-      pol []
-#ifndef API
-[@@ocaml.warning "-27"]
-#endif
+    List.fold_right begin fun po list ->
+      match po with
+        Empty -> Empty :: list
+      | Cell (p, _, _, _, _, base_prefix) ->
+        match get_parents p with
+          Some ifam ->
+          let cpl = foi base ifam in
+          let fath =
+            let p = pget conf base (get_father cpl) in
+            if not @@ is_empty_name p then Some p else None
+          in
+          let moth =
+            let p = pget conf base (get_mother cpl) in
+            if not @@ is_empty_name p then Some p else None
+          in
+          let fo = Some ifam in
+          let base_prefix = conf.bname in
+          begin match fath, moth with
+              Some f, Some m ->
+              Cell (f, fo, Left, true, 1, base_prefix) ::
+              Cell (m, fo, Right, true, 1, base_prefix) :: list
+            | Some f, None ->
+              Cell (f, fo, Alone, true, 1, base_prefix) :: list
+            | None, Some m ->
+              Cell (m, fo, Alone, true, 1, base_prefix) :: list
+            | None, None -> Empty :: list
+          end
+        | _ ->
+          match !GWPARAM_ITL.tree_generation_list conf base base_prefix p with
+          | Some (fath, if1, base_prefix1), Some (moth, if2, base_prefix2) ->
+            Cell (fath, Some if1, Left, true, 1, base_prefix1)
+            :: Cell (moth, Some if2, Right, true, 1, base_prefix2)
+            :: list
+          | Some (fath, ifam, base_prefix), None ->
+            Cell (fath, Some ifam, Alone, true, 1, base_prefix) :: list
+          | None, Some (moth, ifam, base_prefix) ->
+            Cell (moth, Some ifam, Alone, true, 1, base_prefix) :: list
+          | None, None -> Empty :: list
+    end pol []
   in
   let gen =
     let rec loop i gen list =
@@ -2469,18 +2370,13 @@ and eval_compound_var conf base env (a, _ as ep) loc =
           let ep = make_ep conf base (get_father cpl) in
           eval_person_field_var conf base env ep loc sl
       | None ->
-#ifdef API
-          match Perso_link.get_father_link conf.command (get_iper a) with
-            Some fath ->
-              let ep = Perso_link.make_ep_link base fath in
-              let conf = {conf with command = fath.MLink.Person.baseprefix} in
-              let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
-          | None ->
-              warning_use_has_parents_before_parent loc "father" (str_val "")
-#else
-           warning_use_has_parents_before_parent loc "father" (str_val "")
-#endif
+        match !GWPARAM_ITL.get_father conf base conf.command (get_iper a) with
+        | Some (ep, base_prefix) ->
+          let conf = {conf with command = base_prefix} in
+          let env = ("p_link", Vbool true) :: env in
+          eval_person_field_var conf base env ep loc sl
+        | None ->
+          warning_use_has_parents_before_parent loc "father" (str_val "")
       end
   | "item" :: sl ->
       begin match get_env "item" env with
@@ -2494,18 +2390,13 @@ and eval_compound_var conf base env (a, _ as ep) loc =
           let ep = make_ep conf base (get_mother cpl) in
           eval_person_field_var conf base env ep loc sl
       | None ->
-#ifdef API
-          match Perso_link.get_mother_link conf.command (get_iper a) with
-            Some moth ->
-              let ep = Perso_link.make_ep_link base moth in
-              let conf = {conf with command = moth.MLink.Person.baseprefix} in
-              let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
-          | None ->
-              warning_use_has_parents_before_parent loc "mother" (str_val "")
-#else
+        match !GWPARAM_ITL.get_mother conf base conf.command (get_iper a) with
+        | Some (ep, base_prefix) ->
+          let conf = {conf with command = base_prefix} in
+          let env = ("p_link", Vbool true) :: env in
+          eval_person_field_var conf base env ep loc sl
+        | None ->
           warning_use_has_parents_before_parent loc "mother" (str_val "")
-#endif
       end
   | "next_item" :: sl ->
       begin match get_env "item" env with
@@ -2680,7 +2571,6 @@ and eval_compound_var conf base env (a, _ as ep) loc =
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
       | _ ->
-#ifdef API
           match get_env "fam_link" env with
             Vfam (_, _, (_, _, ip), _) ->
               let baseprefix =
@@ -2688,20 +2578,14 @@ and eval_compound_var conf base env (a, _ as ep) loc =
                   Vstring baseprefix -> baseprefix
                 | _ -> conf.command
               in
-              begin match Perso_link.get_person_link baseprefix ip with
-                Some spouse ->
-                  let ep = Perso_link.make_ep_link base spouse in
-                  let conf =
-                    {conf with command = spouse.MLink.Person.baseprefix}
-                  in
+              begin match !GWPARAM_ITL.get_person conf base baseprefix ip with
+                | Some (ep, baseprefix) ->
+                  let conf = { conf with command = baseprefix } in
                   let env = ("p_link", Vbool true) :: env in
                   eval_person_field_var conf base env ep loc sl
-              | None -> raise Not_found
+                | None -> raise Not_found
               end
           | _ -> raise Not_found
-#else
-        raise Not_found
-#endif
       end
   | "witness" :: sl ->
       begin match get_env "witness" env with
@@ -2750,50 +2634,13 @@ and eval_cell_field_var conf base env cell loc =
           if conf.bname = base_prefix then
             let (f, c, a) = make_efam conf base (get_iper p) ifam in
             eval_family_field_var conf base env (ifam, f, c, a) loc sl
-          else
-#ifdef API
+          else begin
             let conf = {conf with command = base_prefix} in
-            let (f, c, a) =
-              let rec loop l =
-                match l with
-                  [] -> failwith "lia"
-                | fam_link :: l ->
-                    let fam_link_ifam = Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam in
-                    if fam_link_ifam = ifam then
-                      let (_, fam, _, _) =
-                        Perso_link.make_efam_link conf base fam_link
-                      in
-                      let ifath = Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifath in
-                      let imoth = Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.imoth in
-                      let cpl =
-                        let ip = get_iper p in
-                        if ip <> ifath && ip <> imoth then
-                          match
-                            Perso_link.get_person_link_with_base conf.command
-                              ip base_prefix
-                          with
-                            Some p ->
-                              let ip = Gwdb.iper_of_string @@ Int32.to_string p.MLink.Person.ip in
-                              ifath, imoth,
-                              (if ip = ifath then imoth else ifath)
-                          | None ->
-                              ifath, imoth,
-                              (if ip = ifath then imoth else ifath)
-                        else
-                          ifath, imoth, (if ip = ifath then imoth else ifath)
-                      in
-                      fam, cpl, true
-                    else loop l
-              in
-              let faml =
-                Perso_link.get_family_link conf.command (get_iper p)
-              in
-              loop faml
-            in
-            eval_family_field_var conf base env (ifam, f, c, a) loc sl
-#else
-            VVstring ""
-#endif
+            match !GWPARAM_ITL.get_family conf base base_prefix p ifam with
+            | Some (f, c, a) ->
+              eval_family_field_var conf base env (ifam, f, c, a) loc sl
+            | None -> assert false
+          end
       | _ -> VVstring ""
       end
   | ["is_center"] ->
@@ -3039,19 +2886,14 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
           let cpl = foi base ifam in
           let ep = make_ep conf base (get_father cpl) in
           eval_person_field_var conf base env ep loc sl
-      | None ->
-#ifdef API
-          match Perso_link.get_father_link conf.command (get_iper p) with
-            Some fath ->
-              let ep = Perso_link.make_ep_link base fath in
-              let conf = {conf with command = fath.MLink.Person.baseprefix} in
-              let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
+        | None ->
+          match !GWPARAM_ITL.get_father conf base conf.command (get_iper p) with
+          | Some (ep, baseprefix) ->
+            let conf = {conf with command = baseprefix} in
+            let env = ("p_link", Vbool true) :: env in
+            eval_person_field_var conf base env ep loc sl
           | None ->
-              warning_use_has_parents_before_parent loc "father" (str_val "")
-#else
-          warning_use_has_parents_before_parent loc "father" (str_val "")
-#endif
+            warning_use_has_parents_before_parent loc "father" (str_val "")
       end
   | ["has_linked_page"; s] ->
       begin match get_env "nldb" env with
@@ -3100,23 +2942,15 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
             Vsosa r -> VVbool (get_sosa conf base env r p <> None)
           | _ -> VVbool false
       end
-#ifdef API
   | ["init_cache"; nb_asc; from_gen_desc; nb_desc] ->
       begin try
         let nb_asc = int_of_string nb_asc in
         let from_gen_desc = int_of_string from_gen_desc in
         let nb_desc = int_of_string nb_desc in
-        let () =
-          Perso_link.init_cache conf base (get_iper p) nb_asc
-            from_gen_desc nb_desc
-        in
+        let () =  !GWPARAM_ITL.init_cache conf base (get_iper p) nb_asc from_gen_desc nb_desc in
         VVstring ""
       with _ -> raise Not_found
       end
-#else
-  | "init_cache" :: _ ->
-      VVstring ""
-#endif
   | ["linked_page"; s] ->
       begin match get_env "nldb" env with
         Vnldb db ->
@@ -3145,18 +2979,13 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
           let ep = make_ep conf base (get_mother cpl) in
           eval_person_field_var conf base env ep loc sl
       | None ->
-#ifdef API
-          match Perso_link.get_mother_link conf.command (get_iper p) with
-            Some moth ->
-              let ep = Perso_link.make_ep_link base moth in
-              let conf = {conf with command = moth.MLink.Person.baseprefix} in
-              let env = ("p_link", Vbool true) :: env in
-              eval_person_field_var conf base env ep loc sl
-          | None ->
-              warning_use_has_parents_before_parent loc "mother" (str_val "")
-#else
+        match !GWPARAM_ITL.get_mother conf base conf.command (get_iper p) with
+        | Some (ep, baseprefix) ->
+          let conf = {conf with command = baseprefix} in
+          let env = ("p_link", Vbool true) :: env in
+          eval_person_field_var conf base env ep loc sl
+        | None ->
           warning_use_has_parents_before_parent loc "mother" (str_val "")
-#endif
       end
   | "nobility_title" :: sl ->
       begin match Util.main_title conf base p with
@@ -3588,89 +3417,22 @@ and eval_bool_person_field conf base env (p, p_auth) =
       in
       p_auth && loop (events_list conf base p)
   | "has_children" ->
-      (* TODO ???
-      let mode_local =
-        match get_env "fam_link" env with
-        [ Vfam ifam _ (_, _, ip) _ -> False
-        | _ -> True ]
-      in*)
       begin match get_env "fam" env with
         Vfam (_, fam, _, _) ->
           if Array.length (get_children fam) > 0 then true
-          else
-#ifdef API
-            let faml =
-              Perso_link.get_family_link conf.command (get_iper p)
-            in
-            let rec loop faml =
-              match faml with
-                [] -> false
-              | fam_link :: faml ->
-                  let (ifath, imoth, _) =
-                    Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifath,
-                    Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.imoth,
-                    Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifam
-                  in
-                  let cpl =
-                    let ip = get_iper p in
-                    if ip <> ifath && ip <> imoth then
-                      match
-                        Perso_link.get_person_link_with_base conf.command ip
-                          fam_link.MLink.Family.baseprefix
-                      with
-                        Some p ->
-                          let ip = Gwdb.iper_of_string @@ Int32.to_string p.MLink.Person.ip in
-                          ifath, imoth, (if ip = ifath then imoth else ifath)
-                      | None ->
-                          ifath, imoth, (if ip = ifath then imoth else ifath)
-                    else ifath, imoth, (if ip = ifath then imoth else ifath)
-                  in
-                  let can_merge =
-                    Perso_link.can_merge_family conf.command (get_iper p)
-                      [fam] fam_link cpl
-                  in
-                  if can_merge then
-                    let (ifam, ifath, imoth) =
-                      Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam,
-                      Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifath,
-                      Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.imoth
-                    in
-                    List.length
-                      (Perso_link.get_children_of_parents
-                         fam_link.MLink.Family.baseprefix ifam ifath imoth) >
-                      0
-                  else loop faml
-            in
-            loop faml
-#else
-            false
-#endif
+          else !GWPARAM_ITL.has_children conf base p fam
       | _ ->
-          let b =
-            Array.exists
-              (fun ifam ->
-                 let des = foi base ifam in
-                 Array.length (get_children des) > 0)
-              (get_family p)
-          in
-          if b then b
-          else
-#ifdef API
-            match get_env "fam_link" env with
-              Vfam (ifam, _, (ifath, imoth, _), _) ->
-                let conf =
-                  match get_env "baseprefix" env with
-                    Vstring baseprefix -> {conf with command = baseprefix}
-                  | _ -> conf
-                in
-                List.length
-                  (Perso_link.get_children_of_parents conf.command ifam ifath
-                     imoth) >
-                  0
-            | _ -> false
-#else
-            false
-#endif
+        Array.exists (fun ifam -> [||] <> get_children (foi base ifam)) (get_family p)
+        || begin match get_env "fam_link" env with
+          | Vfam (ifam, _, (ifath, imoth, _), _) ->
+            let conf =
+              match get_env "baseprefix" env with
+              | Vstring baseprefix -> {conf with command = baseprefix}
+              | _ -> conf
+            in
+            [] <> !GWPARAM_ITL.get_children_of_parents base conf.command ifam ifath imoth
+          | _ -> false
+        end
       end
   | "has_consanguinity" ->
       p_auth && get_consang p != Adef.fix (-1) &&
@@ -3777,13 +3539,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       else false
   | "has_families" ->
       Array.length (get_family p) > 0
-#ifdef API
-      ||
-      List.length
-        (Perso_link.get_family_correspondance conf.command
-           (get_iper p)) >
-        0
-#endif
+      || !GWPARAM_ITL.has_family_correspondance conf.command (get_iper p)
   | "has_first_names_aliases" ->
       if not p_auth && is_hide_names conf p then false
       else get_first_names_aliases p <> []
@@ -3796,15 +3552,11 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_occupation" -> p_auth && sou base (get_occupation p) <> ""
   | "has_parents" ->
       get_parents p <> None
-#ifdef API
-      ||
-      (let conf =
-         match get_env "baseprefix" env with
-           Vstring baseprefix -> {conf with command = baseprefix}
-         | _ -> conf
-       in
-       Perso_link.get_parents_link conf.command (get_iper p) <> None)
-#endif
+      || let conf =
+           match get_env "baseprefix" env with
+           | Vstring baseprefix -> {conf with command = baseprefix}
+           | _ -> conf
+      in !GWPARAM_ITL.has_parents_link conf.command (get_iper p)
   | "has_possible_duplications" -> has_possible_duplications conf base p
   | "has_psources" ->
       if is_hide_names conf p && not p_auth then false
@@ -3830,20 +3582,11 @@ and eval_bool_person_field conf base env (p, p_auth) =
       begin match get_parents p with
         Some ifam -> Array.length (get_children (foi base ifam)) > 1
       | None ->
-#ifdef API
           let conf =
             match get_env "baseprefix" env with
-              Vstring baseprefix -> {conf with command = baseprefix}
+            | Vstring baseprefix -> {conf with command = baseprefix}
             | _ -> conf
-          in
-          match
-            Perso_link.get_parents_link conf.command (get_iper p)
-          with
-            Some family -> List.length family.MLink.Family.children > 1
-          | None -> false
-#else
-          false
-#endif
+          in !GWPARAM_ITL.has_siblings conf.command (get_iper p)
       end
   | "has_sources" ->
       p_auth &&
@@ -4129,18 +3872,13 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       begin match get_env "fam" env with
         Vfam (_, fam, _, _) -> string_of_int (Array.length (get_children fam))
       | _ ->
-#ifdef API
           match get_env "fam_link" env with
             Vfam (ifam, _, _, _) ->
-              let conf =
-                match get_env "baseprefix" env with
-                  Vstring baseprefix -> {conf with command = baseprefix}
-                | _ -> conf
-              in
-              let children =
-                Perso_link.get_children_of_fam conf.command ifam
-              in
-              string_of_int (List.length children)
+            let baseprefix =
+              match get_env "baseprefix" env with
+              | Vstring baseprefix -> baseprefix
+              | _ -> conf.command
+            in string_of_int (!GWPARAM_ITL.nb_children baseprefix ifam)
           | _ ->
               let n =
                 Array.fold_left
@@ -4149,28 +3887,11 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
                   0 (get_family p)
               in
               string_of_int n
-#else
-          let n =
-            Array.fold_left
-              (fun n ifam ->
-                 n + Array.length (get_children (foi base ifam)))
-              0 (get_family p)
-          in
-          string_of_int n
-#endif
       end
   | "nb_families" ->
       begin match get_env "p_link" env with
-        Vbool _ ->
-#ifdef API
-          string_of_int
-            (List.length
-               (Perso_link.get_family_correspondance conf.command
-                  (get_iper p)))
-#else
-      "0"
-#endif
-      | _ -> string_of_int (Array.length (get_family p))
+        | Vbool _ -> string_of_int (!GWPARAM_ITL.nb_families conf.command (get_iper p))
+        | _ -> string_of_int (Array.length (get_family p))
       end
   | "notes" | "pnotes" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
@@ -4587,60 +4308,33 @@ let print_foreach conf base print_ast eval_expr =
               | _ -> raise Not_found
           end
       | "father" :: sl ->
-          begin match get_parents a with
-            Some ifam ->
-              let cpl = foi base ifam in
-              let (_, p_auth as ep) = make_ep conf base (get_father cpl) in
-              let ifath = get_father cpl in
-              let cpl = ifath, get_mother cpl, ifath in
-              let m_auth =
-                p_auth && authorized_age conf base (pget conf base ifath)
-              in
-              let efam = Vfam (ifam, foi base ifam, cpl, m_auth) in
-              loop env ep efam sl
+        begin match get_parents a with
+          | Some ifam ->
+            let cpl = foi base ifam in
+            let (_, p_auth as ep) = make_ep conf base (get_father cpl) in
+            let ifath = get_father cpl in
+            let cpl = ifath, get_mother cpl, ifath in
+            let m_auth =
+              p_auth && authorized_age conf base (pget conf base ifath)
+            in
+            let efam = Vfam (ifam, foi base ifam, cpl, m_auth) in
+            loop env ep efam sl
           | None ->
-#ifdef API
-              let conf =
-                match get_env "baseprefix" env with
-                  Vstring baseprefix -> {conf with command = baseprefix}
-                | _ -> conf
-              in
-              match
-                Perso_link.get_parents_link conf.command (get_iper a)
-              with
-                Some family ->
-                  let (ifath, imoth, ifam) =
-                    Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.ifath,
-                    Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.imoth,
-                    Gwdb.ifam_of_string @@ Int32.to_string family.MLink.Family.ifam
-                  in
-                  begin match
-                    Perso_link.get_person_link family.MLink.Family.baseprefix
-                      ifath
-                  with
-                    Some fath ->
-                      let ep = Perso_link.make_ep_link base fath in
-                      let cpl = ifath, imoth, imoth in
-                      let (_, fam, _, _) =
-                        Perso_link.make_efam_link conf base family
-                      in
-                      let efam = Vfam (ifam, fam, cpl, true) in
-                      let env = ("p_link", Vbool true) :: env in
-                      let env = ("f_link", Vbool true) :: env in
-                      let env =
-                        ("baseprefix",
-                         Vstring fath.MLink.Person.baseprefix) ::
-                        env
-                      in
-                      loop env ep efam sl
-                  | None ->
-                      warning_use_has_parents_before_parent loc "father" ()
-                  end
-              | None -> warning_use_has_parents_before_parent loc "father" ()
-#else
+            let conf =
+              match get_env "baseprefix" env with
+                Vstring baseprefix -> {conf with command = baseprefix}
+              | _ -> conf
+            in
+            match !GWPARAM_ITL.get_father' conf base (get_iper a) with
+            | Some (baseprefix, ep, ifam, fam, cpl) ->
+              let efam = Vfam (ifam, fam, cpl, true) in
+              let env = ("p_link", Vbool true) :: env in
+              let env = ("f_link", Vbool true) :: env in
+              let env = ("baseprefix", Vstring baseprefix) :: env in
+              loop env ep efam sl
+            | None ->
               warning_use_has_parents_before_parent loc "father" ()
-#endif
-          end
+        end
       | "mother" :: sl ->
           begin match get_parents a with
             Some ifam ->
@@ -4654,47 +4348,14 @@ let print_foreach conf base print_ast eval_expr =
               let efam = Vfam (ifam, foi base ifam, cpl, m_auth) in
               loop env ep efam sl
           | None ->
-#ifdef API
-              let conf =
-                match get_env "baseprefix" env with
-                  Vstring baseprefix -> {conf with command = baseprefix}
-                | _ -> conf
-              in
-              match
-                Perso_link.get_parents_link conf.command (get_iper a)
-              with
-                Some family ->
-                  let (ifath, imoth, ifam) =
-                    Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.ifath,
-                    Gwdb.iper_of_string @@ Int32.to_string family.MLink.Family.imoth,
-                    Gwdb.ifam_of_string @@ Int32.to_string family.MLink.Family.ifam
-                  in
-                  begin match
-                    Perso_link.get_person_link family.MLink.Family.baseprefix
-                      imoth
-                  with
-                    Some moth ->
-                      let ep = Perso_link.make_ep_link base moth in
-                      let cpl = ifath, imoth, ifath in
-                      let (_, fam, _, _) =
-                        Perso_link.make_efam_link conf base family
-                      in
-                      let efam = Vfam (ifam, fam, cpl, true) in
-                      let env = ("p_link", Vbool true) :: env in
-                      let env = ("f_link", Vbool true) :: env in
-                      let env =
-                        ("baseprefix",
-                         Vstring moth.MLink.Person.baseprefix) ::
-                        env
-                      in
-                      loop env ep efam sl
-                  | None ->
-                      warning_use_has_parents_before_parent loc "father" ()
-                  end
-              | None -> warning_use_has_parents_before_parent loc "mother" ()
-#else
-              warning_use_has_parents_before_parent loc "mother" ()
-#endif
+            match !GWPARAM_ITL.get_mother' conf base (get_iper a) with
+            | Some (baseprefix, ep, ifam, fam, cpl) ->
+              let efam = Vfam (ifam, fam, cpl, true) in
+              let env = ("p_link", Vbool true) :: env in
+              let env = ("f_link", Vbool true) :: env in
+              let env = ("baseprefix", Vstring baseprefix) :: env in
+              loop env ep efam sl
+            | None -> warning_use_has_parents_before_parent loc "mother" ()
           end
       | "self" :: sl -> loop env ep efam sl
       | "spouse" :: sl ->
@@ -4702,7 +4363,6 @@ let print_foreach conf base print_ast eval_expr =
             Vfam (_, _, (_, _, ip), _) ->
               let ep = make_ep conf base ip in loop env ep efam sl
           | _ ->
-#ifdef API
               match get_env "fam_link" env with
                 Vfam (_, _, (_, _, ip), _) ->
                   let baseprefix =
@@ -4710,22 +4370,14 @@ let print_foreach conf base print_ast eval_expr =
                       Vstring baseprefix -> baseprefix
                     | _ -> conf.command
                   in
-                  begin match Perso_link.get_person_link baseprefix ip with
-                    Some spouse ->
-                      let ep = Perso_link.make_ep_link base spouse in
+                  begin match !GWPARAM_ITL.get_person conf base baseprefix ip with
+                    Some (ep, baseprefix) ->
                       let env = ("p_link", Vbool true) :: env in
-                      let env =
-                        ("baseprefix",
-                         Vstring spouse.MLink.Person.baseprefix) ::
-                        env
-                      in
+                      let env = ("baseprefix", Vstring baseprefix) :: env in
                       loop env ep efam sl
                   | None -> raise Not_found
                   end
               | _ -> raise Not_found
-#else
-              raise Not_found
-#endif
           end
       | _ -> raise Not_found
     in
@@ -4983,30 +4635,19 @@ let print_foreach conf base print_ast eval_expr =
       Vfam (ifam, fam, (ifath, imoth, isp), _) ->
         begin match get_env "f_link" env with
           Vbool _ ->
-#ifdef API
-            (* On est sur une famille distante. *)
-            let env = ("auth", Vbool true) :: env in
-            let conf =
-              match get_env "baseprefix" env with
-                Vstring baseprefix -> {conf with command = baseprefix}
-              | _ -> conf
-            in
-            let children =
-              Perso_link.get_children_of_parents conf.command ifam ifath imoth
-            in
-            List.iter
-              (fun c_link ->
-                 let (p, _) = Perso_link.make_ep_link base c_link in
-                 let baseprefix = c_link.MLink.Person.baseprefix in
-                 let env = ("#loop", Vint 0) :: env in
-                 let env = ("child_link", Vind p) :: env in
-                 let env = ("baseprefix", Vstring baseprefix) :: env in
-                 let env = ("p_link", Vbool true) :: env in
-                 let ep = p, true in List.iter (print_ast env ep) al)
-              children
-#else
-            ()
-#endif
+          let baseprefix =
+            match get_env "baseprefix" env with
+            | Vstring baseprefix -> baseprefix
+            | _ -> conf.command
+          in
+          let children = !GWPARAM_ITL.get_children base baseprefix ifam ifath imoth in
+          List.iter begin fun ((p, _) as ep, baseprefix) ->
+            let env = ("#loop", Vint 0) :: env in
+            let env = ("child_link", Vind p) :: env in
+            let env = ("baseprefix", Vstring baseprefix) :: env in
+            let env = ("p_link", Vbool true) :: env in
+            List.iter (print_ast env ep) al
+          end children
         | _ ->
             let auth =
               Array.for_all
@@ -5044,48 +4685,20 @@ let print_foreach conf base print_ast eval_expr =
                  let ep = p, authorized_age conf base p in
                  List.iter (print_ast env ep) al)
               (get_children fam);
-#ifdef API
-            (* On ajoute les enfants distants. *)
-            let faml =
-              Perso_link.get_families_of_parents conf.command
-                (get_iper (fst ep)) isp
-            in
-            List.iter
-              (fun fam_link ->
-                 let env = ("auth", Vbool true) :: env in
-                 List.iter
-                   (fun c_link ->
-                      let baseprefix = c_link.MLink.Person_link.baseprefix in
-                      let ip_c = Gwdb.iper_of_string @@ Int32.to_string c_link.MLink.Person_link.ip in
-                      match Perso_link.get_person_link baseprefix ip_c with
-                        Some c_link ->
-                          let can_merge =
-                            Perso_link.can_merge_child conf.command
-                              (get_children fam) c_link
-                          in
-                          if can_merge then ()
-                          else
-                            let (p, _) =
-                              Perso_link.make_ep_link base c_link
-                            in
-                            let baseprefix = c_link.MLink.Person.baseprefix in
-                            let env = ("#loop", Vint 0) :: env in
-                            let env = ("child_link", Vind p) :: env in
-                            let env =
-                              ("baseprefix", Vstring baseprefix) :: env
-                            in
-                            let env = ("p_link", Vbool true) :: env in
-                            let ep = p, true in
-                            List.iter (print_ast env ep) al
-                      | None -> ())
-                   fam_link.MLink.Family.children)
-              faml
-#endif
+
+            List.iter begin fun (_, _, children) ->
+              List.iter begin fun ((p, _), baseprefix, can_merge) ->
+                if not can_merge then begin
+                  let env = ("#loop", Vint 0) :: env in
+                  let env = ("child_link", Vind p) :: env in
+                  let env = ("baseprefix", Vstring baseprefix) :: env in
+                  let env = ("p_link", Vbool true) :: env in
+                  let ep = p, true in
+                  List.iter (print_ast env ep) al
+                end end children
+            end (!GWPARAM_ITL.get_children' conf base (get_iper (fst ep)) fam isp)
         end
     | _ -> ()
-#ifndef API
- [@@ocaml.warning "-27"]
-#endif
   and print_foreach_cremation_witness env al (p, _ as ep) =
     let rec loop pevents =
       match pevents with
@@ -5209,61 +4822,29 @@ let print_foreach conf base print_ast eval_expr =
   and print_foreach_family env al ini_ep (p, _) =
     match get_env "p_link" env with
       Vbool _ ->
-#ifdef API
         let conf =
           match get_env "baseprefix" env with
-            Vstring baseprefix -> {conf with command = baseprefix}
+          | Vstring baseprefix -> {conf with command = baseprefix}
           | _ -> conf
         in
-        let faml =
-          Perso_link.get_family_link conf.command (get_iper p)
-        in
-        let rec loop prev i faml =
-          match faml with
-            [] -> ()
-          | fam_link :: faml ->
-              let baseprefix = fam_link.MLink.Family.baseprefix in
-              let (_, fam, _, _) =
-                Perso_link.make_efam_link conf base fam_link
-              in
-              let (ifath, imoth, ifam) =
-                Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifath,
-                Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.imoth,
-                Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam
-              in
-              let cpl =
-                let ip = get_iper p in
-                if ip <> ifath && ip <> imoth then
-                  match
-                    Perso_link.get_person_link_with_base conf.command ip
-                      baseprefix
-                  with
-                    Some p ->
-                      let ip = Gwdb.iper_of_string @@ Int32.to_string p.MLink.Person.ip in
-                      ifath, imoth, (if ip = ifath then imoth else ifath)
-                  | None ->
-                      ifath, imoth, (if ip = ifath then imoth else ifath)
-                else ifath, imoth, (if ip = ifath then imoth else ifath)
-              in
-              let vfam = Vfam (ifam, fam, cpl, true) in
-              let env = ("#loop", Vint 0) :: env in
-              let env = ("fam_link", vfam) :: env in
-              let env = ("f_link", Vbool true) :: env in
-              let env = ("is_link", Vbool true) :: env in
-              let env = ("baseprefix", Vstring baseprefix) :: env in
-              let env = ("family_cnt", Vint (i + 1)) :: env in
-              let env =
-                match prev with
-                  Some vfam -> ("prev_fam", vfam) :: env
-                | None -> env
-              in
-              List.iter (print_ast env ini_ep) al;
-              loop (Some vfam) (i + 1) faml
-        in
-        loop None 0 faml
-#else
-        ()
-#endif
+        List.fold_left begin fun (prev, i) (ifam, fam, (ifath, imoth, spouse), baseprefix, _) ->
+          let cpl = (ifath, imoth, get_iper spouse) in
+          let vfam = Vfam (ifam, fam, cpl, true) in
+          let env = ("#loop", Vint 0) :: env in
+          let env = ("fam_link", vfam) :: env in
+          let env = ("f_link", Vbool true) :: env in
+          let env = ("is_link", Vbool true) :: env in
+          let env = ("baseprefix", Vstring baseprefix) :: env in
+          let env = ("family_cnt", Vint (i + 1)) :: env in
+          let env =
+            match prev with
+            | Some vfam -> ("prev_fam", vfam) :: env
+            | None -> env
+          in
+          List.iter (print_ast env ini_ep) al;
+          (Some vfam, i + 1)
+        end (None, 0) (!GWPARAM_ITL.get_families conf base p)
+        |> ignore
     | _ ->
         if Array.length (get_family p) > 0 then
           begin let rec loop prev i =
@@ -5292,66 +4873,26 @@ let print_foreach conf base print_ast eval_expr =
           in
             loop None 0
           end;
-#ifdef API
-        (* On ajoute les familles distantes. *)
-        let faml =
-          Perso_link.get_family_link conf.command (get_iper p)
-        in
-        let rec loop prev i faml =
-          match faml with
-            [] -> ()
-          | fam_link :: faml ->
-              let (_, fam, _, _) =
-                Perso_link.make_efam_link conf base fam_link
-              in
-              let (ifath, imoth, ifam) =
-                Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.ifath,
-                Gwdb.iper_of_string @@ Int32.to_string fam_link.MLink.Family.imoth,
-                Gwdb.ifam_of_string @@ Int32.to_string fam_link.MLink.Family.ifam
-              in
-              let cpl =
-                let ip = get_iper p in
-                if ip <> ifath && ip <> imoth then
-                  match
-                    Perso_link.get_person_link_with_base conf.command ip
-                      fam_link.MLink.Family.baseprefix
-                  with
-                    Some p ->
-                      let ip = Gwdb.iper_of_string @@ Int32.to_string p.MLink.Person.ip in
-                      ifath, imoth, (if ip = ifath then imoth else ifath)
-                  | None ->
-                      ifath, imoth, (if ip = ifath then imoth else ifath)
-                else ifath, imoth, (if ip = ifath then imoth else ifath)
-              in
-              let can_merge =
-                let fam =
-                  List.map (foi base) (Array.to_list (get_family p))
-                in
-                Perso_link.can_merge_family conf.command (get_iper p) fam
-                  fam_link cpl
-              in
-              if can_merge then loop None i faml
-              else
-                let baseprefix = fam_link.MLink.Family.baseprefix in
-                let vfam = Vfam (ifam, fam, cpl, true) in
-                let env = ("#loop", Vint 0) :: env in
-                let env = ("fam_link", vfam) :: env in
-                let env = ("f_link", Vbool true) :: env in
-                let env = ("is_link", Vbool true) :: env in
-                let env = ("baseprefix", Vstring baseprefix) :: env in
-                let env = ("family_cnt", Vint (i + 1)) :: env in
-                let env =
-                  match prev with
-                    Some vfam -> ("prev_fam", vfam) :: env
-                  | None -> env
-                in
-                List.iter (print_ast env ini_ep) al;
-                loop (Some vfam) (i + 1) faml
-        in
-        loop None 0 faml
-#else
-        ()
-#endif
+        List.fold_left begin fun (prev, i) (ifam, fam, (ifath, imoth, sp), baseprefix, can_merge) ->
+          if can_merge then (None, i)
+          else
+            let cpl = (ifath, imoth, get_iper sp) in
+            let vfam = Vfam (ifam, fam, cpl, true) in
+            let env = ("#loop", Vint 0) :: env in
+            let env = ("fam_link", vfam) :: env in
+            let env = ("f_link", Vbool true) :: env in
+            let env = ("is_link", Vbool true) :: env in
+            let env = ("baseprefix", Vstring baseprefix) :: env in
+            let env = ("family_cnt", Vint (i + 1)) :: env in
+            let env =
+              match prev with
+              | Some vfam -> ("prev_fam", vfam) :: env
+              | None -> env
+            in
+            List.iter (print_ast env ini_ep) al ;
+            (Some vfam, i + 1)
+        end (None, 0) (!GWPARAM_ITL.get_families conf base p)
+        |> ignore
   and print_foreach_first_name_alias env al (p, p_auth as ep) =
     if not p_auth && is_hide_names conf p then ()
     else
@@ -5747,14 +5288,10 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
     let mcl () = Vint (max_cousin_level conf base p) in
     (* Récupère le nombre maximal de niveaux de descendance en prenant en compte les liens inter-arbres (limité à 10 générations car problématique en terme de perf). *)
     let mdl () =
-#ifdef API
-      Vint
-        (max (max_descendant_level base desc_level_table_l)
-           (Perso_link.max_interlinks_descendancy_level conf base
-              (get_iper p) 10))
-#else
-      Vint (max_descendant_level base desc_level_table_l)
-#endif
+      Vint (max
+              (max_descendant_level base desc_level_table_l)
+              (!GWPARAM_ITL.max_descendant_level conf base (get_iper p) 10)
+           )
     in
     (* Static max descendant level *)
     let smdl () =

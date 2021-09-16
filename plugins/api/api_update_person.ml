@@ -62,7 +62,7 @@ let reconstitute_person_aux conf fn_occ fn_rparents fn_pevt_witnesses mod_p =
     end mod_p.Mwrite.Person.titles
   in
   let rparents = fn_rparents mod_p in
-  let access = Piqi_util.piqi_access_to_access mod_p.Mwrite.Person.access in
+  let access = Api_piqi_util.piqi_access_to_access mod_p.Mwrite.Person.access in
   let occupation = Opt.map_default "" only_printable mod_p.Mwrite.Person.occupation in
   let sex =
     match mod_p.Mwrite.Person.sex with
@@ -93,7 +93,7 @@ let reconstitute_person_aux conf fn_occ fn_rparents fn_pevt_witnesses mod_p =
         | Some n -> Epers_Name (no_html_tags (only_printable n))
         | _ ->
           match evt.Mwrite.Pevent.pevent_type with
-          | Some x -> Piqi_util.pevent_name_of_piqi_pevent_name x
+          | Some x -> Api_piqi_util.pevent_name_of_piqi_pevent_name x
           | _ -> Epers_Name ""
       in
       let date =

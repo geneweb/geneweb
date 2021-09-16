@@ -1,5 +1,6 @@
 #ifdef API
 
+open Geneweb
 open Def
 open Config
 

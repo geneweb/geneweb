@@ -1,9 +1,9 @@
 #ifdef API
 
-module MLink = Api_link_tree_piqi
-module MLinkext = Api_link_tree_piqi_ext
+module MLink = Lia_api_link_tree_piqi
+module MLinkext = Lia_api_link_tree_piqi_ext
 
-
+open Geneweb
 open Config
 open Def
 
@@ -336,9 +336,9 @@ let make_efam_link conf base fam_link =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let get_person_link_with_base base_prefix ip base_distante =
-  let base_prefix = Link.chop_base_prefix base_prefix in
-  let base_distante = Link.chop_base_prefix base_distante in
-  try Some (Hashtbl.find Link.ht_person_cache (base_prefix, ip)) with
+  let base_prefix = Lia_link.chop_base_prefix base_prefix in
+  let base_distante = Lia_link.chop_base_prefix base_distante in
+  try Some (Hashtbl.find Lia_link.ht_person_cache (base_prefix, ip)) with
     Not_found ->
       try
         let rec loop l =
@@ -348,9 +348,9 @@ let get_person_link_with_base base_prefix ip base_distante =
               if base_prefix = base_distante then base_prefix, ip else loop l
         in
         let (base_prefix, ip) =
-          loop (Hashtbl.find_all Link.ht_corresp (base_prefix, ip))
+          loop (Hashtbl.find_all Lia_link.ht_corresp (base_prefix, ip))
         in
-        Some (Hashtbl.find Link.ht_person_cache (base_prefix, ip))
+        Some (Hashtbl.find Lia_link.ht_person_cache (base_prefix, ip))
       with Not_found -> None
 
 
@@ -365,14 +365,14 @@ let get_person_link_with_base base_prefix ip base_distante =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let get_person_link base_prefix ip =
-  let base_prefix = Link.chop_base_prefix base_prefix in
-  try Some (Hashtbl.find Link.ht_person_cache (base_prefix, ip)) with
+  let base_prefix = Lia_link.chop_base_prefix base_prefix in
+  try Some (Hashtbl.find Lia_link.ht_person_cache (base_prefix, ip)) with
     Not_found ->
       try
         let (base_prefix, ip) =
-          Hashtbl.find Link.ht_corresp (base_prefix, ip)
+          Hashtbl.find Lia_link.ht_corresp (base_prefix, ip)
         in
-        Some (Hashtbl.find Link.ht_person_cache (base_prefix, ip))
+        Some (Hashtbl.find Lia_link.ht_person_cache (base_prefix, ip))
       with Not_found -> None
 
 
@@ -386,19 +386,19 @@ let get_person_link base_prefix ip =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let get_persons_link base_prefix ip =
-  let base_prefix = Link.chop_base_prefix base_prefix in
+  let base_prefix = Lia_link.chop_base_prefix base_prefix in
   let find_corr (base_prefix, ip) =
-    let l = Hashtbl.find_all Link.ht_corresp (base_prefix, ip) in
+    let l = Hashtbl.find_all Lia_link.ht_corresp (base_prefix, ip) in
     List.fold_left
       (fun accu (base_prefix, ip) ->
          try
-           let p = Hashtbl.find Link.ht_person_cache (base_prefix, ip) in
+           let p = Hashtbl.find Lia_link.ht_person_cache (base_prefix, ip) in
            p :: accu
          with Not_found -> accu)
       [] l
   in
   try
-    let p = Hashtbl.find Link.ht_person_cache (base_prefix, ip) in
+    let p = Hashtbl.find Lia_link.ht_person_cache (base_prefix, ip) in
     let l = find_corr (base_prefix, ip) in p :: l
   with Not_found -> find_corr (base_prefix, ip)
 
@@ -415,8 +415,8 @@ let get_persons_link base_prefix ip =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let get_parents_link base_prefix ip =
-  let base_prefix = Link.chop_base_prefix base_prefix in
-  try Some (Hashtbl.find Link.ht_parents_cache (base_prefix, ip)) with
+  let base_prefix = Lia_link.chop_base_prefix base_prefix in
+  try Some (Hashtbl.find Lia_link.ht_parents_cache (base_prefix, ip)) with
     Not_found ->
       try
         let rec loop l =
@@ -424,10 +424,10 @@ let get_parents_link base_prefix ip =
             [] -> None
           | (base_prefix, ip) :: l ->
               try
-                Some (Hashtbl.find Link.ht_parents_cache (base_prefix, ip))
+                Some (Hashtbl.find Lia_link.ht_parents_cache (base_prefix, ip))
               with Not_found -> loop l
         in
-        loop (Hashtbl.find_all Link.ht_corresp (base_prefix, ip))
+        loop (Hashtbl.find_all Lia_link.ht_corresp (base_prefix, ip))
       with Not_found -> None
 
 
@@ -482,15 +482,15 @@ let get_mother_link base_prefix ip =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let get_family_correspondance base_prefix ip =
-  let base_prefix = Link.chop_base_prefix base_prefix in
-  try Hashtbl.find Link.ht_families_cache (base_prefix, ip) with
+  let base_prefix = Lia_link.chop_base_prefix base_prefix in
+  try Hashtbl.find Lia_link.ht_families_cache (base_prefix, ip) with
     Not_found ->
       try
-        let l = Hashtbl.find_all Link.ht_corresp (base_prefix, ip) in
+        let l = Hashtbl.find_all Lia_link.ht_corresp (base_prefix, ip) in
         List.fold_left
           (fun accu (base_prefix, ip) ->
              try
-               Hashtbl.find Link.ht_families_cache (base_prefix, ip) @ accu
+               Hashtbl.find Lia_link.ht_families_cache (base_prefix, ip) @ accu
              with Not_found -> accu)
           [] l
       with Not_found -> []
@@ -506,7 +506,7 @@ let get_family_correspondance base_prefix ip =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let get_family_link base_prefix ip =
-  let base_prefix = Link.chop_base_prefix base_prefix in
+  let base_prefix = Lia_link.chop_base_prefix base_prefix in
   try
     let l = get_family_correspondance base_prefix ip in
     List.fold_right
@@ -515,9 +515,9 @@ let get_family_link base_prefix ip =
            fam.MLink.Family_link.baseprefix,
            Gwdb.ifam_of_string @@ Int32.to_string fam.MLink.Family_link.ifam
          in
-         let base_prefix = Link.chop_base_prefix base_prefix in
+         let base_prefix = Lia_link.chop_base_prefix base_prefix in
          try
-           Hashtbl.find Link.ht_family_cache (base_prefix, ifam) :: accu
+           Hashtbl.find Lia_link.ht_family_cache (base_prefix, ifam) :: accu
          with Not_found -> accu)
       l []
   with Not_found -> []
@@ -569,9 +569,9 @@ let get_families_of_parents base_prefix ip isp =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let get_children_of_fam base_prefix ifam =
-  let base_prefix = Link.chop_base_prefix base_prefix in
+  let base_prefix = Lia_link.chop_base_prefix base_prefix in
   try
-    let fam = Hashtbl.find Link.ht_family_cache (base_prefix, ifam) in
+    let fam = Hashtbl.find Lia_link.ht_family_cache (base_prefix, ifam) in
     List.fold_right
       (fun c accu ->
          let (base_prefix, ip) =
@@ -599,9 +599,9 @@ let get_children_of_fam base_prefix ifam =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let get_children_of_parents base_prefix ifam ifath imoth =
-  let base_prefix = Link.chop_base_prefix base_prefix in
+  let base_prefix = Lia_link.chop_base_prefix base_prefix in
   try
-    let fam = Hashtbl.find Link.ht_family_cache (base_prefix, ifam) in
+    let fam = Hashtbl.find Lia_link.ht_family_cache (base_prefix, ifam) in
     if ifath = Gwdb.iper_of_string @@ Int32.to_string fam.MLink.Family.ifath &&
        imoth = Gwdb.iper_of_string @@ Int32.to_string fam.MLink.Family.imoth
     then
@@ -635,8 +635,8 @@ let get_children_of_parents base_prefix ifam ifath imoth =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let can_merge_family base_prefix ip fam fam_link (_, _, isp) =
-  let from_baseprefix = Link.chop_base_prefix base_prefix in
-  let base_prefix = Link.chop_base_prefix fam_link.MLink.Family.baseprefix in
+  let from_baseprefix = Lia_link.chop_base_prefix base_prefix in
+  let base_prefix = Lia_link.chop_base_prefix fam_link.MLink.Family.baseprefix in
   let rec loop faml =
     match faml with
       [] -> false
@@ -644,7 +644,7 @@ let can_merge_family base_prefix ip fam fam_link (_, _, isp) =
         let from_ip = Gutil.spouse ip fam in
         try
           let (to_baseprefix, to_ip) =
-            Hashtbl.find Link.ht_corresp (from_baseprefix, from_ip)
+            Hashtbl.find Lia_link.ht_corresp (from_baseprefix, from_ip)
           in
           to_baseprefix = base_prefix && to_ip = isp || loop faml
         with Not_found -> loop faml
@@ -666,16 +666,16 @@ let can_merge_family base_prefix ip fam fam_link (_, _, isp) =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let can_merge_child base_prefix children c_link =
-  let from_baseprefix = Link.chop_base_prefix base_prefix in
+  let from_baseprefix = Lia_link.chop_base_prefix base_prefix in
   let ip = Gwdb.iper_of_string @@ Int32.to_string c_link.MLink.Person.ip in
-  let base_prefix = Link.chop_base_prefix c_link.MLink.Person.baseprefix in
+  let base_prefix = Lia_link.chop_base_prefix c_link.MLink.Person.baseprefix in
   let rec loop children =
     match children with
       [] -> false
     | from_ip :: children ->
         try
           let (to_baseprefix, to_ip) =
-            Hashtbl.find Link.ht_corresp (from_baseprefix, from_ip)
+            Hashtbl.find Lia_link.ht_corresp (from_baseprefix, from_ip)
           in
           to_baseprefix = base_prefix && to_ip = ip || loop children
         with Not_found -> loop children
@@ -703,7 +703,7 @@ let init_cache conf base ip nb_asc from_gen_desc nb_desc =
   (* Option pour activer/desactiver totalement le cache. *)
   let init = Mutil.extract_param "links-tree: " '\n' conf.request in
   if init = "1" then
-    Link.init_cache conf base conf.request conf.bname ip nb_asc from_gen_desc
+    Lia_link.init_cache conf base conf.request conf.bname ip nb_asc from_gen_desc
       nb_desc
 
 (* ***************************************************************************** *)

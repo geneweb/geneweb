@@ -668,7 +668,7 @@ let person_warnings conf base p =
   end Api_warnings.empty (Util.person_warnings conf base p)
 
 let print_person_warnings conf base =
-  let ref_person = Piqi_util.get_params conf Api_piqi_ext.parse_reference_person_i in
+  let ref_person = Api_piqi_util.get_params conf Api_piqi_ext.parse_reference_person_i in
   match
     match ref_person.Api_piqi.Reference_person_i.i with
     | Some i -> Some (Gwdb.iper_of_string i)
