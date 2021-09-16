@@ -232,11 +232,18 @@
           </a>
         </div>
         <div class="btn-group ml-2">
+          %if;("v7," in bvar.plugins)
+          <a href="%prefix_base_password;m=TP&v=upd%evar.m;&%nn;
+            %foreach;env_binding;%if(env.key!="m" and env.val!="")%env.key;=%env.val;&%end;%end;">
+            <span class="far fa-edit fa-lg mb-1" title="[*edit tree]"></span>
+          </a>
+          %else;
           <a href="%prefix_base_password;m=U;et=S;i=2;%nn;
             %foreach;env_binding;%if;(env.key!="m" and env.val!="")%env.key;=%env.val;;%end;%end;%nn;
             mode=%evar.m;;upddag=on;">
             <span class="far fa-edit fa-lg mb-1" title="[*edit tree]"></span>
           </a>
+          %end;
         </div>
       </div>
     </div>
