@@ -11,7 +11,7 @@
 
   environment:
     CYG_BASH: '%CYG_ROOT%/bin/bash -lc'
-    OPAM_PACKAGES: 'calendars camlp5.8.00.01 cppo dune.2.9.0 jingoo markup ocaml ppx_blob stdlib-shims syslog unidecode.0.2.0 uucp uutf uunf'
+    OPAM_PACKAGES: 'calendars camlp5.8.00.01 cppo dune.2.9.0 jingoo markup ocurl piqi piqilib ppx_blob stdlib-shims syslog unidecode.0.2.0 uucp uutf uunf'
     matrix:
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
         CYG_ROOT: C:/cygwin64
@@ -51,7 +51,7 @@
     - sh: 'opam install $OPAM_PACKAGES'
 
   build_script:
-    - sh : 'ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make clean distrib'
+    - sh : 'ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release --api && make clean distrib'
     - sh : 'zip -r geneweb-$PKG_OS-$PKG_VERSION.zip distribution/*'
     - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make clean distrib"'
     - cmd: 'iscc geneweb.iss'
