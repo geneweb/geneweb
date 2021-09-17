@@ -89,7 +89,6 @@ GENERATED_FILES_DEP = \
 	bin/setup/dune \
 	bin/update_nldb/dune \
 	plugins/api/dune \
-	plugins/lia/dune \
 	test/dune \
 
 generated: $(GENERATED_FILES_DEP)

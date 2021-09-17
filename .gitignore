@@ -27,7 +27,6 @@ lib/gwdb/dune
 lib/gwdb-legacy-x-arangodb/dune
 lib/util/dune
 plugins/api/dune
-plugins/lia/dune
 test/dune
 
 dune-workspace
