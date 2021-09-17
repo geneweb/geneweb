@@ -1,5 +1,3 @@
-#ifdef API
-
 open Geneweb
 open Config
 open Def
@@ -104,5 +102,3 @@ let rec get_list_from_cache ?(retry = true) conf base mode max_res s =
       raise e
 
   end
-
-#endif

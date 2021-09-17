@@ -715,18 +715,14 @@ let check_person conf p =
   | None -> Update.check_missing_witnesses_names conf (fun e -> e.epers_witnesses) p.pevents
 
 let error_person conf err =
-#ifdef API
   if not conf.api_mode then begin
-#endif
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
   Output.print_string conf (Utf8.capitalize_fst err);
   Output.print_string conf "\n";
   Update.print_return conf;
   Hutil.trailer conf;
-#ifdef API
   end ;
-#endif
   let err =
     Printf.sprintf "%s%s%s"
       (Utf8.capitalize_fst (transl conf "error"))
@@ -772,9 +768,7 @@ let strip_person p =
      List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents}
 
 let print_conflict conf base p =
-#ifdef API
   if not conf.api_mode then begin
-#endif
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
   Update.print_error conf base (AlreadyDefined p);
@@ -811,9 +805,7 @@ let print_conflict conf base p =
   Output.print_string conf "</form>\n";
   Update.print_same_name conf base p;
   Hutil.trailer conf;
-#ifdef API
   end ;
-#endif
   let err =
     Printf.sprintf
       (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
@@ -838,9 +830,7 @@ let default_prerr conf base = function
   | _ -> assert false
 
 let print_cannot_change_sex ?(prerr = default_prerr) conf base p =
-#ifdef API
   if not conf.api_mode then
-#endif
   prerr conf base (BadSexOfMarriedPerson p) ;
   let err =
     Printf.sprintf "%s." (Utf8.capitalize_fst (transl conf "cannot change sex of a married person"))

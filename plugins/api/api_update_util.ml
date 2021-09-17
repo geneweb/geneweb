@@ -1,5 +1,3 @@
-#ifdef API
-
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
@@ -1676,5 +1674,3 @@ let reconstitute_somebody base person =
     else (fn, sn)
   in
   (fn, sn, occ, create, var, force_create)
-
-#endif

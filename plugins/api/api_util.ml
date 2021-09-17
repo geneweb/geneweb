@@ -1,5 +1,3 @@
-#ifdef API
-
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
@@ -1643,5 +1641,3 @@ let chop_base_prefix base_prefix =
   then
     String.sub base_prefix 0 (len - 2)
   else base_prefix
-
-#endif

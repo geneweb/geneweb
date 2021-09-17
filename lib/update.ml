@@ -213,17 +213,13 @@ let print_continue
   print_aux conf param value continue
 
 let prerr conf _err fn =
-#ifdef API
   if not conf.api_mode then begin
-#endif
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title ;
   fn () ;
   Hutil.trailer conf;
   Output.flush conf ;
-#ifdef API
   end ;
-#endif
   raise @@ ModErr _err
 
 let print_err_unknown conf _base (f, s, o) =

@@ -1,5 +1,3 @@
-#ifdef API
-
 (rule
   (deps api.piqi)
   (targets api_piqi.ml api_piqi_ext.ml)
@@ -73,5 +71,3 @@
 )
 
 (alias (name plugin) (deps (source_tree assets) plugin_api.cmxs))
-
-#endif

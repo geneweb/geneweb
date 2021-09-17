@@ -49,11 +49,6 @@ let use_auth_digest_scheme = ref false
 let wizard_just_friend = ref false
 let wizard_passwd = ref ""
 
-#ifdef API
-let selected_api_host = ref "127.0.0.1"
-let selected_api_port = ref 2322
-#endif
-
 let is_multipart_form =
   let s = "multipart/form-data" in
   fun content_type ->
@@ -1134,11 +1129,7 @@ let make_conf from_addr request script_name env =
   let wizard_just_friend = if manitou then false else wizard_just_friend in
   let conf =
     {from = from_addr;
-#ifdef API
-     api_host = !selected_api_host;
-     api_port = !selected_api_port;
      api_mode = false;
-#endif
      manitou = manitou;
      supervisor = supervisor; wizard = ar.ar_wizard && not wizard_just_friend;
      is_printed_by_template = true;
@@ -1868,10 +1859,6 @@ let main () =
     ; ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
     ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
-#endif
-#ifdef API
-    ; ("-api_h", Arg.String (fun x -> selected_api_host := x), "<HOST> Host for GeneWeb API (default = " ^ !selected_api_host ^ ").")
-    ; ("-api_p", Arg.Int (fun x -> selected_api_port := x), "<NUMBER> Port number for GeneWeb API (default = " ^ string_of_int !selected_api_port ^ ").")
 #endif
     ]
   in

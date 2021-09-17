@@ -1,5 +1,3 @@
-#ifdef API
-
 module Mwrite = Api_saisie_write_piqi
 module Mext_write = Api_saisie_write_piqi_ext
 
@@ -480,5 +478,3 @@ let print_mod conf base ip mod_f =
     end
   in
   print_mod_aux conf base mod_f callback
-
-#endif

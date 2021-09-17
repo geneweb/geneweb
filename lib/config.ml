@@ -33,11 +33,7 @@ type output_conf =
 
 type config =
   { from : string;
-#ifdef API
-    api_host : string;
-    api_port : int;
     api_mode : bool;
-#endif
     manitou : bool;
     supervisor : bool;
     wizard : bool;
@@ -105,11 +101,7 @@ let empty =
   ; manitou = false
   ; supervisor = false
   ; wizard = false
-#ifdef API
-  ; api_host = ""
-  ; api_port = 0
   ; api_mode = false
-#endif
   ; is_printed_by_template = false
   ; debug = false
   ; friend = false

@@ -1,5 +1,3 @@
-#ifdef API
-
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
@@ -823,5 +821,3 @@ let search_person_list base surname first_name =
   | (None, Some fn) ->
       select_start_with_person base get_first_name fn
   | (None, None) -> []
-
-#endif
