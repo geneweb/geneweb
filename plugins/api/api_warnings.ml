@@ -1,5 +1,3 @@
-#ifdef API
-
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
@@ -255,5 +253,3 @@ let add_warning_to_piqi_warning_list conf base =
     (* Not included in api *)
     | ChangedOrderOfFamilyEvents (_, _, _) -> w
     | ChangedOrderOfPersonEvents (_, _, _) -> w
-
-#endif

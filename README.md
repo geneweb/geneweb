@@ -107,24 +107,6 @@ You can have a description of available configuration options using
 $ ocaml ./configure.ml --help
 ```
 
-### Building the API
-
-The API uses the Google Protocol Buffer to exchange information
-encoded as pb, json, xml.
-
-Install [protoc](https://github.com/protocolbuffers/protobuf#protocol-compiler-installation),
-and these extra dependencies:
-
-```
-$ opam install ocurl piqi piqilib redis redis-sync yojson
-```
-
-Then, tell the configure script to enable API.
-
-```
-$ ocaml ./configure.ml --api
-```
-
 ### Coding style
 
 * Try to keep the same coding style as the existing one.

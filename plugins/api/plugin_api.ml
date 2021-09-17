@@ -1,5 +1,3 @@
-#ifdef API
-
 open Geneweb
 open Config
 open Plugin_api_lib
@@ -161,6 +159,3 @@ let () =
     ; ( "API_SELECT_EVENTS"
       , aux @@ w_base @@ Api_graph.print_select_events)
     ]
-
-
-#endif

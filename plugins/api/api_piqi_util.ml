@@ -1,5 +1,3 @@
-#ifdef API
-
 open Geneweb
 open Def
 open Config
@@ -405,5 +403,3 @@ let piqi_access_to_access = function
   | `access_iftitles -> IfTitles
   | `access_public -> Public
   | `access_private -> Private
-
-#endif

@@ -35,10 +35,7 @@ let set_gwdb_legacy_x_arangodb () = assert (!gwdb = `None) ; gwdb := `LegacyAran
 let release = ref true
 
 let speclist =
-  [ ( "--api"
-    , Arg.Unit set_api
-    , "Enable API support" )
-  ; ( "--gwdb-legacy"
+  [ ( "--gwdb-legacy"
     , Arg.Unit set_gwdb_legacy
     , "Use legacy backend" )
   ; ( "--gwdb-legacy-x-arangodb"
@@ -70,11 +67,6 @@ let () =
   Arg.parse speclist failwith errmsg ;
   let dune_dirs_exclude = ref "" in
   let exclude_dir s = dune_dirs_exclude := !dune_dirs_exclude ^ " " ^ s in
-  let api_d, api_pkg =
-    match !api with
-    | true -> " -D API", "piqirun.ext redis-sync yojson curl"
-    | false -> "", ""
-  in
   let syslog_d, syslog_pkg =
     match !syslog with
     | true -> " -D SYSLOG", "syslog"
@@ -131,11 +123,9 @@ let () =
   var "STRIP" strip ;
   var "RM" rm ;
   var "EXT" ext ;
-  var "API_D" api_d ;
   var "GWDB_D" gwdb_d ;
   var "OS_D" os_d ;
   var "SYSLOG_D" syslog_d ;
-  var "API_PKG" api_pkg ;
   var "GWDB_PKG" gwdb_pkg ;
   var "SOSA_PKG" sosa_pkg ;
   var "SYSLOG_PKG" syslog_pkg ;

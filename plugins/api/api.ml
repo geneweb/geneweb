@@ -1,5 +1,3 @@
-#ifdef API
-
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
@@ -788,5 +786,3 @@ let name_frequency conf base =
   M.Name_frequency_result_list.({ result = list ; total = Int32.of_int len })
   |> Mext.gen_name_frequency_result_list
   |> print_result conf
-
-#endif

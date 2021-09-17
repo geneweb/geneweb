@@ -857,13 +857,11 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
   let nfath_p = poi base (Adef.father ncpl) in
   let nmoth_p = poi base (Adef.mother ncpl) in
   let nfam = update_family_with_fevents conf base nfam in
-#ifdef API
   let nfam =
     (* En mode api, on gère directement la relation de même sexe. *)
     if conf.api_mode then {nfam with relation = sfam.relation}
     else nfam
   in
-#endif
   if not nsck then begin
     begin match get_sex nfath_p with
       | Female -> print_err_father_sex conf base nfath_p
