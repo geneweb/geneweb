@@ -25,7 +25,7 @@
 (library
   (name plugin_api_lib)
   (public_name geneweb.plugin_api_lib)
-  (libraries geneweb geneweb.gwd_lib geneweb.util)
+  (libraries geneweb geneweb.gwd_lib geneweb.util piqirun.ext)
   (modules
     api
     api_def
