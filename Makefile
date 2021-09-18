@@ -96,22 +96,16 @@ install uninstall build: $(GENERATED_FILES_DEP)
 
 ###### [BEGIN] Installation / Distribution section
 
-ifdef APPVEYOR
-DUNE_BUILD=dune build --verbose
-else
-DUNE_BUILD=dune build
-endif
-
 build:
-	$(DUNE_BUILD) -p geneweb
+	dune build -p geneweb
 .DEFAULT_GOAL = build
 
 install:
-	$(DUNE_BUILD) @install
+	dune build @install
 	dune install
 
 uninstall:
-	$(DUNE_BUILD) @install
+	dune build @install
 	dune uninstall
 
 BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
@@ -181,15 +175,15 @@ distrib: build
 ###### [END] Installation / Distribution section
 
 doc: | $(GENERATED_FILES_DEP)
-	$(DUNE_BUILD) @doc
+	dune build @doc
 .PHONY: doc
 
 test: | $(GENERATED_FILES_DEP)
-	$(DUNE_BUILD) @runtest
+	dune build @runtest
 .PHONY: test
 
 bench: | $(GENERATED_FILES_DEP)
-	$(DUNE_BUILD) @runbench
+	dune build @runbench
 .PHONY: bench
 
 BENCH_FILE ?= /tmp/geneweb-bench.bin
