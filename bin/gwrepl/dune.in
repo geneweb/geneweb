@@ -34,4 +34,6 @@
  )
  (modes byte object)
  (modules gwrepl data)
+ (enabled_if (= "Unix" %{os_type}))
+ (optional)
 )
