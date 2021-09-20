@@ -8,7 +8,7 @@ open BirthDeath
 
 let print_birth conf base =
   let (list, len) =
-    select conf base (fun p -> Adef.od_of_cdate (get_birth p)) false
+    select_person conf base (fun p -> Adef.od_of_cdate (get_birth p)) false
   in
   let title _ =
     Output.printf conf (fcapitale (ftransl conf "the latest %d births")) len
@@ -57,7 +57,7 @@ let print_birth conf base =
 
 
 let print_death conf base =
-  let (list, len) = select conf base death_date false in
+  let (list, len) = select_person conf base death_date false in
   let title _ =
     Output.printf conf (fcapitale (ftransl conf "the latest %t deaths"))
       (fun _ -> string_of_int len)
@@ -199,7 +199,7 @@ let print_oldest_alive conf base =
       end
     | _ -> None
   in
-  let (list, len) = select conf base get_oldest_alive true in
+  let (list, len) = select_person conf base get_oldest_alive true in
   let title _ =
     Output.printf conf
       (fcapitale (ftransl conf "the %d oldest perhaps still alive")) len
@@ -237,7 +237,7 @@ let print_longest_lived conf base =
       | _ -> None
     else None
   in
-  let (list, len) = select conf base get_longest false in
+  let (list, len) = select_person conf base get_longest false in
   let title _ =
     Output.printf conf (fcapitale (ftransl conf "the %d who lived the longest"))
       len
@@ -264,12 +264,11 @@ let print_marr_or_eng conf base title list =
   Output.print_string conf "<ul>\n";
   let _ =
     List.fold_left
-      (fun (last_month_txt, was_future) (ifam, fam, d, cal) ->
+      (fun (last_month_txt, was_future) (fam, d, cal) ->
          let month_txt =
            let d = {d with day = 0} in
            Utf8.capitalize_fst (DateDisplay.string_of_date conf (Dgreg (d, cal)))
          in
-         let cpl = foi base ifam in
          let future = Date.compare_dmy d conf.today > 0 in
          if not future && was_future then
            begin
@@ -288,13 +287,13 @@ let print_marr_or_eng conf base title list =
          Output.print_string conf "<b>";
          Output.print_string conf
            (referenced_person_text conf base
-              (pget conf base (get_father cpl)));
+              (pget conf base (get_father fam)));
          Output.print_string conf "</b>\n";
          Output.printf conf "%s\n" (transl_nth conf "and" 0);
          Output.print_string conf "<b>";
          Output.print_string conf
            (referenced_person_text conf base
-              (pget conf base (get_mother cpl)));
+              (pget conf base (get_mother fam)));
          Output.print_string conf "</b>";
          Output.print_string conf ",\n";
          if future then
@@ -323,7 +322,7 @@ let print_marr_or_eng conf base title list =
 let print_marriage conf base =
   let (list, len) =
     select_family conf base
-      (fun _ fam ->
+      (fun fam ->
          let rel = get_relation fam in
          if rel = Married || rel = NoSexesCheckMarried then
            Adef.od_of_cdate (get_marriage fam)
@@ -338,7 +337,7 @@ let print_marriage conf base =
 let print_oldest_engagements conf base =
   let (list, len) =
     select_family conf base
-      (fun _ fam ->
+      (fun fam ->
          if get_relation fam = Engaged then
            let husb = pget conf base (get_father fam) in
            let wife = pget conf base (get_mother fam) in
