@@ -1,6 +1,6 @@
 (alias
    (name plugin)
-   (deps plugin_gwxjg.cmxs)
+   (deps (file META) plugin_gwxjg.cmxs)
 )
 
 (ocamllex gwxjg_lexicon_parser)
@@ -16,7 +16,7 @@
 (executable
   (name plugin_gwxjg)
   (libraries geneweb.gwd_lib plugin_gwxjg_lib)
-  (embed_in_plugin_libraries jingoo plugin_gwxjg_lib)
+  (embed_in_plugin_libraries plugin_gwxjg_lib)
   (flags -linkall)
   (modes (native plugin))
   (modules plugin_gwxjg)
