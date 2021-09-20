@@ -1,0 +1,11 @@
+(alias
+  (name plugin)
+  (deps plugin_gen.cmxs)
+)
+
+(executable
+  (name plugin_gen)
+  (embed_in_plugin_libraries gen)
+  (flags -linkall)
+  (modes (native plugin))
+)
