@@ -1,0 +1,11 @@
+(alias
+  (name plugin)
+  (deps plugin_xmlm.cmxs)
+)
+
+(executable
+  (name plugin_xmlm)
+  (embed_in_plugin_libraries xmlm)
+  (flags -linkall)
+  (modes (native plugin))
+)

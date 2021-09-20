@@ -1,3 +1,9 @@
+(alias
+  (name plugin)
+  (deps (file META) (source_tree assets) plugin_api.cmxs)
+  (enabled_if (= "Unix" %{os_type}))
+)
+
 (rule
   (deps api.piqi)
   (targets api_piqi.ml api_piqi_ext.ml)
@@ -72,10 +78,4 @@
   (modules plugin_api)
   (enabled_if (= "Unix" %{os_type}))
   (optional)
-)
-
-(alias
-  (name plugin)
-  (deps (source_tree assets) plugin_api.cmxs)
-  (enabled_if (= "Unix" %{os_type}))
 )
