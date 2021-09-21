@@ -16,6 +16,7 @@
 
   install:
     # windows environnement
+    - cmd: 'set CYGWIN=winsymlinks:nativestrict'
     - cmd: 'choco install -y innosetup'
     - cmd: 'set OPAMYES=1'
     - cmd: 'set PATH=%PATH%;%CYG_ROOT%\usr\x86_64-w64-mingw32\sys-root\mingw\bin'
@@ -28,5 +29,5 @@
     - cmd: '%CYG_BASH% "eval $(ocaml-env cygwin)"'
 
   build_script:
-    - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && cd plugins/api && piqic-ocaml --debug 1 --trace --ext api.piqi && cat api_piqi.ml api_piqi_ext.ml"'
+    - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && cd plugins/api && cat api.piqi && piqic-ocaml --debug 1 --trace --ext api.piqi && cat api_piqi.ml api_piqi_ext.ml"'
 
