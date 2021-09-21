@@ -4,6 +4,9 @@ open Geneweb
 open Gwcomp
 open Def
 
+(* From OCaml manual, integer in binary format is 4 bytes long. *)
+let sizeof_long = 4
+
 let default_source = ref ""
 let do_check = ref true
 let do_consang = ref false
@@ -89,16 +92,12 @@ let designation base p =
   let nom = p_surname base p in
   prenom ^ "." ^ string_of_int p.m_occ ^ " " ^ nom
 
-(*
-value output_item_value oc v =
+let output_item_value oc v =
   Marshal.to_channel oc v [Marshal.No_sharing]
-;
-value input_item_value ic =
+
+let input_item_value ic =
   input_value ic
-;
-*)
-let output_item_value = Iovalue.output
-let input_item_value = Iovalue.input
+
 (**)
 
 let no_string = ""
@@ -310,7 +309,7 @@ let insert_undefined gen key =
           Hashtbl.add gen.g_file_info.f_local_names (h, occ)
             (i)
         end;
-      seek_out gen.g_per_index (Iovalue.sizeof_long * i);
+      seek_out gen.g_per_index (sizeof_long * i);
       output_binary_int gen.g_per_index (pos_out gen.g_per);
       output_char gen.g_per 'U';
       x, i
@@ -442,7 +441,7 @@ let insert_person gen so =
              (if so.psources = "" then !default_source else so.psources);
          key_index = ip}
       in
-      seek_out gen.g_per_index (Iovalue.sizeof_long * ip);
+      seek_out gen.g_per_index (sizeof_long * ip);
       output_binary_int gen.g_per_index (pos_out gen.g_per);
       output_char gen.g_per 'D';
       output_item_value gen.g_per (x : person)
@@ -728,7 +727,7 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
   in
   let fath_uni = uoi gen.g_base ifath in
   let moth_uni = uoi gen.g_base imoth in
-  seek_out gen.g_fam_index (Iovalue.sizeof_long * i);
+  seek_out gen.g_fam_index (sizeof_long * i);
   output_binary_int gen.g_fam_index (pos_out gen.g_fam);
   output_item_value gen.g_fam (fam : family);
   gen.g_base.c_families.(gen.g_fcnt) <- fam;
@@ -1119,7 +1118,7 @@ let convert_persons per_index_ic per_ic persons =
     let p =
       let c =
         try
-          seek_in per_index_ic (Iovalue.sizeof_long * i);
+          seek_in per_index_ic (sizeof_long * i);
           let pos = input_binary_int per_index_ic in
           seek_in per_ic pos; input_char per_ic
         with End_of_file -> 'U'
@@ -1160,7 +1159,7 @@ let particules_file = ref ""
 
 let convert_families fam_index_ic fam_ic len =
   Array.init len begin fun i ->
-    seek_in fam_index_ic (Iovalue.sizeof_long * i) ;
+    seek_in fam_index_ic (sizeof_long * i) ;
     let pos = input_binary_int fam_index_ic in
     seek_in fam_ic pos ;
     (input_item_value fam_ic : family)
