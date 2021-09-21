@@ -11,7 +11,6 @@ module Gutil = Gutil
 module Gwdb = Gwdb
 module Hutil = Geneweb.Hutil
 module Output = Geneweb.Output
-module Pqueue = Geneweb.Pqueue
 module Util = Geneweb.Util
 
 let give_access conf base ia_asex p1 b1 p2 b2 print_sosa =
