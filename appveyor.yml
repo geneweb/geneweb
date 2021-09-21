@@ -6,9 +6,6 @@
   platform:
     - x64
 
-  init:
-    - ps: $env:PKG_VERSION = $env:APPVEYOR_REPO_COMMIT.SubString(0,8)
-
   environment:
     CYG_BASH: '%CYG_ROOT%/bin/bash -lc'
     OPAM_PACKAGES: 'calendars camlp5.8.00.01 cppo dune.2.9.0 jingoo markup piqi piqilib ppx_blob stdlib-shims syslog unidecode.0.2.0 uucp uutf uunf'
@@ -16,12 +13,6 @@
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
         CYG_ROOT: C:/cygwin64
         PKG_OS: win64
-      - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
-        PKG_OS: linux
-      - APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
-        PKG_OS: macos-10.14
-      - APPVEYOR_BUILD_WORKER_IMAGE: macos
-        PKG_OS: macos-10.15
 
   install:
     # windows environnement
@@ -35,42 +26,7 @@
     - cmd: '%CYG_BASH% "opam update"'
     - cmd: '%CYG_BASH% "opam install ${OPAM_PACKAGES}"'
     - cmd: '%CYG_BASH% "eval $(ocaml-env cygwin)"'
-    # unix environnement
-    - sh: 'export OPAMYES=1'
-    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then sudo chown -R appveyor:staff $HOME/.cache; fi;'
-    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then brew update; fi;'
-    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then brew install opam; fi;'
-    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then brew install cpanm; fi;'
-    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib); fi;'
-    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then cpanm String::ShellQuote; fi;'
-    - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then cpanm IPC::System::Simple; fi;'
-    - sh: 'if [[ "$PKG_OS" == "linux" ]]; then sudo add-apt-repository ppa:avsm/ppa; fi;'
-    - sh: 'if [[ "$PKG_OS" == "linux" ]]; then sudo sudo apt-get update; fi;'
-    - sh: 'if [[ "$PKG_OS" == "linux" ]]; then sudo apt-get install -qq opam libstring-shellquote-perl; fi;'
-    - sh: 'opam init --compiler=4.09.1'
-    - sh: 'eval $(opam config env)'
-    - sh: 'opam update'
-    - sh: 'opam install $OPAM_PACKAGES'
 
   build_script:
-    - sh : 'ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make clean distrib'
-    - sh : 'zip -r geneweb-$PKG_OS-$PKG_VERSION.zip distribution/*'
-    - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && make clean distrib"'
-    - cmd: 'iscc geneweb.iss'
-    - cmd: 7z a geneweb-%PKG_OS%-%PKG_VERSION%.zip %APPVEYOR_BUILD_FOLDER%\distribution
+    - cmd: '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release && cd plugins/api && piqic-ocaml --debug 1 --trace --ext api.piqi && cat api_piqi.ml api_piqi_ext.ml"'
 
-  artifacts:
-    - path: geneweb-%PKG_OS%-%PKG_VERSION%.zip
-      name: GeneWeb with default options
-    - path: geneweb-win64-%PKG_VERSION%-installer.exe
-      name: Win64 installer for GeneWeb
-
-  deploy:
-    release: 'Geneweb %PKG_VERSION%'
-    description: 'Geneweb %PKG_VERSION% built by appveyor'
-    provider: GitHub
-    auth_token:
-      secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
-    artifact: /geneweb-%PKG_OS%-%PKG_VERSION%.zip|geneweb-win64-%PKG_VERSION%-installer.exe/
-    draft: false
-    prerelease: true
