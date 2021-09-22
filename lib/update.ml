@@ -5,7 +5,22 @@ open Def
 open Gwdb
 open Util
 
-exception ModErr of string
+type update_error =
+  | UERR of string
+  | UERR_sex_married of person
+  | UERR_sex_incoherent of base * person
+  | UERR_sex_undefined of string * string * int
+  | UERR_unknow_person of string * string * int
+  | UERR_already_defined of base * person * string
+  | UERR_own_ancestor of base * person
+  | UERR_digest
+  | UERR_bad_date of Def.dmy
+  | UERR_missing_field of string
+  | UERR_already_has_parents of base * person
+  | UERR_missing_surname of string
+  | UERR_missing_first_name of string
+
+exception ModErr of update_error
 
 type create_info =
   { ci_birth_date : date option;
@@ -222,13 +237,79 @@ let prerr conf _err fn =
   end ;
   raise @@ ModErr _err
 
-let print_err_unknown conf _base (f, s, o) =
-  let err =
-    Printf.sprintf "%s%s <strong>%s.%d %s</strong>\n"
-      (Utf8.capitalize_fst (transl conf "unknown person")) (transl conf ":") f o s
+let print_someone_strong _conf base p =
+  Printf.sprintf "<strong>%s%s %s</strong>" (p_first_name base p)
+    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
+    (p_surname base p)
+
+let string_of_error conf =
+  let fso f s o = f ^ "." ^ string_of_int o ^ " " ^ s in
+  let fso_p base p =
+    let f = Gwdb.get_first_name p |> Gwdb.sou base |> Name.lower in
+    let s = Gwdb.get_surname p |> Gwdb.sou base |> Name.lower in
+    let o = get_occ p in
+    fso f s o
   in
+  let strong s = "<strong>" ^ s ^ "</strong>" in
+  function
+  | UERR s -> s
+  | UERR_sex_married _ ->
+    Utf8.capitalize_fst (transl conf "cannot change sex of a married person")
+  | UERR_sex_incoherent (base, p) ->
+    Utf8.capitalize_fst (fso_p base p)
+    ^ " "
+    ^ (if get_sex p = Female
+       then transl conf "should be male"
+       else transl conf "should be female")
+  | UERR_sex_undefined (f, s, o) ->
+    Printf.sprintf
+      (fcapitale (ftransl conf "undefined sex for %t"))
+      (fun _ -> fso f s o)
+  | UERR_unknow_person (f, s, o) ->
+    Utf8.capitalize_fst (transl conf "unknown person")
+    ^ transl conf ":"
+    ^ " "
+    ^ strong (fso f s o)
+  | UERR_already_defined (base, p, var) ->
+    Printf.sprintf
+      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+      ("\"" ^ fso_p base p ^ "\"")
+      (fun _ -> Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
+      (fun _ -> "</a>")
+    ^ (if var = "" then "." else "(" ^ var ^ ")")
+  | UERR_own_ancestor (base, p) ->
+    strong (fso_p base p) ^ " " ^ transl conf "would be his/her own ancestor"
+  | UERR_digest ->
+    transl conf {|the base has changed; do "back", "reload", and refill the form|}
+    |> Utf8.capitalize_fst
+  | UERR_bad_date d ->
+    Utf8.capitalize_fst (transl conf "incorrect date")
+    ^ transl conf ":"
+    ^ " "
+    ^ begin match d with
+      | {day = 0; month = 0; year = a} -> Printf.sprintf "%d" a
+      | {day = 0; month = m; year = a} -> Printf.sprintf "%d/%d" m a
+      | {day = j; month = m; year = a} -> Printf.sprintf "%d/%d/%d" j m a
+    end
+  | UERR_missing_field s -> "missing field: " ^ s
+  | UERR_already_has_parents (base, p) ->
+    Printf.sprintf
+      (fcapitale (ftransl conf "%t already has parents"))
+      (fun _ -> Printf.sprintf "%s" (referenced_person_text conf base p))
+  | UERR_missing_first_name "" ->
+    transl conf "first name missing"
+    |> Utf8.capitalize_fst
+  | UERR_missing_first_name x ->
+    (transl conf "first name missing" |> Utf8.capitalize_fst)
+    ^ transl conf ":" ^ " " ^ x
+  | UERR_missing_surname x ->
+    (transl conf "surname missing" |> Utf8.capitalize_fst)
+    ^ transl conf ":" ^ " " ^ x
+
+let print_err_unknown conf base (f, s, o) =
+  let err = UERR_unknow_person (f, s, o) in
   prerr conf err @@ fun () ->
-  Output.print_string conf err;
+  Output.print_string conf (string_of_error conf err);
   print_return conf
 
 let delete_topological_sort_v conf _base =
@@ -262,24 +343,8 @@ let print_first_name_strong conf base p =
   Output.printf conf "<strong>%s%s</strong>" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
 
-let string_of_error conf base = function
-  | AlreadyDefined p ->
-    Printf.sprintf
-      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-      ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-       p_surname base p ^ "\"")
-      (fun _ ->
-         Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
-      (fun _ -> "</a>.")
-  | OwnAncestor p ->
-    Printf.sprintf "%s\n%s" (print_someone_strong conf base p)
-      (transl conf "would be his/her own ancestor")
-  | BadSexOfMarriedPerson _ ->
-    Printf.sprintf "%s."
-      (Utf8.capitalize_fst (transl conf "cannot change sex of a married person"))
-
 let print_error conf base e =
-  Output.print_string conf @@ string_of_error conf base e
+  Output.print_string conf @@ string_of_error conf e
 
 let someone_ref_text conf base p =
   "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">\n" ^
@@ -708,12 +773,18 @@ let print_warnings_and_miscs conf base wl ml =
     Output.print_string conf "</ul>\n"
   end
 
-let error conf base x =
-  let err = string_of_error conf base x in
+let error conf err =
   prerr conf err @@ fun () ->
-  Output.print_string conf err;
+  Output.print_string conf (string_of_error conf err);
   Output.print_string conf "\n";
   print_return conf
+
+let def_error conf base x =
+  error conf @@
+  match x with
+  | AlreadyDefined p -> UERR_already_defined (base, p, "")
+  | OwnAncestor p -> UERR_own_ancestor (base, p)
+  | BadSexOfMarriedPerson p -> UERR_sex_married p
 
 let error_locked conf =
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
@@ -775,13 +846,10 @@ let error_locked conf =
   Hutil.trailer conf
 
 let error_digest conf =
-  let err =
-    Printf.sprintf @@
-    fcapitale (ftransl conf "the base has changed; do \"back\", \"reload\", and refill the form")
-  in
+  let err = UERR_digest in
   prerr conf err @@ fun () ->
   Hutil.print_link_to_welcome conf true;
-  Output.printf conf "<p>%s.\n</p>\n" err
+  Output.printf conf "<p>%s.\n</p>\n" (string_of_error conf err)
 
 let digest_person p = Marshal.to_string p [] |> Mutil.digest
 let digest_family f = Marshal.to_string f [] |> Mutil.digest
@@ -797,19 +865,9 @@ let get_number var key env =
   | _ -> None
 
 let bad_date conf d =
-  let err =
-    Printf.sprintf
-      "%s%s%a\n"
-      (Utf8.capitalize_fst (transl conf "incorrect date"))
-      (transl conf ":")
-      (fun _ -> function
-         | {day = 0; month = 0; year = a} -> Printf.sprintf "%d" a
-         | {day = 0; month = m; year = a} -> Printf.sprintf "%d/%d" m a
-         | {day = j; month = m; year = a} -> Printf.sprintf "%d/%d/%d" j m a)
-      d
-  in
+  let err = UERR_bad_date d in
   prerr conf err @@ fun () ->
-  Output.print_string conf err
+  Output.print_string conf (string_of_error conf err)
 
 let int_of_field s =
   match int_of_string (String.trim s) with
@@ -854,7 +912,7 @@ let reconstitute_date_dmy2 conf var =
           end
       | None -> {day2 = 0; month2 = 0; year2 = y; delta2 = 0}
       end
-  | None -> raise @@ ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
+  | None -> raise @@ ModErr (UERR_missing_field "oryear")
 
 let reconstitute_date_dmy conf var =
   let (prec, y) =
@@ -939,9 +997,9 @@ let reconstitute_date_dmy conf var =
 
 let check_missing_name conf p =
   if p.first_name = "" || p.first_name = "?"
-  then Some (transl conf "first name missing")
+  then Some (UERR_missing_first_name "")
   else if p.surname = "" || p.surname = "?"
-  then Some (transl conf "surname missing")
+  then Some (UERR_missing_surname "")
   else None
 
 let check_missing_witnesses_names conf get list =
@@ -953,13 +1011,9 @@ let check_missing_witnesses_names conf get list =
         let ((fn, sn, _, _, _), _) = Array.get witnesses i in
         if fn = "" && sn = "" then loop (i + 1)
         else if fn = "" || fn = "?" then
-          Some
-            (transl_nth conf "witness/witnesses" 0 ^ " : " ^
-             transl conf "first name missing")
+          Some (UERR_missing_first_name (transl_nth conf "witness/witnesses" 0))
         else if sn = "" || sn = "?" then
-          Some
-            (transl_nth conf "witness/witnesses" 0 ^ " : " ^
-             transl conf "surname missing")
+          Some (UERR_missing_surname (transl_nth conf "witness/witnesses" 0))
         else loop (i + 1)
       end
     in
@@ -1038,17 +1092,9 @@ let text_of_var conf =
     | _ -> var
 
 let print_create_conflict conf base p var =
-  let err =
-    Printf.sprintf
-      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-      ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-       p_surname base p ^ "\" (" ^ text_of_var conf var ^ ")")
-      (fun _ ->
-         Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
-      (fun _ -> "</a>.");
-  in
+  let err = UERR_already_defined (base, p, var) in
   prerr conf err @@ fun () ->
-  Output.print_string conf err ;
+  Output.print_string conf (string_of_error conf err) ;
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in

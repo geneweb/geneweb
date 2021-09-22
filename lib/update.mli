@@ -4,7 +4,22 @@ open Config
 open Def
 open Gwdb
 
-exception ModErr of string
+type update_error =
+  | UERR of string
+  | UERR_sex_married of person
+  | UERR_sex_incoherent of base * person
+  | UERR_sex_undefined of string * string * int
+  | UERR_unknow_person of string * string * int
+  | UERR_already_defined of base * person * string
+  | UERR_own_ancestor of base * person
+  | UERR_digest
+  | UERR_bad_date of Def.dmy
+  | UERR_missing_field of string
+  | UERR_already_has_parents of base * person
+  | UERR_missing_surname of string
+  | UERR_missing_first_name of string
+
+exception ModErr of update_error
 
 type create_info =
   { ci_birth_date : date option;
@@ -51,24 +66,27 @@ val print_return : config -> unit
 *)
 val print_continue : config -> ?continue:string -> string -> string -> unit
 
-(** [prerr conf msg callback]
+(** [prerr conf err callback]
     Regular mode: print error page using [callback] (wrapped in header/trailer)
-    and and raise [ModErr msg]
-    API mode: only raise [ModErr msg]
+    and and raise [ModErr err]
+    API mode: only raise [ModErr err]
 *)
-val prerr : config -> string -> (unit -> unit) -> 'a
+val prerr : config -> update_error -> (unit -> unit) -> 'a
 
-val string_of_error : config -> base -> CheckItem.base_error -> string
-val print_error : config -> base -> CheckItem.base_error -> unit
+val string_of_error : config -> update_error -> string
+val print_error : config -> base -> update_error -> unit
 val print_warnings : config -> base -> CheckItem.base_warning list -> unit
 val print_miscs : config -> base -> CheckItem.base_misc list -> unit
 val print_warnings_and_miscs :
   config -> base -> CheckItem.base_warning list -> CheckItem.base_misc list ->
     unit
-val error : config -> base -> CheckItem.base_error -> 'a
+
+val def_error : config -> base -> person Def.error -> unit
+
+val error : config -> update_error -> 'exn
 
 val error_locked : config -> unit
-val error_digest : config -> unit
+val error_digest : config -> 'exn
 
 val digest_person : (iper, key, string) gen_person -> Digest.t
 val digest_family :
@@ -87,9 +105,9 @@ val check_missing_witnesses_names
   : config
   -> ('a -> ((string * string * 'b * 'c * 'd) * 'e) array)
   -> 'a list
-  -> string option
+  -> update_error option
 
 val check_missing_name
   : config
   -> ('a, 'b, string) Def.gen_person
-  -> string option
+  -> update_error option

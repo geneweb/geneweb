@@ -422,7 +422,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   patch_person base p.key_index p;
   let u = {family = Array.append p_family p2_family} in
   if p2_family <> [||] then patch_union base p.key_index u;
-  Consang.check_noloop_for_person_list base (Update.error conf base) [p.key_index];
+  Consang.check_noloop_for_person_list base (Update.def_error conf base) [p.key_index];
   let wl =
     let a = poi base p.key_index in
     let a = {parents = get_parents a; consang = get_consang a} in

@@ -598,7 +598,7 @@ let compute_warnings conf base resp =
   in
   match resp with
   | Api_update_util.UpdateErrorConflict c -> (false, [], [], Some c, [])
-  | Api_update_util.UpdateError s -> (false, [s], [], None, [])
+  | Api_update_util.UpdateError s -> (false, [Update.string_of_error conf s], [], None, [])
   | Api_update_util.UpdateSuccess (wl, ml, hr) ->
       let warning =
         List.fold_right
@@ -2161,72 +2161,39 @@ let print_add_sibling_ok conf base =
 
 (**/**) (* Fonctions pour la première saisie. *)
 
+let raise_ModErr e = raise (Update.ModErr e)
 
-(* ************************************************************************ *)
-(*  [Fonc] check_input_person : config -> Person -> unit                    *)
-(** [Description] : Cette fonction vérifie que les champs obligatoire sont
-                    bien renseignés.
-    [Args] :
-      - conf  : configuration de la base
-      - mod_p : person piqi
-    [Retour] : Néant
-                                                                           *)
-(* ************************************************************************ *)
+(** [check_input_person conf p] checks that every needed field of [p] is filled *)
 let check_input_person conf mod_p =
-  let designation () =
-    let occ =
-      match mod_p.Mwrite.Person.occ with
-      | Some i -> Int32.to_int i
-      | None -> 0
-    in
-    mod_p.Mwrite.Person.firstname ^ "." ^ string_of_int occ ^
-      " " ^ mod_p.Mwrite.Person.lastname
+  let o =
+    match mod_p.Mwrite.Person.occ with
+    | Some i -> Int32.to_int i
+    | None -> 0
   in
-  let () =
-    if mod_p.Mwrite.Person.lastname = "" &&
-       mod_p.Mwrite.Person.firstname = ""
-    then
-      List.fold_right
-        (fun evt () ->
-          (match evt.Mwrite.Pevent.date with
-          | Some date ->
-              (match date.Mwrite.Date.dmy with
-              | Some dmy ->
-                  (match
-                     (dmy.Mwrite.Dmy.year,
-                      dmy.Mwrite.Dmy.month,
-                      dmy.Mwrite.Dmy.day)
-                   with
-                   | (None, None, None) -> ()
-                   | _ ->
-                       let err =
-                         transl conf "unknown person" ^ ": " ^ designation ()
-                       in
-                       raise (Update.ModErr err))
-              | None -> ())
-          | None -> ()))
-        mod_p.Mwrite.Person.pevents ()
-    else if mod_p.Mwrite.Person.lastname <> "" &&
-            mod_p.Mwrite.Person.firstname <> ""
-    then
-      if mod_p.Mwrite.Person.sex = `unknown then
-        let err =
-          Printf.sprintf
-            (ftransl conf "undefined sex for %t") (fun _ -> designation ())
-        in
-        raise (Update.ModErr err)
-      else ()
-    else
-      let err =
-        if mod_p.Mwrite.Person.lastname = "" then
-          transl conf "surname missing" ^ ": " ^ designation ()
-        else
-          transl conf "first name missing" ^ ": " ^ designation ()
-      in
-      raise (Update.ModErr err)
-  in
-  ()
+  let f = mod_p.Mwrite.Person.firstname in
+  let s = mod_p.Mwrite.Person.lastname in
+  if f = "" && s = "" then
+    List.fold_right begin fun evt () ->
+      match evt.Mwrite.Pevent.date with
+      | None -> ()
+      | Some date ->
+        match date.Mwrite.Date.dmy with
+        | None -> ()
+        | Some dmy ->
+          match dmy.Mwrite.Dmy.year, dmy.Mwrite.Dmy.month, dmy.Mwrite.Dmy.day with
+          | (None, None, None) -> ()
+          | _ -> raise_ModErr (Update.UERR_unknow_person (f, s, o))
+    end mod_p.Mwrite.Person.pevents ()
+  else if s = "" then
+    let designation = mod_p.Mwrite.Person.firstname ^ "." ^ string_of_int o ^ " ?" in
+    raise_ModErr (Update.UERR_missing_surname designation)
+  else if f = "" then
+    let designation = "?." ^ string_of_int o ^ " " ^ mod_p.Mwrite.Person.lastname in
+    raise_ModErr (Update.UERR_missing_first_name designation)
+  else if mod_p.Mwrite.Person.sex = `unknown then
+    raise_ModErr (Update.UERR_sex_undefined (f, s, o))
 
+let check_input_person : Config.config -> Mwrite.person -> 'unit_or_exn = check_input_person
 
 (* ************************************************************************ *)
 (*  [Fonc] compute_add_first_fam : config ->
@@ -2364,33 +2331,20 @@ let compute_add_first_fam conf =
   in
   (add_first_fam, resp)
 
-
-(* ************************************************************************ *)
-(*  [Fonc] print_add_first_fam : config -> ModificationStatus               *)
-(** [Description] : Simule l'ajout de la première saisie mais sans
-      l'existence d'une base GeneWeb.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] :
-      - status : les informations si la modification s'est bien passée.
-                                                                           *)
-(* ************************************************************************ *)
+(** [print_add_first_fam conf]
+    Simulate the addition of the first family in an empty base, without
+    any existing base.
+*)
 let print_add_first_fam conf =
   let (add_first_fam, resp) = compute_add_first_fam conf in
   let mod_p = add_first_fam.Mwrite.Add_first_fam.sosa in
-
-  (* compute_modification_status si pas de base, on ne peut *)
-  (* pas avoir ni warnings, ni modification d'historique.   *)
-  let (surname, first_name, occ, index_person, surname_str, first_name_str) =
-    (mod_p.Mwrite.Person.lastname,
-     mod_p.Mwrite.Person.firstname,
-     mod_p.Mwrite.Person.occ,
-     None,
-     Some mod_p.Mwrite.Person.lastname,
-     Some mod_p.Mwrite.Person.firstname)
-  in
-  let sn = if surname = "" then None else Some (Name.lower surname) in
-  let fn = if first_name = "" then None else Some (Name.lower first_name) in
+  let lastname = mod_p.Mwrite.Person.lastname in
+  let firstname = mod_p.Mwrite.Person.firstname in
+  let occ = mod_p.Mwrite.Person.occ in
+  let lastname_str = Some mod_p.Mwrite.Person.lastname in
+  let firstname_str = Some mod_p.Mwrite.Person.firstname in
+  let n = if lastname = "" then None else Some (Name.lower lastname) in
+  let p = if firstname = "" then None else Some (Name.lower firstname) in
   let index_family = None in
   let (is_base_updated, warnings, miscs, conflict, _) =
     match resp with
@@ -2399,20 +2353,19 @@ let print_add_first_fam conf =
     | Api_update_util.UpdateSuccess _ -> (true, [], [], None, [])
   in
   let response =
-    {
-      Mwrite.Modification_status.is_base_updated = is_base_updated;
-      base_warnings = warnings;
-      base_miscs = miscs;
-      index_person = index_person;
-      lastname = surname;
-      firstname = first_name;
-      occ = occ;
-      index_family = index_family;
-      conflict = conflict;
-      lastname_str = surname_str;
-      firstname_str = first_name_str;
-      n = sn;
-      p = fn;
+    { Mwrite.Modification_status.is_base_updated
+    ; base_warnings = List.map (Update.string_of_error conf) warnings
+    ; base_miscs = miscs
+    ; index_person = None
+    ; lastname
+    ; firstname
+    ; occ
+    ; index_family
+    ; conflict
+    ; lastname_str
+    ; firstname_str
+    ; n
+    ; p
     }
   in
   let data = Mext_write.gen_modification_status response in

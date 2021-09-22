@@ -86,7 +86,7 @@ let api_find_free_occ base fn sn =
 *)
 type update_base_status =
   | UpdateSuccess of CheckItem.base_warning list * CheckItem.base_misc list * (unit -> unit) list
-  | UpdateError of string
+  | UpdateError of Update.update_error
   | UpdateErrorConflict of Mwrite.Create_conflict.t
 
 

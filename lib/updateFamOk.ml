@@ -538,40 +538,25 @@ let strip_array_persons pl =
     pl []
 
 let error_family conf err =
-  let err' =
-    Printf.sprintf "%s%s%s"
-      (Utf8.capitalize_fst (transl conf "error"))
-      (transl conf ":")
-      err
-  in
-  Update.prerr conf err' @@ fun () ->
-  Output.print_string conf (Utf8.capitalize_fst err);
+  Update.prerr conf err @@ fun () ->
+  err |> Update.string_of_error conf |> Utf8.capitalize_fst |> Output.print_string conf;
   Output.print_string conf "\n";
   Update.print_return conf
 
 let check_parents conf cpl =
-  let (fa_fn, fa_sn, _, _, _) = Gutil.father cpl in
-  let (mo_fn, mo_sn, _, _, _) = Gutil.mother cpl in
-  match (fa_fn = "", fa_sn = ""), (mo_fn = "", mo_sn = "") with
-    (true, true), (true, true) | (true, true), (false, false) |
-    (false, false), (true, true) | (false, false), (false, false) ->
-      None
-  | (false, true), _ ->
-      Some
-        (transl_nth conf "father/mother" 0 ^ " : " ^
-         transl conf "surname missing")
-  | (true, false), _ ->
-      Some
-        (transl_nth conf "father/mother" 0 ^ " : " ^
-         transl conf "first name missing")
-  | _, (false, true) ->
-      Some
-        (transl_nth conf "father/mother" 1 ^ " : " ^
-         transl conf "surname missing")
-  | _, (true, false) ->
-      Some
-        (transl_nth conf "father/mother" 1 ^ " : " ^
-         transl conf "first name missing")
+  let check get i =
+    let (fn, sn, _, _, _) = get cpl in
+    if fn = "" then
+      if sn = "" then
+        Some (Update.UERR_missing_first_name (transl_nth conf "father/mother" i))
+      else None
+    else if sn = "" then
+      Some (Update.UERR_missing_surname (transl_nth conf "father/mother" i))
+    else None
+  in
+  match check Gutil.father 0 with
+  | Some _ as err -> err
+  | None -> check Gutil.mother 1
 
 let check_family conf fam cpl =
   let err_parents = check_parents conf cpl in
@@ -588,42 +573,31 @@ let strip_family fam des =
   let des = {children = strip_array_persons des.children} in fam, des
 
 let print_err_parents conf base p =
-  let err =
-    Printf.sprintf (fcapitale (ftransl conf "%t already has parents"))
-      (fun _ -> Printf.sprintf "\n%s" (referenced_person_text conf base p))
-  in
+  let err = Update.UERR_already_has_parents (base, p) in
   Update.prerr conf err @@ fun () ->
   Output.printf conf "\n%s<p><ul><li>%s%s %d</li></ul>"
-    err
+    (Update.string_of_error conf err)
     (Utf8.capitalize_fst (transl conf "first free number"))
     (Util.transl conf ":")
     (Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0);
   Update.print_return conf
 
-let print_err_sex conf base p err =
-  let err =
-    Printf.sprintf "\n%s\n%s\n" (referenced_person_text conf base p) err
-  in
+let print_err_sex conf base p =
+  let err = Update.UERR_sex_incoherent (base, p) in
   Update.prerr conf err @@ fun () ->
-  Output.print_string conf err ;
+  Output.print_string conf (Update.string_of_error conf err) ;
   Update.print_return conf
 
-let print_err_father_sex conf base p =
-  print_err_sex conf base p (transl conf "should be male")
-
-let print_err_mother_sex conf base p =
-  print_err_sex conf base p (transl conf "should be female")
-
 let print_err conf =
-  let err = Printf.sprintf "%s" (Utf8.capitalize_fst (transl conf "error")) in
+  let err = Update.UERR (transl conf "error" |> Utf8.capitalize_fst) in
   Update.prerr conf err @@ fun () ->
   Update.print_return conf
 
 let print_error_disconnected conf =
-  let err = Printf.sprintf "%s" (Utf8.capitalize_fst (transl conf "msg error disconnected")) in
+  let err = Update.UERR (transl conf "msg error disconnected" |> Utf8.capitalize_fst) in
   Update.prerr conf err @@ fun () ->
   Hutil.print_link_to_welcome conf true;
-  Output.print_string conf err
+  Output.print_string conf (Update.string_of_error conf err)
 
 let family_exclude pfams efam =
   let pfaml =
@@ -863,19 +837,16 @@ let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
     else nfam
   in
   if not nsck then begin
-    begin match get_sex nfath_p with
-      | Female -> print_err_father_sex conf base nfath_p
-      | Male -> ()
-      | _ ->
-        let nfath_p = {(gen_person_of_person nfath_p) with sex = Male} in
-        patch_person base nfath_p.key_index nfath_p
-    end;
-    match get_sex nmoth_p with
-      Male -> print_err_mother_sex conf base nmoth_p
-    | Female -> ()
-    | _ ->
-      let nmoth_p = {(gen_person_of_person nmoth_p) with sex = Female} in
-      patch_person base nmoth_p.key_index nmoth_p
+    let exp sex p =
+      let s = get_sex p in
+      if s = Neuter
+      then
+        let p = {(gen_person_of_person p) with sex} in
+        patch_person base p.key_index p
+      else if s <> sex then print_err_sex conf base p
+    in
+    exp Male nfath_p ;
+    exp Female nmoth_p ;
   end ;
   if Adef.father ncpl = Adef.mother ncpl then print_err conf ;
   let origin_file = origin_file nfam ncpl ndes in
@@ -1003,10 +974,12 @@ let effective_add conf base nsck sfam scpl sdes =
 let effective_inv conf base ip u ifam =
   let rec loop =
     function
-      ifam1 :: ifam2 :: ifaml ->
-        if ifam2 = ifam then ifam2 :: ifam1 :: ifaml
-        else ifam1 :: loop (ifam2 :: ifaml)
-    | _ -> Hutil.incorrect_request conf; raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
+    | ifam1 :: ifam2 :: ifaml ->
+      if ifam2 = ifam then ifam2 :: ifam1 :: ifaml
+      else ifam1 :: loop (ifam2 :: ifaml)
+    | _ ->
+      Hutil.incorrect_request conf ;
+      raise @@ Update.ModErr (Update.UERR (__FILE__ ^ " " ^ string_of_int __LINE__))
   in
   let u = {family = Array.of_list (loop (Array.to_list (get_family u)))} in
   patch_union base ip u
@@ -1085,7 +1058,7 @@ let need_check_noloop (scpl, sdes, onfs) =
 let all_checks_family conf base ifam gen_fam cpl des scdo =
   let wl = ref [] in
   let ml = ref [] in
-  let error = Update.error conf base in
+  let error = Update.def_error conf base in
   let warning w = wl := w :: !wl in
   let misc m = ml := m :: !ml in
   if need_check_noloop scdo then

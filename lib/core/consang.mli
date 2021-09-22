@@ -1,7 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-(* TODO: Def.iper -> Gwdb.iper *)
-
 open Def
 open Gwdb
 

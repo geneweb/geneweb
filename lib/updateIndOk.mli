@@ -11,7 +11,7 @@ val effective_del : config -> base -> person -> unit
 
 (** [effective_mod prerr ?skip_conflict conf base sp] *)
 val effective_mod
-  : ?prerr:(config -> base -> person error -> unit)
+  : ?prerr:(config -> base -> Update.update_error -> unit)
   -> ?skip_conflict:iper
   -> config
   -> base
@@ -19,7 +19,7 @@ val effective_mod
   -> (iper, iper, istr) gen_person
 
 val print_mod
-  : ?prerr:(config -> base -> person error -> unit) -> config -> base -> unit
+  : ?prerr:(config -> base -> Update.update_error -> unit) -> config -> base -> unit
 
 val all_checks_person :
   base -> (iper, iper, istr) gen_person -> ifam gen_ascend ->
@@ -45,8 +45,8 @@ val strip_person
   -> (iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person
 val check_person :
   config -> (iper, string * string * 'b * 'c * 'd, string) Def.gen_person ->
-    string option
-val error_person : config -> string -> unit
+    Update.update_error option
+val error_person : config -> Update.update_error -> unit
 val update_relations_of_related : base -> iper -> iper list -> unit
 val reconstitute_death :
   config -> Def.date option -> Def.date option -> string -> Def.burial ->
