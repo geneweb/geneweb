@@ -16,7 +16,6 @@
 
   install:
     # windows environnement
-    - cmd: 'set CYGWIN=winsymlinks:nativestrict'
     - cmd: 'choco install -y innosetup'
     - cmd: 'set OPAMJOBS=1'
     - cmd: 'set OPAMVERBOSE=9'
