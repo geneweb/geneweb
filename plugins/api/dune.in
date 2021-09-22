@@ -1,7 +1,6 @@
 (alias
   (name plugin)
   (deps (file META) (source_tree assets) plugin_api.cmxs)
-  (enabled_if (= "Unix" %{os_type}))
 )
 
 (copy_files assets/*.piqi)
@@ -61,7 +60,6 @@
   )
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% -V OCAML:%{ocaml_version} %{input-file})))
   (wrapped true)
-  (enabled_if (= "Unix" %{os_type}))
   (optional)
 )
 
@@ -78,6 +76,5 @@
   (flags (:standard -w -40-27))
   (modes (native plugin))
   (modules plugin_api)
-  (enabled_if (= "Unix" %{os_type}))
   (optional)
 )
