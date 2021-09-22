@@ -19,6 +19,7 @@
     - cmd: 'set CYGWIN=winsymlinks:nativestrict'
     - cmd: 'choco install -y innosetup'
     - cmd: 'set OPAMJOBS=1'
+    - cmd: 'set OPAMVERBOSE=9'
     - cmd: 'set OPAMYES=1'
     - cmd: 'set PATH=%PATH%;%CYG_ROOT%\usr\x86_64-w64-mingw32\sys-root\mingw\bin'
     - cmd: '%CYG_ROOT%\setup-x86_64.exe -qnNdO -R %CYG_ROOT% -s http://cygwin.mirror.constant.com -l %CYG_ROOT%/var/cache/setup -P rsync -P patch -P diffutils -P unzip -P m4 -P mingw64-x86_64-gcc-core -P mingw64-x86_64-gmp -P perl-IPC-System-Simple'
