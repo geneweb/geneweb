@@ -4,6 +4,8 @@
   (enabled_if (= "Unix" %{os_type}))
 )
 
+(copy_files assets/*.piqi)
+
 (rule
   (deps api.piqi)
   (targets api_piqi.ml api_piqi_ext.ml)
