@@ -292,8 +292,7 @@ let print_mod_aux conf base ncn mod_p callback =
       | Some err -> Api_update_util.UpdateError err
       | None -> callback p
     else
-      let _ = Update.error_digest conf in
-      Api_update_util.UpdateError "BaseChanged"
+      Update.error_digest conf
   with
   | Update.ModErr s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c

@@ -146,7 +146,7 @@ let print_change_done conf base p =
 let print_conflict conf base ip_var p =
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
-  Update.print_error conf base (AlreadyDefined p);
+  Update.print_error conf base @@ Update.UERR_already_defined (base, p, "");
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
@@ -183,14 +183,14 @@ class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize_fst (transl con
   Output.print_string conf "</form>\n";
   Update.print_same_name conf base p;
   Hutil.trailer conf;
-  raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
+  raise @@ Update.ModErr (Update.UERR (__FILE__ ^ " " ^ string_of_int __LINE__))
 
 let error_person conf err =
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
   Output.printf conf "%s\n" (Utf8.capitalize_fst err);
   Hutil.trailer conf;
-  raise @@ Update.ModErr (__FILE__ ^ " " ^ string_of_int __LINE__)
+  raise @@ Update.ModErr (Update.UERR (__FILE__ ^ " " ^ string_of_int __LINE__))
 
 
 let print_update_child conf base =

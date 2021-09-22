@@ -718,17 +718,11 @@ let error_person conf err =
   if not conf.api_mode then begin
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title;
-  Output.print_string conf (Utf8.capitalize_fst err);
+  Output.print_string conf (Utf8.capitalize_fst @@ Update.string_of_error conf err);
   Output.print_string conf "\n";
   Update.print_return conf;
   Hutil.trailer conf;
   end ;
-  let err =
-    Printf.sprintf "%s%s%s"
-      (Utf8.capitalize_fst (transl conf "error"))
-      (Utf8.capitalize_fst (transl conf ":"))
-      err
-  in
   raise @@ Update.ModErr err
 
 let strip_pevents p =
@@ -768,10 +762,9 @@ let strip_person p =
      List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents}
 
 let print_conflict conf base p =
-  if not conf.api_mode then begin
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
-  Hutil.rheader conf title;
-  Update.print_error conf base (AlreadyDefined p);
+  let err = Update.UERR_already_defined (base, p, "") in
+  Update.prerr conf err @@ fun () ->
+  Update.print_error conf base (Update.UERR_already_defined (base, p, ""));
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
@@ -803,48 +796,27 @@ let print_conflict conf base p =
   Output.printf conf "<input type=\"submit\" name=\"return\" value=\"%s\">\n"
     (Utf8.capitalize_fst (transl conf "back"));
   Output.print_string conf "</form>\n";
-  Update.print_same_name conf base p;
-  Hutil.trailer conf;
-  end ;
-  let err =
-    Printf.sprintf
-      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-      ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-       p_surname base p ^ "\"")
-      (fun _ ->
-         Printf.sprintf "%s %s" (sou base (get_first_name p))
-           (sou base (get_surname p)))
-      (fun _ -> ".")
-   in
-   raise @@ Update.ModErr err
+  Update.print_same_name conf base p
 
 let default_prerr conf base = function
-  | BadSexOfMarriedPerson p as err ->
-    let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
-    Hutil.rheader conf title;
+  | Update.UERR_sex_married p as err ->
+    Update.prerr conf err @@ fun () ->
     Update.print_error conf base err ;
-    Output.printf conf "<ul><li>%s</li></ul>" (Util.referenced_person_text conf base p);
+    Output.print_string conf "<ul><li>" ;
+    Output.print_string conf (Util.referenced_person_text conf base p) ;
+    Output.print_string conf "</li></ul>" ;
     Update.print_return conf ;
-    Update.print_continue conf "nsck" "on" ;
-    Hutil.trailer conf
+    Update.print_continue conf "nsck" "on"
   | _ -> assert false
 
-let print_cannot_change_sex ?(prerr = default_prerr) conf base p =
-  if not conf.api_mode then
-  prerr conf base (BadSexOfMarriedPerson p) ;
-  let err =
-    Printf.sprintf "%s." (Utf8.capitalize_fst (transl conf "cannot change sex of a married person"))
-  in
-  raise @@ Update.ModErr err
-
-let check_sex_married ?prerr conf base sp op =
+let check_sex_married ?(prerr = default_prerr) conf base sp op =
   if sp.sex <> get_sex op
   && Array.exists begin fun ifam ->
        let fam = foi base ifam in
        (sp.sex = Male && sp.key_index <> get_father fam)
        || (sp.sex = Female && sp.key_index <> get_mother fam)
      end (get_family op)
-  then print_cannot_change_sex ?prerr conf base op
+  then prerr conf base (Update.UERR_sex_married op)
 
 let rename_image_file conf base op sp =
   match auto_image_file conf base op with
