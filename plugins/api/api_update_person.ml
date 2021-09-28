@@ -305,7 +305,11 @@ let print_mod ?(no_check_name = false) ?(fexclude = []) conf base mod_p =
   in
   let callback p =
     begin
-      let p = UpdateIndOk.effective_mod conf base p in
+      let p =
+        (* Do not check sex of married person *)
+        let conf = { conf with Config.env = ("nsck", "on") :: conf.Config.env } in
+        UpdateIndOk.effective_mod conf base p
+      in
       let op = poi base p.key_index in
       let u = {family = get_family op} in
       patch_person base p.key_index p;
