@@ -7,6 +7,8 @@ open Gwdb
 open Geneweb.Util
 
 module CheckItem = Geneweb.CheckItem
+module Dag = Geneweb.Dag
+module DagDisplay = Geneweb.DagDisplay
 module Date = Date
 module DateDisplay = Geneweb.DateDisplay
 module Gutil = Gutil
@@ -1469,6 +1471,20 @@ let mode_local env =
   | Vfam _ -> false
   | _ -> true
 
+let filter_comments s =
+  let rec loop i s =
+    let beg_c = try String.index_from s i '<' with Not_found -> -1 in
+    let end_c =
+      try if beg_c >= 0 then String.index_from s beg_c '>' else -1 with Not_found -> -1
+    in
+    if beg_c = -1 then s
+    else if beg_c >= 0 && beg_c + 3 < String.length s &&
+       s.[beg_c+1] = '!' && s.[beg_c+2] = '-' && s.[beg_c+3] = '-' &&
+       end_c - 2 >= 0 && s.[end_c-1] = '-' && s.[end_c-2] = '-'
+       then loop beg_c (String.sub s 0 beg_c) ^ (String.sub s (end_c+1) (String.length s - end_c - 1))
+       else loop (beg_c+1) s
+  in loop 0 s
+
 let get_note_source conf base env auth no_note note_source =
   if auth && not no_note then
     let s = string_with_macros conf env note_source in
@@ -1490,8 +1506,9 @@ let get_note_source conf base env auth no_note note_source =
        Wiki.wi_person_exists = person_exists conf base;
        Wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
-    let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
-    Util.safe_html s
+    Wiki.syntax_links conf wi (String.concat "\n" lines)
+    |> Util.safe_html
+    |> filter_comments
   else ""
 
 let rec eval_var conf base env ep loc sl =
@@ -5051,6 +5068,53 @@ let () =
       gen_interp_templ true title templ_fname conf base p
 
 (* Main *)
+
+let limit_by_tree conf =
+  match p_getint conf.base_env "max_anc_tree" with
+    Some x -> max 1 x
+  | None -> 7
+
+let print_ancestors_dag conf base v p =
+  let v = min (limit_by_tree conf) v in
+  let set =
+    let rec loop set lev ip =
+      let set = Dag.Pset.add ip set in
+      if lev <= 1 then set
+      else
+        match get_parents (pget conf base ip) with
+          Some ifam ->
+            let cpl = foi base ifam in
+            let set = loop set (lev - 1) (get_mother cpl) in
+            loop set (lev - 1) (get_father cpl)
+        | None -> set
+    in
+    loop Dag.Pset.empty v (get_iper p)
+  in
+  let elem_txt p = DagDisplay.Item (p, "") in
+  (* Récupère les options d'affichage. *)
+  let options = Util.display_options conf in
+  let vbar_txt ip =
+    let p = pget conf base ip in
+    Printf.sprintf "%sm=A&t=T&v=%d&%s&dag=on&%s" (commd conf) v options
+      (acces conf base p)
+  in
+  let page_title = Utf8.capitalize_fst (Util.transl conf "tree") in
+  DagDisplay.make_and_print_dag conf base elem_txt vbar_txt true set [] page_title ""
+
+let print_ascend conf base p =
+  match
+    p_getenv conf.env "t", p_getenv conf.env "dag", p_getint conf.env "v"
+  with
+    Some "T", Some "on", Some v -> print_ancestors_dag conf base v p
+  | _ ->
+      let templ =
+        match p_getenv conf.env "t" with
+          Some ("E" | "F" | "H" | "L") -> "anclist"
+        | Some ("D" | "G" | "M" | "N" | "P" | "X" | "Y" | "Z") -> "ancsosa"
+        | Some ("A" | "C" | "T") -> "anctree"
+        | _ -> "ancmenu"
+      in
+      !V7_interp.templ templ conf base p
 
 let print ?no_headers conf base p =
   let passwd =
