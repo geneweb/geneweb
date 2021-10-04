@@ -85,22 +85,19 @@ module Make (D : ConverterDriver) = struct
        ; "calendar", str cal
       |]
 
-  type calendar = [%import: Def.calendar] [@@deriving show { with_path = false }]
   let conv_date oc =
     match oc with
-    | Dgreg (d, c) -> conv_date_cal d (show_calendar c)
+    | Dgreg (d, c) -> conv_date_cal d (Def_show.show_calendar c)
     | Dtext t -> str t
 
   let conv_cdate cd = match Adef.od_of_cdate cd with
     | None -> null
     | Some date -> conv_date date
 
-  type 'a gen_pers_event_name = [%import: 'a Def.gen_pers_event_name] [@@deriving show { with_path = false }]
   let conv_pevent_name x =
-    str @@ show_gen_pers_event_name (fun fmt -> Format.fprintf fmt "Epers_Name %s") x
+    str @@ Def_show.show_gen_pers_event_name (fun fmt -> Format.fprintf fmt "Epers_Name %s") x
 
-  type witness_kind = [%import: Def.witness_kind] [@@deriving show { with_path = false }]
-  let conv_event_witness_kind x = str @@ show_witness_kind x
+  let conv_event_witness_kind x = str @@ Def_show.show_witness_kind x
 
   let handler_of_iper i = str @@ Gwdb_driver.string_of_iper i
   let handler_of_ifam i = str @@ Gwdb_driver.string_of_ifam i
@@ -137,12 +134,10 @@ module Make (D : ConverterDriver) = struct
        ; "place", str gen_title.t_place
       |]
 
-  type relation_kind = [%import: Def.relation_kind] [@@deriving show { with_path = false }]
-  let conv_relation_kind x = str @@ show_relation_kind x
+  let conv_relation_kind x = str @@ Def_show.show_relation_kind x
 
-  type 'a gen_fam_event_name = [%import: 'a Def.gen_fam_event_name] [@@deriving show { with_path = false }]
   let conv_fevent_name x =
-    str @@ [%derive.show: string gen_fam_event_name] x
+    str @@ Def_show.show_gen_fam_event_name (fun fmt -> Format.fprintf fmt "Efam_Name %s") x
 
   let conv_fevent fevent =
     obj
@@ -160,8 +155,7 @@ module Make (D : ConverterDriver) = struct
     | Divorced date -> conv_cdate date
     | Separated -> bool true
 
-  type relation_type = [%import: Def.relation_type] [@@deriving show { with_path = false }]
-  let conv_relation_type x = str @@ show_relation_type x
+  let conv_relation_type x = str @@ Def_show.show_relation_type x
 
   let conv_rparent gen_relation =
     obj

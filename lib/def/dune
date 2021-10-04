@@ -1,5 +1,6 @@
 (library
  (name geneweb_def)
  (public_name geneweb.def)
+ (modules adef def)
  (wrapped false)
 )
