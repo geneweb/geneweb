@@ -1,0 +1,7 @@
+(library
+  (name geneweb_export)
+  (public_name geneweb.export)
+  (preprocess (staged_pps ppx_import ppx_deriving.show))
+  (libraries unix geneweb_def geneweb_gwdb)
+  (modules json_converter)
+)

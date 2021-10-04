@@ -33,6 +33,7 @@ depends: [
   "piqilib"
   "ppx_blob"
   "ppx_deriving"
+  "ppx_import"
   "redis"
   "redis-sync"
   "stdlib-shims"
