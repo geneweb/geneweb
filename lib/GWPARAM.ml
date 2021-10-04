@@ -140,6 +140,21 @@ module Default = struct
     in
     Printf.eprintf "[%s]: %s %s\n" (Mutil.sprintf_date tm) level msg
 
+  let wrap_output (conf : Config.config) (title : string) (content : unit -> unit) =
+    Output.print_string conf {|<!DOCTYPE html><head><title>|};
+    Output.print_string conf title ;
+    Output.print_string conf {|</title>|} ;
+    Output.print_string conf {|<meta name="robots" content="none">|} ;
+    Output.print_string conf {|<meta charset="|} ;
+    Output.print_string conf conf.charset ;
+    Output.print_string conf {|">|} ;
+    Output.print_string conf
+      {|<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">|} ;
+    Output.print_string conf {|</head>|} ;
+    Output.print_string conf "<body>" ;
+    content () ;
+    Output.print_string conf {|</body></html>|}
+
 end
 
 let init = ref Default.init
@@ -148,3 +163,9 @@ let bpath = ref Default.bpath
 let output_error = ref Default.output_error
 let p_auth = ref Default.p_auth
 let syslog = ref Default.syslog
+
+(** [wrap_output conf title content]
+    Plugins defining a page content but not a complete UI
+    may want to wrap their page using [wrap_output].
+*)
+let wrap_output = ref Default.wrap_output

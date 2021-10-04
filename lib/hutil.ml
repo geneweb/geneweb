@@ -117,6 +117,12 @@ let gen_trailer with_logo conf =
 
 let trailer = gen_trailer true
 
+let () = GWPARAM.wrap_output := begin fun conf title content ->
+    header conf (fun _ -> Output.print_string conf title) ;
+    content () ;
+    trailer conf ;
+  end
+
 let incorrect_request conf =
   !GWPARAM.output_error conf Def.Bad_Request
 
