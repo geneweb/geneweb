@@ -1,0 +1,16 @@
+(alias
+  (name plugin)
+  (deps plugin_lib_gedcom.cmxs)
+)
+
+(rule
+ (target plugin_lib_gedcom.ml)
+ (action (run touch %{target}))
+)
+
+(executable
+  (name plugin_lib_gedcom)
+  (embed_in_plugin_libraries gedcom)
+  (flags -linkall)
+  (modes (native plugin))
+)
