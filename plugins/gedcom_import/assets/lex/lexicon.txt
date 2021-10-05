@@ -1,0 +1,7 @@
+    plugin_gedcom_import_GEDCOM_IMPORT
+en: Import GEDCOM
+fr: Import de GEDCOM
+
+    plugin_gedcom_import_GEDCOM_IMPORT_OK
+en: Import GEDCOM
+fr: Import de GEDCOM

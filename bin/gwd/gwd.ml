@@ -200,6 +200,7 @@ exception Register_plugin_failure of string * Dynlink.error
 
 let register_plugin dir =
   if not (List.mem dir !unsafe_plugins || GwdPluginMD5.allowed dir) then failwith dir ;
+  if !debug then print_endline ("Loading plugin: " ^ dir) ;
   let pname = Filename.basename dir in
   let plugin = Filename.concat dir @@ "plugin_" ^ pname ^ ".cmxs" in
   lexicon_fname := !lexicon_fname ^ pname ^ "." ;

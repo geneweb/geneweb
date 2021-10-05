@@ -1,0 +1,24 @@
+(alias
+  (name plugin)
+  (deps (source_tree assets) META plugin_gedcom_import.cmxs)
+)
+
+(library
+  (name plugin_gedcom_import_lib)
+  (public_name geneweb.plugin_gedcom_import_lib)
+  (libraries geneweb gedcom res)
+  (flags (:standard -w -42-40 -rectypes))
+  (wrapped true)
+  (modules gedcom_import)
+)
+
+(executable
+  (name plugin_gedcom_import)
+  (libraries geneweb.gwd_lib gedcom plugin_gedcom_import_lib)
+  (flags -linkall -rectypes)
+  (modes (native plugin))
+  (embed_in_plugin_libraries plugin_gedcom_import_lib)
+  (modules plugin_gedcom_import)
+)
+
+(alias (name plugin) (deps plugin_gedcom_import.cmxs))
