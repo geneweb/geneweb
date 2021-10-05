@@ -336,9 +336,12 @@ let propose_base conf =
   Hutil.trailer conf
 
 let try_plugin list conf base m =
-  List.exists
-    (fun (ns, fn) -> List.mem ns list && fn conf base)
-    (Hashtbl.find_all GwdPlugin.ht m)
+  let fn =
+    if List.mem "*" list
+    then (fun ( _, fn) -> fn conf base)
+    else (fun (ns, fn) -> List.mem ns list && fn conf base)
+  in
+  List.exists fn (Hashtbl.find_all GwdPlugin.ht m)
 
 let w_lock ~onerror fn conf base =
   let bfile = Util.bpath (conf.bname ^ ".gwb") in
@@ -420,7 +423,10 @@ let treat_request =
       | None -> []
       | Some list -> String.split_on_char ',' list
     in
-    List.iter (fun (ns, fn) -> if List.mem ns plugins then fn conf base) !GwdPlugin.se ;
+    if List.mem "*" plugins then
+      List.iter (fun (_ , fn) -> fn conf base) !GwdPlugin.se
+    else
+      List.iter (fun (ns, fn) -> if List.mem ns plugins then fn conf base) !GwdPlugin.se ;
     let m = Opt.default "" @@ p_getenv conf.env "m" in
     if not @@ try_plugin plugins conf base m
     then begin
