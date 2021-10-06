@@ -2,35 +2,6 @@ open Geneweb
 open Config
 open Gwdb
 
-module UI = struct
-
-  let enabled conf s = List.assoc_opt s conf.env = Some "on"
-
-  let print_arg conf (name, kind, doc) =
-    match kind with
-    | `Arg_Set ->
-      Output.print_string conf {|<p><label><input type="checkbox" name="|} ;
-      Output.print_string conf name ;
-      Output.print_string conf {|" value="on"> |} ;
-      Output.print_string conf doc ;
-      Output.print_string conf {|</label></p>|} ;
-    | _ -> assert false
-
-  let form conf m submit args =
-    Output.print_string conf {|<form action="|} ;
-    Output.print_string conf (Util.commd conf) ;
-    Output.print_string conf {|" method="GET">|} ;
-    Output.print_string conf {|<input type="hidden" name="m" value="|} ;
-    Output.print_string conf m ;
-    Output.print_string conf {|">|} ;
-    List.iter (print_arg conf) args ;
-    Output.print_string conf {|<input type="submit" value="|} ;
-    Output.print_string conf submit ;
-    Output.print_string conf {|">|} ;
-    Output.print_string conf {|</form>|}
-
-end
-
 let arg_f_parents = "f_parents"
 let arg_f_children = "f_children"
 let arg_p_parents = "p_parents"
@@ -43,10 +14,71 @@ let arg_missing_spouses = "missing_spouses"
 let arg_invalid_utf8 = "invalid_utf8"
 let arg_p_key = "p_key"
 let arg_tstab = "tstab"
+let arg_password = "password"
+
+module UI = struct
+
+  let enabled conf s = List.assoc_opt s conf.env = Some "on"
+
+  let print_arg conf (name, kind, doc) =
+    match kind with
+    | `Arg_Set ->
+      Output.print_string conf {|<p><label><input type="checkbox" name="|} ;
+      Output.print_string conf name ;
+      Output.print_string conf {|" value="on"> |} ;
+      Output.print_string conf doc ;
+      Output.print_string conf {|</label></p>|} ;
+    | `Arg_String ->
+      Output.print_string conf {|<p><label><input type="type" name="|} ;
+      Output.print_string conf name ;
+      Output.print_string conf {|"> |} ;
+      Output.print_string conf doc ;
+      Output.print_string conf {|</label></p>|}
+
+  let form conf m submit args =
+    Output.print_string conf {|<form action="|} ;
+    Output.print_string conf (Util.commd conf) ;
+    Output.print_string conf {|" method="GET">|} ;
+    Output.print_string conf {|<input type="hidden" name="m" value="|} ;
+    Output.print_string conf m ;
+    Output.print_string conf {|">|} ;
+    begin match Util.p_getenv conf.env arg_password with
+      | Some x ->
+        Output.print_string conf {|<input type="hidden" name="password" value="|} ;
+        Output.print_string conf (Mutil.encode x) ;
+        Output.print_string conf {|">|} ;
+      | None -> ()
+    end ;
+    List.iter (print_arg conf) args ;
+    Output.print_string conf {|<input type="submit" value="|} ;
+    Output.print_string conf submit ;
+    Output.print_string conf {|">|} ;
+    Output.print_string conf {|</form>|}
+
+end
+
+let opt_password =
+  match Sys.getenv_opt "GW_PLUGIN_FIXBASE_PASSWORD" with
+  | Some "" | None -> None
+  | x -> x
+
+let opt_manitou =
+  match Sys.getenv_opt "GW_PLUGIN_FIXBASE_ONLY_MANITOU" with
+  | Some ("on"|"ON"|"y"|"Y"|"1") -> true
+  | _ -> false
+
+let missing_password conf =
+  let args = [ (arg_password, `Arg_String, Util.transl conf "plugin_fixbase_password_missing") ] in
+  UI.form conf (List.assoc "m" conf.env) (Util.transl conf "plugin_fixbase_password_submit") args
+
+let wrap conf title fn =
+  !GWPARAM.wrap_output conf title @@ fun () ->
+  if opt_password = List.assoc_opt arg_password conf.env
+  then fn ()
+  else missing_password conf
 
 let fixbase conf _base =
-  let title = Util.transl conf "plugin_fixbase_FIXBASE" in
-  !GWPARAM.wrap_output conf title @@ fun () ->
+  wrap conf (Util.transl conf "plugin_fixbase_FIXBASE") @@ fun () ->
   Output.print_string conf {|<p>|} ;
   Output.print_string conf (Util.transl conf "plugin_fixbase_description") ;
   Output.print_string conf {|</p>|} ;
@@ -109,8 +141,7 @@ let fixbase_ok conf base =
     end ;
     load_persons_array base ;
     let opt s (fn : ?report:_ -> _ -> _ -> _) = if UI.enabled conf s then fn ~report progress base in
-    let title = Util.transl conf "plugin_fixbase_FIXBASE_OK" in
-    !GWPARAM.wrap_output conf title @@ fun () ->
+    wrap conf (Util.transl conf "plugin_fixbase_FIXBASE_OK") @@ fun () ->
     opt "f_parents" Fixbase.check_families_parents ;
     opt "f_children" Fixbase.check_families_children ;
     opt "p_parents" Fixbase.check_persons_parents ;
@@ -352,24 +383,11 @@ let fixbase_ok conf base =
 
 let ns = "fixbase"
 
-let opt_password =
-  match Sys.getenv_opt "GW_PLUGIN_FIXBASE_PASSWORD" with
-  | Some "" | None -> None
-  | x -> x
-
-let opt_manitou =
-  match Sys.getenv_opt "GW_PLUGIN_FIXBASE_ONLY_MANITOU" with
-  | Some ("on"|"ON"|"y"|"Y"|"1") -> true
-  | _ -> false
-
 let _ =
   let aux fn _assets conf = function
     | Some base ->
       if if opt_manitou then conf.manitou else conf.wizard
-      then
-        if opt_password = List.assoc_opt "password" conf.env
-        then (fn conf base ; true)
-        else false
+      then (fn conf base ; true)
       else false
     | None -> false
   in
