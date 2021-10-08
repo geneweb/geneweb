@@ -83,6 +83,7 @@ let compare_event_name name1 name2 =
           | Epers_Burial
           | Epers_Cremation ), Psort Epers_Baptism ->
     1
+  | Psort Epers_Cremation, Epers_Burial -> -1
   | Psort (Epers_Burial | Epers_Cremation), _ -> 1
   | _, Psort (Epers_Burial | Epers_Cremation) -> -1
   | Psort Epers_Funeral, _ -> 1
