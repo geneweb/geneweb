@@ -91,7 +91,9 @@ type config =
 
     (* if true, the base name is in the b argument of the query string: ?b=BASE&...
        if false, the base name is the last element of the uri path: .../base?... *)
-    cgi : bool }
+    cgi : bool
+  ; forced_plugins : string list
+ }
 
 (**/**)
 (**  A dummy {!type:config} value, with uninitialized fields.
@@ -147,7 +149,7 @@ let empty =
   ; today_wd = 0
   ; time = 0,0,0
   ; ctime = 0.
-  ; image_prefix=""
+  ; image_prefix = ""
   ; cgi = false
   ; output_conf =
       { status = ignore
@@ -155,5 +157,6 @@ let empty =
       ; body = ignore
       ; flush = ignore
       }
+  ; forced_plugins =[]
   }
 (**/**)

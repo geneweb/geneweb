@@ -38,6 +38,8 @@ let max_clients = ref None
 let no_host_address = ref false
 let only_addresses = ref []
 let plugins = ref []
+let forced_plugins = ref []
+let unsafe_plugins = ref []
 let redirected_addr = ref None
 let robot_xcl = ref None
 let selected_addr = ref None
@@ -197,6 +199,7 @@ let cache_lexicon () =
 exception Register_plugin_failure of string * Dynlink.error
 
 let register_plugin dir =
+  if not (List.mem dir !unsafe_plugins || GwdPluginMD5.allowed dir) then failwith dir ;
   let pname = Filename.basename dir in
   let plugin = Filename.concat dir @@ "plugin_" ^ pname ^ ".cmxs" in
   lexicon_fname := !lexicon_fname ^ pname ^ "." ;
@@ -1233,6 +1236,7 @@ let make_conf from_addr request script_name env =
        else "images";
      cgi
     ; output_conf
+    ; forced_plugins = !forced_plugins
     }
   in
   conf, ar
@@ -1781,33 +1785,64 @@ let make_cnt_dir x =
     end;
   Util.cnt_dir := x
 
-let arg_plugin ~check =
-  Arg.String begin fun s ->
-    if check && not (GwdPluginMD5.allowed s) then failwith s ;
-    plugins := !plugins @ [s]
-  end
+let arg_plugin_doc opt doc =
+  doc ^ " Combine with -force to enable for every base. \
+         Combine with -unsafe to allow unverified plugins. \
+         e.g. \"" ^ opt ^ " -unsafe -force\"."
 
-let arg_plugins ~check =
-  Arg.String begin fun s ->
-    let ps = Array.to_list (Sys.readdir s) in
-    let deps_ht = Hashtbl.create 0 in
-    let deps =
-      List.map begin fun pname ->
-        let dir = Filename.concat s pname in
-        if check && not (GwdPluginMD5.allowed dir) then failwith s ;
-        Hashtbl.add deps_ht pname dir ;
-        let f = Filename.concat dir "META" in
-        if Sys.file_exists f
-        then (pname, GwdPluginMETA.((parse f).depends))
-        else (pname, [])
-      end ps
-    in
-    begin match GwdPluginDep.sort deps with
-      | GwdPluginDep.ErrorCycle _ -> assert false
-      | GwdPluginDep.Sorted deps ->
-        plugins := !plugins @ List.map (Hashtbl.find deps_ht) deps
+let arg_plugin_aux () =
+  let aux (unsafe, force, p) =
+    incr Arg.current ;
+    assert (!Arg.current < Array.length Sys.argv) ;
+    match Sys.argv.(!Arg.current) with
+    | "-unsafe" -> (true ,force, p)
+    |  "-force" -> (unsafe, true, p)
+    |        p' -> assert (p = "") ; (unsafe, force, p')
+  in
+  let rec loop ( (_, _, p) as acc ) = if p = "" then loop (aux acc) else acc in
+  loop (false, false, "")
+
+let arg_plugin opt doc =
+  ( opt
+  , Arg.Unit begin fun () ->
+      let (unsafe, force, s) = arg_plugin_aux () in
+      if unsafe then unsafe_plugins := !unsafe_plugins @ [s] ;
+      if force then forced_plugins := !forced_plugins @ [s] ;
+      plugins := !plugins @ [s]
     end
-  end
+  , arg_plugin_doc opt doc
+  )
+
+let arg_plugins opt doc =
+  ( opt
+  , Arg.Unit begin fun () ->
+      let (unsafe, force, s) = arg_plugin_aux () in
+      let ps = Array.to_list (Sys.readdir s) in
+      let deps_ht = Hashtbl.create 0 in
+      let deps =
+        List.map begin fun pname ->
+          let dir = Filename.concat s pname in
+          if not unsafe && not (GwdPluginMD5.allowed dir) then failwith s ;
+          Hashtbl.add deps_ht pname dir ;
+          let f = Filename.concat dir "META" in
+          if Sys.file_exists f
+          then (pname, GwdPluginMETA.((parse f).depends))
+          else (pname, [])
+        end ps
+      in
+      begin match GwdPluginDep.sort deps with
+        | GwdPluginDep.ErrorCycle _ -> assert false
+        | GwdPluginDep.Sorted deps ->
+          List.iter begin fun s ->
+            let s = Hashtbl.find deps_ht s in
+            if unsafe then unsafe_plugins := !unsafe_plugins @ [s] ;
+            if force then forced_plugins := !forced_plugins @ [s] ;
+            plugins := !plugins @ [s]
+          end deps
+      end
+    end
+  , arg_plugin_doc opt doc
+  )
 
 let main () =
 #ifdef WINDOWS
@@ -1851,10 +1886,8 @@ let main () =
     ; ("-trace_failed_passwd", Arg.Set trace_failed_passwd, " Print the failed passwords in log (except if option -digest is set). ")
     ; ("-debug", Arg.Unit (fun () -> debug := true ; GwdLog.debug := true ; Printexc.record_backtrace true), " Enable debug mode")
     ; ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock files before writing.")
-    ; ("-plugin", arg_plugin ~check:true, "<PLUGIN>.cmxs load a safe plugin." )
-    ; ("-unsafe_plugin", arg_plugin ~check:false, "<PLUGIN>.cmxs DO NOT USE UNLESS YOU TRUST THE ORIGIN OF <PLUGIN>.")
-    ; ("-plugins", arg_plugins ~check:true, "<DIR> load all plugins in <DIR>.")
-    ; ("-unsafe_plugins", arg_plugins ~check:false, "<DIR> DO NOT USE UNLESS YOU TRUST THE ORIGIN OF EVERY PLUGIN IN <DIR>.")
+    ; (arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin." )
+    ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
 #ifdef UNIX
     ; ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
