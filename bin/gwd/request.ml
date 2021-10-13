@@ -339,7 +339,7 @@ let try_plugin list conf base m =
   let fn =
     if List.mem "*" list
     then (fun ( _, fn) -> fn conf base)
-    else (fun (ns, fn) -> List.mem ns list && fn conf base)
+    else (fun (ns, fn) -> (List.mem ns conf.forced_plugins || List.mem ns list) && fn conf base)
   in
   List.exists fn (Hashtbl.find_all GwdPlugin.ht m)
 
