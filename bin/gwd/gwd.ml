@@ -1807,7 +1807,7 @@ let arg_plugin opt doc =
   , Arg.Unit begin fun () ->
       let (unsafe, force, s) = arg_plugin_aux () in
       if unsafe then unsafe_plugins := !unsafe_plugins @ [s] ;
-      if force then forced_plugins := !forced_plugins @ [s] ;
+      if force then forced_plugins := !forced_plugins @ [ Filename.basename s ] ;
       plugins := !plugins @ [s]
     end
   , arg_plugin_doc opt doc
@@ -1833,10 +1833,10 @@ let arg_plugins opt doc =
       begin match GwdPluginDep.sort deps with
         | GwdPluginDep.ErrorCycle _ -> assert false
         | GwdPluginDep.Sorted deps ->
-          List.iter begin fun s ->
-            let s = Hashtbl.find deps_ht s in
+          List.iter begin fun pname ->
+            let s = Hashtbl.find deps_ht pname in
             if unsafe then unsafe_plugins := !unsafe_plugins @ [s] ;
-            if force then forced_plugins := !forced_plugins @ [s] ;
+            if force then forced_plugins := !forced_plugins @ [pname] ;
             plugins := !plugins @ [s]
           end deps
       end
