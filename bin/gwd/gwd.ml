@@ -1238,6 +1238,7 @@ let make_conf from_addr request script_name env =
      cgi
     ; output_conf
     ; forced_plugins = !forced_plugins
+    ; plugins = !plugins
     }
   in
   conf, ar
