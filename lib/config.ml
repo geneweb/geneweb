@@ -93,6 +93,7 @@ type config =
        if false, the base name is the last element of the uri path: .../base?... *)
     cgi : bool
   ; forced_plugins : string list
+  ; plugins : string list
  }
 
 (**/**)
@@ -158,5 +159,6 @@ let empty =
       ; flush = ignore
       }
   ; forced_plugins =[]
+  ; plugins =[]
   }
 (**/**)
