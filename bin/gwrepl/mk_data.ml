@@ -27,15 +27,17 @@ let partition_map p l =
   in
   part [] [] l
 
+let (//) = Filename.concat
+
 let () =
   let ic = open_in ".depend" in
   let lines = read_lines ic in
   close_in ic ;
   let dune_root = List.hd lines in
   let out = List.tl lines in
-  let root = dune_root ^ "/_build/default/lib/" in
+  let root = dune_root // "_build" // "default" // "lib" in
   let opam_swich_prefix = Sys.getenv "OPAM_SWITCH_PREFIX" in
-  let opam_swich_prefix_lib = opam_swich_prefix ^ "/lib/" in
+  let opam_swich_prefix_lib = opam_swich_prefix // "lib" in
   let aux fn =
     let aux prefix =
       if String.length fn > String.length prefix
@@ -58,30 +60,30 @@ let () =
     end out
   in
   let directories =
-    "etc/lib/ocaml"
-    :: "etc/lib/ocaml/stublibs"
+    ("etc" // "lib" // "ocaml")
+    :: ("etc" // "lib" // "ocaml" // "stublibs")
     :: List.map begin function
-      | `opam d -> "etc/lib/" ^ d
-      | `root d -> "etc/lib/geneweb/" ^ (d |> Filename.dirname |> Filename.dirname)
+      | `opam d -> "etc" // "lib" // d
+      | `root d -> "etc" // "lib" // "geneweb" // (d |> Filename.dirname |> Filename.dirname)
     end directories0
   in
-  let files0 = `opam "ocaml/stdlib.cma" :: files0 in
+  let files0 = `opam ("ocaml" // "stdlib.cma") :: files0 in
   let cmas, cmis =
     List.fold_right begin fun x (cmas, cmis) -> match x with
       | `opam fn ->
-        let aux fn = opam_swich_prefix_lib ^ fn, "etc/lib/" ^ fn in
+        let aux fn = opam_swich_prefix_lib // fn, "etc" // "lib" // fn in
         let cmas = aux fn :: cmas in
         let (src, _) as cmi = aux (Filename.remove_extension fn ^ ".cmi") in
         let cmis = if Sys.file_exists src then cmi :: cmis else cmis in
         (cmas, cmis)
       | `root fn ->
-        let cma = root ^ fn, "etc/lib/geneweb/" ^ fn in
+        let cma = root // fn, "etc" // "lib" // "geneweb" // fn in
         let cmas = cma :: cmas in
-        let dir = dune_root ^ "/_build/install/default/lib/geneweb/" ^ Filename.(dirname fn |> basename) in
+        let dir = dune_root // "_build" // "install" // "default" // "lib" // "geneweb" // Filename.(dirname fn |> basename) in
         let cmis =
           Array.fold_left begin fun cmis s ->
             if Filename.check_suffix (Filename.concat dir s) "cmi"
-            then (Filename.concat dir s, "etc/lib/geneweb/" ^ Filename.concat (Filename.basename dir) s) :: cmis
+            then (Filename.concat dir s, "etc" // "lib" // "geneweb" // Filename.concat (Filename.basename dir) s) :: cmis
             else cmis
           end cmis (Sys.readdir dir)
         in
@@ -90,16 +92,16 @@ let () =
   in
   let cmis =
     let select =
-      let pref = opam_swich_prefix_lib ^ "ocaml/stdlib__" in
+      let pref = opam_swich_prefix_lib // "ocaml" // "stdlib__" in
       let len = String.length pref in
       fun s -> String.length s > len && String.sub s 0 len = pref
     in
     Array.fold_left begin fun cmis s ->
-      let fname = Filename.concat (opam_swich_prefix_lib ^ "ocaml/") s in
+      let fname = opam_swich_prefix_lib // "ocaml" // s in
       if Filename.check_suffix fname "cmi" && select fname
-      then (fname, "etc/lib/ocaml/" ^ s) :: cmis
+      then (fname, "etc" // "lib" // "ocaml" // s) :: cmis
       else cmis
-    end cmis (Sys.readdir (opam_swich_prefix_lib ^ "ocaml/"))
+    end cmis (Sys.readdir (opam_swich_prefix_lib // "ocaml"))
   in
   let data = "data.ml" in
   let out = open_out_bin data in
@@ -112,7 +114,7 @@ let () =
     let aux s list =
       Printf.fprintf out {|let %s=[||} s;
       List.iter begin fun (src, dst) ->
-        Printf.fprintf out {|"%s",[%%blob "%s"];|} dst src
+        Printf.fprintf out {blob|{|%s|},[%%blob {|%s|}];|blob} dst src
       end list ;
       Printf.fprintf out {||];;|}
     in
@@ -123,8 +125,8 @@ let () =
       Printf.fprintf out {|let shared=[||} ;
       if Sys.unix then (* FIXME: what is the windows version? *)
         List.iter begin fun s ->
-          Printf.fprintf out {|"etc/lib/%s",[%%blob "%s"];|} s (opam_swich_prefix_lib ^ s) ;
-        end [ "ocaml/stublibs/dllcamlstr.so" ; "ocaml/stublibs/dllunix.so"] ;
+          Printf.fprintf out {blob|Filename.(concat "etc" (concat "lib" {|%s|})),[%%blob {|%s|}];|blob} s (opam_swich_prefix_lib // s) ;
+        end [ "ocaml" // "stublibs" // "dllcamlstr.so" ; "ocaml" // "stublibs" // "dllunix.so"] ;
       Printf.fprintf out {||];;|}
   end ;
   begin
