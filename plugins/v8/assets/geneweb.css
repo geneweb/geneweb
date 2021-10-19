@@ -1,0 +1,390 @@
+/* FIXME: find and credit the theme which inspired geneweb.css */
+
+:root {
+  --global-font-size: 15px;
+  --global-line-height: 1.4;
+  --global-space: 1ex;
+  --background-color: #fff;
+  --page-width: 60em;
+  --color-a: #dc3545;
+  --color-sex-M: #1a95e0;
+  --color-sex-F: #d20962;
+  --color-sex-N: purple;
+  --font-color: #151515;
+  --invert-font-color: #fff;
+  --secondary-color: #727578;
+  --progress-bar-background: #727578;
+  --progress-bar-fill: #151515;
+  --code-bg-color: #e8eff2;
+  --input-style: solid;
+  --display-h1-decoration: none;
+  --border-tree: 1px dashed purple;
+}
+
+* {
+    color: var(--font-color) ;
+    line-height:1.4 ;
+    font-family: 'monospace' ;
+}
+
+#content a {
+    color: var(--color-a);
+    text-decoration:none
+}
+
+#content a:hover {
+    text-decoration:underline
+}
+
+#content {
+    max-width:120ex;
+    margin: auto ;
+}
+
+.timeline td:first-child {
+    text-align: right;
+    vertical-align: top;
+    padding-right: 1ex;
+}
+
+ul {
+    margin: 0 ;
+    padding: 0 ;
+}
+
+ul ul {
+    margin-left: 2ex;
+}
+
+li {
+    list-style: none;
+    margin-left: 0 ;
+}
+
+li {
+    margin-left: 0 ;
+}
+
+.tree {
+    empty-cells: show;
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    border: var(--border-tree);
+}
+.tree td {
+    border: var(--border-tree);
+    text-align: center ;
+}
+
+.mod::before {
+    content: '[+]' ;
+}
+
+.sex-M::before {
+    content: '■ ';
+    color: var(--color-sex-M);
+}
+
+.sex-F::before {
+    content: '■ ';
+    color: var(--color-sex-F) ;
+}
+
+.sex-N::before {
+    content: '■ ';
+    color: var(--color-sex-N) ;
+}
+
+.li-children-none::before {
+    background-color: transparent ;
+}
+
+.li-children-truncated::before {
+    border-radius: 0 ;
+}
+
+.li-children-placeholder::before {
+    visibility: hidden;
+}
+
+#content p {
+    margin-bottom: 1em;
+}
+
+#content h1,
+#content h2,
+#content h3,
+#content h4,
+#content h5,
+#content h6 {
+    font-size:medium;
+    font-weight:700;
+    margin:1ex 0;
+}
+
+#content h1 {
+    font-size:1.8rem
+}
+
+#content h1::before {
+    content: '# ' ;
+}
+
+#content h2 {
+    font-size:1.6rem
+}
+
+#content h2::before {
+    content: '## ' ;
+}
+
+#content h3 {
+    font-size:1.4rem
+}
+
+#content h3::before {
+    content: '### ' ;
+}
+
+#content h4 {
+    font-size:1.2rem
+}
+
+#content img {
+    display:block;
+    margin:1rem auto;
+    max-width:100%
+}
+
+#content .avatar > img {
+    border-radius:50%;
+    float:right;
+    margin:-8px 0 0 16px;
+    height:90px;
+    width:90px
+}
+
+#content ol {
+    counter-reset:list;
+    list-style:none;
+    padding-left:2ex
+}
+
+#content ol > li {
+    display:table-row
+}
+
+#content ol > li:before {
+    content:"[" counter(list,decimal)"] ";
+    counter-increment:list;
+    display:table-cell;
+    text-align:right;
+    padding-right:.5em
+}
+
+#content blockquote {
+    border-left:0.5ex solid;
+    font-style:italic;
+    margin:0.5ex 0;
+    padding:1ex;
+}
+
+#content code {
+    color:#222;
+    background-color:#f8f8f8;
+    border:1px solid #ccc;
+    border-radius:10%;
+    padding:0 4px
+}
+
+#content pre code {
+    all:unset
+}
+
+.form {
+  width: 100%;
+}
+
+fieldset {
+  border: 1px solid var(--font-color);
+  padding: calc(1ex - 1px);
+  margin-bottom: 1em;
+}
+
+.form-group:hover > label:first-child {
+    color: var(--color-a);
+}
+
+.form-group > label {
+    font-size: 1em;
+    color: var(--font-color);
+    width: 20ex;
+    display: inline-block;
+    text-align: right;
+    margin-right: 1ex;
+}
+
+.form-group > input[type="email"],
+.form-group > input[type="text"],
+.form-group > input[type="number"],
+.form-group > input[type="password"],
+.form-group > input[type="search"],
+.form-group > textarea {
+    border: 1px var(--input-style) var(--font-color);
+    width: calc(100% - 21ex);
+    padding: 0 calc(1ex - 1px);
+    font-size: 1em;
+    appearance: none;
+    border-radius: 0;
+}
+
+.event > .form-group:first-child > input {
+    font-weight: bold ;
+}
+
+.form-group > input[type="email"],
+.form-group > input[type="text"],
+.form-group > input[type="number"],
+.form-group > input[type="password"],
+.form-group > input[type="search"],
+.form-group > textarea {
+    float: right ;
+    clear: both ;
+}
+
+.form-group > textarea {
+  height: auto;
+  resize: vertical;
+}
+
+input[type="email"]:active,
+input[type="text"]:active,
+input[type="number"]:active,
+input[type="password"]:active,
+input[type="search"]:active,
+input[type="email"]:focus,
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus {
+  outline: none;
+  appearance: none;
+  border: 1px solid var(--font-color);
+}
+
+input[type="text"]:not(:placeholder-shown):invalid,
+input[type="email"]:not(:placeholder-shown):invalid,
+input[type="password"]:not(:placeholder-shown):invalid,
+input[type="search"]:not(:placeholder-shown):invalid,
+input[type="number"]:not(:placeholder-shown):invalid {
+  border-color: var(--error-color);
+}
+
+input,
+textarea {
+  color: var(--font-color);
+  background-color: var(--background-color);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--secondary-color) !important;
+  opacity: 1;
+}
+
+textarea:focus {
+  outline: none;
+  appearance: none;
+  border: 1px solid var(--font-color);
+}
+
+textarea:not(:placeholder-shown):invalid {
+  border-color: var(--error-color);
+}
+
+select {
+  border-radius: 0;
+  background-color: white;
+  border: 1px solid black;
+  appearance: none;
+  background: transparent;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position-x: calc(100% + .5ex);
+  background-position-y: -0.5ex;
+  padding-right: 2ex;
+}
+
+.form-group {
+  margin-bottom: 1em ;
+  overflow: auto;
+}
+
+.button::before { content: '[' ; }
+
+.button::after { content: ']' ; }
+
+.button {
+    border: none;
+    background-color: transparent ;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  user-select: none;
+  font-weight: bold ;
+}
+
+.button:active {
+  box-shadow: none;
+}
+
+.button:hover,
+.button:focus {
+    color: red ;
+}
+
+.input-extra {
+    display: none ;
+}
+
+.checkbox-extra:checked + label + input.input-extra,
+.checkbox-extra:checked + label + fieldset.input-extra {
+    display: block;
+}
+
+.checkbox-extra {
+    display: none ;
+}
+
+.checkbox-extra:checked + label {
+    display: none ;
+}
+
+.checkbox-extra:not(:checked) + label + .input-extra + .checkbox-extra + label {
+    display: none ;
+}
+
+.compact-radio:checked + .compact-label + .alln > li > .cnt + ul > li {
+    display: inline-block ;
+}
+
+.compact-radio:checked + .compact-label + .alln > li > .cnt + ul > li:not(:last-child)::after {
+    content: ',' ;
+    margin-right: 1ex;
+}
+
+.compact-radio:checked + .compact-label + .alln > li > ul {
+    display: inline-block;
+    margin-left: 1ex;
+}
+
+.compact-radio { display: none; }
+
+.compact-label::before {
+    content: '[ ] ' ;
+}
+
+.compact-radio:checked + .compact-label::before {
+    content: '[x] ' ;
+}

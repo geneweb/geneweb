@@ -18,3 +18,7 @@ let register ~ns list =
 (**)
 let se : (string * (Config.config -> Gwdb.base option -> unit)) list ref = ref []
 let register_se ~ns fn = Mutil.list_ref_append se (ns, fn !assets)
+
+(**)
+let misc : (string * (Config.config -> string -> bool)) list ref = ref []
+let register_misc ~ns fn = Mutil.list_ref_append misc (ns, fn !assets)

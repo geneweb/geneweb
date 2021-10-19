@@ -1951,7 +1951,7 @@ let search_index conf base an search_order =
       then loop le
       else None
     | FirstName::le ->
-      if Some.search_first_name conf base an = []
+      if Some.select_first_name conf base false an = []
       then loop le
       else None
     | ApproxKey::le ->

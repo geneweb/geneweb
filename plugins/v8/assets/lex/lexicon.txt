@@ -1,0 +1,33 @@
+    v8_txt_first_name
+af: voornaam
+ar: الإسم
+bg: собствено име
+br: raganv
+ca: nom
+co: nome
+cs: křestní jméno
+da: fornavn
+de: Vorname
+en: first name
+eo: propra nomo
+es: nombre
+et: eesnimi
+fi: etunimi
+fr: prénom
+he: שם פרטי
+is: fornafn
+it: nome
+lv: vārds
+nl: voornaam
+no: fornavn
+oc: prenom
+pl: imię
+pt: nome
+pt-br: prenome
+ro: prenume
+ru: имя
+sk: meno
+sl: osebno ime
+sv: förnamn
+tr: ilk ad
+zh: 名
