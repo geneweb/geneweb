@@ -169,7 +169,6 @@ let excl_faml conf base =
   in
   loop [] 0
 
-(* FIXME: remove all these Aray.to_list *)
 let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
   let mark_per = Gwdb.iper_marker (Gwdb.ipers base) NotVisited in
   let mark_fam = Gwdb.ifam_marker (Gwdb.ifams base) false in
@@ -294,6 +293,73 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
   Gwdb.Marker.set mark_per ip2 @@ Visited (false, ip2, Self);
   width_search [ip1] 0 [ip2] 0
 
+(** [simplify_path conf base path]
+    Removes unnecessary people from the path
+    (e.g. half sibling when only parents are useful)
+
+    [ (HalfSibling|Sibling|Child) as x -> Child -> HalfSibling ]
+    becomes [ x -> Mate -> Child ]
+
+    [ HalfSibling -> Parent ]
+    becomes [ Parent -> Mate -> Mate -> Parent ]
+ *)
+let simplify_path conf base path =
+  let get get i =
+    let p = poi base i in
+    match get_parents p with
+    | None -> assert false
+    | Some parents -> get (foi base parents)
+  in
+  let aux get_field ht =
+    fun i ->
+      match Hashtbl.find_opt ht i with
+      | Some r -> r
+      | None ->
+        let r = get get_field i in
+        Hashtbl.add ht i r ;
+        r
+  in
+  let mother = aux get_mother (Hashtbl.create 0) in
+  let father = aux get_father (Hashtbl.create 0) in
+  let rec simplify = function
+    | [] -> []
+    | (  (i1, (HalfSibling|Sibling|Child)) as x)
+      :: (i2, Child)
+      :: (_, HalfSibling)
+      :: tl
+      ->
+      x
+      :: (if father i1 = father i2
+          then mother i2, Mate
+          else father i2, Mate)
+      :: simplify tl
+    | (  (i1, _r1) as x1)
+      :: (i2, HalfSibling)
+      :: (i3, Parent)
+      :: tl
+      ->
+      if father i1 = father i2
+      then x1
+           :: (father i2, Parent)
+           :: (mother i2, Mate)
+           :: ( if mother i2 = i3 then simplify tl
+                else (i3, Mate) :: simplify tl )
+      else x1
+           :: (mother i2, Parent)
+           :: (father i2, Mate)
+           :: ( if father i2 = i3 then simplify tl
+                else (i3, Mate) :: simplify tl )
+    | x
+      :: tl
+      ->
+      x
+      :: simplify tl
+  in
+  let rec loop path =
+    let path' = simplify path in
+    if path = path' then path else loop path'
+  in loop path
+
 let nb_fields s =
   let rec loop cnt i =
     if i = String.length s then cnt
@@ -309,6 +375,7 @@ let rec belongs_to_branch ip dist =
       else belongs_to_branch ip dist lens
   | [] -> false
 
+(* FIXME: remove Array.to_list *)
 let get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
   let (anc, _) = List.hd list in
   let rec loop ip dist =
