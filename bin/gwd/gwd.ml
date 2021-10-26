@@ -196,7 +196,7 @@ let load_lexicon =
 let cache_lexicon () =
   List.iter (fun x -> ignore @@ load_lexicon x) !cache_langs
 
-exception Register_plugin_failure of string * Dynlink.error
+exception Register_plugin_failure of string * [ `dynlink_error of Dynlink.error | `string of string ]
 
 let register_plugin dir =
   if not (List.mem dir !unsafe_plugins || GwdPluginMD5.allowed dir) then failwith dir ;
@@ -215,7 +215,7 @@ let register_plugin dir =
   GwdPlugin.assets := assets ;
   begin
     try Dynlink.loadfile plugin
-    with Dynlink.Error e -> raise (Register_plugin_failure (plugin, e))
+    with Dynlink.Error e -> raise (Register_plugin_failure (plugin, `dynlink_error e))
   end ;
   GwdPlugin.assets := ""
 
@@ -1834,10 +1834,12 @@ let arg_plugins opt doc =
         | GwdPluginDep.ErrorCycle _ -> assert false
         | GwdPluginDep.Sorted deps ->
           List.iter begin fun pname ->
-            let s = Hashtbl.find deps_ht pname in
-            if unsafe then unsafe_plugins := !unsafe_plugins @ [s] ;
-            if force then forced_plugins := !forced_plugins @ [pname] ;
-            plugins := !plugins @ [s]
+            try
+              let s = Hashtbl.find deps_ht pname in
+              if unsafe then unsafe_plugins := !unsafe_plugins @ [s] ;
+              if force then forced_plugins := !forced_plugins @ [pname] ;
+              plugins := !plugins @ [s]
+            with Not_found -> raise (Register_plugin_failure (pname, `string ("Missing plugin")))
           end deps
       end
     end
@@ -1977,6 +1979,8 @@ let () =
       !selected_port;
     flush stderr;
 #endif
-  | Register_plugin_failure (p, e) ->
+  | Register_plugin_failure (p, `dynlink_error e) ->
     GwdLog.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
+  | Register_plugin_failure (p, `string s) ->
+    GwdLog.syslog `LOG_CRIT (p ^ ": " ^ s)
   | e -> GwdLog.syslog `LOG_CRIT (Printexc.to_string e)
