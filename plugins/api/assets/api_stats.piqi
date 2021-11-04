@@ -1,7 +1,7 @@
 .protobuf-package "geneweb.api.stats"
 
 .record [
-    .name data
+    .name Data
     .field [
         .name nb
         .type protobuf-int32
@@ -15,20 +15,20 @@
 ]
 
 .record [
-    .name data-l
+    .name DataL
     .field [
         .name data
-        .type data
+        .type Data
         .repeated
         .code 1
     ]
 ]
 
 .record [
-    .name stat
+    .name Stat
     .field [
         .name title
-        .type title
+        .type Title
         .code 1
     ]
     .field [
@@ -39,7 +39,7 @@
     ]
     .field [
         .name series
-        .type serie
+        .type Serie
         .repeated
         .code 3
     ]
@@ -51,24 +51,24 @@
     ]
     .field [
         .name datas
-        .type data-l
+        .type DataL
         .repeated
         .code 5
     ]
 ]
 
 .record [
-    .name stats
+    .name Stats
     .field [
         .name stats
-        .type stat
+        .type Stat
         .repeated
         .code 1
     ]
 ]
 
 .record [
-    .name stats-params
+    .name StatsParams
     .field [
         .name i
         .type protobuf-int32
@@ -78,353 +78,353 @@
 ]
 
 .enum [
-    .name title
+    .name Title
     .option [
-        .name st-ind-longevity
+        .name ST-IND-LONGEVITY
         .code 0
     ]
     .option [
-        .name st-ind-birth-month
+        .name ST-IND-BIRTH-MONTH
         .code 1
     ]
     .option [
-        .name st-ind-parent-age
+        .name ST-IND-PARENT-AGE
         .code 2
     ]
     .option [
-        .name st-ind-lastname
+        .name ST-IND-LASTNAME
         .code 3
     ]
     .option [
-        .name st-ind-firstname
+        .name ST-IND-FIRSTNAME
         .code 4
     ]
     .option [
-        .name st-ind-occupation
+        .name ST-IND-OCCUPATION
         .code 5
     ]
     .option [
-        .name st-ind-younguest-parent
+        .name ST-IND-YOUNGUEST-PARENT
         .code 6
     ]
     .option [
-        .name st-ind-oldest
+        .name ST-IND-OLDEST
         .code 7
     ]
     .option [
-        .name st-ind-astro
+        .name ST-IND-ASTRO
         .code 8
     ]
     .option [
-        .name st-ind-moon
+        .name ST-IND-MOON
         .code 9
     ]
     .option [
-        .name st-fam-first-marr-parent-age
+        .name ST-FAM-FIRST-MARR-PARENT-AGE
         .code 10
     ]
     .option [
-        .name st-fam-marr-day
+        .name ST-FAM-MARR-DAY
         .code 11
     ]
     .option [
-        .name st-fam-marr-month
+        .name ST-FAM-MARR-MONTH
         .code 12
     ]
     .option [
-        .name st-fam-avg-marr-nb
+        .name ST-FAM-AVG-MARR-NB
         .code 13
     ]
     .option [
-        .name st-fam-avg-marr-duration
+        .name ST-FAM-AVG-MARR-DURATION
         .code 14
     ]
     .option [
-        .name st-fam-avg-nb-children
+        .name ST-FAM-AVG-NB-CHILDREN
         .code 15
     ]
     .option [
-        .name st-fam-int-btw-children
+        .name ST-FAM-INT-BTW-CHILDREN
         .code 16
     ]
     .option [
-        .name st-fam-diff-age-btw-children
+        .name ST-FAM-DIFF-AGE-BTW-CHILDREN
         .code 17
     ]
     .option [
-        .name st-fam-diff-age-btw-cpl
+        .name ST-FAM-DIFF-AGE-BTW-CPL
         .code 18
     ]
     .option [
-        .name st-fam-longuest-marr
+        .name ST-FAM-LONGUEST-MARR
         .code 19
     ]
     .option [
-        .name st-fam-shortest-marr
+        .name ST-FAM-SHORTEST-MARR
         .code 20
     ]
     .option [
-        .name st-asc
+        .name ST-ASC
         .code 21
     ]
     .option [
-        .name st-desc
+        .name ST-DESC
         .code 22
     ]
     .option [
-        .name st-desc-man-woman
+        .name ST-DESC-MAN-WOMAN
         .code 23
     ]
     .option [
-        .name st-asc-lastname
+        .name ST-ASC-LASTNAME
         .code 24
     ]
     .option [
-        .name st-asc-firstname
+        .name ST-ASC-FIRSTNAME
         .code 25
     ]
     .option [
-        .name st-asc-occupation
+        .name ST-ASC-OCCUPATION
         .code 26
     ]
     .option [
-        .name st-desc-lastname
+        .name ST-DESC-LASTNAME
         .code 27
     ]
     .option [
-        .name st-desc-firstname
+        .name ST-DESC-FIRSTNAME
         .code 28
     ]
     .option [
-        .name st-desc-occupation
+        .name ST-DESC-OCCUPATION
         .code 29
     ]
 ]
 
 .enum [
-    .name serie
+    .name Serie
     .option [
-        .name serie-male
+        .name SERIE-MALE
         .code 0
     ]
     .option [
-        .name serie-female
+        .name SERIE-FEMALE
         .code 1
     ]
     .option [
-        .name serie-month-1
+        .name SERIE-MONTH-1
         .code 2
     ]
     .option [
-        .name serie-month-2
+        .name SERIE-MONTH-2
         .code 3
     ]
     .option [
-        .name serie-month-3
+        .name SERIE-MONTH-3
         .code 4
     ]
     .option [
-        .name serie-month-4
+        .name SERIE-MONTH-4
         .code 5
     ]
     .option [
-        .name serie-month-5
+        .name SERIE-MONTH-5
         .code 6
     ]
     .option [
-        .name serie-month-6
+        .name SERIE-MONTH-6
         .code 7
     ]
     .option [
-        .name serie-month-7
+        .name SERIE-MONTH-7
         .code 8
     ]
     .option [
-        .name serie-month-8
+        .name SERIE-MONTH-8
         .code 9
     ]
     .option [
-        .name serie-month-9
+        .name SERIE-MONTH-9
         .code 10
     ]
     .option [
-        .name serie-month-10
+        .name SERIE-MONTH-10
         .code 11
     ]
     .option [
-        .name serie-month-11
+        .name SERIE-MONTH-11
         .code 12
     ]
     .option [
-        .name serie-month-12
+        .name SERIE-MONTH-12
         .code 13
     ]
     .option [
-        .name serie-day-1
+        .name SERIE-DAY-1
         .code 14
     ]
     .option [
-        .name serie-day-2
+        .name SERIE-DAY-2
         .code 15
     ]
     .option [
-        .name serie-day-3
+        .name SERIE-DAY-3
         .code 16
     ]
     .option [
-        .name serie-day-4
+        .name SERIE-DAY-4
         .code 17
     ]
     .option [
-        .name serie-day-5
+        .name SERIE-DAY-5
         .code 18
     ]
     .option [
-        .name serie-day-6
+        .name SERIE-DAY-6
         .code 19
     ]
     .option [
-        .name serie-day-7
+        .name SERIE-DAY-7
         .code 20
     ]
     .option [
-        .name serie-male-age-first-child
+        .name SERIE-MALE-AGE-FIRST-CHILD
         .code 21
     ]
     .option [
-        .name serie-male-age-last-child
+        .name SERIE-MALE-AGE-LAST-CHILD
         .code 22
     ]
     .option [
-        .name serie-female-age-first-child
+        .name SERIE-FEMALE-AGE-FIRST-CHILD
         .code 23
     ]
     .option [
-        .name serie-female-age-last-child
+        .name SERIE-FEMALE-AGE-LAST-CHILD
         .code 24
     ]
     .option [
-        .name serie-all
+        .name SERIE-ALL
         .code 25
     ]
     .option [
-        .name serie-asc-found
+        .name SERIE-ASC-FOUND
         .code 26
     ]
     .option [
-        .name serie-asc-uniq
+        .name SERIE-ASC-UNIQ
         .code 27
     ]
     .option [
-        .name serie-desc-found
+        .name SERIE-DESC-FOUND
         .code 28
     ]
     .option [
-        .name serie-desc-uniq
+        .name SERIE-DESC-UNIQ
         .code 29
     ]
     .option [
-        .name serie-top-10-1
+        .name SERIE-TOP-10-1
         .code 30
     ]
     .option [
-        .name serie-top-10-2
+        .name SERIE-TOP-10-2
         .code 31
     ]
     .option [
-        .name serie-top-10-3
+        .name SERIE-TOP-10-3
         .code 32
     ]
     .option [
-        .name serie-top-10-4
+        .name SERIE-TOP-10-4
         .code 33
     ]
     .option [
-        .name serie-top-10-5
+        .name SERIE-TOP-10-5
         .code 34
     ]
     .option [
-        .name serie-top-10-6
+        .name SERIE-TOP-10-6
         .code 35
     ]
     .option [
-        .name serie-top-10-7
+        .name SERIE-TOP-10-7
         .code 36
     ]
     .option [
-        .name serie-top-10-8
+        .name SERIE-TOP-10-8
         .code 37
     ]
     .option [
-        .name serie-top-10-9
+        .name SERIE-TOP-10-9
         .code 38
     ]
     .option [
-        .name serie-top-10-10
+        .name SERIE-TOP-10-10
         .code 39
     ]
     .option [
-        .name serie-aries
+        .name SERIE-ARIES
         .code 40
     ]
     .option [
-        .name serie-taurus
+        .name SERIE-TAURUS
         .code 41
     ]
     .option [
-        .name serie-gemini
+        .name SERIE-GEMINI
         .code 42
     ]
     .option [
-        .name serie-cancer
+        .name SERIE-CANCER
         .code 43
     ]
     .option [
-        .name serie-leo
+        .name SERIE-LEO
         .code 44
     ]
     .option [
-        .name serie-virgo
+        .name SERIE-VIRGO
         .code 45
     ]
     .option [
-        .name serie-libra
+        .name SERIE-LIBRA
         .code 46
     ]
     .option [
-        .name serie-scorpio
+        .name SERIE-SCORPIO
         .code 47
     ]
     .option [
-        .name serie-sagittarius
+        .name SERIE-SAGITTARIUS
         .code 48
     ]
     .option [
-        .name serie-capricorn
+        .name SERIE-CAPRICORN
         .code 49
     ]
     .option [
-        .name serie-aquarius
+        .name SERIE-AQUARIUS
         .code 50
     ]
     .option [
-        .name serie-pisces
+        .name SERIE-PISCES
         .code 51
     ]
     .option [
-        .name serie-moon-new
+        .name SERIE-MOON-NEW
         .code 52
     ]
     .option [
-        .name serie-moon-first-quarter
+        .name SERIE-MOON-FIRST-QUARTER
         .code 53
     ]
     .option [
-        .name serie-moon-full
+        .name SERIE-MOON-FULL
         .code 54
     ]
     .option [
-        .name serie-moon-last-quarter
+        .name SERIE-MOON-LAST-QUARTER
         .code 55
     ]
 ]

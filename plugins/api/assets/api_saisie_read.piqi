@@ -3,7 +3,7 @@
 .import [ .module api ]
 
 .record [
-    .name dmy
+    .name Dmy
     .field [
         .name day
         .type protobuf-int32
@@ -27,28 +27,28 @@
 ]
 
 .record [
-    .name date
+    .name Date
     .field [
         .name cal
-        .type calendar
+        .type Calendar
         .optional
         .code 2
     ]
     .field [
         .name prec
-        .type precision
+        .type Precision
         .optional
         .code 3
     ]
     .field [
         .name dmy
-        .type dmy
+        .type Dmy
         .optional
         .code 4
     ]
     .field [
         .name dmy2
-        .type dmy
+        .type Dmy
         .optional
         .code 5
     ]
@@ -61,10 +61,10 @@
 ]
 
 .record [
-    .name fiche-parameters
+    .name FicheParameters
     .field [
         .name identifier-person
-        .type identifier-person
+        .type IdentifierPerson
         .code 1
     ]
     .field [
@@ -94,35 +94,35 @@
 ]
 
 .record [
-    .name witness-event
+    .name WitnessEvent
     .field [
         .name witness-type
-        .type witness-type
+        .type WitnessType
         .code 1
     ]
     .field [
         .name witness
-        .type simple-person
+        .type SimplePerson
         .code 2
     ]
 ]
 
 .record [
-    .name witness-fiche-event
+    .name WitnessFicheEvent
     .field [
         .name witness-type
-        .type witness-type
+        .type WitnessType
         .code 1
     ]
     .field [
         .name witness
-        .type person
+        .type Person
         .code 2
     ]
 ]
 
 .record [
-    .name event
+    .name Event
     .field [
         .name name
         .type string
@@ -130,7 +130,7 @@
     ]
     .field [
         .name type
-        .type event-type
+        .type EventType
         .code 2
     ]
     .field [
@@ -165,7 +165,7 @@
     ]
     .field [
         .name date-cal
-        .type calendar
+        .type Calendar
         .optional
         .code 6
     ]
@@ -195,20 +195,20 @@
     ]
     .field [
         .name spouse
-        .type simple-person
+        .type SimplePerson
         .optional
         .code 11
     ]
     .field [
         .name witnesses
-        .type witness-event
+        .type WitnessEvent
         .repeated
         .code 12
     ]
 ]
 
 .record [
-    .name fiche-event
+    .name FicheEvent
     .field [
         .name name
         .type string
@@ -216,7 +216,7 @@
     ]
     .field [
         .name type
-        .type event-type
+        .type EventType
         .code 2
     ]
     .field [
@@ -251,7 +251,7 @@
     ]
     .field [
         .name date-cal
-        .type calendar
+        .type Calendar
         .optional
         .code 6
     ]
@@ -281,20 +281,20 @@
     ]
     .field [
         .name spouse
-        .type person
+        .type Person
         .optional
         .code 11
     ]
     .field [
         .name witnesses
-        .type witness-fiche-event
+        .type WitnessFicheEvent
         .repeated
         .code 12
     ]
 ]
 
 .record [
-    .name person-tree
+    .name PersonTree
     .field [
         .name index
         .type protobuf-int32
@@ -302,7 +302,7 @@
     ]
     .field [
         .name sex
-        .type sex
+        .type Sex
         .code 2
     ]
     .field [
@@ -344,7 +344,7 @@
     ]
     .field [
         .name sosa
-        .type sosa
+        .type Sosa
         .code 10
     ]
     .field [
@@ -360,7 +360,7 @@
 ]
 
 .record [
-    .name simple-person
+    .name SimplePerson
     .field [
         .name index
         .type protobuf-int32
@@ -368,7 +368,7 @@
     ]
     .field [
         .name sex
-        .type sex
+        .type Sex
         .code 2
     ]
     .field [
@@ -440,7 +440,7 @@
     ]
     .field [
         .name sosa
-        .type sosa
+        .type Sosa
         .code 13
     ]
     .field [
@@ -477,35 +477,35 @@
 ]
 
 .record [
-    .name relation-person
+    .name RelationPerson
     .field [
         .name r-type
-        .type relation-type
+        .type RelationType
         .code 1
     ]
     .field [
         .name person
-        .type simple-person
+        .type SimplePerson
         .code 2
     ]
 ]
 
 .record [
-    .name relation-fiche-person
+    .name RelationFichePerson
     .field [
         .name r-type
-        .type relation-type
+        .type RelationType
         .code 1
     ]
     .field [
         .name person
-        .type person
+        .type Person
         .code 2
     ]
 ]
 
 .record [
-    .name event-witness
+    .name EventWitness
     .field [
         .name event-witness-type
         .type string
@@ -513,19 +513,19 @@
     ]
     .field [
         .name husband
-        .type simple-person
+        .type SimplePerson
         .code 2
     ]
     .field [
         .name wife
-        .type simple-person
+        .type SimplePerson
         .optional
         .code 3
     ]
 ]
 
 .record [
-    .name event-fiche-witness
+    .name EventFicheWitness
     .field [
         .name event-witness-type
         .type string
@@ -533,22 +533,22 @@
     ]
     .field [
         .name husband
-        .type person
+        .type Person
         .code 2
     ]
     .field [
         .name wife
-        .type person
+        .type Person
         .optional
         .code 3
     ]
 ]
 
 .record [
-    .name person
+    .name Person
     .field [
         .name type
-        .type person-type
+        .type PersonType
         .code 1
     ]
     .field [
@@ -558,7 +558,7 @@
     ]
     .field [
         .name sex
-        .type sex
+        .type Sex
         .code 3
     ]
     .field [
@@ -636,7 +636,7 @@
     ]
     .field [
         .name birth-date-cal
-        .type calendar
+        .type Calendar
         .optional
         .code 17
     ]
@@ -666,7 +666,7 @@
     ]
     .field [
         .name baptism-date-cal
-        .type calendar
+        .type Calendar
         .optional
         .code 22
     ]
@@ -696,7 +696,7 @@
     ]
     .field [
         .name death-date-cal
-        .type calendar
+        .type Calendar
         .optional
         .code 27
     ]
@@ -714,7 +714,7 @@
     ]
     .field [
         .name death-type
-        .type death-type
+        .type DeathType
         .code 30
     ]
     .field [
@@ -731,7 +731,7 @@
     ]
     .field [
         .name burial-date-cal
-        .type calendar
+        .type Calendar
         .optional
         .code 33
     ]
@@ -778,48 +778,48 @@
     ]
     .field [
         .name related
-        .type relation-person
+        .type RelationPerson
         .repeated
         .code 41
     ]
     .field [
         .name rparents
-        .type relation-person
+        .type RelationPerson
         .repeated
         .code 42
     ]
     .field [
         .name father
-        .type simple-person
+        .type SimplePerson
         .optional
         .code 43
     ]
     .field [
         .name mother
-        .type simple-person
+        .type SimplePerson
         .optional
         .code 44
     ]
     .field [
         .name families
-        .type family
+        .type Family
         .repeated
         .code 45
     ]
     .field [
         .name sosa
-        .type sosa
+        .type Sosa
         .code 46
     ]
     .field [
         .name events
-        .type event
+        .type Event
         .repeated
         .code 47
     ]
     .field [
         .name events-witnesses
-        .type event-witness
+        .type EventWitness
         .repeated
         .code 48
     ]
@@ -829,34 +829,31 @@
         .code 49
     ]
     .field [
-        .name fiche-person-person
-        .type fiche-person
+        .name FichePerson-person
+        .type FichePerson
         .optional
         .code 103
     ]
 ]
 
 .enum [
-    .name person-type
+    .name PersonType
     .option [
-        .name simple
+        .name SIMPLE
         .code 1
-        .protobuf-name "person_simple"
     ]
     .option [
-        .name full
+        .name FULL
         .code 2
-        .protobuf-name "person_full"
     ]
     .option [
-        .name fiche
+        .name FICHE
         .code 3
-        .protobuf-name "person_fiche"
     ]
 ]
 
 .record [
-    .name fiche-person
+    .name FichePerson
     .field [
         .name birth-date-raw
         .type string
@@ -913,7 +910,7 @@
     ]
     .field [
         .name burial-type
-        .type burial-type
+        .type BurialType
         .code 10
     ]
     .field [
@@ -946,7 +943,7 @@
     ]
     .field [
         .name ref-person
-        .type person
+        .type Person
         .optional
         .code 16
     ]
@@ -982,50 +979,50 @@
     ]
     .field [
         .name father
-        .type person
+        .type Person
         .optional
         .code 23
     ]
     .field [
         .name mother
-        .type person
+        .type Person
         .optional
         .code 24
     ]
     .field [
         .name families
-        .type fiche-family
+        .type FicheFamily
         .repeated
         .code 25
     ]
     .field [
         .name related
-        .type relation-fiche-person
+        .type RelationFichePerson
         .repeated
         .code 26
     ]
     .field [
         .name rparents
-        .type relation-fiche-person
+        .type RelationFichePerson
         .repeated
         .code 27
     ]
     .field [
         .name events-witnesses
-        .type event-fiche-witness
+        .type EventFicheWitness
         .repeated
         .code 28
     ]
     .field [
         .name events
-        .type fiche-event
+        .type FicheEvent
         .repeated
         .code 29
     ]
 ]
 
 .record [
-    .name family
+    .name Family
     .field [
         .name index
         .type protobuf-int32
@@ -1033,7 +1030,7 @@
     ]
     .field [
         .name spouse
-        .type simple-person
+        .type SimplePerson
         .code 2
     ]
     .field [
@@ -1074,7 +1071,7 @@
     ]
     .field [
         .name marriage-date-cal
-        .type calendar
+        .type Calendar
         .optional
         .code 6
     ]
@@ -1092,12 +1089,12 @@
     ]
     .field [
         .name marriage-type
-        .type marriage-type
+        .type MarriageType
         .code 9
     ]
     .field [
         .name divorce-type
-        .type divorce-type
+        .type DivorceType
         .code 10
     ]
     .field [
@@ -1132,13 +1129,13 @@
     ]
     .field [
         .name divorce-date-cal
-        .type calendar
+        .type Calendar
         .optional
         .code 14
     ]
     .field [
         .name witnesses
-        .type simple-person
+        .type SimplePerson
         .repeated
         .code 15
     ]
@@ -1156,14 +1153,14 @@
     ]
     .field [
         .name children
-        .type simple-person
+        .type SimplePerson
         .repeated
         .code 18
     ]
 ]
 
 .record [
-    .name fiche-family
+    .name FicheFamily
     .field [
         .name index
         .type protobuf-int32
@@ -1171,7 +1168,7 @@
     ]
     .field [
         .name spouse
-        .type person
+        .type Person
         .code 2
     ]
     .field [
@@ -1212,7 +1209,7 @@
     ]
     .field [
         .name marriage-date-cal
-        .type calendar
+        .type Calendar
         .optional
         .code 6
     ]
@@ -1230,12 +1227,12 @@
     ]
     .field [
         .name marriage-type
-        .type marriage-type
+        .type MarriageType
         .code 9
     ]
     .field [
         .name divorce-type
-        .type divorce-type
+        .type DivorceType
         .code 10
     ]
     .field [
@@ -1270,13 +1267,13 @@
     ]
     .field [
         .name divorce-date-cal
-        .type calendar
+        .type Calendar
         .optional
         .code 14
     ]
     .field [
         .name witnesses
-        .type person
+        .type Person
         .repeated
         .code 15
     ]
@@ -1294,14 +1291,14 @@
     ]
     .field [
         .name children
-        .type person
+        .type Person
         .repeated
         .code 18
     ]
 ]
 
 .record [
-    .name index-person
+    .name IndexPerson
     .field [
         .name index
         .type protobuf-int32
@@ -1316,7 +1313,7 @@
 ]
 
 .record [
-    .name node
+    .name Node
     .field [
         .name id
         .type protobuf-int64
@@ -1324,7 +1321,7 @@
     ]
     .field [
         .name person
-        .type person-tree
+        .type PersonTree
         .code 2
     ]
     .field [
@@ -1336,7 +1333,7 @@
 ]
 
 .record [
-    .name edge
+    .name Edge
     .field [
         .name from-node
         .type protobuf-int64
@@ -1350,56 +1347,56 @@
 ]
 
 .record [
-    .name graph-tree
+    .name GraphTree
     .field [
         .name nodes-asc
-        .type node
+        .type Node
         .repeated
         .code 1
     ]
     .field [
         .name edges-asc
-        .type edge
+        .type Edge
         .repeated
         .code 2
     ]
     .field [
         .name nodes-desc
-        .type node
+        .type Node
         .repeated
         .code 3
     ]
     .field [
         .name edges-desc
-        .type edge
+        .type Edge
         .repeated
         .code 4
     ]
     .field [
         .name nodes-siblings
-        .type node
+        .type Node
         .repeated
         .code 5
     ]
     .field [
         .name nodes-siblings-before
-        .type node
+        .type Node
         .repeated
         .code 6
     ]
     .field [
         .name nodes-siblings-after
-        .type node
+        .type Node
         .repeated
         .code 7
     ]
 ]
 
 .record [
-    .name graph-tree-params
+    .name GraphTreeParams
     .field [
         .name identifier-person
-        .type identifier-person
+        .type IdentifierPerson
         .code 1
     ]
     .field [
@@ -1423,7 +1420,7 @@
 ]
 
 .record [
-    .name identifier-person
+    .name IdentifierPerson
     .field [
         .name index
         .type protobuf-int32
@@ -1457,7 +1454,7 @@
 ]
 
 .record [
-    .name nb-ancestors
+    .name NbAncestors
     .field [
         .name nb
         .type protobuf-int32
@@ -1466,513 +1463,513 @@
 ]
 
 .enum [
-    .name sosa
+    .name Sosa
     .option [
-        .name no-sosa
+        .name NO-SOSA
         .code 2
     ]
     .option [
-        .name sosa-ref
+        .name SOSA-REF
         .code 0
     ]
     .option [
-        .name sosa
+        .name SOSA
         .code 1
     ]
 ]
 
 .enum [
-    .name calendar
+    .name Calendar
     .option [
-        .name gregorian
+        .name GREGORIAN
         .code 0
     ]
     .option [
-        .name julian
+        .name JULIAN
         .code 1
     ]
     .option [
-        .name french
+        .name FRENCH
         .code 2
     ]
     .option [
-        .name hebrew
+        .name HEBREW
         .code 3
     ]
 ]
 
 .enum [
-    .name precision
+    .name Precision
     .option [
-        .name sure
+        .name SURE
         .code 0
     ]
     .option [
-        .name about
+        .name ABOUT
         .code 1
     ]
     .option [
-        .name maybe
+        .name MAYBE
         .code 2
     ]
     .option [
-        .name before
+        .name BEFORE
         .code 3
     ]
     .option [
-        .name after
+        .name AFTER
         .code 4
     ]
     .option [
-        .name oryear
+        .name ORYEAR
         .code 5
     ]
     .option [
-        .name yearint
+        .name YEARINT
         .code 6
     ]
 ]
 
 .enum [
-    .name sex
+    .name Sex
     .option [
-        .name unknown
+        .name UNKNOWN
         .code 2
     ]
     .option [
-        .name male
+        .name MALE
         .code 0
     ]
     .option [
-        .name female
+        .name FEMALE
         .code 1
     ]
 ]
 
 .enum [
-    .name death-type
+    .name DeathType
     .option [
-        .name dont-know-if-dead
+        .name DONT-KNOW-IF-DEAD
         .code 4
     ]
     .option [
-        .name not-dead
+        .name NOT-DEAD
         .code 0
     ]
     .option [
-        .name dead
+        .name DEAD
         .code 1
     ]
     .option [
-        .name dead-young
+        .name DEAD-YOUNG
         .code 2
     ]
     .option [
-        .name dead-dont-know-when
+        .name DEAD-DONT-KNOW-WHEN
         .code 3
     ]
     .option [
-        .name of-course-dead
+        .name OF-COURSE-DEAD
         .code 5
     ]
 ]
 
 .enum [
-    .name burial-type
+    .name BurialType
     .option [
-        .name dont-know
+        .name DONT-KNOW
         .code 0
     ]
     .option [
-        .name buried
+        .name BURIED
         .code 1
     ]
     .option [
-        .name cremated
+        .name CREMATED
         .code 2
     ]
 ]
 
 .enum [
-    .name marriage-type
+    .name MarriageType
     .option [
-        .name no-mention
+        .name NO-MENTION
         .code 4
     ]
     .option [
-        .name married
+        .name MARRIED
         .code 0
     ]
     .option [
-        .name not-married
+        .name NOT-MARRIED
         .code 1
     ]
     .option [
-        .name engaged
+        .name ENGAGED
         .code 2
     ]
     .option [
-        .name no-sexes-check-not-married
+        .name NO-SEXES-CHECK-NOT-MARRIED
         .code 3
     ]
     .option [
-        .name no-sexes-check-married
+        .name NO-SEXES-CHECK-MARRIED
         .code 5
     ]
     .option [
-        .name marriage-bann
+        .name MARRIAGE-BANN
         .code 6
     ]
     .option [
-        .name marriage-contract
+        .name MARRIAGE-CONTRACT
         .code 7
     ]
     .option [
-        .name marriage-license
+        .name MARRIAGE-LICENSE
         .code 8
     ]
     .option [
-        .name pacs
+        .name PACS
         .code 9
     ]
     .option [
-        .name residence
+        .name RESIDENCE
         .code 10
     ]
 ]
 
 .enum [
-    .name divorce-type
+    .name DivorceType
     .option [
-        .name not-divorced
+        .name NOT-DIVORCED
         .code 0
     ]
     .option [
-        .name divorced
+        .name DIVORCED
         .code 1
     ]
     .option [
-        .name separated
+        .name SEPARATED
         .code 2
     ]
 ]
 
 .enum [
-    .name relation-type
+    .name RelationType
     .option [
-        .name rparent-adoption
+        .name RPARENT-ADOPTION
         .code 0
     ]
     .option [
-        .name rparent-recognition
+        .name RPARENT-RECOGNITION
         .code 1
     ]
     .option [
-        .name rparent-candidate-parent
+        .name RPARENT-CANDIDATE-PARENT
         .code 2
     ]
     .option [
-        .name rparent-god-parent
+        .name RPARENT-GOD-PARENT
         .code 3
     ]
     .option [
-        .name rparent-foster-parent
+        .name RPARENT-FOSTER-PARENT
         .code 4
     ]
     .option [
-        .name rchild-adoption
+        .name RCHILD-ADOPTION
         .code 5
     ]
     .option [
-        .name rchild-recognition
+        .name RCHILD-RECOGNITION
         .code 6
     ]
     .option [
-        .name rchild-candidate-parent
+        .name RCHILD-CANDIDATE-PARENT
         .code 7
     ]
     .option [
-        .name rchild-god-parent
+        .name RCHILD-GOD-PARENT
         .code 8
     ]
     .option [
-        .name rchild-foster-parent
+        .name RCHILD-FOSTER-PARENT
         .code 9
     ]
 ]
 
 .enum [
-    .name witness-type
+    .name WitnessType
     .option [
-        .name witness
+        .name WITNESS
         .code 0
     ]
     .option [
-        .name witness-godparent
+        .name WITNESS-GODPARENT
         .code 1
     ]
     .option [
-        .name witness-officer
+        .name WITNESS-OFFICER
         .code 2
     ]
 ]
 
 .enum [
-    .name event-type
+    .name EventType
     .option [
-        .name epers-birth
+        .name EPERS-BIRTH
         .code 0
     ]
     .option [
-        .name epers-baptism
+        .name EPERS-BAPTISM
         .code 1
     ]
     .option [
-        .name epers-death
+        .name EPERS-DEATH
         .code 2
     ]
     .option [
-        .name epers-burial
+        .name EPERS-BURIAL
         .code 3
     ]
     .option [
-        .name epers-cremation
+        .name EPERS-CREMATION
         .code 4
     ]
     .option [
-        .name epers-accomplishment
+        .name EPERS-ACCOMPLISHMENT
         .code 5
     ]
     .option [
-        .name epers-acquisition
+        .name EPERS-ACQUISITION
         .code 6
     ]
     .option [
-        .name epers-adhesion
+        .name EPERS-ADHESION
         .code 7
     ]
     .option [
-        .name epers-baptismlds
+        .name EPERS-BAPTISMLDS
         .code 8
     ]
     .option [
-        .name epers-barmitzvah
+        .name EPERS-BARMITZVAH
         .code 9
     ]
     .option [
-        .name epers-batmitzvah
+        .name EPERS-BATMITZVAH
         .code 10
     ]
     .option [
-        .name epers-benediction
+        .name EPERS-BENEDICTION
         .code 11
     ]
     .option [
-        .name epers-changename
+        .name EPERS-CHANGENAME
         .code 12
     ]
     .option [
-        .name epers-circumcision
+        .name EPERS-CIRCUMCISION
         .code 13
     ]
     .option [
-        .name epers-confirmation
+        .name EPERS-CONFIRMATION
         .code 14
     ]
     .option [
-        .name epers-confirmationlds
+        .name EPERS-CONFIRMATIONLDS
         .code 15
     ]
     .option [
-        .name epers-decoration
+        .name EPERS-DECORATION
         .code 16
     ]
     .option [
-        .name epers-demobilisationmilitaire
+        .name EPERS-DEMOBILISATIONMILITAIRE
         .code 17
     ]
     .option [
-        .name epers-diploma
+        .name EPERS-DIPLOMA
         .code 18
     ]
     .option [
-        .name epers-distinction
+        .name EPERS-DISTINCTION
         .code 19
     ]
     .option [
-        .name epers-dotation
+        .name EPERS-DOTATION
         .code 20
     ]
     .option [
-        .name epers-dotationlds
+        .name EPERS-DOTATIONLDS
         .code 21
     ]
     .option [
-        .name epers-education
+        .name EPERS-EDUCATION
         .code 22
     ]
     .option [
-        .name epers-election
+        .name EPERS-ELECTION
         .code 23
     ]
     .option [
-        .name epers-emigration
+        .name EPERS-EMIGRATION
         .code 24
     ]
     .option [
-        .name epers-excommunication
+        .name EPERS-EXCOMMUNICATION
         .code 25
     ]
     .option [
-        .name epers-familylinklds
+        .name EPERS-FAMILYLINKLDS
         .code 26
     ]
     .option [
-        .name epers-firstcommunion
+        .name EPERS-FIRSTCOMMUNION
         .code 27
     ]
     .option [
-        .name epers-funeral
+        .name EPERS-FUNERAL
         .code 28
     ]
     .option [
-        .name epers-graduate
+        .name EPERS-GRADUATE
         .code 29
     ]
     .option [
-        .name epers-hospitalisation
+        .name EPERS-HOSPITALISATION
         .code 30
     ]
     .option [
-        .name epers-illness
+        .name EPERS-ILLNESS
         .code 31
     ]
     .option [
-        .name epers-immigration
+        .name EPERS-IMMIGRATION
         .code 32
     ]
     .option [
-        .name epers-listepassenger
+        .name EPERS-LISTEPASSENGER
         .code 33
     ]
     .option [
-        .name epers-militarydistinction
+        .name EPERS-MILITARYDISTINCTION
         .code 34
     ]
     .option [
-        .name epers-militarypromotion
+        .name EPERS-MILITARYPROMOTION
         .code 35
     ]
     .option [
-        .name epers-militaryservice
+        .name EPERS-MILITARYSERVICE
         .code 36
     ]
     .option [
-        .name epers-mobilisationmilitaire
+        .name EPERS-MOBILISATIONMILITAIRE
         .code 37
     ]
     .option [
-        .name epers-naturalisation
+        .name EPERS-NATURALISATION
         .code 38
     ]
     .option [
-        .name epers-occupation
+        .name EPERS-OCCUPATION
         .code 39
     ]
     .option [
-        .name epers-ordination
+        .name EPERS-ORDINATION
         .code 40
     ]
     .option [
-        .name epers-property
+        .name EPERS-PROPERTY
         .code 41
     ]
     .option [
-        .name epers-recensement
+        .name EPERS-RECENSEMENT
         .code 42
     ]
     .option [
-        .name epers-residence
+        .name EPERS-RESIDENCE
         .code 43
     ]
     .option [
-        .name epers-retired
+        .name EPERS-RETIRED
         .code 44
     ]
     .option [
-        .name epers-scellentchildlds
+        .name EPERS-SCELLENTCHILDLDS
         .code 45
     ]
     .option [
-        .name epers-scellentparentlds
+        .name EPERS-SCELLENTPARENTLDS
         .code 46
     ]
     .option [
-        .name epers-scellentspouselds
+        .name EPERS-SCELLENTSPOUSELDS
         .code 47
     ]
     .option [
-        .name epers-ventebien
+        .name EPERS-VENTEBIEN
         .code 48
     ]
     .option [
-        .name epers-will
+        .name EPERS-WILL
         .code 49
     ]
     .option [
-        .name epers-custom
+        .name EPERS-CUSTOM
         .code 50
     ]
     .option [
-        .name efam-marriage
+        .name EFAM-MARRIAGE
         .code 100
     ]
     .option [
-        .name efam-no-marriage
+        .name EFAM-NO-MARRIAGE
         .code 101
     ]
     .option [
-        .name efam-no-mention
+        .name EFAM-NO-MENTION
         .code 102
     ]
     .option [
-        .name efam-engage
+        .name EFAM-ENGAGE
         .code 103
     ]
     .option [
-        .name efam-divorce
+        .name EFAM-DIVORCE
         .code 104
     ]
     .option [
-        .name efam-separated
+        .name EFAM-SEPARATED
         .code 105
     ]
     .option [
-        .name efam-annulation
+        .name EFAM-ANNULATION
         .code 106
     ]
     .option [
-        .name efam-marriage-bann
+        .name EFAM-MARRIAGE-BANN
         .code 107
     ]
     .option [
-        .name efam-marriage-contract
+        .name EFAM-MARRIAGE-CONTRACT
         .code 108
     ]
     .option [
-        .name efam-marriage-license
+        .name EFAM-MARRIAGE-LICENSE
         .code 109
     ]
     .option [
-        .name efam-pacs
+        .name EFAM-PACS
         .code 110
     ]
     .option [
-        .name efam-residence
+        .name EFAM-RESIDENCE
         .code 111
     ]
     .option [
-        .name efam-custom
+        .name EFAM-CUSTOM
         .code 112
     ]
 ]

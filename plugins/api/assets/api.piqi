@@ -1,7 +1,7 @@
 .protobuf-package "geneweb.api"
 
 .record [
-    .name infos-base
+    .name InfosBase
     .field [
         .name nb-persons
         .type protobuf-int64
@@ -14,7 +14,7 @@
     ]
     .field [
         .name sosa
-        .type reference-person
+        .type ReferencePerson
         .optional
         .code 3
     ]
@@ -33,7 +33,7 @@
 ]
 
 .record [
-    .name reference-person
+    .name ReferencePerson
     .field [
         .name n
         .type string
@@ -52,10 +52,10 @@
 ]
 
 .record [
-    .name reference-person-i
+    .name ReferencePersonI
     .field [
         .name key
-        .type reference-person
+        .type ReferencePerson
         .optional
         .code 1
     ]
@@ -68,17 +68,17 @@
 ]
 
 .record [
-    .name list-reference-persons
+    .name ListReferencePersons
     .field [
         .name list-ref-persons
-        .type reference-person
+        .type ReferencePerson
         .repeated
         .code 1
     ]
 ]
 
 .record [
-    .name relation-parent
+    .name RelationParent
     .field [
         .name father
         .type protobuf-int32
@@ -99,16 +99,16 @@
     ]
     .field [
         .name rpt-type
-        .type relation-parent-type
+        .type RelationParentType
         .code 4
     ]
 ]
 
 .record [
-    .name title
+    .name Title
     .field [
         .name title-type
-        .type title-type
+        .type TitleType
         .code 1
     ]
     .field [
@@ -150,7 +150,7 @@
 ]
 
 .record [
-    .name spouse
+    .name Spouse
     .field [
         .name sosa
         .type string
@@ -173,7 +173,7 @@
     ]
     .field [
         .name sex
-        .type sex
+        .type Sex
         .code 5
     ]
     .field [
@@ -229,7 +229,7 @@
     ]
     .field [
         .name death-type
-        .type death-type
+        .type DeathType
         .code 16
     ]
     .field [
@@ -254,7 +254,7 @@
     ]
     .field [
         .name divorce-type
-        .type divorce-type
+        .type DivorceType
         .code 21
     ]
     .field [
@@ -265,7 +265,7 @@
 ]
 
 .record [
-    .name person
+    .name Person
     .field [
         .name sosa
         .type string
@@ -288,7 +288,7 @@
     ]
     .field [
         .name sex
-        .type sex
+        .type Sex
         .code 5
     ]
     .field [
@@ -344,7 +344,7 @@
     ]
     .field [
         .name death-type
-        .type death-type
+        .type DeathType
         .code 16
     ]
     .field [
@@ -359,7 +359,7 @@
     ]
     .field [
         .name spouses
-        .type spouse
+        .type Spouse
         .repeated
         .code 19
     ]
@@ -391,7 +391,7 @@
 ]
 
 .record [
-    .name full-person
+    .name FullPerson
     .field [
         .name sosa
         .type string
@@ -419,7 +419,7 @@
     ]
     .field [
         .name sex
-        .type sex
+        .type Sex
         .code 6
     ]
     .field [
@@ -524,7 +524,7 @@
     ]
     .field [
         .name death-type
-        .type death-type
+        .type DeathType
         .code 25
     ]
     .field [
@@ -559,7 +559,7 @@
     ]
     .field [
         .name titles
-        .type title
+        .type Title
         .repeated
         .code 32
     ]
@@ -571,7 +571,7 @@
     ]
     .field [
         .name rparents
-        .type relation-parent
+        .type RelationParent
         .repeated
         .code 34
     ]
@@ -600,7 +600,7 @@
 ]
 
 .record [
-    .name full-family
+    .name FullFamily
     .field [
         .name fsources
         .type string
@@ -627,12 +627,12 @@
     ]
     .field [
         .name marriage-type
-        .type marriage-type
+        .type MarriageType
         .code 5
     ]
     .field [
         .name divorce-type
-        .type divorce-type
+        .type DivorceType
         .code 6
     ]
     .field [
@@ -671,7 +671,7 @@
 ]
 
 .record [
-    .name internal-int32
+    .name InternalInt32
     .field [
         .name value
         .type protobuf-int32
@@ -680,42 +680,42 @@
 ]
 
 .record [
-    .name list-persons
+    .name ListPersons
     .field [
         .name list-persons
-        .type person
+        .type Person
         .repeated
         .code 1
     ]
 ]
 
 .record [
-    .name list-full-persons
+    .name ListFullPersons
     .field [
         .name persons
-        .type full-person
+        .type FullPerson
         .repeated
         .code 1
     ]
 ]
 
 .record [
-    .name list-full-families
+    .name ListFullFamilies
     .field [
         .name families
-        .type full-family
+        .type FullFamily
         .repeated
         .code 1
     ]
 ]
 
 .record [
-    .name search-params
+    .name SearchParams
     .field [
         .name search-type
-        .type search-type
+        .type SearchType
         .optional
-        .default.starting-with
+        .default.STARTING-WITH
         .code 1
     ]
     .field [
@@ -754,10 +754,10 @@
 ]
 
 .record [
-    .name image
+    .name Image
     .field [
         .name person
-        .type person
+        .type Person
         .code 1
     ]
     .field [
@@ -768,10 +768,10 @@
 ]
 
 .record [
-    .name full-image
+    .name FullImage
     .field [
         .name person
-        .type full-person
+        .type FullPerson
         .code 1
     ]
     .field [
@@ -782,30 +782,30 @@
 ]
 
 .record [
-    .name list-images
+    .name ListImages
     .field [
         .name list-images
-        .type image
+        .type Image
         .repeated
         .code 1
     ]
 ]
 
 .record [
-    .name list-full-images
+    .name ListFullImages
     .field [
         .name images
-        .type full-image
+        .type FullImage
         .repeated
         .code 1
     ]
 ]
 
 .record [
-    .name pers-img
+    .name PersImg
     .field [
         .name person
-        .type reference-person
+        .type ReferencePerson
         .code 1
     ]
     .field [
@@ -816,17 +816,17 @@
 ]
 
 .record [
-    .name list-pers-img
+    .name ListPersImg
     .field [
         .name list-pers-img
-        .type pers-img
+        .type PersImg
         .repeated
         .code 1
     ]
 ]
 
 .record [
-    .name index
+    .name Index
     .field [
         .name index
         .type protobuf-int32
@@ -835,7 +835,7 @@
 ]
 
 .record [
-    .name image-address
+    .name ImageAddress
     .field [
         .name img
         .type string
@@ -844,10 +844,10 @@
 ]
 
 .record [
-    .name close-persons-params
+    .name ClosePersonsParams
     .field [
         .name person
-        .type reference-person
+        .type ReferencePerson
         .code 1
     ]
     .field [
@@ -879,7 +879,7 @@
 ]
 
 .record [
-    .name anniversary-params
+    .name AnniversaryParams
     .field [
         .name month
         .type protobuf-int32
@@ -889,7 +889,7 @@
 ]
 
 .record [
-    .name graph-params
+    .name GraphParams
     .field [
         .name generation
         .type protobuf-int32
@@ -898,41 +898,41 @@
     ]
     .field [
         .name person
-        .type reference-person
+        .type ReferencePerson
         .code 2
     ]
 ]
 
 .record [
-    .name graph-rel-params
+    .name GraphRelParams
     .field [
         .name person1
-        .type reference-person
+        .type ReferencePerson
         .code 1
     ]
     .field [
         .name person2
-        .type reference-person
+        .type ReferencePerson
         .code 2
     ]
 ]
 
 .record [
-    .name cpl-rel-params
+    .name CplRelParams
     .field [
         .name person1
-        .type reference-person
+        .type ReferencePerson
         .code 1
     ]
     .field [
         .name person2
-        .type reference-person
+        .type ReferencePerson
         .code 2
     ]
 ]
 
 .record [
-    .name node
+    .name Node
     .field [
         .name id
         .type protobuf-int64
@@ -940,13 +940,13 @@
     ]
     .field [
         .name person
-        .type person
+        .type Person
         .code 2
     ]
 ]
 
 .record [
-    .name full-node
+    .name FullNode
     .field [
         .name id
         .type protobuf-int64
@@ -954,13 +954,13 @@
     ]
     .field [
         .name person
-        .type full-person
+        .type FullPerson
         .code 2
     ]
 ]
 
 .record [
-    .name edge
+    .name Edge
     .field [
         .name from-node
         .type protobuf-int64
@@ -974,45 +974,45 @@
 ]
 
 .record [
-    .name graph
+    .name Graph
     .field [
         .name nodes
-        .type node
+        .type Node
         .repeated
         .code 1
     ]
     .field [
         .name edges
-        .type edge
+        .type Edge
         .repeated
         .code 2
     ]
 ]
 
 .record [
-    .name full-graph
+    .name FullGraph
     .field [
         .name nodes
-        .type full-node
+        .type FullNode
         .repeated
         .code 1
     ]
     .field [
         .name edges
-        .type edge
+        .type Edge
         .repeated
         .code 2
     ]
     .field [
         .name families
-        .type full-family
+        .type FullFamily
         .repeated
         .code 3
     ]
 ]
 
 .record [
-    .name all-persons-params
+    .name AllPersonsParams
     .field [
         .name from
         .type protobuf-int32
@@ -1028,7 +1028,7 @@
 ]
 
 .record [
-    .name all-families-params
+    .name AllFamiliesParams
     .field [
         .name from
         .type protobuf-int32
@@ -1044,23 +1044,23 @@
 ]
 
 .record [
-    .name warning-event
+    .name WarningEvent
     .field [
         .name pevent
-        .type pevent-name
+        .type PeventName
         .optional
         .code 1
     ]
     .field [
         .name fevent
-        .type fevent-name
+        .type FeventName
         .optional
         .code 2
     ]
 ]
 
 .record [
-    .name warning-person
+    .name WarningPerson
     .field [
         .name n
         .type string
@@ -1106,166 +1106,166 @@
 ]
 
 .record [
-    .name warning-already-defined
+    .name WarningAlreadyDefined
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
 ]
 
 .record [
-    .name warning-own-ancestor
+    .name WarningOwnAncestor
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
 ]
 
 .record [
-    .name warning-bad-sex-of-married-person
+    .name WarningBadSexOfMarriedPerson
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
 ]
 
 .record [
-    .name warning-birth-after-death
+    .name WarningBirthAfterDeath
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
 ]
 
 .record [
-    .name warning-incoherent-sex
+    .name WarningIncoherentSex
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
 ]
 
 .record [
-    .name warning-changed-order-of-children
+    .name WarningChangedOrderOfChildren
     .field [
         .name father
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
         .name mother
-        .type warning-person
+        .type WarningPerson
         .code 2
     ]
 ]
 
 .record [
-    .name warning-changed-order-of-marriages
+    .name WarningChangedOrderOfMarriages
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
 ]
 
 .record [
-    .name warning-children-not-in-order
+    .name WarningChildrenNotInOrder
     .field [
         .name father
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
         .name mother
-        .type warning-person
+        .type WarningPerson
         .code 2
     ]
 ]
 
 .record [
-    .name warning-dead-too-early-to-be-father
+    .name WarningDeadTooEarlyToBeFather
     .field [
         .name son
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
         .name father
-        .type warning-person
+        .type WarningPerson
         .code 2
     ]
 ]
 
 .record [
-    .name warning-incoherent-ancestor-date
+    .name WarningIncoherentAncestorDate
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
         .name ancestor
-        .type warning-person
+        .type WarningPerson
         .code 2
     ]
 ]
 
 .record [
-    .name warning-marriage-date-after-death
+    .name WarningMarriageDateAfterDeath
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
 ]
 
 .record [
-    .name warning-marriage-date-before-birth
+    .name WarningMarriageDateBeforeBirth
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
 ]
 
 .record [
-    .name warning-mother-dead-before-child-birth
+    .name WarningMotherDeadBeforeChildBirth
     .field [
         .name mother
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
         .name child
-        .type warning-person
+        .type WarningPerson
         .code 2
     ]
 ]
 
 .record [
-    .name warning-parent-born-after-child
+    .name WarningParentBornAfterChild
     .field [
         .name parent
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
         .name child
-        .type warning-person
+        .type WarningPerson
         .code 2
     ]
 ]
 
 .record [
-    .name warning-parent-too-young
+    .name WarningParentTooYoung
     .field [
         .name parent
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
@@ -1275,67 +1275,53 @@
     ]
     .field [
         .name child
-        .type warning-person
+        .type WarningPerson
         .code 3
     ]
 ]
 
 .record [
-    .name warning-possible-duplicate-fam
+    .name WarningPossibleDuplicateFam
     .field [
         .name family1
-        .type full-family
+        .type FullFamily
         .code 1
     ]
     .field [
         .name family2
-        .type full-family
+        .type FullFamily
         .code 2
     ]
 ]
 
 .record [
-    .name warning-title-dates-error
+    .name WarningTitleDatesError
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
         .name title
-        .type title
+        .type Title
         .code 2
     ]
 ]
 
 .record [
-    .name warning-undefined-sex
+    .name WarningUndefinedSex
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
 ]
 
 .record [
-    .name warning-young-for-marriage
+    .name WarningYoungForMarriage
     .field [
         .name person
-        .type warning-person
-        .code 1
-    ]
-    .field [
-        .name date
-        .type string
-        .code 2
-    ]
-]
-
-.record [
-    .name warning-old-for-marriage
-    .field [
-        .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
@@ -1346,10 +1332,24 @@
 ]
 
 .record [
-    .name warning-parent-too-old
+    .name WarningOldForMarriage
+    .field [
+        .name person
+        .type WarningPerson
+        .code 1
+    ]
+    .field [
+        .name date
+        .type string
+        .code 2
+    ]
+]
+
+.record [
+    .name WarningParentTooOld
     .field [
         .name parent
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
@@ -1359,69 +1359,69 @@
     ]
     .field [
         .name child
-        .type warning-person
+        .type WarningPerson
         .code 3
     ]
 ]
 
 .record [
-    .name warning-close-children
+    .name WarningCloseChildren
     .field [
         .name father
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
         .name mother
-        .type warning-person
+        .type WarningPerson
         .code 2
     ]
     .field [
         .name child1
-        .type warning-person
+        .type WarningPerson
         .code 3
     ]
     .field [
         .name child2
-        .type warning-person
+        .type WarningPerson
         .code 4
     ]
 ]
 
 .record [
-    .name warning-distant-children
+    .name WarningDistantChildren
     .field [
         .name father
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
         .name mother
-        .type warning-person
+        .type WarningPerson
         .code 2
     ]
     .field [
         .name child1
-        .type warning-person
+        .type WarningPerson
         .code 3
     ]
     .field [
         .name child2
-        .type warning-person
+        .type WarningPerson
         .code 4
     ]
 ]
 
 .record [
-    .name warning-big-age-between-spouses
+    .name WarningBigAgeBetweenSpouses
     .field [
         .name father
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
         .name mother
-        .type warning-person
+        .type WarningPerson
         .code 2
     ]
     .field [
@@ -1432,10 +1432,10 @@
 ]
 
 .record [
-    .name warning-dead-old
+    .name WarningDeadOld
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
@@ -1446,240 +1446,240 @@
 ]
 
 .record [
-    .name warning-witness-date-after-death
+    .name WarningWitnessDateAfterDeath
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
         .name event
-        .type warning-event
+        .type WarningEvent
         .code 2
     ]
     .field [
         .name origin
-        .type warning-person
+        .type WarningPerson
         .repeated
         .code 3
     ]
 ]
 
 .record [
-    .name warning-witness-date-before-birth
+    .name WarningWitnessDateBeforeBirth
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
         .name event
-        .type warning-event
+        .type WarningEvent
         .code 2
     ]
     .field [
         .name origin
-        .type warning-person
+        .type WarningPerson
         .repeated
         .code 3
     ]
 ]
 
 .record [
-    .name warning-event-order
+    .name WarningEventOrder
     .field [
         .name person
-        .type warning-person
+        .type WarningPerson
         .code 1
     ]
     .field [
         .name pevents
-        .type pevent-name
+        .type PeventName
         .repeated
         .code 2
     ]
     .field [
         .name fevents
-        .type fevent-name
+        .type FeventName
         .repeated
         .code 3
     ]
 ]
 
 .record [
-    .name base-warnings
+    .name BaseWarnings
     .field [
         .name warning-already-defined
-        .type warning-already-defined
+        .type WarningAlreadyDefined
         .repeated
         .code 1
     ]
     .field [
         .name warning-own-ancestor
-        .type warning-own-ancestor
+        .type WarningOwnAncestor
         .repeated
         .code 2
     ]
     .field [
         .name warning-bad-sex-of-married-person
-        .type warning-bad-sex-of-married-person
+        .type WarningBadSexOfMarriedPerson
         .repeated
         .code 3
     ]
     .field [
         .name warning-birth-after-death
-        .type warning-birth-after-death
+        .type WarningBirthAfterDeath
         .repeated
         .code 4
     ]
     .field [
         .name warning-incoherent-sex
-        .type warning-incoherent-sex
+        .type WarningIncoherentSex
         .repeated
         .code 5
     ]
     .field [
         .name warning-changed-order-of-children
-        .type warning-changed-order-of-children
+        .type WarningChangedOrderOfChildren
         .repeated
         .code 6
     ]
     .field [
         .name warning-children-not-in-order
-        .type warning-children-not-in-order
+        .type WarningChildrenNotInOrder
         .repeated
         .code 7
     ]
     .field [
         .name warning-dead-too-early-to-be-father
-        .type warning-dead-too-early-to-be-father
+        .type WarningDeadTooEarlyToBeFather
         .repeated
         .code 8
     ]
     .field [
         .name warning-incoherent-ancestor-date
-        .type warning-incoherent-ancestor-date
+        .type WarningIncoherentAncestorDate
         .repeated
         .code 9
     ]
     .field [
         .name warning-marriage-date-after-death
-        .type warning-marriage-date-after-death
+        .type WarningMarriageDateAfterDeath
         .repeated
         .code 10
     ]
     .field [
         .name warning-marriage-date-before-birth
-        .type warning-marriage-date-before-birth
+        .type WarningMarriageDateBeforeBirth
         .repeated
         .code 11
     ]
     .field [
         .name warning-mother-dead-before-child-birth
-        .type warning-mother-dead-before-child-birth
+        .type WarningMotherDeadBeforeChildBirth
         .repeated
         .code 12
     ]
     .field [
         .name warning-parent-born-after-child
-        .type warning-parent-born-after-child
+        .type WarningParentBornAfterChild
         .repeated
         .code 13
     ]
     .field [
         .name warning-parent-too-young
-        .type warning-parent-too-young
+        .type WarningParentTooYoung
         .repeated
         .code 14
     ]
     .field [
         .name warning-possible-duplicate-fam
-        .type warning-possible-duplicate-fam
+        .type WarningPossibleDuplicateFam
         .repeated
         .code 26
     ]
     .field [
         .name warning-title-dates-error
-        .type warning-title-dates-error
+        .type WarningTitleDatesError
         .repeated
         .code 15
     ]
     .field [
         .name warning-undefined-sex
-        .type warning-undefined-sex
+        .type WarningUndefinedSex
         .repeated
         .code 16
     ]
     .field [
         .name warning-young-for-marriage
-        .type warning-young-for-marriage
+        .type WarningYoungForMarriage
         .repeated
         .code 17
     ]
     .field [
         .name warning-close-children
-        .type warning-close-children
+        .type WarningCloseChildren
         .repeated
         .code 18
     ]
     .field [
         .name warning-parent-too-old
-        .type warning-parent-too-old
+        .type WarningParentTooOld
         .repeated
         .code 19
     ]
     .field [
         .name warning-changed-order-of-marriages
-        .type warning-changed-order-of-marriages
+        .type WarningChangedOrderOfMarriages
         .repeated
         .code 20
     ]
     .field [
         .name warning-big-age-between-spouses
-        .type warning-big-age-between-spouses
+        .type WarningBigAgeBetweenSpouses
         .repeated
         .code 21
     ]
     .field [
         .name warning-dead-old
-        .type warning-dead-old
+        .type WarningDeadOld
         .repeated
         .code 22
     ]
     .field [
         .name warning-witness-date-after-death
-        .type warning-witness-date-after-death
+        .type WarningWitnessDateAfterDeath
         .repeated
         .code 24
     ]
     .field [
         .name warning-witness-date-before-birth
-        .type warning-witness-date-before-birth
+        .type WarningWitnessDateBeforeBirth
         .repeated
         .code 25
     ]
     .field [
         .name warning-old-for-marriage
-        .type warning-old-for-marriage
+        .type WarningOldForMarriage
         .repeated
         .code 27
     ]
     .field [
         .name warning-distant-children
-        .type warning-distant-children
+        .type WarningDistantChildren
         .repeated
         .code 28
     ]
     .field [
         .name warning-event-order
-        .type warning-event-order
+        .type WarningEventOrder
         .repeated
         .code 29
     ]
 ]
 
 .record [
-    .name filter-date
+    .name FilterDate
     .field [
         .name day
         .type protobuf-int32
@@ -1698,15 +1698,15 @@
 ]
 
 .record [
-    .name filter-date-range
+    .name FilterDateRange
     .field [
         .name date-begin
-        .type filter-date
+        .type FilterDate
         .code 1
     ]
     .field [
         .name date-end
-        .type filter-date
+        .type FilterDate
         .code 2
     ]
     .field [
@@ -1719,7 +1719,7 @@
 ]
 
 .record [
-    .name filters
+    .name Filters
     .field [
         .name only-sosa
         .type bool
@@ -1736,7 +1736,7 @@
     ]
     .field [
         .name sex
-        .type sex
+        .type Sex
         .optional
         .code 3
     ]
@@ -1749,20 +1749,20 @@
     ]
     .field [
         .name date-birth
-        .type filter-date-range
+        .type FilterDateRange
         .optional
         .code 5
     ]
     .field [
         .name date-death
-        .type filter-date-range
+        .type FilterDateRange
         .optional
         .code 6
     ]
 ]
 
 .record [
-    .name modification-status
+    .name ModificationStatus
     .field [
         .name status
         .type bool
@@ -1770,7 +1770,7 @@
     ]
     .field [
         .name base-warnings
-        .type base-warnings
+        .type BaseWarnings
         .code 2
     ]
     .field [
@@ -1782,7 +1782,7 @@
 ]
 
 .record [
-    .name person-start
+    .name PersonStart
     .field [
         .name lastname
         .type string
@@ -1795,7 +1795,7 @@
     ]
     .field [
         .name sex
-        .type sex
+        .type Sex
         .code 3
     ]
     .field [
@@ -1819,7 +1819,7 @@
 ]
 
 .record [
-    .name last-modifications
+    .name LastModifications
     .field [
         .name wizard
         .type string
@@ -1834,14 +1834,14 @@
     ]
     .field [
         .name range
-        .type filter-date-range
+        .type FilterDateRange
         .optional
         .code 3
     ]
 ]
 
 .record [
-    .name last-visits
+    .name LastVisits
     .field [
         .name user
         .type string
@@ -1850,7 +1850,7 @@
 ]
 
 .record [
-    .name dmy
+    .name Dmy
     .field [
         .name day
         .type protobuf-int32
@@ -1874,28 +1874,28 @@
 ]
 
 .record [
-    .name date
+    .name Date
     .field [
         .name cal
-        .type calendar
+        .type Calendar
         .optional
         .code 1
     ]
     .field [
         .name prec
-        .type precision
+        .type Precision
         .optional
         .code 2
     ]
     .field [
         .name dmy
-        .type dmy
+        .type Dmy
         .optional
         .code 3
     ]
     .field [
         .name dmy2
-        .type dmy
+        .type Dmy
         .optional
         .code 4
     ]
@@ -1908,67 +1908,67 @@
 ]
 
 .record [
-    .name events-query-params
+    .name EventsQueryParams
     .field [
-        .name close-persons-params
-        .type close-persons-params
+        .name closePersonsParams
+        .type ClosePersonsParams
         .optional
         .code 1
     ]
     .field [
-        .name start-date
-        .type date
+        .name startDate
+        .type Date
         .optional
         .code 2
     ]
     .field [
-        .name stop-date
-        .type date
+        .name stopDate
+        .type Date
         .optional
         .code 3
     ]
     .field [
         .name pevents
-        .type pevent-name
+        .type PeventName
         .repeated
         .code 4
     ]
     .field [
         .name fevents
-        .type fevent-name
+        .type FeventName
         .repeated
         .code 5
     ]
 ]
 
 .record [
-    .name event-query-result
+    .name EventQueryResult
     .field [
         .name p
-        .type person
+        .type Person
         .code 1
     ]
     .field [
         .name sp
-        .type person
+        .type Person
         .optional
         .code 2
     ]
     .field [
         .name pevent-name
-        .type pevent-name
+        .type PeventName
         .optional
         .code 3
     ]
     .field [
         .name fevent-name
-        .type fevent-name
+        .type FeventName
         .optional
         .code 4
     ]
     .field [
         .name date
-        .type date
+        .type Date
         .code 5
     ]
     .field [
@@ -1989,17 +1989,17 @@
 ]
 
 .record [
-    .name event-query-result-list
+    .name EventQueryResultList
     .field [
         .name events
-        .type event-query-result
+        .type EventQueryResult
         .repeated
         .code 1
     ]
 ]
 
 .record [
-    .name name-frequency-result
+    .name NameFrequencyResult
     .field [
         .name key
         .type string
@@ -2018,10 +2018,10 @@
 ]
 
 .record [
-    .name name-frequency-result-list
+    .name NameFrequencyResultList
     .field [
         .name result
-        .type name-frequency-result
+        .type NameFrequencyResult
         .repeated
         .code 1
     ]
@@ -2033,10 +2033,10 @@
 ]
 
 .record [
-    .name name-frequency-params
+    .name NameFrequencyParams
     .field [
         .name type
-        .type name-frequency-params-type
+        .type NameFrequencyParamsType
         .code 1
     ]
     .field [
@@ -2054,24 +2054,22 @@
 ]
 
 .enum [
-    .name name-frequency-params-type
+    .name NameFrequencyParamsType
     .option [
-        .name last-name
+        .name LAST-NAME
         .code 1
-        .protobuf-name "name_frequency_params_last_name"
     ]
     .option [
-        .name first-name
+        .name FIRST-NAME
         .code 2
-        .protobuf-name "name_frequency_params_first_name"
     ]
 ]
 
 .record [
-    .name error
+    .name Error
     .field [
         .name code
-        .type error-code
+        .type ErrorCode
         .code 998
     ]
     .field [
@@ -2083,509 +2081,505 @@
 ]
 
 .enum [
-    .name error-code
+    .name ErrorCode
     .option [
-        .name bad-request
+        .name BAD-REQUEST
         .code 400
-        .protobuf-name "error_bad_request"
     ]
     .option [
-        .name unauthorized
+        .name UNAUTHORIZED
         .code 401
-        .protobuf-name "error_unauthorized"
     ]
     .option [
-        .name forbidden
+        .name FORBIDDEN
         .code 403
-        .protobuf-name "error_forbidden"
     ]
     .option [
-        .name not-found
+        .name NOT-FOUND
         .code 404
-        .protobuf-name "error_not_found"
     ]
 ]
 
 .enum [
-    .name sex
+    .name Sex
     .option [
-        .name male
+        .name MALE
         .code 0
     ]
     .option [
-        .name female
+        .name FEMALE
         .code 1
     ]
     .option [
-        .name unknown
+        .name UNKNOWN
         .code 2
     ]
 ]
 
 .enum [
-    .name death-type
+    .name DeathType
     .option [
-        .name not-dead
+        .name NOT-DEAD
         .code 0
     ]
     .option [
-        .name dead
+        .name DEAD
         .code 1
     ]
     .option [
-        .name dead-young
+        .name DEAD-YOUNG
         .code 2
     ]
     .option [
-        .name dead-dont-know-when
+        .name DEAD-DONT-KNOW-WHEN
         .code 3
     ]
     .option [
-        .name dont-know-if-dead
+        .name DONT-KNOW-IF-DEAD
         .code 4
     ]
     .option [
-        .name of-course-dead
+        .name OF-COURSE-DEAD
         .code 5
     ]
 ]
 
 .enum [
-    .name marriage-type
+    .name MarriageType
     .option [
-        .name married
+        .name MARRIED
         .code 0
     ]
     .option [
-        .name not-married
+        .name NOT-MARRIED
         .code 1
     ]
     .option [
-        .name engaged
+        .name ENGAGED
         .code 2
     ]
     .option [
-        .name no-sexes-check-not-married
+        .name NO-SEXES-CHECK-NOT-MARRIED
         .code 3
     ]
     .option [
-        .name no-mention
+        .name NO-MENTION
         .code 4
     ]
     .option [
-        .name no-sexes-check-married
+        .name NO-SEXES-CHECK-MARRIED
         .code 5
     ]
     .option [
-        .name marriage-bann
+        .name MARRIAGE-BANN
         .code 6
     ]
     .option [
-        .name marriage-contract
+        .name MARRIAGE-CONTRACT
         .code 7
     ]
     .option [
-        .name marriage-license
+        .name MARRIAGE-LICENSE
         .code 8
     ]
     .option [
-        .name pacs
+        .name PACS
         .code 9
     ]
     .option [
-        .name residence
+        .name RESIDENCE
         .code 10
     ]
 ]
 
 .enum [
-    .name divorce-type
+    .name DivorceType
     .option [
-        .name not-divorced
+        .name NOT-DIVORCED
         .code 0
     ]
     .option [
-        .name divorced
+        .name DIVORCED
         .code 1
     ]
     .option [
-        .name separated
+        .name SEPARATED
         .code 2
     ]
 ]
 
 .enum [
-    .name relation-parent-type
+    .name RelationParentType
     .option [
-        .name rpt-adoption
+        .name RPT-ADOPTION
         .code 0
     ]
     .option [
-        .name rpt-recognition
+        .name RPT-RECOGNITION
         .code 1
     ]
     .option [
-        .name rpt-candidate-parent
+        .name RPT-CANDIDATE-PARENT
         .code 2
     ]
     .option [
-        .name rpt-god-parent
+        .name RPT-GOD-PARENT
         .code 3
     ]
     .option [
-        .name rpt-foster-parent
+        .name RPT-FOSTER-PARENT
         .code 4
     ]
 ]
 
 .enum [
-    .name title-type
+    .name TitleType
     .option [
-        .name title-main
+        .name TITLE-MAIN
         .code 0
     ]
     .option [
-        .name title-name
+        .name TITLE-NAME
         .code 1
     ]
     .option [
-        .name title-none
+        .name TITLE-NONE
         .code 2
     ]
 ]
 
 .enum [
-    .name search-type
+    .name SearchType
     .option [
-        .name starting-with
+        .name STARTING-WITH
         .code 0
     ]
     .option [
-        .name approximative
+        .name APPROXIMATIVE
         .code 1
     ]
     .option [
-        .name lastname-or-firstname
+        .name LASTNAME-OR-FIRSTNAME
         .code 2
     ]
 ]
 
 .enum [
-    .name pevent-name
+    .name PeventName
     .option [
-        .name epers-birth
+        .name EPERS-BIRTH
         .code 0
     ]
     .option [
-        .name epers-baptism
+        .name EPERS-BAPTISM
         .code 1
     ]
     .option [
-        .name epers-death
+        .name EPERS-DEATH
         .code 2
     ]
     .option [
-        .name epers-burial
+        .name EPERS-BURIAL
         .code 3
     ]
     .option [
-        .name epers-cremation
+        .name EPERS-CREMATION
         .code 4
     ]
     .option [
-        .name epers-accomplishment
+        .name EPERS-ACCOMPLISHMENT
         .code 5
     ]
     .option [
-        .name epers-acquisition
+        .name EPERS-ACQUISITION
         .code 6
     ]
     .option [
-        .name epers-adhesion
+        .name EPERS-ADHESION
         .code 7
     ]
     .option [
-        .name epers-baptismlds
+        .name EPERS-BAPTISMLDS
         .code 8
     ]
     .option [
-        .name epers-barmitzvah
+        .name EPERS-BARMITZVAH
         .code 9
     ]
     .option [
-        .name epers-batmitzvah
+        .name EPERS-BATMITZVAH
         .code 10
     ]
     .option [
-        .name epers-benediction
+        .name EPERS-BENEDICTION
         .code 11
     ]
     .option [
-        .name epers-changename
+        .name EPERS-CHANGENAME
         .code 12
     ]
     .option [
-        .name epers-circumcision
+        .name EPERS-CIRCUMCISION
         .code 13
     ]
     .option [
-        .name epers-confirmation
+        .name EPERS-CONFIRMATION
         .code 14
     ]
     .option [
-        .name epers-confirmationlds
+        .name EPERS-CONFIRMATIONLDS
         .code 15
     ]
     .option [
-        .name epers-decoration
+        .name EPERS-DECORATION
         .code 16
     ]
     .option [
-        .name epers-demobilisationmilitaire
+        .name EPERS-DEMOBILISATIONMILITAIRE
         .code 17
     ]
     .option [
-        .name epers-diploma
+        .name EPERS-DIPLOMA
         .code 18
     ]
     .option [
-        .name epers-distinction
+        .name EPERS-DISTINCTION
         .code 19
     ]
     .option [
-        .name epers-dotation
+        .name EPERS-DOTATION
         .code 20
     ]
     .option [
-        .name epers-dotationlds
+        .name EPERS-DOTATIONLDS
         .code 21
     ]
     .option [
-        .name epers-education
+        .name EPERS-EDUCATION
         .code 22
     ]
     .option [
-        .name epers-election
+        .name EPERS-ELECTION
         .code 23
     ]
     .option [
-        .name epers-emigration
+        .name EPERS-EMIGRATION
         .code 24
     ]
     .option [
-        .name epers-excommunication
+        .name EPERS-EXCOMMUNICATION
         .code 25
     ]
     .option [
-        .name epers-familylinklds
+        .name EPERS-FAMILYLINKLDS
         .code 26
     ]
     .option [
-        .name epers-firstcommunion
+        .name EPERS-FIRSTCOMMUNION
         .code 27
     ]
     .option [
-        .name epers-funeral
+        .name EPERS-FUNERAL
         .code 28
     ]
     .option [
-        .name epers-graduate
+        .name EPERS-GRADUATE
         .code 29
     ]
     .option [
-        .name epers-hospitalisation
+        .name EPERS-HOSPITALISATION
         .code 30
     ]
     .option [
-        .name epers-illness
+        .name EPERS-ILLNESS
         .code 31
     ]
     .option [
-        .name epers-immigration
+        .name EPERS-IMMIGRATION
         .code 32
     ]
     .option [
-        .name epers-listepassenger
+        .name EPERS-LISTEPASSENGER
         .code 33
     ]
     .option [
-        .name epers-militarydistinction
+        .name EPERS-MILITARYDISTINCTION
         .code 34
     ]
     .option [
-        .name epers-militarypromotion
+        .name EPERS-MILITARYPROMOTION
         .code 35
     ]
     .option [
-        .name epers-militaryservice
+        .name EPERS-MILITARYSERVICE
         .code 36
     ]
     .option [
-        .name epers-mobilisationmilitaire
+        .name EPERS-MOBILISATIONMILITAIRE
         .code 37
     ]
     .option [
-        .name epers-naturalisation
+        .name EPERS-NATURALISATION
         .code 38
     ]
     .option [
-        .name epers-occupation
+        .name EPERS-OCCUPATION
         .code 39
     ]
     .option [
-        .name epers-ordination
+        .name EPERS-ORDINATION
         .code 40
     ]
     .option [
-        .name epers-property
+        .name EPERS-PROPERTY
         .code 41
     ]
     .option [
-        .name epers-recensement
+        .name EPERS-RECENSEMENT
         .code 42
     ]
     .option [
-        .name epers-residence
+        .name EPERS-RESIDENCE
         .code 43
     ]
     .option [
-        .name epers-retired
+        .name EPERS-RETIRED
         .code 44
     ]
     .option [
-        .name epers-scellentchildlds
+        .name EPERS-SCELLENTCHILDLDS
         .code 45
     ]
     .option [
-        .name epers-scellentparentlds
+        .name EPERS-SCELLENTPARENTLDS
         .code 46
     ]
     .option [
-        .name epers-scellentspouselds
+        .name EPERS-SCELLENTSPOUSELDS
         .code 47
     ]
     .option [
-        .name epers-ventebien
+        .name EPERS-VENTEBIEN
         .code 48
     ]
     .option [
-        .name epers-will
+        .name EPERS-WILL
         .code 49
     ]
 ]
 
 .enum [
-    .name fevent-name
+    .name FeventName
     .option [
-        .name efam-marriage
+        .name EFAM-MARRIAGE
         .code 0
     ]
     .option [
-        .name efam-no-marriage
+        .name EFAM-NO-MARRIAGE
         .code 1
     ]
     .option [
-        .name efam-no-mention
+        .name EFAM-NO-MENTION
         .code 2
     ]
     .option [
-        .name efam-engage
+        .name EFAM-ENGAGE
         .code 3
     ]
     .option [
-        .name efam-divorce
+        .name EFAM-DIVORCE
         .code 4
     ]
     .option [
-        .name efam-separated
+        .name EFAM-SEPARATED
         .code 5
     ]
     .option [
-        .name efam-annulation
+        .name EFAM-ANNULATION
         .code 6
     ]
     .option [
-        .name efam-marriage-bann
+        .name EFAM-MARRIAGE-BANN
         .code 7
     ]
     .option [
-        .name efam-marriage-contract
+        .name EFAM-MARRIAGE-CONTRACT
         .code 8
     ]
     .option [
-        .name efam-marriage-license
+        .name EFAM-MARRIAGE-LICENSE
         .code 9
     ]
     .option [
-        .name efam-pacs
+        .name EFAM-PACS
         .code 10
     ]
     .option [
-        .name efam-residence
+        .name EFAM-RESIDENCE
         .code 11
     ]
 ]
 
 .enum [
-    .name witness-type
+    .name WitnessType
     .option [
-        .name witness
+        .name WITNESS
         .code 0
     ]
     .option [
-        .name witness-godparent
+        .name WITNESS-GODPARENT
         .code 1
     ]
 ]
 
 .enum [
-    .name calendar
+    .name Calendar
     .option [
-        .name gregorian
+        .name GREGORIAN
         .code 0
     ]
     .option [
-        .name julian
+        .name JULIAN
         .code 1
     ]
     .option [
-        .name french
+        .name FRENCH
         .code 2
     ]
     .option [
-        .name hebrew
+        .name HEBREW
         .code 3
     ]
 ]
 
 .enum [
-    .name precision
+    .name Precision
     .option [
-        .name sure
+        .name SURE
         .code 0
     ]
     .option [
-        .name about
+        .name ABOUT
         .code 1
     ]
     .option [
-        .name maybe
+        .name MAYBE
         .code 2
     ]
     .option [
-        .name before
+        .name BEFORE
         .code 3
     ]
     .option [
-        .name after
+        .name AFTER
         .code 4
     ]
     .option [
-        .name oryear
+        .name ORYEAR
         .code 5
     ]
     .option [
-        .name yearint
+        .name YEARINT
         .code 6
     ]
 ]
