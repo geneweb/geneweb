@@ -259,8 +259,8 @@
       %hidden;
       <input type="hidden" name="m" value="FORUM_VAL"%/>
       <input type="hidden" name="p" value="%pos;"%/>
-      <button type="submit" name="v" class="btn btn-outline-secondary btn-lg">[*validate/delete]0</button>
-      <button type="submit" name="d" class="btn btn-outline-secondary btn-lg">[*validate/delete]1</button>
+      <button type="submit" name="v" value="yes" class="btn btn-outline-secondary btn-lg">[*validate/delete]0</button>
+      <button type="submit" name="d" value="yes" class="btn btn-outline-secondary btn-lg">[*validate/delete]1</button>
 
       </p>
       </form>
