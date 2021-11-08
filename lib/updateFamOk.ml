@@ -547,7 +547,7 @@ let check_parents conf cpl =
   let check get i =
     let (fn, sn, _, _, _) = get cpl in
     if fn = "" then
-      if sn = "" then
+      if sn <> "" then
         Some (Update.UERR_missing_first_name (transl_nth conf "father/mother" i))
       else None
     else if sn = "" then
