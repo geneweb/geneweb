@@ -829,7 +829,7 @@
         .code 49
     ]
     .field [
-        .name Person
+        .name person
         .type FichePerson
         .optional
         .code 103
