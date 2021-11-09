@@ -1733,7 +1733,7 @@ let pers_to_piqi_person conf base p base_prefix is_main_person =
       events = fill_events conf base p base_prefix p_auth pers_to_piqi_simple_person simple_witness_constructor get_event_constructor;
       events_witnesses = get_events_witnesses conf base p base_prefix gen_p p_auth has_relations pers_to_piqi_simple_person simple_event_witness_constructor;
       baseprefix = base_prefix;
-      fiche_person_person = None;
+      person = None;
     }
 
 let fill_ref_if_is_main_person conf base is_main_person =
@@ -1832,7 +1832,7 @@ let rec pers_to_piqi_fiche_person conf base p base_prefix is_main_person nb_asc 
       in
       {
         Mread.Person.type_ = `fiche;
-        fiche_person_person = Some piqi_fiche_person;
+        person = Some piqi_fiche_person;
         n = fill_sn conf base p p_auth;
         p = fill_fn conf base p p_auth;
         occ = fill_occ p;
