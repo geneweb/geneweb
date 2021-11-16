@@ -30,17 +30,12 @@ let set_sosa_num () = assert (!sosa = `None) ; sosa := `Num
 
 let set_gwdb_legacy () = assert (!gwdb = `None) ; gwdb := `Legacy
 
-let set_gwdb_legacy_x_arangodb () = assert (!gwdb = `None) ; gwdb := `LegacyArangoDB
-
 let release = ref true
 
 let speclist =
   [ ( "--gwdb-legacy"
     , Arg.Unit set_gwdb_legacy
     , "Use legacy backend" )
-  ; ( "--gwdb-legacy-x-arangodb"
-    , Arg.Unit set_gwdb_legacy_x_arangodb
-    , "Use hybrid legacy-ArangoDB backend" )
   ; ( "--release"
     , Arg.Set release
     , "Use release profile: no debug informations \
@@ -97,11 +92,7 @@ let () =
     match !gwdb with
     | `None
     | `Legacy ->
-      exclude_dir "gwdb-legacy-x-arangodb" ;
       (" -D GENEWEB_GWDB_LEGACY", "geneweb.gwdb-legacy") ;
-    | `LegacyArangoDB ->
-      (" -D GENEWEB_GWDB_LEGACY -D GENEWEB_GWDB_ARANGODB"
-      , "geneweb.gwdb-legacy-x-arangodb")
   in
   let dune_profile = if !release then "release" else "dev" in
   let os_type, os_d, ext, rm, strip =
