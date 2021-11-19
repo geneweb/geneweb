@@ -451,6 +451,9 @@ let templ_eval_var conf =
       VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")
   | ["just_friend_wizard"] -> VVbool conf.just_friend_wizard
   | ["friend"] -> VVbool conf.friend
+  | ["plugin"; plugin] ->
+      let list = List.map (fun p -> Filename.basename p) conf.plugins in
+      VVbool (List.mem plugin list)
   | ["manitou"] -> VVbool conf.manitou
   | ["supervisor"] -> VVbool conf.supervisor
   | ["true"] -> VVbool true
