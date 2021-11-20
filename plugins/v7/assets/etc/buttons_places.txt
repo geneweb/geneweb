@@ -103,8 +103,8 @@
         %foreach;env_binding;%if;(env.val!="" and env.key!="k")%nn;
          &%env.key=%env.val;%end;%nn;
         %end;%nn;"
-        title="[*all the places]">%nn;
-      [*all the places]</a>
+        title="[*v7 all the places]">%nn;
+      [*v7 all the places]</a>
   </div>
   <div class="ml-4" >
 

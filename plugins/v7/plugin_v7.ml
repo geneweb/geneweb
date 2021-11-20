@@ -40,6 +40,18 @@ let l =
     |> fun () -> true
     end
 
+let md =
+  w_base begin fun conf base ->
+    V7_updateDataDisplay.print_mod conf base ;
+    true
+  end
+
+let md_ok =
+  w_base begin fun conf base ->
+    V7_updateDataDisplay.print_mod_ok conf base ;
+    true
+  end
+
 let p =
   w_base begin fun conf base -> match Util.p_getenv conf.env "v" with
     | Some v -> V7_some.first_name_print conf base v ; true
@@ -118,4 +130,6 @@ let _ =
     ; "P", aux p
     ; "PS", aux ps
     ; "TP", aux tp
+    ; "MOD_DATA", aux md
+    ; "MOD_DATA_OK", aux md_ok
     ]

@@ -92,3 +92,11 @@ fr: mot complet
 co: paragunà cù u nome sanu d’un locu
 en: match full location name
 fr: comparer avec le nom complet d'un lieu
+
+    v7 all the places
+en: all the places
+fr: tous les lieux
+
+    v7 list too long
+en: list too long
+fr: liste trop longue

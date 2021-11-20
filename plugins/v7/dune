@@ -17,6 +17,8 @@
     v7_sosa
     v7_srcfile
     v7_templ
+    v7_updateData
+    v7_updateDataDisplay
   )
   (wrapped true)
 )

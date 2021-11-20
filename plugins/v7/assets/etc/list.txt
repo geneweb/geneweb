@@ -103,21 +103,27 @@
 </div>
 
 %define;nbmds(xx,yy,tt,kk)
-  %if;(xx is_substr "kk" or xx="kk")yy%nn;
+  %if;(xx!="" and xx="kk")yy%nn;
+  %else;%if;("tt"=1)&nbsp;%end;
+  %end;
+%end;
+
+%define;nbmds_m(xx,yy,tt,kk)
+  %if;(xx!="" and ("kk" is_substr xx or xx="kk"))yy%nn;
   %else;%if;("tt"=1)&nbsp;%end;
   %end;
 %end;
 
 %define;tags(xx,tt,ss)
   %let;index;xx%in;
-  %let;birthplace;%apply;get_value(index, "birth_place")%in;
-  %let;baptismplace;%apply;get_value(index, "baptism_place")%in;
+  %let;birthplace;%apply;get_value(index, "birth_place_raw")%in;
+  %let;baptismplace;%apply;get_value(index, "baptism_place_raw")%in;
   %let;marriageplace;%apply;get_marriage(index)%in;
-  %let;deathplace;%apply;get_value(index, "death_place")%in;
-  %let;burialplace;%apply;get_value(index, "burial_place")%in;
+  %let;deathplace;%apply;get_value(index, "death_place_raw")%in;
+  %let;burialplace;%apply;get_value(index, "burial_place_raw")%in;
   %apply;nbmds("birthplace","N","tt","ss")%nn;
   %apply;nbmds("baptismplace","B","tt","ss")%nn;
-  %apply;nbmds("marriageplace","M","tt","ss")%nn;
+  %apply;nbmds_m("marriageplace","M","tt","ss")%nn;
   %apply;nbmds("deathplace","D","tt","ss")%nn;
   %apply;nbmds("burialplace","S","tt","ss")%nn;
 %end;
@@ -153,10 +159,12 @@
   %let;occ;%apply;get_value(index, "occ")%in;
   %let;dates;%apply;get_value(index, "dates_sort")%in;
   %let;s;%apply;get_var("p", i)%in;
+  %let;s_no_sub;%apply;get_var("q", i)%in;
   %let;so;%if;(s="")%k;%else;%s;%end;%in;
   %if;(evar.date_sort="on")
     %apply;add_in_sorted_list%with;
       %so;%and;
+      %s_no_sub;%and;
       %dates;%and;
       %index;%and;
       %i;%and;
@@ -164,6 +172,7 @@
   %else;
     %apply;add_in_sorted_list%with;
       %so;%and;
+      %s_no_sub;%and;
       %if;(evar.surn="")%surname;%end;%first_name;%occ;%and;
       %index;%and;
       %i;%and;
@@ -173,7 +182,7 @@
 
 <div class="mt-2">
   %foreach;sorted_list_item;
-  %let;sub;%apply;get_sub(3,item.1)%in;
+  %let;sub;%apply;get_sub(3,item.2)%in;
   %if;(item.1!=prev_item.1 or prev_item.1="")<li>
     %if;(k!="")<a href="%prefix;m=PS&k=%item.1;%opt;">%item.1;</a>%end;
     %if;wizard;
@@ -184,7 +193,7 @@
     %end;
   %end;
     <div class="ml-3">
-      %let;index;%item.3;%in;
+      %let;index;%item.4;%in;
       %let;so;%item.1;%in;
       %let;access;%apply;get_value(index, "access")%in;
       %let;sex;%apply;get_value(index, "sex")%in;

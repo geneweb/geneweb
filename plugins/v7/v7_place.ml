@@ -30,9 +30,13 @@ let suburb_aux sub nosub s =
         match
           let rec loop b i =
             if i = len then None
-            else match String.unsafe_get s i with
-              | ' ' -> loop b (i + 1)
-              | '-' when not b -> loop true (i + 1)
+            else match Char.code s.[i] with
+              | 0x20 -> loop b (i + 1)
+              | 0x2D when not b -> loop true (i + 1)
+              | 0xE2 when Char.code s.[i+1] = 0x80 &&
+                         (Char.code s.[i+2] = 0x93 ||
+                          Char.code  s.[i+2] = 0x94) &&
+                          not b -> loop true (i + 3)
               | _ -> if b then Some i else None
           in loop false (i + 1)
         with
@@ -41,7 +45,7 @@ let suburb_aux sub nosub s =
     end else nosub s
   end
 
-(** [split_suburb "[foo-bar] - boobar (baz)"] is [9"foo-bar", "boobar (baz)")] *)
+(** [split_suburb "[foo-bar] - boobar (baz)"] is ["foo-bar", "boobar (baz)")] *)
 let split_suburb =
   suburb_aux
     begin fun s len i j -> String.sub s 1 (i - 1), String.sub s j (len - j) end
@@ -206,7 +210,7 @@ let get_all =
     let ht : ('a, 'b) Hashtbl.t = Hashtbl.create ht_size in
     let long = p_getenv conf.env "display" = Some "long" in
     let ht_add istr p =
-      let key : 'a = sou base istr |> normalize |> fold_place in
+      let key : 'a = sou base istr |> fold_place in
       if filter key then begin
         begin match Hashtbl.find_opt ht key with
           | Some _ as prev -> Hashtbl.replace ht key (mk_value prev p)
@@ -448,7 +452,7 @@ let print_html_places_surnames_short conf _base max_rlm_nbr link_to_ind
       function
       | ((so, _), p1 :: t_pl, _, ipl) :: t_list when p1 <> prev ->
         if acc <> [] then
-          Output.printf conf "<li>%s<br>" prev;
+          Output.printf conf "<li>%s<br>\n" prev;
           print_place_list conf opt long link_to_ind max_rlm_nbr acc ;
         let p2 = if List.length t_pl > 0 then [(List.hd t_pl); p1] else [p1] in
         let ipl = List.flatten ipl in
@@ -459,12 +463,13 @@ let print_html_places_surnames_short conf _base max_rlm_nbr link_to_ind
         loop2 ([(so, p2, ipl)] :: acc) p1 t_list
       | _ ->
         if acc <> [] then
-          Output.printf conf "<li>%s<br>" prev;
+          Output.printf conf "<li>%s<br>\n" prev;
           print_place_list conf opt long link_to_ind max_rlm_nbr acc
     in
     Output.printf conf "<ul>\n";
     loop2 [] "" new_list;
     Output.printf conf "</ul>\n"
+
 
 let print_html_places_surnames conf base max_rlm_nbr link_to_ind
   (array : ((string * string list) * (string * iper list) list) array) =
@@ -483,6 +488,7 @@ let print_html_places_surnames conf base max_rlm_nbr link_to_ind
     (* Warn : do same sort_uniq in short mode *)
     let ips = List.sort_uniq compare ips in
     let len = List.length ips in
+    let so_no_sub = without_suburb so in
     Output.printf conf "<a href=\"%s" (commd conf);
     if link_to_ind && len = 1
     then Output.print_string conf (acces conf base @@ pget conf base @@ List.hd ips)
@@ -493,7 +499,7 @@ let print_html_places_surnames conf base max_rlm_nbr link_to_ind
         Output.printf conf " (<a href=\"%sm=L%s%s&nb=%d" (commd conf)
           ("&k=" ^ (Mutil.encode so))
           opt len ;
-        Output.printf conf "&p0=%s" so ;
+        Output.printf conf "&p0=%s&q0=%s" so so_no_sub;
         List.iteri (fun i ip ->
           Output.printf conf "&i%d=%s" i (Gwdb.string_of_iper ip))
         ips ;
@@ -663,7 +669,7 @@ let print_all_places_surnames_long conf base _ini ~add_birth ~add_baptism
     | _ -> false
   in
   let t = if short then (Printf.sprintf "%s" (Utf8.capitalize
-    (transl conf "list too long"))) else ""
+    (transl conf "v7 list too long"))) else ""
   in
   let href =
     if short then ""
