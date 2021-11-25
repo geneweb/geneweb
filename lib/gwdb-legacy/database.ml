@@ -538,7 +538,7 @@ type visible_state = VsNone | VsTrue | VsFalse
 
 let verbose = Mutil.verbose
 
-let make_visible_record_access bname persons =
+let make_visible_record_access perm bname persons =
   let visible_ref = ref None in
   let fname = Filename.concat bname "restrict" in
   let read_or_create_visible () =
@@ -561,17 +561,15 @@ let make_visible_record_access bname persons =
   let v_write () =
     match !visible_ref with
       Some visible ->
-        begin try
-          let oc = Secure.open_out fname in
-          if Sys.unix && !verbose then
-            begin
-              Printf.eprintf "*** write restrict file\n";
-              flush stderr
-            end;
-          output_value oc visible;
-          close_out oc
-          with Sys_error _ -> ()
-        end
+      if perm = RDONLY then assert false
+      else
+        let oc = Secure.open_out fname in
+        if Sys.unix && !verbose then begin
+          Printf.eprintf "*** write restrict file\n";
+          flush stderr
+        end ;
+        output_value oc visible;
+        close_out oc
     | None -> ()
   in
   let v_get fct i =
@@ -656,7 +654,7 @@ let make_record_exists patches pending len = fun i ->
   || Hashtbl.find_opt patches i <> None
   || (i < len && i >= 0)
 
-let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending) len name input_array input_item =
+let make_record_access perm ic ic_acc shift array_pos (plenr, patches) (_, pending) len name input_array input_item =
   let tab = ref None in
   let cleared = ref false in
   let gen_get nopending i =
@@ -722,32 +720,36 @@ let empty_patch_ht () =
   }
 
 let input_patches bname =
-  try
-    let ic = Secure.open_in_bin (Filename.concat bname "patches") in
+  let fname = Filename.concat bname "patches" in
+  if Sys.file_exists fname then
+    try
+      let ic = Secure.open_in_bin fname in
       let r =
         if check_patch_magic ic then (input_value ic : patches_ht)
-        else
-          begin
-            (* old implementation of patches *)
-            seek_in ic 0;
-            let patches : Old.patches = input_value ic in
-            let ht = empty_patch_ht () in
-            let add (ir, ht) (k, v) =
-              if k >= !ir then ir := k + 1; Hashtbl.add ht k v
-            in
-            List.iter (add ht.h_person) !(patches.Old.p_person);
-            List.iter (add ht.h_ascend) !(patches.Old.p_ascend);
-            List.iter (add ht.h_union) !(patches.Old.p_union);
-            List.iter (add ht.h_family) !(patches.Old.p_family);
-            List.iter (add ht.h_couple) !(patches.Old.p_couple);
-            List.iter (add ht.h_descend) !(patches.Old.p_descend);
-            List.iter (add ht.h_string) !(patches.Old.p_string);
-            List.iter (add (ref 0, ht.h_name)) !(patches.Old.p_name);
-            ht
-          end
+        else begin
+          (* old implementation of patches *)
+          seek_in ic 0;
+          let patches : Old.patches = input_value ic in
+          let ht = empty_patch_ht () in
+          let add (ir, ht) (k, v) =
+            if k >= !ir then ir := k + 1 ;
+            Hashtbl.add ht k v
+          in
+          List.iter (add ht.h_person) !(patches.Old.p_person);
+          List.iter (add ht.h_ascend) !(patches.Old.p_ascend);
+          List.iter (add ht.h_union) !(patches.Old.p_union);
+          List.iter (add ht.h_family) !(patches.Old.p_family);
+          List.iter (add ht.h_couple) !(patches.Old.p_couple);
+          List.iter (add ht.h_descend) !(patches.Old.p_descend);
+          List.iter (add ht.h_string) !(patches.Old.p_string);
+          List.iter (add (ref 0, ht.h_name)) !(patches.Old.p_name);
+          ht
+        end
       in
-      close_in ic; r
-  with _ -> empty_patch_ht ()
+      close_in ic;
+      Ok r
+    with _ -> Error (Printf.sprintf "%s: corrupted file" fname) ;
+  else Ok ( empty_patch_ht () )
 
 let input_synchro bname =
   try
@@ -784,13 +786,21 @@ let opendb bname =
   in
   let patches = input_patches bname in
   let pending : patches_ht = empty_patch_ht () in
-  fst pending.h_person := !(fst patches.h_person) ;
-  fst pending.h_ascend := !(fst patches.h_ascend) ;
-  fst pending.h_union := !(fst patches.h_union) ;
-  fst pending.h_family := !(fst patches.h_family) ;
-  fst pending.h_couple := !(fst patches.h_couple) ;
-  fst pending.h_descend := !(fst patches.h_descend) ;
-  fst pending.h_string := !(fst patches.h_string) ;
+  let patches, perm =
+    match patches with
+    | Ok patches ->
+      fst pending.h_person := !(fst patches.h_person) ;
+      fst pending.h_ascend := !(fst patches.h_ascend) ;
+      fst pending.h_union := !(fst patches.h_union) ;
+      fst pending.h_family := !(fst patches.h_family) ;
+      fst pending.h_couple := !(fst patches.h_couple) ;
+      fst pending.h_descend := !(fst patches.h_descend) ;
+      fst pending.h_string := !(fst patches.h_string) ;
+      patches, RDRW
+    | Error msg ->
+      prerr_endline msg ;
+      empty_patch_ht (), RDONLY
+  in
   let synchro = input_synchro bname in
   let particles = Mutil.input_particles (Filename.concat bname "particles.txt") in
   let ic = Secure.open_in_bin (Filename.concat bname "base") in
@@ -849,43 +859,43 @@ let opendb bname =
   let iper_exists = make_record_exists (snd patches.h_person) (snd pending.h_person) persons_len in
   let ifam_exists = make_record_exists (snd patches.h_family) (snd pending.h_family) families_len in
   let persons =
-    make_record_access ic ic_acc shift persons_array_pos patches.h_person pending.h_person
+    make_record_access perm ic ic_acc shift persons_array_pos patches.h_person pending.h_person
       persons_len "persons" (input_value : _ -> person array)
       (Iovalue.input : _ -> person)
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let ascends =
-    make_record_access ic ic_acc shift ascends_array_pos patches.h_ascend pending.h_ascend
+    make_record_access perm ic ic_acc shift ascends_array_pos patches.h_ascend pending.h_ascend
       persons_len "ascends" (input_value : _ -> ascend array)
       (Iovalue.input : _ -> ascend)
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let unions =
-    make_record_access ic ic_acc shift unions_array_pos patches.h_union pending.h_union
+    make_record_access perm ic ic_acc shift unions_array_pos patches.h_union pending.h_union
       persons_len "unions" (input_value : _ -> union array)
       (Iovalue.input : _ -> union)
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let families =
-    make_record_access ic ic_acc shift families_array_pos patches.h_family pending.h_family
+    make_record_access perm ic ic_acc shift families_array_pos patches.h_family pending.h_family
       families_len "families" (input_value : _ -> family array)
       (Iovalue.input : _ -> family)
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let couples =
-    make_record_access ic ic_acc shift couples_array_pos patches.h_couple pending.h_couple
+    make_record_access perm ic ic_acc shift couples_array_pos patches.h_couple pending.h_couple
       families_len "couples" (input_value : _ -> couple array)
       (Iovalue.input : _ -> couple)
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let descends =
-    make_record_access ic ic_acc shift descends_array_pos patches.h_descend pending.h_descend
+    make_record_access perm ic ic_acc shift descends_array_pos patches.h_descend pending.h_descend
       families_len "descends" (input_value : _ -> descend array)
       (Iovalue.input : _ -> descend)
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let strings =
-    make_record_access ic ic_acc shift strings_array_pos patches.h_string pending.h_string
+    make_record_access perm ic ic_acc shift strings_array_pos patches.h_string pending.h_string
       strings_len "strings" (input_value : _ -> string array)
       (Iovalue.input : _ -> string)
   in
@@ -940,48 +950,50 @@ let opendb bname =
       x
     end else npb_init ()
   in
-  let commit_patches () =
-    let nbp =
-      Hashtbl.fold begin fun ip p acc ->
-        try
-          match try Some (persons.get_nopending ip) with _ -> None with
-          | Some old ->
-            if is_empty_name old && not (is_empty_name p)
-            then acc + 1
-            else if not (is_empty_name old) && is_empty_name p
-            then acc - 1
+  let commit_patches =
+    if perm = RDONLY then fun () -> assert false
+    else fun () ->
+      let nbp =
+        Hashtbl.fold begin fun ip p acc ->
+          try
+            match try Some (persons.get_nopending ip) with _ -> None with
+            | Some old ->
+              if is_empty_name old && not (is_empty_name p)
+              then acc + 1
+              else if not (is_empty_name old) && is_empty_name p
+              then acc - 1
+              else acc
+            | None -> if not (is_empty_name p) then acc + 1 else acc
+          with _ ->
+            if not (is_empty_name p) then acc + 1
             else acc
-          | None -> if not (is_empty_name p) then acc + 1 else acc
-        with _ ->
-          if not (is_empty_name p) then acc + 1
-          else acc
-      end (snd pending.h_person) (nbp_read ())
-    in
-    let tmp_nbp_fname = nbp_fname ^ "_tmp" in
-    let oc = Secure.open_out_bin tmp_nbp_fname in
-    output_value oc nbp ;
-    close_out oc ;
-    let aux (n, ht) (n', ht') =
-      n := !n' ;
-      Hashtbl.iter (Hashtbl.replace ht) ht' ;
-      Hashtbl.clear ht' ;
-    in
-    aux patches.h_person pending.h_person ;
-    aux patches.h_ascend pending.h_ascend ;
-    aux patches.h_union pending.h_union ;
-    aux patches.h_family pending.h_family ;
-    aux patches.h_couple pending.h_couple ;
-    aux patches.h_descend pending.h_descend ;
-    aux patches.h_string pending.h_string ;
-    let tmp_fname = Filename.concat bname "1patches" in
-    let fname = Filename.concat bname "patches" in
-    let oc9 = Secure.open_out_bin tmp_fname in
-    output_string oc9 magic_patch;
-    Dutil.output_value_no_sharing oc9 (patches : patches_ht);
-    close_out oc9;
-    move_with_backup tmp_nbp_fname nbp_fname ;
-    move_with_backup tmp_fname fname ;
-    commit_synchro ()
+        end (snd pending.h_person) (nbp_read ())
+      in
+      let tmp_nbp_fname = nbp_fname ^ "_tmp" in
+      let oc = Secure.open_out_bin tmp_nbp_fname in
+      output_value oc nbp ;
+      close_out oc ;
+      let aux (n, ht) (n', ht') =
+        n := !n' ;
+        Hashtbl.iter (Hashtbl.replace ht) ht' ;
+        Hashtbl.clear ht' ;
+      in
+      aux patches.h_person pending.h_person ;
+      aux patches.h_ascend pending.h_ascend ;
+      aux patches.h_union pending.h_union ;
+      aux patches.h_family pending.h_family ;
+      aux patches.h_couple pending.h_couple ;
+      aux patches.h_descend pending.h_descend ;
+      aux patches.h_string pending.h_string ;
+      let tmp_fname = Filename.concat bname "1patches" in
+      let fname = Filename.concat bname "patches" in
+      let oc9 = Secure.open_out_bin tmp_fname in
+      output_string oc9 magic_patch;
+      Dutil.output_value_no_sharing oc9 (patches : patches_ht);
+      close_out oc9;
+      move_with_backup tmp_nbp_fname nbp_fname ;
+      move_with_backup tmp_fname fname ;
+      commit_synchro ()
   in
   let patch_person i p =
     assert (i <> -1) ;
@@ -1070,23 +1082,27 @@ let opendb bname =
       str
     with Sys_error _ -> ""
   in
-  let commit_notes fnotes s =
-    let fname =
-      if fnotes = "" then "notes"
-      else
-        begin
-          begin try Unix.mkdir (Filename.concat bname "notes_d") 0o755 with
-            _ -> ()
-          end;
-          Filename.concat "notes_d" (fnotes ^ ".txt")
-        end
-    in
-    let fname = Filename.concat bname fname in
-    (try Sys.remove (fname ^ "~") with Sys_error _ -> ());
-    (try Sys.rename fname (fname ^ "~") with _ -> ());
-    if s = "" then ()
-    else
-      let oc = Secure.open_out fname in output_string oc s; close_out oc; ()
+  let commit_notes =
+    if perm = RDONLY then fun _ _ -> assert false
+    else fun fnotes s ->
+      let fname =
+        if fnotes = "" then "notes"
+        else
+          begin
+            begin try Unix.mkdir (Filename.concat bname "notes_d") 0o755 with
+                _ -> ()
+            end;
+            Filename.concat "notes_d" (fnotes ^ ".txt")
+          end
+      in
+      let fname = Filename.concat bname fname in
+      (try Sys.remove (fname ^ "~") with Sys_error _ -> ());
+      (try Sys.rename fname (fname ^ "~") with _ -> ());
+      if s <> "" then begin
+        let oc = Secure.open_out fname in
+        output_string oc s ;
+        close_out oc
+      end
   in
   let ext_files () =
     let top = Filename.concat bname "notes_d" in
@@ -1112,7 +1128,7 @@ let opendb bname =
     { persons
     ; ascends
     ; unions
-    ; visible = make_visible_record_access bname persons
+    ; visible = make_visible_record_access perm bname persons
     ; families
     ; couples
     ; descends
@@ -1121,6 +1137,7 @@ let opendb bname =
     ; particles = lazy (Mutil.compile_particles particles)
     ; bnotes
     ; bdir = bname
+    ; perm
     }
   in
   let persons_of_name = persons_of_name bname patches.h_name in
@@ -1186,7 +1203,9 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) : Dbd
     ; particles_txt = particles
     ; particles = lazy (Mutil.compile_particles particles)
     ; bnotes = bnotes
-    ; bdir = bdir }
+    ; bdir = bdir
+    ; perm = RDRW
+    }
   in
   let func : Dbdisk.base_func =
     { person_of_key = (fun _ -> assert false)

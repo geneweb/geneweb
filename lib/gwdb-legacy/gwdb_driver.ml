@@ -200,8 +200,9 @@ let new_iper base = base.data.persons.len
 let new_ifam base = base.data.families.len
 
 (* FIXME: lock *)
-let sync ?scratch:_ base =
-  Outbase.output base
+let sync ?(scratch=false) base =
+  if base.data.perm = RDONLY && not scratch
+  then Outbase.output base
 
 let make bname particles arrays : Dbdisk.dsk_base =
   sync ~scratch:true (Database.make bname particles arrays) ;
@@ -227,16 +228,18 @@ module NLDB = struct
     | None -> []
 
   let write base db =
-    let fname_tmp = bfname base "1notes_links" in
-    let fname_def = bfname base "notes_links" in
-    let fname_back = bfname base "notes_links~" in
-    let oc = open_out_bin fname_tmp in
-    output_string oc magic ;
-    output_value oc (db : (iper, ifam) Def.NLDB.t) ;
-    close_out oc ;
-    Mutil.rm fname_back;
-    Mutil.mv fname_def fname_back ;
-    Sys.rename fname_tmp fname_def
+    if base.data.perm = RDONLY then assert false
+    else
+      let fname_tmp = bfname base "1notes_links" in
+      let fname_def = bfname base "notes_links" in
+      let fname_back = bfname base "notes_links~" in
+      let oc = open_out_bin fname_tmp in
+      output_string oc magic ;
+      output_value oc (db : (iper, ifam) Def.NLDB.t) ;
+      close_out oc ;
+      Mutil.rm fname_back;
+      Mutil.mv fname_def fname_back ;
+      Sys.rename fname_tmp fname_def
 
 end
 
@@ -615,14 +618,16 @@ let read_or_create_visible base =
   visible
 
 let base_visible_write base =
-  let fname = Filename.concat base.data.bdir "restrict" in
-  match !visible_ref with
-  | Some visible ->
-    let oc = Secure.open_out fname in
-    output_string oc Mutil.executable_magic ;
-    output_value oc visible;
-    close_out oc
-  | None -> ()
+  if base.data.perm = RDONLY then assert false
+  else
+    let fname = Filename.concat base.data.bdir "restrict" in
+    match !visible_ref with
+    | Some visible ->
+      let oc = Secure.open_out fname in
+      output_string oc Mutil.executable_magic ;
+      output_value oc visible;
+      close_out oc
+    | None -> ()
 
 let base_visible_get base fct i =
   let visible =

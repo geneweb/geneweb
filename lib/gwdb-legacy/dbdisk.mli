@@ -269,6 +269,8 @@ type string_person_index =
 type visible_record_access =
   { v_write : unit -> unit; v_get : (dsk_person -> bool) -> int -> bool }
 
+type perm = RDONLY | RDRW
+
 type base_data =
   { persons : dsk_person record_access
   ; ascends : dsk_ascend record_access
@@ -282,6 +284,7 @@ type base_data =
   ; particles : Re.re Lazy.t
   ; bnotes : Def.base_notes
   ; bdir : string
+  ; perm : perm
   }
 
 type base_func =
