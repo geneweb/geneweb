@@ -784,6 +784,7 @@ let opendb bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
+  let tm_fname = Filename.concat bname "commit_timestamp" in
   let patches = input_patches bname in
   let pending : patches_ht = empty_patch_ht () in
   let patches, perm =
@@ -796,7 +797,7 @@ let opendb bname =
       fst pending.h_couple := !(fst patches.h_couple) ;
       fst pending.h_descend := !(fst patches.h_descend) ;
       fst pending.h_string := !(fst patches.h_string) ;
-      patches, RDRW
+      patches, if Sys.file_exists tm_fname then RDONLY else RDRW
     | Error msg ->
       prerr_endline msg ;
       empty_patch_ht (), RDONLY
@@ -953,6 +954,7 @@ let opendb bname =
   let commit_patches =
     if perm = RDONLY then fun () -> assert false
     else fun () ->
+      let tm = Unix.time () |> Unix.gmtime |> Mutil.sprintf_date in
       let nbp =
         Hashtbl.fold begin fun ip p acc ->
           try
@@ -987,13 +989,17 @@ let opendb bname =
       aux patches.h_string pending.h_string ;
       let tmp_fname = Filename.concat bname "1patches" in
       let fname = Filename.concat bname "patches" in
-      let oc9 = Secure.open_out_bin tmp_fname in
-      output_string oc9 magic_patch;
-      Dutil.output_value_no_sharing oc9 (patches : patches_ht);
-      close_out oc9;
+      let tm_oc = Secure.open_out_bin tm_fname in
+      output_string tm_oc tm ;
+      close_out tm_oc ;
+      let oc_tmp = Secure.open_out_bin tmp_fname in
+      output_string oc_tmp magic_patch ;
+      Dutil.output_value_no_sharing oc_tmp (patches : patches_ht) ;
+      close_out oc_tmp ;
       move_with_backup tmp_nbp_fname nbp_fname ;
       move_with_backup tmp_fname fname ;
-      commit_synchro ()
+      commit_synchro () ;
+      Sys.remove tm_fname
   in
   let patch_person i p =
     assert (i <> -1) ;
