@@ -197,6 +197,7 @@ let cache_lexicon () =
   List.iter (fun x -> ignore @@ load_lexicon x) !cache_langs
 
 exception Register_plugin_failure of string * [ `dynlink_error of Dynlink.error | `string of string ]
+exception Gwd_start_failure of string
 
 let register_plugin dir =
   if !debug then print_endline (__LOC__ ^ ": " ^ dir) ;
@@ -1919,6 +1920,8 @@ let main () =
   List.iter register_plugin !plugins ;
   !GWPARAM.init () ;
   cache_lexicon () ;
+  if not (Sys.file_exists !allowed_tags_file) then
+      raise (Gwd_start_failure (Printf.sprintf "Error: cannot open %s" !allowed_tags_file));
   if !images_dir <> "" then
     begin let abs_dir =
       let f =
@@ -1982,7 +1985,10 @@ let () =
     flush stderr;
 #endif
   | Register_plugin_failure (p, `dynlink_error e) ->
-    GwdLog.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
+    GwdLog.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e);
+    flush stderr;
   | Register_plugin_failure (p, `string s) ->
-    GwdLog.syslog `LOG_CRIT (p ^ ": " ^ s)
-  | e -> GwdLog.syslog `LOG_CRIT (Printexc.to_string e)
+    GwdLog.syslog `LOG_CRIT (p ^ ": " ^ s);
+    flush stderr;
+  | e -> GwdLog.syslog `LOG_CRIT (Printexc.to_string e);
+    flush stderr;

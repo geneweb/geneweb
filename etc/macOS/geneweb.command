@@ -55,11 +55,11 @@ else
   echo "Starting gwd..."
 fi
 "$DIR/gw/gwd" -hd "$DIR/gw" > gwd.log 2>&1 &
-sleep 1
+sleep 2
 gwd_pid=`ps -ef|grep '/gwd'|grep -v grep|awk '{print $2}'`
 if test "$gwd_pid" = ""; then
   if test "$LANG" = "fr"; then echo Echec gwd; else echo Failed gwd; fi
-  cat
+  cat gwd.log
   exit 1
 fi
 
