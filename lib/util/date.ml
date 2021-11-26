@@ -24,36 +24,45 @@ let time_elapsed d1 d2 =
     | (About | Maybe | Sure | After), (Before | Sure | Maybe | About) -> Before
     | _ -> Maybe
   in
+  let sign, d1, d2 =
+    if d1.year < d2.year
+    then (fun i -> i), d1, d2
+    else if d1.month < d2.month
+    then (fun i -> i), d1, d2
+    else if d1.day > d2.day
+    then (fun i -> - i), d2, d1
+    else (fun i -> i), d1, d2
+  in
   match d1 with
   | {day = 0; month = 0; year = a1} ->
-    {day = 0; month = 0; year = d2.year - a1; prec = prec; delta = 0}
+    {day = 0; month = 0; year = sign (d2.year - a1); prec = prec; delta = 0}
   | {day = 0; month = m1; year = a1} ->
     begin match d2 with
         {day = 0; month = 0; year = a2} ->
-        {day = 0; month = 0; year = a2 - a1; prec = prec; delta = 0}
+        {day = 0; month = 0; year = sign (a2 - a1); prec = prec; delta = 0}
       | {day = 0; month = m2; year = a2} ->
         let (month, r) =
           if m1 <= m2 then m2 - m1, 0 else m2 - m1 + 12, 1
         in
         let year = a2 - a1 - r in
-        {day = 0; month = month; year = year; prec = prec; delta = 0}
+        {day = 0; month = sign month; year = sign year; prec = prec; delta = 0}
       | {month = m2; year = a2} ->
         let (month, r) =
           if m1 <= m2 then m2 - m1, 0 else m2 - m1 + 12, 1
         in
         let year = a2 - a1 - r in
-        {day = 0; month = month; year = year; prec = prec; delta = 0}
+        {day = 0; month = sign month; year = sign year; prec = prec; delta = 0}
     end
   | {day = j1; month = m1; year = a1} ->
     match d2 with
       {day = 0; month = 0; year = a2} ->
-      {day = 0; month = 0; year = a2 - a1; prec = prec; delta = 0}
+      {day = 0; month = 0; year = sign (a2 - a1); prec = prec; delta = 0}
     | {day = 0; month = m2; year = a2} ->
       let (month, r) =
         if m1 <= m2 then m2 - m1, 0 else m2 - m1 + 12, 1
       in
       let year = a2 - a1 - r in
-      {day = 0; month = month; year = year; prec = prec; delta = 0}
+      {day = 0; month = sign month; year = sign year; prec = prec; delta = 0}
     | {day = j2; month = m2; year = a2} ->
       let (day, r) =
         if j1 <= j2 then j2 - j1, 0
@@ -63,7 +72,7 @@ let time_elapsed d1 d2 =
         if m1 + r <= m2 then m2 - m1 - r, 0 else m2 - m1 - r + 12, 1
       in
       let year = a2 - a1 - r in
-      {day = day; month = month; year = year; prec = prec; delta = 0}
+      {day = sign day; month = sign month; year = sign year; prec = prec; delta = 0}
 
 let time_elapsed_opt d1 d2 =
   match d1.prec, d2.prec with
@@ -78,6 +87,23 @@ let date_of_death =
 exception Not_comparable
 
 let rec compare_dmy_aux failure success ?(strict=false) dmy1 dmy2 =
+  match dmy1.prec, dmy2.prec with
+  | Before, (Sure | Maybe | About)
+  | (Sure | Maybe | About), After ->
+    begin match time_elapsed dmy1 dmy2 with
+      | { year = 0 ; month = 0 ; day = -1 ; prec = (Sure | Maybe | After) } ->
+        if strict then failure () else success 0
+      | _ -> compare_year strict failure success dmy1 dmy2
+    end
+  | After, (About | Maybe | Sure)
+  | (About | Maybe | Sure), Before ->
+    begin match time_elapsed dmy1 dmy2 with
+      | { year = 0 ; month = 0 ; day = 1 ; prec = (Sure | Maybe | Before) } ->
+        if strict then failure () else success 0
+      | _ -> compare_year strict failure success dmy1 dmy2
+    end
+  | _, _ -> compare_year strict failure success dmy1 dmy2
+and compare_year strict failure success dmy1 dmy2 =
   match compare dmy1.year dmy2.year with
   | 0 -> compare_month strict failure success dmy1 dmy2
   | x ->
