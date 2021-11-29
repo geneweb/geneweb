@@ -1380,6 +1380,9 @@ let conf_and_connection =
               (fun () -> log_passwd_failed ar tm from request conf.bname) ;
             unauth_server conf ar
       | _ ->
+        let printexc e =
+          GwdLog.syslog `LOG_CRIT (context conf contents ^ " " ^ Printexc.to_string e)
+        in
         try
           let t1 = Unix.gettimeofday () in
           Request.treat_request conf ;
@@ -1391,8 +1394,10 @@ let conf_and_connection =
               (Printf.sprintf "%s slow query (%.3f)" (context conf contents) (t2 -. t1))
         with
         | Exit -> ()
-        | e ->
-          GwdLog.syslog `LOG_CRIT (context conf contents ^ " " ^ Printexc.to_string e)
+        | (Def.HttpExn code) as e ->
+          !GWPARAM.output_error conf code ;
+          printexc e
+        | e -> printexc e
 
 let chop_extension name =
   let rec loop i =

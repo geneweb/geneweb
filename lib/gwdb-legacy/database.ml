@@ -561,7 +561,7 @@ let make_visible_record_access perm bname persons =
   let v_write () =
     match !visible_ref with
       Some visible ->
-      if perm = RDONLY then assert false
+      if perm = RDONLY then raise (HttpExn Forbidden)
       else
         let oc = Secure.open_out fname in
         if Sys.unix && !verbose then begin
@@ -952,7 +952,7 @@ let opendb bname =
     end else npb_init ()
   in
   let commit_patches =
-    if perm = RDONLY then fun () -> assert false
+    if perm = RDONLY then fun () -> raise (HttpExn Forbidden)
     else fun () ->
       let tm = Unix.time () |> Unix.gmtime |> Mutil.sprintf_date in
       let nbp =
@@ -1089,7 +1089,7 @@ let opendb bname =
     with Sys_error _ -> ""
   in
   let commit_notes =
-    if perm = RDONLY then fun _ _ -> assert false
+    if perm = RDONLY then fun _ _ -> raise (HttpExn Forbidden)
     else fun fnotes s ->
       let fname =
         if fnotes = "" then "notes"

@@ -11,6 +11,8 @@ type httpStatus =
   | Internal_Server_Error (* 500 *)
   | Service_Unavailable (* 503 *)
 
+exception HttpExn of httpStatus
+
 type ('a, 'b) choice =
     Left of 'a
   | Right of 'b
