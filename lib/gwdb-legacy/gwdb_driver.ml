@@ -202,7 +202,8 @@ let new_ifam base = base.data.families.len
 (* FIXME: lock *)
 let sync ?(scratch=false) base =
   if base.data.perm = RDONLY && not scratch
-  then Outbase.output base
+  then raise Def.(HttpExn Forbidden)
+  else Outbase.output base
 
 let make bname particles arrays : Dbdisk.dsk_base =
   sync ~scratch:true (Database.make bname particles arrays) ;
@@ -228,7 +229,7 @@ module NLDB = struct
     | None -> []
 
   let write base db =
-    if base.data.perm = RDONLY then assert false
+    if base.data.perm = RDONLY then raise Def.(HttpExn Forbidden)
     else
       let fname_tmp = bfname base "1notes_links" in
       let fname_def = bfname base "notes_links" in
@@ -618,7 +619,7 @@ let read_or_create_visible base =
   visible
 
 let base_visible_write base =
-  if base.data.perm = RDONLY then assert false
+  if base.data.perm = RDONLY then raise Def.(HttpExn Forbidden)
   else
     let fname = Filename.concat base.data.bdir "restrict" in
     match !visible_ref with
