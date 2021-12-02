@@ -3,6 +3,7 @@
 open Geneweb
 open Gwcomp
 
+(** Checks a .gwo header and prints fails if header is absent or not compatible. *)
 let check_magic fname ic =
   let b = really_input_string ic (String.length magic_gwo) in
   if b <> magic_gwo then
@@ -14,6 +15,17 @@ let check_magic fname ic =
         ("\"" ^ fname ^
          "\" is not a GeneWeb object file, or it is a very old version")
 
+(** [next_family_fun_templ gwo_list fi] creates a function that read
+    sucessivly a [Gwcomp.gw_syntax] for all .gwo files. In details it does :
+
+    - Switch to the next element in the [gwo_list] if reached the end
+      of the current file. Each element is [(gwo,separate, bnotes, shift)]
+      where [gwo] is .gwo filename and [separate], [bnotes], [shift] are
+      captured options from command line related to the giving file.
+    - Modify [fi] with mentioned previusly information if needed.
+    - Start/continue to read current .gwo file content and return
+      [Gwcomp.gw_syntax]. [None] is returned when reading of the last
+      .gwo file reaches end of file *)
 let next_family_fun_templ gwo_list fi =
   let ngwo = List.length gwo_list in
   let run =
@@ -49,6 +61,7 @@ let next_family_fun_templ gwo_list fi =
       match r with
         Some fam -> Some fam
       | None ->
+          (* switch to the next .gwo file *)
           match !gwo_list with
             (x, separate, bnotes, shift) :: rest ->
               run ();

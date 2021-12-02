@@ -1,6 +1,5 @@
 (* TODO: replace with Unidecode.nbc
    when version constraint [= 0.2.0] will be removed *)
-(** Return the number of bytes composing the UTF8 character starting with [c] *)
 let nbc c =
   if Char.code c < 0x80 then 1
   else if Char.code c < 0xC0 then invalid_arg "nbc"
@@ -11,24 +10,15 @@ let nbc c =
   else if Char.code c < 0xFE then 6
   else invalid_arg "nbc"
 
-(** [Utf8.next s i] returns the index of the character comming after
-    the one which starts at [i].
-*)
 let next s i =
   i + nbc s.[i]
 
-(** [Utf8.get s n] returns the index where the [n]-th character
-    starts in string [s].
-*)
 let get s i =
   let rec loop i k =
     if k = 0 then i
     else loop (next s i) (pred k)
   in loop 0 i
 
-(** Return the length (number of characters, not bytes)
-    of the given string.
-*)
 let length s =
   let rec loop i len =
     if i < String.length s
@@ -36,11 +26,6 @@ let length s =
     else len
   in loop 0 0
 
-(** [sub ?pad s start len]
-    Return a fresh UTF8-friendly substring of [len] characters, padded if needed.
-    Be careful [start] is the index of the byte where to start in [s],
-    not the [start-th] UTF8-character.
-*)
 let sub ?pad str start len =
   let strlen = String.length str in
   let n, i =
@@ -97,6 +82,8 @@ module C = struct
 
   type t = Str of string | Chr of char | Empty
 
+  (* Creates [t] from the UTF-8 character that starts at position [i] in [s].
+    If characher isn't the one that exists in ASCII char set, use unidecode library *)
   let unaccent trimmed s i0 len =
     let rec loop i =
       if i < len then match
@@ -159,6 +146,7 @@ module C = struct
       let m = Char.code (String.unsafe_get s (i + 3)) in
       n' lsl 6 lor (0x7f land m)
 
+  (* compare bytes (UTF-8 charachter) delimited by intevals [i1,j1] and [i2,j2] *)
   let cmp_substring s1 i1 j1 s2 i2 j2 =
     let l1 = j1 - i1 in
     let l2 = j2 - i2 in
@@ -175,6 +163,7 @@ module C = struct
       let c2 = match Uucp.Case.Fold.fold c2 with `Self -> [c2] | `Uchars us -> us in
       Stdlib.compare c1 c2
 
+  (* See [Utf8.compare] *)
   let compare n1 n2 =
     let trimmed1 = ref false in
     let trimmed2 = ref false in
@@ -215,12 +204,4 @@ module C = struct
 
 end
 
-(** [compare a b] compare normalized version of [a] and [b]
-    It is case insensitive.
-    It starts with unaccented comparison of [a] and [b],
-    and refine the result with accents comparison.
-
-    Here is an exemple of how letters would be sorted:
-    [A À Á Â B C Ç Č D E É L Ł Ô Ö Ø Œ P Q R * . ?]
- *)
 let compare = C.compare

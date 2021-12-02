@@ -71,6 +71,7 @@ let gc ?(dry_run = true) base =
   for i = 0 to base.data.families.len - 1 do
     if Array.get mf i then begin
       let f = base.data.families.get i in
+      (* if family wasn't deleted *)
       if f.fam_index <> dummy_ifam then begin
         let _ = Futil.map_family_ps markp markf marks f in
         let _ = Futil.map_couple_p false markp @@ base.data.couples.get i in
@@ -79,12 +80,14 @@ let gc ?(dry_run = true) base =
       end
     end
   done ;
+  (* [p1;p2:p3;p4] [true;false;true;false] -> [0;0;1;1] *)
   let dst_i src m =
     let off = ref 0 in
     Array.init src.len begin fun i ->
       if Array.get m i then i - !off else begin incr off ; i - !off end
     end
   in
+  (* 2 [true;false;true;false] -> [0;2]  *)
   let src_i len m =
     let off = ref 0 in
     let a = Array.make len (-1) in

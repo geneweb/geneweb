@@ -106,7 +106,12 @@ let speclist c =
 module IPS = Util.IperSet
 module IFS = Util.IfamSet
 
-(**/**)
+(** [is_censored_person max_year person_name]
+    Returns [true] iff the person has a birth date that is after max_year and
+    its visibility is not public
+*)
+(* S: Does it mean private persons whose birth year is before 'max_year'
+   are uncensored?  *)
 let is_censored_person threshold p =
   match Adef.od_of_cdate (get_birth p) with
   | None -> false
@@ -115,15 +120,32 @@ let is_censored_person threshold p =
     | Adef.Dgreg (dmy, _) -> dmy.Adef.year >= threshold && get_access p != Def.Public
     | _ -> false
 
+(** [is_censored_couple base max_year family]
+    Returns [true] if either the father or the mother of a given family in the
+    base is censored
+*)
 let is_censored_couple base threshold cpl =
   is_censored_person threshold @@ poi base (get_father cpl)
   || is_censored_person threshold @@ poi base (get_mother cpl)
 
+
+(* The following functions are utils set people as "censored" by marking them.
+   Censoring a person consists in setting a mark defined as:
+   `Marker.get pmark p lor flag`
+
+   This gets the current mark, being 0 or 1, and `lor`s it with `flag` which is `1`.
+   TODO: replace integer markers by booleans
+*)
+
+(** Marks a censored person *)
 let censor_person base pmark flag threshold p no_check =
   let ps = poi base p in
   if no_check || is_censored_person threshold ps
   then Marker.set pmark p (Marker.get pmark p lor flag)
 
+(** Marks all the members of a family that are censored.
+    If a couple is censored, its parents and all its descendants are marked.
+*)
 let rec censor_family base pmark fmark flag threshold i no_check =
   let censor_unions p =
     let uni = poi base p in
@@ -148,6 +170,7 @@ let rec censor_family base pmark fmark flag threshold i no_check =
   let censor_spouse iper =
     if all_families_censored iper
     then Marker.set pmark iper (Marker.get pmark iper lor flag)
+         (* S: Replace this line by `censor_person`? *)
   in
   if Marker.get fmark i = 0 then
     let fam = foi base i in
@@ -158,6 +181,7 @@ let rec censor_family base pmark fmark flag threshold i no_check =
       censor_descendants i
     end
 
+(** Marks all the families that are censored in the given base. *)
 let censor_base base pmark fmark flag threshold =
   Collection.iter begin fun i ->
     censor_family base pmark fmark flag threshold i false
@@ -166,27 +190,34 @@ let censor_base base pmark fmark flag threshold =
     censor_person base pmark flag threshold i false
   end (ipers base)
 
+(** Set non visible persons and families as censored *)
 let restrict_base base per_tab fam_tab flag =
+  (* Starts by censoring non visible persons of the base *)
   Collection.iter begin fun i ->
     if base_visible_get base (fun _ -> false) i
-    then Marker.set per_tab i (Marker.get per_tab i lor flag)
+    then Marker.set per_tab i (Marker.get per_tab i lor flag) (* S: replace by `censor_person` ? *)
   end (ipers base) ;
+
   Collection.iter begin fun i ->
     let fam = foi base i in
-    let des_visible =
+    let des_visible = (* There exists a children of the family that is not censored *)
       (* FIXME: replace with exists *)
       Array.fold_left
         (fun check iper -> check || Marker.get per_tab iper = 0) false
         (get_children fam)
     in
-    let cpl_not_visible =
+    let cpl_not_visible = (* Father or mother is censored *)
       Marker.get per_tab (get_father fam) <> 0
       || Marker.get per_tab (get_mother fam) <> 0
     in
+    (* If all the children, father and mother are censored, then censor family *)
     if not des_visible && cpl_not_visible
     then Marker.set fam_tab i (Marker.get fam_tab i lor flag)
   end (ifams base)
 
+(** [select_asc conf base max_gen ips]
+    Returns all the ancestors of persons in the list `ips` up to the `max_gen`
+    generation. *)
 let select_asc conf base max_gen ips =
   let rec loop_asc (gen : int) set ip =
     if not @@ IPS.mem ip set then begin
@@ -203,6 +234,12 @@ let select_asc conf base max_gen ips =
   in
   List.fold_left (loop_asc 0) IPS.empty ips
 
+(** [select_surname nase pmark fmark surname]
+    Sets a `true` marker to families whose mother or father that
+    match the given surname. Propagates the mark to children
+    that have this surname.
+*)
+(* S: only used by `select_surnames` in a List.iter *)
 (* Should it use search engine functions? *)
 let select_surname base pmark fmark surname =
   let surname = Name.strip_lower surname in
@@ -226,6 +263,12 @@ let select_surname base pmark fmark surname =
     end
   end (ifams base)
 
+(** [select_surnames base surnames]
+    Calls `select_surname` on every family that have the given surnames.
+    Returns two functions:
+    * the first takes a person and returns `true` iff it has been selected
+    * the second takes a family and returns `false` iff it has been selected
+*)
 let select_surnames base surnames : (iper -> bool) * (ifam -> bool) =
   let pmark = Gwdb.iper_marker (Gwdb.ipers base) false in
   let fmark = Gwdb.ifam_marker (Gwdb.ifams base) false in
@@ -234,11 +277,14 @@ let select_surnames base surnames : (iper -> bool) * (ifam -> bool) =
   , (fun i -> Gwdb.Marker.get fmark i) )
 (**/**)
 
+(** [select_parentship base ip1 ip2]
+    Returns the set of common descendants of ip1 and the
+    ancestors of ip2 and the set of their families. *)
 let select_parentship base ip1 ip2 =
   let conf = Config.{ empty with wizard = true ; bname = Gwdb.bname base } in
   let asc = select_asc conf base max_int [ ip1 ] in
   let desc = Util.select_desc conf base (-max_int) [ ip2, 0 ] in
-  let ipers =
+  let ipers = (* S: The intersection of asc and desc *)
     if IPS.cardinal asc > Hashtbl.length desc
     then
       Hashtbl.fold
@@ -249,11 +295,12 @@ let select_parentship base ip1 ip2 =
         (fun k acc -> if Hashtbl.mem desc k then IPS.add k acc else acc)
         asc IPS.empty
   in
-  let ifams =
+  let ifams = (* S: families  *)
     IPS.fold begin fun iper acc ->
       Array.fold_left begin fun acc ifam ->
-        if IFS.mem ifam acc
-        || not (IPS.mem (Gutil.spouse iper @@ foi base ifam) ipers)
+        if IFS.mem ifam acc (* S: useless test? *)
+        || not (IPS.mem (Gutil.spouse iper @@ foi base ifam) ipers) (* S: is the partner of the
+                                                                       person not in ipers? *)
         then acc
         else IFS.add ifam acc
       end acc (get_family (poi base iper))
@@ -261,7 +308,12 @@ let select_parentship base ip1 ip2 =
   in
   ipers, ifams
 
-let select_from_set ipers ifams =
+(** [select_from_set ipers ifams]
+    Returns two functions :
+    * the first returns true if its input is in ipers
+    * the second returns true if its input is in ifams
+*)
+let select_from_set (ipers : IPS.t) (ifams : IFS.t) =
   let sel_per i = IPS.mem i ipers in
   let sel_fam i = IFS.mem i ifams in
   (sel_per, sel_fam)
@@ -294,6 +346,8 @@ let select opts ips =
     in
     let conf = Config.{ empty with wizard = true } in
     let sel_per, sel_fam =
+      (* S: a lot of redundant tests are done here, would be simpler with
+         pattern matchings and factorization. *)
       if opts.ascdesc <> None || opts.desc <> None then begin
         assert (opts.censor = 0) ;
         let asc =
@@ -334,6 +388,7 @@ let select opts ips =
         let sel_fam i = IFS.mem i ifams in
         (sel_per, sel_fam)
       end else match opts.asc with
+        (* opts.ascdesc = None && opts.desc = None *)
         | Some asc ->
           let ipers = select_asc conf base asc ips in
           let per_sel i = IPS.mem i ipers in

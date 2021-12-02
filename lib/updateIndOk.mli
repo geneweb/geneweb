@@ -2,8 +2,10 @@ open Config
 open Def
 open Gwdb
 
+(** Removes a person from the base *)
 val effective_del_no_commit : base -> (iper, iper, string) gen_person -> unit
 
+(** Adds to the diff the deletion of a person *)
 val effective_del_commit : config -> base -> (iper, iper, string) gen_person -> unit
 
 (** [effective_del] applies [effective_del_no_commit] and [effective_del_commit] *)
@@ -18,21 +20,33 @@ val effective_mod
   -> (iper, Update.key, string) gen_person
   -> (iper, iper, istr) gen_person
 
+(** Tries to modifies a person and displays a success page if successful *)
 val print_mod
   : ?prerr:(config -> base -> Update.update_error -> unit) -> config -> base -> unit
 
+(** Patches the informations of a person by checking the order of events:
+    for example, a birth should happen before the death of a mother. *)
 val all_checks_person :
   base -> (iper, iper, istr) gen_person -> ifam gen_ascend ->
-    ifam gen_union -> CheckItem.base_warning list
+  ifam gen_union -> CheckItem.base_warning list
+
 val print_mod_aux :
   config -> base -> ((iper, Update.key, string) gen_person -> unit) -> unit
 
+(** Renames the image associated to a person *)
 val rename_image_file :
   config -> base -> person -> (iper, iper, string) gen_person -> unit
 
+(** Tries to add a person to the base and displays a success HTML page if
+    successful *)
 val print_add : config -> base -> unit
+
+(** Tries to remove a person from the base and displays a success HTML page if
+    successful *)
 val print_del : config -> base -> unit
 
+(** Tries to change the order of events for a person and displays a success HTML
+    page if successful *)
 val print_change_event_order : config -> base -> unit
 
 (* Ajout pour l'API *)

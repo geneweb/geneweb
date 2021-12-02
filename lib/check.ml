@@ -227,6 +227,7 @@ let min_year_of p =
 
 let dummy_date = CheckInfered (CheckOther max_int)
 
+(* check ad print warning if ancestors is born before person *)
 let rec check_ancestors base warning year year_tab ip ini_p =
   let infer = function
     | CheckBefore i -> CheckInfered (CheckBefore (pred i))

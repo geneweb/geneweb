@@ -33,12 +33,6 @@ let first_letters base is_surnames =
     in loop (spi_first iii "") []
   with Not_found -> []
 
-(** [select_names conf base is_surnames ini limit]
-    Select up to [limit] first names/surnames starting with [ini].
-    If more values are available, return [Specify] with different
-    possible prefixes.
-    Otherwise, return the list of values as (key * text * person count).
-  *)
 let select_names conf base is_surnames ini limit =
   let inilen = Utf8.length ini + 1 in
   let cut k = Utf8.sub k 0 (min (Utf8.length k) inilen) in

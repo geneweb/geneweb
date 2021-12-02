@@ -473,6 +473,7 @@ let input_lexicon lang ht open_fname =
     || (String.unsafe_get a i = String.unsafe_get b i
         && aux a b (i - 1) )
   in
+  (* find header *)
   let rec key () =
     match input_line ic with
     | exception End_of_file -> close_in ic
@@ -485,6 +486,7 @@ let input_lexicon lang ht open_fname =
            && String.unsafe_get line 3 = ' '
       then trad (String.sub line 4 (len - 4))
       else key ()
+  (* find a line corresponding to a language *)
   and trad k =
     match input_line ic with
     | exception End_of_file -> close_in ic
@@ -1024,6 +1026,7 @@ let rev_input_line ic pos (rbuff, rpos) =
     decr rpos;
     Bytes.unsafe_get !rbuff !rpos
   in
+  (* reverse buffer *)
   let get_n_reset () =
     let s = Buffer.to_bytes rev in
     let n = Bytes.length s in

@@ -1,19 +1,11 @@
-(** [Description] : Affiche une image (avec ses en-têtes) en réponse HTTP en
-                    utilisant Wserver. Le type MIME de l'image est deviné à
-                    partir de l'extension contenu dans le nom du fichier.
-    [Args] :
-      - fname : le nom du fichier image
-    [Retour] : True si l'image a pu être affichée                           *)
+(** [print_image_file conf fname] send HTTP respose with content of an image file at the path [fname].
+    MIME type of an image is deducted from [fname] extension. Returns [false] if image
+    wasn't found or couldn't be send. *)
 val print_image_file : Config.config -> string -> bool
 
-(** [Description] : Traite une requête image.
-    [Args] :
-      - config : configuration de la requête
-      - base : base de donnée sélectionnée                                  *)
+(** Searhes image's filename in the environement [conf.env] and sends HTTP respose with its content on the socket. If filename isn't presented, looks up
+    personal image for person's mentionned in [conf.env] *)
 val print : Config.config -> Gwdb.base -> unit
 
-(** [Description] : Affiche une image seule dans une page HTML.
-    [Args] :
-      - conf : configuration de la requête
-      - base : argument non utilisé                                          *)
+(** Sends HTTP respose with HTML page containg just image specified in arguments. *)
 val print_html : Config.config -> unit

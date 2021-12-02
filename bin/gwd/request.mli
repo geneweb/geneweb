@@ -48,7 +48,6 @@ val w_person
 
 (**/**)
 (* Used internally by [gwd]. Not intended to be used by other programs. *)
-val special_vars : string list
 val treat_request : Config.config -> unit
 (**/**)
 

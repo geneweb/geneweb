@@ -759,6 +759,7 @@ let print_foreach print_ast _eval_expr =
   in
   print_foreach
 
+(* S: check on `m` should be made beforehand; what about plugins?  *)
 let print_update_ind conf base p digest =
   match p_getenv conf.env "m" with
     Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") | Some ("MOD_IND" | "MOD_IND_OK") |

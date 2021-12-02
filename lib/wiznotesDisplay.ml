@@ -461,6 +461,7 @@ let print_mod conf base =
         else Hutil.incorrect_request conf
     | None -> Hutil.incorrect_request conf
 
+(* S: merge with print_mod *)
 let print_view conf base =
   let auth_file =
     match

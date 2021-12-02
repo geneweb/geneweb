@@ -540,7 +540,7 @@ module Marker = struct
     ; set : 'k -> 'v -> unit
     }
 
-  let make (k : 'a -> 'k) (c : 'a Collection.t) (i : 'v) : ('a, 'v) t =
+  let make (k : 'a -> int) (c : 'a Collection.t) (i : 'v) : ('a, 'v) t =
     let a = Array.make c.Collection.length i in
     { get = (fun x -> Array.get a (k x) )
     ; set = (fun x v -> Array.set a (k x) v) }

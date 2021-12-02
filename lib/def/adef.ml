@@ -35,6 +35,7 @@ type cdate =
   | Cdate of date
   | Cnone
 
+(* compress concrete date if it's possible *)
 let compress d =
   let simple =
     match d.prec with
@@ -70,6 +71,7 @@ let cdate_of_date d =
       end
   | Dtext t -> Ctext t
 
+(* uncompress concrete date *)
 let uncompress x =
   let (year, x) = x mod 2500, x / 2500 in
   let (month, x) = x mod 13, x / 13 in

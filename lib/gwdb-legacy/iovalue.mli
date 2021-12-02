@@ -1,35 +1,18 @@
 (* $Id: iovalue.mli,v 5.5 2012-01-27 08:53:53 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
+(** Size of long integer value inside the Geneweb's binary files *)
+val sizeof_long : int
+
+(** Input a value from the giving channel. Identical to [Marshal.from_channel]. *)
 val input : in_channel -> 'a
+
+(** Output a value to the giving channel. Identical to [Marshal.to_channel] with [No_sharing] flag. *)
 val output : out_channel -> 'a -> unit
 
-val sizeof_long : int
-val sign_extend : int -> int
-
-(* making a header for input_value like output_value does *)
-
-type header_pos
-
-val create_output_value_header : out_channel -> header_pos
-val patch_output_value_header : out_channel -> header_pos -> int
-
-(* generic functions *)
-
-type 'a in_funs =
-  { input_byte : 'a -> int;
-    input_binary_int : 'a -> int;
-    input : 'a -> bytes -> int -> int -> unit }
-val gen_input : 'a in_funs -> 'a -> 'b
-
-type 'a out_funs =
-  { output_byte : 'a -> int -> unit;
-    output_binary_int : 'a -> int -> unit;
-    output : 'a -> string -> int -> int -> unit }
-val gen_output : 'a out_funs -> 'a -> 'b -> unit
-
-val output_block_header : out_channel -> int -> int -> unit
-val size_32 : int ref
-val size_64 : int ref
-
+(** [output_array_acces oc getf arr_get arr_len pos] prints to the channel
+    [oc] position for each element (that could be obtained with [arr_get])
+    in the binary file where marshalled array is stored. Array should be
+    of length [arr_len] and should start at the position [pos] inside the
+    binary file. Returns a position just after the end of array. *)
 val output_array_access : out_channel -> (int -> 'a) -> int -> int -> int

@@ -242,6 +242,7 @@ let create_output_value_header oc =
   size_64 := 0;
   pos_header, pos_out oc
 
+(* making a header for input_value like output_value does *)
 let patch_output_value_header oc (pos_header, pos_start) =
   let pos_end = pos_out oc in
   if Sys.word_size = 64 &&

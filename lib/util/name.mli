@@ -1,24 +1,42 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-(** Apply uppercasing to the first letter of each name part,
+(** List of forbidden to use characters *)
+val forbidden_char : char list
+
+(** [unaccent_utf_8 lower s i] checks UTF-8 characher that starts at position [i] inside [s]
+    and returns couple (cs,np) where [cs] is ASCII representation of this character (characters
+    between 0x00 and 0x7F) and [np] it's a position of next utf8 character inside [s]. If [lower]
+    is true then [cs] will contain only lowercase letters.
+    Example : unaccent_utf_8 "aÈa" 1 -> ("e",3) *)
+val unaccent_utf_8 : bool -> string -> int -> string * int
+
+(** [next_chars_if_equiv s1 i1 s2 i2] checks if UTF-8 characters that start at position
+    [i1] inside [s1] and at [i2] inside [s2] are equivalent (have the same ASCII representation).
+    In this case returns position of the next charecter for each of them. Otherwise, returns None. *)
+val next_chars_if_equiv : string -> int -> string -> int -> (int * int) option
+
+(** Convert every letter to lowercase and use *unidecode* library to
+    represent unicode characters with ASCII. Non-alphanumeric characters
+    (except '.') are remplaced by space. *)
+val lower : string -> string
+
+(** Apply uppercasing to the first letter of each name (sequence of alphabetic characters) part,
     and lowercasing to the rest of the text. *)
 val title : string -> string
 
-val lower : string -> string
-  (* Name.lower:
-     - uppercase -> lowercase
-     - no accents
-     - chars no letters and no numbers (except '.') => spaces (stripped)
-     Key comparison (first name, surname, number) applies "lower" equality
-     on first names and surnames *)
+(** Remplace by an abbreviation or remove particles inside the name *)
 val abbrev : string -> string
-  (* Name.abbrev: suppress lowercase particles, shorten "saint" into "st" *)
+
+(** Removes all the spaces inside the name *)
 val strip : string -> string
-  (* Name.strip = name without spaces *)
+
+(** [strip_c s c] removes all the occurences of [c] inside the name *)
 val strip_c : string -> char -> string
-  (* Name.strip_c = name without the charater c given as parameter *)
-val crush : string -> string
-  (* Name.crush:
+
+(** Removes all the forbiden characters from [forbidden_char] inside the name *)
+val purge : string -> string
+
+(** Converts name to the following format:
      - no spaces
      - roman numbers are keeped
      - vowels are suppressed, except in words starting with a vowel,
@@ -28,28 +46,32 @@ val crush : string -> string
      - "z" replaced by "s"
      - "ph" replaced by "f"
      - others "h" deleted
-     - s at end of words are deleted
+     - s at thr end of words are deleted
      - no double lowercase consons *)
+val crush : string -> string
 
+(** Equivalent to [strip o lower]. Used as:
+   - First comparison of names.
+   - Comparison for first names and surnames. *)
 val strip_lower : string -> string
-  (* strip_lower = strip o lower, as first comparison of names.
-     First names and Surnames comparison is strip_lower equality. *)
 
-val purge : string -> string
-  (* String without any forbidden caracters defined in forbidden_char *)
-
+(** Equivalent to [crush o abbrev o lower]. Used as:
+   - Second comparison of names.
+   - Key when index by names *)
 val crush_lower : string -> string
-  (* crush_lower = crush o abbrev o lower, as second comparison of names.
-     In index by names, the "names" are crush_lowers *)
-
-val next_chars_if_equiv : string -> int -> string -> int -> (int * int) option
-
-val unaccent_utf_8 : bool -> string -> int -> string * int
-
-val forbidden_char : char list
 
 (** [concat fn sn] is [fn ^ " " ^ sn] but faster. *)
 val concat : string -> string -> string
+
+(** [split_sname_callback fn s]
+    Same as [split_sname], but call [fn] with substring indexes instead of building
+    a list *)
+val split_sname_callback : (int -> int -> unit) -> string -> unit
+
+(** [split_fname_callback fn s]
+    Same as [split_fname], but call [fn] with substring indexes instead of building
+    a list *)
+val split_fname_callback : (int -> int -> unit) -> string -> unit
 
 (** [split_sname s] split the surname [s] in parts composing it.
     e.g. [split_sname base "Foo-Bar"] is [[ "Foo" ; "Bar"]] *)
@@ -59,15 +81,3 @@ val split_sname  : string -> string list
     into this list of firstname.
     e.g. [split_fname base "Foo-Bar Baz"] is [[ "Foo-Bar" ; "Baz"]] *)
 val split_fname : string -> string list
-
-(** [split_sname_callback fn s]
-    Same as [split_sname], but call [fn] with substring indices instead of building
-    a list
-*)
-val split_sname_callback : (int -> int -> unit) -> string -> unit
-
-(** [split_fname_callback fn s]
-    Same as [split_fname], but call [fn] with substring indices instead of building
-    a list
-*)
-val split_fname_callback : (int -> int -> unit) -> string -> unit

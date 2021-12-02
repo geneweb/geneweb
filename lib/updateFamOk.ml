@@ -24,6 +24,7 @@ let raw_get conf key =
     Some v -> v
   | None -> failwith (key ^ " unbound")
 
+(* This is exactly the same function than before! *)
 let get conf key =
   match p_getenv conf.env key with
     Some v -> v
@@ -325,15 +326,29 @@ let rec reconstitute_sorted_fevents conf cnt =
       let el = reconstitute_sorted_fevents conf (cnt + 1) in (id, pos) :: el
   | _ -> []
 
-let reconstitute_from_fevents nsck empty_string fevents =
+(* S:
+   * why is marriage record transformed into a tuple?
+ *)
+let reconstitute_from_fevents
+    (nsck : bool)
+    (empty_string : 'string)
+    (fevents : ('person, 'string) Def.gen_fam_event list) =
   (* On tri les évènements pour être sûr. *)
   let fevents =
     CheckItem.sort_events
       (fun evt -> CheckItem.Fsort evt.efam_name) (fun evt -> evt.efam_date)
       fevents
   in
-  let found_marriage = ref None in
-  let found_divorce = ref None in
+  let found_marriage : (
+    Def.relation_kind
+    * Def.cdate
+    * 'string
+    * 'string
+    * 'string
+    * ('person * Def.witness_kind) array
+  ) option ref = ref None in
+
+  let found_divorce : Def.divorce option ref = ref None in
   let mk_marr evt kind =
     let e = Some (kind, evt.efam_date, evt.efam_place, evt.efam_note, evt.efam_src, evt.efam_witnesses) in
     match !found_marriage with
@@ -579,7 +594,7 @@ let print_err_parents conf base p =
     (Update.string_of_error conf err)
     (Utf8.capitalize_fst (transl conf "first free number"))
     (Util.transl conf ":")
-    (Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0);
+    (Gutil.find_free_occ base (p_first_name base p) (p_surname base p));
   Update.print_return conf
 
 let print_err_sex conf base p =

@@ -13,8 +13,8 @@ endif
 # Variables for packagers.
 PREFIX=/usr
 DISTRIB_DIR=distribution
-
 BUILD_DIR=_build/default
+ODOC_DIR=$(BUILD_DIR)/_doc/_html
 
 # [BEGIN] Generated files section
 
@@ -175,9 +175,14 @@ distrib: build
 
 # [END] Installation / Distribution section
 
+doc: ## Documentation generation
 doc: | $(GENERATED_FILES_DEP)
 	dune build @doc
 .PHONY: doc
+
+opendoc: doc
+	xdg-open $(ODOC_DIR)/index.html
+.PHONY: opendoc
 
 test: ## Run tests
 test: | $(GENERATED_FILES_DEP)

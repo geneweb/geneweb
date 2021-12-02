@@ -18,8 +18,13 @@ val interp_templ_with_menu :
 val interp_notempl_with_menu :
   (bool -> unit) -> string -> config -> base -> person -> unit
 
+(** Displays the HTML page of a person *)
 val print : ?no_headers:bool -> config -> base -> person -> unit
+
+(** Displays the ascendants of the selected person *)
 val print_ascend : config -> base -> person -> unit
+
+(** Displays links to pages associated to the person *)
 val print_what_links : config -> base -> person -> unit
 
 val links_to_ind
@@ -29,8 +34,15 @@ val links_to_ind
   -> string * string * int
   -> (iper, ifam) Def.NLDB.page list
 
+(** Construts from the giving person sosa table strored in the cache. Sosa table contains association
+    {i person_id -> sosa number} for each person in the base. Person has sosa [Sosa.one] and his ancestors have sosa > [Sosa.one].
+    For non ancestor person sosa number is set to [Sosa.zero]. *)
 val build_sosa_tree_ht : config -> base -> person -> unit
+
+(** Extract referenced person from environement and constructs for him sosa table wiht [build_sosa_tree_ht]. *)
 val build_sosa_ht : config -> base -> unit
+
+
 val get_sosa_person : person -> Sosa.t
 val get_single_sosa : config -> base -> person -> Sosa.t
 val print_sosa : config -> base -> person -> bool -> unit

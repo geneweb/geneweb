@@ -659,7 +659,7 @@ let allowed_denied_titles key extra_line env base_env () =
       if fname = "" then []
       else
         let ic =
-          Secure.open_in (Filename.concat (Secure.bd ()) fname)
+          Secure.open_in (Filename.concat (Secure.base_dir ()) fname)
         in
         let rec loop set =
           let (line, eof) =
@@ -1936,7 +1936,7 @@ let main () =
       images_url := "file://" ^ slashify abs_dir
     end;
   if !(Util.cnt_dir) = Filename.current_dir_name then
-    Util.cnt_dir := Secure.bd ();
+    Util.cnt_dir := Secure.base_dir ();
   Wserver.stop_server :=
     List.fold_left Filename.concat !(Util.cnt_dir) ["cnt"; "STOP_SERVER"];
   let (query, cgi) =
