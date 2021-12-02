@@ -28,6 +28,12 @@ let next_chars_if_equiv s i t j =
     let (t1, j1) = unaccent_utf_8 true t j in
     if s1 = t1 then Some (i1, j1) else None
 
+(* Name.lower:
+    - uppercase -> lowercase
+    - no accents
+    - chars no letters and no numbers (except '.') => spaces (stripped)
+     Key comparison (first name, surname, number) applies "lower" equality
+     on first names and surnames *)
 let lower s =
   let rec copy special i len =
     if i = String.length s then Buff.get len
@@ -57,11 +63,15 @@ let title s =
 
 (* Name.abbrev *)
 
+(* List of abbreviations. If abbreviation is mapped to [Some s] should be remplaced by 
+  [s]. If mapped to None, it should be removed from name. *)
 let abbrev_list =
   ["a", None; "af", None; "d", None; "de", None; "di", None; "ier", Some "i";
    "of", None; "saint", Some "st"; "sainte", Some "ste"; "van", None;
    "von", None; "zu", None; "zur", None]
 
+(* Checks if words are the same (starting from given position for both of them).
+   In [s] word should end with space. *)
 let rec is_word s i p ip =
   if ip = String.length p then
     if i = String.length s then true else if s.[i] = ' ' then true else false
@@ -69,6 +79,7 @@ let rec is_word s i p ip =
   else if s.[i] = p.[ip] then is_word s (i + 1) p (ip + 1)
   else false
 
+(* Checks if word that starts at position [i] in [s] is one of abbreviation *)
 let rec search_abbrev s i =
   function
     (w, a) :: pl ->
@@ -76,6 +87,7 @@ let rec search_abbrev s i =
       else search_abbrev s i pl
   | [] -> None
 
+(* Name.abbrev: suppress lowercase particles, shorten "saint" into "st" *)
 let abbrev s =
   let rec copy can_start_abbrev i len =
     if i >= String.length s then Buff.get len
@@ -94,6 +106,7 @@ let abbrev s =
 
 (* Name.strip *)
 
+(* Name.strip_c = name without the charater c given as parameter *)
 let strip_c s c =
   let rec copy i len =
     if i = String.length s then Buff.get len
@@ -104,7 +117,7 @@ let strip_c s c =
 
 let strip s = strip_c s ' '
 
-
+(* String without any forbidden caracters defined in forbidden_char *)
 (* ******************************************************************** *)
 (*  [Fonc] purge : string -> string                                     *)
 (** [Description] : Supprime tous les caractères interdits (défini par
@@ -116,11 +129,13 @@ let strip s = strip_c s ' '
       - string : retourne la chaîne délestée des caractères interdits
     [Rem] : Exporté en clair hors de ce module.                         *)
 (* ******************************************************************** *)
-let purge s = List.fold_left (fun s c -> strip_c s c) s forbidden_char
+let purge s = List.fold_left strip_c s forbidden_char
 
 
 (* Name.crush *)
 
+(* If string starting from [i] contains roman number then returns the next position, 
+   else returns None.  *)
 let roman_number s i =
   let rec loop i =
     if i = String.length s then Some i
@@ -132,6 +147,18 @@ let roman_number s i =
   in
   if i = 0 || s.[i-1] = ' ' then loop i else None
 
+(*Name.crush:
+     - no spaces
+     - roman numbers are keeped
+     - vowels are suppressed, except in words starting with a vowel,
+       where this vowel is converted into "e"
+     - "k" and "q" replaced by "c"
+     - "y" replaced by "i"
+     - "z" replaced by "s"
+     - "ph" replaced by "f"
+     - others "h" deleted
+     - s at end of words are deleted
+     - no double lowercase consons *)
 let crush s =
   let rec copy i len first_vowel =
     if i = String.length s then Buff.get len
@@ -185,12 +212,17 @@ let crush s =
 
 (* strip_lower *)
 
+(* strip_lower = strip o lower, as first comparison of names.
+   First names and Surnames comparison is strip_lower equality. *)
 let strip_lower s = strip (lower s)
 
 (* crush_lower *)
 
+(* crush_lower = crush o abbrev o lower, as second comparison of names.
+  In index by names, the "names" are crush_lowers *)
 let crush_lower s = crush (abbrev (lower s))
 
+(* concat two strings using Bytes module *)
 let concat_aux fn l1 sn l2 =
   let b = Bytes.create (l1 + l2 + 1) in
   Bytes.blit_string fn 0 b 0 l1 ;
