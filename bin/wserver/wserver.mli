@@ -30,43 +30,56 @@ val f
   -> (Unix.sockaddr * string list -> string -> string -> unit)
   -> unit
 
+(** Closes the current socket *)
 val close_connection : unit -> unit
 
+(** Formatter printing in the out channel associated to the connected socket *)
 val printf : ('a, out_channel, unit) format -> 'a
     (* To be called to print page contents. *)
 
+(** Prints a string in the out channel associated to the socket *)
 val print_string : string -> unit
 (* To be called to print page contents. *)
 
+(** Prints a header; cannot be called if status or content already has been sent *)
 val header : string -> unit
     (* To print an http header line *)
 
+(** Flushes the content of the current  *)
 val wflush : unit -> unit
     (* To flush page contents print. *)
 
+
+(** [Output.status conf answer] sends the http header where [answer]
+    represents the answer status. *)
 val http : Def.httpStatus -> unit
-    (* [Output.status conf answer] sends the http header where [answer]
-       represents the answer status. If empty string, "200 OK" is assumed. *)
 
+(** [Output.status conf_redirect url] sends the http header where [url]
+    represents the Location where the request needs to be redirected. *)
 val http_redirect_temporarily : string -> unit
-    (* [Output.status conf_redirect url] sends the http header where [url]
-       represents the Location where the request needs to be redirected. *)
 
+(** Returns the request from a stream read from a socket. *)
 val get_request_and_content : char Stream.t -> string list * string
 
+(** Returns the last used socket *)
 val wsocket : unit -> Unix.file_descr
+
+(** Return the out_channel associated to the socket *)
 val woc : unit -> out_channel
 
+(** Names of the files used in windows implementation to communicate
+    http requests and html answers. Default "wserver.sin" and
+    "wserver.sou". Can have relative or absolute paths. *)
 val sock_in : string ref
 val sock_out : string ref
-    (* Names of the files used in windows implementation to communicate
-       http requests and html answers. Default "wserver.sin" and
-       "wserver.sou". Can have relative or absolute paths. *)
+
+(** Name of the file whose presence tells the server to stop (at least
+    one request is necessary to unfreeze the server to make it check
+    that this file exits. Default "STOP_SERVER". Can have relative
+    or absolute path. *)
 val stop_server : string ref
-    (* Name of the file whose presence tells the server to stop (at least
-       one request is necessary to unfreeze the server to make it check
-       that this file exits. Default "STOP_SERVER". Can have relative
-       or absolute path. *)
+
+(** CGI (Common Gateway Interface) mode (default false). *)
 val cgi : bool ref
 
 (* Example:
