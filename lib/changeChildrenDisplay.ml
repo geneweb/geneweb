@@ -148,7 +148,7 @@ let print_conflict conf base ip_var p =
   Hutil.rheader conf title;
   Update.print_error conf base @@ Update.UERR_already_defined (base, p, "");
   let free_n =
-    Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
+    Gutil.find_free_occ base (p_first_name base p) (p_surname base p)
   in
   Output.print_string conf "<ul>\n";
   Output.print_string conf "<li>";

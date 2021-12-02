@@ -440,7 +440,7 @@ let print_branch conf base psn name =
       let render p =
         if with_link then
           if with_id then Util.reference conf base p
-          else Util.reference_noid conf base p 
+          else Util.reference_noid conf base p
         else (fun s -> s)
       in
       Perso.print_sosa conf base p with_link;

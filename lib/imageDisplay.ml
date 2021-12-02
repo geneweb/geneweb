@@ -56,6 +56,12 @@ let print_image_type conf fname ctype =
 
 (* ************************************************************************** *)
 (*  [Fonc] print_image_file : string -> bool                                  *)
+(** [Description] : Affiche une image (avec ses en-têtes) en réponse HTTP en
+                    utilisant Wserver. Le type MIME de l'image est deviné à
+                    partir de l'extension contenu dans le nom du fichier.
+    [Args] :
+      - fname : le nom du fichier image
+    [Retour] : True si l'image a pu être affichée                           *)
 (* ************************************************************************** *)
 let print_image_file conf fname =
   List.exists

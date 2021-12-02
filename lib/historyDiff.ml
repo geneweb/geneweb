@@ -282,4 +282,4 @@ let load_person_history conf fname =
   | None -> ()
   end;
   !history
-    
+

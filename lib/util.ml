@@ -1908,13 +1908,13 @@ let source_image_file_name bname str =
     List.fold_right Filename.concat [base_path ["src"] bname; "images"] str
   in
   let fname2 =
-    List.fold_right Filename.concat [Secure.bd (); "src"; "images"] str
+    List.fold_right Filename.concat [Secure.base_dir (); "src"; "images"] str
   in
   if Sys.file_exists fname1 then fname1 else fname2
 
 let image_file_name str =
   let fname1 =
-    List.fold_right Filename.concat [Secure.bd (); "images"] str
+    List.fold_right Filename.concat [Secure.base_dir (); "images"] str
   in
   if Sys.file_exists fname1 then fname1
   else search_in_assets (Filename.concat "images" str)

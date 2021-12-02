@@ -7,11 +7,20 @@ open Gwdb
 
 val string_person_of : base -> person -> (iper, Update.key, string) gen_person
 
+(** The main HTML page displayed after an update.
+    Based on template updind.txt *)
 val print_update_ind :
   config -> base -> (iper, Update.key, string) gen_person -> string -> unit
 
+(** Displays an HTML form with empty fields for adding a person *)
 val print_add : config -> base -> unit
+
+(** Displays a page for validating the deletion of a person *)
 val print_del : config -> base -> unit
+
+(** Displays a form for updating a person *)
 val print_mod : config -> base -> unit
+
+(** Displays the form for changing the order of events for a person *)
 val print_change_event_order : config -> base -> unit
 

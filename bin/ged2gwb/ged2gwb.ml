@@ -2786,10 +2786,10 @@ let pass3 gen fname =
           Some ('1'..'9') ->
             Stream.junk strm__;
             let (_ : string) = get_to_eoln 0 strm in loop ()
-        | Some _ ->
+        | Some c ->
             Stream.junk strm__;
             print_location !line_cnt;
-            Printf.fprintf !log_oc "Strange input.\n";
+            Printf.fprintf !log_oc "Strange input '%c' (%i).\n" c (Char.code c);
             flush !log_oc;
             let (_ : string) = get_to_eoln 0 strm in loop ()
         | _ -> ()

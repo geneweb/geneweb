@@ -12,6 +12,7 @@ val print_start : config -> base -> unit
 val incr_welcome_counter : config -> (int * int * string) option
 val incr_request_counter : config -> (int * int * string) option
 
+(** Compute administration file path with giving name (search inside {i cnt} directory) *)
 val adm_file : string -> string
 val source_file_name : config -> string -> string
 

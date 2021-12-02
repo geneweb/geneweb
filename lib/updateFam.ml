@@ -840,7 +840,13 @@ let change_order u ifam n =
       [] -> if i = n then [ifam] else []
     | fam :: faml ->
         if ifam = fam then
-          if i = n then ifam :: loop (i + 1) (fam :: faml) else loop i faml
+          (* S: The following code is strange: if i=n, fam is added to the iterated list;
+             at the next iteration, we reach the same block and i = n+1, hence fam is removed  *)
+          if i = n
+          then ifam :: loop (i + 1) (fam :: faml)
+          else loop i faml
+
+        (* S: Same remark than before: fam is added to the iterated list, hence discarded after *)
         else if i = n then ifam :: loop (i + 1) (fam :: faml)
         else fam :: loop (i + 1) faml
   in

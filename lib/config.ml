@@ -7,6 +7,7 @@ type auth_scheme_kind =
     NoAuth
   | TokenAuth of token_auth_scheme
   | HttpAuth of http_auth_scheme
+
 and token_auth_scheme = { ts_user : string; ts_pass : string }
 and http_auth_scheme =
     Basic of basic_auth_scheme
@@ -66,6 +67,7 @@ type config =
     env : (string * string) list;
     mutable senv : (string * string) list;
     mutable henv : (string * string) list;
+    (* content of .gwf file *)
     base_env : (string * string) list;
     allowed_titles : string list Lazy.t;
     denied_titles : string list Lazy.t;
@@ -82,13 +84,13 @@ type config =
     today_wd : int;
     time : int * int * int;
     ctime : float;
+    (* HTTP printer *)
     mutable output_conf : output_conf ;
     (* prefix for image urls:
        the value of argument -images_url if specified, otherwise
        command ^ "?m=IM&v=" in CGI mode
        "images" otherwise *)
     image_prefix : string;
-
     (* if true, the base name is in the b argument of the query string: ?b=BASE&...
        if false, the base name is the last element of the uri path: .../base?... *)
     cgi : bool
@@ -97,8 +99,8 @@ type config =
  }
 
 (**/**)
-(**  A dummy {!type:config} value, with uninitialized fields.
-     Used for testing purpose *)
+(** A dummy {!type:config} value, with uninitialized fields.
+    Used for testing purpose *)
 let empty =
   { from = ""
   ; manitou = false

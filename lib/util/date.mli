@@ -2,8 +2,11 @@
 
 open Def
 
+(** Says if the given year is a leap year. *)
 val leap_year : int -> bool
 
+(** Returns number of days for the given month and year for
+    gregorian calendar. Takes into account leap years. *)
 val nb_days_in_month : int -> int -> int
 
 (** [time_elapsed start stop]
@@ -15,6 +18,7 @@ val nb_days_in_month : int -> int -> int
     - [Before] for "less than" duration
     - [After] for "more than" duration
     - [Maybe] for other cases
+    Used to compare only gregorian calendar's dates.
  *)
 val time_elapsed : Def.dmy -> Def.dmy -> Def.dmy
 
@@ -23,6 +27,7 @@ val time_elapsed : Def.dmy -> Def.dmy -> Def.dmy
     (e.g. time_elapsed_opt /1839 /1859). *)
 val time_elapsed_opt : Def.dmy -> Def.dmy -> Def.dmy option
 
+(** Returns date of death if present. *)
 val date_of_death : Def.death -> Adef.date option
 
 (** [dmy_of_dmy2 dmy2]
@@ -31,8 +36,8 @@ val dmy_of_dmy2 : dmy2 -> dmy
 
 (** [Not_comparable] is raised by [compare_dmy] and [compare_date] when
     [strict] mode is used and precision of dates are incompatibles to
-    have a reliable result
-    (e.g. is [compare_dmy 2019 07/2019]) *)
+    have a reliable result (e.g. is [compare_dmy 2019 07/2019]) or when
+    one of the date in [compare_date] is [Dtext]. *)
 exception Not_comparable
 
 (** [compare_dmy ?strict d1 d2]

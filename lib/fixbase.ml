@@ -193,7 +193,7 @@ let check_persons_parents ?report progress base =
     let ip = get_iper p in
     let fam = Gwdb.foi base ifam in
     if get_ifam fam = dummy_ifam then begin
-      patch_ascend base ip {parents = None; consang = Adef.fix (-1)};
+      patch_ascend base ip {parents = None; consang = Adef.no_consang};
       match report with
       | Some fn -> fn (Fix_ParentDeleted ip)
       | None -> ()

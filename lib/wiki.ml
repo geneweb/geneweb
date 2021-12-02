@@ -61,7 +61,7 @@ let notes_aliases conf =
       let rec loop list =
         match try Some (input_line ic) with End_of_file -> None with
           Some s ->
-            let list =
+          let list = (* S: is it replacable by `String.split_on_char ' '` s? *)
               try
                 let i = String.index s ' ' in
                 (String.sub s 0 i,
@@ -565,22 +565,38 @@ let html_with_summary_of_tlsw conf wi edit_opt s =
     let s2 = string_of_modify_link conf 0 (s = "") edit_opt in s2 ^ s
   else s
 
-let rev_extract_sub_part s v =
+(* v = 0 -> keeps the last lines until a title occurs, discards the rest *)
+(* v = 1 -> *)
+let rev_extract_sub_part (s : string) (v : int) : string list =
   let (lines, _) = lines_list_of_string s in
-  let rec loop lines lev cnt =
-    function
+  let rec loop
+      (lines : string list) (* The accumulator of lines *)
+      (lev : int) (* The section level *)
+      (cnt : int) (* A counter of titles *)
+      : string list -> string list
+    = function
       s :: sl ->
-        let len = String.length s in
-        if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
-          if v = first_cnt - 1 then lines
+      let len = String.length s in
+      if len > 2 && s.[0] = '=' && s.[len-1] = '=' then
+        (* This line is a title *)
+        if v = first_cnt - 1 then lines
+        (* S: previous condition is a strange way to write `if v = 0` *)
+        else
+          let nlev = section_level s len in
+          if cnt = v (*  *)
+          then loop (s :: lines) nlev (cnt + 1) sl
           else
-            let nlev = section_level s len in
-            if cnt = v then loop (s :: lines) nlev (cnt + 1) sl
-            else if cnt > v then
-              if nlev > lev then loop (s :: lines) lev (cnt + 1) sl else lines
+            if cnt > v
+            then
+              if nlev > lev
+              then loop (s :: lines) lev (cnt + 1) sl
+              else lines
             else loop lines lev (cnt + 1) sl
-        else if cnt <= v then loop lines lev cnt sl
-        else loop (s :: lines) lev cnt sl
+      else
+        (* This line is not a title *)
+        if cnt <= v
+        then loop lines lev cnt sl (* Line is in an ignored section *)
+        else loop (s :: lines) lev cnt sl (* Keeping the line *)
     | [] -> lines
   in
   loop [] 0 first_cnt lines
@@ -744,6 +760,7 @@ let insert_sub_part s v sub_part =
   in
   String.concat "\n" (List.rev_append lines sl)
 
+(* TODO: simplify with Str *)
 let rec find_env s i =
   match
     try Some (String.index_from s i '=', String.index_from s i '\n') with

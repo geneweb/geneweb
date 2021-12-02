@@ -4,9 +4,15 @@
 
 open Gwdb
 
+(** Print database specification error on the giving channel *)
 val print_base_error : out_channel -> base -> CheckItem.base_error -> unit
+
+(** Print database specification warning on the giving channel *)
 val print_base_warning : out_channel -> base -> CheckItem.base_warning -> unit
 
+(** [check_base base onwarning onerror _] makes full database proprety check. Checks every person and family separetely
+    with corresponding function inside [CheckItem] module. Checks also person's graph in order to find cycles (if person
+    is own ancestor). *)
 val check_base
   : ?verbose:bool
   -> ?mem:bool

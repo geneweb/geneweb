@@ -644,8 +644,11 @@ let check_person_dates_as_witness base warning p =
   end related_pers
 
 let check_pevents base warning p =
+  (* check order of events *)
   check_order_pevents warning p ;
+  (* check person's witnesses *)
   check_witness_pevents base warning p;
+  (* check another witness dates where person is a witness *)
   check_person_dates_as_witness base warning p
 
 let check_siblings ?(onchange = true) base warning (ifam, fam) callback =
@@ -785,31 +788,44 @@ let check_parent_marriage_age warning fam p =
   loop (get_fevents fam)
 
 let check_parents warning fam fath moth =
+  (* check father's marriage date *)
   check_parent_marriage_age warning fam fath ;
+  (* check mother's marriage date *)
   check_parent_marriage_age warning fam moth ;
+  (* check age difference between spouses *)
   check_difference_age_between_cpl warning fath moth
 
 (* main *)
 
 let person ?(onchange = true) base warning p =
+  (* check personal events *)
   check_pevents base warning p;
+  (* check person's age *)
   check_person_age warning p;
+  (* check titles dates *)
   List.iter (title_dates warning p) (get_titles p);
+  (* check order of personal events *)
   if onchange then changed_pevents_order warning p ;
   related_sex_is_coherent base warning p
 
 let family ?(onchange = true) base warning ifam fam =
   let fath = poi base @@ get_father fam in
   let moth = poi base @@ get_mother fam in
+  (* check order of familial events *)
   check_order_fevents base warning fam ;
+  (* check family's witnesses *)
   check_witness_fevents base warning fam ;
+  (* check parents marraige *)
   check_parents warning fam fath moth ;
+  (* check children *)
   check_children ~onchange base warning (ifam, fam) fath moth ;
   if onchange then begin
     changed_fevents_order warning (ifam, fam);
     let father = poi base (get_father fam) in
     let mother = poi base (get_mother fam) in
+    (* change order of father's families *)
     changed_marriages_order base warning father;
+    (* change order of mother's families *)
     changed_marriages_order base warning mother
   end
 

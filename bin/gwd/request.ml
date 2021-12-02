@@ -211,6 +211,7 @@ let very_unknown conf _ =
       Hutil.trailer conf
     | None -> incorrect_request conf
 
+(* Print Not found page *)
 let unknown = begin fun conf n ->
       let title _ =
         Output.printf conf "%s: \"%s\"" (Utf8.capitalize_fst (transl conf "not found"))
