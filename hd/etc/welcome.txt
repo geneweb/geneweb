@@ -79,7 +79,9 @@ fr: Accès réservé aux amis et magiciens de la base de donnée !
           %end;
           </div>
         %end;
-        %if;(user.ident != "")<span class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom" title="%if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %user.ident;">%user.ident;</span>%end;
+        %if;(user.ident != "")<span class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom" title="%if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %user.ident;">
+          %if;(user.key!="")<a href="%prefix;m=S&n=%user.key;">%user.ident;</a>%else;%user.ident;%end;</span>
+        %end;
         %if;((wizard or friend) and 
              ((bvar.wizard_passwd!="" or bvar.friend_passwd!="") or
              (bvar.wizard_passwd_file!="" or bvar.friend_passwd_file!="")))
