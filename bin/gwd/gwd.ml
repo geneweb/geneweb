@@ -447,7 +447,7 @@ let gen_match_auth_file test_user_and_password auth_file =
               try
                 let i = String.index au.au_info ':' in
                 String.sub au.au_info 0 i
-              with Not_found -> ""
+              with Not_found -> au.au_info
             in
             let username =
               try
