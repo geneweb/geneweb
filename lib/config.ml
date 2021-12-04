@@ -47,6 +47,7 @@ type config =
     user : string;
     username : string;
     userkey : string;
+    usersosa : string;
     auth_scheme : auth_scheme_kind;
     command : string;
     indep_command : string;
@@ -119,6 +120,7 @@ let empty =
   ; user = ""
   ; username = ""
   ; userkey = ""
+  ; usersosa = ""
   ; auth_scheme = NoAuth
   ; command = ""
   ; indep_command = ""

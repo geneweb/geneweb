@@ -1,6 +1,7 @@
 open Geneweb
 open Config
 open TemplAst
+open Templ
 
 let include_begin conf fname =
   if conf.debug then Output.print_string conf ("\n<!-- begin include " ^ fname ^ " -->\n")
@@ -167,7 +168,10 @@ let rec eval_variable conf =
   | "time" :: sl -> eval_time_var conf sl
   | ["user"; "ident"] -> conf.user
   | ["user"; "name"] -> conf.username
+  | ["user"; "key"; "access"] -> Templ.key_to_access conf.userkey false
+  | ["user"; "sosa"; "access"] -> Templ.key_to_access conf.usersosa true
   | ["user"; "key"] -> conf.userkey
+  | ["user"; "sosa"] -> conf.usersosa
   | [s] -> eval_simple_variable conf s
   | _ -> raise Not_found
 and eval_time_var conf =
