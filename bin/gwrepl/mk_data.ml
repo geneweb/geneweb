@@ -1,3 +1,10 @@
+(* This file is used to generate the file 'data.ml', containing all
+   the files (cmis, cmas, .so) that could be used at runtime by
+   a geneweb interpreter.
+
+   See 'data.mli' for the signature of the generated file. *)
+
+
 let read_lines p =
   let rec loop () = match input_line p with
     | exception End_of_file -> close_in p ; []
@@ -30,34 +37,40 @@ let partition_map p l =
 let (//) = Filename.concat
 
 let () =
-  let ic = open_in ".depend" in
-  let lines = read_lines ic in
-  close_in ic ;
-  let dune_root = List.hd lines in
-  let out = List.tl lines in
-  let root = dune_root // "_build" // "default" // "lib" in
   let opam_swich_prefix = Sys.getenv "OPAM_SWITCH_PREFIX" in
   let opam_swich_prefix_lib = opam_swich_prefix // "lib" in
-  let aux fn =
-    let aux prefix =
-      if String.length fn > String.length prefix
-      && String.sub fn 0 (String.length prefix) = prefix
-      then Some (String.sub fn (String.length prefix) (String.length fn - String.length prefix))
-      else None
+
+  let dune_root, root, ( directories0, files0 ) =
+
+    let ic = open_in ".depend" in
+    let lines = read_lines ic in
+    close_in ic ;
+    let dune_root, out = match lines with
+      | [] -> assert false
+      | dune_root :: out -> dune_root, out
     in
-    match aux opam_swich_prefix_lib with
-    | Some x -> Some (`opam x)
-    | None -> match aux root with
-      | Some x -> Some (`root x)
-      | None -> None
-  in
-  let directories0, files0 =
+    let root = dune_root // "_build" // "default" // "lib" in
+    let aux fn =
+      let aux prefix =
+        if String.length fn > String.length prefix
+        && String.sub fn 0 (String.length prefix) = prefix
+        then Some (String.sub fn (String.length prefix) (String.length fn - String.length prefix))
+        else None
+      in
+      match aux opam_swich_prefix_lib with
+      | Some x -> Some (`opam x)
+      | None -> match aux root with
+        | Some x -> Some (`root x)
+        | None -> None
+    in
+    dune_root, root,
     partition_map begin fun s ->
       try Scanf.sscanf s {|#directory "%[^"]";;|} (fun s -> match aux s with Some s -> Some (Either.Left s) | _ -> None)
       with _ ->
       try Scanf.sscanf s {|#load "%[^"]";;|} (fun s -> match aux s with Some s -> Some (Either.Right s) | _ -> None)
       with _ -> failwith s
     end out
+
   in
   let directories =
     ("etc" // "lib" // "ocaml")
@@ -85,7 +98,13 @@ let () =
             if Filename.check_suffix (Filename.concat dir s) "cmi"
             then (Filename.concat dir s, "etc" // "lib" // "geneweb" // Filename.concat (Filename.basename dir) s) :: cmis
             else cmis
-          end cmis (Sys.readdir dir)
+          end cmis (
+            try
+              Sys.readdir dir
+            with exn ->
+              Printf.eprintf "Error in Sys.readdir(%S)\n%!" dir;
+              raise exn
+          )
         in
         (cmas, cmis)
     end files0 ([], [])
@@ -122,12 +141,12 @@ let () =
     aux "cmas" cmas
   end ;
   begin
-      Printf.fprintf out {|let shared=[||} ;
-      if Sys.unix then (* FIXME: what is the windows version? *)
-        List.iter begin fun s ->
-          Printf.fprintf out {blob|Filename.(concat "etc" (concat "lib" {|%s|})),[%%blob {|%s|}];|blob} s (opam_swich_prefix_lib // s) ;
-        end [ "ocaml" // "stublibs" // "dllcamlstr.so" ; "ocaml" // "stublibs" // "dllunix.so"] ;
-      Printf.fprintf out {||];;|}
+    Printf.fprintf out {|let shared=[||} ;
+    if Sys.unix then (* FIXME: what is the windows version? *)
+      List.iter begin fun s ->
+        Printf.fprintf out {blob|Filename.(concat "etc" (concat "lib" {|%s|})),[%%blob {|%s|}];|blob} s (opam_swich_prefix_lib // s) ;
+      end [ "ocaml" // "stublibs" // "dllcamlstr.so" ; "ocaml" // "stublibs" // "dllunix.so"] ;
+    Printf.fprintf out {||];;|}
   end ;
   begin
     let b = Buffer.create 1024 in

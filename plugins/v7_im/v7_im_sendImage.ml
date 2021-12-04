@@ -297,7 +297,7 @@ let effective_send_ok conf base p file =
     let bfdir = Util.base_path ["images"] conf.bname in
     if Sys.file_exists bfdir then bfdir
     else
-      let d = Filename.concat (Secure.bd ()) "images" in
+      let d = Filename.concat (Secure.base_dir ()) "images" in
       let d1 = Filename.concat d conf.bname in
       (try Unix.mkdir d 0o777 with Unix.Unix_error (_, _, _) -> ());
       (try Unix.mkdir d1 0o777 with Unix.Unix_error (_, _, _) -> ());

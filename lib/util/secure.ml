@@ -9,6 +9,8 @@ let ok_r = ref []
 let assets_r = ref []
 let bd_r = ref Filename.current_dir_name
 
+(* [decompose: string -> string list] decompose a path into a list of
+   directory and a basename. "a/b/c" -> [ "a" ; "b"; "c" ] *)
 let decompose =
   let rec loop r s =
     let b = Filename.basename s in
@@ -35,9 +37,11 @@ let set_base_dir d =
 
 (* get all assets *)
 let assets () = !assets_r
-let bd () = !bd_r
+let base_dir () = !bd_r
 
-let suffix d df =
+(* [list_check_prefix d df] returns either [None] if [d] is not a prefix of
+   [df], or [Some suffix], where [df = d @ suffix] *)
+let list_check_prefix d df =
   let rec loop =
     function
       x :: xl, y :: yl -> if x = y then loop (xl, yl) else None
@@ -46,13 +50,19 @@ let suffix d df =
   in
   loop (d, df)
 
+(** Check if a filename is safe to read:
+    * it must not contain the '\000' character
+    * it must either be relative to the local directory OR
+      included in one of the allowed directories (base_dir or assets)
+    * the relative part does not contain the '..' directory
+*)
 let check fname =
   if String.contains fname '\000' then false
   else
     let df = decompose fname in
     let rec loop = function
       | d :: dl ->
-        begin match suffix d df with
+        begin match list_check_prefix d df with
           | Some bf when not (List.mem Filename.parent_dir_name bf) -> true
           | _ -> loop dl
         end
@@ -73,6 +83,9 @@ let check_open fname =
     raise (Sys_error "invalid access")
   end
 
+(* The following functions perform a [check] before opening the file,
+   preventing potential attacks on the system.
+*)
 let open_in fname = check_open fname; Stdlib.open_in fname
 let open_in_bin fname = check_open fname; Stdlib.open_in_bin fname
 let open_out fname = check_open fname; Stdlib.open_out fname
