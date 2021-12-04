@@ -1136,12 +1136,16 @@ let make_conf from_addr request script_name env =
   in
   let wizard_just_friend = if manitou then false else wizard_just_friend in
 	let username = ar.ar_name in
-	let len = String.length username in
-	let username, userkey =
-	  match String.index_opt username '|' with
-	  | Some i ->
-      String.sub username 0 i, String.sub username (i + 1) (len - i - 1)
-	  | None -> username, ""
+	let username, userkey, usersosa =
+	  let l1 = String.split_on_char '|' username in
+	  if List.length l1 <> 3 then
+	    begin
+        GwdLog.syslog `LOG_CRIT "Bad .auth key or sosa encoding";
+	      "", "", ""
+	    end
+	  else
+	    (List.nth l1 0), (List.nth l1 1),
+	    (if List.nth l1 2 = "" then List.nth l1 1 else List.nth l1 2)
 	in
   let conf =
     {from = from_addr;
@@ -1154,7 +1158,8 @@ let make_conf from_addr request script_name env =
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user;
      username = username;
-     userkey = Name.lower userkey;
+     userkey = Mutil.encode (Name.lower userkey);
+     usersosa = Mutil.encode (Name.lower usersosa);
      auth_scheme = ar.ar_scheme;
      command = ar.ar_command;
      indep_command =

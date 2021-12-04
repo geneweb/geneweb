@@ -115,7 +115,19 @@ let setup_link conf =
     "<a href=\"" ^ s ^ "gwsetup?v=main.htm\">gwsetup</a>"
   with Not_found -> ""
 
-let esc s = (Util.escape_html s :> string)
+(* key is first_name.occ+surname, no . or + in fn and sn *)
+let key_to_access key sosa =
+  let l1 = String.split_on_char '+' key in
+  let sn = if List.length l1 <> 2 then "bad sn" else List.nth l1 1 in
+  let fn = List.nth l1 0 in
+  let fn, oc =
+    match String.split_on_char '.' fn with
+    | [fn] -> fn, "bad oc"
+    | [fn; oc] -> fn, oc
+    | _ -> fn, "bad oc"
+  in
+  let z = if sosa then "z" else "" in
+  Printf.sprintf "p%s=%s&n%s=%s&oc%s=%s" z fn z sn z oc
 
 let rec eval_variable conf =
   function
@@ -134,7 +146,10 @@ let rec eval_variable conf =
   | "time" :: sl -> eval_time_var conf sl
   | ["user"; "ident"] -> conf.user
   | ["user"; "name"] -> conf.username
+  | ["user"; "key"; "access"] -> key_to_access conf.userkey false
+  | ["user"; "sosa"; "access"] -> key_to_access conf.usersosa true
   | ["user"; "key"] -> conf.userkey
+  | ["user"; "sosa"] -> conf.usersosa
   | [s] -> eval_simple_variable conf s
   | _ -> raise Not_found
 and eval_time_var conf =
