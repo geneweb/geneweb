@@ -35,6 +35,12 @@ fr: Accès réservé aux amis et magiciens de la base de donnée !
     %end;
   %end;
 %end;
+%define;get_plugin(file)
+  %include.file
+%end;
+%define;get_plugin_cmd(kind, iii)
+  %apply;get_plugin(bvar.kind_iii)
+%end;
 
 <body%body_prop;>
 <div class="container">
@@ -121,7 +127,6 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
     <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-2 mt-lg-4">
       <div >
       <h3 class="font-weight-light">%apply;interp(bvar.motd)</h3>
-      %if;(browsing_with_sosa_ref and bvar.visitor_access!="no")<h4>%apply;display_sosa_ref%with;%sosa_ref;%end;</h4>%end;
       </div>
     </div>
   %end;
@@ -136,18 +141,6 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
       <form class="col-12" method="get" action="%prefix;">
         %hidden;
         <input type="hidden" name="m" value="S">
-        <div class="d-flex justify-content-center">
-          <div class="btn-group-vertical mr-2">
-            <a role="button" href="%prefix;m=N;tri=A"
-              title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2"><i class="fa fa-sort-alpha-down fa-fw"></i></a>
-            <a role="button" href="%prefix;m=N;tri=F"
-              title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3"><i class="fa fa-sort-amount-down fa-fw"></i></a>
-          </div>
-          <label for="surname" class="sr-only col-form-label col-sm-2">[*surname/surnames]0</label>
-          <input type="search" id="surname" class="form-control form-control-lg col-lg-6"
-            name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
-            title="[*search/case sensitive]0 [surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;" autofocus tabindex=1>
-        </div>
         <div class="d-flex justify-content-center mt-2">
           <div class="btn-group-vertical  align-self-center mr-2">
             <a role="button" href="%prefix;m=P;tri=A"
@@ -158,13 +151,34 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           <label for="firstname" class="sr-only col-form-label col-sm-2">[*first name/first names]2</label>
           <input type="search" id="firstname"
             class="form-control form-control-lg col-lg-6 border-top-0"
-            name="p" placeholder="[*first name/first names]2"
-            title="[*search/case sensitive]0 [first name/first names]2" tabindex=2>
+            name="p" placeholder="[*first name/first names]2, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
+            title="[*search/case sensitive]0 [first name/first names]2" autofocus tabindex=1>
+          <div class="btn-group-vertical ml-2">
+          <input  type="checkbox" name="exact_first_name" value="on">
+          <label  for="exact_first_name">[*exact]</label>
+          </div>
+        </div>
+        <div class="d-flex justify-content-center">
+          <div class="btn-group-vertical mr-2">
+            <a role="button" href="%prefix;m=N;tri=A"
+              title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2"><i class="fa fa-sort-alpha-down fa-fw"></i></a>
+            <a role="button" href="%prefix;m=N;tri=F"
+              title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3"><i class="fa fa-sort-amount-down fa-fw"></i></a>
+          </div>
+          <label for="surname" class="sr-only col-form-label col-sm-2">[*surname/surnames]0</label>
+          <input type="search" id="surname" class="form-control form-control-lg col-lg-6"
+            name="n" placeholder="[*surname/surnames]0"
+            title="[*search/case sensitive]0 [surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;" tabindex=2>
+          <div class="btn-group-vertical ml-2">
+          <input  type="checkbox" name="exact_surname" value="on">
+          <label  for="exact_surname">[*exact]</label>
+          </div>
         </div>
         <button type="submit" style="position:absolute;visibility:hidden">
           <i class="fa fa-search fa-fw"></i> %(for Safari: make button invisible rather than display:none %)
         </button>
       </form>
+
       %if;(bvar.propose_titles != "no")
         <form class="col-12 mt-2 mt-md-3 mt-lg-4" method="get" action="%action;">
           %hidden;
@@ -252,6 +266,18 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           <i class="far fa-calendar-alt fa-fw mr-1" aria-hidden="true"></i>[*calendar/calendars]1</a>
       </div>
     </div>
+    %if;(bvar.btn_welcome!="")
+      <div class="d-flex flex-column justify-items-lg-center mt-3 mt-lg-4">
+        <div class="h4 text-lg-center"><i class="fas fa-plug fa-sm fa-fw text-secondary mr-1"></i>[*plugins]</div>
+          <div class="d-inline-flex justify-content-lg-center">
+              %for;i;0;bvar.btn_welcome;
+                %apply;get_plugin_cmd("btn_welcome", i+1)
+              %end;
+          </div>
+        </div>
+      </div>
+    %end;
+    
     %if;wizard;
       <div class="d-flex flex-column flex-lg-row justify-content-lg-center mt-2 mt-lg-4">
         <div class="h4 align-self-lg-center mr-lg-2">
@@ -329,8 +355,6 @@ is: Það hafa verið %nb_accesses; heimsóknir, %nb_accesses_to_welcome; af
     þeim á þessa síðu, síðan %start_date;.
 it: Dal %start_date; ci sono stati %nb_accesses; accessi,
     %nb_accesses_to_welcome; dei quali a questa pagina.
-lt: Iš viso prisijungimų - %nb_accesses; lankyta kartų -
-    %nb_accesses_to_welcome; iš jų šis puslapis, nuo %start_date;.
 lv: Kopš %D datu bāze ir apmeklēta %nb_accesses; reizes,
     %nb_accesses_to_welcome; no tiem ir bijuši šinī lappusē.
 nl: Deze paginas zijn sinds %start_date; reeds %nb_accesses; maal
@@ -349,8 +373,6 @@ sl: %nb_accesses; dostopov, %nb_accesses_to_welcome; od teh na to stran,
     od %start_date;.
 sv: Det har varit %nb_accesses; åtkomster, %nb_accesses_to_welcome; av
     dem till den här sidan, sedan %start_date;.
-tr: %nb_accesses var; erişimler, %nb_accesses_to_welcome;
-    %start_date'den beri bu sayfaya;.
 zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome; 次访问本主页，
     自从 %start_date;。
 ])
@@ -406,9 +428,6 @@ is: Ef vafrinn sem þú notar er í vandræðum með að uppfæra síðuna próf
 it: Se il vostro navigatore non aggiorna automaticamente le pagine modificate
     (obbligandovi a fare « aggiorna »), provate a partire da
     <a href="%prefix;escache=0">questo collegamento</a>.
-lt: Jei naršyklė automatiškai neatnaujina pataisyto puslapio
-    (verčia "perkrauti esamą dokumentą"), pamėginkite paspausti
-    <a href="%prefix;escache=0">šią nuorodą</a>.
 lv: Ja Jūsu Interneta caurlūkprogramma automātiski nepārlādē lappuses pēc
     veiktajām izmaiņām (tādējādi radot Jums nepieciešamību "pārlādēt
     tekošo dokumentu"), tad pamēģiniet uzklikšķināt <a
@@ -439,9 +458,6 @@ sl: Če vaš brskalnik ne more obnavljati strani avtomatično (morate
 sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
     navigera <a href="%prefix;escache=0">härifrån</a>.
-tr: Tarayıcınız değiştirilen sayfaları otomatik olarak güncellemiyorsa (sizi
-    "geçerli belgeyi yeniden yüklemeye" zorluyorsa), gitmeyi deneyin <a
-    href="%prefix;escache=0">bu bağlantıdan</a>.
 ]))
     </div>
   </div>

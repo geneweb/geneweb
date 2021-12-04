@@ -1144,8 +1144,9 @@ let make_conf from_addr request script_name env =
 	      "", "", ""
 	    end
 	  else
-	    (List.nth l1 0), (List.nth l1 1),
-	    (if List.nth l1 2 = "" then List.nth l1 1 else List.nth l1 2)
+	    let u1 = (List.nth l1 1) in
+	    let s1 = (List.nth l1 2) in
+	    (List.nth l1 0), (if u1 = "" then s1 else u1), (if s1 = "" then u1 else s1)
 	in
   let conf =
     {from = from_addr;
