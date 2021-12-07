@@ -766,7 +766,8 @@ let print_slices_menu conf hts =
   let title _ = header 0 in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Util.include_template conf conf.env "buttons_rel" (fun () -> ());
+  Perso.interp_templ ~no_headers:true "buttons_rel" conf base 
+    (Gwdb.empty_person base Gwdb.dummy_iper);
   Output.print_sstring conf {|<form method="get" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|"><p>|};
@@ -803,7 +804,6 @@ let print_slices_menu conf hts =
 let print_dag_page conf page_title hts next_txt =
   let title _ = Output.print_string conf page_title in
   Hutil.header_no_page_title conf title;
-  Util.include_template conf conf.env "buttons_rel" (fun () -> ());
   print_html_table conf hts;
   if (next_txt : Adef.escaped_string :> string) <> "" then (
     Output.print_sstring conf {|<p><a href="|};

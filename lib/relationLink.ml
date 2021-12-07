@@ -623,8 +623,14 @@ let print_relation_ok conf base info =
   in
   Hutil.header_no_page_title conf title;
   Hutil.print_link_to_welcome conf true;
+<<<<<<< HEAD
   Util.include_template conf conf.env "buttons_rel" (fun () -> ());
   Output.print_sstring conf {|<p style="clear:both">|};
+=======
+  Perso.interp_templ ~no_headers:true "buttons_rel" conf base 
+    (Gwdb.empty_person base Gwdb.dummy_iper);
+  Output.print_string conf "<p style=\"clear:both\">\n";
+>>>>>>> Replace include_templ by interp_templ in relations display
   print_relation_path conf base info;
   Hutil.trailer conf
 
