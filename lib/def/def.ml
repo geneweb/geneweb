@@ -1,5 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+(** Http response status *)
 type httpStatus =
   | OK (* 200 *)
   | Moved_Temporarily (* 302 *)
@@ -13,21 +14,32 @@ type httpStatus =
 
 exception HttpExn of httpStatus * string
 
+(** Type that represents 2 possible choices *)
 type ('a, 'b) choice =
     Left of 'a
   | Right of 'b
 
+(** Alias to [Adef.cdate] *)
 type cdate = Adef.cdate
 
+(** Alias to [Adef.date] *)
 type date =
   Adef.date =
       Dgreg of dmy * calendar
     | Dtext of string
+
+(** Alias to [Adef.calendar] *)
 and calendar = Adef.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+
+(** Alias to [Adef.dmy] *)
 and dmy =
   Adef.dmy =
     { day : int; month : int; year : int; prec : precision; delta : int }
+
+(** Alias to [Adef.dmy2] *)
 and dmy2 = Adef.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
+
+(** Alias to [Adef.precision] *)
 and precision =
   Adef.precision =
       Sure
@@ -38,6 +50,7 @@ and precision =
     | OrYear of dmy2
     | YearInt of dmy2
 
+(** Relation kind between couple in the familly *)
 type relation_kind =
   | Married
   | NotMarried
@@ -51,12 +64,16 @@ type relation_kind =
   | Pacs
   | Residence
 
+(** Divorce status *)
 type divorce =
   | NotDivorced
   | Divorced of cdate
   | Separated
 
+(** Death reason *)
 type death_reason = Killed | Murdered | Executed | Disappeared | Unspecified
+
+(** Death status *)
 type death =
     NotDead
   | Death of death_reason * cdate
@@ -65,17 +82,22 @@ type death =
   | DontKnowIfDead
   | OfCourseDead
 
+(** Burial information *)
 type burial =
     UnknownBurial
   | Buried of cdate
   | Cremated of cdate
 
+(** Rules for access to the personal data *)
 type access = IfTitles | Public | Private
 
+(** Title name *)
 type 'string gen_title_name =
     Tmain
   | Tname of 'string
   | Tnone
+
+(** Type that represents information nobility title of a person *)
 type 'string gen_title =
   { t_name : 'string gen_title_name;
     t_ident : 'string;
@@ -84,8 +106,10 @@ type 'string gen_title =
     t_date_end : cdate;
     t_nth : int }
 
+(** Witness kind for an event *)
 type witness_kind = Witness | Witness_GodParent | Witness_Officer
 
+(** Personal event name. *)
 type 'string gen_pers_event_name =
     Epers_Birth
   | Epers_Baptism
@@ -138,6 +162,8 @@ type 'string gen_pers_event_name =
   | Epers_VenteBien
   | Epers_Will
   | Epers_Name of 'string
+
+(** Personal event information *)
 type ('person, 'string) gen_pers_event =
   { epers_name : 'string gen_pers_event_name;
     epers_date : cdate;
@@ -147,6 +173,7 @@ type ('person, 'string) gen_pers_event =
     epers_src : 'string;
     epers_witnesses : ('person * witness_kind) array }
 
+(** Event name pertaining a familly. *)
 type 'string gen_fam_event_name =
     Efam_Marriage
   | Efam_NoMarriage
@@ -161,6 +188,8 @@ type 'string gen_fam_event_name =
   | Efam_PACS
   | Efam_Residence
   | Efam_Name of 'string
+
+(** Event information pertaining a familly. *)
 type ('person, 'string) gen_fam_event =
   { efam_name : 'string gen_fam_event_name;
     efam_date : cdate;
@@ -170,18 +199,21 @@ type ('person, 'string) gen_fam_event =
     efam_src : 'string;
     efam_witnesses : ('person * witness_kind) array }
 
-
+(** Relation type with parent *)
 type relation_type =
   Adoption | Recognition | CandidateParent | GodParent | FosterParent
 
+(** Relation information with parents *)
 type ('person, 'string) gen_relation =
   { r_type : relation_type;
     r_fath : 'person option;
     r_moth : 'person option;
     r_sources : 'string }
 
+(** Sex of person *)
 type sex = Male | Female | Neuter
 
+(** Place information *)
 type place =
   { other : string;
     town : string;
@@ -192,8 +224,7 @@ type place =
     region : string;
     country : string }
 
-(* person *)
-
+(** Polymorphic type describing information about person. *)
 type ('iper, 'person, 'string) gen_person =
   { first_name : 'string;
     surname : 'string;
@@ -231,13 +262,13 @@ type ('iper, 'person, 'string) gen_person =
     psources : 'string;
     key_index : 'iper }
 
-
+(* TODO: doc *)
 type 'family gen_ascend = { parents : 'family option; consang : Adef.fix }
 
 type 'family gen_union = { family : 'family array }
+type 'person gen_descend = { children : 'person array }
 
-(* family *)
-
+(** Polymorphic type describing information about familly. *)
 type ('person, 'ifam, 'string) gen_family =
   { marriage : cdate;
     marriage_place : 'string;
@@ -252,15 +283,16 @@ type ('person, 'ifam, 'string) gen_family =
     fsources : 'string;
     fam_index : 'ifam }
 
+(** Alias to [Adef.gen_couple] *)
 type 'person gen_couple = 'person Adef.gen_couple
 
-type 'person gen_descend = { children : 'person array }
-
+(** Error describing bad specification of the person *)
 type 'person error =
     AlreadyDefined of 'person
   | OwnAncestor of 'person
   | BadSexOfMarriedPerson of 'person
 
+(** Warnings attached to the specification of the person, familly, relation, etc. *)
 type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | BigAgeBetweenSpouses of 'person * 'person * dmy
   | BirthAfterDeath of 'person
@@ -293,6 +325,7 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | YoungForMarriage of 'person * dmy * 'family
   | OldForMarriage of 'person * dmy * 'family
 
+(* TODO:doc *)
 type ('person, 'descend, 'title) misc = MissingSources
 
 type rn_mode = RnAll | Rn1Ln | RnDeg
@@ -303,8 +336,7 @@ type base_notes =
   ; efiles : unit -> string list
   }
 
-(* Historique des modifications *)
-
+(** Update history *)
 type ('iper, 'person, 'family, 'string) base_changed =
     U_Add_person of ('iper, 'person, 'string) gen_person
   | U_Modify_person of
@@ -336,6 +368,7 @@ type ('iper, 'person, 'family, 'string) base_changed =
       ('iper, 'person, 'string) gen_person * ('iper, 'person, 'string) gen_person * bool
   | U_Notes of int option * string
 
+(** TODO : doc *)
 module NLDB = struct
   type ('a, 'b) page =
     | PgInd of 'a

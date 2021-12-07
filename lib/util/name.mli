@@ -50,12 +50,12 @@ val purge : string -> string
      - no double lowercase consons *)
 val crush : string -> string
    
-(* Equivalent to [strip o lower]. Used as: 
+(** Equivalent to [strip o lower]. Used as: 
    - First comparison of names.
    - Comparison for first names and surnames. *)
 val strip_lower : string -> string
 
-(* Equivalent to [crush o abbrev o lower]. Used as: 
+(** Equivalent to [crush o abbrev o lower]. Used as: 
    - Second comparison of names.
    - Key when index by names *)
 val crush_lower : string -> string
