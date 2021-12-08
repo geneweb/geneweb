@@ -4,7 +4,7 @@
 val assets : unit -> string list
 
 (** Returns base directory to which acces is allowed *)
-val base_dir : unit -> string
+val bd : unit -> string
 
 (** Add new asset to the [assets] list *)
 val add_assets : string -> unit

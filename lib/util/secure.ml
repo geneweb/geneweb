@@ -35,13 +35,7 @@ let set_base_dir d =
 
 (* get all assets *)
 let assets () = !assets_r
-<<<<<<< HEAD
 let bd () = !bd_r
-=======
-
-(* get base dir *)
-let base_dir () = !bd_r
->>>>>>> f419bfa4e... Util.Secure documentation
 
 let suffix d df =
   let rec loop =
@@ -69,12 +63,7 @@ let check fname =
     in
     loop !ok_r
 
-<<<<<<< HEAD
 let check_open fname =
-=======
-(* Print error message if fname didn't pass the check. else open fname with do_open *)
-let check_open do_open fname =
->>>>>>> f419bfa4e... Util.Secure documentation
   if not (check fname) then begin
     if Sys.unix then
       begin
