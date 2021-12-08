@@ -74,8 +74,14 @@ val mother : 'a gen_couple -> 'a
 (** [couple f m] creates a couple from father [f] and mother [m] *)
 val couple : 'a -> 'a -> 'a gen_couple
 
-(** TODO: doc *)
+(** Create [gen_couple] from array. First element of array should be father, second - mother  *)
 val parent : 'a array -> 'a gen_couple
+
+(** Returns array from [gen_couple]. First element of array is father, second - mother  *)
 val parent_array : 'a gen_couple -> 'a array
+
+(** DEPRECATED, use [couple] instead *)
 val multi_couple : 'a -> 'a -> 'a gen_couple
+
+(** DEPRECATED, use [parent] instead *)
 val multi_parent : 'a array -> 'a gen_couple
