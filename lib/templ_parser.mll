@@ -551,7 +551,7 @@ and parse_include conf b closing ast = parse
         match List.assoc_opt file !included_files with
         | Some a -> Ainclude (file, a) :: ast
         | None ->
-          match Util.open_templ_fname conf file with
+          match Util.open_etc_file conf file with
           | Some (ic, fname) ->
             wrap fname begin fun () ->
               let lex2 = Lexing.from_channel ic in

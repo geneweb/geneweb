@@ -1166,29 +1166,9 @@ let etc_file_name conf fname =
   | s -> s
 
 let open_etc_file conf fname =
-  let fname1 = etc_file_name conf fname in
-  let fname2 =
-    search_in_assets
-      (Filename.concat "etc" (Filename.basename fname ^ ".txt"))
-  in
-  try Some (Secure.open_in fname1, fname1) with
-    Sys_error _ -> try Some (Secure.open_in fname2, fname2) with Sys_error _ -> None
-
-let open_hed_trl conf fname =
-  try Some (Secure.open_in (etc_file_name conf fname)) with
+  let fname = etc_file_name conf fname in
+  try Some (Secure.open_in fname, fname) with
     Sys_error _ -> None
-
-let open_templ_fname conf fname =
-  try
-    let fname = etc_file_name conf fname in
-    Some (Secure.open_in fname, fname) with
-    Sys_error _ ->
-      let std_fname =
-        search_in_assets (Filename.concat "etc" (fname ^ ".txt"))
-      in
-      try Some (Secure.open_in std_fname, std_fname) with Sys_error _ -> None
-
-let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
 
 let include_template conf env fname failure =
   match open_etc_file conf fname with

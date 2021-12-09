@@ -1,5 +1,12 @@
+open Geneweb
 open Config
 open TemplAst
+
+let include_begin conf fname =
+  if conf.debug then Output.print_string conf ("\n<!-- begin include " ^ fname ^ " -->\n")
+
+let include_end conf fname =
+  if conf.debug then Output.print_string conf ("\n<!-- end include " ^ fname ^ " -->\n")
 
 exception Exc_located of loc * exn
 
@@ -38,36 +45,45 @@ let subst_text x v s =
 let rec subst sf = function
   | Atext (loc, s) -> Atext (loc, sf s)
   | Avar (loc, s, sl) ->
-    let s1 = sf s in
-    if sl = [] && try let _ = int_of_string s1 in true with Failure _ -> false
-    then Aint (loc, s1)
-    else begin
-      let sl1 = List.map sf sl in
-      match String.split_on_char '.' s1 with
-      | [_] -> Avar (loc, s1, sl1)
-      | s2 :: sl2 -> Avar (loc, s2, sl2 @ sl1)
-      | _ -> assert false
-    end
+      let s1 = sf s in
+      if sl = [] &&
+         (try let _ = int_of_string s1 in true with Failure _ -> false)
+      then
+        Aint (loc, s1)
+      else begin
+        let sl1 = List.map sf sl in
+        match String.split_on_char '.' s1 with
+        | [_] -> Avar (loc, s1, sl1)
+        | s2 :: sl2 -> Avar (loc, s2, sl2 @ sl1)
+        | _ -> assert false
+      end
   | Atransl (loc, b, s, c) -> Atransl (loc, b, sf s, c)
   | Aconcat (loc, al) -> Aconcat (loc, List.map (subst sf) al)
   | Awid_hei s -> Awid_hei (sf s)
   | Aif (e, alt, ale) -> Aif (subst sf e, substl sf alt, substl sf ale)
   | Aforeach ((loc, s, sl), pl, al) ->
-    (* Dans le cas d'une "compound variable", il faut la décomposer. *)
-    (* Ex: "ancestor.father".family  =>  ancestor.father.family      *)
-    let s1 = sf s in
-    let sl1 = List.map sf sl in
-    let (s, sl) =
-      match String.split_on_char '.' s1 (* Templ_parser.compound_var lex *) with
-      | [_] -> s1, sl1
-      | s2 :: sl2 -> s2, List.rev_append (List.rev_map sf sl2) sl1
-      | _ -> assert false
-    in
-    Aforeach ((loc, s, sl), List.map (substl sf) pl, substl sf al)
+      (* Dans le cas d'une "compound variable", il faut la décomposer. *)
+      (* Ex: "ancestor.father".family  =>  ancestor.father.family      *)
+      let s1 = sf s in
+      let sl1 = List.map sf sl in
+      let (s, sl) =
+        match String.split_on_char '.' s1 (* Templ_parser.compound_var lex *) with
+        | [_] -> s1, sl1
+        | s2 :: sl2 -> s2, List.rev_append (List.rev_map sf sl2) sl1
+        | _ -> assert false
+      in
+      let lex = Lexing.from_string s1 in
+      let [@warning "-8"] s2 :: sl2 = Templ_parser.compound_var lex in
+      let (s, sl) =
+        if lex.Lexing.lex_curr_p.pos_cnum = String.length s1
+        then s2, sl2 @ sl
+        else s, sl
+      in
+      Aforeach ((loc, s, sl), List.map (substl sf) pl, substl sf al)
   | Afor (i, min, max, al) ->
-    Afor (sf i, subst sf min, subst sf max, substl sf al)
+      Afor (sf i, subst sf min, subst sf max, substl sf al)
   | Adefine (f, xl, al, alk) ->
-    Adefine (sf f, List.map sf xl, substl sf al, substl sf alk)
+      Adefine (sf f, List.map sf xl, substl sf al, substl sf alk)
   | Aapply (loc, f, all) -> Aapply (loc, sf f, List.map (substl sf) all)
   | Alet (k, v, al) -> Alet (sf k, substl sf v, substl sf al)
   | Ainclude (file, al) -> Ainclude (sf file, substl sf al)
@@ -126,6 +142,28 @@ let rec eval_variable conf =
         Some vv -> Util.escape_html vv
       | None -> ""
       end
+  (* look for evar.vi scanning i down to 0 *)
+  | ["evar_cur"; v; i] ->
+    let n = int_of_string i in
+    let rec loop n =
+      match Util.p_getenv (conf.env @ conf.henv) (v ^ string_of_int n) with
+      | Some vv -> vv
+      | None -> if n > 0 then loop (n - 1) else ""
+    in loop n
+  | ["substr_start"; n; v] ->
+    let n = int_of_string n in
+    (* Attention aux caractères utf-8 !! *)
+    let sub =
+      let len = String.length v in
+      let rec loop i n str =
+        if n = 0 || i >= len then str
+        else
+          let nbc = Utf8.nbc v.[i] in
+          let car = String.sub v i nbc in
+          loop (i+nbc) (n-1) (str ^ car)
+      in
+      loop 0 n ""
+    in sub
   | "time" :: sl -> eval_time_var conf sl
   | ["user"; "ident"] -> conf.user
   | ["user"; "name"] -> conf.username
@@ -183,6 +221,7 @@ and eval_simple_variable conf =
   | "left" -> conf.left
   | "nl" -> "\n"
   | "nn" -> ""
+  | "plugins" -> (List.fold_left (fun s p -> (Filename.basename p) ^ "," ^ s) "" conf.plugins)
   | "prefix" -> Util.commd conf
   | "prefix_2" -> Util.commd_2 conf
   | "prefix_base" -> Util.prefix_base conf
@@ -299,18 +338,35 @@ let apply_format conf nth s1 s2 =
       match Util.check_format "%s" s1 with
         Some s3 -> Printf.sprintf (transl_nth_format s3) s2
       | None ->
-          match Util.check_format "%d" s1 with
-            Some s3 -> Printf.sprintf (transl_nth_format s3) (int_of_string s2)
-          | None ->
-              match Util.check_format "%s%s" s1 with
-                Some s3 ->
-                  let (s21, s22) =
-                    let i = String.index s2 ':' in
-                    String.sub s2 0 i,
-                    String.sub s2 (i + 1) (String.length s2 - i - 1)
-                  in
-                  Printf.sprintf (transl_nth_format s3) s21 s22
-              | None -> raise Not_found
+           match Util.check_format "%d" s1 with
+             Some s3 -> Printf.sprintf (transl_nth_format s3) (int_of_string s2)
+           | None ->
+              let (s21, s22) =
+                let i = String.index s2 ':' in
+                String.sub s2 0 i,
+                String.sub s2 (i + 1) (String.length s2 - i - 1)
+              in
+               match Util.check_format "%s%s" s1 with
+                Some s3 -> Printf.sprintf (transl_nth_format s3) s21 s22
+              | None ->
+                match Util.check_format "%t%s" s1 with
+                  Some s3 ->
+                    Printf.sprintf (transl_nth_format s3) (fun _ -> s21) s22
+                | None ->
+                  match Util.check_format "%s%t" s1 with
+                    Some s3 ->
+                      Printf.sprintf (transl_nth_format s3) s21 (fun _ -> s22)
+                  | None ->
+                    match Util.check_format "%t%d" s1 with
+                      Some s3 ->
+                        Printf.sprintf (transl_nth_format s3) (fun _ -> s21)
+                        (int_of_string s22)
+                    | None ->
+                      match Util.check_format "%s%d" s1 with
+                        Some s3 ->
+                          Printf.sprintf (transl_nth_format s3) s21
+                          (int_of_string s22)
+                      | None -> raise Not_found
 
 let rec eval_ast conf =
   function
@@ -395,6 +451,9 @@ let templ_eval_var conf =
       VVbool (Mutil.extract_param "referer: " '\n' conf.request <> "")
   | ["just_friend_wizard"] -> VVbool conf.just_friend_wizard
   | ["friend"] -> VVbool conf.friend
+  | ["plugin"; plugin] ->
+      let list = List.map (fun p -> Filename.basename p) conf.plugins in
+      VVbool (List.mem plugin list)
   | ["manitou"] -> VVbool conf.manitou
   | ["supervisor"] -> VVbool conf.supervisor
   | ["true"] -> VVbool true
@@ -425,6 +484,17 @@ let int_of e =
   | VVbool _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "int value expected")
 
+let float_of e =
+  function
+    VVstring s ->
+      begin try Float.of_string s with
+        Failure _ ->
+          raise_with_loc (loc_of_expr e)
+            (Failure ("float value expected\nFound = " ^ s))
+      end
+  | VVbool _ | VVother _ ->
+      raise_with_loc (loc_of_expr e) (Failure "float value expected")
+
 let num_of e =
   function
     VVstring s ->
@@ -435,6 +505,13 @@ let num_of e =
       end
   | VVbool _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "num value expected")
+
+let strip_dot str =
+  let str = if str.[String.length str - 1] = '.' then
+    String.sub str 0 (String.length str - 1)
+    else str
+  in
+  VVstring str
 
 let rec eval_expr (conf, eval_var, eval_apply as ceva) =
   function
@@ -474,6 +551,7 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
       end
   | Aop2 (loc, op, e1, e2) ->
       let int e = int_of e (eval_expr ceva e) in
+      let float e = float_of e (eval_expr ceva e) in
       let num e = num_of e (eval_expr ceva e) in
       let bool e = bool_of e (eval_expr ceva e) in
       let string e = string_of e (eval_expr ceva e) in
@@ -487,11 +565,12 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
       | "!=" -> VVbool (eval_expr ceva e1 <> eval_expr ceva e2)
       | "<=" -> VVbool (int e1 <= int e2)
       | ">=" -> VVbool (int e1 >= int e2)
-      | "+" -> VVstring (Sosa.to_string (Sosa.add (num e1) (num e2)))
-      | "-" -> VVstring (Sosa.to_string (Sosa.sub (num e1) (num e2)))
-      | "*" -> VVstring (Sosa.to_string (Sosa.mul (num e1) (int e2)))
+      | "+" -> VVstring (string_of_int ((int e1) + (int e2)))
+      | "-" -> VVstring (string_of_int ((int e1) - (int e2)))
+      | "*" -> VVstring (string_of_int ((int e1) * (int e2)))
       | "^" -> VVstring (Sosa.to_string (Sosa.exp (num e1) (int e2)))
-      | "/" -> VVstring (Sosa.to_string (Sosa.div (num e1) (int e2)))
+      | "/" -> VVstring (string_of_int ((int e1) / (int e2)))
+      | "/." -> strip_dot (Float.to_string (Float.div (float e1) (float e2)))
       | "%" -> VVstring (Sosa.to_string (Sosa.modl (num e1) (int e2)))
       | _ -> raise_with_loc loc (Failure ("op \"" ^ op ^ "\""))
       end
@@ -878,9 +957,9 @@ let rec interp_ast conf ifun env =
         let s = squeeze_spaces s in
         print_ast_list env ep (Atext (loc, s) :: al)
     | Ainclude (fname, astl) :: al ->
-        Util.include_begin conf fname ;
+        include_begin conf fname ;
         print_ast_list env ep astl;
-        Util.include_end conf fname ;
+        include_end conf fname ;
         print_ast_list !m_env ep al
     | [a] -> print_ast env ep a
     | a :: al -> print_ast env ep a; print_ast_list env ep al
@@ -938,9 +1017,9 @@ and print_var print_ast_list conf ifun env ep loc sl =
             begin match input_templ conf templ with
               | Some astl ->
                 let () = Templ_parser.(included_files := (templ, astl) :: !included_files) in
-                Util.include_begin conf fname ;
+                include_begin conf fname ;
                 print_ast_list env ep astl ;
-                Util.include_end conf fname ;
+                include_end conf fname ;
               | None -> Output.printf conf " %%%s?" (String.concat "." sl)
               end
             | None -> Output.printf conf " %%%s?" (String.concat "." sl)
