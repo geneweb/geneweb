@@ -240,7 +240,8 @@ val create_env : string -> (string * string) list
 (** [open_etc_file fname] search for template {i etc/fname.txt}
     inside the base directory or inside one of assets directories.
     Returns input channel and the path to giving template. *)
-val open_etc_file : string -> (in_channel * string) option
+val open_etc_file : config -> string -> (in_channel * string) option
+
 val open_hed_trl : config -> string -> in_channel option
 
 (** [open_etc_file fname] search for template {i etc/fname.txt}

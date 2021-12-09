@@ -1165,8 +1165,8 @@ let etc_file_name conf fname =
     "" -> default_templ config_templ std_fname
   | s -> s
 
-let open_etc_file fname =
-  let fname1 = base_path ["etc"] (Filename.basename fname ^ ".txt") in
+let open_etc_file conf fname =
+  let fname1 = etc_file_name conf fname in
   let fname2 =
     search_in_assets
       (Filename.concat "etc" (Filename.basename fname ^ ".txt"))
@@ -1191,7 +1191,7 @@ let open_templ_fname conf fname =
 let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
 
 let include_template conf env fname failure =
-  match open_etc_file fname with
+  match open_etc_file conf fname with
   | Some (ic, fname) ->
     include_begin conf fname;
     copy_from_templ conf env ic;

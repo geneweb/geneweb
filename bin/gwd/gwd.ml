@@ -105,7 +105,7 @@ let log_passwd_failed ar tm from request base_file =
   if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
 
 let copy_file conf fname =
-  match Util.open_etc_file fname with
+  match Util.open_etc_file conf fname with
     Some (ic, _fname) ->
       begin try
         while true do let c = input_char ic in Output.printf conf "%c" c done
