@@ -1,6 +1,8 @@
 (* $Id: progrBar.ml,v 5.4 2007-02-01 10:28:55 ddr Exp $ *)
 
+(* bar size in characters *)
 let size = 60
+
 let draw_rep = 5
 let draw = "|/-\\"
 let empty = ref '.'
