@@ -1,14 +1,32 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
-val int_size : int
+(** Global variable that indicates either 
+    servers should be in verbose mode. *)
 val verbose : bool ref
 
+(** [list_iter_first f l] iter over first element with [f true] and over others with [f false]. *)
 val list_iter_first : (bool -> 'a -> unit) -> 'a list -> unit
+
+(** Remove all trailing spaces in string *)
 val strip_all_trailing_spaces : string -> string
 
+(* [decline dform dformat] encode name that could be declined (like in the czech language)
+   and its declination form in more comprehensible for computer format. 
+   Declination form [dform] is one of the follows:
+   - 'n' for nominative
+   - 'a' for accusative
+   - 'g' for genitif
+   Declination format [dformat] describes how does a name changes throughout different
+   declination forms comparing to the nominative form. 
+   See {{: https://geneweb.tuxfamily.org/wiki/declension }Declination in Geneweb} for more details.
+   Example 1: [decline 'a' "Vladana:a:Vladanu:g:Vladany"] returns encoding "@(@(a)@(a?Vladanu:g?Vladany:Vladana))."
+   Example 2: [decline 'a' "Vladana:a:-u:g:-y"] returns encoding "@(@(a)Vladan@(a?u:g?y:a))" 
+   @deprecated *)
 val decline : char -> string -> string
-val nominative : string -> string
 
+(** Encodes name for nominative declination format.
+    @deprecated *)
+val nominative : string -> string
 
 (** [mkdir_p ?perm dir]
     Create the directory [dir].
@@ -16,23 +34,48 @@ val nominative : string -> string
 *)
 val mkdir_p : ?perm:int -> string -> unit
 
+(** Remove every file in the directory and then remove the directory itself *)
 val remove_dir : string -> unit
+
+(** Create a lock file (with extension .lck). Result is generally used as an 
+    argument for [Lock.control] function. *)
 val lock_file : string -> string
 
-val name_key : string -> string
+(** Returns position of first capital letter in the name (0 if no capitals). *)
 val initial : string -> int
+
+(** [input_particles fname] read file and returns list of lines. 
+    Empty lines are skipped. *)
 val input_particles : string -> string list
+
+(** Divide surnames on pieces. Every separated word that contains at least 4 character 
+    forms one piece. Words that contains less than 4 characters or words "saint" and "sainte" 
+    are considered as the particles and are attached to the another word to form a piece.
+    If string contains less than two pieces, returns an empty list. *)
 val surnames_pieces : string -> string list
 
+(** Convert encoded string with ISO 8859-1 to UTF 8 *)
 val utf_8_of_iso_8859_1 : string -> string
+
+(** Convert encoded string with UTF 8 to ISO 8859-1 *)
 val iso_8859_1_of_utf_8 : string -> string
 
+(** Convert arabic number (int) to roman (string). Number should be < 4000. *)
 val roman_of_arabian : int -> string
+
+(** Convert roman number (string) to arabic (int). Number should be less or equal 
+    to MMMCMXCIX (3999). *)
 val arabian_of_roman : string -> int
 
+(** [input_lexicon lang ht open_file] open {i lexicon.txt} file with [open_file ()], 
+    parse it and fill [ht] where key is a section name (in english) and value is
+    a coresponding traduction associated to a [lang] language code. If traduction 
+    line has a form [->: sect] it associates to the current section name the value
+    associated to [sect] section name inside [ht]. *)
 val input_lexicon :
   string -> (string, string) Hashtbl.t -> (unit -> in_channel) -> unit
 
+(** Set of strings *)
 module StrSet : Set.S with type elt = string
 
 (** [tr c1 c2 str]
@@ -44,7 +87,7 @@ module StrSet : Set.S with type elt = string
 val tr : char -> char -> string -> string
 
 (** [unsafe_tr c1 c2 str]
-    Update [str] in place. Replace all occurences of [c1] replaced by [c2].
+    Update [str] in place. Replace all occurences of [c1] by [c2].
  *)
 val unsafe_tr : char -> char -> string -> string
 
@@ -99,7 +142,9 @@ val compile_particles : string list -> Re.re
     If no such [p] exists, empty string [""] is returned. *)
 val get_particle : Re.re -> string -> string
 
-(** [compare_after_particle particles s1 s2] *)
+(** [compare_after_particle particles s1 s2] 
+    compare strings [s1] [s2] starting from the first character after
+    particle's match. If they are equal, compare particles. *)
 val compare_after_particle : Re.re -> string -> string -> int
 
 (** [rm fname]
@@ -153,7 +198,8 @@ val list_slice : int -> int -> 'a list -> 'a list
 *)
 val check_magic : string -> in_channel -> bool
 
-(** Magic string generated from the md5sum of the running executable.
+(** Magic string are either get from {i GW_EXECUTABLE_MAGIC} environement variable 
+    either generated from the md5sum of the running executable.
     It can be used for volatile files which can be easily corrupted
     by any change in program or data representation.
 *)
@@ -187,7 +233,9 @@ val array_forall2 : ('a -> 'b -> bool) -> 'a array -> 'b array -> bool
 *)
 val list_replace : 'a -> 'a -> 'a list -> 'a list
 
-(** [list_except old_v new_v list] *)
+(** [list_except x list]
+    Return a list containing all the elements from [list] 
+    except the first occurence of [x]. *)
 val list_except : 'a -> 'a list -> 'a list
 
 (** [list_index element list]
@@ -220,8 +268,12 @@ val input_file_ic : in_channel -> string
 *)
 val normalize_utf_8 : string -> string
 
+(** [list_map_sort_uniq f l] apply [f] to every element and return 
+    sorted with Merge Sort algorithm list where every element is unique. *)
 val list_map_sort_uniq : ('a -> 'b) -> 'a list -> 'b list
 
+(** [list_rev_map_append f l1 l2] apply [f] to every element in [l1], reverse it and 
+    concat with [l2]. *)
 val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
 
 (** [read_or_create_channel ?magic fname read write]
@@ -267,6 +319,7 @@ val read_or_create_value
  *)
 val bench : string -> (unit -> 'a) -> 'a
 
+(** Prints call stack on stderr with at most [max] entries. *)
 val print_callstack : ?max:int -> unit -> unit
 
 (** [encode s]
@@ -297,7 +350,8 @@ val gen_decode : bool -> string -> string
     Answers the empty string if the parameter is not found. *)
 val extract_param : string -> char -> string list -> string
 
-(** Print a date using "%04d-%02d-%02d %02d:%02d:%02d" format. *)
+(** Print a date using "%04d-%02d-%02d %02d:%02d:%02d" format
+    Example : 2021-12-13 22:35:08. *)
 val sprintf_date : Unix.tm -> string
 
 (** [rev_input_line ic pos (rbytes, rpos)]
@@ -307,7 +361,11 @@ val sprintf_date : Unix.tm -> string
     character at the end, and the position of the first character
     of the returned line (to be used with next [rev_input_line] call).
 
-    [rpos] and [rbytes] must be the same in each subsequents calls
+    [rpos] and [rbytes] are intermediate between [ic] and reading functions.
+    At the beginig when [!rpos = 0] and [rbytes] is empty, initialise buffer with 
+    the size = 1024, then reads last 1024 characters from [ci]. When [rpos] comes 
+    down to 0, resize buffer *2 and reads 2048 characters before 1024 last 
+    characters. [rpos] and [rbytes] must be the same in each subsequents calls
 
     Raises [End_of_file] if the beginning of the file is reached
     at the beginning of line.
@@ -330,7 +388,7 @@ val search_asset_opt : string -> string option
 *)
 val eq_key : (string * string * int) -> (string * string * int) -> bool
 
-(** [ls_rs dirs]
+(** [ls_r dirs]
     List directories (and subdirectories) contents of [dirs], including [dirs] themselves.
 *)
 val ls_r : string list -> string list

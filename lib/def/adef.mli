@@ -80,8 +80,8 @@ val parent : 'a array -> 'a gen_couple
 (** Returns array from [gen_couple]. First element of array is father, second - mother  *)
 val parent_array : 'a gen_couple -> 'a array
 
-(** DEPRECATED, use [couple] instead *)
+(** @deprecated Use [couple] instead *)
 val multi_couple : 'a -> 'a -> 'a gen_couple
 
-(** DEPRECATED, use [parent] instead *)
+(** @deprecated Use [parent] instead *)
 val multi_parent : 'a array -> 'a gen_couple
