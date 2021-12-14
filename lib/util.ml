@@ -1064,6 +1064,24 @@ let bpath bname = !GWPARAM.bpath bname
 let copy_from_templ_ref = ref (fun _ _ _ -> assert false)
 let copy_from_templ conf env ic = !copy_from_templ_ref conf env ic
 
+let include_begin conf fname =
+  if conf.debug then
+    let ext = Filename.extension fname in
+    let (com_b, com_e) =
+      if (ext = ".css" || ext = ".js") then ("\n/*", "*/\n") else ("\n<!--", "-->\n")
+    in
+    let s = Printf.sprintf "begin include %s" fname in
+    Output.print_string conf (com_b ^ s ^ com_e)
+
+let include_end conf fname =
+  if conf.debug then
+    let ext = Filename.extension fname in
+    let (com_b, com_e) =
+      if (ext = ".css" || ext = ".js") then ("\n/*", "*/\n") else ("\n<!--", "-->\n")
+    in
+    let s = Printf.sprintf "end include %s" fname in
+    Output.print_string conf (com_b ^ s ^ com_e)
+
 (* ************************************************************************ *)
 (*  [Fonc] etc_file_name : config -> string -> string                       *)
 (** [Description] : Renvoie le chemin vers le fichier de template passé
@@ -1175,9 +1193,9 @@ let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
 let include_template conf env fname failure =
   match open_etc_file fname with
   | Some (ic, fname) ->
-    if conf.debug then Output.printf conf "\n<!-- begin include %s -->\n" fname;
+    include_begin conf fname;
     copy_from_templ conf env ic;
-    if conf.debug then Output.printf conf "<!-- end include %s -->\n" fname;
+    include_end conf fname;
   | None -> failure ()
 
 let image_prefix conf = conf.image_prefix

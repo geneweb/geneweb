@@ -2,12 +2,6 @@ open Geneweb
 open Config
 open TemplAst
 
-let include_begin conf fname =
-  if conf.debug then Output.print_string conf ("\n<!-- begin include " ^ fname ^ " -->\n")
-
-let include_end conf fname =
-  if conf.debug then Output.print_string conf ("\n<!-- end include " ^ fname ^ " -->\n")
-
 exception Exc_located of loc * exn
 
 let raise_with_loc loc = function
@@ -957,9 +951,9 @@ let rec interp_ast conf ifun env =
         let s = squeeze_spaces s in
         print_ast_list env ep (Atext (loc, s) :: al)
     | Ainclude (fname, astl) :: al ->
-        include_begin conf fname ;
+        Util.include_begin conf fname ;
         print_ast_list env ep astl;
-        include_end conf fname ;
+        Util.include_end conf fname ;
         print_ast_list !m_env ep al
     | [a] -> print_ast env ep a
     | a :: al -> print_ast env ep a; print_ast_list env ep al
@@ -1017,9 +1011,9 @@ and print_var print_ast_list conf ifun env ep loc sl =
             begin match input_templ conf templ with
               | Some astl ->
                 let () = Templ_parser.(included_files := (templ, astl) :: !included_files) in
-                include_begin conf fname ;
+                Util.include_begin conf fname ;
                 print_ast_list env ep astl ;
-                include_end conf fname ;
+                Util.include_end conf fname ;
               | None -> Output.printf conf " %%%s?" (String.concat "." sl)
               end
             | None -> Output.printf conf " %%%s?" (String.concat "." sl)
