@@ -1,5 +1,8 @@
+(** Convert [Adef.date] to Calendars.d *)
 let to_calendars : Def.dmy -> Calendars.d =
   fun { Def.day ; month ; year ; delta ; _ } -> { Calendars.day ; month ; year ; delta }
+
+(** Convert Calendars.d to [Adef.date] *)
 let of_calendars : ?prec:Def.precision -> Calendars.d -> Def.dmy =
   fun ?(prec = Def.Sure) { Calendars.day ; month ; year ; delta } -> { Def.day ; month ; year ; delta ; prec }
 
