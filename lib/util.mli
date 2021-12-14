@@ -11,6 +11,9 @@ val bpath : string -> string
 
 val search_in_assets : string -> string
 
+val include_begin : config -> string -> unit
+val include_end : config -> string -> unit
+
 val etc_file_name : config -> string -> string
 
 val escache_value : base -> string
