@@ -12,6 +12,12 @@ let raw_output = ref false
 let sep_limit = ref 21
 let separate_list = ref []
 
+(* Returns true if `old_gw` is `true` and there exist an event associated to a
+   person that:
+   * is either a birth, baptism, death, burial or a cremation and is associated to
+     a note or a witness;
+   * is any other event.
+   Otherwise, returns false *)
 let put_events_in_notes base p =
   (* Si on est en mode old_gw, on mets tous les évènements *)
   (* dans les notes.                                       *)
@@ -33,9 +39,9 @@ let put_events_in_notes base p =
     loop (get_pevents p)
   else false
 
-let ht_dup_occ = Hashtbl.create 20001
+let (ht_dup_occ : (Gwdb.iper, int) Hashtbl.t) = Hashtbl.create 20001
 
-let ht_orig_occ = Hashtbl.create 20001
+let (ht_orig_occ : (string, int list) Hashtbl.t) = Hashtbl.create 20001
 
 let prepare_free_occ ?(select = fun _ -> true) base =
   (* Parce qu'on est obligé ... *)
