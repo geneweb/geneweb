@@ -276,7 +276,7 @@ let string_of_error conf =
       ("\"" ^ fso_p base p ^ "\"")
       (fun _ -> Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
       (fun _ -> "</a>")
-    ^ (if var = "" then "." else "(" ^ var ^ ")")
+    ^ (if var = "" then "." else "<span class=\"UERR_already_defined_var\">(" ^ var ^ ")</span>.")
   | UERR_own_ancestor (base, p) ->
     strong (fso_p base p) ^ " " ^ transl conf "would be his/her own ancestor"
   | UERR_digest ->
