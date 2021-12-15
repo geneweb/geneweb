@@ -995,10 +995,16 @@ let reconstitute_date_dmy conf var =
   in
   d, force_f_cal
 
-let check_missing_name conf p =
-  if p.first_name = "" || p.first_name = "?"
+let check_missing_name base p =
+  let quest f g =
+    (* only raise error if `?` is not already recorded in the database *)
+    f = "?"
+    && p.key_index <> dummy_iper
+    && poi base p.key_index |> g |> sou base |> (<>) "?"
+  in
+  if p.first_name = "" || quest p.first_name get_first_name
   then Some (UERR_missing_first_name "")
-  else if p.surname = "" || p.surname = "?"
+  else if p.surname = "" || quest p.surname get_surname
   then Some (UERR_missing_surname "")
   else None
 

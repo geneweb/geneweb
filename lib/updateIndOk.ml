@@ -709,8 +709,8 @@ let reconstitute_person conf =
   in
   p, ext
 
-let check_person conf p =
-  match Update.check_missing_name conf p with
+let check_person conf base p =
+  match Update.check_missing_name base p with
   | Some _ as err -> err
   | None -> Update.check_missing_witnesses_names conf (fun e -> e.epers_witnesses) p.pevents
 
@@ -1146,7 +1146,6 @@ let print_change_event_order_ok conf base wl p =
   Output.print_string conf "\n";
   Hutil.trailer conf
 
-
 let print_add o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
@@ -1161,7 +1160,7 @@ let print_add o_conf base =
   if ext || redisp then UpdateInd.print_update_ind conf base sp ""
   else
     let sp = strip_person sp in
-    match check_person conf sp with
+    match check_person conf base sp with
       Some err -> error_person conf err
     | None ->
       let (p, a) = effective_add conf base sp in
@@ -1193,7 +1192,7 @@ let print_mod_aux conf base callback =
     if ext || redisp then UpdateInd.print_update_ind conf base p digest
     else
       let p = strip_person p in
-      match check_person conf p with
+      match check_person conf base p with
         Some err -> error_person conf err
       | None -> callback p
   else Update.error_digest conf

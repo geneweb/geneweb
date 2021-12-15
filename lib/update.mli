@@ -108,6 +108,6 @@ val check_missing_witnesses_names
   -> update_error option
 
 val check_missing_name
-  : config
-  -> ('a, 'b, string) Def.gen_person
+  : base
+  -> (Gwdb.iper, 'b, string) Def.gen_person
   -> update_error option

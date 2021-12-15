@@ -43,9 +43,11 @@ val raw_get : config -> string -> string
 val strip_person
   : (iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person
   -> (iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person
-val check_person :
-  config -> (iper, string * string * 'b * 'c * 'd, string) Def.gen_person ->
-    Update.update_error option
+val check_person
+  : config
+  -> base
+  -> (iper, string * string * 'b * 'c * 'd, string) Def.gen_person
+  -> Update.update_error option
 val error_person : config -> Update.update_error -> unit
 val update_relations_of_related : base -> iper -> iper list -> unit
 val reconstitute_death :
