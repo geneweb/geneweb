@@ -97,7 +97,7 @@ type 'string gen_title_name =
   | Tname of 'string
   | Tnone
 
-(** Type that represents information nobility title of a person *)
+(** Type that represents information about nobility title of a person *)
 type 'string gen_title =
   { t_name : 'string gen_title_name;
     t_ident : 'string;
