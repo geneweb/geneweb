@@ -1394,7 +1394,7 @@ let conf_and_connection =
               (Printf.sprintf "%s slow query (%.3f)" (context conf contents) (t2 -. t1))
         with
         | Exit -> ()
-        | (Def.HttpExn code) as e ->
+        | (Def.HttpExn (code, _)) as e ->
           !GWPARAM.output_error conf code ;
           printexc e
         | e -> printexc e
