@@ -593,12 +593,12 @@ let make_visible_record_access perm bname persons =
 
 (*
    Synchro:
-     - synchro_person contient la liste des ip des personnes patchées.
-     - synchro_family contient la liste des ifam des familles patchées.
+     - synchro_person contient la liste des ip des personnes patchï¿½es.
+     - synchro_family contient la liste des ifam des familles patchï¿½es.
      - synchro_patch contient :
          * le timestamp de la modification
-         * la liste des personnes modifiées
-         * la liste des familles modifiées
+         * la liste des personnes modifiï¿½es
+         * la liste des familles modifiï¿½es
 *)
 let synchro_person = ref []
 let synchro_family = ref []

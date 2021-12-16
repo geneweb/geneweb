@@ -31,4 +31,4 @@ module type S =
 
 (** Functor building an implementation of the map structure given a 
     totally ordered type. *)
-module Make : functor (Ord : OrderedType) -> S
+module Make : functor (Ord : OrderedType) -> S with type key = Ord.t
