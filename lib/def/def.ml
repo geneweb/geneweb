@@ -25,7 +25,8 @@ type cdate = Adef.cdate
 (** Alias to [Adef.date] *)
 type date =
   Adef.date =
-      Dgreg of dmy * calendar
+    Dgreg of dmy * calendar
+    (* textual form of the date *)
     | Dtext of string
 
 (** Alias to [Adef.calendar] *)
@@ -48,9 +49,10 @@ and precision =
     | Before
     | After
     | OrYear of dmy2
+    (* inteval *)
     | YearInt of dmy2
 
-(** Relation kind between couple in the familly *)
+(** Relation kind between couple in the family *)
 type relation_kind =
   | Married
   | NotMarried
@@ -173,7 +175,7 @@ type ('person, 'string) gen_pers_event =
     epers_src : 'string;
     epers_witnesses : ('person * witness_kind) array }
 
-(** Event name pertaining a familly. *)
+(** Event name pertaining a family. *)
 type 'string gen_fam_event_name =
     Efam_Marriage
   | Efam_NoMarriage
@@ -189,7 +191,7 @@ type 'string gen_fam_event_name =
   | Efam_Residence
   | Efam_Name of 'string
 
-(** Event information pertaining a familly. *)
+(** Event information pertaining a family. *)
 type ('person, 'string) gen_fam_event =
   { efam_name : 'string gen_fam_event_name;
     efam_date : cdate;
@@ -199,11 +201,11 @@ type ('person, 'string) gen_fam_event =
     efam_src : 'string;
     efam_witnesses : ('person * witness_kind) array }
 
-(** Relation type with parent *)
+(** Relation type with parent (if not native) *)
 type relation_type =
   Adoption | Recognition | CandidateParent | GodParent | FosterParent
 
-(** Relation information with parents *)
+(** Relation information with parents (if not native) *)
 type ('person, 'string) gen_relation =
   { r_type : relation_type;
     r_fath : 'person option;
@@ -236,7 +238,10 @@ type ('iper, 'person, 'string) gen_person =
     first_names_aliases : 'string list;
     surnames_aliases : 'string list;
     titles : 'string gen_title list;
+    (* relations with not native parents *)
     rparents : ('person, 'string) gen_relation list;
+    (* related persons like (father of winessed family, 
+      concerned person of wintessed event, adopted child, etc.) *)
     related : 'person list;
     occupation : 'string;
     sex : sex;
@@ -262,13 +267,16 @@ type ('iper, 'person, 'string) gen_person =
     psources : 'string;
     key_index : 'iper }
 
-(* TODO: doc *)
+(** Person's ascendants with their consangunity degree *)
 type 'family gen_ascend = { parents : 'family option; consang : Adef.fix }
 
+(* TODOOCP : doc *)
 type 'family gen_union = { family : 'family array }
+
+(** Children of the family *)
 type 'person gen_descend = { children : 'person array }
 
-(** Polymorphic type describing information about familly. *)
+(** Polymorphic type describing information about family. *)
 type ('person, 'ifam, 'string) gen_family =
   { marriage : cdate;
     marriage_place : 'string;
@@ -279,20 +287,20 @@ type ('person, 'ifam, 'string) gen_family =
     divorce : divorce;
     fevents : ('person, 'string) gen_fam_event list;
     comment : 'string;
-    origin_file : 'string;
+    origin_file : 'string; (* .gw filename where family is defined *)
     fsources : 'string;
     fam_index : 'ifam }
 
 (** Alias to [Adef.gen_couple] *)
 type 'person gen_couple = 'person Adef.gen_couple
 
-(** Error describing bad specification of the person *)
+(** Database errors describing bad specification of the person *)
 type 'person error =
     AlreadyDefined of 'person
   | OwnAncestor of 'person
   | BadSexOfMarriedPerson of 'person
 
-(** Warnings attached to the specification of the person, familly, relation, etc. *)
+(** Database warnings attached to the specification of the person, family, relation, etc. *)
 type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | BigAgeBetweenSpouses of 'person * 'person * dmy
   | BirthAfterDeath of 'person
@@ -325,14 +333,21 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | YoungForMarriage of 'person * dmy * 'family
   | OldForMarriage of 'person * dmy * 'family
 
-(* TODO:doc *)
+(* TODOOCP: doc *)
 type ('person, 'descend, 'title) misc = MissingSources
 
+(** Database note/page reading mode *)
 type rn_mode = RnAll | Rn1Ln | RnDeg
 
+(** Database note/page information structure *)
 type base_notes =
-  { nread : string -> rn_mode -> string
+  { 
+    (* read content of the page with giving mode. 
+       Page '' represent database note *)
+    nread : string -> rn_mode -> string
+    (* origin file where page is stored *)
   ; norigin_file : string
+    (* returns list of all pages and database note *)
   ; efiles : unit -> string list
   }
 

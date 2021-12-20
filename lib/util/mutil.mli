@@ -37,7 +37,7 @@ val mkdir_p : ?perm:int -> string -> unit
 (** Remove every file in the directory and then remove the directory itself *)
 val remove_dir : string -> unit
 
-(** Create a lock file (with extension .lck). Result is generally used as an 
+(** Returns the name of a lock file (with extension .lck). Result is generally used as an 
     argument for [Lock.control] function. *)
 val lock_file : string -> string
 

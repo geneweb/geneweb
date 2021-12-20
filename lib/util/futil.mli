@@ -54,7 +54,7 @@ val map_person_ps
   -> ('a, 'b, 'c) gen_person
   -> ('a, 'd, 'e) gen_person
 
-(** Convert generic type used to represent familly inside [Def.gen_ascend] into 
+(** Convert generic type used to represent family inside [Def.gen_ascend] into 
     another one. *)
 val map_ascend_f : ('a -> 'b) -> 'a gen_ascend -> 'b gen_ascend
 

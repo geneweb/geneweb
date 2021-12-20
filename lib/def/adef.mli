@@ -62,7 +62,8 @@ val od_of_cdate : cdate -> date option
 (** Optional date to [cdate] *)
 val cdate_of_od : date option -> cdate
 
-(** Polymorphic type to represent a couple of persons. Couple consists of the father and of the mother. *)
+(** Polymorphic type to represent a family's couple. 
+    Couple consists of the father and of the mother. *)
 type 'person gen_couple
 
 (** Get father from couple *)
