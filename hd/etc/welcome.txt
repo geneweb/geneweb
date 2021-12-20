@@ -323,6 +323,8 @@ is: Það hafa verið %nb_accesses; heimsóknir, %nb_accesses_to_welcome; af
     þeim á þessa síðu, síðan %start_date;.
 it: Dal %start_date; ci sono stati %nb_accesses; accessi,
     %nb_accesses_to_welcome; dei quali a questa pagina.
+lt: Iš viso prisijungimų - %nb_accesses; lankyta kartų -
+    %nb_accesses_to_welcome; iš jų šis puslapis, nuo %start_date;.
 lv: Kopš %D datu bāze ir apmeklēta %nb_accesses; reizes,
     %nb_accesses_to_welcome; no tiem ir bijuši šinī lappusē.
 nl: Deze paginas zijn sinds %start_date; reeds %nb_accesses; maal
@@ -395,6 +397,9 @@ is: Ef vafrinn sem þú notar er í vandræðum með að uppfæra síðuna próf
 it: Se il vostro navigatore non aggiorna automaticamente le pagine modificate
     (obbligandovi a fare « aggiorna »), provate a partire da
     <a href="%prefix;escache=0">questo collegamento</a>.
+lt: Jei naršyklė automatiškai neatnaujina pataisyto puslapio
+    (verčia "perkrauti esamą dokumentą"), pamėginkite paspausti
+    <a href="%prefix;escache=0">šią nuorodą</a>.
 lv: Ja Jūsu Interneta caurlūkprogramma automātiski nepārlādē lappuses pēc
     veiktajām izmaiņām (tādējādi radot Jums nepieciešamību "pārlādēt
     tekošo dokumentu"), tad pamēģiniet uzklikšķināt <a
