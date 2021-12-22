@@ -4,20 +4,35 @@ open Config
 open Def
 open Gwdb
 
+(** Returns the current dir
+    (changed by `gwd` if geneweb is running on windows) *)
 val cnt_dir : string ref
+
+(** Returns the image prefix (conf.image_prefix)  *)
 val image_prefix : config -> string
+
+(** Alias for !GWPARAM.base_path *)
 val base_path : string list -> string -> string
+
+(** Alias for !GWPARAM.bpath *)
 val bpath : string -> string
 
+(** Checks that the file in argument belong to one of the asserts dir
+    (defined in the Secure module *)
 val search_in_assets : string -> string
 
 val include_begin : config -> string -> unit
 val include_end : config -> string -> unit
 
+(** Returns the path to the template file in parameter *)
 val etc_file_name : config -> string -> string
 
+(** Returns the date of the base directory last update *)
 val escache_value : base -> string
+
+(** Commits the patches and logs the modification *)
 val commit_patches : config -> base -> unit
+
 val update_wf_trace : config -> string -> unit
 
 val get_referer : config -> string
