@@ -5,6 +5,8 @@ open Gwdb
 open Config
 
 val print_someone : config -> base -> person -> unit
+
+(** Displays a menu for merging two persons *)
 val print : config -> base -> person -> unit
 
 val print_possible_continue_merging : config -> base -> unit

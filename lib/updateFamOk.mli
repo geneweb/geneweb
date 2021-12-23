@@ -69,6 +69,7 @@ val print_mod_aux :
 
 val print_mod : Config.config -> Gwdb.base -> unit
 
+(** Reverses families *)
 val print_inv : Config.config -> Gwdb.base -> unit
 
 (** Changes the family order for a person *)
