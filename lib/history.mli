@@ -10,7 +10,10 @@ val file_name : config -> string
 val record : config -> base -> (iper, iper, ifam, string) base_changed -> string -> unit
 val notify : config -> base -> string -> unit
 
+(** Displays an history of updates *)
 val print : config -> base -> unit
+
+(** Same as `print`, but with a default search*)
 val print_search : config -> base -> unit
 
 

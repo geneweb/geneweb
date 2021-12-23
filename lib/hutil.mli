@@ -25,4 +25,6 @@ val interp :
 val interp_no_header :
   config -> string -> ('a, 'b) Templ.interp_fun -> 'a Templ.env -> 'b -> unit
 
+(** Displays the calendar; if no key is set, it will use today's date =.
+    Based on template file calendar.txt *)
 val print_calendar : config -> unit
