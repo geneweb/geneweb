@@ -270,7 +270,7 @@ type ('iper, 'person, 'string) gen_person =
 (** Person's ascendants with their consangunity degree *)
 type 'family gen_ascend = { parents : 'family option; consang : Adef.fix }
 
-(* Person's families to which he belongs (union of families) *)
+(* Person's families to which he belongs as parent (union of families) *)
 type 'family gen_union = { family : 'family array }
 
 (** Children of the family *)

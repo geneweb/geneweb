@@ -1102,7 +1102,7 @@ let print_create_conflict conf base p var =
   prerr conf err @@ fun () ->
   Output.print_string conf (string_of_error conf err) ;
   let free_n =
-    Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
+    Gutil.find_free_occ base (p_first_name base p) (p_surname base p)
   in
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   List.iter

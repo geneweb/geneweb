@@ -2,10 +2,10 @@ open Def
 
 include Gwdb_driver
 
-(** [insert_person base per]
-    Add a new person with the same properties as [per] in [base],
-    returning the fresh new {!type:iper} for this person.
-    [per] SHOULD be defined using [dummy_iper].
+(** [insert_person base p a u]
+    Add a new person with its union and ascendants in the [base]. 
+    Allocate and returns the fresh new id for this person.
+    [p] SHOULD be defined using [dummy_iper].
 *)
 let insert_person base p a u =
   let iper = Gwdb_driver.new_iper base in
@@ -15,10 +15,10 @@ let insert_person base p a u =
   Gwdb_driver.insert_person base iper p ;
   iper
 
-(** [insert_family base fam]
-    Add a new family with the same properties as [fam] in [base],
-    returning the fresh new {!type:ifam} for this family.
-    [fam] SHOULD be defined using [dummy_ifam].
+(** [insert_family base f c d]
+    Add a new family with its couple and descendants the in the [base].
+    Allocate and returns the fresh new id for this family.
+    [f] SHOULD be defined using [dummy_ifam].
 *)
 let insert_family base f c d =
   let ifam = Gwdb_driver.new_ifam base in
@@ -50,10 +50,13 @@ let rec delete_person excl base ip =
               ^ "])"
              ) ;
   let a = get_gen_ascend base ip in
+  (* if person is the single childran ad his parents are empty persons then [ipers] contains father and mother and [ifams] contains family *)
   let ipers, ifams =
     match a.parents with
     | Some ifam ->
+      (* delete ascendants *)
       Gwdb_driver.delete_ascend base ip ;
+      (* remove person id from family descendants *)
       let children =
         (get_gen_descend base ifam).children
         |> Mutil.array_except ip
@@ -181,6 +184,9 @@ let delete_family base ifam = ignore @@ delete_family ([], []) base ifam
 (**/**)
 (** Misc *)
 
+(** [nobtit base allowed_titles denied_titles p] returns list of titles of a person [p] 
+    that apprears in [allowed_titles] and doesn't appears in [denied_titles]. If [allowed_titles] 
+    is empty the every title is allowed *)
 let nobtit base allowed_titles denied_titles p =
   let list = get_titles p in
   match Lazy.force allowed_titles with
@@ -215,9 +221,14 @@ let nobtit base allowed_titles denied_titles p =
            else true)
         list
 
+(** Returns first name of person with giving id *)
 let p_first_name base p = Mutil.nominative (sou base (get_first_name p))
+
+(** Returns surname of person with giving id *)
 let p_surname base p = Mutil.nominative (sou base (get_surname p))
 
+(** Returns array of surnames of person's husbands. First element of a couple in the array is husband's surname, 
+    second - is a husband's surname aliases *)
 let husbands base gp =
   let p = poi base gp.key_index in
   Array.map begin fun ifam ->
@@ -228,7 +239,9 @@ let husbands base gp =
     husband_surname, husband_surnames_aliases
   end (get_family p)
 
-let father_titles_places base p nobtit =
+
+(** Return person's father titles *)
+let father_titles_places base p (nobtit : person -> title list)  =
   match get_parents (poi base p.key_index) with
   | Some ifam ->
     let fam = foi base ifam in
@@ -246,9 +259,12 @@ let gen_gen_person_misc_names base p nobtit nobtit_fun =
     (father_titles_places base p nobtit_fun)
   |> List.map Name.lower
 
+(** [person_misc_names base p nobtit] computes various mix between all kind of names of a person's entry [p] 
+    from the database [base]. [nobtit] is used to return a title entries for passed in argument person. *)
 let person_misc_names base p nobtit =
   gen_gen_person_misc_names base (gen_person_of_person p) (nobtit p) nobtit
 
+(** Returns list of children ids for every family for giving person *)
 let children_of_p base p =
   Array.fold_right
     (fun ifam -> Array.fold_right List.cons (get_children @@ foi base ifam) )

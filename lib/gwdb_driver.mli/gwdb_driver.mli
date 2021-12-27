@@ -163,7 +163,7 @@ val get_death_src : person -> istr
 (** Get family's divorce status *)
 val get_divorce : family -> Def.divorce
 
-(** Get array of family's ids to which a person belongs (person's union) *)
+(** Get array of family's ids to which a person belongs as parent (person's union) *)
 val get_family : person -> ifam array
 
 (** Get family's father id (from the family's couple) *)
@@ -403,7 +403,8 @@ val delete_descend : base -> ifam -> unit
 (** Clear family's couple data structure *)
 val delete_couple : base -> ifam -> unit
 
-(** [person_of_key first_name surname occ] *)
+(** [person_of_key first_name surname occ] returns person from his key information
+    (first name, surname and occurence number) *)
 val person_of_key : base -> string -> string -> int -> iper option
 
 (** Return list of person ids that have giving name (could be one of the mix). *)

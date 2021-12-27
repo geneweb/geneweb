@@ -594,7 +594,7 @@ let print_err_parents conf base p =
     (Update.string_of_error conf err)
     (Utf8.capitalize_fst (transl conf "first free number"))
     (Util.transl conf ":")
-    (Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0);
+    (Gutil.find_free_occ base (p_first_name base p) (p_surname base p));
   Update.print_return conf
 
 let print_err_sex conf base p =

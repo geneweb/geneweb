@@ -258,7 +258,7 @@ let sort_person_list = sort_person_list_aux List.sort
 
 let sort_uniq_person_list = sort_person_list_aux List.sort_uniq
 
-let find_free_occ base f s _i =
+let find_free_occ base f s =
   let ipl = persons_of_name base (f ^ " " ^ s) in
   let first_name = Name.lower f in
   let surname = Name.lower s in
