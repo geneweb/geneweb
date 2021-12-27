@@ -1480,7 +1480,7 @@ let empty_base : cbase =
                ; norigin_file = ""
                ; efiles = fun _ -> [] } }
 
-(** Extend information from the [gen.g_base] and create database *)
+(** Extract information from the [gen.g_base] and create database *)
 let make_base bname gen per_index_ic per_ic =
   let _ =
     Printf.eprintf "pcnt %d persons %d\n" gen.g_pcnt
@@ -1547,7 +1547,7 @@ let output_wizard_notes bdir wiznotes =
     end wiznotes
   end
 
-(** Create file with command used to call this program *)
+(** Create file that contains command used to call this program *)
 let output_command_line bdir =
   let oc = open_out (Filename.concat bdir "command.txt") in
   Printf.fprintf oc "%s" Sys.argv.(0);

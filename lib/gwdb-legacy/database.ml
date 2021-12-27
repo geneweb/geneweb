@@ -51,20 +51,22 @@ let move_with_backup src dst =
     names.inx - index for names, strings of first names and surnames
        offset to sindex : binary_int
        offset to findex : binary_int
-       1st index (names) : value
+       1st index (mixes between names) : value
          array, length = "table_size", associating:
           - a hash value of a "crushed" (module "Name") name (modulo length)
           - to the array of indexes of the corresponding persons
-       2nd index (surnames strings) : value
+       2nd index (surnames sub-strings) : value
          array, length = "table_size", associating:
-          - a hash value of the "crushed" (module "Name") first name or
-            surname (modulo length)
-          - to the array of the corresponding string indexes
-       3rd index (surnames strings) : value
+          - a hash value of the "crushed" (module "Name") surname sub-string
+           (modulo length)
+          - to the array of the corresponding surnnames (string indexes) that contains 
+            giving surname substring
+       3rd index (first name sub-strings) : value
          array, length = "table_size", associating:
-          - a hash value of the "crushed" (module "Name") first name or
-            surname (modulo length)
-          - to the array of the corresponding string indexes
+          - a hash value of the "crushed" (module "Name") first name sub-string 
+          (modulo length)
+          - to the array of the corresponding string indexes that contains 
+            giving fiest name substring
 
     names.acc - direct accesses to arrays inside names.inx
 
@@ -76,10 +78,10 @@ let move_with_backup src dst =
            - to its index in the string array
          strings list array (length = string array length)
            - associating a string index
-           - to the index of the next index holding the same hash value
+           - to the index of the next index (previus value) holding the same hash value
 
     snames.inx - index for surnames
-       binary tree
+       array ordered by surname  
         - associating the string index of a surname
         - to a pointer (int) to snames.dat
 
@@ -87,19 +89,29 @@ let move_with_backup src dst =
       table of list of persons holding a surname
 
     fnames.inx - index for first names
-       binary tree
+       array ordered by first name 
         - associating the string index of a first name
         - to a pointer (int) to fnames.dat
 
     fnames.dat - data associated with fnames.inx
       table of list of persons holding a first name
 
-the corresponding list of persons holding this surname
+    notes - text file containing data base notes.
+
+    notes_d - directory containing .txt for each extended page
+
+    particles.txt - text file with autorised name's particles
 
     patches - patches
        When updated, none of the previous files are modified. Only this one
        is written and rewritten. It holds a record of type "patches", composed
        of association lists "index" - "new value".
+
+    nb_persons - number of real persons (with those added by patches)
+
+    synchro_patches - timestamped history of base's modification. 
+
+    restrict - defines visibility of each person in the base 
 *)
 
 exception Found of int
@@ -275,6 +287,7 @@ let binary_search_next arr cmp =
 let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
   let (proj, person_patches, names_inx, names_dat, bname) = params in
   let fname_dat = Filename.concat bname names_dat in
+  (* content of "snames.inx" *)
   let bt =
     lazy begin
       let fname_inx = Filename.concat bname names_inx in
@@ -284,6 +297,7 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
       bt
     end
   in
+  (* ordered by string name's ids attached to the patched persons *)
   let patched =
     (* This is not useful to keep the list of ipers here because [patched]
        is not used by [find] but only by [cursor] and [next] *)
@@ -840,6 +854,7 @@ let opendb bname =
         flush stderr;
         None
   in
+  (* skipping array length *)
   let ic2_string_start_pos =
     match version with
     | GnWb0024 | GnWb0023 | GnWb0022 -> Dutil.int_size
@@ -955,6 +970,7 @@ let opendb bname =
     if perm = RDONLY then fun () -> raise (HttpExn (Forbidden, __LOC__))
     else fun () ->
       let tm = Unix.time () |> Unix.gmtime |> Mutil.sprintf_date in
+    (* read real person number (considering pending patches) *)
       let nbp =
         Hashtbl.fold begin fun ip p acc ->
           try
@@ -980,6 +996,7 @@ let opendb bname =
         Hashtbl.iter (Hashtbl.replace ht) ht' ;
         Hashtbl.clear ht' ;
       in
+    (* commit every pending patch *)
       aux patches.h_person pending.h_person ;
       aux patches.h_ascend pending.h_ascend ;
       aux patches.h_union pending.h_union ;
@@ -987,6 +1004,7 @@ let opendb bname =
       aux patches.h_couple pending.h_couple ;
       aux patches.h_descend pending.h_descend ;
       aux patches.h_string pending.h_string ;
+    (* update "pathes" file *)
       let tmp_fname = Filename.concat bname "1patches" in
       let fname = Filename.concat bname "patches" in
       let tm_oc = Secure.open_out_bin tm_fname in
@@ -1213,6 +1231,8 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) : Dbd
     ; perm = RDRW
     }
   in
+  (* since this function as called exclusively to create a database, it doesn't
+     needs for functionalities over arays *)
   let func : Dbdisk.base_func =
     { person_of_key = (fun _ -> assert false)
     ; persons_of_name = (fun _ -> assert false)

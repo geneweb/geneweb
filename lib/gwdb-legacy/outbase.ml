@@ -22,6 +22,7 @@ let count_error computed found =
 
 let output_index_aux oc_inx oc_inx_acc ni =
   let bpos = pos_out oc_inx in
+  (* output name index (circular hash table) in the "names.inx" and position for hashed value in the "names.acc" *)
   Dutil.output_value_no_sharing oc_inx ni ;
   let epos =
     Iovalue.output_array_access oc_inx_acc (Array.get ni) (Array.length ni)
@@ -33,6 +34,7 @@ let make_name_index base =
   let t = Array.make Dutil.table_size [] in
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
+    (* not ? ? *)
     if p.first_name <> 1 && p.first_name <> 1
     then begin
       List.iter (fun i -> Array.set t i @@ p.key_index :: Array.get t i) @@
@@ -108,7 +110,9 @@ let output_strings_hash tmp_strings_inx base =
   let tabl = Array.make strings_array.len (-1) in
   for i = 0 to strings_array.len - 1 do
     let ia = Hashtbl.hash (base.data.strings.get i) mod Array.length taba in
-    tabl.(i) <- taba.(ia); taba.(ia) <- i
+    (* store last associated value associated to the same hash *)
+    tabl.(i) <- taba.(ia); 
+    taba.(ia) <- i
   done;
   output_binary_int oc (Array.length taba);
   for i = 0 to Array.length taba - 1 do output_binary_int oc taba.(i) done;
@@ -129,14 +133,15 @@ let output_name_index_aux cmp get base names_inx names_dat =
   done ;
   let a = Array.make (Dutil.IntHT.length ht) (0, []) in
   ignore @@ Dutil.IntHT.fold (fun k v i -> Array.set a i (k, v) ; succ i) ht 0 ;
+  (* sort by name behind the int order *)
   Array.sort (fun (k, _) (k', _) -> cmp k k') a ;
   let oc_n_dat = Secure.open_out_bin names_dat in
   let bt2 =
-    Array.map begin fun (i, ipl) ->
+    Array.map begin fun (k, ipl) ->
       let off = pos_out oc_n_dat in
       output_binary_int oc_n_dat (List.length ipl) ;
       List.iter (output_binary_int oc_n_dat) ipl ;
-      (i, off)
+      (k, off)
     end a
   in
   close_out oc_n_dat ;
@@ -166,8 +171,10 @@ let output_particles_file particles fname =
   close_out oc
 
 let output base =
+  (* create database directory *)
   let bname = base.data.bdir in
   if not (Sys.file_exists bname) then Unix.mkdir bname 0o755 ;
+  (* temporary files *)
   let tmp_particles = Filename.concat bname "1particles.txt" in
   let tmp_base = Filename.concat bname "1base" in
   let tmp_base_acc = Filename.concat bname "1base.acc" in
@@ -196,6 +203,7 @@ let output base =
     if epos <> pos_out oc then count_error epos (pos_out oc)
   in
   begin try
+      (* output header of "base" *)
       output_string oc Dutil.magic_GnWb0024;
       output_binary_int oc base.data.persons.len;
       output_binary_int oc base.data.families.len;
@@ -209,6 +217,7 @@ let output base =
       output_binary_int oc 0;
       output_binary_int oc 0;
       Dutil.output_value_no_sharing oc (base.data.bnotes.Def.norigin_file : string);
+      (* output arrays in the "base" and position for each element in the "base.acc" *)
       let persons_array_pos = pos_out oc in
       output_array "persons" base.data.persons;
       let ascends_array_pos = pos_out oc in
@@ -223,6 +232,7 @@ let output base =
       output_array "descends" base.data.descends;
       let strings_array_pos = pos_out oc in
       output_array "strings" base.data.strings;
+      (* output arrays position in the header *)
       seek_out oc array_start_indexes;
       output_binary_int oc persons_array_pos;
       output_binary_int oc ascends_array_pos;

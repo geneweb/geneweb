@@ -90,7 +90,7 @@ type burial =
   | Buried of cdate
   | Cremated of cdate
 
-(** Rules for access to the personal data *)
+(** Rights for access to the personal data *)
 type access = IfTitles | Public | Private
 
 (** Title name *)
@@ -240,8 +240,8 @@ type ('iper, 'person, 'string) gen_person =
     titles : 'string gen_title list;
     (* relations with not native parents *)
     rparents : ('person, 'string) gen_relation list;
-    (* related persons like (father of winessed family, 
-      concerned person of wintessed event, adopted child, etc.) *)
+    (* related persons like (father of witnessed family, 
+      concerned person of witnessed event, adopted child, etc.) *)
     related : 'person list;
     occupation : 'string;
     sex : sex;
@@ -270,7 +270,7 @@ type ('iper, 'person, 'string) gen_person =
 (** Person's ascendants with their consangunity degree *)
 type 'family gen_ascend = { parents : 'family option; consang : Adef.fix }
 
-(* TODOOCP : doc *)
+(* Person's families to which he belongs (union of families) *)
 type 'family gen_union = { family : 'family array }
 
 (** Children of the family *)
@@ -337,21 +337,24 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
 type ('person, 'descend, 'title) misc = MissingSources
 
 (** Database note/page reading mode *)
-type rn_mode = RnAll | Rn1Ln | RnDeg
+type rn_mode =
+  | RnAll (** Read all content *) 
+  | Rn1Ln (** Read first line *)
+  | RnDeg (** If file isn't empty returns a space *)
 
-(** Database note/page information structure *)
+(** Database note/page explorer structure *)
 type base_notes =
   { 
     (* read content of the page with giving mode. 
-       Page '' represent database note *)
+       Page "" represent database note *)
     nread : string -> rn_mode -> string
-    (* origin file where page is stored *)
+    (* origin .gw filename *)
   ; norigin_file : string
-    (* returns list of all pages and database note *)
+    (* returns list of extended pages *)
   ; efiles : unit -> string list
   }
 
-(** Update history *)
+(** Update database history *)
 type ('iper, 'person, 'family, 'string) base_changed =
     U_Add_person of ('iper, 'person, 'string) gen_person
   | U_Modify_person of
@@ -383,7 +386,7 @@ type ('iper, 'person, 'family, 'string) base_changed =
       ('iper, 'person, 'string) gen_person * ('iper, 'person, 'string) gen_person * bool
   | U_Notes of int option * string
 
-(** TODO : doc *)
+(** TODOOCP : doc *)
 module NLDB = struct
   type ('a, 'b) page =
     | PgInd of 'a

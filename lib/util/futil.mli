@@ -11,6 +11,7 @@ val map_title_strings
   -> 'b gen_title
 
 (** Convert:
+    
     - Generic type used to represent witnesses of [Def.gen_pers_event] into another one. 
     - Generic type used to represent name, place, reason, note and source of [Def.gen_pers_event] 
     into another one. 
@@ -23,6 +24,7 @@ val map_pers_event
   -> ('c, 'd) gen_pers_event
 
 (** Convert:
+    
     - Generic type used to represent witnesses of [Def.gen_fam_event] into another one. 
     - Generic type used to represent name, place, reason, note and source of [Def.gen_fam_event] 
     into another one. 
@@ -35,12 +37,14 @@ val map_fam_event
   -> ('c, 'd) gen_fam_event
 
 (** Convert:
+    
     - Generic type used to represent father and mother inside [Def.gen_relation] into another one. 
     - Generic type used to represent sources of [Def.gen_relation] into another one. *)
 val map_relation_ps :
   ('a -> 'c) -> ('b -> 'd) -> ('a, 'b) gen_relation -> ('c, 'd) gen_relation
 
 (** Convert:
+    
     - Generic type used to represent related persons (parents, witnesses of a personal event, etc.)
     of [Def.gen_person] into another one. 
     - Generic type used to represent another large part of information of [Def.gen_person] 
@@ -63,6 +67,7 @@ val map_ascend_f : ('a -> 'b) -> 'a gen_ascend -> 'b gen_ascend
 val map_union_f : ('a -> 'b) -> 'a gen_union -> 'b gen_union
 
 (** Convert:
+    
     - Generic type used to represent faimily indexation key into another one. 
     - Generic type used to represent witnesses (of the marriage or of a famillial events, etc.)
     of [Def.gen_family] into another one. 
