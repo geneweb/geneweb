@@ -38,7 +38,10 @@ type relationship_info =
 
 let half x = x *. 0.5
 
-type visit = NotVisited | BeingVisited | Visited
+type visit = 
+  | NotVisited (* not visited person *)
+  | BeingVisited (* visited person but visit of ascendants haven't been terminated *)
+  | Visited (* visited person and his ascendants *)
 
 let rec noloop_aux base error tab i =
   match Gwdb.Marker.get tab i with
@@ -94,6 +97,7 @@ let topological_sort base poi =
       | _ -> ()
     )
     persons ;
+  (* starting from the leaf vertex of graph (persons without childs) *)
   let todo =
     Gwdb.Collection.fold (fun acc i ->
         if Gwdb.Marker.get tab i = 0 then i :: acc else acc

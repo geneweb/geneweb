@@ -1,13 +1,13 @@
 (* $Id: adef.mli,v 5.6 2007-02-21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-(** Consanguinity degree *)
+(** Consanguinity rate *)
 type fix
 
-(** Returns float coefficient of consanguinity degree *)
+(** Returns float coefficient of consanguinity rate *)
 val float_of_fix : fix -> float
 
-(** Returns consanguinity degree from its float coefficient *)
+(** Returns consanguinity rate from its float coefficient *)
 val fix_of_float : float -> fix
 
 (** [fix] from int *)
@@ -16,7 +16,7 @@ external fix : int -> fix = "%identity"
 (** [fix] to int *)
 external fix_repr : fix -> int = "%identity"
 
-(** No consanguinity degree *)
+(** No consanguinity *)
 val no_consang : fix
 
 (** Date data type that can be either concrete date associated to a calendar or a textual form of the date. *)
