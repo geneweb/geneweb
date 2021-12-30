@@ -1,9 +1,11 @@
 
 (** [reconstitute_from_fevents nsck empty_string family_events]
-    Returns a tuple with:
-    * marriage information (relation kind, date, place, notes, source);
-    * divorce information;
-    * marriage witnesses;
+    Iterate over family's events and returns a tuple with:
+    
+    - marriage information (relation kind, date, place, notes, source);
+    - divorce information;
+    - marriage witnesses;
+    
     Boolean `nsck' is true if no check have been made on the married
     persons sex.
  *)
@@ -75,6 +77,6 @@ val print_inv : Config.config -> Gwdb.base -> unit
 (** Changes the family order for a person *)
 val print_change_order_ok : Config.config -> Gwdb.base -> unit
 
-(** Changes the evenements order fo a family *)
+(** Changes the evenements order for a family *)
 val print_change_event_order : Config.config -> Gwdb.base -> unit
 

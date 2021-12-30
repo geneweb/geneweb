@@ -267,7 +267,8 @@ type ('iper, 'person, 'string) gen_person =
     psources : 'string;
     key_index : 'iper }
 
-(** Person's ascendants with its consangunity rate (equal to relationship betwen his parents) *)
+(** Person's ascendants (family where he is a childran) with its consangunity rate 
+    (equal to relationship betwen his parents). *)
 type 'family gen_ascend = { parents : 'family option; consang : Adef.fix }
 
 (* Person's families to which he belongs as parent (union of families) *)
