@@ -296,42 +296,42 @@ type 'person gen_couple = 'person Adef.gen_couple
 
 (** Database errors describing bad specification of the person *)
 type 'person error =
-    AlreadyDefined of 'person
-  | OwnAncestor of 'person
+  | AlreadyDefined of 'person
+  | OwnAncestor of 'person (** Person is his own ancestor *)
   | BadSexOfMarriedPerson of 'person
 
 (** Database warnings attached to the specification of the person, family, relation, etc. *)
 type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
-  | BigAgeBetweenSpouses of 'person * 'person * dmy
-  | BirthAfterDeath of 'person
-  | IncoherentSex of 'person * int * int
-  | ChangedOrderOfChildren of 'family * 'descend * 'iper array * 'iper array
-  | ChangedOrderOfMarriages of 'person * 'family array * 'family array
-  | ChangedOrderOfFamilyEvents of 'family * 'fevent list * 'fevent list
-  | ChangedOrderOfPersonEvents of 'person * 'pevent list * 'pevent list
-  | ChildrenNotInOrder of 'family * 'descend * 'person * 'person
-  | CloseChildren of 'family * 'person * 'person
-  | DeadOld of 'person * dmy
-  | DeadTooEarlyToBeFather of 'person * 'person
-  | DistantChildren of 'family * 'person * 'person
-  | FEventOrder of 'person * 'fevent * 'fevent
-  | FWitnessEventAfterDeath of 'person * 'fevent * 'family
-  | FWitnessEventBeforeBirth of 'person * 'fevent * 'family
-  | IncoherentAncestorDate of 'person * 'person
-  | MarriageDateAfterDeath of 'person
-  | MarriageDateBeforeBirth of 'person
-  | MotherDeadBeforeChildBirth of 'person * 'person
-  | ParentBornAfterChild of 'person * 'person
-  | ParentTooOld of 'person * dmy * 'person
-  | ParentTooYoung of 'person * dmy * 'person
-  | PEventOrder of 'person * 'pevent * 'pevent
+  | BigAgeBetweenSpouses of 'person * 'person * dmy (* Age differece between couples is greater then 50 years *)
+  | BirthAfterDeath of 'person (** Person is born after his death *)
+  | IncoherentSex of 'person * int * int (** Incoherent sex of person *)
+  | ChangedOrderOfChildren of 'family * 'descend * 'iper array * 'iper array (** Children order has been modified *)
+  | ChangedOrderOfMarriages of 'person * 'family array * 'family array (** Person's marriages order has been modified *)
+  | ChangedOrderOfFamilyEvents of 'family * 'fevent list * 'fevent list (** Family's events order has been modified *)
+  | ChangedOrderOfPersonEvents of 'person * 'pevent list * 'pevent list (** Person's events order has been modified *)
+  | ChildrenNotInOrder of 'family * 'descend * 'person * 'person (** Children aren't ordered *)
+  | CloseChildren of 'family * 'person * 'person (** Age difference between two child is less then 7 month (except for twins) *)
+  | DeadOld of 'person * dmy (** Dead old (at the age older then 109 after 1900 year and older then 100 before) *)
+  | DeadTooEarlyToBeFather of 'person * 'person (** Childran is born in more then 1 year after his father's death *)
+  | DistantChildren of 'family * 'person * 'person (** Age gap between two of siblings greater then 50 years *)
+  | FEventOrder of 'person * 'fevent * 'fevent (** Familial events haven't been ordered correctly *)
+  | FWitnessEventAfterDeath of 'person * 'fevent * 'family (** Witness is dead before familial event date *)
+  | FWitnessEventBeforeBirth of 'person * 'fevent * 'family (** Witness is born after familial event date *)
+  | IncoherentAncestorDate of 'person * 'person (** Ancestor is born after person's birth *)
+  | MarriageDateAfterDeath of 'person (** Person is married after his death *)
+  | MarriageDateBeforeBirth of 'person (** Person is married before his birth *)
+  | MotherDeadBeforeChildBirth of 'person * 'person (** Childran is born after his mother's death *)
+  | ParentBornAfterChild of 'person * 'person (** Parent is born after one of his childran *)
+  | ParentTooOld of 'person * dmy * 'person (** Person became a parent at age older then 55 years for mother and 70 for father *)
+  | ParentTooYoung of 'person * dmy * 'person (** Person became a parent at age younger then 11 years old *)
+  | PEventOrder of 'person * 'pevent * 'pevent (** Personal events haven't been ordered correctly *)
   | PossibleDuplicateFam of 'family * 'family
-  | PWitnessEventAfterDeath of 'person * 'pevent * 'person
-  | PWitnessEventBeforeBirth of 'person * 'pevent * 'person
-  | TitleDatesError of 'person * 'title
-  | UndefinedSex of 'person
-  | YoungForMarriage of 'person * dmy * 'family
-  | OldForMarriage of 'person * dmy * 'family
+  | PWitnessEventAfterDeath of 'person * 'pevent * 'person (** Witness is dead before personal event date *)
+  | PWitnessEventBeforeBirth of 'person * 'pevent * 'person (** Witness is born after personal event date *)
+  | TitleDatesError of 'person * 'title (** Title's start date is after end date or person is born after title dates *)
+  | UndefinedSex of 'person (** Person has undefined sex (Neuter) *)
+  | YoungForMarriage of 'person * dmy * 'family (** Person is married before he was 12 years old *)
+  | OldForMarriage of 'person * dmy * 'family (** Person is married after he was 100 years old *)
 
 (* TODOOCP: doc *)
 type ('person, 'descend, 'title) misc = MissingSources
