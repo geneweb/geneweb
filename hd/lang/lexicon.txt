@@ -7113,30 +7113,20 @@ pt: árvore em H 7 gerações
 sv: 7 generationers H träd
 tr: 7 nesil H ağacı
 
-    half siblings
-co: fratellastri è surellastre
-de: Halbbrüder und -schwestern
-en: half-siblings
-es: hermanastros y hermanastras
-fi: puolisisarukset
-fr: demi-frères et sœurs
-it: fratellastri e sorellastre
-lt: pusbroliai ir seserys
-nl: half broers en zusters
-no: halvbrødre/halvsøstre/halvsøsken
-oc: frairastres e sorrastras
-pt: meios irmãos e meias irmãs
-ru: сводные братья или сёстры
-sv: halvsyskon
-tr: üvey kardeşler
-
     half-brothers/half-sisters/half-siblings
 co: fratellastri/surellastre/mezu-fratelli è surelle
 de: Halb-Brüder/Halb-Schwestern/Halb-Geschwister
 en: half-brothers/half-sisters/half-siblings
+es: hermanastros&#407;as/hermanastros&#407;as/hermanastros&#407;as
+fi: Puolisisarukset/Puolisisarukset/Puolisisarukset
 fr: demi-frères/demi-sœurs/demi-frères et sœurs
 lt: pusiau broliai/pusseserės/pusbroliai ir seserys
+it: fratellastri/sorellastre/fratellastri e sorellastre
+nl: half broers/half zusters/half broers en zusters
+no: Halvsøsken/Halvsøsken/Halvsøsken
+oc: frairastres/sorrastras/frairastres e sorrastras
 pt: meios-irmãos/meias-irmãs/meios-irmãos
+ru: сводные братья/сводные сёстры/сводные братья или сёстры
 sv: halvbröder/halvsystrar/halvsyskon
 tr: üvey erkek kardeşler/üvey kız kardeşler/üvey kardeşler
 
