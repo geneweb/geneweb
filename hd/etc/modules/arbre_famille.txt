@@ -241,7 +241,7 @@
         %if;(evar.semi!="on")semi=on;%end;"
         class="btn btn-outline-secondary btn-sm border-0 px-0"
         title="%if;(evar.semi!="on")[*visualize/show/hide/summary]1%else;%nn;
-           [*visualize/show/hide/summary]2%end; [half siblings]"
+           [*visualize/show/hide/summary]2%end; [half-brothers/half-sisters/half-siblings]2"
       ><span class="mx-1">½</span>
         <i class="fa fa-toggle-%if;(evar.semi!="on")off%else;on%end; text-muted"></i>
       </a>

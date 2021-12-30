@@ -821,7 +821,7 @@
             %let;half_mother;%count;%in;
             %if;(half_father != 0 or half_mother != 0)
               %if;xx.has_siblings;<tr><td colspan="6">&nbsp;</td></tr>%end;
-              <tr><th colspan="6">[*half siblings]</th></tr>
+              <tr><th colspan="6">[*half-brothers/half-sisters/half-siblings]2</th></tr>
               <tr class="fp_grey">
                 <td>[*name]</td>
                 <td colspan="3">[*date/dates]1</td>

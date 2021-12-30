@@ -145,7 +145,7 @@
 %(aaa2 %half_father;, %half_mother;<br>%)
 
 %if;(op_m=1 and has_parents and (half_father != 0 or half_mother != 0))
-  <h2>[*half siblings]</h2>
+  <h2>[*half-brothers/half-sisters/half-siblings]2</h2>
   %if;(half_father != 0)
       %apply;on_side%with;%apply;very_short_display_person("father")%end;
       %if;(father.nb_families > 1 and half_father != 0)
@@ -194,7 +194,7 @@
     %end;
 <!--  modules/freresoeur_complet (deux listes de demi frères côte à côte) -->
 %elseif;(op_m=3 and has_parents and (half_father != 0 or half_mother != 0))
-  <h2>[*half siblings]</h2>
+  <h2>[*half-brothers/half-sisters/half-siblings]2</h2>
   <table style="border:%border;;width:100%">
       <tr>
         %if;(half_father != 0)
