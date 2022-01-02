@@ -41,11 +41,11 @@ val printf : ('a, out_channel, unit) format -> 'a
 val print_string : string -> unit
 (* To be called to print page contents. *)
 
-(** Prints a header; cannot be called if status or content already has been sent *)
+(** Prints a header; cannot be called if part of content part already has been sent *)
 val header : string -> unit
     (* To print an http header line *)
 
-(** Flushes the content of the current  *)
+(** Flushes the content of the current socket *)
 val wflush : unit -> unit
     (* To flush page contents print. *)
 

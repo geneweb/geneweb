@@ -5,8 +5,10 @@ open Gwdb
 
 (* TODOOCP: doc *)
 
+(** Relation with ancestor status *)
 type anc_stat
 
+(** Consanguinity information attached to person (relationship between parents) *)
 type relationship =
   { mutable weight1 : float;
     mutable weight2 : float;
@@ -18,6 +20,7 @@ type relationship =
     mutable anc_stat1 : anc_stat;
     mutable anc_stat2 : anc_stat }
 
+(** Computation consanguinity state for every person in the base *)
 type relationship_info =
   { 
     (* Information about topological rank for each person *)
@@ -38,7 +41,7 @@ val topological_sort
   -> (Gwdb.base -> Gwdb.iper -> Gwdb.person)
   -> (Gwdb.iper, int) Gwdb.Marker.t
 
-(** Initialise relationship info *)
+(** Initialise relationship info. *)
 val make_relationship_info : base -> (Gwdb.iper, int) Gwdb.Marker.t -> relationship_info
 
 (* TODOOCP: doc *)

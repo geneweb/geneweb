@@ -3,7 +3,7 @@
 (** Returns list of allowed to acces assets *)
 val assets : unit -> string list
 
-(** Returns base directory to which acces is allowed *)
+(** Returns directory where databases are installed to which acces is allowed *)
 val base_dir : unit -> string
 
 (** Add new asset to the [assets] list *)

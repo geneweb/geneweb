@@ -3,16 +3,25 @@
 open Def
 open Gwdb
 
+(** Authentication scheme data type *)
 type auth_scheme_kind =
     NoAuth
   | TokenAuth of token_auth_scheme
   | HttpAuth of http_auth_scheme
+
+(** Authentication via security token *)
 and token_auth_scheme = { ts_user : string; ts_pass : string }
+
+(** Authentication via HTTP *)
 and http_auth_scheme =
     Basic of basic_auth_scheme
   | Digest of digest_auth_scheme
+
+(** Basic authentication scheme inside {i Autorization} HTTP header *)
 and basic_auth_scheme =
   { bs_realm : string; bs_user : string; bs_pass : string }
+
+(** Digest authentication scheme inside {i Autorization} HTTP header *)
 and digest_auth_scheme =
   { ds_username : string;
     ds_realm : string;
@@ -24,6 +33,7 @@ and digest_auth_scheme =
     ds_cnonce : string;
     ds_response : string }
 
+(** HTTP printer, that prints and sends requests on the user's socket *)
 type output_conf =
   { status : Def.httpStatus -> unit
   ; header : string -> unit
@@ -31,6 +41,7 @@ type output_conf =
   ; flush : unit -> unit
   }
 
+(** Geneweb configuration data type *)
 type config =
   { from : string;
     api_mode : bool;
@@ -66,6 +77,7 @@ type config =
     env : (string * string) list;
     mutable senv : (string * string) list;
     mutable henv : (string * string) list;
+    (* content of .gwf file *)
     base_env : (string * string) list;
     allowed_titles : string list Lazy.t;
     denied_titles : string list Lazy.t;
@@ -82,13 +94,13 @@ type config =
     today_wd : int;
     time : int * int * int;
     ctime : float;
+    (* HTTP printer *)
     mutable output_conf : output_conf ;
     (* prefix for image urls:
        the value of argument -images_url if specified, otherwise
        command ^ "?m=IM&v=" in CGI mode
        "images" otherwise *)
     image_prefix : string;
-
     (* if true, the base name is in the b argument of the query string: ?b=BASE&...
        if false, the base name is the last element of the uri path: .../base?... *)
     cgi : bool

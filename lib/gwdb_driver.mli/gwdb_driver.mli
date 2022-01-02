@@ -425,12 +425,13 @@ val spi_first : string_person_index -> string -> istr
     Gutil.alphabetical order *)
 val spi_next : string_person_index -> istr -> istr
 
-(** Retruns all persons id having that [first/sur]name id as the [first/sur]name *)
+(** Retruns all persons id having that [first/sur]name. *)
 val spi_find : string_person_index -> istr -> iper list
 
-(** [base_visible_get base fct ip] get visibility of person [ip] ([true] for visible) 
-    from the [base]. If file {i restrict} is present then get read it to get visibility information.
-    If person's visibility isn't known, then set it with [fct]. *)
+(** [base_visible_get base fct ip] get visibility of person [ip] ([true] for not visible 
+    (restrited)) from the [base]. If file {i restrict} is present then read it to get 
+    visibility information. If person's visibility isn't known, then set it with [fct]. 
+    Used when mode `use_restrict` is ativated *)
 val base_visible_get : base -> (person -> bool) -> iper -> bool
 
 (** Write updated visibility information to the {i restricted} file. *)

@@ -18,7 +18,7 @@ val base_path : string list -> string -> string
 val bpath : string -> string
 
 (** Checks that the file in argument belong to one of the asserts dir
-    (defined in the Secure module *)
+    (defined in the Secure module) *)
 val search_in_assets : string -> string
 
 val include_begin : config -> string -> unit
@@ -35,12 +35,15 @@ val commit_patches : config -> base -> unit
 
 val update_wf_trace : config -> string -> unit
 
+(** Get referer (the page you came from to the current page) page from HTTP request *)
 val get_referer : config -> string
 
 val no_html_tags : string -> string
 val clean_html_tags : string -> string list -> string
 
+(** Prints HTTP response headers with giving content type (default : {i text/html}) on the socket. *)
 val html : ?content_type:string -> config -> unit
+
 val unauthorized : config -> string -> unit
 val string_of_ctime : config -> string
 
@@ -52,9 +55,14 @@ val prefix_base_2 : config -> string
 val prefix_base_password_2 : config -> string
 val hidden_env : config -> unit
 
+(** [nobtit conf base p] returns list of titles of [p] from the [base] 
+    that respects constraints imposed by [conf.allowed_titles] and 
+    [conf.denied_titles] *)
 val nobtit : config -> base -> person -> title list
 
 val strictly_after_private_years : config -> dmy -> bool
+
+(** Alias to !GWPARAM.p_auth *)
 val authorized_age : config -> base -> person -> bool
 val is_old_person : config -> (iper, iper, istr) gen_person -> bool
 
@@ -68,10 +76,15 @@ val accessible_by_key : config -> base -> person -> string -> string -> bool
 val geneweb_link : config -> string -> string -> string
 val wprint_geneweb_link : config -> string -> string -> unit
 
+(** Tells if person is restrited to acccess. If mode `use_restrict` is
+    disabled returns always [false]. *)
 val is_restricted : config -> base -> iper -> bool
 val is_hidden : person -> bool
 
+(** Returns person with giving id from the base. If person is restrited to 
+acccess returns empty person with giving id. *)
 val pget : config -> base -> iper -> person
+
 val string_gen_person :
   base -> (iper, iper, istr) gen_person -> (iper, iper, string) gen_person
 val string_gen_family :
@@ -115,18 +128,37 @@ val referenced_person_text_without_surname :
 
 val update_family_loop : config -> base -> person -> string -> string
 
+(** Returns value associated to the label in environnement *)
 val p_getenv : (string * string) list -> string -> string option
+
+(** Returns integer value associated to the label in environnement *)
 val p_getint : (string * string) list -> string -> int option
+
+(** Create association list from two types of string. First has format : [[k1=v1;k2=v2]]. Second : [[k1=v1&k2=v2]].
+    For both returns list [[("k1","v1"); ("k2","v2")]]. *)
 val create_env : string -> (string * string) list
 
+(** [open_etc_file fname] search for template {i etc/fname.txt} inside the base directory or inside one of assets directories.
+    Returns input channel and the path to giving template. *)
 val open_etc_file : string -> (in_channel * string) option
 val open_hed_trl : config -> string -> in_channel option
-val open_templ : config -> string -> in_channel option
+
+(** [open_etc_file fname] search for template {i etc/fname.txt} using [config] or inside one of assets directories.
+    Returns input channel and the path to giving template. *)
 val open_templ_fname : config -> string -> (in_channel * string) option
+
+(** Same as [open_templ_fname] but returns only input channel of the giving template file *)
+val open_templ : config -> string -> in_channel option
 val string_of_place : config -> string -> string
 val place_of_string : config -> string -> place option
 val allowed_tags_file : string ref
+
+(** Returns additional attributes for <body> tag from [config]. *)
 val body_prop : config -> string
+
+(** Prints all messages send to wizard (or friend) on the socket. Messages are located in  
+    {i <basename>/etc/mess_wizzard.txt} (messages destinated to all wizards) and in 
+    {i <basename>/etc/mess_wizzard_<user>.txt} (messages destinated to considered wizard). *)
 val message_to_wizard : config -> unit
 
 val of_course_died : config -> person -> bool
@@ -154,6 +186,7 @@ type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 val check_format : ('a, 'b) format2 -> string -> ('a, 'b) format2 option
 val valid_format : ('a, 'b) format2 -> string -> ('a, 'b) format2
 
+(** Find translation of given english word in [conf.lexicon] *)
 val transl : config -> string -> string
 val transl_nth : config -> string -> int -> string
 val transl_decline : config -> string -> string -> string
@@ -220,7 +253,11 @@ val default_sosa_ref : config -> base -> person option
 val find_sosa_ref : config -> base -> person option
 val update_gwf_sosa : config -> base -> iper * (string * string * int) -> unit
 
+(** Returns server host name with its port number (if different from 80). *)
 val get_server_string : config -> string
+
+(** Returns request string. Request string has format {i scriptname?querystring} where 
+    scriptname is a path to the script in URI. *)
 val get_request_string : config -> string
 
 val create_topological_sort : config -> base -> (iper, int) Gwdb.Marker.t
@@ -249,6 +286,9 @@ val old_branch_of_sosa : config -> base -> iper -> Sosa.t -> (iper * sex) list o
 val old_sosa_of_branch : config -> base -> (iper * sex) list -> Sosa.t
 
 val has_image : config -> base -> person -> bool
+
+(** [image_file_name fname] search for image {i images/fname} inside the base and assets directories.
+    Retrun the path to found file or [fname] if file isn't found.  *)
 val image_file_name : string -> string
 val source_image_file_name : string -> string -> string
 
@@ -293,10 +333,13 @@ val short_f_month : int -> string
 
 (* Reading password file *)
 
+(** Authenticated user from from authorization file. *)
 type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
+(** Read all authenticated users with their passwords from authorization file (associated to {i "wizard_passwd_file"} in [conf.base_env]) *)
 val read_gen_auth_file : string -> auth_user list
 
+(** [is_that_user_and_password auth_sheme user paswd] verify if given user with his password correspond to the authentication scheme. *)
 val is_that_user_and_password : auth_scheme_kind -> string -> string -> bool
 
 (* Searching *)
@@ -309,7 +352,7 @@ val html_highlight : bool -> string -> string -> string
 val wprint_in_columns :
   config -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
 
-(* Variable that use also private flag of person *)
+(** Tells if person's names are hiden (if person's access is [Private] or if mode [conf.hide_names] is enabled). *)
 val is_hide_names : config -> person -> bool
 
 val reduce_list : int -> 'a list -> 'a list
@@ -377,16 +420,18 @@ module IperSet : sig include Set.S with type elt = iper end
 module IfamSet : sig include Set.S with type elt = ifam end
 
 (**/**)
-(* [copy_from_templ_ref] is for internal usage only. Use copy_from_templ *)
+
+(** Reference by default [Templ.copy_from_templ] *)
 val copy_from_templ_ref :
   (config -> (string * string) list -> in_channel -> unit) ref
+  (* [copy_from_templ_ref] is for internal usage only. Use copy_from_templ *)
 
 (**/**)
 
-(** [include_template failure conf env fname]
-    Search [fname] in templates path en interpret it with [env] provided.
-
-    If the file can not be found, failure is called.
+(** [include_template conf env fname failure]
+    Search [fname] in templates path and interpret it with global environnement [env] provided.
+    Interpretation of template write directly its results in the socket. 
+    If the file can not be found, [failure] is called.
 *)
 val include_template
   : config
