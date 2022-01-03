@@ -20,7 +20,7 @@ build: [
 depends: [
   "benchmark"
   "calendars"
-  "camlp5" { = "8.00.01" }
+  "camlp5" { >= "8.00.01" }
   "cppo"
   "dune" { = "2.9.0" }
   "jingoo"
