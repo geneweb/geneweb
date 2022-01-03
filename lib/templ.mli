@@ -25,7 +25,11 @@ val interp_ast :
 (**)
 
 val input_templ : config -> string -> ast list option
+
+(** Evaluates and prints content of {i cpr} template. If template wasn't found prints basic copyrigth HTML structure. *)
 val print_copyright : config -> unit
+
+(** Calls [print_copyright] with config where variable {i with_logo} is set to "yes" *)
 val print_copyright_with_logo : config -> unit
 val include_hed_trl : config -> string -> unit
 val copy_from_templ : config -> string env -> in_channel -> unit

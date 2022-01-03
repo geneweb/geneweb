@@ -44,6 +44,7 @@ val clean_html_tags : string -> string list -> string
 (** Prints HTTP response headers with giving content type (default : {i text/html}) on the socket. *)
 val html : ?content_type:string -> config -> unit
 
+(** Prints HTTP response with code 401 (Unauthorized) and error page with giving message *)
 val unauthorized : config -> string -> unit
 val string_of_ctime : config -> string
 
@@ -188,12 +189,21 @@ val valid_format : ('a, 'b) format2 -> string -> ('a, 'b) format2
 
 (** Find translation of given english word in [conf.lexicon] *)
 val transl : config -> string -> string
+
+(** [transl_nth conf w n] returns translation for [n]'th word (with [nth_field]). *)
 val transl_nth : config -> string -> int -> string
 val transl_decline : config -> string -> string -> string
 val ftransl : config -> ('a, 'b) format2 -> ('a, 'b) format2
 val ftransl_nth : config -> ('a, 'b) format2 -> int -> ('a, 'b) format2
 val fdecline : ('a, 'b) format2 -> string -> ('a, 'b) format2
 val fcapitale : ('a, 'b) format2 -> ('a, 'b) format2
+
+(** [nth_field str n] gets [n]'th field of string that separate its fields with "/".
+    Example :
+    - nth_field "a/b/</c>/d" 0 = a
+    - nth_field "a/b/</c>/d" 1 = b
+    - nth_field "a/b/</c>/d" 2 = </c>
+    - nth_field "a/b/</c>/d" 3 = d *)
 val nth_field : string -> int -> string
 val cftransl : config -> string -> string list -> string
 val translate_eval : string -> string
@@ -355,6 +365,7 @@ val wprint_in_columns :
 (** Tells if person's names are hiden (if person's access is [Private] or if mode [conf.hide_names] is enabled). *)
 val is_hide_names : config -> person -> bool
 
+(** [reduce_list n l] takes [n] first elements from the list [l] *)
 val reduce_list : int -> 'a list -> 'a list
 
 val print_reference : config -> string -> int -> string -> unit

@@ -44,7 +44,7 @@ val topological_sort
 (** Initialise relationship info. *)
 val make_relationship_info : base -> (Gwdb.iper, int) Gwdb.Marker.t -> relationship_info
 
-(* TODOOCP: doc *)
+(* Returns relationship rate between two person and common ancestors (is exists). *)
 val relationship_and_links :
   base -> relationship_info -> bool -> Gwdb.iper -> Gwdb.iper -> float * Gwdb.iper list
 

@@ -334,7 +334,7 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | YoungForMarriage of 'person * dmy * 'family (** Person is married before he was 12 years old *)
   | OldForMarriage of 'person * dmy * 'family (** Person is married after he was 100 years old *)
 
-(* TODOOCP: doc *)
+(** Missing sources warning *)
 type ('person, 'descend, 'title) misc = MissingSources
 
 (** Database note/page reading mode *)

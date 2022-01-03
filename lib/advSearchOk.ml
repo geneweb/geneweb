@@ -442,10 +442,6 @@ let advanced_search conf base max_answers =
   in
   List.rev list, len
 
-(*
-  Returns a description string for the current advanced search results in the correct language.
-  e.g. "Search all Pierre, born in Paris, died in Paris"
-*)
 let searching_fields conf base =
   let test_date x =
     reconstitute_date conf (x ^ "1") <> None
