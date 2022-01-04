@@ -28,6 +28,7 @@
       %bvar.visitor_access_msg_en;
     %else;
       [
+co: L’accessu hè riservatu à l’amichi è à i maghi di a basa di dati !
 en: Access restricted to friends and wizards of the database!
 fr: Accès réservé aux amis et magiciens de la base de donnée !
       ]
@@ -106,6 +107,7 @@ fr: Accès réservé aux amis et magiciens de la base de donnée !
         </button>
         <span>
 [
+co: I <strong>diritti di i maghi</strong> sò attualmente<strong>disattivati</strong> per via d’una mantenenza.
 en: <strong>Wizard rights</strong> are now <strong>suspended</strong> for maintenance.
 fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendus</strong> pour maintenance.
 ]
@@ -297,6 +299,8 @@ br: gweladennoù a zo bet : %nb_accesses;, er bajenn-mañ :%sp;
     %nb_accesses_to_welcome;, abaoe an deiz-mañ : %start_date;.
 ca: Hi ha hagut %nb_accesses; consultes, de les quals
     %nb_accesses_to_welcome; en aquesta pàgina, des del %start_date;.
+co: Ci hè statu %nb_accesses; cunsultazioni, è %nb_accesses_to_welcome; di
+    i quale à sta pagina dapoi u %start_date;.
 cs: %nb_accesses; přístupů, z toho %nb_accesses_to_welcome; na tuto
     stránku, od %start_date;.
 da: Der har været %nb_accesses; opslag, %nb_accesses_to_welcome; af
@@ -364,6 +368,9 @@ ca: Si el vostre navegador no actualitza automàticament les
     pàgines modificades (obligant-vos a fer actualitzar manualment
     la pàgina), proveu de navegar des d'<a href="%prefix;%sq;
     escache=0">aquest altre lloc</a>.
+co: S’è u vostru navigatore ùn rinfresca micca e pagine mudificate
+    (vi furzendu à attualizà a pagina), pruvate a navigazione cù
+    <a href="%prefix;escache=0">stu liame</a>.
 cs: Pokud Váš prohlížeč neprovádí automaticky obnovu upravených stránek
     (musíte používat tlačítko "obnovit"), zkuste prohlížení přes <a
     href="%prefix;escache=0">tento odkaz</a>.
