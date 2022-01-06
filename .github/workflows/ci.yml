@@ -19,7 +19,8 @@ jobs:
       matrix:
 
         ocaml-version:
-          - 4.13.1
+          # GeneWeb dependencies do not build on 4.13
+          # - 4.13.1
           - 4.12.1
           - 4.11.2
           - 4.10.2
