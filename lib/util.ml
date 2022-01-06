@@ -838,11 +838,14 @@ let reference_flags with_id conf base p s =
   let iper = get_iper p in
   if is_hidden p then s
   else
-    String.concat ""
-      ["<a href=\""; commd conf; acces conf base p;
-       if with_id then "\" id=\"i" else "";
-       if with_id then string_of_iper iper else "";
-       "\">"; s; "</a>"]
+    match p_getenv conf.env "cgl" with
+		| Some "on" -> s
+		| _ ->
+				String.concat ""
+					["<a href=\""; commd conf; acces conf base p;
+					if with_id then "\" id=\"i" else "";
+					if with_id then string_of_iper iper else "";
+					"\">"; s; "</a>"]
 
 let reference = reference_flags true
 
