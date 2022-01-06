@@ -1068,7 +1068,7 @@ let include_begin conf fname =
   if conf.debug then
     let ext = Filename.extension fname in
     let (com_b, com_e) =
-      if (ext = ".css" || ext = ".js") then ("\n/*", "*/\n") else ("\n<!--", "-->\n")
+      if (ext = ".css" || ext = ".js") then ("\n/* ", " */\n") else ("\n<!-- ", " -->\n")
     in
     let s = Printf.sprintf "begin include %s" fname in
     Output.print_string conf (com_b ^ s ^ com_e)
@@ -1077,7 +1077,7 @@ let include_end conf fname =
   if conf.debug then
     let ext = Filename.extension fname in
     let (com_b, com_e) =
-      if (ext = ".css" || ext = ".js") then ("\n/*", "*/\n") else ("\n<!--", "-->\n")
+      if (ext = ".css" || ext = ".js") then ("\n/* ", " */\n") else ("\n<!-- ", " -->\n")
     in
     let s = Printf.sprintf "end include %s" fname in
     Output.print_string conf (com_b ^ s ^ com_e)
