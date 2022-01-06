@@ -5,8 +5,8 @@
   <div class="btn-toolbar my-1" role="toolbar" arial-label="config buttons toolbar">
     %if;(evar.em="R")
       <a href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env.key!="long")%env.key;=%env.val;&%end;%end;
-        %if;(evar.long!="on")&long=on%end;"
+        %foreach;env_binding;%if;(env.key!="long" and env.val!="")%env.key;=%env.val;&%end;%end;
+        %if;(evar.long!="on")long=on&%end;"
         title="%if;(evar.long!="on")[*visualize/show/hide/summary]1%else;
             [*visualize/show/hide/summary]2%end; [long display]">
        <i class="fa fa-chevron-%if;(evar.long="on")up%else;down%end; fa-fw p-0"></i>
@@ -14,19 +14,19 @@
     %end;
     %if;((evar.em="R" and evar.long="on") or evar.m="RL")
       <a href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env.key!="image")%env.key;=%env.val;&%end;%end;
-        %if;(evar.image!="off")&image=off%end;"
+        %foreach;env_binding;%if;(env.key!="image" and env.val!="")%env.key;=%env.val;&%end;%end;
+        %if;(evar.image!="off")image=off&%end;"
         title="%if;(evar.image!="off")[*visualize/show/hide/summary]2%else;
             [*visualize/show/hide/summary]1%end; [image/images]0">
         <i class="fa fa-images p-0 ml-1%if;(evar.image!="off") text-muted%end;"></i>
       </a>
       <a href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env.key!="spouse")%env.key;=%env.val;&%end;%end;
-       %if;(evar.spouse!="on")&spouse=on%end;"
+        %foreach;env_binding;%if;(env.key!="spouse" and env.val!="")%env.key;=%env.val;&%end;%end;
+       %if;(evar.spouse!="on")spouse=on&%end;"
         title="%if;(evar.spouse!="on")[*visualize/show/hide/summary]1%else;
           [*visualize/show/hide/summary]2%end; [spouse/spouses]0">%nn;
           <i class="fa fa-user%if;(evar.spouse!="on")-friends%end; fa-fw ml-2"></i></a>
-      <a href="%url&cgl=on" target="_blank"><i class="fa fa-unlink fa-fw ml-2" title="[*cancel GeneWeb links]"></i></a>
+      <a href="%url;cgl=on&" target="_blank"><i class="fa fa-unlink fa-fw ml-2" title="[*cancel GeneWeb links]"></i></a>
     %end;
   </div>
 %end;
