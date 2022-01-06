@@ -52,7 +52,7 @@ let need_split = function
   | "the spouse"
   | "would be his/her own ancestor"
   | "died at an advanced age"
-  | "half-siblings"
+  | "half siblings"
   | "(short month)"
     -> true
   | "is born after his/her child"
