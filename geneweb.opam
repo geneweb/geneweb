@@ -22,7 +22,7 @@ depends: [
   "calendars"
   "camlp5" { >= "8.00.01" }
   "cppo"
-  "dune" { = "2.9.0" }
+  "dune" { >= "2.9.0" }
   "jingoo"
   "markup"
   "num"
