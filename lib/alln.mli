@@ -21,7 +21,7 @@ val first_letters : Gwdb.base -> bool -> string list
     Otherwise, return the list of values [Result] with all first names 
     and number of persons that have giving name. *)
 val select_names :
-  Geneweb.Config.config -> Gwdb.base -> bool -> string -> int -> t * int
+  Config.config -> Gwdb.base -> bool -> string -> int -> t * int
 
 (** Returns prefix of length [len] of UTF8 encoded name *)
 val ini : int -> string -> string
