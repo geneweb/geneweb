@@ -48,7 +48,13 @@ val html : ?content_type:string -> config -> unit
 val unauthorized : config -> string -> unit
 val string_of_ctime : config -> string
 
+(** Returns link to the current command (database name after domain name and port in url) with query string 
+    that containts bindings from [conf.henv] and [conf.senv]. Doesn't add binding [(k,v)] when:
+    - k = "oc" or "ocz" and v = "0"
+    - v = "" *)
 val commd : config -> string
+
+(** Same as [commd] but returns without separator '&' at the end. *)
 val commd_2 : config -> string
 val prefix_base : config -> string
 val prefix_base_password : config -> string
@@ -74,7 +80,11 @@ val acces : config -> base -> person -> string
 val wprint_hidden_person : config -> base -> string -> person -> unit
 val accessible_by_key : config -> base -> person -> string -> string -> bool
 
+(** [geneweb_link conf href s] Returns HTML link to actual geneweb's command (database name) with additional (to those defind by [commd]) 
+    argument [href] and [s] as textual content of the link. *)
 val geneweb_link : config -> string -> string -> string
+
+(** Prints on the socket link created by [geneweb_link]. *)
 val wprint_geneweb_link : config -> string -> string -> unit
 
 (** Tells if person is restrited to acccess. If mode `use_restrict` is
