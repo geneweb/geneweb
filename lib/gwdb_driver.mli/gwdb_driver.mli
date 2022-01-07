@@ -324,7 +324,7 @@ val nb_of_families : base -> int
 val bname : base -> string
 
 (** Modify/add person with the giving id in the base. New names are added 
-    to the name index for the cosidered person and for evey member of family to 
+    to the patched name index for the cosidered person and for evey member of family to 
     which he belongs. Modification stay blocked until call of [commit_patches]. *)
 val patch_person : base -> iper -> (iper, iper, istr) Def.gen_person -> unit
 
