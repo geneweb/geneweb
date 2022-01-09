@@ -97,7 +97,7 @@ val ifam_exists : base -> ifam -> bool
     If corresponding information part isn't present, driver load it from
     the disk and cache it so further gets will return result immediately. *)
 
-(** Get rights to access person's data *)
+(** Get rights that defines access to person's data *)
 val get_access : person -> Def.access
 
 (** Get person's aliases ids *)

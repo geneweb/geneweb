@@ -2,7 +2,7 @@
 (** Lists the last births *)
 val print_birth : Config.config -> Gwdb.base -> unit
 
-(** Lists tje last deaths *)
+(** Lists the last deaths *)
 val print_death : Config.config -> Gwdb.base -> unit
 
 (** Lists the persons who lived the longest *)

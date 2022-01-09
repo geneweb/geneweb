@@ -60,6 +60,9 @@ val prefix_base : config -> string
 val prefix_base_password : config -> string
 val prefix_base_2 : config -> string
 val prefix_base_password_2 : config -> string
+
+(** Creates a hidden HTML input for every key and value in [conf.henv] and [conf.senv]. 
+    Used to include immutable environement bindings in the HTML form. *)
 val hidden_env : config -> unit
 
 (** [nobtit conf base p] returns list of titles of [p] from the [base] 
@@ -78,6 +81,8 @@ val start_with_vowel : string -> bool
 val acces_n : config -> base -> string -> person -> string
 val acces : config -> base -> person -> string
 val wprint_hidden_person : config -> base -> string -> person -> unit
+
+(** Tells if person could be accessed by his first name and surname *)
 val accessible_by_key : config -> base -> person -> string -> string -> bool
 
 (** [geneweb_link conf href s] Returns HTML link to actual geneweb's command (database name) with additional (to those defind by [commd]) 
@@ -90,6 +95,8 @@ val wprint_geneweb_link : config -> string -> string -> unit
 (** Tells if person is restrited to acccess. If mode `use_restrict` is
     disabled returns always [false]. *)
 val is_restricted : config -> base -> iper -> bool
+
+(** Tells if person is hiden (if his surname is empty) *)
 val is_hidden : person -> bool
 
 (** Returns person with giving id from the base. If person is restrited to 
@@ -101,39 +108,100 @@ val string_gen_person :
 val string_gen_family :
   base -> (iper, ifam, istr) gen_family -> (iper, ifam, string) gen_family
 
+(** Type that defines couple of functions allowing to access to person's first name
+    and surname. *)
 type p_access = (base -> person -> string) * (base -> person -> string)
+
+(** Standard access (p_first_name, p_surname). *)
 val std_access : p_access
+
+(** Raw access (sou + get_name). *)
 val raw_access : p_access
 
-(* Fonctions d'écriture du nom et prénom d'un individu en fonction de : *)
-(*   - son/ses titre de noblesse                                        *)
-(*   - son/ses nom public                                               *)
-(*   - son/ses sobriquets ...                                           *)
+(** Returns person's first name and surname HTML description depending on :
+    - his public name
+    - his qualifiers
+  If person is hiden returns ".....". If person's names are hiden 
+  or access to them is denied returns "x x" *)
 val gen_person_text : p_access -> config -> base -> person -> string
+
+(** Same as [gen_person_text] but doesn't encapsulates description in HTML
+    tag <em>. *)
 val gen_person_text_no_html : p_access -> config -> base -> person -> string
+
+(** Returns either person's first name and surname either title and qualifiers
+    HTML description *)
 val gen_person_text_without_title :
   p_access -> config -> base -> person -> string
+
+(** [gen_person_title_text reference paccess conf base p] returns HTML structure 
+    of person that describes person's first name surname and main title. [reference] 
+    is used to either encapsulate structure in the link (or other type 
+    of maniplations). *)
 val gen_person_title_text :
   (config -> base -> person -> string -> string) -> p_access -> config ->
     base -> person -> string
+
+(** Makes call to [gen_person_text] with [std_access] *)
 val person_text : config -> base -> person -> string
+
+(** Makes call to [gen_person_text_no_html] with [std_access] *)
 val person_text_no_html : config -> base -> person -> string
+
+(** Same as [gen_person_text] but doesn't display surname *)
 val person_text_without_surname : config -> base -> person -> string
+
+(** Same as [gen_person_text] but :
+    - doesn't display surname
+    - returns HTML description even if person's names are hiden 
+      or access to them is denied (don't print "x x") *)
 val person_text_no_surn_no_acc_chk : config -> base -> person -> string
+
+(** Makes call to [gen_person_text_without_title] with [std_access] *)
 val person_text_without_title : config -> base -> person -> string
+
+(** Returns main person's title. If person doesn't have it, then returns first title
+    from the list. *)
 val main_title : config -> base -> person -> title option
+
+(** Returns person's first name and surname text description depending on
+    person's title *)
 val titled_person_text : config -> base -> person -> title -> string
+
+(** Returns HTML representation of title's identifier with its place (if exists) *)
 val one_title_text : base -> title -> string
+
+(** Returns HTML structure of person that describes person's first name surname 
+    and main title. Calls [gen_person_title_text] with [no_reference]. *)
 val person_title_text : config -> base -> person -> string
+
+(** Returns HTML representation of person's main title (or first title if 
+    main doesn't exists). If person doesn't have a title or if access to 
+    person isn't granted returns empty string *)
 val person_title : config -> base -> person -> string
 
 val child_of_parent : config -> base -> person -> string
 
+(** [reference conf base p desc] returns HTML link to the person 
+    where [desc] is content of the link (generaly his first name and 
+    surname description). If person is hidden returns [desc] (do not 
+    create link). *)
 val reference : config -> base -> person -> string -> string
+
+(** Same as [reference] but link doesn't has "id" field *)
 val reference_noid : config -> base -> person -> string -> string
+
+(** [reference conf base p desc] returns [desc] without creating a link *)
 val no_reference : config -> base -> person -> string -> string
+
+(** Retruns HTML link to the person that contains its first name, surname and person's 
+    nobility title. Calls [gen_person_title_text] with [reference]. *)
 val referenced_person_title_text : config -> base -> person -> string
+
+(** Returns HTML link to the person that contains its first name and surname. *)
 val referenced_person_text : config -> base -> person -> string
+
+(** Returns HTML link to the person that contains its first name. *)
 val referenced_person_text_without_surname :
   config -> base -> person -> string
 
@@ -226,8 +294,10 @@ val translate_eval : string -> string
 val transl_a_of_b : config -> string -> string -> string -> string
 val transl_a_of_gr_eq_gen_lev : config -> string -> string -> string -> string
 
+(** Colorise HTML element with [conf.highlight] color. *)
 val std_color : config -> string -> string
 
+(** Sex index (0 for male, 1 for female, 2 for neuter) *)
 val index_of_sex : sex -> int
 
 val string_of_pevent_name :
@@ -258,7 +328,7 @@ val husband_wife : config -> base -> person -> bool -> string
 
 (** [find_person_in_env conf base suff]
     Reconstitutes the key of a person from [conf.env],
-    using ["i" ^ suff] or ["n" ^ suffix] + ["p" ^ suff] + ["oc" ^ suff]
+    using ["i" ^ suff] or ["n" ^ suff] + ["p" ^ suff] + ["oc" ^ suff]
 *)
 val find_person_in_env : config -> base -> string -> person option
 
@@ -336,7 +406,10 @@ val browser_doesnt_have_tables : config -> bool
 
 val doctype : config -> string
 
+(** Prints on the socket beginning of the <table> tag untill first opened <td> where the text is centred *)
 val begin_centered : config -> unit
+
+(** Prints on the socket end of the column and table opened by [begin_centered] *)
 val end_centered : config -> unit
 
 val print_alphab_list
