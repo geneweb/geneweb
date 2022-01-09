@@ -80,9 +80,7 @@ module StrSet : Set.S with type elt = string
 
 (** [tr c1 c2 str]
     Return a new string which is the same as [str] with all occurences of [c1]
-    replaced by [c2].
-    If [str] does not contain [c1]. [str] is returned intouched.
-
+    replaced by [c2]. If [str] does not contain [c1] [str] is returned untouched.
  *)
 val tr : char -> char -> string -> string
 

@@ -390,11 +390,21 @@ val image_and_size :
     (string -> (int * int) option -> (int * int) option) ->
     (bool * string * (int * int) option) option
 
+(** Returns default image name calculated from person's first name, surname
+    and occurence number. For example : Jean Claude DUPOND 3 => jean_claude.3.dupond *)
 val default_image_name_of_key : string -> string -> int -> string
+
+(** Returns default image name calculated from person's key. *)
 val default_image_name : base -> person -> string
+
+(** Searchs personal image (portrait) inside the base directory by looking up its default name
+    and tryig to deduce its extension. Returns path to the image if found. *)
 val auto_image_file : config -> base -> person -> string option
 
+(** Trims and remplaces all non-printable characters by spaces in the given string. *)
 val only_printable : string -> string
+
+(** Same as [only_printable] but also accepts '\n'. *)
 val only_printable_or_nl : string -> string
 
 val relation_type_text : config -> relation_type -> int -> string
