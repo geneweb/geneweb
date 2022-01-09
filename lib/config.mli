@@ -1,37 +1,49 @@
-(* Copyright (c) 1998-2007 INRIA *)
-
 open Def
 open Gwdb
 
+(** Authentication scheme data type *)
 type auth_scheme_kind =
     NoAuth
   | TokenAuth of token_auth_scheme
   | HttpAuth of http_auth_scheme
 
-and token_auth_scheme = { ts_user : string; ts_pass : string }
+(** Authentication via security token *)
+and token_auth_scheme = { ts_user : string; ts_pass : string; }
+
+(** Authentication via HTTP *)
 and http_auth_scheme =
     Basic of basic_auth_scheme
   | Digest of digest_auth_scheme
-and basic_auth_scheme =
-  { bs_realm : string; bs_user : string; bs_pass : string }
-and digest_auth_scheme =
-  { ds_username : string;
-    ds_realm : string;
-    ds_nonce : string;
-    ds_meth : string;
-    ds_uri : string;
-    ds_qop : string;
-    ds_nc : string;
-    ds_cnonce : string;
-    ds_response : string }
 
-type output_conf =
-  { status : Def.httpStatus -> unit
-  ; header : string -> unit
-  ; body : string -> unit
-  ; flush : unit -> unit
-  }
+(** Basic authentication scheme inside {i Autorization} HTTP header *)
+and basic_auth_scheme = {
+  bs_realm : string;
+  bs_user : string;
+  bs_pass : string;
+}
 
+(** Digest authentication scheme inside {i Autorization} HTTP header *)
+and digest_auth_scheme = {
+  ds_username : string;
+  ds_realm : string;
+  ds_nonce : string;
+  ds_meth : string;
+  ds_uri : string;
+  ds_qop : string;
+  ds_nc : string;
+  ds_cnonce : string;
+  ds_response : string;
+}
+
+(** HTTP printer, that prints and sends requests on the user's socket *)
+type output_conf = {
+  status : Def.httpStatus -> unit;
+  header : string -> unit;
+  body : string -> unit;
+  flush : unit -> unit;
+}
+
+(** Geneweb configuration data type *)
 type config =
   { from : string;
     api_mode : bool;
@@ -96,71 +108,8 @@ type config =
     cgi : bool
   ; forced_plugins : string list
   ; plugins : string list
- }
+}
 
-(**/**)
 (** A dummy {!type:config} value, with uninitialized fields.
     Used for testing purpose *)
-let empty =
-  { from = ""
-  ; manitou = false
-  ; supervisor = false
-  ; wizard = false
-  ; api_mode = false
-  ; is_printed_by_template = false
-  ; debug = false
-  ; friend = false
-  ; just_friend_wizard = false
-  ; user = ""
-  ; username = ""
-  ; auth_scheme = NoAuth
-  ; command = ""
-  ; indep_command = ""
-  ; highlight = ""
-  ; lang = ""
-  ; default_lang = ""
-  ; default_sosa_ref = Gwdb.dummy_iper, None
-  ; multi_parents = false
-  ; authorized_wizards_notes = false
-  ; public_if_titles = false
-  ; public_if_no_date = false
-  ; setup_link = false
-  ; access_by_key = false
-  ; private_years = 0
-  ; hide_names = false
-  ; use_restrict = false
-  ; no_image = false
-  ; no_note = false
-  ; bname = ""
-  ; cgi_passwd = ""
-  ; env = []
-  ; senv = []
-  ; henv = []
-  ; base_env = []
-  ; allowed_titles = lazy []
-  ; denied_titles = lazy []
-  ; request = []
-  ; lexicon = Hashtbl.create 16
-  ; charset = ""
-  ; is_rtl = false
-  ; left = ""
-  ; right = ""
-  ; auth_file = ""
-  ; border = 0
-  ; n_connect = None
-  ; today = { Def.day = 0 ; month = 0 ; year = 0 ; delta = 0 ; prec = Def.Sure }
-  ; today_wd = 0
-  ; time = 0,0,0
-  ; ctime = 0.
-  ; image_prefix = ""
-  ; cgi = false
-  ; output_conf =
-      { status = ignore
-      ; header = ignore
-      ; body = ignore
-      ; flush = ignore
-      }
-  ; forced_plugins =[]
-  ; plugins =[]
-  }
-(**/**)
+val empty : config
