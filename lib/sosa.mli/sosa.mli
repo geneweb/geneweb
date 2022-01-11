@@ -2,15 +2,36 @@
 
 type t
 
+(** Initial sosa value *)
 val zero : t
+
+(** Sosa number describing the subject itself *)
 val one : t
+
+(** Equality between 2 sosa *)
 val eq : t -> t -> bool
+
+(** Tells if one sosa number is greater then another *)
 val gt : t -> t -> bool
+
+(** Comparison function between sosa numbers *)
 val compare : t -> t -> int
+
+(** Addition of 2 sosa numbers *)
 val add : t -> t -> t
+
+(** Substraction of 2 sosa numbers *)
 val sub : t -> t -> t
+
+(** Returns sosa number multiplied by 2. Represents father's sosa number of
+    person with the giving sosa. *)
 val twice : t -> t
+
+(** Returns sosa number divided by 2. If person has a child then result number 
+    will be child's sosa number. *)
 val half : t -> t
+
+(** Tells if sosa number is even. Even numbers describe fathers, odd - mothers for each generation. *)
 val even : t -> bool
 val inc : t -> int -> t
 val mul : t -> int -> t

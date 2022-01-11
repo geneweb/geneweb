@@ -78,6 +78,7 @@ val is_old_person : config -> (iper, iper, istr) gen_person -> bool
 
 val start_with_vowel : string -> bool
 
+(** Returns URL query string to access nth person *)
 val acces_n : config -> base -> string -> person -> string
 val acces : config -> base -> person -> string
 val wprint_hidden_person : config -> base -> string -> person -> unit
@@ -358,7 +359,7 @@ val create_topological_sort : config -> base -> (iper, int) Gwdb.Marker.t
 val p_of_sosa : config -> base -> Sosa.t -> person -> person option
 
 (** [branch_of_sosa conf base sosa p0]
-    Get all the lineage to go from [p0]'s sosa [sosa] to [p0]
+    Get all the lineage to go from [p0]'s ancestor with sosa number [sosa] to [p0]
 *)
 val branch_of_sosa : config -> base -> Sosa.t -> person -> person list option
 
@@ -463,7 +464,10 @@ val reduce_list : int -> 'a list -> 'a list
 
 val print_reference : config -> string -> int -> string -> unit
 
+(** Print a tip with the specified text *)
 val gen_print_tips : config -> string -> unit
+
+(** Print a tip that tells to {i Click an individual below to calculate the family link.} *)
 val print_tips_relationship : config -> unit
 
 val print_image_sex : config -> person -> int -> unit
