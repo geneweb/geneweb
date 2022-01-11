@@ -18,13 +18,16 @@ and span_id
 and ghost_id
 
 type align = LeftA | CenterA | RightA
+
 type ('a, 'b) table_data =
     TDitem of 'a
   | TDtext of string
   | TDhr of align
   | TDbar of 'b option
   | TDnothing
+
 type ('a, 'b) html_table_line = (int * align * ('a, 'b) table_data) array
+
 type ('a, 'b) html_table = ('a, 'b) html_table_line array
 
 val html_table_struct :
