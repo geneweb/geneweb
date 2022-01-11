@@ -269,7 +269,7 @@ val valid_format : ('a, 'b) format2 -> string -> ('a, 'b) format2
 (** Find translation of given english word in [conf.lexicon] *)
 val transl : config -> string -> string
 
-(** [transl_nth conf w n] returns translation for [n]'th word (with [nth_field]). *)
+(** [transl_nth conf w n] translate word [w] and returns [n]'th field of its translation (with [nth_field]). *)
 val transl_nth : config -> string -> int -> string
 val transl_decline : config -> string -> string -> string
 val ftransl : config -> ('a, 'b) format2 -> ('a, 'b) format2
