@@ -61,12 +61,12 @@ val print_link_to_welcome : config -> bool -> unit
 (** Sends [Bad Request] HTTP response (same as [GWPARAM.output_error conf Bad_Request]) *)
 val incorrect_request : config -> unit
 
+(* TODOOCP *)
 val interp :
   config -> string -> ('a, 'b) Templ.interp_fun -> 'a Templ.env -> 'b -> unit
-
 val interp_no_header :
   config -> string -> ('a, 'b) Templ.interp_fun -> 'a Templ.env -> 'b -> unit
 
-(** Displays the calendar; if no key is set, it will use today's date =.
+(** Displays the calendar; if no key is set, it will use today's date.
     Based on template file calendar.txt *)
 val print_calendar : config -> unit

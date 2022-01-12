@@ -384,11 +384,21 @@ val has_image : config -> base -> person -> bool
 (** [image_file_name fname] search for image {i images/fname} inside the base and assets directories.
     Retrun the path to found file or [fname] if file isn't found.  *)
 val image_file_name : string -> string
+
+(** Returns path to the image file with the giving name in directory {i sources}. *)
 val source_image_file_name : string -> string -> string
 
+(** Returns width and height of an image. *)
 val image_size : string -> (int * int) option
+
+(** [limited_image_size max_wid max_hei fname defsize] returns image size of [fname]. If width and height are greater 
+    then their limits [max_wid] and [max_hei] then returns reduced size with the same proportions. [defsize] is returned 
+    if image filename is empty. *)
 val limited_image_size :
   int -> int -> string -> (int * int) option -> (int * int) option
+
+(** Returns path to the personal image. In details, returns [(is_filename,source,size)] where [is_filename] tells if [source]
+    is a filename or URL and [size] is a size of image (width x height). *)
 val image_and_size :
   config -> base -> person ->
     (string -> (int * int) option -> (int * int) option) ->

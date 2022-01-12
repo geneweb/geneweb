@@ -3,14 +3,9 @@
     wasn't found or couldn't be send. *)
 val print_image_file : Config.config -> string -> bool 
 
-(** [Description] : Traite une requête image.
-    [Args] :
-      - config : configuration de la requête
-      - base : base de donnée sélectionnée                                  *)
+(** Searhes image's filename in the environement [conf.env] and sends HTTP respose with its content on the socket. If filename isn't presented, looks up 
+    personal image for person's mentionned in [conf.env] *)
 val print : Config.config -> Gwdb.base -> unit
 
-(** [Description] : Affiche une image seule dans une page HTML.
-    [Args] :
-      - conf : configuration de la requête
-      - base : argument non utilisé                                          *)
+(** Sends HTTP respose with HTML page containg just image specified in arguments. *)
 val print_html : Config.config -> unit
