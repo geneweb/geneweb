@@ -144,20 +144,6 @@ let rec eval_variable conf =
       | Some vv -> vv
       | None -> if n > 0 then loop (n - 1) else ""
     in loop n
-  | ["substr_start"; n; v] ->
-    let n = int_of_string n in
-    (* Attention aux caractères utf-8 !! *)
-    let sub =
-      let len = String.length v in
-      let rec loop i n str =
-        if n = 0 || i >= len then str
-        else
-          let nbc = Utf8.nbc v.[i] in
-          let car = String.sub v i nbc in
-          loop (i+nbc) (n-1) (str ^ car)
-      in
-      loop 0 n ""
-    in sub
   | "time" :: sl -> eval_time_var conf sl
   | ["user"; "ident"] -> conf.user
   | ["user"; "name"] -> conf.username
@@ -879,6 +865,55 @@ let rec interp_ast conf ifun env =
         | "nth_c", [VVstring s1; VVstring s2] ->
             let n = try int_of_string s2 with Failure _ -> 0 in
             (try Char.escaped (String.get s1 n) with Invalid_argument _ -> "")
+        | "scan_pmod_option", [VVstring letter; VVstring default] ->
+            let p_mod =
+              begin match Util.p_getenv conf.env "p_mod" with
+              | Some vv -> Util.escape_html vv (* TODO safe string *)
+              | None -> (try List.assoc "p_mod" conf.base_env
+                  with Not_found -> "z2i3u2c1n1s2a3f1r1")
+              end
+            in
+            begin try let i = String.rindex p_mod letter.[0] in
+                String.sub p_mod (i+1) 1
+              with Not_found | Invalid_argument _ -> default
+            end
+        | "substr", [VVstring st; VVstring ln; VVstring str] ->
+          let ln = int_of_string ln in
+          let st = int_of_string st in
+          let st = if st < String.length str then Utf8.get str st else -1 in
+          let sub =
+            let len = String.length str in
+            let rec loop i n sub =
+              if n = 0 || i >= len then sub
+              else
+                let nbc = Utf8.nbc str.[i] in
+                let car = String.sub str i nbc in
+                loop (i+nbc) (n-1) (sub ^ car)
+            in
+            if st >= 0 then loop st ln "" else ""
+          in sub
+        | "substr_index", [VVstring st; VVstring sub; VVstring str] ->
+          let st = int_of_string st in
+          let st1 = if st < String.length str then Utf8.get str st else -1 in
+          let strlen = String.length str in
+          let sublen = String.length sub in
+          let rec aux i1 i2 =
+            if i1 >= sublen then (i2 - i1)
+            else if i2 >= strlen then -1
+            else if String.unsafe_get sub i1 = String.unsafe_get str i2
+            then aux (i1 + 1) (i2 + 1)
+            else -1
+          in
+          let i0 =
+            let rec loop i =
+              if sublen > 0 && strlen > 0 && st1 >= 0 && i + sublen <= strlen then
+                (if (aux 0 i) >= 0 then (aux 0 i) else loop (i + 1))
+              else -1
+            in
+            loop st1
+          in
+          string_of_int (if i0 < 0 then i0 else Utf8.nb_utf8_char str i0)
+        | "str_length", [VVstring s] -> string_of_int (Utf8.length s)
         | "red_of_hsv", [VVstring h; VVstring s; VVstring v] ->
             begin try
               let (r, _, _) = rgb_of_str_hsv h s v in string_of_int r

@@ -49,13 +49,14 @@
                     %apply;input_hidden("evar.lang","lang")
                     <div class="input-group">
                       <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"
-                        value="%if;(p_mod!="zz" and p_mod!="")%p_mod;%end;"
-                        placeholder="%if;(evar.p_mod="" and bvar.p_mod!="")%bvar.p_mod;
-                        (%base.name;.gwf)%else;[*select p_mod]%end;"
+                        value="%if;(p_mod!="")%p_mod;%else;z2i3u2c1n1s2a3f1r1%end;"
+                        placeholder="%if;(p_mod!="")%p_mod;%else;z2i3u2c1n1s2a3f1r1%end;"
                         maxlength="30">
                       <div class="input-group-append">
-                        <button type="submit" class="btn btn-outline-success" title="[*validate/delete]0"><i class="fa fa-check fa-lg"></i></button>
-                        <button type="button" class="btn btn-outline-danger" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-times fa-lg mx-1"></i></button>
+                        <button type="submit" class="btn btn-outline-success" id="p_mod_ok" 
+                          title="[*validate/delete]0"><i class="fa fa-check fa-lg"></i></button>
+                        <button type="button" class="btn btn-outline-danger" id="p_mod_clear" 
+                          title="[*validate/delete]1"><i class="fa fa-times fa-lg mx-1"></i></button>
                       </div>
                     </div>
                     %if;(evar.i="")
@@ -86,6 +87,10 @@
                     [
 en: Select each module by clicking on the corresponding button (max 15).
 fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
+                    ]<br>
+                    [
+en: Modules can be organized in one (variable layout) or two (fixed list and layout) columns.
+fr: Les modules peuvent être organisés en une colonne (ordre variable) ou deux colonnes (liste et ordre prédéfini).
                     ]
                     </div>
                     <a role="button" class="btn btn-outline-%if;(evar.wide="on")danger%else;primary%end; my-3"%sp;

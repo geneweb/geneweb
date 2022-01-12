@@ -156,66 +156,37 @@
   %end;
 %end;
 
-%define;border()
-  <div class="w-50 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
-%end;
-
-%let;evm;%if;(evar.m="F")m=F;%end;%in;
-%let;prefx;%if;(evar.m="F")%prefix_no_pmod;%else;%prefix;%end;%in;
-%if;(evar.m!="MOD_IND")
-  <div class="col-12">
-  <h1 class="%if;(op_m=2)text-center%else;text-xs-center text-md-left%end;">
-    %if;has_public_name;
-      %if;has_qualifiers;%public_name; <em>%qualifier;</em>
-      %else;%public_name; %surname;%end;
-    %else;
-      %if;has_qualifiers;%first_name; <em>%qualifier;</em>
-      %else;
-        %if;cancel_links;%first_name; %surname;
-        %else;
-          <a href="%prefix;m=P;v=%first_name_key;#i%index;">%first_name;</a>
-          <a href="%prefix;m=N;v=%surname_key;#i%index;">%surname;</a>
-        %end;
-      %end;
-    %end;
-    <span class="font-weight-light small">%dates;</span>
-  </h1>
-  </div> %( closing div just before h1 %)
-
-  %if;((p_mod="zz" or p_mod="") and evar.m!="F")<div class="col-12%if;(evar.wide!="on") col-lg-8%end;">
-  %end;
-  %if;(op_m=1)
+%if;(op_m=1)
+  <div class="col-12 text-center mb-2 mx-2">
     %apply;portrait()
-    %apply;etat_civil()
     <div class="text-center mb-2 mx-2">
+      %apply;etat_civil()
       %apply;sosa()
     </div>
     <div class="mt-2 mb-1 ml-2">
       %apply;detailed_names()
     </div>
-  
-  %elseif;(op_m=2)
-    <div class="col-12 text-center mb-2 mx-2">
-      %apply;portrait()
-      %apply;sosa()
-    </div>
-    <div class="col-12 text-center mb-2 mx-2">
-      %apply;detailed_names()
-    </div>
-    %apply;etat_civil()
-  
-  %elseif;(op_m=3)
-    <div class="d-flex">
-      %apply;portrait()
-      <div>
-        <div class="text-center mb-2 mx-2">
-          %apply;detailed_names()
-          %apply;sosa()
-        </div>
-        %apply;etat_civil()
+  </div>
+
+%elseif;(op_m=2)
+  <div class="col-12 text-center mb-2 mx-2">
+    %apply;portrait()
+    %apply;sosa()
+  </div>
+  <div class="col-12 text-center mb-2 mx-2">
+    %apply;detailed_names()
+  </div>
+  %apply;etat_civil()
+
+%elseif;(op_m=3)
+  <div class="d-flex">
+    %apply;portrait()
+    <div>
+      <div class="text-center mb-2 mx-2">
+        %apply;detailed_names()
+        %apply;sosa()
       </div>
+      %apply;etat_civil()
     </div>
-  %else;
-  Unavailambe option value!
-  %end;
+  </div>
 %end;

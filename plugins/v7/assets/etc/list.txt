@@ -27,7 +27,7 @@
   %evar.pi;
 %end;
 %define;get_sub(nn,ss)
-  %substr_start.nn.ss;
+  %apply;substr(0,nn,ss)
 %end;
 
 %( %qvar.index.marriage_places; renvoie une chaine avec les places de mariage, séparées par des | %)

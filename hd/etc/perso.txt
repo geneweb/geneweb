@@ -79,44 +79,100 @@
   %init_cache.nb_asc.from_gen_desc.nb_desc;
 %end;
 
+%let;op_mz;%apply;scan_pmod_option("z",2)%in;
+%let;op_mi;%apply;scan_pmod_option("i",3)%in;
+%let;op_mp;%apply;scan_pmod_option("p",2)%in;
+%let;op_mu;%apply;scan_pmod_option("u",2)%in;
+%let;op_mf;%apply;scan_pmod_option("f",1)%in;
+%let;op_mr;%apply;scan_pmod_option("r",1)%in;
+%let;op_mc;%apply;scan_pmod_option("c",1)%in;
+%let;op_mn;%apply;scan_pmod_option("n",1)%in;
+%let;op_ms;%apply;scan_pmod_option("s",2)%in;
+%let;op_ma;%apply;scan_pmod_option("a",3)%in;
+%let;op_mg;%apply;scan_pmod_option("g",1)%in;
+%let;op_ml;%apply;scan_pmod_option("l",1)%in;
+%let;op_md;%apply;scan_pmod_option("d",1)%in;
+%let;timeline;%apply;time_l()%in;
+
 %(note that p_mod= (b)%bvar.p_mod; or (e)%evar.p_mod;%)
-%if;(evar.p_mod="zz" or (bvar.p_mod="zz" and evar.p_mod="") or
-    (bvar.p_mod="" and evar.p_mod=""))
-  %(Statique%)
+%if;(op_mz=2)
+  %(Statique two columns %)
   %apply;init_cache(3, 2, 2)
-  %if;(has_parents and (father.has_parents or mother.has_parents))
+  <h1 class="%if;(op_mi=2)text-center%else;text-xs-center text-md-left%end;">
+    %if;has_public_name;
+      %if;has_qualifiers;%public_name; <em>%qualifier;</em>
+      %else;%public_name; %surname;%end;
+    %else;
+      %if;has_qualifiers;%first_name; <em>%qualifier;</em>
+      %else;
+        %if;cancel_links;%first_name; %surname;
+        %else;
+          <a href="%prefix;m=P;v=%first_name_key;#i%index;">%first_name;</a>
+          <a href="%prefix;m=N;v=%surname_key;#i%index;">%surname;</a>
+        %end;
+      %end;
+    %end;
+    <span class="font-weight-light small">%dates;</span>
+  </h1>
+<hr>
+  %if;(op_mz=2 and has_parents and (father.has_parents or mother.has_parents))
      <div class="collapse" id="collapseExample1">
-        %let;op_m;1%in;%include;modules/gr_parents
+        %let;op_m;%op_mg;%in;%include;modules/gr_parents
      </div>
   %end;
- <div class="row">
-    %(be carefull h1 is col-12 for full width then an opening <div class="col-8"> is inside personnal_data %)
-      %let;op_m;3%in;%include;modules/individu
-      %let;op_m;2%in;%include;modules/unions
-      %let;op_m;1%in;%include;modules/chronologie
-      %let;op_m;1%in;%include;modules/notes
-      %let;op_m;2%in;%include;modules/sources
-    %if;(p_mod="" or p_mod="zz")</div>%end; %( end of <div class="col-8"> from personnal_data %)
+
+%if;(op_mz=2)<hr>%end;
+  <div class="row">
+    <div class="col-8">
+      %let;op_m;%op_mi;%in;%include;modules/individu
+      %let;op_m;%op_mu%in;%include;modules/unions
+      %let;op_m;%op_mc;%in;%include;modules/chronologie
+      %let;op_m;%op_mn;%in;%include;modules/notes
+      %let;op_m;%op_ms;%in;%include;modules/sources
+    </div>
     <div class="col-4">
       %if;has_parents;
         <div class="collapse show" id="collapseExample2">
-          %let;op_m;2%in;%include;modules/arbre_3gen_photo
+          %let;op_m;%op_ma;%in;%include;modules/arbres
         </div>
       %end;
-      %let;op_m;1%in;%include;modules/fratrie
-      %let;op_m;1%in;%include;modules/relations
+      %let;op_m;%op_mf;%in;%include;modules/fratrie
+      %let;op_m;%op_mr;%in;%include;modules/relations
     </div>
   </div>
 %else;
   %(Dynamic %)
   %apply;init_cache(3, 2, 2)
   <div class="mt-2">
-    %for;i;0;p_mod_nbr;
-      %let;mmi;%apply;mm(i)%in;
-      %let;ooi;%apply;oo(i)%in;
-      %if;(mmi!="" and ooi!=0)
-        %apply;get_mod(mmi, ooi)
-      %end
+    %let;len;%apply;str_length(p_mod)%in;
+    %let;len2;%expr(len/2)%in;
+    %for;i;0;len2;
+      %let;module;%apply;substr(2*i,1,p_mod)%in;
+      %let;op_m;%apply;substr(2*i+1,1,p_mod)%in;
+      %if;(module="i")%include;modules/individu
+      %end;
+      %if;(module="p")%include;modules/parents
+      %end;
+      %if;(module="u")%include;modules/unions
+      %end;
+      %if;(module="f")%include;modules/fratrie
+      %end;
+      %if;(module="r")%include;modules/relations
+      %end;
+      %if;(module="c")%include;modules/chronologie
+      %end;
+      %if;(module="n")%include;modules/notes
+      %end;
+      %if;(module="s")%include;modules/sources
+      %end;
+      %if;(module="a")%include;modules/arbres
+      %end;
+      %if;(module="g")%include;modules/gr_parents
+      %end;
+      %if;(module="l")%include;modules/ligne
+      %end;
+      %if;(module="d")%include;modules/data_3col
+      %end;
     %end;
   </div>
 %end;

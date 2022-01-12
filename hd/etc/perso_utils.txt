@@ -859,14 +859,6 @@
   %if;(bvar.module_perso_ix="timeline")%incr_count;%end;
 %end;
 
-%reset_count;
-%if;(p_mod!="" and p_mod!="zz")
-  %for;i;0;26;
-    %apply;test_templ%with;%apply;letter(i)%end;
-  %end;
-%elseif;(bvar.module_perso_tplnb!="" and bvar.module_perso_tplnb>0)
-  %for;i;0;bvar.module_perso_tplnb;
-    %apply;test_templ(i)
-  %end;
+%define;time_l()
+  %if;("c" in p_mod)yes%else;no%end;
 %end;
-%let;timeline;%if;(count>0)yes%else;no%end;%in;

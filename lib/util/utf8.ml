@@ -26,6 +26,15 @@ let get s i =
     else loop (next s i) (pred k)
   in loop 0 i
 
+(** [Utf8.nb_utf8_char s n] returns the number of characters (not bytes) before index n
+    in string [s].
+*)
+let nb_utf8_char s n =
+  let rec loop i k =
+    if i = n then k
+    else loop (next s i) (succ k)
+  in loop 0 0
+
 (** Return the length (number of characters, not bytes)
     of the given string.
 *)
