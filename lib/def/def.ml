@@ -355,7 +355,7 @@ type base_notes =
   ; efiles : unit -> string list
   }
 
-(** Update database history *)
+(** Update modification used for history tracking *)
 type ('iper, 'person, 'family, 'string) base_changed =
     U_Add_person of ('iper, 'person, 'string) gen_person
   | U_Modify_person of
@@ -383,6 +383,8 @@ type ('iper, 'person, 'family, 'string) base_changed =
   | U_Add_parent of
       ('iper, 'person, 'string) gen_person * ('person, 'family, 'string) gen_family
   | U_Kill_ancestors of ('iper, 'person, 'string) gen_person
+  (* Modification U_Multi used when multiple persons are modified successively. Separation with U_Modify_person is necessary to inform foreign notify_change script
+     about database change without creating process for every person. *)
   | U_Multi of
       ('iper, 'person, 'string) gen_person * ('iper, 'person, 'string) gen_person * bool
   | U_Notes of int option * string

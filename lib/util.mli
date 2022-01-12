@@ -104,8 +104,11 @@ val is_hidden : person -> bool
 acccess returns empty person with giving id. *)
 val pget : config -> base -> iper -> person
 
+(** Remplaces string ids inside person's entry by real strings *)
 val string_gen_person :
   base -> (iper, iper, istr) gen_person -> (iper, iper, string) gen_person
+
+(** Remplaces string ids inside family's entry by real strings *)
 val string_gen_family :
   base -> (iper, ifam, istr) gen_family -> (iper, ifam, string) gen_family
 
