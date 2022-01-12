@@ -426,6 +426,7 @@ let compile_particles list =
     list
     |> List.map (fun s -> Re.str (tr '_' ' ' s))
     |> Re.alt
+    |> Re.longest
     |> Re.group
   in
   Re.(seq [ bos ; parts ; greedy (rep notnl) ])
