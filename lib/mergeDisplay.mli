@@ -4,9 +4,11 @@
 open Gwdb
 open Config
 
+(** Prints person's key on the socket *)
 val print_someone : config -> base -> person -> unit
 
 (** Displays a menu for merging two persons *)
 val print : config -> base -> person -> unit
 
+(** Prints link on the page to continue merging two persons (or two duplications). *)
 val print_possible_continue_merging : config -> base -> unit
