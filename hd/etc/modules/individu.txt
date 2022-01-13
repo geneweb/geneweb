@@ -69,8 +69,8 @@
       %end;
       <br>
     %end;
-    %if;(is_dead and computable_death_age)%death_age%end;
-    %if;(not is_dead and computable_age)%age;%end;
+    %if;(is_dead and computable_death_age)[*age at death][:] %death_age%end;
+    %if;(not is_dead and computable_age)[*age][:] %age;%end;
   %end;
 %end;
 
