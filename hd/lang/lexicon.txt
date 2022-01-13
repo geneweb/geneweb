@@ -4883,7 +4883,7 @@ co: ghjorni
 cs: dnů starý/dnů stará
 da: dage gammel
 de: Tage alt
-en: days old
+en: days
 eo: tagoj
 es: días
 et: päeva
@@ -8513,7 +8513,7 @@ co: menu d’un mese
 cs: méně než měsíc starý/méně než měsíc stará
 da: mindre end en måned gammel
 de: weniger als einen Monat alt
-en: less than one month old
+en: less than one month
 eo: malpli ol unu monato
 es: menos de un mes
 et: alla kuu vanune
@@ -9964,7 +9964,7 @@ co: mesi
 cs: měsíců starý/měsíců stará
 da: måneder gammel
 de: Monate alt
-en: months old
+en: months
 eo: monatoj
 es: meses
 et: kuud
@@ -11379,7 +11379,7 @@ co: un ghjornu fà
 cs: jeden den starý/jeden den stará
 da: en dag gammel
 de: einen Tag alt
-en: one day old
+en: one day
 eo: unu tago
 es: un día
 et: üks päev
@@ -11411,7 +11411,7 @@ co: un mese fà
 cs: jeden měsíc starý/jeden měsíc stará
 da: en måned gammel
 de: einen Monat alt
-en: one month old
+en: one month
 eo: unu monato
 es: un mes
 et: üks kuu
@@ -11443,7 +11443,7 @@ co: un annu fà
 cs: jeden rok starý/jeden rok stará
 da: et år gammel
 de: ein Jahr alt
-en: one year old
+en: one year
 eo: unu jaro
 es: un año
 et: üks aasta
@@ -16728,7 +16728,7 @@ co: anni
 cs: let
 da: år
 de: Jahre alt
-en: years old
+en: years
 eo: jaroj
 es: años
 et: aastat
