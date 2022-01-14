@@ -78,9 +78,9 @@
         <div class="ml-auto">
           <a role="button"
             href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%if;(evar.digest="")%suffix;%end;"
-            title="%if(evar.templ!="templm")templm%else;defaut template%end;">%nn;
+            title="%if(evar.templ!="templm")templm%else;default template%end;">%nn;
             <span class="fab fa-markdown" aria-hidden="true"></span>%nn;
-            <span class="sr-only">switch to %if(evar.templ!="templm")templm%else;defaut template%end;</span>%nn;
+            <span class="sr-only">switch to %if(evar.templ!="templm")templm%else;default template%end;</span>%nn;
           </a>
           GeneWeb v. %version;
         </div>

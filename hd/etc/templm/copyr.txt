@@ -40,7 +40,7 @@
 
 <div id="footer">
   <a href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%suffix;"
-     title="Switch to %if(evar.templ!="templm")template m%else;defaut template%end;">GeneWeb</a>
+     title="Switch to %if(evar.templ!="templm")template m%else;default template%end;">GeneWeb</a>
   v. %version;%sp;
   &copy; INRIA 1998-2016 %connections;%sq;
   <a href="https://github.com/geneweb/geneweb" target="_blank" title="GeneWeb sources on GitHub">
