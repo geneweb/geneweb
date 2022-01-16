@@ -33,11 +33,23 @@ val half : t -> t
 
 (** Tells if sosa number is even. Even numbers describe fathers, odd - mothers for each generation. *)
 val even : t -> bool
+
+(** Addition of sosa number with a integer *)
 val inc : t -> int -> t
+
+(** Multiply sosa number with an integer *)
 val mul : t -> int -> t
+
+(** The power of the sosa number *)
 val exp : t -> int -> t
+
+(** Divide sosa number by an integer *)
 val div : t -> int -> t
+
+(** Calculate module of sosa number comparing to integer *)
 val modl : t -> int -> t
+
+(** Retruns generation of sosa number. *)
 val gen : t -> int
 
 (** [branches sosa]
@@ -47,8 +59,13 @@ val gen : t -> int
 *)
 val branches : t -> int list
 
+(** Converts sosa from integer *)
 val of_int : int -> t
+
+(** Converts sosa from string *)
 val of_string : string -> t
+
+(** Converts sosa to string *)
 val to_string : t -> string
 
 (** See {!val:Mutil.string_of_int_sep} *)

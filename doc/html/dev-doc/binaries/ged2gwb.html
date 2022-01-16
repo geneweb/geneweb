@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ged2gwb &#8212; Geneweb 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="gwb2ged" href="gwb2ged.html" />
+    <link rel="prev" title="consang" href="consang.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="tex2jax_ignore mathjax_ignore section" id="ged2gwb">
+<h1>ged2gwb<a class="headerlink" href="#ged2gwb" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>Imports a GEDCOM 5.5.1 file to a Geneweb base. GEDCOM is a popular format
+among genealogy enthusiasts.
+<a class="reference external" href="http://www.ancestris.org/dl/ancestris/norme_gedcom/Gedcom_norm_551_2019_11_15.pdf">GEDCOM 5.5.1 documentation</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="n">geneweb</span><span class="o">.</span><span class="n">ged2gwb</span> <span class="p">[</span><span class="o">&lt;</span><span class="n">ged</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="n">where</span> <span class="n">options</span> <span class="n">are</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">charset</span> <span class="p">[</span><span class="n">ANSEL</span><span class="o">|</span><span class="n">ASCII</span><span class="o">|</span><span class="n">MSDOS</span><span class="p">]</span> <span class="n">Force</span> <span class="n">given</span> <span class="n">charset</span> <span class="n">decoding</span><span class="p">,</span> <span class="n">overriding</span> <span class="n">the</span> <span class="n">possible</span> <span class="n">setting</span> <span class="ow">in</span> <span class="n">GEDCOM</span>
+  <span class="o">-</span><span class="n">dates_dm</span> <span class="n">Interpret</span> <span class="n">months</span><span class="o">-</span><span class="n">numbered</span> <span class="n">dates</span> <span class="k">as</span> <span class="n">day</span><span class="o">/</span><span class="n">month</span><span class="o">/</span><span class="n">year</span>
+  <span class="o">-</span><span class="n">dates_md</span> <span class="n">Interpret</span> <span class="n">months</span><span class="o">-</span><span class="n">numbered</span> <span class="n">dates</span> <span class="k">as</span> <span class="n">month</span><span class="o">/</span><span class="n">day</span><span class="o">/</span><span class="n">year</span>
+  <span class="o">-</span><span class="n">ds</span> <span class="n">Set</span> <span class="n">the</span> <span class="n">source</span> <span class="n">field</span> <span class="k">for</span> <span class="n">persons</span> <span class="ow">and</span> <span class="n">families</span> <span class="n">without</span> <span class="n">source</span> <span class="n">data</span>
+  <span class="o">-</span><span class="n">efn</span> <span class="n">When</span> <span class="n">creating</span> <span class="n">a</span> <span class="n">person</span><span class="p">,</span> <span class="k">if</span> <span class="n">the</span> <span class="n">GEDCOM</span> <span class="n">first</span> <span class="n">name</span> <span class="n">part</span> <span class="n">holds</span> <span class="n">several</span> <span class="n">names</span><span class="p">,</span> <span class="n">the</span> <span class="n">first</span> <span class="n">of</span> <span class="n">this</span> <span class="n">names</span> <span class="n">becomes</span> <span class="n">the</span> <span class="n">person</span> <span class="s2">&quot;first name&quot;</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">complete</span> <span class="n">GEDCOM</span> <span class="n">first</span> <span class="n">name</span> <span class="n">part</span> <span class="n">a</span> <span class="s2">&quot;first name alias&quot;</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">epn</span> <span class="n">When</span> <span class="n">creating</span> <span class="n">a</span> <span class="n">person</span><span class="p">,</span> <span class="k">if</span> <span class="n">the</span> <span class="n">GEDCOM</span> <span class="n">first</span> <span class="n">name</span> <span class="n">part</span> <span class="n">looks</span> <span class="n">like</span> <span class="n">a</span> <span class="n">public</span> <span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">holds</span><span class="p">:</span>
+<span class="o">*</span> <span class="n">a</span> <span class="n">number</span> <span class="ow">or</span> <span class="n">a</span> <span class="n">roman</span> <span class="n">number</span><span class="p">,</span> <span class="n">supposed</span> <span class="n">to</span> <span class="n">be</span> <span class="n">a</span> <span class="n">number</span> <span class="n">of</span> <span class="n">a</span> <span class="n">nobility</span> <span class="n">title</span><span class="p">,</span>
+<span class="o">*</span> <span class="n">one</span> <span class="n">of</span> <span class="n">the</span> <span class="n">words</span><span class="p">:</span> <span class="s2">&quot;der&quot;</span><span class="p">,</span> <span class="s2">&quot;den&quot;</span><span class="p">,</span> <span class="s2">&quot;die&quot;</span><span class="p">,</span> <span class="s2">&quot;el&quot;</span><span class="p">,</span> <span class="s2">&quot;le&quot;</span><span class="p">,</span> <span class="s2">&quot;la&quot;</span><span class="p">,</span> <span class="s2">&quot;the&quot;</span><span class="p">,</span> <span class="n">supposed</span> <span class="n">to</span> <span class="n">be</span> <span class="n">the</span> <span class="n">beginning</span> <span class="n">of</span> <span class="n">a</span> <span class="n">qualifier</span><span class="p">,</span> <span class="n">then</span> <span class="n">the</span> <span class="n">GEDCOM</span> <span class="n">first</span> <span class="n">name</span> <span class="n">part</span> <span class="n">becomes</span> <span class="n">the</span> <span class="n">person</span> <span class="s2">&quot;public name&quot;</span> <span class="ow">and</span> <span class="n">its</span> <span class="n">first</span> <span class="n">word</span> <span class="n">his</span> <span class="s2">&quot;first name&quot;</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">f</span> <span class="n">Remove</span> <span class="n">database</span> <span class="k">if</span> <span class="n">already</span> <span class="n">existing</span>
+  <span class="o">-</span><span class="n">fne</span> <span class="o">&lt;</span><span class="n">be</span><span class="o">&gt;</span> <span class="n">When</span> <span class="n">creating</span> <span class="n">a</span> <span class="n">person</span><span class="p">,</span> <span class="k">if</span> <span class="n">the</span> <span class="n">GEDCOM</span> <span class="n">first</span> <span class="n">name</span> <span class="n">part</span> <span class="n">holds</span> <span class="n">a</span> <span class="n">part</span> <span class="n">between</span> <span class="s1">&#39;b&#39;</span> <span class="p">(</span><span class="nb">any</span> <span class="n">character</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;e&#39;</span> <span class="p">(</span><span class="nb">any</span> <span class="n">character</span><span class="p">),</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">considered</span> <span class="n">to</span> <span class="n">be</span> <span class="n">the</span> <span class="n">usual</span> <span class="n">first</span> <span class="n">name</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="o">-</span><span class="n">fne</span> <span class="s1">&#39;&quot;&quot;&#39;</span> <span class="ow">or</span> <span class="o">-</span><span class="n">fne</span> <span class="s2">&quot;()&quot;</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">lf</span> <span class="n">Convert</span> <span class="n">first</span> <span class="n">names</span> <span class="n">to</span> <span class="n">lowercase</span> <span class="n">letters</span><span class="p">,</span> <span class="k">with</span> <span class="n">initials</span> <span class="ow">in</span> <span class="n">uppercase</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">log</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span> <span class="n">Redirect</span> <span class="n">log</span> <span class="n">trace</span> <span class="n">to</span> <span class="n">this</span> <span class="n">file</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">ls</span> <span class="n">Convert</span> <span class="n">surnames</span> <span class="n">to</span> <span class="n">lowercase</span> <span class="n">letters</span><span class="p">,</span> <span class="k">with</span> <span class="n">initials</span> <span class="ow">in</span> <span class="n">uppercase</span><span class="o">.</span> <span class="n">Try</span> <span class="n">to</span> <span class="n">keep</span> <span class="n">lowercase</span> <span class="n">particles</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">nc</span> <span class="n">No</span> <span class="n">consistency</span> <span class="n">check</span>
+  <span class="o">-</span><span class="n">no_efn</span> <span class="n">Cancels</span> <span class="n">the</span> <span class="n">previous</span> <span class="n">option</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">no_epn</span> <span class="n">Cancels</span> <span class="n">the</span> <span class="n">previous</span> <span class="n">option</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">no_nd</span> <span class="n">Don</span><span class="s1">&#39;t interpret a year preceded by a minus sign as a negative year</span>
+  <span class="o">-</span><span class="n">no_pit</span> <span class="n">Do</span> <span class="ow">not</span> <span class="n">consider</span> <span class="n">persons</span> <span class="n">having</span> <span class="n">titles</span> <span class="k">as</span> <span class="n">public</span>
+  <span class="o">-</span><span class="n">nopicture</span> <span class="n">Don</span><span class="s1">&#39;t extract individual picture.</span>
+  <span class="o">-</span><span class="n">o</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span> <span class="n">Output</span> <span class="n">database</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">particles</span> <span class="o">&lt;</span><span class="n">FILE</span><span class="o">&gt;</span> <span class="n">Use</span> <span class="n">the</span> <span class="n">given</span> <span class="n">file</span> <span class="k">as</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">particles</span>
+  <span class="o">-</span><span class="n">rs_no_mention</span> <span class="n">Force</span> <span class="n">relation</span> <span class="n">status</span> <span class="n">to</span> <span class="n">NoMention</span> <span class="p">(</span><span class="n">default</span> <span class="ow">is</span> <span class="n">Married</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">tnd</span> <span class="n">Set</span> <span class="n">negative</span> <span class="n">dates</span> <span class="n">when</span> <span class="n">inconsistency</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">birth</span> <span class="n">after</span> <span class="n">death</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">trackid</span> <span class="n">Print</span> <span class="n">gedcom</span> <span class="nb">id</span> <span class="n">to</span> <span class="n">gw</span> <span class="nb">id</span> <span class="n">matches</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">udi</span> <span class="n">x</span><span class="o">-</span><span class="n">y</span> <span class="n">Set</span> <span class="n">the</span> <span class="n">interval</span> <span class="k">for</span> <span class="n">persons</span> <span class="n">whose</span> <span class="n">death</span> <span class="n">part</span> <span class="ow">is</span> <span class="n">undefined</span><span class="p">:</span>
+       <span class="o">-</span> <span class="k">if</span> <span class="n">before</span> <span class="n">x</span> <span class="n">years</span><span class="p">,</span> <span class="n">they</span> <span class="n">are</span> <span class="n">considered</span> <span class="k">as</span> <span class="n">alive</span>
+       <span class="o">-</span> <span class="k">if</span> <span class="n">after</span> <span class="n">y</span> <span class="n">year</span><span class="p">,</span> <span class="n">they</span> <span class="n">are</span> <span class="n">considered</span> <span class="k">as</span> <span class="n">death</span>
+       <span class="o">-</span> <span class="n">between</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">y</span> <span class="n">year</span><span class="p">,</span> <span class="n">they</span> <span class="n">are</span> <span class="n">considered</span> <span class="k">as</span> <span class="s2">&quot;don&#39;t know&quot;</span>
+       <span class="n">Default</span> <span class="n">x</span> <span class="ow">is</span> <span class="mi">80</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="mi">120</span>
+  <span class="o">-</span><span class="n">uin</span> <span class="n">Put</span> <span class="n">untreated</span> <span class="n">GEDCOM</span> <span class="n">tags</span> <span class="ow">in</span> <span class="n">notes</span>
+  <span class="o">-</span><span class="n">us</span> <span class="n">Convert</span> <span class="n">surnames</span> <span class="n">to</span> <span class="n">uppercase</span> <span class="n">letters</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Depends on the library <code class="docutils literal notranslate"><span class="pre">gwexport</span></code>.</p>
+</div>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Geneweb</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation/index.html">Installation procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html">Project binaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/index.html">Documentation API</a></li>
+
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Developer documentation</a><ul>
+  <li><a href="../overview/index.html">Overview</a><ul>
+  <li><a href="official_binaries.html">Official binaries</a><ul>
+      <li>Previous: <a href="consang.html" title="previous chapter">consang</a></li>
+      <li>Next: <a href="gwb2ged.html" title="next chapter">gwb2ged</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021-2022, OCamlPro.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/dev-doc/binaries/ged2gwb.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

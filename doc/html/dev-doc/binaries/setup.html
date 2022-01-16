@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>setup &#8212; Geneweb 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="update_nldb" href="update_nldb.html" />
+    <link rel="prev" title="gwu" href="gwu.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="tex2jax_ignore mathjax_ignore section" id="setup">
+<h1>setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h1>
+<p>The database setup portal. It depends on <code class="docutils literal notranslate"><span class="pre">wserver</span></code>, a library defined in <code class="docutils literal notranslate"><span class="pre">bin/</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="n">setup</span><span class="o">.</span><span class="n">exe</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="n">where</span> <span class="n">options</span> <span class="n">are</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">bd</span> <span class="o">&lt;</span><span class="nb">dir</span><span class="o">&gt;</span><span class="p">:</span> <span class="n">Directory</span> <span class="n">where</span> <span class="n">the</span> <span class="n">databases</span> <span class="n">are</span> <span class="n">installed</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">gwd_p</span> <span class="o">&lt;</span><span class="n">number</span><span class="o">&gt;</span><span class="p">:</span> <span class="n">Specify</span> <span class="n">the</span> <span class="n">port</span> <span class="n">number</span> <span class="n">of</span> <span class="n">gwd</span> <span class="p">(</span><span class="n">default</span> <span class="o">=</span> <span class="mi">2317</span><span class="p">);</span> <span class="o">&gt;</span> <span class="mi">1024</span> <span class="k">for</span> <span class="n">normal</span> <span class="n">users</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">lang</span> <span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">:</span> <span class="n">default</span> <span class="n">lang</span>
+  <span class="o">-</span><span class="n">daemon</span> <span class="p">:</span> <span class="n">Unix</span> <span class="n">daemon</span> <span class="n">mode</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">p</span> <span class="o">&lt;</span><span class="n">number</span><span class="o">&gt;</span><span class="p">:</span> <span class="n">Select</span> <span class="n">a</span> <span class="n">port</span> <span class="n">number</span> <span class="p">(</span><span class="n">default</span> <span class="o">=</span> <span class="mi">2316</span><span class="p">);</span> <span class="o">&gt;</span> <span class="mi">1024</span> <span class="k">for</span> <span class="n">normal</span> <span class="n">users</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">only</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">:</span> <span class="n">File</span> <span class="n">containing</span> <span class="n">the</span> <span class="n">only</span> <span class="n">authorized</span> <span class="n">address</span>
+  <span class="o">-</span><span class="n">gd</span> <span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">:</span> <span class="n">gwsetup</span> <span class="n">directory</span>
+  <span class="o">-</span><span class="n">bindir</span> <span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">:</span> <span class="n">binary</span> <span class="n">directory</span> <span class="p">(</span><span class="n">default</span> <span class="o">=</span> <span class="n">value</span> <span class="n">of</span> <span class="n">option</span> <span class="o">-</span><span class="n">gd</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Geneweb</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation/index.html">Installation procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../geneweb-lib/index.html">Geneweb library overview</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Project binaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/index.html">Documentation API</a></li>
+
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Developer documentation</a><ul>
+  <li><a href="index.html">Project binaries</a><ul>
+  <li><a href="official_binaries.html">Official binaries</a><ul>
+      <li>Previous: <a href="gwu.html" title="previous chapter">gwu</a></li>
+      <li>Next: <a href="update_nldb.html" title="next chapter">update_nldb</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021-2022, OCamlPro.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/dev-doc/binaries/setup.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

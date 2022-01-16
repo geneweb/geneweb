@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gwd &#8212; Geneweb 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="gwdiff" href="gwdiff.html" />
+    <link rel="prev" title="gwc" href="gwc.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="tex2jax_ignore mathjax_ignore section" id="gwd">
+<h1>gwd<a class="headerlink" href="#gwd" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>The main web-server for geneweb. It depends on <code class="docutils literal notranslate"><span class="pre">wserver</span></code>, a library defined in <code class="docutils literal notranslate"><span class="pre">bin/</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="n">gwd</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="n">where</span> <span class="n">options</span> <span class="n">are</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">a</span> <span class="o">&lt;</span><span class="n">ADDRESS</span><span class="o">&gt;</span>           <span class="n">Select</span> <span class="n">a</span> <span class="n">specific</span> <span class="n">address</span> <span class="p">(</span><span class="n">default</span> <span class="o">=</span> <span class="nb">any</span> <span class="n">address</span> <span class="n">of</span> <span class="n">this</span> <span class="n">computer</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">add_lexicon</span> <span class="o">&lt;</span><span class="n">FILE</span><span class="o">&gt;</span>    <span class="n">Add</span> <span class="n">file</span> <span class="k">as</span> <span class="n">lexicon</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">allowed_tags</span> <span class="o">&lt;</span><span class="n">FILE</span><span class="o">&gt;</span>   <span class="n">HTML</span> <span class="n">tags</span> <span class="n">which</span> <span class="n">are</span> <span class="n">allowed</span> <span class="n">to</span> <span class="n">be</span> <span class="n">displayed</span><span class="o">.</span> <span class="n">One</span> <span class="n">tag</span> <span class="n">per</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">auth</span> <span class="o">&lt;</span><span class="n">FILE</span><span class="o">&gt;</span>           <span class="n">Authorization</span> <span class="n">file</span> <span class="n">to</span> <span class="n">restrict</span> <span class="n">access</span><span class="o">.</span> <span class="n">The</span> <span class="n">file</span> <span class="n">must</span> <span class="n">hold</span> <span class="n">lines</span> <span class="n">of</span> <span class="n">the</span> <span class="n">form</span> <span class="s2">&quot;user:password&quot;</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">bd</span> <span class="o">&lt;</span><span class="n">DIR</span><span class="o">&gt;</span>              <span class="n">Directory</span> <span class="n">where</span> <span class="n">the</span> <span class="n">databases</span> <span class="n">are</span> <span class="n">installed</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">blang</span>                 <span class="n">Select</span> <span class="n">the</span> <span class="n">user</span> <span class="n">browser</span> <span class="n">language</span> <span class="k">if</span> <span class="nb">any</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">cache_langs</span>           <span class="n">Lexicon</span> <span class="n">languages</span> <span class="n">to</span> <span class="n">be</span> <span class="n">cached</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">cgi</span>                   <span class="n">Force</span> <span class="n">CGI</span> <span class="n">mode</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">conn_tmout</span> <span class="o">&lt;</span><span class="n">SEC</span><span class="o">&gt;</span>      <span class="n">Connection</span> <span class="n">timeout</span> <span class="p">(</span><span class="n">default</span> <span class="mi">120</span><span class="n">s</span><span class="p">;</span> <span class="mi">0</span> <span class="n">means</span> <span class="n">no</span> <span class="n">limit</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">daemon</span>                <span class="n">Unix</span> <span class="n">daemon</span> <span class="n">mode</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">debug</span>                 <span class="n">Enable</span> <span class="n">debug</span> <span class="n">mode</span>
+  <span class="o">-</span><span class="n">digest</span>                <span class="n">Use</span> <span class="n">Digest</span> <span class="n">authorization</span> <span class="n">scheme</span> <span class="p">(</span><span class="n">more</span> <span class="n">secure</span> <span class="n">on</span> <span class="n">passwords</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">friend</span> <span class="o">&lt;</span><span class="n">PASSWD</span><span class="o">&gt;</span>       <span class="n">Set</span> <span class="n">a</span> <span class="n">friend</span> <span class="n">password</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">hd</span> <span class="o">&lt;</span><span class="n">DIR</span><span class="o">&gt;</span>              <span class="n">Directory</span> <span class="n">where</span> <span class="n">the</span> <span class="n">directory</span> <span class="n">lang</span> <span class="ow">is</span> <span class="n">installed</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">images_dir</span> <span class="o">&lt;</span><span class="n">DIR</span><span class="o">&gt;</span>      <span class="n">Same</span> <span class="n">than</span> <span class="n">previous</span> <span class="n">but</span> <span class="n">directory</span> <span class="n">name</span> <span class="n">relative</span> <span class="n">to</span> <span class="n">current</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">images_url</span> <span class="o">&lt;</span><span class="n">URL</span><span class="o">&gt;</span>      <span class="n">URL</span> <span class="k">for</span> <span class="n">GeneWeb</span> <span class="n">images</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">gwd</span> <span class="n">send</span> <span class="n">them</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">lang</span> <span class="o">&lt;</span><span class="n">LANG</span><span class="o">&gt;</span>           <span class="n">Set</span> <span class="n">a</span> <span class="n">default</span> <span class="n">language</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">fr</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">log</span> <span class="o">&lt;</span><span class="n">FILE</span><span class="o">&gt;</span>            <span class="n">Log</span> <span class="n">trace</span> <span class="n">to</span> <span class="n">this</span> <span class="n">file</span><span class="o">.</span> <span class="n">Use</span> <span class="s2">&quot;-&quot;</span> <span class="ow">or</span> <span class="s2">&quot;&lt;stdout&gt;&quot;</span> <span class="n">to</span> <span class="n">redirect</span> <span class="n">output</span> <span class="n">to</span> <span class="n">stdout</span> <span class="ow">or</span> <span class="s2">&quot;&lt;stderr&gt;&quot;</span> <span class="n">to</span> <span class="n">output</span> <span class="n">log</span> <span class="n">to</span> <span class="n">stderr</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">log_level</span> <span class="o">&lt;</span><span class="n">N</span><span class="o">&gt;</span>         <span class="n">Send</span> <span class="n">messages</span> <span class="k">with</span> <span class="n">severity</span> <span class="o">&lt;=</span> <span class="o">&lt;</span><span class="n">N</span><span class="o">&gt;</span> <span class="n">to</span> <span class="n">syslog</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="mi">7</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">login_tmout</span> <span class="o">&lt;</span><span class="n">SEC</span><span class="o">&gt;</span>     <span class="n">Login</span> <span class="n">timeout</span> <span class="k">for</span> <span class="n">entries</span> <span class="k">with</span> <span class="n">passwords</span> <span class="ow">in</span> <span class="n">CGI</span> <span class="n">mode</span> <span class="p">(</span><span class="n">default</span> <span class="mi">1800</span><span class="n">s</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">max_clients</span> <span class="o">&lt;</span><span class="n">NUM</span><span class="o">&gt;</span>     <span class="n">Max</span> <span class="n">number</span> <span class="n">of</span> <span class="n">clients</span> <span class="n">treated</span> <span class="n">at</span> <span class="n">the</span> <span class="n">same</span> <span class="n">time</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">no</span> <span class="n">limit</span><span class="p">)</span> <span class="p">(</span><span class="ow">not</span> <span class="n">cgi</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">min_disp_req</span>          <span class="n">Minimum</span> <span class="n">number</span> <span class="n">of</span> <span class="n">requests</span> <span class="ow">in</span> <span class="n">robot</span> <span class="n">trace</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="mi">6</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">no_host_address</span>       <span class="n">Force</span> <span class="n">no</span> <span class="n">reverse</span> <span class="n">host</span> <span class="n">by</span> <span class="n">address</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">nolock</span>                <span class="n">Do</span> <span class="ow">not</span> <span class="n">lock</span> <span class="n">files</span> <span class="n">before</span> <span class="n">writing</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">only</span> <span class="o">&lt;</span><span class="n">ADDRESS</span><span class="o">&gt;</span>        <span class="n">Only</span> <span class="n">inet</span> <span class="n">address</span> <span class="n">accepted</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">p</span> <span class="o">&lt;</span><span class="n">NUMBER</span><span class="o">&gt;</span>            <span class="n">Select</span> <span class="n">a</span> <span class="n">port</span> <span class="n">number</span> <span class="p">(</span><span class="n">default</span> <span class="o">=</span> <span class="mi">2317</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">plugin</span> <span class="o">&lt;</span><span class="n">PLUGIN</span><span class="o">&gt;.</span><span class="n">cmxs</span>  <span class="n">load</span> <span class="n">a</span> <span class="n">safe</span> <span class="n">plugin</span><span class="o">.</span> <span class="n">Combine</span> <span class="k">with</span> <span class="o">-</span><span class="n">force</span> <span class="n">to</span> <span class="n">enable</span> <span class="k">for</span> <span class="n">every</span> <span class="n">base</span><span class="o">.</span> <span class="n">Combine</span> <span class="k">with</span> <span class="o">-</span><span class="n">unsafe</span> <span class="n">to</span> <span class="n">allow</span> <span class="n">unverified</span> <span class="n">plugins</span><span class="o">.</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="s2">&quot;-plugin -unsafe -force&quot;</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">plugins</span> <span class="o">&lt;</span><span class="n">DIR</span><span class="o">&gt;</span>         <span class="n">load</span> <span class="nb">all</span> <span class="n">plugins</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">DIR</span><span class="o">&gt;.</span> <span class="n">Combine</span> <span class="k">with</span> <span class="o">-</span><span class="n">force</span> <span class="n">to</span> <span class="n">enable</span> <span class="k">for</span> <span class="n">every</span> <span class="n">base</span><span class="o">.</span> <span class="n">Combine</span> <span class="k">with</span> <span class="o">-</span><span class="n">unsafe</span> <span class="n">to</span> <span class="n">allow</span> <span class="n">unverified</span> <span class="n">plugins</span><span class="o">.</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="s2">&quot;-plugins -unsafe -force&quot;</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">redirect</span> <span class="o">&lt;</span><span class="n">ADDR</span><span class="o">&gt;</span>       <span class="n">Send</span> <span class="n">a</span> <span class="n">message</span> <span class="n">to</span> <span class="n">say</span> <span class="n">that</span> <span class="n">this</span> <span class="n">service</span> <span class="n">has</span> <span class="n">been</span> <span class="n">redirected</span> <span class="n">to</span> <span class="o">&lt;</span><span class="n">ADDR</span><span class="o">&gt;.</span>
+  <span class="o">-</span><span class="n">robot_xcl</span> <span class="o">&lt;</span><span class="n">CNT</span><span class="o">&gt;</span><span class="p">,</span><span class="o">&lt;</span><span class="n">SEC</span><span class="o">&gt;</span> <span class="n">Exclude</span> <span class="n">connections</span> <span class="n">when</span> <span class="n">more</span> <span class="n">than</span> <span class="o">&lt;</span><span class="n">CNT</span><span class="o">&gt;</span> <span class="n">requests</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">SEC</span><span class="o">&gt;</span> <span class="n">seconds</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">setup_link</span>            <span class="n">Display</span> <span class="n">a</span> <span class="n">link</span> <span class="n">to</span> <span class="n">local</span> <span class="n">gwsetup</span> <span class="ow">in</span> <span class="n">bottom</span> <span class="n">of</span> <span class="n">pages</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">trace_failed_passwd</span>   <span class="n">Print</span> <span class="n">the</span> <span class="n">failed</span> <span class="n">passwords</span> <span class="ow">in</span> <span class="n">log</span> <span class="p">(</span><span class="k">except</span> <span class="k">if</span> <span class="n">option</span> <span class="o">-</span><span class="n">digest</span> <span class="ow">is</span> <span class="nb">set</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">wd</span> <span class="o">&lt;</span><span class="n">DIR</span><span class="o">&gt;</span>              <span class="n">Directory</span> <span class="k">for</span> <span class="n">socket</span> <span class="n">communication</span> <span class="p">(</span><span class="n">Windows</span><span class="p">)</span> <span class="ow">and</span> <span class="n">access</span> <span class="n">count</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">wizard</span> <span class="o">&lt;</span><span class="n">PASSWD</span><span class="o">&gt;</span>       <span class="n">Set</span> <span class="n">a</span> <span class="n">wizard</span> <span class="n">password</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">wjf</span>                   <span class="n">Wizard</span> <span class="n">just</span> <span class="n">friend</span> <span class="p">(</span><span class="n">permanently</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>It is build from eight files: <code class="docutils literal notranslate"><span class="pre">gwdLog.ml</span></code>, <code class="docutils literal notranslate"><span class="pre">gwdPlugin.ml</span></code>, <code class="docutils literal notranslate"><span class="pre">request.ml</span></code> (these
+three files define <code class="docutils literal notranslate"><span class="pre">geneweb.gwd_lib</span></code>),, <code class="docutils literal notranslate"><span class="pre">gwdPluginDep.ml</span></code>,
+<code class="docutils literal notranslate"><span class="pre">gwdPluginMD5.ml</span></code>, <code class="docutils literal notranslate"><span class="pre">gwdPluginMETA.ml</span></code>, <code class="docutils literal notranslate"><span class="pre">robot.ml</span></code> and <code class="docutils literal notranslate"><span class="pre">gwd.ml</span></code>.</p>
+<div class="section" id="gwdlog-module">
+<h3>GwdLog module<a class="headerlink" href="#gwdlog-module" title="Permalink to this headline">¶</a></h3>
+<p>Util functions for logging errors &amp; infos.</p>
+</div>
+<div class="section" id="gwdplugin-module">
+<h3>GwdPlugin module<a class="headerlink" href="#gwdplugin-module" title="Permalink to this headline">¶</a></h3>
+<p>Module used for registering plug-ins to Gwd.</p>
+</div>
+<div class="section" id="request-module">
+<h3>Request module<a class="headerlink" href="#request-module" title="Permalink to this headline">¶</a></h3>
+<p>The main interface between the Geneweb core and the rest of the world.</p>
+</div>
+<div class="section" id="gedplugindep-module">
+<h3>GedPluginDep module<a class="headerlink" href="#gedplugindep-module" title="Permalink to this headline">¶</a></h3>
+<p>Calculates the load order of the different plugins.</p>
+</div>
+<div class="section" id="gwdpluginmd5-module">
+<h3>GwdPluginMD5 module<a class="headerlink" href="#gwdpluginmd5-module" title="Permalink to this headline">¶</a></h3>
+<p>Checks the plugins .cmxs files and assets did not change since compilation.
+This module is written by mk_gwdPluginMD5.ml. After the plug-ins have been compiled,
+mk_gwdPluginMD5.ml lists them in a pattern matching with their MD5 hash.</p>
+</div>
+<div class="section" id="gwdpluginmeta-module">
+<h3>GwdPluginMETA module<a class="headerlink" href="#gwdpluginmeta-module" title="Permalink to this headline">¶</a></h3>
+<p>Handles the metadata of a plug-in: its version, its mainteners’ list and
+its dependencies.
+Metadata is optional, and may contain the dependencies of the plugin (separated
+by a comma), its maintainers (separated by a comma) and its version.</p>
+</div>
+<div class="section" id="robot-module">
+<h3>Robot module<a class="headerlink" href="#robot-module" title="Permalink to this headline">¶</a></h3>
+<p>Handles the connection of robots to the server.</p>
+</div>
+<div class="section" id="gwd-module">
+<h3>Gwd module<a class="headerlink" href="#gwd-module" title="Permalink to this headline">¶</a></h3>
+<p>The executable</p>
+</div>
+</div>
+<div class="section" id="requests">
+<h2>Requests<a class="headerlink" href="#requests" title="Permalink to this headline">¶</a></h2>
+<p>Gwd displays different web pages and perform different actions given a mode.
+This mode is given as a GET argument with the key <code class="docutils literal notranslate"><span class="pre">m</span></code>.</p>
+<p>Here is a quick documentation of each mode.</p>
+<ul class="simple">
+<li><p>No mode: displays the default page depending on other arguments. It can be
+the index page (no base selected), a welcome page (only a base has been
+selected) or a person page (a base and a person has been selected).</p></li>
+<li><p>Mode “A”: displays the ascendants of the selected person (selection key is <code class="docutils literal notranslate"><span class="pre">i</span></code>).</p></li>
+<li><p>Mode “ADD_FAM”: displays the form for adding families.</p></li>
+<li><p>Mode “ADD_FAM_OK”: requests to add a new family.</p></li>
+<li><p>Mode “ADD_IND”: displays a form for adding a new person</p></li>
+<li><p>Mode “ADD_IND_OK”: requests to add a new person.</p></li>
+<li><p>Mode “ADD_PAR”: associate parents to a person (person identifier must be set
+with key <code class="docutils literal notranslate"><span class="pre">ip</span></code>)</p></li>
+<li><p>Mode “ADD_PAR_OK” : requests to add new parents.</p></li>
+<li><p>Mode “ANM” : displays the menu of anniversaries modification</p></li>
+<li><p>Mode “AN” : displays anniversaries ; with the <code class="docutils literal notranslate"><span class="pre">v</span></code> key for months, displays
+the anniversaries of thay month (v=1 -&gt; January, …)</p></li>
+<li><p>Mode “AD”: displays death anniversaries ; with the <code class="docutils literal notranslate"><span class="pre">v</span></code> key for months, displays
+the anniversaries of thay month (v=1 -&gt; January, …)</p></li>
+<li><p>Mode “AM”: displays marriage anniversaries ; with the <code class="docutils literal notranslate"><span class="pre">v</span></code> key for months, displays
+the anniversaries of thay month (v=1 -&gt; January, …)</p></li>
+<li><p>Mode “AS_OK”: displays the results of an advanced search</p></li>
+<li><p>Mode “C”: displays the cousins menu</p></li>
+<li><p>Mode “CAL”: displays the calendars; if no key set, it will use today’s date.</p></li>
+<li><p>Mode “CHG_CHN”: displays the form for changing children names of a person</p></li>
+<li><p>Mode “CHG_CHN_OK”: requests to change the children names a new person.</p></li>
+<li><p>Mode “CHG_EVT_IND_ORD”: displays the form for changing the order of events
+for a person</p></li>
+<li><p>Mode “CHG_EVT_IND_ORD_OK”: requests to change the evenement order of a
+person.</p></li>
+<li><p>Mode “CHG_EVT_FAM_ORD”: displays the form for changing the order of events
+for a family</p></li>
+<li><p>Mode “CHG_EVT_FAM_ORD_OK”: requests to change the evenement order of a
+family.</p></li>
+<li><p>Mode “CHG_FAM_ORD”: displays a menu to change the family order</p></li>
+<li><p>Mode “CHG_FAM_ORD_OK”: requests the family order change</p></li>
+<li><p>Mode “CONN_WIZ”: displays the connected wizards (the base admins)</p></li>
+<li><p>Mode “D”: displays the descendants of the selected person (selection key is <code class="docutils literal notranslate"><span class="pre">i</span></code>).</p></li>
+<li><p>Mode “DAG”: displays a relationship graph.</p></li>
+<li><p>Mode “DEL_FAM”: displays a page for validating the deletion of the family in
+argument (key is <code class="docutils literal notranslate"><span class="pre">i</span></code>).</p></li>
+<li><p>Mode “DEL_FAM_OK”: requests to remove a family.</p></li>
+<li><p>Mode “DEL_IND”: displays a page for validating the deletion of the person in
+argument (key is <code class="docutils literal notranslate"><span class="pre">i</span></code>).</p></li>
+<li><p>Mode “DEL_IND_OK”: requests to remove a person.</p></li>
+<li><p>Mode “F”: displays the family tree.</p></li>
+<li><p>Mode “H”: displays the file <code class="docutils literal notranslate"><span class="pre">fname.txt</span></code> where <code class="docutils literal notranslate"><span class="pre">fname</span></code> is register with the key
+<code class="docutils literal notranslate"><span class="pre">v</span></code> and the file being in <code class="docutils literal notranslate"><span class="pre">hd/etc</span></code> (<code class="docutils literal notranslate"><span class="pre">hd</span></code> is the dir specified by option <code class="docutils literal notranslate"><span class="pre">-hd</span></code>).</p></li>
+<li><p>Mode “HIST”: displays an history of updates.</p></li>
+<li><p>Mode “HIST_CLEAN”: displays the history list associated to the history file
+in argument (key is <code class="docutils literal notranslate"><span class="pre">f</span></code>).</p></li>
+<li><p>Mode “HIST_CLEAN_OK”: requests to clean the history associated to the history
+file in argument</p></li>
+<li><p>Mode “HIST_DIFF”: displays the page that allows to select (with variable
+<code class="docutils literal notranslate"><span class="pre">t</span> <span class="pre">=</span> <span class="pre">&quot;SUM&quot;</span></code>) and to view (with variable <code class="docutils literal notranslate"><span class="pre">t</span> <span class="pre">=</span> <span class="pre">&quot;DIFF&quot;</span></code>) the difference
+between all revisions of history file of concerned person in variable <code class="docutils literal notranslate"><span class="pre">f</span></code>.
+Intepretate the template file <code class="docutils literal notranslate"><span class="pre">updhist_diff.txt</span></code></p></li>
+<li><p>Mode “HIST_SEARCH”: same as “HIST”, but with a default search</p></li>
+<li><p>Mode “IM”: displays the image whose name is in argument (key is <code class="docutils literal notranslate"><span class="pre">s</span></code>)</p></li>
+<li><p>Mode “IMH”: same than “IM”, but returns HTML</p></li>
+<li><p>Mode “INV_FAM”: displays a menu for inverting the order of two families (where
+a family is given by the <code class="docutils literal notranslate"><span class="pre">f</span></code> key and the individual is given by the <code class="docutils literal notranslate"><span class="pre">i</span></code> key).</p></li>
+<li><p>Mode “INV_FAM_OK”: requests to reverse the families.</p></li>
+<li><p>Mode “KILL_ANC”: Undocumented feature; kill someone’s ancestors.</p></li>
+<li><p>Mode “LB”: lists the last births.</p></li>
+<li><p>Mode “LD”: lists the last deaths.</p></li>
+<li><p>Mode “LINKED”: displays links to pages assocaited to an individual.</p></li>
+<li><p>Mode “LL”: lists the persons who lived the longest.</p></li>
+<li><p>Mode “LM”: lists the last marriages.</p></li>
+<li><p>Mode “MISC_NOTES”: displays a menu to search in notes.</p></li>
+<li><p>Mode “MISC_NOTES_SEARCH”: same as “MISC_NOTES”, but with a search argument
+(key is <code class="docutils literal notranslate"><span class="pre">s</span></code>)</p></li>
+<li><p>Mode “MOD_DATA”: displays a menu for updating Geneweb’s dictionary of names,
+last names, locations, sources and professions.</p></li>
+<li><p>Mode “MOD_DATA_OK”: requests a data modification.</p></li>
+<li><p>Mode “MOD_FAM”: displays a form for updating a family (key is <code class="docutils literal notranslate"><span class="pre">i</span></code>).</p></li>
+<li><p>Mode “MOD_FAM_OK”: requests a family modification.</p></li>
+<li><p>Mode “MOD_IND”:  displays a form for updating a person (key is <code class="docutils literal notranslate"><span class="pre">i</span></code>).</p></li>
+<li><p>Mode “MOD_IND_OK”: requests a person modification.</p></li>
+<li><p>Mode “MOD_NOTES”: displays a text form for writing notes.</p></li>
+<li><p>Mode “MOD_NOTES_OK”: requests a note update.</p></li>
+<li><p>Mode “MOD_WIZNOTES”: displays the HTML page for editing wizard notes.
+Fails if wizard authentification is incorrect or if current user cannot
+edit.</p></li>
+<li><p>Mode “MOD_WIZNOTES_OK”: requests the wizard note modification.</p></li>
+<li><p>Mode “MRG”: displays a menu for merging two persons
+(key for persons is <code class="docutils literal notranslate"><span class="pre">i</span></code>).</p></li>
+<li><p>Mode “MRG_DUP”: displays a menu for merging possible duplications of persons
+(key for persons is <code class="docutils literal notranslate"><span class="pre">ip</span></code>).</p></li>
+<li><p>Mode “MRG_DUP_IND_Y_N”: either displays the merge dupliate menu if
+<code class="docutils literal notranslate"><span class="pre">answer_y</span></code> is not a key of the request, or a form for merging two
+person (whose keys are <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">i2</span></code>).</p></li>
+<li><p>Mod “MRG_DUP_FAM_Y_N”: same than “MRG_DUP_IND_Y_N”, but for families.</p></li>
+<li><p>Mode “MRG_FAM”: displays a menu for merging families (family keys are <code class="docutils literal notranslate"><span class="pre">i</span></code>
+and <code class="docutils literal notranslate"><span class="pre">i2</span></code>). Couples must be identical (modulo reversion).</p></li>
+<li><p>Mode “MRG_FAM_OK”: requests the family merge</p></li>
+<li><p>Mode “MRG_MOD_FAM_OK”: requests the family modification and merge</p></li>
+<li><p>Mode “MRG_IND”: displays a form for merging two persons</p></li>
+<li><p>Mode “MRG_IND_OK”: requests a merge of two persons</p></li>
+<li><p>Mode “MRG_MOD_IND_OK”: requests a merge &amp; modification of two persons</p></li>
+<li><p>Mode “N”: lists all the surnames; if a surname is selected (key is <code class="docutils literal notranslate"><span class="pre">v</span></code>),
+displays the list of pages where this surname is used.</p></li>
+<li><p>Mode “NG”: same than <code class="docutils literal notranslate"><span class="pre">N</span></code>, but expects a name with the key <code class="docutils literal notranslate"><span class="pre">n</span></code></p></li>
+<li><p>Mode “NOTES”: displays the notes</p></li>
+<li><p>Mode “OA”: displays the list of the oldest persons that are still alive or,
+if unknown, whose death are not probable</p></li>
+<li><p>Mode “OE”: same as “OA”, but for engaged couples</p></li>
+<li><p>Mode “P”: lists all the first names; if a surname is selected (key is <code class="docutils literal notranslate"><span class="pre">v</span></code>),
+displays the list of pages where this name is used.</p></li>
+<li><p>Mode “PQP_PYR”: displays a population pyramid (reachable from “STAT”)</p></li>
+<li><p>Mode “PS”: displays all the persons associated to a given place (<code class="docutils literal notranslate"><span class="pre">ma</span></code> key for
+marriage, <code class="docutils literal notranslate"><span class="pre">bi</span></code> key for birth, <code class="docutils literal notranslate"><span class="pre">bp</span></code> key for baptism, <code class="docutils literal notranslate"><span class="pre">de</span></code> key for death and <code class="docutils literal notranslate"><span class="pre">bu</span></code>
+key for burial).</p></li>
+<li><p>Mode “R”: displays the relationship details between two persons</p></li>
+<li><p>Mode “REQUEST”: displays the current request</p></li>
+<li><p>Mode “RL”: displays the relationship link between two persons</p></li>
+<li><p>Mode “RLM”: displays relation ship details between multiple persons</p></li>
+<li><p>Mode “S”: displays the results of a search
+(from, for example, the main page).</p></li>
+<li><p>Mode “SRC”: displays the file in argument (key is <code class="docutils literal notranslate"><span class="pre">v</span></code>)</p></li>
+<li><p>Mode “STAT”: displays several links for statistics: latest births, death,
+marriages, the oldest couples, persons that are alive and who lives the longest.
+There also is a population pyramid.</p></li>
+<li><p>Mode “CHANGE_WIZ_VIS”: displays the connected wizards</p></li>
+<li><p>Mode “TT”: displays the titles associated to persons</p></li>
+<li><p>Mode “U”: displays the page associated to the template <code class="docutils literal notranslate"><span class="pre">updmenu.txt</span></code></p></li>
+<li><p>Mode “VIEW_WIZNOTES”: Prints the HTML page displaying wizard notes</p></li>
+<li><p>Mode “WIZNOTES”: Same as VIEW_WIZNOTES, but fails if not authentificated</p></li>
+<li><p>Mode “WIZNOTES_SEARCH”: Same as VIEW_WIZNOTES, but highlights HTML with
+the specified string searched (key is <code class="docutils literal notranslate"><span class="pre">s</span></code>).</p></li>
+</ul>
+<p>Any other mode leads to an incorrect request page (Error 400).</p>
+</div>
+<div class="section" id="plug-ins">
+<h2>Plug-ins<a class="headerlink" href="#plug-ins" title="Permalink to this headline">¶</a></h2>
+<p>Plus-ins are additional features that can be added to <code class="docutils literal notranslate"><span class="pre">gwd</span></code>. They can register
+two kind of services:</p>
+<ul class="simple">
+<li><p>additional modes: with <code class="docutils literal notranslate"><span class="pre">GwdPlugin.register</span></code>, a plug-in can register new
+requests</p></li>
+<li><p>additional computations: with <code class="docutils literal notranslate"><span class="pre">GwdPlugin.register_se</span></code>, a plug-in can register
+pre/post processors</p></li>
+</ul>
+</div>
+<div class="section" id="customization">
+<h2>Customization<a class="headerlink" href="#customization" title="Permalink to this headline">¶</a></h2>
+<p>Each base can be customized with a <code class="docutils literal notranslate"><span class="pre">&lt;BASENAME&gt;.gwf</span></code> file. A documented example is
+available on the <code class="docutils literal notranslate"><span class="pre">etc</span></code> directory at the root of the project.
+Plug-ins are activated for a base with the <code class="docutils literal notranslate"><span class="pre">plugin=...</span></code> directive in the
+configuration file.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Geneweb</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../overview/index.html">Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#how-to-start-a-geneweb-server">How to start a Geneweb server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#architecture-of-geneweb">Architecture of Geneweb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#libraries">Libraries</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../overview/index.html#official-binaries">Official binaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#web-server-and-plug-ins">Web-server and plug-ins</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../installation/index.html">Installation procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html">Project binaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/index.html">Documentation API</a></li>
+
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Developer documentation</a><ul>
+  <li><a href="../overview/index.html">Overview</a><ul>
+  <li><a href="official_binaries.html">Official binaries</a><ul>
+      <li>Previous: <a href="gwc.html" title="previous chapter">gwc</a></li>
+      <li>Next: <a href="gwdiff.html" title="next chapter">gwdiff</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021-2022, OCamlPro.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/dev-doc/binaries/gwd.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

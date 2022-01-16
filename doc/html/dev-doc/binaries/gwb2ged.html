@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gwb2ged &#8212; Geneweb 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="gwc" href="gwc.html" />
+    <link rel="prev" title="ged2gwb" href="ged2gwb.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="tex2jax_ignore mathjax_ignore section" id="gwb2ged">
+<h1>gwb2ged<a class="headerlink" href="#gwb2ged" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>Converts a Geneweb database to a GEDCOM 5.5.1 file. GEDCOM is a popular format
+among genealogy enthusiasts.
+<a class="reference external" href="http://www.ancestris.org/dl/ancestris/norme_gedcom/Gedcom_norm_551_2019_11_15.pdf">GEDCOM 5.5.1 documentation</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="n">geneweb</span><span class="o">.</span><span class="n">gwb2ged</span> <span class="o">&lt;</span><span class="n">BASE</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">OPT</span><span class="p">]</span>
+  <span class="o">-</span><span class="n">indexes</span>                          <span class="n">export</span> <span class="n">indexes</span> <span class="ow">in</span> <span class="n">gedcom</span>
+  <span class="o">-</span><span class="n">a</span> <span class="o">&lt;</span><span class="n">N</span><span class="o">&gt;</span>                            <span class="n">maximum</span> <span class="n">generation</span> <span class="n">of</span> <span class="n">the</span> <span class="n">root</span><span class="s1">&#39;s ascendants</span>
+  <span class="o">-</span><span class="n">ad</span> <span class="o">&lt;</span><span class="n">N</span><span class="o">&gt;</span>                           <span class="n">maximum</span> <span class="n">generation</span> <span class="n">of</span> <span class="n">the</span> <span class="n">root</span><span class="s1">&#39;s ascendants descendants</span>
+  <span class="o">-</span><span class="n">key</span> <span class="o">&lt;</span><span class="n">KEY</span><span class="o">&gt;</span>                        <span class="n">key</span> <span class="n">reference</span> <span class="n">of</span> <span class="n">root</span> <span class="n">person</span><span class="o">.</span> <span class="n">Used</span> <span class="k">for</span> <span class="o">-</span><span class="n">a</span><span class="o">/-</span><span class="n">d</span> <span class="n">options</span><span class="o">.</span> <span class="n">Can</span> <span class="n">be</span> <span class="n">used</span> <span class="n">multiple</span> <span class="n">times</span><span class="o">.</span> <span class="n">Key</span> <span class="nb">format</span> <span class="ow">is</span> <span class="s2">&quot;First Name.occ SURNAME&quot;</span>
+  <span class="o">-</span><span class="n">c</span> <span class="o">&lt;</span><span class="n">NUM</span><span class="o">&gt;</span><span class="p">:</span>                         <span class="n">when</span> <span class="n">a</span> <span class="n">person</span> <span class="ow">is</span> <span class="n">born</span> <span class="n">less</span> <span class="n">than</span> <span class="o">&lt;</span><span class="n">num</span><span class="o">&gt;</span> <span class="n">years</span> <span class="n">ago</span><span class="p">,</span> <span class="n">it</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">exported</span> <span class="n">unless</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">Public</span><span class="o">.</span> <span class="n">All</span> <span class="n">the</span> <span class="n">spouses</span> <span class="ow">and</span> <span class="n">descendants</span> <span class="n">are</span> <span class="n">also</span> <span class="n">censored</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">charset</span> <span class="p">[</span><span class="n">ASCII</span><span class="o">|</span><span class="n">ANSEL</span><span class="o">|</span><span class="n">ANSI</span><span class="o">|</span><span class="n">UTF</span><span class="o">-</span><span class="mi">8</span><span class="p">]</span> <span class="nb">set</span> <span class="n">charset</span><span class="p">;</span> <span class="n">default</span> <span class="ow">is</span> <span class="n">UTF</span><span class="o">-</span><span class="mi">8</span>
+  <span class="o">-</span><span class="n">d</span> <span class="o">&lt;</span><span class="n">N</span><span class="o">&gt;</span>                            <span class="n">maximum</span> <span class="n">generation</span> <span class="n">of</span> <span class="n">the</span> <span class="n">root</span><span class="s1">&#39;s descendants.</span>
+  <span class="o">-</span><span class="n">mem</span>                              <span class="n">save</span> <span class="n">memory</span> <span class="n">space</span><span class="p">,</span> <span class="n">but</span> <span class="n">slower</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">nn</span>                               <span class="n">no</span> <span class="p">(</span><span class="n">database</span><span class="p">)</span> <span class="n">notes</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">nnn</span>                              <span class="n">no</span> <span class="n">notes</span> <span class="p">(</span><span class="n">implies</span> <span class="o">-</span><span class="n">nn</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">nopicture</span>                        <span class="n">don</span><span class="s1">&#39;t extract individual picture.</span>
+  <span class="o">-</span><span class="n">o</span> <span class="o">&lt;</span><span class="n">GED</span><span class="o">&gt;</span>                          <span class="n">output</span> <span class="n">file</span> <span class="n">name</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">stdout</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">parentship</span>                       <span class="n">select</span> <span class="n">individuals</span> <span class="n">involved</span> <span class="ow">in</span> <span class="n">parentship</span> <span class="n">computation</span> <span class="n">between</span> <span class="n">pairs</span> <span class="n">of</span> <span class="n">keys</span><span class="o">.</span> <span class="n">Pairs</span> <span class="n">must</span> <span class="n">be</span> <span class="n">defined</span> <span class="k">with</span> <span class="o">-</span><span class="n">key</span> <span class="n">option</span><span class="p">,</span> <span class="n">descendant</span> <span class="n">first</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="o">-</span><span class="n">key</span> <span class="s2">&quot;Descendant.0 SURNAME&quot;</span> <span class="o">-</span><span class="n">key</span> <span class="s2">&quot;Ancestor.0 SURNAME&quot;</span><span class="o">.</span> <span class="n">If</span> <span class="n">multiple</span> <span class="n">pair</span> <span class="n">are</span> <span class="n">provided</span><span class="p">,</span> <span class="n">union</span> <span class="n">of</span> <span class="n">persons</span> <span class="n">are</span> <span class="n">returned</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">picture</span><span class="o">-</span><span class="n">path</span>                     <span class="n">extract</span> <span class="n">pictures</span> <span class="n">path</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">s</span> <span class="o">&lt;</span><span class="n">SN</span><span class="o">&gt;</span>                           <span class="n">select</span> <span class="n">this</span> <span class="n">surname</span> <span class="p">(</span><span class="n">option</span> <span class="n">usable</span> <span class="n">several</span> <span class="n">times</span><span class="p">,</span> <span class="n">union</span> <span class="n">of</span> <span class="n">surnames</span> <span class="n">will</span> <span class="n">be</span> <span class="n">used</span><span class="p">)</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">source</span> <span class="o">&lt;</span><span class="n">SRC</span><span class="o">&gt;</span>                     <span class="n">replace</span> <span class="n">individuals</span> <span class="ow">and</span> <span class="n">families</span> <span class="n">sources</span><span class="o">.</span> <span class="n">Also</span> <span class="n">delete</span> <span class="n">event</span> <span class="n">sources</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">v</span>                                <span class="n">verbose</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Geneweb</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../overview/index.html">Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#how-to-start-a-geneweb-server">How to start a Geneweb server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#architecture-of-geneweb">Architecture of Geneweb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#libraries">Libraries</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../overview/index.html#official-binaries">Official binaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#web-server-and-plug-ins">Web-server and plug-ins</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../installation/index.html">Installation procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html">Project binaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/index.html">Documentation API</a></li>
+
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Developer documentation</a><ul>
+  <li><a href="../overview/index.html">Overview</a><ul>
+  <li><a href="official_binaries.html">Official binaries</a><ul>
+      <li>Previous: <a href="ged2gwb.html" title="previous chapter">ged2gwb</a></li>
+      <li>Next: <a href="gwc.html" title="next chapter">gwc</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021-2022, OCamlPro.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/dev-doc/binaries/gwb2ged.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

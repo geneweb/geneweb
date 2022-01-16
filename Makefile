@@ -13,8 +13,10 @@ endif
 # Variables for packagers.
 PREFIX=/usr
 DISTRIB_DIR=distribution
-
 BUILD_DIR=_build/default
+ODOC_DIR=$(BUILD_DIR)/_doc/_html
+
+DOC_DIR=doc
 
 ###### [BEGIN] Generated files section
 
@@ -174,7 +176,16 @@ distrib: build
 
 doc: | $(GENERATED_FILES_DEP)
 	dune build @doc
+	if [ ! -d $(DOC_DIR)/doc ] ; then \
+    	mkdir -p $(DOC_DIR)/doc ; \
+		cp -r $(ODOC_DIR)/* $(DOC_DIR)/doc ; \
+	fi
 .PHONY: doc
+
+opendoc : doc
+	xdg-open $(DOC_DIR)/html/dev-doc/index.html
+.PHONY: opendoc
+
 
 test: | $(GENERATED_FILES_DEP)
 	dune build @runtest
@@ -202,6 +213,7 @@ clean:
 	@echo -n "Cleaning..."
 	@$(RM) $(GENERATED_FILES_DEP) lib/*_piqi*.ml
 	@$(RM) -r $(DISTRIB_DIR)
+	@$(RM) -r $(DOC_DIR)/doc
 	@dune clean
 	@echo " Done!"
 .PHONY: clean

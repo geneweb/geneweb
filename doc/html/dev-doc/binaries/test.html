@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>test &#8212; Geneweb 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="bench" href="bench.html" />
+    <link rel="prev" title="Tests" href="tests.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="tex2jax_ignore mathjax_ignore section" id="test">
+<h1>test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h1>
+<p>Starts multiple non-regression tests. Tested modules are <code class="docutils literal notranslate"><span class="pre">MUtil</span></code>, <code class="docutils literal notranslate"><span class="pre">Util</span></code>
+(<code class="docutils literal notranslate"><span class="pre">Test_utils</span></code>), the choosen <code class="docutils literal notranslate"><span class="pre">Sosa</span></code> implementation (<code class="docutils literal notranslate"><span class="pre">Test_sosa</span></code>), <code class="docutils literal notranslate"><span class="pre">Place</span></code>
+(<code class="docutils literal notranslate"><span class="pre">Test_place</span></code>) and <code class="docutils literal notranslate"><span class="pre">NotesLink</span></code> (<code class="docutils literal notranslate"><span class="pre">Test_wiki</span></code>).
+Can be executed with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> or <code class="docutils literal notranslate"><span class="pre">_build/default/test/test.exe</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>usage: default/test/test.exe options*
+  -conf fn                        Read configuration file.
+  -cache-filename str             Cache file to store previous results. (default: /home/ovenstent/gits/geneweb-project/geneweb/_build/oUnit-$(suite_name).cache)
+  -chooser {failfirst|simple}
+                                  Select the method to choose tests to run. (default: simple)
+  -ci {true|false}                Display logs for CI, like Travis and AppVeyor, in the console with colors. (default: false)
+  -display {true|false}           Output logs on screen. (default: true)
+  -health-check-interval f        Seconds between checking health of workers. (default: 1.)
+  -log-encoding str               Encoding of the log. (default: utf-8)
+  -no-cache-filename              Reset value of cache_filename.
+  -no-output-file                 Reset value of output_file.
+  -no-output-html-dir             Reset value of output_html_dir.
+  -no-output-junit-file           Reset value of output_junit_file.
+  -no-testdata-dir                Reset value of testdata_dir.
+  -output-file str                Output verbose log in the given file. (default: /home/ovenstent/gits/geneweb-project/geneweb/_build/oUnit-$(suite_name)-$(shard_id).log)
+  -output-html-dir str            Output directory of the HTML files. (default: none)
+  -output-junit-file str          Output file for JUnit. (default: none)
+  -processes-grace-period f       Delay to wait for a process to stop. (default: 5.)
+  -processes-kill-period f        Delay to wait for a process to stop after killing it. (default: 5.)
+  -results-style-1-X {true|false} Use OUnit 1.X results printer (will be deprecated in 2.1.0+). (default: false)
+  -run-gc-full-major {true|false} Run a Gc.full_major in between tests. (default: true)
+  -runner {processes|sequential}
+                                  Select a the method to run tests. (default: processes)
+  -shards i                       Number of shards to use as worker (threads or processes). (default: 4)
+  -suite-name str                 The name of the test suite running. (default: Geneweb)
+  -testdata-dir str               Location of the test data directory (absolute path). (default: none)
+  -verbose {true|false}           Run test in verbose mode. (default: false)
+  -only-test path                 Run only the selected tests.
+  -list-test                      List tests
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Geneweb</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../installation/index.html">Installation procedure</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Project binaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/index.html">Documentation API</a></li>
+
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Developer documentation</a><ul>
+  <li><a href="index.html">Project binaries</a><ul>
+  <li><a href="tests.html">Tests</a><ul>
+      <li>Previous: <a href="tests.html" title="previous chapter">Tests</a></li>
+      <li>Next: <a href="bench.html" title="next chapter">bench</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021-2022, OCamlPro.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/dev-doc/binaries/test.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

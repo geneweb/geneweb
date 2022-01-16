@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Database overview &#8212; Geneweb 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Official binaries" href="../binaries/official_binaries.html" />
+    <link rel="prev" title="Overview" href="index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="tex2jax_ignore mathjax_ignore section" id="database-overview">
+<h1>Database overview<a class="headerlink" href="#database-overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="gw-files">
+<h2>Gw files<a class="headerlink" href="#gw-files" title="Permalink to this headline">¶</a></h2>
+<p>Genealogy database could be created by Geneweb from one or from multiple source files with <em>.gw</em> extension. Those files describe structurally persons, families all kinds of relationships, different events, etc. You can read more about the file structure <a class="reference external" href="https://geneweb.tuxfamily.org/wiki/gw">here</a>. Binary executable <code class="docutils literal notranslate"><span class="pre">gwc</span></code> reads files <em>.gw</em>, extracts all persons and families information and passes it to the <strong>Gwdb</strong> module in order to create the database.</p>
+</div>
+<div class="section" id="database-entries">
+<h2>Database entries<a class="headerlink" href="#database-entries" title="Permalink to this headline">¶</a></h2>
+<p>Transmitted to <strong>Gwdb</strong> information is composed mainly from:</p>
+<ul class="simple">
+<li><p>Array of all strings that could be any kind of information encoded as a string, like for example: person’s name, birth place, marriage place, etc. Identifier <code class="docutils literal notranslate"><span class="pre">istr</span></code> allows to reference the string in the given array (index of an element inside the array).</p></li>
+<li><p>Array of persons where each element encompasses information about one person. Every string field of a person (like his name, birthplace, etc.) is an identifier where the real string is stored in array mentioned before. Reference to other persons by means of identifier <code class="docutils literal notranslate"><span class="pre">iper</span></code> that reference person in the current array (index of an element inside the persons array).</p></li>
+<li><p>Array of families where each element encompasses information about one family (couple, children, marriage date, etc.). Identifier <code class="docutils literal notranslate"><span class="pre">ifam</span></code> allows to reference the family in the given array (index of element inside the array).</p></li>
+</ul>
+<p>Each array keeps a data structure defined in the module <strong>Def</strong>. Further, those entries will be the main source for every database request.</p>
+</div>
+<div class="section" id="storage">
+<h2>Storage<a class="headerlink" href="#storage" title="Permalink to this headline">¶</a></h2>
+<p><strong>Gwdb</strong> is responsible for creating the database on the disk from the provided inputs. It creates a directory <code class="docutils literal notranslate"><span class="pre">dbname.gwb</span></code> containing several
+files. The main file <code class="docutils literal notranslate"><span class="pre">base</span></code> contains marshalled representation of each array and <code class="docutils literal notranslate"><span class="pre">base.acc</span></code> stores offsets to every entry entry that allows to make constant time access. Additionally, it creates some index files that associate useful for requests information to the entry’s identifier in the <code class="docutils literal notranslate"><span class="pre">base</span></code> file. That helps to requests to find instantly entry without iteration over all existing ones in the database. For example <code class="docutils literal notranslate"><span class="pre">strings.inx</span></code> is a string index that allows to find id for a searched string. One file is slightly different: the <code class="docutils literal notranslate"><span class="pre">patches</span></code> file. It stores every modification done inside the base (see <a class="reference external" href="#modifications">Modifications</a> subsection). The storage manipulation interface is described in <code class="docutils literal notranslate"><span class="pre">lib/gwdb_driver.mli/gwdb_driver.mli</span></code>. This is a virtual module whose
+current implementation is available on <code class="docutils literal notranslate"><span class="pre">gwdb-legacy</span></code>. Format and description for every database file is listed below:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>base - the base itself
+  magic number (magic_gwb)                 : string of length 8
+  number of persons                        : binary_int
+  number of families                       : binary_int
+  number of strings                        : binary_int
+  persons array offset in file             : binary_int
+  ascends array offset in file             : binary_int
+  unions array offset in file              : binary_int
+  families array offset in file            : binary_int
+  couples array offset in file             : binary_int
+  descends array offset in file            : binary_int
+  strings array offset in file             : binary_int
+  notes origin file                        : value
+  persons array                            : value
+  ascends array                            : value
+  unions array                             : value
+  families array                           : value
+  couples array                            : value
+  descends array                           : value
+  strings array                            : value
+
+base.acc - direct accesses to arrays inside base
+  persons offsets   : array of binary_ints
+  ascends offsets   : array of binary_ints
+  unions offsets    : array of binary_ints
+  families offsets  : array of binary_ints
+  couples offsets   : array of binary_ints
+  descends offsets  : array of binary_ints
+  strings offsets   : array of binary_ints
+
+names.inx - index for names, strings of first names and surnames
+  offset to sindex : binary_int
+  offset to findex : binary_int
+  1st index (mixes between names) : value 
+    array, length = 16383, associating:
+      - a hash value of a &quot;crushed&quot; (module &quot;Name&quot;) name 
+        (modulo length)
+      - to the array of ids of the corresponding persons
+  2nd index (surnames sub-strings) : value
+    array, length = &quot;table_size&quot;, associating:
+      - a hash value of the &quot;crushed&quot; (module &quot;Name&quot;) surname 
+        sub-string (modulo length)
+      - to the array of the corresponding surnnames (string ids) 
+      that contain giving surname sub-string
+  3rd index (first name sub-strings) : value 
+    array, length = 16383, associating:
+      - a hash value of the &quot;crushed&quot; (module &quot;Name&quot;) first name 
+      sub-string (modulo length)
+      - to the array of the corresponding string ids that contains 
+      giving first name sub-string
+
+names.acc - direct accesses to values inside arrays in names.inx
+
+strings.inx - index for all strings
+  length of the strings offset array : binary_int
+  strings hash table index           : 2 arrays of binary_ints
+    strings offset array (length = prime after 10 * strings 
+    array length)
+      - associating a hash value of the string modulo length
+      - to its id in the string array
+    strings list array (length = string array length)
+      - associating a string id
+      - to the id of the next index (previous value) holding the 
+      same hash value
+
+snames.inx - index for surnames
+  array ordered by surname  
+    - associating the string id of a surname
+    - to a pointer (offset) inside snames.dat
+
+snames.dat - data associated with snames.inx
+  array of list of persons holding a surname
+
+fnames.inx - index for first names
+  array ordered by first name 
+    - associating the string id of a first name
+    - to a pointer (offset) inside fnames.dat
+
+fnames.dat - data associated with fnames.inx
+  array of list of persons holding a first name
+
+notes - text file containing data base notes.
+
+notes_d - directory containing .txt for each extended page
+
+particles.txt - text file with autorised name&#39;s particles
+
+patches - modification inside the database
+  When updated, none of the previous files are modified. 
+  Only this one is written and rewritten. It holds a record 
+  of type &quot;patches&quot;, composed of association lists 
+  &quot;index&quot; - &quot;new value&quot;.
+
+nb_persons - number of real persons (with those added by patches)
+
+synchro_patches - timestamped history of base&#39;s modifications. 
+
+restrict - defines visibility of each person in the base 
+</pre></div>
+</div>
+</div>
+<div class="section" id="modifications">
+<h2>Modifications<a class="headerlink" href="#modifications" title="Permalink to this headline">¶</a></h2>
+<p>When a modification is requested, geneweb does not update <code class="docutils literal notranslate"><span class="pre">base</span></code> file itself. It
+completes the <code class="docutils literal notranslate"><span class="pre">patches</span></code> file containing all the latest modifications on the
+base. Every modification (patch) done is pended until patches are committed with <code class="docutils literal notranslate"><span class="pre">commit_patches</span></code> request.
+Commit performs update of the <code class="docutils literal notranslate"><span class="pre">patches</span></code> file.</p>
+<p>Patching signifies only operations that add or modify an entry. Entry suppression is done quite differently.
+It is replaced by a <em>dummy</em> entry and then removed by Geneweb’s garbage collector <code class="docutils literal notranslate"><span class="pre">gwgc</span></code> that performs compaction
+of database arrays. Another useful <code class="docutils literal notranslate"><span class="pre">fixbase</span></code> tool, locates and fixes inconsistencies on the base and updates all database files.</p>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>Here is an example how Geneweb displays birth dates of persons that have given name (let’s say “Pierre”) without considering caches:</p>
+<ul class="simple">
+<li><p>Firstly, it makes dichotomous search inside <code class="docutils literal notranslate"><span class="pre">fnames.inx</span></code> of a string id (<code class="docutils literal notranslate"><span class="pre">istr</span></code>) that references “Pierre”</p></li>
+<li><p>Then it reads (with associated to “Pierre” offset from <code class="docutils literal notranslate"><span class="pre">fnames.inx</span></code>) position in the file <code class="docutils literal notranslate"><span class="pre">fnames.data</span></code> where list of ids of persons (<code class="docutils literal notranslate"><span class="pre">iper</span></code>) with first name “Pierre” are stored.</p></li>
+<li><p>For every person’s id it gets person’s entry offset from <code class="docutils literal notranslate"><span class="pre">base.acc</span></code> file</p></li>
+<li><p>Then it reads person’s entry with giving offset and get field associated to the birth date.</p></li>
+<li><p>Displays all extracted birth dates.</p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Geneweb</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="index.html#how-to-start-a-geneweb-server">How to start a Geneweb server</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html#architecture-of-geneweb">Architecture of Geneweb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#libraries">Libraries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#official-binaries">Official binaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#web-server-and-plug-ins">Web-server and plug-ins</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../installation/index.html">Installation procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../binaries/index.html">Project binaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/index.html">Documentation API</a></li>
+
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Developer documentation</a><ul>
+  <li><a href="index.html">Overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Overview</a></li>
+      <li>Next: <a href="../binaries/official_binaries.html" title="next chapter">Official binaries</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021-2022, OCamlPro.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/dev-doc/overview/database.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,4 @@
+# v7
+
+Defines new reqursts and redefines some old ones with new changes for the V7.
+Registers the requests to the index (""), A, C, D, DOC, L, P, PS and TP.

@@ -1,0 +1,112 @@
+# Geneweb library overview
+
+## Def lib
+
+### Adef
+
+This module exposes base types and functions used by many other geneweb's libraries. It defines the types and manipulation functions for:
+- Consanguinity degrees
+- Dates
+- Compressed dates
+- Polymorphic couple that regroups parents (father and mother).
+
+### Def
+## Util lib
+
+### Buff
+
+Module that defines extenisable buffer and auxilarry functions to store charcacters and strings and get buffer's content. The reason to define this module instead of using standard [Buffer](https://docs.ocaml.pro/docs/LIBRARY.stdlib@ocaml-base-compiler.4.10.0/Stdlib/Buffer/index.html) module is that its  
+storing functions are more simple to use as an argument to the recursive functions over strings that are very common throughout Geneweb library.
+
+### Name
+
+Module that defines some useful functions to construct, format, compress and adopt the strings to represent them as being person surnames/first names. 
+
+### Utf8
+
+Utf8 is a module that regroups some standard and useful functions dealing with UTF-8 encoded strings, which differs to standard OCaml module [Stdlib.String](https://docs.ocaml.pro/docs/LIBRARY.stdlib@ocaml-base-compiler.4.10.0/Stdlib/String/index.html), that internally considers the string as a table of bytes (Utf8 consider it as a table of UTF-8 encoded character). The major difference of this module comparing to the similar (like [Camomile](http://camomile.sourceforge.net/)) is that sometimes it makes use of [OCaml implementation](https://github.com/geneweb/unidecode) for [Unidecode](https://pypi.org/project/Unidecode/) library, that is used to convert encoded UTF-8 character to its ASCII representation.
+
+### Secure
+
+This module grants additional security layer and controls which directories can be read by the webserver, to prevent malicious users from reading/writing on the server disk. Allowed directories are composed of list of **assets** and the **base directory**. 
+
+### Opt
+
+Module that defines/redefines some useful functions over `option` type.
+
+### Lock
+
+Module that define the flag and the functions that allow
+to manage simultaneous accesses to the files by puting a lock on them with `Unix.lockf`. 
+
+### ProgrBar
+
+Module that provides printing functions that helps to iterate over collections with progressive bar that shows current iteration stage (proportion of current index to total number). Here is an exemple how does it used for iteration over collection with 240 elements :
+
+```bash
+
+# start ()
+............................................................
+
+# run 0 240
+|...........................................................
+
+# run 1 240
+/...........................................................
+
+# run 2 240
+-...........................................................
+
+# run 3 240
+\...........................................................
+
+# run 4 240
+o|..........................................................
+
+# sucessive runs
+
+# run 120 240
+
+oooooooooooooooooooooooooooooo|.............................
+
+```
+
+### Mutil
+
+The main module inside *Util* library that regroups many type of useful functions dealing with :
+- File system
+- Lists
+- Arrays
+- Names
+- Letters
+- IO
+- System calls
+- Parsing different formats (like lexicon.txt or HTTP header)
+- Encoding/decoding
+
+
+### Calendar
+
+This module defines bindings to [calendars](https://github.com/geneweb/calendars) package that allows to manage different calendar's date. Module exposes functions that:
+- Convert SDN (serial day number) to and from one of the date for supported calendars (gregorian, julian, french andhebrew).
+- Convert any supported calendar's date to and from gregorian's date.
+- Give information about moon's phase and about lunar calendar for the given day (SDN).
+
+### Date
+
+*Date* provides usefull functions that helps to compare and to count time elapes between two dates. 
+
+### Pqueue
+
+This module implements priority queues. All operations are purely applicative (no side effects).
+The implementation uses [binomial queues from Chris Okasaki](https://lara.epfl.ch/w/_media/fv20/optimalpurelyfunctionalqueues.pdf). Functions `add`, `take` and `union` are in O(log n) in the worst case.
+
+### Futil
+
+This module regroups some usefull functions dealing with polymorphic data types (starts with `gen_`). Particulary it exposes functions that map values inside `gen_` data type. Aditionally it provide `gen_person_misc_names` that computes list of various mix between all kind of name of the person.
+
+## Gwdb-legacy lib
+
+### Btree
+
+Module that is equivalent to [Stdlib.Map](https://ocaml.org/api/Map.html) except some added in output signature functions dealing with keys.

@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gwc &#8212; Geneweb 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="gwd" href="gwd.html" />
+    <link rel="prev" title="gwb2ged" href="gwb2ged.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="tex2jax_ignore mathjax_ignore section" id="gwc">
+<h1>gwc<a class="headerlink" href="#gwc" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>Creates a new database.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="n">geneweb</span><span class="o">.</span><span class="n">gwc</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="p">[</span><span class="n">files</span><span class="p">]</span>
+<span class="n">where</span> <span class="p">[</span><span class="n">files</span><span class="p">]</span> <span class="n">are</span> <span class="n">a</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">files</span><span class="p">:</span>
+  <span class="n">source</span> <span class="n">files</span> <span class="n">end</span> <span class="k">with</span> <span class="o">.</span><span class="n">gw</span>
+  <span class="nb">object</span> <span class="n">files</span> <span class="n">end</span> <span class="k">with</span> <span class="o">.</span><span class="n">gwo</span>
+<span class="ow">and</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="n">are</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">bnotes</span> <span class="p">[</span><span class="n">drop</span><span class="o">|</span><span class="n">erase</span><span class="o">|</span><span class="n">first</span><span class="o">|</span><span class="n">merge</span><span class="p">]</span> <span class="n">Behavior</span> <span class="k">for</span> <span class="n">base</span> <span class="n">notes</span> <span class="n">of</span> <span class="n">the</span> <span class="nb">next</span> <span class="n">file</span><span class="o">.</span> <span class="p">[</span><span class="n">drop</span><span class="p">]:</span> <span class="n">dropped</span><span class="o">.</span> <span class="p">[</span><span class="n">erase</span><span class="p">]:</span> <span class="n">erase</span> <span class="n">the</span> <span class="n">current</span> <span class="n">content</span><span class="o">.</span> <span class="p">[</span><span class="n">first</span><span class="p">]:</span> <span class="n">dropped</span> <span class="k">if</span> <span class="n">current</span> <span class="n">content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">empty</span><span class="o">.</span> <span class="p">[</span><span class="n">merge</span><span class="p">]:</span> <span class="n">concatenated</span> <span class="n">to</span> <span class="n">the</span> <span class="n">current</span> <span class="n">content</span><span class="o">.</span> <span class="n">Default</span><span class="p">:</span> <span class="n">merge</span>
+  <span class="o">-</span><span class="n">c</span>                               <span class="n">Only</span> <span class="n">compiling</span>
+  <span class="o">-</span><span class="n">cg</span>                              <span class="n">Compute</span> <span class="n">consanguinity</span>
+  <span class="o">-</span><span class="n">ds</span> <span class="o">&lt;</span><span class="nb">str</span><span class="o">&gt;</span>                        <span class="n">Set</span> <span class="n">the</span> <span class="n">source</span> <span class="n">field</span> <span class="k">for</span> <span class="n">persons</span> <span class="ow">and</span> <span class="n">families</span> <span class="n">without</span> <span class="n">source</span> <span class="n">data</span>
+  <span class="o">-</span><span class="n">f</span>                               <span class="n">Remove</span> <span class="n">database</span> <span class="k">if</span> <span class="n">already</span> <span class="n">existing</span>
+  <span class="o">-</span><span class="n">mem</span>                             <span class="n">Save</span> <span class="n">memory</span><span class="p">,</span> <span class="n">but</span> <span class="n">slower</span>
+  <span class="o">-</span><span class="n">nc</span>                              <span class="n">No</span> <span class="n">consistency</span> <span class="n">check</span>
+  <span class="o">-</span><span class="n">nofail</span>                          <span class="n">No</span> <span class="n">failure</span> <span class="ow">in</span> <span class="n">case</span> <span class="n">of</span> <span class="n">error</span>
+  <span class="o">-</span><span class="n">nolock</span>                          <span class="n">Do</span> <span class="ow">not</span> <span class="n">lock</span> <span class="n">database</span>
+  <span class="o">-</span><span class="n">nopicture</span>                       <span class="n">Do</span> <span class="ow">not</span> <span class="n">create</span> <span class="n">associative</span> <span class="n">pictures</span>
+  <span class="o">-</span><span class="n">o</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span>                        <span class="n">Output</span> <span class="n">database</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">gwb</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">particles</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span>                <span class="n">Particles</span> <span class="n">file</span> <span class="p">(</span><span class="n">default</span> <span class="o">=</span> <span class="n">predefined</span> <span class="n">particles</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">q</span>                               <span class="n">Quiet</span>
+  <span class="o">-</span><span class="n">sep</span>                             <span class="n">Separate</span> <span class="nb">all</span> <span class="n">persons</span> <span class="ow">in</span> <span class="nb">next</span> <span class="n">file</span>
+  <span class="o">-</span><span class="n">sh</span> <span class="o">&lt;</span><span class="nb">int</span><span class="o">&gt;</span>                        <span class="n">Shift</span> <span class="nb">all</span> <span class="n">persons</span> <span class="n">numbers</span> <span class="ow">in</span> <span class="nb">next</span> <span class="n">files</span>
+  <span class="o">-</span><span class="n">stats</span>                           <span class="n">Print</span> <span class="n">statistics</span>
+  <span class="o">-</span><span class="n">v</span>                               <span class="n">Verbose</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Geneweb</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../overview/index.html">Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#how-to-start-a-geneweb-server">How to start a Geneweb server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#architecture-of-geneweb">Architecture of Geneweb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#libraries">Libraries</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../overview/index.html#official-binaries">Official binaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#web-server-and-plug-ins">Web-server and plug-ins</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../installation/index.html">Installation procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html">Project binaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/index.html">Documentation API</a></li>
+
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Developer documentation</a><ul>
+  <li><a href="../overview/index.html">Overview</a><ul>
+  <li><a href="official_binaries.html">Official binaries</a><ul>
+      <li>Previous: <a href="gwb2ged.html" title="previous chapter">gwb2ged</a></li>
+      <li>Next: <a href="gwd.html" title="next chapter">gwd</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021-2022, OCamlPro.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/dev-doc/binaries/gwc.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

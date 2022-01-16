@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Overview &#8212; Geneweb 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Database overview" href="database.html" />
+    <link rel="prev" title="Developer documentation" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="how-to-start-a-geneweb-server">
+<h2>How to start a Geneweb server<a class="headerlink" href="#how-to-start-a-geneweb-server" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="starting-the-server">
+<h3>Starting the server<a class="headerlink" href="#starting-the-server" title="Permalink to this headline">¶</a></h3>
+<p>Starting a Geneweb web server requires two tools:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">gwd</span></code>, the actual web server;</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">setup</span></code>, the database setup portal.</p></li>
+</ul>
+<p>These two tools are part of the main distribution and can be found on <code class="code docutils literal notranslate"><span class="pre">_build</span></code>.
+If you built the project with <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">clean</span> <span class="pre">distrib</span></code>, two scripts are available on
+the directory <code class="code docutils literal notranslate"><span class="pre">distribution/</span></code>. Keep in mind they are scripts wrapping the actual
+binaries.</p>
+<p>To start the server on the current directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_build</span><span class="o">/</span><span class="n">install</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">geneweb</span><span class="o">.</span><span class="n">gwd</span> <span class="o">-</span><span class="n">hd</span> <span class="o">&lt;</span><span class="n">location_of_hd_dir</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>This will start the main web server on port 2317.</p>
+<p>To start the setup server on the current directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_build</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">setup</span><span class="o">/</span><span class="n">setup</span><span class="o">.</span><span class="n">exe</span> <span class="o">-</span><span class="n">gd</span> <span class="o">&lt;</span><span class="n">location_of_gwsetup_dir</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>This will start the setup server on port 2316.</p>
+</div>
+<div class="section" id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<p>Geneweb can be configured by defining a <cite>&lt;base name&gt;.gwb</cite> file. An example is
+available in the <code class="code docutils literal notranslate"><span class="pre">etc</span></code> directory.</p>
+</div>
+</div>
+<div class="section" id="architecture-of-geneweb">
+<h2>Architecture of Geneweb<a class="headerlink" href="#architecture-of-geneweb" title="Permalink to this headline">¶</a></h2>
+<p>Geneweb is built from three main components:</p>
+<ul class="simple">
+<li><p>the storage of the genealogical trees, divided in a patch file and the actual data;</p></li>
+<li><p>the libraries, reading the data from the storage and writing the patch file</p></li>
+<li><p>the binaries and the web server, reading and writing the storage</p></li>
+</ul>
+<img alt="../../_images/diagram.png" src="../../_images/diagram.png" />
+<div class="section" id="storage-architecture">
+<h3>Storage architecture<a class="headerlink" href="#storage-architecture" title="Permalink to this headline">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="database.html">Database overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="database.html#gw-files">Gw files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#database-entries">Database entries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#storage">Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#modifications">Modifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html#example">Example</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="libraries">
+<h2>Libraries<a class="headerlink" href="#libraries" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p><cite>Util</cite>: a library with miscellaneous useful modules for manipulating
+base data types.</p></li>
+<li><p><cite>Def</cite>: the definition of the main type definitions used in Geneweb trees.</p></li>
+<li><p><cite>Sosa</cite>: describes a Sosa-Stradonitz numbering (known an
+Ahnentafel numbering), associating natural identifiers to individuals. This
+library is virtual and has three different implementations. One of these
+implementations is selected by the configuration script.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>Sosa_array</cite> is one of the <cite>sosa</cite> implementations. It represents naturals
+as pair of integers stored in an array <cite>a</cite> such that
+<cite>sosa = a.(0) + base * a(1)</cite>) where <cite>base</cite> is a hardcoded constant.</p></li>
+<li><p><cite>Sosa_num</cite> is one of the <cite>sosa</cite> implementation based on the <cite>Big_int</cite>
+library.</p></li>
+<li><p><cite>Sosa_zarith</cite> is one of the <cite>sosa</cite> implementation based on the <cite>Zarith</cite>
+library.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><cite>Gwdb_driver</cite>: describes the storage implementation. While it is
+virtual, it currently has only one implementation, <cite>gwdb-legacy</cite>. It is wrapped
+by the <cite>gwdb</cite> library that exports many tools for database updates.</p></li>
+<li><p><cite>Core</cite>: core of Geneweb for calculating consanguinity between persons.</p></li>
+<li><p><cite>Geneweb_export</cite> : provides a functor for defining Json convertors for Geneweb’s
+datatypes.</p></li>
+<li><p><cite>Def_show</cite>: defines formatters and <cite>string</cite> converters for Geneweb’s datatypes.</p></li>
+<li><p><cite>Geneweb</cite>: the main library. It contains several kinds of files, from
+utilitarian modules to HTML generation.</p></li>
+<li><p><cite>Gwb2gedLib</cite>: defines a function for exporting a base to a GEDCOM file.</p></li>
+<li><p><cite>Wserver</cite>: a light-weight web server, used by <cite>gwd</cite> and <cite>setup</cite>.</p></li>
+<li><p><cite>Gwd_lib</cite>: defines additional modules for the <cite>gwd</cite> web server.</p></li>
+<li><p><cite>GwuLib</cite>: defines useful functions for exporting a database to a <cite>.gw</cite> file.</p></li>
+</ul>
+<p>The documentation of each module is available on the automatically generated
+documentation of geneweb (<cite>$ make doc</cite>)</p>
+<div class="section" id="binaries">
+<h3>Binaries<a class="headerlink" href="#binaries" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="official-binaries">
+<h2>Official binaries<a class="headerlink" href="#official-binaries" title="Permalink to this headline">¶</a></h2>
+<p>Here are the binaries maintained by Geneweb:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="../binaries/connex.html">Connex</a>: calculates connex components of a base;</p></li>
+<li><p><a class="reference external" href="../binaries/consang.html">Consang</a>: calculates the consanguinity level of individuals;</p></li>
+<li><p><a class="reference external" href="../binaries/ged2gwb.html">Ged2gwb</a>: imports a GEDCOM 5.5.1 file to a Geneweb base;</p></li>
+<li><p><a class="reference external" href="../binaries/gwb2ged.html">Gwb2ged</a>: exports a base to a GEDCOM 5.5.1 base;</p></li>
+<li><p><a class="reference external" href="../binaries/gwc.html">Gwc</a>: creates a new database;</p></li>
+<li><p><a class="reference external" href="../binaries/gwd.html">Gwd</a>: starts Geneweb’s main web server which allows to interact with bases;</p></li>
+<li><p><a class="reference external" href="../binaries/gwdiff.html">Gwdiff</a>: targets differences between two databases;</p></li>
+<li><p><a class="reference external" href="../binaries/gwfixbase.html">Fixbase</a>: checks the consistency of a base and applies patches;</p></li>
+<li><p><a class="reference external" href="../binaries/gwgc.html">Gwgc</a>: removes unused entries in Geneweb’s arrays;</p></li>
+<li><p><a class="reference external" href="../binaries/gwrepl.html">Gwrepl</a>: an OCaml interactive top level, useful for scripts;</p></li>
+<li><p><a class="reference external" href="../binaries/gwu.html">Gwu</a>: exports a base to a <code class="code docutils literal notranslate"><span class="pre">.gw</span></code> file;</p></li>
+<li><p><a class="reference external" href="../binaries/setup.html">Setup</a>: a web server for selecting and creating databases.</p></li>
+</ul>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">For mor details about every binary, see:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../binaries/official_binaries.html">Official binaries</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="web-server-and-plug-ins">
+<h2>Web-server and plug-ins<a class="headerlink" href="#web-server-and-plug-ins" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="code docutils literal notranslate"><span class="pre">gwd</span></code> web server is customizable with plug-ins; code replacing
+the original behaviour of the web server handling requests. They are
+dynamically loaded by <code class="code docutils literal notranslate"><span class="pre">gwd</span></code> at its start and each base can be activated
+through the <code class="code docutils literal notranslate"><span class="pre">.gwb</span></code> file (<code class="code docutils literal notranslate"><span class="pre">plugins=*</span></code> for activating all plug-ins,
+otherwise <code class="code docutils literal notranslate"><span class="pre">plugins=p1,p2,...</span></code>).</p>
+<p>A plug-in is composed of its code, a <code class="code docutils literal notranslate"><span class="pre">dune</span></code> file for building and a
+<code class="code docutils literal notranslate"><span class="pre">META</span></code> file, containing some informations about the plug-in itself.</p>
+<p>Here is an example of <code class="code docutils literal notranslate"><span class="pre">META</span></code> file:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">version:1</span>
+<span class="pre">maintainers:OCamlPro</span>
+<span class="pre">depends:plugin1,plugin2</span>
+<span class="pre">`</span></code></p>
+<p>The only field taken into account by <cite>gwd</cite> is <cite>depends</cite> as it is used to
+check there are no circular dependencies between plug-ins.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Geneweb</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-start-a-geneweb-server">How to start a Geneweb server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#architecture-of-geneweb">Architecture of Geneweb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#libraries">Libraries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#official-binaries">Official binaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#web-server-and-plug-ins">Web-server and plug-ins</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../installation/index.html">Installation procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../binaries/index.html">Project binaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/index.html">Documentation API</a></li>
+
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Developer documentation</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">Developer documentation</a></li>
+      <li>Next: <a href="database.html" title="next chapter">Database overview</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021-2022, OCamlPro.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/dev-doc/overview/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

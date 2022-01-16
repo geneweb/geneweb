@@ -1,0 +1,38 @@
+.. audit documentation master file, created by
+   sphinx-quickstart on Mon Nov 22 11:15:19 2021.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to Geneweb Audit's Documentation!
+=========================================
+
+This document is one of the results of OCamlPro's first mission over Geneweb.  
+It consists mainly of two parts:
+
+- A developer documentation, complementing the `Geneweb wiki <https://geneweb.tuxfamily.org/wiki/GeneWeb>`_.
+  In turn, it provides an overview of the main components of Geneweb, in addition to the documentation for its 
+  code part generated using **odoc**.
+
+- An audit that gives recommendations starting from comments on the source code and ending with long term improvement
+  advices. It was based on this `commit <https://github.com/OCamlPro/geneweb/commit/b34f9cc756d5b21792ebbe8d6e9f9ebf01eddd27>`_. 
+
+In addition to the document, a `PR <https://github.com/geneweb/geneweb/pull/1288>`_ makes part of the mission results that, in turn : 
+
+* Adds interfaces and documentation to the most of existing modules;
+* Fixes:
+   * CI execution with *appveyor.yml*;
+   * Access to assets files with Secure module.
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Contents:
+
+   dev-doc/index
+   audit/index
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

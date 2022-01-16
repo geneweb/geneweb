@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gwdiff &#8212; Geneweb 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="fixbase" href="gwfixbase.html" />
+    <link rel="prev" title="gwd" href="gwd.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="tex2jax_ignore mathjax_ignore section" id="gwdiff">
+<h1>gwdiff<a class="headerlink" href="#gwdiff" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>Target differences between two GeneWeb databases (see README for more details)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="n">geneweb</span><span class="o">.</span><span class="n">gwdiff</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="n">base1</span> <span class="n">base2</span>
+<span class="n">Options</span> <span class="n">are</span><span class="p">:</span> 
+  <span class="o">-</span><span class="mi">1</span> <span class="o">&lt;</span><span class="n">fn</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">occ</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">sn</span><span class="o">&gt;</span> <span class="p">:</span> <span class="p">(</span><span class="n">mandatory</span><span class="p">)</span> <span class="n">defines</span> <span class="n">starting</span> <span class="n">person</span> <span class="ow">in</span> <span class="n">base1</span>
+  <span class="o">-</span><span class="mi">2</span> <span class="o">&lt;</span><span class="n">fn</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">occ</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">sn</span><span class="o">&gt;</span> <span class="p">:</span> <span class="p">(</span><span class="n">mandatory</span><span class="p">)</span> <span class="n">defines</span> <span class="n">starting</span> <span class="n">person</span> <span class="ow">in</span> <span class="n">base2</span>
+  <span class="o">-</span><span class="n">ad</span> <span class="p">:</span> <span class="n">checks</span> <span class="n">descendants</span> <span class="n">of</span> <span class="nb">all</span> <span class="n">ascendants</span> 
+  <span class="o">-</span><span class="n">d</span> <span class="p">:</span> <span class="n">checks</span> <span class="n">descendants</span> <span class="p">(</span><span class="n">default</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">html</span> <span class="o">&lt;</span><span class="n">root</span><span class="o">&gt;</span><span class="p">:</span> <span class="n">HTML</span> <span class="nb">format</span> <span class="n">used</span> <span class="k">for</span> <span class="n">report</span>
+  <span class="o">-</span><span class="n">mem</span> <span class="p">:</span> <span class="n">save</span> <span class="n">memory</span> <span class="n">space</span><span class="p">,</span> <span class="n">but</span> <span class="n">slower</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Geneweb</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../overview/index.html">Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#how-to-start-a-geneweb-server">How to start a Geneweb server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#architecture-of-geneweb">Architecture of Geneweb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#libraries">Libraries</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../overview/index.html#official-binaries">Official binaries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview/index.html#web-server-and-plug-ins">Web-server and plug-ins</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../installation/index.html">Installation procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html">Project binaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/index.html">Documentation API</a></li>
+
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Developer documentation</a><ul>
+  <li><a href="../overview/index.html">Overview</a><ul>
+  <li><a href="official_binaries.html">Official binaries</a><ul>
+      <li>Previous: <a href="gwd.html" title="previous chapter">gwd</a></li>
+      <li>Next: <a href="gwfixbase.html" title="next chapter">fixbase</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021-2022, OCamlPro.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/dev-doc/binaries/gwdiff.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
