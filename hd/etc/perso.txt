@@ -115,7 +115,7 @@
 
 %let;y;%apply;substr_index(0,"s",p_mod)%in;
 %let;o;%if;(y>=0)%expr(y+1)%end;%in;
-%let;op_mi;%if;(y>=0)%apply;substr(o,1,p_mod)%else;3%end;%in;
+%let;op_ms;%if;(y>=0)%apply;substr(o,1,p_mod)%else;3%end;%in;
 
 %let;y;%apply;substr_index(0,"a",p_mod)%in;
 %let;o;%if;(y>=0)%expr(y+1)%end;%in;
@@ -164,7 +164,7 @@
   <div class="row">
     <div class="col-8">
       %let;op_m;%op_mi;%in;%include;modules/individu
-      %let;op_m;%op_mu%in;%include;modules/unions
+      %let;op_m;%op_mu;%in;%include;modules/unions
       %let;op_m;%op_mc;%in;%include;modules/chronologie
       %let;op_m;%op_mn;%in;%include;modules/notes
       %let;op_m;%op_ms;%in;%include;modules/sources

@@ -125,11 +125,13 @@ function reset_all_buttons (){
       $(elt).removeClass("btn-outline-primary").removeClass("btn-outline-success").addClass("btn-outline-secondary")
     };
   };
+  p_mod = '';
+  $('#p_mod').val(p_mod);
+  build_p_mod_image();
 };
 
 function create_option_reset_button (i){
   var letter = options[i][0];
-  var regexp = "";
   var new_p_mod = p_mod;
   $('#'+letter+'0').on('click', function ()
   { for (j = 1;j<options[i].length;j++){
@@ -137,7 +139,8 @@ function create_option_reset_button (i){
       regexp = RegExp (letter+j);
       new_p_mod = new_p_mod.replace (regexp, '');
     }
-    $('#p_mod').val(new_p_mod);
+    p_mod = new_p_mod+letter+'0';
+    $('#p_mod').val(p_mod);
     build_p_mod_image();
   });
 };
@@ -209,7 +212,7 @@ var p_mod_table = '\
   </tbody>\
 </table>';
 
-build_p_mod_image();
+build_p_mod_image(); /* from currrent p_mod */
 
 $('#p_mod_table').replaceWith(p_mod_table);
 
@@ -230,7 +233,8 @@ $('#p_mod_rm').on('click', function ()
 });
 
 $('#p_mod_ok').on('click', function ()
-{ var regexp = RegExp ('z');
+{ p_mod = $('#p_mod').val();
+  var regexp = RegExp ('z');
   var index = p_mod.search (regexp);
   if (index<0) {p_mod = 'z2'+p_mod};
   $('#p_mod').val(p_mod);
