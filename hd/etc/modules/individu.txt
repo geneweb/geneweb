@@ -74,53 +74,53 @@
   %end;
 %end;
 
-%define;etat_civil()
-  <ul>
+%define;etat_civil(bullets)
+  %if;(bullets=1)<ul>%end;
     %if;has_birth_date;
-      <li>%apply;capitalize(nth([born],sex)) %on_birth_date;
+      %if;(bullets=1)<li>%end;%apply;capitalize(nth([born],sex)) %on_birth_date;
       %if;birthday; ([happy birthday to you!])%end;
-      %if;has_birth_place; - %birth_place;%end;</li>%nl;
+      %if;has_birth_place; - %birth_place;%end;%if;(bullets=1)</li>%else;<br>%end;%nl;
     %else;
       %if;has_birth_place;
-        <li>%apply;capitalize(nth([born],sex)) - %birth_place;</li>%nl;
+        %if;(bullets=1)<li>%end;%apply;capitalize(nth([born],sex)) - %birth_place;%if;(bullets=1)</li>%else;<br>%end;%nl;
       %end;
     %end;
     %if;has_baptism_date;
-      <li>%apply;capitalize(nth([baptized],sex)) %on_baptism_date;
-      %if;has_baptism_place; - %baptism_place;%end;</li>%nl;
+      %if;(bullets=1)<li>%end;%apply;capitalize(nth([baptized],sex)) %on_baptism_date;
+      %if;has_baptism_place; - %baptism_place;%end;%if;(bullets=1)</li>%else;<br>%end;%nl;
     %else;
       %if;has_baptism_place;
-        <li>%apply;capitalize(nth([baptized],sex)) - %baptism_place;</li>%nl;
+        %if;(bullets=1)<li>%end;%apply;capitalize(nth([baptized],sex)) - %baptism_place;%if;(bullets=1)</li>%else;<br>%end;%nl;
       %end;
     %end;
     %if;is_dead;
-      <li>%apply;capitalize(died)
+      %if;(bullets=1)<li>%end;%apply;capitalize(died)
       %if;has_death_date; %on_death_date;%end;
       %if;has_death_place; - %death_place;%end;
-      %if;(has_linked_page.DEATH and linked_page.DEATH!="") (%linked_page.DEATH;)%end;</li>%nl;
+      %if;(has_linked_page.DEATH and linked_page.DEATH!="") (%linked_page.DEATH;)%end;%if;(bullets=1)</li>%else;<br>%end;%nl;
     %end;
     %if;is_buried;
-      <li>%apply;capitalize(nth([buried],sex))
+      %if;(bullets=1)<li>%end;%apply;capitalize(nth([buried],sex))
       %if;has_burial_date; %on_burial_date;%end;
-      %if;has_burial_place; - %burial_place;%end;</li>%nl;
+      %if;has_burial_place; - %burial_place;%end;%if;(bullets=1)</li>%else;<br>%end;%nl;
     %end;
     %if;is_cremated;
-      <li>%apply;capitalize(nth([cremated],sex))
+      %if;(bullets=1)<li>%end;%apply;capitalize(nth([cremated],sex))
       %if;has_cremation_date; %on_cremation_date;%end;
-      %if;has_cremation_place; - %cremation_place;%end;</li>%nl;
+      %if;has_cremation_place; - %cremation_place;%end;%if;(bullets=1)</li>%else;<br>%end;%nl;
     %end;
     %if;has_occupation;
-      <li>%apply;capitalize(occupation)</li>%nl;
+      %if;(bullets=1)<li>%end;%apply;capitalize(occupation)%if;(bullets=1)</li>%else;<br>%end;%nl;
     %end;
     %if;(has_linked_page.OCCU and linked_page.OCCU!="")
-      <li>%apply;capitalize(linked_page.OCCU)</li>%nl;
+      %if;(bullets=1)<li>%end;%apply;capitalize(linked_page.OCCU)%if;(bullets=1)</li>%else;<br>%end;%nl;
     %end;
     %if;(has_consanguinity and bvar.show_consang!="no")
       %if;(cancel_links)
-        <li>[*consanguinity][:] %consanguinity;</li>%nl;
+        %if;(bullets=1)<li>%end;[*consanguinity][:] %consanguinity;%if;(bullets=1)</li>%else;<br>%end;%nl;
       %else;
-        <li><a href="%prefix;m=NG;em=R;et=A;ei=%mother.index;;select=%father.index;;spouse=on%if;(evar.image!="");image=%evar.image;%end;"
-           title="[*relationship computing] [father/mother]0/[father/mother]1">[*consanguinity][:] %consanguinity;</a></li>
+        %if;(bullets=1)<li>%end;<a href="%prefix;m=NG;em=R;et=A;ei=%mother.index;;select=%father.index;;spouse=on%if;(evar.image!="");image=%evar.image;%end;"
+           title="[*relationship computing] [father/mother]0/[father/mother]1">[*consanguinity][:] %consanguinity;</a>%if;(bullets=1)</li>%else;<br>%end;
       %end;
     %end;
   </ul>
@@ -160,7 +160,7 @@
   <div class="col-12 text-center mb-2 mx-2">
     %apply;portrait()
     <div class="text-center mb-2 mx-2">
-      %apply;etat_civil()
+      %apply;etat_civil(0)
       %apply;sosa()
     </div>
     <div class="mt-2 mb-1 ml-2">
@@ -176,7 +176,7 @@
   <div class="col-12 text-center mb-2 mx-2">
     %apply;detailed_names()
   </div>
-  %apply;etat_civil()
+  %apply;etat_civil(1)
 
 %elseif;(op_m=3)
   <div class="d-flex">
@@ -186,7 +186,7 @@
         %apply;detailed_names()
         %apply;sosa()
       </div>
-      %apply;etat_civil()
+      %apply;etat_civil(1)
     </div>
   </div>
 %end;

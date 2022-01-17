@@ -29,10 +29,11 @@ let get s i =
 (** [nb_char s n] returns the number of characters (not bytes) before index [n]
     in string [s].
 *)
+
 let nb_char s n =
   let rec loop i k =
-    if i = n then k
-    else loop (next s i) (succ k)
+    if i <n then loop (next s i) (succ k)
+    else k
   in loop 0 0
 
 (** Return the length (number of characters, not bytes)
