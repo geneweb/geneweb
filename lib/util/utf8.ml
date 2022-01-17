@@ -26,10 +26,10 @@ let get s i =
     else loop (next s i) (pred k)
   in loop 0 i
 
-(** [Utf8.nb_utf8_char s n] returns the number of characters (not bytes) before index n
+(** [nb_char s n] returns the number of characters (not bytes) before index [n]
     in string [s].
 *)
-let nb_utf8_char s n =
+let nb_char s n =
   let rec loop i k =
     if i = n then k
     else loop (next s i) (succ k)
@@ -38,12 +38,7 @@ let nb_utf8_char s n =
 (** Return the length (number of characters, not bytes)
     of the given string.
 *)
-let length s =
-  let rec loop i len =
-    if i < String.length s
-    then loop (next s i) (succ len)
-    else len
-  in loop 0 0
+let length s = nb_char s (String.length s)
 
 (** [sub ?pad s start len]
     Return a fresh UTF8-friendly substring of [len] characters, padded if needed.

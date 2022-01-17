@@ -865,18 +865,6 @@ let rec interp_ast conf ifun env =
         | "nth_c", [VVstring s1; VVstring s2] ->
             let n = try int_of_string s2 with Failure _ -> 0 in
             (try Char.escaped (String.get s1 n) with Invalid_argument _ -> "")
-        | "scan_pmod_option", [VVstring letter; VVstring default] ->
-            let p_mod =
-              begin match Util.p_getenv conf.env "p_mod" with
-              | Some vv -> Util.escape_html vv (* TODO safe string *)
-              | None -> (try List.assoc "p_mod" conf.base_env
-                  with Not_found -> "z2i3u2c1n1s2a3f1r1")
-              end
-            in
-            begin try let i = String.rindex p_mod letter.[0] in
-                String.sub p_mod (i+1) 1
-              with Not_found | Invalid_argument _ -> default
-            end
         | "substr", [VVstring st; VVstring ln; VVstring str] ->
           let ln = int_of_string ln in
           let st = int_of_string st in
@@ -912,7 +900,7 @@ let rec interp_ast conf ifun env =
             in
             loop st1
           in
-          string_of_int (if i0 < 0 then i0 else Utf8.nb_utf8_char str i0)
+          string_of_int (if i0 < 0 then i0 else Utf8.nb_char str i0)
         | "str_length", [VVstring s] -> string_of_int (Utf8.length s)
         | "red_of_hsv", [VVstring h; VVstring s; VVstring v] ->
             begin try
