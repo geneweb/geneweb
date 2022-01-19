@@ -16,7 +16,7 @@ DISTRIB_DIR=distribution
 
 BUILD_DIR=_build/default
 
-###### [BEGIN] Generated files section
+# [BEGIN] Generated files section
 
 lib/gwlib.ml:
 	@echo -n "Generating $@..."
@@ -61,7 +61,7 @@ hd/etc/version.txt:
 	@echo " Done!"
 .PHONY:hd/etc/version.txt
 
-###### [End] Generated files section
+# [End] Generated files section
 
 GENERATED_FILES_DEP = \
 	dune-workspace \
@@ -92,22 +92,25 @@ generated: $(GENERATED_FILES_DEP)
 
 install uninstall build: $(GENERATED_FILES_DEP)
 
-###### [BEGIN] Installation / Distribution section
+# [BEGIN] Installation / Distribution section
 
+build: ## Build the geneweb package (librairies and binaries)
 build:
 	dune build -p geneweb
-.DEFAULT_GOAL = build
 
+install: ## Install geneweb using dune
 install:
 	dune build @install
 	dune install
 
+uninstall: ## Uninstall geneweb using dune
 uninstall:
 	dune build @install
 	dune uninstall
 
 BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
 
+distrib: ## Build the project and copy what is necessary for distribution
 distrib: build
 	$(RM) -r $(DISTRIB_DIR)
 	mkdir $(DISTRIB_DIR)
@@ -170,22 +173,25 @@ distrib: build
 
 .PHONY: install uninstall distrib
 
-###### [END] Installation / Distribution section
+# [END] Installation / Distribution section
 
 doc: | $(GENERATED_FILES_DEP)
 	dune build @doc
 .PHONY: doc
 
+test: ## Run tests
 test: | $(GENERATED_FILES_DEP)
 	dune build @runtest
 .PHONY: test
 
+bench: ## Run benchmarks
 bench: | $(GENERATED_FILES_DEP)
 	dune build @runbench
 .PHONY: bench
 
 BENCH_FILE ?= /tmp/geneweb-bench.bin
 
+bench-marshal: ## Run benchmarks and record the result
 bench-marshal: | $(GENERATED_FILES_DEP)
 ifdef BENCH_NAME
 	dune exec benchmark/bench.exe -- --marshal --name ${BENCH_NAME} ${BENCH_FILE}
@@ -194,6 +200,7 @@ else
 endif
 .PHONY: bench-marshal
 
+bench-tabulate: ## Read BENCH_FILE and print a report
 bench-tabulate: | $(GENERATED_FILES_DEP)
 	dune exec benchmark/bench.exe -- --tabulate ${BENCH_FILE}
 .PHONY: bench-tabulate
@@ -206,9 +213,24 @@ clean:
 	@echo " Done!"
 .PHONY: clean
 
+ci: ## Run unit tests and benchmark with different configurations
 ci:
 	@ocaml ./configure.ml && BENCH_NAME=vanilla $(MAKE) -s clean test bench-marshal clean
 	@ocaml ./configure.ml --sosa-num && BENCH_NAME=num $(MAKE) -s clean test bench-marshal clean
 	@ocaml ./configure.ml --sosa-zarith && BENCH_NAME=zarith $(MAKE) -s clean test bench-marshal clean
 	@$(MAKE) -s bench-tabulate
 .PHONY: ci
+
+ocp-indent: ## Run ocp-indent (inplace edition)
+ocp-indent:
+	for f in `find lib bin -type f -regex .*[.]ml[i]?` ; do \
+		echo $$f ; \
+		ocp-indent -i $$f ; \
+	done
+.PHONY: ocp-indent
+
+.DEFAULT_GOAL := help
+help:
+	@clear;grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' Makefile | awk 'BEGIN {FS = ":.*?#\
+# "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## /[33m/'
+.PHONY: help
