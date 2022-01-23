@@ -40,7 +40,7 @@ af: af=Afrikaans/bg=Bulgaars/br=Bretons/ca=Catalan/co=Korsikaans/cs=Czeck/da=Dee
 bg: af=бурски/bg=български/br=бретонски/ca=каталонски/co=корсикан/cs=чешки/da=датски/de=немски/en=английски/eo=есперанто/es=испански/et=естонски/fi=финландски/fr=френски/he=иврит/is=исландски/it=италиански/lv=латвийски/nl=холандски/no=норвежки/oc=окситански/pl=полски/pt=португалски/pt-br=бразилско-португалски/ro=румънски/ru=руски/sk=Словашки език/sl=словенски/sv=шведски/tr=турски/zh=китайски
 br: af=afrikaaneg/bg=bulgareg/br=brezhoneg/ca=katalaneg/co=korseg/cs=tchekeg/da=daneg/de=alamaneg/en=saozneg/eo=esperanteg/es=spagnoleg/et=estonieg/fi=finneg/fr=galleg/he=hebreeg/is=islandeg/it=italianeg/lv=letoneg/nl=izelvroeg/no=norvegieg/oc=okitaneg/pl=poloneg/pt=portugaleg/pt-br=portugaleg bro-Vrazil/ro=roumaneg/ru=rusianeg/sk=Slovakeg/sl=sloveneg/sv=svedeg/tr=turc/zh=sinaeg
 ca: af=africà/bg=búlgar/br=bretó/ca=català/co=cors/cs=xec/da=danès/de=alemany/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/oc=occità/pl=polac/pt=portuguès/pt-br=brasiler/ro=romanès/ru=rus/sk=Eslovac/sl=eslovè/sv=suec/tr=turc/zh=Xinès
-co: af=africanu/bg=bulgaru/br=brittonu/ca=catalanu/co=corsu/cs=ceccu/da=danese/de=tedescu/en=inglese/eo=esperanto/es=spagnolu/et=estonianu/fi=finlandese/fr=francese/he=ebreu/is=islandese/it=talianu/lv=lettonu/nl=neerlandese/no=nurvegese/oc=occitanicu/pl=pulunese/pt=purtughese/pt-br=purtughese brasilianu/ro=rumanu/ru=russiu/sk=sluvaccu/sl=slovenu/sv=svedese/tr=turcu/zh=chinese
+co: af=africaanu/bg=bulgaru/br=brittonu/ca=catalanu/co=corsu/cs=ceccu/da=danese/de=tedescu/en=inglese/eo=esperanto/es=spagnolu/et=estone/fi=finlandese/fr=francese/he=ebreu/is=islandese/it=talianu/lv=lettone/nl=neerlandese/no=nurvegese/oc=uccitanu/pl=pulunese/pt=purtughese/pt-br=purtughese brasilianu/ro=rumenu/ru=russiu/sk=sluvaccu/sl=sluvenu/sv=svedese/tr=turcu/zh=chinese
 cs: af=afrikánština/bg=bulharština/br=bretonština/ca=katalánština/co=korsikánština/cs=čeština/da=dánština/de=němčina/en=angličtina/eo=esperanto/es=španělština/et=estonština/fi=finština/fr=francouzština/he=hebrejština/is=islandština/it=italština/lv=lotyšština/nl=holandština/no=norština/oc=okcitánština/pl=polština/pt=portugalština/pt-br=brasilština/ro=rumunština/ru=ruština/sk=slovenština/sl=slovinština/sv=švédština/tr=turečtina/zh=čínština
 da: af=afrikaans/bg=bulgarsk/br=bretonsk/ca=katalansk/co=korsikansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/oc=occitansk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ro=rumænsk/ru=russisk/sk= Slovakisk/sl=slovensk/sv=svensk/tr=tyrkisk/zh=kinesisk
 de: af=Afrikaans/bg=Bulgarish/br=Bretonisch/ca=Katalanisch/co=Korsisch/cs=Tschechisch/da=Dänisch/de=Deutsch/en=Englisch/eo=Esperanto/es=Spanisch/et=Estnisch/fi=Finnisch/fr=Französisch/he=Hebräisch/is=Isländisch/it=Italienisch/lv=Litauisch/nl=Holländisch/no=Norwegisch/oc=Okzitanisch/pl=Polnisch/pt=Portugiesisch/pt-br=Brasil-Portugiesisch/ro=Rumänisch/ru=Russisch/sk=Slowakisch/sl=Slovenisch/sv=Schwedisch/tr=türkisch/zh=Chinesisch
@@ -175,7 +175,7 @@ sv: du har inte längre åtkomst till denna sida %s
 tr: Bu sayfa için %s erişimi iptal edildi
 
     %s and %s have several unions
-co: ci hè parechje unioni trà %s è %s
+co: %s è %s anu parechje unioni
 de: %s und %s haben mehrere Partnerschaften
 en: %s and %s have several unions
 fr: il y a plusieurs unions entre %s et %s
@@ -5296,7 +5296,7 @@ tr: kayboldu
 
     disconnect
 bg: да се прекъсне връзката
-co: discunnettà
+co: discunnette
 cs: odpojené
 da: afbryd
 de: abmelden
@@ -5640,7 +5640,7 @@ af: moet nie takke van ooreenstemende oorsprong saamvoeg nie
 bg: да не се обединяват общите клонове
 br: n'eo ket dav kendastum ar skourroù boutin
 ca: no reagrupar les branques comunes
-co: ùn addunisce micca e ghjembe cummune
+co: ùn adunisce micca e ghjembe cummune
 cs: nespojovat spolecné vetve
 da: slå ikke fælles anelinier sammen
 de: gemeinsame Zweige nicht zusammenfassen
@@ -6244,7 +6244,7 @@ sv: Familjekällor
 tr: Kaynak
 
     family time line
-co: cronulugia di a famiglia
+co: cronolugia di a famiglia
 de: Timeline der Familie
 en: time line of the family
 fr: chronologie de la famille
@@ -6525,7 +6525,7 @@ ar: الإسم
 bg: собствено име/собствени имена
 br: raganv/raganvioù
 ca: nom/noms/nom·s
-co: nome/nomi
+co: nome/nomi/nome(i)
 cs: křestní jméno/křestní jména
 da: fornavn/fornavne
 de: Vorname/Vornamen
@@ -7359,7 +7359,7 @@ sv: hans/hennes
 tr: onun/onun
 
     history
-co: cronulugia
+co: cronolugia
 de: Verlauf
 en: History
 es: histórico
@@ -7380,7 +7380,7 @@ af: bywerkingsgeskiedenis
 bg: история на измененията
 br: dezrevell an hizivadurioù
 ca: històric de les actualitzacions
-co: cronulugia di e mudificazioni
+co: cronolugia di e mudificazioni
 cs: historie změn
 da: opdateringers historie
 de: Verlauf der Updates
@@ -7518,7 +7518,7 @@ af: ident/e-pos/onderwerp
 bg: идентификатор/e-mail/тема
 br: anv/postel/danvez
 ca: ident/email/tema
-co: nome/e-mail/sughjettu
+co: nome/indirizzu elettronicu/sughjettu
 cs: ident/email/předmět (osoba?)
 da: navn/e-post/emne
 de: Name/E-Mail/Betreff
@@ -7599,7 +7599,7 @@ sv: ignorera implex
 tr: implexi yoksay
 
     illness
-co: maladia
+co: malatia
 de: Krankheit
 en: Disease
 es: enfermedad
@@ -8093,7 +8093,7 @@ sv: anteckningar om personen
 tr: bireysel not
 
     inline chronology
-co: cronulugia simplice/cronulugia detagliata
+co: cronolugia simplice/cronolugia detagliata
 en: simple chronology/detailed chronology
 fr: chronologie simple/chronologie détaillée
 pt: cronologia simples/cronologia detalhada
@@ -8101,7 +8101,7 @@ sv: förenklad kronologi/detaljerad kronologi
 tr: basit kronoloji/ayrıntılı kronoloji
 
     input database
-co: Scrivite quì u nome sanu di a basa di dati à impiegà :
+co: Stampittate quì u nome sanu di a basa di dati à impiegà :
 en: Please, enter the name of the database you want to use:
 fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
 pt: Introduza o nome da base de dados que quer utilizar:
@@ -8141,7 +8141,7 @@ sv: infoga
 tr: Ekle
 
     insufficient revision history for %s
-co: a cronulugia di e revisioni di %s hè insufficiente per effettuà i paragoni
+co: a cronolugia di e revisioni di %s hè insufficiente per effettuà i paragoni
 de: der Versionsverlauf von %s ist nicht ausreichend um Vergleiche anzustellen
 en: No history found for %s
 es: el histórico de las revisiones de %s es insuficiente para realizar comparaciones
@@ -8989,7 +8989,7 @@ sv: manliga linjen/kvinnliga linjen
 tr: erkek hattı/kadın hattı
 
     male/female/neuter
-co: omu/donna/micca specificatu
+co: omu/donna/neutru&#047;scunnisciutu
 de: Mann/Frau/neutral&#047;Unbekannt
 en: male/female/neuter&#047;unknown
 es: hombre/mujer/neutro&#047;no específicado
@@ -9182,11 +9182,13 @@ sv: anteckningar om vigseln
 tr: evlilik notları/evlilik notları
 
     marriage of %t after his/her death
+co: matrimoniu di %t dopu a so morte
 en: marriage of %t after his/her death
 fr: marriage de %t avant son décès
 lt: santuoka po %t mirties
 
     marriage of %t before his/her birth
+co: matrimoniu di %t nanzu a so nascita
 en: marriage of %t before his/her death
 fr: marriage de %t après son décès
 lt: %t susituokė prieš gimdamas 
@@ -9685,7 +9687,7 @@ sv: blandade noteringar
 tr: çeşitli notlar
 
     missing %s
-co: %s manchendu
+co: %s assente
 en: missing %s
 fr: %s manquant
 pt: %s em falta
@@ -10524,7 +10526,7 @@ af: geen bekende verwantskap tussen %s en %s
 bg: няма данни за родство между %s и %s
 br: ne gaver ket al liamm a gerentiezh etre %s ha %s
 ca: cap lligam de parentesc conegut entre %s i %s
-co: nisunu liame di parentia cunnisciutu tra %s è %s
+co: nisunu liame di parentia cunnisciutu trà %s è %s
 cs: žádný známý vztah mezi :i:%s a :i:%s
 da: intet kendt slægtskab mellem %s og %s
 de: %s und %s sind anscheinend nicht verwandt
@@ -11375,7 +11377,7 @@ af: een dag oud
 bg: на един ден
 br: un devezh
 ca: un dia
-co: un ghjornu fà
+co: un ghjornu
 cs: jeden den starý/jeden den stará
 da: en dag gammel
 de: einen Tag alt
@@ -11407,7 +11409,7 @@ af: een maand oud
 bg: на един месец
 br: ur mizvezh
 ca: un mes
-co: un mese fà
+co: un mese
 cs: jeden měsíc starý/jeden měsíc stará
 da: en måned gammel
 de: einen Monat alt
@@ -11439,7 +11441,7 @@ af: een jaar oud
 bg: на една година
 br: ur bloavezh
 ca: un any
-co: un annu fà
+co: un annu
 cs: jeden rok starý/jeden rok stará
 da: et år gammel
 de: ein Jahr alt
@@ -12102,7 +12104,7 @@ sv: presentation
 tr: Sunum
 
     preview family tree
-co: avvistu di l’arburu
+co: fighjulata di l’arburu
 de: Überblick vom Stammbaum
 en: Preview Family Tree
 es: ver ärbol
@@ -12379,7 +12381,7 @@ sv: erkännande far/erkännande mor/erkännande föräldrar
 tr: baba tarafından tanınan/anne tarafından tanınan/tarafından tanınan
 
     reduce/increase
-co: reduce/aumentà
+co: riduce/aummentà
 de: vermindern/erhöhen
 en: reduce/increase
 fr: réduire/augmenter
@@ -12781,7 +12783,7 @@ sv: Pensionerad
 tr: Emeklilik
 
     revision history
-co: cronulugia di i revisioni
+co: cronolugia di i revisioni
 de: Verlauf der Revisionen
 en: revision history
 es: histórico de las revisiones
@@ -13247,7 +13249,7 @@ sv: välj anpassad modul
 tr: kişiselleştirilmiş modülleri seçin
 
     select person to compute relationship
-co: cliccà nant’à a persona cù quella ci vole à fà un calculu di parentia
+co: selezziunate a persona cù quella ci vole à fà un calculu di parentia
 de: auf die Person klicken, zu der Sie das Verwandtschaftsverhältnis berechnen möchten.
 en: click an individual below to calculate the family link.
 es: pulse en la persona con la que quiere realizar un cálculo de parentesco.
@@ -14842,7 +14844,7 @@ sv: Följande barn till %t och %t är födda mycket tätt
 tr: %t ve %t çocuklarının doğum tarihi birbirine çok yakın
 
     the following children of %t and %t are born very distant
-co: e date di nascita di sti zitelli di %t è %t parenu troppu alluntanate
+co: e date di nascita di quelli zitelli di %t è %t parenu troppu alluntanate
 de: Der Altersunterschied zwischen den 2 Kindern %t und %t ist extrem groß
 en: important age gap between the two children %t et %t
 es: importante diferencia de edad entre los niños %t y %t
@@ -15286,7 +15288,7 @@ sv: detta forum har moderator
 tr: bu forum yönetilmektedir
 
     time line
-co: cronulugia
+co: cronolugia
 de: Chronologie
 en: timeline
 es: cronología
@@ -16195,7 +16197,7 @@ tr: "oluştur" yerine "bağlantı" kullanın
     user/password/cancel
 bg: ползвател/парола/отказване
 br: implijer/tremenger/nulañ
-co: utilizatore/parolla d’entrata/abbandunà
+co: utilizatore/parolla d’intesa/abbandunà
 da: bruger/adgangskode/annuller
 de: Benutzer/Passwort/Abbruch
 en: user/password/cancel
@@ -16859,4 +16861,3 @@ ru: ваше сообщение ожидает проверки
 sk: tvoja správa čaká na potvrdenie
 sv: ditt meddelande väntar på godkännande
 tr: mesajınız doğrulama için bekliyor
-
