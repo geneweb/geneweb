@@ -9184,13 +9184,13 @@ tr: evlilik notları/evlilik notları
     marriage of %t after his/her death
 co: matrimoniu di %t dopu a so morte
 en: marriage of %t after his/her death
-fr: marriage de %t avant son décès
+fr: marriage de %t après son décès
 lt: santuoka po %t mirties
 
     marriage of %t before his/her birth
 co: matrimoniu di %t nanzu a so nascita
-en: marriage of %t before his/her death
-fr: marriage de %t après son décès
+en: marriage of %t before his/her birth
+fr: marriage de %t avant sa naissance
 lt: %t susituokė prieš gimdamas 
 
     marriage place
