@@ -917,6 +917,16 @@ and eval_dag_cell_var conf (colspan, align, td) =
         TDhr RightA -> VVbool true
       | _ -> VVbool false
       end
+  | ["is_hr_center"] ->
+      begin match td with
+        TDhr CenterA -> VVbool true
+      | _ -> VVbool false
+      end
+  | ["is_hr"] ->
+      begin match td with
+        TDhr RightA | TDhr LeftA | TDhr CenterA -> VVbool true
+      | _ -> VVbool false
+      end
   | ["is_nothing"] -> VVbool (td = TDnothing)
   | ["item"] ->
       begin match td with
