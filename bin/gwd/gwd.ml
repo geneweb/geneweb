@@ -1921,6 +1921,7 @@ let main () =
 #endif
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
+  Geneweb.GWPARAM.syslog := GwdLog.syslog;
   List.iter register_plugin !plugins ;
   !GWPARAM.init () ;
   cache_lexicon () ;
