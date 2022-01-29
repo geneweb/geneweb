@@ -3005,6 +3005,12 @@ and eval_date_field_var conf d =
           VVstring (string_of_int (Calendar.sdn_of_julian dmy))
       | _ -> null_val
       end
+  | ["gregorian_day"] ->
+      begin match d with
+        Dgreg (dmy, _) ->
+          VVstring (string_of_int (Calendar.sdn_of_gregorian dmy))
+      | _ -> VVstring ""
+      end
   | ["month"] ->
       begin match d with
         Dgreg (dmy, _) -> VVstring (DateDisplay.month_text dmy)
