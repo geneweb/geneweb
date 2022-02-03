@@ -50,7 +50,8 @@ let rec delete_person excl base ip =
               ^ "])"
              ) ;
   let a = get_gen_ascend base ip in
-  (* if person is the single childran ad his parents are empty persons then [ipers] contains father and mother and [ifams] contains family *)
+  (* if person is the single children and his parents are empty persons
+     then [ipers] contains father and mother and [ifams] contains family *)
   let ipers, ifams =
     match a.parents with
     | Some ifam ->

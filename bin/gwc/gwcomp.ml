@@ -872,9 +872,9 @@ let parse_parent str l =
     let u = create_person () in
     let (u, l) = set_infos pp np op u.sex "" "" str u l in Defined u, np, l
 
-(** Parses the line containing a childran and returns a person [gen_person] containing
-    all extracted information. If a childran definition doesn't provide
-    surname then father's surname is used. ALso if it doesn't provide a childran's
+(** Parses the line containing a children and returns a person [gen_person] containing
+    all extracted information. If a children definition doesn't provide
+    surname then father's surname is used. ALso if it doesn't provide a children's
     birth place and source then it uses information provided by family definiton. *)
 let parse_child str surname sex csrc cbp l =
   let u = create_person () in
