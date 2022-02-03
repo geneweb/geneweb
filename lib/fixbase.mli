@@ -35,7 +35,7 @@ val check_NBDS : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base ->
 (** For every family's parent in the base add current family to the parent's union (if absent). *)
 val check_families_parents : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 
-(** For every family's childran in the base add current family to the childran's ascendants (if absent).
+(** For every family's children in the base add current family to the children's ascendants (if absent).
     Doesn't modify consanguinity rate. *)
 val check_families_children : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 

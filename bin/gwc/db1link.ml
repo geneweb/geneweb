@@ -665,7 +665,7 @@ let insert_somebody gen =
     Undefined key -> insert_undefined gen key
   | Defined so -> insert_person gen so
 
-(** Checks if childran [ix] doesn't have another parents *)
+(** Checks if children [ix] doesn't have another parents *)
 let check_parents_not_already_defined gen ix fath moth =
   let x = poi gen.g_base ix in
   match (aoi gen.g_base ix).parents with
@@ -881,11 +881,11 @@ let update_fevents_with_family gen fam =
     - insert every witness in the person's base and associate father
       as a related person.
     - order, convert, adjust and insert events
-    - insert every childran in the person's base
+    - insert every children in the person's base
     - creates entry (of type [family]) for the giving family and its
       couple and descendants in the base.
     - associate father's and mother's union to the current family
-    - associate every childran's ascendants to the current family
+    - associate every children's ascendants to the current family
       (current couple, since it has the same index)
     - stores family in the [gen.g_fam] channel.
     - stores in [gen.g_fam_index] position where person was stored in
@@ -1003,11 +1003,11 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
   gen.g_base.c_unions.(imoth) <- moth_uni;
   notice_sex gen fath fath_sex;
   notice_sex gen moth moth_sex;
-  (* Append familly to the childran's ascendant *)
+  (* Append familly to the children's ascendant *)
   Array.iter
     (fun ix ->
        let a = gen.g_base.c_ascends.(ix) in
-       (* check if childran has no another parents *)
+       (* check if children has no another parents *)
        check_parents_not_already_defined gen ix fath moth;
        let a = {a with parents = Some (i)} in
        gen.g_base.c_ascends.(ix) <- a)

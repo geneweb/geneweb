@@ -6,7 +6,7 @@ val children_of_fam : Gwdb.base -> Gwdb.ifam -> Gwdb.iper list
 
 (** Returns list of person's siblings that includes also half-blood siblings. Every sibling
     is annotated with parent's id and parent's sex. For common father's and mother's
-    childran father's annotation is preserved. *)
+    children father's annotation is preserved. *)
 val siblings :
   Config.config ->
   Gwdb.base -> Gwdb.iper -> (Gwdb.iper * (Gwdb.iper * Def.sex)) list

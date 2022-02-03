@@ -46,7 +46,7 @@ val purge : string -> string
      - "z" replaced by "s"
      - "ph" replaced by "f"
      - others "h" deleted
-     - s at thr end of words are deleted
+     - s at the end of words are deleted
      - no double lowercase consons *)
 val crush : string -> string
 

@@ -267,7 +267,7 @@ type ('iper, 'person, 'string) gen_person =
     psources : 'string;
     key_index : 'iper }
 
-(** Person's ascendants (family where he is a childran) with its consangunity rate
+(** Person's ascendants (family where he is a children) with its consangunity rate
     (equal to relationship betwen his parents). *)
 type 'family gen_ascend = { parents : 'family option; consang : Adef.fix }
 
@@ -313,7 +313,7 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | ChildrenNotInOrder of 'family * 'descend * 'person * 'person (** Children aren't ordered *)
   | CloseChildren of 'family * 'person * 'person (** Age difference between two child is less then 7 month (except for twins) *)
   | DeadOld of 'person * dmy (** Dead old (at the age older then 109 after 1900 year and older then 100 before) *)
-  | DeadTooEarlyToBeFather of 'person * 'person (** Childran is born in more then 1 year after his father's death *)
+  | DeadTooEarlyToBeFather of 'person * 'person (** Children is born in more then 1 year after his father's death *)
   | DistantChildren of 'family * 'person * 'person (** Age gap between two of siblings greater then 50 years *)
   | FEventOrder of 'person * 'fevent * 'fevent (** Familial events haven't been ordered correctly *)
   | FWitnessEventAfterDeath of 'person * 'fevent * 'family (** Witness is dead before familial event date *)
@@ -321,8 +321,8 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | IncoherentAncestorDate of 'person * 'person (** Ancestor is born after person's birth *)
   | MarriageDateAfterDeath of 'person (** Person is married after his death *)
   | MarriageDateBeforeBirth of 'person (** Person is married before his birth *)
-  | MotherDeadBeforeChildBirth of 'person * 'person (** Childran is born after his mother's death *)
-  | ParentBornAfterChild of 'person * 'person (** Parent is born after one of his childran *)
+  | MotherDeadBeforeChildBirth of 'person * 'person (** Children is born after his mother's death *)
+  | ParentBornAfterChild of 'person * 'person (** Parent is born after one of his children *)
   | ParentTooOld of 'person * dmy * 'person (** Person became a parent at age older then 55 years for mother and 70 for father *)
   | ParentTooYoung of 'person * dmy * 'person (** Person became a parent at age younger then 11 years old *)
   | PEventOrder of 'person * 'pevent * 'pevent (** Personal events haven't been ordered correctly *)
