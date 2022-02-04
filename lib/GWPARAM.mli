@@ -1,13 +1,17 @@
-(** The level of log gravity (`LOG_WARNING the lightest). *)
+(** The level of log gravity. See SYSLOG(3) *)
 type syslog_level =
-    [ `LOG_ALERT
-    | `LOG_CRIT
-    | `LOG_DEBUG
-    | `LOG_EMERG
-    | `LOG_ERR
-    | `LOG_INFO
-    | `LOG_NOTICE
-    | `LOG_WARNING ]
+    [ `LOG_EMERG                (** A panic condition. *)
+    | `LOG_ALERT                (** A condition that should be corrected immediately,
+                                    such as a corrupted system database. *)
+    | `LOG_CRIT                 (** Critical conditions, such as hard device errors. *)
+    | `LOG_ERR                  (** Errors. *)
+    | `LOG_WARNING              (** Warning messages.  *)
+    | `LOG_DEBUG                (** Conditions that are not error conditions,
+                                    but that may require special handling. *)
+    | `LOG_INFO                 (** Informational messages. *)
+    | `LOG_NOTICE               (** Messages that contain information
+                                    normally of use only when debugging a program.  *)
+    ]
 
 (** Inititialise assets for gwd server (one in current directory one in /usr/share/geneweb) *)
 val init : (unit -> unit) ref
