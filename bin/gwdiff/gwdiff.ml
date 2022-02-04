@@ -15,8 +15,8 @@ let html = ref false
 let root = ref ""
 let cr = ref ""
 
-(* Messages are printed when there is a difference between a person
-   present in the two bases explored. *)
+(** Messages are printed when there is a difference between a person
+    present in the two bases explored. *)
 type messages =
     MsgBadChild of iper
   | MsgBirthDate
@@ -36,9 +36,9 @@ type messages =
   | MsgSpouses of iper
   | MsgSurname
 
-(* [person_string base iper]
-   Returns the string associated to the person with id `iper` in the base
-   `base`. *)
+(** [person_string base iper]
+    Returns the string associated to the person with id `iper` in the base
+    `base`. *)
 let person_string base iper =
   let p = poi base iper in
   let fn = sou base (get_first_name p) in
@@ -47,15 +47,15 @@ let person_string base iper =
     fn ^ " " ^ sn ^ " (#" ^ string_of_iper iper ^ ")"
   else fn ^ "." ^ string_of_int (get_occ p) ^ " " ^ sn
 
-(* Returns the string associated to a person in HTML if the html option is set,
-   otherwise it has the same effect tja, `person_string`. *)
+(** Returns the string associated to a person in HTML if the html option is set,
+    otherwise it has the same effect tja, `person_string`. *)
 let person_link bname base iper target =
   if !html then
     Printf.sprintf "<A HREF=\"%s%s_w?i=%s\" TARGET=\"%s\">%s</A>" !root bname
       (string_of_iper iper) target (person_string base iper)
   else person_string base iper
 
-(* Prints a message *)
+(** Prints a message *)
 let print_message base1 msg =
   Printf.printf " ";
   begin match msg with
@@ -89,7 +89,7 @@ let print_message base1 msg =
   end;
   Printf.printf "%s" !cr
 
-(* Prints messages associates to the two families identifiers in argument *)
+(** Prints messages associates to the two families identifiers in argument *)
 let print_f_messages base1 base2 ifam1 ifam2 res =
   let f1 = foi base1 ifam1 in
   let f2 = foi base2 ifam2 in
@@ -100,30 +100,30 @@ let print_f_messages base1 base2 ifam1 ifam2 res =
     (person_link !in_file2 base2 (get_father f2) "base2") !cr;
   List.iter (print_message base1) res
 
-(* Same, but for persons *)
+(** Same, but for persons *)
 let print_p_messages base1 base2 iper1 iper2 res =
   Printf.printf "%s / %s%s" (person_link !in_file1 base1 iper1 "base1")
     (person_link !in_file2 base2 iper2 "base2") !cr;
   List.iter (print_message base1) res
 
-(* [compatible_names src_name dest_name_list]
-   Returns true if `src_name` is in `dest_name_list` (case insensitive) *)
+(** [compatible_names src_name dest_name_list]
+    Returns true if `src_name` is in `dest_name_list` (case insensitive) *)
 let compatible_names src_name dest_name_list =
   let src_name = Name.lower src_name in
   let dest_name_list = List.map Name.lower dest_name_list in
   List.mem src_name dest_name_list
 
-(* [compatible_str_field istr1 istr2]
-   Checks the compatibility of two string identifiers, i.e.
-   if istr1 is not the empty string identifier, then istr2
-   must not be. *)
+(** [compatible_str_field istr1 istr2]
+    Checks the compatibility of two string identifiers, i.e.
+    if istr1 is not the empty string identifier, then istr2
+    must not be. *)
 let compatible_str_field istr1 istr2 =
   is_empty_string istr1 || not (is_empty_string istr2)
 
-(* Returns a list of intervals of SDN (SDN 1 is November 25, 4714 BC Gregorian
-   calendar) of the date in argument. An interval has the format (b, b'),
-   where b is an optional lower bound (None => no bound), and b' an optional
-   upper bound. *)
+(** Returns a list of intervals of SDN (SDN 1 is November 25, 4714 BC Gregorian
+    calendar) of the date in argument. An interval has the format (b, b'),
+    where b is an optional lower bound (None => no bound), and b' an optional
+    upper bound. *)
 let dmy_to_sdn_range_l dmy =
   let sdn_of_dmy dmy =
     let sdn = Calendar.sdn_of_gregorian dmy in
@@ -170,9 +170,9 @@ let dmy_to_sdn_range_l dmy =
       let (_sdn21, sdn22) = sdn_of_dmy (Date.dmy_of_dmy2 dmy2) in
       [Some sdn11, Some sdn22]
 
-(* [compatible_sdn i1 i2]
-   Checks if two intervals `i1` and `i2` (as described for `dmy_to_sdn_range_l`)
-   are compatible, i.e. if i2 is a sub interval of i1. *)
+(** [compatible_sdn i1 i2]
+    Checks if two intervals `i1` and `i2` (as described for `dmy_to_sdn_range_l`)
+    are compatible, i.e. if i2 is a sub interval of i1. *)
 let compatible_sdn (sdn11, sdn12) (sdn21, sdn22) =
   if (sdn21, sdn22) = (None, None) then true
   else
@@ -191,27 +191,27 @@ let compatible_sdn (sdn11, sdn12) (sdn21, sdn22) =
     in
     bool1 && bool2
 
-(* [compatible_sdn_l l i]
-   Checks if there exists an interval in `l` that is compatible with `i` *)
+(** [compatible_sdn_l l i]
+    Checks if there exists an interval in `l` that is compatible with `i` *)
 let compatible_sdn_l sdn1_l sdn2 =
   (* S: replace by List.exists *)
   List.fold_left (fun r sdn1 -> r || compatible_sdn sdn1 sdn2) false sdn1_l
 
-(* [compatible_sdn_l l1 l2]
-   Checks if for all intervals `i2` in `l2`, there exists an interval `i1` in
-   `l1` such that `i1` is compatible with `i2` *)
+(** [compatible_sdn_l l1 l2]
+    Checks if for all intervals `i2` in `l2`, there exists an interval `i1` in
+    `l1` such that `i1` is compatible with `i2` *)
 let compatible_sdn_ll sdn1_l sdn2_l =
   List.fold_left (fun r sdn2 -> r && compatible_sdn_l sdn1_l sdn2) true sdn2_l
 
-(* [compatible_dmys d1 d2]
-   Checks if `d1` is compatible with `d2`, i.e. if despite a potential lack
-   of precision in the dates, d2 is more precise than d1. *)
+(** [compatible_dmys d1 d2]
+    Checks if `d1` is compatible with `d2`, i.e. if despite a potential lack
+    of precision in the dates, d2 is more precise than d1. *)
 let compatible_dmys dmy1 dmy2 =
   compatible_sdn_ll (dmy_to_sdn_range_l dmy1) (dmy_to_sdn_range_l dmy2)
 
-(* [compatible_dates date1 date2]
-   Same than before, but also checks the kind of date (Dgreg or Dtext)
-   and, in the first case, if calendars are compatible. *)
+(** [compatible_dates date1 date2]
+    Same than before, but also checks the kind of date (Dgreg or Dtext)
+    and, in the first case, if calendars are compatible. *)
 let compatible_dates date1 date2 =
   let compatible_cals cal1 cal2 =
     match cal1, cal2 with
@@ -226,7 +226,7 @@ let compatible_dates date1 date2 =
     | Dgreg (_, _), Dtext _ -> false
     | Dtext _, _ -> true
 
-(* Same than before, but for Adef.ctype. *)
+(** Same than before, but for Adef.ctype. *)
 let compatible_cdates cdate1 cdate2 =
   let od1 = Adef.od_of_cdate cdate1 in
   let od2 = Adef.od_of_cdate cdate2 in
@@ -235,12 +235,12 @@ let compatible_cdates cdate1 cdate2 =
   | Some _, None -> false
   | None, _ -> true
 
-(* Checks if birth between two persons are compatible, i.e. if their birth date
-   (baptism date if birth date not provided) and place are compatible, and
-   returns a list of messages.
-   If birth is not provided, checks bathism date instead.
-   If birth/bathism date are not compatible, the returned list will have MsgBirthDate
-   If birth place are not compatible, the returned list will have MsgBirthPlace *)
+(** Checks if birth between two persons are compatible, i.e. if their birth date
+    (baptism date if birth date not provided) and place are compatible, and
+    returns a list of messages.
+    If birth is not provided, checks bathism date instead.
+    If birth/bathism date are not compatible, the returned list will have MsgBirthDate
+    If birth place are not compatible, the returned list will have MsgBirthPlace *)
 let compatible_birth p1 p2 =
   let get_birth person =
     if person.birth = Adef.cdate_None then person.baptism else person.birth
@@ -256,8 +256,8 @@ let compatible_birth p1 p2 =
   in
   res1 @ res2
 
-(* Same than before, but for death. Messages returned are
-   MsgDeathDate and MsgDeathPlace *)
+(** Same than before, but for death. Messages returned are
+    MsgDeathDate and MsgDeathPlace *)
 let compatible_death p1 p2 =
   let bool1 =
     p1.death = p2.death ||
@@ -278,21 +278,21 @@ let compatible_death p1 p2 =
   in
   res1 @ res2
 
-(* [compatible_sexes p1 p2]
-   Returns [] if `p1` and `p2` have the same sex, [MsgSex] otherwise. *)
+(** [compatible_sexes p1 p2]
+    Returns [] if `p1` and `p2` have the same sex, [MsgSex] otherwise. *)
 let compatible_sexes p1 p2 =
   if p1.sex = p2.sex then [] else [MsgSex]
 
-(* [compatible_occupations p1 p2]
-   Returns [] if `p1` and `p2` have compatible occupations, [MsgOccupation] otherwise. *)
+(** [compatible_occupations p1 p2]
+    Returns [] if `p1` and `p2` have compatible occupations, [MsgOccupation] otherwise. *)
 let compatible_occupations p1 p2 =
   if compatible_str_field p1.occupation p2.occupation then []
   else [MsgOccupation]
 
-(* Checks if two persons' names are compatible wrt. their eventual aliases and returns a
-   list of messages.
-   If first names are not compatible, the returned list will have MsgFirstName.
-   If surnames are not compatible, the returned list will have MsgSurname. *)
+(** Checks if two persons' names are compatible wrt. their eventual aliases and returns a
+    list of messages.
+    If first names are not compatible, the returned list will have MsgFirstName.
+    If surnames are not compatible, the returned list will have MsgSurname. *)
 let compatible_persons_ligth base1 base2 p1 p2 =
   let fn1 = sou base1 p1.first_name in
   let fn2 = sou base2 p2.first_name in
@@ -304,17 +304,17 @@ let compatible_persons_ligth base1 base2 p1 p2 =
   let res2 = if compatible_names sn1 asn2 then [] else [MsgSurname] in
   res1 @ res2
 
-(* Checks if two persons are compatible and returns all the messages associated
-   to the compatiblity of their name, sex, birth, death and occupation. *)
+(** Checks if two persons are compatible and returns all the messages associated
+    to the compatiblity of their name, sex, birth, death and occupation. *)
 let compatible_persons base1 base2 p1 p2 =
   compatible_persons_ligth base1 base2 p1 p2 @
   compatible_sexes p1 p2 @ compatible_birth p1 p2 @
   compatible_death p1 p2 @
   compatible_occupations p1 p2
 
-(* [find_compatible_persons_ligth base1 base2 iper1 iper2_list]
-   Returns the sublist of persons of `iper2_list` that are compatible with
-   `iper1` (only checking names). *)
+(** [find_compatible_persons_ligth base1 base2 iper1 iper2_list]
+    Returns the sublist of persons of `iper2_list` that are compatible with
+    `iper1` (only checking names). *)
 let rec find_compatible_persons_ligth base1 base2 iper1 iper2_list =
   (* S: not tail recursive, could be *)
   match iper2_list with
@@ -326,8 +326,8 @@ let rec find_compatible_persons_ligth base1 base2 iper1 iper2_list =
       if compatible_persons_ligth base1 base2 p1 p2 = [] then head :: c_rest
       else c_rest
 
-(* Same than before, but with full compatibility ( name, sex, birth, death and
-   occupation) *)
+(** Same than before, but with full compatibility ( name, sex, birth, death and
+    occupation) *)
 let rec find_compatible_persons base1 base2 iper1 iper2_list =
   match iper2_list with
     [] -> []
@@ -338,8 +338,8 @@ let rec find_compatible_persons base1 base2 iper1 iper2_list =
       if compatible_persons base1 base2 p1 p2 = [] then head :: c_rest
       else c_rest
 
-(* Checks if the spouse of the persons (whose id are in argument) are
-   compatible (only checking names) and returns the associated messages list. *)
+(** Checks if the spouse of the persons (whose id are in argument) are
+    compatible (only checking names) and returns the associated messages list. *)
 let compatible_unions base1 base2 iper1 iper2 ifam1 ifam2 =
   let get_spouse base iper ifam =
     let f = foi base ifam in
@@ -350,9 +350,9 @@ let compatible_unions base1 base2 iper1 iper2 ifam1 ifam2 =
   let spouse2 = gen_person_of_person (get_spouse base2 iper2 ifam2) in
   compatible_persons_ligth base1 base2 spouse1 spouse2
 
-(* [find_compatible_unions base1 base2 iper1 iper2_list ifam1 ifam2_list]
-   Returns the sublist of families of `ifam2_list` whose union is compatible
-   (in the sense of `compatible_unions`). *)
+(** [find_compatible_unions base1 base2 iper1 iper2_list ifam1 ifam2_list]
+    Returns the sublist of families of `ifam2_list` whose union is compatible
+    (in the sense of `compatible_unions`). *)
 let rec find_compatible_unions base1 base2 iper1 iper2 ifam1 ifam2_list =
   match ifam2_list with
     [] -> []
@@ -364,18 +364,18 @@ let rec find_compatible_unions base1 base2 iper1 iper2 ifam1 ifam2_list =
         head :: c_rest
       else c_rest
 
-(* [compatible_divorces d1 d2]
-   Returns true if divorces are compatible, i.e. if both divorced, then
-   checking date compatibility, if d1 is a divorce and d2 is not returns
-   false, otherwise returns true. *)
+(** [compatible_divorces d1 d2]
+    Returns true if divorces are compatible, i.e. if both divorced, then
+    checking date compatibility, if d1 is a divorce and d2 is not returns
+    false, otherwise returns true. *)
 let compatible_divorces d1 d2 =
   match d1, d2 with
     Divorced cdate1, Divorced cdate2 -> compatible_cdates cdate1 cdate2
   | Divorced _, _ -> false
   | _ -> true
 
-(* Checks the compatibility of marriages (mariage date, divorce
-   and mariage place), then print the list of messages calculated. *)
+(** Checks the compatibility of marriages (mariage date, divorce
+    and mariage place), then print the list of messages calculated. *)
 let compatible_marriages base1 base2 ifam1 ifam2 =
   let f1 = gen_family_of_family (foi base1 ifam1) in
   let f2 = gen_family_of_family (foi base2 ifam2) in
@@ -393,16 +393,16 @@ let compatible_marriages base1 base2 ifam1 ifam2 =
   let res = res1 @ res2 @ res3 in
   if res = [] then () else print_f_messages base1 base2 ifam1 ifam2 res
 
-(* Calculates the compatibility of two persons and prints the associated
-   messages *)
+(** Calculates the compatibility of two persons and prints the associated
+    messages *)
 let pdiff base1 base2 iper1 iper2 =
   let p1 = gen_person_of_person (poi base1 iper1) in
   let p2 = gen_person_of_person (poi base2 iper2) in
   let res = compatible_persons base1 base2 p1 p2 in
   if res = [] then () else print_p_messages base1 base2 iper1 iper2 res
 
-(* Calculates the compatibility of two persons' families and prints the
-   associated messages. *)
+(** Calculates the compatibility of two persons' families and prints the
+    associated messages. *)
 let compatible_parents base1 base2 iper1 iper2 =
   let a1 = get_parents (poi base1 iper1) in
   let a2 = get_parents (poi base2 iper2) in
@@ -417,8 +417,8 @@ let compatible_parents base1 base2 iper1 iper2 =
   | Some _, None ->
       print_p_messages base1 base2 iper1 iper2 [MsgParentsMissing]
 
-(* Checks che compatibility of two persons and their families, and prints it.
-   This is performed recursively through their descendants *)
+(** Checks che compatibility of two persons and their families, and prints it.
+    This is performed recursively through their descendants *)
 let rec ddiff base1 base2 iper1 iper2 d_tab =
   (* S: Simplify with statement:
      let ddiff iper1 iper2 = ddiff base1 base2 iper1 iper2 d_tab *)
@@ -466,7 +466,7 @@ let rec ddiff base1 base2 iper1 iper2 d_tab =
     let u2 = Array.to_list (get_family (poi base2 iper2)) in
     pdiff base1 base2 iper1 iper2; List.iter (fu base1 base2 u2) u1
 
-(* Returns the eldest persons on the base starting from the persons in argument. *)
+(** Returns the eldest persons on the base starting from the persons in argument. *)
 let rec find_top base1 base2 iper1 iper2 =
   let p1 = gen_person_of_person (poi base1 iper1) in
   let p2 = gen_person_of_person (poi base2 iper2) in
@@ -493,7 +493,7 @@ let rec find_top base1 base2 iper1 iper2 =
       []
     end
 
-(* Same than ddiff, but starting from the eldest ancestors from the persons in argument *)
+(** Same than ddiff, but starting from the eldest ancestors from the persons in argument *)
 let addiff base1 base2 iper1 iper2 d_tab =
   let topdiff (iper1, iper2) =
     Printf.printf "==> %s / %s%s" (person_link !in_file1 base1 iper1 "base1")
