@@ -2,7 +2,7 @@ open Geneweb
 
 let ns = "no_index"
 
-let url_no_index conf base =
+let url_no_index conf base pwd =
   let scratch s = Mutil.encode (Name.lower (Gwdb.sou base s)) in
   let get_a_person v =
     try
@@ -46,6 +46,7 @@ let url_no_index conf base =
       function
         [] -> []
       | ("opt", "no_index") :: l -> loop l
+      | ("opt", "no_index_pwd") :: l -> loop l
       | (("dsrc" | "escache" | "templ"), _) :: l -> loop l
       | ("i", v) :: l -> new_env "i" v (fun x -> x) l
       | ("ei", v) :: l -> new_env "ei" v (fun x -> "e" ^ x) l
@@ -75,8 +76,15 @@ let url_no_index conf base =
     let pref =
       let s = Util.get_request_string conf in
       match String.rindex_opt s '?' with
-        Some i -> String.sub s 0 i
+      | Some i -> String.sub s 0 i
       | None -> s
+    in
+    let pref =
+      if pwd then pref
+      else
+        match String.rindex_opt pref '_' with
+        | Some i -> String.sub pref 0 i
+        | None -> pref
     in
     Util.get_server_string conf ^ pref
   in
@@ -94,9 +102,11 @@ let url_no_index conf base =
 let () =
   Gwd_lib.GwdPlugin.register_se ~ns @@ fun _assets conf -> function
   | Some base ->
-    if Util.p_getenv conf.env "opt" = Some "no_index"
+    let opt1 = Util.p_getenv conf.env "opt" = Some "no_index" in
+    let opt2 = Util.p_getenv conf.env "opt" = Some "no_index_pwd" in
+    if opt1 || opt2
     then begin
-      let link = url_no_index conf base in
+      let link = url_no_index conf base opt2 in
       Output.printf conf "<a href=\"http://%s\">%s</a>" link link;
       Output.flush conf ;
       exit 0
