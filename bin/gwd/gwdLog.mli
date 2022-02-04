@@ -1,14 +1,14 @@
 (** Verbosity level: defines the verbosity level that will
-    allow the `syslog` function to print anything. *)
+    allow the [syslog] function to print anything. *)
 val verbosity : int ref
 
-(** If set to `true`, prints backtrace when printng log. *)
+(** If set to [true], prints backtrace when printing log. *)
 val debug : bool ref
 
 (** The output channel in which log is written. *)
 val oc : out_channel option ref
 
-(** Prints on `oc` *)
+(** Prints on [oc] *)
 val log : (out_channel -> unit) -> unit
 
 (** The level of log. *)
@@ -24,5 +24,5 @@ type level = [
   ]
 
 (** [syslog level msg]
-    Prints `msg` on `!oc` depending on the verbosity. *)
+    Prints [msg] on [!oc] depending on the verbosity. *)
 val syslog : level -> string -> unit

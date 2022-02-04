@@ -433,7 +433,7 @@ let insert_undefined gen key =
         poi gen.g_base ip, ip
     (* if person not found *)
     with Not_found ->
-      (* abailable occurence number *)
+      (* available occurence number *)
       let new_occ =
         if gen.g_file_info.f_separate && key.pk_first_name <> "?" &&
            key.pk_surname <> "?"
@@ -538,7 +538,7 @@ let insert_person gen so =
         poi gen.g_base ip, ip
     (* if person not found *)
     with Not_found ->
-      (* abailable occurence number *)
+      (* available occurence number *)
       let new_occ =
         if gen.g_file_info.f_separate && so.first_name <> "?" &&
            so.surname <> "?"

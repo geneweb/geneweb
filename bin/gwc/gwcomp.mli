@@ -56,11 +56,12 @@ type gw_syntax =
            string * (somebody * sex * witness_kind) list) list
   (** Block that defines database notes and extended pages.
       First string represents name of extended page ("" for
-      database notes, only one for file). Second is note's
-      or page's content. *)
+      database notes, only one for file).
+      Second is note's or page's content. *)
   | Bnotes of string * string
-  (** Block that defines wizard notes. First string represents
-      First string represents wizard's id. Second is note's content. *)
+  (** Block that defines wizard notes.
+      First string represents wizard's id.
+      Second is note's content. *)
   | Wnotes of string * string
 
 (** .gwo file header *)

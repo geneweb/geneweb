@@ -303,7 +303,7 @@ let rec input_real_line ic =
   let x = input_a_line ic in
   if x = "" || x.[0] = '#' then input_real_line ic else x
 
-(** Parses person's birthdate if it is present. *)
+(** Parses person's birth date if it is present. *)
 let get_optional_birthdate l =
   match l with
     x :: l' ->
@@ -317,7 +317,7 @@ let get_optional_birthdate l =
         end
   | _ -> None, l
 
-(** Parses person's babtization date if it is present. *)
+(** Parses person's baptism date if it is present. *)
 let get_optional_baptdate l =
   match l with
     x :: l' ->
@@ -396,7 +396,7 @@ let get_optional_sexe =
   | "f" :: l -> Female, l
   | l -> Neuter, l
 
-(** Parses int from that starts at the position [i] inside [x].
+(** Parses int that starts at the position [i] inside [x].
     Raises [Not_found] if integer isn't found. *)
 let make_int x =
   let rec loop found n i =
@@ -409,8 +409,8 @@ let make_int x =
   in
   loop false 0
 
-(** Parses person's first name and occurence number. Returns 0 if occurence
-    number isn't present. *)
+(** Parses person's first name and occurence number.
+    Occurence number is 0 if not present. *)
 let get_fst_name str l =
   match l with
     x :: l' ->
@@ -769,7 +769,7 @@ let create_person () =
 let bogus_def p n = p = "?" || n = "?"
 
 (** Parse the line and create person's [gen_person] definition.
-    Doesn't modify folowing personal information:
+    Doesn't modify following personal information:
     - Key
     - Parents
     - Related persons
@@ -795,7 +795,7 @@ let set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   let (baptism, l) = get_optional_baptdate l in
   let (baptism_place, l) =
     let (pp, l) = get_field "#pp" l in
-    (* if no baptization place then it's equals to birth place *)
+    (* if no baptism place then it's equals to birth place *)
     if pp = "" then get_field "#bp" l else pp, l
   in
   let (bapt_note, l) = get_field "#pn" l in
