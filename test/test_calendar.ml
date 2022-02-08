@@ -32,10 +32,10 @@ let suite =
   [ "Calendar" >:::
     []
 
-    @ (sdn_round_trip "gregorian" Calendar.sdn_of_gregorian Calendar.gregorian_of_sdn)
-    @ (sdn_round_trip "julian" Calendar.sdn_of_julian Calendar.julian_of_sdn)
-    @ (sdn_round_trip "french" Calendar.sdn_of_french Calendar.french_of_sdn)
-    @ (sdn_round_trip "hebrew" Calendar.sdn_of_hebrew Calendar.hebrew_of_sdn)
+    (* @ (sdn_round_trip "gregorian" Calendar.sdn_of_gregorian Calendar.gregorian_of_sdn)
+     * @ (sdn_round_trip "julian" Calendar.sdn_of_julian Calendar.julian_of_sdn)
+     * @ (sdn_round_trip "french" Calendar.sdn_of_french Calendar.french_of_sdn)
+     * @ (sdn_round_trip "hebrew" Calendar.sdn_of_hebrew Calendar.hebrew_of_sdn) *)
 
     @ (gregorian_round_trip "julian" Calendar.gregorian_of_julian Calendar.julian_of_gregorian)
     @ (gregorian_round_trip "french" Calendar.gregorian_of_french Calendar.french_of_gregorian)
