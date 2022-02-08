@@ -7,10 +7,11 @@
 
 (executable
   (name test)
-  (libraries %%%SOSA_PKG%%% dummy_gwdb geneweb oUnit stdlib-shims)
+  (libraries %%%SOSA_PKG%%% dummy_gwdb geneweb geneweb_def_show oUnit stdlib-shims)
   (preprocess (pps ppx_deriving.show))
   (modules
     test
+    test_calendar
     test_place
     test_sosa
     test_utils
