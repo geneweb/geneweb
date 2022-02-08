@@ -76,7 +76,11 @@ let show_pau base p =
   let p = Gwdb.gen_person_of_person p in
   let p = Futil.map_person_ps Gwdb.string_of_iper (Gwdb.sou base) p in
   let p = { p with key_index = Gwdb.string_of_iper p.key_index } in
-  let a = { a with parents = Option.map Gwdb.string_of_ifam a.parents } in
+  let a = { a with parents =
+                     match a.parents with
+                     | Some ifam -> Some (Gwdb.string_of_ifam ifam)
+                     | None -> None
+          } in
   let u = { Def.family = Array.map Gwdb.string_of_ifam u.family } in
   ( [%show: (string,string,string) gen_person] p
   , [%show: string gen_ascend] a
