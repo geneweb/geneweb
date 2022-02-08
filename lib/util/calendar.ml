@@ -22,7 +22,7 @@ let dmy_of_dmy2 : Def.dmy2 -> Def.dmy =
 let aux fn (d : Def.dmy) : Def.dmy =
   let aux2 d2 =
     let d = of_calendars @@ fn @@ to_calendars @@ dmy_of_dmy2 d2 in
-    { Def.day2 = d.Def.day ; month2 = d.Def.month ; year2 = d.Def.year ; delta2 = 0 }
+    { Def.day2 = d.Def.day ; month2 = d.Def.month ; year2 = d.Def.year ; delta2 = d.Def.delta }
   in
   let prec =
     match d.Def.prec with
