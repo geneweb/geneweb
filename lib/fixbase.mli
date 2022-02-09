@@ -11,7 +11,7 @@
     [Gwdb.commit_patches]
 *)
 
-(** All possible patches that could be automatically deducted from incontinent
+(** All possible patches that could be automatically deducted from inconsistent
     or absent information in the database *)
 type patch =
   | Fix_NBDS of Gwdb.iper
@@ -32,35 +32,40 @@ type patch =
     his fields and vice versa. *)
 val check_NBDS : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 
-(** For every family's parent in the base add current family to the parent's union (if absent). *)
+(** For every family's parent in the base add current family to the parent's union if absent. *)
 val check_families_parents : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 
-(** For every family's children in the base add current family to the children's ascendants (if absent).
+(** For every family's children in the base add current family to the children's ascendants if absent.
     Doesn't modify consanguinity rate. *)
 val check_families_children : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 
-(** For every person checks it ascendants. If it references to the dummy family, then remove this reference.
-    Otherwise add person to the family's children if he is absent. *)
+(** For every person checks their ascendants.
+    If it references to the dummy family, then remove this reference.
+    Otherwise add the person to the family's children if absent. *)
 val check_persons_parents : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 
-(** For every person in the base removes all duplicate families and families where person isn't a parent  *)
+(** For every person in the base removes all duplicate families and families where person isn't a parent. *)
 val check_persons_families : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 
-(** For every person's event's witness add current person to the list of related persons if absent. *)
+(** For every person's event's witness add current person to the list of related of the witness if absent. *)
 val check_pevents_witnesses : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 
-(** For every family's event's witness add family's father to the list of related persons if absent. *)
+(** For every family's event's witness add family's father to the list of related of the witness if absent. *)
 val check_fevents_witnesses : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 
 (** For every family in the base synchronise its fields with marriage and divorce events. *)
 val fix_marriage_divorce : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 
-(** For every family's missing parent (or spouse) fix his id and add current family to the parent's union  *)
+(** For every family, if a parent refers to a person dummy person (with dummy iper).
+    Fix this person and add the family to their union list.
+    If this situation happens, an explaination is that the person has been incorrectly deleted,
+    instead of just erasing their personal details.
+*)
 val fix_missing_spouses : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 
-(** For every person's and family's string remplace it with normalized UTF8 version *)
+(** For every person's and family's field, remplace it with normalized UTF8 version. *)
 val fix_utf8_sequence : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 
-(** For every person in the base update his occurence number if someone with same name and same occurence
-    number already exists in the base. *)
+(** For every person in the base, update their occurence number
+    if someone with same key (normalized first name and last name, and occurence number) already exists. *)
 val fix_key : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
