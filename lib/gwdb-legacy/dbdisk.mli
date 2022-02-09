@@ -319,7 +319,7 @@ type base_data =
     ascends : dsk_ascend record_access;
     (* Array of persons' unions *)
     unions : dsk_union record_access;
-    (* unused *)
+    (* unused by default *)
     visible : visible_record_access;
     (* Array of families *)
     families : dsk_family record_access;
@@ -340,7 +340,7 @@ type base_data =
   ; perm : perm
   }
 
-(** Functioallity part of database. Every modification of the base is stored in {i patches} file.
+(** Functionality part of database. Every modification of the base is stored in {i patches} file.
     Note that, every modification firstly is pendent and should be commited
     to apply them and to update {i patches} file with [commit_patches]. *)
 type base_func =
@@ -361,51 +361,46 @@ type base_func =
     persons_of_surname : string_person_index;
     (* Search functionalities throughout index by first name *)
     persons_of_first_name : string_person_index;
-    (* Insert or modify person with a giving id. Added inside pending patches. *)
+    (* Insert or modify person with a giving id (add to pending patches). *)
     patch_person : int -> dsk_person -> unit;
-    (* Insert or modify ascendants of a person with a giving id.
-       Added inside pending patches. *)
+    (* Insert or modify ascendants of a person with a giving id (add to pending patches). *)
     patch_ascend : int -> dsk_ascend -> unit;
-    (* Insert or modify union of a person with a giving id.
-       Added inside pending patches. *)
+    (* Insert or modify union of a person with a giving id (add to pending patches). *)
     patch_union : int -> dsk_union -> unit;
-    (* Insert or modify family with a giving id. Added inside pending patches. *)
+    (* Insert or modify family with a giving id (add to pending patches). *)
     patch_family : int -> dsk_family -> unit;
-    (* Insert or modify couple of a family with a giving id.
-       Added inside pending patches. *)
+    (* Insert or modify couple of a family with a giving id (add to pending patches). *)
     patch_couple : int -> dsk_couple -> unit;
-    (* Insert or modify descendants of a family with a giving id.
-       Added inside pending patches. *)
+    (* Insert or modify descendants of a family with a giving id (add to pending patches). *)
     patch_descend : int -> dsk_descend -> unit;
-    (* Associate person to the another name inside the index.
-    Added directly inside commited patches. *)
+    (* Associate person to [name] inside the index.
+       Added directly inside commited patches. *)
     patch_name : string -> int -> unit;
     (* Insert new string inside the pending patches and returns its id.
        If string already exists return its id. *)
     insert_string : string -> int;
     (* Commit pending patches and write a patches' new state inside "patches"
-       file. "nb_persons" are also updated. *)
+       file. "nb_persons" is also updated. *)
     commit_patches : unit -> unit;
     (* Update content (second arg) of the notes' file (first arg) if exists. *)
     commit_notes : string -> string -> unit;
     (* Close every opened channel. *)
     cleanup : unit -> unit;
-    (* Returns real number of persons inside the base
-       (without bogus ? ? definition). Pendent patches aren't considered. *)
+    (* Returns real number of persons inside the base (without empty persons).
+       Pending patches aren't considered. *)
     nb_of_real_persons : unit -> int;
     (* Tells if person with giving id exists in the base.
-       Pendent patches are also considered *)
+       Pending patches are also considered. *)
     iper_exists : int -> bool;
     (* Tells if family with giving id exists in the base.
-       Pendent patches are also considered *)
+       Pending patches are also considered. *)
     ifam_exists : int -> bool
   }
 
 (** Geneweb database version *)
 type base_version = GnWb0020 | GnWb0021 | GnWb0022 | GnWb0023 | GnWb0024
 
-(** Database represntation in the memory that regroups
-    data and basic requests over this data. *)
+(** Database representation: data and basic requests over this data. *)
 type dsk_base = { data : base_data
                 ; func : base_func
                 ; version : base_version }

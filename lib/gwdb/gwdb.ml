@@ -50,7 +50,7 @@ let rec delete_person excl base ip =
               ^ "])"
              ) ;
   let a = get_gen_ascend base ip in
-  (* if person is the single children and his parents are empty persons
+  (* if person is the single child and their parents are empty persons
      then [ipers] contains father and mother and [ifams] contains family *)
   let ipers, ifams =
     match a.parents with
@@ -222,13 +222,14 @@ let nobtit base allowed_titles denied_titles p =
            else true)
         list
 
-(** Returns first name of person with giving id *)
+(** Returns first name of person *)
 let p_first_name base p = Mutil.nominative (sou base (get_first_name p))
 
-(** Returns surname of person with giving id *)
+(** Returns surname of person *)
 let p_surname base p = Mutil.nominative (sou base (get_surname p))
 
-(** Returns array of surnames of person's husbands. First element of a couple in the array is husband's surname,
+(** Returns array of surnames of person's husbands.
+    First element of a couple in the array is husband's surname,
     second - is a husband's surname aliases *)
 let husbands base gp =
   let p = poi base gp.key_index in
