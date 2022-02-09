@@ -72,14 +72,6 @@ let int_size = 4
 let output_value_no_sharing oc v =
   Marshal.to_channel oc v [Marshal.No_sharing]
 
-(* (*UNUSED*)
-let output_array_no_sharing oc arr_get arr_len =
-  let header_pos = Iovalue.create_output_value_header oc in
-  Iovalue.output_block_header oc 0 arr_len;
-  for i = 0 to arr_len - 1 do Iovalue.output oc (arr_get i) done;
-  let pos_end = Iovalue.patch_output_value_header oc header_pos in
-  seek_out oc pos_end*)
-
 module IntHT = Hashtbl.Make (struct
     type t = int
     let equal = (=)
