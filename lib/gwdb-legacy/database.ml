@@ -59,7 +59,7 @@ let move_with_backup src dst =
          array, length = "table_size", associating:
           - a hash value of the "crushed" (module "Name") surname sub-string
            (modulo length)
-          - to the array of the corresponding surnnames (string indexes) that contains
+          - to the array of the corresponding surnames (string indexes) that contains
             giving surname substring
        3rd index (first name sub-strings) : value
          array, length = "table_size", associating:
@@ -607,12 +607,12 @@ let make_visible_record_access perm bname persons =
 
 (*
    Synchro:
-     - synchro_person contient la liste des ip des personnes patch�es.
-     - synchro_family contient la liste des ifam des familles patch�es.
+     - synchro_person contient la liste des ip des personnes patchées.
+     - synchro_family contient la liste des ifam des familles patchées.
      - synchro_patch contient :
          * le timestamp de la modification
-         * la liste des personnes modifi�es
-         * la liste des familles modifi�es
+         * la liste des personnes modifiées
+         * la liste des familles modifiées
 *)
 let synchro_person = ref []
 let synchro_family = ref []
@@ -1004,7 +1004,7 @@ let opendb bname =
       aux patches.h_couple pending.h_couple ;
       aux patches.h_descend pending.h_descend ;
       aux patches.h_string pending.h_string ;
-    (* update "pathes" file *)
+    (* update "patches" file *)
       let tmp_fname = Filename.concat bname "1patches" in
       let fname = Filename.concat bname "patches" in
       let tm_oc = Secure.open_out_bin tm_fname in
@@ -1231,7 +1231,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) : Dbd
     ; perm = RDRW
     }
   in
-  (* since this function as called exclusively to create a database, it doesn't
+  (* since this function is called exclusively to create a database, it doesn't
      needs for functionalities over arays *)
   let func : Dbdisk.base_func =
     { person_of_key = (fun _ -> assert false)

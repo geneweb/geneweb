@@ -49,14 +49,13 @@ type fam_event = (iper, istr) Def.gen_fam_event
     (surname or first name). *)
 type string_person_index
 
-(** Database represntation in the memory that regroups
-    data and basic requests over this data. *)
+(** The database representation. *)
 type base
 
-(** Open database situated in the specified directory. *)
+(** Open database associated with (likely situated in) the specified directory. *)
 val open_base : string -> base
 
-(** Close database memory representation. *)
+(** Close database. May perform some clean up tasks. *)
 val close_base : base -> unit
 
 (** Dummy person id *)
@@ -65,13 +64,13 @@ val dummy_iper : iper
 (** Dummy family id *)
 val dummy_ifam : ifam
 
-(** Says if strings with the giving ids are equal *)
+(** [true] if strings with the giving ids are equal *)
 val eq_istr : istr -> istr -> bool
 
-(** Says if string with the giving id is empty ("") *)
+(** [true] if string with the giving id is empty ("") *)
 val is_empty_string : istr -> bool
 
-(** Says if string with the giving id is a question mark ("?") *)
+(** [true] if string with the giving id is a question mark ("?") *)
 val is_quest_string : istr -> bool
 
 (** Id of the empty string ("") *)
@@ -97,7 +96,7 @@ val ifam_exists : base -> ifam -> bool
     If corresponding information part isn't present, driver load it from
     the disk and cache it so further gets will return result immediately. *)
 
-(** Get rights that defines access to person's data *)
+(** Get privacy settings that define access to person's data *)
 val get_access : person -> Def.access
 
 (** Get person's aliases ids *)
@@ -142,7 +141,7 @@ val get_burial_src : person -> istr
 (** Get array of family's children ids *)
 val get_children : family -> iper array
 
-(** Get family's comment id *)
+(** Get family's comment (notes) id *)
 val get_comment : family -> istr
 
 (** Get person's consanguinity degree with his ascendants *)
@@ -214,7 +213,7 @@ val get_occ : person -> int
 (** Get person's occupation id *)
 val get_occupation : person -> istr
 
-(** Get family's origin file (.gw filename where family is defined) id *)
+(** Get family's origin file (e.g. a .gw or .ged filename) id *)
 val get_origin_file : family -> istr
 
 (** Get family's parents ids (father and mother from family's couple) *)
