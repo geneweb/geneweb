@@ -7,6 +7,7 @@ open Gwdb
 open TemplAst
 open Util
 
+(* S: Fail if conf.bname is undefined? *)
 let file_name conf =
   let bname =
     if Filename.check_suffix conf.bname ".gwb" then conf.bname

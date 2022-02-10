@@ -35,7 +35,8 @@ val links_to_ind
   -> (iper, ifam) Def.NLDB.page list
 
 (** Construts from the giving person sosa table strored in the cache. Sosa table contains association
-    {i person_id -> sosa number} for each person in the base. Person has sosa [Sosa.one] and his ancestors have sosa > [Sosa.one].
+    {i person_id -> sosa number} for each person in the base.
+    Person has sosa [Sosa.one] and his ancestors have sosa > [Sosa.one].
     For non ancestor person sosa number is set to [Sosa.zero]. *)
 val build_sosa_tree_ht : config -> base -> person -> unit
 

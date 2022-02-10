@@ -36,7 +36,7 @@ val strip_c : string -> char -> string
 (** Removes all the forbiden characters from [forbidden_char] inside the name *)
 val purge : string -> string
 
-(** Converts name to the following format:
+(** A custom sonnex/soundex-like phonetic algorithm:
      - no spaces
      - roman numbers are keeped
      - vowels are suppressed, except in words starting with a vowel,
@@ -46,7 +46,7 @@ val purge : string -> string
      - "z" replaced by "s"
      - "ph" replaced by "f"
      - others "h" deleted
-     - s at the end of words are deleted
+     - s at end of words are deleted
      - no double lowercase consons *)
 val crush : string -> string
 

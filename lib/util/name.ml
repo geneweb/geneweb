@@ -70,20 +70,21 @@ let abbrev_list =
    "of", None; "saint", Some "st"; "sainte", Some "ste"; "van", None;
    "von", None; "zu", None; "zur", None]
 
-(* Checks if words are the same (starting from given position for both of them).
-   In [s] word should end with space. *)
-let rec is_word s i p ip =
-  if ip = String.length p then
-    if i = String.length s then true else if s.[i] = ' ' then true else false
-  else if i = String.length s then false
-  else if s.[i] = p.[ip] then is_word s (i + 1) p (ip + 1)
-  else false
+(* Checks if the word starting at [i] in [s] is [p]. *)
+let rec is_word s i p =
+  let rec is_word s i p ip =
+    if ip = String.length p then
+      if i = String.length s then true else if s.[i] = ' ' then true else false
+    else if i = String.length s then false
+    else if s.[i] = p.[ip] then is_word s (i + 1) p (ip + 1)
+    else false
+  in is_word s i p 0
 
 (* Checks if word that starts at position [i] in [s] is one of abbreviation *)
 let rec search_abbrev s i =
   function
     (w, a) :: pl ->
-      if is_word s i w 0 then Some (String.length w, a)
+      if is_word s i w then Some (String.length w, a)
       else search_abbrev s i pl
   | [] -> None
 
@@ -147,7 +148,7 @@ let roman_number s i =
   in
   if i = 0 || s.[i-1] = ' ' then loop i else None
 
-(*Name.crush:
+(* Name.crush, a custom sonnex/soundex-like phonetic algorithm:
      - no spaces
      - roman numbers are keeped
      - vowels are suppressed, except in words starting with a vowel,

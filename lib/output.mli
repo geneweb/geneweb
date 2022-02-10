@@ -1,7 +1,11 @@
-(** By default:
+(** This module uses `conf.output_conf` in order to print an answer to te request.
+    e.g. send HTML page to the client.
+
+    By default:
     - GeneWeb's web server set HTTP status to OK if a printing function is used
-    without a previous call to [status].
+      without a previous call to [status].
     - The output channel is a socket given by [gwd]
+
 *)
 
 (** [status conf answer] print HTTP status line to the output channel

@@ -68,10 +68,10 @@ val roman_of_arabian : int -> string
 val arabian_of_roman : string -> int
 
 (** [input_lexicon lang ht open_file] open {i lexicon.txt} file with [open_file ()],
-    parse it and fill [ht] where key is a section name (in english) and value is
-    a coresponding traduction associated to a [lang] language code. If traduction
-    line has a form [->: sect] it associates to the current section name the value
-    associated to [sect] section name inside [ht]. *)
+    parse it and fill [ht] where key is the keyword and value is
+    a coresponding traduction associated to a [lang] language code.
+    If traduction line has a form [->: kw] it associates to the current section name the value
+    associated to [kw] section name inside [ht] (keyword alias). *)
 val input_lexicon :
   string -> (string, string) Hashtbl.t -> (unit -> in_channel) -> unit
 
