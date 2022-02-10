@@ -46,7 +46,7 @@ val exp : t -> int -> t
 (** Divide sosa number by an integer *)
 val div : t -> int -> t
 
-(** Calculate module of sosa number comparing to integer *)
+(** Calculate modulo of sosa number comparing to integer *)
 val modl : t -> int -> t
 
 (** Retruns generation of sosa number. *)

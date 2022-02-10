@@ -4,8 +4,7 @@ open Config
 open Def
 open Gwdb
 
-(** Returns the current dir
-    (changed by `gwd` if geneweb is running on windows) *)
+(** The directory where counters (e.g. number page displayed) are stored. *)
 val cnt_dir : string ref
 
 (** Returns the image prefix (conf.image_prefix)  *)
@@ -78,12 +77,18 @@ val is_old_person : config -> (iper, iper, istr) gen_person -> bool
 
 val start_with_vowel : string -> bool
 
-(** Returns URL query string to access nth person *)
+(** Returns URL query string to access nth person
+    (e.g. for person 2 in url: p2=foo&n2=bar&oc2=1 *)
 val acces_n : config -> base -> string -> person -> string
 val acces : config -> base -> person -> string
 val wprint_hidden_person : config -> base -> string -> person -> unit
 
-(** Tells if person could be accessed by his first name and surname *)
+(** [accessible_by_key conf base p fn sn]
+    Tells if person could be accessed by his first name and surname
+
+    i.e. current base configuration and user rights allow this and
+    person's name is suitable for searching by key (e.g. `? ?` is not)
+*)
 val accessible_by_key : config -> base -> person -> string -> string -> bool
 
 (** [geneweb_link conf href s] Returns HTML link to actual geneweb's command (database name) with additional (to those defind by [commd])
@@ -100,26 +105,36 @@ val is_restricted : config -> base -> iper -> bool
 (** Tells if person is hiden (if his surname is empty) *)
 val is_hidden : person -> bool
 
-(** Returns person with giving id from the base. If person is restrited to
-acccess returns empty person with giving id. *)
+(** Returns person with giving id from the base.
+    Wrapper around `Gwdb.poi` defined such as:
+    - if `conf.use_restrict` (option defined in .gwf file):
+      checks that the user has enought rights to see
+      corresponding person (see `authorized_age`).
+      If the user does not have enought permissions, returns
+      an empty person.
+    - just an alias to `Gwdb.poi` if `use_restrict` disabled.
+*)
 val pget : config -> base -> iper -> person
 
-(** Remplaces string ids inside person's entry by real strings *)
+(** Remplaces string ids inside person's entry by their actual string value. *)
 val string_gen_person :
   base -> (iper, iper, istr) gen_person -> (iper, iper, string) gen_person
 
-(** Remplaces string ids inside family's entry by real strings *)
+(** Remplaces string ids inside family's entry by their actual string value. *)
 val string_gen_family :
   base -> (iper, ifam, istr) gen_family -> (iper, ifam, string) gen_family
 
-(** Type that defines couple of functions allowing to access to person's first name
-    and surname. *)
+(** Type that defines couple of functions
+    returning someone's first name and surname.
+    Typical use is to add some markup to a field, or systematically replace
+    one by `""`.
+*)
 type p_access = (base -> person -> string) * (base -> person -> string)
 
 (** Standard access (p_first_name, p_surname). *)
 val std_access : p_access
 
-(** Raw access (sou + get_name). *)
+(** Raw access: same as `std_access` without the `Mutil.nominative` call. *)
 val raw_access : p_access
 
 (** Returns person's first name and surname HTML description depending on :
@@ -217,16 +232,19 @@ val p_getenv : (string * string) list -> string -> string option
 (** Returns integer value associated to the label in environnement *)
 val p_getint : (string * string) list -> string -> int option
 
-(** Create association list from two types of string. First has format : [[k1=v1;k2=v2]]. Second : [[k1=v1&k2=v2]].
-    For both returns list [[("k1","v1"); ("k2","v2")]]. *)
+(** Create association list from the query part of a URL.
+    (i.e. a list of key-value separated by `&` or `;`)
+*)
 val create_env : string -> (string * string) list
 
-(** [open_etc_file fname] search for template {i etc/fname.txt} inside the base directory or inside one of assets directories.
+(** [open_etc_file fname] search for template {i etc/fname.txt}
+    inside the base directory or inside one of assets directories.
     Returns input channel and the path to giving template. *)
 val open_etc_file : string -> (in_channel * string) option
 val open_hed_trl : config -> string -> in_channel option
 
-(** [open_etc_file fname] search for template {i etc/fname.txt} using [config] or inside one of assets directories.
+(** [open_etc_file fname] search for template {i etc/fname.txt}
+    using [config] or inside one of assets directories.
     Returns input channel and the path to giving template. *)
 val open_templ_fname : config -> string -> (in_channel * string) option
 
@@ -236,10 +254,10 @@ val string_of_place : config -> string -> string
 val place_of_string : config -> string -> place option
 val allowed_tags_file : string ref
 
-(** Returns additional attributes for <body> tag from [config]. *)
+(** Returns additional attributes for <body> tag from [config] (defined in .gwf file). *)
 val body_prop : config -> string
 
-(** Prints all messages send to wizard (or friend) on the socket. Messages are located in
+(** Prints all messages sent to wizard (or friend) on the socket. Messages are located in
     {i <basename>/etc/mess_wizzard.txt} (messages destinated to all wizards) and in
     {i <basename>/etc/mess_wizzard_<user>.txt} (messages destinated to considered wizard). *)
 val message_to_wizard : config -> unit
@@ -269,7 +287,8 @@ type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 val check_format : ('a, 'b) format2 -> string -> ('a, 'b) format2 option
 val valid_format : ('a, 'b) format2 -> string -> ('a, 'b) format2
 
-(** Find translation of given english word in [conf.lexicon] *)
+(** Find translation of given keyword in [conf.lexicon].
+    Keywords used to be its english translation but can be any string. *)
 val transl : config -> string -> string
 
 (** [transl_nth conf w n] translate word [w] and returns [n]'th field of its translation (with [nth_field]). *)
@@ -298,10 +317,11 @@ val translate_eval : string -> string
 val transl_a_of_b : config -> string -> string -> string -> string
 val transl_a_of_gr_eq_gen_lev : config -> string -> string -> string -> string
 
-(** Colorise HTML element with [conf.highlight] color. *)
+(** Colorise HTML element with [conf.highlight] color
+    (wrap text in <span> with inline style). *)
 val std_color : config -> string -> string
 
-(** Sex index (0 for male, 1 for female, 2 for neuter) *)
+(** Sex index used in translations (0 for male, 1 for female, 2 for neuter) *)
 val index_of_sex : sex -> int
 
 val string_of_pevent_name :
@@ -382,10 +402,10 @@ val old_sosa_of_branch : config -> base -> (iper * sex) list -> Sosa.t
 val has_image : config -> base -> person -> bool
 
 (** [image_file_name fname] search for image {i images/fname} inside the base and assets directories.
-    Retrun the path to found file or [fname] if file isn't found.  *)
+    Return the path to found file or [fname] if file isn't found.  *)
 val image_file_name : string -> string
 
-(** Returns path to the image file with the giving name in directory {i sources}. *)
+(** Returns path to the image file with the giving name in directory {i src/}. *)
 val source_image_file_name : string -> string -> string
 
 (** Returns width and height of an image. *)

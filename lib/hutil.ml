@@ -36,6 +36,7 @@ let gen_print_link_to_welcome f conf right_aligned =
 
 let print_link_to_welcome = gen_print_link_to_welcome (fun () -> ())
 
+(* S: use Util.include_template for "hed"? *)
 let header_without_http conf title =
   Output.print_string conf "<!DOCTYPE html>\n";
   Output.print_string conf "<head>\n";

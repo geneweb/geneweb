@@ -8,7 +8,7 @@ val print_linked_list :
 (** Displays the base notes *)
 val print : Config.config -> Gwdb.base -> unit
 
-(** Displays a text form for writing notes *)
+(** Displays a text form for notes creation/edition *)
 val print_mod : Config.config -> Gwdb.base -> unit
 
 (** Updates notes *)
