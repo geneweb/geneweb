@@ -1,0 +1,37 @@
+name: Build and deploy documentation
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  build-and-deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use OCaml ${{ matrix.ocaml-version }}
+        uses: avsm/setup-ocaml@v1
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
+
+      - run: sudo apt-get update
+
+      - run: opam pin add geneweb.dev . --no-action
+
+      - run: opam depext geneweb --yes
+
+      - run: opam install geneweb --deps-only
+
+      - run: opam exec -- make doc
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4.2.3
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: _build/default/_doc/_html # The folder the action should deploy.
