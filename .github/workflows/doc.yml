@@ -21,17 +21,17 @@ jobs:
         with:
           ocaml-version: ${{ matrix.ocaml-version }}
 
-      - run: sudo apt-get update
+      - name: Install GeneWeb depenencies
+        run: |
+             sudo apt-get update
+             opam pin add geneweb.dev . --no-action
+             opam depext geneweb --yes
+             opam install geneweb --deps-only
 
-      - run: opam pin add geneweb.dev . --no-action
+      - name: Generate documentation
+        run: opam exec -- make doc
 
-      - run: opam depext geneweb --yes
-
-      - run: opam install geneweb --deps-only
-
-      - run: opam exec -- make doc
-
-      - name: Deploy
+      - name: Deploy documentation
         uses: JamesIves/github-pages-deploy-action@v4.2.3
         with:
           branch: gh-pages # The branch the action should deploy to.
