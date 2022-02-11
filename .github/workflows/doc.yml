@@ -30,7 +30,7 @@ jobs:
 
       - name: Generate documentation
         run: |
-             ocaml ./configure.ml
+             opam exec -- ocaml ./configure.ml
              opam exec -- make doc
 
       - name: Deploy documentation
