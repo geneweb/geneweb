@@ -7,7 +7,9 @@ with a Web interface and can be used off-line or as a Web service.
 
 ## Documentation
 
-The documentation is available online: http://geneweb.tuxfamily.org/
+- Documentation maintained by the community: http://geneweb.tuxfamily.org/
+- GeneWeb API (generated from source): http://geneweb.github.io/geneweb/
+- GeneWeb overview (realized by OCamlPro): http://geneweb.github.io/
 
 ## Installation (for users)
 
