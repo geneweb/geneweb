@@ -1,8 +1,9 @@
 name: Build and deploy documentation
+
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
 
