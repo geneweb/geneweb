@@ -27,6 +27,7 @@ depends: [
   "markup"
   "num"
   "ocaml"
+  "odoc"
   "ounit"
   "ppx_blob"
   "ppx_deriving"
