@@ -88,3 +88,11 @@ val check_family
   -> (string * string * _ * _ * _, _, _) Def.gen_family
   -> (string * string * _ * _ * _) Def.gen_couple
   -> Update.update_error option * Update.update_error option
+
+(** [strip_family fam des]
+    Removes empty person from witness list and empty events from event list. *)
+val strip_family
+  :  (string * 'a * 'b * 'c * 'd, 'e, string) Def.gen_family
+  -> (string * 'f * 'g * 'h * 'i) Def.gen_descend
+  -> (string * 'a * 'b * 'c * 'd, 'e, string) Def.gen_family
+     * (string * 'f * 'g * 'h * 'i) Def.gen_descend
