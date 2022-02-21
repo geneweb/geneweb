@@ -96,3 +96,17 @@ val strip_family
   -> (string * 'f * 'g * 'h * 'i) Def.gen_descend
   -> (string * 'a * 'b * 'c * 'd, 'e, string) Def.gen_family
      * (string * 'f * 'g * 'h * 'i) Def.gen_descend
+
+(** [effective_add conf base nsck sfam scpl sdes]
+    Patch base (without commiting changes) *)
+val effective_add
+  :  Config.config
+  -> Gwdb.base
+  -> bool
+  -> (Update.key, 'a, string) Def.gen_family
+  -> Update.key Def.gen_couple
+  -> Update.key Def.gen_descend
+  -> Gwdb_driver.ifam
+     * (Gwdb.iper, Gwdb.ifam, Gwdb.istr) Def.gen_family
+     * Gwdb.iper Def.gen_couple
+     * Gwdb.iper Def.gen_descend
