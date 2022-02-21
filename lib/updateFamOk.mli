@@ -80,3 +80,11 @@ val print_change_order_ok : Config.config -> Gwdb.base -> unit
 (** Changes the evenements order for a family *)
 val print_change_event_order : Config.config -> Gwdb.base -> unit
 
+(** [check_family conf fam cpl]
+    Checks that no name is missing.
+*)
+val check_family
+  :  Config.config
+  -> (string * string * _ * _ * _, _, _) Def.gen_family
+  -> (string * string * _ * _ * _) Def.gen_couple
+  -> Update.update_error option * Update.update_error option
