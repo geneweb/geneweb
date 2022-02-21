@@ -98,7 +98,7 @@ val strip_family
      * (string * 'f * 'g * 'h * 'i) Def.gen_descend
 
 (** [effective_add conf base nsck sfam scpl sdes]
-    Patch base (without commiting changes) *)
+    Patch base without commiting changes. *)
 val effective_add
   :  Config.config
   -> Gwdb.base
@@ -110,3 +110,30 @@ val effective_add
      * (Gwdb.iper, Gwdb.ifam, Gwdb.istr) Def.gen_family
      * Gwdb.iper Def.gen_couple
      * Gwdb.iper Def.gen_descend
+
+(** [patch_parent_with_pevents base cpl]
+    If parents have information about birth or death but no pevent,
+    add a pevent with these info *)
+val patch_person_with_pevents
+  :  Gwdb.base
+  -> Gwdb.iper
+  -> unit
+
+(** See patch_person_with_pevents  *)
+val patch_parent_with_pevents
+  :  Gwdb.base
+  -> Gwdb.iper Adef.gen_couple
+  -> unit
+
+(** See patch_person_with_pevents  *)
+val patch_children_with_pevents
+  :  Gwdb.base
+  -> Gwdb.iper Def.gen_descend
+  -> unit
+
+(** [family_structure base ifam]
+    Returns (parents, children) *)
+val family_structure
+  :  Gwdb.base
+  -> Gwdb.ifam
+  -> Gwdb.iper array * Gwdb.iper array
