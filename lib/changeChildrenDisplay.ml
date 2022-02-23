@@ -144,46 +144,8 @@ let print_change_done conf base p =
   Hutil.trailer conf
 
 let print_conflict conf base ip_var p =
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
-  Hutil.rheader conf title;
-  Update.print_error conf base @@ Update.UERR_already_defined (base, p, "");
-  let free_n =
-    Gutil.find_free_occ base (p_first_name base p) (p_surname base p)
-  in
-  Output.print_string conf "<ul>\n";
-  Output.print_string conf "<li>";
-  Output.printf conf "%s%s %d.\n" (Utf8.capitalize_fst (transl conf "first free number"))
-    (Util.transl conf ":") free_n;
-  Output.printf conf (fcapitale (ftransl conf "click on \"%s\""))
-    (transl conf "create");
-  Output.printf conf " %s.\n" (transl conf "to try again with this number");
-  Output.print_string conf "</li>";
-  Output.print_string conf "<li>";
-  Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "or"));
-  Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
-  Output.printf conf " %s %s." (transl_nth conf "and" 0)
-    (transl conf "change it (the number) yourself");
-  Output.print_string conf "</li>";
-  Output.print_string conf "</ul>\n";
-  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  List.iter
-    (fun (x, v) ->
-       Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" x
-         (Util.escape_html (Mutil.decode v)))
-    (conf.henv @ conf.env);
-  begin let var = "c" ^ string_of_iper ip_var in
-    Output.printf conf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var
-  end;
-  Output.printf conf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
-    free_n;
-  Output.printf conf  "<button type=\"submit\" name=\"create\" \
-class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize_fst (transl conf "create"));
-  Output.printf conf "<button type=\"submit\" name=\"return\" \
-class=\"btn btn-primary btn-lg\">%s</button>\n" (Utf8.capitalize_fst (transl conf "back"));
-  Output.print_string conf "</form>\n";
-  Update.print_same_name conf base p;
-  Hutil.trailer conf;
-  raise @@ Update.ModErr (Update.UERR (__FILE__ ^ " " ^ string_of_int __LINE__))
+  let var = "c" ^ string_of_iper ip_var in
+  Update.print_create_conflict conf base p var
 
 let error_person conf err =
   let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in

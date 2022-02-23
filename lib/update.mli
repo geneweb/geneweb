@@ -74,7 +74,7 @@ val print_continue : config -> ?continue:string -> string -> string -> unit
 val prerr : config -> update_error -> (unit -> unit) -> 'a
 
 val string_of_error : config -> update_error -> string
-val print_error : config -> base -> update_error -> unit
+val print_error : config -> update_error -> unit
 val print_warnings : config -> base -> CheckItem.base_warning list -> unit
 val print_miscs : config -> base -> CheckItem.base_misc list -> unit
 val print_warnings_and_miscs :
@@ -111,3 +111,18 @@ val check_missing_name
   : base
   -> (Gwdb.iper, 'b, string) Def.gen_person
   -> update_error option
+
+(** [print_create_conflict conf base p var]
+    Print a message because a personne with same key already exists,
+    and display a form with two options:
+    - create a personne with the next occurence number available
+    - go back to the previous pre-filled form.
+
+    [var] is used for the input with name "field". Leave it empty if unused.
+ *)
+val print_create_conflict
+  :  config
+  -> base
+  -> person
+  -> string
+  -> 'exn

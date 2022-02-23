@@ -343,7 +343,7 @@ let print_first_name_strong conf base p =
   Output.printf conf "<strong>%s%s</strong>" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
 
-let print_error conf base e =
+let print_error conf e =
   Output.print_string conf @@ string_of_error conf e
 
 let someone_ref_text conf base p =
@@ -1100,7 +1100,7 @@ let text_of_var conf =
 let print_create_conflict conf base p var =
   let err = UERR_already_defined (base, p, var) in
   prerr conf err @@ fun () ->
-  Output.print_string conf (string_of_error conf err) ;
+  print_error conf err ;
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p)
   in
