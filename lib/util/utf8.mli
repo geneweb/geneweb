@@ -38,6 +38,28 @@ val capitalize_fst : string -> string
 (** Returns UTF-8 encoded string where the first letter is capitalised and others minimalised *)
 val capitalize : string -> string
 
+module C : sig
+
+  (** Utf8 char type.  *)
+  type t = Str of string | Chr of char | Empty
+
+  (** [unaccent trimmed s i0 len]
+      Returns [(t, start, next)]: next UTF-8 character in string [s] starting at position [i0].
+      The diacritic marks are removed, character is also case lowered, and any character
+      returning [Empty] (unsupported or reported as empty) is ignored: the next character in [s]
+      will be picked except if you reach [len]. In that case, [Empty] is returned.
+
+      [start] is the byte offset in [s] where the resulting character [t] starts.
+      [next] is the offset of the byte after [t].
+ *)
+  val unaccent : bool -> string -> int -> int -> (t * int * int)
+
+  (** [cp s i] returns the Unicode code point of the character starting
+      at [i]-th byte.  *)
+  val cp : string -> int -> Uchar.t
+
+end
+
 (** [compare a b] compare normalized version of [a] and [b]
     It is case insensitive.
     It starts with unaccented comparison of [a] and [b],
