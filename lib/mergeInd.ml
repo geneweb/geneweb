@@ -189,7 +189,7 @@ let is_ancestor base p1 p2 =
     let rec loop set = function
       | [] -> false
       | ip :: tl ->
-        if IperSet.mem ip set then false
+        if IperSet.mem ip set then loop set tl
         else if ip = ip1 then true
         else
           let set = IperSet.add ip set in
@@ -197,7 +197,7 @@ let is_ancestor base p1 p2 =
           | Some ifam ->
             let cpl = foi base ifam in
             loop set (get_father cpl :: get_mother cpl :: tl)
-          | None -> false
+          | None -> loop set tl
     in
     loop IperSet.empty [ip2]
 
