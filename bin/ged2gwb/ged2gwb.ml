@@ -814,20 +814,7 @@ let string_quest = 1
 let string_x = 2
 
 let unknown_per i sex =
-  let empty = string_empty in
-  let what = string_quest in
-  let p =
-    {first_name = what; surname = what; occ = i; public_name = empty;
-     image = empty; qualifiers = []; aliases = []; first_names_aliases = [];
-     surnames_aliases = []; titles = []; rparents = []; related = [];
-     occupation = empty; sex = sex; access = IfTitles;
-     birth = Adef.cdate_None; birth_place = empty; birth_note = empty;
-     birth_src = empty; baptism = Adef.cdate_None; baptism_place = empty;
-     baptism_note = empty; baptism_src = empty; death = DontKnowIfDead;
-     death_place = empty; death_note = empty; death_src = empty;
-     burial = UnknownBurial; burial_place = empty; burial_note = empty;
-     burial_src = empty; pevents = []; notes = empty; psources = empty;
-     key_index = i}
+  let p = { (Mutil.empty_person string_empty string_quest) with sex ; occ = i ; key_index = i }
   and a = {parents = None; consang = Adef.fix (-1)}
   and u = {family = [| |]} in
   p, a, u
