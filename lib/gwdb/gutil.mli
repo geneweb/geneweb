@@ -13,10 +13,18 @@ val person_not_a_key_find_all : base -> string -> iper list
     then returns list of one corresponding person. Otherwise calls [person_not_a_key_find_all]  *)
 val person_ht_find_all : base -> string -> iper list
 
-(** [person_of_string_key base key] try to find a key inside [key] string of
-    the form {i "firstname.occ surname"} and returns a corresponding person.
+(** [person_of_string_key base key]
+    Finds a key inside [key] string of the form {i "firstname.occ surname"}
+    and returns a corresponding person.
+    The first occurence of an int preceded by a dot is used as occurence number.
+
     If person doesn't exists or key isn't found then returns [None] *)
 val person_of_string_key : base -> string -> iper option
+
+(** [person_of_string_dot_key base key]
+    Same as {!val:person_of_string_key}, but use the last occurence
+    of an int preceded by a dot as occurence number. *)
+val person_of_string_dot_key : base -> string -> iper option
 
 (** Returns list of persons having the same first name and surname
     as the specified person *)
