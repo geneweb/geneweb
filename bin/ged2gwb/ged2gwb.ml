@@ -828,14 +828,9 @@ let phony_per gen sex =
   i
 
 let unknown_fam gen i =
-  let empty = string_empty in
   let father = phony_per gen Male in
   let mother = phony_per gen Female in
-  let f =
-    {marriage = Adef.cdate_None; marriage_place = empty;
-     marriage_note = empty; marriage_src = empty; witnesses = [| |];
-     relation = !relation_status; divorce = NotDivorced; fevents = [];
-     comment = empty; origin_file = empty; fsources = empty; fam_index = i}
+  let f = { (Mutil.empty_family string_empty) with fam_index = i }
   and c = Adef.couple father mother
   and d = {children = [| |]} in
   f, c, d

@@ -1151,3 +1151,18 @@ let empty_person empty what =
   ; psources = empty
   ; key_index = ()
   }
+
+let empty_family empty =
+  { Def.marriage = Adef.cdate_None
+  ; marriage_place = empty
+  ; marriage_note = empty
+  ; marriage_src = empty
+  ; witnesses = [||]
+  ; relation = Def.NoMention
+  ; divorce = Def.NotDivorced
+  ; fevents = []
+  ; comment = empty
+  ; origin_file = empty
+  ; fsources = empty
+  ; fam_index = ()
+  }
