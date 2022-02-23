@@ -423,3 +423,8 @@ val digest : string -> string
     only empty arrays/lists.
 *)
 val empty_person : 'string -> 'string -> (unit, _, 'string) Def.gen_person
+
+(** [empty_family empty] returns a Def.gen_person with string field initialized
+    initialized with [empty] and only empty arrays/lists.
+*)
+val empty_family : 'string -> (_, unit, 'string) Def.gen_family
