@@ -1,6 +1,6 @@
 (library
   (name dummy_gwdb)
-  (libraries geneweb.def stdlib-shims)
+  (libraries geneweb.def geneweb.util stdlib-shims)
   (implements geneweb.gwdb_driver)
   (modules gwdb_driver)
 )
@@ -12,6 +12,7 @@
   (modules
     test
     test_calendar
+    test_mergeInd
     test_place
     test_sosa
     test_utils
