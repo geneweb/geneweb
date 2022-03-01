@@ -112,55 +112,14 @@ let specify conf base n pl =
   Output.print_sstring conf "<ul>\n";
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
-  List.iter begin fun (p, tl) ->
-    Output.print_sstring conf "<li>";
-    SosaCache.print_sosa conf base p true;
-    begin match tl with
-      | [] ->
-        Output.print_sstring conf " " ;
-        Output.print_string conf (referenced_person_title_text conf base p)
-      | t :: _ ->
-        Output.print_sstring conf {|<a href="|} ;
-        Output.print_string conf (commd conf) ;
-        Output.print_string conf (acces conf base p) ;
-        Output.print_sstring conf {|"> |};
-        Output.print_string conf (titled_person_text conf base p t);
-        Output.print_sstring conf "</a> ";
-        List.iter (fun t -> Output.print_string conf (one_title_text base t)) tl
-    end;
-    Output.print_string conf (DateDisplay.short_dates_text conf base p);
-    if authorized_age conf base p
-    then begin match get_first_names_aliases p with
-      | [] -> ()
-      | fnal ->
-        Output.print_sstring conf "\n<em>(" ;
-        Mutil.list_iter_first begin fun first fna ->
-          if not first then Output.print_sstring conf ", ";
-          sou base fna |> Util.escape_html |> Output.print_string conf
-        end fnal ;
-        Output.print_sstring conf ")</em>"
-    end ;
-    let spouses =
-      Array.fold_right begin fun ifam spouses ->
-        let cpl = foi base ifam in
-        let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
-        if p_surname base spouse <> "?" then spouse :: spouses
-        else spouses
-      end (get_family p) []
-    in
-    begin match spouses with
-      | [] -> ()
-      | h :: hl ->
-        Output.print_sstring conf ", <em>&amp; " ;
-        List.fold_left
-          (fun s h -> s ^^^ ",\n" ^<^ person_title_text conf base h)
-          (person_title_text conf base h) hl
-        |> Output.print_string conf ;
-        Output.print_sstring conf "</em>"
-    end ;
-    Output.print_sstring conf "</li>"
-  end ptll;
-  Output.print_sstring conf "</ul>" ;
+  List.iter
+    (fun (p, tl) ->
+       Output.print_string conf "<li>\n";
+       SosaCache.print_sosa conf base p true;
+       Update.print_person_parents_and_spouse conf base p;
+       Output.print_string conf "</li>\n"
+    ) ptll;
+  Output.print_string conf "</ul>\n";
   Hutil.trailer conf
 
 let incorrect_request ?(comment = "") conf =

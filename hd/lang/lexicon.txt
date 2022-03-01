@@ -9803,6 +9803,10 @@ sl: poroke/poroke
 sv: äktenskap/äktenskap
 tr: eş/eşler
 
+    marriages with
+en: relations or marriages with
+fr: relations ou marriages avec
+
     married
 af: getroud
 bg: в брак

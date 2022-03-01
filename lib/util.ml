@@ -1643,19 +1643,31 @@ let child_of_parent conf base p =
       |> translate_eval |> Adef.safe
 
 let husband_wife conf base p all =
-  let relation =
-    let rec loop i =
+  let multiple =
+    let rec loop i kind =
       if i < Array.length (get_family p) then
         let fam = foi base (get_family p).(i) in
+        let cur_type = get_relation fam in
+        if i = 0 then loop (i + 1) cur_type
+        else if cur_type = kind then loop (i + 1) kind
+        else -1
+      else i
+    in
+    loop 0 NoMention
+  in
+  let relation =
+    if Array.length (get_family p) > 0 then
+      if multiple >= 0 then
+        let fam = foi base (get_family p).(0) in
         let conjoint = Gutil.spouse (get_iper p) fam in
         let conjoint = pget conf base conjoint in
         if not @@ is_empty_name conjoint then
           Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
-          |> translate_eval |> Adef.safe
-        else loop (i + 1)
-      else Adef.safe ""
-    in
-    loop 0
+             |> translate_eval
+             |> Adef.safe
+        else Adef.safe ""
+      else (transl conf "marriages with") |> Adef.safe
+    else Adef.safe ""
   in
   let res =
     let rec loop i res =
@@ -1663,14 +1675,12 @@ let husband_wife conf base p all =
         let fam = foi base (get_family p).(i) in
         let conjoint = Gutil.spouse (get_iper p) fam in
         let conjoint = pget conf base conjoint in
-        if not @@ is_empty_name conjoint then
+        if not @@ is_empty_name conjoint
+        then
           let res =
             res
-            ^>^ translate_eval
-                  (" "
-                   ^<^ gen_person_text conf base conjoint
-                   ^^^ relation_date conf fam
-                    :> string)
+            ^>^ translate_eval (" " ^<^ gen_person_text conf base conjoint ^^^ relation_date conf fam
+                                :> string)
             ^ ","
           in
           if all then loop (i + 1) res else res
@@ -1681,8 +1691,8 @@ let husband_wife conf base p all =
   in
   let res = (res :> string) in
   let res =
-    if String.length res > 1 then String.sub res 0 (String.length res - 1)
-    else res
+    if String.length res > 1
+    then (String.sub res 0 (String.length res - 1)) else res
   in
   Adef.safe res
 
