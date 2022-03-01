@@ -113,13 +113,13 @@ let specify conf base n pl =
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
   List.iter
-    (fun (p, tl) ->
-       Output.print_string conf "<li>\n";
+    (fun (p, _tl) ->
+       Output.print_sstring conf "<li>\n";
        SosaCache.print_sosa conf base p true;
-       Update.print_person_parents_and_spouse conf base p;
-       Output.print_string conf "</li>\n"
+       Update.print_person_parents_and_spouses conf base p;
+       Output.print_sstring conf "</li>\n"
     ) ptll;
-  Output.print_string conf "</ul>\n";
+  Output.print_sstring conf "</ul>\n";
   Hutil.trailer conf
 
 let incorrect_request ?(comment = "") conf =

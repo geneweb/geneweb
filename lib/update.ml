@@ -159,16 +159,17 @@ let rec infer_death conf base p =
       - p    : person
     [Retour] : unit
     [Rem] : Not visible.                                                      *)
-let print_person_parents_and_spouse conf base p =
-  Output.print_sstring conf {|<a href="|};
-  Output.print_string conf (commd conf);
-  Output.print_string conf (acces conf base p);
-  Output.print_sstring conf {|">|};
-  Output.print_string conf (escape_html @@ p_first_name base p);
-  Output.print_sstring conf ".";
-  Output.print_sstring conf (string_of_int @@ get_occ p);
-  Output.print_sstring conf " ";
-  Output.print_string conf (escape_html @@ p_surname base p);
+(* ************************************************************************** *)
+let print_person_parents_and_spouses conf base p =
+  Output.print_sstring conf {|<a href="|} ;
+  Output.print_string conf (commd conf) ;
+  Output.print_string conf (acces conf base p) ;
+  Output.print_sstring conf {|">|} ;
+  Output.print_string conf (escape_html @@ p_first_name base p) ;
+  Output.print_sstring conf "." ;
+  Output.print_sstring conf (string_of_int @@ get_occ p) ;
+  Output.print_sstring conf " " ;
+  Output.print_string conf (escape_html @@ p_surname base p) ;
   Output.print_sstring conf "</a>";
   Output.print_string conf (DateDisplay.short_dates_text conf base p);
   let cop = Util.child_of_parent conf base p in
@@ -193,7 +194,7 @@ let print_same_name conf base p =
       List.iter
         (fun p ->
           Output.print_sstring conf "<li>";
-          print_person_parents_and_spouse conf base p;
+          print_person_parents_and_spouses conf base p;
           Output.print_sstring conf "</li>")
         pl;
       Output.print_sstring conf "</ul></p>"
