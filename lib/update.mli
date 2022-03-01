@@ -42,7 +42,7 @@ val infer_death_from_parents : config -> base -> family -> death
 (** [infer_death_from_parents conf base fam] infer death status for a new children in this family *)
 
 val print_same_name : config -> base -> person -> unit
-val print_person_parents_and_spouse : config -> base -> person -> unit
+val print_person_parents_and_spouses : config -> base -> person -> unit
 
 val insert_person :
   config ->
