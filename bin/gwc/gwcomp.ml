@@ -754,16 +754,7 @@ let read_line ic =
 
 (** Create a dummy [gen_person]. *)
 let create_person () =
-  {first_name = ""; surname = ""; occ = 0; image = ""; public_name = "";
-   qualifiers = []; aliases = []; first_names_aliases = [];
-   surnames_aliases = []; titles = []; rparents = []; related = [];
-   occupation = ""; sex = Neuter; access = IfTitles; birth = Adef.cdate_None;
-   birth_place = ""; birth_note = ""; birth_src = "";
-   baptism = Adef.cdate_None; baptism_place = ""; baptism_note = "";
-   baptism_src = ""; death = DontKnowIfDead; death_place = "";
-   death_note = ""; death_src = ""; burial = UnknownBurial; burial_place = "";
-   burial_note = ""; burial_src = ""; pevents = []; notes = ""; psources = "";
-   key_index = Gwdb.dummy_iper}
+  { (Mutil.empty_person "" "") with key_index = Gwdb.dummy_iper }
 
 (** Person is unknown (bogus definition) *)
 let bogus_def p n = p = "?" || n = "?"

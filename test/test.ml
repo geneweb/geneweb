@@ -5,9 +5,10 @@ let _ =
     "Geneweb" >:::
     []
     @ Test_calendar.suite
-    @ Test_utils.suite
-    @ Test_sosa.suite
+    @ Test_mergeInd.suite
     @ Test_place.suite
+    @ Test_sosa.suite
+    @ Test_utils.suite
     @ Test_wiki.suite
   end
 

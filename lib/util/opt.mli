@@ -12,3 +12,7 @@ val default : 'a -> 'a option -> 'a
 
 (** [to_string so] if [so=Some s] then returns [s] otherwise returns empty string.  *)
 val to_string : string option -> string
+
+(** [of_string s]
+    If [ s <> "" ] then returns [Some s] otherwise returns [None].  *)
+val of_string : string -> string option

@@ -67,7 +67,25 @@ let get_event_field_name gets event_criteria event_name search_type =
   if search_type <> "OR" then event_name ^ "_" ^ event_criteria
   else if "on" = gets ("event_" ^ event_name) then event_criteria
   else ""
+  
+(*
+  Search for other persons in the base matching with the provided infos.
+  
+  On search semantic:
 
+   Search can be set to be exact on the first name and/or the surname,
+   if no first name or surname is provided then the search ignores the
+   parameter in both the exact and the loose case.
+   
+   - When search is loose it is only necessary for each name atom (name atoms
+   for "Jean-Pierre" are: [Jean] [Pierre]) to be found at least once in another
+   person's name atoms in the base.
+   
+   - When search is exact, it is necessary for each atom to be found exactly the
+   number of times it occurs in the given name but order is not considered for
+   a person from the base to match. (ie. "Pierre-Jean de Bourbon de Vallois" matches
+   with "Jean Pierre de Vallois de Bourbon" but not with "Jean de Bourbon")
+*)
 let advanced_search conf base max_answers =
   let hs = Hashtbl.create 73 in
   let hss = Hashtbl.create 73 in
@@ -111,12 +129,12 @@ let advanced_search conf base max_answers =
   in
   let fn_list =
     List.map begin fun s ->
-      List.sort_uniq compare @@ List.map Name.lower @@ Name.split_fname s
+      List.map Name.lower @@ Name.split_fname s
     end (getss "first_name")
   in
   let sn_list =
     List.map begin fun s ->
-      List.sort_uniq compare @@ List.map Name.lower @@ Name.split_sname s
+      List.map Name.lower @@ Name.split_sname s
     end (getss "surname")
   in
   (* Search type can be AND or OR. *)

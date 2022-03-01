@@ -1116,3 +1116,56 @@ let groupby ~key ~value list =
 
 let digest s =
   Digest.string s |> Digest.to_hex
+
+let empty_person empty what =
+  { Def.first_name = what
+  ; surname = what
+  ; occ = 0
+  ; public_name = empty
+  ; image = empty
+  ; qualifiers = []
+  ; aliases = []
+  ; first_names_aliases = []
+  ; surnames_aliases = []
+  ; titles = []
+  ; rparents = []
+  ; related = []
+  ; occupation = empty
+  ; sex = Neuter
+  ; access = IfTitles
+  ; birth = Adef.cdate_None
+  ; birth_place = empty
+  ; birth_note = empty
+  ; birth_src = empty
+  ; baptism = Adef.cdate_None
+  ; baptism_place = empty
+  ; baptism_note = empty
+  ; baptism_src = empty
+  ; death = DontKnowIfDead
+  ; death_place = empty
+  ; death_note = empty
+  ; death_src = empty
+  ; burial = UnknownBurial
+  ; burial_place = empty
+  ; burial_note = empty
+  ; burial_src = empty
+  ; pevents = []
+  ; notes = empty
+  ; psources = empty
+  ; key_index = ()
+  }
+
+let empty_family empty =
+  { Def.marriage = Adef.cdate_None
+  ; marriage_place = empty
+  ; marriage_note = empty
+  ; marriage_src = empty
+  ; witnesses = [||]
+  ; relation = Def.NoMention
+  ; divorce = Def.NotDivorced
+  ; fevents = []
+  ; comment = empty
+  ; origin_file = empty
+  ; fsources = empty
+  ; fam_index = ()
+  }

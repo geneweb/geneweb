@@ -1402,7 +1402,8 @@ let print_mod_aux conf base callback =
   else Update.error_digest conf
 
 let family_structure base ifam =
-  let fam = foi base ifam in get_parent_array fam, get_children fam
+  let fam = foi base ifam in
+  get_parent_array fam, get_children fam
 
 let print_mod o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)

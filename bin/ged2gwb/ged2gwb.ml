@@ -814,20 +814,7 @@ let string_quest = 1
 let string_x = 2
 
 let unknown_per i sex =
-  let empty = string_empty in
-  let what = string_quest in
-  let p =
-    {first_name = what; surname = what; occ = i; public_name = empty;
-     image = empty; qualifiers = []; aliases = []; first_names_aliases = [];
-     surnames_aliases = []; titles = []; rparents = []; related = [];
-     occupation = empty; sex = sex; access = IfTitles;
-     birth = Adef.cdate_None; birth_place = empty; birth_note = empty;
-     birth_src = empty; baptism = Adef.cdate_None; baptism_place = empty;
-     baptism_note = empty; baptism_src = empty; death = DontKnowIfDead;
-     death_place = empty; death_note = empty; death_src = empty;
-     burial = UnknownBurial; burial_place = empty; burial_note = empty;
-     burial_src = empty; pevents = []; notes = empty; psources = empty;
-     key_index = i}
+  let p = { (Mutil.empty_person string_empty string_quest) with sex ; occ = i ; key_index = i }
   and a = {parents = None; consang = Adef.fix (-1)}
   and u = {family = [| |]} in
   p, a, u
@@ -841,14 +828,9 @@ let phony_per gen sex =
   i
 
 let unknown_fam gen i =
-  let empty = string_empty in
   let father = phony_per gen Male in
   let mother = phony_per gen Female in
-  let f =
-    {marriage = Adef.cdate_None; marriage_place = empty;
-     marriage_note = empty; marriage_src = empty; witnesses = [| |];
-     relation = !relation_status; divorce = NotDivorced; fevents = [];
-     comment = empty; origin_file = empty; fsources = empty; fam_index = i}
+  let f = { (Mutil.empty_family string_empty) with fam_index = i }
   and c = Adef.couple father mother
   and d = {children = [| |]} in
   f, c, d

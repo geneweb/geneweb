@@ -39,6 +39,14 @@ val string_of_on_french_dmy : config -> dmy -> Adef.safe_string
     with prefix "on" before dates (changes for other languages). *)
 val string_of_on_hebrew_dmy : config -> dmy -> Adef.safe_string
 
+(** Translate a date in the french calendar
+    with prefix "on" before dates (changes for other languages). *)
+val string_of_on_french_dmy : config -> dmy -> string
+
+(** Translate a date in the habrew calendar
+    with prefix "on" before dates (changes for other languages). *)
+val string_of_on_hebrew_dmy : config -> dmy -> string
+
 (** Returns date in format dd/mm/yyyy. Format could be different for other languages (defined by [!dates order]
     keyword in the lexicon). *)
 val string_slash_of_date : config -> date -> Adef.safe_string
@@ -91,7 +99,7 @@ val string_of_date_aux
   -> ?sep:Adef.safe_string
   -> Config.config
   -> Def.date
-  -> Adef.safe_string
+  -> string
 
 (**/**)
 
@@ -110,4 +118,6 @@ val french_month : config -> int -> string
     returns translated phrase according to prec of [d].
     [d] is only used to determine the precision
  *)
-val string_of_prec_dmy : config -> string -> string -> dmy -> Adef.safe_string
+
+val string_of_prec_dmy : config -> string -> string -> dmy -> string
+

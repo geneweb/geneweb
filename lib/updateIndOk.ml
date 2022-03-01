@@ -762,45 +762,11 @@ let strip_person p =
    rparents =
      List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents}
 
-let print_conflict conf base p =
-  let err = Update.UERR_already_defined (base, p, "") in
-  Update.prerr conf err @@ fun () ->
-  Update.print_error conf base (Update.UERR_already_defined (base, p, ""));
-  let free_n =
-    Gutil.find_free_occ base (p_first_name base p) (p_surname base p)
-  in
-  Output.print_sstring conf "<ul>\n";
-  Output.print_sstring conf "<li>";
-  Output.printf conf "%s%s %d.\n" (Utf8.capitalize_fst (transl conf "first free number"))
-    (Util.transl conf ":") free_n;
-  Output.printf conf (fcapitale (ftransl conf "click on \"%s\""))
-    (transl conf "create");
-  Output.printf conf " %s.\n" (transl conf "to try again with this number");
-  Output.print_sstring conf "</li>";
-  Output.print_sstring conf "<li>";
-  Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "or"));
-  Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
-  Output.printf conf " %s %s." (transl_nth conf "and" 0)
-    (transl conf "change it (the number) yourself");
-  Output.print_sstring conf "</li>";
-  Output.print_sstring conf "</ul>\n";
-  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  Util.hidden_env_aux conf conf.henv ;
-  Util.hidden_env_aux conf conf.env ;
-  Output.printf conf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
-    free_n;
-  Output.printf conf "<input type=\"submit\" name=\"create\" value=\"%s\">\n"
-    (Utf8.capitalize_fst (transl conf "create"));
-  Output.printf conf "<input type=\"submit\" name=\"return\" value=\"%s\">\n"
-    (Utf8.capitalize_fst (transl conf "back"));
-  Output.print_sstring conf "</form>\n";
-  Update.print_same_name conf base p
-
 let default_prerr conf base = function
   | Update.UERR_sex_married p as err ->
     Update.prerr conf err @@ fun () ->
-    Update.print_error conf base err ;
-    Output.print_sstring conf "<ul><li>" ;
+    Update.print_error conf err ;
+    Output.print_string conf "<ul><li>" ;
     Output.print_string conf (Util.referenced_person_text conf base p) ;
     Output.print_sstring conf "</li></ul>" ;
     Update.print_return conf ;
@@ -854,7 +820,7 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
   if ofn <> sp.first_name || osn <> sp.surname || oocc <> sp.occ then begin
     match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
     | Some p' when p' <> pi && Some p' <> skip_conflict ->
-      print_conflict conf base (poi base p')
+      Update.print_create_conflict conf base (poi base p') ""
     | _ ->
       rename_image_file conf base op sp
   end ;
@@ -876,7 +842,8 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
 
 let effective_add conf base sp =
   begin match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
-    | Some p' -> print_conflict conf base (poi base p')
+    | Some p' ->
+      Update.print_create_conflict conf base (poi base p') ""
     | _ -> ()
   end ;
   let created_p = ref [] in

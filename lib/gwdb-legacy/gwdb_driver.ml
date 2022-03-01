@@ -382,41 +382,7 @@ let get_relation = cache_fam (fun f -> f.Def.relation)
 let get_witnesses = cache_fam (fun f -> f.Def.witnesses)
 
 let no_person ip =
-  { first_name = empty_string
-  ; surname = empty_string
-  ; occ = 0
-  ; image = empty_string
-  ; first_names_aliases = []
-  ; surnames_aliases = []
-  ; public_name = empty_string
-  ; qualifiers = []
-  ; titles = []
-  ; rparents = []
-  ; related = []
-  ; aliases = []
-  ; occupation = empty_string
-  ; sex = Neuter
-  ; access = Private
-  ; birth = Adef.cdate_None
-  ; birth_place = empty_string
-  ; birth_note = empty_string
-  ; birth_src = empty_string
-  ; baptism = Adef.cdate_None
-  ; baptism_place = empty_string
-  ; baptism_note = empty_string
-  ; baptism_src = empty_string
-  ; death = DontKnowIfDead
-  ; death_place = empty_string
-  ; death_note = empty_string
-  ; death_src = empty_string
-  ; burial = UnknownBurial
-  ; burial_place = empty_string
-  ; burial_note = empty_string
-  ; burial_src = empty_string
-  ; pevents = []
-  ; notes = empty_string
-  ; psources = empty_string
-  ; key_index = ip }
+  { (Mutil.empty_person empty_string quest_string) with key_index = ip }
 
 let no_ascend = { parents = None ; consang = Adef.no_consang }
 
@@ -454,20 +420,7 @@ let poi base iper =
   if iper = dummy_iper then empty_person base iper
   else { base ; iper ; p = None ; a = None ; u = None } [@ocaml.warning "-42"]
 
-let no_family ifam =
-  { marriage = Adef.cdate_None
-  ; marriage_place = empty_string
-  ; marriage_note = empty_string
-  ; marriage_src = empty_string
-  ; witnesses = [||]
-  ; relation = Def.NoMention
-  ; divorce = Def.NotDivorced
-  ; fevents = []
-  ; comment = empty_string
-  ; origin_file = empty_string
-  ; fsources = empty_string
-  ; fam_index = ifam
-  }
+let no_family ifam = { (Mutil.empty_family empty_string) with fam_index = ifam }
 
 let no_couple = Adef.couple dummy_iper dummy_iper
 

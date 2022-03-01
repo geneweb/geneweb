@@ -165,56 +165,8 @@ let print_change_done conf base p =
   Hutil.trailer conf
 
 let print_conflict conf base ip_var p =
-  let title _ = transl conf "error" |> Utf8.capitalize_fst |> Output.print_sstring conf in
-  Hutil.rheader conf title;
-  Update.print_error conf base @@ Update.UERR_already_defined (base, p, "");
-  let free_n =
-    Gutil.find_free_occ base (p_first_name base p) (p_surname base p)
-  in
-  Output.print_sstring conf "<ul>\n";
-  Output.print_sstring conf "<li>";
-  transl conf "first free number"
-  |> Utf8.capitalize_fst
-  |> Output.print_sstring conf ; (* "%s%s %d.\n" *)
-  Output.print_sstring conf (Util.transl conf ":") ;
-  Output.print_sstring conf " " ;
-  Output.print_sstring conf (string_of_int free_n);
-  Output.print_sstring conf "." ;
-  Output.printf conf
-    (fcapitale (ftransl conf "click on \"%s\""))
-    (transl conf "create") ;
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl conf "to try again with this number");
-  Output.print_sstring conf ". ";
-  Output.print_sstring conf "</li><li>";
-  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "or"));
-  Output.print_sstring conf " " ;
-  Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
-  Output.print_sstring conf " " ;
-  Output.print_sstring conf (transl_nth conf "and" 0) ;
-  Output.print_sstring conf " ";
-  Output.print_sstring conf (transl conf "change it (the number) yourself") ;
-  Output.print_sstring conf ".</li></ul>";
-  Output.print_sstring conf {|<form method="post" action="|} ;
-  Output.print_sstring conf conf.command ;
-  Output.print_sstring conf {|">|} ;
-  Util.hidden_env_aux conf conf.henv ;
-  Util.hidden_env_aux conf conf.env ;
-  Util.hidden_input conf "field" (Adef.encoded @@ "c" ^ string_of_iper ip_var) ;
-  Util.hidden_input conf "free_occ" (Adef.encoded @@ string_of_int free_n) ;
-  Output.print_sstring conf {|<button type="submit" name="create" class="btn btn-primary btn-lg">|} ;
-  transl conf "create"
-  |> Utf8.capitalize_fst
-  |> Output.print_sstring conf ;
-  Output.print_sstring conf
-    {|</button><button type="submit" name="return" class="btn btn-primary btn-lg">|} ;
-  transl conf "back"
-  |> Utf8.capitalize_fst
-  |> Output.print_sstring conf ;
-  Output.print_sstring conf "</button></form>";
-  Update.print_same_name conf base p;
-  Hutil.trailer conf;
-  raise @@ Update.ModErr (Update.UERR (__FILE__ ^ " " ^ string_of_int __LINE__ |> Adef.safe))
+  let var = "c" ^ string_of_iper ip_var in
+  Update.print_create_conflict conf base p var
 
 let error_person conf err =
   let title _ = transl conf "error" |> Utf8.capitalize_fst |> Output.print_sstring conf in

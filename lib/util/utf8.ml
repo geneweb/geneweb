@@ -82,8 +82,6 @@ module C = struct
 
   type t = Str of string | Chr of char | Empty
 
-  (* Creates [t] from the UTF-8 character that starts at position [i] in [s].
-    If characher isn't the one that exists in ASCII char set, use unidecode library *)
   let unaccent trimmed s i0 len =
     let rec loop i =
       if i < len then match
