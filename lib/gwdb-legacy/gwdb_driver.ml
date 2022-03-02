@@ -382,7 +382,7 @@ let get_relation = cache_fam (fun f -> f.Def.relation)
 let get_witnesses = cache_fam (fun f -> f.Def.witnesses)
 
 let no_person ip =
-  { (Mutil.empty_person empty_string quest_string) with key_index = ip }
+  { (Mutil.empty_person empty_string empty_string) with key_index = ip }
 
 let no_ascend = { parents = None ; consang = Adef.no_consang }
 
