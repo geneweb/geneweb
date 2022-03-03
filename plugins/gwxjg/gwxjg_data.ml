@@ -1133,124 +1133,6 @@ let trans (conf : Config.config) =
     | x -> Jingoo.Jg_types.failwith_type_error_1 "trans" x
   end
 
-(* copy/paste from Yojson adapted to Jingoo *)
-module Yojson_write = struct
-
-  let rec hex n =
-    Char.chr (if n < 10 then n + 48 else n + 87)
-
-  and write_special src start stop ob str =
-    Buffer.add_substring ob src !start (stop - !start);
-    Buffer.add_string ob str;
-    start := stop + 1
-
-  and write_control_char src start stop ob c =
-    Buffer.add_substring ob src !start (stop - !start);
-    Buffer.add_string ob "\\u00" ;
-    Buffer.add_char ob (hex (Char.code c lsr 4)) ;
-    Buffer.add_char ob (hex (Char.code c land 0xf));
-    start := stop + 1
-
-  and finish_string src start ob =
-    Buffer.add_substring ob src !start (String.length src - !start)
-
-  and write_string_body ob s =
-    let start = ref 0 in
-    for i = 0 to String.length s - 1 do
-      match s.[i] with
-        '"' -> write_special s start i ob "\\\""
-      | '\\' -> write_special s start i ob "\\\\"
-      | '\b' -> write_special s start i ob "\\b"
-      | '\012' -> write_special s start i ob "\\f"
-      | '\n' -> write_special s start i ob "\\n"
-      | '\r' -> write_special s start i ob "\\r"
-      | '\t' -> write_special s start i ob "\\t"
-      | '\x00'..'\x1F'
-      | '\x7F' as c -> write_control_char s start i ob c
-      | _ -> ()
-    done;
-    finish_string s start ob
-
-  and write_string ob s =
-    Buffer.add_char ob '"';
-    write_string_body ob s;
-    Buffer.add_char ob '"'
-
-  and dec n =
-    Char.chr (n + 48)
-
-  and write_digits ob x =
-    if x = 0 then ()
-    else
-      let d = x mod 10 in
-      write_digits ob (x / 10) ;
-      Buffer.add_char ob (dec (abs d))
-
-  and write_int ob x =
-    if x > 0 then write_digits ob x
-    else if x < 0 then begin
-      Buffer.add_char ob '-' ;
-      write_digits ob x
-    end
-    else
-      Buffer.add_char ob '0'
-
-  and write_float ob x =
-    Buffer.add_string ob @@ Printf.sprintf "%.17g" x
-
-  and write_null ob () =
-    Buffer.add_string ob "null"
-
-  and write_bool ob x =
-    Buffer.add_string ob (if x then "true" else "false")
-
-  and write_kv ob (k, v) = write_string ob k ; Buffer.add_char ob ':' ; write_json ob v
-
-  and write_list_aux : 'a . (Buffer.t -> 'a -> unit) -> Buffer.t -> 'a list -> unit =
-    fun fn ob x ->
-      let rec loop = function
-        | [] -> ()
-        | [ x ] -> fn ob x
-        | hd :: tl -> fn ob hd ; Buffer.add_char ob ',' ; loop tl
-      in
-      loop x
-
-  and write_assoc ob x =
-    Buffer.add_char ob '{' ;
-    write_list_aux write_kv ob x ;
-    Buffer.add_char ob '}'
-
-  and write_hash ob x =
-    Hashtbl.fold (fun k v acc -> (k, v) :: acc) x []
-    |> write_assoc ob
-
-  and write_list ob x =
-    Buffer.add_char ob '[' ;
-    write_list_aux write_json ob x ;
-    Buffer.add_char ob ']'
-
-  and write_array ob x =
-    write_list ob (Array.to_list x)
-
-  and write_json ob = function
-    | Tint i -> write_int ob i
-    | Tfloat f -> write_float ob f
-    | Tnull -> write_null ob ()
-    | Tbool b -> write_bool ob b
-    | Tstr s -> write_string ob s
-    | Tobj assoc -> write_assoc ob assoc
-    | Thash hash -> write_hash ob hash
-    | Tlist list | Tset list -> write_list ob list
-    | Tarray array -> write_array ob array
-    | x -> failwith_type_error_1 "write_json" x
-
-end
-
-let json_encode o =
-  let open Yojson_write in
-  let ob = Buffer.create 64 in
-  write_json ob o ;
-  Buffer.contents ob
 
 let log = func_arg1_no_kw @@ fun x -> print_endline @@ Jg_runtime.string_of_tvalue x ; Tnull
 
@@ -1314,7 +1196,6 @@ let default_env_aux conf =
   :: ("decode_varenv", decode_varenv)
   :: ("encode_varenv", encode_varenv)
   :: ("alphabetic", alphabetic)
-  :: ("json_encode", func_arg1_no_kw (fun x -> Tstr (json_encode x) ))
   :: ("conf", mk_conf conf)
   :: ("LOG", log)
   :: ("CAST", module_CAST)
