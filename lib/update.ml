@@ -1120,7 +1120,7 @@ let print_create_conflict conf base p var =
          Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
            x (Util.escape_html (Mutil.decode v)))
     (conf.henv @ conf.env);
-  Output.printf conf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var;
+  if var <> "" then Output.printf conf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var;
   Output.printf conf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
     free_n;
   Output.print_string conf "<ul>\n";
