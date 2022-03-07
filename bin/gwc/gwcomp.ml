@@ -669,8 +669,12 @@ let get_optional_event_date l =
 (** Parse witness kind *)
 let get_event_witness_kind l =
   match l with
-    "#godp" :: l' -> Witness_GodParent, l'
-  | "#offi" :: l' -> Witness_Officer, l'
+  | "#godp" :: l' -> Witness_GodParent, l'
+  | "#offi" :: l' -> Witness_CivilOfficer, l'
+  | "#reli" :: l' -> Witness_ReligiousOfficer, l'
+  | "#info" :: l' -> Witness_Informant, l'
+  | "#atte" :: l' -> Witness_Attending, l'
+  | "#ment" :: l' -> Witness_Mentioned, l'
   | _ -> Witness, l
 
 (** Parses the line containing an information about relationship between parents within family

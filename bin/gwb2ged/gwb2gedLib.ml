@@ -89,6 +89,7 @@ let oc opts = match opts.Gwexport.oc with _, oc, _ -> oc
     already printed
     @param i specifies the last char index (index to s -- one byte
     char) *)
+
 let rec display_note_aux opts tagn s len i =
   let j = ref i in
   (* read wide char (case charset UTF-8) or char (other charset) in s string*)
@@ -388,6 +389,23 @@ let is_primary_pevents =
       true
   | _ -> false
 
+let relation_format_of_witness_kind :
+      witness_kind -> ('a, unit, string, unit) format4
+  = function
+  | Witness                  -> "3 RELA witness"
+  | Witness_GodParent        -> "3 RELA GODP"
+  | Witness_CivilOfficer     -> "3 RELA officer"
+  | Witness_ReligiousOfficer -> "3 RELA Officiating priest"
+  | Witness_Informant        -> "3 RELA Informant"
+  | Witness_Attending        -> "3 RELA Attending"
+  | Witness_Mentioned        -> "3 RELA Mentioned"
+                       
+let oc' opts s =
+  Printf.ksprintf (oc opts) (s ^^ "\n")
+
+let oc_witness_kind opts wk =
+  oc' opts (relation_format_of_witness_kind wk)
+  
 let ged_pevent opts base per_sel evt =
   let typ =
     if is_primary_pevents evt.epers_name then
@@ -405,10 +423,7 @@ let ged_pevent opts base per_sel evt =
          begin
            Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
            Printf.ksprintf (oc opts) "3 TYPE INDI\n";
-           match wk with
-           | Witness -> Printf.ksprintf (oc opts) "3 RELA witness\n"
-           | Witness_GodParent -> Printf.ksprintf (oc opts) "3 RELA GODP\n"
-           | Witness_Officer -> Printf.ksprintf (oc opts) "3 RELA officer\n"
+           oc_witness_kind opts wk
          end)
     evt.epers_witnesses
 
@@ -652,10 +667,7 @@ let ged_fevent opts base per_sel evt =
       begin
         Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
         Printf.ksprintf (oc opts) "3 TYPE INDI\n";
-        match wk with
-        | Witness -> Printf.ksprintf (oc opts) "3 RELA witness\n"
-        | Witness_GodParent -> Printf.ksprintf (oc opts) "3 RELA GODP\n"
-        | Witness_Officer -> Printf.ksprintf (oc opts) "3 RELA officer\n"
+        oc_witness_kind opts wk
       end
   end evt.efam_witnesses
 

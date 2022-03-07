@@ -1297,6 +1297,16 @@ let rec find_all_rela nl =
           loop nl
       | None -> find_all_rela nl rl
 
+let witness_kind_of_rval rval = match rval with
+  | "GODP"               -> Witness_GodParent
+  | "officer"            -> Witness_CivilOfficer
+  | "Registry officer"   -> Witness_CivilOfficer
+  | "Officiating priest" -> Witness_ReligiousOfficer
+  | "Informant"          -> Witness_Informant
+  | "Attending"          -> Witness_Attending
+  | "Mentioned"          -> Witness_Mentioned
+  | _                    -> Witness
+              
 let find_event_witness gen tag ip r =
   let rec find_witnesses =
     function
@@ -1306,10 +1316,7 @@ let find_event_witness gen tag ip r =
           let witness = forward_pevent_witn gen ip (strip_spaces r.rval) in
           let witness_kind =
             match find_field "RELA" r.rsons with
-              Some rr ->
-                if rr.rval = "GODP" then Witness_GodParent
-                else if rr.rval = "officer" then Witness_Officer
-                else Witness
+              Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
           (witness, witness_kind) :: find_witnesses asso_l
@@ -1317,10 +1324,7 @@ let find_event_witness gen tag ip r =
           let witness = forward_pevent_witn gen ip (strip_spaces r.rval) in
           let witness_kind =
             match find_field "RELA" r.rsons with
-              Some rr ->
-                if rr.rval = "GODP" then Witness_GodParent
-                else if rr.rval = "officer" then Witness_Officer
-                else Witness
+              Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
           (witness, witness_kind) :: find_witnesses asso_l
@@ -1341,10 +1345,7 @@ let find_fevent_witness gen tag ifath r =
           let witness = forward_fevent_witn gen ifath (strip_spaces r.rval) in
           let witness_kind =
             match find_field "RELA" r.rsons with
-              Some rr ->
-                if rr.rval = "GODP" then Witness_GodParent
-                else if rr.rval = "officer" then Witness_Officer
-                else Witness
+              Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
           (witness, witness_kind) :: find_witnesses asso_l
@@ -1352,10 +1353,7 @@ let find_fevent_witness gen tag ifath r =
           let witness = forward_fevent_witn gen ifath (strip_spaces r.rval) in
           let witness_kind =
             match find_field "RELA" r.rsons with
-              Some rr ->
-                if rr.rval = "GODP" then Witness_GodParent
-                else if rr.rval = "officer" then Witness_Officer
-                else Witness
+              Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
           (witness, witness_kind) :: find_witnesses asso_l

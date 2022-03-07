@@ -205,8 +205,12 @@ type witness_kind =
   Def.witness_kind =
     Witness
   | Witness_GodParent
-  | Witness_Officer
-
+  | Witness_CivilOfficer
+  | Witness_ReligiousOfficer
+  | Witness_Informant
+  | Witness_Attending
+  | Witness_Mentioned
+  
 (** Printer for [witness_kind] *)
 val pp_witness_kind :
   Format.formatter ->
@@ -607,3 +611,4 @@ val show_gen_descend :
   (Format.formatter ->
    'person -> unit) ->
   'person gen_descend -> string
+
