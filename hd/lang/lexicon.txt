@@ -4033,6 +4033,30 @@ ru: обрезание
 sv: Omskärellse
 tr: Sünnet
 
+    civil registrar/civil registrar/civil registrar
+de: Standesbeamter/Standesbeamter/Standesbeamter
+en: civil registrar/civil registrar/civil registrar
+es: oficial del registro civil/oficial del registro civil/oficial del registro civil
+fi: siviilirekisterin pitäjä/siviilirekisterin pitäjä/siviilirekisterin pitäjä
+fr: officier d'état-civil/officière d'état-civil/officier d'état-civil
+it: ufficiale dell' anagrafe/ufficiale dell' anagrafe/ufficiale dell' anagrafe
+nl: burgerlijk celebrant/burgerlijk celebrant/burgerlijk celebrant
+no: sivilregistrator/sivilregistrator/sivilregistrator
+pt: escrivão civil/escrivão civil/escrivão civil
+sv: civila register/civila register/civila register
+
+    civil registrar/civil registrars
+de: Standesbeamter/Standesbeamte
+en: civil registrar/civil registrars
+es: oficial del registro civil/registradores civiles
+fi: siviilirekisterin pitäjä/siviilirekisterin pitäjä
+fr: officier d'état-civil/officiers d'état-civil
+it: ufficiale dell' anagrafe/ufficiali dell'anagrafe
+nl: burgerlijk celebrant/ambtenaar
+no: sivilregistrator/sivile registerførere
+pt: escrivão civil/escrivão civil
+sv: civila register/civila register
+
     click
 af: druk
 bg: щракнете
@@ -8092,6 +8116,30 @@ ru: личные заметки
 sv: anteckningar om personen
 tr: bireysel not
 
+    informant/informant/informant
+de: Anmelder/Anmelder/Anmelder
+en: informant/informant/informant
+es: declarante/declarante/declarante
+fi: ilmoittaja/ilmoittajana/ilmoittaja
+fr: déclarant/déclarante/déclarant.e
+it: dichiarante/dichiarante/dichiarante
+nl: aangever/aangever/aangever
+no: informant/informant/informant
+pt: informante/informante/informante
+sv: informatör/informatör/informatör
+
+    informant/informants
+de: Deklarant/Deklaranten
+en: informant/informants
+es: declarante/declarantes
+fi: ilmoittaja/ilmoittajat
+fr: déclarant/déclarants
+it: dichiarante/dichiaranti
+nl: aangever/aangevers
+no: informant/informanter
+pt: informante/informantes
+sv: informatör/informatör
+
     inline chronology
 co: cronolugia simplice/cronolugia detagliata
 en: simple chronology/detailed chronology
@@ -9419,6 +9467,30 @@ sk: maximum
 sl: največ
 sv: maximalt
 tr: maksimum
+
+    mentioned/mentioned
+de: zitierte/zitierten
+en: cited/cited
+es: citado/citado
+fi: lainaus/lainaus
+fr: cité/cités
+it: citato/citati
+nl: genoemd/genoemd
+no: sitert/sitert
+pt: citado/citados
+sv: citerad/citerad
+
+    mentioned/mentioned/mentioned
+de: zitierte/zitierte/zitierte
+en: cited/cited/cited
+es: citado/citada/citado
+fi: lainaus/lainaus/lainaus
+fr: cité/citée/cité.e
+it: citato/citata/citato
+nl: genoemd/genoemd/genoemd
+no: sitert/sitert/sitert
+pt: citado/citada/citado
+sv: citerad/citerad/citerad
 
     merge
 af: saamvoeg
@@ -11689,6 +11761,30 @@ sv: föräldrar
 tr: ebeveynler
 zh:  父母
 
+    parrish registrar/parrish registrar/parrish registrar
+de: religiöser Amtsträger/religiöser Amtsträger/religiöser Amtsträger
+en: parish registrar/parish registrar/parish registrar
+es: oficiante religioso/oficiante religioso/oficiante religioso
+fi: seurakunnan rekisterinpitäjä/seurakunnan rekisterinpitäjä/seurakunnan rekisterinpitäjä
+fr: officiant religieux/officiante religieuse/officiant.e religieux.se
+it: officiante religioso/officiante religioso/officiante religioso
+nl: geestelijk celebrant/geestelijk celebrant/geestelijk celebrant
+no: sogneregistrator/sogneregistrator/sogneregistrator
+pt: escrivão paroquial/escrivão paroquial/escrivão paroquial
+sv: församlingsregister/församlingsregister/församlingsregister
+
+    parrish registrar/parrish registrars
+de: religiöser Amtsträger/religiöse Amtsträgern
+en: parish registrar/parish registrars 
+es: oficiante religioso/oficiantes religiosos
+fi: seurakunnan rekisterinpitäjä/seurakunnan rekisteriin
+fr: officiant religieux/officiants religieux
+it: officiante religioso/officiante religioso
+nl: geestelijk celebrant/geestelijken celebranten
+no: sogneregistrator/menighetsregistratorer
+pt: escrivão paroquial/escrivão paroquial
+sv: församlingsregister/församlingsregister
+
     participant/participant
 co: participante/participante
 de: Teilnehmer/Teilnehmerin
@@ -12088,6 +12184,30 @@ sk: presne
 sl: natančnost
 sv: precision
 tr: hassaslık
+
+    present/present
+de: Anwesende/Anwesende
+en: present/present
+es: presente/presente
+fi: läsnäolijat/läsnäolijat
+fr: présent/présents
+it: astante/presenti
+nl: aanwezig/aanwezig
+no: tilstedeværende/tilstedeværende
+pt: presente/presentes
+sv: närvarande/närvarande
+
+    present/present/present
+de: Anwesende/Anwesende/Anwesende
+en: present/present/present  
+es: presente/presente/presente
+fi: läsnäolijat/läsnäolijana/läsnäolijat
+fr: présent/présente/présent.e
+it: astante/astante/astante
+nl: aanwezig/aanwezig/aanwezig
+no: tilstedeværende/tilstedeværende/tilstedeværende
+pt: presente/presente/presente
+sv: närvarande/närvarande/närvarande
 
     presentation
 co: Prisentazione
