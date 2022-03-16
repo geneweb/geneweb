@@ -71,12 +71,6 @@ let extract_var sini s =
 let bool_val x = VVbool x
 let str_val x = VVstring x
 
-module ExtList = struct
-  let nth_opt l n =
-    try Some (List.nth l n) with Failure _ -> None
-  let assoc_opt l k =
-    try Some (List.assoc l k) with Not_found -> None
-end
 module ExtOption = struct
   let bind o f = match o with
     | Some v -> f v
@@ -100,38 +94,27 @@ let eval_witness_kind = function
   | Witness                  -> str_val ""
 
 let family_events_opt env fam = match get_env "cnt" env with
-  | Vint i -> ExtList.nth_opt fam.fevents (i - 1)
+  | Vint i -> List.nth_opt fam.fevents (i - 1)
   | _      -> None
 
-let ( >>= ) x f = try ExtOption.bind x f with Failure _ -> None
+let witness_person_of_event_opt env e = match get_env "wcnt" env with
+  | Vint i when (i - 1) >= 0 && (i - 1) < Array.length e.efam_witnesses ->
+     Some (fst e.efam_witnesses.(i - 1))
+  | Vint i when (i - 1) >= 0 && (i - 1) < 2 && Array.length e.efam_witnesses < 2 ->
+     Some ("", "", 0, Update.Create (Neuter, None), "")
+  | _      -> None
 
+let ( >>= ) x f = ExtOption.bind x f
 
-(* TODO : rewrite, this looks bad *)
-let rec eval_fwitness env fam sl = match get_env "cnt" env with
-    Vint i ->
-     let e =
-       try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None
-     in
-     begin match e with
-       Some e ->
-        begin match get_env "wcnt" env with
-          Vint i ->
-           let i = i - 1 in
-           let k =
-             if i >= 0 && i < Array.length e.efam_witnesses then
-               fst e.efam_witnesses.(i)
-             else if
-               i >= 0 && i < 2 && Array.length e.efam_witnesses < 2
-             then
-               "", "", 0, Update.Create (Neuter, None), ""
-             else raise Not_found
-           in
-           eval_key k sl
-        | _ -> raise Not_found
-        end
-     | None -> raise Not_found
-     end
-  | _ -> raise Not_found
+let rec eval_fwitness env fam sl =
+  let fwitness_opt =
+    family_events_opt env fam >>= fun e ->
+    witness_person_of_event_opt env e >>= fun p ->
+    eval_key_opt p sl
+  in
+  match fwitness_opt with
+  | Some fw -> fw
+  | None    -> raise Not_found
 
 (* TODO : function logic around array length is not clear  *)
 and eval_child env des sl =
@@ -152,7 +135,7 @@ and eval_var conf base env (fam, cpl, des) _loc sl =
     Not_found -> eval_simple_var conf base env (fam, cpl, des) sl
 
 and eval_bvar conf v =
-  match ExtList.assoc_opt v conf.base_env with
+  match List.assoc_opt v conf.base_env with
   | Some v -> VVstring v
   | None   -> VVstring ""
 
@@ -449,6 +432,7 @@ and eval_event_var e =
       | _ -> str_val ""
       end
   | _ -> raise Not_found
+
 and eval_parent' conf env k =
   function
     ["himher"] ->
@@ -461,6 +445,7 @@ and eval_parent' conf env k =
       in
       str_val s
   | sl -> eval_key k sl
+
 and eval_key (fn, sn, oc, create, _) =
   function
     ["create"] -> str_val (if create <> Update.Link then "create" else "link")
@@ -469,6 +454,9 @@ and eval_key (fn, sn, oc, create, _) =
   | ["occ"] -> str_val (if oc = 0 then "" else string_of_int oc)
   | ["surname"] -> str_val (Util.escape_html sn)
   | _ -> raise Not_found
+
+and eval_key_opt p sl = Some (eval_key p sl)
+
 (* TODO : looks bad *)
 and eval_create c =
   function
