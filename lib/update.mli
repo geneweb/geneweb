@@ -18,6 +18,7 @@ type update_error =
   | UERR_already_has_parents of base * person
   | UERR_missing_surname of string
   | UERR_missing_first_name of string
+  | UERR_locked_base
 
 exception ModErr of update_error
 
@@ -85,7 +86,7 @@ val def_error : config -> base -> person Def.error -> unit
 
 val error : config -> update_error -> 'exn
 
-val error_locked : config -> unit
+val error_locked : config -> 'exn
 val error_digest : config -> 'exn
 
 val digest_person : (iper, key, string) gen_person -> Digest.t

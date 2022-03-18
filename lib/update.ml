@@ -19,6 +19,7 @@ type update_error =
   | UERR_already_has_parents of base * person
   | UERR_missing_surname of string
   | UERR_missing_first_name of string
+  | UERR_locked_base
 
 exception ModErr of update_error
 
@@ -305,6 +306,9 @@ let string_of_error conf =
   | UERR_missing_surname x ->
     (transl conf "surname missing" |> Utf8.capitalize_fst)
     ^ transl conf ":" ^ " " ^ x
+  | UERR_locked_base ->
+    transl conf "the file is temporarily locked: please try again"
+    |> Utf8.capitalize_fst
 
 let print_err_unknown conf base (f, s, o) =
   let err = UERR_unknow_person (f, s, o) in
@@ -787,13 +791,10 @@ let def_error conf base x =
   | BadSexOfMarriedPerson p -> UERR_sex_married p
 
 let error_locked conf =
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
-  Hutil.rheader conf title;
+  let err = UERR_locked_base in
+  prerr conf err @@ fun () ->
   Output.print_string conf "<p>\n";
-  Output.printf conf
-    (fcapitale
-       (ftransl conf "the file is temporarily locked: please try again"));
-  Output.print_string conf ".\n";
+  Output.print_string conf (string_of_error conf err);
   Output.print_string conf "</p>\n";
   Output.print_string conf "<table>\n";
   Output.print_string conf "<tr>\n";
@@ -842,8 +843,7 @@ let error_locked conf =
   Output.print_string conf "</form>\n";
   Output.print_string conf "</td>\n";
   Output.print_string conf "</tr>\n";
-  Output.print_string conf "</table>\n";
-  Hutil.trailer conf
+  Output.print_string conf "</table>\n"
 
 let error_digest conf =
   let err = UERR_digest in
