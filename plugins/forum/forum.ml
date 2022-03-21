@@ -71,9 +71,11 @@ module MF : MF =
             (fun a b -> {p_ord = a = 0; p_ext = a; p_pos = b})
         with Scanf.Scan_failure _ -> not_a_pos
     let extend fname f =
-      let tmp = fname ^ "~" in
+      (*let tmp = fname ^ "~" in
       let oc = open_out tmp in
       (try f oc with e -> close_out oc; raise e);
+      print_endline "========================================waiting to open forum file";
+      let _ = read_line () in
       begin match (try Some (open_in fname) with Sys_error _ -> None) with
         Some ic ->
           begin try while true do output_char oc (input_char ic) done with
@@ -84,7 +86,69 @@ module MF : MF =
       end;
       close_out oc;
       Mutil.rm fname ;
-      Sys.rename tmp fname
+      print_endline "========================================waiting to rename forum~ to forum";
+      let _ = read_line () in
+      Sys.rename tmp fname*)
+      let tmp = fname ^ "~" in
+
+      let fd_tmp = Unix.openfile tmp [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
+      let fd_forum = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
+
+      print_endline "========================================waiting to take locks";
+      let _ = read_line () in
+      
+      Unix.lockf fd_tmp Unix.F_LOCK 0;
+      
+      Unix.lockf fd_forum Unix.F_LOCK 0;
+
+      let tmp_oc = Unix.out_channel_of_descr fd_tmp in
+      let tmp_ic = Unix.in_channel_of_descr fd_tmp in
+      let forum_oc = Unix.out_channel_of_descr fd_forum in
+      let forum_ic = Unix.in_channel_of_descr fd_forum in
+
+      print_endline "========================================waiting to write tmp forum files";
+      let _ = read_line () in
+      
+      (try f tmp_oc with e ->
+         close_out tmp_oc;
+         close_out forum_oc;
+         Unix.lockf fd_tmp Unix.F_ULOCK 0;
+         Unix.lockf fd_forum Unix.F_ULOCK 0;         
+         raise e
+      );
+      
+      begin try while true do output_char tmp_oc (input_char forum_ic) done with
+              End_of_file -> ()
+      end;      
+
+      flush tmp_oc;
+      
+      Unix.ftruncate fd_forum 0;
+
+      let _ = Unix.lseek fd_forum 0 Unix.SEEK_SET in
+      let _ = Unix.lseek fd_tmp 0 Unix.SEEK_SET in
+
+
+      print_endline "========================================waiting to write forum file";
+      let _ = read_line () in
+      
+      begin try while true do output_char forum_oc (input_char tmp_ic) done with
+              End_of_file -> ()
+      end;  
+
+      
+      flush forum_oc;
+      Unix.ftruncate fd_tmp 0;
+      
+      Unix.lockf fd_tmp Unix.F_ULOCK 0;
+      Unix.lockf fd_forum Unix.F_ULOCK 0;
+      
+      close_out forum_oc;
+      close_out tmp_oc;
+      
+      print_endline "========================================FINISHTA"
+      
+      
     let patch fname pos str =
       let fname =
         if pos.p_ext = 0 then fname else fname ^ "." ^ string_of_int pos.p_ext
