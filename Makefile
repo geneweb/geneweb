@@ -25,7 +25,7 @@ lib/gwlib.ml:
 	@echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 	@echo " Done!"
 
-CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D)
+CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D) $(SOSA_D)
 
 ifeq ($(DUNE_PROFILE),dev)
     CPPO_D+= -D DEBUG

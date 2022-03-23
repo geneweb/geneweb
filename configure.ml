@@ -72,20 +72,20 @@ let () =
     else if installed "num" then set_sosa_num ()
     else set_sosa_legacy ()
   end ;
-  let sosa_pkg =
+  let sosa_d, sosa_pkg =
     match !sosa with
     | `Legacy ->
       exclude_dir "sosa_num" ;
       exclude_dir "sosa_zarith" ;
-      "geneweb_sosa_array"
+      "", "geneweb_sosa_array"
     | `Num ->
       exclude_dir "sosa_array" ;
       exclude_dir "sosa_zarith" ;
-      "geneweb_sosa_num"
+      " -D SOSA_NUM ", "geneweb_sosa_num"
     | `Zarith ->
       exclude_dir "sosa_array" ;
       exclude_dir "sosa_num" ;
-      "geneweb_sosa_zarith"
+      " -D SOSA_ZARITH ","geneweb_sosa_zarith"
     | `None -> assert false
   in
   let gwdb_d, gwdb_pkg =
@@ -116,6 +116,7 @@ let () =
   var "EXT" ext ;
   var "GWDB_D" gwdb_d ;
   var "OS_D" os_d ;
+  var "SOSA_D" sosa_d ;
   var "SYSLOG_D" syslog_d ;
   var "GWDB_PKG" gwdb_pkg ;
   var "SOSA_PKG" sosa_pkg ;
