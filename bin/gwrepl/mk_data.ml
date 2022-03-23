@@ -1,4 +1,4 @@
-(* This file is used to generate the file 'data.ml', containing all
+(* This file is used to generate the file 'data.cppo.ml', containing all
    the files (cmis, cmas, .so) that could be used at runtime by
    a geneweb interpreter.
 
@@ -35,6 +35,11 @@ let partition_map p l =
   part [] [] l
 
 let (//) = Filename.concat
+
+let if_sosa_zarith out fn =
+  Printf.fprintf out "\n#ifdef SOSA_ZARITH\n" ;
+  fn () ;
+  Printf.fprintf out "\n#endif\n"
 
 let () =
   let opam_swich_prefix = Sys.getenv "OPAM_SWITCH_PREFIX" in
@@ -122,11 +127,13 @@ let () =
       else cmis
     end cmis (Sys.readdir (opam_swich_prefix_lib // "ocaml"))
   in
-  let data = "data.ml" in
+  let data = "data.cppo.ml" in
   let out = open_out_bin data in
   begin
+    let print_dir d = Printf.fprintf out {|"%s";|} d in
     Printf.fprintf out {|let directories=[||} ;
-    List.iter (Printf.fprintf out {|"%s";|}) directories ;
+    List.iter print_dir directories ;
+    if_sosa_zarith out (fun () -> print_dir ("etc" // "lib" // "stublibs")) ;
     Printf.fprintf out {||];;|}
   end ;
   begin
@@ -142,10 +149,16 @@ let () =
   end ;
   begin
     Printf.fprintf out {|let shared=[||} ;
-    if Sys.unix then (* FIXME: what is the windows version? *)
-      List.iter begin fun s ->
-        Printf.fprintf out {blob|Filename.(concat "etc" (concat "lib" {|%s|})),[%%blob {|%s|}];|blob} s (opam_swich_prefix_lib // s) ;
-      end [ "ocaml" // "stublibs" // "dllcamlstr.so" ; "ocaml" // "stublibs" // "dllunix.so"] ;
+    if Sys.unix then begin (* FIXME: what is the windows version? *)
+      let aux s =
+        Printf.fprintf out {blob|Filename.(concat "etc" (concat "lib" {|%s|})),[%%blob {|%s|}];|blob}
+          s (opam_swich_prefix_lib // s)
+      in
+      List.iter aux [ "ocaml" // "stublibs" // "dllcamlstr.so"
+                    ; "ocaml" // "stublibs" // "dllunix.so"
+                    ] ;
+      if_sosa_zarith out (fun () -> aux ("stublibs" // "dllzarith.so")) ;
+    end ;
     Printf.fprintf out {||];;|}
   end ;
   begin

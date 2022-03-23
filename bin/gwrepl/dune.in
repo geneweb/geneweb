@@ -16,9 +16,15 @@
 )
 
 (rule
-  (target data.ml)
+  (target data.cppo.ml)
   (deps .depend (:maker mk_data.ml))
   (action (with-stdout-to %{target} (run ocaml unix.cma %{maker})))
+)
+
+(rule
+  (target data.ml)
+  (deps data.cppo.ml)
+  (action (run %{bin:cppo} %%%CPPO_D%%% %{deps} -o %{target}))
 )
 
 (executable
