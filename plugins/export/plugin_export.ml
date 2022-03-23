@@ -7,7 +7,7 @@ let ns = "export"
 module IPS = Set.Make (struct type t = Gwdb.iper let compare = compare end)
 module IFS = Set.Make (struct type t = Gwdb.ifam let compare = compare end)
 
-let w_lock = Gwd_lib.Request.w_lock ~onerror:(fun conf _ -> Update.error_locked conf ; true)
+let w_lock = Gwd_lib.Request.w_lock ~onerror:(fun conf _ -> Update.error_locked conf)
 let w_base = Gwd_lib.Request.w_base ~none:(fun conf -> Hutil.incorrect_request conf ; true)
 
 let export conf base =
