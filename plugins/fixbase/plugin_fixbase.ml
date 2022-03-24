@@ -270,7 +270,7 @@ let fixbase_ok conf base =
       Printf.sprintf {|<a href="%s&i=%s">%s</a>|}
         (Util.commd conf :> string)
         (string_of_iper i |> Mutil.encode :> string)
-        (Gutil.designation base (poi base i) |> Util.safe_html :> string)
+        (Util.designation base (poi base i) : Adef.escaped_string :> string)
       |> Adef.safe
     in
     let string_of_f i =
