@@ -1050,7 +1050,7 @@ let print_base_loop conf base p =
   Output.printf conf
     (fcapitale (ftransl conf "loop in database: %s is his/her own ancestor"))
     (Util.update_family_loop conf base p
-       (Gutil.designation base p |> Util.escape_html :> Adef.safe_string) :> string) ;
+       (Util.designation base p : Adef.escaped_string :> Adef.safe_string) :> string) ;
   Output.print_sstring conf "." ;
   Hutil.trailer conf
 

@@ -301,12 +301,12 @@ let different_sexes conf base p1 p2 =
   Output.print_string conf (commd conf);
   Output.print_string conf (acces conf base p1);
   Output.print_sstring conf {|">|};
-  Output.print_string conf (Gutil.designation base p1 |> escape_html);
+  Output.print_string conf (Util.designation base p1);
   Output.print_sstring conf {|</a></li><li>|};
   Output.print_string conf (commd conf);
   Output.print_string conf (acces conf base p2);
   Output.print_sstring conf {|">|};
-  Output.print_string conf (Gutil.designation base p2 |> escape_html);
+  Output.print_string conf (Util.designation base p2);
   Output.print_sstring conf "</li></ul>";
   Hutil.trailer conf
 

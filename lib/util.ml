@@ -2901,3 +2901,6 @@ let cut_words str =
     else [String.sub str beg (i - beg)]
   in
   loop 0 0
+
+let designation base p =
+  Gutil.designation base p |> escape_html
