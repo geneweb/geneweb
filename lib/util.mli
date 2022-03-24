@@ -609,3 +609,6 @@ val name_with_roman_number : string -> string option
     [String.split_on_char ' ' s |> List.map String.trim |> List.filter ((<>) "")]
 *)
 val cut_words : string -> string list
+
+(** [designation base p] is [Gutil.designation base p |> escape_html] *)
+val designation : base -> person -> Adef.escaped_string
