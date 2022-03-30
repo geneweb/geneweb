@@ -20,12 +20,6 @@ let anonfun s =
   if !fname = "" then fname := s
   else raise (Arg.Bad "Cannot treat several databases")
 
-type ('index, 'item) field_info =
-  { fi_nb : int;
-    fi_ht : ('index, 'item) Hashtbl.t;
-    fi_index_of_int : int -> 'index;
-    fi_dir : string }
-
 let main () =
   Arg.parse speclist anonfun errmsg;
   if !fname = "" then
