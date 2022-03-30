@@ -1698,28 +1698,8 @@ let mode_local env =
   | _ -> true
 
 let get_note_source conf base env auth no_note note_source =
-  if auth && not no_note then
-    let s = string_with_macros conf env note_source in
-    let lines = Wiki.html_of_tlsw conf s in
-    let lines =
-      (* remove enclosing <p> .. </p> if any *)
-      if List.length lines > 2 then
-        match lines with
-        | "<p>" :: remain ->
-          if List.hd (List.rev remain) = "</p>"
-          then List.rev (List.tl (List.rev remain))
-          else lines
-        | _ -> lines
-      else lines
-    in
-    let wi =
-      {Wiki.wi_mode = "NOTES";
-       Wiki.wi_file_path = Notes.file_path conf base;
-       Wiki.wi_person_exists = person_exists conf base;
-       Wiki.wi_always_show_link = conf.wizard || conf.friend}
-    in
-    let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
-    Util.safe_html s
+  if auth && not no_note
+  then Notes.note conf base env note_source
   else Adef.safe ""
 
 let date_aux conf p_auth date =
@@ -4019,21 +3999,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
     end
   | "source" ->
     begin match get_env "src" env with
-      | Vstring s ->
-        let env = ['i', (fun () -> Util.default_image_name base p)] in
-        let s =
-          let wi =
-            { Wiki.wi_mode = "NOTES"
-            ; Wiki.wi_file_path = Notes.file_path conf base
-            ; Wiki.wi_person_exists = person_exists conf base
-            ; Wiki.wi_always_show_link = conf.wizard || conf.friend
-            }
-          in
-          Wiki.syntax_links conf wi s
-        in
-        string_with_macros conf env s
-        |> Util.safe_html
-        |> safe_val
+      | Vstring s -> safe_val (Notes.person_note conf base p s)
       | _ -> raise Not_found
     end
   | "surname" ->

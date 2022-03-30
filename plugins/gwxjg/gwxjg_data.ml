@@ -14,32 +14,14 @@ let escaped (x : Adef.escaped_string) = Tsafe (x :> string)
 
 let unbox_string = function Tsafe s | Tstr s -> s | x -> Jg_types.failwith_type_error_1 "unbox_string" x
 
-let wiki_aux pp conf base env str =
-  let s = Util.string_with_macros conf env str in
-  let lines = pp (Wiki.html_of_tlsw conf s) in
-  let wi =
-    { Wiki.wi_mode = "NOTES"
-    ; Wiki.wi_file_path = Notes.file_path conf base
-    ; Wiki.wi_person_exists = Util.person_exists conf base
-    ; Wiki.wi_always_show_link = conf.wizard || conf.friend
-    }
-  in
-  let html =
-    String.concat "\n" lines
-    |> Wiki.syntax_links conf wi
-    |> Util.safe_html
-  in
-  (Tstr str, safe html)
-
 let mk_source_rs conf base str =
-  wiki_aux (function "<p>" :: x :: [ "</p>" ] -> [ x ] | x -> x) conf base [] str
+  Tstr str, safe (Notes.source conf base str)
 
 let mk_note_rs conf base env str =
-  wiki_aux (fun x -> x) conf base env str
+  Tstr str, safe (Notes.note conf base env str)
 
-let mk_person_note_rs conf base p note =
-  let env = ['i', (fun () -> Util.default_image_name base p)] in
-  mk_note_rs conf base env note
+let mk_person_note_rs conf base p str =
+  Tstr str, safe (Notes.person_note conf base p str)
 
 let mk_place conf str =
   Tstr str, escaped (Util.string_of_place conf str)
