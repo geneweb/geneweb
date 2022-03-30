@@ -41,7 +41,7 @@ let mk_person_note_rs conf base p note =
   let env = ['i', (fun () -> Util.default_image_name base p)] in
   mk_note_rs conf base env note
 
-let mk_place conf base str =
+let mk_place conf str =
   Tstr str, escaped (Util.string_of_place conf str)
 
 let rec date_compare_aux date1 date2 =
@@ -448,7 +448,7 @@ and mk_event conf base d =
           end
         end w end
   in
-  let place_raw, place = mk_place conf base (E.place conf base d) in
+  let place_raw, place = mk_place conf (E.place conf base d) in
   let source_raw, source = mk_source_rs conf base (E.src base d) in
   let note_raw, note = mk_note_rs conf base [] (E.note conf base d) in
   Tpat begin function
@@ -458,6 +458,7 @@ and mk_event conf base d =
     | "note" -> note
     | "note_raw" -> note_raw
     | "place" -> place
+    | "place_raw" -> place_raw
     | "spouse" -> spouse
     | "source" -> source
     | "source_raw" -> source_raw
@@ -465,14 +466,14 @@ and mk_event conf base d =
     | _ -> raise Not_found
   end
 
-and mk_title base t =
+and mk_title conf base t =
   let ident = Tstr (Gwdb.sou base t.Def.t_ident) in
   let name = match t.t_name with
     | Tmain -> Tstr ""
     | Tname s -> Tstr (Gwdb.sou base s)
     | Tnone -> Tnull
   in
-  let place = Tstr (Gwdb.sou base t.t_place) in
+  let place_raw, place = mk_place conf (Gwdb.sou base t.t_place) in
   let date_start = mk_opt mk_date (Adef.od_of_cdate t.t_date_start) in
   let date_end = mk_opt mk_date (Adef.od_of_cdate t.t_date_end) in
   let nth = Tint t.t_nth in
@@ -480,6 +481,7 @@ and mk_title base t =
     | "ident" -> ident
     | "name" -> name
     | "place" -> place
+    | "place_raw" -> place_raw
     | "date_start" -> date_start
     | "date_end" -> date_end
     | "nth" -> nth
@@ -685,7 +687,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
         Tnull
     end end
   in
-  let titles = lazy_list (mk_title base) (Gwdb.get_titles p) in
+  let titles = lazy_list (mk_title conf base) (Gwdb.get_titles p) in
   let _, note = mk_person_note_rs conf base p (E.note conf base p) in
   let occ = Tint (Gwdb.get_occ p) in
   let occupation_raw, occupation = mk_source_rs conf base (Gwdb.sou base @@ Gwdb.get_occupation p) in
@@ -760,21 +762,6 @@ and mk_pevent conf base e =
     , e.epers_src
     , e.epers_witnesses
     , None)
-
-and mk_gen_title base t =
-  Tpat (function "t_ident" -> Tstr (Gwdb.sou base t.Def.t_ident)
-               | "t_place" -> Tstr (Gwdb.sou base t.t_place)
-               | "t_date_start" ->
-                 begin match Adef.od_of_cdate t.t_date_start with
-                   | Some d -> mk_date d
-                   | None -> Tnull
-                 end
-               | "t_date_end" ->
-                 begin match Adef.od_of_cdate t.t_date_end with
-                   | Some d -> mk_date d
-                   | None -> Tnull
-                 end
-               | _ -> raise Not_found)
 
 (* take optionnal p parameter for spouse things? *)
 and mk_warning conf base =
@@ -936,7 +923,7 @@ and mk_warning conf base =
   | TitleDatesError (p, t) ->
     Tset [ Tsafe "TitleDatesError"
          ; unsafe_mk_person conf base p
-         ; mk_gen_title base t ]
+         ; mk_title conf base t ]
   | UndefinedSex p ->
     Tset [ Tsafe "UndefinedSex"
          ; unsafe_mk_person conf base p ]
