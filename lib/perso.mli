@@ -117,3 +117,14 @@ val string_of_title :
   * (Def.date option * Def.date option) list ->
   Adef.safe_string
 (** Optionnal [link] argument is passed to {!val:DateDisplay.string_of_ondate} *)
+
+val string_of_title
+  : ?safe:bool
+  -> ?link:bool
+  -> config
+  -> base
+  -> Adef.safe_string
+  -> person
+  -> int * istr Def.gen_title_name * istr * istr list * (Def.date option * Def.date option) list
+  -> Adef.safe_string
+
