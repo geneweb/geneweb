@@ -166,14 +166,14 @@ module Family = struct
     if auth then
       List.fold_right
         (fun evt fam_fevents ->
-          let name = Event.Fevent evt.efam_name in
-          let date = evt.efam_date in
-          let place = evt.efam_place in
-          let note = evt.efam_note in
-          let src = evt.efam_src in
-          let wl = evt.efam_witnesses in
-          let x = (name, date, place, note, src, wl, Some isp) in
-          x :: fam_fevents)
+           let name = Event.Fevent evt.efam_name in
+           let date = evt.efam_date in
+           let place = evt.efam_place in
+           let note = evt.efam_note in
+           let src = evt.efam_src in
+           let wl = Array.map (fun (ip, wk) -> ip, wk, Gwdb.empty_string) evt.efam_witnesses in
+           let x = name, date, place, note, src, wl, Some isp in
+           x :: fam_fevents)
         (get_fevents fam) []
     else []
 
@@ -285,7 +285,13 @@ module Event = struct
   let note conf base (_, _, _, n, _, _, _) =
     if conf.no_note then "" else sou base n
 
-  let src base (_, _, _, _, s, _, _) = sou base s
-  let witnesses (_, _, _, _, _, w, _) = w
-  let spouse_opt (_, _, _, _, _, _, isp) = isp
+  let src base (_, _, _, _, s, _, _) =
+    sou base s
+    
+  let witnesses (_, _, _, _, _, w, _) : (Gwdb.iper * Def.witness_kind * Gwdb.istr) array =
+    w
+
+  let spouse_opt (_, _, _, _, _, _, isp) =
+    isp
+
 end

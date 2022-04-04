@@ -53,7 +53,7 @@ type 'a event_item =
   * istr
   * istr
   * istr
-  * (iper * witness_kind) array
+  * (iper * witness_kind * istr) array
   * iper option
 
 let events conf base p =

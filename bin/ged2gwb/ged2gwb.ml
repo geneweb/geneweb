@@ -1309,7 +1309,7 @@ let witness_kind_of_rval rval = match rval with
   | "Mentioned"          -> Witness_Mentioned
   | "Other"              -> Witness_Other
   | _                    -> Witness
-              
+(* WNOTES TODO HANDLE WNOTES *)              
 let find_event_witness gen tag ip r =
   let rec find_witnesses =
     function
@@ -1322,7 +1322,7 @@ let find_event_witness gen tag ip r =
               Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
-          (witness, witness_kind) :: find_witnesses asso_l
+          (witness, witness_kind, -1) :: find_witnesses asso_l
         else
           let witness = forward_pevent_witn gen ip (strip_spaces r.rval) in
           let witness_kind =
@@ -1330,7 +1330,7 @@ let find_event_witness gen tag ip r =
               Some rr -> witness_kind_of_rval rr.rval
             | _ -> Witness
           in
-          (witness, witness_kind) :: find_witnesses asso_l
+          (witness, witness_kind, -1) :: find_witnesses asso_l
   in
   let witnesses =
     match find_all_fields "ASSO" r.rsons with

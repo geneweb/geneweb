@@ -122,3 +122,8 @@ val gen_person_misc_names :
     mix between all kind of names.
     It can contain duplicates. Strings are used raw (not lowered).
  *)
+
+val map_cdate : (Def.date -> Def.date) -> Adef.cdate -> Adef.cdate
+val map_death : (Def.date -> Def.date) -> Def.death -> Def.death
+val map_burial :(Def.date -> Def.date) -> Def.burial -> Def.burial
+

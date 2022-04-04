@@ -1,9 +1,6 @@
+(* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk
-
-type ('iper, 'person, 'string) legacy_dsk_person = ('iper, 'person, 'string) Dbdisk.gen_person   
-type ('iper, 'string) legacy_dsk_pers_event = ('iper, 'string) Dbdisk.gen_pers_event
-
 
 type istr = int
 type ifam = int
@@ -24,8 +21,9 @@ let empty_string = 0
 let quest_string = 1
 
 let eq_istr i1 i2 = i1 = i2
-let eq_iper i1 i2 = i1 = i2
 let eq_ifam i1 i2 = i1 = i2
+let eq_iper i1 i2 = i1 = i2
+
 let is_empty_string istr = istr = 0
 let is_quest_string istr = istr = 1
 
@@ -44,7 +42,6 @@ let close_base base = base.func.cleanup ()
 let sou base i = base.data.strings.get i
 
 let bname base = Filename.(remove_extension @@ basename base.data.bdir)
-let bdir base = base.data.bdir
 let nb_of_persons base = base.data.persons.len
 let nb_of_real_persons base = base.func.nb_of_real_persons ()
 let nb_of_families base = base.data.families.len
@@ -91,29 +88,29 @@ let date_of_last_change base =
 
 let gen_gen_person_misc_names = Dutil.dsk_person_misc_names
 
-let patch_misc_names base ip (p : (iper, iper, istr) Dbdisk.gen_person) =
-  let p = { p with Dbdisk.key_index = ip } in
+let patch_misc_names base ip (p : (iper, iper, istr) Def.gen_person) =
+  let p = { p with Def.key_index = ip } in
   List.iter
     (fun s -> base.func.Dbdisk.patch_name s ip)
-    (gen_gen_person_misc_names base p (fun p -> p.Dbdisk.titles))
+    (gen_gen_person_misc_names base p (fun p -> p.Def.titles))
 
-let patch_person base ip (p : (iper, iper, istr) Dbdisk.gen_person) =
+let patch_person base ip (p : (iper, iper, istr) Def.gen_person) =
   base.func.Dbdisk.patch_person ip p ;
   let s = sou base p.first_name ^ " " ^ sou base p.surname in
   base.func.Dbdisk.patch_name s ip ;
   patch_misc_names base ip p ;
   Array.iter
     begin fun i ->
-    let cpl = base.data.couples.get i in
-    let m = Adef.mother cpl in
-    let f = Adef.father cpl in
-    patch_misc_names base m (base.data.persons.get m) ;
-    patch_misc_names base f (base.data.persons.get f) ;
-    Array.iter
-      begin
-        fun i -> patch_misc_names base i (base.data.persons.get i)
-      end
-      (base.data.descends.get i).children
+      let cpl = base.data.couples.get i in
+      let m = Adef.mother cpl in
+      let f = Adef.father cpl in
+      patch_misc_names base m (base.data.persons.get m) ;
+      patch_misc_names base f (base.data.persons.get f) ;
+      Array.iter
+        begin
+          fun i -> patch_misc_names base i (base.data.persons.get i)
+        end
+        (base.data.descends.get i).children
     end
     (base.data.unions.get ip).family
 
@@ -151,11 +148,11 @@ let delete_person base ip =
     ; occupation = empty_string
     ; sex = Neuter
     ; access = Private
-    ; birth = Adef.cdate_None
+    ; birth = Date.cdate_None
     ; birth_place = empty_string
     ; birth_note = empty_string
     ; birth_src = empty_string
-    ; baptism = Adef.cdate_None
+    ; baptism = Date.cdate_None
     ; baptism_place = empty_string
     ; baptism_note = empty_string
     ; baptism_src = empty_string
@@ -181,7 +178,7 @@ let delete_union base ip =
 
 let delete_family base ifam =
   patch_family base ifam
-    { marriage = Adef.cdate_None
+    { marriage = Date.cdate_None
     ; marriage_place = empty_string
     ; marriage_note = empty_string
     ; marriage_src = empty_string
@@ -226,12 +223,12 @@ module NLDB = struct
     let fname = bfname base "notes_links" in
     match try Some (open_in_bin fname) with Sys_error _ -> None with
     | Some ic ->
-       let r =
-         if Files.check_magic magic ic
-         then (input_value ic : (iper, iper) Def.NLDB.t)
-         else failwith "unsupported nldb format"
-       in
-       close_in ic ; r
+      let r =
+        if Files.check_magic magic ic
+        then (input_value ic : (iper, iper) Def.NLDB.t)
+        else failwith "unsupported nldb format"
+      in
+      close_in ic ; r
     | None -> []
 
   let write base db =
@@ -247,6 +244,7 @@ module NLDB = struct
       Files.rm fname_back;
       Files.mv fname_def fname_back ;
       Sys.rename fname_tmp fname_def
+
 end
 
 let read_nldb = NLDB.read
@@ -279,7 +277,7 @@ let base_notes_are_empty base fnotes = base_notes_read_aux base fnotes Def.RnDeg
 
 type relation = (iper, istr) Def.gen_relation
 type title = istr Def.gen_title
-type pers_event = (iper, istr) Dbdisk.gen_pers_event
+type pers_event = (iper, istr) Def.gen_pers_event
 type fam_event = (iper, istr) Def.gen_fam_event
 
 let cache f a get set x =
@@ -308,44 +306,44 @@ let cache_uni f ({ base ; iper ; _ } as p) =
 let gen_person_of_person = cache_per (fun p -> p)
 let gen_ascend_of_person = cache_asc (fun p -> p)
 let gen_union_of_person = cache_uni (fun p -> p)
-let get_access = cache_per (fun p -> p.Dbdisk.access)
-let get_aliases = cache_per (fun p -> p.Dbdisk.aliases)
-let get_baptism = cache_per (fun p -> p.Dbdisk.baptism)
-let get_baptism_note = cache_per (fun p -> p.Dbdisk.baptism_note)
-let get_baptism_place = cache_per (fun p -> p.Dbdisk.baptism_place)
-let get_baptism_src = cache_per (fun p -> p.Dbdisk.baptism_src)
-let get_birth = cache_per (fun p -> p.Dbdisk.birth)
-let get_birth_note = cache_per (fun p -> p.Dbdisk.birth_note)
-let get_birth_place = cache_per (fun p -> p.Dbdisk.birth_place)
-let get_birth_src = cache_per (fun p -> p.Dbdisk.birth_src)
-let get_burial = cache_per (fun p -> p.Dbdisk.burial)
-let get_burial_note = cache_per (fun p -> p.Dbdisk.burial_note)
-let get_burial_place = cache_per (fun p -> p.Dbdisk.burial_place)
-let get_burial_src = cache_per (fun p -> p.Dbdisk.burial_src)
+let get_access = cache_per (fun p -> p.Def.access)
+let get_aliases = cache_per (fun p -> p.Def.aliases)
+let get_baptism = cache_per (fun p -> p.Def.baptism)
+let get_baptism_note = cache_per (fun p -> p.Def.baptism_note)
+let get_baptism_place = cache_per (fun p -> p.Def.baptism_place)
+let get_baptism_src = cache_per (fun p -> p.Def.baptism_src)
+let get_birth = cache_per (fun p -> p.Def.birth)
+let get_birth_note = cache_per (fun p -> p.Def.birth_note)
+let get_birth_place = cache_per (fun p -> p.Def.birth_place)
+let get_birth_src = cache_per (fun p -> p.Def.birth_src)
+let get_burial = cache_per (fun p -> p.Def.burial)
+let get_burial_note = cache_per (fun p -> p.Def.burial_note)
+let get_burial_place = cache_per (fun p -> p.Def.burial_place)
+let get_burial_src = cache_per (fun p -> p.Def.burial_src)
 let get_consang = cache_asc (fun a -> a.Def.consang)
-let get_death = cache_per (fun p -> p.Dbdisk.death)
-let get_death_note = cache_per (fun p -> p.Dbdisk.death_note)
-let get_death_place = cache_per (fun p -> p.Dbdisk.death_place)
-let get_death_src = cache_per (fun p -> p.Dbdisk.death_src)
+let get_death = cache_per (fun p -> p.Def.death)
+let get_death_note = cache_per (fun p -> p.Def.death_note)
+let get_death_place = cache_per (fun p -> p.Def.death_place)
+let get_death_src = cache_per (fun p -> p.Def.death_src)
 let get_family = cache_uni (fun u -> u.Def.family)
-let get_first_name = cache_per (fun p -> p.Dbdisk.first_name)
-let get_first_names_aliases = cache_per (fun p -> p.Dbdisk.first_names_aliases)
-let get_image = cache_per (fun p -> p.Dbdisk.image)
-let get_iper = cache_per (fun p -> p.Dbdisk.key_index)
-let get_notes = cache_per (fun p -> p.Dbdisk.notes)
-let get_occ = cache_per (fun p -> p.Dbdisk.occ)
-let get_occupation = cache_per (fun p -> p.Dbdisk.occupation)
+let get_first_name = cache_per (fun p -> p.Def.first_name)
+let get_first_names_aliases = cache_per (fun p -> p.Def.first_names_aliases)
+let get_image = cache_per (fun p -> p.Def.image)
+let get_iper = cache_per (fun p -> p.Def.key_index)
+let get_notes = cache_per (fun p -> p.Def.notes)
+let get_occ = cache_per (fun p -> p.Def.occ)
+let get_occupation = cache_per (fun p -> p.Def.occupation)
 let get_parents = cache_asc (fun a -> a.Def.parents)
-let get_pevents = cache_per (fun p -> p.Dbdisk.pevents)
-let get_psources = cache_per (fun p -> p.Dbdisk.psources)
-let get_public_name = cache_per (fun p -> p.Dbdisk.public_name)
-let get_qualifiers = cache_per (fun p -> p.Dbdisk.qualifiers)
-let get_related = cache_per (fun p -> p.Dbdisk.related)
-let get_rparents = cache_per (fun p -> p.Dbdisk.rparents)
-let get_sex = cache_per (fun p -> p.Dbdisk.sex)
-let get_surname = cache_per (fun p -> p.Dbdisk.surname)
-let get_surnames_aliases = cache_per (fun p -> p.Dbdisk.surnames_aliases)
-let get_titles = cache_per (fun p -> p.Dbdisk.titles)
+let get_pevents = cache_per (fun p -> p.Def.pevents)
+let get_psources = cache_per (fun p -> p.Def.psources)
+let get_public_name = cache_per (fun p -> p.Def.public_name)
+let get_qualifiers = cache_per (fun p -> p.Def.qualifiers)
+let get_related = cache_per (fun p -> p.Def.related)
+let get_rparents = cache_per (fun p -> p.Def.rparents)
+let get_sex = cache_per (fun p -> p.Def.sex)
+let get_surname = cache_per (fun p -> p.Def.surname)
+let get_surnames_aliases = cache_per (fun p -> p.Def.surnames_aliases)
+let get_titles = cache_per (fun p -> p.Def.titles)
 
 (** Families *)
 
@@ -386,8 +384,8 @@ let get_parent_array = cache_cpl (fun c -> Adef.parent_array c)
 let get_relation = cache_fam (fun f -> f.Def.relation)
 let get_witnesses = cache_fam (fun f -> f.Def.witnesses)
 
-let no_person ip : dsk_person =
-  { (Dutil.empty_person empty_string empty_string) with key_index = ip }
+let no_person ip =
+  { (Mutil.empty_person empty_string empty_string) with key_index = ip }
 
 let no_ascend = { parents = None ; consang = Adef.no_consang }
 
@@ -442,7 +440,6 @@ let foi base ifam =
   if ifam = dummy_ifam then empty_family base ifam
   else { base ; ifam ; f = None ; c = None ; d = None }
 
-
 module Collection = struct
 
   type 'a t =
@@ -462,7 +459,7 @@ module Collection = struct
 
   let iteri fn { get ; length } =
     for i = 0 to length - 1 do match get i with Some x -> fn i x | None -> () done
-    
+
   let fold ?from ?until fn acc { get ; length } =
     let from = match from with Some x -> x | None -> 0 in
     let until = match until with Some x -> x + 1 | None -> length in
@@ -508,18 +505,7 @@ module Marker = struct
   let set ({ set ; _ } : _ t) k = set k
 
 end
-              
-let dummy_collection _ =
-  { Collection.length = -1
-  ; get = fun _ -> None
-  }
-  
-let dummy_marker (_ : 'a) (v : 'b) : ('a, 'b) Marker.t =
-  { Marker.get = begin fun _ -> v end
-  ; set = begin fun _ _ -> () end
-  }
 
-  
 let persons base =
   { Collection.length = nb_of_persons base
   ; get = (fun i -> Some (poi base i))
@@ -535,27 +521,35 @@ let iper_marker c i = Marker.make (fun i -> i) c i
 let ifams ?(select = fun _ -> true) base =
   { Collection.length = nb_of_families base
   ; get = begin fun i ->
-          if select i
-          then
-            if get_ifam (foi base i) = dummy_ifam
-            then None else Some i
-          else None
-          end
+      if select i
+      then
+        if get_ifam (foi base i) = dummy_ifam
+        then None else Some i
+      else None
+    end
   }
 
 let families ?(select = fun _ -> true) base =
   { Collection.length = nb_of_families base
   ; get = begin fun i ->
-          let f = foi base i in
-          if get_ifam f <> dummy_ifam && select f
-          then Some f
-          else None
-          end
+      let f = foi base i in
+      if get_ifam f <> dummy_ifam && select f
+      then Some f
+      else None
+    end
+  }
+
+let dummy_collection _ =
+  { Collection.length = -1
+  ; get = fun _ -> None
   }
 
 let ifam_marker c i = Marker.make (fun i -> i) c i
 
-
+let dummy_marker (_ : 'a) (v : 'b) : ('a, 'b) Marker.t =
+  { Marker.get = begin fun _ -> v end
+  ; set = begin fun _ _ -> () end
+  }
 
 
 (* Restrict file *)
@@ -586,10 +580,10 @@ let base_visible_write base =
     let fname = Filename.concat base.data.bdir "restrict" in
     match !visible_ref with
     | Some visible ->
-       let oc = Secure.open_out fname in
-       output_string oc Mutil.executable_magic ;
-       output_value oc visible;
-       close_out oc
+      let oc = Secure.open_out fname in
+      output_string oc Mutil.executable_magic ;
+      output_value oc visible;
+      close_out oc
     | None -> ()
 
 let base_visible_get base fct i =
@@ -600,11 +594,10 @@ let base_visible_get base fct i =
   in
   match Hashtbl.find_opt visible i with
   | None ->
-     let status = fct (poi base i) in
-     Hashtbl.add visible i status ;
-     visible_ref := Some visible;
-     status
+    let status = fct (poi base i) in
+    Hashtbl.add visible i status ;
+    visible_ref := Some visible;
+    status
   | Some b -> b
 
 include Gwdb_gc
-

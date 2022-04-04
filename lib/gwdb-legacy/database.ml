@@ -384,7 +384,11 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
   in
   { find; cursor; next }
 
-let persons_of_first_name = function
+let persons_of_first_name :
+      base_version -> base_data ->
+      ('a -> Dutil.IntHT.key) * (int, person) Hashtbl.t * 
+        string * string * string -> Dbdisk.string_person_index
+  = function
   | GnWb0024 ->
       new_persons_of_first_name_or_surname
         (fun _ -> Dutil.compare_fnames)
@@ -394,7 +398,10 @@ let persons_of_first_name = function
         Dutil.compare_snames_i
   | GnWb0020 -> old_persons_of_first_name_or_surname
 
-let persons_of_surname = function
+let persons_of_surname :
+      base_version -> base_data ->
+      ('a -> Dutil.IntHT.key) * (int, person) Hashtbl.t * 
+        string * string * string -> Dbdisk.string_person_index = function
   | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 ->
       new_persons_of_first_name_or_surname Dutil.compare_snames
         Dutil.compare_snames_i
@@ -470,23 +477,21 @@ let old_strings_of_fsname bname strings (_, person_patches) =
       close_in ic_inx;
       ai
     in
-    Hashtbl.fold
-      (fun _ p acc ->
-        let aux split acc istr =
-          let str = strings.get istr in
-          if
-            (not (List.mem istr acc))
-            &&
-            match split str with
-            | [ s ] -> i = Dutil.name_index s
-            | list -> List.exists (fun s -> i = Dutil.name_index s) (str :: list)
-          then istr :: acc
-          else acc
-        in
-        let acc = aux Name.split_fname acc p.first_name in
-        let acc = aux Name.split_sname acc p.surname in
-        acc)
-      person_patches (Array.to_list r)
+    Hashtbl.fold begin fun _ p acc ->
+      let aux split acc istr =
+        let str = strings.get istr in
+        if not (List.mem istr acc)
+        && match split str with
+        | [ s ] -> i = Dutil.name_index s
+        | list ->
+          List.exists (fun s -> i = Dutil.name_index s) (str :: list)
+        then istr :: acc
+        else acc
+      in
+      let acc = aux Name.split_fname acc p.Dbdisk.first_name in
+      let acc = aux Name.split_sname acc p.Dbdisk.surname in
+      acc
+    end person_patches (Array.to_list r)
 (**)
 
 (** offset: 1 pour sname 2 pour fname *)
@@ -539,10 +544,10 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
       person_patches (Array.to_list r)
 
 let new_strings_of_sname =
-  new_strings_of_fsname_aux 1 0 Name.split_sname (fun p -> p.surname)
+  new_strings_of_fsname_aux 1 0 Name.split_sname (fun p -> p.Dbdisk.surname)
 
 let new_strings_of_fname =
-  new_strings_of_fsname_aux 2 1 Name.split_fname (fun p -> p.first_name)
+  new_strings_of_fsname_aux 2 1 Name.split_fname (fun p -> p.Dbdisk.first_name)
 
 let strings_of_sname = function
   | GnWb0024 | GnWb0023 -> new_strings_of_sname
@@ -786,24 +791,26 @@ let input_synchro bname =
     r
   with _ -> { synch_list = [] }
 
-let person_of_key persons strings persons_of_name first_name surname occ =
-  let first_name = Mutil.nominative first_name in
-  let surname = Mutil.nominative surname in
-  let ipl = persons_of_name (first_name ^ " " ^ surname) in
-  let first_name = Name.lower first_name in
-  let surname = Name.lower surname in
-  let rec find = function
-    | ip :: ipl ->
-        let p = persons.get ip in
-        if
-          occ = p.occ
-          && first_name = Name.lower (strings.get p.first_name)
-          && surname = Name.lower (strings.get p.surname)
-        then Some ip
-        else find ipl
-    | _ -> None
-  in
-  find ipl
+let person_of_key (persons : person record_access) strings persons_of_name first_name surname occ =
+    let first_name = Mutil.nominative first_name in
+    let surname = Mutil.nominative surname in
+    let ipl = persons_of_name (first_name ^ " " ^ surname) in
+    let first_name = Name.lower first_name in
+    let surname = Name.lower surname in
+    let rec find =
+      function
+        ip :: ipl ->
+          let p = persons.get ip in
+          if occ = p.occ &&
+             first_name =
+               Name.lower (strings.get p.first_name) &&
+             surname = Name.lower (strings.get p.surname)
+          then
+            Some ip
+          else find ipl
+      | _ -> None
+    in
+    find ipl
 
 let opendb bname =
   let bname =
@@ -963,8 +970,9 @@ let opendb bname =
     move_with_backup tmp_fname fname
   in
   let nbp_fname = Filename.concat bname "nb_persons" in
-  let is_empty_name p =
-    (0 = p.surname || 1 = p.surname) && (0 = p.first_name || 1 = p.first_name)
+  let is_empty_name (p : person) =
+    (0 = p.surname || 1 = p.surname)
+    && (0 = p.first_name || 1 = p.first_name)
   in
   let npb_init () =
     let cnt = ref 0 in

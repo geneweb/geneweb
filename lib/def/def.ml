@@ -167,15 +167,14 @@ type 'string gen_pers_event_name =
   | Epers_Will
   | Epers_Name of 'string
 
-type ('person, 'string) gen_pers_event = {
-  epers_name : 'string gen_pers_event_name;
-  epers_date : cdate;
-  epers_place : 'string;
-  epers_reason : 'string;
-  epers_note : 'string;
-  epers_src : 'string;
-  epers_witnesses : ('person * witness_kind) array;
-}
+type ('person, 'string) gen_pers_event =
+  { epers_name : 'string gen_pers_event_name;
+    epers_date : cdate;
+    epers_place : 'string;
+    epers_reason : 'string;
+    epers_note : 'string;
+    epers_src : 'string;
+    epers_witnesses : ('person * witness_kind * 'string) array }
 (** Personal event information *)
 
 (** Event name pertaining a family. *)
