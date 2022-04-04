@@ -1,6 +1,9 @@
 (library
   (name gwdb_legacy)
   (public_name geneweb.gwdb-legacy)
+#ifdef GENEWEB_GWDB_LEGACY
+  (implements geneweb.gwdb_driver)
+#endif
   (libraries
       geneweb.def
       geneweb.util

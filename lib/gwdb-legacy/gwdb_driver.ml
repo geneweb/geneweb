@@ -1,604 +1,676 @@
-(* Copyright (c) 1998-2007 INRIA *)
 
-open Dbdisk
+module type Gwdb_driver = sig
 
-type istr = int
-type ifam = int
-type iper = int
+  (* Copyright (c) 1998-2007 INRIA *)
 
-let string_of_iper = string_of_int
-let string_of_ifam = string_of_int
-let string_of_istr = string_of_int
+  (** String id *)
+  type istr
 
-let iper_of_string = int_of_string
-let ifam_of_string = int_of_string
-let istr_of_string = int_of_string
+  (** Family id *)
+  type ifam
 
-let dummy_iper = -1
-let dummy_ifam = -1
+  (** Person id *)
+  type iper
 
-let empty_string = 0
-let quest_string = 1
+  (** Convert [iper] to string *)
+  val string_of_iper : iper -> string
 
-let eq_istr i1 i2 = i1 = i2
-let eq_ifam i1 i2 = i1 = i2
-let eq_iper i1 i2 = i1 = i2
+  (** Convert [ifam] to string *)
+  val string_of_ifam : ifam -> string
 
-                  
-let is_empty_string istr = istr = 0
-let is_quest_string istr = istr = 1
+  (** Convert [istr] to string *)
+  val string_of_istr : istr -> string
 
-type string_person_index = Dbdisk.string_person_index
+  (** Convert [iper] from string *)
+  val iper_of_string : string -> iper
 
-let spi_find spi = spi.find
-let spi_first spi = spi.cursor
-let spi_next (spi : string_person_index) istr = spi.next istr
+  (** Convert [ifam] from string *)
+  val ifam_of_string : string -> ifam
 
-type base = dsk_base
+  (** Convert [istr] from string *)
+  val istr_of_string : string -> istr
 
-let open_base bname : base = Database.opendb bname
+  (** Person data structure *)
+  type person
 
-let close_base base = base.func.cleanup ()
+  (** Family data structure *)
+  type family
 
-let sou base i = base.data.strings.get i
+  (** Database implementation for [Def.gen_relation] *)
+  type relation = (iper, istr) Def.gen_relation
 
-let bname base = Filename.(remove_extension @@ basename base.data.bdir)
-let nb_of_persons base = base.data.persons.len
-let nb_of_real_persons base = base.func.nb_of_real_persons ()
-let nb_of_families base = base.data.families.len
+  (** Database implementation for [Def.gen_title] *)
+  type title = istr Def.gen_title
 
-let insert_string base s =
-  base.func.Dbdisk.insert_string @@ Mutil.normalize_utf_8 s
+  (** Database implementation for [Def.pers_event] *)
+  type pers_event = (iper, istr) Def.gen_pers_event
 
-let commit_patches base = base.func.Dbdisk.commit_patches ()
+  (** Database implementation for [Def.fam_event] *)
+  type fam_event = (iper, istr) Def.gen_fam_event
 
-let commit_notes base s = base.func.Dbdisk.commit_notes s
+  (** Data structure for optimised search throughout index by name
+    (surname or first name). *)
+  type string_person_index
 
-let person_of_key base = base.func.Dbdisk.person_of_key
-let persons_of_name base = base.func.Dbdisk.persons_of_name
-let persons_of_first_name base = base.func.Dbdisk.persons_of_first_name
-let persons_of_surname base = base.func.Dbdisk.persons_of_surname
+  (** The database representation. *)
+  type base
 
-let base_particles base = Lazy.force base.data.particles
-let base_strings_of_first_name base s = base.func.strings_of_fname s
-let base_strings_of_surname base s = base.func.strings_of_sname s
+  (** Open database associated with (likely situated in) the specified directory. *)
+  val open_base : string -> base
 
-let load_ascends_array base = base.data.ascends.load_array ()
-let load_unions_array base = base.data.unions.load_array ()
-let load_couples_array base = base.data.couples.load_array ()
-let load_descends_array base = base.data.descends.load_array ()
-let load_strings_array base = base.data.strings.load_array ()
-let load_persons_array base = base.data.persons.load_array ()
-let load_families_array base = base.data.families.load_array ()
+  (** Close database. May perform some clean up tasks. *)
+  val close_base : base -> unit
 
-let clear_ascends_array base = base.data.ascends.clear_array ()
-let clear_unions_array base = base.data.unions.clear_array ()
-let clear_couples_array base = base.data.couples.clear_array ()
-let clear_descends_array base = base.data.descends.clear_array ()
-let clear_strings_array base = base.data.strings.clear_array ()
-let clear_persons_array base = base.data.persons.clear_array ()
-let clear_families_array base = base.data.families.clear_array ()
+  (** Dummy person id *)
+  val dummy_iper : iper
 
-let date_of_last_change base =
-  let s =
-    let bdir = base.data.bdir in
-    try Unix.stat (Filename.concat bdir "patches")
-    with Unix.Unix_error (_, _, _) -> Unix.stat (Filename.concat bdir "base")
-  in
-  s.Unix.st_mtime
+  (** Dummy family id *)
+  val dummy_ifam : ifam
 
-let gen_gen_person_misc_names = Dutil.dsk_person_misc_names
+  (** [true] if strings with the given ids are equal *)
+  val eq_istr : istr -> istr -> bool
 
-let patch_misc_names base ip (p : (iper, iper, istr) Def.gen_person) =
-  let p = { p with Def.key_index = ip } in
-  List.iter
-    (fun s -> base.func.Dbdisk.patch_name s ip)
-    (gen_gen_person_misc_names base p (fun p -> p.Def.titles))
+  (** [true] if families with the given ids are equal *)
+  val eq_ifam : ifam -> ifam -> bool
 
-let patch_person base ip (p : (iper, iper, istr) Def.gen_person) =
-  base.func.Dbdisk.patch_person ip p ;
-  let s = sou base p.first_name ^ " " ^ sou base p.surname in
-  base.func.Dbdisk.patch_name s ip ;
-  patch_misc_names base ip p ;
-  Array.iter
-    begin fun i ->
-      let cpl = base.data.couples.get i in
-      let m = Adef.mother cpl in
-      let f = Adef.father cpl in
-      patch_misc_names base m (base.data.persons.get m) ;
-      patch_misc_names base f (base.data.persons.get f) ;
-      Array.iter
-        begin
-          fun i -> patch_misc_names base i (base.data.persons.get i)
-        end
-        (base.data.descends.get i).children
-    end
-    (base.data.unions.get ip).family
+  (** [true] if persons with the given ids are equal *)
+  val eq_iper : iper -> iper -> bool
+    
+  (** [true] if string with the given id is empty ("") *)
+  val is_empty_string : istr -> bool
 
-let patch_ascend base ip a = base.func.Dbdisk.patch_ascend ip a
+  (** [true] if string with the given id is a question mark ("?") *)
+  val is_quest_string : istr -> bool
 
-let patch_union base ip u = base.func.Dbdisk.patch_union ip u
+  (** Id of the empty string ("") *)
+  val empty_string : istr
 
-let patch_family base ifam f = base.func.Dbdisk.patch_family ifam f
+  (** Id of the question mark ("?") *)
+  val quest_string : istr
 
-let patch_couple base ifam c = base.func.Dbdisk.patch_couple ifam c
+  (** Returns unitialised person with the giving id. *)
+  val empty_person : base -> iper -> person
 
-let patch_descend base ifam d = base.func.Dbdisk.patch_descend ifam d
+  (** Returns unitialised family with the giving id. *)
+  val empty_family : base -> ifam -> family
 
-let insert_person = patch_person
-let insert_ascend = patch_ascend
-let insert_union = patch_union
-let insert_family = patch_family
-let insert_couple = patch_couple
-let insert_descend = patch_descend
+  (** Tells if person with giving id exists in the base. *)
+  val iper_exists : base -> iper -> bool
 
-let delete_person base ip =
-  patch_person base ip
-    { first_name = quest_string
-    ; surname = quest_string
-    ; occ = 0
-    ; image = empty_string
-    ; first_names_aliases = []
-    ; surnames_aliases = []
-    ; public_name = empty_string
-    ; qualifiers = []
-    ; titles = []
-    ; rparents = []
-    ; related = []
-    ; aliases = []
-    ; occupation = empty_string
-    ; sex = Neuter
-    ; access = Private
-    ; birth = Adef.cdate_None
-    ; birth_place = empty_string
-    ; birth_note = empty_string
-    ; birth_src = empty_string
-    ; baptism = Adef.cdate_None
-    ; baptism_place = empty_string
-    ; baptism_note = empty_string
-    ; baptism_src = empty_string
-    ; death = DontKnowIfDead
-    ; death_place = empty_string
-    ; death_note = empty_string
-    ; death_src = empty_string
-    ; burial = UnknownBurial
-    ; burial_place = empty_string
-    ; burial_note = empty_string
-    ; burial_src = empty_string
-    ; pevents = []
-    ; notes = empty_string
-    ; psources = empty_string
-    ; key_index = ip
-    }
+  (** Tells if family with giving id exists in the base. *)
+  val ifam_exists : base -> ifam -> bool
 
-let delete_ascend base ip =
-  patch_ascend base ip { parents = None ; consang = Adef.no_consang }
+  (** {2 Getters}
+    Getters are used to extract information about person and family.
+    If corresponding information part isn't present, driver load it from
+    the disk and cache it so further gets will return result immediately. *)
 
-let delete_union base ip =
-  patch_union base ip { family = [||] }
+  (** Get privacy settings that define access to person's data *)
+  val get_access : person -> Def.access
 
-let delete_family base ifam =
-  patch_family base ifam
-    { marriage = Adef.cdate_None
-    ; marriage_place = empty_string
-    ; marriage_note = empty_string
-    ; marriage_src = empty_string
-    ; relation = Married
-    ; divorce = NotDivorced
-    ; fevents = []
-    ; witnesses = [||]
-    ; comment = empty_string
-    ; origin_file = empty_string
-    ; fsources = empty_string
-    ; fam_index = dummy_ifam
-    }
+  (** Get person's aliases ids *)
+  val get_aliases : person -> istr list
 
-let delete_couple base ifam =
-  patch_couple base ifam (Adef.couple dummy_iper dummy_iper)
+  (** Get person's baptism date *)
+  val get_baptism : person -> Def.cdate
 
-let delete_descend base ifam =
-  patch_descend base ifam { children = [||] }
+  (** Get person's baptism note id *)
+  val get_baptism_note : person -> istr
 
-let new_iper base = base.data.persons.len
+  (** Get person's baptism place id *)
+  val get_baptism_place : person -> istr
 
-let new_ifam base = base.data.families.len
+  (** Get person's baptism source id *)
+  val get_baptism_src : person -> istr
 
-(* FIXME: lock *)
-let sync ?(scratch=false) ~save_mem base =
-  if base.data.perm = RDONLY && not scratch
-  then raise Def.(HttpExn (Forbidden, __LOC__))
-  else Outbase.output ~save_mem base
+  (** Get person's birth date *)
+  val get_birth : person -> Def.cdate
 
-let make bname particles arrays : Dbdisk.dsk_base =
-  sync ~scratch:true ~save_mem:false (Database.make bname particles arrays) ;
-  open_base bname
+  (** Get person's birth note id *)
+  val get_birth_note : person -> istr
 
-let bfname base fname =
-  Filename.concat base.data.bdir fname
+  (** Get person's birth place id *)
+  val get_birth_place : person -> istr
 
-module NLDB = struct
+  (** Get person's birth source id *)
+  val get_birth_src : person -> istr
 
-  let magic = "GWNL0010"
+  (** Get information about person's burial *)
+  val get_burial : person -> Def.burial
 
-  let read base =
-    let fname = bfname base "notes_links" in
-    match try Some (open_in_bin fname) with Sys_error _ -> None with
-    | Some ic ->
-      let r =
-        if Files.check_magic magic ic
-        then (input_value ic : (iper, iper) Def.NLDB.t)
-        else failwith "unsupported nldb format"
-      in
-      close_in ic ; r
-    | None -> []
+  (** Get person's burial note id *)
+  val get_burial_note : person -> istr
 
-  let write base db =
-    if base.data.perm = RDONLY then raise Def.(HttpExn (Forbidden, __LOC__))
-    else
-      let fname_tmp = bfname base "1notes_links" in
-      let fname_def = bfname base "notes_links" in
-      let fname_back = bfname base "notes_links~" in
-      let oc = open_out_bin fname_tmp in
-      output_string oc magic ;
-      output_value oc (db : (iper, ifam) Def.NLDB.t) ;
-      close_out oc ;
-      Files.rm fname_back;
-      Files.mv fname_def fname_back ;
-      Sys.rename fname_tmp fname_def
+  (** Get person's burial place id *)
+  val get_burial_place : person -> istr
 
+  (** Get person's burial source id *)
+  val get_burial_src : person -> istr
+
+  (** Get array of family's children ids *)
+  val get_children : family -> iper array
+
+  (** Get family's comment (notes) id *)
+  val get_comment : family -> istr
+
+  (** Get person's consanguinity degree with his ascendants *)
+  val get_consang : person -> Adef.fix
+
+  (** Get person's death status *)
+  val get_death : person -> Def.death
+
+  (** Get person's death note id *)
+  val get_death_note : person -> istr
+
+  (** Get person's death place id *)
+  val get_death_place : person -> istr
+
+  (** Get person's death source id *)
+  val get_death_src : person -> istr
+
+  (** Get family's divorce status *)
+  val get_divorce : family -> Def.divorce
+
+  (** Get array of family's ids to which a person belongs as parent (person's union) *)
+  val get_family : person -> ifam array
+
+  (** Get family's father id (from the family's couple) *)
+  val get_father : family -> iper
+
+  (** Get family's event list *)
+  val get_fevents : family -> fam_event list
+
+  (** Get person's first name id *)
+  val get_first_name : person -> istr
+
+  (** Get list of person's first name aliases ids *)
+  val get_first_names_aliases : person -> istr list
+
+  (** Get family's sources id *)
+  val get_fsources : family -> istr
+
+  (** Get family's id *)
+  val get_ifam : family -> ifam
+
+  (** Get id of path to person's image *)
+  val get_image : person -> istr
+
+  (** Get person's id *)
+  val get_iper : person -> iper
+
+  (** Get family's marriage date *)
+  val get_marriage : family -> Def.cdate
+
+  (** Get family's marriage note id *)
+  val get_marriage_note : family -> istr
+
+  (** Get family's marriage place id *)
+  val get_marriage_place : family -> istr
+
+  (** Get family's marriage source id *)
+  val get_marriage_src : family -> istr
+
+  (** Get family's mother id (from the family's couple) *)
+  val get_mother : family -> iper
+
+  (** Get person's notes id *)
+  val get_notes : person -> istr
+
+  (** Get person's occurence number *)
+  val get_occ : person -> int
+
+  (** Get person's occupation id *)
+  val get_occupation : person -> istr
+
+  (** Get family's origin file (e.g. a .gw or .ged filename) id *)
+  val get_origin_file : family -> istr
+
+  (** Get family's parents ids (father and mother from family's couple) *)
+  val get_parent_array : family -> iper array
+
+  (** Get person's family id to which his parents belong (as family's couple) *)
+  val get_parents : person -> ifam option
+
+  (** Get person's event list *)
+  val get_pevents : person -> pers_event list
+
+  (** Get person's sources id *)
+  val get_psources : person -> istr
+
+  (** Get person's public name id *)
+  val get_public_name : person -> istr
+
+  (** Get list of person's qualifiers ids *)
+  val get_qualifiers : person -> istr list
+
+  (** Get person's related persons ids *)
+  val get_related : person -> iper list
+
+  (** Get relation kind between couple in the family *)
+  val get_relation : family -> Def.relation_kind
+
+  (** Get person's relations with not native parents *)
+  val get_rparents : person -> relation list
+
+  (** Get person's sex *)
+  val get_sex : person -> Def.sex
+
+  (** Get person's surname id *)
+  val get_surname : person -> istr
+
+  (** Get person's surname aliases ids *)
+  val get_surnames_aliases : person -> istr list
+
+  (** Get list of person's nobility titles *)
+  val get_titles : person -> title list
+
+  (** Get array of family's witnesses ids *)
+  val get_witnesses : family -> iper array
+
+  (** Extract [gen_couple] from [family]. *)
+  val gen_couple_of_family : family -> iper Def.gen_couple
+
+  (** Extract [gen_descend] from [family]. *)
+  val gen_descend_of_family : family -> iper Def.gen_descend
+
+  (** Extract [gen_family] from [family]. *)
+  val gen_family_of_family : family -> (iper, ifam, istr) Def.gen_family
+
+  (** Extract [gen_person] from [person]. *)
+  val gen_person_of_person : person -> (iper, iper, istr) Def.gen_person
+
+  (** Extract [gen_ascend] from [person]. *)
+  val gen_ascend_of_person : person -> ifam Def.gen_ascend
+
+  (** Extract [gen_union] from [person]. *)
+  val gen_union_of_person : person -> ifam Def.gen_union
+
+  (** Create [family] from associated values. *)
+  val family_of_gen_family : base -> (iper, ifam, istr) Def.gen_family * iper Def.gen_couple * iper Def.gen_descend -> family
+
+  (** Create [person] from associated values. *)
+  val person_of_gen_person : base -> (iper, iper, istr) Def.gen_person * ifam Def.gen_ascend * ifam Def.gen_union -> person
+
+  (** Create uninitialised person with giving id *)
+  val poi : base -> iper -> person
+
+  (** Create uninitialised family with giving id *)
+  val foi : base -> ifam -> family
+
+  (** Returns string that has giving id from the base *)
+  val sou : base -> istr -> string
+
+  (** Returns unitialised [gen_person] with giving id *)
+  val no_person : iper -> (iper, iper, istr) Def.gen_person
+
+  (** Returns unitialised [gen_ascend] *)
+  val no_ascend : ifam Def.gen_ascend
+
+  (** Returns unitialised [gen_union] *)
+  val no_union : ifam Def.gen_union
+
+  (** Returns unitialised [gen_family] with giving id *)
+  val no_family : ifam -> (iper, ifam, istr) Def.gen_family
+
+  (** Returns unitialised [gen_descend] *)
+  val no_descend :iper Def.gen_descend
+
+  (** Returns unitialised [gen_couple] *)
+  val no_couple : iper Def.gen_couple
+
+  (** Returns number of persons inside the database *)
+  val nb_of_persons : base -> int
+
+  (** Returns number of defined persons (without bogus definition "? ?")
+    inside the database *)
+  val nb_of_real_persons : base -> int
+
+  (** Returns number of families inside the database *)
+  val nb_of_families : base -> int
+
+  (** Returns database name *)
+  val bname : base -> string
+
+  (** Modify/add person with the giving id in the base. New names are added
+    to the patched name index for the cosidered person and for evey member of family to
+    which he belongs. Modification stay blocked until call of [commit_patches]. *)
+  val patch_person : base -> iper -> (iper, iper, istr) Def.gen_person -> unit
+
+  (** Modify/add ascendants of a person with a giving id. Modification stay blocked until
+    call of [commit_patches]. *)
+  val patch_ascend : base -> iper -> ifam Def.gen_ascend -> unit
+
+  (** Modify/add union of a person with a giving id. Modification stay blocked until
+    call of [commit_patches]. *)
+  val patch_union : base -> iper -> ifam Def.gen_union -> unit
+
+  (** Modify/add family with a giving id. Modification stay blocked until
+    call of [commit_patches]. *)
+  val patch_family : base -> ifam -> (iper, ifam, istr) Def.gen_family -> unit
+
+  (** Modify/add descendants of a family with a giving id. Modification stay blocked until
+    call of [commit_patches]. *)
+  val patch_descend : base -> ifam -> iper Def.gen_descend -> unit
+
+  (** Modify/add couple of a family with a giving id. Modification stay blocked until
+    call of [commit_patches]. *)
+  val patch_couple : base -> ifam -> iper Def.gen_couple -> unit
+
+  (** Modify/add string with a giving id. If string already exists return its id.
+    Modification stay blocked until call of [commit_patches]. *)
+  val insert_string : base -> string -> istr
+
+  (** Commit blocked modifications (patches) and update database files in order to
+    apply modifications on the disk.  *)
+  val commit_patches : base -> unit
+
+  (** [commit_notes fname s] Update content of the notes/extended page file [fname] if exists. *)
+  val commit_notes : base -> string -> string -> unit
+
+  (** Retruns new unused person's id *)
+  val new_iper : base -> iper
+
+  (** Retruns new unused family's id *)
+  val new_ifam : base -> ifam
+
+  (** Same as [patch_person] *)
+  val insert_person : base -> iper -> (iper, iper, istr) Def.gen_person -> unit
+
+  (** Same as [patch_ascend] *)
+  val insert_ascend : base -> iper -> ifam Def.gen_ascend -> unit
+
+  (** Same as [patch_union] *)
+  val insert_union : base -> iper -> ifam Def.gen_union -> unit
+
+  (** Same as [patch_family] *)
+  val insert_family : base -> ifam -> (iper, ifam, istr) Def.gen_family -> unit
+
+  (** Same as [patch_couple] *)
+  val insert_descend : base -> ifam -> iper Def.gen_descend -> unit
+
+  (** Same as [patch_descend] *)
+  val insert_couple : base -> ifam -> iper Def.gen_couple -> unit
+
+  (** Remplace person with the giving id by bogus definition and clear
+    person's data structure. *)
+  val delete_person : base -> iper -> unit
+
+  (** Clear person's ascendants data structure *)
+  val delete_ascend : base -> iper -> unit
+
+  (** Clear person's union data structure *)
+  val delete_union : base -> iper -> unit
+
+  (** Remplace family with the giving id by dummy family and clear
+    family's data structure. *)
+  val delete_family : base -> ifam -> unit
+
+  (** Clear family's descendants data structure *)
+  val delete_descend : base -> ifam -> unit
+
+  (** Clear family's couple data structure *)
+  val delete_couple : base -> ifam -> unit
+
+  (** [person_of_key first_name surname occ] returns person from his key information
+    (first name, surname and occurence number) *)
+  val person_of_key : base -> string -> string -> int -> iper option
+
+  (** Return list of person ids that have giving name (could be one of the mix). *)
+  val persons_of_name : base -> string -> iper list
+
+  (** Returns data structure that allows to make optimised search throughout
+    index by first name *)
+  val persons_of_first_name : base -> string_person_index
+
+  (** Returns data structure that allows to make optimised search throughout
+    index by surname *)
+  val persons_of_surname : base -> string_person_index
+
+  (** Returns first [first/sur]name id starting with that string *)
+  val spi_first : string_person_index -> string -> istr
+
+  (** Retruns next [first/sur]name id that follows giving name's id by
+    Gutil.alphabetical order *)
+  val spi_next : string_person_index -> istr -> istr
+
+  (** Retruns all persons id having that [first/sur]name. *)
+  val spi_find : string_person_index -> istr -> iper list
+
+  (** [base_visible_get base fct ip] get visibility of person [ip] ([true] for not visible
+    (restrited)) from the [base]. If file {i restrict} is present then read it to get
+    visibility information. If person's visibility isn't known, then set it with [fct].
+    Used when mode `use_restrict` is ativated *)
+  val base_visible_get : base -> (person -> bool) -> iper -> bool
+
+  (** Write updated visibility information to the {i restricted} file. *)
+  val base_visible_write : base -> unit
+
+  (** Return regular expression that matches all defined in the [base] particles. *)
+  val base_particles : base -> Re.re
+
+  (** [base_strings_of_first_name base x]
+    Return the list of first names (as [istr]) being equal or to [x]
+    using {!val:Name.crush_lower} comparison. [x] could be also a substring
+    of the matched first name.
+   *)
+  val base_strings_of_first_name : base -> string -> istr list
+
+  (** [base_strings_of_surname base x]
+    Return the list of surnames (as [istr]) being equal to [x]
+    using  {!val:Name.crush_lower} comparison. [x] could be also a substring
+    of the matched surname.
+   *)
+  val base_strings_of_surname : base -> string -> istr list
+
+  (** Load array of ascendants in the memory and cache it so it could be accessed
+    instantly by other functions unless [clear_ascends_array] is called. *)
+  val load_ascends_array : base -> unit
+
+  (** Load array of unions in the memory and cache it so it could be accessed
+    instantly by other functions unless [clear_unions_array] is called. *)
+  val load_unions_array : base -> unit
+
+  (** Load array of couples in the memory and cache it so it could be accessed
+    instantly by other functions unless [clear_couples_array] is called. *)
+  val load_couples_array : base -> unit
+
+  (** Load array of descendants in the memory and cache it so it could be accessed
+    instantly by other functions unless [clear_descends_array] is called. *)
+  val load_descends_array : base -> unit
+
+  (** Load array of strings in the memory and cache it so it could be accessed
+    instantly by other functions unless [clear_strings_array] is called. *)
+  val load_strings_array : base -> unit
+
+  (** Load array of persons in the memory and cache it so it could be accessed
+    instantly by other functions unless [clear_persons_array] is called. *)
+  val load_persons_array : base -> unit
+
+  (** Load array of families in the memory and cache it so it could be accessed
+    instantly by other functions unless [clear_families_array] is called. *)
+  val load_families_array : base -> unit
+
+  (** Remove array of ascendants from the memory *)
+  val clear_ascends_array : base -> unit
+
+  (** Remove array of unions from the memory *)
+  val clear_unions_array : base -> unit
+
+  (** Remove array of couples from the memory *)
+  val clear_couples_array : base -> unit
+
+  (** Remove array of descendants from the memory *)
+  val clear_descends_array : base -> unit
+
+  (** Remove array of strings from the memory *)
+  val clear_strings_array : base -> unit
+
+  (** Remove array of persons from the memory *)
+  val clear_persons_array : base -> unit
+
+  (** Remove array of families from the memory *)
+  val clear_families_array : base -> unit
+
+  (** [base_notes_read base fname] read and return content of [fname] note
+    (either database note either extended page). *)
+  val base_notes_read : base -> string -> string
+
+  (** [base_notes_read base fname] read and return first line of [fname] note *)
+  val base_notes_read_first_line : base -> string -> string
+
+  (** Says if note has empty content *)
+  val base_notes_are_empty : base -> string -> bool
+
+  (** Retruns origin file (.gw file) of the note *)
+  val base_notes_origin_file : base -> string
+
+  (** Directory where extended pages are stored *)
+  val base_notes_dir : base -> string
+
+  (** Directory where wizard notes are stored *)
+  val base_wiznotes_dir : base -> string
+
+  (** Returns last modification time of the database on disk *)
+  val date_of_last_change : base -> float
+
+  (** Collections of elemetns *)
+  module Collection : sig
+
+    (** Collections are sets of elements you want to traverse. *)
+    type 'a t
+
+    (** Return the number of elements of a colletion *)
+    val length : 'a t -> int
+
+    (** [map fn c]
+      Return a collection corresponding to [c]
+      where [fn] would have been applied to each of its elements.
+     *)
+    val map : ('a -> 'b) -> 'a t -> 'b t
+
+    (** [iter fn c]
+      Apply [fn] would have been applied to each elements of [c].
+     *)
+    val iter : ('a -> unit) -> 'a t -> unit
+
+    (** [iter fn c]
+      Apply [fn i] would have been applied to each elements of [c]
+      where [i] is the index (starting with 0) of the element.
+     *)
+    val iteri : (int -> 'a -> unit) -> 'a t -> unit
+
+    (** [fold fn acc c]
+      Combine each element of [c] into a single value using [fn].
+      [fn] first argument is the result computed so far as we traverse the
+      collection, and second element is the current element being combined.
+      [acc] is the starting combined value.
+      Start at [from]-nth and finish with [until]-nth element (included).
+     *)
+    val fold : ?from:int -> ?until:int -> ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
+
+    (** [fold_until continue fn acc c]
+      Same as [fold fn acc c], but computation stops as soon as [continue]
+      is not satisfied by combined value anymore.
+     *)
+    val fold_until : ('a -> bool) -> ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
+
+    (** [iterator c]
+      Return a function returning [Some next_element] when it is called,
+      or [None] if you reached the end of the collection.
+     *)
+    val iterator : 'a t -> (unit -> 'a option)
+
+  end
+
+  (** Markers for elements inside [Collection.t] *)
+  module Marker : sig
+
+    (** Markers are way to annotate (add extra information to) elements of a {!val:Collection.t}. *)
+    type ('k, 'v) t
+
+    (** [get marker key]
+      Return the annotation associated to [key].
+     *)
+    val get : ('k, 'v) t -> 'k -> 'v
+
+    (** [set marker key value]
+      Set [value] as annotation associated to [key].
+     *)
+    val set : ('k, 'v) t -> 'k -> 'v -> unit
+
+  end
+
+  (** {2 Useful collections} *)
+
+  (** Collection of person's ids *)
+  val ipers : base -> iper Collection.t
+
+  (** Collection of persons *)
+  val persons : base -> person Collection.t
+
+  (** Collection of family's ids *)
+  val ifams : ?select:(ifam -> bool) -> base -> ifam Collection.t
+
+  (** Collection of families *)
+  val families : ?select:(family -> bool) -> base -> family Collection.t
+
+  (** [dummy_collection x] create a dummy collection with no element.
+    [x] is only used for typing.
+    Useful for placeholders or for typing purpose. *)
+  val dummy_collection : 'a -> 'a Collection.t
+
+  (** {2 Useful markers} *)
+
+  (** [iper_marker c v] create marker over collection of person's ids and initialise it
+    for every element with [v] *)
+  val iper_marker : iper Collection.t -> 'a -> (iper, 'a) Marker.t
+
+  (** [ifam_marker c v] create marker over collection of family's ids and initialise it
+    for every element with [v] *)
+  val ifam_marker : ifam Collection.t -> 'a -> (ifam, 'a) Marker.t
+
+  (** [dummy_marker k v] create a dummy collection with no element.
+    [k] and [v] are only used for typing.
+    Useful for placeholders or for typing purpose. *)
+  val dummy_marker : 'a -> 'b -> ('a, 'b) Marker.t
+
+  (** {2 Database creation} *)
+
+  (** [make bname particles arrays] create a base with [bname] name and [arrays] as content. *)
+  val make
+      : string
+        -> string list
+        -> ( ( (int, int, int) Def.gen_person array
+               * int Def.gen_ascend array
+               * int Def.gen_union array )
+             * ( (int, int, int) Def.gen_family array
+                 * int Def.gen_couple array
+                 * int Def.gen_descend array )
+             * string array
+             * Def.base_notes )
+        -> base
+
+  (** TODOOCP : doc *)
+  val read_nldb : base -> (iper, ifam) Def.NLDB.t
+  val write_nldb : base -> (iper, ifam) Def.NLDB.t -> unit
+
+  (** [sync scratch base]
+    Ensure that everything is synced on disk.
+
+    Depending on the backend,
+    it may perform various operation such as indexes rebuilding,
+    and it might be a lengthy operation.
+
+    Use [scratch] (default false) to sync and rebuild
+    the whole database. Otherwise, only changes that occured
+    since the last [sync] call are treated.
+   *)
+  val sync : ?scratch:bool -> save_mem:bool -> base -> unit
+
+  val gc : ?dry_run:bool -> save_mem:bool -> base -> int list * int list * int list
+
+    
 end
 
-let read_nldb = NLDB.read
-let write_nldb = NLDB.write
+include (Gwdb_driver_legacy : Gwdb_driver)
 
-let base_notes_origin_file base = base.data.bnotes.Def.norigin_file
-let base_notes_dir _base = "notes_d"
-let base_wiznotes_dir _base = "wiznotes"
-
-let base_notes_read_aux base fnotes mode =
-  let fname =
-    if fnotes = "" then "notes"
-    else Filename.concat "notes_d" (fnotes ^ ".txt")
-  in
-  try
-    let ic = Secure.open_in @@ Filename.concat base.data.bdir fname in
-    let str =
-      match mode with
-      | Def.RnDeg -> if in_channel_length ic = 0 then "" else " "
-      | Def.Rn1Ln -> (try input_line ic with End_of_file -> "")
-      | Def.RnAll -> Mutil.input_file_ic ic
-    in
-    close_in ic ;
-    str
-  with Sys_error _ -> ""
-
-let base_notes_read base fnotes = base_notes_read_aux base fnotes Def.RnAll
-let base_notes_read_first_line base fnotes = base_notes_read_aux base fnotes Def.Rn1Ln
-let base_notes_are_empty base fnotes = base_notes_read_aux base fnotes Def.RnDeg = ""
-
-type relation = (iper, istr) Def.gen_relation
-type title = istr Def.gen_title
-type pers_event = (iper, istr) Def.gen_pers_event
-type fam_event = (iper, istr) Def.gen_fam_event
-
-let cache f a get set x =
-  match get x with
-  | Some v -> v
-  | None -> let v = f a in set x (Some v) ; v
-
-(** Persons *)
-
-type person =
-  { base : base
-  ; iper : iper
-  ; mutable p : (iper, iper, istr) gen_person option
-  ; mutable a : ifam gen_ascend option
-  ; mutable u : ifam gen_union option }
-
-let cache_per f ({ base ; iper ; _ } as p) =
-  f (cache base.data.persons.get iper (fun p -> p.p) (fun p v -> p.p <- v) p)
-
-let cache_asc f ({ base ; iper ; _ } as p) =
-  f (cache base.data.ascends.get iper (fun p -> p.a) (fun p v -> p.a <- v) p)
-
-let cache_uni f ({ base ; iper ; _ } as p) =
-  f (cache base.data.unions.get iper (fun p -> p.u) (fun p v -> p.u <- v) p)
-
-let gen_person_of_person = cache_per (fun p -> p)
-let gen_ascend_of_person = cache_asc (fun p -> p)
-let gen_union_of_person = cache_uni (fun p -> p)
-let get_access = cache_per (fun p -> p.Def.access)
-let get_aliases = cache_per (fun p -> p.Def.aliases)
-let get_baptism = cache_per (fun p -> p.Def.baptism)
-let get_baptism_note = cache_per (fun p -> p.Def.baptism_note)
-let get_baptism_place = cache_per (fun p -> p.Def.baptism_place)
-let get_baptism_src = cache_per (fun p -> p.Def.baptism_src)
-let get_birth = cache_per (fun p -> p.Def.birth)
-let get_birth_note = cache_per (fun p -> p.Def.birth_note)
-let get_birth_place = cache_per (fun p -> p.Def.birth_place)
-let get_birth_src = cache_per (fun p -> p.Def.birth_src)
-let get_burial = cache_per (fun p -> p.Def.burial)
-let get_burial_note = cache_per (fun p -> p.Def.burial_note)
-let get_burial_place = cache_per (fun p -> p.Def.burial_place)
-let get_burial_src = cache_per (fun p -> p.Def.burial_src)
-let get_consang = cache_asc (fun a -> a.Def.consang)
-let get_death = cache_per (fun p -> p.Def.death)
-let get_death_note = cache_per (fun p -> p.Def.death_note)
-let get_death_place = cache_per (fun p -> p.Def.death_place)
-let get_death_src = cache_per (fun p -> p.Def.death_src)
-let get_family = cache_uni (fun u -> u.Def.family)
-let get_first_name = cache_per (fun p -> p.Def.first_name)
-let get_first_names_aliases = cache_per (fun p -> p.Def.first_names_aliases)
-let get_image = cache_per (fun p -> p.Def.image)
-let get_iper = cache_per (fun p -> p.Def.key_index)
-let get_notes = cache_per (fun p -> p.Def.notes)
-let get_occ = cache_per (fun p -> p.Def.occ)
-let get_occupation = cache_per (fun p -> p.Def.occupation)
-let get_parents = cache_asc (fun a -> a.Def.parents)
-let get_pevents = cache_per (fun p -> p.Def.pevents)
-let get_psources = cache_per (fun p -> p.Def.psources)
-let get_public_name = cache_per (fun p -> p.Def.public_name)
-let get_qualifiers = cache_per (fun p -> p.Def.qualifiers)
-let get_related = cache_per (fun p -> p.Def.related)
-let get_rparents = cache_per (fun p -> p.Def.rparents)
-let get_sex = cache_per (fun p -> p.Def.sex)
-let get_surname = cache_per (fun p -> p.Def.surname)
-let get_surnames_aliases = cache_per (fun p -> p.Def.surnames_aliases)
-let get_titles = cache_per (fun p -> p.Def.titles)
-
-(** Families *)
-
-type family =
-  { base : base
-  ; ifam : ifam
-  ; mutable f : (iper, ifam, istr) gen_family option
-  ; mutable c : iper gen_couple option
-  ; mutable d : iper gen_descend option
-  }
-
-let cache_fam f ({ base ; ifam ; _ } as fam)  =
-  f (cache base.data.families.get ifam (fun f -> f.f) (fun f v -> f.f <- v) fam)
-
-let cache_cpl f ({ base ; ifam ; _ } as fam) =
-  f (cache base.data.couples.get ifam (fun f -> f.c) (fun f v -> f.c <- v) fam)
-
-let cache_des f ({ base ; ifam ; _ } as fam) =
-  f (cache base.data.descends.get ifam (fun f -> f.d) (fun f v -> f.d <- v) fam)
-
-let gen_couple_of_family = cache_cpl (fun c -> c)
-let gen_descend_of_family = cache_des (fun d -> d)
-let gen_family_of_family = cache_fam (fun f -> f)
-let get_children = cache_des (fun d -> d.Def.children)
-let get_comment = cache_fam (fun f -> f.Def.comment)
-let get_ifam = cache_fam (fun f -> f.Def.fam_index)
-let get_divorce = cache_fam (fun f -> f.Def.divorce)
-let get_father = cache_cpl (fun c -> Adef.father c)
-let get_fevents = cache_fam (fun f -> f.Def.fevents)
-let get_fsources = cache_fam (fun f -> f.Def.fsources)
-let get_marriage = cache_fam (fun f -> f.Def.marriage)
-let get_marriage_note = cache_fam (fun f -> f.Def.marriage_note)
-let get_marriage_place = cache_fam (fun f -> f.Def.marriage_place)
-let get_marriage_src = cache_fam (fun f -> f.Def.marriage_src)
-let get_mother = cache_cpl (fun c -> Adef.mother c)
-let get_origin_file = cache_fam (fun f -> f.Def.origin_file)
-let get_parent_array = cache_cpl (fun c -> Adef.parent_array c)
-let get_relation = cache_fam (fun f -> f.Def.relation)
-let get_witnesses = cache_fam (fun f -> f.Def.witnesses)
-
-let no_person ip =
-  { (Mutil.empty_person empty_string empty_string) with key_index = ip }
-
-let no_ascend = { parents = None ; consang = Adef.no_consang }
-
-let no_union = { family = [||] }
-
-let empty_person base iper =
-  { base
-  ; iper
-  ; p = Some (no_person iper)
-  ; a = Some no_ascend
-  ; u = Some no_union
-  } [@ocaml.warning "-42"]
-
-let person_of_gen_person base (p, a, u) =
-  { base
-  ; iper = p.key_index
-  ; p = Some p
-  ; a = Some a
-  ; u = Some u
-  } [@ocaml.warning "-42"]
-
-let family_of_gen_family base (f, c, d) =
-  { base
-  ; ifam = f.fam_index
-  ; f = Some f
-  ; c = Some c
-  ; d = Some d
-  } [@ocaml.warning "-42"]
-
-let iper_exists base = base.func.iper_exists
-
-let ifam_exists base = base.func.ifam_exists
-
-let poi base iper =
-  if iper = dummy_iper then empty_person base iper
-  else { base ; iper ; p = None ; a = None ; u = None } [@ocaml.warning "-42"]
-
-let no_family ifam = { (Mutil.empty_family empty_string) with fam_index = ifam }
-
-let no_couple = Adef.couple dummy_iper dummy_iper
-
-let no_descend = { Def.children = [||] }
-
-let empty_family base ifam =
-  { base
-  ; ifam
-  ; f = Some (no_family ifam)
-  ; c = Some no_couple
-  ; d = Some no_descend }
-
-let foi base ifam =
-  if ifam = dummy_ifam then empty_family base ifam
-  else { base ; ifam ; f = None ; c = None ; d = None }
-
-module Collection = struct
-
-  type 'a t =
-    { length : int
-    ; get : int -> 'a option
-    }
-
-  let map (fn : 'a -> 'b) c =
-    { length = c.length
-    ; get = (fun i ->  match c.get i with Some x -> Some (fn x) | None -> None)
-    }
-
-  let length { length ; _ } = length
-
-  let iter fn { get ; length } =
-    for i = 0 to length - 1 do match get i with Some x -> fn x | None -> () done
-
-  let iteri fn { get ; length } =
-    for i = 0 to length - 1 do match get i with Some x -> fn i x | None -> () done
-
-  let fold ?from ?until fn acc { get ; length } =
-    let from = match from with Some x -> x | None -> 0 in
-    let until = match until with Some x -> x + 1 | None -> length in
-    let rec loop acc i =
-      if i = until then acc
-      else loop (match get i with Some x -> fn acc x | None -> acc) (i + 1)
-    in
-    loop acc from
-
-  let fold_until continue fn acc { get ; length } =
-    let rec loop acc i =
-      if not (continue acc) || i = length then acc
-      else loop (match get i with Some x -> fn acc x | None -> acc) (i + 1)
-    in
-    loop acc 0
-
-  let iterator { get ; length } =
-    let cursor = ref 0 in
-    let rec next () =
-      if !cursor < length then
-        match get !cursor with
-        | None -> incr cursor ; next ()
-        |  v -> incr cursor ; v
-      else None
-    in
-    next
-
-end
-
-module Marker = struct
-
-  type ('k, 'v) t =
-    { get : 'k -> 'v
-    ; set : 'k -> 'v -> unit
-    }
-
-  let make (k : 'a -> int) (c : 'a Collection.t) (i : 'v) : ('a, 'v) t =
-    let a = Array.make c.Collection.length i in
-    { get = (fun x -> Array.get a (k x) )
-    ; set = (fun x v -> Array.set a (k x) v) }
-
-  let get ({ get ; _ } : _ t) k = get k
-  let set ({ set ; _ } : _ t) k = set k
-
-end
-
-let persons base =
-  { Collection.length = nb_of_persons base
-  ; get = (fun i -> Some (poi base i))
-  }
-
-let ipers base =
-  { Collection.length = nb_of_persons base
-  ; get = (fun i -> Some i)
-  }
-
-let iper_marker c i = Marker.make (fun i -> i) c i
-
-let ifams ?(select = fun _ -> true) base =
-  { Collection.length = nb_of_families base
-  ; get = begin fun i ->
-      if select i
-      then
-        if get_ifam (foi base i) = dummy_ifam
-        then None else Some i
-      else None
-    end
-  }
-
-let families ?(select = fun _ -> true) base =
-  { Collection.length = nb_of_families base
-  ; get = begin fun i ->
-      let f = foi base i in
-      if get_ifam f <> dummy_ifam && select f
-      then Some f
-      else None
-    end
-  }
-
-let dummy_collection _ =
-  { Collection.length = -1
-  ; get = fun _ -> None
-  }
-
-let ifam_marker c i = Marker.make (fun i -> i) c i
-
-let dummy_marker (_ : 'a) (v : 'b) : ('a, 'b) Marker.t =
-  { Marker.get = begin fun _ -> v end
-  ; set = begin fun _ _ -> () end
-  }
-
-
-(* Restrict file *)
-
-(* FIXME: these values should not be global *)
-let visible_ref : (iper, bool) Hashtbl.t option ref = ref None
-
-let read_or_create_visible base =
-  let fname = Filename.concat base.data.bdir "restrict" in
-  let visible =
-    if Sys.file_exists fname then
-      let ic = Secure.open_in fname in
-      let visible =
-        if Files.check_magic Mutil.executable_magic ic
-        then input_value ic
-        else Hashtbl.create (nb_of_persons base)
-      in
-      close_in ic ;
-      visible
-    else Hashtbl.create (nb_of_persons base)
-  in
-  visible_ref := Some visible ;
-  visible
-
-let base_visible_write base =
-  if base.data.perm = RDONLY then raise Def.(HttpExn (Forbidden, __LOC__))
-  else
-    let fname = Filename.concat base.data.bdir "restrict" in
-    match !visible_ref with
-    | Some visible ->
-      let oc = Secure.open_out fname in
-      output_string oc Mutil.executable_magic ;
-      output_value oc visible;
-      close_out oc
-    | None -> ()
-
-let base_visible_get base fct i =
-  let visible =
-    match !visible_ref with
-    | Some visible -> visible
-    | None -> read_or_create_visible base
-  in
-  match Hashtbl.find_opt visible i with
-  | None ->
-    let status = fct (poi base i) in
-    Hashtbl.add visible i status ;
-    visible_ref := Some visible;
-    status
-  | Some b -> b
-
-include Gwdb_gc

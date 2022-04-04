@@ -2,6 +2,6 @@
  (name geneweb_system_util)
  (public_name geneweb.system_util)
  (wrapped false)
- (preprocess (action (run %{bin:cppo} -D GENEWEB_GWDB_LEGACY -D UNIX -D SYSLOG -V OCAML:%{ocaml_version} %{input-file})))
+ (preprocess (action (run %{bin:cppo} -D GENEWEB_GWDB_VERSIONED -D UNIX  -V OCAML:%{ocaml_version} %{input-file})))
  (libraries)
 )
