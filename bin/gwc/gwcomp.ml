@@ -1297,32 +1297,30 @@ let comp_families x =
   let out_file = Filename.chop_suffix x ".gw" ^ ".gwo" in
   line_cnt := 0;
   let oc = open_out_bin out_file in
-  (try
-     let ic = open_in x in
-     (* write header *)
-     output_string oc magic_gwo;
-     (* write source filename *)
-     output_value oc (x : string);
-     let rec loop line encoding =
-       match read_family_1 (ic, encoding) x line with
-       | F_some (family, line) ->
-           output_value oc (family : gw_syntax);
-           loop line encoding
-       | F_enc_utf_8 -> loop (read_line (ic, E_utf_8)) E_utf_8
-       | F_gw_plus ->
-           create_all_keys := true;
-           loop (read_line (ic, encoding)) encoding
-       | F_none -> ()
-       | F_fail str ->
-           Printf.printf "File \"%s\", line %d:\n" x !line_cnt;
-           Printf.printf "Error: %s\n" str;
-           flush stdout;
-           loop (read_line (ic, encoding)) encoding
-     in
-     loop (read_line (ic, E_iso_8859_1)) E_iso_8859_1;
-     close_in ic
-   with e ->
-     close_out oc;
-     Mutil.rm out_file;
-     raise e);
+  begin try
+    let ic = open_in x in
+    (* write header *)
+    output_string oc magic_gwo;
+    (* write source filename *)
+    output_value oc (x : string);
+    let rec loop line encoding =
+      match read_family_1 (ic, encoding) x line with
+        F_some (family, line) ->
+          output_value oc (family : gw_syntax); loop line encoding
+      | F_enc_utf_8 -> loop (read_line (ic, E_utf_8)) E_utf_8
+      | F_gw_plus ->
+          create_all_keys := true; loop (read_line (ic, encoding)) encoding
+      | F_none -> ()
+      | F_fail str ->
+          Printf.printf "File \"%s\", line %d:\n" x !line_cnt;
+          Printf.printf "Error: %s\n" str;
+          flush stdout;
+          loop (read_line (ic, encoding)) encoding
+    in
+    loop (read_line (ic, E_iso_8859_1)) E_iso_8859_1; close_in ic
+  with e ->
+    close_out oc;
+    Files.rm out_file;
+    raise e
+  end;
   close_out oc

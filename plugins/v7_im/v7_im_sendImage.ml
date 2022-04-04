@@ -203,19 +203,20 @@ let write_file fname content =
 let move_file_to_old conf fname bfname =
   List.fold_left
     (fun cnt typ ->
-      let ext = extension_of_type typ in
-      let new_file = fname ^ ext in
-      if Sys.file_exists new_file then (
-        let old_dir =
-          Filename.concat (Util.base_path [ "images" ] conf.bname) "old"
-        in
-        let old_file = Filename.concat old_dir bfname ^ ext in
-        Mutil.rm old_file;
-        Mutil.mkdir_p old_dir;
-        (try Unix.rename new_file old_file
-         with Unix.Unix_error (_, _, _) -> ());
-        cnt + 1)
-      else cnt)
+       let ext = extension_of_type typ in
+       let new_file = fname ^ ext in
+       if Sys.file_exists new_file then
+         let old_dir =
+           Filename.concat (Util.base_path ["images"] conf.bname) "old"
+         in
+         let old_file = Filename.concat old_dir bfname ^ ext in
+         Files.rm old_file ;
+         Files.mkdir_p old_dir ;
+         begin try Unix.rename new_file old_file with
+           Unix.Unix_error (_, _, _) -> ()
+         end;
+         cnt + 1
+       else cnt)
     0 image_types
 
 let normal_image_type s =

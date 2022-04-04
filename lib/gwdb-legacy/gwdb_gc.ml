@@ -34,14 +34,14 @@ let empty_person p =
   && p.burial_src = empty_string
   && p.pevents = [] && p.notes = empty_string && p.psources = empty_string
 
-let gc ?(dry_run = true) base =
-  base.data.persons.load_array ();
-  base.data.ascends.load_array ();
-  base.data.unions.load_array ();
-  base.data.families.load_array ();
-  base.data.couples.load_array ();
-  base.data.descends.load_array ();
-  base.data.strings.load_array ();
+let gc ?(dry_run = true) ~save_mem base =
+  base.data.persons.load_array () ;
+  base.data.ascends.load_array () ;
+  base.data.unions.load_array () ;
+  base.data.families.load_array () ;
+  base.data.couples.load_array () ;
+  base.data.descends.load_array () ;
+  base.data.strings.load_array () ;
   let mp = Array.make base.data.persons.len false in
   let mf = Array.make base.data.families.len false in
   let ms = Array.make base.data.strings.len false in
@@ -169,19 +169,19 @@ let gc ?(dry_run = true) base =
           strings,
           bnotes )
     in
-    base'.data.persons.load_array ();
-    base'.data.ascends.load_array ();
-    base'.data.unions.load_array ();
-    base'.data.families.load_array ();
-    base'.data.couples.load_array ();
-    base'.data.descends.load_array ();
-    base'.data.strings.load_array ();
-    Outbase.output base';
-    base'.data.persons.clear_array ();
-    base'.data.ascends.clear_array ();
-    base'.data.unions.clear_array ();
-    base'.data.families.clear_array ();
-    base'.data.couples.clear_array ();
-    base'.data.descends.clear_array ();
-    base'.data.strings.clear_array ();
+    base'.data.persons.load_array () ;
+    base'.data.ascends.load_array () ;
+    base'.data.unions.load_array () ;
+    base'.data.families.load_array () ;
+    base'.data.couples.load_array () ;
+    base'.data.descends.load_array () ;
+    base'.data.strings.load_array () ;
+    Outbase.output ~save_mem base';
+    base'.data.persons.clear_array () ;
+    base'.data.ascends.clear_array () ;
+    base'.data.unions.clear_array () ;
+    base'.data.families.clear_array () ;
+    base'.data.couples.clear_array () ;
+    base'.data.descends.clear_array () ;
+    base'.data.strings.clear_array () ;
     (deletedp, deletedf, deleteds)
