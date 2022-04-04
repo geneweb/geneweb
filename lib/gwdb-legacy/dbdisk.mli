@@ -135,16 +135,14 @@ type 'string gen_pers_event_name = 'string Def.gen_pers_event_name =
   | Epers_Will
   | Epers_Name of 'string
 
-type ('person, 'string) gen_pers_event =
-      ('person, 'string) Def.gen_pers_event = {
-  epers_name : 'string gen_pers_event_name;
-  epers_date : cdate;
-  epers_place : 'string;
-  epers_reason : 'string;
-  epers_note : 'string;
-  epers_src : 'string;
-  epers_witnesses : ('person * witness_kind) array;
-}
+type ('person, 'string) gen_pers_event = (*('person, 'string) Def.gen_pers_event =*)
+  { epers_name : 'string gen_pers_event_name;
+    epers_date : cdate;
+    epers_place : 'string;
+    epers_reason : 'string;
+    epers_note : 'string;
+    epers_src : 'string;
+    epers_witnesses : ('person * witness_kind) array }
 
 type 'string gen_fam_event_name = 'string Def.gen_fam_event_name =
   | Efam_Marriage
@@ -200,44 +198,42 @@ type place = Def.place = {
 
 (* person *)
 
-type ('iper, 'person, 'string) gen_person =
-      ('iper, 'person, 'string) Def.gen_person = {
-  first_name : 'string;
-  surname : 'string;
-  occ : int;
-  image : 'string;
-  public_name : 'string;
-  qualifiers : 'string list;
-  aliases : 'string list;
-  first_names_aliases : 'string list;
-  surnames_aliases : 'string list;
-  titles : 'string gen_title list;
-  rparents : ('person, 'string) gen_relation list;
-  related : 'person list;
-  occupation : 'string;
-  sex : sex;
-  access : access;
-  birth : cdate;
-  birth_place : 'string;
-  birth_note : 'string;
-  birth_src : 'string;
-  baptism : cdate;
-  baptism_place : 'string;
-  baptism_note : 'string;
-  baptism_src : 'string;
-  death : death;
-  death_place : 'string;
-  death_note : 'string;
-  death_src : 'string;
-  burial : burial;
-  burial_place : 'string;
-  burial_note : 'string;
-  burial_src : 'string;
-  pevents : ('person, 'string) gen_pers_event list;
-  notes : 'string;
-  psources : 'string;
-  key_index : 'iper;
-}
+type ('iper, 'person, 'string) gen_person (*= ('iper, 'person, 'string) Def.gen_person*) =
+  { first_name : 'string;
+    surname : 'string;
+    occ : int;
+    image : 'string;
+    public_name : 'string;
+    qualifiers : 'string list;
+    aliases : 'string list;
+    first_names_aliases : 'string list;
+    surnames_aliases : 'string list;
+    titles : 'string gen_title list;
+    rparents : ('person, 'string) gen_relation list;
+    related : 'person list;
+    occupation : 'string;
+    sex : sex;
+    access : access;
+    birth : cdate;
+    birth_place : 'string;
+    birth_note : 'string;
+    birth_src : 'string;
+    baptism : cdate;
+    baptism_place : 'string;
+    baptism_note : 'string;
+    baptism_src : 'string;
+    death : death;
+    death_place : 'string;
+    death_note : 'string;
+    death_src : 'string;
+    burial : burial;
+    burial_place : 'string;
+    burial_note : 'string;
+    burial_src : 'string;
+    pevents : ('person, 'string) gen_pers_event list;
+    notes : 'string;
+    psources : 'string;
+    key_index : 'iper }
 
 type 'family gen_ascend = 'family Def.gen_ascend = {
   parents : 'family option;

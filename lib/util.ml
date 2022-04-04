@@ -2511,6 +2511,8 @@ let record_visited conf ip =
 
 (* TODO OCaml 4.13 : use Array.find_opt *)
 let array_mem_witn conf base x a =
+  let fst (a,_,_) = a in
+  let snd (_,b,_) = b in
   let rec loop i =
     if i = Array.length a then None
     else if x = fst a.(i) then
