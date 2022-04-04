@@ -28,19 +28,6 @@ val nominative : string -> string
 (** Encodes name for nominative declination format.
     @deprecated *)
 
-val mkdir_p : ?perm:int -> string -> unit
-(** [mkdir_p ?perm dir]
-    Create the directory [dir].
-    No error if existing, make parent directories as needed.
-*)
-
-val remove_dir : string -> unit
-(** Remove every file in the directory and then remove the directory itself *)
-
-val lock_file : string -> string
-(** Returns the name of a lock file (with extension .lck). Result is generally used as an
-    argument for [Lock.control] function. *)
-
 val initial : string -> int
 (** Returns position of first capital letter in the name (0 if no capitals). *)
 
@@ -145,16 +132,6 @@ val compare_after_particle : Re.re -> string -> string -> int
     compare strings [s1] [s2] starting from the first character after
     particle's match. If they are equal, compare particles. *)
 
-val rm : string -> unit
-(** [rm fname]
-    Remove [fname]. If [fname] does not exists, do nothing.
-*)
-
-val mv : string -> string -> unit
-(** [mv src dst]
-    Move [src] to [dst]. If [src] does not exists, do nothing.
-*)
-
 val string_of_int_sep : string -> int -> string
 (** [string_of_int_sep "," 1000000] is ["1,000,000"]
 *)
@@ -187,14 +164,6 @@ val list_slice : int -> int -> 'a list -> 'a list
     to [b]-nth (exclusive). If [list] is not long enough, result
     will be shorter than requested, but the function will not fail.
   *)
-
-val check_magic : string -> in_channel -> bool
-(** [check_magic magic ic]
-    Read (and consume) the [magic] string at the beggining of [ic]
-    and return [true].
-    If [ic] does not start with [magic], reset the reading position
-    of [ic] to where is was before you call [check_magic] and return [false].
-*)
 
 val executable_magic : string
 (** Magic string are either get from {i GW_EXECUTABLE_MAGIC} environement variable
@@ -274,40 +243,6 @@ val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
 (** [list_rev_map_append f l1 l2] apply [f] to every element in [l1], reverse it and
     concat with [l2]. *)
 
-val read_or_create_channel :
-  ?magic:string ->
-  ?wait:bool ->
-  string ->
-  (in_channel -> 'a) ->
-  (out_channel -> 'a) ->
-  'a
-(** [read_or_create_channel ?magic fname read write]
-
-    If [fname] exists (and starts with [magic] if this one is provided),
-    [read] function is used on the file.
-    If it does not, or does not start with [magic], or if [read] raise an exception,
-    [write] function is used on the file.
-
-    This function takes care of locking and closing files so you must not take care of
-    that in [read]/[write].
-    It also takes care of writing [magic] at the beginning of the file before calling
-    [write]
-
-    On Windows, file is not locked.
-*)
-
-val read_or_create_value :
-  ?magic:string -> ?wait:bool -> string -> (unit -> 'a) -> 'a
-(** [read_or_create_value ?magic fname create]
-
-    If [fname] exists (and starts and ends with [magic] if this one is provided),
-    return the unmarshalled value.
-    If it does not, or does not start with [magic], or if unmarshalling raise an exception,
-    [create] function is used to produce the value to be marshalled.
-
-    On Windows, file is not locked.
-*)
-
 val bench : string -> (unit -> 'a) -> 'a
 (** [bench name fn]
     Execute [fn], print stats about time and memory allocation, return [fn] result.
@@ -366,30 +301,9 @@ val rev_input_line : in_channel -> int -> bytes ref * int ref -> string * int
     at the beginning of line.
 *)
 
-val search_file_opt : string list -> string -> string option
-(** [search_file directories file]
-    Search for a [file] in different [directories] and return
-    then first result or [None] if not found
-  *)
-
-val search_asset_opt : string -> string option
-(** [search_asset fname]
-    Searches for a file in assets directories.
-    i.e. directories previously registered with [Secure.add_assets] *)
-
 val eq_key : string * string * int -> string * string * int -> bool
 (** [eq_key (fn1, sn1, oc1) (fn2, sn2, oc2)]
     Tests if two persons would have the same key
-*)
-
-val ls_r : string list -> string list
-(** [ls_r dirs]
-    List directories (and subdirectories) contents of [dirs], including [dirs] themselves.
-*)
-
-val rm_rf : string -> unit
-(** [rm_rf dir]
-    Remove directory [dir] and everything inside [dir].
 *)
 
 val filter_map : ('a -> 'b option) -> 'a list -> 'b list

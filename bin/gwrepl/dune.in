@@ -8,6 +8,7 @@
     geneweb_core
     geneweb_def
     geneweb_util
+    geneweb_system_util
     geneweb_gwdb
     %%%GWDB_PKG%%%
     %%%SOSA_PKG%%%
