@@ -25,7 +25,7 @@ type gw_syntax =
         * string
         * string
         * string
-        * (somebody * sex * witness_kind) list)
+        * (somebody * sex * witness_kind * string) list)
         list
       * ((iper, iper, string) gen_person, ifam, string) gen_family
       * (iper, iper, string) gen_person gen_descend
@@ -56,9 +56,9 @@ type gw_syntax =
         * string
         * string
         * string
-        * (somebody * sex * witness_kind) list)
+        * (somebody * sex * witness_kind * string) list)
         list
-      (** Block that defines events of a person. Specific to gwplus format. Contains:
+  (** Block that defines events of a person. Specific to gwplus format. Contains:
       - Concerned person definition/reference
       - Sex of person
       - List of information about every personal event (name, date,

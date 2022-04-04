@@ -4288,6 +4288,69 @@ let print_foreach conf base print_ast eval_expr =
     in
     loop true gen
   in
+  let print_foreach_baptism_witness env al (p, _ as ep) =
+    let rec loop pevents =
+      match pevents with
+        [] -> ()
+      | (name, _, _, _, _, wl, _) :: events ->
+          if name = Pevent Epers_Baptism then
+            Array.iteri
+              begin fun i (ip, _, _) ->
+                let p = pget conf base ip in
+                let env =
+                  ("baptism_witness", Vind p)
+                  :: ("first", Vbool (i = 0))
+                  :: env
+                in
+                List.iter (print_ast env ep) al
+              end
+              wl
+          else loop events
+    in
+    loop (events_list conf base p)
+  in
+  let print_foreach_birth_witness env al (p, _ as ep) =
+    let rec loop pevents =
+      match pevents with
+        [] -> ()
+      | (name, _, _, _, _, wl, _) :: events ->
+          if name = Pevent Epers_Birth then
+            Array.iteri
+              begin fun i (ip, _, _) ->
+                let p = pget conf base ip in
+                let env =
+                  ("birth_witness", Vind p)
+                  :: ("first", Vbool (i = 0))
+                  :: env
+                in
+                List.iter (print_ast env ep) al
+              end
+              wl
+          else loop events
+    in
+    loop (events_list conf base p)
+  in
+  let print_foreach_burial_witness env al (p, _ as ep) =
+    let rec loop pevents =
+      match pevents with
+        [] -> ()
+      | (name, _, _, _, _, wl, _) :: events ->
+          if name = Pevent Epers_Burial then
+            Array.iteri
+              begin fun i (ip, _, _) ->
+                let p = pget conf base ip in
+                let env =
+                  ("burial_witness", Vind p)
+                  :: ("first", Vbool (i = 0))
+                  :: env
+                in
+                List.iter (print_ast env ep) al
+              end
+              wl
+          else loop events
+    in
+    loop (events_list conf base p)
+  in
   let print_foreach_cell env al ep =
     let celll =
       match get_env "celll" env with
@@ -4411,6 +4474,48 @@ let print_foreach conf base print_ast eval_expr =
     in
     loop 0 ip_l
   in
+  let print_foreach_cremation_witness env al (p, _ as ep) =
+    let rec loop pevents =
+      match pevents with
+        [] -> ()
+      | (name, _, _, _, _, wl, _) :: events ->
+          if name = Pevent Epers_Cremation then
+            Array.iteri
+              begin fun i (ip, _, _) ->
+                let p = pget conf base ip in
+                let env =
+                  ("cremation_witness", Vind p)
+                  :: ("first", Vbool (i = 0))
+                  :: env
+                in
+                List.iter (print_ast env ep) al
+              end
+              wl
+          else loop events
+    in
+    loop (events_list conf base p)
+  in
+  let print_foreach_death_witness env al (p, _ as ep) =
+    let rec loop pevents =
+      match pevents with
+        [] -> ()
+      | (name, _, _, _, _, wl, _) :: events ->
+          if name = Pevent Epers_Death then
+            Array.iteri
+              begin fun i (ip, _, _) ->
+                let p = pget conf base ip in
+                let env =
+                  ("death_witness", Vind p)
+                  :: ("first", Vbool (i = 0))
+                  :: env
+                in
+                List.iter (print_ast env ep) al
+              end
+              wl
+          else loop events
+    in
+    loop (events_list conf base p)
+  in
   let print_foreach_descendant_level env al ep =
     let max_level =
       match get_env "max_desc_level" env with Vint n -> n | _ -> 0
@@ -4463,7 +4568,7 @@ let print_foreach conf base print_ast eval_expr =
       match get_env "event" env with
       | Vevent (_, (_, _, _, _, _, witnesses, _)) ->
           Array.iteri
-            (fun i (ip, wk) ->
+            ( fun i (ip, wk, _) ->
               let p = pget conf base ip in
               let wk = Util.string_of_witness_kind conf (get_sex p) wk in
               let env =
@@ -4537,7 +4642,6 @@ let print_foreach conf base print_ast eval_expr =
         ()
     | _ -> ()
   in
-
   let print_foreach_witness_relation env al ((p, _) as ep) =
     let l =
       let related = List.sort_uniq compare (get_related p) in

@@ -28,34 +28,40 @@ let set_sosa_num () =
   assert (!sosa = `None);
   sosa := `Num
 
-let set_gwdb_legacy () =
-  assert (!gwdb = `None);
-  gwdb := `Legacy
+let set_gwdb_legacy () = assert (!gwdb = `None) ; gwdb := `Legacy
+let set_gwdb_versioned () = assert (!gwdb = `None) ; gwdb := `Versioned
 
 let release = ref false
 
 let speclist =
   [
-    ("--gwdb-legacy", Arg.Unit set_gwdb_legacy, " Use legacy backend");
-    ( "--release",
-      Arg.Set release,
-      " Use release profile: no debug informations (defaut: "
-      ^ string_of_bool !release ^ ")" );
-    ( "--debug",
-      Arg.Clear release,
-      " Use dev profile: no optimization, debug informations (default: "
-      ^ string_of_bool (not !release)
-      ^ ")" );
-    ( "--sosa-legacy",
-      Arg.Unit set_sosa_legacy,
-      " Use legacy Sosa module implementation" );
-    ( "--sosa-num",
-      Arg.Unit set_sosa_num,
-      " Use Sosa module implementation based on `num` library" );
-    ( "--sosa-zarith",
-      Arg.Unit set_sosa_zarith,
-      " Use Sosa module implementation based on `zarith` library" );
-    ("--syslog", Arg.Unit set_syslog, " Log gwd errors using syslog");
+    ("--gwdb-versioned",
+     Arg.Unit set_gwdb_versioned,
+     "Use versioned backend"
+    );
+    ( "--gwdb-legacy"
+    , Arg.Unit set_gwdb_legacy
+    , " Use legacy backend" )
+  ; ( "--release"
+    , Arg.Set release
+    , " Use release profile: no debug informations \
+      (defaut: " ^ string_of_bool !release ^ ")" )
+  ; ( "--debug"
+    , Arg.Clear release
+    , " Use dev profile: no optimization, debug informations \
+       (default: " ^ string_of_bool (not !release) ^ ")" )
+  ; ( "--sosa-legacy"
+    , Arg.Unit set_sosa_legacy
+    , " Use legacy Sosa module implementation" )
+  ; ( "--sosa-num"
+    , Arg.Unit set_sosa_num
+    , " Use Sosa module implementation based on `num` library" )
+  ; ( "--sosa-zarith"
+    , Arg.Unit set_sosa_zarith
+    , " Use Sosa module implementation based on `zarith` library" )
+  ; ( "--syslog"
+    , Arg.Unit set_syslog
+    , " Log gwd errors using syslog" )
   ]
   |> List.sort compare |> Arg.align
 
@@ -88,7 +94,11 @@ let () =
   in
   let gwdb_d, gwdb_pkg =
     match !gwdb with
-    | `None | `Legacy -> (" -D GENEWEB_GWDB_LEGACY", "geneweb.gwdb-legacy")
+    | `None
+    | `Versioned ->
+       " -D GENEWEB_GWDB_VERSIONED", "geneweb.gwdb-versioned"
+    | `Legacy ->
+      (" -D GENEWEB_GWDB_LEGACY", "geneweb.gwdb-legacy") ;
   in
   let dune_profile = if !release then "release" else "dev" in
   let os_type, os_d, ext, rm, strip =

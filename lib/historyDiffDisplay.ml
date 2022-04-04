@@ -265,15 +265,16 @@ let string_of_divorce conf divorce =
   | Separated -> transl conf "separated" |> Adef.safe
 
 let string_of_event_witness conf base witnesses =
-  Array.fold_right
-    (fun (ip, wk) accu ->
-      let witn = person_of_iper conf base ip in
-      let kind = Util.string_of_witness_kind conf (get_sex @@ poi base ip) wk in
-      if (witn :> string) = "" then (kind ^^^ transl conf ":" ^<^ witn) :: accu
-      else accu)
-    witnesses []
-  |> fun s ->
-  String.concat ", " (s : Adef.safe_string list :> string list) |> Adef.safe
+  (* WNOTES TODO *)
+  Array.fold_right begin fun (ip, wk, _) accu ->
+    let witn = person_of_iper conf base ip in
+    let kind = Util.string_of_witness_kind conf (get_sex @@ poi base ip) wk in
+    if (witn :> string) = ""
+    then (kind ^^^ transl conf ":" ^<^  witn) :: accu
+    else accu
+  end witnesses []
+  |> fun s -> String.concat ", " (s : Adef.safe_string list :> string list)
+  |> Adef.safe
 
 let string_of_epers_name conf epers_name =
   match epers_name with
@@ -692,14 +693,17 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) :
   | "fevent_src" -> (
       match get_env "fevent" env with
       | Vfevent (bef, aft, m_auth) ->
-          aux' m_auth bef aft (fun _ x -> escape_html x.efam_src)
-      | _ -> raise Not_found)
+        aux' m_auth bef aft (fun _ x -> escape_html x.efam_src)
+      | _ -> raise Not_found
+    )
   | "fevent_witness" -> (
       match get_env "fevent" env with
       | Vfevent (bef, aft, m_auth) ->
-          aux' m_auth bef aft (fun conf x ->
-              string_of_event_witness conf base x.efam_witnesses)
-      | _ -> raise Not_found)
+        (* WNOTES TODO *)
+        let fam_wit ws = Array.map (fun (ip, wk) -> ip, wk, "") ws in
+        aux' m_auth bef aft (fun conf x -> string_of_event_witness conf base (fam_wit x.efam_witnesses))
+      | _ -> raise Not_found
+    )
   | "comment" -> (
       match get_env "fam" env with
       | Vfam (bef, aft, m_auth) ->

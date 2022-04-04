@@ -1,8 +1,10 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
-open Dbdisk
 open Def
+open Dbdisk
 
+external identity : 'a -> 'a = "%identity"
+                             
 type name_index_data = int array array
 type strings_of_fsname = int array array
 
@@ -30,7 +32,7 @@ let husbands base p =
       (husband_surname, husband_surnames_aliases))
     (uoi base p.key_index).family
 
-let father_titles_places base p nobtit =
+let father_titles_places base p (nobtit : dsk_person -> dsk_title list) =
   match (aoi base p.key_index).parents with
   | Some ifam ->
       let cpl = coi base ifam in
@@ -38,10 +40,12 @@ let father_titles_places base p nobtit =
       nobtit fath
   | None -> []
 
-let dsk_person_misc_names base p nobtit =
-  Futil.gen_person_misc_names (sou base) 0 1 p.first_name p.surname
-    p.public_name p.qualifiers p.aliases p.first_names_aliases
-    p.surnames_aliases (nobtit p)
+let dsk_person_misc_names :   dsk_base -> dsk_person -> (dsk_person -> dsk_title list) -> string list = fun base p nobtit ->
+  Futil.gen_person_misc_names
+    (sou base) 0 1
+    p.first_name p.surname p.public_name p.qualifiers p.aliases
+    p.first_names_aliases p.surnames_aliases
+    (nobtit p)
     (if p.sex = Female then husbands base p else [||])
     (father_titles_places base p nobtit)
 
@@ -75,3 +79,112 @@ end)
 
 let name_index s = Hashtbl.hash (Name.crush_lower s) mod table_size
 
+let empty_person empty what =
+  { Dbdisk.first_name = what
+  ; surname = what
+  ; occ = 0
+  ; public_name = empty
+  ; image = empty
+  ; qualifiers = []
+  ; aliases = []
+  ; first_names_aliases = []
+  ; surnames_aliases = []
+  ; titles = []
+  ; rparents = []
+  ; related = []
+  ; occupation = empty
+  ; sex = Neuter
+  ; access = IfTitles
+  ; birth = Adef.cdate_None
+  ; birth_place = empty
+  ; birth_note = empty
+  ; birth_src = empty
+  ; baptism = Adef.cdate_None
+  ; baptism_place = empty
+  ; baptism_note = empty
+  ; baptism_src = empty
+  ; death = DontKnowIfDead
+  ; death_place = empty
+  ; death_note = empty
+  ; death_src = empty
+  ; burial = UnknownBurial
+  ; burial_place = empty
+  ; burial_note = empty
+  ; burial_src = empty
+  ; pevents = []
+  ; notes = empty
+  ; psources = empty
+  ; key_index = ()
+  }
+
+let map_pers_event ?(fd = identity) fp fs e =
+  let epers_name =
+    match e.epers_name with
+      Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial |
+      Epers_Cremation | Epers_Accomplishment | Epers_Acquisition |
+      Epers_Adhesion | Epers_BaptismLDS | Epers_BarMitzvah |
+      Epers_BatMitzvah | Epers_Benediction | Epers_ChangeName |
+      Epers_Circumcision | Epers_Confirmation | Epers_ConfirmationLDS |
+      Epers_Decoration | Epers_DemobilisationMilitaire | Epers_Diploma |
+      Epers_Distinction | Epers_Dotation | Epers_DotationLDS |
+      Epers_Education | Epers_Election | Epers_Emigration |
+      Epers_Excommunication | Epers_FamilyLinkLDS | Epers_FirstCommunion |
+      Epers_Funeral | Epers_Graduate | Epers_Hospitalisation | Epers_Illness |
+      Epers_Immigration | Epers_ListePassenger | Epers_MilitaryDistinction |
+      Epers_MilitaryPromotion | Epers_MilitaryService |
+      Epers_MobilisationMilitaire | Epers_Naturalisation | Epers_Occupation |
+      Epers_Ordination | Epers_Property | Epers_Recensement |
+      Epers_Residence | Epers_Retired | Epers_ScellentChildLDS |
+      Epers_ScellentParentLDS | Epers_ScellentSpouseLDS | Epers_VenteBien |
+      Epers_Will as evt ->
+        evt
+    | Epers_Name s -> Epers_Name (fs s)
+  in
+  let epers_date = Futil.map_cdate fd e.epers_date in
+  let epers_place = fs e.epers_place in
+  let epers_reason = fs e.epers_reason in
+  let epers_note = fs e.epers_note in
+  let epers_src = fs e.epers_src in
+  let epers_witnesses = Array.map (fun (p, w) -> fp p, w) e.epers_witnesses in
+  {epers_name = epers_name; epers_date = epers_date;
+   epers_place = epers_place; epers_reason = epers_reason;
+   epers_note = epers_note; epers_src = epers_src;
+   epers_witnesses = epers_witnesses}
+
+let map_person_ps ?(fd = identity) fp fs p =
+  { first_name = fs p.first_name
+  ; surname = fs p.surname
+  ; occ = p.occ
+  ; image = fs p.image
+  ; first_names_aliases = List.map fs p.first_names_aliases
+  ; surnames_aliases = List.map fs p.surnames_aliases
+  ; public_name = fs p.public_name
+  ; qualifiers = List.map fs p.qualifiers
+  ; titles = List.map (Futil.map_title_strings ~fd fs) p.titles
+  ; rparents = List.map (Futil.map_relation_ps fp fs) p.rparents
+  ; related = List.map fp p.related
+  ; aliases = List.map fs p.aliases
+  ;  occupation = fs p.occupation
+  ; sex = p.sex
+  ; access = p.access
+  ; birth = Futil.map_cdate fd p.birth
+  ; birth_place = fs p.birth_place
+  ; birth_note = fs p.birth_note
+  ; birth_src = fs p.birth_src
+  ; baptism = Futil.map_cdate fd p.baptism
+  ; baptism_place = fs p.baptism_place
+  ; baptism_note = fs p.baptism_note
+  ; baptism_src = fs p.baptism_src
+  ; death = Futil.map_death fd p.death
+  ; death_place = fs p.death_place
+  ; death_note = fs p.death_note
+  ; death_src = fs p.death_src
+  ; burial = Futil.map_burial fd p.burial
+  ; burial_place = fs p.burial_place
+  ; burial_note = fs p.burial_note
+  ; burial_src = fs p.burial_src
+  ; pevents = List.map (map_pers_event ~fd fp fs) p.pevents
+  ; notes = fs p.notes
+  ; psources = fs p.psources
+  ; key_index = p.key_index
+  }

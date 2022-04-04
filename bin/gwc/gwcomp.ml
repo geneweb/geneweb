@@ -32,7 +32,7 @@ type gw_syntax =
         * string
         * string
         * string
-        * (somebody * sex * witness_kind) list)
+        * (somebody * sex * witness_kind * string) list)
         list
       * ((iper, iper, string) gen_person, ifam, string) gen_family
       * (iper, iper, string) gen_person gen_descend
@@ -63,7 +63,7 @@ type gw_syntax =
         * string
         * string
         * string
-        * (somebody * sex * witness_kind) list)
+        * (somebody * sex * witness_kind * string) list)
         list
       (** Block that defines events of a person. Specific to gwplus format. Contains:
       - Concerned person's definition/reference
@@ -1003,17 +1003,17 @@ let loop_note line ic =
 let loop_witn line ic =
   let rec loop_witn acc str =
     match fields str with
-    | ("wit" | "wit:") :: l ->
-        let sex, l =
-          match l with
-          | "m:" :: l -> (Male, l)
-          | "f:" :: l -> (Female, l)
-          | l -> (Neuter, l)
-        in
-        let wkind, l = get_event_witness_kind l in
-        let wk, _, l = parse_parent str l in
-        if l <> [] then failwith str;
-        loop_witn ((wk, sex, wkind) :: acc) (input_a_line ic)
+      ("wit" | "wit:") :: l ->
+      let (sex, l) =
+        match l with
+          "m:" :: l -> Male, l
+        | "f:" :: l -> Female, l
+        | l -> Neuter, l
+      in
+      let (wkind, l) = get_event_witness_kind l in
+      let (wk, _, l) = parse_parent str l in
+      if l <> [] then failwith str;
+      loop_witn ((wk, sex, wkind, "") :: acc) (input_a_line ic)
     | _ -> (List.rev acc, str)
   in
   loop_witn [] line

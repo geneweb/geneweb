@@ -468,7 +468,7 @@ val array_mem_witn :
   Config.config ->
   Gwdb.base ->
   iper ->
-  (iper * Def.witness_kind) array ->
+  (iper * Def.witness_kind * istr) array ->
   Adef.safe_string option
 (** [array_mem_witn conf base ip array] checks if [ip] is in [array]
     and returns corresponding [string_of_witness_kind] if so.

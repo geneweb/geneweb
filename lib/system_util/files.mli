@@ -51,6 +51,13 @@ val lock_file : string -> string
  *)
 val check_magic : string -> in_channel -> bool
 
+
+(** [check_magics magics ic]
+    Given a list of magic strings [magics] returns true if for one of the strings s
+    [check_magic s ic] returns [true], [false] otherwise
+ *)  
+val check_magics : string list -> in_channel -> bool
+  
 (** [read_or_create_channel ?magic fname read write]
 
     If [fname] exists (and starts with [magic] if this one is provided),
