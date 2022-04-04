@@ -101,7 +101,8 @@ let separate = ref false
 let bnotes = ref "merge"
 let shift = ref 0
 let files = ref []
-
+let save_mem = ref false
+          
 let speclist =
   [
     ( "-bnotes",
@@ -117,7 +118,7 @@ let speclist =
       "<str> Set the source field for persons and families without source data"
     );
     ("-f", Arg.Set force, " Remove database if already existing");
-    ("-mem", Arg.Set Outbase.save_mem, " Save memory, but slower");
+    ("-mem", Arg.Set save_mem, " Save memory, but slower");
     ("-nc", Arg.Clear Db1link.do_check, " No consistency check");
     ("-nofail", Arg.Set Gwcomp.no_fail, " No failure in case of error");
     ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database");
@@ -179,7 +180,7 @@ let main () =
         gwo := (x, separate, bnotes, shift) :: !gwo
       else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\"")))
     (List.rev !files);
-  if not !just_comp then (
+  if not !just_comp then
     let bdir =
       if Filename.check_suffix !out_file ".gwb" then !out_file
       else !out_file ^ ".gwb"
@@ -190,14 +191,14 @@ let main () =
         !out_file;
       flush stdout;
       exit 2);
-    Lock.control (Mutil.lock_file !out_file)
+    Lock.control (Files.lock_file !out_file)
       false ~onerror:Lock.print_error_and_exit (fun () ->
         let bdir =
           if Filename.check_suffix !out_file ".gwb" then !out_file
           else !out_file ^ ".gwb"
         in
         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
-        if Db1link.link next_family_fun bdir then ()
+        if Db1link.link ~save_mem:!save_mem next_family_fun bdir then ()
         else (
           flush stderr;
           Printf.eprintf "*** database not created\n";

@@ -78,6 +78,7 @@ GENERATED_FILES_DEP = \
 	lib/gwdb/dune \
 	lib/core/dune \
 	lib/util/dune \
+	lib/system_util/dune \
 	benchmark/dune \
 	bin/connex/dune \
 	bin/cache_files/dune \

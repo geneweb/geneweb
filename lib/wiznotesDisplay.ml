@@ -59,7 +59,7 @@ let read_wizard_notes fname =
   | None -> ("", 0.)
 
 let write_wizard_notes fname nn =
-  if nn = "" then Mutil.rm fname
+  if nn = "" then Files.rm fname
   else
     match try Some (Secure.open_out fname) with Sys_error _ -> None with
     | Some oc ->
@@ -614,24 +614,24 @@ let do_change_wizard_visibility conf base x set_vis =
   if not @@ Sys.file_exists wddir then Unix.mkdir wddir 0o755;
   let denying = wizard_denying wddir in
   let is_visible = not (List.mem conf.user denying) in
-  (if ((not set_vis) && not is_visible) || (set_vis && is_visible) then ()
+  if not set_vis && not is_visible || set_vis && is_visible then ()
   else
-    let tmp_file = Filename.concat wddir "1connected.deny" in
-    let oc = Secure.open_out tmp_file in
-    let found =
-      List.fold_left
-        (fun found wz ->
-          if wz = conf.user && set_vis then true
-          else (
-            Printf.fprintf oc "%s\n" wz;
-            found))
-        false denying
-    in
-    if (not found) && not set_vis then Printf.fprintf oc "%s\n" conf.user;
-    close_out oc;
-    let file = Filename.concat wddir "connected.deny" in
-    Mutil.rm file;
-    Sys.rename tmp_file file);
+    begin
+      let tmp_file = Filename.concat wddir "1connected.deny" in
+      let oc = Secure.open_out tmp_file in
+      let found =
+        List.fold_left
+          (fun found wz ->
+             if wz = conf.user && set_vis then true
+             else begin Printf.fprintf oc "%s\n" wz; found end)
+          false denying
+      in
+      if not found && not set_vis then Printf.fprintf oc "%s\n" conf.user;
+      close_out oc;
+      let file = Filename.concat wddir "connected.deny" in
+      Files.rm file ;
+      Sys.rename tmp_file file
+    end;
   do_connected_wizards conf base x
 
 let change_wizard_visibility conf base =

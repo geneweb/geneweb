@@ -73,104 +73,103 @@ module MF : MF = struct
       if pos < 0 then not_a_pos else { p_ord = true; p_ext = 0; p_pos = pos }
     with Failure _ -> (
       try
-        Scanf.sscanf s "%d-%d" (fun a b ->
-            { p_ord = a = 0; p_ext = a; p_pos = b })
-      with Scanf.Scan_failure _ -> not_a_pos)
+        let pos = int_of_string s in
+        if pos < 0 then not_a_pos else {p_ord = true; p_ext = 0; p_pos = pos}
+      with Failure _ ->
+        try
+          Scanf.sscanf s "%d-%d"
+            (fun a b -> {p_ord = a = 0; p_ext = a; p_pos = b})
+        with Scanf.Scan_failure _ -> not_a_pos)
 
   let extend fname f =
-    let tmp = fname ^ "~" in
-    let oc = open_out tmp in
-    (try f oc
-     with e ->
-       close_out oc;
-       raise e);
-    (match try Some (open_in fname) with Sys_error _ -> None with
-    | Some ic ->
-        (try
-           while true do
-             output_char oc (input_char ic)
-           done
-         with End_of_file -> ());
-        close_in ic
-    | None -> ());
-    close_out oc;
-    Mutil.rm fname;
-    Sys.rename tmp fname
-
-  let patch fname pos str =
-    let fname =
-      if pos.p_ext = 0 then fname else fname ^ "." ^ string_of_int pos.p_ext
-    in
-    match try Some (open_in fname) with Sys_error _ -> None with
-    | Some ic ->
-        let tmp_fname = fname ^ "~" in
-        let oc = open_out tmp_fname in
-        let ic_len = in_channel_length ic in
-        (let rec loop i =
-           if i = ic_len then ()
-           else
-             let c = input_char ic in
-             if
-               i < ic_len - pos.p_pos
-               || i >= ic_len - pos.p_pos + String.length str
-             then output_char oc c
-             else output_char oc str.[i - ic_len + pos.p_pos];
-             loop (i + 1)
-         in
-         loop 0);
-        close_in ic;
-        close_out oc;
-        Mutil.rm fname;
-        Sys.rename tmp_fname fname
-    | None -> ()
-
-  let open_in fname =
-    { ic_fname = fname; ic_chan = open_in_bin fname; ic_ext = 0 }
-
-  let input_char ic = input_char ic.ic_chan
-
-  let rec input_line ic =
-    try Stdlib.input_line ic.ic_chan
-    with End_of_file ->
-      let ext = ic.ic_ext + 1 in
-      let fn = ic.ic_fname ^ "." ^ string_of_int ext in
-      let ic2 = try open_in_bin fn with Sys_error _ -> raise End_of_file in
-      close_in ic.ic_chan;
-      ic.ic_chan <- ic2;
-      ic.ic_ext <- ext;
-      input_line ic
-
-  let rpos_in ic =
-    let pos = in_channel_length ic.ic_chan - pos_in ic.ic_chan in
-    { p_ord = ic.ic_ext = 0; p_ext = ic.ic_ext; p_pos = pos }
-
-  let rec rseek_in ic pos =
-    if ic.ic_ext = pos.p_ext then
-      let len = in_channel_length ic.ic_chan in
-      if pos.p_pos > len then
-        if pos.p_ext >= 1 then (
-          let ext = ic.ic_ext - 1 in
-          pos.p_ord <- ext = 0;
-          pos.p_ext <- ext;
-          pos.p_pos <- pos.p_pos - len;
-          rseek_in ic pos)
-        else invalid_arg "rseek_in"
-      else seek_in ic.ic_chan (len - pos.p_pos)
-    else
-      let fn =
-        if pos.p_ext = 0 then ic.ic_fname
-        else ic.ic_fname ^ "." ^ string_of_int pos.p_ext
+      let tmp = fname ^ "~" in
+      let oc = open_out tmp in
+      (try f oc with e -> close_out oc; raise e);
+      begin match (try Some (open_in fname) with Sys_error _ -> None) with
+        Some ic ->
+          begin try while true do output_char oc (input_char ic) done with
+            End_of_file -> ()
+          end;
+          close_in ic
+      | None -> ()
+      end;
+      close_out oc;
+      Files.rm fname ;
+      Sys.rename tmp fname
+    let patch fname pos str =
+      let fname =
+        if pos.p_ext = 0 then fname else fname ^ "." ^ string_of_int pos.p_ext
       in
-      let ic2 = try open_in_bin fn with Sys_error _ -> failwith "rseek_in" in
-      close_in ic.ic_chan;
-      ic.ic_chan <- ic2;
-      ic.ic_ext <- pos.p_ext;
-      rseek_in ic pos
-
-  let close_in ic = close_in ic.ic_chan
+      match try Some (open_in fname) with Sys_error _ -> None with
+        Some ic ->
+          let tmp_fname = fname ^ "~" in
+          let oc = open_out tmp_fname in
+          let ic_len = in_channel_length ic in
+          begin let rec loop i =
+            if i = ic_len then ()
+            else
+              let c = input_char ic in
+              if i < ic_len - pos.p_pos ||
+                 i >= ic_len - pos.p_pos + String.length str
+              then
+                output_char oc c
+              else output_char oc str.[i - ic_len + pos.p_pos];
+              loop (i + 1)
+          in
+            loop 0
+          end;
+          close_in ic;
+          close_out oc;
+          Files.rm fname ;
+          Sys.rename tmp_fname fname
+      | None -> ()
+    let open_in fname =
+      {ic_fname = fname; ic_chan = open_in_bin fname; ic_ext = 0}
+    let input_char ic = input_char ic.ic_chan
+    let rec input_line ic =
+      try Stdlib.input_line ic.ic_chan with
+        End_of_file ->
+          let ext = ic.ic_ext + 1 in
+          let fn = ic.ic_fname ^ "." ^ string_of_int ext in
+          let ic2 =
+            try open_in_bin fn with Sys_error _ -> raise End_of_file
+          in
+          close_in ic.ic_chan;
+          ic.ic_chan <- ic2;
+          ic.ic_ext <- ext;
+          input_line ic
+    let rpos_in ic =
+      let pos = in_channel_length ic.ic_chan - pos_in ic.ic_chan in
+      {p_ord = ic.ic_ext = 0; p_ext = ic.ic_ext; p_pos = pos}
+    let rec rseek_in ic pos =
+      if ic.ic_ext = pos.p_ext then
+        let len = in_channel_length ic.ic_chan in
+        if pos.p_pos > len then
+          if pos.p_ext >= 1 then
+            let ext = ic.ic_ext - 1 in
+            pos.p_ord <- ext = 0;
+            pos.p_ext <- ext;
+            pos.p_pos <- pos.p_pos - len;
+            rseek_in ic pos
+          else invalid_arg "rseek_in"
+        else seek_in ic.ic_chan (len - pos.p_pos)
+      else
+        let fn =
+          if pos.p_ext = 0 then ic.ic_fname
+          else ic.ic_fname ^ "." ^ string_of_int pos.p_ext
+        in
+        let ic2 =
+          try open_in_bin fn with Sys_error _ -> failwith "rseek_in"
+        in
+        close_in ic.ic_chan;
+        ic.ic_chan <- ic2;
+        ic.ic_ext <- pos.p_ext;
+        rseek_in ic pos
+    let close_in ic = close_in ic.ic_chan
 end
 
-let forum_file conf =
+
+  let forum_file conf =
   let fn = Filename.concat (bpath (conf.bname ^ ".gwb")) "forum" in
   MF.filename_of_string fn
 
