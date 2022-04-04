@@ -1,6 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-(** Returns list of allowed to acces assets *)
+(** Returns list of allowed to access assets *)
 val assets : unit -> string list
 
 (** Returns directory where databases are installed to which acces is allowed *)

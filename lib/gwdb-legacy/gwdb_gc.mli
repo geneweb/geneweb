@@ -4,4 +4,4 @@
     arrays and update corresponding database on the disk. Otherwise, it just perform computing stage
     without database update. Returns [(deletedp,deletedf,deleteds)] where [deletedp] is ids of all unmarked
     persons, [deletedf] is ids of all unmarked families and [deleteds] is ids of all unmarked strings *)
-val gc : ?dry_run:bool -> Dbdisk.dsk_base -> int list * int list * int list
+val gc : ?dry_run:bool -> save_mem:bool -> Dbdisk.dsk_base -> int list * int list * int list

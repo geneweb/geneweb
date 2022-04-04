@@ -26,4 +26,4 @@ val save_mem : bool ref
     - {i notes_d} directory containing .txt for each extended page.
     - {i particles.txt} text file with autorised name's particles.
     *)
-val output : Dbdisk.dsk_base -> unit
+val output : ?save_mem : bool -> Dbdisk.dsk_base -> unit

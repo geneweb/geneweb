@@ -223,8 +223,8 @@ let move_file_to_old conf fname bfname =
            Filename.concat (Util.base_path ["images"] conf.bname) "old"
          in
          let old_file = Filename.concat old_dir bfname ^ ext in
-         Mutil.rm old_file ;
-         Mutil.mkdir_p old_dir ;
+         Files.rm old_file ;
+         Files.mkdir_p old_dir ;
          begin try Unix.rename new_file old_file with
            Unix.Unix_error (_, _, _) -> ()
          end;

@@ -159,7 +159,7 @@ let check
       flush stdout
     end ;
     if v1 then (Printf.printf "Rebuilding the indexes..\n" ; flush stdout) ;
-    Gwdb.sync base ;
+    Gwdb.sync ~save_mem:false base ;
     if v1 then (Printf.printf "Done" ; flush stdout)
   end
 
@@ -206,7 +206,7 @@ let main () =
   Arg.parse speclist anonfun usage;
   Secure.set_base_dir (Filename.dirname !bname);
   if !bname = "" then begin Arg.usage speclist usage; exit 2 end;
-  Lock.control (Mutil.lock_file !bname) false ~onerror:Lock.print_try_again @@
+  Lock.control (Files.lock_file !bname) false ~onerror:Lock.print_try_again @@
   fun () ->
   if !f_parents
   || !f_children

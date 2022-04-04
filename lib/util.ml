@@ -1816,7 +1816,7 @@ let write_default_sosa conf key =
   List.iter (fun (k, v) -> Stdlib.output_string oc (k ^ "=" ^ v ^ "\n"))
     gwf;
   close_out oc;
-  Mutil.rm (fname ^ "~") ;
+  Files.rm (fname ^ "~") ;
   Sys.rename fname (fname ^ "~") ;
   try Sys.rename tmp_fname fname with Sys_error _ -> ()
 
@@ -1846,9 +1846,9 @@ let create_topological_sort conf base =
       then Filename.concat bfile "tstab_visitor"
       else Filename.concat bfile "tstab"
     in
-    Mutil.read_or_create_value ~magic:Mutil.executable_magic tstab_file
+    Files.read_or_create_value ~magic:Mutil.executable_magic tstab_file
       begin fun () ->
-        Lock.control (Mutil.lock_file bfile) false
+        Lock.control (Files.lock_file bfile) false
           ~onerror:begin fun () ->
             let () = load_ascends_array base in
             let () = load_couples_array base in

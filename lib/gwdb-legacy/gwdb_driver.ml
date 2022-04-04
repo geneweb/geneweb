@@ -204,13 +204,13 @@ let new_iper base = base.data.persons.len
 let new_ifam base = base.data.families.len
 
 (* FIXME: lock *)
-let sync ?(scratch=false) base =
+let sync ?(scratch=false) ~save_mem base =
   if base.data.perm = RDONLY && not scratch
   then raise Def.(HttpExn (Forbidden, __LOC__))
-  else Outbase.output base
+  else Outbase.output ~save_mem base
 
 let make bname particles arrays : Dbdisk.dsk_base =
-  sync ~scratch:true (Database.make bname particles arrays) ;
+  sync ~scratch:true ~save_mem:false (Database.make bname particles arrays) ;
   open_base bname
 
 let bfname base fname =
@@ -225,7 +225,7 @@ module NLDB = struct
     match try Some (open_in_bin fname) with Sys_error _ -> None with
     | Some ic ->
       let r =
-        if Mutil.check_magic magic ic
+        if Files.check_magic magic ic
         then (input_value ic : (iper, iper) Def.NLDB.t)
         else failwith "unsupported nldb format"
       in
@@ -242,8 +242,8 @@ module NLDB = struct
       output_string oc magic ;
       output_value oc (db : (iper, ifam) Def.NLDB.t) ;
       close_out oc ;
-      Mutil.rm fname_back;
-      Mutil.mv fname_def fname_back ;
+      Files.rm fname_back;
+      Files.mv fname_def fname_back ;
       Sys.rename fname_tmp fname_def
 
 end
@@ -564,7 +564,7 @@ let read_or_create_visible base =
     if Sys.file_exists fname then
       let ic = Secure.open_in fname in
       let visible =
-        if Mutil.check_magic Mutil.executable_magic ic
+        if Files.check_magic Mutil.executable_magic ic
         then input_value ic
         else Hashtbl.create (nb_of_persons base)
       in
@@ -600,3 +600,5 @@ let base_visible_get base fct i =
     visible_ref := Some visible;
     status
   | Some b -> b
+
+include Gwdb_gc

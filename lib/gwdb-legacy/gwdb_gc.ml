@@ -41,7 +41,7 @@ let empty_person p =
   && p.notes = empty_string
   && p.psources = empty_string
 
-let gc ?(dry_run = true) base =
+let gc ?(dry_run = true) ~save_mem base =
   base.data.persons.load_array () ;
   base.data.ascends.load_array () ;
   base.data.unions.load_array () ;
@@ -189,7 +189,7 @@ let gc ?(dry_run = true) base =
     base'.data.couples.load_array () ;
     base'.data.descends.load_array () ;
     base'.data.strings.load_array () ;
-    Outbase.output base' ;
+    Outbase.output ~save_mem base';
     base'.data.persons.clear_array () ;
     base'.data.ascends.clear_array () ;
     base'.data.unions.clear_array () ;

@@ -11,9 +11,9 @@ type couple = dsk_couple
 type descend = dsk_descend
 
 let move_with_backup src dst =
-  Mutil.rm (dst ^ "~");
-  Mutil.mv dst (dst ^ "~") ;
-  Mutil.mv src dst
+  Files.rm (dst ^ "~");
+  Files.mv dst (dst ^ "~") ;
+  Files.mv src dst
 
 (*
  Files in base (directory .gwb)
@@ -820,11 +820,11 @@ let opendb bname =
   let particles = Mutil.input_particles (Filename.concat bname "particles.txt") in
   let ic = Secure.open_in_bin (Filename.concat bname "base") in
   let version =
-    if Mutil.check_magic Dutil.magic_GnWb0024 ic then GnWb0024
-    else if Mutil.check_magic Dutil.magic_GnWb0023 ic then GnWb0023
-    else if Mutil.check_magic Dutil.magic_GnWb0022 ic then GnWb0022
-    else if Mutil.check_magic Dutil.magic_GnWb0021 ic then GnWb0021
-    else if Mutil.check_magic Dutil.magic_GnWb0020 ic then GnWb0020
+    if Files.check_magic Dutil.magic_GnWb0024 ic then GnWb0024
+    else if Files.check_magic Dutil.magic_GnWb0023 ic then GnWb0023
+    else if Files.check_magic Dutil.magic_GnWb0022 ic then GnWb0022
+    else if Files.check_magic Dutil.magic_GnWb0021 ic then GnWb0021
+    else if Files.check_magic Dutil.magic_GnWb0020 ic then GnWb0020
     else if really_input_string ic 4 = "GnWb"
     then failwith "this is a GeneWeb base, but not compatible"
     else failwith "this is not a GeneWeb base, or it is a very old version"

@@ -169,7 +169,7 @@ let output_particles_file particles fname =
   end particles ;
   close_out oc
 
-let output base =
+let output ?(save_mem = false) base =
   (* create database directory *)
   let bname = base.data.bdir in
   if not (Sys.file_exists bname) then Unix.mkdir bname 0o755 ;
@@ -255,7 +255,7 @@ let output base =
           base.data.ascends.clear_array ();
           base.data.unions.clear_array ();
           base.data.couples.clear_array ();
-          if !save_mem then begin trace "compacting"; Gc.compact () end;
+          if save_mem then begin trace "compacting"; Gc.compact () end;
           let surname_pos = pos_out oc_inx in
           trace "create strings of sname";
           create_strings_of_sname oc_inx oc_inx_acc base;
@@ -268,14 +268,14 @@ let output base =
           output_binary_int oc_inx first_name_pos;
           close_out oc_inx;
           close_out oc_inx_acc;
-          if !save_mem then begin trace "compacting"; Gc.compact () end;
+          if save_mem then begin trace "compacting"; Gc.compact () end;
           Gc.compact () ;
           trace "create string index";
           output_strings_hash tmp_strings_inx base;
-          if !save_mem then begin trace "compacting"; Gc.compact () end;
+          if save_mem then begin trace "compacting"; Gc.compact () end;
           trace "create surname index";
           output_surname_index base tmp_snames_inx tmp_snames_dat;
-          if !save_mem then begin trace "compacting"; Gc.compact () end;
+          if save_mem then begin trace "compacting"; Gc.compact () end;
           trace "create first name index";
           output_first_name_index base tmp_fnames_inx tmp_fnames_dat;
           let s = base.data.bnotes.Def.nread "" Def.RnAll in
@@ -288,7 +288,7 @@ let output base =
             (fun f ->
                let s = base.data.bnotes.Def.nread f Def.RnAll in
                let fname = Filename.concat tmp_notes_d (f ^ ".txt") in
-               Mutil.mkdir_p (Filename.dirname fname);
+               Files.mkdir_p (Filename.dirname fname);
                let oc = open_out fname in output_string oc s; close_out oc)
             (List.rev (base.data.bnotes.Def.efiles ()));
           output_particles_file base.data.particles_txt tmp_particles
@@ -319,50 +319,50 @@ let output base =
     with e ->
       (try close_out oc with _ -> ());
       (try close_out oc_acc with _ -> ());
-      Mutil.rm tmp_base;
-      Mutil.rm tmp_base_acc;
+      Files.rm tmp_base;
+      Files.rm tmp_base_acc;
       begin
-        Mutil.rm tmp_names_inx;
-        Mutil.rm tmp_names_acc;
-        Mutil.rm tmp_strings_inx;
-        Mutil.remove_dir tmp_notes_d
+        Files.rm tmp_names_inx;
+        Files.rm tmp_names_acc;
+        Files.rm tmp_strings_inx;
+        Files.remove_dir tmp_notes_d
       end;
       raise e
   end;
   close_base base;
-  Mutil.rm (Filename.concat bname "base");
+  Files.rm (Filename.concat bname "base");
   Sys.rename tmp_base (Filename.concat bname "base");
-  Mutil.rm (Filename.concat bname "base.acc");
+  Files.rm (Filename.concat bname "base.acc");
   Sys.rename tmp_base_acc (Filename.concat bname "base.acc");
-  Mutil.rm (Filename.concat bname "names.inx");
+  Files.rm (Filename.concat bname "names.inx");
   Sys.rename tmp_names_inx (Filename.concat bname "names.inx");
-  Mutil.rm (Filename.concat bname "names.acc");
+  Files.rm (Filename.concat bname "names.acc");
   Sys.rename tmp_names_acc (Filename.concat bname "names.acc");
-  Mutil.rm (Filename.concat bname "snames.dat");
+  Files.rm (Filename.concat bname "snames.dat");
   Sys.rename tmp_snames_dat (Filename.concat bname "snames.dat");
-  Mutil.rm (Filename.concat bname "snames.inx");
+  Files.rm (Filename.concat bname "snames.inx");
   Sys.rename tmp_snames_inx (Filename.concat bname "snames.inx");
-  Mutil.rm (Filename.concat bname "fnames.dat");
+  Files.rm (Filename.concat bname "fnames.dat");
   Sys.rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
-  Mutil.rm (Filename.concat bname "fnames.inx");
+  Files.rm (Filename.concat bname "fnames.inx");
   Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
-  Mutil.rm (Filename.concat bname "strings.inx");
+  Files.rm (Filename.concat bname "strings.inx");
   Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");
   Sys.rename tmp_particles (Filename.concat bname "particles.txt") ;
-  Mutil.rm (Filename.concat bname "notes");
+  Files.rm (Filename.concat bname "notes");
   if Sys.file_exists tmp_notes then
     Sys.rename tmp_notes (Filename.concat bname "notes");
   if Sys.file_exists tmp_notes_d then
     begin let notes_d = Filename.concat bname "notes_d" in
-      Mutil.remove_dir notes_d; Sys.rename tmp_notes_d notes_d
+      Files.remove_dir notes_d; Sys.rename tmp_notes_d notes_d
     end;
-  Mutil.rm (Filename.concat bname "patches");
-  Mutil.rm (Filename.concat bname "patches~");
-  Mutil.rm (Filename.concat bname "synchro_patches");
-  Mutil.rm (Filename.concat bname "notes_link");
-  Mutil.rm (Filename.concat bname "restrict") ;
-  Mutil.rm (Filename.concat bname "tstab_visitor");
-  Mutil.rm (Filename.concat bname "nb_persons");
+  Files.rm (Filename.concat bname "patches");
+  Files.rm (Filename.concat bname "patches~");
+  Files.rm (Filename.concat bname "synchro_patches");
+  Files.rm (Filename.concat bname "notes_link");
+  Files.rm (Filename.concat bname "restrict") ;
+  Files.rm (Filename.concat bname "tstab_visitor");
+  Files.rm (Filename.concat bname "nb_persons");
   (* FIXME: should not be present in this part of the code? *)
-  Mutil.rm (Filename.concat bname "tstab");
-  Mutil.rm (Filename.concat bname "tstab_visitor")
+  Files.rm (Filename.concat bname "tstab");
+  Files.rm (Filename.concat bname "tstab_visitor")

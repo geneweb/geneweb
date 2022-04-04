@@ -28,19 +28,6 @@ val decline : char -> string -> string
     @deprecated *)
 val nominative : string -> string
 
-(** [mkdir_p ?perm dir]
-    Create the directory [dir].
-    No error if existing, make parent directories as needed.
-*)
-val mkdir_p : ?perm:int -> string -> unit
-
-(** Remove every file in the directory and then remove the directory itself *)
-val remove_dir : string -> unit
-
-(** Returns the name of a lock file (with extension .lck). Result is generally used as an
-    argument for [Lock.control] function. *)
-val lock_file : string -> string
-
 (** Returns position of first capital letter in the name (0 if no capitals). *)
 val initial : string -> int
 
@@ -62,7 +49,7 @@ val iso_8859_1_of_utf_8 : string -> string
 
 (** Convert arabic number (int) to roman (string). Number should be < 4000. *)
 val roman_of_arabian : int -> string
-
+  
 (** Convert roman number (string) to arabic (int). Number should be less or equal
     to MMMCMXCIX (3999). *)
 val arabian_of_roman : string -> int
@@ -145,16 +132,6 @@ val get_particle : Re.re -> string -> string
     particle's match. If they are equal, compare particles. *)
 val compare_after_particle : Re.re -> string -> string -> int
 
-(** [rm fname]
-    Remove [fname]. If [fname] does not exists, do nothing.
-*)
-val rm : string -> unit
-
-(** [mv src dst]
-    Move [src] to [dst]. If [src] does not exists, do nothing.
-*)
-val mv : string -> string -> unit
-
 (** [string_of_int_sep "," 1000000] is ["1,000,000"]
 *)
 val string_of_int_sep : string -> int -> string
@@ -187,14 +164,6 @@ val list_last : 'a list -> 'a
     will be shorter than requested, but the function will not fail.
   *)
 val list_slice : int -> int -> 'a list -> 'a list
-
-(** [check_magic magic ic]
-    Read (and consume) the [magic] string at the beggining of [ic]
-    and return [true].
-    If [ic] does not start with [magic], reset the reading position
-    of [ic] to where is was before you call [check_magic] and return [false].
-*)
-val check_magic : string -> in_channel -> bool
 
 (** Magic string are either get from {i GW_EXECUTABLE_MAGIC} environement variable
     either generated from the md5sum of the running executable.
@@ -274,44 +243,6 @@ val list_map_sort_uniq : ('a -> 'b) -> 'a list -> 'b list
     concat with [l2]. *)
 val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
 
-(** [read_or_create_channel ?magic fname read write]
-
-    If [fname] exists (and starts with [magic] if this one is provided),
-    [read] function is used on the file.
-    If it does not, or does not start with [magic], or if [read] raise an exception,
-    [write] function is used on the file.
-
-    This function takes care of locking and closing files so you must not take care of
-    that in [read]/[write].
-    It also takes care of writing [magic] at the beginning of the file before calling
-    [write]
-
-    On Windows, file is not locked.
-*)
-val read_or_create_channel
-  :  ?magic:string
-  -> ?wait:bool
-  -> string
-  -> (in_channel -> 'a)
-  -> (out_channel -> 'a)
-  -> 'a
-
-(** [read_or_create_value ?magic fname create]
-
-    If [fname] exists (and starts and ends with [magic] if this one is provided),
-    return the unmarshalled value.
-    If it does not, or does not start with [magic], or if unmarshalling raise an exception,
-    [create] function is used to produce the value to be marshalled.
-
-    On Windows, file is not locked.
-*)
-val read_or_create_value
-  :  ?magic:string
-  -> ?wait:bool
-  -> string
-  -> (unit -> 'a)
-  -> 'a
-
 (** [bench name fn]
     Execute [fn], print stats about time and memory allocation, return [fn] result.
  *)
@@ -370,31 +301,10 @@ val sprintf_date : Unix.tm -> Adef.safe_string
 *)
 val rev_input_line : in_channel -> int -> (bytes ref * int ref) -> string * int
 
-(** [search_file directories file]
-    Search for a [file] in different [directories] and return
-    then first result or [None] if not found
-  *)
-val search_file_opt : string list -> string -> string option
-
-(** [search_asset fname]
-    Searches for a file in assets directories.
-    i.e. directories previously registered with [Secure.add_assets] *)
-val search_asset_opt : string -> string option
-
 (** [eq_key (fn1, sn1, oc1) (fn2, sn2, oc2)]
     Tests if two persons would have the same key
 *)
 val eq_key : (string * string * int) -> (string * string * int) -> bool
-
-(** [ls_r dirs]
-    List directories (and subdirectories) contents of [dirs], including [dirs] themselves.
-*)
-val ls_r : string list -> string list
-
-(** [rm_rf dir]
-    Remove directory [dir] and everything inside [dir].
-*)
-val rm_rf : string -> unit
 
 (** [filter_map fn list] is a combination of map and filter.
     Not tail-recursive.

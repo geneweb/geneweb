@@ -1550,9 +1550,9 @@ let output_command_line bdir =
   close_out oc
 
 (** Link .gwo files and create a database. *)
-let link next_family_fun bdir =
+let link ~save_mem next_family_fun bdir =
   let tmp_dir = Filename.concat "gw_tmp" bdir in
-  Mutil.mkdir_p tmp_dir ;
+  Files.mkdir_p tmp_dir ;
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
   let tmp_per = Filename.concat tmp_dir "gwc_per" in
   let tmp_fam_index = Filename.concat tmp_dir "gwc_fam_index" in
@@ -1610,9 +1610,9 @@ let link next_family_fun bdir =
   if not gen.g_errored then
     begin
       if !do_consang then ignore @@ ConsangAll.compute base true ;
-      Gwdb.sync base ;
+      Gwdb.sync ~save_mem base ;
       output_wizard_notes bdir gen.g_wiznotes;
-      Mutil.remove_dir tmp_dir ;
+      Files.remove_dir tmp_dir ;
       output_command_line bdir;
       true
     end

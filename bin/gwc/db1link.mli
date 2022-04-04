@@ -25,4 +25,4 @@ type file_info = {
 
 (** Link .gwo files and create a database. *)
 val link :
-  (file_info -> unit -> Gwcomp.gw_syntax option) -> string -> bool
+  save_mem:bool -> (file_info -> unit -> Gwcomp.gw_syntax option) -> string -> bool

@@ -60,7 +60,7 @@ module Default = struct
         let fname lang =
           (code ^ "-" ^ lang ^ ".html")
           |> Filename.concat "etc"
-          |> Mutil.search_asset_opt
+          |> Files.search_asset_opt
         in
         match fname conf.lang with
         | Some fn -> output_file conf fn

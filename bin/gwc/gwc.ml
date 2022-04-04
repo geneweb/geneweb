@@ -92,7 +92,8 @@ let separate = ref false
 let bnotes = ref "merge"
 let shift = ref 0
 let files = ref []
-
+let save_mem = ref false
+          
 let speclist =
   [ "-bnotes", Arg.Set_string bnotes
   , "[drop|erase|first|merge] Behavior for base notes of the next file. \
@@ -106,7 +107,7 @@ let speclist =
   ; "-ds", Arg.Set_string Db1link.default_source
     , "<str> Set the source field for persons and families without source data"
   ; "-f", Arg.Set force, " Remove database if already existing"
-  ; "-mem", Arg.Set Outbase.save_mem, " Save memory, but slower"
+  ; "-mem", Arg.Set save_mem, " Save memory, but slower"
   ; "-nc", Arg.Clear Db1link.do_check, " No consistency check"
   ; "-nofail", Arg.Set Gwcomp.no_fail, " No failure in case of error"
   ; "-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database"
@@ -173,7 +174,7 @@ let main () =
         exit 2
       end;
     Lock.control
-      (Mutil.lock_file !out_file)
+      (Files.lock_file !out_file)
       false
       ~onerror:Lock.print_error_and_exit
       (fun () ->
@@ -182,7 +183,7 @@ let main () =
            else !out_file ^ ".gwb"
          in
          let next_family_fun = next_family_fun_templ (List.rev !gwo) in
-         if Db1link.link next_family_fun bdir then ()
+         if Db1link.link ~save_mem:!save_mem next_family_fun bdir then ()
          else
            begin
              Printf.eprintf "*** database not created\n";

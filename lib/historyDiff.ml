@@ -51,7 +51,7 @@ let create_history_dirs conf fname =
     let dirs =
       [history_d conf; String.make 1 fname.[0]; String.make 1 fname.[1]]
     in
-    Mutil.mkdir_p (List.fold_left Filename.concat "" dirs)
+    Files.mkdir_p (List.fold_left Filename.concat "" dirs)
 
 
 (* ************************************************************************ *)
