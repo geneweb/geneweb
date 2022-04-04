@@ -43,28 +43,31 @@ module Default = struct
       List.iter (Output.header conf "%s") headers;
       match content with
       | Some content -> Output.print_string conf content
-      | None -> (
-          let code =
-            match code with
-            | Def.Bad_Request -> "400"
-            | Unauthorized -> "401"
-            | Forbidden -> "403"
-            | Not_Found -> "404"
-            | Conflict -> "409"
-            | Internal_Server_Error -> "500"
-            | Service_Unavailable -> "503"
-            | OK | Moved_Temporarily -> assert false
-          in
-          let fname lang =
-            code ^ "-" ^ lang ^ ".html"
-            |> Filename.concat "etc" |> Mutil.search_asset_opt
-          in
-          match fname conf.lang with
+      | None ->
+        let code = match code with
+          | Def.Bad_Request -> "400"
+          | Unauthorized -> "401"
+          | Forbidden -> "403"
+          | Not_Found -> "404"
+          | Conflict -> "409"
+          | Internal_Server_Error -> "500"
+          | Service_Unavailable -> "503"
+          | OK | Moved_Temporarily -> assert false
+        in
+        let fname lang =
+          (code ^ "-" ^ lang ^ ".html")
+          |> Filename.concat "etc"
+          |> Files.search_asset_opt
+        in
+        match fname conf.lang with
+        | Some fn -> output_file conf fn
+        | None ->
+          match fname "en" with
           | Some fn -> output_file conf fn
           | None -> (
               match fname "en" with
               | Some fn -> output_file conf fn
-              | None -> Output.print_sstring conf ""))
+              | None -> Output.print_sstring conf "")
 
   (** Calcul les droits de visualisation d'une personne en
       fonction de son age.
