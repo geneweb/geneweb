@@ -654,7 +654,7 @@ val read_nldb : base -> (iper, ifam) Def.NLDB.t
 
 val write_nldb : base -> (iper, ifam) Def.NLDB.t -> unit
 
-val sync : ?scratch:bool -> base -> unit
+val sync : ?scratch:bool -> save_mem:bool -> base -> unit
 (** [sync scratch base]
     Ensure that everything is synced on disk.
 
@@ -666,3 +666,5 @@ val sync : ?scratch:bool -> base -> unit
     the whole database. Otherwise, only changes that occured
     since the last [sync] call are treated.
 *)
+
+val gc : ?dry_run:bool -> save_mem:bool -> base -> int list * int list * int list

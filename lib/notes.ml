@@ -159,8 +159,8 @@ let commit_notes conf base fnotes s =
       (Util.bpath (conf.bname ^ ".gwb"))
       [ base_notes_dir base; fname ]
   in
-  Mutil.mkdir_p (Filename.dirname fpath);
-  Gwdb.commit_notes base fname s;
+  Files.mkdir_p (Filename.dirname fpath);
+  Gwdb.commit_notes base fname s ;
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db base pg s
 

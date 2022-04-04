@@ -8,6 +8,7 @@
    stdlib-shims
    unidecode
    geneweb.def
+   geneweb.system_util
    re
    unix
    uucp
