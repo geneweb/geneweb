@@ -82,9 +82,9 @@ let print_clean_ok conf =
       let history = load_person_history conf f in
       let new_history = clean_history 0 history [] in
       let fname = history_path conf f in
-      (if new_history = [] then Mutil.rm fname
+      if new_history = [] then Files.rm fname
       else
-        let ext_flags =
+        begin let ext_flags =
           [ Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock ]
         in
         match
@@ -94,7 +94,8 @@ let print_clean_ok conf =
         | Some oc ->
             List.iter (fun v -> output_value oc (v : gen_record)) new_history;
             close_out oc
-        | None -> ());
+        | None -> ()
+      end;
       Hutil.trailer conf
   | _ -> Hutil.incorrect_request conf
 
