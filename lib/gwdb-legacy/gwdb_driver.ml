@@ -671,6 +671,6 @@ module type Gwdb_driver = sig
 
     
 end
-
 include (Gwdb_driver_legacy : Gwdb_driver)
+(*include Gwdb_driver_legacy*)
 
