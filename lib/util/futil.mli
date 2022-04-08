@@ -124,3 +124,7 @@ val gen_person_misc_names :
   'a Def.gen_title list ->
   ('a * 'a list) array ->
   'a Def.gen_title list -> string list
+
+val map_cdate : (Def.date -> Def.date) -> Adef.cdate -> Adef.cdate
+val map_death : (Def.date -> Def.date) -> Def.death -> Def.death
+val map_burial :(Def.date -> Def.date) -> Def.burial -> Def.burial
