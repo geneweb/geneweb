@@ -1,12 +1,14 @@
 
-module G = (Gwdb_legacy.Gwdb_driver : Gwdb_legacy.Gwdb_driver.Gwdb_driver
-        with type base = Gwdb_legacy.Gwdb_driver.base
+(*module G = (Gwdb_legacy.Gwdb_driver : Gwdb_legacy.Gwdb_driver.Gwdb_driver
+            with type base = Gwdb_legacy.Gwdb_driver.base
         )
-
+ *)
+module G = Gwdb_legacy.Gwdb_driver
 (*type base = Gwdb_legacy.Gwdb_driver.base*)
 
 include G
-         
+let not_impl _ = assert false
+(*       
 type base =
   | Legacy of G.base
   | Current
@@ -47,7 +49,7 @@ let close_base = function
   | _ -> assert false
 
 
-let not_impl _ = assert false
+
 (* let & base = wrap_base base G.& not_impl *)
 let empty_person base = wrap_base base G.empty_person not_impl
 let empty_family base = wrap_base base G.empty_family not_impl
@@ -127,3 +129,8 @@ let write_nldb base = wrap_base base G.write_nldb not_impl
 
 let sync ?(scratch = false) ~save_mem base = wrap_base base (G.sync ~scratch ~save_mem) not_impl
 let gc ?(dry_run = false) ~save_mem base = wrap_base base (G.gc ~dry_run ~save_mem) not_impl
+
+
+
+ *)
+let gen_person_of_person = not_impl
