@@ -8,7 +8,7 @@ module G = Gwdb_legacy.Gwdb_driver
 
 include G
 let not_impl _ = assert false
-(*       
+
 type base =
   | Legacy of G.base
   | Current
@@ -132,5 +132,7 @@ let gc ?(dry_run = false) ~save_mem base = wrap_base base (G.gc ~dry_run ~save_m
 
 
 
+
+
+(*let gen_person_of_person = not_impl
  *)
-let gen_person_of_person = not_impl
