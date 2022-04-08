@@ -75,3 +75,25 @@ end
     in an array of size [table_size].
 *)
 val name_index : string -> int
+
+(** [empty_person empty quest] returns a Def.gen_person with
+    [first_name] and [surname] initialized to [quest],
+    other 'string field initialized to [empty], and
+    only empty arrays/lists.
+*)
+val empty_person : 'string -> 'string -> (unit, _, 'string) Dbdisk.gen_person
+
+(** Convert:
+    
+    - Generic type used to represent related persons (parents, witnesses of a personal event, etc.)
+    of [Def.gen_person] into another one.
+    - Generic type used to represent another large part of information of [Def.gen_person]
+    into another one.
+    If [fd] is present, apply it on every date (birth, death, titles,, personal events, etc.).
+    Generic type that is used to represent indexation key isn't converted. *)
+val map_person_ps
+  : ?fd:(Def.date -> Def.date)
+  -> ('b -> 'd)
+  -> ('c -> 'e)
+  -> ('a, 'b, 'c) Dbdisk.gen_person
+  -> ('a, 'd, 'e) Dbdisk.gen_person
