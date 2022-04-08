@@ -61,7 +61,7 @@ let gc ?(dry_run = true) ~save_mem base =
     let p = base.data.persons.get i in
     if not (empty_person p) then begin
       markp i ;
-      let _ = Futil.map_person_ps markp marks p in
+      let _ = Dutil.map_person_ps markp marks p in
       let _ = Futil.map_union_f markf @@ base.data.unions.get i in
       let _ = Futil.map_ascend_f markf @@ base.data.ascends.get i in
       ()
@@ -134,9 +134,9 @@ let gc ?(dry_run = true) ~save_mem base =
     let src_istr = Array.get src_istrs in
     let persons =
       Array.init lenp @@ begin fun i ->
-        { (Futil.map_person_ps dst_iper dst_istr @@
-           base.data.persons.get @@
-           src_iper i)
+        { (Dutil.map_person_ps dst_iper dst_istr @@
+             base.data.persons.get @@
+               src_iper i)
           with key_index = i }
       end
     in
