@@ -268,7 +268,7 @@ val gen_descend_of_family : family -> iper Def.gen_descend
 val gen_family_of_family : family -> (iper, ifam, istr) Def.gen_family
 
 (** Extract [gen_person] from [person]. *)
-val gen_person_of_person : person -> (iper, iper, istr) Dbdisk.gen_person
+val gen_person_of_person : person -> (iper, iper, istr) Def.gen_person
 
 (** Extract [gen_ascend] from [person]. *)
 val gen_ascend_of_person : person -> ifam Def.gen_ascend
