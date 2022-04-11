@@ -4,9 +4,11 @@
   (implements geneweb.gwdb_driver)
   (libraries
 	geneweb.gwdb-legacy
+	geneweb.def
   )
   (modules
 	gwdb_driver
+	gwdb_gnwb25
   	dsk_format
 	format
 	partition

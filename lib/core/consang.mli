@@ -24,8 +24,8 @@ type relationship =
 type relationship_info =
   {
     (* Information about topological rank for each person *)
-    tstab : (Gwdb.iper, int) Gwdb.Marker.t
-  ; reltab : (Gwdb.iper, relationship) Gwdb.Marker.t
+    tstab : (Gwdb.iper, int) Common.Marker.t
+  ; reltab : (Gwdb.iper, relationship) Common.Marker.t
   ; mutable queue : Gwdb.iper list array
   }
 
@@ -39,10 +39,10 @@ exception TopologicalSortError of person
 val topological_sort
   : Gwdb.base
   -> (Gwdb.base -> Gwdb.iper -> Gwdb.person)
-  -> (Gwdb.iper, int) Gwdb.Marker.t
+  -> (Gwdb.iper, int) Common.Marker.t
 
 (** Initialise relationship info. *)
-val make_relationship_info : base -> (Gwdb.iper, int) Gwdb.Marker.t -> relationship_info
+val make_relationship_info : base -> (Gwdb.iper, int) Common.Marker.t -> relationship_info
 
 (* Returns relationship rate between two person and common ancestors (is exists). *)
 val relationship_and_links :

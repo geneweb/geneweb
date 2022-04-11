@@ -21,7 +21,6 @@
     gwdb_gc
     iovalue
     outbase
-    gwdb_driver_legacy
     translate
   )
   (private_modules
@@ -32,6 +31,6 @@
     gwdb_gc
     iovalue
     outbase
-    gwdb_driver_legacy
+    translate
   )
 )
