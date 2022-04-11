@@ -4,4 +4,5 @@
  (libraries re)
  (modules adef def gwdb_driver_sig common)
  (wrapped false)
+ (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
 )
