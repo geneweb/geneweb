@@ -1,4 +1,3 @@
-#ifdef GENEWEB_GWDB_VERSIONED
 (library
   (name geneweb_gwdb_versioned)
   (public_name geneweb.gwdb-versioned)
@@ -16,4 +15,3 @@
 	version
   )
 )
-#endif
