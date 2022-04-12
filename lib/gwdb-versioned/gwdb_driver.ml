@@ -4,7 +4,7 @@
 module GLegacy = (Gwdb_legacy.Gwdb_driver (*: Gwdb_driver_sig.Gwdb_driver_S*))
 module G25 = (Gwdb_gnwb25 (*: Gwdb_driver_sig.Gwdb_driver_S*))
 
-include GLegacy
+(*include GLegacy*)
 
 let not_impl _ = assert false
                
@@ -12,22 +12,45 @@ let not_impl _ = assert false
 type base =
   | Legacy of GLegacy.base
   | G25 of G25.base
-(*
-type istr' = int
-  
-type _ istr =
-  Legacy_istr : GLegacy.istr -> GLegacy.istr istr
-| Current_istr : istr' -> istr' istr
- *)
+
+type iper = int
+type istr = int
+type ifam = int
+
+(** Database implementation for [Def.gen_relation] *)
+type relation = (iper, istr) Def.gen_relation
+
+(** Database implementation for [Def.gen_title] *)
+type title = istr Def.gen_title
+
+(** Database implementation for [Def.pers_event] *)
+type pers_event = (iper, istr) Def.gen_pers_event
+
+(** Database implementation for [Def.fam_event] *)
+type fam_event = (iper, istr) Def.gen_fam_event
+
+(** Data structure for optimised search throughout index by name
+    (surname or first name). *)
+type string_person_index =
+  | Legacy_spi of GLegacy.string_person_index
+  | G25_spi of G25.string_person_index
+                
 type person =
   | Legacy_person of GLegacy.person
   | G25_person of G25.person
-type 'a collection = 'a Common.Collection.t
-type ('k, 'v) marker = ('k, 'v) Common.Marker.t
+
+type 'a collection =
+  | Legacy_collection of 'a GLegacy.Collection.t
+  | G25_collection of 'a G25.Collection.t
+
+type ('k, 'v) marker =
+  | Legacy_marker of ('k, 'v) GLegacy.Marker.t
+  | G25_marker of ('k, 'v) G25.Marker.t
 
 type family =
   | Legacy_family of GLegacy.family
   | G25_family of G25.family
+
 let open_base bname =
   
   let bname =
@@ -48,8 +71,8 @@ let open_base bname =
      assert false
   | _ ->
      print_endline "====================YATA24================";
-     Dsk_format.test bname;
-     print_endline "====================TEST PASSED================";
+(*     Dsk_format.test bname;
+     print_endline "====================TEST PASSED================";*)
      Legacy (GLegacy.open_base bname)
      
 (* TODO wrong *)
@@ -64,15 +87,32 @@ let close_base = function
   | G25 base ->
      G25.close_base base
 
+let dummy_iper = GLegacy.dummy_iper
+let dummy_ifam = GLegacy.dummy_ifam
+let empty_string = GLegacy.empty_string
+let quest_string = GLegacy.quest_string
+let eq_istr = GLegacy.eq_istr
+let is_empty_string = GLegacy.is_empty_string
+let is_quest_string = GLegacy.is_quest_string
+let no_person = GLegacy.no_person
+let no_ascend = GLegacy.no_ascend
+let no_union = GLegacy.no_union
+let no_family = GLegacy.no_family
+let no_descend = GLegacy.no_descend
+let no_couple = GLegacy.no_couple
 
-(*
-let get_& person = match person with
-    Legacy_person p -> GLegacy.get_& p
-  | G25_person p -> G25.get_& p
- *)
-    
-(* let & base = wrap_base base GLegacy.& not_impl *)
-(*
+let spi_first spi s = match spi with
+  | Legacy_spi spi -> GLegacy.spi_first spi s
+  | G25_spi spi -> G25.spi_first spi s
+
+let spi_next spi istr = match spi with
+  | Legacy_spi spi -> GLegacy.spi_next spi istr
+  | G25_spi spi -> G25.spi_next spi istr
+                 
+let spi_find spi istr = match spi with
+  | Legacy_spi spi -> GLegacy.spi_find spi istr
+  | G25_spi spi -> G25.spi_find spi istr
+
 module Collection = struct
 
   type 'a t = 'a collection
@@ -95,14 +135,15 @@ module Collection = struct
 
   (* TODO verify index from and until ? *)
   let fold ?from ?until fn acc c =
-    let from = match from with Some x -> x | None -> 0 in
-    let until = match until with Some x -> x + 1 | None -> length c in
-    match c with
-    | Legacy_collection c ->
-       GLegacy.Collection.fold ~from ~until fn acc c
-    | G25_collection c ->
+    print_endline "lets fold";
+    let r = match c with
+      | Legacy_collection c ->
+         GLegacy.Collection.fold ~from ~until fn acc c
+      | G25_collection c ->
        G25.Collection.fold ~from ~until fn acc c
-
+    in
+    print_endline "folded"; r
+    
   let fold_until continue fn acc = function
     | Legacy_collection c ->
        GLegacy.Collection.fold_until continue fn acc c
@@ -126,9 +167,15 @@ module Marker = struct
     | Legacy_marker m -> GLegacy.Marker.set m k
     | G25_marker m -> G25.Marker.set m k
 
-end*)
+end
 
-              
+let string_of_iper = string_of_int
+let string_of_ifam = string_of_int
+let string_of_istr = string_of_int
+let iper_of_string = int_of_string
+let ifam_of_string = int_of_string
+let istr_of_string = int_of_string
+
 let empty_person base iper = match base with
     Legacy b -> Legacy_person (GLegacy.empty_person b iper)
   | G25 b -> G25_person (G25.empty_person b iper)
@@ -317,8 +364,8 @@ let base_visible_get base personf iper = match base with
   | G25 b ->  G25.base_visible_get b (fun p -> personf (G25_person p)) iper
 
 let persons base = match base with
-  | Legacy b -> Common.Collection.map (fun p -> Legacy_person p) (GLegacy.persons b)
-  | G25 b -> Common.Collection.map (fun p -> G25_person p) (G25.persons b)
+  | Legacy b -> Legacy_collection (GLegacy.Collection.map (fun p -> Legacy_person p) (GLegacy.persons b))
+  | G25 b -> G25_collection (G25.Collection.map (fun p -> G25_person p) (G25.persons b))
            
 let empty_family base ifam = match base with
   | Legacy b -> Legacy_family (GLegacy.empty_family b ifam)
@@ -409,42 +456,40 @@ let foi base ifam = match base with
   | G25 b -> G25_family (G25.foi b ifam)
 
 let persons = function
-  | Legacy b -> Common.Collection.map (fun p -> Legacy_person p) @@ GLegacy.persons b
-  | G25 b -> Common.Collection.map (fun p -> G25_person p) @@ G25.persons b
+  | Legacy b -> Legacy_collection (GLegacy.Collection.map (fun p -> Legacy_person p) @@ GLegacy.persons b)
+  | G25 b -> G25_collection (G25.Collection.map (fun p -> G25_person p) @@ G25.persons b)
 
-let ipers = function
-  | Legacy b -> GLegacy.ipers b
-  | G25 b -> G25.ipers b
+let ipers : base -> iper Collection.t = function
+  | Legacy b -> Legacy_collection (GLegacy.ipers b)
+  | G25 b -> G25_collection (G25.ipers b)
 
 let ifams ?(select = fun _ -> true)  = function
-  | Legacy b -> GLegacy.ifams ~select b
-  | G25 b -> G25.ifams ~select b
+  | Legacy b -> Legacy_collection (GLegacy.ifams ~select b)
+  | G25 b -> G25_collection (G25.ifams ~select b)
 
 let families ?(select = fun _ -> true) base : family collection = match base with
   | Legacy b ->
      let select fam = select (Legacy_family fam) in
-     Common.Collection.map (fun fam -> Legacy_family fam) (GLegacy.families ~select b)
+     Legacy_collection (GLegacy.Collection.map (fun fam -> Legacy_family fam) (GLegacy.families ~select b))
   | G25 b ->
      let select fam = select (G25_family fam) in
-     Common.Collection.map (fun fam -> G25_family fam) (G25.families ~select b)
+     G25_collection (G25.Collection.map (fun fam -> G25_family fam) (G25.families ~select b))
 
 (* Is it used ? *)
-let dummy_collection = Common.dummy_collection
-let dummy_marker = Common.dummy_marker
-let iper_marker base (c : iper Common.Collection.t) (v : 'a) : (iper, 'a) Common.Marker.t = match base with
-  | Legacy b -> GLegacy.iper_marker c v
-  | G25 b -> G25.iper_marker c v
+let dummy_collection = not_impl
+let dummy_marker = not_impl
 
-let ifam_marker base (c : ifam Common.Collection.t) (v : 'a) : (ifam, 'a) Common.Marker.t = match base with
-  | Legacy b -> GLegacy.ifam_marker c v
-  | G25 b -> G25.ifam_marker c v
+let iper_marker c v = match c with
+  | Legacy_collection c -> Legacy_marker (GLegacy.iper_marker c v)
+  | G25_collection c -> G25_marker (G25.iper_marker c v)
+
+let ifam_marker c v = match c with
+  | Legacy_collection c -> Legacy_marker (GLegacy.ifam_marker c v)
+  | G25_collection c -> G25_marker (G25.ifam_marker c v)
                       
 let iper_exists base = wrap_base base GLegacy.iper_exists G25.iper_exists
 let ifam_exists base = wrap_base base GLegacy.ifam_exists not_impl
-(*let family_of_gen_family base = wrap_base base GLegacy.family_of_gen_family not_impl*)
-(*let person_of_gen_person base = wrap_base base GLegacy.person_of_gen_person not_impl*)
-(*let poi base = wrap_base base GLegacy.poi not_impl*)
-(*let foi base = wrap_base base GLegacy.foi not_impl*)
+
 let sou base = wrap_base base GLegacy.sou not_impl
 let nb_of_persons base = wrap_base base GLegacy.nb_of_persons not_impl
 let nb_of_real_persons base = wrap_base base GLegacy.nb_of_real_persons not_impl
@@ -475,9 +520,15 @@ let delete_descend base = wrap_base base GLegacy.delete_descend not_impl
 let delete_couple base = wrap_base base GLegacy.delete_couple not_impl
 let person_of_key base = wrap_base base GLegacy.person_of_key not_impl
 let persons_of_name base = wrap_base base GLegacy.persons_of_name not_impl
-let persons_of_first_name base = wrap_base base GLegacy.persons_of_first_name not_impl
-let persons_of_surname base = wrap_base base GLegacy.persons_of_surname not_impl
-(*let base_visible_get base = wrap_base base GLegacy.base_visible_get not_impl*)
+
+let persons_of_first_name = function
+  | Legacy b -> Legacy_spi (GLegacy.persons_of_first_name b)
+  | G25 b -> G25_spi (G25.persons_of_first_name b)
+
+let persons_of_surname = function
+  | Legacy b -> Legacy_spi (GLegacy.persons_of_surname b)
+  | G25 b -> G25_spi (G25.persons_of_surname b)
+
 let base_visible_write base = wrap_base base GLegacy.base_visible_write not_impl
 let base_particles base = wrap_base base GLegacy.base_particles not_impl
 let base_strings_of_first_name base = wrap_base base GLegacy.base_strings_of_first_name not_impl
@@ -504,10 +555,6 @@ let base_notes_origin_file base = wrap_base base GLegacy.base_notes_origin_file 
 let base_notes_dir base = wrap_base base GLegacy.base_notes_dir not_impl
 let base_wiznotes_dir base = wrap_base base GLegacy.base_wiznotes_dir not_impl
 let date_of_last_change base = wrap_base base GLegacy.date_of_last_change not_impl
-(*let ipers base = wrap_base base GLegacy.ipers not_impl*)
-(*let persons base = wrap_base base GLegacy.persons not_impl*)
-(*let ifams ?(select = fun _ -> true) base = wrap_base base (GLegacy.ifams ~select) not_impl*)
-(*let families ?(select = fun _ -> true) base = wrap_base base (GLegacy.families ~select) not_impl*)
 
 let make bname particles arrays = Legacy (GLegacy.make bname particles arrays)
 let read_nldb base = wrap_base base GLegacy.read_nldb not_impl
@@ -515,13 +562,3 @@ let write_nldb base = wrap_base base GLegacy.write_nldb not_impl
 
 let sync ?(scratch = false) ~save_mem base = wrap_base base (GLegacy.sync ~scratch ~save_mem) not_impl
 let gc ?(dry_run = false) ~save_mem base = wrap_base base (GLegacy.gc ~dry_run ~save_mem) not_impl
-
-
-                                                     (*
-let string_of_istr istr = ""
-let istr_of_string s = GLegacy.istr_of_string "4"
-                                                      *)
-
-
-                                                     (*let gen_person_of_person = not_impl
-                                                      *)

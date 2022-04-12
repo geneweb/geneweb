@@ -443,20 +443,98 @@ module Driver : Gwdb_driver_sig.Gwdb_driver_S
     if ifam = dummy_ifam then empty_family base ifam
     else { base ; ifam ; f = None ; c = None ; d = None }
 
+
+  module Collection = struct
+
+    type 'a t =
+      { length : int
+      ; get : int -> 'a option
+      }
+
+    let map (fn : 'a -> 'b) c =
+      { length = c.length
+      ; get = (fun i ->  match c.get i with Some x -> Some (fn x) | None -> None)
+      }
+
+    let length { length ; _ } = length
+
+    let iter fn { get ; length } =
+      for i = 0 to length - 1 do match get i with Some x -> fn x | None -> () done
+
+    let iteri fn { get ; length } =
+      for i = 0 to length - 1 do match get i with Some x -> fn i x | None -> () done
+      
+    let fold ~from ~until fn acc { get ; length } =
+      let from = match from with Some x -> x | None -> 0 in
+      let until = match until with Some x -> x + 1 | None -> length in
+      let rec loop acc i =
+        if i = until then acc
+        else loop (match get i with Some x -> fn acc x | None -> acc) (i + 1)
+      in
+      loop acc from
+
+    let fold_until continue fn acc { get ; length } =
+      let rec loop acc i =
+        if not (continue acc) || i = length then acc
+        else loop (match get i with Some x -> fn acc x | None -> acc) (i + 1)
+      in
+      loop acc 0
+
+    let iterator { get ; length } =
+      let cursor = ref 0 in
+      let rec next () =
+        if !cursor < length then
+          match get !cursor with
+          | None -> incr cursor ; next ()
+          |  v -> incr cursor ; v
+        else None
+      in
+      next
+
+  end
+
+  module Marker = struct
+
+    type ('k, 'v) t =
+      { get : 'k -> 'v
+      ; set : 'k -> 'v -> unit
+      }
+
+    let make (k : 'a -> int) (c : 'a Collection.t) (i : 'v) : ('a, 'v) t =
+      let a = Array.make c.Collection.length i in
+      { get = (fun x -> Array.get a (k x) )
+      ; set = (fun x v -> Array.set a (k x) v) }
+
+    let get ({ get ; _ } : _ t) k = get k
+    let set ({ set ; _ } : _ t) k = set k
+
+  end
+                
+  let dummy_collection _ =
+    { Collection.length = -1
+    ; get = fun _ -> None
+    }
+    
+  let dummy_marker (_ : 'a) (v : 'b) : ('a, 'b) Marker.t =
+    { Marker.get = begin fun _ -> v end
+    ; set = begin fun _ _ -> () end
+    }
+
+    
   let persons base =
-    { Common.Collection.length = nb_of_persons base
+    { Collection.length = nb_of_persons base
     ; get = (fun i -> Some (poi base i))
     }
 
   let ipers base =
-    { Common.Collection.length = nb_of_persons base
+    { Collection.length = nb_of_persons base
     ; get = (fun i -> Some i)
     }
 
-  let iper_marker c i = Common.Marker.make (fun i -> i) c i
+  let iper_marker c i = Marker.make (fun i -> i) c i
 
   let ifams ?(select = fun _ -> true) base =
-    { Common.Collection.length = nb_of_families base
+    { Collection.length = nb_of_families base
     ; get = begin fun i ->
             if select i
             then
@@ -467,7 +545,7 @@ module Driver : Gwdb_driver_sig.Gwdb_driver_S
     }
 
   let families ?(select = fun _ -> true) base =
-    { Common.Collection.length = nb_of_families base
+    { Collection.length = nb_of_families base
     ; get = begin fun i ->
             let f = foi base i in
             if get_ifam f <> dummy_ifam && select f
@@ -476,17 +554,9 @@ module Driver : Gwdb_driver_sig.Gwdb_driver_S
             end
     }
 
-  let dummy_collection _ =
-    { Common.Collection.length = -1
-    ; get = fun _ -> None
-    }
+  let ifam_marker c i = Marker.make (fun i -> i) c i
 
-  let ifam_marker c i = Common.Marker.make (fun i -> i) c i
 
-  let dummy_marker (_ : 'a) (v : 'b) : ('a, 'b) Common.Marker.t =
-    { Common.Marker.get = begin fun _ -> v end
-    ; set = begin fun _ _ -> () end
-    }
 
 
   (* Restrict file *)

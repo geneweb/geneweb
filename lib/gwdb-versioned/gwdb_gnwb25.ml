@@ -13,9 +13,11 @@ type couple = iper Def.gen_couple
 type title = istr Def.gen_title
 type descend = iper Def.gen_descend
 type gen_family = (iper, ifam, istr) Def.gen_family
+type string_person_index
 type base
 type person
 type family
+
 let open_base bname = assert false
 let close_base : base -> unit = not_impl
 let empty_person : base -> iper -> person = not_impl
@@ -63,14 +65,14 @@ let gen_union_of_person : person -> ifam Def.gen_union = not_impl
 let person_of_gen_person :  base -> (iper, iper, istr) Def.gen_person * ifam Def.gen_ascend * ifam Def.gen_union -> person = not_impl
 let poi : base -> iper -> person = not_impl
 let base_visible_get : base -> (person -> bool) -> iper -> bool = not_impl
-(*  
+
 module Collection : sig
   type 'a t
   val map : ('a -> 'b) -> 'a t -> 'b t
   val length : 'a t -> int
   val iter : ('a -> unit) -> 'a t -> unit
   val iteri : (int -> 'a -> unit) -> 'a t -> unit
-  val fold : ?from:int -> ?until:int -> ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
+  val fold : from:int option -> until:int option -> ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
   val fold_until : ('b -> bool) -> ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
   val iterator : 'a t -> unit -> 'a option
 end = struct
@@ -79,7 +81,7 @@ end = struct
   let length = not_impl
   let iter = not_impl
   let iteri = not_impl
-  let fold ?from ?until = not_impl
+  let fold ~from ~until = not_impl
   let fold_until = not_impl
   let iterator = not_impl
 end
@@ -101,9 +103,8 @@ end = struct
 
   let make (k:'a -> int) (c : 'a Collection.t) (i : 'v) : ('a, 'v) t = assert false
 
-end*)
-module Collection = Common.Collection
-module Marker = Common.Marker
+end
+
 
 let persons : base -> person Collection.t = not_impl
 let empty_family : base -> ifam -> family = not_impl
@@ -135,7 +136,11 @@ let ifams : base -> ?select:(ifam -> bool) -> ifam Collection.t = not_impl
 let families : ?select:(family -> bool) -> base -> family Collection.t =
   fun ?(select = fun _ -> true) -> not_impl
 
-let iper_marker c i = Common.Marker.make (fun i -> i) c i
-let ifam_marker c i = Common.Marker.make (fun i -> i) c i
+let iper_marker c i = Marker.make (fun i -> i) c i
+let ifam_marker c i = Marker.make (fun i -> i) c i
 
-
+let spi_first : string_person_index -> string -> istr = not_impl
+let spi_next : string_person_index -> istr -> istr = not_impl
+let spi_find : string_person_index -> istr -> iper list = not_impl
+let persons_of_first_name : base -> string_person_index = not_impl
+let persons_of_surname : base -> string_person_index = not_impl
