@@ -268,7 +268,7 @@ val gen_descend_of_family : family -> iper Def.gen_descend
 val gen_family_of_family : family -> (iper, ifam, istr) Def.gen_family
 
 (** Extract [gen_person] from [person]. *)
-val gen_person_of_person : person -> (iper, iper, istr) Def.gen_person
+val gen_person_of_person : person -> (iper, iper, istr) Dbdisk.gen_person
 
 (** Extract [gen_ascend] from [person]. *)
 val gen_ascend_of_person : person -> ifam Def.gen_ascend
@@ -280,7 +280,7 @@ val gen_union_of_person : person -> ifam Def.gen_union
 val family_of_gen_family : base -> (iper, ifam, istr) Def.gen_family * iper Def.gen_couple * iper Def.gen_descend -> family
 
 (** Create [person] from associated values. *)
-val person_of_gen_person : base -> (iper, iper, istr) Def.gen_person * ifam Def.gen_ascend * ifam Def.gen_union -> person
+val person_of_gen_person : base -> (iper, iper, istr) Dbdisk.gen_person * ifam Def.gen_ascend * ifam Def.gen_union -> person
 
 (** Create uninitialised person with giving id *)
 val poi : base -> iper -> person
@@ -292,7 +292,7 @@ val foi : base -> ifam -> family
 val sou : base -> istr -> string
 
 (** Returns unitialised [gen_person] with giving id *)
-val no_person : iper -> (iper, iper, istr) Def.gen_person
+val no_person : iper -> (iper, iper, istr) Dbdisk.gen_person
 
 (** Returns unitialised [gen_ascend] *)
 val no_ascend : ifam Def.gen_ascend
@@ -325,7 +325,7 @@ val bname : base -> string
 (** Modify/add person with the giving id in the base. New names are added
     to the patched name index for the cosidered person and for evey member of family to
     which he belongs. Modification stay blocked until call of [commit_patches]. *)
-val patch_person : base -> iper -> (iper, iper, istr) Def.gen_person -> unit
+val patch_person : base -> iper -> (iper, iper, istr) Dbdisk.gen_person -> unit
 
 (** Modify/add ascendants of a person with a giving id. Modification stay blocked until
     call of [commit_patches]. *)
@@ -365,7 +365,7 @@ val new_iper : base -> iper
 val new_ifam : base -> ifam
 
 (** Same as [patch_person] *)
-val insert_person : base -> iper -> (iper, iper, istr) Def.gen_person -> unit
+val insert_person : base -> iper -> (iper, iper, istr) Dbdisk.gen_person -> unit
 
 (** Same as [patch_ascend] *)
 val insert_ascend : base -> iper -> ifam Def.gen_ascend -> unit
@@ -631,7 +631,7 @@ val dummy_marker : 'a -> 'b -> ('a, 'b) Marker.t
 val make
     : string
       -> string list
-      -> ( ( (int, int, int) Def.gen_person array
+      -> ( ( (int, int, int) Dbdisk.gen_person array
              * int Def.gen_ascend array
              * int Def.gen_union array )
            * ( (int, int, int) Def.gen_family array

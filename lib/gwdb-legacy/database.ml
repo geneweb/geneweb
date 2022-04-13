@@ -389,14 +389,21 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
   in
   { find ; cursor ; next }
 
-let persons_of_first_name = function
+let persons_of_first_name :
+      base_version -> base_data ->
+      ('a -> Dutil.IntHT.key) * (int, person) Hashtbl.t * 
+        string * string * string -> Dbdisk.string_person_index
+  = function
   | GnWb0024 ->
     new_persons_of_first_name_or_surname (fun _ -> Dutil.compare_fnames) Dutil.compare_fnames_i
   | GnWb0023 | GnWb0022 | GnWb0021 ->
     new_persons_of_first_name_or_surname Dutil.compare_snames Dutil.compare_snames_i
   | GnWb0020 -> old_persons_of_first_name_or_surname
 
-let persons_of_surname = function
+let persons_of_surname :
+      base_version -> base_data ->
+      ('a -> Dutil.IntHT.key) * (int, person) Hashtbl.t * 
+        string * string * string -> Dbdisk.string_person_index = function
   | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 ->
     new_persons_of_first_name_or_surname Dutil.compare_snames Dutil.compare_snames_i
   | GnWb0020 -> old_persons_of_first_name_or_surname
@@ -481,8 +488,8 @@ let old_strings_of_fsname bname strings (_, person_patches) =
         then istr :: acc
         else acc
       in
-      let acc = aux Name.split_fname acc p.first_name in
-      let acc = aux Name.split_sname acc p.surname in
+      let acc = aux Name.split_fname acc p.Dbdisk.first_name in
+      let acc = aux Name.split_sname acc p.Dbdisk.surname in
       acc
     end person_patches (Array.to_list r)
 (**)
@@ -533,10 +540,10 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings (_, 
     end person_patches (Array.to_list r)
 
 let new_strings_of_sname =
-  new_strings_of_fsname_aux 1 0 Name.split_sname (fun p -> p.surname)
+  new_strings_of_fsname_aux 1 0 Name.split_sname (fun p -> p.Dbdisk.surname)
 
 let new_strings_of_fname =
-  new_strings_of_fsname_aux 2 1 Name.split_fname (fun p -> p.first_name)
+  new_strings_of_fsname_aux 2 1 Name.split_fname (fun p -> p.Dbdisk.first_name)
 
 let strings_of_sname = function
   | GnWb0024 | GnWb0023 -> new_strings_of_sname
@@ -773,7 +780,7 @@ let input_synchro bname =
     r
   with _ -> {synch_list = []}
 
-let person_of_key persons strings persons_of_name first_name surname occ =
+let person_of_key (persons : person record_access) strings persons_of_name first_name surname occ =
     let first_name = Mutil.nominative first_name in
     let surname = Mutil.nominative surname in
     let ipl = persons_of_name (first_name ^ " " ^ surname) in
@@ -943,7 +950,7 @@ let opendb bname =
     move_with_backup tmp_fname fname
   in
   let nbp_fname = Filename.concat bname "nb_persons" in
-  let is_empty_name p =
+  let is_empty_name (p : person) =
     (0 = p.surname || 1 = p.surname)
     && (0 = p.first_name || 1 = p.first_name)
   in

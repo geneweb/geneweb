@@ -190,7 +190,7 @@ type place = Def.place =
 
 (* person *)
 
-type ('iper, 'person, 'string) gen_person = ('iper, 'person, 'string) Def.gen_person =
+type ('iper, 'person, 'string) gen_person (*= ('iper, 'person, 'string) Def.gen_person*) =
   { first_name : 'string;
     surname : 'string;
     occ : int;

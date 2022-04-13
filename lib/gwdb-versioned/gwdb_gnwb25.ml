@@ -144,3 +144,21 @@ let spi_next : string_person_index -> istr -> istr = not_impl
 let spi_find : string_person_index -> istr -> iper list = not_impl
 let persons_of_first_name : base -> string_person_index = not_impl
 let persons_of_surname : base -> string_person_index = not_impl
+let no_person : iper -> (iper, ifam, istr) Def.gen_person = not_impl
+let patch_person : base -> iper -> (iper, ifam, istr) Def.gen_person -> unit = not_impl
+let insert_person : base -> iper -> (iper, ifam, istr) Def.gen_person -> unit = not_impl
+
+let make :
+      string ->
+      string list ->
+      (int, int, int) Def.gen_person array ->
+      int Def.gen_ascend array ->
+      int Def.gen_union array ->
+      (int, int, int) Def.gen_family array ->
+      int Def.gen_couple array ->
+      int Def.gen_descend array ->
+      string array ->
+      Def.base_notes ->
+      base
+  = fun bname particles persons ascends unions families couples descends strings notes ->
+  assert false
