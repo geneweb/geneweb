@@ -89,10 +89,14 @@ let close_base = function
   | G25 base ->
      G25.close_base base
 
-let dummy_iper = GLegacy.dummy_iper
-let dummy_ifam = GLegacy.dummy_ifam
-let empty_string = GLegacy.empty_string
-let quest_string = GLegacy.quest_string
+let dummy_iper = -1
+let _ = assert (dummy_iper = GLegacy.dummy_iper)
+let dummy_ifam = -1
+let _ = assert (dummy_ifam = GLegacy.dummy_ifam)
+let empty_string = 0
+let _ = assert (empty_string = GLegacy.empty_string)
+let quest_string = 0
+let _ = assert (quest_string = GLegacy.quest_string)
 let eq_istr = GLegacy.eq_istr
 let is_empty_string = GLegacy.is_empty_string
 let is_quest_string = GLegacy.is_quest_string
