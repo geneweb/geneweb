@@ -61,11 +61,11 @@ let open_base bname =
     try
       let v = really_input_string ic 8 in
       print_endline ("VERSION FOUND : " ^ v);
-      Version.check_version v
+      Geneweb_dsk_format.Version.check_version v
     with _ -> failwith "could not find version number in base"
   in
   match version_opt with
-  | Some Version.GnWb25 ->
+  | Some Geneweb_dsk_format.Version.GnWb25 ->
      print_endline "====================YATA25================";
      assert false
   | _ ->
