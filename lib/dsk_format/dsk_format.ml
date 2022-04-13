@@ -36,7 +36,7 @@ let gnwb_legacy_ft =
     
 module GnWb25 = (struct
                   include GnWb25F
-                  include Gwdb_legacy.Gwdb_driver
+                            (*include Gwdb_legacy.Gwdb_driver*)
                 end (*: Gwdb_legacy.Gwdb_driver.Gwdb_driver*))
               
 let test base_name =
