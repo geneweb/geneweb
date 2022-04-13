@@ -84,13 +84,13 @@ let date_of_last_change base =
 
 let gen_gen_person_misc_names = Dutil.dsk_person_misc_names
 
-let patch_misc_names base ip (p : (iper, iper, istr) Def.gen_person) =
-  let p = { p with Def.key_index = ip } in
+let patch_misc_names base ip (p : (iper, iper, istr) Dbdisk.gen_person) =
+  let p = { p with Dbdisk.key_index = ip } in
   List.iter
     (fun s -> base.func.Dbdisk.patch_name s ip)
-    (gen_gen_person_misc_names base p (fun p -> p.Def.titles))
+    (gen_gen_person_misc_names base p (fun p -> p.Dbdisk.titles))
 
-let patch_person base ip (p : (iper, iper, istr) Def.gen_person) =
+let patch_person base ip (p : (iper, iper, istr) Dbdisk.gen_person) =
   base.func.Dbdisk.patch_person ip p ;
   let s = sou base p.first_name ^ " " ^ sou base p.surname in
   base.func.Dbdisk.patch_name s ip ;
@@ -301,44 +301,44 @@ let cache_uni f ({ base ; iper ; _ } as p) =
 let gen_person_of_person = cache_per (fun p -> p)
 let gen_ascend_of_person = cache_asc (fun p -> p)
 let gen_union_of_person = cache_uni (fun p -> p)
-let get_access = cache_per (fun p -> p.Def.access)
-let get_aliases = cache_per (fun p -> p.Def.aliases)
-let get_baptism = cache_per (fun p -> p.Def.baptism)
-let get_baptism_note = cache_per (fun p -> p.Def.baptism_note)
-let get_baptism_place = cache_per (fun p -> p.Def.baptism_place)
-let get_baptism_src = cache_per (fun p -> p.Def.baptism_src)
-let get_birth = cache_per (fun p -> p.Def.birth)
-let get_birth_note = cache_per (fun p -> p.Def.birth_note)
-let get_birth_place = cache_per (fun p -> p.Def.birth_place)
-let get_birth_src = cache_per (fun p -> p.Def.birth_src)
-let get_burial = cache_per (fun p -> p.Def.burial)
-let get_burial_note = cache_per (fun p -> p.Def.burial_note)
-let get_burial_place = cache_per (fun p -> p.Def.burial_place)
-let get_burial_src = cache_per (fun p -> p.Def.burial_src)
+let get_access = cache_per (fun p -> p.Dbdisk.access)
+let get_aliases = cache_per (fun p -> p.Dbdisk.aliases)
+let get_baptism = cache_per (fun p -> p.Dbdisk.baptism)
+let get_baptism_note = cache_per (fun p -> p.Dbdisk.baptism_note)
+let get_baptism_place = cache_per (fun p -> p.Dbdisk.baptism_place)
+let get_baptism_src = cache_per (fun p -> p.Dbdisk.baptism_src)
+let get_birth = cache_per (fun p -> p.Dbdisk.birth)
+let get_birth_note = cache_per (fun p -> p.Dbdisk.birth_note)
+let get_birth_place = cache_per (fun p -> p.Dbdisk.birth_place)
+let get_birth_src = cache_per (fun p -> p.Dbdisk.birth_src)
+let get_burial = cache_per (fun p -> p.Dbdisk.burial)
+let get_burial_note = cache_per (fun p -> p.Dbdisk.burial_note)
+let get_burial_place = cache_per (fun p -> p.Dbdisk.burial_place)
+let get_burial_src = cache_per (fun p -> p.Dbdisk.burial_src)
 let get_consang = cache_asc (fun a -> a.Def.consang)
-let get_death = cache_per (fun p -> p.Def.death)
-let get_death_note = cache_per (fun p -> p.Def.death_note)
-let get_death_place = cache_per (fun p -> p.Def.death_place)
-let get_death_src = cache_per (fun p -> p.Def.death_src)
+let get_death = cache_per (fun p -> p.Dbdisk.death)
+let get_death_note = cache_per (fun p -> p.Dbdisk.death_note)
+let get_death_place = cache_per (fun p -> p.Dbdisk.death_place)
+let get_death_src = cache_per (fun p -> p.Dbdisk.death_src)
 let get_family = cache_uni (fun u -> u.Def.family)
-let get_first_name = cache_per (fun p -> p.Def.first_name)
-let get_first_names_aliases = cache_per (fun p -> p.Def.first_names_aliases)
-let get_image = cache_per (fun p -> p.Def.image)
-let get_iper = cache_per (fun p -> p.Def.key_index)
-let get_notes = cache_per (fun p -> p.Def.notes)
-let get_occ = cache_per (fun p -> p.Def.occ)
-let get_occupation = cache_per (fun p -> p.Def.occupation)
+let get_first_name = cache_per (fun p -> p.Dbdisk.first_name)
+let get_first_names_aliases = cache_per (fun p -> p.Dbdisk.first_names_aliases)
+let get_image = cache_per (fun p -> p.Dbdisk.image)
+let get_iper = cache_per (fun p -> p.Dbdisk.key_index)
+let get_notes = cache_per (fun p -> p.Dbdisk.notes)
+let get_occ = cache_per (fun p -> p.Dbdisk.occ)
+let get_occupation = cache_per (fun p -> p.Dbdisk.occupation)
 let get_parents = cache_asc (fun a -> a.Def.parents)
-let get_pevents = cache_per (fun p -> p.Def.pevents)
-let get_psources = cache_per (fun p -> p.Def.psources)
-let get_public_name = cache_per (fun p -> p.Def.public_name)
-let get_qualifiers = cache_per (fun p -> p.Def.qualifiers)
-let get_related = cache_per (fun p -> p.Def.related)
-let get_rparents = cache_per (fun p -> p.Def.rparents)
-let get_sex = cache_per (fun p -> p.Def.sex)
-let get_surname = cache_per (fun p -> p.Def.surname)
-let get_surnames_aliases = cache_per (fun p -> p.Def.surnames_aliases)
-let get_titles = cache_per (fun p -> p.Def.titles)
+let get_pevents = cache_per (fun p -> p.Dbdisk.pevents)
+let get_psources = cache_per (fun p -> p.Dbdisk.psources)
+let get_public_name = cache_per (fun p -> p.Dbdisk.public_name)
+let get_qualifiers = cache_per (fun p -> p.Dbdisk.qualifiers)
+let get_related = cache_per (fun p -> p.Dbdisk.related)
+let get_rparents = cache_per (fun p -> p.Dbdisk.rparents)
+let get_sex = cache_per (fun p -> p.Dbdisk.sex)
+let get_surname = cache_per (fun p -> p.Dbdisk.surname)
+let get_surnames_aliases = cache_per (fun p -> p.Dbdisk.surnames_aliases)
+let get_titles = cache_per (fun p -> p.Dbdisk.titles)
 
 (** Families *)
 
@@ -379,8 +379,8 @@ let get_parent_array = cache_cpl (fun c -> Adef.parent_array c)
 let get_relation = cache_fam (fun f -> f.Def.relation)
 let get_witnesses = cache_fam (fun f -> f.Def.witnesses)
 
-let no_person ip =
-  { (Mutil.empty_person empty_string empty_string) with key_index = ip }
+let no_person ip : dsk_person =
+  { (Dutil.empty_person empty_string empty_string) with key_index = ip }
 
 let no_ascend = { parents = None ; consang = Adef.no_consang }
 
