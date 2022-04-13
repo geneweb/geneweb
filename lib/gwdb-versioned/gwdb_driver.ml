@@ -95,7 +95,7 @@ let dummy_ifam = -1
 let _ = assert (dummy_ifam = GLegacy.dummy_ifam)
 let empty_string = 0
 let _ = assert (empty_string = GLegacy.empty_string)
-let quest_string = 0
+let quest_string = 1
 let _ = assert (quest_string = GLegacy.quest_string)
 let eq_istr = GLegacy.eq_istr
 let is_empty_string = GLegacy.is_empty_string
@@ -368,7 +368,6 @@ let gen_union_of_person person = match person with
 let person_of_gen_person base (p, a, u) = match base with
   | Legacy b -> Legacy_person (GLegacy.person_of_gen_person b (p, a, u))
   | G25 b -> G25_person (G25.person_of_gen_person b (p, a, u))
-(*let empty_person base = wrap_base base GLegacy.empty_person not_impl*)
 
 let poi base iper = match base with
   | Legacy b -> Legacy_person (GLegacy.poi b iper)
@@ -471,8 +470,10 @@ let foi base ifam = match base with
   | G25 b -> G25_family (G25.foi b ifam)
 
 let persons = function
-  | Legacy b -> Legacy_collection (GLegacy.Collection.map (fun p -> Legacy_person p) @@ GLegacy.persons b)
-  | G25 b -> G25_collection (G25.Collection.map (fun p -> G25_person p) @@ G25.persons b)
+  | Legacy b ->
+     Legacy_collection (GLegacy.Collection.map (fun p -> Legacy_person p) @@ GLegacy.persons b)
+  | G25 b ->
+     G25_collection (G25.Collection.map (fun p -> G25_person p) @@ G25.persons b)
 
 let ipers : base -> iper Collection.t = function
   | Legacy b -> Legacy_collection (GLegacy.ipers b)
