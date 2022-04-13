@@ -42,11 +42,13 @@ type person =
 type 'a collection =
   | Legacy_collection of 'a GLegacy.Collection.t
   | G25_collection of 'a G25.Collection.t
+  | Dummy_collection
 
 type ('k, 'v) marker =
   | Legacy_marker of ('k, 'v) GLegacy.Marker.t
   | G25_marker of ('k, 'v) G25.Marker.t
-
+  | Dummy_marker
+    
 type family =
   | Legacy_family of GLegacy.family
   | G25_family of G25.family
@@ -120,19 +122,23 @@ module Collection = struct
   let map (fn : 'a -> 'b) c = match c with
     | Legacy_collection c -> Legacy_collection (GLegacy.Collection.map fn c)
     | G25_collection c -> G25_collection (G25.Collection.map fn c)
+    | Dummy_collection -> Dummy_collection
 
   let length = function
     | Legacy_collection c -> GLegacy.Collection.length c
     | G25_collection c -> G25.Collection.length c
+    | Dummy_collection -> -1
 
   let iter fn = function
     | Legacy_collection c -> GLegacy.Collection.iter fn c
     | G25_collection c -> G25.Collection.iter fn c
+    | Dummy_collection -> ()
 
   let iteri fn = function
     | Legacy_collection c -> GLegacy.Collection.iteri fn c
     | G25_collection c -> G25.Collection.iteri fn c
-
+    | Dummy_collection -> ()
+                        
   (* TODO verify index from and until ? *)
   let fold ?from ?until fn acc c =
     print_endline "lets fold";
@@ -140,7 +146,8 @@ module Collection = struct
       | Legacy_collection c ->
          GLegacy.Collection.fold ~from ~until fn acc c
       | G25_collection c ->
-       G25.Collection.fold ~from ~until fn acc c
+         G25.Collection.fold ~from ~until fn acc c
+      | Dummy_collection -> acc
     in
     print_endline "folded"; r
     
@@ -149,10 +156,12 @@ module Collection = struct
        GLegacy.Collection.fold_until continue fn acc c
     | G25_collection c ->
        G25.Collection.fold_until continue fn acc c
-
+    | Dummy_collection -> acc
+      
   let iterator = function
     | Legacy_collection c -> GLegacy.Collection.iterator c
     | G25_collection c -> G25.Collection.iterator c
+    | Dummy_collection -> fun _ -> None
 end
 
 module Marker = struct
@@ -162,10 +171,12 @@ module Marker = struct
   let get m k = match m with
     | Legacy_marker m -> GLegacy.Marker.get m k
     | G25_marker m -> G25.Marker.get m k
+    | Dummy_marker -> raise (Invalid_argument "dummy marker access")
 
-  let set m k = match m with
-    | Legacy_marker m -> GLegacy.Marker.set m k
-    | G25_marker m -> G25.Marker.set m k
+  let set m k v = match m with
+    | Legacy_marker m -> GLegacy.Marker.set m k v
+    | G25_marker m -> G25.Marker.set m k v
+    | Dummy_marker -> ()
 
 end
 
@@ -476,16 +487,18 @@ let families ?(select = fun _ -> true) base : family collection = match base wit
      G25_collection (G25.Collection.map (fun fam -> G25_family fam) (G25.families ~select b))
 
 (* Is it used ? *)
-let dummy_collection = not_impl
-let dummy_marker = not_impl
+let dummy_collection _ = Dummy_collection
+let dummy_marker _ _ = Dummy_marker
 
 let iper_marker c v = match c with
   | Legacy_collection c -> Legacy_marker (GLegacy.iper_marker c v)
   | G25_collection c -> G25_marker (G25.iper_marker c v)
+  | Dummy_collection -> raise (Invalid_argument "iper_marker called with a dummy collection")
 
 let ifam_marker c v = match c with
   | Legacy_collection c -> Legacy_marker (GLegacy.ifam_marker c v)
   | G25_collection c -> G25_marker (G25.ifam_marker c v)
+  | Dummy_collection -> raise (Invalid_argument "ifam_marker called with a dummy collection")
                       
 let iper_exists base = wrap_base base GLegacy.iper_exists G25.iper_exists
 let ifam_exists base = wrap_base base GLegacy.ifam_exists not_impl
