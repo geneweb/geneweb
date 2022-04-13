@@ -1,14 +1,11 @@
 
 
+module GLegacy = Gwdb_legacy.Gwdb_driver
+module G25 = Gwdb_gnwb25
 
-module GLegacy = (Gwdb_legacy.Gwdb_driver (*: Gwdb_driver_sig.Gwdb_driver_S*))
-module G25 = (Gwdb_gnwb25 (*: Gwdb_driver_sig.Gwdb_driver_S*))
-
-(*include GLegacy*)
 
 let not_impl _ = assert false
-               
-(* TODO : implement correctly *)
+
 type base =
   | Legacy of GLegacy.base
   | G25 of G25.base
@@ -100,7 +97,7 @@ let _ = assert (quest_string = GLegacy.quest_string)
 let eq_istr = GLegacy.eq_istr
 let is_empty_string = GLegacy.is_empty_string
 let is_quest_string = GLegacy.is_quest_string
-let no_person = GLegacy.no_person
+let no_person = G25.no_person
 let no_ascend = GLegacy.no_ascend
 let no_union = GLegacy.no_union
 let no_family = GLegacy.no_family
@@ -354,7 +351,7 @@ let get_titles person = match person with
   | G25_person p -> G25.get_titles p
                   
 let gen_person_of_person person = match person with
-    Legacy_person p -> GLegacy.gen_person_of_person p
+    Legacy_person p -> Gwdb_legacy.Translate.as_def_person (GLegacy.gen_person_of_person p)
   | G25_person p -> G25.gen_person_of_person p
 
 let gen_ascend_of_person person = match person with
@@ -366,7 +363,9 @@ let gen_union_of_person person = match person with
   | G25_person p -> G25.gen_union_of_person p
 
 let person_of_gen_person base (p, a, u) = match base with
-  | Legacy b -> Legacy_person (GLegacy.person_of_gen_person b (p, a, u))
+  | Legacy b ->
+     let p = Gwdb_legacy.Translate.as_dsk_person p in
+     Legacy_person (GLegacy.person_of_gen_person b (p, a, u))
   | G25 b -> G25_person (G25.person_of_gen_person b (p, a, u))
 
 let poi base iper = match base with
@@ -513,7 +512,10 @@ let nb_of_persons base = wrap_base base GLegacy.nb_of_persons not_impl
 let nb_of_real_persons base = wrap_base base GLegacy.nb_of_real_persons not_impl
 let nb_of_families base = wrap_base base GLegacy.nb_of_families not_impl
 let bname base = wrap_base base GLegacy.bname not_impl
-let patch_person base = wrap_base base GLegacy.patch_person not_impl
+let patch_person base iper p = match base with
+  | Legacy b -> GLegacy.patch_person b iper (Gwdb_legacy.Translate.as_dsk_person p)
+  | G25 b -> G25.patch_person b iper p
+
 let patch_ascend base = wrap_base base GLegacy.patch_ascend not_impl
 let patch_union base = wrap_base base GLegacy.patch_union not_impl
 let patch_family base = wrap_base base GLegacy.patch_family not_impl
@@ -524,7 +526,10 @@ let commit_patches base = wrap_base base GLegacy.commit_patches not_impl
 let commit_notes base = wrap_base base GLegacy.commit_notes not_impl
 let new_iper base = wrap_base base GLegacy.new_iper not_impl
 let new_ifam base = wrap_base base GLegacy.new_ifam not_impl
-let insert_person base = wrap_base base GLegacy.insert_person not_impl
+let insert_person base iper p = match base with
+  | Legacy b -> GLegacy.insert_person b iper (Gwdb_legacy.Translate.as_dsk_person p)
+  | G25 b -> G25.insert_person b iper p
+
 let insert_ascend base = wrap_base base GLegacy.insert_ascend not_impl
 let insert_union base = wrap_base base GLegacy.insert_union not_impl
 let insert_family base = wrap_base base GLegacy.insert_family not_impl
@@ -574,7 +579,16 @@ let base_notes_dir base = wrap_base base GLegacy.base_notes_dir not_impl
 let base_wiznotes_dir base = wrap_base base GLegacy.base_wiznotes_dir not_impl
 let date_of_last_change base = wrap_base base GLegacy.date_of_last_change not_impl
 
-let make bname particles arrays = Legacy (GLegacy.make bname particles arrays)
+(* .. *)
+let make_g25 bname particles p a u f c d s n =
+  G25.make bname particles p a u f c d s n
+
+
+let make bname particles ((p, a, u), (f, c, d), s, n) =
+  let p = Array.map Gwdb_legacy.Translate.as_dsk_person p in
+  let arrays = ((p, a, u), (f, c, d), s, n) in
+  Legacy (GLegacy.make bname particles arrays)
+
 let read_nldb base = wrap_base base GLegacy.read_nldb not_impl
 let write_nldb base = wrap_base base GLegacy.write_nldb not_impl
 
