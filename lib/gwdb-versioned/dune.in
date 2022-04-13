@@ -6,14 +6,15 @@
   (libraries
 	geneweb.gwdb-legacy
 	geneweb.def
+	geneweb.dsk_format
   )
   (modules
 	gwdb_driver
 	gwdb_gnwb25
-  	dsk_format
-	format
-	partition
-	version
+  	;;dsk_format
+	;;format
+	;;partition
+	;;version
   )
 )
 #endif

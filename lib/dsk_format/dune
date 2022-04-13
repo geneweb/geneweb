@@ -1,0 +1,14 @@
+
+(library
+  (name geneweb_dsk_format)
+  (public_name geneweb.dsk_format)
+  (libraries
+	geneweb.system_util
+  )
+  (modules
+	dsk_format
+	partition
+	format
+	version
+  )
+)
