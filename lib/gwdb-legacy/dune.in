@@ -31,6 +31,5 @@
     gwdb_gc
     iovalue
     outbase
-    translate
   )
 )
