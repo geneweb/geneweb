@@ -1,7 +1,7 @@
 
 
-type t
-   
+(*type t*)
+
 type 'a inchan
 type 'a outchan
 
