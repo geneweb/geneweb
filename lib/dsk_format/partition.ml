@@ -17,6 +17,15 @@
  *)
 
 
+(* TODO : 
+   - implement cached readings
+   - implement patching system :
+     - write (patch committing on disk/pending patches held in memory)
+     - read (readings including patch files on disk and patch held in memory)
+     - patch syncing (writing patches in their respective partitions on disk)
+*)
+
+
 (*type t*)
    
 type 'a inchan = {
