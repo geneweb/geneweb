@@ -8121,7 +8121,7 @@ de: Anmelder/Anmelder/Anmelder
 en: informant/informant/informant
 es: declarante/declarante/declarante
 fi: ilmoittaja/ilmoittajana/ilmoittaja
-fr: déclarant/déclarante/déclarant.e
+fr: déclarant/déclarante/déclarant(e)
 it: dichiarante/dichiarante/dichiarante
 nl: aangever/aangever/aangever
 no: informant/informant/informant
@@ -9473,7 +9473,7 @@ de: zitierte/zitierten
 en: cited/cited
 es: citado/citado
 fi: lainaus/lainaus
-fr: cité/cités
+fr: mentionné/mentionnés
 it: citato/citati
 nl: genoemd/genoemd
 no: sitert/sitert
@@ -9485,7 +9485,7 @@ de: zitierte/zitierte/zitierte
 en: cited/cited/cited
 es: citado/citada/citado
 fi: lainaus/lainaus/lainaus
-fr: cité/citée/cité.e
+fr: mentionné/mentionnée/mentionné(e)
 it: citato/citata/citato
 nl: genoemd/genoemd/genoemd
 no: sitert/sitert/sitert
@@ -11766,7 +11766,7 @@ de: religiöser Amtsträger/religiöser Amtsträger/religiöser Amtsträger
 en: parish registrar/parish registrar/parish registrar
 es: oficiante religioso/oficiante religioso/oficiante religioso
 fi: seurakunnan rekisterinpitäjä/seurakunnan rekisterinpitäjä/seurakunnan rekisterinpitäjä
-fr: officiant religieux/officiante religieuse/officiant.e religieux.se
+fr: officiant religieux/officiante religieuse/officiant(e) religieux(se)
 it: officiante religioso/officiante religioso/officiante religioso
 nl: geestelijk celebrant/geestelijk celebrant/geestelijk celebrant
 no: sogneregistrator/sogneregistrator/sogneregistrator
@@ -12202,7 +12202,7 @@ de: Anwesende/Anwesende/Anwesende
 en: present/present/present  
 es: presente/presente/presente
 fi: läsnäolijat/läsnäolijana/läsnäolijat
-fr: présent/présente/présent.e
+fr: présent/présente/présent(e)
 it: astante/astante/astante
 nl: aanwezig/aanwezig/aanwezig
 no: tilstedeværende/tilstedeværende/tilstedeværende
