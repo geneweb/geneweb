@@ -571,6 +571,7 @@ let string_of_witness_kind : Def.witness_kind -> ('a, unit, string, unit) format
   | Witness_Informant -> Some "#info"
   | Witness_Attending -> Some "#atte"
   | Witness_Mentioned -> Some "#ment"
+  | Witness_Other     -> Some "#othe"
   
 let print_witness opts base gen p =
   Printf.ksprintf (oc opts) "%s %s%s" (correct_string base (get_surname p))

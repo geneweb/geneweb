@@ -90,7 +90,8 @@ let eval_witness_kind = function
   | Witness_ReligiousOfficer -> str_val "reli"
   | Witness_Informant        -> str_val "info"
   | Witness_Attending        -> str_val "atte"
-  | Witness_Mentioned        -> str_val "ment"                              
+  | Witness_Mentioned        -> str_val "ment"
+  | Witness_Other            -> str_val "othe"
   | Witness                  -> str_val ""
 
 let family_events_opt env fam = match get_env "cnt" env with

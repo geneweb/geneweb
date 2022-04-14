@@ -75,6 +75,7 @@ type witness_kind = Def.witness_kind =
   | Witness_Informant
   | Witness_Attending
   | Witness_Mentioned
+  | Witness_Other
 
 type 'string gen_pers_event_name = 'string Def.gen_pers_event_name =
   | Epers_Birth

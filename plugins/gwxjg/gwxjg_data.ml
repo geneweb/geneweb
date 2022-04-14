@@ -417,6 +417,7 @@ and mk_witness_kind = function
   | Def.Witness_Informant        -> Tstr "WITNESS_INFORMANT"
   | Def.Witness_Attending        -> Tstr "WITNESS_ATTENDING"
   | Def.Witness_Mentioned        -> Tstr "WITNESS_MENTIONED"
+  | Def.Witness_Other            -> Tstr "WITNESS_OTHER"
                            
 and mk_event conf base d =
   let module E = Ezgw.Event in

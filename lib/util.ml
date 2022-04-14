@@ -1071,7 +1071,10 @@ let string_of_witness_kind conf sex witness_kind =
   | Witness_Mentioned ->
      let n = index_of_sex sex in
      transl_nth conf "mentioned/mentioned/mentioned" n
-
+  | Witness_Other ->
+     let n = index_of_sex sex in
+     transl_nth conf "other/other/other" n
+     
 let base_path pref bname = !GWPARAM.base_path pref bname
 
 let bpath bname = !GWPARAM.bpath bname

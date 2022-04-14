@@ -675,6 +675,7 @@ let get_event_witness_kind l =
   | "#info" :: l' -> Witness_Informant, l'
   | "#atte" :: l' -> Witness_Attending, l'
   | "#ment" :: l' -> Witness_Mentioned, l'
+  | "#othe" :: l' -> Witness_Other, l'
   | _ -> Witness, l
 
 (** Parses the line containing an information about relationship between parents within family

@@ -117,7 +117,8 @@ type witness_kind =
   | Witness_Informant
   | Witness_Attending
   | Witness_Mentioned
-
+  | Witness_Other
+  
 (** Personal event name. *)
 type 'string gen_pers_event_name =
     Epers_Birth

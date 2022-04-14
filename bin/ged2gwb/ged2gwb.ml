@@ -1305,6 +1305,7 @@ let witness_kind_of_rval rval = match rval with
   | "Informant"          -> Witness_Informant
   | "Attending"          -> Witness_Attending
   | "Mentioned"          -> Witness_Mentioned
+  | "Other"              -> Witness_Other
   | _                    -> Witness
               
 let find_event_witness gen tag ip r =

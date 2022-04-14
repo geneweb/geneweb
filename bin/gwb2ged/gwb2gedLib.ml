@@ -399,7 +399,8 @@ let relation_format_of_witness_kind :
   | Witness_Informant        -> "3 RELA Informant"
   | Witness_Attending        -> "3 RELA Attending"
   | Witness_Mentioned        -> "3 RELA Mentioned"
-                       
+  | Witness_Other            -> "3 RELA Other"
+
 let oc' opts s =
   Printf.ksprintf (oc opts) (s ^^ "\n")
 

@@ -254,6 +254,7 @@ let rec reconstitute_pevents conf ext cnt =
                 | Some "info" -> c, Witness_Informant
                 | Some "atte" -> c, Witness_Attending
                 | Some "ment" -> c, Witness_Mentioned
+                | Some "othe" -> c, Witness_Other
                 | _           -> c, Witness
               in
               let var_w =

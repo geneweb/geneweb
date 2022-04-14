@@ -210,7 +210,8 @@ type witness_kind =
   | Witness_Informant
   | Witness_Attending
   | Witness_Mentioned
-  
+  | Witness_Other
+
 (** Printer for [witness_kind] *)
 val pp_witness_kind :
   Format.formatter ->

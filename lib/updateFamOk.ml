@@ -250,6 +250,7 @@ let rec reconstitute_events conf ext cnt =
                 | Some "info" -> c, Witness_Informant
                 | Some "atte" -> c, Witness_Attending
                 | Some "ment" -> c, Witness_Mentioned
+                | Some "othe" -> c, Witness_Other
                 | _           -> c, Witness
               in
               begin match

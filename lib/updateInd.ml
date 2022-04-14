@@ -359,6 +359,7 @@ and eval_simple_var conf base env p =
                     | Witness_Informant        -> str_val "info"
                     | Witness_Attending        -> str_val "atte"
                     | Witness_Mentioned        -> str_val "ment"
+                    | Witness_Other            -> str_val "othe"
                     | Witness                  -> str_val ""
                   else if
                     i >= 0 && i < 2 && Array.length e.epers_witnesses < 2
