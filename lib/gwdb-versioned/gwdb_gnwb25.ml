@@ -13,6 +13,9 @@ type couple = iper Def.gen_couple
 type title = istr Def.gen_title
 type descend = iper Def.gen_descend
 type gen_family = (iper, ifam, istr) Def.gen_family
+
+
+
 type string_person_index
 
 type base
