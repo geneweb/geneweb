@@ -196,7 +196,8 @@ let read ~(ic : 'a inchan) ~index =
      print_endline @@ "VARIABLE READ LEN FOUND TO BE :" ^ (string_of_int len);
      
      read ic.inchan len ic.conv
-
+     
+     
 (* WRONG *)
 let write_fixed_size ~oc ~index ~value =
   seek_out' oc index;
