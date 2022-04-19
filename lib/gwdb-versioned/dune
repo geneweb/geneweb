@@ -10,14 +10,14 @@
   (modules
 	gwdb_driver
 	gwdb_gnwb25
-	formats
+	gw_formats
   	;;dsk_format
 	;;format
 	;;partition
 	;;version
   )
   (private_modules
-	formats
+	gw_formats
 	gwdb_gnwb25
   )
 )
