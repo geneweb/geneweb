@@ -14,7 +14,9 @@ type title = istr Def.gen_title
 type descend = iper Def.gen_descend
 type gen_family = (iper, ifam, istr) Def.gen_family
 type string_person_index
+
 type base
+
 type person
 type family
 
@@ -145,6 +147,11 @@ let spi_find : string_person_index -> istr -> iper list = not_impl
 let persons_of_first_name : base -> string_person_index = not_impl
 let persons_of_surname : base -> string_person_index = not_impl
 let no_person : iper -> (iper, ifam, istr) Def.gen_person = not_impl
+(*let no_ascend : ifam Def.gen_ascend = assert false
+let no_union : ifam Def.gen_union = {family = [||] }
+let no_family : ifam -> (iper, ifam, istr) Def.gen_family = not_impl
+let no_couple : iper -> (iper, ifam, istr) Def.gen_person = not_impl
+let no_descend : iper -> (iper, ifam, istr) Def.gen_person = not_impl*)
 let patch_person : base -> iper -> (iper, ifam, istr) Def.gen_person -> unit = not_impl
 let insert_person : base -> iper -> (iper, ifam, istr) Def.gen_person -> unit = not_impl
 
