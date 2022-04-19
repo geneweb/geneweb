@@ -47,11 +47,11 @@ val files : t -> file list
 val version : t -> version
 
 (* Builds format *)  
-val make_format : version -> file list -> t
+val make_format : version:version -> files:file list -> t
 (* Builds file *)
-val make_file : filename -> partition list -> file
+val make_file : name:filename -> partitions:partition list -> file
 (* Builds partition *)
-val make_partition : partition_name -> partition_kind -> size_type -> partition    
+val make_partition : name:partition_name -> kind:partition_kind -> size_type:size_type -> partition    
 
 (* the type of informations related to some partition *)  
 type informations
