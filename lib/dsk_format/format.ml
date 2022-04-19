@@ -98,9 +98,10 @@ let filename f = f.filename
 let files ft = ft.files
 let version ft = ft.version
 
-let make_partition name kind size_type = {name; kind; size_type}
+let make_partition ~name ~kind ~size_type = {name; kind; size_type}
 
-let make_file filename partitions =
+let make_file ~name ~partitions =
+  let filename = name in
   let master_table = match partitions with
     | [] | [_] -> None
     | _ ->
@@ -116,7 +117,7 @@ let make_format_environment files =
   env
   
   
-let make_format version files =
+let make_format ~version ~files =
   let env = make_format_environment files in
   {env; version; files}
 
