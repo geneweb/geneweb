@@ -10,5 +10,9 @@
 	partition
 	format
 	version
+	cache
+  )
+  (private_modules
+	cache
   )
 )
