@@ -16,6 +16,7 @@ type size_type =
 type partition_kind =
 | Acc of partition_name (* direct access via offsets arrays *)
 | Dat (* actual data *)
+| Patch of partition_name
 
 type partition = {
     name : partition_name;
@@ -115,8 +116,14 @@ let make_format_environment files =
   let env = FormatEnv.empty in
   let env = List.fold_left (fun e f -> FormatEnv.bind_all_partitions f e) env files in
   env
-  
-  
+
+
+(* TODO perform basic verifications :
+   every partition name is unique
+   every variable size paritition has an access partition
+   every data partition has a patch partition
+   every patch partition has an access partition
+*)
 let make_format ~version ~files =
   let env = make_format_environment files in
   {env; version; files}
