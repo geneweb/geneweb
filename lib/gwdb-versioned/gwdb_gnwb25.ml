@@ -1,5 +1,7 @@
 (*include Gwdb_legacy.Gwdb_driver*)
 
+open Geneweb_dsk_format
+
 let not_impl _ = assert false
 
 type iper = int
@@ -17,11 +19,14 @@ type gen_family = (iper, ifam, istr) Def.gen_family
 
 
 type string_person_index
-
-type base
-
 type person
 type family
+
+type base = {
+    persons_inchan : person Partition.inchan option
+  }
+
+
 
 let open_base bname = assert false
 let close_base : base -> unit = not_impl

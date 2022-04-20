@@ -7,31 +7,31 @@ end = struct
 
   let names_acc_file =
     Format.make_file
-      "names.acc"
-      [Format.make_partition "names access" (Format.Acc "names data") (Format.Fixed 4)]
+      ~name:"names.acc"
+      ~partitions:[Format.make_partition ~name:"names access" ~kind:(Format.Acc "names data") ~size_type:(Format.Fixed 4)]
     
   let gnwb25_format =
     Format.make_format
-      (Version.format_version Version.gnwb25)
-      [names_acc_file]
+      ~version:(Version.format_version Version.gnwb25)
+      ~files:[names_acc_file]
 
 end
 
     
 let names_inx_file =
   Format.make_file
-    "names.inx2"
-    [Format.make_partition "names index" (Format.Dat) (Format.Variable "names access")]
+    ~name:"names.inx2"
+    ~partitions:[Format.make_partition ~name:"names index" ~kind:(Format.Dat) ~size_type:(Format.Variable "names access")]
   
 let names_acc_file =
   Format.make_file
-    "names.acc2"
-    [Format.make_partition "names access" (Format.Acc "names index") (Format.Fixed 4)]
+    ~name:"names.acc2"
+    ~partitions:[Format.make_partition ~name:"names access" ~kind:(Format.Acc "names index") ~size_type:(Format.Fixed 4)]
     
 let gnwb_legacy_ft =
   Format.make_format 
-    (Version.format_version Version.gnwb24)
-    [names_acc_file;
+    ~version:(Version.format_version Version.gnwb24)
+    ~files:[names_acc_file;
      names_inx_file;]
     
 module GnWb25 = (struct

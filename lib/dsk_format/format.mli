@@ -24,17 +24,17 @@ type partition
 type partition_kind =
 | Acc of partition_name (* direct access via offsets arrays to {partition_name} *)
 | Dat (* actual data *)
-
+| Patch of partition_name
 (* Partition content can be either of fixed size or have a variable size,
    when content is of variable size we use another partition to store relations
-   between index and offsets, ie. data corresponding to {index} is stored in the file
+   between index and offsets, ie. data corresponding to {index} is stored in the partition
    at {offset} byte.
 *)
 type size_type =
   Fixed of size
 | Variable of partition_name
 
-(* The type of files *)            
+(* The type of files *)
 type file
 
 (* Returns the partitions stored in the given file, *)   
