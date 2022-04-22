@@ -1,7 +1,7 @@
 (*include Gwdb_legacy.Gwdb_driver*)
 
 open Geneweb_dsk_format
-
+                    
 let not_impl _ = assert false
 
 type iper = int
@@ -22,6 +22,24 @@ type string_person_index
 type person
 type family
 
+module PersonAccess =
+  Partition_system.MakeAccessPartition (struct
+      let filename = "persons_access.acc.gnw25"
+      let ipart = Partition_system.solo_partition_ipart
+    end)
+
+module PersonPartition =
+  Partition_system.MakeVariableSize
+    (struct
+      type data = person
+      let to_bytes = not_impl
+      let of_bytes = not_impl
+      let filename = "persons.data.gnw25"
+      let ipart = Partition_system.solo_partition_ipart
+    end)
+    (PersonAccess)
+  
+   
 type base = {
     persons_inchan : person Partition.inchan option
   }
