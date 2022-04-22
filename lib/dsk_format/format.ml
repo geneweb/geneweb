@@ -45,6 +45,8 @@ module FormatEnv : sig
   val lookup_partition : partition_name -> t -> partition_infos
 
   val bind_all_partitions : file -> t -> t
+
+  val fold : (partition_name -> partition_infos -> 'a -> 'a) -> t -> 'a -> 'a
     
 end = struct
   
@@ -83,7 +85,8 @@ end = struct
     fold_left_i (fun index env partition ->
         bind_partition partition.name f partition index env
       ) e f.partitions
-                            
+
+  let fold f t acc = StrMap.fold f t.partitions_env acc
 end
               
 type format = {
@@ -143,3 +146,6 @@ let content_size_of_partition partition = partition.size_type
 
 let partition_kind partition = partition.kind
 
+let data_partitions format =
+  let partitions = List.flatten (List.map partition_table format.files) in
+  List.filter (fun p -> match p.kind with Dat -> true | _ -> false) partitions
