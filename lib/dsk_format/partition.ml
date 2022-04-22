@@ -1,4 +1,6 @@
 
+                                                         
+
 (**
    Partitions store either :
    - data
@@ -197,7 +199,29 @@ let read ~(ic : 'a inchan) ~index =
      
      read ic.inchan len ic.conv
      
-     
+module MakePatch ( M : sig type t end) = struct
+
+  type t = M.t
+
+  let pend change = assert false
+
+                  
+  (* TODO : check everything is ok before reading or writing in patch file *)                  
+  let read_patches ~base_path ~patch_file =
+    let ic = Stdlib.open_in (Filename.concat base_path patch_file) in
+    let patch = (input_value ic : t) in
+    Stdlib.close_in ic;
+    patch
+    
+  let commit_patches ~base_path ~patch_file ~patch =
+    let oc = Stdlib.open_out (Filename.concat base_path patch_file) in
+    output_value oc patch;
+    Stdlib.close_out oc
+
+end
+
+let sync _ = assert false
+
 (* WRONG *)
 let write_fixed_size ~oc ~index ~value =
   seek_out' oc index;

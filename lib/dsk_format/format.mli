@@ -68,3 +68,5 @@ val file_has_multiple_partitions : file -> bool
 val content_size_of_partition : partition -> size_type
 
 val partition_kind : partition -> partition_kind
+
+val data_partitions : t -> partition list

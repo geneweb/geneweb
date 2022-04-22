@@ -41,3 +41,22 @@ val read_acc : inchan -> int -> int
 
 val read : ic:'a inchan -> index:int -> 'a
 val write : oc:'a outchan -> index:int -> value:'a -> unit
+
+
+module MakePatch (M : sig type t end) : sig
+  
+  type t = M.t
+
+
+  val read_patches :
+    base_path:string ->
+    patch_file:Format.filename ->
+    t
+
+  val commit_patches :
+    base_path:string ->
+    patch_file:Format.filename ->
+    patch:t ->
+    unit
+
+end
