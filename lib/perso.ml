@@ -3999,7 +3999,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
     end
   | "source" ->
     begin match get_env "src" env with
-      | Vstring s -> safe_val (Notes.person_note conf base p s)
+      | Vstring s -> safe_val (Notes.source_note conf base p s)
       | _ -> raise Not_found
     end
   | "surname" ->
