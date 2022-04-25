@@ -47,3 +47,8 @@ val person_note : Config.config -> Gwdb.base -> Gwdb.person -> string -> Adef.sa
     - env is available during [str] interpretation with [i] variable bound to person image
 *)
 val source_note : Config.config -> Gwdb.base -> Gwdb.person -> string -> Adef.safe_string
+
+(** [source_note_with_env conf base env str]
+    Interprets wiki syntax in a "source" context with a predefined env.
+*)
+val source_note_with_env : Config.config -> Gwdb.base -> (char * (unit -> string)) list -> string -> Adef.safe_string
