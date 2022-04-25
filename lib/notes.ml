@@ -192,3 +192,7 @@ let note conf base env str =
 let person_note conf base p str =
   let env = ['i', (fun () -> Util.default_image_name base p)] in
   note conf base env str
+
+let source_note conf base p str =
+  let env = ['i', (fun () -> Util.default_image_name base p)] in
+  source conf base str
