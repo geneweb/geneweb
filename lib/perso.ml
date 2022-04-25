@@ -1699,7 +1699,7 @@ let mode_local env =
 
 let get_note_source conf base env auth no_note note_source =
   if auth && not no_note
-  then Notes.note conf base env note_source
+  then Notes.source_note_with_env conf base env note_source
   else Adef.safe ""
 
 let date_aux conf p_auth date =

@@ -195,4 +195,7 @@ let person_note conf base p str =
 
 let source_note conf base p str =
   let env = ['i', (fun () -> Util.default_image_name base p)] in
-  source conf base str
+  wiki_aux (function [ "<p>" ; x ; "</p>" ] -> [ x ] | x -> x) conf base env str
+
+let source_note_with_env conf base env str =
+  wiki_aux (function [ "<p>" ; x ; "</p>" ] -> [ x ] | x -> x) conf base env str
