@@ -1,6 +1,6 @@
 
 
-
+(*
 module GnWb25F : sig
   val gnwb25_format : Format.t
 end = struct
@@ -113,3 +113,4 @@ let test base_name =
   
   Partition.close_in names_ic;
   print_endline ("========================================" ^ (string_of_int 42 (*value*)))
+ *)

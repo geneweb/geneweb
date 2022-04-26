@@ -20,15 +20,7 @@ let magic_GnWb0022 = "GnWb0022"
 let magic_GnWb0023 = "GnWb0023"
 let magic_GnWb0024 = "GnWb0024"
 let magic_GnWb0025 = "GnWb0025"
- 
-let format_version = function
-  | GnWb20 -> Format.version_of_string magic_GnWb0020
-  | GnWb21 -> Format.version_of_string magic_GnWb0021
-  | GnWb22 -> Format.version_of_string magic_GnWb0022
-  | GnWb23 -> Format.version_of_string magic_GnWb0023
-  | GnWb24 -> Format.version_of_string magic_GnWb0024
-  | GnWb25 -> Format.version_of_string magic_GnWb0025
-
+                   
 let check_version = function
   | "GnWb0020" -> Some gnwb20
   | "GnWb0021" -> Some gnwb21
@@ -37,3 +29,11 @@ let check_version = function
   | "GnWb0024" -> Some gnwb24
   | "GnWb0025" -> Some gnwb25
   | _  -> None
+
+let string_of_version = function
+  | GnWb20 -> magic_GnWb0020
+  | GnWb21 -> magic_GnWb0021
+  | GnWb22 -> magic_GnWb0022
+  | GnWb23 -> magic_GnWb0023
+  | GnWb24 -> magic_GnWb0024
+  | GnWb25 -> magic_GnWb0025

@@ -64,15 +64,17 @@ let open_base bname =
       Geneweb_dsk_format.Version.check_version v
     with _ -> failwith "could not find version number in base"
   in
+  
   match version_opt with
   | Some Geneweb_dsk_format.Version.GnWb25 ->
      print_endline "====================YATA25================";
-     assert false
-  | _ ->
-     print_endline "====================YATA24================";
+     G25 (G25.open_base bname)
+  | Some v ->
+     print_endline @@ "====================YATAV================" ^ (Geneweb_dsk_format.Version.string_of_version v);
 (*     Dsk_format.test bname;
      print_endline "====================TEST PASSED================";*)
      Legacy (GLegacy.open_base bname)
+  | None -> assert false (* should not happen *)
      
 (* TODO wrong *)
 let wrap_base base f g = match base with
