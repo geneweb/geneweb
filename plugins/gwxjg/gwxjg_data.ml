@@ -410,10 +410,15 @@ and mk_rchild conf base acc = mk_rparent_aux begin function
   end conf base acc
 
 and mk_witness_kind = function
-  | Def.Witness -> Tstr "WITNESS"
-  | Def.Witness_GodParent -> Tstr "WITNESS_GODPARENT"
-  | Def.Witness_Officer -> Tstr "WITNESS_OFFICER"
-
+  | Def.Witness                  -> Tstr "WITNESS"
+  | Def.Witness_GodParent        -> Tstr "WITNESS_GODPARENT"
+  | Def.Witness_CivilOfficer     -> Tstr "WITNESS_CIVILOFFICER"
+  | Def.Witness_ReligiousOfficer -> Tstr "WITNESS_RELIGIOUSOFFICER"
+  | Def.Witness_Informant        -> Tstr "WITNESS_INFORMANT"
+  | Def.Witness_Attending        -> Tstr "WITNESS_ATTENDING"
+  | Def.Witness_Mentioned        -> Tstr "WITNESS_MENTIONED"
+  | Def.Witness_Other            -> Tstr "WITNESS_OTHER"
+                           
 and mk_event conf base d =
   let module E = Ezgw.Event in
   let date = match E.date d with Some d -> mk_date d | None -> Tnull in

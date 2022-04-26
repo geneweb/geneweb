@@ -353,9 +353,14 @@ and eval_simple_var conf base env p =
                   let i = i - 1 in
                   if i >= 0 && i < Array.length e.epers_witnesses then
                     match snd e.epers_witnesses.(i) with
-                      Witness_GodParent -> str_val "godp"
-                    | Witness_Officer -> str_val "offi"
-                    | _ -> str_val ""
+                      Witness_GodParent        -> str_val "godp"
+                    | Witness_CivilOfficer     -> str_val "offi"
+                    | Witness_ReligiousOfficer -> str_val "reli"
+                    | Witness_Informant        -> str_val "info"
+                    | Witness_Attending        -> str_val "atte"
+                    | Witness_Mentioned        -> str_val "ment"
+                    | Witness_Other            -> str_val "othe"
+                    | Witness                  -> str_val ""
                   else if
                     i >= 0 && i < 2 && Array.length e.epers_witnesses < 2
                   then

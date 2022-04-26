@@ -71,222 +71,237 @@ let extract_var sini s =
 let bool_val x = VVbool x
 let str_val x = VVstring x
 
-let rec eval_var conf base env (fam, cpl, des) _loc sl =
+module ExtOption = struct
+  let bind o f = match o with
+    | Some v -> f v
+    | None   -> None
+  let get : 'a option -> 'a = function
+    | Some v -> v
+    | None   -> raise (Invalid_argument "option is None")
+  let value o ~default = match o with
+    | Some v -> v
+    | None   -> default
+  let is_none = function None -> true | _ -> false
+end
+
+let eval_witness_kind = function
+  | Witness_GodParent        -> str_val "godp"
+  | Witness_CivilOfficer     -> str_val "offi"
+  | Witness_ReligiousOfficer -> str_val "reli"
+  | Witness_Informant        -> str_val "info"
+  | Witness_Attending        -> str_val "atte"
+  | Witness_Mentioned        -> str_val "ment"
+  | Witness_Other            -> str_val "othe"
+  | Witness                  -> str_val ""
+
+let family_events_opt env fam = match get_env "cnt" env with
+  | Vint i -> List.nth_opt fam.fevents (i - 1)
+  | _      -> None
+
+let witness_person_of_event_opt env e = match get_env "wcnt" env with
+  | Vint i when (i - 1) >= 0 && (i - 1) < Array.length e.efam_witnesses ->
+     Some (fst e.efam_witnesses.(i - 1))
+  | Vint i when (i - 1) >= 0 && (i - 1) < 2 && Array.length e.efam_witnesses < 2 ->
+     Some ("", "", 0, Update.Create (Neuter, None), "")
+  | _      -> None
+
+let ( >>= ) x f = ExtOption.bind x f
+
+let rec eval_fwitness env fam sl =
+  let fwitness_opt =
+    family_events_opt env fam >>= fun e ->
+    witness_person_of_event_opt env e >>= fun p ->
+    eval_key_opt p sl
+  in
+  match fwitness_opt with
+  | Some fw -> fw
+  | None    -> raise Not_found
+
+(* TODO : function logic around array length is not clear  *)
+and eval_child env des sl =
+  let k =
+    match get_env "cnt" env with
+    | Vint i ->
+       let i = i - 1 in
+       if i >= 0 && i < Array.length des.children then des.children.(i)
+       else if i >= 0 && i < 1 && Array.length des.children = 0 then
+         "", "", 0, Update.Create (Neuter, None), ""
+       else raise Not_found
+    | _ -> raise Not_found
+  in
+  eval_key k sl
+
+and eval_var conf base env (fam, cpl, des) _loc sl =
   try eval_special_var conf base sl with
     Not_found -> eval_simple_var conf base env (fam, cpl, des) sl
+
+and eval_bvar conf v =
+  match List.assoc_opt v conf.base_env with
+  | Some v -> VVstring v
+  | None   -> VVstring ""
+
+and eval_divorce fam = match fam.divorce with
+  | Divorced _  -> str_val "divorced"
+  | NotDivorced -> str_val "not_divorced"
+  | Separated   -> str_val "separated"
+
+(* TODO : rewrite, second case with None passed as an argument looks odd *)
+and eval_divorce' fam s = match fam.divorce with
+  | Divorced d -> eval_date_var (Adef.od_of_cdate d) s
+  | _ -> eval_date_var None s
+
+and eval_is_first env = match get_env "first" env with
+  | Vbool x -> bool_val x
+  | _       -> raise Not_found
+
+and eval_is_last env = match get_env "last" env with
+  | Vbool x -> bool_val x
+  | _       -> raise Not_found
+
+(* TODO : feels like it could be simpler *)             
+and eval_parent conf env cpl sl = match get_env "cnt" env with
+  | Vint i ->
+     let arr = Gutil.parent_array cpl in
+     let i = i - 1 in
+     let k = if i >= 0 && i < Array.length arr then arr.(i)
+             else if i >= 0 && i < 1 && Array.length arr = 0 then
+               "", "", 0, Update.Create (Neuter, None), ""
+             else raise Not_found
+     in eval_parent' conf env k sl
+  | _ -> raise Not_found
+
+(* TODO : more array length logic *)
+and eval_witness env fam sl = match get_env "cnt" env with
+  | Vint i ->
+     let i = i - 1 in
+     let k = if i >= 0 && i < Array.length fam.witnesses then fam.witnesses.(i)
+             else if i >= 0 && i < 2 && Array.length fam.witnesses < 2 then
+               "", "", 0, Update.Create (Neuter, None), ""
+             else raise Not_found
+     in eval_key k sl
+  | _ -> raise Not_found
+
+
+(* TODO : rewrite, looks bad *)
+and eval_event_str conf base env fam = match get_env "cnt" env with
+  | Vint i ->
+     begin try
+         let fam = foi base fam.fam_index in
+         let e = List.nth (get_fevents fam) (i - 1) in
+         let name =
+           Utf8.capitalize_fst (Util.string_of_fevent_name conf base e.efam_name)
+         in
+         let date =
+           match Adef.od_of_cdate e.efam_date with
+             Some d -> DateDisplay.string_of_date conf d
+           | None -> ""
+         in
+         let place = Util.string_of_place conf (sou base e.efam_place) in
+         let note = sou base e.efam_note in
+         let src = sou base e.efam_src in
+         let wit =
+           List.fold_right
+             (fun (w, _) accu ->
+               (transl_nth conf "witness/witnesses" 0 ^ ": " ^
+                  Util.person_text conf base (poi base w)) ::
+                 accu)
+             (Array.to_list e.efam_witnesses) []
+         in
+         let s = String.concat ", " [name; date; place; note; src] in
+         let sw = String.concat ", " wit in str_val (s ^ ", " ^ sw)
+       with Failure _ -> str_val ""
+     end
+  | _ -> str_val ""
+
+and eval_has_fwitness env fam =
+  let has_fwitness_opt =
+    family_events_opt env fam >>= fun e ->
+    Some (bool_val (e.efam_witnesses <> [| |]))
+  in try ExtOption.get has_fwitness_opt
+     with Invalid_argument _ -> raise Not_found
+
+(* TODO : rewrite, looks bad *)
+and eval_fwitness_kind env fam = match get_env "cnt" env with
+  | Vint i ->
+     let e =
+       try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None
+     in
+     begin match e with
+       Some e ->
+        begin match get_env "wcnt" env with
+          Vint i ->
+           let i = i - 1 in
+           if i >= 0 && i < Array.length e.efam_witnesses then
+             eval_witness_kind (snd e.efam_witnesses.(i))
+           else if
+             i >= 0 && i < 2 && Array.length e.efam_witnesses < 2
+           then
+             str_val ""
+           else raise Not_found
+        | _ -> raise Not_found
+        end
+     | None -> raise Not_found
+     end
+  | _ -> raise Not_found
+
+
+(* TODO : rewrite, looks bad + find a better name *)       
+and eval_default_var conf s =
+  let v = extract_var "evar_" s in
+  if v <> "" then
+    match p_getenv (conf.env @ conf.henv) v with
+    | Some vv -> str_val (Util.escape_html vv)
+    | None -> str_val ""
+  else
+    let v = extract_var "bvar_" s in
+    let v = if v = "" then extract_var "cvar_" s else v in
+    if v <> "" then
+      str_val (try List.assoc v conf.base_env with Not_found -> "")
+    else raise Not_found
+
+and eval_event_date env fam s =
+  let od = family_events_opt env fam >>= fun e ->
+           Adef.od_of_cdate e.efam_date
+  in eval_date_var od s
+
 and eval_simple_var conf base env (fam, cpl, des) =
   function
-    ["bvar"; v] ->
-      begin try VVstring (List.assoc v conf.base_env) with
-        Not_found -> VVstring ""
-      end
-  | "child" :: sl ->
-      let k =
-        match get_env "cnt" env with
-          Vint i ->
-            let i = i - 1 in
-            if i >= 0 && i < Array.length des.children then des.children.(i)
-            else if i >= 0 && i < 1 && Array.length des.children = 0 then
-              "", "", 0, Update.Create (Neuter, None), ""
-            else raise Not_found
-        | _ -> raise Not_found
-      in
-      eval_key k sl
-  | ["cnt"] -> eval_int_env "cnt" env
-  | ["comment"] -> str_val (Util.escape_html fam.comment)
-  | ["digest"] -> eval_string_env "digest" env
-  | ["divorce"] ->
-      let s =
-        match fam.divorce with
-          Divorced _ -> "divorced"
-        | NotDivorced -> "not_divorced"
-        | Separated -> "separated"
-      in
-      str_val s
-  | ["divorce"; s] ->
-      let d =
-        match fam.divorce with
-          Divorced d -> Adef.od_of_cdate d
-        | _ -> None
-      in
-      eval_date_var d s
-  | "father" :: sl -> eval_key (Gutil.father cpl) sl
-  | ["fsources"] -> str_val (Util.escape_html fam.fsources)
-  | ["is_first"] ->
-      begin match get_env "first" env with
-        Vbool x -> bool_val x
-      | _ -> raise Not_found
-      end
-  | ["is_last"] ->
-      begin match get_env "last" env with
-        Vbool x -> bool_val x
-      | _ -> raise Not_found
-      end
-  | ["marriage"; s] -> eval_date_var (Adef.od_of_cdate fam.marriage) s
+  | ["bvar"; v]        -> eval_bvar conf v
+  | "child" :: sl      -> eval_child env des sl
+  | ["cnt"]            -> eval_int_env "cnt" env
+  | ["comment"]        -> str_val (Util.escape_html fam.comment)
+  | ["digest"]         -> eval_string_env "digest" env
+  | ["divorce"]        -> eval_divorce fam
+  | ["divorce"; s]     -> eval_divorce' fam s
+  | "father" :: sl     -> eval_key (Gutil.father cpl) sl
+  | ["fsources"]       -> str_val (Util.escape_html fam.fsources)
+  | ["is_first"]       -> eval_is_first env
+  | ["is_last"]        -> eval_is_last env
+  | ["marriage"; s]    -> eval_date_var (Adef.od_of_cdate fam.marriage) s
   | ["marriage_place"] -> str_val (Util.escape_html fam.marriage_place)
-  | ["marriage_note"] -> str_val (Util.escape_html fam.marriage_note)
-  | ["marriage_src"] -> str_val (Util.escape_html fam.marriage_src)
-  | ["mrel"] -> str_val (eval_relation_kind fam.relation)
-  | ["nb_fevents"] -> str_val (string_of_int (List.length fam.fevents))
-  | ["origin_file"] -> str_val (Util.escape_html fam.origin_file)
-  | "parent" :: sl ->
-      let k =
-        match get_env "cnt" env with
-          Vint i ->
-            let arr = Gutil.parent_array cpl in
-            let i = i - 1 in
-            if i >= 0 && i < Array.length arr then arr.(i)
-            else if i >= 0 && i < 1 && Array.length arr = 0 then
-              "", "", 0, Update.Create (Neuter, None), ""
-            else raise Not_found
-        | _ -> raise Not_found
-      in
-      eval_parent conf env k sl
-  | ["wcnt"] -> eval_int_env "wcnt" env
-  | "witness" :: sl ->
-      let k =
-        match get_env "cnt" env with
-          Vint i ->
-            let i = i - 1 in
-            if i >= 0 && i < Array.length fam.witnesses then fam.witnesses.(i)
-            else if i >= 0 && i < 2 && Array.length fam.witnesses < 2 then
-              "", "", 0, Update.Create (Neuter, None), ""
-            else raise Not_found
-        | _ -> raise Not_found
-      in
-      eval_key k sl
-  | ["has_fevents"] -> bool_val (fam.fevents <> [])
-  | "event" :: sl ->
-      let e =
-        match get_env "cnt" env with
-          Vint i ->
-            (try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None)
-        | _ -> None
-      in
-      eval_event_var e sl
-  | ["event_date"; s] ->
-      let od =
-        match get_env "cnt" env with
-          Vint i ->
-            begin try
-              let e = List.nth fam.fevents (i - 1) in
-              Adef.od_of_cdate e.efam_date
-            with Failure _ -> None
-            end
-        | _ -> None
-      in
-      eval_date_var od s
-  | ["event_str"] ->
-      begin match get_env "cnt" env with
-        Vint i ->
-          begin try
-            let fam = foi base fam.fam_index in
-            let e = List.nth (get_fevents fam) (i - 1) in
-            let name =
-              Utf8.capitalize_fst (Util.string_of_fevent_name conf base e.efam_name)
-            in
-            let date =
-              match Adef.od_of_cdate e.efam_date with
-                Some d -> DateDisplay.string_of_date conf d
-              | None -> ""
-            in
-            let place = Util.string_of_place conf (sou base e.efam_place) in
-            let note = sou base e.efam_note in
-            let src = sou base e.efam_src in
-            let wit =
-              List.fold_right
-                (fun (w, _) accu ->
-                   (transl_nth conf "witness/witnesses" 0 ^ ": " ^
-                    Util.person_text conf base (poi base w)) ::
-                   accu)
-                (Array.to_list e.efam_witnesses) []
-            in
-            let s = String.concat ", " [name; date; place; note; src] in
-            let sw = String.concat ", " wit in str_val (s ^ ", " ^ sw)
-          with Failure _ -> str_val ""
-          end
-      | _ -> str_val ""
-      end
-  | ["has_fwitness"] ->
-      begin match get_env "cnt" env with
-        Vint i ->
-          let e =
-            try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None
-          in
-          begin match e with
-            Some e -> bool_val (e.efam_witnesses <> [| |])
-          | None -> raise Not_found
-          end
-      | _ -> raise Not_found
-      end
-  | "fwitness" :: sl ->
-      begin match get_env "cnt" env with
-        Vint i ->
-          let e =
-            try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None
-          in
-          begin match e with
-            Some e ->
-              begin match get_env "wcnt" env with
-                Vint i ->
-                  let i = i - 1 in
-                  let k =
-                    if i >= 0 && i < Array.length e.efam_witnesses then
-                      fst e.efam_witnesses.(i)
-                    else if
-                      i >= 0 && i < 2 && Array.length e.efam_witnesses < 2
-                    then
-                      "", "", 0, Update.Create (Neuter, None), ""
-                    else raise Not_found
-                  in
-                  eval_key k sl
-              | _ -> raise Not_found
-              end
-          | None -> raise Not_found
-          end
-      | _ -> raise Not_found
-      end
-  | ["fwitness_kind"] ->
-      begin match get_env "cnt" env with
-        Vint i ->
-          let e =
-            try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None
-          in
-          begin match e with
-            Some e ->
-              begin match get_env "wcnt" env with
-                Vint i ->
-                  let i = i - 1 in
-                  if i >= 0 && i < Array.length e.efam_witnesses then
-                    match snd e.efam_witnesses.(i) with
-                      Witness_GodParent -> str_val "godp"
-                    | Witness_Officer -> str_val "offi"
-                    | _ -> str_val ""
-                  else if
-                    i >= 0 && i < 2 && Array.length e.efam_witnesses < 2
-                  then
-                    str_val ""
-                  else raise Not_found
-              | _ -> raise Not_found
-              end
-          | None -> raise Not_found
-          end
-      | _ -> raise Not_found
-      end
-  | [s] ->
-      let v = extract_var "evar_" s in
-      if v <> "" then
-        match p_getenv (conf.env @ conf.henv) v with
-          Some vv -> str_val (Util.escape_html vv)
-        | None -> str_val ""
-      else
-        let v = extract_var "bvar_" s in
-        let v = if v = "" then extract_var "cvar_" s else v in
-        if v <> "" then
-          str_val (try List.assoc v conf.base_env with Not_found -> "")
-        else raise Not_found
+  | ["marriage_note"]  -> str_val (Util.escape_html fam.marriage_note)
+  | ["marriage_src"]   -> str_val (Util.escape_html fam.marriage_src)
+  | ["mrel"]           -> str_val (eval_relation_kind fam.relation)
+  | ["nb_fevents"]     -> str_val (string_of_int (List.length fam.fevents))
+  | ["origin_file"]    -> str_val (Util.escape_html fam.origin_file)
+  | "parent" :: sl     -> eval_parent conf env cpl sl
+  | ["wcnt"]           -> eval_int_env "wcnt" env
+  | "witness" :: sl    -> eval_witness env fam sl
+  | ["has_fevents"]    -> bool_val (fam.fevents <> [])
+  | "event" :: sl      ->
+     let e = family_events_opt env fam in
+     eval_event_var e sl
+  | ["event_date"; s]  -> eval_event_date env fam s
+  | ["event_str"]      -> eval_event_str conf base env fam
+  | ["has_fwitness"]   -> eval_has_fwitness env fam
+  | "fwitness" :: sl   -> eval_fwitness env fam sl
+  | ["fwitness_kind"]  -> eval_fwitness_kind env fam
+  | [s]                -> eval_default_var conf s
   | _ -> raise Not_found
+
 and eval_date_var od s = str_val (eval_date_var_aux od s)
+
+(* TODO : rewrite, looks bad *)
 and eval_date_var_aux od =
   function
     "calendar" ->
@@ -418,7 +433,8 @@ and eval_event_var e =
       | _ -> str_val ""
       end
   | _ -> raise Not_found
-and eval_parent conf env k =
+
+and eval_parent' conf env k =
   function
     ["himher"] ->
       let s =
@@ -430,6 +446,7 @@ and eval_parent conf env k =
       in
       str_val s
   | sl -> eval_key k sl
+
 and eval_key (fn, sn, oc, create, _) =
   function
     ["create"] -> str_val (if create <> Update.Link then "create" else "link")
@@ -438,6 +455,10 @@ and eval_key (fn, sn, oc, create, _) =
   | ["occ"] -> str_val (if oc = 0 then "" else string_of_int oc)
   | ["surname"] -> str_val (Util.escape_html sn)
   | _ -> raise Not_found
+
+and eval_key_opt p sl = Some (eval_key p sl)
+
+(* TODO : looks bad *)
 and eval_create c =
   function
     "birth_day" ->
@@ -562,6 +583,7 @@ and eval_relation_kind =
   | MarriageLicense -> "license"
   | Pacs -> "pacs"
   | Residence ->"residence"
+(* TODO looks bad *)
 and eval_special_var conf base =
   function
     ["include_perso_header"] -> (* TODO merge with mainstream includes ?? *)

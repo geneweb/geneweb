@@ -109,8 +109,16 @@ type 'string gen_title =
     t_nth : int }
 
 (** Witness kind for an event *)
-type witness_kind = Witness | Witness_GodParent | Witness_Officer
-
+type witness_kind =
+  | Witness
+  | Witness_GodParent
+  | Witness_CivilOfficer
+  | Witness_ReligiousOfficer
+  | Witness_Informant
+  | Witness_Attending
+  | Witness_Mentioned
+  | Witness_Other
+  
 (** Personal event name. *)
 type 'string gen_pers_event_name =
     Epers_Birth

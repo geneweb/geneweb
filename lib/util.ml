@@ -1051,12 +1051,30 @@ let string_of_fevent conf base = function
 
 let string_of_witness_kind conf sex witness_kind =
   match witness_kind with
-    Witness -> transl_nth conf "witness/witness/witnesses" 0
-  | Witness_Officer -> transl_nth conf "officer/officer/officers" 0
+  | Witness ->
+     transl_nth conf "witness/witness/witnesses" 0
+  | Witness_CivilOfficer ->
+     let n = index_of_sex sex in     
+     transl_nth conf "civil registrar/civil registrar/civil registrar" n
   | Witness_GodParent ->
-      let n = index_of_sex sex in
-      transl_nth conf "godfather/godmother/godparents" n
-
+     let n = index_of_sex sex in
+     transl_nth conf "godfather/godmother/godparents" n
+  | Witness_ReligiousOfficer ->
+     let n = index_of_sex sex in
+     transl_nth conf "parrish registrar/parrish registrar/parrish registrar" n
+  | Witness_Informant ->
+     let n = index_of_sex sex in
+     transl_nth conf "informant/informant/informant" n
+  | Witness_Attending ->
+     let n = index_of_sex sex in
+     transl_nth conf "present/present/present" n
+  | Witness_Mentioned ->
+     let n = index_of_sex sex in
+     transl_nth conf "mentioned/mentioned/mentioned" n
+  | Witness_Other ->
+     let n = index_of_sex sex in
+     transl_nth conf "other/other/other" n
+     
 let base_path pref bname = !GWPARAM.base_path pref bname
 
 let bpath bname = !GWPARAM.bpath bname

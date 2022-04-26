@@ -562,6 +562,17 @@ let empty_family base m =
   bogus_person base m.m_fath && bogus_person base m.m_moth &&
   Array.for_all (bogus_person base) m.m_chil
 
+let string_of_witness_kind : Def.witness_kind -> ('a, unit, string, unit) format4 option
+  = function
+  | Witness_GodParent -> Some "#godp"
+  | Witness -> None
+  | Witness_CivilOfficer -> Some "#offi"
+  | Witness_ReligiousOfficer -> Some "#reli"
+  | Witness_Informant -> Some "#info"
+  | Witness_Attending -> Some "#atte"
+  | Witness_Mentioned -> Some "#ment"
+  | Witness_Other     -> Some "#othe"
+  
 let print_witness opts base gen p =
   Printf.ksprintf (oc opts) "%s %s%s" (correct_string base (get_surname p))
     (correct_string base (get_first_name p))
@@ -656,9 +667,10 @@ let print_pevent opts base gen e =
            | _ -> ()
          end;
          Printf.ksprintf (oc opts) ": ";
-         begin match wk with
-             Witness_GodParent -> Printf.ksprintf (oc opts) "#godp "
-           | _ -> ()
+         let sk = string_of_witness_kind wk in
+         begin match sk with
+         | Some s -> Printf.ksprintf (oc opts) (s ^^ " ")
+         | None -> ()
          end;
          print_witness opts base gen p;
          Printf.ksprintf (oc opts) "\n")
@@ -760,9 +772,10 @@ let print_fevent opts base gen in_comment e =
            | _ -> ()
          end;
          Printf.ksprintf (oc opts) ": ";
-         begin match wk with
-             Witness_GodParent -> Printf.ksprintf (oc opts) "#godp "
-           | _ -> ()
+         let sk = string_of_witness_kind wk in
+         begin match sk with
+         | Some s -> Printf.ksprintf (oc opts) (s ^^ " ")
+         | None -> ()
          end;
          print_witness opts base gen p;
          print_sep ())
@@ -987,9 +1000,10 @@ let print_notes_for_person opts base gen p =
            | _ -> ()
          end;
          Printf.ksprintf (oc opts) ": ";
-         begin match wk with
-             Witness_GodParent -> Printf.ksprintf (oc opts) "#godp "
-           | _ -> ()
+         let sk = string_of_witness_kind wk in
+         begin match sk with
+         | Some s -> Printf.ksprintf (oc opts) (s ^^ " ")
+         | None -> ()
          end;
          print_witness opts base gen p;
          Printf.ksprintf (oc opts) "\n")
