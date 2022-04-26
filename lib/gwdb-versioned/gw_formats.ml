@@ -1,5 +1,5 @@
 
-
+(*
 open Geneweb_dsk_format
 
 let make_variable_dat_part ~name ~acc_name =
@@ -42,3 +42,4 @@ end
 
 
 include GnWb25
+ *)
