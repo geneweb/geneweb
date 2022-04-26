@@ -15,5 +15,8 @@
   )
   (private_modules
 	cache
+	partition
+	dsk_format
+	format
   )
 )

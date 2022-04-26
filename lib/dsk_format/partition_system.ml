@@ -145,3 +145,31 @@ module MakeVariableSize (P : Partition_S) (AP : AccessPartitionSystem) : Partiti
 
                      
 end
+
+module type Patch_S = sig
+  type t
+  val read_patches : base_path:string -> t
+  val commit_patches : base_path:string -> patch:t -> unit
+end
+
+module type Patch_I = sig
+  type t
+  val filename : string
+end
+
+module MakePatch (P : Patch_I) : Patch_S with type t = P.t = struct
+  type t = P.t
+
+  (* TODO perform checks *)
+  let read_patches ~base_path =
+    let ic = Secure.open_in (Filename.concat base_path P.filename) in
+    let patch = (input_value ic : t) in
+    close_in ic;
+    patch
+    
+  let commit_patches ~base_path ~patch =
+    let oc = Secure.open_out (Filename.concat base_path P.filename) in
+    output_value oc patch;
+    close_out oc
+    
+end
