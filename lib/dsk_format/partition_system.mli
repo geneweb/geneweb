@@ -43,12 +43,23 @@ module type FixedSizePartition_S = sig
   include Partition_S
   val data_bytes_size : int 
 end
-
-
-
+                                 
 module MakeAccessPartition (P : AccessPartition_S) : AccessPartitionSystem
 
 module MakeFixedSize (P : FixedSizePartition_S) : PartitionSystem
 
 module MakeVariableSize (P : Partition_S) (AP : AccessPartitionSystem) : PartitionSystem
 
+
+module type Patch_S = sig
+  type t
+  val read_patches : base_path:string -> t
+  val commit_patches : base_path:string -> patch:t -> unit
+end
+
+module type Patch_I = sig
+  type t
+  val filename : string
+end
+
+module MakePatch (P : Patch_I) : Patch_S with type t = P.t

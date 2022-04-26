@@ -14,6 +14,6 @@ val gnwb23 : gnwb_version
 val gnwb24 : gnwb_version
 val gnwb25 : gnwb_version
 
-val format_version : gnwb_version -> Format.version
-
 val check_version : string -> gnwb_version option
+
+val string_of_version : gnwb_version -> string
