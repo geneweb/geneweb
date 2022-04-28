@@ -375,7 +375,9 @@ let print_link_name conf base n p1 p2 sol =
   if n > 1 then begin
     Output.print_sstring conf " " ;
     Output.print_sstring conf (transl conf "also") ;
-  end ;
+    end
+  else
+    Output.print_sstring conf " ";
   let (s, sp1, sp2) =
     let ini_p1 = p1
     and ini_p2 = p2 in
@@ -855,9 +857,10 @@ let print_main_relationship conf base long p1 p2 rel =
       Output.print_sstring conf " (" ;
       Output.print_sstring conf (Sosa.to_string_sep (transl conf "(thousand separator)") total) ;
       Output.print_sstring conf " " ;
-      (if Sosa.eq total Sosa.one then 0 else 1)
+      ((if Sosa.eq total Sosa.one then 0 else 1)
       |> transl_nth conf "relationship link/relationship links"
-      |> Output.print_sstring conf
+      |> Output.print_sstring conf);
+      Output.print_sstring conf ")"
     end
   in
   Hutil.header conf title;
