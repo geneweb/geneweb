@@ -3902,7 +3902,7 @@ sv: ändrade ordningen för barnen
 tr: çocukların sırasını değiştirme
 
     changed order of family's events
-co: cambiu di l’ordine di l’avvenimenti famigliale
+co: cambiu di l’ordine di l’evenimenti famigliale
 de: ändern der Reihenfolge familiärer Ereignisse
 en: change order of family events
 es: cambio del orden de los acontecimientos familiares
@@ -3931,7 +3931,7 @@ sv: Ändrade ordningen för giftermål
 tr: Evlilik düzeni değiştirildi
 
     changed order of person's events
-co: cambiu di l’ordine di l’avvenimenti di l’individuu
+co: cambiu di l’ordine di l’evenimenti di l’individuu
 de: ändern der Reihenfolge bei Ereignissen des Individuums
 en: change order of individual events
 es: cambio del orden de los acontecimientos del individuo
@@ -4034,6 +4034,7 @@ sv: Omskärellse
 tr: Sünnet
 
     civil registrar/civil registrar/civil registrar
+co: officiale di u statu civile/officiale di u statu civile/officiale di u statu civile
 de: Standesbeamter/Standesbeamter/Standesbeamter
 en: civil registrar/civil registrar/civil registrar
 es: oficial del registro civil/oficial del registro civil/oficial del registro civil
@@ -4046,6 +4047,7 @@ pt: escrivão civil/escrivão civil/escrivão civil
 sv: civila register/civila register/civila register
 
     civil registrar/civil registrars
+co: officiale di u statu civile/officiali di u statu civile
 de: Standesbeamter/Standesbeamte
 en: civil registrar/civil registrars
 es: oficial del registro civil/registradores civiles
@@ -4665,7 +4667,7 @@ sv: Kremering
 tr: Ölü yakma
 
     custom event
-co: avvenimentu persunalizatu
+co: evenimentu persunalizatu
 de: benutzerdefiniertes Ereignis
 en: custom event
 fr: événement personnalisé
@@ -8117,6 +8119,7 @@ sv: anteckningar om personen
 tr: bireysel not
 
     informant/informant/informant
+co: dichjarante/dichjarante/dichjarante
 de: Anmelder/Anmelder/Anmelder
 en: informant/informant/informant
 es: declarante/declarante/declarante
@@ -8129,6 +8132,7 @@ pt: informante/informante/informante
 sv: informatör/informatör/informatör
 
     informant/informants
+co: dichjarante/dichjaranti
 de: Deklarant/Deklaranten
 en: informant/informants
 es: declarante/declarantes
@@ -8617,7 +8621,7 @@ sv: länk
 tr: bağlantı
 
     link back to parents
-co: liame di ritornu ver di i genitori
+co: liame di ritornu versu i genitori
 en: link back to parents
 fr: lien retour vers les parents
 no: lenke til foreldre
@@ -8658,7 +8662,7 @@ sv: släktskap emellan
 tr: arasındaki ilişki
 
     link to children
-co: liame ver di i zitelli
+co: liame versu i zitelli
 en: link to children
 fr: lien vers les enfants
 no: lenke til barn
@@ -9232,13 +9236,13 @@ tr: evlilik notları/evlilik notları
     marriage of %t after his/her death
 co: matrimoniu di %t dopu a so morte
 en: marriage of %t after his/her death
-fr: marriage de %t après son décès
+fr: mariage de %t après son décès
 lt: santuoka po %t mirties
 
     marriage of %t before his/her birth
 co: matrimoniu di %t nanzu a so nascita
 en: marriage of %t before his/her birth
-fr: marriage de %t avant sa naissance
+fr: mariage de %t avant sa naissance
 lt: %t susituokė prieš gimdamas 
 
     marriage place
@@ -9469,6 +9473,7 @@ sv: maximalt
 tr: maksimum
 
     mentioned/mentioned
+co: mintulatu/mintulati
 de: zitierte/zitierten
 en: cited/cited
 es: citado/citado
@@ -9481,6 +9486,7 @@ pt: citado/citados
 sv: citerad/citerad
 
     mentioned/mentioned/mentioned
+co: mintulatu/mintulata/mintulatu(a)
 de: zitierte/zitierte/zitierte
 en: cited/cited/cited
 es: citado/citada/citado
@@ -9808,7 +9814,7 @@ sv: datum saknas
 tr: tarih yok
 
     missing events
-co: avvenimenti assente
+co: evenimenti assente
 de: Fehlende Ereignisse
 en: missing events
 es: faltan eventos
@@ -9975,7 +9981,7 @@ sv: ändra
 tr: Güncelleme
 
     modify family %s event order
-co: intervertisce l’avvenimenti di a famiglia %s
+co: intervertisce l’evenimenti di a famiglia %s
 en: permute the events of family %s
 fr: permuter les événements de la famille %s
 pt: permutar os eventos da família %s
@@ -9983,7 +9989,7 @@ sv: ändra ordningen för %s familjehändelser
 tr: %s ailesinin etkinliklerini değiştir
 
     modify person event order
-co: intervertisce l’avvenimenti individuali
+co: intervertisce l’evenimenti individuali
 en: permute personnal events
 fr: permuter les événéments individuels
 pt: permutar os eventos individuais
@@ -10396,7 +10402,7 @@ sv: barn
 tr: Çocuklar
 
     nb events
-co: num. avvenimenti
+co: num. d’evenimenti
 de: Ereignisse
 en: nb events
 es: núm. eventos
@@ -11112,7 +11118,7 @@ sv: antal barn
 tr: çocuk sayısı
 
     number of events
-co: numeru d’avvenimenti
+co: numeru d’evenimenti
 de: Anzahl der Ereignisse
 en: number of events
 es: número de eventos
@@ -11762,6 +11768,7 @@ tr: ebeveynler
 zh:  父母
 
     parrish registrar/parrish registrar/parrish registrar
+co: offiziante religiosu/offiziante religiosa/offiziante religiosu(a)
 de: religiöser Amtsträger/religiöser Amtsträger/religiöser Amtsträger
 en: parish registrar/parish registrar/parish registrar
 es: oficiante religioso/oficiante religioso/oficiante religioso
@@ -11774,6 +11781,7 @@ pt: escrivão paroquial/escrivão paroquial/escrivão paroquial
 sv: församlingsregister/församlingsregister/församlingsregister
 
     parrish registrar/parrish registrars
+co: offiziante religiosu/offizianti religiosi
 de: religiöser Amtsträger/religiöse Amtsträgern
 en: parish registrar/parish registrars 
 es: oficiante religioso/oficiantes religiosos
@@ -12186,6 +12194,7 @@ sv: precision
 tr: hassaslık
 
     present/present
+co: presente/presenti
 de: Anwesende/Anwesende
 en: present/present
 es: presente/presente
@@ -12198,6 +12207,7 @@ pt: presente/presentes
 sv: närvarande/närvarande
 
     present/present/present
+co: presente/presente/presente
 de: Anwesende/Anwesende/Anwesende
 en: present/present/present  
 es: presente/presente/presente
@@ -12501,7 +12511,7 @@ sv: erkännande far/erkännande mor/erkännande föräldrar
 tr: baba tarafından tanınan/anne tarafından tanınan/tarafından tanınan
 
     reduce/increase
-co: riduce/aummentà
+co: riduce/aumentà
 de: vermindern/erhöhen
 en: reduce/increase
 fr: réduire/augmenter
@@ -13833,7 +13843,7 @@ sv: visas efter:/grenar/alfabetisk ordning
 tr: satır/alfabetik sıraya göre sırala
 
     sort by/date begin/alphabetic order/nb individuals/nb events
-co: urganizà da :/data di principiu/ordine alfabeticu/numeru d’individuu/numeru d’avvenimenti
+co: urganizà da :/data di principiu/ordine alfabeticu/numeru d’individuu/numeru d’evenimenti
 de: sortieren nach: /Anfangsdatum/Alphabet/Anzahl der Individuen/Anzahl der Ereignisse
 en: sort by/date/alphabetical order/number of individuals/number of events
 es: organizar por: fecha de inicio/orden alfabético/numero de individuos/número de eventos
@@ -14889,7 +14899,7 @@ af: die lêer is tydelik gesluit: probeer asseblief later weer
 bg: файлът е временно заключен; опитайте отново. Ако това не помага, изчакайте малко преди да опитате пак
 br: ar fichennaoueg a zo morailhet evit ar poent: klaskit ober ur wech c'hoazh. Ma ne da ket en-dro, gortozit un tamm a-raok adkregiñ ganti
 ca: la base està temporalment tancada: provar de nou. Si això no funciona, espereu uns moments abans de tornar a provar
-co: u schedariu hè bluccatu : pruvate torna. S’ella ùn funzionneghja micca, aspettate una cria nanzu di pruvà torna.
+co: u schedariu hè bluccatu : pruvate torna. S’ella ùn funzioneghja micca, aspettate una cria nanzu di pruvà torna.
 cs: soubor je dočasně uzamčen: zkuste to znova. Pokud to stále nefunguje, chvíli počkejte a pak to zkuste znovu.
 da: filen er midlertidigt låst: prøv igen. Hvis dette gentagne gange ikke fungerer, da vent lidt inden næste forsøg
 de: die Datei ist z.Z. geschützt: versuche es bitte nochmal. Wenn das nicht funktioniert, bitte eine Weile warten und nochmal probieren.
@@ -16689,7 +16699,7 @@ sv: vittne/vittnen
 tr: tanık/tanıklar
 
     witnesses at his events
-co: testimoni à i so avvenimenti
+co: testimoni à i so evenimenti
 de: Zeugen zu seinen Ereignissen
 en: witnesses at his events
 fr: témoins à ses évènements
@@ -16697,7 +16707,7 @@ sv: vittnen vid hans händelser
 tr: etkinliklerinde tanıklar
 
     witnesses to events of
-co: testimoni à l’avvenimenti di
+co: testimoni à l’evenimenti di
 de: Zeugen zu Ereignissen von
 en: witnesses to events of
 fr: témoins aux évènements de
@@ -16705,7 +16715,7 @@ sv: vittnen vid händelser för
 tr: etkinliklerinin tanıkları
 
     witnesses to my events and godparents
-co: testimoni à i mo avvenimenti è cumpare/cummare
+co: testimoni à i mo evenimenti è cumpare/cummare
 de: Zeugen zu meinen Ereignissen und Taufzeugen
 en: witnesses to my events and godparents
 fr: témoins à mes évènements et parrains/marraines
