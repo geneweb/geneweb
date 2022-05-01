@@ -339,7 +339,7 @@
                     %end;
                   %end;">[*modify::tree]</a></li>
           %end;
-          <li><a href="%prefix;%suffix;notab=on" accesskey="/"
+          <li><a href="%prefix;%suffix;&notab=on" accesskey="/"
              title="[display by slices/slice width/overlap/total width]0 (/)"
              >[*display by slices/slice width/overlap/total width]0</a></li>
         </ul>

@@ -148,16 +148,16 @@
     %end;
     %if;(not cancel_links)
       <span class="ml-2">%nn;
-        <a href="%prefix;%suffix;m=D;t=T;v=1;image=on"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="tree desc." title="[*descendants tree] [to the children] ([with] [spouse/spouses]0)"/></a>
+        <a href="%prefix;%suffix;&m=D;t=T;v=1;image=on"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="tree desc." title="[*descendants tree] [to the children] ([with] [spouse/spouses]0)"/></a>
         %if;(op_m!=1)
           %if;(max_desc_level>1)
-            <a href="%prefix;%suffix;m=D;t=T;v=2;image=on"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="20" alt="tree desc." title="[*descendants tree] [to the grandchildren]"/></a>
+            <a href="%prefix;%suffix;&m=D;t=T;v=2;image=on"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="20" alt="tree desc." title="[*descendants tree] [to the grandchildren]"/></a>
           %end;
           %if;(max_desc_level>2)
-            <a href="%prefix;%suffix;m=D;t=T;v=3;image=on"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="22" alt="tree desc." title="[*descendants tree] [to the great-grandchildren]"/></a>
+            <a href="%prefix;%suffix;&m=D;t=T;v=3;image=on"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="22" alt="tree desc." title="[*descendants tree] [to the great-grandchildren]"/></a>
           %end;
           %if;(max_desc_level>3)
-            <a href="%prefix;%suffix;m=D;t=T;v=%max_desc_level;;image=on"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="24" alt="tree desc." title="[*descendants tree] (%max_desc_level; [generation/generations]1)"/></a>
+            <a href="%prefix;%suffix;&m=D;t=T;v=%max_desc_level;;image=on"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="24" alt="tree desc." title="[*descendants tree] (%max_desc_level; [generation/generations]1)"/></a>
           %end;
         %end;
       </span>
