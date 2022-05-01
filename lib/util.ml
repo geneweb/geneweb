@@ -293,7 +293,8 @@ let unauthorized conf auth_type =
   Output.printf conf "<ul><li>%s</ul>\n" auth_type;
   Output.print_sstring conf "</body>\n"
 
-let commd ?(excl = []) ?(trim = true) ?(henv = true) ?(senv = true) conf : Adef.escaped_string =
+let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true) ?(senv = true)
+  conf : Adef.escaped_string =
   let aux =
     List.fold_left begin fun c (k, (v : Adef.encoded_string)) ->
       if List.mem k excl
@@ -302,7 +303,18 @@ let commd ?(excl = []) ?(trim = true) ?(henv = true) ?(senv = true) conf : Adef.
       else c ^^^ k ^<^ "=" ^<^ (v :> Adef.escaped_string) ^>^ "&"
     end
   in
-  let s = Adef.escaped @@ conf.command ^ "?" in
+  let commd = conf.command in
+  let commd = if pwd then commd else
+    match String.split_on_char '_' commd with
+    | b :: _p -> b
+    | [] -> !GWPARAM.syslog `LOG_ERR
+        (Format.sprintf "Poorly formatted command: %s" commd); commd
+  in
+  let s =
+    if conf.cgi then
+      Adef.escaped @@ commd ^ "?" ^ "b=" ^ conf.bname
+    else Adef.escaped @@ commd ^ "?"
+  in
   let s = if henv then aux s conf.henv else s in
   let s = if senv then aux s conf.senv else s in
   s
@@ -326,16 +338,6 @@ let prefix_base_password conf =
       conf.command ^ "?b=" ^ conf.bname ^ "&"
     else
       conf.command ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd ^ "&"
-  else
-    conf.command ^ "?"
-
-let prefix_base_password_2 conf =
-  Adef.escaped @@
-  if conf.cgi then
-    if conf.cgi_passwd = "" then
-      conf.command ^ "?b=" ^ conf.bname
-    else
-      conf.command ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd
   else
     conf.command ^ "?"
 

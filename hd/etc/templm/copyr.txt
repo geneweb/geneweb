@@ -19,8 +19,8 @@
       %nl;
       <div id="trl" style="clear:both;">
         <ul>
-          <li><a href="%prefix_no_templ;templ=;%suffix;">default</a></li>
-          <li><a href="%prefix_no_templ;templ=templm;%suffix;">templm</a></li>
+          <li><a href="%prefix_no_templ;templ=&%suffix;">default</a></li>
+          <li><a href="%prefix_no_templ;templ=templm&%suffix;">templm</a></li>
         </ul>
       </div>
     %end;
@@ -34,12 +34,12 @@
 %define;language_link()
   %for;i;1;30;
     %let;l1;%apply;lang(i)%in;
-    <a class="dropdown-item" href="%prefix_base_password;lang=%l1;;templ=%evar.templ;;%suffix;">%l1; %apply;language_name(l1)</a>
+    <a class="dropdown-item" href="%prefix_base_password;lang=%l1;&templ=%evar.templ;&%suffix;">%l1; %apply;language_name(l1)</a>
   %end;
 %end;
 
 <div id="footer">
-  <a href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%suffix;"
+  <a href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;&%suffix;"
      title="Switch to %if(evar.templ!="templm")template m%else;default template%end;">GeneWeb</a>
   v. %version;%sp;
   &copy; INRIA 1998-2016 %connections;%sq;

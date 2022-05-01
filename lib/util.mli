@@ -50,6 +50,7 @@ val string_of_ctime : config -> string
 val commd
   : ?excl:string list
   -> ?trim:bool
+  -> ?pwd:bool
   -> ?henv:bool
   -> ?senv:bool
   -> config
@@ -57,7 +58,6 @@ val commd
 
 val prefix_base : config -> Adef.escaped_string
 val prefix_base_password : config -> Adef.escaped_string
-val prefix_base_password_2 : config -> Adef.escaped_string
 
 (** [hidden_env_aux env]
     Creates a hidden HTML input for every key and value in [env].

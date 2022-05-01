@@ -1,9 +1,6 @@
 open Config
 open TemplAst
 
-let commd ?excl ?trim conf =
-  (Util.commd ?excl ?trim conf :> string)
-
 exception Exc_located of loc * exn
 
 let raise_with_loc loc = function
@@ -117,21 +114,100 @@ let setup_link conf =
 
 let esc s = (Util.escape_html s :> string)
 
+let url_aux ?(pwd = true) conf =
+  let l = List.filter_map (fun (k, v) ->
+    let v = Adef.as_string v in
+    if ( ( k = "oc" || k = "ocz" ) && v = "0" ) || k = "" then None
+    else Some (Format.sprintf "%s=%s" k v)) (conf.henv @ conf.senv @ conf.env)
+  in
+  let prefix =
+    if pwd then (Util.prefix_base_password conf :> string)
+    else (Util.prefix_base conf :> string)
+  in
+  if conf.cgi then
+    prefix ^ "?" ^ conf.bname ^ (String.concat "&" l)
+  else
+    prefix ^ (String.concat "&" l)
+
+let url_set_aux conf evar str =
+  (* rebuild the current url from conf.env, replacing &evar=xxx by &evar=str () *)
+  let url =
+    match String.split_on_char '?' (Util.commd conf :> string) with
+    | [] -> Printf.sprintf "Empty Url\n" |> !GWPARAM.syslog `LOG_WARNING ; ""
+    | s::_l -> s ^ "?"
+  in
+  let t = 
+    match List.find_opt (fun (k, _) -> k = evar)
+      (conf.henv @ conf.senv @ conf.env) with
+    | Some (_, _) -> true
+    | None -> false
+  in
+  let l = List.filter_map (fun (k, v) ->
+    let v = Adef.as_string @@ v in
+    if k = evar && str <> "" then
+      Some (Format.sprintf "%s=%s" k str)
+    else
+      if v = "" || (k = "oc" && v = "0") || (k = "ocz" && v = "0") ||
+        k = evar && str = ""
+      then None
+      else (Some (Format.sprintf "%s=%s" k v))) (conf.henv @ conf.senv @ conf.env)
+  in
+  let url = url ^ (String.concat "&" l) in
+  (* t is true if evar was present in conf.env. If not, add it *)
+  if t || str = "" then url else (url ^ (Format.sprintf "&%s=%s" evar str))
+
 let rec eval_variable conf =
   function
-    ["bvar"; v] -> (try List.assoc v conf.base_env with Not_found -> "")
-  | ["evar"; v; "ns"] ->
+    ["bvar"; v] | ["b"; v] -> (try List.assoc v conf.base_env with Not_found -> "")
+  | ["evar"; v; "ns"] | ["e"; v; "ns"] ->
       begin try
         let vv = List.assoc v (conf.env @ conf.henv) in
         Mutil.gen_decode false vv |> esc
       with Not_found -> ""
       end
-  | ["evar"; v] ->
+  | ["evar"; v] | ["e"; v] ->
+      (* TODO verify if senv must be treated as well *)
       begin match Util.p_getenv (conf.env @ conf.henv) v with
         Some vv -> esc vv
       | None -> ""
       end
+  (* look for evar.vi scanning i down to 0 *)
+  | ["evar_cur"; v; i] ->
+      (* TODO same as evar *)
+      let n = int_of_string i in
+      let rec loop n =
+        match Util.p_getenv (conf.env @ conf.henv) (v ^ string_of_int n) with
+        | Some vv -> vv
+        | None -> if n > 0 then loop (n - 1) else ""
+      in loop n
+  | ["prefix_set"; pl] ->
+      let pl_l =
+        match pl with
+        | "iz" -> ["iz"; "nz"; "pz"; "ocz"]
+        | "all" -> ["templ";"p_mod";"wide"]
+        | _ -> [pl]
+      in
+      (Util.commd ~excl:pl_l conf :> string)
+  | ["prefix_set"; evar; str] ->
+      let prefix = (Util.commd ~excl:[evar] conf :> string) in
+      let amp = if prefix.[String.length prefix - 1] = '?' then "" else "&" in
+      if str = "" then prefix else prefix ^ Printf.sprintf "%s%s=%s" amp evar str
+  | ["substr_start"; n; v] ->
+      (* extract the n first characters of string v *)
+      let n = int_of_string n in
+      let len = String.length v in
+      let rec loop i n str =
+        if n = 0 || i >= len then str
+        else
+          (* Attention aux caractères utf-8 !! *)
+          let nbc = Utf8.nbc v.[i] in
+          let car = String.sub v i nbc in
+          loop (i+nbc) (n-1) (str ^ car)
+      in
+      loop 0 n ""
   | "time" :: sl -> eval_time_var conf sl
+  | ["url_set"; evar;] -> url_set_aux conf evar ""
+  | ["url_set"; evar; str] -> url_set_aux conf evar str
   | ["user"; "ident"] -> conf.user
   | ["user"; "name"] -> conf.username
   | [s] -> eval_simple_variable conf s
@@ -159,7 +235,7 @@ and eval_simple_variable conf =
                     "wizard/wizards/friend/friends/exterior" 1)
                  (if conf.wizard then
                     Printf.sprintf "<a href=\"%sm=CONN_WIZ\">%d</a>"
-                      (commd conf) cw
+                      (Util.commd conf :> string) cw
                   else string_of_int cw)
              else "") ^
             (if cf > 0 then
@@ -184,18 +260,25 @@ and eval_simple_variable conf =
     )
   | "lang" -> conf.lang
   | "left" -> conf.left
+  | "link_next" ->
+      begin match Util.p_getenv conf.env "link_next" with
+      | Some vv -> vv
+      | None -> ""
+      end
   | "nl" -> "\n"
   | "nn" -> ""
-  | "prefix" -> commd conf
-  | "prefix_base" -> (Util.prefix_base conf :> string)
-  | "prefix_base_password" -> (Util.prefix_base_password conf :> string)
-  | "prefix_base_password_2" -> (Util.prefix_base_password_2 conf :> string)
-  | "prefix_no_iz" -> commd ~excl:["iz"; "nz"; "pz"; "ocz"] conf
-  | "prefix_no_templ" -> commd ~excl:["templ"] conf
-  | "prefix_no_pmod" -> commd ~excl:["p_mod"] conf
-  | "prefix_no_wide" -> commd ~excl:["wide"] conf
-  | "prefix_no_lang" -> commd ~excl:["lang"] conf
-  | "prefix_no_all" -> commd ~excl:["templ";"p_mod";"wide"] conf
+  | "plugins" ->
+      let l = List.map Filename.basename conf.plugins in
+      String.concat "," l
+  | "prefix" -> (Util.commd conf :> string)
+  | "prefix_base" -> (Util.commd ~pwd:false ~henv:false ~senv:false conf :> string)
+  | "prefix_base_password" -> (Util.commd ~henv:false ~senv:false conf :> string)
+  | "prefix_no_iz" -> (Util.commd ~excl:["iz"; "nz"; "pz"; "ocz"] conf :> string)
+  | "prefix_no_templ" -> (Util.commd ~excl:["templ"] conf :> string)
+  | "prefix_no_pmod" -> (Util.commd ~excl:["p_mod"] conf :> string)
+  | "prefix_no_wide" -> (Util.commd ~excl:["wide"] conf :> string)
+  | "prefix_no_lang" -> (Util.commd ~excl:["lang"] conf :> string)
+  | "prefix_no_all" -> (Util.commd ~excl:["templ";"p_mod";"wide"] conf :> string)
   | "referer" -> (Util.get_referer conf :> string)
   | "right" -> conf.right
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
@@ -209,20 +292,18 @@ and eval_simple_variable conf =
      in s :> string)
   | "suffix" ->
     (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
-    let l = List.fold_left (fun accu (k, _) -> List.remove_assoc k accu) conf.env (List.rev_append conf.henv conf.senv) in
-    List.fold_left (fun c (k, v) ->
+    let l =
+      List.fold_left (fun accu (k, _) -> List.remove_assoc k accu) conf.env
+        (conf.henv @ conf.senv)
+    in
+    let l = List.filter_map (fun (k, v) ->
       let v = Adef.as_string v in
-      if ( ( k = "oc" || k = "ocz" ) && v = "0" ) || k = "" then c
-      else c ^ k ^ "=" ^ v ^ "&")
-    "" l
-  | "url" ->
-      let c :> string = Util.commd conf in
-      (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
-      let l :> (string * string) list =
-        List.fold_left (fun accu (k, _) -> List.remove_assoc k accu) conf.env
-          (List.rev_append conf.henv conf.senv)
-      in
-      List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ "&") c l
+      if ( ( k = "oc" || k = "ocz" ) && v = "0" ) || k = "" then None
+      else Some (Format.sprintf "%s=%s" k v)) l
+    in
+    String.concat "&" l
+  | "url" -> url_aux ~pwd:true conf
+  | "url_no_pwd" -> url_aux ~pwd:false conf
   | "version" -> Version.txt
   | "/" -> ""
   | _ -> raise Not_found
@@ -245,29 +326,55 @@ let eval_var_handled conf sl =
     Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl)
 
 let apply_format conf nth s1 s2 =
-  let transl_nth_format s =
+  let s1  = (* perform nth selection before format check *)
     match nth with
-      Some n -> Util.ftransl_nth conf s n
-    | None -> Util.ftransl conf s
+      Some n -> Util.transl_nth conf s1 n
+    | None -> Util.transl conf s1
   in
-  match Util.check_format "%t" s1 with
-    Some s3 -> Printf.sprintf (transl_nth_format s3) (fun _ -> s2)
-  | None ->
+  if not (String.contains s1 '%') then s1 else
+    try match Util.check_format "%t" s1 with
+    | Some s3 -> Printf.sprintf s3 (fun _ -> s2)
+    | None ->
       match Util.check_format "%s" s1 with
-        Some s3 -> Printf.sprintf (transl_nth_format s3) s2
+      | Some s3 -> Printf.sprintf s3 s2
       | None ->
-          match Util.check_format "%d" s1 with
-            Some s3 -> Printf.sprintf (transl_nth_format s3) (int_of_string s2)
+        match Util.check_format "%d" s1 with
+        |Some s3 -> Printf.sprintf s3 (int_of_string s2)
+        | None ->
+          let (s21, s22) =
+            try let i = String.index s2 ':' in
+                String.sub s2 0 i,
+                String.sub s2 (i + 1) (String.length s2 - i - 1)
+            with _ -> "", ""
+          in
+           match Util.check_format "%s%s" s1 with
+          | Some s3 -> Printf.sprintf s3 s21 s22
           | None ->
-              match Util.check_format "%s%s" s1 with
-                Some s3 ->
-                  let (s21, s22) =
-                    let i = String.index s2 ':' in
-                    String.sub s2 0 i,
-                    String.sub s2 (i + 1) (String.length s2 - i - 1)
-                  in
-                  Printf.sprintf (transl_nth_format s3) s21 s22
-              | None -> raise Not_found
+            match Util.check_format "%t%s" s1 with
+            | Some s3 -> Printf.sprintf s3 (fun _ -> s21) s22
+            | None ->
+              match Util.check_format "%d%s" s1 with
+              | Some s3 -> Printf.sprintf s3 (int_of_string s21) s22
+              | None ->
+                match Util.check_format "%s%t" s1 with
+                | Some s3 -> Printf.sprintf s3 s21 (fun _ -> s22)
+                | None ->
+                  match Util.check_format "%t%t" s1 with
+                  | Some s3 -> Printf.sprintf s3 (fun _ -> s21) (fun _ -> s22)
+                  | None ->
+                    match Util.check_format "%d%t" s1 with
+                    | Some s3 -> Printf.sprintf s3 (int_of_string s21) (fun _ -> s22) 
+                    | None ->
+                      match Util.check_format "%s%d" s1 with
+                      | Some s3 -> Printf.sprintf s3 s21 (int_of_string s22)
+                      | None ->
+                        match Util.check_format "%t%d" s1 with
+                        | Some s3 -> Printf.sprintf s3 (fun _ -> s21) (int_of_string s22)
+                        | None ->
+                          match Util.check_format "%d%d" s1 with
+                          | Some s3 -> Printf.sprintf s3 (int_of_string s21) (int_of_string s22)
+                          | None -> "[" ^ s1 ^ "?]"
+    with _ -> Printf.sprintf "Format error in %s\n" s1 |> !GWPARAM.syslog `LOG_WARNING ; s1
 
 let rec eval_ast conf =
   function
@@ -353,6 +460,8 @@ let templ_eval_var conf =
   | ["just_friend_wizard"] -> VVbool conf.just_friend_wizard
   | ["friend"] -> VVbool conf.friend
   | ["manitou"] -> VVbool conf.manitou
+  | ["plugin"; plugin] ->
+      VVbool (List.exists (fun p -> Filename.basename p = plugin) conf.plugins)
   | ["supervisor"] -> VVbool conf.supervisor
   | ["true"] -> VVbool true
   | ["wizard"] -> VVbool conf.wizard
@@ -381,6 +490,17 @@ let int_of e =
       end
   | VVbool _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "int value expected")
+
+let float_of e =
+  function
+    VVstring s ->
+      begin try Float.of_string s with
+        Failure _ ->
+          raise_with_loc (loc_of_expr e)
+            (Failure ("float value expected\nFound = " ^ s))
+      end
+  | VVbool _ | VVother _ ->
+      raise_with_loc (loc_of_expr e) (Failure "float value expected")
 
 let num_of e =
   function
@@ -431,6 +551,7 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
       end
   | Aop2 (loc, op, e1, e2) ->
       let int e = int_of e (eval_expr ceva e) in
+      let float e = float_of e (eval_expr ceva e) in
       let num e = num_of e (eval_expr ceva e) in
       let bool e = bool_of e (eval_expr ceva e) in
       let string e = string_of e (eval_expr ceva e) in
@@ -444,11 +565,16 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
       | "!=" -> VVbool (eval_expr ceva e1 <> eval_expr ceva e2)
       | "<=" -> VVbool (int e1 <= int e2)
       | ">=" -> VVbool (int e1 >= int e2)
-      | "+" -> VVstring (Sosa.to_string (Sosa.add (num e1) (num e2)))
-      | "-" -> VVstring (Sosa.to_string (Sosa.sub (num e1) (num e2)))
-      | "*" -> VVstring (Sosa.to_string (Sosa.mul (num e1) (int e2)))
+      | "+" -> VVstring (string_of_int ((int e1) + (int e2)))
+      | "-" -> VVstring (string_of_int ((int e1) - (int e2)))
+      | "*" -> VVstring (string_of_int ((int e1) * (int e2)))
       | "^" -> VVstring (Sosa.to_string (Sosa.exp (num e1) (int e2)))
       | "/" -> VVstring (Sosa.to_string (Sosa.div (num e1) (int e2)))
+      | "/." -> VVstring (
+          let fl = (Float.div (float e1) (float e2)) in
+          if Float.is_integer fl then string_of_int (Float.to_int fl)
+          else Float.to_string fl
+      )
       | "%" -> VVstring (Sosa.to_string (Sosa.modl (num e1) (int e2)))
       | _ -> raise_with_loc loc (Failure ("op \"" ^ op ^ "\""))
       end
@@ -610,7 +736,7 @@ and print_foreach_env_binding conf print_ast set_vother env ep al =
          print_ast (("binding", set_vother (Vbind (k, v))) :: env) ep
        in
        List.iter print_ast al)
-    conf.env
+    (conf.env @ conf.henv @ conf.senv)
 
 let float_rgb_of_hsv h s v =
   let h = if h > 1. then 1. else if h < 0. then 0. else h in
