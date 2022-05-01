@@ -63,6 +63,15 @@ let rec subst sf = function
       | s2 :: sl2 -> s2, List.rev_append (List.rev_map sf sl2) sl1
       | _ -> assert false
     in
+    (* FIXIT is this code necessary?
+    let lex = Lexing.from_string s1 in
+    let [@warning "-8"] s2 :: sl2 = Templ_parser.compound_var lex in
+    let (s, sl) =
+      if lex.Lexing.lex_curr_p.pos_cnum = String.length s1
+      then s2, sl2 @ sl
+      else s, sl
+    in
+    *)
     Aforeach ((loc, s, sl), List.map (substl sf) pl, substl sf al)
   | Afor (i, min, max, al) ->
     Afor (sf i, subst sf min, subst sf max, substl sf al)
@@ -114,19 +123,63 @@ let setup_link conf =
 
 let rec eval_variable conf =
   function
-    ["bvar"; v] -> (try List.assoc v conf.base_env with Not_found -> "")
-  | ["evar"; v; "ns"] ->
+    ["bvar"; v] | ["b"; v] -> (try List.assoc v conf.base_env with Not_found -> "")
+  | ["evar"; v; "ns"] | ["e"; v; "ns"] ->
       begin try
         let vv = List.assoc v (conf.env @ conf.henv) in
         Util.escape_html (Mutil.gen_decode false vv)
       with Not_found -> ""
       end
-  | ["evar"; v] ->
+  | ["evar"; v] | ["e"; v] ->
       begin match Util.p_getenv (conf.env @ conf.henv) v with
         Some vv -> Util.escape_html vv
       | None -> ""
       end
+  (* look for evar.vi scanning i down to 0 *)
+  | ["evar_cur"; v; i] ->
+    let n = int_of_string i in
+    let rec loop n =
+      match Util.p_getenv (conf.env @ conf.henv) (v ^ string_of_int n) with
+      | Some vv -> vv
+      | None -> if n > 0 then loop (n - 1) else ""
+    in loop n
+  | ["substr_start"; n; v] ->
+    let n = int_of_string n in
+    (* Attention aux caractères utf-8 !! *)
+    let sub =
+      let len = String.length v in
+      let rec loop i n str =
+        if n = 0 || i >= len then str
+        else
+          let nbc = Utf8.nbc v.[i] in
+          let car = String.sub v i nbc in
+          loop (i+nbc) (n-1) (str ^ car)
+      in
+      loop 0 n ""
+    in sub
   | "time" :: sl -> eval_time_var conf sl
+  | ["urlv"; evar;]  ->
+      let url = Util.commd conf in
+      let url = (List.hd (String.split_on_char '?' url)) ^ "?" in
+      let url = List.fold_left (fun c (k, v) ->
+        if k = evar then c
+        else
+          if v = "" || (k = "oc" && v = "0") || (k = "ocz" && v = "0") then c
+          else (c ^ k ^ "=" ^ v ^ "&")) url conf.env
+      in
+      String.sub url 0 (String.length url - 1)
+  | ["urlv"; evar; str]  ->
+      let url = Util.commd conf in
+      let url = (List.hd (String.split_on_char '?' url)) ^ "?" in
+      let (url, t) = List.fold_left (fun (c, t) (k, v) ->
+        if k = evar then
+          ((c ^ k ^ "=" ^ str ^ "&"), true)
+        else
+          if v = "" || (k = "oc" && v = "0") || (k = "ocz" && v = "0") then (c, t)
+          else ((c ^ k ^ "=" ^ v ^ "&"), t)) (url, false) conf.env
+      in
+      let url = String.sub url 0 (String.length url - 1) in
+      if t then url else (url ^ "&" ^ evar ^ "=" ^ str)
   | ["user"; "ident"] -> conf.user
   | ["user"; "name"] -> conf.username
   | [s] -> eval_simple_variable conf s
@@ -186,8 +239,14 @@ and eval_simple_variable conf =
       else Util.image_prefix conf
   | "lang" -> conf.lang
   | "left" -> conf.left
+  | "link_next" ->
+      begin match Util.p_getenv conf.env "link_next" with
+      | Some vv -> vv
+      | None -> ""
+      end
   | "nl" -> "\n"
   | "nn" -> ""
+  | "plugins" -> (List.fold_left (fun s p -> (Filename.basename p) ^ "," ^ s) "" conf.plugins)
   | "prefix" -> Util.commd conf
   | "prefix_2" -> Util.commd_2 conf
   | "prefix_base" -> Util.prefix_base conf
@@ -299,29 +358,43 @@ let eval_var_handled conf sl =
     Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl)
 
 let apply_format conf nth s1 s2 =
-  let transl_nth_format s =
+  let s1  = (* perform nth selection before format check *)
     match nth with
-      Some n -> Util.ftransl_nth conf s n
-    | None -> Util.ftransl conf s
+      Some n -> Util.transl_nth conf s1 n
+    | None -> Util.transl conf s1
   in
-  match Util.check_format "%t" s1 with
-    Some s3 -> Printf.sprintf (transl_nth_format s3) (fun _ -> s2)
-  | None ->
+  try let _ = String.index s1 '%' in
+    match Util.check_format "%t" s1 with
+    | Some s3 -> Printf.sprintf s3 (fun _ -> s2)
+    | None ->
       match Util.check_format "%s" s1 with
-        Some s3 -> Printf.sprintf (transl_nth_format s3) s2
+        Some s3 -> Printf.sprintf s3 s2
       | None ->
-          match Util.check_format "%d" s1 with
-            Some s3 -> Printf.sprintf (transl_nth_format s3) (int_of_string s2)
+        match Util.check_format "%d" s1 with
+         Some s3 -> Printf.sprintf s3 (int_of_string s2)
+        | None ->
+          let (s21, s22) =
+            try let i = String.index s2 ':' in
+                String.sub s2 0 i,
+                String.sub s2 (i + 1) (String.length s2 - i - 1)
+            with _ -> "", ""
+          in
+           match Util.check_format "%s%s" s1 with
+            Some s3 -> Printf.sprintf s3 s21 s22
           | None ->
-              match Util.check_format "%s%s" s1 with
-                Some s3 ->
-                  let (s21, s22) =
-                    let i = String.index s2 ':' in
-                    String.sub s2 0 i,
-                    String.sub s2 (i + 1) (String.length s2 - i - 1)
-                  in
-                  Printf.sprintf (transl_nth_format s3) s21 s22
-              | None -> raise Not_found
+            match Util.check_format "%t%s" s1 with
+              Some s3 -> Printf.sprintf s3 (fun _ -> s21) s22
+            | None ->
+              match Util.check_format "%s%t" s1 with
+                Some s3 -> Printf.sprintf s3 s21 (fun _ -> s22)
+              | None ->
+                match Util.check_format "%t%d" s1 with
+                  Some s3 -> Printf.sprintf s3 (fun _ -> s21) (int_of_string s22)
+                | None ->
+                  match Util.check_format "%s%d" s1 with
+                    Some s3 -> Printf.sprintf s3 s21 (int_of_string s22)
+                  | None -> "[" ^ s1 ^ "?]"
+  with _ -> s1
 
 let rec eval_ast conf =
   function
@@ -407,6 +480,9 @@ let templ_eval_var conf =
   | ["just_friend_wizard"] -> VVbool conf.just_friend_wizard
   | ["friend"] -> VVbool conf.friend
   | ["manitou"] -> VVbool conf.manitou
+  | ["plugin"; plugin] ->
+      let list = List.map (fun p -> Filename.basename p) conf.plugins in
+      VVbool (List.mem plugin list)
   | ["supervisor"] -> VVbool conf.supervisor
   | ["true"] -> VVbool true
   | ["wizard"] -> VVbool conf.wizard
@@ -436,6 +512,17 @@ let int_of e =
   | VVbool _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "int value expected")
 
+let float_of e =
+  function
+    VVstring s ->
+      begin try Float.of_string s with
+        Failure _ ->
+          raise_with_loc (loc_of_expr e)
+            (Failure ("float value expected\nFound = " ^ s))
+      end
+  | VVbool _ | VVother _ ->
+      raise_with_loc (loc_of_expr e) (Failure "float value expected")
+
 let num_of e =
   function
     VVstring s ->
@@ -446,6 +533,11 @@ let num_of e =
       end
   | VVbool _ | VVother _ ->
       raise_with_loc (loc_of_expr e) (Failure "num value expected")
+
+let strip_dot str =
+  if str.[String.length str - 1] = '.' then
+    String.sub str 0 (String.length str - 1)
+  else str
 
 let rec eval_expr (conf, eval_var, eval_apply as ceva) =
   function
@@ -485,6 +577,7 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
       end
   | Aop2 (loc, op, e1, e2) ->
       let int e = int_of e (eval_expr ceva e) in
+      let float e = float_of e (eval_expr ceva e) in
       let num e = num_of e (eval_expr ceva e) in
       let bool e = bool_of e (eval_expr ceva e) in
       let string e = string_of e (eval_expr ceva e) in
@@ -498,11 +591,12 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
       | "!=" -> VVbool (eval_expr ceva e1 <> eval_expr ceva e2)
       | "<=" -> VVbool (int e1 <= int e2)
       | ">=" -> VVbool (int e1 >= int e2)
-      | "+" -> VVstring (Sosa.to_string (Sosa.add (num e1) (num e2)))
-      | "-" -> VVstring (Sosa.to_string (Sosa.sub (num e1) (num e2)))
-      | "*" -> VVstring (Sosa.to_string (Sosa.mul (num e1) (int e2)))
+      | "+" -> VVstring (string_of_int ((int e1) + (int e2)))
+      | "-" -> VVstring (string_of_int ((int e1) - (int e2)))
+      | "*" -> VVstring (string_of_int ((int e1) * (int e2)))
       | "^" -> VVstring (Sosa.to_string (Sosa.exp (num e1) (int e2)))
       | "/" -> VVstring (Sosa.to_string (Sosa.div (num e1) (int e2)))
+      | "/." -> VVstring (strip_dot (Float.to_string (Float.div (float e1) (float e2))))
       | "%" -> VVstring (Sosa.to_string (Sosa.modl (num e1) (int e2)))
       | _ -> raise_with_loc loc (Failure ("op \"" ^ op ^ "\""))
       end
@@ -732,10 +826,10 @@ let print_wid_hei conf fname =
 let print_copyright conf =
   Util.include_template conf [] "copyr"
     (fun () ->
-      Output.print_string conf "<hr style=\"margin:0\">\n";
-      Output.print_string conf "<div style=\"font-size: 80%\">\n";
+      Output.print_string conf "<hr class=\"m-0\">\n";
+      Output.print_string conf "<div class=\"small\">\n";
       Output.print_string conf "<em>";
-      Output.print_string conf "Copyright (c) 1998-2007 INRIA - GeneWeb " ;
+      Output.print_string conf "©INRIA 1998-2022 - GeneWeb " ;
       Output.print_string conf Version.txt;
       Output.print_string conf "</em>";
       Output.print_string conf "</div>\n";
