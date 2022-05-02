@@ -177,7 +177,7 @@ let syntax_links conf wi s =
               (encode fname)
               (encode anchor)
               c
-              (escape text)
+              text
           in
           loop quot_lev pos j (Buff.mstore len t)
       | NotesLinks.WLperson (j, (fn, sn, oc), name, _) ->
@@ -188,7 +188,7 @@ let syntax_links conf wi s =
                 (encode fn)
                 (encode sn)
                 (if oc = 0 then "" else "&oc=" ^ string_of_int oc)
-                (escape name)
+                name
             else if wi.wi_always_show_link then
               let s = " style=\"color:red\"" in
               Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\"%s>%s</a>" pos
@@ -197,7 +197,7 @@ let syntax_links conf wi s =
                 (encode sn)
                 (if oc = 0 then "" else "&oc=" ^ string_of_int oc)
                 s
-                (escape name)
+                name
             else
               Printf.sprintf "<a href=\"%s\" style=\"color:red\">%s</a>"
                 (commd conf :> string)
@@ -210,7 +210,7 @@ let syntax_links conf wi s =
             Printf.sprintf "<a href=\"%sm=WIZNOTES&f=%s\">%s</a>"
               (commd conf :> string)
               (encode wiz)
-              (escape s)
+              s
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLnone -> loop quot_lev pos (i + 1) (Buff.store len s.[i])
