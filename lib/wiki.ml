@@ -124,7 +124,7 @@ let syntax_links conf wi s =
     else if s.[i] = '{' then
       let (b, j) =
         let rec loop len j =
-          if j = slen then Buff2.get len, j
+          if j = slen then "", i + 1
           else if j < slen - 1 && s.[j] = '%' then
             loop (Buff2.store len s.[j+1]) (j + 2)
           else if s.[j] = '}' then Buff2.get len, j + 1
@@ -132,7 +132,11 @@ let syntax_links conf wi s =
         in
         loop 0 (i + 1)
       in
-      let s = Printf.sprintf "<span class=\"highlight\">%s</span>" (escape b) in
+      let s =
+        if String.length b <> 0 then
+          Printf.sprintf "<span class=\"highlight\">%s</span>" (escape b)
+        else ""
+      in
       loop quot_lev pos j (Buff.mstore len s)
     else if
       i <= slen - 5 && s.[i] = '\'' && s.[i+1] = '\'' && s.[i+2] = '\'' &&
