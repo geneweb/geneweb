@@ -1,5 +1,15 @@
 #!/bin/sh
 
+# This script assumes that the distribution folder,
+# (or a link to it) is installed at the Document root
+# of the Web server (Apache or other).
+# Please update the search for DocumentRoot according to
+# your understanding of other environments.
+
+# The purpose of the script is to install
+# - gwd.cgi and test.cgi in the cgi-bin folder
+# - a test base in the bases folder
+
 OS_ENV=`uname` 
 
 # Find the document root under Apache
