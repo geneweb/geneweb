@@ -11699,6 +11699,18 @@ sv: andra åtgärder
 tr: diğer eylem
 zh: 其他行動
 
+    other/other/other
+de: anderer/andere/andere
+en: other/other/other
+es: otro/otra/otro
+fi: muuta/muuta/muuta
+fr: autre/autre/autre
+it: altro/altro/altro
+nl: overige/overige/overige
+no: annen/annen/annen
+pt: outro/outra/outro
+sv: annat/annat/annat
+
     PACS
 co: PACS
 de: verfestigte Lebensgemeinschaft
