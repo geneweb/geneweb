@@ -17,11 +17,13 @@
 	;;format
 	;;partition
 	;;version
+	translate
   )
   (private_modules
 	gw_formats
 	gwdb_gnwb25
 	gwdb_gnwb26
+	translate
   )
 )
 #endif
