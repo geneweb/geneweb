@@ -120,6 +120,7 @@ distrib: build
 	cp etc/README.txt $(DISTRIB_DIR)/.
 	cp etc/LISEZMOI.txt $(DISTRIB_DIR)/.
 	cp etc/START.htm $(DISTRIB_DIR)/.
+	cp -R etc/install-cgi $(DISTRIB_DIR)
 	if test $(OS_TYPE) = "Win"; then \
 	  cp etc/Windows/gwd.bat $(DISTRIB_DIR); \
 	  cp etc/Windows/gwsetup.bat $(DISTRIB_DIR); \
