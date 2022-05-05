@@ -353,7 +353,7 @@ let get_titles person = match person with
   | G25_person p -> G25.get_titles p
                   
 let gen_person_of_person person = match person with
-    Legacy_person p -> Gwdb_legacy.Translate.as_def_person (GLegacy.gen_person_of_person p)
+    Legacy_person p -> Translate.as_def_person (GLegacy.gen_person_of_person p)
   | G25_person p -> G25.gen_person_of_person p
 
 let gen_ascend_of_person person = match person with
@@ -366,7 +366,7 @@ let gen_union_of_person person = match person with
 
 let person_of_gen_person base (p, a, u) = match base with
   | Legacy b ->
-     let p = Gwdb_legacy.Translate.as_dsk_person p in
+     let p = Translate.as_dsk_person p in
      Legacy_person (GLegacy.person_of_gen_person b (p, a, u))
   | G25 b -> G25_person (G25.person_of_gen_person b (p, a, u))
 
@@ -515,7 +515,7 @@ let nb_of_real_persons base = wrap_base base GLegacy.nb_of_real_persons not_impl
 let nb_of_families base = wrap_base base GLegacy.nb_of_families not_impl
 let bname base = wrap_base base GLegacy.bname not_impl
 let patch_person base iper p = match base with
-  | Legacy b -> GLegacy.patch_person b iper (Gwdb_legacy.Translate.as_dsk_person p)
+  | Legacy b -> GLegacy.patch_person b iper (Translate.as_dsk_person p)
   | G25 b -> G25.patch_person b iper p
 
 let patch_ascend base = wrap_base base GLegacy.patch_ascend not_impl
@@ -529,7 +529,7 @@ let commit_notes base = wrap_base base GLegacy.commit_notes not_impl
 let new_iper base = wrap_base base GLegacy.new_iper not_impl
 let new_ifam base = wrap_base base GLegacy.new_ifam not_impl
 let insert_person base iper p = match base with
-  | Legacy b -> GLegacy.insert_person b iper (Gwdb_legacy.Translate.as_dsk_person p)
+  | Legacy b -> GLegacy.insert_person b iper (Translate.as_dsk_person p)
   | G25 b -> G25.insert_person b iper p
 
 let insert_ascend base = wrap_base base GLegacy.insert_ascend not_impl
@@ -587,7 +587,7 @@ let make_g25 bname particles p a u f c d s n =
 
 
 let make bname particles ((p, a, u), (f, c, d), s, n) =
-  let p = Array.map Gwdb_legacy.Translate.as_dsk_person p in
+  let p = Array.map Translate.as_dsk_person p in
   let arrays = ((p, a, u), (f, c, d), s, n) in
   Legacy (GLegacy.make bname particles arrays)
 

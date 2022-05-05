@@ -21,7 +21,6 @@
     gwdb_gc
     iovalue
     outbase
-    translate
   )
   (private_modules
     btree

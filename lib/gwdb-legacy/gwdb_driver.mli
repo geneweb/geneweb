@@ -1,5 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+type ('iper, 'person, 'string) legacy_dsk_person = ('iper, 'person, 'string) Dbdisk.gen_person
+
 (** String id *)
 type istr = int
 
