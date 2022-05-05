@@ -1,6 +1,8 @@
 
 open Dbdisk
-   
+
+type ('iper, 'person, 'string) legacy_dsk_person = ('iper, 'person, 'string) Dbdisk.gen_person   
+
 type istr = int
 type ifam = int
 type iper = int
