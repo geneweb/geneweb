@@ -249,10 +249,11 @@ and eval_simple_variable conf =
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
   | "sp" -> " "
   | "static_path" ->
-      begin match Util.p_getenv conf.base_env "static_path" with
-      | Some x -> x
-      | None -> conf.static_path
-      end
+      if conf.cgi then
+        match Util.p_getenv conf.base_env "static_path" with
+        | Some x -> x
+        | None -> conf.static_path
+      else ""
   | "suffix" ->
       (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
       let l =

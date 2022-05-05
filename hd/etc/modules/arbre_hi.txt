@@ -43,8 +43,8 @@
   -->
 </script>
 
-<script type="text/javascript" src="%if;(cgi)%static_path;%end;js/jquery.min.js"></script>
-<script type="text/javascript" src="%if;(cgi)%static_path;%end;js/jquery.line.js"></script>
+<script type="text/javascript" src="%static_path;js/jquery.min.js"></script>
+<script type="text/javascript" src="%static_path;js/jquery.line.js"></script>
 
 %define;implexc(x0,y0,x1,y1)
   <span style="top:%top;px;left:%left;px;font-family:monospace;">x

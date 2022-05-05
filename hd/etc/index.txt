@@ -7,13 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 
-%if;(cgi)
-  <link rel="stylesheet" href="%static_path;css/bootstrap.min.css?version=4.6.1">
-  <link rel="stylesheet" href="%static_path;css/all.min.css?version=6.00.0">
-  <link rel="stylesheet" href="%static_path;css/css.css">
-%else;
-  %include;css
-%end;
+%include;css
 
 </head>
 <body%body_prop;>

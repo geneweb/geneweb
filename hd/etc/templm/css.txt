@@ -1,7 +1,7 @@
 <!-- $Id: templm/css.txt, v7.00 2017/11/11 hg 05:46:40 $ -->
-<link rel="stylesheet" href="%if;(cgi)%static_path;%end;templm/css%bvar.css;.css" media="all" title="css%bvar.css;"%/>
+<link rel="stylesheet" href="%static_path;templm/css%bvar.css;.css" media="all" title="css%bvar.css;"%/>
 
-<script src=%if;(cgi)%static_path;%end;templm/js.js></script>
+<script src=%static_path;templm/js.js></script>
 %if;(bvar.uppercase = "yes")
   <script>
   <!--
@@ -14,7 +14,7 @@
     %end;
   -->
   </script>
-  <script src=%if;(cgi)%static_path;%end;templm/js_uppercase.js></script>
+  <script src=%static_path;templm/js_uppercase.js></script>
 %else;
-  <script src=%if;(cgi)%static_path;%end;templm/js_uppercase_no.js></script>
+  <script src=%static_path;templm/js_uppercase_no.js></script>
 %end;
