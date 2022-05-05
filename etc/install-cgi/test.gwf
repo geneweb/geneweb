@@ -1,4 +1,3 @@
-static_path=distribution/gw/etc/
 
 plugins=carrousel,cgl,fixbase,forum,no_index,v7,v7_im,welcome
 
