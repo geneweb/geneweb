@@ -14,11 +14,11 @@ li.female { list-style-type: circle; list-style-image: url('%image_prefix;/femal
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css"
       integrity="sha384-REHJTs1r2ErKBuJB0fCK99gCYsVjwxHrSU0N7I1zl9vZbggVJXRMsv/sLlOAGb4M" crossorigin="anonymous">
   %else;
-    <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/bootstrap.min.css?version=4.4.1">
-    <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/all.min.css?version=5.12.0">
+    <link rel="stylesheet" href="%if;(cgi)%static_path;%end;css/bootstrap.min.css?version=4.4.1">
+    <link rel="stylesheet" href="%if;(cgi)%static_path;%end;css/all.min.css?version=5.12.0">
   %end;
 %end;
-<link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/css.css">
+<link rel="stylesheet" href="%if;(cgi)%static_path;%end;css/css.css">
 %if;(bvar.css_prop != "")
-<link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/%bvar.css_prop;">
+<link rel="stylesheet" href="%if;(cgi)%static_path;%end;css/%bvar.css_prop;">
 %end;

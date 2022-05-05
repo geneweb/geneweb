@@ -1,10 +1,10 @@
 <!-- $Id: templm/js_upd.txt,v 7.00 2014/11/18 10:17:06 mr Exp $ --> 
-<script src="%if;(cgi)%bvar.static_path;%end;templm/js_upd.js"></script>
+<script src="%if;(cgi)%static_path;%end;templm/js_upd.js"></script>
 %if;(bvar.jquery = "no")
-  <script src="%if;(cgi)%bvar.static_path;%end;templm/js_upd_jq_no.js"></script>
+  <script src="%if;(cgi)%static_path;%end;templm/js_upd_jq_no.js"></script>
 %else;
-  <script src="%if;(cgi)%bvar.static_path;%end;templm/js_upd_jq.js"></script>
-  <script src="%if;(cgi)%bvar.static_path;%end;js/jquery.min.js"></script>
+  <script src="%if;(cgi)%static_path;%end;templm/js_upd_jq.js"></script>
+  <script src="%if;(cgi)%static_path;%end;js/jquery.min.js"></script>
 %end;
 %if;(bvar.uppercase = "yes")
   <script>
@@ -16,7 +16,7 @@
   %end;
   -->
   </script>
-  <script src=%if;(cgi)%bvar.static_path;%end;templm/js_uppercase.js></script>
+  <script src=%if;(cgi)%static_path;%end;templm/js_uppercase.js></script>
 %else;
-  <script src=%if;(cgi)%bvar.static_path;%end;templm/js_uppercase_no.js></script>
+  <script src=%if;(cgi)%static_path;%end;templm/js_uppercase_no.js></script>
 %end;

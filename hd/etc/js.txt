@@ -6,16 +6,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"
       integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm" crossorigin="anonymous"></script>
   %else;
-    <script src="%if;(cgi)%bvar.static_path;%end;js/jquery.min.js?version=3.5.0"></script>
-    <script src="%if;(cgi)%bvar.static_path;%end;js/bootstrap.bundle.min.js?version=4.4.1"></script>
+    <script src="%if;(cgi)%static_path;%end;js/jquery.min.js?version=3.5.0"></script>
+    <script src="%if;(cgi)%static_path;%end;js/bootstrap.bundle.min.js?version=4.4.1"></script>
   %end;
   %if;(evar.m!="MOD_DATA")
   <script>
     $('#load_once_p_mod').one('click', function() {
-      $.getScript('%if;(cgi)%bvar.static_path;%end;js/p_mod.js');
+      $.getScript('%if;(cgi)%static_path;%end;js/p_mod.js');
     });
     $('#load_once_copylink').one('click', function() {
-      $.getScript('%if;(cgi)%bvar.static_path;%end;js/copylink.js');
+      $.getScript('%if;(cgi)%static_path;%end;js/copylink.js');
     });
   </script>
   %end;
@@ -66,7 +66,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js" 
       integrity="sha384-gqYjRLBp7SeF6PCEz2XeqqNyvtxuzI3DuEepcrNHbrO+KG3woVNa/ISn/i8gGtW8" crossorigin="anonymous"></script>
   %else;
-     <script src="%if;(cgi)%bvar.static_path;%end;js/autosize.min.js?version=4.0.2"></script>
+     <script src="%if;(cgi)%static_path;%end;js/autosize.min.js?version=4.0.2"></script>
    %end;
   <script>autosize(document.querySelectorAll('textarea'));</script>
 %end;

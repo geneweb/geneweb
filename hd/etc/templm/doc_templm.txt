@@ -160,7 +160,7 @@
   </td>
 </tr>
 <tr>
-  <td>static_path=%bvar.static_path;</td>
+  <td>static_path=%static_path;</td>
   <td>
     En mode CGI :
     <ul>
