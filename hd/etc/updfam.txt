@@ -400,12 +400,13 @@ $(document).ready(function(){
     </div>
     <div class="col-md-3">
       <select class="form-control" name="excnt_witnwcnt_kind">
-        <option value=""     %if;(fwitness_kind = "")     selected %end;>[*witness/witnesses]0</option>
-        <option value="info" %if;(fwitness_kind = "info") selected %end;>[*informant/informants]0</option>
-        <option value="atte" %if;(fwitness_kind = "atte") selected %end;>[*present/present]0</option>
-        <option value="ment" %if;(fwitness_kind = "ment") selected %end;>[*mentioned/mentioned]0</option>
-        <option value="offi" %if;(fwitness_kind = "offi") selected %end;>[*civil registrar/civil registrars]0</option>
-        <option value="reli" %if;(fwitness_kind = "reli") selected %end;>[*parrish registrar/parrish registrars]0</option>
+	<option value="" %if;(fwitness_kind = "") selected="selected" %end;>[*witness/witnesses]0</option>
+	<option value="info" %if;(fwitness_kind = "info") selected="selected" %end;>[*informant/informant/informant]2</option>
+        <option value="atte" %if;(fwitness_kind = "atte") selected="selected" %end;>[*present/present/present]2</option>
+	<option value="ment" %if;(fwitness_kind = "ment") selected="selected" %end;>[*mentioned/mentioned/mentioned]2</option>
+	<option value="offi" %if;(fwitness_kind = "offi") selected="selected" %end;>[*civil registrar/civil registrar/civil registrar]2</option>
+	<option value="reli" %if;(fwitness_kind = "reli") selected="selected" %end;>[*parrish registrar/parrish registrar/parrish registrar]2</option>
+	<option value="othe" %if;(fwitness_kind = "othe") selected="selected" %end;>[*other/other/other]2</option>
       </select>
     </div>
   </div>

@@ -1235,7 +1235,12 @@ let make_conf from_addr request script_name env =
        if !images_url <> "" then !images_url
        else if !(Wserver.cgi) then ar.ar_command ^ "?m=IM&v="
        else "images";
-     cgi
+    static_path =
+      begin match Sys.getenv_opt "GW_STATIC_PATH" with
+      | Some x -> x
+      | None -> "../distribution/gw/etc/"
+      end
+    ; cgi
     ; output_conf
     ; forced_plugins = !forced_plugins
     ; plugins = !plugins

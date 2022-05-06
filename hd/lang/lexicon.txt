@@ -11718,7 +11718,7 @@ no: annen/annen/annen
 pt: outro/outra/outro
 sv: annat/annat/annat
 
-PACS
+    PACS
 co: PACS
 de: verfestigte Lebensgemeinschaft
 en: Civil Marriage
