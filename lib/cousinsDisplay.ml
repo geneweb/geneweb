@@ -60,14 +60,14 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
       "<a href=\"" ^<^ (href :> Adef.safe_string) ^^^ "\">" ^<^ s ^>^ "</a>"
   in
   let print_nospouse _ =
-    Perso.print_sosa conf base p2 true ;
+    SosaCache.print_sosa conf base p2 true ;
     Output.print_string conf (gen_person_title_text reference conf base p2) ;
     Output.print_string conf (DateDisplay.short_dates_text conf base p2)
   in
   let print_spouse sp first =
     incr cnt_sp;
     if first then begin
-      Perso.print_sosa conf base p2 true ;
+      SosaCache.print_sosa conf base p2 true ;
       Output.print_string conf (gen_person_title_text reference conf base p2)
     end else begin
       Output.print_sstring conf "<br>" ;
@@ -75,7 +75,7 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
     end ;
     Output.print_string conf (DateDisplay.short_dates_text conf base p2) ;
     Output.print_sstring conf " &amp; " ;
-    Perso.print_sosa conf base sp true ;
+    SosaCache.print_sosa conf base sp true ;
     Output.print_string conf (gen_person_title_text (reference_sp sp) conf base sp) ;
     Output.print_string conf (DateDisplay.short_dates_text conf base sp)
   in
@@ -262,7 +262,7 @@ let print_cousins conf base p lev1 lev2 =
   Output.print_sstring conf "</div>";
   cnt := 0;
   (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in
+  let () = SosaCache.build_sosa_ht conf base in
   print_cousins_lev conf base max_cnt p lev1 lev2;
   Output.print_sstring conf "<div><p>";
   if !cnt >= max_cnt then Output.print_sstring conf "etc... "

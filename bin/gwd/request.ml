@@ -111,10 +111,10 @@ let specify conf base n pl =
   Util.print_tips_relationship conf;
   Output.print_sstring conf "<ul>\n";
   (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in
+  let () = SosaCache.build_sosa_ht conf base in
   List.iter begin fun (p, tl) ->
     Output.print_sstring conf "<li>";
-    Perso.print_sosa conf base p true;
+    SosaCache.print_sosa conf base p true;
     begin match tl with
       | [] ->
         Output.print_sstring conf " " ;

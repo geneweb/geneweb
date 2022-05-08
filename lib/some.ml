@@ -179,7 +179,7 @@ let print_elem conf base is_surname (p, xl) =
   Mutil.list_iter_first begin fun first x ->
     let iper = get_iper x in
     if not first then Output.print_sstring conf "</li><li> ";
-    Perso.print_sosa conf base x true;
+    SosaCache.print_sosa conf base x true;
     Output.print_sstring conf {|<a href="|} ;
     Output.print_string conf (commd conf) ;
     Output.print_string conf (acces conf base x) ;
@@ -350,7 +350,7 @@ let first_name_print conf base x =
   in
   let list = List.fold_right merge_insert list [] in
   (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in
+  let () = SosaCache.build_sosa_ht conf base in
   match list with
     [] -> first_name_not_found conf x
   | [_, (strl, iperl)] ->
@@ -446,7 +446,7 @@ let print_branch conf base psn name =
           else Util.reference_noid conf base p
         else (fun s -> s)
       in
-      Perso.print_sosa conf base p with_link;
+      SosaCache.print_sosa conf base p with_link;
       Output.print_sstring conf @@ if with_link then "<strong>" else "<em>" ;
       Output.print_string conf
         (render p
@@ -773,7 +773,7 @@ let surname_print conf base not_found_fun x =
   in
   let iperl = PerSet.elements iperl in
   (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in
+  let () = SosaCache.build_sosa_ht conf base in
   match p_getenv conf.env "o" with
     Some "i" ->
       let pl =
@@ -888,7 +888,7 @@ let search_surname_print conf base not_found_fun x =
   in
   let iperl = PerSet.elements iperl in
   (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in
+  let () = SosaCache.build_sosa_ht conf base in
   match p_getenv conf.env "o" with
     Some "i" ->
       let pl =
@@ -959,7 +959,7 @@ let search_first_name_print conf base x =
   in
   let list = List.fold_right merge_insert list [] in
   (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in
+  let () = SosaCache.build_sosa_ht conf base in
   match list with
     [] -> first_name_not_found conf x
   | [_, (strl, iperl)] ->

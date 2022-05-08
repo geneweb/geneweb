@@ -34,20 +34,6 @@ val links_to_ind
   -> string * string * int
   -> (iper, ifam) Def.NLDB.page list
 
-(** Construts from the giving person sosa table strored in the cache. Sosa table contains association
-    {i person_id -> sosa number} for each person in the base.
-    Person has sosa [Sosa.one] and his ancestors have sosa > [Sosa.one].
-    For non ancestor person sosa number is set to [Sosa.zero]. *)
-val build_sosa_tree_ht : config -> base -> person -> unit
-
-(** Extract referenced person from environement and constructs for him sosa table wiht [build_sosa_tree_ht]. *)
-val build_sosa_ht : config -> base -> unit
-
-
-val get_sosa_person : person -> Sosa.t
-val get_single_sosa : config -> base -> person -> Sosa.t
-val print_sosa : config -> base -> person -> bool -> unit
-
 val get_linked_page : config -> base -> person -> string -> Adef.safe_string
 val get_birth_text : config -> person -> bool -> Adef.safe_string
 val get_baptism_text : config -> person -> bool -> Adef.safe_string
