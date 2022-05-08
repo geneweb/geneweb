@@ -9,12 +9,12 @@ let print_result conf base max_answers (list, len) =
   in
   if len = 0 then Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "no match"))
   else
-    let () = Perso.build_sosa_ht conf base in
+    let () = SosaMain.build_sosa_ht conf base in
     Output.print_string conf "<ul>\n";
     List.iter
       (fun p ->
          Output.print_string conf "<li>" ;
-         Perso.print_sosa conf base p true;
+         SosaMain.print_sosa conf base p true;
          Output.printf conf "\n%s%s<em>"
            (referenced_person_text conf base p)
            (DateDisplay.short_dates_text conf base p) ;

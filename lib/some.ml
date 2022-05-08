@@ -192,7 +192,7 @@ let print_elem conf base is_surname (p, xl) =
     (fun first x ->
        let iper = get_iper x in
        if not first then Output.print_string conf "</li>\n<li>\n  ";
-       Perso.print_sosa conf base x true;
+       SosaMain.print_sosa conf base x true;
        Output.printf conf "<a href=\"%s%s\" id=\"i%s\">" (commd conf)
          (acces conf base x) (string_of_iper iper);
        if is_surname then
@@ -348,7 +348,7 @@ let first_name_print conf base x =
   in
   let list = List.fold_right merge_insert list [] in
   (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in
+  let () = SosaMain.build_sosa_ht conf base in
   match list with
     [] -> first_name_not_found conf x
   | [_, (strl, iperl)] ->
@@ -443,7 +443,7 @@ let print_branch conf base psn name =
           else Util.reference_noid conf base p
         else (fun s -> s)
       in
-      Perso.print_sosa conf base p with_link;
+      SosaMain.print_sosa conf base p with_link;
       Output.printf conf "<%s>%s</%s>%s\n"
         hl
         (render p
@@ -780,7 +780,7 @@ let surname_print conf base not_found_fun x =
   in
   let iperl = PerSet.elements iperl in
   (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in
+  let () = SosaMain.build_sosa_ht conf base in
   match p_getenv conf.env "o" with
     Some "i" ->
       let pl =
@@ -895,7 +895,7 @@ let search_surname_print conf base not_found_fun x =
   in
   let iperl = PerSet.elements iperl in
   (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in
+  let () = SosaMain.build_sosa_ht conf base in
   match p_getenv conf.env "o" with
     Some "i" ->
       let pl =
@@ -966,7 +966,7 @@ let search_first_name_print conf base x =
   in
   let list = List.fold_right merge_insert list [] in
   (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in
+  let () = SosaMain.build_sosa_ht conf base in
   match list with
     [] -> first_name_not_found conf x
   | [_, (strl, iperl)] ->

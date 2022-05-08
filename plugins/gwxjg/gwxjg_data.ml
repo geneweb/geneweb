@@ -597,8 +597,8 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
 and get_sosa_person =
   let loaded = ref false in
   fun conf base p ->
-    if not !loaded then (Perso.build_sosa_ht conf base ; loaded := true) ;
-    let sosa = Perso.get_sosa_person p in
+    if not !loaded then (SosaMain.build_sosa_ht conf base ; loaded := true) ;
+    let sosa = SosaMain.get_sosa_person p in
     if sosa = Sosa.zero then Tnull else Tstr (Sosa.to_string sosa)
 
 and find_event conf base x events =
