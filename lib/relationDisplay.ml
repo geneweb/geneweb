@@ -781,7 +781,7 @@ let print_propose_upto conf base p1 p2 rl =
     Output.print_sstring conf {|/picto_rel_asc.png" alt=""> <a href="|} ;
     Output.print_string conf (commd conf) ;
     Output.print_string conf (acces conf base p) ;
-    Output.print_sstring conf "m=A&t=D&" ;
+    Output.print_sstring conf "&m=A&t=D&" ;
     Output.print_string conf (acces_n conf base (Adef.escaped "1") a) ;
     Output.print_sstring conf "&l=" ;
     Output.print_sstring conf (string_of_int maxlen) ;
