@@ -188,6 +188,7 @@ and eval_compound_var conf base env xx sl =
     | ["evar"; s] -> Opt.default "" (p_getenv conf.env s)
     | "encode" :: sl -> (Mutil.encode (loop sl) :> string) (* FIXME? *)
     | ("escape"|"html_encode") :: sl -> (Util.escape_html (loop sl) :> string) (* FIXME? *)
+    | "safe" :: sl -> (Util.safe_html (loop sl) :> string) (* FIXME? *)
     | "printable" :: sl -> only_printable (loop sl)
     | _ -> raise Not_found
   in
