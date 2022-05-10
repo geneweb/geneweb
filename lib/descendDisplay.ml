@@ -620,7 +620,7 @@ let print_desc_table_header conf =
     if p_getenv conf.env get = Some "on" then begin
       Output.print_sstring conf "<th>";
       incr nb_col;
-      transl conf txt
+      txt
       |> Utf8.capitalize_fst
       |> Output.print_sstring conf ;
       Output.print_sstring conf "</th>"
@@ -712,9 +712,15 @@ let print_person_table conf base p lab =
   then td (fun () ->
       Output.print_string conf birth_place ;
       Output.print_sstring conf "nbsp;") ;
-  let aux ?alt gets f =
+  let aux ?alt ?attr gets f =
     if List.exists (fun get -> p_getenv conf.env get = Some "on") gets then begin
       Output.print_sstring conf "<td" ;
+      begin match attr with
+      | Some attr ->
+         let attr = List.fold_left (fun acc (a, v) -> " " ^ a ^ "=" ^ "\"" ^ v ^ "\"") "" attr in
+         Output.print_sstring conf attr;
+      | None -> ()
+      end;
       if nb_families > 1 then Output.print_sstring conf {|" style="border-bottom:none"|} ;
       Output.print_sstring conf ">" ;
       if nb_families > 0 then
@@ -752,21 +758,10 @@ let print_person_table conf base p lab =
       |> Output.print_string conf ;
     Output.print_sstring conf " &nbsp;"
   end ;
-  aux [ "child" ; "marr" ; "marr_place" ; "marr_date"]
-    begin fun fam _spouse ->
-      Output.print_sstring conf (get_children fam |> Array.length |> string_of_int) ;
-      Output.print_sstring conf " &nbsp;"
-    end
-    ~alt:begin fun () ->
-      let n =
-        Array.fold_left
-          (fun n ifam -> n + Array.length (get_children (foi base ifam))) 0
-          (get_family p)
-      in
-      Output.print_sstring conf "<td>";
-      Output.print_sstring conf (string_of_int n) ;
-      Output.print_sstring conf " &nbsp;</td>"
-    end ;
+  aux [ "child" ] ~attr:["align", "center"] begin fun fam _spouse ->
+    Output.print_sstring conf (get_children fam |> Array.length |> string_of_int) ;
+    Output.print_sstring conf " &nbsp;"
+    end;
   if p_getenv conf.env "death" = Some "on"
   then td (fun () -> Output.print_string conf death) ;
   if p_getenv conf.env "death_place" = Some "on"
