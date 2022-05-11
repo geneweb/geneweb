@@ -1969,7 +1969,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
     begin match get_env "lazy_print" env with
         Vlazyp r ->
         begin match !r with
-            Some s -> r := None; Util.safe_html s |> safe_val
+            Some s -> r := None; safe_val (Adef.safe s)
           | None -> null_val
         end
       | _ -> raise Not_found
