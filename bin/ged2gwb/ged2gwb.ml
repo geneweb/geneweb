@@ -1299,8 +1299,10 @@ let rec find_all_rela nl =
 
 let witness_kind_of_rval rval = match rval with
   | "GODP"               -> Witness_GodParent
-  | "officer"            -> Witness_CivilOfficer
+  | "officer"
+  | "Civil officer"
   | "Registry officer"   -> Witness_CivilOfficer
+  | "Religious officer"
   | "Officiating priest" -> Witness_ReligiousOfficer
   | "Informant"          -> Witness_Informant
   | "Attending"          -> Witness_Attending
