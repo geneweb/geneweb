@@ -583,14 +583,14 @@ let witness_occur : iper -> (iper * witness_kind) array -> bool * bool =
   let is_w, only_mentioned_or_other = Array.fold_left (f iper) (false, true) a in
   is_w, is_w && only_mentioned_or_other
 
-let witness_kind_of_witness_array iper witnesses = 
+let witness_kind_of_witness_array iper witnesses =
   let is_witness, only_mentioned_or_other = witness_occur iper witnesses in
   if is_witness then
     let kind = if only_mentioned_or_other then Def.Witness_Mentioned else Def.Witness in
     Some kind
   else
     None
-  
+
 let check_person_dates_as_witness base warning p =
   let ip = get_iper p in
   let birth_date =
@@ -677,7 +677,7 @@ let check_person_dates_as_witness base warning p =
          (fun e -> e.epers_date)
          (fun e -> warning (PWitnessEventBeforeBirth (p, e, r)))
          (fun e -> warning (PWitnessEventAfterDeath (p, e, r)))
-         evt       
+         evt
   end related_pers
 
 let check_pevents base warning p =
