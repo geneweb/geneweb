@@ -1230,12 +1230,16 @@ let make_conf from_addr request script_name env =
        {day = tm.Unix.tm_mday; month = succ tm.Unix.tm_mon;
         year = tm.Unix.tm_year + 1900; prec = Sure; delta = 0};
      today_wd = tm.Unix.tm_wday;
-     time = tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec; ctime = utm;
-     image_prefix =
+     time = tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec; ctime = utm
+    ; image_prefix =
        if !images_url <> "" then !images_url
-       else if !(Wserver.cgi) then ar.ar_command ^ "?m=IM&v="
-       else "images";
-    static_path =
+       else if !(Wserver.cgi) then
+					begin match Sys.getenv_opt "GW_STATIC_PATH" with
+					| Some x -> x ^ "../images"
+					| None -> "../distribution/gw/images/"
+					end
+       else "images"
+    ; static_path =
       begin match Sys.getenv_opt "GW_STATIC_PATH" with
       | Some x -> x
       | None -> "../distribution/gw/etc/"

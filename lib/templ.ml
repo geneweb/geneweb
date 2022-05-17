@@ -178,7 +178,12 @@ and eval_simple_variable conf =
       in
       Util.doctype conf ^ "\n"
   | "highlight" -> conf.highlight
-  | "image_prefix" -> Util.image_prefix conf
+  | "image_prefix" ->
+      if conf.cgi then
+        match Util.p_getenv conf.base_env "image_prefix" with
+        | Some x -> x
+        | None -> conf.image_prefix
+      else conf.image_prefix
   | "lang" -> conf.lang
   | "left" -> conf.left
   | "nl" -> "\n"
