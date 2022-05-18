@@ -38,8 +38,9 @@ DIR="$(dirname "$0")"
 cd "$DIR"
 
 if [ -d $WEB_ROOT/cgi-bin ]; then
-  cp gwd.cgi $WEB_ROOT/cgi-bin 
-  cp test.cgi $WEB_ROOT/cgi-bin 
+  cp gwd.cgi $WEB_ROOT/cgi-bin
+  cp test.cgi $WEB_ROOT/cgi-bin
+  cp Lenna.jpg $WEB_ROOT
 else
   echo "missing cgi-bin"
   exit -1
