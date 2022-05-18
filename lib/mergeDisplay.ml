@@ -85,6 +85,7 @@ let print conf base p =
   Hutil.trailer conf
 
 let print_possible_continue_merging conf base =
+  let open Adef in
   match p_getenv conf.env "ini1", p_getenv conf.env "ini2" with
     Some ini1, Some ini2 ->
       let ini1 = iper_of_string ini1 in
@@ -112,15 +113,15 @@ let print_possible_continue_merging conf base =
           let ip = iper_of_string ip in
           let s1 =
             match p_getenv conf.env "iexcl" with
-              Some "" | None -> ""
-            | Some s -> "&iexcl=" ^ s
+              Some "" | None -> Adef.encoded ""
+            | Some s -> "&iexcl=" ^<^ Mutil.encode s
           in
           let s2 =
             match p_getenv conf.env "fexcl" with
-              Some "" | None -> ""
-            | Some s -> "&fexcl=" ^ s
+              Some "" | None -> Adef.encoded ""
+            | Some s -> "&fexcl=" ^<^ Mutil.encode s
           in
-          if s1 <> "" || s2 <> "" then
+          if s1 <^> (Adef.encoded "") || s2 <^> (Adef.encoded "") then
             begin
               let p = poi base ip in
               let s = gen_person_text conf base p in
@@ -128,8 +129,8 @@ let print_possible_continue_merging conf base =
               Output.print_string conf (commd conf) ;
               Output.print_sstring conf {|m=MRG_DUP&ip=|} ;
               Output.print_string conf (string_of_iper ip |> Mutil.encode ) ;
-              Output.print_string conf (Mutil.encode s1) ;
-              Output.print_string conf (Mutil.encode s2) ;
+              Output.print_string conf s1 ;
+              Output.print_string conf s2 ;
               Output.print_sstring conf {|">|} ;
               Output.print_sstring conf (Utf8.capitalize_fst (transl conf "continue merging")) ;
               Output.print_sstring conf {| (|} ;
