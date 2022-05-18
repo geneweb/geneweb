@@ -145,6 +145,8 @@ let ( ^>^ ) : 'a astring -> string -> 'a astring =
 let ( ^<^ ) : string -> 'a astring -> 'a astring =
   fun (a : string) (b : 'a astring) -> ( (a ^  b) : 'a astring)
 
+let ( <^> ) : 'a astring -> 'a astring -> bool = ( <> )
+                                     
 external safe : string -> safe_string = "%identity"
 
 external escaped : string -> escaped_string = "%identity"
