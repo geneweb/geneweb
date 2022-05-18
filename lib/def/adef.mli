@@ -98,6 +98,7 @@ type encoded_string = [`encoded] astring
 val ( ^^^ ) : 'a astring -> 'a astring -> 'a astring
 val ( ^>^ ) : 'a astring -> string -> 'a astring
 val ( ^<^ ) : string -> 'a astring -> 'a astring
+val ( <^> ) : 'a astring -> 'a astring -> bool
 val safe : string -> safe_string
 val escaped : string -> escaped_string
 val encoded : string -> encoded_string
