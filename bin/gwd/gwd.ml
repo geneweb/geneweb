@@ -1317,6 +1317,23 @@ let no_access conf =
   Output.print_sstring conf "No access to this database in CGI mode\n";
   Hutil.trailer conf
 
+let log_and_robot_check conf auth from request script_name contents =
+  if !robot_xcl = None
+  then log (Unix.time ()) conf from auth request script_name contents
+  else
+    Lock.control (SrcfileDisplay.adm_file "gwd.lck") true ~onerror:ignore
+      begin fun () ->
+        let tm = Unix.time () in
+        begin match !robot_xcl with
+          | Some (cnt, sec) ->
+            let s = "suicide" in
+            let suicide = Util.p_getenv conf.env s <> None in
+            conf.n_connect <- Some (Robot.check tm from cnt sec conf suicide)
+          | _ -> ()
+        end;
+        log tm conf from auth request script_name contents
+      end
+  
 let conf_and_connection =
   let slow_query_threshold =
     match Sys.getenv_opt "GWD_SLOW_QUERY_THRESHOLD" with
@@ -1338,6 +1355,13 @@ let conf_and_connection =
         else if !(Wserver.cgi) then true, ""
         else auth_err request conf.auth_file
       in
+      let mode = Util.p_getenv conf.env "m" in
+      if mode <> Some "IM" then begin
+          let contents =
+            if List.mem_assoc "log_pwd" env then Adef.encoded "..." else contents
+          in
+          log_and_robot_check conf auth from request script_name (contents :> string)
+        end;
       match !(Wserver.cgi), auth_err, passwd_err with
         true, true, _ ->
           if is_robot from then Robot.robot_error conf 0 0
