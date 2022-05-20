@@ -51,7 +51,7 @@ let print_submit conf name value =
   Output.print_sstring conf name;
   Output.print_sstring conf {|" value="|};
   Output.print_sstring conf (transl_nth conf "Y/N" value);
-  Output.print_sstring conf {|">|}
+  Output.print_sstring conf {|" style="margin-right:4px">|}
 
 let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   let title _ = transl conf "merge" |> Utf8.capitalize_fst |> Output.print_sstring conf in
