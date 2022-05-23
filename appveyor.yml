@@ -71,7 +71,7 @@
     description: 'Geneweb %PKG_VERSION% built by appveyor'
     provider: GitHub
     auth_token:
-      secure: fMXpYzNO3X61MnpDkjGw8NiI53HYiaSTgzpvYo5qj8TIBBy7O2+lqVVSCxxqqu3h
+      secure: YbzLC93Z4uRdKRn/TmH2lgzPVQ8Zgv4/PzAhJdUKHAXPKu+5vWfNCOelxnab+zCf
     artifact: /geneweb-%PKG_OS%-%PKG_VERSION%.zip|geneweb-win64-%PKG_VERSION%-installer.exe/
     draft: false
     prerelease: true
