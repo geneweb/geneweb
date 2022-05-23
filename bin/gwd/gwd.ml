@@ -1231,7 +1231,7 @@ let make_conf from_addr request script_name env =
         year = tm.Unix.tm_year + 1900; prec = Sure; delta = 0};
      today_wd = tm.Unix.tm_wday;
      time = tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec; ctime = utm;
-    image_prefix =
+     image_prefix =
        if !images_url <> "" then !images_url
        else if !(Wserver.cgi) then
 					begin match Sys.getenv_opt "GW_STATIC_PATH" with
@@ -1239,15 +1239,15 @@ let make_conf from_addr request script_name env =
 					| None -> "../distribution/gw/images/"
 					end
        else "images";
-    static_path =
-      begin match Sys.getenv_opt "GW_STATIC_PATH" with
-      | Some x -> x
-      | None -> "../distribution/gw/etc/"
-      end;
-    cgi;
-    output_conf;
-    forced_plugins = !forced_plugins;
-    plugins = !plugins
+     static_path =
+       begin match Sys.getenv_opt "GW_STATIC_PATH" with
+       | Some x -> x
+       | None -> "../distribution/gw/etc/"
+       end;
+     cgi;
+     output_conf;
+     forced_plugins = !forced_plugins;
+     plugins = !plugins;
     }
   in
   conf, ar
