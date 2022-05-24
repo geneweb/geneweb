@@ -570,20 +570,23 @@ let check_witness_pevents base warning origin =
     | _ -> ()
   end (get_pevents origin)
 
-let witness_occur =
-  let f iper (is_witness, only_mentioned) (i, wk) =
+(** Returns wether [iper] can be found in the provided associative array and
+    wether it was found associated only with the Mentionned or Other witness kind.
+**)
+let witness_occur : iper -> (iper * witness_kind) array -> bool * bool =
+  let f iper (is_witness, only_mentioned_or_other) (i, wk) =
     if i = iper then
-      true, only_mentioned && (wk = Def.Witness_Mentioned || wk = Def.Witness_Other)
-    else is_witness, only_mentioned
+      true, only_mentioned_or_other && (wk = Def.Witness_Mentioned || wk = Def.Witness_Other)
+    else is_witness, only_mentioned_or_other
   in
   fun iper a ->
-  let is_w, only_mentioned = Array.fold_left (f iper) (false, true) a in
-  is_w, is_w && only_mentioned
+  let is_w, only_mentioned_or_other = Array.fold_left (f iper) (false, true) a in
+  is_w, is_w && only_mentioned_or_other
 
 let witness_kind_of_witness_array iper witnesses = 
-  let is_witness, only_mentioned = witness_occur iper witnesses in
+  let is_witness, only_mentioned_or_other = witness_occur iper witnesses in
   if is_witness then
-    let kind = if only_mentioned then Def.Witness_Mentioned else Def.Witness in
+    let kind = if only_mentioned_or_other then Def.Witness_Mentioned else Def.Witness in
     Some kind
   else
     None
