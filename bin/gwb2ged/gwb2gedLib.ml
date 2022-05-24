@@ -392,10 +392,10 @@ let is_primary_pevents =
 let relation_format_of_witness_kind :
       witness_kind -> ('a, unit, string, unit) format4
   = function
-  | Witness                  -> "3 RELA witness"
+  | Witness                  -> "3 RELA Witness"
   | Witness_GodParent        -> "3 RELA GODP"
-  | Witness_CivilOfficer     -> "3 RELA officer"
-  | Witness_ReligiousOfficer -> "3 RELA Officiating priest"
+  | Witness_CivilOfficer     -> "3 RELA Civil officer"
+  | Witness_ReligiousOfficer -> "3 RELA Religious officer"
   | Witness_Informant        -> "3 RELA Informant"
   | Witness_Attending        -> "3 RELA Attending"
   | Witness_Mentioned        -> "3 RELA Mentioned"
