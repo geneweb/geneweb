@@ -11,9 +11,9 @@
 
   environment:
     CYG_BASH: '%CYG_ROOT%/bin/bash -lc'
-    OPAM_PACKAGES: 'calendars camlp5.8.00.01 cppo dune.2.9.0 jingoo markup ppx_blob ppx_deriving ppx_import stdlib-shims syslog unidecode.0.2.0 uucp uutf uunf'
+    OPAM_PACKAGES: 'calendars camlp5 cppo dune jingoo markup ppx_blob ppx_deriving ppx_import stdlib-shims syslog unidecode.0.2.0 uucp uutf uunf'
     matrix:
-      - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
         CYG_ROOT: C:/cygwin64
         PKG_OS: win64
       - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
@@ -31,7 +31,7 @@
     - cmd: '%CYG_ROOT%\setup-x86_64.exe -qnNdO -R %CYG_ROOT% -s http://cygwin.mirror.constant.com -l %CYG_ROOT%/var/cache/setup -P rsync -P patch -P diffutils -P unzip -P m4 -P mingw64-x86_64-gcc-core -P mingw64-x86_64-gmp -P perl-IPC-System-Simple'
     - cmd: '%CYG_BASH% "curl -fsSL -o opam64.tar.xz https://github.com/fdopen/opam-repository-mingw/releases/download/0.0.0.2/opam64.tar.xz"'
     - cmd: '%CYG_BASH% "tar -xf opam64.tar.xz && opam64/install.sh"'
-    - cmd: '%CYG_BASH% "opam init -a mingw https://github.com/fdopen/opam-repository-mingw.git#opam2 -c 4.09.1+mingw64c --disable-sandboxing"'
+    - cmd: '%CYG_BASH% "opam init -a mingw https://github.com/fdopen/opam-repository-mingw.git#opam2 -c 4.13.1+flambda+mingw64c+ --disable-sandboxing"'
     - cmd: '%CYG_BASH% "opam update"'
     - cmd: '%CYG_BASH% "opam install ${OPAM_PACKAGES}"'
     - cmd: '%CYG_BASH% "eval $(ocaml-env cygwin)"'
@@ -48,7 +48,7 @@
     - sh: 'if [[ "$PKG_OS" == "linux" ]]; then sudo add-apt-repository ppa:avsm/ppa; fi;'
     - sh: 'if [[ "$PKG_OS" == "linux" ]]; then sudo sudo apt-get update; fi;'
     - sh: 'if [[ "$PKG_OS" == "linux" ]]; then sudo apt-get install -qq opam libstring-shellquote-perl; fi;'
-    - sh: 'opam init --compiler=4.09.1'
+    - sh: 'opam init --compiler=4.13.1'
     - sh: 'eval $(opam config env)'
     - sh: 'opam update'
     - sh: 'opam install $OPAM_PACKAGES'
