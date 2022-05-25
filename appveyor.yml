@@ -32,9 +32,8 @@
     - cmd: '%CYG_BASH% "curl -fsSL -o opam64.tar.xz https://github.com/fdopen/opam-repository-mingw/releases/download/0.0.0.2/opam64.tar.xz"'
     - cmd: '%CYG_BASH% "tar -xf opam64.tar.xz && opam64/install.sh"'
     - cmd: '%CYG_BASH% "opam init -a mingw https://github.com/fdopen/opam-repository-mingw.git#opam2 -c 4.13.1+flambda+mingw64c --disable-sandboxing"'
-    - cmd: '%CYG_BASH% "opam update"'
-    - cmd: '%CYG_BASH% "opam install ${OPAM_PACKAGES}"'
     - cmd: '%CYG_BASH% "eval $(ocaml-env cygwin)"'
+    - cmd: '%CYG_BASH% "opam install ${OPAM_PACKAGES}"'
     # unix environnement
     - sh: 'export OPAMYES=1'
     - sh: 'if [[ "$PKG_OS" == "macos-10.14" || "$PKG_OS" == "macos-10.15" ]]; then sudo chown -R appveyor:staff $HOME/.cache; fi;'
