@@ -63,15 +63,6 @@ let rec subst sf = function
       | s2 :: sl2 -> s2, List.rev_append (List.rev_map sf sl2) sl1
       | _ -> assert false
     in
-    (* FIXIT is this code necessary?
-    let lex = Lexing.from_string s1 in
-    let [@warning "-8"] s2 :: sl2 = Templ_parser.compound_var lex in
-    let (s, sl) =
-      if lex.Lexing.lex_curr_p.pos_cnum = String.length s1
-      then s2, sl2 @ sl
-      else s, sl
-    in
-    *)
     Aforeach ((loc, s, sl), List.map (substl sf) pl, substl sf al)
   | Afor (i, min, max, al) ->
     Afor (sf i, subst sf min, subst sf max, substl sf al)
