@@ -16,6 +16,7 @@ val make_tree_hts :
 type dag_item = string
 val print_slices_menu_or_dag_page :
   Config.config ->
+  Gwdb.base ->
   string ->
   (int * Dag2html.align *
    (dag_item, string) Dag2html.table_data)

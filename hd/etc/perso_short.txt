@@ -19,6 +19,21 @@
   %end;
 %end;
 
+%define;thegen(xx)
+  [the %s generation:::xx]%nn;
+%end;
+
+%define;gena(xx)
+  %if;(xx = 1)[*specify::generation/generations]0%nn;
+  %elseif;(xx = 2)[*the parents]%nn;
+  %elseif;(xx = 3)[*the grandparents]%nn;
+  %elseif;(xx = 4)[*the great-grandparents]%nn;
+  %else;
+    %apply;thegen%with;
+      %apply;nth([nth (generation)], xx)
+    %end;
+  %end;
+%end;
 %define;relation_type_txt(xx, sex)
   %if;("xx" = [adoptive father/adoptive mother/adoptive parents]2)
     %apply;capitalize(nth([adoptive father/adoptive mother/adoptive parents], sex))
@@ -130,7 +145,7 @@
             </td>
             <td>
               %if;spouse.has_occupation;
-                <span class="fp_grey_italic">[*occupation/occupations]0:</span>
+                <span class="fp_grey_italic">[*occupation/occupations]0[:]</span>
                 %spouse.occupation;
               %end;
             </td>
@@ -673,7 +688,7 @@
       </tr>
     </table>
     <div class="fp_person_info">
-      %if;(evar.image!="off" and xx.has_image)
+      %if;(e.im="" and xx.has_image)
         <table width="100%%">
           <tr>
             <td width="30">
@@ -684,7 +699,7 @@
       <ul class="fp_person_info_ul">
         %if;xx.has_aliases;
           <li>
-            <span class="fp_grey_italic">[*alias]:</span>
+            <span class="fp_grey_italic">[*alias][:]</span>
             %foreach;xx.alias;
               <em>%if;not is_first;,%end;&nbsp;%alias;</em>
             %end;
@@ -692,7 +707,7 @@
         %end;
         %if;xx.has_nobility_titles;
           <li>
-            <span class="fp_grey_italic">[*title/titles]1:</span>
+            <span class="fp_grey_italic">[*title/titles]1[:]</span>
             <em>
               %foreach;xx.nobility_title;
                 %if;not is_first;,%end;
@@ -703,7 +718,7 @@
         %end;
         %if;xx.has_occupation;
           <li>
-            <span class="fp_grey_italic">[*occupation/occupations]0:</span>
+            <span class="fp_grey_italic">[*occupation/occupations]0[:]</span>
             %xx.occupation;
           </li>
         %end;
@@ -749,7 +764,7 @@
           </li>
         %end;
       </ul>
-      %if;(evar.image!="off" and xx.has_image)
+      %if;(e.im="" and xx.has_image)
         </td></tr></table>
       %end;
     </div>
@@ -760,26 +775,26 @@
       <tr><th colspan="2">[*parents]</th></tr>
       <tr>
         <td>
-          <span class="fp_grey_italic">%apply;capitalize(nth([father/mother],xx.father.sex)):</span>
+          <span class="fp_grey_italic">%apply;capitalize(nth([father/mother],xx.father.sex))[:]</span>
           %xx.father;
           %if;(xx.father_age_at_birth != "")%sp;(%xx.father_age_at_birth;)%end;
         </td>
         <td>
           %if;xx.father.has_occupation;
-            <span class="fp_grey_italic">[*occupation/occupations]0:</span>
+            <span class="fp_grey_italic">[*occupation/occupations]0[:]</span>
             %xx.father.occupation;
           %end;
         </td>
       </tr>
       <tr>
         <td>
-          <span class="fp_grey_italic">%apply;capitalize(nth([father/mother],xx.mother.sex)):</span>
+          <span class="fp_grey_italic">%apply;capitalize(nth([father/mother],xx.mother.sex))[:]</span>
           %xx.mother;
           %if;(xx.mother_age_at_birth != "")%sp;(%xx.mother_age_at_birth;)%end;
         </td>
         <td>
           %if;xx.mother.has_occupation;
-            <span class="fp_grey_italic">[*occupation/occupations]0:</span>
+            <span class="fp_grey_italic">[*occupation/occupations]0[:]</span>
             %xx.mother.occupation;
           %end;
         </td>
@@ -966,7 +981,7 @@
       <table class="fp_table_marriage" cellspacing="0">
         <tr>
           <th>
-            [*marriage/marriages]1 %if;(evar.children = "on" and xx.has_children) [and::child/children]1%end;
+            [*marriage/marriages]f %if;(evar.children = "on" and xx.has_children) [and] [child/children]c%end;
           </th>
         </tr>
         <tr>
@@ -1013,7 +1028,7 @@
                       </p>
                     %end;
                     %if;event.has_note;<div>%event.note;</div>%end;
-                      %if;event.has_src;<span><em>[*source/sources]1: %event.src;</em></span>%end;
+                      %if;event.has_src;<span><em>[*source/sources]1[:] %event.src;</em>.</span>%end;
                   </td>
                 </tr>
               %end;
@@ -1041,7 +1056,7 @@
           <td>
             <ul class="fp_source">
               %foreach;xx.source;
-                <li>%source_type;: %source;</li>
+                <li>%source_type;[:] %source;</li>
               %end;
             </ul>
           </td>
@@ -1056,8 +1071,8 @@
   %if;(evar.v > 1)
     <span width=100%%">
       <hr%/>
-      %apply;capitalize(nth([summary book ascendants], 3))%sp;
-      %apply;togen(nb_gen).
+      %apply;capitalize(nth([summary book ascendants], 3))%nn;
+      %if(evar.only="on"). [*only] %apply;gena(nb_gen)%else;%sp;%apply;togen(nb_gen)%end;.
       <hr%/>
     </span>
     <ul class="fp_ul_summary">
@@ -1065,15 +1080,17 @@
         %apply;lazy_print%with;
           <li><b>[*generation/generations]0 %level;</b></li>
         %end;
-        %foreach;ancestor;
-          %lazy_force;
-          %if;(ancestor.same = "")
-            <li>
-              <a href="#ind_%ancestor.index;" class="see-more">%ancestor;</a>
-              %if;(evar.sosa = "on" and ancestor.has_sosa)
-                ([n° Sosa]&nbsp;:%sp;%ancestor.sosa;)
-              %end;
-            </li>
+        %if;(evar.only!="on" or (evar.only="on" and level=evar.v))
+          %foreach;ancestor;
+            %lazy_force;
+            %if;(ancestor.same = "")
+              <li>
+                <a href="#ind_%ancestor.index;" class="see-more">%ancestor;</a>
+                %if;(evar.sosa = "on" and ancestor.has_sosa)
+                  ([n° Sosa]&nbsp;:%sp;%ancestor.sosa;)
+                %end;
+              </li>
+            %end;
           %end;
         %end;
       %end;
@@ -1082,11 +1099,13 @@
   %end;
 
   %foreach;ancestor_level(nb_gen)
-    %foreach;ancestor;
-      %if;(ancestor.same = "")
-        %apply;print_long_ind("ancestor")
-        %if;(not (is_last and level = nb_gen))
-          <p style="page-break-after:always;">&nbsp;</p>
+    %if;(evar.only!="on" or (evar.only="on" and level=evar.v))
+      %foreach;ancestor;
+        %if;(ancestor.same = "")
+          %apply;print_long_ind("ancestor")
+          %if;(not (is_last and level = nb_gen))
+            <p style="page-break-after:always;">&nbsp;</p>
+          %end;
         %end;
       %end;
     %end;

@@ -1,4 +1,10 @@
 (* $Id: dag2html.ml,v 5.0 2005-12-13 11:51:26 ddr Exp $ *)
+open Config
+open Gwdb
+open Def
+open TemplAst
+open Util
+
 
 type 'a dag = { mutable dag : 'a node array }
 and 'a node =
@@ -28,15 +34,15 @@ let new_ghost_id = let i = ref 0 in fun () -> incr i; ghost_id_of_int !i
 
 type align = LeftA | CenterA | RightA
 type ('a, 'b) table_data =
-    TDitem of 'a
-  | TDtext of string
+    TDitem of iper * 'a * string
+  | TDtext of iper * string
   | TDhr of align
   | TDbar of 'b option
   | TDnothing
 type ('a, 'b) html_table_line = (int * align * ('a, 'b) table_data) array
 type ('a, 'b) html_table = ('a, 'b) html_table_line array
 
-let html_table_struct indi_txt vbar_txt phony d t =
+let html_table_struct indi_ip indi_txt vbar_txt phony d t =
   let phony =
     function
       Elem e -> phony d.dag.(int_of_idag e)
@@ -45,7 +51,7 @@ let html_table_struct indi_txt vbar_txt phony d t =
   in
   let elem_txt =
     function
-      Elem e -> TDitem (indi_txt d.dag.(int_of_idag e))
+      Elem e -> TDitem (indi_ip d.dag.(int_of_idag e), indi_txt d.dag.(int_of_idag e), "")
     | Ghost _ -> TDbar None
     | Nothing -> TDnothing
   in

@@ -1,0 +1,29 @@
+(alias
+   (name plugin)
+   (deps (source_tree assets) plugin_v7.cmxs)
+)
+
+(library
+  (name plugin_v7_lib)
+  (libraries geneweb geneweb.gwd_lib geneweb.util)
+  (modules
+    v7_place
+    v7_relation
+    v7_searchName
+    v7_some
+    v7_updateData
+    v7_updateDataDisplay
+  )
+  (wrapped true)
+)
+
+(executable
+  (name plugin_v7)
+  (libraries geneweb.gwd_lib plugin_v7_lib)
+  (embed_in_plugin_libraries plugin_v7_lib)
+  (flags -linkall)
+  (modes (native plugin))
+  (modules plugin_v7)
+)
+
+(alias (name plugin) (deps plugin_v7.cmxs))

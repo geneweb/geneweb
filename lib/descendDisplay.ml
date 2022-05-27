@@ -1194,7 +1194,7 @@ let make_tree_hts conf base gv p =
                 bd td_prop txt
             else txt
           in
-          2 * ncol - 1, CenterA, TDitem txt
+          2 * ncol - 1, CenterA, TDitem ((get_iper p), txt, "")
       | None -> 1, LeftA, TDnothing
     in
     td :: tdl
@@ -1208,13 +1208,13 @@ let make_tree_hts conf base gv p =
           else
             let ifam = (get_family p).(i) in
             let tdl =
-              if i > 0 then (1, LeftA, TDtext "...") :: tdl else tdl
+              if i > 0 then (1, LeftA, TDtext (Gwdb.dummy_iper, "...")) :: tdl else tdl
             in
             let td =
               let fam = foi base ifam in
               let ncol = if v > 1 then fam_nb_column 0 (v - 1) fam else 1 in
+              let sp = pget conf base (Gutil.spouse (get_iper p) fam) in
               let s =
-                let sp = pget conf base (Gutil.spouse (get_iper p) fam) in
                 let txt = person_title_text conf base sp in
                 let txt = reference conf base sp txt in
                 let txt =
@@ -1233,7 +1233,7 @@ let make_tree_hts conf base gv p =
                     bd td_prop s
                 else s
               in
-              2 * ncol - 1, CenterA, TDitem s
+              2 * ncol - 1, CenterA, TDitem ((get_iper sp), s, "spouse_x")
             in
             loop (td :: tdl) (i + 1)
         in
@@ -1296,7 +1296,7 @@ let print_tree conf base v p =
        transl_a_of_gr_eq_gen_lev conf (transl conf "descendants") s s)
   in
   let hts = make_tree_hts conf base gv p in
-  DagDisplay.print_slices_menu_or_dag_page conf page_title hts ""
+  DagDisplay.print_slices_menu_or_dag_page conf base page_title hts ""
 
 let print_aboville conf base max_level p =
   let max_level = min (Perso.limit_desc conf) max_level in

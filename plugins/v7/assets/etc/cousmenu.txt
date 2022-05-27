@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: cousmenu.txt, v7.1 16/10/2021 20:09:41 ddr a2 Exp $ -->
+  <!-- Copyright (c) 1998-2022 INRIA -->
+  <title>%nn;
+   [*relationship link between]%sp;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  %include;favicon
+  %include;css
+  %include;hed
+</head>
+<body%body_prop;>
+%message_to_wizard;
+<div class="container%if;(evar.v!="" and evar.v>5)-fluid%end;">
+%include;perso_utils
+%include;menubar
+%define;picklvl(vvv)
+  <a role="button" class="btn btn-primary btn-sm%if;((evar.v="" and vvv=3) or (evar.v!="" and evar.v=vvv)) disabled%end; align-self-center" 
+  href="%prefix_base_password;%foreach;env_binding;%if;(env.val!="" and env.key!="v")&%env.key=%env.val;%end;%end;%if;(vvv!=3)&v=%expr(vvv)%end;" 
+  title="[*ascending/descending (degree)]0 [maximum]">vvv</a>
+%end;
+<div class="d-flex justify-content-between">
+  <h1>%nn;
+    [*link between]%sp;
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") <em>%qualifier;</em>%end;
+    %sp;%surname;
+    %(%if;(alias != "") <em>(%alias;)</em>%end;%)
+    %sp;[and] [close family]
+  </h1>
+  <div class="ml-auto py-0 btn-group%if;(evar.v!="" and evar.v>3) mr-4%end;" role="group" aria-label="gen. pick">
+    %let;min;%if;(not has_children)1%else;0%end;%in;
+    %let;max;%if;(static_max_anc_level>bvar.max_anc_level and bvar.max_anc_level<10)%bvar.max_anc_level;%elseif;(static_max_anc_level<10)%static_max_anc_level%else;10%end;%in;
+    %for;i;min;max;%apply;picklvl(i)%end;
+  </div>
+</div>
+%define;cousin_lex(vvv,www)
+  [cousins.vvv.www]1
+%end;
+%define;cousin_lex_tt(vvv,www)
+  %( condition pour garder la tooltip (title="") vide si elle n'est pas définie pour la langue en cours %)
+  %if;([cousins.vvv.www tt]!="[cousins.vvv.www tt]")[cousins.vvv.www tt]1%else;%end;
+%end;
+%define;list_ancestor(vvv)
+  %(todo: remove implexes%)
+  %reset_count1;%reset_count2;
+  %foreach;ancestor_level;
+    %if;(level=vvv+1)
+      %foreach;ancestor;
+        %incr_count1;
+        %if;(is_first)<span class="text-nowrap">%nn;
+        %else;
+          %if;(count1%2=1)%if;(ancestor="? ?")%incr_count2;%else;</span> <span class="text-nowrap">%end;%end;
+        %end;
+        %if;(count1%2=0 and ancestor!="? ?" and count2!=1) & %end;
+        %if;(ancestor!="? ?")%ancestor;%end;
+        %if;(count1%2=0)%reset_count2;%if;(not is_last) • %else;</span>%end;%end;
+      %end;
+    %end;
+  %end;
+%end;
+%define;link(vvv,lll,ttt,ddd,ccc)
+ %let;evarv;%if;(evar.v="")3%else;%evar.v;%end;%in;
+ %let;width;%expr((100/(evarv+1))*vvv)%in;
+ %if("ddd"="disabled" and vvv!=0)
+ %else;
+   <td%if;(vvv>0) colspan="%expr(vvv+1)"%end; %if;(vvv=0)style="width:%expr(100/lll)%%"%end; class="table-%if;(vvv=0)info%elseif;(vvv %2 = 1)primary%else;danger%end;" >
+     <div class="%if;(vvv>=0)border-right %(border-bottom %)border-%if;(i=0)success%elseif;(vvv%2=1)primary%else;danger%end;%end;  d-flex flex-column   justify-content-between">
+       <div class="font-weight-bold" style="height:%;"><sup>vvv</sup>/<sub>0</sub></div>
+       <a role="button" href="%prefix;&%access;&m=C&v1=vvv&v2=0"
+        class="btn btn-light ddd w-100"%if;(vvv<5) style="height:120px;"%end;
+         data-toggle="tooltip" data-html="true" title="%apply;cousin_lex_tt(vvv,0)">
+         %if;(vvv=0)<span class="badge badge-success">1</span>%incr_count;<br>%end;ttt%nn;
+         %if;(vvv<10)<div class="d-flex justify-content-center"><div class="mt-1 mx-3 small text-muted">%apply;list_ancestor(vvv)</div></div></a>%end;
+      <div>%expr(100/.(2^vvv)) %%</div>
+      </div>
+    </td>
+  %end;
+%end;
+%define;one_ancestor(vvv,ttt)
+  %reset_count1;%reset_count2;
+    %foreach;ancestor_level;
+      %if;(level=vvv+1)
+        %foreach;ancestor;
+          %incr_count2;
+          %if;(ancestor!="? ?")%incr_count;%else;%incr_count1;%end;
+        %end;
+      %end;
+    %end;
+  %apply;link%with;vvv%and;%and;<span class="badge badge-xl badge-%if;(vvv %2 = 1)primary%else;danger%end;"> %expr(count2-count1)</span><br>ttt%and;%if;(count2=0)disabled%end;%and;%end;
+%end;
+%( Calcul de la hauteur maximale du tableau descendant, limité en dur à deux fois max la hauteur montante evar.v %)
+%let;maxv;%if;(evar.v="")4%else;%expr(evar.v+1)%end;%in;
+%let;maxw;%if;(evar.v=0 or (2*maxv<static_max_desc_level+1 and static_max_desc_level<10))%expr(static_max_desc_level+2)%else;%expr(2*maxv)%end;%in;
+%let;minw;%if;has_children;2%else;1%end;%in;
+%let;zero;%for;i;0;maxv;0%end;%in;
+%define;cous(vvv,www)
+  %if;plugin.v7;%expr(cousins.vvv.www)%end;
+%end;
+%define;row_counts(xxx)
+  %for;i;0;maxv;
+    %apply;cous%with;%expr(i)%and;%expr(i+xxx)%end;
+  %end;
+%end;
+%reset_count1;
+%for;i;minw;maxw;
+  %let;row;%apply;row_counts(i)%in;
+  %if;(row=zero)%incr_count1;%end;
+%end;
+%let;maxdesc;%expr(maxw-count1)%in;
+%define;link_cousin(vvv,www,ttt,sss)
+  %let;cousins_vvv_www_float;%if;plugin.v7;%cousins.vvv.www;%end;%in;
+  %let;cousins_vvv_www;%expr(cousins_vvv_www_float/.1)%in;
+  <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=www" data-toggle="tooltip" data-html="true" title="sss" class="btn btn-light %if;(cousins_vvv_www!="" and cousins_vvv_www=0) disabled%end; w-100" %if;(www-vvv<=10) style="height:120px;"%end;>
+    <span class="badge badge-%if;(vvv=0)info%elseif;(vvv%2=1)primary%else;danger%end;">%cousins_vvv_www;</span>%nn;
+    %if;(plugin.v7 and "." in cousins_vvv_www_float)
+      %let;couspaths_vvv_www;%cousins.vvv.www.paths;%in;
+      +<span class="badge badge-info">%couspaths_vvv_www;</span>
+    %for;i;0;couspaths_vvv_www;%incr_count3;%end;
+    %end;<br>
+    ttt</a><div>%if;(vvv=0)%expr((100/.(2^(vvv+www))))%else;%expr((100/.(2^(vvv+www-1))))%end; %%</div>
+    %for;i;0;cousins_vvv_www;%incr_count;%end;
+%end;
+%( table of cousins.i.j-xxx+i, maxdesc calculé auparavant %)
+%define;table(xxx)
+  %let;max;%expr(maxdesc+xxx)%in;
+  <table id="quickrel" class="table table-bordered table-responsive-sm text-center mb-0">
+    %for;j;0;max;
+      <tr>
+        %for;i;0;xxx;
+          %if;(i!=0 and j+i=xxx)
+            %apply;one_ancestor%with;%i%and;%apply;cousin_lex(i,0)%end;
+          %elseif;(j+i<xxx)
+            %(%if;(i!=0)
+              <td class="border-0"></td>
+            %end;%)
+          %else;
+             %if;(i=0 and j=xxx)
+               %apply;link%with;0%and;j%and;
+               <b>%if;is_male;[him/her]0%elseif;is_female;[him/her]1%end;</b>%nn;
+               %and;disabled%and;%end;
+             %else;
+               <td %if;(j=xxx)style="width:%expr(100/xxx)%%"%end; class="table-%if;(i=0)info%elseif;(i %2 = 1)primary%else;danger%end;">
+                 <div class="%if;(i>=0)border-right %(border-bottom %)border-%if;(i=0)success%elseif;(i%2=1)primary%else;danger%end;%end; d-flex flex-column justify-content-between">
+                   <span class="font-weight-bold"><sup>%i;</sup>/<sub>%expr(j-xxx+i)</sub></span>
+                   %apply;link_cousin%with;%i;%and;%expr(j-xxx+i)
+                     %and;%apply;cousin_lex(i,j-xxx+i)
+                     %and;%apply;cousin_lex_tt(i,j-xxx+i)
+                   %end;
+                 </div>
+               </td>
+             %end;
+          %end;
+        %end;
+      </tr>
+    %end;
+    <tr>
+      <td colspan="%xxx;">[coefficient of relationship]<br>[half DNA]<br>[one ancestor counted]</td>
+    </tr>
+  </table>
+%end;
+%reset_count;%reset_count3;
+%if;(evar.v="")
+  %apply;table(4)
+%elseif(evar.v>0 or evar.v<10)
+  %apply;table(evar.v+1)
+%end;
+
+%let;paths;%expr(count+count3)%in;
+%if;plugin.v7;Total[:] %count; %if;(count=1)[person/persons]0%else;[person/persons]1%end;%if;(count3>0) (+ <span class="badge badge-info">%count3;</span> = %paths; %if;(paths=1)[path/paths]0%else;[path/paths]1%end;)%end;.%end;
+%include;trl
+%include;copyr
+</div>
+%include;js
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+</body>
+</html>

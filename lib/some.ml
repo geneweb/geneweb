@@ -136,6 +136,12 @@ let print_alphabetic_to_branch conf x =
   Output.print_string conf "</table>";
   Output.print_string conf "<br>\n"
 
+let match_fnames word str x =
+  if word then
+    let rexp = Str.regexp (".*\\b" ^ x ^ "\\b.*") in
+    Str.string_match rexp str 0
+  else Mutil.contains str x
+
 let persons_of_fsname conf base base_strings_of_fsname find proj x =
   (* list of strings index corresponding to the crushed lower first name
      or surname "x" *)
@@ -220,6 +226,33 @@ let name_unaccent s =
   in
   copy 0 0
 
+(* TODO find a way tu use get_vother, set_vother from templ.camlp5 *)
+let buttons_fnames conf =
+  Util.include_template conf conf.env "buttons_fnames" (fun () -> ())
+
+let print_other_list conf _base list =
+  let s_title = Printf.sprintf "%s" (Utf8.capitalize (transl conf "see also")) in
+  let s_colon = Printf.sprintf "%s" (transl conf ":") in
+  Output.printf conf "<span>%s%s</span>\n" s_title s_colon;
+  Mutil.list_iter_first (fun first (fn, c) ->
+      Output.printf conf "%s<a href=\"%sm=P&v=%s&other=on\">%s</a> (%d)"
+        (if first then "" else ", ") (commd conf) (Mutil.encode fn) fn c)
+    list
+
+let other_fnames conf base x =
+  match Alln.select_names conf base false "" max_int with
+  | (Alln.Result list, _len) ->
+    let exact = p_getenv conf.env "t" = Some "A" in
+    let word = p_getenv conf.env "word" = Some "on" in
+    let x = if exact then x else Name.lower x in
+    List.fold_left
+      (fun l (_k, str, c) ->
+         let strl = if exact then str else Name.lower str in
+         if (match_fnames word strl x && strl <> x)
+         then (str, c) :: l else l)
+      [] list
+  | (Alln.Specify _l, _len) -> [] (* TODO is [] ok? *)
+
 let first_name_print_list conf base x1 xl liste =
   let liste =
     let l =
@@ -257,9 +290,19 @@ let first_name_print_list conf base x1 xl liste =
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
+  buttons_fnames conf;
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
+  let other = p_getenv conf.env "other" = Some "on" in
+  if other then
+    let listo =
+        List.fold_left (fun l x ->
+            (other_fnames conf base x) :: l) [] (StrSet.elements xl)
+    in
+    let listo = List.flatten listo |> List.sort_uniq compare in
+    if listo <> [] then print_other_list conf base listo else ()
+  else ();
   let list =
     List.map
       (fun (sn, ipl) ->
@@ -279,6 +322,7 @@ let select_first_name conf n list =
       (transl conf "specify")
   in
   Hutil.header conf title;
+  buttons_fnames conf;
   Output.print_string conf "<ul>";
   List.iter
     (fun (sstr, (strl, _)) ->
@@ -626,10 +670,11 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   let access txt sn =
     geneweb_link conf ("m=N&v=" ^ Mutil.encode sn ^ "&t=N") txt
   in
+  buttons_fnames conf;
   Util.wprint_in_columns conf (fun (ord, _, _) -> ord)
     (fun (_, txt, sn) -> Output.print_string conf (access txt sn)) list;
   Output.print_string conf "<p>\n";
-  Output.print_string conf "<em style=\"font-size:80%%\">\n";
+  Output.print_string conf "<em class=\"small\">\n";
   Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "click"));
   Output.printf conf "<a href=\"%sm=N&o=i&v=%s\">%s</a>\n" (commd conf)
     (if List.length homonymes = 1 then Mutil.encode x ^ "&t=A"

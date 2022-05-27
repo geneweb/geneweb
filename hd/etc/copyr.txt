@@ -86,7 +86,7 @@
         </div>
         <div class="btn-group">
           <span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer, noopener">INRIA</a> 1998-2019</span>
-          <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang!="en")/%lang;%end;" class="ml-1"
+          <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang="fr" or lang="de" or lang="nl" or lang="ru" or lang="sv")/%lang;%end;" class="ml-1"
             target="_blank" rel="noreferrer, noopener" title="Documentation GeneWeb">%nn;
             <i class="fab fa-wikipedia-w"></i></a>%nn;
           <a href="https://github.com/geneweb/geneweb" class="ml-1"

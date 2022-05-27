@@ -21,9 +21,6 @@ val interp_notempl_with_menu :
 (** Displays the HTML page of a person *)
 val print : ?no_headers:bool -> config -> base -> person -> unit
 
-(** Displays the ascendants of the selected person *)
-val print_ascend : config -> base -> person -> unit
-
 (** Displays links to pages associated to the person *)
 val print_what_links : config -> base -> person -> unit
 

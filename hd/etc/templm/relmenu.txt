@@ -31,7 +31,7 @@
 %define;nth_cousins(xx)
   [*%s cousins:::xx]%nn;
 %end;
-
+%(%apply;nth_cousins%with;%apply;nth%with;zero/[nth (cousin)]%and;2%end;%end; ?? %)
 <h1>[*link between]%sp;
   %if;(public_name != "")%public_name;%else;%first_name;%end;
   %if;(qualifier != "") <em>%qualifier;</em>%end;

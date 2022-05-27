@@ -365,7 +365,7 @@ let gen_print_menu_birth conf base f_scan mode =
   let list_aft = ref [] in
   begin match Util.find_person_in_env conf base "" with
     Some p ->
-      Perso.interp_notempl_with_menu title "perso_header" conf base p;
+      !Templ_interp.notempl_with_menu title "perso_header" conf base p;
       Output.print_string conf "<h2>\n";
       title false;
       Output.print_string conf "</h2>\n"

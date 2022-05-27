@@ -106,10 +106,11 @@ let print_source_image conf f =
   let fname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
-  if fname = Filename.basename fname then
+  (* remove Filename.basename for subfolder location
+  if fname = Filename.basename fname then *)
     let fname = Util.source_image_file_name conf.bname fname in
     if print_image_file conf fname then () else Hutil.incorrect_request conf
-  else Hutil.incorrect_request conf
+  (* else Hutil.incorrect_request conf *)
 
 (* ************************************************************************** *)
 (*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)

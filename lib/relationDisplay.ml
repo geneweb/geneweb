@@ -50,7 +50,7 @@ let old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   let (set, d) = dag_of_relation_path conf base path in
   let page_title = Utf8.capitalize_fst (transl conf "relationship") in
   let hts = DagDisplay.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
-  DagDisplay.print_slices_menu_or_dag_page conf page_title hts next_txt
+  DagDisplay.print_slices_menu_or_dag_page conf base page_title hts next_txt
 
 let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   if p_getenv conf.env "new" <> Some "on" then
@@ -144,25 +144,19 @@ let print_shortest_path conf base p1 p2 =
                  (cftransl conf "no known relationship link between %s and %s"
                     [s1; s2]));
             Output.print_string conf "<br>\n";
-            begin
-              Output.print_string conf "<p>\n";
-              begin
-                Output.print_string conf "<span>";
-                begin
-                  Output.printf conf "<a href=\"%s&m=R&%s\">" (commd conf)
-                    (acces conf base p1);
-                  Output.print_string conf
-                    (Utf8.capitalize_fst
-                       (transl_nth conf "try another/relationship computing"
-                          0));
-                  Output.print_string conf "</a>"
-                end;
-                Output.printf conf " %s.\n"
-                  (transl_nth conf "try another/relationship computing" 1);
-                Output.print_string conf "</span>"
-              end;
-              Output.print_string conf "</p>\n"
-            end
+            Output.print_string conf "<p>\n";
+            Output.print_string conf "<span>";
+            Output.printf conf "<a href=\"%s&m=R&%s\">" (commd conf)
+              (acces conf base p1);
+            Output.print_string conf
+              (Utf8.capitalize_fst
+              (transl_nth conf "try another/relationship computing"
+                    0));
+            Output.print_string conf "</a>";
+            Output.printf conf " %s.\n"
+              (transl_nth conf "try another/relationship computing" 1);
+            Output.print_string conf "</span>";
+            Output.print_string conf "</p>\n"
           end
         else
           begin
@@ -172,6 +166,7 @@ let print_shortest_path conf base p1 p2 =
             Output.print_string conf "</ul>\n"
           end;
         Hutil.trailer conf
+
 let parents_label conf base info =
   function
     1 -> transl conf "the parents"
@@ -823,7 +818,16 @@ let print_main_relationship conf base long p1 p2 rel =
     | Some (_, total, _) -> total
   in
   let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (transl conf "relationship"));
+    match p_getenv conf.env "et" with
+    | Some "A" ->
+        Output.print_string conf (Utf8.capitalize_fst (transl conf "relationship by ancestors"))
+    | Some "M" ->
+        Output.print_string conf (Utf8.capitalize_fst (transl conf "relationship by marriage"))
+    | Some "S" ->
+        Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "relation/relations" 0) ^
+          " (" ^ (transl conf "shortest path") ^ ")")
+    | _ -> 
+        Output.print_string conf (Utf8.capitalize_fst (transl conf "relationship"));
     if Sosa.eq total Sosa.zero then ()
     else
       begin
@@ -846,6 +850,7 @@ let print_main_relationship conf base long p1 p2 rel =
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Util.include_template conf conf.env "buttons_rel" (fun () -> ());
+  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
   begin match p_getenv conf.env "spouse" with
     Some "on" -> conf.senv <- conf.senv @ ["spouse", "on"]
   | _ -> ()
@@ -932,6 +937,7 @@ let print_main_relationship conf base long p1 p2 rel =
         end;
       print_propose_upto conf base p1 p2 rl
   end;
+  Output.print_string conf "</form>\n";
   Hutil.trailer conf
 
 let multi_relation_next_txt conf pl2 lim assoc_txt =
@@ -1030,8 +1036,6 @@ let print_base_loop conf base p =
   Output.print_string conf ".\n";
   Hutil.trailer conf
 
-let relmenu_print = Perso.interp_templ "relmenu"
-
 let print conf base p =
   function
     Some p1 ->
@@ -1051,7 +1055,7 @@ let print conf base p =
             Left rel -> print_main_relationship conf base long p1 p rel
           | Right p -> print_base_loop conf base p
       end
-  | None -> relmenu_print conf base p
+  | None -> !Templ_interp.templ "relmenu" conf base p
 
 let print_multi conf base =
   let assoc_txt = Hashtbl.create 53 in

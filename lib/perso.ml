@@ -382,6 +382,47 @@ let max_ancestor_level conf base ip max_lev =
 
 let default_max_cousin_lev = 5
 
+let get_descendants_at_level base p lev2 =
+  match lev2 with
+  | 0 -> []
+  | n ->
+    let rec loop acc lev fam =
+      Array.fold_left
+      (fun acc ifam ->
+        let children = Array.to_list (get_children (foi base ifam)) in
+        List.fold_left
+        (fun acc ch ->
+          if lev < n then
+            loop acc (lev + 1) (get_family (poi base ch))
+          else
+            if not (List.mem ifam acc) then
+              ifam :: acc
+            else acc
+        ) acc children
+      ) acc fam
+    in
+    loop [] 1 (get_family p)
+
+let count_cousins conf base p lev1 lev2 =
+  match (lev1, lev2) with
+  | (0, 0) -> (1, 0, 0) (* self *)
+  | (0, lev2) -> (* descendants *)
+    let ifam_l = get_descendants_at_level base p lev2 in
+    let (cnt, cnt_sp) = List.fold_left (fun (cnt, cnt_sp) ifam ->
+        (cnt + Array.length (get_children (foi base ifam)),
+        cnt_sp + 1)) (0, 0) ifam_l
+    in
+    (cnt, cnt, cnt_sp)
+  | (_, _) ->
+    let max_cnt =
+      try int_of_string (List.assoc "max_cousins" conf.base_env) with
+        Not_found | Failure _ -> CousinsPrintOrCount.default_max_cnt
+    in
+    let () = SosaMain.build_sosa_ht conf base in
+    let (cnt_t, iplist, splist) =
+      CousinsPrintOrCount.print_cousins_lev conf base max_cnt p lev1 lev2 false SosaMain.print_sosa
+    in ((List.length iplist), cnt_t, (List.length iplist))
+
 let max_cousin_level conf base p =
   let max_lev =
     try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
@@ -1249,6 +1290,7 @@ type 'a env =
   | Vrel of relation * person option
   | Vbool of bool
   | Vint of int
+  | Vvars of (string * string) list ref
   | Vgpl of generation_person list
   | Vnldb of (Gwdb.iper, Gwdb.ifam) Def.NLDB.t
   | Vstring of string
@@ -1616,6 +1658,16 @@ and eval_simple_str_var conf base env (_, p_auth) =
         Vcnt c -> string_of_int !c
       | _ -> ""
       end
+  | "count3" ->
+      begin match get_env "count3" env with
+        Vcnt c -> string_of_int !c
+      | _ -> ""
+      end
+  | "desc_cnt" ->
+      begin match get_env "desc_cnt" env with
+        Vint c -> string_of_int c
+      | _ -> ""
+      end
   | "divorce_date" ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) when mode_local env ->
@@ -1709,6 +1761,11 @@ and eval_simple_str_var conf base env (_, p_auth) =
         Vcnt c -> incr c; ""
       | _ -> ""
       end
+  | "incr_count3" ->
+      begin match get_env "count3" env with
+        Vcnt c -> incr c; ""
+      | _ -> ""
+      end
   | "lazy_force" ->
       begin match get_env "lazy_print" env with
         Vlazyp r ->
@@ -1734,6 +1791,18 @@ and eval_simple_str_var conf base env (_, p_auth) =
             Vfam (_, fam, _, m_auth) ->
               if m_auth then
                 Util.string_of_place conf (sou base (get_marriage_place fam))
+              else ""
+          | _ -> raise Not_found
+      end
+  | "marriage_place_raw" ->
+      begin match get_env "fam" env with
+        Vfam (_, fam, _, m_auth) when mode_local env ->
+          if m_auth then sou base (get_marriage_place fam)
+          else ""
+      | _ ->
+          match get_env "fam_link" env with
+            Vfam (_, fam, _, m_auth) ->
+              if m_auth then sou base (get_marriage_place fam)
               else ""
           | _ -> raise Not_found
       end
@@ -1878,6 +1947,11 @@ and eval_simple_str_var conf base env (_, p_auth) =
       end
   | "reset_count2" ->
       begin match get_env "count2" env with
+        Vcnt c -> c := 0; ""
+      | _ -> ""
+      end
+  | "reset_count3" ->
+      begin match get_env "count3" env with
         Vcnt c -> c := 0; ""
       | _ -> ""
       end
@@ -2094,6 +2168,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       end
   | "number_of_descendants" :: sl ->
       (* FIXME: what is the difference with number_of_descendants_at_level??? *)
+      (* -> Gwdb.Marker.get m ip <= i rather than = i *)
       begin match get_env "level" env with
         Vint i ->
           begin match get_env "desc_level_table" env with
@@ -2132,6 +2207,22 @@ and eval_compound_var conf base env (a, _ as ep) loc =
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found
       end
+  | ["person_index"] ->
+      begin match find_person_in_env conf base "" with
+      | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
+      | None -> raise Not_found
+      end
+  | ["person_index"; x] ->
+      let find_person =
+        match x with
+        | "e" -> find_person_in_env_pref
+        | s -> find_person_in_env
+      in
+      let s = if x = "x" then "" else x in
+      begin match find_person conf base s with
+      | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
+      | None -> raise Not_found
+      end
   | "prev_item" :: sl ->
       begin match get_env "prev_item" env with
         Vslistlm ell -> eval_item_field_var ell sl
@@ -2160,6 +2251,32 @@ and eval_compound_var conf base env (a, _ as ep) loc =
         if is_hidden (fst ep) then raise Not_found
         else eval_person_field_var conf base env ep loc sl
       (* else raise Not_found *)
+  | ["set_count"; n; v] ->
+    begin match n with
+    | "1" | "2" | "3" ->
+      begin match get_env ("count" ^ n) env with
+      | Vcnt c -> c := int_of_string v; VVstring ""
+      | _ -> raise Not_found
+      end
+    | _ -> raise Not_found
+    end
+  | ["get_var"; name;] ->
+      begin match get_env ("vars") env with
+      | Vvars lv ->
+          let vv = try List.assoc name !lv
+          with Not_found -> raise Not_found
+          in
+          VVstring vv
+      | _ -> VVstring ("%get_var;" ^ name ^ "?")
+      end
+  | ["set_var"; name; value] ->
+      begin match get_env ("vars") env with
+      | Vvars lv ->
+          if List.mem_assoc name !lv
+          then lv := List.remove_assoc name !lv;
+          lv := (name, value) :: !lv; VVstring ""
+      | _ -> raise Not_found
+      end
   | "svar" :: i :: sl ->
       (* http://localhost:2317/HenriT_w?m=DAG&p1=henri&n1=duchmol&s1=243&s2=245
          access to sosa si=n of a person pi ni
@@ -2544,6 +2661,19 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
           end
       | _ -> VVstring ""
       end
+  | ["cousins"; l1; l2] ->
+      let l1 = int_of_string l1 in
+      let l2 = int_of_string l2 in
+      let (cnt, cnt_t, _cnt_sp) = count_cousins conf base p l1 l2 in
+      if cnt = cnt_t then
+        VVstring (string_of_int cnt)
+      else
+        VVstring ((string_of_int cnt) ^ ".")
+  | ["cousins"; l1; l2; "paths"] ->
+      let l1 = int_of_string l1 in
+      let l2 = int_of_string l2 in
+      let (cnt, cnt_t, _cnt_sp) = count_cousins conf base p l1 l2 in
+      VVstring (string_of_int (cnt_t - cnt))
   | "cremated_date" :: sl ->
       begin match get_burial p with
         Cremated cod when p_auth ->
@@ -2647,7 +2777,7 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
           VVstring s
       | _ -> raise Not_found
       end
-  | "marriage_date" :: sl ->
+  | ("marriage_date"|"marriage") :: sl ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, true) ->
           begin match Adef.od_of_cdate (get_marriage fam) with
@@ -2772,6 +2902,12 @@ and eval_date_field_var conf d =
           VVstring (string_of_int (Calendar.sdn_of_julian dmy))
       | _ -> VVstring ""
       end
+  | ["gregorian_day"] ->
+      begin match d with
+        Dgreg (dmy, _) ->
+          VVstring (string_of_int (Calendar.sdn_of_gregorian dmy))
+      | _ -> VVstring ""
+      end
   | ["month"] ->
       begin match d with
         Dgreg (dmy, _) -> VVstring (DateDisplay.month_text dmy)
@@ -2802,6 +2938,11 @@ and eval_date_field_var conf d =
           end
       | _ -> VVstring ""
       end
+  | ["date_s"] ->
+    begin match d with
+      | Dgreg (dmy, _) -> VVstring (DateDisplay.prec_year_text conf dmy)
+      | _ -> VVstring ""
+    end
   | [] ->
     VVstring (DateDisplay.string_of_date_aux ~link:false conf ~sep:"&#010;  " d)
   | _ -> raise Not_found
@@ -2937,6 +3078,15 @@ and eval_event_field_var conf base env (p, p_auth)
         true, Some d -> eval_date_field_var conf d sl
       | _ -> VVstring ""
       end
+  | ["date_s"] ->
+    begin match p_auth, Adef.od_of_cdate date with
+      | true, Some d ->
+        begin match d with
+          | Dgreg (dmy, _) -> VVstring (DateDisplay.prec_year_text conf dmy)
+          | _ -> VVstring ""
+        end
+      | _ -> VVstring ""
+    end
   | "spouse" :: sl ->
       begin match isp with
         Some isp ->
@@ -3365,6 +3515,9 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "birth_place" ->
       if p_auth then Util.string_of_place conf (sou base (get_birth_place p))
       else ""
+  | "birth_place_raw" ->
+      if p_auth then sou base (get_birth_place p)
+      else ""
   | "birth_note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
       get_note_source conf base env p_auth conf.no_note
@@ -3377,6 +3530,9 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       if p_auth then
         Util.string_of_place conf (sou base (get_baptism_place p))
       else ""
+  | "baptism_place_raw" ->
+      if p_auth then sou base (get_baptism_place p)
+      else ""
   | "baptism_note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
       get_note_source conf base env p_auth conf.no_note
@@ -3387,6 +3543,9 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         (sou base (get_baptism_src p))
   | "burial_place" ->
       if p_auth then Util.string_of_place conf (sou base (get_burial_place p))
+      else ""
+  | "burial_place_raw" ->
+      if p_auth then sou base (get_burial_place p)
       else ""
   | "burial_note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
@@ -3416,6 +3575,9 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "cremation_place" ->
       if p_auth then Util.string_of_place conf (sou base (get_burial_place p))
       else ""
+  | "cremation_place_raw" ->
+      if p_auth then sou base (get_burial_place p)
+      else ""
   | "dates" -> if p_auth then DateDisplay.short_dates_text conf base p else ""
   | "death_age" ->
       if p_auth then
@@ -3433,6 +3595,9 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       else ""
   | "death_place" ->
       if p_auth then Util.string_of_place conf (sou base (get_death_place p))
+      else ""
+  | "death_place_raw" ->
+      if p_auth then sou base (get_death_place p)
       else ""
   | "death_note" ->
       let env = ['i', (fun () -> Util.default_image_name base p)] in
@@ -3522,6 +3687,10 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
           else ""
       | _ -> raise Not_found
       end
+  | "marriage_places" ->
+    List.fold_left
+      (fun acc ifam -> acc ^ (sou base (get_marriage_place (foi base ifam))) ^ "|")
+    "|" (Array.to_list (get_family p))
   | "mother_age_at_birth" -> string_of_parent_age conf base ep get_mother
   | "misc_names" ->
       if p_auth then
@@ -3805,9 +3974,21 @@ and eval_family_field_var conf base env
           let ep = make_ep conf base ifath in
           eval_person_field_var conf base env ep loc sl
       end
-  | "marriage_date" :: sl ->
+  | ["date_s"] | ["dates"] -> VVstring (DateDisplay.short_family_dates_text conf base true fam)
+  | ["sep_date_s"] | ["sep_dates"] -> VVstring (DateDisplay.short_family_dates_text conf base false fam)
+  | "marriage_date" :: sl | "marriage" :: sl ->
       begin match Adef.od_of_cdate (get_marriage fam) with
         Some d when m_auth -> eval_date_field_var conf d sl
+      | _ -> VVstring ""
+      end
+  | "divorce_date" :: sl | "divorce" :: sl ->
+      begin match get_divorce fam with
+      | Divorced d ->
+          let d = Adef.od_of_cdate d in
+          begin match d with
+          | Some d when m_auth -> eval_date_field_var conf d sl
+          | _ -> VVstring ""
+          end
       | _ -> VVstring ""
       end
   | "mother" :: sl ->
@@ -3904,7 +4085,7 @@ let eval_transl conf base env upp s c =
           "n" ->
             (* replaced by %apply;nth([...],sex) *)
             begin match get_env "p" env with
-              Vind p -> 1 - index_of_sex (get_sex p)
+              Vind p -> index_of_sex (get_sex p)
             | _ -> 2
             end
         | "s" ->
@@ -3944,8 +4125,8 @@ let eval_transl conf base env upp s c =
             end
         | _ -> assert false
       in
-      let r = Util.translate_eval (Util.transl_nth conf s n) in
-      if upp then Utf8.capitalize_fst r else r
+      let c = string_of_int n in
+      Templ.eval_transl_lexicon conf upp s c
   | _ -> Templ.eval_transl conf upp s c
 
 let print_foreach conf base print_ast eval_expr =
@@ -4087,6 +4268,7 @@ let print_foreach conf base print_ast eval_expr =
     | "cousin_level" -> print_foreach_level "max_cous_level" env al ep
     | "cremation_witness" -> print_foreach_cremation_witness env al ep
     | "death_witness" -> print_foreach_death_witness env al ep
+    | "descendant" -> print_foreach_descendant env al ep
     | "descendant_level" -> print_foreach_descendant_level env al ep
     | "event" -> print_foreach_event env al ep
     | "event_witness" -> print_foreach_event_witness env al ep
@@ -4423,6 +4605,33 @@ let print_foreach conf base print_ast eval_expr =
           else loop events
     in
     loop (events_list conf base p)
+  and print_foreach_descendant env al (p, _) =
+    let lev =
+      match get_env "level" env with
+      | Vint lev -> lev
+      | _ -> 0
+    in
+    let ifam_l = get_descendants_at_level base p lev in
+    let ip_l = List.flatten (List.fold_left
+        (fun acc ifam ->
+          Array.to_list (get_children (foi base ifam)) :: acc
+        ) [] ifam_l)
+    in
+    let rec loop i ip_l =
+      match ip_l with
+      | [] -> ()
+      | ip :: ip_l ->
+          let ep = (poi base ip), true in
+          let env =
+            ("descendant", Vind (poi base ip))
+            :: ("desc_cnt", Vint i)
+            :: ("first", Vbool (i=0))
+            :: ("last", Vbool (ip_l=[] ))
+            :: env
+          in
+          List.iter (print_ast env ep) al; loop (succ i) ip_l
+    in
+    loop 0 ip_l
   and print_foreach_descendant_level env al ep =
     let max_level =
       match get_env "max_desc_level" env with
@@ -4992,6 +5201,8 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
      ("count", Vcnt (ref 0));
      ("count1", Vcnt (ref 0));
      ("count2", Vcnt (ref 0));
+     ("count3", Vcnt (ref 0));
+     ("vars", Vvars (ref []));
      ("list", Vslist (ref SortedList.empty));
      ("listb", Vslist (ref SortedList.empty));
      ("listc", Vslist (ref SortedList.empty));

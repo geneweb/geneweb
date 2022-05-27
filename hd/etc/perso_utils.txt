@@ -234,19 +234,24 @@
 
 %define;short_display_person_tree(xx)
   %if;(xx.has_sosa)%apply;display_sosa("xx")%end;
-  %if;(cancel_links or xx.is_restricted)<span class="text-nowrap">%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span>
-  %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;;%if;(evar.t!="")t=%evar.t;;%end;%if;(evar.v!="")v=%evar.v;;%end;%if;(evar.image="off")image=off;%end;%if;(evar.marriage="on")marriage=on;%end;"><span class="text-nowrap">%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
+  %if;(cancel_links or xx.is_restricted)<span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span>
+  %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;;%if;(evar.t!="")t=%evar.t;;%end;%if;(evar.v!="")v=%evar.v;;%end;%if;(e.im=0)im=0;%end;%if;(evar.marriage="on")marriage=on;%end;"><span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
   %end;
   <br>%nn;
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
   %end;
-  <span class="text-nowrap font-italic">%nn;
+  <div class="text-nowrap font-italic%nn;
+      %(%if;(e.m="A" and xx.index!=index)
+        %if;(not xx.is_dead) mr-5%nn;
+        %else;%if;(xx.death_date.year="") mr-4%end;
+        %end;
+      %end;%)">%nn;
     %if;(xx.dates!="")%xx.dates;%nn;
     %elseif;(wizard and not cancel_links)-%nn;
-    %elseif;(cancel_links)<br>
+    %elseif;(cancel_links)
     %end;%nn;
-  </span>%nn;
+  </div>%nn;
   %if;(wizard and not cancel_links)</a>%end;
 %end;
 
@@ -577,7 +582,11 @@
   %foreach;xx.mother.family;
     %if;(spouse.access=xx.father.access)
       %if;(marriage_date.year!="")
-        %if;(wizard and not cancel_links)<a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;" title="[modify::family/families]0">%end;<span class="text-nowrap">%marriage_date.prec;%marriage_date.year;</span>%if;(wizard and not cancel_links)</a>%end;
+        %if;(wizard and not cancel_links)<a href="%prefix&m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">%end;
+        <span class="text-nowrap">%nn;
+          %if;plugin.v7;%family.date_s;%else;%marriage.date_s;%end;
+        </span>
+        %if;(wizard and not cancel_links)</a>%end;
       %else;&nbsp;%end;
     %end;
   %end;

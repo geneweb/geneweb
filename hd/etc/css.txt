@@ -1,4 +1,4 @@
-<!-- $Id: css.txt, v7.00 10/01/2020 21:31:20 $ -->
+<!-- $Id: css.txt, v7.1 09/02/2022 23:39:32 $ -->
 <style>/* Put here only properties that uses variables */
 li.folder { list-style-type: disc; list-style-image: url('%image_prefix;/folder.png'); }
 li.file { list-style-type: circle; list-style-image: url('%image_prefix;/file.png'); }
@@ -9,13 +9,13 @@ li.female { list-style-type: circle; list-style-image: url('%image_prefix;/femal
 </style>
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css"
-      integrity="sha384-REHJTs1r2ErKBuJB0fCK99gCYsVjwxHrSU0N7I1zl9vZbggVJXRMsv/sLlOAGb4M" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.1/css/bootstrap.min.css"
+      integrity="sha512-T584yQ/tdRR5QwOpfvDfVQUidzfgc2339Lc8uBDtcp/wYu80d7jwBgAxbyMh0a9YM9F8N3tdErpFI8iaGx6x5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   %else;
-    <link rel="stylesheet" href="%static_path;css/bootstrap.min.css?version=4.4.1">
-    <link rel="stylesheet" href="%static_path;css/all.min.css?version=5.12.0">
+    <link rel="stylesheet" href="%static_path;css/bootstrap.min.css?version=4.6.1">
+    <link rel="stylesheet" href="%static_path;css/all.min.css?version=6.00.0">
   %end;
 %end;
 <link rel="stylesheet" href="%static_path;css/css.css">

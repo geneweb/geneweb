@@ -3,6 +3,8 @@
     wasn't found or couldn't be send. *)
 val print_image_file : Config.config -> string -> bool
 
+val print_source_image : Config.config -> string -> unit
+
 (** Searhes image's filename in the environement [conf.env] and sends HTTP respose with its content on the socket. If filename isn't presented, looks up
     personal image for person's mentionned in [conf.env] *)
 val print : Config.config -> Gwdb.base -> unit

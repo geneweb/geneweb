@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updfam.txt,v 7.00 exp 21/06/2018 23:27:22 $ -->
+  <!-- $Id: updfam.txt,v 7.00 exp 13/05/2020 17:53:58 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -29,13 +29,13 @@
 
 %define;nav()
   <div class="container fixed-top" role="navigation">
-    <nav class="navbar navbar-light bg-white justify-content-end" id="banner">
+    <nav class="navbar navbar-light bg-white justify-content-center" id="banner">
       <nav class="nav nav-pills nav-fill">
-        <a class="nav-item nav-link" href="#family" title="[*parents]"><i class="fa fa-male fa-fw" aria-hidden="true"></i><i class="fa fa-female" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*parents]</span></a>
-        <a class="nav-item nav-link" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*event/events]1</span></a>
-        <a class="nav-item nav-link" href="#children" title="[*child/children]1"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*child/children]1</span></a>
-        <a class="nav-item nav-link" href="#sources" title="[*source/sources]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*source/sources]1</span></a>
-        <a class="nav-item nav-link" href="#comments" title="[*comment]1"><i class="fa fa-file-alt fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*comment]</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#family" title="[*parents]"><i class="fa fa-male fa-fw" aria-hidden="true"></i><i class="fa fa-female" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*parents]</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*event/events]1</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#children" title="[*child/children]1"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*child/children]1</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#sources" title="[*source/sources]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*source/sources]1</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#comments" title="[*comment]1"><i class="fa fa-file-alt fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*comment]</span></a>
       </nav>
     </nav>
   </div>
@@ -238,7 +238,7 @@ $(document).ready(function(){
   %let;year_input;pattern="[?><~/-+]?\d*/?" size="4" maxlength="8" %readonly;%in;
   <div class="row">
     <span class="col-sm-2 col-form-label">[*kind]</span>
-    <div class="col-sm-3 form-inline">
+    <div class="col-sm-auto form-inline">
       %if;([!dates order]0 = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
         <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
         <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>

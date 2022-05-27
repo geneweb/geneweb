@@ -140,17 +140,17 @@
 %end;
 
 %define;month(mmm)
-  %if;(mmm.month="")%if;(mmm.prec="&gt;")12%else;00%end;
+  %if;(mmm.month="")%if;(mmm.prec="&#62;")12%else;00%end;
   %elseif;(mmm.month<10)0%mmm.month;%else;%mmm.month;%end;
 %end;
 
 %define;day(ddd)
-  %if;(ddd.day="")%if;(ddd.prec="&gt;")32%else;00%end;
+  %if;(ddd.day="")%if;(ddd.prec="&#62;")32%else;00%end;
   %elseif;(ddd.day<10)0%ddd.day;%else;%ddd.day;%end;
 %end;
 
 %define;dprec(ddd)
-  %if;(ddd.prec="&lt;")2%elseif;(ddd.prec="&gt;")2%else;2%end;
+  %if;(ddd.prec="&#60;")2%elseif;(ddd.prec="&#62;")2%else;2%end;
 %end;
 
 %define;one_child(ccc,evm,labl,ddd)

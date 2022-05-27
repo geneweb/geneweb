@@ -89,9 +89,9 @@
           %if;(evar.marriage = "on" and cell.family.marriage_date.year != "")
             <i style="font-size:80%%">%nn;
                &amp;%nn;
-              %if;(cell.family.marriage_date.prec = "&lt;")
+              %if;(cell.family.marriage_date.prec = "&#60;")
                 /%cell.family.marriage_date.year;%nn;
-              %elseif;(cell.family.marriage_date.prec = "&gt;")
+              %elseif;(cell.family.marriage_date.prec = "&#62;")
                 %cell.family.marriage_date.year;/%nn;
               %elseif;(cell.family.marriage_date.prec = "|" or cell.family.marriage_date.prec = "..")
                 %cell.family.marriage_date.year;%nn;

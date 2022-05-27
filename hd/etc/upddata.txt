@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: upddata.txt,v 7 15/03/2018 12:14:42 Exp $ -->
+  <!-- $Id: upddata.txt,v 7 11/12/2021 23:48:10 Exp $ -->
   <!-- Copyright (c) 2006-2017 INRIA -->
   <title>%title;</title>
   <meta name="robots" content="none">
@@ -12,161 +12,251 @@
   %include;hed
 </head>
 <body%body_prop;>
-<div class="container">
-<h1 class="text-center mt-1">%title;</h1>
-%define;arrows()
-  %if;not cancel_links;
-    <div class="float-%right; btn-group mr-%if;(evar.s!="")3%else;2%end;">
-      %if;(referer != "")
-        <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-      %end;
-      <a href="%prefix;"><span class="fa fa-home fa-lg ml-1" title="[*home]"></span></a>
-    </div>
-  %end;
-%end;
+%(
+%(Affichage court: %foreach;initial identique à %foreach;entry juste en-dessous%)
 %define;print_short()
   <div class="clearfix mt-3 mx-5">
     <div class="float-%left; font-weight-bold">%if;(evar.s="")[*select a letter]%else;[*specify]%end;[:]</div>
-    %apply;arrows()
   </div>
   <div class="row justify-content-center mt-3 mb-1">
     <div class="col-xl-9 ml-xl-3 col-lg-11 ml-lg-5">
       <div class="d-flex flex-wrap" role="toolbar" aria-label="First character selection">
         %foreach;initial;
-          <a class="btn btn-outline-secondary btn-lg text-center book-char" role="button" href="%prefix;m=MOD_DATA;data=%evar.data;;s=%encode.ini;">%html_encode.ini;</a>
+          <a class="btn btn-primary text-center text-monospace" role="button"
+            href="%prefix;m=MOD_DATA&data=%evar.data;&s=%encode.ini;">%html_encode.ini;</a>
         %end;
       </div>
     </div>
   </div>
 %end;
-%define;print_long()
-  <div class="col-10 alert alert-danger alert-dismissible fade show mx-auto text-center mt-2" role="alert">[*help modify data]</div>
-  <div class="col-12 justify-content-between">
-    <div class="col-11 btn-group" role="toolbar" aria-label="Second character selection">
-      <a class="mr-2" href="%prefix;m=MOD_DATA;data=%evar.data;;s=" title="Index"><i class="fa fa-book fa-fw"></i></a>
-      <div class="btn-group d-flex align-content-around flex-wrap">
-        %foreach;entry;
-          <a class="book-char px-2" href="#%entry_ini;">%html_encode.entry_ini;</a>
+%)
+<div class="container">
+  <div class="d-flex justify-content-between mt-1">
+    <div class="col-1">%if;(evar.s!="")<a title="[*help modify data]" class="mt-2" role="alert"><i class="fas fa-hat-wizard fa-lg text-danger"></i></a>%else; %end;</div>
+    <h1 class="text-center">%title;</h1>
+    %if;not cancel_links;
+      <div class="btn-group col-1">
+        %if;(referer != "")
+          <a href="%referer;"><i class="fa fa-arrow-left fa-lg" title="<<"></i></a>
         %end;
+        <a href="%prefix;"><i class="fa fa-home fa-lg ml-1" title="[*home]"></i></a>
       </div>
-    </div>
-    %apply;arrows()
+    %end;
   </div>
-  <div class="col-12 mt-1">
-    <ul class="list-group">
-      %foreach;entry;
-        <li class="list-group-item list-group-item-info mt-3 justify-content-between">
-          <strong><a id="%entry_ini;">%html_encode.entry_ini;</a></strong>
-          <a class="btn" href="#top" title="Return to top"><span class="fa fa-arrow-up fa-fw"></span></a>
-        </li>
-        <li class="list-unstyled mt-1">
-          <ul class="list-group">
-            %foreach;value;
-              <li class="list-unstyled ml-4">
-                %if;not is_modified;
-                  <a href="%prefix;m=MOD_DATA&data=%evar.data;&key=%entry_key;&s=%encode.evar.s;#mod">%escape.entry_value;</a>
-                %else;
-                  <form class="form-inline my-2" method="post" action="%action;" id="mod">
-                    <div class="text-muted w-100">%escape.entry_value;</div>
-                    %hidden;
-                    <input type="hidden" name="key" value="%entry_key;">
-                    <input type="hidden" name="m" value="MOD_DATA_OK">
-                    <input type="hidden" name="data" value="%evar.data;">
-                    <input type="hidden" name="s" value="%evar.s;">
-                    %if;(bvar.notextarea="yes")
-                      <input type="text" class="form-control w-100 ml-1 my-1" id="nx_input" name="nx_input" maxlength="%if;(evar.data="src" or evar.data="occu" or evar.data="place")1000%else;200%end;" value="%escape.printable.entry_value;" placeholder="%escape.printable.entry_value;" autofocus>
-                    %else;
-                      <textarea class="form-control w-100 ml-1 my-1" id="nx_input" name="nx_input" rows="1" maxlength="%if;(evar.data="src" or evar.data="occu" or evar.data="place")1000%else;200%end;" placeholder="%escape.printable.entry_value;" autofocus>%escape.printable.entry_value;</textarea>
-                    %end;
-                    %if;(evar.data = "fn")
-                      <div class="form-check form-check-inline ml-sm-2 ml-md-5">
-                        <label class="form-check-label">
-                          <input class="form-check-input" type="checkbox" id="first_name_aliases" name="first_name_aliases" value="yes"> [*add the previous name as a first name alias]
-                        </label>
-                      </div>
-                    %end;
-                    %if;(evar.data = "sn")
-                      <div class="form-check form-check-inline mt-2 ml-5">
-                        <label class="form-check-label">
-                          <input class="form-check-input" type="checkbox" id="surname_aliases" name="surname_aliases" value="yes"> [*add the previous name as a surname alias]
-                        </label>
-                      </div>
-                    %end;
-                    <button type="submit" class="btn btn-outline-secondary ml-2">Ok</button>
-                  </form>
+
+  %let;length_s;%if;(evar.s!="")%evar.length.s;%else;0%end;%in;
+  %let;nbs;%if;(evar.nbs!="" and evar.nbs<=length_s)%evar.nbs;%else;%length_s;%end;%in;
+  %let;enbs;&nbs=%nbs;%in;
+%( Boutons %)
+  <div class="d-flex">
+    <div class="ml-auto">
+    <a role="button" class="btn"
+      href="%prefix_base_password;%nn;
+        %foreach;env_binding;%if;(env.val!="" and env.key!="rev")%nn;
+         &%env.key=%env.val;%end;%nn;
+        %end;%nn;
+        %if;(evar.rev!="" and evar.rev!="on")&rev=on%elseif;(evar.rev="")&rev=on%end;%nn;"
+        title="[*invert elements]">
+      <i class="fas fa-arrows-alt-h fa-lg"></i>%nn;
+    </a>%nn;
+    %if;(evar.s!="")
+      <a role="button" class="btn pl-2"%sp;
+        title="[*delete] 1 [substr]"%sp;
+        href="%prefix_base_password;%nn;
+            %foreach;env_binding;
+              %if;(env.key="nbs" and evar.nbs>=1)&nbs=%expr(evar.nbs-1)%nn;
+              %elseif;(env.key!="")&%env.key=%env.val;%nn;
+              %end;
+            %end;">%nn;
+        <i class="fa fa-minus fa-lg %if;(evar.nbs<1) disabled text-muted%end;" aria-hidden="true"></i>
+        <span class="sr-only">-</span>
+      </a>
+      <span class="sr-only">/</span>
+      <a role="button" class="btn pl-2"%sp;
+        title="[*add] 1 [substr]0"%sp;
+        href="%prefix_base_password;%nn;
+              %foreach;env_binding;
+                %if;(env.key="nbs" and evar.nbs+3<length_s)&nbs=%expr(evar.nbs+1)%nn;
+                %elseif;(env.key!="")&%env.key=%env.val;%nn;
                 %end;
-              </li>
-            %end;
-          </ul>
-        </li>
-      %end;
-    </ul>
+              %end;">%nn;
+        <i class="fa fa-plus fa-lg %if;(evar.nbs+3>=length_s) disabled text-muted%end;" aria-hidden="true"></i>%nn;
+        <span class="sr-only">+</span>%nn;
+      </a>
+    %end;
+    </div>
   </div>
+
+%( Idée facile mais moins esthétique pour les cas longs, fixé à 7, sans utiliser nbs atm, une bvar plutôt qu'evar ? %)
+  %reset_count;
+  %foreach;entry;
+    %foreach;value;
+      %incr_count;
+    %end;
+  %end;
+  %let;value_list_len;%count;%in;
+  
+    %if;(nb_results>1000)<div class="col-12 font-weight-bold my-3 mx-3">%if;(evar.s="")[*select a letter]%else;[*specify][:]%end;</div>%end;
+  
+  <div class="col-auto">
+    <div class="btn-group" role="toolbar" aria-label="sub-selection">
+      %if;(evar.s!="")
+        <a class="mr-2" href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;" title="Index"><i class="fa fa-book fa-lg"></i></a>
+      %end;
+  <span class="text-monospace">
+          %foreach;substr.s;
+            <a href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;&s=%substr;" title="%substr;">%if;(length_s>7)%tail;%else;%substr;%end;</a>%nn;
+            %if;(length_s>7) %else; > %end;%nn;
+          %end;%if;(length_s>7)>%end; <b>%evar.s;</b>%nn;
+          %if;(value_list_len>1)
+            %foreach;entry;
+              %sp;%if;(max>0)<a href="%prefix;m=MOD_DATA%enbs;&data=%evar.data&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>%else;%html_encode.entry_ini;%end;
+              %if;(evar.s!="")(%sp;%if;(max>0 and not first)<a href="#_%entry_ini;" title="↓ %entry_ini;">·</a>%else;·%end;
+              %else; %end;
+            %end;
+          %end;
+        </span>
+      
+    </div>
+  </div>
+  %( autre façon? à décrire %)
+  --------
+  <div class="col-auto">
+    <div class="btn-group" role="toolbar" aria-label="sub-selection">
+      %if;(evar.s!="")<a class="mr-2" href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;%if;(evar.nbs!="")&nbs=%evar.nbs;%end;" title="Index"><i class="fa fa-book fa-lg"></i></a>%end;
+      <div class="btn-group d-flex align-content-around flex-wrap">
+        <span class="text-monospace">
+          %if;(substr_start.1.s!="" and length_s > 1)<a href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;&s=%substr_start.1.s;">%substr_start.1.s;</a> >%end;
+          %if;(substr_start.2.s!="" and length_s > 2) <a href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;&s=%substr_start.2.s;">%substr_start.2.s;</a> >%end;
+          %if;(substr_start.3.s!="" and length_s > 3) <a href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;&s=%substr_start.3.s;">%substr_start.3.s;</a> >%end;
+          %if;(length_s-nbs>4 and nbs>0) … >%end;
+          %if;(evar.s!="")
+            %foreach;substr.s;
+              %if;(cnt > 2 and cnt+1 >= length_s-nbs )<a href="%prefix;m=MOD_DATA%nbs;&data=%evar.data;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%substr;"> %substr;</a> > %end;%nn;
+            %end;<b> %evar.s;</b>%nn;
+          %end;
+          %if;(value_list_len>1)
+            %foreach;entry;
+              %sp;%if;(max>0)<a href="#_%entry_ini;">·</a>%else;·%end;
+              %sp;%if;(max>0)<a href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&s=%entry_ini;#%entry_ini;">%html_encode.entry_ini;</a>%else;%html_encode.entry_ini;%end;
+            %end;
+          %end;
+        </span>
+      </div>
+    </div>
+  </div>
+  %if;(evar.s!="" and nb_results<1000)
+  %( liste des entrées et formulaire d'édition %)
+  <ul class="list-group">
+    %foreach;entry;
+      <li class="list-group-item list-group-item-primary py-0 mt-2 justify-content-between">
+        <a class="btn btn-link p-0 ml-1" href="#top" title="Return to top" tabindex="-1"><i class="fa fa-arrow-up fa-fw mx-1"></i></a>%nn;
+        <a class="font-weight-bold text-monospace" id="_%entry_ini;" href="%prefix;&m=MOD_DATA%enbs;&data=%evar.data;&s=%html_encode.entry_ini;">%html_encode.entry_ini;</a>
+      </li>
+      <li class="list-unstyled mt-1">
+        <ul class="list-group">
+          %foreach;value;
+            <li class="list-unstyled ml-4">
+              <table><tr><td>
+                %if;(evar.data="place")
+                <a href="https://www.wikidata.org/w/index.php?search=%nn;
+                  %if;(not first and suburb!="")%escape.printable.suburb;%else;%escape.printable.other;%end;"
+                  role="button" class="btn btn-link p-0 ml-1"
+                  title="%if;(not first and suburb!="")%escape.printable.suburb;%else;%escape.printable.other;%end; sur Wikidata"
+                  target="_blank" rel="noreferrer" rel="noopener" tabindex="-1">
+                  <i class="fab fa-wikipedia-w fa-sm%if;(not first and suburb!="") text-danger%end;"></i>
+                </a>
+                %if;(plugin.v7 and first and suburb!="")<br>
+                <a href="https://www.wikidata.org/w/index.php?search=%escape.printable.suburb;"
+                  role="button" class="btn btn-link p-0 ml-1"
+                  title="%escape.printable.suburb; sur Wikidata"
+                  target="_blank" rel="noreferrer" rel="noopener" tabindex="-1">
+                  <i class="fab fa-wikipedia-w fa-sm text-danger"></i>
+                </a>
+                %end;
+                %end;
+                </td><td>
+              <a role="button" id="%escape.entry_value;" class="btn btn-link d-inline text-wrap ml-%if;is_modified;5 pl-4%else;2%end;%nn;
+                %if;is_modified; disabled" tabindex="-1" aria-disabled="true%end;"
+                href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&key=%entry_key;&s=%encode.evar.s;">
+                  %if;(plugin.v7 and evar.data="place" and suburb!="")
+                    %if;is_modified;%escape.entry_value;
+                    %else;
+                      %if;(first)
+                        %escape.other;<br><span class="ml-5">%escape.suburb;</span>
+                      %else;
+                        <span class="ml-4">%escape.suburb;</span>
+                      %end;
+                    %end;
+                  %else;
+                    %escape.entry_value;
+                  %end;
+                %if;is_modified; <b>([modify])</b>%end;</a>
+              %if;is_modified;
+                <form class="form-inline pl-1 ml-5 needs-validation" method="post" action="%action;" novalidate>
+                  %hidden;
+                  <input type="hidden" name="key" value="%entry_key;">
+                  <input type="hidden" name="m" value="MOD_DATA_OK">
+                  <input type="hidden" name="data" value="%evar.data;">
+                  <input type="hidden" name="s" value="%evar.s;">
+                  <input type="hidden" name="k" value="kkk">
+                  %if;(evar.rev!="" and evar.rev="on")
+                    <input type="hidden" name="rev" value="on">
+                  %end;
+                  %if;(evar.data = "fn")
+                    <div class="form-check form-check-inline ml-sm-2 ml-md-5">
+                      <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" id="first_name_aliases" name="first_name_aliases" value="yes" autofocus> [*add the previous name as a first name alias]
+                      </label>
+                    </div>
+                  %end;
+                  %if;(evar.data = "sn")
+                    <div class="form-check form-check-inline mt-2 ml-5">
+                      <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" id="surname_aliases" name="surname_aliases" value="yes" autofocus> [*add the previous name as a surname alias]
+                      </label>
+                    </div>
+                  %end;
+                  <div class="input-group col-12 px-0 mx-2">
+                    %let;entry_v;%if;(evar.rev!="" and evar.rev="on")%escape.printable.entry_value_rev;%else;%escape.printable.entry_value;%end;%in;
+                    %if;(bvar.notextarea="yes" or evar.data="fn" or evar.data="sn" or evar.data="place")
+                      <input type="text" class="form-control col-11" id="nx_input" name="nx_input"%nn
+                        maxlength="%if;(evar.data="src" or evar.data="occu" or evar.data="place")1000%else;200%end;"
+                        value="%entry_v;" placeholder="%entry_v;"
+                        %if;(evar.data!="fn" or evar.data!="sn") autofocus%end; aria-label="Recipient's username" aria-describedby="button-addon2" required>
+                    %else;
+                      <textarea class="form-control col-11" id="nx_input" name="nx_input" rows="1"
+                        maxlength="%if;(evar.data="src" or evar.data="occu" or evar.data="place")1000%else;200%end;"
+                        placeholder="%entry_v;"%if;(evar.data!="fn" or evar.data!="sn") autofocus%end; required>%entry_v;</textarea>
+                    %end;
+                    <div class="valid-feedback">
+                      must be different!
+                    </div>
+                    <div class="input-group-append">
+                      <button type="submit" class="btn btn-primary" title="[*modify]">OK</button>
+                    </div>
+                  </div>
+                </form>
+              %end;
+              </td></tr></table>
+            </li>
+          %end;
+        </ul>
+      </li>
+    %end;
+  </ul>
+
 %end;
-%if;(nb_results > 1500)
+%(
+%( boucle principale %)
+%if;(evar.s="" or nb_results > 1000)
   %apply;print_short()
 %else;
   %apply;print_long()
-%end;
+%end;%)
 %include;trl
 %include;copyr
 </div>
 %include;js
-<script>
-$(document).ready(function() {
-jQuery.fn.putCursorAtEnd = function() {
-
-  return this.each(function() {
-
-    // Cache references
-    var $el = $(this),
-        el = this;
-
-    // Only focus if input isn't already
-    if (!$el.is(":focus")) {
-     $el.focus();
-    }
-
-    // If this function exists... (IE 9+)
-    if (el.setSelectionRange) {
-
-      // Double the length because Opera is inconsistent about whether a carriage return is one character or two.
-      var len = $el.val().length * 2;
-
-      // Timeout seems to be required for Blink
-      setTimeout(function() {
-        el.setSelectionRange(len, len);
-      }, 1);
-
-    } else {
-
-      // As a fallback, replace the contents with itself
-      // Doesn't work in Chrome, but Chrome supports setSelectionRange
-      $el.val($el.val());
-
-    }
-
-    // Scroll to the bottom, in case we're in a tall textarea
-    // (Necessary for Firefox and Chrome)
-    this.scrollTop = 999999;
-
-  });
-
-};
-
-(function() {
-
-  var searchInput = $("#nx_input");
-
-  searchInput
-    .putCursorAtEnd() // should be chainable
-    .on("focus", function() { // could be on any event
-      searchInput.putCursorAtEnd()
-    });
-
-})();
-
-});
-</script>
 </body>
 </html>

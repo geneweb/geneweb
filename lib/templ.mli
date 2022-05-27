@@ -7,6 +7,7 @@ type 'a vother
 type 'a env = (string * 'a) list
 
 val eval_transl : config -> bool -> string -> string -> string
+val eval_transl_lexicon : config -> bool -> string -> string -> string
 
 type ('a, 'b) interp_fun =
   { eval_var : 'a env -> 'b -> loc -> string list -> 'b expr_val;

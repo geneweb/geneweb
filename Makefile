@@ -96,6 +96,7 @@ install uninstall build: $(GENERATED_FILES_DEP)
 
 build: ## Build the geneweb package (librairies and binaries)
 build:
+	$(RM) -r $(DISTRIB_DIR)
 	dune build -p geneweb
 
 install: ## Install geneweb using dune
@@ -112,7 +113,6 @@ BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
 
 distrib: ## Build the project and copy what is necessary for distribution
 distrib: build
-	$(RM) -r $(DISTRIB_DIR)
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
 	cp CHANGES $(DISTRIB_DIR)/CHANGES.txt
