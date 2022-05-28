@@ -204,7 +204,7 @@ let ng = w_base @@ begin fun conf base ->
   end
 
 let p = w_base begin fun conf base -> match Util.p_getenv conf.env "v" with
-    | Some v -> V7_some.first_name_print conf base v ; true
+    | Some v -> Some.first_name_print conf base v ; true
     | None -> false
   end
 

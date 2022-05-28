@@ -57,7 +57,7 @@ let print_mod_ok conf base =
   in
   if nb_pers <> 0 && data_modified then
     begin
-      V7_updateData.update_person_list conf base new_input list nb_pers max_updates;
+      UpdateData.update_person_list conf base new_input list nb_pers max_updates;
       let title _ =
         Output.print_string conf (Utf8.capitalize_fst (transl conf "modification successful"))
       in
@@ -276,7 +276,7 @@ let print_foreach conf print_ast _eval_expr =
         Vlist_data l -> l
       | _ -> []
     in
-    let list = V7_updateData.build_list_long conf list in
+    let list = UpdateData.build_list_long conf list in
     let max = List.length list in
     let k = Opt.to_string @@ p_getenv conf.env "key" in
     let rec loop cnt =
@@ -368,7 +368,7 @@ let print_foreach conf print_ast _eval_expr =
         Vlist_data l -> l
       | _ -> []
     in
-    let ini_list = V7_updateData.build_list_short conf list in
+    let ini_list = UpdateData.build_list_short conf list in
     let rec loop =
       function
         ini :: l ->
@@ -383,7 +383,7 @@ let print_foreach conf print_ast _eval_expr =
 let print_mod conf base =
   match p_getenv conf.env "data" with
   | Some ("place" | "src" | "occu" | "fn" | "sn") ->
-    let list = V7_updateData.build_list conf base in
+    let list = UpdateData.build_list conf base in
     let env = ("list", Vlist_data list) ::
               ("count", Vcnt (ref 0)) :: []
     in

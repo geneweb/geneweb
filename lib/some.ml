@@ -226,9 +226,11 @@ let name_unaccent s =
   in
   copy 0 0
 
-(* TODO find a way tu use get_vother, set_vother from templ.camlp5 *)
 let buttons_fnames conf =
   Util.include_template conf conf.env "buttons_fnames" (fun () -> ())
+
+let buttons_rel conf =
+  Util.include_template conf conf.env "buttons_rel" (fun () -> ())
 
 let print_other_list conf _base list =
   let s_title = Printf.sprintf "%s" (Utf8.capitalize (transl conf "see also")) in

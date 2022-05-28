@@ -8,6 +8,7 @@ module Util = Geneweb.Util
 module Hutil = Geneweb.Hutil
 module Output = Geneweb.Output
 module Perso = Geneweb.Perso
+module Some = Geneweb.Some
 module Request = Gwd_lib.Request
 
 let empty_sn_or_fn base p =
@@ -63,7 +64,7 @@ let search_by_name conf base n =
     let fn = String.sub n1 0 i in
     let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
     let (list, _) =
-      V7_some.persons_of_fsname conf base base_strings_of_surname
+      Some.persons_of_fsname conf base base_strings_of_surname
         (spi_find (persons_of_surname base)) get_surname sn
     in
     List.fold_left begin fun pl (_, _, ipl) ->
@@ -144,18 +145,18 @@ let search conf base an search_order specify unknown =
         | pl -> specify conf base an pl
         end
     | Surname :: l ->
-        let pl = V7_some.search_surname conf base an in
+        let pl = Some.search_surname conf base an in
         begin match pl with
           [] -> loop l
         | _ ->
-            V7_some.search_surname_print conf base unknown an
+            Some.search_surname_print conf base unknown an
         end
     | FirstName :: l ->
-        let pl = V7_some.search_first_name conf base an in
+        let pl = Some.search_first_name conf base an in
         begin match pl with
           [] -> loop l
         | _ ->
-            V7_some.search_first_name_print conf base an
+            Some.search_first_name_print conf base an
         end
     | ApproxKey :: l ->
         let pl = search_approx_key conf base an in
@@ -174,7 +175,7 @@ let search conf base an search_order specify unknown =
         | pl -> specify conf base an pl
         end
     | DefaultSurname :: _ ->
-        V7_some.search_surname_print conf base unknown an
+        Some.search_surname_print conf base unknown an
   in
   loop search_order
 
