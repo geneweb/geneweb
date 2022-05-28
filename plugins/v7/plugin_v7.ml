@@ -11,6 +11,7 @@ module SrcfileDisplay = Geneweb.SrcfileDisplay
 module ImageDisplay = Geneweb.ImageDisplay
 module Request = Gwd_lib.Request
 module Templ_interp = Geneweb.Templ_interp
+module UpdateDataDisplay = Geneweb.UpdateDataDisplay
 
 open Plugin_v7_lib
 
@@ -142,12 +143,12 @@ let l = w_base @@ fun conf base ->
     |> fun () -> true
     
 let md = w_base begin fun conf base ->
-    V7_updateDataDisplay.print_mod conf base ;
+    UpdateDataDisplay.print_mod conf base ;
     true
   end
 
 let md_ok = w_base begin fun conf base ->
-    V7_updateDataDisplay.print_mod_ok conf base ;
+    UpdateDataDisplay.print_mod_ok conf base ;
     true
   end
 

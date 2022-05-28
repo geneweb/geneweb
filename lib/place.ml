@@ -77,7 +77,7 @@ let compare_places s1 s2 =
 
 (* [String.length s > 0] is always true because we already tested [is_empty_string].
    If it is not true, then the base should be cleaned. *)
-let fold_place_long inverted s =
+let fold_place_long_aux inverted s =
   let len = String.length s in
   (* Trimm spaces after ',' and build reverse String.split_on_char ',' *)
   let rec loop iend list i ibeg =
@@ -111,6 +111,13 @@ let fold_place_long inverted s =
     else loop len [] 0 0
   in
   if inverted then List.rev list else list
+
+let fold_place_long inverted s =
+  fold_place_long_aux inverted s
+
+let fold_place_long_2 inverted s =
+  let list = fold_place_long_aux inverted s in
+  (s, list)
 
 let fold_place_short inverted s =
   if inverted
