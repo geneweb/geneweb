@@ -226,11 +226,15 @@ let name_unaccent s =
   in
   copy 0 0
 
-let buttons_fnames conf =
-  Util.include_template conf conf.env "buttons_fnames" (fun () -> ())
-
-let buttons_rel conf =
-  Util.include_template conf conf.env "buttons_rel" (fun () -> ())
+(* la fonction Util.include_template n'interprète pas %env.val; *)
+let buttons_fnames conf base =
+  Perso.interp_templ ~no_headers:true "buttons_fnames" conf base
+    (Gwdb.empty_person base Gwdb.dummy_iper)
+(*
+let buttons_fnames conf base =
+  !Templ_interp.templ ~no_headers:true "buttons_fnames" conf base
+    (Gwdb.empty_person base Gwdb.dummy_iper)
+*)
 
 let print_other_list conf _base list =
   let s_title = Printf.sprintf "%s" (Utf8.capitalize (transl conf "see also")) in
@@ -292,7 +296,7 @@ let first_name_print_list conf base x1 xl liste =
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  buttons_fnames conf;
+  buttons_fnames conf base;
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
@@ -317,14 +321,14 @@ let first_name_print_list conf base x1 xl liste =
     (fun (_, txt, ipl) -> print_elem conf base true (txt, ipl)) list;
   Hutil.trailer conf
 
-let select_first_name conf n list =
+let select_first_name conf base n list =
   let title _ =
     Output.printf conf "%s \"%s\" : %s"
       (Utf8.capitalize_fst (transl_nth conf "first name/first names" 0)) n
       (transl conf "specify")
   in
   Hutil.header conf title;
-  buttons_fnames conf;
+  buttons_fnames conf base;
   Output.print_string conf "<ul>";
   List.iter
     (fun (sstr, (strl, _)) ->
@@ -409,7 +413,7 @@ let first_name_print conf base x =
           pl []
       in
       first_name_print_list conf base x strl pl
-  | _ -> select_first_name conf x list
+  | _ -> select_first_name conf base x list
 
 let has_children_with_that_name conf base des name =
   let compare_name n1 n2 =
@@ -672,7 +676,7 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   let access txt sn =
     geneweb_link conf ("m=N&v=" ^ Mutil.encode sn ^ "&t=N") txt
   in
-  buttons_fnames conf;
+  buttons_fnames conf base;
   Util.wprint_in_columns conf (fun (ord, _, _) -> ord)
     (fun (_, txt, sn) -> Output.print_string conf (access txt sn)) list;
   Output.print_string conf "<p>\n";
@@ -1028,4 +1032,4 @@ let search_first_name_print conf base x =
           pl []
       in
       first_name_print_list conf base x strl pl
-  | _ -> select_first_name conf x list
+  | _ -> select_first_name conf base x list

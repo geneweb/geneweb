@@ -435,7 +435,7 @@ let print conf base p =
       Not_found | Failure _ -> default_max_cousin_lev
   in
   match (p_getint conf.env "v1", p_getint conf.env "v2", p_getenv conf.env "t") with
-  | (Some 1, Some 1, _) | (Some 0, _, _)  | (_, Some 0, _)->
+  | (Some 1, Some 1, _) | (Some 0, _, _)  | (_, Some 0, _) ->
     Util.include_template conf conf.env "buttons_rel" (fun () -> ())
   | (Some lev1, _, _) ->
     let lev1 = min (max 1 lev1) max_lev in

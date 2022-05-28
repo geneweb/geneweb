@@ -1208,6 +1208,7 @@ let open_templ_fname conf fname =
 
 let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
 
+(* include_template does not interpret some functions %env.val; *)
 let include_template conf env fname failure =
   match open_etc_file fname with
   | Some (ic, fname) ->

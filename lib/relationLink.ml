@@ -608,7 +608,7 @@ let print_relation_ok conf base info =
   in
   Hutil.header_no_page_title conf title;
   Hutil.print_link_to_welcome conf true;
-  !Templ_interp.templ ~no_headers:true "buttons_rel" conf base
+  Perso.interp_templ ~no_headers:true "buttons_rel" conf base
     (Gwdb.empty_person base Gwdb.dummy_iper);
   Output.print_string conf "<p style=\"clear:both\">\n";
   print_relation_path conf base info;
