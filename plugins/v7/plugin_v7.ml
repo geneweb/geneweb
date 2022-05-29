@@ -12,10 +12,10 @@ module ImageDisplay = Geneweb.ImageDisplay
 module Request = Gwd_lib.Request
 module Templ_interp = Geneweb.Templ_interp
 module UpdateDataDisplay = Geneweb.UpdateDataDisplay
+module SearchName = Geneweb.SearchName
 
 open Plugin_v7_lib
 
-module SearchName = V7_searchName
 
 let person_is_std_key conf base p k =
   let k = Name.strip_lower k in
@@ -219,7 +219,7 @@ let rl = w_base @@ fun conf base -> RelationLink.print conf base ; true
 
 let rlm = w_base @@ fun conf base -> RelationDisplay.print_multi conf base ; true
 
-let s = w_base @@ fun conf base -> V7_searchName.print conf base
+let s = w_base @@ fun conf base -> SearchName.print conf base
     Request.specify Request.unknown; true
 
 let tp = w_base begin fun conf base ->

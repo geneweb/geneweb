@@ -9,7 +9,6 @@
   (modules
     v7_place
     v7_relation
-    v7_searchName
   )
   (wrapped true)
 )
