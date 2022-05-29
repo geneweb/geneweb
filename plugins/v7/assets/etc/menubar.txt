@@ -379,6 +379,24 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
               %end;
             </div>
           </li>
+          %if;(plugin.v7_im and b.carrousel="on")
+            %if;(keydir_img_nbr>0)
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="modal" data-target="#carousel_modal"
+                  title="[*photos & documents]">
+                  <span class="fa fa-images fa-fw" aria-hidden="true"></span>%nn;
+                  <span class="sr-only">[*image/images]1</span>%nn;
+                </a>
+              </li>
+            %end;
+            <li class="nav-item">
+              <a class="nav-link"href="%prefix;&m=SND_IMAGE_C&i=%index;"
+                title="[*add]/[remove] [image/images]0">
+                <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
+                <span class="sr-only">[*add]/[remove] [image/images]0</span>%nn;
+              </a>
+            </li>
+          %end;
         </ul>
       </div>
     </nav>
@@ -387,4 +405,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
   %if;(evar.m="C" and evar.v1!="" or evar.v2!="" and not cancel_links)
     %include;buttons_cousins
   %end;
+%end;
+%if;(plugin.v7_im and b.carrousel="on")
+  %include;carrousel_display
 %end;

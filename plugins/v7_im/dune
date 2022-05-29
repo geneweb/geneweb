@@ -1,7 +1,15 @@
+(alias
+   (name plugin)
+   (deps (source_tree assets) plugin_v7_im.cmxs)
+)
+
 (library
   (name plugin_v7_im_lib)
   (libraries geneweb geneweb.gwd_lib geneweb.util)
-  (modules v7_im_sendImage)
+  (modules 
+    v7_im_sendImage
+    v7_im_carrousel
+  )
   (wrapped true)
 )
 

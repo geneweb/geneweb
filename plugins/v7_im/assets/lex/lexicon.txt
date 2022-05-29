@@ -1,0 +1,104 @@
+    carrousel
+en: carrousel
+fr: carrousel
+
+    display carrousel
+en: display carrousel
+fr: afficher le carrousel
+
+    plugins
+en: plugins
+fr: plugins
+
+# carrousel
+
+    warning refresh
+en: refresh the page only after having clicked on the main icon as this would repeat the swap action.
+fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l'icone car cela répéterait l'échange des images.
+
+    select input
+de: wählen
+en: choose file
+fr: sélect. fichier
+
+    portrait
+en: portrait
+fr: portrait
+
+    saved images
+en: saved image/saved images
+fr: image sauvegardée/images sauvegardées
+
+    comment
+en: comment
+fr: commentaire
+
+    with comment
+en: with a comment
+fr: avec un commentaire
+
+    send image with comment
+en: send selected image with this comment
+fr: envoyer l’image selectionée avec ce commentaire
+
+    add image
+en: add an image
+fr: ajouter une image
+
+    uploaded
+en: uploaded
+fr: envoyé/envoyée
+
+    save
+en: save
+fr: sauvegarder
+
+    saved
+en: saved
+fr: sauvegardé/sauvegardée
+
+    deleted
+en: deleted
+fr: supprimé/supprimée
+
+    restore
+en: restore
+fr: restaurer
+
+    restored
+en: restored
+fr: restauré/restaurée
+
+    save portrait
+en: the existing portait will be saved to
+fr: le portrait existant sera sauvegardé dans
+
+    modify portrait
+en: modify the portait
+fr: modifier le portrait
+
+    previous portrait
+en: a possible previous version of the saved portait will be deleted.
+fr: une sauvegarde pré-existante du portrait sera supprimée.
+
+    store image
+en: the selected image will be copied to
+fr: l'image sélectionnée sera enregistrée dans
+
+    save image
+en: an image with a similar name will moved to
+fr: si une image du même nom existe déjà, elle sera sauvegardée dans
+
+    previous image
+en: if an image with the same name already exists in the saved, it will be deleted.
+fr: si une image du même nom existe déjà dans le sous-répertoire de sauvegarde, elle sera supprimée.
+
+    image comment
+en: add a comment for the image.
+fr: ajouter un commentaire à l’image.
+
+    update image comment
+en: update image comment
+fr: mettre à jour le commentaire de l’image
+
+
