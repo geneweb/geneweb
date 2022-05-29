@@ -166,7 +166,7 @@ let get_extension conf saved keydir =
   else if Sys.file_exists (f ^ ".gif") then ".gif"
   else "."
 
-let print_confirm_c conf base save_t report =
+let print_confirm_c conf base save_m report =
   match p_getint conf.env "i" with
   | Some ip ->
       let p = poi base (Gwdb.iper_of_string (string_of_int ip)) in
@@ -174,14 +174,14 @@ let print_confirm_c conf base save_t report =
       let new_env =
         List.fold_left
           (fun accu (k, v) ->
-             if k = "t" then ("t", "REFRESH") :: accu
+             if k = "m" then ("m", "REFRESH") :: accu
              else if k = "idigest" || k = "" then accu
              else (k, v) :: accu)
           [] conf.env
       in
       let new_env =
-        if save_t = "REFRESH" then new_env
-        else ("em", save_t) :: new_env
+        if save_m = "REFRESH" then new_env
+        else ("em", save_m) :: new_env
       in
       let new_env = ("idigest", digest) :: new_env in
       let new_env = ("report", report) :: new_env in
@@ -401,15 +401,15 @@ let print_c conf base =
   (* if em="" this is the first pass, do it *)
   begin match p_getenv conf.env "em" with
   | None ->
-    begin match p_getenv conf.env "t" with
-    | Some t ->
-      let save_t = t in
+    begin match p_getenv conf.env "m" with
+    | Some m ->
+      let save_m = m in
       begin match p_getenv conf.env "i" with
       | Some ip ->
           let p = poi base (Gwdb.iper_of_string ip) in
           let digest = default_image_name base p in
           let (conf, report) =
-            begin match p_getenv conf.env "t" with
+            begin match p_getenv conf.env "m" with
             | Some "SND_IMAGE_C_OK" ->
                 let mode =
                   try List.assoc "mode" conf.env with Not_found -> "portraits"
@@ -464,7 +464,7 @@ let print_c conf base =
           begin match report with
           | "digest error" -> Update.error_digest conf
           | "incorrect request" -> Hutil.incorrect_request conf
-          | _ -> print_confirm_c conf base save_t report
+          | _ -> print_confirm_c conf base save_m report
           end
       | None -> Hutil.incorrect_request conf
       end
