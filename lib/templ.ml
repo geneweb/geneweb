@@ -237,7 +237,7 @@ and eval_simple_variable conf =
       end
   | "nl" -> "\n"
   | "nn" -> ""
-  | "plugins" -> (List.fold_left (fun s p -> (Filename.basename p) ^ "," ^ s) "" conf.plugins)
+  | "plugins" -> (List.fold_left (fun s p -> (Filename.basename p) ^ ", " ^ s) "" conf.plugins)
   | "prefix" -> Util.commd conf
   | "prefix_2" -> Util.commd_2 conf
   | "prefix_base" -> Util.prefix_base conf

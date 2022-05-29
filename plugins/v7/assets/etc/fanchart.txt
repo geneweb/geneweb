@@ -39,28 +39,31 @@
 <li id="DA7"><span class="arrow">&#x1f842;</span><span class="DA7">■</span> 105+</li>
 </ul>
 </div>
-<div id="buttons" class="noprint">
-<span id="b-home" class="button" title="Accueil"><i class="fa fa-home fa-fw"></i></span>
-<span id="b-refresh" class="button" title="Ajuster à la fenêtre"><i class="fa fa-redo fa-fw"></i></span>
-<span id="b-zoom-in" class="button" title="Zoomer"><i class="fa fa-search-plus fa-fw"></i></span>
-<span id="b-zoom-out" class="button" title="Dézoomer"><i class="fa fa-search-minus fa-fw"></i></span>
-<span id="b-gen-add" class="button%if(evar.v >= 10) disabled%end;" title="Ajouter une génération"><i class="fa fa-plus fa-fw"></i></span>
-<span id="b-gen-del" class="button%if(evar.v <= 1) disabled%end;" title="Supprimer une génération"><i class="fa fa-minus fa-fw"></i></span>
-%if;(evar.implex = "")
-<span id="b-implex" class="button" title="Développer les implexes"><i class="far fa-comment-dots fa-fw"></i></span>
-%else;
-<span id="b-implex" class="button" title="Réduire les implexes"><i class="fa fa-comment-slash fa-fw"></i></span>
+%if;(e.pdf!="on")
+  <div id="buttons" class="noprint">
+  <span id="b-home" class="button" title="Accueil"><i class="fa fa-home fa-fw"></i></span>
+  <span id="b-refresh" class="button" title="Ajuster à la fenêtre"><i class="fa fa-redo fa-fw"></i></span>
+  <span id="b-zoom-in" class="button" title="Zoomer"><i class="fa fa-search-plus fa-fw"></i></span>
+  <span id="b-zoom-out" class="button" title="Dézoomer"><i class="fa fa-search-minus fa-fw"></i></span>
+  <span id="b-gen-add" class="button%if(evar.v >= 10) disabled%end;" title="Ajouter une génération"><i class="fa fa-plus fa-fw"></i></span>
+  <span id="b-gen-del" class="button%if(evar.v <= 1) disabled%end;" title="Supprimer une génération"><i class="fa fa-minus fa-fw"></i></span>
+  %if;(evar.implex = "")
+  <span id="b-implex" class="button" title="Développer les implexes"><i class="far fa-comment-dots fa-fw"></i></span>
+  %else;
+  <span id="b-implex" class="button" title="Réduire les implexes"><i class="fa fa-comment-slash fa-fw"></i></span>
+  %end;
+  <span id="b-places-hl" class="button" title="Activer la mise en évidence des lieux"><i class="fa fa-globe-americas fa-fw"></i></span>
+  <span id="b-places-colorise" class="button" title="Activer la colorisation globale des lieux"><i class="fa fa-paint-brush fa-fw"></i></span>
+  <input type="checkbox" id="bi" title="N"><label for="bi">N</label>
+  <input type="checkbox" id="ba" title="B"><label for="ba">B</label>
+  <input type="checkbox" id="ma" title="M"><label for="ma">M</label>
+  <input type="checkbox" id="de" title="D"><label for="de">D</label>
+  <input type="checkbox" id="bu" title="S"><label for="bu">S</label>
+  <span id="b-death-age" class="button" title="Activer la colorisation de l'âge de décès"><i class="fa fa-cross fa-fw"></i></span>
+  <span id="b-no-tool" class="button" title="Désactiver les outils"><i class="fa fa-power-off fa-fw"></i></span>
+  <span id="b-no-buttons" class="button" title="Désactiver les boutons"><i class="fa fa-file-pdf fa-fw"></i></span>
+  </div>
 %end;
-<span id="b-places-hl" class="button" title="Activer la mise en évidence des lieux"><i class="fa fa-globe-americas fa-fw"></i></span>
-<span id="b-places-colorise" class="button" title="Activer la colorisation globale des lieux"><i class="fa fa-paint-brush fa-fw"></i></span>
-<input type="checkbox" id="bi" title="N"><label for="bi">N</label>
-<input type="checkbox" id="ba" title="B">
-<input type="checkbox" id="ma" title="M"><label for="ma">M</label>
-<input type="checkbox" id="de" title="D"><label for="de">D</label>
-<input type="checkbox" id="bu" title="S">
-<span id="b-death-age" class="button" title="Activer la colorisation de l'âge de décès"><i class="fa fa-cross fa-fw"></i></span>
-<span id="b-no-tool" class="button" title="Désactiver les outils"><i class="fa fa-power-off fa-fw"></i></span>
-</div>
 <svg id="fanchart" class="bi ba ma de bu%if(evar.mono = "on") mono%end;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
 
 </body>

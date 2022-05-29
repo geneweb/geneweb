@@ -114,6 +114,7 @@ type search_type =
   | Key
   | Surname
   | FirstName
+  | FullName
   | ApproxKey
   | PartialKey
   | DefaultSurname
@@ -151,6 +152,51 @@ let search conf base an search_order specify unknown =
         | _ ->
             Some.search_first_name_print conf base an
         end
+    | FullName :: l ->
+        let max_answers =
+          match p_getint conf.env "max" with
+            Some n -> n
+          | None -> 100
+        in
+        let fn = match p_getenv conf.env "p" with
+          | Some fn -> fn
+          | None -> ""
+        in
+        let sn = match p_getenv conf.env "n" with
+          | Some sn -> sn
+          | None -> ""
+        in
+        let conf = { conf with 
+          env = ("first_name", fn) :: ("surname", sn) :: conf.env }
+        in
+        let (list, len) = AdvSearchOk.advanced_search conf base max_answers in
+        let list =
+          if len > max_answers then Util.reduce_list max_answers list else list
+        in
+        begin match list with
+        | [] -> (* try again without sn *)
+          begin
+             let list = search_approx_key conf base fn in
+            if list = [] then loop l
+            else
+              begin
+                let list =
+                  List.fold_left (fun list p ->
+                    if Name.lower sn = Name.lower (p_surname base p) then p :: list
+                    else list) [] list
+                in
+                begin match list with
+                | [] -> loop l
+                | [p] ->
+                    record_visited conf (get_iper p); Perso.print conf base p
+                | pl -> specify conf base an pl
+                end
+              end
+          end
+        | [p] ->
+            record_visited conf (get_iper p); Perso.print conf base p
+        | pl -> specify conf base an pl
+        end        
     | ApproxKey :: l ->
         let pl = search_approx_key conf base an in
         begin match pl with
@@ -184,21 +230,35 @@ let search conf base an search_order specify unknown =
     [Retour] : Néant
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
+
 let print conf base specify unknown =
   let real_input label =
     match p_getenv conf.env label with
       Some s -> if s = "" then None else Some s
     | None -> None
   in
+  let fn_sn_order =
+    match p_getenv conf.base_env "fn_sn_order" with
+    | Some "fn_sn" -> true
+    | _ -> false
+  in
   match real_input "p", real_input "n" with
-    Some fn, Some sn ->
-      let order = [Key; ApproxKey; PartialKey] in
+  | Some fn, Some sn ->
+      let order = if fn_sn_order
+        then [FullName]
+        else [Key; ApproxKey; PartialKey]
+      in
       search conf base (fn ^ " " ^ sn) order specify unknown
   | Some fn, None ->
-      let order = [FirstName] in search conf base fn order specify unknown
+      let order = if fn_sn_order
+        then [Sosa; Key; FirstName; ApproxKey; PartialKey; DefaultSurname]
+        else [FirstName]
+      in
+      search conf base fn order specify unknown
   | None, Some sn ->
-      let order =
-        [Sosa; Key; Surname; ApproxKey; PartialKey; DefaultSurname]
+      let order = if fn_sn_order
+        then [Surname]
+        else [Sosa; Key; Surname; ApproxKey; PartialKey; DefaultSurname]
       in
       search conf base sn order specify unknown
   | None, None -> Hutil.incorrect_request conf

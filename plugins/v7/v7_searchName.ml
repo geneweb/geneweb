@@ -4,12 +4,14 @@ open Geneweb.Config
 open Gwdb
 open Geneweb.Util
 
-module Util = Geneweb.Util
+module AdvSearchOk = Geneweb.AdvSearchOk
 module Hutil = Geneweb.Hutil
 module Output = Geneweb.Output
 module Perso = Geneweb.Perso
-module Some = Geneweb.Some
 module Request = Gwd_lib.Request
+module SearchName = Geneweb.SearchName
+module Some = Geneweb.Some
+module Util = Geneweb.Util
 
 let empty_sn_or_fn base p =
   is_empty_string (get_surname p) || is_quest_string (get_surname p) ||
@@ -121,6 +123,7 @@ type search_type =
   | Key
   | Surname
   | FirstName
+  | FullName
   | ApproxKey
   | PartialKey
   | DefaultSurname
@@ -158,6 +161,51 @@ let search conf base an search_order specify unknown =
         | _ ->
             Some.search_first_name_print conf base an
         end
+    | FullName :: l ->
+        let max_answers =
+          match p_getint conf.env "max" with
+            Some n -> n
+          | None -> 100
+        in
+        let fn = match p_getenv conf.env "p" with
+          | Some fn -> fn
+          | None -> ""
+        in
+        let sn = match p_getenv conf.env "n" with
+          | Some sn -> sn
+          | None -> ""
+        in
+        let conf = { conf with 
+          env = ("first_name", fn) :: ("surname", sn) :: conf.env }
+        in
+        let (list, len) = AdvSearchOk.advanced_search conf base max_answers in
+        let list =
+          if len > max_answers then Util.reduce_list max_answers list else list
+        in
+        begin match list with
+        | [] -> (* try again without sn *)
+          begin
+             let list = SearchName.search_approx_key conf base fn in
+            if list = [] then loop l
+            else
+              begin
+                let list =
+                  List.fold_left (fun list p ->
+                    if Name.lower sn = Name.lower (p_surname base p) then p :: list
+                    else list) [] list
+                in
+                begin match list with
+                | [] -> loop l
+                | [p] ->
+                    record_visited conf (get_iper p); Perso.print conf base p
+                | pl -> Request.specify conf base an pl
+                end
+              end
+          end
+        | [p] ->
+            record_visited conf (get_iper p); Perso.print conf base p
+        | pl -> Request.specify conf base an pl
+        end        
     | ApproxKey :: l ->
         let pl = search_approx_key conf base an in
         begin match pl with
