@@ -1,4 +1,0 @@
-<li class="nav-item">
-  <a class="nav-link" href="%prefix;m=SND_IMAGE;t=SND_IMAGE_C;%access;">
-  <span class="fa fa-image"></span></a>
-</li>
