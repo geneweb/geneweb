@@ -1048,6 +1048,7 @@ let decode_varenv =
 let encode_varenv =
   func_arg1_no_kw @@ function
   | Tstr str -> encoded (Mutil.encode str)
+  | Tsafe str -> safe (Adef.safe str)
   | x -> Jg_types.failwith_type_error_1 "encode_varenv" x
 
 let mk_base base =
@@ -1180,6 +1181,7 @@ end
 
 let default_env_aux conf =
   ("trans", trans conf)
+  :: ("trans_no_escape", trans ~autoescape:false conf)
   :: ("DATE", module_DATE conf)
   :: ("OPT", module_OPT)
   :: ("decode_varenv", decode_varenv)
