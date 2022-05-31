@@ -16,64 +16,6 @@ module SearchName = Geneweb.SearchName
 
 open Plugin_v7_lib
 
-
-let person_is_std_key conf base p k =
-  let k = Name.strip_lower k in
-  if k = Name.strip_lower (Gwdb.p_first_name base p ^ " " ^ Gwdb.p_surname base p) then
-    true
-  else if
-    List.exists (fun n -> Name.strip n = k)
-      (Gwdb.person_misc_names base p (Util.nobtit conf base))
-  then
-    true
-  else false
-
-let select_std_eq conf base pl k =
-  List.fold_right
-    (fun p pl -> if person_is_std_key conf base p k then p :: pl else pl) pl
-    []
-
-let find_all conf base an =
-  let sosa_ref = Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
-  match sosa_ref, sosa_nb with
-  | Some p, Some n ->
-    if n <> Sosa.zero then
-      match Util.branch_of_sosa conf base n p with
-        Some (p :: _) -> [p], true
-      | _ -> [], false
-    else [], false
-  | _ ->
-    let acc = SearchName.search_by_key conf base an in
-    if acc <> [] then acc, false
-    else
-      ( SearchName.search_key_aux begin fun conf base acc an ->
-            let spl = select_std_eq conf base acc an in
-            if spl = [] then
-              if acc = [] then SearchName.search_by_name conf base an
-              else acc
-            else spl
-          end conf base an
-      , false )
-
-let relation_print conf base p =
-  let p1 =
-    match Util.p_getenv conf.senv "ei" with
-    | Some i ->
-      conf.senv <- [] ;
-      let i = Gwdb.iper_of_string i in
-      if Gwdb.iper_exists base i
-      then Some (Util.pget conf base i)
-      else None
-    | None ->
-      match Util.find_person_in_env conf base "1" with
-      | Some p1 ->
-        conf.senv <- [];
-        Some p1
-      | None -> None
-  in
-  RelationDisplay.print conf base p p1
-
 let w_base =
   Request.w_base
     ~none:(fun c -> Gwd_lib.Request.incorrect_request c ; true)
@@ -83,28 +25,9 @@ let w_person =
 
 let person_selected conf base p =
   match Util.p_getenv conf.senv "em" with
-  | Some "R" -> relation_print conf base p
+  | Some "R" -> Request.relation_print conf base p
   | Some _ -> Request.incorrect_request conf
   | None -> Perso.print conf base p
-
-let person_selected_with_redirect conf base p =
-  match Util.p_getenv conf.senv "em" with
-    Some "R" -> relation_print conf base p
-  | Some _ -> Request.incorrect_request conf
-  | None ->
-    Wserver.http_redirect_temporarily (Util.commd conf ^ Util.acces conf base p)
-
-let doc = w_base @@ fun conf base ->
-    match Util.p_getenv conf.env "s" with
-    | Some f ->
-        begin
-          if Filename.check_suffix f ".txt" then
-            let f = Filename.chop_suffix f ".txt" in
-            SrcfileDisplay.print_source conf base f
-          else ImageDisplay.print_source_image conf f;
-          true
-        end
-    | None -> false
 
 let home conf base : bool =
   if base <> None
@@ -113,64 +36,13 @@ let home conf base : bool =
       if Request.only_special_env conf.env then false
       else w_person begin fun conf base p ->
           match Util.p_getenv conf.env "ptempl" with
-          | Some t when Util.p_getenv conf.base_env "ptempl" = Some "yes" -> false
+          | Some t when Util.p_getenv conf.base_env "ptempl" = Some "yes" ->
+            Perso.interp_templ t conf base p ; true
           | _ -> person_selected conf base p ; true
         end conf base
     end conf base
   else false
     
-let ng = w_base @@ begin fun conf base ->
-    (* Rétro-compatibilité <= 6.06 *)
-    let env =
-      match Util.p_getenv conf.env "n" with
-        Some n ->
-        begin match Util.p_getenv conf.env "t" with
-            Some "P" -> ("fn", n) :: conf.env
-          | Some "N" -> ("sn", n) :: conf.env
-          | _ -> ("ri", n) :: conf.env
-        end
-      | None -> conf.env
-    in
-    let conf = {conf with env = env} in
-    (* Nouveau mode de recherche. *)
-    match Util.p_getenv conf.env "select" with
-    | Some "input" | None ->
-      (* Récupère le contenu non vide de la recherche. *)
-      let real_input label =
-        match Util.p_getenv conf.env label with
-        | Some s -> if s = "" then None else Some s
-        | None -> None
-      in
-      (* Recherche par clé, sosa, alias ... *)
-      let search n =
-        let (pl, sosa_acc) = find_all conf base n in
-        match pl with
-        | [] ->
-          Some.surname_print conf base Request.unknown n
-        | [p] ->
-          if sosa_acc
-          || Gutil.person_of_string_key base n <> None
-          || person_is_std_key conf base p n
-          then person_selected_with_redirect conf base p
-          else Request.specify conf base n pl
-        | pl -> Request.specify conf base n pl
-      in
-      begin match real_input "ri" with
-        | Some n -> search n ; true
-        | None ->
-          match real_input "fn", real_input "sn" with
-            Some fn, Some sn -> search (fn ^ " " ^ sn) ; true
-          | Some fn, None ->
-            Some.first_name_print conf base fn ; true
-          | None, Some sn ->
-            Some.surname_print conf base Request.unknown sn ; true
-          | None, None -> Request.incorrect_request conf ; true
-      end
-    | Some i ->
-      relation_print conf base
-        (Util.pget conf base (Gwdb.iper_of_string i)) ; true
-  end
-
 let ps = w_base @@ fun conf base ->
     V7_place.print_all_places_surnames conf base ; true
 
@@ -183,6 +55,5 @@ let _ =
   in
   Gwd_lib.GwdPlugin.register ~ns
     [ "", aux home
-    ; "NG", aux ng
     ; "PS", aux ps
     ]
