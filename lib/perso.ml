@@ -5361,7 +5361,7 @@ let eval_predefined_apply conf env f vl =
   | "clean_html_tags", [s] ->
       (* On supprime surtout les balises qui peuvent casser la mise en page. *)
       Util.clean_html_tags s
-        ["<br */?>"; "</?p>"; "</?div>"; "</?span>"; "</?pre>"]
+        ["<br */?>"; "</?p>"; "</?div>"; "</?span>"; "</?pre>"; "<!--.*-->" ]
   | _ -> raise Not_found
 
 let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
