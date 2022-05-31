@@ -94,23 +94,6 @@ let person_selected_with_redirect conf base p =
   | None ->
     Wserver.http_redirect_temporarily (Util.commd conf ^ Util.acces conf base p)
 
-let a = w_base @@ fun conf base ->
-    match Util.find_person_in_env conf base "" with
-    | Some p ->
-      if Util.p_getenv conf.env "t" = Some  "FC"
-      then Perso.interp_templ "fanchart" conf base p
-      else AscendDisplay.print conf base p ;
-      true
-    | _ -> false
-
-let c = w_base @@ fun conf base ->
-    match Util.find_person_in_env conf base "" with
-    | Some p -> CousinsPrintOrCount.print conf base p ; true
-    | _ -> false
-
-let d = w_base @@ w_person @@ fun conf base p ->
-  DescendDisplay.print conf base p; true
-
 let doc = w_base @@ fun conf base ->
     match Util.p_getenv conf.env "s" with
     | Some f ->
@@ -135,23 +118,7 @@ let home conf base : bool =
         end conf base
     end conf base
   else false
-
-let l = w_base @@ fun conf base ->
-    Gwdb.dummy_iper
-    |> Gwdb.empty_person base
-    |> !Templ_interp.templ "list" conf base
-    |> fun () -> true
     
-let md = w_base begin fun conf base ->
-    UpdateDataDisplay.print_mod conf base ;
-    true
-  end
-
-let md_ok = w_base begin fun conf base ->
-    UpdateDataDisplay.print_mod_ok conf base ;
-    true
-  end
-
 let ng = w_base @@ begin fun conf base ->
     (* Rétro-compatibilité <= 6.06 *)
     let env =
@@ -204,23 +171,8 @@ let ng = w_base @@ begin fun conf base ->
         (Util.pget conf base (Gwdb.iper_of_string i)) ; true
   end
 
-let p = w_base begin fun conf base -> match Util.p_getenv conf.env "v" with
-    | Some v -> Some.first_name_print conf base v ; true
-    | None -> false
-  end
-
 let ps = w_base @@ fun conf base ->
     V7_place.print_all_places_surnames conf base ; true
-
-let r = w_base @@ w_person @@ fun conf base p ->
-    relation_print conf base p ; true
-
-let rl = w_base @@ fun conf base -> RelationLink.print conf base ; true
-
-let rlm = w_base @@ fun conf base -> RelationDisplay.print_multi conf base ; true
-
-let s = w_base @@ fun conf base -> SearchName.print conf base
-    Request.specify Request.unknown; true
 
 let tp = w_base begin fun conf base ->
     match Util.p_getenv conf.env "v" with
@@ -243,19 +195,8 @@ let _ =
   in
   Gwd_lib.GwdPlugin.register ~ns
     [ "", aux home
-    ; "A", aux a
-    ; "C", aux c
-    ; "D", aux d
     ; "DOC", aux doc
-    ; "L", aux l
-    ; "MOD_DATA", aux md
-    ; "MOD_DATA_OK", aux md_ok
     ; "NG", aux ng
-    ; "P", aux p
     ; "PS", aux ps
-    ; "R", aux r
-    ; "RL", aux rl
-    ; "RLM", aux rlm
-    ; "S", aux s
     ; "TP", aux tp
     ]
