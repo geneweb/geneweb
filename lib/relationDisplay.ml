@@ -375,6 +375,7 @@ let print_link_name conf base n p1 p2 sol =
   if n > 1 then begin
     Output.print_sstring conf " " ;
     Output.print_sstring conf (transl conf "also") ;
+    Output.print_sstring conf " " ;
     end
   else
     Output.print_sstring conf " ";
