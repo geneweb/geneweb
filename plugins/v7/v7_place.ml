@@ -644,7 +644,8 @@ let print_all_places_surnames_long conf base _ini ~add_birth ~add_baptism
   let long = p_getenv conf.env "display" = Some "long" in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Util.include_template conf conf.env "buttons_places" (fun () -> ());  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
+  Util.include_template conf conf.env "buttons_places" (fun () -> ());
+  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
   let max_rlm_nbr =
     match p_getenv conf.env "max_rlm_nbr" with
     | Some n -> if n = "" then
@@ -687,6 +688,7 @@ let print_all_places_surnames_long conf base _ini ~add_birth ~add_baptism
       print_html_places_surnames conf base max_rlm_nbr link_to_ind array
     else
       print_html_places_surnames_short conf base max_rlm_nbr link_to_ind array;
+  Output.printf conf "</form>\n";
   Hutil.trailer conf
 
 let print_all_places_surnames conf base =

@@ -136,7 +136,7 @@ let source_file_name conf fname =
   if Sys.file_exists fname1 then fname1
   else
     Filename.concat (Util.base_path ["src"] bname)
-      (Filename.basename fname ^ ".txt")
+      ((*Filename.basename*) fname ^ ".txt")
 
 let extract_date s =
   try Scanf.sscanf s "%d/%d/%d" (fun d m y -> Some (d, m, y))

@@ -924,6 +924,17 @@ let encode s =
     let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
   else s
 
+let rec strip_heading_and_trailing_spaces s =
+  if String.length s > 0 then
+    if s.[0] = ' ' then
+      strip_heading_and_trailing_spaces
+        (String.sub s 1 (String.length s - 1))
+    else if s.[String.length s - 1] = ' ' then
+      strip_heading_and_trailing_spaces
+        (String.sub s 0 (String.length s - 1))
+    else s
+  else s
+
 let gen_decode strip_spaces s =
   let hexa_val conf =
     match conf with
@@ -961,17 +972,6 @@ let gen_decode strip_spaces s =
       in
       copy_decode_in s1 i (succ i1)
     else Bytes.unsafe_to_string s1
-  in
-  let rec strip_heading_and_trailing_spaces s =
-    if String.length s > 0 then
-      if s.[0] = ' ' then
-        strip_heading_and_trailing_spaces
-          (String.sub s 1 (String.length s - 1))
-      else if s.[String.length s - 1] = ' ' then
-        strip_heading_and_trailing_spaces
-          (String.sub s 0 (String.length s - 1))
-      else s
-    else s
   in
   if need_decode 0 then
     let len = compute_len 0 0 in

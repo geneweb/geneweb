@@ -340,6 +340,9 @@ val decode : string -> string
 *)
 val gen_decode : bool -> string -> string
 
+(** does what the name implies *)
+val strip_heading_and_trailing_spaces : string -> string
+
 (** [extract_param name stopc request] can be used to extract some
     parameter from a browser [request] (list of strings); [name]
     is a string which should match the beginning of a request line,

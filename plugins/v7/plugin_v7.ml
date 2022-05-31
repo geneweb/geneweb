@@ -195,7 +195,6 @@ let _ =
   in
   Gwd_lib.GwdPlugin.register ~ns
     [ "", aux home
-    ; "DOC", aux doc
     ; "NG", aux ng
     ; "PS", aux ps
     ; "TP", aux tp

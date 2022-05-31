@@ -425,6 +425,9 @@ let treat_request =
       | None -> []
       | Some list -> String.split_on_char ',' list
     in
+    let plugins =
+      List.map (fun p -> Mutil.strip_heading_and_trailing_spaces p) plugins
+    in
     if List.mem "*" plugins then
       List.iter (fun (_ , fn) -> fn conf base) !GwdPlugin.se
     else
@@ -529,6 +532,18 @@ let treat_request =
           w_wizard @@ w_base @@ UpdateInd.print_del
         | "DEL_IND_OK" ->
           w_wizard @@ w_base @@ w_lock @@ UpdateIndOk.print_del
+        | "DOC" ->
+          w_base @@ fun conf base ->
+            begin match Util.p_getenv conf.env "s" with
+            | Some f ->
+                begin
+                  if Filename.check_suffix f ".txt" then
+                    let f = Filename.chop_suffix f ".txt" in
+                    SrcfileDisplay.print_source conf base f
+                  else ImageDisplay.print_source_image conf f
+                end
+            | None -> incorrect_request conf base
+            end
         | "F" ->
           w_base @@ w_person @@ Perso.interp_templ "family"
         | "H" ->
