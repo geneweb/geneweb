@@ -174,18 +174,6 @@ let ng = w_base @@ begin fun conf base ->
 let ps = w_base @@ fun conf base ->
     V7_place.print_all_places_surnames conf base ; true
 
-let tp = w_base begin fun conf base ->
-    match Util.p_getenv conf.env "v" with
-    | Some f ->
-      begin match Util.find_person_in_env conf base "" with
-      | Some p -> !Templ_interp.templ ("tp_" ^ f) conf base p
-      | _ -> !Templ_interp.templ ("tp0_" ^ f) conf base
-               (Gwdb.empty_person base Gwdb.dummy_iper)
-      end ;
-      true
-    | None -> false
-  end
-
 let ns = "v7"
 
 let _ =
@@ -197,5 +185,4 @@ let _ =
     [ "", aux home
     ; "NG", aux ng
     ; "PS", aux ps
-    ; "TP", aux tp
     ]

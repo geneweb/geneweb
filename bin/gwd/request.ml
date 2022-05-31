@@ -719,6 +719,17 @@ let treat_request =
           w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
         | "CHANGE_WIZ_VIS" ->
           w_wizard @@ w_base @@ w_lock @@ WiznotesDisplay.change_wizard_visibility
+        | "TP" ->
+          w_base @@ fun conf base ->
+            begin match Util.p_getenv conf.env "v" with
+            | Some f ->
+              begin match Util.find_person_in_env conf base "" with
+              | Some p -> Perso.interp_templ ("tp_" ^ f) conf base p
+              | _ -> Perso.interp_templ ("tp0_" ^ f) conf base
+                       (Gwdb.empty_person base Gwdb.dummy_iper)
+              end
+            | None -> incorrect_request conf base
+            end
         | "TT" ->
           w_base @@ TitleDisplay.print
         | "U" ->

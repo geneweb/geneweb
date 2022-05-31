@@ -45,7 +45,7 @@
         %end;
       %end;
   %end;
-%elseif;(e.em!="R" and e.m!="A")
+%elseif;(e.em!="R" and e.em!="RLM" and e.m!="A")
   %foreach;father.child;
     %if;is_sibling_before;
       %apply;setvar%with;prevsiblingaccess%and;%child.access;%end;
