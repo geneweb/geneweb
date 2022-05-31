@@ -45,7 +45,7 @@ let image_url_txt conf url_p url height : Adef.safe_string =
   {|<a href="|} ^ (url_p : Adef.escaped_string :> string) ^ {|"><img src="|} ^ (url : Adef.escaped_string :> string)
   ^ {|" alt="|} ^ image_txt ^ {|" title="|} ^ image_txt ^ {|" style="|}
   ^ (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
-  ^ {|">|} ^ image_txt ^ {|</a>|}
+  ^ {|">|} ^ {|</a>|}
 
 let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
