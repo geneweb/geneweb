@@ -721,7 +721,7 @@ let print_person_table conf base p lab =
          Output.print_sstring conf attr;
       | None -> ()
       end;
-      if nb_families > 1 then Output.print_sstring conf {|" style="border-bottom:none"|} ;
+      if nb_families > 1 then Output.print_sstring conf {| style="border-bottom:none"|} ;
       Output.print_sstring conf ">" ;
       if nb_families > 0 then
         let fam = foi base (get_family p).(0) in
