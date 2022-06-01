@@ -365,7 +365,6 @@ let w_base ~none fn conf base =
     fn conf base
 
 let w_person ~none fn conf base =
-  let _ = Printf.eprintf "W_person\n" in
   match find_person_in_env conf base "" with
   | Some p -> fn conf base p
   | _ -> none conf base

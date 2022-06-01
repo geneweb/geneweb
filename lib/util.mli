@@ -39,6 +39,7 @@ val get_referer : config -> string
 
 val no_html_tags : string -> string
 val clean_html_tags : string -> string list -> string
+val clean_comment_tag : string -> string
 
 (** Prints HTTP response headers with giving content type (default : {i text/html}) on the socket. *)
 val html : ?content_type:string -> config -> unit

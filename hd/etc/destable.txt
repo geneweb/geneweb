@@ -302,7 +302,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
         %rowspan;%nn;
         %if;(e.ns=1 and (has_notes or has_psources)) tabindex="0"%sp;
           data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"%sp;
-          data-content='%if;(has_notes)%apply;clean_html_tags(notes)%end;
+          data-content='%if;(has_notes)%apply;clean_comment_tag(notes)%end;
                         %if;(has_notes and has_psources)<hr>%end;
                         %if;(has_psources)%apply;capitalize(psources)%end;'%sp;
           title="%if;(has_notes and not has_psources)[*note/notes]1%nn;
@@ -335,7 +335,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
               or xxx.first_name="Xx" or xxx.first_name="Yy" or xxx.first_name="Xy")) table-warning%end;"%nn;
         %if;(e.ns=1 and (xxx.has_notes or xxx.has_psources)) tabindex="0"%sp;
           data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"%sp;
-          data-content='%if;(xxx.has_notes)%apply;clean_html_tags(xxx.notes)%end;
+          data-content='%if;(xxx.has_notes)%apply;clean_comment_tag(xxx.notes)%end;
                         %if;(xxx.has_notes and xxx.has_psources)<hr>%end;
                         %if;(xxx.has_psources)%apply;capitalize(xxx.psources)%end;'%sp;
           title="%if;(xxx.has_notes and not xxx.has_psources)[*note/notes]1%nn;
@@ -385,7 +385,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
           %if;(evar.hl="on" and ("?" is_substr spouse or spouse.first_name="N." or  spouse.first_name="Nn" or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) table-warning%end;"%nn;
           %if;(e.ns=1 and (spouse.has_notes or spouse.has_psources)) tabindex="0"%sp;
             data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
-            data-content='%if;(spouse.has_notes)%apply;clean_html_tags(spouse.notes)%end;
+            data-content='%if;(spouse.has_notes)%apply;clean_comment_tag(spouse.notes)%end;
                           %if;(spouse.has_notes and spouse.has_psources)<hr>%end;
                           %if;(spouse.has_psources)%apply;capitalize(spouse.psources)%end;'%sp;
             title="%if;(spouse.has_notes and not spouse.has_psources)[*note/notes]1%nn;
@@ -459,7 +459,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
             rowspan="%if;(evar.t="I" and zzz.nb_families=1)2%else;1%end;"%nn;
             %if;(e.ns=1 and (has_marriage_note or has_marriage_source)) tabindex="0"
               data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
-              data-content='%if;(has_marriage_note)%apply;clean_html_tags(marriage_note)%end;
+              data-content='%if;(has_marriage_note)%apply;clean_comment_tag(marriage_note)%end;
                             %if;(has_marriage_note and has_marriage_source)<hr>%end;
                             %if;(has_marriage_source)%apply;capitalize(marriage_source)%end;'%sp;
               title="%if;(has_marriage_source or has_marriage_note)
@@ -535,7 +535,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
             rowspan="%if;(evar.t="I" and zzz.nb_families=1)2%else;1%end;"%nn;
             %if;(e.ns=1 and (has_fnotes or has_fsources)) tabindex="0"
               data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
-              data-content='%if;(has_fnotes)%apply;clean_html_tags(fnotes)%end;
+              data-content='%if;(has_fnotes)%apply;clean_comment_tag(fnotes)%end;
                             %if;(has_fnotes and has_fsources)<hr>%end;
                             %if;(has_fsources)%apply;capitalize(fsources)%end;'
               title="%if;(has_fnotes or has_fsources)

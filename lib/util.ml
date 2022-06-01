@@ -491,6 +491,9 @@ let clean_html_tags s l =
     (fun s html_tag -> Str.global_replace (Str.regexp html_tag) "&nbsp;" s) s
     l
 
+let clean_comment_tag s =
+    Str.global_replace (Str.regexp "<!--.*-->") "&nbsp;" s
+
 let hidden_env conf =
   List.iter
     (fun (k, v) ->

@@ -710,7 +710,7 @@
   %if;((evar.notes = "on" and (ancestor.has_notes or ancestor.has_event) and evar.inline = "on") or (evar.src = "on" and ancestor.has_sources and evar.inline = "on"))
     <p class="asc_notes_src_inline">
       %if;(evar.notes = "on" and (ancestor.has_notes or ancestor.has_event))
-        [*note/notes]0 : %apply;clean_html_tags(ancestor.notes)
+        [*note/notes]0 : %apply;clean_comment_tag(ancestor.notes)
         <br>
         %if;ancestor.has_event;
           <table>
@@ -750,7 +750,7 @@
         <em>
           [*source/sources]1 :
           %foreach;ancestor.source;
-            %source_type;: %apply;clean_html_tags(source)
+            %source_type;: %apply;clean_comment_tag(source)
             %if;(not is_last),%sp;%end;
           %end;
         </em>
@@ -803,7 +803,7 @@
     %if;((evar.notes = "on" and (child.has_notes or child.has_event) and evar.inline = "on") or (evar.src = "on" and child.has_sources and evar.inline = "on"))
       <p class="asc_notes_src_inline">
         %if;(evar.notes = "on" and (child.has_notes or child.has_event))
-          [*note/notes]0 : %apply;clean_html_tags(child.notes)
+          [*note/notes]0 : %apply;clean_comment_tag(child.notes)
           <br>
           %if;child.has_event;
             <table>
@@ -843,7 +843,7 @@
           <em>
             [*source/sources]1 :
             %foreach;child.source;
-              %source_type;: %apply;clean_html_tags(source)
+              %source_type;: %apply;clean_comment_tag(source)
               %if;(not is_last),%sp;%end;
             %end;
           </em>
@@ -1208,7 +1208,7 @@
               or ancestor.first_name="Xx" or ancestor.first_name="Yy" or ancestor.first_name="Xy")) table-warning%end;"%sp;
     %if;(e.ns=1 and (ancestor.has_notes or ancestor.has_psources)) tabindex="0"
       data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
-      data-content='%if;(ancestor.has_notes)%apply;clean_html_tags(ancestor.notes)%end;
+      data-content='%if;(ancestor.has_notes)%apply;clean_comment_tag(ancestor.notes)%end;
                     %if;(ancestor.has_psources)
                       %if;(ancestor.has_notes)<hr>%end;
                       %apply;capitalize(ancestor.psources)
@@ -1292,7 +1292,7 @@
           %if;(evar.hl="on" and marriage_place="") table-warning%end;"%sp;
           %if;(e.ns=1 and (has_marriage_note or has_marriage_source)) tabindex="0"
             data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
-            data-content='%if;(has_marriage_note)%apply;clean_html_tags(marriage_note)%end;
+            data-content='%if;(has_marriage_note)%apply;clean_comment_tag(marriage_note)%end;
                           %if;(has_marriage_source)
                             %if;(has_marriage_note)<hr>%end;
                             %apply;capitalize(marriage_source)
@@ -1330,7 +1330,7 @@
                   %end;"
                 %if;(e.ns=1 and (has_fsources or has_fnotes)) tabindex="0"
                 data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
-                data-content='%if;(has_fnotes)%apply;clean_html_tags(fnotes)%end;
+                data-content='%if;(has_fnotes)%apply;clean_comment_tag(fnotes)%end;
                               %if;(has_fsources)
                                 %if;(has_fnotes)<hr>%end;
                                 %fsources;
@@ -1395,7 +1395,7 @@
               or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) table-warning%end;"
               %if;(e.ns=1 and (spouse.has_psources or spouse.has_pnotes)) tabindex="0"
               data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
-              data-content='%if;(spouse.has_pnotes)%apply;clean_html_tags(spouse.pnotes)%end;
+              data-content='%if;(spouse.has_pnotes)%apply;clean_comment_tag(spouse.pnotes)%end;
                             %if;(spouse.has_psources)
                               %if;(spouse.has_pnotes)<hr>%end;
                               %spouse.psources;
@@ -1442,7 +1442,7 @@
               %if;(evar.hl="on" and marriage_place="") table-warning%end;"
               %if;(e.ns=1 and (has_marriage_note or has_marriage_source)) tabindex="0"
                 data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
-                data-content='%if;(has_marriage_note)%apply;clean_html_tags(marriage_note)%end;
+                data-content='%if;(has_marriage_note)%apply;clean_comment_tag(marriage_note)%end;
                               %if;(has_marriage_source)
                                 %if;(has_marriage_note)<hr>%end;
                                 %apply;capitalize(marriage_source)
@@ -1472,7 +1472,7 @@
               %end;"%sp;
               %if;(e.ns=1 and (has_fnotes or has_fsources)) tabindex="0"
                 data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
-                data-content='%if;(has_fnotes)%apply;clean_html_tags(fnotes)%end;
+                data-content='%if;(has_fnotes)%apply;clean_comment_tag(fnotes)%end;
                               %if;(has_fsources)
                                 %if;(has_fnotes)<hr>%end;
                                 %apply;capitalize(fsources)
