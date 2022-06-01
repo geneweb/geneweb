@@ -1179,9 +1179,15 @@ let module_GWDB conf base = begin
   end
 end
 
+let escape = Tfun begin fun ?(kwargs=[]) -> function
+    | Tsafe s | Tstr s -> Tstr (Jg_utils.escape_html s)
+    | x -> Jingoo.Jg_types.failwith_type_error_1 "escape" x
+ end
+
 let default_env_aux conf =
   ("trans", trans conf)
   :: ("trans_no_escape", trans ~autoescape:false conf)
+  :: ("escape", escape)
   :: ("DATE", module_DATE conf)
   :: ("OPT", module_OPT)
   :: ("decode_varenv", decode_varenv)
