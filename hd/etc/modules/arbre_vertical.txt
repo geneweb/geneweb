@@ -85,7 +85,7 @@
             %end;
               %let;spouses_dead;%if;(not cell.family.mother.is_dead and not cell.family.father.is_dead and cell.family.marriage_date.year!="")%if;(today.year-cell.family.marriage_date.year>100)1%end;%end;%in;
               class="small font-italic text-center text-nowrap%if;(spouses_dead=1) text-danger%end;"
-              title="%if;(cell.family.marriage_date.year!="" and ((not (cell.family.father.is_dead and cell.family.mother.is_dead)) or (plugin.v7 and "-" in cell.family.date_s and cell.family.sep_date_s!="" and cell.family.marriage_date.prec="")))
+              title="%if;(cell.family.marriage_date.year!="" and ((not (cell.family.father.is_dead and cell.family.mother.is_dead)) or ("-" in cell.family.date_s and cell.family.sep_date_s!="" and cell.family.marriage_date.prec="")))
                        %if;(cell.family.sep_date_s!="")
                          %apply;a_of_b%with;%expr(cell.family.sep_date_s-cell.family.marriage_date.year) [years old]%and;[relation/relations]0%end;%nn;
                        %elseif;(cell.family.sep_date_s="" and not (("-" in cell.family.date_s) and cell.family.father.is_dead and cell.family.mother.is_dead))
@@ -133,43 +133,40 @@
                   %end;
                 %end;
               %in;
-              %if;plugin.v7;
-                %if;(fw!="" and (cell.family.date_s=cell.family.marriage_date.year)and cell.family.sep_date_s="")
-                   %( DEBUG %fw;|%widow_year;|%widow_period;<br> %)
-                  <span class="font-italic">%cell.family.date_s;</span>%nn;
-                  <span class="small font-weight-bold
-                    %if;(fw=3)text-secondary%elseif;(fw=0)text-primary%nn;
-                    %elseif;(fw=5 or fw=6)
-                      %if;(widow_period!="" and widow_period>100)text-danger%nn;
-                      %else;text-success%end;
-                    %end;"
-                   title="%nn;
-                   %if;(widow_year!="")
-                     %if;(cell.family.marriage_date.year!="" and cell.family.marriage_date.prec="")
-                       %if;((fw=2 or fw=4) or ((fw=0 or fw=3) and (cell.family.mother.death_date.prec="?" or cell.family.father.death_date.prec="?")))[possibly (date)] %end;
-                       %apply;a_of_b%with;%expr(widow_year-cell.family.marriage_date.year) [years old]%and;[relation/relations]0%end;
-                     %end;
+              %if;(fw!="" and (cell.family.date_s=cell.family.marriage_date.year)and cell.family.sep_date_s="")
+                 %( DEBUG %fw;|%widow_year;|%widow_period;<br> %)
+                <span class="font-italic">%cell.family.date_s;</span>%nn;
+                <span class="small font-weight-bold
+                  %if;(fw=3)text-secondary%elseif;(fw=0)text-primary%nn;
+                  %elseif;(fw=5 or fw=6)
+                    %if;(widow_period!="" and widow_period>100)text-danger%nn;
+                    %else;text-success%end;
+                  %end;"
+                 title="%nn;
+                 %if;(widow_year!="")
+                   %if;(cell.family.marriage_date.year!="" and cell.family.marriage_date.prec="")
+                     %if;((fw=2 or fw=4) or ((fw=0 or fw=3) and (cell.family.mother.death_date.prec="?" or cell.family.father.death_date.prec="?")))[possibly (date)] %end;
+                     %apply;a_of_b%with;%expr(widow_year-cell.family.marriage_date.year) [years old]%and;[relation/relations]0%end;
                    %end;
-                   %if;(widow_period!="")
-                     %apply;a_of_b%with;&#013;&#013;
-                       %if;(fw=0 or fw=5)%cell.family.mother;%else;%cell.family.father;%end;%sp;
-                       %if;(fw=0 or fw=5)[widower/widow]1%else;[widower/widow]0%end;%sp;
-                       %if;(fw=5 or fw=6)[for/since]1%else;[for/since]0%end;%sp;
-                       %if;((fw=0 and cell.family.mother.death_date.prec="&#62;")
-                         or (fw=3 and cell.family.father.death_date.prec="&#62;"))&#62;%end;
-                       %if;((fw=0 or fw=3) and (cell.family.mother.death_date.prec="?" or cell.family.father.death_date.prec="?"))[possibly (date)] %end;
-                       %if;(widow_period!="")%widow_period; %if;(widow_period=1)[year/month/day]0%else;[years old]%if;(widow_period>100) (?!)%end;%end;
-                       %end;
-                     %and;
-                       %if;(fw=0 or fw=5)%cell.family.father;%else;%cell.family.mother;%end;
+                 %end;
+                 %if;(widow_period!="")
+                   %apply;a_of_b%with;&#013;&#013;
+                     %if;(fw=0 or fw=5)%cell.family.mother;%else;%cell.family.father;%end;%sp;
+                     %if;(fw=0 or fw=5)[widower/widow]1%else;[widower/widow]0%end;%sp;
+                     %if;(fw=5 or fw=6)[for/since]1%else;[for/since]0%end;%sp;
+                     %if;((fw=0 and cell.family.mother.death_date.prec="&#62;")
+                       or (fw=3 and cell.family.father.death_date.prec="&#62;"))&#62;%end;
+                     %if;((fw=0 or fw=3) and (cell.family.mother.death_date.prec="?" or cell.family.father.death_date.prec="?"))[possibly (date)] %end;
+                     %if;(widow_period!="")%widow_period; %if;(widow_period=1)[year/month/day]0%else;[years old]%if;(widow_period>100) (?!)%end;%end;
                      %end;
-                     %if;(widow_period>100)&#013;Please let both spouses rest in peace!%end;
-                   %end;">%if;(not ("-" in cell.family.date_s))—%end;%if;(fw=2 or fw=4)?%end;%widow_year;</span>
-                %else;
-                  %cell.family.date_s;
+                   %and;
+                     %if;(fw=0 or fw=5)%cell.family.father;%else;%cell.family.mother;%end;
+                   %end;
+                   %if;(widow_period>100)&#013;Please let both spouses rest in peace!%end;
+                 %end;">%if;(not ("-" in cell.family.date_s))—%end;%if;(fw=2 or fw=4)?%end;%widow_year;</span>
+              %else;
+                %cell.family.date_s;
                 %end;
-              %else;%cell.family.marriage.date_s;
-              %end;
             %end;
             %if;(wizard and not cancel_links)</a>%elseif;friend;</span>%end;
          %else;

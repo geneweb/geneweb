@@ -158,7 +158,7 @@
           %else;│%end;
         %elseif;(dag_cell.text != "")%dag_cell.text;
         %elseif;(dag_cell.item != "")
-          %if;(plugin.v7 and line_nbr!=0 and dag_cell.index!="-1")
+          %if;(line_nbr!=0 and dag_cell.index!="-1")
             <div class="position-relative list-group-item-action">
               <a href="%prefix_no_pmod;i=%dag_cell.index;&m=D&t=TV&%foreach;env_binding;%nn;
                 %if;(not (env.key="i" or env.key="p" or env.key="n" or env.key="oc" or
@@ -167,7 +167,7 @@
                 title="[*navigation] on tree [with] this individual" style="line-height:1rem"></a>
           %end;
           <div class="d-flex-row flex-column justify-content-between%if;(dag_cell.item!="") mx-1%end;">%dag_cell.item;</div>
-          %if;(plugin.v7 and line_nbr!=0 and dag_cell.index!="-1")
+          %if;(line_nbr!=0 and dag_cell.index!="-1")
             </div>
           %end;
         %else;

@@ -807,16 +807,15 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
   %end;
 %end;
 
-%if;plugin.v7;
-  %define;cousins_l(lll)
-    %cousins.0.lll;
-  %end;
-  %define;desc_cousin_count_l(xxx)
-    %foreach;descendant_level;
-      %if;(level=xxx)%apply;cousins_l(xxx)%end;
-    %end;
+%define;cousins_l(lll)
+  %cousins.0.lll;
+%end;
+%define;desc_cousin_count_l(xxx)
+  %foreach;descendant_level;
+    %if;(level=xxx)%apply;cousins_l(xxx)%end;
   %end;
 %end;
+
 %( Main %)
 <table class="table table-hover table-sm descends_table mt-1">
   %if;(evar.t="A")
@@ -837,7 +836,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
         %if;(e.gen=1 and lev<max_desc_level)
           <tr>
             <th class="text-left" scope="row" colspan="%nb_col;">
-              <span class="ml-1"%if;plugin.v7; title="Debug count using cousin.l.v function: %apply;desc_cousin_count_l%with;%expr(lev+1)%end; desc. (should be identical)"%end;>[*generation/generations]0 %expr(lev+1) :             %apply;desc_count(lev+1,1,1,0,0)</span>
+              <span class="ml-1" title="Debug count using cousin.l.v function: %apply;desc_cousin_count_l%with;%expr(lev+1)%end; desc. (should be identical)">[*generation/generations]0 %expr(lev+1) :             %apply;desc_count(lev+1,1,1,0,0)</span>
             </th>
           </tr>
         %end;

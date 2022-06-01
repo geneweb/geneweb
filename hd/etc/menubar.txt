@@ -330,11 +330,9 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=CT&hi=H&v=5&scale=100&fs=17&sosa=on" title="[*compact tree] [with] %self;"><span class="fa fa-th fa-fw mr-2"></span>[*compact tree]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=h7&wide=on" title="[Arbre 7 gen]"><span class="fa fa-border-none fa-fw mr-2"></span>7 [generation/generations]1</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=m" title="[Arbre 9 gen]"><span class="fa fa-chess-board fa-fw mr-2"></span>9 [generation/generations]1</a>
-                %if;plugin.v7;
-                  <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=5"><span class="fa fa-chart-pie fa-fw mr-2"></span>[*v7 fanchart]</a>
-                  </div>
-                %end;
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=5"><span class="fa fa-chart-pie fa-fw mr-2"></span>[*v7 fanchart]</a>
+              </div>
             </li>
           %end;
           %if;has_children;
@@ -359,12 +357,8 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
             <div class="dropdown-menu">
               <a class="dropdown-item" href="%prefix;m=R&%access;" %laR;><span class="fa fa-cog fa-fw mr-2"></span>[*relationship computing]</a>
               <div class="dropdown-divider"></div>
-              %if;plugin.v7;
                 <a class="dropdown-item" href="%prefix;%access;&m=C"
-              %else;
-                <a class="dropdown-item" href="%prefix;%access;&m=C%if;(static_max_anc_level<=3)&v=%expr(static_max_anc_level-1)%end;"
-              %end;
-              title="[*relationship link/relationship links]0 [with] [close family]"><span class="fa fa-elevator fa-fw mr-2"></span>[*relationship]</a>
+                  title="[*relationship link/relationship links]0 [with] [close family]"><span class="fa fa-elevator fa-fw mr-2"></span>[*relationship]</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" %nn;
                 href="%prefix;m=F;%access;;%nn;

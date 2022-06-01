@@ -369,7 +369,7 @@
       %end;
       %if;has_sosa;
         %apply;sosa(count2)
-      %elseif;plugin.v7;
+      %else;
         %apply;from_sosa(count2)
       %end;
     %end;

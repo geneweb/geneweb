@@ -102,7 +102,7 @@
 %let;minw;%if;has_children;2%else;1%end;%in;
 %let;zero;%for;i;0;maxv;0%end;%in;
 %define;cous(vvv,www)
-  %if;plugin.v7;%expr(cousins.vvv.www)%end;
+  %expr(cousins.vvv.www)
 %end;
 %define;row_counts(xxx)
   %for;i;0;maxv;
@@ -116,11 +116,11 @@
 %end;
 %let;maxdesc;%expr(maxw-count1)%in;
 %define;link_cousin(vvv,www,ttt,sss)
-  %let;cousins_vvv_www_float;%if;plugin.v7;%cousins.vvv.www;%end;%in;
+  %let;cousins_vvv_www_float;%cousins.vvv.www;%in;
   %let;cousins_vvv_www;%expr(cousins_vvv_www_float/.1)%in;
   <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=www" data-toggle="tooltip" data-html="true" title="sss" class="btn btn-light %if;(cousins_vvv_www!="" and cousins_vvv_www=0) disabled%end; w-100" %if;(www-vvv<=10) style="height:120px;"%end;>
     <span class="badge badge-%if;(vvv=0)info%elseif;(vvv%2=1)primary%else;danger%end;">%cousins_vvv_www;</span>%nn;
-    %if;(plugin.v7 and "." in cousins_vvv_www_float)
+    %if;("." in cousins_vvv_www_float)
       %let;couspaths_vvv_www;%cousins.vvv.www.paths;%in;
       +<span class="badge badge-info">%couspaths_vvv_www;</span>
     %for;i;0;couspaths_vvv_www;%incr_count3;%end;
@@ -174,7 +174,7 @@
 %end;
 
 %let;paths;%expr(count+count3)%in;
-%if;plugin.v7;Total[:] %count; %if;(count=1)[person/persons]0%else;[person/persons]1%end;%if;(count3>0) (+ <span class="badge badge-info">%count3;</span> = %paths; %if;(paths=1)[path/paths]0%else;[path/paths]1%end;)%end;.%end;
+Total[:] %count; %if;(count=1)[person/persons]0%else;[person/persons]1%end;%if;(count3>0) (+ <span class="badge badge-info">%count3;</span> = %paths; %if;(paths=1)[path/paths]0%else;[path/paths]1%end;)%end;.
 %include;trl
 %include;copyr
 </div>
