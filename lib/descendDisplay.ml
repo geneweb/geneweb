@@ -711,7 +711,7 @@ let print_person_table conf base p lab =
   if p_getenv conf.env "birth_place" = Some "on"
   then td (fun () ->
       Output.print_string conf birth_place ;
-      Output.print_sstring conf "nbsp;") ;
+      Output.print_sstring conf "&nbsp;") ;
   let aux ?alt ?attr gets f =
     if List.exists (fun get -> p_getenv conf.env get = Some "on") gets then begin
       Output.print_sstring conf "<td" ;
