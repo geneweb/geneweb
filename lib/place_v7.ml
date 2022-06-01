@@ -1,14 +1,9 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Geneweb.Config
+open Config
 open Gwdb
-open Geneweb.Util
-
-module Hutil = Geneweb.Hutil
-module Output = Geneweb.Output
-module Perso = Geneweb.Perso
-module Templ = Geneweb.Templ
-module Util = Geneweb.Util
+open Hutil
+open Util
 
 let rec alphabetic_order_list l1 l2 =
   if l1 = [] || l2 = [] then
