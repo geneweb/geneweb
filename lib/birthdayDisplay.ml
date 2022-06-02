@@ -284,7 +284,7 @@ let list_aux conf base list cb =
     cb conf year ;
     Output.print_sstring conf "</em></li>"
   end list;
-  Output.print_sstring conf "<ul>"
+  Output.print_sstring conf "</ul>"
 
 let print_marriage conf base month =
   let title _ =
@@ -319,6 +319,7 @@ let print_marriage conf base month =
       Output.print_sstring conf " <li>" ;
       Output.print_sstring conf (string_of_int i);
       list_aux conf base list (fun _ _ -> ()) ;
+      Output.print_sstring conf " </li>" ;
   done;
   Output.print_sstring conf "</ul>";
   Hutil.trailer conf
