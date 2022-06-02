@@ -418,7 +418,10 @@ let print_menu_birth conf base =
       | Some i -> (pget conf base i, referenced_person_title_text)
       | None -> raise Not_found
   in
-  gen_print_menu_birth conf base f_scan (fun () -> ())
+  let mode () =
+    Output.print_sstring conf "<input type=\"hidden\" name=\"m\" value=\"AN\">\n"
+  in
+  gen_print_menu_birth conf base f_scan mode
 
 let gen_print_menu_dead conf base f_scan mode =
   let title _ =
