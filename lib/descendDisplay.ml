@@ -801,11 +801,18 @@ let print_person_table conf base p lab =
     || p_getenv conf.env "marr_date" = Some "on"
     || p_getenv conf.env "marr_place" = Some "on"
     then
-      let aux i get fn =
+      let aux ?attr i get fn =
         if p_getenv conf.env get = Some "on" then begin
           Output.print_sstring conf {|<td style="border-top:none; |} ;
           if nb_families - 1 <> i then Output.print_sstring conf "border-bottom:none;" ;
-          Output.print_sstring conf {|">|} ;
+          Output.print_sstring conf "\"";
+          begin match attr with
+          | Some attr ->
+             let attr = List.fold_left (fun acc (a, v) -> " " ^ a ^ "=" ^ "\"" ^ v ^ "\"") "" attr in
+             Output.print_sstring conf attr;
+          | None -> ()
+          end;
+          Output.print_sstring conf {|>|} ;
           fn () ;
           Output.print_sstring conf "</td>"
         end
@@ -842,7 +849,7 @@ let print_person_table conf base p lab =
             |> Output.print_string conf ;
           Output.print_sstring conf " &nbsp;" ;
         end ;
-        aux i "child" begin fun () ->
+        aux ~attr:["align", "center"] i "child" begin fun () ->
           Output.print_sstring conf (get_children fam |> Array.length |> string_of_int) ;
           Output.print_sstring conf " &nbsp;" ;
         end ;
