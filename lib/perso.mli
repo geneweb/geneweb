@@ -120,7 +120,8 @@ val has_possible_duplications : config -> base -> person -> bool
 
 (** Optionnal [link] argument is passed to {!val:DateDisplay.string_of_ondate} *)
 val string_of_title
-  : ?link:bool
+  : ?safe:bool
+  -> ?link:bool
   -> config
   -> base
   -> Adef.safe_string
