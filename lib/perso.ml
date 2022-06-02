@@ -27,9 +27,11 @@ let string_of_marriage_text conf base fam =
   | "" -> s
   | _ -> s ^^^ ", " ^<^ Util.safe_html (string_with_macros conf [] marriage_place) ^>^ ","
 
-let string_of_title ?(link = true) conf base (and_txt : Adef.safe_string) p (nth, name, title, places, dates) =
+let string_of_title ?(safe = false) ?(link = true) conf base (and_txt : Adef.safe_string) p (nth, name, title, places, dates) =
+  let safe_html = if not safe then Util.safe_html else Adef.safe in
+  let escape_html = if not safe then Util.escape_html else Adef.escaped in
   let (tit, est) = sou base title, sou base (List.hd places) in
-  let acc = Util.safe_html (tit ^ " " ^ est) in
+  let acc = safe_html (tit ^ " " ^ est) in
   let href place s =
     if link then
       let href =
@@ -50,7 +52,7 @@ let string_of_title ?(link = true) conf base (and_txt : Adef.safe_string) p (nth
     in
     match places with
     | place :: places ->
-      let est = Util.safe_html (sou base place) in
+      let est = safe_html (sou base place) in
       let acc = acc ^^^ href place est in
       loop acc places
     | _ -> acc
@@ -73,7 +75,7 @@ let string_of_title ?(link = true) conf base (and_txt : Adef.safe_string) p (nth
     match name with
     | Tname n ->
       let acc = if not first then acc ^>^ " ," else acc in
-      ( acc ^^^ (sou base n |> Util.escape_html :> Adef.safe_string)
+      ( acc ^^^ (sou base n |> escape_html :> Adef.safe_string)
       , false )
     | _ -> acc, first
   in
