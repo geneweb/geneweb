@@ -3,7 +3,7 @@
 %( Boutons de configurations et d'options %)
 
 <form class="form-group mx-1" name="evt_url" method="get" action="%action;">
-  <input type="hidden" name="m" value="PS">
+  <input type="hidden" name="m" value="PPS">
   <div class="form-inline">
     <label class="sr-only" for="k">[*place] (k)</label>
     <input type="search" class="form-control col-4 ml-2" name="k"
