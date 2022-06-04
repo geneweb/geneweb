@@ -110,6 +110,12 @@ uninstall:
 	dune uninstall
 
 BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
+DEV_DIR=$(shell pwd)
+
+devtpl:
+	$(RM) -r $(DISTRIB_DIR)
+	export TPL="yes"; \
+	make distrib
 
 distrib: ## Build the project and copy what is necessary for distribution
 distrib: build
@@ -149,28 +155,45 @@ distrib: build
 	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT);
 	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT);
 	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT);
-	mkdir $(DISTRIB_DIR)/gw/setup
-	cp bin/setup/intro.txt $(DISTRIB_DIR)/gw/setup/
-	mkdir $(DISTRIB_DIR)/gw/setup/lang
-	cp bin/setup/setup.gwf $(DISTRIB_DIR)/gw/setup/
-	cp bin/setup/setup.css $(DISTRIB_DIR)/gw/setup/
-	cp bin/setup/lang/*.htm $(DISTRIB_DIR)/gw/setup/lang/
-	cp bin/setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/
-	cp bin/setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/
-	cp -R hd/* $(DISTRIB_DIR)/gw/
-	mkdir $(DISTRIB_DIR)/gw/plugins
+
+	if test $(OS_TYPE) = "Win"; then \
+	  export CYGWIN="winsymlinks:nativestrict"; \
+	fi;
+	if test "$(TPL)" = "yes"; then \
+	  ln -s $(DEV_DIR)/hd/etc    $(DISTRIB_DIR)/gw/etc; \
+	  ln -s $(DEV_DIR)/hd/lang   $(DISTRIB_DIR)/gw/lang; \
+		ln -s $(DEV_DIR)/hd/images $(DISTRIB_DIR)/gw/images; \
+	  ln -s $(DEV_DIR)/bin/setup $(DISTRIB_DIR)/gw/setup; \
+	else \
+	  cp -R $(DEV_DIR)/hd/*    $(DISTRIB_DIR)/gw/; \
+	  mkdir $(DISTRIB_DIR)/gw/setup; \
+	  mkdir $(DISTRIB_DIR)/gw/setup/lang; \
+	  cp bin/setup/intro.txt $(DISTRIB_DIR)/gw/setup/; \
+	  cp bin/setup/setup.gwf $(DISTRIB_DIR)/gw/setup/; \
+	  cp bin/setup/setup.css $(DISTRIB_DIR)/gw/setup/; \
+	  cp bin/setup/lang/*.htm $(DISTRIB_DIR)/gw/setup/lang/; \
+	  cp bin/setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/; \
+	  cp bin/setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/; \
+	fi;
+
+	$(RM) -r $(DISTRIB_DIR)/gw/plugins;
+	mkdir $(DISTRIB_DIR)/gw/plugins;
 	for P in $(shell ls plugins); do \
-		if [ -f $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs ] ; then \
-			mkdir $(DISTRIB_DIR)/gw/plugins/$$P; \
-			cp $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs $(DISTRIB_DIR)/gw/plugins/$$P/; \
-			if [ -d plugins/$$P/assets ] ; then \
-				cp -R $(BUILD_DIR)/plugins/$$P/assets $(DISTRIB_DIR)/gw/plugins/$$P/; \
-			fi; \
-			if [ -f $(BUILD_DIR)/plugins/$$P/META ] ; then \
-				cp $(BUILD_DIR)/plugins/$$P/META $(DISTRIB_DIR)/gw/plugins/$$P/; \
-			fi; \
-		fi; \
-	done
+	  if [ -f $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs ]; then \
+	    mkdir $(DISTRIB_DIR)/gw/plugins/$$P; \
+	    cp $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs $(DISTRIB_DIR)/gw/plugins/$$P/; \
+	    if [ -f $(BUILD_DIR)/plugins/$$P/META ]; then \
+	      cp $(BUILD_DIR)/plugins/$$P/META $(DISTRIB_DIR)/gw/plugins/$$P/; \
+	    fi; \
+	    if [ -d plugins/$$P/assets ]; then \
+	      if test "$(TPL)" = "yes"; then \
+	        ln -s $(DEV_DIR)/plugins/$$P/assets $(DISTRIB_DIR)/gw/plugins/$$P/assets; \
+	      else \
+	        cp -R $(DEV_DIR)/plugins/$$P/assets $(DISTRIB_DIR)/gw/plugins/$$P/; \
+	      fi; \
+	    fi; \
+	  fi; \
+	done;
 
 .PHONY: install uninstall distrib
 
