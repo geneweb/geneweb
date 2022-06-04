@@ -166,7 +166,7 @@
                   target="_blank" rel="noreferrer" rel="noopener" tabindex="-1">
                   <i class="fab fa-wikipedia-w fa-sm%if;(not first and suburb!="") text-danger%end;"></i>
                 </a>
-                %if;(plugin.v7 and first and suburb!="")<br>
+                %if;(first and suburb!="")<br>
                 <a href="https://www.wikidata.org/w/index.php?search=%escape.printable.suburb;"
                   role="button" class="btn btn-link p-0 ml-1"
                   title="%escape.printable.suburb; sur Wikidata"
@@ -179,7 +179,7 @@
               <a role="button" id="%escape.entry_value;" class="btn btn-link d-inline text-wrap ml-%if;is_modified;5 pl-4%else;2%end;%nn;
                 %if;is_modified; disabled" tabindex="-1" aria-disabled="true%end;"
                 href="%prefix;m=MOD_DATA%enbs;&data=%evar.data;%if;(evar.rev!="" and evar.rev="on")&rev=on%end;&key=%entry_key;&s=%encode.evar.s;">
-                  %if;(plugin.v7 and evar.data="place" and suburb!="")
+                  %if;(evar.data="place" and suburb!="")
                     %if;is_modified;%escape.entry_value;
                     %else;
                       %if;(first)
