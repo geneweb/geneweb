@@ -2484,34 +2484,27 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       | _ -> raise Not_found
     end
   | "spouse" :: sl ->
-    begin match get_env "fam" env with
-        Vfam (_, _, (_, _, ip), _) when mode_local env ->
+     begin match get_env "fam" env with
+       Vfam (_, _, (_, _, ip), _) when mode_local env ->
         let ep = make_ep conf base ip in
         eval_person_field_var conf base env ep loc sl
-      | _ ->
-        #ifdef API
-          match get_env "fam_link" env with
-            Vfam (_, _, (_, _, ip), _) ->
-            let baseprefix =
-              match get_env "baseprefix" env with
-                Vstring baseprefix -> baseprefix
-              | _ -> conf.command
-            in
-            begin match Perso_link.get_person_link baseprefix ip with
-                Some spouse ->
-                let ep = Perso_link.make_ep_link base spouse in
-                let conf =
-                  {conf with command = spouse.MLink.Person.baseprefix}
-                in
-                let env = ("p_link", Vbool true) :: env in
-                eval_person_field_var conf base env ep loc sl
-              | None -> raise Not_found
-            end
-          | _ -> raise Not_found
-                       #else
-  raise Not_found
-        #endif
-end
+     | _ ->
+        match get_env "fam_link" env with
+          Vfam (_, _, (_, _, ip), _) ->
+           let baseprefix =
+             match get_env "baseprefix" env with
+               Vstring baseprefix -> baseprefix
+             | _ -> conf.command
+           in
+           begin match !GWPARAM_ITL.get_person conf base baseprefix ip with
+           | Some (ep, baseprefix) ->
+              let conf = { conf with command = baseprefix } in
+              let env = ("p_link", Vbool true) :: env in
+              eval_person_field_var conf base env ep loc sl
+           | None -> raise Not_found
+           end
+        | _ -> raise Not_found
+     end
 | "witness" :: sl ->
   begin match get_env "witness" env with
       Vind p ->
