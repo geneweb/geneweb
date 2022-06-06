@@ -47,7 +47,7 @@ let string_of_title ?(safe = false) ?(link = true) conf base (and_txt : Adef.saf
   let rec loop acc places =
     let acc = match places with
       | [] -> acc
-      | [_] -> acc ^^^ " " ^<^ and_txt
+      | [_] -> acc ^^^ " " ^<^ and_txt ^^^ (Adef.safe " ")
       | _ -> acc ^>^ ", "
     in
     match places with
