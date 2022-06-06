@@ -151,7 +151,8 @@ val string_gen_family :
     or access to them is denied (don't print "x x")
 *)
 val gen_person_text
-  : ?html:bool
+  : ?escape:bool
+  -> ?html:bool
   -> ?sn:bool
   -> ?chk:bool
   -> ?p_first_name:(base -> person -> string)

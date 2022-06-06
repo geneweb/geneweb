@@ -645,12 +645,14 @@ let restricted_txt = Adef.safe "....."
 let x_x_txt = Adef.safe "x x"
 
 let gen_person_text
+    ?(escape = true)  
     ?(html = true)
     ?(sn = true)
     ?(chk = true)
     ?(p_first_name = p_first_name)
     ?(p_surname = p_surname)
     conf base p =
+  let esc = if escape then esc else Adef.safe in
   if is_hidden p then restricted_txt
   else if chk && is_hide_names conf p && not (authorized_age conf base p) then x_x_txt
   else
