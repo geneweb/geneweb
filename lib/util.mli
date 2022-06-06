@@ -245,6 +245,7 @@ val open_templ_fname : config -> string -> (in_channel * string) option
 val open_templ : config -> string -> in_channel option
 
 val string_of_place : config -> string -> Adef.escaped_string
+val raw_string_of_place : config -> string -> string
 val place_of_string : config -> string -> place option
 val allowed_tags_file : string ref
 

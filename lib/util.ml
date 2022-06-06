@@ -1440,9 +1440,11 @@ let place_of_string conf place =
       Some place
   | None -> None
 
-let string_of_place _conf place =
+let raw_string_of_place _conf place =
   List.fold_left (fun s c -> Name.strip_c s c) place ['['; ']']
-  |> escape_html
+
+let string_of_place _conf place =
+  raw_string_of_place _conf place |> escape_html
 
 let menu_threshold = 20
 
