@@ -14,7 +14,6 @@ let not_found conf txt x =
     Output.print_sstring conf {| "|} ;
     Output.print_string conf (Util.escape_html x) ;
     Output.print_sstring conf {|"|} ;
-    Output.print_sstring conf (Utf8.capitalize_fst txt) ;
   in
   Hutil.rheader conf title;
   Hutil.print_link_to_welcome conf false;
