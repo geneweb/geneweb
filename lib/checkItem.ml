@@ -823,15 +823,47 @@ let check_parent_marriage_age warning fam p =
       | _ :: list -> loop list
   in
   loop (get_fevents fam)
+  
+let check_possible_duplicate_family base warning family father mother =
+  let ifath = get_father family in
+  let imoth = get_mother family in
+  let ifam = get_ifam family in
+  let father_fn, father_sn = get_first_name father, get_surname father in
+  let mother_fn, mother_sn = get_first_name mother, get_surname mother in
+  let fath_families = get_family father in
+  let moth_families = get_family mother in
+  
+  let f get_parent (current_parent, current_parent_iper, current_parent_fn, current_parent_sn) ifam' =
+    if eq_ifam ifam ifam' then ()
+    else begin
+        let fam' = foi base ifam' in
+        let parent' = get_parent fam' in
+        let person = poi base parent' in
+        let fn, sn = get_first_name person, get_surname person in
+        (* Parent is strictly the same *)
+        if eq_iper parent' current_parent_iper then
+          warning (PossibleDuplicateFam (ifam, ifam'))
+        (*  Homonymous parents *)
+        else if eq_istr fn current_parent_fn && eq_istr sn current_parent_sn then
+          warning (PossibleDuplicateFamHomonymous (ifam, ifam', current_parent))
+        else ()
+      end
+  in
 
-let check_parents warning fam fath moth =
+  Array.iter (f get_mother (mother, imoth, mother_fn, mother_sn)) fath_families;
+  Array.iter (f get_father (father, ifath, father_fn, father_sn)) moth_families
+
+
+let check_parents base warning fam fath moth =
   (* check father's marriage date *)
   check_parent_marriage_age warning fam fath ;
   (* check mother's marriage date *)
   check_parent_marriage_age warning fam moth ;
   (* check age difference between spouses *)
-  check_difference_age_between_cpl warning fath moth
+  check_difference_age_between_cpl warning fath moth;
+  check_possible_duplicate_family base warning fam fath moth
 
+  
 (* main *)
 
 let person ?(onchange = true) base warning p =
@@ -853,7 +885,7 @@ let family ?(onchange = true) base warning ifam fam =
   (* check family's witnesses *)
   check_witness_fevents base warning fam ;
   (* check parents marraige *)
-  check_parents warning fam fath moth ;
+  check_parents base warning fam fath moth ;
   (* check children *)
   check_children ~onchange base warning (ifam, fam) fath moth ;
   if onchange then begin

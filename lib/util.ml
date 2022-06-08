@@ -2864,6 +2864,7 @@ let auth_warning conf base w =
   | ParentTooOld (p, _, c) -> pauth p && pauth c
   | ParentTooYoung (p, _, c) -> pauth p && pauth c
   | PossibleDuplicateFam (f1, f2) -> fauth f1 && fauth f2
+  | PossibleDuplicateFamHomonymous (f1, f2, p) -> fauth f1 && fauth f2 && pauth p
   | PEventOrder (p, _, _) -> pauth p
   | PWitnessEventAfterDeath (p, _, origin) -> pauth p && pauth origin
   | PWitnessEventBeforeBirth (p, _, origin) -> pauth p && pauth origin
