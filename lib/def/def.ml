@@ -334,7 +334,10 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | ParentTooOld of 'person * dmy * 'person (** Person became a parent at age older then 55 years for mother and 70 for father *)
   | ParentTooYoung of 'person * dmy * 'person (** Person became a parent at age younger then 11 years old *)
   | PEventOrder of 'person * 'pevent * 'pevent (** Personal events haven't been ordered correctly *)
+  (** There is a possibility that two families are a duplicate of each other *)
   | PossibleDuplicateFam of 'family * 'family
+  (** There is a possibility that two families are a duplicate of each other (Homonymous spouse) *)
+  | PossibleDuplicateFamHomonymous of 'family * 'family * 'person
   | PWitnessEventAfterDeath of 'person * 'pevent * 'person (** Witness is dead before personal event date *)
   | PWitnessEventBeforeBirth of 'person * 'pevent * 'person (** Witness is born after personal event date *)
   | TitleDatesError of 'person * 'title (** Title's start date is after end date or person is born after title dates *)

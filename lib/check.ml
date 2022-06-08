@@ -191,6 +191,13 @@ let print_base_warning oc base =
   | PossibleDuplicateFam (f1, f2) ->
     Printf.fprintf oc "possible duplicate families: %s and %s\n"
       (string_of_ifam f1) (string_of_ifam f2)
+  | PossibleDuplicateFamHomonymous (f1, f2, p) ->
+     let f = foi base f1 in
+     let fath = get_father f in
+     let moth = get_mother f in
+     let curr, hom = if eq_iper fath (get_iper p) then moth, fath else fath, moth in
+     Printf.fprintf oc "possible duplicate families: %s and %s, %s has unions with several persons named %s\n"
+       (string_of_ifam f1) (string_of_ifam f2) (designation base (poi base curr)) (designation base (poi base hom))
   | PEventOrder (p, e1, e2) ->
       Printf.fprintf oc "%s's %s before his/her %s\n" (designation base p)
         (string_of_epers_name base e1.epers_name)

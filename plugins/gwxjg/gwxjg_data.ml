@@ -919,7 +919,13 @@ and mk_warning conf base =
          ; get_fam ifam1
          ; get_fam ifam2
          ]
-
+  | PossibleDuplicateFamHomonymous (ifam1, ifam2, p) ->
+    Tset [ Tsafe "PossibleDuplicateFamHomonymous"
+         ; get_fam ifam1
+         ; get_fam ifam2
+         ; unsafe_mk_person conf base p
+      ]
+    
 let module_OPT =
   let map = func_arg2_no_kw begin fun fn -> function
       | Tnull -> Tnull
