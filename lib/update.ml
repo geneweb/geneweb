@@ -624,6 +624,15 @@ let print_warning conf base =
       (fcapitale (ftransl conf "%s and %s have several unions"))
       ((someone_strong base @@ poi base @@ get_father f :> string))
       ((someone_strong base @@ poi base @@ get_mother f :> string))
+  | PossibleDuplicateFamHomonymous (f1, _, p) ->
+     let f = foi base f1 in
+     let fath = get_father f in
+     let moth = get_mother f in
+     let curr, hom = if eq_iper fath (get_iper p) then moth, fath else fath, moth in
+     Output.printf conf
+       (fcapitale (ftransl conf "%s has unions with several persons named %s"))
+       ((someone_strong base @@ poi base @@ curr :> string))
+       ((someone_strong base @@ poi base @@ hom :> string))
   | PEventOrder (p, e1, e2) ->
     Output.printf conf (fcapitale (ftransl conf "%t's %s before his/her %s"))
       (fun _ -> (someone_strong base p :> string))
