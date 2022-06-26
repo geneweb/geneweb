@@ -61,7 +61,7 @@ let print_html_places_surnames conf base (array : (string list * (string * iper 
 
 let print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage =
     (if add_birth then "&bi=on" else "") ^
-    (if add_baptism then "&bp=on" else "") ^
+    (if add_baptism then "&ba=on" else "") ^
     (if add_death then "&de=on" else "") ^
     (if add_burial then "&bu=on" else "") ^
     (if add_marriage then "&ma=on" else "")
@@ -158,7 +158,7 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism ~add_de
 let print_all_places_surnames conf base =
   let add_marriage = p_getenv conf.env "ma" = Some "on" in
   let add_birth = p_getenv conf.env "bi" = Some "on" in
-  let add_baptism = p_getenv conf.env "bp" = Some "on" in
+  let add_baptism = p_getenv conf.env "ba" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
   let add_burial = p_getenv conf.env "bu" = Some "on" in
   match p_getenv conf.env "k" with

@@ -170,7 +170,7 @@ exception List_too_long
 
 let get_opt conf =
   let add_birth = p_getenv conf.env "bi" = Some "on" in
-  let add_baptism = p_getenv conf.env "bp" = Some "on" in
+  let add_baptism = p_getenv conf.env "ba" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
   let add_burial = p_getenv conf.env "bu" = Some "on" in
   let add_marriage = p_getenv conf.env "ma" = Some "on" in
@@ -181,7 +181,7 @@ let get_opt conf =
   let word = p_getenv conf.env "word" = Some "on" in
   let any = p_getenv conf.env "any" = Some "on" in
   (if add_birth then "&bi=on" else "") ^
-  (if add_baptism then "&bp=on" else "") ^
+  (if add_baptism then "&ba=on" else "") ^
   (if add_death then "&de=on" else "") ^
   (if add_burial then "&bu=on" else "") ^
   (if add_marriage then "&ma=on" else "") ^
@@ -561,7 +561,7 @@ let print_html_places_surnames conf base max_rlm_nbr link_to_ind
 
 let print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage =
     (if add_birth then "&bi=on" else "") ^
-    (if add_baptism then "&bp=on" else "") ^
+    (if add_baptism then "&ba=on" else "") ^
     (if add_death then "&de=on" else "") ^
     (if add_burial then "&bu=on" else "") ^
     (if add_marriage then "&ma=on" else "")
@@ -689,7 +689,7 @@ let print_all_places_surnames_long conf base _ini ~add_birth ~add_baptism
 let print_all_places_surnames conf base =
   let add_marriage = p_getenv conf.env "ma" = Some "on" in
   let add_birth = p_getenv conf.env "bi" = Some "on" in
-  let add_baptism = p_getenv conf.env "bp" = Some "on" in
+  let add_baptism = p_getenv conf.env "ba" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
   let add_burial = p_getenv conf.env "bu" = Some "on" in
   let lim = 

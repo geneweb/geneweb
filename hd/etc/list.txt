@@ -74,7 +74,7 @@
 </div>
 %let;opt;%nn;
   %if;(evar.bi="on")&bi=on%end;%nn;
-  %if;(evar.bp="on")&bp=on%end;%nn;
+  %if;(evar.ba="on")&bp=on%end;%nn;
   %if;(evar.ma="on")&ma=on%end;%nn;
   %if;(evar.de="on")&de=on%end;%nn;
   %if;(evar.bu="on")&bu=on%end;%nn;
@@ -96,7 +96,7 @@
   %if;("vv"!="bi"), %end;<span class="text-%if;(evar.vv="on")primary%else;secondary%end;">tt ii</span>%nn;
 %end;
 %apply;evt("bi",[birth],"N")
-%apply;evt("bp",[baptism],"B")
+%apply;evt("ba",[baptism],"B")
 %apply;evt("ma",[marriage event],"M")
 %apply;evt("de",[death],"D")
 %apply;evt("bu",[burial],"S").

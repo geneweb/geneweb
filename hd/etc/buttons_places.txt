@@ -21,11 +21,11 @@
           for="bi">[*birth]</label>
       </div>
       <div class="custom-control custom-checkbox ml-2">
-        <input type="checkbox" class="custom-control-input" name="bp"
-          onclick="test_all()" id="bp" value="on"
-          %if;(evar.bp!="" and evar.bp="on") checked%end;>
+        <input type="checkbox" class="custom-control-input" name="ba"
+          onclick="test_all()" id="ba" value="on"
+          %if;(evar.ba!="" and evar.ba="on") checked%end;>
         <label class="custom-control-label" title="[*baptism place]"
-          for="bp">[*baptism]</label>
+          for="ba">[*baptism]</label>
       </div>
       <div class="custom-control custom-checkbox ml-2">
         <input type="checkbox" class="custom-control-input" name="ma"
@@ -52,7 +52,7 @@
         <input type="checkbox" class="custom-control-input" name="all"
           id="all" value="on"
           %if;((evar.bi!="" and evar.bi="on") and
-          (evar.bp!="" and evar.bp="on") and
+          (evar.ba!="" and evar.ba="on") and
           (evar.ma!="" and evar.ma="on") and
           (evar.de!="" and evar.de="on") and
           (evar.bu!="" and evar.bu="on")) checked%end;>
@@ -146,7 +146,7 @@ function toggle (btn, state) {
 
 function test_all () {
   var bi = document.getElementById("bi").checked;
-  var bp = document.getElementById("bp").checked;
+  var bp = document.getElementById("ba").checked;
   var ma = document.getElementById("ma").checked;
   var de = document.getElementById("de").checked;
   var bu = document.getElementById("bu").checked;
@@ -157,7 +157,7 @@ function test_all () {
 document.getElementById("all").onclick = function() {
   var state = document.getElementById("all").checked ;
   toggle ("bi", state) ;
-  toggle ("bp", state) ;
+  toggle ("ba", state) ;
   toggle ("ma", state) ;
   toggle ("de", state) ;
   toggle ("bu", state) ;
