@@ -362,8 +362,8 @@ let print_first_name conf base p =
 let someone_strong base p =
   "<strong>"
   ^<^ escape_html (p_first_name base p)
+  ^^^ (if get_occ p = 0 then Adef.escaped "" else Adef.escaped @@ "." ^ string_of_int (get_occ p))
   ^^^ " "
-  ^<^ (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
   ^<^ escape_html (p_surname base p)
   ^>^ "</strong>"
 
