@@ -660,7 +660,7 @@ let gen_person_text
       match sou base (get_public_name p), get_qualifiers p with
       | "", nn :: _ ->
         esc (p_first_name base p)
-        ^^^ (if html then " <em>" else "")
+        ^^^ (if html then " <em>" else " ")
         ^<^ esc (sou base nn)
         ^>^ (if html then "</em>" else "")
       | "", [] ->
