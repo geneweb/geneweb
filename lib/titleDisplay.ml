@@ -42,7 +42,7 @@ let give_access_someone conf base (x, t) list =
   end;
   if has_dates then Output.print_sstring conf "</em>: ";
   if List.mem x list then Output.print_sstring conf "<em>"
-  else Output.print_string conf ({|"<a href="|} ^<^ commd conf ^^^ acces conf base x ^>^ {|">|});
+  else Output.print_string conf ({|<a href="|} ^<^ commd conf ^^^ acces conf base x ^>^ {|">|});
   begin match t.t_name, get_public_name x, get_qualifiers x with
     | Tmain, pn, nn :: _ when sou base pn <> "" ->
       Output.print_string conf (escape_html @@ sou base pn) ;
