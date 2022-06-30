@@ -1186,7 +1186,6 @@ let print_del_ok conf base wl =
       let p = poi base (iper_of_string i) in
       Output.print_sstring conf "<ul><li>";
       Output.print_string conf (reference conf base p (gen_person_text conf base p));
-      Output.print_string conf (reference conf base p (gen_person_text conf base p));
       Output.print_sstring conf "\n</ul>"
     | _ -> ()
   end;
