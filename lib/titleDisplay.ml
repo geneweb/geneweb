@@ -146,11 +146,12 @@ let print_title_place_list conf base t p t_equiv list =
           ("&a=A&t=" ^<^ Mutil.encode t)
           (escape_html t) ;
         if p <> "" then begin
-          give_access_title_aux conf
-            ("&a=A&p=" ^<^ Mutil.encode p)
-            (escape_html p) ;
-        end
-      end t_equiv
+            Output.print_sstring conf " ";
+            give_access_title_aux conf
+              ("&a=A&p=" ^<^ Mutil.encode p)
+              (escape_html p) ;
+          end
+        end t_equiv
   in
   Hutil.header conf title;
   Output.print_sstring conf "<ul>";
