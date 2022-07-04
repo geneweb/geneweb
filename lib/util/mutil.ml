@@ -831,48 +831,55 @@ let read_or_create_channel ?magic ?(wait = false) fname read write =
 #endif
   assert (Secure.check fname) ;
   let fd = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
+#ifndef WINDOWS
+  begin try
+    Unix.lockf fd (if wait then Unix.F_LOCK else Unix.F_TLOCK) 0
+    with e -> Unix.close fd; raise e
+  end;
+#endif
   let ic = Unix.in_channel_of_descr fd in
-  let check = function None -> true | Some m -> check_magic m ic in
   let read () =
-    seek_in ic 0 ;
-    if check magic
-    then
-      try
-        let res = read ic in
-        assert (check magic) ;
-        close_in ic ;
-        Some res
-      with _ -> None
-    else None
+    seek_in ic 0;
+    try
+      match magic with
+      | Some m when check_magic m ic ->
+         let r = Some (read ic) in
+         let _ = seek_in ic (in_channel_length ic - (String.length m)) in
+         assert (check_magic m ic);
+         r
+      | Some _ -> None
+      | None -> Some (read ic)
+    with _ -> None
   in
   match read () with
-  | Some v -> v
+  | Some v ->
+#ifndef WINDOWS
+     Unix.lockf fd Unix.F_ULOCK 0;
+#endif
+     close_in ic;
+     v
   | None ->
+     Unix.ftruncate fd 0 ;
+     let oc = Unix.out_channel_of_descr fd in
+     seek_out oc 0;
+     begin match magic with Some m -> seek_out oc (String.length m) | None -> () end;
+     let v = write oc in
+     flush oc;
+     let _ = seek_out oc (out_channel_length oc) in
+     begin match magic with Some m -> output_string oc m | None -> () end;
+     begin match magic with Some m -> seek_out oc 0 ; output_string oc m | None -> () end ;
+     flush oc;
 #ifndef WINDOWS
-    Unix.lockf fd (if wait then Unix.F_LOCK else Unix.F_TLOCK) 0 ;
-    match read () with
-    | Some v -> v
-    | None ->
+     Unix.lockf fd Unix.F_ULOCK 0;
 #endif
-      let fd2 = Unix.dup fd in
-      Unix.ftruncate fd2 0 ;
-      let oc = Unix.out_channel_of_descr fd2 in
-      begin match magic with Some m -> seek_out oc (String.length m) | None -> () end ;
-      let v = write oc in
-      begin match magic with Some m -> output_string oc m | None -> () end ;
-      begin match magic with Some m -> seek_out oc 0 ; output_string oc m | None -> () end ;
-#ifndef WINDOWS
-      Unix.lockf fd Unix.F_ULOCK 0 ;
-#endif
-      close_in ic ;
-      close_out oc ;
-      v
+     close_out oc;
+     v
 
 let read_or_create_value ?magic ?wait fname create =
   let read ic = Marshal.from_channel ic in
   let write oc =
     let v = create () in
-    Marshal.to_channel oc v [ Marshal.No_sharing ; Marshal.Closures ] ;
+    Marshal.to_channel oc v [ Marshal.No_sharing ; Marshal.Closures ];
     v
   in
   try read_or_create_channel ?magic ?wait fname read write
