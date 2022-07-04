@@ -177,7 +177,7 @@ let load_lexicon =
     match Hashtbl.find_opt lexicon_cache fname with
     | Some lex -> lex
     | None ->
-      let lex =
+       let lex =
         Mutil.read_or_create_value ~wait:true ~magic:Mutil.random_magic fname
           begin fun () ->
             let ht = Hashtbl.create 0 in
