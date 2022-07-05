@@ -955,6 +955,7 @@ let on_person_update base warning p =
     in
     check_parent_marriage_age warning fam p ;
     check_difference_age_between_cpl warning fath moth ;
+    check_possible_duplicate_family base warning fam fath moth;
     Array.iter begin fun child ->
       let child = poi base child in
       child_born_after_his_parent warning child p ;
