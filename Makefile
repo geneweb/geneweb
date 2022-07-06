@@ -131,8 +131,8 @@ distrib: build
 	  cp etc/gwsetup $(DISTRIB_DIR)/gwsetup.command; \
 	  cp etc/macOS/geneweb.command $(DISTRIB_DIR); \
 	else \
-	  cp etc/gwd $(DISTRIB_DIR); \
-	  cp etc/gwsetup $(DISTRIB_DIR); \
+	  cp etc/gwd $(DISTRIB_DIR)/gwd.sh; \
+	  cp etc/gwsetup $(DISTRIB_DIR)/gwsetup.sh; \
 	fi
 	mkdir $(DISTRIB_DIR)/gw
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
