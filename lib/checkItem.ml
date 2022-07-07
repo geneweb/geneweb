@@ -833,7 +833,7 @@ let check_possible_duplicate_family base warning family father mother =
   let fath_families = get_family father in
   let moth_families = get_family mother in
   
-  let f get_parent (current_parent, current_parent_iper, current_parent_fn, current_parent_sn) ifam' =
+  let f get_parent (current_parent, current_parent_iper, current_parent_fn, current_parent_sn) parent_source ifam' =
     if eq_ifam ifam ifam' then ()
     else begin
         let fam' = foi base ifam' in
@@ -845,13 +845,13 @@ let check_possible_duplicate_family base warning family father mother =
           warning (PossibleDuplicateFam (ifam, ifam'))
         (*  Homonymous parents *)
         else if eq_istr fn current_parent_fn && eq_istr sn current_parent_sn then
-          warning (PossibleDuplicateFamHomonymous (ifam, ifam', current_parent))
+          warning (PossibleDuplicateFamHomonymous (ifam, ifam', parent_source))
         else ()
       end
   in
 
-  Array.iter (f get_mother (mother, imoth, mother_fn, mother_sn)) fath_families;
-  Array.iter (f get_father (father, ifath, father_fn, father_sn)) moth_families
+  Array.iter (f get_mother (mother, imoth, mother_fn, mother_sn) father) fath_families;
+  Array.iter (f get_father (father, ifath, father_fn, father_sn) mother) moth_families
 
 
 let check_parents base warning fam fath moth =
