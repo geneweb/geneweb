@@ -278,7 +278,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         %end;
         %if;(bvar.propose_place_surnames!="no")
           <a role="button" class="btn btn-outline-primary mr-1" 
-            href="%prefix;m=PPS&bi=on&ba=on&ma=on&de=on&bu=on">
+            href="%prefix;m=PPS">
             <i class="fas fa-globe fa-fw mr-1" aria-hidden="true"></i>[*places]/[surname/surnames]0</a>
         %end;
         %if;(bvar.hide_advanced_request = "no")
