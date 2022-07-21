@@ -2877,10 +2877,18 @@ let auth_warning conf base w =
   | ChangedOrderOfFamilyEvents _
   | ChangedOrderOfPersonEvents _ -> false
 
+let eq_warning w1 w2 = match w1, w2 with
+  | PossibleDuplicateFam (f1, f2), PossibleDuplicateFam (f2', f1')
+       when f1 = f1' && f2 = f2' -> true
+  | PossibleDuplicateFamHomonymous (f1, f2, _),
+    PossibleDuplicateFamHomonymous (f2', f1', _)
+       when f1 = f1' && f2 = f2' -> true
+  | _ -> w1 = w2
+
 let person_warnings conf base p =
   let w = ref [] in
   let filter x =
-    if not (List.mem x !w) && auth_warning conf base x
+    if not (List.exists (eq_warning x) !w) && auth_warning conf base x
     then w := x :: !w
   in
   ignore @@ CheckItem.person base filter p ;
