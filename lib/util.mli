@@ -614,3 +614,7 @@ val cut_words : string -> string list
 
 (** [designation base p] is [Gutil.designation base p |> escape_html] *)
 val designation : base -> person -> Adef.escaped_string
+
+
+(** equality between base_warnings *)
+val eq_warning : base -> CheckItem.base_warning -> CheckItem.base_warning -> bool
