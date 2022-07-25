@@ -828,8 +828,13 @@ let check_possible_duplicate_family ?p base warning family father mother =
   let ifath = get_father family in
   let imoth = get_mother family in
   let ifam = get_ifam family in
-  let father_fn, father_sn = get_first_name father, get_surname father in
-  let mother_fn, mother_sn = get_first_name mother, get_surname mother in
+
+  let name fn i = Name.strip_lower @@ sou base (fn i) in
+  let first_name = name get_first_name in
+  let surname = name get_surname in
+
+  let father_fn, father_sn = first_name father, surname father in
+  let mother_fn, mother_sn = first_name mother, surname mother in
   let fath_families = get_family father in
   let moth_families = get_family mother in
   
@@ -839,12 +844,12 @@ let check_possible_duplicate_family ?p base warning family father mother =
         let fam' = foi base ifam' in
         let parent' = get_parent fam' in
         let person = poi base parent' in
-        let fn, sn = get_first_name person, get_surname person in
+        let fn, sn = first_name person, surname person in
         (* Parent is strictly the same *)
         if eq_iper parent' current_parent_iper then
           warning (PossibleDuplicateFam (ifam, ifam'))
         (*  Homonymous parents *)
-        else if eq_istr fn current_parent_fn && eq_istr sn current_parent_sn then
+        else if fn = current_parent_fn && sn = current_parent_sn then
           warning (PossibleDuplicateFamHomonymous (ifam, ifam', parent_source))
         else ()
       end
