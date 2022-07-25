@@ -2877,18 +2877,32 @@ let auth_warning conf base w =
   | ChangedOrderOfFamilyEvents _
   | ChangedOrderOfPersonEvents _ -> false
 
-let eq_warning w1 w2 = match w1, w2 with
+let first_name base p = Name.strip_lower @@ sou base @@ get_first_name p
+let surname base p = Name.strip_lower @@ sou base @@ get_surname p
+let eq_person base p1 p2 =
+  let fn1, sn1 = first_name base p1, surname base p1 in
+  let fn2, sn2 = first_name base p2, surname base p2 in
+  fn1 = fn2 && sn1 = sn2
+  
+let eq_fam base f1 f2 =
+  let f1, f2 = foi base f1, foi base f2 in
+  let fa1, mo1 = poi base @@ get_father f1, poi base @@ get_mother f1 in
+  let fa2, mo2 = poi base @@ get_father f2, poi base @@ get_mother f2 in
+  eq_person base fa1 fa2 && eq_person base mo1 mo2
+
+let eq_warning base w1 w2 = match w1, w2 with
   | PossibleDuplicateFam (f1, f2), PossibleDuplicateFam (f2', f1')
        when f1 = f1' && f2 = f2' -> true
   | PossibleDuplicateFamHomonymous (f1, f2, _),
     PossibleDuplicateFamHomonymous (f2', f1', _)
-       when f1 = f1' && f2 = f2' -> true
+       when eq_fam base f1 f1' && eq_fam base f2 f2'
+            ||  eq_fam base f1 f2' && eq_fam base f1' f2 -> true
   | _ -> w1 = w2
 
 let person_warnings conf base p =
   let w = ref [] in
   let filter x =
-    if not (List.exists (eq_warning x) !w) && auth_warning conf base x
+    if not (List.exists (eq_warning base x) !w) && auth_warning conf base x
     then w := x :: !w
   in
   ignore @@ CheckItem.person base filter p ;
