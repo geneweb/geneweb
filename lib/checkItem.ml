@@ -824,34 +824,45 @@ let check_parent_marriage_age warning fam p =
   in
   loop (get_fevents fam)
   
-let check_possible_duplicate_family base warning family father mother =
+let check_possible_duplicate_family ?p base warning family father mother =
   let ifath = get_father family in
   let imoth = get_mother family in
   let ifam = get_ifam family in
-  let father_fn, father_sn = get_first_name father, get_surname father in
-  let mother_fn, mother_sn = get_first_name mother, get_surname mother in
+
+  let name fn i = Name.strip_lower @@ sou base (fn i) in
+  let first_name = name get_first_name in
+  let surname = name get_surname in
+
+  let father_fn, father_sn = first_name father, surname father in
+  let mother_fn, mother_sn = first_name mother, surname mother in
   let fath_families = get_family father in
   let moth_families = get_family mother in
   
-  let f get_parent (current_parent, current_parent_iper, current_parent_fn, current_parent_sn) ifam' =
+  let f get_parent (current_parent, current_parent_iper, current_parent_fn, current_parent_sn) parent_source ifam' =
     if eq_ifam ifam ifam' then ()
     else begin
         let fam' = foi base ifam' in
         let parent' = get_parent fam' in
         let person = poi base parent' in
-        let fn, sn = get_first_name person, get_surname person in
+        let fn, sn = first_name person, surname person in
         (* Parent is strictly the same *)
         if eq_iper parent' current_parent_iper then
           warning (PossibleDuplicateFam (ifam, ifam'))
         (*  Homonymous parents *)
-        else if eq_istr fn current_parent_fn && eq_istr sn current_parent_sn then
-          warning (PossibleDuplicateFamHomonymous (ifam, ifam', current_parent))
+        else if fn = current_parent_fn && sn = current_parent_sn then
+          warning (PossibleDuplicateFamHomonymous (ifam, ifam', parent_source))
         else ()
       end
   in
 
-  Array.iter (f get_mother (mother, imoth, mother_fn, mother_sn)) fath_families;
-  Array.iter (f get_father (father, ifath, father_fn, father_sn)) moth_families
+  match p with
+  | Some p when eq_iper (get_iper p) ifath ->
+     Array.iter (f get_mother (mother, imoth, mother_fn, mother_sn) father) fath_families
+  | Some p when eq_iper (get_iper p) imoth ->
+     Array.iter (f get_father (father, ifath, father_fn, father_sn) mother) moth_families
+  | _ ->
+     Array.iter (f get_mother (mother, imoth, mother_fn, mother_sn) father) fath_families;
+     Array.iter (f get_father (father, ifath, father_fn, father_sn) mother) moth_families
 
 
 let check_parents base warning fam fath moth =
@@ -955,6 +966,7 @@ let on_person_update base warning p =
     in
     check_parent_marriage_age warning fam p ;
     check_difference_age_between_cpl warning fath moth ;
+    check_possible_duplicate_family ~p base warning fam fath moth;
     Array.iter begin fun child ->
       let child = poi base child in
       child_born_after_his_parent warning child p ;
