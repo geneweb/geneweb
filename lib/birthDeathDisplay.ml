@@ -384,12 +384,11 @@ let old_print_statistics conf =
 
 type 'a env =
     Vother of 'a
-  | Vnone
 
 let get_vother =
   function
     Vother x -> Some x
-  | _ -> None
+
 let set_vother x = Vother x
 
 let print_statistics conf =

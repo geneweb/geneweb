@@ -406,7 +406,7 @@ let oc' opts s =
 
 let oc_witness_kind opts wk =
   oc' opts (relation_format_of_witness_kind wk)
-  
+
 let ged_pevent opts base per_sel evt =
   let typ =
     if is_primary_pevents evt.epers_name then
@@ -429,32 +429,6 @@ let ged_pevent opts base per_sel evt =
     evt.epers_witnesses
 
 let adop_fam_list = ref []
-let adop_fam_cnt = ref 0
-
-let ged_adoption opts base per_sel per r =
-  let sel =
-    match r.r_fath, r.r_moth with
-      Some ip1, Some ip2 -> per_sel ip1 && per_sel ip2
-    | Some ip1, _ -> per_sel ip1
-    | _, Some ip2 -> per_sel ip2
-    | _ -> true
-  in
-  if sel then
-    begin
-      Printf.ksprintf (oc opts) "1 ADOP Y\n";
-      adop_fam_list :=
-        (r.r_fath, r.r_moth, get_iper per) :: !adop_fam_list;
-      incr adop_fam_cnt;
-      Printf.ksprintf (oc opts) "2 FAMC @F%d@\n" (nb_of_families base + !adop_fam_cnt);
-      Printf.ksprintf (oc opts) "3 ADOP ";
-      begin match r.r_fath, r.r_moth with
-        Some _, None -> Printf.ksprintf (oc opts) "HUSB"
-      | None, Some _ -> Printf.ksprintf (oc opts) "WIFE"
-      | Some _, Some _ -> Printf.ksprintf (oc opts) "BOTH"
-      | _ -> ()
-      end;
-      Printf.ksprintf (oc opts) "\n"
-    end
 
 let ged_fam_adop opts i (fath, moth, _) =
   Printf.ksprintf (oc opts) "0 @F%d@ FAM\n" i;
@@ -594,33 +568,6 @@ let ged_note opts base per =
     match sou base (get_notes per) with
     | "" -> ()
     | s -> display_note opts 1 s
-
-let ged_marriage opts base fam =
-  match
-    Adef.od_of_cdate (get_marriage fam), sou base (get_marriage_place fam),
-    get_relation fam
-  with d, pl, _ ->
-    Printf.ksprintf (oc opts) "1 %s" (if get_relation fam = Engaged then "ENGA" else "MARR");
-    let typ =
-      if get_relation fam = NoSexesCheckNotMarried ||
-         get_relation fam = NoSexesCheckMarried
-      then
-        "gay"
-      else ""
-    in
-    let note = sou base (get_marriage_note fam) in
-    let src = sou base (get_marriage_src fam) in
-    ged_ev_detail opts 2 typ d pl note src;
-    if get_relation fam = NotMarried then Printf.ksprintf (oc opts) "2 PLAC unmarried\n"
-
-let ged_divorce opts fam =
-  match get_divorce fam with
-  | NotDivorced -> ()
-  | Separated -> ()
-  | Divorced cd ->
-    let d = Adef.od_of_cdate cd in
-    Printf.ksprintf (oc opts) "1 DIV" ;
-    ged_ev_detail opts 2 "" d "" "" ""
 
 let ged_tag_fevent base evt =
   match evt.efam_name with

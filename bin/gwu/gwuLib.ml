@@ -262,14 +262,6 @@ let print_src_if_not_equal_to opts x base lab is =
 
 let print_if_no_empty opts = print_if_not_equal_to opts ""
 
-let print_if_no_empty_endline opts base lab is =
-  if sou base is <> ""
-  then Printf.ksprintf (oc opts) " %s %s\n" lab (correct_string base is)
-
-let print_if_no_empty_no_newline opts base lab is =
-  if sou base is <> ""
-  then Printf.ksprintf (oc opts) " %s %s" lab (no_newlines (correct_string base is))
-
 let print_first_name_alias opts base is =
   Printf.ksprintf (oc opts) " {%s}" (correct_string base is)
 
@@ -459,33 +451,6 @@ let add_linked_files gen from s some_linked_files =
     else loop new_linked_files (i + 1)
   in
   loop some_linked_files 0
-
-let find_free_occ base f s =
-  let ipl = persons_of_name base (f ^ " " ^ s) in
-  let first_name = f in
-  let surname = s in
-  let list_occ =
-    let rec loop list =
-      function
-        ip :: ipl ->
-        let p = poi base ip in
-        if not (List.mem (get_occ p) list) &&
-           first_name = p_first_name base p &&
-           surname = p_surname base p
-        then
-          loop (get_occ p :: list) ipl
-        else loop list ipl
-      | [] -> list
-    in
-    loop [] ipl
-  in
-  let list_occ = List.sort compare list_occ in
-  let rec loop cnt1 =
-    function
-      cnt2 :: list -> if cnt1 = cnt2 then loop (cnt1 + 1) list else cnt1
-    | [] -> cnt1
-  in
-  loop 0 list_occ
 
 let print_parent opts base gen p =
   let has_printed_parents =
@@ -1457,15 +1422,6 @@ let connected_families base fam_sel ifam cpl =
     | [] -> ifaml
   in
   loop [ifam] [] [get_father cpl]
-
-let find_person base p1 po p2 =
-  match person_of_key base p1 p2 po with
-    Some ip -> ip
-  | None ->
-    Printf.printf "Not found: %s%s %s\n" p1
-      (if po = 0 then "" else " " ^ string_of_int po) p2;
-    flush stdout;
-    exit 2
 
 let read_file_contents fname =
   match try Some (open_in fname) with Sys_error _ -> None with

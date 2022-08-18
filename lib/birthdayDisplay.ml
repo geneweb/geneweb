@@ -562,12 +562,11 @@ let print_menu_marriage conf base =
 (* template *)
 type 'a env =
     Vother of 'a
-  | Vnone
 
 let get_vother =
   function
     Vother x -> Some x
-  | _ -> None
+
 let set_vother x = Vother x
 
 let print_anniversaries conf =

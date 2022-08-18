@@ -1,5 +1,3 @@
-open Geneweb
-
 let dry_run = ref false
 let bname = ref ""
 

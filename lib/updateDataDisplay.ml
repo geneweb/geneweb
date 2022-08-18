@@ -121,9 +121,7 @@ let print_mod_ok conf base =
 
 type 'a env =
     Vlist_data of (istr * string) list
-  | Vlist_ini of string list
   | Vlist_value of (istr * string) list
-  | Vint of int
   | Vstring of string
   | Vother of 'a
   | Vnone
@@ -197,10 +195,6 @@ and eval_compound_var conf base env xx sl =
 and eval_string_env s env =
   match get_env s env with
     Vstring s -> s
-  | _ -> raise Not_found
-and eval_int_env s env =
-  match get_env s env with
-    Vint i -> string_of_int i
   | _ -> raise Not_found
 
 let print_foreach conf print_ast _eval_expr =

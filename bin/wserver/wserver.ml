@@ -236,16 +236,6 @@ let wait_available max_clients s =
       done
   | None -> ()
 
-let wait_and_compact s =
-  if Unix.select [s] [] [] 15.0 = ([], [], []) then
-    begin
-      eprintf "Compacting... ";
-      flush stderr;
-      Gc.compact ();
-      eprintf "Ok\n";
-      flush stderr
-    end
-
 let skip_possible_remaining_chars fd =
   if not !connection_closed then skip_possible_remaining_chars fd
 

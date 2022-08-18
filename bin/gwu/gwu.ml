@@ -1,4 +1,3 @@
-open Geneweb
 open GwuLib
 
 let isolated = ref false
