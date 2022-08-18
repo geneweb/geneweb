@@ -79,10 +79,6 @@ module ExtOption = struct
   let get : 'a option -> 'a = function
     | Some v -> v
     | None   -> raise (Invalid_argument "option is None")
-  let value o ~default = match o with
-    | Some v -> v
-    | None   -> default
-  let is_none = function None -> true | _ -> false
 end
 
 let eval_witness_kind = function
@@ -159,7 +155,7 @@ and eval_is_last env = match get_env "last" env with
   | Vbool x -> bool_val x
   | _       -> raise Not_found
 
-(* TODO : feels like it could be simpler *)             
+(* TODO : feels like it could be simpler *)
 and eval_parent conf env cpl sl = match get_env "cnt" env with
   | Vint i ->
      let arr = Gutil.parent_array cpl in
@@ -248,7 +244,7 @@ and eval_fwitness_kind env fam = match get_env "cnt" env with
   | _ -> raise Not_found
 
 
-(* TODO : rewrite, looks bad + find a better name *)       
+(* TODO : rewrite, looks bad + find a better name *)
 and eval_default_var conf s =
   let v = extract_var "evar_" s in
   if v <> "" then

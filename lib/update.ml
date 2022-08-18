@@ -328,7 +328,7 @@ let string_of_error conf =
     |> Utf8.capitalize_fst
     |> Adef.safe
 
-let print_err_unknown conf base (f, s, o) =
+let print_err_unknown conf (f, s, o) =
   let err = UERR_unknow_person (f, s, o) in
   prerr conf err @@ fun () ->
   Output.print_string conf (string_of_error conf err);
@@ -1028,46 +1028,6 @@ let reconstitute_date conf var =
           if txt = "" then None else Some (Dtext txt)
       | _ -> None
 
-let parse_int s i =
-  let j =
-    let rec loop j =
-      if j = String.length s
-      || match String.unsafe_get s j with '0'..'9' -> false | _ -> true
-      then j
-      else loop (j + 1)
-    in
-    loop i
-  in
-  (int_of_string @@ String.sub s i (j - i), j)
-
-let text_of_var conf x =
-  Adef.safe @@ match x with
-  | "pa1" -> transl_nth conf "him/her" 0
-  | "pa2" -> transl_nth conf "him/her" 1
-  | var -> match String.get var 0 with
-    | 'r' ->
-      let (pos, i) = parse_int var 1 in
-      assert (String.get var i = '_') ;
-      let pn = match String.get var (i + 1) with 'f' -> 0 | 'm' -> 1 | _ -> assert false in
-      transl_nth conf "relation/relations" 0 ^ " " ^ string_of_int pos
-      ^ " - " ^ transl_nth conf "father/mother" pn
-    | 'e' ->
-      let (epos, i) = parse_int var 1 in
-      assert (String.get var i = '_') ;
-      assert (String.get var (i + 1) = 'w') ;
-      assert (String.get var (i + 2) = 'i') ;
-      assert (String.get var (i + 3) = 't') ;
-      assert (String.get var (i + 4) = 'n') ;
-      let (wpos, _) = parse_int var (i + 5) in
-      let a = transl_nth conf "witness/witnesses" 0 ^ " " ^ string_of_int wpos in
-      let b = transl_nth conf "event/events" 0 ^ " " ^ string_of_int epos in
-      transl_a_of_b conf a b b
-    | 'c' when String.length var >= 3 && String.unsafe_get var 1 = 'h' ->
-      let (pos, _) = parse_int var 2 in
-      Util.translate_eval (transl_nth conf "child/children" 0)
-      ^ " " ^ string_of_int pos
-    | _ -> var
-
 let print_create_conflict conf base p var =
   let err = UERR_already_defined (base, p, var) in
   prerr conf err @@ fun () ->
@@ -1210,17 +1170,17 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
   | Link ->
     if f = "?" || s = "?" then
       if o < 0 || o >= nb_of_persons base then
-        print_err_unknown conf base (f, s, o)
+        print_err_unknown conf (f, s, o)
       else
         (* FIXME: this would fail if internal repr of iper is not int *)
         let ip = Gwdb.iper_of_string @@ string_of_int o in
         let p = poi base ip in
         if p_first_name base p = f && p_surname base p = s then ip
-        else print_err_unknown conf base (f, s, o)
+        else print_err_unknown conf (f, s, o)
     else
       match person_of_key base f s o with
         Some ip -> ip
-      | None -> print_err_unknown conf base (f, s, o)
+      | None -> print_err_unknown conf (f, s, o)
 
 let rec update_conf_env field (p : Adef.encoded_string) (occ : Adef.encoded_string) o_env n_env =
   match o_env with

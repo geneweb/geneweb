@@ -43,32 +43,3 @@ let _ =
   for i = 0 to 9 do char64.(i+52) <- Char.chr (Char.code '0' + i) done;
   char64.(62) <- '+';
   char64.(63) <- '/'
-
-(* Encoding *)
-let encode s =
-  let rpos = ref 0
-  and wpos = ref 0 in
-  let origlen = String.length s in
-  let (s, len) =
-    match origlen mod 3 with
-      0 -> s, origlen
-    | 1 -> s ^ "\000\000", origlen + 2
-    | 2 -> s ^ "\000", origlen + 1
-    | _ -> raise (Match_failure ("src/base64.ml", 63, 11))
-  in
-  let res = Bytes.create (len / 3 * 4) in
-  while !rpos < len do
-    begin let i1 = Char.code s.[!rpos] in
-      let i2 = Char.code s.[!rpos + 1] in
-      let i3 = Char.code s.[!rpos + 2] in
-      let i = i1 lsl 16 lor i2 lsl 8 lor i3 in
-      Bytes.set res !wpos char64.(i lsr 18 land 0x3f);
-      Bytes.set res (!wpos + 1) char64.(i lsr 12 land 0x3f);
-      Bytes.set res (!wpos + 2) char64.(i lsr 6 land 0x3f);
-      Bytes.set res (!wpos + 3) char64.(i land 0x3f);
-      rpos := !rpos + 3;
-      wpos := !wpos + 4
-    end
-  done;
-  for i = 1 to len - origlen do Bytes.set res (Bytes.length res - i) '=' done;
-  res

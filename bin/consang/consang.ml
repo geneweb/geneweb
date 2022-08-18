@@ -1,7 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Geneweb
-
 let fname = ref ""
 let scratch = ref false
 let verbosity = ref 2

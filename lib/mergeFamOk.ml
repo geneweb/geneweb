@@ -6,12 +6,6 @@ open Def
 open Gwdb
 open Util
 
-let rec merge_lists l1 =
-  function
-    x2 :: l2 ->
-      if List.mem x2 l1 then merge_lists l1 l2 else merge_lists (l1 @ [x2]) l2
-  | [] -> l1
-
 let cat_strings base is1 sep is2 =
   let n1 = sou base is1 in
   let n2 = sou base is2 in

@@ -402,7 +402,6 @@ let diff_string (before : Adef.safe_string) (after : Adef.safe_string) : Adef.sa
     Adef.safe bef_s, Adef.safe aft_s
 
 type 'a env =
-    Vgen_record of gen_record
   | Vfam of
       (iper, ifam, string) gen_family option * (iper, ifam, string) gen_family option *
         bool
@@ -413,7 +412,6 @@ type 'a env =
   | Vpevent of
       (iper, string) gen_pers_event option *
         (iper, string) gen_pers_event option
-  | Vbool of bool
   | Vint of int
   | Vstring of string
   | Vother of 'a
@@ -426,8 +424,6 @@ let get_vother =
   | _ -> None
 let set_vother x = Vother x
 let str_val x = VVstring x
-let bool_val x = VVbool x
-let safe_val (x : Adef.safe_string) = VVstring (x :> string)
 
 let rec eval_var conf base env (bef, aft, p_auth) _loc sl =
   try eval_simple_var conf base env (bef, aft, p_auth) sl with

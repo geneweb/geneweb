@@ -47,7 +47,6 @@ let make_name_index base =
 let create_name_index oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_name_index base)
 
-module StringSet = Set.Make (String)
 module IntSet = Set.Make (struct type t = int let compare = compare end)
 
 let make_strings_of_fsname_aux split get base =

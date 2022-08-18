@@ -14,12 +14,12 @@ val merge :
   Gwdb.person ->
   (Config.config ->
    Gwdb.base ->
-   (Gwdb.iper * Gwdb.iper) list -> Gwdb.person -> Gwdb.person -> 'a) ->
+   (Gwdb.iper * Gwdb.iper) list -> Gwdb.person -> Gwdb.person -> unit) ->
   (Config.config ->
    Gwdb.base ->
    (Gwdb.iper * Gwdb.iper) list ->
    Gwdb.ifam * Gwdb.family ->
-   Gwdb.ifam * Gwdb.family -> Gwdb.person -> Gwdb.person -> 'b) ->
+   Gwdb.ifam * Gwdb.family -> Gwdb.person -> Gwdb.person -> unit) ->
   bool * CheckItem.base_warning list
 val kill_ancestors :
   Config.config ->

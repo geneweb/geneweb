@@ -71,7 +71,7 @@ let abbrev_list =
    "von", None; "zu", None; "zur", None]
 
 (* Checks if the word starting at [i] in [s] is [p]. *)
-let rec is_word s i p =
+let is_word s i p =
   let rec is_word s i p ip =
     if ip = String.length p then
       if i = String.length s then true else if s.[i] = ' ' then true else false

@@ -43,9 +43,9 @@ let run ~ppf ~verbose ~noprompt =
   Toploop.loop ppf
 
 (** For script execution, run:
-    cat <script.ml> | [ GWREPL_PPF=/dev/null ] [ GWREPL_VERBOSE=1 ] [ GWREPL_FORCE_UNPACK=1 ] [ GWREPL_NOPROMPT=1 ] gwrepl.exe [scrip_arg1] ...  *)
-(** For interactive toplevel, run:
-    gwrepl.exe *)
+      cat <script.ml> | [ GWREPL_PPF=/dev/null ] [ GWREPL_VERBOSE=1 ] [ GWREPL_FORCE_UNPACK=1 ] [ GWREPL_NOPROMPT=1 ] gwrepl.exe [scrip_arg1] ...
+    For interactive toplevel, run:
+      gwrepl.exe *)
 let () =
   let ppf =
     match Sys.getenv_opt "GWREPL_PPF" with

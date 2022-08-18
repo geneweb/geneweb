@@ -455,9 +455,7 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
   | Aint (_, s) -> VVstring s
   | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e))
 
-let line_of_loc = Templ_parser.line_of_loc
-
-let print_error conf ((fname, bp, ep) as pos) exc =
+let print_error ((fname, bp, ep) as pos) exc =
   incr nb_errors;
   if !nb_errors <= 10 then
     begin
@@ -465,7 +463,7 @@ let print_error conf ((fname, bp, ep) as pos) exc =
       else Printf.eprintf "File %s" fname;
       let line =
         if fname = "" then None
-        else line_of_loc conf pos
+        else Templ_parser.line_of_loc pos
       in
       Printf.eprintf ", ";
       begin match line with
@@ -487,7 +485,7 @@ let eval_bool_expr conf (eval_var, eval_apply) e =
       VVbool b -> b
     | VVstring _ | VVother _ ->
         raise_with_loc (loc_of_expr e) (Failure "bool value expected")
-  with Exc_located (loc, exc) -> print_error conf loc exc; false
+  with Exc_located (loc, exc) -> print_error loc exc; false
 
 let eval_string_expr conf (eval_var, eval_apply) e =
   try
@@ -495,7 +493,7 @@ let eval_string_expr conf (eval_var, eval_apply) e =
       VVstring s -> Util.translate_eval s
     | VVbool _ | VVother _ ->
         raise_with_loc (loc_of_expr e) (Failure "string value expected")
-  with Exc_located (loc, exc) -> print_error conf loc exc; ""
+  with Exc_located (loc, exc) -> print_error loc exc; ""
 
 let print_body_prop conf =
   let s =

@@ -6,7 +6,7 @@ open Gwdb
 open Util
 
 let digest_children base ipl =
-  List.fold_left begin fun s ip ->
+  List.fold_left begin fun _s ip ->
     let p = poi base ip in
     sou base (get_first_name p) ^ "\n"
     ^ sou base (get_surname p) ^ "\n"

@@ -212,10 +212,6 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
   end ;
   if lev1 > 1 then Output.print_sstring conf "</ul>"
 
-let include_templ conf name =
-  Util.include_template conf [] name
-    (fun () -> Output.printf conf "Failed to open: %s.txt" name)
-
 (* HTML main *)
 
 let print_cousins conf base p lev1 lev2 =
