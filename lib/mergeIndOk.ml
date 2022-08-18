@@ -11,11 +11,6 @@ let rec merge_lists l1 =
       if List.mem x2 l1 then merge_lists l1 l2 else merge_lists (l1 @ [x2]) l2
   | [] -> l1
 
-let cat_strings base is1 sep is2 =
-  let n1 = sou base is1 in
-  let n2 = sou base is2 in
-  if n1 = "" then n2 else if n2 = "" then n1 else n1 ^ sep ^ n2
-
 let merge_strings base is1 sep is2 =
   let n1 = sou base is1 in
   let n2 = sou base is2 in
@@ -442,4 +437,3 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let oocc2 = o_p2.occ in
   let pgl2 = Perso.links_to_ind conf base db (Name.lower ofn2, Name.lower osn2, oocc2) in
   print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
-

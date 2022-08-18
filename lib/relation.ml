@@ -303,7 +303,7 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
     [ HalfSibling -> Parent ]
     becomes [ Parent -> Mate -> Mate -> Parent ]
  *)
-let simplify_path conf base path =
+let simplify_path base path =
   let get get i =
     let p = poi base i in
     match get_parents p with

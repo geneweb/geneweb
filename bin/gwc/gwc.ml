@@ -1,6 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Geneweb
 open Gwcomp
 
 (** Checks a .gwo header and prints fails if header is absent or not compatible. *)

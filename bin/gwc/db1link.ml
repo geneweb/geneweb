@@ -1453,14 +1453,6 @@ let convert_persons per_index_ic per_ic persons =
 (** File containing the particles to use *)
 let particules_file = ref ""
 
-let convert_families fam_index_ic fam_ic len =
-  Array.init len begin fun i ->
-    seek_in fam_index_ic (sizeof_long * i) ;
-    let pos = input_binary_int fam_index_ic in
-    seek_in fam_ic pos ;
-    (input_item_value fam_ic : family)
-  end
-
 (** Returns list of particles from the file. If filename is empty string
     then returns default particles list *)
 let input_particles = function

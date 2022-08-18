@@ -909,7 +909,7 @@ let family ?(onchange = true) base warning ifam fam =
     changed_marriages_order base warning mother
   end
 
-let check_related_person_pevents warning base birth_date death_date p iper related_p =
+let check_related_person_pevents warning birth_date death_date p iper related_p =
   List.iter begin fun e ->
     match Adef.od_of_cdate e.epers_date with
     | Some (Dgreg (date, _)) ->
@@ -937,7 +937,7 @@ let check_related_person_fevents warning base birth_date death_date p iper relat
 
 let check_related_on_person_update warning base birth_date death_date p iper irel =
   let related_p = poi base irel in
-  check_related_person_pevents warning base birth_date death_date p iper related_p;
+  check_related_person_pevents warning birth_date death_date p iper related_p;
   check_related_person_fevents warning base birth_date death_date p iper related_p
 
 

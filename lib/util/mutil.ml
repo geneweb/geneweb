@@ -92,7 +92,6 @@ let bench name fn =
 let print_callstack ?(max = 5) () =
   Printexc.(print_raw_backtrace stderr @@ get_callstack max)
 
-let int_size = 4
 let verbose = ref true
 
 let rm fname =
@@ -215,14 +214,6 @@ let initial n =
       | _ -> loop (succ i)
   in
   loop 0
-
-let name_key s =
-  let i = initial s in
-  let s =
-    if i = 0 then s
-    else String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
-  in
-  Name.lower s
 
 let input_particles fname =
   try

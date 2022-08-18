@@ -1,6 +1,5 @@
 {
 
-open Config
 open TemplAst
 
 let dump_list pp a = String.concat ";" (List.map pp a)
@@ -56,7 +55,7 @@ let wrap fname fn =
     current_file := old ;
     raise e
 
-let line_of_loc conf (fname, bp, ep) =
+let line_of_loc (fname, bp, ep) =
   match try Some (Secure.open_in fname) with _ -> None with
   | None -> None
   | Some ic ->

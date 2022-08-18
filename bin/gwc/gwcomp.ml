@@ -1,6 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Geneweb
 open Def
 open Gwdb
 
@@ -17,22 +16,13 @@ type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
 (** Represents a person in .gw file. It could be either reference to a person
     (only key elements provided) or definition (all information provided). *)
 type somebody =
-  (** Reference to person *)
   | Undefined of key
-  (** Person's definition *)
+  (** Reference to person *)
   | Defined of (iper, iper, string) gen_person
+  (** Person's definition *)
 
 (** Blocks that could appear in .gw file. *)
 type gw_syntax =
-  (** Family definition block. Contains:
-      - Family couple (father's and mother's definition/reference)
-      - Father's sex
-      - Mother's sex
-      - List of witnesses definition/reference with their sex.
-      - List of information about every family event (name, date,
-        place, reason, source, notes and witnesses)
-      - Family definition
-      - Children (descendants) *)
   | Family of
       somebody gen_couple
       * sex
@@ -42,33 +32,42 @@ type gw_syntax =
           string * (somebody * sex * witness_kind) list) list
       * ((iper, iper, string) gen_person, ifam, string) gen_family
       * (iper, iper, string) gen_person gen_descend
+  (** Family definition block. Contains:
+      - Family couple (father's and mother's definition/reference)
+      - Father's sex
+      - Mother's sex
+      - List of witnesses definition/reference with their sex.
+      - List of information about every family event (name, date,
+        place, reason, source, notes and witnesses)
+      - Family definition
+      - Children (descendants) *)
+  | Notes of key * string
   (** Block that defines personal notes. First element represents
       reference to person. Second is note's content. *)
-  | Notes of key * string
+  | Relations of somebody * sex * (somebody, string) gen_relation list
   (** Block that defines relations of a person with someone outisde of
       family block (like foster parents) (field {i rparents}). Contains:
       - Concerned person definition/reference
       - Sex of person
       - List of his relations. *)
-  | Relations of somebody * sex * (somebody, string) gen_relation list
-  (** Block that defines events of a person. Specific to gwplus format. Contains:
-      - Concerned person's definition/reference
-      - Sex of person
-      - List of information about every personal event (name, date,
-      place, reason, source, notes and witnesses)*)
   | Pevent of
       somebody
       * sex
       * (string gen_pers_event_name * cdate * string * string * string *
            string * (somebody * sex * witness_kind) list) list
+  (** Block that defines events of a person. Specific to gwplus format. Contains:
+      - Concerned person's definition/reference
+      - Sex of person
+      - List of information about every personal event (name, date,
+      place, reason, source, notes and witnesses)*)
+  | Bnotes of string * string
   (** Block that defines database notes and extended pages.
       First string represents name of extended page ("" for
       database notes, only one for file). Second is note's
       or page's content. *)
-  | Bnotes of string * string
+  | Wnotes of string * string
   (** Block that defines wizard notes. First string represents
       First string represents wizard's id. Second is note's content. *)
-  | Wnotes of string * string
 
 (** {i .gw} file encoding *)
 type encoding = E_utf_8 | E_iso_8859_1
@@ -966,16 +965,16 @@ let read_notes_db ic end_txt =
 
 (** Parsing status of .gw block  *)
 type 'a read_family =
-  (** Read block inside .gw file *)
   | F_some of 'a
-  (** Read block that defines that file use utf-8 encoding *)
+  (** Read block inside .gw file *)
   | F_enc_utf_8
-  (** Read block that defines that the file uses gwplus syntax *)
+  (** Read block that defines that file use utf-8 encoding *)
   | F_gw_plus
-  (** Read end of the file *)
+  (** Read block that defines that the file uses gwplus syntax *)
   | F_none
-  (** Exception while reading *)
+  (** Read end of the file *)
   | F_fail of string
+  (** Exception while reading *)
 
 (** Read succesive family note lines and concat it. *)
 let loop_note line ic =
