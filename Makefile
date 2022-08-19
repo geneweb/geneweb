@@ -92,10 +92,14 @@ generated: $(GENERATED_FILES_DEP)
 
 install uninstall build distrib: $(GENERATED_FILES_DEP)
 
+fmt:
+	dune build @fmt --auto-promote
+
 # [BEGIN] Installation / Distribution section
 
 build: ## Build the geneweb package (librairies and binaries)
 build:
+	-dune build @fmt --auto-promote
 	dune build -p geneweb --profile $(DUNE_PROFILE)
 
 install: ## Install geneweb using dune
