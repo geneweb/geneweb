@@ -1819,7 +1819,7 @@ let jpeg_image_size ic =
         if exif_type && not found then loop true
         else
           begin
-            for i = 1 to 3 do let _ = input_char ic in () done;
+            for _i = 1 to 3 do let _ = input_char ic in () done;
             let a = input_char ic in
             let b = input_char ic in
             let c = input_char ic in
@@ -1832,7 +1832,7 @@ let jpeg_image_size ic =
         let b = input_char ic in
         let len = Char.code a lsl 8 lor Char.code b in
         let len = if len >= 32768 then 0 else len in
-        for i = 1 to len - 2 do let _ = input_char ic in () done;
+        for _i = 1 to len - 2 do let _ = input_char ic in () done;
         if Char.code ch <> 0xDA then loop found else None
     in
     loop false
