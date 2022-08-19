@@ -92,7 +92,7 @@ module Default = struct
     || Gwdb.get_access p = Public
     || (conf.public_if_titles
         && Gwdb.get_access p = IfTitles
-        && Gwdb.nobtit base conf.allowed_titles conf.denied_titles p <> [])
+        && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> [])
     || begin
       let death = Gwdb.get_death p in
       if death = NotDead then conf.private_years < 1
