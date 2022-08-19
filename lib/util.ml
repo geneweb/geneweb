@@ -509,7 +509,7 @@ let p_getint env label =
   with Failure _ -> None
 
 let nobtit conf base p =
-  Gwdb.nobtit base conf.allowed_titles conf.denied_titles p
+  Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p
 
 let strictly_after_private_years conf a =
   if a.year > conf.private_years then true

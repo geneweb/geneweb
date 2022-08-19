@@ -2,7 +2,6 @@
 
 open Def
 open Config
-open Gwdb
 open Util
 open Notes
 
@@ -137,9 +136,9 @@ let print_linked_list conf base pgl =
         Output.print_string conf (DateDisplay.short_dates_text conf base p);
         Output.print_sstring conf "</span></tt>"
       | Def.NLDB.PgFam ifam ->
-        let fam = foi base ifam in
-        let fath = pget conf base (get_father fam) in
-        let moth = pget conf base (get_mother fam) in
+        let fam = Gwdb.foi base ifam in
+        let fath = pget conf base (Gwdb.get_father fam) in
+        let moth = pget conf base (Gwdb.get_mother fam) in
         Output.print_sstring conf "<tt>";
         if conf.wizard then begin
           Output.print_sstring conf {|<a class="mx-2" href="|} ;
@@ -147,7 +146,7 @@ let print_linked_list conf base pgl =
           Output.print_sstring conf "m=MOD_FAM&i=" ;
           Output.print_string conf (Gwdb.string_of_ifam ifam |> Mutil.encode) ;
           Output.print_sstring conf "&ip=" ;
-          Output.print_string conf (get_iper fath |> Gwdb.string_of_iper |> Mutil.encode) ;
+          Output.print_string conf (Gwdb.get_iper fath |> Gwdb.string_of_iper |> Mutil.encode) ;
           Output.print_sstring conf {|"><sup><i class="fa fa-cog"></i></sup></a>|}
         end ;
         Output.print_sstring conf "<span class=\"mx-2\">" ;

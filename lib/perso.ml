@@ -3464,7 +3464,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_history" -> has_history conf base p p_auth
   | "has_image" -> Util.has_image conf base p
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
-  | "has_nobility_titles" -> p_auth && nobtit conf base p <> []
+  | "has_nobility_titles" -> p_auth && Util.nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
       p_auth && not conf.no_note && sou base (get_notes p) <> ""
   | "has_occupation" -> p_auth && sou base (get_occupation p) <> ""

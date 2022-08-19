@@ -424,6 +424,7 @@ let get_vother =
   | _ -> None
 let set_vother x = Vother x
 let str_val x = VVstring x
+let safe_val (x : Adef.safe_string) = VVstring (x :> string)
 
 let rec eval_var conf base env (bef, aft, p_auth) _loc sl =
   try eval_simple_var conf base env (bef, aft, p_auth) sl with
