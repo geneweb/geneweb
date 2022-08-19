@@ -71,8 +71,6 @@ val short_dates_text : config -> base -> person -> Adef.safe_string
 (** Retruns year of marriage for given spouses with its precision. *)
 val short_marriage_date_text : config -> base -> family -> person -> person -> Adef.safe_string
 
-val print_dates : config -> base -> person -> unit
-
 (** [death_symbol conf]
     Return the value associated to ["death_symbol"] in [.gwf] file
     if it is defined, or use ["†"] if it is not.
