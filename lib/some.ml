@@ -614,16 +614,19 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   Util.wprint_in_columns conf (fun (ord, _, _) -> ord)
     (fun (_, txt, sn) -> Output.print_string conf (access txt sn)) list;
   Output.print_sstring conf {|<p><em style="font-size:80%">|};
-  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "click"));
-  Output.print_sstring conf {| <a href="|} ;
+  Output.print_sstring conf {| <a |} ;
+  Output.print_sstring conf {| href="|} ;
   Output.print_string conf (commd conf) ;
-  Output.print_sstring conf {|m=N&o=i&t=A&v=|} ;
+  Output.print_sstring conf {|m=N&o=i&t=N&v=|} ;
   Output.print_string conf
     (if List.length homonymes = 1 then Mutil.encode x else Mutil.encode fx) ;
   Output.print_sstring conf {|">|} ;
+  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "click"));
+  Output.print_sstring conf " ";
   Output.print_sstring conf (transl conf "here") ;
-  Output.print_sstring conf {|</a> |} ;
+  Output.print_sstring conf " ";
   Output.print_sstring conf (transl conf "for the first names by alphabetic order");
+  Output.print_sstring conf {|</a> |} ;
   Output.print_sstring conf ".</em></p>";
   Hutil.trailer conf
 
