@@ -3960,7 +3960,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
     else get_public_name p |> sou base |> Util.escape_html |> safe_val
   | "qualifier" ->
     begin match get_qualifiers p with
-      | nn :: _ when p_auth && not (is_hide_names conf p) ->
+      | nn :: _ when p_auth || not (is_hide_names conf p) ->
         sou base nn
         |> Util.escape_html
         |> safe_val
