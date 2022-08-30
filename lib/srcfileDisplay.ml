@@ -190,7 +190,7 @@ let macro conf base = function
             :> Adef.safe_string )
       with Not_found -> Adef.safe ""
     end
-  | 'o' -> (image_prefix conf :> Adef.safe_string)
+  | 'o' -> (Image.prefix conf :> Adef.safe_string)
   | 'q' ->
     let r = count conf in
     string_of_int_sep_aux conf (r.welcome_cnt + r.request_cnt)

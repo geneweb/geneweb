@@ -645,7 +645,7 @@ let restricted_txt = Adef.safe "....."
 let x_x_txt = Adef.safe "x x"
 
 let gen_person_text
-    ?(escape = true)  
+    ?(escape = true)
     ?(html = true)
     ?(sn = true)
     ?(chk = true)
@@ -966,7 +966,7 @@ let string_of_witness_kind conf sex witness_kind =
   | Witness ->
      transl_nth conf "witness/witness/witnesses" 0
   | Witness_CivilOfficer ->
-     let n = index_of_sex sex in     
+     let n = index_of_sex sex in
      transl_nth conf "civil registrar/civil registrar/civil registrar" n
   | Witness_GodParent ->
      let n = index_of_sex sex in
@@ -1111,8 +1111,6 @@ let include_template conf env fname failure =
     copy_from_templ conf env ic;
     include_end conf (esc fname)
   | None -> failure ()
-
-let image_prefix conf = escape_html conf.image_prefix
 
 let body_prop conf =
   try
@@ -1743,115 +1741,6 @@ let string_of_decimal_num conf f =
   in
   loop 0
 
-let personal_image_file_name bname str =
-  Filename.concat (base_path ["images"] bname) str
-
-let source_image_file_name bname str =
-  let fname1 =
-    List.fold_right Filename.concat [base_path ["src"] bname; "images"] str
-  in
-  let fname2 =
-    List.fold_right Filename.concat [Secure.base_dir (); "src"; "images"] str
-  in
-  if Sys.file_exists fname1 then fname1 else fname2
-
-let image_file_name str =
-  let fname1 =
-    List.fold_right Filename.concat [Secure.base_dir (); "images"] str
-  in
-  if Sys.file_exists fname1 then fname1
-  else search_in_assets (Filename.concat "images" str)
-
-let png_image_size ic =
-  let magic = really_input_string ic 4 in
-  if magic = "\137PNG" then
-    begin
-      seek_in ic 16;
-      let wid = input_binary_int ic in
-      let hei = input_binary_int ic in Some (wid, hei)
-    end
-  else None
-
-let gif_image_size ic =
-  let magic = really_input_string ic 4 in
-  if magic = "GIF8" then
-    begin
-      seek_in ic 6;
-      let wid = let x = input_byte ic in input_byte ic * 256 + x in
-      let hei = let x = input_byte ic in input_byte ic * 256 + x in
-      Some (wid, hei)
-    end
-  else None
-
-let jpeg_image_size ic =
-  let magic = really_input_string ic 10 in
-  if Char.code magic.[0] = 0xff && Char.code magic.[1] = 0xd8 &&
-     (let m = String.sub magic 6 4 in m = "JFIF" || m = "Exif")
-  then
-    let exif_type = String.sub magic 6 4 = "Exif" in
-    let rec loop found =
-      while Char.code (input_char ic) <> 0xFF do () done;
-      let ch =
-        let rec loop ch =
-          if Char.code ch = 0xFF then loop (input_char ic) else ch
-        in
-        loop (input_char ic)
-      in
-      if Char.code ch = 0xC0 || Char.code ch = 0xC3 then
-        if exif_type && not found then loop true
-        else
-          begin
-            for _i = 1 to 3 do let _ = input_char ic in () done;
-            let a = input_char ic in
-            let b = input_char ic in
-            let c = input_char ic in
-            let d = input_char ic in
-            let wid = Char.code c lsl 8 lor Char.code d in
-            let hei = Char.code a lsl 8 lor Char.code b in Some (wid, hei)
-          end
-      else
-        let a = input_char ic in
-        let b = input_char ic in
-        let len = Char.code a lsl 8 lor Char.code b in
-        let len = if len >= 32768 then 0 else len in
-        for _i = 1 to len - 2 do let _ = input_char ic in () done;
-        if Char.code ch <> 0xDA then loop found else None
-    in
-    loop false
-  else None
-
-let image_size fname =
-  try
-    let ic = Secure.open_in_bin fname in
-    let r =
-      try
-        let sz = jpeg_image_size ic in
-        let sz =
-          if sz = None then begin seek_in ic 0; png_image_size ic end
-          else sz
-        in
-        if sz = None then begin seek_in ic 0; gif_image_size ic end else sz
-      with End_of_file -> None
-    in
-    close_in ic; r
-  with Sys_error _ -> None
-
-let limited_image_size max_wid max_hei fname size =
-  match if fname = "" then size else image_size fname with
-    Some (wid, hei) ->
-      let (wid, hei) =
-        if hei > max_hei then
-          let wid = wid * max_hei / hei in let hei = max_hei in wid, hei
-        else wid, hei
-      in
-      let (wid, hei) =
-        if wid > max_wid then
-          let hei = hei * max_wid / wid in let wid = max_wid in wid, hei
-        else wid, hei
-      in
-      Some (wid, hei)
-  | None -> None
-
 let find_person_in_env_aux conf base env_i env_p env_n env_occ =
   match p_getenv conf.env env_i with
   | Some i when i <> "" ->
@@ -2020,101 +1909,6 @@ let old_sosa_of_branch conf base (ipl : (iper * sex) list) =
 let old_branch_of_sosa conf base ip sosa =
   branch_of_sosa conf base sosa (pget conf base ip)
   |> Option.map @@ List.map (fun p -> get_iper p, get_sex p)
-
-let default_image_name_of_key fnam surn occ =
-  let aux s = Name.lower s |> Mutil.tr ' ' '_' in
-  aux fnam ^ "." ^ string_of_int occ ^ "." ^ aux surn
-
-let default_image_name base p =
-  default_image_name_of_key
-    (p_first_name base p)
-    (p_surname base p)
-    (get_occ p)
-
-let auto_image_file conf base p =
-  let s = default_image_name base p in
-  let f = Filename.concat (base_path ["images"] conf.bname) s in
-  if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
-  else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
-  else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")
-  else None
-
-(* ********************************************************************** *)
-(*  [Fonc] image_and_size : config -> base -> person -> image_size        *)
-(** [Description] : Renvoie la source de l'image ainsi que sa taille.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de données
-      - p    : personne
-      [Retour] :
-        - is_filename : indique si la source de l'image est un nom de
-                        fichier ou une URL.
-        - source
-        - image_size
-    [Rem] : Exporté en clair hors de ce module.                            *)
-(* *********************************************************************** *)
-let image_and_size conf base p image_size =
-  if not conf.no_image && authorized_age conf base p then
-    match sou base (get_image p) with
-      "" ->
-        begin match auto_image_file conf base p with
-          Some f -> Some (true, f, image_size f None)
-        | None -> None
-        end
-    | s ->
-        let (s, size) =
-          let l = String.length s - 1 in
-          if s.[l] = ')' then
-            try
-              let pos1 = String.index s '(' in
-              let pos2 = String.index_from s pos1 'x' in
-              let wid = String.sub s (pos1 + 1) (pos2 - pos1 - 1) in
-              let hei = String.sub s (pos2 + 1) (l - pos2 - 1) in
-              let size = Some (int_of_string wid, int_of_string hei) in
-              String.sub s 0 pos1, image_size "" size
-            with Not_found | Failure _ -> s, None
-          else s, None
-        in
-        let http = "http://" in
-        let https = "https://" in
-        if String.length s > String.length http &&
-           String.sub s 0 (String.length http) = http ||
-           String.length s > String.length https &&
-           String.sub s 0 (String.length https) = https
-        then
-          Some (false, s, size)
-        else if Filename.is_implicit s then
-          match
-            try Some (List.assoc "images_path" conf.base_env) with
-              Not_found -> None
-          with
-            Some p when p <> "" -> Some (false, p ^ s, size)
-          | _ ->
-              let fname = personal_image_file_name conf.bname s in
-              if Sys.file_exists fname then
-                Some (true, fname, image_size fname None)
-              else None
-        else None
-  else None
-
-(* ********************************************************************** *)
-(*  [Fonc] has_image : config -> base -> person -> bool                   *)
-(** [Description] : Renvoie Vrai si la personne a une photo et qu'on a les
-                    droits pour la voir, Faux sinon.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-    [Retour] : Vrai si la personne a une image, Faux sinon.
-    [Rem] : Exporté en clair hors de ce module.                           *)
-(* ********************************************************************** *)
-let has_image conf base p =
-  if not conf.no_image && authorized_age conf base p then
-    not (is_empty_string (get_image p)) &&
-    (conf.wizard || conf.friend ||
-     not (Mutil.contains (sou base (get_image p)) "/private/")) ||
-    auto_image_file conf base p <> None
-  else false
 
 let gen_only_printable or_nl s =
   let s' =
@@ -2576,25 +2370,6 @@ let print_tips_relationship conf =
     |> Adef.safe
     |> gen_print_tips conf
 
-let print_image_sex conf p size =
-  let (image, alt) =
-    match get_sex p with
-    | Male -> "male.png", "M"
-    | Female -> "female.png", "F"
-    | Neuter -> "sexunknown.png", "?"
-  in
-  Output.print_sstring conf {|<img src="|} ;
-  Output.print_string conf (image_prefix conf) ;
-  Output.print_sstring conf {|/|} ;
-  Output.print_sstring conf image ;
-  Output.print_sstring conf {|" alt="|} ;
-  Output.print_sstring conf alt ;
-  Output.print_sstring conf {|" title="sex" width="|} ;
-  Output.print_sstring conf (string_of_int size) ;
-  Output.print_sstring conf {|" heigth="|} ;
-  Output.print_sstring conf (string_of_int size) ;
-  Output.print_sstring conf {|">|}
-
 (* ********************************************************************** *)
 (*  [Fonc] display_options : config -> string                             *)
 (** [Description] : Recherche dans l'URL les options d'affichage qui sont
@@ -2865,7 +2640,7 @@ let hom_person base p1 p2 =
   let fn1, sn1 = first_name base p1, surname base p1 in
   let fn2, sn2 = first_name base p2, surname base p2 in
   fn1 = fn2 && sn1 = sn2
-  
+
 let hom_fam base f1 f2 =
   let f1, f2 = foi base f1, foi base f2 in
   let fa1, mo1 = poi base @@ get_father f1, poi base @@ get_mother f1 in

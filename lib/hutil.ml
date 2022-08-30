@@ -40,10 +40,10 @@ let header_without_http conf title =
   Output.print_sstring conf conf.charset ;
   Output.print_sstring conf "\">" ;
   Output.print_sstring conf {|<link rel="shortcut icon" href="|};
-  Output.print_string conf (Util.image_prefix conf);
+  Output.print_string conf (Image.prefix conf);
   Output.print_sstring conf {|/favicon_gwd.png">|};
   Output.print_sstring conf {|<link rel="apple-touch-icon" href="|};
-  Output.print_string conf (Util.image_prefix conf);
+  Output.print_string conf (Image.prefix conf);
   Output.print_sstring conf {|/favicon_gwd.png">|};
   Output.print_sstring conf
     {|<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">|};

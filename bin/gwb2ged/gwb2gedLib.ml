@@ -544,7 +544,7 @@ let ged_psource opts base per =
     | s -> print_sour opts 1 (encode opts s)
 
 let has_image_file opts base p =
-  let s = Util.default_image_name base p in
+  let s = Image.default_portrait_filename base p in
   let f = Filename.concat opts.Gwexport.img_base_path s in
   if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
   else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
