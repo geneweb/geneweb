@@ -177,7 +177,11 @@ let reconstitute conf base p1 p2 =
        field "surname" (fun p -> p_surname base p)
          (fun x -> x = "" || x = "?");
      occ = field "number" get_occ ((=) 0);
-     image = field "image" (fun p -> sou base (get_image p)) ((=) "");
+     image = field "image" (fun p ->
+       match Image.get_portrait conf base p with
+       | Some src -> Image.src_to_string src
+       | None -> ""
+     ) ((=) "");
      public_name =
        field "public_name" (fun p -> sou base (get_public_name p)) ((=) "");
      qualifiers = list (sou base) get_qualifiers;
@@ -442,4 +446,3 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let oocc2 = o_p2.occ in
   let pgl2 = Perso.links_to_ind conf base db (Name.lower ofn2, Name.lower osn2, oocc2) in
   print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
-

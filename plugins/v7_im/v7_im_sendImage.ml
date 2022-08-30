@@ -68,7 +68,7 @@ let raw_get conf key =
 
 (* print delete image link *)
 let print_link_delete_image conf base p =
-  if Util.has_image conf base p then begin
+  if Option.is_some @@ Image.get_portrait conf base p then begin
     Output.print_sstring conf {|<p><a href="|} ;
     Output.print_string conf (commd conf) ;
     Output.print_sstring conf "m=DEL_IMAGE&i=" ;
@@ -87,7 +87,7 @@ let print_link_delete_image conf base p =
 
 let print_send_image conf base p =
   let title h =
-    if Util.has_image conf base p then
+    if Option.is_some @@ Image.get_portrait conf base p then
       transl_nth conf "image/images" 0
       |> transl_decline conf "modify"
       |> Utf8.capitalize_fst
@@ -142,14 +142,14 @@ let print_send_image conf base p =
 
 let print conf base =
   match p_getenv conf.env "i" with
-    Some ip ->
+  | Some ip ->
       let p = poi base (iper_of_string ip) in
       let fn = p_first_name base p in
       let sn = p_surname base p in
-      if sou base (get_image p) <> "" || fn = "?" || sn = "?" then
+      if Option.is_some (Image.get_portrait conf base p) || fn = "?" || sn = "?" then
         Hutil.incorrect_request conf
       else print_send_image conf base p
-  | _ -> Hutil.incorrect_request conf
+  | None -> Hutil.incorrect_request conf
 
 (* Delete image form *)
 
@@ -183,15 +183,15 @@ let print_delete_image conf base p =
 
 let print_del conf base =
   match p_getenv conf.env "i" with
-    Some ip ->
+  | Some ip ->
       let p = poi base (iper_of_string ip) in
       if sou base (get_image p) <> "" then Hutil.incorrect_request conf
       else
-        begin match auto_image_file conf base p with
-          Some _ -> print_delete_image conf base p
-        | _ -> Hutil.incorrect_request conf
+        begin match Image.get_portrait_path conf base p with
+        | Some _path -> print_delete_image conf base p
+        | None -> Hutil.incorrect_request conf
         end
-  | _ -> Hutil.incorrect_request conf
+  | None -> Hutil.incorrect_request conf
 
 (* Send image form validated *)
 
@@ -306,7 +306,7 @@ let effective_send_ok conf base p file =
         error_too_big_image conf base p (String.length content) len
       | _ -> typ, content
   in
-  let bfname = default_image_name base p in
+  let bfname = Image.default_portrait_filename base p in
   let bfdir =
     let bfdir = Util.base_path ["images"] conf.bname in
     if Sys.file_exists bfdir then bfdir
@@ -356,7 +356,7 @@ let print_deleted conf base p =
   Hutil.trailer conf
 
 let effective_delete_ok conf base p =
-  let bfname = default_image_name base p in
+  let bfname = Image.default_portrait_filename base p in
   let fname = Filename.concat (Util.base_path ["images"] conf.bname) bfname in
   if move_file_to_old conf fname bfname = 0 then incorrect conf;
   let changed =

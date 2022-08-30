@@ -7,9 +7,6 @@ open Gwdb
 (** The directory where counters (e.g. number page displayed) are stored. *)
 val cnt_dir : string ref
 
-(** Returns the image prefix (conf.image_prefix)  *)
-val image_prefix : config -> Adef.escaped_string
-
 (** Alias for !GWPARAM.base_path *)
 val base_path : string list -> string -> string
 
@@ -389,42 +386,6 @@ val old_branch_of_sosa : config -> base -> iper -> Sosa.t -> (iper * sex) list o
 (** @deprecated Use [sosa_of_branch] instead *)
 val old_sosa_of_branch : config -> base -> (iper * sex) list -> Sosa.t
 
-val has_image : config -> base -> person -> bool
-
-(** [image_file_name fname] search for image {i images/fname} inside the base and assets directories.
-    Return the path to found file or [fname] if file isn't found.  *)
-val image_file_name : string -> string
-
-(** Returns path to the image file with the giving name in directory {i src/}. *)
-val source_image_file_name : string -> string -> string
-
-(** Returns width and height of an image. *)
-val image_size : string -> (int * int) option
-
-(** [limited_image_size max_wid max_hei fname defsize] returns image size of [fname]. If width and height are greater
-    then their limits [max_wid] and [max_hei] then returns reduced size with the same proportions. [defsize] is returned
-    if image filename is empty. *)
-val limited_image_size :
-  int -> int -> string -> (int * int) option -> (int * int) option
-
-(** Returns path to the personal image. In details, returns [(is_filename,source,size)] where [is_filename] tells if [source]
-    is a filename or URL and [size] is a size of image (width x height). *)
-val image_and_size :
-  config -> base -> person ->
-    (string -> (int * int) option -> (int * int) option) ->
-    (bool * string * (int * int) option) option
-
-(** Returns default image name calculated from person's first name, surname
-    and occurence number. For example : Jean Claude DUPOND 3 => jean_claude.3.dupond *)
-val default_image_name_of_key : string -> string -> int -> string
-
-(** Returns default image name calculated from person's key. *)
-val default_image_name : base -> person -> string
-
-(** Searchs personal image (portrait) inside the base directory by looking up its default name
-    and tryig to deduce its extension. Returns path to the image if found. *)
-val auto_image_file : config -> base -> person -> string option
-
 (** Trims and remplaces all non-printable characters by spaces in the given string. *)
 val only_printable : string -> string
 
@@ -485,8 +446,6 @@ val gen_print_tips : config -> Adef.safe_string -> unit
 
 (** Print a tip that tells to {i Click an individual below to calculate the family link.} *)
 val print_tips_relationship : config -> unit
-
-val print_image_sex : config -> person -> int -> unit
 
 val display_options : config -> Adef.escaped_string
 

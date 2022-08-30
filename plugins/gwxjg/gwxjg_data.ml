@@ -636,7 +636,8 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   in
   let first_name = Tstr (E.first_name base p) in
   let first_name_aliases = mk_str_lst base (Gwdb.get_first_names_aliases p) in
-  let image = Tstr (Gwdb.sou base @@ Gwdb.get_image p) in
+  let image = Tstr (Image.get_portrait conf base p
+    |> Option.fold ~none:"" ~some:Image.src_to_string) in
   let iper = Tstr (Gwdb.string_of_iper iper') in
   let linked_page =
     Tlazy begin lazy begin

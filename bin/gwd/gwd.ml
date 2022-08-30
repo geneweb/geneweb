@@ -1450,7 +1450,7 @@ let image_request conf script_name env =
         if fname.[0] = '/' then String.sub fname 1 (String.length fname - 1)
         else fname
       in
-      let fname = Util.image_file_name fname in
+      let `Path fname = Image.path_of_filename fname in
       let _ = ImageDisplay.print_image_file conf fname in true
   | _ ->
       let s = script_name in
@@ -1461,7 +1461,7 @@ let image_request conf script_name env =
         (* empeche d'avoir des images qui se trouvent dans le dossier   *)
         (* image. Si on ne fait pas de basename, alors ça marche.       *)
         (* let fname = Filename.basename fname in *)
-        let fname = Util.image_file_name fname in
+        let `Path fname = Image.path_of_filename fname in
         let _ = ImageDisplay.print_image_file conf fname in true
       else false
 

@@ -702,7 +702,7 @@ let print_person_table conf base p lab =
   Output.print_sstring conf "<tr>" ;
   td (fun () -> Output.print_string conf lab) ;
   td (fun () ->
-      Util.print_image_sex conf p 11 ;
+      ImageDisplay.print_placeholder_gendered_portrait conf p 11 ;
       Output.print_sstring conf " " ;
       Output.print_string conf (referenced_person_title_text conf base p) ;
       Output.print_sstring conf "&nbsp;") ;
@@ -732,7 +732,7 @@ let print_person_table conf base p lab =
     end else match alt with None -> () | Some fn -> fn ()
   in
   aux [ "marr" ] begin fun _fam spouse ->
-    Util.print_image_sex conf spouse 11;
+    ImageDisplay.print_placeholder_gendered_portrait conf spouse 11;
     Output.print_sstring conf " " ;
     Output.print_string conf (referenced_person_text conf base spouse) ;
     Output.print_sstring conf " &nbsp;"
@@ -824,7 +824,7 @@ let print_person_table conf base p lab =
         let fam = foi base (get_family u).(i) in
         Output.print_sstring conf "<tr>\n";
         aux i "marr" begin fun () ->
-          Util.print_image_sex conf spouse 11 ;
+          ImageDisplay.print_placeholder_gendered_portrait conf spouse 11 ;
           Output.print_sstring conf " " ;
           Output.print_string conf (referenced_person_text conf base spouse) ;
           Output.print_sstring conf "&nbsp;"

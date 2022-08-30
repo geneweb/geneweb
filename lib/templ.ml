@@ -177,8 +177,8 @@ and eval_simple_variable conf =
       let s = if conf.cgi then
         match Util.p_getenv conf.base_env "image_prefix" with
         | Some x -> x
-        | None -> Util.image_prefix conf
-      else Util.image_prefix conf
+        | None -> Image.prefix conf
+      else Image.prefix conf
       in
       s :> string
     )
@@ -669,9 +669,9 @@ let print_foreach conf ifun print_ast eval_expr env ep loc s sl el al =
       templ_print_foreach conf print_ast ifun.set_vother env ep loc s sl el al
 
 let print_wid_hei conf fname =
-  match Util.image_size (Util.image_file_name fname) with
-    Some (wid, hei) -> Output.printf conf " width=\"%d\" height=\"%d\"" wid hei
-  | None -> ()
+  match Image.size_from_path (Image.path_of_filename fname) with
+  | Ok (wid, hei) -> Output.printf conf " width=\"%d\" height=\"%d\"" wid hei
+  | Error () -> ()
 
 (** Evaluates and prints content of {i cpr} template.
     If template wasn't found prints basic copyrigth HTML structure. *)

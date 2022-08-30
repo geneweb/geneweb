@@ -437,7 +437,7 @@ let print_population_pyramid conf base =
     Output.print_sstring conf "<td>";
     if doit then begin
       Output.print_sstring conf {|<img src="|} ;
-      Output.print_string conf (Util.image_prefix conf) ;
+      Output.print_string conf (Image.prefix conf) ;
       Output.print_sstring conf "/" ;
       Output.print_string conf iname ;
       Output.print_sstring conf {|" alt="|} ;
