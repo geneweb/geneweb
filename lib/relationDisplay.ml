@@ -519,7 +519,7 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
       let dp1 = match pp1 with Some p -> p | _ -> p1 in
       let dp2 = match pp2 with Some p -> p | _ -> p2 in
       Output.print_sstring conf "<img src=\"" ;
-      Output.print_string conf (Util.image_prefix conf) ;
+      Output.print_string conf (Image.prefix conf) ;
       Output.print_sstring conf "/picto_rel_small.png\" alt=\"\">" ;
       let href =
         (commd conf)
@@ -578,7 +578,7 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
       let dp1 = match pp1 with Some p -> p | _ -> p1 in
       let dp2 = match pp2 with Some p -> p | _ -> p2 in
       Output.print_sstring conf {|<img src="|} ;
-      Output.print_string conf (Util.image_prefix conf) ;
+      Output.print_string conf (Image.prefix conf) ;
       Output.print_sstring conf {|/picto_rel_small.png" alt="">|} ;
       let href =
         (commd conf)
@@ -642,7 +642,7 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
 let print_solution conf base long n p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), _) = sol in
   Output.print_sstring conf {|<p><img src="|} ;
-  Output.print_string conf (Util.image_prefix conf) ;
+  Output.print_string conf (Image.prefix conf) ;
   Output.print_sstring conf {|/picto_fleche_bleu.png" alt="">|} ;
   print_link_name conf base n p1 p2 sol;
   Output.print_sstring conf "</p>\n";
@@ -684,7 +684,7 @@ let print_dag_links conf base p1 p2 rl =
     let rest = ref false in
     if is_anc then begin
       Output.print_sstring conf {|<img src="|} ;
-      Output.print_string conf (Util.image_prefix conf) ;
+      Output.print_string conf (Image.prefix conf) ;
       Output.print_sstring conf {|/picto_fleche_bleu.png" alt="">|}
     end else Output.print_sstring conf "<ul>";
     M.iter begin fun ip (pp1, pp2, nn, nt, _) ->
@@ -765,7 +765,7 @@ let print_propose_upto conf base p1 p2 rl =
     in
     let (p, a) = if x1 = 0 then p2, p1 else p1, p2 in
     Output.print_sstring conf {|<p><img src="|} ;
-    Output.print_string conf (Util.image_prefix conf) ;
+    Output.print_string conf (Image.prefix conf) ;
     Output.print_sstring conf
       {|/picto_fleche_bleu.png" alt=""> <span class="smaller">|} ;
     let s = (person_title_text conf base p : Adef.safe_string :> string) in
@@ -778,7 +778,7 @@ let print_propose_upto conf base p1 p2 rl =
     |> transl_decline conf "up to"
     |> Output.print_sstring conf ;
     Output.print_sstring conf {|&nbsp;<img src="|} ;
-    Output.print_string conf (Util.image_prefix conf) ;
+    Output.print_string conf (Image.prefix conf) ;
     Output.print_sstring conf {|/picto_rel_asc.png" alt=""> <a href="|} ;
     Output.print_string conf (commd conf) ;
     Output.print_string conf (acces conf base p) ;

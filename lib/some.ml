@@ -26,7 +26,7 @@ let surname_not_found conf = not_found conf (transl conf "surname not found")
 
 let print_img conf img =
   Output.print_sstring conf {|<img src="|};
-  Output.print_string conf (Util.image_prefix conf) ;
+  Output.print_string conf (Image.prefix conf) ;
   Output.print_sstring conf {|/|} ;
   Output.print_string conf img ;
   Output.print_sstring conf {|" alt="" title="">|}

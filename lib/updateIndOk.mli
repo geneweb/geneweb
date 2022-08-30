@@ -33,10 +33,6 @@ val all_checks_person :
 val print_mod_aux :
   config -> base -> ((iper, Update.key, string) gen_person -> unit) -> unit
 
-(** Renames the image associated to a person *)
-val rename_image_file :
-  config -> base -> person -> (iper, iper, string) gen_person -> unit
-
 (** Tries to add a person to the base and displays a success HTML page if
     successful *)
 val print_add : config -> base -> unit
