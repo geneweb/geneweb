@@ -172,7 +172,11 @@ let reconstitute conf base p1 p2 =
        field "surname" (fun p -> p_surname base p)
          (fun x -> x = "" || x = "?");
      occ = field "number" get_occ ((=) 0);
-     image = field "image" (fun p -> sou base (get_image p)) ((=) "");
+     image = field "image" (fun p ->
+       match Image.get_portrait conf base p with
+       | Some src -> Image.src_to_string src
+       | None -> ""
+     ) ((=) "");
      public_name =
        field "public_name" (fun p -> sou base (get_public_name p)) ((=) "");
      qualifiers = list (sou base) get_qualifiers;

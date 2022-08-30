@@ -787,17 +787,6 @@ let check_sex_married ?(prerr = default_prerr) conf base sp op =
      end (get_family op)
   then prerr conf base (Update.UERR_sex_married op)
 
-let rename_image_file conf base op sp =
-  match auto_image_file conf base op with
-    Some old_f ->
-      let s = default_image_name_of_key sp.first_name sp.surname sp.occ in
-      let f = Filename.concat (Util.base_path ["images"] conf.bname) s in
-      let new_f =
-        if Filename.check_suffix old_f ".gif" then f ^ ".gif" else f ^ ".jpg"
-      in
-      (try Sys.rename old_f new_f with Sys_error _ -> ())
-  | _ -> ()
-
 let rparents_of rparents =
   List.fold_left
     (fun ipl r ->
@@ -827,7 +816,7 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
     | Some p' when p' <> pi && Some p' <> skip_conflict ->
       Update.print_create_conflict conf base (poi base p') ""
     | _ ->
-      rename_image_file conf base op sp
+      Image.rename_portrait conf base op (sp.first_name, sp.surname, sp.occ)
   end ;
   if (List.assoc_opt "nsck" conf.env :> string option) <> Some "on"
   then check_sex_married ?prerr conf base sp op ;

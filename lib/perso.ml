@@ -482,7 +482,7 @@ let print_sosa conf base p link =
           )
       in
       Output.print_sstring conf {|<img src="|} ;
-      Output.print_string conf (image_prefix conf) ;
+      Output.print_string conf (Image.prefix conf) ;
       Output.print_sstring conf {|/sosa.png" alt="sosa" title="|} ;
       Output.print_string conf title ;
       Output.print_sstring conf {|"> |} ;
@@ -1579,13 +1579,13 @@ let null_val = VVstring ""
 let safe_val (x : [< `encoded | `escaped | `safe] Adef.astring) =
   VVstring ((x :> Adef.safe_string) :> string)
 
-let gen_string_of_img_sz max_wid max_hei conf base (p, p_auth) =
+let gen_string_of_img_sz max_w max_h conf base (p, p_auth) =
   if p_auth then
-    let v = image_and_size conf base p (limited_image_size max_wid max_hei) in
-    match v with
-      Some (_, _, Some (width, height)) ->
-        Format.sprintf " width=\"%d\" height=\"%d\"" width height
-    | Some (_, _, None) -> Format.sprintf " height=\"%d\"" max_hei
+    match Image.get_portrait_with_size conf base p with
+    | Some (_, Some (w,h)) ->
+        let w, h = Image.scale_to_fit ~max_w ~max_h ~w ~h in
+        Format.sprintf " width=\"%d\" height=\"%d\"" w h
+    | Some (_, None) -> Format.sprintf " height=\"%d\"" max_h
     | None -> ""
   else ""
 let string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid
@@ -3155,12 +3155,12 @@ and eval_str_event_field conf base (p, p_auth)
         |> safe_val
       else null_val
   | "note" ->
-      let env = ['i', (fun () -> Util.default_image_name base p)] in
+      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       sou base note
       |> get_note_source conf base env p_auth conf.no_note
       |> safe_val
   | "src" ->
-      let env = ['i', (fun () -> Util.default_image_name base p)] in
+      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       sou base src
       |> get_note_source conf base env p_auth false
       |> safe_val
@@ -3462,7 +3462,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       if not p_auth && is_hide_names conf p then false
       else get_first_names_aliases p <> []
   | "has_history" -> has_history conf base p p_auth
-  | "has_image" -> Util.has_image conf base p
+  | "has_image" -> Image.get_portrait conf base p |> Option.is_some
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && Util.nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
@@ -3585,24 +3585,24 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "approx_death_place" ->
       if p_auth then Util.get_approx_death_date_place conf base p |> snd |> safe_val
       else null_val
-  | "auto_image_file_name" ->
-      if p_auth then match auto_image_file conf base p with
-        | Some x -> str_val x
+  | "auto_image_file_name" -> (
+      match Image.get_portrait_path conf base p with
+        | Some (`Path s) -> str_val s
         | None -> null_val
-      else null_val
+    )
   | "bname_prefix" -> Util.commd conf |> safe_val
   | "birth_place" ->
       if p_auth
       then get_birth_place p |> sou base |> Util.string_of_place conf |> safe_val
       else null_val
   | "birth_note" ->
-      let env = ['i', (fun () -> Util.default_image_name base p)] in
+      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_birth_note p
       |> sou base
       |> get_note_source conf base env p_auth conf.no_note
       |> safe_val
   | "birth_source" ->
-      let env = ['i', (fun () -> Util.default_image_name base p)] in
+      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_birth_src p
       |> sou base
       |> get_note_source conf base env p_auth false
@@ -3615,13 +3615,13 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         |> safe_val
       else null_val
   | "baptism_note" ->
-      let env = ['i', (fun () -> Util.default_image_name base p)] in
+      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_baptism_note p
       |> sou base
       |> get_note_source conf base env p_auth conf.no_note
       |> safe_val
   | "baptism_source" ->
-      let env = ['i', (fun () -> Util.default_image_name base p)] in
+      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_baptism_src p
       |> sou base
       |> get_note_source conf base env p_auth false
@@ -3635,13 +3635,13 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         |> safe_val
       else null_val
   | "burial_note" ->
-      let env = ['i', (fun () -> Util.default_image_name base p)] in
+      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_burial_note p
       |> sou base
       |> get_note_source conf base env p_auth conf.no_note
       |> safe_val
   | "burial_source" ->
-      let env = ['i', (fun () -> Util.default_image_name base p)] in
+      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_burial_src p
       |> sou base
       |> get_note_source conf base env p_auth false
@@ -3699,13 +3699,13 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         |> safe_val
       else null_val
   | "death_note" ->
-      let env = ['i', (fun () -> Util.default_image_name base p)] in
+      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_death_note p
       |> sou base
       |> get_note_source conf base env p_auth conf.no_note
       |> safe_val
   | "death_source" ->
-      let env = ['i', (fun () -> Util.default_image_name base p)] in
+      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_death_src p
       |> sou base
       |> get_note_source conf base env p_auth false
@@ -3734,7 +3734,11 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         let occ = get_occ p in
         HistoryDiff.history_file fn sn occ
         |> str_val
-  | "image" -> if not p_auth then null_val else get_image p |> sou base |> str_val
+  | "image" -> (
+      match Image.get_portrait conf base p with
+      | Some src -> Image.src_to_string src |> str_val
+      | None -> null_val
+    )
   | "image_html_url" -> string_of_image_url conf base ep true |> safe_val
   | "image_size" -> string_of_image_size conf base ep |> str_val
   | "image_medium_size" -> string_of_image_medium_size conf base ep |> str_val
@@ -3854,7 +3858,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
           |> str_val
       end
   | "notes" | "pnotes" ->
-      let env = ['i', (fun () -> Util.default_image_name base p)] in
+      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_notes p
       |> sou base
       |> get_note_source conf base env p_auth conf.no_note
@@ -3863,7 +3867,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       if is_hide_names conf p && not p_auth then null_val
       else get_occ p |> string_of_int |> str_val
   | "occupation" ->
-      let env = ['i', (fun () -> Util.default_image_name base p)] in
+      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_occupation p
       |> sou base
       |> get_note_source conf base env p_auth false
@@ -3894,7 +3898,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       | _ -> raise Not_found
     end
   | "psources" ->
-      let env = ['i', (fun () -> Util.default_image_name base p)] in
+      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_psources p
       |> sou base
       |> get_note_source conf base env p_auth false
@@ -4117,11 +4121,11 @@ and string_of_died conf p p_auth =
   else Adef.safe ""
 and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
   if p_auth then
-    match image_and_size conf base p (limited_image_size max_im_wid max_im_wid) with
-    | Some (true, fname, _) ->
+    match Image.get_portrait conf base p with
+    | Some (`Path fname) ->
       let s = Unix.stat fname in
       let b = acces conf base p in
-      let k = default_image_name base p in
+      let k = Image.default_portrait_filename base p in
       Format.sprintf "%sm=IM%s&d=%d&%s&k=/%s"
         (commd conf :> string)
         (if html then "H" else "")
@@ -4129,7 +4133,7 @@ and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
         (b :> string)
         k
       |> Adef.escaped
-    | Some (false, link, _) -> Adef.escaped link (* FIXME *)
+    | Some (`Url url) -> Adef.escaped url (* FIXME *)
     | None -> Adef.escaped ""
   else Adef.escaped ""
 and string_of_parent_age conf base (p, p_auth) parent : Adef.safe_string =

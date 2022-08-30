@@ -10,7 +10,7 @@ let image_normal_txt conf base p fname width height =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
   let s = Unix.stat fname in
   let b = acces conf base p in
-  let k = default_image_name base p in
+  let k = Image.default_portrait_filename base p in
   let r =
     "<img src=\""
     ^<^ commd conf
@@ -63,36 +63,29 @@ let image_txt conf base p =
   Adef.safe @@
   match p_getenv conf.env "image" with
   | Some "off" -> ""
-  | _ ->
-    if has_image conf base p then
-      match image_and_size conf base p (limited_image_size 100 75) with
-      | Some (true, f, Some (wid, hei)) ->
+  | Some _ | None ->
+       match Image.get_portrait_with_size conf base p with
+      | None -> ""
+      | Some (`Path s, size_opt) ->
+        let max_w,max_h = 100,75 in
+        let w, h = match size_opt with | Some (h,w) -> Image.scale_to_fit ~max_w ~max_h ~w ~h | None -> 0, max_h in
         {|<br><center><table border="0"><tr align="left"><td>|}
-        ^ (image_normal_txt conf base p f wid hei : Adef.safe_string :> string)
+        ^ (image_normal_txt conf base p s w h |> Adef.as_string )
         ^ "</td></tr></table></center>"
-      | Some (true, f, None) ->
-        {|<br><center><table border="0"><tr align="left"><td>|} ^
-        (image_normal_txt conf base p f 0 75 : Adef.safe_string :> string) ^
-        "</td></tr></table></center>"
-      | Some (false, url, Some (wid, hei)) ->
+      | Some (`Url url, Some (wid, hei)) ->
         let url_p = commd conf ^^^ acces conf base p in
         {|<br><center><table border="0"><tr align="left"><td>|} ^
-        (image_url_txt_with_size conf url_p (Util.escape_html url) wid hei : Adef.safe_string :> string) ^
+        (image_url_txt_with_size conf url_p (Util.escape_html url) wid hei |> Adef.as_string) ^
         {|</td></tr></table></center>|}
-      | Some (false, url, None) ->
+      | Some (`Url url, None) ->
         let url_p = commd conf ^^^ acces conf base p in
         let height = 75 in
         (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
         {|<br><center><table border="0" style="height:|}
         ^ string_of_int height
         ^ {|px"><tr align="left"><td>|}
-        ^ (image_url_txt conf url_p (Util.escape_html url) height : Adef.safe_string :> string)
+        ^ (image_url_txt conf url_p (Util.escape_html url) height |> Adef.as_string)
         ^ "</td></tr></table></center>\n"
-      | _ -> ""
-    else
-      ""
-
-(* *)
 
 type item = Item of person * Adef.safe_string
 

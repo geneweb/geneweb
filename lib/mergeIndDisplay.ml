@@ -89,12 +89,15 @@ let print_differences conf base branches p1 p2 =
     (transl_nth conf "image/images" 0 |> Adef.safe)
     ("image" |> Adef.encoded)
     (fun p ->
-       let v = image_and_size conf base p (limited_image_size 75 100) in
-       match v with
-       | Some (false, link, _) ->
-         ({|<img src="|} ^<^ escape_html link ^>^ {|" style="max-width:75px;max-height:100px">|}
+       match Image.get_portrait conf base p with
+       | Some (`Url url) ->
+         ({|<img src="|} ^<^ escape_html url ^>^ {|" style="max-width:75px;max-height:100px">|}
           :> Adef.safe_string)
-       | _ -> (get_image p |> sou base |> escape_html :> Adef.safe_string)) ;
+       | Some (`Path path) ->
+           (* TODO: ?? *)
+       ((escape_html path ):> Adef.safe_string)
+       | None -> Adef.safe ""
+    );
   string_field
     (transl conf "public name" |> Adef.safe)
     ("public_name" |> Adef.encoded)

@@ -124,9 +124,6 @@ module Person = struct
     let sn = sou base (get_surname p) in
     let occ = get_occ p in HistoryDiff.history_file fn sn occ
 
-  let image base p =
-    sou base (get_image p)
-
   let is_accessible_by_key conf base p =
     Util.accessible_by_key
       conf base p (p_first_name base p) (p_surname base p)
