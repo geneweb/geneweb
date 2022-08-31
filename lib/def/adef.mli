@@ -102,4 +102,5 @@ val ( <^> ) : 'a astring -> 'a astring -> bool
 val safe : string -> safe_string
 val escaped : string -> escaped_string
 val encoded : string -> encoded_string
+val as_string : 'a astring -> string
 val safe_fn : (string -> string) -> 'a astring -> 'a astring
