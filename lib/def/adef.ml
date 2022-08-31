@@ -153,4 +153,6 @@ external escaped : string -> escaped_string = "%identity"
 
 external encoded : string -> encoded_string = "%identity"
 
+external as_string : 'a astring -> string = "%identity"
+
 let safe_fn = ( @@ )
