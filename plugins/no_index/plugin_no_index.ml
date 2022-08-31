@@ -104,21 +104,23 @@ let url_no_index conf base pwd =
   if conf.cgi then addr ^<^ "?b=" ^<^ conf.bname ^<^ "&" ^<^ suff
   else addr ^<^ "?" ^<^ suff
 
+let w_base =
+  let none conf = Hutil.incorrect_request conf in
+  Gwd_lib.Request.w_base ~none
+
+let no_index conf base =
+  let opt1 = Util.p_getenv conf.env "opt" = Some "no_index" in
+  let opt2 = Util.p_getenv conf.env "opt" = Some "no_index_pwd" in
+  if opt1 || opt2
+  then
+    let link = url_no_index conf base opt2 in
+    Output.print_sstring conf {|<a href="http://|} ;
+    Output.print_string conf link ;
+    Output.print_sstring conf {|">|} ;
+    Output.print_string conf link ;
+    Output.print_sstring conf "</a>" ;
+    Output.flush conf ;
+    exit 0
+
 let () =
-  Gwd_lib.GwdPlugin.register_se ~ns @@ fun _assets conf -> function
-  | Some base ->
-    let opt1 = Util.p_getenv conf.env "opt" = Some "no_index" in
-    let opt2 = Util.p_getenv conf.env "opt" = Some "no_index_pwd" in
-    if opt1 || opt2
-    then begin
-      let link = url_no_index conf base opt2 in
-      Output.print_sstring conf {|<a href="http://|} ;
-      Output.print_string conf link ;
-      Output.print_sstring conf {|">|} ;
-      Output.print_string conf link ;
-      Output.print_sstring conf "</a>" ;
-      Output.flush conf ;
-      exit 0
-    end
-  | None ->
-    Hutil.incorrect_request conf
+  Gwd_lib.GwdPlugin.register_se ~ns @@ fun _assets -> w_base no_index

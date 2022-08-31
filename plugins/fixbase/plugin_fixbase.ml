@@ -391,14 +391,13 @@ let fixbase_ok conf base =
 let ns = "fixbase"
 
 let _ =
-  let aux fn _assets conf = function
-    | Some base ->
-      if if opt_manitou then conf.manitou else conf.wizard
-      then (fn conf base ; true)
-      else false
-    | None -> false
+  let aux fn _assets conf base =
+    if if opt_manitou then conf.manitou else conf.wizard
+    then (fn conf base ; true)
+    else false
   in
+  let w_base = Gwd_lib.Request.w_base ~none:(fun _ -> false) in
   Gwd_lib.GwdPlugin.register ~ns
-    [ "FIXBASE", aux fixbase
-    ; "FIXBASE_OK", aux fixbase_ok
+    [ "FIXBASE", (fun assets -> w_base @@ aux fixbase assets)
+    ; "FIXBASE_OK", (fun assets -> w_base @@ aux fixbase_ok assets)
     ]

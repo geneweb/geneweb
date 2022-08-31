@@ -349,33 +349,36 @@ let propose_base conf =
   Output.print_sstring conf "</button></li></ul>";
   Hutil.trailer conf
 
-let try_plugin list conf base m =
+let try_plugin list conf base_name m =
   let fn =
     if List.mem "*" list
-    then (fun ( _, fn) -> fn conf base)
-    else (fun (ns, fn) -> (List.mem ns conf.forced_plugins || List.mem ns list) && fn conf base)
+    then (fun ( _, fn) -> fn conf base_name)
+    else (fun (ns, fn) -> (List.mem ns conf.forced_plugins || List.mem ns list) && fn conf base_name)
   in
   List.exists fn (Hashtbl.find_all GwdPlugin.ht m)
 
-let w_lock ~onerror fn conf base =
+let w_lock ~onerror fn conf (base_name : string option) =
   let bfile = Util.bpath (conf.bname ^ ".gwb") in
   Lock.control
-    (Mutil.lock_file bfile) false
-    ~onerror:(fun () -> onerror conf base)
-    (fun () -> fn conf base)
+    (Mutil.lock_file bfile) true
+    ~onerror:(fun () -> onerror conf base_name)
+    (fun () -> fn conf base_name)
 
-let w_base ~none fn conf base =
-  match base with
+let w_base ~none fn conf (bfile : string option) =
+  match bfile with
   | None -> none conf
-  | Some base ->
-    let conf = make_henv conf base in
-    let conf = make_senv conf base in
-    let conf =
-      match Util.default_sosa_ref conf base with
-      | Some p -> { conf with default_sosa_ref = get_iper p, Some p }
-      | None -> conf
-    in
-    fn conf base
+  | Some bfile ->
+     let base = try Some (Gwdb.open_base bfile) with _ -> None in
+     match base with
+     | None -> none conf
+     | Some base ->
+        let conf = make_henv conf base in
+        let conf = make_senv conf base in
+        let conf = match Util.default_sosa_ref conf base with
+          | Some p -> { conf with default_sosa_ref = get_iper p, Some p }
+          | None -> conf
+        in
+        fn conf base
 
 let w_person ~none fn conf base =
   match find_person_in_env conf base "" with
@@ -413,11 +416,6 @@ let treat_request =
       then Some bfile
       else None
   in
-  let base =
-    match bfile with
-    | None -> None
-    | Some bfile -> try Some (Gwdb.open_base bfile) with _ -> None
-  in
   let process () =
   if conf.wizard
   || conf.friend
@@ -438,11 +436,11 @@ let treat_request =
       | Some list -> String.split_on_char ',' list
     in
     if List.mem "*" plugins then
-      List.iter (fun (_ , fn) -> fn conf base) !GwdPlugin.se
+      List.iter (fun (_ , fn) -> fn conf bfile) !GwdPlugin.se
     else
-      List.iter (fun (ns, fn) -> if List.mem ns plugins then fn conf base) !GwdPlugin.se ;
+      List.iter (fun (ns, fn) -> if List.mem ns plugins then fn conf bfile) !GwdPlugin.se ;
     let m = Opt.default "" @@ p_getenv conf.env "m" in
-    if not @@ try_plugin plugins conf base m
+    if not @@ try_plugin plugins conf bfile m
     then begin
         if List.assoc_opt "counter" conf.base_env <> Some "no"
         then begin
@@ -463,6 +461,11 @@ let treat_request =
         let incorrect_request conf _ = incorrect_request conf in
         match m with
         | "" ->
+           let base =
+             match bfile with
+             | None -> None
+             | Some bfile -> try Some (Gwdb.open_base bfile) with _ -> None
+           in
           if base <> None then
             w_base @@
             if only_special_env conf.env then SrcfileDisplay.print_start
@@ -487,15 +490,15 @@ let treat_request =
         | "ADD_FAM" ->
           w_wizard @@ w_base @@ UpdateFam.print_add
         | "ADD_FAM_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_add
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add
         | "ADD_IND" ->
           w_wizard @@ w_base @@ UpdateInd.print_add
         | "ADD_IND_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateIndOk.print_add
+          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_add
         | "ADD_PAR" ->
           w_wizard @@ w_base @@ UpdateFam.print_add_parents
         | "ADD_PAR_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_add_parents
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add_parents
         | "ANM" ->
           w_base @@ fun conf _ -> BirthdayDisplay.print_anniversaries conf
         | "AN" ->
@@ -522,19 +525,19 @@ let treat_request =
         | "CHG_CHN" when conf.wizard ->
           w_wizard @@ w_base @@ ChangeChildrenDisplay.print
         | "CHG_CHN_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ ChangeChildrenDisplay.print_ok
+          w_wizard @@ w_lock @@ w_base @@ ChangeChildrenDisplay.print_ok
         | "CHG_EVT_IND_ORD" ->
           w_wizard @@ w_base @@ UpdateInd.print_change_event_order
         | "CHG_EVT_IND_ORD_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateIndOk.print_change_event_order
+          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_change_event_order
         | "CHG_EVT_FAM_ORD" ->
           w_wizard @@ w_base @@ UpdateFam.print_change_event_order
         | "CHG_EVT_FAM_ORD_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_change_event_order
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_change_event_order
         | "CHG_FAM_ORD" ->
           w_wizard @@ w_base @@ UpdateFam.print_change_order
         | "CHG_FAM_ORD_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_change_order_ok
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_change_order_ok
         | "CONN_WIZ" ->
           w_wizard @@ w_base @@ WiznotesDisplay.connected_wizards
         | "D" ->
@@ -544,11 +547,11 @@ let treat_request =
         | "DEL_FAM" ->
           w_wizard @@ w_base @@ UpdateFam.print_del
         | "DEL_FAM_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_del
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_del
         | "DEL_IND" ->
           w_wizard @@ w_base @@ UpdateInd.print_del
         | "DEL_IND_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateIndOk.print_del
+          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_del
         | "F" ->
           w_base @@ w_person @@ Perso.interp_templ "family"
         | "H" ->
@@ -573,9 +576,9 @@ let treat_request =
         | "INV_FAM" ->
           w_wizard @@ w_base @@ UpdateFam.print_inv
         | "INV_FAM_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_inv
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_inv
         | "KILL_ANC" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeIndDisplay.print_kill_ancestors
+          w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print_kill_ancestors
         | "LB" when conf.wizard || conf.friend ->
           w_base @@ BirthDeathDisplay.print_birth
         | "LD" when conf.wizard || conf.friend ->
@@ -593,43 +596,43 @@ let treat_request =
         | "MOD_DATA" ->
           w_wizard @@ w_base @@ UpdateDataDisplay.print_mod
         | "MOD_DATA_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateDataDisplay.print_mod_ok
+          w_wizard @@ w_lock @@ w_base @@ UpdateDataDisplay.print_mod_ok
         | "MOD_FAM" ->
           w_wizard @@ w_base @@ UpdateFam.print_mod
         | "MOD_FAM_OK" when conf.wizard ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_mod
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_mod
         | "MOD_IND" ->
           w_wizard @@ w_base @@ UpdateInd.print_mod
         | "MOD_IND_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateIndOk.print_mod
+          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_mod
         | "MOD_NOTES" ->
           w_wizard @@ w_base @@ NotesDisplay.print_mod
         | "MOD_NOTES_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ NotesDisplay.print_mod_ok
+          w_wizard @@ w_lock @@ w_base @@ NotesDisplay.print_mod_ok
         | "MOD_WIZNOTES" when conf.authorized_wizards_notes ->
           w_base @@ WiznotesDisplay.print_mod
         | "MOD_WIZNOTES_OK" when conf.authorized_wizards_notes ->
-          w_base @@ w_lock @@ WiznotesDisplay.print_mod_ok
+          w_lock @@ w_base @@ WiznotesDisplay.print_mod_ok
         | "MRG" ->
           w_wizard @@ w_base @@ w_person @@ MergeDisplay.print
         | "MRG_DUP" ->
           w_wizard @@ w_base @@ MergeDupDisplay.main_page
         | "MRG_DUP_IND_Y_N" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeDupDisplay.answ_ind_y_n
+          w_wizard @@ w_lock @@ w_base @@ MergeDupDisplay.answ_ind_y_n
         | "MRG_DUP_FAM_Y_N" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeDupDisplay.answ_fam_y_n
+          w_wizard @@ w_lock @@ w_base @@ MergeDupDisplay.answ_fam_y_n
         | "MRG_FAM" ->
           w_wizard @@ w_base @@ MergeFamDisplay.print
         | "MRG_FAM_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeFamOk.print_merge
+          w_wizard @@ w_lock @@ w_base @@ MergeFamOk.print_merge
         | "MRG_MOD_FAM_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeFamOk.print_mod_merge
+          w_wizard @@ w_lock @@ w_base @@ MergeFamOk.print_mod_merge
         | "MRG_IND" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeIndDisplay.print
+          w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print
         | "MRG_IND_OK" -> (* despite the _OK suffix, this one does not actually update databse *)
           w_wizard @@ w_base @@ MergeIndOkDisplay.print_merge
         | "MRG_MOD_IND_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeIndOkDisplay.print_mod_merge
+          w_wizard @@ w_lock @@ w_base @@ MergeIndOkDisplay.print_mod_merge
         | "N" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
             | Some v -> Some.surname_print conf base Some.surname_not_found v
@@ -725,7 +728,7 @@ let treat_request =
         | "STAT" ->
           w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
         | "CHANGE_WIZ_VIS" ->
-          w_wizard @@ w_base @@ w_lock @@ WiznotesDisplay.change_wizard_visibility
+          w_wizard @@ w_lock @@ w_base @@ WiznotesDisplay.change_wizard_visibility
         | "TT" ->
           w_base @@ TitleDisplay.print
         | "U" ->
@@ -737,7 +740,7 @@ let treat_request =
         | "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
           w_base @@ WiznotesDisplay.print_search
         | _ -> incorrect_request
-      end conf base ;
+      end conf bfile ;
     Output.flush conf ;
   end else begin
     let title _ =

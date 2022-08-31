@@ -13,17 +13,17 @@ val w_base
   : none:(Config.config -> 'a)
   -> (Config.config -> Gwdb.base -> 'a)
   -> Config.config
-  -> Gwdb.base option
+  -> string option
   -> 'a
 
 (** [w_lock ~onerror callback conf base]
     Acquire a write lock on the base and call the callback, or fail with [onerror].
 *)
 val w_lock
-  : onerror:(Config.config -> Gwdb.base -> 'a)
-  -> (Config.config -> Gwdb.base -> 'a)
+  : onerror:(Config.config -> string option -> 'a)
+  -> (Config.config -> string option -> 'a)
   -> Config.config
-  -> Gwdb.base
+  -> string option
   -> 'a
 
 (** [w_wizard callback conf base]

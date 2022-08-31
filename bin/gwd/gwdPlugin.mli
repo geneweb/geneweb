@@ -25,11 +25,11 @@ val assets : string ref
  *)
 val register
   : ns:string
-  -> (string * (string -> Geneweb.Config.config -> Gwdb.base option -> bool)) list ->
+  -> (string * (string -> Geneweb.Config.config -> string option -> bool)) list ->
   unit
 
 (** Table of handlers registered by plugins.  *)
-val ht : (string, (string * (Geneweb.Config.config -> Gwdb.base option -> bool))) Hashtbl.t
+val ht : (string, (string * (Geneweb.Config.config -> string option -> bool))) Hashtbl.t
 
 (** [register_se ~ns hook] register a plugin hook (side effect function).
 
@@ -42,8 +42,8 @@ val ht : (string, (string * (Geneweb.Config.config -> Gwdb.base option -> bool))
   *)
 val register_se :
   ns:string ->
-  (string -> Geneweb.Config.config -> Gwdb.base option -> unit) ->
+  (string -> Geneweb.Config.config -> string option -> unit) ->
   unit
 
 (** Table of hooks registered by plugins. *)
-val se : (string * (Geneweb.Config.config -> Gwdb.base option -> unit)) list ref
+val se : (string * (Geneweb.Config.config -> string option -> unit)) list ref
