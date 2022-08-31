@@ -176,6 +176,7 @@ and eval_simple_str_var conf _base env _xx =
     let result =
       if ini = "" then Printf.sprintf " (%d %s)" len title
       else
+        let ini = Adef.as_string @@ Mutil.encode ini in
         " - " ^
         Printf.sprintf (ftransl conf "%d %s starting with %s") len title ini
     in
