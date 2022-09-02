@@ -62,8 +62,7 @@ let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
 let image_txt conf base p =
   Adef.safe @@
   match p_getenv conf.env "image" with
-  | Some "off" -> ""
-  | Some _ | None ->
+  | Some "on" -> (
        match Image.get_portrait_with_size conf base p with
       | None -> ""
       | Some (`Path s, size_opt) ->
@@ -86,6 +85,8 @@ let image_txt conf base p =
         ^ {|px"><tr align="left"><td>|}
         ^ (image_url_txt conf url_p (Util.escape_html url) height |> Adef.as_string)
         ^ "</td></tr></table></center>\n"
+    )
+  | Some "off" | Some _ | None -> ""
 
 type item = Item of person * Adef.safe_string
 
