@@ -67,7 +67,7 @@
         %end;
       %end;
       %if;(count=0)<span class="fa fa-caret-left invisible"></span>%end;
-      <a href="%prefix;i=%father.index;;m=D;t=T;v=1;image=on">%nn;
+      <a href="%prefix;%father.access;&m=D&t=T&v=1">%nn;
       <img class="px-1 mb-1" src="%image_prefix;/gui_create.png" height="20" alt="Tree"
         title="[*tree] [siblings] ([with] [spouse/spouses]1)"/>%nn;
       </a>%nn;

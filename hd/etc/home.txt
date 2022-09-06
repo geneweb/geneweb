@@ -1,10 +1,10 @@
-<!-- $Id: home.txt,v7.00-exp 10/01/2018 20:11:37 $ -->
+<!-- $Id: home.txt, v7.00-exp 06/02/2022 01:52:52 $ -->
 %define;display_sosa_ref(xx)
   [*sosa reference: %t:::xx]
 %end;
 %if;(not cancel_links)
   <div class="float-left">
-    <div class="d-flex mt-2 fixed_top_btn%if;(evar.m!="A")_col flex-column%end; %if;(evar.wide="on")fixed_top_btn_wide%end;">
+    <div class="d-flex flex-column mt-2 fixed_top_btn%if;(evar.m!="A")_col %end; %if;(evar.wide="on")fixed_top_btn_wide%end;">
       <a role="button" class="btn btn-link ml-0 p-0" href="%prefix;">%nn;
         <i class="fa fa-home fa-fw" title="[*home]" aria-hidden="true"></i>%nn;
         <i class="sr-only">[*home]</i>%nn;

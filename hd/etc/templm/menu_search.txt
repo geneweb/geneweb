@@ -115,8 +115,8 @@
     title="[*advanced request]0%nl;%nl;[*select]%nl;%if;(evar.templ != "")%evar.templ;%else;templ%end;">%if;(bvar.hide_advanced_request != "yes")🔍%else;templ%end;</a>
     %if;(evar.digest = "")
       <span class="s_menu" id="tpl">
-        <a href="%prefix_no_all;templ=&%suffix;" %apply;bg("")>default</a>
-        %( <a href="%prefix_no_all;templ=templa&%suffix;" %apply;bg("templa")>templa</a> %)
+        <a href="%prefix_set.all;templ=&%suffix;" %apply;bg("")>default</a>
+        %( <a href="%prefix_set.all;templ=templa&%suffix;" %apply;bg("templa")>templa</a> %)
         %if;(wizard or bvar.wizard_passwd = "")
           <small><a href="%prefix;m=H;v=doc_templm">doc templm</a></small>
         %end;

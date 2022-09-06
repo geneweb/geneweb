@@ -331,7 +331,7 @@
       %else;
         <ul>
           %if;(wizard and evar.m = "RLM")
-            <li><a href="%prefix_no_iz;i=0;upddag=on;%nn;
+            <li><a href="%prefix_set.iz;i=0;upddag=on;%nn;
                   %foreach;env_binding;
                     %if;(env.key = "m")m=U;%nn;
                     %elseif;(env.key = "templ")

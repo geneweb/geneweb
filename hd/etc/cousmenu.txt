@@ -1,112 +1,242 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: cousmenu.txt,v 5.6 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: cousmenu.txt, v7.1 24/11/2022 02:36:23 ddr a2 Exp $ -->
+  <!-- Copyright (c) 1998-2023 INRIA -->
   <title>%nn;
-    %apply;a_of_b_gr_eq_lev%with;
-      [*cousins (general term)]%nn;
-    %and;
+   [*relationship link between]%sp;
       %if;(public_name != "")%public_name;%else;%first_name;%end;
       %if;(qualifier != "") %qualifier;%end;
       %sp;%surname;
-    %end;
   </title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include;favicon
   %include;css
   %include;hed
 </head>
 <body%body_prop;>
 %message_to_wizard;
-<div class="container">
-<h1>%nn;
-  %apply;a_of_b_gr_eq_lev%with;
-    [*cousins (general term)]%nn;
-  %and;
+<div class="container%if;(e.v!="" and e.v>8)-fluid%end;">
+%include;perso_utils
+%include;menubar
+  <h1>%nn;
+    [*link between]%sp;
     %if;(public_name != "")%public_name;%else;%first_name;%end;
     %if;(qualifier != "") <em>%qualifier;</em>%end;
     %sp;%surname;
-    %if;(alias != "") <em>(%alias;)</em>%end;
-  %end;
-</h1>
-
-%define;nth_cousins(xx)
-  %let;xx;xx-1;%in;
-  [*%s cousins:::xx]%nn;
+    %(%if;(alias != "") <em>(%alias;)</em>%end;%)
+    %sp;[and] [close family]
+  </h1>
+%let;min;%if;(not has_children)1%else;0%end;%in;
+%let;max;%if;(bvar.max_anc_level!="" and bvar.max_anc_level<max_anc_level)%bvar.max_anc_level;%elseif;(static_max_anc_level!="")%static_max_anc_level;%end;%in;
+%define;picklvl(vvv)
+  <a role="button" class="btn btn-light btn-sm%if;((e.v="" and vvv=3) or (e.v!="" and e.v=vvv)) disabled font-weight-bold%end;"%sp;
+  href="%prefix_base_password;%foreach;env_binding;%if;(env.val!="" and env.key!="v")&%env.key=%env.val;%end;%end;&v=%expr(vvv)"%sp;
+  title="[*ascending/descending (degree)]0 vvv%if;(vvv=0) ([self])%end;">vvv</a>%nn;
 %end;
-
-%if;not cancel_links;
-  <div class="btn-group float-%right; mt-2">
-    %if;(referer != "")
-      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+<div class="col-auto d-flex justify-content-between btn-toolbar px-3" role="toolbar" aria-label="button to select max ascending level">
+  <div class="ml-auto py-0 btn-group%if;(e.v!="" and e.v>3) mr-4%end; flex-wrap" role="group" aria-label="button v from 0 to max">
+    %for;i;min;max;%apply;picklvl(i)%end;
   </div>
+</div>
+%define;cousin_lex_tt(vvv,www)
+  %( condition pour garder la tooltip (title="") vide si elle n'est pas définie pour la langue en cours %)
+  %if;([cousins.vvv.www tt]!="[cousins.vvv.www tt]")[cousins.vvv.www tt]1%else;%end;
 %end;
-
-<ul>
-  <li>
-  <form method="get" action="%action;">
-    <p>
-      %hidden;
-      <input type="hidden" name="m" value="C"%/>
-      %if;access_by_key;
-        <input type="hidden" name="p" value="%first_name_key_val;"%/>
-        <input type="hidden" name="n" value="%surname_key_val;"%/>
-        %if;(occ != "0")
-          <input type="hidden" name="oc" value="%occ;"%/>
+%define;list_ancestor(vvv)
+  %( TODO remove implexes 
+  %reset_count1;%reset_count2;
+  %foreach;ancestor_level;
+    %if;(level=vvv+1)
+      %foreach;ancestor;
+        %incr_count1;
+        %if;(is_first)<span class="text-nowrap">%nn;
+        %else;
+          %if;(count1%2=1)%if;(ancestor="? ?")%incr_count2;%else;</span> <span class="text-nowrap">%end;%end;
         %end;
-      %else
-        <input type="hidden" name="i" value="%index;"%/>
+        %if;(count1%2=0 and ancestor!="? ?" and count2!=1) & %end;
+        %if;(ancestor!="? ?")%ancestor;%end;
+        %if;(count1%2=0)%reset_count2;%if;(not is_last) • %else;</span>%end;%end;
       %end;
-      <select name="v1">
-        %foreach;cousin_level;
-          <option value="%level;"%if;(level = 2) selected="selected"%end;>%nn;
-          %if;(level = 1)[*siblings]%nn;
-          %elseif;(level = 2)[*cousins]%nn;
-          %elseif;(level = 3)[*2nd cousins]%nn;
-          %elseif;(level = 4)[*3rd cousins]%nn;
-          %else;
-            %apply;nth_cousins%with;
-              %apply;nth%with;zero/[nth (cousin)]%and;%level;%end;
-            %end;
-          %end;
-          </option>
-         %end;
-      </select>
-      <input type="submit" value="Ok"%/>
-      <br>
-      <label>
-        <input type="checkbox" name="spouse" value="on"%/>
-        [*include spouses]
-      </label>
-    </p>
-  </form>
-  </li>
-  <li>
-    <a href="%prefix;%access;;m=C;v1=2;v2=1">[*uncles and aunts]</a>
-  </li>
-  %if;has_nephews_or_nieces;
-    <li>
-      <a href="%prefix;%access;;m=C;v1=1;v2=2">[*a nephew/a niece]</a>
-    </li>
-  %end;
-</ul>
-%if;(died = "" and (wizard or friend))
-  <ul>
-    <li>
-      <a href="%prefix;%access;;m=C;t=AN">[*birthdays]</a>
-    </li>
-  </ul>
+    %end;
+  %end; %)
 %end;
-
+%define;link(vvv,lll,ttt,ddd,ccc)
+ %let;evarv;%if;(e.v="")3%else;%e.v;%end;%in;
+ %let;width;%expr((100/(evarv+1))*vvv)%in;
+ %if;("ddd"="disabled" and vvv!=0)
+ %else;
+   <td%if;(vvv>0) colspan="%expr(vvv+1)"%end; %if;(vvv=0)style="width:%expr(100/lll)%%"%end; class="table-%if;(vvv=0)info%elseif;(vvv %2 = 1)primary%else;danger%end;" >
+     <div class="%if;(vvv>=0)border-right %(border-bottom %)border-%if;(i=0)success%elseif;(vvv%2=1)primary%else;danger%end;%end; d-flex flex-column justify-content-between">
+       <div class="%(font-weight-bold%)">vvv/0</div>
+       <a role="button" href="%prefix;&%access;&m=C&v1=vvv&v2=0"
+        class="btn btn-light ddd w-100" style="height:80px;"
+         data-toggle="tooltip" data-html="true" title="%apply;cousin_lex_tt(vvv,0)">
+         %if;(vvv=0)<span class="badge badge-xl badge-success">1</span>%incr_count;%end; ttt%nn;
+         %(%if;(vvv<10)<div class="d-flex justify-content-center"><div class="mt-1 mx-3 small text-muted">%apply;list_ancestor(vvv)</div></div>%end;%)</a>
+      %(<div>%expr(100/.(2^vvv)) %%</div>%)
+      </div>
+    </td>
+  %end;
+%end;
+%define;one_ancestor(vvv,ttt)
+  %reset_count1;%reset_count2;
+    %foreach;ancestor_level;
+      %if;(level=vvv+1)
+        %foreach;ancestor;
+          %incr_count2;
+          %if;(ancestor!="? ?")%incr_count;%else;%incr_count1;%end;
+        %end;
+      %end;
+    %end;
+  %apply;link%with;vvv%and;%and;<span class="badge badge-xl badge-%if;(vvv %2 = 1)primary%else;danger%end;"> %expr(count2-count1)</span> ttt%and;%if;(count2=0)disabled%end;%and;%end;
+%end;
+%(%define;cous(vvv,www)
+%cousins.vvv.www;
+%end;
+%let;mx;%expr(e.v+3)%in;
+%let;2mx;%expr(2*mx)%in;
+<table class="table">
+<tr>%for;i;0;mx;<td><b>%i</b></td>%end;</tr>
+%for;j;0;2mx;
+  <tr>
+    %for;i;0;mx;
+    <td>%apply;cous%with;%i%and;%j;%end;</td>
+   %end;
+  <tr>
+%end;
+</table>
+COUSINS MAX_D : %cousins.max_d;%)
+%( hack désuet de la hauteur maximale du tableau descendant, limité en dur à deux fois max la hauteur montante e.v > on utilise %cousins.max_d; [but fixme!] %)
+%(%let;maxv;%if;(e.v="")4%else;%expr(e.v+1)%end;%in;
+%let;maxw;%if;(e.v=0 or (2*maxv<static_max_desc_level+1 and static_max_desc_level<10))%expr(static_max_desc_level+2)%else;%expr(2*maxv)%end;%in;
+%let;minw;%if;has_children;2%else;1%end;%in;
+%let;zero;%for;i;0;maxv;0%end;%in;
+%define;cous2(vvv,www)
+  %expr(cousins2.vvv.www)
+%end;
+%define;row_counts(xxx)
+  %for;i;0;maxv;
+    %apply;cous2%with;%expr(i)%and;%expr(i+xxx)%end;
+  %end;
+%end;
+%reset_count1;
+%for;i;minw;maxw;
+  %let;row;%apply;row_counts(i)%in;
+  %if;(row=zero)%incr_count1;%end;
+%end;
+%let;maxdesc;%expr(maxw-count1)%in; ! %)
+%define;link_cousin(vvv,www,ttt,sss)
+  %let;cousins_vvv_www_float;%cousins.vvv.www;%in;
+  %let;cousins_vvv_www;%expr(cousins_vvv_www_float/.1)%in;
+  <button type="button" data-toggle="tooltip" data-html="true" title="sss" class="flex-shrink-1 btn btn-light%if;(cousins_vvv_www!="" and cousins_vvv_www=0) disabled%end; position-relative"%( style="height:80px"%)><div class="stretched-link h-100"   data-toggle="modal" data-target="#modal_vvv_www">%nn;
+    <span class="badge badge-xl badge-%if;(vvv=0)info%elseif;(vvv%2=1)primary%else;danger%end;">%cousins_vvv_www;%(/%cousins2.vvv.www;%)</span>%nn;
+    %(%if;("." in cousins_vvv_www_float)
+      %let;couspaths_vvv_www;%cousins2.vvv.www.paths;%in;
+      +<span class="badge badge-xl badge-info">%couspaths_vvv_www;</span>
+    %for;i;0;couspaths_vvv_www;%incr_count3;%end;
+    %end;<br>%) ttt</div></button>%(<div>%if;(vvv=0)%expr((100/.(2^(vvv+www))))%else;%expr((100/.(2^(vvv+www-1))))%end; %%</div>%)
+    %for;i;0;cousins_vvv_www;%incr_count;%end;
+    %( TODO : count asc./desc/cousins separetely!%)
+%end;
+%define;cousin_lex(vvv,www)
+  [cousins.vvv.www]1
+%end;
+%(
+modal-sm	300px
+Default	None	500px
+Large	.modal-lg	800px
+Extra large	.modal-xl	1140px
+ %)
+%define;cous_mod(vvv,www)
+<div class="modal fade" id="modal_vvv_www" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><small class="text-muted">X chemins vers</small> %cousins.vvv.www; [cousins.vvv.www]
+        </h5
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        %if;(www=0)
+          %( copier liste des ancêtres de cousins.txt? %)
+        %else;
+          <ul class="list-unstyled card-columns" style="column-count:2">
+            %let;fake;%expr(i+j+2)%in;
+            %for;i;0;fake;<li>%if;(i %2 = 1)2 × %end;Jean Lorem-Ipsum %i<sup>e%if;(i=1)r%end;</sup></li>%end;
+          </ul>
+        %end;
+      </div>
+      <div class="modal-footer">
+        <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=www" class="btn btn-primary"><i class="fa-solid fa-wave-square"></i> Détail des chemins c(vvv,www)</a>
+        <a role="button" href="%(m=RLM+sommedesindexs…%)" class="btn btn-primary">Graphe RLM (todo)</a>
+      </div>
+    </div>
+  </div>
+</div>
+%end;
+%( table of cousins.i.j-vvv+i (i.k), max desc donné par %cousins.max_d; 
+   table high = 1 (self) + cousins.max_d (desc) + v (asc) %)
+%define;table(xxx)
+  %let;max;%expr(cousins.max_d+xxx+1)%in;
+  <table id="quickrel" class="table table-responsive-sm text-center mb-0 mt-3">
+    %for;j;1;max;
+      <tr>%nn;
+        %for;i;0;xxx;
+          %let;k;%expr(j+i-xxx)%in;
+          %if;(i!=0 and k=0)
+            %apply;one_ancestor%with;%i%and;%apply;cousin_lex(i,0)%end;
+          %elseif;(k<0)
+            %(%if;(i!=0)
+              <td class="border-0"></td>
+            %end;%)
+          %else;
+             %if;(i=0 and j=xxx)
+               %apply;link%with;0%and;j%and;
+               <b>%if;is_male;[him/her]0%elseif;is_female;[him/her]1%end;</b>%nn;
+               %and;disabled%and;%end;
+             %else;
+               <td %if;(j=xxx)style="width:%expr(100/xxx)%%"%end; class="table-%if;(i=0)info%elseif;(i %2 = 1)primary%else;danger%end;">
+                 <div class="%if;(i>=0)border-right %(border-bottom %)border-%if;(i=0)success%elseif;(i%2=1)primary%else;danger%end;%end; d-flex flex-column justify-content-between">
+                   <span class="%(font-weight-bold %)">%i;/%k</span>
+                   %apply;link_cousin%with;%i;%and;%k;
+                     %and;%apply;cousin_lex(i,k)
+                     %and;%apply;cousin_lex_tt(i,k)
+                   %end;
+                 </div>
+                 %apply;cous_mod%with;%i;%and;%k;%end;
+               </td>%nn;
+             %end;
+          %end;
+        %end;
+      </tr>
+    %end;
+    <tr><td colspan="%xxx;">[coefficient of relationship]<br>[half DNA]<br>[one ancestor counted]</td></tr>
+  </table>
+%end;
+%reset_count;%reset_count3;
+%if;(e.v="")
+  %apply;table(4)
+%else;
+  %apply;table(e.v+1)
+%end;
+%let;paths;%expr(count+count3)%in;
+Total[:] %count; %if;(count=1)[person/persons]0%else;[person/persons]1%end;%if;(count3>0) (+ <span class="badge badge-info">%count3;</span> = %paths; %if;(paths=1)[path/paths]0%else;[path/paths]1%end;)%end;. (beware that it’s not the number of cousins atm!!)
 %include;trl
 %include;copyr
 </div>
 %include;js
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})
+</script>
 </body>
 </html>

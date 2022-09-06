@@ -22,10 +22,17 @@
 <body%body_prop;>
 %message_to_wizard;
 
-<div class="container%if;(evar.wide="on")-fluid%end; clearfix">
+<div class="container-fluid">
+%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>4))
+  </div>
+  <div class="container">
+%end;
 %include;perso_utils
 %include;menubar
-
+%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>4))
+  </div>
+  <div class="container-fluid">
+%end;
 %if;(evar.t="T" and evar.t1="7")
   %include;modules/arbre_7gen
 %elseif;(evar.t="T" and evar.t1="h7")
@@ -34,19 +41,24 @@
   %include;modules/arbre_9gen
 %elseif;(evar.t="T" and evar.t1="CT") %(CT for compatibility with templm %)
   %include;modules/arbre_hi_tools
-  %include;tools
+  %include;templm/tools
   %include;modules/arbre_hi_indexes
   %include;modules/arbre_hi
 %elseif;(evar.t="A" or evar.t="C" or evar.t="T")
-  %include;modules/arbre_vertical
+  %include;modules/arbre_vertical 
 %else;
-  bad values for evar.t and evar.t1
+  This should not happen (probably a bad variable in URL: check t=/t1=)
 %end;
-</div>
 
-<div>
+%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>4))
+  </div>
+  <div class="container">
+%end;
 %include;trl
 %include;copyr
+%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>4))
+  </div>
+%end;
 </div>
 %include;js
 </body>

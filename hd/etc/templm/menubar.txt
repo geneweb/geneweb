@@ -33,7 +33,7 @@
     <a href="%prefix;%access;">[*person/persons]0</a>
     %if;(not browsing_with_sosa_ref or sosa_ref.index!=central_index)
       <span class="s_menu">
-        <a href="%prefix_no_iz;iz=%self.index;;%self.access;" %laS;>
+        <a href="%prefix_set.iz;iz=%self.index;;%self.access;" %laS;>
           %apply;navsosa%with;
             %self; %if;has_nobility_titles;, <em>%nobility_title;</em>%end;
           %end;
@@ -128,7 +128,7 @@
       <a href="%prefix;m=D;%access;">[*descendants]</a>
       <span class="s_menu">
         <a href="%prefix;m=D;t=T;v=4;image=on;%access"%if;(not has_parents) %laY;%end;>[tree]</a>%nn;
-        <a href="%prefix;m=D;t=H;v=%max_desc_level;;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;death_age=on;occu=on;gen=on;%access;">[table]</a>%nn;
+        <a href="%prefix;m=D;t=H;v=%max_desc_level;;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;death_age=on;occu=on;gen=1;%access;">[table]</a>%nn;
         <a href="%prefix;m=D;t=L;v=3;maxv=%max_desc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;%access;">[long display]</a>%nn;
         <a href="%prefix;m=D;t=A;num=on;v=%max_desc_level;;%access">d’Aboville</a>%nn;
       </span>

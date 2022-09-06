@@ -30,12 +30,12 @@
   %if;(is_dead and computable_death_age
                and birth_date.day != "" and birth_date.prec = ""
                and death_date.day != "" and death_date.prec = "")
-    %if;(death_date.julian_day > birth_date.julian_day)
-      %expr(death_date.julian_day - birth_date.julian_day)
+    %if;(death_date.gregorian_day > birth_date.gregorian_day)
+      %expr(death_date.gregorian_day - birth_date.gregorian_day)
     %else;0%end;
   %elseif;(computable_age and has_birth_date and birth_date.day != "" and birth_date.prec = "")
-    %if;(today.julian_day > birth_date.julian_day)
-      %expr(today.julian_day - birth_date.julian_day)
+    %if;(today.gregorian_day > birth_date.gregorian_day)
+      %expr(today.gregorian_day - birth_date.gregorian_day)
     %else;0%end;
   %end;
 %in;
@@ -185,7 +185,7 @@
     <span style="position:absolute;top:%if;(evar.wide="on" or bvar.wide="on")82%else;30%end;px;right:13px;">%apply;sosainfo()</span>
     <span style="position:absolute;right:13px;top:%if;(evar.wide="on" or bvar.wide="on")100%else;48%end;px">
      %if;((bvar.access_by_key!="yes" and evar.iz!="") or (bvar.access_by_key="yes" and evar.nz!="" and evar.pz!=""))
-       <a href="%prefix_no_iz;%self.access;%l_url;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;"> X</a> <br/>
+       <a href="%prefix_set.iz;%self.access;%l_url;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;"> X</a> <br/>
      %end;
      <a href="%prefix;%access;%if;(evar.spouse!="off");spouse=off%else;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="");image=%evar.image;%end;%if;(evar.wide!="");wide=%evar.wide;%end;%if;(evar.misc!="")misc=%evar.misc;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
       title="%if;(evar.spouse="off")[visualize/show/hide/summary]1%else;[visualize/show/hide/summary]2%end; [spouse/spouses]1">%if;(evar.spouse="off")👫%else;👤%end;</a>
@@ -292,8 +292,8 @@
 %end;
 %define;link_dates(xx)
   %if;(not cancel_links)
-    <a id="xx_%xx.index;" %apply;a_title("xx") %l_ldates;%xx.index;">
-    %if;(xx.dates != "")%xx.dates;%else; - %end;</a>%else;%xx.dates;%end;
+    %sp;<a id="xx_%xx.index;" %apply;a_title("xx") %l_ldates;%xx.index;">%nn;
+    %if;(xx.dates!="")%xx.dates;%else;-%end;</a>%else;%xx.dates;%end;
 %end;
 %define;link_marriage(xx)
   %if;(not cancel_links)
@@ -563,7 +563,7 @@
     %if;(count != 0)
       %if;(not cancel_links), <a href="%prefix;m=A;t=N;v=%max_anc_level;;i=%index;;same=%count;" style="float:none;padding:0px;"
          title="[display smallest sosa number relative to ancestor]">%count; %if;(count=1)[implex/implexes]0%else[implex/implexes]1%end;</a>
-      %else;, %count; %if;(count=1)[implex/implexes]0%else[implex/implexes]1%end;
+      %else;, %count; %if;(count=1)[implex/implexes]0%else[implex/implexes]1%end;
       %end;
     %end;
   %end;
@@ -798,7 +798,8 @@
      %if;("herxx" != "")%incr_count;i%count;=%herxx.index;;t%count;=%l_rt1;;%nn;%end;
      %if;(browsing_with_sosa_ref)%incr_count;i%count;=%sosa_ref.index;;t%count;=sosa_1;%nn;%end;
      %incr_count;i%count;=%index;;t%count;=%l_hh;;%nn;
-     " title="[*shortest path] ♆">•</a>%nn;
+     " title="[*shortest path] [with]…">•</a>%nn;&nbsp;%nn;
+    %else;%if;not is_first;,%sp;%end;
     %end;
 %end;
 %define;age_at(xx)
@@ -821,15 +822,15 @@
 %define;compute_age1(z1,z2,z3)
   <abbr class="abbr1" %if;(l_nbd > 31)title="%l_nbd; [days old]"
   %end;>%if;(z1 > 0)
-    %if;(z1 = 1)[one year old]%else;z1 [years old]%end;
+    %if;(z1 = 1)[one year old]%else;z1 [years old]%end;
     %if;(z2 > 0 or z3 > 0), %end;
   %end;
   %if;(z2 > 0)
-    %if;(z2 = 1)[one month old]%else;z2 [months old]%end;
+    %if;(z2 = 1)[one month old]%else;z2 [months old]%end;
     %if;(z3 > 0), %end;
   %end;
   %if;(z3 > 0)
-    %if;(z3 = 1)[one day old]%else;z3 [days old]%end;
+    %if;(z3 = 1)[one day old]%else;z3 [days old]%end;
   %end;
   </abbr>
 %end;
@@ -1014,8 +1015,8 @@
     %reset_count;%foreach;event_witness;%incr_count;%end;
     %if;(count>1)[witness/witnesses]1%else;[witness/witnesses]0%end;[:]
     %foreach;event_witness;
-      %if;(not is_first)%sp;%nl;%end;
-      %if;(count>1)%apply;relation_computing("event_witness","",[witness/witnesses]0)%sp;%end;
+      %if;(not is_first and not cancel_links)%sp;%end;
+      %if;(count>1)%apply;relation_computing("event_witness","",[witness/witnesses]0)%end;
       %apply;somebody("event_witness")
     %end;
     </span>
@@ -1045,7 +1046,7 @@
   %if;has_children;
     %foreach;descendant_level;
       %if;(max_desc_level > 1 and level = max_desc_level)
-        %if;(level!= 1 and level!=0)[up to] %number_of_descendants;%nn;
+        %if;(level!= 1 and level!=0)[up to] %number_of_descendants;%nn;
           %sp;à %level; [generation/generations]1
         %end;
       %end;
@@ -1073,9 +1074,9 @@
 %define;nav_with_sosa_ref(xx)
   <a id="nav_sosa_ref"
     %if;(bvar.access_by_key="yes")
-      href="%prefix_no_iz;pz=%first_name_key;;nz=%surname_key;%if;(evar.ocz!=0);ocz=%occ;%end;;%self.access;%l_url;"
+      href="%prefix_set.iz;pz=%first_name_key;;nz=%surname_key;%if;(evar.ocz!=0);ocz=%occ;%end;;%self.access;%l_url;"
     %else;
-      href="%prefix_no_iz;iz=%self.index;;%self.access;%l_url;"
+      href="%prefix_set.iz;iz=%self.index;;%self.access;%l_url;"
     %end;
      title="[*navigation with %t as Sosa reference:::xx] %lcS;" %laS;> √  </a>
 %end;
@@ -1106,7 +1107,7 @@
     </p>
   %end;
 %end;
-<div class="col1">
+<div><div class="col1">
   <div class="person"> %( <!-- Begin display image, person --> %)
     <h1 class="ch1 h1_%sex; h1_%has_families;%has_sosa;" style="margin-top:%if;(evar.wide!="on")15%else;30%end;px">
       %if;(has_public_name)
@@ -1182,7 +1183,7 @@
       %end;
       <br%/>
       %if;(is_dead and computable_death_age)[*age at death][:] %apply;curr_age()%end;
-      %if;(not is_dead and computable_age)[*age][:] %apply;curr_age();%end;
+      %if;(not is_dead and computable_age)[*age][:] %apply;curr_age()%end;
     </p>
   </div>
   %apply;timeline()
@@ -1205,7 +1206,7 @@
             %if;(has_relation_him and has_relation_her)
               %apply;relation_computing("relation_him", "relation_her", "") %apply;capitalize(relation_type)[:]
               <span style="white-space: nowrap">%apply;somebody("relation_him")
-              %sp;[and]%sp;%apply;somebody("relation_her")</span>
+              %sp;[and]%sp;%apply;somebody("relation_her")</span>.
             %end;
             %if;(has_relation_him and not has_relation_her)
               %apply;relation_computing("relation_him", "", "") %apply;capitalize(relation_type)[:]
@@ -1244,13 +1245,15 @@
     <br/>
     <span %if;(not has_linked_pages)class="ch2"%end;>%if;(has_linked_pages and not cancel_links)<a href="%prefix;m=LINKED;%access;" class="ch2"
      title="[*linked pages]">%end;[*note/notes]1%if;(has_linked_pages and not cancel_links)<small>*</small>%end;%if;(has_linked_pages and not cancel_links)</a>%end;</span>
-      %if;(has_linked_page.BNOTE)
-        %linked_page.BNOTE;
-      %end;
-      %notes;
-      %if;(has_linked_page.NOTE)
-        %linked_page.NOTE;
-      %end;
+     <div>
+        %if;(has_linked_page.BNOTE)
+          %linked_page.BNOTE;
+        %end;
+        %notes;
+        %if;(has_linked_page.NOTE)
+          %linked_page.NOTE;
+        %end;
+      </div>
     %end;
   </div>
   %if;has_families;
@@ -1322,7 +1325,7 @@
             <a href="%prefix;m=D;t=T;v=4;image=on;%access"%if;(not has_parents) %laY;%end;>[*descendants tree]</a>%nn;
             %let;l1;%apply;min(max_desc_level,5)%in;
             <a href="%prefix;m=D;t=D;v=%l1;;maxv=%max_desc_level;;i=%index;">[*descendant tree view]</a>%nn;
-            <a href="%prefix;m=D;t=H;v=%max_desc_level;;num=on;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;death_age=on;occu=on;gen=on;%access;">[*table] [descendants]</a>%nn;
+            <a href="%prefix;m=D;t=H;v=%max_desc_level;;num=on;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;death_age=on;occu=on;gen=1;%access;">[*table] [descendants]</a>%nn;
             <a href="%prefix;m=D;t=L;v=3;maxv=%max_desc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;upd=on;hide=on;%access;">[*long display]</a>%nn;
             <a href="%prefix;m=D;%access;">Menu [tools] [descendants]</a>%nn;
             </span>
@@ -1337,7 +1340,7 @@
           %if;(family_cnt != 1)
             <span class="button">
               <a href="%prefix;m=INV_FAM;i=%index;;f=%family.index;"
-               title="[*invert::family/families]1" style="border:0px;font-size:17px">⇪</a>
+               title="[*invert::family/families]1" style="background-color:#555;padding:2px;">^</a>
             </span>
             %if;(family.father.index = prev_family.father.index
               and family.mother.index = prev_family.mother.index)
@@ -1346,12 +1349,13 @@
             %end;
           %end;
         %end;
+        </div>
         %(<span class="button"><a id="chg_evt_fam" href="%prefix;m=CHG_EVT_FAM_ORD;i=%family.index;;ip=%index;"
          style="border:0px;font-size:17px" title="[*invert::event/events]1 [family/families]0">⇳</a></span>%)
         %apply;content_family("self","spouse")
         %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em>%nl;%end;
-        %if;(evar.image!="off" and nb_families > 1)<hr style="clear:both;"%/>%end;
-      </div>
+        %if;(evar.image="on" and nb_families > 1)<hr style="clear:both;"%/>%end;
+      
     %end;
     </div>
   %else;
@@ -1383,17 +1387,13 @@
     <p>This browser does not like iframe!</p>
   </iframe>
 %end;
+</div>
 %if;(not cancel_links)
-  <div>
-    %apply;menu()
-    %apply;buttons()
-  </div>
-  <div style="clear:both;">
+  %apply;menu()
+  %apply;buttons()
   %include;trl
   %include;copyr
-  </div>
 %end;
- </div>
 </div>
 %include;js
 </body>

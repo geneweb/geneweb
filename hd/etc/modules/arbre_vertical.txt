@@ -1,38 +1,75 @@
-<!-- $Id: modules/arbre_vertical v7.00 18/11/2017 20:02:08 Arbre ascendant (vertical) -->
-
+<!-- $Id: modules/arbre_vertical v7.00 11/02/2022 00:48:44 Arbre ascendant vertical -->
 %define;a_tree_line()
   %if;(not is_first)
     <tr>
+      %foreach;cell;
+        %if;(not is_first)
+          <td class="text-center"><samp>&nbsp;</samp></td>
+        %end;
+        <td colspan="%cell.colspan;" class="text-center py-0 mx-0">%nn;
+          %if;(cell.is_empty or cell.is_top)<samp>&nbsp;</samp>%else;│%end;
+        </td>
+      %end;
+    </tr>
+  %end;
+  <tr>
     %foreach;cell;
       %if;(not is_first)
         <td class="text-center"><samp>&nbsp;</samp></td>
       %end;
-      <td colspan="%cell.colspan;" class="text-center py-0 mx-0">%nn;
-        %if;(cell.is_empty or cell.is_top)<samp>&nbsp;</samp>%else;│%end;
+      <td colspan="%cell.colspan;"%( style="max-width:%expr(1024/(2^(e.v-1)))px"%) class="text-center align-bottom p-0">%nn;
+        %if;(cell.is_empty)<samp>&nbsp;</samp>%nn;
+        %else;
+          %if;(e.im="" and cell.person.has_image)
+            %if;not cancel_links;<a href="%cell.person.image_html_url;">%end;
+            <img class="rounded mb-1" src="%cell.person.image_url;"%cell.person.image_small_size;%sp;%nn;
+             alt="[image/images]0" title="[image/images]0"%/>%nn;
+            %if;not cancel_links;</a>%end;<br>
+          %end;
+          %( Checking if the ancestors are falsly alive by verifying three first generations (self/parents/grand-parents births)
+             + also cell.person birth and death + his cell.family.marriage + cell.family.”parents” infos too
+              we can’t do a single mark from bottom to mark upper cells because table %foreach;cell start at top rows %)
+          %let;self_parent_dead;
+            %if;(birth_date!="" and birth_date.year<today.year-120)1%end;
+            %if;has_parents;
+              %if;((father.birth_date!="" and father.birth_date.year<today.year-120)
+               or (mother.birth_date!="" and mother.birth_date.year<today.year-120))1%end;
+              %if;father.has_parents;
+                %if;((father.father.birth_date!="" and father.father.birth_date.year<today.year-120)
+                 or (father.mother.birth_date!="" and father.mother.birth_date.year<today.year-120))1%end;
+               %end;
+              %if;mother.has_parents;
+                %if;((mother.father.birth_date!="" and mother.father.birth_date.year<today.year-120)
+                 or (mother.mother.birth_date!="" and mother.mother.birth_date.year<today.year-120))1%end;
+               %end;
+            %end;
+          %in;
+          %let;cell_person_dead;
+            %if;(not cell.person.is_dead)
+              %if;(self_parent_dead!="")1%end;
+              %if;(cell.person.birth_date.year!="" and cell.person.birth_date.prec="")
+                %if;(cell.person.birth_date.year<today.year-120)1%end;%end;
+              %if;(cell.family.marriage_date.year!="" and cell.family.marriage_date.prec="")%if;(cell.family.marriage_date.year<today.year-100)1%end;%end;
+              %if;cell.person.has_parents;
+                %if;(cell.person.father!="")
+                  %if;(cell.person.father.birth_date.year!="" and cell.person.father.birth_date.prec="")%if;(cell.person.father.birth_date.year<today.year-135)1%end;%end;
+                  %if;(cell.person.father.is_dead and cell.person.father.death_date!="" and cell.person.father.death_date.prec="")%if;(cell.person.father.death_date.year<today.year-120)1%end%end;
+                %end;
+                %if;(cell.person.mother!="")
+                  %if;(cell.person.mother.birth_date.year!="" and cell.person.mother.birth_date.prec="")%if;(cell.person.mother.birth_date.year<today.year-135)1%end;%end;
+                  %if;(cell.person.mother.is_dead and cell.person.mother.death_date!="" and cell.person.mother.death_date.prec="")%if;(cell.person.mother.death_date.year<today.year-120)1%end%end;
+                %end;
+              %end;
+            %end;
+          %in;
+          %apply;short_display_person_tree("cell.person")%nn;
+          %if;(cell_person_dead!="" and cell.person!=self and cell.person!=self.mother and cell.person!=self.father)
+            <div class="text-danger" title="Please! Let me rest in peace!">†</div>
+          %end;
+          %if;cell.person.has_nobility_titles;%cell.person.title;%end;
+        %end;
       </td>
     %end;
-    </tr>
-  %end;
-  <tr>
-
-  %foreach;cell;
-    %if;(not is_first)
-      <td class="text-center"><samp>&nbsp;</samp></td>
-    %end;
-    <td colspan="%cell.colspan;" class="text-center align-bottom py-0">%nn;
-      %if;(cell.is_empty)<samp>&nbsp;</samp>%nn;
-      %else;
-        %if;(evar.image!="off" and cell.person.has_image)
-          %if;(evar.cgl != "on")<a href="%cell.person.image_html_url;">%end;
-          <img class="rounded mb-1" src="%cell.person.image_url;"%cell.person.image_small_size;%sp;%nn;
-           alt="[image/images]0" title="[image/images]0"%/>%nn;
-          %if;(evar.cgl != "on")</a>%end;<br>
-        %end;
-        %apply;short_display_person_tree("cell.person")%nn;
-        %if;cell.person.has_nobility_titles;<br>%cell.person.title;%end;
-      %end;
-    </td>
-  %end;
   </tr>
   %if;(not is_last)
     <tr>
@@ -40,22 +77,100 @@
       %if;(not is_first)
         <td class="text-center py-0">%nn;
         %if;cell.is_right;
-          %if;(evar.marriage = "on")
-            %if;(wizard and not cancel_links)<a class="small font-weight-italic text-center text-nowrap" href="%prefix_base_password;m=MOD_FAM;i=%cell.family.index;;ip=%index;" title="%if;(cell.family.marriage_date.year="")[*add::marriage/marriages]0%else;[*update::family/families]0%end; %cell.family.father; [and] %cell.family.mother;">%end;
-              %if;(cell.family.marriage_date.year!= "")
-                %if;(cell.family.marriage_date.prec = "&lt;")
-                  /%cell.family.marriage_date.year;%nn;
-                %elseif;(cell.family.marriage_date.prec = "&gt;")
-                  %cell.family.marriage_date.year;/%nn;
-                %elseif;(cell.family.marriage_date.prec = "│" or cell.family.marriage_date.prec = "..")
-                  %cell.family.marriage_date.year;%nn;
+          %if;(e.ma!="0")
+            %if;(wizard and not cancel_links)
+              <a href="%prefix_base_password;m=MOD_FAM&i=%cell.family.index;&ip=%index;"
+            %else;
+              <span
+            %end;
+              %let;spouses_dead;%if;(not cell.family.mother.is_dead and not cell.family.father.is_dead and cell.family.marriage_date.year!="")%if;(today.year-cell.family.marriage_date.year>100)1%end;%end;%in;
+              class="small font-italic text-center text-nowrap%if;(spouses_dead=1) text-danger%end;"
+              title="%if;(cell.family.marriage_date.year!="" and ((not (cell.family.father.is_dead and cell.family.mother.is_dead)) or ("-" in cell.family.date_s and cell.family.sep_date_s!="" and cell.family.marriage_date.prec="")))
+                       %if;(cell.family.sep_date_s!="")
+                         %apply;a_of_b%with;%expr(cell.family.sep_date_s-cell.family.marriage_date.year) [years old]%and;[relation/relations]0%end;%nn;
+                       %elseif;(cell.family.sep_date_s="" and not (("-" in cell.family.date_s) and cell.family.father.is_dead and cell.family.mother.is_dead))
+                         %apply;a_of_b%with;%expr(today.year-cell.family.marriage_date.year) [years old]%if;(spouses_dead=1) (?!)%end;%and;[relation/relations]0%end;
+                         %if;(spouses_dead=1)&#013;&#013;Please let both spouses rest in peace!%end;
+                       %end;%nn;
+                     %end;
+                     %if;wizard;&#013;&#013;%nn;
+                       %if;(cell.family.marriage_date.year="")[*add::marriage/marriages]0
+                       %else;[*update::family/families]0%end; %cell.family.father; [and] %cell.family.mother;
+                     %end;">%nn;
+            %if;(cell.family.marriage_date.year="")
+              -%nn;
+            %else;
+              %let;fw;%( first widow different cases %)
+                %if;(cell.family.father.death_date.year!="" and cell.family.father.death_date.prec=""
+                 and cell.family.mother.death_date.year!="" and cell.family.mother.death_date.prec="")
+                  %if;(cell.family.father.death_date.year-cell.family.mother.death_date.year=0)1%nn;
+                  %elseif;(cell.family.mother.death_date.year>cell.family.father.death_date.year)0%else;3%end;
                 %else;
-                  %cell.family.marriage_date.prec;%cell.family.marriage_date.year;%nn;
+                  %if;(cell.family.father.death_date.year!="" and cell.family.father.death_date.prec="")
+                    %if;(cell.family.mother.death_date.year!="" and (cell.family.mother.death_date.prec="&#62;" or cell.family.mother.death_date.prec="?"))
+                      %if;(cell.family.mother.death_date.year>cell.family.father.death_date.year)0%else;3%end;
+                    %elseif;cell.family.mother.is_dead;2%else;5%end;
+                  %elseif;(cell.family.mother.death_date.year!="" and cell.family.mother.death_date.prec="")
+                    %if;(cell.family.father.death_date.year!="" and (cell.father.father.death_date.prec="&#62;" or cell.family.father.death_date.prec="?"))
+                      %if;(cell.family.father.death_date.year>cell.family.mother.death_date.year)3%else;0%end;
+                    %elseif;cell.family.father.is_dead;4%else;6%end;
+                  %end;
                 %end;
-              %elseif;(wizard and not cancel_links)-%nn;
-              %end;
-            %if;(wizard and not cancel_links)</a>%end;
-          %else;<samp>&nbsp;</samp>
+              %in;
+              %let;widow_year;%( year of first death/widow %)
+                %if;(fw!="")
+                  %if;(fw<3 or fw=5)%cell.family.father.death_date.year;%nn;
+                  %elseif;(fw=3 or fw=4 or fw=6)%cell.family.mother.death_date.year;%nn;
+                  %end;
+                %end;
+              %in;
+              %let;widow_period;
+                %if;(fw!="")
+                  %if;(fw=0)%expr(cell.family.mother.death_date.year-cell.family.father.death_date.year)%nn;
+                  %elseif;(fw=3)%expr(cell.family.father.death_date.year-cell.family.mother.death_date.year)%nn;
+                  %elseif;(fw=5)%expr(today.year-cell.family.father.death_date.year)%nn;
+                  %elseif;(fw=6)%expr(today.year-cell.family.mother.death_date.year)%nn;
+                  %end;
+                %end;
+              %in;
+              %if;(fw!="" and (cell.family.date_s=cell.family.marriage_date.year)and cell.family.sep_date_s="")
+                 %( DEBUG %fw;|%widow_year;|%widow_period;<br> %)
+                <span class="font-italic">%cell.family.date_s;</span>%nn;
+                <span class="small font-weight-bold
+                  %if;(fw=3)text-secondary%elseif;(fw=0)text-primary%nn;
+                  %elseif;(fw=5 or fw=6)
+                    %if;(widow_period!="" and widow_period>100)text-danger%nn;
+                    %else;text-success%end;
+                  %end;"
+                 title="%nn;
+                 %if;(widow_year!="")
+                   %if;(cell.family.marriage_date.year!="" and cell.family.marriage_date.prec="")
+                     %if;((fw=2 or fw=4) or ((fw=0 or fw=3) and (cell.family.mother.death_date.prec="?" or cell.family.father.death_date.prec="?")))[possibly (date)] %end;
+                     %apply;a_of_b%with;%expr(widow_year-cell.family.marriage_date.year) [years old]%and;[relation/relations]0%end;
+                   %end;
+                 %end;
+                 %if;(widow_period!="")
+                   %apply;a_of_b%with;&#013;&#013;
+                     %if;(fw=0 or fw=5)%cell.family.mother;%else;%cell.family.father;%end;%sp;
+                     %if;(fw=0 or fw=5)[widower/widow]1%else;[widower/widow]0%end;%sp;
+                     %if;(fw=5 or fw=6)[for/since]1%else;[for/since]0%end;%sp;
+                     %if;((fw=0 and cell.family.mother.death_date.prec="&#62;")
+                       or (fw=3 and cell.family.father.death_date.prec="&#62;"))&#62;%end;
+                     %if;((fw=0 or fw=3) and (cell.family.mother.death_date.prec="?" or cell.family.father.death_date.prec="?"))[possibly (date)] %end;
+                     %if;(widow_period!="")%widow_period; %if;(widow_period=1)[year/month/day]0%else;[years old]%if;(widow_period>100) (?!)%end;%end;
+                     %end;
+                   %and;
+                     %if;(fw=0 or fw=5)%cell.family.father;%else;%cell.family.mother;%end;
+                   %end;
+                   %if;(widow_period>100)&#013;Please let both spouses rest in peace!%end;
+                 %end;">%if;(not ("-" in cell.family.date_s))—%end;%if;(fw=2 or fw=4)?%end;%widow_year;</span>
+              %else;
+                %cell.family.date_s;
+                %end;
+            %end;
+            %if;(wizard and not cancel_links)</a>%elseif;friend;</span>%end;
+         %else;
+            <samp>&nbsp;</samp>
           %end;
         %else;<samp>&nbsp;</samp>
         %end;
@@ -66,12 +181,12 @@
         %elseif;(cancel_links)│%nn;
         %else;
           <a href="%cell.person.bname_prefix;%cell.person.access;%nn;
-            ;m=%if;(evar.m!="")%evar.m;%else;A%end;%nn;
-            ;t=%if;(evar.t!="")%evar.t;%else;T%end;%nn;
-            ;v=%if;(evar.v!="")%evar.v;%else;3%end;%nn;
-            %if;(evar.image!="off");image=on%end;%nn;
-            %if;(evar.marriage = "on");marriage=on%end;"
-            title="%if;(evar.m="")[*tree][:] [full width/columns]0%end;">│</a>%nn;
+            &m=%if;(e.m!="")%e.m;%else;A%end;%nn;
+            &t=%if;(e.t!="")%e.t;%else;T%end;%nn;
+            &v=%if;(e.v!="")%e.v;%else;3%end;%nn;
+            %if;(e.im=0)&im=0%end;%nn;
+            %if;(e.ma=0)&ma=0%end;"
+            title="[*navigation] [with] %cell.person;">│</a>%nn;
         %end;
       </td>
     %end;
@@ -97,166 +212,62 @@
     </tr>
   %end;
 %end;
-
 %define;male_line(xx, yy)
-  %if;(yy > 0)
+  %if;(yy>0)
     %if;(xx.has_parents)%apply;male_line("xx.father", yy - 1)%end;
     <a href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;(evar.image!="off" and xx.has_image)
+    %if;(e.im="" and xx.has_image)
       <br>
-      %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
+      %if;not cancel_links;<a href="%xx.image_html_url;">%end;
       <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
        alt="[image/images]0" title="[image/images]0"%/>
-      %if;(evar.cgl != "on")</a>%end;
+      %if;not cancel_links;</a>%end;
     %end;
     %if;("xx" != "self")<br>│<br>%end;
   %end;%nl;
 %end;
-
 %define;female_line(xx, yy)
-  %if;(yy > 0)
+  %if;(yy>0)
     %if;(xx.has_parents)%apply;female_line("xx.mother", yy - 1)%end;
     <a href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;(evar.image!="off" and xx.has_image)
+    %if;(e.im="" and xx.has_image)
       <br>
-      %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
+      %if;not cancel_links;<a href="%xx.image_html_url;">%end;
       <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
        alt="[image/images]0" title="[image/images]0"%/>%nn;
-      %if;(evar.cgl != "on")</a>%end;
+      %if;not cancel_links;</a>%end;
     %end;
     %if;("xx" != "self")<br>│<br>%end;
   %end;%nl;
 %end;
-
-%if;(evar.t = "T")%nn;
-  <div class="text-%right">%nn;
-  <a href="%prefix_base_password;%foreach;env_binding;%env.key=%env.val;;%end;%nn;
-  dag=on;notab=on;slices=on" title="[*display by slices/slice width/overlap/total width]0"><samp>//</samp></a></div>
-%end;
-
-%define;tree(xx)
-  %foreach;ancestor_tree_line(xx)
-    %apply;a_tree_line()
-  %end;
-%end;
-
-%if;has_parents;
-  %let;evarv;%if;(evar.v!="")%evar.v;%else;3%end;%in;
-  %let;maxlev;%apply;min%with;
-    %if;(bvar.max_anc_tree!="")%bvar.max_anc_tree;%else;120%end;%and;
-    %if;(bvar.max_anc_level!="")%bvar.max_anc_level;%else;120%end;%and;
-    %expr(static_max_anc_level)%end;%in;
-  %let;maxv;%if;(maxlev<10 or maxlev<evarv+5)%expr(maxlev+1)
-            %elseif;(maxlev>=evarv+5 and evarv>5)%expr(evarv+5)
-            %else;10%end;%in;
-  %let;minv;%if;(maxlev>9 and maxlev<evarv+5)%expr(maxv-9)
-            %elseif;(maxlev>9 and evarv>5)%expr(evarv-4)
-            %else;1%end;%in;
-  %(minv %minv; < evarv %evarv; < maxv %maxv; (maxlev %maxlev;)%)
-  <div class="d-flex justify-content-between">
-    <h2 id="a">%if;(evar.t="A")[*male line/female line]0%nn;
-    %elseif;(evar.t="C")[*male line/female line]1%nn;
-    %else[*ascendants tree]%end;</h2>
-    %if;not cancel_links;
-      <div class="form-inline">
-        <div class="btn-group mx-2">
-          %if;(maxlev>9 and evarv>5)
-            <a href="%prefix_base_password;%nn;
-                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(evarv-5);%end;%end;"
-              class="btn btn-outline-secondary btn-sm border-0 px-0 small"
-              title="(-5) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]1 (max %maxlev;)">&nbsp;-⁵</a>
-            <a href="%prefix_base_password;%nn;
-                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(evarv-1);%end;%end;%if;(evar.v="")v=2;%end;"
-              class="btn btn-outline-secondary btn-sm border-0 px-0 small"
-              title="(-1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]1 (max %maxlev;)">&nbsp;-</a>
-          %end;
-          %for;i;minv;maxv;
-            <a id="v%i;" class="btn btn-outline-%if;(evarv=i)dark font-weight-bold disabled%else;secondary%end; btn-sm border-0 px-1"
-              href="%prefix_base_password;%nn;
-                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%else;v=%i;;%end;%end;%if;(evar.v="")v=%i;;%end;"
-              title="%if;(evarv!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
-              %end; %if;(i=maxlev)(max)%end;">%i;</a>
-          %end;
-          %if;(maxlev>9 and maxlev-evarv>=5)
-            <a href="%prefix_base_password;%nn;
-                %foreach;env_binding;
-                %if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(evarv+1);%end;%end;%if;(evar.v="")v=4;%end;"
-              class="btn btn-outline-secondary btn-sm border-0 px-0 small"
-              title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">&nbsp;+</a>
-            <a href="%prefix_base_password;%nn;
-                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(evarv+5);%end;%end;%if;(evar.v="")v=8;%end;"
-              class="btn btn-outline-secondary btn-sm border-0 px-0 small"
-              title="(+5) [visualize/show/hide/summary]1 %expr(evarv+5) [generation/generations]1 (max %maxlev;)">&nbsp;+⁵</a>
-          %end;
-        </div>
-        %if;(evarv>1)
-          <div class="btn-group mx-2">
-            <a href="%prefix_base_password;%foreach;env_binding;%if;(env.key!="t")%env.key=%env.val;;%end;%end;t=A;"
-              class="btn btn-outline-%if;(evar.t="A")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0"
-              title="[*male line/female line]1">A</a>
-            <a href="%prefix_base_password;%foreach;env_binding;%if;(env.key!="t")%env.key=%env.val;;%end;%end;t=C;"
-              class="btn btn-outline-%if;(evar.t="C")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0 ml-2"
-              title="[*male line/female line]1">C</a>
-            <a href="%prefix_base_password;%foreach;env_binding;%if;(env.key!="t")%env.key=%env.val;;%end;%end;"
-              class="btn btn-outline-%if;(evar.t="T" or evar.t="")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0 ml-2"
-              title="[*male line/female line]1">T</a>
-          </div>
-        %end;
-        <div class="mx-2">
-          <a href="%prefix_base_password;%nn;
-            %foreach;env_binding;%if;(env.key != "image")%env.key=%env.val;;%end;%end;%nn;
-            %if;(evar.image!="off")image=off;%end;"
-            class="btn btn-outline-secondary btn-sm border-0 px-0"
-            title="%if;(evar.image="off")[*visualize/show/hide/summary]1%else;%nn;
-              [*visualize/show/hide/summary]2%end; [image/images]1">
-            <i class="fa fa-image fa-fw"></i>
-            <i class="fa fa-toggle-%if;(evar.image="off")off%else;on%end; text-muted"></i>
-          </a>
-        </div>
-        %if;(evarv>1 and evar.t="T")
-          <div class="mx-2">
-            <a href="%prefix_base_password;%nn;
-              %foreach;env_binding;%if;(env.key!="marriage")%env.key=%env.val;;%end;%end;%nn;
-              %if;(evar.marriage!="on")marriage=on;%end;"
-              class="btn btn-outline-secondary btn-sm border-0 px-0%evar.dag; %evar.n;%if;(evar.dag="on") disabled%end;"
-              title="%if;(evar.marriage!="on")[*visualize/show/hide/summary]1%else;
-                  [*visualize/show/hide/summary]2%end; [date of marriage]"
-            ><i class="fa fa-random fa-fw"></i>
-              <i class="fa fa-toggle-%if;(evar.marriage!="on")on%else;off%end; text-muted%(success ?%)"></i>
-            </a>
-          </div>
-        %end;
-        <div class="mx-2">
-          <a href="%prefix_base_password;%nn;
-              %foreach;env_binding;%if;(env.key!="dag")%env.key=%env.val;;%end;%end;%nn;
-              %if;(evar.dag!="on")dag=on;%end;"
-            class="btn btn-outline-secondary btn-sm border-0 px-0"
-            title="%if;(evar.dag="on")[*dag on/dag off]1%else;[*dag on/dag off]0%end;"
-          ><i class="fa fa-%if;(evar.dag="on")minus%else;plus%end; fa-fw"></i>
-          </a>
-        </div>
-      </div>
-    %end;
+%let;gen;%if;(e.v!="")%e.v;%else;3%end;%in;
+%if;not cancel_links;
+  <div class="d-flex justify-content-center">
+    %include;buttons_dag
   </div>
+%end;
+%if;has_parents;
   <table class="tree-vert mx-auto my-3" style="border-width:%border;">
-    %if;(evar.t="T" and evar.t1="m")
+    %if;(e.t="T" and e.t1="m")
       %include;modules/arbre_9gen
-    %elseif(evar.t = "A" or evar.t = "C")
-      %if;(evar.t = "A")
+    %elseif(e.t="A" or e.t="C")
+      %if;(e.t="A")
         <tr>
           <td class="text-center">
-            %apply;male_line("self", evarv)
+            %apply;male_line("self", gen)
           </td>
         </tr>
-      %elseif;(evar.t = "C")
+      %elseif;(e.t="C")
         <tr>
           <td class="text-center">
-            %apply;female_line("self", evarv)
+            %apply;female_line("self", gen)
           </td>
         </tr>
       %end;
     %else;
-      %apply;tree(evarv)
+      %foreach;ancestor_tree_line(gen)
+        %apply;a_tree_line()
+      %end;
     %end;
   </table>
 %end;
