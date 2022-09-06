@@ -1,13 +1,13 @@
-<!-- $Id: js.txt, v7.00 13/04/2020 09:56:18 $ -->
+<!-- $Id: js.txt, v7.1 09/02/2022 23:51:17 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    <script src="https://code.jquery.com/jquery-3.5.0.min.js"
-      integrity="sha384-LVoNJ6yst/aLxKvxwp6s2GAabqPczfWh6xzm38S/YtjUyZ+3aTKOnD/OJVGYLZDl" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"
-      integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+      integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.1/js/bootstrap.bundle.min.js"
+      integrity="sha512-mULnawDVcCnsk9a4aG1QLZZ6rcce/jSzEGqUkeOLy0b6q0+T6syHrxlsAGH7ZVoqC93Pd0lBqd6WguPWih7VHA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   %else;
-    <script src="%static_path;js/jquery.min.js?version=3.5.0"></script>
-    <script src="%static_path;js/bootstrap.bundle.min.js?version=4.4.1"></script>
+    <script src="%static_path;js/jquery.min.js?version=3.6.0"></script>
+    <script src="%static_path;js/bootstrap.bundle.min.js?version=4.6.1"></script>
   %end;
   %if;(evar.m!="MOD_DATA")
   <script>
@@ -70,8 +70,61 @@
    %end;
   <script>autosize(document.querySelectorAll('textarea'));</script>
 %end;
+%if;(evar.templ="")
 <script><!-- focus on found autofocus input in opening BS modal -->
-$('.modal').on('shown.bs.modal', function() {
+  $('.modal').on('shown.bs.modal', function() {
   $(this).find('[autofocus]').focus();
 });
 </script>
+%end;
+%if;((evar.m="A" and evar.t="H") or (evar.m="D" and evar.t="D"))
+<script%if;(evar.templ!="") type="text/javascript"%end;>
+ <!--
+   $("#btnshowfilter").on("click", function() {
+    var nbinput = $('input.filter:text:disabled').length;
+    if (nbinput == 5) {
+      $('#input1').prop('disabled', false);
+      $('#filterbysurname').removeClass("d-none");
+      $('#total').addClass("text-muted");
+      $('#input1').focus(); }
+    else { 
+      $('.filter').prop('disabled', true);
+      $('#filterbysurname').addClass("d-none");
+      $('#total').removeClass("text-muted"); }
+  });
+  $("#btnplus").on("click", function() {
+    var len = $('.filter:text:not(:disabled)').length + 1;
+    $('#input'+len).removeClass("d-none").prop('disabled', false).focus();
+    if (len == 5) { $("#btnplus").addClass("disabled").attr('tabindex', '-1'); }
+  });
+  $("#btnclear").on("click", function() {
+    $('.extrafilter').val('').addClass("d-none").prop('disabled', true);
+    $('#input1').val('').focus();
+    $('#btnplus').removeClass('disabled').removeAttr('tabindex');
+    $('*[data-surname]').removeClass("d-none");
+  });
+  $('.filter').on("input", function(e) {
+    var input1 = $("#input1").val();
+    var input2 = $("#input2").val();
+    var input3 = $("#input3").val();
+    var input4 = $("#input4").val();
+    var input5 = $("#input5").val();
+    if (input1 == "") { var input1 = "_"; }
+    $('[data-surname]').addClass("d-none");
+    $('[data-surname*="' + input1 + '"]').removeClass("d-none");
+    $('[data-surname*="' + input2 + '"]').removeClass("d-none");
+    $('[data-surname*="' + input3 + '"]').removeClass("d-none");
+    $('[data-surname*="' + input4 + '"]').removeClass("d-none");
+    $('[data-surname*="' + input5 + '"]').removeClass("d-none");
+  });
+  function implex(xx) {
+    $('[class^="sosa_"]').css("background-color","");
+    $('.sosa_'+xx).add('.sosa_implex_'+xx).css("background-color","#CCFFFF");
+  }
+  function implexdesc(xx) {
+    $('a[data-index]').css("background-color","");
+    $('a[data-index="' + xx + '"]').css("background-color","#CCFFFF");
+  }
+  -->
+</script>
+%end;

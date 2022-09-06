@@ -1,4 +1,4 @@
-<!-- $Id: cousins_tools.txt, v7.00 03/04/2018 14:04:31 $ -->
+<!-- $Id: cousins_tools.txt, v7.1 25/11/2022 21:37:33 $ -->
 %define;url(vvv,ttt)
   %urlv.vvv.ttt;
 %end;
@@ -26,12 +26,12 @@
       </div>
     </div>
     <div class="align-items-center ml-1">
-      <a href="%apply;url2%with;v1%and;%if;(evar.v1!="" and evar.v1>1)&v1=%expr(evar.v1-1)%end;
+      <a href="%apply;url2%with;v1%and;%if;(evar.v1!="" and evar.v1>1)%expr(evar.v1-1)%end;
                 %and;v2%and;
                   %if;(evar.v2!="")
-                    %if;(evar.v2>1)&v2=%expr(evar.v2-1)%end;
+                    %if;(evar.v2>1)%expr(evar.v2-1)%end;
                   %else;
-                    %if;(evar.v1!="" and evar.v1>1)&v2=%expr(evar.v1-1)%end;
+                    %if;(evar.v1!="" and evar.v1>1)%expr(evar.v1-1)%end;
                   %end;
                 %end;"
          class="btn btn-sm btn-outline-secondary border-0

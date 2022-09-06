@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: relmenu.txt,v 5.6 18/07/2017 04:54:22 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: relmenu.txt, v. 7.0-exp 20/05/2020 17:16:08 ddr $ -->
+  <!-- Copyright (c) 1998-2020 INRIA -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
     %else;%first_name; %surname;%end; [and]0…%nn;
@@ -34,247 +34,178 @@
   %if;(alias != "") <em>(%alias;)</em>%end;
   %sp;[and]0...%nn;
 </h1>
-%define;ancestor_siblings(lll,ttt)
-  %reset_count;
-  %foreach;ancestor_level;
-    %if;(level=lll)
-      %foreach;ancestor;
-        %if;(ancestor.has_siblings)%incr_count;%end;
-      %end;
-    %end;
-  %end;
-  %if;(count>0)
-    <option id="uncleslll" value="lll">lll. [*ttt]</option>
-  %end;
-%end;
+
 <form name="relationship" method="submit" action="%action;">
   <div class="row">
-    <div class="col-9">
-      <div class="row">
-        <div class="col-5">
-          <div id="rel_form_shortcut" class="form-group">
-            <input type="hidden" name="em" value="R"%/>
-            %if;access_by_key;
-              <input type="hidden" name="ep" value="%first_name_key_val;"%/>
-              <input type="hidden" name="en" value="%surname_key_val;"%/>
-              %if;(occ != "0")
-                <input type="hidden" name="eoc" value="%occ;"%/>
-              %end;
-            %else
-              <input type="hidden" name="ei" value="%index;"%/>
-            %end;
-            <input type="hidden" name="m" value="NG"%/>
-            <span>[*relationship shortcut]</span>
-            <div class="mt-1 ml-2">
-              %if;(browsing_with_sosa_ref and self.index!=sosa_ref.index)
-                <div class="form-check">
-                  <label class="form-check-label">
-                    <input type="radio" class="form-check-input" name="select" value="%sosa_ref.index;" onclick="main()"%/>
-                    <i class="fa fa-dot-circle-o text-success"></i>%nn;
-                    <b>%sosa_ref;</b> ([Sosa] 1)
-                  </label>
-                </div>
-              %end;
-              %foreach;family;
-                %if;(spouse != "? ?")
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input type="radio" class="form-check-input" name="select" value="%spouse.index;" onclick="main()"%/>
-                      %spouse;
-                      %if;spouse.has_nobility_titles;,%sp;
-                      <em>%spouse.nobility_title;</em>%end;%nl;
-                      ([spouse/spouses]0)%nl;
-                    </label>
-                  </div>
-                %end;
-              %end;
-              %foreach;relation;
-                %if;has_relation_him;
-                <div class="form-check">
-                  <label class="form-check-label">
-                    <input type="radio" class="form-check-input" name="select" value="%relation_him.index;" onclick="main()"%/>
-                    %relation_him;
-                    %if;relation_him.has_nobility_titles;,%sp;
-                    <em>%relation_him.nobility_title;</em>%end;%nl;
-                    (%relation_him.type;)%nl;
-                  </label>
-                </div>
-                %end;
-                %if;has_relation_her;
-                <div class="form-check">
-                  <label class="form-check-label">
-                    <input type="radio" class="form-check-input" name="select" value="%relation_her.index;" onclick="main()"%/>
-                    %relation_her;
-                    %if;relation_her.has_nobility_titles;,%sp;
-                    <em>%relation_her.nobility_title;</em>%end;%nl;
-                    (%relation_her.type;)%nl;
-                  </label>
-                </div>
-                %end;
-              %end;
-              %foreach;related;
-              <div class="form-check">
-                <label class="form-check-label">
-                  <input type="radio" class="form-check-input" name="select" value="%related.index;" onclick="main()"%/>
-                  %related;
-                  %if;related.has_nobility_titles;,%sp;
-                  <em>%related.nobility_title;</em>%end;%nl;
-                  (%related.type;)%nl;
-                </label>
-              </div>
-              %end;
-              %foreach;event_witness_relation;
-                <div class="form-check">
-                  <label class="form-check-label">
-                    <input type="radio" class="form-check-input" name="select" value="%event_witness_relation.person.index;" onclick="main()"%/>
-                    %event_witness_relation.person;%nl;
-                    ([witness/witnesses]0)%nl;
-                  </label>
-                </div>
-              %end;
+    <div id="rel_form_shortcut" class="col-4">
+      <input type="hidden" name="em" value="R">
+      %if;access_by_key;
+        <input type="hidden" name="ep" value="%first_name_key_val;">
+        <input type="hidden" name="en" value="%surname_key_val;">
+        %if;(occ != "0")
+          <input type="hidden" name="eoc" value="%occ;">
+        %end;
+      %else
+        <input type="hidden" name="ei" value="%index;">
+      %end;
+      <input type="hidden" name="m" value="NG">
+      <span>[*relationship shortcut]</span>
+      <div class="mt-1 ml-2">
+        %if;(browsing_with_sosa_ref and self.index!=sosa_ref.index)
+          <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input" id="sel_sosa" name="select" value="%sosa_ref.index;" onclick="main()">
+            <label class="custom-control-label" for="sel_sosa"><i class="far fa-dot-circle text-success mr-1"></i><b>%sosa_ref;</b> ([Sosa] 1)</label>
+          </div>
+        %end;
+        %foreach;family;
+          %if;(spouse!="? ?")
+            <div class="custom-control custom-radio">
+              <input type="radio" class="custom-control-input" id="sel_spouse_%spouse.index;" name="select" value="%spouse.index;" onclick="main()">
+              <label class="custom-control-label" for="sel_spouse_%spouse.index;">%spouse;%if;spouse.has_nobility_titles;,%sp;
+                <em>%spouse.nobility_title;</em>%end; ([spouse/spouses]0)</label>
             </div>
-          </div>
-        </div>
-        <div id="rel_search">
-          <p>%hidden;</p>
-          <div id="rel_form_search" onclick="document.getElementById('radio_R').checked = 'checked'; main();">
-            <input type="hidden" name="em" value="R"%/>
-            %if;access_by_key;
-              <input type="hidden" name="ep" value="%first_name_key_val;"%/>
-              <input type="hidden" name="en" value="%surname_key_val;"%/>
-              %if;(occ != "0")
-                <input type="hidden" name="eoc" value="%occ;"%/>
-              %end;
-            %else
-              <input type="hidden" name="ei" value="%index;"%/>
-            %end;
-            <input type="hidden" name="m" value="NG"%/>
-            <label id="rel_search_title">
-              <input type="radio" id="radio_R" name="select" value="input" checked onclick="main()"%/>
-              [*search/case sensitive]0 [any individual in the base][:]<br>
-            </label>
-            <div id="rel_search_content">
-                  <label class="sr-only" for="firstname">[*first name/first names]0</label>
-                  <input type="search" id="firstname" class="form-control" name="fn" placeholder="[*first name/first names]0" autofocus/>
-                  <label class="sr-only" for="surname">[*surname/surnames]0</label>
-                  <input type="search" id="surname" class="form-control" name="sn" placeholder="[*surname/surnames]0"/>
-                  <label class="sr-only" for="n">[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…</label>
-                  <input type="search" id="n" class="form-control" name="n" placeholder="[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…"/>
+          %end;
+        %end;
+        %foreach;relation;
+          %if;has_relation_him;
+            <div class="custom-control custom-radio">
+              <input type="radio" class="custom-control-input" id="sel_rel_him_%relation_him.index;" name="select" value="%relation_him.index;" onclick="main()">
+              <label class="custom-control-label" for="sel_rel_him_%relation_him.index;">%relation_him;%if;relation_him.has_nobility_titles;,%sp;
+                <em>%relation_him.nobility_title;</em>%end; (%relation_him.type;)</label>
             </div>
-          </div>
-          <div id="rel_form_cousin" onclick="document.getElementById('radio_C').checked = 'checked'; main();">
-            <input type="hidden" name="m" value="C"%/>
-            %if;access_by_key;
-              <input type="hidden" name="p" value="%first_name_key_val;"%/>
-              <input type="hidden" name="n" value="%surname_key_val;"%/>
-              %if;(occ != "0")
-                <input type="hidden" name="oc" value="%occ;"%/>
-              %end;
-            %else
-              <input type="hidden" name="i" value="%index;"%/>
-            %end;
-            <label id="rel_cousin_title">
-              <input type="radio" id="radio_C" name="select" onclick="main()" value=""%/>
-              [*select] [close family][:]<br>
-            </label>
-            <div id="rel_cousin_content">
-              <select id="sel_C" class="form-control" name="v1" onfocus="document.getElementById('radio_C').checked=true; main()" onchange="main()">
-                %if;has_siblings;
-                  <option id="siblings" value="1">1. [*siblings]</option>
-                %end;
-                %if;has_nephews_or_nieces;
-                  <option id="nephew" value="1">     ↳  [*a nephew/a niece]4</option>
-                  <option id="grnephew" value="1">          ↳  [*a great-nephew/a great-niece]4</option>
-                %end;
-                %if;(father.has_siblings or mother.has_siblings)
-                  <option id="uncles" value="2">2. [*uncles and aunts]</option>
-                %end;
-                %foreach;cousin_level;
-                  %if;(level=2)
-                    <option value="2">     ↳  [*cousins]</option>
-                    %( <option id="childcous" value="2">     ↳  [*children of cousins]</option>%)
-                  %end;
-                %end;
-                %apply;ancestor_siblings(3,"siblings of the grandparents")
-                <option id="parcousins" value="3">      ↳  %apply;a_of_b%with;[*cousins]3%and;[the father/the mother/a parent]2%end;</option>
-                %foreach;cousin_level;
-                  %if;(level=3)
-                    <option value="3">            ↳ [*2nd cousins]</option>
-                  %end;
-                %end;
-                %apply;ancestor_siblings(4,"siblings of the great-grandparents")
-                <option id="grparcousins" value="4">      ↳  %apply;a_of_b%with;[*cousins]3%and;[a grandfather/a grandmother/a grandparent]2%end;</option>
-                <option id="parcousins2" value="4">            ↳  %apply;a_of_b%with;[*2nd cousins]3%and;[the father/the mother/a parent]2%end;</option>
-                %foreach;cousin_level;
-                  %if;(level=4)
-                    <option value="4">                ↳ [*3rd cousins]</option>
-                  %end;
-                %end;
-                <option class="text-uppercase" selected disabled>--</option>
-                %foreach;cousin_level;
-                  %if;(level>4)
-                    <option value="%level;">%level;. %apply;nth_cousins%with;%apply;nth%with;zero/[nth (cousin)]%and;%level;%end;%end;</option>
-                  %end;
-                %end;
-              </select>
-              <input type="hidden" id="v2" name="v2" value=""/>
+          %end;
+          %if;has_relation_her;
+            <div class="custom-control custom-radio">
+              <input type="radio" class="custom-control-input" id="sel_rel_her_%relation_her.index;" name="select" value="%relation_her.index;" onclick="main()">
+              <label class="custom-control-label" for="sel_rel_her_%relation_her.index;">%relation_her;%if;relation_her.has_nobility_titles;,%sp;
+                <em>%relation_her.nobility_title;</em>%end; (%relation_her.type;)</label>
             </div>
+          %end;
+        %end;
+        %foreach;related;
+          <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input" id="sel_related_%related.index;" name="select" value="%related.index;" onclick="main()">
+            <label class="custom-control-label" for="sel_related_%related.index;">%related;%if;related.has_nobility_titles;,%sp;
+              <em>%related.nobility_title;</em>%end; (%related.type;)</label>
           </div>
-          <div class="text-center my-5">
-            <button type="submit" class="btn btn-outline-secondary btn-lg">[*validate/delete]0</button>
+        %end;
+        %foreach;event_witness_relation;
+          <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input" id="sel_witness_%event_witness_relation.person.index;" name="select" value="%event_witness_relation.person.index;" onclick="main()">
+            <label class="custom-control-label" for="sel_witness_%event_witness_relation.person.index;">%event_witness_relation.person; ([witness/witnesses]0)</label>
           </div>
-        </div>
+        %end;
       </div>
     </div>
-    <div class="col mt-3">
-      <div class="row" id="rel_mode">
-        <span class="font-weight-bold">[*relationship computing mode][:]</span>
+    <div class="col-4">
+      %hidden;
+      <div id="rel_form_search" onclick="document.getElementById('radio_R').checked = 'checked'; main();">
+        <input type="hidden" name="em" value="R"%/>
+        %if;access_by_key;
+          <input type="hidden" name="ep" value="%first_name_key_val;"%/>
+          <input type="hidden" name="en" value="%surname_key_val;"%/>
+          %if;(occ != "0")
+            <input type="hidden" name="eoc" value="%occ;"%/>
+          %end;
+        %else
+          <input type="hidden" name="ei" value="%index;"%/>
+        %end;
+        <input type="hidden" name="m" value="NG"%/>
+        <div class="custom-control custom-radio">
+          <input type="radio" class="custom-control-input" id="radio_R" name="select" value="input" onclick="main()" checked>
+          <label class="custom-control-label" for="radio_R">[*search/case sensitive]0 [any individual in the base][:]</label>
+        </div>
+        <div>
+          <label class="sr-only" for="n">[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…</label>
+          <input type="search" id="n" class="form-control mt-1" name="n" placeholder="[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to]%end;…" autofocus>
+          <label class="sr-only" for="firstname">[*first name/first names]0</label>
+          <input type="search" id="firstname" class="form-control" name="fn" placeholder="[*first name/first names]0">
+          <label class="sr-only" for="surname">[*surname/surnames]0</label>
+          <input type="search" id="surname" class="form-control" name="sn" placeholder="[*surname/surnames]0">
+        </div>
+      </div>
+      <div class="text-center my-4">
+        <button type="submit" class="btn btn-outline-primary btn-lg">[*validate/delete]0</button>
+      </div>
+    </div>
+    <div class="col-4 flex-column">
+      <div>
+        <span>[*relationship computing mode][:]</span>
         <div class="ml-2 mt-1">
-          <div class="form-check" id="rel_ancestors">
-            <label class="form-check-label"><input type="radio" class="form-check-input" name="et" value="A" checked%/>
-            [*relationship by ancestors]</label>
+          <div class="custom-control custom-radio" id="rel_shortest_path">
+            <input type="radio" class="custom-control-input" id="etS" name="et" value="S" checked>
+            <label class="custom-control-label" for="etS">[*shortest path]</label>
           </div>
-          <div class="form-check" id="rel_by_marriage">
-            <label class="form-check-label"><input type="radio" class="form-check-input" name="et" value="M"%/>
-            [*relationship by marriage]</label>
+          <div class="custom-control custom-radio" id="rel_ancestors">
+            <input type="radio" class="custom-control-input" id="etA" name="et" value="A">
+            <label class="custom-control-label" for="etA">[*relationship by ancestors]</label>
           </div>
-          <div class="form-check" id="rel_shortest_path">
-            <label class="form-check-label"><input type="radio" class="form-check-input" name="et" value="S"%/>
-            [*shortest path]</label>
+          <div class="custom-control custom-radio" id="rel_by_marriage">
+            <input type="radio" class="custom-control-input" id="etM" name="et" value="M">
+            <label class="custom-control-label" for="etM">[*relationship by marriage]</label>
           </div>
         </div>
       </div>
-      <div class="row">
-        <span class="font-weight-bold">[*relationship display options]</span>
-        <div class="ml-2 mt-1">
-          <div class="form-check">
-            <label class="form-check-label"><input type="checkbox" class="form-check-input" name="spouse" value="on"%/> [*display spouse]</label>
-          </div>
-          <div class="form-check">
-            %( default value if "image" is undefined is "on" %)
-            <input type="hidden" name="image" value="off">
-            <label class="form-check-label"><input type="checkbox" class="form-check-input" name="image" value="on"%/> [*display picture]1</label>
-          </div>
-          <div class="form-check">
-            <label class="form-check-label"><input type="checkbox" class="form-check-input" name="long" value="on"%/> [*long display]</label>
-          </div>
-          <div class="form-inline d-flex">
-            <label class="col-form-label" for="bd">[*border][:]</label>
-            <div class="input-group input-group-sm ml-2 mt-1 ">
-              <input type="number" class="form-control form-control-sm" id="bd" name="bd" min="0" max="15" placeholder="0" value=""/>
-              <div class="input-group-addon">px</div>
+      <div class="mt-2">
+        <span>[*relationship display options]</span>
+          <div class="ml-2 mt-1">
+            <div class="custom-control custom-checkbox">
+              <input type=checkbox class="custom-control-input" id="long" name="long">
+              <label class="custom-control-label" for="long">[*long display]</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type=checkbox class="custom-control-input" id="spouse" name="spouse">
+              <label class="custom-control-label" for="spouse">[*display spouse]</label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="image" name="image" value="off">
+              <label class="custom-control-label" for="image">[*visualize/show/hide/summary]2 [image/images]1 <span class="text-info">✘</span></label>
             </div>
           </div>
-          <span>[*color][:]</span>
-          <div class="form-check form-check-inline ml-1">
-            <label class="form-check-label"><input type="radio" class="form-check-input mx-1" name="color" value="" checked%/>0</label>
-            <label class="form-check-label bg1"><input type="radio" class="form-check-input mx-1" name="color" value="bg1"%/>1</label>
-            <label class="form-check-label bg2"><input type="radio" class="form-check-input mx-1" name="color" value="bg2"%/>2</label>
-            <label class="form-check-label bg3"><input type="radio" class="form-check-input mx-1" name="color" value="bg3"%/>3</label>
-            <label class="form-check-label bg4"><input type="radio" class="form-check-input mx-1" name="color" value="bg4"%/>4</label>
-            <label class="form-check-label bg5"><input type="radio" class="form-check-input mx-1" name="color" value="bg5"%/>5</label>
-            <label class="form-check-label bg6"><input type="radio" class="form-check-input mx-1" name="color" value="bg6"%/>6</label>
+          %(
+          <div class="form-group row ml-2 mt-3">
+            <label class="col-form-label ml-4" for="bd">[*border][:]</label>
+            <div class="input-group col-6">
+              <input type="number" class="form-control" id="bd" name="bd" min="0" max="15" placeholder="0">
+              <div class="input-group-append">
+                <div class="input-group-text">px</div>
+              </div>
+            </div>
           </div>
+          <fieldset class="form-group ml-2 mt-2">
+            <legend class="col-form-label ml-4 pt-0">[*color][:]</legend>
+            <div class="flex-row align-item-center">
+              <div class="form-check form-check-inline mx-0 px-1">
+                <input class="form-check-input" type="radio" id="color" name="color" value="" checked>
+                <label class="form-check-label" for="color">0</label>
+              </div>
+              <div class="form-check form-check-inline mx-0 px-1 bg1">
+                <input class="form-check-input" type="radio" id="color1" name="color" value="bg1">
+                <label class="form-check-label" for="color1">1</label>
+              </div>
+              <div class="form-check form-check-inline bg2 mx-0 px-1">
+                <input class="form-check-input" type="radio" id="color2" name="color" value="bg2">
+                <label class="form-check-label" for="color2">2</label>
+              </div>
+              <div class="form-check form-check-inline bg3 mx-0 px-1">
+                <input class="form-check-input" type="radio" id="color3" name="color" value="bg3">
+                <label class="form-check-label" for="color3">3</label>
+              </div>
+              <div class="form-check form-check-inline bg4 mx-0 px-1">
+                <input class="form-check-input" type="radio" id="color4" name="color" value="bg4">
+                <label class="form-check-label" for="color4">4</label>
+              </div>
+              <div class="form-check form-check-inline bg5 mx-0 px-1">
+                <input class="form-check-input" type="radio" id="color5" name="color" value="bg5">
+                <label class="form-check-label" for="color5">5</label>
+              </div>
+              <div class="form-check form-check-inline bg6 mx-0 px-1">
+                <input class="form-check-input" type="radio" id="color6" name="color" value="bg6">
+                <label class="form-check-label" for="color6">6</label>
+              </div>
+            </div>
+          </fieldset>
+          %)
         </div>
       </div>
     </div>
@@ -283,16 +214,12 @@
 %include;trl
 %include;copyr
 </div>
-
 <script>
 <!--
   function enable(id) {
     var inputs = document.getElementById(id).getElementsByTagName('input');
     for (i=0; i<inputs.length; i++) {
       inputs[i].disabled = '';
-    }
-    if (id == "rel_form_cousin") {
-      document.getElementById('sel_C').disabled = '';
     }
   }
 
@@ -303,74 +230,17 @@
         inputs[i].disabled = 'disabled';
       }
     }
-    if (id == "rel_form_cousin") {
-      document.getElementById('sel_C').disabled = 'disabled';
-    }
-  }
-
-  function hide_mode() {
-    var title = document.getElementById("rel_mode");
-    var mode1 = document.getElementById("rel_ancestors");
-    var mode2 = document.getElementById("rel_by_marriage");
-    var mode3 = document.getElementById("rel_shortest_path");
-    title.style.display = 'none';
-    mode1.style.display = 'none';
-    mode2.style.display = 'none';
-    mode3.style.display = 'none';
-  }
-
-  function show_mode() {
-    var title = document.getElementById("rel_mode");
-    var mode1 = document.getElementById("rel_ancestors");
-    var mode2 = document.getElementById("rel_by_marriage");
-    var mode3 = document.getElementById("rel_shortest_path");
-    title.style.display = 'block';
-    mode1.style.display = 'block';
-    mode2.style.display = 'block';
-    mode3.style.display = 'block';
   }
 
   function main() {
     %( recherche individu %)
     if (radio_R.checked == true) {
-      disable("rel_form_cousin");
       disable("rel_form_shortcut");
       enable("rel_form_search");
-      enable("rel_mode");
-      show_mode();
     }
-    %( recherche d'un proche %)
-    else if (radio_C.checked == true) {
-      disable("rel_form_search");
-      disable("rel_form_shortcut");
-      disable("rel_mode");
-      hide_mode();
-      enable("rel_form_cousin");
-      if (siblings!=null && siblings.selected == true ||
-            uncles!=null && uncles.selected == true ||
-           uncles3!=null && uncles3.selected == true ||
-           uncles4!=null && uncles4.selected == true ||
-           uncles5!=null && uncles5.selected == true ) {
-          v2.value = "1";
-      } else if ( nephew!=null && nephew.selected == true ||
-                 parcousins!=null && parcousins.selected == true ||
-               grparcousins.selected == true ) {
-          v2.value = "2";
-      } else if ( grnephew.selected == true ||
-               parcousins2.selected == true ) {
-          v2.value = "3";
-      }
-        else {
-          v2.value = "";
-      }
-    }
-    %( raccourcis %)
     else {
       disable("rel_form_search");
-      disable("rel_form_cousin");
       enable("rel_form_shortcut");
-      enable("rel_mode");
-      show_mode();
     }
   }
 -->

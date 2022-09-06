@@ -1,10 +1,27 @@
 
 h1, h2, h3, h4, h5, h6 { font-weight: lighter !important; }
 
-
+#content:focus { outline: none; }
 /* Remove overused p anchor top margin*/
 p {
 	margin-top:1rem;
+}
+
+/* Relation menu table */
+#quickrel.table td{
+	padding: 0px;
+	vertical-align: middle;
+	height: 140px;
+}
+
+.tooltip.show {
+  opacity: 1;
+}
+
+.tooltip-inner {
+   white-space: nowrap;
+   max-width: 450px;
+   opacity: 1 !important;
 }
 
 /*! Small webfont with 50 monospaced glyphs for descending tree view	p {
@@ -18,7 +35,8 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
     font-weight: normal;	
     font-style: normal;	
 }
-tt {font-family: 'dejavu_sans_mono';}	
+.tt {font-family: 'dejavu_sans_mono';}	
+.deslist, .anclist_hr {line-height:1rem;font-size:1rem;}
 
 .unselectable {
   -moz-user-select: none;
@@ -240,7 +258,11 @@ span.image_small_size {
 
 /* Fix dag line height */
 table#dag {
-  line-height: 1.05
+  empty-cells: show;
+}
+tr#dag, td#dag {
+  font-family:Noto Sans;
+  vertical-align:top;
 }
 
 /* Sex symbol color */
@@ -267,11 +289,6 @@ table#dag {
 a.male-underline:hover { border-bottom: 1px solid #318CE7; }
 a.female-underline:hover { border-bottom: 1px solid #F653A6; }
 a.neuter-underline:hover { border-bottom: 1px solid grey; }
-
-/* Fixed width button in books indexes using monospace font */
-a.book-char{
-  font-family: monospace, monospace;
-}
 
 /* Fix noword-wrap on long a href */
 a {
@@ -553,59 +570,6 @@ a:hover.date
  background-color: #6f8301;
  color: white;
 }
-
-
-/* Menu ascendance descendance commun */
-div.menu_anc_des {
-background-repeat:repeat-x;
-position:relative;
-top:-15px;
-margin:0;
-padding:0;
-}
-
-div.menu_anc_des div.menu {
-border-width:1px;
-border-style:solid;
-border-radius:10px;
-width:250px;
-float:left;
-margin:25px 15px 25px 15px;
-background-color:white;
-background-position:0 100%;
-background-repeat:repeat-x;
-}
-
-div.menu_anc_des div.menu ul {
-padding:0;
-padding-left:5px;
-list-style-type:none;
-}
-
-div.menu_anc_des div.menu ul li{
-padding:5px;
-}
-
-div.menu_anc_des div.menu h2 {
-margin:10px;
-}
-
-div.menu_anc_des_example {
-text-align:center;
-display:none;
-padding:25px 15px 25px 15px;
-}
-
-div.menu_anc_des_example span{
-padding-top:15px;
-display:block;
-}
-
-div.menu_anc_des_example img{
-box-shadow:5px 5px 5px #cdc3c6;
-}
-
-
 
 /* Properties of the navigation block. Page perso.txt      */
 /* Trick : to center easily this block, one must add the   */
@@ -1044,29 +1008,6 @@ table.display_search
  border:2px solid #F0ECED;
 }
 
-
-/* --------------------------------- Tips --------------------------------- */
-
-div.tips {
- padding:0px 0px 0px 50px;
- min-height:50px;
- background-color:#E7EDB3;
- background-position:5px center;
- background-repeat: no-repeat;
- margin-right:60px;
-}
-
-div.tips table {
- height:50px;
- margin:0;
- color: #514549;
-}
-
-div.tips table td{
- vertical-align:middle;
-}
-
-
 /* ----------------------- Simulate a select button ----------------------- */
 
 div.select
@@ -1153,64 +1094,6 @@ div.select:hover ul
 {
   display:block;
   z-index:100;
-}
-
-/* ----------------------------- Relationship ----------------------------- */
-
-#rel_form_search, #rel_form_cousin, #rel_form_shortcut, #rel_options
-{
-  margin: 10px;
-}
-
-#rel_search_content, #rel_cousin_content
-{
-  margin-left: 25px;
-}
-
-#rel_search
-{
-  float: left;
-  width:45%;
-  padding-right:10px;
-}
-
-#rel_form_search span
-{
-  font-weight:bold;
-}
-
-#rel_search_title
-{
-  font-weight:bold;
-}
-
-#rel_form_search ul
-{
-  list-style-type: none;
-  margin:0;
-  padding:0;
-}
-
-#rel_cousin_title
-{
-  font-weight:bold;
-}
-
-#rel_form_cousin span
-{
-  font-weight:bold;
-}
-
-#rel_form_shortcut span
-{
-  font-weight:bold;
-}
-
-#rel_form_shortcut ul
-{
-  list-style-type: none;
-  margin:0;
-  padding:0;
 }
 
 /* --- Ascendants/Descendants trees --- */

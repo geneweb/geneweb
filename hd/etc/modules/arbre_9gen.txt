@@ -229,12 +229,12 @@
       %if;(level>1 and level<5)
         %if;(evar.cgl!="on")
           %if;(evar.nav="on")
-        <a href="%prefix_no_pmod;m=A;p=%ancestor.first_name;;n=%ancestor.surname;;oc=%ancestor.occ;;%nn;
+        <a href="%prefix_set.pmod;m=A;p=%ancestor.first_name;;n=%ancestor.surname;;oc=%ancestor.occ;;%nn;
                maxv=;v=7;t=T;marriage=on;image=on;bd=;color=on;t1=m;nav=on"%nn;
         title="Sosa %if;(ancestor.same != "")%ancestor.same;%else;%ancestor.anc_sosa;%end;[:] ♂%nn;
       %ancestor.first_name; %ancestor.surname; (%ancestor.occ) – [*generation/generations]0 %level;">
       %else;
-        <a href="%prefix_no_pmod;%ancestor.access;">
+        <a href="%prefix_set.pmod;%ancestor.access;">
       %end;
     %end;
       %ancestor.first_name; %ancestor.surname;%if;(evar.cgl!="on")</a>%end;<br>
@@ -252,12 +252,12 @@
       </tr></table>
         %if;(evar.cgl!="on")
           %if;(evar.nav="on")
-            <a href="%prefix_no_pmod;m=A;p=%ancestor.spouse.first_name;;n=%ancestor.spouse.surname;;oc=%ancestor.spouse.occ;;%nn;
+            <a href="%prefix_set.pmod;m=A;p=%ancestor.spouse.first_name;;n=%ancestor.spouse.surname;;oc=%ancestor.spouse.occ;;%nn;
               maxv=;v=7;t=T;marriage=on;image=on;bd=;color=on;t1=m;nav=on"%nn;
               title="Sosa %expr(ancestor.anc_sosa+1)[:] ♀%nn;
               %ancestor.spouse.first_name; %ancestor.spouse.surname; (%ancestor.spouse.occ) – [*generation/generations]0 %level;">
           %else;
-            <a href="%prefix_no_pmod;%ancestor.spouse.access;">
+            <a href="%prefix_set.pmod;%ancestor.spouse.access;">
           %end;
         %end;
         %ancestor.spouse.first_name; %ancestor.spouse.surname;
@@ -269,12 +269,12 @@
       %if;(level> 4)
         %if;(evar.cgl!="on")
           %if;(evar.nav="on")
-        <a href="%prefix_no_pmod;m=A;p=%ancestor.first_name;;n=%ancestor.surname;;oc=%ancestor.occ;;%nn;
+        <a href="%prefix_set.pmod;m=A;p=%ancestor.first_name;;n=%ancestor.surname;;oc=%ancestor.occ;;%nn;
                maxv=;v=7;t=T;marriage=on;image=on;bd=;color=on;t1=m;nav=on"%nn;
         title="Sosa %if;(ancestor.same != "")%ancestor.same;%else;%ancestor.anc_sosa;%end;[:] ♂%nn;
       %ancestor.first_name; %ancestor.surname; (%ancestor.occ) – [*generation/generations]0 %level;">
       %else;
-        <a href="%prefix_no_pmod;%ancestor.access;">
+        <a href="%prefix_set.pmod;%ancestor.access;">
       %end;
     %end;
       %if;(ancestor.same != "")%ancestor.same;%else;%ancestor.anc_sosa;%end;%if;(evar.cgl!="on")</a>%end;

@@ -70,7 +70,7 @@
       fam7_no_date%nn;
     %end;
   %and;
-    %xx.has_sosa;
+    .%xx.has_sosa;
   %and;
     %if;("lexa" = "him/her")fam7_him_her%end;
   %and;
@@ -133,7 +133,7 @@
       fam7_no_date%nn;
     %end;
   %and;
-    %xx.has_sosa;
+    .%xx.has_sosa;
   %and;
     %if;("lexa" = "him/her")
       fam7_him_her%nn;

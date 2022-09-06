@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updind.txt, v7.00-exp 31/08/2018 09:21:253 $ -->
+  <!-- $Id: updind.txt, v7.00-exp 13/05/2020 17:53:03 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
@@ -18,24 +18,24 @@
   %include;hed
 </head>
 <body%body_prop; id="person">
-<div class="container">
+<div class="container pl-lg-0 pr-lg-3 px-xl-3">
 %message_to_wizard;
 %( do not use %include;perso_header %)
 %include_perso_header;
 
 %define;nav()
   <div class="container fixed-top" role="navigation">
-    <nav class="navbar navbar-light bg-white justify-content-end" id="banner">
+    <nav class="navbar navbar-light bg-white justify-content-center" id="banner">
       <nav class="nav nav-pills nav-fill">
-        <a class="nav-item nav-link" href="#person" title="[*person/persons]0"><i class="fa fa-user fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*person/persons]0</span></a>
-        <a class="nav-item nav-link" href="#birth" title="[*birth]"><i class="fa fa-birthday-cake fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
-        <a class="nav-item nav-link" href="#baptism" title="[*baptism]"><i class="fa fa-dove fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*baptism]</span></a>
-        <a class="nav-item nav-link" href="#death" title="[*death]"><i class="fa fa-cross fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*death]</span></a>
-        <a class="nav-item nav-link" href="#burial" title="[*burial]"><i class="fa fa-pray fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*burial]</span></a>
-        <a class="nav-item nav-link" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*event/events]1</span></a>
-        <a class="nav-item nav-link" href="#relations" title="[*relation/relations]1"><i class="fa fa-users fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*relation/relations]1</span></a>
-        <a class="nav-item nav-link" href="#titles" title="[*title/titles]1"><i class="fa fa-award fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*title/titles]1</span></a>
-        <a class="nav-item nav-link" href="#notes" title="[*note/notes]1"><i class="fa fa-file-alt fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*note/notes]1</span></a>
+        <a class="nav-item nav-link px-1 py-1" href="#person" title="[*person/persons]0"><i class="fa fa-user fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*person/persons]0</span></a>
+        <a class="nav-item nav-link px-1 py-1" href="#birth" title="[*birth]"><i class="fa fa-birthday-cake fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
+        <a class="nav-item nav-link px-1 py-1" href="#baptism" title="[*baptism]"><i class="fa fa-dove fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*baptism]</span></a>
+        <a class="nav-item nav-link px-1 py-1" href="#death" title="[*death]"><i class="fa fa-cross fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*death]</span></a>
+        <a class="nav-item nav-link px-1 py-1" href="#burial" title="[*burial]"><i class="fa fa-pray fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*burial]</span></a>
+        <a class="nav-item nav-link px-1 py-1" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*event/events]1</span></a>
+        <a class="nav-item nav-link px-1 py-1" href="#relations" title="[*relation/relations]1"><i class="fa fa-users fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*relation/relations]1</span></a>
+        <a class="nav-item nav-link px-1 py-1" href="#titles" title="[*title/titles]1"><i class="fa fa-award fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*title/titles]1</span></a>
+        <a class="nav-item nav-link px-1 py-1" href="#notes" title="[*note/notes]1"><i class="fa fa-file-alt fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*note/notes]1</span></a>
       </nav>
     </nav>
   </div>
@@ -47,7 +47,7 @@
 %end;
 
 %define;date(xlab,xvar,xdt,xcond)
-  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="1" maxlength="2" xcond%in;
+  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2" xcond%in;
   %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2" xcond%in;
   %let;year_input;pattern="[?><~/-+]?\d*/?" size="4" maxlength="8" xcond%in;
   <div class="row justify-content-sm-between justify-content-md-start">
@@ -1114,7 +1114,7 @@
 %define;insert_relation(xx)
   <div class="row">
     <span class="col-form-label col-2">[*insert]</span>
-    <div class="btn-group col-10">
+    <div class="btn-group col-auto">
       <label class="btn btn-outline-secondary mb-0">1 [relation/relations]0
         <input class="ml-1" type="checkbox" name="add_relationxx" value="on">
       </label>
