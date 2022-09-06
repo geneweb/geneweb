@@ -9,7 +9,7 @@
 tt {font-family: 'dejavu_sans_mono';}
 /* Properties of all html pages.*/
 input[type=number]::-webkit-inner-spin-button {opacity:1}
-html{color:#EEF;background-color:#000;}
+html{color:#FFF;background-color:#000;}
 /* placeholder color, don't concatenate */
 ::-webkit-input-placeholder {color:#aaa;}
 ::-moz-placeholder {color:#aaa;}
@@ -24,8 +24,7 @@ legend{margin-left:10px;line-height:25px;height:25px;}
 dt{font-weight:500;}
 dt:first-letter{font-size:120%;font-family:serif;}
 abbr{border-bottom:dashed 1px #EE9;}
-abbr:hover{cursor:help;}
-.abbr1{border:none;}
+.abbr1{border:none;text-decoration:none;}
 pre{font-size:1em;font-family:monospace,monospace;}
 .ul_0{margin:0;padding-left:10px;list-style-type:none;}
 .color_sosa{color:#FC0;}
@@ -193,6 +192,8 @@ input[type='submit']{line-height:14px;height:24px;}
 #upd .e{width:166px;}
 #upd .jq2,#upd .jq4{text-align:left;}
 code{font-size:12px;color:#999;font-family:monospace;}
+.tt {font-family:monospace;}
+.deslist {line-height:12pt;font-size:12pt;font-family:monospace;}
 #upd #notes{min-height:270px;max-height:540px;width:415px;height:270px;}
 #notes:focus{background-color:#FAFAFA}
 #upd #notes1{min-height:1em;}

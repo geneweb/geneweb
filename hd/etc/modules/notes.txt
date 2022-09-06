@@ -88,7 +88,7 @@
     %end;
     %foreach;family;
       %if;(has_comment or has_marriage_note)
-        <h3>[*marriage notes/marriages notes]0%sp;
+        <h3>[*marriage notes/marriages notes]1%sp;
         [with] %spouse.first_name; %spouse.surname;</h3>
       %end;
       <blockquote>%nn;

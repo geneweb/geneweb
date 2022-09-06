@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: anclist.txt,v 7.00 2018-04-28 13:15:18 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 7.00 26/09/2020 12:05:01 ddr Exp $ -->
   <title>%nn;
     %if;(evar.t = "F")- [*surnames branch] -%nn;
     %else
@@ -27,28 +27,13 @@
 %include;perso_utils
 %if;not cancel_links;
   %include;menubar
+  %include;buttons
 %end;
-
-<script type="text/javascript">
-  <!--
-  function over1(xx)
-  {
-   document.getElementById(xx).style.backgroundColor="#CBFECE";
-   return false;
-  }
-  function out1(xx)
-  {
-   document.getElementById(xx).style.backgroundColor="";
-   return false;
-  }
-  -->
-</script>
-
-%define;implex1(xx)
-  onmouseover="over1('xx')" onmouseout="out1('xx')" %nn;
-%end;
-
-<h1>%nn;
+%let;lvL;
+  %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
+  %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
+%in;
+<h3>%nn;
   %if;(evar.t = "F")
     %if;(public_name != "")%public_name;%else;%first_name;%end;
     %if;(qualifier != "") <em>%qualifier;</em>%end;
@@ -63,18 +48,12 @@
     - [*list eclair] -
   %else;
     %apply;a_of_b%with;[*ancestors]%and;
-      %if;(public_name != "")%public_name;%else;%first_name;%end;
-      %if;(qualifier != "") <em>%qualifier;</em>%end;
-      %sp;%surname;
-      %if;(alias != "") <em>(%alias;)</em>%end;
+      %if;(public_name!="")%public_name;%else;%first_name;%end; %surname; %end;
+    %if;(evar.t="D")[up to] %pvar.1;
+    %elseif;(evar.t="H")<small class="text-muted">%apply;togena(lvL)</small>
     %end;
-    %if;(evar.t = "D") [up to] %pvar.1;%end;
   %end;
-</h1>
-
-%if;not cancel_links;
-  %include;buttons
-%end;
+</h3>
 
 %define;ancestors_by_list(xx, nnn)
   %if;(xx.has_parents and nnn > 1)
@@ -88,68 +67,84 @@
     </ul>
   %end;
 %end;
-
-%define;ancestors_horizontally(pp, xx, ss1, ss2, ss3, zz)
-  %if;(xx > 0)
-    %if;(pp.sosa=zz or (not browsing_with_sosa_ref) or evar.implx="")
-      %if;(pp.has_parents)
-        %apply;ancestors_horizontally(
-          "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
-          "ss1&nbsp;┌──&nbsp;", "ss1&nbsp;|&nbsp;&nbsp;&nbsp;", zz*2)
-      %end;
-      <samp>ss2</samp>%nn;
+%define;anc_row_hr(pp, vv, zz, ss1, ss2, ss3)
+  %(if;("pp"="self")  <a role="button" onclick="implex('%pp.sosa.v;')"%(filter('%evar.surname1;','%evar.surname2;','%evar.surname3;')"
+        "><i class="fa fa-random fa-fw fa-sm mx-1" aria-hidden="true"></i></a><br>%end; %)
+  %if;(vv > 0 and ((pp.surname is_substr evar.surname1) or (pp.surname is_substr evar.surname2) or (pp.surname is_substr evar.surname3)))%)
+  %if;(vv>0)
+    %if;(pp.has_parents and (pp.sosa.v=zz or evar.implx!="on"))
+      %apply;anc_row_hr("pp.father", vv-1, zz*2, "ss1     ", "ss1 ┌──╴", "ss1 |   ")
+    %end;
+    %(  or not browsing_with_sosa_ref à replacer ! %)
+    <span data-surname="_%pp.surname;">
+    <span>ss2</span>%nn;
+    <span>%nn;
+      %if;(not cancel_links)<a href="%prefix;%pp.access;"
+        class="sosa_%if;(pp.sosa.v!=zz)implex_%end;%pp.sosa.v;" role="button">%pp;</a>%nn;
+      %else;%pp;%end;%pp.title;%pp.dates;%nn;
+    </span>
+    %if;(pp.sosa.v!=zz and evar.force!="on")
       %if;(not cancel_links)
-        <a id="sosa_%pp.sosa;" href="%prefix;%pp.access;">%pp;</a>
-      %else;
-        %pp;%nn;
+        <a role="button" onclick="implex('%pp.sosa.v;')"
+          title="[*implex/implexes]0, [see above] [*Sosa] %pp.sosa;">%nn;
+        <i class="fa fa-random fa-fw fa-sm mx-1" aria-hidden="true"></i>
+          <span class="sr-only">%sp;(==)%sp;</span></a>
+      %else;<i class="fa fa-random fa-fw fa-sm mx-1" aria-hidden="true"></i>%nn;
+            <span class="sr-only">%sp;(==)%sp;</span>
       %end;
-      %pp.title;%pp.dates;<br>
-      %if;(pp.has_parents)
-        %apply;ancestors_horizontally(
-          "pp.mother", xx - 1, "ss3&nbsp;|&nbsp;&nbsp;&nbsp;",
-          "ss3&nbsp;└──&nbsp;", "ss3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", zz*2+1)
-      %end;
-    %else;
-      %let;sss;sosa_%pp.sosa;%in;
-      <samp>ss2</samp>%nn;
-      %if;(not cancel_links)
-        <a href="%prefix;%pp.access;">%pp;</a>
-        <a href="#%sss;" %apply;implex1(sss)
-          title="[implex/implexes]0, [see above] zz">%nn;
-        <i class="fa fa-random  fa-fw mx-0" aria-hidden="true"></i>
-        <span class="sr-only">%sp;(==)%sp;</span></a><br>
-      %else;
-        %pp;<i class="fa fa-random  fa-fw mx-0" aria-hidden="true"></i>%nn;
-        <span class="sr-only">%sp;(==)%sp;</span><br>
-      %end;
+    %end;
+    <br>
+    </span>
+    %if;(pp.has_parents and (pp.sosa.v=zz or evar.implx!="on"))
+      %apply;anc_row_hr("pp.mother", vv-1, zz*2+1, "ss3 |   ", "ss3 └──╴", "ss3     ")
     %end;
   %end;
 %end;
-
+%define;input(xx)
+  <label class="sr-only mt-2" for="inputxx">Filtre xx</label>
+  <input type="text" id="inputxx" placeholder="[surname/surnames]0xx" title="[filter by::surname/surnames]0xx" class="filter%if;(xx>1) extrafilter%end; form-control-sm mr-1%if;(xx!=1) d-none%end;" disabled>
+%end;
 %if;(evar.v = "" or evar.v <= 1)
   [*specify::generation/generations]0.
 %else;
   %if;(evar.t = "L")
     %( by list %)
-    %let;xx;
-      %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
-      %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
-    %in;
     <p>%apply;togena(xx).</p>
-    %apply;ancestors_by_list("self", xx)
+    %apply;ancestors_by_list("self", lvL)
 
-  %elseif;(evar.t = "H")
-    %( horizontally %)
-    %let;xx;
-      %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
-      %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
-    %in;
-    <p>%apply;togena(xx).</p>
-    <table><tr><td style="font-family:monospace;white-space:nowrap;line-height:1.2em;">
-    %apply;ancestors_horizontally(
-      "self", xx, "&nbsp;&nbsp;&nbsp;", "──&nbsp;", "&nbsp;&nbsp;&nbsp;", 1)
-    </td></tr></table>
-
+  %elseif;(evar.t="H")
+    %( horizontal ascendency %)
+    <form class="form-inline mt-2">
+      <div id="filterbysurname" class="form-row d-none">
+        <span class="form-control-sm">[*filter by][:]</span>%nn;
+        %apply;input(1)%apply;input(2)%apply;input(3)%apply;input(4)%apply;input(5)   
+        <button id="btnplus" type="button" class="btn btn-primary btn-sm" title="[*add filter] (max 5)"><i class="fa fa-plus fa-fw"></i></button>
+        <button id="btnclear" type="button" class="btn btn-danger btn-sm ml-1" title="[*clear filters]"><i class="fa fa-times fa-fw"></i></button>
+      </div>
+    </form>
+    <div class="text-monospace anclist_hr mt-2">
+      %if;(sosa="" and evar.force!="on")
+        <a href="%prefix_set.iz;%nn;
+          %foreach;env_binding;
+            %if;(not (env.key="pz" or env.key="nz" or env.key="iz" or env.key="ocz" or env.key="force")
+            and env.val!="")&%env.key=%env.val;%end;%nn;
+          %end;%nn;
+          &pz=%first_name_key;&nz=%surname_key;%if;(occ!=0)&ocz=%occ;%end;">[redefine]</a> [Sosa] 1
+        [or]
+        <a href="%prefix_set.iz;
+          %foreach;env_binding;
+            %if;(not (env.key="pz" or env.key="nz" or env.key="iz" or env.key="ocz" or env.key="force")
+            and env.val!="")&%env.key=%env.val;%end;%nn;
+          %end;&force=on">[continue]</a> [without implex display]
+      %else;
+        %if;(evar.force="on")
+          %apply;anc_row_hr("self", lvL, 1, "   ", "──╴", "   ")
+        %else;
+          %apply;anc_row_hr("self", lvL, sosa.v, "   ", "──╴", "   ")
+        %end;
+      %end;
+    </div>
+    
   %elseif;(evar.t = "E" and evar.sort != "")
     %( list eclair sorted by date begin or number of individuals or number of events %)
     %empty_sorted_list;
@@ -318,9 +313,9 @@
             %ancestor.place;
           </td>
           <td align="center">
-            %if;(ancestor.date_begin.prec = "&lt;")
+            %if;(ancestor.date_begin.prec = "&#60;")
               /%ancestor.date_begin.year;%nn;
-            %elseif;(ancestor.date_begin.prec = "&gt;")
+            %elseif;(ancestor.date_begin.prec = "&#62;")
               %ancestor.date_begin.year;/%nn;
             %elseif;(ancestor.date_begin.prec = "|" or ancestor.date_begin.prec = "..")
               %ancestor.date_begin.year;%nn;
@@ -329,9 +324,9 @@
             %end;
           </td>
           <td align="center">
-            %if;(ancestor.date_end.prec = "&lt;")
+            %if;(ancestor.date_end.prec = "&#60;")
               /%ancestor.date_end.year;%nn;
-            %elseif;(ancestor.date_end.prec = "&gt;")
+            %elseif;(ancestor.date_end.prec = "&#62;")
               %ancestor.date_end.year;/%nn;
             %elseif;(ancestor.date_end.prec = "|" or ancestor.date_end.prec = "..")
               %ancestor.date_end.year;%nn;
@@ -515,9 +510,9 @@
             %ancestor.place;
           </td>
           <td>
-            %if;(ancestor.date_begin.prec = "&lt;")
+            %if;(ancestor.date_begin.prec = "&#60;")
               /%ancestor.date_begin.year;%nn;
-            %elseif;(ancestor.date_begin.prec = "&gt;")
+            %elseif;(ancestor.date_begin.prec = "&#62;")
               %ancestor.date_begin.year;/%nn;
             %elseif;(ancestor.date_begin.prec = "|" or ancestor.date_begin.prec = "..")
               %ancestor.date_begin.year;%nn;
@@ -525,9 +520,9 @@
               %ancestor.date_begin.prec;%ancestor.date_begin.year;%nn;
             %end;
             -%nn;
-            %if;(ancestor.date_end.prec = "&lt;")
+            %if;(ancestor.date_end.prec = "&#60;")
               /%ancestor.date_end.year;%nn;
-            %elseif;(ancestor.date_end.prec = "&gt;")
+            %elseif;(ancestor.date_end.prec = "&#62;")
               %ancestor.date_end.year;/%nn;
             %elseif;(ancestor.date_end.prec = "|" or ancestor.date_end.prec = "..")
               %ancestor.date_end.year;%nn;
@@ -541,7 +536,6 @@
     </table>
   %end;
 %end;
-
 %include;trl
 %include;copyr
 </div>

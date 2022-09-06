@@ -92,7 +92,7 @@
    enfant, d'où le code ci-dessous :
    1 si on a des enfants
    2 si on a des petits enfants
-   3 si on a des arrières petits endants
+   3 si on a des arrières petits enfants
 %)
 %reset_count;
 %if;has_children;
@@ -129,15 +129,15 @@
   <h2 class="mt-2 w-100">
     %if;(op_m!=1)
       %if;(count2>0)
-        %if(nb_families>1)[*marriage/marriages]1%else;[*marriage/marriages]0%end;%nn;
+        [*marriage/marriages]f%nn;
       %else;
-        %if(nb_families>1)[*spouse/spouses]1%else[*spouse/spouses]0%end;%nn;
+        [*spouse/spouses]f%nn;
       %end;
       %if;(op_m=2 or op_m=3 or count>0)
-        %sp; %if;(nb_children=1)[and::child/children]0%else;[and::child/children]1%end;%nn;
+        %sp;[and] [child/children]c%nn;
       %end;
     %else;
-      %if(nb_families>1)[*family/families]1%else;[*family/families]0%end;%nn;
+      [*family/families]f%nn;
     %end;
     %if;(op_m=4 or op_m=5)
       %if;(count>2)
@@ -148,16 +148,16 @@
     %end;
     %if;(not cancel_links)
       <span class="ml-2">%nn;
-        <a href="%prefix;%suffix;&m=D;t=T;v=1;image=on"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="tree desc." title="[*descendants tree] [to the children] ([with] [spouse/spouses]0)"/></a>
+        <a href="%prefix;%suffix;m=D&t=T&v=1"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="tree desc." title="[*descendants tree] [to the children] ([with] [spouse/spouses]0)"/></a>
         %if;(op_m!=1)
           %if;(max_desc_level>1)
-            <a href="%prefix;%suffix;&m=D;t=T;v=2;image=on"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="20" alt="tree desc." title="[*descendants tree] [to the grandchildren]"/></a>
+            <a href="%prefix;%suffix;&m=D&t=T&v=2"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="20" alt="tree desc." title="[*descendants tree] [to the grandchildren]"/></a>
           %end;
           %if;(max_desc_level>2)
-            <a href="%prefix;%suffix;&m=D;t=T;v=3;image=on"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="22" alt="tree desc." title="[*descendants tree] [to the great-grandchildren]"/></a>
+            <a href="%prefix;%suffix;&m=D&t=T&v=3"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="22" alt="tree desc." title="[*descendants tree] [to the great-grandchildren]"/></a>
           %end;
           %if;(max_desc_level>3)
-            <a href="%prefix;%suffix;&m=D;t=T;v=%max_desc_level;;image=on"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="24" alt="tree desc." title="[*descendants tree] (%max_desc_level; [generation/generations]1)"/></a>
+            <a href="%prefix;%suffix;&m=D&t=T&v=%max_desc_level;"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="24" alt="tree desc." title="[*descendants tree] (%max_desc_level; [generation/generations]1)"/></a>
           %end;
         %end;
       </span>
@@ -199,8 +199,8 @@
             <sup>%count;</sup>
           %end;
         %end;
-        %if;are_divorced;, [divorced]0%divorce_date;%end;
-        %if;are_separated;, [separated]0
+        %if;are_divorced;, [divorced]%divorce_date;%end;
+        %if;are_separated;, [separated]
           %foreach;event;
             %if;(event.name=[separate event]0)%event.date;%end;
           %end;
@@ -262,7 +262,7 @@
       %if;(has_children)%nn;
         , [having as children]0%if;(nb_children>1) %apply;in_full%with;%nb_children;%and;0%end; [child/children]1%end;[:]
         %foreach;child;
-          <ul>%apply;li_SD("child")%nn;
+          <ul>%apply;li_SDC("child")%nn;
             %if;(bvar.always_surname="yes")
               %apply;short_display_person("child")
             %else;
@@ -298,14 +298,13 @@
           %if;(spouse.has_parents)
             <div class="d-inline-flex mt-1 align-self-center">
              <div class="mx-1 text-center align-self-center">
-                  %apply;a_of_b%with;%if;spouse.is_male;[son/daughter/child]0%nn;
-                    %elseif;spouse.is_female;[son/daughter/child]1%nn;%end;
-                  %and;%end;%(<div class="invisible"><br>&#8203;</div>%)
+               %apply;a_of_b%with;%if;spouse.is_male;[son/daughter/child]0%nn;
+                 %elseif;spouse.is_female;[son/daughter/child]1%nn;%end;%and;%end;
               </div>
               <div class="align-self-center mr-1">/<br><br><br>\</div>
               <div class="flex-wrap">
                 %foreach;spouse.parent;
-                  %(%if;(father!="" and parent.is_female)<div class="ml-2 mr-1 align-self-center text-center">[and]<div class="invisible"><br>&#8203;</div></div>%end;%)
+                  
                   <div class="d-inline-flex col %if;(parent.is_male)mb-1%end; px-1">
                     %if;parent.has_image;
                       %if;(not cancel_links)
@@ -360,7 +359,7 @@
                   <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-2 pb-2">&nbsp;</span>
                 %end;
                 <div class="ml-2 align-self-center">
-                  %if;(count2=0)<ul>%apply;li_SD("child")%end;%nn;
+                  %if;(count2=0)<ul>%apply;li_SDC("child")%end;%nn;
                   %apply;short_display_person_noname%with;child%and;br%and;age%and;%count1;%and;%end;%nn;
                   %if;(count2=0)</li></ul>%end;
                 </div>

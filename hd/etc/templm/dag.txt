@@ -31,7 +31,7 @@
     %if;(evar.t = "T")
       %if;(evar.m = "A")
         <span>
-          <a title="[*ascendants tree] (Y)" accesskey="Y" href="%prefix_no_iz;%nn;
+          <a title="[*ascendants tree] (Y)" accesskey="Y" href="%prefix_set.iz;%nn;
               %foreach;env_binding;
                 %if;(env.key = "m")m=D;%nn;
                 %elseif;(env.key = "templ")
@@ -41,7 +41,7 @@
         </span>
       %elseif;(evar.m = "D")
         <span>
-          <a title="[tree] (Y)" accesskey="Y" href="%prefix_no_iz;%nn;
+          <a title="[tree] (Y)" accesskey="Y" href="%prefix_set.iz;%nn;
               %foreach;env_binding;
                 %if;(env.key = "m")m=A;%nn;
                 %elseif;(env.key = "dag" or env.key = "templ")
@@ -74,7 +74,7 @@
       <span>
       %if;(pos1 = 0)
       %else;
-        <a href="%prefix_no_iz;
+        <a href="%prefix_set.iz;
           %foreach;env_binding;
             %if;(env.key != "pos1" and env.key != "pos2" and env.key != "templ")
               %env.key=%env.val.decoded;;%nn;
@@ -86,7 +86,7 @@
       %end;
       %if;(pos2 >= dag.ncol)&nbsp;%nn;
       %else;
-        <a href="%prefix_no_iz;
+        <a href="%prefix_set.iz;
           %foreach;env_binding;
             %if;(env.key != "pos1" and env.key != "pos2" and env.key != "templ")
               %env.key=%env.val.decoded;;%nn;

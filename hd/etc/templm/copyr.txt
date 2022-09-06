@@ -19,8 +19,8 @@
       %nl;
       <div id="trl" style="clear:both;">
         <ul>
-          <li><a href="%prefix_no_templ;templ=&%suffix;">default</a></li>
-          <li><a href="%prefix_no_templ;templ=templm&%suffix;">templm</a></li>
+          <li><a href="%prefix_set.templ;templ=&%suffix;">default</a></li>
+          <li><a href="%prefix_set.templ;templ=templm&%suffix;">templm</a></li>
         </ul>
       </div>
     %end;
@@ -37,15 +37,22 @@
     <a class="dropdown-item" href="%prefix_base_password;lang=%l1;&templ=%evar.templ;&%suffix;">%l1; %apply;language_name(l1)</a>
   %end;
 %end;
-
-<div id="footer">
-  <a href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;&%suffix;"
-     title="Switch to %if(evar.templ!="templm")template m%else;default template%end;">GeneWeb</a>
-  v. %version;%sp;
-  &copy; INRIA 1998-2016 %connections;%sq;
-  <a href="https://github.com/geneweb/geneweb" target="_blank" title="GeneWeb sources on GitHub">
-  <img src="%image_prefix;/logo_bas.png" alt="Logo GeneWeb bas"></a>
-  %let;suffx;%if;(lang!="en")/%lang;%else;%end;%in;
-  <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%suffx;" target="_blank" title="GeneWeb documentation MediaWiki">
-  <img src="%image_prefix;/logo_bas_mw.png" alt="Manual of GeneWeb on Mediawiki"></a>
+<div id="footer" style="clear:both;">
+  <table style="border:0;">
+    <tr>
+      <td>
+        v.&nbsp;%version; - &copy;&nbsp;INRIA&nbsp;1998-2020<br%/>
+        <a href="%prefix_set.templ;&%suffix;"
+          title="Switch to %if(evar.templ!="templm")template m%else;default template%end;">default</a>
+        %connections;%sq;
+      </td>
+      <td style="width:205px">
+        <a href="https://github.com/geneweb/geneweb" target="_blank" title="GeneWeb sources on GitHub">
+          <img src="%image_prefix;/logo_bas.png" alt="Logo GeneWeb bas"></a>
+        %let;suffx;%if;(lang!="en")/%lang;%else;%end;%in;
+        <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%suffx;" target="_blank" title="GeneWeb documentation MediaWiki">
+          <img src="%image_prefix;/logo_bas_mw.png" alt="Manual of GeneWeb on Mediawiki"></a>
+      </td>
+    </tr>
+  </table>
 </div>

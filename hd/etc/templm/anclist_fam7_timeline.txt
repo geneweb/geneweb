@@ -83,7 +83,8 @@
   %and;
     %if;(lxby != 9999 and lby != 9999 and lby > lxby)<div style="width:%expr(lby - lxby)px"> </div>%end;
   %and;
-    %xx.has_sosa;
+    %( fixme: %xx.has_sosa; working but can't be left alone? same on fam7_table, item.12 not used %)
+    .%xx.has_sosa;
   %and;
     %if;("lexa" = "him/her")fam7_him_her%end;
   %and;

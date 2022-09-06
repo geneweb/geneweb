@@ -89,9 +89,9 @@
           %if;(evar.marriage = "on" and cell.family.marriage_date.year != "")
             <i style="font-size:80%%">%nn;
                &amp;%nn;
-              %if;(cell.family.marriage_date.prec = "&lt;")
+              %if;(cell.family.marriage_date.prec = "&#60;")
                 /%cell.family.marriage_date.year;%nn;
-              %elseif;(cell.family.marriage_date.prec = "&gt;")
+              %elseif;(cell.family.marriage_date.prec = "&#62;")
                 %cell.family.marriage_date.year;/%nn;
               %elseif;(cell.family.marriage_date.prec = "|" or cell.family.marriage_date.prec = "..")
                 %cell.family.marriage_date.year;%nn;
@@ -107,7 +107,7 @@
       %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
       %elseif;(evar.cgl = "on")%apply;symbol("cell.person")%nn;
       %else;
-        <a style="text-decoration:none;" title="[*navigation]" href="%prefix_no_iz;%cell.person.access;;%nn;
+        <a style="text-decoration:none;" title="[*navigation]" href="%prefix_set.iz;%cell.person.access;;%nn;
         %foreach;env_binding;
           %if;(env.key = "" or env.key = "p" or env.key = "n" or env.key = "oc" or env.key = "i" or env.key = "templ")
           %else;%env.key;=%env.val.decoded;;%nn;
@@ -203,7 +203,7 @@
     <div class="menu">
       %if;has_children;
         <span>
-        <a title="[tree] (Y)" accesskey="Y" href="%prefix_no_iz;%nn;
+        <a title="[tree] (Y)" accesskey="Y" href="%prefix_set.iz;%nn;
           %foreach;env_binding;
             %if;(env.key = "m")m=D;%nn;
             %elseif;(env.key = "templ")

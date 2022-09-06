@@ -1,0 +1,190 @@
+<!-- $Id: buttons_dag.txt v7.1 26/11/2022 00:12:27 $ -->
+<!-- Copyright (c) 1998-2022 INRIA -->
+%( Boutons de configurations et d’options pour les arbres et DAG %)
+%define;urlv(x,y)
+  %url_set.x.y;
+%end;
+%let;evarv;%if;(e.v!="")%e.v;%else;3%end;%in;
+%( TODO : fix static_levels for dag, atm fixed at 12! %)
+%let;maxlev;
+  %if;(e.m="A")
+    %apply;min%with;%if;(b.max_anc_tree!="")%b.max_anc_tree;%end;
+               %and;%if;(b.max_anc_level!="")%b.max_anc_level;%end;
+               %and;%static_max_anc_level;%end;
+  %elseif;(e.m="D")
+    %apply;min%with;%if;(b.max_desc_tree!="")%b.max_desc_tree;%end;
+               %and;%if;(b.max_desc_level!="")%b.max_desc_level;%end;
+               %and;%static_max_desc_level;%end;
+  %else;%expr(12)
+  %end;
+%in;
+%let;maxv;%if;(maxlev<10 or maxlev<evarv+5)%expr(maxlev+1)
+          %elseif;(maxlev>=evarv+5 and evarv>5)%expr(evarv+5)
+          %else;10%end;%in;
+%let;minv;%if;(maxlev>9 and maxlev<evarv+5)%expr(maxv-9)
+          %elseif;(maxlev>9 and evarv>5)%expr(evarv-4)
+          %else;1%end;%in;
+%( minv %minv; < evarv %evarv; < maxv %maxv; (maxlev %maxlev;) %)
+%define;setvar(nnn,vvv)
+  %set_var.nnn.vvv;
+%end;
+%define;getvar(nnn)
+  %get_var.nnn;
+%end;
+%let;dtree;%if;(e.m="D" and (e.t="T" or e.t="TV"))1%end;%in;
+%if;(dtree=1)
+  %foreach;dag_line;
+      %foreach;dag_cell;
+        %if;(line_nbr=0)
+          %if;(e.t="T" or (e.t="TV" and cell_nbr<2 and dag_cell.index!="")) %( last condition allows to capture index of root individual %)
+            %apply;setvar%with;fatheraccess%and;%dag_cell.father.access;%end;
+            %apply;setvar%with;motheraccess%and;%dag_cell.mother.access;%end;
+            %apply;setvar%with;prevsiblingaccess%and;%if;dag_cell.has_prev_sibling;%dag_cell.prev_sibling.access;%else;%end;%end;
+            %apply;setvar%with;nextsiblingaccess%and;%if;dag_cell.has_next_sibling;%dag_cell.next_sibling.access;%else;%end;%end;
+          %end;
+        %end;
+      %end;
+  %end;
+%elseif;(e.em!="R" and e.em!="RLM" and e.m!="A")
+  %foreach;father.child;
+    %if;is_sibling_before;
+      %apply;setvar%with;prevsiblingaccess%and;%child.access;%end;
+      %apply;setvar%with;prevsiblingname%and;%child.first_name; %child.surname;%end;
+    %elseif;is_sibling_after;
+      %apply;setvar%with;nextsiblingaccess%and;%child.access;%end;
+      %apply;setvar%with;nextsiblingname%and;%child.first_name; %child.surname;%end;
+    %end;
+  %end;
+%end;
+%let;father_access;%if(dtree=1)%get_var.fatheraccess;%else;%father.access;%end;%in;
+%let;mother_access;%if(dtree=1)%get_var.motheraccess;%else;%mother.access;%end;%in;
+%let;prev_sibling_access;%get_var.prevsiblingaccess;%in;
+%let;next_sibling_access;%get_var.nextsiblingaccess;%in;
+%if;(e.m="A" or e.m="D")
+  <div class="btn-toolbar%if;(e.m="D" or e.dag=1) mt-2%end;" role="toolbar" arial-label="agnatic and cognatic buttons group">
+    <div class="btn-group border rounded mr-1" role="group" aria-label="ascendant tree buttons group">
+      <a role="button" href="%prefix_base_password;%foreach;env_binding;%if;(env.key!="m" and env.key!="t" and env.key!="dag")%env.key=%env.val;&%end;%end;m=A&t=A"
+        class="btn btn-outline-primary border-%if;(e.t!="A")0%else;2 disabled font-weight-bold%end;"
+        title="[*male line/female line]0"><i class="fas fa-mars fa-lg"></i><br>Agna.</a>
+      <a role="button" href="%prefix_base_password;%foreach;env_binding;%if;(env.key!="m" and env.key!="t" and env.key!="dag")%env.key=%env.val;&%end;%end;m=A&t=C"
+        class="btn btn-outline-primary border-%if;(e.t!="C")0%else;2 disabled font-weight-bold%end;"
+        title="[*male line/female line]1"><i class="fas fa-venus fa-lg"></i><br>Cogn.</a>
+      <a role="button" href="%prefix_base_password;%foreach;env_binding;%if;(env.key!="m" and env.key!="t")%env.key=%env.val;&%end;%end;m=A&t=T"
+        class="btn btn-outline-primary border-%if;(e.m="A" and e.t="T")2 disabled font-weight-bold%else;0%end;"
+        title="[*ascendants tree]"><i class="fas fa-code-fork fa-lg"></i><br>Asc.</a>
+    </div>
+    <div class="btn-group border rounded mr-1">
+      <a role="button" href="%prefix_base_password;%foreach;env_binding;%if;(env.key!="m" and env.key!="t")%env.key=%env.val;&%end;%end;m=D&t=T"
+        class="btn btn-outline-primary border-%if;(e.m="D" and e.t="T")2 disabled font-weight-bold%else;0%end;"
+        title="[*descendants tree]"><i class="fas fa-sitemap fa-lg"></i><br>Desc.</a>
+      <a role="button" class="btn btn-outline-primary border-%if;(e.m="D" and e.t="TV" and e.oi="")2 disabled font-weight-bold%else;0%end;"
+        href="%prefix_base_password;%foreach;env_binding;%if;(env.key!="m" and env.key!="t" and env.key!="dag" and env.key!="oi")%env.key=%env.val;&%end;%end;m=D&t=TV"
+        title="%if;(e.t!="TV")[*visualize/show/hide/summary]1 [compact form]%end;"><i class="fas fa-compress fa-lg"></i><br>Comp.</a>
+    </div>
+    <div class="d-flex flex-column mr-1">
+      <div class="d-flex flex-nowrap justify-content-center">
+        <div class="border rounded mr-1">
+          <a role="button" class="btn btn-sm btn-outline-%if;(father_access="")dark disabled%else;primary%end; border-0" href="%prefix_base_password;&%father_access;&%nn;
+            %foreach;env_binding;%if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="i" or env.key="v"))%env.key;=%env.val;&%end;%end;v=%if;(e.m="D")%expr(e.v+1)%else;%e.v;%end;"
+            title="[*navigation] %if;(dtree="1")[father/mother]0[:]&#013;%father_access;&#013;v=%expr(e.v+1)%else;%father.first_name; %father_surname; ([father/mother]0)%end;">%nn;
+            <i class="fas fa-arrow-turn-up fa-flip-horizontal fa-sm mr-2"></i>[*father/mother]0%nn;
+          </a>
+        </div>
+        <div class="border rounded">
+          <a role="button" class="btn btn-sm btn-outline-%if;(mother_access="")dark disabled%else;primary%end; border-0" href="%prefix_base_password;&%mother_access;&%nn;
+            %foreach;env_binding;%if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="i" or env.key="v"))%env.key;=%env.val;&%end;%end;v=%if;(e.m="D")%expr(e.v+1)%else;%e.v;%end;"
+            title="[*navigation] %if;(dtree="1")[father/mother]1[:]&#013;%mother_access;&#013;v=%expr(e.v+1)%else;%mother.first_name; %mother_surname; ([father/mother]1)%end;">%nn;
+            [*father/mother]1<i class="fas fa-arrow-turn-up fa-sm ml-2"></i></a>
+        </div>
+      </div>
+      <div class="border rounded mt-1">
+        <div class="d-flex justify-content-between">
+          <a class="btn btn-sm btn-outline-%if;(prev_sibling_access="" or "%" in prev_sibling_access)dark disabled%else;primary%end; border-0" href="%prefix_base_password;%prev_sibling_access;&%nn;
+            %foreach;env_binding;%if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="i"))%env.key;=%env.val;&%end;%end;"
+            title="[*previous sibling]2[:] %if;(dtree=1)%prev_sibling_access;%else;%get_var.prevsiblingname;%end;"><i class="fas fa-angle-left"></i></a>
+          <span class="px-0">[*siblings]</span>
+          <a class="btn btn-sm btn-outline-%if;(next_sibling_access="" or "%" in next_sibling_access)dark disabled%else;primary%end; border-0" href="%prefix_base_password;%next_sibling_access;&%nn;
+            %foreach;env_binding;%if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="i"))%env.key;=%env.val;&%end;%end;"
+            title="[*next sibling]2[:] %if;(dtree=1)%next_sibling_access;%else;%get_var.nextsiblingname;%end;"><i class="fas fa-angle-right"></i></a>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="btn-group border rounded" role="group" aria-label="generation pickup buttons group">
+        <span class="btn btn-primary disabled border border-info rounded-left py-0 w-100 h-100">[*generation/generations]0</span>
+        %if;(maxlev>9 and evarv>5)
+          %(<a role="button" href="%apply;urlv%with;v%and;%expr(evarv-5)%end;"
+            class="btn btn-outline-primary font-weight-bold border-0 px-2 py-0"
+            title="(-5) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]1 (max %maxlev;)">−5</a>%)
+          <a role="button" href="%apply;urlv%with;v%and;%expr(evarv-1)%end;"
+            class="btn btn-outline-primary font-weight-bold border-0 px-2 py-0"
+            title="(-1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]1 (max %maxlev;)">−</a>
+        %end;
+        %for;i;minv;maxv;
+          <a role="button" id="v%i;" class="btn px-%if;(i<10)2%else;1%end; py-0 btn-outline-primary border-%if;(evarv=i)2 rounded disabled font-weight-bold%else;0%end;" %if;(evarv!=i)href="%apply;urlv%with;v%and;%expr(i)%end;"%end;
+            title="%if;(evarv!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
+            %end; %if;(i=maxlev)(max)%end;">%i;%(%if;(evarv=i)<br>^%end;%)</a>
+        %end;
+        %if;(maxlev>9 and maxlev-evarv>=5)
+          <a role="button" href="%apply;urlv%with;v%and;%expr(evarv+1)%end;"
+            class="btn btn-outline-primary font-weight-bold border-0 px-2 py-0"
+            title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+</a>
+          %(<a role="button" href="%apply;urlv%with;v%and;%expr(evarv+5)%end;"
+            class="btn btn-outline-primary font-weight-bold border-0 px-1"
+            title="(+5) [visualize/show/hide/summary]1 %expr(evarv+5) [generation/generations]1 (max %maxlev;)">+5</a>%)
+        %end;
+      </div>
+      <div class="d-flex align-self-center mt-1">
+        <div class="border rounded mr-1">
+          <a role="button" class="btn btn-sm btn-outline-%if;(e.dag=1)primary font-weight-bold border-2%elseif;(e.t="C" or e.t="A" or e.t="TV")dark disabled border-0%else;primary border-0%end;"
+        href="%if;(e.dag="")%urlv.dag.1;%else;%urlv.dag;%end;"
+        title="%if;(e.dag="")[*dag on/dag off]0%else;[*dag on/dag off]1%end; ([dag])">
+          <i class="fa fa-random fa-fw fa-lg"></i>Dag</a>
+        </div>
+        <div class="border rounded mr-1">
+          <a role="button" class="btn btn-sm btn-outline-primary border-%if;(e.im="")2%else;0%end; h-100"
+            href="%if;(e.im="")%urlv.im.0;%else;%urlv.im;%end;"
+            title="%if;(e.im="")[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [image/images]1">
+            <i class="fa fa-image fa-sm mr-1"></i>[*image/images]1
+          </a>
+        </div>
+        <div class="border rounded mr-1">
+          <a role="button" class="btn btn-sm btn-outline-%if;(e.dag=1 or e.t="C" or e.t="A")dark disabled border-0%else;primary%end; border-%if;(e.ma="")2%else;0%end; w-100 h-100"
+            href="%if;(e.ma="")%urlv.ma.0;%else;%urlv.ma;%end;"
+            title="%if;(e.ma="")[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [date of marriage]">
+            <i class="fa fa-venus-mars fa-sm mr-1"></i>[*marriage/marriages]1
+          </a>
+        </div>
+        <div class="border rounded mr-1">
+          <a role="button" class="btn btn-sm btn-outline-%if;(e.m="A")dark disabled border-0%else;primary %end; border-%if;(e.sp="")2%else;0%end; w-100 h-100"
+            href="%if;(e.sp="")%urlv.sp.0;%else;%urlv.sp;%end;"
+            title="%if;(e.sp="")[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [spouse/spouses]1">
+            <i class="fa fa-user-plus fa-sm mr-1"></i>[*spouse/spouses]1
+          </a>
+        </div>
+        <div class="border rounded mr-1">
+          <a role="button" class="btn btn-sm btn-outline-primary mr-2 border-0 w-100 h-100" href="%urlv.cgl.on;" target="_blank">
+          <i class="fa fa-unlink fa-sm mr-1" title="[*cancel GeneWeb links]"></i>Cgl</a>
+        </div>
+        %(%if;(e.slices!="on" and e.notab!="on" and e.t!="TV")
+          <a role="button" class="btn btn-sm"
+          href="%prefix_base_password;%foreach;env_binding;%env.key;=%env.val;&%end;notab=on&slices=on" accesskey="/"
+          title="[*display by slices/slice width/overlap/total width]0">//</a>
+        %end;%)
+      </div>
+    </div>
+  </div>
+</div>
+%elseif;(e.m="RLM")
+  <div class="d-flex justify-content-between">
+    <div class="mt-2 mb-4 h2">[*multi relations graph]</div>
+    <div class="btn-toolbar mt-4 mr-2" role="toolbar"aria-label="Toolbar for dag/images/edit tree buttons" style='%if;(e.wide="on")transform:translateX(-40px)%end;'>
+      <div class="btn-group ml-2">
+        <a role="button" href="%prefix_base_password;m=TP&v=upd%e.m;&%nn;
+         %foreach;env_binding;%if(env.key!="m" and env.val!="")%env.key;=%env.val;&%end;%end;">
+        <span class="far fa-edit fa-lg mb-1" title="[*edit tree]"></span>
+        </a>
+      </div>
+    </div>
+  </div>
+%end;
