@@ -69,6 +69,12 @@ val dummy_ifam : ifam
 (** [true] if strings with the giving ids are equal *)
 val eq_istr : istr -> istr -> bool
 
+(** [true] if families with the giving ids are equal *)
+val eq_ifam : ifam -> ifam -> bool
+
+(** [true] if persons with the giving ids are equal *)
+val eq_iper : iper -> iper -> bool
+
 (** [true] if string with the giving id is empty ("") *)
 val is_empty_string : istr -> bool
 
