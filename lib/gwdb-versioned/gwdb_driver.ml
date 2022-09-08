@@ -97,6 +97,8 @@ let _ = assert (empty_string = GLegacy.empty_string)
 let quest_string = 1
 let _ = assert (quest_string = GLegacy.quest_string)
 let eq_istr = GLegacy.eq_istr
+let eq_iper = GLegacy.eq_iper
+let eq_ifam = GLegacy.eq_ifam
 let is_empty_string = GLegacy.is_empty_string
 let is_quest_string = GLegacy.is_quest_string
 let no_person = G25.no_person

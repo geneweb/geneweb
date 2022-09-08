@@ -22,6 +22,8 @@ let empty_string = 0
 let quest_string = 1
 
 let eq_istr i1 i2 = i1 = i2
+let eq_iper i1 i2 = i1 = i2
+let eq_ifam i1 i2 = i1 = i2
 let is_empty_string istr = istr = 0
 let is_quest_string istr = istr = 1
 
