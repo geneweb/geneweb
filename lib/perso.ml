@@ -881,6 +881,7 @@ let build_surnames_list conf base v p =
        let surn = sou base i in
        if surn <> "?" then list := (surn, !dp) :: !list)
     ht;
+  (* TODO don't query db in sort *)
   List.sort
     (fun (s1, _) (s2, _) ->
        match
@@ -1010,6 +1011,7 @@ let build_list_eclair conf base v p =
          list := (surn, place, db, de, p, pl) :: !list)
     ht;
   (* On trie la liste par nom, puis lieu. *)
+  (* TODO don't query db in sort *)
   List.sort begin fun (s1, pl1, _, _, _, _) (s2, pl2, _, _, _, _) ->
     match
       Gutil.alphabetic_order (surname_without_particle base s1) (surname_without_particle base s2)
@@ -1137,6 +1139,19 @@ type ancestor_surname_info =
   | Eclair of
       (string * Adef.safe_string * date option * date option * person * iper list * loc)
 
+type title_item =
+  int * istr gen_title_name * istr * istr list *
+    (date option * date option) list
+
+type event_name =
+    Pevent of istr gen_pers_event_name
+  | Fevent of istr gen_fam_event_name
+
+type event_item =
+  event_name * cdate * istr * istr * istr * (iper * witness_kind) array *
+    iper option
+
+(* ??? *)
 type 'a env =
     Vallgp of generation_person list
   | Vanc of generation_person
@@ -1165,15 +1180,6 @@ type 'a env =
   | Vlazy of 'a env Lazy.t
   | Vother of 'a
   | Vnone
-and title_item =
-  int * istr gen_title_name * istr * istr list *
-    (date option * date option) list
-and event_item =
-  event_name * cdate * istr * istr * istr * (iper * witness_kind) array *
-    iper option
-and event_name =
-    Pevent of istr gen_pers_event_name
-  | Fevent of istr gen_fam_event_name
 
 let get_env v env =
   try
@@ -3851,7 +3857,847 @@ let print_foreach conf base print_ast eval_expr =
     let s = eval_expr env ep e in
     try int_of_string s with Failure _ -> raise Not_found
   in
-  let rec print_foreach env ini_ep loc s sl ell al =
+  let print_foreach_alias env al (p, p_auth as ep) =
+    if not p_auth && is_hide_names conf p then ()
+    else
+      Mutil.list_iter_first
+        (fun first a ->
+           let env = ("alias", Vstring (sou base a)) :: env in
+           let env = ("first", Vbool first) :: env in
+           List.iter (print_ast env ep) al)
+        (get_aliases p)
+  in
+  let print_foreach_ancestor env al ep =
+    match get_env "gpl" env with
+      Vgpl gpl ->
+        let rec loop first gpl =
+          match gpl with
+            [] -> ()
+          | gp :: gl ->
+              begin match gp with
+                GP_missing (_, _) -> ()
+              | _ ->
+                  let env =
+                    ("ancestor", Vanc gp) :: ("first", Vbool first) ::
+                    ("last", Vbool (gl = [])) :: env
+                  in
+                  List.iter (print_ast env ep) al
+              end;
+              loop false gl
+        in
+        loop true gpl
+    | _ -> ()
+  in
+  let print_foreach_ancestor_level env el al (p, _ as ep) =
+    let max_level =
+      match el with
+        [[e]] -> eval_int_expr env ep e
+      | [] ->
+          begin match get_env "max_anc_level" env with
+            Vint n -> n
+          | _ -> 0
+          end
+      | _ -> raise Not_found
+    in
+    let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
+    let rec loop gpl i n =
+      if i > max_level then ()
+      else
+        let n =
+          List.fold_left
+            (fun n gp ->
+               match gp with
+                 GP_person (_, _, _) -> n + 1
+               | _ -> n)
+            n gpl
+        in
+        let env =
+          ("gpl", Vgpl gpl) :: ("level", Vint i) :: ("n", Vint n) :: env
+        in
+        List.iter (print_ast env ep) al;
+        let gpl = next_generation conf base mark gpl in loop gpl (succ i) n
+    in
+    loop [GP_person (Sosa.one, get_iper p, None)] 1 0
+  in
+  let print_foreach_ancestor_level2 env al (p, _ as ep) =
+    let max_lev = "max_anc_level" in
+    let max_level =
+      match get_env max_lev env with
+        Vint n -> n
+      | _ -> 0
+    in
+    let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
+    let rec loop gpl i =
+      if i > max_level then ()
+      else
+        let env = ("gpl", Vgpl gpl) :: ("level", Vint i) :: env in
+        List.iter (print_ast env ep) al;
+        Gwdb.Collection.iter (fun i -> Gwdb.Marker.set mark i Sosa.zero) (Gwdb.ipers base) ;
+        let gpl = next_generation2 conf base mark gpl in loop gpl (succ i)
+    in
+    loop [GP_person (Sosa.one, get_iper p, None)] 1
+  in
+  let print_foreach_anc_surn env el al loc (p, _ as ep) =
+    let max_level =
+      match el with
+        [[e]] -> eval_int_expr env ep e
+      | [] ->
+          begin match get_env "max_anc_level" env with
+            Vint n -> n
+          | _ -> 0
+          end
+      | _ -> raise Not_found
+    in
+    (* En fonction du type de sortie demandé, on construit *)
+    (* soit la liste des branches soit la liste éclair.    *)
+    match p_getenv conf.env "t" with
+      Some "E" ->
+        let list = build_list_eclair conf base max_level p in
+        List.iter
+          (fun (a, b, c, d, e, f) ->
+             let b = (b : Adef.escaped_string :> Adef.safe_string) in
+             let env =
+               ("ancestor", Vanc_surn (Eclair (a, b, c, d, e, f, loc))) :: env
+             in
+             List.iter (print_ast env ep) al)
+          list
+    | Some "F" ->
+        let list = build_surnames_list conf base max_level p in
+        List.iter
+          (fun (a, (((b, c, d), e), f)) ->
+             let env =
+               ("ancestor", Vanc_surn (Branch (a, b, c, d, e, f, loc))) :: env
+             in
+             List.iter (print_ast env ep) al)
+          list
+    | _ -> ()
+  in
+  let print_foreach_ancestor_tree env el al (p, _ as ep) =
+    let (p, max_level) =
+      match el with
+        [[e1]; [e2]] ->
+          let ip = iper_of_string @@ eval_expr env ep e1 in
+          let max_level = eval_int_expr env ep e2 in
+          pget conf base ip, max_level
+      | [[e]] -> p, eval_int_expr env ep e
+      | [] ->
+          begin match get_env "max_anc_level" env with
+            Vint n -> p, n
+          | _ -> p, 0
+          end
+      | _ -> raise Not_found
+    in
+    let gen = tree_generation_list conf base max_level p in
+    let rec loop first =
+      function
+        g :: gl ->
+          let env =
+            ("celll", Vcelll g) :: ("first", Vbool first) ::
+            ("last", Vbool (gl = [])) :: env
+          in
+          List.iter (print_ast env ep) al; loop false gl
+      | [] -> ()
+    in
+    loop true gen
+  in
+  let print_foreach_baptism_witness env al (p, _ as ep) =
+    let rec loop pevents =
+      match pevents with
+        [] -> ()
+      | (name, _, _, _, _, wl, _) :: events ->
+          if name = Pevent Epers_Baptism then
+            Array.iteri
+              begin fun i (ip, _) ->
+                let p = pget conf base ip in
+                let env =
+                  ("baptism_witness", Vind p)
+                  :: ("first", Vbool (i = 0))
+                  :: env
+                in
+                List.iter (print_ast env ep) al
+              end
+              wl
+          else loop events
+    in
+    loop (events_list conf base p)
+  in
+  let print_foreach_birth_witness env al (p, _ as ep) =
+    let rec loop pevents =
+      match pevents with
+        [] -> ()
+      | (name, _, _, _, _, wl, _) :: events ->
+          if name = Pevent Epers_Birth then
+            Array.iteri
+              begin fun i (ip, _) ->
+                let p = pget conf base ip in
+                let env =
+                  ("birth_witness", Vind p)
+                  :: ("first", Vbool (i = 0))
+                  :: env
+                in
+                List.iter (print_ast env ep) al
+              end
+              wl
+          else loop events
+    in
+    loop (events_list conf base p)
+  in
+  let print_foreach_burial_witness env al (p, _ as ep) =
+    let rec loop pevents =
+      match pevents with
+        [] -> ()
+      | (name, _, _, _, _, wl, _) :: events ->
+          if name = Pevent Epers_Burial then
+            Array.iteri
+              begin fun i (ip, _) ->
+                let p = pget conf base ip in
+                let env =
+                  ("burial_witness", Vind p)
+                  :: ("first", Vbool (i = 0))
+                  :: env
+                in
+                List.iter (print_ast env ep) al
+              end
+              wl
+          else loop events
+    in
+    loop (events_list conf base p)
+  in
+  let print_foreach_cell env al ep =
+    let celll =
+      match get_env "celll" env with
+        Vcelll celll -> celll
+      | _ -> raise Not_found
+    in
+    Mutil.list_iter_first
+      (fun first cell ->
+         let env = ("cell", Vcell cell) :: ("first", Vbool first) :: env in
+         List.iter (print_ast env ep) al)
+      celll
+  in
+  let print_foreach_child env al ep =
+    function
+      Vfam (ifam, fam, (ifath, imoth, isp), _) ->
+        begin match get_env "f_link" env with
+          Vbool _ ->
+          let baseprefix =
+            match get_env "baseprefix" env with
+            | Vstring baseprefix -> baseprefix
+            | _ -> conf.command
+          in
+          let children = !GWPARAM_ITL.get_children base baseprefix ifam ifath imoth in
+          List.iter begin fun ((p, _) as ep, baseprefix) ->
+            let env = ("#loop", Vint 0) :: env in
+            let env = ("child_link", Vind p) :: env in
+            let env = ("baseprefix", Vstring baseprefix) :: env in
+            let env = ("p_link", Vbool true) :: env in
+            List.iter (print_ast env ep) al
+          end children
+        | _ ->
+            let auth =
+              Array.for_all
+                (fun ip -> authorized_age conf base (pget conf base ip))
+                (get_children fam)
+            in
+            let env = ("auth", Vbool auth) :: env in
+            let n =
+              let p =
+                match get_env "p" env with
+                  Vind p -> p
+                | _ -> assert false
+              in
+              let rec loop i =
+                if i = Array.length (get_children fam) then -2
+                else if (get_children fam).(i) = get_iper p then i
+                else loop (i + 1)
+              in
+              loop 0
+            in
+            Array.iteri
+              (fun i ip ->
+                 let p = pget conf base ip in
+                 let env = ("#loop", Vint 0) :: env in
+                 let env = ("child", Vind p) :: env in
+                 let env = ("child_cnt", Vint (i + 1)) :: env in
+                 let env =
+                   if i = n - 1 && not (is_hidden p) then
+                     ("pos", Vstring "prev") :: env
+                   else if i = n then ("pos", Vstring "self") :: env
+                   else if i = n + 1 && not (is_hidden p) then
+                     ("pos", Vstring "next") :: env
+                   else env
+                 in
+                 let ep = p, authorized_age conf base p in
+                 List.iter (print_ast env ep) al)
+              (get_children fam);
+
+            List.iter begin fun (_, _, children) ->
+              List.iter begin fun ((p, _), baseprefix, can_merge) ->
+                if not can_merge then begin
+                  let env = ("#loop", Vint 0) :: env in
+                  let env = ("child_link", Vind p) :: env in
+                  let env = ("baseprefix", Vstring baseprefix) :: env in
+                  let env = ("p_link", Vbool true) :: env in
+                  let ep = p, true in
+                  List.iter (print_ast env ep) al
+                end end children
+            end (!GWPARAM_ITL.get_children' conf base (get_iper (fst ep)) fam isp)
+        end
+    | _ -> ()
+  in
+  let print_foreach_cremation_witness env al (p, _ as ep) =
+    let rec loop pevents =
+      match pevents with
+        [] -> ()
+      | (name, _, _, _, _, wl, _) :: events ->
+          if name = Pevent Epers_Cremation then
+            Array.iteri
+              begin fun i (ip, _) ->
+                let p = pget conf base ip in
+                let env =
+                  ("cremation_witness", Vind p)
+                  :: ("first", Vbool (i = 0))
+                  :: env
+                in
+                List.iter (print_ast env ep) al
+              end
+              wl
+          else loop events
+    in
+    loop (events_list conf base p)
+  in
+  let print_foreach_death_witness env al (p, _ as ep) =
+    let rec loop pevents =
+      match pevents with
+        [] -> ()
+      | (name, _, _, _, _, wl, _) :: events ->
+          if name = Pevent Epers_Death then
+            Array.iteri
+              begin fun i (ip, _) ->
+                let p = pget conf base ip in
+                let env =
+                  ("death_witness", Vind p)
+                  :: ("first", Vbool (i = 0))
+                  :: env
+                in
+                List.iter (print_ast env ep) al
+              end
+              wl
+          else loop events
+    in
+    loop (events_list conf base p)
+  in
+  let print_foreach_descendant_level env al ep =
+    let max_level =
+      match get_env "max_desc_level" env with
+        Vint n -> n
+      | _ -> 0
+    in
+    let rec loop i =
+      if i > max_level then ()
+      else
+        let env = ("level", Vint i) :: env in
+        List.iter (print_ast env ep) al; loop (succ i)
+    in
+    loop 0
+  in
+  let print_foreach_event env al (p, _ as ep) =
+    let events = events_list conf base p in
+    Mutil.list_iter_first
+      (fun first evt ->
+         let env = ("event", Vevent (p, evt)) :: env in
+         let env = ("first", Vbool first) :: env in
+         List.iter (print_ast env ep) al)
+      events
+  in
+  let print_foreach_event_witness env al (_, p_auth as ep) =
+    if p_auth then
+      match get_env "event" env with
+        Vevent (_, (_, _, _, _, _, witnesses, _)) ->
+          Array.iteri
+            begin fun i (ip, wk) ->
+              let p = pget conf base ip in
+              let wk = Util.string_of_witness_kind conf (get_sex p) wk in
+              let env =
+                ("event_witness", Vind p)
+                :: ("event_witness_kind", Vstring (wk :> string))
+                :: ("first", Vbool (i = 0))
+                :: env
+              in
+              List.iter (print_ast env ep) al
+            end
+            witnesses
+      | _ -> ()
+  in
+  let print_foreach_event_witness_relation env al (p, p_auth as ep) =
+    let related = List.sort_uniq compare (get_related p) in
+    let events_witnesses =
+      let list = ref [] in
+      begin let rec make_list =
+        function
+          ic :: icl ->
+            let c = pget conf base ic in
+            List.iter
+              (fun (name, _, _, _, _, wl, _ as evt) ->
+                 let (mem, wk) = Util.array_mem_witn conf base (get_iper p) wl in
+                 if mem then
+                   match name with
+                     Fevent _ ->
+                       if get_sex c = Male then list := (c, wk, evt) :: !list
+                   | _ -> list := (c, wk, evt) :: !list)
+              (events_list conf base c);
+            make_list icl
+        | [] -> ()
+      in
+        make_list related
+      end;
+      !list
+    in
+    (* On tri les témoins dans le même ordre que les évènements. *)
+    let events_witnesses =
+      CheckItem.sort_events
+        (fun (_, _, (name, _, _, _, _, _, _)) ->
+           match name with
+           | Pevent n -> CheckItem.Psort n
+           | Fevent n -> CheckItem.Fsort n)
+        (fun (_, _, (_, date, _, _, _, _, _)) -> date)
+        events_witnesses
+    in
+    List.iter
+      (fun (p, wk, evt) ->
+         if p_auth then
+           let env = ("event_witness_relation", Vevent (p, evt)) :: env in
+           let env =
+             ( "event_witness_relation_kind"
+             , Vstring (wk : Adef.safe_string :> string) )
+             :: env
+           in
+           List.iter (print_ast env ep) al)
+      events_witnesses
+  in
+  let print_foreach_family env al ini_ep (p, _) =
+    match get_env "p_link" env with
+      Vbool _ ->
+        let conf =
+          match get_env "baseprefix" env with
+          | Vstring baseprefix -> {conf with command = baseprefix}
+          | _ -> conf
+        in
+        List.fold_left begin fun (prev, i) (ifam, fam, (ifath, imoth, spouse), baseprefix, _) ->
+          let cpl = (ifath, imoth, get_iper spouse) in
+          let vfam = Vfam (ifam, fam, cpl, true) in
+          let env = ("#loop", Vint 0) :: env in
+          let env = ("fam_link", vfam) :: env in
+          let env = ("f_link", Vbool true) :: env in
+          let env = ("is_link", Vbool true) :: env in
+          let env = ("baseprefix", Vstring baseprefix) :: env in
+          let env = ("family_cnt", Vint (i + 1)) :: env in
+          let env =
+            match prev with
+            | Some vfam -> ("prev_fam", vfam) :: env
+            | None -> env
+          in
+          List.iter (print_ast env ini_ep) al;
+          (Some vfam, i + 1)
+        end (None, 0) (!GWPARAM_ITL.get_families conf base p)
+        |> ignore
+    | _ ->
+        if Array.length (get_family p) > 0 then
+          begin let rec loop prev i =
+            if i = Array.length (get_family p) then ()
+            else
+              let ifam = (get_family p).(i) in
+              let fam = foi base ifam in
+              let ifath = get_father fam in
+              let imoth = get_mother fam in
+              let ispouse = Gutil.spouse (get_iper p) fam in
+              let cpl = ifath, imoth, ispouse in
+              let m_auth =
+                authorized_age conf base (pget conf base ifath) &&
+                authorized_age conf base (pget conf base imoth)
+              in
+              let vfam = Vfam (ifam, fam, cpl, m_auth) in
+              let env = ("#loop", Vint 0) :: env in
+              let env = ("fam", vfam) :: env in
+              let env = ("family_cnt", Vint (i + 1)) :: env in
+              let env =
+                match prev with
+                  Some vfam -> ("prev_fam", vfam) :: env
+                | None -> env
+              in
+              List.iter (print_ast env ini_ep) al; loop (Some vfam) (i + 1)
+          in
+            loop None 0
+          end;
+        List.fold_left begin fun (prev, i) (ifam, fam, (ifath, imoth, sp), baseprefix, can_merge) ->
+          if can_merge then (None, i)
+          else
+            let cpl = (ifath, imoth, get_iper sp) in
+            let vfam = Vfam (ifam, fam, cpl, true) in
+            let env = ("#loop", Vint 0) :: env in
+            let env = ("fam_link", vfam) :: env in
+            let env = ("f_link", Vbool true) :: env in
+            let env = ("is_link", Vbool true) :: env in
+            let env = ("baseprefix", Vstring baseprefix) :: env in
+            let env = ("family_cnt", Vint (i + 1)) :: env in
+            let env =
+              match prev with
+              | Some vfam -> ("prev_fam", vfam) :: env
+              | None -> env
+            in
+            List.iter (print_ast env ini_ep) al ;
+            (Some vfam, i + 1)
+        end (None, 0) (!GWPARAM_ITL.get_families conf base p)
+        |> ignore
+  in
+  let print_foreach_first_name_alias env al (p, p_auth as ep) =
+    if not p_auth && is_hide_names conf p then ()
+    else
+      Mutil.list_iter_first
+        (fun first s ->
+           let env = ("first_name_alias", Vstring (sou base s)) :: env in
+           let env = ("first", Vbool first) :: env in
+           List.iter (print_ast env ep) al)
+        (get_first_names_aliases p)
+  in
+  let print_foreach_cousin_level env al (_, _ as ep) =
+    let max_level =
+      match get_env "max_cous_level" env with
+      | Vint n -> n
+      | _ -> 0
+    in
+    let rec loop i =
+      if i > max_level then ()
+      else
+        let env = ("level", Vint i) :: env in
+        List.iter (print_ast env ep) al; loop (succ i)
+    in
+    loop 1
+  in
+  let print_foreach_nobility_title env al (p, p_auth as ep) =
+    if p_auth then
+      let titles = nobility_titles_list conf base p in
+      Mutil.list_iter_first
+        (fun first x ->
+           let env = ("nobility_title", Vtitle (p, x)) :: env in
+           let env = ("first", Vbool first) :: env in
+           List.iter (print_ast env ep) al)
+        titles
+  in
+  let print_foreach_parent env al (a, _ as ep) =
+    match get_parents a with
+      Some ifam ->
+        let cpl = foi base ifam in
+        Array.iter
+          (fun iper ->
+             let p = pget conf base iper in
+             let env = ("parent", Vind p) :: env in
+             List.iter (print_ast env ep) al)
+          (get_parent_array cpl)
+    | None -> ()
+  in
+  let print_foreach_qualifier env al (p, p_auth as ep) =
+    if not p_auth && is_hide_names conf p then ()
+    else
+      Mutil.list_iter_first
+        (fun first nn ->
+           let env = ("qualifier", Vstring (sou base nn)) :: env in
+           let env = ("first", Vbool first) :: env in
+           List.iter (print_ast env ep) al)
+        (get_qualifiers p)
+  in
+  let print_foreach_relation env al (p, p_auth as ep) =
+    if p_auth then
+      Mutil.list_iter_first
+        (fun first r ->
+           let env = ("rel", Vrel (r, None)) :: env in
+           let env = ("first", Vbool first) :: env in
+           List.iter (print_ast env ep) al)
+        (get_rparents p)
+  in
+  let print_foreach_related env al (p, p_auth as ep) =
+    if p_auth then
+      let list =
+        let list = List.sort_uniq compare (get_related p) in
+        List.fold_left
+          (fun list ic ->
+             let c = pget conf base ic in
+             let rec loop list =
+               function
+                 r :: rl ->
+                   begin match r.r_fath with
+                     Some ip when ip = get_iper p ->
+                       loop ((c, r) :: list) rl
+                   | _ ->
+                       match r.r_moth with
+                         Some ip when ip = get_iper p ->
+                           loop ((c, r) :: list) rl
+                       | _ -> loop list rl
+                   end
+               | [] -> list
+             in
+             loop list (get_rparents c))
+          [] list
+      in
+      let list =
+        (* TODO don't query db in sort *)
+        List.sort
+          (fun (c1, _) (c2, _) ->
+             let d1 =
+               match Adef.od_of_cdate (get_baptism c1) with
+                 None -> Adef.od_of_cdate (get_birth c1)
+               | x -> x
+             in
+             let d2 =
+               match Adef.od_of_cdate (get_baptism c2) with
+                 None -> Adef.od_of_cdate (get_birth c2)
+               | x -> x
+             in
+             match d1, d2 with
+               Some d1, Some d2 -> Date.compare_date d1 d2
+             | _ -> -1)
+          (List.rev list)
+      in
+      List.iter
+        (fun (c, r) ->
+           let env = ("rel", Vrel (r, Some c)) :: env in
+           List.iter (print_ast env ep) al)
+        list
+  in
+  let print_foreach_sorted_list_item env al ep =
+    let list =
+      match get_env "list" env with
+        Vslist l -> SortedList.elements !l
+      | _ -> []
+    in
+    let rec loop prev_item =
+      function
+        _ :: sll as gsll ->
+          let item = Vslistlm gsll in
+          let env = ("item", item) :: ("prev_item", prev_item) :: env in
+          List.iter (print_ast env ep) al; loop item sll
+      | [] -> ()
+    in
+    loop (Vslistlm []) list
+  in
+  let print_foreach_sorted_listb_item env al ep =
+    let list =
+      match get_env "listb" env with
+      | Vslist l -> SortedList.elements !l
+      | _ -> []
+    in
+    let rec loop prev_item =
+      function
+      | (_ :: sll) as gsll ->
+           let item = Vslistlm gsll in
+           let env = ("item", item) :: ("prev_item", prev_item) :: env in
+           List.iter (print_ast env ep) al;
+           loop item sll
+      | [] -> ()
+    in loop (Vslistlm []) list
+  in
+  let print_foreach_sorted_listc_item env al ep =
+    let list =
+      match get_env "listc" env with
+      | Vslist l -> SortedList.elements !l
+      | _ -> []
+    in
+    let rec loop prev_item =
+      function
+      | (_ :: sll) as gsll ->
+           let item = Vslistlm gsll in
+           let env = ("item", item) :: ("prev_item", prev_item) :: env in
+           List.iter (print_ast env ep) al;
+           loop item sll
+      | [] -> ()
+    in loop (Vslistlm []) list
+  in
+  let print_foreach_source env al (p, p_auth as ep) =
+    let rec insert_loop typ src =
+      function
+        (typ1, src1) :: srcl ->
+          if src = src1 then (typ1 ^ ", " ^ typ, src1) :: srcl
+          else (typ1, src1) :: insert_loop typ src srcl
+      | [] -> [typ, src]
+    in
+    let insert typ src srcl =
+      if src = "" then srcl
+      else insert_loop (Util.translate_eval typ) src srcl
+    in
+    let srcl =
+      if p_auth then
+        let srcl = [] in
+        let srcl =
+          insert (transl_nth conf "person/persons" 0)
+            (sou base (get_psources p)) srcl
+        in
+        let srcl =
+          insert (transl_nth conf "birth" 0) (sou base (get_birth_src p)) srcl
+        in
+        let srcl =
+          insert (transl_nth conf "baptism" 0) (sou base (get_baptism_src p))
+            srcl
+        in
+        let (srcl, _) =
+          Array.fold_left
+            (fun (srcl, i) ifam ->
+               let fam = foi base ifam in
+               let isp = Gutil.spouse (get_iper p) fam in
+               let sp = poi base isp in
+               (* On sait que p_auth vaut vrai. *)
+               let m_auth = authorized_age conf base sp in
+               if m_auth then
+                 let lab =
+                   if Array.length (get_family p) = 1 then ""
+                   else " " ^ string_of_int i
+                 in
+                 let srcl =
+                   let src_typ = transl_nth conf "marriage/marriages" 0 in
+                   insert (src_typ ^ lab) (sou base (get_marriage_src fam))
+                     srcl
+                 in
+                 let src_typ = transl_nth conf "family/families" 0 in
+                 insert (src_typ ^ lab) (sou base (get_fsources fam)) srcl,
+                 i + 1
+               else srcl, i + 1)
+            (srcl, 1) (get_family p)
+        in
+        let srcl =
+          insert (transl_nth conf "death" 0) (sou base (get_death_src p)) srcl
+        in
+        let buri_crem_lex =
+          match get_burial p with
+          Cremated _ -> "cremation"
+          | _ -> "burial"
+        in
+        insert (transl_nth conf buri_crem_lex 0) (sou base (get_burial_src p))
+          srcl
+      else []
+    in
+    (* Affiche les sources et met à jour les variables "first" et "last". *)
+    let rec loop first =
+      function
+        (src_typ, src) :: srcl ->
+          let env =
+            ("first", Vbool first) :: ("last", Vbool (srcl = [])) ::
+            ("src_typ", Vstring src_typ) :: ("src", Vstring src) :: env
+          in
+          List.iter (print_ast env ep) al; loop false srcl
+      | [] -> ()
+    in
+    loop true srcl
+  in
+  let print_foreach_surname_alias env al (p, p_auth as ep) =
+    if not p_auth && is_hide_names conf p then ()
+    else
+      Mutil.list_iter_first
+        (fun first s ->
+           let env = ("surname_alias", Vstring (sou base s)) :: env in
+           let env = ("first", Vbool first) :: env in
+           List.iter (print_ast env ep) al)
+        (get_surnames_aliases p)
+  in
+  let print_foreach_witness env al ep =
+    function
+    | Vfam (_, fam, _, true) ->
+      Array.iteri
+        begin fun i ip ->
+          let p = pget conf base ip in
+          let env =
+            ("witness", Vind p)
+            :: ("first", Vbool (i = 0))
+            :: env
+          in
+          List.iter (print_ast env ep) al
+        end
+        (get_witnesses fam)
+    | _ -> ()
+  in
+  let print_foreach_witness_relation env al (p, _ as ep) =
+    let list =
+      let list = ref [] in
+      let related = List.sort_uniq compare (get_related p) in
+      begin let rec make_list =
+        function
+          ic :: icl ->
+            let c = pget conf base ic in
+            if get_sex c = Male then
+              Array.iter
+                (fun ifam ->
+                   let fam = foi base ifam in
+                   if Array.mem (get_iper p) (get_witnesses fam) then
+                     list := (ifam, fam) :: !list)
+                (get_family (pget conf base ic));
+            make_list icl
+        | [] -> ()
+      in
+        make_list related
+      end;
+      !list
+    in
+    (* TODO don't query db in sort *)
+    let list =
+      List.sort
+        (fun (_, fam1) (_, fam2) ->
+           match
+             Adef.od_of_cdate (get_marriage fam1),
+             Adef.od_of_cdate (get_marriage fam2)
+           with
+           | Some d1, Some d2 -> Date.compare_date d1 d2
+           | _ -> 0)
+        list
+    in
+    List.iter
+      (fun (ifam, fam) ->
+         let ifath = get_father fam in
+         let imoth = get_mother fam in
+         let cpl = ifath, imoth, imoth in
+         let m_auth =
+           authorized_age conf base (pget conf base ifath) &&
+           authorized_age conf base (pget conf base imoth)
+         in
+         if m_auth then
+           let env = ("fam", Vfam (ifam, fam, cpl, true)) :: env in
+           List.iter (print_ast env ep) al)
+      list
+  in
+  let print_simple_foreach env el al ini_ep ep efam loc =
+    function
+      "alias" -> print_foreach_alias env al ep
+    | "ancestor" -> print_foreach_ancestor env al ep
+    | "ancestor_level" -> print_foreach_ancestor_level env el al ep
+    | "ancestor_level2" -> print_foreach_ancestor_level2 env al ep
+    | "ancestor_surname" -> print_foreach_anc_surn env el al loc ep
+    | "ancestor_tree_line" -> print_foreach_ancestor_tree env el al ep
+    | "cell" -> print_foreach_cell env al ep
+    | "child" -> print_foreach_child env al ep efam
+    | "cousin_level" -> print_foreach_cousin_level env al ep
+    | "descendant_level" -> print_foreach_descendant_level env al ep
+    | "event" -> print_foreach_event env al ep
+    | "family" -> print_foreach_family env al ini_ep ep
+    | "first_name_alias" -> print_foreach_first_name_alias env al ep
+    | "nobility_title" -> print_foreach_nobility_title env al ep
+    | "parent" -> print_foreach_parent env al ep
+    | "qualifier" -> print_foreach_qualifier env al ep
+    | "related" -> print_foreach_related env al ep
+    | "relation" -> print_foreach_relation env al ep
+    | "sorted_list_item" -> print_foreach_sorted_list_item env al ep
+    | "sorted_listb_item" -> print_foreach_sorted_listb_item env al ep
+    | "sorted_listc_item" -> print_foreach_sorted_listc_item env al ep
+    | "source" -> print_foreach_source env al ep
+    | "surname_alias" -> print_foreach_surname_alias env al ep
+    | "witness" -> print_foreach_witness env al ep efam
+    | "baptism_witness" -> print_foreach_baptism_witness env al ep
+    | "birth_witness" -> print_foreach_birth_witness env al ep
+    | "burial_witness" -> print_foreach_burial_witness env al ep
+    | "cremation_witness" -> print_foreach_cremation_witness env al ep
+    | "death_witness" -> print_foreach_death_witness env al ep
+    | "event_witness" -> print_foreach_event_witness env al ep
+    | "event_witness_relation" -> print_foreach_event_witness_relation env al ep
+    | "witness_relation" -> print_foreach_witness_relation env al ep
+    | _ -> raise Not_found
+  in
+  let print_foreach env ini_ep loc s sl ell al =
     let rec loop env (a, _ as ep) efam =
       function
         [s] -> print_simple_foreach env ell al ini_ep ep efam loc s
@@ -3969,814 +4815,6 @@ let print_foreach conf base print_ast eval_expr =
       | _ -> get_env "fam" env
     in
     loop env ini_ep efam (s :: sl)
-  and print_simple_foreach env el al ini_ep ep efam loc =
-    function
-      "alias" -> print_foreach_alias env al ep
-    | "ancestor" -> print_foreach_ancestor env al ep
-    | "ancestor_level" -> print_foreach_ancestor_level env el al ep
-    | "ancestor_level2" -> print_foreach_ancestor_level2 env al ep
-    | "ancestor_surname" -> print_foreach_anc_surn env el al loc ep
-    | "ancestor_tree_line" -> print_foreach_ancestor_tree env el al ep
-    | "baptism_witness" -> print_foreach_baptism_witness env al ep
-    | "birth_witness" -> print_foreach_birth_witness env al ep
-    | "burial_witness" -> print_foreach_burial_witness env al ep
-    | "cell" -> print_foreach_cell env al ep
-    | "child" -> print_foreach_child env al ep efam
-    | "cousin_level" -> print_foreach_cousin_level env al ep
-    | "cremation_witness" -> print_foreach_cremation_witness env al ep
-    | "death_witness" -> print_foreach_death_witness env al ep
-    | "descendant_level" -> print_foreach_descendant_level env al ep
-    | "event" -> print_foreach_event env al ep
-    | "event_witness" -> print_foreach_event_witness env al ep
-    | "event_witness_relation" ->
-        print_foreach_event_witness_relation env al ep
-    | "family" -> print_foreach_family env al ini_ep ep
-    | "first_name_alias" -> print_foreach_first_name_alias env al ep
-    | "nobility_title" -> print_foreach_nobility_title env al ep
-    | "parent" -> print_foreach_parent env al ep
-    | "qualifier" -> print_foreach_qualifier env al ep
-    | "related" -> print_foreach_related env al ep
-    | "relation" -> print_foreach_relation env al ep
-    | "sorted_list_item" -> print_foreach_sorted_list_item env al ep
-    | "sorted_listb_item" -> print_foreach_sorted_listb_item env al ep
-    | "sorted_listc_item" -> print_foreach_sorted_listc_item env al ep
-    | "source" -> print_foreach_source env al ep
-    | "surname_alias" -> print_foreach_surname_alias env al ep
-    | "witness" -> print_foreach_witness env al ep efam
-    | "witness_relation" -> print_foreach_witness_relation env al ep
-    | _ -> raise Not_found
-  and print_foreach_alias env al (p, p_auth as ep) =
-    if not p_auth && is_hide_names conf p then ()
-    else
-      Mutil.list_iter_first
-        (fun first a ->
-           let env = ("alias", Vstring (sou base a)) :: env in
-           let env = ("first", Vbool first) :: env in
-           List.iter (print_ast env ep) al)
-        (get_aliases p)
-  and print_foreach_ancestor env al ep =
-    match get_env "gpl" env with
-      Vgpl gpl ->
-        let rec loop first gpl =
-          match gpl with
-            [] -> ()
-          | gp :: gl ->
-              begin match gp with
-                GP_missing (_, _) -> ()
-              | _ ->
-                  let env =
-                    ("ancestor", Vanc gp) :: ("first", Vbool first) ::
-                    ("last", Vbool (gl = [])) :: env
-                  in
-                  List.iter (print_ast env ep) al
-              end;
-              loop false gl
-        in
-        loop true gpl
-    | _ -> ()
-  and print_foreach_ancestor_level env el al (p, _ as ep) =
-    let max_level =
-      match el with
-        [[e]] -> eval_int_expr env ep e
-      | [] ->
-          begin match get_env "max_anc_level" env with
-            Vint n -> n
-          | _ -> 0
-          end
-      | _ -> raise Not_found
-    in
-    let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
-    let rec loop gpl i n =
-      if i > max_level then ()
-      else
-        let n =
-          List.fold_left
-            (fun n gp ->
-               match gp with
-                 GP_person (_, _, _) -> n + 1
-               | _ -> n)
-            n gpl
-        in
-        let env =
-          ("gpl", Vgpl gpl) :: ("level", Vint i) :: ("n", Vint n) :: env
-        in
-        List.iter (print_ast env ep) al;
-        let gpl = next_generation conf base mark gpl in loop gpl (succ i) n
-    in
-    loop [GP_person (Sosa.one, get_iper p, None)] 1 0
-  and print_foreach_ancestor_level2 env al (p, _ as ep) =
-    let max_lev = "max_anc_level" in
-    let max_level =
-      match get_env max_lev env with
-        Vint n -> n
-      | _ -> 0
-    in
-    let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
-    let rec loop gpl i =
-      if i > max_level then ()
-      else
-        let env = ("gpl", Vgpl gpl) :: ("level", Vint i) :: env in
-        List.iter (print_ast env ep) al;
-        Gwdb.Collection.iter (fun i -> Gwdb.Marker.set mark i Sosa.zero) (Gwdb.ipers base) ;
-        let gpl = next_generation2 conf base mark gpl in loop gpl (succ i)
-    in
-    loop [GP_person (Sosa.one, get_iper p, None)] 1
-  and print_foreach_anc_surn env el al loc (p, _ as ep) =
-    let max_level =
-      match el with
-        [[e]] -> eval_int_expr env ep e
-      | [] ->
-          begin match get_env "max_anc_level" env with
-            Vint n -> n
-          | _ -> 0
-          end
-      | _ -> raise Not_found
-    in
-    (* En fonction du type de sortie demandé, on construit *)
-    (* soit la liste des branches soit la liste éclair.    *)
-    match p_getenv conf.env "t" with
-      Some "E" ->
-        let list = build_list_eclair conf base max_level p in
-        List.iter
-          (fun (a, b, c, d, e, f) ->
-             let b = (b : Adef.escaped_string :> Adef.safe_string) in
-             let env =
-               ("ancestor", Vanc_surn (Eclair (a, b, c, d, e, f, loc))) :: env
-             in
-             List.iter (print_ast env ep) al)
-          list
-    | Some "F" ->
-        let list = build_surnames_list conf base max_level p in
-        List.iter
-          (fun (a, (((b, c, d), e), f)) ->
-             let env =
-               ("ancestor", Vanc_surn (Branch (a, b, c, d, e, f, loc))) :: env
-             in
-             List.iter (print_ast env ep) al)
-          list
-    | _ -> ()
-  and print_foreach_ancestor_tree env el al (p, _ as ep) =
-    let (p, max_level) =
-      match el with
-        [[e1]; [e2]] ->
-          let ip = iper_of_string @@ eval_expr env ep e1 in
-          let max_level = eval_int_expr env ep e2 in
-          pget conf base ip, max_level
-      | [[e]] -> p, eval_int_expr env ep e
-      | [] ->
-          begin match get_env "max_anc_level" env with
-            Vint n -> p, n
-          | _ -> p, 0
-          end
-      | _ -> raise Not_found
-    in
-    let gen = tree_generation_list conf base max_level p in
-    let rec loop first =
-      function
-        g :: gl ->
-          let env =
-            ("celll", Vcelll g) :: ("first", Vbool first) ::
-            ("last", Vbool (gl = [])) :: env
-          in
-          List.iter (print_ast env ep) al; loop false gl
-      | [] -> ()
-    in
-    loop true gen
-  and print_foreach_baptism_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Pevent Epers_Baptism then
-            Array.iteri
-              begin fun i (ip, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("baptism_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (events_list conf base p)
-  and print_foreach_birth_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Pevent Epers_Birth then
-            Array.iteri
-              begin fun i (ip, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("birth_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (events_list conf base p)
-  and print_foreach_burial_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Pevent Epers_Burial then
-            Array.iteri
-              begin fun i (ip, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("burial_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (events_list conf base p)
-  and print_foreach_cell env al ep =
-    let celll =
-      match get_env "celll" env with
-        Vcelll celll -> celll
-      | _ -> raise Not_found
-    in
-    Mutil.list_iter_first
-      (fun first cell ->
-         let env = ("cell", Vcell cell) :: ("first", Vbool first) :: env in
-         List.iter (print_ast env ep) al)
-      celll
-  and print_foreach_child env al ep =
-    function
-      Vfam (ifam, fam, (ifath, imoth, isp), _) ->
-        begin match get_env "f_link" env with
-          Vbool _ ->
-          let baseprefix =
-            match get_env "baseprefix" env with
-            | Vstring baseprefix -> baseprefix
-            | _ -> conf.command
-          in
-          let children = !GWPARAM_ITL.get_children base baseprefix ifam ifath imoth in
-          List.iter begin fun ((p, _) as ep, baseprefix) ->
-            let env = ("#loop", Vint 0) :: env in
-            let env = ("child_link", Vind p) :: env in
-            let env = ("baseprefix", Vstring baseprefix) :: env in
-            let env = ("p_link", Vbool true) :: env in
-            List.iter (print_ast env ep) al
-          end children
-        | _ ->
-            let auth =
-              Array.for_all
-                (fun ip -> authorized_age conf base (pget conf base ip))
-                (get_children fam)
-            in
-            let env = ("auth", Vbool auth) :: env in
-            let n =
-              let p =
-                match get_env "p" env with
-                  Vind p -> p
-                | _ -> assert false
-              in
-              let rec loop i =
-                if i = Array.length (get_children fam) then -2
-                else if (get_children fam).(i) = get_iper p then i
-                else loop (i + 1)
-              in
-              loop 0
-            in
-            Array.iteri
-              (fun i ip ->
-                 let p = pget conf base ip in
-                 let env = ("#loop", Vint 0) :: env in
-                 let env = ("child", Vind p) :: env in
-                 let env = ("child_cnt", Vint (i + 1)) :: env in
-                 let env =
-                   if i = n - 1 && not (is_hidden p) then
-                     ("pos", Vstring "prev") :: env
-                   else if i = n then ("pos", Vstring "self") :: env
-                   else if i = n + 1 && not (is_hidden p) then
-                     ("pos", Vstring "next") :: env
-                   else env
-                 in
-                 let ep = p, authorized_age conf base p in
-                 List.iter (print_ast env ep) al)
-              (get_children fam);
-
-            List.iter begin fun (_, _, children) ->
-              List.iter begin fun ((p, _), baseprefix, can_merge) ->
-                if not can_merge then begin
-                  let env = ("#loop", Vint 0) :: env in
-                  let env = ("child_link", Vind p) :: env in
-                  let env = ("baseprefix", Vstring baseprefix) :: env in
-                  let env = ("p_link", Vbool true) :: env in
-                  let ep = p, true in
-                  List.iter (print_ast env ep) al
-                end end children
-            end (!GWPARAM_ITL.get_children' conf base (get_iper (fst ep)) fam isp)
-        end
-    | _ -> ()
-  and print_foreach_cremation_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Pevent Epers_Cremation then
-            Array.iteri
-              begin fun i (ip, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("cremation_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (events_list conf base p)
-  and print_foreach_death_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Pevent Epers_Death then
-            Array.iteri
-              begin fun i (ip, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("death_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (events_list conf base p)
-  and print_foreach_descendant_level env al ep =
-    let max_level =
-      match get_env "max_desc_level" env with
-        Vint n -> n
-      | _ -> 0
-    in
-    let rec loop i =
-      if i > max_level then ()
-      else
-        let env = ("level", Vint i) :: env in
-        List.iter (print_ast env ep) al; loop (succ i)
-    in
-    loop 0
-  and print_foreach_event env al (p, _ as ep) =
-    let events = events_list conf base p in
-    Mutil.list_iter_first
-      (fun first evt ->
-         let env = ("event", Vevent (p, evt)) :: env in
-         let env = ("first", Vbool first) :: env in
-         List.iter (print_ast env ep) al)
-      events
-  and print_foreach_event_witness env al (_, p_auth as ep) =
-    if p_auth then
-      match get_env "event" env with
-        Vevent (_, (_, _, _, _, _, witnesses, _)) ->
-          Array.iteri
-            begin fun i (ip, wk) ->
-              let p = pget conf base ip in
-              let wk = Util.string_of_witness_kind conf (get_sex p) wk in
-              let env =
-                ("event_witness", Vind p)
-                :: ("event_witness_kind", Vstring (wk :> string))
-                :: ("first", Vbool (i = 0))
-                :: env
-              in
-              List.iter (print_ast env ep) al
-            end
-            witnesses
-      | _ -> ()
-  and print_foreach_event_witness_relation env al (p, p_auth as ep) =
-    let related = List.sort_uniq compare (get_related p) in
-    let events_witnesses =
-      let list = ref [] in
-      begin let rec make_list =
-        function
-          ic :: icl ->
-            let c = pget conf base ic in
-            List.iter
-              (fun (name, _, _, _, _, wl, _ as evt) ->
-                 let (mem, wk) = Util.array_mem_witn conf base (get_iper p) wl in
-                 if mem then
-                   match name with
-                     Fevent _ ->
-                       if get_sex c = Male then list := (c, wk, evt) :: !list
-                   | _ -> list := (c, wk, evt) :: !list)
-              (events_list conf base c);
-            make_list icl
-        | [] -> ()
-      in
-        make_list related
-      end;
-      !list
-    in
-    (* On tri les témoins dans le même ordre que les évènements. *)
-    let events_witnesses =
-      CheckItem.sort_events
-        (fun (_, _, (name, _, _, _, _, _, _)) ->
-           match name with
-           | Pevent n -> CheckItem.Psort n
-           | Fevent n -> CheckItem.Fsort n)
-        (fun (_, _, (_, date, _, _, _, _, _)) -> date)
-        events_witnesses
-    in
-    List.iter
-      (fun (p, wk, evt) ->
-         if p_auth then
-           let env = ("event_witness_relation", Vevent (p, evt)) :: env in
-           let env =
-             ( "event_witness_relation_kind"
-             , Vstring (wk : Adef.safe_string :> string) )
-             :: env
-           in
-           List.iter (print_ast env ep) al)
-      events_witnesses
-  and print_foreach_family env al ini_ep (p, _) =
-    match get_env "p_link" env with
-      Vbool _ ->
-        let conf =
-          match get_env "baseprefix" env with
-          | Vstring baseprefix -> {conf with command = baseprefix}
-          | _ -> conf
-        in
-        List.fold_left begin fun (prev, i) (ifam, fam, (ifath, imoth, spouse), baseprefix, _) ->
-          let cpl = (ifath, imoth, get_iper spouse) in
-          let vfam = Vfam (ifam, fam, cpl, true) in
-          let env = ("#loop", Vint 0) :: env in
-          let env = ("fam_link", vfam) :: env in
-          let env = ("f_link", Vbool true) :: env in
-          let env = ("is_link", Vbool true) :: env in
-          let env = ("baseprefix", Vstring baseprefix) :: env in
-          let env = ("family_cnt", Vint (i + 1)) :: env in
-          let env =
-            match prev with
-            | Some vfam -> ("prev_fam", vfam) :: env
-            | None -> env
-          in
-          List.iter (print_ast env ini_ep) al;
-          (Some vfam, i + 1)
-        end (None, 0) (!GWPARAM_ITL.get_families conf base p)
-        |> ignore
-    | _ ->
-        if Array.length (get_family p) > 0 then
-          begin let rec loop prev i =
-            if i = Array.length (get_family p) then ()
-            else
-              let ifam = (get_family p).(i) in
-              let fam = foi base ifam in
-              let ifath = get_father fam in
-              let imoth = get_mother fam in
-              let ispouse = Gutil.spouse (get_iper p) fam in
-              let cpl = ifath, imoth, ispouse in
-              let m_auth =
-                authorized_age conf base (pget conf base ifath) &&
-                authorized_age conf base (pget conf base imoth)
-              in
-              let vfam = Vfam (ifam, fam, cpl, m_auth) in
-              let env = ("#loop", Vint 0) :: env in
-              let env = ("fam", vfam) :: env in
-              let env = ("family_cnt", Vint (i + 1)) :: env in
-              let env =
-                match prev with
-                  Some vfam -> ("prev_fam", vfam) :: env
-                | None -> env
-              in
-              List.iter (print_ast env ini_ep) al; loop (Some vfam) (i + 1)
-          in
-            loop None 0
-          end;
-        List.fold_left begin fun (prev, i) (ifam, fam, (ifath, imoth, sp), baseprefix, can_merge) ->
-          if can_merge then (None, i)
-          else
-            let cpl = (ifath, imoth, get_iper sp) in
-            let vfam = Vfam (ifam, fam, cpl, true) in
-            let env = ("#loop", Vint 0) :: env in
-            let env = ("fam_link", vfam) :: env in
-            let env = ("f_link", Vbool true) :: env in
-            let env = ("is_link", Vbool true) :: env in
-            let env = ("baseprefix", Vstring baseprefix) :: env in
-            let env = ("family_cnt", Vint (i + 1)) :: env in
-            let env =
-              match prev with
-              | Some vfam -> ("prev_fam", vfam) :: env
-              | None -> env
-            in
-            List.iter (print_ast env ini_ep) al ;
-            (Some vfam, i + 1)
-        end (None, 0) (!GWPARAM_ITL.get_families conf base p)
-        |> ignore
-  and print_foreach_first_name_alias env al (p, p_auth as ep) =
-    if not p_auth && is_hide_names conf p then ()
-    else
-      Mutil.list_iter_first
-        (fun first s ->
-           let env = ("first_name_alias", Vstring (sou base s)) :: env in
-           let env = ("first", Vbool first) :: env in
-           List.iter (print_ast env ep) al)
-        (get_first_names_aliases p)
-  and print_foreach_cousin_level env al (_, _ as ep) =
-    let max_level =
-      match get_env "max_cous_level" env with
-      | Vint n -> n
-      | _ -> 0
-    in
-    let rec loop i =
-      if i > max_level then ()
-      else
-        let env = ("level", Vint i) :: env in
-        List.iter (print_ast env ep) al; loop (succ i)
-    in
-    loop 1
-  and print_foreach_nobility_title env al (p, p_auth as ep) =
-    if p_auth then
-      let titles = nobility_titles_list conf base p in
-      Mutil.list_iter_first
-        (fun first x ->
-           let env = ("nobility_title", Vtitle (p, x)) :: env in
-           let env = ("first", Vbool first) :: env in
-           List.iter (print_ast env ep) al)
-        titles
-  and print_foreach_parent env al (a, _ as ep) =
-    match get_parents a with
-      Some ifam ->
-        let cpl = foi base ifam in
-        Array.iter
-          (fun iper ->
-             let p = pget conf base iper in
-             let env = ("parent", Vind p) :: env in
-             List.iter (print_ast env ep) al)
-          (get_parent_array cpl)
-    | None -> ()
-  and print_foreach_qualifier env al (p, p_auth as ep) =
-    if not p_auth && is_hide_names conf p then ()
-    else
-      Mutil.list_iter_first
-        (fun first nn ->
-           let env = ("qualifier", Vstring (sou base nn)) :: env in
-           let env = ("first", Vbool first) :: env in
-           List.iter (print_ast env ep) al)
-        (get_qualifiers p)
-  and print_foreach_relation env al (p, p_auth as ep) =
-    if p_auth then
-      Mutil.list_iter_first
-        (fun first r ->
-           let env = ("rel", Vrel (r, None)) :: env in
-           let env = ("first", Vbool first) :: env in
-           List.iter (print_ast env ep) al)
-        (get_rparents p)
-  and print_foreach_related env al (p, p_auth as ep) =
-    if p_auth then
-      let list =
-        let list = List.sort_uniq compare (get_related p) in
-        List.fold_left
-          (fun list ic ->
-             let c = pget conf base ic in
-             let rec loop list =
-               function
-                 r :: rl ->
-                   begin match r.r_fath with
-                     Some ip when ip = get_iper p ->
-                       loop ((c, r) :: list) rl
-                   | _ ->
-                       match r.r_moth with
-                         Some ip when ip = get_iper p ->
-                           loop ((c, r) :: list) rl
-                       | _ -> loop list rl
-                   end
-               | [] -> list
-             in
-             loop list (get_rparents c))
-          [] list
-      in
-      let list =
-        List.sort
-          (fun (c1, _) (c2, _) ->
-             let d1 =
-               match Adef.od_of_cdate (get_baptism c1) with
-                 None -> Adef.od_of_cdate (get_birth c1)
-               | x -> x
-             in
-             let d2 =
-               match Adef.od_of_cdate (get_baptism c2) with
-                 None -> Adef.od_of_cdate (get_birth c2)
-               | x -> x
-             in
-             match d1, d2 with
-               Some d1, Some d2 -> Date.compare_date d1 d2
-             | _ -> -1)
-          (List.rev list)
-      in
-      List.iter
-        (fun (c, r) ->
-           let env = ("rel", Vrel (r, Some c)) :: env in
-           List.iter (print_ast env ep) al)
-        list
-  and print_foreach_sorted_list_item env al ep =
-    let list =
-      match get_env "list" env with
-        Vslist l -> SortedList.elements !l
-      | _ -> []
-    in
-    let rec loop prev_item =
-      function
-        _ :: sll as gsll ->
-          let item = Vslistlm gsll in
-          let env = ("item", item) :: ("prev_item", prev_item) :: env in
-          List.iter (print_ast env ep) al; loop item sll
-      | [] -> ()
-    in
-    loop (Vslistlm []) list
-
-  and print_foreach_sorted_listb_item env al ep =
-    let list =
-      match get_env "listb" env with
-      | Vslist l -> SortedList.elements !l
-      | _ -> []
-    in
-    let rec loop prev_item =
-      function
-      | (_ :: sll) as gsll ->
-           let item = Vslistlm gsll in
-           let env = ("item", item) :: ("prev_item", prev_item) :: env in
-           List.iter (print_ast env ep) al;
-           loop item sll
-      | [] -> ()
-    in loop (Vslistlm []) list
-  and print_foreach_sorted_listc_item env al ep =
-    let list =
-      match get_env "listc" env with
-      | Vslist l -> SortedList.elements !l
-      | _ -> []
-    in
-    let rec loop prev_item =
-      function
-      | (_ :: sll) as gsll ->
-           let item = Vslistlm gsll in
-           let env = ("item", item) :: ("prev_item", prev_item) :: env in
-           List.iter (print_ast env ep) al;
-           loop item sll
-      | [] -> ()
-    in loop (Vslistlm []) list
-
-  and print_foreach_source env al (p, p_auth as ep) =
-    let rec insert_loop typ src =
-      function
-        (typ1, src1) :: srcl ->
-          if src = src1 then (typ1 ^ ", " ^ typ, src1) :: srcl
-          else (typ1, src1) :: insert_loop typ src srcl
-      | [] -> [typ, src]
-    in
-    let insert typ src srcl =
-      if src = "" then srcl
-      else insert_loop (Util.translate_eval typ) src srcl
-    in
-    let srcl =
-      if p_auth then
-        let srcl = [] in
-        let srcl =
-          insert (transl_nth conf "person/persons" 0)
-            (sou base (get_psources p)) srcl
-        in
-        let srcl =
-          insert (transl_nth conf "birth" 0) (sou base (get_birth_src p)) srcl
-        in
-        let srcl =
-          insert (transl_nth conf "baptism" 0) (sou base (get_baptism_src p))
-            srcl
-        in
-        let (srcl, _) =
-          Array.fold_left
-            (fun (srcl, i) ifam ->
-               let fam = foi base ifam in
-               let isp = Gutil.spouse (get_iper p) fam in
-               let sp = poi base isp in
-               (* On sait que p_auth vaut vrai. *)
-               let m_auth = authorized_age conf base sp in
-               if m_auth then
-                 let lab =
-                   if Array.length (get_family p) = 1 then ""
-                   else " " ^ string_of_int i
-                 in
-                 let srcl =
-                   let src_typ = transl_nth conf "marriage/marriages" 0 in
-                   insert (src_typ ^ lab) (sou base (get_marriage_src fam))
-                     srcl
-                 in
-                 let src_typ = transl_nth conf "family/families" 0 in
-                 insert (src_typ ^ lab) (sou base (get_fsources fam)) srcl,
-                 i + 1
-               else srcl, i + 1)
-            (srcl, 1) (get_family p)
-        in
-        let srcl =
-          insert (transl_nth conf "death" 0) (sou base (get_death_src p)) srcl
-        in
-        let buri_crem_lex =
-          match get_burial p with
-          Cremated _ -> "cremation"
-          | _ -> "burial"
-        in
-        insert (transl_nth conf buri_crem_lex 0) (sou base (get_burial_src p))
-          srcl
-      else []
-    in
-    (* Affiche les sources et met à jour les variables "first" et "last". *)
-    let rec loop first =
-      function
-        (src_typ, src) :: srcl ->
-          let env =
-            ("first", Vbool first) :: ("last", Vbool (srcl = [])) ::
-            ("src_typ", Vstring src_typ) :: ("src", Vstring src) :: env
-          in
-          List.iter (print_ast env ep) al; loop false srcl
-      | [] -> ()
-    in
-    loop true srcl
-  and print_foreach_surname_alias env al (p, p_auth as ep) =
-    if not p_auth && is_hide_names conf p then ()
-    else
-      Mutil.list_iter_first
-        (fun first s ->
-           let env = ("surname_alias", Vstring (sou base s)) :: env in
-           let env = ("first", Vbool first) :: env in
-           List.iter (print_ast env ep) al)
-        (get_surnames_aliases p)
-  and print_foreach_witness env al ep =
-    function
-      Vfam (_, fam, _, true) ->
-      Array.iteri
-        begin fun i ip ->
-          let p = pget conf base ip in
-          let env =
-            ("witness", Vind p)
-            :: ("first", Vbool (i = 0))
-            :: env
-          in
-          List.iter (print_ast env ep) al
-        end
-        (get_witnesses fam)
-    | _ -> ()
-  and print_foreach_witness_relation env al (p, _ as ep) =
-    let list =
-      let list = ref [] in
-      let related = List.sort_uniq compare (get_related p) in
-      begin let rec make_list =
-        function
-          ic :: icl ->
-            let c = pget conf base ic in
-            if get_sex c = Male then
-              Array.iter
-                (fun ifam ->
-                   let fam = foi base ifam in
-                   if Array.mem (get_iper p) (get_witnesses fam) then
-                     list := (ifam, fam) :: !list)
-                (get_family (pget conf base ic));
-            make_list icl
-        | [] -> ()
-      in
-        make_list related
-      end;
-      !list
-    in
-    let list =
-      List.sort
-        (fun (_, fam1) (_, fam2) ->
-           match
-             Adef.od_of_cdate (get_marriage fam1),
-             Adef.od_of_cdate (get_marriage fam2)
-           with
-           | Some d1, Some d2 -> Date.compare_date d1 d2
-           | _ -> 0)
-        list
-    in
-    List.iter
-      (fun (ifam, fam) ->
-         let ifath = get_father fam in
-         let imoth = get_mother fam in
-         let cpl = ifath, imoth, imoth in
-         let m_auth =
-           authorized_age conf base (pget conf base ifath) &&
-           authorized_age conf base (pget conf base imoth)
-         in
-         if m_auth then
-           let env = ("fam", Vfam (ifam, fam, cpl, true)) :: env in
-           List.iter (print_ast env ep) al)
-      list
   in
   print_foreach
 
