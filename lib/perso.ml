@@ -1810,11 +1810,32 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       | Vanc_surn info -> eval_anc_by_surnl_field_var conf base env ep info sl
       | _ -> raise Not_found
     end
-  | "baptism_witness" :: sl ->
-    begin match get_env "baptism_witness" env with
+  | ("baptism_witness" as s ):: sl
+  | ("birth_witness" as s ):: sl
+  | ("burial_witness" as s) :: sl
+  | ("cremation_witness" as s) :: sl
+  | ("death_witness" as s) :: sl
+  | ("event_witness" as s) :: sl ->
+    begin match get_env s env with
         Vind p ->
         let ep = p, authorized_age conf base p in
         eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found
+    end
+  | "event_witness_relation" :: sl ->
+    begin match get_env "event_witness_relation" env with
+        Vevent (p, e) ->
+        eval_event_witness_relation_var conf base env (p, e) loc sl
+      | _ -> raise Not_found
+    end
+  | "event_witness_relation_kind" :: _ ->
+    begin match get_env "event_witness_relation_kind" env with
+        Vstring wk -> VVstring wk
+      | _ -> raise Not_found
+    end
+  | "event_witness_kind" :: _ ->
+    begin match get_env "event_witness_kind" env with
+        Vstring s -> VVstring s
       | _ -> raise Not_found
     end
   | ["base"; "name"] -> VVstring conf.bname
@@ -1828,20 +1849,6 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       (Mutil.string_of_int_sep
          (Util.transl conf "(thousand separator)")
          (Gwdb.nb_of_real_persons base))
-  | "birth_witness" :: sl ->
-    begin match get_env "birth_witness" env with
-        Vind p ->
-        let ep = p, authorized_age conf base p in
-        eval_person_field_var conf base env ep loc sl
-      | _ -> raise Not_found
-    end
-  | "burial_witness" :: sl ->
-    begin match get_env "burial_witness" env with
-        Vind p ->
-        let ep = p, authorized_age conf base p in
-        eval_person_field_var conf base env ep loc sl
-      | _ -> raise Not_found
-    end
   | "cell" :: sl ->
     begin match get_env "cell" env with
         Vcell cell -> eval_cell_field_var conf base env cell loc sl
@@ -1865,20 +1872,6 @@ and eval_compound_var conf base env (a, _ as ep) loc =
           eval_person_field_var conf base env ep loc sl
         | _ -> raise Not_found
     end
-  | "cremation_witness" :: sl ->
-    begin match get_env "cremation_witness" env with
-        Vind p ->
-        let ep = p, authorized_age conf base p in
-        eval_person_field_var conf base env ep loc sl
-      | _ -> raise Not_found
-    end
-  | "death_witness" :: sl ->
-    begin match get_env "death_witness" env with
-        Vind p ->
-        let ep = p, authorized_age conf base p in
-        eval_person_field_var conf base env ep loc sl
-      | _ -> raise Not_found
-    end
   | "enclosing" :: sl ->
     let rec loop =
       function
@@ -1887,29 +1880,6 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       | [] -> raise Not_found
     in
     loop env
-  | "event_witness" :: sl ->
-    begin match get_env "event_witness" env with
-        Vind p ->
-        let ep = p, authorized_age conf base p in
-        eval_person_field_var conf base env ep loc sl
-      | _ -> raise Not_found
-    end
-  | "event_witness_relation" :: sl ->
-    begin match get_env "event_witness_relation" env with
-        Vevent (p, e) ->
-        eval_event_witness_relation_var conf base env (p, e) loc sl
-      | _ -> raise Not_found
-    end
-  | "event_witness_relation_kind" :: _ ->
-    begin match get_env "event_witness_relation_kind" env with
-        Vstring wk -> VVstring wk
-      | _ -> raise Not_found
-    end
-  | "event_witness_kind" :: _ ->
-    begin match get_env "event_witness_kind" env with
-        Vstring s -> VVstring s
-      | _ -> raise Not_found
-    end
   | "family" :: sl ->
     (* TODO ???
        let mode_local =
