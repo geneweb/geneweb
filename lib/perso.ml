@@ -4032,69 +4032,6 @@ let print_foreach conf base print_ast eval_expr =
     in
     loop true gen
   in
-  let print_foreach_baptism_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Pevent Epers_Baptism then
-            Array.iteri
-              begin fun i (ip, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("baptism_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (events_list conf base p)
-  in
-  let print_foreach_birth_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Pevent Epers_Birth then
-            Array.iteri
-              begin fun i (ip, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("birth_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (events_list conf base p)
-  in
-  let print_foreach_burial_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Pevent Epers_Burial then
-            Array.iteri
-              begin fun i (ip, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("burial_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (events_list conf base p)
-  in
   let print_foreach_cell env al ep =
     let celll =
       match get_env "celll" env with
@@ -4177,48 +4114,6 @@ let print_foreach conf base print_ast eval_expr =
         end
     | _ -> ()
   in
-  let print_foreach_cremation_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Pevent Epers_Cremation then
-            Array.iteri
-              begin fun i (ip, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("cremation_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (events_list conf base p)
-  in
-  let print_foreach_death_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Pevent Epers_Death then
-            Array.iteri
-              begin fun i (ip, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("death_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (events_list conf base p)
-  in
   let print_foreach_descendant_level env al ep =
     let max_level =
       match get_env "max_desc_level" env with
@@ -4242,6 +4137,31 @@ let print_foreach conf base print_ast eval_expr =
          List.iter (print_ast env ep) al)
       events
   in
+  let print_foreach_epers_event_witness env al (p, _ as ep) epers_event =
+    let epers_event_witness_string = match epers_event with
+      | Epers_Burial -> "burial_witness"
+      | Epers_Cremation -> "cremation_witness"
+      | Epers_Death -> "death_witness"
+      | Epers_Baptism -> "batism_witness"
+      | Epers_Birth -> "birth_witness"
+      | _ -> "" (* TODO: ? *)
+    in
+    List.iter (fun (name, _, _, _, _, wl, _) ->
+          if name = Pevent epers_event then
+            Array.iteri
+              begin fun i (ip, _) ->
+                let p = pget conf base ip in
+                let env =
+                  (epers_event_witness_string, Vind p)
+                  :: ("first", Vbool (i = 0))
+                  :: env
+                in
+                List.iter (print_ast env ep) al
+              end
+              wl
+          else ()
+          ) (events_list conf base p);
+  in
   let print_foreach_event_witness env al (_, p_auth as ep) =
     if p_auth then
       match get_env "event" env with
@@ -4249,6 +4169,7 @@ let print_foreach conf base print_ast eval_expr =
           Array.iteri
             begin fun i (ip, wk) ->
               let p = pget conf base ip in
+              (* TODO don't make it a string here and use Vwitness_kind *)
               let wk = Util.string_of_witness_kind conf (get_sex p) wk in
               let env =
                 ("event_witness", Vind p)
@@ -4306,6 +4227,70 @@ let print_foreach conf base print_ast eval_expr =
            in
            List.iter (print_ast env ep) al)
       events_witnesses
+  in
+  let print_foreach_witness env al ep =
+    function
+    | Vfam (_, fam, _, true) ->
+      Array.iteri
+        begin fun i ip ->
+          let p = pget conf base ip in
+          let env =
+            ("witness", Vind p)
+            :: ("first", Vbool (i = 0))
+            :: env
+          in
+          List.iter (print_ast env ep) al
+        end
+        (get_witnesses fam)
+    | _ -> ()
+  in
+  let print_foreach_witness_relation env al (p, _ as ep) =
+    let list =
+      let list = ref [] in
+      let related = List.sort_uniq compare (get_related p) in
+      begin let rec make_list =
+        function
+          ic :: icl ->
+            let c = pget conf base ic in
+            if get_sex c = Male then
+              Array.iter
+                (fun ifam ->
+                   let fam = foi base ifam in
+                   if Array.mem (get_iper p) (get_witnesses fam) then
+                     list := (ifam, fam) :: !list)
+                (get_family (pget conf base ic));
+            make_list icl
+        | [] -> ()
+      in
+        make_list related
+      end;
+      !list
+    in
+    (* TODO don't query db in sort *)
+    let list =
+      List.sort
+        (fun (_, fam1) (_, fam2) ->
+           match
+             Adef.od_of_cdate (get_marriage fam1),
+             Adef.od_of_cdate (get_marriage fam2)
+           with
+           | Some d1, Some d2 -> Date.compare_date d1 d2
+           | _ -> 0)
+        list
+    in
+    List.iter
+      (fun (ifam, fam) ->
+         let ifath = get_father fam in
+         let imoth = get_mother fam in
+         let cpl = ifath, imoth, imoth in
+         let m_auth =
+           authorized_age conf base (pget conf base ifath) &&
+           authorized_age conf base (pget conf base imoth)
+         in
+         if m_auth then
+           let env = ("fam", Vfam (ifam, fam, cpl, true)) :: env in
+           List.iter (print_ast env ep) al)
+      list
   in
   let print_foreach_family env al ini_ep (p, _) =
     match get_env "p_link" env with
@@ -4630,70 +4615,6 @@ let print_foreach conf base print_ast eval_expr =
            List.iter (print_ast env ep) al)
         (get_surnames_aliases p)
   in
-  let print_foreach_witness env al ep =
-    function
-    | Vfam (_, fam, _, true) ->
-      Array.iteri
-        begin fun i ip ->
-          let p = pget conf base ip in
-          let env =
-            ("witness", Vind p)
-            :: ("first", Vbool (i = 0))
-            :: env
-          in
-          List.iter (print_ast env ep) al
-        end
-        (get_witnesses fam)
-    | _ -> ()
-  in
-  let print_foreach_witness_relation env al (p, _ as ep) =
-    let list =
-      let list = ref [] in
-      let related = List.sort_uniq compare (get_related p) in
-      begin let rec make_list =
-        function
-          ic :: icl ->
-            let c = pget conf base ic in
-            if get_sex c = Male then
-              Array.iter
-                (fun ifam ->
-                   let fam = foi base ifam in
-                   if Array.mem (get_iper p) (get_witnesses fam) then
-                     list := (ifam, fam) :: !list)
-                (get_family (pget conf base ic));
-            make_list icl
-        | [] -> ()
-      in
-        make_list related
-      end;
-      !list
-    in
-    (* TODO don't query db in sort *)
-    let list =
-      List.sort
-        (fun (_, fam1) (_, fam2) ->
-           match
-             Adef.od_of_cdate (get_marriage fam1),
-             Adef.od_of_cdate (get_marriage fam2)
-           with
-           | Some d1, Some d2 -> Date.compare_date d1 d2
-           | _ -> 0)
-        list
-    in
-    List.iter
-      (fun (ifam, fam) ->
-         let ifath = get_father fam in
-         let imoth = get_mother fam in
-         let cpl = ifath, imoth, imoth in
-         let m_auth =
-           authorized_age conf base (pget conf base ifath) &&
-           authorized_age conf base (pget conf base imoth)
-         in
-         if m_auth then
-           let env = ("fam", Vfam (ifam, fam, cpl, true)) :: env in
-           List.iter (print_ast env ep) al)
-      list
-  in
   let print_simple_foreach env el al ini_ep ep efam loc =
     function
       "alias" -> print_foreach_alias env al ep
@@ -4720,11 +4641,11 @@ let print_foreach conf base print_ast eval_expr =
     | "source" -> print_foreach_source env al ep
     | "surname_alias" -> print_foreach_surname_alias env al ep
     | "witness" -> print_foreach_witness env al ep efam
-    | "baptism_witness" -> print_foreach_baptism_witness env al ep
-    | "birth_witness" -> print_foreach_birth_witness env al ep
-    | "burial_witness" -> print_foreach_burial_witness env al ep
-    | "cremation_witness" -> print_foreach_cremation_witness env al ep
-    | "death_witness" -> print_foreach_death_witness env al ep
+    | "baptism_witness" -> print_foreach_epers_event_witness env al ep Epers_Baptism
+    | "birth_witness" -> print_foreach_epers_event_witness env al ep Epers_Birth
+    | "burial_witness" -> print_foreach_epers_event_witness env al ep Epers_Burial
+    | "cremation_witness" -> print_foreach_epers_event_witness env al ep Epers_Cremation
+    | "death_witness" -> print_foreach_epers_event_witness env al ep Epers_Death
     | "event_witness" -> print_foreach_event_witness env al ep
     | "event_witness_relation" -> print_foreach_event_witness_relation env al ep
     | "witness_relation" -> print_foreach_witness_relation env al ep
