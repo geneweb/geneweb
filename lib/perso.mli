@@ -60,6 +60,8 @@ val string_of_image_url : config -> base -> person * bool -> bool -> Adef.escape
 
 val round_2_dec : float -> float
 
+
+(* TODO put in lib/image.ml *)
 val string_of_image_size : config -> base -> person * bool -> string
 val string_of_image_medium_size : config -> base -> person * bool -> string
 val string_of_image_small_size : config -> base -> person * bool -> string

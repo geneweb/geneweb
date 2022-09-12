@@ -19,6 +19,7 @@ let sorp base ip =
   sou base (get_first_name p), sou base (get_surname p), get_occ p,
   Update.Link, ""
 
+(* TODO: O(n^2) *)
 let merge_witnesses base wit1 wit2 =
   Array.of_list @@
   Array.fold_right
@@ -26,6 +27,7 @@ let merge_witnesses base wit1 wit2 =
     (Array.map (sorp base) wit1)
     (List.map (sorp base) (Array.to_list wit2))
 
+(* TODO: O(n^2) *)
 let merge_event_witnesses wit1 wit2 =
   Array.of_list @@
   Array.fold_right
