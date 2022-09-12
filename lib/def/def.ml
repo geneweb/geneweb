@@ -1,5 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
+(* TODO shouldn't this be in gwdb? *)
 (** Http response status *)
 type httpStatus =
   | OK (* 200 *)
@@ -14,6 +15,7 @@ type httpStatus =
 
 exception HttpExn of httpStatus * string
 
+(* TODO OCaml 4.12 : use Either *)
 (** Type that represents 2 possible choices *)
 type ('a, 'b) choice =
     Left of 'a
