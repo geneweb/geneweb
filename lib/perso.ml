@@ -15,7 +15,7 @@ let string_of_marriage_text conf base fam =
   let s =
     match marriage with
     | Some d -> " " ^<^ DateDisplay.string_of_ondate conf d
-    | _ -> Adef.safe ""
+    | None -> Adef.safe ""
   in
   match marriage_place with
   | "" -> s
@@ -124,14 +124,13 @@ let nobility_titles_list conf base p =
   List.fold_right
     (fun (t_nth, t_name, t_ident, t_place, t_dates) l ->
        match l with
-         (nth, name, title, places, dates) :: rl
+       | (nth, name, title, places, dates) :: rl
          when
            not conf.is_rtl && nth = t_nth && name_equiv name t_name &&
            eq_istr title t_ident && dates = t_dates ->
            (nth, name, title, t_place :: places, dates) :: rl
        | _ -> (t_nth, t_name, t_ident, [t_place], t_dates) :: l)
     titles []
-
 
 (* ********************************************************************** *)
 (*  [Fonc] has_history : config -> string -> bool                         *)
@@ -177,7 +176,7 @@ let get_death_text conf p p_auth =
         end
       | DeadYoung -> transl_nth conf "died young" is |> Adef.safe
       | DeadDontKnowWhen -> transl_nth conf "died" is |> Adef.safe
-      | _ -> "" |> Adef.safe
+      | NotDead | DontKnowIfDead | OfCourseDead -> "" |> Adef.safe
     else "" |> Adef.safe
   in
   let on_death_date =
@@ -188,7 +187,7 @@ let get_death_text conf p p_auth =
         | Some "yes" ->
           DateDisplay.string_of_ondate ~link:false conf d
           ^>^ DateDisplay.get_wday conf d
-        | _ -> DateDisplay.string_of_ondate ~link:false conf d
+        | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d
       end
     | _ -> "" |> Adef.safe
   in
@@ -208,7 +207,7 @@ let get_baptism_text conf p p_auth =
         | Some "yes" ->
           DateDisplay.string_of_ondate ~link:false conf d
           ^>^ DateDisplay.get_wday conf d
-        | _ -> DateDisplay.string_of_ondate ~link:false conf d
+        | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d
       end
     | _ -> "" |> Adef.safe
   in
@@ -227,7 +226,7 @@ let get_birth_text conf p p_auth =
         | Some "yes" ->
           DateDisplay.string_of_ondate ~link:false conf d
           ^>^ DateDisplay.get_wday conf d
-        | _ -> DateDisplay.string_of_ondate ~link:false conf d
+        | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d
       end
     | _ -> "" |> Adef.safe
   in
@@ -240,7 +239,7 @@ let get_marriage_date_text conf fam p_auth =
       | Some "yes" ->
         DateDisplay.string_of_ondate ~link:false conf d
         ^>^ DateDisplay.get_wday conf d
-      | _ -> DateDisplay.string_of_ondate ~link:false conf d
+      | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d
     end
   | _ -> "" |> Adef.safe
 
@@ -259,11 +258,11 @@ let get_burial_text conf p p_auth =
             | Some "yes" ->
               DateDisplay.string_of_ondate ~link:false conf d
               ^>^ DateDisplay.get_wday conf d
-            | _ -> DateDisplay.string_of_ondate ~link:false conf d
+            | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d
           end
         | _ -> "" |> Adef.safe
       end
-    | _ -> "" |> Adef.safe
+    | UnknownBurial | Cremated _ -> "" |> Adef.safe
   in
   buried ^^^ " " ^<^ on_burial_date
 
@@ -282,11 +281,11 @@ let get_cremation_text conf p p_auth =
             | Some "yes" ->
               DateDisplay.string_of_ondate ~link:false conf d
               ^>^ DateDisplay.get_wday conf d
-            | _ -> DateDisplay.string_of_ondate ~link:false conf d
+            | Some _ | None -> DateDisplay.string_of_ondate ~link:false conf d
           end
         | _ -> "" |> Adef.safe
       end
-    | _ -> "" |> Adef.safe
+    | UnknownBurial | Buried _ -> "" |> Adef.safe
   in
   cremated ^^^ " " ^<^ on_cremation_date
 
@@ -390,18 +389,18 @@ let next_generation conf base mark gpl =
              in
              let gp = GP_interv (Some (Sosa.twice n1, Sosa.twice n2, x)) in
              gp :: gpl
-         | _ -> gpl)
+         | GP_same _ | GP_missing _ -> gpl)
       gpl []
   in
   let gpl =
     List.fold_left
       (fun gpl gp ->
          match gp with
-           GP_person (n, ip, _) ->
+         | GP_person (n, ip, _) ->
              let m = Gwdb.Marker.get mark ip in
              if Sosa.eq m Sosa.zero then begin Gwdb.Marker.set mark ip n; gp :: gpl end
              else GP_same (n, m, ip) :: gpl
-         | _ -> gp :: gpl)
+         | GP_same _ | GP_interv _ | GP_missing _ -> gp :: gpl)
       [] gpl
   in
   List.rev gpl
@@ -411,20 +410,20 @@ let next_generation2 conf base mark gpl =
     List.map
       (fun gp ->
          match gp with
-           GP_same (n, m, _) ->
+         | GP_same (n, m, _) ->
              GP_interv (Some (n, Sosa.inc n 1, Some (m, Sosa.inc m 1)))
-         | _ -> gp)
+         | GP_person _ | GP_interv _ | GP_missing _ -> gp )
       gpl
   in
   let gpl = next_generation conf base mark gpl in
   List.fold_right
     (fun gp gpl ->
        match gp, gpl with
-         GP_interv (Some (n1, n2, x)), GP_interv (Some (n3, n4, y)) :: gpl1 ->
+       | GP_interv (Some (n1, n2, x)), GP_interv (Some (n3, n4, y)) :: gpl1 ->
            if Sosa.eq n2 n3 then
              let z =
                match x, y with
-                 Some (m1, m2), Some (m3, m4) ->
+               | Some (m1, m2), Some (m3, m4) ->
                    if Sosa.eq m2 m3 then Some (m1, m4) else None
                | _ -> None
              in
@@ -438,7 +437,7 @@ let next_generation2 conf base mark gpl =
 let sosa_is_present all_gp n1 =
   let rec loop =
     function
-      GP_person (n, _, _) :: gpl | GP_same (n, _, _) :: gpl ->
+    | GP_person (n, _, _) :: gpl | GP_same (n, _, _) :: gpl ->
         if Sosa.eq n n1 then true else loop gpl
     | _ :: gpl -> loop gpl
     | [] -> false
@@ -448,7 +447,7 @@ let sosa_is_present all_gp n1 =
 let get_link all_gp ip =
   let rec loop =
     function
-      (GP_person (_, ip0, _) as gp) :: gpl ->
+    | (GP_person (_, ip0, _) as gp) :: gpl ->
         if ip = ip0 then Some gp else loop gpl
     | _ :: gpl -> loop gpl
     | [] -> None
@@ -470,12 +469,12 @@ let will_print =
   function
     GP_person (_, _, _) -> true
   | GP_same (_, _, _) -> true
-  | _ -> false
+  | GP_interv _ | GP_missing _ -> false
 
 let get_all_generations conf base p =
   let max_level =
     match p_getint conf.env "v" with
-      Some v -> v
+    | Some v -> v
     | None -> 0
   in
   let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
@@ -558,7 +557,7 @@ let tree_generation_list conf base gv p =
         Empty -> Empty :: list
       | Cell (p, _, _, _, _, base_prefix) ->
         match get_parents p with
-          Some ifam ->
+        | Some ifam ->
           let cpl = foi base ifam in
           let fath =
             let p = pget conf base (get_father cpl) in
@@ -580,7 +579,7 @@ let tree_generation_list conf base gv p =
               Cell (m, fo, Alone, true, 1, base_prefix) :: list
             | None, None -> Empty :: list
           end
-        | _ ->
+        | None ->
           match !GWPARAM_ITL.tree_generation_list conf base base_prefix p with
           | Some (fath, if1, base_prefix1), Some (moth, if2, base_prefix2) ->
             Cell (fath, Some if1, Left, true, 1, base_prefix1)
@@ -621,12 +620,12 @@ let get_date_place conf base auth_for_all_anc p =
     in
     let d2 =
       match get_death p with
-        Death (_, cd) -> Some (Adef.date_of_cdate cd)
-      | _ ->
+      | Death (_, cd) -> Some (Adef.date_of_cdate cd)
+      | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead| OfCourseDead ->
           match get_burial p with
-            Buried cod -> Adef.od_of_cdate cod
+          | Buried cod -> Adef.od_of_cdate cod
           | Cremated cod -> Adef.od_of_cdate cod
-          | _ -> None
+          | UnknownBurial -> None
     in
     let auth_for_all_anc =
       if auth_for_all_anc then true
@@ -961,14 +960,14 @@ let build_list_eclair conf base v p =
           (Adef.od_of_cdate (get_baptism p));
         let death =
           match get_death p with
-            Death (_, cd) -> Some (Adef.date_of_cdate cd)
-          | _ -> None
+          | Death (_, cd) -> Some (Adef.date_of_cdate cd)
+          | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead -> None
         in
         add_surname p surn (get_death_place p) death;
         let burial =
           match get_burial p with
-            Buried cod | Cremated cod -> Adef.od_of_cdate cod
-          | _ -> None
+          | Buried cod | Cremated cod -> Adef.od_of_cdate cod
+          | UnknownBurial -> None
         in
         add_surname p surn (get_burial_place p) burial;
         Array.iter
@@ -1041,7 +1040,7 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) : 
         in
         match text.Def.NLDB.lnTxt with
         | Some "" -> str
-        | _ ->
+        | Some _ | None ->
           let str1 =
             let v =
               let text = text.Def.NLDB.lnTxt in
@@ -1081,7 +1080,10 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) : 
           if (str :> string) = "" then str1 else str ^^^ ", " ^<^ str1
       with Not_found -> str
     end list str
-  | _ -> str
+  | Def.NLDB.PgInd _
+  | Def.NLDB.PgFam _
+  | Def.NLDB.PgNotes
+  | Def.NLDB.PgWizard _ -> str
 
 let links_to_ind conf base db key =
   let list =
@@ -1189,7 +1191,7 @@ let get_env v env =
   with Not_found -> Vnone
 let get_vother =
   function
-    Vother x -> Some x
+  | Vother x -> Some x
   | _ -> None
 let set_vother x = Vother x
 
@@ -1232,7 +1234,7 @@ let get_sosa conf base env r p =
     Not_found ->
       let s =
         match get_env "sosa_ref" env with
-          Vsosa_ref v ->
+        | Vsosa_ref v ->
             begin match get_env "t_sosa" env with
               | Vt_sosa (Some t_sosa) -> SosaCache.find_sosa conf base p v t_sosa
               | _ -> None
@@ -1372,7 +1374,7 @@ and eval_simple_bool_var conf base env =
   in
   function
   | "are_divorced" ->
-    fam_check_aux (fun fam -> match get_divorce fam with Divorced _ -> true | _ -> false)
+    fam_check_aux (fun fam -> match get_divorce fam with Divorced _ -> true | NotDivorced | Separated -> false)
   | "are_engaged" ->
     check_relation ((=) Engaged)
   | "are_married" ->
@@ -1527,7 +1529,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
               | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
               | x -> x
             end
-          | _ -> raise Not_found
+          | NotDivorced | Separated -> raise Not_found
         end
       | _ ->
         match get_env "fam_link" env with
@@ -1538,7 +1540,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
                 | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
                 | x -> x
               end
-            | _ -> raise Not_found
+            | NotDivorced | Separated -> raise Not_found
           end
         | _ -> raise Not_found
     end
@@ -1546,14 +1548,14 @@ and eval_simple_str_var conf base env (_, p_auth) =
     begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
         begin match get_divorce fam with
-            Divorced d ->
+          | Divorced d ->
             let d = Adef.od_of_cdate d in
             begin match d with
                 Some d when m_auth ->
                 DateDisplay.string_slash_of_date conf d |> safe_val
               | _ -> null_val
             end
-          | _ -> raise Not_found
+          | NotDivorced | Separated -> raise Not_found
         end
       | _ -> raise Not_found
     end
@@ -1749,10 +1751,10 @@ and eval_simple_str_var conf base env (_, p_auth) =
     begin match get_env "rel" env with
         Vrel (r, None) ->
         begin match r.r_fath, r.r_moth with
-            Some _, None -> relation_type_text conf r.r_type 0 |> safe_val
+          | Some _, None -> relation_type_text conf r.r_type 0 |> safe_val
           | None, Some _ -> relation_type_text conf r.r_type 1 |> safe_val
           | Some _, Some _ -> relation_type_text conf r.r_type 2 |> safe_val
-          | _ -> raise Not_found
+          | None, None -> raise Not_found
         end
       | _ -> raise Not_found
     end
@@ -2089,7 +2091,7 @@ and eval_compound_var conf base env (a, _ as ep) loc =
       | Some np ->
         let np_auth = authorized_age conf base np in
         eval_person_field_var conf base env (np, np_auth) loc sl
-      | _ -> raise Not_found
+      | None -> raise Not_found
     end
   | "related" :: sl ->
     begin match get_env "rel" env with
@@ -2298,7 +2300,7 @@ and eval_ancestor_field_var conf base env gp loc =
           let n2 = Sosa.sub n2 Sosa.one in
           VVstring (to_string n1 ^ "-" ^ to_string n2 ^ " = ...")
         | GP_interv None -> VVstring "..."
-        | _ -> null_val
+        | GP_person _ | GP_same _ | GP_missing _ -> null_val
       end
     | ["mother_sosa"] ->
       begin match gp, get_env "all_gp" env with
@@ -2309,14 +2311,14 @@ and eval_ancestor_field_var conf base env gp loc =
       end
     | "same" :: sl ->
       begin match gp with
-          GP_same (_, n, _) -> VVstring (eval_num conf n sl)
-        | _ -> null_val
+        | GP_same (_, n, _) -> VVstring (eval_num conf n sl)
+        | GP_person _ | GP_interv _ | GP_missing _ -> null_val
       end
     | "anc_sosa" :: sl ->
       begin match gp with
-          GP_person (n, _, _) | GP_same (n, _, _) ->
+        | GP_person (n, _, _) | GP_same (n, _, _) ->
           VVstring (eval_num conf n sl)
-        | _ -> null_val
+        | GP_interv _ | GP_missing _ -> null_val
       end
     | "spouse" :: sl ->
       begin match gp with
@@ -2324,14 +2326,14 @@ and eval_ancestor_field_var conf base env gp loc =
           let ip = Gutil.spouse ip (foi base ifam) in
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
-        | _ -> raise Not_found
+        | GP_person _ | GP_interv _ | GP_missing _ | GP_same _-> raise Not_found
       end
     | sl ->
       match gp with
-        GP_person (_, ip, _) | GP_same (_, _, ip) ->
+      | GP_person (_, ip, _) | GP_same (_, _, ip) ->
         let ep = make_ep conf base ip in
         eval_person_field_var conf base env ep loc sl
-      | _ -> raise Not_found
+      | GP_interv _ | GP_missing _ -> raise Not_found
 and eval_anc_by_surnl_field_var conf base env ep info =
     match info with
       Branch (_, db, de, place, p, sosa_list, loc) ->
@@ -2396,37 +2398,38 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
   function
     "baptism_date" :: sl ->
       begin match Adef.od_of_cdate (get_baptism p) with
-        Some d when p_auth -> eval_date_field_var conf d sl
-      | _ -> null_val
+      | Some d when p_auth -> eval_date_field_var conf d sl
+      | Some _ | None -> null_val
       end
   | "birth_date" :: sl ->
       begin match Adef.od_of_cdate (get_birth p) with
-        Some d when p_auth -> eval_date_field_var conf d sl
-      | _ -> null_val
+      | Some d when p_auth -> eval_date_field_var conf d sl
+      | Some _ | None -> null_val
       end
   | "burial_date" :: sl ->
       begin match get_burial p with
-        Buried cod when p_auth ->
+      | Buried cod when p_auth ->
           begin match Adef.od_of_cdate cod with
-            Some d -> eval_date_field_var conf d sl
+          | Some d -> eval_date_field_var conf d sl
           | None -> null_val
           end
-      | _ -> null_val
+      | Buried _ | Cremated _ | UnknownBurial -> null_val
       end
   | "cremated_date" :: sl ->
       begin match get_burial p with
-        Cremated cod when p_auth ->
+      | Cremated cod when p_auth ->
           begin match Adef.od_of_cdate cod with
             Some d -> eval_date_field_var conf d sl
           | None -> null_val
           end
-      | _ -> null_val
+      | Buried _ | Cremated _ | UnknownBurial -> null_val
       end
   | "death_date" :: sl ->
       begin match get_death p with
-        Death (_, cd) when p_auth ->
+      | Death (_, cd) when p_auth ->
           eval_date_field_var conf (Adef.date_of_cdate cd) sl
-      | _ -> null_val
+      | Death _ | NotDead | DeadYoung | DeadDontKnowWhen
+      | DontKnowIfDead | OfCourseDead -> null_val
       end
   | "event" :: sl ->
       begin match get_env "event" env with
@@ -2542,11 +2545,11 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
       end
   | "nobility_title" :: sl ->
       begin match Util.main_title conf base p with
-        Some t when p_auth ->
+      | Some t when p_auth ->
           let id = sou base t.t_ident in
           let pl = sou base t.t_place in
           eval_nobility_title_field_var (id, pl) sl
-      | _ -> null_val
+      | Some _ | None -> null_val
       end
   | "self" :: sl -> eval_person_field_var conf base env ep loc sl
   | "sosa" :: sl ->
@@ -2744,13 +2747,13 @@ and eval_bool_event_field base (p, p_auth)
   | "computable_age" ->
       if p_auth then
         match Adef.od_of_cdate (get_birth p) with
-          Some (Dgreg (d, _)) ->
+        | Some (Dgreg (d, _)) ->
             not (d.day = 0 && d.month = 0 && d.prec <> Sure)
-        | _ ->
+        | Some _ | None ->
             match Adef.od_of_cdate (get_baptism p) with
-              Some (Dgreg (d, _)) ->
+            | Some (Dgreg (d, _)) ->
                 not (d.day = 0 && d.month = 0 && d.prec <> Sure)
-            | _ -> false
+            | Some _ | None -> false
       else false
   | _ -> raise Not_found
 and eval_str_event_field conf base (p, p_auth)
@@ -2860,7 +2863,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
           begin match get_relation fam, get_divorce fam with
-            (Married | NoSexesCheckMarried), NotDivorced ->
+          | (Married | NoSexesCheckMarried), NotDivorced ->
               begin match m_auth, Adef.od_of_cdate (get_marriage fam) with
                 true, Some (Dgreg (d, _)) ->
                   let father = pget conf base (get_father fam) in
@@ -2999,8 +3002,8 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_cremation_date" ->
       if p_auth then
         match get_burial p with
-          Cremated cod -> Adef.od_of_cdate cod <> None
-        | _ -> false
+        | Cremated cod -> Adef.od_of_cdate cod <> None
+        | Buried _ | UnknownBurial -> false
       else false
   | "has_cremation_place" -> p_auth && sou base (get_burial_place p) <> ""
   | "has_cremation_witnesses" ->
@@ -3014,8 +3017,8 @@ and eval_bool_person_field conf base env (p, p_auth) =
       p_auth && loop (events_list conf base p)
   | "has_death_date" ->
       begin match get_death p with
-        Death (_, _) -> p_auth
-      | _ -> false
+      | Death (_, _) -> p_auth
+      | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead -> false
       end
   | "has_death_place" -> p_auth && sou base (get_death_place p) <> ""
   | "has_death_source" -> p_auth && sou base (get_death_src p) <> ""
@@ -3038,7 +3041,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
         | Some "never" -> false
         | Some "always" ->
           if nb_fam > 0 || (List.length events) > 0 then true else false
-        | _ ->
+        | Some _ | None ->
             (* Renvoie vrai que si il y a des informations supplémentaires *)
             (* par rapport aux évènements principaux, i.e. témoins (mais   *)
             (* on ne prend pas en compte les notes).                       *)
@@ -3174,23 +3177,24 @@ and eval_bool_person_field conf base env (p, p_auth) =
       else get_surnames_aliases p <> []
   | "is_buried" ->
       begin match get_burial p with
-        Buried _ -> p_auth
-      | _ -> false
+      | Buried _ -> p_auth
+      | Cremated _ | UnknownBurial -> false
       end
   | "is_cremated" ->
       begin match get_burial p with
-        Cremated _ -> p_auth
-      | _ -> false
+      | Cremated _ -> p_auth
+      | Buried _ | UnknownBurial -> false
       end
   | "is_dead" ->
       begin match get_death p with
-        Death (_, _) | DeadYoung | DeadDontKnowWhen -> p_auth
-      | _ -> false
+      | Death _ | DeadYoung | DeadDontKnowWhen -> p_auth
+      | NotDead | DontKnowIfDead | OfCourseDead -> false
       end
   | "is_certainly_dead" ->
       begin match get_death p with
-        OfCourseDead -> p_auth
-      | _ -> false
+      | OfCourseDead -> p_auth
+      (* TODO: why not: | Death _ | DeadYoung -> true *)
+      | Death _ | DeadYoung | DeadDontKnowWhen | NotDead | DontKnowIfDead -> false
       end
   | "is_descendant" ->
       begin match get_env "desc_mark" env with
@@ -3532,7 +3536,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "slash_birth_date" ->
       if p_auth then match Adef.od_of_cdate (get_birth p) with
         | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
-        | _ -> null_val
+        | None -> null_val
       else null_val
   | "slash_approx_birth_date" ->
       if p_auth then match fst (Util.get_approx_birth_date_place conf base p) with
@@ -3542,7 +3546,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "on_burial_date" ->
     begin match get_burial p with
       | Buried cod -> date_aux conf p_auth cod
-      | _ -> raise Not_found
+      | Cremated _ | UnknownBurial -> raise Not_found
     end
   | "psources" ->
       let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
@@ -3555,14 +3559,14 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       | Buried cod ->
         begin match Adef.od_of_cdate cod with
           | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
-          | _ -> null_val
+          | None -> null_val
         end
-      | _ -> raise Not_found
+      | Cremated _ | UnknownBurial -> raise Not_found
     else null_val
   | "on_cremation_date" ->
     begin match get_burial p with
       | Cremated cod -> date_aux conf p_auth cod
-      | _ -> raise Not_found
+      | Buried _ | UnknownBurial -> raise Not_found
     end
   | "slash_cremation_date" ->
       begin match get_burial p with
@@ -3576,7 +3580,8 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   | "on_death_date" ->
     begin match get_death p with
       | Death (_, d) -> date_aux conf p_auth d
-      | _ -> raise Not_found
+      | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead
+       -> raise Not_found
     end
   | "slash_death_date" ->
     begin match p_auth, get_death p with
@@ -3625,7 +3630,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       | Vallgp all_gp ->
         begin match get_link all_gp (get_iper p) with
           | Some (GP_person (s, _, _)) -> str_val (Sosa.to_string s)
-          | _ -> null_val
+          | Some _ | None -> null_val
         end
       | _ -> raise Not_found
     end
@@ -3713,8 +3718,8 @@ and eval_family_field_var conf base env (_, fam, (ifath, imoth, _), m_auth as fc
       end
   | "marriage_date" :: sl ->
       begin match Adef.od_of_cdate (get_marriage fam) with
-        Some d when m_auth -> eval_date_field_var conf d sl
-      | _ -> null_val
+      | Some d when m_auth -> eval_date_field_var conf d sl
+      | Some _ | None -> null_val
       end
   | "mother" :: sl ->
       begin match get_env "f_link" env with
@@ -3754,7 +3759,7 @@ and string_of_died conf p p_auth =
   if p_auth then
     let is = index_of_sex (get_sex p) in
     match get_death p with
-      Death (dr, _) ->
+    | Death (dr, _) ->
         begin match dr with
           Unspecified -> transl_nth conf "died" is |> Adef.safe
         | Murdered -> transl_nth conf "murdered" is |> Adef.safe
@@ -3764,7 +3769,7 @@ and string_of_died conf p p_auth =
         end
     | DeadYoung -> transl_nth conf "died young" is |> Adef.safe
     | DeadDontKnowWhen -> transl_nth conf "died" is |> Adef.safe
-    | _ -> Adef.safe ""
+    | NotDead | DontKnowIfDead | OfCourseDead -> Adef.safe ""
   else Adef.safe ""
 and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
   if p_auth then
@@ -3875,8 +3880,8 @@ let print_foreach conf base print_ast eval_expr =
             [] -> ()
           | gp :: gl ->
               begin match gp with
-                GP_missing (_, _) -> ()
-              | _ ->
+              | GP_missing (_, _) -> ()
+              | GP_person _ | GP_same _ | GP_interv _ ->
                   let env =
                     ("ancestor", Vanc gp) :: ("first", Vbool first) ::
                     ("last", Vbool (gl = [])) :: env
@@ -3907,8 +3912,8 @@ let print_foreach conf base print_ast eval_expr =
           List.fold_left
             (fun n gp ->
                match gp with
-                 GP_person (_, _, _) -> n + 1
-               | _ -> n)
+               | GP_person (_, _, _) -> n + 1
+               | GP_same _ | GP_interv _ | GP_missing _ -> n)
             n gpl
         in
         let env =
@@ -4426,13 +4431,13 @@ let print_foreach conf base print_ast eval_expr =
                function
                  r :: rl ->
                    begin match r.r_fath with
-                     Some ip when ip = get_iper p ->
+                   | Some ip when ip = get_iper p ->
                        loop ((c, r) :: list) rl
-                   | _ ->
+                   | Some _ | None ->
                        match r.r_moth with
-                         Some ip when ip = get_iper p ->
+                       | Some ip when ip = get_iper p ->
                            loop ((c, r) :: list) rl
-                       | _ -> loop list rl
+                       | Some _ | None -> loop list rl
                    end
                | [] -> list
              in
@@ -4567,8 +4572,9 @@ let print_foreach conf base print_ast eval_expr =
         in
         let buri_crem_lex =
           match get_burial p with
-          Cremated _ -> "cremation"
-          | _ -> "burial"
+          | Cremated _cdate -> "cremation"
+          | Buried _cdate -> "burial"
+          | UnknownBurial -> "burial" (* TODO what should we print here *)
         in
         insert (transl_nth conf buri_crem_lex 0) (sou base (get_burial_src p))
           srcl
@@ -4709,7 +4715,7 @@ let print_foreach conf base print_ast eval_expr =
             | _ -> None
           in
           begin match ip_ifamo with
-            Some (ip, ifamo) ->
+          | Some (ip, ifamo) ->
               let ep = make_ep conf base ip in
               let efam =
                 match ifamo with
@@ -4719,7 +4725,7 @@ let print_foreach conf base print_ast eval_expr =
                 | None -> efam
               in
               loop env ep efam sl
-          | _ -> raise Not_found
+          | None -> raise Not_found
           end
       | "child" :: sl ->
           begin match get_env "child" env with
@@ -4885,7 +4891,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
     let t_sosa =
       match sosa_ref with
       | Some p -> SosaCache.init_sosa_t conf base p
-      | _ -> None
+      | None -> None
     in
     let desc_level_table_l =
       let dlt () = make_desc_level_table conf base emal p in Lazy.from_fun dlt
@@ -4909,7 +4915,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       match Util.find_sosa_ref conf base with
       | Some sosa_ref ->
         Vint (max_ancestor_level conf base (get_iper sosa_ref) 120 + 1)
-      | _ -> Vint 0
+      | None -> Vint 0
     in
     let mcl () = Vint (Cousins.max_cousin_level conf base p) in
     (* Récupère le nombre maximal de niveaux de descendance en prenant en compte les liens inter-arbres (limité à 10 générations car problématique en terme de perf). *)
@@ -5013,7 +5019,7 @@ let print ?no_headers conf base p =
   | Some (src, passwd)
     when is_that_user_and_password conf.auth_scheme "" passwd = false ->
     Util.unauthorized conf src
-  | _ -> interp_templ ?no_headers "perso" conf base p
+  | Some _ | None -> interp_templ ?no_headers "perso" conf base p
 
 let limit_by_tree conf =
   match Option.map int_of_string (List.assoc_opt "max_anc_tree" conf.base_env) with
