@@ -69,6 +69,8 @@ let check_magic magic ic =
   else if magic = really_input_string ic len then true
   else begin seek_in ic pos ; false end
 
+let check_magics magics ic =
+  List.exists (fun magic -> check_magic magic ic) magics
   
 (* POSIX lockf(3), and fcntl(2), releases its locks when the process
    that holds the locks closes ANY file descriptor that was open on that file.
