@@ -26,7 +26,6 @@ val interp_ast :
 
 val input_templ : config -> string -> ast list option
 val print_copyright : config -> unit
-val print_copyright_with_logo : config -> unit
 val include_hed_trl : config -> string -> unit
 val copy_from_templ : config -> string env -> in_channel -> unit
 val key_to_access : string -> bool -> string

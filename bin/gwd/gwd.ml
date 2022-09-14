@@ -514,10 +514,10 @@ let get_actlog check_from utm from_addr base_password =
             in
             let len = String.length user in
             let user, username =
-	  					match String.index_opt user ' ' with
-	  					| Some i ->
-     						 String.sub user 0 i, String.sub user (i + 1) (len - i - 1)
-	  					| None -> user, ""
+              match String.index_opt user ' ' with
+              | Some i ->
+                  String.sub user 0 i, String.sub user (i + 1) (len - i - 1)
+              | None -> user, ""
             in
             let (list, r, changed) =
               if utm -. tm >= tmout then list, r, true
@@ -1135,19 +1135,19 @@ let make_conf from_addr request script_name env =
     with Not_found -> false
   in
   let wizard_just_friend = if manitou then false else wizard_just_friend in
-	let username = ar.ar_name in
-	let username, userkey, usersosa =
-	  let l1 = String.split_on_char '|' username in
-	  if List.length l1 <> 3 then
-	    begin
+  let username = ar.ar_name in
+  let username, userkey, usersosa =
+    let l1 = String.split_on_char '|' username in
+    if List.length l1 <> 3 then
+      begin
         GwdLog.syslog `LOG_CRIT "Bad .auth key or sosa encoding";
-	      "", "", ""
-	    end
-	  else
-	    let u1 = (List.nth l1 1) in
-	    let s1 = (List.nth l1 2) in
-	    (List.nth l1 0), (if u1 = "" then s1 else u1), (if s1 = "" then u1 else s1)
-	in
+        "", "", ""
+      end
+    else
+      let u1 = (List.nth l1 1) in
+      let s1 = (List.nth l1 2) in
+      (List.nth l1 0), (if u1 = "" then s1 else u1), (if s1 = "" then u1 else s1)
+  in
   let conf =
     {from = from_addr;
      api_mode = false;
@@ -1255,10 +1255,10 @@ let make_conf from_addr request script_name env =
      image_prefix =
        if !images_url <> "" then !images_url
        else if !(Wserver.cgi) then
-					begin match Sys.getenv_opt "GW_STATIC_PATH" with
-					| Some x -> x ^ "../images"
-					| None -> "../distribution/gw/images/"
-					end
+          begin match Sys.getenv_opt "GW_STATIC_PATH" with
+          | Some x -> x ^ "../images"
+          | None -> "../distribution/gw/images/"
+          end
        else "images";
      static_path =
        begin match Sys.getenv_opt "GW_STATIC_PATH" with

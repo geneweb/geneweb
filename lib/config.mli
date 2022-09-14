@@ -58,6 +58,8 @@ type config =
   ; just_friend_wizard : bool
   ; user : string
   ; username : string
+  ; userkey : string
+  ; usersosa : string
   ; auth_scheme : auth_scheme_kind
   ; command : string
   ; indep_command : string

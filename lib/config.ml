@@ -92,10 +92,9 @@ type config =
        the value of argument -images_url if specified, otherwise
        command ^ "?m=IM&v=" in CGI mode
        "images" otherwise *)
-    image_prefix : string;
-
+    image_prefix : string
   ; static_path : string
-    (* in CGI mode, provides location of etc files to Apache for direct loading *)
+  (* in CGI mode, provides location of etc files to Apache for direct loading *)
 
   (* if true, the base name is in the b argument of the query string: ?b=BASE&...
      if false, the base name is the last element of the uri path: .../base?... *)
