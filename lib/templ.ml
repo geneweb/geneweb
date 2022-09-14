@@ -115,6 +115,8 @@ let setup_link conf =
     "<a href=\"" ^ s ^ "gwsetup?v=main.htm\">gwsetup</a>"
   with Not_found -> ""
 
+let esc s = (Util.escape_html s :> string)
+
 (* key is first_name.occ+surname, no . or + in fn and sn *)
 let key_to_access key sosa =
   let l1 = String.split_on_char '+' key in
