@@ -498,6 +498,9 @@ let input_lexicon lang ht open_fname =
           Hashtbl.replace ht k v ;
           key ()
         end
+        (* defining alias names for existing entries in the lexicon *)
+        (*     alias_name *)
+        (* ->: real_entry *)
         else if String.length line > 4
              && String.unsafe_get line 0 = '-'
              && String.unsafe_get line 1 = '>'
