@@ -175,8 +175,8 @@ and eval_simple_variable conf =
   | "highlight" -> conf.highlight
   | "image_prefix" -> (
       let s = if conf.cgi then
-        match Util.p_getenv conf.base_env "image_prefix" with
-        | Some x -> x
+        match List.assoc_opt "image_prefix" conf.base_env with
+        | Some x -> Adef.escaped x
         | None -> Util.image_prefix conf
       else Util.image_prefix conf
       in
@@ -200,12 +200,13 @@ and eval_simple_variable conf =
   | "right" -> conf.right
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
   | "sp" -> " "
-  | "static_path" ->
-      if conf.cgi then
-        match Util.p_getenv conf.base_env "static_path" with
-        | Some x -> x
-        | None -> conf.static_path
-      else ""
+  | "static_path" -> (
+     let s = if conf.cgi then
+        match List.assoc_opt "static_path" conf.base_env with
+        | Some x -> Adef.escaped x
+        | None -> Adef.escaped conf.static_path
+             else Adef.escaped ""
+     in s :> string)
   | "suffix" ->
     let aux = List.fold_left (fun acc (k, _) -> k :: acc) in
     let excl = aux (aux [] conf.henv) conf.senv in
