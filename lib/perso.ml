@@ -5280,8 +5280,8 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
         env ep
   else if menu then
     let size =
-      match Util.open_templ conf templ_fname with
-        Some ic ->
+      match Util.open_etc_file conf templ_fname with
+        Some (ic, _) ->
           let fd = Unix.descr_of_in_channel ic in
           let stats = Unix.fstat fd in close_in ic; stats.Unix.st_size
       | None -> 0
