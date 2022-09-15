@@ -18,15 +18,6 @@ val persons_of_fsname :
     Returns [(l,inj)] where [l] is a list of [(str,istr,iperl)] where [istr] is id of [str] and [iperl] is a list of persons
     found that has [istr] as a first/surname such that [str = inj x]*)
 
-val first_name_print : Config.config -> Gwdb.base -> string -> unit
-
-val surname_print :
-  Config.config ->
-  Gwdb.base ->
-  (Config.config -> string -> unit) ->
-  string ->
-  unit
-
 val search_surname : Config.config -> Gwdb.base -> string -> Gwdb.iper list
 
 val search_surname_print :

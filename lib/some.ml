@@ -350,41 +350,6 @@ let persons_of_absolute_first_name =
 let persons_of_absolute_surname =
   persons_of_absolute base_strings_of_surname persons_of_surname get_surname
 
-let first_name_print conf base x =
-  let list, _ =
-    if p_getenv conf.env "t" = Some "A" then
-      (persons_of_absolute_first_name conf base x, fun _ -> assert false)
-    else if x = "" then ([], fun _ -> assert false)
-    else
-      persons_of_fsname conf base base_strings_of_first_name
-        (spi_find (persons_of_first_name base))
-        get_first_name x
-  in
-  let list =
-    List.map
-      (fun (str, _, iperl) ->
-        (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
-      list
-  in
-  let list = List.fold_right merge_insert list [] in
-  (* Construction de la table des sosa de la base *)
-  let () = SosaCache.build_sosa_ht conf base in
-  match list with
-  | [] -> first_name_not_found conf x
-  | [ (_, (strl, iperl)) ] ->
-      let iperl = List.sort_uniq compare iperl in
-      let pl = List.map (pget conf base) iperl in
-      let pl =
-        List.fold_right
-          (fun p pl ->
-            if (not (is_hide_names conf p)) || authorized_age conf base p then
-              p :: pl
-            else pl)
-          pl []
-      in
-      first_name_print_list conf base x strl pl
-  | _ -> select_first_name conf x list
-
 let has_children_with_that_name conf base des name =
   let compare_name n1 n2 =
     if p_getenv conf.env "t" = Some "A" then n1 = n2
@@ -791,126 +756,7 @@ module PerSet = Set.Make (struct
   let compare = compare
 end)
 
-let surname_print conf base not_found_fun x =
-  let list, name_inj =
-    if p_getenv conf.env "t" = Some "A" then
-      (persons_of_absolute_surname conf base x, fun x -> x)
-    else if x = "" then
-      ([], fun _ -> raise (Match_failure ("src/some.ml", 825, 29)))
-    else
-      persons_of_fsname conf base base_strings_of_surname
-        (spi_find (persons_of_surname base))
-        get_surname x
-  in
-  let list =
-    List.map
-      (fun (str, _, iperl) ->
-        (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
-      list
-  in
-  let list = List.fold_right merge_insert list [] in
-  let iperl, _ =
-    List.fold_right
-      (fun (str, (_, iperl1)) (iperl, strl) ->
-        let len = List.length iperl1 in
-        let strl =
-          try
-            let len1 = List.assoc str strl in
-            (str, len + len1) :: List.remove_assoc str strl
-          with Not_found -> (str, len) :: strl
-        in
-        (List.fold_right PerSet.add iperl1 iperl, strl))
-      list (PerSet.empty, [])
-  in
-  let iperl = PerSet.elements iperl in
-  (* Construction de la table des sosa de la base *)
-  let () = SosaCache.build_sosa_ht conf base in
-  match p_getenv conf.env "o" with
-  | Some "i" ->
-      let pl =
-        List.fold_right (fun ip ipl -> pget conf base ip :: ipl) iperl []
-      in
-      let pl =
-        List.fold_right
-          (fun p pl ->
-            if (not (is_hide_names conf p)) || authorized_age conf base p then
-              p :: pl
-            else pl)
-          pl []
-      in
-      print_family_alphabetic x conf base pl
-  | _ -> (
-      let bhl = select_ancestors conf base name_inj iperl in
-      let bhl =
-        List.map
-          (fun bh ->
-            {
-              bh_ancestor = pget conf base bh.bh_ancestor;
-              bh_well_named_ancestors =
-                List.map (pget conf base) bh.bh_well_named_ancestors;
-            })
-          bhl
-      in
-      match (bhl, list) with
-      | [], _ -> not_found_fun conf x
-      | _, [ (s, (strl, _)) ] ->
-          print_one_surname_by_branch conf base x strl (bhl, s)
-      | _ ->
-          let strl = List.map fst list in
-          print_several_possible_surnames x conf base (bhl, strl))
-
-(**/**)
-(* TODO: refactoring avec les fonctions ci-dessus !!! *)
-
-let search_surname conf base x =
-  let list, name_inj =
-    if p_getenv conf.env "t" = Some "A" then
-      (persons_of_absolute_surname conf base x, fun x -> x)
-    else if x = "" then
-      ([], fun _ -> raise (Match_failure ("src/some.ml", 896, 29)))
-    else
-      persons_of_fsname conf base base_strings_of_surname
-        (spi_find (persons_of_surname base))
-        get_surname x
-  in
-  let list =
-    List.map
-      (fun (str, _, iperl) ->
-        (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
-      list
-  in
-  let list = List.fold_right merge_insert list [] in
-  let iperl, _ =
-    List.fold_right
-      (fun (str, (_, iperl1)) (iperl, strl) ->
-        let len = List.length iperl1 in
-        let strl =
-          try
-            let len1 = List.assoc str strl in
-            (str, len + len1) :: List.remove_assoc str strl
-          with Not_found -> (str, len) :: strl
-        in
-        (List.fold_right PerSet.add iperl1 iperl, strl))
-      list (PerSet.empty, [])
-  in
-  let iperl = PerSet.elements iperl in
-  let bhl = select_ancestors conf base name_inj iperl in
-  let bhl =
-    List.map
-      (fun bh ->
-        {
-          bh_ancestor = pget conf base bh.bh_ancestor;
-          bh_well_named_ancestors =
-            List.map (pget conf base) bh.bh_well_named_ancestors;
-        })
-      bhl
-  in
-  match (bhl, list) with
-  | [], _ -> []
-  | _, [ (_, (_, iperl)) ] -> iperl
-  | _ -> []
-
-let search_surname_print conf base not_found_fun x =
+let search_surname_list conf base x =
   let list, name_inj =
     if p_getenv conf.env "t" = Some "A" then
       (persons_of_absolute_surname conf base x, fun x -> x)
@@ -941,7 +787,28 @@ let search_surname_print conf base not_found_fun x =
         (List.fold_right PerSet.add iperl1 iperl, strl))
       list (PerSet.empty, [])
   in
-  let iperl = PerSet.elements iperl in
+  (list, PerSet.elements iperl, name_inj)
+
+let search_surname conf base x =
+  let list, iperl, name_inj = search_surname_list conf base x in
+  let bhl = select_ancestors conf base name_inj iperl in
+  let bhl =
+    List.map
+      (fun bh ->
+        {
+          bh_ancestor = pget conf base bh.bh_ancestor;
+          bh_well_named_ancestors =
+            List.map (pget conf base) bh.bh_well_named_ancestors;
+        })
+      bhl
+  in
+  match (bhl, list) with
+  | [], _ -> []
+  | _, [ (_, (_, iperl)) ] -> iperl
+  | _ -> []
+
+let search_surname_print conf base not_found_fun x =
+  let list, iperl, name_inj = search_surname_list conf base x in
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
   match p_getenv conf.env "o" with
@@ -999,24 +866,7 @@ let search_first_name conf base x =
   List.fold_right merge_insert list []
 
 let search_first_name_print conf base x =
-  let list, _ =
-    if p_getenv conf.env "t" = Some "A" then
-      ( persons_of_absolute_first_name conf base x,
-        fun _ -> raise (Match_failure ("src/some.ml", 1025, 51)) )
-    else if x = "" then
-      ([], fun _ -> raise (Match_failure ("src/some.ml", 1026, 29)))
-    else
-      persons_of_fsname conf base base_strings_of_first_name
-        (spi_find (persons_of_first_name base))
-        get_first_name x
-  in
-  let list =
-    List.map
-      (fun (str, _, iperl) ->
-        (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
-      list
-  in
-  let list = List.fold_right merge_insert list [] in
+  let list = search_first_name conf base x in
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
   match list with
