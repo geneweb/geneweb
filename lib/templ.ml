@@ -1063,6 +1063,7 @@ and print_var print_ast_list conf ifun env ep loc sl =
       | VVother f -> print_var1 f []
     with Not_found -> (
       match sl with
+      (* covers case of %include.file; *)
       | [ "include"; templ ] -> (
           match Util.open_etc_file conf templ with
           | Some (_, fname) -> (

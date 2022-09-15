@@ -547,23 +547,24 @@ and parse_let conf b closing ast = parse
 and parse_include conf b closing ast = parse
   | value as file {
       let ast =
-        match List.assoc_opt file !included_files with
-        | Some a -> Ainclude (file, a) :: ast
+        let fname = Util.etc_file_name conf file in
+        match List.assoc_opt fname !included_files with
+        | Some a -> Ainclude (fname, a) :: ast
         | None ->
-          match Util.open_etc_file conf file with
-          | Some (ic, fname) ->
+          try
+            let ic = Secure.open_in fname in
             wrap fname begin fun () ->
               let lex2 = Lexing.from_channel ic in
               try
                 let (a, _) = parse_ast conf (Buffer.create 1024) [] [] lex2 in
                 let () = close_in ic in
-                let () = included_files := (file, a) :: !included_files in
-                Ainclude (file, a) :: ast
+                let () = included_files := (fname, a) :: !included_files in
+                Ainclude (fname, a) :: ast
               with _ -> fail lex2 ()
             end
-          | None ->
+          with Sys_error _ ->
             !GWPARAM.syslog `LOG_WARNING ("Missing template: " ^ file) ;
-            ast
+          ast
       in
       parse_ast conf b closing ast lexbuf
     }
