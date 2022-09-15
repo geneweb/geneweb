@@ -637,7 +637,7 @@ let treat_request =
           w_wizard @@ w_lock @@ w_base @@ MergeIndOkDisplay.print_mod_merge
         | "N" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some v -> Some.surname_print conf base Some.surname_not_found v
+            | Some v -> Some.search_surname_print conf base Some.surname_not_found v
             | _ -> AllnDisplay.print_surnames conf base
           end
         | "NG" -> w_base @@ begin fun conf base ->
@@ -667,7 +667,7 @@ let treat_request =
                 let (pl, sosa_acc) = find_all conf base n in
                 match pl with
                 | [] ->
-                  Some.surname_print conf base unknown n
+                  Some.search_surname_print conf base unknown n
                 | [p] ->
                   if sosa_acc
                   || Gutil.person_of_string_key base n <> None
@@ -682,9 +682,9 @@ let treat_request =
                   match real_input "fn", real_input "sn" with
                     Some fn, Some sn -> search (fn ^ " " ^ sn)
                   | Some fn, None ->
-                    Some.first_name_print conf base fn
+                    Some.search_first_name_print conf base fn
                   | None, Some sn ->
-                    Some.surname_print conf base unknown sn
+                    Some.search_surname_print conf base unknown sn
                   | None, None -> incorrect_request conf base
               end
             | Some i ->
@@ -699,7 +699,7 @@ let treat_request =
           w_base @@ BirthDeathDisplay.print_oldest_engagements
         | "P" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some v -> Some.first_name_print conf base v
+            | Some v -> Some.search_first_name_print conf base v
             | None -> AllnDisplay.print_first_names conf base
           end
         | "POP_PYR" when conf.wizard || conf.friend ->
