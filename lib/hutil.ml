@@ -48,8 +48,8 @@ let header_without_http conf title =
   Output.print_sstring conf
     {|<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">|};
   Util.include_template conf [] "css" (fun () -> ());
-  begin match Util.open_templ conf "hed" with
-    Some ic -> Templ.copy_from_templ conf [] ic
+  begin match Util.open_etc_file conf "hed" with
+    Some (ic, _) -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
   Output.print_sstring conf "\n</head>\n";
@@ -101,8 +101,8 @@ let rheader conf title =
 
 let trailer conf =
   let conf = {conf with is_printed_by_template = false} in
-  begin match Util.open_templ conf "trl" with
-    Some ic -> Templ.copy_from_templ conf [] ic
+  begin match Util.open_etc_file conf "trl" with
+    Some (ic, _) -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
   Templ.print_copyright conf;

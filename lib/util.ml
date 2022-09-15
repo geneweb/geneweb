@@ -1097,33 +1097,15 @@ let etc_file_name conf fname =
     "" -> default_templ config_templ std_fname
   | s -> s
 
-let open_etc_file fname =
-  let fname1 = base_path ["etc"] (Filename.basename fname ^ ".txt") in
-  let fname2 =
-    search_in_assets
-      (Filename.concat "etc" (Filename.basename fname ^ ".txt"))
-  in
-  try Some (Secure.open_in fname1, fname1) with
-    Sys_error _ -> try Some (Secure.open_in fname2, fname2) with Sys_error _ -> None
-
-let open_hed_trl conf fname =
-  try Some (Secure.open_in (etc_file_name conf fname)) with
-    Sys_error _ -> None
-
-let open_templ_fname conf fname =
-  try
-    let fname = etc_file_name conf fname in
-    Some (Secure.open_in fname, fname) with
-    Sys_error _ ->
-      let std_fname =
-        search_in_assets (Filename.concat "etc" (fname ^ ".txt"))
-      in
-      try Some (Secure.open_in std_fname, std_fname) with Sys_error _ -> None
-
-let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
+let open_etc_file conf fname =
+  let fname = etc_file_name conf fname in
+  try Some (Secure.open_in fname, fname) with
+    Sys_error e ->
+         !GWPARAM.syslog `LOG_ERR (Format.sprintf "Error openning file %s in open_etc_file: %s" fname e);
+         None
 
 let include_template conf env fname failure =
-  match open_etc_file fname with
+  match open_etc_file conf fname with
   | Some (ic, fname) ->
     include_begin conf (esc fname);
     copy_from_templ conf env ic;

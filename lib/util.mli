@@ -230,19 +230,10 @@ val p_getint : Config.env -> string -> int option
 *)
 val create_env : Adef.encoded_string -> Config.env
 
-(** [open_etc_file fname] search for template {i etc/fname.txt}
+(** [open_etc_file conf fname] search for template {i etc/fname.txt}
     inside the base directory or inside one of assets directories.
-    Returns input channel and the path to giving template. *)
-val open_etc_file : string -> (in_channel * string) option
-val open_hed_trl : config -> string -> in_channel option
-
-(** [open_etc_file fname] search for template {i etc/fname.txt}
-    using [config] or inside one of assets directories.
-    Returns input channel and the path to giving template. *)
-val open_templ_fname : config -> string -> (in_channel * string) option
-
-(** Same as [open_templ_fname] but returns only input channel of the giving template file *)
-val open_templ : config -> string -> in_channel option
+    Returns input channel and the path to given template. *)
+val open_etc_file : config -> string -> (in_channel * string) option
 
 val string_of_place : config -> string -> Adef.escaped_string
 val raw_string_of_place : config -> string -> string
