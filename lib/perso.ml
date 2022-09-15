@@ -4205,7 +4205,6 @@ let print_foreach conf base print_ast eval_expr =
     let witnesses = List.map (fun marriage -> marriage.efam_witnesses) marriages in
     witnesses |> Array.concat
   in
-    
   let print_foreach_witness env al ep witness_kind =
     function
     | Vfam (_, fam, _, true) ->
@@ -4463,53 +4462,21 @@ let print_foreach conf base print_ast eval_expr =
            List.iter (print_ast env ep) al)
         list
   in
-  let print_foreach_sorted_list_item env al ep =
-    let list =
-      match get_env "list" env with
-        Vslist l -> SortedList.elements !l
+  let print_foreach_sorted_list_item env al ep listname =
+    let l =
+      match get_env listname env with
+      | Vslist l -> SortedList.elements !l
       | _ -> []
     in
     let rec loop prev_item =
       function
-        _ :: sll as gsll ->
+      | [] -> ()
+      | _ :: sll as gsll ->
           let item = Vslistlm gsll in
           let env = ("item", item) :: ("prev_item", prev_item) :: env in
           List.iter (print_ast env ep) al; loop item sll
-      | [] -> ()
     in
-    loop (Vslistlm []) list
-  in
-  let print_foreach_sorted_listb_item env al ep =
-    let list =
-      match get_env "listb" env with
-      | Vslist l -> SortedList.elements !l
-      | _ -> []
-    in
-    let rec loop prev_item =
-      function
-      | (_ :: sll) as gsll ->
-           let item = Vslistlm gsll in
-           let env = ("item", item) :: ("prev_item", prev_item) :: env in
-           List.iter (print_ast env ep) al;
-           loop item sll
-      | [] -> ()
-    in loop (Vslistlm []) list
-  in
-  let print_foreach_sorted_listc_item env al ep =
-    let list =
-      match get_env "listc" env with
-      | Vslist l -> SortedList.elements !l
-      | _ -> []
-    in
-    let rec loop prev_item =
-      function
-      | (_ :: sll) as gsll ->
-           let item = Vslistlm gsll in
-           let env = ("item", item) :: ("prev_item", prev_item) :: env in
-           List.iter (print_ast env ep) al;
-           loop item sll
-      | [] -> ()
-    in loop (Vslistlm []) list
+    loop (Vslistlm []) l
   in
   let print_foreach_source env al (p, p_auth as ep) =
     let rec insert_loop typ src =
@@ -4617,9 +4584,9 @@ let print_foreach conf base print_ast eval_expr =
     | "qualifier" -> print_foreach_qualifier env al ep
     | "related" -> print_foreach_related env al ep
     | "relation" -> print_foreach_relation env al ep
-    | "sorted_list_item" -> print_foreach_sorted_list_item env al ep
-    | "sorted_listb_item" -> print_foreach_sorted_listb_item env al ep
-    | "sorted_listc_item" -> print_foreach_sorted_listc_item env al ep
+    | "sorted_list_item" -> print_foreach_sorted_list_item env al ep "list"
+    | "sorted_listb_item" -> print_foreach_sorted_list_item env al ep "listb"
+    | "sorted_listc_item" -> print_foreach_sorted_list_item env al ep "listc"
     | "source" -> print_foreach_source env al ep
     | "surname_alias" -> print_foreach_surname_alias env al ep
     | "witness" -> print_foreach_witness env al ep Witness efam
