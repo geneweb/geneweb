@@ -1221,6 +1221,7 @@ type 'a env =
   | Vlazy of 'a env Lazy.t
   | Vother of 'a
   | Vnone
+  | Vwit of person * witness_kind
 
 let get_env v env =
   try
@@ -4198,20 +4199,31 @@ let print_foreach conf base print_ast eval_expr =
            List.iter (print_ast env ep) al)
       events_witnesses
   in
-  let print_foreach_witness env al ep =
+  let get_marriage_witnesses fam =
+    let fevents = Gwdb.get_fevents fam in
+    let marriages = List.filter (fun fe -> fe.efam_name = Efam_Marriage) fevents in
+    let witnesses = List.map (fun marriage -> marriage.efam_witnesses) marriages in
+    witnesses |> Array.concat
+  in
+    
+  let print_foreach_witness env al ep witness_kind =
     function
     | Vfam (_, fam, _, true) ->
-      Array.iteri
-        begin fun i ip ->
-          let p = pget conf base ip in
-          let env =
-            ("witness", Vind p)
-            :: ("first", Vbool (i = 0))
-            :: env
-          in
-          List.iter (print_ast env ep) al
-        end
-        (get_witnesses fam)
+       let _ = Array.fold_left
+        begin fun (i, first) (ip, wk) ->
+        if wk = witness_kind then begin
+            let p = pget conf base ip in
+            let env =
+              ("witness", Vind p)
+              :: ("first", Vbool first)
+              :: env
+            in
+            List.iter (print_ast env ep) al;
+            (i + 1, false)
+          end
+            else (i + 1, first)
+        end (0, true)
+        (get_marriage_witnesses fam) in ()
     | _ -> ()
   in
   let print_foreach_witness_relation env al (p, _ as ep) =
@@ -4610,7 +4622,14 @@ let print_foreach conf base print_ast eval_expr =
     | "sorted_listc_item" -> print_foreach_sorted_listc_item env al ep
     | "source" -> print_foreach_source env al ep
     | "surname_alias" -> print_foreach_surname_alias env al ep
-    | "witness" -> print_foreach_witness env al ep efam
+    | "witness" -> print_foreach_witness env al ep Witness efam
+    | "witness_godparent" -> print_foreach_witness env al ep Witness_Mentioned efam
+    | "witness_civilofficer" -> print_foreach_witness env al ep Witness_CivilOfficer efam
+    | "witness_religiousofficer" -> print_foreach_witness env al ep Witness_ReligiousOfficer  efam
+    | "witness_informant" -> print_foreach_witness env al ep Witness_Informant  efam
+    | "witness_attending" -> print_foreach_witness env al ep Witness_Attending efam
+    | "witness_mentioned" -> print_foreach_witness env al ep Witness_Mentioned efam
+    | "witness_other" -> print_foreach_witness env al ep Witness_Other efam
     | "baptism_witness" -> print_foreach_epers_event_witness env al ep Epers_Baptism
     | "birth_witness" -> print_foreach_epers_event_witness env al ep Epers_Birth
     | "burial_witness" -> print_foreach_epers_event_witness env al ep Epers_Burial
