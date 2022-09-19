@@ -1192,7 +1192,6 @@ type event_item =
   event_name * cdate * istr * istr * istr * (iper * witness_kind) array *
     iper option
 
-(* ??? *)
 type 'a env =
     Vallgp of generation_person list
   | Vanc of generation_person
@@ -4178,12 +4177,14 @@ let print_foreach conf base print_ast eval_expr =
             let c = pget conf base ic in
             List.iter
               (fun (name, _, _, _, _, wl, _ as evt) ->
-                 let (mem, wk) = Util.array_mem_witn conf base (get_iper p) wl in
-                 if mem then
+                 match Util.array_mem_witn conf base (get_iper p) wl with
+                 | None -> ()
+                 | Some wk -> (
                    match name with
                      Fevent _ ->
                        if get_sex c = Male then list := (c, wk, evt) :: !list
                    | _ -> list := (c, wk, evt) :: !list)
+              )
               (events_list conf base c);
             make_list icl
         | [] -> ()
@@ -4236,29 +4237,24 @@ let print_foreach conf base print_ast eval_expr =
     | _ -> ()
   in
   let print_foreach_witness_relation env al (p, _ as ep) =
-    let list =
-      let list = ref [] in
+    let l =
       let related = List.sort_uniq compare (get_related p) in
-      begin let rec make_list =
-        function
-          ic :: icl ->
-            let c = pget conf base ic in
-            if get_sex c = Male then
-              Array.iter
-                (fun ifam ->
-                   let fam = foi base ifam in
-                   if Array.mem (get_iper p) (get_witnesses fam) then
-                     list := (ifam, fam) :: !list)
-                (get_family (pget conf base ic));
-            make_list icl
-        | [] -> ()
-      in
-        make_list related
-      end;
-      !list
+      let l = ref [] in
+      List.iter (fun ic ->
+          let c = pget conf base ic in
+          (* TODO why only on Male? probably bugged on same sex or neuter couples *)
+          begin if get_sex c = Male then
+            Array.iter
+              (fun ifam ->
+                 let fam = foi base ifam in
+                 if Array.mem (get_iper p) (get_witnesses fam) then
+                   l := (ifam, fam) :: !l)
+              (get_family (pget conf base ic))
+          end;
+      ) related;
+      !l
     in
-    (* TODO don't query db in sort *)
-    let list =
+    let l =
       List.sort
         (fun (_, fam1) (_, fam2) ->
            match
@@ -4267,7 +4263,7 @@ let print_foreach conf base print_ast eval_expr =
            with
            | Some d1, Some d2 -> Date.compare_date d1 d2
            | _ -> 0)
-        list
+        l
     in
     List.iter
       (fun (ifam, fam) ->
@@ -4281,7 +4277,7 @@ let print_foreach conf base print_ast eval_expr =
          if m_auth then
            let env = ("fam", Vfam (ifam, fam, cpl, true)) :: env in
            List.iter (print_ast env ep) al)
-      list
+      l
   in
   let print_foreach_family env al ini_ep (p, _) =
     match get_env "p_link" env with

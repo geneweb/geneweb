@@ -969,30 +969,24 @@ let string_of_fevent_name conf base = function
   | Efam_Name n -> (escape_html (sou base n) :> Adef.safe_string)
 
 let string_of_witness_kind conf sex witness_kind =
+  let n = index_of_sex sex in
   Adef.safe @@
   match witness_kind with
   | Witness ->
      transl_nth conf "witness/witness/witnesses" 0
   | Witness_CivilOfficer ->
-     let n = index_of_sex sex in
      transl_nth conf "civil registrar/civil registrar/civil registrar" n
   | Witness_GodParent ->
-     let n = index_of_sex sex in
      transl_nth conf "godfather/godmother/godparents" n
   | Witness_ReligiousOfficer ->
-     let n = index_of_sex sex in
      transl_nth conf "parrish registrar/parrish registrar/parrish registrar" n
   | Witness_Informant ->
-     let n = index_of_sex sex in
      transl_nth conf "informant/informant/informant" n
   | Witness_Attending ->
-     let n = index_of_sex sex in
      transl_nth conf "present/present/present" n
   | Witness_Mentioned ->
-     let n = index_of_sex sex in
      transl_nth conf "mentioned/mentioned/mentioned" n
   | Witness_Other ->
-     let n = index_of_sex sex in
      transl_nth conf "other/other/other" n
 
 let base_path pref bname = !GWPARAM.base_path pref bname
@@ -2504,11 +2498,12 @@ let record_visited conf ip =
 
 (**/**)
 
+(* TODO OCaml 4.13 : use Array.find_opt *)
 let array_mem_witn conf base x a =
   let rec loop i =
-    if i = Array.length a then (false, Adef.safe "")
+    if i = Array.length a then None
     else if x = fst a.(i)
-    then (true, string_of_witness_kind conf (get_sex @@ poi base x) (snd a.(i)))
+    then Some (string_of_witness_kind conf (get_sex @@ poi base x) (snd a.(i)))
     else loop (i + 1)
   in
   loop 0
