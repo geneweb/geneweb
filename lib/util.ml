@@ -993,25 +993,27 @@ let string_of_fevent_name conf base = function
   | Efam_Name n -> (escape_html (sou base n) :> Adef.safe_string)
 
 let string_of_witness_kind conf sex witness_kind =
-  let n = index_of_sex sex in
-  Adef.safe @@
-  match witness_kind with
-  | Witness ->
-     transl_nth conf "witness/witness/witnesses" 0
-  | Witness_CivilOfficer ->
-     transl_nth conf "civil registrar/civil registrar/civil registrar" n
-  | Witness_GodParent ->
-     transl_nth conf "godfather/godmother/godparents" n
-  | Witness_ReligiousOfficer ->
-     transl_nth conf "parrish registrar/parrish registrar/parrish registrar" n
-  | Witness_Informant ->
-     transl_nth conf "informant/informant/informant" n
-  | Witness_Attending ->
-     transl_nth conf "present/present/present" n
-  | Witness_Mentioned ->
-     transl_nth conf "mentioned/mentioned/mentioned" n
-  | Witness_Other ->
-     transl_nth conf "other/other/other" n
+  let n = if witness_kind = Witness then 0 else index_of_sex sex in
+  let s =
+    match witness_kind with
+    | Witness ->
+       "witness/witness/witnesses"
+    | Witness_CivilOfficer ->
+       "civil registrar/civil registrar/civil registrar"
+    | Witness_GodParent ->
+       "godfather/godmother/godparents"
+    | Witness_ReligiousOfficer ->
+       "parrish registrar/parrish registrar/parrish registrar"
+    | Witness_Informant ->
+       "informant/informant/informant"
+    | Witness_Attending ->
+       "present/present/present"
+    | Witness_Mentioned ->
+       "mentioned/mentioned/mentioned"
+    | Witness_Other ->
+       "other/other/other"
+  in
+  Adef.safe @@ transl_nth conf s n
 
 let base_path pref bname = !GWPARAM.base_path pref bname
 
