@@ -208,13 +208,21 @@ and eval_simple_variable conf =
              else Adef.escaped ""
      in s :> string)
   | "suffix" ->
-    let aux = List.fold_left (fun acc (k, _) -> k :: acc) in
-    let excl = aux (aux [] conf.henv) conf.senv in
-    commd ~excl conf
+    (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
+    let l = List.fold_left (fun accu (k, _) -> List.remove_assoc k accu) conf.env (List.rev_append conf.henv conf.senv) in
+    List.fold_left (fun c (k, v) ->
+      let v = Adef.as_string v in
+      if ( ( k = "oc" || k = "ocz" ) && v = "0" ) || k = "" then c
+      else c ^ k ^ "=" ^ v ^ "&")
+    "" l
   | "url" ->
-    let aux = List.fold_left (fun acc (k, _) -> k :: acc) in
-    let excl = aux (aux [] conf.henv) conf.senv in
-    commd ~excl ~trim:false conf
+      let c :> string = Util.commd conf in
+      (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
+      let l :> (string * string) list =
+        List.fold_left (fun accu (k, _) -> List.remove_assoc k accu) conf.env
+          (List.rev_append conf.henv conf.senv)
+      in
+      List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ "&") c l
   | "version" -> Version.txt
   | "/" -> ""
   | _ -> raise Not_found
