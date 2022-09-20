@@ -1153,7 +1153,6 @@ type event_item =
   event_name * cdate * istr * istr * istr * (iper * witness_kind) array *
     iper option
 
-(* ??? *)
 type 'a env =
     Vallgp of generation_person list
   | Vanc of generation_person
@@ -1182,7 +1181,6 @@ type 'a env =
   | Vlazy of 'a env Lazy.t
   | Vother of 'a
   | Vnone
-  | Vwit of person * witness_kind
 
 let get_env v env =
   try
@@ -1350,6 +1348,17 @@ let date_aux conf p_auth date =
          |> safe_val
     else DateDisplay.string_of_ondate conf d |> safe_val
   | _ -> null_val
+
+
+let get_marriage_witnesses fam =
+  let fevents = Gwdb.get_fevents fam in
+  let marriages = List.filter (fun fe -> fe.efam_name = Efam_Marriage) fevents in
+  let witnesses = List.map (fun marriage -> marriage.efam_witnesses) marriages in
+  witnesses |> Array.concat
+
+let get_nb_marriage_witnesses_of_kind fam wk =
+  let witnesses = get_marriage_witnesses fam in
+  Array.fold_left (fun acc (_, w) -> if wk = w then acc + 1 else acc) 0 witnesses
 
 let rec eval_var conf base env ep loc sl =
   try eval_simple_var conf base env ep sl with
@@ -3699,7 +3708,27 @@ and eval_family_field_var conf base env (_, fam, (ifath, imoth, _), m_auth as fc
           let ep = make_ep conf base imoth in
           eval_person_field_var conf base env ep loc sl
       end
+  | "marriage" :: sl ->
+     eval_family_marriage_field_var fam sl
   | [s] -> str_val (eval_str_family_field env fcd s)
+  | _ -> raise Not_found
+and eval_family_marriage_field_var fam = function
+  | ["nb_witnesses_witness"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness |> string_of_int)
+  | ["nb_witnesses_godparent"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_GodParent |> string_of_int)
+  | ["nb_witnesses_civilofficer"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_CivilOfficer |> string_of_int)
+  | ["nb_witnesses_religiousofficer"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_ReligiousOfficer |> string_of_int)
+  | ["nb_witnesses_informant"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_Informant |> string_of_int)
+  | ["nb_witnesses_attending"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_Attending |> string_of_int)
+  | ["nb_witnesses_mentioned"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_Mentioned |> string_of_int)
+  | ["nb_witnesses_other"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_Other |> string_of_int)
   | _ -> raise Not_found
 and eval_str_family_field env (ifam, _, _, _) =
   function
@@ -4136,12 +4165,14 @@ let print_foreach conf base print_ast eval_expr =
             let c = pget conf base ic in
             List.iter
               (fun (name, _, _, _, _, wl, _ as evt) ->
-                 let (mem, wk) = Util.array_mem_witn conf base (get_iper p) wl in
-                 if mem then
+                 match Util.array_mem_witn conf base (get_iper p) wl with
+                 | None -> ()
+                 | Some wk -> (
                    match name with
                      Fevent _ ->
                        if get_sex c = Male then list := (c, wk, evt) :: !list
                    | _ -> list := (c, wk, evt) :: !list)
+              )
               (events_list conf base c);
             make_list icl
         | [] -> ()
@@ -4172,12 +4203,7 @@ let print_foreach conf base print_ast eval_expr =
            List.iter (print_ast env ep) al)
       events_witnesses
   in
-  let get_marriage_witnesses fam =
-    let fevents = Gwdb.get_fevents fam in
-    let marriages = List.filter (fun fe -> fe.efam_name = Efam_Marriage) fevents in
-    let witnesses = List.map (fun marriage -> marriage.efam_witnesses) marriages in
-    witnesses |> Array.concat
-  in
+
   let print_foreach_witness env al ep witness_kind =
     function
     | Vfam (_, fam, _, true) ->
@@ -4199,29 +4225,24 @@ let print_foreach conf base print_ast eval_expr =
     | _ -> ()
   in
   let print_foreach_witness_relation env al (p, _ as ep) =
-    let list =
-      let list = ref [] in
+    let l =
       let related = List.sort_uniq compare (get_related p) in
-      begin let rec make_list =
-        function
-          ic :: icl ->
-            let c = pget conf base ic in
-            if get_sex c = Male then
-              Array.iter
-                (fun ifam ->
-                   let fam = foi base ifam in
-                   if Array.mem (get_iper p) (get_witnesses fam) then
-                     list := (ifam, fam) :: !list)
-                (get_family (pget conf base ic));
-            make_list icl
-        | [] -> ()
-      in
-        make_list related
-      end;
-      !list
+      let l = ref [] in
+      List.iter (fun ic ->
+          let c = pget conf base ic in
+          (* TODO why only on Male? probably bugged on same sex or neuter couples *)
+          begin if get_sex c = Male then
+            Array.iter
+              (fun ifam ->
+                 let fam = foi base ifam in
+                 if Array.mem (get_iper p) (get_witnesses fam) then
+                   l := (ifam, fam) :: !l)
+              (get_family (pget conf base ic))
+          end;
+      ) related;
+      !l
     in
-    (* TODO don't query db in sort *)
-    let list =
+    let l =
       List.sort
         (fun (_, fam1) (_, fam2) ->
            match
@@ -4230,7 +4251,7 @@ let print_foreach conf base print_ast eval_expr =
            with
            | Some d1, Some d2 -> Date.compare_date d1 d2
            | _ -> 0)
-        list
+        l
     in
     List.iter
       (fun (ifam, fam) ->
@@ -4244,7 +4265,7 @@ let print_foreach conf base print_ast eval_expr =
          if m_auth then
            let env = ("fam", Vfam (ifam, fam, cpl, true)) :: env in
            List.iter (print_ast env ep) al)
-      list
+      l
   in
   let print_foreach_family env al ini_ep (p, _) =
     match get_env "p_link" env with
@@ -4563,7 +4584,7 @@ let print_foreach conf base print_ast eval_expr =
     | "source" -> print_foreach_source env al ep
     | "surname_alias" -> print_foreach_surname_alias env al ep
     | "witness" -> print_foreach_witness env al ep Witness efam
-    | "witness_godparent" -> print_foreach_witness env al ep Witness_Mentioned efam
+    | "witness_godparent" -> print_foreach_witness env al ep Witness_GodParent efam
     | "witness_civilofficer" -> print_foreach_witness env al ep Witness_CivilOfficer efam
     | "witness_religiousofficer" -> print_foreach_witness env al ep Witness_ReligiousOfficer  efam
     | "witness_informant" -> print_foreach_witness env al ep Witness_Informant  efam

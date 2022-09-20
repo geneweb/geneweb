@@ -455,7 +455,7 @@ val array_mem_witn
  -> Gwdb.base
  -> iper
  -> (iper * Def.witness_kind) array
- -> bool * Adef.safe_string
+ -> Adef.safe_string option
 
 (** [name_key base name] is [name],
     with particles put at the end of the string instead of the beginning.

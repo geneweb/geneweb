@@ -1,6 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-(* TODO shouldn't this be in gwdb? *)
 (** Http response status *)
 type httpStatus =
   | OK (* 200 *)
