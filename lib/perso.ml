@@ -1390,6 +1390,13 @@ let date_aux conf p_auth date =
     else DateDisplay.string_of_ondate conf d |> safe_val
   | _ -> null_val
 
+
+let get_marriage_witnesses fam =
+  let fevents = Gwdb.get_fevents fam in
+  let marriages = List.filter (fun fe -> fe.efam_name = Efam_Marriage) fevents in
+  let witnesses = List.map (fun marriage -> marriage.efam_witnesses) marriages in
+  witnesses |> Array.concat
+
 let rec eval_var conf base env ep loc sl =
   try eval_simple_var conf base env ep sl with
     Not_found -> eval_compound_var conf base env ep loc sl
@@ -3726,7 +3733,15 @@ and eval_family_field_var conf base env (_, fam, (ifath, imoth, _), m_auth as fc
           let ep = make_ep conf base imoth in
           eval_person_field_var conf base env ep loc sl
       end
+  | "marriage" :: sl ->
+     eval_family_marriage_field_var conf base env fam sl
   | [s] -> str_val (eval_str_family_field env fcd s)
+  | _ -> raise Not_found
+and eval_family_marriage_field_var conf base env fam = function
+  | ["nb_witnesses"] ->
+     let witnesses = get_marriage_witnesses fam in
+     let witnesses = List.filter (fun (_, wk) -> wk = Def.Witness) @@ Array.to_list witnesses in
+     VVstring (List.length witnesses |> string_of_int)
   | _ -> raise Not_found
 and eval_str_family_field env (ifam, _, _, _) =
   function
@@ -4199,12 +4214,7 @@ let print_foreach conf base print_ast eval_expr =
            List.iter (print_ast env ep) al)
       events_witnesses
   in
-  let get_marriage_witnesses fam =
-    let fevents = Gwdb.get_fevents fam in
-    let marriages = List.filter (fun fe -> fe.efam_name = Efam_Marriage) fevents in
-    let witnesses = List.map (fun marriage -> marriage.efam_witnesses) marriages in
-    witnesses |> Array.concat
-  in
+
   let print_foreach_witness env al ep witness_kind =
     function
     | Vfam (_, fam, _, true) ->
