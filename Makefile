@@ -87,6 +87,7 @@ GENERATED_FILES_DEP = \
 	bin/gwu/dune \
 	bin/setup/dune \
 	bin/update_nldb/dune \
+	test/dune \
 
 generated: $(GENERATED_FILES_DEP)
 
