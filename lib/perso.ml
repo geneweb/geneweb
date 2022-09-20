@@ -1220,7 +1220,6 @@ type 'a env =
   | Vlazy of 'a env Lazy.t
   | Vother of 'a
   | Vnone
-  | Vwit of person * witness_kind
 
 let get_env v env =
   try
@@ -1395,6 +1394,10 @@ let get_marriage_witnesses fam =
   let marriages = List.filter (fun fe -> fe.efam_name = Efam_Marriage) fevents in
   let witnesses = List.map (fun marriage -> marriage.efam_witnesses) marriages in
   witnesses |> Array.concat
+
+let get_nb_marriage_witnesses_of_kind fam wk =
+  let witnesses = get_marriage_witnesses fam in
+  Array.fold_left (fun acc (_, w) -> if wk = w then acc + 1 else acc) 0 witnesses
 
 let rec eval_var conf base env ep loc sl =
   try eval_simple_var conf base env ep sl with
@@ -3733,14 +3736,26 @@ and eval_family_field_var conf base env (_, fam, (ifath, imoth, _), m_auth as fc
           eval_person_field_var conf base env ep loc sl
       end
   | "marriage" :: sl ->
-     eval_family_marriage_field_var conf base env fam sl
+     eval_family_marriage_field_var fam sl
   | [s] -> str_val (eval_str_family_field env fcd s)
   | _ -> raise Not_found
-and eval_family_marriage_field_var conf base env fam = function
-  | ["nb_witnesses"] ->
-     let witnesses = get_marriage_witnesses fam in
-     let witnesses = List.filter (fun (_, wk) -> wk = Def.Witness) @@ Array.to_list witnesses in
-     VVstring (List.length witnesses |> string_of_int)
+and eval_family_marriage_field_var fam = function
+  | ["nb_witnesses_witness"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness |> string_of_int)
+  | ["nb_witnesses_godparent"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_GodParent |> string_of_int)
+  | ["nb_witnesses_civilofficer"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_CivilOfficer |> string_of_int)
+  | ["nb_witnesses_religiousofficer"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_ReligiousOfficer |> string_of_int)
+  | ["nb_witnesses_informant"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_Informant |> string_of_int)
+  | ["nb_witnesses_attending"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_Attending |> string_of_int)
+  | ["nb_witnesses_mentioned"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_Mentioned |> string_of_int)
+  | ["nb_witnesses_other"] ->
+     VVstring (get_nb_marriage_witnesses_of_kind fam Def.Witness_Other |> string_of_int)
   | _ -> raise Not_found
 and eval_str_family_field env (ifam, _, _, _) =
   function
@@ -4613,7 +4628,7 @@ let print_foreach conf base print_ast eval_expr =
     | "witness_relation" -> print_foreach_witness_relation env al ep
     | _ -> raise Not_found
   in
-  let rec print_foreach env ini_ep loc s sl ell al =
+  let print_foreach env ini_ep loc s sl ell al =
     let rec loop env (a, _ as ep) efam =
       function
         [s] -> print_simple_foreach env ell al ini_ep ep efam loc s
