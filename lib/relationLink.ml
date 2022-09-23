@@ -26,14 +26,14 @@ let pre_text_size txt =
   normal 0 0
 
 let print_pre_center conf sz txt =
-  for i = 1 to (sz - pre_text_size txt) / 2 do Output.print_sstring conf " " done;
+  for _i = 1 to (sz - pre_text_size txt) / 2 do Output.print_sstring conf " " done;
   Output.print_string conf txt ;
   Output.print_sstring conf "\n"
 
 let print_pre_left conf sz txt =
   let tsz = pre_text_size txt in
   if tsz < sz / 2 - 1 then
-    for i = 2 to (sz / 2 - 1 - tsz) / 2 do Output.print_sstring conf " " done;
+    for _i = 2 to (sz / 2 - 1 - tsz) / 2 do Output.print_sstring conf " " done;
   Output.print_sstring conf " " ;
   Output.print_string conf txt ;
   Output.print_sstring conf "\n"
@@ -42,11 +42,11 @@ let print_pre_right conf sz txt =
   let tsz = pre_text_size txt in
   if tsz < sz / 2 - 1 then
     begin
-      for i = 1 to sz / 2 do Output.print_sstring conf " " done;
-      for i = 1 to (sz / 2 - 1 - tsz) / 2 do Output.print_sstring conf " " done;
+      for _i = 1 to sz / 2 do Output.print_sstring conf " " done;
+      for _i = 1 to (sz / 2 - 1 - tsz) / 2 do Output.print_sstring conf " " done;
       ()
     end
-  else for i = 1 to sz - pre_text_size txt - 1 do Output.print_sstring conf " " done;
+  else for _i = 1 to sz - pre_text_size txt - 1 do Output.print_sstring conf " " done;
   Output.print_sstring conf " " ;
   Output.print_string conf txt ;
   Output.print_sstring conf "\n"

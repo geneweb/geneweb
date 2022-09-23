@@ -823,7 +823,7 @@ let check_parent_marriage_age warning fam p =
       | _ :: list -> loop list
   in
   loop (get_fevents fam)
-  
+
 let check_possible_duplicate_family ?p base warning family father mother =
   let ifath = get_father family in
   let imoth = get_mother family in
@@ -837,8 +837,8 @@ let check_possible_duplicate_family ?p base warning family father mother =
   let mother_fn, mother_sn = first_name mother, surname mother in
   let fath_families = get_family father in
   let moth_families = get_family mother in
-  
-  let f get_parent (current_parent, current_parent_iper, current_parent_fn, current_parent_sn) parent_source ifam' =
+
+  let f get_parent (_current_parent, current_parent_iper, current_parent_fn, current_parent_sn) parent_source ifam' =
     if eq_ifam ifam ifam' then ()
     else begin
         let fam' = foi base ifam' in
@@ -874,7 +874,7 @@ let check_parents base warning fam fath moth =
   check_difference_age_between_cpl warning fath moth;
   check_possible_duplicate_family base warning fam fath moth
 
-  
+
 (* main *)
 
 let person ?(onchange = true) base warning p =

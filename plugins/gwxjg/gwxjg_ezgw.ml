@@ -350,7 +350,7 @@ module Event = struct
   let date (_, d, _, _, _, _, _) =
     Adef.od_of_cdate d
 
-  let place conf base (_, _, p, _, _, _, _) =
+  let place base (_, _, p, _, _, _, _) =
     sou base p
 
   let note conf base (_, _, _, n, _, _, _) =
