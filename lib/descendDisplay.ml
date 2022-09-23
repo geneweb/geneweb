@@ -717,7 +717,8 @@ let print_person_table conf base p lab =
       Output.print_sstring conf "<td" ;
       begin match attr with
       | Some attr ->
-         let attr = List.fold_left (fun acc (a, v) -> " " ^ a ^ "=" ^ "\"" ^ v ^ "\"") "" attr in
+         (* TODO?: why is only the last string used? *)
+         let attr = List.fold_left (fun _acc (a, v) -> " " ^ a ^ "=" ^ "\"" ^ v ^ "\"") "" attr in
          Output.print_sstring conf attr;
       | None -> ()
       end;
@@ -808,7 +809,8 @@ let print_person_table conf base p lab =
           Output.print_sstring conf "\"";
           begin match attr with
           | Some attr ->
-             let attr = List.fold_left (fun acc (a, v) -> " " ^ a ^ "=" ^ "\"" ^ v ^ "\"") "" attr in
+             (* TODO?: why is only the last string used? *)
+             let attr = List.fold_left (fun _acc (a, v) -> " " ^ a ^ "=" ^ "\"" ^ v ^ "\"") "" attr in
              Output.print_sstring conf attr;
           | None -> ()
           end;

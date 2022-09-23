@@ -426,7 +426,7 @@ and mk_event conf base d =
           end
         end w end
   in
-  let place_raw, place = mk_place conf (E.place conf base d) in
+  let place_raw, place = mk_place conf (E.place base d) in
   let source_raw, source = mk_source_rs conf base (E.src base d) in
   let note_raw, note = mk_note_rs conf base [] (E.note conf base d) in
   Tpat begin function
@@ -1181,7 +1181,7 @@ let module_GWDB conf base = begin
   end
 end
 
-let escape = Tfun begin fun ?(kwargs=[]) -> function
+let escape = Tfun begin fun ?kwargs:_ -> function
     | Tsafe s | Tstr s -> Tstr (Jg_utils.escape_html s)
     | x -> Jingoo.Jg_types.failwith_type_error_1 "escape" x
  end
