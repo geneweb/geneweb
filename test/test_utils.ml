@@ -1,6 +1,5 @@
 open Geneweb
 open OUnit2
-open Config
 open Def
 
 let mutil_contains _ =
