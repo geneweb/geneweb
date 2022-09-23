@@ -30,7 +30,7 @@ let set_sosa_num () = assert (!sosa = `None) ; sosa := `Num
 
 let set_gwdb_legacy () = assert (!gwdb = `None) ; gwdb := `Legacy
 
-let release = ref true
+let release = ref false
 
 let speclist =
   [ ( "--gwdb-legacy"
