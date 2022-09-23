@@ -25,7 +25,7 @@ lib/gwlib.ml:
 	@echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 	@echo " Done!"
 
-CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D) $(SOSA_D) $(SAFE_USER_INPUT_D)
+CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D) $(SOSA_D)
 
 ifeq ($(DUNE_PROFILE),dev)
     CPPO_D+= -D DEBUG
@@ -62,7 +62,6 @@ hd/etc/version.txt:
 
 GENERATED_FILES_DEP = \
 	hd/etc/version.txt \
-	lib/def/dune \
 	lib/dune \
 	lib/gwdb/dune \
 	lib/core/dune \
@@ -219,7 +218,6 @@ clean:
 
 ci: ## Run unit tests and benchmark with different configurations
 ci:
-	@ocaml ./configure.ml --safe-user-input && $(MAKE) -s clean build clean
 	@ocaml ./configure.ml && BENCH_NAME=vanilla $(MAKE) -s clean test bench-marshal clean
 	@ocaml ./configure.ml --sosa-num && BENCH_NAME=num $(MAKE) -s clean test bench-marshal clean
 	@ocaml ./configure.ml --sosa-zarith && BENCH_NAME=zarith $(MAKE) -s clean test bench-marshal clean

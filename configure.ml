@@ -17,7 +17,6 @@ let api = ref false
 let sosa = ref `None
 let gwdb = ref `None
 let syslog = ref false
-let safe_user_input = ref false
 
 let set_api () = api := true
 
@@ -28,8 +27,6 @@ let set_sosa_legacy () = assert (!sosa = `None) ; sosa := `Legacy
 let set_sosa_zarith () = assert (!sosa = `None) ; sosa := `Zarith
 
 let set_sosa_num () = assert (!sosa = `None) ; sosa := `Num
-
-let set_safe_user_input () = safe_user_input := true
 
 let set_gwdb_legacy () = assert (!gwdb = `None) ; gwdb := `Legacy
 
@@ -59,9 +56,6 @@ let speclist =
   ; ( "--syslog"
     , Arg.Unit set_syslog
     , " Log gwd errors using syslog" )
-  ; ( "--safe-user-input"
-    , Arg.Unit set_safe_user_input
-    , " Check string escaping at compilation time" )
   ]
   |> List.sort compare
   |> Arg.align
@@ -74,11 +68,6 @@ let () =
     match !syslog with
     | true -> " -D SYSLOG", "syslog"
     | false -> "", ""
-  in
-  let safe_user_input_d =
-    match !safe_user_input with
-    | true -> " -D SAFE_USER_INPUT"
-    | false -> ""
   in
   if !sosa = `None then begin
     if installed "zarith" then set_sosa_zarith ()
@@ -131,7 +120,6 @@ let () =
   var "OS_D" os_d ;
   var "SOSA_D" sosa_d ;
   var "SYSLOG_D" syslog_d ;
-  var "SAFE_USER_INPUT_D" safe_user_input_d ;
   var "GWDB_PKG" gwdb_pkg ;
   var "SOSA_PKG" sosa_pkg ;
   var "SYSLOG_PKG" syslog_pkg ;

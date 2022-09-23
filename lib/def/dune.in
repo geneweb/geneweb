@@ -1,6 +1,0 @@
-(library
- (name geneweb_def)
- (public_name geneweb.def)
- (wrapped false)
- (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-)
