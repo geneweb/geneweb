@@ -565,7 +565,7 @@ module Collection : sig
       [acc] is the starting combined value.
       Start at [from]-nth and finish with [until]-nth element (included).
    *)
-  val fold : from:int option -> until:int option -> ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
+  val fold : ?from:int -> ?until:int -> ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
 
   (** [fold_until continue fn acc c]
       Same as [fold fn acc c], but computation stops as soon as [continue]
