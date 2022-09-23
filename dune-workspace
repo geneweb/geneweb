@@ -2,7 +2,7 @@
 
 (context default)
 
-(profile release)
+(profile dev)
 
 (env
  (dev
