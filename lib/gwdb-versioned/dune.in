@@ -16,8 +16,9 @@
   	;;dsk_format
 	;;format
 	;;partition
-	;;version
+	version
 	translate
+	compat
   )
   (private_modules
 	gw_formats

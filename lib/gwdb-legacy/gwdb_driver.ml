@@ -460,7 +460,7 @@ module Collection = struct
   let iteri fn { get ; length } =
     for i = 0 to length - 1 do match get i with Some x -> fn i x | None -> () done
     
-  let fold ~from ~until fn acc { get ; length } =
+  let fold ?from ?until fn acc { get ; length } =
     let from = match from with Some x -> x | None -> 0 in
     let until = match until with Some x -> x + 1 | None -> length in
     let rec loop acc i =

@@ -9,7 +9,7 @@ end
 module Compat (A : Base) (B : Base) = struct
 end
  *)
-
+(*
 module G25 = Gwdb_gnwb25
 module Current = G25
 
@@ -624,3 +624,40 @@ let sync ?(scratch = false) ~save_mem base = wrap_base base (GLegacy.sync ~scrat
 let gc ?(dry_run = false) ~save_mem base = wrap_base base (GLegacy.gc ~dry_run ~save_mem) not_impl
 
 
+ *)
+
+
+module Legacy_driver = struct
+
+  include Gwdb_legacy.Gwdb_driver
+  let versions = Version.([gnwb20;gnwb21;gnwb22;gnwb23;gnwb24])
+
+  let gen_person_of_person person =
+    let gen_pers = gen_person_of_person person in
+    Translate.legacy_to_def_person gen_pers
+
+  let person_of_gen_person base (genpers, gen_ascend, gen_union) =
+    let genpers = Translate.as_legacy_person genpers in
+    person_of_gen_person base (genpers, gen_ascend, gen_union)
+
+  let no_person iper =
+    let nop = no_person iper in
+    Translate.legacy_to_def_person nop
+
+  let patch_person base iper genpers =
+    let genpers = Translate.as_legacy_person genpers in
+    patch_person base iper genpers
+
+  let insert_person base iper genpers =
+    let genpers = Translate.as_legacy_person genpers in
+    insert_person base iper genpers
+
+  let make bname particles ((persons, ascends, unions), fam_arrays, string_arrays, base_notes) =
+    let persons = Array.map Translate.as_legacy_person persons in
+    make bname particles ((persons, ascends, unions), fam_arrays, string_arrays, base_notes)
+
+end
+
+module Driver = Compat.Make (Legacy_driver) (Legacy_driver)
+
+include Driver
