@@ -12,7 +12,7 @@ type 'a event_item =
   * istr
   * istr
   * istr
-  * (iper * Def.witness_kind) array
+  * (iper * Def.witness_kind * istr) array
   * iper option
 (** a representation of events *)
 
