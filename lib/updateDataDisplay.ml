@@ -28,9 +28,9 @@ let translate_title conf =
       [Rem] : Non exporté en clair hors de ce module.                     *)
 (* ******************************************************************** *)
 let print_mod_ok conf base =
-  let data = Opt.default "" (p_getenv conf.env "data") in
-  let ini = Opt.default "" (p_getenv conf.env "s") in
-  let new_input = Opt.map_default "" only_printable (p_getenv conf.env "nx_input") in
+  let data = Option.value ~default:"" (p_getenv conf.env "data") in
+  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
+  let new_input = Option.fold ~none:"" ~some:only_printable (p_getenv conf.env "nx_input") in
   let list = get_person_from_data conf base in
   let list = List.map (fun (istr, perl) -> sou base istr, perl) list in
   let nb_pers =
@@ -169,7 +169,7 @@ and eval_simple_str_var conf _base env _xx =
         Vlist_data l -> List.length l
       | _ -> 0
     in
-    let ini = Opt.default "" (p_getenv conf.env "s") in
+    let ini = Option.value ~default:"" (p_getenv conf.env "s") in
     let (book_of, title) = translate_title conf in
     let result =
       if ini = "" then Printf.sprintf " (%d %s)" len title
@@ -184,7 +184,7 @@ and eval_compound_var conf base env xx sl =
   let rec loop =
     function
       [s] -> eval_simple_str_var conf base env xx s
-    | ["evar"; s] -> Opt.default "" (p_getenv conf.env s)
+    | ["evar"; s] -> Option.value ~default:"" (p_getenv conf.env s)
     | "encode" :: sl -> (Mutil.encode (loop sl) :> string) (* FIXME? *)
     | ("escape"|"html_encode") :: sl -> (Util.escape_html (loop sl) :> string) (* FIXME? *)
     | "safe" :: sl -> (Util.safe_html (loop sl) :> string) (* FIXME? *)
@@ -211,7 +211,7 @@ let print_foreach conf print_ast _eval_expr =
       | _ -> []
     in
     let list = build_list_long conf list in
-    let k = Opt.to_string @@ p_getenv conf.env "key" in
+    let k = Option.value ~default:"" (p_getenv conf.env "key") in
     let rec loop =
       function
         (ini_k, (list_v : (istr * string) list)) :: l ->

@@ -238,7 +238,7 @@ let print_what_links conf base fnotes =
   let db = notes_links_db conf base false in
   Hutil.header conf title ;
   Hutil.print_link_to_welcome conf true ;
-  Opt.iter (print_linked_list conf base) (List.assoc_opt fnotes db) ;
+  Option.iter (print_linked_list conf base) (List.assoc_opt fnotes db) ;
   Hutil.trailer conf
 
 let print conf base =

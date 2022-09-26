@@ -158,7 +158,7 @@ let excl_faml conf base =
     | None ->
       match find_person_in_env conf base ("ef" ^ string_of_int i) with
       | Some p ->
-        let n = p_getint conf.env ("fef" ^ string_of_int i) |> Opt.default 0 in
+        let n = p_getint conf.env ("fef" ^ string_of_int i) |> Option.value ~default:0 in
         let list =
           if n < Array.length (get_family p)
           then (get_family p).(n) :: list
@@ -225,7 +225,7 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
              [get_father fam, Mate, ifam; get_mother fam, Mate, ifam] @
            nb)
       (get_family (pget conf base iper))
-      (Opt.map_default [] parse_fam (get_parents (pget conf base iper) ) )
+      (Option.fold ~none:[] ~some:parse_fam (get_parents (pget conf base iper) ) )
   in
   let rec make_path path vertex =
     match List.hd path with

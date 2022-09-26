@@ -1029,7 +1029,7 @@ let mk_env conf base =
           match Util.p_getenv conf.env ("nz") with
           | None -> Tnull
           | Some n ->
-            let occ = Opt.default 0 (Util.p_getint conf.env "ocz") in
+            let occ = Option.value ~default:0 (Util.p_getint conf.env "ocz") in
             match Gwdb.person_of_key base p n occ with
             | Some ip -> get_n_mk_person conf base ip
             | None -> Tnull

@@ -420,7 +420,7 @@ let update_person_list conf base new_input list nb_pers max_updates =
 (** Get all the data and filter them if ["s"] is defined in [conf.env] *)
 let build_list conf base =
   (* Paramètre pour savoir par quoi commence la chaine. *)
-  let ini = Opt.to_string @@ p_getenv conf.env "s" in
+  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
   let list = get_all_data conf base in
   if ini <> "" then
     Mutil.filter_map begin fun istr ->
@@ -432,7 +432,7 @@ let build_list conf base =
   else List.rev_map (fun istr -> istr, sou base istr) list
 
 let build_list_short conf list =
-  let ini = Opt.default "" (p_getenv conf.env "s") in
+  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
   (* Construit la liste des string commençant par ini. *)
   (* Pour certaines données comme les sources, on peut *)
   (* avoir beaucoup de sources qui commencent par les  *)
@@ -464,6 +464,6 @@ let build_list_short conf list =
   build_ini list (String.length ini)
 
 let build_list_long conf list : (string * (istr * string) list) list =
-  let ini = Opt.default "" (p_getenv conf.env "s") in
+  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
   let list = combine_by_ini ini list in
   List.sort (fun (ini1, _) (ini2, _) -> Gutil.alphabetic_order ini1 ini2) list

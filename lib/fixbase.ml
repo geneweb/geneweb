@@ -189,7 +189,7 @@ let check_persons_parents ?report progress base =
   let nb_ind = nb_of_persons base in
   Gwdb.Collection.iteri begin fun i p ->
     progress i nb_ind;
-    get_parents p |> Opt.iter @@ fun ifam ->
+    get_parents p |> Option.iter @@ fun ifam ->
     let ip = get_iper p in
     let fam = Gwdb.foi base ifam in
     if get_ifam fam = dummy_ifam then begin

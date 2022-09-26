@@ -502,10 +502,10 @@ let submit_input conf k v =
   aux_input_s conf (Adef.encoded "submit") k (Mutil.decode v)
 
 let p_getenv env label =
-  Opt.map Mutil.decode (List.assoc_opt label env)
+  Option.map Mutil.decode (List.assoc_opt label env)
 
 let p_getint env label =
-  try Opt.map (fun s -> int_of_string (String.trim s)) (p_getenv env label)
+  try Option.map (fun s -> int_of_string (String.trim s)) (p_getenv env label)
   with Failure _ -> None
 
 let nobtit conf base p =
@@ -1864,7 +1864,7 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
   | _ ->
     match p_getenv conf.env env_p, p_getenv conf.env env_n with
     | Some p, Some n ->
-      let occ = Opt.default 0 (p_getint conf.env env_occ) in
+      let occ = Option.value ~default:0 (p_getint conf.env env_occ) in
       begin match person_of_key base p n occ with
         | Some ip ->
           let p = pget conf base ip in
@@ -2019,7 +2019,7 @@ let old_sosa_of_branch conf base (ipl : (iper * sex) list) =
 (* FIXME: remove this and use branch_of_sosa only *)
 let old_branch_of_sosa conf base ip sosa =
   branch_of_sosa conf base sosa (pget conf base ip)
-  |> Opt.map @@ List.map (fun p -> get_iper p, get_sex p)
+  |> Option.map @@ List.map (fun p -> get_iper p, get_sex p)
 
 let default_image_name_of_key fnam surn occ =
   let aux s = Name.lower s |> Mutil.tr ' ' '_' in
