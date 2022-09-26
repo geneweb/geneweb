@@ -65,7 +65,7 @@ let compute ?(verbosity = 2) base from_scratch =
       if from_scratch then begin cset i Adef.no_consang; incr cnt end
       else
         let cg = cget i in
-        Opt.iter (fun ifam -> Gwdb.Marker.set consang_tab ifam cg) (fget i) ;
+        Option.iter (fun ifam -> Gwdb.Marker.set consang_tab ifam cg) (fget i) ;
         if cg = Adef.no_consang then incr cnt
     end persons ;
     (* number of persons which need consanguinity to be computed *)
@@ -134,4 +134,3 @@ let compute ?(verbosity = 2) base from_scratch =
   end ;
     if !patched then Gwdb.commit_patches base ;
     !patched
-

@@ -14,7 +14,7 @@ let getenv var env =
   List.assoc var env |> Mutil.decode
 
 let getenv_opt var env =
-  List.assoc_opt var env |> Opt.map Mutil.decode
+  List.assoc_opt var env |> Option.map Mutil.decode
 
 let export conf base =
   assert conf.wizard ;

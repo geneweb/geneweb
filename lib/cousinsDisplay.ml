@@ -35,7 +35,7 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
                then Adef.encoded "&spouse=on" else Adef.encoded "")
               ^^^ (if (List.assoc_opt "image" conf.env :> string option) = Some "off"
                    then Adef.encoded "&image=off" else Adef.encoded "")
-              ^^^ "&bd=" ^<^ Opt.default (Adef.encoded "0") (List.assoc_opt "bd" conf.env)
+              ^^^ "&bd=" ^<^ Option.value ~default:(Adef.encoded "0") (List.assoc_opt "bd" conf.env)
               :> Adef.escaped_string)
       in
       "<a href=\"" ^<^ (href :> Adef.safe_string) ^^^ "\">" ^<^ s ^>^ "</a>"
@@ -54,7 +54,7 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
                then Adef.encoded "&spouse=on" else Adef.encoded "")
               ^^^ (if (List.assoc_opt "image" conf.env :> string option ) = Some "off"
                    then Adef.encoded "&image=off" else Adef.encoded "")
-              ^^^ "&bd=" ^<^ Opt.default (Adef.encoded "0") (List.assoc_opt "bd" conf.env)
+              ^^^ "&bd=" ^<^ Option.value ~default:(Adef.encoded "0") (List.assoc_opt "bd" conf.env)
               :> Adef.escaped_string)
       in
       "<a href=\"" ^<^ (href :> Adef.safe_string) ^^^ "\">" ^<^ s ^>^ "</a>"
@@ -368,7 +368,7 @@ let print_anniv conf base p dead_people level =
       commd conf
       ^^^ "m=RL&" ^<^ acces_n conf base (Adef.escaped "1") p
       ^^^ "&b1=" ^<^ string_of_int up_sosa
-      ^<^ "&" ^<^ acces_n conf base (Adef.escaped "2") (Opt.map_default c (pget conf base) spouse)
+      ^<^ "&" ^<^ acces_n conf base (Adef.escaped "2") (Option.fold ~none:c ~some:(pget conf base) spouse)
       ^^^ "&b2=" ^<^ string_of_int (sosa_of_persons conf base down_br)
       ^<^ (if spouse = None
            then ("&" ^<^ acces_n conf base (Adef.escaped "4") c)

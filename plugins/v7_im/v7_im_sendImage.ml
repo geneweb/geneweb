@@ -125,7 +125,7 @@ let print_send_image conf base p =
   Output.print_sstring conf " " ;
   Output.print_sstring conf
     {| <input type="file" class="form-control" name="file" size="50" maxlength="250" accept="image/*"></p>|} ;
-  begin match Opt.map int_of_string @@ List.assoc_opt "max_images_size" conf.base_env with
+  begin match Option.map int_of_string @@ List.assoc_opt "max_images_size" conf.base_env with
     | Some len ->
       Output.print_sstring conf "<p>(maximum authorized size = " ;
       Output.print_sstring conf (string_of_int len) ;
@@ -301,7 +301,7 @@ let effective_send_ok conf base p file =
       Mutil.extract_param "content-type: " '\n' request
       |> incorrect_content_type conf base p
     | Some (typ, content) ->
-      match Opt.map int_of_string @@ List.assoc_opt "max_images_size" conf.base_env with
+      match Option.map int_of_string @@ List.assoc_opt "max_images_size" conf.base_env with
       | Some len when String.length content > len ->
         error_too_big_image conf base p (String.length content) len
       | _ -> typ, content

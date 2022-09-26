@@ -662,7 +662,7 @@ let max_cousin_level conf base p =
   max_ancestor_level conf base (get_iper p) max_lev + 1
 
 let limit_desc conf =
-  match Opt.map int_of_string @@ List.assoc_opt "max_desc_level" conf.base_env with
+  match Option.map int_of_string @@ List.assoc_opt "max_desc_level" conf.base_env with
   | Some x -> max 1 x
   | None -> 12
 
@@ -5332,7 +5332,7 @@ let print ?no_headers conf base p =
   | _ -> interp_templ ?no_headers "perso" conf base p
 
 let limit_by_tree conf =
-  match Opt.map int_of_string (List.assoc_opt "max_anc_tree" conf.base_env) with
+  match Option.map int_of_string (List.assoc_opt "max_anc_tree" conf.base_env) with
   | Some x -> max 1 x
   | None -> 7
 

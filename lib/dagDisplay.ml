@@ -1025,8 +1025,8 @@ and print_foreach_dag_cell_pre hts print_ast env al =
       let clipped_outs =
         if pos1 = None && pos2 = None then outs
         else
-          let pos1 = Opt.default pos pos1 in
-          let pos2 = Opt.default (pos + sz) pos2 in
+          let pos1 = Option.value ~default:pos pos1 in
+          let pos2 = Option.value ~default:(pos + sz) pos2 in
           if pos + sz <= pos1 then ""
           else if pos > pos2 then ""
           else if pos2 >= pos + sz then

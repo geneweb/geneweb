@@ -107,7 +107,7 @@ let print_death conf base =
         Output.print_sstring conf " <em>" ;
         Output.print_string conf (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
         Output.print_sstring conf "</em>" ;
-        Opt.iter begin fun a ->
+        Option.iter begin fun a ->
           Output.print_sstring conf " <em>(" ;
           Output.print_string conf (DateDisplay.string_of_age conf a) ;
           Output.print_sstring conf ")</em>"

@@ -501,7 +501,7 @@ let input_lexicon lang ht open_fname =
              && String.unsafe_get line 3 = ' '
         then
           let k2 = String.sub line 4 (String.length line - 4) in
-          Opt.iter (Hashtbl.replace ht k) (Hashtbl.find_opt ht k2) ;
+          Option.iter (Hashtbl.replace ht k) (Hashtbl.find_opt ht k2) ;
           key ()
         else trad k
       | None -> key ()

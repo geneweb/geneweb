@@ -806,7 +806,7 @@ let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
   let b2 = RelationLink.find_first_branch conf base dist ip l2 ip2 Neuter in
   match b1, b2 with
   | Some b1, Some b2 ->
-    let bd = Opt.default 0 (p_getint conf.env "bd") in
+    let bd = Option.value ~default:0 (p_getint conf.env "bd") in
     let td_prop =
       match Util.p_getenv conf.env "color" with
       | None | Some "" -> Adef.safe ""
@@ -1097,5 +1097,5 @@ let print_multi conf base =
     in
     loop [] 1
   in
-  let lim = Opt.default 0 (p_getint conf.env "lim") in
+  let lim = Option.value ~default:0 (p_getint conf.env "lim") in
   print_multi_relation conf base pl lim assoc_txt

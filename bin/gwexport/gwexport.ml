@@ -352,10 +352,10 @@ let select opts ips =
         assert (opts.censor = 0) ;
         let asc =
           if opts.ascdesc <> None
-          then Opt.default max_int opts.asc
-          else Opt.default 0 opts.asc
+          then Option.value ~default:max_int opts.asc
+          else Option.value ~default:0 opts.asc
         in
-        let desc = - (Opt.default 0 opts.desc) in
+        let desc = - (Option.value ~default:0 opts.desc) in
         let ht =
           match opts.ascdesc with
           | Some ascdesc ->

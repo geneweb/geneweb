@@ -408,7 +408,7 @@ let reconstitute_from_fevents
       relation, date, place, note, src
     else marr
   in
-  let div = Opt.default NotDivorced !found_divorce in
+  let div = Option.value ~default:NotDivorced !found_divorce in
   marr, div, wit
 
 let reconstitute_family conf base nsck =
@@ -1332,7 +1332,7 @@ let print_add_parents o_conf base =
        ; efam_witnesses = [| |] } ]
   && sfam.comment = ""
   && sfam.origin_file = ""
-  && sfam.fsources = Opt.to_string @@ p_getenv conf.env "dsrc"
+  && sfam.fsources = Option.value ~default:"" (p_getenv conf.env "dsrc")
   && sfam.fam_index = dummy_ifam
   then match Adef.father scpl, Adef.mother scpl, sdes.children with
     | ( (ff, fs, fo, Update.Link, _)

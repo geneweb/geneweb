@@ -439,7 +439,7 @@ let treat_request =
       List.iter (fun (_ , fn) -> fn conf bfile) !GwdPlugin.se
     else
       List.iter (fun (ns, fn) -> if List.mem ns plugins then fn conf bfile) !GwdPlugin.se ;
-    let m = Opt.default "" @@ p_getenv conf.env "m" in
+    let m = Option.value ~default:"" (p_getenv conf.env "m") in
     if not @@ try_plugin plugins conf bfile m
     then begin
         if List.assoc_opt "counter" conf.base_env <> Some "no"
