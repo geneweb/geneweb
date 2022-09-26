@@ -307,7 +307,7 @@ and eval_simple_var conf base env p = function
                   let i = i - 1 in
                   let k =
                     if i >= 0 && i < Array.length e.epers_witnesses then
-                      fst e.epers_witnesses.(i)
+                      let ip, _, _ =  e.epers_witnesses.(i) in ip
                     else if
                       i >= 0 && i < 2 && Array.length e.epers_witnesses < 2
                     then ("", "", 0, Update.Create (Neuter, None), "")
@@ -329,9 +329,10 @@ and eval_simple_var conf base env p = function
               | Vint i ->
                   let i = i - 1 in
                   if i >= 0 && i < Array.length e.epers_witnesses then
-                    match snd e.epers_witnesses.(i) with
-                    | Witness_GodParent -> str_val "godp"
-                    | Witness_CivilOfficer -> str_val "offi"
+                    let _, wk, _ = e.epers_witnesses.(i) in 
+                    match wk with
+                      Witness_GodParent        -> str_val "godp"
+                    | Witness_CivilOfficer     -> str_val "offi"
                     | Witness_ReligiousOfficer -> str_val "reli"
                     | Witness_Informant -> str_val "info"
                     | Witness_Attending -> str_val "atte"
