@@ -632,6 +632,8 @@ module Legacy_driver = struct
   include Gwdb_legacy.Gwdb_driver
   let versions = Version.([gnwb20;gnwb21;gnwb22;gnwb23;gnwb24])
 
+  type pers_event = (iper, istr) Def.gen_pers_event
+               
   let gen_person_of_person person =
     let gen_pers = gen_person_of_person person in
     Translate.legacy_to_def_person gen_pers
@@ -652,10 +654,17 @@ module Legacy_driver = struct
     let genpers = Translate.as_legacy_person genpers in
     insert_person base iper genpers
 
+
+  let get_pevents p =
+    let pevents = get_pevents p in
+    List.map Translate.legacy_to_def_pers_event pevents
+    
   let make bname particles ((persons, ascends, unions), fam_arrays, string_arrays, base_notes) =
     let persons = Array.map Translate.as_legacy_person persons in
     make bname particles ((persons, ascends, unions), fam_arrays, string_arrays, base_notes)
 
+  let compatibility_directory = "gnwb25"
+    
 end
 
 module Driver = Compat.Make (Legacy_driver) (Legacy_driver)

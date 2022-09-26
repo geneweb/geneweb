@@ -117,6 +117,40 @@ let empty_person empty what =
   ; key_index = ()
   }
 
+let map_pers_event ?(fd = identity) fp fs e =
+  let epers_name =
+    match e.epers_name with
+      Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial |
+      Epers_Cremation | Epers_Accomplishment | Epers_Acquisition |
+      Epers_Adhesion | Epers_BaptismLDS | Epers_BarMitzvah |
+      Epers_BatMitzvah | Epers_Benediction | Epers_ChangeName |
+      Epers_Circumcision | Epers_Confirmation | Epers_ConfirmationLDS |
+      Epers_Decoration | Epers_DemobilisationMilitaire | Epers_Diploma |
+      Epers_Distinction | Epers_Dotation | Epers_DotationLDS |
+      Epers_Education | Epers_Election | Epers_Emigration |
+      Epers_Excommunication | Epers_FamilyLinkLDS | Epers_FirstCommunion |
+      Epers_Funeral | Epers_Graduate | Epers_Hospitalisation | Epers_Illness |
+      Epers_Immigration | Epers_ListePassenger | Epers_MilitaryDistinction |
+      Epers_MilitaryPromotion | Epers_MilitaryService |
+      Epers_MobilisationMilitaire | Epers_Naturalisation | Epers_Occupation |
+      Epers_Ordination | Epers_Property | Epers_Recensement |
+      Epers_Residence | Epers_Retired | Epers_ScellentChildLDS |
+      Epers_ScellentParentLDS | Epers_ScellentSpouseLDS | Epers_VenteBien |
+      Epers_Will as evt ->
+        evt
+    | Epers_Name s -> Epers_Name (fs s)
+  in
+  let epers_date = Futil.map_cdate fd e.epers_date in
+  let epers_place = fs e.epers_place in
+  let epers_reason = fs e.epers_reason in
+  let epers_note = fs e.epers_note in
+  let epers_src = fs e.epers_src in
+  let epers_witnesses = Array.map (fun (p, w) -> fp p, w) e.epers_witnesses in
+  {epers_name = epers_name; epers_date = epers_date;
+   epers_place = epers_place; epers_reason = epers_reason;
+   epers_note = epers_note; epers_src = epers_src;
+   epers_witnesses = epers_witnesses}
+
 let map_person_ps ?(fd = identity) fp fs p =
   { first_name = fs p.first_name
   ; surname = fs p.surname
@@ -149,7 +183,7 @@ let map_person_ps ?(fd = identity) fp fs p =
   ; burial_place = fs p.burial_place
   ; burial_note = fs p.burial_note
   ; burial_src = fs p.burial_src
-  ; pevents = List.map (Futil.map_pers_event ~fd fp fs) p.pevents
+  ; pevents = List.map (map_pers_event ~fd fp fs) p.pevents
   ; notes = fs p.notes
   ; psources = fs p.psources
   ; key_index = p.key_index
