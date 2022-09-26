@@ -36,46 +36,53 @@ type create_info = {
 type create = Create of sex * create_info option | Link
 type key = string * string * int * create * string
 
-let infer_death_from_age a =
-  if a > 120 then OfCourseDead (*TODO private_years??? *) else DontKnowIfDead
+let maximum_lifespan = 125
 
-let infer_death_from_date conf d =
-  infer_death_from_age (Date.time_elapsed d conf.today).year
+let infer_death_from_dmy conf ?(max_age = maximum_lifespan) d =
+  (* TODO this max_age should be related to private_years_marriage *)
+  let age = (Date.time_elapsed d conf.today).year in
+  if age > max_age then OfCourseDead else DontKnowIfDead
 
-let infer_death_from_odate conf = function
-  | Some (Dgreg (d, _)) -> infer_death_from_date conf d
-  | _ -> DontKnowIfDead
+let infer_death_from_cdate conf ?(max_age = maximum_lifespan) cdate =
+  match Date.cdate_to_dmy_opt cdate with
+  | None -> DontKnowIfDead
+  | Some dmy -> infer_death_from_dmy conf ~max_age dmy
 
 let infer_death_bb conf birth bapt =
+  let infer_death_from_odate conf = function
+    | Some (Dgreg (d, _)) -> infer_death_from_dmy conf d
+    | Some (Dtext _) | None -> DontKnowIfDead
+  in
   match infer_death_from_odate conf birth with
   | DontKnowIfDead -> infer_death_from_odate conf bapt
-  | death -> death
+  | (NotDead | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead) as
+    death_status ->
+      death_status
 
 let infer_death_from_parents conf base fam =
-  let fath = poi base @@ get_father fam in
-  let moth = poi base @@ get_mother fam in
-  let aux = function
-    | Death (_, d), _ | _, Death (_, d) ->
-        infer_death_from_odate conf (Date.od_of_cdate d)
-    | _ -> (
-        match
-          ( Date.od_of_cdate @@ get_birth moth,
-            Date.od_of_cdate @@ get_birth fath )
-        with
-        | Some (Dgreg (d, _)), _ | _, Some (Dgreg (d, _)) ->
-            infer_death_from_age @@ ((Date.time_elapsed d conf.today).year - 120)
-        | _ -> DontKnowIfDead)
+  let infer parent =
+    (* child is considered OfCourseDead if one parent is
+       dead more than maximum_lifespan years ago *)
+    let from_death =
+      match Date.dmy_of_death (get_death parent) with
+      | Some dmy -> infer_death_from_dmy conf dmy
+      | None -> DontKnowIfDead
+    in
+    if from_death = OfCourseDead then OfCourseDead
+    else
+      (* child is considered OfCourseDead if one parent was
+         born more than maximum_lifespan + 25 years ago *)
+      infer_death_from_cdate conf ~max_age:(maximum_lifespan + 25)
+        (get_birth parent)
   in
-  match (get_death fath, get_death moth) with
-  | (Death (_, d1) as a), (Death (_, d2) as b) -> (
-      match (Date.od_of_cdate d1, Date.od_of_cdate d2) with
-      | Some (Dgreg (d1, _) as d1'), Some (Dgreg (d2, _) as d2') ->
-          if Date.compare_date d1' d2' > 0 then infer_death_from_date conf d2
-          else infer_death_from_date conf d1
-      | Some (Dgreg (d, _)), _ | _, Some (Dgreg (d, _)) ->
-          infer_death_from_date conf d
-      | _ -> aux (a, b))
-  | a, b -> aux (a, b)
+  let from_father = infer @@ poi base @@ get_father fam in
+  let from_mother = infer @@ poi base @@ get_mother fam in
+  let from_marriage = infer_death_from_cdate conf (get_marriage fam) in
+  if
+    Array.exists (( = ) OfCourseDead)
+      [| from_father; from_mother; from_marriage |]
+  then OfCourseDead
+  else DontKnowIfDead
 
 let rec infer_death conf base p =
   let death =
@@ -92,12 +99,9 @@ let rec infer_death conf base p =
         if i = len then DontKnowIfDead
         else
           let fam = foi base families.(i) in
-          match Date.od_of_cdate (get_marriage fam) with
-          (* TODO this 120 should be related to private_years_marriage *)
-          | Some (Dgreg (d, _)) when (Date.time_elapsed d conf.today).year > 120
-            ->
-              OfCourseDead
-          | _ ->
+          match Date.cdate_to_dmy_opt (get_marriage fam) with
+          | Some d -> infer_death_from_dmy conf d
+          | None ->
               let death =
                 let children = get_children fam in
                 let len = Array.length children in
@@ -681,11 +685,11 @@ let print_warning conf base = function
            ^^^ "</strong> <em>"
            ^<^ (match Date.od_of_cdate t.t_date_start with
                | Some d -> DateDisplay.string_of_date conf d
-               | _ -> Adef.safe "")
+               | None -> Adef.safe "")
            ^^^ "-"
            ^<^ (match Date.od_of_cdate t.t_date_end with
                | Some d -> DateDisplay.string_of_date conf d
-               | _ -> Adef.safe "")
+               | None -> Adef.safe "")
            ^>^ "</em>"
             :> string))
   | UndefinedSex p ->
