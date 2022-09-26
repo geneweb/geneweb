@@ -4,6 +4,7 @@ open Dbdisk
 type ('iper, 'person, 'string) legacy_dsk_person = ('iper, 'person, 'string) Dbdisk.gen_person   
 type ('iper, 'string) legacy_dsk_pers_event = ('iper, 'string) Dbdisk.gen_pers_event
 
+
 type istr = int
 type ifam = int
 type iper = int
@@ -43,6 +44,7 @@ let close_base base = base.func.cleanup ()
 let sou base i = base.data.strings.get i
 
 let bname base = Filename.(remove_extension @@ basename base.data.bdir)
+let bdir base = base.data.bdir
 let nb_of_persons base = base.data.persons.len
 let nb_of_real_persons base = base.func.nb_of_real_persons ()
 let nb_of_families base = base.data.families.len
