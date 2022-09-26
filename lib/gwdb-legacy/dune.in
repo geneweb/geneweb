@@ -26,7 +26,6 @@
   (private_modules
     btree
     database
-    dbdisk
     dutil
     gwdb_gc
     iovalue
