@@ -331,6 +331,9 @@ val nb_of_families : base -> int
 (** Returns database name *)
 val bname : base -> string
 
+(** Returns database name *)
+val bdir : base -> string
+  
 (** Modify/add person with the giving id in the base. New names are added
     to the patched name index for the cosidered person and for evey member of family to
     which he belongs. Modification stay blocked until call of [commit_patches]. *)
