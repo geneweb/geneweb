@@ -633,7 +633,22 @@ module Legacy_driver = struct
   let versions = Version.([gnwb20;gnwb21;gnwb22;gnwb23;gnwb24])
 
   type pers_event = (iper, istr) Def.gen_pers_event
-               
+
+  let compatibility_directory = "gnwb25"
+                              
+  let create_compatibility_files base =
+    let dir = bdir base in
+    print_endline @@ "BASE DIR:" ^ dir;
+    Files.mkdir_p (Filename.concat dir compatibility_directory);
+    ()
+
+  let insert_witness_notes base person : unit =
+    assert false
+
+  let read_witness_notes base person : istr list =
+    assert false
+    
+    
   let gen_person_of_person person =
     let gen_pers = gen_person_of_person person in
     Translate.legacy_to_def_person gen_pers
@@ -651,6 +666,7 @@ module Legacy_driver = struct
     patch_person base iper genpers
 
   let insert_person base iper genpers =
+    (*let pers_events = genpers.Def.pevents in*)
     let genpers = Translate.as_legacy_person genpers in
     insert_person base iper genpers
 
@@ -663,8 +679,16 @@ module Legacy_driver = struct
     let persons = Array.map Translate.as_legacy_person persons in
     make bname particles ((persons, ascends, unions), fam_arrays, string_arrays, base_notes)
 
-  let compatibility_directory = "gnwb25"
-    
+
+
+
+  let open_base bname =
+    print_endline @@ "BNAME:" ^ bname;
+    let base = open_base bname in
+    print_endline @@ "Bdir:" ^ bdir base;
+    create_compatibility_files base;
+    base
+
 end
 
 module Driver = Compat.Make (Legacy_driver) (Legacy_driver)
