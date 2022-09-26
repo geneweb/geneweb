@@ -651,7 +651,7 @@ module Legacy_driver = struct
     
   let gen_person_of_person person =
     let gen_pers = gen_person_of_person person in
-    Translate.legacy_to_def_person gen_pers
+    Translate.legacy_to_def_person empty_string gen_pers
 
   let person_of_gen_person base (genpers, gen_ascend, gen_union) =
     let genpers = Translate.as_legacy_person genpers in
@@ -659,7 +659,7 @@ module Legacy_driver = struct
 
   let no_person iper =
     let nop = no_person iper in
-    Translate.legacy_to_def_person nop
+    Translate.legacy_to_def_person empty_string nop
 
   let patch_person base iper genpers =
     let genpers = Translate.as_legacy_person genpers in
@@ -673,7 +673,7 @@ module Legacy_driver = struct
 
   let get_pevents p =
     let pevents = get_pevents p in
-    List.map Translate.legacy_to_def_pers_event pevents
+    List.map (Translate.legacy_to_def_pevent empty_string) pevents
     
   let make bname particles ((persons, ascends, unions), fam_arrays, string_arrays, base_notes) =
     let persons = Array.map Translate.as_legacy_person persons in
