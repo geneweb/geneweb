@@ -1,6 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 type ('iper, 'person, 'string) legacy_dsk_person = ('iper, 'person, 'string) Dbdisk.gen_person
+type ('iper, 'string) legacy_dsk_pers_event = ('iper, 'string) Dbdisk.gen_pers_event
 
 (** String id *)
 type istr = int
@@ -42,7 +43,7 @@ type relation = (iper, istr) Def.gen_relation
 type title = istr Def.gen_title
 
 (** Database implementation for [Def.pers_event] *)
-type pers_event = (iper, istr) Def.gen_pers_event
+type pers_event = (iper, istr) Dbdisk.gen_pers_event
 
 (** Database implementation for [Def.fam_event] *)
 type fam_event = (iper, istr) Def.gen_fam_event

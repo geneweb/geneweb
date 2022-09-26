@@ -130,7 +130,7 @@ type 'string gen_pers_event_name = 'string Def.gen_pers_event_name =
   | Epers_Will
   | Epers_Name of 'string
 
-type ('person, 'string) gen_pers_event = ('person, 'string) Def.gen_pers_event =
+type ('person, 'string) gen_pers_event = (*('person, 'string) Def.gen_pers_event =*)
   { epers_name : 'string gen_pers_event_name;
     epers_date : cdate;
     epers_place : 'string;

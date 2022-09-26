@@ -677,4 +677,9 @@ module type DriverImpl = sig
   val versions : Version.t list
 end
 
-module Make (Legacy : DriverImpl) (Current : DriverImpl) : Driver_S
+module type DriverImplCompat = sig
+  include DriverImpl
+  val compatibility_directory : string
+end
+                       
+module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S

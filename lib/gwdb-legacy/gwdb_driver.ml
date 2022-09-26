@@ -2,6 +2,7 @@
 open Dbdisk
 
 type ('iper, 'person, 'string) legacy_dsk_person = ('iper, 'person, 'string) Dbdisk.gen_person   
+type ('iper, 'string) legacy_dsk_pers_event = ('iper, 'string) Dbdisk.gen_pers_event
 
 type istr = int
 type ifam = int
@@ -276,7 +277,7 @@ let base_notes_are_empty base fnotes = base_notes_read_aux base fnotes Def.RnDeg
 
 type relation = (iper, istr) Def.gen_relation
 type title = istr Def.gen_title
-type pers_event = (iper, istr) Def.gen_pers_event
+type pers_event = (iper, istr) Dbdisk.gen_pers_event
 type fam_event = (iper, istr) Def.gen_fam_event
 
 let cache f a get set x =
