@@ -1184,8 +1184,45 @@ module Make (Legacy : DriverImpl) (Current : DriverImpl) : Driver_S = struct
       | Dummy_collection -> ()
 
     (* DO SOMETHING *)                          
-    let fold ?(from = 0) ?until f acc coll =
+    let fold ?from ?until f acc coll =
       print_endline "FOLDING";
+
+      let res = match from, until with
+      | Some from, Some until ->
+         begin match coll with
+         | Legacy_collection c ->
+            Legacy.Collection.fold ~from ~until f acc c
+         | Current_collection c ->
+            Current.Collection.fold ~from ~until f acc c
+         | Dummy_collection -> acc
+         end
+      | None, None ->
+         begin match coll with
+         | Legacy_collection c ->
+            Legacy.Collection.fold f acc c
+         | Current_collection c ->
+            Current.Collection.fold f acc c
+         | Dummy_collection -> acc
+         end
+      | Some from, None ->
+         begin match coll with
+         | Legacy_collection c ->
+            Legacy.Collection.fold ~from f acc c
+         | Current_collection c ->
+            Current.Collection.fold ~from f acc c
+         | Dummy_collection -> acc
+         end
+      | None, Some until ->
+         begin match coll with
+         | Legacy_collection c ->
+            Legacy.Collection.fold ~until f acc c
+         | Current_collection c ->
+            Current.Collection.fold ~until f acc c
+         | Dummy_collection -> acc
+         end
+      in
+      print_endline "FOLDED"; res
+      (*
       let until = match until, coll with
         | None, Legacy_collection c -> (Legacy.Collection.length c - 1)
         | None, Current_collection c -> (Current.Collection.length c - 1)
@@ -1200,7 +1237,7 @@ module Make (Legacy : DriverImpl) (Current : DriverImpl) : Driver_S = struct
       | Dummy_collection -> acc
       in
       print_endline "FOLDED"; res
-
+       *)
     let fold_until continue fn acc coll = match coll with
       | Legacy_collection c ->
          Legacy.Collection.fold_until continue fn acc c
