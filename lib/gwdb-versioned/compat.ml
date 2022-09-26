@@ -677,8 +677,9 @@ module type DriverImpl = sig
   val versions : Version.t list
 end
 
-module type Compat = sig
-  val compat_directory : string
+module type DriverImplCompat = sig
+  include DriverImpl
+  val compatibility_directory : string
 end
 
 
@@ -688,7 +689,7 @@ let dummy_ifam = -1
 let empty_string = 0
 let quest_string = 1
                
-module Make (Legacy : DriverImpl) (Current : DriverImpl) : Driver_S = struct
+module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = struct
  
 
   type base =
