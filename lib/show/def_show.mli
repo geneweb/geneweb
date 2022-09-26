@@ -295,7 +295,7 @@ type ('person, 'string) gen_pers_event =
   epers_reason : 'string;
   epers_note : 'string;
   epers_src : 'string;
-  epers_witnesses : ('person * witness_kind) array;
+  epers_witnesses : ('person * witness_kind * 'string) array;
 }
 
 (** Printer for [gen_pers_event] *)

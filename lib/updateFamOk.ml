@@ -505,7 +505,11 @@ let check_parents conf cpl =
 let check_family conf fam cpl : (Update.update_error option * Update.update_error option) =
   let err_parents = check_parents conf cpl in
   let err_fevent_witness =
-    Update.check_missing_witnesses_names conf (fun e -> e.efam_witnesses) fam.fevents
+    (* WNOTES TODO HANDLE FEVENTS WNOTES*)
+    Update.check_missing_witnesses_names conf (fun e ->
+        let witnesses = Array.map (fun (ip,wk) -> ip, wk, "") e.efam_witnesses in
+        witnesses
+      ) fam.fevents
   in
   err_fevent_witness, err_parents
 

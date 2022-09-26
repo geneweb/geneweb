@@ -560,7 +560,8 @@ let check_witness_pevents base warning origin =
   List.iter begin fun evt ->
     match Adef.od_of_cdate evt.epers_date with
     | Some (Dgreg (d2, _)) ->
-      Array.iter begin fun (iw, witness_kind) ->
+       Array.iter begin fun (iw, witness_kind, wnotes) ->
+         (* WNOTES TODO *)
         let p = poi base iw in
         check_witness_pevents_aux warning origin evt d2
           (Adef.od_of_cdate @@ get_birth p)
@@ -573,8 +574,9 @@ let check_witness_pevents base warning origin =
 (** Returns wether [iper] can be found in the provided associative array and
     wether it was found associated only with the Mentionned or Other witness kind.
 **)
-let witness_occur : iper -> (iper * witness_kind) array -> bool * bool =
-  let f iper (is_witness, only_mentioned_or_other) (i, wk) =
+let witness_occur : iper -> (iper * witness_kind * istr) array -> bool * bool =
+  let f iper (is_witness, only_mentioned_or_other) (i, wk, wnotes) =
+    (* WNOTES TODO *)
     if i = iper then
       true, only_mentioned_or_other && (wk = Def.Witness_Mentioned || wk = Def.Witness_Other)
     else is_witness, only_mentioned_or_other
@@ -635,7 +637,8 @@ let check_person_dates_as_witness base warning p =
   in
   List.iter begin fun fam ->
     List.iter begin fun evt ->
-      match witness_kind_of_witness_array ip evt.efam_witnesses with
+      (* WNOTES TODO WFAMNOTES *)
+      match witness_kind_of_witness_array ip (Array.map (fun (ip,wk) -> ip,wk,Gwdb.empty_string) evt.efam_witnesses) with
       | Some Def.Witness_Mentioned | Some Def.Witness_Other ->
          aux
            (fun e -> e.efam_date)
@@ -926,7 +929,8 @@ let check_related_person_fevents warning base birth_date death_date p iper relat
     List.iter begin fun e ->
       match Adef.od_of_cdate e.efam_date with
       | Some (Dgreg (date, _)) ->
-         let is_witness, only_mentioned = witness_occur iper e.efam_witnesses in
+         (* WNOTES TODO WFAM NOTES *)
+         let is_witness, only_mentioned = witness_occur iper (Array.map (fun (ip, wk) -> ip, wk, Gwdb.empty_string) e.efam_witnesses) in
          if is_witness then
            let witness_kind = if only_mentioned then Def.Witness_Mentioned else Def.Witness in
            check_witness_fevents_aux warning f e date birth_date death_date p witness_kind

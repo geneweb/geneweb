@@ -276,14 +276,14 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                 let (e, mod_pc, p_related, mod_p) =
                   let (witnesses, mod_p, p_related) =
                     List.fold_right
-                      (fun (ip, k) (witnesses, mod_p, p_related) ->
+                      (fun (ip, k, wnotes) (witnesses, mod_p, p_related) ->
                          if ip = ip2 then
                            let (p_related, mod_p) =
                              if List.mem ipc p_related then p_related, mod_p
                              else ipc :: p_related, true
                            in
-                           (p.key_index, k) :: witnesses, mod_p, p_related
-                         else (ip, k) :: witnesses, mod_p, p_related)
+                           (p.key_index, k, wnotes) :: witnesses, mod_p, p_related
+                         else (ip, k, wnotes) :: witnesses, mod_p, p_related)
                       (Array.to_list e.epers_witnesses)
                       ([], mod_pc, p_related)
                   in

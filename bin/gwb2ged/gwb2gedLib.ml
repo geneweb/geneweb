@@ -419,7 +419,8 @@ let ged_pevent opts base per_sel evt =
   let src = sou base evt.epers_src in
   ged_ev_detail opts 2 typ date place note src;
   Array.iter
-    (fun (ip, wk) ->
+    (fun (ip, wk, wnote) ->
+      (* WNOTE TODO *)
        if per_sel ip then
          begin
            Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);

@@ -452,7 +452,7 @@ val array_mem_witn
  : Config.config
  -> Gwdb.base
  -> iper
- -> (iper * Def.witness_kind) array
+ -> (iper * Def.witness_kind * istr) array
  -> bool * Adef.safe_string
 
 (** [name_key base name] is [name],

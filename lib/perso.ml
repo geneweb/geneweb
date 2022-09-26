@@ -1208,7 +1208,7 @@ and title_item =
   int * istr gen_title_name * istr * istr list *
     (date option * date option) list
 and event_item =
-  event_name * cdate * istr * istr * istr * (iper * witness_kind) array *
+  event_name * cdate * istr * istr * istr * (iper * witness_kind * istr) array *
     iper option
 and event_name =
     Pevent of istr gen_pers_event_name
@@ -1344,6 +1344,12 @@ let events_list conf base p =
          CheckItem.merge_events get_name get_date fam_fevents fevents)
       (get_family p) []
   in
+  (* WNOTES TODO WFAMNOTES *)
+  let fevents = List.map (fun (a, b, c, d, e, ws, f) ->
+                    let ws = Array.map (fun (ip, wk) -> ip, wk, Gwdb.empty_string) ws in
+                    a, b, c, d, e, ws, f
+                  )
+                  fevents in
   CheckItem.merge_events get_name get_date pevents fevents
 
 let make_ep conf base ip =
@@ -4182,7 +4188,7 @@ let print_foreach conf base print_ast eval_expr =
       | (name, _, _, _, _, wl, _) :: events ->
           if name = Pevent Epers_Baptism then
             Array.iteri
-              begin fun i (ip, _) ->
+              begin fun i (ip, _, _) ->
                 let p = pget conf base ip in
                 let env =
                   ("baptism_witness", Vind p)
@@ -4202,7 +4208,7 @@ let print_foreach conf base print_ast eval_expr =
       | (name, _, _, _, _, wl, _) :: events ->
           if name = Pevent Epers_Birth then
             Array.iteri
-              begin fun i (ip, _) ->
+              begin fun i (ip, _, _) ->
                 let p = pget conf base ip in
                 let env =
                   ("birth_witness", Vind p)
@@ -4222,7 +4228,7 @@ let print_foreach conf base print_ast eval_expr =
       | (name, _, _, _, _, wl, _) :: events ->
           if name = Pevent Epers_Burial then
             Array.iteri
-              begin fun i (ip, _) ->
+              begin fun i (ip, _, _) ->
                 let p = pget conf base ip in
                 let env =
                   ("burial_witness", Vind p)
@@ -4322,7 +4328,7 @@ let print_foreach conf base print_ast eval_expr =
       | (name, _, _, _, _, wl, _) :: events ->
           if name = Pevent Epers_Cremation then
             Array.iteri
-              begin fun i (ip, _) ->
+              begin fun i (ip, _, _) ->
                 let p = pget conf base ip in
                 let env =
                   ("cremation_witness", Vind p)
@@ -4342,7 +4348,7 @@ let print_foreach conf base print_ast eval_expr =
       | (name, _, _, _, _, wl, _) :: events ->
           if name = Pevent Epers_Death then
             Array.iteri
-              begin fun i (ip, _) ->
+              begin fun i (ip, _, _) ->
                 let p = pget conf base ip in
                 let env =
                   ("death_witness", Vind p)
@@ -4381,7 +4387,7 @@ let print_foreach conf base print_ast eval_expr =
       match get_env "event" env with
         Vevent (_, (_, _, _, _, _, witnesses, _)) ->
           Array.iteri
-            begin fun i (ip, wk) ->
+            begin fun i (ip, wk, _) ->
               let p = pget conf base ip in
               let wk = Util.string_of_witness_kind conf (get_sex p) wk in
               let env =

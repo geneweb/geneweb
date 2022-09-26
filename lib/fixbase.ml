@@ -243,7 +243,8 @@ let check_pevents_witnesses ?report progress base =
     progress i nb_ind ;
     let ip = get_iper p in
     List.iter begin fun evt ->
-      let witn = Array.map fst evt.epers_witnesses in
+      let fst' (x,_,__) = x in
+      let witn = Array.map fst' evt.epers_witnesses in
       for j = 0 to Array.length witn - 1 do
         let ip2 = witn.(j) in
         let p2 = poi base ip2 in

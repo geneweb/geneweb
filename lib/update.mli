@@ -109,7 +109,7 @@ val check_greg_day : config -> dmy -> unit
 
 val check_missing_witnesses_names
   : config
-  -> ('a -> ((string * string * 'b * 'c * 'd) * 'e) array)
+  -> ('a -> ((string * string * 'b * 'c * 'd) * 'e * string) array)
   -> 'a list
   -> update_error option
 

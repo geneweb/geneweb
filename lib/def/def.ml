@@ -181,7 +181,7 @@ type ('person, 'string) gen_pers_event =
     epers_reason : 'string;
     epers_note : 'string;
     epers_src : 'string;
-    epers_witnesses : ('person * witness_kind) array }
+    epers_witnesses : ('person * witness_kind * 'string) array }
 
 (** Event name pertaining a family. *)
 type 'string gen_fam_event_name =

@@ -924,7 +924,7 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
          (* insert all event witnesses *)
          let witnesses =
            List.map
-             (fun (wit, sex, wk) ->
+             (fun (wit, sex, wk, wnote) ->
                 let (p, ip) = insert_somebody gen wit in
                 notice_sex gen p sex;
                 p.m_related <- ifath :: p.m_related;
@@ -1064,13 +1064,14 @@ let insert_pevents fname gen sb pevtl =
         (fun (name, date, place, reason, src, notes, witl) ->
            let witnesses =
              List.map
-               (fun (wit, sex, wk) ->
+               (fun (wit, sex, wk, wnote) ->
                   (* insert witnesses *)
                   let (wp, wip) = insert_somebody gen wit in
                   notice_sex gen wp sex;
                   (* add concerned person as witness' relation *)
                   wp.m_related <- ip :: wp.m_related;
-                  wip, wk)
+                  let wistr = unique_string gen wnote in
+                  wip, wk, wistr)
                witl
            in
            {epers_name = pevent_name_unique_string gen name;

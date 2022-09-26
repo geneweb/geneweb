@@ -55,7 +55,7 @@ let map_pers_event ?(fd = identity) fp fs e =
   let epers_reason = fs e.epers_reason in
   let epers_note = fs e.epers_note in
   let epers_src = fs e.epers_src in
-  let epers_witnesses = Array.map (fun (p, w) -> fp p, w) e.epers_witnesses in
+  let epers_witnesses = Array.map (fun (p, w, wnote) -> fp p, w, fs wnote) e.epers_witnesses in
   {epers_name = epers_name; epers_date = epers_date;
    epers_place = epers_place; epers_reason = epers_reason;
    epers_note = epers_note; epers_src = epers_src;

@@ -2505,6 +2505,8 @@ let record_visited conf ip =
 (**/**)
 
 let array_mem_witn conf base x a =
+  let fst (a,_,_) = a in
+  let snd (_,b,_) = b in
   let rec loop i =
     if i = Array.length a then (false, Adef.safe "")
     else if x = fst a.(i)
