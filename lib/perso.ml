@@ -1262,57 +1262,49 @@ let get_linked_page conf base p s =
   in
   List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
 
-let events_list conf base p =
-  let pevents =
-    if authorized_age conf base p then
-      List.fold_right
-        (fun evt events ->
-           let name = Pevent evt.epers_name in
-           let date = evt.epers_date in
-           let place = evt.epers_place in
-           let note = evt.epers_note in
-           let src = evt.epers_src in
-           let wl = evt.epers_witnesses in
-           let x = name, date, place, note, src, wl, None in x :: events)
-        (get_pevents p) []
-    else []
-  in
-  let get_name = function
-    | (Pevent n, _, _, _, _, _, _) -> CheckItem.Psort n
-    | (Fevent n, _, _, _, _, _, _) -> CheckItem.Fsort n
-  in
-  let get_date (_, date, _, _, _, _, _) = date in
-  let fevents =
-    (* On conserve l'ordre des familles. *)
-    Array.fold_right
-      (fun ifam fevents ->
-         let fam = foi base ifam in
-         let ifath = get_father fam in
-         let imoth = get_mother fam in
-         let isp = Gutil.spouse (get_iper p) fam in
-         let m_auth =
-           authorized_age conf base (pget conf base ifath) &&
-           authorized_age conf base (pget conf base imoth)
-         in
-         let fam_fevents =
-           if m_auth then
-             List.fold_right
-               (fun evt fam_fevents ->
-                  let name = Fevent evt.efam_name in
-                  let date = evt.efam_date in
-                  let place = evt.efam_place in
-                  let note = evt.efam_note in
-                  let src = evt.efam_src in
-                  let wl = evt.efam_witnesses in
-                  let x = name, date, place, note, src, wl, Some isp in
-                  x :: fam_fevents)
-               (get_fevents fam) []
-           else []
-         in
-         CheckItem.merge_events get_name get_date fam_fevents fevents)
-      (get_family p) []
-  in
-  CheckItem.merge_events get_name get_date pevents fevents
+let events conf base p =
+  if authorized_age conf base p then begin
+    let pevents =
+      List.fold_right begin fun evt events ->
+        let name = Pevent evt.epers_name in
+        let date = evt.epers_date in
+        let place = evt.epers_place in
+        let note = evt.epers_note in
+        let src = evt.epers_src in
+        let wl = evt.epers_witnesses in
+        let x = name, date, place, note, src, wl, None in
+        x :: events
+      end (get_pevents p) []
+    in
+    let get_name = function
+      | (Pevent n, _, _, _, _, _, _) -> CheckItem.Psort n
+      | (Fevent n, _, _, _, _, _, _) -> CheckItem.Fsort n
+    in
+    let get_date (_, date, _, _, _, _, _) = date in
+    let fevents =
+      Array.fold_right begin fun ifam fevents ->
+        let fam = foi base ifam in
+        let isp = Gutil.spouse (get_iper p) fam in
+        let m_auth = authorized_age conf base (pget conf base isp) in
+        let fam_fevents =
+          if m_auth then
+            List.fold_right begin fun evt fam_fevents ->
+              let name = Fevent evt.efam_name in
+              let date = evt.efam_date in
+              let place = evt.efam_place in
+              let note = evt.efam_note in
+              let src = evt.efam_src in
+              let wl = evt.efam_witnesses in
+              let x = name, date, place, note, src, wl, Some isp in
+              x :: fam_fevents
+            end (get_fevents fam) []
+          else []
+        in
+        CheckItem.merge_events get_name get_date fam_fevents fevents
+      end (get_family p) []
+    in
+    CheckItem.merge_events get_name get_date pevents fevents
+  end else []
 
 let make_ep conf base ip =
   let p = pget conf base ip in
@@ -2921,7 +2913,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
             if name = Pevent Epers_Baptism then Array.length wl > 0
             else loop events
       in
-      p_auth && loop (events_list conf base p)
+      p_auth && loop (events conf base p)
   | "has_birth_date" -> p_auth && get_birth p <> Adef.cdate_None
   | "has_birth_place" -> p_auth && sou base (get_birth_place p) <> ""
   | "has_birth_source" -> p_auth && sou base (get_birth_src p) <> ""
@@ -2935,7 +2927,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
             if name = Pevent Epers_Birth then Array.length wl > 0
             else loop events
       in
-      p_auth && loop (events_list conf base p)
+      p_auth && loop (events conf base p)
   | "has_burial_date" ->
       if p_auth then
         match get_burial p with
@@ -2954,7 +2946,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
             if name = Pevent Epers_Burial then Array.length wl > 0
             else loop events
       in
-      p_auth && loop (events_list conf base p)
+      p_auth && loop (events conf base p)
   | "has_children" ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, _) ->
@@ -2991,7 +2983,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
             if name = Pevent Epers_Cremation then Array.length wl > 0
             else loop events
       in
-      p_auth && loop (events_list conf base p)
+      p_auth && loop (events conf base p)
   | "has_death_date" ->
       begin match get_death p with
       | Death (_, _) -> p_auth
@@ -3009,10 +3001,10 @@ and eval_bool_person_field conf base env (p, p_auth) =
             if name = Pevent Epers_Death then Array.length wl > 0
             else loop events
       in
-      p_auth && loop (events_list conf base p)
+      p_auth && loop (events conf base p)
   | "has_event" ->
       if p_auth then
-        let events = events_list conf base p in
+        let events = events conf base p in
         let nb_fam = Array.length (get_family p) in
         match List.assoc_opt "has_events" conf.base_env with
         | Some "never" -> false
