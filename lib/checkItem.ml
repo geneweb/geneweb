@@ -43,22 +43,24 @@ let strictly_after d1 d2 =
 let strictly_younger age year =
   match age.prec with
   | After -> false
-  | _ -> age.year < year
+  | Sure | About | Maybe
+  | Before | OrYear _ | YearInt _ -> age.year < year
 
 let strictly_older age year =
   match age.prec with
   | Before -> false
-  | _ -> age.year > year
+  | Sure | About | Maybe
+  | After | OrYear _ | YearInt _ -> age.year > year
 
 let odate = function
   | Some (Dgreg (d, _)) -> Some d
-  | _ -> None
+  | Some (Dtext _) | None -> None
 
 let obirth x =
   get_birth x |> Adef.od_of_cdate |> odate
 
 type 'string event_name =
-    Psort of 'string gen_pers_event_name
+  | Psort of 'string gen_pers_event_name
   | Fsort of 'string gen_fam_event_name
 
 (*
@@ -91,6 +93,7 @@ let compare_event_name name1 name2 =
   | Psort Epers_Death, _ -> 1
   | _, Psort Epers_Death -> -1
   | _ -> 0
+  (*TODO Fsort??*)
 
 let cmp_events get_name get_date e1 e2 =
   match Adef.od_of_cdate (get_date e1) with
@@ -101,24 +104,24 @@ let cmp_events get_name get_date e1 e2 =
           | Some 0 | None -> compare_event_name (get_name e1) (get_name e2)
           | Some x -> x
         end
-      | _ -> compare_event_name (get_name e1) (get_name e2)
+      | Some (Dtext _) | None -> compare_event_name (get_name e1) (get_name e2)
     end
-  | _ -> compare_event_name (get_name e1) (get_name e2)
+  | Some (Dtext _) | None -> compare_event_name (get_name e1) (get_name e2)
 
 let sort_events get_name get_date events =
   List.stable_sort (fun e1 e2 -> cmp_events get_name get_date e1 e2) events
 
 let merge_events get_name get_date l1 l2 =
-  List.merge (fun e1 e2 -> cmp_events get_name get_date e1 e2) l1 l2
+  List.sort (fun e1 e2 -> cmp_events get_name get_date e1 e2) (l1 @ l2)
 
 let changed_pevents_order warning p =
-  let a =
+  let a = get_pevents p in
+  let b =
     sort_events
       (fun evt -> Psort evt.epers_name) (fun evt -> evt.epers_date)
-      (get_pevents p)
+      a
   in
-  let b = get_pevents p in
-  if compare b a <> 0 then warning (ChangedOrderOfPersonEvents (p, b, a))
+  if a <> b then warning (ChangedOrderOfPersonEvents (p, a, b))
 
 let changed_fevents_order warning (ifam, fam) =
   let a =
@@ -164,7 +167,7 @@ let check_person_age warning p =
       | Some (Dgreg (d, _)) -> aux d d2
       | _ -> match Adef.od_of_cdate (get_baptism p) with
         | Some (Dgreg (d, _)) -> aux d d2
-        | _ -> ()
+        | Some (Dtext _) | None -> ()
     end
   | _ -> ()
 

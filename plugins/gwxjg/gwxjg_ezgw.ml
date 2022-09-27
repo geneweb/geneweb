@@ -71,50 +71,7 @@ module Person = struct
   let death p =
     get_death p
 
-  let events conf base p =
-    if authorized_age conf base p then begin
-      let pevents =
-        List.fold_right begin fun evt events ->
-          let name = Perso.Pevent evt.epers_name in
-          let date = evt.epers_date in
-          let place = evt.epers_place in
-          let note = evt.epers_note in
-          let src = evt.epers_src in
-          let wl = evt.epers_witnesses in
-          let x = name, date, place, note, src, wl, None in
-          x :: events
-        end (get_pevents p) []
-      in
-      let get_name = function
-        | (Perso.Pevent n, _, _, _, _, _, _) -> CheckItem.Psort n
-        | (Perso.Fevent n, _, _, _, _, _, _) -> CheckItem.Fsort n
-      in
-      let get_date (_, date, _, _, _, _, _) = date in
-      let fevents =
-        (* On conserve l'ordre des familles. *)
-        Array.fold_right begin fun ifam fevents ->
-          let fam = foi base ifam in
-          let isp = Gutil.spouse (get_iper p) fam in
-          let m_auth = authorized_age conf base (pget conf base isp) in
-          let fam_fevents =
-            if m_auth then
-              List.fold_right begin fun evt fam_fevents ->
-                let name = Perso.Fevent evt.efam_name in
-                let date = evt.efam_date in
-                let place = evt.efam_place in
-                let note = evt.efam_note in
-                let src = evt.efam_src in
-                let wl = evt.efam_witnesses in
-                let x = name, date, place, note, src, wl, Some isp in
-                x :: fam_fevents
-              end (get_fevents fam) []
-            else []
-          in
-          CheckItem.merge_events get_name get_date fam_fevents fevents
-        end (get_family p) []
-      in
-      CheckItem.merge_events get_name get_date pevents fevents
-    end else []
+  let events = Perso.events
 
   let first_name base p =
     p_first_name base p
