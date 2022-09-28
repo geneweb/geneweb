@@ -11695,6 +11695,10 @@ sl: po strani %s
 sv: från %ss släktsida
 tr: %s tarafında
 
+    on %s's siblings side
+en: on %s's siblings side
+fr: du côté des frères et soeurs de %s
+
     on (day month year)
 af: op
 ar: يوم

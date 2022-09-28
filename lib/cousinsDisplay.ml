@@ -193,7 +193,7 @@ let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
           : Adef.safe_string
           :> string);
       ]
-      |> cftransl conf "on %s's side"
+      |> cftransl conf "on %s's siblings side"
       |> Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf (Util.transl conf ":"));
     let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in
