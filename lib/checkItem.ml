@@ -111,6 +111,7 @@ let cmp_events get_name get_date e1 e2 =
 let sort_events get_name get_date events =
   List.stable_sort (fun e1 e2 -> cmp_events get_name get_date e1 e2) events
 
+(* TODO don't merge just sort , call it sort_events *)
 let merge_events get_name get_date l1 l2 =
   List.sort (fun e1 e2 -> cmp_events get_name get_date e1 e2) (l1 @ l2)
 

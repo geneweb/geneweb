@@ -1182,6 +1182,15 @@ type 'a env =
   | Vother of 'a
   | Vnone
 
+(* tuple used to store event information *)
+type event_tuple =
+  (event_name * Def.cdate * Gwdb.istr * Gwdb.istr * Gwdb.istr *
+   (Gwdb.iper * Def.witness_kind) array * Gwdb.iper option)
+
+(** [has_witness_for_event event_name events] is [true] iff there is an event with name [event_name] in [events] and this event had witnesses. It do not check for permissions *)
+let has_witness_for_event event_name events = List.exists (fun ((name, _, _, _, _, wl, _) : event_tuple) ->
+  name = event_name && Array.length wl > 0) events
+
 let get_env v env =
   try
     match List.assoc v env with
@@ -1262,10 +1271,11 @@ let get_linked_page conf base p s =
   in
   List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
 
-let events conf base p =
-  if authorized_age conf base p then begin
+(* TODO this is call a lot but when the list doesn't need to be sorted by check item merge*)
+let events conf base p : event_tuple list =
+  if authorized_age conf base p then
     let pevents =
-      List.fold_right begin fun evt events ->
+      List.fold_right (fun evt events ->
         let name = Pevent evt.epers_name in
         let date = evt.epers_date in
         let place = evt.epers_place in
@@ -1274,7 +1284,7 @@ let events conf base p =
         let wl = evt.epers_witnesses in
         let x = name, date, place, note, src, wl, None in
         x :: events
-      end (get_pevents p) []
+      ) (get_pevents p) []
     in
     let get_name = function
       | (Pevent n, _, _, _, _, _, _) -> CheckItem.Psort n
@@ -1282,13 +1292,13 @@ let events conf base p =
     in
     let get_date (_, date, _, _, _, _, _) = date in
     let fevents =
-      Array.fold_right begin fun ifam fevents ->
+      Array.fold_right (fun ifam fevents ->
         let fam = foi base ifam in
         let isp = Gutil.spouse (get_iper p) fam in
         let m_auth = authorized_age conf base (pget conf base isp) in
         let fam_fevents =
           if m_auth then
-            List.fold_right begin fun evt fam_fevents ->
+            List.fold_right (fun evt fam_fevents ->
               let name = Fevent evt.efam_name in
               let date = evt.efam_date in
               let place = evt.efam_place in
@@ -1297,14 +1307,14 @@ let events conf base p =
               let wl = evt.efam_witnesses in
               let x = name, date, place, note, src, wl, Some isp in
               x :: fam_fevents
-            end (get_fevents fam) []
+            ) (get_fevents fam) []
           else []
         in
         CheckItem.merge_events get_name get_date fam_fevents fevents
-      end (get_family p) []
+      ) (get_family p) []
     in
     CheckItem.merge_events get_name get_date pevents fevents
-  end else []
+  else []
 
 let make_ep conf base ip =
   let p = pget conf base ip in
@@ -2906,28 +2916,16 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_baptism_note" ->
       p_auth && not conf.no_note && sou base (get_baptism_note p) <> ""
   | "has_baptism_witnesses" ->
-      let rec loop pevents =
-        match pevents with
-          [] -> false
-        | (name, _, _, _, _, wl, _) :: events ->
-            if name = Pevent Epers_Baptism then Array.length wl > 0
-            else loop events
-      in
-      p_auth && loop (events conf base p)
+      p_auth &&
+        has_witness_for_event (Pevent Epers_Baptism) (events conf base p)
   | "has_birth_date" -> p_auth && get_birth p <> Adef.cdate_None
   | "has_birth_place" -> p_auth && sou base (get_birth_place p) <> ""
   | "has_birth_source" -> p_auth && sou base (get_birth_src p) <> ""
   | "has_birth_note" ->
       p_auth && not conf.no_note && sou base (get_birth_note p) <> ""
   | "has_birth_witnesses" ->
-      let rec loop pevents =
-        match pevents with
-          [] -> false
-        | (name, _, _, _, _, wl, _) :: events ->
-            if name = Pevent Epers_Birth then Array.length wl > 0
-            else loop events
-      in
-      p_auth && loop (events conf base p)
+      p_auth &&
+        has_witness_for_event (Pevent Epers_Birth) (events conf base p)
   | "has_burial_date" ->
       if p_auth then
         match get_burial p with
@@ -2939,14 +2937,8 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_burial_note" ->
       p_auth && not conf.no_note && sou base (get_burial_note p) <> ""
   | "has_burial_witnesses" ->
-      let rec loop pevents =
-        match pevents with
-          [] -> false
-        | (name, _, _, _, _, wl, _) :: events ->
-            if name = Pevent Epers_Burial then Array.length wl > 0
-            else loop events
-      in
-      p_auth && loop (events conf base p)
+      p_auth &&
+        has_witness_for_event (Pevent Epers_Burial) (events conf base p)
   | "has_children" ->
       begin match get_env "fam" env with
         Vfam (_, fam, _, _) ->
@@ -2976,14 +2968,8 @@ and eval_bool_person_field conf base env (p, p_auth) =
       else false
   | "has_cremation_place" -> p_auth && sou base (get_burial_place p) <> ""
   | "has_cremation_witnesses" ->
-      let rec loop pevents =
-        match pevents with
-          [] -> false
-        | (name, _, _, _, _, wl, _) :: events ->
-            if name = Pevent Epers_Cremation then Array.length wl > 0
-            else loop events
-      in
-      p_auth && loop (events conf base p)
+      p_auth &&
+        has_witness_for_event (Pevent Epers_Cremation) (events conf base p)
   | "has_death_date" ->
       begin match get_death p with
       | Death (_, _) -> p_auth
@@ -2994,14 +2980,8 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_death_note" ->
       p_auth && not conf.no_note && sou base (get_death_note p) <> ""
   | "has_death_witnesses" ->
-      let rec loop pevents =
-        match pevents with
-          [] -> false
-        | (name, _, _, _, _, wl, _) :: events ->
-            if name = Pevent Epers_Death then Array.length wl > 0
-            else loop events
-      in
-      p_auth && loop (events conf base p)
+      p_auth &&
+        has_witness_for_event (Pevent Epers_Death) (events conf base p)
   | "has_event" ->
       if p_auth then
         let events = events conf base p in
@@ -3016,11 +2996,11 @@ and eval_bool_person_field conf base env (p, p_auth) =
             (* on ne prend pas en compte les notes).                       *)
             let rec loop events nb_birth nb_bapt nb_deat nb_buri nb_marr =
               match events with
-                [] -> false
+              | [] -> false
               | (name, _, p, n, s, wl, _) :: events ->
                   let (p, n, s) = sou base p, sou base n, sou base s in
                   match name with
-                    Pevent pname ->
+                  | Pevent pname ->
                       begin match pname with
                         Epers_Birth | Epers_Baptism | Epers_Death |
                         Epers_Burial | Epers_Cremation ->
@@ -3028,7 +3008,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
                           else
                             let (nb_birth, nb_bapt, nb_deat, nb_buri) =
                               match pname with
-                                Epers_Birth ->
+                              | Epers_Birth ->
                                   succ nb_birth, nb_bapt, nb_deat, nb_buri
                               | Epers_Baptism ->
                                   nb_birth, succ nb_bapt, nb_deat, nb_buri
@@ -3038,8 +3018,8 @@ and eval_bool_person_field conf base env (p, p_auth) =
                                   nb_birth, nb_bapt, nb_deat, succ nb_buri
                               | _ -> nb_birth, nb_bapt, nb_deat, nb_buri
                             in
-                            if List.exists (fun i -> i > 1)
-                                 [nb_birth; nb_bapt; nb_deat; nb_buri]
+                            if Array.exists (fun i -> i > 1)
+                                 [|nb_birth; nb_bapt; nb_deat; nb_buri|]
                             then
                               true
                             else
@@ -4058,7 +4038,7 @@ let print_foreach conf base print_ast eval_expr =
     loop 0
   in
   let print_foreach_event env al (p, _ as ep) =
-    let events = events_list conf base p in
+    let events = events conf base p in
     Mutil.list_iter_first
       (fun first evt ->
          let env = ("event", Vevent (p, evt)) :: env in
@@ -4089,7 +4069,7 @@ let print_foreach conf base print_ast eval_expr =
               end
               wl
           else ()
-          ) (events_list conf base p);
+          ) (events conf base p);
   in
   let print_foreach_event_witness env al (_, p_auth as ep) =
     if p_auth then
@@ -4129,7 +4109,7 @@ let print_foreach conf base print_ast eval_expr =
                        if get_sex c = Male then list := (c, wk, evt) :: !list
                    | _ -> list := (c, wk, evt) :: !list)
               )
-              (events_list conf base c);
+              (events conf base c);
             make_list icl
         | [] -> ()
       in
