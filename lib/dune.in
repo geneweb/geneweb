@@ -10,7 +10,7 @@
  (libraries unix
             str
             stdlib-shims
-            camlp5
+            camlp-streams
             geneweb_core
             geneweb_def
             geneweb_gwdb
