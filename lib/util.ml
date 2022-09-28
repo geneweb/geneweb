@@ -308,11 +308,19 @@ let commd ?(excl = []) ?(trim = true) ?(henv = true) ?(senv = true) conf : Adef.
   s
 
 let prefix_base conf =
+  let cmmd = conf.command in
   Adef.encoded @@
-  if conf.cgi then conf.command ^ "?b=" ^ conf.bname ^ "&"
-  else conf.command ^ "?"
+  if conf.cgi then cmmd ^ "?b=" ^ conf.bname ^ "&"
+  else
+    let cmmd =
+      match String.index_opt cmmd '_' with
+      | Some i -> String.sub cmmd 0 i
+      | None -> cmmd
+    in
+    cmmd ^ "?"
 
 let prefix_base_password conf =
+  Adef.encoded @@
   if conf.cgi then
     if conf.cgi_passwd = "" then
       conf.command ^ "?b=" ^ conf.bname ^ "&"
@@ -321,8 +329,8 @@ let prefix_base_password conf =
   else
     conf.command ^ "?"
 
-
 let prefix_base_password_2 conf =
+  Adef.encoded @@
   if conf.cgi then
     if conf.cgi_passwd = "" then
       conf.command ^ "?b=" ^ conf.bname
