@@ -171,6 +171,7 @@ let macro conf base = function
   | 'e' -> Adef.safe conf.charset
   | 'f' -> Adef.safe conf.command
   | 'g' -> (Util.prefix_base conf :> Adef.safe_string)
+  | 'G' -> (Util.prefix_base_password conf :> Adef.safe_string)
   | 'i' -> Adef.safe conf.highlight
   | 'k' -> Adef.safe conf.indep_command
   | 'l' -> Adef.safe conf.lang
