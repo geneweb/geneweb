@@ -188,8 +188,8 @@ and eval_simple_variable conf =
   | "nn" -> ""
   | "prefix" -> commd conf
   | "prefix_base" -> (Util.prefix_base conf :> string)
-  | "prefix_base_password" -> Util.prefix_base_password conf
-  | "prefix_base_password_2" -> Util.prefix_base_password_2 conf
+  | "prefix_base_password" -> (Util.prefix_base_password conf :> string)
+  | "prefix_base_password_2" -> (Util.prefix_base_password_2 conf :> string)
   | "prefix_no_iz" -> commd ~excl:["iz"; "nz"; "pz"; "ocz"] conf
   | "prefix_no_templ" -> commd ~excl:["templ"] conf
   | "prefix_no_pmod" -> commd ~excl:["p_mod"] conf

@@ -1001,7 +1001,7 @@ let mk_conf conf =
 
 let mk_env_no_base conf =
   let prefix = escaped (Util.commd conf) in
-  let prefix_base = encoded (Util.prefix_base conf) in
+  let prefix_base = escaped (Util.prefix_base conf) in
   Tpat begin function
     | "prefix" -> prefix
     | "prefix_base" -> prefix_base
@@ -1010,7 +1010,7 @@ let mk_env_no_base conf =
 
 let mk_env conf base =
   let prefix = escaped (Util.commd conf) in
-  let prefix_base = encoded (Util.prefix_base conf) in
+  let prefix_base = escaped (Util.prefix_base conf) in
   let sosa_ref =
     box_lazy @@ lazy begin
       match Util.p_getenv conf.Config.env "iz" with
