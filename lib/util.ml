@@ -309,7 +309,7 @@ let commd ?(excl = []) ?(trim = true) ?(henv = true) ?(senv = true) conf : Adef.
 
 let prefix_base conf =
   let cmmd = conf.command in
-  Adef.encoded @@
+  Adef.escaped @@
   if conf.cgi then cmmd ^ "?b=" ^ conf.bname ^ "&"
   else
     let cmmd =
@@ -320,7 +320,7 @@ let prefix_base conf =
     cmmd ^ "?"
 
 let prefix_base_password conf =
-  Adef.encoded @@
+  Adef.escaped @@
   if conf.cgi then
     if conf.cgi_passwd = "" then
       conf.command ^ "?b=" ^ conf.bname ^ "&"
@@ -330,7 +330,7 @@ let prefix_base_password conf =
     conf.command ^ "?"
 
 let prefix_base_password_2 conf =
-  Adef.encoded @@
+  Adef.escaped @@
   if conf.cgi then
     if conf.cgi_passwd = "" then
       conf.command ^ "?b=" ^ conf.bname
