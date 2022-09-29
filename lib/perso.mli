@@ -115,8 +115,10 @@ type event_name =
     Pevent of istr Def.gen_pers_event_name
   | Fevent of istr Def.gen_fam_event_name
 
-val events :
-  config -> base -> person ->
-    (event_name * Def.cdate * istr * istr * istr *
-       (iper * Def.witness_kind) array * iper option)
-      list
+(** representation of events used in this module *)
+type event_tuple =
+  (event_name * Def.cdate * Gwdb.istr * Gwdb.istr * Gwdb.istr *
+   (Gwdb.iper * Def.witness_kind) array * Gwdb.iper option)
+
+  (** [sorted_events conf base p] is the list of [p]'s events, sorted by Checkitem.sorted_events *)
+val sorted_events : config -> base -> person -> event_tuple list

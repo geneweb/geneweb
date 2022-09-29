@@ -71,7 +71,8 @@ module Person = struct
   let death p =
     get_death p
 
-  let events = Perso.events
+  (* TODOWHY: should it be Perso.sorted_events or can it be just Perso.events? *)
+  let events = Perso.sorted_events
 
   let first_name base p =
     p_first_name base p

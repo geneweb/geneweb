@@ -21,11 +21,6 @@ type 'string event_name =
 val sort_events :
   ('a -> 'string event_name) -> ('a -> Adef.cdate) -> 'a list -> 'a list
 
-(** Merge two sorted event lists (returns sorted list) *)
-val merge_events :
-  ('a -> 'string event_name) -> ('a -> Adef.cdate) -> 'a list -> 'a list ->
-    'a list
-
 (** [check_siblings ?onchange base warning (ifam, fam) callback]
     Checks birth date consistency between siblings.
     Also calls [callback] with each child. *)
