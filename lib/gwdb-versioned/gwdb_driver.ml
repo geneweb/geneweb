@@ -781,17 +781,20 @@ module Legacy_driver = struct
     test_on_person base genpers;
     print_endline "LETS PATCH";
     let pevents = genpers.pevents in
-    let tbl = witness_notes_tbl base in
-    add_witness_notes tbl iper pevents;
     let genpers = Translate.as_legacy_person genpers in
-    patch_person base iper genpers
+    patch_person base iper genpers;
+    let tbl = witness_notes_tbl base in
+    add_witness_notes tbl iper pevents
 
   let insert_person base iper genpers =
     print_endline "INSERT PERSON";
     test_on_person base genpers;
     print_endline "LETS INSERT";
+    let pevents = genpers.pevents in
     let genpers = Translate.as_legacy_person genpers in
-    insert_person base iper genpers
+    insert_person base iper genpers;
+    let tbl = witness_notes_tbl base in
+    add_witness_notes tbl iper pevents
 
   let commit_patches base =
     print_endline "COMMIT LEGACY PATCHES";
