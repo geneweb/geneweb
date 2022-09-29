@@ -217,22 +217,29 @@ let rec reconstitute_pevents conf ext cnt =
               let var_c =
                 "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_kind"
               in
-              let c =
+              let wkind =
                 match p_getenv conf.env var_c with
-                | Some "godp" -> (c, Witness_GodParent)
-                | Some "offi" -> (c, Witness_CivilOfficer)
-                | Some "reli" -> (c, Witness_ReligiousOfficer)
-                | Some "info" -> (c, Witness_Informant)
-                | Some "atte" -> (c, Witness_Attending)
-                | Some "ment" -> (c, Witness_Mentioned)
-                | Some "othe" -> (c, Witness_Other)
-                | _ -> (c, Witness)
+                | Some "godp" -> Witness_GodParent
+                | Some "offi" -> Witness_CivilOfficer
+                | Some "reli" -> Witness_ReligiousOfficer
+                | Some "info" -> Witness_Informant
+                | Some "atte" -> Witness_Attending
+                | Some "ment" -> Witness_Mentioned
+                | Some "othe" -> Witness_Other
+                | _           -> Witness
               in
               (* WNOTES TODO GET ACTUAL WNOTE *)
-              let c =
-                let c, wk = c in
-                c, wk, ""
+              let wnote =
+                let var_note =
+                  "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_note"
+                in
+                match p_getenv conf.env var_note with
+                | Some wnote -> print_endline ("NOTE:" ^ wnote); wnote
+                | _ -> ""
               in
+              
+              let c = c, wkind, wnote in
+              
               let var_w =
                 "e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i
               in
