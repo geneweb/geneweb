@@ -1271,9 +1271,9 @@ let get_linked_page conf base p s =
   in
   List.fold_left (linked_page_text conf base p s key) (Adef.safe "") db
 
-(* TODO this is call a lot but when the list doesn't need to be sorted by check item merge*)
-let events conf base p : event_tuple list =
-  if authorized_age conf base p then
+let events conf base p =
+  if not (authorized_age conf base p) then []
+  else
     let pevents =
       List.fold_right (fun evt events ->
         let name = Pevent evt.epers_name in
@@ -1286,11 +1286,6 @@ let events conf base p : event_tuple list =
         x :: events
       ) (get_pevents p) []
     in
-    let get_name = function
-      | (Pevent n, _, _, _, _, _, _) -> CheckItem.Psort n
-      | (Fevent n, _, _, _, _, _, _) -> CheckItem.Fsort n
-    in
-    let get_date (_, date, _, _, _, _, _) = date in
     let fevents =
       Array.fold_right (fun ifam fevents ->
         let fam = foi base ifam in
@@ -1310,11 +1305,19 @@ let events conf base p : event_tuple list =
             ) (get_fevents fam) []
           else []
         in
-        CheckItem.merge_events get_name get_date fam_fevents fevents
+        fam_fevents @ fevents
       ) (get_family p) []
     in
-    CheckItem.merge_events get_name get_date pevents fevents
-  else []
+    (pevents @ fevents)
+
+let sorted_events conf base p =
+  let unsorted_events = events conf base p in
+  let get_name = function
+    | (Pevent n, _, _, _, _, _, _) -> CheckItem.Psort n
+    | (Fevent n, _, _, _, _, _, _) -> CheckItem.Fsort n
+  in
+  let get_date (_, date, _, _, _, _, _) = date in
+  CheckItem.sort_events get_name get_date unsorted_events
 
 let make_ep conf base ip =
   let p = pget conf base ip in
@@ -3142,7 +3145,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "is_certainly_dead" ->
       begin match get_death p with
       | OfCourseDead -> p_auth
-      (* TODO: why not: | Death _ | DeadYoung -> true *)
+      (* TODOWHY : why not: | Death _ | DeadYoung -> true *)
       | Death _ | DeadYoung | DeadDontKnowWhen | NotDead | DontKnowIfDead -> false
       end
   | "is_descendant" ->
@@ -4038,13 +4041,12 @@ let print_foreach conf base print_ast eval_expr =
     loop 0
   in
   let print_foreach_event env al (p, _ as ep) =
-    let events = events conf base p in
     Mutil.list_iter_first
       (fun first evt ->
          let env = ("event", Vevent (p, evt)) :: env in
          let env = ("first", Vbool first) :: env in
          List.iter (print_ast env ep) al)
-      events
+    (sorted_events conf base p)
   in
   let print_foreach_epers_event_witness env al (p, _ as ep) epers_event =
     let epers_event_witness_string = match epers_event with
@@ -4078,7 +4080,6 @@ let print_foreach conf base print_ast eval_expr =
           Array.iteri
             begin fun i (ip, wk) ->
               let p = pget conf base ip in
-              (* TODO don't make it a string here and use Vwitness_kind *)
               let wk = Util.string_of_witness_kind conf (get_sex p) wk in
               let env =
                 ("event_witness", Vind p)
@@ -4166,7 +4167,7 @@ let print_foreach conf base print_ast eval_expr =
       let l = ref [] in
       List.iter (fun ic ->
           let c = pget conf base ic in
-          (* TODO why only on Male? probably bugged on same sex or neuter couples *)
+          (* TODOWHY: only on Male? probably bugged on same sex or neuter couples *)
           begin if get_sex c = Male then
             Array.iter
               (fun ifam ->
@@ -4465,7 +4466,7 @@ let print_foreach conf base print_ast eval_expr =
           match get_burial p with
           | Cremated _cdate -> "cremation"
           | Buried _cdate -> "burial"
-          | UnknownBurial -> "burial" (* TODO what should we print here *)
+          | UnknownBurial -> "burial" (* TODOWHY what should we print here *)
         in
         insert (transl_nth conf buri_crem_lex 0) (sou base (get_burial_src p))
           srcl
