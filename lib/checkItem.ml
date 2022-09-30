@@ -59,76 +59,6 @@ let odate = function
 let obirth x =
   get_birth x |> Adef.od_of_cdate |> odate
 
-(* TODO use Perso.event_name instead *)
-type 'string event_name =
-  | Psort of 'string gen_pers_event_name
-  | Fsort of 'string gen_fam_event_name
-
-(*
-   On ignore les événements personnalisés.
-   Dans l'ordre de priorité :
-     birth, baptism, ..., death, funeral, burial/cremation.
-   Pour les évènements familiaux, cet ordre est envisageable :
-     engage, PACS, marriage bann, marriage contract, marriage, ...,
-     separate, divorce
-*)
-let compare_event_name name1 name2 =
-  match name1, name2 with
-  | Psort Epers_Birth, _ -> -1
-  | _, Psort Epers_Birth -> 1
-  | Psort Epers_Baptism, Psort ( Epers_Death
-                               | Epers_Funeral
-                               | Epers_Burial
-                               | Epers_Cremation ) ->
-    -1
-  | Psort ( Epers_Death
-          | Epers_Funeral
-          | Epers_Burial
-          | Epers_Cremation ), Psort Epers_Baptism ->
-    1
-  | Psort Epers_Cremation, Psort Epers_Burial -> -1
-  | Psort (Epers_Burial | Epers_Cremation), _ -> 1
-  | _, Psort (Epers_Burial | Epers_Cremation) -> -1
-  | Psort Epers_Funeral, _ -> 1
-  | _, Psort Epers_Funeral -> -1
-  | Psort Epers_Death, _ -> 1
-  | _, Psort Epers_Death -> -1
-  | _ -> 0
-  (*TODO Fsort??*)
-
-let cmp_events get_name get_date e1 e2 =
-  match Adef.od_of_cdate (get_date e1) with
-  | Some (Dgreg (d1, _)) -> begin
-      match Adef.od_of_cdate (get_date e2) with
-      | Some (Dgreg (d2, _)) ->
-        begin match Date.compare_dmy_opt ~strict:false d1 d2 with
-          | Some 0 | None -> compare_event_name (get_name e1) (get_name e2)
-          | Some x -> x
-        end
-      | Some (Dtext _) | None -> compare_event_name (get_name e1) (get_name e2)
-    end
-  | Some (Dtext _) | None -> compare_event_name (get_name e1) (get_name e2)
-
-let sort_events get_name get_date events =
-  List.stable_sort (fun e1 e2 -> cmp_events get_name get_date e1 e2) events
-
-let changed_pevents_order warning p =
-  let a = get_pevents p in
-  let b =
-    sort_events
-      (fun evt -> Psort evt.epers_name) (fun evt -> evt.epers_date)
-      a
-  in
-  if a <> b then warning (ChangedOrderOfPersonEvents (p, a, b))
-
-let changed_fevents_order warning (ifam, fam) =
-  let a =
-    sort_events (fun evt -> Fsort evt.efam_name) (fun evt -> evt.efam_date)
-      (get_fevents fam)
-  in
-  let b = get_fevents fam in
-  if compare b a <> 0 then warning (ChangedOrderOfFamilyEvents (ifam, b, a))
-
 let title_dates warning p t =
   let t_date_start = Adef.od_of_cdate t.t_date_start in
   let t_date_end = Adef.od_of_cdate t.t_date_end in
@@ -439,9 +369,9 @@ let close_siblings warning x np ifam =
         && (d.month < max_month_btw_sibl)
         && (d.month <> 0 || d.day >= max_days_btw_sibl)
         then warning (CloseChildren (ifam, elder, x))
-      | _ -> ()
+      | None -> ()
     end
-  | _ -> ()
+  | None -> ()
 
 let born_after_his_elder_sibling warning x b np ifam des =
   match np with
@@ -521,19 +451,20 @@ let possible_father warning x father =
 let child_has_sex warning child =
   if get_sex child = Neuter then warning (UndefinedSex child)
 
+(* this check if events chronology is sound (e.g. no baptism before birth *)
 let check_order_pfevents get_name get_date warning events =
-  let events = sort_events get_name get_date events in
+  let events = Event.sort_events get_name get_date events in
   let rec loop = function
     | e1 :: e2 :: events ->
       begin match get_name e1 with
-        | Psort (Epers_Name _) | Fsort (Efam_Name _) ->
+        | Event.Pevent (Epers_Name _) | Event.Fevent (Efam_Name _) ->
           loop (e2 :: events)
         | n1 ->
           match  get_name e2 with
-          | Psort (Epers_Name _) | Fsort (Efam_Name _) ->
+          | Event.Pevent (Epers_Name _) | Event.Fevent (Efam_Name _) ->
             loop (e1 :: events)
           | n2 ->
-            if compare_event_name n1 n2 = 1
+            if Event.compare_event_name n1 n2 = 1
             then warning e1 e2 ;
             loop (e2 :: events)
       end
@@ -543,10 +474,18 @@ let check_order_pfevents get_name get_date warning events =
 
 let check_order_pevents warning p =
   check_order_pfevents
-    (fun evt -> Psort evt.epers_name)
+    (fun evt -> Event.Pevent evt.epers_name)
     (fun evt -> evt.epers_date)
     (fun e1 e2 -> warning (PEventOrder (p, e1, e2)))
     (get_pevents p)
+
+let check_order_fevents base warning fam =
+  let p = poi base (get_father fam) in
+  check_order_pfevents
+    (fun evt -> Event.Fevent evt.efam_name)
+    (fun evt -> evt.efam_date)
+    (fun e1 e2 -> warning (FEventOrder (p, e1, e2)))
+    (get_fevents fam)
 
 let check_witness_pevents_aux warning origin evt date b d p witness_kind =
   match b, d with
@@ -766,14 +705,6 @@ let check_sources base misc ifam fam =
     if has_person_sources fath && has_person_sources moth then ()
     else misc MissingSources
 
-let check_order_fevents base warning fam =
-  let p = poi base (get_father fam) in
-  check_order_pfevents
-    (fun evt -> Fsort evt.efam_name)
-    (fun evt -> evt.efam_date)
-    (fun e1 e2 -> warning (FEventOrder (p, e1, e2)))
-    (get_fevents fam)
-
 let check_witness_fevents_aux warning fam evt date b d p witness_kind =
   match b, d with
   | Some (Dgreg (d1, _)), _ when strictly_before_dmy date d1 ->
@@ -875,6 +806,22 @@ let check_parents base warning fam fath moth =
   check_difference_age_between_cpl warning fath moth;
   check_possible_duplicate_family base warning fam fath moth
 
+let changed_pevents_order warning p =
+  let a = get_pevents p in
+  let b =
+    Event.sort_events
+      (fun evt -> Pevent evt.epers_name) (fun evt -> evt.epers_date)
+      a
+  in
+  if a <> b then warning (ChangedOrderOfPersonEvents (p, a, b))
+
+let changed_fevents_order warning (ifam, fam) =
+  let a =
+    Event.sort_events (fun evt -> Fevent evt.efam_name) (fun evt -> evt.efam_date)
+      (get_fevents fam)
+  in
+  let b = get_fevents fam in
+  if compare b a <> 0 then warning (ChangedOrderOfFamilyEvents (ifam, b, a))
 
 (* main *)
 
@@ -992,3 +939,125 @@ let on_person_update base warning p =
     [Rem] : Exporté en clair hors de ce module.                              *)
 (* ************************************************************************* *)
 let check_other_fields base misc ifam fam = check_sources base misc ifam fam
+
+
+let first_name base p = Name.strip_lower @@ sou base @@ get_first_name p
+let surname base p = Name.strip_lower @@ sou base @@ get_surname p
+
+let hom_person base p1 p2 =
+  let fn1, sn1 = first_name base p1, surname base p1 in
+  let fn2, sn2 = first_name base p2, surname base p2 in
+  fn1 = fn2 && sn1 = sn2
+
+let hom_fam base f1 f2 =
+  let f1, f2 = foi base f1, foi base f2 in
+  let fa1, mo1 = poi base @@ get_father f1, poi base @@ get_mother f1 in
+  let fa2, mo2 = poi base @@ get_father f2, poi base @@ get_mother f2 in
+  hom_person base fa1 fa2 && hom_person base mo1 mo2
+
+let eq_person p1 p2 =
+  eq_iper (get_iper p1) (get_iper p2)
+
+let eq_family f1 f2 =
+  eq_ifam (get_ifam f1) (get_ifam f2)
+
+let eq_warning base w1 w2 = match w1, w2 with
+  | PossibleDuplicateFam (f1, f2),
+    PossibleDuplicateFam (f1', f2') ->
+     eq_ifam f1 f1' && eq_ifam f2 f2'
+     || eq_ifam f1 f2' && eq_ifam f2 f1'
+  | PossibleDuplicateFamHomonymous (f1, f2, _),
+    PossibleDuplicateFamHomonymous (f1', f2', _) ->
+     hom_fam base f1 f1' && hom_fam base f2 f2'
+     || hom_fam base f1 f2' && hom_fam base f2 f1'
+  | BigAgeBetweenSpouses (p1, p2, d),
+    BigAgeBetweenSpouses (p1', p2', d') ->
+     (eq_person p1 p1' && eq_person p2 p2'
+      || eq_person p1 p2' && eq_person p2 p1')
+     && d = d'
+  | BirthAfterDeath p,
+    BirthAfterDeath p' ->
+     eq_person p p'
+  | IncoherentSex (p, s1, s2),
+    IncoherentSex (p', s1', s2') ->
+     eq_person p p'
+     && (s1 = s1' && s2 = s2' || s1 = s2' && s2 = s1')
+  | ChangedOrderOfChildren (ifam, fam, ipers1, ipers2),
+    ChangedOrderOfChildren (ifam', fam', ipers1', ipers2')->
+     eq_ifam ifam ifam'
+     && (eq_family fam fam')
+     && ipers1 = ipers1' && ipers2 = ipers2'
+  | ChangedOrderOfMarriages (p, ifams, ifams2),
+    ChangedOrderOfMarriages (p', ifams', ifams2') ->
+     eq_person p p' && ifams = ifams' && ifams2 = ifams2'
+  | ChangedOrderOfFamilyEvents (ifam, fevents, fevents2),
+    ChangedOrderOfFamilyEvents (ifam', fevents', fevents2') ->
+     eq_ifam ifam ifam' && fevents = fevents' && fevents2 = fevents2'
+  | ChangedOrderOfPersonEvents (p, pevents, pevents2),
+    ChangedOrderOfPersonEvents (p', pevents', pevents2') ->
+     eq_person p p' && pevents = pevents' && pevents2 = pevents2'
+  | ChildrenNotInOrder (ifam, fam, p1, p2),
+    ChildrenNotInOrder (ifam', fam', p1', p2') ->
+     eq_ifam ifam ifam' && eq_family fam fam' && eq_person p1 p1' && eq_person p2 p2'
+  | CloseChildren (ifam, p1, p2),
+    CloseChildren (ifam', p1', p2') ->
+     eq_ifam ifam ifam'
+     && (eq_person p1 p1' && eq_person p2 p2'
+         || eq_person p1 p2' && eq_person p2 p1')
+  | DeadOld (p, d), DeadOld (p', d') ->
+     eq_person p p' && d = d'
+  | DeadTooEarlyToBeFather (p1, p2), DeadTooEarlyToBeFather (p1', p2') ->
+     eq_person p1 p1' && eq_person p2 p2'
+  | DistantChildren (ifam, p1, p2), DistantChildren (ifam', p1', p2') ->
+     eq_ifam ifam ifam' && eq_person p1 p1' && eq_person p2 p2'
+  | FEventOrder (p, fevent, fevent2), FEventOrder (p', fevent', fevent2') ->
+     eq_person p p' && fevent = fevent' && fevent2 = fevent2'
+  | FWitnessEventAfterDeath (p, fevent, ifam),
+    FWitnessEventAfterDeath (p', fevent', ifam') ->
+     eq_person p p' && fevent = fevent' && eq_ifam ifam ifam'
+  | FWitnessEventBeforeBirth (p, fevent, ifam),
+    FWitnessEventBeforeBirth (p', fevent', ifam') ->
+     eq_person p p' && fevent = fevent' && eq_ifam ifam ifam'
+  | IncoherentAncestorDate (p1, p2),
+    IncoherentAncestorDate (p1', p2') ->
+     eq_person p1 p1' && eq_person p2 p2'
+  | MarriageDateAfterDeath p, MarriageDateAfterDeath p' ->
+     eq_person p p'
+  | MarriageDateBeforeBirth p, MarriageDateBeforeBirth p' ->
+     eq_person p p'
+  | MotherDeadBeforeChildBirth (p1, p2), MotherDeadBeforeChildBirth (p1', p2') ->
+     eq_person p1 p1' && eq_person p2 p2'
+  | ParentBornAfterChild (p1, p2), ParentBornAfterChild (p1', p2') ->
+     eq_person p1 p1' && eq_person p2 p2'
+  | ParentTooOld (p1, d, p2), ParentTooOld (p1', d', p2') ->
+     eq_person p1 p1' && eq_person p2 p2' && d = d'
+  | ParentTooYoung (p1, d, p2), ParentTooYoung (p1', d', p2') ->
+     eq_person p1 p1' && eq_person p2 p2' && d = d'
+  | PEventOrder (p, pevent1, pevent2), PEventOrder (p', pevent1', pevent2') ->
+     eq_person p p' && pevent1 = pevent1' && pevent2 = pevent2'
+  | PWitnessEventAfterDeath (p1, pevent, p2), PWitnessEventAfterDeath (p1', pevent', p2') ->
+     eq_person p1 p1' && eq_person p2 p2' && pevent = pevent'
+  | PWitnessEventBeforeBirth (p1, pevent, p2), PWitnessEventBeforeBirth (p1', pevent', p2') ->
+     eq_person p1 p1' && eq_person p2 p2' && pevent = pevent'
+  | TitleDatesError (p, title), TitleDatesError (p', title') ->
+     eq_person p p' && title = title'
+  | UndefinedSex p, UndefinedSex p' ->
+     eq_person p p'
+  | YoungForMarriage (p, d, ifam), YoungForMarriage (p', d', ifam') ->
+     eq_person p p' && d = d' && eq_ifam ifam ifam'
+  | OldForMarriage (p, d, ifam), OldForMarriage (p', d', ifam') ->
+     eq_person p p' && d = d' && eq_ifam ifam ifam'
+  | _ -> false
+
+let person_warnings conf base p =
+  let w = ref [] in
+  let filter x =
+    if not (List.exists (eq_warning base x) !w) && Util.auth_warning conf base x
+    then w := x :: !w
+  in
+  ignore @@ person base filter p ;
+  on_person_update base filter p ;
+  Array.iter begin fun ifam ->
+    check_siblings ~onchange:false base filter (ifam, foi base ifam) ignore
+  end (get_family p) ;
+  !w

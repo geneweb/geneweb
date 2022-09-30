@@ -264,8 +264,8 @@ let reconstitute_from_fevents
     (fevents : ('person, 'string) Def.gen_fam_event list) =
   (* On tri les évènements pour être sûr. *)
   let fevents =
-    CheckItem.sort_events
-      (fun evt -> CheckItem.Fsort evt.efam_name) (fun evt -> evt.efam_date)
+    Event.sort_events
+      (fun evt -> Event.Fevent evt.efam_name) (fun evt -> evt.efam_date)
       fevents
   in
   let found_marriage : (

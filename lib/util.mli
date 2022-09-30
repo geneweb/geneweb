@@ -546,13 +546,6 @@ val sprintf_today : Config.config -> Adef.safe_string
     Check if current user has enough right in order to see [w] *)
 val auth_warning : config -> base -> ('a, person, ifam, 'b, 'c, 'd, 'e) warning -> bool
 
-(** [person_warnings conf base p]
-    Shorthand for [CheckItem.person] and [CheckItem.on_person_update] on [p]
-    and [CheckItem.check_siblings] on they children
-    using [auth_warning] for filtering.
-*)
-val person_warnings : config -> base -> person -> CheckItem.base_warning list
-
 (** Convert arabic numerals to roman numerals.
     [Some result] is returned if there are numerals, [None] if not.
 *)
@@ -566,9 +559,5 @@ val cut_words : string -> string list
 
 (** [designation base p] is [Gutil.designation base p |> escape_html] *)
 val designation : base -> person -> Adef.escaped_string
-
-
-(** equality between base_warnings *)
-val eq_warning : base -> CheckItem.base_warning -> CheckItem.base_warning -> bool
 
 val has_children : base -> person -> bool

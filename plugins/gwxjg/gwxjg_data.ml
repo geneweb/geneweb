@@ -78,30 +78,30 @@ let rec mk_family (conf : Config.config) base ((_, fam, (ifath, imoth, ispouse),
   let relation =
     match Gwdb.get_relation fam with
     | Def.Married | NoSexesCheckMarried ->
-      find_event conf base (Perso.Fevent Def.Efam_Marriage) events'
+      find_event conf base (Event.Fevent Def.Efam_Marriage) events'
     | NotMarried | NoSexesCheckNotMarried ->
-      find_event conf base (Perso.Fevent Def.Efam_NoMarriage) events'
+      find_event conf base (Event.Fevent Def.Efam_NoMarriage) events'
     | Engaged ->
-      find_event conf base (Perso.Fevent Def.Efam_Engage) events'
+      find_event conf base (Event.Fevent Def.Efam_Engage) events'
     | NoMention ->
-      find_event conf base (Perso.Fevent Def.Efam_NoMention) events'
+      find_event conf base (Event.Fevent Def.Efam_NoMention) events'
     | MarriageBann ->
-      find_event conf base (Perso.Fevent Def.Efam_MarriageBann) events'
+      find_event conf base (Event.Fevent Def.Efam_MarriageBann) events'
     | MarriageContract ->
-      find_event conf base (Perso.Fevent Def.Efam_MarriageContract) events'
+      find_event conf base (Event.Fevent Def.Efam_MarriageContract) events'
     | MarriageLicense ->
-      find_event conf base (Perso.Fevent Def.Efam_MarriageLicense) events'
+      find_event conf base (Event.Fevent Def.Efam_MarriageLicense) events'
     | Pacs ->
-      find_event conf base (Perso.Fevent Def.Efam_PACS) events'
+      find_event conf base (Event.Fevent Def.Efam_PACS) events'
     | Residence ->
-      find_event conf base (Perso.Fevent Def.Efam_Residence) events'
+      find_event conf base (Event.Fevent Def.Efam_Residence) events'
   in
   let separation =
     match Gwdb.get_divorce fam with
     | Def.Divorced _ ->
-      find_event conf base (Perso.Fevent Def.Efam_Divorce)events'
+      find_event conf base (Event.Fevent Def.Efam_Divorce)events'
     | Separated ->
-      find_event conf base (Perso.Fevent Def.Efam_Separated) events'
+      find_event conf base (Event.Fevent Def.Efam_Separated) events'
     | NotDivorced -> Tnull
   in
   let ifam = Tstr (E.ifam fcd) in
@@ -606,8 +606,8 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let consanguinity = Tfloat (E.consanguinity p) in
   let events' = E.events conf base p in
   let events = lazy_list (mk_event conf base) events' in
-  let birth = find_event conf base (Perso.Pevent Epers_Birth) events' in
-  let baptism = find_event conf base (Perso.Pevent Epers_Baptism) events' in
+  let birth = find_event conf base (Event.Pevent Epers_Birth) events' in
+  let baptism = find_event conf base (Event.Pevent Epers_Baptism) events' in
   let death =
     let wrap s = Tpat (function "reason" -> Tsafe s | _ -> raise Not_found) in
     match Gwdb.get_death p with
@@ -620,7 +620,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
         | Disappeared -> Tsafe "Disappeared"
         | Unspecified -> Tsafe "Unspecified"
       in
-      let e = find_event conf base (Perso.Pevent Epers_Death) events' in
+      let e = find_event conf base (Event.Pevent Epers_Death) events' in
       Tpat (function "reason" -> reason | s -> Jg_runtime.jg_obj_lookup e s)
     | DeadYoung -> wrap "DeadYoung"
     | DeadDontKnowWhen -> wrap "DeadDontKnowWhen"
@@ -628,7 +628,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
     | OfCourseDead -> wrap "OfCourseDead"
   in
   let burial =
-    find_events conf base [ Perso.Pevent Epers_Burial ; Perso.Pevent Epers_Cremation ] events'
+    find_events conf base [Event.Pevent Epers_Burial ;Event.Pevent Epers_Cremation ] events'
   in
   let first_name = Tstr (E.first_name base p) in
   let first_name_aliases = mk_str_lst base (Gwdb.get_first_names_aliases p) in
