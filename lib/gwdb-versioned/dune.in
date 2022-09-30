@@ -6,13 +6,13 @@
   (libraries
 	geneweb.gwdb-legacy
 	geneweb.def
-	geneweb.dsk_format
+;;	geneweb.dsk_format
   )
   (modules
 	gwdb_driver
-	gwdb_gnwb25
-	gwdb_gnwb26
-	gw_formats
+;;	gwdb_gnwb25
+;;	gwdb_gnwb26
+;;	gw_formats
   	;;dsk_format
 	;;format
 	;;partition
@@ -21,9 +21,9 @@
 	compat
   )
   (private_modules
-	gw_formats
-	gwdb_gnwb25
-	gwdb_gnwb26
+;;	gw_formats
+;;	gwdb_gnwb25
+;;	gwdb_gnwb26
 	translate
   )
 )

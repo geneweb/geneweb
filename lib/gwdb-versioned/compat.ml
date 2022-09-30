@@ -705,35 +705,17 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
     | Current_family of Current.family
 
   type istr = int
-(*    | Legacy_istr of Legacy.istr
-    | Current_istr of Current.istr*)
                     
   type ifam = int
-(*    | Legacy_ifam of Legacy.ifam
-    | Current_ifam of Current.ifam
- *)
-  type iper = int
-(*    | Legacy_iper of Legacy.iper
-    | Current_iper of Current.iper
- *)                   
-(*  type relation =
-    | Legacy_relation of Legacy.relation
-    | Current_relation of Current.relation
- *)
 
- type relation = (iper, istr) Def.gen_relation
-(*  type title =
-    | Legacy_title of Legacy.title
-    | Current_title of Current.title*)
+  type iper = int
+
+  type relation = (iper, istr) Def.gen_relation
+
   type title = istr Def.gen_title
-  (*type pers_event =
-    | Legacy_pers_event of Legacy.pers_event
-    | Current_pers_event of Current.pers_event
-   *)
+  
   type pers_event = (iper, istr) Def.gen_pers_event
-  (*type fam_event =
-    | Legacy_fam_event of Legacy.fam_event
-    | Current_fam_event of Current.fam_event*)
+
   type fam_event = (iper, istr) Def.gen_fam_event
 
   type string_person_index =
@@ -747,25 +729,12 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
     val wrap_person : (Legacy.person -> 'a) -> (Current.person -> 'a) -> person -> 'a
     val wrap_family : (Legacy.family -> 'a) -> (Current.family -> 'a) -> family -> 'a
     val wrap_spi : (Legacy.string_person_index -> 'a) -> (Current.string_person_index -> 'a) -> string_person_index -> 'a
-(*
-    val wrap_iper : (Legacy.iper -> 'a) -> (Current.iper -> 'a) -> iper -> 'a
-    val wrap_ifam : (Legacy.ifam -> 'a) -> (Current.ifam -> 'a) -> ifam -> 'a
- *)  
+
   end = struct
 
     let wrap_base legacyf currentf = function
       | Legacy_base b -> legacyf b
       | Current_base b -> currentf b
-    
-   (*                     
-  let wrap_iper legacyf currentf = function
-    | Legacy_iper i -> legacyf i
-    | Current_iper i -> currentf i
-
-  let wrap_ifam legacyf currentf = function
-    | Legacy_ifam i -> legacyf i
-    | Current_ifam i -> currentf i
-    *)
 
     let wrap_person legacyf currentf = function
       | Legacy_person person -> legacyf person
@@ -781,7 +750,7 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
       | Current_string_person_index spi -> currentf spi
   end
 
-                      
+
   let string_of_iper = string_of_int
 
   let string_of_ifam = string_of_int
@@ -1147,14 +1116,6 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
       Legacy_collection of 'a Legacy.Collection.t
     | Current_collection of 'a Current.Collection.t
     | Dummy_collection
-    (*
-    module Util : sig
-      val wrap_collection : ('a Legacy.Collection.t -> 'b) -> ('a Current.Collection.t -> 'b) -> 'a t -> 'b
-    end = struct
-      let wrap_collection f g = function
-        | Legacy_collection c -> f c
-        | Current_collection c -> g c
-    end*)
 
     let length = function
         Legacy_collection c -> Legacy.Collection.length c
@@ -1184,7 +1145,7 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
          Current.Collection.iteri f c
       | Dummy_collection -> ()
 
-    (* DO SOMETHING *)                          
+    (* DO SOMETHING *)
     let fold ?from ?until f acc coll =
       print_endline "FOLDING";
 
@@ -1223,29 +1184,14 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
          end
       in
       print_endline "FOLDED"; res
-      (*
-      let until = match until, coll with
-        | None, Legacy_collection c -> (Legacy.Collection.length c - 1)
-        | None, Current_collection c -> (Current.Collection.length c - 1)
-        | None, Dummy_collection -> 0
-        | Some x, _ -> x
-      in
-      let res = match coll with
-      | Legacy_collection c ->
-         Legacy.Collection.fold ~from ~until f acc c
-      | Current_collection c ->
-         Current.Collection.fold ~from ~until f acc c
-      | Dummy_collection -> acc
-      in
-      print_endline "FOLDED"; res
-       *)
+
     let fold_until continue fn acc coll = match coll with
       | Legacy_collection c ->
          Legacy.Collection.fold_until continue fn acc c
       | Current_collection c ->
          Current.Collection.fold_until continue fn acc c
       | Dummy_collection -> acc
-        
+
     let iterator = function
       | Legacy_collection c -> Legacy.Collection.iterator c
       | Current_collection c -> Current.Collection.iterator c
@@ -1263,20 +1209,12 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
     val set : ('k, 'v) t -> 'k -> 'v -> unit
 
   end = struct
-    
+
     type ('k, 'v) t =
       | Legacy_marker of ('k, 'v) Legacy.Marker.t
       | Current_marker of ('k, 'v) Current.Marker.t
       | Dummy_marker of 'v
-(*
-    module Util : sig
-      val wrap_marker : (('k, 'v) Legacy.Marker.t -> 'b) -> (('k, 'v) Current.Marker.t -> 'b) -> ('k, 'v) t -> 'b
-    end = struct
-      let wrap_marker f g = function
-        | Legacy_marker m -> f m
-        | Current_marker m -> g m
-    end
- *)                      
+
     let get = function
       | Legacy_marker m -> Legacy.Marker.get m
       | Current_marker m -> Current.Marker.get m
@@ -1361,6 +1299,3 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
   let gc ?(dry_run = false) ~save_mem =
     Util.wrap_base (Legacy.gc ~dry_run ~save_mem) (Current.gc ~dry_run ~save_mem)
 end
-
-                                                                        
-
