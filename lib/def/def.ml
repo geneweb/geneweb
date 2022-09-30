@@ -77,7 +77,7 @@ type death_reason = Killed | Murdered | Executed | Disappeared | Unspecified
 
 (** Death status *)
 type death =
-    NotDead
+  | NotDead
   | Death of death_reason * cdate
   | DeadYoung
   | DeadDontKnowWhen

@@ -63,6 +63,9 @@ val crush_lower : string -> string
 (** [concat fn sn] is [fn ^ " " ^ sn] but faster. *)
 val concat : string -> string -> string
 
+(** [contains_forbidden_char s] is [true] iif s contains forbidden characters *)
+val contains_forbidden_char : string -> bool
+
 (** [split_sname_callback fn s]
     Same as [split_sname], but call [fn] with substring indexes instead of building
     a list *)

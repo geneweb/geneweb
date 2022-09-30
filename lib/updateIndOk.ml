@@ -4,44 +4,32 @@ open Config
 open Def
 open Gwdb
 open Util
+open Update_util
 
 (* Liste des string dont on a supprimé un caractère.       *)
 (* Utilisé pour le message d'erreur lors de la validation. *)
 let removed_string = ref []
 
-let raw_get conf key =
-  match p_getenv conf.env key with
-    Some v -> v
-  | None -> failwith (key ^ " unbound")
+let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
 
-let get conf key =
-  match p_getenv conf.env key with
-    Some v -> v
-  | None -> failwith (key ^ " unbound")
-
-let get_nth conf key cnt = p_getenv conf.env (key ^ string_of_int cnt)
-
-let getn conf var key =
-  match p_getenv conf.env (var ^ "_" ^ key) with
-    Some v -> v
-  | None -> failwith (var ^ "_" ^ key ^ " unbound")
+let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
 
 let rec reconstitute_string_list conf var ext cnt =
   match get_nth conf var cnt with
-    Some s ->
+  | None -> [], ext
+  | Some s ->
       let s = only_printable s in
       let (sl, ext) = reconstitute_string_list conf var ext (cnt + 1) in
       begin match get_nth conf ("add_" ^ var) cnt with
-        Some "on" -> s :: "" :: sl, true
-      | _ -> s :: sl, ext
+      | Some "on" -> s :: "" :: sl, true
+      | Some _ | None -> s :: sl, ext
       end
-  | _ -> [], ext
 
 let reconstitute_insert_title conf ext cnt tl =
   let var = "ins_title" ^ string_of_int cnt in
   let n =
     match p_getenv conf.env var, p_getint conf.env (var ^ "_n") with
-      _, Some n when n > 1 -> n
+    | _, Some n when n > 1 -> n
     | Some "on", _ -> 1
     | _ -> 0
   in
@@ -67,10 +55,10 @@ let rec reconstitute_titles conf ext cnt =
     get_nth conf "t_ident" cnt, get_nth conf "t_place" cnt,
     get_nth conf "t_name" cnt
   with
-    Some t_ident, Some t_place, Some t_name ->
+  | Some t_ident, Some t_place, Some t_name ->
       let t_name =
         match get_nth conf "t_main_title" cnt, t_name with
-          Some "on", _ -> Tmain
+        | Some "on", _ -> Tmain
         | _, "" -> Tnone
         | _, _ -> Tname (only_printable t_name)
       in
@@ -82,8 +70,8 @@ let rec reconstitute_titles conf ext cnt =
       in
       let t_nth =
         match get_nth conf "t_nth" cnt with
-          Some s -> (try int_of_string s with Failure _ -> 0)
-        | _ -> 0
+        | Some s -> (try int_of_string s with Failure _ -> 0)
+        | None -> 0
       in
       let t =
         {t_name = t_name; t_ident = only_printable t_ident;
@@ -96,43 +84,11 @@ let rec reconstitute_titles conf ext cnt =
       t :: tl, ext
   | _ -> [], ext
 
-let reconstitute_somebody conf var =
-  let first_name = only_printable (getn conf var "fn") in
-  let surname = only_printable (getn conf var "sn") in
-  (* S'il y a des caractères interdits, on les supprime *)
-  let (first_name, surname) =
-    let contain_fn = String.contains first_name in
-    let contain_sn = String.contains surname in
-    if List.exists contain_fn Name.forbidden_char ||
-       List.exists contain_sn Name.forbidden_char
-    then
-      begin
-        removed_string :=
-          (Name.purge first_name ^ " " ^ Name.purge surname) ::
-          !removed_string;
-        Name.purge first_name, Name.purge surname
-      end
-    else first_name, surname
-  in
-  let occ = try int_of_string (getn conf var "occ") with Failure _ -> 0 in
-  let sex =
-    match p_getenv conf.env (var ^ "_sex") with
-      Some "M" -> Male
-    | Some "F" -> Female
-    | _ -> Neuter
-  in
-  let create =
-    match getn conf var "p" with
-      "create" -> Update.Create (sex, None)
-    | _ -> Update.Link
-  in
-  first_name, surname, occ, create, var
-
 let reconstitute_insert_pevent conf ext cnt el =
   let var = "ins_event" ^ string_of_int cnt in
   let n =
     match p_getenv conf.env var, p_getint conf.env (var ^ "_n") with
-      _, Some n when n > 1 -> n
+    | _, Some n when n > 1 -> n
     | Some "on", _ -> 1
     | _ -> 0
   in
@@ -155,10 +111,12 @@ let reconstitute_insert_pevent conf ext cnt el =
 
 let rec reconstitute_pevents conf ext cnt =
   match get_nth conf "e_name" cnt with
-    Some epers_name ->
+  | None -> [], ext
+  | Some epers_name ->
       let epers_name =
+        (* TODO EVENT to/of_string *)
         match epers_name with
-          "#birt" -> Epers_Birth
+        | "#birt" -> Epers_Birth
         | "#bapt" -> Epers_Baptism
         | "#deat" -> Epers_Death
         | "#buri" -> Epers_Burial
@@ -215,19 +173,19 @@ let rec reconstitute_pevents conf ext cnt =
       in
       let epers_place =
         match get_nth conf "e_place" cnt with
-          Some place -> only_printable place
-        | _ -> ""
+        | Some place -> only_printable place
+        | None -> ""
       in
       let epers_note =
         match get_nth conf "e_note" cnt with
         | Some note ->
           only_printable_or_nl (Mutil.strip_all_trailing_spaces note)
-        | _ -> ""
+        | None -> ""
       in
       let epers_src =
         match get_nth conf "e_src" cnt with
-          Some src -> only_printable src
-        | _ -> ""
+        | Some src -> only_printable src
+        | None -> ""
       in
       (* Type du témoin par défaut lors de l'insertion de nouveaux témoins. *)
       let wk =
@@ -241,14 +199,14 @@ let rec reconstitute_pevents conf ext cnt =
               Some (reconstitute_somebody conf var)
             with Failure _ -> None
           with
-            Some c ->
+          | Some c ->
               let (witnesses, ext) = loop (i + 1) ext in
               let var_c =
                 "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_kind"
               in
               let c =
                 match p_getenv conf.env var_c with
-                  Some "godp" -> c, Witness_GodParent
+                | Some "godp" -> c, Witness_GodParent
                 | Some "offi" -> c, Witness_CivilOfficer
                 | Some "reli" -> c, Witness_ReligiousOfficer
                 | Some "info" -> c, Witness_Informant
@@ -293,10 +251,10 @@ let rec reconstitute_pevents conf ext cnt =
       let (witnesses, ext) =
         let evt_ins = "e" ^ string_of_int cnt ^ "_ins_witn0" in
         match p_getenv conf.env evt_ins with
-          Some "on" ->
+        | Some "on" ->
             let ins_witn_n = "e" ^ string_of_int cnt ^ "_ins_witn0_n" in
             begin match p_getint conf.env ins_witn_n with
-              Some n when n > 1 ->
+            | Some n when n > 1 ->
                 let rec loop_witn n witnesses =
                   if n = 0 then witnesses, true
                   else
@@ -307,13 +265,13 @@ let rec reconstitute_pevents conf ext cnt =
                     loop_witn (n - 1) witnesses
                 in
                 loop_witn n witnesses
-            | _ ->
+            | Some _ | None ->
                 let new_witn =
                   ("", "", 0, Update.Create (Neuter, None), ""), wk
                 in
                 new_witn :: witnesses, true
             end
-        | _ -> witnesses, ext
+        | Some _ | None -> witnesses, ext
       in
       let e =
         {epers_name = epers_name; epers_date = Adef.cdate_of_od epers_date;
@@ -324,31 +282,21 @@ let rec reconstitute_pevents conf ext cnt =
       let (el, ext) = reconstitute_pevents conf ext (cnt + 1) in
       let (el, ext) = reconstitute_insert_pevent conf ext (cnt + 1) el in
       e :: el, ext
-  | _ -> [], ext
-
-let rec reconstitute_sorted_pevents conf cnt =
-  match get_nth conf "e_id" cnt, get_nth conf "e_pos" cnt with
-    Some id, Some pos ->
-      let (id, pos) =
-        try int_of_string id, int_of_string pos with Failure _ -> 0, 0
-      in
-      let el = reconstitute_sorted_pevents conf (cnt + 1) in (id, pos) :: el
-  | _ -> []
 
 let reconstitute_add_relation conf ext cnt rl =
   match get_nth conf "add_relation" cnt with
-    Some "on" ->
+  | Some "on" ->
       let r =
         {r_type = GodParent; r_fath = None; r_moth = None; r_sources = ""}
       in
       r :: rl, true
-  | _ -> rl, ext
+  | Some _ | None -> rl, ext
 
 let deleted_relation = ref []
 
 let reconstitute_relation_parent conf var key sex =
   match getn conf var (key ^ "_fn"), getn conf var (key ^ "_sn") with
-    "", _ | _, "" | "?", _ | _, "?" as n ->
+  | "", _ | _, "" | "?", _ | _, "?" as n ->
       let p = only_printable (fst n) ^ only_printable (snd n) in
       if p = "" || p = "??" then ()
       else deleted_relation := p :: !deleted_relation;
@@ -357,23 +305,12 @@ let reconstitute_relation_parent conf var key sex =
       let fn = only_printable fn in
       let sn = only_printable sn in
       (* S'il y a des caractères interdits, on les supprime *)
-      let (fn, sn) =
-        let contain_fn = String.contains fn in
-        let contain_sn = String.contains sn in
-        if List.exists contain_fn Name.forbidden_char ||
-           List.exists contain_sn Name.forbidden_char
-        then
-          begin
-            removed_string :=
-              (Name.purge fn ^ " " ^ Name.purge sn) :: !removed_string;
-            Name.purge fn, Name.purge sn
-          end
-        else fn, sn
-      in
+      let (fn, sn) = get_purged_fn_sn fn sn in
       let occ =
         try int_of_string (getn conf var (key ^ "_occ")) with Failure _ -> 0
       in
       let create =
+        (* why is it key ^ "_p" here *)
         match getn conf var (key ^ "_p") with
           "create" -> Update.Create (sex, None)
         | _ -> Update.Link
@@ -386,29 +323,29 @@ let reconstitute_relation conf var =
     let r_moth = reconstitute_relation_parent conf var "moth" Female in
     let r_type =
       match getn conf var "type" with
-        "Adoption" -> Adoption
+      | "Adoption" -> Adoption
       | "Recognition" -> Recognition
       | "CandidateParent" -> CandidateParent
       | "GodParent" -> GodParent
       | "FosterParent" -> FosterParent
-      | _ -> GodParent
+      | _s -> GodParent
     in
     Some {r_type = r_type; r_fath = r_fath; r_moth = r_moth; r_sources = ""}
   with Failure _ -> None
 
 let rec reconstitute_relations conf ext cnt =
   match reconstitute_relation conf ("r" ^ string_of_int cnt) with
-    Some r ->
+  | Some r ->
       let (rl, ext) = reconstitute_relations conf ext (cnt + 1) in
       let (rl, ext) = reconstitute_add_relation conf ext cnt rl in
       r :: rl, ext
-  | _ -> [], ext
+  | None -> [], ext
 
 let reconstitute_death conf birth baptism death_place burial burial_place =
   let d = Update.reconstitute_date conf "death" in
   let dr =
     match p_getenv conf.env "death_reason" with
-      Some "Killed" -> Killed
+    | Some "Killed" -> Killed
     | Some "Murdered" -> Murdered
     | Some "Executed" -> Executed
     | Some "Disappeared" -> Disappeared
@@ -426,23 +363,24 @@ let reconstitute_death conf birth baptism death_place burial burial_place =
   | "DontKnowIfDead" when d = None -> DontKnowIfDead
   | "NotDead" -> NotDead
   | "OfCourseDead" when d = None -> OfCourseDead
-  | _ ->
+  | _s ->
       match d with
-        Some d -> Death (dr, Adef.cdate_of_date d)
-      | _ -> DeadDontKnowWhen
+      | Some d -> Death (dr, Adef.cdate_of_date d)
+      | None -> DeadDontKnowWhen
 
 let reconstitute_burial conf burial_place =
   let d = Update.reconstitute_date conf "burial" in
   match p_getenv conf.env "burial" with
-    Some "UnknownBurial" | None ->
+  | Some "UnknownBurial" | None ->
       begin match d, burial_place with
-        None, "" -> UnknownBurial
+      | None, "" -> UnknownBurial
       | _ -> Buried (Adef.cdate_of_od d)
       end
   | Some "Buried" -> Buried (Adef.cdate_of_od d)
   | Some "Cremated" -> Cremated (Adef.cdate_of_od d)
   | Some x -> failwith ("bad burial type " ^ x)
 
+(* TODO EVENT put this in Event *)
 let sort_pevents pevents =
   CheckItem.sort_events
     (fun evt -> CheckItem.Psort evt.epers_name) (fun evt -> evt.epers_date)
@@ -458,15 +396,16 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
   let death_reason_std_fields =
     let (death_std_fields, _, _, _) = de in
     match death_std_fields with
-      Death (dr, _) -> dr
-    | _ -> Unspecified
+    | Death (dr, _) -> dr
+    | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead
+      -> Unspecified
   in
   let rec loop pevents bi bp de bu =
     match pevents with
-      [] -> bi, bp, de, bu
+    | [] -> bi, bp, de, bu
     | evt :: l ->
         match evt.epers_name with
-          Epers_Birth ->
+        | Epers_Birth ->
             if !found_birth then loop l bi bp de bu
             else
               let bi =
@@ -485,17 +424,17 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
             else
               let death =
                 match Adef.od_of_cdate evt.epers_date with
-                  Some d ->
+                | Some d ->
                     Death (death_reason_std_fields, Adef.cdate_of_date d)
                 | None ->
                     let (death, _, _, _) = de in
                     (* On ajoute DontKnowIfDead dans le cas où tous les *)
                     (* champs sont vides.                               *)
                     match death with
-                      DeadYoung | DeadDontKnowWhen | OfCourseDead |
+                    | DeadYoung | DeadDontKnowWhen | OfCourseDead |
                       DontKnowIfDead as death ->
                         death
-                    | _ -> DeadDontKnowWhen
+                    | Death _ | NotDead -> DeadDontKnowWhen
               in
               let de =
                 death, evt.epers_place, evt.epers_note, evt.epers_src
@@ -569,8 +508,10 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
       else
         let (death, _, _, _) = de in
         match death with
-          NotDead -> NotDead, "", "", ""
-        | _ -> DontKnowIfDead, "", "", ""
+        | NotDead -> NotDead, "", "", ""
+        | DeadYoung | DeadDontKnowWhen | OfCourseDead
+        | DontKnowIfDead | Death _ ->
+            DontKnowIfDead, "", "", ""
     else de
   in
   let bu = if not !found_burial then UnknownBurial, "", "", "" else bu in
@@ -581,25 +522,12 @@ let reconstitute_person conf =
   let key_index =
     match p_getenv conf.env "i" with
     | Some s -> (try iper_of_string (String.trim s) with Failure _ -> dummy_iper)
-    | _ -> dummy_iper
+    | None -> dummy_iper
   in
   let first_name = only_printable (get conf "first_name") in
   let surname = only_printable (get conf "surname") in
   (* S'il y a des caractères interdits, on les supprime *)
-  let (first_name, surname) =
-    let contain_fn = String.contains first_name in
-    let contain_sn = String.contains surname in
-    if List.exists contain_fn Name.forbidden_char ||
-       List.exists contain_sn Name.forbidden_char
-    then
-      begin
-        removed_string :=
-          (Name.purge first_name ^ " " ^ Name.purge surname) ::
-          !removed_string;
-        Name.purge first_name, Name.purge surname
-      end
-    else first_name, surname
-  in
+  let (first_name, surname) = get_purged_fn_sn first_name surname in
   let occ =
     try int_of_string (String.trim (get conf "occ")) with Failure _ -> 0
   in
@@ -619,16 +547,16 @@ let reconstitute_person conf =
   let (rparents, ext) = reconstitute_add_relation conf ext 0 rparents in
   let access =
     match p_getenv conf.env "access" with
-      Some "Public" -> Public
+    | Some "Public" -> Public
     | Some "Private" -> Private
-    | _ -> IfTitles
+    | Some _ | None -> IfTitles
   in
   let occupation = only_printable (get conf "occu") in
   let sex =
     match p_getenv conf.env "sex" with
-      Some "M" -> Male
+    | Some "M" -> Male
     | Some "F" -> Female
-    | _ -> Neuter
+    | Some _ | None -> Neuter
   in
   let birth = Update.reconstitute_date conf "birth" in
   let birth_place = only_printable (get conf "birth_place") in
@@ -660,13 +588,17 @@ let reconstitute_person conf =
   in
   let death_place =
     match death with
-      Death (_, _) | DeadYoung | DeadDontKnowWhen -> death_place
-    | _ -> ""
+    | Death _ | DeadYoung | DeadDontKnowWhen -> death_place
+    | NotDead | DontKnowIfDead | OfCourseDead -> ""
   in
   let death =
-    match death, burial with
-      (NotDead | DontKnowIfDead), (Buried _ | Cremated _) -> DeadDontKnowWhen
-    | _ -> death
+    match death with
+    | NotDead | DontKnowIfDead ->
+      begin match burial with
+        | Buried _ | Cremated _ -> DeadDontKnowWhen
+        | UnknownBurial -> death
+      end
+    | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> death
   in
   let (pevents, ext) = reconstitute_pevents conf ext 1 in
   let (pevents, ext) = reconstitute_insert_pevent conf ext 0 pevents in
@@ -691,26 +623,26 @@ let reconstitute_person conf =
   (* peut-être besoin de refaire un infer_death.      *)
   let death =
     match death with
-      DontKnowIfDead ->
+    | DontKnowIfDead ->
       (* FIXME: do not use _bb version *)
         Update.infer_death_bb conf (Adef.od_of_cdate birth)
           (Adef.od_of_cdate bapt)
-    | _ -> death
+    | NotDead | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> death
   in
   let p =
-    {first_name = first_name; surname = surname; occ = occ; image = image;
-     first_names_aliases = first_names_aliases;
-     surnames_aliases = surnames_aliases; public_name = public_name;
-     qualifiers = qualifiers; aliases = aliases; titles = titles;
-     rparents = rparents; occupation = occupation; related = []; sex = sex;
-     access = access; birth = birth; birth_place = birth_place;
-     birth_note = birth_note; birth_src = birth_src; baptism = bapt;
+    {first_name; surname; occ; image;
+     first_names_aliases;
+     surnames_aliases; public_name;
+     qualifiers; aliases; titles;
+     rparents; occupation; related = []; sex;
+     access; birth; birth_place;
+     birth_note; birth_src; baptism = bapt;
      baptism_place = bapt_place; baptism_note = bapt_note;
-     baptism_src = bapt_src; death = death; death_place = death_place;
-     death_note = death_note; death_src = death_src; burial = burial;
-     burial_place = burial_place; burial_note = burial_note;
-     burial_src = burial_src; pevents = pevents; notes = notes;
-     psources = psources; key_index = key_index}
+     baptism_src = bapt_src; death; death_place;
+     death_note; death_src ; burial;
+     burial_place; burial_note;
+     burial_src; pevents; notes;
+     psources; key_index}
   in
   p, ext
 
@@ -731,6 +663,7 @@ let error_person conf err =
   end ;
   raise @@ Update.ModErr err
 
+(* TODO EVENT put this in Event *)
 let strip_pevents p =
   let strip_array_witness pl =
     let pl =
@@ -797,6 +730,7 @@ let rparents_of rparents =
        | _ -> ipl)
     [] rparents
 
+(* TODO EVENT put this in Event *)
 let pwitnesses_of pevents =
   List.fold_left
     (fun ipl e ->
@@ -838,7 +772,7 @@ let effective_add conf base sp =
   begin match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
     | Some p' ->
       Update.print_create_conflict conf base (poi base p') ""
-    | _ -> ()
+    | None -> ()
   end ;
   let created_p = ref [] in
   let pi =
@@ -970,8 +904,8 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
     end;
   (* Si on a supprimé des relations, on les mentionne *)
   begin match !deleted_relation with
-    [] -> ()
-  | _ ->
+  | [] -> ()
+  | _l ->
       Output.print_sstring conf "<p>\n";
       Output.printf conf "%s, %s %s %s :"
         (Utf8.capitalize_fst (transl_nth conf "relation/relations" 0))
@@ -1093,16 +1027,12 @@ let print_add o_conf base =
   let () = removed_string := [] in
   let conf = Update.update_conf o_conf in
   let (sp, ext) = reconstitute_person conf in
-  let redisp =
-    match p_getenv conf.env "return" with
-      Some _ -> true
-    | _ -> false
-  in
+  let redisp = Option.is_some (p_getenv conf.env "return") in
   if ext || redisp then UpdateInd.print_update_ind conf base sp ""
   else
     let sp = strip_person sp in
     match check_person conf base sp with
-      Some err -> error_person conf err
+    | Some err -> error_person conf err
     | None ->
       let (p, a) = effective_add conf base sp in
       let u = {family = get_family (poi base p.key_index)} in
@@ -1118,23 +1048,19 @@ let print_del conf base =
     let p = poi base ip in
     effective_del conf base p ;
     print_del_ok conf
-  | _ -> Hutil.incorrect_request conf
+  | None -> Hutil.incorrect_request conf
 
 let print_mod_aux conf base callback =
   let (p, ext) = reconstitute_person conf in
-  let redisp =
-    match p_getenv conf.env "return" with
-      Some _ -> true
-    | _ -> false
-  in
+  let redisp = Option.is_some (p_getenv conf.env "return") in
   let ini_ps = UpdateInd.string_person_of base (poi base p.key_index) in
   let digest = Update.digest_person ini_ps in
-  if digest = raw_get conf "digest" then
+  if digest = get conf "digest" then
     if ext || redisp then UpdateInd.print_update_ind conf base p digest
     else
       let p = strip_person p in
       match check_person conf base p with
-        Some err -> error_person conf err
+      | Some err -> error_person conf err
       | None -> callback p
   else Update.error_digest conf
 
@@ -1144,7 +1070,7 @@ let print_mod ?prerr o_conf base =
   let () = removed_string := [] in
   let o_p =
     match p_getenv o_conf.env "i" with
-      Some ip ->
+    | Some ip ->
         Util.string_gen_person base
           (gen_person_of_person (poi base (iper_of_string ip)))
     | None ->
@@ -1198,9 +1124,11 @@ let print_mod ?prerr o_conf base =
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
-  | Some ip ->
-    let p = poi base (iper_of_string ip) in
+  | None -> Hutil.incorrect_request conf
+  | Some s ->
+    let p = poi base (iper_of_string s) in
     let o_p = Util.string_gen_person base (gen_person_of_person p) in
+    (* TODO_EVENT use Event.sorted_event *)
     let ht = Hashtbl.create 50 in
     let _ =
       List.fold_left (fun id evt -> Hashtbl.add ht id evt; succ id) 1
@@ -1208,7 +1136,7 @@ let print_change_event_order conf base =
     in
     let sorted_pevents =
       List.sort (fun (_, pos1) (_, pos2) -> compare pos1 pos2)
-        (reconstitute_sorted_pevents conf 1)
+        (reconstitute_sorted_events conf 1)
     in
     let pevents =
       List.fold_right
@@ -1230,4 +1158,3 @@ let print_change_event_order conf base =
     let changed = U_Modify_person (o_p, Util.string_gen_person base p) in
     History.record conf base changed "mp";
     print_change_event_order_ok conf base wl p
-  | _ -> Hutil.incorrect_request conf

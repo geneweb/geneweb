@@ -179,11 +179,7 @@ let print_update_child conf base =
 let print_change_ok conf base p =
   let ipl = children_of_p base p in
   let parent_surname = p_surname base p in
-  let redisp =
-    match p_getenv conf.env "return" with
-      Some _ -> true
-    | _ -> false
-  in
+  let redisp = Option.is_some (p_getenv conf.env "return") in
   if redisp then print_update_child conf base
   else begin
     check_digest conf (digest_children base ipl);
