@@ -349,9 +349,9 @@ let fixbase_ok conf base =
         let bname = Util.base_path [] (bname base ^ ".gwb") in
         Files.rm (Filename.concat bname "tstab_visitor") ;
         Files.rm (Filename.concat bname "tstab") ;
-        Output.print_string conf {|<p>|} ;
-        Output.print_string conf (Util.transl conf "plugin_fixbase_ok_tstab") ;
-        Output.print_string conf {|</p>|} ;
+        Output.print_sstring conf {|<p>|} ;
+        Output.print_sstring conf (Util.transl conf "plugin_fixbase_ok_tstab") ;
+        Output.print_sstring conf {|</p>|} ;
       end
     in
     if not dry_run then begin

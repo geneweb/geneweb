@@ -341,7 +341,7 @@ and eval_simple_var conf base env p =
               let i = i - 1 in
               if i >= 0 && i < Array.length e.epers_witnesses then
                 let _, _, wnote = e.epers_witnesses.(i) in 
-                str_val (Util.escape_html wnote)
+                safe_val (Util.escape_html wnote :> Adef.safe_string)
               else if
                 i >= 0 && i < 2 && Array.length e.epers_witnesses < 2
               then
