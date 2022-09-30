@@ -126,4 +126,4 @@ let export conf base =
     true
 
 let () =
-  Gwd_lib.GwdPlugin.register ~ns [ "EXPORT", fun _assets -> w_base @@ w_lock @@ export ]
+  Gwd_lib.GwdPlugin.register ~ns [ "EXPORT", fun _assets -> w_lock @@ w_base @@ export ]
