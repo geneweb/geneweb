@@ -12,15 +12,6 @@ type base_warning = (iper, person, ifam, family, title, pers_event, fam_event) D
 (* *)
 type base_misc = (person, family, title) Def.misc
 
-(** Event name that unites personal and familial event names *)
-type 'string event_name =
-  | Psort of 'string Def.gen_pers_event_name (** Personal event name *)
-  | Fsort of 'string Def.gen_fam_event_name (** Familial event name *)
-
-(** Sort events (both peronal and familial) by their date and their name *)
-val sort_events :
-  ('a -> 'string event_name) -> ('a -> Adef.cdate) -> 'a list -> 'a list
-
 (** [check_siblings ?onchange base warning (ifam, fam) callback]
     Checks birth date consistency between siblings.
     Also calls [callback] with each child. *)
@@ -81,3 +72,13 @@ val sort_children :
 (** Cheks if family, father and mother have sources. Otherwise call [misc] on [base_misc] *)
 val check_other_fields :
   base -> (base_misc -> unit) -> ifam -> family -> unit
+
+(** equality between base_warnings *)
+val eq_warning : base -> base_warning -> base_warning -> bool
+
+(** [person_warnings conf base p]
+    Shorthand for [CheckItem.person] and [CheckItem.on_person_update] on [p]
+    and [CheckItem.check_siblings] on they children
+    using [auth_warning] for filtering.
+*)
+val person_warnings : Config.config -> base -> person -> base_warning list

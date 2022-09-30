@@ -71,8 +71,8 @@ module Person = struct
   let death p =
     get_death p
 
-  (* TODOWHY: should it be Perso.sorted_events or can it be just Perso.events? *)
-  let events = Perso.sorted_events
+(* TODOWHY: should it be Event.sorted_events or can it be just Event.events? *)
+let events = Event.sorted_events
 
   let first_name base p =
     p_first_name base p
@@ -177,7 +177,7 @@ module Family = struct
     if auth then
       List.fold_right
         (fun evt fam_fevents ->
-           let name = Perso.Fevent evt.efam_name in
+           let name = Event.Fevent evt.efam_name in
            let date = evt.efam_date in
            let place = evt.efam_place in
            let note = evt.efam_note in
@@ -232,12 +232,12 @@ module Event = struct
 
   let name conf base (n, _, _, _, _, _, _) =
     match n with
-    | Geneweb.Perso.Pevent name -> Util.string_of_pevent_name conf base name
-    | Fevent name -> Util.string_of_fevent_name conf base name
+    | Event.Pevent name -> Util.string_of_pevent_name conf base name
+    | Event.Fevent name -> Util.string_of_fevent_name conf base name
 
   let kind (n, _, _, _, _, _, _) =
     match n with
-    | Geneweb.Perso.Pevent Epers_Birth -> "EPERS_BIRTH"
+    | Event.Pevent Epers_Birth -> "EPERS_BIRTH"
     | Pevent Epers_Baptism -> "EPERS_BAPTISM"
     | Pevent Epers_Death -> "EPERS_DEATH"
     | Pevent Epers_Burial -> "EPERS_BURIAL"

@@ -382,8 +382,8 @@ let reconstitute_burial conf burial_place =
 
 (* TODO EVENT put this in Event *)
 let sort_pevents pevents =
-  CheckItem.sort_events
-    (fun evt -> CheckItem.Psort evt.epers_name) (fun evt -> evt.epers_date)
+  Event.sort_events
+    (fun evt -> Event.Pevent evt.epers_name) (fun evt -> evt.epers_date)
     pevents
 
 let reconstitute_from_pevents pevents ext bi bp de bu =
@@ -968,7 +968,7 @@ let relation_sex_is_coherent base warning p =
 
 let all_checks_person base p a u =
   let wl = ref [] in
-  let warning w = if not (List.exists (Util.eq_warning base w) !wl) then wl := w :: !wl in
+  let warning w = if not (List.exists (CheckItem.eq_warning base w) !wl) then wl := w :: !wl in
   let pp = person_of_gen_person base (p, a, u) in
   ignore @@ CheckItem.person base warning pp ;
   relation_sex_is_coherent base warning p;
