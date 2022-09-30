@@ -234,6 +234,9 @@ let concat_aux fn l1 sn l2 =
 let concat fn sn =
   concat_aux fn (String.length fn) sn (String.length sn)
 
+let contains_forbidden_char s =
+  List.exists (String.contains s) forbidden_char
+
 (* Copy/paste from String.split_on_char adapted to our needs *)
 let split_sname_callback fn s =
   let open String in

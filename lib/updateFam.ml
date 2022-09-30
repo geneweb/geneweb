@@ -55,22 +55,16 @@ type 'a env =
   | Vbool of bool
   | Vnone
 
+let bool_val = Update_util.bool_val
+let str_val = Update_util.str_val
+let safe_val = Update_util.safe_val
+
 let get_env v env = try List.assoc v env with Not_found -> Vnone
 let get_vother =
   function
     Vother x -> Some x
   | _ -> None
 let set_vother x = Vother x
-
-let extract_var sini s =
-  let len = String.length sini in
-  if String.length s > len && String.sub s 0 (String.length sini) = sini then
-    String.sub s len (String.length s - len)
-  else ""
-
-let bool_val x = VVbool x
-let str_val x = VVstring x
-let safe_val (x : Adef.safe_string) = VVstring (x :> string)
 
 module ExtOption = struct
   let bind o f = match o with
@@ -145,7 +139,7 @@ and eval_divorce fam = match fam.divorce with
 (* TODO : rewrite, second case with None passed as an argument looks odd *)
 and eval_divorce' fam s = match fam.divorce with
   | Divorced d -> eval_date_var (Adef.od_of_cdate d) s
-  | _ -> eval_date_var None s
+  | NotDivorced | Separated -> eval_date_var None s
 
 and eval_is_first env = match get_env "first" env with
   | Vbool x -> bool_val x
@@ -226,7 +220,7 @@ and eval_fwitness_kind env fam = match get_env "cnt" env with
        try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None
      in
      begin match e with
-       Some e ->
+     | Some e ->
         begin match get_env "wcnt" env with
           Vint i ->
            let i = i - 1 in
@@ -246,17 +240,7 @@ and eval_fwitness_kind env fam = match get_env "cnt" env with
 
 (* TODO : rewrite, looks bad + find a better name *)
 and eval_default_var conf s =
-  let v = extract_var "evar_" s in
-  if v <> "" then
-    match p_getenv (conf.env @ conf.henv) v with
-    | Some vv -> safe_val (Util.escape_html vv :> Adef.safe_string)
-    | None -> str_val ""
-  else
-    let v = extract_var "bvar_" s in
-    let v = if v = "" then extract_var "cvar_" s else v in
-    if v <> "" then
-      str_val (try List.assoc v conf.base_env with Not_found -> "")
-    else raise Not_found
+  Update_util.eval_default_var conf s
 
 and eval_event_date env fam s =
   let od = family_events_opt env fam >>= fun e ->
@@ -298,108 +282,7 @@ and eval_simple_var conf base env (fam, cpl, des) =
   | [s]                -> eval_default_var conf s
   | _ -> raise Not_found
 
-(* TODO : rewrite, looks bad *)
-and eval_date_var od =
-  function
-    "calendar" ->
-     str_val @@
-       begin match od with
-         Some (Dgreg (_, Dgregorian)) -> "gregorian"
-       | Some (Dgreg (_, Djulian)) -> "julian"
-       | Some (Dgreg (_, Dfrench)) -> "french"
-       | Some (Dgreg (_, Dhebrew)) -> "hebrew"
-       | _ -> ""
-       end
-  | "day" ->
-     str_val @@
-       begin match eval_date_field od with
-         Some d -> if d.day = 0 then "" else string_of_int d.day
-       | None -> ""
-       end
-  | "month" ->
-     str_val @@
-       begin match eval_date_field od with
-         Some d ->
-          if d.month = 0 then ""
-          else
-            begin match od with
-              Some (Dgreg (_, Dfrench)) -> short_f_month d.month
-            | _ -> string_of_int d.month
-            end
-       | None -> ""
-       end
-  | "orday" ->
-     str_val @@
-       begin match eval_date_field od with
-         Some d ->
-          begin match d.prec with
-            OrYear d2 | YearInt d2 ->
-              if d2.day2 = 0 then "" else string_of_int d2.day2
-          | _ -> ""
-          end
-      | None -> ""
-      end
-  | "ormonth" ->
-     str_val @@
-      begin match eval_date_field od with
-        Some d ->
-          begin match d.prec with
-            OrYear d2 | YearInt d2 ->
-              if d2.month2 = 0 then ""
-              else
-                begin match od with
-                  Some (Dgreg (_, Dfrench)) -> short_f_month d2.month2
-                | _ -> string_of_int d2.month2
-                end
-          | _ -> ""
-          end
-      | None -> ""
-      end
-  | "oryear" ->
-     str_val @@
-      begin match eval_date_field od with
-        Some d ->
-          begin match d.prec with
-            OrYear d2 | YearInt d2 -> string_of_int d2.year2
-          | _ -> ""
-          end
-      | None -> ""
-      end
-  | "prec" ->
-     str_val @@
-      begin match od with
-        Some (Dgreg ({prec = Sure}, _)) -> "sure"
-      | Some (Dgreg ({prec = About}, _)) -> "about"
-      | Some (Dgreg ({prec = Maybe}, _)) -> "maybe"
-      | Some (Dgreg ({prec = Before}, _)) -> "before"
-      | Some (Dgreg ({prec = After}, _)) -> "after"
-      | Some (Dgreg ({prec = OrYear _}, _)) -> "oryear"
-      | Some (Dgreg ({prec = YearInt _}, _)) -> "yearint"
-      | _ -> ""
-      end
-  | "text" ->
-      begin match od with
-        Some (Dtext s) -> safe_val (Util.safe_html s :> Adef.safe_string)
-      | _ -> str_val ""
-      end
-  | "year" ->
-    str_val @@
-      begin match eval_date_field od with
-        Some d -> string_of_int d.year
-      | None -> ""
-      end
-  | _ -> raise Not_found
-and eval_date_field =
-  function
-    Some d ->
-      begin match d with
-        Dgreg (d, Dgregorian) -> Some d
-      | Dgreg (d, Djulian) -> Some (Calendar.julian_of_gregorian d)
-      | Dgreg (d, Dfrench) -> Some (Calendar.french_of_gregorian d)
-      | Dgreg (d, Dhebrew) -> Some (Calendar.hebrew_of_gregorian d)
-      | _ -> None
-      end
-  | None -> None
+and eval_date_var = Update_util.eval_date_var
 and eval_event_var e =
   function
     ["e_name"] ->
@@ -582,7 +465,7 @@ and add_precision s p =
   | Before -> "&lt;" ^ s
   | After -> "&gt;" ^ s
   | About -> "/" ^ s ^ "/"
-  | _ -> s
+  | Sure | OrYear _ | YearInt _ -> s
 and eval_relation_kind =
   function
   | Married -> "marr"
@@ -688,7 +571,7 @@ let print_foreach print_ast _eval_expr =
 
 let print_update_fam conf base fcd digest =
   match p_getenv conf.env "m" with
-    Some
+  | Some
       ("ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "ADD_PAR_OK" | "MOD_FAM" | "MOD_FAM_OK" |
        "MRG_DUP_FAM_Y_N" | "MRG_FAM" | "MRG_FAM_OK" | "MRG_MOD_FAM_OK") ->
       let env = ["digest", Vstring digest] in
@@ -699,10 +582,10 @@ let print_update_fam conf base fcd digest =
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach}
         env fcd
-  | _ -> Hutil.incorrect_request conf
+  | Some _ | None -> Hutil.incorrect_request conf
 
 let print_del1 conf base ifam =
-  let title _ =
+  let title () =
     transl_nth conf "family/families" 0
     |> transl_decline conf "delete"
     |> Utf8.capitalize_fst
@@ -713,9 +596,10 @@ let print_del1 conf base ifam =
       Some ip -> poi base (iper_of_string ip)
     | None -> Gwdb.empty_person base dummy_iper
   in
-  Perso.interp_notempl_with_menu title "perso_header" conf base p;
+  (* TODO check if first argument really needs to be [bool -> unit] and not [unit -> unit] *)
+  Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
   Output.print_sstring conf "<h2>\n";
-  title false;
+  title ();
   Output.print_sstring conf {|</h2><form method="post" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|"><p>|} ;
@@ -734,7 +618,7 @@ let print_del1 conf base ifam =
   Hutil.trailer conf
 
 let print_inv1 conf base p ifam1 ifam2 =
-  let title _ =
+  let title () =
     transl_decline conf "invert" ""
     |> Utf8.capitalize_fst
     |> Adef.safe
@@ -742,7 +626,8 @@ let print_inv1 conf base p ifam1 ifam2 =
   in
   let cpl1 = foi base ifam1 in
   let cpl2 = foi base ifam2 in
-  Perso.interp_notempl_with_menu title "perso_header" conf base p;
+  (* TODO check if first argument really needs to be [bool -> unit] and not [unit -> unit] *)
+  Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
   Output.print_sstring conf
     (Utf8.capitalize_fst (transl conf "invert the order of the following families")) ;
   Output.print_sstring conf (Util.transl conf ":");
@@ -914,14 +799,15 @@ let print_change_order conf base =
     in
     let after = change_order p ifam n in
     let (before, after) = get_family p, Array.of_list after in
-    let title _ =
+    let title () =
       transl_decline conf "invert" ""
       |> Utf8.capitalize_fst
       |> Output.print_sstring conf
     in
-    Perso.interp_templ_with_menu title "perso_header" conf base p;
+    (* TODO check if first argument really needs to be [bool -> unit] and not [unit -> unit] *)
+    Perso.interp_templ_with_menu (fun _b -> title ()) "perso_header" conf base p;
     Output.print_sstring conf "<h2>";
-    title false;
+    title ();
     Output.print_sstring conf "</h2>";
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl conf "invert the order of the following families")) ;
@@ -942,7 +828,8 @@ let print_change_order conf base =
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
-    Some i ->
+  | None -> Hutil.incorrect_request conf
+  | Some i ->
       let i = ifam_of_string i in
       let sfam = string_family_of conf base i in
       Hutil.interp conf "updfamevt"
@@ -952,4 +839,3 @@ let print_change_event_order conf base =
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach}
         [] sfam
-  | _ -> Hutil.incorrect_request conf

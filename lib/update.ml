@@ -833,7 +833,7 @@ let get var key env =
 let get_number var key env =
   match p_getint env (var ^ "_" ^ key) with
   | Some x when x <> 0 -> Some x
-  | _ -> None
+  | Some _ | None -> None
 
 let bad_date conf d =
   let err = UERR_bad_date d in
@@ -940,12 +940,12 @@ let reconstitute_date_dmy conf var =
                   let dmy2 = reconstitute_date_dmy2 conf var in YearInt dmy2
               | None -> Sure
               end
-          | _ -> Sure
+          | Some _ | None -> Sure
         in
         begin match m with
-          Some m ->
+        | Some m ->
             begin match get_number var "dd" conf.env with
-              Some d ->
+            | Some d ->
                 let d =
                   {day = d; month = m; year = y; prec = prec; delta = 0}
                 in
@@ -1023,10 +1023,10 @@ let reconstitute_date conf var =
   | Some d, true -> Some (Dgreg (Calendar.gregorian_of_french d, Dfrench))
   | None, _ ->
       match p_getenv conf.env (var ^ "_text") with
-        Some _ ->
+      | Some _ ->
           let txt = only_printable (get var "text" conf.env) in
           if txt = "" then None else Some (Dtext txt)
-      | _ -> None
+      | None -> None
 
 let print_create_conflict conf base p var =
   let err = UERR_already_defined (base, p, var) in
@@ -1119,7 +1119,7 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
         in
         let (death, death_place) =
           match info with
-            Some {ci_death_date = Some d; ci_death_place = dpl} ->
+          | Some {ci_death_date = Some d; ci_death_place = dpl} ->
               Death (Unspecified, Adef.cdate_of_date d), dpl
           | Some {ci_death_date = None; ci_death_place = dpl}
             when dpl <> "" ->
@@ -1128,12 +1128,12 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
               {ci_death = DeadDontKnowWhen | NotDead as dead;
                ci_death_date = None; ci_death_place = dpl} ->
               dead, dpl
-          | _ -> infer_death_bb conf birth baptism, ""
+          | Some _ | None -> infer_death_bb conf birth baptism, ""
         in
         let occupation =
           match info with
-            Some {ci_occupation = occupation} -> occupation
-          | _ -> ""
+          | Some {ci_occupation = occupation} -> occupation
+          | None -> ""
         in
         let access =
           match info with
@@ -1202,12 +1202,12 @@ let update_conf_aux _create _occ conf =
   let field =
     match p_getenv conf.env "field" with
     | Some f -> f ^ "_"
-    | _ -> ""
+    | None -> ""
   in
   let occ =
     match p_getenv conf.env _occ with
     | Some occ -> Mutil.encode occ
-    | _ -> Adef.encoded ""
+    | None -> Adef.encoded ""
   in
   { conf with env = update_conf_env field _create occ conf.env [] }
 
