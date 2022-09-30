@@ -31,15 +31,9 @@ let get_vother =
   | _ -> None
 let set_vother x = Vother x
 
-let extract_var sini s =
-  let len = String.length sini in
-  if String.length s > len && String.sub s 0 (String.length sini) = sini then
-    String.sub s len (String.length s - len)
-  else ""
-
-let bool_val x = VVbool x
-let str_val x = VVstring x
-let safe_val (x : Adef.safe_string) = VVstring (x :> string)
+let bool_val = Update_util.bool_val
+let str_val = Update_util.str_val
+let safe_val = Update_util.safe_val
 
 let rec eval_var conf base env p _loc sl =
   try eval_special_var conf base sl with
@@ -366,132 +360,10 @@ and eval_simple_var conf base env p =
       | _ -> raise Not_found
       end
   | [s] ->
-      let v = extract_var "evar_" s in
-      if v <> "" then
-        match p_getenv (conf.env @ conf.henv) v with
-          Some vv -> safe_val (Util.escape_html vv :> Adef.safe_string)
-        | None -> str_val ""
-      else
-        let v = extract_var "bvar_" s in
-        let v = if v = "" then extract_var "cvar_" s else v in
-        if v <> "" then
-          str_val (try List.assoc v conf.base_env with Not_found -> "")
-        else raise Not_found
+      Update_util.eval_default_var conf s
   | _ -> raise Not_found
-and eval_date_var od s = safe_val (eval_date_var_aux od s)
-and eval_date_var_aux od =
-  function
-    "calendar" ->
-    Adef.safe @@
-      begin match od with
-        Some (Dgreg (_, Dgregorian)) -> "gregorian"
-      | Some (Dgreg (_, Djulian)) -> "julian"
-      | Some (Dgreg (_, Dfrench)) -> "french"
-      | Some (Dgreg (_, Dhebrew)) -> "hebrew"
-      | _ -> ""
-      end
-  | "day" ->
-    Adef.safe @@
-      begin match eval_date_field od with
-        Some d -> if d.day = 0 then "" else string_of_int d.day
-      | None -> ""
-      end
-  | "month" ->
-    Adef.safe @@
-      begin match eval_date_field od with
-        Some d ->
-          if d.month = 0 then ""
-          else
-            begin match od with
-              Some (Dgreg (_, Dfrench)) -> short_f_month d.month
-            | _ -> string_of_int d.month
-            end
-      | None -> ""
-      end
-  | "orday" ->
-    Adef.safe @@
-      begin match eval_date_field od with
-        Some d ->
-          begin match d.prec with
-            OrYear d2 | YearInt d2 ->
-              if d2.day2 = 0 then "" else string_of_int d2.day2
-          | _ -> ""
-          end
-      | None -> ""
-      end
-  | "ormonth" ->
-    Adef.safe @@
-      begin match eval_date_field od with
-        Some d ->
-          begin match d.prec with
-            OrYear d2 | YearInt d2 ->
-              if d2.month2 = 0 then ""
-              else
-                begin match od with
-                  Some (Dgreg (_, Dfrench)) -> short_f_month d2.month2
-                | _ -> string_of_int d2.month2
-                end
-          | _ -> ""
-          end
-      | None -> ""
-      end
-  | "oryear" ->
-    Adef.safe @@
-      begin match eval_date_field od with
-        Some d ->
-          begin match d.prec with
-            OrYear d2 | YearInt d2 -> string_of_int d2.year2
-          | _ -> ""
-          end
-      | None -> ""
-      end
-  | "prec" ->
-    Adef.safe @@
-      begin match od with
-        Some (Dgreg ({prec = Sure}, _)) -> "sure"
-      | Some (Dgreg ({prec = About}, _)) -> "about"
-      | Some (Dgreg ({prec = Maybe}, _)) -> "maybe"
-      | Some (Dgreg ({prec = Before}, _)) -> "before"
-      | Some (Dgreg ({prec = After}, _)) -> "after"
-      | Some (Dgreg ({prec = OrYear _}, _)) -> "oryear"
-      | Some (Dgreg ({prec = YearInt _}, _)) -> "yearint"
-      | _ -> ""
-      end
-  | "text" ->
-      begin match od with
-        Some (Dtext s) -> Util.safe_html s
-      | _ -> Adef.safe @@ ""
-      end
-  | "year" ->
-    Adef.safe @@
-      begin match eval_date_field od with
-        Some d -> string_of_int d.year
-      | None -> ""
-      end
-  | "cal_french" -> eval_is_cal Dfrench od
-  | "cal_gregorian" -> eval_is_cal Dgregorian od
-  | "cal_hebrew" -> eval_is_cal Dhebrew od
-  | "cal_julian" -> eval_is_cal Djulian od
-  | "prec_no" -> if od = None then Adef.safe "1" else Adef.safe ""
-  | "prec_sure" -> eval_is_prec (function Sure -> true | _ -> false) od
-  | "prec_about" -> eval_is_prec (function About -> true | _ -> false) od
-  | "prec_maybe" -> eval_is_prec (function Maybe -> true | _ -> false) od
-  | "prec_before" -> eval_is_prec (function Before -> true | _ -> false) od
-  | "prec_after" -> eval_is_prec (function After -> true | _ -> false) od
-  | "prec_oryear" -> eval_is_prec (function OrYear _ -> true | _ -> false) od
-  | "prec_yearint" -> eval_is_prec (function YearInt _ -> true | _ -> false) od
-  | _ -> raise Not_found
-and eval_date_field =
-  function
-    Some d ->
-      begin match d with
-        Dgreg (d, Dgregorian) -> Some d
-      | Dgreg (d, Djulian) -> Some (Calendar.julian_of_gregorian d)
-      | Dgreg (d, Dfrench) -> Some (Calendar.french_of_gregorian d)
-      | Dgreg (d, Dhebrew) -> Some (Calendar.hebrew_of_gregorian d)
-      | _ -> None
-      end
-  | None -> None
+and eval_date_var =
+  Update_util.eval_date_var
 and eval_event_var e =
   function
     ["e_name"] ->
@@ -642,14 +514,6 @@ and eval_person_var (fn, sn, oc, create, _) =
   | ["occ"] -> str_val (if oc = 0 then "" else string_of_int oc)
   | ["surname"] -> safe_val (Util.escape_html sn :> Adef.safe_string)
   | _ -> raise Not_found
-and eval_is_cal cal =
-  function
-    Some (Dgreg (_, x)) -> if x = cal then Adef.safe "1" else Adef.safe ""
-  | _ -> Adef.safe ""
-and eval_is_prec cond =
-  function
-    Some (Dgreg ({prec = x}, _)) -> if cond x then Adef.safe "1" else Adef.safe ""
-  | _ -> Adef.safe ""
 and eval_is_death_reason dr =
   function
     Death (dr1, _) -> bool_val (dr = dr1)
@@ -702,7 +566,8 @@ let print_foreach print_ast _eval_expr =
     | ["witness"] -> print_foreach_witness env p al p.pevents
     | _ -> raise Not_found
   and print_foreach_string env p al list lab =
-    let _ =
+    let () =
+      ignore @@
       List.fold_left
         (fun cnt nn ->
            let env = (lab, Vstring nn) :: env in
@@ -712,7 +577,8 @@ let print_foreach print_ast _eval_expr =
     in
     ()
   and print_foreach_relation env p al list =
-    let _ =
+    let () =
+      ignore @@
       List.fold_left
         (fun cnt _ ->
            let env = ("cnt", Vint cnt) :: env in
@@ -721,7 +587,8 @@ let print_foreach print_ast _eval_expr =
     in
     ()
   and print_foreach_title env p al list =
-    let _ =
+    let () =
+      ignore @@
       List.fold_left
         (fun cnt _ ->
            let env = ("cnt", Vint cnt) :: env in
@@ -781,16 +648,16 @@ let print_update_ind conf base p digest =
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach}
         env p
-  | _ -> Hutil.incorrect_request conf
+  | Some _ | None -> Hutil.incorrect_request conf
 
 let print_del1 conf base p =
-  let title _ =
+  let title () =
     let s = transl_nth conf "person/persons" 0 in
     Output.print_sstring conf (Utf8.capitalize_fst (transl_decline conf "delete" s))
   in
-  Perso.interp_notempl_with_menu title "perso_header" conf base p;
+  Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
   Output.print_sstring conf "<h2>\n";
-  title false;
+  title ();
   Output.print_sstring conf "</h2>\n";
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Output.print_sstring conf "<p>\n";
@@ -824,21 +691,22 @@ let print_add conf base =
 
 let print_mod conf base =
   match p_getenv conf.env "i" with
-    Some i ->
+  | None -> Hutil.incorrect_request conf
+  | Some i ->
       let p = poi base (iper_of_string i) in
       let sp = string_person_of base p in
       let digest = Update.digest_person sp in
       print_update_ind conf base sp digest
-  | _ -> Hutil.incorrect_request conf
 
 let print_del conf base =
   match p_getenv conf.env "i" with
-    Some i -> let p = poi base (iper_of_string i) in print_del1 conf base p
-  | _ -> Hutil.incorrect_request conf
+  | None -> Hutil.incorrect_request conf
+  | Some i -> let p = poi base (iper_of_string i) in print_del1 conf base p
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
-    Some i ->
+  | None -> Hutil.incorrect_request conf
+  | Some i ->
       let p = string_person_of base (poi base (iper_of_string i)) in
       Hutil.interp conf "updindevt"
         {Templ.eval_var = eval_var conf base;
@@ -847,4 +715,3 @@ let print_change_event_order conf base =
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach}
         [] p
-  | _ -> Hutil.incorrect_request conf

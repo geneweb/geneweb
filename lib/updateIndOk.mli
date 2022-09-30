@@ -53,7 +53,6 @@ val print_change_event_order : config -> base -> unit
 val effective_add
   : config -> base -> (iper, Update.key, string) Def.gen_person
   -> (iper, iper, istr) Def.gen_person * ifam Def.gen_ascend
-val raw_get : config -> string -> string
 val strip_person
   : (iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person
   -> (iper, string * 'a * 'b * 'c * 'd, string) Def.gen_person

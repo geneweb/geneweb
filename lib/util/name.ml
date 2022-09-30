@@ -267,3 +267,6 @@ let split_fname s =
   let r = ref [] in
   split_fname_callback (fun i j -> r := String.sub s i j :: !r) s ;
   !r
+
+let contains_forbidden_char s =
+  List.exists (String.contains s) forbidden_char

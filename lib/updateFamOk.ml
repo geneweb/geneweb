@@ -4,6 +4,7 @@ open Config
 open Def
 open Gwdb
 open Util
+open Update_util
 
 (* Liste des string dont on a supprimé un caractère.       *)
 (* Utilisé pour le message d'erreur lors de la validation. *)
@@ -19,55 +20,9 @@ type create_info =
       ci_occupation : string;
       ci_public : bool }
 
-let raw_get conf key =
-  match p_getenv conf.env key with
-    Some v -> v
-  | None -> failwith (key ^ " unbound")
+let get_purged_fn_sn = Update_util.get_purged_fn_sn removed_string
 
-(* This is exactly the same function than before! *)
-let get conf key =
-  match p_getenv conf.env key with
-    Some v -> v
-  | None -> failwith (key ^ " unbound")
-
-let get_nth conf key cnt = p_getenv conf.env (key ^ string_of_int cnt)
-
-let getn conf var key =
-  match p_getenv conf.env (var ^ "_" ^ key) with
-    Some v -> v
-  | None -> failwith (var ^ "_" ^ key ^ " unbound")
-
-let reconstitute_somebody conf var =
-  let first_name = only_printable (getn conf var "fn") in
-  let surname = only_printable (getn conf var "sn") in
-  (* S'il y a des caractères interdits, on les supprime *)
-  let (first_name, surname) =
-    let contain_fn = String.contains first_name in
-    let contain_sn = String.contains surname in
-    if List.exists contain_fn Name.forbidden_char ||
-       List.exists contain_sn Name.forbidden_char
-    then
-      begin
-        removed_string :=
-          (Name.purge first_name ^ " " ^ Name.purge surname) ::
-          !removed_string;
-        Name.purge first_name, Name.purge surname
-      end
-    else first_name, surname
-  in
-  let occ = try int_of_string (getn conf var "occ") with Failure _ -> 0 in
-  let sex =
-    match p_getenv conf.env (var ^ "_sex") with
-      Some "M" -> Male
-    | Some "F" -> Female
-    | _ -> Neuter
-  in
-  let create =
-    match getn conf var "p" with
-      "create" -> Update.Create (sex, None)
-    | _ -> Update.Link
-  in
-  first_name, surname, occ, create, var
+let reconstitute_somebody = Update_util.reconstitute_somebody removed_string
 
 let reconstitute_parent_or_child conf var default_surname =
   let first_name = only_printable (getn conf var "fn") in
@@ -76,29 +31,16 @@ let reconstitute_parent_or_child conf var default_surname =
     if surname = "" then default_surname else surname
   in
   (* S'il y a des caractères interdits, on les supprime *)
-  let (first_name, surname) =
-    let contain_fn = String.contains first_name in
-    let contain_sn = String.contains surname in
-    if List.exists contain_fn Name.forbidden_char ||
-       List.exists contain_sn Name.forbidden_char
-    then
-      begin
-        removed_string :=
-          (Name.purge first_name ^ " " ^ Name.purge surname) ::
-          !removed_string;
-        Name.purge first_name, Name.purge surname
-      end
-    else first_name, surname
-  in
+  let (first_name, surname) = get_purged_fn_sn first_name surname in
   let occ = try int_of_string (getn conf var "occ") with Failure _ -> 0 in
   let create_info =
     let b = Update.reconstitute_date conf (var ^ "b") in
     let bpl = getn conf (var ^ "b") "pl" in
     let death =
       match p_getenv conf.env (var ^ "d_yyyy") with
-        Some "+" -> DeadDontKnowWhen
+      | Some "+" -> DeadDontKnowWhen
       | Some ("-" | "=") -> NotDead
-      | _ -> DontKnowIfDead
+      | Some _ | None -> DontKnowIfDead
     in
     let d = Update.reconstitute_date conf (var ^ "d") in
     let dpl = getn conf (var ^ "d") "pl" in
@@ -108,17 +50,8 @@ let reconstitute_parent_or_child conf var default_surname =
      ci_death_date = d; ci_death_place = dpl; ci_occupation = occupation;
      ci_public = public}
   in
-  let sex =
-    match p_getenv conf.env (var ^ "_sex") with
-      Some "M" -> Male
-    | Some "F" -> Female
-    | _ -> Neuter
-  in
-  let create =
-    match getn conf var "p" with
-      "create" -> Update.Create (sex, Some create_info)
-    | _ -> Update.Link
-  in
+  let sex = getenv_sex conf var in
+  let create = getn_p conf var ~create_info sex in
   first_name, surname, occ, create, var
 
 let invert_children conf (c, children, ext) i =
@@ -192,7 +125,8 @@ let reconstitute_insert_event conf ext cnt el =
 
 let rec reconstitute_events conf ext cnt =
   match get_nth conf "e_name" cnt with
-    Some efam_name ->
+  | None -> [], ext
+  | Some efam_name ->
       let efam_name =
         match efam_name with
           "#marr" -> Efam_Marriage
@@ -214,18 +148,18 @@ let rec reconstitute_events conf ext cnt =
       in
       let efam_place =
         match get_nth conf "e_place" cnt with
-          Some place -> only_printable place
-        | _ -> ""
+        | Some place -> only_printable place
+        | None -> ""
       in
       let efam_note =
         match get_nth conf "e_note" cnt with
-          Some note -> only_printable_or_nl (Mutil.strip_all_trailing_spaces note)
-        | _ -> ""
+        | Some note -> only_printable_or_nl (Mutil.strip_all_trailing_spaces note)
+        | None -> ""
       in
       let efam_src =
         match get_nth conf "e_src" cnt with
-          Some src -> only_printable src
-        | _ -> ""
+        | Some src -> only_printable src
+        | None -> ""
       in
       let (witnesses, ext) =
         let rec loop i ext =
@@ -236,7 +170,8 @@ let rec reconstitute_events conf ext cnt =
                    ("e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i))
             with Failure _ -> None
           with
-            Some c ->
+          | None -> [], ext
+          | Some c ->
               let (witnesses, ext) = loop (i + 1) ext in
               let c =
                 match
@@ -244,26 +179,26 @@ let rec reconstitute_events conf ext cnt =
                     ("e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^
                      "_kind")
                 with
-                  Some "godp" -> c, Witness_GodParent
+                | Some "godp" -> c, Witness_GodParent
                 | Some "offi" -> c, Witness_CivilOfficer
                 | Some "reli" -> c, Witness_ReligiousOfficer
                 | Some "info" -> c, Witness_Informant
                 | Some "atte" -> c, Witness_Attending
                 | Some "ment" -> c, Witness_Mentioned
                 | Some "othe" -> c, Witness_Other
-                | _           -> c, Witness
+                | Some _ | None -> c, Witness
               in
               begin match
                 p_getenv conf.env
                   ("e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i)
               with
-                Some "on" ->
+              | Some "on" ->
                   let ins_witn_n =
                     "e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i ^
                     "_n"
                   in
                   begin match p_getint conf.env ins_witn_n with
-                    Some n when n > 1 ->
+                  | Some n when n > 1 ->
                       let rec loop_witn n witnesses =
                         if n = 0 then c :: witnesses, true
                         else
@@ -275,25 +210,24 @@ let rec reconstitute_events conf ext cnt =
                           loop_witn (n - 1) witnesses
                       in
                       loop_witn n witnesses
-                  | _ ->
+                  | Some _ | None ->
                       let new_witn =
                         ("", "", 0, Update.Create (Neuter, None), ""), Witness
                       in
                       c :: new_witn :: witnesses, true
                   end
-              | _ -> c :: witnesses, ext
+              | Some _ | None -> c :: witnesses, ext
               end
-          | None -> [], ext
         in
         loop 1 ext
       in
       let (witnesses, ext) =
         let evt_ins = "e" ^ string_of_int cnt ^ "_ins_witn0" in
         match p_getenv conf.env evt_ins with
-          Some "on" ->
+        | Some "on" ->
             let ins_witn_n = "e" ^ string_of_int cnt ^ "_ins_witn0_n" in
             begin match p_getint conf.env ins_witn_n with
-              Some n when n > 1 ->
+            | Some n when n > 1 ->
                 let rec loop_witn n witnesses =
                   if n = 0 then witnesses, true
                   else
@@ -304,13 +238,13 @@ let rec reconstitute_events conf ext cnt =
                     loop_witn (n - 1) witnesses
                 in
                 loop_witn n witnesses
-            | _ ->
+            | Some _ | None ->
                 let new_witn =
                   ("", "", 0, Update.Create (Neuter, None), ""), Witness
                 in
                 new_witn :: witnesses, true
             end
-        | _ -> witnesses, ext
+        | Some _ | None -> witnesses, ext
       in
       let e =
         {efam_name = efam_name; efam_date = Adef.cdate_of_od efam_date;
@@ -320,16 +254,6 @@ let rec reconstitute_events conf ext cnt =
       let (el, ext) = reconstitute_events conf ext (cnt + 1) in
       let (el, ext) = reconstitute_insert_event conf ext cnt el in
       e :: el, ext
-  | _ -> [], ext
-
-let rec reconstitute_sorted_fevents conf cnt =
-  match get_nth conf "e_id" cnt, get_nth conf "e_pos" cnt with
-    Some id, Some pos ->
-      let (id, pos) =
-        try int_of_string id, int_of_string pos with Failure _ -> 0, 0
-      in
-      let el = reconstitute_sorted_fevents conf (cnt + 1) in (id, pos) :: el
-  | _ -> []
 
 (* S:
    * why is marriage record transformed into a tuple?
@@ -403,7 +327,9 @@ let reconstitute_from_fevents
       let relation =
         match relation with
         | Married -> NoSexesCheckMarried
-        | x -> x
+        | NotMarried | Engaged | NoSexesCheckNotMarried | NoMention
+        | NoSexesCheckMarried | MarriageBann | MarriageContract | MarriageLicense
+        | Pacs | Residence as x -> x
       in
       relation, date, place, note, src
     else marr
@@ -455,14 +381,10 @@ let reconstitute_family conf base nsck =
     only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "comment"))
   in
   let fsources = only_printable (get conf "src") in
-  let origin_file =
-    match p_getenv conf.env "origin_file" with
-      Some x -> x
-    | None -> ""
-  in
+  let origin_file = Option.value ~default:"" (p_getenv conf.env "origin_file") in
   let fam_index =
     match p_getenv conf.env "i" with
-      Some i -> Gwdb.ifam_of_string i
+    | Some i -> Gwdb.ifam_of_string i
     | None -> Gwdb.dummy_ifam
   in
   (* Mise à jour des évènements principaux. *)
@@ -685,6 +607,7 @@ let infer_origin_file conf base ifam ncpl ndes =
   in
   if no_dec && sou base r = "" then print_error_disconnected conf else r
 
+(* TODO EVENT put this in Event *)
 let fwitnesses_of fevents =
   List.fold_left
     (fun ipl e ->
@@ -1107,7 +1030,7 @@ let print_family conf base (wl, ml) cpl des =
   let rdsrc =
     match p_getenv conf.env "rdsrc" with
     | Some "on" -> p_getenv conf.env "src"
-    | _ -> p_getenv conf.env "dsrc"
+    | Some _ | None -> p_getenv conf.env "dsrc"
   in
   begin match rdsrc with
     | Some x ->
@@ -1187,7 +1110,7 @@ let print_del_ok conf base wl =
       Output.print_sstring conf "<ul><li>";
       Output.print_string conf (reference conf base p (gen_person_text conf base p));
       Output.print_sstring conf "\n</ul>"
-    | _ -> ()
+    | None -> ()
   end;
   Update.print_warnings conf base wl;
   Hutil.trailer conf
@@ -1200,12 +1123,12 @@ let print_del conf base =
     let ip =
       match p_getenv conf.env "ip" with
       | Some i when get_mother fam = iper_of_string i -> get_mother fam
-      | _ -> get_father fam
+      | Some _ | None -> get_father fam
     in
     effective_del conf base ip fam ;
     Util.commit_patches conf base;
     print_del_ok conf base []
-  | _ -> Hutil.incorrect_request conf
+  | None -> Hutil.incorrect_request conf
 
 let print_inv_ok conf base p =
   Hutil.header conf @@ print_title conf "inversion done";
@@ -1240,11 +1163,7 @@ let print_add o_conf base =
   let conf = Update.update_conf o_conf in
   let nsck = p_getenv conf.env "nsck" = Some "on" in
   let (sfam, scpl, sdes, ext) = reconstitute_family conf base nsck in
-  let redisp =
-    match p_getenv conf.env "return" with
-      Some _ -> true
-    | _ -> false
-  in
+  let redisp = Option.is_some (p_getenv conf.env "return") in
   let digest =
     match p_getenv conf.env "ip" with
       Some ip ->
@@ -1252,7 +1171,7 @@ let print_add o_conf base =
         (Array.length (get_family (poi base (iper_of_string ip))))
     | None -> ""
   in
-  let sdigest = raw_get conf "digest" in
+  let sdigest = get conf "digest" in
   if digest <> "" && sdigest <> "" && digest <> sdigest then
     Update.error_digest conf
   else if ext || redisp then
@@ -1385,21 +1304,17 @@ let print_add_parents o_conf base =
 let print_mod_aux conf base callback =
   let nsck = p_getenv conf.env "nsck" = Some "on" in
   let (sfam, scpl, sdes, ext) = reconstitute_family conf base nsck in
-  let redisp =
-    match p_getenv conf.env "return" with
-      Some _ -> true
-    | _ -> false
-  in
+  let redisp = Option.is_some (p_getenv conf.env "return") in
   let digest =
     let ini_sfam = UpdateFam.string_family_of conf base sfam.fam_index in
     Update.digest_family ini_sfam
   in
-  if digest = raw_get conf "digest" then
+  if digest = get conf "digest" then
     if ext || redisp then
       UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
     else
       match check_family conf sfam scpl with
-        Some err, _ | _, Some err -> error_family conf err
+      | Some err, _ | _, Some err -> error_family conf err
       | None, None ->
         let (sfam, sdes) = strip_family sfam sdes in
         callback sfam scpl sdes
@@ -1416,7 +1331,7 @@ let print_mod o_conf base =
   let o_f =
     let ifam =
       match p_getenv o_conf.env "i" with
-        Some i -> ifam_of_string i
+      | Some i -> ifam_of_string i
       | None -> dummy_ifam
     in
     Util.string_gen_family base (gen_family_of_family (foi base ifam))
@@ -1452,7 +1367,7 @@ let print_mod o_conf base =
     let changed =
       let ip =
         match p_getenv o_conf.env "ip" with
-          Some i -> iper_of_string i
+        | Some i -> iper_of_string i
         | None -> dummy_iper
       in
       let p =
@@ -1501,18 +1416,21 @@ let print_change_order_ok conf base =
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
-  | Some ifam ->
-    let ifam = Gwdb.ifam_of_string ifam in
+  | None -> Hutil.incorrect_request conf
+  | Some s ->
+    let ifam = Gwdb.ifam_of_string s in
     let fam = foi base ifam in
     let o_f = Util.string_gen_family base (gen_family_of_family fam) in
+    (* TODO_EVENT use Event.sorted_event *)
     let ht = Hashtbl.create 50 in
-    let _ =
-      List.fold_left (fun id evt -> Hashtbl.add ht id evt; succ id) 1
-        (get_fevents fam)
+    let () =
+      ignore @@
+        List.fold_left (fun id evt -> Hashtbl.add ht id evt; succ id) 1
+          (get_fevents fam)
     in
     let sorted_fevents =
       List.sort (fun (_, pos1) (_, pos2) -> compare pos1 pos2)
-        (reconstitute_sorted_fevents conf 1)
+        (reconstitute_sorted_events conf 1)
     in
     let fevents =
       List.fold_right
@@ -1556,4 +1474,3 @@ let print_change_event_order conf base =
     in
     History.record conf base changed "mf";
     print_change_event_order_ok conf base (wl, []) cpl des
-  | _ -> Hutil.incorrect_request conf

@@ -77,7 +77,7 @@ type death_reason = Killed | Murdered | Executed | Disappeared | Unspecified
 
 (** Death status *)
 type death =
-    NotDead
+  | NotDead
   | Death of death_reason * cdate
   | DeadYoung
   | DeadDontKnowWhen
@@ -118,7 +118,7 @@ type witness_kind =
   | Witness_Attending
   | Witness_Mentioned
   | Witness_Other
-  
+
 (** Personal event name. *)
 type 'string gen_pers_event_name =
     Epers_Birth

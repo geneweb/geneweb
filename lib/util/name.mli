@@ -81,3 +81,6 @@ val split_sname  : string -> string list
     into this list of firstname.
     e.g. [split_fname base "Foo-Bar Baz"] is [[ "Foo-Bar" ; "Baz"]] *)
 val split_fname : string -> string list
+
+(** [contains_forbidden_char s] is [true] iif s contains forbidden characters *)
+val contains_forbidden_char : string -> bool
