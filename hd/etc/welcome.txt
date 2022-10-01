@@ -6,7 +6,8 @@
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">	  <link rel="icon" href="favicon.ico">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+  <link rel="icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
   %include;css
   %include;hed
