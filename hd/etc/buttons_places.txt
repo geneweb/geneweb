@@ -3,7 +3,7 @@
 %( Boutons de configurations et d'options %)
 
 <form class="form-group mx-1" name="evt_url" method="get" action="%action;">
-  <input type="hidden" name="m" value="P">
+  <input type="hidden" name="m" value="PPS">
   <div class="form-inline">
     <label class="sr-only" for="k">[*place] (k)</label>
     <input type="search" class="form-control col-4 ml-2" name="k"
@@ -93,7 +93,8 @@
       <button type="submit" class="btn btn-primary btn-sm ml-4"
         title="[*search/case sensitive]0 [surname/surnames]1 /
           [places] [and] [event/events]1">
-        <i class="fa fa-search mr-2"></i>Search</button>
+        <i class="fa fa-search mr-2"></i>Search
+      </button>
     </div>
   </div>
 </form>
@@ -131,6 +132,17 @@
       <i class="fas fa-sort-%if;(evar.a_sort!="on")alpha-up%else;alpha-down%end;%sp;
         fa-lg"></i>%nn;
   </a>
+  
+  <a role="button" class="ml-auto"
+    href="%prefix_base_password;%nn;
+      %foreach;env_binding;%if;(env.val!="" and env.key!="very")%nn;
+       &%env.key=%env.val;%end;%nn;
+      %end;%nn;
+      %if;(evar.very!="on")&very=on%end;%nn;"
+      title="[*very short display]">
+      <i class="fas fa-%if;(evar.very="on")plus%else;minus%end;%sp;
+        fa-lg"></i>  </a>
+  
   </div>
 </div>
 <script>

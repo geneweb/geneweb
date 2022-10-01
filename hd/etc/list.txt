@@ -137,7 +137,7 @@
       %foreach;env_binding;%nn;
         %if;(env.key!="parents" and env.key!="dates" and env.key!="m" and env.key!="nb"
          and env.key!="k"
-         and env.key!="bi" and env.key!="bd" and env.key!="ma" and env.key!="de" and env.key!="bu"
+         and env.key!="bi" and env.key!="ba" and env.key!="ma" and env.key!="de" and env.key!="bu"
          and env.key!="surn" and env.key!="date_sort" and env.key!="i0")%env.key;=%env.val;&%nn;
         %elseif(env.key="i0")i%nb;=%env.val;&%end;%nn;
         %end;%nn;
@@ -159,12 +159,12 @@
   %let;occ;%apply;get_value(index, "occ")%in;
   %let;dates;%apply;get_value(index, "dates_sort")%in;
   %let;s;%apply;get_var("p", i)%in;
-  %let;s_no_sub;%apply;get_var("q", i)%in;
+  %let;sub;%apply;get_var("q", i)%in;
   %let;so;%if;(s="")%k;%else;%s;%end;%in;
   %if;(evar.date_sort="on")
     %apply;add_in_sorted_list%with;
       %so;%and;
-      %s_no_sub;%and;
+      %sub;%and;
       %dates;%and;
       %index;%and;
       %i;%and;
@@ -172,7 +172,7 @@
   %else;
     %apply;add_in_sorted_list%with;
       %so;%and;
-      %s_no_sub;%and;
+      %sub;%and;
       %if;(evar.surn="")%surname;%end;%first_name;%occ;%and;
       %index;%and;
       %i;%and;
@@ -182,7 +182,7 @@
 
 <div class="mt-2">
   %foreach;sorted_list_item;
-  %let;sub;%apply;get_sub(3,item.2)%in; %( was item.2 %)
+  %let;sub;%apply;get_sub(5,item.1)%in; %( was item.2 %)
   %if;(item.1!=prev_item.1 or prev_item.1="")<li>
     %if;(k!="")<a href="%prefix;m=PS&k=%item.1;%opt;">%item.1;</a>%end;
     %if;wizard;
