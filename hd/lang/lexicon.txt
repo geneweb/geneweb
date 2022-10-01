@@ -18037,3 +18037,8 @@ fr: liste trop longue
     path/paths
 en: path/paths
 fr: chemin/chemins
+
+    very short display
+en: veru short display
+fr: affichage très court
+
