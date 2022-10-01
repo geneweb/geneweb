@@ -2221,6 +2221,17 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let ep = make_ep conf base (get_iper p) in
           eval_person_field_var conf base env ep loc sl
       | None -> raise Not_found)
+  | "qvar" :: v :: sl ->
+      (* %qvar.index_v.surname;
+         direct access to a person whose index value is v
+      *)
+      let v1 = iper_of_string v in
+      let v0 = int_of_string v in
+      if v0 >= 0 && v0 < nb_of_persons base then
+        let ep = make_ep conf base v1 in
+        if is_hidden (fst ep) then raise Not_found
+        else eval_person_field_var conf base env ep loc sl
+      else raise Not_found
   | "p_of_index" :: v :: sl ->
       (* %p_of_index.index_v.surname;
          direct access to a person whose index value is v

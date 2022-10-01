@@ -93,7 +93,8 @@
       <button type="submit" class="btn btn-primary btn-sm ml-4"
         title="[*search/case sensitive]0 [surname/surnames]1 /
           [places] [and] [event/events]1">
-        <i class="fa fa-search mr-2"></i>Search</button>
+        <i class="fa fa-search mr-2"></i>Search
+      </button>
     </div>
   </div>
 </form>
@@ -130,7 +131,19 @@
         [sort by/branch/alphabetic order]2">
       <i class="fas fa-sort-%if;(evar.a_sort!="on")alpha-up%else;alpha-down%end;%sp;
         fa-lg"></i>%nn;
-  </a>
+  </a>%nn;
+  %if;(e.display!="long")
+    <a role="button" class="ml-auto"
+      href="%prefix_base_password;%nn;
+        %foreach;env_binding;%if;(env.val!="" and env.key!="very")%nn;
+         &%env.key=%env.val;%end;%nn;
+        %end;%nn;
+        &very=%if;(evar.very!="on")on%else;off%end;%nn;"
+        title="%if;(evar.very="on")[*short display]%else;[*very short display]%end;">
+        <i class="fas fa-%if;(evar.very="on")plus%else;minus%end;%sp;
+          fa-lg"></i>
+    </a>%nn;
+  %end;
   </div>
 </div>
 <script>
