@@ -214,7 +214,6 @@ let rec eval_variable conf = function
       let rec loop i n str =
         if n = 0 || i >= len then str
         else
-          (* Attention aux caractères utf-8 !! *)
           let nbc = Utf8.nbc v.[i] in
           let car = String.sub v i nbc in
           loop (i + nbc) (n - 1) (str ^ car)

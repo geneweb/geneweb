@@ -159,7 +159,7 @@
   %let;occ;%apply;get_value(index, "occ")%in;
   %let;dates;%apply;get_value(index, "dates_sort")%in;
   %let;s;%apply;get_var("p", i)%in;
-  et;s_no_sub;%apply;get_var("q", i)%in;
+  %let;s_no_sub;%apply;get_var("q", i)%in;
   %let;so;%if;(s="")%k;%else;%s;%end;%in;
   %if;(evar.date_sort="on")
     %apply;add_in_sorted_list%with;
