@@ -467,8 +467,15 @@ val array_mem_witn :
   (iper * Def.witness_kind * istr) array ->
   Adef.safe_string option
 (** [array_mem_witn conf base ip array] checks if [ip] is in [array]
-    and returns corresponding [string_of_witness_kind] if so.
+    and returns corresponding [string_of_witness_kind] and witness note if so.
 *)
+
+val array_mem_witn
+ : Config.config
+ -> Gwdb.base
+ -> iper
+ -> (iper * Def.witness_kind * istr) array
+ -> bool * Adef.safe_string * string
 
 val name_key : Gwdb.base -> string -> string
 (** [name_key base name] is [name],
