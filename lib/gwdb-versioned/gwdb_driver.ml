@@ -1,4 +1,42 @@
 
+module Log = struct
+  let oc : out_channel option ref = ref None
+
+  let log fn =
+    match !oc with
+    | Some oc -> fn oc
+    | None -> ()
+
+  type level =
+    [ `LOG_ALERT
+    | `LOG_CRIT
+    | `LOG_DEBUG
+    | `LOG_EMERG
+    | `LOG_ERR
+    | `LOG_INFO
+    | `LOG_NOTICE
+    | `LOG_WARNING
+    ]
+
+  let syslog (level : level) msg =
+    let flags = [`LOG_PERROR] in
+    let log = Syslog.openlog ~flags @@ Filename.basename @@ Sys.executable_name in
+    Syslog.syslog log level msg ;
+    Syslog.closelog log ;
+    Printexc.print_backtrace stderr
+(*  let log msg =
+    let tm = Unix.(time () |> localtime) in
+    let level = "DEBUG" in
+    Printf.eprintf "[%s]: %s %s\n"
+      (Mutil.sprintf_date tm : Adef.safe_string :> string) level msg
+  (*let log = Syslog.openlog ~flags @@ Filename.basename @@ Sys.executable_name in
+    Syslog.syslog log level msg ;
+    Syslog.closelog log ;
+    if !debug then Printexc.print_backtrace stderr *)*)
+end
+
+let log msg = Log.syslog Log.(`LOG_DEBUG) msg
+
 module Legacy_driver = struct
 
   include Gwdb_legacy.Gwdb_driver
@@ -21,7 +59,7 @@ module Legacy_driver = struct
 
   let create_compatibility_files base =
     let dir = bdir base in
-    print_endline @@ "CREATE COMPAT DIR:" ^ dir;
+    log @@ "CREATE COMPAT DIR:" ^ dir;
     Files.mkdir_p (compat_dir base)
 
   let witness_notes_tbl : (iper, istr array array) Hashtbl.t option ref =
@@ -41,34 +79,44 @@ module Legacy_driver = struct
        let witfile_tmp = witfile ^ "~" in
        if Sys.file_exists witfile_tmp then failwith "oups";
        let oc = Secure.open_out witfile_tmp in
+
+       log "WRITE TBL";
+       Hashtbl.iter (fun iper wnotes ->
+           log @@ "WIPER:" ^ (string_of_int iper);
+           log "WNOTES:";
+           Array.iter (Array.iter (fun istr-> log @@ "ISTR" ^ (string_of_int istr))) wnotes
+         ) tbl;
+       
        Marshal.to_channel oc tbl [Marshal.No_sharing];
        close_out oc;
        Files.mv witfile_tmp witfile;
        Files.rm witfile_tmp
 
   let write_witness_notes base =
-    print_endline "WRITE_WITNESS_NOTES";
+    log "WRITE_WITNESS_NOTES";
     let tbl_opt = !witness_notes_tbl in
     write_witness_notes base tbl_opt
        
   let load_witness_notes base =
-    print_endline "LOAD WNOTES";
+    log "LOAD WNOTES";
     let tbl =
       if compat_exists base then begin
-          print_endline "COMPAT EXISTS";
+          log "COMPAT EXISTS";
           let ic = Secure.open_in (compat_file base) in
           let tbl = (Marshal.from_channel ic : (iper, istr array array) Hashtbl.t) in
           close_in ic;
-          print_endline "PRINT NOTES";
+          log "PRINT NOTES";
           Hashtbl.iter (fun iper notes ->
-              print_endline (string_of_int iper);
-              Array.iter (Array.iter (fun n -> print_endline @@ sou base n)) notes
+              log ("IPER:" ^ string_of_int iper);
+              Array.iter (Array.iter (fun n ->
+                              log @@ "ISTR:" ^ string_of_int n;
+                              log @@ "NOTE:" ^ sou base n)) notes
             ) tbl;
           witness_notes_tbl := Some tbl;
           tbl
         end
       else begin
-          print_endline "NO COMPAT FOUND"; Hashtbl.create 1
+          log "NO COMPAT FOUND"; Hashtbl.create 1
         end
     in
     witness_notes_tbl := Some tbl;
@@ -114,7 +162,7 @@ module Legacy_driver = struct
     List.iter (fun pers_event ->
         let witnesses = pers_event.Def.epers_witnesses in
         let wnotes = Array.map (fun (ip, wk, wnote) -> sou base wnote) witnesses in
-        Array.iter print_endline wnotes
+        Array.iter (log) wnotes
       ) pers_events
 
 
@@ -129,9 +177,9 @@ module Legacy_driver = struct
     Hashtbl.replace tbl iper a
     
   let patch_person base iper genpers =
-    print_endline "PATCH PERSON";
+    log @@ "PATCH PERSON" ^ (string_of_int iper);
     test_on_person base genpers;
-    print_endline "LETS PATCH";
+    log "LETS PATCH";
     let pevents = genpers.pevents in
     let genpers = Translate.as_legacy_person genpers in
     patch_person base iper genpers;
@@ -139,9 +187,9 @@ module Legacy_driver = struct
     add_witness_notes tbl iper pevents
 
   let insert_person base iper genpers =
-    print_endline "INSERT PERSON";
+    log "INSERT PERSON";
     test_on_person base genpers;
-    print_endline "LETS INSERT";
+    log "LETS INSERT";
     let pevents = genpers.pevents in
     let genpers = Translate.as_legacy_person genpers in
     insert_person base iper genpers;
@@ -149,9 +197,9 @@ module Legacy_driver = struct
     add_witness_notes tbl iper pevents
 
   let commit_patches base =
-    print_endline "COMMIT LEGACY PATCHES";
+    log "COMMIT LEGACY PATCHES";
     commit_patches base;
-    print_endline "COMMIT NOTES PATCHES";
+    log "COMMIT NOTES PATCHES";
     write_witness_notes base
 
   let get_pevents p =
@@ -164,13 +212,13 @@ module Legacy_driver = struct
 
 
   let open_base bname =
-    print_endline @@ "BNAME:" ^ bname;
+    log @@ "BNAME:" ^ bname;
     let base = open_base bname in
-    print_endline @@ "Bdir:" ^ bdir base;
+    log @@ "Bdir:" ^ bdir base;
     base
 
   let close_base base =
-    print_endline @@ "CLOSING THE BASE";
+    log "CLOSING THE BASE";
     close_base base
 
   let empty_person base iper =
