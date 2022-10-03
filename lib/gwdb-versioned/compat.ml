@@ -762,14 +762,17 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
   let ifam_of_string = int_of_string
 
   let istr_of_string = int_of_string
-                     
 
+  (*  let log = print_endline*)
+
+  let log _ = ()
+   
   let open_base bname =
     let ic = Secure.open_in_bin (Filename.concat bname "base") in
     let version_opt =
       try
         let v = really_input_string ic 8 in
-        print_endline ("VERSION FOUND : " ^ v);
+        log ("VERSION FOUND : " ^ v);
         Version.check_version v
       with
       | Version.Unsupported_base ->
@@ -780,9 +783,9 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
     close_in ic;
     match version_opt with
     | Some version when List.exists (Version.eq_version version) Current.versions ->
-       print_endline "opening CURRENT";
+       log "opening CURRENT";
        let base = Current.open_base bname in
-       print_endline "CURRENT opened";
+       log "CURRENT opened";
        Current_base base
     | Some version when List.exists (Version.eq_version version) Legacy.versions ->
        let base = Legacy.open_base bname in
@@ -1147,7 +1150,7 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
 
     (* DO SOMETHING *)
     let fold ?from ?until f acc coll =
-      print_endline "FOLDING";
+      log "FOLDING";
 
       let res = match from, until with
       | Some from, Some until ->
@@ -1183,7 +1186,7 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
          | Dummy_collection -> acc
          end
       in
-      print_endline "FOLDED"; res
+      log "FOLDED"; res
 
     let fold_until continue fn acc coll = match coll with
       | Legacy_collection c ->
