@@ -2513,10 +2513,11 @@ let record_visited conf ip =
 let array_mem_witn conf base x a =
   let fst (a,_,_) = a in
   let snd (_,b,_) = b in
+  let thd (_,_,c) = c in
   let rec loop i =
-    if i = Array.length a then None
-    else if x = fst a.(i) then
-      Some (string_of_witness_kind conf (get_sex @@ poi base x) (snd a.(i)))
+    if i = Array.length a then (false, Adef.safe "", "")
+    else if x = fst a.(i)
+    then (true, string_of_witness_kind conf (get_sex @@ poi base x) (snd a.(i)), sou base (thd a.(i)))
     else loop (i + 1)
   in
   loop 0
