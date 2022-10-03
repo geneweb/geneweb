@@ -35,8 +35,10 @@ module Log = struct
     if !debug then Printexc.print_backtrace stderr *)*)
 end
 
-let log msg = Log.syslog Log.(`LOG_DEBUG) msg
+(*let log msg = Log.syslog Log.(`LOG_DEBUG) msg*)
+let log _ = ()
 
+            
 module Legacy_driver = struct
 
   include Gwdb_legacy.Gwdb_driver
