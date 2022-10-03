@@ -1942,6 +1942,11 @@ and eval_compound_var conf base env (a, _ as ep) loc =
         Vstring wk -> VVstring wk
       | _ -> raise Not_found
     end
+  | "event_witness_relation_note" :: _ ->
+     begin match get_env "event_witness_relation_note" env with
+       Vstring wnote -> VVstring wnote
+     | _ -> raise Not_found
+     end
   | "event_witness_kind" :: _ ->
     begin match get_env "event_witness_kind" env with
         Vstring s -> VVstring s
@@ -4410,12 +4415,12 @@ let print_foreach conf base print_ast eval_expr =
             let c = pget conf base ic in
             List.iter
               (fun (name, _, _, _, _, wl, _ as evt) ->
-                 let (mem, wk) = Util.array_mem_witn conf base (get_iper p) wl in
+                 let (mem, wk, wnote) = Util.array_mem_witn conf base (get_iper p) wl in
                  if mem then
                    match name with
                      Fevent _ ->
-                       if get_sex c = Male then list := (c, wk, evt) :: !list
-                   | _ -> list := (c, wk, evt) :: !list)
+                       if get_sex c = Male then list := (c, wk, wnote, evt) :: !list
+                   | _ -> list := (c, wk, wnote, evt) :: !list)
               (events_list conf base c);
             make_list icl
         | [] -> ()
@@ -4427,20 +4432,22 @@ let print_foreach conf base print_ast eval_expr =
     (* On tri les témoins dans le même ordre que les évènements. *)
     let events_witnesses =
       CheckItem.sort_events
-        (fun (_, _, (name, _, _, _, _, _, _)) ->
+        (fun (_, _, _, (name, _, _, _, _, _, _)) ->
            match name with
            | Pevent n -> CheckItem.Psort n
            | Fevent n -> CheckItem.Fsort n)
-        (fun (_, _, (_, date, _, _, _, _, _)) -> date)
+        (fun (_, _, _, (_, date, _, _, _, _, _)) -> date)
         events_witnesses
     in
     List.iter
-      (fun (p, wk, evt) ->
+      (fun (p, wk, wnote, evt) ->
          if p_auth then
+           let wnote = Util.escape_html wnote in
            let env = ("event_witness_relation", Vevent (p, evt)) :: env in
            let env =
              ( "event_witness_relation_kind"
              , Vstring (wk : Adef.safe_string :> string) )
+             :: ( "event_witness_relation_note", Vstring (wnote : Adef.escaped_string :> string))
              :: env
            in
            List.iter (print_ast env ep) al)

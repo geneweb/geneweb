@@ -446,14 +446,14 @@ val read_visited : config -> cache_visited_t
 val record_visited : config -> iper -> unit
 
 (** [array_mem_witn conf base ip array] checks if [ip] is in [array]
-    and returns corresponding [string_of_witness_kind] if so.
+    and returns corresponding [string_of_witness_kind] and witness note if so.
 *)
 val array_mem_witn
  : Config.config
  -> Gwdb.base
  -> iper
  -> (iper * Def.witness_kind * istr) array
- -> bool * Adef.safe_string
+ -> bool * Adef.safe_string * string
 
 (** [name_key base name] is [name],
     with particles put at the end of the string instead of the beginning.
