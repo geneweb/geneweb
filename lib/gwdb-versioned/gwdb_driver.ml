@@ -203,8 +203,15 @@ module Legacy_driver = struct
     write_witness_notes base
 
   let get_pevents p =
-    let pevents = get_pevents p in
-    List.map (Translate.legacy_to_def_pevent empty_string) pevents
+    let pevents = get_pevents p.person in
+    let pevents =
+      List.mapi (fun i pe ->
+          let pe = Translate.legacy_to_def_pevent empty_string pe in
+          let wnotes = p.witness_notes.(i) in
+          let witnesses = Array.mapi (fun i (ip, wk, _) -> ip, wk, wnotes.(i)) pe.epers_witnesses in
+          {pe with epers_witnesses = witnesses}
+        ) pevents in
+    pevents
     
   let make bname particles ((persons, ascends, unions), fam_arrays, string_arrays, base_notes) =
     let persons = Array.map Translate.as_legacy_person persons in
@@ -253,7 +260,6 @@ module Legacy_driver = struct
   let get_occ p = get_occ p.person
   let get_occupation p = get_occupation p.person
   let get_parents p = get_parents p.person
-  let get_pevents p = get_pevents p.person
   let get_psources p = get_psources p.person
   let get_public_name p =get_public_name p.person
   let get_qualifiers p = get_qualifiers p.person
