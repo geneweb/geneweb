@@ -617,14 +617,12 @@ let fwitnesses_of fevents =
 
 (* Lorsqu'on ajout naissance décès par exemple en créant une personne. *)
 let patch_person_with_pevents base ip =
-  let p = poi base ip in
-  let p = gen_person_of_person p in
-  let empty_string = Gwdb.empty_string in
+  let p = poi base ip |> gen_person_of_person in
   let evt ~name ?(date = Adef.cdate_None) ~place ~src ~note () =
     {epers_name = name; epers_date = date;
-     epers_place = place; epers_reason = empty_string;
+     epers_place = place; epers_reason = Gwdb.empty_string;
      epers_note = note; epers_src = src;
-     epers_witnesses = [| |]}
+     epers_witnesses = [| |]} (* TODO why empty witnesses *)
   in
   let evt_birth =
     let evt ?date () =
@@ -634,7 +632,7 @@ let patch_person_with_pevents base ip =
       let src = p.birth_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    if Adef.od_of_cdate p.birth <> None
+    if Option.is_some (Adef.od_of_cdate p.birth)
     then evt ~date:p.birth ()
     else if sou base p.birth_place = "" then None
     else evt ()
@@ -647,7 +645,7 @@ let patch_person_with_pevents base ip =
       let src = p.baptism_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    if Adef.od_of_cdate p.baptism <> None
+    if Option.is_some (Adef.od_of_cdate p.baptism)
     then evt ~date:p.baptism ()
     else if sou base p.baptism_place = "" then None
     else evt ()
@@ -664,74 +662,49 @@ let patch_person_with_pevents base ip =
     | Death (_, cd) ->
         let date = Adef.cdate_of_od (Some (Adef.date_of_cdate cd)) in
         evt ~date ()
-    | _ ->
+    | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead ->
         if sou base p.death_place = "" then None
         else evt ()
   in
   (* Attention, on prend aussi les autres évènements sinon,  *)
   (* on va tout effacer et ne garder que naissance et décès. *)
-  let found_birth = ref false in
-  let found_death = ref false in
   let pevents =
-    let rec loop pevents accu =
-      match pevents with
-        [] ->
-          let accu =
-            if !found_birth then accu
-            else
-              match evt_birth, evt_baptism with
-                Some evt, None -> evt :: accu
-              | None, Some evt -> evt :: accu
-              | _ -> accu
-          in
-          let accu =
-            if !found_death then accu
-            else
-              match evt_death with
-                Some evt -> evt :: accu
-              | None -> accu
-          in
-          List.rev accu
-      | evt :: l ->
-          match evt.epers_name with
-            Epers_Birth | Epers_Baptism ->
-              if !found_birth then loop l (evt :: accu)
-              else
-                begin match evt_birth, evt_baptism with
-                  Some evt2, None ->
-                    let () = found_birth := true in
-                    (* Si il y avait des témoins, on les remets en place. *)
-                    let evt =
-                      {evt2 with epers_witnesses = evt.epers_witnesses}
-                    in
-                    loop l (evt :: accu)
-                | None, Some evt2 ->
-                    let () = found_birth := true in
-                    (* Si il y avait des témoins, on les remets en place. *)
-                    let evt =
-                      {evt2 with epers_witnesses = evt.epers_witnesses}
-                    in
-                    loop l (evt :: accu)
-                | _ -> loop l (evt :: accu)
-                end
-          | Epers_Death ->
-              if !found_death then loop l (evt :: accu)
-              else
-                begin match evt_death with
-                  Some evt2 ->
-                    let () = found_death := true in
-                    (* Si il y avait des témoins, on les remets en place. *)
-                    let evt =
-                      {evt2 with epers_witnesses = evt.epers_witnesses}
-                    in
-                    loop l (evt :: accu)
-                | None -> loop l (evt :: accu)
-                end
-          | _ -> loop l (evt :: accu)
+    let found_birth = ref false in
+    let found_baptism = ref false in
+    let found_death = ref false in
+    let replace_witnesses event found new_event =
+      (* Si il y avait des témoins, on les remets en place. *)
+      if !found then event
+      else
+        begin match new_event with
+        | None -> event
+        | Some new_event ->
+            found := true;
+            {new_event with epers_witnesses = event.epers_witnesses}
+        end
     in
-    loop p.pevents []
+    let l = List.map (fun evt ->
+          match evt.epers_name with
+          | Epers_Birth ->
+              replace_witnesses evt found_birth evt_birth
+          | Epers_Baptism ->
+              replace_witnesses evt found_baptism evt_baptism
+          | Epers_Death ->
+              replace_witnesses evt found_death evt_death
+          | _other -> evt
+    ) p.pevents in
+    (* add default birth|baptism|death event if it was not found *)
+    let complete found event_opt l =
+      if found then l
+      else
+        match event_opt with
+        | None -> l
+        | Some evt -> evt :: l
+    in
+    complete !found_birth evt_birth l |> complete !found_baptism evt_baptism |> complete !found_death evt_death
   in
-  let p = {p with pevents = pevents} in patch_person base p.key_index p
+  let p = {p with pevents = pevents} in
+  patch_person base p.key_index p
 
 let patch_parent_with_pevents base cpl =
   Array.iter (patch_person_with_pevents base) (Adef.parent_array cpl)
