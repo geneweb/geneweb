@@ -1,9 +1,5 @@
 open Config
-open Def
 open Gwdb
-
-(* TODO: use Uri/Fpath *)
-type src = [ `Url of string | `Src_with_size_info of string | `Path of string ]
 
 let prefix conf = Util.escape_html conf.image_prefix
 
@@ -96,9 +92,8 @@ let jpeg_size ic =
       if Char.code ch = 0xC0 || Char.code ch = 0xC3 then
         if exif_type && not found then loop true
         else (
-          for i = 1 to 3 do
-            let _ = input_char ic in
-            ()
+          for _i = 1 to 3 do
+            ignore @@ input_char ic
           done;
           let a = input_char ic in
           let b = input_char ic in
@@ -112,9 +107,8 @@ let jpeg_size ic =
         let b = input_char ic in
         let len = (Char.code a lsl 8) lor Char.code b in
         let len = if len >= 32768 then 0 else len in
-        for i = 1 to len - 2 do
-          let _ = input_char ic in
-          ()
+        for _i = 1 to len - 2 do
+          ignore @@ input_char ic
         done;
         if Char.code ch <> 0xDA then loop found else Error ()
     in
@@ -141,7 +135,7 @@ let size_from_path fname =
         in
         close_in ic;
         r
-      with Sys_error e -> Error ()
+      with Sys_error _e -> Error ()
   in
   if Result.is_error res then
     !GWPARAM.syslog `LOG_ERR
