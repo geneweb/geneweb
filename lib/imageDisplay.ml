@@ -40,7 +40,7 @@ let content conf ct len fname =
 
 let print_image_file conf fname =
   let res = List.find_opt
-    (fun (suff, ctype) ->
+    (fun (suff, _ctype) ->
        if Filename.check_suffix fname suff ||
           Filename.check_suffix fname (String.uppercase_ascii suff)
        then

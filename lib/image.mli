@@ -1,5 +1,4 @@
 open Config
-open Def
 open Gwdb
 
 val scale_to_fit : max_w:int -> max_h:int -> w:int -> h:int -> int * int
