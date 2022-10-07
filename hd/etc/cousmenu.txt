@@ -35,6 +35,7 @@
 </h1>
 
 %define;nth_cousins(xx)
+  %let;xx;xx-1;%in;
   [*%s cousins:::xx]%nn;
 %end;
 

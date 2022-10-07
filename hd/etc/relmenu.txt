@@ -16,6 +16,7 @@
   %include;hed
 </head>
 %define;nth_cousins(xx)
+  %let;xx;xx-1;%in;
   [*%s cousins:::xx]%nn;
 %end;
 %define;relative_sosa(sosa_link)

@@ -8,6 +8,8 @@ open Cousins
 
 let default_max_cnt = Cousins.default_max_cnt
 
+(* there is a mismatch between cousins degree and "v1" parameter
+   which is the number of generation we go back to find a common ancestor *)
 let brother_label conf x =
   match x with
   | 1 -> transl conf "siblings"
@@ -286,6 +288,18 @@ let print_cousins conf base p lev1 lev2 =
   Output.print_sstring conf "</p></div>";
   Hutil.trailer conf
 
+(* TODO use Sosa module instead *)
+let sosa_of_persons conf base =
+  let rec loop n =
+    function
+    | [] -> n
+    | ip :: list ->
+        (* do no works if sex = Neuter *)
+        loop (if get_sex (pget conf base ip) = Male then 2 * n else 2 * n + 1)
+          list
+  in
+  loop 1
+
 let print_anniv conf base p dead_people level =
   let module S = Map.Make (struct type t = iper let compare = compare end) in
   let s_mem x m = try let _ = S.find x m in true with Not_found -> false in
@@ -398,22 +412,24 @@ let print_anniv conf base p dead_people level =
 let cousmenu_print = Perso.interp_templ "cousmenu"
 
 let print conf base p =
-  let max_lev =
-    try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
-      Not_found | Failure _ -> Perso.default_max_cousin_lev
-  in
+  let max_lvl = max_cousin_level conf base p in
+  (* v1 is the number of generation we go up to get a common ancestor,
+     v2 is the number of generation we go down from the ancestor.
+     e.g.
+          (v1,v2) = (1,1) are their sisters/brothers
+          (v1,v2) = (2,2) are their "cousins" *)
   match (p_getint conf.env "v1", p_getint conf.env "v2", p_getenv conf.env "t") with
   | (Some 1, Some 1, _) | (Some 0, _, _)  | (_, Some 0, _)->
     Perso.interp_templ "cousins" conf base p
-  | (Some lev1, _, _) ->
-    let lev1 = min (max 1 lev1) max_lev in
-    let lev2 =
+  | (Some lvl1, _, _) ->
+    let lvl1 = min (max 1 lvl1) max_lvl in
+    let lvl2 =
       match p_getint conf.env "v2" with
-        Some lev2 -> min (max 1 lev2) max_lev
-      | None -> lev1
+        Some lvl2 -> min (max 1 lvl2) max_lvl
+      | None -> lvl1
     in
-    print_cousins conf base p lev1 lev2
+    print_cousins conf base p lvl1 lvl2
   | (_, _, Some (("AN" | "AD") as t)) when conf.wizard || conf.friend ->
-    print_anniv conf base p (t = "AD") max_lev
+    print_anniv conf base p (t = "AD") max_lvl
   | _ ->
     cousmenu_print conf base p
