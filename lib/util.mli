@@ -174,6 +174,8 @@ val person_text_without_title : config -> base -> person -> Adef.safe_string
     from the list. *)
 val main_title : config -> base -> person -> title option
 
+val max_ancestor_level : config -> base -> iper -> int -> int
+
 (** Returns person's first name and surname text description depending on
     person's title *)
 val titled_person_text : config -> base -> person -> title -> Adef.safe_string

@@ -6,6 +6,14 @@ open Util
 
 let default_max_cnt = 2000
 
+let max_cousin_level conf base p =
+  let default_max_cousin_lvl = 6 in
+  let max_lvl =
+    try int_of_string (List.assoc "max_cousins_level" conf.Config.base_env) with
+      Not_found | Failure _ -> default_max_cousin_lvl
+  in
+  Util.max_ancestor_level conf base (get_iper p) max_lvl + 1
+
 let children_of base u =
   Array.fold_right
     (fun ifam list ->
@@ -23,9 +31,9 @@ let merge_siblings l1 l2 =
   let l =
     let rec rev_merge r =
       function
-        (v, _ as x) :: l ->
+        | [] -> r
+        | (v, _ as x) :: l ->
           rev_merge (if List.mem_assoc v r then r else x :: r) l
-      | [] -> r
     in
     rev_merge (List.rev l1) l2
   in
@@ -33,7 +41,8 @@ let merge_siblings l1 l2 =
 
 let siblings conf base ip =
   match get_parents (pget conf base ip) with
-    Some ifam ->
+  | None -> []
+  | Some ifam ->
       let cpl = foi base ifam in
       let fath_sib =
         List.map (fun ip -> ip, (get_father cpl, Male))
@@ -44,7 +53,6 @@ let siblings conf base ip =
           (siblings_by conf base (get_mother cpl) ip)
       in
       merge_siblings fath_sib moth_sib
-  | None -> []
 
 let rec has_desc_lev conf base lev u =
   if lev <= 1 then true
@@ -64,13 +72,3 @@ let br_inter_is_empty b1 b2 =
 
 let sibling_has_desc_lev conf base lev (ip, _) =
   has_desc_lev conf base lev (pget conf base ip)
-
-let sosa_of_persons conf base =
-  let rec loop n =
-    function
-      [] -> n
-    | ip :: list ->
-        loop (if get_sex (pget conf base ip) = Male then 2 * n else 2 * n + 1)
-          list
-  in
-  loop 1

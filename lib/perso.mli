@@ -52,8 +52,6 @@ val linked_page_text
   -> (iper, ifam) Def.NLDB.page * ('b * ('a * Def.NLDB.ind) list)
   -> Adef.safe_string
 
-val max_ancestor_level : config -> base -> iper -> int -> int
-
 val string_of_died : config -> person -> bool -> Adef.safe_string
 
 val string_of_parent_age : config -> base -> person * bool -> (family -> iper) -> Adef.safe_string
@@ -80,8 +78,6 @@ val make_desc_level_table
   -> int
   -> person
   -> (Util.IperSet.elt, int) Gwdb.Marker.t * (ifam, int) Gwdb.Marker.t
-
-val default_max_cousin_lev : int
 
 type dup =
     DupFam of ifam * ifam

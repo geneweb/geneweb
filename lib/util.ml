@@ -683,6 +683,30 @@ let gen_person_text
       | sn -> beg ^^^ " " ^<^ esc sn
     else beg
 
+let max_ancestor_level conf base ip max_lvl =
+  let x = ref 0 in
+  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
+  (* Loading ITL cache, up to 10 generations. *)
+  let () = !GWPARAM_ITL.init_cache conf base ip 10 0 0 in
+  let rec loop level ip =
+    (* Ne traite pas l'index s'il a déjà été traité. *)
+    (* Pose surement probleme pour des implexes. *)
+    if not @@ Gwdb.Marker.get mark ip then begin
+        (* Met à jour le tableau d'index pour indiquer que l'index est traité. *)
+        Gwdb.Marker.set mark ip true ;
+        x := max !x level;
+        if !x <> max_lvl then
+          match get_parents (pget conf base ip) with
+          | Some ifam ->
+              let cpl = foi base ifam in
+              loop (succ level) (get_father cpl);
+              loop (succ level) (get_mother cpl)
+          | _ ->
+            x := max !x (!GWPARAM_ITL.max_ancestor_level conf base ip conf.bname max_lvl level)
+      end
+  in
+  loop 0 ip; !x
+
 let main_title conf base p =
   let titles = nobtit conf base p in
   match List.find_opt (fun x -> x.t_name = Tmain) titles with

@@ -296,39 +296,6 @@ let get_cremation_text conf p p_auth =
   in
   cremated ^^^ " " ^<^ on_cremation_date
 
-let max_ancestor_level conf base ip max_lev =
-  let x = ref 0 in
-  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
-  (* Loading ITL cache, up to 10 generations. *)
-  let () = !GWPARAM_ITL.init_cache conf base ip 10 0 0 in
-  let rec loop level ip =
-    (* Ne traite pas l'index s'il a déjà été traité. *)
-    (* Pose surement probleme pour des implexes. *)
-    if not @@ Gwdb.Marker.get mark ip then begin
-        (* Met à jour le tableau d'index pour indiquer que l'index est traité. *)
-        Gwdb.Marker.set mark ip true ;
-        x := max !x level;
-        if !x <> max_lev then
-          match get_parents (pget conf base ip) with
-          | Some ifam ->
-              let cpl = foi base ifam in
-              loop (succ level) (get_father cpl);
-              loop (succ level) (get_mother cpl)
-          | _ ->
-            x := max !x (!GWPARAM_ITL.max_ancestor_level conf base ip conf.bname max_lev level)
-      end
-  in
-  loop 0 ip; !x
-
-let default_max_cousin_lev = 5
-
-let max_cousin_level conf base p =
-  let max_lev =
-    try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
-      Not_found | Failure _ -> default_max_cousin_lev
-  in
-  max_ancestor_level conf base (get_iper p) max_lev + 1
-
 let limit_desc conf =
   match Option.map int_of_string @@ List.assoc_opt "max_desc_level" conf.base_env with
   | Some x -> max 1 x
@@ -4015,7 +3982,7 @@ let print_foreach conf base print_ast eval_expr =
     | "burial_witness" -> print_foreach_burial_witness env al ep
     | "cell" -> print_foreach_cell env al ep
     | "child" -> print_foreach_child env al ep efam
-    | "cousin_level" -> print_foreach_level "max_cous_level" env al ep
+    | "cousin_level" -> print_foreach_cousin_level env al ep
     | "cremation_witness" -> print_foreach_cremation_witness env al ep
     | "death_witness" -> print_foreach_death_witness env al ep
     | "descendant_level" -> print_foreach_descendant_level env al ep
@@ -4522,10 +4489,10 @@ let print_foreach conf base print_ast eval_expr =
            let env = ("first", Vbool first) :: env in
            List.iter (print_ast env ep) al)
         (get_first_names_aliases p)
-  and print_foreach_level max_lev env al (_, _ as ep) =
+  and print_foreach_cousin_level env al (_, _ as ep) =
     let max_level =
-      match get_env max_lev env with
-        Vint n -> n
+      match get_env "max_cous_level" env with
+      | Vint n -> n
       | _ -> 0
     in
     let rec loop i =
@@ -4868,6 +4835,7 @@ let eval_predefined_apply conf env f vl =
 let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
   template_file := templ_fname ^ ".txt";
   let ep = p, authorized_age conf base p in
+  (* TODO what is this? what are those "120" *)
   let emal =
     match p_getint conf.env "v" with
       Some i -> i
@@ -4905,7 +4873,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
         Vint (max_ancestor_level conf base (get_iper sosa_ref) 120 + 1)
       | _ -> Vint 0
     in
-    let mcl () = Vint (max_cousin_level conf base p) in
+    let mcl () = Vint (Cousins.max_cousin_level conf base p) in
     (* Récupère le nombre maximal de niveaux de descendance en prenant en compte les liens inter-arbres (limité à 10 générations car problématique en terme de perf). *)
     let mdl () =
       Vint (max
