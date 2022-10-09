@@ -573,7 +573,7 @@ let print_all_places_surnames conf base =
     print_all_places_surnames_aux conf base ini ~add_birth ~add_baptism
       ~add_death ~add_burial ~add_marriage lim false filter
   with List_too_long ->
-    let conf = {conf with env = ("display", "short") :: conf.env} in
+    let conf = {conf with env = ("display", "short") :: (List.remove_assoc "display" conf.env)} in
     print_all_places_surnames_aux conf base ini ~add_birth ~add_baptism
       ~add_death ~add_burial ~add_marriage lim true filter
 
