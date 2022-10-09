@@ -157,9 +157,9 @@ let fold_place_long inverted s =
   in
   ((if inverted then List.rev list else list), sub)
 
-let places_to_string pl =
+let places_to_string inverse pl =
   (* TODO reverse ??*)
-  let pl = List.rev pl in
+  let pl = if inverse then List.rev pl else pl in
   let rec loop acc first =
     function
     | p :: l -> loop (p ^ (if first then "" else ", ") ^ acc) false l
@@ -304,14 +304,14 @@ let get_ip_list (snl : (string * iper list) list) =
 
 (** print the number of items in ip_list and a call to m=L for them **)
 (* TODO clean-up pi (place) and qi (suburb??) *)
-let print_ip_list conf places sub opt link_to_ind ipl =
+let print_ip_list conf places opt link_to_ind ipl =
   let len = List.length ipl in
   if len > (max_rlm_nbr conf) && link_to_ind then
     Output.printf conf "(%d)" len
   else begin
     let head = 
-      Printf.sprintf " (<a href=\"%sm=L&k=%s%s&nb=%d&p0=%s&q0=%s"
-        (commd conf) (Mutil.encode sub) opt len places sub
+      Printf.sprintf " (<a href=\"%sm=L%s&k=%s&nb=%d&p0=%s"
+        (commd conf) opt places len places
     in
     let body =
       let rec loop i acc =
@@ -352,6 +352,7 @@ let get_new_list list =
 
 let print_html_places_surnames_short conf _base link_to_ind
   (array : ((string list * string) * (string * iper list) list) array) =
+  let long = p_getenv conf.env "display" = Some "long" in
   let very = p_getenv conf.env "very" = Some "on" in
   let a_sort = p_getenv conf.env "a_sort" = Some "on" in
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
@@ -361,11 +362,11 @@ let print_html_places_surnames_short conf _base link_to_ind
   let list = List.sort
       (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) list
   in
+  (* build new list of (places, ipl) *)
   let new_list =
     let rec loop prev_pl acc acc_l =
       function
-      | ((pl, sub), snl) :: list when (not very && prev_pl =  pl) ||
-            (very && List.hd prev_pl = List.hd pl)->
+      | ((pl, sub), snl) :: list when prev_pl =  pl ->
           loop pl ((get_ip_list snl) :: acc) acc_l list
       | ((pl, sub), snl) :: list when acc <> [] ->
           let acc = List.sort_uniq compare (List.flatten acc) in
@@ -377,6 +378,7 @@ let print_html_places_surnames_short conf _base link_to_ind
           (prev_pl, acc) :: acc_l
     in loop [""] [] [] list
   in
+  (* sort *)
   let new_list =
     if a_sort then List.sort (fun (pl1, _) (pl2, _) ->
       sort_place_utf8 (pl2, "") (pl1, "")) new_list
@@ -389,16 +391,60 @@ let print_html_places_surnames_short conf _base link_to_ind
       else ((List.length ipl2) - (List.length ipl1))) new_list
     else new_list
   in
+  (* regroup entries according to List.hd pl if very=true *)
+  let new_list =
+    let rec loop prev acc acc_l =
+      function
+      | (pl, ipl) :: list when very && (List.hd pl = List.hd prev) ->
+          loop pl ((pl, ipl) :: acc) acc_l list
+      | (pl, ipl) :: list when very && (List.hd pl <> List.hd prev) ->
+          loop pl  [(pl, ipl)] (if acc <> [] then acc :: acc_l else acc_l) list
+      | (pl, ipl) :: list ->
+          loop pl [] ([(pl, ipl)] :: acc_l) list
+      | [] -> (if acc <> [] then acc :: acc_l else acc_l)
+    in loop [""] [] [] new_list
+  in
+  (* one entry has one place in mode "very" and possibly several otherwise *)
+  let print_one_entry list =
+    let len = List.fold_left (fun acc (_, ipl) -> acc + (List.length ipl)) 0 list in
+    let rec loop0 =
+      function
+      | [] -> ()
+      | (pl, ipl) :: list when len < (max_rlm_nbr conf) ->
+          let str = if very then (List.hd pl) else places_to_string true pl in
+          Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
+            (commd conf) opt (if long then "long" else "short") str str;
+          Output.printf conf " (<a href=\"%sm=L%s&k=%s&nb=%d"
+            (commd conf) opt str len;
+          let rec loop1 i prev =
+            function
+            | [] -> ()
+            | (pl, ipl) :: list ->
+                let rec loop2 i prev =
+                  function
+                  | [] -> loop1 i pl list
+                  | ip :: ipl ->
+                      Output.printf conf "&i%d=%s%s" i (Gwdb.string_of_iper ip)
+                         (Printf.sprintf "&p%d=%s" i (places_to_string false pl));
+                      loop2 (i+1) pl ipl
+                in loop2 i pl ipl
+          in loop1 0 [""] ((pl, ipl) :: list);
+          Output.printf conf "\" title=\"%s\">%d</a>)"
+            (Utf8.capitalize (transl conf "summary book ascendants")) len;
+      | (pl, ipl) :: list ->
+          let str = if very then (List.hd pl) else places_to_string true pl in
+          Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
+            (commd conf) opt (if long then "long" else "short") str str;
+          Output.printf conf " (%d)" len;
+    in loop0 list
+  in
   let rec loop first =
     function
-    | [] -> ()
-    | (pl, ipl) :: list ->
+    | l1 :: list ->
         Output.print_sstring conf (if first then "" else "; ");
-        Output.print_sstring conf
-          (pps_call conf opt true (List.hd pl) 
-            [(if very then (List.hd pl) else (places_to_string pl))]);
-        print_ip_list conf (places_to_string pl) "sub" opt link_to_ind ipl;
+        print_one_entry l1;
         loop false list
+    | [] -> ()
   in loop true new_list;
   Output.print_sstring conf "<p>"
 
@@ -418,15 +464,13 @@ let print_html_places_surnames_long conf base link_to_ind
     (* Warn : do same sort_uniq in short mode *)
     let ips = List.sort_uniq compare ips in
     let len = List.length ips in
-    let places = places_to_string pl in
-    let sub = "[" ^ sub ^ "]" in
+    let places = places_to_string true pl in
     Output.printf conf "<a href=\"%s" (commd conf);
     if link_to_ind && len = 1
     then Output.print_string conf (acces conf base @@ pget conf base @@ List.hd ips)
     else Output.printf conf "m=N&v=%s" (Mutil.encode sn);
     Output.printf conf "\">%s</a>" sn;
-    print_ip_list conf places sub opt link_to_ind ips
-
+    print_ip_list conf places opt link_to_ind ips
   in
   let print_sn_list (pl, sub) (snl : (string * iper list) list) =
     if List.length pl = 1 then Output.print_sstring conf "<ul>\n";

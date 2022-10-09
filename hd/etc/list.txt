@@ -159,12 +159,10 @@
   %let;occ;%apply;get_value(index, "occ")%in;
   %let;dates;%apply;get_value(index, "dates_sort")%in;
   %let;s;%apply;get_var("p", i)%in;
-  %let;sub;%apply;get_var("q", i)%in;
   %let;so;%if;(s="")%k;%else;%s;%end;%in;
   %if;(evar.date_sort="on")
     %apply;add_in_sorted_list%with;
       %so;%and;
-      %sub;%and;
       %dates;%and;
       %index;%and;
       %i;%and;
@@ -172,7 +170,6 @@
   %else;
     %apply;add_in_sorted_list%with;
       %so;%and;
-      %sub;%and;
       %if;(evar.surn="")%surname;%end;%first_name;%occ;%and;
       %index;%and;
       %i;%and;
@@ -184,7 +181,7 @@
   %foreach;sorted_list_item;
   %let;sub;%apply;get_sub(5,item.1)%in; %( was item.2 %)
   %if;(item.1!=prev_item.1 or prev_item.1="")<li>
-    %if;(k!="")<a href="%prefix;m=PS&k=%item.1;%opt;">%item.1;</a>%end;
+    %if;(k!="")<a href="%prefix;m=PPS&k=%item.1;%opt;">%item.1;</a>%end;
     %if;wizard;
       <a href="%prefix;m=MOD_DATA&%nbs;&data=place&s=%sub;#%item.1;" 
         title="%apply;book_of([places]) [modify] #%item.1;…">
@@ -193,7 +190,7 @@
     %end;
   %end;
     <div class="ml-3">
-      %let;index;%item.4;%in;
+      %let;index;%item.3;%in;
       %let;so;%item.1;%in;
       %let;access;%apply;get_value(index, "access")%in;
       %let;sex;%apply;get_value(index, "sex")%in;
