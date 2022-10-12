@@ -72,58 +72,63 @@ let time_elapsed_opt d1 d2 =
 
 let date_of_death =
   function
-    Death (_, cd) -> Some (Adef.date_of_cdate cd)
-  | _ -> None
+  | Death (_, cd) -> Some (Adef.date_of_cdate cd)
+  | NotDead | DeadYoung | DeadDontKnowWhen
+  | DontKnowIfDead | OfCourseDead -> None
+
+let rec compare_dmy_opt ?(strict=false) dmy1 dmy2 =
+  match compare dmy1.year dmy2.year with
+  | 0 -> compare_month_or_day ~is_day:false strict dmy1 dmy2
+  | x -> eval_strict strict dmy1 dmy2 x
+and compare_month_or_day ~is_day strict dmy1 dmy2 =
+  (* compare a known month|day with a unknown one (0) *)
+  let compare_with_unknown_value ~strict ~unkonwn ~known =
+    match unkonwn.prec with
+      | After -> Some 1
+      | Before -> Some (-1)
+      | _other -> if strict then None
+      else compare_prec false unkonwn known
+  in
+  (* if we are comparing months the next comparison to do is on days
+      else if we are comparing days it is compare_prec *)
+  let x, y, next_comparison =
+    if is_day then dmy1.day, dmy2.day, compare_prec
+    else dmy1.month, dmy2.month, compare_month_or_day ~is_day:true
+  in
+  (* 0 means month|day is unknow*)
+  match x,y with
+  | 0, 0 -> compare_prec strict dmy1 dmy2
+  | 0, _ ->
+    compare_with_unknown_value ~strict ~unkonwn:dmy1 ~known:dmy2
+  | _, 0 ->
+    (* swap dmy1 and dmy2 *)
+    Option.map Int.neg @@
+      compare_with_unknown_value ~strict ~unkonwn:dmy2 ~known:dmy1
+  | m1, m2 -> match Int.compare m1 m2 with
+    | 0 -> next_comparison strict dmy1 dmy2
+    | x -> eval_strict strict dmy1 dmy2 x
+and compare_prec strict dmy1 dmy2 =
+  match dmy1.prec, dmy2.prec with
+  | (Sure|About|Maybe), (Sure|About|Maybe) -> Some 0
+  | After, After | Before, Before -> Some 0
+  | OrYear dmy1, OrYear dmy2 | YearInt dmy1, YearInt dmy2 ->
+    compare_dmy_opt ~strict (dmy_of_dmy2 dmy1) (dmy_of_dmy2 dmy2)
+  | _, After | Before, _ -> Some (-1)
+  | After, _ | _, Before -> Some 1
+  | _ -> Some 0
+and eval_strict strict dmy1 dmy2 x =
+    if strict then match x with
+      | -1 when dmy1.prec = After || dmy2.prec = Before -> None
+      | 1 when dmy1.prec = Before || dmy2.prec = After -> None
+      | x -> Some x
+    else Some x
 
 exception Not_comparable
 
-let rec compare_dmy_aux failure success ?(strict=false) dmy1 dmy2 =
-  match compare dmy1.year dmy2.year with
-  | 0 -> compare_month strict failure success dmy1 dmy2
-  | x ->
-    if strict then match x with
-      | -1 when dmy1.prec = After || dmy2.prec = Before -> failure ()
-      | 1 when dmy1.prec = Before || dmy2.prec = After -> failure ()
-      | x -> success x
-    else success x
-and compare_month strict failure success dmy1 dmy2 = match dmy1.month, dmy2.month with
-  | 0, 0 -> cmp_prec strict failure success dmy1 dmy2
-  | 0, _ ->
-    if dmy1.prec = After then success 1
-    else if strict then failure ()
-    else cmp_prec false failure success dmy1 dmy2
-  | _, 0 ->
-    if dmy2.prec = After then success (-1)
-    else if strict then failure ()
-    else cmp_prec false failure success dmy1 dmy2
-  | m1, m2 -> match compare m1 m2 with
-    | 0 -> compare_day strict failure success dmy1 dmy2
-    | x -> success x
-and compare_day strict failure success dmy1 dmy2 = match dmy1.day, dmy2.day with
-  | 0, 0 -> cmp_prec strict failure success dmy1 dmy2
-  | 0, _ ->
-    if dmy1.prec = After then success 1
-    else if strict then failure ()
-    else cmp_prec false failure success dmy1 dmy2
-  | _, 0 ->
-    if dmy2.prec = After then success (-1)
-    else if strict then failure ()
-    else cmp_prec false failure success dmy1 dmy2
-  | d1, d2 -> match compare d1 d2 with
-    | 0 -> cmp_prec strict failure success dmy1 dmy2
-    | x -> success x
-and cmp_prec strict failure success dmy1 dmy2 =
-  match dmy1.prec, dmy2.prec with
-  | (Sure|About|Maybe), (Sure|About|Maybe) -> success 0
-  | After, After | Before, Before -> success 0
-  | OrYear dmy1, OrYear dmy2 | YearInt dmy1, YearInt dmy2 ->
-    compare_dmy_aux ~strict failure success (dmy_of_dmy2 dmy1) (dmy_of_dmy2 dmy2)
-  | _, After | Before, _ -> success (-1)
-  | After, _ | _, Before -> success 1
-  | _ -> success 0
-
-let compare_dmy = compare_dmy_aux (fun () -> raise Not_comparable) (fun x -> x)
-let compare_dmy_opt = compare_dmy_aux (fun () -> None) (fun x -> Some x)
+let compare_dmy ?(strict=false) dmy1 dmy2 =
+  match compare_dmy_opt ~strict dmy1 dmy2 with
+    | None -> raise Not_comparable
+    | Some x -> x
 
 let compare_date ?(strict=false) d1 d2 =
   match d1, d2 with
