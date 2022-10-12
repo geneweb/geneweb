@@ -42,7 +42,7 @@ let compare get_name get_date e1 e2 =
   | Some (Dgreg (d1, _)) -> begin
       match Adef.od_of_cdate (get_date e2) with
       | Some (Dgreg (d2, _)) ->
-        begin match Date.compare_dmy_opt ~strict:false d1 d2 with
+        begin match Date.compare_dmy_opt ~strict:true d1 d2 with
           | Some 0 | None -> compare_event_name (get_name e1) (get_name e2)
           | Some x -> x
         end
