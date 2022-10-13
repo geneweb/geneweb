@@ -96,19 +96,19 @@ build:
 
 install: ## Install geneweb using dune
 install:
-	dune build @install
+	dune build @install --profile $(DUNE_PROFILE)
 	dune install
 
 uninstall: ## Uninstall geneweb using dune
 uninstall:
-	dune build @install
+	dune build @install --profile $(DUNE_PROFILE)
 	dune uninstall
 
 BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
 
 distrib: ## Build the project and copy what is necessary for distribution
 distrib:
-	dune build -p geneweb
+	dune build -p geneweb --profile $(DUNE_PROFILE)
 	$(RM) -r $(DISTRIB_DIR)
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
