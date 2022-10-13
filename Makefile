@@ -50,6 +50,9 @@ bin/gwrepl/.depend:
 	@dune top bin/gwrepl >> $@
 	@echo " Done!"
 
+dune-workspace: dune-workspace.in Makefile.config
+	cat $< | sed  -e "s/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g" > $@
+
 hd/etc/version.txt:
 	@echo -n "Generating $@..."
 	@echo "GeneWeb[:] [compiled on %s from commit %s:::" > $@
@@ -61,6 +64,7 @@ hd/etc/version.txt:
 # [End] Generated files section
 
 GENERATED_FILES_DEP = \
+	dune-workspace \
 	hd/etc/version.txt \
 	lib/dune \
 	lib/gwdb/dune \

@@ -2,7 +2,7 @@
 
 (context default)
 
-(profile dev)
+(profile %%%DUNE_PROFILE%%%)
 
 (env
  (dev
