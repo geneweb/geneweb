@@ -337,7 +337,7 @@ let print_send_ok conf base =
   if (digest :> string) = Mutil.decode (raw_get conf "digest")
   then
     raw_get conf "file"
-    |> Mutil.decode
+    |> Adef.as_string
     |> effective_send_ok conf base p
   else Update.error_digest conf
 
