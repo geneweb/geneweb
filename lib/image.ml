@@ -239,7 +239,7 @@ let get_portrait_with_size conf base p =
         | Error _e -> None
         | Ok (s, size) -> Some (s, Some size))
     | `Url _s as url -> Some (url, None)
-    | `Path _p as path -> Some (path, size_from_path path |> Result.to_option)
+    | `Path p as path -> if Sys.file_exists p then Some (path, size_from_path path |> Result.to_option) else None
     | `Empty -> (
         match full_portrait_path conf base p with
         | None -> None
@@ -254,7 +254,7 @@ let get_portrait conf base p =
         | Error _e -> None
         | Ok (s, _size) -> Some s)
     | `Url _s as url -> Some url
-    | `Path _p as path -> Some path
+    | `Path p as path -> if Sys.file_exists p then Some path else None
     | `Empty -> (
         match full_portrait_path conf base p with
         | None -> None
