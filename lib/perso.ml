@@ -1335,9 +1335,16 @@ let mode_local env =
   | Vfam _ -> false
   | _ -> true
 
-let get_note_source conf base env auth no_note note_source =
+let get_note_source conf base ?p auth no_note note_source =
+  safe_val @@
   if auth && not no_note
-  then Notes.source_note_with_env conf base env note_source
+  then
+    let env =
+      match p with
+      | None -> []
+      | Some p -> ['i', (fun () -> Image.default_portrait_filename base p)]
+    in
+    Notes.source_note_with_env conf base env (sou base note_source)
   else Adef.safe ""
 
 let date_aux conf p_auth date =
@@ -1510,9 +1517,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
     begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
         get_comment fam
-        |> sou base
-        |> get_note_source conf base [] m_auth conf.no_note
-        |> safe_val
+        |> get_note_source conf base m_auth conf.no_note
       | _ -> raise Not_found
     end
   | "count" ->
@@ -1653,18 +1658,14 @@ and eval_simple_str_var conf base env (_, p_auth) =
     begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
         get_marriage_note fam
-        |> sou base
-        |> get_note_source conf base [] m_auth conf.no_note
-        |> safe_val
+        |> get_note_source conf base m_auth conf.no_note
       | _ -> raise Not_found
     end
   | "marriage_source" ->
     begin match get_env "fam" env with
         Vfam (_, fam, _, m_auth) ->
         get_marriage_src fam
-        |> sou base
-        |> get_note_source conf base [] m_auth false
-        |> safe_val
+        |> get_note_source conf base m_auth false
       | _ -> raise Not_found
     end
   | "max_anc_level" ->
@@ -2779,15 +2780,11 @@ and eval_str_event_field conf base (p, p_auth)
         |> safe_val
       else null_val
   | "note" ->
-      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
-      sou base note
-      |> get_note_source conf base env p_auth conf.no_note
-      |> safe_val
+      note
+      |> get_note_source conf base ~p p_auth conf.no_note
   | "src" ->
-      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
-      sou base src
-      |> get_note_source conf base env p_auth false
-      |> safe_val
+      src
+      |> get_note_source conf base ~p p_auth false
   | _ -> raise Not_found
 and eval_event_field_var conf base env (p, p_auth)
     (name, date, place, note, src, w, isp) loc =
@@ -3227,17 +3224,11 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       then get_birth_place p |> sou base |> Util.string_of_place conf |> safe_val
       else null_val
   | "birth_note" ->
-      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_birth_note p
-      |> sou base
-      |> get_note_source conf base env p_auth conf.no_note
-      |> safe_val
+      |> get_note_source conf base ~p p_auth conf.no_note
   | "birth_source" ->
-      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_birth_src p
-      |> sou base
-      |> get_note_source conf base env p_auth false
-      |> safe_val
+      |> get_note_source conf base ~p p_auth false
   | "baptism_place" ->
       if p_auth then
         get_baptism_place p
@@ -3246,17 +3237,11 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         |> safe_val
       else null_val
   | "baptism_note" ->
-      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_baptism_note p
-      |> sou base
-      |> get_note_source conf base env p_auth conf.no_note
-      |> safe_val
+      |> get_note_source conf base ~p p_auth conf.no_note
   | "baptism_source" ->
-      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_baptism_src p
-      |> sou base
-      |> get_note_source conf base env p_auth false
-      |> safe_val
+      |> get_note_source conf base ~p p_auth false
   | "burial_place" ->
       if p_auth
       then
@@ -3266,17 +3251,11 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         |> safe_val
       else null_val
   | "burial_note" ->
-      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_burial_note p
-      |> sou base
-      |> get_note_source conf base env p_auth conf.no_note
-      |> safe_val
+      |> get_note_source conf base ~p p_auth conf.no_note
   | "burial_source" ->
-      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_burial_src p
-      |> sou base
-      |> get_note_source conf base env p_auth false
-      |> safe_val
+      |> get_note_source conf base ~p p_auth false
   | "child_name" ->
       let force_surname =
         match get_parents p with
@@ -3330,17 +3309,11 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         |> safe_val
       else null_val
   | "death_note" ->
-      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_death_note p
-      |> sou base
-      |> get_note_source conf base env p_auth conf.no_note
-      |> safe_val
+      |> get_note_source conf base ~p p_auth conf.no_note
   | "death_source" ->
-      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_death_src p
-      |> sou base
-      |> get_note_source conf base env p_auth false
-      |> safe_val
+      |> get_note_source conf base ~p p_auth false
   | "died" -> string_of_died conf p p_auth |> safe_val
   | "father_age_at_birth" -> string_of_parent_age conf base ep get_father |> safe_val
   | "first_name" ->
@@ -3489,20 +3462,14 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
           |> str_val
       end
   | "notes" | "pnotes" ->
-      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_notes p
-      |> sou base
-      |> get_note_source conf base env p_auth conf.no_note
-      |> safe_val
+      |> get_note_source conf base ~p p_auth conf.no_note
   | "occ" ->
       if is_hide_names conf p && not p_auth then null_val
       else get_occ p |> string_of_int |> str_val
   | "occupation" ->
-      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_occupation p
-      |> sou base
-      |> get_note_source conf base env p_auth false
-      |> safe_val
+      |> get_note_source conf base ~p p_auth false
   | "on_baptism_date" ->
     date_aux conf p_auth (get_baptism p)
   | "slash_baptism_date" ->
@@ -3529,11 +3496,8 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       | Cremated _ | UnknownBurial -> raise Not_found
     end
   | "psources" ->
-      let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
       get_psources p
-      |> sou base
-      |> get_note_source conf base env p_auth false
-      |> safe_val
+      |> get_note_source conf base ~p p_auth false
   | "slash_burial_date" ->
     if p_auth then match get_burial p with
       | Buried cod ->
