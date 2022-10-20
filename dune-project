@@ -19,6 +19,7 @@
     benchmark
     calendars
     (camlp5 (>= "8.00.01"))
+    camlp-streams
     cppo
     (dune (>= "2.9.0"))
     jingoo
