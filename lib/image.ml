@@ -137,9 +137,6 @@ let size_from_path fname =
         r
       with Sys_error _e -> Error ()
   in
-  if Result.is_error res then
-    !GWPARAM.syslog `LOG_ERR
-      (Format.sprintf "Error reading size_from_path of %s" fname);
   res
 
 let rename_portrait conf base p (nfn, nsn, noc) =
@@ -180,7 +177,7 @@ let has_access_to_portrait conf base p =
   let img = get_image p in
   (not conf.no_image)
   && Util.authorized_age conf base p
-  && (not (is_empty_string img))
+  && (not (is_empty_string img) || full_portrait_path conf base p <> None)
   && (conf.wizard || conf.friend
      || not (Mutil.contains (sou base img) "/private/"))
 (* TODO: privacy settings should be in db not in url *)
