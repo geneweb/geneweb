@@ -35,29 +35,55 @@ let image_normal_txt conf base p fname width height =
   in
   {|<a href="|}
   ^ (commd conf : Adef.escaped_string :> string)
-  ^ {|m=IM&|} ^ (b : Adef.escaped_string :> string) ^ {|&k=/|} ^ k ^ {|">|}
-  ^ (r : Adef.escaped_string :> string) ^ "</a>"
+  ^ {|m=IM&|}
+  ^ (b : Adef.escaped_string :> string)
+  ^ {|&k=/|}
+  ^ k
+  ^ {|">|}
+  ^ (r : Adef.escaped_string :> string)
+  ^ "</a>"
   |> Adef.safe
 
 let image_url_txt conf url_p url height : Adef.safe_string =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
-  Adef.safe @@
-  {|<a href="|} ^ (url_p : Adef.escaped_string :> string) ^ {|"><img src="|} ^ (url : Adef.escaped_string :> string)
-  ^ {|" alt="|} ^ image_txt ^ {|" title="|} ^ image_txt ^ {|" style="|}
-  ^ (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
-  ^ {|">|} ^ {|</a>|}
+  {|<a href="|}
+  ^ (url_p : Adef.escaped_string :> string)
+  ^ {|"><img src="|}
+  ^ (url : Adef.escaped_string :> string)
+  ^ {|" alt="|}
+  ^ image_txt
+  ^ {|" title="|}
+  ^ image_txt
+  ^ {|" style="|}
+  ^ (if height = 0 then "" else "max-height:"
+  ^ string_of_int height ^ "px;")
+  ^ {|">|}
+  ^ {|</a>|}
+  |> Adef.safe
 
 let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
-  Adef.safe @@
-  {|<a href="|} ^ (url_p : Adef.escaped_string :> string) ^ {|">|} ^
-  {|<img src="|} ^ (url : Adef.escaped_string :> string) ^ {|" width="|}
-  ^ string_of_int width ^ {|" height="|} ^ string_of_int height ^ {|" alt="|}
-  ^ image_txt ^ {|" title="|} ^ image_txt ^ {|" style="|}
+  {|<a href="|}
+  ^ (url_p : Adef.escaped_string :> string)
+  ^ {|">|}
+  ^ {|<img src="|}
+  ^ (url : Adef.escaped_string :> string)
+  ^ {|" width="|}
+  ^ string_of_int width
+  ^ {|" height="|}
+  ^ string_of_int height
+  ^ {|" alt="|}
+  ^ image_txt
+  ^ {|" title="|}
+  ^ image_txt
+  ^ {|" style="|}
   ^ (if width = 0 then "" else " max-width:" ^ string_of_int width ^ "px;")
-  ^ {| |} ^ (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;") ^ {|">|}
+  ^ {| |}
+  ^ (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;")
+  ^ {|">|}
   ^ image_txt
   ^ "</a>"
+  |> Adef.safe
 
 let image_txt conf base p =
   Adef.safe @@
@@ -67,8 +93,8 @@ let image_txt conf base p =
        match Image.get_portrait_with_size conf base p with
       | None -> ""
       | Some (`Path s, size_opt) ->
-        let max_w,max_h = 100,75 in
-        let w, h = match size_opt with | Some (h,w) -> Image.scale_to_fit ~max_w ~max_h ~w ~h | None -> 0, max_h in
+        let max_w, max_h = 100, 75 in
+        let w, h = match size_opt with | Some (w, h) -> Image.scale_to_fit ~max_w ~max_h ~w ~h | None -> 0, max_h in
         {|<br><center><table border="0"><tr align="left"><td>|}
         ^ (image_normal_txt conf base p s w h |> Adef.as_string )
         ^ "</td></tr></table></center>"
