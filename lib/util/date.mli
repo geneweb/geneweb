@@ -63,3 +63,6 @@ val compare_dmy_opt : ?strict:bool -> dmy -> dmy -> int option
     is false by default (see [Not_comparable])
 *)
 val compare_date : ?strict:bool -> date -> date -> int
+
+(** [cdate_to_dmy_opt d] is [Some dmy] iff [d] resolve to [Dgreg (dmy,_)] *)
+val cdate_to_dmy_opt : cdate -> dmy option

@@ -131,3 +131,8 @@ let compare_date ?(strict=false) d1 d2 =
   | Dgreg (_, _), Dtext _ -> if strict then raise Not_comparable else 1
   | Dtext _, Dgreg (_, _) -> if strict then raise Not_comparable else -1
   | Dtext _, Dtext _ -> if strict then raise Not_comparable else 0
+
+let cdate_to_dmy_opt cdate =
+  match Adef.od_of_cdate cdate with
+  | Some (Dgreg (d,_) ) -> Some d
+  | Some (Dtext _) | None -> None
