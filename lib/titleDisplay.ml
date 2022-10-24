@@ -21,22 +21,22 @@ let string_cnt_list_uniq l =
 let compare_titles2 (t1, _) (t2, _) = my_alphabetic t1 t2
 
 let give_access_someone conf base (x, t) list =
-  let t_date_start = Adef.od_of_cdate t.t_date_start in
-  let t_date_end = Adef.od_of_cdate t.t_date_end in
+  let t_date_start = Date.cdate_to_dmy_opt t.t_date_start in
+  let t_date_end = Date.cdate_to_dmy_opt t.t_date_end in
   let has_dates =
     match (t_date_start, t_date_end) with
-    | Some (Dgreg (_, _)), _ | _, Some (Dgreg (_, _)) -> true
+    | Some _d, _ | _, Some _d -> true
     | _ -> false
   in
   if has_dates then Output.print_sstring conf "<em>";
   (match t_date_start with
-  | Some (Dgreg (d, _)) -> Output.print_sstring conf (string_of_int d.year)
-  | _ -> ());
+  | None -> ()
+  | Some d -> Output.print_sstring conf (string_of_int d.year));
   (match t_date_end with
-  | Some (Dgreg (d, _)) ->
+  | None -> ()
+  | Some d ->
       Output.print_sstring conf "-";
-      Output.print_sstring conf (string_of_int d.year)
-  | _ -> ());
+      Output.print_sstring conf (string_of_int d.year));
   if has_dates then Output.print_sstring conf "</em>: ";
   if List.mem x list then Output.print_sstring conf "<em>"
   else

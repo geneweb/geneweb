@@ -549,16 +549,16 @@ let strictly_after_private_years conf a =
 
 let is_old_person conf p =
   match
-    ( Adef.od_of_cdate p.birth,
-      Adef.od_of_cdate p.baptism,
+    ( Date.cdate_to_dmy_opt p.birth,
+      Date.cdate_to_dmy_opt p.baptism,
       p.death,
       Date.date_of_death p.death )
   with
   | _, _, NotDead, _ when conf.private_years > 0 -> false
-  | Some (Dgreg (d, _)), _, _, _ ->
+  | Some d, _, _, _ ->
       let a = Date.time_elapsed d conf.today in
       strictly_after_private_years conf a
-  | _, Some (Dgreg (d, _)), _, _ ->
+  | _, Some d, _, _ ->
       let a = Date.time_elapsed d conf.today in
       strictly_after_private_years conf a
   | _, _, _, Some (Dgreg (d, _)) ->
@@ -1559,13 +1559,9 @@ let relation_txt conf sex fam =
 let relation_date conf fam : Adef.safe_string =
   Adef.safe
   @@
-  match Adef.od_of_cdate (get_marriage fam) with
-  | Some d -> (
-      match d with
-      | Dgreg (dmy, _) ->
-          " " ^ transl conf "in (year)" ^ " " ^ string_of_int dmy.year
-      | _ -> "")
-  | _ -> ""
+  match Date.cdate_to_dmy_opt (get_marriage fam) with
+  | None -> ""
+  | Some dmy -> " " ^ transl conf "in (year)" ^ " " ^ string_of_int dmy.year
 
 let child_of_parent conf base p =
   (* Si le père a un nom de famille différent de la personne *)
@@ -1739,9 +1735,8 @@ let get_approx_death_date_place conf base p =
   let death_place = string_of_place conf (sou base (get_death_place p)) in
   let buri =
     match get_burial p with
-    | Buried cd -> Adef.od_of_cdate cd
-    | Cremated cd -> Adef.od_of_cdate cd
-    | _ -> None
+    | Buried cd | Cremated cd -> Adef.od_of_cdate cd
+    | UnknownBurial -> None
   in
   let buri_place = string_of_place conf (sou base (get_burial_place p)) in
   get_approx_date_place death
@@ -2026,9 +2021,11 @@ let browser_doesnt_have_tables conf =
   String.lowercase_ascii user_agent = "lynx"
 
 let of_course_died conf p =
-  match Adef.od_of_cdate (get_birth p) with
-  | Some (Dgreg (d, _)) -> conf.today.year - d.year > 120
-  | _ -> false
+  match Date.cdate_to_dmy_opt (get_birth p) with
+  | Some d ->
+      (* TODO this value should be defined elsewhere *)
+      conf.today.year - d.year > 120
+  | None -> false
 
 let escache_value base =
   let t = Gwdb.date_of_last_change base in

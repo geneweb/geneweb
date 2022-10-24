@@ -65,9 +65,8 @@ and eval_simple_var conf base env p = function
   | [ "burial"; s ] ->
       let od =
         match p.burial with
-        | Buried cod -> Adef.od_of_cdate cod
-        | Cremated cod -> Adef.od_of_cdate cod
-        | _ -> None
+        | Buried cod | Cremated cod -> Adef.od_of_cdate cod
+        | UnknownBurial -> None
       in
       eval_date_var od s
   | [ "burial_place" ] ->
