@@ -291,10 +291,9 @@ let get_birth_death_date p =
   let death_date, approx =
     match Date.date_of_death (get_death p) with
     | Some d -> (Some d, approx)
-    | _ -> (
+    | None -> (
         match get_burial p with
-        | Buried cd -> (Adef.od_of_cdate cd, true)
-        | Cremated cd -> (Adef.od_of_cdate cd, true)
-        | _ -> (None, approx))
+        | Buried cd | Cremated cd -> (Adef.od_of_cdate cd, true)
+        | UnknownBurial -> (None, approx))
   in
   (birth_date, death_date, approx)

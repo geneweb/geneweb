@@ -81,8 +81,9 @@ let print_death conf base =
             Output.print_sstring conf "<ul>");
           let age, ages_sum, ages_nb =
             let sure d = d.prec = Sure in
-            match Adef.od_of_cdate (get_birth p) with
-            | Some (Dgreg (d1, _)) ->
+            match Date.cdate_to_dmy_opt (get_birth p) with
+            | None -> (None, ages_sum, ages_nb)
+            | Some d1 ->
                 if sure d1 && sure d && d1 <> d then
                   let a = Date.time_elapsed d1 d in
                   let ages_sum =
@@ -99,7 +100,6 @@ let print_death conf base =
                   in
                   (Some a, ages_sum, ages_nb)
                 else (None, ages_sum, ages_nb)
-            | _ -> (None, ages_sum, ages_nb)
           in
           Output.print_sstring conf "<li><b>";
           Output.print_string conf (referenced_person_text conf base p);
@@ -229,11 +229,11 @@ let print_oldest_alive conf base =
 let print_longest_lived conf base =
   let get_longest p =
     if Util.authorized_age conf base p then
-      match (Adef.od_of_cdate (get_birth p), get_death p) with
-      | Some (Dgreg (bd, _)), Death (_, cd) -> (
-          match Adef.date_of_cdate cd with
-          | Dgreg (dd, _) -> Some (Dgreg (Date.time_elapsed bd dd, Dgregorian))
-          | _ -> None)
+      match (Date.cdate_to_dmy_opt (get_birth p), get_death p) with
+      | Some bd, Death (_, cd) -> (
+          match Date.cdate_to_dmy_opt cd with
+          | None -> None
+          | Some dd -> Some (Dgreg (Date.time_elapsed bd dd, Dgregorian)))
       | _ -> None
     else None
   in

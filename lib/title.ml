@@ -19,36 +19,26 @@ let date_interval conf base t x =
       if Date.compare_dmy d !d2 > 0 then d2 := d;
       found := true
     in
-    (match Adef.od_of_cdate (get_birth x) with
-    | Some (Dgreg (d, _)) -> set d
-    | _ -> ());
-    (match Adef.od_of_cdate (get_baptism x) with
-    | Some (Dgreg (d, _)) -> set d
-    | _ -> ());
+    Option.iter set (Date.cdate_to_dmy_opt (get_birth x));
+    Option.iter set (Date.cdate_to_dmy_opt (get_baptism x));
     (match Date.date_of_death (get_death x) with
     | Some (Dgreg (d, _)) -> set d
     | _ -> if get_death x = NotDead then set conf.today);
     List.iter
       (fun t ->
-        (match Adef.od_of_cdate t.t_date_start with
-        | Some (Dgreg (d, _)) -> set d
-        | _ -> ());
-        match Adef.od_of_cdate t.t_date_end with
-        | Some (Dgreg (d, _)) -> set d
-        | _ -> ())
+        Option.iter set (Date.cdate_to_dmy_opt t.t_date_start);
+        Option.iter set (Date.cdate_to_dmy_opt t.t_date_end))
       (Util.nobtit conf base x);
     match t with
     | JustSelf -> ()
-    | _ ->
+    | AddSpouse | AddChildren ->
         let u = pget conf base (get_iper x) in
         Array.iter
           (fun ifam ->
             let fam = foi base ifam in
             let md = get_marriage fam in
             let conj = Gutil.spouse (get_iper x) fam in
-            (match Adef.od_of_cdate md with
-            | Some (Dgreg (d, _)) -> set d
-            | _ -> ());
+            Option.iter set (Date.cdate_to_dmy_opt md);
             loop JustSelf (pget conf base conj);
             match t with
             | AddChildren ->

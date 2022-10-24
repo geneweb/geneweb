@@ -66,17 +66,17 @@ let get_event_field_name gets event_criteria event_name search_type =
 
 (*
   Search for other persons in the base matching with the provided infos.
-  
+
   On search semantic:
 
    Search can be set to be exact on the first name and/or the surname,
    if no first name or surname is provided then the search ignores the
    parameter in both the exact and the loose case.
-   
+
    - When search is loose it is only necessary for each name atom (name atoms
    for "Jean-Pierre" are: [Jean] [Pierre]) to be found at least once in another
    person's name atoms in the base.
-   
+
    - When search is exact, it is necessary for each atom to be found exactly the
    number of times it occurs in the given name but order is not considered for
    a person from the base to match. (ie. "Pierre-Jean de Bourbon de Vallois" matches
@@ -237,10 +237,10 @@ let advanced_search conf base max_answers =
   let match_burial_date p empty_default_value =
     match_date p burial_date_field_name
       (fun () ->
+        (* TODO Date.cdate_of_burial *)
         match get_burial p with
-        | Buried cod -> Adef.od_of_cdate cod
-        | Cremated cod -> Adef.od_of_cdate cod
-        | _ -> None)
+        | Buried cod | Cremated cod -> Adef.od_of_cdate cod
+        | UnknownBurial -> None)
       empty_default_value
   in
   let cmp_place = if "on" = gets "exact_place" then ( = ) else string_incl in
