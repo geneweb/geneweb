@@ -8,12 +8,12 @@ external identity : 'a -> 'a = "%identity"
 let map_cdate fd d =
   match Adef.od_of_cdate d with
   | Some d -> Adef.cdate_of_date (fd d)
-  | _ -> d
+  | None -> d
 
 let map_title_strings ?(fd = identity) f t =
   let t_name =
     match t.t_name with
-      Tmain -> Tmain
+    | Tmain -> Tmain
     | Tname s -> Tname (f s)
     | Tnone -> Tnone
   in

@@ -30,7 +30,7 @@ let need_differences_selection conf base fam1 fam2 =
   need_selection
     (fun fam ->
        match Adef.od_of_cdate (get_marriage fam) with
-         None -> ""
+       | None -> ""
        | Some d -> (DateDisplay.string_of_ondate conf d :> string)) ||
   need_selection (fun fam -> sou base (get_marriage_place fam)) ||
   need_selection
@@ -40,7 +40,7 @@ let need_differences_selection conf base fam1 fam2 =
        | Separated -> "separated"
        | Divorced cod ->
            match Adef.od_of_cdate cod with
-             Some d -> (DateDisplay.string_of_ondate conf d :> string)
+           | Some d -> (DateDisplay.string_of_ondate conf d :> string)
            | None -> "divorced")
 
 let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =

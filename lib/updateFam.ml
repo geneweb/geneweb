@@ -185,7 +185,7 @@ and eval_event_str conf base env fam = match get_env "cnt" env with
          in
          let date =
            match Adef.od_of_cdate e.efam_date with
-             Some d -> DateDisplay.string_of_date conf d
+           | Some d -> DateDisplay.string_of_date conf d
            | None -> Adef.safe ""
          in
          let place = Util.string_of_place conf (sou base e.efam_place) in

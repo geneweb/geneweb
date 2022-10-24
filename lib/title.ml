@@ -21,41 +21,27 @@ let date_interval conf base t x =
       if Date.compare_dmy d !d2 > 0 then d2 := d;
       found := true
     in
-    begin match Adef.od_of_cdate (get_birth x) with
-      Some (Dgreg (d, _)) -> set d
-    | _ -> ()
-    end;
-    begin match Adef.od_of_cdate (get_baptism x) with
-      Some (Dgreg (d, _)) -> set d
-    | _ -> ()
-    end;
+    Option.iter set (Date.cdate_to_dmy_opt (get_birth x));
+    Option.iter set (Date.cdate_to_dmy_opt (get_baptism x));
     begin match Date.date_of_death (get_death x) with
-      Some (Dgreg (d, _)) -> set d
+    | Some (Dgreg (d, _)) -> set d
     | _ -> if get_death x = NotDead then set conf.today
     end;
     List.iter
       (fun t ->
-         begin match Adef.od_of_cdate t.t_date_start with
-           Some (Dgreg (d, _)) -> set d
-         | _ -> ()
-         end;
-         match Adef.od_of_cdate t.t_date_end with
-           Some (Dgreg (d, _)) -> set d
-         | _ -> ())
+         Option.iter set (Date.cdate_to_dmy_opt t.t_date_start);
+         Option.iter set (Date.cdate_to_dmy_opt t.t_date_end))
       (Util.nobtit conf base x);
     match t with
-      JustSelf -> ()
-    | _ ->
+    | JustSelf -> ()
+    | AddSpouse | AddChildren ->
         let u = pget conf base (get_iper x) in
         Array.iter
           (fun ifam ->
              let fam = foi base ifam in
              let md = get_marriage fam in
              let conj = Gutil.spouse (get_iper x) fam in
-             begin match Adef.od_of_cdate md with
-               Some (Dgreg (d, _)) -> set d
-             | _ -> ()
-             end;
+             Option.iter set (Date.cdate_to_dmy_opt md);
              loop JustSelf (pget conf base conj);
              match t with
                AddChildren ->
@@ -73,7 +59,7 @@ let compare_title_dates conf base (x1, t1) (x2, t2) =
     (get_birth x2, Adef.od_of_cdate t2.t_date_start,
      Adef.od_of_cdate t2.t_date_end, get_death x2)
   with
-    (_, Some (Dgreg (d1, _)), _, _), (_, Some (Dgreg (d2, _)), _, _) ->
+  | (_, Some (Dgreg (d1, _)), _, _), (_, Some (Dgreg (d2, _)), _, _) ->
     begin match Date.compare_dmy d1 d2 with
       | 0 ->
         begin match Adef.od_of_cdate t1.t_date_end, Adef.od_of_cdate t2.t_date_end with

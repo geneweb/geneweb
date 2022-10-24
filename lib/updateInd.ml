@@ -66,9 +66,8 @@ and eval_simple_var conf base env p =
   | ["burial"; s] ->
       let od =
         match p.burial with
-          Buried cod -> Adef.od_of_cdate cod
-        | Cremated cod -> Adef.od_of_cdate cod
-        | _ -> None
+        | Buried cod | Cremated cod -> Adef.od_of_cdate cod
+        | UnknownBurial -> None
       in
       eval_date_var od s
   | ["burial_place"] -> safe_val (Util.escape_html p.burial_place :> Adef.safe_string)
@@ -126,7 +125,7 @@ and eval_simple_var conf base env p =
             in
             let date =
               match Adef.od_of_cdate e.epers_date with
-                Some d -> DateDisplay.string_of_date conf d
+              | Some d -> DateDisplay.string_of_date conf d
               | None -> Adef.safe ""
             in
             let place = Util.string_of_place conf (sou base e.epers_place) in

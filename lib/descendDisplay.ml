@@ -399,7 +399,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
   let p = ancestor in
   if authorized_age conf base p then
     begin match Adef.od_of_cdate (get_birth p), get_death p with
-      Some _, _ | _, Death (_, _) -> Output.print_sstring conf "<br>"
+    | Some _, _ | _, Death (_, _) -> Output.print_sstring conf "<br>"
     | _ -> ()
     end;
   (text_to conf max_level : Adef.safe_string :> string)
@@ -744,7 +744,7 @@ let print_person_table conf base p lab =
       && authorized_age conf base spouse
       then match Adef.od_of_cdate (get_marriage fam) with
         | Some d -> DateDisplay.string_slash_of_date conf d
-        | _ -> Adef.safe "&nbsp;"
+        | None -> Adef.safe "&nbsp;"
       else Adef.safe "&nbsp;"
     in
     Output.print_string conf mdate
@@ -839,7 +839,7 @@ let print_person_table conf base p lab =
             | Some d ->
               DateDisplay.string_slash_of_date conf d
               |> Output.print_string conf
-            | _ -> Output.print_sstring conf "&nbsp;"
+            | None -> Output.print_sstring conf "&nbsp;"
           else Output.print_sstring conf "&nbsp;" ;
         end ;
         aux i "marr_place" begin fun () ->
@@ -1251,12 +1251,12 @@ let print_aboville conf base max_level p =
         && authorized_age conf base spouse
         then begin
           let fam = foi base (get_family u).(i) in
-          match Adef.od_of_cdate (get_marriage fam) with
-          | Some (Dgreg (d, _)) ->
+          match Date.cdate_to_dmy_opt (get_marriage fam) with
+          | Some d ->
             Output.print_sstring conf {|<font size="-2"><em>|} ;
             Output.print_sstring conf (DateDisplay.prec_year_text conf d) ;
             Output.print_sstring conf "</em></font> "
-          | _ -> Output.print_sstring conf " "
+          | None -> Output.print_sstring conf " "
         end else Output.print_sstring conf " " ;
         Output.print_string conf (referenced_person_title_text conf base spouse) ;
         Output.print_string conf (DateDisplay.short_dates_text conf base spouse)

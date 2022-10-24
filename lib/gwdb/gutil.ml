@@ -288,16 +288,15 @@ let find_free_occ base f s =
 let get_birth_death_date p =
   let (birth_date, approx) =
     match Adef.od_of_cdate (get_birth p) with
-      None -> Adef.od_of_cdate (get_baptism p), true
+    | None -> Adef.od_of_cdate (get_baptism p), true
     | x -> x, false
   in
   let (death_date, approx) =
     match Date.date_of_death (get_death p) with
-      Some d -> Some d, approx
-    | _ ->
+    | Some d -> Some d, approx
+    | None ->
         match get_burial p with
-          Buried cd -> Adef.od_of_cdate cd, true
-        | Cremated cd -> Adef.od_of_cdate cd, true
-        | _ -> None, approx
+        | Buried cd | Cremated cd -> Adef.od_of_cdate cd, true
+        | UnknownBurial -> None, approx
   in
   birth_date, death_date, approx

@@ -54,8 +54,8 @@ let gen_print conf base mois f_scan dead_people =
     while true do
       let (p, txt_of) = f_scan () in
       if not dead_people then
-        match Adef.od_of_cdate (get_birth p), get_death p with
-          Some (Dgreg (d, _)), (NotDead | DontKnowIfDead) ->
+        match Date.cdate_to_dmy_opt (get_birth p), get_death p with
+        | Some d, (NotDead | DontKnowIfDead) ->
             if d.prec = Sure && d.day <> 0 && d.month <> 0 &&
                d.month = mois && d.delta = 0
             then
@@ -65,10 +65,11 @@ let gen_print conf base mois f_scan dead_people =
         | _ -> ()
       else
         match get_death p with
-          NotDead | DontKnowIfDead -> ()
-        | _ ->
-            begin match Adef.od_of_cdate (get_birth p) with
-              Some (Dgreg (dt, _)) ->
+        | NotDead | DontKnowIfDead -> ()
+        | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
+            begin match Date.cdate_to_dmy_opt (get_birth p) with
+            | None -> ()
+            | Some dt ->
                 if dt.prec = Sure && dt.day <> 0 && dt.month <> 0 &&
                    dt.month = mois && dt.delta = 0
                 then
@@ -76,7 +77,6 @@ let gen_print conf base mois f_scan dead_people =
                     let j = dt.day in
                     tab.(pred j) <-
                       (p, dt.year, DeBirth, txt_of) :: tab.(pred j)
-            | _ -> ()
             end;
             match get_death p with
               Death (dr, d) ->
@@ -298,8 +298,8 @@ let print_marriage conf base month =
   Hutil.print_link_to_welcome conf true;
   Gwdb.Collection.iter (fun ifam ->
     let fam = foi base ifam in
-      match Adef.od_of_cdate (get_marriage fam) with
-      | Some (Dgreg ({day = d; month = m; year = y; prec = Sure}, _))
+      match Date.cdate_to_dmy_opt (get_marriage fam) with
+      | Some {day = d; month = m; year = y; prec = Sure}
         when d <> 0 && m <> 0 ->
         let father = pget conf base (get_father fam) in
         let mother = pget conf base (get_mother fam) in
@@ -383,8 +383,8 @@ let gen_print_menu_birth conf base f_scan mode =
   begin try
     while true do
       let (p, txt_of) = f_scan () in
-      match Adef.od_of_cdate (get_birth p), get_death p with
-        Some (Dgreg (d, _)), (NotDead | DontKnowIfDead) ->
+      match Date.cdate_to_dmy_opt (get_birth p), get_death p with
+      | Some d, (NotDead | DontKnowIfDead) ->
           if d.prec = Sure && d.day <> 0 && d.month <> 0 then
             if match_dates conf base p d conf.today then
               list_tod := (p, d.year, DeBirth, txt_of) :: !list_tod
@@ -441,10 +441,11 @@ let gen_print_menu_dead conf base f_scan mode =
     while true do
       let (p, txt_of) = f_scan () in
       match get_death p with
-        NotDead | DontKnowIfDead -> ()
-      | _ ->
-          begin match Adef.od_of_cdate (get_birth p) with
-            Some (Dgreg (d, _)) ->
+      | NotDead | DontKnowIfDead -> ()
+      | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
+          begin match Date.cdate_to_dmy_opt (get_birth p) with
+          | None -> ()
+          | Some d ->
               if d.prec = Sure && d.day <> 0 && d.month <> 0 then
                 if match_dates conf base p d conf.today then
                   list_tod := (p, d.year, DeBirth, txt_of) :: !list_tod
@@ -452,12 +453,11 @@ let gen_print_menu_dead conf base f_scan mode =
                   list_tom := (p, d.year, DeBirth, txt_of) :: !list_tom
                 else if match_dates conf base p d aft then
                   list_aft := (p, d.year, DeBirth, txt_of) :: !list_aft
-          | _ -> ()
           end;
           match get_death p with
-            Death (dr, d) ->
+          | Death (dr, d) ->
               begin match Adef.date_of_cdate d with
-                Dgreg (d, _) ->
+              | Dgreg (d, _) ->
                   if d.prec = Sure && d.day <> 0 && d.month <> 0 then
                     if match_dates conf base p d conf.today then
                       list_tod := (p, d.year, DeDeath dr, txt_of) :: !list_tod
@@ -467,7 +467,8 @@ let gen_print_menu_dead conf base f_scan mode =
                       list_aft := (p, d.year, DeDeath dr, txt_of) :: !list_aft
               | _ -> ()
               end
-          | _ -> ()
+          | NotDead | DeadYoung | DeadDontKnowWhen
+          | DontKnowIfDead | OfCourseDead -> ()
     done
   with Not_found -> ()
   end;
@@ -524,8 +525,8 @@ let print_menu_marriage conf base =
   Hutil.print_link_to_welcome conf true;
   Gwdb.Collection.iter (fun ifam ->
     let fam = foi base ifam in
-      match Adef.od_of_cdate (get_marriage fam), get_divorce fam with
-      | Some (Dgreg (d, _)), NotDivorced
+      match Date.cdate_to_dmy_opt (get_marriage fam), get_divorce fam with
+      | Some d, NotDivorced
         when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
           let update_list cpl =
             if match_mar_dates conf base cpl d conf.today then

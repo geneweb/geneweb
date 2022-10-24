@@ -424,8 +424,7 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
             else
               let death =
                 match Adef.od_of_cdate evt.epers_date with
-                | Some d ->
-                    Death (death_reason_std_fields, Adef.cdate_of_date d)
+                | Some _d -> Death (death_reason_std_fields, evt.epers_date)
                 | None ->
                     let (death, _, _, _) = de in
                     (* On ajoute DontKnowIfDead dans le cas où tous les *)

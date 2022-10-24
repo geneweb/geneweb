@@ -90,8 +90,9 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
       let sex = get_sex p in
       let dea = get_death p in
       if sex <> Neuter then
-        match Adef.od_of_cdate (get_birth p) with
-        | Some (Dgreg (dmy, _)) ->
+        match Date.cdate_to_dmy_opt (get_birth p) with
+        | None -> ()
+        | Some dmy ->
           if Date.compare_dmy dmy at_date <= 0 then
             let a = Date.time_elapsed dmy at_date in
             let j = min nb_intervals (a.year / interval) in
@@ -106,6 +107,5 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
             then
               if sex = Male then men.(j) <- men.(j) + 1
               else wom.(j) <- wom.(j) + 1
-        | Some (Dtext _) | None -> ()
     ) (Gwdb.ipers base) ;
   (men, wom)

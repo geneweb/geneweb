@@ -228,9 +228,7 @@ let min_year_of p =
     | { prec = Before ; year } -> CheckBefore year
     | { year } -> CheckOther year
   in
-  match Adef.od_of_cdate (get_birth p) with
-  | Some (Dgreg (d, _)) -> Some (aux d)
-  | Some (Dtext _) | None -> None
+  Option.map aux (Date.cdate_to_dmy_opt (get_birth p))
 
 let dummy_date = CheckInfered (CheckOther max_int)
 

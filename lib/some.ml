@@ -518,7 +518,7 @@ let print_one_branch conf base bh psn =
 let print_one_surname_by_branch conf base x xl (bhl, str) =
   let ancestors =
     match p_getenv conf.env "order" with
-      Some "d" ->
+    | Some "d" ->
         let born_before p1 p2 =
           match
             Adef.od_of_cdate (get_birth p1), Adef.od_of_cdate (get_birth p2)
@@ -538,7 +538,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
   let len = List.length ancestors in
   let psn =
     match p_getenv conf.env "alwsurn" with
-      Some x -> x = "yes"
+    | Some x -> x = "yes"
     | None ->
         try List.assoc "always_surname" conf.base_env = "yes" with
           Not_found -> false

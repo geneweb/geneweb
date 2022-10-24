@@ -38,17 +38,16 @@ let compare_event_name name1 name2 =
   (*TODO Fevent??*)
 
 let compare get_name get_date e1 e2 =
-  match Adef.od_of_cdate (get_date e1) with
-  | Some (Dgreg (d1, _)) -> begin
-      match Adef.od_of_cdate (get_date e2) with
-      | Some (Dgreg (d2, _)) ->
+  match Date.cdate_to_dmy_opt (get_date e1) with
+  | None -> compare_event_name (get_name e1) (get_name e2)
+  | Some d1 ->
+      match Date.cdate_to_dmy_opt (get_date e2) with
+      | None -> compare_event_name (get_name e1) (get_name e2)
+      | Some d2 ->
         begin match Date.compare_dmy_opt ~strict:false d1 d2 with
           | Some 0 | None -> compare_event_name (get_name e1) (get_name e2)
           | Some x -> x
         end
-      | Some (Dtext _) | None -> compare_event_name (get_name e1) (get_name e2)
-    end
-  | Some (Dtext _) | None -> compare_event_name (get_name e1) (get_name e2)
 
 let sort_events get_name get_date events =
   List.stable_sort (fun e1 e2 -> compare get_name get_date e1 e2) events

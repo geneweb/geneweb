@@ -15,9 +15,9 @@ type stats =
   }
 
 let birth_year p =
-  match Adef.od_of_cdate (get_birth p) with
-  | Some (Dgreg ( { year ; prec = Sure}, _)) -> Some year
-  | _ -> None
+  match Date.cdate_to_dmy_opt (get_birth p) with
+  | Some { year ; prec = Sure} -> Some year
+  | Some _ | None -> None
 
 let death_year current_year p =
   match get_death p with

@@ -109,7 +109,7 @@ let nobility_titles_list conf base p =
          let t_date_start = Adef.od_of_cdate t.t_date_start in
          let t_date_end = Adef.od_of_cdate t.t_date_end in
          match l with
-           (nth, name, title, place, dates) :: rl
+         | (nth, name, title, place, dates) :: rl
            when
              not conf.is_rtl && nth = t.t_nth && name_equiv name t.t_name &&
              eq_istr title t.t_ident && eq_istr place t.t_place ->
@@ -606,7 +606,7 @@ let get_date_place conf base auth_for_all_anc p =
   if auth_for_all_anc || authorized_age conf base p then
     let d1 =
       match Adef.od_of_cdate (get_birth p) with
-        None -> Adef.od_of_cdate (get_baptism p)
+      | None -> Adef.od_of_cdate (get_baptism p)
       | x -> x
     in
     let d1 =
@@ -623,8 +623,7 @@ let get_date_place conf base auth_for_all_anc p =
       | Death (_, cd) -> Some (Adef.date_of_cdate cd)
       | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead| OfCourseDead ->
           match get_burial p with
-          | Buried cod -> Adef.od_of_cdate cod
-          | Cremated cod -> Adef.od_of_cdate cod
+          | Buried cod | Cremated cod -> Adef.od_of_cdate cod
           | UnknownBurial -> None
     in
     let auth_for_all_anc =
@@ -1511,7 +1510,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
           | Divorced d ->
             let d = Adef.od_of_cdate d in
             begin match d with
-                Some d when m_auth ->
+              | Some d when m_auth ->
                 DateDisplay.string_slash_of_date conf d |> safe_val
               | _ -> null_val
             end
@@ -2322,6 +2321,7 @@ and eval_num conf n =
   | _ -> raise Not_found
 and eval_person_field_var conf base env (p, p_auth as ep) loc =
   function
+    (* TODO factorize this *)
     "baptism_date" :: sl ->
       begin match Adef.od_of_cdate (get_baptism p) with
       | Some d when p_auth -> eval_date_field_var conf d sl
@@ -2447,9 +2447,9 @@ and eval_person_field_var conf base env (p, p_auth as ep) loc =
       end
   | "marriage_date" :: sl ->
       begin match get_env "fam" env with
-        Vfam (_, fam, _, true) ->
+      | Vfam (_, fam, _, true) ->
           begin match Adef.od_of_cdate (get_marriage fam) with
-            Some d -> eval_date_field_var conf d sl
+          | Some d -> eval_date_field_var conf d sl
           | None -> null_val
           end
       | _ -> raise Not_found
@@ -2672,14 +2672,14 @@ and eval_bool_event_field base (p, p_auth)
   | "has_spouse" -> p_auth && isp <> None
   | "computable_age" ->
       if p_auth then
-        match Adef.od_of_cdate (get_birth p) with
-        | Some (Dgreg (d, _)) ->
+        match Date.cdate_to_dmy_opt (get_birth p) with
+        | Some d ->
             not (d.day = 0 && d.month = 0 && d.prec <> Sure)
-        | Some _ | None ->
-            match Adef.od_of_cdate (get_baptism p) with
-            | Some (Dgreg (d, _)) ->
+        | None ->
+            match Date.cdate_to_dmy_opt (get_baptism p) with
+            | Some d ->
                 not (d.day = 0 && d.month = 0 && d.prec <> Sure)
-            | Some _ | None -> false
+            | None -> false
       else false
   | _ -> raise Not_found
 and eval_str_event_field conf base (p, p_auth)
@@ -2688,13 +2688,13 @@ and eval_str_event_field conf base (p, p_auth)
     "age" ->
       if p_auth then
         let (birth_date, approx) =
-          match Adef.od_of_cdate (get_birth p) with
-            None -> Adef.od_of_cdate (get_baptism p), true
+          match Date.cdate_to_dmy_opt (get_birth p) with
+          | None -> Date.cdate_to_dmy_opt (get_baptism p), true
           | x -> x, false
         in
-        match birth_date, Adef.od_of_cdate date with
-          Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
-          Some (Dgreg (({prec = Sure | About | Maybe} as d2), _))
+        match birth_date, Date.cdate_to_dmy_opt date with
+          Some (({prec = Sure | About | Maybe} as d1)),
+          Some (({prec = Sure | About | Maybe} as d2))
           when d1 <> d2 ->
             let a = Date.time_elapsed d1 d2 in
             let s =
@@ -2772,8 +2772,8 @@ and eval_bool_person_field conf base env (p, p_auth) =
       Util.accessible_by_key conf base p (p_first_name base p)
         (p_surname base p)
   | "birthday" ->
-      begin match p_auth, Adef.od_of_cdate (get_birth p) with
-        true, Some (Dgreg (d, _)) ->
+      begin match p_auth, Date.cdate_to_dmy_opt (get_birth p) with
+      | true, Some d ->
           if d.prec = Sure && get_death p = NotDead then
             d.day = conf.today.day && d.month = conf.today.month &&
             d.year < conf.today.year ||
@@ -2787,8 +2787,8 @@ and eval_bool_person_field conf base env (p, p_auth) =
         Vfam (_, fam, _, m_auth) ->
           begin match get_relation fam, get_divorce fam with
           | (Married | NoSexesCheckMarried), NotDivorced ->
-              begin match m_auth, Adef.od_of_cdate (get_marriage fam) with
-                true, Some (Dgreg (d, _)) ->
+              begin match m_auth, Date.cdate_to_dmy_opt (get_marriage fam) with
+              | true, Some d ->
                   let father = pget conf base (get_father fam) in
                   let mother = pget conf base (get_mother fam) in
                   if d.prec = Sure && authorized_age conf base father &&
@@ -2809,8 +2809,8 @@ and eval_bool_person_field conf base env (p, p_auth) =
       end
   | "computable_age" ->
       if p_auth then
-        match Adef.od_of_cdate (get_birth p), get_death p with
-          Some (Dgreg (d, _)), NotDead ->
+        match Date.cdate_to_dmy_opt (get_birth p), get_death p with
+          Some d, NotDead ->
             not (d.day = 0 && d.month = 0 && d.prec <> Sure)
         | _ -> false
       else false
@@ -2831,11 +2831,11 @@ and eval_bool_person_field conf base env (p, p_auth) =
         Vfam (_, fam, _, m_auth) ->
           if m_auth then
             match
-              Adef.od_of_cdate (get_birth p),
-              Adef.od_of_cdate (get_marriage fam)
+              Date.cdate_to_dmy_opt (get_birth p),
+              Date.cdate_to_dmy_opt (get_marriage fam)
             with
-              Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
-              Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)) ->
+              Some ({prec = Sure | About | Maybe} as d1),
+              Some ({prec = Sure | About | Maybe} as d2) ->
                 let a = Date.time_elapsed d1 d2 in
                 a.year > 0 ||
                 a.year = 0 && (a.month > 0 || a.month = 0 && a.day > 0)
@@ -2873,8 +2873,8 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_burial_date" ->
       if p_auth then
         match get_burial p with
-          Buried cod -> Adef.od_of_cdate cod <> None
-        | _ -> false
+        | Buried cod -> Adef.od_of_cdate cod <> None
+        | Cremated _ | UnknownBurial -> false
       else false
   | "has_burial_place" -> p_auth && sou base (get_burial_place p) <> ""
   | "has_burial_source" -> p_auth && sou base (get_burial_src p) <> ""
@@ -3107,8 +3107,8 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
   function
   | "access" -> acces conf base p |> safe_val
   | "age" ->
-      begin match p_auth, Adef.od_of_cdate (get_birth p), get_death p with
-        true, Some (Dgreg (d, _)), NotDead ->
+      begin match p_auth, Date.cdate_to_dmy_opt (get_birth p), get_death p with
+        true, Some d, NotDead ->
           Date.time_elapsed d conf.today
           |> DateDisplay.string_of_age conf
           |> safe_val
@@ -3297,11 +3297,11 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
         Vfam (_, fam, _, m_auth) ->
           if m_auth then
             match
-              Adef.od_of_cdate (get_birth p),
-              Adef.od_of_cdate (get_marriage fam)
+              Date.cdate_to_dmy_opt (get_birth p),
+              Date.cdate_to_dmy_opt (get_marriage fam)
             with
-              Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
-              Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)) ->
+              Some (({prec = Sure | About | Maybe} as d1)),
+              Some (({prec = Sure | About | Maybe} as d2)) ->
                 Date.time_elapsed d1 d2
                 |> DateDisplay.string_of_age conf
                 |> safe_val
@@ -3674,8 +3674,8 @@ and string_of_parent_age conf base (p, p_auth) parent : Adef.safe_string =
       let cpl = foi base ifam in
       let pp = pget conf base (parent cpl) in
       if p_auth && authorized_age conf base pp then
-        match Adef.od_of_cdate (get_birth pp), Adef.od_of_cdate (get_birth p) with
-        | Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) ->
+        match Date.cdate_to_dmy_opt (get_birth pp), Date.cdate_to_dmy_opt (get_birth p) with
+        | Some d1, Some d2 ->
           Date.time_elapsed d1 d2 |> DateDisplay.string_of_age conf
         | _ -> Adef.safe ""
       else Adef.safe ""
@@ -4313,12 +4313,12 @@ let print_foreach conf base print_ast eval_expr =
           (fun (c1, _) (c2, _) ->
              let d1 =
                match Adef.od_of_cdate (get_baptism c1) with
-                 None -> Adef.od_of_cdate (get_birth c1)
+               | None -> Adef.od_of_cdate (get_birth c1)
                | x -> x
              in
              let d2 =
                match Adef.od_of_cdate (get_baptism c2) with
-                 None -> Adef.od_of_cdate (get_birth c2)
+               | None -> Adef.od_of_cdate (get_birth c2)
                | x -> x
              in
              match d1, d2 with
