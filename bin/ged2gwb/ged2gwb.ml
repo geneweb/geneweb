@@ -3119,19 +3119,19 @@ let rec negative_date_ancestors persons ascends unions families couples i =
   done ;
   let a = ascends.(i) in
   match a.parents with
+  | None -> ()
   | Some ifam ->
     let cpl = couples.(ifam) in
     negative_date_ancestors
       persons ascends unions families couples (Adef.father cpl) ;
     negative_date_ancestors
       persons ascends unions families couples (Adef.mother cpl)
-  | _ -> ()
 
 let negative_dates persons ascends unions families couples =
   for i = 0 to Array.length persons - 1 do
     let p = persons.(i) in
-    match Date.cdate_to_dmy_opt p.birth, Date.date_of_death p.death with
-    | Some d1, Some (Dgreg (d2, _)) ->
+    match Date.cdate_to_dmy_opt p.birth, Date.dmy_of_death p.death with
+    | Some d1, Some d2 ->
       if d1.year > 0 && d2.year > 0 && Date.compare_dmy d2 d1 < 0
       then negative_date_ancestors persons ascends unions families couples i
     | _ -> ()

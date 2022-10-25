@@ -22,9 +22,9 @@ let date_interval conf base t x =
     Option.iter set (Date.cdate_to_dmy_opt (get_birth x));
     Option.iter set (Date.cdate_to_dmy_opt (get_baptism x));
     let death = get_death x in
-    (match Date.date_of_death death with
-    | Some (Dgreg (d, _)) -> set d
-    | _ -> if death = NotDead then set conf.today);
+    (match Date.dmy_of_death death with
+    | Some d -> set d
+    | None -> if death = NotDead then set conf.today);
     List.iter
       (fun t ->
         Option.iter set (Date.cdate_to_dmy_opt t.t_date_start);
