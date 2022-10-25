@@ -552,7 +552,7 @@ let is_old_person conf p =
     ( Date.cdate_to_dmy_opt p.birth,
       Date.cdate_to_dmy_opt p.baptism,
       p.death,
-      Date.date_of_death p.death )
+      Date.dmy_of_death p.death )
   with
   | _, _, NotDead, _ when conf.private_years > 0 -> false
   | Some d, _, _, _ ->
@@ -561,7 +561,7 @@ let is_old_person conf p =
   | _, Some d, _, _ ->
       let a = Date.time_elapsed d conf.today in
       strictly_after_private_years conf a
-  | _, _, _, Some (Dgreg (d, _)) ->
+  | _, _, _, Some d ->
       let a = Date.time_elapsed d conf.today in
       strictly_after_private_years conf a
   | None, None, DontKnowIfDead, None ->

@@ -95,16 +95,16 @@ module Default = struct
     else
       let check_date d none =
         match d with
-        | Some (Def.Dgreg (d, _)) ->
+        | None -> none ()
+        | Some d ->
             let a = Date.time_elapsed d conf.today in
             if a.Def.year > conf.Config.private_years then true
             else if a.year < conf.private_years then false
             else a.month > 0 || a.day > 0
-        | _ -> none ()
       in
-      check_date (Gwdb.get_birth p |> Date.od_of_cdate) @@ fun () ->
-      check_date (Gwdb.get_baptism p |> Date.od_of_cdate) @@ fun () ->
-      check_date (Gwdb.get_death p |> Date.date_of_death) @@ fun () ->
+      check_date (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) @@ fun () ->
+      check_date (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt) @@ fun () ->
+      check_date (Gwdb.get_death p |> Date.dmy_of_death) @@ fun () ->
       (Gwdb.get_access p <> Def.Private && conf.public_if_no_date)
       ||
       let families = Gwdb.get_family p in
@@ -113,7 +113,7 @@ module Default = struct
         i < len
         && check_date
              (Array.get families i |> Gwdb.foi base |> Gwdb.get_marriage
-            |> Date.od_of_cdate)
+            |> Date.cdate_to_dmy_opt)
              (fun () -> loop (i + 1))
       in
       loop 0

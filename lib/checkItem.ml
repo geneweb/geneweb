@@ -93,7 +93,7 @@ let check_person_age warning p =
   (* On pourrait faire un calcul sur la descendance ou l'ascendance si  *)
   (* on ne trouve rien ... mais c'est peut être un peu trop gourmand    *)
   (* juste pour un warning ?                                            *)
-  match odate @@ Date.date_of_death (get_death p) with
+  match Date.dmy_of_death (get_death p) with
   | None -> ()
   | Some d2 -> (
       match Date.cdate_to_dmy_opt (get_birth p) with
@@ -383,11 +383,11 @@ let born_after_his_elder_sibling warning x b np ifam des =
           if strictly_after_dmy d1 d2 then
             warning (ChildrenNotInOrder (ifam, des, elder, x))
       | None -> (
-          match odate @@ Date.date_of_death (get_death x) with
+          match Date.dmy_of_death (get_death x) with
+          | None -> ()
           | Some d2 ->
               if strictly_after_dmy d1 d2 then
-                warning (ChildrenNotInOrder (ifam, des, elder, x))
-          | None -> ()))
+                warning (ChildrenNotInOrder (ifam, des, elder, x))))
 
 let siblings_gap gap child = function
   | None -> gap
@@ -405,7 +405,7 @@ let child_born_after_his_parent warning x parent =
   | Some g1 -> (
       match Date.cdate_to_dmy_opt (get_birth x) with
       | None -> (
-          match odate @@ Date.date_of_death (get_death x) with
+          match Date.dmy_of_death (get_death x) with
           | None -> ()
           | Some g2 ->
               if strictly_after_dmy g1 g2 then
@@ -432,17 +432,17 @@ let child_born_before_mother_death warning x mother =
   match Date.cdate_to_dmy_opt (get_birth x) with
   | None -> ()
   | Some d1 -> (
-      match Date.date_of_death @@ get_death mother with
-      | Some (Dgreg (d2, _)) ->
+      match Date.dmy_of_death @@ get_death mother with
+      | None -> ()
+      | Some d2 ->
           if strictly_after_dmy d1 d2 then
-            warning (MotherDeadBeforeChildBirth (mother, x))
-      | _ -> ())
+            warning (MotherDeadBeforeChildBirth (mother, x)))
 
 let possible_father warning x father =
   match Date.cdate_to_dmy_opt (get_birth x) with
   | Some d1 when d1.prec <> Before -> (
-      match Date.date_of_death (get_death father) with
-      | Some (Dgreg (d2, _)) when d2.prec <> After ->
+      match Date.dmy_of_death (get_death father) with
+      | Some d2 when d2.prec <> After ->
           let a2 =
             match d2 with
             | { prec = YearInt dmy2 } -> dmy2.year2
@@ -450,7 +450,7 @@ let possible_father warning x father =
             | { year = a } -> a
           in
           if d1.year > a2 + 1 then warning (DeadTooEarlyToBeFather (father, x))
-      | _ -> ())
+      | Some _ | None -> ())
   | Some _ | None -> ()
 
 let child_has_sex warning child =
@@ -761,7 +761,7 @@ let check_parent_marriage_age warning fam p =
                          else if strictly_older e max_age_marriage then
                            warning (OldForMarriage (p, e, get_ifam fam))
                          else loop list
-                | _ -> loop list))
+                | Some (Dtext _) | None -> loop list))
         | _ -> loop list)
     | _ :: list -> loop list
   in
