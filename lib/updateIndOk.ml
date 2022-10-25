@@ -39,8 +39,8 @@ let reconstitute_insert_title conf ext cnt tl =
               t_name = Tnone;
               t_ident = "";
               t_place = "";
-              t_date_start = Adef.cdate_None;
-              t_date_end = Adef.cdate_None;
+              t_date_start = Date.cdate_None;
+              t_date_end = Date.cdate_None;
               t_nth = 0;
             }
           in
@@ -81,8 +81,8 @@ let rec reconstitute_titles conf ext cnt =
           t_name;
           t_ident = only_printable t_ident;
           t_place = only_printable t_place;
-          t_date_start = Adef.cdate_of_od t_date_start;
-          t_date_end = Adef.cdate_of_od t_date_end;
+          t_date_start = Date.cdate_of_od t_date_start;
+          t_date_end = Date.cdate_of_od t_date_end;
           t_nth;
         }
       in
@@ -106,7 +106,7 @@ let reconstitute_insert_pevent conf ext cnt el =
           let e1 =
             {
               epers_name = Epers_Name "";
-              epers_date = Adef.cdate_None;
+              epers_date = Date.cdate_None;
               epers_place = "";
               epers_reason = "";
               epers_note = "";
@@ -286,7 +286,7 @@ let rec reconstitute_pevents conf ext cnt =
       let e =
         {
           epers_name;
-          epers_date = Adef.cdate_of_od epers_date;
+          epers_date = Date.cdate_of_od epers_date;
           epers_place;
           epers_reason = "";
           epers_note;
@@ -380,7 +380,7 @@ let reconstitute_death conf birth baptism death_place burial burial_place =
   | "OfCourseDead" when d = None -> OfCourseDead
   | _s -> (
       match d with
-      | Some d -> Death (dr, Adef.cdate_of_date d)
+      | Some d -> Death (dr, Date.cdate_of_date d)
       | None -> DeadDontKnowWhen)
 
 let reconstitute_burial conf burial_place =
@@ -389,9 +389,9 @@ let reconstitute_burial conf burial_place =
   | Some "UnknownBurial" | None -> (
       match (d, burial_place) with
       | None, "" -> UnknownBurial
-      | _ -> Buried (Adef.cdate_of_od d))
-  | Some "Buried" -> Buried (Adef.cdate_of_od d)
-  | Some "Cremated" -> Cremated (Adef.cdate_of_od d)
+      | _ -> Buried (Date.cdate_of_od d))
+  | Some "Buried" -> Buried (Date.cdate_of_od d)
+  | Some "Cremated" -> Cremated (Date.cdate_of_od d)
   | Some x -> failwith ("bad burial type " ^ x)
 
 (* TODO EVENT put this in Event *)
@@ -440,7 +440,7 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
             if !found_death then loop l bi bp de bu
             else
               let death =
-                match Adef.od_of_cdate evt.epers_date with
+                match Date.od_of_cdate evt.epers_date with
                 | Some _d -> Death (death_reason_std_fields, evt.epers_date)
                 | None -> (
                     let death, _, _, _ = de in
@@ -526,8 +526,8 @@ let reconstitute_from_pevents pevents ext bi bp de bu =
     else pevents
   in
   (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
-  let bi = if not !found_birth then (Adef.cdate_None, "", "", "") else bi in
-  let bp = if not !found_baptism then (Adef.cdate_None, "", "", "") else bp in
+  let bi = if not !found_birth then (Date.cdate_None, "", "", "") else bi in
+  let bp = if not !found_baptism then (Date.cdate_None, "", "", "") else bp in
   let de =
     if not !found_death then
       if !found_burial then (DeadDontKnowWhen, "", "", "")
@@ -639,8 +639,8 @@ let reconstitute_person conf =
   (* Mise à jour des évènements principaux. *)
   let bi, bp, de, bu, pevents =
     reconstitute_from_pevents pevents ext
-      (Adef.cdate_of_od birth, birth_place, birth_note, birth_src)
-      (Adef.cdate_of_od bapt, bapt_place, bapt_note, bapt_src)
+      (Date.cdate_of_od birth, birth_place, birth_note, birth_src)
+      (Date.cdate_of_od bapt, bapt_place, bapt_note, bapt_src)
       (death, death_place, death_note, death_src)
       (burial, burial_place, burial_note, burial_src)
   in
@@ -654,8 +654,8 @@ let reconstitute_person conf =
     match death with
     | DontKnowIfDead ->
         (* FIXME: do not use _bb version *)
-        Update.infer_death_bb conf (Adef.od_of_cdate birth)
-          (Adef.od_of_cdate bapt)
+        Update.infer_death_bb conf (Date.od_of_cdate birth)
+          (Date.od_of_cdate bapt)
     | NotDead | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> death
   in
   let p =
@@ -737,7 +737,7 @@ let strip_pevents p =
         match e.epers_name with
         | Epers_Name s -> (s <> "", strip_array_witness e.epers_witnesses)
         | Epers_Birth | Epers_Baptism ->
-            ( Adef.od_of_cdate e.epers_date <> None
+            ( Date.od_of_cdate e.epers_date <> None
               || e.epers_place <> "" || e.epers_reason <> ""
               || e.epers_note <> "" || e.epers_src <> "",
               strip_array_witness e.epers_witnesses )

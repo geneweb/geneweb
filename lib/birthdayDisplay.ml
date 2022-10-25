@@ -78,9 +78,13 @@ let gen_print conf base mois f_scan dead_people =
                      tab.(pred j) <-
                        (p, dt.year, DeBirth, txt_of) :: tab.(pred j));
              match get_death p with
+             | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead
+             | OfCourseDead ->
+                 ()
              | Death (dr, d) -> (
-                 match Adef.date_of_cdate d with
-                 | Dgreg (dt, _) ->
+                 match Date.cdate_to_dmy_opt d with
+                 | None -> ()
+                 | Some dt ->
                      if
                        dt.prec = Sure && dt.day <> 0 && dt.month <> 0
                        && dt.month = mois && dt.delta = 0
@@ -89,9 +93,7 @@ let gen_print conf base mois f_scan dead_people =
                          let j = dt.day in
                          let a = dt.year in
                          tab.(pred j) <-
-                           (p, a, DeDeath dr, txt_of) :: tab.(pred j)
-                 | _ -> ())
-             | _ -> ())
+                           (p, a, DeDeath dr, txt_of) :: tab.(pred j)))
      done
    with Not_found -> ());
   Hutil.header conf title;
@@ -467,16 +469,16 @@ let gen_print_menu_dead conf base f_scan mode =
                    list_aft := (p, d.year, DeBirth, txt_of) :: !list_aft);
            match get_death p with
            | Death (dr, d) -> (
-               match Adef.date_of_cdate d with
-               | Dgreg (d, _) ->
+               match Date.cdate_to_dmy_opt d with
+               | None -> ()
+               | Some d ->
                    if d.prec = Sure && d.day <> 0 && d.month <> 0 then
                      if match_dates conf base p d conf.today then
                        list_tod := (p, d.year, DeDeath dr, txt_of) :: !list_tod
                      else if match_dates conf base p d tom then
                        list_tom := (p, d.year, DeDeath dr, txt_of) :: !list_tom
                      else if match_dates conf base p d aft then
-                       list_aft := (p, d.year, DeDeath dr, txt_of) :: !list_aft
-               | _ -> ())
+                       list_aft := (p, d.year, DeDeath dr, txt_of) :: !list_aft)
            | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead
            | OfCourseDead ->
                ())

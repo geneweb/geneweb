@@ -56,11 +56,11 @@ let infer_death_from_parents conf base fam =
   let moth = poi base @@ get_mother fam in
   let aux = function
     | Death (_, d), _ | _, Death (_, d) ->
-        infer_death_from_odate conf (Adef.od_of_cdate d)
+        infer_death_from_odate conf (Date.od_of_cdate d)
     | _ -> (
         match
-          ( Adef.od_of_cdate @@ get_birth moth,
-            Adef.od_of_cdate @@ get_birth fath )
+          ( Date.od_of_cdate @@ get_birth moth,
+            Date.od_of_cdate @@ get_birth fath )
         with
         | Some (Dgreg (d, _)), _ | _, Some (Dgreg (d, _)) ->
             infer_death_from_age @@ ((Date.time_elapsed d conf.today).year - 120)
@@ -68,7 +68,7 @@ let infer_death_from_parents conf base fam =
   in
   match (get_death fath, get_death moth) with
   | (Death (_, d1) as a), (Death (_, d2) as b) -> (
-      match (Adef.od_of_cdate d1, Adef.od_of_cdate d2) with
+      match (Date.od_of_cdate d1, Date.od_of_cdate d2) with
       | Some (Dgreg (d1, _) as d1'), Some (Dgreg (d2, _) as d2') ->
           if Date.compare_date d1' d2' > 0 then infer_death_from_date conf d2
           else infer_death_from_date conf d1
@@ -80,8 +80,8 @@ let infer_death_from_parents conf base fam =
 let rec infer_death conf base p =
   let death =
     infer_death_bb conf
-      (Adef.od_of_cdate (get_birth p))
-      (Adef.od_of_cdate (get_baptism p))
+      (Date.od_of_cdate (get_birth p))
+      (Date.od_of_cdate (get_baptism p))
   in
   if death <> DontKnowIfDead then death
   else
@@ -92,7 +92,7 @@ let rec infer_death conf base p =
         if i = len then DontKnowIfDead
         else
           let fam = foi base families.(i) in
-          match Adef.od_of_cdate (get_marriage fam) with
+          match Date.od_of_cdate (get_marriage fam) with
           (* TODO this 120 should be related to private_years_marriage *)
           | Some (Dgreg (d, _)) when (Date.time_elapsed d conf.today).year > 120
             ->
@@ -679,11 +679,11 @@ let print_warning conf base = function
            ^^^ " "
            ^<^ (safe_html @@ sou base t.t_place)
            ^^^ "</strong> <em>"
-           ^<^ (match Adef.od_of_cdate t.t_date_start with
+           ^<^ (match Date.od_of_cdate t.t_date_start with
                | Some d -> DateDisplay.string_of_date conf d
                | _ -> Adef.safe "")
            ^^^ "-"
-           ^<^ (match Adef.od_of_cdate t.t_date_end with
+           ^<^ (match Date.od_of_cdate t.t_date_end with
                | Some d -> DateDisplay.string_of_date conf d
                | _ -> Adef.safe "")
            ^>^ "</em>"
@@ -1136,7 +1136,7 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
         let death, death_place =
           match info with
           | Some { ci_death_date = Some d; ci_death_place = dpl } ->
-              (Death (Unspecified, Adef.cdate_of_date d), dpl)
+              (Death (Unspecified, Date.cdate_of_date d), dpl)
           | Some { ci_death_date = None; ci_death_place = dpl } when dpl <> ""
             ->
               (DeadDontKnowWhen, dpl)
@@ -1176,11 +1176,11 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
             occupation = Gwdb.insert_string base occupation;
             sex;
             access;
-            birth = Adef.cdate_of_od birth;
+            birth = Date.cdate_of_od birth;
             birth_place = Gwdb.insert_string base birth_place;
             birth_note = empty_string;
             birth_src = empty_string;
-            baptism = Adef.cdate_of_od baptism;
+            baptism = Date.cdate_of_od baptism;
             baptism_place = Gwdb.insert_string base baptism_place;
             baptism_note = empty_string;
             baptism_src = empty_string;

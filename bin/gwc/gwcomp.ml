@@ -351,7 +351,7 @@ let get_optional_deathdate l =
             let d =
               match date_of_string x i with
               | None -> DeadDontKnowWhen
-              | Some d -> Death (dr, Adef.cdate_of_date d)
+              | Some d -> Death (dr, Date.cdate_of_date d)
             in
             (Some d, l')
         | _ -> (None, l)
@@ -371,8 +371,8 @@ let get_burial l =
                 (date_of_string x i, l')
             | _ -> (None, l)
           in
-          (Buried (Adef.cdate_of_od od), l)
-      | [] -> (Buried Adef.cdate_None, l))
+          (Buried (Date.cdate_of_od od), l)
+      | [] -> (Buried Date.cdate_None, l))
   | "#crem" :: l -> (
       match l with
       | x :: l' ->
@@ -383,8 +383,8 @@ let get_burial l =
                 (date_of_string x i, l')
             | _ -> (None, l)
           in
-          (Cremated (Adef.cdate_of_od od), l)
-      | [] -> (Cremated Adef.cdate_None, l))
+          (Cremated (Date.cdate_of_od od), l)
+      | [] -> (Cremated Date.cdate_None, l))
   | _ -> (UnknownBurial, l)
 
 (** Parse sex of person *)
@@ -562,8 +562,8 @@ let scan_title t =
       t_name = name;
       t_ident = title;
       t_place = place;
-      t_date_start = Adef.cdate_of_od date_start;
-      t_date_end = Adef.cdate_of_od date_end;
+      t_date_start = Date.cdate_of_od date_start;
+      t_date_end = Date.cdate_of_od date_end;
       t_nth = nth;
     }
 
@@ -696,8 +696,8 @@ let get_mar_date str = function
       let mar, l =
         match x.[0] with
         | '+' ->
-            ( (if String.length x > 1 then Adef.cdate_of_od (date_of_string x 1)
-              else Adef.cdate_None),
+            ( (if String.length x > 1 then Date.cdate_of_od (date_of_string x 1)
+              else Date.cdate_None),
               l )
         | _ -> failwith str
       in
@@ -741,8 +741,8 @@ let get_mar_date str = function
         match l with
         | x :: l when x.[0] = '-' ->
             if String.length x > 1 then
-              (Divorced (Adef.cdate_of_od (date_of_string x 1)), l)
-            else (Divorced Adef.cdate_None, l)
+              (Divorced (Date.cdate_of_od (date_of_string x 1)), l)
+            else (Divorced Date.cdate_None, l)
         | "#sep" :: l -> (Separated, l)
         | _ -> (NotDivorced, l)
       in
@@ -808,11 +808,11 @@ let set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   in
   let naissance =
     match naissance with
-    | None -> Adef.cdate_None
-    | Some x -> Adef.cdate_of_od x
+    | None -> Date.cdate_None
+    | Some x -> Date.cdate_of_od x
   in
   let baptism =
-    match baptism with None -> Adef.cdate_None | Some x -> Adef.cdate_of_od x
+    match baptism with None -> Date.cdate_None | Some x -> Date.cdate_of_od x
   in
   let burial, l = get_burial l in
   let burial_place, l = get_field "#rp" l in
@@ -1104,8 +1104,8 @@ let read_family ic fname = function
                     let src, l = get_field "#s" l in
                     let date =
                       match date with
-                      | None -> Adef.cdate_None
-                      | Some x -> Adef.cdate_of_od x
+                      | None -> Date.cdate_None
+                      | Some x -> Date.cdate_of_od x
                     in
                     if l <> [] then failwith str;
                     (* On récupère les témoins *)
@@ -1265,8 +1265,8 @@ let read_family ic fname = function
                 let src, l = get_field "#s" l in
                 let date =
                   match date with
-                  | None -> Adef.cdate_None
-                  | Some x -> Adef.cdate_of_od x
+                  | None -> Date.cdate_None
+                  | Some x -> Date.cdate_of_od x
                 in
                 if l <> [] then failwith str;
                 (* On récupère les témoins *)

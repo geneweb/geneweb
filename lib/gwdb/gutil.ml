@@ -233,18 +233,18 @@ let sort_person_list_aux sort base =
       else
         match
           match
-            ( Adef.od_of_cdate (get_birth p1),
+            ( Date.od_of_cdate (get_birth p1),
               get_death p1,
-              Adef.od_of_cdate (get_birth p2),
+              Date.od_of_cdate (get_birth p2),
               get_death p2 )
           with
           | Some d1, _, Some d2, _ -> Date.compare_date d1 d2
           | Some d1, _, _, Death (_, d2) ->
-              Date.compare_date d1 (Adef.date_of_cdate d2)
+              Date.compare_date d1 (Date.date_of_cdate d2)
           | _, Death (_, d1), Some d2, _ ->
-              Date.compare_date (Adef.date_of_cdate d1) d2
+              Date.compare_date (Date.date_of_cdate d1) d2
           | _, Death (_, d1), _, Death (_, d2) ->
-              Date.compare_date (Adef.date_of_cdate d1) (Adef.date_of_cdate d2)
+              Date.compare_date (Date.date_of_cdate d1) (Date.date_of_cdate d2)
           | Some _, _, _, _ -> 1
           | _, Death (_, _), _, _ -> 1
           | _, _, Some _, _ -> -1
@@ -284,8 +284,8 @@ let find_free_occ base f s =
 
 let get_birth_death_date p =
   let birth_date, approx =
-    match Adef.od_of_cdate (get_birth p) with
-    | None -> (Adef.od_of_cdate (get_baptism p), true)
+    match Date.od_of_cdate (get_birth p) with
+    | None -> (Date.od_of_cdate (get_baptism p), true)
     | x -> (x, false)
   in
   let death_date, approx =
@@ -293,7 +293,7 @@ let get_birth_death_date p =
     | Some d -> (Some d, approx)
     | None -> (
         match get_burial p with
-        | Buried cd | Cremated cd -> (Adef.od_of_cdate cd, true)
+        | Buried cd | Cremated cd -> (Date.od_of_cdate cd, true)
         | UnknownBurial -> (None, approx))
   in
   (birth_date, death_date, approx)

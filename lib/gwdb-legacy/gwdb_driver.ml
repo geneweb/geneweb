@@ -128,11 +128,11 @@ let delete_person base ip =
       occupation = empty_string;
       sex = Neuter;
       access = Private;
-      birth = Adef.cdate_None;
+      birth = Date.cdate_None;
       birth_place = empty_string;
       birth_note = empty_string;
       birth_src = empty_string;
-      baptism = Adef.cdate_None;
+      baptism = Date.cdate_None;
       baptism_place = empty_string;
       baptism_note = empty_string;
       baptism_src = empty_string;
@@ -158,7 +158,7 @@ let delete_union base ip = patch_union base ip { family = [||] }
 let delete_family base ifam =
   patch_family base ifam
     {
-      marriage = Adef.cdate_None;
+      marriage = Date.cdate_None;
       marriage_place = empty_string;
       marriage_note = empty_string;
       marriage_src = empty_string;

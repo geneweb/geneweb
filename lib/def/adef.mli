@@ -41,23 +41,15 @@ and precision =
   | OrYear of dmy2
   | YearInt of dmy2
 
-type cdate
 (** Compressed date *)
-
-val date_of_cdate : cdate -> date
-(** Convert [cdate] to [date] *)
-
-val cdate_of_date : date -> cdate
-(** Convert [date] to [cdate] *)
-
-val cdate_None : cdate
-(** Absent compressed date *)
-
-val od_of_cdate : cdate -> date option
-(** Optional date from [cdate] *)
-
-val cdate_of_od : date option -> cdate
-(** Optional date to [cdate] *)
+type cdate =
+  | Cgregorian of int
+  | Cjulian of int
+  | Cfrench of int
+  | Chebrew of int
+  | Ctext of string
+  | Cdate of date
+  | Cnone
 
 type 'person gen_couple
 (** Polymorphic type to represent a family's couple.
