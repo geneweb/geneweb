@@ -84,10 +84,7 @@ let select_family conf base get_date find_oldest =
     (if find_oldest then (module FQ_oldest) else (module FQ))
     nb_of_families Gwdb.ifams Gwdb.foi get_date conf base
 
-let death_date p =
-  match get_death p with
-  | Death (_, cd) -> Some (Adef.date_of_cdate cd)
-  | _ -> None
+let death_date p = Date.date_of_death (get_death p)
 
 let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
   let men = Array.make (nb_intervals + 1) 0 in
@@ -108,12 +105,12 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
               if
                 (dea = NotDead || (dea = DontKnowIfDead && a.year < limit))
                 ||
-                match dea with
-                | Death (_, cd) -> (
-                    match Adef.date_of_cdate cd with
+                match Date.date_of_death dea with
+                | None -> false
+                | Some d -> (
+                    match d with
                     | Dgreg (d, _) -> Date.compare_dmy d at_date > 0
                     | _ -> false)
-                | _ -> false
               then
                 if sex = Male then men.(j) <- men.(j) + 1
                 else wom.(j) <- wom.(j) + 1)

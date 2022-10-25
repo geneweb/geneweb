@@ -135,7 +135,7 @@ and eval_divorce fam =
 (* TODO : rewrite, second case with None passed as an argument looks odd *)
 and eval_divorce' fam s =
   match fam.divorce with
-  | Divorced d -> eval_date_var (Adef.od_of_cdate d) s
+  | Divorced d -> eval_date_var (Date.od_of_cdate d) s
   | NotDivorced | Separated -> eval_date_var None s
 
 and eval_is_first env =
@@ -185,7 +185,7 @@ and eval_event_str conf base env fam =
           |> Adef.safe_fn Utf8.capitalize_fst
         in
         let date =
-          match Adef.od_of_cdate e.efam_date with
+          match Date.od_of_cdate e.efam_date with
           | Some d -> DateDisplay.string_of_date conf d
           | None -> Adef.safe ""
         in
@@ -245,7 +245,7 @@ and eval_default_var conf s = Update_util.eval_default_var conf s
 
 and eval_event_date env fam s =
   let od =
-    family_events_opt env fam >>= fun e -> Adef.od_of_cdate e.efam_date
+    family_events_opt env fam >>= fun e -> Date.od_of_cdate e.efam_date
   in
   eval_date_var od s
 
@@ -262,7 +262,7 @@ and eval_simple_var conf base env (fam, cpl, des) = function
       safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
   | [ "is_first" ] -> eval_is_first env
   | [ "is_last" ] -> eval_is_last env
-  | [ "marriage"; s ] -> eval_date_var (Adef.od_of_cdate fam.marriage) s
+  | [ "marriage"; s ] -> eval_date_var (Date.od_of_cdate fam.marriage) s
   | [ "marriage_place" ] ->
       safe_val (Util.escape_html fam.marriage_place :> Adef.safe_string)
   | [ "marriage_note" ] ->
@@ -687,7 +687,7 @@ let print_add conf base =
   in
   let fam =
     {
-      marriage = Adef.cdate_None;
+      marriage = Date.cdate_None;
       marriage_place = "";
       marriage_note = "";
       marriage_src = "";
@@ -706,11 +706,12 @@ let print_add conf base =
 
 let print_add_parents conf base =
   match p_getenv conf.env "ip" with
+  | None -> Hutil.incorrect_request conf
   | Some i ->
       let p = poi base (iper_of_string i) in
       let fam =
         {
-          marriage = Adef.cdate_None;
+          marriage = Date.cdate_None;
           marriage_place = "";
           marriage_note = "";
           marriage_src = "";
@@ -740,7 +741,6 @@ let print_add_parents conf base =
         }
       in
       print_update_fam conf base (fam, cpl, des) ""
-  | _ -> Hutil.incorrect_request conf
 
 let print_mod conf base =
   match p_getenv conf.env "i" with

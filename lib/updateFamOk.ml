@@ -118,7 +118,7 @@ let reconstitute_insert_event conf ext cnt el =
           let e1 =
             {
               efam_name = Efam_Name "";
-              efam_date = Adef.cdate_None;
+              efam_date = Date.cdate_None;
               efam_place = "";
               efam_reason = "";
               efam_note = "";
@@ -258,7 +258,7 @@ let rec reconstitute_events conf ext cnt =
       let e =
         {
           efam_name;
-          efam_date = Adef.cdate_of_od efam_date;
+          efam_date = Date.cdate_of_od efam_date;
           efam_place;
           efam_reason = "";
           efam_note;
@@ -368,7 +368,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
   let marr, wit =
     match !found_marriage with
     | None ->
-        ( (NoMention, Adef.cdate_None, empty_string, empty_string, empty_string),
+        ( (NoMention, Date.cdate_None, empty_string, empty_string, empty_string),
           [||] )
     | Some (kind, date, place, note, src, wit) ->
         ((kind, date, place, note, src), wit)
@@ -448,7 +448,7 @@ let reconstitute_family conf base nsck =
       let evt =
         {
           efam_name = Efam_NoMention;
-          efam_date = Adef.cdate_None;
+          efam_date = Date.cdate_None;
           efam_place = "";
           efam_reason = "";
           efam_note = "";
@@ -687,7 +687,7 @@ let fwitnesses_of fevents =
 (* Lorsqu'on ajout naissance décès par exemple en créant une personne. *)
 let patch_person_with_pevents base ip =
   let p = poi base ip |> gen_person_of_person in
-  let evt ~name ?(date = Adef.cdate_None) ~place ~src ~note () =
+  let evt ~name ?(date = Date.cdate_None) ~place ~src ~note () =
     {
       epers_name = name;
       epers_date = date;
@@ -707,7 +707,7 @@ let patch_person_with_pevents base ip =
       let src = p.birth_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    if Option.is_some (Adef.od_of_cdate p.birth) then evt ~date:p.birth ()
+    if Option.is_some (Date.od_of_cdate p.birth) then evt ~date:p.birth ()
     else if sou base p.birth_place = "" then None
     else evt ()
   in
@@ -719,7 +719,7 @@ let patch_person_with_pevents base ip =
       let src = p.baptism_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    if Option.is_some (Adef.od_of_cdate p.baptism) then evt ~date:p.baptism ()
+    if Option.is_some (Date.od_of_cdate p.baptism) then evt ~date:p.baptism ()
     else if sou base p.baptism_place = "" then None
     else evt ()
   in
@@ -731,12 +731,11 @@ let patch_person_with_pevents base ip =
       let src = p.death_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    match p.death with
-    | Death (_, cd) ->
-        let date = Adef.cdate_of_od (Some (Adef.date_of_cdate cd)) in
+    match Date.date_of_death p.death with
+    | Some cd ->
+        let date = Date.cdate_of_od (Some cd) in
         evt ~date ()
-    | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead ->
-        if sou base p.death_place = "" then None else evt ()
+    | None -> if sou base p.death_place = "" then None else evt ()
   in
   (* Attention, on prend aussi les autres évènements sinon,  *)
   (* on va tout effacer et ne garder que naissance et décès. *)
@@ -1273,7 +1272,7 @@ let print_add_parents o_conf base =
   let nsck = p_getenv conf.env "nsck" = Some "on" in
   let sfam, scpl, sdes, _ = reconstitute_family conf base nsck in
   if
-    sfam.marriage = Adef.cdate_None
+    sfam.marriage = Date.cdate_None
     && sfam.marriage_place = "" && sfam.marriage_note = ""
     && sfam.marriage_src = "" && sfam.witnesses = [||]
     && sfam.relation = Married && sfam.divorce = NotDivorced
@@ -1281,7 +1280,7 @@ let print_add_parents o_conf base =
        = [
            {
              efam_name = Efam_Marriage;
-             efam_date = Adef.cdate_None;
+             efam_date = Date.cdate_None;
              efam_place = "";
              efam_reason = "";
              efam_note = "";

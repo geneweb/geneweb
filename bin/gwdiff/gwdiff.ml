@@ -237,8 +237,8 @@ let compatible_dates date1 date2 =
 
 (** Same than before, but for Adef.ctype. *)
 let compatible_cdates cdate1 cdate2 =
-  let od1 = Adef.od_of_cdate cdate1 in
-  let od2 = Adef.od_of_cdate cdate2 in
+  let od1 = Date.od_of_cdate cdate1 in
+  let od2 = Date.od_of_cdate cdate2 in
   match (od1, od2) with
   | Some date1, Some date2 -> compatible_dates date1 date2
   | Some _, None -> false
@@ -252,7 +252,7 @@ let compatible_cdates cdate1 cdate2 =
     If birth place are not compatible, the returned list will have MsgBirthPlace *)
 let compatible_birth p1 p2 =
   let get_birth person =
-    if person.birth = Adef.cdate_None then person.baptism else person.birth
+    if person.birth = Date.cdate_None then person.baptism else person.birth
   in
   let birth1 = get_birth p1 in
   let birth2 = get_birth p2 in
@@ -271,8 +271,8 @@ let compatible_death p1 p2 =
     ||
     match (p1.death, p2.death) with
     | Death (_, cdate1), Death (_, cdate2) ->
-        let date1 = Adef.date_of_cdate cdate1 in
-        let date2 = Adef.date_of_cdate cdate2 in
+        let date1 = Date.date_of_cdate cdate1 in
+        let date2 = Date.date_of_cdate cdate2 in
         compatible_dates date1 date2
     | NotDead, _
     | DeadYoung, Death (_, _)
