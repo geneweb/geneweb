@@ -9,80 +9,46 @@ open Dag
 let image_normal_txt conf base p fname width height =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
   let s = Unix.stat fname in
-  let b = acces conf base p in
   let k = Image.default_portrait_filename base p in
   let r =
-    "<img src=\""
-    ^<^ commd conf
-    ^^^ "m=IM&d="
-    ^<^ (string_of_int @@ int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
-    ^<^ "&"
-    ^<^ b
-    ^^^ "&k=/"
-    ^<^ Util.escape_html k
-    ^>^ "\""
-    ^ (if width = 0 then "" else " width=\"" ^ string_of_int width ^ "\"")
-    ^ (if height = 0 then "" else " height=\"" ^ string_of_int height ^ "\"")
-    ^ " alt=\""
-    ^ image_txt
-    ^ "\" title=\""
-    ^ image_txt
-    ^ "\" style=\""
-    ^ (if width = 0 then "" else "max-width:" ^ string_of_int width ^ "px;")
-    ^ " "
-    ^ (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
-    ^ "\">"
+    Format.sprintf {|<img src="%sm=IM&d=%s&%s&k=%s"%s%s alt="%s" title="%s"
+        style="%s %s">|}
+      (commd conf :Adef.escaped_string :> string)
+      (string_of_int @@ int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
+      (acces conf base p : Adef.escaped_string :> string) k
+      (if width = 0 then "" else " width=" ^ string_of_int width)
+      (if height = 0 then "" else " height=" ^ string_of_int height)
+      image_txt image_txt
+      (if width = 0 then "" else "max-width:" ^ string_of_int width ^ "px;")
+      (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
   in
-  {|<a href="|}
-  ^ (commd conf : Adef.escaped_string :> string)
-  ^ {|m=IM&|}
-  ^ (b : Adef.escaped_string :> string)
-  ^ {|&k=/|}
-  ^ k
-  ^ {|">|}
-  ^ (r : Adef.escaped_string :> string)
-  ^ "</a>"
+  Format.sprintf {|<a href="%sm=IM&%s&k=%s">%s</a>|}
+    (commd conf : Adef.escaped_string :> string)
+    (acces conf base p : Adef.escaped_string :> string) k r
   |> Adef.safe
 
 let image_url_txt conf url_p url height : Adef.safe_string =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
-  {|<a href="|}
-  ^ (url_p : Adef.escaped_string :> string)
-  ^ {|"><img src="|}
-  ^ (url : Adef.escaped_string :> string)
-  ^ {|" alt="|}
-  ^ image_txt
-  ^ {|" title="|}
-  ^ image_txt
-  ^ {|" style="|}
-  ^ (if height = 0 then "" else "max-height:"
-  ^ string_of_int height ^ "px;")
-  ^ {|">|}
-  ^ {|</a>|}
+  Format.sprintf {|<a href="%s"><img src="%s" alt="%s" title="%s"
+      style="%s"></a>|}
+    (url_p : Adef.escaped_string :> string)
+    (url : Adef.escaped_string :> string)
+    image_txt image_txt
+    (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
   |> Adef.safe
 
 let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
-  {|<a href="|}
-  ^ (url_p : Adef.escaped_string :> string)
-  ^ {|">|}
-  ^ {|<img src="|}
-  ^ (url : Adef.escaped_string :> string)
-  ^ {|" width="|}
-  ^ string_of_int width
-  ^ {|" height="|}
-  ^ string_of_int height
-  ^ {|" alt="|}
-  ^ image_txt
-  ^ {|" title="|}
-  ^ image_txt
-  ^ {|" style="|}
-  ^ (if width = 0 then "" else " max-width:" ^ string_of_int width ^ "px;")
-  ^ {| |}
-  ^ (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;")
-  ^ {|">|}
-  ^ image_txt
-  ^ "</a>"
+  Format.sprintf {|<a href="%s"><img src="%s"%s%s alt="%s" title="%s"
+      style="%s %s">%s</a>|}
+    (url_p : Adef.escaped_string :> string)
+    (url : Adef.escaped_string :> string)
+    (if width = 0 then "" else " width=" ^ string_of_int width)
+    (if height = 0 then "" else " height=" ^ string_of_int height)
+    image_txt image_txt
+    (if width = 0 then "" else "max-width:" ^ string_of_int width ^ "px;")
+    (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
+    image_txt
   |> Adef.safe
 
 let image_txt conf base p =
