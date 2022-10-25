@@ -27,8 +27,9 @@ val time_elapsed : Def.dmy -> Def.dmy -> Def.dmy
     (e.g. time_elapsed_opt /1839 /1859). *)
 val time_elapsed_opt : Def.dmy -> Def.dmy -> Def.dmy option
 
-(* TODO same with burial? personal/familial event?  *)
-(* TODO add a dmy_of_death *)
+(* TODO add date_of_burial/event?  *)
+val dmy_of_death : Def.death -> Adef.dmy option
+
 (** Returns date of death if present. *)
 val date_of_death : Def.death -> Adef.date option
 

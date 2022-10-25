@@ -94,13 +94,9 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
             let a = Date.time_elapsed dmy at_date in
             let j = min nb_intervals (a.year / interval) in
             if (dea = NotDead || dea = DontKnowIfDead && a.year < limit)
-            || match Date.date_of_death dea with
-            | None -> false
-            | Some d ->
-              begin match d with
-                | Dgreg (d, _) -> Date.compare_dmy d at_date > 0
-                | _ -> false
-              end
+            || match Date.dmy_of_death dea with
+               | None -> false
+               | Some d -> Date.compare_dmy d at_date > 0
             then
               if sex = Male then men.(j) <- men.(j) + 1
               else wom.(j) <- wom.(j) + 1
