@@ -126,20 +126,19 @@ let person_of_iper_array conf base ipl =
   |> String.concat ", " |> Adef.safe
 
 let string_of_cdate conf cod =
-  match Adef.od_of_cdate cod with
+  match Date.od_of_cdate cod with
   | Some d -> DateDisplay.string_slash_of_date conf d
   | None -> Adef.safe ""
 
 let string_of_death conf death =
-  match death with
-  | Death (_, cd) ->
-      DateDisplay.string_slash_of_date conf (Adef.date_of_cdate cd)
-  | _ -> Adef.safe ""
+  match Date.date_of_death death with
+  | Some cd -> DateDisplay.string_slash_of_date conf cd
+  | None -> Adef.safe ""
 
 let string_of_burial conf burial =
   match burial with
   | Buried cod | Cremated cod -> string_of_cdate conf cod
-  | _ -> Adef.safe ""
+  | UnknownBurial -> Adef.safe ""
 
 let string_of_title conf titles : Adef.safe_string =
   let string_of_t_name t =
@@ -247,13 +246,16 @@ let string_of_rparents conf base rparents : Adef.safe_string =
   |> Adef.safe
 
 let string_of_marriage conf marriage =
-  match marriage with
-  | NotMarried | NoSexesCheckNotMarried -> transl conf "with" |> Adef.safe
-  | Married | NoSexesCheckMarried -> transl conf "married" |> Adef.safe
-  | Engaged -> transl conf "engaged" |> Adef.safe
-  | NoMention | MarriageBann | MarriageContract | MarriageLicense | Pacs
-  | Residence ->
-      transl conf "with" |> Adef.safe
+  let s =
+    match marriage with
+    | NotMarried | NoSexesCheckNotMarried -> "with"
+    | Married | NoSexesCheckMarried -> "married"
+    | Engaged -> "engaged"
+    | NoMention | MarriageBann | MarriageContract | MarriageLicense | Pacs
+    | Residence ->
+        "with"
+  in
+  Adef.safe (transl conf s)
 
 let string_of_divorce conf divorce =
   match divorce with

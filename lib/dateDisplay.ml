@@ -617,10 +617,10 @@ let short_marriage_date_text conf base fam p1 p2 =
   Adef.safe
   @@
   if authorized_age conf base p1 && authorized_age conf base p2 then
-    match Adef.od_of_cdate (get_marriage fam) with
-    | Some (Dgreg (d, _)) ->
+    match Date.cdate_to_dmy_opt (get_marriage fam) with
+    | Some d ->
         "<span style=\"font-size:70%\">" ^ prec_year_text conf d ^ "</span>"
-    | _ -> ""
+    | None -> ""
   else ""
 
 (* For public interfce, force [string_of_prec_dmy] args to be safe strings *)

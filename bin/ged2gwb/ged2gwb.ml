@@ -1181,8 +1181,8 @@ let treat_indi_title gen public_name r =
     | None -> Tnone, title, place
   in
   {t_name = name; t_ident = add_string gen title;
-   t_place = add_string gen place; t_date_start = Adef.cdate_of_od date_start;
-   t_date_end = Adef.cdate_of_od date_end; t_nth = nth}
+   t_place = add_string gen place; t_date_start = Date.cdate_of_od date_start;
+   t_date_end = Date.cdate_of_od date_end; t_nth = nth}
 
 let forward_adop gen ip lab which_parent =
   Hashtbl.add
@@ -1476,7 +1476,7 @@ let treat_indi_pevent gen ip r =
               in
               let witnesses = find_event_witness gen "INDI" ip r in
               let evt =
-                {epers_name = name; epers_date = Adef.cdate_of_od date;
+                {epers_name = name; epers_date = Date.cdate_of_od date;
                  epers_place = add_string gen place;
                  epers_reason = add_string gen reason;
                  epers_note = add_string gen note;
@@ -1548,7 +1548,7 @@ let treat_indi_pevent gen ip r =
                in
                let witnesses = find_event_witness gen "INDI" ip r in
                let evt =
-                 {epers_name = name; epers_date = Adef.cdate_of_od date;
+                 {epers_name = name; epers_date = Date.cdate_of_od date;
                   epers_place = add_string gen place;
                   epers_reason = add_string gen reason;
                   epers_note = add_string gen note;
@@ -1619,8 +1619,8 @@ let reconstitute_from_pevents pevents bi bp de bu =
             if !found_death then loop l bi bp de bu
             else
               let death =
-                match Adef.od_of_cdate evt.epers_date with
-                  Some d -> Death (Unspecified, Adef.cdate_of_date d)
+                match Date.od_of_cdate evt.epers_date with
+                | Some d -> Death (Unspecified, Date.cdate_of_date d)
                 | None -> DeadDontKnowWhen
               in
               let de =
@@ -1909,7 +1909,7 @@ let add_indi gen r =
   in
   let (death, death_place, (death_note, _), (death_src, death_nt)) =
     match find_field "DEAT" r.rsons with
-      Some r ->
+    | Some r ->
       if r.rsons = [] then
         if r.rval = "Y" then DeadDontKnowWhen, "", ("", []), ("", [])
         else infer_death birth bapt, "", ("", []), ("", [])
@@ -1918,19 +1918,19 @@ let add_indi gen r =
           match find_field "DATE" r.rsons with
             Some r ->
             begin match date_of_field r.rval with
-                Some d -> Death (Unspecified, Adef.cdate_of_date d)
+              | Some d -> Death (Unspecified, Date.cdate_of_date d)
               | None -> DeadDontKnowWhen
             end
           | _ -> DeadDontKnowWhen
         in
         let p =
           match find_field "PLAC" r.rsons with
-            Some r -> strip_spaces r.rval
-          | _ -> ""
+          | Some r -> strip_spaces r.rval
+          | None -> ""
         in
         let note =
           match find_all_fields "NOTE" r.rsons with
-            [] -> ""
+          | [] -> ""
           | rl -> treat_notes gen rl
         in
         d, p, (note, []), source gen r
@@ -1942,7 +1942,7 @@ let add_indi gen r =
         Some r ->
         if r.rsons = [] then
           if r.rval = "Y" then
-            Buried Adef.cdate_None, "", ("", []), ("", [])
+            Buried Date.cdate_None, "", ("", []), ("", [])
           else UnknownBurial, "", ("", []), ("", [])
         else
           let d =
@@ -1960,7 +1960,7 @@ let add_indi gen r =
               [] -> ""
             | rl -> treat_notes gen rl
           in
-          Buried (Adef.cdate_of_od d), p, (note, []), source gen r
+          Buried (Date.cdate_of_od d), p, (note, []), source gen r
       | None -> UnknownBurial, "", ("", []), ("", [])
     in
     let (crem, crem_place, (crem_note, _), (crem_src, crem_nt)) =
@@ -1968,7 +1968,7 @@ let add_indi gen r =
         Some r ->
         if r.rsons = [] then
           if r.rval = "Y" then
-            Cremated Adef.cdate_None, "", ("", []), ("", [])
+            Cremated Date.cdate_None, "", ("", []), ("", [])
           else UnknownBurial, "", ("", []), ("", [])
         else
           let d =
@@ -1986,7 +1986,7 @@ let add_indi gen r =
               [] -> ""
             | rl -> treat_notes gen rl
           in
-          Cremated (Adef.cdate_of_od d), p, (note, []), source gen r
+          Cremated (Date.cdate_of_od d), p, (note, []), source gen r
       | None -> UnknownBurial, "", ("", []), ("", [])
     in
     match buri, crem with
@@ -1994,8 +1994,8 @@ let add_indi gen r =
       crem, crem_place, (crem_note, []), (crem_src, crem_nt)
     | _ -> buri, buri_place, (buri_note, []), (buri_src, buri_nt)
   in
-  let birth = Adef.cdate_of_od birth in
-  let bapt = Adef.cdate_of_od bapt in
+  let birth =Date.cdate_of_od birth in
+  let bapt =Date.cdate_of_od bapt in
   let (psources, psources_nt) =
     let (s, s_nt) = source gen r in
     if s = "" then !default_source, s_nt else s, s_nt
@@ -2199,7 +2199,7 @@ let treat_fam_fevent gen ifath r =
                 | _ -> name, place
               in
               let evt =
-                {efam_name = name; efam_date = Adef.cdate_of_od date;
+                {efam_name = name; efam_date = Date.cdate_of_od date;
                  efam_place = add_string gen place;
                  efam_reason = add_string gen reason;
                  efam_note = add_string gen note;
@@ -2267,7 +2267,7 @@ let treat_fam_fevent gen ifath r =
                in
                let witnesses = find_fevent_witness gen "INDI" ifath r in
                let evt =
-                 {efam_name = name; efam_date = Adef.cdate_of_od date;
+                 {efam_name = name; efam_date = Date.cdate_of_od date;
                   efam_place = add_string gen place;
                   efam_reason = add_string gen reason;
                   efam_note = add_string gen note;
@@ -2326,10 +2326,10 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on met une précision "vers".      *)
               let date =
-                match Adef.od_of_cdate evt.efam_date with
-                  Some (Dgreg (dmy, cal)) ->
+                match Date.od_of_cdate evt.efam_date with
+                | Some (Dgreg (dmy, cal)) ->
                     let dmy = {dmy with prec = About} in
-                    Adef.cdate_of_od (Some (Dgreg (dmy, cal)))
+                    Date.cdate_of_od (Some (Dgreg (dmy, cal)))
                 | _ -> evt.efam_date
               in
               (* Pour différencier le fait qu'on recopie le *)
@@ -2512,12 +2512,12 @@ let add_fam_norm gen r adop_list =
     match find_field "DIV" r.rsons with
       Some r ->
       begin match find_field "DATE" r.rsons with
-          Some d -> Divorced (Adef.cdate_of_od (date_of_field d.rval))
+          Some d -> Divorced (Date.cdate_of_od (date_of_field d.rval))
         | _ ->
           match find_field "PLAC" r.rsons with
-            Some _ -> Divorced Adef.cdate_None
+            Some _ -> Divorced Date.cdate_None
           | _ ->
-            if r.rval = "Y" then Divorced Adef.cdate_None else NotDivorced
+            if r.rval = "Y" then Divorced Date.cdate_None else NotDivorced
       end
     | None -> NotDivorced
   in
@@ -2571,7 +2571,7 @@ let add_fam_norm gen r adop_list =
   in
   (* Mise à jour des évènements principaux. *)
   let (marr, marr_place, marr_note, marr_src) =
-    Adef.cdate_of_od marr, add_string gen marr_place,
+    Date.cdate_of_od marr, add_string gen marr_place,
     add_string gen marr_note, add_string gen marr_src
   in
   (* On tri les évènements pour être sûr. *)
@@ -3089,15 +3089,15 @@ let neg_year = function
   | Dgreg (d, cal) -> Dgreg (neg_year_dmy d, cal)
   | x -> x
 
-let neg_year_cdate cd = Adef.cdate_of_date (neg_year (Adef.date_of_cdate cd))
+let neg_year_cdate cd = Date.cdate_of_date (neg_year (Date.date_of_cdate cd))
 
 let rec negative_date_ancestors persons ascends unions families couples i =
   let p = persons.(i) in
   let p =
     { p with
-      birth = begin match Adef.od_of_cdate p.birth with
-        | Some d1 -> Adef.cdate_of_od (Some (neg_year d1))
-        | _ -> p.birth
+      birth = begin match Date.od_of_cdate p.birth with
+        | Some d1 -> Date.cdate_of_od (Some (neg_year d1))
+        | None -> p.birth
       end ;
       death = match p.death with
         | Death (dr, cd2) -> Death (dr, neg_year_cdate cd2)
@@ -3109,13 +3109,13 @@ let rec negative_date_ancestors persons ascends unions families couples i =
   for i = 0 to Array.length u.family - 1 do
     let j = u.family.(i) in
     let fam = families.(j) in
-    match Adef.od_of_cdate fam.marriage with
+    match Date.od_of_cdate fam.marriage with
+    | None -> ()
     | Some d ->
       let fam =
-        { fam with marriage = Adef.cdate_of_od (Some (neg_year d)) }
+        { fam with marriage = Date.cdate_of_od (Some (neg_year d)) }
       in
       families.(j) <- fam
-    | None -> ()
   done ;
   let a = ascends.(i) in
   match a.parents with
@@ -3130,8 +3130,8 @@ let rec negative_date_ancestors persons ascends unions families couples i =
 let negative_dates persons ascends unions families couples =
   for i = 0 to Array.length persons - 1 do
     let p = persons.(i) in
-    match Adef.od_of_cdate p.birth, Date.date_of_death p.death with
-    | Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) ->
+    match Date.cdate_to_dmy_opt p.birth, Date.date_of_death p.death with
+    | Some d1, Some (Dgreg (d2, _)) ->
       if d1.year > 0 && d2.year > 0 && Date.compare_dmy d2 d1 < 0
       then negative_date_ancestors persons ascends unions families couples i
     | _ -> ()
@@ -3143,13 +3143,13 @@ let finish_base (persons, families, strings, _) =
   for i = 0 to Array.length descends - 1 do
     let des = descends.(i) in
     let children = des.children in
-    sort_by_date (fun i -> Adef.od_of_cdate persons.(i).birth) children ;
+    sort_by_date (fun i -> Date.od_of_cdate persons.(i).birth) children ;
     descends.(i) <- { children }
   done ;
   for i = 0 to Array.length unions - 1 do
     let u = unions.(i) in
     let family = u.family in
-    sort_by_date (fun i -> Adef.od_of_cdate families.(i).marriage) family ;
+    sort_by_date (fun i -> Date.od_of_cdate families.(i).marriage) family ;
     unions.(i) <- { family }
   done ;
   for i = 0 to Array.length persons - 1 do

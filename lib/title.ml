@@ -21,9 +21,10 @@ let date_interval conf base t x =
     in
     Option.iter set (Date.cdate_to_dmy_opt (get_birth x));
     Option.iter set (Date.cdate_to_dmy_opt (get_baptism x));
-    (match Date.date_of_death (get_death x) with
+    let death = get_death x in
+    (match Date.date_of_death death with
     | Some (Dgreg (d, _)) -> set d
-    | _ -> if get_death x = NotDead then set conf.today);
+    | _ -> if death = NotDead then set conf.today);
     List.iter
       (fun t ->
         Option.iter set (Date.cdate_to_dmy_opt t.t_date_start);
@@ -41,11 +42,11 @@ let date_interval conf base t x =
             Option.iter set (Date.cdate_to_dmy_opt md);
             loop JustSelf (pget conf base conj);
             match t with
+            | AddSpouse | JustSelf -> ()
             | AddChildren ->
                 Array.iter
                   (fun e -> loop JustSelf (pget conf base e))
-                  (get_children fam)
-            | _ -> ())
+                  (get_children fam))
           (get_family u)
   in
   loop t x;
@@ -54,19 +55,19 @@ let date_interval conf base t x =
 let compare_title_dates conf base (x1, t1) (x2, t2) =
   match
     ( ( get_birth x1,
-        Adef.od_of_cdate t1.t_date_start,
-        Adef.od_of_cdate t1.t_date_end,
+        Date.od_of_cdate t1.t_date_start,
+        Date.od_of_cdate t1.t_date_end,
         get_death x1 ),
       ( get_birth x2,
-        Adef.od_of_cdate t2.t_date_start,
-        Adef.od_of_cdate t2.t_date_end,
+        Date.od_of_cdate t2.t_date_start,
+        Date.od_of_cdate t2.t_date_end,
         get_death x2 ) )
   with
   | (_, Some (Dgreg (d1, _)), _, _), (_, Some (Dgreg (d2, _)), _, _) -> (
       match Date.compare_dmy d1 d2 with
       | 0 -> (
           match
-            (Adef.od_of_cdate t1.t_date_end, Adef.od_of_cdate t2.t_date_end)
+            (Date.od_of_cdate t1.t_date_end, Date.od_of_cdate t2.t_date_end)
           with
           | Some d1, Some d2 -> Date.compare_date d1 d2
           | _ -> -1)
@@ -75,10 +76,10 @@ let compare_title_dates conf base (x1, t1) (x2, t2) =
     ->
       Date.compare_date d1 d2
   | (_, _, _, Death (_, d1)), (_, Some d2, _, _)
-    when Date.compare_date (Adef.date_of_cdate d1) d2 <= 0 ->
+    when Date.compare_date (Date.date_of_cdate d1) d2 <= 0 ->
       -1
   | (_, Some (Dgreg (_, _) as d1), _, _), (_, _, _, Death (_, d2))
-    when Date.compare_date d1 (Adef.date_of_cdate d2) > 0 ->
+    when Date.compare_date d1 (Date.date_of_cdate d2) > 0 ->
       1
   | _ -> (
       match
