@@ -231,18 +231,15 @@ let advanced_search conf base max_answers =
   in
   let match_baptism_date p empty_default_value =
     match_date p bapt_date_field_name
-      (fun () -> Adef.od_of_cdate (get_baptism p)) empty_default_value
+      (fun () -> Date.od_of_cdate (get_baptism p)) empty_default_value
   in
   let match_birth_date p empty_default_value =
     match_date p birth_date_field_name
-      (fun () -> Adef.od_of_cdate (get_birth p)) empty_default_value
+      (fun () -> Date.od_of_cdate (get_birth p)) empty_default_value
   in
   let match_death_date p empty_default_value =
     match_date p death_date_field_name
-      (fun () ->
-         match get_death p with
-           Death (_, cd) -> Some (Adef.date_of_cdate cd)
-         | _ -> None)
+      (fun () -> Date.date_of_death (get_death p))
       empty_default_value
   in
   let match_burial_date p empty_default_value =
@@ -250,7 +247,7 @@ let advanced_search conf base max_answers =
       (fun () ->
         (* TODO Date.cdate_of_burial *)
          match get_burial p with
-         | Buried cod | Cremated cod -> Adef.od_of_cdate cod
+         | Buried cod | Cremated cod -> Date.od_of_cdate cod
          | UnknownBurial -> None)
       empty_default_value
   in
@@ -323,7 +320,7 @@ let advanced_search conf base max_answers =
     in
     match d1, d2 with
     | Some d1, Some d2 ->
-      test_date_place begin fun fam -> match Adef.od_of_cdate (get_marriage fam) with
+      test_date_place begin fun fam -> match Date.od_of_cdate (get_marriage fam) with
         | Some (Dgreg (_, _) as d) ->
           if Date.compare_date d d1 < 0 then false
           else if Date.compare_date d2 d < 0 then false
@@ -331,13 +328,13 @@ let advanced_search conf base max_answers =
         | _ -> false
       end
     | Some d1, _ ->
-      test_date_place begin fun fam -> match Adef.od_of_cdate (get_marriage fam) with
+      test_date_place begin fun fam -> match Date.od_of_cdate (get_marriage fam) with
         | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
           if Date.compare_date d d1 < 0 then false else true
         | _ -> false
       end
     | _, Some d2 ->
-      test_date_place begin fun fam -> match Adef.od_of_cdate (get_marriage fam) with
+      test_date_place begin fun fam -> match Date.od_of_cdate (get_marriage fam) with
         | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
           if Date.compare_date d d2 > 0 then false else true
         | _ -> false

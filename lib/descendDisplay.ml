@@ -398,7 +398,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
   Output.print_string conf (DateDisplay.short_dates_text conf base ancestor);
   let p = ancestor in
   if authorized_age conf base p then
-    begin match Adef.od_of_cdate (get_birth p), get_death p with
+    begin match Date.od_of_cdate (get_birth p), get_death p with
     | Some _, _ | _, Death (_, _) -> Output.print_sstring conf "<br>"
     | _ -> ()
     end;
@@ -742,7 +742,7 @@ let print_person_table conf base p lab =
     let mdate =
       if authorized_age conf base p
       && authorized_age conf base spouse
-      then match Adef.od_of_cdate (get_marriage fam) with
+      then match Date.od_of_cdate (get_marriage fam) with
         | Some d -> DateDisplay.string_slash_of_date conf d
         | None -> Adef.safe "&nbsp;"
       else Adef.safe "&nbsp;"
@@ -835,7 +835,7 @@ let print_person_table conf base p lab =
           if authorized_age conf base p && authorized_age conf base spouse
           then
             let fam = foi base (get_family u).(i) in
-            match Adef.od_of_cdate (get_marriage fam) with
+            match Date.od_of_cdate (get_marriage fam) with
             | Some d ->
               DateDisplay.string_slash_of_date conf d
               |> Output.print_string conf

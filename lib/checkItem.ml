@@ -60,13 +60,13 @@ let obirth x =
   get_birth x |> Date.cdate_to_dmy_opt
 
 let title_dates warning p t =
-  let t_date_start = Adef.od_of_cdate t.t_date_start in
-  let t_date_end = Adef.od_of_cdate t.t_date_end in
+  let t_date_start = Date.od_of_cdate t.t_date_start in
+  let t_date_end = Date.od_of_cdate t.t_date_end in
   match t_date_start, t_date_end with
   | None, None -> ()
   | Some d1, Some d2 when strictly_after d1 d2 -> warning (TitleDatesError (p, t))
   | _ ->
-    match Adef.od_of_cdate (get_birth p) with
+    match Date.od_of_cdate (get_birth p) with
     | None -> ()
     | Some d1 ->
       match t_date_start with
@@ -233,9 +233,9 @@ let semi_sort base a before comp di =
     else
       let p1 = poi base a.(i) in
       let d1 =
-        match Adef.od_of_cdate (get_birth p1) with
+        match Date.od_of_cdate (get_birth p1) with
         | Some d1 -> Some d1
-        | None -> Adef.od_of_cdate (get_baptism p1)
+        | None -> Date.od_of_cdate (get_baptism p1)
       in
       match d1 with
         Some d1 ->
@@ -244,9 +244,9 @@ let semi_sort base a before comp di =
             else
               let p2 = poi base a.(j) in
               let d2 =
-                match Adef.od_of_cdate (get_birth p2) with
+                match Date.od_of_cdate (get_birth p2) with
                 | Some d2 -> Some d2
-                | None -> Adef.od_of_cdate (get_baptism p2)
+                | None -> Date.od_of_cdate (get_baptism p2)
               in
               match d2 with
                 Some d2 ->
@@ -267,9 +267,9 @@ let semi_sort base a before comp di =
                             else
                               let p3 = poi base a.(k) in
                               let d3 =
-                                match Adef.od_of_cdate (get_birth p3) with
+                                match Date.od_of_cdate (get_birth p3) with
                                 | Some d3 -> Some d3
-                                | None -> Adef.od_of_cdate (get_baptism p3)
+                                | None -> Date.od_of_cdate (get_baptism p3)
                               in
                               match d3 with
                                 Some d3 ->
@@ -327,7 +327,7 @@ let changed_marriages_order base warning p =
       (fun (max_date, tab) ifam ->
          let fam = foi base ifam in
          let date =
-           match Adef.od_of_cdate (get_marriage fam) with
+           match Date.od_of_cdate (get_marriage fam) with
            | Some d -> Some d
            | None -> max_date
          in
@@ -361,7 +361,7 @@ let changed_marriages_order base warning p =
 let close_siblings warning x np ifam =
   match np with
   | Some (elder, d1) ->
-    begin match odate @@ Adef.od_of_cdate (get_birth x) with
+    begin match odate @@ Date.od_of_cdate (get_birth x) with
       | None -> ()
       | Some d2 ->
         Date.time_elapsed_opt d1 d2 |> Option.iter @@ fun d ->
@@ -506,7 +506,7 @@ let check_witness_pevents base warning origin =
       Array.iter begin fun (iw, witness_kind) ->
         let p = poi base iw in
         check_witness_pevents_aux warning origin evt d2
-          (Adef.od_of_cdate @@ get_birth p)
+          (Date.od_of_cdate @@ get_birth p)
           (Date.date_of_death @@ get_death p) p
           witness_kind
       end evt.epers_witnesses
@@ -536,9 +536,9 @@ let witness_kind_of_witness_array iper witnesses =
 let check_person_dates_as_witness base warning p =
   let ip = get_iper p in
   let aux date w1 w2 = fun evt ->
-    begin match Adef.od_of_cdate (date evt) with
+    begin match Date.od_of_cdate (date evt) with
       | Some (Dgreg (_, _) as d) ->
-        begin match Adef.od_of_cdate (get_birth p) with
+        begin match Date.od_of_cdate (get_birth p) with
           | Some (Dgreg (_, _) as d') -> if strictly_before d d' then w1 evt
           | _ -> ()
         end ;
@@ -714,7 +714,7 @@ let check_witness_fevents base warning fam =
       Array.iter begin fun (iw, witness_kind) ->
         let p = poi base iw in
         check_witness_fevents_aux warning fam evt d2
-          (Adef.od_of_cdate @@ get_birth p)
+          (Date.od_of_cdate @@ get_birth p)
           (Date.date_of_death @@ get_death p) p
           witness_kind
       end evt.efam_witnesses
@@ -724,13 +724,13 @@ let check_parent_marriage_age warning fam p =
   let rec loop = function
     | [] -> ()
     | { efam_name = (Efam_Marriage|Efam_PACS) ; efam_date ; _ } :: list ->
-        begin match Adef.od_of_cdate efam_date with
+        begin match Date.od_of_cdate efam_date with
           | Some (Dgreg (g2, _) as d2) ->
             begin match Date.date_of_death (get_death p) with
               | Some d1 when strictly_after d2 d1 ->
                 warning (MarriageDateAfterDeath p)
               | _ ->
-                match Adef.od_of_cdate (get_birth p) with
+                match Date.od_of_cdate (get_birth p) with
                 | Some (Dgreg (g1, _) as d1) ->
                   if strictly_before d2 d1
                   then warning (MarriageDateBeforeBirth p)
@@ -890,9 +890,9 @@ let on_person_update base warning p =
       child_born_after_his_parent warning p fath ;
       child_born_after_his_parent warning p moth ;
       check_siblings base warning (i, fam) ignore
-    | _ -> ()
+    | None -> ()
   end ;
-  let b = Adef.od_of_cdate (get_birth p) in
+  let b = Date.od_of_cdate (get_birth p) in
   let d = Date.date_of_death @@ get_death p in
   let iper = get_iper p in
   if b <> None || d <> None then

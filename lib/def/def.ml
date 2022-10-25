@@ -44,7 +44,7 @@ and dmy2 = Adef.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
 (** Alias to [Adef.precision] *)
 and precision =
   Adef.precision =
-      Sure
+    | Sure
     | About
     | Maybe
     | Before

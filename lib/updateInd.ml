@@ -47,11 +47,11 @@ and eval_simple_var conf base env p =
   | ["bapt_place"] -> safe_val (Util.escape_html p.baptism_place :> Adef.safe_string)
   | ["bapt_note"] -> safe_val (Util.escape_html p.baptism_note :> Adef.safe_string)
   | ["bapt_src"] -> safe_val (Util.escape_html p.baptism_src :> Adef.safe_string)
-  | ["birth"; s] -> eval_date_var (Adef.od_of_cdate p.birth) s
+  | ["birth"; s] -> eval_date_var (Date.od_of_cdate p.birth) s
   | ["birth_place"] -> safe_val (Util.escape_html p.birth_place :> Adef.safe_string)
   | ["birth_note"] -> safe_val (Util.escape_html p.birth_note :> Adef.safe_string)
   | ["birth_src"] -> safe_val (Util.escape_html p.birth_src :> Adef.safe_string)
-  | ["bapt"; s] -> eval_date_var (Adef.od_of_cdate p.baptism) s
+  | ["bapt"; s] -> eval_date_var (Date.od_of_cdate p.baptism) s
   | ["bt_buried"] ->
       bool_val
         (match p.burial with
@@ -66,7 +66,7 @@ and eval_simple_var conf base env p =
   | ["burial"; s] ->
       let od =
         match p.burial with
-        | Buried cod | Cremated cod -> Adef.od_of_cdate cod
+        | Buried cod | Cremated cod -> Date.od_of_cdate cod
         | UnknownBurial -> None
       in
       eval_date_var od s
@@ -76,11 +76,7 @@ and eval_simple_var conf base env p =
   | ["cnt"] -> eval_int_env "cnt" env
   | ["dead_dont_know_when"] -> bool_val (p.death = DeadDontKnowWhen)
   | ["death"; s] ->
-      let od =
-        match p.death with
-          Death (_, cd) -> Some (Adef.date_of_cdate cd)
-        | _ -> None
-      in
+      let od = Date.date_of_death p.death in
       eval_date_var od s
   | ["death_place"] -> safe_val (Util.escape_html p.death_place :> Adef.safe_string)
   | ["death_note"] -> safe_val (Util.escape_html p.death_note :> Adef.safe_string)
@@ -107,7 +103,7 @@ and eval_simple_var conf base env p =
           Vint i ->
             begin try
               let e = List.nth p.pevents (i - 1) in
-              Adef.od_of_cdate e.epers_date
+              Date.od_of_cdate e.epers_date
             with Failure _ -> None
             end
         | _ -> None
@@ -115,7 +111,7 @@ and eval_simple_var conf base env p =
       eval_date_var od s
   | ["event_str"] ->
       begin match get_env "cnt" env with
-        Vint i ->
+      | Vint i ->
           begin try
             let p = poi base p.key_index in
             let e = List.nth (get_pevents p) (i - 1) in
@@ -124,7 +120,7 @@ and eval_simple_var conf base env p =
               |> Adef.safe_fn Utf8.capitalize_fst
             in
             let date =
-              match Adef.od_of_cdate e.epers_date with
+              match Date.od_of_cdate e.epers_date with
               | Some d -> DateDisplay.string_of_date conf d
               | None -> Adef.safe ""
             in
@@ -140,7 +136,7 @@ and eval_simple_var conf base env p =
   | ["first_name"] -> safe_val (Util.escape_html p.first_name :> Adef.safe_string)
   | ["first_name_alias"] -> eval_string_env "first_name_alias" env
   | ["has_aliases"] -> bool_val (p.aliases <> [])
-  | ["has_birth_date"] -> bool_val (Adef.od_of_cdate p.birth <> None)
+  | ["has_birth_date"] -> bool_val (Date.od_of_cdate p.birth <> None)
   | ["has_pevent_birth"] ->
       let rec loop pevents =
         match pevents with
@@ -268,7 +264,7 @@ and eval_simple_var conf base env p =
           Vint i ->
             begin try
               let t = List.nth p.titles (i - 1) in
-              Adef.od_of_cdate t.t_date_start
+              Date.od_of_cdate t.t_date_start
             with Failure _ -> None
             end
         | _ -> None
@@ -280,7 +276,7 @@ and eval_simple_var conf base env p =
           Vint i ->
             begin try
               let t = List.nth p.titles (i - 1) in
-              Adef.od_of_cdate t.t_date_end
+              Date.od_of_cdate t.t_date_end
             with Failure _ -> None
             end
         | _ -> None
@@ -678,8 +674,8 @@ let print_add conf base =
      first_names_aliases = []; surnames_aliases = []; public_name = "";
      qualifiers = []; aliases = []; titles = []; rparents = []; related = [];
      occupation = ""; sex = Neuter; access = IfTitles;
-     birth = Adef.cdate_None; birth_place = ""; birth_note = "";
-     birth_src = ""; baptism = Adef.cdate_None; baptism_place = "";
+     birth = Date.cdate_None; birth_place = ""; birth_note = "";
+     birth_src = ""; baptism = Date.cdate_None; baptism_place = "";
      baptism_note = ""; baptism_src = ""; death = DontKnowIfDead;
      death_place = ""; death_note = ""; death_src = "";
      burial = UnknownBurial; burial_place = ""; burial_note = "";

@@ -6,11 +6,11 @@ and precision = [%import: Def.precision] [@@deriving show { with_path = false }]
 
 type cdate = Adef.cdate
 let pp_cdate fmt x =
-  match Adef.od_of_cdate x with
+  match Date.od_of_cdate x with
   | Some d -> pp_date fmt d
   | None -> Format.fprintf fmt "None"
 let show_cdate x =
-  match Adef.od_of_cdate x with
+  match Date.od_of_cdate x with
   | Some d -> show_date d
   | None -> "None"
 

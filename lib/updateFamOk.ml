@@ -111,7 +111,7 @@ let reconstitute_insert_event conf ext cnt el =
       let rec loop el n =
         if n > 0 then
           let e1 =
-            {efam_name = Efam_Name ""; efam_date = Adef.cdate_None;
+            {efam_name = Efam_Name ""; efam_date = Date.cdate_None;
              efam_place = ""; efam_reason = ""; efam_note = ""; efam_src = "";
              efam_witnesses = [| |]}
           in
@@ -247,7 +247,7 @@ let rec reconstitute_events conf ext cnt =
         | Some _ | None -> witnesses, ext
       in
       let e =
-        {efam_name = efam_name; efam_date = Adef.cdate_of_od efam_date;
+        {efam_name = efam_name; efam_date = Date.cdate_of_od efam_date;
          efam_place = efam_place; efam_reason = ""; efam_note = efam_note;
          efam_src = efam_src; efam_witnesses = Array.of_list witnesses}
       in
@@ -317,7 +317,7 @@ let reconstitute_from_fevents
   loop (List.rev fevents) ;
   (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
   let marr, wit = match !found_marriage with
-    | None -> (NoMention, Adef.cdate_None, empty_string, empty_string, empty_string), [||]
+    | None -> (NoMention, Date.cdate_None, empty_string, empty_string, empty_string), [||]
     | Some (kind, date, place, note, src, wit) -> ((kind, date, place, note, src), wit)
   in
   (* Parents de même sexe. *)
@@ -394,7 +394,7 @@ let reconstitute_family conf base nsck =
   let events =
     if events = [] then
       let evt =
-        {efam_name = Efam_NoMention; efam_date = Adef.cdate_None;
+        {efam_name = Efam_NoMention; efam_date = Date.cdate_None;
          efam_place = ""; efam_reason = ""; efam_note = ""; efam_src = "";
          efam_witnesses = [| |]}
       in
@@ -620,7 +620,7 @@ let patch_person_with_pevents base ip =
   let p = poi base ip in
   let p = gen_person_of_person p in
   let empty_string = Gwdb.empty_string in
-  let evt ~name ?(date = Adef.cdate_None) ~place ~src ~note () =
+  let evt ~name ?(date = Date.cdate_None) ~place ~src ~note () =
     {epers_name = name; epers_date = date;
      epers_place = place; epers_reason = empty_string;
      epers_note = note; epers_src = src;
@@ -634,7 +634,7 @@ let patch_person_with_pevents base ip =
       let src = p.birth_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    if Adef.od_of_cdate p.birth <> None
+    if Date.od_of_cdate p.birth <> None
     then evt ~date:p.birth ()
     else if sou base p.birth_place = "" then None
     else evt ()
@@ -647,7 +647,7 @@ let patch_person_with_pevents base ip =
       let src = p.baptism_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    if Adef.od_of_cdate p.baptism <> None
+    if Date.od_of_cdate p.baptism <> None
     then evt ~date:p.baptism ()
     else if sou base p.baptism_place = "" then None
     else evt ()
@@ -660,11 +660,11 @@ let patch_person_with_pevents base ip =
       let src = p.death_src in
       Some (evt ~name ?date ~place ~note ~src ())
     in
-    match p.death with
-    | Death (_, cd) ->
-        let date = Adef.cdate_of_od (Some (Adef.date_of_cdate cd)) in
+    match Date.date_of_death p.death with
+    | Some cd ->
+        let date = Date.cdate_of_od (Some cd) in
         evt ~date ()
-    | _ ->
+    | None ->
         if sou base p.death_place = "" then None
         else evt ()
   in
@@ -1234,7 +1234,7 @@ let print_add_parents o_conf base =
   let conf = Update.update_conf o_conf in
   let nsck = p_getenv conf.env "nsck" = Some "on" in
   let (sfam, scpl, sdes, _) = reconstitute_family conf base nsck in
-  if sfam.marriage = Adef.cdate_None
+  if sfam.marriage = Date.cdate_None
   && sfam.marriage_place = ""
   && sfam.marriage_note = ""
   && sfam.marriage_src = ""
@@ -1243,7 +1243,7 @@ let print_add_parents o_conf base =
   && sfam.divorce = NotDivorced
   && sfam.fevents =
      [ { efam_name = Efam_Marriage
-       ; efam_date = Adef.cdate_None
+       ; efam_date = Date.cdate_None
        ; efam_place = ""
        ; efam_reason = ""
        ; efam_note = ""

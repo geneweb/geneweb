@@ -90,7 +90,7 @@ module Make (D : ConverterDriver) = struct
     | Dgreg (d, c) -> conv_date_cal d (Def_show.show_calendar c)
     | Dtext t -> str t
 
-  let conv_cdate cd = match Adef.od_of_cdate cd with
+  let conv_cdate cd = match Date.od_of_cdate cd with
     | None -> null
     | Some date -> conv_date date
 

@@ -22,8 +22,8 @@ let birth_year p =
 let death_year current_year p =
   match get_death p with
   | Death (_, d) ->
-    begin match Adef.date_of_cdate d with
-      | Dgreg ({year = y; prec = Sure}, _) -> Some y
+    begin match Date.cdate_to_dmy_opt d with
+      | Some {year = y; prec = Sure} -> Some y
       | _ -> None
     end
   | NotDead -> Some current_year

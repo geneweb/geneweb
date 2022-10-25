@@ -79,9 +79,11 @@ let gen_print conf base mois f_scan dead_people =
                       (p, dt.year, DeBirth, txt_of) :: tab.(pred j)
             end;
             match get_death p with
-              Death (dr, d) ->
-                begin match Adef.date_of_cdate d with
-                  Dgreg (dt, _) ->
+            | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead -> ()
+            | Death (dr, d) ->
+                match Date.cdate_to_dmy_opt d with
+                | None -> ()
+                | Some dt ->
                     if dt.prec = Sure && dt.day <> 0 && dt.month <> 0 &&
                        dt.month = mois && dt.delta = 0
                     then
@@ -90,9 +92,6 @@ let gen_print conf base mois f_scan dead_people =
                         let a = dt.year in
                         tab.(pred j) <-
                           (p, a, DeDeath dr, txt_of) :: tab.(pred j)
-                | _ -> ()
-                end
-            | _ -> ()
     done
   with Not_found -> ()
   end;
@@ -456,8 +455,9 @@ let gen_print_menu_dead conf base f_scan mode =
           end;
           match get_death p with
           | Death (dr, d) ->
-              begin match Adef.date_of_cdate d with
-              | Dgreg (d, _) ->
+              begin match Date.cdate_to_dmy_opt d with
+              | None -> ()
+              | Some d ->
                   if d.prec = Sure && d.day <> 0 && d.month <> 0 then
                     if match_dates conf base p d conf.today then
                       list_tod := (p, d.year, DeDeath dr, txt_of) :: !list_tod
@@ -465,7 +465,6 @@ let gen_print_menu_dead conf base f_scan mode =
                       list_tom := (p, d.year, DeDeath dr, txt_of) :: !list_tom
                     else if match_dates conf base p d aft then
                       list_aft := (p, d.year, DeDeath dr, txt_of) :: !list_aft
-              | _ -> ()
               end
           | NotDead | DeadYoung | DeadDontKnowWhen
           | DontKnowIfDead | OfCourseDead -> ()

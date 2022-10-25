@@ -2,6 +2,89 @@
 
 open Def
 
+type cdate = Adef.cdate =
+  | Cgregorian of int
+  | Cjulian of int
+  | Cfrench of int
+  | Chebrew of int
+  | Ctext of string
+  | Cdate of date
+  | Cnone
+
+(* compress concrete date if it's possible *)
+let compress d =
+  let simple =
+    match d.prec with
+    | Sure | About | Maybe | Before | After ->
+        d.day >= 0 && d.month >= 0 && d.year > 0 && d.year < 2500 &&
+        d.delta = 0
+    | OrYear _ | YearInt _ -> false
+  in
+  if simple then
+    let p =
+      match d.prec with
+      | About -> 1
+      | Maybe -> 2
+      | Before -> 3
+      | After -> 4
+      | Sure | OrYear _ | YearInt _ -> 0
+    in
+    Some (((p * 32 + d.day) * 13 + d.month) * 2500 + d.year)
+  else None
+
+(* uncompress concrete date *)
+let uncompress x =
+  let (year, x) = x mod 2500, x / 2500 in
+  let (month, x) = x mod 13, x / 13 in
+  let (day, x) = x mod 32, x / 32 in
+  let prec =
+    match x with
+    | 1 -> About
+    | 2 -> Maybe
+    | 3 -> Before
+    | 4 -> After
+    | _ -> Sure
+  in
+  {day = day; month = month; year = year; prec = prec; delta = 0}
+
+let date_of_cdate =
+  function
+  | Cgregorian i -> Dgreg (uncompress i, Dgregorian)
+  | Cjulian i -> Dgreg (uncompress i, Djulian)
+  | Cfrench i -> Dgreg (uncompress i, Dfrench)
+  | Chebrew i -> Dgreg (uncompress i, Dhebrew)
+  | Cdate d -> d
+  | Ctext t -> Dtext t
+  | Cnone -> failwith "date_of_cdate"
+
+
+let cdate_of_date d =
+  match d with
+  | Dgreg (g, cal) ->
+      begin match compress g with
+      | Some i ->
+          begin match cal with
+            Dgregorian -> Cgregorian i
+          | Djulian -> Cjulian i
+          | Dfrench -> Cfrench i
+          | Dhebrew -> Chebrew i
+          end
+      | None -> Cdate d
+      end
+  | Dtext t -> Ctext t
+
+let cdate_of_od =
+  function
+  | Some d -> cdate_of_date d
+  | None -> Cnone
+
+let od_of_cdate od =
+  match od with
+  | Cnone -> None
+  | _ -> Some (date_of_cdate od)
+
+let cdate_None = cdate_of_od None
+
 let dmy_of_dmy2 dmy2 =
   {day = dmy2.day2; month = dmy2.month2; year = dmy2.year2; prec = Sure;
    delta = dmy2.delta2}
@@ -70,11 +153,6 @@ let time_elapsed_opt d1 d2 =
   | After, After | Before, Before -> None
   | _ -> Some (time_elapsed d1 d2)
 
-let date_of_death =
-  function
-    Death (_, cd) -> Some (Adef.date_of_cdate cd)
-  | _ -> None
-
 exception Not_comparable
 
 let rec compare_dmy_aux failure success ?(strict=false) dmy1 dmy2 =
@@ -133,6 +211,11 @@ let compare_date ?(strict=false) d1 d2 =
   | Dtext _, Dtext _ -> if strict then raise Not_comparable else 0
 
 let cdate_to_dmy_opt cdate =
-  match Adef.od_of_cdate cdate with
+  match od_of_cdate cdate with
   | Some (Dgreg (d,_) ) -> Some d
   | Some (Dtext _) | None -> None
+
+let date_of_death =
+  function
+  | Death (_, cd) -> Some (date_of_cdate cd)
+  | _ -> None

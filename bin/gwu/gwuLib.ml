@@ -107,11 +107,11 @@ let oc opts = match opts.Gwexport.oc with _, oc, _ -> oc
 
 let print_date_dmy opts d =
   begin match d.prec with
-      About -> Printf.ksprintf (oc opts) "~"
+    | About -> Printf.ksprintf (oc opts) "~"
     | Maybe -> Printf.ksprintf (oc opts) "?"
     | Before -> Printf.ksprintf (oc opts) "<"
     | After -> Printf.ksprintf (oc opts) ">"
-    | _ -> ()
+    | Sure | OrYear _ | YearInt _ -> ()
   end;
   if d.month = 0 then Printf.ksprintf (oc opts) "%s" (soy d.year)
   else if d.day = 0 then Printf.ksprintf (oc opts) "%d/%s" d.month (soy d.year)
@@ -202,7 +202,7 @@ let gen_print_date opts no_colon =
 
 let gen_print_date_option opts no_colon =
   function
-    Some d -> gen_print_date opts no_colon d
+  | Some d -> gen_print_date opts no_colon d
   | None -> ()
 
 let print_date opts = gen_print_date opts false
@@ -246,8 +246,8 @@ let has_infos_not_dates opts base p =
 
 let has_infos opts base p =
   has_infos_not_dates opts base p
-  || get_birth p <> Adef.cdate_None
-  || get_baptism p <> Adef.cdate_None
+  || get_birth p <> Date.cdate_None
+  || get_baptism p <> Date.cdate_None
   || get_death p <> NotDead
 
 let print_if_not_equal_to opts x base lab is =
@@ -276,26 +276,26 @@ let print_alias opts base is =
 
 let print_burial opts b =
   match b with
-    Buried cod ->
+  | Buried cod ->
     Printf.ksprintf (oc opts) " #buri";
-    begin match Adef.od_of_cdate cod with
-        Some d -> Printf.ksprintf (oc opts) " "; print_date opts d; ()
-      | _ -> ()
+    begin match Date.od_of_cdate cod with
+      | Some d -> Printf.ksprintf (oc opts) " "; print_date opts d; ()
+      | None -> ()
     end
   | Cremated cod ->
     Printf.ksprintf (oc opts) " #crem";
-    begin match Adef.od_of_cdate cod with
-        Some d -> Printf.ksprintf (oc opts) " "; print_date opts d; ()
-      | _ -> ()
+    begin match Date.od_of_cdate cod with
+      | Some d -> Printf.ksprintf (oc opts) " "; print_date opts d; ()
+      | None -> ()
     end
   | UnknownBurial -> ()
 
 let print_title opts base t =
-  let t_date_start = Adef.od_of_cdate t.t_date_start in
-  let t_date_end = Adef.od_of_cdate t.t_date_end in
+  let t_date_start = Date.od_of_cdate t.t_date_start in
+  let t_date_end = Date.od_of_cdate t.t_date_end in
   Printf.ksprintf (oc opts) " [";
   begin match t.t_name with
-      Tmain -> Printf.ksprintf (oc opts) "*"
+    | Tmain -> Printf.ksprintf (oc opts) "*"
     | Tname s -> Printf.ksprintf (oc opts) "%s" (correct_string_no_colon base s)
     | Tnone -> ()
   end;
@@ -306,25 +306,25 @@ let print_title opts base t =
   if t.t_nth <> 0 then Printf.ksprintf (oc opts) ":"
   else
     begin match t_date_start, t_date_end with
-        Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) ":"
+      | Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) ":"
       | _ -> ()
     end;
   print_title_date_option opts t_date_start;
   if t.t_nth <> 0 then Printf.ksprintf (oc opts) ":"
   else
     begin match t_date_end with
-        Some _ -> Printf.ksprintf (oc opts) ":"
-      | _ -> ()
+      | Some _ -> Printf.ksprintf (oc opts) ":"
+      | None -> ()
     end;
   print_title_date_option opts t_date_end;
   if t.t_nth <> 0 then Printf.ksprintf (oc opts) ":%d" t.t_nth;
   Printf.ksprintf (oc opts) "]"
 
 let zero_birth_is_required opts base is_child p =
-  if get_baptism p <> Adef.cdate_None then false
+  if get_baptism p <> Date.cdate_None then false
   else
     begin match get_death p with
-        Death (_, _) | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
+      | Death (_, _) | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
         true
       | DontKnowIfDead
         when
@@ -347,29 +347,29 @@ let print_infos opts base is_child csrc cbp p =
   List.iter (print_alias opts base) (get_aliases p);
   List.iter (print_title opts base) (get_titles p);
   begin match get_access p with
-      IfTitles -> ()
+    | IfTitles -> ()
     | Public -> Printf.ksprintf (oc opts) " #apubl"
     | Private -> Printf.ksprintf (oc opts) " #apriv"
   end;
   print_if_no_empty opts base "#occu" (get_occupation p);
   print_src_if_not_equal_to opts csrc base "#src" (get_psources p);
-  begin match Adef.od_of_cdate (get_birth p) with
-      Some d -> Printf.ksprintf (oc opts) " "; print_date opts d
+  begin match Date.od_of_cdate (get_birth p) with
+    | Some d -> Printf.ksprintf (oc opts) " "; print_date opts d
     | _ when zero_birth_is_required opts base is_child p -> Printf.ksprintf (oc opts) " 0"
-    | _ -> ()
+    | None -> ()
   end;
   print_if_not_equal_to opts cbp base "#bp" (get_birth_place p);
   if opts.source = None then
     print_if_no_empty opts base "#bs" (get_birth_src p);
-  begin match Adef.od_of_cdate (get_baptism p) with
-      Some d -> Printf.ksprintf (oc opts) " !"; print_date opts d
-    | _ -> ()
+  begin match Date.od_of_cdate (get_baptism p) with
+    | Some d -> Printf.ksprintf (oc opts) " !"; print_date opts d
+    | None -> ()
   end;
   print_if_no_empty opts base "#pp" (get_baptism_place p);
   if opts.source = None then
     print_if_no_empty opts base "#ps" (get_baptism_src p);
   begin match get_death p with
-      Death (dr, d) ->
+    | Death (dr, d) ->
       Printf.ksprintf (oc opts) " ";
       begin match dr with
           Killed -> Printf.ksprintf (oc opts) "k"
@@ -378,14 +378,14 @@ let print_infos opts base is_child csrc cbp p =
         | Disappeared -> Printf.ksprintf (oc opts) "s"
         | _ -> ()
       end;
-      print_date opts (Adef.date_of_cdate d)
+      print_date opts (Date.date_of_cdate d)
     | DeadYoung -> Printf.ksprintf (oc opts) " mj"
     | DeadDontKnowWhen -> Printf.ksprintf (oc opts) " 0"
     | DontKnowIfDead ->
       begin match
-          Adef.od_of_cdate (get_birth p), Adef.od_of_cdate (get_baptism p)
+          Date.od_of_cdate (get_birth p), Date.od_of_cdate (get_baptism p)
         with
-          Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) " ?"
+        | Some _, _ | _, Some _ -> Printf.ksprintf (oc opts) " ?"
         | _ -> ()
       end
     | OfCourseDead -> Printf.ksprintf (oc opts) " od"
@@ -613,7 +613,7 @@ let print_pevent opts base gen e =
     | Epers_Name s -> Printf.ksprintf (oc opts) "#%s" (correct_string base s)
   end;
   Printf.ksprintf (oc opts) " ";
-  let epers_date = Adef.od_of_cdate e.epers_date in
+  let epers_date = Date.od_of_cdate e.epers_date in
   print_date_option opts epers_date;
   print_if_no_empty opts base "#p" e.epers_place;
   (* TODO *)
@@ -719,7 +719,7 @@ let print_fevent opts base gen in_comment e =
     | Efam_Name n -> Printf.ksprintf (oc opts) "#%s" (correct_string base n)
   end;
   Printf.ksprintf (oc opts) " ";
-  let efam_date = Adef.od_of_cdate e.efam_date in
+  let efam_date = Date.od_of_cdate e.efam_date in
   print_date_option opts efam_date;
   print_if_no_empty opts base "#p" e.efam_place;
   (*print_if_no_empty opts base "#c" e.efam_cause;*)
@@ -796,7 +796,7 @@ let print_family opts base gen m =
   Printf.ksprintf (oc opts) "fam ";
   print_parent opts base gen m.m_fath;
   Printf.ksprintf (oc opts) " +";
-  print_date_option opts (Adef.od_of_cdate (get_marriage fam));
+  print_date_option opts (Date.od_of_cdate (get_marriage fam));
   let print_sexes s =
     let c x =
       match get_sex x with
@@ -826,7 +826,7 @@ let print_family opts base gen m =
       NotDivorced -> ()
     | Separated -> Printf.ksprintf (oc opts) " #sep"
     | Divorced d ->
-      let d = Adef.od_of_cdate d in
+      let d = Date.od_of_cdate d in
       Printf.ksprintf (oc opts) " -"; print_date_option opts d
   end;
   Printf.ksprintf (oc opts) " ";
@@ -1700,12 +1700,12 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
       then
         let p = poi base i in
         match get_parents p with
-          Some _ -> ()
+        | Some _ -> ()
         | None ->
           if bogus_person base p &&
              not
-               (get_birth p <> Adef.cdate_None ||
-                get_baptism p <> Adef.cdate_None ||
+               (get_birth p <> Date.cdate_None ||
+                get_baptism p <> Date.cdate_None ||
                 get_first_names_aliases p <> [] ||
                 get_surnames_aliases p <> [] ||
                 sou base (get_public_name p) <> "" ||

@@ -348,11 +348,11 @@ let get_optional_deathdate l =
       in
       if i < String.length x then
         match x.[i] with
-          '~' | '?' | '>' | '<' | '-' | '0'..'9' ->
+        | '~' | '?' | '>' | '<' | '-' | '0'..'9' ->
             let d =
               match date_of_string x i with
                 None -> DeadDontKnowWhen
-              | Some d -> Death (dr, Adef.cdate_of_date d)
+              | Some d -> Death (dr, Date.cdate_of_date d)
             in
             Some d, l'
         | _ -> None, l
@@ -371,8 +371,8 @@ let get_burial l =
               '~' | '?' | '>' | '<' | '-' | '0'..'9' -> date_of_string x i, l'
             | _ -> None, l
           in
-          Buried (Adef.cdate_of_od od), l
-      | [] -> Buried Adef.cdate_None, l
+          Buried (Date.cdate_of_od od), l
+      | [] -> Buried Date.cdate_None, l
       end
   | "#crem" :: l ->
       begin match l with
@@ -383,8 +383,8 @@ let get_burial l =
               '~' | '?' | '>' | '<' | '-' | '0'..'9' -> date_of_string x i, l'
             | _ -> None, l
           in
-          Cremated (Adef.cdate_of_od od), l
-      | [] -> Cremated Adef.cdate_None, l
+          Cremated (Date.cdate_of_od od), l
+      | [] -> Cremated Date.cdate_None, l
       end
   | _ -> UnknownBurial, l
 
@@ -557,8 +557,8 @@ let scan_title t =
   if i <> String.length t then failwith t
   else
     {t_name = name; t_ident = title; t_place = place;
-     t_date_start = Adef.cdate_of_od date_start;
-     t_date_end = Adef.cdate_of_od date_end; t_nth = nth}
+     t_date_start = Date.cdate_of_od date_start;
+     t_date_end = Date.cdate_of_od date_end; t_nth = nth}
 
 (** Parses list of titles ([gen_title]) if they are present. *)
 let rec get_titles str l =
@@ -692,8 +692,8 @@ let get_mar_date str =
         match x.[0] with
           '+' ->
             (if String.length x > 1 then
-               Adef.cdate_of_od (date_of_string x 1)
-             else Adef.cdate_None),
+                Date.cdate_of_od (date_of_string x 1)
+             else Date.cdate_None),
             l
         | _ -> failwith str
       in
@@ -742,8 +742,8 @@ let get_mar_date str =
         match l with
           x :: l when x.[0] = '-' ->
             if String.length x > 1 then
-              Divorced (Adef.cdate_of_od (date_of_string x 1)), l
-            else Divorced Adef.cdate_None, l
+              Divorced ( Date.cdate_of_od (date_of_string x 1)), l
+            else Divorced Date.cdate_None, l
         | "#sep" :: l -> Separated, l
         | _ -> NotDivorced, l
       in
@@ -810,13 +810,13 @@ let set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   in
   let naissance =
     match naissance with
-      None -> Adef.cdate_None
-    | Some x -> Adef.cdate_of_od x
+      None -> Date.cdate_None
+    | Some x -> Date.cdate_of_od x
   in
   let baptism =
     match baptism with
-      None -> Adef.cdate_None
-    | Some x -> Adef.cdate_of_od x
+      None -> Date.cdate_None
+    | Some x -> Date.cdate_of_od x
   in
   let (burial, l) = get_burial l in
   let (burial_place, l) = get_field "#rp" l in
@@ -1059,21 +1059,21 @@ let read_family ic fname =
       (* read familial source if present *)
       let (fsrc, line) =
         match line with
-          Some (_, ["src"; x]) -> cut_space x, read_line ic
+        | Some (_, ["src"; x]) -> cut_space x, read_line ic
         | Some (str, "src" :: _) -> failwith str
         | _ -> "", line
       in
       (* read common children source if present *)
       let (csrc, line) =
         match line with
-          Some (_, ["csrc"; x]) -> cut_space x, read_line ic
+        | Some (_, ["csrc"; x]) -> cut_space x, read_line ic
         | Some (str, "csrc" :: _) -> failwith str
         | _ -> "", line
       in
       (* read common children birth place if present *)
       let (cbp, line) =
         match line with
-          Some (_, ["cbp"; x]) -> cut_space x, read_line ic
+        | Some (_, ["cbp"; x]) -> cut_space x, read_line ic
         | Some (str, "cbp" :: _) -> failwith str
         | _ -> "", line
       in
@@ -1082,7 +1082,7 @@ let read_family ic fname =
       (* read a family comments *)
       let (comm, line) =
         match line with
-          Some (str, "comm" :: _) ->
+        | Some (str, "comm" :: _) ->
             let comm = String.sub str 5 (String.length str - 5) in
             comm, read_line ic
         | _ -> "", line
@@ -1094,7 +1094,7 @@ let read_family ic fname =
             let (fevents, line) =
               let rec loop fevents =
                 function
-                  "end fevt" -> fevents, read_line ic
+                | "end fevt" -> fevents, read_line ic
                 | x ->
                     let (str, l) = x, fields x in
                     (* On récupère le nom, date, lieu, source, cause *)
@@ -1105,8 +1105,8 @@ let read_family ic fname =
                     let (src, l) = get_field "#s" l in
                     let date =
                       match date with
-                        None -> Adef.cdate_None
-                      | Some x -> Adef.cdate_of_od x
+                      | None -> Date.cdate_None
+                      | Some x -> Date.cdate_of_od x
                     in
                     if l <> [] then failwith str;
                     (* On récupère les témoins *)
@@ -1252,8 +1252,8 @@ let read_family ic fname =
                 let (src, l) = get_field "#s" l in
                 let date =
                   match date with
-                    None -> Adef.cdate_None
-                  | Some x -> Adef.cdate_of_od x
+                  | None -> Date.cdate_None
+                  | Some x -> Date.cdate_of_od x
                 in
                 if l <> [] then failwith str;
                 (* On récupère les témoins *)

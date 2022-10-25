@@ -77,12 +77,11 @@ let merge_events l1 l2 p =
                  else if e.epers_name = e1.epers_name then
                    let (is_dead, date) =
                      match p.death with
-                       NotDead | DontKnowIfDead -> false, Adef.cdate_None
+                     | NotDead | DontKnowIfDead -> false, Date.cdate_None
                      | Death (_, cd) ->
-                         true,
-                         Adef.cdate_of_od (Some (Adef.date_of_cdate cd))
+                         true, cd
                      | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
-                         true, Adef.cdate_None
+                         true, Date.cdate_None
                    in
                    let witnesses =
                      merge_event_witnesses e1.epers_witnesses e.epers_witnesses
@@ -190,14 +189,14 @@ let reconstitute conf base p1 p2 =
        field "occupation" (fun p -> sou base (get_occupation p)) ((=) "");
      sex = field "sex" get_sex ((=) Neuter);
      access = field "access" get_access ((=) IfTitles);
-     birth = field "birth" get_birth ((=) Adef.cdate_None);
+     birth = field "birth" get_birth ((=) Date.cdate_None);
      birth_place =
        field "birth_place" (fun p -> sou base (get_birth_place p)) ((=) "");
      birth_note =
        merge_strings base (get_birth_note p1) "<br>\n" (get_birth_note p2);
      birth_src =
        merge_strings base (get_birth_src p1) ", " (get_birth_src p2);
-     baptism = field "baptism" get_baptism ((=) Adef.cdate_None);
+     baptism = field "baptism" get_baptism ((=) Date.cdate_None);
      baptism_place =
        field "baptism_place" (fun p -> sou base (get_baptism_place p))
          ((=) "");
@@ -210,7 +209,7 @@ let reconstitute conf base p1 p2 =
        field "death" get_death
          (fun x ->
             match x with
-              DontKnowIfDead | OfCourseDead -> true
+            | DontKnowIfDead | OfCourseDead -> true
             | _ -> false);
      death_place =
        field "death_place" (fun p -> sou base (get_death_place p)) ((=) "");

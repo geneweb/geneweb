@@ -34,11 +34,12 @@ let find_pevent names pevents =
 
 let fix_pevents ?report base pp =
   (* Should it use UpdateIndOk.reconstitute_from_pevents? *)
+  (* TODO clean up *)
   let p = gen_person_of_person pp in
-  let empty_bi = (Adef.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string) in
-  let empty_bp = (Adef.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string) in
-  let empty_de = (Adef.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string) in
-  let empty_bu = (Adef.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string) in
+  let empty_bi = (Date.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string) in
+  let empty_bp = (Date.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string) in
+  let empty_de = (Date.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string) in
+  let empty_bu = (Date.cdate_None, Gwdb.empty_string, Gwdb.empty_string, Gwdb.empty_string) in
   let pevents = p.pevents in
   let aux name date place note src empty pevents =
     match find_pevent [ name ] pevents with
@@ -52,7 +53,7 @@ let fix_pevents ?report base pp =
       let e' =
         { epers_name = e.epers_name
         ; epers_date =
-            if e.epers_date = Adef.cdate_None then date else e.epers_date
+            if e.epers_date = Date.cdate_None then date else e.epers_date
         ; epers_place =
             if e.epers_place = Gwdb.empty_string then place else e.epers_place
         ; epers_reason = e.epers_reason
@@ -75,14 +76,14 @@ let fix_pevents ?report base pp =
     let death =
       match p.death with
       | Death (_, d) -> d
-      | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead -> Adef.cdate_None
+      | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead -> Date.cdate_None
     in
     aux Epers_Death death p.death_place p.death_note p.death_src empty_de pevents
   in
   let death =
     match p.death with
     | Death _ -> p.death
-    | NotDead when death <> Adef.cdate_None -> Death (Unspecified, death)
+    | NotDead when death <> Date.cdate_None -> Death (Unspecified, death)
     | x -> x
   in
   let (burial, burial_place, burial_note, burial_src), pevents =

@@ -214,23 +214,23 @@ let compatible_dmys dmy1 dmy2 =
 let compatible_dates date1 date2 =
   let compatible_cals cal1 cal2 =
     match cal1, cal2 with
-      Dgregorian, Djulian | Dgregorian, Dfrench -> true
+    | Dgregorian, Djulian | Dgregorian, Dfrench -> true
     | _ -> cal1 = cal2
   in
   if date1 = date2 then true
   else
     match date1, date2 with
-      Dgreg (dmy1, cal1), Dgreg (dmy2, cal2) ->
+    | Dgreg (dmy1, cal1), Dgreg (dmy2, cal2) ->
         compatible_dmys dmy1 dmy2 && compatible_cals cal1 cal2
     | Dgreg (_, _), Dtext _ -> false
     | Dtext _, _ -> true
 
 (** Same than before, but for Adef.ctype. *)
 let compatible_cdates cdate1 cdate2 =
-  let od1 = Adef.od_of_cdate cdate1 in
-  let od2 = Adef.od_of_cdate cdate2 in
+  let od1 = Date.od_of_cdate cdate1 in
+  let od2 = Date.od_of_cdate cdate2 in
   match od1, od2 with
-    Some date1, Some date2 -> compatible_dates date1 date2
+  | Some date1, Some date2 -> compatible_dates date1 date2
   | Some _, None -> false
   | None, _ -> true
 
@@ -242,7 +242,7 @@ let compatible_cdates cdate1 cdate2 =
     If birth place are not compatible, the returned list will have MsgBirthPlace *)
 let compatible_birth p1 p2 =
   let get_birth person =
-    if person.birth = Adef.cdate_None then person.baptism else person.birth
+    if person.birth = Date.cdate_None then person.baptism else person.birth
   in
   let birth1 = get_birth p1 in
   let birth2 = get_birth p2 in
@@ -261,14 +261,15 @@ let compatible_death p1 p2 =
   let bool1 =
     p1.death = p2.death ||
     (match p1.death, p2.death with
-       Death (_, cdate1), Death (_, cdate2) ->
-         let date1 = Adef.date_of_cdate cdate1 in
-         let date2 = Adef.date_of_cdate cdate2 in compatible_dates date1 date2
-     | NotDead, _ | DeadYoung, Death (_, _) |
-       DeadDontKnowWhen, (Death (_, _) | DeadYoung | DeadDontKnowWhen) |
-       DontKnowIfDead, _ ->
-         true
-     | _ -> (* S: avoid non-exhaustive pattern matching *) false)
+    | Death (_, cdate1), Death (_, cdate2) ->
+       let date1 = Date.date_of_cdate cdate1 in
+       let date2 = Date.date_of_cdate cdate2 in
+       compatible_dates date1 date2
+    | NotDead, _ | DeadYoung, Death (_, _) |
+      DeadDontKnowWhen, (Death (_, _) | DeadYoung | DeadDontKnowWhen) |
+      DontKnowIfDead, _ ->
+        true
+    | _ -> (* S: avoid non-exhaustive pattern matching *) false)
   in
   let res1 = if bool1 then [] else [MsgDeathDate] in
   let res2 =
@@ -369,7 +370,7 @@ let rec find_compatible_unions base1 base2 iper1 iper2 ifam1 ifam2_list =
     false, otherwise returns true. *)
 let compatible_divorces d1 d2 =
   match d1, d2 with
-    Divorced cdate1, Divorced cdate2 -> compatible_cdates cdate1 cdate2
+  | Divorced cdate1, Divorced cdate2 -> compatible_cdates cdate1 cdate2
   | Divorced _, _ -> false
   | _ -> true
 

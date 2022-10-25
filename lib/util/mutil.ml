@@ -1131,11 +1131,11 @@ let empty_person empty what =
   ; occupation = empty
   ; sex = Neuter
   ; access = IfTitles
-  ; birth = Adef.cdate_None
+  ; birth = Date.cdate_None
   ; birth_place = empty
   ; birth_note = empty
   ; birth_src = empty
-  ; baptism = Adef.cdate_None
+  ; baptism = Date.cdate_None
   ; baptism_place = empty
   ; baptism_note = empty
   ; baptism_src = empty
@@ -1154,7 +1154,7 @@ let empty_person empty what =
   }
 
 let empty_family empty =
-  { Def.marriage = Adef.cdate_None
+  { Def.marriage = Date.cdate_None
   ; marriage_place = empty
   ; marriage_note = empty
   ; marriage_src = empty

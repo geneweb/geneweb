@@ -105,8 +105,8 @@ module Default = struct
             else a.month > 0 || a.day > 0
           | _ -> none ()
         in
-        check_date (Gwdb.get_birth p |> Adef.od_of_cdate) @@ fun () ->
-        check_date (Gwdb.get_baptism p |> Adef.od_of_cdate) @@ fun () ->
+        check_date (Gwdb.get_birth p |> Date.od_of_cdate) @@ fun () ->
+        check_date (Gwdb.get_baptism p |> Date.od_of_cdate) @@ fun () ->
         check_date (Gwdb.get_death p |> Date.date_of_death) @@ fun () ->
         (Gwdb.get_access p <> Def.Private && conf.public_if_no_date)
         || begin
@@ -118,7 +118,7 @@ module Default = struct
               (Array.get families i
                |> Gwdb.foi base
                |> Gwdb.get_marriage
-               |> Adef.od_of_cdate)
+               |> Date.od_of_cdate)
               (fun () -> loop (i + 1))
           in
           loop 0

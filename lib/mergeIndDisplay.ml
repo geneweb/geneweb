@@ -120,7 +120,7 @@ let print_differences conf base branches p1 p2 =
       (transl conf trans |> Adef.safe)
       name
       (fun p ->
-         match Adef.od_of_cdate (get p) with
+         match Date.od_of_cdate (get p) with
          | None -> Adef.safe ""
          | Some d -> DateDisplay.string_of_ondate conf d)
   in
@@ -148,7 +148,7 @@ let print_differences conf base branches p1 p2 =
            | Disappeared -> transl_nth conf "disappeared" is
            | Unspecified -> transl_nth conf "died" is
          in
-         s ^<^ " " ^<^ DateDisplay.string_of_ondate conf (Adef.date_of_cdate cd)
+         s ^<^ " " ^<^ DateDisplay.string_of_ondate conf (Date.date_of_cdate cd)
        | DeadYoung -> transl_nth conf "died young" is |> Adef.safe
        | DeadDontKnowWhen -> transl_nth conf "died" is |> Adef.safe
        | DontKnowIfDead | OfCourseDead -> Adef.safe "");
@@ -158,18 +158,19 @@ let print_differences conf base branches p1 p2 =
     (Adef.encoded "burial")
     begin fun p ->
       let is = 2 in
+      (* TODO burial_to_string *)
       match get_burial p with
       | UnknownBurial -> Adef.safe ""
       | Buried cod ->
         transl_nth conf "buried" is
         ^<^
-        (match Adef.od_of_cdate cod with
+        (match Date.od_of_cdate cod with
          | None -> Adef.safe ""
          | Some d -> " " ^<^ DateDisplay.string_of_ondate conf d)
       | Cremated cod ->
         transl_nth conf "cremated" is
         ^<^
-        (match Adef.od_of_cdate cod with
+        (match Date.od_of_cdate cod with
          | None -> Adef.safe ""
          | Some d -> " " ^<^ DateDisplay.string_of_ondate conf d)
     end ;

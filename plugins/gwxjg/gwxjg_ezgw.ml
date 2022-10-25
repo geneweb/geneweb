@@ -104,8 +104,8 @@ let events = Event.sorted_events
     List.sort
       (fun (c1, _) (c2, _) ->
          let mk_date c =
-           match Adef.od_of_cdate (get_baptism c) with
-           | None -> Adef.od_of_cdate (get_birth c)
+           match Date.od_of_cdate (get_baptism c) with
+           | None -> Date.od_of_cdate (get_birth c)
            | x -> x
          in
          match mk_date c1, mk_date c2 with
@@ -170,7 +170,7 @@ module Family = struct
 
   let divorce_date (_, fam, _, auth) =
     match get_divorce fam with
-    | Divorced d when auth -> Adef.od_of_cdate d
+    | Divorced d when auth -> Date.od_of_cdate d
     | _ -> None
 
   let events (_, fam, (_, _, isp), auth) =
@@ -193,7 +193,7 @@ module Family = struct
   let ifam (ifam, _, _, _) = string_of_ifam ifam
 
   let marriage_date (_, fam, (_, _, _), auth) =
-    if auth then Adef.od_of_cdate (get_marriage fam)
+    if auth then Date.od_of_cdate (get_marriage fam)
     else None
 
   let marriage_place (_, fam, _, _) =
@@ -303,7 +303,7 @@ module Event = struct
     | Fevent Efam_Name _ -> "EFAM"
 
   let date (_, d, _, _, _, _, _) =
-    Adef.od_of_cdate d
+    Date.od_of_cdate d
 
   let place base (_, _, p, _, _, _, _) =
     sou base p

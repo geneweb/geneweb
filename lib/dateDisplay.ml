@@ -538,7 +538,7 @@ let short_dates_text conf base p =
     let (birth_date, death_date, _) = Gutil.get_birth_death_date p in
     let s =
       match birth_date, death_date with
-        Some (Dgreg (b, _)), Some (Dgreg (d, _)) ->
+      | Some (Dgreg (b, _)), Some (Dgreg (d, _)) ->
           prec_year_text conf b ^ "-" ^ prec_year_text conf d
       | Some (Dgreg (b, _)), _ ->
           (* La personne peut être décédée mais ne pas avoir de date. *)
@@ -551,7 +551,7 @@ let short_dates_text conf base p =
       | _, _ ->
           (* La personne peut être décédée mais ne pas avoir de date. *)
           match get_death p with
-            Death (_, _) | DeadDontKnowWhen | DeadYoung -> death_symbol conf
+          | Death (_, _) | DeadDontKnowWhen | DeadYoung -> death_symbol conf
           | _ -> ""
     in
     if s <> "" then " <bdo dir=\"ltr\">" ^ s ^ "</bdo>"
@@ -575,10 +575,10 @@ let short_dates_text conf base p =
 let short_marriage_date_text conf base fam p1 p2 =
   Adef.safe @@
   if authorized_age conf base p1 && authorized_age conf base p2 then
-    match Adef.od_of_cdate (get_marriage fam) with
-      Some (Dgreg (d, _)) ->
+    match Date.cdate_to_dmy_opt (get_marriage fam) with
+    | Some d->
         "<span style=\"font-size:70%\">" ^ prec_year_text conf d ^ "</span>"
-    | _ -> ""
+    | None -> ""
   else ""
 
 (* For public interfce, force [string_of_prec_dmy] args to be safe strings *)

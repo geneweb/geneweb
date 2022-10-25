@@ -1721,9 +1721,9 @@ let get_approx_date_place d1 (p1 : Adef.safe_string) d2 (p2 : Adef.safe_string) 
   | None, _, Some x, y -> if y = "" then Some x, p1 else Some x, p2
 
 let get_approx_birth_date_place conf base p =
-  let birth = Adef.od_of_cdate (get_birth p) in
+  let birth = Date.od_of_cdate (get_birth p) in
   let birth_place = string_of_place conf (sou base (get_birth_place p)) in
-  let baptism = Adef.od_of_cdate (get_baptism p) in
+  let baptism = Date.od_of_cdate (get_baptism p) in
   let baptism_place = string_of_place conf (sou base (get_baptism_place p)) in
   get_approx_date_place
     birth
@@ -1736,7 +1736,7 @@ let get_approx_death_date_place conf base p =
   let death_place = string_of_place conf (sou base (get_death_place p)) in
   let buri =
     match get_burial p with
-    | Buried cd | Cremated cd -> Adef.od_of_cdate cd
+    | Buried cd | Cremated cd -> Date.od_of_cdate cd
     | UnknownBurial -> None
   in
   let buri_place = string_of_place conf (sou base (get_burial_place p)) in

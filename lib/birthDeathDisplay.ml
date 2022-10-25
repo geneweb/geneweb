@@ -14,7 +14,7 @@ let month_txt conf d cal =
 
 let print_birth conf base =
   let (list, len) =
-    select_person conf base (fun p -> Adef.od_of_cdate (get_birth p)) false
+    select_person conf base (fun p -> Date.od_of_cdate (get_birth p)) false
   in
   let title _ =
     Output.printf conf (fcapitale (ftransl conf "the latest %d births")) len
@@ -186,13 +186,13 @@ let print_oldest_alive conf base =
   in
   let get_oldest_alive p =
     match get_death p with
-    | NotDead -> Adef.od_of_cdate (get_birth p)
+    | NotDead -> Date.od_of_cdate (get_birth p)
     | DontKnowIfDead when limit > 0 ->
-      begin match Adef.od_of_cdate (get_birth p) with
+      begin match Date.od_of_cdate (get_birth p) with
         | Some (Dgreg (d, _)) as x when conf.today.year - d.year <= limit -> x
-        | _ -> None
+        | Some _ | None -> None
       end
-    | _ -> None
+    | Death _ | DontKnowIfDead | DeadYoung | DeadDontKnowWhen | OfCourseDead -> None
   in
   let (list, len) = select_person conf base get_oldest_alive true in
   let title _ =
@@ -319,7 +319,7 @@ let print_marriage conf base =
     select_family conf base begin fun fam ->
       let rel = get_relation fam in
       if rel = Married || rel = NoSexesCheckMarried then
-        Adef.od_of_cdate (get_marriage fam)
+        Date.od_of_cdate (get_marriage fam)
       else None end false
   in
   let title _ =
@@ -336,7 +336,7 @@ let print_oldest_engagements conf base =
         let wife = pget conf base (get_mother fam) in
         match get_death husb, get_death wife with
         | (NotDead | DontKnowIfDead), (NotDead | DontKnowIfDead) ->
-          Adef.od_of_cdate (get_marriage fam)
+          Date.od_of_cdate (get_marriage fam)
         | _ -> None
       else None
     end true

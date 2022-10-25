@@ -452,8 +452,8 @@ and mk_title conf base t =
     | Tnone -> Tnull
   in
   let place_raw, place = mk_place conf (Gwdb.sou base t.t_place) in
-  let date_start = mk_opt mk_date (Adef.od_of_cdate t.t_date_start) in
-  let date_end = mk_opt mk_date (Adef.od_of_cdate t.t_date_end) in
+  let date_start = mk_opt mk_date (Date.od_of_cdate t.t_date_start) in
+  let date_end = mk_opt mk_date (Date.od_of_cdate t.t_date_end) in
   let nth = Tint t.t_nth in
   Tpat begin function
     | "ident" -> ident
