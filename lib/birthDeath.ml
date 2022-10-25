@@ -105,12 +105,9 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
               if
                 (dea = NotDead || (dea = DontKnowIfDead && a.year < limit))
                 ||
-                match Date.date_of_death dea with
+                match Date.dmy_of_death dea with
                 | None -> false
-                | Some d -> (
-                    match d with
-                    | Dgreg (d, _) -> Date.compare_dmy d at_date > 0
-                    | _ -> false)
+                | Some d -> Date.compare_dmy d at_date > 0
               then
                 if sex = Male then men.(j) <- men.(j) + 1
                 else wom.(j) <- wom.(j) + 1)

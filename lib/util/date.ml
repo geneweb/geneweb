@@ -209,6 +209,10 @@ let cdate_to_dmy_opt cdate =
   | Some (Dgreg (d, _)) -> Some d
   | Some (Dtext _) | None -> None
 
-let date_of_death = function
-  | Death (_, cd) -> Some (date_of_cdate cd)
-  | _ -> None
+let cdate_of_death = function
+  | Death (_, cd) -> Some cd
+  | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead ->
+      None
+
+let dmy_of_death death = Option.bind (cdate_of_death death) cdate_to_dmy_opt
+let date_of_death death = Option.bind (cdate_of_death death) od_of_cdate
