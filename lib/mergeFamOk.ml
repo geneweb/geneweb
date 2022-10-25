@@ -59,7 +59,7 @@ let merge_events conf l1 l2 =
   let field x1 x2 null = if null x1 then x2 else x1 in
   let need_selection x1 x2 = x1 <> "" && x2 <> "" && x1 <> x2 in
   let string_event_date e =
-    match Adef.od_of_cdate e.efam_date with
+    match Date.od_of_cdate e.efam_date with
     | None -> Adef.safe ""
     | Some d -> DateDisplay.string_of_ondate conf d
   in
@@ -87,7 +87,7 @@ let merge_events conf l1 l2 =
                   else if e.efam_name = e1.efam_name && can_merge_event e e1
                   then
                     let date =
-                      field e.efam_date e1.efam_date (( = ) Adef.cdate_None)
+                      field e.efam_date e1.efam_date (( = ) Date.cdate_None)
                     in
                     let place = field e.efam_place e1.efam_place (( = ) "") in
                     let note =
@@ -115,7 +115,7 @@ let merge_events conf l1 l2 =
                   else if e.efam_name = e1.efam_name && can_merge_event e e1
                   then
                     let date =
-                      field e.efam_date e1.efam_date (( = ) Adef.cdate_None)
+                      field e.efam_date e1.efam_date (( = ) Date.cdate_None)
                     in
                     let place = field e.efam_place e1.efam_place (( = ) "") in
                     let note =
@@ -169,7 +169,7 @@ let reconstitute conf base ifam1 fam1 fam2 =
   in
   let fam =
     {
-      marriage = field "marriage" get_marriage (( = ) Adef.cdate_None);
+      marriage = field "marriage" get_marriage (( = ) Date.cdate_None);
       marriage_place =
         field "marriage_place"
           (fun f -> sou base (get_marriage_place f))
@@ -233,6 +233,7 @@ let print_mod_merge_ok conf base wl cpl des =
 
 let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
   match p_getenv conf.env "i2" with
+  | None -> Hutil.incorrect_request conf
   | Some i2 ->
       let ifam2 = ifam_of_string i2 in
       UpdateFamOk.effective_del conf base Gwdb.dummy_iper (foi base ifam2);
@@ -276,7 +277,6 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
       in
       History.record conf base changed "ff";
       print_mod_merge_ok conf base wl cpl des
-  | None -> Hutil.incorrect_request conf
 
 let print_mod_merge o_conf base =
   let get_gen_family i =

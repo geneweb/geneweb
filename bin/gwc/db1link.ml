@@ -208,7 +208,7 @@ let no_family gen =
   let empty_string = unique_string gen "" in
   let fam =
     {
-      marriage = Adef.cdate_None;
+      marriage = Date.cdate_None;
       marriage_place = empty_string;
       marriage_note = empty_string;
       marriage_src = empty_string;
@@ -757,11 +757,11 @@ let update_family_with_fevents gen fam =
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on met une précision "vers".      *)
               let date =
-                match Adef.od_of_cdate evt.efam_date with
+                match Date.od_of_cdate evt.efam_date with
                 | Some (Dgreg (dmy, cal)) ->
                     let dmy = { dmy with prec = About } in
-                    Adef.cdate_of_od (Some (Dgreg (dmy, cal)))
-                | _ -> evt.efam_date
+                    Date.cdate_of_od (Some (Dgreg (dmy, cal)))
+                | Some (Dtext _) | None -> evt.efam_date
               in
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on ne met pas de lieu.            *)
@@ -887,7 +887,7 @@ let update_fevents_with_family gen fam =
         let evt =
           {
             efam_name = Efam_Separated;
-            efam_date = Adef.cdate_None;
+            efam_date = Date.cdate_None;
             efam_place = unique_string gen "";
             efam_reason = unique_string gen "";
             efam_note = unique_string gen "";
@@ -1288,8 +1288,8 @@ let update_person_with_pevents p =
             if !found_death then loop l p
             else
               let death =
-                match Adef.od_of_cdate evt.epers_date with
-                | Some d -> Death (death_reason_std_fields, Adef.cdate_of_date d)
+                match Date.od_of_cdate evt.epers_date with
+                | Some d -> Death (death_reason_std_fields, Date.cdate_of_date d)
                 | None -> (
                     match death_std_fields with
                     | OfCourseDead -> OfCourseDead
@@ -1343,7 +1343,7 @@ let update_person_with_pevents p =
 let update_pevents_with_person p =
   let empty_string = 0 in
   let evt_birth =
-    match Adef.od_of_cdate p.birth with
+    match Date.od_of_cdate p.birth with
     | Some _ ->
         let evt =
           {
@@ -1374,7 +1374,7 @@ let update_pevents_with_person p =
           Some evt
   in
   let evt_bapt =
-    match Adef.od_of_cdate p.baptism with
+    match Date.od_of_cdate p.baptism with
     | Some _ ->
         let evt =
           {
@@ -1412,7 +1412,7 @@ let update_pevents_with_person p =
           let evt =
             {
               epers_name = Epers_Death;
-              epers_date = Adef.cdate_None;
+              epers_date = Date.cdate_None;
               epers_place = p.death_place;
               epers_reason = empty_string;
               epers_note = p.death_note;
@@ -1422,7 +1422,7 @@ let update_pevents_with_person p =
           in
           Some evt
     | Death (_, cd) ->
-        let date = Adef.cdate_of_od (Some (Adef.date_of_cdate cd)) in
+        let date = Date.cdate_of_od (Some (Date.date_of_cdate cd)) in
         let evt =
           {
             epers_name = Epers_Death;
@@ -1439,7 +1439,7 @@ let update_pevents_with_person p =
         let evt =
           {
             epers_name = Epers_Death;
-            epers_date = Adef.cdate_None;
+            epers_date = Date.cdate_None;
             epers_place = p.death_place;
             epers_reason = empty_string;
             epers_note = p.death_note;
@@ -1457,7 +1457,7 @@ let update_pevents_with_person p =
           let evt =
             {
               epers_name = Epers_Burial;
-              epers_date = Adef.cdate_None;
+              epers_date = Date.cdate_None;
               epers_place = p.burial_place;
               epers_reason = empty_string;
               epers_note = p.burial_note;
@@ -1539,11 +1539,11 @@ let convert_persons per_index_ic per_ic persons =
               occupation = empty_string;
               sex = Neuter;
               access = IfTitles;
-              birth = Adef.cdate_None;
+              birth = Date.cdate_None;
               birth_place = empty_string;
               birth_note = empty_string;
               birth_src = empty_string;
-              baptism = Adef.cdate_None;
+              baptism = Date.cdate_None;
               baptism_place = empty_string;
               baptism_note = empty_string;
               baptism_src = empty_string;

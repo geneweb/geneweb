@@ -94,7 +94,7 @@ module Make (D : ConverterDriver) = struct
     | Dtext t -> str t
 
   let conv_cdate cd =
-    match Adef.od_of_cdate cd with None -> null | Some date -> conv_date date
+    match Date.od_of_cdate cd with None -> null | Some date -> conv_date date
 
   let conv_pevent_name x =
     str

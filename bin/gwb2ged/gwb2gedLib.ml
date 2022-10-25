@@ -441,7 +441,7 @@ let ged_pevent opts base per_sel evt =
       Printf.ksprintf (oc opts) "1 EVEN";
       ged_tag_pevent base evt)
   in
-  let date = Adef.od_of_cdate evt.epers_date in
+  let date = Date.od_of_cdate evt.epers_date in
   let place = sou base evt.epers_place in
   let note = sou base evt.epers_note in
   let src = sou base evt.epers_src in
@@ -477,7 +477,7 @@ let ged_title opts base per tit =
   if tit.t_nth <> 0 then Printf.ksprintf (oc opts) ", %d" tit.t_nth;
   Printf.ksprintf (oc opts) "\n";
   (match
-     (Adef.od_of_cdate tit.t_date_start, Adef.od_of_cdate tit.t_date_end)
+     (Date.od_of_cdate tit.t_date_start, Date.od_of_cdate tit.t_date_end)
    with
   | None, None -> ()
   | Some sd, None ->
@@ -620,7 +620,7 @@ let ged_fevent opts base per_sel evt =
       Printf.ksprintf (oc opts) "1 EVEN";
       ged_tag_fevent base evt)
   in
-  let date = Adef.od_of_cdate evt.efam_date in
+  let date = Date.od_of_cdate evt.efam_date in
   let place = sou base evt.efam_place in
   let note = sou base evt.efam_note in
   let src = sou base evt.efam_src in
@@ -656,7 +656,7 @@ let has_personal_infos base per =
   get_parents per <> None
   || sou base (get_first_name per) <> "?"
   || sou base (get_surname per) <> "?"
-  || get_birth per <> Adef.cdate_None
+  || get_birth per <> Date.cdate_None
   || sou base (get_birth_place per) <> ""
   || (get_death per <> NotDead && get_death per <> DontKnowIfDead)
   || sou base (get_occupation per) <> ""

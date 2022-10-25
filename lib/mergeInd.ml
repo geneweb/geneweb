@@ -4,7 +4,7 @@ open Def
 open Gwdb
 
 let compatible_cdates cd1 cd2 =
-  cd1 = cd2 || cd2 = Adef.cdate_None || cd1 = Adef.cdate_None
+  cd1 = cd2 || cd2 = Date.cdate_None || cd1 = Date.cdate_None
 
 let compatible_death_reasons dr1 dr2 = dr1 = dr2 || dr2 = Unspecified
 
@@ -135,11 +135,11 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
       (gen_person_of_person p1) with
       sex = (if get_sex p2 <> Neuter then get_sex p2 else get_sex p1);
       birth =
-        (if get_birth p1 = Adef.cdate_None then get_birth p2 else get_birth p1);
+        (if get_birth p1 = Date.cdate_None then get_birth p2 else get_birth p1);
       birth_place = get_string get_birth_place;
       birth_src = get_string get_birth_src;
       baptism =
-        (if get_baptism p1 = Adef.cdate_None then get_baptism p2
+        (if get_baptism p1 = Date.cdate_None then get_baptism p2
         else get_baptism p1);
       baptism_place = get_string get_baptism_place;
       baptism_src = get_string get_baptism_src;
@@ -233,7 +233,7 @@ let effective_merge_fam conf base ifam1 fam1 fam2 =
     {
       (gen_family_of_family fam1) with
       marriage =
-        (if get_marriage fam1 = Adef.cdate_None then get_marriage fam2
+        (if get_marriage fam1 = Date.cdate_None then get_marriage fam2
         else get_marriage fam1);
       marriage_place =
         (if is_empty_string (get_marriage_place fam1) then

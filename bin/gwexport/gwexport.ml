@@ -137,13 +137,9 @@ module IFS = Util.IfamSet
     its visibility is not public
 *)
 let is_censored_person threshold p =
-  match Adef.od_of_cdate (get_birth p) with
+  match Date.cdate_to_dmy_opt (get_birth p) with
   | None -> false
-  | Some date -> (
-      match date with
-      | Adef.Dgreg (dmy, _) ->
-          dmy.Adef.year >= threshold && get_access p != Def.Public
-      | _ -> false)
+  | Some dmy -> dmy.Adef.year >= threshold && get_access p != Def.Public
 
 (** [is_censored_couple base max_year family]
     Returns [true] if either the father or the mother of a given family in the

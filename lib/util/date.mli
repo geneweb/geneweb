@@ -27,6 +27,9 @@ val time_elapsed_opt : Def.dmy -> Def.dmy -> Def.dmy option
     if computation is not possible
     (e.g. time_elapsed_opt /1839 /1859). *)
 
+(* TODO same with burial? personal/familial event?  *)
+(* TODO add a dmy_of_death *)
+
 val date_of_death : Def.death -> Adef.date option
 (** Returns date of death if present. *)
 
@@ -64,5 +67,22 @@ val compare_date : ?strict:bool -> date -> date -> int
     is false by default (see [Not_comparable])
 *)
 
+val cdate_None : cdate
+(** Absent compressed date *)
+
+val date_of_cdate : cdate -> date
+(** Convert [cdate] to [date]; fail if [cdate] is [Cnone]  *)
+
+val od_of_cdate : cdate -> date option
+(** Optional date from [cdate] *)
+
 val cdate_to_dmy_opt : cdate -> dmy option
 (** [cdate_to_dmy_opt d] is [Some dmy] iff [d] resolve to [Dgreg (dmy,_)] *)
+
+val cdate_of_date : date -> cdate
+(** Convert [date] to [cdate] *)
+
+val cdate_of_od : date option -> cdate
+(** Optional date to [cdate] *)
+
+(* TODO date_to_dmy? *)
