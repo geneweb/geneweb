@@ -173,7 +173,7 @@ let print_cousins_side_of conf base cnt_t iplist splist max_cnt a ini_p ini_br l
         print_descend_upto conf base cnt_t iplist splist max_cnt ini_p ini_br
             lev2 sib false print_sosa
       in
-      let has_cousins = iplist1 > iplist0 in
+      let has_cousins = List.length iplist1 > List.length iplist0 in
       if lev1 > 1 && print && has_cousins then
         begin
           Output.print_string conf "<li>\n";
@@ -216,11 +216,11 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 print print_sosa =
         let (some, cnt_t, iplist, splist) =
           match Util.old_branch_of_sosa conf base (get_iper p) sosa with
             Some ((ia, _) :: _ as br) ->
-            let (some1, cnt_t, iplist, splist) =
-              print_cousins_side_of conf base cnt_t iplist splist max_cnt
-                (pget conf base ia) p br lev1 lev2 print print_sosa
-            in
-            (some || some1, cnt_t, iplist, splist)
+                let (some1, cnt_t, iplist, splist) =
+                  print_cousins_side_of conf base cnt_t iplist splist max_cnt
+                    (pget conf base ia) p br lev1 lev2 print print_sosa
+                in
+                (some || some1, cnt_t, iplist, splist)
           | _ -> (some, cnt_t, iplist, splist)
         in
         loop (Sosa.inc sosa 1) (some, cnt_t, iplist, splist)

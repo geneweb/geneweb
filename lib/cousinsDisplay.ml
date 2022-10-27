@@ -198,9 +198,9 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
         let some =
           match Util.old_branch_of_sosa conf base (get_iper p) sosa with
             Some ((ia, _) :: _ as br) ->
-            print_cousins_side_of conf base max_cnt (pget conf base ia) p br
-              lev1 lev2 ||
-            some
+                print_cousins_side_of conf base max_cnt (pget conf base ia) p br
+                lev1 lev2 ||
+                some
           | _ -> some
         in
         loop (Sosa.inc sosa 1) some
@@ -259,7 +259,8 @@ let print_cousins conf base p lev1 lev2 =
   cnt := 0;
   (* Construction de la table des sosa de la base *)
   let () = SosaMain.build_sosa_ht conf base in
-  print_cousins_lev conf base max_cnt p lev1 lev2;
+  let (cnt_t, iplist, splist) = CousinsPrintOrCount.print_cousins_lev conf base max_cnt p lev1 lev2 true SosaMain.print_sosa in
+  cnt := cnt_t;
   Output.print_string conf "<div>\n";
   Output.print_string conf "<p>\n";
   if !cnt >= max_cnt then Output.print_string conf "etc...\n"
