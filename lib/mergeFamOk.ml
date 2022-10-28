@@ -6,12 +6,6 @@ open Def
 open Gwdb
 open Util
 
-let rec merge_lists l1 =
-  function
-    x2 :: l2 ->
-      if List.mem x2 l1 then merge_lists l1 l2 else merge_lists (l1 @ [x2]) l2
-  | [] -> l1
-
 let cat_strings base is1 sep is2 =
   let n1 = sou base is1 in
   let n2 = sou base is2 in
@@ -59,15 +53,15 @@ let merge_events conf l1 l2 =
   let need_selection x1 x2 = x1 <> "" && x2 <> "" && x1 <> x2 in
   let string_event_date e =
     match Adef.od_of_cdate e.efam_date with
-      None -> ""
+      None -> Adef.safe ""
     | Some d -> DateDisplay.string_of_ondate conf d
   in
   let can_merge_event e1 e2 =
     not
-      (need_selection (string_event_date e1) (string_event_date e2) ||
-       need_selection e1.efam_place e2.efam_place ||
-       need_selection e1.efam_note e2.efam_note ||
-       need_selection e1.efam_src e2.efam_src)
+      (need_selection (string_event_date e1 :> string) (string_event_date e2 :> string)
+       || need_selection e1.efam_place e2.efam_place
+       || need_selection e1.efam_note e2.efam_note
+       || need_selection e1.efam_src e2.efam_src)
   in
   let list_mem e l =
     let found_marriage = ref false in
@@ -203,7 +197,7 @@ let print_merge conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_mod_merge_ok conf base wl cpl des =
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "merge done")) in
+  let title _ = Output.print_sstring conf (Utf8.capitalize_fst (transl conf "merge done")) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   UpdateFamOk.print_family conf base wl cpl des;

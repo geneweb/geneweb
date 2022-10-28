@@ -11,7 +11,7 @@
 
   environment:
     CYG_BASH: '%CYG_ROOT%/bin/bash -lc'
-    OPAM_PACKAGES: 'calendars camlp5 cppo dune jingoo markup ppx_blob ppx_deriving ppx_import stdlib-shims syslog unidecode.0.2.0 uucp uutf uunf'
+    OPAM_PACKAGES: 'calendars camlp5 camlp-streams cppo dune jingoo markup ppx_blob ppx_deriving ppx_import stdlib-shims syslog unidecode.0.2.0 uucp uutf uunf'
     matrix:
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
         CYG_ROOT: C:/cygwin64
@@ -64,13 +64,3 @@
       name: GeneWeb with default options
     - path: geneweb-win64-%PKG_VERSION%-installer.exe
       name: Win64 installer for GeneWeb
-
-  deploy:
-    release: 'Geneweb %PKG_VERSION%'
-    description: 'Geneweb %PKG_VERSION% built by appveyor'
-    provider: GitHub
-    auth_token:
-      secure: YbzLC93Z4uRdKRn/TmH2lgzPVQ8Zgv4/PzAhJdUKHAXPKu+5vWfNCOelxnab+zCf
-    artifact: /geneweb-%PKG_OS%-%PKG_VERSION%.zip|geneweb-win64-%PKG_VERSION%-installer.exe/
-    draft: false
-    prerelease: true

@@ -67,7 +67,7 @@ let syslog (level : level) msg =
       | `LOG_INFO -> "INFO"
       | `LOG_DEBUG -> "DEBUG"
     in
-    let print oc = Printf.fprintf oc "[%s]: %s %s\n" (Mutil.sprintf_date tm) level msg in
+    let print oc = Printf.fprintf oc "[%s]: %s %s\n" (Mutil.sprintf_date tm :> string) level msg in
     begin match Sys.getenv_opt "GW_SYSLOG_FILE" with
       | Some fn ->
         let oc = open_out_gen [ Open_wronly ; Open_creat ; Open_append ] 0o644 fn in

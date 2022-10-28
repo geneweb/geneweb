@@ -90,28 +90,29 @@ GENERATED_FILES_DEP = \
 
 generated: $(GENERATED_FILES_DEP)
 
-install uninstall build: $(GENERATED_FILES_DEP)
+install uninstall build distrib: $(GENERATED_FILES_DEP)
 
 # [BEGIN] Installation / Distribution section
 
 build: ## Build the geneweb package (librairies and binaries)
 build:
-	dune build -p geneweb
+	dune build -p geneweb --profile $(DUNE_PROFILE)
 
 install: ## Install geneweb using dune
 install:
-	dune build @install
+	dune build @install --profile $(DUNE_PROFILE)
 	dune install
 
 uninstall: ## Uninstall geneweb using dune
 uninstall:
-	dune build @install
+	dune build @install --profile $(DUNE_PROFILE)
 	dune uninstall
 
 BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
 
 distrib: ## Build the project and copy what is necessary for distribution
-distrib: build
+distrib:
+	dune build -p geneweb --profile $(DUNE_PROFILE)
 	$(RM) -r $(DISTRIB_DIR)
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
@@ -131,8 +132,8 @@ distrib: build
 	  cp etc/gwsetup $(DISTRIB_DIR)/gwsetup.command; \
 	  cp etc/macOS/geneweb.command $(DISTRIB_DIR); \
 	else \
-	  cp etc/gwd $(DISTRIB_DIR); \
-	  cp etc/gwsetup $(DISTRIB_DIR); \
+	  cp etc/gwd $(DISTRIB_DIR)/gwd.sh; \
+	  cp etc/gwsetup $(DISTRIB_DIR)/gwsetup.sh; \
 	fi
 	mkdir $(DISTRIB_DIR)/gw
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.

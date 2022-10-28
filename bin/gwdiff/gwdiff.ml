@@ -1,6 +1,5 @@
 (* Copyright (c) 2001 Ludovic LEDIEU *)
 
-open Geneweb
 open Def
 open Gwdb
 

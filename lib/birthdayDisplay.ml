@@ -10,30 +10,35 @@ type date_event =
   | DeDeath of death_reason
 
 let print_anniversary_day conf base dead_people liste =
-  Output.print_string conf "<ul>\n";
-  List.iter
-    (fun (p, a, date_event, txt_of) ->
-       let is = index_of_sex (get_sex p) in
-       Output.print_string conf "<li>\n";
-       Output.printf conf "%s\n" (txt_of conf base p);
-       if not dead_people then Output.printf conf " <em>%d</em>\n" a
-       else
-         begin let txt =
-           match date_event with
-             DeBirth -> transl_nth conf "born" is
-           | DeDeath Unspecified -> transl_nth conf "died" is
-           | DeDeath Killed -> transl_nth conf "killed (in action)" is
-           | DeDeath Murdered -> transl_nth conf "murdered" is
-           | DeDeath Executed ->
-               transl_nth conf "executed (legally killed)" is
-           | DeDeath Disappeared -> transl_nth conf "disappeared" is
-         in
-           Output.printf conf ", <em>%s %s %d</em>\n" txt
-             (transl conf "in (year)") a
-         end;
-       Output.print_string conf "</li>\n")
-    liste;
-  Output.print_string conf "</ul>\n"
+  Output.print_sstring conf "<ul>";
+  List.iter begin fun (p, a, date_event, txt_of) ->
+    let is = index_of_sex (get_sex p) in
+    Output.print_sstring conf "<li>";
+    Output.print_string conf (txt_of conf base p);
+    if not dead_people then begin
+      Output.print_sstring conf " <em>" ;
+      Output.print_sstring conf (string_of_int a) ;
+      Output.print_sstring conf "</em>" ;
+    end else begin
+      Output.print_sstring conf ", <em>" ;
+      begin Output.print_sstring conf @@ match date_event with
+        | DeBirth -> transl_nth conf "born" is
+        | DeDeath Unspecified -> transl_nth conf "died" is
+        | DeDeath Killed -> transl_nth conf "killed (in action)" is
+        | DeDeath Murdered -> transl_nth conf "murdered" is
+        | DeDeath Executed ->
+          transl_nth conf "executed (legally killed)" is
+        | DeDeath Disappeared -> transl_nth conf "disappeared" is
+      end ;
+      Output.print_sstring conf " " ;
+      Output.print_sstring conf (transl conf "in (year)") ;
+      Output.print_sstring conf " " ;
+      Output.print_sstring conf (string_of_int a) ;
+      Output.print_sstring conf "</em>" ;
+    end ;
+    Output.print_sstring conf "</li>"
+  end liste;
+  Output.print_sstring conf "</ul>"
 
 let gen_print conf base mois f_scan dead_people =
   let tab = Array.make 31 [] in
@@ -95,15 +100,15 @@ let gen_print conf base mois f_scan dead_people =
   Hutil.print_link_to_welcome conf true;
   if Array.for_all ((=) []) tab then
     begin
-      Output.print_string conf "<p>\n";
+      Output.print_sstring conf "<p>\n";
       Output.printf conf "%s.\n" (Utf8.capitalize_fst (transl conf "no anniversary"));
-      Output.print_string conf "</p>\n"
+      Output.print_sstring conf "</p>\n"
     end;
-  Output.print_string conf "<ul>\n";
+  Output.print_sstring conf "<ul>\n";
   for j = 1 to 31 do
     if tab.(pred j) <> [] then
       begin
-        Output.print_string conf "<li>\n";
+        Output.print_sstring conf "<li>\n";
         Output.printf conf "%d\n" j;
         begin let liste =
           List.sort (fun (_, a1, _, _) (_, a2, _, _) -> compare a1 a2)
@@ -111,50 +116,53 @@ let gen_print conf base mois f_scan dead_people =
         in
           print_anniversary_day conf base dead_people liste
         end;
-        Output.print_string conf "</li>\n"
+        Output.print_sstring conf "</li>\n"
       end
   done;
-  Output.print_string conf "</ul>\n";
+  Output.print_sstring conf "</ul>\n";
   Hutil.trailer conf
 
 let print_anniversary_list conf base dead_people dt liste =
   let a_ref = dt.year in
-  Output.print_string conf "<ul>\n";
+  Output.print_sstring conf "<ul>\n";
   List.iter
     (fun (p, a, date_event, txt_of) ->
-       Output.print_string conf "<li>";
-       if dead_people then
-         begin
-           Output.print_string conf "<em>";
-           begin match date_event with
-             DeBirth -> Output.print_string conf (transl conf "birth")
-           | DeDeath _ -> Output.print_string conf (transl conf "death")
-           end;
-           Output.print_string conf "</em>\n";
-           Output.print_string conf "-&gt; ";
-           Output.print_string conf (txt_of conf base p);
-           Output.printf conf "\n<em>%s %d" (transl conf "in (year)") a;
-           Output.print_string conf " (";
-           Output.printf conf (ftransl conf "%d years ago") (conf.today.year - a);
-           Output.print_string conf ")</em>"
-         end
-       else
-         begin
-           Output.print_string conf (txt_of conf base p);
-           match get_death p with
-             NotDead ->
-               Output.print_string conf " <em>";
-               begin match a_ref - a with
-                 0 -> Output.print_string conf (transl conf "birth")
-               | 1 -> Output.print_string conf (transl conf "one year old")
-               | n -> Output.printf conf "%d %s" n (transl conf "years old")
-               end;
-               Output.print_string conf "</em>"
-           | _ -> ()
+       Output.print_sstring conf "<li>";
+       if dead_people then begin
+         Output.print_sstring conf "<em>";
+         begin match date_event with
+           | DeBirth -> Output.print_sstring conf (transl conf "birth")
+           | DeDeath _ -> Output.print_sstring conf (transl conf "death")
          end;
-       Output.print_string conf "</li>\n")
+         Output.print_sstring conf "</em> -&gt; ";
+         Output.print_string conf (txt_of conf base p);
+         Output.print_sstring conf " <em>" ;
+         Output.print_sstring conf (transl conf "in (year)") ;
+         Output.print_sstring conf " " ;
+         Output.print_sstring conf (string_of_int a );
+         Output.print_sstring conf " (";
+         Output.print_sstring conf
+           (Printf.sprintf (ftransl conf "%d years ago") (conf.today.year - a) );
+         Output.print_sstring conf ")</em>"
+       end else begin
+         Output.print_string conf (txt_of conf base p);
+         match get_death p with
+         | NotDead ->
+           Output.print_sstring conf " <em>";
+           begin match a_ref - a with
+             | 0 -> Output.print_sstring conf (transl conf "birth")
+             | 1 -> Output.print_sstring conf (transl conf "one year old")
+             | n ->
+               Output.print_sstring conf (string_of_int n) ;
+               Output.print_sstring conf " " ;
+               Output.print_sstring conf (transl conf "years old") ;
+           end ;
+           Output.print_sstring conf "</em>"
+         | _ -> ()
+       end ;
+       Output.print_sstring conf "</li>")
     liste;
-  Output.print_string conf "</ul>\n"
+  Output.print_sstring conf "</ul>"
 
 let f_scan conf base =
   let next = Gwdb.Collection.iterator (Gwdb.ipers base) in
@@ -169,60 +177,60 @@ let print_dead conf base mois =
 
 let print_birth_day conf base day_name fphrase wd dt list =
   match list with
-    [] ->
-      Output.print_string conf "<p>\n";
-      Output.printf conf "%s %s.\n" (Utf8.capitalize_fst (transl conf "no birthday"))
-        day_name;
-      Output.print_string conf "</p>\n"
+  | [] ->
+    Output.print_sstring conf "<p>";
+    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "no birthday")) ;
+    Output.print_sstring conf " " ;
+    Output.print_string conf day_name ;
+    Output.print_sstring conf ".</p>"
   | _ ->
-      Output.print_string conf "<p>\n";
-      begin let txt =
-        transl_decline conf "on (weekday day month year)"
-          (transl_nth conf "(week day)" wd ^ " " ^ DateDisplay.code_dmy conf dt)
-      in
-        Output.printf conf fphrase
-          (Utf8.capitalize_fst day_name ^ ",\n" ^ std_color conf ("<b>" ^ txt ^ "</b>"))
-          (transl conf "the birthday")
-      end;
-      Output.print_string conf "...\n";
-      Output.print_string conf "</p>\n";
-      print_anniversary_list conf base false dt list
+    Output.print_sstring conf "<p>\n";
+    let txt =
+      (transl_nth conf "(week day)" wd ^ " " ^ DateDisplay.code_dmy conf dt)
+      |> transl_decline conf "on (weekday day month year)"
+      |> Adef.safe
+    in
+    Output.printf conf fphrase
+      (Utf8.capitalize_fst (day_name : Adef.safe_string :> string)
+       ^<^ ",\n" ^<^ std_color conf ("<b>" ^<^ txt ^>^ "</b>")
+       : Adef.safe_string :> string)
+      (transl conf "the birthday") ;
+    Output.print_sstring conf "...</p>";
+    print_anniversary_list conf base false dt list
 
 let propose_months conf mode =
   begin_centered conf;
-  Output.print_string conf "<span>";
-  Output.print_string conf
-    (Utf8.capitalize_fst (transl conf "select a month to see all the anniversaries"));
-  Output.print_string conf "</span>";
-  Output.printf conf "<table border=\"%d\">\n" conf.border;
-  Output.print_string conf "<tr>\n";
-  Output.print_string conf "<td>\n";
-  Output.printf conf "<form class=\"form-inline\" method=\"get\" action=\"%s\">\n"
-    conf.command;
-  Output.print_string conf "<p>\n";
-  Util.hidden_env conf;
-  mode ();
-  Output.print_string conf
-    "<select class=\"form-control form-control-lg\" name=\"v\">\n";
+  Output.print_sstring conf "<span>";
+  transl conf "select a month to see all the anniversaries"
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf "</span>";
+  Output.print_sstring conf {|<table border="|} ;
+  Output.print_sstring conf (string_of_int conf.border) ;
+  Output.print_sstring conf {|"><tr><td>|};
+  Output.print_sstring conf {|<form class="form-inline" method="get" action="|} ;
+  Output.print_sstring conf conf.command ;
+  Output.print_sstring conf {|"><p>|} ;
+  Util.hidden_env conf ;
+  mode () ;
+  Output.print_sstring conf {|<select class="form-control form-control-lg" name="v">|} ;
   for i = 1 to 12 do
-    begin
-      Output.printf conf "<option value=\"%d\"%s>" i
-        (if i = conf.today.month then " selected=\"selected\"" else "");
-      Output.print_string conf
-        (Utf8.capitalize_fst (Util.translate_eval (transl_nth conf "(month)" (i - 1))));
-      Output.print_string conf "</option>\n"
-    end
+    Output.print_sstring conf {|<option value="|} ;
+    Output.print_sstring conf (string_of_int i) ;
+    Output.print_sstring conf {|"|} ;
+    Output.print_sstring conf (if i = conf.today.month then {| selected="selected">|} else ">");
+    transl_nth conf "(month)" (i - 1)
+    |> Util.translate_eval
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf ;
+    Output.print_sstring conf "</option>"
   done;
-  Output.print_string conf "</select>\n";
-  Output.print_string conf
-    "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-  Output.print_string conf "</button>\n";
-  Output.print_string conf "</p>\n";
-  Output.print_string conf "</form>\n";
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "</table>\n";
+  Output.print_sstring conf "</select>";
+  Output.print_sstring conf {|<button type="submit" class="btn btn-secondary btn-lg">|};
+  transl_nth conf "validate/delete" 0
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf "</button></p></form></td></tr></table>";
   end_centered conf
 
 let day_after d =
@@ -234,26 +242,49 @@ let day_after d =
   let year = d.year + r in
   {day = day; month = month; year = year; prec = Sure; delta = 0}
 
-let print_anniv conf base day_name fphrase wd dt list =
-  match list with
-    [] ->
-      Output.print_string conf "<p>\n";
-      Output.printf conf "%s %s.\n" (Utf8.capitalize_fst (transl conf "no anniversary"))
-        day_name;
-      Output.print_string conf "</p>\n"
-  | _ ->
-      Output.print_string conf "<p>\n";
-      begin let txt =
-        transl_decline conf "on (weekday day month year)"
-          (transl_nth conf "(week day)" wd ^ " " ^ DateDisplay.code_dmy conf dt)
-      in
-        Output.printf conf fphrase
-          (Utf8.capitalize_fst day_name ^ ",\n" ^ std_color conf ("<b>" ^ txt ^ "</b>"))
-          (transl conf "the anniversary")
-      end;
-      Output.print_string conf "...\n";
-      Output.print_string conf "</p>\n";
-      print_anniversary_list conf base true dt list
+let print_anniv conf base day_name fphrase wd dt = function
+  | [] ->
+    Output.print_sstring conf "<p>";
+    transl conf "no anniversary"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf ;
+    Output.print_sstring conf " " ;
+    Output.print_string conf day_name ;
+    Output.print_sstring conf ".</p>"
+  | list ->
+    Output.print_sstring conf "<p>";
+    let txt =
+      (transl_nth conf "(week day)" wd ^ " " ^ DateDisplay.code_dmy conf dt)
+      |> transl_decline conf "on (weekday day month year)"
+      |> Adef.safe
+    in
+    Output.printf conf fphrase
+      (Utf8.capitalize_fst (day_name : Adef.safe_string :> string)
+       ^<^ ",\n" ^<^ std_color conf ("<b>" ^<^ txt ^>^ "</b>")
+       : Adef.safe_string :> string)
+      (transl conf "the anniversary") ;
+    Output.print_sstring conf "...</p>";
+    print_anniversary_list conf base true dt list
+
+let list_aux conf base list cb =
+  Output.print_sstring conf "<ul>";
+  List.iter begin fun (fam, year) ->
+    Output.print_sstring conf "<li>";
+    Output.print_string conf
+      (referenced_person_title_text conf base (pget conf base (get_father fam)));
+    Output.print_sstring conf " " ;
+    Output.print_sstring conf (transl_nth conf "and" 0);
+    Output.print_sstring conf " " ;
+    Output.print_string conf
+      (referenced_person_title_text conf base (pget conf base (get_mother fam)));
+    Output.print_sstring conf ", <em>";
+    Output.print_sstring conf (transl conf "in (year)") ;
+    Output.print_sstring conf " " ;
+    Output.print_sstring conf (string_of_int year) ;
+    cb conf year ;
+    Output.print_sstring conf "</em></li>"
+  end list;
+  Output.print_sstring conf "</ul>"
 
 let print_marriage conf base month =
   let title _ =
@@ -279,98 +310,75 @@ let print_marriage conf base month =
           tab.(pred d) <- (fam, y) :: tab.(pred d)
       | _ -> ()
     ) (Gwdb.ifams base) ;
-  Output.print_string conf "<ul>";
+  Output.print_sstring conf "<ul>";
   for i = 1 to 31 do
     match tab.(i-1) with
-      [] -> ()
-    | l ->
-        let l = List.sort (fun (_, y1) (_, y2) -> compare y1 y2) l in
-        Output.print_string conf "\n";
-        Output.print_string conf "<li>" ;
-        Output.printf conf "%d\n<ul>" i;
-        List.iter
-          (fun (fam, year) ->
-             Output.print_string conf "<li>" ;
-             Output.print_string conf
-               (referenced_person_title_text conf base
-                  (pget conf base (get_father fam)));
-             Output.printf conf "\n%s\n" (transl_nth conf "and" 0);
-             Output.print_string conf
-               (referenced_person_title_text conf base
-                  (pget conf base (get_mother fam)));
-             Output.printf conf ", <em>%s %d</em>\n" (transl conf "in (year)")
-               year)
-          l;
-        Output.print_string conf "</ul>\n"
+    | [] -> ()
+    | list ->
+      let list = List.sort (fun (_, y1) (_, y2) -> compare y1 y2) list in
+      Output.print_sstring conf " <li>" ;
+      Output.print_sstring conf (string_of_int i);
+      list_aux conf base list (fun _ _ -> ()) ;
+      Output.print_sstring conf " </li>" ;
   done;
-  Output.print_string conf "</ul>\n";
+  Output.print_sstring conf "</ul>";
   Hutil.trailer conf
 
 let print_anniversaries_of_marriage conf base list =
-  Output.print_string conf "<ul>\n";
-  List.iter
-    (fun (fam, year) ->
-       Output.print_string conf "<li>";
-       Output.printf conf "%s\n"
-         (referenced_person_title_text conf base
-            (pget conf base (get_father fam)));
-       Output.printf conf "%s\n" (transl_nth conf "and" 0);
-       Output.print_string conf
-         (referenced_person_title_text conf base
-            (pget conf base (get_mother fam)));
-       Output.printf conf ", <em>%s %d\n(" (transl conf "in (year)") year;
-       Output.printf conf (ftransl conf "%d years ago") (conf.today.year - year);
-       Output.print_string conf "</em>)";
-       Output.print_string conf "</li>\n")
-    list;
-  Output.print_string conf "</ul>\n"
+  list_aux conf base list begin fun conf year ->
+    Output.print_sstring conf " (" ;
+    Printf.sprintf (ftransl conf "%d years ago") (conf.today.year - year)
+    |> Output.print_sstring conf ;
+    Output.print_sstring conf ")" ;
+  end
 
-let print_marriage_day conf base day_name fphrase wd dt list =
-  match list with
-    [] ->
-      Output.print_string conf "<p>\n";
-      Output.printf conf "%s %s.\n" (Utf8.capitalize_fst (transl conf "no anniversary"))
-        day_name;
-      Output.print_string conf "</p>\n"
-  | _ ->
-      Output.print_string conf "<p>\n";
-      Output.printf conf fphrase
-        (Utf8.capitalize_fst day_name ^ ",\n" ^
-         std_color conf
-           ("<b>" ^
-            transl_decline conf "on (weekday day month year)"
-              (transl_nth conf "(week day)" wd ^ " " ^
-               DateDisplay.code_dmy conf dt) ^
-            "</b>"))
-        (transl conf "the anniversary of marriage");
-      Output.print_string conf "...\n";
-      Output.print_string conf "</p>\n";
-      print_anniversaries_of_marriage conf base list
+let print_marriage_day conf base day_name fphrase wd dt = function
+  | [] ->
+    Output.print_sstring conf "<p>";
+    transl conf "no anniversary"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf ;
+    Output.print_sstring conf " " ;
+    Output.print_string conf day_name;
+    Output.print_sstring conf ".</p>"
+  | list ->
+    Output.print_sstring conf "<p>";
+    Output.printf conf fphrase
+      (Utf8.capitalize_fst (day_name : Adef.safe_string :> string)
+       ^<^ ",\n"
+       ^<^ std_color conf
+         ("<b>"
+          ^ transl_decline conf "on (weekday day month year)"
+            (transl_nth conf "(week day)" wd ^ " " ^ DateDisplay.code_dmy conf dt)
+          ^ "</b>"
+          |> Adef.safe)
+       : Adef.safe_string :> string)
+      (transl conf "the anniversary of marriage") ;
+    Output.print_sstring conf "...</p>" ;
+    print_anniversaries_of_marriage conf base list
 
 let match_dates conf base p d1 d2 =
   if d1.day = d2.day && d1.month = d2.month then authorized_age conf base p
-  else if
-    d1.day = 29 && d1.month = 2 && d2.day = 1 && d2.month = 3 &&
-    not (Date.leap_year d2.year)
-  then
-    authorized_age conf base p
+  else if d1.day = 29 && d1.month = 2 && d2.day = 1 && d2.month = 3
+          && not (Date.leap_year d2.year)
+  then authorized_age conf base p
   else false
 
 let gen_print_menu_birth conf base f_scan mode =
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "birthdays")) in
+  let title _ = transl conf "birthdays" |> Utf8.capitalize_fst |> Output.print_sstring conf in
   let tom = day_after conf.today in
   let aft = day_after tom in
   let list_tod = ref [] in
   let list_tom = ref [] in
   let list_aft = ref [] in
   begin match Util.find_person_in_env conf base "" with
-    Some p ->
+    | Some p ->
       Perso.interp_notempl_with_menu title "perso_header" conf base p;
-      Output.print_string conf "<h2>\n";
+      Output.print_sstring conf "<h2>";
       title false;
-      Output.print_string conf "</h2>\n"
-  | None -> Hutil.header conf title
-  end;
+      Output.print_sstring conf "</h2>"
+    | None -> Hutil.header conf title
+  end ;
   Hutil.print_link_to_welcome conf true;
   begin try
     while true do
@@ -388,22 +396,20 @@ let gen_print_menu_birth conf base f_scan mode =
     done
   with Not_found -> ()
   end;
-  List.iter
-    (fun xx ->
-       xx :=
-         List.sort (fun (_, a1, _, _) (_, a2, _, _) -> compare a1 a2) !xx)
-    [list_tod; list_tom; list_aft];
-  print_birth_day conf base (transl conf "today")
+  List.iter begin fun xx ->
+    xx := List.sort (fun (_, a1, _, _) (_, a2, _, _) -> compare a1 a2) !xx
+  end [list_tod; list_tom; list_aft];
+  print_birth_day conf base (transl conf "today" |> Adef.safe)
     (ftransl conf "%s, it is %s of") conf.today_wd conf.today !list_tod;
-  print_birth_day conf base (transl conf "tomorrow")
+  print_birth_day conf base (transl conf "tomorrow" |> Adef.safe)
     (ftransl conf "%s, it will be %s of") ((conf.today_wd + 1) mod 7) tom
     !list_tom;
-  print_birth_day conf base (transl conf "the day after tomorrow")
+  print_birth_day conf base (transl conf "the day after tomorrow" |> Adef.safe)
     (ftransl conf "%s, it will be %s of") ((conf.today_wd + 2) mod 7) aft
     !list_aft;
-  Output.print_string conf "\n";
+  Output.print_sstring conf " ";
   propose_months conf mode;
-  Output.print_string conf "\n";
+  Output.print_sstring conf " ";
   Hutil.trailer conf
 
 let print_menu_birth conf base =
@@ -414,14 +420,15 @@ let print_menu_birth conf base =
       | None -> raise Not_found
   in
   let mode () =
-    Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"AN\">\n"
+    Output.print_sstring conf "<input type=\"hidden\" name=\"m\" value=\"AN\">\n"
   in
   gen_print_menu_birth conf base f_scan mode
 
 let gen_print_menu_dead conf base f_scan mode =
   let title _ =
-    Output.print_string conf
-      (Utf8.capitalize_fst (transl conf "anniversaries of dead people"))
+    transl conf "anniversaries of dead people"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   let tom = day_after conf.today in
   let aft = day_after tom in
@@ -464,22 +471,21 @@ let gen_print_menu_dead conf base f_scan mode =
     done
   with Not_found -> ()
   end;
-  List.iter
-    (fun xx ->
-       xx :=
-         List.sort (fun (_, a1, _, _) (_, a2, _, _) -> compare a1 a2) !xx)
-    [list_tod; list_tom; list_aft];
-  print_anniv conf base (transl conf "today") (ftransl conf "%s, it is %s of")
+  List.iter begin fun xx ->
+    xx := List.sort (fun (_, a1, _, _) (_, a2, _, _) -> compare a1 a2) !xx
+  end [list_tod; list_tom; list_aft];
+  print_anniv conf base (transl conf "today" |> Adef.safe)
+    (ftransl conf "%s, it is %s of")
     conf.today_wd conf.today !list_tod;
-  print_anniv conf base (transl conf "tomorrow")
+  print_anniv conf base (transl conf "tomorrow" |> Adef.safe)
     (ftransl conf "%s, it will be %s of") ((conf.today_wd + 1) mod 7) tom
     !list_tom;
-  print_anniv conf base (transl conf "the day after tomorrow")
+  print_anniv conf base (transl conf "the day after tomorrow" |> Adef.safe)
     (ftransl conf "%s, it will be %s of") ((conf.today_wd + 2) mod 7) aft
     !list_aft;
-  Output.print_string conf "\n";
+  Output.print_sstring conf "\n";
   propose_months conf mode;
-  Output.print_string conf "\n";
+  Output.print_sstring conf "\n";
   Hutil.trailer conf
 
 let print_menu_dead conf base =
@@ -489,10 +495,7 @@ let print_menu_dead conf base =
       | Some i -> (pget conf base i, referenced_person_title_text)
       | None -> raise Not_found
   in
-  let mode () =
-    Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"AD\">\n"
-  in
-  gen_print_menu_dead conf base f_scan mode
+  gen_print_menu_dead conf base f_scan (fun () -> Util.hidden_input conf "m" @@ Adef.encoded "AD")
 
 let match_mar_dates conf base cpl d1 d2 =
   if d1.day = d2.day && d1.month = d2.month then
@@ -508,7 +511,9 @@ let match_mar_dates conf base cpl d1 d2 =
 
 let print_menu_marriage conf base =
   let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (transl conf "anniversaries of marriage"))
+    transl conf "anniversaries of marriage"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   let tom = day_after conf.today in
   let aft = day_after tom in
@@ -541,29 +546,27 @@ let print_menu_marriage conf base =
   List.iter
     (fun xx -> xx := List.sort (fun (_, y1) (_, y2) -> compare y1 y2) !xx)
     [list_tod; list_tom; list_aft];
-  print_marriage_day conf base (transl conf "today")
+  print_marriage_day conf base (transl conf "today" |> Adef.safe)
     (ftransl conf "%s, it is %s of") conf.today_wd conf.today !list_tod;
-  print_marriage_day conf base (transl conf "tomorrow")
+  print_marriage_day conf base (transl conf "tomorrow" |> Adef.safe)
     (ftransl conf "%s, it will be %s of") ((conf.today_wd + 1) mod 7) tom
     !list_tom;
-  print_marriage_day conf base (transl conf "the day after tomorrow")
+  print_marriage_day conf base (transl conf "the day after tomorrow" |> Adef.safe)
     (ftransl conf "%s, it will be %s of") ((conf.today_wd + 2) mod 7) aft
     !list_aft;
-  Output.print_string conf "\n";
-  let mode () =
-    Output.print_string conf "<input type=\"hidden\" name=\"m\" value=\"AM\">\n"
-  in
-  propose_months conf mode; Output.print_string conf "\n"; Hutil.trailer conf
+  Output.print_sstring conf "\n";
+  propose_months conf (fun () -> Util.hidden_input conf "m" @@ Adef.encoded "AM");
+  Output.print_sstring conf "\n";
+  Hutil.trailer conf
 
 (* template *)
 type 'a env =
     Vother of 'a
-  | Vnone
 
 let get_vother =
   function
     Vother x -> Some x
-  | _ -> None
+
 let set_vother x = Vother x
 
 let print_anniversaries conf =

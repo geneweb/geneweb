@@ -17,8 +17,8 @@ let select (type a) (module Q : Pqueue.S with type elt = (a * dmy * calendar)) n
   let ref_date =
     match p_getint conf.env "by" with
     | Some by ->
-      let bm = Opt.default (-1) (p_getint conf.env "bm") in
-      let bd = Opt.default (-1) (p_getint conf.env "bd") in
+      let bm = Option.value ~default:(-1) (p_getint conf.env "bm") in
+      let bd = Option.value ~default:(-1) (p_getint conf.env "bd") in
       Some {day = bd; month = bm; year = by; prec = Sure; delta = 0}
     | None -> None
   in

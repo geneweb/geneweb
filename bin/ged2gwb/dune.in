@@ -3,5 +3,5 @@
   (public_name geneweb.ged2gwb)
   (modules ged2gwb)
   (preprocess (action (run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo %{input-file})))
-  (libraries unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
+  (libraries camlp5 unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
 )

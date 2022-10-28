@@ -78,7 +78,7 @@ let get_all_data conf base =
 
 let get_person_from_data conf base =
   let (get_p, get_pe, get_f, get_fe) = get_data conf in
-  let istr = Gwdb.istr_of_string @@ List.assoc "key" conf.env in
+  let istr = Gwdb.istr_of_string @@ (List.assoc "key" conf.env :> string) in
   let add acc (istr : istr) p =
     try PersMap.add istr (PersSet.add p @@ PersMap.find istr acc) acc
     with Not_found -> PersMap.add istr (PersSet.add p PersSet.empty) acc
@@ -170,7 +170,7 @@ let update_person conf base old new_input p =
       {(gen_person_of_person p) with occupation = occupation}
   | Some "place" ->
       let new_istr =
-        Gwdb.insert_string base (no_html_tags (only_printable new_input))
+        Gwdb.insert_string base (only_printable new_input)
       in
       let pl_bi = get_birth_place p in
       let s_bi = sou base pl_bi in
@@ -307,7 +307,7 @@ let update_family conf base old new_istr fam =
   match p_getenv conf.env "data" with
     Some "place" ->
       let new_istr =
-        Gwdb.insert_string base (no_html_tags (only_printable new_istr))
+        Gwdb.insert_string base (only_printable new_istr)
       in
       let p_ma = get_marriage_place fam in
       let s_ma = sou base p_ma in
@@ -388,7 +388,7 @@ let update_person_list conf base new_input list nb_pers max_updates =
                   Futil.map_person_ps (fun ip -> ip)
                     (fun istr -> sou base istr) np
                 in
-                UpdateIndOk.rename_image_file conf base op sp
+                Image.rename_portrait conf base op (sp.first_name,sp.surname,sp.occ)
               end;
             patch_person base np.key_index np;
             if test_family then
@@ -420,7 +420,7 @@ let update_person_list conf base new_input list nb_pers max_updates =
 (** Get all the data and filter them if ["s"] is defined in [conf.env] *)
 let build_list conf base =
   (* Paramètre pour savoir par quoi commence la chaine. *)
-  let ini = Opt.to_string @@ p_getenv conf.env "s" in
+  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
   let list = get_all_data conf base in
   if ini <> "" then
     Mutil.filter_map begin fun istr ->
@@ -432,7 +432,7 @@ let build_list conf base =
   else List.rev_map (fun istr -> istr, sou base istr) list
 
 let build_list_short conf list =
-  let ini = Opt.default "" (p_getenv conf.env "s") in
+  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
   (* Construit la liste des string commençant par ini. *)
   (* Pour certaines données comme les sources, on peut *)
   (* avoir beaucoup de sources qui commencent par les  *)
@@ -464,6 +464,6 @@ let build_list_short conf list =
   build_ini list (String.length ini)
 
 let build_list_long conf list : (string * (istr * string) list) list =
-  let ini = Opt.default "" (p_getenv conf.env "s") in
+  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
   let list = combine_by_ini ini list in
   List.sort (fun (ini1, _) (ini2, _) -> Gutil.alphabetic_order ini1 ini2) list

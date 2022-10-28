@@ -109,59 +109,58 @@ let specify conf base n pl =
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
-  Output.print_string conf "<ul>\n";
+  Output.print_sstring conf "<ul>\n";
   (* Construction de la table des sosa de la base *)
   let () = Perso.build_sosa_ht conf base in
-  List.iter
-    (fun (p, tl) ->
-       Output.print_string conf "<li>\n";
-       Perso.print_sosa conf base p true;
-       begin match tl with
-           [] ->
-           Output.printf conf "\n%s" (referenced_person_title_text conf base p)
-         | t :: _ ->
-           Output.printf conf "<a href=\"%s%s\">\n" (commd conf)
-             (acces conf base p);
-           Output.print_string conf (titled_person_text conf base p t);
-           Output.print_string conf "</a>\n";
-           List.iter
-             (fun t -> Output.print_string conf (one_title_text base t)) tl
-       end;
-       Output.print_string conf (DateDisplay.short_dates_text conf base p);
-       if authorized_age conf base p then
-         begin match get_first_names_aliases p with
-             [] -> ()
-           | fnal ->
-             Output.print_string conf "\n<em>(";
-             Mutil.list_iter_first
-               (fun first fna ->
-                  if not first then Output.print_string conf ", ";
-                  Output.print_string conf (sou base fna))
-               fnal;
-             Output.print_string conf ")</em>"
-         end;
-       begin let spouses =
-               Array.fold_right
-                 (fun ifam spouses ->
-                    let cpl = foi base ifam in
-                    let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
-                    if p_surname base spouse <> "?" then spouse :: spouses
-                    else spouses)
-                 (get_family p) []
-         in
-         match spouses with
-           [] -> ()
-         | h :: hl ->
-           let s =
-             List.fold_left
-               (fun s h -> s ^ ",\n" ^ person_title_text conf base h)
-               (person_title_text conf base h) hl
-           in
-           Output.printf conf ", <em>&amp; %s</em>\n" s
-       end;
-       Output.print_string conf "</li>\n")
-    ptll;
-  Output.print_string conf "</ul>\n";
+  List.iter begin fun (p, tl) ->
+    Output.print_sstring conf "<li>";
+    Perso.print_sosa conf base p true;
+    begin match tl with
+      | [] ->
+        Output.print_sstring conf " " ;
+        Output.print_string conf (referenced_person_title_text conf base p)
+      | t :: _ ->
+        Output.print_sstring conf {|<a href="|} ;
+        Output.print_string conf (commd conf) ;
+        Output.print_string conf (acces conf base p) ;
+        Output.print_sstring conf {|"> |};
+        Output.print_string conf (titled_person_text conf base p t);
+        Output.print_sstring conf "</a> ";
+        List.iter (fun t -> Output.print_string conf (one_title_text base t)) tl
+    end;
+    Output.print_string conf (DateDisplay.short_dates_text conf base p);
+    if authorized_age conf base p
+    then begin match get_first_names_aliases p with
+      | [] -> ()
+      | fnal ->
+        Output.print_sstring conf "\n<em>(" ;
+        Mutil.list_iter_first begin fun first fna ->
+          if not first then Output.print_sstring conf ", ";
+          sou base fna |> Util.escape_html |> Output.print_string conf
+        end fnal ;
+        Output.print_sstring conf ")</em>"
+    end ;
+    let spouses =
+      Array.fold_right begin fun ifam spouses ->
+        let cpl = foi base ifam in
+        let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
+        if p_surname base spouse <> "?" then spouse :: spouses
+        else spouses
+      end (get_family p) []
+    in
+    begin match spouses with
+      | [] -> ()
+      | h :: hl ->
+        Output.print_sstring conf ", <em>&amp; " ;
+        List.fold_left
+          (fun s h -> s ^^^ ",\n" ^<^ person_title_text conf base h)
+          (person_title_text conf base h) hl
+        |> Output.print_string conf ;
+        Output.print_sstring conf "</em>"
+    end ;
+    Output.print_sstring conf "</li>"
+  end ptll;
+  Output.print_sstring conf "</ul>" ;
   Hutil.trailer conf
 
 let incorrect_request conf = Hutil.incorrect_request conf
@@ -174,10 +173,11 @@ let person_selected conf base p =
 
 let person_selected_with_redirect conf base p =
   match p_getenv conf.senv "em" with
-    Some "R" -> relation_print conf base p
+  | Some "R" -> relation_print conf base p
   | Some _ -> incorrect_request conf
   | None ->
-    Wserver.http_redirect_temporarily (commd conf ^ Util.acces conf base p)
+    Wserver.http_redirect_temporarily
+      (commd conf ^^^ Util.acces conf base p :> string)
 
 let updmenu_print = Perso.interp_templ "updmenu"
 
@@ -185,8 +185,15 @@ let very_unknown conf _ =
   match p_getenv conf.env "n", p_getenv conf.env "p" with
   | Some sname, Some fname ->
     let title _ =
-      Output.printf conf "%s: \"%s %s\"" (Utf8.capitalize_fst (transl conf "not found"))
-        (Util.escape_html fname) (Util.escape_html sname)
+      transl conf "not found"
+      |> Utf8.capitalize_fst
+      |> Output.print_sstring conf ;
+      Output.print_sstring conf (transl conf ":") ;
+      Output.print_sstring conf {| "|} ;
+      Output.print_string conf (Util.escape_html fname) ;
+      Output.print_sstring conf {| |} ;
+      Output.print_string conf (Util.escape_html sname) ;
+      Output.print_sstring conf {|"|} ;
     in
     Output.status conf Def.Not_Found;
     Hutil.rheader conf title;
@@ -196,14 +203,14 @@ let very_unknown conf _ =
     match p_getenv conf.env "i" with
     | Some i ->
       let title _ =
-        Output.print_string conf "<kbd>" ;
+        Output.print_sstring conf "<kbd>" ;
         Output.print_string conf (Util.escape_html i) ;
-        Output.print_string conf "</kbd>" ;
-        Output.print_string conf (transl conf ":") ;
-        Output.print_string conf " " ;
+        Output.print_sstring conf "</kbd>" ;
+        Output.print_sstring conf (transl conf ":") ;
+        Output.print_sstring conf " " ;
         transl conf "not found"
         |> Utf8.capitalize_fst
-        |> Output.print_string conf ;
+        |> Output.print_sstring conf ;
       in
       Output.status conf Def.Not_Found;
       Hutil.rheader conf title;
@@ -212,16 +219,20 @@ let very_unknown conf _ =
     | None -> incorrect_request conf
 
 (* Print Not found page *)
-let unknown = begin fun conf n ->
-      let title _ =
-        Output.printf conf "%s: \"%s\"" (Utf8.capitalize_fst (transl conf "not found"))
-          (Util.escape_html n)
-      in
-      Output.status conf Def.Not_Found;
-      Hutil.rheader conf title;
-      Hutil.print_link_to_welcome conf false;
-      Hutil.trailer conf
-    end
+let unknown conf n =
+  let title _ =
+    transl conf "not found"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf ;
+    Output.print_sstring conf (transl conf ":") ;
+    Output.print_sstring conf {| "|} ;
+    Output.print_string conf (Util.escape_html n) ;
+    Output.print_sstring conf {|"|} ;
+  in
+  Output.status conf Def.Not_Found;
+  Hutil.rheader conf title;
+  Hutil.print_link_to_welcome conf false;
+  Hutil.trailer conf
 
 let make_henv conf base =
   let conf =
@@ -231,10 +242,11 @@ let make_henv conf base =
         let first_name = p_first_name base p in
         let surname = p_surname base p in
         if Util.accessible_by_key conf base p first_name surname then
-          [ "pz", Mutil.encode (Name.lower first_name)
-          ; "nz", Mutil.encode (Name.lower surname)
-          ; "ocz", string_of_int (get_occ p) ]
-        else [ "iz", string_of_iper (get_iper p) ]
+          [ "pz", Name.lower first_name |> Mutil.encode
+          ; "nz", Name.lower surname |> Mutil.encode
+          ; "ocz", get_occ p |> string_of_int |> Mutil.encode
+          ]
+        else [ "iz", get_iper p |> string_of_iper |> Mutil.encode ]
       in
       { conf with henv = conf.henv @ x }
     | None -> conf
@@ -256,12 +268,12 @@ let make_henv conf base =
   in
   let conf =
     if Util.p_getenv conf.env "manitou" = Some "off"
-    then { conf with henv = conf.henv @ ["manitou", "off"] }
+    then { conf with henv = conf.henv @ ["manitou", Adef.encoded "off"] }
     else conf
   in
   let aux param conf =
     match Util.p_getenv conf.env param with
-    | Some s -> { conf with henv = conf.henv @ [ param, s ] }
+    | Some s -> { conf with henv = conf.henv @ [param, Mutil.encode s] }
     | None -> conf
   in
   aux "alwsurn" conf
@@ -272,16 +284,16 @@ let make_henv conf base =
 
 let special_vars =
   [ "alwsurn"; "cgl"; "dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et";
-    "iz"; "log_cnl"; "log_pwd"; "log_uid"; "long"; "manitou"; "nz"; "ocz";
+    "iz"; "long"; "manitou"; "nz"; "ocz";
     "p_mod"; "pure_xhtml"; "pz"; "size"; "spouse"; "templ"; "wide" ]
 
-let only_special_env = List.for_all (fun (x, _) -> List.mem x special_vars)
+let only_special_env env = List.for_all (fun (x, _) -> List.mem x special_vars) env
 
 let make_senv conf base =
   let set_senv conf vm vi =
     let aux k v conf =
       if p_getenv conf.env k = Some v
-      then { conf with senv = conf.senv @ [k,v] }
+      then { conf with senv = conf.senv @ [ k, Mutil.encode v ] }
       else conf
     in
     let conf =
@@ -292,14 +304,14 @@ let make_senv conf base =
     in
     let conf =
       match p_getenv conf.env "et" with
-      | Some x -> { conf with senv = conf.senv @ ["et", x] }
+      | Some x -> { conf with senv = conf.senv @ ["et", Mutil.encode x] }
       | _ -> conf
     in
     let conf = aux "cgl" "on" conf in
     let conf =
       match p_getenv conf.env "bd" with
       | None | Some ("0" | "") -> conf
-      | Some x -> { conf with senv = conf.senv @ ["bd", x] }
+      | Some x -> { conf with senv = conf.senv @ ["bd", Mutil.encode x] }
     in
     match p_getenv conf.env "color" with
     | Some x -> { conf with senv = conf.senv @ ["color", Mutil.encode x] }
@@ -307,7 +319,7 @@ let make_senv conf base =
   in
   let get x = Util.p_getenv conf.env x in
   match get "em", get "ei", get "ep", get "en", get "eoc" with
-  | Some vm, Some vi, _, _, _ -> set_senv conf vm vi
+  | Some vm, Some vi, _, _, _ -> set_senv conf (Mutil.encode vm) (Mutil.encode vi)
   | Some vm, None, Some vp, Some vn, voco ->
     let voc =
       match voco with
@@ -320,49 +332,53 @@ let make_senv conf base =
       | None -> incorrect_request conf; raise Exit
     in
     let vi = string_of_iper ip in
-    set_senv conf vm vi
+    set_senv conf (Mutil.encode vm) (Mutil.encode vi)
   | _ -> conf
 
 let propose_base conf =
-  let title _ = Output.print_string conf "Base" in
+  let title _ = Output.print_sstring conf "Base" in
   Hutil.header conf title;
-  Output.print_string conf "<ul><li>";
-  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.indep_command;
-  Output.print_string conf "<input name=\"b\" size=\"40\"> =&gt;\n";
-  Output.print_string conf
-    "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
-  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-  Output.print_string conf "</button>\n";
-  Output.print_string conf "</li></ul>";
+  Output.print_sstring conf {|<ul><li><form method="GET" action="|} ;
+  Output.print_sstring conf conf.indep_command ;
+  Output.print_sstring conf {|">|} ;
+  Output.print_sstring conf {|<input name="b" size="40"> =&gt; |} ;
+  Output.print_sstring conf {|<button type="submit" class="btn btn-secondary btn-lg">|} ;
+  transl_nth conf "validate/delete" 0
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf "</button></li></ul>";
   Hutil.trailer conf
 
-let try_plugin list conf base m =
+let try_plugin list conf base_name m =
   let fn =
     if List.mem "*" list
-    then (fun ( _, fn) -> fn conf base)
-    else (fun (ns, fn) -> (List.mem ns conf.forced_plugins || List.mem ns list) && fn conf base)
+    then (fun ( _, fn) -> fn conf base_name)
+    else (fun (ns, fn) -> (List.mem ns conf.forced_plugins || List.mem ns list) && fn conf base_name)
   in
   List.exists fn (Hashtbl.find_all GwdPlugin.ht m)
 
-let w_lock ~onerror fn conf base =
+let w_lock ~onerror fn conf (base_name : string option) =
   let bfile = Util.bpath (conf.bname ^ ".gwb") in
   Lock.control
-    (Mutil.lock_file bfile) false
-    ~onerror:(fun () -> onerror conf base)
-    (fun () -> fn conf base)
+    (Mutil.lock_file bfile) true
+    ~onerror:(fun () -> onerror conf base_name)
+    (fun () -> fn conf base_name)
 
-let w_base ~none fn conf base =
-  match base with
+let w_base ~none fn conf (bfile : string option) =
+  match bfile with
   | None -> none conf
-  | Some base ->
-    let conf = make_henv conf base in
-    let conf = make_senv conf base in
-    let conf =
-      match Util.default_sosa_ref conf base with
-      | Some p -> { conf with default_sosa_ref = get_iper p, Some p }
-      | None -> conf
-    in
-    fn conf base
+  | Some bfile ->
+     let base = try Some (Gwdb.open_base bfile) with _ -> None in
+     match base with
+     | None -> none conf
+     | Some base ->
+        let conf = make_henv conf base in
+        let conf = make_senv conf base in
+        let conf = match Util.default_sosa_ref conf base with
+          | Some p -> { conf with default_sosa_ref = get_iper p, Some p }
+          | None -> conf
+        in
+        fn conf base
 
 let w_person ~none fn conf base =
   match find_person_in_env conf base "" with
@@ -400,11 +416,6 @@ let treat_request =
       then Some bfile
       else None
   in
-  let base =
-    match bfile with
-    | None -> None
-    | Some bfile -> try Some (Gwdb.open_base bfile) with _ -> None
-  in
   let process () =
   if conf.wizard
   || conf.friend
@@ -425,13 +436,13 @@ let treat_request =
       | Some list -> String.split_on_char ',' list
     in
     if List.mem "*" plugins then
-      List.iter (fun (_ , fn) -> fn conf base) !GwdPlugin.se
+      List.iter (fun (_ , fn) -> fn conf bfile) !GwdPlugin.se
     else
-      List.iter (fun (ns, fn) -> if List.mem ns plugins then fn conf base) !GwdPlugin.se ;
-    let m = Opt.default "" @@ p_getenv conf.env "m" in
-    if not @@ try_plugin plugins conf base m
+      List.iter (fun (ns, fn) -> if List.mem ns plugins then fn conf bfile) !GwdPlugin.se ;
+    let m = Option.value ~default:"" (p_getenv conf.env "m") in
+    if not @@ try_plugin plugins conf bfile m
     then begin
-        if p_getenv conf.base_env "counter" <> Some "no"
+        if List.assoc_opt "counter" conf.base_env <> Some "no"
         then begin
           match
             if only_special_env conf.env
@@ -450,14 +461,27 @@ let treat_request =
         let incorrect_request conf _ = incorrect_request conf in
         match m with
         | "" ->
-          if conf.bname = ""
+           let base =
+             match bfile with
+             | None -> None
+             | Some bfile -> try Some (Gwdb.open_base bfile) with _ -> None
+           in
+          if base <> None then
+            w_base @@
+            if only_special_env conf.env then SrcfileDisplay.print_start
+            else w_person @@ fun conf base p ->
+              match p_getenv conf.env "ptempl" with
+              | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
+                Perso.interp_templ t conf base p
+              | _ -> person_selected conf base p
+          else if conf.bname = ""
           then fun conf _ -> include_template conf [] "index" (fun () -> propose_base conf)
           else
             w_base begin
               if only_special_env conf.env then SrcfileDisplay.print_start
               else w_person @@ fun conf base p ->
                 match p_getenv conf.env "ptempl" with
-                | Some t when p_getenv conf.base_env "ptempl" = Some "yes" ->
+                | Some t when List.assoc_opt "ptempl" conf.base_env = Some "yes" ->
                   Perso.interp_templ t conf base p
                 | _ -> person_selected conf base p
             end
@@ -466,15 +490,15 @@ let treat_request =
         | "ADD_FAM" ->
           w_wizard @@ w_base @@ UpdateFam.print_add
         | "ADD_FAM_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_add
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add
         | "ADD_IND" ->
           w_wizard @@ w_base @@ UpdateInd.print_add
         | "ADD_IND_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateIndOk.print_add
+          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_add
         | "ADD_PAR" ->
           w_wizard @@ w_base @@ UpdateFam.print_add_parents
         | "ADD_PAR_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_add_parents
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_add_parents
         | "ANM" ->
           w_base @@ fun conf _ -> BirthdayDisplay.print_anniversaries conf
         | "AN" ->
@@ -501,19 +525,19 @@ let treat_request =
         | "CHG_CHN" when conf.wizard ->
           w_wizard @@ w_base @@ ChangeChildrenDisplay.print
         | "CHG_CHN_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ ChangeChildrenDisplay.print_ok
+          w_wizard @@ w_lock @@ w_base @@ ChangeChildrenDisplay.print_ok
         | "CHG_EVT_IND_ORD" ->
           w_wizard @@ w_base @@ UpdateInd.print_change_event_order
         | "CHG_EVT_IND_ORD_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateIndOk.print_change_event_order
+          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_change_event_order
         | "CHG_EVT_FAM_ORD" ->
           w_wizard @@ w_base @@ UpdateFam.print_change_event_order
         | "CHG_EVT_FAM_ORD_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_change_event_order
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_change_event_order
         | "CHG_FAM_ORD" ->
           w_wizard @@ w_base @@ UpdateFam.print_change_order
         | "CHG_FAM_ORD_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_change_order_ok
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_change_order_ok
         | "CONN_WIZ" ->
           w_wizard @@ w_base @@ WiznotesDisplay.connected_wizards
         | "D" ->
@@ -523,11 +547,11 @@ let treat_request =
         | "DEL_FAM" ->
           w_wizard @@ w_base @@ UpdateFam.print_del
         | "DEL_FAM_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_del
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_del
         | "DEL_IND" ->
           w_wizard @@ w_base @@ UpdateInd.print_del
         | "DEL_IND_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateIndOk.print_del
+          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_del
         | "F" ->
           w_base @@ w_person @@ Perso.interp_templ "family"
         | "H" ->
@@ -552,9 +576,9 @@ let treat_request =
         | "INV_FAM" ->
           w_wizard @@ w_base @@ UpdateFam.print_inv
         | "INV_FAM_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_inv
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_inv
         | "KILL_ANC" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeIndDisplay.print_kill_ancestors
+          w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print_kill_ancestors
         | "LB" when conf.wizard || conf.friend ->
           w_base @@ BirthDeathDisplay.print_birth
         | "LD" when conf.wizard || conf.friend ->
@@ -572,43 +596,43 @@ let treat_request =
         | "MOD_DATA" ->
           w_wizard @@ w_base @@ UpdateDataDisplay.print_mod
         | "MOD_DATA_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateDataDisplay.print_mod_ok
+          w_wizard @@ w_lock @@ w_base @@ UpdateDataDisplay.print_mod_ok
         | "MOD_FAM" ->
           w_wizard @@ w_base @@ UpdateFam.print_mod
         | "MOD_FAM_OK" when conf.wizard ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateFamOk.print_mod
+          w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_mod
         | "MOD_IND" ->
           w_wizard @@ w_base @@ UpdateInd.print_mod
         | "MOD_IND_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ UpdateIndOk.print_mod
+          w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_mod
         | "MOD_NOTES" ->
           w_wizard @@ w_base @@ NotesDisplay.print_mod
         | "MOD_NOTES_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ NotesDisplay.print_mod_ok
+          w_wizard @@ w_lock @@ w_base @@ NotesDisplay.print_mod_ok
         | "MOD_WIZNOTES" when conf.authorized_wizards_notes ->
           w_base @@ WiznotesDisplay.print_mod
         | "MOD_WIZNOTES_OK" when conf.authorized_wizards_notes ->
-          w_base @@ w_lock @@ WiznotesDisplay.print_mod_ok
+          w_lock @@ w_base @@ WiznotesDisplay.print_mod_ok
         | "MRG" ->
           w_wizard @@ w_base @@ w_person @@ MergeDisplay.print
         | "MRG_DUP" ->
           w_wizard @@ w_base @@ MergeDupDisplay.main_page
         | "MRG_DUP_IND_Y_N" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeDupDisplay.answ_ind_y_n
+          w_wizard @@ w_lock @@ w_base @@ MergeDupDisplay.answ_ind_y_n
         | "MRG_DUP_FAM_Y_N" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeDupDisplay.answ_fam_y_n
+          w_wizard @@ w_lock @@ w_base @@ MergeDupDisplay.answ_fam_y_n
         | "MRG_FAM" ->
           w_wizard @@ w_base @@ MergeFamDisplay.print
         | "MRG_FAM_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeFamOk.print_merge
+          w_wizard @@ w_lock @@ w_base @@ MergeFamOk.print_merge
         | "MRG_MOD_FAM_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeFamOk.print_mod_merge
+          w_wizard @@ w_lock @@ w_base @@ MergeFamOk.print_mod_merge
         | "MRG_IND" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeIndDisplay.print
+          w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print
         | "MRG_IND_OK" -> (* despite the _OK suffix, this one does not actually update databse *)
           w_wizard @@ w_base @@ MergeIndOkDisplay.print_merge
         | "MRG_MOD_IND_OK" ->
-          w_wizard @@ w_base @@ w_lock @@ MergeIndOkDisplay.print_mod_merge
+          w_wizard @@ w_lock @@ w_base @@ MergeIndOkDisplay.print_mod_merge
         | "N" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
             | Some v -> Some.surname_print conf base Some.surname_not_found v
@@ -620,9 +644,9 @@ let treat_request =
               match p_getenv conf.env "n" with
                 Some n ->
                 begin match p_getenv conf.env "t" with
-                    Some "P" -> ("fn", n) :: conf.env
-                  | Some "N" -> ("sn", n) :: conf.env
-                  | _ -> ("v", n) :: conf.env
+                    Some "P" -> ("fn", Mutil.encode n) :: conf.env
+                  | Some "N" -> ("sn", Mutil.encode n) :: conf.env
+                  | _ -> ("v", Mutil.encode n) :: conf.env
                 end
               | None -> conf.env
             in
@@ -686,7 +710,10 @@ let treat_request =
           w_wizard @@ fun _ _ ->
             Output.status conf Def.OK;
             Output.header conf "Content-type: text";
-            List.iter (fun s -> Output.print_string conf @@ s ^ "\n") conf.Config.request ;
+            List.iter begin fun s ->
+              Output.print_sstring conf s ;
+              Output.print_sstring conf "\n"
+            end conf.Config.request ;
         | "RL" ->
           w_base @@ RelationLink.print
         | "RLM" ->
@@ -701,7 +728,7 @@ let treat_request =
         | "STAT" ->
           w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
         | "CHANGE_WIZ_VIS" ->
-          w_wizard @@ w_base @@ w_lock @@ WiznotesDisplay.change_wizard_visibility
+          w_wizard @@ w_lock @@ w_base @@ WiznotesDisplay.change_wizard_visibility
         | "TT" ->
           w_base @@ TitleDisplay.print
         | "U" ->
@@ -713,17 +740,26 @@ let treat_request =
         | "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
           w_base @@ WiznotesDisplay.print_search
         | _ -> incorrect_request
-      end conf base ;
+      end conf bfile ;
     Output.flush conf ;
-  end else
-    begin
-      let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
-      Hutil.rheader conf title;
-      Output.printf conf "<ul>\n<li>\n%s \"%s\" %s.</li>\n</ul>"
-        (Utf8.capitalize_fst (transl conf "base")) conf.bname
-        (Utf8.capitalize_fst (transl conf "reserved to friends or wizards"));
-      Hutil.trailer conf
-    end
+  end else begin
+    let title _ =
+      transl conf "error"
+      |> Utf8.capitalize_fst
+      |> Output.print_sstring conf
+    in
+    Hutil.rheader conf title ;
+    Output.print_sstring conf "<ul><li>" ;
+    transl conf "base" |> Utf8.capitalize_fst |> Output.print_sstring conf ;
+    Output.print_sstring conf {| "|} ;
+    Output.print_sstring conf conf.bname ;
+    Output.print_sstring conf {|" |} ;
+    transl conf "reserved to friends or wizards"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf ;
+    Output.print_sstring conf ".</li></ul>" ;
+    Hutil.trailer conf
+  end
   in
   if conf.debug then Mutil.bench (__FILE__ ^ " " ^ string_of_int __LINE__) process
   else process ()

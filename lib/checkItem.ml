@@ -146,7 +146,7 @@ let title_dates warning p t =
 
 let check_person_age warning p =
   let aux d1 d2 =
-    Date.time_elapsed_opt d1 d2 |> Opt.iter @@ fun a ->
+    Date.time_elapsed_opt d1 d2 |> Option.iter @@ fun a ->
     if a.year < 0 then warning (BirthAfterDeath p)
     else if d2.year > lim_date_death then begin
       if strictly_older a max_death_after_lim_date_death
@@ -280,7 +280,7 @@ let check_difference_age_between_cpl warning fath moth =
     | Some d2 ->
       (if d1.year < d2.year then Date.time_elapsed_opt d1 d2
        else Date.time_elapsed_opt d2 d1)
-      |> Opt.iter @@ fun a ->
+      |> Option.iter @@ fun a ->
       if strictly_older a max_age_btw_cpl
       then warning (BigAgeBetweenSpouses (fath, moth, a))
 
@@ -432,7 +432,7 @@ let close_siblings warning x np ifam =
   | Some (elder, d1) ->
     begin match odate @@ Adef.od_of_cdate (get_birth x) with
       | Some d2 ->
-        Date.time_elapsed_opt d1 d2 |> Opt.iter @@ fun d ->
+        Date.time_elapsed_opt d1 d2 |> Option.iter @@ fun d ->
         (* On vérifie les jumeaux ou naissances proches. *)
         if d.year = 0
         && (d.month < max_month_btw_sibl)
@@ -472,7 +472,7 @@ let child_born_after_his_parent warning x parent =
     begin match Adef.od_of_cdate (get_birth x) with
       | Some (Dgreg (g2, _)) ->
         if strictly_after_dmy g1 g2 then warning (ParentBornAfterChild (parent, x))
-        else Date.time_elapsed_opt g1 g2 |> Opt.iter @@ fun a ->
+        else Date.time_elapsed_opt g1 g2 |> Option.iter @@ fun a ->
           if strictly_younger a min_parent_age
           then warning (ParentTooYoung (parent, a, x))
           else if (get_sex parent = Female && strictly_older a max_mother_age)
@@ -481,7 +481,7 @@ let child_born_after_his_parent warning x parent =
       | _ -> match Date.date_of_death (get_death x) with
         | Some (Dgreg (g2, _)) ->
           if strictly_after_dmy g1 g2 then warning (ParentBornAfterChild (parent, x))
-          else Date.time_elapsed_opt g1 g2 |> Opt.iter @@ fun a ->
+          else Date.time_elapsed_opt g1 g2 |> Option.iter @@ fun a ->
             if strictly_younger a min_parent_age
             then warning (ParentTooYoung (parent, a, x))
         | _ -> ()
@@ -583,14 +583,14 @@ let witness_occur : iper -> (iper * witness_kind) array -> bool * bool =
   let is_w, only_mentioned_or_other = Array.fold_left (f iper) (false, true) a in
   is_w, is_w && only_mentioned_or_other
 
-let witness_kind_of_witness_array iper witnesses = 
+let witness_kind_of_witness_array iper witnesses =
   let is_witness, only_mentioned_or_other = witness_occur iper witnesses in
   if is_witness then
     let kind = if only_mentioned_or_other then Def.Witness_Mentioned else Def.Witness in
     Some kind
   else
     None
-  
+
 let check_person_dates_as_witness base warning p =
   let ip = get_iper p in
   let birth_date =
@@ -677,7 +677,7 @@ let check_person_dates_as_witness base warning p =
          (fun e -> e.epers_date)
          (fun e -> warning (PWitnessEventBeforeBirth (p, e, r)))
          (fun e -> warning (PWitnessEventAfterDeath (p, e, r)))
-         evt       
+         evt
   end related_pers
 
 let check_pevents base warning p =
@@ -716,7 +716,7 @@ let check_siblings ?(onchange = true) base warning (ifam, fam) callback =
   in
   match gap with
   | Some ((d1, p1), (d2, p2)) ->
-    Date.time_elapsed_opt d1 d2 |> Opt.iter @@ fun e ->
+    Date.time_elapsed_opt d1 d2 |> Option.iter @@ fun e ->
     if e.year > max_siblings_gap then warning (DistantChildren (ifam, p1, p2))
    | _ -> ()
 
@@ -810,7 +810,7 @@ let check_parent_marriage_age warning fam p =
                 | Some (Dgreg (g1, _) as d1) ->
                   if strictly_before d2 d1
                   then warning (MarriageDateBeforeBirth p)
-                  else Date.time_elapsed_opt g1 g2 |> Opt.iter @@ fun e ->
+                  else Date.time_elapsed_opt g1 g2 |> Option.iter @@ fun e ->
                     if strictly_younger e min_age_marriage
                     then warning (YoungForMarriage (p, e, get_ifam fam))
                     else if strictly_older e max_age_marriage
@@ -824,13 +824,56 @@ let check_parent_marriage_age warning fam p =
   in
   loop (get_fevents fam)
 
-let check_parents warning fam fath moth =
+let check_possible_duplicate_family ?p base warning family father mother =
+  let ifath = get_father family in
+  let imoth = get_mother family in
+  let ifam = get_ifam family in
+
+  let name fn i = Name.strip_lower @@ sou base (fn i) in
+  let first_name = name get_first_name in
+  let surname = name get_surname in
+
+  let father_fn, father_sn = first_name father, surname father in
+  let mother_fn, mother_sn = first_name mother, surname mother in
+  let fath_families = get_family father in
+  let moth_families = get_family mother in
+
+  let f get_parent (_current_parent, current_parent_iper, current_parent_fn, current_parent_sn) parent_source ifam' =
+    if eq_ifam ifam ifam' then ()
+    else begin
+        let fam' = foi base ifam' in
+        let parent' = get_parent fam' in
+        let person = poi base parent' in
+        let fn, sn = first_name person, surname person in
+        (* Parent is strictly the same *)
+        if eq_iper parent' current_parent_iper then
+          warning (PossibleDuplicateFam (ifam, ifam'))
+        (*  Homonymous parents *)
+        else if fn = current_parent_fn && sn = current_parent_sn then
+          warning (PossibleDuplicateFamHomonymous (ifam, ifam', parent_source))
+        else ()
+      end
+  in
+
+  match p with
+  | Some p when eq_iper (get_iper p) ifath ->
+     Array.iter (f get_mother (mother, imoth, mother_fn, mother_sn) father) fath_families
+  | Some p when eq_iper (get_iper p) imoth ->
+     Array.iter (f get_father (father, ifath, father_fn, father_sn) mother) moth_families
+  | _ ->
+     Array.iter (f get_mother (mother, imoth, mother_fn, mother_sn) father) fath_families;
+     Array.iter (f get_father (father, ifath, father_fn, father_sn) mother) moth_families
+
+
+let check_parents base warning fam fath moth =
   (* check father's marriage date *)
   check_parent_marriage_age warning fam fath ;
   (* check mother's marriage date *)
   check_parent_marriage_age warning fam moth ;
   (* check age difference between spouses *)
-  check_difference_age_between_cpl warning fath moth
+  check_difference_age_between_cpl warning fath moth;
+  check_possible_duplicate_family base warning fam fath moth
+
 
 (* main *)
 
@@ -853,7 +896,7 @@ let family ?(onchange = true) base warning ifam fam =
   (* check family's witnesses *)
   check_witness_fevents base warning fam ;
   (* check parents marraige *)
-  check_parents warning fam fath moth ;
+  check_parents base warning fam fath moth ;
   (* check children *)
   check_children ~onchange base warning (ifam, fam) fath moth ;
   if onchange then begin
@@ -866,7 +909,7 @@ let family ?(onchange = true) base warning ifam fam =
     changed_marriages_order base warning mother
   end
 
-let check_related_person_pevents warning base birth_date death_date p iper related_p =
+let check_related_person_pevents warning birth_date death_date p iper related_p =
   List.iter begin fun e ->
     match Adef.od_of_cdate e.epers_date with
     | Some (Dgreg (date, _)) ->
@@ -894,7 +937,7 @@ let check_related_person_fevents warning base birth_date death_date p iper relat
 
 let check_related_on_person_update warning base birth_date death_date p iper irel =
   let related_p = poi base irel in
-  check_related_person_pevents warning base birth_date death_date p iper related_p;
+  check_related_person_pevents warning birth_date death_date p iper related_p;
   check_related_person_fevents warning base birth_date death_date p iper related_p
 
 
@@ -923,6 +966,7 @@ let on_person_update base warning p =
     in
     check_parent_marriage_age warning fam p ;
     check_difference_age_between_cpl warning fath moth ;
+    check_possible_duplicate_family ~p base warning fam fath moth;
     Array.iter begin fun child ->
       let child = poi base child in
       child_born_after_his_parent warning child p ;

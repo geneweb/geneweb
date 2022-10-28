@@ -84,7 +84,6 @@ let in_channel_funs =
    input = really_input}
 
 let input ic = Obj.magic (input_loop in_channel_funs ic)
-let gen_input ifuns i = Obj.magic (input_loop ifuns i)
 
 (* Output *)
 
@@ -190,7 +189,6 @@ let out_channel_funs =
 
 let output oc x = output_loop out_channel_funs oc (Obj.repr x)
 let gen_output ofuns i x = output_loop ofuns i (Obj.repr x)
-let output_block_header = gen_output_block_header out_channel_funs
 
 (* Size *)
 
@@ -219,43 +217,3 @@ let output_array_access oc arr_get arr_len pos =
       end
   in
   loop (pos + output_value_header_size + array_header_size arr_len) 0
-
-(* *)
-
-type header_pos = int * int
-
-let intext_magic_number = [| 0x84; 0x95; 0xA6; 0xBE |]
-
-let create_output_value_header oc =
-  (* magic number *)
-  for i = 0 to 3 do output_byte oc intext_magic_number.(i) done;
-  let pos_header = pos_out oc in
-  (* room for block length *)
-  output_binary_int oc 0;
-  (* room for obj counter *)
-  output_binary_int oc 0;
-  (* room for size_32 *)
-  output_binary_int oc 0;
-  (* room for size_64 *)
-  output_binary_int oc 0;
-  size_32 := 0;
-  size_64 := 0;
-  pos_header, pos_out oc
-
-(* making a header for input_value like output_value does *)
-let patch_output_value_header oc (pos_header, pos_start) =
-  let pos_end = pos_out oc in
-  if Sys.word_size = 64 &&
-     (pos_end >= 1 lsl 32 || !size_32 >= 1 lsl 32 || !size_64 >= 1 lsl 32)
-  then
-    failwith "Iovalue.output: object too big";
-  (* block_length *)
-  seek_out oc pos_header;
-  output_binary_int oc (pos_end - pos_start);
-  (* obj counter is zero because no_sharing *)
-  output_binary_int oc 0;
-  (* size_32 *)
-  output_binary_int oc !size_32;
-  (* size_64 *)
-  output_binary_int oc !size_64;
-  pos_end

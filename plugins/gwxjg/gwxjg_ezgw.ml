@@ -124,9 +124,6 @@ module Person = struct
     let sn = sou base (get_surname p) in
     let occ = get_occ p in HistoryDiff.history_file fn sn occ
 
-  let image base p =
-    sou base (get_image p)
-
   let is_accessible_by_key conf base p =
     Util.accessible_by_key
       conf base p (p_first_name base p) (p_surname base p)
@@ -139,7 +136,7 @@ module Person = struct
       let sn = Name.lower (sou base (get_surname p)) in
       fn, sn, get_occ p
     in
-    List.fold_left (Perso.linked_page_text conf base p s key) "" db
+    List.fold_left (Perso.linked_page_text conf base p s key) (Adef.safe "") db
 
   let note conf base p =
     if not conf.no_note then sou base (get_notes p)
@@ -350,8 +347,8 @@ module Event = struct
   let date (_, d, _, _, _, _, _) =
     Adef.od_of_cdate d
 
-  let place conf base (_, _, p, _, _, _, _) =
-    Util.string_of_place conf @@ sou base p
+  let place base (_, _, p, _, _, _, _) =
+    sou base p
 
   let note conf base (_, _, _, n, _, _, _) =
     if conf.no_note then "" else sou base n

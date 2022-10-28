@@ -6,7 +6,7 @@ open Gwdb
 open Util
 
 type update_error =
-  | UERR of string
+  | UERR of Adef.safe_string
   | UERR_sex_married of person
   | UERR_sex_incoherent of base * person
   | UERR_sex_undefined of string * string * int
@@ -15,10 +15,10 @@ type update_error =
   | UERR_own_ancestor of base * person
   | UERR_digest
   | UERR_bad_date of Def.dmy
-  | UERR_missing_field of string
+  | UERR_missing_field of Adef.safe_string
   | UERR_already_has_parents of base * person
-  | UERR_missing_surname of string
-  | UERR_missing_first_name of string
+  | UERR_missing_surname of Adef.safe_string
+  | UERR_missing_first_name of Adef.safe_string
   | UERR_locked_base
 
 exception ModErr of update_error
@@ -155,35 +155,43 @@ let rec infer_death conf base p =
     [Rem] : Not visible.                                                      *)
 (* ************************************************************************** *)
 let print_person_parents_and_spouse conf base p =
-  Output.printf conf "<a href=\"%s%s\">" (commd conf) (acces conf base p);
-  Output.printf conf "%s.%d %s" (p_first_name base p) (get_occ p)
-    (p_surname base p);
-  Output.print_string conf "</a>";
+  Output.print_sstring conf {|<a href="|} ;
+  Output.print_string conf (commd conf) ;
+  Output.print_string conf (acces conf base p) ;
+  Output.print_sstring conf {|">|} ;
+  Output.print_string conf (escape_html @@ p_first_name base p) ;
+  Output.print_sstring conf "." ;
+  Output.print_sstring conf (string_of_int @@ get_occ p) ;
+  Output.print_sstring conf " " ;
+  Output.print_string conf (escape_html @@ p_surname base p) ;
+  Output.print_sstring conf "</a>";
   Output.print_string conf (DateDisplay.short_dates_text conf base p);
   let cop = Util.child_of_parent conf base p in
-  if (String.length cop) > 0 then Output.printf conf ", %s" cop;
+  if String.length (cop :> string) > 0 then begin
+    Output.print_sstring conf ", ";
+    Output.print_string conf cop;
+  end ;
   let hbw = Util.husband_wife conf base p true in
-  if (String.length hbw) > 0 then Output.printf conf ", %s" hbw;
-  Output.print_string conf ".\n"
+  if String.length (hbw :> string) > 0 then begin
+    Output.print_sstring conf ", ";
+    Output.print_string conf hbw;
+  end ;
+  Output.print_sstring conf ". "
 
 let print_same_name conf base p =
   match Gutil.find_same_name base p with
-    [_] -> ()
+  | [_] -> ()
   | pl ->
-      Output.print_string conf "<p>\n";
-      Output.printf conf "%s%s\n"
-        (Utf8.capitalize_fst (transl conf "persons having the same name"))
-        (transl conf ":");
-      Output.print_string conf "<ul>\n";
-      List.iter
-        (fun p ->
-           Output.print_string conf "<li>";
-           print_person_parents_and_spouse conf base p;
-           Output.print_string conf "</li>")
-        pl;
-      Output.print_string conf "</ul>\n";
-      Output.print_string conf "</p>\n"
-
+    Output.print_sstring conf "<p>";
+    Output.print_sstring conf @@ Utf8.capitalize_fst (transl conf "persons having the same name") ;
+    Output.print_sstring conf (transl conf ":");
+    Output.print_sstring conf "<ul>";
+    List.iter begin fun p ->
+      Output.print_sstring conf "<li>";
+      print_person_parents_and_spouse conf base p;
+      Output.print_sstring conf "</li>"
+    end pl ;
+    Output.print_sstring conf "</ul></p>"
 
 (* ************************************************************************* *)
 (*  [Fonc] is_label_note : string -> bool                                    *)
@@ -209,28 +217,26 @@ let is_label_note lbl =
   in
   loop 0
 
-let print_aux conf param value submit =
+let print_aux conf param (value : Adef.encoded_string) (submit : Adef.encoded_string) =
   Output.printf conf {|<p><form method="post" action="%s">|} conf.command;
-  List.iter begin fun (x, v) ->
-    (* Only textarea can contain newline. *)
-    Output.printf conf {|<textarea style="display:none;" name="%s">|} x ;
-    Output.print_string conf (Util.escape_html (Mutil.decode v)) ;
-    Output.print_string conf "</textarea>"
-  end (conf.henv @ conf.env) ;
-  Output.printf conf {|<input type="hidden" name="%s" value="%s">|} param value ;
-  Output.printf conf {|<input type="submit" value="%s">|} submit ;
-  Output.print_string conf {|</form></p>|}
+  List.iter begin fun (x, v) -> Util.hidden_textarea conf x v end conf.henv ;
+  List.iter begin fun (x, v) -> Util.hidden_textarea conf x v end conf.env ;
+  Util.hidden_input conf param value ;
+  Output.print_sstring conf {|<input type="submit" value="|} ;
+  Output.print_string conf submit ;
+  Output.print_sstring conf {|"></form></p>|}
 
 let print_return conf =
-  print_aux conf "return" "ok" (Utf8.capitalize_fst (transl conf "back"))
+  print_aux conf "return" (Adef.encoded "ok")
+    (Adef.encoded @@ Utf8.capitalize_fst @@ transl conf "back")
 
 let print_continue
-    conf ?(continue = Utf8.capitalize_fst (transl conf "continue")) param value =
+    conf ?(continue = Adef.encoded @@ Utf8.capitalize_fst @@ transl conf "continue") param value =
   print_aux conf param value continue
 
 let prerr conf _err fn =
   if not conf.api_mode then begin
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "error")) in
+  let title _ = Output.print_sstring conf (Utf8.capitalize_fst (transl conf "error")) in
   Hutil.rheader conf title ;
   fn () ;
   Hutil.trailer conf;
@@ -238,51 +244,59 @@ let prerr conf _err fn =
   end ;
   raise @@ ModErr _err
 
-let print_someone_strong _conf base p =
-  Printf.sprintf "<strong>%s%s %s</strong>" (p_first_name base p)
-    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
-    (p_surname base p)
-
 let string_of_error conf =
-  let fso f s o = f ^ "." ^ string_of_int o ^ " " ^ s in
+  let fso f s o : Adef.escaped_string =
+    Util.escape_html f ^^^ "." ^<^ string_of_int o ^<^ " " ^<^ Util.escape_html s
+  in
   let fso_p base p =
     let f = Gwdb.get_first_name p |> Gwdb.sou base |> Name.lower in
     let s = Gwdb.get_surname p |> Gwdb.sou base |> Name.lower in
     let o = get_occ p in
     fso f s o
   in
-  let strong s = "<strong>" ^ s ^ "</strong>" in
+  let strong s = ("<strong>" ^<^ s ^>^ "</strong>" :> Adef.safe_string) in
   function
   | UERR s -> s
   | UERR_sex_married _ ->
     Utf8.capitalize_fst (transl conf "cannot change sex of a married person")
+    |> Adef.safe
   | UERR_sex_incoherent (base, p) ->
-    Utf8.capitalize_fst (fso_p base p)
+    Utf8.capitalize_fst (fso_p base p :> string)
     ^ " "
     ^ (if get_sex p = Female
        then transl conf "should be male"
        else transl conf "should be female")
+    |> Adef.safe
   | UERR_sex_undefined (f, s, o) ->
     Printf.sprintf
       (fcapitale (ftransl conf "undefined sex for %t"))
-      (fun _ -> fso f s o)
+      (fun _ -> (fso f s o :> string))
+    |> Adef.safe
   | UERR_unknow_person (f, s, o) ->
     Utf8.capitalize_fst (transl conf "unknown person")
-    ^ transl conf ":"
-    ^ " "
-    ^ strong (fso f s o)
+    ^<^ transl conf ":"
+    ^<^ " "
+    ^<^ strong (fso f s o)
   | UERR_already_defined (base, p, var) ->
     Printf.sprintf
       (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-      ("\"" ^ fso_p base p ^ "\"")
-      (fun _ -> Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
+      ("\"" ^ (fso_p base p :> string) ^ "\"")
+      (fun _ ->
+         Printf.sprintf "<a href=\"%s%s\">"
+           (commd conf : Adef.escaped_string :> string)
+           (acces conf base p : Adef.escaped_string :> string) )
       (fun _ -> "</a>")
-    ^ (if var = "" then "." else "<span class=\"UERR_already_defined_var\">(" ^ var ^ ")</span>.")
+    ^ (if var = "" then "."
+       else "<span class=\"UERR_already_defined_var\">("
+            ^ (Util.escape_html var : Adef.escaped_string :> string)
+            ^ ")</span>.")
+    |> Adef.safe
   | UERR_own_ancestor (base, p) ->
-    strong (fso_p base p) ^ " " ^ transl conf "would be his/her own ancestor"
+    strong (fso_p base p) ^>^ " " ^ transl conf "would be his/her own ancestor"
   | UERR_digest ->
     transl conf {|the base has changed; do "back", "reload", and refill the form|}
     |> Utf8.capitalize_fst
+    |> Adef.safe
   | UERR_bad_date d ->
     Utf8.capitalize_fst (transl conf "incorrect date")
     ^ transl conf ":"
@@ -292,25 +306,29 @@ let string_of_error conf =
       | {day = 0; month = m; year = a} -> Printf.sprintf "%d/%d" m a
       | {day = j; month = m; year = a} -> Printf.sprintf "%d/%d/%d" j m a
     end
-  | UERR_missing_field s -> "missing field: " ^ s
+    |> Adef.safe
+  | UERR_missing_field s -> "missing field: " ^<^ s
   | UERR_already_has_parents (base, p) ->
     Printf.sprintf
       (fcapitale (ftransl conf "%t already has parents"))
-      (fun _ -> Printf.sprintf "%s" (referenced_person_text conf base p))
-  | UERR_missing_first_name "" ->
+      (fun _ -> (Util.referenced_person_text conf base p : Adef.safe_string :> string))
+    |> Adef.safe
+  | UERR_missing_first_name s when s = Adef.safe "" ->
     transl conf "first name missing"
     |> Utf8.capitalize_fst
+    |> Adef.safe
   | UERR_missing_first_name x ->
     (transl conf "first name missing" |> Utf8.capitalize_fst)
-    ^ transl conf ":" ^ " " ^ x
+    ^<^ transl conf ":" ^<^ " " ^<^ (x :> Adef.safe_string)
   | UERR_missing_surname x ->
     (transl conf "surname missing" |> Utf8.capitalize_fst)
-    ^ transl conf ":" ^ " " ^ x
+    ^<^ transl conf ":" ^<^ " " ^<^ (x :> Adef.safe_string)
   | UERR_locked_base ->
     transl conf "the file is temporarily locked: please try again"
     |> Utf8.capitalize_fst
+    |> Adef.safe
 
-let print_err_unknown conf base (f, s, o) =
+let print_err_unknown conf (f, s, o) =
   let err = UERR_unknow_person (f, s, o) in
   prerr conf err @@ fun () ->
   Output.print_string conf (string_of_error conf err);
@@ -335,13 +353,19 @@ let print_someone conf base p =
     (p_surname base p)
 
 let print_first_name conf base p =
-  Output.printf conf "%s%s" (p_first_name base p)
-    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
+  Output.print_string conf (Util.escape_html @@ p_first_name base p) ;
+  if get_occ p <> 0 then begin
+    Output.print_sstring conf "." ;
+    Output.print_sstring conf @@ string_of_int (get_occ p) ;
+  end
 
-let print_someone_strong _conf base p =
-  Printf.sprintf "<strong>%s%s %s</strong>" (p_first_name base p)
-    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
-    (p_surname base p)
+let someone_strong base p =
+  "<strong>"
+  ^<^ escape_html (p_first_name base p)
+  ^^^ (if get_occ p = 0 then Adef.escaped "" else Adef.escaped @@ "." ^ string_of_int (get_occ p))
+  ^^^ " "
+  ^<^ escape_html (p_surname base p)
+  ^>^ "</strong>"
 
 let print_first_name_strong conf base p =
   Output.printf conf "<strong>%s%s</strong>" (p_first_name base p)
@@ -350,353 +374,310 @@ let print_first_name_strong conf base p =
 let print_error conf e =
   Output.print_string conf @@ string_of_error conf e
 
-let someone_ref_text conf base p =
-  "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">\n" ^
-  p_first_name base p ^
-  (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p)) ^ " " ^
-  p_surname base p ^ "</a>"
+let print_someone_ref_text conf base p =
+  Output.print_sstring conf {|<a href="|} ;
+  Output.print_string conf (commd conf) ;
+  Output.print_string conf (acces conf base p) ;
+  Output.print_sstring conf {|">|} ;
+  Output.print_string conf (escape_html @@ p_first_name base p) ;
+  if get_occ p <> 0 then begin
+    Output.print_sstring conf "." ;
+    Output.print_sstring conf (string_of_int (get_occ p))
+  end ;
+  Output.print_sstring conf " " ;
+  Output.print_string conf (escape_html @@ p_surname base p) ;
+  Output.print_sstring conf "</a>"
 
 let print_list_aux conf base title list printer =
   if list <> [] then begin
     Output.printf conf "%s\n<ul>" (Utf8.capitalize_fst (transl conf title)) ;
     printer conf base list ;
-    Output.print_string conf "</ul>";
+    Output.print_sstring conf "</ul>";
   end
+
+let print_order_changed conf print_list before after =
+  let (bef_d, aft_d) = Difference.f before after in
+  Output.print_sstring conf (Util.transl conf ":");
+  Output.print_sstring conf
+    {|<table style="margin:1em"><tr><td><ul style="list-style-type:none">|};
+  print_list before bef_d;
+  Output.print_sstring conf {|</ul></td><td><ul style="list-style-type:none">|};
+  print_list after aft_d;
+  Output.print_sstring conf {|</ul></td></tr></table>|}
+
+let someone_strong_n_short_dates conf base p =
+  (someone_strong base p :> Adef.safe_string) ^^^ DateDisplay.short_dates_text conf base p
 
 let print_warning conf base =
   function
   | BigAgeBetweenSpouses (p1, p2, a) ->
-      Output.printf conf
-        (fcapitale
-           (ftransl conf
-              "the difference of age between %t and %t is quite important"))
-        (fun _ -> print_someone_strong conf base p1)
-        (fun _ -> print_someone_strong conf base p2);
-      Output.printf conf ": %s" (DateDisplay.string_of_age conf a)
+    Output.printf conf
+      (fcapitale
+         (ftransl conf
+            "the difference of age between %t and %t is quite important"))
+      (fun _ -> (someone_strong base p1 :> string))
+      (fun _ -> (someone_strong base p2 :> string));
+    Output.print_sstring conf (transl conf ":") ;
+    Output.print_sstring conf " " ;
+    Output.print_string conf (DateDisplay.string_of_age conf a)
   | BirthAfterDeath p ->
-      Output.printf conf (ftransl conf "%t died before his/her birth")
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
-             (DateDisplay.short_dates_text conf base p))
+    Output.printf conf (ftransl conf "%t died before his/her birth")
+      (fun _ -> (someone_strong_n_short_dates conf base p :> string))
   | ChangedOrderOfChildren (ifam, _, before, after) ->
-      let cpl = foi base ifam in
-      let fath = poi base (get_father cpl) in
-      let moth = poi base (get_mother cpl) in
-      Output.printf conf "%s\n"
-        (Utf8.capitalize_fst (transl conf "changed order of children"));
-      Output.print_string conf "-&gt;\n";
-      Output.print_string conf
-        (someone_ref_text conf base fath ^ "\n" ^ transl_nth conf "and" 0 ^
-         " " ^ someone_ref_text conf base moth ^ "\n");
-      let print_list arr diff_arr =
-        Array.iteri
-          (fun i (* i *)p ->
-             let p = poi base p in
-             Output.printf conf "<li %s>\n"
-               (if diff_arr.(i) then "style=\"background:pink\"" else "");
-             if eq_istr (get_surname p) (get_surname fath) then
-               print_first_name conf base p
-             else print_someone conf base p;
-             Output.print_string conf (DateDisplay.short_dates_text conf base p);
-             Output.print_string conf "\n";
-             Output.print_string conf "</li>\n")
-          arr
-      in
-      let (bef_d, aft_d) = Difference.f before after in
-      Output.print_string conf "<table style=\"margin:1em\">\n";
-      Output.print_string conf "<tr>\n";
-      Output.print_string conf "<td>\n";
-      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
-      print_list before bef_d;
-      Output.print_string conf "</ul>\n";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "<td>\n";
-      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
-      print_list after aft_d;
-      Output.print_string conf "</ul>\n";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "</tr>\n";
-      Output.print_string conf "</table>\n"
+    let cpl = foi base ifam in
+    let fath = poi base (get_father cpl) in
+    let moth = poi base (get_mother cpl) in
+    let print_list arr diff_arr =
+      Array.iteri begin fun i p ->
+        let p = poi base p in
+        Output.print_sstring conf "<li" ;
+        if diff_arr.(i) then Output.print_sstring conf {| style="background:pink"|} ;
+        Output.print_sstring conf ">" ;
+        Output.print_sstring conf "\n" ;
+        if eq_istr (get_surname p) (get_surname fath)
+        then print_first_name conf base p
+        else print_someone conf base p ;
+        Output.print_string conf (DateDisplay.short_dates_text conf base p);
+        Output.print_sstring conf "\n";
+        Output.print_sstring conf "</li>\n"
+      end arr
+    in
+    Output.print_sstring conf (Utf8.capitalize_fst (transl conf "changed order of children"));
+    Output.print_sstring conf "\n";
+    print_someone_ref_text conf base fath;
+    Output.print_sstring conf " ";
+    Output.print_sstring conf (transl_nth conf "and" 0);
+    Output.print_sstring conf " ";
+    print_someone_ref_text conf base moth ;
+    print_order_changed conf print_list before after
   | ChildrenNotInOrder (ifam, _, elder, x) ->
-      let cpl = foi base ifam in
-      Output.printf conf
-        (fcapitale
-           (ftransl conf
-              "the following children of %t and %t are not in order"))
-        (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
-        (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
-      Output.print_string conf ":\n";
-      Output.print_string conf "<ul>\n";
-      Output.print_string conf "<li>";
-      print_first_name_strong conf base elder;
-      Output.print_string conf (DateDisplay.short_dates_text conf base elder);
-      Output.print_string conf "</li>";
-      Output.print_string conf "<li>";
-      print_first_name_strong conf base x;
-      Output.print_string conf (DateDisplay.short_dates_text conf base x);
-      Output.print_string conf "</li>";
-      Output.print_string conf "</ul>\n"
+    let cpl = foi base ifam in
+    Output.printf conf
+      (fcapitale
+         (ftransl conf
+            "the following children of %t and %t are not in order"))
+      (fun _ -> (someone_strong base (poi base (get_father cpl)) :> string))
+      (fun _ -> (someone_strong base (poi base (get_mother cpl)) :> string));
+    Output.print_sstring conf ":\n<ul><li>";
+    print_first_name_strong conf base elder;
+    Output.print_string conf (DateDisplay.short_dates_text conf base elder);
+    Output.print_sstring conf "</li><li>";
+    print_first_name_strong conf base x;
+    Output.print_string conf (DateDisplay.short_dates_text conf base x);
+    Output.print_sstring conf "</li></ul>\n"
   | ChangedOrderOfMarriages (p, before, after) ->
-      Output.printf conf "%s\n"
-        (Utf8.capitalize_fst (transl conf "changed order of marriages"));
-      Output.print_string conf "-&gt;\n";
-      let print_list arr diff_arr =
-        Array.iteri
-          (fun i ifam ->
-             let fam = foi base ifam in
-             let sp = Gutil.spouse (get_iper p) fam in
-             let sp = poi base sp in
-             Output.printf conf "<li %s>\n"
-               (if diff_arr.(i) then "style=\"background:pink\"" else "");
-             print_first_name conf base p;
-             Output.print_string conf "  &amp;";
-             Output.printf conf "%s\n"
-               (DateDisplay.short_marriage_date_text conf base fam p sp);
-             print_someone conf base sp;
-             Output.print_string conf "\n";
-             Output.print_string conf "</li>\n")
-          arr
-      in
-      let (bef_d, aft_d) = Difference.f before after in
-      Output.print_string conf "<table style=\"margin:1em\">\n";
-      Output.print_string conf "<tr>\n";
-      Output.print_string conf "<td>\n";
-      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
-      print_list before bef_d;
-      Output.print_string conf "</ul>\n";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "<td>\n";
-      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
-      print_list after aft_d;
-      Output.print_string conf "</ul>\n";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "</tr>\n";
-      Output.print_string conf "</table>\n"
+    let print_list arr diff_arr =
+      Array.iteri begin fun i ifam ->
+        let fam = foi base ifam in
+        let sp = Gutil.spouse (get_iper p) fam in
+        let sp = poi base sp in
+        Output.print_sstring conf "<li";
+        if diff_arr.(i) then Output.print_sstring conf {| style="background:pink"|} ;
+        Output.print_sstring conf ">\n" ;
+        print_first_name conf base p;
+        Output.print_sstring conf "  &amp;";
+        Output.print_string conf
+          (DateDisplay.short_marriage_date_text conf base fam p sp);
+        Output.print_sstring conf "\n";
+        print_someone conf base sp;
+        Output.print_sstring conf "\n</li>\n"
+      end arr
+    in
+    Output.print_sstring conf
+      (Utf8.capitalize_fst (transl conf "changed order of marriages"));
+    print_order_changed conf print_list before after
   | ChangedOrderOfFamilyEvents (_, before, after) ->
-      Output.printf conf "%s\n"
-        (Utf8.capitalize_fst (transl conf "changed order of family's events"));
-      Output.print_string conf "-&gt;\n";
-      let print_list arr diff_arr =
-        Array.iteri
-          (fun i evt ->
-             let name = Util.string_of_fevent_name conf base evt.efam_name in
-             Output.printf conf "<li %s>\n"
-               (if diff_arr.(i) then "style=\"background:pink\"" else "");
-             Output.printf conf "%s\n" name;
-             Output.print_string conf "</li>\n")
-          arr
-      in
-      let before = Array.of_list before in
-      let after = Array.of_list after in
-      let (bef_d, aft_d) = Difference.f before after in
-      Output.print_string conf "<table style=\"margin:1em\">\n";
-      Output.print_string conf "<tr>\n";
-      Output.print_string conf "<td>\n";
-      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
-      print_list before bef_d;
-      Output.print_string conf "</ul>\n";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "<td>\n";
-      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
-      print_list after aft_d;
-      Output.print_string conf "</ul>\n";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "</tr>\n";
-      Output.print_string conf "</table>\n"
+    let print_list arr diff_arr =
+      Array.iteri begin fun i evt ->
+        let name = Util.string_of_fevent_name conf base evt.efam_name in
+        Output.print_sstring conf "<li" ;
+        if diff_arr.(i) then Output.print_sstring conf {| style="background:pink"|} ;
+        Output.print_sstring conf ">" ;
+        Output.print_string conf name;
+        Output.print_sstring conf "</li>"
+      end arr
+    in
+    let before = Array.of_list before in
+    let after = Array.of_list after in
+    Output.printf conf "%s\n"
+      (Utf8.capitalize_fst (transl conf "changed order of family's events"));
+    print_order_changed conf print_list before after
   | ChangedOrderOfPersonEvents (_, before, after) ->
-      Output.printf conf "%s\n"
-        (Utf8.capitalize_fst (transl conf "changed order of person's events"));
-      Output.print_string conf "-&gt;\n";
-      let print_list arr diff_arr =
-        Array.iteri
-          (fun i evt ->
-             let name = Util.string_of_pevent_name conf base evt.epers_name in
-             Output.printf conf "<li %s>\n"
-               (if diff_arr.(i) then "style=\"background:pink\"" else "");
-             Output.printf conf "%s\n" name;
-             Output.print_string conf "</li>\n")
-          arr
-      in
-      let before = Array.of_list before in
-      let after = Array.of_list after in
-      let (bef_d, aft_d) = Difference.f before after in
-      Output.print_string conf "<table style=\"margin:1em\">\n";
-      Output.print_string conf "<tr>\n";
-      Output.print_string conf "<td>\n";
-      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
-      print_list before bef_d;
-      Output.print_string conf "</ul>\n";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "<td>\n";
-      Output.print_string conf "<ul style=\"list-style-type:none\">\n";
-      print_list after aft_d;
-      Output.print_string conf "</ul>\n";
-      Output.print_string conf "</td>\n";
-      Output.print_string conf "</tr>\n";
-      Output.print_string conf "</table>\n"
+    let print_list arr diff_arr =
+      Array.iteri begin fun i evt ->
+        let name = Util.string_of_pevent_name conf base evt.epers_name in
+        Output.print_sstring conf "<li" ;
+        if diff_arr.(i) then Output.print_sstring conf {| style="background:pink"|} ;
+        Output.print_sstring conf ">" ;
+        Output.print_string conf name;
+        Output.print_sstring conf "</li>"
+      end arr
+    in
+    Output.print_sstring conf
+      (Utf8.capitalize_fst (transl conf "changed order of person's events"));
+    Output.print_sstring conf " -&gt; ";
+    let before = Array.of_list before in
+    let after = Array.of_list after in
+    print_order_changed conf print_list before after
   | CloseChildren (ifam, c1, c2) ->
-      let cpl = foi base ifam in
-      Output.printf conf
-        (fcapitale
-           (ftransl conf
-              "the following children of %t and %t are born very close"))
-        (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
-        (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
-      Output.print_string conf ":\n";
-      Output.print_string conf "<ul>\n";
-      Output.print_string conf "<li>";
-      print_first_name_strong conf base c1;
-      Output.print_string conf (DateDisplay.short_dates_text conf base c1);
-      Output.print_string conf "</li>";
-      Output.print_string conf "<li>";
-      print_first_name_strong conf base c2;
-      Output.print_string conf (DateDisplay.short_dates_text conf base c2);
-      Output.print_string conf "</li>";
-      Output.print_string conf "</ul>\n"
+    let cpl = foi base ifam in
+    Output.printf conf
+      (fcapitale
+         (ftransl conf
+            "the following children of %t and %t are born very close"))
+      (fun _ -> (someone_strong base (poi base (get_father cpl)) :> string))
+      (fun _ -> (someone_strong base (poi base (get_mother cpl)) :> string));
+    Output.print_sstring conf ":\n<ul><li>";
+    print_first_name_strong conf base c1;
+    Output.print_string conf (DateDisplay.short_dates_text conf base c1);
+    Output.print_sstring conf "</li><li>";
+    print_first_name_strong conf base c2;
+    Output.print_string conf (DateDisplay.short_dates_text conf base c2);
+    Output.print_sstring conf "</li></ul>\n"
   | DistantChildren (ifam, p1, p2) ->
-      let cpl = foi base ifam in
-      Output.printf conf
-        (fcapitale
-           (ftransl conf
-              "the following children of %t and %t are born very distant"))
-        (fun _ -> print_someone_strong conf base (poi base (get_father cpl)))
-        (fun _ -> print_someone_strong conf base (poi base (get_mother cpl)));
-      Output.print_string conf ":\n";
-      Output.print_string conf "<ul>\n";
-      Output.print_string conf "<li>";
-      print_first_name_strong conf base p1;
-      Output.print_string conf (DateDisplay.short_dates_text conf base p1);
-      Output.print_string conf "</li>";
-      Output.print_string conf "<li>";
-      print_first_name_strong conf base p2;
-      Output.print_string conf (DateDisplay.short_dates_text conf base p2);
-      Output.print_string conf "</li>";
-      Output.print_string conf "</ul>\n"
+    let cpl = foi base ifam in
+    Output.printf conf
+      (fcapitale
+         (ftransl conf
+            "the following children of %t and %t are born very distant"))
+      (fun _ -> (someone_strong base (poi base (get_father cpl)) :> string))
+      (fun _ -> (someone_strong base (poi base (get_mother cpl)) :> string));
+    Output.print_sstring conf ":<ul><li>";
+    print_first_name_strong conf base p1;
+    Output.print_string conf (DateDisplay.short_dates_text conf base p1);
+    Output.print_sstring conf "</li><li>";
+    print_first_name_strong conf base p2;
+    Output.print_string conf (DateDisplay.short_dates_text conf base p2);
+    Output.print_sstring conf "</li></ul>"
   | DeadOld (p, a) ->
-      Output.printf conf "%s\n%s\n" (print_someone_strong conf base p)
-        (transl_nth conf "died at an advanced age"
-           (index_of_sex (get_sex p)));
-      Output.printf conf "(%s)" (DateDisplay.string_of_age conf a)
+    Output.print_string conf (someone_strong base p) ;
+    Output.print_sstring conf " " ;
+    Output.print_sstring conf
+      (transl_nth conf "died at an advanced age" @@ index_of_sex @@ get_sex p);
+    Output.print_sstring conf "(" ;
+    Output.print_string conf (DateDisplay.string_of_age conf a) ;
+    Output.print_sstring conf ")" ;
   | DeadTooEarlyToBeFather (father, child) ->
-      Output.printf conf
-        (ftransl conf "%t is born more than 2 years after the death of his/her father %t")
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base child)
-             (DateDisplay.short_dates_text conf base child))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base father)
-             (DateDisplay.short_dates_text conf base father))
+    Output.printf conf
+      (ftransl conf "%t is born more than 2 years after the death of his/her father %t")
+      (fun _ -> (someone_strong_n_short_dates conf base child :> string))
+      (fun _ -> (someone_strong_n_short_dates conf base father :> string))
   | FEventOrder (p, e1, e2) ->
-      Output.printf conf (fcapitale (ftransl conf "%t's %s before his/her %s"))
-        (fun _ -> print_someone_strong conf base p)
-        (Util.string_of_fevent_name conf base e1.efam_name)
-        (Util.string_of_fevent_name conf base e2.efam_name)
-  | FWitnessEventAfterDeath (p, e, _origin) ->
-      Output.printf conf
-        (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
-             (DateDisplay.short_dates_text conf base p))
-        (Util.string_of_fevent_name conf base e.efam_name)
-  | FWitnessEventBeforeBirth (p, e, _origin) ->
-      Output.printf conf
-        (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
-             (DateDisplay.short_dates_text conf base p))
-        (Util.string_of_fevent_name conf base e.efam_name)
+    Output.printf conf (fcapitale (ftransl conf "%t's %s before his/her %s"))
+      (fun _ -> (someone_strong base p :> string))
+      ((Util.string_of_fevent_name conf base e1.efam_name :> string))
+      ((Util.string_of_fevent_name conf base e2.efam_name :> string))
+  | FWitnessEventAfterDeath (p, e, _) ->
+    Output.printf conf
+      (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
+      (fun _ -> (someone_strong_n_short_dates conf base p :> string))
+      ((Util.string_of_fevent_name conf base e.efam_name :> string))
+  | FWitnessEventBeforeBirth (p, e, _) ->
+    Output.printf conf
+      (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
+      (fun _ -> (someone_strong_n_short_dates conf base p :> string))
+      ((Util.string_of_fevent_name conf base e.efam_name :> string))
   | IncoherentSex (p, _, _) ->
-      Output.printf conf
-        (fcapitale
-           (ftransl conf "%t's sex is not coherent with his/her relations"))
-        (fun _ -> print_someone_strong conf base p)
+    Output.printf conf
+      (fcapitale (ftransl conf "%t's sex is not coherent with his/her relations"))
+      (fun _ -> (someone_strong base p :> string))
   | IncoherentAncestorDate (anc, p) ->
-      Output.printf conf "%s has a younger ancestor %s"
-        (print_someone_strong conf base p)
-        (print_someone_strong conf base anc)
+    Output.printf conf "%s has a younger ancestor %s"
+      ((someone_strong base p :> string))
+      ((someone_strong base anc :> string))
   | MarriageDateAfterDeath p ->
-      Output.printf conf
-        (fcapitale
-           (ftransl conf "marriage had occurred after the death of %t"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
-             (DateDisplay.short_dates_text conf base p))
+    Output.printf conf
+      (fcapitale (ftransl conf "marriage had occurred after the death of %t"))
+      (fun _ -> (someone_strong_n_short_dates conf base p :> string))
   | MarriageDateBeforeBirth p ->
-      Output.printf conf
-        (fcapitale
-           (ftransl conf "marriage had occurred before the birth of %t"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
-             (DateDisplay.short_dates_text conf base p))
+    Output.printf conf
+      (fcapitale (ftransl conf "marriage had occurred before the birth of %t"))
+      (fun _ -> (someone_strong_n_short_dates conf base p :> string))
   | MotherDeadBeforeChildBirth (mother, child) ->
-      Output.printf conf
-        (ftransl conf "%t is born after the death of his/her mother %t")
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base child)
-             (DateDisplay.short_dates_text conf base child))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base mother)
-             (DateDisplay.short_dates_text conf base mother))
+    Output.printf conf
+      (ftransl conf "%t is born after the death of his/her mother %t")
+      (fun _ -> (someone_strong_n_short_dates conf base child :> string))
+      (fun _ -> (someone_strong_n_short_dates conf base mother :> string))
   | ParentBornAfterChild (p, c) ->
-      Output.printf conf "%s\n%s\n%s" (print_someone_strong conf base p)
-        (transl conf "is born after his/her child")
-        (print_someone_strong conf base c)
+    Output.print_string conf (someone_strong base p) ;
+    Output.print_sstring conf " " ;
+    Output.print_sstring conf (transl conf "is born after his/her child") ;
+    Output.print_sstring conf " " ;
+    Output.print_string conf (someone_strong base c)
   | ParentTooYoung (p, a, _) ->
-      Output.printf conf "%s\n%s\n" (print_someone_strong conf base p)
-        (transl conf "is a very young parent");
-      Output.printf conf "(%s)" (DateDisplay.string_of_age conf a)
+    Output.print_string conf (someone_strong base p) ;
+    Output.print_sstring conf " " ;
+    Output.print_sstring conf (transl conf "is a very young parent") ;
+    Output.print_sstring conf " (" ;
+    Output.print_string conf (DateDisplay.string_of_age conf a) ;
+    Output.print_sstring conf ")"
   | ParentTooOld (p, a, _) ->
-      Output.printf conf "%s\n%s\n" (print_someone_strong conf base p)
-        (transl conf "is a very old parent");
-      Output.printf conf "(%s)" (DateDisplay.string_of_age conf a)
+    Output.print_string conf (someone_strong base p) ;
+    Output.print_sstring conf " " ;
+    Output.print_sstring conf (transl conf "is a very old parent") ;
+    Output.print_sstring conf " (" ;
+    Output.print_string conf (DateDisplay.string_of_age conf a) ;
+    Output.print_sstring conf ")"
   | PossibleDuplicateFam (f1, _) ->
     let f = foi base f1 in
     Output.printf conf
       (fcapitale (ftransl conf "%s and %s have several unions"))
-      (print_someone_strong conf base @@ poi base @@ get_father f)
-      (print_someone_strong conf base @@ poi base @@ get_mother f)
+      ((someone_strong base @@ poi base @@ get_father f :> string))
+      ((someone_strong base @@ poi base @@ get_mother f :> string))
+  | PossibleDuplicateFamHomonymous (f1, _, p) ->
+     let f = foi base f1 in
+     let fath = get_father f in
+     let moth = get_mother f in
+     let curr, hom = if eq_iper fath (get_iper p) then moth, fath else fath, moth in
+     Output.printf conf
+       (fcapitale (ftransl conf "%s has unions with several persons named %s"))
+       ((someone_strong base @@ poi base @@ curr :> string))
+       ((someone_strong base @@ poi base @@ hom :> string))
   | PEventOrder (p, e1, e2) ->
-      Output.printf conf (fcapitale (ftransl conf "%t's %s before his/her %s"))
-        (fun _ -> print_someone_strong conf base p)
-        (Util.string_of_pevent_name conf base e1.epers_name)
-        (Util.string_of_pevent_name conf base e2.epers_name)
+    Output.printf conf (fcapitale (ftransl conf "%t's %s before his/her %s"))
+      (fun _ -> (someone_strong base p :> string))
+      ((Util.string_of_pevent_name conf base e1.epers_name :> string))
+      ((Util.string_of_pevent_name conf base e2.epers_name :> string))
   | PWitnessEventAfterDeath (p, e, _origin) ->
-      Output.printf conf
-        (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
-             (DateDisplay.short_dates_text conf base p))
-        (Util.string_of_pevent_name conf base e.epers_name)
+    Output.printf conf
+      (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
+      (fun _ -> (someone_strong_n_short_dates conf base p :> string))
+      ((Util.string_of_pevent_name conf base e.epers_name :> string))
   | PWitnessEventBeforeBirth (p, e, _origin) ->
-      Output.printf conf
-        (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
-             (DateDisplay.short_dates_text conf base p))
-        (Util.string_of_pevent_name conf base e.epers_name)
+    Output.printf conf
+      (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
+      (fun _ -> (someone_strong_n_short_dates conf base p :> string))
+      ((Util.string_of_pevent_name conf base e.epers_name :> string))
   | TitleDatesError (p, t) ->
-      Output.printf conf
-        (fcapitale (ftransl conf "%t has incorrect title dates: %t"))
-        (fun _ ->
-           Printf.sprintf "%s%s" (print_someone_strong conf base p)
-             (DateDisplay.short_dates_text conf base p))
-        (fun _ ->
-           Printf.sprintf "<strong>%s %s</strong> <em>%s-%s</em>"
-             (sou base t.t_ident) (sou base t.t_place)
-             (match Adef.od_of_cdate t.t_date_start with
-                Some d -> DateDisplay.string_of_date conf d
-              | _ -> "")
-             (match Adef.od_of_cdate t.t_date_end with
-                Some d -> DateDisplay.string_of_date conf d
-              | _ -> ""))
+    Output.printf conf
+      (fcapitale (ftransl conf "%t has incorrect title dates: %t"))
+      (fun _ -> (someone_strong_n_short_dates conf base p :> string))
+      (fun _ ->
+         ("<strong>"
+          ^<^ (safe_html @@ sou base t.t_ident)
+          ^^^ " "
+          ^<^ (safe_html @@ sou base t.t_place)
+          ^^^ "</strong> <em>"
+          ^<^ (match Adef.od_of_cdate t.t_date_start with
+              | Some d -> DateDisplay.string_of_date conf d
+              | _ -> Adef.safe "")
+          ^^^ "-"
+          ^<^ (match Adef.od_of_cdate t.t_date_end with
+              | Some d -> DateDisplay.string_of_date conf d
+              | _ -> Adef.safe "")
+          ^>^ "</em>"
+          :> string)
+      )
   | UndefinedSex p ->
-      Output.printf conf (fcapitale (ftransl conf "undefined sex for %t"))
-        (fun _ -> print_someone_strong conf base p)
+    Output.printf conf
+      (fcapitale (ftransl conf "undefined sex for %t"))
+      (fun _ -> (someone_strong base p :> string))
   | YoungForMarriage (p, a, _)
   | OldForMarriage (p, a, _) ->
-      Output.printf conf "%s\n" (print_someone_strong conf base p);
-      Output.printf conf (ftransl conf "married at age %t")
-        (fun _ -> DateDisplay.string_of_age conf a)
+    Output.print_string conf (someone_strong base p);
+    Output.print_sstring conf " ";
+    Output.printf conf (ftransl conf "married at age %t")
+      (fun _ -> (DateDisplay.string_of_age conf a :> string))
 
 let print_warnings conf base wl =
   print_list_aux conf base "warnings" wl @@ fun conf base wl ->
@@ -705,9 +686,9 @@ let print_warnings conf base wl =
   let wl = List.sort_uniq compare wl in
   List.iter
     (fun w ->
-       Output.print_string conf "<li>" ;
+       Output.print_sstring conf "<li>" ;
        print_warning conf base w ;
-       Output.print_string conf "</li>" )
+       Output.print_sstring conf "</li>" )
     wl
 
 (* ************************************************************************* *)
@@ -724,9 +705,9 @@ let print_warnings conf base wl =
 let print_misc conf _base =
   function
     MissingSources ->
-      Output.print_string conf "<em>";
+      Output.print_sstring conf "<em>";
       Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "missing sources"));
-      Output.print_string conf "</em>"
+      Output.print_sstring conf "</em>"
 
 (* ************************************************************************* *)
 (*  [Fonc] print_miscs : config -> base -> Def.misc list -> unit             *)
@@ -742,7 +723,7 @@ let print_misc conf _base =
 let print_miscs conf base ml =
   print_list_aux conf base "miscellaneous informations" ml @@ fun conf base ->
   List.iter
-    (fun m -> Output.print_string conf "<li>" ; print_misc conf base m ; Output.print_string conf "</li>")
+    (fun m -> Output.print_sstring conf "<li>" ; print_misc conf base m ; Output.print_sstring conf "</li>")
 
 (* ************************************************************************* *)
 (*  [Fonc] print_miscs :
@@ -761,26 +742,26 @@ let print_miscs conf base ml =
 let print_warnings_and_miscs conf base wl ml =
   if wl <> [] || ml <> [] then begin
     Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "warnings"));
-    Output.print_string conf "<ul>\n";
+    Output.print_sstring conf "<ul>\n";
     List.iter
       (fun w ->
-         Output.print_string conf "<li>" ;
+         Output.print_sstring conf "<li>" ;
          print_warning conf base w ;
-         Output.print_string conf "</li>")
+         Output.print_sstring conf "</li>")
       wl ;
     List.iter
       (fun m ->
-         Output.print_string conf "<li>" ;
+         Output.print_sstring conf "<li>" ;
          print_misc conf base m ;
-         Output.print_string conf "</li>")
+         Output.print_sstring conf "</li>")
       ml;
-    Output.print_string conf "</ul>\n"
+    Output.print_sstring conf "</ul>\n"
   end
 
 let error conf err =
   prerr conf err @@ fun () ->
   Output.print_string conf (string_of_error conf err);
-  Output.print_string conf "\n";
+  Output.print_sstring conf "\n";
   print_return conf
 
 let def_error conf base x =
@@ -793,63 +774,53 @@ let def_error conf base x =
 let error_locked conf =
   let err = UERR_locked_base in
   prerr conf err @@ fun () ->
-  Output.print_string conf "<p>\n";
-  Output.print_string conf (string_of_error conf err);
-  Output.print_string conf "</p>\n";
-  Output.print_string conf "<table>\n";
-  Output.print_string conf "<tr>\n";
-  Output.print_string conf "<td>\n";
-  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  List.iter
-    (fun (x, v) ->
-       if x = "retry" then ()
-       else if x = "notes" || is_label_note x then
-         begin
-           Output.printf conf "<textarea style=\"display:none;\" name=\"%s\">\n"
-             x;
-           Output.print_string conf (Util.escape_html (Mutil.decode v));
-           Output.print_string conf "</textarea>\n"
-         end
-       else
-         Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
-           x (Util.escape_html (Mutil.decode v)))
-    (conf.henv @ conf.env);
-  (* just to see in the traces... *)
-  Output.printf conf "<input type=\"hidden\" name=\"retry\" value=\"%s\">\n"
-    (Util.escape_html conf.user);
-  Output.printf conf "<input type=\"submit\" value=\"%s\">\n"
-    (Utf8.capitalize_fst (transl conf "try again"));
-  Output.print_string conf "</form>\n";
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "<td>\n";
-  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
-  List.iter
-    (fun (x, v) ->
-       Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" x
-         (Util.escape_html (Mutil.decode v)))
-    conf.henv;
-  begin let ip =
-    match p_getenv conf.env "ip" with
-      Some ip -> Some ip
-    | None -> p_getenv conf.env "i"
+  Output.print_sstring conf "<p>\n";
+  transl conf "the file is temporarily locked: please try again"
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf {|.</p><table><tr><td><form method="post" action="|} ;
+  Output.print_sstring conf conf.command;
+  Output.print_sstring conf {|">|};
+  let aux env =
+    List.iter begin fun (x, v) ->
+      if x = "retry" then ()
+      else if x = "notes" || is_label_note x
+      then Util.hidden_textarea conf x v
+      else Util.hidden_input conf x v
+    end env
   in
-    match ip with
-      Some n ->
-        Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n" n
+  aux conf.henv ;
+  aux conf.env ;
+  (* just to see in the traces... *)
+  Util.hidden_input conf "retry" (Mutil.encode conf.user);
+  Util.hidden_input conf "submit"
+    (transl conf "try again" |> Utf8.capitalize_fst |> Mutil.encode);
+  Output.print_sstring conf {|</form></td><td><form method="get" action="|} ;
+  Output.print_sstring conf conf.command ;
+  Output.print_sstring conf {|">|};
+  Util.hidden_env_aux conf conf.henv;
+  begin
+    match
+      match p_getenv conf.env "ip" with
+      | Some ip -> Some ip
+      | None -> p_getenv conf.env "i"
+    with
+    | Some n -> Util.hidden_input conf "i" (Mutil.encode n)
     | None -> ()
   end;
-  Output.printf conf "<input type=\"submit\" value=\"%s\">\n"
-    (Utf8.capitalize_fst (transl_nth conf "user/password/cancel" 2));
-  Output.print_string conf "</form>\n";
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "</table>\n"
+  transl_nth conf "user/password/cancel" 2
+  |> Utf8.capitalize_fst
+  |> Mutil.encode
+  |> Util.hidden_input conf "submit" ;
+  Output.print_sstring conf "</form></td></tr></table>"
 
 let error_digest conf =
   let err = UERR_digest in
   prerr conf err @@ fun () ->
   Hutil.print_link_to_welcome conf true;
-  Output.printf conf "<p>%s.\n</p>\n" (string_of_error conf err)
+  Output.print_sstring conf "<p>";
+  Output.print_string conf (string_of_error conf err) ;
+  Output.print_sstring conf "</p>"
 
 let digest_person p = Marshal.to_string p [] |> Mutil.digest
 let digest_family f = Marshal.to_string f [] |> Mutil.digest
@@ -912,7 +883,7 @@ let reconstitute_date_dmy2 conf var =
           end
       | None -> {day2 = 0; month2 = 0; year2 = y; delta2 = 0}
       end
-  | None -> raise @@ ModErr (UERR_missing_field "oryear")
+  | None -> raise @@ ModErr (UERR_missing_field (Adef.safe "oryear"))
 
 let reconstitute_date_dmy conf var =
   let (prec, y) =
@@ -1003,9 +974,9 @@ let check_missing_name base p =
     && poi base p.key_index |> g |> sou base |> (<>) "?"
   in
   if p.first_name = "" || quest p.first_name get_first_name
-  then Some (UERR_missing_first_name "")
+  then Some (UERR_missing_first_name (Adef.safe ""))
   else if p.surname = "" || quest p.surname get_surname
-  then Some (UERR_missing_surname "")
+  then Some (UERR_missing_surname (Adef.safe ""))
   else None
 
 let check_missing_witnesses_names conf get list =
@@ -1017,9 +988,9 @@ let check_missing_witnesses_names conf get list =
         let ((fn, sn, _, _, _), _) = Array.get witnesses i in
         if fn = "" && sn = "" then loop (i + 1)
         else if fn = "" || fn = "?" then
-          Some (UERR_missing_first_name (transl_nth conf "witness/witnesses" 0))
+          Some (UERR_missing_first_name (transl_nth conf "witness/witnesses" 0 |> Adef.safe))
         else if sn = "" || sn = "?" then
-          Some (UERR_missing_surname (transl_nth conf "witness/witnesses" 0))
+          Some (UERR_missing_surname (transl_nth conf "witness/witnesses" 0 |> Adef.safe))
         else loop (i + 1)
       end
     in
@@ -1029,7 +1000,7 @@ let check_missing_witnesses_names conf get list =
     | [] -> None
     | hd :: tl ->
       match aux (get hd) with
-      | Some _ as err -> err
+      | Some err -> Some err
       | None -> loop tl
   in
   loop list
@@ -1057,46 +1028,6 @@ let reconstitute_date conf var =
           if txt = "" then None else Some (Dtext txt)
       | _ -> None
 
-let parse_int s i =
-  let j =
-    let rec loop j =
-      if j = String.length s
-      || match String.unsafe_get s j with '0'..'9' -> false | _ -> true
-      then j
-      else loop (j + 1)
-    in
-    loop i
-  in
-  (int_of_string @@ String.sub s i (j - i), j)
-
-let text_of_var conf =
-  function
-  | "pa1" -> transl_nth conf "him/her" 0
-  | "pa2" -> transl_nth conf "him/her" 1
-  | var -> match String.get var 0 with
-    | 'r' ->
-      let (pos, i) = parse_int var 1 in
-      assert (String.get var i = '_') ;
-      let pn = match String.get var (i + 1) with 'f' -> 0 | 'm' -> 1 | _ -> assert false in
-      transl_nth conf "relation/relations" 0 ^ " " ^ string_of_int pos
-      ^ " - " ^ transl_nth conf "father/mother" pn
-    | 'e' ->
-      let (epos, i) = parse_int var 1 in
-      assert (String.get var i = '_') ;
-      assert (String.get var (i + 1) = 'w') ;
-      assert (String.get var (i + 2) = 'i') ;
-      assert (String.get var (i + 3) = 't') ;
-      assert (String.get var (i + 4) = 'n') ;
-      let (wpos, _) = parse_int var (i + 5) in
-      let a = transl_nth conf "witness/witnesses" 0 ^ " " ^ string_of_int wpos in
-      let b = transl_nth conf "event/events" 0 ^ " " ^ string_of_int epos in
-      transl_a_of_b conf a b b
-    | 'c' when String.length var >= 3 && String.unsafe_get var 1 = 'h' ->
-      let (pos, _) = parse_int var 2 in
-      Util.translate_eval (transl_nth conf "child/children" 0)
-      ^ " " ^ string_of_int pos
-    | _ -> var
-
 let print_create_conflict conf base p var =
   let err = UERR_already_defined (base, p, var) in
   prerr conf err @@ fun () ->
@@ -1104,51 +1035,57 @@ let print_create_conflict conf base p var =
   let free_n =
     Gutil.find_free_occ base (p_first_name base p) (p_surname base p)
   in
-  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
-  List.iter
-    (fun (x, v) ->
-       (* Seul un textarea peut contenir des sauts de ligne. *)
-       (* On remplace donc l'input par un textarea.          *)
-       if x = "notes" || is_label_note x then
-         begin
-           Output.printf conf "<textarea style=\"display:none;\" name=\"%s\">\n"
-             x;
-           Output.print_string conf (Util.escape_html (Mutil.decode v));
-           Output.print_string conf "</textarea>\n"
-         end
-       else
-         Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
-           x (Util.escape_html (Mutil.decode v)))
-    (conf.henv @ conf.env);
-  if var <> "" then Output.printf conf "<input type=\"hidden\" name=\"field\" value=\"%s\">\n" var;
-  Output.printf conf "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
-    free_n;
-  Output.print_string conf "<ul>\n";
-  Output.print_string conf "<li>";
-  Output.printf conf "%s%s %d. \n" (Utf8.capitalize_fst (transl conf "first free number"))
-    (transl conf ":") free_n;
-  Output.printf conf (fcapitale (ftransl conf "click on \"%s\""))
-    (transl conf "create");
-  Output.printf conf " %s." (transl conf "to try again with this number");
-  Output.print_string conf "</li>";
-  Output.print_string conf "<li>";
-  Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "or"));
-  Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
-  Output.printf conf " %s %s." (transl_nth conf "and" 0)
-    (transl conf "change it (the number) yourself");
-  Output.print_string conf "</li>";
-  Output.print_string conf "<li>";
-  Output.printf conf "%s " (Utf8.capitalize_fst (transl conf "or"));
-  Output.printf conf (ftransl conf "click on \"%s\"") (transl conf "back");
-  Output.printf conf " %s %s." (transl_nth conf "and" 0)
-    (transl conf "use \"link\" instead of \"create\"");
-  Output.print_string conf "</li>";
-  Output.print_string conf "</ul>\n";
-  Output.printf conf "<input type=\"submit\" name=\"create\" value=\"%s\">\n"
-    (Utf8.capitalize_fst (transl conf "create"));
-  Output.printf conf "<input type=\"submit\" name=\"return\" value=\"%s\">\n"
-    (Utf8.capitalize_fst (transl conf "back"));
-  Output.print_string conf "</form>\n";
+  Output.print_sstring conf {|<form method="post" action="|};
+  Output.print_sstring conf conf.command ;
+  Output.print_sstring conf {|">|};
+  let aux =
+    List.iter begin fun (x, v) ->
+      if x = "notes" || is_label_note x
+      then Util.hidden_textarea conf x v
+      else Util.hidden_input conf x v
+    end
+  in
+  aux conf.henv;
+  aux conf.env;
+  if var <> "" then Util.hidden_input conf "field" (Mutil.encode var);
+  Util.hidden_input conf "free_occ" (Mutil.encode @@ string_of_int free_n);
+  Output.print_sstring conf "<ul><li>";
+  transl conf "first free number"
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf (transl conf ":") ;
+  Output.print_sstring conf " " ;
+  Output.print_sstring conf (string_of_int free_n) ;
+  Output.print_sstring conf ".\n" ;
+  Output.printf conf (fcapitale (ftransl conf {|click on "%s"|})) (transl conf "create");
+  Output.print_sstring conf " ";
+  Output.print_sstring conf (transl conf "to try again with this number");
+  Output.print_sstring conf ".</li><li>";
+  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "or"));
+  Output.print_sstring conf " ";
+  Output.printf conf (ftransl conf {|click on "%s"|}) (transl conf "back");
+  Output.print_sstring conf " " ;
+  Output.print_sstring conf (transl_nth conf "and" 0) ;
+  Output.print_sstring conf " " ;
+  Output.print_sstring conf (transl conf "change it (the number) yourself");
+  Output.print_sstring conf ".</li><li>";
+  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "or"));
+  Output.print_sstring conf " ";
+  Output.printf conf (ftransl conf {|click on "%s"|}) (transl conf "back");
+  Output.print_sstring conf " " ;
+  Output.print_sstring conf (transl_nth conf "and" 0) ;
+  Output.print_sstring conf " " ;
+  Output.print_sstring conf (transl conf {|use "link" instead of "create"|});
+  Output.print_sstring conf ".</li></ul>";
+  transl conf "create"
+  |> Utf8.capitalize_fst
+  |> Adef.encoded
+  |> Util.submit_input conf "create" ;
+  transl conf "back"
+  |> Utf8.capitalize_fst
+  |> Adef.encoded
+  |> Util.submit_input conf "return" ;
+  Output.print_sstring conf {|</form>|};
   print_same_name conf base p
 
 let insert_person conf base src new_persons (f, s, o, create, var) =
@@ -1233,58 +1170,50 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
   | Link ->
     if f = "?" || s = "?" then
       if o < 0 || o >= nb_of_persons base then
-        print_err_unknown conf base (f, s, o)
+        print_err_unknown conf (f, s, o)
       else
         (* FIXME: this would fail if internal repr of iper is not int *)
         let ip = Gwdb.iper_of_string @@ string_of_int o in
         let p = poi base ip in
         if p_first_name base p = f && p_surname base p = s then ip
-        else print_err_unknown conf base (f, s, o)
+        else print_err_unknown conf (f, s, o)
     else
       match person_of_key base f s o with
         Some ip -> ip
-      | None -> print_err_unknown conf base (f, s, o)
+      | None -> print_err_unknown conf (f, s, o)
 
-let rec update_conf_env field p occ o_env n_env =
+let rec update_conf_env field (p : Adef.encoded_string) (occ : Adef.encoded_string) o_env n_env =
   match o_env with
-    [] -> n_env
+  | [] -> n_env
   | ((name, _) as head) :: rest ->
-      if name = field ^ "p" then
-        update_conf_env field p occ rest ((name, p) :: n_env)
-      else if name = field ^ "occ" then
-        update_conf_env field p occ rest ((name, occ) :: n_env)
-      else if
-        name = "link" || name = "create" || name = "free_occ" ||
-        name = "field" || name = "link_occ"
-      then
-        update_conf_env field p occ rest n_env
-      else update_conf_env field p occ rest (head :: n_env)
+    if name = field ^ "p"
+    then update_conf_env field p occ rest ((name, p) :: n_env)
+    else if name = field ^ "occ"
+    then update_conf_env field p occ rest ((name, occ) :: n_env)
+    else if name = "link"
+         || name = "create"
+         || name = "free_occ"
+         || name = "field"
+         || name = "link_occ"
+    then update_conf_env field p occ rest n_env
+    else update_conf_env field p occ rest (head :: n_env)
 
-let update_conf_create conf =
+let update_conf_aux _create _occ conf =
   let field =
     match p_getenv conf.env "field" with
-      Some f -> f ^ "_"
+    | Some f -> f ^ "_"
     | _ -> ""
   in
   let occ =
-    match p_getenv conf.env "free_occ" with
-      Some occ -> occ
-    | _ -> ""
+    match p_getenv conf.env _occ with
+    | Some occ -> Mutil.encode occ
+    | _ -> Adef.encoded ""
   in
-  {conf with env = update_conf_env field "create" occ conf.env []}
+  { conf with env = update_conf_env field _create occ conf.env [] }
 
-let update_conf_link conf =
-  let field =
-    match p_getenv conf.env "field" with
-      Some f -> f ^ "_"
-    | _ -> ""
-  in
-  let occ =
-    match p_getenv conf.env "link_occ" with
-      Some occ -> occ
-    | _ -> ""
-  in
-  {conf with env = update_conf_env field "link" occ conf.env []}
+let update_conf_create = update_conf_aux (Adef.encoded "create") "free_occ"
+
+let update_conf_link = update_conf_aux (Adef.encoded "link") "link_occ"
 
 let update_conf conf =
   match p_getenv conf.env "link" with

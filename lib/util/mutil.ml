@@ -92,7 +92,6 @@ let bench name fn =
 let print_callstack ?(max = 5) () =
   Printexc.(print_raw_backtrace stderr @@ get_callstack max)
 
-let int_size = 4
 let verbose = ref true
 
 let rm fname =
@@ -215,14 +214,6 @@ let initial n =
       | _ -> loop (succ i)
   in
   loop 0
-
-let name_key s =
-  let i = initial s in
-  let s =
-    if i = 0 then s
-    else String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
-  in
-  Name.lower s
 
 let input_particles fname =
   try
@@ -510,7 +501,7 @@ let input_lexicon lang ht open_fname =
              && String.unsafe_get line 3 = ' '
         then
           let k2 = String.sub line 4 (String.length line - 4) in
-          Opt.iter (Hashtbl.replace ht k) (Hashtbl.find_opt ht k2) ;
+          Option.iter (Hashtbl.replace ht k) (Hashtbl.find_opt ht k2) ;
           key ()
         else trad k
       | None -> key ()
@@ -831,54 +822,61 @@ let read_or_create_channel ?magic ?(wait = false) fname read write =
 #endif
   assert (Secure.check fname) ;
   let fd = Unix.openfile fname [ Unix.O_RDWR ; Unix.O_CREAT ] 0o666 in
+#ifndef WINDOWS
+  begin try
+    Unix.lockf fd (if wait then Unix.F_LOCK else Unix.F_TLOCK) 0
+    with e -> Unix.close fd; raise e
+  end;
+#endif
   let ic = Unix.in_channel_of_descr fd in
-  let check = function None -> true | Some m -> check_magic m ic in
   let read () =
-    seek_in ic 0 ;
-    if check magic
-    then
-      try
-        let res = read ic in
-        assert (check magic) ;
-        close_in ic ;
-        Some res
-      with _ -> None
-    else None
+    seek_in ic 0;
+    try
+      match magic with
+      | Some m when check_magic m ic ->
+         let r = Some (read ic) in
+         let _ = seek_in ic (in_channel_length ic - (String.length m)) in
+         assert (check_magic m ic);
+         r
+      | Some _ -> None
+      | None -> Some (read ic)
+    with _ -> None
   in
   match read () with
-  | Some v -> v
+  | Some v ->
+#ifndef WINDOWS
+     Unix.lockf fd Unix.F_ULOCK 0;
+#endif
+     close_in ic;
+     v
   | None ->
+     Unix.ftruncate fd 0 ;
+     let oc = Unix.out_channel_of_descr fd in
+     seek_out oc 0;
+     begin match magic with Some m -> seek_out oc (String.length m) | None -> () end;
+     let v = write oc in
+     flush oc;
+     let _ = seek_out oc (out_channel_length oc) in
+     begin match magic with Some m -> output_string oc m | None -> () end;
+     begin match magic with Some m -> seek_out oc 0 ; output_string oc m | None -> () end ;
+     flush oc;
 #ifndef WINDOWS
-    Unix.lockf fd (if wait then Unix.F_LOCK else Unix.F_TLOCK) 0 ;
-    match read () with
-    | Some v -> v
-    | None ->
+     Unix.lockf fd Unix.F_ULOCK 0;
 #endif
-      let fd2 = Unix.dup fd in
-      Unix.ftruncate fd2 0 ;
-      let oc = Unix.out_channel_of_descr fd2 in
-      begin match magic with Some m -> seek_out oc (String.length m) | None -> () end ;
-      let v = write oc in
-      begin match magic with Some m -> output_string oc m | None -> () end ;
-      begin match magic with Some m -> seek_out oc 0 ; output_string oc m | None -> () end ;
-#ifndef WINDOWS
-      Unix.lockf fd Unix.F_ULOCK 0 ;
-#endif
-      close_in ic ;
-      close_out oc ;
-      v
+     close_out oc;
+     v
 
 let read_or_create_value ?magic ?wait fname create =
   let read ic = Marshal.from_channel ic in
   let write oc =
     let v = create () in
-    Marshal.to_channel oc v [ Marshal.No_sharing ; Marshal.Closures ] ;
+    Marshal.to_channel oc v [ Marshal.No_sharing ; Marshal.Closures ];
     v
   in
   try read_or_create_channel ?magic ?wait fname read write
   with _ -> create ()
 
-let encode s =
+let encode s : Adef.encoded_string =
   let special = function
     | '\000'..'\031' | '\127'..'\255' | '<' | '>' | '"' | '#' | '%' | '{'
     | '}' | '|' | '\\' | '^' | '~' | '[' | ']' | '`' | ';' | '/' | '?' | ':'
@@ -921,10 +919,12 @@ let encode s =
     else Bytes.unsafe_to_string s1
   in
   if need_code 0 then
-    let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
-  else s
+    let len = compute_len 0 0 in
+    Adef.encoded (copy_code_in (Bytes.create len) 0 0)
+  else Adef.encoded s
 
-let gen_decode strip_spaces s =
+let gen_decode strip_spaces (s : Adef.encoded_string) : string =
+  let s = (s :> string) in
   let hexa_val conf =
     match conf with
     | '0'..'9' -> Char.code conf - Char.code '0'
@@ -980,7 +980,7 @@ let gen_decode strip_spaces s =
     if strip_spaces then strip_heading_and_trailing_spaces s else s
   else s
 
-let decode = gen_decode true
+let decode : Adef.encoded_string -> string = gen_decode true
 
 let rec extract_param name stop_char =
   let case_unsensitive_eq s1 s2 =
@@ -1001,6 +1001,7 @@ let rec extract_param name stop_char =
   | [] -> ""
 
 let sprintf_date tm =
+  Adef.safe @@
   Printf.sprintf
     "%04d-%02d-%02d %02d:%02d:%02d"
     (1900 + tm.Unix.tm_year)

@@ -30,33 +30,35 @@ let set_sosa_num () = assert (!sosa = `None) ; sosa := `Num
 
 let set_gwdb_legacy () = assert (!gwdb = `None) ; gwdb := `Legacy
 
-let release = ref true
+let release = ref false
 
 let speclist =
   [ ( "--gwdb-legacy"
     , Arg.Unit set_gwdb_legacy
-    , "Use legacy backend" )
+    , " Use legacy backend" )
   ; ( "--release"
     , Arg.Set release
-    , "Use release profile: no debug informations \
+    , " Use release profile: no debug informations \
       (defaut: " ^ string_of_bool !release ^ ")" )
   ; ( "--debug"
     , Arg.Clear release
-    , "Use dev profile: no optimization, debug informations \
+    , " Use dev profile: no optimization, debug informations \
        (default: " ^ string_of_bool (not !release) ^ ")" )
   ; ( "--sosa-legacy"
     , Arg.Unit set_sosa_legacy
-    , "Use legacy Sosa module implementation" )
+    , " Use legacy Sosa module implementation" )
   ; ( "--sosa-num"
     , Arg.Unit set_sosa_num
-    , "Use Sosa module implementation based on `num` library" )
+    , " Use Sosa module implementation based on `num` library" )
   ; ( "--sosa-zarith"
     , Arg.Unit set_sosa_zarith
-    , "Use Sosa module implementation based on `zarith` library" )
+    , " Use Sosa module implementation based on `zarith` library" )
   ; ( "--syslog"
     , Arg.Unit set_syslog
-    , "Log gwd errors using syslog" )
+    , " Log gwd errors using syslog" )
   ]
+  |> List.sort compare
+  |> Arg.align
 
 let () =
   Arg.parse speclist failwith errmsg ;

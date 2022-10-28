@@ -1,6 +1,5 @@
 {
 
-open Config
 open TemplAst
 
 let dump_list pp a = String.concat ";" (List.map pp a)
@@ -56,7 +55,7 @@ let wrap fname fn =
     current_file := old ;
     raise e
 
-let line_of_loc conf (fname, bp, ep) =
+let line_of_loc (fname, bp, ep) =
   match try Some (Secure.open_in fname) with _ -> None with
   | None -> None
   | Some ic ->
@@ -551,7 +550,7 @@ and parse_include conf b closing ast = parse
         match List.assoc_opt file !included_files with
         | Some a -> Ainclude (file, a) :: ast
         | None ->
-          match Util.open_templ_fname conf file with
+          match Util.open_etc_file conf file with
           | Some (ic, fname) ->
             wrap fname begin fun () ->
               let lex2 = Lexing.from_channel ic in

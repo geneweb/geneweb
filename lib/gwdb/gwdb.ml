@@ -185,10 +185,10 @@ let delete_family base ifam = ignore @@ delete_family ([], []) base ifam
 (**/**)
 (** Misc *)
 
-(** [nobtit base allowed_titles denied_titles p] returns list of titles of a person [p]
+(** [nobtitles base allowed_titles denied_titles p] returns list of titles of a person [p]
     that apprears in [allowed_titles] and doesn't appears in [denied_titles]. If [allowed_titles]
     is empty the every title is allowed *)
-let nobtit base allowed_titles denied_titles p =
+let nobtitles base allowed_titles denied_titles p =
   let list = get_titles p in
   match Lazy.force allowed_titles with
   | [] -> list

@@ -168,3 +168,34 @@ let commit_notes conf base fnotes s =
   Gwdb.commit_notes base fname s ;
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db base pg s
+
+let wiki_aux pp conf base env str =
+  let s = Util.string_with_macros conf env str in
+  let lines = pp (Wiki.html_of_tlsw conf s) in
+  let wi =
+    { Wiki.wi_mode = "NOTES"
+    ; Wiki.wi_file_path = file_path conf base
+    ; Wiki.wi_person_exists = Util.person_exists conf base
+    ; Wiki.wi_always_show_link = conf.wizard || conf.friend
+    }
+  in
+  String.concat "\n" lines
+  |> Wiki.syntax_links conf wi
+  |> Util.safe_html
+
+let source conf base str =
+  wiki_aux (function [ "<p>" ; x ; "</p>" ] -> [ x ] | x -> x) conf base [] str
+
+let note conf base env str =
+  wiki_aux (fun x -> x) conf base env str
+
+let person_note conf base p str =
+  let env = ['i', (fun () -> Image.default_portrait_filename base p )] in
+  note conf base env str
+
+let source_note conf base p str =
+  let env = ['i', (fun () -> Image.default_portrait_filename base p)] in
+  wiki_aux (function [ "<p>" ; x ; "</p>" ] -> [ x ] | x -> x) conf base env str
+
+let source_note_with_env conf base env str =
+  wiki_aux (function [ "<p>" ; x ; "</p>" ] -> [ x ] | x -> x) conf base env str

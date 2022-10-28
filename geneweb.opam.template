@@ -1,0 +1,4 @@
+build: [
+  [ "ocaml" "./configure.ml" "--release" ]
+  [ make "build" ]
+]

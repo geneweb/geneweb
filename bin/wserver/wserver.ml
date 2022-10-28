@@ -130,7 +130,7 @@ let get_request_and_content strm =
     | "" -> ""
     | x -> String.init (int_of_string x) (fun _ -> Stream.next strm)
   in
-  request, content
+  request, Adef.encoded content
 
 let string_of_sockaddr =
   function
@@ -156,24 +156,26 @@ let treat_connection tmout callback addr fd =
     end ;
     ignore @@ Unix.alarm tmout ;
   end ;
-  let (request, script_name, contents) =
-    let (request, contents) =
+  let (request, path, query) =
+    let (request, query) =
       let strm = Stream.of_channel (Unix.in_channel_of_descr fd) in
       get_request_and_content strm
     in
-    let (script_name, contents) =
+    let (path, query) =
       match Mutil.extract_param "GET /" ' ' request with
-        "" -> Mutil.extract_param "POST /" ' ' request, contents
+      | "" ->
+        ( Mutil.extract_param "POST /" ' ' request
+        , query )
       | str ->
-          try
-            let i = String.index str '?' in
-            String.sub str 0 i,
-            String.sub str (i + 1) (String.length str - i - 1)
-          with Not_found -> str, ""
+        match String.index_opt str '?' with
+        | Some i ->
+          ( String.sub str 0 i
+          , String.sub str (i + 1) (String.length str - i - 1) |> Adef.encoded )
+        | None -> str, "" |> Adef.encoded
     in
-    request, script_name, contents
+    request, path, query
   in
-  callback (addr, request) script_name contents
+  callback (addr, request) path query
 
 let buff = Bytes.create 1024
 
@@ -233,16 +235,6 @@ let wait_available max_clients s =
           end
       done
   | None -> ()
-
-let wait_and_compact s =
-  if Unix.select [s] [] [] 15.0 = ([], [], []) then
-    begin
-      eprintf "Compacting... ";
-      flush stderr;
-      Gc.compact ();
-      eprintf "Ok\n";
-      flush stderr
-    end
 
 let skip_possible_remaining_chars fd =
   if not !connection_closed then skip_possible_remaining_chars fd

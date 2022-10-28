@@ -4,6 +4,57 @@ open Config
 open Def
 open Gwdb
 
+let escape_aux count blit str =
+  let strlen = String.length str in
+  let rec loop acc i =
+    if i < strlen
+    then loop (acc + count (String.unsafe_get str i)) (i + 1)
+    else if acc = strlen then str
+    else
+      let buf = Bytes.create acc in
+      let rec loop istr ibuf =
+        if istr = strlen then Bytes.unsafe_to_string buf
+        else blit buf ibuf istr loop (String.unsafe_get str istr)
+      in loop 0 0
+  in
+  loop 0 0
+
+(** [escape_html str] replaces '&', '"', '<' and '>'
+    with their corresponding character entities (using entity number) *)
+let escape_html s : Adef.escaped_string =
+  escape_aux
+    begin function
+      | '&' | '"' | '\'' | '<' | '>' -> 5 (* "&#xx;" *)
+      | _ -> 1
+    end
+    begin fun buf ibuf istr loop -> function
+      | '&' -> Bytes.blit_string "&#38;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | '"' -> Bytes.blit_string "&#34;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | '\'' -> Bytes.blit_string "&#39;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | '<' -> Bytes.blit_string "&#60;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | '>' -> Bytes.blit_string "&#62;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | c -> Bytes.unsafe_set buf ibuf c ; loop (istr + 1) (ibuf + 1)
+    end
+    s
+  |> Adef.escaped
+
+let esc x = (escape_html x :> Adef.safe_string)
+
+(** [escape_attribute str] only escapes double quote and ampersand.
+    Since we will return normalized HTML, ['"'] should be the only
+    dangerous character here. *)
+let escape_attribute =
+  escape_aux
+    begin function
+      | '&' | '"' -> 5 (* "&#xx;" *)
+      | _ -> 1
+    end
+    begin fun buf ibuf istr loop -> function
+      | '&' -> Bytes.blit_string "&#38;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | '"' -> Bytes.blit_string "&#34;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
+      | c -> Bytes.unsafe_set buf ibuf c ; loop (istr + 1) (ibuf + 1)
+    end
+
 let is_hide_names conf p =
   if conf.hide_names || get_access p = Private then true else false
 
@@ -199,25 +250,15 @@ let translate_eval s = Translate.eval (Mutil.nominative s)
 
 (* *)
 
-let escape_char src dst str =
-  let rec loop i len =
-    if i = String.length str then Buff.get len
-    else if str.[i] = src then loop (i + 1) (Buff.mstore len dst)
-    else loop (i + 1) (Buff.store len str.[i])
-  in
-  loop 0 0
-
-let escape_amp = escape_char '&' "&#38;"
-
 let get_referer conf =
   let referer = Mutil.extract_param "referer: " '\n' conf.request in
-  escape_amp referer
+  escape_html referer
 
 let begin_centered conf =
   Output.printf conf
     "<table border=\"%d\" width=\"100%%\"><tr><td align=\"center\">\n"
     conf.border
-let end_centered conf = Output.print_string conf "</td></tr></table>\n"
+let end_centered conf = Output.print_sstring conf "</td></tr></table>\n"
 
 let week_day_txt =
   let txt = [| "Sun"; "Mon"; "Tue"; "Wed"; "Thu"; "Fri"; "Sat" |] in
@@ -247,35 +288,39 @@ let unauthorized conf auth_type =
   if not conf.cgi then
     Output.header conf "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
   Output.header conf "Content-type: text/html; charset=%s" conf.charset;
-  Output.print_string conf "<head><title>Access failed</title></head>\n";
-  Output.print_string conf "<body><h1>Access failed</h1>\n";
+  Output.print_sstring conf "<head><title>Access failed</title></head>\n";
+  Output.print_sstring conf "<body><h1>Access failed</h1>\n";
   Output.printf conf "<ul><li>%s</ul>\n" auth_type;
-  Output.print_string conf "</body>\n"
+  Output.print_sstring conf "</body>\n"
 
-let commd conf =
-  let c = conf.command ^ "?" in
-  List.fold_left (fun c (k, v) ->
-    if ( (k = "oc" || k = "ocz") && v = "0" ) || v = "" then c
-    else c ^ k ^ "=" ^ v ^ "&") c (conf.henv @ conf.senv)
-
-let commd_2 conf =
-  let c = conf.command ^ "?" in
-  List.fold_left (fun c (k, v) ->
-    if ( k = "oc" || k = "ocz" && v = "" || v = "0" ) || v = "" then
-      c else c ^ "&" ^ k ^ "=" ^ v ) c (conf.henv @ conf.senv)
-
+let commd ?(excl = []) ?(trim = true) ?(henv = true) ?(senv = true) conf : Adef.escaped_string =
+  let aux =
+    List.fold_left begin fun c (k, (v : Adef.encoded_string)) ->
+      if List.mem k excl
+      || (trim && (k = "oc" || k = "ocz") && (v :> string) = "0")
+      || (v :> string) = "" then c
+      else c ^^^ k ^<^ "=" ^<^ (v :> Adef.escaped_string) ^>^ "&"
+    end
+  in
+  let s = Adef.escaped @@ conf.command ^ "?" in
+  let s = if henv then aux s conf.henv else s in
+  let s = if senv then aux s conf.senv else s in
+  s
 
 let prefix_base conf =
-  if conf.cgi then conf.command ^ "?b=" ^ conf.bname ^ "&"
-  else conf.command ^ "?"
-
-let prefix_base_2 conf =
-  if conf.cgi then
-    conf.command ^ "?b=" ^ conf.bname
+  let cmmd = conf.command in
+  Adef.escaped @@
+  if conf.cgi then cmmd ^ "?b=" ^ conf.bname ^ "&"
   else
-    conf.command ^ "?"
+    let cmmd =
+      match String.index_opt cmmd '_' with
+      | Some i -> String.sub cmmd 0 i
+      | None -> cmmd
+    in
+    cmmd ^ "?"
 
 let prefix_base_password conf =
+  Adef.escaped @@
   if conf.cgi then
     if conf.cgi_passwd = "" then
       conf.command ^ "?b=" ^ conf.bname ^ "&"
@@ -284,8 +329,8 @@ let prefix_base_password conf =
   else
     conf.command ^ "?"
 
-
 let prefix_base_password_2 conf =
+  Adef.escaped @@
   if conf.cgi then
     if conf.cgi_passwd = "" then
       conf.command ^ "?b=" ^ conf.bname
@@ -373,65 +418,6 @@ let safe_html_allowed_tags =
     end
   end
 
-let escape_aux count blit str =
-  let strlen = String.length str in
-  let rec loop acc i =
-    if i < strlen
-    then loop (acc + count (String.unsafe_get str i)) (i + 1)
-    else if acc = strlen then str
-    else
-      let buf = Bytes.create acc in
-      let rec loop istr ibuf =
-        if istr = strlen then Bytes.unsafe_to_string buf
-        else blit buf ibuf istr loop (String.unsafe_get str istr)
-      in loop 0 0
-  in
-  loop 0 0
-
-(** [escape_html str] replaces '&', '"', '<' and '>'
-    with their corresponding character entities (using entity number) *)
-let escape_html =
-  escape_aux
-    begin function
-      | '&' | '"' | '\'' | '<' | '>' -> 5 (* "&#xx;" *)
-      | _ -> 1
-    end
-    begin fun buf ibuf istr loop -> function
-      | '&' -> Bytes.blit_string "&#38;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-      | '"' -> Bytes.blit_string "&#34;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-      | '\'' -> Bytes.blit_string "&#39;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-      | '<' -> Bytes.blit_string "&#60;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-      | '>' -> Bytes.blit_string "&#62;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-      | c -> Bytes.unsafe_set buf ibuf c ; loop (istr + 1) (ibuf + 1)
-    end
-
-(** [escape_attribute str] only escapes double quote and ampersand.
-    Since we will return normalized HTML, ['"'] should be the only
-    dangerous character here. *)
-let escape_attribute =
-  escape_aux
-    begin function
-      | '&' | '"' -> 5 (* "&#xx;" *)
-      | _ -> 1
-    end
-    begin fun buf ibuf istr loop -> function
-      | '&' -> Bytes.blit_string "&#38;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-      | '"' -> Bytes.blit_string "&#34;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-      | c -> Bytes.unsafe_set buf ibuf c ; loop (istr + 1) (ibuf + 1)
-    end
-
-let no_html_tags =
-  escape_aux
-    begin function
-      | '<' | '>' -> 4 (* "&{l,g}t;" *)
-      | _ -> 1
-    end
-    begin fun buf ibuf istr loop -> function
-      | '<' -> Bytes.blit_string "&lt;" 0 buf ibuf 4 ; loop (istr + 1) (ibuf + 4)
-      | '>' -> Bytes.blit_string "&gt;" 0 buf ibuf 4 ; loop (istr + 1) (ibuf + 4)
-      | c -> Bytes.unsafe_set buf ibuf c ; loop (istr + 1) (ibuf + 1)
-    end
-
 (* Few notes:
 
    According to https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs,
@@ -483,7 +469,7 @@ let safe_html_aux escape_text s =
   |> write_html ~escape_text ~escape_attribute
   |> to_string
 
-let safe_html = safe_html_aux escape_html
+let safe_html s = Adef.safe (safe_html_aux (fun s -> (escape_html s :> string)) s)
 
 (* Version 1 => moche *)
 let clean_html_tags s l =
@@ -491,22 +477,47 @@ let clean_html_tags s l =
     (fun s html_tag -> Str.global_replace (Str.regexp html_tag) "&nbsp;" s) s
     l
 
+let hidden_textarea conf k v =
+  Output.print_sstring conf {|<textarea style="display:none;" name="|} ;
+  Output.print_string conf (escape_html k) ;
+  Output.print_sstring conf {|">|} ;
+  Output.print_string conf (escape_html (Mutil.decode v)) ;
+  Output.print_sstring conf "</textarea>\n"
+
+let aux_input_s conf t k v =
+  Output.print_sstring conf {|<input type="|} ;
+  Output.print_string conf t ;
+  Output.print_sstring conf {|" name="|} ;
+  Output.print_string conf (escape_html k) ;
+  Output.print_sstring conf {|" value="|} ;
+  Output.print_string conf (escape_html v) ;
+  Output.print_sstring conf "\">\n"
+
+let hidden_input_s conf k v =
+  aux_input_s conf (Adef.encoded "hidden") k v
+
+let hidden_input conf k v =
+  hidden_input_s conf k (Mutil.decode v)
+
+let hidden_env_aux conf =
+  List.iter (fun (k, v) -> hidden_input conf k v)
+
 let hidden_env conf =
-  List.iter
-    (fun (k, v) ->
-       Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" k
-         (escape_html (Mutil.decode v)))
-    (conf.henv @ conf.senv)
+  hidden_env_aux conf conf.henv ;
+  hidden_env_aux conf conf.senv
+
+let submit_input conf k v =
+  aux_input_s conf (Adef.encoded "submit") k (Mutil.decode v)
 
 let p_getenv env label =
-  Opt.map Mutil.decode (List.assoc_opt (Mutil.decode label) env)
+  Option.map Mutil.decode (List.assoc_opt label env)
 
 let p_getint env label =
-  try Opt.map (fun s -> int_of_string (String.trim s)) (p_getenv env label)
+  try Option.map (fun s -> int_of_string (String.trim s)) (p_getenv env label)
   with Failure _ -> None
 
 let nobtit conf base p =
-  Gwdb.nobtit base conf.allowed_titles conf.denied_titles p
+  Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p
 
 let strictly_after_private_years conf a =
   if a.year > conf.private_years then true
@@ -591,27 +602,36 @@ let accessible_by_key conf base p fn sn =
 (** [Description] : Renvoie les paramètres URL pour l'accès à la nième
                     personne.
     [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - n    : la nième personne (e.g. : calcul de parenté entre p1 et p2)
-      - p    : person
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                           *)
+    - conf : configuration de la base
+    - base : base de donnée
+    - n    : la nième personne (e.g. : calcul de parenté entre p1 et p2)
+    - p    : person
+      [Retour] : string
+      [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
-let acces_n conf base n x =
+let acces_n conf base n x : Adef.escaped_string =
   let first_name = p_first_name base x in
   let surname = p_surname base x in
-  if surname = "" then ""
+  if surname = "" then Adef.escaped ""
   else if accessible_by_key conf base x first_name surname then
-    "p" ^ n ^ "=" ^ Mutil.encode (Name.lower first_name) ^ "&n" ^ n ^ "=" ^
-    Mutil.encode (Name.lower surname) ^
-    (if get_occ x <> 0 then "&oc" ^ n ^ "=" ^ string_of_int (get_occ x)
-     else "")
+    "p"
+    ^<^ n
+    ^^^ "="
+    ^<^ (Mutil.encode (Name.lower first_name) :> Adef.escaped_string)
+    ^^^ "&n"
+    ^<^ n
+    ^^^ "="
+    ^<^ (Mutil.encode (Name.lower surname) :> Adef.escaped_string)
+    ^^^ (if get_occ x <> 0 then "&oc" ^<^ n ^>^ "=" ^ string_of_int (get_occ x)
+        else Adef.escaped "")
   else
-    "i" ^ n ^ "=" ^ string_of_iper (get_iper x) ^
-    (if conf.wizard && get_occ x <> 0 then
-       "&oc" ^ n ^ "=" ^ string_of_int (get_occ x)
-     else "")
+    "i"
+    ^<^ n
+    ^^^ "="
+    ^<^ (string_of_iper (get_iper x))
+    ^<^ (if conf.wizard && get_occ x <> 0
+        then "&oc" ^<^ n ^>^ "=" ^ string_of_int (get_occ x)
+        else Adef.escaped "")
 
 
 (* ********************************************************************** *)
@@ -624,163 +644,55 @@ let acces_n conf base n x =
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
-let acces conf base x = acces_n conf base "" x
-
-type p_access = (base -> person -> string) * (base -> person -> string)
-let std_access = p_first_name, p_surname
-let raw_access =
-  (fun base p -> sou base (get_first_name p)),
-  (fun base p -> sou base (get_surname p))
-
+let acces conf base x = acces_n conf base (Adef.escaped "") x
 
 (**/**)
-(* Fonctions d'écriture du nom et prénom d'un individu en fonction de : *)
-(*   - son/ses titre de noblesse                                        *)
-(*   - son/ses nom public                                               *)
-(*   - son/ses sobriquets                                               *)
 
+let restricted_txt = Adef.safe "....."
 
-let restricted_txt = "....."
+let x_x_txt = Adef.safe "x x"
 
-
-(* ************************************************************************** *)
-(*  [Fonc] gen_person_text : fun -> fun -> config -> base -> person -> string *)
-(** [Description] : Renvoie le prénom et nom d'un individu en fonction
-                    de son nom public et sobriquet.
-    [Args] :
-      - p_first_name : renvoie le prénom d'un individu (string)
-      - p_surname    : renvoie le nom d'un individu (string)
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                               *)
-(* ************************************************************************** *)
-let gen_person_text (p_first_name, p_surname) conf base p =
+let gen_person_text
+    ?(escape = true)
+    ?(html = true)
+    ?(sn = true)
+    ?(chk = true)
+    ?(p_first_name = p_first_name)
+    ?(p_surname = p_surname)
+    conf base p =
+  let esc = if escape then esc else Adef.safe in
   if is_hidden p then restricted_txt
-  else if is_hide_names conf p && not (authorized_age conf base p) then "x x"
+  else if chk && is_hide_names conf p && not (authorized_age conf base p) then x_x_txt
   else
     let beg =
       match sou base (get_public_name p), get_qualifiers p with
-        "", nn :: _ -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
-      | "", [] -> p_first_name base p
-      | n, nn :: _ -> n ^ " <em>" ^ sou base nn ^ "</em>"
-      | n, [] -> n
+      | "", nn :: _ ->
+        esc (p_first_name base p)
+        ^^^ (if html then " <em>" else " ")
+        ^<^ esc (sou base nn)
+        ^>^ (if html then "</em>" else "")
+      | "", [] ->
+        esc (p_first_name base p)
+      | n, nn :: _ ->
+        esc n ^^^ " <em>" ^<^ esc (sou base nn) ^>^ "</em>"
+      | n, [] ->
+        esc n
     in
-    let sn = p_surname base p in if sn = "" then beg else beg ^ " " ^ sn
+    if sn then match p_surname base p with
+      | "" -> beg
+      | sn -> beg ^^^ " " ^<^ esc sn
+    else beg
 
-
-(* ************************************************************************** *)
-(*  [Fonc] gen_person_text_no_html :
-             fun -> fun -> config -> base -> person -> string                 *)
-(** [Description] : Renvoie le prénom et nom d'un individu en fonction
-                    de son nom public et sobriquet (sans balise html <em>).
-    [Args] :
-      - p_first_name : renvoie le prénom d'un individu (string)
-      - p_surname    : renvoie le nom d'un individu (string)
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                               *)
-(* ************************************************************************** *)
-let gen_person_text_no_html (p_first_name, p_surname) conf base p =
-  if is_hidden p then restricted_txt
-  else if is_hide_names conf p && not (authorized_age conf base p) then "x x"
-  else
-    let beg =
-      match sou base (get_public_name p), get_qualifiers p with
-        "", nn :: _ -> p_first_name base p ^ " " ^ sou base nn
-      | "", [] -> p_first_name base p
-      | n, nn :: _ -> n ^ " " ^ sou base nn
-      | n, [] -> n
-    in
-    beg ^ " " ^ p_surname base p
-
-
-(* ************************************************************************** *)
-(*  [Fonc] gen_person_text_without_surname :
-             fun -> fun -> config -> base -> person -> string                 *)
-(** [Description] : Renvoie le prénom d'un individu en fonction de son
-                    nom public et sobriquet.
-    [Args] :
-      - p_first_name : renvoie le prénom d'un individu (string)
-      - p_surname    : renvoie le nom d'un individu (string)
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                               *)
-(* ************************************************************************** *)
-let gen_person_text_without_surname check_acc (p_first_name, _p_surname) conf
-    base p =
-  if is_hidden p then restricted_txt
-  else if
-    check_acc && is_hide_names conf p && not (authorized_age conf base p)
-  then
-    "x x"
-  else
-    match sou base (get_public_name p), get_qualifiers p with
-      n, nn :: _ when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
-    | n, [] when n <> "" -> n
-    | _, nn :: _ -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
-    | _, [] -> p_first_name base p
-
-let person_text = gen_person_text std_access
-let person_text_no_html = gen_person_text_no_html std_access
-let person_text_without_surname =
-  gen_person_text_without_surname true std_access
-let person_text_no_surn_no_acc_chk =
-  gen_person_text_without_surname false std_access
-
-
-(* *********************************************************************** *)
-(*  [Fonc] main_title : config -> base -> person -> title option           *)
-(** [Description] : Renvoie le titre principal d'une personne. Si aucun
-                    titre principal n'est trouvé mais que la personne a
-                    plusieurs titre, alors on renvoie le premier titre.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-    [Retour] : title option
-    [Rem] : Exporté en clair hors de ce module.                            *)
-(* *********************************************************************** *)
 let main_title conf base p =
-  (* Fonction de recherche du titre principal. *)
-  let rec find_main =
-    function
-      [] -> None
-    | x :: l -> if x.t_name = Tmain then Some x else find_main l
-  in
-  match find_main (nobtit conf base p) with
-    None ->
-      (* Aucun titre trouvé, on renvoie le premier (s'il existe). *)
-      begin match nobtit conf base p with
-        x :: _ -> Some x
-      | _ -> None
-      end
+  let titles = nobtit conf base p in
+  match List.find_opt (fun x -> x.t_name = Tmain) titles with
+  | None -> (match titles with x :: _ -> Some x | _ -> None)
   | x -> x
 
-
-(* *********************************************************************** *)
-(*  [Fonc] titled_person_text : config -> base -> person -> istr gen_title *)
-(** [Description] : Renvoie la chaîne de caractère de la personne en
-                    fonction de son titre.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-      - t    : gen_title
-    [Retour] : string
-    [Rem] : Non exporté en clair hors de ce module.                        *)
-(* *********************************************************************** *)
-let titled_person_text conf base p t =
-  if p_getenv conf.base_env "print_advanced_title" = Some "yes" then
+let titled_person_text conf base p t : Adef.safe_string =
+  if List.assoc_opt "print_advanced_title" conf.base_env = Some "yes" then
     let estate = sou base t.t_place in
     let surname = p_surname base p in
-    let elen = String.length estate in
-    let slen = String.length surname in
     (* Si le nom de l'individu est le même que son domaine, on renvoie : *)
     (*   - le nom du titre                                               *)
     (*   - le nom du titre et le premier sobriquet                       *)
@@ -788,30 +700,38 @@ let titled_person_text conf base p t =
     (*     fonction du nom public et sobriquet                           *)
     if Name.strip_lower estate = Name.strip_lower surname then
       match t.t_name, get_qualifiers p with
-        Tname n, [] -> sou base n
-      | Tname n, nn :: _ -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
-      | _ -> person_text_without_surname conf base p
-    else if elen < slen && String.sub surname (slen - elen) elen = estate then
-      match t.t_name, get_qualifiers p with
-        Tname n, [] -> sou base n
-      | Tname n, nn :: _ -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
+      | Tname n, [] ->
+        (esc (sou base n) :> Adef.safe_string)
+      | Tname n, nn :: _ ->
+        (esc (sou base n) :> Adef.safe_string)
+        ^^^ " <em>"
+        ^<^ (esc (sou base nn) :> Adef.safe_string)
+        ^>^ "</em>"
       | _ ->
-          let trunc_surname _ _ =
-            String.trim (String.sub surname 0 (slen - elen))
-          in
-          let trunc_access = p_first_name, trunc_surname in
-          gen_person_text trunc_access conf base p
+        gen_person_text ~sn:false conf base p
     else
-      match t.t_name with
-        Tname s ->
-          let s = sou base s in
+      let elen = String.length estate in
+      let slen = String.length surname in
+      if elen < slen && String.sub surname (slen - elen) elen = estate then
+        match t.t_name, get_qualifiers p with
+        | Tname n, [] ->
+          esc (sou base n)
+        | Tname n, nn :: _ ->
+          esc (sou base n) ^^^ " <em>" ^<^ esc (sou base nn) ^>^ "</em>"
+        | _ ->
+          gen_person_text
+            ~p_surname:(fun _ _ -> String.trim (String.sub surname 0 (slen - elen)) )
+            conf base p
+      else
+        match t.t_name with
+        | Tname s ->
+          let s = esc (sou base s) in
           begin match get_qualifiers p with
-            [] -> s
-          | nn :: _ -> s ^ " <em>" ^ sou base nn ^ "</em>"
+            | [] -> s
+            | nn :: _ -> s ^^^ " <em>" ^<^ esc (sou base nn) ^>^ "</em>"
           end
-      | _ -> person_text conf base p
-  else person_text conf base p
-
+        | _ -> gen_person_text conf base p
+  else gen_person_text conf base p
 
 (* *********************************************************************** *)
 (*  [Fonc] one_title_text : base -> istr gen_title     *)
@@ -823,26 +743,29 @@ let titled_person_text conf base p t =
     [Retour] : string
     [Rem] : Non exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
-let one_title_text base t =
+let one_title_text base t : Adef.safe_string =
   let place = sou base t.t_place in
   let s = sou base t.t_ident in
-  let s = if place = "" then s else s ^ " " ^ place in " <em>" ^ s ^ "</em>"
+  let s = if place = "" then s else s ^ " " ^ place in
+  " <em>" ^<^ (esc s :> Adef.safe_string) ^>^ "</em>"
 
-let geneweb_link conf href s =
-  "<a href=\"" ^ commd conf ^ href ^ "\">" ^ s ^ "</a>"
+let geneweb_link conf (href : Adef.escaped_string) (s : Adef.safe_string) =
+  "<a href=\"" ^<^ (commd conf ^^^ href :> Adef.safe_string) ^^^ "\">" ^<^ s ^>^ "</a>"
 
 let wprint_geneweb_link conf href s =
   Output.print_string conf (geneweb_link conf href s)
 
-let reference_flags with_id conf base p s =
+let reference_flags with_id conf base p (s : Adef.safe_string) =
   let iper = get_iper p in
   if is_hidden p then s
   else
-    String.concat ""
-      ["<a href=\""; commd conf; acces conf base p;
-       if with_id then "\" id=\"i" else "";
-       if with_id then string_of_iper iper else "";
-       "\">"; s; "</a>"]
+     "<a href=\""
+    ^<^ ( (commd conf ^^^ acces conf base p) :> Adef.safe_string)
+    ^^^ (if with_id then "\" id=\"i" else "")
+    ^<^ (if with_id then string_of_iper iper else "")
+    ^<^ "\">"
+    ^<^ s
+    ^>^ "</a>"
 
 let reference = reference_flags true
 
@@ -879,55 +802,54 @@ let update_family_loop conf base p s =
       if List.length res = 1 then
         let iper = string_of_iper iper in
         let ifam = string_of_ifam (List.hd res) in
-        "<a href=\"" ^ commd conf ^ "m=MOD_FAM&i=" ^ ifam ^ "&ip=" ^ iper ^
-        "\">" ^ s ^ "</a>"
+        "<a href=\"" ^<^ (commd conf :> Adef.safe_string)
+        ^^^ "m=MOD_FAM&i=" ^<^ ifam ^<^ "&ip=" ^<^ iper ^<^
+        "\">" ^<^ s ^>^ "</a>"
       else
         let iper = string_of_iper iper in
-        "<a href=\"" ^ commd conf ^ "m=U&i=" ^ iper ^ "\">" ^ s ^ "</a>"
+        "<a href=\"" ^<^ (commd conf :> Adef.safe_string)
+        ^^^ "m=U&i=" ^<^ iper ^<^ "\">" ^<^ s ^>^ "</a>"
     else s
 
 let no_reference _conf _base _p s = s
 
-let gen_person_title_text reference p_access conf base p =
+let gen_person_title_text reference conf base p =
   if authorized_age conf base p then
     match main_title conf base p with
-      Some t ->
-        reference conf base p (titled_person_text conf base p t) ^
-          ", " ^ one_title_text base t
-    | None -> reference conf base p (gen_person_text p_access conf base p)
-  else reference conf base p (gen_person_text p_access conf base p)
+    | Some t ->
+      reference conf base p (titled_person_text conf base p t)
+      ^^^ ", " ^<^ one_title_text base t
+    | None -> reference conf base p (gen_person_text conf base p)
+  else reference conf base p (gen_person_text conf base p)
 
-let referenced_person_title_text = gen_person_title_text reference std_access
-
-let person_title_text = gen_person_title_text no_reference std_access
+let referenced_person_title_text = gen_person_title_text reference
+let person_title_text = gen_person_title_text no_reference
 
 let referenced_person_text conf base p =
-  reference conf base p (person_text conf base p)
+  reference conf base p (gen_person_text conf base p)
 
 let referenced_person_text_without_surname conf base p =
-  reference conf base p (person_text_without_surname conf base p)
+  reference conf base p (gen_person_text ~sn:false conf base p)
 
-let gen_person_text_without_title p_access conf base p =
+let person_text_without_title conf base p =
   match main_title conf base p with
-    Some t ->
-      if eq_istr t.t_place (get_surname p) then
-        gen_person_text_without_surname true p_access conf base p
-      else
-        begin match t.t_name, get_qualifiers p with
-          Tname s, nn :: _ -> sou base s ^ " <em>" ^ sou base nn ^ "</em>"
-        | Tname s, _ -> sou base s
-        | _ -> gen_person_text p_access conf base p
-        end
-  | None -> gen_person_text p_access conf base p
-
-let person_text_without_title = gen_person_text_without_title std_access
+  | Some t ->
+    if eq_istr t.t_place (get_surname p)
+    then gen_person_text ~sn:false conf base p
+    else
+      begin match t.t_name, get_qualifiers p with
+        | Tname s, nn :: _ -> esc (sou base s) ^^^ " <em>" ^<^ esc (sou base nn) ^>^ "</em>"
+        | Tname s, _ -> esc (sou base s)
+        | _ -> gen_person_text conf base p
+      end
+  | None -> gen_person_text conf base p
 
 let person_title conf base p =
   if authorized_age conf base p then
     match main_title conf base p with
-      Some t -> one_title_text base t
-    | None -> ""
-  else ""
+    | Some t -> one_title_text base t
+    | None -> Adef.safe ""
+  else Adef.safe ""
 
 let name_key base s =
   let part = Mutil.get_particle (Gwdb.base_particles base) s in
@@ -951,6 +873,7 @@ let rec skip_spaces s i =
   if i < String.length s && s.[i] = ' ' then skip_spaces s (i + 1) else i
 
 let create_env s =
+  let s = (s : Adef.encoded_string :> string) in
   let rec get_assoc beg i =
     if i = String.length s then
       if i = beg then [] else [String.sub s beg (i - beg)]
@@ -960,15 +883,15 @@ let create_env s =
     else get_assoc beg (succ i)
   in
   let rec separate i s =
-    if i = String.length s then s, ""
+    if i = String.length s then s, Adef.encoded ""
     else if s.[i] = '=' then
-      String.sub s 0 i, String.sub s (succ i) (String.length s - succ i)
+      String.sub s 0 i, Adef.encoded (String.sub s (succ i) (String.length s - succ i))
     else separate (succ i) s
   in
   List.map (separate 0) (get_assoc 0 0)
 
-let std_color conf s =
-  "<span style=\"color:" ^ conf.highlight ^ "\">" ^ s ^ "</span>"
+let std_color conf (s : Adef.safe_string) =
+  "<span style=\"color:" ^<^ conf.highlight ^<^ "\">" ^<^ s ^>^ "</span>"
 
 let index_of_sex =
   function
@@ -978,83 +901,80 @@ let index_of_sex =
 
 let string_of_pevent_name conf base epers_name =
   match epers_name with
-    Epers_Birth -> transl conf "birth"
-  | Epers_Baptism -> transl conf "baptism"
-  | Epers_Death -> transl conf "death"
-  | Epers_Burial -> transl conf "burial"
-  | Epers_Cremation -> transl conf "cremation"
-  | Epers_Accomplishment -> transl conf "accomplishment"
-  | Epers_Acquisition -> transl conf "acquisition"
-  | Epers_Adhesion -> transl conf "adhesion"
-  | Epers_BaptismLDS -> transl conf "baptismLDS"
-  | Epers_BarMitzvah -> transl conf "bar mitzvah"
-  | Epers_BatMitzvah -> transl conf "bat mitzvah"
-  | Epers_Benediction -> transl conf "benediction"
-  | Epers_ChangeName -> transl conf "change name"
-  | Epers_Circumcision -> transl conf "circumcision"
-  | Epers_Confirmation -> transl conf "confirmation"
-  | Epers_ConfirmationLDS -> transl conf "confirmation LDS"
-  | Epers_Decoration -> transl conf "decoration"
-  | Epers_DemobilisationMilitaire -> transl conf "demobilisationMilitaire"
-  | Epers_Diploma -> transl conf "diploma"
-  | Epers_Distinction -> transl conf "distinction"
-  | Epers_Dotation -> transl conf "dotation"
-  | Epers_DotationLDS -> transl conf "dotationLDS"
-  | Epers_Education -> transl conf "education"
-  | Epers_Election -> transl conf "election"
-  | Epers_Emigration -> transl conf "emigration"
-  | Epers_Excommunication -> transl conf "excommunication"
-  | Epers_FamilyLinkLDS -> transl conf "familyLinkLDS"
-  | Epers_FirstCommunion -> transl conf "firstCommunion"
-  | Epers_Funeral -> transl conf "funeral"
-  | Epers_Graduate -> transl conf "graduate"
-  | Epers_Hospitalisation -> transl conf "hospitalisation"
-  | Epers_Illness -> transl conf "illness"
-  | Epers_Immigration -> transl conf "immigration"
-  | Epers_ListePassenger -> transl conf "listePassenger"
-  | Epers_MilitaryDistinction -> transl conf "militaryDistinction"
-  | Epers_MilitaryPromotion -> transl conf "militaryPromotion"
-  | Epers_MilitaryService -> transl conf "militaryService"
-  | Epers_MobilisationMilitaire -> transl conf "mobilisationMilitaire"
-  | Epers_Naturalisation -> transl conf "naturalisation"
-  | Epers_Occupation -> transl_nth conf "occupation/occupations" 0
-  | Epers_Ordination -> transl conf "ordination"
-  | Epers_Property -> transl conf "property"
-  | Epers_Recensement -> transl conf "recensement"
-  | Epers_Residence -> transl conf "residence"
-  | Epers_Retired -> transl conf "retired"
-  | Epers_ScellentChildLDS -> transl conf "scellentChildLDS"
-  | Epers_ScellentParentLDS -> transl conf "scellentParentLDS"
-  | Epers_ScellentSpouseLDS -> transl conf "scellentSpouseLDS"
-  | Epers_VenteBien -> transl conf "venteBien"
-  | Epers_Will -> transl conf "will"
-  | Epers_Name n -> sou base n
+  | Epers_Birth -> Adef.safe @@ transl conf "birth"
+  | Epers_Baptism -> Adef.safe @@ transl conf "baptism"
+  | Epers_Death -> Adef.safe @@ transl conf "death"
+  | Epers_Burial -> Adef.safe @@ transl conf "burial"
+  | Epers_Cremation -> Adef.safe @@ transl conf "cremation"
+  | Epers_Accomplishment -> Adef.safe @@ transl conf "accomplishment"
+  | Epers_Acquisition -> Adef.safe @@ transl conf "acquisition"
+  | Epers_Adhesion -> Adef.safe @@ transl conf "adhesion"
+  | Epers_BaptismLDS -> Adef.safe @@ transl conf "baptismLDS"
+  | Epers_BarMitzvah -> Adef.safe @@ transl conf "bar mitzvah"
+  | Epers_BatMitzvah -> Adef.safe @@ transl conf "bat mitzvah"
+  | Epers_Benediction -> Adef.safe @@ transl conf "benediction"
+  | Epers_ChangeName -> Adef.safe @@ transl conf "change name"
+  | Epers_Circumcision -> Adef.safe @@ transl conf "circumcision"
+  | Epers_Confirmation -> Adef.safe @@ transl conf "confirmation"
+  | Epers_ConfirmationLDS -> Adef.safe @@ transl conf "confirmation LDS"
+  | Epers_Decoration -> Adef.safe @@ transl conf "decoration"
+  | Epers_DemobilisationMilitaire -> Adef.safe @@ transl conf "demobilisationMilitaire"
+  | Epers_Diploma -> Adef.safe @@ transl conf "diploma"
+  | Epers_Distinction -> Adef.safe @@ transl conf "distinction"
+  | Epers_Dotation -> Adef.safe @@ transl conf "dotation"
+  | Epers_DotationLDS -> Adef.safe @@ transl conf "dotationLDS"
+  | Epers_Education -> Adef.safe @@ transl conf "education"
+  | Epers_Election -> Adef.safe @@ transl conf "election"
+  | Epers_Emigration -> Adef.safe @@ transl conf "emigration"
+  | Epers_Excommunication -> Adef.safe @@ transl conf "excommunication"
+  | Epers_FamilyLinkLDS -> Adef.safe @@ transl conf "familyLinkLDS"
+  | Epers_FirstCommunion -> Adef.safe @@ transl conf "firstCommunion"
+  | Epers_Funeral -> Adef.safe @@ transl conf "funeral"
+  | Epers_Graduate -> Adef.safe @@ transl conf "graduate"
+  | Epers_Hospitalisation -> Adef.safe @@ transl conf "hospitalisation"
+  | Epers_Illness -> Adef.safe @@ transl conf "illness"
+  | Epers_Immigration -> Adef.safe @@ transl conf "immigration"
+  | Epers_ListePassenger -> Adef.safe @@ transl conf "listePassenger"
+  | Epers_MilitaryDistinction -> Adef.safe @@ transl conf "militaryDistinction"
+  | Epers_MilitaryPromotion -> Adef.safe @@ transl conf "militaryPromotion"
+  | Epers_MilitaryService -> Adef.safe @@ transl conf "militaryService"
+  | Epers_MobilisationMilitaire -> Adef.safe @@ transl conf "mobilisationMilitaire"
+  | Epers_Naturalisation -> Adef.safe @@ transl conf "naturalisation"
+  | Epers_Occupation -> Adef.safe @@ transl_nth conf "occupation/occupations" 0
+  | Epers_Ordination -> Adef.safe @@ transl conf "ordination"
+  | Epers_Property -> Adef.safe @@ transl conf "property"
+  | Epers_Recensement -> Adef.safe @@ transl conf "recensement"
+  | Epers_Residence -> Adef.safe @@ transl conf "residence"
+  | Epers_Retired -> Adef.safe @@ transl conf "retired"
+  | Epers_ScellentChildLDS -> Adef.safe @@ transl conf "scellentChildLDS"
+  | Epers_ScellentParentLDS -> Adef.safe @@ transl conf "scellentParentLDS"
+  | Epers_ScellentSpouseLDS -> Adef.safe @@ transl conf "scellentSpouseLDS"
+  | Epers_VenteBien -> Adef.safe @@ transl conf "venteBien"
+  | Epers_Will -> Adef.safe @@ transl conf "will"
+  | Epers_Name n -> (escape_html (sou base n) :> Adef.safe_string)
 
 let string_of_fevent_name conf base = function
-  | Efam_Marriage -> transl conf "marriage event"
-  | Efam_NoMarriage -> transl conf "no marriage event"
-  | Efam_NoMention -> transl conf "no mention"
-  | Efam_Engage -> transl conf "engage event"
-  | Efam_Divorce -> transl conf "divorce event"
-  | Efam_Separated -> transl conf "separate event"
-  | Efam_Annulation -> transl conf "annulation"
-  | Efam_MarriageBann -> transl conf "marriage bann"
-  | Efam_MarriageContract -> transl conf "marriage contract"
-  | Efam_MarriageLicense -> transl conf "marriage licence"
-  | Efam_PACS -> transl conf "PACS"
-  | Efam_Residence -> transl conf "residence"
-  | Efam_Name n -> sou base n
-
-let string_of_fevent conf base = function
-  | Efam_NoMention -> transl conf "no mention"
-  | x -> string_of_fevent_name conf base x
+  | Efam_Marriage -> Adef.safe @@ transl conf "marriage event"
+  | Efam_NoMarriage -> Adef.safe @@ transl conf "no marriage event"
+  | Efam_NoMention -> Adef.safe @@ transl conf "no mention"
+  | Efam_Engage -> Adef.safe @@ transl conf "engage event"
+  | Efam_Divorce -> Adef.safe @@ transl conf "divorce event"
+  | Efam_Separated -> Adef.safe @@ transl conf "separate event"
+  | Efam_Annulation -> Adef.safe @@ transl conf "annulation"
+  | Efam_MarriageBann -> Adef.safe @@ transl conf "marriage bann"
+  | Efam_MarriageContract -> Adef.safe @@ transl conf "marriage contract"
+  | Efam_MarriageLicense -> Adef.safe @@ transl conf "marriage licence"
+  | Efam_PACS -> Adef.safe @@ transl conf "PACS"
+  | Efam_Residence -> Adef.safe @@ transl conf "residence"
+  | Efam_Name n -> (escape_html (sou base n) :> Adef.safe_string)
 
 let string_of_witness_kind conf sex witness_kind =
+  Adef.safe @@
   match witness_kind with
   | Witness ->
      transl_nth conf "witness/witness/witnesses" 0
   | Witness_CivilOfficer ->
-     let n = index_of_sex sex in     
+     let n = index_of_sex sex in
      transl_nth conf "civil registrar/civil registrar/civil registrar" n
   | Witness_GodParent ->
      let n = index_of_sex sex in
@@ -1074,7 +994,7 @@ let string_of_witness_kind conf sex witness_kind =
   | Witness_Other ->
      let n = index_of_sex sex in
      transl_nth conf "other/other/other" n
-     
+
 let base_path pref bname = !GWPARAM.base_path pref bname
 
 let bpath bname = !GWPARAM.bpath bname
@@ -1082,23 +1002,25 @@ let bpath bname = !GWPARAM.bpath bname
 let copy_from_templ_ref = ref (fun _ _ _ -> assert false)
 let copy_from_templ conf env ic = !copy_from_templ_ref conf env ic
 
-let include_begin conf fname =
+let include_begin_end_aux (k : Adef.safe_string) conf (fname : Adef.safe_string) =
   if conf.debug then
-    let ext = Filename.extension fname in
-    let (com_b, com_e) =
-      if (ext = ".css" || ext = ".js") then ("\n/* ", " */\n") else ("\n<!-- ", " -->\n")
-    in
-    let s = Printf.sprintf "begin include %s" fname in
-    Output.print_string conf (com_b ^ s ^ com_e)
+    match Filename.extension (fname :> string) with
+    | ".css" | ".js" ->
+      Output.print_sstring conf "\n/* " ;
+      Output.print_string conf k ;
+      Output.print_sstring conf " " ;
+      Output.print_string conf fname ;
+      Output.print_sstring conf " */\n" ;
+    | _ ->
+      Output.print_sstring conf "\n<!-- " ;
+      Output.print_string conf k ;
+      Output.print_sstring conf " " ;
+      Output.print_string conf fname ;
+      Output.print_sstring conf " -->\n"
 
-let include_end conf fname =
-  if conf.debug then
-    let ext = Filename.extension fname in
-    let (com_b, com_e) =
-      if (ext = ".css" || ext = ".js") then ("\n/* ", " */\n") else ("\n<!-- ", " -->\n")
-    in
-    let s = Printf.sprintf "end include %s" fname in
-    Output.print_string conf (com_b ^ s ^ com_e)
+let include_begin = include_begin_end_aux (Adef.safe "begin")
+
+let include_end = include_begin_end_aux (Adef.safe "end")
 
 (* ************************************************************************ *)
 (*  [Fonc] etc_file_name : config -> string -> string                       *)
@@ -1183,40 +1105,20 @@ let etc_file_name conf fname =
     "" -> default_templ config_templ std_fname
   | s -> s
 
-let open_etc_file fname =
-  let fname1 = base_path ["etc"] (Filename.basename fname ^ ".txt") in
-  let fname2 =
-    search_in_assets
-      (Filename.concat "etc" (Filename.basename fname ^ ".txt"))
-  in
-  try Some (Secure.open_in fname1, fname1) with
-    Sys_error _ -> try Some (Secure.open_in fname2, fname2) with Sys_error _ -> None
-
-let open_hed_trl conf fname =
-  try Some (Secure.open_in (etc_file_name conf fname)) with
-    Sys_error _ -> None
-
-let open_templ_fname conf fname =
-  try
-    let fname = etc_file_name conf fname in
-    Some (Secure.open_in fname, fname) with
-    Sys_error _ ->
-      let std_fname =
-        search_in_assets (Filename.concat "etc" (fname ^ ".txt"))
-      in
-      try Some (Secure.open_in std_fname, std_fname) with Sys_error _ -> None
-
-let open_templ conf fname = Opt.map fst (open_templ_fname conf fname)
+let open_etc_file conf fname =
+  let fname = etc_file_name conf fname in
+  try Some (Secure.open_in fname, fname) with
+    Sys_error e ->
+         !GWPARAM.syslog `LOG_ERR (Format.sprintf "Error openning file %s in open_etc_file: %s" fname e);
+         None
 
 let include_template conf env fname failure =
-  match open_etc_file fname with
+  match open_etc_file conf fname with
   | Some (ic, fname) ->
-    include_begin conf fname;
+    include_begin conf (esc fname);
     copy_from_templ conf env ic;
-    include_end conf fname;
+    include_end conf (esc fname)
   | None -> failure ()
-
-let image_prefix conf = conf.image_prefix
 
 let body_prop conf =
   try
@@ -1255,21 +1157,7 @@ let message_to_wizard conf =
     print_file "mess_wizard";
     if conf.user <> "" then print_file ("mess_wizard_" ^ conf.user)
 
-let doctype conf =
-  match p_getenv conf.base_env "doctype" with
-    Some "html-5" -> "<!DOCTYPE html>"
-  | Some "html-4.01-trans" ->
-      "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n\
-       \"http://www.w3.org/TR/html4/loose.dtd\">"
-  | Some "html-4.01" ->
-      "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\
-       \"http://www.w3.org/TR/html4/strict.dtd\">"
-  | Some "xhtml-1.0-trans" ->
-      "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n\
-       \"http://www.w3.org/TR/xhtml10/DTD/loose.dtd\">"
-  | _ ->
-      "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n\
-       \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">"
+let doctype = Adef.safe "<!DOCTYPE html>"
 
 let http_string s i =
   let start_with s i p =
@@ -1394,7 +1282,7 @@ type tag_type = In_a_href | In_norm | Out
 let expand_env =
   let buff = Buffer.create 30 in
   fun conf s ->
-    match p_getenv conf.base_env "expand_env" with
+    match List.assoc_opt "expand_env" conf.base_env with
       Some "yes" ->
         let _ = (Buffer.clear buff : unit) in
         let rec loop i =
@@ -1422,93 +1310,84 @@ let string_with_macros conf env s =
         let i =
           try Buffer.add_string buff (List.assoc s.[i+1] env ()); i + 2 with
             Not_found ->
-              match s.[i+1] with
-                's' -> Buffer.add_string buff (commd conf); i + 2
-              | 'v' ->
-                  let (k, vl, j) = get_variable s (i + 2) in
-                  let (v, i) =
-                    let v =
-                      try
-                        let v = List.assoc ("var_" ^ k) conf.base_env in
-                        Some (expand_env conf v)
-                      with Not_found -> None
+            match s.[i+1] with
+            | 's' -> Buffer.add_string buff (commd conf :> string); i + 2
+            | 'v' ->
+              let (k, vl, j) = get_variable s (i + 2) in
+              let (v, i) =
+                let v =
+                  try
+                    let v = List.assoc ("var_" ^ k) conf.base_env in
+                    Some (expand_env conf v)
+                  with Not_found -> None
+                in
+                match v with
+                  Some s ->
+                  let s =
+                    let rec loop vl len i =
+                      if i = String.length s then Buff.get len
+                      else if
+                        i + 1 < String.length s && s.[i] = '%' &&
+                        s.[i+1] = 's'
+                      then
+                        match vl with
+                          v :: vl -> loop vl (Buff.mstore len v) (i + 2)
+                        | [] ->
+                          Buff.get len ^
+                          String.sub s i (String.length s - i)
+                      else loop vl (Buff.store len s.[i]) (i + 1)
                     in
-                    match v with
-                      Some s ->
-                        let s =
-                          let rec loop vl len i =
-                            if i = String.length s then Buff.get len
-                            else if
-                              i + 1 < String.length s && s.[i] = '%' &&
-                              s.[i+1] = 's'
-                            then
-                              match vl with
-                                v :: vl -> loop vl (Buff.mstore len v) (i + 2)
-                              | [] ->
-                                  Buff.get len ^
-                                  String.sub s i (String.length s - i)
-                            else loop vl (Buff.store len s.[i]) (i + 1)
-                          in
-                          loop vl 0 0
-                        in
-                        s, j
-                    | None -> "%", i + 1
+                    loop vl 0 0
                   in
-                  Buffer.add_string buff v; i
-              | '%' -> Buffer.add_string buff "%"; i + 2
-              | _ -> Buffer.add_string buff "%"; i + 1
+                  s, j
+                | None -> "%", i + 1
+              in
+              Buffer.add_string buff v; i
+            | '%' -> Buffer.add_string buff "%"; i + 2
+            | _ -> Buffer.add_string buff "%"; i + 1
         in
         loop tt i
       else
         match tt with
           In_a_href ->
-            let tt = if start_with s i "</a>" then Out else In_a_href in
-            Buffer.add_char buff s.[i]; loop tt (i + 1)
+          let tt = if start_with s i "</a>" then Out else In_a_href in
+          Buffer.add_char buff s.[i]; loop tt (i + 1)
         | In_norm ->
-            let tt = if s.[i] = '>' then Out else In_norm in
-            Buffer.add_char buff s.[i]; loop tt (i + 1)
+          let tt = if s.[i] = '>' then Out else In_norm in
+          Buffer.add_char buff s.[i]; loop tt (i + 1)
         | Out ->
-            match http_string s i with
-              Some (x, j) ->
-                Printf.bprintf buff "<a href=\"%s\">" x;
-                expand_ampersand buff x;
-                Printf.bprintf buff "</a>";
-                loop Out j
+          match http_string s i with
+            Some (x, j) ->
+            Printf.bprintf buff "<a href=\"%s\">" x;
+            expand_ampersand buff x;
+            Printf.bprintf buff "</a>";
+            loop Out j
+          | None ->
+            match email_addr s i with
+              Some j ->
+              let x = String.sub s i (j - i) in
+              Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
+              loop Out j
             | None ->
-                match email_addr s i with
-                  Some j ->
-                    let x = String.sub s i (j - i) in
-                    Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
-                    loop Out j
-                | None ->
-                    let tt =
-                      if start_with s i "<a href=" ||
-                         start_with s i "<a\nhref="
-                      then
-                        In_a_href
-                      else if s.[i] = '<' then In_norm
-                      else Out
-                    in
-                    if s.[i] = '&' && not (followed_by_ident_semi s (i + 1))
-                    then
-                      Buffer.add_string buff "&amp;"
-                    else Buffer.add_char buff s.[i];
-                    loop tt (i + 1)
-    else
-      let escape =
-        escape_aux
-          begin function '&' -> 5 (* "&amp;" *) | _ -> 1 end
-          begin fun buf ibuf istr loop -> function
-            | '&' -> Bytes.blit_string "&amp;" 0 buf ibuf 5 ; loop (istr + 1) (ibuf + 5)
-            | c -> Bytes.unsafe_set buf ibuf c ; loop (istr + 1) (ibuf + 1)
-          end
-      in
-      safe_html_aux escape (Buffer.contents buff)
+              let tt =
+                if start_with s i "<a href=" ||
+                   start_with s i "<a\nhref="
+                then
+                  In_a_href
+                else if s.[i] = '<' then In_norm
+                else Out
+              in
+              if s.[i] = '&' && not (followed_by_ident_semi s (i + 1))
+              then
+                Buffer.add_string buff "&amp;"
+              else Buffer.add_char buff s.[i];
+              loop tt (i + 1)
+    else Buffer.contents buff
   in
   loop Out 0
 
 let place_of_string conf place =
-  match p_getenv conf.base_env "place" with
+  match List.assoc_opt "place" conf.base_env with
   | Some gwf_place ->
       let list = String.split_on_char ',' gwf_place in
       let list = List.map String.trim list in
@@ -1549,21 +1428,11 @@ let place_of_string conf place =
       Some place
   | None -> None
 
-(* ********************************************************************** *)
-(*  [Fonc] string_of_place : config -> string -> string                   *)
-(** [Description] : Astuce temporaire pour supprimer les crochets dans
-                    un lieu-dit. À l'avenir, il faudra revoir comment sont
-                    implémentés les lieux.
-    [Args] :
-      - conf  : configuration de la base
-      - place : lieu dont on veut supprimer les crochets
-    [Retour] :
-      - string : lieu sans les crochets du lieu-dit.
-    [Rem] : Exporté en clair hors de ce module.                           *)
-(* ********************************************************************** *)
-let string_of_place conf place =
-  List.fold_left (fun s c -> Name.strip_c s c)
-    (string_with_macros conf [] place) ['['; ']']
+let raw_string_of_place _conf place =
+  List.fold_left (fun s c -> Name.strip_c s c) place ['['; ']']
+
+let string_of_place _conf place =
+  raw_string_of_place _conf place |> escape_html
 
 let menu_threshold = 20
 
@@ -1584,7 +1453,7 @@ let print_alphab_list conf crit print_elem liste =
   let len = List.length liste in
   if len > menu_threshold then
     begin
-      Output.print_string conf "<p>\n";
+      Output.print_sstring conf "<p>\n";
       begin let _ =
         List.fold_left
           (fun last e ->
@@ -1601,9 +1470,9 @@ let print_alphab_list conf crit print_elem liste =
       in
         ()
       end;
-      Output.print_string conf "</p>\n"
+      Output.print_sstring conf "</p>\n"
     end;
-  Output.print_string conf "<ul>\n";
+  Output.print_sstring conf "<ul>\n";
   begin let _ =
     List.fold_left
       (fun last e ->
@@ -1617,26 +1486,26 @@ let print_alphab_list conf crit print_elem liste =
            begin
              begin match last with
                Some _ ->
-                 if not same_than_last then Output.print_string conf "</ul>\n</li>\n"
+                 if not same_than_last then Output.print_sstring conf "</ul>\n</li>\n"
              | _ -> ()
              end;
              if not same_than_last then
                begin
-                 Output.print_string conf "<li>\n";
+                 Output.print_sstring conf "<li>\n";
                  Output.printf conf "<a id=\"ai%s\">%s</a>\n" (hexa_string t) t;
-                 Output.print_string conf "<ul>\n"
+                 Output.print_sstring conf "<ul>\n"
                end
            end;
-         Output.print_string conf "<li>\n  ";
+         Output.print_sstring conf "<li>\n  ";
          print_elem e;
-         Output.print_string conf "</li>\n";
+         Output.print_sstring conf "</li>\n";
          Some t)
       None liste
   in
     ()
   end;
-  if len > menu_threshold then Output.print_string conf "</ul>\n</li>\n";
-  Output.print_string conf "</ul>\n"
+  if len > menu_threshold then Output.print_sstring conf "</ul>\n</li>\n";
+  Output.print_sstring conf "</ul>\n"
 
 
 let relation_txt conf sex fam =
@@ -1662,34 +1531,23 @@ let relation_txt conf sex fam =
   | NoMention ->
     "%t" ^^ ftransl conf "with"
 
-let relation_date conf fam =
+let relation_date conf fam : Adef.safe_string =
+  Adef.safe @@
   match Adef.od_of_cdate (get_marriage fam) with
-    Some d ->
-      begin match d with
-        Dgreg (dmy, _) -> " " ^ ( transl conf "in (year)" ) ^ " " ^
-          ( string_of_int dmy.year )
-     | _ -> ""
-      end
+  | Some d ->
+    begin match d with
+      | Dgreg (dmy, _) -> " " ^ transl conf "in (year)" ^ " " ^ string_of_int dmy.year
+      | _ -> ""
+    end
   | _ -> ""
 
-(* ************************************************************************** *)
-(*  [Fonc] child_of_parent : config -> base -> person -> unit                 *)
-(** [Description] : Traduction selon l'existence des parents :
-                      * fils/fille de Jean (et) Jeanne
-    [Args] :
-      - conf : configuration
-      - base : base de donnée
-      - p    : person
-    [Retour] : string
-    [Rem] : Non exporté en clair hors de ce module.                           *)
-(* ************************************************************************** *)
 let child_of_parent conf base p =
   (* Si le père a un nom de famille différent de la personne *)
   (* alors on l'affiche, sinon on n'affiche que le prénom.   *)
   let print_father fath =
-    if not (eq_istr (get_surname p) (get_surname fath)) then
-      person_text conf base fath
-    else gen_person_text (p_first_name, (fun _ _ -> "")) conf base fath
+    if not (eq_istr (get_surname p) (get_surname fath))
+    then gen_person_text conf base fath
+    else gen_person_text ~sn:false conf base fath
   in
   let a = pget conf base (get_iper p) in
   let ifam =
@@ -1708,36 +1566,26 @@ let child_of_parent conf base p =
     | None -> None
   in
   match ifam with
-    Some (None, None) | None -> ""
+  | Some (None, None) | None -> Adef.safe ""
   | Some (fath, moth) ->
       let s =
         match fath, moth with
           Some fath, None -> print_father fath
-        | None, Some moth -> person_text conf base moth
+        | None, Some moth -> gen_person_text conf base moth
         | Some fath, Some moth ->
-            print_father fath ^ " " ^ transl_nth conf "and" 0 ^ " " ^
-            person_text conf base moth
-        | _ -> ""
+            print_father fath
+            ^^^ " "
+            ^<^ transl_nth conf "and" 0
+            ^<^ " "
+            ^<^ gen_person_text conf base moth
+        | _ -> Adef.safe ""
       in
       let is = index_of_sex (get_sex p) in
-      translate_eval
-        (transl_a_of_gr_eq_gen_lev conf
-           (transl_nth conf "son/daughter/child" is) s s)
+      let s = (s :> string) in
+      transl_a_of_gr_eq_gen_lev conf (transl_nth conf "son/daughter/child" is) s s
+      |> translate_eval
+      |> Adef.safe
 
-
-(* ************************************************************************** *)
-(*  [Fonc] husband_wife : config -> base -> person -> bool -> string                    *)
-(** [Description] : Traduction selon l'existence du premier conjoint
-                    différent de ?? :
-                      * époux/épouse de Jean/Jeanne
-    [Args] :
-      - conf : configuration
-      - base : base de donnée
-      - p    : person
-      - all  : if true, list all spouses
-    [Retour] : string
-    [Rem]    : Exporté en clair hors de ce module.                           *)
-(* ************************************************************************** *)
 let husband_wife conf base p all =
   let relation =
     let rec loop i =
@@ -1746,10 +1594,11 @@ let husband_wife conf base p all =
         let conjoint = Gutil.spouse (get_iper p) fam in
         let conjoint = pget conf base conjoint in
         if not @@ is_empty_name conjoint
-        then
-          translate_eval (Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> ""))
+        then Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
+             |> translate_eval
+             |> Adef.safe
         else loop (i + 1)
-      else ""
+      else Adef.safe ""
     in
     loop 0
   in
@@ -1761,33 +1610,25 @@ let husband_wife conf base p all =
         let conjoint = pget conf base conjoint in
         if not @@ is_empty_name conjoint
         then
-          if all then
-            loop (i + 1) (res ^ translate_eval (" " ^
-              (person_text conf base conjoint) ^ (relation_date conf fam)) ^ ",")
-          else
-            res ^ translate_eval (" " ^
-              (person_text conf base conjoint) ^ (relation_date conf fam)) ^ ","
+          let res =
+            res
+            ^>^ translate_eval (" " ^<^ gen_person_text conf base conjoint ^^^ relation_date conf fam
+                                :> string)
+            ^ ","
+          in
+          if all then loop (i + 1) res else res
         else loop (i + 1) res
       else res
     in
     loop 0 relation
   in
-  let res = if String.length res > 1
-    then (String.sub res 0 (String.length res -1)) else res
+  let res = (res :> string) in
+  let res =
+    if String.length res > 1
+    then (String.sub res 0 (String.length res - 1)) else res
   in
-  res
+  Adef.safe res
 
-(* ************************************************************************** *)
-(*  [Fonc] first_child : config -> base -> person -> unit                     *)
-(** [Description] : Traduction selon l'existence du premier enfants :
-                      * père/mère de Jean
-    [Args] :
-      - conf : configuration
-      - base : base de donnée
-      - p    : person
-    [Retour] : string
-    [Rem] : Non exporté en clair hors de ce module.                           *)
-(* ************************************************************************** *)
 let first_child conf base p =
   let is = index_of_sex (get_sex p) in
   let rec loop i =
@@ -1797,96 +1638,82 @@ let first_child conf base p =
       if Array.length ct > 0 then
         let enfant = pget conf base ct.(0) in
         let child =
-          if is_hide_names conf enfant &&
-             not (authorized_age conf base enfant)
-          then
-            "xx"
-          else if not (eq_istr (get_surname p) (get_surname enfant)) then
-            person_text conf base enfant
-          else
-            gen_person_text (p_first_name, (fun _ _ -> "")) conf base enfant
+          if is_hide_names conf enfant
+          && not (authorized_age conf base enfant)
+          then Adef.safe "xx"
+          else if not (eq_istr (get_surname p) (get_surname enfant))
+          then (gen_person_text conf base enfant)
+          else (gen_person_text ~sn:false conf base enfant)
         in
-        translate_eval
-          (transl_a_of_b conf (transl_nth conf "father/mother" is) child child)
+        let child = (child :> string) in
+        transl_a_of_b conf (transl_nth conf "father/mother" is) child child
+        |> translate_eval
+        |> Adef.safe
       else loop (i + 1)
-    else ""
+    else Adef.safe ""
   in
   loop 0
 
-
-(* ************************************************************************** *)
-(*  [Fonc] specify_homonymous : config -> base -> person -> bool -> string    *)
-(** [Description] : Permet d'afficher des informations supplémentaires sur la
-      personne en cas d'homonymes (par exemple sur la recherche par ordre
-      alphabétique).
-      L'affichage se fait de façon similaire à gen_person_text, i.e. en
-      fonction du nom publique et sobriquet si on valorise le paramètre
-      specify_public_name à True :
-        * Louis VI le gros (nom publique sobriquet)
-        * Louis le gros    (prénom sobriquet)
-        * Louis VI         (nom publique)
-        * Louis Capétiens, fils de Philippe et Berthe, marié avec Adèlaïde,
-            père de Philippe
-    [Args] :
-      - conf : configuration
-      - base : base de donnée
-      - p    : person
-      - specify_public_name : en fonction des affichages, on peut déjà avoir
-          affiché le nom public de la personne, et dans ce cas, on ne veut pas
-          l'afficher de nouveau.
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                               *)
-(* ************************************************************************** *)
 let specify_homonymous conf base p specify_public_name =
   match get_public_name p, get_qualifiers p with
-    n, nn :: _ when sou base n <> "" && specify_public_name ->
-      Output.printf conf " %s <em>%s</em>" (sou base n) (sou base nn)
+  | n, nn :: _ when sou base n <> "" && specify_public_name ->
+    Output.print_sstring conf " " ;
+    Output.print_string conf (esc @@ sou base n) ;
+    Output.print_sstring conf " <em>" ;
+    Output.print_string conf (esc @@ sou base nn) ;
+    Output.print_sstring conf "</em>" ;
   | _, nn :: _ when specify_public_name ->
-      Output.printf conf " %s <em>%s</em>" (p_first_name base p) (sou base nn)
+    Output.print_sstring conf " " ;
+    Output.print_string conf (esc @@ p_first_name base p) ;
+    Output.print_sstring conf " <em>" ;
+    Output.print_string conf (esc @@ sou base nn) ;
+    Output.print_sstring conf "</em>" ;
   | n, [] when sou base n <> "" && specify_public_name ->
-      Output.printf conf " %s" (sou base n)
+    Output.print_sstring conf " " ;
+    Output.print_string conf (esc @@ sou base n) ;
   | _, _ ->
-      (* Le nom public et le qualificatif ne permettent pas de distinguer *)
-      (* la personne, donc on affiche les informations sur les parents,   *)
-      (* le mariage et/ou le premier enfant.                              *)
-      let cop = child_of_parent conf base p in
-      let hw = husband_wife conf base p true in
+    (* Le nom public et le qualificatif ne permettent pas de distinguer *)
+    (* la personne, donc on affiche les informations sur les parents,   *)
+    (* le mariage et/ou le premier enfant.                              *)
+    let cop = child_of_parent conf base p in
+    if (cop :> string) <> "" then begin
+      Output.print_sstring conf ", " ;
+      Output.print_string conf cop ;
+    end ;
+    let hw = husband_wife conf base p true in
+    if (hw :> string) = ""
+    then begin
       let fc = first_child conf base p in
-      let s =
-        (if cop = "" then "" else ", " ^ cop) ^
-        (if hw = "" then if fc = "" then "" else ", " ^ fc else ", " ^ hw) ^ "."
-      in
-      Output.print_string conf s
+      if (fc :> string) <> ""
+      then begin
+        Output.print_sstring conf ", " ;
+        Output.print_string conf fc ;
+      end
+    end else begin
+      Output.print_sstring conf ", " ;
+      Output.print_string conf hw ;
+    end
 
-
-(* ************************************************************************** *)
-(*  [Fonc] get_approx_date_place :
-             cdate -> string -> cdate -> string -> (cdate, string)         *)
-(** [Description] : Renvoi la date et le lieu le mieux correspondant.
-    [Args] :
-      - d1   : date (naissance/décès)
-      - p1   : lieu (naissance/décès)
-      - d2   : date (baptème/inhumation)
-      - p2   : lieu (baptème/inhumation)
-    [Retour] : (cdate, string)
-    [Rem] : None exporté en clair hors de ce module.                          *)
-(* ************************************************************************** *)
-let get_approx_date_place d1 p1 d2 p2 =
-  match d1, p1, d2, p2 with
-    Some d, "", None, y -> Some d, y
-  | Some d, "", Some x, y -> if y = "" then Some d, "" else Some x, y
-  | Some d, p, _, _ -> Some d, p
-  | None, "", None, p -> None, p
-  | None, "", Some x, y -> Some x, y
-  | None, p, None, _ -> None, p
-  | None, p, Some x, y -> if y = "" then Some x, p else Some x, y
+let get_approx_date_place d1 (p1 : Adef.safe_string) d2 (p2 : Adef.safe_string) =
+  match d1, (p1 :> string), d2, (p2 :> string) with
+    Some d, "", None, _ -> Some d, p2
+  | Some d, "", Some x, y -> if y = "" then Some d, Adef.safe "" else Some x, p2
+  | Some d, _, _, _ -> Some d, p1
+  | None, "", None, _ -> None, p1
+  | None, "", Some x, _ -> Some x, p2
+  | None, _, None, _ -> None, p1
+  | None, _, Some x, y -> if y = "" then Some x, p1 else Some x, p2
 
 let get_approx_birth_date_place conf base p =
   let birth = Adef.od_of_cdate (get_birth p) in
   let birth_place = string_of_place conf (sou base (get_birth_place p)) in
   let baptism = Adef.od_of_cdate (get_baptism p) in
   let baptism_place = string_of_place conf (sou base (get_baptism_place p)) in
-  get_approx_date_place birth birth_place baptism baptism_place
+  get_approx_date_place
+    birth
+    (birth_place :> Adef.safe_string)
+    baptism
+    (baptism_place :> Adef.safe_string)
 
 let get_approx_death_date_place conf base p =
   let death = Date.date_of_death (get_death p) in
@@ -1898,7 +1725,11 @@ let get_approx_death_date_place conf base p =
     | _ -> None
   in
   let buri_place = string_of_place conf (sou base (get_burial_place p)) in
-  get_approx_date_place death death_place buri buri_place
+  get_approx_date_place
+    death
+    (death_place :> Adef.safe_string)
+    buri
+    (buri_place :> Adef.safe_string)
 
 let string_of_decimal_num conf f =
   let s = string_of_float f in
@@ -1918,115 +1749,6 @@ let string_of_decimal_num conf f =
   in
   loop 0
 
-let personal_image_file_name bname str =
-  Filename.concat (base_path ["images"] bname) str
-
-let source_image_file_name bname str =
-  let fname1 =
-    List.fold_right Filename.concat [base_path ["src"] bname; "images"] str
-  in
-  let fname2 =
-    List.fold_right Filename.concat [Secure.base_dir (); "src"; "images"] str
-  in
-  if Sys.file_exists fname1 then fname1 else fname2
-
-let image_file_name str =
-  let fname1 =
-    List.fold_right Filename.concat [Secure.base_dir (); "images"] str
-  in
-  if Sys.file_exists fname1 then fname1
-  else search_in_assets (Filename.concat "images" str)
-
-let png_image_size ic =
-  let magic = really_input_string ic 4 in
-  if magic = "\137PNG" then
-    begin
-      seek_in ic 16;
-      let wid = input_binary_int ic in
-      let hei = input_binary_int ic in Some (wid, hei)
-    end
-  else None
-
-let gif_image_size ic =
-  let magic = really_input_string ic 4 in
-  if magic = "GIF8" then
-    begin
-      seek_in ic 6;
-      let wid = let x = input_byte ic in input_byte ic * 256 + x in
-      let hei = let x = input_byte ic in input_byte ic * 256 + x in
-      Some (wid, hei)
-    end
-  else None
-
-let jpeg_image_size ic =
-  let magic = really_input_string ic 10 in
-  if Char.code magic.[0] = 0xff && Char.code magic.[1] = 0xd8 &&
-     (let m = String.sub magic 6 4 in m = "JFIF" || m = "Exif")
-  then
-    let exif_type = String.sub magic 6 4 = "Exif" in
-    let rec loop found =
-      while Char.code (input_char ic) <> 0xFF do () done;
-      let ch =
-        let rec loop ch =
-          if Char.code ch = 0xFF then loop (input_char ic) else ch
-        in
-        loop (input_char ic)
-      in
-      if Char.code ch = 0xC0 || Char.code ch = 0xC3 then
-        if exif_type && not found then loop true
-        else
-          begin
-            for i = 1 to 3 do let _ = input_char ic in () done;
-            let a = input_char ic in
-            let b = input_char ic in
-            let c = input_char ic in
-            let d = input_char ic in
-            let wid = Char.code c lsl 8 lor Char.code d in
-            let hei = Char.code a lsl 8 lor Char.code b in Some (wid, hei)
-          end
-      else
-        let a = input_char ic in
-        let b = input_char ic in
-        let len = Char.code a lsl 8 lor Char.code b in
-        let len = if len >= 32768 then 0 else len in
-        for i = 1 to len - 2 do let _ = input_char ic in () done;
-        if Char.code ch <> 0xDA then loop found else None
-    in
-    loop false
-  else None
-
-let image_size fname =
-  try
-    let ic = Secure.open_in_bin fname in
-    let r =
-      try
-        let sz = jpeg_image_size ic in
-        let sz =
-          if sz = None then begin seek_in ic 0; png_image_size ic end
-          else sz
-        in
-        if sz = None then begin seek_in ic 0; gif_image_size ic end else sz
-      with End_of_file -> None
-    in
-    close_in ic; r
-  with Sys_error _ -> None
-
-let limited_image_size max_wid max_hei fname size =
-  match if fname = "" then size else image_size fname with
-    Some (wid, hei) ->
-      let (wid, hei) =
-        if hei > max_hei then
-          let wid = wid * max_hei / hei in let hei = max_hei in wid, hei
-        else wid, hei
-      in
-      let (wid, hei) =
-        if wid > max_wid then
-          let hei = hei * max_wid / wid in let wid = max_wid in wid, hei
-        else wid, hei
-      in
-      Some (wid, hei)
-  | None -> None
-
 let find_person_in_env_aux conf base env_i env_p env_n env_occ =
   match p_getenv conf.env env_i with
   | Some i when i <> "" ->
@@ -2039,7 +1761,7 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
   | _ ->
     match p_getenv conf.env env_p, p_getenv conf.env env_n with
     | Some p, Some n ->
-      let occ = Opt.default 0 (p_getint conf.env env_occ) in
+      let occ = Option.value ~default:0 (p_getint conf.env env_occ) in
       begin match person_of_key base p n occ with
         | Some ip ->
           let p = pget conf base ip in
@@ -2058,7 +1780,7 @@ let find_person_in_env_pref conf base pref =
   find_person_in_env_aux conf base (pref ^ "i") (pref ^ "p") (pref ^ "n") (pref ^ "oc")
 
 let person_exists conf base (fn, sn, oc) =
-  match p_getenv conf.base_env "red_if_not_exist" with
+  match List.assoc_opt "red_if_not_exist" conf.base_env with
     Some "off" -> true
   | Some _ | None ->
       match person_of_key base fn sn oc with
@@ -2066,7 +1788,7 @@ let person_exists conf base (fn, sn, oc) =
       | None -> false
 
 let default_sosa_ref conf base =
-  match p_getenv conf.base_env "default_sosa_ref" with
+  match List.assoc_opt "default_sosa_ref" conf.base_env with
     Some n ->
       if n = "" then None
       else
@@ -2194,127 +1916,7 @@ let old_sosa_of_branch conf base (ipl : (iper * sex) list) =
 (* FIXME: remove this and use branch_of_sosa only *)
 let old_branch_of_sosa conf base ip sosa =
   branch_of_sosa conf base sosa (pget conf base ip)
-  |> Opt.map @@ List.map (fun p -> get_iper p, get_sex p)
-
-let space_to_unders = Mutil.tr ' ' '_'
-
-
-(* ************************************************************************** *)
-(*  [Fonc] default_image_name_of_key : string -> string -> int -> string      *)
-(** [Description] : Renvoie à partir de la clé d'une personne, le nom par
-                    défaut de son image (portrait).
-                    Par exemple, Jean Claude DUPOND 3 => jean_claude.3.dupond
-    [Args] :
-      - fnam : first name
-      - snam : surname
-      - occ  : occ
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                               *)
-(* ************************************************************************** *)
-let default_image_name_of_key fnam surn occ =
-  let f = space_to_unders (Name.lower fnam) in
-  let s = space_to_unders (Name.lower surn) in
-  f ^ "." ^ string_of_int occ ^ "." ^ s
-
-
-(* *********************************************************************** *)
-(*  [Fonc] default_image_name : base -> person -> string                   *)
-(** [Description] : Renvoie à partir d'une personne, le nom par défaut de
-                    son image (portrait) => voir default_image_name_of_key.
-    [Args] :
-      - base : base de donnée
-      - p    : person
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                            *)
-(* *********************************************************************** *)
-let default_image_name base p =
-  default_image_name_of_key (p_first_name base p) (p_surname base p)
-    (get_occ p)
-
-let auto_image_file conf base p =
-  let s = default_image_name base p in
-  let f = Filename.concat (base_path ["images"] conf.bname) s in
-  if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
-  else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
-  else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")
-  else None
-
-(* ********************************************************************** *)
-(*  [Fonc] image_and_size : config -> base -> person -> image_size        *)
-(** [Description] : Renvoie la source de l'image ainsi que sa taille.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de données
-      - p    : personne
-      [Retour] :
-        - is_filename : indique si la source de l'image est un nom de
-                        fichier ou une URL.
-        - source
-        - image_size
-    [Rem] : Exporté en clair hors de ce module.                            *)
-(* *********************************************************************** *)
-let image_and_size conf base p image_size =
-  if not conf.no_image && authorized_age conf base p then
-    match sou base (get_image p) with
-      "" ->
-        begin match auto_image_file conf base p with
-          Some f -> Some (true, f, image_size f None)
-        | None -> None
-        end
-    | s ->
-        let (s, size) =
-          let l = String.length s - 1 in
-          if s.[l] = ')' then
-            try
-              let pos1 = String.index s '(' in
-              let pos2 = String.index_from s pos1 'x' in
-              let wid = String.sub s (pos1 + 1) (pos2 - pos1 - 1) in
-              let hei = String.sub s (pos2 + 1) (l - pos2 - 1) in
-              let size = Some (int_of_string wid, int_of_string hei) in
-              String.sub s 0 pos1, image_size "" size
-            with Not_found | Failure _ -> s, None
-          else s, None
-        in
-        let http = "http://" in
-        let https = "https://" in
-        if String.length s > String.length http &&
-           String.sub s 0 (String.length http) = http ||
-           String.length s > String.length https &&
-           String.sub s 0 (String.length https) = https
-        then
-          Some (false, s, size)
-        else if Filename.is_implicit s then
-          match
-            try Some (List.assoc "images_path" conf.base_env) with
-              Not_found -> None
-          with
-            Some p when p <> "" -> Some (false, p ^ s, size)
-          | _ ->
-              let fname = personal_image_file_name conf.bname s in
-              if Sys.file_exists fname then
-                Some (true, fname, image_size fname None)
-              else None
-        else None
-  else None
-
-(* ********************************************************************** *)
-(*  [Fonc] has_image : config -> base -> person -> bool                   *)
-(** [Description] : Renvoie Vrai si la personne a une photo et qu'on a les
-                    droits pour la voir, Faux sinon.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-    [Retour] : Vrai si la personne a une image, Faux sinon.
-    [Rem] : Exporté en clair hors de ce module.                           *)
-(* ********************************************************************** *)
-let has_image conf base p =
-  if not conf.no_image && authorized_age conf base p then
-    not (is_empty_string (get_image p)) &&
-    (conf.wizard || conf.friend ||
-     not (Mutil.contains (sou base (get_image p)) "/private/")) ||
-    auto_image_file conf base p <> None
-  else false
+  |> Option.map @@ List.map (fun p -> get_iper p, get_sex p)
 
 let gen_only_printable or_nl s =
   let s' =
@@ -2335,46 +1937,39 @@ let only_printable = gen_only_printable false
 
 let relation_type_text conf t n =
   match t with
-    Adoption ->
-      transl_nth conf "adoptive father/adoptive mother/adoptive parents" n
+  | Adoption ->
+    transl_nth conf "adoptive father/adoptive mother/adoptive parents" n
+    |> Adef.safe
   | Recognition ->
-      transl_nth conf
-        "recognizing father/recognizing mother/recognizing parents" n
+    transl_nth conf "recognizing father/recognizing mother/recognizing parents" n
+    |> Adef.safe
   | CandidateParent ->
-      transl_nth conf "candidate father/candidate mother/candidate parents" n
-  | GodParent -> transl_nth conf "godfather/godmother/godparents" n
+    transl_nth conf "candidate father/candidate mother/candidate parents" n
+    |> Adef.safe
+  | GodParent ->
+    transl_nth conf "godfather/godmother/godparents" n
+    |> Adef.safe
   | FosterParent ->
-      transl_nth conf "foster father/foster mother/foster parents" n
+    transl_nth conf "foster father/foster mother/foster parents" n
+    |> Adef.safe
 
 let rchild_type_text conf t n =
   match t with
-    Adoption ->
-      transl_nth conf "adoptive son/adoptive daughter/adoptive child" n
+  | Adoption ->
+    transl_nth conf "adoptive son/adoptive daughter/adoptive child" n
+    |> Adef.safe
   | Recognition ->
-      transl_nth conf "recognized son/recognized daughter/recognized child" n
+    transl_nth conf "recognized son/recognized daughter/recognized child" n
+    |> Adef.safe
   | CandidateParent ->
-      transl_nth conf "candidate son/candidate daughter/candidate child" n
-  | GodParent -> transl_nth conf "godson/goddaughter/godchild" n
+    transl_nth conf "candidate son/candidate daughter/candidate child" n
+    |> Adef.safe
+  | GodParent ->
+    transl_nth conf "godson/goddaughter/godchild" n
+    |> Adef.safe
   | FosterParent ->
-      transl_nth conf "foster son/foster daughter/foster child" n
-
-let wprint_hidden conf pref name valu =
-  Output.printf conf "<input type=\"hidden\" name=\"%s%s\" value=\"%s\">\n" pref
-    name (escape_html valu)
-
-let wprint_hidden_person conf base pref p =
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
-  if accessible_by_key conf base p first_name surname then
-    begin
-      wprint_hidden conf pref "p" (Name.lower first_name);
-      wprint_hidden conf pref "n" (Name.lower surname);
-      if get_occ p > 0 then
-        wprint_hidden conf pref "oc" (string_of_int (get_occ p))
-    end
-  else
-    wprint_hidden conf pref "i"
-      (string_of_iper (get_iper p))
+    transl_nth conf "foster son/foster daughter/foster child" n
+    |> Adef.safe
 
 exception Ok
 
@@ -2423,46 +2018,6 @@ let browser_doesnt_have_tables conf =
   let user_agent = Mutil.extract_param "user-agent: " '/' conf.request in
   String.lowercase_ascii user_agent = "lynx"
 
-(* Printing for browsers without tables *)
-
-let pre_text_size txt =
-  let rec normal len i =
-    if i = String.length txt then len
-    else if txt.[i] = '<' then in_tag len (i + 1)
-    else if txt.[i] = '&' then in_char (len + 1) (i + 1)
-    else normal (len + 1) (i + 1)
-  and in_tag len i =
-    if i = String.length txt then len
-    else if txt.[i] = '>' then normal len (i + 1)
-    else in_tag len (i + 1)
-  and in_char len i =
-    if i = String.length txt then len
-    else if txt.[i] = ';' then normal len (i + 1)
-    else in_char len (i + 1)
-  in
-  normal 0 0
-
-let print_pre_center conf sz txt =
-  for i = 1 to (sz - pre_text_size txt) / 2 do Output.print_string conf " " done;
-  Output.printf conf "%s\n" txt
-
-let print_pre_left conf sz txt =
-  let tsz = pre_text_size txt in
-  if tsz < sz / 2 - 1 then
-    for i = 2 to (sz / 2 - 1 - tsz) / 2 do Output.print_string conf " " done;
-  Output.printf conf " %s\n" txt
-
-let print_pre_right conf sz txt =
-  let tsz = pre_text_size txt in
-  if tsz < sz / 2 - 1 then
-    begin
-      for i = 1 to sz / 2 do Output.print_string conf " " done;
-      for i = 1 to (sz / 2 - 1 - tsz) / 2 do Output.print_string conf " " done;
-      ()
-    end
-  else for i = 1 to sz - pre_text_size txt - 1 do Output.print_string conf " " done;
-  Output.printf conf " %s\n" txt
-
 let of_course_died conf p =
   match Adef.od_of_cdate (get_birth p) with
     Some (Dgreg (d, _)) -> conf.today.year - d.year > 120
@@ -2470,7 +2025,8 @@ let of_course_died conf p =
 
 let escache_value base =
   let t = Gwdb.date_of_last_change base in
-  let v = int_of_float (mod_float t (float_of_int max_int)) in string_of_int v
+  let v = int_of_float (mod_float t (float_of_int max_int)) in
+  Adef.encoded (string_of_int v)
 
 let adm_file f = List.fold_right Filename.concat [!cnt_dir; "cnt"] f
 
@@ -2505,7 +2061,7 @@ let write_wf_trace fname wt =
   List.iter (fun (dt, u) -> Printf.fprintf oc "%s %s\n" dt u) wt; close_out oc
 
 let update_wf_trace conf fname =
-  let dt = sprintf_today conf in
+  let dt = (sprintf_today conf :> string) in
   let wt =
     let r = read_wf_trace fname in
     let dtlen = String.length dt in
@@ -2708,24 +2264,24 @@ let print_in_columns conf ncols len_list list wprint_elem =
       (fun (list, _first) len ->
          let rec loop n list =
            if n = 0 then
-             begin Output.print_string conf "</ul>\n</td>\n"; list, false end
+             begin Output.print_sstring conf "</ul>\n</td>\n"; list, false end
            else
              match list with
                (kind, ord, elem) :: list ->
                  if n = len then
                    Output.printf conf "<td width=\"%d\">\n" (100 / ncols)
-                 else if !kind <> Elem then Output.print_string conf "</ul>\n";
+                 else if !kind <> Elem then Output.print_sstring conf "</ul>\n";
                  if !kind <> Elem then
                    begin
                      Output.printf conf "<h3 class=\"subtitle\">%s%s</h3>\n"
                        (if ord = "" then "..." else String.make 1 ord.[0])
                        (if !kind = HeadElem then ""
                         else " (" ^ transl conf "continued" ^ ")");
-                     Output.print_string conf "<ul>\n"
+                     Output.print_sstring conf "<ul>\n"
                    end;
-                 Output.print_string conf "<li>";
+                 Output.print_sstring conf "<li>";
                  wprint_elem elem;
-                 Output.print_string conf "</li>\n";
+                 Output.print_sstring conf "</li>\n";
                  loop (n - 1) list
              | [] -> [], false
          in
@@ -2734,8 +2290,8 @@ let print_in_columns conf ncols len_list list wprint_elem =
   in
     ()
   end;
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "</table>\n";
+  Output.print_sstring conf "</tr>\n";
+  Output.print_sstring conf "</table>\n";
   end_centered conf
 
 let wprint_in_columns conf order wprint_elem list =
@@ -2788,10 +2344,10 @@ let reduce_list size list =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 let print_reference conf fn occ sn =
-  Output.print_string conf "<span class=\"reference\">";
+  Output.print_sstring conf "<span class=\"reference\">";
   Output.printf conf " (%s %s.%d %s)" (transl conf "reference key")
     (Name.lower fn) occ (Name.lower sn);
-  Output.print_string conf "</span>"
+  Output.print_sstring conf "</span>"
 
 
 (* ********************************************************************** *)
@@ -2804,57 +2360,23 @@ let print_reference conf fn occ sn =
     [Rem] : Non exporté en clair hors de ce module.                       *)
 (* ********************************************************************** *)
 let gen_print_tips conf s =
-  Output.print_string conf "<div class=\"tips\">\n";
-  Output.print_string conf "<table>\n";
-  Output.print_string conf "<tr>\n";
-  Output.print_string conf "<td>\n";
+  Output.print_sstring conf "<div class=\"tips\">\n";
+  Output.print_sstring conf "<table>\n";
+  Output.print_sstring conf "<tr>\n";
+  Output.print_sstring conf "<td>\n";
   Output.print_string conf s;
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "</table>\n";
-  Output.print_string conf "</div>\n";
-  Output.print_string conf "<br>\n"
+  Output.print_sstring conf "</td>\n";
+  Output.print_sstring conf "</tr>\n";
+  Output.print_sstring conf "</table>\n";
+  Output.print_sstring conf "</div>\n";
+  Output.print_sstring conf "<br>\n"
 
-(* ********************************************************************** *)
-(*  [Fonc] print_tips_relationship : conf -> unit                         *)
-(** [Description] : Lors d'un calcul de parenté, il n'est pas évident de
-      savoir qu'il faut cliquer sur la personne pour lancer le calcul.
-      On affiche donc une petite aide pour l'utilisateur.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                           *)
-(* ********************************************************************** *)
 let print_tips_relationship conf =
   if p_getenv conf.env "em" = Some "R" || p_getenv conf.env "m" = Some "C"
   then
-    let s = Utf8.capitalize_fst (transl conf "select person to compute relationship") in
-    gen_print_tips conf s
-
-
-(* ********************************************************************** *)
-(*  [Fonc] print_image_sex : conf -> person -> int -> unit                *)
-(** [Description] : Affiche l'image du sexe correspondant à la personne.
-    [Args] :
-      - conf : configuration de la base
-      - p    : person
-      - size : taille de l'image
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                           *)
-(* ********************************************************************** *)
-let print_image_sex conf p size =
-  let (image, alt) =
-    match get_sex p with
-      Male -> "male.png", "M"
-    | Female -> "female.png", "F"
-    | Neuter -> "sexunknown.png", "?"
-  in
-  Output.printf conf
-    "<img src=\"%s/%s\" alt=\"%s\" title=\"sex\" width=\"%d\" heigth=\"%d\">\n"
-    (image_prefix conf) image alt size size
-
+    Utf8.capitalize_fst (transl conf "select person to compute relationship")
+    |> Adef.safe
+    |> gen_print_tips conf
 
 (* ********************************************************************** *)
 (*  [Fonc] display_options : config -> string                             *)
@@ -2867,20 +2389,23 @@ let print_image_sex conf p size =
 (* ********************************************************************** *)
 let display_options conf =
   let s =
-    if p_getenv conf.env "image" = Some "off" then "&image=off"
+    Adef.escaped @@
+    if p_getenv conf.env "image" = Some "off"
+    then "&image=off"
     else ""
   in
   let s =
-    if p_getenv conf.env "marriage" = Some "on" then s ^ "&marriage=on"
+    if p_getenv conf.env "marriage" = Some "on"
+    then s ^>^ "&marriage=on"
     else s
   in
   let s =
     match p_getenv conf.env "bd" with
-      Some i -> s ^ "&bd=" ^ i
+    | Some i -> s ^^^ "&bd=" ^<^ (Mutil.encode i :> Adef.escaped_string)
     | None -> s
   in
   match p_getenv conf.env "color" with
-    Some c -> s ^ "&color=" ^ c
+  | Some c -> s ^^^ "&color=" ^<^ (Mutil.encode c :> Adef.escaped_string)
   | None -> s
 
 (* Hashtbl qui associe un user à la liste des dernières personnes visitées. *)
@@ -2952,7 +2477,7 @@ let write_visited conf ht =
 let record_visited conf ip =
   if conf.friend || conf.wizard then
     let ht = read_visited conf in
-    let time = sprintf_today conf in
+    let time = (sprintf_today conf :> string) in
     let () =
       try
         let vl = Hashtbl.find ht conf.user in
@@ -2981,7 +2506,7 @@ let record_visited conf ip =
 
 let array_mem_witn conf base x a =
   let rec loop i =
-    if i = Array.length a then (false, "")
+    if i = Array.length a then (false, Adef.safe "")
     else if x = fst a.(i)
     then (true, string_of_witness_kind conf (get_sex @@ poi base x) (snd a.(i)))
     else loop (i + 1)
@@ -3104,6 +2629,7 @@ let auth_warning conf base w =
   | ParentTooOld (p, _, c) -> pauth p && pauth c
   | ParentTooYoung (p, _, c) -> pauth p && pauth c
   | PossibleDuplicateFam (f1, f2) -> fauth f1 && fauth f2
+  | PossibleDuplicateFamHomonymous (f1, f2, p) -> fauth f1 && fauth f2 && pauth p
   | PEventOrder (p, _, _) -> pauth p
   | PWitnessEventAfterDeath (p, _, origin) -> pauth p && pauth origin
   | PWitnessEventBeforeBirth (p, _, origin) -> pauth p && pauth origin
@@ -3116,10 +2642,117 @@ let auth_warning conf base w =
   | ChangedOrderOfFamilyEvents _
   | ChangedOrderOfPersonEvents _ -> false
 
+let first_name base p = Name.strip_lower @@ sou base @@ get_first_name p
+let surname base p = Name.strip_lower @@ sou base @@ get_surname p
+let hom_person base p1 p2 =
+  let fn1, sn1 = first_name base p1, surname base p1 in
+  let fn2, sn2 = first_name base p2, surname base p2 in
+  fn1 = fn2 && sn1 = sn2
+
+let hom_fam base f1 f2 =
+  let f1, f2 = foi base f1, foi base f2 in
+  let fa1, mo1 = poi base @@ get_father f1, poi base @@ get_mother f1 in
+  let fa2, mo2 = poi base @@ get_father f2, poi base @@ get_mother f2 in
+  hom_person base fa1 fa2 && hom_person base mo1 mo2
+
+let eq_person p1 p2 =
+  eq_iper (get_iper p1) (get_iper p2)
+
+let eq_family f1 f2 =
+  eq_ifam (get_ifam f1) (get_ifam f2)
+
+let eq_warning base w1 w2 = match w1, w2 with
+  | PossibleDuplicateFam (f1, f2),
+    PossibleDuplicateFam (f1', f2') ->
+     eq_ifam f1 f1' && eq_ifam f2 f2'
+     || eq_ifam f1 f2' && eq_ifam f2 f1'
+  | PossibleDuplicateFamHomonymous (f1, f2, _),
+    PossibleDuplicateFamHomonymous (f1', f2', _) ->
+     hom_fam base f1 f1' && hom_fam base f2 f2'
+     || hom_fam base f1 f2' && hom_fam base f2 f1'
+  | BigAgeBetweenSpouses (p1, p2, d),
+    BigAgeBetweenSpouses (p1', p2', d') ->
+     (eq_person p1 p1' && eq_person p2 p2'
+      || eq_person p1 p2' && eq_person p2 p1')
+     && d = d'
+  | BirthAfterDeath p,
+    BirthAfterDeath p' ->
+     eq_person p p'
+  | IncoherentSex (p, s1, s2),
+    IncoherentSex (p', s1', s2') ->
+     eq_person p p'
+     && (s1 = s1' && s2 = s2' || s1 = s2' && s2 = s1')
+  | ChangedOrderOfChildren (ifam, fam, ipers1, ipers2),
+    ChangedOrderOfChildren (ifam', fam', ipers1', ipers2')->
+     eq_ifam ifam ifam'
+     && (eq_family fam fam')
+     && ipers1 = ipers1' && ipers2 = ipers2'
+  | ChangedOrderOfMarriages (p, ifams, ifams2),
+    ChangedOrderOfMarriages (p', ifams', ifams2') ->
+     eq_person p p' && ifams = ifams' && ifams2 = ifams2'
+  | ChangedOrderOfFamilyEvents (ifam, fevents, fevents2),
+    ChangedOrderOfFamilyEvents (ifam', fevents', fevents2') ->
+     eq_ifam ifam ifam' && fevents = fevents' && fevents2 = fevents2'
+  | ChangedOrderOfPersonEvents (p, pevents, pevents2),
+    ChangedOrderOfPersonEvents (p', pevents', pevents2') ->
+     eq_person p p' && pevents = pevents' && pevents2 = pevents2'
+  | ChildrenNotInOrder (ifam, fam, p1, p2),
+    ChildrenNotInOrder (ifam', fam', p1', p2') ->
+     eq_ifam ifam ifam' && eq_family fam fam' && eq_person p1 p1' && eq_person p2 p2'
+  | CloseChildren (ifam, p1, p2),
+    CloseChildren (ifam', p1', p2') ->
+     eq_ifam ifam ifam'
+     && (eq_person p1 p1' && eq_person p2 p2'
+         || eq_person p1 p2' && eq_person p2 p1')
+  | DeadOld (p, d), DeadOld (p', d') ->
+     eq_person p p' && d = d'
+  | DeadTooEarlyToBeFather (p1, p2), DeadTooEarlyToBeFather (p1', p2') ->
+     eq_person p1 p1' && eq_person p2 p2'
+  | DistantChildren (ifam, p1, p2), DistantChildren (ifam', p1', p2') ->
+     eq_ifam ifam ifam' && eq_person p1 p1' && eq_person p2 p2'
+  | FEventOrder (p, fevent, fevent2), FEventOrder (p', fevent', fevent2') ->
+     eq_person p p' && fevent = fevent' && fevent2 = fevent2'
+  | FWitnessEventAfterDeath (p, fevent, ifam),
+    FWitnessEventAfterDeath (p', fevent', ifam') ->
+     eq_person p p' && fevent = fevent' && eq_ifam ifam ifam'
+  | FWitnessEventBeforeBirth (p, fevent, ifam),
+    FWitnessEventBeforeBirth (p', fevent', ifam') ->
+     eq_person p p' && fevent = fevent' && eq_ifam ifam ifam'
+  | IncoherentAncestorDate (p1, p2),
+    IncoherentAncestorDate (p1', p2') ->
+     eq_person p1 p1' && eq_person p2 p2'
+  | MarriageDateAfterDeath p, MarriageDateAfterDeath p' ->
+     eq_person p p'
+  | MarriageDateBeforeBirth p, MarriageDateBeforeBirth p' ->
+     eq_person p p'
+  | MotherDeadBeforeChildBirth (p1, p2), MotherDeadBeforeChildBirth (p1', p2') ->
+     eq_person p1 p1' && eq_person p2 p2'
+  | ParentBornAfterChild (p1, p2), ParentBornAfterChild (p1', p2') ->
+     eq_person p1 p1' && eq_person p2 p2'
+  | ParentTooOld (p1, d, p2), ParentTooOld (p1', d', p2') ->
+     eq_person p1 p1' && eq_person p2 p2' && d = d'
+  | ParentTooYoung (p1, d, p2), ParentTooYoung (p1', d', p2') ->
+     eq_person p1 p1' && eq_person p2 p2' && d = d'
+  | PEventOrder (p, pevent1, pevent2), PEventOrder (p', pevent1', pevent2') ->
+     eq_person p p' && pevent1 = pevent1' && pevent2 = pevent2'
+  | PWitnessEventAfterDeath (p1, pevent, p2), PWitnessEventAfterDeath (p1', pevent', p2') ->
+     eq_person p1 p1' && eq_person p2 p2' && pevent = pevent'
+  | PWitnessEventBeforeBirth (p1, pevent, p2), PWitnessEventBeforeBirth (p1', pevent', p2') ->
+     eq_person p1 p1' && eq_person p2 p2' && pevent = pevent'
+  | TitleDatesError (p, title), TitleDatesError (p', title') ->
+     eq_person p p' && title = title'
+  | UndefinedSex p, UndefinedSex p' ->
+     eq_person p p'
+  | YoungForMarriage (p, d, ifam), YoungForMarriage (p', d', ifam') ->
+     eq_person p p' && d = d' && eq_ifam ifam ifam'
+  | OldForMarriage (p, d, ifam), OldForMarriage (p', d', ifam') ->
+     eq_person p p' && d = d' && eq_ifam ifam ifam'
+  | _ -> false
+
 let person_warnings conf base p =
   let w = ref [] in
   let filter x =
-    if not (List.mem x !w) && auth_warning conf base x
+    if not (List.exists (eq_warning base x) !w) && auth_warning conf base x
     then w := x :: !w
   in
   ignore @@ CheckItem.person base filter p ;
@@ -3163,3 +2796,6 @@ let cut_words str =
     else [String.sub str beg (i - beg)]
   in
   loop 0 0
+
+let designation base p =
+  Gutil.designation base p |> escape_html

@@ -7,42 +7,46 @@ open Gwdb
 open Util
 
 let limit_by_tree conf =
-  match p_getint conf.base_env "max_desc_tree" with
-    Some x -> max 1 x
+  match List.assoc_opt "max_desc_tree" conf.base_env with
   | None -> 4
+  | Some x -> try max 1 (int_of_string x) with _ -> 4
 
-let text_to conf =
-  function
-    0 ->
-      transl_decline conf "specify"
-        (transl_nth conf "generation/generations" 0)
-  | 1 -> transl conf "to the children"
-  | 2 -> transl conf "to the grandchildren"
-  | 3 -> transl conf "to the great-grandchildren"
+let text_to conf = function
+  | 0 ->
+    transl_nth conf "generation/generations" 0
+    |> transl_decline conf "specify"
+    |> Adef.safe
+  | 1 -> transl conf "to the children" |> Adef.safe
+  | 2 -> transl conf "to the grandchildren" |> Adef.safe
+  | 3 -> transl conf "to the great-grandchildren" |> Adef.safe
   | i ->
-      Printf.sprintf (ftransl conf "to the %s generation")
-        (transl_nth conf "nth (generation)" i)
+    Printf.sprintf
+      (ftransl conf "to the %s generation")
+      (transl_nth conf "nth (generation)" i)
+    |> Adef.safe
 
-let text_level conf =
-  function
-    0 ->
-      transl_decline conf "specify"
-        (transl_nth conf "generation/generations" 0)
-  | 1 -> transl conf "the children"
-  | 2 -> transl conf "the grandchildren"
-  | 3 -> transl conf "the great-grandchildren"
+let text_level conf = function
+  | 0 ->
+    transl_nth conf "generation/generations" 0
+    |> transl_decline conf "specify"
+    |> Adef.safe
+  | 1 -> transl conf "the children" |> Adef.safe
+  | 2 -> transl conf "the grandchildren" |> Adef.safe
+  | 3 -> transl conf "the great-grandchildren" |> Adef.safe
   | i ->
-      Printf.sprintf (ftransl conf "the %s generation")
-        (transl_nth conf "nth (generation)" i)
+    Printf.sprintf
+      (ftransl conf "the %s generation")
+      (transl_nth conf "nth (generation)" i)
+    |> Adef.safe
 
 let descendants_title conf base p h =
-  let s1 = gen_person_text raw_access conf base p in
-  let s2 = if h then gen_person_text_no_html raw_access conf base p else s1 in
-  let s =
-    translate_eval
-      (transl_a_of_gr_eq_gen_lev conf (transl conf "descendants") s1 s2)
-  in
-  Output.print_string conf (Utf8.capitalize_fst s)
+  let s1 = gen_person_text conf base p in
+  let s2 = if h then gen_person_text ~html:false conf base p else s1 in
+  translate_eval
+    (transl_a_of_gr_eq_gen_lev conf
+       (transl conf "descendants") (s1 :> string) (s2 :> string))
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf
 
 let display_descendants_level conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
@@ -93,22 +97,27 @@ let display_descendants_level conf base max_level ancestor =
       [] list
   in
   Hutil.header conf (descendants_title conf base ancestor);
-  Output.print_string conf (Utf8.capitalize_fst (text_level conf max_level));
-  if !len > 1 then
-    Output.printf conf " (%d %s)" !len
-      (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
-  Output.print_string conf ".\n";
-  Output.print_string conf "<p>" ;
-  print_alphab_list conf
-    (fun (p, _) ->
-       if is_hidden p then "?"
-       else String.sub (p_surname base p) (Mutil.initial (p_surname base p)) 1)
-    (fun (p, c) ->
-       Output.printf conf "\n%s" (referenced_person_title_text conf base p);
-       Output.print_string conf (DateDisplay.short_dates_text conf base p);
-       if not (is_hidden p) && c > 1 then Output.printf conf " <em>(%d)</em>" c;
-       Output.print_string conf "\n")
-    list;
+  (text_level conf max_level : Adef.safe_string :> string)
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  if !len > 1 then begin
+    Output.print_sstring conf " (" ;
+    Output.print_sstring conf (string_of_int !len) ;
+    Output.print_sstring conf " " ;
+    Output.print_sstring conf (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1)) ;
+    Output.print_sstring conf ")"
+  end ;
+  Output.print_sstring conf ".<p>" ;
+  print_alphab_list conf begin fun (p, _) ->
+    if is_hidden p then "?"
+    else String.sub (p_surname base p) (Mutil.initial (p_surname base p)) 1
+  end begin fun (p, c) ->
+    Output.print_sstring conf " " ;
+    Output.print_string conf (referenced_person_title_text conf base p) ;
+    Output.print_string conf (DateDisplay.short_dates_text conf base p) ;
+    if not (is_hidden p) && c > 1 then Output.printf conf " <em>(%d)</em>" c ;
+    Output.print_sstring conf "\n"
+  end list ;
   Hutil.trailer conf
 
 (* With number *)
@@ -188,40 +197,42 @@ let labelled conf base marks max_lev lev ip =
 
 let label_of_path paths p =
   let rec loop = function
-    | [] -> ""
-    | c :: cl -> loop cl ^ String.make 1 c
-  in
-  loop @@ Gwdb.Marker.get paths (get_iper p)
+    | [] -> Adef.escaped ""
+    | c :: cl -> loop cl ^^^ Util.escape_html (String.make 1 c)
+  in get_iper p |> Gwdb.Marker.get paths |> loop
 
 let print_child conf base p1 p2 e =
-  Output.print_string conf "<strong>";
-  if get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1) ||
-     get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2)
-  then
-    Output.print_string conf (referenced_person_text_without_surname conf base e)
-  else Output.printf conf "\n%s" (referenced_person_text conf base e);
-  Output.print_string conf "</strong>";
+  Output.print_sstring conf "<strong>";
+  if get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1)
+  || get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2)
+  then Output.print_string conf (referenced_person_text_without_surname conf base e)
+  else begin
+    Output.print_sstring conf " " ;
+    Output.print_string conf (referenced_person_text conf base e)
+  end ;
+  Output.print_sstring conf "</strong>";
   Output.print_string conf (DateDisplay.short_dates_text conf base e)
 
 let print_repeat_child conf base p1 p2 e =
-  Output.print_string conf "<em>";
-  if get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1) ||
-     get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2)
-  then
-    Output.print_string conf (person_text_without_surname conf base e)
-  else Output.print_string conf (person_text conf base e);
-  Output.print_string conf "</em>"
+  Output.print_sstring conf "<em>";
+  if get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1)
+  || get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2)
+  then Output.print_string conf (gen_person_text ~sn:false conf base e)
+  else Output.print_string conf (gen_person_text conf base e);
+  Output.print_sstring conf "</em>"
 
 let display_spouse conf base marks paths fam p c =
-  Output.print_string conf "\n&amp;";
+  Output.print_sstring conf " &amp;";
   Output.print_string conf (DateDisplay.short_marriage_date_text conf base fam p c);
-  Output.print_string conf " ";
-  Output.print_string conf "<strong>";
-  Output.printf conf "\n%s" (referenced_person_text conf base c);
-  Output.print_string conf "</strong>";
+  Output.print_sstring conf " <strong> ";
+  Output.print_string conf (referenced_person_text conf base c) ;
+  Output.print_sstring conf "</strong>";
   if Gwdb.Marker.get marks (get_iper c)
-  then Output.printf conf " (<tt><b>%s</b></tt>)" (label_of_path paths c)
-  else Output.print_string conf (DateDisplay.short_dates_text conf base c)
+  then begin
+    Output.print_sstring conf " (<tt><b>" ;
+    Output.print_string conf (label_of_path paths c) ;
+    Output.print_sstring conf "</b></tt>)"
+  end else Output.print_string conf (DateDisplay.short_dates_text conf base c)
 
 let total = ref 0
 
@@ -235,10 +246,10 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
           let c = Gutil.spouse (get_iper p) fam in
           let el = get_children fam in
           let c = pget conf base c in
-          if need_br then Output.print_string conf "<br>" ;
+          if need_br then Output.print_sstring conf "<br>" ;
           if not first then print_repeat_child conf base p1 c1 p;
           display_spouse conf base marks paths fam p c;
-          Output.print_string conf "\n";
+          Output.print_sstring conf "\n";
           let print_children =
             get_sex p = Male || not (Gwdb.Marker.get marks (get_iper c))
           in
@@ -249,9 +260,9 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
                 let e = pget conf base ie in
                 if print_children then
                   begin
-                    Output.print_string conf "<li type=\"A\"> ";
+                    Output.print_sstring conf "<li type=\"A\"> ";
                     print_child conf base p c e;
-                    Output.print_string conf "\n";
+                    Output.print_sstring conf "\n";
                     incr total;
                     if succ lev = max_lev then
                       Array.iteri
@@ -262,12 +273,12 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
                           let c1 = pget conf base c1 in
                           if i <> 0 then
                             begin
-                              Output.print_string conf "<br>" ;
+                              Output.print_sstring conf "<br>" ;
                               print_repeat_child conf base p c e
                             end ;
                           display_spouse conf base marks paths fam e c1;
-                          if Array.length el <> 0 then Output.print_string conf ".....";
-                          Output.print_string conf "\n"
+                          if Array.length el <> 0 then Output.print_sstring conf ".....";
+                          Output.print_sstring conf "\n"
                         end
                         (get_family (pget conf base ie))
                     else loop (succ lev) e
@@ -276,67 +287,69 @@ let print_family_locally conf base marks paths max_lev lev p1 c1 e =
               end
               cnt el
           in
-          if print_children then Output.print_string conf "</ol>\n";
+          if print_children then Output.print_sstring conf "</ol>\n";
           cnt, false, not print_children
         end
         (0, true, false) (get_family p)
   in
   loop lev e
 
-let last_label = ref ""
+let last_label = ref (Adef.escaped "")
 
 let print_family conf base marks paths max_lev lev p =
-  if lev <> 0 then Output.printf conf "<tt><b>%s</b></tt>.<br>" (label_of_path paths p);
+  if lev <> 0 then begin
+    Output.print_sstring conf "<tt><b>" ;
+    Output.print_string conf (label_of_path paths p) ;
+    Output.print_sstring conf "</b></tt>.<br>"
+  end ;
   let lab = label_of_path paths p in
   if lab < !last_label then failwith "print_family" else last_label := lab;
   ignore @@
-  Array.fold_left
-    (fun cnt ifam ->
-       let fam = foi base ifam in
-       let c = Gutil.spouse (get_iper p) fam in
-       let el = get_children fam in
-       let c = pget conf base c in
-       Output.print_string conf "<strong>";
-       Output.printf conf "\n%s" (referenced_person_text conf base p);
-       Output.print_string conf "</strong>";
-       display_spouse conf base marks paths fam p c;
-       Output.printf conf "<ol start=\"%d\">\n" (succ cnt);
-       let cnt =
-         Array.fold_left
-           (fun cnt ie ->
-              let e = pget conf base ie in
-              if get_sex p = Male
-              || not (Gwdb.Marker.get marks (get_iper c))
-              then
-                begin
-                  Output.print_string conf "<li type=\"A\">";
-                  print_child conf base p c e;
-                  incr total;
-                  Output.print_string conf "\n";
-                  if labelled conf base marks max_lev lev ie then
-                    Output.printf conf " => <tt><b>%s</b></tt>\n"
-                      (label_of_path paths e)
-                  else if succ lev = max_lev then
-                    Array.iter
-                      (fun ifam ->
-                         let fam = foi base ifam in
-                         let c = Gutil.spouse ie fam in
-                         let el = get_children fam in
-                         let c = pget conf base c in
-                         display_spouse conf base marks paths fam e c;
-                         if Array.length el <> 0 then
-                           Output.print_string conf ".....";
-                         Output.print_string conf "\n")
-                      (get_family (pget conf base ie))
-                  else
-                    print_family_locally conf base marks paths max_lev
-                      (succ lev) p c e
-                end;
-              succ cnt)
-           cnt el
-       in
-       Output.print_string conf "</ol>\n"; cnt)
-    0 (get_family p)
+  Array.fold_left begin fun cnt ifam ->
+    let fam = foi base ifam in
+    let c = Gutil.spouse (get_iper p) fam in
+    let el = get_children fam in
+    let c = pget conf base c in
+    Output.print_sstring conf "<strong> " ;
+    Output.print_string conf (referenced_person_text conf base p) ;
+    Output.print_sstring conf "</strong>" ;
+    display_spouse conf base marks paths fam p c;
+    Output.print_sstring conf {|<ol start="|} ;
+    Output.print_sstring conf (succ cnt |> string_of_int) ;
+    Output.print_sstring conf {|">|} ;
+    let cnt =
+      Array.fold_left begin fun cnt ie ->
+        let e = pget conf base ie in
+        if get_sex p = Male || not (Gwdb.Marker.get marks (get_iper c))
+        then begin
+          Output.print_sstring conf {|<li type="A">|} ;
+          print_child conf base p c e ;
+          incr total;
+          Output.print_sstring conf " ";
+          if labelled conf base marks max_lev lev ie
+          then begin
+            Output.print_sstring conf " =&gt; <tt><b>" ;
+            Output.print_string conf (label_of_path paths e) ;
+            Output.print_sstring conf "</b></tt> "
+          end else if succ lev = max_lev then
+            Array.iter begin fun ifam ->
+              let fam = foi base ifam in
+              let c = Gutil.spouse ie fam in
+              let el = get_children fam in
+              let c = pget conf base c in
+              display_spouse conf base marks paths fam e c;
+              if Array.length el <> 0 then Output.print_sstring conf "....." ;
+              Output.print_sstring conf "\n"
+            end (get_family (pget conf base ie))
+          else
+            print_family_locally conf base marks paths max_lev (succ lev) p c e
+        end ;
+        succ cnt
+      end cnt el
+    in
+    Output.print_sstring conf "</ol>" ;
+    cnt
+  end 0 (get_family p)
 
 let print_families conf base marks paths max_lev =
   let rec loop lev p =
@@ -367,13 +380,16 @@ let display_descendants_with_numbers conf base max_level ancestor =
     if h then descendants_title conf base ancestor h
     else
       wprint_geneweb_link conf
-        ("m=D&i=" ^
-         string_of_iper (get_iper ancestor) ^ "&v=" ^
-         string_of_int max_level ^ "&t=G")
-        (Utf8.capitalize_fst
-           (let s1 = person_text conf base ancestor in
-            let s2 = person_text_no_html conf base ancestor in
-            transl_a_of_gr_eq_gen_lev conf (transl conf "descendants") s1 s2))
+        ("m=D&i=" ^ string_of_iper (get_iper ancestor) ^ "&v=" ^ string_of_int max_level ^ "&t=G"
+         |> Adef.escaped)
+        (let s1 = gen_person_text conf base ancestor in
+         let s2 = gen_person_text ~html:true conf base ancestor in
+         transl_a_of_gr_eq_gen_lev conf
+           (transl conf "descendants")
+           (s1 : Adef.safe_string :> string)
+           (s2 : Adef.safe_string :> string)
+         |> Utf8.capitalize_fst
+         |> Adef.safe)
   in
   let marks = Gwdb.iper_marker (Gwdb.ipers base) false in
   let paths = Gwdb.iper_marker (Gwdb.ipers base) [] in
@@ -383,79 +399,84 @@ let display_descendants_with_numbers conf base max_level ancestor =
   let p = ancestor in
   if authorized_age conf base p then
     begin match Adef.od_of_cdate (get_birth p), get_death p with
-      Some _, _ | _, Death (_, _) -> Output.print_string conf "<br>"
+      Some _, _ | _, Death (_, _) -> Output.print_sstring conf "<br>"
     | _ -> ()
     end;
-  Output.printf conf "%s." (Utf8.capitalize_fst (text_to conf max_level));
-  Output.print_string conf "<p>" ;
+  (text_to conf max_level : Adef.safe_string :> string)
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf ".<p>" ;
   mark_descendants conf base marks max_level (get_iper ancestor);
   label_descendants conf base marks paths max_level ancestor;
   print_families conf base marks paths max_level ancestor;
   if !total > 1 then
     begin
-      Output.print_string conf "<p>" ;
+      Output.print_sstring conf "<p>" ;
       Output.printf conf "%s%s %d %s" (Utf8.capitalize_fst (transl conf "total"))
         (Util.transl conf ":") !total
         (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
       if max_level > 1 then
         Output.printf conf " (%s)" (transl conf "spouses not included");
-      Output.print_string conf ".\n"
+      Output.print_sstring conf ".\n"
     end;
   Hutil.trailer conf
 
 let print_ref conf base paths p =
-  if Gwdb.Marker.get paths (get_iper p) <> [] then
-    Output.printf conf " => <tt><b>%s</b></tt>" (label_of_path paths p)
-  else
-    Array.iter
-      (fun ifam ->
-         let c = Gutil.spouse (get_iper p) (foi base ifam) in
-         if Gwdb.Marker.get paths c <> [] then
-           let c = pget conf base c in
-           Output.printf conf " => %s %s <tt><b>%s</b></tt>" (p_first_name base c)
-             (p_surname base c) (label_of_path paths c))
-      (get_family p)
+  if Gwdb.Marker.get paths (get_iper p) <> [] then begin
+    Output.print_sstring conf " =&gt; <tt><b>"  ;
+    Output.print_string conf (label_of_path paths p) ;
+    Output.print_sstring conf "</b></tt>" ;
+  end else
+    Array.iter begin fun ifam ->
+      let c = Gutil.spouse (get_iper p) (foi base ifam) in
+      if Gwdb.Marker.get paths c <> [] then
+        let c = pget conf base c in
+        Output.print_sstring conf " =&gt; " ;
+        Output.print_string conf (p_first_name base c |> Util.escape_html) ;
+        Output.print_sstring conf " " ;
+        Output.print_string conf (p_surname base c |> Util.escape_html) ;
+        Output.print_sstring conf " <tt><b>" ;
+        Output.print_string conf (label_of_path paths c) ;
+        Output.print_sstring conf "</b></tt>" ;
+    end (get_family p)
 
 let print_elem conf base paths precision (n, pll) =
-  Output.print_string conf "<li>" ;
+  Output.print_sstring conf "<li>" ;
   match List.rev pll with
-    [[p]] ->
-      Output.printf conf "<strong>%s %s %s</strong>" (surname_without_particle base n)
-        (reference conf base p (person_text_without_surname conf base p))
-        (surname_particle base n);
-      Output.print_string conf (DateDisplay.short_dates_text conf base p);
-      print_ref conf base paths p;
-      Output.print_string conf "\n"
+  | [[p]] ->
+    Output.print_sstring conf "<strong>" ;
+    Output.print_string conf (surname_without_particle base n |> Util.escape_html) ;
+    Output.print_sstring conf " " ;
+    gen_person_text ~sn:false conf base p
+    |> reference conf base p
+    |> Output.print_string conf ;
+    Output.print_sstring conf " " ;
+    Output.print_string conf (surname_particle base n |> Util.escape_html) ;
+    Output.print_sstring conf "</strong>" ;
+    Output.print_string conf (DateDisplay.short_dates_text conf base p);
+    print_ref conf base paths p;
+    Output.print_sstring conf "\n"
   | pll ->
-      Output.printf conf "<strong>%s%s</strong>\n" (surname_without_particle base n)
-        (surname_particle base n);
-      Output.print_string conf "<ul>\n";
-      List.iter
-        (fun pl ->
-           let several =
-             match pl with
-               [_] -> false
-             | _ -> true
-           in
-           List.iter
-             (fun p ->
-                Output.print_string conf "<li>" ;
-                Output.print_string conf "<strong>";
-                wprint_geneweb_link conf (acces conf base p)
-                  (p_first_name base p);
-                Output.print_string conf "</strong>";
-                if several && precision then
-                  begin
-                    Output.print_string conf "<em>";
-                    specify_homonymous conf base p true;
-                    Output.print_string conf "</em>"
-                  end;
-                Output.print_string conf (DateDisplay.short_dates_text conf base p);
-                print_ref conf base paths p;
-                Output.print_string conf "\n")
-             pl)
-        pll;
-      Output.print_string conf "</ul>\n"
+    Output.print_sstring conf "<strong>" ;
+    Output.print_string conf (surname_without_particle base n |> Util.escape_html) ;
+    Output.print_string conf (surname_particle base n |> Util.escape_html) ;
+    Output.print_sstring conf "</strong><ul>" ;
+    List.iter begin fun pl ->
+      let several = match pl with [_] -> false | _ -> true in
+      List.iter begin fun p ->
+        Output.print_sstring conf "<li><strong>";
+        wprint_geneweb_link conf (acces conf base p)
+          (p_first_name base p |> Util.escape_html :> Adef.safe_string);
+        Output.print_sstring conf "</strong>";
+        if several && precision then begin
+          Output.print_sstring conf "<em>";
+          specify_homonymous conf base p true;
+          Output.print_sstring conf "</em>"
+        end;
+        Output.print_string conf (DateDisplay.short_dates_text conf base p);
+        print_ref conf base paths p;
+      end pl end pll ;
+      Output.print_sstring conf "</ul>"
 
 let sort_and_display conf base paths precision list =
   let list = List.map (pget conf base) list in
@@ -494,20 +515,24 @@ let sort_and_display conf base paths precision list =
   in
   if list <> [] then
     begin
-      Output.print_string conf "<ul>\n";
+      Output.print_sstring conf "<ul>\n";
       List.iter (print_elem conf base paths precision) list;
-      Output.print_string conf "</ul>\n"
+      Output.print_sstring conf "</ul>\n"
     end
 
 let display_descendant_index conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let title h =
-    let txt = Utf8.capitalize_fst (transl conf "index of the descendants") in
+    let txt =
+      transl conf "index of the descendants"
+      |> Utf8.capitalize_fst
+      |> Adef.safe
+    in
     if not h then
       wprint_geneweb_link conf
-        ("m=D&i=" ^
-         string_of_iper (get_iper ancestor) ^ "&v=" ^
-         string_of_int max_level ^ "&t=C")
+        ("m=D&i=" ^ string_of_iper (get_iper ancestor) ^ "&v="
+         ^ string_of_int max_level ^ "&t=C"
+         |> Adef.escaped)
         txt
     else Output.print_string conf txt
   in
@@ -533,8 +558,9 @@ let display_descendant_index conf base max_level ancestor =
 let display_spouse_index conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let title _ =
-    Output.print_string conf
-      (Utf8.capitalize_fst (transl conf "index of the spouses (non descendants)"))
+    transl conf "index of the spouses (non descendants)"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   Hutil.header conf title;
   let marks = Gwdb.iper_marker (Gwdb.ipers base) false in
@@ -581,87 +607,37 @@ let display_spouse_index conf base max_level ancestor =
 (* *********************************************************************** *)
 let print_desc_table_header conf =
   let nb_col = ref 2 in
-  Output.print_string conf "<tr class=\"descends_table_header\">\n";
-  Output.print_string conf "<th>\n";
-  Output.print_string conf (Utf8.capitalize_fst (transl conf "n° d'Aboville"));
-  Output.print_string conf "</th>\n";
-  Output.print_string conf "<th>\n";
-  Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "person/persons" 0));
-  Output.print_string conf "</th>\n";
-  if p_getenv conf.env "birth" = Some "on" then
-    begin
-      Output.print_string conf "<th>\n";
+  Output.print_sstring conf {|<tr class="descends_table_header"><th>|} ;
+  transl conf "n° d'Aboville"
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf "</th><th>" ;
+  transl_nth conf "person/persons" 0
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf "</th>" ;
+  let aux get txt =
+    if p_getenv conf.env get = Some "on" then begin
+      Output.print_sstring conf "<th>";
       incr nb_col;
-      Output.print_string conf (Utf8.capitalize_fst (transl conf "date of birth"));
-      Output.print_string conf "</th>\n"
-    end;
-  if p_getenv conf.env "birth_place" = Some "on" then
-    begin
-      Output.print_string conf "<th>\n";
-      incr nb_col;
-      Output.print_string conf (Utf8.capitalize_fst (transl conf "where born"));
-      Output.print_string conf "</th>\n"
-    end;
-  if p_getenv conf.env "marr" = Some "on" then
-    begin
-      Output.print_string conf "<th>\n";
-      incr nb_col;
-      Output.print_string conf (Utf8.capitalize_fst (transl_nth conf "spouse/spouses" 1));
-      Output.print_string conf "</th>\n"
-    end;
-  if p_getenv conf.env "marr_date" = Some "on" then
-    begin
-      Output.print_string conf "<th>\n";
-      Output.print_string conf (Utf8.capitalize_fst (transl conf "date of marriage"));
-      incr nb_col;
-      Output.print_string conf "</th>\n"
-    end;
-  if p_getenv conf.env "marr_place" = Some "on" then
-    begin
-      Output.print_string conf "<th>\n";
-      incr nb_col;
-      Output.print_string conf (Utf8.capitalize_fst (transl conf "where married"));
-      Output.print_string conf "</th>\n"
-    end;
-  if p_getenv conf.env "child" = Some "on" then
-    begin
-      Output.print_string conf "<th>\n";
-      incr nb_col;
-      Output.print_string conf (Utf8.capitalize_fst (transl conf "nb children"));
-      Output.print_string conf "</th>\n"
-    end;
-  if p_getenv conf.env "death" = Some "on" then
-    begin
-      Output.print_string conf "<th>\n";
-      Output.print_string conf (Utf8.capitalize_fst (transl conf "date of death"));
-      incr nb_col;
-      Output.print_string conf "</th>\n"
-    end;
-  if p_getenv conf.env "death_place" = Some "on" then
-    begin
-      Output.print_string conf "<th>\n";
-      incr nb_col;
-      Output.print_string conf (Utf8.capitalize_fst (transl conf "where dead"));
-      Output.print_string conf "</th>\n"
-    end;
-  if p_getenv conf.env "death_age" = Some "on" then
-    begin
-      Output.print_string conf "<th>\n";
-      incr nb_col;
-      Output.print_string conf (Utf8.capitalize_fst (transl conf "age at death"));
-      Output.print_string conf "</th>\n"
-    end;
-  if p_getenv conf.env "occu" = Some "on" then
-    begin
-      Output.print_string conf "<th>\n";
-      incr nb_col;
-      Output.print_string conf
-        (Utf8.capitalize_fst (transl_nth conf "occupation/occupations" 1));
-      Output.print_string conf "</th>\n"
-    end;
-  Output.print_string conf "</tr>\n";
+      txt
+      |> Utf8.capitalize_fst
+      |> Output.print_sstring conf ;
+      Output.print_sstring conf "</th>"
+    end
+  in
+  aux "birth" (transl conf "date of birth") ;
+  aux "birth_place" (transl conf "where born") ;
+  aux "marr" (transl_nth conf "spouse/spouses" 1) ;
+  aux "marr_date" (transl conf "date of marriage") ;
+  aux "marr_place" (transl conf "where married") ;
+  aux "child" (transl conf "nb children") ;
+  aux "death" (transl conf "date of death") ;
+  aux "death_place" (transl conf "where dead") ;
+  aux "death_age" (transl conf "age at death") ;
+  aux "occu" (transl_nth conf "occupation/occupations" 1) ;
+  Output.print_sstring conf "</tr>" ;
   !nb_col
-
 
 (* *********************************************************************** *)
 (*  [Fonc] print_person_table : config -> base -> person -> string -> unit *)
@@ -669,280 +645,218 @@ let print_desc_table_header conf =
                     les informations d'une personne (correspond à une ligne
                     du tableau).
     [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
-      - lab  : numéro d'Aboville de p
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                        *)
+    - conf : configuration de la base
+    - base : base de donnée
+    - p    : person
+    - lab  : numéro d'Aboville de p
+      [Retour] : Néant
+      [Rem] : Non exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
 let print_person_table conf base p lab =
   let p_auth = Util.authorized_age conf base p in
   let nb_families = Array.length (get_family p) in
   let (birth, birth_place) =
-    if (p_getenv conf.env "birth" = Some "on" ||
-        p_getenv conf.env "birth_place" = Some "on") &&
-       p_auth
+    if p_auth
+    && (p_getenv conf.env "birth" = Some "on" || p_getenv conf.env "birth_place" = Some "on")
     then
       let (date, place) = Util.get_approx_birth_date_place conf base p in
       let date =
         match date with
-          Some d -> DateDisplay.string_slash_of_date conf d
-        | None -> ""
+        | Some d -> DateDisplay.string_slash_of_date conf d
+        | None -> Adef.safe ""
       in
       date, place
-    else "&nbsp;", ""
+    else Adef.safe "&nbsp;", Adef.safe ""
   in
   let (death, death_place) =
-    if (p_getenv conf.env "death" = Some "on" ||
-        p_getenv conf.env "death_place" = Some "on") &&
-       p_auth
+    if p_auth
+    && (p_getenv conf.env "death" = Some "on" || p_getenv conf.env "death_place" = Some "on")
     then
       let (date, place) = Util.get_approx_death_date_place conf base p in
       let date =
         match date with
-          Some d -> DateDisplay.string_slash_of_date conf d
-        | None -> ""
+        | Some d -> DateDisplay.string_slash_of_date conf d
+        | None -> Adef.safe ""
       in
       date, place
-    else "&nbsp;", ""
+    else Adef.safe "&nbsp;", Adef.safe ""
   in
   (* On calcul le nombre de rowspan pour avoir un affichage joli. *)
   let rowspan =
-    if nb_families > 1 &&
-       (p_getenv conf.env "marr" = Some "on" ||
-        p_getenv conf.env "marr_date" = Some "on" ||
-        p_getenv conf.env "marr_place" = Some "on")
-    then
-      "rowspan=\"" ^ string_of_int nb_families ^ "\""
-    else ""
+    if nb_families > 1
+    && (p_getenv conf.env "marr" = Some "on"
+        || p_getenv conf.env "marr_date" = Some "on"
+        || p_getenv conf.env "marr_place" = Some "on")
+    then Adef.safe ("rowspan=\"" ^ string_of_int nb_families ^ "\"")
+    else Adef.safe ""
+  in
+  let td txt =
+    Output.print_sstring conf "<td " ;
+    Output.print_string conf rowspan ;
+    Output.print_sstring conf ">" ;
+    txt ();
+    Output.print_sstring conf "</td>"
   in
   (* On met partout un &nbsp; dans le cas où ce que l'on souhaite *)
   (* afficher est vide, comme ça, on ne casse pas le rowspan.     *)
-  Output.print_string conf "<tr>\n";
-  Output.printf conf "<td %s>\n" rowspan;
-  Output.print_string conf lab;
-  Output.print_string conf "</td>\n";
-  Output.printf conf "<td %s>\n" rowspan;
-  Util.print_image_sex conf p 11;
-  Output.printf conf " %s &nbsp;" (referenced_person_title_text conf base p);
-  Output.print_string conf "</td>\n";
-  if p_getenv conf.env "birth" = Some "on" then
-    begin
-      Output.printf conf "<td %s>\n" rowspan;
-      Output.print_string conf birth;
-      Output.print_string conf "</td>\n"
-    end;
-  if p_getenv conf.env "birth_place" = Some "on" then
-    begin
-      Output.printf conf "<td %s>\n" rowspan;
-      Output.printf conf "%s &nbsp;" birth_place;
-      Output.print_string conf "</td>\n"
-    end;
-  (* On affiche que la première famille (get_family u).(0). *)
-  (* Les autres familles seront affichées après qu'on ait   *)
-  (* fini de remplir le <tr>.                               *)
-  if p_getenv conf.env "marr" = Some "on" then
-    begin
-      Output.printf conf "<td %s>\n"
-        (if nb_families > 1 then "style=\"border-bottom:none\"" else "");
-      begin let u = p in
-        if nb_families > 0 then
-          let cpl = foi base (get_family u).(0) in
-          let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
-          Util.print_image_sex conf spouse 11;
-          Output.printf conf " %s &nbsp;"
-            (referenced_person_text conf base spouse)
-        else Output.print_string conf "&nbsp;"
+  Output.print_sstring conf "<tr>" ;
+  td (fun () -> Output.print_string conf lab) ;
+  td (fun () ->
+      ImageDisplay.print_placeholder_gendered_portrait conf p 11 ;
+      Output.print_sstring conf " " ;
+      Output.print_string conf (referenced_person_title_text conf base p) ;
+      Output.print_sstring conf "&nbsp;") ;
+  if p_getenv conf.env "birth" = Some "on"
+  then td (fun () -> Output.print_string conf birth) ;
+  if p_getenv conf.env "birth_place" = Some "on"
+  then td (fun () ->
+      Output.print_string conf birth_place ;
+      Output.print_sstring conf "&nbsp;") ;
+  let aux ?alt ?attr gets f =
+    if List.exists (fun get -> p_getenv conf.env get = Some "on") gets then begin
+      Output.print_sstring conf "<td" ;
+      begin match attr with
+      | Some attr ->
+         (* TODO?: why is only the last string used? *)
+         let attr = List.fold_left (fun _acc (a, v) -> " " ^ a ^ "=" ^ "\"" ^ v ^ "\"") "" attr in
+         Output.print_sstring conf attr;
+      | None -> ()
       end;
-      Output.print_string conf "</td>\n"
-    end;
-  (* On affiche que la première famille (get_family u).(0). *)
-  (* Les autres familles seront affichées après qu'on ait   *)
-  (* fini de remplir le <tr>.                               *)
-  if p_getenv conf.env "marr_date" = Some "on" then
-    begin
-      Output.printf conf "<td %s>\n"
-        (if nb_families > 1 then "style=\"border-bottom:none\"" else "");
-      begin let u = p in
-        if nb_families > 0 then
-          let cpl = foi base (get_family u).(0) in
-          let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
-          let mdate =
-            if authorized_age conf base p && authorized_age conf base spouse
-            then
-              let fam = foi base (get_family u).(0) in
-              match Adef.od_of_cdate (get_marriage fam) with
-                Some d -> DateDisplay.string_slash_of_date conf d
-              | _ -> "&nbsp;"
-            else "&nbsp;"
-          in
-          Output.print_string conf mdate
-        else Output.print_string conf "&nbsp;"
-      end;
-      Output.print_string conf "</td>\n"
-    end;
-  (* On affiche que la première famille (get_family u).(0). *)
-  (* Les autres familles seront affichées après qu'on ait   *)
-  (* fini de remplir le <tr>.                               *)
-  if p_getenv conf.env "marr_place" = Some "on" then
-    begin
-      Output.printf conf "<td %s>\n"
-        (if nb_families > 1 then "style=\"border-bottom:none\"" else "");
-      begin let u = p in
-        if nb_families > 0 then
-          let cpl = foi base (get_family u).(0) in
-          let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
-          let mplace =
-            if authorized_age conf base p && authorized_age conf base spouse
-            then
-              Util.string_of_place conf (sou base (get_marriage_place cpl))
-            else ""
-          in
-          Output.printf conf "%s &nbsp;" mplace
-        else Output.print_string conf "&nbsp;"
-      end;
-      Output.print_string conf "</td>\n"
-    end;
-  (* On affiche que la première famille (get_family u).(0). *)
-  (* Les autres familles seront affichées après qu'on ait   *)
-  (* fini de remplir le <tr>.                               *)
-  if p_getenv conf.env "child" = Some "on" then
-    if p_getenv conf.env "marr" = Some "on" ||
-       p_getenv conf.env "marr_place" = Some "on" ||
-       p_getenv conf.env "marr_date" = Some "on"
+      if nb_families > 1 then Output.print_sstring conf {| style="border-bottom:none"|} ;
+      Output.print_sstring conf ">" ;
+      if nb_families > 0 then
+        let fam = foi base (get_family p).(0) in
+        let spouse = pget conf base (Gutil.spouse (get_iper p) fam) in
+        f fam spouse
+      else Output.print_sstring conf "&nbsp;" ;
+      Output.print_sstring conf "</td>"
+    end else match alt with None -> () | Some fn -> fn ()
+  in
+  aux [ "marr" ] begin fun _fam spouse ->
+    ImageDisplay.print_placeholder_gendered_portrait conf spouse 11;
+    Output.print_sstring conf " " ;
+    Output.print_string conf (referenced_person_text conf base spouse) ;
+    Output.print_sstring conf " &nbsp;"
+  end ;
+  aux [ "marr_date" ] begin fun fam spouse ->
+    let mdate =
+      if authorized_age conf base p
+      && authorized_age conf base spouse
+      then match Adef.od_of_cdate (get_marriage fam) with
+        | Some d -> DateDisplay.string_slash_of_date conf d
+        | _ -> Adef.safe "&nbsp;"
+      else Adef.safe "&nbsp;"
+    in
+    Output.print_string conf mdate
+  end ;
+  aux [ "marr_place" ] begin fun fam spouse ->
+    if authorized_age conf base p
+    && authorized_age conf base spouse
     then
-      begin
-        Output.printf conf "<td align=\"center\" %s>\n"
-          (if nb_families > 1 then "style=\"border-bottom:none\"" else "");
-        begin let u = p in
-          if nb_families > 0 then
-            let fam = foi base (get_family u).(0) in
-            Output.printf conf "%d &nbsp;" (Array.length (get_children fam))
-          else Output.print_string conf "&nbsp;"
-        end;
-        Output.print_string conf "</td>\n"
-      end
-    else
-      begin
-        let n =
-          Array.fold_left
-            (fun n ifam -> n + Array.length (get_children (foi base ifam))) 0
-            (get_family p)
-        in
-        Output.print_string conf "<td>\n";
-        Output.printf conf "%d &nbsp;" n;
-        Output.print_string conf "</td>\n"
-      end;
-  if p_getenv conf.env "death" = Some "on" then
-    begin
-      Output.printf conf "<td %s>\n" rowspan;
-      Output.print_string conf death;
-      Output.print_string conf "</td>\n"
+      get_marriage_place fam
+      |> sou base
+      |> Util.string_of_place conf
+      |> Output.print_string conf ;
+    Output.print_sstring conf " &nbsp;"
+  end ;
+  aux [ "child" ] ~attr:["align", "center"] begin fun fam _spouse ->
+    Output.print_sstring conf (get_children fam |> Array.length |> string_of_int) ;
+    Output.print_sstring conf " &nbsp;"
     end;
-  if p_getenv conf.env "death_place" = Some "on" then
-    begin
-      Output.printf conf "<td %s>\n" rowspan;
-      Output.printf conf "%s &nbsp;" death_place;
-      Output.print_string conf "</td>\n"
-    end;
-  if p_getenv conf.env "death_age" = Some "on" then
-    begin
-      Output.printf conf "<td %s>\n" rowspan;
-      begin let d =
-        if not p_auth then ""
-        else
-          match Gutil.get_birth_death_date p with
-            Some (Dgreg (({prec = Sure | About | Maybe} as d1), _)),
-            Some (Dgreg (({prec = Sure | About | Maybe} as d2), _)), approx
-            when d1 <> d2 ->
-              let a = Date.time_elapsed d1 d2 in
-              let s =
-                if not approx && d1.prec = Sure && d2.prec = Sure then ""
-                else transl_decline conf "possibly (date)" "" ^ " "
-              in
-              s ^ DateDisplay.string_of_age conf a
-          | _ -> ""
-      in
-        Output.printf conf "%s &nbsp;" d
-      end;
-      Output.print_string conf "</td>\n"
-    end;
-  if p_getenv conf.env "occu" = Some "on" then
-    begin
-      Output.printf conf "<td %s>\n" rowspan;
-      Output.printf conf "%s &nbsp;"
-        (if p_auth then sou base (get_occupation p) else "");
-      Output.print_string conf "</td>\n"
-    end;
-  (* On met partout un &nbsp; dans le cas où ce que l'on souhaite *)
-  (* afficher est vide, comme ça, on ne casse pas le rowspan.     *)
-  Output.print_string conf "</tr>\n";
+  if p_getenv conf.env "death" = Some "on"
+  then td (fun () -> Output.print_string conf death) ;
+  if p_getenv conf.env "death_place" = Some "on"
+  then td begin fun () ->
+      Output.print_string conf death_place ;
+      Output.print_sstring conf " &nbsp;" ;
+    end ;
+  if p_getenv conf.env "death_age" = Some "on"
+  then td (fun () ->
+      if p_auth then begin match Gutil.get_birth_death_date p with
+        | Some (Dgreg (({prec = Sure | About | Maybe} as d1), _))
+        , Some (Dgreg (({prec = Sure | About | Maybe} as d2), _))
+        , approx when d1 <> d2 ->
+          if not (not approx && d1.prec = Sure && d2.prec = Sure)
+          then begin
+            transl_decline conf "possibly (date)" ""
+            |> Output.print_sstring conf ;
+            Output.print_sstring conf " "
+          end ;
+          Date.time_elapsed d1 d2
+          |> DateDisplay.string_of_age conf
+          |> Output.print_string conf
+        | _ -> ()
+      end ;
+      Output.print_sstring conf " &nbsp;"
+    ) ;
+  if p_getenv conf.env "occu" = Some "on"
+  then td (fun () ->
+      if p_auth then get_occupation p |> sou base |> Util.escape_html |> Output.print_string conf ;
+      Output.print_sstring conf " &nbsp;") ;
+  Output.print_sstring conf "</tr>" ;
   (* Maintenant qu'on a fini d'afficher le <tr> complet, si il y a  *)
   (* plusieurs familles, il faut alors afficher chacune d'elle dans *)
   (* un <tr> afin d'avoir une mise en page utilisant des rowspan.   *)
   if nb_families > 1 then
-    if p_getenv conf.env "marr" = Some "on" ||
-       p_getenv conf.env "marr_date" = Some "on" ||
-       p_getenv conf.env "marr_place" = Some "on"
+    if p_getenv conf.env "marr" = Some "on"
+    || p_getenv conf.env "marr_date" = Some "on"
+    || p_getenv conf.env "marr_place" = Some "on"
     then
+      let aux ?attr i get fn =
+        if p_getenv conf.env get = Some "on" then begin
+          Output.print_sstring conf {|<td style="border-top:none; |} ;
+          if nb_families - 1 <> i then Output.print_sstring conf "border-bottom:none;" ;
+          Output.print_sstring conf "\"";
+          begin match attr with
+          | Some attr ->
+             (* TODO?: why is only the last string used? *)
+             let attr = List.fold_left (fun _acc (a, v) -> " " ^ a ^ "=" ^ "\"" ^ v ^ "\"") "" attr in
+             Output.print_sstring conf attr;
+          | None -> ()
+          end;
+          Output.print_sstring conf {|>|} ;
+          fn () ;
+          Output.print_sstring conf "</td>"
+        end
+      in
       let u = p in
       for i = 1 to nb_families - 1 do
         let cpl = foi base (get_family u).(i) in
         let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
         let fam = foi base (get_family u).(i) in
-        Output.print_string conf "<tr>\n";
-        if p_getenv conf.env "marr" = Some "on" then
-          begin
-            Output.printf conf "<td style=\"border-top:none; %s\">\n"
-              (if nb_families - 1 <> i then "border-bottom:none;" else "");
-            Util.print_image_sex conf spouse 11;
-            Output.printf conf " %s &nbsp;"
-              (referenced_person_text conf base spouse);
-            Output.print_string conf "</td>\n"
-          end;
-        if p_getenv conf.env "marr_date" = Some "on" then
-          begin
-            Output.printf conf "<td style=\"border-top:none; %s\">\n"
-              (if nb_families - 1 <> i then "border-bottom:none;" else "");
-            begin let mdate =
-              if authorized_age conf base p && authorized_age conf base spouse
-              then
-                let fam = foi base (get_family u).(i) in
-                match Adef.od_of_cdate (get_marriage fam) with
-                  Some d -> DateDisplay.string_slash_of_date conf d
-                | _ -> "&nbsp;"
-              else "&nbsp;"
-            in
-              Output.print_string conf mdate
-            end;
-            Output.print_string conf "</td>\n"
-          end;
-        if p_getenv conf.env "marr_place" = Some "on" then
-          begin
-            Output.printf conf "<td style=\"border-top:none; %s\">\n"
-              (if nb_families - 1 <> i then "border-bottom:none;" else "");
-            begin let mplace =
-              if authorized_age conf base p && authorized_age conf base spouse
-              then
-                Util.string_of_place conf (sou base (get_marriage_place cpl))
-              else ""
-            in
-              Output.printf conf "%s &nbsp;" mplace
-            end;
-            Output.print_string conf "</td>\n"
-          end;
-        if p_getenv conf.env "child" = Some "on" then
-          begin
-            Output.printf conf
-              "<td align=\"center\" style=\"border-top:none; %s\">\n"
-              (if nb_families - 1 <> i then "border-bottom:none;" else "");
-            Output.printf conf "%d &nbsp;" (Array.length (get_children fam));
-            Output.print_string conf "</td>\n"
-          end;
-        Output.print_string conf "</tr>\n"
+        Output.print_sstring conf "<tr>\n";
+        aux i "marr" begin fun () ->
+          ImageDisplay.print_placeholder_gendered_portrait conf spouse 11 ;
+          Output.print_sstring conf " " ;
+          Output.print_string conf (referenced_person_text conf base spouse) ;
+          Output.print_sstring conf "&nbsp;"
+        end ;
+        aux i "marr_date" begin fun () ->
+          if authorized_age conf base p && authorized_age conf base spouse
+          then
+            let fam = foi base (get_family u).(i) in
+            match Adef.od_of_cdate (get_marriage fam) with
+            | Some d ->
+              DateDisplay.string_slash_of_date conf d
+              |> Output.print_string conf
+            | _ -> Output.print_sstring conf "&nbsp;"
+          else Output.print_sstring conf "&nbsp;" ;
+        end ;
+        aux i "marr_place" begin fun () ->
+          if authorized_age conf base p && authorized_age conf base spouse
+          then
+            get_marriage_place cpl
+            |> sou base
+            |> Util.string_of_place conf
+            |> Output.print_string conf ;
+          Output.print_sstring conf " &nbsp;" ;
+        end ;
+        aux ~attr:["align", "center"] i "child" begin fun () ->
+          Output.print_sstring conf (get_children fam |> Array.length |> string_of_int) ;
+          Output.print_sstring conf " &nbsp;" ;
+        end ;
+        Output.print_sstring conf "</tr>"
       done
-
 
 (* ********************************************************************** *)
 (*  [Fonc] build_desc : config -> base -> person list -> person list      *)
@@ -956,31 +870,30 @@ let print_person_table conf base p lab =
     [Retour] : person list
     [Rem] : Non exporté en clair hors de ce module.                       *)
 (* ********************************************************************** *)
-let build_desc conf base l =
+let build_desc conf base l : ('a * Adef.safe_string) list =
   let rec loop l accu =
     match l with
-      [] ->
-        (* Comme on a fait un fold_left pour avoir le bon ordre *)
-        (* des enfants, on renverse l'accumulateur pour l'avoir *)
-        (* lui aussi dans le bon ordre.                         *)
-        List.rev accu
+    | [] ->
+      (* Comme on a fait un fold_left pour avoir le bon ordre *)
+      (* des enfants, on renverse l'accumulateur pour l'avoir *)
+      (* lui aussi dans le bon ordre.                         *)
+      List.rev accu
     | (p, lab) :: l ->
-        let cnt = ref 0 in
-        let nx_accu =
-          (* On fait des fold_left pour garder l'ordre des enfants. *)
-          (* lab correspond au numéro d'Aboville de p.              *)
-          Array.fold_left
-            (fun accu ifam ->
-               let fam = foi base ifam in
-               Array.fold_left
-                 (fun accu ip ->
-                    let _ = incr cnt in
-                    (pget conf base ip, lab ^ string_of_int !cnt ^ ".") ::
-                    accu)
-                 accu (get_children fam))
-            accu (get_family p)
-        in
-        loop l nx_accu
+      let cnt = ref 0 in
+      let nx_accu =
+        (* On fait des fold_left pour garder l'ordre des enfants. *)
+        (* lab correspond au numéro d'Aboville de p.              *)
+        Array.fold_left begin fun accu ifam ->
+          let fam = foi base ifam in
+          Array.fold_left begin fun accu ip ->
+            let _ = incr cnt in
+            ( pget conf base ip
+            , lab ^>^ string_of_int !cnt ^ ".") ::
+            accu
+          end accu (get_children fam)
+        end accu (get_family p)
+      in
+      loop l nx_accu
   in
   loop l []
 
@@ -1007,58 +920,55 @@ let display_descendant_with_table conf base max_lev p =
   (* est vide, on les calcul par rapport à refl)                   *)
   let rec loop lev nb_col first refl l =
     match l with
-      [] ->
-        if lev < max_lev then
-          let nl = build_desc conf base refl in
-          loop (lev + 1) nb_col true nl nl
-    | (p, lab) :: q ->
-        if first && lev > 0 && p_getenv conf.env "gen" = Some "on" then
-          begin
-            Output.print_string conf "<tr>\n";
-            begin
-              Output.printf conf "<th align=\"left\" colspan=\"%d\">\n" nb_col;
-              Output.printf conf "%s %d"
-                (Utf8.capitalize_fst (transl_nth conf "generation/generations" 0)) lev;
-              Output.print_string conf "</th>\n"
-            end;
-            Output.print_string conf "</tr>\n"
-          end;
-        print_person_table conf base p lab;
-        incr nb_pers;
-        loop lev nb_col false refl q
+    | [] ->
+      if lev < max_lev
+      then
+        let nl = build_desc conf base refl in
+        loop (lev + 1) nb_col true nl nl
+    | (p, (lab : Adef.safe_string)) :: q ->
+      if first && lev > 0 && p_getenv conf.env "gen" = Some "on" then begin
+        Output.print_sstring conf "<tr>" ;
+        Output.print_sstring conf {|<th align="left" colspan="|} ;
+        Output.print_sstring conf (string_of_int nb_col) ;
+        Output.print_sstring conf {|">|} ;
+        transl_nth conf "generation/generations" 0
+        |> Utf8.capitalize_fst
+        |> Output.print_sstring conf ;
+        Output.print_sstring conf " " ;
+        Output.print_sstring conf (string_of_int lev) ;
+        Output.print_sstring conf "</th></tr>"
+      end ;
+      print_person_table conf base p lab ;
+      incr nb_pers;
+      loop lev nb_col false refl q
   in
   Hutil.header_fluid conf (descendants_title conf base p);
-  Output.print_string conf "<p>\n";
-  Output.printf conf "%s." (Utf8.capitalize_fst (text_to conf max_lev));
-  Output.print_string conf "</p>\n";
-  Output.print_string conf "<table class=descends_table>\n";
+  Output.print_sstring conf "<p>" ;
+  (text_to conf max_lev : Adef.safe_string :> string)
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf {|.</p><table class="descends_table">|} ;
   (* On affiche l'entête et on en profite pour récupèrer *)
   (* le nombre de colonnes à afficher pour les colspans. *)
-  begin let nb_col = print_desc_table_header conf in
-    loop 0 nb_col true [p, ""] [p, ""]
-  end;
-  Output.print_string conf "</table>\n";
-  Output.print_string conf "<p>\n";
-  Output.printf conf "%s%s %d %s" (Utf8.capitalize_fst (transl conf "total"))
-    (Util.transl conf ":")
-    !nb_pers
-    (transl_nth conf "person/persons" 1);
-  Output.print_string conf "</p>\n";
+  loop 0 (print_desc_table_header conf) true [p, Adef.safe ""] [p, Adef.safe ""] ;
+  Output.print_sstring conf "</table><p>" ;
+  transl conf "total"
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf (Util.transl conf ":") ;
+  Output.print_sstring conf " " ;
+  Output.print_sstring conf (string_of_int !nb_pers) ;
+  Output.print_sstring conf " " ;
+  Output.print_sstring conf (transl_nth conf "person/persons" 1) ;
+  Output.print_sstring conf "</p>" ;
   Hutil.trailer conf
 
 let make_tree_hts conf base gv p =
-  let bd =
-    match Util.p_getint conf.env "bd" with
-      Some x -> x
-    | None -> 0
-  in
+  let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
   let td_prop =
-    match Util.p_getenv conf.env "td" with
-      Some x -> " " ^ x
-    | _ ->
-        match Util.p_getenv conf.env "color" with
-          None | Some "" -> ""
-        | Some x -> " class=\"" ^ x ^ "\""
+    match Util.p_getenv conf.env "color" with
+    | None | Some "" -> Adef.safe ""
+    | Some x -> " class=\"" ^<^ (Util.escape_html x :> Adef.safe_string) ^>^ "\""
   in
   let rec nb_column n v u =
     if v = 0 then n + max 1 (Array.length (get_family u))
@@ -1078,14 +988,19 @@ let make_tree_hts conf base gv p =
     let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
     let td =
       match po with
-        Some (p, _) ->
-          (* Récupère les options d'affichage. *)
-          let options = Util.display_options conf in
-          let ncol = nb_column 0 (v - 1) p in
-          let vbar_txt =
-            Printf.sprintf "%sm=D&t=T&v=%d&%s&%s" (commd conf) gv options
-              (acces conf base p)
-          in
+      | Some (p, _) ->
+        (* Récupère les options d'affichage. *)
+        let options = Util.display_options conf in
+        let ncol = nb_column 0 (v - 1) p in
+        let vbar_txt =
+          commd conf
+          ^^^ "m=D&t=T&v="
+          ^<^ string_of_int gv
+          ^<^ "&"
+          ^<^ options
+          ^^^ "&"
+          ^<^ acces conf base p
+        in
           2 * ncol - 1, CenterA, TDbar (Some vbar_txt)
       | None -> 1, LeftA, TDnothing
     in
@@ -1175,26 +1090,31 @@ let make_tree_hts conf base gv p =
     let tdl = if tdl = [] then [] else (1, LeftA, TDnothing) :: tdl in
     let td =
       match po with
-        Some (p, auth) ->
-          let ncol =
-            if v > 1 then nb_column 0 (v - 1) p
-            else Array.length (get_family p)
-          in
-          let txt = person_title_text conf base p in
-          let txt = reference conf base p txt in
-          let txt =
-            if auth then txt ^ DateDisplay.short_dates_text conf base p else txt
-          in
-          let txt = txt ^ DagDisplay.image_txt conf base p in
-          let txt =
-            if bd > 0 || td_prop <> "" then
-              Printf.sprintf
-                "<table style=\"border: %dpx solid\"><tr><td align=\"center\"%s>%s</td>\
-                 </tr></table>"
-                bd td_prop txt
-            else txt
-          in
-          2 * ncol - 1, CenterA, TDitem txt
+      | Some (p, auth) ->
+        let ncol =
+          if v > 1 then nb_column 0 (v - 1) p
+          else Array.length (get_family p)
+        in
+        let txt = reference conf base p (person_title_text conf base p) in
+        let txt =
+          if auth
+          then txt ^^^ DateDisplay.short_dates_text conf base p
+          else txt
+        in
+        let txt = txt ^^^ DagDisplay.image_txt conf base p in
+        let txt =
+          if bd > 0 || (td_prop :> string) <> ""
+          then
+            {|<table style="border:|}
+            ^<^ string_of_int bd
+            ^<^ {|px solid"><tr><td align="center"|}
+            ^<^ td_prop
+            ^^^ {|>|}
+            ^<^ txt
+            ^>^ {|</td></tr></table>|}
+          else txt
+        in
+        2 * ncol - 1, CenterA, TDitem txt
       | None -> 1, LeftA, TDnothing
     in
     td :: tdl
@@ -1208,29 +1128,31 @@ let make_tree_hts conf base gv p =
           else
             let ifam = (get_family p).(i) in
             let tdl =
-              if i > 0 then (1, LeftA, TDtext "...") :: tdl else tdl
+              if i > 0 then (1, LeftA, TDtext (Adef.safe "...")) :: tdl else tdl
             in
             let td =
               let fam = foi base ifam in
               let ncol = if v > 1 then fam_nb_column 0 (v - 1) fam else 1 in
               let s =
                 let sp = pget conf base (Gutil.spouse (get_iper p) fam) in
-                let txt = person_title_text conf base sp in
-                let txt = reference conf base sp txt in
+                let txt = reference conf base sp (person_title_text conf base sp) in
                 let txt =
-                  if auth then txt ^ DateDisplay.short_dates_text conf base sp
+                  if auth
+                  then txt ^^^ DateDisplay.short_dates_text conf base sp
                   else txt
                 in
-                "&amp;" ^
-                (if auth then DateDisplay.short_marriage_date_text conf base fam p sp
-                 else "") ^
-                "&nbsp;" ^ txt ^ DagDisplay.image_txt conf base sp
+                "&amp;"
+                ^<^ (if auth
+                     then DateDisplay.short_marriage_date_text conf base fam p sp
+                     else Adef.safe "")
+                ^^^ "&nbsp;" ^<^ txt ^^^ DagDisplay.image_txt conf base sp
               in
               let s =
-                if bd > 0 || td_prop <> "" then
-                  Printf.sprintf "<table style=\"border: %dpx solid\"><tr>\
-                     <td align=\"center\"%s>%s</td></tr></table>"
-                    bd td_prop s
+                if bd > 0 || (td_prop :> string) <> "" then
+                  {|<table style="border:|}
+                  ^<^ string_of_int bd
+                  ^<^ {|px solid"><tr><td align="center" |} ^<^ td_prop ^^^ {|>|}
+                  ^<^ s ^>^ {|</td></tr></table>|}
                 else s
               in
               2 * ncol - 1, CenterA, TDitem s
@@ -1291,45 +1213,55 @@ let make_tree_hts conf base gv p =
 let print_tree conf base v p =
   let gv = min (limit_by_tree conf) v in
   let page_title =
+    let s = gen_person_text ~html:false conf base p in
     translate_eval
-      (let s = person_text_no_html conf base p in
-       transl_a_of_gr_eq_gen_lev conf (transl conf "descendants") s s)
+      (transl_a_of_gr_eq_gen_lev conf
+         (transl conf "descendants")
+         (s : Adef.safe_string :> string)
+         (s : Adef.safe_string :> string))
+    |> Adef.safe
   in
   let hts = make_tree_hts conf base gv p in
-  DagDisplay.print_slices_menu_or_dag_page conf page_title hts ""
+  DagDisplay.print_slices_menu_or_dag_page conf page_title hts (Adef.escaped "")
 
 let print_aboville conf base max_level p =
   let max_level = min (Perso.limit_desc conf) max_level in
   let num_aboville = p_getenv conf.env "num" = Some "on" in
   Hutil.header conf (descendants_title conf base p);
   Hutil.print_link_to_welcome conf true;
-  Output.printf conf "%s.<br><p>" (Utf8.capitalize_fst (text_to conf max_level));
+  (text_to conf max_level : Adef.safe_string :> string)
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf ".<br><p>" ;
   let rec loop_ind lev lab p =
-    if num_aboville then Output.printf conf "<tt>%s</tt>\n" lab
-    else Output.printf conf "%s\n" lab;
-    Output.printf conf "%s%s\n" (referenced_person_title_text conf base p)
-      (DateDisplay.short_dates_text conf base p);
+    if num_aboville then begin
+      Output.print_sstring conf "<tt>" ;
+      Output.print_string conf lab ;
+      Output.print_sstring conf "</tt>"
+    end else Output.print_string conf lab ;
+    Output.print_string conf (referenced_person_title_text conf base p) ;
+    Output.print_string conf (DateDisplay.short_dates_text conf base p) ;
     let u = p in
     if lev < max_level then
       for i = 0 to Array.length (get_family u) - 1 do
         let cpl = foi base (get_family u).(i) in
         let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
-        let mdate =
-          if authorized_age conf base p && authorized_age conf base spouse
-          then
-            let fam = foi base (get_family u).(i) in
-            match Adef.od_of_cdate (get_marriage fam) with
-              Some (Dgreg (d, _)) ->
-                let date = DateDisplay.prec_year_text conf d in
-                "<font size=\"-2\"><em>" ^ date ^ "</em></font>"
-            | _ -> ""
-          else ""
-        in
-        Output.printf conf "&amp;%s %s%s\n" mdate
-          (referenced_person_title_text conf base spouse)
-          (DateDisplay.short_dates_text conf base spouse)
+        Output.print_sstring conf "&amp;" ;
+        if authorized_age conf base p
+        && authorized_age conf base spouse
+        then begin
+          let fam = foi base (get_family u).(i) in
+          match Adef.od_of_cdate (get_marriage fam) with
+          | Some (Dgreg (d, _)) ->
+            Output.print_sstring conf {|<font size="-2"><em>|} ;
+            Output.print_sstring conf (DateDisplay.prec_year_text conf d) ;
+            Output.print_sstring conf "</em></font> "
+          | _ -> Output.print_sstring conf " "
+        end else Output.print_sstring conf " " ;
+        Output.print_string conf (referenced_person_title_text conf base spouse) ;
+        Output.print_string conf (DateDisplay.short_dates_text conf base spouse)
       done;
-    Output.print_string conf "<br>\n";
+    Output.print_sstring conf "<br>";
     if lev < max_level then
       let rec loop_fam cnt_chil i =
         if i = Array.length (get_family u) then ()
@@ -1341,10 +1273,9 @@ let print_aboville conf base max_level p =
             else
               begin
                 loop_ind (lev + 1)
-                  (if num_aboville then lab ^ string_of_int cnt_chil ^ "."
-                   else
-                     lab ^
-                     "<span class=\"descends_aboville_pipe\">&nbsp;</span>")
+                  (if num_aboville
+                   then lab ^>^ string_of_int cnt_chil ^ "."
+                   else lab ^>^ {|<span class="descends_aboville_pipe">&nbsp;</span>|})
                   (pget conf base (get_children des).(j));
                 loop_chil (cnt_chil + 1) (j + 1)
               end
@@ -1353,7 +1284,8 @@ let print_aboville conf base max_level p =
       in
       loop_fam 1 0
   in
-  loop_ind 0 "" p; Hutil.trailer conf
+  loop_ind 0 (Adef.safe "") p;
+  Hutil.trailer conf
 
 let desmenu_print = Perso.interp_templ "desmenu"
 
@@ -1370,7 +1302,7 @@ let print conf base p =
   if templ <> "" then Perso.interp_templ templ conf base p
   else
     match p_getenv conf.env "t", p_getint conf.env "v" with
-      Some "B", Some v -> print_aboville conf base v p
+    | Some "B", Some v -> print_aboville conf base v p
     | Some "S", Some v -> display_descendants_level conf base v p
     | Some "K", Some v -> display_descendant_with_table conf base v p
     | Some "N", Some v -> display_descendants_with_numbers conf base v p

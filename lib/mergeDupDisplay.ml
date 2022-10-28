@@ -1,133 +1,126 @@
-(* $Id: mergeDup.ml,v 5.9 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
+open Def
 open Config
 open Gwdb
 open Util
 
 let print_link conf base p =
-  Output.printf conf "<a href=\"%s%s\">" (commd conf) (acces conf base p);
-  Output.printf conf "%s.%d %s" (sou base (get_first_name p)) (get_occ p)
-    (sou base (get_surname p));
-  Output.print_string conf "</a>";
+  Output.print_sstring conf "<a href=\"";
+  Output.print_string conf (commd conf);
+  Output.print_string conf (acces conf base p);
+  Output.print_sstring conf "\">";
+  Output.print_string conf (get_first_name p |> sou base |> escape_html);
+  Output.print_sstring conf ".";
+  Output.print_sstring conf (get_occ p |> string_of_int);
+  Output.print_sstring conf " ";
+  Output.print_string conf (get_surname p |> sou base |> escape_html);
+  Output.print_sstring conf "</a>";
   Output.print_string conf (DateDisplay.short_dates_text conf base p);
   match main_title conf base p with
-    Some t -> Output.print_string conf (one_title_text base t)
+  | Some t -> Output.print_string conf (one_title_text base t)
   | None -> ()
 
 let print_no_candidate conf base p =
   let title _ =
-    Output.printf conf "%s\n"
-      (Utf8.capitalize_fst
-         (transl_decline conf "merge" (transl conf "possible duplications")))
+    transl conf "possible duplications"
+    |> transl_decline conf "merge"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "not found"));
-  Output.print_string conf "<ul>\n";
-  Output.print_string conf "<li>\n";
+  transl conf "not found" |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Output.print_sstring conf "<ul><li>";
   print_link conf base p;
-  Output.print_string conf "</li>\n";
-  Output.print_string conf "</ul>\n";
+  Output.print_sstring conf "</li></ul>";
   Hutil.trailer conf
 
 let input_excl string_of_i excl =
-  List.fold_left
-    (fun s (i1, i2) ->
-       let t = string_of_i i1 ^ "," ^ string_of_i i2 in
-       if s = "" then t else s ^ "," ^ t)
-    "" excl
+  List.fold_left begin fun (s : Adef.encoded_string) (i1, i2) ->
+    let t = string_of_i i1 ^^^ "," ^<^ string_of_i i2 in
+    if (s :> string) = "" then t else s ^^^ "," ^<^ t
+  end (Adef.encoded "") excl
 
 let print_input_excl conf string_of_i excl excl_name =
   let s = input_excl string_of_i excl in
-  if s = "" then ()
-  else
-    Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
-      excl_name s
+  if (s :> string) <> "" then Util.hidden_input conf excl_name s
+
+let print_submit conf name value =
+  Output.print_sstring conf {|<input type="submit" name="|};
+  Output.print_sstring conf name;
+  Output.print_sstring conf {|" value="|};
+  Output.print_sstring conf (transl_nth conf "Y/N" value);
+  Output.print_sstring conf {|" style="margin-right:4px">|}
 
 let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
-  let title _ = Output.printf conf "%s\n" (Utf8.capitalize_fst (transl conf "merge")) in
+  let title _ = transl conf "merge" |> Utf8.capitalize_fst |> Output.print_sstring conf in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.print_string conf "<h2>\n";
+  Output.print_sstring conf "<h2>";
   title false;
-  Output.print_string conf "</h2>\n";
+  Output.print_sstring conf "</h2>";
   Hutil.print_link_to_welcome conf true;
-  Output.print_string conf "<ul>\n";
-  Output.print_string conf "<li>\n";
+  Output.print_sstring conf "<ul><li>";
   print_link conf base (poi base ip1);
-  Output.print_string conf "</li>\n";
-  Output.print_string conf "<li>\n";
+  Output.print_sstring conf "</li><li>";
   print_link conf base (poi base ip2);
-  Output.print_string conf "</li>\n";
-  Output.print_string conf "</ul>\n";
-  Output.print_string conf "<p>\n";
-  Output.printf conf "%s ?\n" (Utf8.capitalize_fst (transl conf "merge"));
-  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.print_sstring conf "</li></ul><p>";
+  transl conf "merge" |> Utf8.capitalize_fst |> Output.print_sstring conf ;
+  Output.print_sstring conf " ?\n" ; (* FIXME: trans *)
+  Output.print_sstring conf {|<form method="post" action="|} ;
+  Output.print_sstring conf conf.command;
+  Output.print_sstring conf {|">|} ;
   Util.hidden_env conf;
-  Output.print_string conf
-    "<input type=\"hidden\" name=\"m\" value=\"MRG_DUP_IND_Y_N\">\n";
-  Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n"
-    (string_of_iper ip);
-  print_input_excl conf string_of_iper ((ip1, ip2) :: iexcl) "iexcl";
-  print_input_excl conf string_of_ifam fexcl "fexcl";
-  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
-    (string_of_iper ip1);
-  Output.printf conf "<input type=\"hidden\" name=\"select\" value=\"%s\">\n"
-    (string_of_iper ip2);
-  Output.printf conf "<input type=\"submit\" name=\"answer_y\" value=\"%s\">\n"
-    (transl_nth conf "Y/N" 0);
-  Output.printf conf "<input type=\"submit\" name=\"answer_n\" value=\"%s\">\n"
-    (transl_nth conf "Y/N" 1);
-  Output.print_string conf "</form>\n";
-  Output.print_string conf "</p>\n";
+  Util.hidden_input conf "m" (Adef.encoded "MRG_DUP_IND_Y_N");
+  Util.hidden_input conf "ip" (string_of_iper ip |> Mutil.encode);
+  print_input_excl conf (fun x -> string_of_iper x |> Mutil.encode) ((ip1, ip2) :: iexcl) "iexcl";
+  print_input_excl conf (fun x -> string_of_ifam x |> Mutil.encode) fexcl "fexcl";
+  Util.hidden_input conf "i" (string_of_iper ip1 |> Mutil.encode);
+  Util.hidden_input conf "select" (string_of_iper ip2 |> Mutil.encode);
+  print_submit conf "answer_y" 0;
+  print_submit conf "answer_n" 1;
+  Output.print_sstring conf "</form></p>";
   Hutil.trailer conf
 
 let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
   let title _ =
-    Output.printf conf "%s\n"
-      (Utf8.capitalize_fst
-         (transl_decline conf "merge" (transl_nth conf "family/families" 1)))
+    transl_nth conf "family/families" 1
+    |> transl_decline conf "merge"
+    |> Utf8.capitalize_fst
+    |> Output.print_sstring conf
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.print_string conf "<h2>\n";
+  Output.print_sstring conf "<h2>";
   title false;
-  Output.print_string conf "</h2>\n";
+  Output.print_sstring conf "</h2>";
   Hutil.print_link_to_welcome conf true;
   let (ip1, ip2) =
     let cpl = foi base ifam1 in Gwdb.get_father cpl, Gwdb.get_mother cpl
   in
-  Output.print_string conf "<ul>\n";
-  Output.print_string conf "<li>\n";
+  Output.print_sstring conf "<ul><li>";
   print_link conf base (poi base ip1);
-  Output.print_string conf "\n&amp;\n";
+  Output.print_sstring conf " &amp; ";
   print_link conf base (poi base ip2);
-  Output.print_string conf "</li>\n";
-  Output.print_string conf "<li>\n";
+  Output.print_sstring conf "</li><li>";
   print_link conf base (poi base ip1);
-  Output.print_string conf "\n&amp;\n";
+  Output.print_sstring conf " &amp; ";
   print_link conf base (poi base ip2);
-  Output.print_string conf "</li>\n";
-  Output.print_string conf "</ul>\n";
-  Output.print_string conf "<p>\n";
-  Output.printf conf "%s ?\n" (Utf8.capitalize_fst (transl conf "merge"));
-  Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
+  Output.print_sstring conf "</li></ul><p>";
+  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "merge"));
+  Output.print_sstring conf " ? ";
+  Output.print_sstring conf {|<form method="post" action="|};
+  Output.print_sstring conf conf.command;
+  Output.print_sstring conf {|">|};
   Util.hidden_env conf;
-  Output.print_string conf
-    "<input type=\"hidden\" name=\"m\" value=\"MRG_DUP_FAM_Y_N\">\n";
-  Output.printf conf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n"
-    (string_of_iper ip);
-  print_input_excl conf string_of_iper iexcl "iexcl";
-  print_input_excl conf string_of_ifam ((ifam1, ifam2) :: fexcl) "fexcl";
-  Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
-    (string_of_ifam ifam1);
-  Output.printf conf "<input type=\"hidden\" name=\"i2\" value=\"%s\">\n"
-    (string_of_ifam ifam2);
-  Output.printf conf "<input type=\"submit\" name=\"answer_y\" value=\"%s\">\n"
-    (transl_nth conf "Y/N" 0);
-  Output.printf conf "<input type=\"submit\" name=\"answer_n\" value=\"%s\">\n"
-    (transl_nth conf "Y/N" 1);
-  Output.print_string conf "</form>\n";
-  Output.print_string conf "</p>\n";
+  Util.hidden_input conf "m" (Adef.encoded "MRG_DUP_FAM_Y_N") ;
+  Util.hidden_input conf "ip" (string_of_iper ip |> Mutil.encode) ;
+  print_input_excl conf (fun x -> string_of_iper x |> Mutil.encode) iexcl "iexcl";
+  print_input_excl conf (fun x -> string_of_ifam x |> Mutil.encode) ((ifam1, ifam2) :: fexcl) "fexcl";
+  Util.hidden_input conf "i" (string_of_ifam ifam1 |> Mutil.encode) ;
+  Util.hidden_input conf "i2" (string_of_ifam ifam2 |> Mutil.encode) ;
+  print_submit conf "answer_y" 0;
+  print_submit conf "answer_n" 1;
+  Output.print_sstring conf "</form></p>";
   Hutil.trailer conf
 
 let main_page conf base =

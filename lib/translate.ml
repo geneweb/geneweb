@@ -276,9 +276,7 @@ and eval_rec str =
         let j =
           if j > String.length str
           then
-            Opt.default
-              (String.length str - 1)
-              (String.rindex_opt str ')')
+            Option.value ~default:(String.length str - 1) (String.rindex_opt str ')')
           else j
         in
         let sstr = eval (String.sub str (i + 2) (j - i - 2)) in

@@ -38,8 +38,8 @@ let getn conf var key =
   | None -> failwith (var ^ "_" ^ key ^ " unbound")
 
 let reconstitute_somebody conf var =
-  let first_name = no_html_tags (only_printable (getn conf var "fn")) in
-  let surname = no_html_tags (only_printable (getn conf var "sn")) in
+  let first_name = only_printable (getn conf var "fn") in
+  let surname = only_printable (getn conf var "sn") in
   (* S'il y a des caractères interdits, on les supprime *)
   let (first_name, surname) =
     let contain_fn = String.contains first_name in
@@ -70,9 +70,9 @@ let reconstitute_somebody conf var =
   first_name, surname, occ, create, var
 
 let reconstitute_parent_or_child conf var default_surname =
-  let first_name = no_html_tags (only_printable (getn conf var "fn")) in
+  let first_name = only_printable (getn conf var "fn") in
   let surname =
-    let surname = no_html_tags (only_printable (getn conf var "sn")) in
+    let surname = only_printable (getn conf var "sn") in
     if surname = "" then default_surname else surname
   in
   (* S'il y a des caractères interdits, on les supprime *)
@@ -207,14 +207,14 @@ let rec reconstitute_events conf ext cnt =
         | "#marl" -> Efam_MarriageLicense
         | "#pacs" -> Efam_PACS
         | "#resi" -> Efam_Residence
-        | n -> Efam_Name (no_html_tags (only_printable n))
+        | n -> Efam_Name (only_printable n)
       in
       let efam_date =
         Update.reconstitute_date conf ("e_date" ^ string_of_int cnt)
       in
       let efam_place =
         match get_nth conf "e_place" cnt with
-          Some place -> no_html_tags (only_printable place)
+          Some place -> only_printable place
         | _ -> ""
       in
       let efam_note =
@@ -408,7 +408,7 @@ let reconstitute_from_fevents
       relation, date, place, note, src
     else marr
   in
-  let div = Opt.default NotDivorced !found_divorce in
+  let div = Option.value ~default:NotDivorced !found_divorce in
   marr, div, wit
 
 let reconstitute_family conf base nsck =
@@ -559,8 +559,10 @@ let strip_array_persons pl =
 
 let error_family conf err =
   Update.prerr conf err @@ fun () ->
-  err |> Update.string_of_error conf |> Utf8.capitalize_fst |> Output.print_string conf;
-  Output.print_string conf "\n";
+  (err |> Update.string_of_error conf : Adef.safe_string :> string)
+  |> Utf8.capitalize_fst
+  |> Output.print_sstring conf ;
+  Output.print_sstring conf "\n";
   Update.print_return conf
 
 let check_parents conf cpl =
@@ -568,17 +570,17 @@ let check_parents conf cpl =
     let (fn, sn, _, _, _) = get cpl in
     if fn = "" then
       if sn <> "" then
-        Some (Update.UERR_missing_first_name (transl_nth conf "father/mother" i))
+        Some (Update.UERR_missing_first_name (transl_nth conf "father/mother" i |> Adef.safe))
       else None
     else if sn = "" then
-      Some (Update.UERR_missing_surname (transl_nth conf "father/mother" i))
+      Some (Update.UERR_missing_surname (transl_nth conf "father/mother" i |> Adef.safe))
     else None
   in
   match check Gutil.father 0 with
   | Some _ as err -> err
   | None -> check Gutil.mother 1
 
-let check_family conf fam cpl =
+let check_family conf fam cpl : (Update.update_error option * Update.update_error option) =
   let err_parents = check_parents conf cpl in
   let err_fevent_witness =
     Update.check_missing_witnesses_names conf (fun e -> e.efam_witnesses) fam.fevents
@@ -595,11 +597,14 @@ let strip_family fam des =
 let print_err_parents conf base p =
   let err = Update.UERR_already_has_parents (base, p) in
   Update.prerr conf err @@ fun () ->
-  Output.printf conf "\n%s<p><ul><li>%s%s %d</li></ul>"
-    (Update.string_of_error conf err)
-    (Utf8.capitalize_fst (transl conf "first free number"))
-    (Util.transl conf ":")
-    (Gutil.find_free_occ base (p_first_name base p) (p_surname base p));
+  Output.print_sstring conf "\n" ;
+  Output.print_string conf (Update.string_of_error conf err) ;
+  Output.print_sstring conf "<p><ul><li>" ;
+  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "first free number")) ;
+  Output.print_sstring conf (Util.transl conf ":") ;
+  Output.print_sstring conf
+  @@ string_of_int @@ Gutil.find_free_occ base (p_first_name base p) (p_surname base p);
+  Output.print_sstring conf "</li></ul>" ;
   Update.print_return conf
 
 let print_err_sex conf base p =
@@ -609,12 +614,12 @@ let print_err_sex conf base p =
   Update.print_return conf
 
 let print_err conf =
-  let err = Update.UERR (transl conf "error" |> Utf8.capitalize_fst) in
+  let err = Update.UERR (transl conf "error" |> Utf8.capitalize_fst |> Adef.safe) in
   Update.prerr conf err @@ fun () ->
   Update.print_return conf
 
 let print_error_disconnected conf =
-  let err = Update.UERR (transl conf "msg error disconnected" |> Utf8.capitalize_fst) in
+  let err = Update.UERR (transl conf "msg error disconnected" |> Utf8.capitalize_fst |> Adef.safe) in
   Update.prerr conf err @@ fun () ->
   Hutil.print_link_to_welcome conf true;
   Output.print_string conf (Update.string_of_error conf err)
@@ -999,7 +1004,7 @@ let effective_inv conf base ip u ifam =
       else ifam1 :: loop (ifam2 :: ifaml)
     | _ ->
       Hutil.incorrect_request conf ;
-      raise @@ Update.ModErr (Update.UERR (__FILE__ ^ " " ^ string_of_int __LINE__))
+      raise @@ Update.ModErr (Update.UERR (__FILE__ ^ " " ^ string_of_int __LINE__ |> Adef.safe))
   in
   let u = {family = Array.of_list (loop (Array.to_list (get_family u)))} in
   patch_union base ip u
@@ -1101,71 +1106,67 @@ let all_checks_family conf base ifam gen_fam cpl des scdo =
 let print_family conf base (wl, ml) cpl des =
   let rdsrc =
     match p_getenv conf.env "rdsrc" with
-      Some "on" -> p_getenv conf.env "src"
+    | Some "on" -> p_getenv conf.env "src"
     | _ -> p_getenv conf.env "dsrc"
   in
   begin match rdsrc with
-    Some x ->
+    | Some x ->
       conf.henv <- List.remove_assoc "dsrc" conf.henv;
       if x <> "" then conf.henv <- ("dsrc", Mutil.encode x) :: conf.henv
-  | None -> ()
+    | None -> ()
   end;
-  Output.print_string conf "<ul>\n";
-  Output.print_string conf "<li>";
+  Output.print_sstring conf "<ul>\n";
+  Output.print_sstring conf "<li>";
   Output.print_string conf
     (referenced_person_text conf base (poi base (Adef.father cpl)));
-  Output.print_string conf "</li>";
-  Output.print_string conf "\n";
-  Output.print_string conf "<li>";
+  Output.print_sstring conf "</li>";
+  Output.print_sstring conf "\n";
+  Output.print_sstring conf "<li>";
   Output.print_string conf
     (referenced_person_text conf base (poi base (Adef.mother cpl)));
-  Output.print_string conf "</li>";
-  Output.print_string conf "</ul>\n";
+  Output.print_sstring conf "</li>";
+  Output.print_sstring conf "</ul>\n";
   if des.children <> [| |] then
     begin
-      Output.print_string conf "<ul>\n";
+      Output.print_sstring conf "<ul>\n";
       Array.iter
         (fun ip ->
-           Output.print_string conf "<li>";
+           Output.print_sstring conf "<li>";
            Output.print_string conf
              (referenced_person_text conf base (poi base ip));
-           Output.print_string conf "</li>")
+           Output.print_sstring conf "</li>")
         des.children;
-      Output.print_string conf "</ul>\n"
+      Output.print_sstring conf "</ul>\n"
     end;
   Update.print_warnings_and_miscs conf base wl ml
 
+let print_title conf fmt _ =
+  Output.print_sstring conf (Utf8.capitalize_fst (transl conf fmt))
+
 let print_mod_ok conf base (wl, ml) cpl des =
-  let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (transl conf "family modified"))
-  in
-  Hutil.header conf title;
+  Hutil.header conf @@ print_title conf "family modified" ;
   Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then
     begin
-      Output.print_string conf "<h3 class=\"error\">";
+      Output.print_sstring conf "<h3 class=\"error\">";
       Output.printf conf (fcapitale (ftransl conf "%s forbidden char"))
         (List.fold_left (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ") " "
            Name.forbidden_char);
-      Output.print_string conf "</h3>\n";
+      Output.print_sstring conf "</h3>\n";
       List.iter (Output.printf conf "<p>%s</p>") !removed_string
     end;
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
 let print_change_event_order_ok conf base (wl, ml) cpl des =
-  let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (transl conf "family modified"))
-  in
-  Hutil.header conf title;
+  Hutil.header conf @@ print_title conf "family modified" ;
   Hutil.print_link_to_welcome conf true;
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
 let print_add_ok conf base (wl, ml) cpl des =
-  let title _ = Output.print_string conf (Utf8.capitalize_fst (transl conf "family added")) in
-  Hutil.header conf title;
+  Hutil.header conf @@ print_title conf "family added" ;
   Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then
@@ -1178,19 +1179,15 @@ let print_add_ok conf base (wl, ml) cpl des =
   Hutil.trailer conf
 
 let print_del_ok conf base wl =
-  let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (transl conf "family deleted"))
-  in
-  Hutil.header conf title;
+  Hutil.header conf @@ print_title conf "family deleted" ;
   Hutil.print_link_to_welcome conf true;
   begin match p_getenv conf.env "ip" with
-    Some i ->
+    | Some i ->
       let p = poi base (iper_of_string i) in
-      Output.print_string conf "<ul>\n";
-      Output.print_string conf "<li>\n";
-      Output.printf conf "%s\n" (reference conf base p (person_text conf base p));
-      Output.print_string conf "</ul>\n"
-  | _ -> ()
+      Output.print_sstring conf "<ul><li>";
+      Output.print_string conf (reference conf base p (gen_person_text conf base p));
+      Output.print_sstring conf "\n</ul>"
+    | _ -> ()
   end;
   Update.print_warnings conf base wl;
   Hutil.trailer conf
@@ -1211,13 +1208,11 @@ let print_del conf base =
   | _ -> Hutil.incorrect_request conf
 
 let print_inv_ok conf base p =
-  let title _ =
-    Output.print_string conf (Utf8.capitalize_fst (transl conf "inversion done"))
-  in
-  Hutil.header conf title;
+  Hutil.header conf @@ print_title conf "inversion done";
   Hutil.print_link_to_welcome conf true;
-  Output.printf conf "\n%s" (referenced_person_text conf base p);
-  Output.print_string conf "\n";
+  Output.print_sstring conf "\n";
+  Output.print_string conf (referenced_person_text conf base p);
+  Output.print_sstring conf "\n";
   Hutil.trailer conf
 
 let get_create (_, _, _, create, _) = create
@@ -1337,7 +1332,7 @@ let print_add_parents o_conf base =
        ; efam_witnesses = [| |] } ]
   && sfam.comment = ""
   && sfam.origin_file = ""
-  && sfam.fsources = Opt.to_string @@ p_getenv conf.env "dsrc"
+  && sfam.fsources = Option.value ~default:"" (p_getenv conf.env "dsrc")
   && sfam.fam_index = dummy_ifam
   then match Adef.father scpl, Adef.mother scpl, sdes.children with
     | ( (ff, fs, fo, Update.Link, _)

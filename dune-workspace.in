@@ -1,3 +1,10 @@
-(lang dune 2.7.1)
+(lang dune 2.7)
+
 (context default)
+
 (profile %%%DUNE_PROFILE%%%)
+
+(env
+ (dev
+  (flags
+   (:standard -w +a-4-9-40-42-48-69-70))))

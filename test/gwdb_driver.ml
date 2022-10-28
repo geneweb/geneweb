@@ -111,9 +111,9 @@ and get_fevents _ = assert false
 and get_first_name _ = assert false
 and get_first_names_aliases _ = assert false
 and get_fsources _ = assert false
-and get_ifam (base, i) = i
+and get_ifam (_base, i) = i
 and get_image _ = assert false
-and get_iper (base, i) = i
+and get_iper (_base, i) = i
 and get_marriage _ = assert false
 and get_marriage_note _ = assert false
 and get_marriage_place _ = assert false
@@ -210,3 +210,6 @@ and sync ?scratch:_ = assert false
 and write_nldb _ = assert false
 
 let no_couple = Adef.couple dummy_iper dummy_iper
+
+let eq_iper _= assert false
+let eq_ifam _= assert false

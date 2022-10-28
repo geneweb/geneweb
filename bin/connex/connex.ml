@@ -1,6 +1,5 @@
 (* Copyright (c) 1999 INRIA *)
 
-open Geneweb
 open Def
 open Gwdb
 

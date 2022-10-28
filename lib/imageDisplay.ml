@@ -3,6 +3,19 @@
 
 open Config
 
+let print_placeholder_gendered_portrait conf p size =
+  let open Gwdb in
+  let image, alt =
+    match get_sex p with
+    | Male -> ("male.png", "M")
+    | Female -> ("female.png", "F")
+    | Neuter -> ("sexunknown.png", "?")
+  in
+  Output.printf conf
+    {|<img src="%s/%s" alt="%s" title="sex" width="%d" height="%d">|}
+    (Image.prefix conf |> Adef.as_string)
+    image alt size size
+
 (* ************************************************************************** *)
 (*  [Fonc] content : string -> int -> string -> unit                          *)
 (** [Description] : Envoie les en-têtes de contenu et de cache pour un fichier
@@ -25,21 +38,24 @@ let content conf ct len fname =
   Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
   Output.flush conf
 
-(* ************************************************************************** *)
-(*  [Fonc] print_image_type : string -> string -> bool                        *)
-(** [Description] : Affiche une image (avec ses en-têtes) en réponse HTTP en
-                    utilisant Wserver.
-    [Args] :
-      - fname : le chemin vers le fichier image
-      - ctype : le content_type MIME du fichier, par exemple "image/png",
-                "image/jpeg" ou "application/pdf"
-    [Retour] : True si le fichier image existe et qu'il a été servi en réponse
-               HTTP.
-    [Rem] : Ne pas utiliser en dehors de ce module.                           *)
-(* ************************************************************************** *)
-let print_image_type conf fname ctype =
-  match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
-    Some ic ->
+let print_image_file conf fname =
+  let res = List.find_opt
+    (fun (suff, _ctype) ->
+       if Filename.check_suffix fname suff ||
+          Filename.check_suffix fname (String.uppercase_ascii suff)
+       then
+         true
+       else false)
+    [(".png", "image/png"); (".jpg", "image/jpeg");
+     (".jpeg", "image/jpeg"); (".pjpeg", "image/jpeg");
+     (".gif", "image/gif"); (".pdf", "application/pdf");
+     (".htm", "text/html"); (".html", "text/html")]
+  in
+  match res with
+  | None -> Error (Format.sprintf "Could not find mime type from extension for file: %s" fname)
+  | Some (_suff, ctype) ->
+    try
+      let ic = Secure.open_in_bin fname in
       let buf = Bytes.create 1024 in
       let len = in_channel_length ic in
       content conf ctype len fname;
@@ -48,36 +64,17 @@ let print_image_type conf fname ctype =
         else
           let olen = min (Bytes.length buf) len in
           really_input ic buf 0 olen;
-          Output.print_string conf (Bytes.sub_string buf 0 olen);
+          Output.print_sstring conf (Bytes.sub_string buf 0 olen);
           loop (len - olen)
       in
-      loop len; close_in ic; true
-  | None -> false
+      loop len; close_in ic;
+      Ok ()
+    with Sys_error e ->
+      !GWPARAM.syslog `LOG_ERR (Format.sprintf "Error printing image file content for %s : %s" fname e);
+      Error e
 
 (* ************************************************************************** *)
-(*  [Fonc] print_image_file : string -> bool                                  *)
-(** [Description] : Affiche une image (avec ses en-têtes) en réponse HTTP en
-                    utilisant Wserver. Le type MIME de l'image est deviné à
-                    partir de l'extension contenu dans le nom du fichier.
-    [Args] :
-      - fname : le nom du fichier image
-    [Retour] : True si l'image a pu être affichée                           *)
-(* ************************************************************************** *)
-let print_image_file conf fname =
-  List.exists
-    (fun (suff, ctype) ->
-       if Filename.check_suffix fname suff ||
-          Filename.check_suffix fname (String.uppercase_ascii suff)
-       then
-         print_image_type conf fname ctype
-       else false)
-    [(".png", "image/png"); (".jpg", "image/jpeg");
-     (".jpeg", "image/jpeg"); (".pjpeg", "image/jpeg");
-     (".gif", "image/gif"); (".pdf", "application/pdf");
-     (".htm", "text/html"); (".html", "text/html")]
-
-(* ************************************************************************** *)
-(*  [Fonc] print_personal_image : Config.config -> Gwdb.base -> Gwdb.person -> unit *)
+(*  [Fonc] print_portrait : Config.config -> Gwdb.base -> Gwdb.person -> unit *)
 (** [Description] : Affiche l'image d'une personne en réponse HTTP.
     [Args] :
       - conf : configuration de la requête
@@ -86,14 +83,15 @@ let print_image_file conf fname =
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-let print_personal_image conf base p =
-  match Util.image_and_size conf base p (fun _ _ -> Some (1, 1)) with
-    Some (true, f, _) ->
-      if print_image_file conf f then () else Hutil.incorrect_request conf
-  | _ -> Hutil.incorrect_request conf
+let print_portrait conf base p =
+  match Image.get_portrait conf base p with
+    Some `Path path ->
+      Result.fold ~ok:ignore ~error:(fun _ -> Hutil.incorrect_request conf)
+        (print_image_file conf path)
+  | Some (`Url _) | None -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
-(*  [Fonc] print_source_image : Config.config -> string -> unit               *)
+(*  [Fonc] print_source : Config.config -> string -> unit               *)
 (** [Description] : Affiche une image à partir de son basename uniquement en
                     la cherchant dans les dossiers d'images.
     [Args] :
@@ -102,13 +100,14 @@ let print_personal_image conf base p =
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-let print_source_image conf f =
+let print_source conf f =
   let fname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
   if fname = Filename.basename fname then
-    let fname = Util.source_image_file_name conf.bname fname in
-    if print_image_file conf fname then () else Hutil.incorrect_request conf
+    let fname = Image.source_filename conf.bname fname in
+    Result.fold ~ok:ignore ~error:(fun _ -> Hutil.incorrect_request conf)
+      (print_image_file conf fname)
   else Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
@@ -116,25 +115,26 @@ let print_source_image conf f =
 (* ************************************************************************** *)
 let print conf base =
   match Util.p_getenv conf.env "s" with
-    Some f -> print_source_image conf f
+  | Some f -> print_source conf f
   | None ->
       match Util.find_person_in_env conf base "" with
-        Some p -> print_personal_image conf base p
-      | _ -> Hutil.incorrect_request conf
+      | Some p -> print_portrait conf base p
+      | None -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
 (*  [Fonc] print_html : config -> 'a -> unit                                  *)
 (* ************************************************************************** *)
 let print_html conf =
   Util.html conf;
-  Output.print_string conf "<head>\n";
-  Output.printf conf "  <title>%s</title>\n"
-    (Util.transl_nth conf "image/images" 0);
-  Output.print_string conf "</head>\n<body>\n";
-  Output.printf conf "<img src=\"%s" (Util.commd conf);
-  Mutil.list_iter_first
-    (fun first (k, v) ->
-       let v = if k = "m" then "IM" else v in
-       Output.printf conf "%s%s=%s" (if first then "" else "&") k v)
-    conf.env;
-  Output.print_string conf "\">\n</body>\n</html>"
+  Output.print_sstring conf "<head><title>" ;
+  Output.print_sstring conf (Util.transl_nth conf "image/images" 0) ;
+  Output.print_sstring conf "</title></head><body><img src=\"";
+  Output.print_string conf (Util.commd conf);
+  Mutil.list_iter_first begin fun first (k, v) ->
+    let v = if k = "m" then Adef.encoded "IM" else v in
+    if not first then Output.print_sstring conf "&" ;
+    Output.print_sstring conf k ;
+    Output.print_sstring conf "=" ;
+    Output.print_string conf v
+  end conf.env ;
+  Output.print_sstring conf "\"></body></html>"

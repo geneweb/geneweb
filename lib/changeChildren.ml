@@ -6,7 +6,7 @@ open Gwdb
 open Util
 
 let digest_children base ipl =
-  List.fold_left begin fun s ip ->
+  List.fold_left begin fun _s ip ->
     let p = poi base ip in
     sou base (get_first_name p) ^ "\n"
     ^ sou base (get_surname p) ^ "\n"
@@ -32,17 +32,6 @@ let check_conflict base p key new_occ ipl =
        get_occ p1 = new_occ
     then raise @@ ChangeChildrenConflict (p, p1)
   end ipl
-
-let rename_image_file conf base p (nfn, nsn, noc) =
-  match auto_image_file conf base p with
-    Some old_f ->
-      let s = default_image_name_of_key nfn nsn noc in
-      let f = Filename.concat (base_path ["images"] conf.bname) s in
-      let new_f =
-        if Filename.check_suffix old_f ".gif" then f ^ ".gif" else f ^ ".jpg"
-      in
-      (try Sys.rename old_f new_f with Sys_error _ -> ())
-  | _ -> ()
 
 let change_child conf base parent_surname changed ip =
   let p = poi base ip in
@@ -71,7 +60,7 @@ let change_child conf base parent_surname changed ip =
     let key = new_first_name ^ " " ^ new_surname in
     let ipl = Gutil.person_ht_find_all base key in
     check_conflict base p key new_occ ipl;
-    rename_image_file conf base p (new_first_name, new_surname, new_occ);
+    Image.rename_portrait conf base p (new_first_name, new_surname, new_occ);
     (* On ajoute les enfants dans le type Change_children_name       *)
     (* pour la future mise à jour de l'historique et du fichier gwf. *)
     let changed =

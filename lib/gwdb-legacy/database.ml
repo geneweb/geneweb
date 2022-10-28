@@ -668,7 +668,7 @@ let make_record_exists patches pending len = fun i ->
   || Hashtbl.find_opt patches i <> None
   || (i < len && i >= 0)
 
-let make_record_access perm ic ic_acc shift array_pos (plenr, patches) (_, pending) len name input_array input_item =
+let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending) len name input_array input_item =
   let tab = ref None in
   let cleared = ref false in
   let gen_get nopending i =
@@ -875,43 +875,43 @@ let opendb bname =
   let iper_exists = make_record_exists (snd patches.h_person) (snd pending.h_person) persons_len in
   let ifam_exists = make_record_exists (snd patches.h_family) (snd pending.h_family) families_len in
   let persons =
-    make_record_access perm ic ic_acc shift persons_array_pos patches.h_person pending.h_person
+    make_record_access ic ic_acc shift persons_array_pos patches.h_person pending.h_person
       persons_len "persons" (input_value : _ -> person array)
       (Iovalue.input : _ -> person)
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let ascends =
-    make_record_access perm ic ic_acc shift ascends_array_pos patches.h_ascend pending.h_ascend
+    make_record_access ic ic_acc shift ascends_array_pos patches.h_ascend pending.h_ascend
       persons_len "ascends" (input_value : _ -> ascend array)
       (Iovalue.input : _ -> ascend)
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let unions =
-    make_record_access perm ic ic_acc shift unions_array_pos patches.h_union pending.h_union
+    make_record_access ic ic_acc shift unions_array_pos patches.h_union pending.h_union
       persons_len "unions" (input_value : _ -> union array)
       (Iovalue.input : _ -> union)
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let families =
-    make_record_access perm ic ic_acc shift families_array_pos patches.h_family pending.h_family
+    make_record_access ic ic_acc shift families_array_pos patches.h_family pending.h_family
       families_len "families" (input_value : _ -> family array)
       (Iovalue.input : _ -> family)
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let couples =
-    make_record_access perm ic ic_acc shift couples_array_pos patches.h_couple pending.h_couple
+    make_record_access ic ic_acc shift couples_array_pos patches.h_couple pending.h_couple
       families_len "couples" (input_value : _ -> couple array)
       (Iovalue.input : _ -> couple)
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let descends =
-    make_record_access perm ic ic_acc shift descends_array_pos patches.h_descend pending.h_descend
+    make_record_access ic ic_acc shift descends_array_pos patches.h_descend pending.h_descend
       families_len "descends" (input_value : _ -> descend array)
       (Iovalue.input : _ -> descend)
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let strings =
-    make_record_access perm ic ic_acc shift strings_array_pos patches.h_string pending.h_string
+    make_record_access ic ic_acc shift strings_array_pos patches.h_string pending.h_string
       strings_len "strings" (input_value : _ -> string array)
       (Iovalue.input : _ -> string)
   in
@@ -1008,7 +1008,7 @@ let opendb bname =
       let tmp_fname = Filename.concat bname "1patches" in
       let fname = Filename.concat bname "patches" in
       let tm_oc = Secure.open_out_bin tm_fname in
-      output_string tm_oc tm ;
+      output_string tm_oc (tm : Adef.safe_string :> string) ;
       close_out tm_oc ;
       let oc_tmp = Secure.open_out_bin tmp_fname in
       output_string oc_tmp magic_patch ;

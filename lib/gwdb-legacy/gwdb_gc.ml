@@ -1,7 +1,6 @@
 open Dbdisk
 
 (* copied from Gwdb_driver *)
-let dummy_iper = -1
 let dummy_ifam = -1
 let empty_string = 0
 let quest_string = 1
