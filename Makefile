@@ -128,12 +128,12 @@ distrib:
 	  cp -f etc/Windows/README.txt $(DISTRIB_DIR)/README.txt; \
 	  cp -f etc/Windows/LISEZMOI.txt $(DISTRIB_DIR)/LISEZMOI.txt; \
 	elif test $(OS_TYPE) = "Darwin"; then \
-	  cp etc/gwd $(DISTRIB_DIR)/gwd.command; \
-	  cp etc/gwsetup $(DISTRIB_DIR)/gwsetup.command; \
+	  cp etc/gwd.sh $(DISTRIB_DIR)/gwd.command; \
+	  cp etc/gwsetup.sh $(DISTRIB_DIR)/gwsetup.command; \
 	  cp etc/macOS/geneweb.command $(DISTRIB_DIR); \
 	else \
-	  cp etc/gwd $(DISTRIB_DIR)/gwd.sh; \
-	  cp etc/gwsetup $(DISTRIB_DIR)/gwsetup.sh; \
+	  cp etc/gwd.sh $(DISTRIB_DIR)/gwd.sh; \
+	  cp etc/gwsetup.sh $(DISTRIB_DIR)/gwsetup.sh; \
 	fi
 	mkdir $(DISTRIB_DIR)/gw
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
