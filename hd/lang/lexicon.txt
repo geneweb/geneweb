@@ -2454,12 +2454,12 @@ co: un ziu/una zia/zii/zie/zii è zie
 cs: strýc/teta
 da: en onkel/en tante
 de: ein:d:+em Onkel/eine:d:+r Tante
-en: an %suncle/an %saunt/uncles/aunts/uncles and aunts
+en: an uncle/an aunt/uncles/aunts/uncles and aunts
 eo: onklo/onklino
 es: un tío/una tía
 et: onu/tädi
 fi: setä:g:---dän/täti:g:--din/eno:g:+n/täti:g:--din
-fr: un %soncle/une %stante
+fr: un oncle/une tante/oncles/tantes/oncles et tantes
 he:   דוד/ דודה
 is: föður(móður)bróðir/föður(móður)systir
 it: uno zio/una zia
