@@ -54,6 +54,7 @@ type config = {
   just_friend_wizard : bool;
   user : string;
   username : string;
+  userkey : string;
   auth_scheme : auth_scheme_kind;
   command : string;
   indep_command : string;
@@ -129,6 +130,7 @@ let empty =
     just_friend_wizard = false;
     user = "";
     username = "";
+    userkey = "";
     auth_scheme = NoAuth;
     command = "";
     indep_command = "";

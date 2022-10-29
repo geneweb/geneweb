@@ -258,6 +258,7 @@ let rec eval_variable conf = function
   | [ "url_set"; evar; str ] -> url_set_aux conf [ evar ] str
   | [ "user"; "ident" ] -> conf.user
   | [ "user"; "name" ] -> conf.username
+  | [ "user"; "key" ] -> conf.userkey
   | [ s ] -> eval_simple_variable conf s
   | _ -> raise Not_found
 

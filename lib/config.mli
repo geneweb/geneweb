@@ -45,6 +45,7 @@ type output_conf = {
 
 type env = (string * Adef.encoded_string) list
 
+(** Geneweb configuration data type *)
 type config = {
   from : string;
   api_mode : bool;
@@ -58,6 +59,7 @@ type config = {
   just_friend_wizard : bool;
   user : string;
   username : string;
+  userkey : string;
   auth_scheme : auth_scheme_kind;
   command : string;
   indep_command : string;
