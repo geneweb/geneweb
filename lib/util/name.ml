@@ -15,9 +15,12 @@ let unaccent_utf_8 lower s i =
     else fun n c -> String.make 1 c, n
   in
   let s, n =
-    Unidecode.decode fns fnc
-      (fun n -> String.sub s i (n - i), n)
-      s i (String.length s)
+    match Char.code s.[i] with
+    | 0xE2 when Char.code s.[i+1] = 0x80 && Char.code s.[i+2] = 0x99
+          -> "'", i + 3 (* ’ apostrophe typo *)
+    | _ -> Unidecode.decode fns fnc
+            (fun n -> String.sub s i (n - i), n)
+            s i (String.length s)
   in
   if lower then String.lowercase_ascii s, n else s, n
 

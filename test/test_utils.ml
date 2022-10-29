@@ -173,6 +173,64 @@ let datedisplay_string_of_date _ =
   ; test (Adef.safe "d[i |'marzu 1975") Dgregorian (0, 3, 1975)
   ; test (Adef.safe "4 d[i sittembre 1974") Dgregorian (4, 9, 1974)
 
+let name_unaccent_lower s =
+  let rec copy i len =
+    if i = String.length s then Buff.get len
+    else
+      let (t, j) = Name.unaccent_utf_8 true s i in copy j (Buff.mstore len t)
+  in
+  copy 0 0
+
+let name_unaccent _ =
+  let test a b =
+    assert_equal ~printer:(fun x -> x) a (Some.name_unaccent b)
+  in
+  let test_l a b =
+    assert_equal ~printer:(fun x -> x) a (name_unaccent_lower b)
+  in
+  let test_nl a b =
+    assert_equal ~printer:(fun x -> x) a (Name.lower b)
+  in
+  test "etienne" "étienne"
+  ; test "Etienne" "Étienne"
+  ; test "yvette" "ÿvette"
+  ; test "Yvette" "Ÿvette"
+  ; test "Etienne" "Ĕtienne"
+  (* apostrophes *)
+  ; test "L'homme" "L'homme"
+  ; test_l "l'homme" "L'homme"
+  ; test "L'homme" "L’homme"
+  ; test_l "l'homme" "L’homme"
+  (* unaccent performs cyrillic to latin translation! *)
+  ; test "Genri" "Генри"
+  ; test_l "genri" "ГЕНРИ"
+  (* Latin supplemental, vietnameese *)
+  ; test "Mien Dinh Nguyen Phuc" "Miên Định Nguyễn Phúc"
+  ; test_l "mien dinh nguyen phuc" "Miên Định Nguyễn Phúc"
+  ; test "aaaaaaaeceeeeiiiinooooouuuuyy"
+         "àáâãäåæçèéêëìíîïñòóôõöùúûüýÿ"
+  ; test "llnnnnooooerrrsssstttuuuuuuwyyzzz"
+         "ŀłńņňŋōŏőœŕŗřśŝşšţťŧũūŭůűųŵŷÿźżž"
+  ; test_nl "abcdefghijklmnopqrstuvwxyz"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
+(* Latin-1 supplement. C3 80 - "àáâãäåæçèéêëìíîïñòóôõöùúûüýÿ" *)
+  ; test_nl "aaaaaaaeceeeeiiiinooooouuuuyy"
+            "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝŸ"
+(* Latin-1 supplement. C4 80 - "āăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĳĵķĺļľ"*)
+  ; test_nl "aaaccccddeeeeegggghhiiiiiijjklll"
+            "ĀĂĄĆĈĊČĎĐĒĔĖĘĚĜĞĠĢĤĦĨĪĬĮİĲĴĶĹĻĽ"
+(* Latin-1 supplement. C5 80 - "ŀłńņňŋōŏőœŕŗřśŝşšţťŧũūŭůűųŵŷÿźżž" *)
+  ; test_nl "llnnnnooooerrrsssstttuuuuuuwyyzzz"
+            "ĿŁŃŅŇŊŌŎŐŒŔŖŘŚŜŞŠŢŤŦŨŪŬŮŰŲŴŶŸŹŻŽ"
+(* Latin-1 supplement. C5 80 - *)
+
+(* Latin-1 supplement. Greek, CE 80 - "αβγδεζηθικλμνξοπρςστυφχψωάέήίΰϊϋόύώ" *)
+(*     "abgde dz e th iklmnxopr ss tu ph kh ps o aeniaiyoyo" *)
+(*     "ΑΒΓΔΕ Ζ  Η Θ  ΙΚΛΜΝΞΟΠΡ ςΣ ΤΥ Φ  Χ  Ψ  Ω ΆΈήΊΰΪΫΌΎΏ" *)
+  ; test_nl "abgdedzethiklmnxoprsstuphkhpsoaeniaiyoyo"
+            "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡςΣΤΥΦΧΨΩΆΈήΊΰΪΫΌΎΏ"
+
+
 let suite =
   [ "Mutil" >:::
     [ "mutil_contains" >:: mutil_contains
@@ -194,5 +252,6 @@ let suite =
     ; "util_safe_html" >:: util_safe_html
     ; "util_string_with_macros" >:: util_string_with_macros
     ; "util_transl_a_of_b" >:: util_transl_a_of_b
+    ; "name_unaccent" >:: name_unaccent
     ]
   ]
