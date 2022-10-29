@@ -1,0 +1,6 @@
+(executables
+  (names check_apostr)
+  (public_names geneweb.check_apostr)
+  (modules check_apostr)
+  (libraries unix str geneweb.gwdb-legacy geneweb_sosa_zarith geneweb)
+)

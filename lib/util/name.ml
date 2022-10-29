@@ -5,7 +5,7 @@ let forbidden_char = [':'; '@'; '#'; '='; '$']
 
 (* Name.lower *)
 
-let unaccent_utf_8 lower s i =
+let unaccent_utf_8 ?(apostr=false) lower s i =
   let fns =
     if lower then fun n s -> String.lowercase_ascii s, n
     else fun n s -> s, n
@@ -16,8 +16,10 @@ let unaccent_utf_8 lower s i =
   in
   let s, n =
     match Char.code s.[i] with
-    | 0xE2 when Char.code s.[i+1] = 0x80 && Char.code s.[i+2] = 0x99
-          -> "'", i + 3 (* ’ apostrophe typo *)
+    | 0xE2 when apostr && Char.code s.[i+1] = 0x80 && 
+           (Char.code s.[i+2] = 0x98 || (* ’ apostrophes typo *)
+            Char.code s.[i+2] = 0x99)   (* ‘ autre apostrophe *)
+          -> " ", i + 3 (* ’ or ‘ autres apostrophes *)
     | _ -> Unidecode.decode fns fnc
             (fun n -> String.sub s i (n - i), n)
             s i (String.length s)
@@ -37,7 +39,7 @@ let next_chars_if_equiv s i t j =
     - chars no letters and no numbers (except '.') => spaces (stripped)
      Key comparison (first name, surname, number) applies "lower" equality
      on first names and surnames *)
-let lower s =
+let lower ?(apostr=false) s =
   let rec copy special i len =
     if i = String.length s then Buff.get len
     else if Char.code s.[i] < 0x80 then match s.[i] with
@@ -48,7 +50,10 @@ let lower s =
       | _ -> copy (len <> 0) (i + 1) len
     else
       let len = if special then Buff.store len ' ' else len in
-      let (t, j) = unaccent_utf_8 true s i in copy false j (Buff.mstore len t)
+      let (t, j) = unaccent_utf_8 ~apostr:apostr true s i in
+      copy false j (Buff.mstore len t)
+      (* après unaccent_utf_8, on devrait remplacer
+         les caractères speciaux par un espace *)
   in
   copy false 0 0
 

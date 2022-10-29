@@ -159,7 +159,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
         (fun (str, istr, iperl) l ->
            if x = Name.lower str then (str, istr, iperl) :: l else l)
         l [],
-      Name.lower
+      Name.lower ~apostr:false
     in
     let (l1, name_inj) =
       if l1 = [] then

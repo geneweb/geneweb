@@ -72,6 +72,7 @@ GENERATED_FILES_DEP = \
 	lib/gwlib.ml \
 	lib/util/dune \
 	benchmark/dune \
+	bin/check_apostr/dune \
 	bin/connex/dune \
 	bin/consang/dune \
 	bin/fixbase/dune \
@@ -138,6 +139,7 @@ distrib:
 	mkdir $(DISTRIB_DIR)/gw
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
 	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
+	cp $(BUILD_DISTRIB_DIR)check_apostr/check_apostr.exe $(DISTRIB_DIR)/gw/check_apostr$(EXT);
 	cp $(BUILD_DISTRIB_DIR)connex/connex.exe $(DISTRIB_DIR)/gw/connex$(EXT);
 	cp $(BUILD_DISTRIB_DIR)consang/consang.exe $(DISTRIB_DIR)/gw/consang$(EXT);
 	cp $(BUILD_DISTRIB_DIR)fixbase/gwfixbase.exe $(DISTRIB_DIR)/gw/gwfixbase$(EXT);
