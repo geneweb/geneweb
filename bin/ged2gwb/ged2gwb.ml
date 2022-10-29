@@ -1035,7 +1035,7 @@ let rebuild_text r =
        let n = strip_spaces n in
        match e.rlab with
          "CONC" -> s ^ n ^ end_spc
-       | "CONT" -> s ^ "<br>\n" ^ n ^ end_spc
+       | "CONT" -> s ^ "\n" ^ n ^ end_spc
        | _ -> s)
     s r.rsons
 
@@ -1049,7 +1049,7 @@ let notes_from_source_record rl =
   let text =
     match find_field "TEXT" rl with
       Some l ->
-        let s = rebuild_text l in if title = "" then s else "<br>\n" ^ s
+        let s = rebuild_text l in if title = "" then s else "\n" ^ s
     | None -> ""
   in
   title ^ text
@@ -1070,7 +1070,7 @@ let treat_notes gen rl =
            end
          else if lab = "CONT" || lab = "NOTE" then
            begin
-             Buffer.add_string buf "<br>\n";
+             Buffer.add_string buf "\n";
              Buffer.add_string buf n;
              Buffer.add_string buf (if end_spc then " " else "")
            end
@@ -1455,7 +1455,7 @@ let treat_indi_pevent gen ip r =
               let note =
                 let name_info = strip_spaces r.rval in
                 if name_info = "" || r.rval = "Y" then note
-                else name_info ^ "<br>\n" ^ note
+                else name_info ^ "\n" ^ note
               in
               let src =
                 match find_all_fields "SOUR" r.rsons with
@@ -1527,7 +1527,7 @@ let treat_indi_pevent gen ip r =
                let note =
                  let name_info = strip_spaces r.rval in
                  if name_info = "" || r.rval = "Y" then note
-                 else name_info ^ "<br>\n" ^ note
+                 else name_info ^ "\n" ^ note
                in
                let src =
                  match find_all_fields "SOUR" r.rsons with
@@ -2005,16 +2005,16 @@ let add_indi gen r =
       let s = if s1 = "" && notes = "" || s2 = "" then "" else s_sep in
       s1 ^ s ^ s2
     in
-    let text = concat_text "" (notes_from_source_record birth_nt) "<br>\n" in
-    let text = concat_text text (notes_from_source_record bapt_nt) "<br>\n" in
+    let text = concat_text "" (notes_from_source_record birth_nt) "\n" in
+    let text = concat_text text (notes_from_source_record bapt_nt) "\n" in
     let text =
-      concat_text text (notes_from_source_record death_nt) "<br>\n"
+      concat_text text (notes_from_source_record death_nt) "\n"
     in
     let text =
-      concat_text text (notes_from_source_record burial_nt) "<br>\n"
+      concat_text text (notes_from_source_record burial_nt) "\n"
     in
     let text =
-      concat_text text (notes_from_source_record psources_nt) "<br>\n"
+      concat_text text (notes_from_source_record psources_nt) "\n"
     in
     if !untreated_in_notes then
       let remain_tags_in_notes text init rtl =
@@ -2165,7 +2165,7 @@ let treat_fam_fevent gen ifath r =
               let note =
                 let name_info = strip_spaces r.rval in
                 if name_info = "" || r.rval = "Y" then note
-                else name_info ^ "<br>\n" ^ note
+                else name_info ^ "\n" ^ note
               in
               let src =
                 match find_all_fields "SOUR" r.rsons with
@@ -2246,7 +2246,7 @@ let treat_fam_fevent gen ifath r =
                let note =
                  let name_info = strip_spaces r.rval in
                  if name_info = "" || r.rval = "Y" then note
-                 else name_info ^ "<br>\n" ^ note
+                 else name_info ^ "\n" ^ note
                in
                let src =
                  match find_all_fields "SOUR" r.rsons with
@@ -2535,8 +2535,8 @@ let add_fam_norm gen r adop_list =
     let s = if s1 = "" then "" else s_sep in s1 ^ s ^ s2
   in
   let ext_sources =
-    let text = concat_text "" (notes_from_source_record marr_nt) "<br>\n" in
-    concat_text text (notes_from_source_record fsources_nt) "<br>\n"
+    let text = concat_text "" (notes_from_source_record marr_nt) "\n" in
+    concat_text text (notes_from_source_record fsources_nt) "\n"
   in
   let ext_notes =
     if !untreated_in_notes then
@@ -2559,7 +2559,7 @@ let add_fam_norm gen r adop_list =
       let notes =
         if notes = "" then ext_sources ^ ext_notes
         else if ext_sources = "" then notes ^ "\n" ^ ext_notes
-        else notes ^ "<br>\n" ^ ext_sources ^ ext_notes
+        else notes ^ "\n" ^ ext_sources ^ ext_notes
       in
       let new_notes = add_string gen notes in
       let p = { p with notes = new_notes } in
