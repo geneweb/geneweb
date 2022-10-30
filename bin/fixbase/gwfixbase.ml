@@ -160,7 +160,7 @@ let check
     end ;
     if v1 then (Printf.printf "Rebuilding the indexes..\n" ; flush stdout) ;
     Gwdb.sync base ;
-    if v1 then (Printf.printf "Done" ; flush stdout)
+    if v1 then (Printf.printf "Done\n" ; flush stdout)
   end
 
 (**/**)
