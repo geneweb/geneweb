@@ -19,7 +19,7 @@ let special_utf_8 s =
       | _ -> " "
   else s
 
-let unaccent_utf_8 ?(apostr=true) lower s i =
+let unaccent_utf_8 lower s i =
   let fns =
     if lower then fun n s -> String.lowercase_ascii s, n
     else fun n s -> s, n
@@ -29,16 +29,21 @@ let unaccent_utf_8 ?(apostr=true) lower s i =
     else fun n c -> String.make 1 c, n
   in
   let s, n =
-    match Char.code s.[i] with
-    | 0xE2 when apostr && Char.code s.[i+1] = 0x80 && 
-           (Char.code s.[i+2] = 0x98 || (* ’ apostrophes typo *)
-            Char.code s.[i+2] = 0x99)   (* ‘ autre apostrophe *)
-          -> " ", i + 3
-    | _ -> Unidecode.decode fns fnc
-            (fun n -> String.sub s i (n - i), n)
-            s i (String.length s)
+    Unidecode.decode fns fnc
+      (fun n -> String.sub s i (n - i), n)
+      s i (String.length s)
   in
   if lower then String.lowercase_ascii s, n else s, n
+
+let string_unaccent ?(special=false) lower s =
+  let rec copy i len =
+    if i = String.length s then Buff.get len
+    else
+      let (t, j) = unaccent_utf_8 lower s i in
+      let t = if special then special_utf_8 t else t in
+      copy j (Buff.mstore len t)
+  in
+  copy 0 0
 
 let next_chars_if_equiv s i t j =
   if i >= String.length s || j >= String.length t then None
@@ -64,8 +69,9 @@ let lower ?(apostr=true) s =
       | _ -> copy (len <> 0) (i + 1) len
     else
       let len = if special then Buff.store len ' ' else len in
-      let (t, j) = unaccent_utf_8 ~apostr:false false s i in
-      let t = if apostr && true then special_utf_8 t else t in
+      let (t, j) = unaccent_utf_8 false s i in
+      let t = if apostr then special_utf_8 t else t in
+      let t = String.lowercase_ascii t in
       copy false j (Buff.mstore len t)
       (* après unaccent_utf_8, on devrait remplacer
          les caractères speciaux par un espace *)

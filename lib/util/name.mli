@@ -8,7 +8,15 @@ val forbidden_char : char list
     between 0x00 and 0x7F) and [np] it's a position of next utf8 character inside [s]. If [lower]
     is true then [cs] will contain only lowercase letters.
     Example : unaccent_utf_8 "aÈa" 1 -> ("e",3) *)
-val unaccent_utf_8 : ?apostr:bool -> bool -> string -> int -> string * int
+val unaccent_utf_8 : bool -> string -> int -> string * int
+
+(** [string_unaccent ?special:bool lower s] unaccents string s and possibly puts it in lowercase
+    if special is true, transforms special characters into spaces
+    special chars are not 'a'..'z' | 'A'..'Z' | '0'..'9' | '.' *)
+val string_unaccent : ?special:bool -> bool -> string -> string
+
+(** [special_utf_8 s] replaces some Utf-8 characters by a space *)
+val special_utf_8 : string -> string
 
 (** [next_chars_if_equiv s1 i1 s2 i2] checks if UTF-8 characters that start at position
     [i1] inside [s1] and at [i2] inside [s2] are equivalent (have the same ASCII representation).

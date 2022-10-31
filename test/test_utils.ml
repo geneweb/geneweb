@@ -173,20 +173,16 @@ let datedisplay_string_of_date _ =
   ; test (Adef.safe "d[i |'marzu 1975") Dgregorian (0, 3, 1975)
   ; test (Adef.safe "4 d[i sittembre 1974") Dgregorian (4, 9, 1974)
 
-let name_unaccent_lower s =
-  let rec copy i len =
-    if i = String.length s then Buff.get len
-    else
-      let (t, j) = Name.unaccent_utf_8 true s i in copy j (Buff.mstore len t)
-  in
-  copy 0 0
 
 let name_unaccent _ =
   let test a b =
-    assert_equal ~printer:(fun x -> x) a (Some.name_unaccent b)
+    assert_equal ~printer:(fun x -> x) a (Name.string_unaccent false b)
   in
   let test_l a b =
-    assert_equal ~printer:(fun x -> x) a (name_unaccent_lower b)
+    assert_equal ~printer:(fun x -> x) a (Name.string_unaccent true b)
+  in
+  let test_ls a b =
+    assert_equal ~printer:(fun x -> x) a (Name.string_unaccent ~special:true true b)
   in
   let test_nl a b =
     assert_equal ~printer:(fun x -> x) a (Name.lower b)
@@ -196,17 +192,24 @@ let name_unaccent _ =
   ; test "yvette" "ÿvette"
   ; test "Yvette" "Ÿvette"
   ; test "Etienne" "Ĕtienne"
-  (* apostrophes *)
-  ; test "L'homme" "L'homme"
-  ; test_l "l'homme" "L'homme"
-  ; test "L'homme" "L’homme"
-  ; test_l "l'homme" "L’homme"
-  (* unaccent performs cyrillic to latin translation! *)
-  ; test "Genri" "Генри"
+(* apostrophes *)
+  ; test    "L'homme" "L'homme"
+  ; test_l  "l'homme" "L'homme"
+  ; test_ls "l homme" "L'homme"
+  ; test    "L'homme" "L’homme" (* Unidecode does the job *)
+  ; test_l  "l'homme" "L’homme"
+  ; test_l  "l‘homme" "L‘homme" (* Unidecode does not handle ‘ *)
+  ; test_ls "l homme" "L‘homme" 
+  ; test_nl "l homme" "L‘homme" (* Name.lower replaces special chars by a space *)
+  ; test_nl "l.homme" "L.homme" (* | 'a'..'z' | 'A'..'Z' | '0'..'9' | '.' *)
+  ; test_nl "l homme" "L$homme"
+(* unaccent performs cyrillic to latin translation! *)
+  ; test   "Genri" "Генри"
   ; test_l "genri" "ГЕНРИ"
-  (* Latin supplemental, vietnameese *)
-  ; test "Mien Dinh Nguyen Phuc" "Miên Định Nguyễn Phúc"
-  ; test_l "mien dinh nguyen phuc" "Miên Định Nguyễn Phúc"
+(* Latin supplemental, vietnameese *)
+  ; test    "Mien Dinh Nguyen Phuc" "Miên Định Nguyễn Phúc"
+  ; test_l  "mien dinh nguyen phuc" "Miên Định Nguyễn Phúc"
+  ; test_nl "mien dinh nguyen phuc" "Miên Định Nguyễn Phúc"
   ; test "aaaaaaaeceeeeiiiinooooouuuuyy"
          "àáâãäåæçèéêëìíîïñòóôõöùúûüýÿ"
   ; test "llnnnnooooerrrsssstttuuuuuuwyyzzz"
@@ -214,6 +217,10 @@ let name_unaccent _ =
   ; test_nl "abcdefghijklmnopqrstuvwxyz"
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
 (* Latin-1 supplement. C3 80 - "àáâãäåæçèéêëìíîïñòóôõöùúûüýÿ" *)
+  ; test    "AAAAAAAECEEEEIIIINOOOOOUUUUYY"
+            "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝŸ"
+  ; test_l  "aaaaaaaeceeeeiiiinooooouuuuyy"
+            "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝŸ"
   ; test_nl "aaaaaaaeceeeeiiiinooooouuuuyy"
             "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝŸ"
 (* Latin-1 supplement. C4 80 - "āăąćĉċčďđēĕėęěĝğġģĥħĩīĭįıĳĵķĺļľ"*)
@@ -222,7 +229,6 @@ let name_unaccent _ =
 (* Latin-1 supplement. C5 80 - "ŀłńņňŋōŏőœŕŗřśŝşšţťŧũūŭůűųŵŷÿźżž" *)
   ; test_nl "llnnnnooooerrrsssstttuuuuuuwyyzzz"
             "ĿŁŃŅŇŊŌŎŐŒŔŖŘŚŜŞŠŢŤŦŨŪŬŮŰŲŴŶŸŹŻŽ"
-(* Latin-1 supplement. C5 80 - *)
 
 (* Latin-1 supplement. Greek, CE 80 - "αβγδεζηθικλμνξοπρςστυφχψωάέήίΰϊϋόύώ" *)
 (*     "abgde dz e th iklmnxopr ss tu ph kh ps o aeniaiyoyo" *)

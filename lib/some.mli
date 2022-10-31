@@ -37,6 +37,3 @@ val search_first_name :
 
 val search_first_name_print :
   Config.config -> Gwdb.base -> string -> unit
-
-val name_unaccent :
-  string -> string
