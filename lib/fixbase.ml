@@ -372,14 +372,7 @@ let fix_utf8_sequence ?report progress base =
     if p' <> p then Gwdb.patch_person base iper p' ;
   end (Gwdb.persons base)
 
-let cnt = ref 0
-
-
-
-
-
 let fix_key ?report progress base =
-  let ht = Hashtbl.create (Gwdb.nb_of_persons base) in
   let nb_ind = nb_of_persons base in
   let ipers = Gwdb.ipers base in
   let skip = Gwdb.iper_marker ipers false in
@@ -388,7 +381,6 @@ let fix_key ?report progress base =
     let p = poi base ip in
     let f = Gwdb.p_first_name base p in
     let s = Gwdb.p_surname base p in
-    let oc = string_of_int (Gwdb.get_occ p) in
     if f <> "?" && s <> "?" then begin
       let key = Name.concat f s in
       let ipers = Gwdb.persons_of_name base key in
@@ -397,10 +389,6 @@ let fix_key ?report progress base =
       let list =
         let rec loop acc = function
           | ip :: tl ->
-            if s = "xxxweeger" then
-              Printf.eprintf "Ip: %s/%s, %s/%s\n"
-                (Name.lower @@ p_first_name base p) f
-                (Name.lower @@ p_surname base p) s;
             let p = poi base ip in
             if Name.lower @@ p_first_name base p = f
             && Name.lower @@ p_surname base p = s
@@ -449,20 +437,94 @@ let fix_key ?report progress base =
             end else loop ((ip, occ) :: acc) tl
       in
       ignore @@ loop [] rev_list
-    end;
-    let fn1 = Name.lower ~apostr:true f in
-    let sn1 = Name.lower ~apostr:true s in
-    let k = fn1 ^ "." ^ oc ^ " " ^ sn1 in
-    let v = f  ^ "." ^ oc ^ " " ^ s in
-    if f <> "?" && s <> "?" then
-    if not (Hashtbl.mem ht k) then
-      Hashtbl.add ht k v
+    end
+  end ipers
+
+(* Scan a base to identify potential conflicts arising when:
+   - replacing ’ by ' in the lower function
+   - properly treating supplementary Latin accented characters (for vietnameese)
+   resolution typically consists in changing the occ number (+1)
+*)
+
+let special_utf_8 s =
+  let s = match Char.code s.[0] with
+    | 0xE2 when String.length s = 3 &&
+            Char.code s.[1] = 0x80 && 
+           (Char.code s.[2] = 0x98 || (* ’ apostrophes typo *)
+            Char.code s.[2] = 0x99)   (* ‘ autre apostrophe *)
+          -> " "
+    | _ -> s
+  in
+  if Char.code s.[0] < 0x80 then match s.[0] with
+      | 'a'..'z' | 'A'..'Z' | '0'..'9' | '.' -> s
+      | _ -> " "
+  else s
+
+let string_unaccent ?(special=false) lower s =
+  let rec copy i len =
+    if i = String.length s then Buff.get len
     else
+      let (t, j) = Name.unaccent_utf_8 lower s i in
+      let t = if special then special_utf_8 t else t in
+      copy j (Buff.mstore len t)
+  in
+  copy 0 0
+
+let scan_utf8_conflicts ?report progress base =
+  let rec new_occ fn sn occ htoc =
+    let oc = string_of_int occ in
+    let v1 = string_unaccent ~special:true true (fn  ^ "." ^ oc ^ " " ^ sn) in
+    match Gwdb.person_of_key base
+      (string_unaccent ~special:true true fn)
+      (string_unaccent ~special:true true sn)
+      occ with
+    (* Fail : changes have not been commmited yet !! *)
+    (* works only for first conflict *)
+    | Some _ip ->
+        let occ = match Hashtbl.find_opt htoc v1 with
+          | Some occ' -> occ' + 1
+          | None -> occ + 1
+        in
+        new_occ fn sn occ htoc
+    | _ -> occ
+  in
+  let nb_ind = Gwdb.nb_of_persons base in
+  let ht = Hashtbl.create nb_ind in
+  let htoc = Hashtbl.create 100 in (* up to 100 changes! *)
+  let ipers = Gwdb.ipers base in
+  Gwdb.Collection.iteri begin fun i ip ->
+    progress i nb_ind ;
+    let p = poi base ip in
+    let fn = Gwdb.sou base (Gwdb.get_first_name p) in
+    let sn = Gwdb.sou base (Gwdb.get_surname p) in
+    let occ = string_of_int (Gwdb.get_occ p) in
+    let ip0 = 
+      match Gwdb.person_of_key base
+        (string_unaccent ~special:true true fn)
+        (string_unaccent ~special:true true sn)
+        (int_of_string occ) with
+      | Some ip -> ip
+      | _ -> Gwdb.dummy_iper
+    in
+    let v = fn  ^ "." ^ occ ^ " " ^ sn in
+    let v1 = string_unaccent ~special:true true (fn  ^ "." ^ occ ^ " " ^ sn) in
+    if fn <> "?" && sn <> "?" then
       begin
-        Printf.printf "conflit %s avec %s...\n" v (Hashtbl.find ht k) ;
-        incr cnt
+        if not (Hashtbl.mem ht v1) then
+          Hashtbl.add ht v1 v1
+        else
+          begin
+            Printf.printf "conflit %s (index: %d) avec %s (%s)...\n" v i
+              (Hashtbl.find ht v1) (string_of_iper ip0);
+            let occ' = new_occ fn sn (int_of_string occ) htoc in
+            Hashtbl.add htoc v1 occ';
+            Gwdb.patch_person base ip
+              { (Gwdb.gen_person_of_person (poi base ip) ) with occ = occ' } ;
+            begin match report with
+              | Some fn -> fn (Fix_UpdatedOcc (ip, (int_of_string occ), occ'))
+              | None -> ()
+            end ;
+          end
       end
-  end ipers;
-  if !cnt > 0 then
-   Printf.printf "There are %d conflicts that need to be resolved\n" !cnt;
-  flush stderr; flush stdout
+  end ipers
+

@@ -69,3 +69,8 @@ val fix_utf8_sequence : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.
 (** For every person in the base, update their occurence number
     if someone with same key (normalized first name and last name, and occurence number) already exists. *)
 val fix_key : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
+
+(** For every person in the base, update their occurence number
+    if someone with same key (normalized first name and last name, and occurence number) already exists.
+    What normalize means may vary !! *)
+val scan_utf8_conflicts : ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
