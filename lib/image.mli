@@ -10,6 +10,7 @@ val source_filename : string -> string -> string
 val prefix : config -> Adef.escaped_string
 (** Returns the image prefix (conf.image_prefix), html escaped  *)
 
+(* TODO this should be removed *)
 val default_portrait_filename : base -> person -> string
 (** [default_portrait_filename base p] is the default filename of [p]'s portrait. Without it's file extension.
  e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
@@ -31,6 +32,7 @@ val rename_portrait : config -> base -> person -> string * string * int -> unit
 val src_to_string : [< `Path of string | `Url of string ] -> string
 (** [src_to_string src] is [src] as a string *)
 
+(* TODO this should be removed *)
 val get_portrait_path : config -> base -> person -> [> `Path of string ] option
 (** [get_portrait_path conf base p] is
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.
