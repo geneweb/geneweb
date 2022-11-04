@@ -3260,6 +3260,7 @@ and eval_str_person_field conf base env (p, p_auth as ep) =
       if p_auth then Util.get_approx_death_date_place conf base p |> snd |> safe_val
       else null_val
   | "auto_image_file_name" -> (
+      (* TODO what do we want here? can we remove this? *)
       match Image.get_portrait_path conf base p with
         | Some (`Path s) -> str_val s
         | None -> null_val

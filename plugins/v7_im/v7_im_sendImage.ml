@@ -186,8 +186,8 @@ let print_del conf base =
   | None -> Hutil.incorrect_request conf
   | Some ip ->
       let p = poi base (iper_of_string ip) in
-      match Image.get_portrait_path conf base p with
-      | Some _path -> print_delete_image conf base p
+      match Image.get_portrait conf base p with
+      | Some _src -> print_delete_image conf base p
       | None -> Hutil.incorrect_request conf
 
 (* Send image form validated *)
