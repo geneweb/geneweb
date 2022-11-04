@@ -142,14 +142,14 @@ let print_send_image conf base p =
 
 let print conf base =
   match p_getenv conf.env "i" with
+  | None -> Hutil.incorrect_request conf
   | Some ip ->
       let p = poi base (iper_of_string ip) in
       let fn = p_first_name base p in
       let sn = p_surname base p in
-      if Option.is_some (Image.get_portrait conf base p) || fn = "?" || sn = "?" then
+      if fn = "?" || sn = "?" then
         Hutil.incorrect_request conf
       else print_send_image conf base p
-  | None -> Hutil.incorrect_request conf
 
 (* Delete image form *)
 
@@ -183,15 +183,12 @@ let print_delete_image conf base p =
 
 let print_del conf base =
   match p_getenv conf.env "i" with
+  | None -> Hutil.incorrect_request conf
   | Some ip ->
       let p = poi base (iper_of_string ip) in
-      if sou base (get_image p) <> "" then Hutil.incorrect_request conf
-      else
-        begin match Image.get_portrait_path conf base p with
-        | Some _path -> print_delete_image conf base p
-        | None -> Hutil.incorrect_request conf
-        end
-  | None -> Hutil.incorrect_request conf
+      match Image.get_portrait_path conf base p with
+      | Some _path -> print_delete_image conf base p
+      | None -> Hutil.incorrect_request conf
 
 (* Send image form validated *)
 
