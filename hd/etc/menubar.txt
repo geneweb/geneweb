@@ -178,7 +178,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
           %if;(not (bvar.wizard_just_friend="yes") and wizard)
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" title="[*changed order of person's events]"><span class="fa fa-sort fa-fw mr-2"></span>[*invert::event/events]1</a>
-                %if;(bvar.can_send_image != "no" and image = "" and first_name != "?" and surname != "?")
+                %if;(bvar.can_send_image != "no" and (not has_image_url) and first_name != "?" and surname != "?")
                   <a class="dropdown-item" href="%prefix;m=SND_IMAGE;i=%index;" %laI;><span class="far fa-file-image fa-fw mr-2"></span>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
                 %end;
                 <div class="dropdown-divider"></div>

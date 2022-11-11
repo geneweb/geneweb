@@ -3137,6 +3137,11 @@ and eval_bool_person_field conf base env (p, p_auth) =
       else get_first_names_aliases p <> []
   | "has_history" -> has_history conf base p p_auth
   | "has_image" -> Image.get_portrait conf base p |> Option.is_some
+  | "has_image_url" -> begin match Image.get_portrait conf base p with
+    | Some (`Url _url) -> true
+    | Some (`Path _fname) -> false
+    | None -> false
+    end
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && Util.nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
