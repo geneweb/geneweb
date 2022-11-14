@@ -733,7 +733,7 @@ let update_family_with_fevents _gen fam =
         | Some relation' ->
             if !found_marriage then loop l fam
             else
-              let witnesses = Array.map fst evt.efam_witnesses in
+              let witnesses = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
               let fam =
                 {
                   fam with
@@ -783,7 +783,7 @@ let update_fevents_with_family gen fam =
       | Pacs -> Efam_PACS
       | Residence -> Efam_Residence
     in
-    let witnesses = Array.map (fun ip -> (ip, Witness)) fam.witnesses in
+    let witnesses = Array.map (fun ip -> ip, Witness, empty_string) fam.witnesses in
     let evt =
       {
         efam_name = name;
@@ -895,7 +895,8 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
                 let (p, ip) = insert_somebody gen wit in
                 notice_sex gen p sex;
                 p.m_related <- ifath :: p.m_related;
-                ip, wk)
+                let wistr = unique_string gen wnote in
+                ip, wk, wistr)
              witl
          in
          {efam_name = fevent_name_unique_string gen name; efam_date = date;

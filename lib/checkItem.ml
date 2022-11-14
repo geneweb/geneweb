@@ -510,13 +510,13 @@ let check_witness_pevents_aux warning origin evt date b d p witness_kind =
 
 let check_witness_pevents base warning origin =
   List.iter begin fun evt ->
-    match Adef.od_of_cdate evt.epers_date with
+    match Date.od_of_cdate evt.epers_date with
     | Some (Dgreg (d2, _)) ->
        Array.iter begin fun (iw, witness_kind, wnotes) ->
          (* WNOTES TODO *)
         let p = poi base iw in
         check_witness_pevents_aux warning origin evt d2
-          (Adef.od_of_cdate @@ get_birth p)
+          (Date.od_of_cdate @@ get_birth p)
           (Date.date_of_death @@ get_death p) p
           witness_kind
       end evt.epers_witnesses
@@ -579,8 +579,7 @@ let check_person_dates_as_witness base warning p =
   in
   List.iter begin fun fam ->
     List.iter begin fun evt ->
-      (* WNOTES TODO WFAMNOTES *)
-      match witness_kind_of_witness_array ip (Array.map (fun (ip,wk) -> ip,wk,Gwdb.empty_string) evt.efam_witnesses) with
+      match witness_kind_of_witness_array ip evt.efam_witnesses with
       | Some Def.Witness_Mentioned | Some Def.Witness_Other ->
          aux
            (fun e -> e.efam_date)
@@ -727,20 +726,18 @@ let check_witness_fevents_aux warning fam evt date b d p witness_kind =
   | _ -> ()
 
 let check_witness_fevents base warning fam =
-  List.iter
-    (fun evt ->
-      match Date.cdate_to_dmy_opt evt.efam_date with
-      | None -> ()
-      | Some d2 ->
-          Array.iter
-            (fun (iw, witness_kind) ->
-              let p = poi base iw in
-              check_witness_fevents_aux warning fam evt d2
-                (Date.od_of_cdate @@ get_birth p)
-                (Date.date_of_death @@ get_death p)
-                p witness_kind)
-            evt.efam_witnesses)
-    (get_fevents fam)
+  List.iter begin fun evt ->
+    match Date.od_of_cdate evt.efam_date with
+    | Some (Dgreg (d2, _)) ->
+      Array.iter begin fun (iw, witness_kind, _wnote) ->
+        let p = poi base iw in
+        check_witness_fevents_aux warning fam evt d2
+          (Date.od_of_cdate @@ get_birth p)
+          (Date.date_of_death @@ get_death p) p
+          witness_kind
+      end evt.efam_witnesses
+    | _ -> ()
+  end (get_fevents fam)
 
 let check_parent_marriage_age warning fam p =
   let rec loop = function
@@ -904,10 +901,9 @@ let check_related_person_fevents warning base birth_date death_date p iper relat
   Array.iter begin fun i ->
     let f = foi base i in
     List.iter begin fun e ->
-      match Adef.od_of_cdate e.efam_date with
+      match Date.od_of_cdate e.efam_date with
       | Some (Dgreg (date, _)) ->
-         (* WNOTES TODO WFAM NOTES *)
-         let is_witness, only_mentioned = witness_occur iper (Array.map (fun (ip, wk) -> ip, wk, Gwdb.empty_string) e.efam_witnesses) in
+         let is_witness, only_mentioned = witness_occur iper e.efam_witnesses in
          if is_witness then
            let witness_kind = if only_mentioned then Def.Witness_Mentioned else Def.Witness in
            check_witness_fevents_aux warning f e date birth_date death_date p witness_kind

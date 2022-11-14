@@ -628,9 +628,9 @@ let ged_fevent opts base per_sel evt =
   let note = sou base evt.efam_note in
   let src = sou base evt.efam_src in
   ged_ev_detail opts 2 typ date place note src;
-  Array.iter
-    (fun (ip, wk) ->
-      if per_sel ip then (
+  (* TODO HANDLE WNOTES FROM GED *)
+  Array.iter (fun (ip, wk, _wnote) ->
+    if per_sel ip then (
         Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
         Printf.ksprintf (oc opts) "3 TYPE INDI\n";
         oc_witness_kind opts wk))

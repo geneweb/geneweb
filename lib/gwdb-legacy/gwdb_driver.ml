@@ -2,8 +2,9 @@
 open Dbdisk
 
 type ('iper, 'person, 'string) legacy_dsk_person = ('iper, 'person, 'string) Dbdisk.gen_person   
+type ('iper, 'person, 'string) legacy_dsk_family = ('iper, 'person, 'string) Dbdisk.gen_family
 type ('iper, 'string) legacy_dsk_pers_event = ('iper, 'string) Dbdisk.gen_pers_event
-
+type ('iper, 'string) legacy_dsk_fam_event = ('iper, 'string) Dbdisk.gen_fam_event
 
 type istr = int
 type ifam = int
@@ -280,7 +281,7 @@ let base_notes_are_empty base fnotes = base_notes_read_aux base fnotes Def.RnDeg
 type relation = (iper, istr) Def.gen_relation
 type title = istr Def.gen_title
 type pers_event = (iper, istr) Dbdisk.gen_pers_event
-type fam_event = (iper, istr) Def.gen_fam_event
+type fam_event = (iper, istr) Dbdisk.gen_fam_event
 
 let cache f a get set x =
   match get x with
@@ -370,21 +371,21 @@ let gen_couple_of_family = cache_cpl (fun c -> c)
 let gen_descend_of_family = cache_des (fun d -> d)
 let gen_family_of_family = cache_fam (fun f -> f)
 let get_children = cache_des (fun d -> d.Def.children)
-let get_comment = cache_fam (fun f -> f.Def.comment)
-let get_ifam = cache_fam (fun f -> f.Def.fam_index)
-let get_divorce = cache_fam (fun f -> f.Def.divorce)
+let get_comment = cache_fam (fun f -> f.Dbdisk.comment)
+let get_ifam = cache_fam (fun f -> f.Dbdisk.fam_index)
+let get_divorce = cache_fam (fun f -> f.Dbdisk.divorce)
 let get_father = cache_cpl (fun c -> Adef.father c)
-let get_fevents = cache_fam (fun f -> f.Def.fevents)
-let get_fsources = cache_fam (fun f -> f.Def.fsources)
-let get_marriage = cache_fam (fun f -> f.Def.marriage)
-let get_marriage_note = cache_fam (fun f -> f.Def.marriage_note)
-let get_marriage_place = cache_fam (fun f -> f.Def.marriage_place)
-let get_marriage_src = cache_fam (fun f -> f.Def.marriage_src)
+let get_fevents = cache_fam (fun f -> f.Dbdisk.fevents)
+let get_fsources = cache_fam (fun f -> f.Dbdisk.fsources)
+let get_marriage = cache_fam (fun f -> f.Dbdisk.marriage)
+let get_marriage_note = cache_fam (fun f -> f.Dbdisk.marriage_note)
+let get_marriage_place = cache_fam (fun f -> f.Dbdisk.marriage_place)
+let get_marriage_src = cache_fam (fun f -> f.Dbdisk.marriage_src)
 let get_mother = cache_cpl (fun c -> Adef.mother c)
-let get_origin_file = cache_fam (fun f -> f.Def.origin_file)
+let get_origin_file = cache_fam (fun f -> f.Dbdisk.origin_file)
 let get_parent_array = cache_cpl (fun c -> Adef.parent_array c)
-let get_relation = cache_fam (fun f -> f.Def.relation)
-let get_witnesses = cache_fam (fun f -> f.Def.witnesses)
+let get_relation = cache_fam (fun f -> f.Dbdisk.relation)
+let get_witnesses = cache_fam (fun f -> f.Dbdisk.witnesses)
 
 let no_person ip : dsk_person =
   { (Dutil.empty_person empty_string empty_string) with key_index = ip }
@@ -425,7 +426,7 @@ let poi base iper =
   if iper = dummy_iper then empty_person base iper
   else { base ; iper ; p = None ; a = None ; u = None } [@ocaml.warning "-42"]
 
-let no_family ifam = { (Mutil.empty_family empty_string) with fam_index = ifam }
+let no_family ifam = { (Dutil.empty_family empty_string) with fam_index = ifam }
 
 let no_couple = Adef.couple dummy_iper dummy_iper
 

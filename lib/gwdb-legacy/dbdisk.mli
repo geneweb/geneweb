@@ -159,15 +159,14 @@ type 'string gen_fam_event_name = 'string Def.gen_fam_event_name =
   | Efam_Residence
   | Efam_Name of 'string
 
-type ('person, 'string) gen_fam_event = ('person, 'string) Def.gen_fam_event = {
-  efam_name : 'string gen_fam_event_name;
-  efam_date : cdate;
-  efam_place : 'string;
-  efam_reason : 'string;
-  efam_note : 'string;
-  efam_src : 'string;
-  efam_witnesses : ('person * witness_kind) array;
-}
+type ('person, 'string) gen_fam_event = (*('person, 'string) Def.gen_fam_event =*)
+  { efam_name : 'string gen_fam_event_name;
+    efam_date : cdate;
+    efam_place : 'string;
+    efam_reason : 'string;
+    efam_note : 'string;
+    efam_src : 'string;
+    efam_witnesses : ('person * witness_kind) array }
 
 type relation_type = Def.relation_type =
   | Adoption
@@ -244,21 +243,19 @@ type 'family gen_union = 'family Def.gen_union = { family : 'family array }
 
 (* family *)
 
-type ('person, 'ifam, 'string) gen_family =
-      ('person, 'ifam, 'string) Def.gen_family = {
-  marriage : cdate;
-  marriage_place : 'string;
-  marriage_note : 'string;
-  marriage_src : 'string;
-  witnesses : 'person array;
-  relation : relation_kind;
-  divorce : divorce;
-  fevents : ('person, 'string) gen_fam_event list;
-  comment : 'string;
-  origin_file : 'string;
-  fsources : 'string;
-  fam_index : 'ifam;
-}
+type ('person, 'ifam, 'string) gen_family = (*('person, 'ifam, 'string) Def.gen_family =*)
+  { marriage : cdate;
+    marriage_place : 'string;
+    marriage_note : 'string;
+    marriage_src : 'string;
+    witnesses : 'person array;
+    relation : relation_kind;
+    divorce : divorce;
+    fevents : ('person, 'string) gen_fam_event list;
+    comment : 'string;
+    origin_file : 'string;
+    fsources : 'string;
+    fam_index : 'ifam }
 
 type 'person gen_couple = 'person Def.gen_couple (* FIXME: expose its type *)
 
