@@ -117,6 +117,21 @@ let empty_person empty what =
   ; key_index = ()
   }
 
+let empty_family empty =
+  { Dbdisk.marriage = Adef.cdate_None
+  ; marriage_place = empty
+  ; marriage_note = empty
+  ; marriage_src = empty
+  ; witnesses = [||]
+  ; relation = Def.NoMention
+  ; divorce = Def.NotDivorced
+  ; fevents = []
+  ; comment = empty
+  ; origin_file = empty
+  ; fsources = empty
+  ; fam_index = ()
+  }
+
 let map_pers_event ?(fd = identity) fp fs e =
   let epers_name =
     match e.epers_name with
@@ -188,3 +203,38 @@ let map_person_ps ?(fd = identity) fp fs p =
   ; psources = fs p.psources
   ; key_index = p.key_index
   }
+
+
+let map_fam_event ?(fd = identity) fp fs e =
+  let efam_name =
+    match e.efam_name with
+      Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage |
+      Efam_Divorce | Efam_Separated | Efam_Annulation | Efam_MarriageBann |
+      Efam_MarriageContract | Efam_MarriageLicense | Efam_PACS |
+      Efam_Residence as evt ->
+        evt
+    | Efam_Name s -> Efam_Name (fs s)
+  in
+  let efam_date = Futil.map_cdate fd e.efam_date in
+  let efam_place = fs e.efam_place in
+  let efam_reason = fs e.efam_reason in
+  let efam_note = fs e.efam_note in
+  let efam_src = fs e.efam_src in
+  let efam_witnesses = Array.map (fun (p, wkind) -> fp p, wkind) e.efam_witnesses in
+  {efam_name = efam_name; efam_date = efam_date; efam_place = efam_place;
+   efam_reason = efam_reason; efam_note = efam_note; efam_src = efam_src;
+   efam_witnesses = efam_witnesses}
+
+let map_family_ps ?(fd = identity) fp ff fs fam =
+  { marriage = Futil.map_cdate fd fam.marriage
+  ; marriage_place = fs fam.marriage_place
+  ; marriage_note = fs fam.marriage_note
+  ; marriage_src = fs fam.marriage_src
+  ; witnesses = Array.map fp fam.witnesses
+  ; relation = fam.relation
+  ; divorce = Futil.map_divorce fd fam.divorce
+  ; fevents = List.map (map_fam_event ~fd fp fs) fam.fevents
+  ; comment = fs fam.comment
+  ; origin_file = fs fam.origin_file
+  ; fsources = fs fam.fsources
+  ; fam_index = ff fam.fam_index }

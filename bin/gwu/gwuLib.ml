@@ -702,22 +702,25 @@ let print_fevent opts base gen in_comment e =
   (*print_if_no_empty opts base "#c" e.efam_cause;*)
   if opts.source = None then print_if_no_empty opts base "#s" e.efam_src;
   print_sep ();
+  (* TODO HANDLE WNOTES *)
   Array.iter
-    (fun (ip, wk) ->
-      if gen.per_sel ip then (
-        let p = poi base ip in
-        Printf.ksprintf (oc opts) "wit";
-        (match get_sex p with
-        | Male -> Printf.ksprintf (oc opts) " m"
-        | Female -> Printf.ksprintf (oc opts) " f"
-        | _ -> ());
-        Printf.ksprintf (oc opts) ": ";
-        let sk = string_of_witness_kind wk in
-        (match sk with
-        | Some s -> Printf.ksprintf (oc opts) (s ^^ " ")
-        | None -> ());
-        print_witness opts base gen p;
-        print_sep ()))
+    (fun (ip, wk, _wnote) ->
+       if gen.per_sel ip then
+         let p = poi base ip in
+         Printf.ksprintf (oc opts) "wit";
+         begin match get_sex p with
+             Male -> Printf.ksprintf (oc opts) " m"
+           | Female -> Printf.ksprintf (oc opts) " f"
+           | _ -> ()
+         end;
+         Printf.ksprintf (oc opts) ": ";
+         let sk = string_of_witness_kind wk in
+         begin match sk with
+         | Some s -> Printf.ksprintf (oc opts) (s ^^ " ")
+         | None -> ()
+         end;
+         print_witness opts base gen p;
+         print_sep ())
     e.efam_witnesses;
   let note = if opts.no_notes <> `nnn then sou base e.efam_note else "" in
   if note <> "" then

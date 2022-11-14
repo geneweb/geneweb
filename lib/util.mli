@@ -592,3 +592,7 @@ val designation : base -> person -> Adef.escaped_string
 
 val has_children : base -> person -> bool
 val is_public : config -> base -> Gwdb.person -> bool
+
+(** equality between base_warnings *)
+val eq_warning : base -> CheckItem.base_warning -> CheckItem.base_warning -> bool
+

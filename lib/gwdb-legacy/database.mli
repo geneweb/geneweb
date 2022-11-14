@@ -7,10 +7,10 @@ val opendb : string -> Dbdisk.dsk_base
 val make :
   string ->
   string list ->
-  ((int, int, int) Def.gen_person array
+  ((int, int, int) Dbdisk.gen_person array
   * int Def.gen_ascend array
   * int Def.gen_union array)
-  * ((int, int, int) Def.gen_family array
+  * ((int, int, int) Dbdisk.gen_family array
     * int Def.gen_couple array
     * int Def.gen_descend array)
   * string array

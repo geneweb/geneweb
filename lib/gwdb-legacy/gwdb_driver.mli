@@ -1,7 +1,9 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 type ('iper, 'person, 'string) legacy_dsk_person = ('iper, 'person, 'string) Dbdisk.gen_person
+type ('iper, 'person, 'string) legacy_dsk_family = ('iper, 'person, 'string) Dbdisk.gen_family
 type ('iper, 'string) legacy_dsk_pers_event = ('iper, 'string) Dbdisk.gen_pers_event
+type ('iper, 'string) legacy_dsk_fam_event = ('iper, 'string) Dbdisk.gen_fam_event
 
 (** String id *)
 type istr = int
@@ -46,7 +48,7 @@ type title = istr Def.gen_title
 type pers_event = (iper, istr) Dbdisk.gen_pers_event
 
 (** Database implementation for [Def.fam_event] *)
-type fam_event = (iper, istr) Def.gen_fam_event
+type fam_event = (iper, istr) Dbdisk.gen_fam_event
 
 (** Data structure for optimised search throughout index by name
     (surname or first name). *)
@@ -274,7 +276,7 @@ val gen_couple_of_family : family -> iper Def.gen_couple
 val gen_descend_of_family : family -> iper Def.gen_descend
 
 (** Extract [gen_family] from [family]. *)
-val gen_family_of_family : family -> (iper, ifam, istr) Def.gen_family
+val gen_family_of_family : family -> (iper, ifam, istr) Dbdisk.gen_family
 
 (** Extract [gen_person] from [person]. *)
 val gen_person_of_person : person -> (iper, iper, istr) Dbdisk.gen_person
@@ -286,7 +288,7 @@ val gen_ascend_of_person : person -> ifam Def.gen_ascend
 val gen_union_of_person : person -> ifam Def.gen_union
 
 (** Create [family] from associated values. *)
-val family_of_gen_family : base -> (iper, ifam, istr) Def.gen_family * iper Def.gen_couple * iper Def.gen_descend -> family
+val family_of_gen_family : base -> (iper, ifam, istr) Dbdisk.gen_family * iper Def.gen_couple * iper Def.gen_descend -> family
 
 (** Create [person] from associated values. *)
 val person_of_gen_person : base -> (iper, iper, istr) Dbdisk.gen_person * ifam Def.gen_ascend * ifam Def.gen_union -> person
@@ -310,7 +312,7 @@ val no_ascend : ifam Def.gen_ascend
 val no_union : ifam Def.gen_union
 
 (** Returns unitialised [gen_family] with giving id *)
-val no_family : ifam -> (iper, ifam, istr) Def.gen_family
+val no_family : ifam -> (iper, ifam, istr) Dbdisk.gen_family
 
 (** Returns unitialised [gen_descend] *)
 val no_descend :iper Def.gen_descend
@@ -349,7 +351,7 @@ val patch_union : base -> iper -> ifam Def.gen_union -> unit
 
 (** Modify/add family with a giving id. Modification stay blocked until
     call of [commit_patches]. *)
-val patch_family : base -> ifam -> (iper, ifam, istr) Def.gen_family -> unit
+val patch_family : base -> ifam -> (iper, ifam, istr) Dbdisk.gen_family -> unit
 
 (** Modify/add descendants of a family with a giving id. Modification stay blocked until
     call of [commit_patches]. *)
@@ -386,7 +388,7 @@ val insert_ascend : base -> iper -> ifam Def.gen_ascend -> unit
 val insert_union : base -> iper -> ifam Def.gen_union -> unit
 
 (** Same as [patch_family] *)
-val insert_family : base -> ifam -> (iper, ifam, istr) Def.gen_family -> unit
+val insert_family : base -> ifam -> (iper, ifam, istr) Dbdisk.gen_family -> unit
 
 (** Same as [patch_couple] *)
 val insert_descend : base -> ifam -> iper Def.gen_descend -> unit
@@ -646,7 +648,7 @@ val make
       -> ( ( (int, int, int) Dbdisk.gen_person array
              * int Def.gen_ascend array
              * int Def.gen_union array )
-           * ( (int, int, int) Def.gen_family array
+           * ( (int, int, int) Dbdisk.gen_family array
                * int Def.gen_couple array
                * int Def.gen_descend array )
            * string array
