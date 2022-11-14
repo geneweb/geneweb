@@ -599,3 +599,7 @@ val has_children : base -> person -> bool
 val get_bases_list : unit -> string list
 
 val is_public : config -> base -> Gwdb.person -> bool
+
+(** equality between base_warnings *)
+val eq_warning : base -> CheckItem.base_warning -> CheckItem.base_warning -> bool
+

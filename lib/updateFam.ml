@@ -86,13 +86,12 @@ let family_events_opt env fam =
   | Vint i -> List.nth_opt fam.fevents (i - 1)
   | _ -> None
 
-let witness_person_of_event_opt env e =
-  match get_env "wcnt" env with
-  | Vint i when i - 1 >= 0 && i - 1 < Array.length e.efam_witnesses ->
-      Some (fst e.efam_witnesses.(i - 1))
-  | Vint i when i - 1 >= 0 && i - 1 < 2 && Array.length e.efam_witnesses < 2 ->
-      Some ("", "", 0, Update.Create (Neuter, None), "")
-  | _ -> None
+let witness_person_of_event_opt env e = match get_env "wcnt" env with
+  | Vint i when (i - 1) >= 0 && (i - 1) < Array.length e.efam_witnesses ->
+     Some ((fun (p, _, _) -> p) e.efam_witnesses.(i - 1))
+  | Vint i when (i - 1) >= 0 && (i - 1) < 2 && Array.length e.efam_witnesses < 2 ->
+     Some ("", "", 0, Update.Create (Neuter, None), "")
+  | _      -> None
 
 let ( >>= ) x f = ExtOption.bind x f
 
@@ -174,41 +173,36 @@ and eval_witness env fam sl =
   | _ -> raise Not_found
 
 (* TODO : rewrite, looks bad *)
-and eval_event_str conf base env fam =
-  match get_env "cnt" env with
-  | Vint i -> (
-      try
-        let fam = foi base fam.fam_index in
-        let e = List.nth (get_fevents fam) (i - 1) in
-        let name =
-          Util.string_of_fevent_name conf base e.efam_name
-          |> Adef.safe_fn Utf8.capitalize_fst
-        in
-        let date =
-          match Date.od_of_cdate e.efam_date with
-          | Some d -> DateDisplay.string_of_date conf d
-          | None -> Adef.safe ""
-        in
-        let place = Util.string_of_place conf (sou base e.efam_place) in
-        let note = Util.safe_html (sou base e.efam_note) in
-        let src = Util.safe_html (sou base e.efam_src) in
-        let wit =
-          Array.fold_right
-            (fun (w, _) accu ->
-              (transl_nth conf "witness/witnesses" 0
-              ^<^ transl conf ":"
-              ^<^ Util.gen_person_text conf base (poi base w))
-              :: accu)
-            e.efam_witnesses []
-        in
-        let s =
-          String.concat ", "
-            ([ name; date; (place :> Adef.safe_string); note; src ]
-              :> string list)
-        in
-        let sw = String.concat ", " (wit :> string list) in
-        safe_val (Adef.safe (s ^ ", " ^ sw))
-      with Failure _ -> str_val "")
+and eval_event_str conf base env fam = match get_env "cnt" env with
+  | Vint i ->
+     begin try
+         let fam = foi base fam.fam_index in
+         let e = List.nth (get_fevents fam) (i - 1) in
+         let name =
+           Util.string_of_fevent_name conf base e.efam_name
+           |> Adef.safe_fn Utf8.capitalize_fst
+         in
+         let date =
+           match Adef.od_of_cdate e.efam_date with
+             Some d -> DateDisplay.string_of_date conf d
+           | None -> Adef.safe ""
+         in
+         let place = Util.string_of_place conf (sou base e.efam_place) in
+         let note = Util.safe_html (sou base e.efam_note) in
+         let src = Util.safe_html (sou base e.efam_src) in
+         let wit =
+           Array.fold_right
+             (fun (w, _, _) accu ->
+               (transl_nth conf "witness/witnesses" 0 ^<^ (transl conf ":") ^<^
+                  Util.gen_person_text conf base (poi base w)) ::
+                 accu)
+             e.efam_witnesses []
+         in
+         let s = String.concat ", " ([ name ; date ; (place :> Adef.safe_string) ; note ; src ] :> string list) in
+         let sw = String.concat ", " (wit :> string list) in
+         safe_val (Adef.safe (s ^ ", " ^ sw))
+       with Failure _ -> str_val ""
+     end
   | _ -> str_val ""
 
 and eval_has_fwitness env fam =
@@ -220,24 +214,52 @@ and eval_has_fwitness env fam =
   with Invalid_argument _ -> raise Not_found
 
 (* TODO : rewrite, looks bad *)
-and eval_fwitness_kind env fam =
+and eval_fwitness_kind env fam = match get_env "cnt" env with
+  | Vint i ->
+     let e =
+       try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None
+     in
+     begin match e with
+     | Some e ->
+        begin match get_env "wcnt" env with
+          Vint i ->
+           let i = i - 1 in
+           if i >= 0 && i < Array.length e.efam_witnesses then
+             eval_witness_kind ((fun (_, wk, _) -> wk) e.efam_witnesses.(i))
+           else if
+             i >= 0 && i < 2 && Array.length e.efam_witnesses < 2
+           then
+             str_val ""
+           else raise Not_found
+        | _ -> raise Not_found
+        end
+     | None -> raise Not_found
+     end
+  | _ -> raise Not_found
+
+and eval_fwitness_note env fam =
   match get_env "cnt" env with
-  | Vint i -> (
-      let e =
-        try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None
-      in
-      match e with
-      | Some e -> (
-          match get_env "wcnt" env with
-          | Vint i ->
-              let i = i - 1 in
-              if i >= 0 && i < Array.length e.efam_witnesses then
-                eval_witness_kind (snd e.efam_witnesses.(i))
-              else if i >= 0 && i < 2 && Array.length e.efam_witnesses < 2 then
-                str_val ""
-              else raise Not_found
-          | _ -> raise Not_found)
-      | None -> raise Not_found)
+  | Vint i ->
+     let e =
+       try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None
+     in
+     begin match e with
+     | Some e ->
+        begin match get_env "wcnt" env with
+        | Vint i ->
+           let i = i - 1 in
+           if i >= 0 && i < Array.length e.efam_witnesses then
+             let _, _, wnote = e.efam_witnesses.(i) in 
+             safe_val (Util.escape_html wnote :> Adef.safe_string)
+           else if
+             i >= 0 && i < 2 && Array.length e.efam_witnesses < 2
+           then
+             str_val ""
+           else raise Not_found
+        | _ -> raise Not_found
+        end
+     | None -> raise Not_found
+     end
   | _ -> raise Not_found
 
 (* TODO : rewrite, looks bad + find a better name *)
@@ -249,43 +271,40 @@ and eval_event_date env fam s =
   in
   eval_date_var od s
 
-and eval_simple_var conf base env (fam, cpl, des) = function
-  | [ "bvar"; v ] -> eval_bvar conf v
-  | "child" :: sl -> eval_child env des sl
-  | [ "cnt" ] -> eval_int_env "cnt" env
-  | [ "comment" ] -> safe_val (Util.escape_html fam.comment :> Adef.safe_string)
-  | [ "digest" ] -> eval_string_env "digest" env
-  | [ "divorce" ] -> eval_divorce fam
-  | [ "divorce"; s ] -> eval_divorce' fam s
-  | "father" :: sl -> eval_key (Gutil.father cpl) sl
-  | [ "fsources" ] ->
-      safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
-  | [ "is_first" ] -> eval_is_first env
-  | [ "is_last" ] -> eval_is_last env
-  | [ "marriage"; s ] -> eval_date_var (Date.od_of_cdate fam.marriage) s
-  | [ "marriage_place" ] ->
-      safe_val (Util.escape_html fam.marriage_place :> Adef.safe_string)
-  | [ "marriage_note" ] ->
-      safe_val (Util.escape_html fam.marriage_note :> Adef.safe_string)
-  | [ "marriage_src" ] ->
-      safe_val (Util.escape_html fam.marriage_src :> Adef.safe_string)
-  | [ "mrel" ] -> str_val (eval_relation_kind fam.relation)
-  | [ "nb_fevents" ] -> str_val (string_of_int (List.length fam.fevents))
-  | [ "origin_file" ] ->
-      safe_val (Util.escape_html fam.origin_file :> Adef.safe_string)
-  | "parent" :: sl -> eval_parent conf env cpl sl
-  | [ "wcnt" ] -> eval_int_env "wcnt" env
-  | "witness" :: sl -> eval_witness env fam sl
-  | [ "has_fevents" ] -> bool_val (fam.fevents <> [])
-  | "event" :: sl ->
-      let e = family_events_opt env fam in
-      eval_event_var e sl
-  | [ "event_date"; s ] -> eval_event_date env fam s
-  | [ "event_str" ] -> eval_event_str conf base env fam
-  | [ "has_fwitness" ] -> eval_has_fwitness env fam
-  | "fwitness" :: sl -> eval_fwitness env fam sl
-  | [ "fwitness_kind" ] -> eval_fwitness_kind env fam
-  | [ s ] -> eval_default_var conf s
+and eval_simple_var conf base env (fam, cpl, des) =
+  function
+  | ["bvar"; v]        -> eval_bvar conf v
+  | "child" :: sl      -> eval_child env des sl
+  | ["cnt"]            -> eval_int_env "cnt" env
+  | ["comment"]        -> safe_val (Util.escape_html fam.comment :> Adef.safe_string)
+  | ["digest"]         -> eval_string_env "digest" env
+  | ["divorce"]        -> eval_divorce fam
+  | ["divorce"; s]     -> eval_divorce' fam s
+  | "father" :: sl     -> eval_key (Gutil.father cpl) sl
+  | ["fsources"]       -> safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
+  | ["is_first"]       -> eval_is_first env
+  | ["is_last"]        -> eval_is_last env
+  | ["marriage"; s]    -> eval_date_var (Adef.od_of_cdate fam.marriage) s
+  | ["marriage_place"] -> safe_val (Util.escape_html fam.marriage_place :> Adef.safe_string)
+  | ["marriage_note"]  -> safe_val (Util.escape_html fam.marriage_note :> Adef.safe_string)
+  | ["marriage_src"]   -> safe_val (Util.escape_html fam.marriage_src :> Adef.safe_string)
+  | ["mrel"]           -> str_val (eval_relation_kind fam.relation)
+  | ["nb_fevents"]     -> str_val (string_of_int (List.length fam.fevents))
+  | ["origin_file"]    -> safe_val (Util.escape_html fam.origin_file :> Adef.safe_string)
+  | "parent" :: sl     -> eval_parent conf env cpl sl
+  | ["wcnt"]           -> eval_int_env "wcnt" env
+  | "witness" :: sl    -> eval_witness env fam sl
+  | ["has_fevents"]    -> bool_val (fam.fevents <> [])
+  | "event" :: sl      ->
+     let e = family_events_opt env fam in
+     eval_event_var e sl
+  | ["event_date"; s]  -> eval_event_date env fam s
+  | ["event_str"]      -> eval_event_str conf base env fam
+  | ["has_fwitness"]   -> eval_has_fwitness env fam
+  | "fwitness" :: sl   -> eval_fwitness env fam sl
+  | ["fwitness_kind"]  -> eval_fwitness_kind env fam
+  | ["fwitness_note"]  -> eval_fwitness_note env fam
+  | [s]                -> eval_default_var conf s
   | _ -> raise Not_found
 
 and eval_date_var = Update_util.eval_date_var

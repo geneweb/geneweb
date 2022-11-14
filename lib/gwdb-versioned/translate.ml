@@ -110,3 +110,54 @@ and as_legacy_pevent e =
     epers_src = e.epers_src;
     epers_witnesses = Array.map (fun (ip, wk, _) -> ip, wk) e.epers_witnesses
   }
+
+let legacy_to_def_fevent value fe = {
+    Def.efam_name = fe.Gwdb_legacy.Dbdisk.efam_name;
+    efam_date = fe.efam_date;
+    efam_place = fe.efam_place;
+    efam_reason = fe.efam_reason;
+    efam_note = fe.efam_note;
+    efam_src = fe.efam_src;
+    efam_witnesses = Array.map (fun (ip, wk) -> ip, wk, value) fe.efam_witnesses
+  }
+
+let legacy_to_def_family value f = {
+    Def.marriage = f.Gwdb_legacy.Dbdisk.marriage;
+    marriage_place = f.marriage_place;
+    marriage_note = f.marriage_note;
+    marriage_src = f.marriage_src;
+    witnesses = f.witnesses;
+    relation = f.relation;
+    divorce = f.divorce;
+    fevents = List.map (legacy_to_def_fevent value) f.fevents;
+    comment = f.comment;
+    origin_file = f.origin_file;
+    fsources = f.fsources;
+    fam_index = f.fam_index
+  }
+  
+
+let as_legacy_fevent fe = {
+    Gwdb_legacy.Dbdisk.efam_name = fe.Def.efam_name;
+    efam_date = fe.efam_date;
+    efam_place = fe.efam_place;
+    efam_reason = fe.efam_reason;
+    efam_note = fe.efam_note;
+    efam_src = fe.efam_src;
+    efam_witnesses = Array.map (fun (ip, wk, _wnote) -> ip, wk) fe.efam_witnesses
+  }
+
+let as_legacy_family f = {
+    Gwdb_legacy.Dbdisk.marriage = f.Def.marriage;
+    marriage_place = f.marriage_place;
+    marriage_note = f.marriage_note;
+    marriage_src = f.marriage_src;
+    witnesses = f.witnesses;
+    relation = f.relation;
+    divorce = f.divorce;
+    fevents = List.map as_legacy_fevent f.fevents;
+    comment = f.comment;
+    origin_file = f.origin_file;
+    fsources = f.fsources;
+    fam_index = f.fam_index
+  }

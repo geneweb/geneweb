@@ -785,7 +785,7 @@ and mk_fevent ?spouse conf base e =
     , e.efam_place
     , e.efam_note
     , e.efam_src
-    , Array.map (fun (ip, wk) -> ip, wk, Gwdb.empty_string) e.efam_witnesses
+    , e.efam_witnesses
     , spouse)
 
 and mk_pevent conf base e =
