@@ -416,27 +416,29 @@ let redirect_added_families base p ip2 p2_family =
     let ifam = p2_family.(i) in
     let fam = foi base ifam in
     let cpl =
-      if ip2 = get_father fam then (
-        Array.iter
-          (fun ip ->
-            let w = poi base ip in
-            if not (List.mem p.key_index (get_related w)) then
-              let w = gen_person_of_person w in
-              let w = { w with related = p.key_index :: w.related } in
-              patch_person base ip w)
-          (get_witnesses fam);
-        List.iter
-          (fun evt ->
-            Array.iter
-              (fun (ip, _) ->
-                let w = poi base ip in
-                if not (List.mem p.key_index (get_related w)) then
-                  let w = gen_person_of_person w in
-                  let w = { w with related = p.key_index :: w.related } in
-                  patch_person base ip w)
-              evt.efam_witnesses)
-          (get_fevents fam);
-        Gutil.couple false p.key_index (get_mother fam))
+      if ip2 = get_father fam then
+        begin
+          Array.iter
+            (fun ip ->
+               let w = poi base ip in
+               if not (List.mem p.key_index (get_related w)) then
+                 let w = gen_person_of_person w in
+                 let w = {w with related = p.key_index :: w.related} in
+                 patch_person base ip w)
+            (get_witnesses fam);
+          List.iter
+            (fun evt ->
+               Array.iter
+                 (fun (ip, _, _) ->
+                    let w = poi base ip in
+                    if not (List.mem p.key_index (get_related w)) then
+                      let w = gen_person_of_person w in
+                      let w = {w with related = p.key_index :: w.related} in
+                      patch_person base ip w)
+                 evt.efam_witnesses)
+            (get_fevents fam);
+          Gutil.couple false p.key_index (get_mother fam)
+        end
       else if ip2 = get_mother fam then
         Gutil.couple false (get_father fam) p.key_index
       else assert false

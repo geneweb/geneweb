@@ -193,15 +193,14 @@ type 'string gen_fam_event_name =
   | Efam_Residence
   | Efam_Name of 'string
 
-type ('person, 'string) gen_fam_event = {
-  efam_name : 'string gen_fam_event_name;
-  efam_date : cdate;
-  efam_place : 'string;
-  efam_reason : 'string;
-  efam_note : 'string;
-  efam_src : 'string;
-  efam_witnesses : ('person * witness_kind) array;
-}
+type ('person, 'string) gen_fam_event =
+  { efam_name : 'string gen_fam_event_name;
+    efam_date : cdate;
+    efam_place : 'string;
+    efam_reason : 'string;
+    efam_note : 'string;
+    efam_src : 'string;
+    efam_witnesses : ('person * witness_kind * 'string) array }
 (** Event information pertaining a family. *)
 
 (** Relation type with parent (if not native) *)

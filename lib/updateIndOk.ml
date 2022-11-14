@@ -918,21 +918,52 @@ let update_relations_of_related base ip old_related =
                      if ip2 = ip then accu, true else (ip2, k, wnotes) :: accu, rad)
                   e.epers_witnesses ([], rad)
               in
-              let e = { e with efam_witnesses = Array.of_list witnesses } in
-              (e :: list, rad))
-            (get_fevents fam) ([], false)
-        in
-        if new_witnesses <> old_witnesses || fevents_are_different then
-          let fam = gen_family_of_family fam in
-          let witnesses =
-            if new_witnesses <> old_witnesses then Array.of_list new_witnesses
-            else fam.witnesses
-          in
-          let fevents =
-            if fevents_are_different then fevents else fam.fevents
-          in
-          patch_family base ifam { fam with witnesses; fevents }
-      done)
+              let e = {e with epers_witnesses = Array.of_list witnesses} in
+              e :: list, rad)
+           (get_pevents p1) ([], false)
+       in
+       if rparents_are_different || pevents_are_different then
+         begin
+           let p = gen_person_of_person p1 in
+           let rparents =
+             if rparents_are_different then rparents else p.rparents
+           in
+           let pevents =
+             if pevents_are_different then pevents else p.pevents
+           in
+           patch_person base ip1 {p with rparents ; pevents }
+         end;
+       let families = get_family p1 in
+       for i = 0 to Array.length families - 1 do
+         let ifam = families.(i) in
+         let fam = foi base ifam in
+         let old_witnesses = Array.to_list (get_witnesses fam) in
+         let new_witnesses = List.filter ((<>) ip) old_witnesses in
+         let (fevents, fevents_are_different) =
+           List.fold_right
+             (fun e (list, rad) ->
+                let (witnesses, rad) =
+                  Array.fold_right
+                    (fun (ip2, wkind, wnote) (accu, rad) ->
+                       if ip2 = ip then accu, true else (ip2, wkind, wnote) :: accu, rad)
+                    e.efam_witnesses ([], rad)
+                in
+                let e = {e with efam_witnesses = Array.of_list witnesses} in
+                e :: list, rad)
+             (get_fevents fam) ([], false)
+         in
+         if new_witnesses <> old_witnesses || fevents_are_different then
+           let fam = gen_family_of_family fam in
+           let witnesses =
+             if new_witnesses <> old_witnesses then
+               Array.of_list new_witnesses
+             else fam.witnesses
+           in
+           let fevents =
+             if fevents_are_different then fevents else fam.fevents
+           in
+           patch_family base ifam { fam with witnesses ; fevents }
+       done)
     old_related
 
 let effective_del_no_commit base op =

@@ -171,7 +171,7 @@ module Family = struct
            let place = evt.efam_place in
            let note = evt.efam_note in
            let src = evt.efam_src in
-           let wl = Array.map (fun (ip, wk) -> ip, wk, Gwdb.empty_string) evt.efam_witnesses in
+           let wl = evt.efam_witnesses in
            let x = name, date, place, note, src, wl, Some isp in
            x :: fam_fevents)
         (get_fevents fam) []
