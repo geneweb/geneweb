@@ -46,6 +46,8 @@ module Legacy_driver = struct
 
   type pers_event = (iper, istr) Def.gen_pers_event
 
+  type fam_event = (iper, istr) Def.gen_fam_event
+
   let compatibility_directory = "gnwb25"
 
   let compat_dir base =
@@ -72,7 +74,12 @@ module Legacy_driver = struct
       witness_notes : istr array array
       (*      base : Gwdb_legacy.Gwdb_driver.base*)
     }
-    
+
+  type family = {
+      family : Gwdb_legacy.Gwdb_driver.family;
+      witness_notes : istr array array
+    }
+              
   let write_witness_notes base tbl_opt = match tbl_opt with
     | None -> ()
     | Some tbl ->
@@ -142,7 +149,7 @@ module Legacy_driver = struct
     in
     let gen_pers = Translate.legacy_to_def_person empty_string gen_pers in
     {gen_pers with pevents}
-
+                             
   let person_of_gen_person base (genpers, gen_ascend, gen_union) =
     let pevents = genpers.Def.pevents in
     let witness_notes =
@@ -214,10 +221,16 @@ module Legacy_driver = struct
           {pe with epers_witnesses = witnesses}
         ) pevents in
     pevents
+
+  let get_fevents f =
+    let fevents = get_fevents f in
+    let fevents = List.map (fun fe -> Translate.legacy_to_def_fevent empty_string fe) fevents in
+    fevents
     
-  let make bname particles ((persons, ascends, unions), fam_arrays, string_arrays, base_notes) =
+  let make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes) =
     let persons = Array.map Translate.as_legacy_person persons in
-    make bname particles ((persons, ascends, unions), fam_arrays, string_arrays, base_notes)
+    let families = Array.map Translate.as_legacy_family families in
+    make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes)
 
 
   let open_base bname =
@@ -233,7 +246,7 @@ module Legacy_driver = struct
   let empty_person base iper =
     let p = empty_person base iper in
     {person = p; witness_notes = [||]}
-
+    
   let get_access p = get_access p.person
   let get_aliases p = get_aliases p.person
   let get_baptism p = get_baptism p.person
@@ -305,6 +318,85 @@ module Legacy_driver = struct
     Collection.map (fun person ->
         let witness_notes = witness_notes base (Gwdb_legacy.Gwdb_driver.get_iper person) in
         {person; witness_notes} ) coll
+
+  let empty_family base ifam =
+    let f = empty_family base ifam in
+    {family = f; witness_notes = [||]}
+
+  let gen_family_of_family f =
+    let gen_fam = gen_family_of_family f.family in
+    let fevents =
+      List.mapi (fun ie fe ->
+          let fe = Translate.legacy_to_def_fevent empty_string fe in
+          let efam_witnesses =
+            Array.mapi (fun iw (ip, wk, _) ->
+                ip, wk, f.witness_notes.(ie).(iw)) fe.efam_witnesses
+          in
+          {fe with efam_witnesses}
+        ) gen_fam.fevents
+    in
+    let gen_fam = Translate.legacy_to_def_family empty_string gen_fam in
+    {gen_fam with fevents}
+    
+  let family_of_gen_family base (genfam, gen_couple, gen_descend) =
+    let fevents = genfam.Def.fevents in
+    let witness_notes =
+      List.map (fun fe ->
+          Array.map (fun (_,_,wnote) -> wnote) fe.Def.efam_witnesses
+        ) fevents |> Array.of_list
+    in
+    let genfam = Translate.as_legacy_family genfam in
+    let family = family_of_gen_family base (genfam, gen_couple, gen_descend) in
+    {family; witness_notes}
+
+  let no_family ifam =
+    let nof = no_family ifam in
+    Translate.legacy_to_def_family empty_string nof
+
+  let patch_family base ifam genfam =
+    let genfam = Translate.as_legacy_family genfam in
+    (* TODO HANDLE WNOTES *)
+    patch_family base ifam genfam
+    
+  let insert_family base ifam genfam =
+    let genfam = Translate.as_legacy_family genfam in
+    (* TODO HANDLE WNOTES *)
+    insert_family base ifam genfam
+
+  let get_children f = get_children f.family
+  let get_comment f = get_comment f.family
+  let get_divorce f = get_divorce f.family
+  let get_father f = get_father f.family
+  let get_fevents f = get_fevents f.family
+  let get_fsources f = get_fsources f.family
+  let get_ifam f = get_ifam f.family
+  let get_marriage f = get_marriage f.family
+  let get_marriage_note f = get_marriage_note f.family
+  let get_marriage_place f = get_marriage_place f.family
+  let get_marriage_src f = get_marriage_src f.family
+  let get_mother f = get_mother f.family
+  let get_origin_file f = get_origin_file f.family
+  let get_parent_array f = get_parent_array f.family
+  let get_relation f = get_relation f.family
+  let get_witnesses f = get_witnesses f.family
+  let gen_couple_of_family f = gen_couple_of_family f.family
+  let gen_descend_of_family f = gen_descend_of_family f.family
+  let foi base ifam =
+    let family = foi base ifam in
+    (* TODO WNOTE *)
+    {family; witness_notes = Array.make 10 (Array.make 10 empty_string)}
+
+  let families ?(select = fun _ -> true) base =
+    let select f =
+      select {family = f; witness_notes = [||]}
+    in
+    let coll = families ~select base in
+    Collection.map (fun family ->
+        (* TODO WNOTES *)
+        let witness_notes = [||] in
+        {family; witness_notes} ) coll
+
+                         
 end
 
 module Driver = Compat.Make (Legacy_driver) (Legacy_driver)
