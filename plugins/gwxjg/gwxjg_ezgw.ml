@@ -114,10 +114,6 @@ module Person = struct
         end (get_family p) []
       in
       (* WNOTES HANDLE FWIT NOTES*)
-      let fevents = List.map (fun (a, b, c, d, e, wit, g) ->
-                        let wit = Array.map (fun (ip, wk) -> ip, wk, Gwdb.empty_string) wit in
-        a,b,c,d,e, wit,g) fevents
-      in
       CheckItem.merge_events get_name get_date pevents fevents
     end else []
 
@@ -229,7 +225,7 @@ module Family = struct
            let place = evt.efam_place in
            let note = evt.efam_note in
            let src = evt.efam_src in
-           let wl = Array.map (fun (ip, wk) -> ip, wk, Gwdb.empty_string) evt.efam_witnesses in
+           let wl = evt.efam_witnesses in
            let x = name, date, place, note, src, wl, Some isp in
            x :: fam_fevents)
         (get_fevents fam) []

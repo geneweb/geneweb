@@ -266,7 +266,8 @@ let check_fevents_witnesses ?report progress base =
     progress i nb_fam ;
     let ifath = get_father fam in
     List.iter begin fun evt ->
-      let witn = Array.map fst evt.efam_witnesses in
+      let fst' (x, _, _) = x in
+      let witn = Array.map fst' evt.efam_witnesses in
       for j = 0 to Array.length witn - 1 do
         let ip = witn.(j) in
         let p = poi base ip in

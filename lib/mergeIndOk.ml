@@ -341,9 +341,10 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                               p_related, mod_p
                             else
                               let (p_related, mod_p) =
-                                if fst e.efam_witnesses.(j) = ip2 then
-                                  let (_, wk) = e.efam_witnesses.(j) in
-                                  e.efam_witnesses.(j) <- p.key_index, wk;
+                                let witness_iper, _, _ = e.efam_witnesses.(j) in
+                                if witness_iper = ip2 then
+                                  let (_, wk, wnote) = e.efam_witnesses.(j) in
+                                  e.efam_witnesses.(j) <- p.key_index, wk, wnote;
                                   if List.mem ipc p_related then
                                     p_related, mod_p
                                   else ipc :: p_related, true
@@ -391,7 +392,7 @@ let redirect_added_families base p ip2 p2_family =
           List.iter
             (fun evt ->
                Array.iter
-                 (fun (ip, _) ->
+                 (fun (ip, _, _) ->
                     let w = poi base ip in
                     if not (List.mem p.key_index (get_related w)) then
                       let w = gen_person_of_person w in

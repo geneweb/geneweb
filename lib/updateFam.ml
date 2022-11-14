@@ -91,7 +91,7 @@ let family_events_opt env fam = match get_env "cnt" env with
 
 let witness_person_of_event_opt env e = match get_env "wcnt" env with
   | Vint i when (i - 1) >= 0 && (i - 1) < Array.length e.efam_witnesses ->
-     Some (fst e.efam_witnesses.(i - 1))
+     Some ((fun (p, _, _) -> p) e.efam_witnesses.(i - 1))
   | Vint i when (i - 1) >= 0 && (i - 1) < 2 && Array.length e.efam_witnesses < 2 ->
      Some ("", "", 0, Update.Create (Neuter, None), "")
   | _      -> None
@@ -193,7 +193,7 @@ and eval_event_str conf base env fam = match get_env "cnt" env with
          let src = Util.safe_html (sou base e.efam_src) in
          let wit =
            Array.fold_right
-             (fun (w, _) accu ->
+             (fun (w, _, _) accu ->
                (transl_nth conf "witness/witnesses" 0 ^<^ (transl conf ":") ^<^
                   Util.gen_person_text conf base (poi base w)) ::
                  accu)
@@ -225,7 +225,7 @@ and eval_fwitness_kind env fam = match get_env "cnt" env with
           Vint i ->
            let i = i - 1 in
            if i >= 0 && i < Array.length e.efam_witnesses then
-             eval_witness_kind (snd e.efam_witnesses.(i))
+             eval_witness_kind ((fun (_, wk, _) -> wk) e.efam_witnesses.(i))
            else if
              i >= 0 && i < 2 && Array.length e.efam_witnesses < 2
            then

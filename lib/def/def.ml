@@ -207,7 +207,7 @@ type ('person, 'string) gen_fam_event =
     efam_reason : 'string;
     efam_note : 'string;
     efam_src : 'string;
-    efam_witnesses : ('person * witness_kind) array }
+    efam_witnesses : ('person * witness_kind * 'string) array }
 
 (** Relation type with parent (if not native) *)
 type relation_type =

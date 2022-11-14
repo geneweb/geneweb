@@ -66,6 +66,9 @@ val map_ascend_f : ('a -> 'b) -> 'a gen_ascend -> 'b gen_ascend
     another one. *)
 val map_union_f : ('a -> 'b) -> 'a gen_union -> 'b gen_union
 
+(** Convert generic type used to represent a divorce into another one. *)
+val map_divorce : (Def.date -> Def.date) -> Def.divorce -> Def.divorce
+
 (** Convert:
 
     - Generic type used to represent faimily indexation key into another one.

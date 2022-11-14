@@ -352,7 +352,7 @@ type ('person, 'string) gen_fam_event =
   efam_reason : 'string;
   efam_note : 'string;
   efam_src : 'string;
-  efam_witnesses : ('person * witness_kind) array;
+  efam_witnesses : ('person * witness_kind * 'string) array;
 }
 
 (** Printer for [gen_fam_event] *)

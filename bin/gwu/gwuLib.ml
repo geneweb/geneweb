@@ -727,8 +727,9 @@ let print_fevent opts base gen in_comment e =
   if opts.source = None then
     print_if_no_empty opts base "#s" e.efam_src;
   print_sep ();
+  (* TODO HANDLE WNOTES *)
   Array.iter
-    (fun (ip, wk) ->
+    (fun (ip, wk, _wnote) ->
        if gen.per_sel ip then
          let p = poi base ip in
          Printf.ksprintf (oc opts) "wit";

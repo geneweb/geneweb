@@ -859,8 +859,8 @@ let update_relations_of_related base ip old_related =
              (fun e (list, rad) ->
                 let (witnesses, rad) =
                   Array.fold_right
-                    (fun (ip2, k) (accu, rad) ->
-                       if ip2 = ip then accu, true else (ip2, k) :: accu, rad)
+                    (fun (ip2, wkind, wnote) (accu, rad) ->
+                       if ip2 = ip then accu, true else (ip2, wkind, wnote) :: accu, rad)
                     e.efam_witnesses ([], rad)
                 in
                 let e = {e with efam_witnesses = Array.of_list witnesses} in

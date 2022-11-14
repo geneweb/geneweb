@@ -729,7 +729,7 @@ let update_family_with_fevents gen fam =
         Efam_Engage ->
         if !found_marriage then loop l fam
         else
-          let witnesses = Array.map fst evt.efam_witnesses in
+          let witnesses = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
           let fam =
             {fam with relation =
                         if nsck_std_fields then NoSexesCheckNotMarried else Engaged;
@@ -739,7 +739,7 @@ let update_family_with_fevents gen fam =
           in
           let () = found_marriage := true in loop l fam
       | Efam_Marriage ->
-        let witnesses = Array.map fst evt.efam_witnesses in
+        let witnesses = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
         let fam =
           {fam with relation =
                       if nsck_std_fields then NoSexesCheckMarried else Married;
@@ -751,7 +751,7 @@ let update_family_with_fevents gen fam =
       | Efam_MarriageContract ->
         if !found_marriage then loop l fam
         else
-          let witnesses = Array.map fst evt.efam_witnesses in
+          let witnesses = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
           (* Pour différencier le fait qu'on recopie le *)
           (* mariage, on met une précision "vers".      *)
           let date =
@@ -776,7 +776,7 @@ let update_family_with_fevents gen fam =
         Efam_Annulation | Efam_PACS ->
         if !found_marriage then loop l fam
         else
-          let witnesses = Array.map fst evt.efam_witnesses in
+          let witnesses = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
           let fam =
             {fam with relation =
                         if nsck_std_fields then NoSexesCheckNotMarried
@@ -789,7 +789,7 @@ let update_family_with_fevents gen fam =
       | Efam_NoMarriage ->
         if !found_marriage then loop l fam
         else
-          let witnesses = Array.map fst evt.efam_witnesses in
+          let witnesses = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
           let fam =
             {fam with relation =
                         if nsck_std_fields then NoSexesCheckNotMarried
@@ -831,7 +831,7 @@ let update_fevents_with_family gen fam =
       | Pacs -> Efam_PACS
       | Residence -> Efam_Residence
     in
-    let witnesses = Array.map (fun ip -> ip, Witness) fam.witnesses in
+    let witnesses = Array.map (fun ip -> ip, Witness, empty_string) fam.witnesses in
     let evt =
       {efam_name = name; efam_date = fam.marriage;
        efam_place = fam.marriage_place; efam_reason = empty_string;
@@ -928,7 +928,8 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
                 let (p, ip) = insert_somebody gen wit in
                 notice_sex gen p sex;
                 p.m_related <- ifath :: p.m_related;
-                ip, wk)
+                let wistr = unique_string gen wnote in
+                ip, wk, wistr)
              witl
          in
          {efam_name = fevent_name_unique_string gen name; efam_date = date;

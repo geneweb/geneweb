@@ -154,7 +154,7 @@ type 'string gen_fam_event_name = 'string Def.gen_fam_event_name =
   | Efam_Residence
   | Efam_Name of 'string
 
-type ('person, 'string) gen_fam_event = ('person, 'string) Def.gen_fam_event =
+type ('person, 'string) gen_fam_event = (*('person, 'string) Def.gen_fam_event =*)
   { efam_name : 'string gen_fam_event_name;
     efam_date : cdate;
     efam_place : 'string;
@@ -233,7 +233,7 @@ type 'family gen_union = 'family Def.gen_union = { family : 'family array }
 
 (* family *)
 
-type ('person, 'ifam, 'string) gen_family = ('person, 'ifam, 'string) Def.gen_family =
+type ('person, 'ifam, 'string) gen_family = (*('person, 'ifam, 'string) Def.gen_family =*)
   { marriage : cdate;
     marriage_place : 'string;
     marriage_note : 'string;

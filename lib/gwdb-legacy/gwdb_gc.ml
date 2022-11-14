@@ -72,7 +72,7 @@ let gc ?(dry_run = true) ~save_mem base =
       let f = base.data.families.get i in
       (* if family wasn't deleted *)
       if f.fam_index <> dummy_ifam then begin
-        let _ = Futil.map_family_ps markp markf marks f in
+        let _ = Dutil.map_family_ps markp markf marks f in
         let _ = Futil.map_couple_p false markp @@ base.data.couples.get i in
         let _ = Futil.map_descend_p markp @@ base.data.descends.get i in
         ()
@@ -152,7 +152,7 @@ let gc ?(dry_run = true) ~save_mem base =
     in
     let families =
       Array.init lenf @@ begin fun i ->
-        Futil.map_family_ps dst_iper (fun _ -> i) dst_istr @@ base.data.families.get @@ src_ifam i
+        Dutil.map_family_ps dst_iper (fun _ -> i) dst_istr @@ base.data.families.get @@ src_ifam i
       end
     in
     let couples =

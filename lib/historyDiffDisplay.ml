@@ -636,9 +636,7 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) : string -> ('a expr_va
   | "fevent_witness" ->
     begin match get_env "fevent" env with
     | Vfevent (bef, aft, m_auth) ->
-       (* WNOTES TODO *)
-       let fam_wit ws = Array.map (fun (ip, wk) -> ip, wk, "") ws in
-        aux' m_auth bef aft (fun conf x -> string_of_event_witness conf base (fam_wit x.efam_witnesses))
+        aux' m_auth bef aft (fun conf x -> string_of_event_witness conf base x.efam_witnesses)
       | _ -> raise Not_found
     end
   | "comment" ->

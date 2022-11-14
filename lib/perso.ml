@@ -1344,9 +1344,8 @@ let events_list conf base p =
          CheckItem.merge_events get_name get_date fam_fevents fevents)
       (get_family p) []
   in
-  (* WNOTES TODO WFAMNOTES *)
   let fevents = List.map (fun (a, b, c, d, e, ws, f) ->
-                    let ws = Array.map (fun (ip, wk) -> ip, wk, Gwdb.empty_string) ws in
+                    let ws = Array.map (fun (ip, wk, wnote) -> ip, wk, Gwdb.empty_string) ws in
                     a, b, c, d, e, ws, f
                   )
                   fevents in
