@@ -303,7 +303,7 @@ type ('person, 'string) gen_fam_event = ('person, 'string) Def.gen_fam_event = {
   efam_reason : 'string;
   efam_note : 'string;
   efam_src : 'string;
-  efam_witnesses : ('person * witness_kind) array;
+  efam_witnesses : ('person * witness_kind * 'string) array;
 }
 
 val pp_gen_fam_event :

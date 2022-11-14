@@ -281,28 +281,24 @@ let check_pevents_witnesses ?report progress base =
 
 let check_fevents_witnesses ?report progress base =
   let nb_fam = nb_of_families base in
-  Gwdb.Collection.iteri
-    (fun i fam ->
-      progress i nb_fam;
-      let ifath = get_father fam in
-      List.iter
-        (fun evt ->
-          let witn = Array.map fst evt.efam_witnesses in
-          for j = 0 to Array.length witn - 1 do
-            let ip = witn.(j) in
-            let p = poi base ip in
-            if not (List.memq ifath (get_related p)) then (
-              patch_person base ip
-                {
-                  (gen_person_of_person p) with
-                  related = ifath :: get_related p;
-                };
-              match report with
-              | Some fn -> fn (Fix_AddedRelatedFromFevent (ip, ifath))
-              | None -> ())
-          done)
-        (get_fevents fam))
-    (Gwdb.families base)
+  Gwdb.Collection.iteri begin fun i fam ->
+    progress i nb_fam ;
+    let ifath = get_father fam in
+    List.iter begin fun evt ->
+      let fst' (x, _, _) = x in
+      let witn = Array.map fst' evt.efam_witnesses in
+      for j = 0 to Array.length witn - 1 do
+        let ip = witn.(j) in
+        let p = poi base ip in
+        if not (List.memq ifath (get_related p)) then begin
+          patch_person base ip {(gen_person_of_person p) with related = ifath :: get_related p} ;
+          match report with
+          | Some fn -> fn (Fix_AddedRelatedFromFevent (ip, ifath)) ;
+          | None -> ()
+          end
+      done
+    end (get_fevents fam)
+  end (Gwdb.families base)
 
 let fix_marriage_divorce ?report progress base =
   let nb_fam = nb_of_families base in

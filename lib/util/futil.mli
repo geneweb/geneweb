@@ -63,6 +63,9 @@ val map_union_f : ('a -> 'b) -> 'a gen_union -> 'b gen_union
 (** Convert generic type used to represent one of the famillies inside [Def.gen_union] into
     another one. *)
 
+(** Convert generic type used to represent a divorce into another one. *)
+val map_divorce : (Def.date -> Def.date) -> Def.divorce -> Def.divorce
+
 val map_family_ps :
   ?fd:(Def.date -> Def.date) ->
   ('a -> 'b) ->

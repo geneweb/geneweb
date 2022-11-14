@@ -113,10 +113,11 @@ module Make (D : ConverterDriver) = struct
        ; "note", str note
       |]
 
-  let conv_fevent_witness (i, kind) =
+  let conv_fevent_witness (i, kind, note) =
     obj
-      [|
-        ("person", handler_of_iper i); ("kind", conv_event_witness_kind kind);
+      [| "person", handler_of_iper i
+       ; "kind", conv_event_witness_kind kind
+       ; "note", str note
       |]
     
   let conv_pevent pevent =

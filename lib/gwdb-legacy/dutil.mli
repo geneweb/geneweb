@@ -77,12 +77,17 @@ val name_index : string -> int
     in an array of size [table_size].
 *)
 
-(** [empty_person empty quest] returns a Def.gen_person with
+(** [empty_person empty quest] returns a Dbdisk.gen_person with
     [first_name] and [surname] initialized to [quest],
     other 'string field initialized to [empty], and
     only empty arrays/lists.
 *)
 val empty_person : 'string -> 'string -> (unit, _, 'string) Dbdisk.gen_person
+
+(** [empty_family empty] returns a Dbdisk.gen_person with string field initialized
+    initialized with [empty] and only empty arrays/lists.
+*)
+val empty_family : 'string -> (_, unit, 'string) Dbdisk.gen_family
 
 (** Convert:
     
@@ -98,4 +103,20 @@ val map_person_ps
   -> ('c -> 'e)
   -> ('a, 'b, 'c) Dbdisk.gen_person
   -> ('a, 'd, 'e) Dbdisk.gen_person
+
+(** Convert:
+
+    - Generic type used to represent faimily indexation key into another one.
+    - Generic type used to represent witnesses (of the marriage or of a famillial events, etc.)
+    of [Def.gen_family] into another one.
+    - Generic type used to represent another large part of information of [Def.gen_family]
+    into another one.
+    If [fd] is present, apply it on it on every date (marriage, divorce, famillial events, etc.).*)
+val map_family_ps
+    : ?fd:(Def.date -> Def.date)
+    -> ('a -> 'b)
+    -> ('c -> 'd)
+    -> ('e -> 'f)
+    -> ('a, 'c, 'e) Dbdisk.gen_family
+    -> ('b, 'd, 'f) Dbdisk.gen_family
 
