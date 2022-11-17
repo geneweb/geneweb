@@ -220,12 +220,12 @@ let print_sosa conf base p link =
   let sosa_num = get_sosa_person p in
   if Sosa.gt sosa_num Sosa.zero then
     match Util.find_sosa_ref conf base with
-      Some ref ->
+      Some r ->
         if not link then ()
         else
           begin let sosa_link =
               let i1 = string_of_iper (get_iper p) in
-              let i2 = string_of_iper (get_iper ref) in
+              let i2 = string_of_iper (get_iper r) in
               let b2 = Sosa.to_string sosa_num in
               "m=RL&i1=" ^ i1 ^ "&i2=" ^ i2 ^ "&b1=1&b2=" ^ b2
             in
@@ -235,12 +235,12 @@ let print_sosa conf base p link =
             Output.print_sstring conf {|"> |};
           end;
         let title =
-          if Util.is_hide_names conf ref && not (Util.authorized_age conf base ref) then
+          if Util.is_hide_names conf r && not (Util.authorized_age conf base r) then
             ""
           else
             let direct_ancestor =
-              Name.strip_c (p_first_name base ref) '"' ^ " " ^
-              Name.strip_c (p_surname base ref) '"'
+              Name.strip_c (p_first_name base r) '"' ^ " " ^
+              Name.strip_c (p_surname base r) '"'
             in
             Printf.sprintf (Util.fcapitale (Util.ftransl conf "direct ancestor of %s"))
               direct_ancestor ^
@@ -249,6 +249,7 @@ let print_sosa conf base p link =
         in
         Output.print_sstring conf {|<img src="|} ;
         Output.print_string conf (Image.prefix conf) ;
+        Output.print_sstring conf {|/sosa.png" alt="sosa" title="|} ;
         Output.print_string conf (title |> Adef.safe) ;
         Output.print_sstring conf {|"> |};
         if not link then () else 
