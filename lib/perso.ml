@@ -9,12 +9,6 @@ open Util
 let max_im_wid = 240
 let round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0
 
-let has_children base u =
-  Array.exists
-    (fun ifam ->
-       let des = foi base ifam in Array.length (get_children des) > 0)
-    (get_family u)
-
 let string_of_marriage_text conf base fam =
   let marriage = Adef.od_of_cdate (get_marriage fam) in
   let marriage_place = sou base (get_marriage_place fam) in

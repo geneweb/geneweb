@@ -1,12 +1,6 @@
 open Def
 open Gwdb
 
-let has_children base u =
-  Array.exists
-    (fun ifam ->
-       let des = foi base ifam in Array.length (get_children des) > 0)
-    (get_family u)
-
 (* Optimisation de find_sosa_aux :                                           *)
 (* - ajout d'un cache pour conserver les descendants du sosa que l'on calcul *)
 (* - on sauvegarde la dernière génération où l'on a arrêté le calcul pour    *)
@@ -107,7 +101,7 @@ let find_sosa conf base a sosa_ref t_sosa =
       if get_iper a = get_iper p then Some (Sosa.one, p)
       else
         let u = Util.pget conf base (get_iper a) in
-        if has_children base u then
+        if Util.has_children base u then
           try Hashtbl.find t_sosa.sosa_ht (get_iper a) with
             Not_found -> find_sosa_aux conf base a p t_sosa
         else None
@@ -116,6 +110,20 @@ let find_sosa conf base a sosa_ref t_sosa =
 (* [Type]: (iper, Sosa.t) Hashtbl.t *)
 let sosa_ht = Hashtbl.create 5003
 
+(* ************************************************************************ *)
+(*  [Fonc] build_sosa_tree_ht : config -> base -> person -> unit            *)
+(** [Description] : Construit à partir d'une personne la base, la
+      liste de tous ses ancêtres directs et la stocke dans une hashtbl. La
+      clé de la table est l'iper de la personne et on lui associe son numéro
+      de sosa. Les sosa multiples ne sont représentés qu'une seule fois par
+      leur plus petit numéro sosa.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+    [Retour] :
+      - unit
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
 let build_sosa_tree_ht conf base person =
   let () = load_ascends_array base in
   let () = load_couples_array base in
@@ -168,11 +176,30 @@ let build_sosa_tree_ht conf base person =
   in
   loop 1 1
 
+(* ************************************************************************ *)
+(*  [Fonc] build_sosa_ht : config -> base -> unit                           *)
+(** [Description] : Fait appel à la construction de la
+      liste de tous les ancêtres directs de la souche de l'arbre
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+    [Retour] :
+      - unit
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
 let build_sosa_ht conf base =
   match Util.find_sosa_ref conf base with
     Some sosa_ref -> build_sosa_tree_ht conf base sosa_ref
   | None -> ()
 
+(* ******************************************************************** *)
+(*  [Fonc] next_sosa : Sosa.t -> Sosa.t               *)
+(** [Description] : Recherche le sosa suivant
+    [Args] :
+      - s    : sosa
+    [Retour] :
+      - Sosa.t : retourne Sosa.zero s'il n'y a pas de sosa suivant      *)
+(* ******************************************************************** *)
 let next_sosa s =
   (* La clé de la table est l'iper de la personne et on lui associe son numéro
     de sosa. On inverse pour trier sur les sosa *)
@@ -202,9 +229,33 @@ let prev_sosa s =
   let (so, ip) = find_n s sosa_list in
   (so, ip)
 
+(* ******************************************************************** *)
+(*  [Fonc] get_sosa_person : config -> person -> Sosa.t          *)
+(** [Description] : Recherche si la personne passée en argument a un
+                    numéro de sosa.
+    [Args] :
+      - p    : personne dont on cherche si elle a un numéro sosa
+    [Retour] :
+      - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de
+                sosa, ou retourne son numéro de sosa sinon
+    [Rem] : Exporté en clair hors de ce module.                         *)
+(* ******************************************************************** *)
 let get_sosa_person p =
   try Hashtbl.find sosa_ht (get_iper p) with Not_found -> Sosa.zero
 
+(* ******************************************************************** *)
+(*  [Fonc] get_single_sosa : config -> base -> person -> Sosa.t          *)
+(** [Description] : Recherche si la personne passée en argument a un
+                    numéro de sosa.
+    [Args] :
+    - conf : configuration de la base
+    - base : base de donnée
+    - p    : personne dont on cherche si elle a un numéro sosa
+      [Retour] :
+    - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de
+                sosa, ou retourne son numéro de sosa sinon
+      [Rem] : Exporté en clair hors de ce module.                         *)
+(* ******************************************************************** *)
 let get_single_sosa conf base p =
   match Util.find_sosa_ref conf base with
   | None -> Sosa.zero
@@ -216,6 +267,22 @@ let get_single_sosa conf base p =
       | Some (z, _) -> z
       | None -> Sosa.zero
 
+(* ************************************************************************ *)
+(*  [Fonc] print_sosa : config -> base -> person -> bool -> unit            *)
+(** [Description] : Affiche le picto sosa ainsi que le lien de calcul de
+      relation entre la personne et le sosa 1 (si l'option cancel_link
+      n'est pas activée).
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : la personne que l'on veut afficher
+      - link : ce booléen permet d'afficher ou non le lien sur le picto
+               sosa. Il n'est pas nécessaire de mettre le lien si on a
+               déjà affiché cette personne.
+    [Retour] :
+      - unit
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
 let print_sosa conf base p link =
   let sosa_num = get_sosa_person p in
   if Sosa.gt sosa_num Sosa.zero then

@@ -568,3 +568,5 @@ val designation : base -> person -> Adef.escaped_string
 
 (** equality between base_warnings *)
 val eq_warning : base -> CheckItem.base_warning -> CheckItem.base_warning -> bool
+
+val has_children : base -> person -> bool

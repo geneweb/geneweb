@@ -2799,3 +2799,9 @@ let cut_words str =
 
 let designation base p =
   Gutil.designation base p |> escape_html
+
+let has_children base u =
+  Array.exists
+    (fun ifam ->
+      let des = foi base ifam in Array.length (get_children des) > 0)
+    (get_family u)
