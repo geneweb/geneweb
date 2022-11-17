@@ -1941,8 +1941,8 @@ and eval_compound_var conf base env (a, _ as ep) loc =
         Vstring wk -> VVstring wk
       | _ -> raise Not_found
     end
-  | "event_witness_relation_note" :: _ ->
-     begin match get_env "event_witness_relation_note" env with
+  | "event_witness_note" :: _ ->
+     begin match get_env "event_witness_note" env with
        Vstring wnote -> VVstring wnote
      | _ -> raise Not_found
      end
@@ -4391,12 +4391,13 @@ let print_foreach conf base print_ast eval_expr =
       match get_env "event" env with
         Vevent (_, (_, _, _, _, _, witnesses, _)) ->
           Array.iteri
-            begin fun i (ip, wk, _) ->
+            begin fun i (ip, wk, wnote) ->
               let p = pget conf base ip in
               let wk = Util.string_of_witness_kind conf (get_sex p) wk in
               let env =
                 ("event_witness", Vind p)
                 :: ("event_witness_kind", Vstring (wk :> string))
+                :: ( "event_witness_note", Vstring (sou base wnote))
                 :: ("first", Vbool (i = 0))
                 :: env
               in
@@ -4446,7 +4447,7 @@ let print_foreach conf base print_ast eval_expr =
            let env =
              ( "event_witness_relation_kind"
              , Vstring (wk : Adef.safe_string :> string) )
-             :: ( "event_witness_relation_note", Vstring (wnote : Adef.escaped_string :> string))
+             :: ( "event_witness_note", Vstring (wnote : Adef.escaped_string :> string))
              :: env
            in
            List.iter (print_ast env ep) al)
