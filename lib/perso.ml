@@ -3318,7 +3318,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
             (* Renvoie vrai que si il y a des informations supplémentaires *)
             (* par rapport aux évènements principaux, i.e. témoins (mais   *)
             (* on ne prend pas en compte les notes).                       *)
-            let rec loop events nb_birth nb_bapt nb_deat nb_buri nb_marr =
+            let rec loop events nb_principal_pevents nb_marr =
               match events with
               | [] -> false
               | (name, _, p, n, s, wl, _) :: events -> (
@@ -3330,26 +3330,11 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                       | Epers_Cremation ->
                           if Array.length wl > 0 then true
                           else
-                            let nb_birth, nb_bapt, nb_deat, nb_buri =
-                              match pname with
-                              | Epers_Birth ->
-                                  (succ nb_birth, nb_bapt, nb_deat, nb_buri)
-                              | Epers_Baptism ->
-                                  (nb_birth, succ nb_bapt, nb_deat, nb_buri)
-                              | Epers_Death ->
-                                  (nb_birth, nb_bapt, succ nb_deat, nb_buri)
-                              | Epers_Burial | Epers_Cremation ->
-                                  (nb_birth, nb_bapt, nb_deat, succ nb_buri)
-                              | _ -> (nb_birth, nb_bapt, nb_deat, nb_buri)
-                            in
-                            if
-                              Array.exists
-                                (fun i -> i > 1)
-                                [| nb_birth; nb_bapt; nb_deat; nb_buri |]
-                            then true
+                            let nb_principal_pevents = succ nb_principal_pevents in
+                            if nb_principal_pevents > 1 then
+                              true
                             else
-                              loop events nb_birth nb_bapt nb_deat nb_buri
-                                nb_marr
+                              loop events nb_principal_pevents nb_marr
                       | _ -> true)
                   | Fevent fname -> (
                       match fname with
@@ -3358,16 +3343,16 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                           let nb_marr = succ nb_marr in
                           if nb_marr > nb_fam then true
                           else
-                            loop events nb_birth nb_bapt nb_deat nb_buri nb_marr
+                            loop events nb_principal_pevents nb_marr
                       | Efam_Divorce | Efam_Separated ->
                           if
                             p <> "" || n <> "" || s <> "" || Array.length wl > 0
                           then true
                           else
-                            loop events nb_birth nb_bapt nb_deat nb_buri nb_marr
+                            loop events nb_principal_pevents nb_marr
                       | _ -> true))
             in
-            loop events 0 0 0 0 0
+            loop events 0 0
       else false
   | "has_families" ->
       Array.length (get_family p) > 0
