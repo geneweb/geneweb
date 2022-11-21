@@ -3081,63 +3081,47 @@ and eval_bool_person_field conf base env (p, p_auth) =
         | Some "never" -> false
         | Some "always" ->
           if nb_fam > 0 || (List.length events) > 0 then true else false
-        | _ ->
+        | Some _ | None ->
             (* Renvoie vrai que si il y a des informations supplémentaires *)
             (* par rapport aux évènements principaux, i.e. témoins (mais   *)
             (* on ne prend pas en compte les notes).                       *)
-            let rec loop events nb_birth nb_bapt nb_deat nb_buri nb_marr =
+            let rec loop events nb_principal_pevents nb_marr =
               match events with
-                [] -> false
+              | [] -> false
               | (name, _, p, n, s, wl, _) :: events ->
                   let (p, n, s) = sou base p, sou base n, sou base s in
                   match name with
                     Pevent pname ->
                       begin match pname with
-                        Epers_Birth | Epers_Baptism | Epers_Death |
+                      | Epers_Birth | Epers_Baptism | Epers_Death |
                         Epers_Burial | Epers_Cremation ->
                           if Array.length wl > 0 then true
                           else
-                            let (nb_birth, nb_bapt, nb_deat, nb_buri) =
-                              match pname with
-                                Epers_Birth ->
-                                  succ nb_birth, nb_bapt, nb_deat, nb_buri
-                              | Epers_Baptism ->
-                                  nb_birth, succ nb_bapt, nb_deat, nb_buri
-                              | Epers_Death ->
-                                  nb_birth, nb_bapt, succ nb_deat, nb_buri
-                              | Epers_Burial | Epers_Cremation ->
-                                  nb_birth, nb_bapt, nb_deat, succ nb_buri
-                              | _ -> nb_birth, nb_bapt, nb_deat, nb_buri
-                            in
-                            if List.exists (fun i -> i > 1)
-                                 [nb_birth; nb_bapt; nb_deat; nb_buri]
-                            then
+                            let nb_principal_pevents = succ nb_principal_pevents in
+                            if nb_principal_pevents > 1 then
                               true
                             else
-                              loop events nb_birth nb_bapt nb_deat nb_buri
-                                nb_marr
+                              loop events nb_principal_pevents nb_marr
                       | _ -> true
                       end
                   | Fevent fname ->
                       match fname with
-                        Efam_Engage | Efam_Marriage | Efam_NoMention |
+                      | Efam_Engage | Efam_Marriage | Efam_NoMention |
                         Efam_NoMarriage ->
                           let nb_marr = succ nb_marr in
                           if nb_marr > nb_fam then true
                           else
-                            loop events nb_birth nb_bapt nb_deat nb_buri
-                              nb_marr
+                            loop events nb_principal_pevents nb_marr
                       | Efam_Divorce | Efam_Separated ->
                           if p <> "" || n <> "" || s <> "" ||
                              Array.length wl > 0
                           then
                             true
                           else
-                            loop events nb_birth nb_bapt nb_deat nb_buri
-                              nb_marr
+                            loop events nb_principal_pevents nb_marr
                       | _ -> true
             in
-            loop events 0 0 0 0 0
+            loop events 0 0
       else false
   | "has_families" ->
       Array.length (get_family p) > 0
