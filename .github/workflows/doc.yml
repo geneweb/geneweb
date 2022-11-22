@@ -1,39 +1,28 @@
-name: Build and deploy documentation
-
+name: deploy-doc
 on:
   push:
     branches:
       - master
-
 jobs:
-
   build-and-deploy:
-
     runs-on: ubuntu-latest
-
     steps:
-
-      - name: Checkout code
+      - name: checkout-code
         uses: actions/checkout@v2
-
-      - name: Use OCaml 4.13.1
+      - name: setup-ocaml
         uses: avsm/setup-ocaml@v1
         with:
-          ocaml-version: 4.13.1
-
-      - name: Install GeneWeb depenencies
+          ocaml-version: 4.14.0
+      - name: setup
         run: |
-             sudo apt-get update
-             opam pin add geneweb.dev . --no-action
-             opam depext geneweb --yes
-             opam install geneweb --deps-only
-
-      - name: Generate documentation
+             opam pin add . -y --no-action
+             opam depext -y geneweb
+             opam install -y ./*.opam --deps-only --with-doc
+      - name: build
         run: |
              opam exec -- ocaml ./configure.ml
              opam exec -- make doc
-
-      - name: Deploy documentation
+      - name: deploy
         uses: JamesIves/github-pages-deploy-action@v4.2.3
         with:
           branch: gh-pages # The branch the action should deploy to.
