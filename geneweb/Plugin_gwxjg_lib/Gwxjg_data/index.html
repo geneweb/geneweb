@@ -79,13 +79,7 @@
   <span><span class="xref-unresolved">Jingoo</span>.Jg_types.tvalue list</span></span></code></div></div><div class="odoc-spec"><div class="spec value" id="val-mk_witness_kind" class="anchored"><a href="#val-mk_witness_kind" class="anchor"></a><code><span><span class="keyword">val</span> mk_witness_kind : <span><a href="../../Def/index.html#type-witness_kind">Def.witness_kind</a> <span class="arrow">&#45;&gt;</span></span> <span class="xref-unresolved">Jingoo</span>.Jg_types.tvalue</span></code></div></div><div class="odoc-spec"><div class="spec value" id="val-mk_event" class="anchored"><a href="#val-mk_event" class="anchor"></a><code><span><span class="keyword">val</span> mk_event : 
   <span><a href="../../Geneweb/Config/index.html#type-config">Geneweb.Config.config</a> <span class="arrow">&#45;&gt;</span></span>
   <span><a href="../../Gwdb/index.html#type-base">Gwdb.base</a> <span class="arrow">&#45;&gt;</span></span>
-  <span><span>(<a href="../../Geneweb/Perso/index.html#type-event_name">Geneweb.Perso.event_name</a>
-   * <a href="../../Def/index.html#type-cdate">Def.cdate</a>
-   * <a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a>
-   * <a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a>
-   * <a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a>
-   * <span><span>(<a href="../../Gwdb/index.html#type-iper">Gwdb.iper</a> * <a href="../../Def/index.html#type-witness_kind">Def.witness_kind</a>)</span> array</span>
-   * <span><a href="../../Gwdb/index.html#type-iper">Gwdb.iper</a> option</span>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a> <a href="../../Geneweb/Event/index.html#type-event_item">Geneweb.Event.event_item</a></span> <span class="arrow">&#45;&gt;</span></span>
   <span class="xref-unresolved">Jingoo</span>.Jg_types.tvalue</span></code></div></div><div class="odoc-spec"><div class="spec value" id="val-mk_title" class="anchored"><a href="#val-mk_title" class="anchor"></a><code><span><span class="keyword">val</span> mk_title : 
   <span><a href="../../Geneweb/Config/index.html#type-config">Geneweb.Config.config</a> <span class="arrow">&#45;&gt;</span></span>
   <span><a href="../../Gwdb/index.html#type-base">Gwdb.base</a> <span class="arrow">&#45;&gt;</span></span>
@@ -114,27 +108,13 @@
   <span class="xref-unresolved">Jingoo</span>.Jg_types.tvalue</span></code></div></div><div class="odoc-spec"><div class="spec value" id="val-find_event" class="anchored"><a href="#val-find_event" class="anchor"></a><code><span><span class="keyword">val</span> find_event : 
   <span><a href="../../Geneweb/Config/index.html#type-config">Geneweb.Config.config</a> <span class="arrow">&#45;&gt;</span></span>
   <span><a href="../../Gwdb/index.html#type-base">Gwdb.base</a> <span class="arrow">&#45;&gt;</span></span>
-  <span><a href="../../Geneweb/Perso/index.html#type-event_name">Geneweb.Perso.event_name</a> <span class="arrow">&#45;&gt;</span></span>
-  <span><span><span>(<a href="../../Geneweb/Perso/index.html#type-event_name">Geneweb.Perso.event_name</a>
-   * <a href="../../Def/index.html#type-cdate">Def.cdate</a>
-   * <a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a>
-   * <a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a>
-   * <a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a>
-   * <span><span>(<a href="../../Gwdb/index.html#type-iper">Gwdb.iper</a> * <a href="../../Def/index.html#type-witness_kind">Def.witness_kind</a>)</span> array</span>
-   * <span><a href="../../Gwdb/index.html#type-iper">Gwdb.iper</a> option</span>)</span>
-    list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a> <a href="../../Geneweb/Event/index.html#type-event_name">Geneweb.Event.event_name</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a> <a href="../../Geneweb/Event/index.html#type-event_item">Geneweb.Event.event_item</a></span> list</span> <span class="arrow">&#45;&gt;</span></span>
   <span class="xref-unresolved">Jingoo</span>.Jg_types.tvalue</span></code></div></div><div class="odoc-spec"><div class="spec value" id="val-find_events" class="anchored"><a href="#val-find_events" class="anchor"></a><code><span><span class="keyword">val</span> find_events : 
   <span><a href="../../Geneweb/Config/index.html#type-config">Geneweb.Config.config</a> <span class="arrow">&#45;&gt;</span></span>
   <span><a href="../../Gwdb/index.html#type-base">Gwdb.base</a> <span class="arrow">&#45;&gt;</span></span>
-  <span><span><a href="../../Geneweb/Perso/index.html#type-event_name">Geneweb.Perso.event_name</a> list</span> <span class="arrow">&#45;&gt;</span></span>
-  <span><span><span>(<a href="../../Geneweb/Perso/index.html#type-event_name">Geneweb.Perso.event_name</a>
-   * <a href="../../Def/index.html#type-cdate">Def.cdate</a>
-   * <a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a>
-   * <a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a>
-   * <a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a>
-   * <span><span>(<a href="../../Gwdb/index.html#type-iper">Gwdb.iper</a> * <a href="../../Def/index.html#type-witness_kind">Def.witness_kind</a>)</span> array</span>
-   * <span><a href="../../Gwdb/index.html#type-iper">Gwdb.iper</a> option</span>)</span>
-    list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a> <a href="../../Geneweb/Event/index.html#type-event_name">Geneweb.Event.event_name</a></span> list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><a href="../../Gwdb/index.html#type-istr">Gwdb.istr</a> <a href="../../Geneweb/Event/index.html#type-event_item">Geneweb.Event.event_item</a></span> list</span> <span class="arrow">&#45;&gt;</span></span>
   <span class="xref-unresolved">Jingoo</span>.Jg_types.tvalue</span></code></div></div><div class="odoc-spec"><div class="spec value" id="val-unsafe_mk_person" class="anchored"><a href="#val-unsafe_mk_person" class="anchor"></a><code><span><span class="keyword">val</span> unsafe_mk_person : 
   <span><a href="../../Geneweb/Config/index.html#type-config">Geneweb.Config.config</a> <span class="arrow">&#45;&gt;</span></span>
   <span><a href="../../Gwdb/index.html#type-base">Gwdb.base</a> <span class="arrow">&#45;&gt;</span></span>
