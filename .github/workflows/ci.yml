@@ -1,54 +1,40 @@
-name: CI
-
+name: build
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
-
+  push:
+    branches:
+      - master
 jobs:
-
   build:
-
     strategy:
-
-      fail-fast: true
-
+      fail-fast: false
       matrix:
-
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
         ocaml-version:
           - 4.14.0
-          - 4.13.1
-          - 4.12.1
-          - 4.11.2
-          - 4.10.2
-          - 4.09.1
-          - 4.08.1
-
+        include:
+          - os: ubuntu-latest
+            ocaml-version: 4.08.0
+    runs-on: ${{ matrix.os }}
     runs-on: ubuntu-latest
-
     steps:
-
-      - name: Checkout code
+      - name: checkout
         uses: actions/checkout@v2
-
-      - name: Use OCaml ${{ matrix.ocaml-version }}
+      - name: setup-ocaml
         uses: avsm/setup-ocaml@v1
         with:
           ocaml-version: ${{ matrix.ocaml-version }}
-
-      - run: opam install dune ocamlformat
-
-      - run: opam exec -- dune build @fmt
-
-      - run: sudo apt-get update
-
-      - run: opam pin add geneweb.dev . --no-action
-
-      - run: opam depext geneweb --yes
-
-      - run: opam install geneweb --deps-only
-
-      - run: opam exec -- make ci
+      - name: setup
+        run: |
+          opam install dune ocamlformat
+          opam exec -- dune build @fmt
+          opam pin add . -y --no-action
+          opam depext -y geneweb
+          opam install -y ./*.opam --deps-only --with-test
+      - name: makeci
+        run: opam exec -- make ci
