@@ -768,6 +768,10 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
   let log _ = ()
    
   let open_base bname =
+    let bname =
+      if Filename.check_suffix bname ".gwb" then bname
+      else bname ^ ".gwb"
+    in
     let ic = Secure.open_in_bin (Filename.concat bname "base") in
     let version_opt =
       try
