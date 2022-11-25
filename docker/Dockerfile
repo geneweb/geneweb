@@ -64,7 +64,4 @@ COPY geneweb-launch.sh bin/geneweb-launch.sh
 EXPOSE 2316-2317
 VOLUME [ "/usr/local/share/geneweb/share/data", "/usr/local/share/geneweb/etc" ]
 
-# Ignore the USER warning here - geneweb-launch.sh uses sudo to run the services as an unprivileged user
-# hadolint ignore=DL3002
-USER root
 CMD [ "bin/geneweb-launch.sh" ]
