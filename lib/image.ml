@@ -177,7 +177,7 @@ let has_access_to_portrait conf base p =
   let img = get_image p in
   (not conf.no_image)
   && Util.authorized_age conf base p
-  && (not (is_empty_string img) || full_portrait_path conf base p <> None)
+  && ((not (is_empty_string img)) || full_portrait_path conf base p <> None)
   && (conf.wizard || conf.friend
      || not (Mutil.contains (sou base img) "/private/"))
 (* TODO: privacy settings should be in db not in url *)
@@ -236,7 +236,10 @@ let get_portrait_with_size conf base p =
         | Error _e -> None
         | Ok (s, size) -> Some (s, Some size))
     | `Url _s as url -> Some (url, None)
-    | `Path p as path -> if Sys.file_exists p then Some (path, size_from_path path |> Result.to_option) else None
+    | `Path p as path ->
+        if Sys.file_exists p then
+          Some (path, size_from_path path |> Result.to_option)
+        else None
     | `Empty -> (
         match full_portrait_path conf base p with
         | None -> None

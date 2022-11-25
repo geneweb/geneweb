@@ -2,6 +2,7 @@ open Def
 
 module type ConverterDriver = sig
   type t
+
   val str : string -> t
   val int : int -> t
   val obj : (string * t) array -> t
@@ -36,7 +37,6 @@ end
  * end *)
 
 module Make (D : ConverterDriver) = struct
-
   let str = D.str
   let int = D.int
   let obj = D.obj
@@ -49,17 +49,19 @@ module Make (D : ConverterDriver) = struct
   (** gwdb to json  *)
 
   let conv_dmy dmy =
-    obj [| "day", int dmy.day
-         ; "delta", if dmy.delta = 0 then null else int dmy.delta
-         ; "month", int dmy.month
-         ; "year", int dmy.year
-        |]
+    obj
+      [|
+        ("day", int dmy.day);
+        ("delta", if dmy.delta = 0 then null else int dmy.delta);
+        ("month", int dmy.month);
+        ("year", int dmy.year);
+      |]
 
   let conv_dmy2 dmy =
-    obj [| "day", int dmy.day2
-         ; "month", int dmy.month2
-         ; "year", int dmy.year2
-        |]
+    obj
+      [|
+        ("day", int dmy.day2); ("month", int dmy.month2); ("year", int dmy.year2);
+      |]
 
   let conv_date_cal dt cal =
     let prec =
@@ -79,10 +81,11 @@ module Make (D : ConverterDriver) = struct
       | _ -> null
     in
     obj
-      [| "prec", prec
-       ; "dmy1", conv_dmy dt
-       ; "dmy2", dmy2
-       ; "calendar", str cal
+      [|
+        ("prec", prec);
+        ("dmy1", conv_dmy dt);
+        ("dmy2", dmy2);
+        ("calendar", str cal);
       |]
 
   let conv_date oc =
@@ -90,33 +93,36 @@ module Make (D : ConverterDriver) = struct
     | Dgreg (d, c) -> conv_date_cal d (Def_show.show_calendar c)
     | Dtext t -> str t
 
-  let conv_cdate cd = match Adef.od_of_cdate cd with
-    | None -> null
-    | Some date -> conv_date date
+  let conv_cdate cd =
+    match Adef.od_of_cdate cd with None -> null | Some date -> conv_date date
 
   let conv_pevent_name x =
-    str @@ Def_show.show_gen_pers_event_name (fun fmt -> Format.fprintf fmt "Epers_Name %s") x
+    str
+    @@ Def_show.show_gen_pers_event_name
+         (fun fmt -> Format.fprintf fmt "Epers_Name %s")
+         x
 
   let conv_event_witness_kind x = str @@ Def_show.show_witness_kind x
-
   let handler_of_iper i = str @@ Gwdb_driver.string_of_iper i
   let handler_of_ifam i = str @@ Gwdb_driver.string_of_ifam i
 
   let conv_event_witness (i, kind) =
     obj
-      [| "person", handler_of_iper i
-       ; "kind", conv_event_witness_kind kind
+      [|
+        ("person", handler_of_iper i); ("kind", conv_event_witness_kind kind);
       |]
 
   let conv_pevent pevent =
     obj
-      [| "place", str pevent.epers_place
-       ; "reason", str pevent.epers_reason
-       ; "note", str pevent.epers_note
-       ; "src", str pevent.epers_src
-       ; "name", conv_pevent_name pevent.epers_name
-       ; "date", conv_cdate pevent.epers_date
-       ; "witnesses", array @@ Array.map conv_event_witness pevent.epers_witnesses
+      [|
+        ("place", str pevent.epers_place);
+        ("reason", str pevent.epers_reason);
+        ("note", str pevent.epers_note);
+        ("src", str pevent.epers_src);
+        ("name", conv_pevent_name pevent.epers_name);
+        ("date", conv_cdate pevent.epers_date);
+        ( "witnesses",
+          array @@ Array.map conv_event_witness pevent.epers_witnesses );
       |]
 
   let conv_title_name = function
@@ -126,28 +132,34 @@ module Make (D : ConverterDriver) = struct
 
   let conv_title gen_title =
     obj
-      [| "name", conv_title_name gen_title.t_name
-       ; "date_start", conv_cdate gen_title.t_date_start
-       ; "date_end", conv_cdate gen_title.t_date_end
-       ; "nth", int gen_title.t_nth
-       ; "ident", str gen_title.t_ident
-       ; "place", str gen_title.t_place
+      [|
+        ("name", conv_title_name gen_title.t_name);
+        ("date_start", conv_cdate gen_title.t_date_start);
+        ("date_end", conv_cdate gen_title.t_date_end);
+        ("nth", int gen_title.t_nth);
+        ("ident", str gen_title.t_ident);
+        ("place", str gen_title.t_place);
       |]
 
   let conv_relation_kind x = str @@ Def_show.show_relation_kind x
 
   let conv_fevent_name x =
-    str @@ Def_show.show_gen_fam_event_name (fun fmt -> Format.fprintf fmt "Efam_Name %s") x
+    str
+    @@ Def_show.show_gen_fam_event_name
+         (fun fmt -> Format.fprintf fmt "Efam_Name %s")
+         x
 
   let conv_fevent fevent =
     obj
-      [| "date", conv_cdate fevent.efam_date
-       ; "name", conv_fevent_name fevent.efam_name
-       ; "note", str fevent.efam_note
-       ; "place", str fevent.efam_place
-       ; "reason", str fevent.efam_reason
-       ; "src", str fevent.efam_src
-       ; "witnesses", array @@ Array.map conv_event_witness fevent.efam_witnesses
+      [|
+        ("date", conv_cdate fevent.efam_date);
+        ("name", conv_fevent_name fevent.efam_name);
+        ("note", str fevent.efam_note);
+        ("place", str fevent.efam_place);
+        ("reason", str fevent.efam_reason);
+        ("src", str fevent.efam_src);
+        ( "witnesses",
+          array @@ Array.map conv_event_witness fevent.efam_witnesses );
       |]
 
   let conv_divorce = function
@@ -159,10 +171,11 @@ module Make (D : ConverterDriver) = struct
 
   let conv_rparent gen_relation =
     obj
-      [| "father", opt handler_of_iper gen_relation.r_fath
-       ; "mother", opt handler_of_iper gen_relation.r_moth
-       ; "source", str gen_relation.r_sources
-       ; "type", conv_relation_type gen_relation.r_type
+      [|
+        ("father", opt handler_of_iper gen_relation.r_fath);
+        ("mother", opt handler_of_iper gen_relation.r_moth);
+        ("source", str gen_relation.r_sources);
+        ("type", conv_relation_type gen_relation.r_type);
       |]
 
   let conv_death = function
@@ -183,28 +196,32 @@ module Make (D : ConverterDriver) = struct
     let pa = Gwdb.gen_ascend_of_person p in
     let pu = Gwdb.gen_union_of_person p in
     obj
-      [| "access", int (match pp.access with Private -> 2 | Public -> 1 | _ -> 0)
-       ; "aliases", list (List.map str pp.aliases)
-       ; "first_names_aliases", list (List.map str pp.first_names_aliases)
-       ; "firstname", str pp.first_name
-       ; "image", str pp.image
-       ; "iper", handler_of_iper pp.key_index
-       ; "lastname", str pp.surname
-       ; "note", str pp.notes
-       ; "occ", int pp.occ
-       ; "occupation", str pp.occupation
-       ; "parents", opt handler_of_ifam pa.parents
-       ; "consang", if pa.consang = Adef.no_consang then null else int (Adef.fix_repr pa.consang)
-       ; "pevents", list (List.map conv_pevent pp.pevents)
-       ; "psources", str pp.psources
-       ; "public_name", str pp.public_name
-       ; "qualifiers", list (List.map str pp.qualifiers)
-       ; "related", list (List.map handler_of_iper pp.related)
-       ; "rparents", list (List.map conv_rparent pp.rparents)
-       ; "sex", int (match pp.sex with Male -> 1 | Female -> 2 | _ -> 0)
-       ; "surnames_aliases", list (List.map str pp.surnames_aliases)
-       ; "titles", list (List.map conv_title pp.titles)
-       ; "unions", list (List.map handler_of_ifam (Array.to_list pu.family) )
+      [|
+        ( "access",
+          int (match pp.access with Private -> 2 | Public -> 1 | _ -> 0) );
+        ("aliases", list (List.map str pp.aliases));
+        ("first_names_aliases", list (List.map str pp.first_names_aliases));
+        ("firstname", str pp.first_name);
+        ("image", str pp.image);
+        ("iper", handler_of_iper pp.key_index);
+        ("lastname", str pp.surname);
+        ("note", str pp.notes);
+        ("occ", int pp.occ);
+        ("occupation", str pp.occupation);
+        ("parents", opt handler_of_ifam pa.parents);
+        ( "consang",
+          if pa.consang = Adef.no_consang then null
+          else int (Adef.fix_repr pa.consang) );
+        ("pevents", list (List.map conv_pevent pp.pevents));
+        ("psources", str pp.psources);
+        ("public_name", str pp.public_name);
+        ("qualifiers", list (List.map str pp.qualifiers));
+        ("related", list (List.map handler_of_iper pp.related));
+        ("rparents", list (List.map conv_rparent pp.rparents));
+        ("sex", int (match pp.sex with Male -> 1 | Female -> 2 | _ -> 0));
+        ("surnames_aliases", list (List.map str pp.surnames_aliases));
+        ("titles", list (List.map conv_title pp.titles));
+        ("unions", list (List.map handler_of_ifam (Array.to_list pu.family)));
       |]
 
   let conv_family base f =
@@ -213,13 +230,13 @@ module Make (D : ConverterDriver) = struct
     let fc = Gwdb.gen_couple_of_family f in
     let fd = Gwdb.gen_descend_of_family f in
     obj
-      [| ("fevents", list (List.map conv_fevent ff.fevents))
-       ; ("comment", str ff.comment)
-       ; ("origin_file", str ff.origin_file)
-       ; ("fsources", str ff.fsources)
-       ; ("witnesses", array (Array.map handler_of_iper ff.witnesses))
-       ; ("children", array (Array.map handler_of_iper fd.children))
-       ; ("parents", array (Array.map handler_of_iper @@ Adef.parent_array fc))
+      [|
+        ("fevents", list (List.map conv_fevent ff.fevents));
+        ("comment", str ff.comment);
+        ("origin_file", str ff.origin_file);
+        ("fsources", str ff.fsources);
+        ("witnesses", array (Array.map handler_of_iper ff.witnesses));
+        ("children", array (Array.map handler_of_iper fd.children));
+        ("parents", array (Array.map handler_of_iper @@ Adef.parent_array fc));
       |]
-
 end

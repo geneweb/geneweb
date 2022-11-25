@@ -9,26 +9,24 @@ let get_number var key env = p_getint env (var ^ "_" ^ key)
 
 let reconstitute_date_dmy conf var =
   match get_number var "yyyy" conf.env with
-    Some y ->
-      begin match get_number var "mm" conf.env with
-        Some m ->
-          begin match get_number var "dd" conf.env with
-            Some d ->
+  | Some y -> (
+      match get_number var "mm" conf.env with
+      | Some m -> (
+          match get_number var "dd" conf.env with
+          | Some d ->
               if d >= 1 && d <= 31 && m >= 1 && m <= 12 then
-                Some {day = d; month = m; year = y; prec = Sure; delta = 0}
+                Some { day = d; month = m; year = y; prec = Sure; delta = 0 }
               else None
           | None ->
               if m >= 1 && m <= 12 then
-                Some {day = 0; month = m; year = y; prec = Sure; delta = 0}
-              else None
-          end
-      | None -> Some {day = 0; month = 0; year = y; prec = Sure; delta = 0}
-      end
+                Some { day = 0; month = m; year = y; prec = Sure; delta = 0 }
+              else None)
+      | None -> Some { day = 0; month = 0; year = y; prec = Sure; delta = 0 })
   | None -> None
 
 let reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
-    Some d -> Some (Dgreg (d, Dgregorian))
+  | Some d -> Some (Dgreg (d, Dgregorian))
   | None -> None
 
 let rec skip_spaces x i =
@@ -48,12 +46,10 @@ let string_incl x y =
       let rec loop1 i j =
         if i = String.length x then
           if j = String.length y then true
-          else
-            String.unsafe_get y j = ' ' || String.unsafe_get y (j - 1) = ' '
+          else String.unsafe_get y j = ' ' || String.unsafe_get y (j - 1) = ' '
         else if
           j < String.length y && String.unsafe_get x i = String.unsafe_get y j
-        then
-          loop1 (i + 1) (j + 1)
+        then loop1 (i + 1) (j + 1)
         else loop (skip_spaces y (skip_no_spaces y j_ini))
       in
       loop1 0 j_ini
@@ -67,7 +63,7 @@ let get_event_field_name gets event_criteria event_name search_type =
   if search_type <> "OR" then event_name ^ "_" ^ event_criteria
   else if "on" = gets ("event_" ^ event_name) then event_criteria
   else ""
-  
+
 (*
   Search for other persons in the base matching with the provided infos.
   
@@ -94,20 +90,16 @@ let advanced_search conf base max_answers =
     try Hashtbl.find hd x
     with Not_found ->
       let v =
-        reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2")
+        (reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2"))
       in
-      Hashtbl.add hd x v ;
+      Hashtbl.add hd x v;
       v
   in
   let gets x =
     try Hashtbl.find hs x
     with Not_found ->
-      let v =
-        match p_getenv conf.env x with
-        | Some v -> v
-        | None -> ""
-      in
-      Hashtbl.add hs x v ;
+      let v = match p_getenv conf.env x with Some v -> v | None -> "" in
+      Hashtbl.add hs x v;
       v
   in
   let getss x =
@@ -117,25 +109,25 @@ let advanced_search conf base max_answers =
       match Hashtbl.find_opt hss @@ x with
       | Some v -> v
       | None ->
-        let rec loop acc i =
-          let k = x ^ "_" ^ string_of_int i in
-          match p_getenv conf.env k with
-          | Some v -> loop (if v <> "" then v :: acc else acc) (i + 1)
-          | None -> acc
-        in
-        let v = loop [] 1 in
-        Hashtbl.add hss x v ;
-        v
+          let rec loop acc i =
+            let k = x ^ "_" ^ string_of_int i in
+            match p_getenv conf.env k with
+            | Some v -> loop (if v <> "" then v :: acc else acc) (i + 1)
+            | None -> acc
+          in
+          let v = loop [] 1 in
+          Hashtbl.add hss x v;
+          v
   in
   let fn_list =
-    List.map begin fun s ->
-      List.map Name.lower @@ Name.split_fname s
-    end (getss "first_name")
+    List.map
+      (fun s -> List.map Name.lower @@ Name.split_fname s)
+      (getss "first_name")
   in
   let sn_list =
-    List.map begin fun s ->
-      List.map Name.lower @@ Name.split_sname s
-    end (getss "surname")
+    List.map
+      (fun s -> List.map Name.lower @@ Name.split_sname s)
+      (getss "surname")
   in
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
@@ -149,7 +141,8 @@ let advanced_search conf base max_answers =
   let apply_to_field_value p x get cmp empty_default_value =
     let y = gets x in
     if y = "" then empty_default_value
-    else if authorized_age conf base p then cmp (abbrev_lower y) (abbrev_lower @@ sou base @@ get p)
+    else if authorized_age conf base p then
+      cmp (abbrev_lower y) (abbrev_lower @@ sou base @@ get p)
     else false
   in
   let do_compare p y get cmp =
@@ -159,8 +152,7 @@ let advanced_search conf base max_answers =
   let apply_to_field_values_raw p x get cmp empty_default_value =
     let y = getss x in
     if y = [] then empty_default_value
-    else if authorized_age conf base p
-    then do_compare p y get cmp
+    else if authorized_age conf base p then do_compare p y get cmp
     else false
   in
   let apply_to_field_values p x get cmp empty_default_value =
@@ -169,34 +161,29 @@ let advanced_search conf base max_answers =
   in
   (* Check if the date matches with the person event. *)
   let match_date p x df empty_default_value =
-    let (d1, d2) = getd x in
+    let d1, d2 = getd x in
     authorized_age conf base p
-    && match d1, d2 with
-      | Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) ->
-        begin match df () with
-          | Some (Dgreg (d, _)) ->
+    &&
+    match (d1, d2) with
+    | Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) -> (
+        match df () with
+        | Some (Dgreg (d, _)) ->
             Date.compare_dmy d d1 >= 0 && Date.compare_dmy d d2 <= 0
-          | _ -> false
-        end
-      | Some (Dgreg (d1, _)), _ ->
-        begin match df () with
-          | Some (Dgreg (d, _)) -> Date.compare_dmy d d1 >= 0
-          | _ -> false
-        end
-      | _, Some (Dgreg (d2, _)) ->
-        begin match df () with
-          | Some (Dgreg (d, _)) -> Date.compare_dmy d d2 <= 0
-          | _ -> false
-        end
-      | _ -> empty_default_value
+        | _ -> false)
+    | Some (Dgreg (d1, _)), _ -> (
+        match df () with
+        | Some (Dgreg (d, _)) -> Date.compare_dmy d d1 >= 0
+        | _ -> false)
+    | _, Some (Dgreg (d2, _)) -> (
+        match df () with
+        | Some (Dgreg (d, _)) -> Date.compare_dmy d d2 <= 0
+        | _ -> false)
+    | _ -> empty_default_value
   in
   let match_sex p empty_default_value =
     apply_to_field_value_raw p "sex"
-      begin function
-        | "M" -> get_sex p = Male
-        | "F" -> get_sex p = Female
-        | _ -> true
-      end
+      (function
+        | "M" -> get_sex p = Male | "F" -> get_sex p = Female | _ -> true)
       empty_default_value
   in
   let bapt_date_field_name =
@@ -231,57 +218,56 @@ let advanced_search conf base max_answers =
   in
   let match_baptism_date p empty_default_value =
     match_date p bapt_date_field_name
-      (fun () -> Adef.od_of_cdate (get_baptism p)) empty_default_value
+      (fun () -> Adef.od_of_cdate (get_baptism p))
+      empty_default_value
   in
   let match_birth_date p empty_default_value =
     match_date p birth_date_field_name
-      (fun () -> Adef.od_of_cdate (get_birth p)) empty_default_value
+      (fun () -> Adef.od_of_cdate (get_birth p))
+      empty_default_value
   in
   let match_death_date p empty_default_value =
     match_date p death_date_field_name
       (fun () ->
-         match get_death p with
-           Death (_, cd) -> Some (Adef.date_of_cdate cd)
-         | _ -> None)
+        match get_death p with
+        | Death (_, cd) -> Some (Adef.date_of_cdate cd)
+        | _ -> None)
       empty_default_value
   in
   let match_burial_date p empty_default_value =
     match_date p burial_date_field_name
       (fun () ->
-         match get_burial p with
-           Buried cod -> Adef.od_of_cdate cod
-         | Cremated cod -> Adef.od_of_cdate cod
-         | _ -> None)
+        match get_burial p with
+        | Buried cod -> Adef.od_of_cdate cod
+        | Cremated cod -> Adef.od_of_cdate cod
+        | _ -> None)
       empty_default_value
   in
-  let cmp_place = if "on" = gets "exact_place" then (=) else string_incl in
+  let cmp_place = if "on" = gets "exact_place" then ( = ) else string_incl in
   let match_baptism_place p empty_default_value =
-    apply_to_field_values
-      p bapt_place_field_name get_baptism_place cmp_place empty_default_value
+    apply_to_field_values p bapt_place_field_name get_baptism_place cmp_place
+      empty_default_value
   in
   let match_birth_place p empty_default_value =
-    apply_to_field_values
-      p birth_place_field_name get_birth_place cmp_place empty_default_value
+    apply_to_field_values p birth_place_field_name get_birth_place cmp_place
+      empty_default_value
   in
   let match_death_place p empty_default_value =
-    apply_to_field_values
-      p death_place_field_name get_death_place cmp_place empty_default_value
+    apply_to_field_values p death_place_field_name get_death_place cmp_place
+      empty_default_value
   in
   let match_burial_place p empty_default_value =
-    apply_to_field_values
-      p burial_place_field_name get_burial_place cmp_place empty_default_value
+    apply_to_field_values p burial_place_field_name get_burial_place cmp_place
+      empty_default_value
   in
   let match_occupation p empty_default_value =
-    apply_to_field_value
-      p "occu" get_occupation string_incl empty_default_value
+    apply_to_field_value p "occu" get_occupation string_incl empty_default_value
   in
   let match_name search_list exact : string list -> bool =
     let eq : string list -> string list -> bool =
-      if exact
-      then fun x search ->
+      if exact then fun x search ->
         List.sort compare search = List.sort compare x
-      else fun x search ->
-        List.for_all (fun s -> List.mem s x) search
+      else fun x search -> List.for_all (fun s -> List.mem s x) search
     in
     fun x -> List.exists (eq x) search_list
   in
@@ -290,7 +276,9 @@ let advanced_search conf base max_answers =
     else
       let eq = match_name fn_list (gets "exact_first_name" = "on") in
       fun p ->
-        eq (List.map Name.lower @@ Name.split_fname @@ sou base @@ get_first_name p)
+        eq
+          (List.map Name.lower @@ Name.split_fname @@ sou base
+         @@ get_first_name p)
   in
   let match_surname =
     if sn_list = [] then fun _ -> true
@@ -301,164 +289,158 @@ let advanced_search conf base max_answers =
   in
   let match_married p empty_default_value =
     apply_to_field_value_raw p "married"
-      begin function
-        | "Y" -> get_family p <> [| |]
-        | "N" -> get_family p = [| |]
-        | _ -> true
-      end
+      (function
+        | "Y" -> get_family p <> [||] | "N" -> get_family p = [||] | _ -> true)
       empty_default_value
   in
   let match_marriage p x y empty_default_value =
-    let (d1, d2) = getd x in
+    let d1, d2 = getd x in
     let y = getss y in
     let test_date_place df =
-      Array.exists begin fun ifam ->
-        let fam = foi base ifam in
-        let sp = poi base @@ Gutil.spouse (get_iper p) fam in
-        if authorized_age conf base sp
-        then df fam && (y = []
-                        || do_compare fam y (fun f -> sou base @@ get_marriage_place f) cmp_place)
-        else false
-      end (get_family p)
+      Array.exists
+        (fun ifam ->
+          let fam = foi base ifam in
+          let sp = poi base @@ Gutil.spouse (get_iper p) fam in
+          if authorized_age conf base sp then
+            df fam
+            && (y = []
+               || do_compare fam y
+                    (fun f -> sou base @@ get_marriage_place f)
+                    cmp_place)
+          else false)
+        (get_family p)
     in
-    match d1, d2 with
+    match (d1, d2) with
     | Some d1, Some d2 ->
-      test_date_place begin fun fam -> match Adef.od_of_cdate (get_marriage fam) with
-        | Some (Dgreg (_, _) as d) ->
-          if Date.compare_date d d1 < 0 then false
-          else if Date.compare_date d2 d < 0 then false
-          else true
-        | _ -> false
-      end
+        test_date_place (fun fam ->
+            match Adef.od_of_cdate (get_marriage fam) with
+            | Some (Dgreg (_, _) as d) ->
+                if Date.compare_date d d1 < 0 then false
+                else if Date.compare_date d2 d < 0 then false
+                else true
+            | _ -> false)
     | Some d1, _ ->
-      test_date_place begin fun fam -> match Adef.od_of_cdate (get_marriage fam) with
-        | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-          if Date.compare_date d d1 < 0 then false else true
-        | _ -> false
-      end
+        test_date_place (fun fam ->
+            match Adef.od_of_cdate (get_marriage fam) with
+            | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
+                if Date.compare_date d d1 < 0 then false else true
+            | _ -> false)
     | _, Some d2 ->
-      test_date_place begin fun fam -> match Adef.od_of_cdate (get_marriage fam) with
-        | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-          if Date.compare_date d d2 > 0 then false else true
-        | _ -> false
-      end
+        test_date_place (fun fam ->
+            match Adef.od_of_cdate (get_marriage fam) with
+            | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
+                if Date.compare_date d d2 > 0 then false else true
+            | _ -> false)
     | _ ->
-        if y = [] then empty_default_value
-        else test_date_place (fun _ -> true)
+        if y = [] then empty_default_value else test_date_place (fun _ -> true)
   in
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~skip_fname ~skip_sname p =
     match_sex p true
     && (skip_fname || match_first_name p)
     && (skip_sname || match_surname p)
-    && match_married p true
-    && match_occupation p true
+    && match_married p true && match_occupation p true
   in
-  let match_person ?(skip_fname = false) ?(skip_sname = false) ((list, len) as acc) p search_type =
-    if search_type <> "OR"
-    then if match_civil_status ~skip_fname ~skip_sname p
-         && match_baptism_date p true
-         && match_baptism_place p true
-         && match_birth_date p true
-         && match_birth_place p true
-         && match_burial_date p true
-         && match_burial_place p true
-         && match_death_date p true
-         && match_death_place p true
-         && match_marriage p marriage_date_field_name marriage_place_field_name true
-      then (p :: list, len +1)
+  let match_person ?(skip_fname = false) ?(skip_sname = false)
+      ((list, len) as acc) p search_type =
+    if search_type <> "OR" then
+      if
+        match_civil_status ~skip_fname ~skip_sname p
+        && match_baptism_date p true && match_baptism_place p true
+        && match_birth_date p true && match_birth_place p true
+        && match_burial_date p true && match_burial_place p true
+        && match_death_date p true && match_death_place p true
+        && match_marriage p marriage_date_field_name marriage_place_field_name
+             true
+      then (p :: list, len + 1)
       else acc
     else if
       match_civil_status ~skip_fname ~skip_sname p
-      && (getss "place" = [] && gets "date2_yyyy" = "" && gets "date1_yyyy" = ""
-          || (match_baptism_date p false || match_baptism_place p false)
-          && match_baptism_date p true && match_baptism_place p true
-          || (match_birth_date p false || match_birth_place p false)
-          && match_birth_date p true && match_birth_place p true
-          || (match_burial_date p false || match_burial_place p false)
-          && match_burial_date p true && match_burial_place p true
-          || (match_death_date p false || match_death_place p false)
-          && match_death_date p true && match_death_place p true
-          || match_marriage p marriage_date_field_name marriage_place_field_name false
-         )
+      && (getss "place" = []
+          && gets "date2_yyyy" = ""
+          && gets "date1_yyyy" = ""
+         || (match_baptism_date p false || match_baptism_place p false)
+            && match_baptism_date p true && match_baptism_place p true
+         || (match_birth_date p false || match_birth_place p false)
+            && match_birth_date p true && match_birth_place p true
+         || (match_burial_date p false || match_burial_place p false)
+            && match_burial_date p true && match_burial_place p true
+         || (match_death_date p false || match_death_place p false)
+            && match_death_date p true && match_death_place p true
+         || match_marriage p marriage_date_field_name marriage_place_field_name
+              false)
     then (p :: list, len + 1)
     else acc
   in
   let list, len =
-  if "on" = gets "sosa_filter"
-  then match Util.find_sosa_ref conf base with
-    | Some sosa_ref ->
-      let rec loop p (set, acc) =
-        if not (IperSet.mem (get_iper p) set) then begin
-          let set = IperSet.add (get_iper p) set in
-          let acc = match_person acc p search_type in
-          match get_parents p with
-          | Some ifam ->
-            let fam = foi base ifam in
-            let set, acc = loop (pget conf base @@ get_mother fam) (set, acc) in
-            loop (pget conf base @@ get_father fam) (set, acc)
-          | None -> set, acc
-        end else (set, acc)
+    if "on" = gets "sosa_filter" then
+      match Util.find_sosa_ref conf base with
+      | Some sosa_ref ->
+          let rec loop p (set, acc) =
+            if not (IperSet.mem (get_iper p) set) then
+              let set = IperSet.add (get_iper p) set in
+              let acc = match_person acc p search_type in
+              match get_parents p with
+              | Some ifam ->
+                  let fam = foi base ifam in
+                  let set, acc =
+                    loop (pget conf base @@ get_mother fam) (set, acc)
+                  in
+                  loop (pget conf base @@ get_father fam) (set, acc)
+              | None -> (set, acc)
+            else (set, acc)
+          in
+          loop (pget conf base @@ get_iper sosa_ref) (IperSet.empty, ([], 0))
+          |> snd
+      | None -> ([], 0)
+    else if fn_list <> [] || sn_list <> [] then
+      let list_aux strings_of persons_of split n_list exact =
+        List.map
+          (List.map (fun x ->
+               let eq = match_name n_list exact in
+               let istrs = strings_of base x in
+               List.fold_left
+                 (fun acc istr ->
+                   let str = Mutil.nominative (sou base istr) in
+                   if eq (List.map Name.lower @@ split str) then istr :: acc
+                   else acc)
+                 [] istrs))
+          n_list
+        |> List.flatten |> List.flatten |> List.sort_uniq compare
+        |> List.map (spi_find @@ persons_of base)
+        |> List.flatten |> List.sort_uniq compare
       in
-      loop (pget conf base @@ get_iper sosa_ref) (IperSet.empty, ([], 0))
-      |> snd
-    | None -> [], 0
-  else if fn_list <> [] || sn_list <> [] then
-    let list_aux strings_of persons_of split n_list exact =
-      List.map begin List.map begin fun x ->
-        let eq = match_name n_list exact in
-        let istrs = strings_of base x in
-        List.fold_left begin fun acc istr ->
-          let str = Mutil.nominative (sou base istr) in
-          if eq (List.map Name.lower @@ split str)
-          then istr :: acc
-          else acc
-        end [] istrs
-      end end n_list
-      |> List.flatten
-      |> List.flatten
-      |> List.sort_uniq compare
-      |> List.map (spi_find @@ persons_of base)
-      |> List.flatten
-      |> List.sort_uniq compare
-    in
-    let skip_fname, skip_sname, list =
-      if sn_list <> [] then
-        ( false
-        , true
-        , list_aux
-            Gwdb.base_strings_of_surname
-            Gwdb.persons_of_surname
-            Name.split_sname
-            sn_list
-            (gets "exact_surname" = "on")
-        )
+      let skip_fname, skip_sname, list =
+        if sn_list <> [] then
+          ( false,
+            true,
+            list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
+              Name.split_sname sn_list
+              (gets "exact_surname" = "on") )
+        else
+          ( true,
+            false,
+            list_aux Gwdb.base_strings_of_first_name Gwdb.persons_of_first_name
+              Name.split_fname fn_list
+              (gets "exact_first_name" = "on") )
+      in
+      let rec loop ((_, len) as acc) = function
+        | [] -> acc
+        | _ when len > max_answers -> acc
+        | ip :: l ->
+            loop
+              (match_person ~skip_fname ~skip_sname acc (pget conf base ip)
+                 search_type)
+              l
+      in
+      loop ([], 0) list
     else
-        ( true
-        , false
-        , list_aux
-            Gwdb.base_strings_of_first_name
-            Gwdb.persons_of_first_name
-            Name.split_fname
-            fn_list
-            (gets "exact_first_name" = "on")
-        )
-    in
-    let rec loop ((_, len) as acc) = function
-      | [] -> acc
-      | _ when len > max_answers -> acc
-      | ip :: l ->
-        loop (match_person ~skip_fname ~skip_sname acc (pget conf base ip) search_type) l
-    in
-    loop ([], 0) list
-  else
-    Gwdb.Collection.fold_until
-      (fun (_, len) -> len <= max_answers)
-      (fun acc i -> match_person acc (pget conf base i) search_type)
-      ([], 0)
-      (Gwdb.ipers base)
+      Gwdb.Collection.fold_until
+        (fun (_, len) -> len <= max_answers)
+        (fun acc i -> match_person acc (pget conf base i) search_type)
+        ([], 0) (Gwdb.ipers base)
   in
-  List.rev list, len
+  (List.rev list, len)
 
 let searching_fields conf base =
   let test_date x =
@@ -469,98 +451,89 @@ let searching_fields conf base =
     match p_getenv conf.env x with
     | Some v when v <> "" -> v
     | _ ->
-      let rec loop acc i =
-        let k = x ^ "_" ^ string_of_int i in
-        match p_getenv conf.env k with
-        | Some v -> loop (if acc = "" then v else if v = "" then acc else acc ^ " / " ^ v) (i + 1)
-        | None -> acc
-      in
-      loop "" 1
+        let rec loop acc i =
+          let k = x ^ "_" ^ string_of_int i in
+          match p_getenv conf.env k with
+          | Some v ->
+              loop
+                (if acc = "" then v
+                else if v = "" then acc
+                else acc ^ " / " ^ v)
+                (i + 1)
+          | None -> acc
+        in
+        loop "" 1
   in
   let test_string x = gets x <> "" in
   let getd x =
-    reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2")
+    (reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2"))
   in
-  let sex =
-    match gets "sex" with
-      "M" -> 0
-    | "F" -> 1
-    | _ -> 2
-  in
+  let sex = match gets "sex" with "M" -> 0 | "F" -> 1 | _ -> 2 in
   (* Fonction pour tester un simple champ texte (e.g: first_name). *)
   let string_field x (search : Adef.safe_string) =
-    if test_string x then search ^^^ " " ^<^ (escape_html (gets x) :> Adef.safe_string) else search
+    if test_string x then
+      search ^^^ " " ^<^ (escape_html (gets x) :> Adef.safe_string)
+    else search
   in
   (* Returns the place and date request. (e.g.: ...in Paris between 1800 and 1900) *)
-  let get_place_date_request place_prefix_field_name date_prefix_field_name search =
+  let get_place_date_request place_prefix_field_name date_prefix_field_name
+      search =
     let search =
       match getd date_prefix_field_name with
       | Some d1, Some d2 ->
-        search
-        ^^^ " "
-        ^<^ transl conf "between (date)"
-        ^<^ DateDisplay.string_of_date conf d1
-        ^^^ " "
-        ^<^ transl conf "and"
-        ^<^ " "
-        ^<^ DateDisplay.string_of_date conf d2
+          search ^^^ " "
+          ^<^ transl conf "between (date)"
+          ^<^ DateDisplay.string_of_date conf d1
+          ^^^ " " ^<^ transl conf "and" ^<^ " "
+          ^<^ DateDisplay.string_of_date conf d2
       | Some d1, _ ->
-        search
-        ^^^ " "
-        ^<^ transl conf "after (date)"
-        ^<^ " "
-        ^<^ DateDisplay.string_of_date conf d1
+          search ^^^ " " ^<^ transl conf "after (date)" ^<^ " "
+          ^<^ DateDisplay.string_of_date conf d1
       | _, Some d2 ->
-        search
-        ^^^ " "
-        ^<^ transl conf "before (date)"
-        ^<^ " "
-        ^<^ DateDisplay.string_of_date conf d2
+          search ^^^ " "
+          ^<^ transl conf "before (date)"
+          ^<^ " "
+          ^<^ DateDisplay.string_of_date conf d2
       | _ -> search
     in
     if test_string place_prefix_field_name then
-      search
-      ^^^ " "
-      ^<^ transl conf "in (place)"
-      ^<^ " "
+      search ^^^ " " ^<^ transl conf "in (place)" ^<^ " "
       ^<^ (escape_html (gets place_prefix_field_name) :> Adef.safe_string)
     else search
   in
   (* Returns the event request. (e.g.: born in...) *)
-  let get_event_field_request place_prefix_field_name date_prefix_field_name event_name search search_type =
+  let get_event_field_request place_prefix_field_name date_prefix_field_name
+      event_name search search_type =
     (* Separator character depends on search type operator, a comma for AND search, a slash for OR search. *)
     let sep : Adef.safe_string =
-      if (search : Adef.safe_string :> string) <> ""
-      then
-        if search_type <> "OR"
-        then Adef.safe ", "
-        else Adef.safe " / "
+      if (search : Adef.safe_string :> string) <> "" then
+        if search_type <> "OR" then Adef.safe ", " else Adef.safe " / "
       else Adef.safe ""
     in
     let search =
-      if test_string place_prefix_field_name
-      || test_date date_prefix_field_name
+      if test_string place_prefix_field_name || test_date date_prefix_field_name
       then search ^^^ sep ^>^ transl_nth conf event_name sex
       else search
     in
     (* The place and date have to be shown after each event only for the AND request. *)
     if search_type <> "OR" then
-      get_place_date_request place_prefix_field_name date_prefix_field_name search
+      get_place_date_request place_prefix_field_name date_prefix_field_name
+        search
     else search
   in
   let sosa_field search =
-    if gets "sosa_filter" <> ""
-    then match Util.find_sosa_ref conf base with
+    if gets "sosa_filter" <> "" then
+      match Util.find_sosa_ref conf base with
       | Some p ->
-        let s =
-          Adef.safe @@
-          Printf.sprintf
-            (ftransl conf "direct ancestor of %s")
-            (Util.gen_person_text conf base p : Adef.safe_string :> string)
-        in
-        if (search : Adef.safe_string :> string) = "" then s
-        else if (s :> string) = "" then search
-        else search ^^^ ", " ^<^ s
+          let s =
+            Adef.safe
+            @@ Printf.sprintf
+                 (ftransl conf "direct ancestor of %s")
+                 (Util.gen_person_text conf base p : Adef.safe_string :> string)
+          in
+          if (search : Adef.safe_string :> string) = "" then s
+          else if (s :> string) = "" then search
+          else search ^^^ ", " ^<^ s
       | None -> search
     else search
   in
@@ -602,8 +575,8 @@ let searching_fields conf base =
   let search = sosa_field search in
   let event_search = Adef.safe "" in
   let event_search =
-    get_event_field_request birth_place_field_name birth_date_field_name
-      "born" event_search search_type
+    get_event_field_request birth_place_field_name birth_date_field_name "born"
+      event_search search_type
   in
   let event_search =
     get_event_field_request bapt_place_field_name bapt_date_field_name
@@ -614,8 +587,8 @@ let searching_fields conf base =
       "married" event_search search_type
   in
   let event_search =
-    get_event_field_request death_place_field_name death_date_field_name
-      "died" event_search search_type
+    get_event_field_request death_place_field_name death_date_field_name "died"
+      event_search search_type
   in
   let event_search =
     get_event_field_request burial_place_field_name burial_date_field_name
@@ -628,19 +601,21 @@ let searching_fields conf base =
   in
   (* Adding the place and date at the end for the OR request. *)
   let search =
-    if search_type = "OR" &&
-       (gets "place" != "" || gets "date2_yyyy" != "" ||
-        gets "date1_yyyy" != "")
-    then
-      get_place_date_request "place" "date" search
+    if
+      search_type = "OR"
+      && (gets "place" != ""
+         || gets "date2_yyyy" != ""
+         || gets "date1_yyyy" != "")
+    then get_place_date_request "place" "date" search
     else search
   in
   let search =
-    if not (test_string marriage_place_field_name || test_date "marriage")
-    then
+    if not (test_string marriage_place_field_name || test_date "marriage") then
       let sep = if (search :> string) <> "" then ", " else "" in
-      if gets "married" = "Y" then search ^>^ sep ^ transl conf "having a family"
-      else if gets "married" = "N" then search ^>^ sep ^ transl conf "having no family"
+      if gets "married" = "Y" then
+        search ^>^ sep ^ transl conf "having a family"
+      else if gets "married" = "N" then
+        search ^>^ sep ^ transl conf "having no family"
       else search
     else search
   in

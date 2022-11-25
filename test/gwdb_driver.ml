@@ -2,26 +2,27 @@ type ifam = int
 type iper = int
 type istr = int
 
-type base =
-  { persons: (iper, iper, istr) Def.gen_person array
-  ; ascends: ifam Def.gen_ascend array
-  ; unions: ifam Def.gen_union array
-  ; families: (iper, ifam, istr) Def.gen_family array
-  ; couples: iper Def.gen_couple array
-  ; descends: iper Def.gen_descend array
-  ; strings: string array
-  }
+type base = {
+  persons : (iper, iper, istr) Def.gen_person array;
+  ascends : ifam Def.gen_ascend array;
+  unions : ifam Def.gen_union array;
+  families : (iper, ifam, istr) Def.gen_family array;
+  couples : iper Def.gen_couple array;
+  descends : iper Def.gen_descend array;
+  strings : string array;
+}
 
 type fam_event = (iper, istr) Def.gen_fam_event
-type family = (base * ifam)
+type family = base * ifam
 type pers_event = (iper, istr) Def.gen_pers_event
-type person = (base * iper)
+type person = base * iper
 type relation = (iper, istr) Def.gen_relation
 type string_person_index
 type title = istr Def.gen_title
 
 module Collection = struct
   type 'a t
+
   let length _ = assert false
   let map _ = assert false
   let iter _ = assert false
@@ -33,6 +34,7 @@ end
 
 module Marker = struct
   type ('k, 'v) t
+
   let get _ = assert false
   let set _ = assert false
 end
@@ -73,7 +75,7 @@ and dummy_marker _ = assert false
 and empty_family _ = assert false
 and empty_person _ = assert false
 and empty_string = 0
-and eq_istr = (=)
+and eq_istr = ( = )
 and families ?select:_ _ = assert false
 and family_of_gen_family _ = assert false
 and foi base i = (base, i)
@@ -163,25 +165,22 @@ and load_persons_array _ = ()
 and load_strings_array _ = ()
 and load_unions_array _ = ()
 
-and make _ _ ((persons, ascends, unions), (families, couples, descends), strings, _) =
-  { persons
-  ; ascends
-  ; unions
-  ; families
-  ; couples
-  ; descends
-  ; strings
-  }
+and make _ _
+    ((persons, ascends, unions), (families, couples, descends), strings, _) =
+  { persons; ascends; unions; families; couples; descends; strings }
 
 and nb_of_families _ = assert false
 and nb_of_persons _ = assert false
 and nb_of_real_persons _ = assert false
 and new_ifam _ = assert false
 and new_iper _ = assert false
-and no_ascend = { Def.parents = None ; consang = Adef.no_consang }
+and no_ascend = { Def.parents = None; consang = Adef.no_consang }
 and no_descend = { Def.children = [||] }
 and no_family ifam = { (Mutil.empty_family empty_string) with fam_index = ifam }
-and no_person ip = { (Mutil.empty_person empty_string quest_string) with key_index = ip }
+
+and no_person ip =
+  { (Mutil.empty_person empty_string quest_string) with key_index = ip }
+
 and no_union = { Def.family = [||] }
 and open_base _ = assert false
 and patch_ascend _ = assert false
@@ -210,6 +209,5 @@ and sync ?scratch:_ = assert false
 and write_nldb _ = assert false
 
 let no_couple = Adef.couple dummy_iper dummy_iper
-
-let eq_iper _= assert false
-let eq_ifam _= assert false
+let eq_iper _ = assert false
+let eq_ifam _ = assert false
