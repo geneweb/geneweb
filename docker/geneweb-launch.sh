@@ -61,7 +61,7 @@ start() {
 	>>${GENEWEB_HOME}/log/gwsetup.log 2>&1
 	gwlaunch_log "-- Started gwsetup!"
 
-	GWD_AUTH_FILE=${GENEWEB_HOME}/etc/gwd_passwd
+	GWD_AUTH_FILE=${GWD_AUTH_FILE:=${GENEWEB_HOME}/etc/gwd_passwd}
 	if [ -f $GWD_AUTH_FILE ]; then
 		AUTH_ARG="-auth $GWD_AUTH_FILE"
 	else
