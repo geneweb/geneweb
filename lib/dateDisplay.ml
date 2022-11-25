@@ -6,24 +6,23 @@ open Util
 open Gwdb
 
 let get_wday conf = function
-  | Dgreg ({ prec = Sure ; delta = 0 } as d, _) when d.day <> 0 && d.month <> 0 ->
-    let jd = Calendar.sdn_of_gregorian d in
-    let wday =
-      let jd_today = Calendar.sdn_of_gregorian conf.today in
-      let x = conf.today_wd - jd_today + jd in
-      if x < 0 then 6 + (x + 1) mod 7 else x mod 7
-    in
-    " (" ^ transl_nth conf "(week day)" wday ^ ")"
+  | Dgreg (({ prec = Sure; delta = 0 } as d), _) when d.day <> 0 && d.month <> 0
+    ->
+      let jd = Calendar.sdn_of_gregorian d in
+      let wday =
+        let jd_today = Calendar.sdn_of_gregorian conf.today in
+        let x = conf.today_wd - jd_today + jd in
+        if x < 0 then 6 + ((x + 1) mod 7) else x mod 7
+      in
+      " (" ^ transl_nth conf "(week day)" wday ^ ")"
   | _ -> ""
 
 let death_symbol conf =
-  try List.assoc "death_symbol" conf.base_env
-  with Not_found -> "†"
+  try List.assoc "death_symbol" conf.base_env with Not_found -> "†"
 
 let code_date conf encoding d m y =
-  let apply_date_code =
-    function
-      'd' -> string_of_int d
+  let apply_date_code = function
+    | 'd' -> string_of_int d
     | 'm' -> transl_nth conf "(month)" (m - 1)
     | 'y' -> string_of_int y
     | c -> "%" ^ String.make 1 c
@@ -31,27 +30,28 @@ let code_date conf encoding d m y =
   let rec loop i =
     if i = String.length encoding then ""
     else
-      let (s, i) =
+      let s, i =
         match encoding.[i] with
-          '%' when i + 1 < String.length encoding ->
-            let s = apply_date_code encoding.[i+1] in s, i + 1
-        | '[' ->
-            begin try (* code similar to Util.gen_decline *)
+        | '%' when i + 1 < String.length encoding ->
+            let s = apply_date_code encoding.[i + 1] in
+            (s, i + 1)
+        | '[' -> (
+            try
+              (* code similar to Util.gen_decline *)
               let len = String.length encoding in
               let j = String.index_from encoding i ']' in
               let k = String.index_from encoding i '|' in
               if k < j && j + 2 < len && encoding.[j + 1] = '%' then
                 let s = apply_date_code encoding.[j + 2] in
                 let s1 =
-                  if start_with_vowel s then String.sub encoding (k + 1) (j - k - 1)
+                  if start_with_vowel s then
+                    String.sub encoding (k + 1) (j - k - 1)
                   else String.sub encoding (i + 1) (k - i - 1)
                 in
-                s1 ^ s, j + 2
-              else
-                String.make 1 '[', i
-            with Not_found -> String.make 1 '[', i
-            end
-        | c -> String.make 1 c, i
+                (s1 ^ s, j + 2)
+              else (String.make 1 '[', i)
+            with Not_found -> (String.make 1 '[', i))
+        | c -> (String.make 1 c, i)
       in
       s ^ loop (i + 1)
   in
@@ -71,16 +71,41 @@ let code_dmy conf d =
 
 let default_french_month =
   let tab =
-    [| "Vendemiaire"; "Brumaire"; "Frimaire"; "Nivose"; "Pluviose"; "Ventose";
-       "Germinal"; "Floreal"; "Prairial"; "Messidor"; "Thermidor";
-       "Fructidor"; "Extra" |]
+    [|
+      "Vendemiaire";
+      "Brumaire";
+      "Frimaire";
+      "Nivose";
+      "Pluviose";
+      "Ventose";
+      "Germinal";
+      "Floreal";
+      "Prairial";
+      "Messidor";
+      "Thermidor";
+      "Fructidor";
+      "Extra";
+    |]
   in
   fun m -> tab.(m)
 
 let default_hebrew_month =
   let tab =
-    [| "Tishri"; "Heshvan"; "Kislev"; "Tevet"; "Shevat"; "AdarI"; "AdarII";
-       "Nisan"; "Iyyar"; "Sivan"; "Tammuz"; "Av"; "Elul" |]
+    [|
+      "Tishri";
+      "Heshvan";
+      "Kislev";
+      "Tevet";
+      "Shevat";
+      "AdarI";
+      "AdarII";
+      "Nisan";
+      "Iyyar";
+      "Sivan";
+      "Tammuz";
+      "Av";
+      "Elul";
+    |]
   in
   fun m -> tab.(m)
 
@@ -94,13 +119,14 @@ let hebrew_month conf m =
   if r = "[(hebrew month)]" then "[" ^ default_hebrew_month m ^ "]" else r
 
 let code_french_year conf y =
-  transl_nth conf "year/month/day" 3 ^ " " ^
-  (if y >= 1 && y < 4000 then Mutil.roman_of_arabian y else string_of_int y)
+  transl_nth conf "year/month/day" 3
+  ^ " "
+  ^ if y >= 1 && y < 4000 then Mutil.roman_of_arabian y else string_of_int y
 
 let code_french_date conf d m y =
   let s =
     if d = 0 then ""
-    else string_of_int d ^ (if d = 1 then "<sup>er</sup>" else "")
+    else string_of_int d ^ if d = 1 then "<sup>er</sup>" else ""
   in
   let s =
     if m = 0 then ""
@@ -118,7 +144,7 @@ let code_hebrew_date conf d m y =
 
 let string_of_on_prec_dmy_aux conf sy sy2 d =
   match d.prec with
-    Sure ->
+  | Sure ->
       if d.day = 0 && d.month = 0 then transl conf "in (year)" ^ " " ^ sy
       else if d.day = 0 then transl_decline conf "in (month year)" sy
       else transl_decline conf "on (day month year)" sy
@@ -141,8 +167,7 @@ let string_of_on_prec_dmy_aux conf sy sy2 d =
         else transl_decline conf "on (day month year)" sy
       in
       let s2 =
-        if d2.day2 = 0 && d2.month2 = 0 then
-          transl conf "in (year)" ^ " " ^ sy2
+        if d2.day2 = 0 && d2.month2 = 0 then transl conf "in (year)" ^ " " ^ sy2
         else if d2.day2 = 0 then transl_decline conf "in (month year)" sy2
         else transl_decline conf "on (day month year)" sy2
       in
@@ -158,8 +183,8 @@ let string_of_on_prec_dmy_aux conf sy sy2 d =
         else if d2.day2 = 0 then sy2
         else transl_decline conf "on (day month year)" sy2
       in
-      transl conf "between (date)" ^ " " ^ s ^ " " ^ transl_nth conf "and" 0 ^
-      " " ^ Mutil.nominative s2
+      transl conf "between (date)"
+      ^ " " ^ s ^ " " ^ transl_nth conf "and" 0 ^ " " ^ Mutil.nominative s2
 
 let replace_spaces_by_nbsp s =
   let rec loop i len =
@@ -170,7 +195,8 @@ let replace_spaces_by_nbsp s =
   loop 0 0
 
 let string_of_on_prec_dmy conf sy sy2 d =
-  Adef.safe @@
+  Adef.safe
+  @@
   let r = string_of_on_prec_dmy_aux conf sy sy2 d in
   replace_spaces_by_nbsp r
 
@@ -178,8 +204,7 @@ let string_of_on_french_dmy conf d =
   let sy = code_french_date conf d.day d.month d.year in
   let sy2 =
     match d.prec with
-      OrYear d2 | YearInt d2 ->
-        code_french_date conf d2.day2 d2.month2 d2.year2
+    | OrYear d2 | YearInt d2 -> code_french_date conf d2.day2 d2.month2 d2.year2
     | _ -> ""
   in
   string_of_on_prec_dmy conf sy sy2 d
@@ -188,24 +213,24 @@ let string_of_on_hebrew_dmy conf d =
   let sy = code_hebrew_date conf d.day d.month d.year in
   let sy2 =
     match d.prec with
-      OrYear d2 | YearInt d2 ->
-        code_hebrew_date conf d2.day2 d2.month2 d2.year2
+    | OrYear d2 | YearInt d2 -> code_hebrew_date conf d2.day2 d2.month2 d2.year2
     | _ -> ""
   in
   string_of_on_prec_dmy conf sy sy2 d
 
 let string_of_prec_dmy conf s s2 d =
-  Adef.safe @@
+  Adef.safe
+  @@
   match d.prec with
-    Sure -> Mutil.nominative s
+  | Sure -> Mutil.nominative s
   | About -> transl_decline conf "about (date)" s
   | Before -> transl_decline conf "before (date)" s
   | After -> transl_decline conf "after (date)" s
   | Maybe -> transl_decline conf "possibly (date)" s
   | OrYear _ -> s ^ " " ^ transl conf "or" ^ " " ^ Mutil.nominative s2
   | YearInt _ ->
-    transl conf "between (date)" ^ " " ^ s ^ " " ^
-    transl_nth conf "and" 0 ^ " " ^ Mutil.nominative s2
+      transl conf "between (date)"
+      ^ " " ^ s ^ " " ^ transl_nth conf "and" 0 ^ " " ^ Mutil.nominative s2
 
 let string_of_dmy_aux fn conf d =
   let sy = code_dmy conf d in
@@ -216,15 +241,15 @@ let string_of_dmy_aux fn conf d =
   in
   fn conf sy sy2 d
 
-let string_of_on_dmy conf d =
-  string_of_dmy_aux string_of_on_prec_dmy conf d
-
-let string_of_dmy conf d =
-  string_of_dmy_aux string_of_prec_dmy conf d
+let string_of_on_dmy conf d = string_of_dmy_aux string_of_on_prec_dmy conf d
+let string_of_dmy conf d = string_of_dmy_aux string_of_prec_dmy conf d
 
 (* ************************************************************************ *)
-(*  [Fonc] translate_dmy : config -> (string * string * string) ->
-                             calendar -> bool -> (string * string * string) *)
+(* [Fonc] translate_dmy : config -> (string * string * string) ->
+                            calendar -> bool -> (string * string * string) *)
+
+(* ************************************************************************ *)
+
 (** [Description] : Traduit en fonction du calendrier, le mois et/ou l'année
                     d'une date et renvoie le triplet conformément au format
                     de la date.
@@ -236,11 +261,10 @@ let string_of_dmy conf d =
                 VD/Vendémiaire
     [Retour] : (string * string * string) : date traduite
     [Rem] : Non exporté en clair hors de ce module.                         *)
-(* ************************************************************************ *)
 let translate_dmy conf (fst, snd, trd) cal short =
   let translate_month m =
     match cal with
-      Dfrench when m <> "" ->
+    | Dfrench when m <> "" ->
         if short then Util.short_f_month (int_of_string m)
         else french_month conf (int_of_string m)
     | Dhebrew when m <> "" ->
@@ -252,15 +276,15 @@ let translate_dmy conf (fst, snd, trd) cal short =
   in
   let translate_year y =
     match cal with
-      Dfrench ->
+    | Dfrench ->
         let y1 = int_of_string y in
         if y1 >= 1 && y1 < 4000 then Mutil.roman_of_arabian y1 else y
     | _ -> y
   in
   match transl conf "!dates order" with
-    "yymmdd" | "yyyymmdd" -> translate_year fst, translate_month snd, trd
-  | "mmddyyyy" -> translate_month fst, snd, translate_year trd
-  | _ -> fst, translate_month snd, translate_year trd
+  | "yymmdd" | "yyyymmdd" -> (translate_year fst, translate_month snd, trd)
+  | "mmddyyyy" -> (translate_month fst, snd, translate_year trd)
+  | _ -> (fst, translate_month snd, translate_year trd)
 
 (** [decode_dmy conf dmy]
     Returns a triplet corresponding to day/month/year, arranged in
@@ -271,40 +295,44 @@ let translate_dmy conf (fst, snd, trd) cal short =
 *)
 let decode_dmy conf d =
   match transl conf "!dates order" with
-    "dmyyyy" ->
-      string_of_int d.day, string_of_int d.month, string_of_int d.year
-  | "mmddyyyy" ->
+  | "dmyyyy" ->
+      (string_of_int d.day, string_of_int d.month, string_of_int d.year)
+  | "mmddyyyy" -> (
       (* Si le jour et/ou le mois n'est pas sur 2 caractères, *)
       (* on rajoute les 0 nécessaires.                        *)
-      begin match d.day, d.month, d.year with
-        0, 0, year -> "", "", string_of_int year
+      match (d.day, d.month, d.year) with
+      | 0, 0, year -> ("", "", string_of_int year)
       | 0, month, year ->
-          let m = Printf.sprintf "%02d" month in m, "", string_of_int year
+          let m = Printf.sprintf "%02d" month in
+          (m, "", string_of_int year)
       | day, month, year ->
           let d = Printf.sprintf "%02d" day in
-          let m = Printf.sprintf "%02d" month in m, d, string_of_int year
-      end
-  | "yyyymmdd" | "yymmdd" ->
+          let m = Printf.sprintf "%02d" month in
+          (m, d, string_of_int year))
+  | "yyyymmdd" | "yymmdd" -> (
       (* Si le jour et/ou le mois n'est pas sur 2 caractères, *)
       (* on rajoute les 0 nécessaires.                        *)
-      begin match d.day, d.month, d.year with
-        0, 0, year -> string_of_int year, "", ""
+      match (d.day, d.month, d.year) with
+      | 0, 0, year -> (string_of_int year, "", "")
       | 0, month, year ->
-          let m = Printf.sprintf "%02d" month in string_of_int year, m, ""
+          let m = Printf.sprintf "%02d" month in
+          (string_of_int year, m, "")
       | day, month, year ->
           let d = Printf.sprintf "%02d" day in
-          let m = Printf.sprintf "%02d" month in string_of_int year, m, d
-      end
-  | "ddmmyyyy" | "ddmmyy" | _ ->
+          let m = Printf.sprintf "%02d" month in
+          (string_of_int year, m, d))
+  | "ddmmyyyy" | "ddmmyy" | _ -> (
       (* Si le jour et/ou le mois n'est pas sur 2 caractères, *)
       (* on rajoute les 0 nécessaires.                        *)
-      match d.day, d.month, d.year with
-        0, 0, year -> "", "", string_of_int year
+      match (d.day, d.month, d.year) with
+      | 0, 0, year -> ("", "", string_of_int year)
       | 0, month, year ->
-          let m = Printf.sprintf "%02d" month in "", m, string_of_int year
+          let m = Printf.sprintf "%02d" month in
+          ("", m, string_of_int year)
       | day, month, year ->
           let d = Printf.sprintf "%02d" day in
-          let m = Printf.sprintf "%02d" month in d, m, string_of_int year
+          let m = Printf.sprintf "%02d" month in
+          (d, m, string_of_int year))
 
 let gregorian_precision conf d =
   if d.delta = 0 then string_of_dmy conf d
@@ -312,60 +340,66 @@ let gregorian_precision conf d =
     let d2 =
       Calendar.gregorian_of_sdn d.prec (Calendar.sdn_of_gregorian d + d.delta)
     in
-    Adef.safe @@
-    transl conf "between (date)" ^ " " ^ (string_of_on_dmy conf d :> string) ^ " " ^
-    transl_nth conf "and" 0 ^ " " ^ (string_of_on_dmy conf d2 :> string)
+    Adef.safe
+    @@ transl conf "between (date)"
+    ^ " "
+    ^ (string_of_on_dmy conf d :> string)
+    ^ " " ^ transl_nth conf "and" 0 ^ " "
+    ^ (string_of_on_dmy conf d2 :> string)
 
-let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy) ?(sep = Adef.safe " ") conf =
+let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
+    ?(sep = Adef.safe " ") conf =
   let mk_link c d (s : Adef.safe_string) =
-    Adef.safe @@
-    Printf.sprintf
-      {|<a href="%sm=CAL&y%c=%d&m%c=%d&d%c=%d&t%c=1" class="date">%s</a>|}
-          (commd conf :> string) c d.year c d.month c d.day c (s :> string)
+    Adef.safe
+    @@ Printf.sprintf
+         {|<a href="%sm=CAL&y%c=%d&m%c=%d&d%c=%d&t%c=1" class="date">%s</a>|}
+         (commd conf :> string)
+         c d.year c d.month c d.day c
+         (s :> string)
   in
   function
-    Dgreg (d, Dgregorian) ->
+  | Dgreg (d, Dgregorian) ->
       let s = dmy conf d in
       if link && d.day > 0 then mk_link 'g' d s else s
   | Dgreg (d, Djulian) ->
       let cal_prec =
-        if d.year < 1582 then Adef.safe "" else " (" ^<^ gregorian_precision conf d ^>^ ")"
+        if d.year < 1582 then Adef.safe ""
+        else " (" ^<^ gregorian_precision conf d ^>^ ")"
       in
       let d1 = Calendar.julian_of_gregorian d in
       let year_prec =
-        if d1.month > 0 && d1.month < 3 ||
-           d1.month = 3 && d1.day > 0 && d1.day < 25
-        then
-          Printf.sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
+        if
+          (d1.month > 0 && d1.month < 3)
+          || (d1.month = 3 && d1.day > 0 && d1.day < 25)
+        then Printf.sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
         else ""
       in
       let s =
-        dmy conf d1 ^^^ year_prec ^<^ sep ^^^
-        transl_nth conf "gregorian/julian/french/hebrew" 1 ^<^ cal_prec
+        dmy conf d1 ^^^ year_prec ^<^ sep
+        ^^^ transl_nth conf "gregorian/julian/french/hebrew" 1
+        ^<^ cal_prec
       in
       if link && d1.day > 0 then mk_link 'j' d1 s else s
-  | Dgreg (d, Dfrench) ->
+  | Dgreg (d, Dfrench) -> (
       let d1 = Calendar.french_of_gregorian d in
       let s = string_of_on_french_dmy conf d1 in
-      let s = if link && d1.day > 0 then mk_link 'f' d1 s else s
-      in
-      begin match d.prec with
-        | Sure | About | Before | After | Maybe -> s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
-        | OrYear _ | YearInt _ -> s
-      end
-  | Dgreg (d, Dhebrew) ->
+      let s = if link && d1.day > 0 then mk_link 'f' d1 s else s in
+      match d.prec with
+      | Sure | About | Before | After | Maybe ->
+          s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
+      | OrYear _ | YearInt _ -> s)
+  | Dgreg (d, Dhebrew) -> (
       let d1 = Calendar.hebrew_of_gregorian d in
       let s = string_of_on_hebrew_dmy conf d1 in
-      begin match d.prec with
-        | Sure | About | Before | After | Maybe -> s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
-        | OrYear _ | YearInt _ -> s
-      end
+      match d.prec with
+      | Sure | About | Before | After | Maybe ->
+          s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
+      | OrYear _ | YearInt _ -> s)
   | Dtext t -> "(" ^<^ (Util.escape_html t :> Adef.safe_string) ^>^ ")"
 
 let string_of_ondate ?link conf d =
   (string_of_date_aux ?link ~dmy:string_of_on_dmy conf d :> string)
-  |> Util.translate_eval
-  |> Adef.safe
+  |> Util.translate_eval |> Adef.safe
 
 let string_of_date conf = function
   | Dgreg (d, _) -> string_of_dmy conf d
@@ -374,83 +408,89 @@ let string_of_date conf = function
 let string_slash_of_date conf date =
   let rec slashify_dmy (fst, snd, trd) d =
     let code fst snd trd =
-      List.fold_right (fun s accu -> if s <> "" then s ^ "/" ^ accu else accu)
-        [fst; snd] trd
+      List.fold_right
+        (fun s accu -> if s <> "" then s ^ "/" ^ accu else accu)
+        [ fst; snd ] trd
     in
     match d.prec with
-      OrYear d2 ->
-      let sy = code fst snd trd in
-      let d2 = Date.dmy_of_dmy2 d2 in
-      let sy2 = slashify_dmy (decode_dmy conf d2) d2 in
-      sy ^ " " ^ transl conf "or" ^ " " ^ sy2
+    | OrYear d2 ->
+        let sy = code fst snd trd in
+        let d2 = Date.dmy_of_dmy2 d2 in
+        let sy2 = slashify_dmy (decode_dmy conf d2) d2 in
+        sy ^ " " ^ transl conf "or" ^ " " ^ sy2
     | YearInt d2 ->
-      let sy = code fst snd trd in
-      let d2 = Date.dmy_of_dmy2 d2 in
-      let sy2 = slashify_dmy (decode_dmy conf d2) d2 in
-      transl conf "between (date)" ^ " " ^ sy ^ " " ^
-      transl_nth conf "and" 0 ^ " " ^ sy2
+        let sy = code fst snd trd in
+        let d2 = Date.dmy_of_dmy2 d2 in
+        let sy2 = slashify_dmy (decode_dmy conf d2) d2 in
+        transl conf "between (date)"
+        ^ " " ^ sy ^ " " ^ transl_nth conf "and" 0 ^ " " ^ sy2
     | _ ->
-      let sy = code fst snd trd in
-      (string_of_prec_dmy conf sy "" d :> string)
+        let sy = code fst snd trd in
+        (string_of_prec_dmy conf sy "" d :> string)
   in
   match date with
   | Dtext t -> (Util.escape_html t :> Adef.safe_string)
-  | Dgreg (d, cal) ->
-    Adef.safe @@ match cal with
-    | Dgregorian -> slashify_dmy (decode_dmy conf d) d
-    | Djulian ->
-      let d1 = Calendar.julian_of_gregorian d in
-      slashify_dmy (translate_dmy conf (decode_dmy conf d1) Djulian true) d1 ^
-      " (" ^ transl_nth conf "gregorian/julian/french/hebrew" 1 ^ ")"
-    | Dfrench ->
-      let d1 = Calendar.french_of_gregorian d in
-      slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dfrench true) d1
-    | Dhebrew ->
-      let d1 = Calendar.french_of_gregorian d in
-      slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dhebrew true) d1 ^
-      " (" ^ transl_nth conf "gregorian/julian/french/hebrew" 3 ^ ")"
+  | Dgreg (d, cal) -> (
+      Adef.safe
+      @@
+      match cal with
+      | Dgregorian -> slashify_dmy (decode_dmy conf d) d
+      | Djulian ->
+          let d1 = Calendar.julian_of_gregorian d in
+          slashify_dmy (translate_dmy conf (decode_dmy conf d1) Djulian true) d1
+          ^ " ("
+          ^ transl_nth conf "gregorian/julian/french/hebrew" 1
+          ^ ")"
+      | Dfrench ->
+          let d1 = Calendar.french_of_gregorian d in
+          slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dfrench true) d1
+      | Dhebrew ->
+          let d1 = Calendar.french_of_gregorian d in
+          slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dhebrew true) d1
+          ^ " ("
+          ^ transl_nth conf "gregorian/julian/french/hebrew" 3
+          ^ ")")
 
 let string_of_age conf a =
-  Adef.safe @@
+  Adef.safe
+  @@
   match a with
-    {day = 0; month = 0; year = y} ->
+  | { day = 0; month = 0; year = y } ->
       if y > 1 then string_of_int y ^ " " ^ transl conf "years old"
       else if y = 1 then transl conf "one year old"
       else transl conf "birth"
-  | {day = 0; month = m; year = y} ->
+  | { day = 0; month = m; year = y } ->
       if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
       else if y > 0 || m > 1 then
-        string_of_int (y * 12 + m) ^ " " ^ transl conf "months old"
+        string_of_int ((y * 12) + m) ^ " " ^ transl conf "months old"
       else if m = 1 then transl conf "one month old"
       else transl conf "less than one month old"
-  | {day = d; month = m; year = y} ->
+  | { day = d; month = m; year = y } ->
       if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
       else if y > 0 || m > 1 then
-        string_of_int (y * 12 + m) ^ " " ^ transl conf "months old"
+        string_of_int ((y * 12) + m) ^ " " ^ transl conf "months old"
       else if m = 1 then transl conf "one month old"
       else if d >= 2 then string_of_int d ^ " " ^ transl conf "days old"
       else if d = 1 then transl conf "one day old"
       else "0"
 
-
 (* ************************************************************************ *)
 (*  [Fonc] prec_text : config -> Def.dmy -> string                          *)
+
+(* ************************************************************************ *)
+
 (** [Description] : Renvoie la précision d'une date.
     [Args] :
       - conf : configuration de la base
       - d    : Def.dmy
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
 let prec_text conf d =
   match d.prec with
-    About ->
+  | About -> (
       (* On utilise le dictionnaire pour être sur *)
       (* que ce soit compréhensible de tous.      *)
-      begin match transl conf "about (short date)" with
-        "ca" -> "ca "
-      | s -> s
-      end
+      match transl conf "about (short date)" with "ca" -> "ca " | s -> s)
   | Maybe -> "?"
   | Before -> "<"
   | After -> ">"
@@ -460,62 +500,64 @@ let prec_text conf d =
 
 (* ************************************************************************ *)
 (*  [Fonc] month_text : Def.dmy -> string                                   *)
+
+(* ************************************************************************ *)
+
 (** [Description] : Renvoie le mois d'une date.
     [Args] :
       - d : Def.dmy
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
 let month_text d = if d.month = 0 then "" else string_of_int d.month
-
 
 (* ************************************************************************ *)
 (*  [Fonc] year_text : Def.dmy -> string                                    *)
+
+(* ************************************************************************ *)
+
 (** [Description] : Renvoie l'année d'une date.
     [Args] :
       - d : Def.dmy
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
 let year_text d =
   match d.prec with
   | OrYear d2 when d.year <> d2.year2 ->
-    (string_of_int d.year) ^ "/" ^ string_of_int d2.year2
+      string_of_int d.year ^ "/" ^ string_of_int d2.year2
   | YearInt d2 when d.year <> d2.year2 ->
-    (string_of_int d.year) ^ ".." ^ string_of_int d2.year2
+      string_of_int d.year ^ ".." ^ string_of_int d2.year2
   | _ -> string_of_int d.year
-
 
 (* ************************************************************************ *)
 (*  [Fonc] prec_year_text : config -> Def.dmy -> string                     *)
+
+(* ************************************************************************ *)
+
 (** [Description] : Renvoie la précision d'une date et l'année de la date.
     [Args] :
       - conf : configuration de la base
       - d    : Def.dmy
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
 let prec_year_text conf d =
   let s =
     match d.prec with
-      About ->
+    | About -> (
         (* On utilise le dictionnaire pour être sur *)
         (* que ce soit compréhensible de tous.      *)
-        begin match transl conf "about (short date)" with
-          "ca" -> "ca "
-        | s -> s
-        end
+        match transl conf "about (short date)" with "ca" -> "ca " | s -> s)
     | Maybe -> "?"
     | Before -> "/"
     | _ -> ""
   in
   let s = s ^ year_text d in
-  match d.prec with
-    After -> s ^ "/"
-  | _ -> s
+  match d.prec with After -> s ^ "/" | _ -> s
 
 (* ********************************************************************** *)
 (*  [Fonc] short_dates_text : config -> base -> person -> string          *)
+
+(* ********************************************************************** *)
+
 (** [Description] : Renvoie la concatenation de l'année de naissance et
       l'année de décès (si trouvée par get_birth_death_date). La précision
       de la date est ajoutée pour chaque année.
@@ -531,37 +573,37 @@ let prec_year_text conf d =
       - p    : person
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                           *)
-(* ********************************************************************** *)
 let short_dates_text conf base p =
-  Adef.safe @@
+  Adef.safe
+  @@
   if authorized_age conf base p then
-    let (birth_date, death_date, _) = Gutil.get_birth_death_date p in
+    let birth_date, death_date, _ = Gutil.get_birth_death_date p in
     let s =
-      match birth_date, death_date with
-        Some (Dgreg (b, _)), Some (Dgreg (d, _)) ->
+      match (birth_date, death_date) with
+      | Some (Dgreg (b, _)), Some (Dgreg (d, _)) ->
           prec_year_text conf b ^ "-" ^ prec_year_text conf d
-      | Some (Dgreg (b, _)), _ ->
-          (* La personne peut être décédée mais ne pas avoir de date. *)
-          begin match get_death p with
-            Death (_, _) | DeadDontKnowWhen | DeadYoung ->
-              prec_year_text conf b ^ "-"
-          | _ -> prec_year_text conf b
-          end
-      | _, Some (Dgreg (d, _)) -> death_symbol conf ^ prec_year_text conf d
-      | _, _ ->
+      | Some (Dgreg (b, _)), _ -> (
           (* La personne peut être décédée mais ne pas avoir de date. *)
           match get_death p with
-            Death (_, _) | DeadDontKnowWhen | DeadYoung -> death_symbol conf
-          | _ -> ""
+          | Death (_, _) | DeadDontKnowWhen | DeadYoung ->
+              prec_year_text conf b ^ "-"
+          | _ -> prec_year_text conf b)
+      | _, Some (Dgreg (d, _)) -> death_symbol conf ^ prec_year_text conf d
+      | _, _ -> (
+          (* La personne peut être décédée mais ne pas avoir de date. *)
+          match get_death p with
+          | Death (_, _) | DeadDontKnowWhen | DeadYoung -> death_symbol conf
+          | _ -> "")
     in
-    if s <> "" then " <bdo dir=\"ltr\">" ^ s ^ "</bdo>"
-    else s
+    if s <> "" then " <bdo dir=\"ltr\">" ^ s ^ "</bdo>" else s
   else ""
 
+(* ********************************************************************** *)
+(* [Fonc] short_marriage_date_text :
+            config -> base -> person -> person -> string *)
 
 (* ********************************************************************** *)
-(*  [Fonc] short_marriage_date_text :
-             config -> base -> person -> person -> string                 *)
+
 (** [Description] : Renvoie l'année de la date de mariage ansi que la
                     précision de la date.
     [Args] :
@@ -571,12 +613,12 @@ let short_dates_text conf base p =
       - p2   : conjoint 2
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                           *)
-(* ********************************************************************** *)
 let short_marriage_date_text conf base fam p1 p2 =
-  Adef.safe @@
+  Adef.safe
+  @@
   if authorized_age conf base p1 && authorized_age conf base p2 then
     match Adef.od_of_cdate (get_marriage fam) with
-      Some (Dgreg (d, _)) ->
+    | Some (Dgreg (d, _)) ->
         "<span style=\"font-size:70%\">" ^ prec_year_text conf d ^ "</span>"
     | _ -> ""
   else ""

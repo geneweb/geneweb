@@ -1,7 +1,7 @@
-
-(** Flag that enables memory saving by calling gc sometimes *)
 val save_mem : bool ref
+(** Flag that enables memory saving by calling gc sometimes *)
 
+val output : Dbdisk.dsk_base -> unit
 (** [output base] uses data section of the [base] to store database on the disk in the files:
 
     - {i base} main file that stores all the arrays of the database
@@ -26,4 +26,3 @@ val save_mem : bool ref
     - {i notes_d} directory containing .txt for each extended page.
     - {i particles.txt} text file with autorised name's particles.
     *)
-val output : Dbdisk.dsk_base -> unit

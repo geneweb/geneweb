@@ -4,33 +4,25 @@
 
 (* Adapted to GeneWeb by Julien Sagot *)
 
-type 'a sort_result =
-  | Sorted of 'a list
-  | ErrorCycle of 'a list
+type 'a sort_result = Sorted of 'a list | ErrorCycle of 'a list
 
 (* Finds "isolated" nodes,
    that is, nodes that have no dependencies *)
 let find_isolated_nodes hash =
-  let aux id deps acc =
-    match deps with
-    | [] -> id :: acc
-    | _  -> acc
-  in Hashtbl.fold aux hash []
+  let aux id deps acc = match deps with [] -> id :: acc | _ -> acc in
+  Hashtbl.fold aux hash []
 
 (* Takes a node name list and removes all those nodes from a hash *)
-let remove_nodes nodes hash =
-  List.iter (Hashtbl.remove hash) nodes
+let remove_nodes nodes hash = List.iter (Hashtbl.remove hash) nodes
 
 (* Walks through a node:dependencies hash and removes a dependency
    from all nodes that have it in their dependency lists *)
 let remove_dependency hash dep =
   let aux dep hash id =
     let deps = Hashtbl.find hash id in
-    let deps = List.filter ((<>) dep) deps in
-    begin
-      Hashtbl.remove hash id;
-      Hashtbl.add hash id deps
-    end
+    let deps = List.filter (( <> ) dep) deps in
+    Hashtbl.remove hash id;
+    Hashtbl.add hash id deps
   in
   let ids = Hashtbl.fold (fun k _ a -> k :: a) hash [] in
   List.iter (aux dep hash) ids
@@ -38,14 +30,13 @@ let remove_dependency hash dep =
 (* Deduplicate list items. *)
 let deduplicate l =
   let tbl = Hashtbl.create (List.length l) in
-  List.fold_left (fun acc x ->
-      if Hashtbl.mem tbl x then
-        acc
+  List.fold_left
+    (fun acc x ->
+      if Hashtbl.mem tbl x then acc
       else (
         Hashtbl.add tbl x ();
-        x :: acc
-      )
-    ) [] l
+        x :: acc))
+    [] l
   |> List.rev
 
 (*
@@ -55,14 +46,13 @@ let deduplicate l =
 *)
 let add_missing_nodes graph_l graph =
   let missing =
-    List.fold_left (fun acc (_, vl) ->
-        List.fold_left (fun acc v ->
-            if not (Hashtbl.mem graph v) then
-              (v, []) :: acc
-            else
-              acc
-          ) acc vl
-      ) [] graph_l
+    List.fold_left
+      (fun acc (_, vl) ->
+        List.fold_left
+          (fun acc v ->
+            if not (Hashtbl.mem graph v) then (v, []) :: acc else acc)
+          acc vl)
+      [] graph_l
     |> List.rev
   in
   List.iter (fun (v, vl) -> Hashtbl.replace graph v vl) missing;
@@ -86,15 +76,17 @@ let sort nodes =
     match deps with
     | [] -> acc
     | dep :: deps ->
-      let () = remove_dependency hash dep in
-      let isolated_nodes = find_isolated_nodes hash in
-      let () = remove_nodes isolated_nodes hash in
-      sorting_loop
-        (List.append deps isolated_nodes) hash (List.append acc isolated_nodes)
+        let () = remove_dependency hash dep in
+        let isolated_nodes = find_isolated_nodes hash in
+        let () = remove_nodes isolated_nodes hash in
+        sorting_loop
+          (List.append deps isolated_nodes)
+          hash
+          (List.append acc isolated_nodes)
   in
   let nodes_hash =
     let tbl = Hashtbl.create 32 in
-    List.iter (fun (k,v) -> Hashtbl.add tbl k v) nodes;
+    List.iter (fun (k, v) -> Hashtbl.add tbl k v) nodes;
     tbl
   in
   let _nodes = add_missing_nodes nodes nodes_hash in
@@ -105,7 +97,7 @@ let sort nodes =
   let remaining_ids = Hashtbl.fold (fun k _ a -> k :: a) nodes_hash [] in
   match remaining_ids with
   | [] -> Sorted sorted_node_ids
-  | _  -> ErrorCycle remaining_ids
+  | _ -> ErrorCycle remaining_ids
 
 (* MIT License *)
 

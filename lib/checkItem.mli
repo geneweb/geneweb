@@ -3,26 +3,33 @@
 
 open Gwdb
 
-(** Database specification error *)
 type base_error = person Def.error
+(** Database specification error *)
 
+type base_warning =
+  (iper, person, ifam, family, title, pers_event, fam_event) Def.warning
 (** Database specification warning *)
-type base_warning = (iper, person, ifam, family, title, pers_event, fam_event) Def.warning
 
 (* *)
 type base_misc = (person, family, title) Def.misc
 
+val check_siblings :
+  ?onchange:bool ->
+  base ->
+  (base_warning -> unit) ->
+  ifam * family ->
+  (person -> unit) ->
+  unit
 (** [check_siblings ?onchange base warning (ifam, fam) callback]
     Checks birth date consistency between siblings.
     Also calls [callback] with each child. *)
-val check_siblings :
- ?onchange:bool
- -> base
- -> (base_warning -> unit)
- -> (ifam * family)
- -> (person -> unit)
- -> unit
 
+val person :
+  ?onchange:bool ->
+  base ->
+  (base_warning -> unit) ->
+  person ->
+  (iper * person * Def.sex option * relation list option) list option
 (** [person onchange base warn p] checks person's properties:
 
     - personal events
@@ -31,13 +38,9 @@ val check_siblings :
     - etc.
     If [onchange] is set then sort person's events
     Calls [warn] on corresponding [base_warning] when find some inconsistencies. *)
-val person
-  : ?onchange:bool
-  -> base
-  -> (base_warning -> unit)
-  -> person
-  -> (iper * person * Def.sex option * relation list option) list option
 
+val family :
+  ?onchange:bool -> base -> (base_warning -> unit) -> ifam -> family -> unit
 (** [family onchange base warn f] checks family properties like :
 
     - familial events
@@ -46,39 +49,26 @@ val person
     - etc.
     If [onchange] is set then sort family's events
     Calls [warn] on corresponding [base_warning] when find some inconsistencies. *)
-val family
-  : ?onchange:bool
-  -> base
-  -> (base_warning -> unit)
-  -> ifam
-  -> family
-  -> unit
 
+val on_person_update : base -> (base_warning -> unit) -> person -> unit
 (** Unlike [person] who checks directly the properties of a person, checks the properties
     of a person in relation to other people (his children, parents, spouses, witnesses, etc).
     Calls [warn] on corresponding [base_warning] when find some inconsistencies.
  *)
-val on_person_update
-  : base
-  -> (base_warning -> unit)
-  -> person
-  -> unit
 
+val sort_children : base -> iper array -> (iper array * iper array) option
 (** Sort array of children by their birth date from oldest to youngest.
     Returns old array and sorted version. *)
-val sort_children :
-  base -> iper array -> (iper array * iper array) option
 
+val check_other_fields : base -> (base_misc -> unit) -> ifam -> family -> unit
 (** Cheks if family, father and mother have sources. Otherwise call [misc] on [base_misc] *)
-val check_other_fields :
-  base -> (base_misc -> unit) -> ifam -> family -> unit
 
-(** equality between base_warnings *)
 val eq_warning : base -> base_warning -> base_warning -> bool
+(** equality between base_warnings *)
 
+val person_warnings : Config.config -> base -> person -> base_warning list
 (** [person_warnings conf base p]
     Shorthand for [CheckItem.person] and [CheckItem.on_person_update] on [p]
     and [CheckItem.check_siblings] on they children
     using [auth_warning] for filtering.
 *)
-val person_warnings : Config.config -> base -> person -> base_warning list

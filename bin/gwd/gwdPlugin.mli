@@ -1,9 +1,13 @@
+val assets : string ref
 (** When dynamically loading a plugin, this variable contains
     the path of the assets directory associated to the plugin
     being currently loaded.
 *)
-val assets : string ref
 
+val register :
+  ns:string ->
+  (string * (string -> Geneweb.Config.config -> string option -> bool)) list ->
+  unit
 (** [register ~ns handlers] register modes handlers of a plugin.
 
     [ns] is the namespace of the plugin (i.e. its name)
@@ -23,14 +27,15 @@ val assets : string ref
 
     Handlers can overwrite pre-existing modes or create new ones.
  *)
-val register
-  : ns:string
-  -> (string * (string -> Geneweb.Config.config -> string option -> bool)) list ->
-  unit
 
+val ht :
+  (string, string * (Geneweb.Config.config -> string option -> bool)) Hashtbl.t
 (** Table of handlers registered by plugins.  *)
-val ht : (string, (string * (Geneweb.Config.config -> string option -> bool))) Hashtbl.t
 
+val register_se :
+  ns:string ->
+  (string -> Geneweb.Config.config -> string option -> unit) ->
+  unit
 (** [register_se ~ns hook] register a plugin hook (side effect function).
 
     If enabled, hooks are executed before the request handlers, in the
@@ -40,10 +45,6 @@ val ht : (string, (string * (Geneweb.Config.config -> string option -> bool))) H
     in a buffer and apply a transformation to the resulting document before actually
     sending it to the client.
   *)
-val register_se :
-  ns:string ->
-  (string -> Geneweb.Config.config -> string option -> unit) ->
-  unit
 
-(** Table of hooks registered by plugins. *)
 val se : (string * (Geneweb.Config.config -> string option -> unit)) list ref
+(** Table of hooks registered by plugins. *)
