@@ -39,6 +39,10 @@ jobs:
         with:
           ocaml-version: ${{ matrix.ocaml-version }}
 
+      - run: opam install dune ocamlformat
+
+      - run: opam exec -- dune build @fmt
+
       - run: sudo apt-get update
 
       - run: opam pin add geneweb.dev . --no-action
