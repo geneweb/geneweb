@@ -1,52 +1,51 @@
 (* /!\ This is mostly copy/paste of the Perso module /!\ *)
 (* Sync with perso from ed7525bac *)
 open Geneweb
-
 open Config
 open Def
 open Gwdb
 open Util
 
-type fam = (ifam * family * (iper * iper * iper) * bool)
+type fam = ifam * family * (iper * iper * iper) * bool
+type rel = relation * person option
 
-type rel = (relation * person option)
-
-type env =
-  { all_gp : Perso.generation_person list option
-  ; baseprefix : string option
-  ; desc_level_table : (int array * int array) Lazy.t option
-  ; desc_mark : bool array ref option
-  ; f_link : bool option
-  ; fam : fam option
-  ; fam_link : fam option
-  ; p_link : bool option
-  ; prev_fam : fam option
-  ; sosa : (iper * (Sosa.t * person) option) list ref option
-  ; sosa_ref : person option Lazy.t option
-  ; src : string option
-  }
+type env = {
+  all_gp : Perso.generation_person list option;
+  baseprefix : string option;
+  desc_level_table : (int array * int array) Lazy.t option;
+  desc_mark : bool array ref option;
+  f_link : bool option;
+  fam : fam option;
+  fam_link : fam option;
+  p_link : bool option;
+  prev_fam : fam option;
+  sosa : (iper * (Sosa.t * person) option) list ref option;
+  sosa_ref : person option Lazy.t option;
+  src : string option;
+}
 
 let conf_w_baseprefix conf env =
   match env.baseprefix with
   | Some baseprefix -> { conf with command = baseprefix }
   | None -> conf
 
-let empty = { all_gp = None
-            ; baseprefix = None
-            ; desc_level_table = None
-            ; desc_mark = None
-            ; fam = None
-            ; f_link = None
-            ; fam_link = None
-            ; p_link = None
-            ; prev_fam = None
-            ; sosa = None
-            ; sosa_ref = None
-            ; src = None
-            }
+let empty =
+  {
+    all_gp = None;
+    baseprefix = None;
+    desc_level_table = None;
+    desc_mark = None;
+    fam = None;
+    f_link = None;
+    fam_link = None;
+    p_link = None;
+    prev_fam = None;
+    sosa = None;
+    sosa_ref = None;
+    src = None;
+  }
 
 let env = empty
-
 let get_env x = match x with Some x -> x | None -> raise Not_found
 
 let sex_of_index = function
@@ -56,35 +55,29 @@ let sex_of_index = function
   | _ -> raise (Invalid_argument "sex_of_index")
 
 module Person = struct
-
   let children base p = Gwdb.children_of_p base p
 
   let consanguinity p =
     let c = get_consang p in
-    if c != Adef.fix (-1) && c >= Adef.fix_of_float 0.0001
-    then Adef.float_of_fix c
+    if c != Adef.fix (-1) && c >= Adef.fix_of_float 0.0001 then
+      Adef.float_of_fix c
     else 0.
 
-  let dates conf base p =
-    DateDisplay.short_dates_text conf base p
+  let dates conf base p = DateDisplay.short_dates_text conf base p
+  let death p = get_death p
 
-  let death p =
-    get_death p
-
-(* TODOWHY: should it be Event.sorted_events or can it be just Event.events? *)
-let events = Event.sorted_events
-
-  let first_name base p =
-    p_first_name base p
+  (* TODOWHY: should it be Event.sorted_events or can it be just Event.events? *)
+  let events = Event.sorted_events
+  let first_name base p = p_first_name base p
 
   let history_file base p =
     let fn = sou base (get_first_name p) in
     let sn = sou base (get_surname p) in
-    let occ = get_occ p in HistoryDiff.history_file fn sn occ
+    let occ = get_occ p in
+    HistoryDiff.history_file fn sn occ
 
   let is_accessible_by_key conf base p =
-    Util.accessible_by_key
-      conf base p (p_first_name base p) (p_surname base p)
+    Util.accessible_by_key conf base p (p_first_name base p) (p_surname base p)
 
   let linked_page conf base p s =
     let db = Gwdb.read_nldb base in
@@ -92,80 +85,76 @@ let events = Event.sorted_events
     let key =
       let fn = Name.lower (sou base (get_first_name p)) in
       let sn = Name.lower (sou base (get_surname p)) in
-      fn, sn, get_occ p
+      (fn, sn, get_occ p)
     in
     List.fold_left (Perso.linked_page_text conf base p s key) (Adef.safe "") db
 
-  let note conf base p =
-    if not conf.no_note then sou base (get_notes p)
-    else ""
+  let note conf base p = if not conf.no_note then sou base (get_notes p) else ""
 
   let related conf base p =
-    List.sort
-      (fun (c1, _) (c2, _) ->
-         let mk_date c =
-           match Adef.od_of_cdate (get_baptism c) with
-           | None -> Adef.od_of_cdate (get_birth c)
-           | x -> x
-         in
-         match mk_date c1, mk_date c2 with
-         | Some d1, Some d2 -> Date.compare_date d1 d2
-         | _ -> -1)
-    @@
-    List.fold_left (fun list ic ->
-        let c = pget conf base ic in
-        List.fold_left (fun acc r -> match r.r_fath, r.r_moth with
-            | Some ip, _  when ip = get_iper p -> (c, r) :: acc
-            | _ , Some ip when ip = get_iper p -> (c, r) :: acc
-            | _ -> acc)
-          list (get_rparents c) )
-      [] (List.sort_uniq compare (get_related p))
+    List.sort (fun (c1, _) (c2, _) ->
+        let mk_date c =
+          match Adef.od_of_cdate (get_baptism c) with
+          | None -> Adef.od_of_cdate (get_birth c)
+          | x -> x
+        in
+        match (mk_date c1, mk_date c2) with
+        | Some d1, Some d2 -> Date.compare_date d1 d2
+        | _ -> -1)
+    @@ List.fold_left
+         (fun list ic ->
+           let c = pget conf base ic in
+           List.fold_left
+             (fun acc r ->
+               match (r.r_fath, r.r_moth) with
+               | Some ip, _ when ip = get_iper p -> (c, r) :: acc
+               | _, Some ip when ip = get_iper p -> (c, r) :: acc
+               | _ -> acc)
+             list (get_rparents c))
+         []
+         (List.sort_uniq compare (get_related p))
 
   (* Why isnt this already unique? *)
-  let relations p =
-    List.sort_uniq compare (get_related p)
+  let relations p = List.sort_uniq compare (get_related p)
 
   let siblings base p =
     match get_parents p with
     | Some ifam ->
-      let ip = get_iper p in
-      Array.fold_right
-        (fun i acc -> if i <> ip then i :: acc else acc)
-        (get_children (foi base ifam))
-        []
+        let ip = get_iper p in
+        Array.fold_right
+          (fun i acc -> if i <> ip then i :: acc else acc)
+          (get_children (foi base ifam))
+          []
     | None -> []
 
   let half_siblings base p =
     match get_parents p with
     | Some ifam ->
-      let ip = get_iper p in
-      let f = foi base ifam in
-      let filter = fun (acc : iper list) i ->
-        if i = ifam then acc else
-          Array.fold_right
-            (fun i acc -> if i <> ip then i :: acc else acc)
-            (get_children (foi base i)) acc
-      in
-      let hs =
-        let ifath = get_father f in
-        if ifath = dummy_iper then []
-        else Array.fold_left filter [] (get_family @@ poi base ifath)
-      in
-      let imoth = get_mother f in
-      if imoth = dummy_iper then hs
-      else Array.fold_left filter hs (get_family @@ poi base imoth)
+        let ip = get_iper p in
+        let f = foi base ifam in
+        let filter (acc : iper list) i =
+          if i = ifam then acc
+          else
+            Array.fold_right
+              (fun i acc -> if i <> ip then i :: acc else acc)
+              (get_children (foi base i))
+              acc
+        in
+        let hs =
+          let ifath = get_father f in
+          if ifath = dummy_iper then []
+          else Array.fold_left filter [] (get_family @@ poi base ifath)
+        in
+        let imoth = get_mother f in
+        if imoth = dummy_iper then hs
+        else Array.fold_left filter hs (get_family @@ poi base imoth)
     | None -> []
 
-  let sex p =
-    index_of_sex (get_sex p)
-
-  let surname base p =
-    p_surname base p
-
+  let sex p = index_of_sex (get_sex p)
+  let surname base p = p_surname base p
 end
 
 module Family = struct
-
   let children (_, fam, _, _) = get_children fam
 
   let divorce_date (_, fam, _, auth) =
@@ -177,59 +166,47 @@ module Family = struct
     if auth then
       List.fold_right
         (fun evt fam_fevents ->
-           let name = Event.Fevent evt.efam_name in
-           let date = evt.efam_date in
-           let place = evt.efam_place in
-           let note = evt.efam_note in
-           let src = evt.efam_src in
-           let wl = evt.efam_witnesses in
-           let x = name, date, place, note, src, wl, Some isp in
-           x :: fam_fevents)
+          let name = Event.Fevent evt.efam_name in
+          let date = evt.efam_date in
+          let place = evt.efam_place in
+          let note = evt.efam_note in
+          let src = evt.efam_src in
+          let wl = evt.efam_witnesses in
+          let x = (name, date, place, note, src, wl, Some isp) in
+          x :: fam_fevents)
         (get_fevents fam) []
     else []
 
   let father (_, _, (ifath, _, _), _) = ifath
-
   let ifam (ifam, _, _, _) = string_of_ifam ifam
 
   let marriage_date (_, fam, (_, _, _), auth) =
-    if auth then Adef.od_of_cdate (get_marriage fam)
-    else None
+    if auth then Adef.od_of_cdate (get_marriage fam) else None
 
-  let marriage_place (_, fam, _, _) =
-    get_marriage_place fam
+  let marriage_place (_, fam, _, _) = get_marriage_place fam
 
   let marriage_note (_, fam, _, auth) =
-    if auth then get_marriage_note fam
-    else Gwdb.empty_string
+    if auth then get_marriage_note fam else Gwdb.empty_string
 
   let marriage_source (_, fam, _, auth) =
-    if auth then get_marriage_src fam
-    else Gwdb.empty_string
+    if auth then get_marriage_src fam else Gwdb.empty_string
 
   let mother (_, _, (_, imoth, _), _) = imoth
 
   let note conf base (_, fam, _, auth) =
-    if auth && not conf.no_note then sou base (get_comment fam)
-    else ""
+    if auth && not conf.no_note then sou base (get_comment fam) else ""
 
   let origin_file conf base (_, fam, _, _) =
-    if conf.wizard then sou base (get_origin_file fam)
-    else ""
+    if conf.wizard then sou base (get_origin_file fam) else ""
 
   let spouse_iper (_, _, (_, _, ip), _) = ip
-
-  let witnesses (_, fam, _, auth) =
-    if auth then get_witnesses fam else [||]
+  let witnesses (_, fam, _, auth) = if auth then get_witnesses fam else [||]
 
   let sources base (_, fam, _, auth) =
-    if auth then sou base (get_fsources fam)
-    else ""
-
+    if auth then sou base (get_fsources fam) else ""
 end
 
 module Event = struct
-
   let name conf base (n, _, _, _, _, _, _) =
     match n with
     | Event.Pevent name -> Util.string_of_pevent_name conf base name
@@ -299,25 +276,16 @@ module Event = struct
     | Fevent Efam_MarriageLicense -> "EFAM_MARRIAGE_LICENSE"
     | Fevent Efam_PACS -> "EFAM_PACS"
     | Fevent Efam_Residence -> "EFAM_RESIDENCE"
-    | Pevent Epers_Name _ -> "EPERS"
-    | Fevent Efam_Name _ -> "EFAM"
+    | Pevent (Epers_Name _) -> "EPERS"
+    | Fevent (Efam_Name _) -> "EFAM"
 
-  let date (_, d, _, _, _, _, _) =
-    Adef.od_of_cdate d
-
-  let place base (_, _, p, _, _, _, _) =
-    sou base p
+  let date (_, d, _, _, _, _, _) = Adef.od_of_cdate d
+  let place base (_, _, p, _, _, _, _) = sou base p
 
   let note conf base (_, _, _, n, _, _, _) =
     if conf.no_note then "" else sou base n
 
-  let src base (_, _, _, _, s, _, _) =
-    sou base s
-
-  let witnesses (_, _, _, _, _, w, _) =
-    w
-
-  let spouse_opt (_, _, _, _, _, _, isp) =
-    isp
-
+  let src base (_, _, _, _, s, _, _) = sou base s
+  let witnesses (_, _, _, _, _, w, _) = w
+  let spouse_opt (_, _, _, _, _, _, isp) = isp
 end

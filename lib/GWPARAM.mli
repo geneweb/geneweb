@@ -1,81 +1,82 @@
-(** The level of log gravity. See SYSLOG(3) *)
 type syslog_level =
-    [ `LOG_EMERG                (** A panic condition. *)
-    | `LOG_ALERT                (** A condition that should be corrected immediately,
+  [ `LOG_EMERG  (** A panic condition. *)
+  | `LOG_ALERT
+    (** A condition that should be corrected immediately,
                                     such as a corrupted system database. *)
-    | `LOG_CRIT                 (** Critical conditions, such as hard device errors. *)
-    | `LOG_ERR                  (** Errors. *)
-    | `LOG_WARNING              (** Warning messages.  *)
-    | `LOG_DEBUG                (** Conditions that are not error conditions,
+  | `LOG_CRIT  (** Critical conditions, such as hard device errors. *)
+  | `LOG_ERR  (** Errors. *)
+  | `LOG_WARNING  (** Warning messages.  *)
+  | `LOG_DEBUG
+    (** Conditions that are not error conditions,
                                     but that may require special handling. *)
-    | `LOG_INFO                 (** Informational messages. *)
-    | `LOG_NOTICE               (** Messages that contain information
+  | `LOG_INFO  (** Informational messages. *)
+  | `LOG_NOTICE
+    (** Messages that contain information
                                     normally of use only when debugging a program.  *)
-    ]
+  ]
+(** The level of log gravity. See SYSLOG(3) *)
 
 (* S: Move it to gwd_lib?  *)
+
+val init : (unit -> unit) ref
 (** Function called before gwd starts
     e.g. inititialise assets folders in Secure module. *)
-val init : (unit -> unit) ref
 
+val base_path : (string list -> string -> string) ref
 (** [!base_path pref fname] function that returns a path to a file identified by [pref] [fname]
     related to bases. [pref] is like a category for file [fname].
 
     See {!val:GWPARAM.Default.base_path} for a concrete example.
 *)
-val base_path : (string list -> string -> string) ref
 
-(** Same as {!val:base_path}, but without the prefix (avoid unecessary empty list). *)
 val bpath : (string -> string) ref
+(** Same as {!val:base_path}, but without the prefix (avoid unecessary empty list). *)
 
+val output_error :
+  (?headers:string list ->
+  ?content:Adef.safe_string ->
+  Config.config ->
+  Def.httpStatus ->
+  unit)
+  ref
 (** [!output_error ?headers ?content conf status] default function that send the http status [status].
     Also send [headers] and use [content] (typically a HTML string describing the error) if provided.
 *)
-val output_error :
-  (?headers:string list
-   -> ?content:Adef.safe_string
-   -> Config.config
-   -> Def.httpStatus
-   -> unit)
-  ref
 
-(** Check if a person should be displayed or not *)
 val p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
+(** Check if a person should be displayed or not *)
 
-(** [!syslog level log] log message [log] with gravity level [level] on stderr. *)
 val syslog : (syslog_level -> string -> unit) ref
+(** [!syslog level log] log message [log] with gravity level [level] on stderr. *)
 
+val wrap_output :
+  (Config.config -> Adef.safe_string -> (unit -> unit) -> unit) ref
 (** [wrap_output conf title content]
     Wrap the display of [title] and [content] in a defined template.
 *)
-val wrap_output :
-  (Config.config
-   -> Adef.safe_string
-   -> (unit -> unit)
-   -> unit) ref
 
 module Default : sig
-
+  val init : unit -> unit
   (** Inititialise assets directoris for gwd server:
       * current directory
       * /usr/share/geneweb  *)
-  val init : (unit -> unit)
 
+  val base_path : string list -> string -> string
   (** Use concatenation of [Secure.base_dir ()], [pref] and [fname] *)
-  val base_path : (string list -> string -> string)
 
+  val bpath : string -> string
   (** [Filename.concat (Secure.base_dir ())] *)
-  val bpath : (string -> string)
 
+  val output_error :
+    ?headers:string list ->
+    ?content:Adef.safe_string ->
+    Config.config ->
+    Def.httpStatus ->
+    unit
   (** If [?content] is not set, sends page content from {/etc/<status-code>-<lang>.html}.
       If the current lang is not available, use `en` *)
-  val output_error :
-    (?headers:string list
-     -> ?content:Adef.safe_string
-     -> Config.config
-     -> Def.httpStatus
-     -> unit)
 
+  val p_auth : Config.config -> Gwdb.base -> Gwdb.person -> bool
   (** Calculate the access rights to the person's information in
       according to his age.
       Returns (in the order of the tests) :
@@ -94,16 +95,10 @@ module Default : sig
       - `true` if person has been married for more than {i private_years}
       - `false` otherwise
   *)
-  val p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool)
 
+  val syslog : syslog_level -> string -> unit
   (** Prints on stderr using `"[date]: level message"` format. *)
-  val syslog : (syslog_level -> string -> unit)
 
+  val wrap_output : Config.config -> Adef.safe_string -> (unit -> unit) -> unit
   (** Display in a very basic HTML doc, with no CSS or JavaScript. *)
-  val wrap_output :
-    (Config.config
-     -> Adef.safe_string
-     -> (unit -> unit)
-     -> unit)
-
 end

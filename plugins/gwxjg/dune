@@ -1,23 +1,24 @@
 (alias
-   (name plugin)
-   (deps (file META) plugin_gwxjg.cmxs)
-)
+ (name plugin)
+ (deps
+  (file META)
+  plugin_gwxjg.cmxs))
 
 (ocamllex gwxjg_lexicon_parser)
 
 (library
-  (name plugin_gwxjg_lib)
-  (public_name geneweb.plugin_gwxjg_lib)
-  (libraries unix geneweb jingoo)
-  (flags (:standard -w -42-40))
-  (modules gwxjg_ezgw gwxjg_data gwxjg_trans gwxjg_lexicon_parser)
-)
+ (name plugin_gwxjg_lib)
+ (public_name geneweb.plugin_gwxjg_lib)
+ (libraries unix geneweb jingoo)
+ (flags
+  (:standard -w -42-40))
+ (modules gwxjg_ezgw gwxjg_data gwxjg_trans gwxjg_lexicon_parser))
 
 (executable
-  (name plugin_gwxjg)
-  (libraries geneweb.gwd_lib plugin_gwxjg_lib)
-  (embed_in_plugin_libraries plugin_gwxjg_lib)
-  (flags -linkall)
-  (modes (native plugin))
-  (modules plugin_gwxjg)
-)
+ (name plugin_gwxjg)
+ (libraries geneweb.gwd_lib plugin_gwxjg_lib)
+ (embed_in_plugin_libraries plugin_gwxjg_lib)
+ (flags -linkall)
+ (modes
+  (native plugin))
+ (modules plugin_gwxjg))

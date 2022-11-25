@@ -1,15 +1,19 @@
 (alias
-   (name plugin)
-   (deps (source_tree assets) plugin_fixbase.cmxs)
-)
+ (name plugin)
+ (deps
+  (source_tree assets)
+  plugin_fixbase.cmxs))
 
 (executable
-  (name plugin_fixbase)
-  (libraries geneweb.gwd_lib geneweb_def_show)
-  (preprocess (pps ppx_deriving.show))
-  (flags -linkall)
-  (modes (native plugin))
-  (modules plugin_fixbase)
-)
+ (name plugin_fixbase)
+ (libraries geneweb.gwd_lib geneweb_def_show)
+ (preprocess
+  (pps ppx_deriving.show))
+ (flags -linkall)
+ (modes
+  (native plugin))
+ (modules plugin_fixbase))
 
-(alias (name plugin) (deps plugin_fixbase.cmxs))
+(alias
+ (name plugin)
+ (deps plugin_fixbase.cmxs))

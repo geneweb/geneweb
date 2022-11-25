@@ -1,23 +1,18 @@
 type date = Adef.date = Dgreg of dmy * calendar | Dtext of string
 and calendar = Adef.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
-and dmy =
-  Adef.dmy = {
+
+and dmy = Adef.dmy = {
   day : int;
   month : int;
   year : int;
   prec : precision;
   delta : int;
 }
-and dmy2 =
-  Adef.dmy2 = {
-  day2 : int;
-  month2 : int;
-  year2 : int;
-  delta2 : int;
-}
-and precision =
-  Adef.precision =
-    Sure
+
+and dmy2 = Adef.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
+
+and precision = Adef.precision =
+  | Sure
   | About
   | Maybe
   | Before
@@ -25,55 +20,46 @@ and precision =
   | OrYear of dmy2
   | YearInt of dmy2
 
-(** Printer for [date] *)
 val pp_date : Format.formatter -> date -> unit
+(** Printer for [date] *)
 
-(** Convert [date] to string. *)
 val show_date : date -> string
+(** Convert [date] to string. *)
 
+val pp_calendar : Format.formatter -> calendar -> unit
 (** Printer for [calendar] *)
-val pp_calendar :
-  Format.formatter ->
-  calendar -> unit
 
-(** Convert [calendar] to string *)
 val show_calendar : calendar -> string
+(** Convert [calendar] to string *)
 
+val pp_dmy : Format.formatter -> dmy -> unit
 (** Printer for [dmy] *)
-val pp_dmy :
-  Format.formatter -> dmy -> unit
 
-(** Convert [dmy] to string *)
 val show_dmy : dmy -> string
+(** Convert [dmy] to string *)
 
+val pp_dmy2 : Format.formatter -> dmy2 -> unit
 (** Printer for [dmy2] *)
-val pp_dmy2 :
-  Format.formatter -> dmy2 -> unit
 
-(** Convert [dmy2] to string *)
 val show_dmy2 : dmy2 -> string
+(** Convert [dmy2] to string *)
 
+val pp_precision : Format.formatter -> precision -> unit
 (** Printer for [precision] *)
-val pp_precision :
-  Format.formatter ->
-  precision -> unit
 
-(** Convert [precision] to string *)
 val show_precision : precision -> string
+(** Convert [precision] to string *)
 
 type cdate = Adef.cdate
 
+val pp_cdate : Format.formatter -> Adef.cdate -> unit
 (** Printer for [cdate] *)
-val pp_cdate :
-  Format.formatter ->
-  Adef.cdate -> unit
 
-(** Convert [cdate] to string *)
 val show_cdate : Adef.cdate -> string
+(** Convert [cdate] to string *)
 
-type relation_kind =
-  Def.relation_kind =
-    Married
+type relation_kind = Def.relation_kind =
+  | Married
   | NotMarried
   | Engaged
   | NoSexesCheckNotMarried
@@ -85,101 +71,80 @@ type relation_kind =
   | Pacs
   | Residence
 
+val pp_relation_kind : Format.formatter -> relation_kind -> unit
 (** Printer for [relation_kind] *)
-val pp_relation_kind :
-  Format.formatter ->
-  relation_kind -> unit
 
-(** Convert [relation_kind] to string *)
 val show_relation_kind : relation_kind -> string
+(** Convert [relation_kind] to string *)
 
 type divorce = Def.divorce = NotDivorced | Divorced of cdate | Separated
 
+val pp_divorce : Format.formatter -> divorce -> unit
 (** Printer for [divorce] *)
-val pp_divorce :
-  Format.formatter ->
-  divorce -> unit
 
-(** Convert [divorce] to string *)
 val show_divorce : divorce -> string
+(** Convert [divorce] to string *)
 
-type death_reason =
-  Def.death_reason =
-    Killed
+type death_reason = Def.death_reason =
+  | Killed
   | Murdered
   | Executed
   | Disappeared
   | Unspecified
 
+val pp_death_reason : Format.formatter -> death_reason -> unit
 (** Printer for [death_reason] *)
-val pp_death_reason :
-  Format.formatter ->
-  death_reason -> unit
 
-(** Convert [death_reason] to string *)
 val show_death_reason : death_reason -> string
+(** Convert [death_reason] to string *)
 
-type death =
-  Def.death =
-    NotDead
+type death = Def.death =
+  | NotDead
   | Death of death_reason * cdate
   | DeadYoung
   | DeadDontKnowWhen
   | DontKnowIfDead
   | OfCourseDead
 
+val pp_death : Format.formatter -> death -> unit
 (** Printer for [death] *)
-val pp_death :
-  Format.formatter -> death -> unit
 
-(** Convert [death] to string *)
 val show_death : death -> string
+(** Convert [death] to string *)
 
-type burial =
-  Def.burial =
-    UnknownBurial
-  | Buried of cdate
-  | Cremated of cdate
+type burial = Def.burial = UnknownBurial | Buried of cdate | Cremated of cdate
 
+val pp_burial : Format.formatter -> burial -> unit
 (** Printer for [burial] *)
-val pp_burial :
-  Format.formatter ->
-  burial -> unit
 
-(** Convert [burial] to string *)
 val show_burial : burial -> string
+(** Convert [burial] to string *)
 
 type access = Def.access = IfTitles | Public | Private
 
+val pp_access : Format.formatter -> access -> unit
 (** Printer for [access] *)
-val pp_access :
-  Format.formatter ->
-  access -> unit
 
-(** Convert [access] to string *)
 val show_access : access -> string
+(** Convert [access] to string *)
 
-type 'string gen_title_name =
-  'string Def.gen_title_name =
-    Tmain
+type 'string gen_title_name = 'string Def.gen_title_name =
+  | Tmain
   | Tname of 'string
   | Tnone
 
-(** Printer for [gen_title_name] *)
 val pp_gen_title_name :
-  (Format.formatter ->
-   'string -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
   Format.formatter ->
-  'string gen_title_name -> unit
+  'string gen_title_name ->
+  unit
+(** Printer for [gen_title_name] *)
 
-(** Convert [gen_title_name] to string *)
 val show_gen_title_name :
-  (Format.formatter ->
-   'string -> unit) ->
-  'string gen_title_name -> string
+  (Format.formatter -> 'string -> unit) -> 'string gen_title_name -> string
+(** Convert [gen_title_name] to string *)
 
-type 'string gen_title =
-  'string Def.gen_title = {
+type 'string gen_title = 'string Def.gen_title = {
   t_name : 'string gen_title_name;
   t_ident : 'string;
   t_place : 'string;
@@ -188,22 +153,19 @@ type 'string gen_title =
   t_nth : int;
 }
 
-(** Printer for [gen_title] *)
 val pp_gen_title :
-  (Format.formatter ->
-   'string -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
   Format.formatter ->
-  'string gen_title -> unit
+  'string gen_title ->
+  unit
+(** Printer for [gen_title] *)
 
-(** Convert [gen_title] to string *)
 val show_gen_title :
-  (Format.formatter ->
-   'string -> unit) ->
-  'string gen_title -> string
+  (Format.formatter -> 'string -> unit) -> 'string gen_title -> string
+(** Convert [gen_title] to string *)
 
-type witness_kind =
-  Def.witness_kind =
-    Witness
+type witness_kind = Def.witness_kind =
+  | Witness
   | Witness_GodParent
   | Witness_CivilOfficer
   | Witness_ReligiousOfficer
@@ -212,17 +174,14 @@ type witness_kind =
   | Witness_Mentioned
   | Witness_Other
 
+val pp_witness_kind : Format.formatter -> witness_kind -> unit
 (** Printer for [witness_kind] *)
-val pp_witness_kind :
-  Format.formatter ->
-  witness_kind -> unit
 
-(** Convert [witness_kind] to string *)
 val show_witness_kind : witness_kind -> string
+(** Convert [witness_kind] to string *)
 
-type 'string gen_pers_event_name =
-  'string Def.gen_pers_event_name =
-    Epers_Birth
+type 'string gen_pers_event_name = 'string Def.gen_pers_event_name =
+  | Epers_Birth
   | Epers_Baptism
   | Epers_Death
   | Epers_Burial
@@ -274,21 +233,19 @@ type 'string gen_pers_event_name =
   | Epers_Will
   | Epers_Name of 'string
 
-(** Printer for [gen_pers_event_name] *)
 val pp_gen_pers_event_name :
-  (Format.formatter ->
-   'string -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
   Format.formatter ->
-  'string gen_pers_event_name -> unit
+  'string gen_pers_event_name ->
+  unit
+(** Printer for [gen_pers_event_name] *)
 
-(** Convert [gen_pers_event_name] to string *)
 val show_gen_pers_event_name :
-  (Format.formatter ->
-   'string -> unit) ->
-  'string gen_pers_event_name -> string
+  (Format.formatter -> 'string -> unit) -> 'string gen_pers_event_name -> string
+(** Convert [gen_pers_event_name] to string *)
 
 type ('person, 'string) gen_pers_event =
-  ('person, 'string) Def.gen_pers_event = {
+      ('person, 'string) Def.gen_pers_event = {
   epers_name : 'string gen_pers_event_name;
   epers_date : cdate;
   epers_place : 'string;
@@ -298,26 +255,23 @@ type ('person, 'string) gen_pers_event =
   epers_witnesses : ('person * witness_kind) array;
 }
 
-(** Printer for [gen_pers_event] *)
 val pp_gen_pers_event :
-  (Format.formatter ->
-   'person -> unit) ->
-  (Format.formatter ->
-   'string -> unit) ->
+  (Format.formatter -> 'person -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
   Format.formatter ->
-  ('person, 'string) gen_pers_event -> unit
+  ('person, 'string) gen_pers_event ->
+  unit
+(** Printer for [gen_pers_event] *)
 
-(** Convert [gen_pers_event] to string *)
 val show_gen_pers_event :
-  (Format.formatter ->
-   'person -> unit) ->
-  (Format.formatter ->
-   'string -> unit) ->
-  ('person, 'string) gen_pers_event -> string
+  (Format.formatter -> 'person -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
+  ('person, 'string) gen_pers_event ->
+  string
+(** Convert [gen_pers_event] to string *)
 
-type 'string gen_fam_event_name =
-  'string Def.gen_fam_event_name =
-    Efam_Marriage
+type 'string gen_fam_event_name = 'string Def.gen_fam_event_name =
+  | Efam_Marriage
   | Efam_NoMarriage
   | Efam_NoMention
   | Efam_Engage
@@ -331,21 +285,18 @@ type 'string gen_fam_event_name =
   | Efam_Residence
   | Efam_Name of 'string
 
-(** Printer for [gen_fam_event_name] *)
 val pp_gen_fam_event_name :
-  (Format.formatter ->
-   'string -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
   Format.formatter ->
-  'string gen_fam_event_name -> unit
+  'string gen_fam_event_name ->
+  unit
+(** Printer for [gen_fam_event_name] *)
 
-(** Convert [gen_fam_event_name] to string *)
 val show_gen_fam_event_name :
-  (Format.formatter ->
-   'string -> unit) ->
-  'string gen_fam_event_name -> string
+  (Format.formatter -> 'string -> unit) -> 'string gen_fam_event_name -> string
+(** Convert [gen_fam_event_name] to string *)
 
-type ('person, 'string) gen_fam_event =
-  ('person, 'string) Def.gen_fam_event = {
+type ('person, 'string) gen_fam_event = ('person, 'string) Def.gen_fam_event = {
   efam_name : 'string gen_fam_event_name;
   efam_date : cdate;
   efam_place : 'string;
@@ -355,75 +306,65 @@ type ('person, 'string) gen_fam_event =
   efam_witnesses : ('person * witness_kind) array;
 }
 
-(** Printer for [gen_fam_event] *)
 val pp_gen_fam_event :
-  (Format.formatter ->
-   'person -> unit) ->
-  (Format.formatter ->
-   'string -> unit) ->
+  (Format.formatter -> 'person -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
   Format.formatter ->
-  ('person, 'string) gen_fam_event -> unit
+  ('person, 'string) gen_fam_event ->
+  unit
+(** Printer for [gen_fam_event] *)
 
-(** Convert [gen_fam_event] to string *)
 val show_gen_fam_event :
-  (Format.formatter ->
-   'person -> unit) ->
-  (Format.formatter ->
-   'string -> unit) ->
-  ('person, 'string) gen_fam_event -> string
+  (Format.formatter -> 'person -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
+  ('person, 'string) gen_fam_event ->
+  string
+(** Convert [gen_fam_event] to string *)
 
-type relation_type =
-  Def.relation_type =
-    Adoption
+type relation_type = Def.relation_type =
+  | Adoption
   | Recognition
   | CandidateParent
   | GodParent
   | FosterParent
 
+val pp_relation_type : Format.formatter -> relation_type -> unit
 (** Printer for [relation_type] *)
-val pp_relation_type :
-  Format.formatter ->
-  relation_type -> unit
 
-(** Convert [relation_type] to string *)
 val show_relation_type : relation_type -> string
+(** Convert [relation_type] to string *)
 
-type ('person, 'string) gen_relation =
-  ('person, 'string) Def.gen_relation = {
+type ('person, 'string) gen_relation = ('person, 'string) Def.gen_relation = {
   r_type : relation_type;
   r_fath : 'person option;
   r_moth : 'person option;
   r_sources : 'string;
 }
 
-(** Printer for [gen_relation] *)
 val pp_gen_relation :
-  (Format.formatter ->
-   'person -> unit) ->
-  (Format.formatter ->
-   'string -> unit) ->
+  (Format.formatter -> 'person -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
   Format.formatter ->
-  ('person, 'string) gen_relation -> unit
+  ('person, 'string) gen_relation ->
+  unit
+(** Printer for [gen_relation] *)
 
-(** Convert [gen_relation] to string *)
 val show_gen_relation :
-  (Format.formatter ->
-   'person -> unit) ->
-  (Format.formatter ->
-   'string -> unit) ->
-  ('person, 'string) gen_relation -> string
+  (Format.formatter -> 'person -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
+  ('person, 'string) gen_relation ->
+  string
+(** Convert [gen_relation] to string *)
 
 type sex = Def.sex = Male | Female | Neuter
 
+val pp_sex : Format.formatter -> sex -> unit
 (** Printer for [sex] *)
-val pp_sex :
-  Format.formatter -> sex -> unit
 
-(** Convert [sex] to string *)
 val show_sex : sex -> string
+(** Convert [sex] to string *)
 
-type place =
-  Def.place = {
+type place = Def.place = {
   other : string;
   town : string;
   township : string;
@@ -434,15 +375,14 @@ type place =
   country : string;
 }
 
+val pp_place : Format.formatter -> place -> unit
 (** Printer for [place] *)
-val pp_place :
-  Format.formatter -> place -> unit
 
-(** Convert [place] to string *)
 val show_place : place -> string
+(** Convert [place] to string *)
 
 type ('iper, 'person, 'string) gen_person =
-  ('iper, 'person, 'string) Def.gen_person = {
+      ('iper, 'person, 'string) Def.gen_person = {
   first_name : 'string;
   surname : 'string;
   occ : int;
@@ -480,71 +420,62 @@ type ('iper, 'person, 'string) gen_person =
   key_index : 'iper;
 }
 
-(** Printer for [gen_person] *)
 val pp_gen_person :
-  (Format.formatter ->
-   'iper -> unit) ->
-  (Format.formatter ->
-   'person -> unit) ->
-  (Format.formatter ->
-   'string -> unit) ->
+  (Format.formatter -> 'iper -> unit) ->
+  (Format.formatter -> 'person -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
   Format.formatter ->
-  ('iper, 'person, 'string) gen_person -> unit
+  ('iper, 'person, 'string) gen_person ->
+  unit
+(** Printer for [gen_person] *)
 
-(** Convert [gen_person] to string *)
 val show_gen_person :
-  (Format.formatter ->
-   'iper -> unit) ->
-  (Format.formatter ->
-   'person -> unit) ->
-  (Format.formatter ->
-   'string -> unit) ->
-  ('iper, 'person, 'string) gen_person -> string
+  (Format.formatter -> 'iper -> unit) ->
+  (Format.formatter -> 'person -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
+  ('iper, 'person, 'string) gen_person ->
+  string
+(** Convert [gen_person] to string *)
 
 type fix = Adef.fix
 
-(** Printer for [fix] *)
 val pp_fix : Format.formatter -> Adef.fix -> unit
+(** Printer for [fix] *)
 
-(** Convert [fix] to string *)
 val show_fix : Adef.fix -> string
+(** Convert [fix] to string *)
 
-type 'family gen_ascend =
-  'family Def.gen_ascend = {
+type 'family gen_ascend = 'family Def.gen_ascend = {
   parents : 'family option;
   consang : fix;
 }
 
-(** Printer for [gen_ascend] *)
 val pp_gen_ascend :
-  (Format.formatter ->
-   'family -> unit) ->
+  (Format.formatter -> 'family -> unit) ->
   Format.formatter ->
-  'family gen_ascend -> unit
+  'family gen_ascend ->
+  unit
+(** Printer for [gen_ascend] *)
 
-(** Convert [gen_ascend] to string *)
 val show_gen_ascend :
-  (Format.formatter ->
-   'family -> unit) ->
-  'family gen_ascend -> string
+  (Format.formatter -> 'family -> unit) -> 'family gen_ascend -> string
+(** Convert [gen_ascend] to string *)
 
-type 'family gen_union = 'family Def.gen_union = { family : 'family array; }
+type 'family gen_union = 'family Def.gen_union = { family : 'family array }
 
-(** Printer for [gen_union] *)
 val pp_gen_union :
-  (Format.formatter ->
-   'family -> unit) ->
+  (Format.formatter -> 'family -> unit) ->
   Format.formatter ->
-  'family gen_union -> unit
+  'family gen_union ->
+  unit
+(** Printer for [gen_union] *)
 
-(** Convert [gen_union] to string *)
 val show_gen_union :
-  (Format.formatter ->
-   'family -> unit) ->
-  'family gen_union -> string
+  (Format.formatter -> 'family -> unit) -> 'family gen_union -> string
+(** Convert [gen_union] to string *)
 
 type ('person, 'ifam, 'string) gen_family =
-  ('person, 'ifam, 'string) Def.gen_family = {
+      ('person, 'ifam, 'string) Def.gen_family = {
   marriage : cdate;
   marriage_place : 'string;
   marriage_note : 'string;
@@ -559,57 +490,47 @@ type ('person, 'ifam, 'string) gen_family =
   fam_index : 'ifam;
 }
 
-(** Printer for [gen_family] *)
 val pp_gen_family :
-  (Format.formatter ->
-   'person -> unit) ->
-  (Format.formatter ->
-   'ifam -> unit) ->
-  (Format.formatter ->
-   'string -> unit) ->
+  (Format.formatter -> 'person -> unit) ->
+  (Format.formatter -> 'ifam -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
   Format.formatter ->
-  ('person, 'ifam, 'string) gen_family -> unit
+  ('person, 'ifam, 'string) gen_family ->
+  unit
+(** Printer for [gen_family] *)
 
-(** Convert [gen_family] to string *)
 val show_gen_family :
-  (Format.formatter ->
-   'person -> unit) ->
-  (Format.formatter ->
-   'ifam -> unit) ->
-  (Format.formatter ->
-   'string -> unit) ->
-  ('person, 'ifam, 'string) gen_family -> string
+  (Format.formatter -> 'person -> unit) ->
+  (Format.formatter -> 'ifam -> unit) ->
+  (Format.formatter -> 'string -> unit) ->
+  ('person, 'ifam, 'string) gen_family ->
+  string
+(** Convert [gen_family] to string *)
 
 type 'person gen_couple = 'person Adef.gen_couple
 
-(** Printer for [gen_couple] *)
 val pp_gen_couple :
-  (Format.formatter ->
-   'person -> unit) ->
+  (Format.formatter -> 'person -> unit) ->
   Format.formatter ->
-  'person gen_couple -> unit
+  'person gen_couple ->
+  unit
+(** Printer for [gen_couple] *)
 
-(** Convert [gen_couple] to string *)
 val show_gen_couple :
-  (Format.formatter ->
-   'person -> unit) ->
-  'person gen_couple -> string
+  (Format.formatter -> 'person -> unit) -> 'person gen_couple -> string
+(** Convert [gen_couple] to string *)
 
-type 'person gen_descend =
-  'person Def.gen_descend = {
+type 'person gen_descend = 'person Def.gen_descend = {
   children : 'person array;
 }
 
-(** Printer for [gen_descend] *)
 val pp_gen_descend :
-  (Format.formatter ->
-   'person -> unit) ->
+  (Format.formatter -> 'person -> unit) ->
   Format.formatter ->
-  'person gen_descend -> unit
+  'person gen_descend ->
+  unit
+(** Printer for [gen_descend] *)
 
-(** Convert [gen_descend] to string *)
 val show_gen_descend :
-  (Format.formatter ->
-   'person -> unit) ->
-  'person gen_descend -> string
-
+  (Format.formatter -> 'person -> unit) -> 'person gen_descend -> string
+(** Convert [gen_descend] to string *)
