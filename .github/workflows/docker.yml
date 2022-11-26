@@ -28,7 +28,7 @@ jobs:
           submodules: 'true'
 
       - name: Generate date stamp
-        run: echo "DATESTAMP=$(date +"%Y%m%d")" >> $GITHUB_ENV
+        run: echo "DATESTAMP=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
 
       - name: Generate Docker image metadata
         id: docker-meta
