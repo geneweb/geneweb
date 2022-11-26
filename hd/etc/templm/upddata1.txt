@@ -17,7 +17,7 @@
   function submitupd()
   {
    var x1 = document.getElementById('nx_a');
-   var x2 = "%prefix;m=MOD_DATA_OK;data=%evar.data;;s=%encode.evar.s;;"
+   var x2 = "%prefix;m=MOD_DATA_OK&data=%evar.data;&s=%encode.evar.s;"
    var x3 = x1.title;
    var x4 = "nx_input=";
    var x5 = document.getElementById('nx_input').value;

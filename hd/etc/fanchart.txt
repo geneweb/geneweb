@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Arbre en éventail</title>
-<link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/all.min.css?version=5.9.0">
-<link rel="stylesheet" href="%if;(cgi)%bvar.static_path;../plugins/v7/assets/etc/%end;css/fanchart.css">
+<link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/all.min.css?version=6.2.1">
+<link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css/fanchart.css?version=7.1">
 <style title="fc-auto"></style>
 </head>
 
@@ -89,5 +89,5 @@ var ancestor = {
 %end;
 };
 </script>
-<script src="%if;(cgi)%bvar.static_path;../plugins/v7/assets/etc/%end;js/fanchart.js"></script>
+<script src="%if;(cgi)%bvar.static_path;%end;js/fanchart.js"></script>
 </html>

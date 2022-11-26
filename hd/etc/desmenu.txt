@@ -96,9 +96,9 @@ function table_spouse_disabled () {
         <label class="custom-control-label" for="tL"><i class="fa fa-align-justify fa-fw mr-1"></i>[*long display]%sp;
           <span class="text-muted">
             %if;(bvar.max_desc_level = "" and max_desc_level > 12)
-              ([maximum] 12 [generation/generations]1)
+              <br>%sp;([maximum] 12 [generation/generations]1)
             %elseif;(bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level)
-              ([maximum] %bvar.max_desc_level; [generation/generations]1)
+              <br>%sp;([maximum] %bvar.max_desc_level; [generation/generations]1)
             %end;
           </span>
         </label>
@@ -148,7 +148,7 @@ function table_spouse_disabled () {
           [*border]
           <input type="number" class="form-control" name="bd" min="0" max="50" value="0"%/>
         </label>
-        <br%/>
+        <br>
         <table style="padding:0">
           <tr>
             <td class="text-%left;">[*color]</td>
@@ -211,9 +211,9 @@ function table_spouse_disabled () {
         <label class="custom-control-label" for="tA"><i class="fa fa-sort-alpha-down fa-fw mr-1"></i>D'Aboville%sp;
           <span class="text-muted">
             %if;(bvar.max_desc_level = "" and max_desc_level > 12)
-              ([maximum] 12 [generation/generations]1)
+              <br>%sp;([maximum] 12 [generation/generations]1)
             %elseif;(bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level)
-              ([maximum] %bvar.max_desc_level; [generation/generations]1)
+              <br>%sp;([maximum] %bvar.max_desc_level; [generation/generations]1)
             %end;
           </span>
         </label>
@@ -368,9 +368,9 @@ function table_spouse_disabled () {
           </div>
         </div>
         <div class="order-1">
-          <label for="v">[*generation/generations]1[:]</label>
+          <label class="sr-only" for="v">[*generation/generations]1[:]</label>
           <select class="custom-select" id="v" name="v" required>
-            <option value="" disabled selected>[*specify::generation/generations]0</option>
+            <option value="" disabled selected>[*specify::generation/generations]0…</option>
             %foreach;descendant_level;
               %if;(level>0)
                 <option value="%level;">%nn;

@@ -111,7 +111,7 @@
   %and;
     %if;are_married;&amp;%else;-%end;%if;are_divorced;)(%elseif;are_separated;|%end;%nn;
   %and;
-    %xx;<br%/> &amp; %spouse;%nn;
+    %xx;<br> &amp; %spouse;%nn;
   %and;
     %if;(cancel_links or xx.is_restricted)
       %lxr;%nn;

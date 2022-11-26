@@ -32,8 +32,7 @@
 %let;min;%if;(not has_children)1%else;0%end;%in;
 %let;max;%if;(bvar.max_anc_level!="" and bvar.max_anc_level<max_anc_level)%bvar.max_anc_level;%elseif;(static_max_anc_level!="")%static_max_anc_level;%end;%in;
 %define;picklvl(vvv)
-  <a role="button" class="btn btn-light btn-sm%if;((e.v="" and vvv=3) or (e.v!="" and e.v=vvv)) disabled font-weight-bold%end;"%sp;
-  href="%prefix_base_password;%foreach;env_binding;%if;(env.val!="" and env.key!="v")&%env.key=%env.val;%end;%end;&v=%expr(vvv)"%sp;
+  <a role="button" class="btn btn-light btn-sm%if;((e.v="" and vvv=3) or (e.v!="" and e.v=vvv)) disabled font-weight-bold%end;" href="%url_set.v.vvv;"%sp;
   title="[*ascending/descending (degree)]0 vvv%if;(vvv=0) ([self])%end;">vvv</a>%nn;
 %end;
 <div class="col-auto d-flex justify-content-between btn-toolbar px-3" role="toolbar" aria-label="button to select max ascending level">
@@ -71,7 +70,7 @@
    <td%if;(vvv>0) colspan="%expr(vvv+1)"%end; %if;(vvv=0)style="width:%expr(100/lll)%%"%end; class="table-%if;(vvv=0)info%elseif;(vvv %2 = 1)primary%else;danger%end;" >
      <div class="%if;(vvv>=0)border-right %(border-bottom %)border-%if;(i=0)success%elseif;(vvv%2=1)primary%else;danger%end;%end; d-flex flex-column justify-content-between">
        <div class="%(font-weight-bold%)">vvv/0</div>
-       <a role="button" href="%prefix;&%access;&m=C&v1=vvv&v2=0"
+       <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=0"
         class="btn btn-light ddd w-100" style="height:80px;"
          data-toggle="tooltip" data-html="true" title="%apply;cousin_lex_tt(vvv,0)">
          %if;(vvv=0)<span class="badge badge-xl badge-success">1</span>%incr_count;%end; ttt%nn;

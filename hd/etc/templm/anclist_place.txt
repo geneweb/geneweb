@@ -32,7 +32,7 @@
   %foreach;sorted_list_item;
     %if;(prev_item.1 != item.1)
       %reset_count;%incr_count;
-      <br%/>%item.1;;%item.2;;<a href="%prefix;spouse=on;i%count;=%item.3;;t%count;=%item.4;;%nn;
+      <br>%item.1;;%item.2;;<a href="%prefix;spouse=on;i%count;=%item.3;;t%count;=%item.4;;%nn;
     %end;
     %if;(prev_item.1 = item.1)
       %incr_count;

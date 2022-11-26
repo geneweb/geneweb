@@ -81,7 +81,7 @@ body {%sp;
 %let;pos1;%if;(random.2 = 0)%left;%else;%right;%end;%in;
 %let;pos2;%if;(random.2 = 0)%left;%else;%right;%end;%in;
 %let;sz;%if;(random.2 = 0)100%else;70%end;%in;
-#lang .title { display : none }
+#lang .title { display: none }
 #lang { width: 12%%; float: %pos1;; text-align: %pos2;; background: %bg; }
 #lang { padding: 30px 10px 10%% 10px }
 #lang a { display: block; font-size: %sz;%% }

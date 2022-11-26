@@ -32,44 +32,44 @@
       <span><input id="acckey" name="acckey" %laZ; %if;(evar.m!="A")autofocus%end; onkeypress="javascript:return acc_key(this,event,'sib_1','spo_1','chi_1_1','mod_ind','add_par','add_fam','mod_fam_1');"/>
         <span class="s_menu">
           %if;(evar.m = "MOD_IND")
-          Alt+%lpc1k; [first name/first names]0<br%/>
-          Alt+%lpc2k; [birth]<br%/>
-          Alt+%lpc3k; [death]<br%/>
-          Alt+%lpc4k; [add] [event/events]0<br%/>
-          Alt+%lpc5k; [note/notes]1<br%/>
-          Alt+%lpc6k; [relation/relations]1<br%/>
-          Alt+%lpc7k; [title/titles]1<br%/>
-          Alt+%lpcPk; [occupation/occupations]0<br%/>
-          Alt+%lpcOk; [invert::event/events]1<br%/><br%/>
+          Alt+%lpc1k; [first name/first names]0<br>
+          Alt+%lpc2k; [birth]<br>
+          Alt+%lpc3k; [death]<br>
+          Alt+%lpc4k; [add] [event/events]0<br>
+          Alt+%lpc5k; [note/notes]1<br>
+          Alt+%lpc6k; [relation/relations]1<br>
+          Alt+%lpc7k; [title/titles]1<br>
+          Alt+%lpcPk; [occupation/occupations]0<br>
+          Alt+%lpcOk; [invert::event/events]1<br><br>
           %elseif;(evar.m ="MOD_FAM" or evar.m ="ADD_FAM")
-          Alt+%lfc1k; [first name/first names]0 [father/mother]0<br%/>
-          Alt+%lfc2k; [add] [child/children]0<br%/>
-          Alt+%lfc3k; [date of marriage]/[relation/relations]0<br%/>
-          Alt+%lfc4k; [add] [event/events]0<br%/>
-          Alt+%lfc5k; [marriage notes]<br%/>
-          Alt+%lfc6k; [source/sources]1<br%/>
-          Alt+%lpcOk; [invert::event/events]1 [family/families]0<br%/><br%/>
+          Alt+%lfc1k; [first name/first names]0 [father/mother]0<br>
+          Alt+%lfc2k; [add] [child/children]0<br>
+          Alt+%lfc3k; [date of marriage]/[relation/relations]0<br>
+          Alt+%lfc4k; [add] [event/events]0<br>
+          Alt+%lfc5k; [marriage notes]<br>
+          Alt+%lfc6k; [source/sources]1<br>
+          Alt+%lpcOk; [invert::event/events]1 [family/families]0<br><br>
           %else;
-          (0) [spouse/spouses]1<br%/>
-          (1) [siblings]<br%/>
-          (2 3 4 5 6 7) [n° Sosa] [ancestors]<br%/>
-          (8) [child/children]1<br%/>
-          (9) [child/children]1 Sosa<br%/>
-          (%laDk;) [difference between the two revisions]<br%/>
-          (%laRk;) [relationship computing]<br%/>
-          (%laSk;) [navigation with %t as Sosa reference:::xx]<br%/>
-          (%laYk;) [tree]<br%/><br%/>
+          (0) [spouse/spouses]1<br>
+          (1) [siblings]<br>
+          (2 3 4 5 6 7) [n° Sosa] [ancestors]<br>
+          (8) [child/children]1<br>
+          (9) [child/children]1 Sosa<br>
+          (%laDk;) [difference between the two revisions]<br>
+          (%laRk;) [relationship computing]<br>
+          (%laSk;) [navigation with %t as Sosa reference:::xx]<br>
+          (%laYk;) [tree]<br><br>
             %if;wizard;
-            (%laAk;) [add::family/families]0<br%/>
-            (%laFk;) [modify::family/families]0 1<br%/>
-            (%laGk;) [modify::family/families]0 2<br%/>
-            (%laHk;) [modify::family/families]0 3<br%/>
-            (%laIk;) [send::image/images]0<br%/>
-            (%laLk;) [add::parents]<br%/>
-            (%laPk;) [modify::person/persons]0<br%/>
+            (%laAk;) [add::family/families]0<br>
+            (%laFk;) [modify::family/families]0 1<br>
+            (%laGk;) [modify::family/families]0 2<br>
+            (%laHk;) [modify::family/families]0 3<br>
+            (%laIk;) [send::image/images]0<br>
+            (%laLk;) [add::parents]<br>
+            (%laPk;) [modify::person/persons]0<br>
             %end;
           %end;
-          (%laWk;) [search/case sensitive]0<br%/>
+          (%laWk;) [search/case sensitive]0<br>
         </span>
       </span>
     </form>

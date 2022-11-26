@@ -24,7 +24,7 @@
     %apply;display_horizontal("father")
   %end;
   %if;(op_m=4 or op_m=5)
-    <br%/>
+    <br>
     %foreach;father.family;
       %if;(op_m=4 and spouse.access=mother.access)
         <em>%apply;long_married("father")</em>
@@ -49,7 +49,7 @@
     %foreach;father.family;
       %if;(spouse.access=mother.access)
         %if(are_divorced or are_separated)
-          <br%/>
+          <br>
           <em style="font-size: 90%%">%nn;
             %if;are_divorced;[divorced]0%divorce_date;%end;
             %if;are_separated;[separated]0%end;
@@ -128,8 +128,8 @@
         %foreach;father.family;
           %if;(spouse.access=mother.access)
             %apply;long_married_f("father", "UPPER")
-            %if;are_divorced;<br%/>[divorced]0%divorce_date;%end;
-            %if;are_separated;<br%/>[separated]0%end;
+            %if;are_divorced;<br>[divorced]0%divorce_date;%end;
+            %if;are_separated;<br>[separated]0%end;
           %end;
         %end;
       </td>

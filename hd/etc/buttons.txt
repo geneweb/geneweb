@@ -59,23 +59,20 @@
       <i class="fa fa-image yyy" aria-hidden="true"></i>%nn;
     </a>
 %end;
-%define;urlv(x,y)
-  %url_set.x.y;
-%end;
 <div class="input-group ml-2">
   <div class="button-group" role="group" aria-label="nav buttons">
     %if;(istable=1)
       %( TODO allfn sur table/couple %)
       <a role="button" class="btn btn-link mx-0 px-0 mr-1 %if;(evar.t="Y" or evar.csv="on") disabled%end;"
-        href="%if;(e.fn=1)%urlv.fn;%else;%urlv.fn.1;%end;" title="[*visualize/show/hide/summary]1 %if;(e.fn=1)[public name]%else;[first name/first names]1%end;">%nn;
+        href="%if;(e.fn=1)%url_set.fn;%else;%url_set.fn.1;%end;" title="[*visualize/show/hide/summary]1 %if;(e.fn=1)[public name]%else;[first name/first names]1%end;">%nn;
         <i class="fas fa-address-%if;(e.fn=1)book%else;card%end; fa-fw fa-lg" aria-hidden="true"></i>%nn;
       </a>
       <a role="button" class="btn btn-link mx-0 px-0 mr-1 %if;(evar.t="Y" or evar.csv="on") disabled%end;%if;(e.tt=1) text-danger%end;"
-        href="%if;(e.tt=1)%urlv.tt;%else;%urlv.tt.1;%end;" title="%if;(e.tt=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [title/titles]1">%nn;
+        href="%if;(e.tt=1)%url_set.tt;%else;%url_set.tt.1;%end;" title="%if;(e.tt=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [title/titles]1">%nn;
         <i class="fas fa-crown fa-fw fa-lg" aria-hidden="true"></i>%nn;
       </a>
       <a role="button" class="btn btn-link mx-0 px-0%if;(evar.csv="on") disabled%end;%if;(e.im=0) text-danger%end;"
-        href="%if;(e.im=0)%urlv.im;%else;%urlv.im.0;%end;"
+        href="%if;(e.im=0)%url_set.im;%else;%url_set.im.0;%end;"
           title="%if;(e.im=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [image/images]1">%nn;
         <i class="fa fa-image fa-lg fa-fw" aria-hidden="true"></i>%nn;
       </a>
@@ -87,7 +84,7 @@
       <span class="sr-only">—</span>
       <a role="button" class="btn btn-link px-0%if;(e.ns=1) text-danger%end;%if;(e.t="Y" or e.csv="on") disabled%end;"
         title="%if;(e.ns=1)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [note/notes]1 [and] [source/sources]1%if;(e.ns=""). [*colored corner]%end;"
-        href="%if;(e.ns=1)%urlv.ns;%else;%urlv.ns.1;%end;">
+        href="%if;(e.ns=1)%url_set.ns;%else;%url_set.ns.1;%end;">
         <i class="far fa-sticky-note fa-flip-vertical fa-lg fa-fw mb-1 mr-1" aria-hidden="true"></i>%nn;
         <span class="notecolor">[*note/notes]1</span> <span class="notesourcecolor">[and]</span> <span class="sourcecolor">[source/sources]1</span>%nn;
       </a>

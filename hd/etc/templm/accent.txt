@@ -2,7 +2,7 @@
 %( How to : Copy this file to bases/etc/ %)
 <script ><!--
 document.getElementsByName("notes")[0].onkeypress = 
-  function(o){o=o||event;if(o.shiftKey && o.keyCode == 13)return insertTags('<br/>\n','','');}
+  function(o){o=o||event;if(o.shiftKey && o.keyCode == 13)return insertTags('<br>\n','','');}
 --></script>
 <div style="text-align:left">
 <input type="submit" value="Ok"/>
@@ -57,7 +57,7 @@ document.getElementsByName("notes")[0].onkeypress =
   <a onclick="return insertTags('ń','','')" href="javascript:;">ń</a>
   <a onclick="return insertTags('Ñ','','')" href="javascript:;">Ñ</a>
   <a onclick="return insertTags('ñ','','')" href="javascript:;">ñ</a>
-  <br%/>
+  <br>
   <a onclick="return insertTags('Ó','','')" href="javascript:;">Ó</a>
   <a onclick="return insertTags('ó','','')" href="javascript:;">ó</a>
   <a onclick="return insertTags('Ô','','')" href="javascript:;">Ô</a>
@@ -98,7 +98,7 @@ document.getElementsByName("notes")[0].onkeypress =
   <a onclick="return insertTags('ź','','')" href="javascript:;">ź</a>
   <a onclick="return insertTags('Ż','','')" href="javascript:;">Ż</a>
   <a onclick="return insertTags('ż','','')" href="javascript:;">ż</a>
-  <br%/>
+  <br>
   <a onclick="return insertTags('½','','')" href="javascript:;">½</a>
   <a onclick="return insertTags('¼','','')" href="javascript:;">¼</a>
   <a onclick="return insertTags('¾','','')" href="javascript:;">¾</a>
@@ -151,7 +151,7 @@ document.getElementsByName("notes")[0].onkeypress =
   <span>
     <a href="#">&lt;html&gt;</a>
     <span class="s_menu">
-      <a onclick="return insertTags('<br/>\n','','')"
+      <a onclick="return insertTags('<br>\n','','')"
          href="javascript:;" title="= shift + enter">&lt;br/&gt;</a>
       <a onclick="return insertTags('\n<hr/>\n','','')" href="javascript:;">&lt;hr/&gt;
         (————————)</a>
@@ -190,13 +190,13 @@ document.getElementsByName("notes")[0].onkeypress =
   </span>
   <span><a href="#">ul ol dl pre</a>
     <span class="s_menu">
-      <a onclick="return insertTags('*','','')" href="javascript:;">•  *ul li<br%/>   •  **ul ul li</a>
-      <a onclick="return insertTags('#','','')" href="javascript:;">1.  #ol li<br%/>   2.  ##ol ol li</a>
+      <a onclick="return insertTags('*','','')" href="javascript:;">•  *ul li<br>   •  **ul ul li</a>
+      <a onclick="return insertTags('#','','')" href="javascript:;">1.  #ol li<br>   2.  ##ol ol li</a>
       <a onclick="return insertTags(';x:x','','')" href="javascript:;"><strong>;dl dt</strong>:dd</a>
-      <a onclick="return insertTags(':','','')" href="javascript:;">   :dl dd<br%/>      ::dl dl dd</a>
+      <a onclick="return insertTags(':','','')" href="javascript:;">   :dl dd<br>      ::dl dl dd</a>
       <a style="font-family:'Courier New',Courier,monospace;"
         onclick="return insertTags('\n\n \n ','\n','')" href="javascript:;">
-        &nbsp;pre<br%/>&nbsp;pre<br%/></a>
+        &nbsp;pre<br>&nbsp;pre<br></a>
     </span>
   </span>
   <span><a href="#">[*miscellaneous notes]</a>

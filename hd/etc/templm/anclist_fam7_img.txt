@@ -240,7 +240,7 @@
            onmousemove="style.left=event.clientX - 25 + 'px';style.top=event.clientY - 175 + 'px';"
            onmouseup="style.zIndex=varZIndex++;style.width='100px';style.height='150px';style.fontSize='0px';">
         <img alt="img" src="%item.5;"%/>
-        <br%/>%item.2;<br%/>%item.1;<br%/><span>%item.3;</span>
+        <br>%item.2;<br>%item.1;<br><span>%item.3;</span>
       </div>
     %end;
   </div>
