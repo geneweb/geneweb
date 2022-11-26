@@ -46,7 +46,7 @@ FROM debian:bullseye-slim AS container
 # Ignore the apt warning here as apt-get does not allow wildcarding versions
 # hadolint ignore=DL3027
 RUN apt-get update -q \
-    && apt install -qy sudo=1.* openssl=1.* \
+    && apt install -qy --no-install-recommends sudo=1.* openssl=1.* \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && adduser --system --group --uid 1000 --home /usr/local/share/geneweb --shell /bin/bash geneweb \
