@@ -1165,6 +1165,7 @@ type 'a env =
   | Vcell of cell
   | Vcelll of cell list
   | Vcnt of int ref
+  | Vcousl of (iper * int) list ref
   | Vdesclevtab of ((iper, int) Marker.t * (ifam, int) Marker.t) lazy_t
   | Vdmark of (iper, bool) Marker.t ref
   | Vslist of SortedList.t ref
@@ -1330,6 +1331,16 @@ let cousins_l1_l2_aux conf base env l1 l2 p =
     (* gros calcul *)
     Some cousins_cnt.(il1).(il2)
   else None
+
+(* create a new list with (count, ip) *)
+let cousins_fold list =
+  let cnt = Hashtbl.create 10000 in
+  List.iter (fun ip -> 
+    if Hashtbl.mem cnt ip then
+      Hashtbl.replace cnt ip (succ (Hashtbl.find cnt ip))
+    else Hashtbl.replace cnt ip 1
+  ) list ;
+  Hashtbl.to_seq cnt |> List.of_seq
 
 let bool_val x = VVbool x
 let str_val x = VVstring x
@@ -1896,6 +1907,13 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
               let conf = { conf with command = baseprefix } in
               eval_person_field_var conf base env ep loc sl
           | _ -> raise Not_found))
+  | "cousin" :: sl -> (
+      match get_env "cousin" env with
+      | Vind p when mode_local env ->
+          let auth = authorized_age conf base p in
+          let ep = (p, auth) in
+          eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found)
   | "enclosing" :: sl ->
       let rec loop = function
         | ("#loop", _) :: env -> eval_person_field_var conf base env ep loc sl
@@ -2402,6 +2420,10 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           | Some d -> eval_date_field_var conf d sl
           | None -> null_val)
       | Buried _ | Cremated _ | UnknownBurial -> null_val)
+  | ["cnt"] -> (
+      match get_env "cnt" env with
+      | Vint cnt -> VVstring (string_of_int cnt)
+      | _ -> VVstring "")
   | [ "cousins"; l1; l2; "paths" ] -> (
       let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
       match list1 with
@@ -2413,15 +2435,20 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
       match list1 with
       | Some list1 ->
-          let list2 = List.sort_uniq compare list1 in
-          VVstring (string_of_int (List.length list2))
-      | None -> VVstring ("%cousins." ^ l1 ^ "." ^ l2 ^ "?"))
-  | [ "cousins"; "max_a" ] ->
+        let list2 = cousins_fold list1 in
+        (* first try, list 1 = 2 x list2 !! 2 parents = 2 children! *)
+        begin match get_env "cousins" env with
+        | Vcousl l -> l := list2
+        | _ -> raise Not_found
+        end;
+        VVstring (string_of_int (List.length list2))
+      | None -> raise Not_found)
+  | [ "cousins"; "max_a" ] -> (
       let max_a, _ = max_l1_l2 conf base env p in
-      VVstring (string_of_int max_a)
-  | [ "cousins"; "max_d" ] ->
+      VVstring (string_of_int max_a))
+  | [ "cousins"; "max_d" ] -> (
       let _, max_d = max_l1_l2 conf base env p in
-      VVstring (string_of_int max_d)
+      VVstring (string_of_int max_d))
   | "cremated_date" :: sl -> (
       match get_burial p with
       | Cremated cod when p_auth -> (
@@ -2434,8 +2461,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       | Death (_, cd) when p_auth ->
           eval_date_field_var conf (Date.date_of_cdate cd) sl
       | Death _ | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead
-      | OfCourseDead ->
-          null_val)
+      | OfCourseDead -> null_val)
   | "event" :: sl -> (
       match get_env "event" env with
       | Vevent (_, e) -> eval_event_field_var conf base env ep e loc sl
@@ -2539,8 +2565,11 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
               let conf = { conf with command = baseprefix } in
               let env = ("p_link", Vbool true) :: env in
               eval_person_field_var conf base env ep loc sl
-          | None -> warning_use_has_parents_before_parent loc "mother" null_val)
-      )
+          | None -> warning_use_has_parents_before_parent loc "mother" null_val))
+  | ["nbr"] -> (
+      match get_env "nbr" env with
+      | Vint nbr -> VVstring (string_of_int nbr)
+      | _ -> VVstring "")
   | "nobility_title" :: sl -> (
       match Util.main_title conf base p with
       | Some t when p_auth ->
@@ -4182,6 +4211,26 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
         (get_first_names_aliases p)
   in
+  let print_foreach_cousin env al ep _listname =
+    let l =
+      match get_env "cousins" env with
+      | Vcousl l -> !l
+      | _ -> []
+    in
+    let rec loop cnt = function
+      | [] -> ()
+      | (ip, nbr) :: sll ->
+          let env = 
+               ("cousin", Vind (pget conf base ip))
+            :: ("nbr", Vint nbr)
+            :: ("cnt", Vint cnt)
+            :: env
+          in
+          List.iter (print_ast env ep) al;
+          loop (cnt+1) sll
+    in
+    loop 1 l
+  in
   let print_foreach_cousin_level env al ((_, _) as ep) =
     let max_level =
       match get_env "max_cous_level" env with Vint n -> n | _ -> 0
@@ -4407,6 +4456,7 @@ let print_foreach conf base print_ast eval_expr =
     | "ancestor_tree_line" -> print_foreach_ancestor_tree env el al ep
     | "cell" -> print_foreach_cell env al ep
     | "child" -> print_foreach_child env al ep efam
+    | "cousin" -> print_foreach_cousin env al ep "cousin"
     | "cousin_level" -> print_foreach_cousin_level env al ep
     | "descendant_level" -> print_foreach_descendant_level env al ep
     | "event" -> print_foreach_event env al ep
@@ -4671,6 +4721,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       ("count", Vcnt (ref 0));
       ("count1", Vcnt (ref 0));
       ("count2", Vcnt (ref 0));
+      ("cousins", Vcousl (ref []));
       ("list", Vslist (ref SortedList.empty));
       ("listb", Vslist (ref SortedList.empty));
       ("listc", Vslist (ref SortedList.empty));
