@@ -2,16 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: ancsosa.txt,v 7.00 2016/02/04 21:20:57 mr Exp $ -->
-  %let;l_v0;%if;(evar.v != "")%if;(evar.v > max_anc_level)%max_anc_level;%else;%evar.v;%end;%else;1%end;%in;
-  %let;l_v;%if;(bvar.max_anc_level = "")%l_v0;%elseif;(bvar.max_anc_level > l_v0)%l_v0;%else;%bvar.max_anc_level;%end;%in;
-  %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
-  %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
-  %let;l_up;%if;(evar.i1 != "" or evar.p1 != "")1%end;%in;
+
   <title>%nn;
     %if;(l_up = 1)
       [*ancestors] … [up to] …%nn;
     %elseif;(evar.t = "N" and evar.only = "on")
-      [*generation/generations]0 %l_v;
+      [*generation/generations]0 %e.v;
     %else;
       %apply;a_of_b2%with;
         %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
@@ -34,6 +30,11 @@
 </head>
 
 %( <!-- Begin define --> %)
+  %let;l_v0;%if;(evar.v != "")%if;(evar.v > max_anc_level)%max_anc_level;%else;%evar.v;%end;%else;1%end;%in;
+  %let;l_v;%if;(bvar.max_anc_level = "")%l_v0;%elseif;(bvar.max_anc_level > l_v0)%l_v0;%else;%bvar.max_anc_level;%end;%in;
+  %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
+  %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
+  %let;l_up;%if;(evar.i1 != "" or evar.p1 != "")1%end;%in;
 
 %define;tothegen(xx)
   [*to the %s generation:::xx]%nn;
