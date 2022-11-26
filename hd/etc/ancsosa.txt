@@ -993,9 +993,9 @@
       <th scope="row" class="text-center" rowspan="2">[*birth place]</th>
       %incr_count;
     %end;
-    %if;(e.baptis%incr_count;m="on" and e.baptism_place="on")
+    %if;(e.baptism="on" and e.baptism_place="on")
       <th class="text-center" colspan="2">[*baptism]</th>
-      %incr_count;
+      %incr_count;%incr_count;
     %elseif;(e.baptism="on" and e.baptism_place!="on")
       <th scope="row" class="text-center" rowspan="2">[*date of baptism]</th>
       %incr_count;
