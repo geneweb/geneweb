@@ -38,18 +38,18 @@
 
 <ul>
 %if;(wizard or friend)
-  <li><a href="%prefix;m=LB;k=%n;">%apply;births(n)</a></li>
-  <li><a href="%prefix;m=LD;k=%n;">%apply;deaths(n)</a></li>
-  <li><a href="%prefix;m=LM;k=%n;">%apply;marriages(n)</a></li>
-  <li><a href="%prefix;m=OE;k=%n;">%apply;engaged(n)</a></li>
-  <li><a href="%prefix;m=OA;k=%n;;lim=0">%apply;alive(n)</a></li>
+  <li><a href="%prefix;m=LB&k=%n;">%apply;births(n)</a></li>
+  <li><a href="%prefix;m=LD&k=%n;">%apply;deaths(n)</a></li>
+  <li><a href="%prefix;m=LM&k=%n;">%apply;marriages(n)</a></li>
+  <li><a href="%prefix;m=OE&k=%n;">%apply;engaged(n)</a></li>
+  <li><a href="%prefix;m=OA&k=%n;&lim=0">%apply;alive(n)</a></li>
 %end;
-<li><a href="%prefix;m=LL;k=%n;">%apply;lived(n)</a></li>
+<li><a href="%prefix;m=LL&k=%n;">%apply;lived(n)</a></li>
 </ul>
 
 %if;(wizard or friend)
   <ul>
-    <li><a href="%prefix;m=POP_PYR;int=5;lim=0">[population pyramid]</a></li>
+    <li><a href="%prefix;m=POP_PYR&int=5&lim=0">[population pyramid]</a></li>
   </ul>
 %end;
 

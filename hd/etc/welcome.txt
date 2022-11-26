@@ -135,9 +135,9 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         <input type="hidden" name="m" value="S">
         <div class="d-flex justify-content-center">
           <div class="btn-group-vertical mr-2">
-            <a role="button" href="%prefix;m=N;tri=A"
+            <a role="button" href="%prefix;m=N&tri=A"
               title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2"><i class="fa fa-sort-alpha-down fa-fw"></i></a>
-            <a role="button" href="%prefix;m=N;tri=F"
+            <a role="button" href="%prefix;m=N&tri=F"
               title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3"><i class="fa fa-sort-amount-down fa-fw"></i></a>
           </div>
           <label for="surname" class="sr-only col-form-label col-sm-2">[*surname/surnames]0</label>
@@ -147,9 +147,9 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         </div>
         <div class="d-flex justify-content-center mt-2">
           <div class="btn-group-vertical  align-self-center mr-2">
-            <a role="button" href="%prefix;m=P;tri=A"
+            <a role="button" href="%prefix;m=P&tri=A"
               title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2"><i class="fa fa-sort-alpha-down fa-fw"></i></a>
-            <a role="button" href="%prefix;m=P;tri=F"
+            <a role="button" href="%prefix;m=P&tri=F"
               title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3"><i class="fa fa-sort-amount-down fa-fw"></i></a>
           </div>
           <label for="firstname" class="sr-only col-form-label col-sm-2">[*first name/first names]2</label>
@@ -168,9 +168,9 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         <input type="hidden" name="m" value="S">
         <div class="d-flex justify-content-center mt-2">
           <div class="btn-group-vertical  align-self-center mr-2">
-            <a role="button" href="%prefix;m=P;tri=A"
+            <a role="button" href="%prefix;m=P&tri=A"
               title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2"><i class="fa fa-sort-alpha-down fa-fw"></i></a>
-            <a role="button" href="%prefix;m=P;tri=F"
+            <a role="button" href="%prefix;m=P&tri=F"
               title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3"><i class="fa fa-sort-amount-down fa-fw"></i></a>
           </div>
           <label for="firstname" class="sr-only col-form-label col-sm-2">[*first name/first names]2</label>
@@ -185,9 +185,9 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         </div>
         <div class="d-flex justify-content-center">
           <div class="btn-group-vertical mr-2">
-            <a role="button" href="%prefix;m=N;tri=A"
+            <a role="button" href="%prefix;m=N&tri=A"
               title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2"><i class="fa fa-sort-alpha-down fa-fw"></i></a>
-            <a role="button" href="%prefix;m=N;tri=F"
+            <a role="button" href="%prefix;m=N&tri=F"
               title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3"><i class="fa fa-sort-amount-down fa-fw"></i></a>
           </div>
           <label for="surname" class="sr-only col-form-label col-sm-2">[*surname/surnames]0</label>
@@ -211,7 +211,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           <input type="hidden" name="m" value="TT">
           <div class="d-flex justify-content-center">
             <a class="mr-2 align-self-center" role="button"
-              href="%prefix;m=TT;t=" title="[*all the titles]"><i class="fa fa-list-ul fa-fw"></i></a>
+              href="%prefix;m=TT" title="[*all the titles]"><i class="fa fa-list-ul fa-fw"></i></a>
             <label for="titles" class="sr-only col-form-label col-sm-2">[*title/titles]0</label>
             <input type="search" 
               class="form-control col-lg-5 border-top-0 border-right-0 border-left-0"
@@ -219,7 +219,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           </div>
           <div class="d-flex justify-content-center mt-2">
             <a class="mr-2 align-self-center" role="button"
-              href="%prefix;m=TT;p=*" title="[*all the estates]"><i class="fa fa-list-ul fa-fw"></i></a>
+              href="%prefix;m=TT&p=*" title="[*all the estates]"><i class="fa fa-list-ul fa-fw"></i></a>
             <label for="estates"
               class="sr-only col-form-label col-sm-2" >[*estate]0</label>
             <input type="search"
@@ -264,9 +264,9 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           href="%prefix;m=ANM"><i class="fa fa-birthday-cake fa-fw mr-1" aria-hidden="true"></i>[*anniversaries]</a>
         %if;(has_history and bvar.history="yes")
           <a role="button" class="btn btn-outline-primary%if;(bvar.disable_forum!="yes") mr-1%end;"
-            href="%prefix;m=HIST;k=20"><i class="fas fa-history fa-fw mr-1" aria-hidden="true"></i>[*history]</a>
+            href="%prefix;m=HIST&k=20"><i class="fas fa-history fa-fw mr-1" aria-hidden="true"></i>[*history]</a>
         %end;
-        %if;(bvar.disable_forum != "yes")
+        %if;(plugin.forum and b.disable_forum!="yes")
           <a class="btn  btn-outline-primary"
             href="%prefix;m=FORUM"><i class="far fa-comments fa-fw mr-1" aria-hidden="true"></i>[*forum]</a>
         %end;
@@ -284,7 +284,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         %end;
         %if;(bvar.hide_advanced_request = "no")
           <a role="button" class="btn btn-outline-primary mr-1" 
-            href="%prefix;m=H;v=advanced">
+            href="%prefix;m=H&v=advanced">
             <i class="fa fa-search-plus fa-fw mr-1" aria-hidden="true"></i>[*advanced request]0</a>
         %end;
         <a role="button" class="btn btn-outline-primary mr-1" 
@@ -299,23 +299,23 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         </div>
         <div class="d-inline-flex justify-content-lg-center">
           <a role="button" class="btn btn-outline-success mr-1"
-            href="%prefix;m=MOD_DATA;data=fn"
+            href="%prefix;m=MOD_DATA&data=fn"
             title="[*modify] %apply;book_of([first name/first names]1)
               ([wizard/wizards/friend/friends/exterior]0)">[*first name/first names]1</a>
           <a role="button" class="btn btn-outline-success mr-1" 
-            href="%prefix;m=MOD_DATA;data=sn"
+            href="%prefix;m=MOD_DATA&data=sn"
             title="[*modify] %apply;book_of([surname/surnames]1)
               ([wizard/wizards/friend/friends/exterior]0)">[*surname/surnames]1</a>
           <a role="button" class="btn btn-outline-success mr-1" 
-            href="%prefix;m=MOD_DATA;data=place"
+            href="%prefix;m=MOD_DATA&data=place"
             title="[*modify] %apply;book_of([places])
               ([wizard/wizards/friend/friends/exterior]0)">[*places]</a>
           <a role="button" class="btn btn-outline-success mr-1" 
-            href="%prefix;m=MOD_DATA;data=occu"
+            href="%prefix;m=MOD_DATA&data=occu"
             title="[*modify] %apply;book_of([occupation/occupations]1)
               ([wizard/wizards/friend/friends/exterior]0)">[*occupation/occupations]1</a>
           <a role="button" class="btn btn-outline-success" 
-            href="%prefix;m=MOD_DATA;data=src"
+            href="%prefix;m=MOD_DATA&data=src"
             title="[*modify] %apply;book_of([source/sources]1)
               ([wizard/wizards/friend/friends/exterior]0)">[*source/sources]1</a>
         </div>

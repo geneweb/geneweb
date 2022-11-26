@@ -181,14 +181,14 @@
             %if;(evar.sort = "date")
               [sort by/date begin/alphabetic order/nb individuals/nb events]1
             %else;
-              <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=date">
+              <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%evar.oc;&t=%evar.t;&v=%evar.v;&sort=date">
                 [sort by/date begin/alphabetic order/nb individuals/nb events]1
               </a>
             %end;
           </td>
           <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
           <td>
-            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;">
+            <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%evar.oc;&t=%evar.t;&v=%evar.v;">
             [sort by/date begin/alphabetic order/nb individuals/nb events]2
             </a>
           </td>
@@ -197,7 +197,7 @@
             %if;(evar.sort = "ind")
               [sort by/date begin/alphabetic order/nb individuals/nb events]3
             %else;
-              <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=ind">
+              <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%evar.oc;&t=%evar.t;&v=%evar.v;&sort=ind">
                 [sort by/date begin/alphabetic order/nb individuals/nb events]3%nn;
               </a>
             %end;
@@ -205,7 +205,7 @@
             %if;(evar.sort = "evt")
               [sort by/date begin/alphabetic order/nb individuals/nb events]4
             %else;
-              <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=evt">
+              <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%evar.oc;&t=%evar.t;&v=%evar.v;&sort=evt">
                 [sort by/date begin/alphabetic order/nb individuals/nb events]4
               </a>
             %end;
@@ -271,7 +271,7 @@
           <td><b>[*sort by/date begin/alphabetic order/nb individuals/nb events]0</b></td>
           <td><img src="%image_prefix;/picto_calendar.png"%/></td>
           <td>
-            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=date">
+            <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%evar.oc;&t=%evar.t;&v=%evar.v;&sort=date">
               [sort by/date begin/alphabetic order/nb individuals/nb events]1
             <a>
           </td>
@@ -279,11 +279,11 @@
           <td>[sort by/date begin/alphabetic order/nb individuals/nb events]2</td>
           <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
           <td>
-            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=ind">
+            <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%evar.oc;&t=%evar.t;&v=%evar.v;&sort=ind">
               [sort by/date begin/alphabetic order/nb individuals/nb events]3%nn;
             </a>
             [or]
-            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=evt">
+            <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%evar.oc;&t=%evar.t;&v=%evar.v;&sort=evt">
               [sort by/date begin/alphabetic order/nb individuals/nb events]4
             </a>
           </td>
@@ -383,7 +383,7 @@
           <td>[sort by/branch/alphabetic order]1</td>
           <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
           <td>
-            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;sosab=%evar.sosab;&amp;t=%evar.t;&amp;v=%evar.v;">
+            <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%evar.oc;&sosab=%evar.sosab;&t=%evar.t;&v=%evar.v;">
               [sort by/branch/alphabetic order]2
             </a>
           </td>
@@ -420,7 +420,7 @@
           </td>
           <td align="center">
             %if;(evar.cgl != "on")
-              <a href="%prefix;m=DAG;%item.4;">%item.1;</a>
+              <a href="%prefix;m=DAG&%item.4;">%item.1;</a>
             %else;
               %item.1;
             %end;
@@ -474,7 +474,7 @@
           <td><b>[*sort by/branch/alphabetic order]0</b></td>
           <td><img src="%image_prefix;/picto_branch.png"%/></td>
           <td>
-            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;sosab=%evar.sosab;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=on">
+            <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%evar.oc;&sosab=%evar.sosab;&t=%evar.t;&v=%evar.v;&sort=on">
               [sort by/branch/alphabetic order]1
             </a>
           </td>
@@ -501,7 +501,7 @@
           </td>
           <td align="center">
             %if;(evar.cgl != "on")
-              <a href="%prefix;m=DAG;%ancestor.sosa_access;">%ancestor.nb_times;</a>
+              <a href="%prefix;m=DAG&%ancestor.sosa_access;">%ancestor.nb_times;</a>
             %else;
               %ancestor.nb_times;
             %end;

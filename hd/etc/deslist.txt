@@ -183,7 +183,7 @@
                       <p style="margin:0;">
                         %foreach;event_witness;
                           <span>%apply;capitalize(event_witness_kind)[:]</span>
-                          %apply;short_display_person("event_witness")<br/>
+                          %apply;short_display_person("event_witness")<br>
                         %end;
                       </p>
                     %end;
@@ -257,7 +257,7 @@
                           <p style="margin:0;">
                             %foreach;event_witness;
                               <span>%apply;capitalize(event_witness_kind)[:]</span>
-                              %apply;short_display_person("event_witness")<br/>
+                              %apply;short_display_person("event_witness")<br>
                             %end;
                           </p>
                         %end;
@@ -382,7 +382,7 @@
                       <p style="margin:0;">
                         %foreach;event_witness;
                           <span>%apply;capitalize(event_witness_kind)[:]</span>
-                          %apply;short_display_person("event_witness")<br/>
+                          %apply;short_display_person("event_witness")<br>
                         %end;
                       </p>
                     %end;
@@ -447,7 +447,7 @@
                         <p style="margin:0;">
                           %foreach;event_witness;
                             <span>%apply;capitalize(event_witness_kind)[:]</span>
-                            %apply;short_display_person("event_witness")<br/>
+                            %apply;short_display_person("event_witness")<br>
                           %end;
                         </p>
                       %end;

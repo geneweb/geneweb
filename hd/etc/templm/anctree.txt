@@ -63,7 +63,7 @@
       %end;
       %cell.person.title;%cell.person.dates;
       %if;(evar.image!="off" and cell.person.has_image)
-        <br%/>
+        <br>
         %if;(evar.cgl != "on")
           <a href="%cell.person.image_html_url;"
             ><img src="%cell.person.image_url;"%cell.person.image_small_size; border="0" alt="[image/images]0"
@@ -147,7 +147,7 @@
     <a href="%prefix;%xx.access">%xx;</a>
     %end;
     %xx.title;%xx.dates;
-    %if;("xx" != "self")<br%/>│<br%/>%end;
+    %if;("xx" != "self")<br>│<br>%end;
   %end;%nl;
 %end;
 
@@ -159,7 +159,7 @@
     <a href="%prefix;%xx.access">%xx;</a>
     %end;
     %xx.title;%xx.dates;
-    %if;("xx" != "self")<br%/>│<br%/>%end;
+    %if;("xx" != "self")<br>│<br>%end;
   %end;%nl;
 %end;
 

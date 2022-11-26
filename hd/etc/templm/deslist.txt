@@ -69,7 +69,7 @@
         %if;(alias != "") <em>(%alias;)</em>%end;
       %if;(not cancel_links)</a>%end;
     %end;
-      %sp;%dates;<br%/>
+      %sp;%dates;<br>
   </h1>
   %if;(evar.m = "D" and evar.t = "L" and evar.tl1 = "aad")
     %include;ancdes_aad

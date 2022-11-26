@@ -4170,7 +4170,7 @@ tr: oğulları/kızları/çocukları
 ->: child/children
 
     cousins.0.1 tt
-en: sons and daughters
+en: sons and daughters
 fr: fils et filles, enfants
 
     children's names changed
@@ -4676,7 +4676,7 @@ sv: kopiera länken
 tr: bağlantıyı panoya kopyala
 
     copy permalink
-en: copy the permalink
+en: copy the permalink
 fr: copier le permalien
 
     country
@@ -10409,17 +10409,17 @@ sv: flytta upp/flytta ner/flytta pekaren uppåt/flytta pekaren nedåt
 tr: yukarı taşı/aşağı taşı/imleci yukarı taşı/imleci aşağı taşı
 
     msg error disconnected
-co: per disgrazia, pudete aghjunghje solu famiglie chì sò cunnettate à l’altre.<br />Sta restrizione hè stata aghjunta da u pruprietariu di a basa di dati.
-de: sorry, Sie können nur Familien hinzufügen, die mit dem Rest in Verbindung stehen. <br /> Diese Einschränkung wurde durch den Eigentümer der Datenbank hinzugefügt.
-en: sorry, you can add only families connected to the rest.<br />This restriction has been added by this database owner.
-fr: désolé, vous ne pouvez ajouter que des familles connectées au reste.<br />Cette restriction a été ajoutée par le propriétaire de cette base de données.
-it: spiacenti, puoi aggiungere solo delle famiglie collegate al resto.<br />Questa restrizione è stata aggiunta dal proprietario del data base
-no: beklager, du kan bare legge til familier som er koblet til andre.<br />Denne begrensningen er lagt til av database-eieren.
-oc: o planhi, mas podètz pas apondre que de familhas ligadas.<br />Aquela restriccion foguèt aponduda pel proprietari d'aquela basa.
-pt: lamentamos mas só pode adicionar famílias ligadas às restantes.<br />Esta restrição foi colocada pelo proprietário da base de dados.
-ru: к сожалению, добавить можно только ветви, связанные с основным деревом.<br />Ограничение введено владельцем базы.
-sv: du kan bara lägga till familjer som är kopplade till övriga.<br />Denna begränsning är tillagd av databasägaren.
-tr: ne yazık ki, sadece diğerlerine bağlı aileleri ekleyebilirsiniz.<br/>Bu kısıtlama, bu veritabanı sahibi tarafından eklenmiştir.
+co: per disgrazia, pudete aghjunghje solu famiglie chì sò cunnettate à l’altre.<br>Sta restrizione hè stata aghjunta da u pruprietariu di a basa di dati.
+de: sorry, Sie können nur Familien hinzufügen, die mit dem Rest in Verbindung stehen. <br> Diese Einschränkung wurde durch den Eigentümer der Datenbank hinzugefügt.
+en: sorry, you can add only families connected to the rest.<br>This restriction has been added by this database owner.
+fr: désolé, vous ne pouvez ajouter que des familles connectées au reste.<br>Cette restriction a été ajoutée par le propriétaire de cette base de données.
+it: spiacenti, puoi aggiungere solo delle famiglie collegate al resto.<br>Questa restrizione è stata aggiunta dal proprietario del data base
+no: beklager, du kan bare legge til familier som er koblet til andre.<br>Denne begrensningen er lagt til av database-eieren.
+oc: o planhi, mas podètz pas apondre que de familhas ligadas.<br>Aquela restriccion foguèt aponduda pel proprietari d'aquela basa.
+pt: lamentamos mas só pode adicionar famílias ligadas às restantes.<br>Esta restrição foi colocada pelo proprietário da base de dados.
+ru: к сожалению, добавить можно только ветви, связанные с основным деревом.<br>Ограничение введено владельцем базы.
+sv: du kan bara lägga till familjer som är kopplade till övriga.<br>Denna begränsning är tillagd av databasägaren.
+tr: ne yazık ki, sadece diğerlerine bağlı aileleri ekleyebilirsiniz.<br>Bu kısıtlama, bu veritabanı sahibi tarafından eklenmiştir.
 
     mtree
 co: arburu in H di 9 generazioni
@@ -15688,7 +15688,7 @@ zh: 父/母/a parent
 ->: parents
 
     cousins.1.0 tt
-en: father and mother
+en: father and mother
 fr: père et mère<br>géniteur et génitrice
 
     the file is temporarily locked: please try again
@@ -17881,7 +17881,7 @@ en: filter by
 fr: filtrer par
 
     clear filters
-en: clear every filters
+en: clear every filters
 fr: effacer tous les filtres
 
     unfiltered total

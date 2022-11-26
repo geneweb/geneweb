@@ -41,7 +41,7 @@
   <table style="border:0;">
     <tr>
       <td>
-        v.&nbsp;%version; - &copy;&nbsp;INRIA&nbsp;1998-2020<br%/>
+        v.&nbsp;%version; - &copy;&nbsp;INRIA&nbsp;1998-2020<br>
         <a href="%prefix_set.templ;&%suffix;"
           title="Switch to %if(evar.templ!="templm")template m%else;default template%end;">default</a>
         %connections;%sq;

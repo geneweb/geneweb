@@ -183,7 +183,7 @@
         </table>
       </td>
     </tr>
-  </table><br/>
+  </table><br>
 
   %if;(evar.children = "on" and has_children)
     <table class="fp_table_children" cellspacing="0">
@@ -195,7 +195,7 @@
       %foreach;child;
         %apply;display_children("child",child_cnt)
       %end;
-    </table><br/>
+    </table><br>
   %end;
 
   %if;(evar.comm = "on" and (has_comment or has_marriage_note))
@@ -206,7 +206,7 @@
           %if;has_marriage_note;%marriage_note;%end;
         </td>
       </tr>
-    </table><br/>
+    </table><br>
   %end;
 %end;
 
@@ -217,9 +217,9 @@
 %define;access(num,nnn)
   num_
   %if;("num" = 1)
-    %nnn;%nnn.title;%nnn.dates;<br%/>
+    %nnn;%nnn.title;%nnn.dates;<br>
   %else;
-    %apply;access_ind("nnn")<br%/>
+    %apply;access_ind("nnn")<br>
   %end;
 %end;
 
@@ -264,7 +264,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        /<br%/>
+        /<br>
       %end;
     %end;
   %end;
@@ -295,7 +295,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;/
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;\<br%/>
+        &nbsp;&nbsp;&nbsp;&nbsp;\<br>
       %end;
 
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -321,12 +321,12 @@
       %else
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;/<br%/>
+        &nbsp;&nbsp;/<br>
       %end;
     %else
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      &nbsp;&nbsp;&nbsp;&nbsp;/<br%/>
+      &nbsp;&nbsp;&nbsp;&nbsp;/<br>
     %end;
   %end;
 
@@ -350,7 +350,7 @@
         |
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        \<br%/>
+        \<br>
       %end;
 
       |
@@ -382,13 +382,13 @@
         &nbsp;&nbsp;\
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br%/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
       %end;
     %else
       |
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      &nbsp;&nbsp;\<br%/>
+      &nbsp;&nbsp;\<br>
     %end;
   %end;
 
@@ -419,7 +419,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br%/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br>
       %end;
 
       |
@@ -489,7 +489,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br%/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
       %end;
     %end;
   %end;
@@ -523,7 +523,7 @@
         &nbsp;&nbsp;/
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;\<br%/>
+        &nbsp;&nbsp;&nbsp;&nbsp;\<br>
       %end;
 
       |
@@ -553,7 +553,7 @@
       |
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      &nbsp;/<br%/>
+      &nbsp;/<br>
     %end;
   %end;
 
@@ -575,7 +575,7 @@
       %else
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;\<br%/>
+        &nbsp;&nbsp;\<br>
       %end;
 
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -604,12 +604,12 @@
         &nbsp;&nbsp;&nbsp;&nbsp;\
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br%/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
       %end;
     %else
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      &nbsp;&nbsp;&nbsp;&nbsp;\<br%/>
+      &nbsp;&nbsp;&nbsp;&nbsp;\<br>
     %end;
   %end;
 
@@ -639,7 +639,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        \<br%/>
+        \<br>
       %end;
 
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1023,7 +1023,7 @@
                       <p style="margin:0;">
                         %foreach;event_witness;
                           <span>%apply;capitalize(event_witness_kind) :</span>
-                          %apply;short_display_person("event_witness")<br/>
+                          %apply;short_display_person("event_witness")<br>
                         %end;
                       </p>
                     %end;

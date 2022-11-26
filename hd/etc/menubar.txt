@@ -1,4 +1,4 @@
-<!-- $Id: menubar.txt v7.00 11/08/2017 15:35:40 -->
+<!-- $Id: menubar.txt v7.1 26/11/2022 17:53:50 -->
 %let;laA;title="[*add::family/families]0 (A)" accesskey="A"%in;
 %let;laD;title="[*difference between the two revisions] (D)" accesskey="D"%in;
 %let;laI;title="[*send::image/images]0 (I)" accesskey="I"%in;
@@ -8,7 +8,6 @@
 %let;laU;title="[*update] (U)" accesskey="U"%in;
 %let;laS;accesskey="S"%in;
 %let;laY;title="[*tree] (Y)" accesskey="Y"%in;
-%let;acc;%if;access_by_key;ep=%first_name_key;;en=%surname_key;;%if;(occ!= "0")eoc=%occ;;%end;%else;ei=%index;;%end;%in;
 %let;sexcolor;%if;is_male;male%elseif;is_female;female%else;neuter%end;%in;
 %define;othersexcolor(sex)
   %if;(sex=1)male%elseif;(sex=0)female%else;neuter%end;
@@ -143,7 +142,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
           %end;
           <li class="nav-item">
             <a class="nav-link %if;(e.m="")active%end;" id="self"
-              href="%prefix_set.all;%access;%if;(e.templ!="")&templ=%e.templ;%end;%if;(e.image="off")&image=off%end;" title="%first_name;%if;(occ!=0).%occ%end; %surname;">
+              href="%prefix;%access;" title="%first_name;%if;(occ!=0).%occ%end; %surname;">
               <span class="fa fa-user-alt fa-fw %sexcolor;" aria-hidden="true"></span>
               <span class="sr-only">%first_name;%if;(occ!=0).%occ%end; %surname;</span>
             </a>
@@ -164,7 +163,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
             </a>
             <div class="dropdown-menu">
               %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)
-                <a class="dropdown-item" href="%prefix_set.iz;%(iz=%self.index;;%)pz=%first_name_key;&nz=%surname_key;%if;(e.oc!="" and e.oc!=0)&ocz=%occ;%end;&%access;" %laS; title="%apply;nav_with_sosa_ref(self)">%nn;
+                <a class="dropdown-item" href="%prefix_set.iz;%(iz=%self.index;%)pz=%first_name_key;&nz=%surname_key;%if;(e.oc!="" and e.oc!=0)&ocz=%occ;%end;&%access;" %laS; title="%apply;nav_with_sosa_ref(self)">%nn;
                   <i class="far fa-dot-circle fa-fw %sexcolor; mr-1"></i> [*modify::Sosa 1]%nn;
                 </a>
               %else;
@@ -241,18 +240,18 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
             %if;(nb_families = 0)
               <li class="nav-item">
                 %if;(not is_male and not is_female)
-                    <a class="nav-link" href="%prefix;m=ADD_FAM;ip=%index;;sex=M" title="[*add::relation/relations]0 ([M/F]0)">%nn;
+                    <a class="nav-link" href="%prefix;m=ADD_FAM&ip=%index;&sex=M" title="[*add::relation/relations]0 ([M/F]0)">%nn;
                       <span aria-hidden="true"><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user male"></span></span>%nn;
                       <span class="sr-only">[*add::relation/relations]0 ([M/F]0)</span>%nn;
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="%prefix;m=ADD_FAM;ip=%index;;sex=F" title="[*add::relation/relations]0 ([M/F]1)">%nn;
+                    <a class="nav-link" href="%prefix;m=ADD_FAM&ip=%index;&sex=F" title="[*add::relation/relations]0 ([M/F]1)">%nn;
                       <span aria-hidden="true"><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user female"></span></span>%nn;
                       <span class="sr-only">[*add::relation/relations]0 ([M/F]1)</span>%nn;
                     </a>
                 %else;
-                  <a class="nav-link %if;(e.m="ADD_FAM")active%end;" id="add_fam" href="%prefix;m=ADD_FAM;ip=%index;" %laA;>%nn;
+                  <a class="nav-link %if;(e.m="ADD_FAM")active%end;" id="add_fam" href="%prefix;m=ADD_FAM&ip=%index;" %laA;>%nn;
                     <span aria-hidden="true"><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user %apply;othersexcolor(sex)"></span></span>%nn;
                     <span class="sr-only">[*add::family/families]0 (A)</span>%nn;
                   </a>
@@ -300,7 +299,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                     %end;
                     <span class="dropdown-header">[*marriage with] %spouse;</span>
                     <a class="dropdown-item" href="%prefix;m=CHG_EVT_FAM_ORD&i=%family.index;&ip=%index;" title="[*changed order of family's events]"><span class="fa fa-sort fa-fw mr-2"></span>[*invert::event/events]1</a>
-                    <a class="dropdown-item" href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index"><span class="fa fa-trash fa-fw text-danger mr-2"></span>[*delete::family/families]0</a>
+                    <a class="dropdown-item" href="%prefix;m=DEL_FAM&i=%family.index;&ip=%index"><span class="fa fa-trash fa-fw text-danger mr-2"></span>[*delete::family/families]0</a>
                     %if;(family_cnt != 1)
                       %if;(family.father.index = prev_family.father.index and family.mother.index = prev_family.mother.index)
                         <a class="dropdown-item" href="%prefix;m=MRG_FAM&i=%prev_family.index;&i2=%family.index;&ip=%index;"><span class="fa fa-user-times fa-fw mr-1">[*merge::family/families]1</a>
@@ -384,7 +383,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
               </li>
             %end;
             <li class="nav-item">
-              <a class="nav-link"href="%prefix;&m=SND_IMAGE_C&i=%index;"
+              <a class="nav-link"href="%prefix;m=SND_IMAGE_C&i=%index;"
                 title="[*add]/[remove] [image/images]0">
                 <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
                 <span class="sr-only">[*add]/[remove] [image/images]0</span>%nn;

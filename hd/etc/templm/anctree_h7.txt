@@ -84,13 +84,13 @@
 %define;somebody()
   <a href="%prefix;%access;" class="s%sex; nc%has_children;">
     %if;(evar.image!="off" and has_image)
-      <img src="%image_url;"%/><br%/>
+      <img src="%image_url;"%/><br>
     %end;
     %if;(evar.sosa = "on" and browsing_with_sosa_ref and has_sosa)
-      &middot; %sosa; &middot;<br%/>
+      &middot; %sosa; &middot;<br>
     %end;
-    %first_name;<br%/>%dates;
-    %if;(evar.bp = "on" and has_birth_place)<br%/>%birth_place;%end;
+    %first_name;<br>%dates;
+    %if;(evar.bp = "on" and has_birth_place)<br>%birth_place;%end;
   </a>
 %end;
 
@@ -124,16 +124,16 @@
           %else;
             >
             %if;(l_sosa_ref = "on")
-              &middot; %ancestor.sosa; &middot;<br%/>
+              &middot; %ancestor.sosa; &middot;<br>
             %elseif;(evar.sosa = "on")
               &middot; %ancestor.anc_sosa;
               %if;(browsing_with_sosa_ref and ancestor.has_sosa) ~ %ancestor.sosa;%end;
-              %sp;&middot;<br%/>
+              %sp;&middot;<br>
             %end;
-            %ancestor;<br%/>
+            %ancestor;<br>
             %ancestor.dates;
             %if;(evar.bp = "on" and ancestor.has_birth_place)
-              <br%/>%ancestor.birth_place;
+              <br>%ancestor.birth_place;
             %end;
             </a>
           %end;

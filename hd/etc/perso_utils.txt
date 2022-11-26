@@ -48,7 +48,7 @@
 
 %define;image_MF(xx)
   %if;(wizard and not cancel_links)
-    <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">%nn;
+    <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">%nn;
   %end;
   %if;xx.is_male;
     <i class="fa fa-mars male mr-1"></i>%nn;
@@ -235,11 +235,11 @@
 %define;short_display_person_tree(xx)
   %if;(xx.has_sosa)%apply;display_sosa("xx")%end;
   %if;(cancel_links or xx.is_restricted)<span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span>
-  %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;;%if;(evar.t!="")t=%evar.t;;%end;%if;(evar.v!="")v=%evar.v;;%end;%if;(e.im=0)im=0;%end;%if;(evar.marriage="on")marriage=on;%end;"><span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
+  %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;%if;(evar.t!="")&t=%evar.t;%end;%if;(evar.v!="")&v=%evar.v;%end;%if;(e.im=0)&im=0%end;%if;(evar.marriage="on")&marriage=on%end;"><span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
   %end;
   <br>%nn;
   %if;(wizard and not cancel_links)
-    <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
+    <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
   %end;
   <div class="text-nowrap font-italic%nn;
       %(%if;(e.m="A" and xx.index!=index)
@@ -264,7 +264,7 @@
     %end;
   %end;
   %if;("yy"="br")<br>%end;%if;(wizard and not cancel_links)
-  <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">%end;<span class="text-nowrap font-italic">%xx.dates;</span>%if;(wizard and not cancel_links)</a>%end;%nn;
+  <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">%end;<span class="text-nowrap font-italic">%xx.dates;</span>%if;(wizard and not cancel_links)</a>%end;%nn;
   %if;("zz"="age")<br> <span class="text-nowrap">%xx.age;%xx.death_age;</span>%nn;%end;
 %end;
 
@@ -517,7 +517,7 @@
 
 %define;married_to_f(UP_lo, m_f, date_place)
   %if;(wizard and not cancel_links)
-    <a href="%prefix;;m=MOD_FAM;i=%family.index;;ip=%index;">%nn;
+    <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;">%nn;
       <i class="fa fa-wrench%sp;
         %if;(m_f=0)male%elseif;(m_f=1)female%else;neuter%end;"%sp;
         title="[*modify::family/families]0 [with]%sp;
@@ -583,9 +583,7 @@
     %if;(spouse.access=xx.father.access)
       %if;(marriage_date.year!="")
         %if;(wizard and not cancel_links)<a href="%prefix&m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">%end;
-        <span class="text-nowrap">%nn;
-          %family.date_s;
-        </span>
+        <span class="text-nowrap">%family.date_s;</span>
         %if;(wizard and not cancel_links)</a>%end;
       %else;&nbsp;%end;
     %end;
@@ -647,7 +645,7 @@
     %if;child.has_families;
       %foreach;child.family;
         %if;(family_cnt!=1)
-          <br%/><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="" title=""%/>
+          <br><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="" title=""%/>
           <em>%child;%child.title;%child.dates;</em>
         %end;
         <em>%apply;long_married_f("child", "lower")</em>

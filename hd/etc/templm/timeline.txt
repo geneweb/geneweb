@@ -51,7 +51,7 @@
                 <p style="margin:0;">
                   %foreach;event_witness;
                     <span>%apply;capitalize(event_witness_kind) :</span>
-                    %apply;short_display_person("event_witness")<br/>
+                    %apply;short_display_person("event_witness")<br>
                   %end;
                 </p>
               %end;
@@ -86,7 +86,7 @@
     %apply;add("mother","the father/the mother/a parent",1)
   %end;
 
-  <br/><h3 class="highlight">[*time line]</h3>
+  <br><h3 class="highlight">[*time line]</h3>
   <table>
     %foreach;sorted_list_item;
       %item.2;

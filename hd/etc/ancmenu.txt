@@ -243,9 +243,9 @@ function missing_events_options () {
         <label class="custom-control-label" for="tT"><i class="fa fa-sitemap fa-rotate-180 fa-fw mr-1"></i>[*ascendants tree] <span class="text-info">✘</span>%nn;
           <span class="text-muted">%nn;
             %if;(bvar.max_anc_tree="" and max_anc_level>=7)
-              %sp;([maximum] 7 [generation/generations]1)
+              <br>%sp;([maximum] 7 [generation/generations]1)
             %elseif;(bvar.max_anc_tree!="" and max_anc_level>=bvar.max_anc_tree)
-              %sp;([maximum] %bvar.max_anc_tree; [generation/generations]1)
+              <br>%sp;([maximum] %bvar.max_anc_tree; [generation/generations]1)
             %end;
           </span>%nn;
         </label>
@@ -253,7 +253,7 @@ function missing_events_options () {
       <div class="ml-4">
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="tree_marriage" name="ma" value="0">
-          <label class="custom-control-label" for="tree_marriage">[*visualize/show/hide/summary]2 [ marriage date]</label>
+          <label class="custom-control-label" for="tree_marriage">[*visualize/show/hide/summary]2 [marriage date]</label>
         </div>
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="tree_dag" name="dag">
@@ -506,7 +506,7 @@ function missing_events_options () {
         <div class="order-1">
           <label class="sr-only" for="v">[*generation/generations]1[:]</label>
           <select class="custom-select" id="v" name="v" required>
-            <option selected disabled value="">[*select] [generation/generations]0…%nn;</option>
+            <option selected disabled value="">[*specify::generation/generations]0…%nn;</option>
             %foreach;ancestor_level;
                 %if;(level>1)
                 <option value="%level;">%nn;

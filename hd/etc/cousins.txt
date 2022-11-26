@@ -112,7 +112,7 @@
   %end;
 %elseif;(evar.v1=0)
   %if;(evar.v2=0 or evar.v2="")
-    <a href="%prefix;;m=RL&p1=%my_first_name_key;&n1=%my_surname_key;&b1=2%nn;
+    <a href="%prefix;m=RL&p1=%my_first_name_key;&n1=%my_surname_key;&b1=2%nn;
               &p2=%my_first_name_key;&n2=%my_surname_key;&b2=2%nn;
               %if;(evar.image="off")&image=off;%end;%nn;
               %if;(evar.spouse!="")&spouse=%evar.spouse;%end;%nn;

@@ -98,7 +98,7 @@
       <span style="width:270px">⟔%(⇱%)
         <span class="s_menu">
           <a id="mod_ind" href="%prefix;m=MOD_IND;i=%index;" %laP; %l_on1;>↺ [*modify::person/persons]0</a>%nn;
-          <a id="chg_evt_ind" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" %l_on1;>⇳ [*invert::event/events]1%(<br/>[*modify person event order]0%)</a>
+          <a id="chg_evt_ind" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" %l_on1;>⇳ [*invert::event/events]1%(<br>[*modify person event order]0%)</a>
           %if;(is_male or is_female)
             <a id="add_fam" href="%prefix;m=ADD_FAM;ip=%index;" %laA; %l_on1;>👫 [*add::family/families]0</a>%nn;
           %else;
@@ -117,7 +117,7 @@
               <a id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;" title="[*modify::family/families]0 %family_cnt;"
                  %l_on1;>↺ [*modify::family/families]0 %family_cnt;</a>%nn;
             %end;
-            <a href="%prefix;m=CHG_EVT_FAM_ORD;i=%family.index;;ip=%index;" %l_on1;>⇳ [*invert::event/events]1 [family/families]0 %if;(nb_families>1)%family_cnt;%end;%(<br/>%apply;chg_evt_fam_ord(family_cnt)%)</a>
+            <a href="%prefix;m=CHG_EVT_FAM_ORD;i=%family.index;;ip=%index;" %l_on1;>⇳ [*invert::event/events]1 [family/families]0 %if;(nb_families>1)%family_cnt;%end;%(<br>%apply;chg_evt_fam_ord(family_cnt)%)</a>
           %end;
           %if;has_children;
             <a href="%prefix;m=CHG_CHN;ip=%index;">👦👧 [*change children's names]</a>
@@ -144,7 +144,7 @@
         %let;l1;%if;(bvar.setup_http != "")%bvar.setup_http;%else;http://localhost:2316/%end;%in;
         %let;l2;%if;(has_sosa)s%sosa.v;%else;i%index;%end;%apply;initial(first_name_key)%apply;initial(surname_key)-%base.name;%in;
         %let;l_gwu;%l1;gwu?opt=check;anon=%base.name;;nn=on;c=%in;
-        <br%/><br%/><span>|
+        <br><br><span>|
           %if;(has_parents or has_children)
             <span class="s_menu">
               %if;(version = l_version)
@@ -185,26 +185,26 @@
     <span style="position:absolute;top:%if;(evar.wide="on" or bvar.wide="on")82%else;30%end;px;right:13px;">%apply;sosainfo()</span>
     <span style="position:absolute;right:13px;top:%if;(evar.wide="on" or bvar.wide="on")100%else;48%end;px">
      %if;((bvar.access_by_key!="yes" and evar.iz!="") or (bvar.access_by_key="yes" and evar.nz!="" and evar.pz!=""))
-       <a href="%prefix_set.iz;%self.access;%l_url;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;"> X</a> <br/>
+       <a href="%prefix_set.iz;%self.access;%l_url;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;"> X</a> <br>
      %end;
      <a href="%prefix;%access;%if;(evar.spouse!="off");spouse=off%else;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="");image=%evar.image;%end;%if;(evar.wide!="");wide=%evar.wide;%end;%if;(evar.misc!="")misc=%evar.misc;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
       title="%if;(evar.spouse="off")[visualize/show/hide/summary]1%else;[visualize/show/hide/summary]2%end; [spouse/spouses]1">%if;(evar.spouse="off")👫%else;👤%end;</a>
-     <br/><a href="%prefix;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="on");age=on%else;%end;%if;(evar.image!="");image=%evar.image;%end;%if;(evar.wide!="");wide=%evar.wide;%end;%if;(evar.misc!="")misc=%evar.misc;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
+     <br><a href="%prefix;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="on");age=on%else;%end;%if;(evar.image!="");image=%evar.image;%end;%if;(evar.wide!="");wide=%evar.wide;%end;%if;(evar.misc!="")misc=%evar.misc;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
       title="%if;(evar.age!="on")[visualize/show/hide/summary]1%else;[visualize/show/hide/summary]2%end; [age]/[event/events]1" style="%if;(evar.age="on")color:red;%end;">🎂</a>
     %if;(bvar.event_age!="on")
       %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
-        <br/><a href="%prefix;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="off");image=off%else;%end;%if;(evar.wide!="");wide=%evar.wide;%end;%if;(evar.misc!="")misc=%evar.misc;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
+        <br><a href="%prefix;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="off");image=off%else;%end;%if;(evar.wide!="");wide=%evar.wide;%end;%if;(evar.misc!="")misc=%evar.misc;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
         title="%if;(evar.image="off")[visualize/show/hide/summary]1%else;[visualize/show/hide/summary]2%end; [image/images]1" style="%if;(evar.image!="off")color:red;%end;">🎴</a>
       %end;
     %end;
     %if;(bvar.wide!="on")
-      <br/><a href="%prefix_base_password;%if;(evar.wide!="on")wide=on;%end;%nn;
+      <br><a href="%prefix_base_password;%if;(evar.wide!="on")wide=on;%end;%nn;
               %foreach;env_binding;%if;(env.key!="wide")%env.key=%env.val;;%end;%end;"
               title="%if;(evar.wide="on")[full width/columns]1%else;[full width/columns]0%end;">%if;(evar.wide!="on")⚊%else;⚋%end;
            </a>
     %end;
     %if;(wizard and bvar.misc!="yes")
-      <br/><a href="%prefix;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="");image=%evar.image;%end;%if;(evar.wide!="");wide=%evar.wide;%end;%if;(evar.misc!="yes");misc=yes%else;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
+      <br><a href="%prefix;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="");image=%evar.image;%end;%if;(evar.wide!="");wide=%evar.wide;%end;%if;(evar.misc!="yes");misc=yes%else;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
       title="%if;(evar.misc!="yes")[visualize/show/hide/summary]1%else;[visualize/show/hide/summary]2%end; wikitext">%if;(evar.misc!="yes")M%else;<s>M</s>%end;</a>
     %end;
     </span>
@@ -402,7 +402,7 @@
       %foreach;family;
           %if;(evar.spouse != "off")
             <div class="image_sheet" style="font-size: 80%%;">
-                %if;(spouse.has_image)%apply;link_image("spouse")<br%/>%end;
+                %if;(spouse.has_image)%apply;link_image("spouse")<br>%end;
                 %apply;somebody("spouse")
             </div>
           %end;
@@ -410,7 +410,7 @@
             %if;(has_children)
               %foreach;child;
                 <div class="image_sheet" style="font-size: 75%%;margin-left: 8%%; border: dashed 1px %highlight;;">
-                  %if;(child.has_image)%apply;link_image("child")<br%/>%end;
+                  %if;(child.has_image)%apply;link_image("child")<br>%end;
                   %apply;child_long_info(curlev+1,maxlev)
                 </div>
               %end;
@@ -447,7 +447,7 @@
     %(%if;(evar.image!="off")
       %foreach;child;
         <div class="image_sheet">
-          %if;(has_image)%apply;link_image("self")<br%/>%end;
+          %if;(has_image)%apply;link_image("self")<br>%end;
           %apply;child_long_info(1,l_maxlev)
         </div>
       %end;
@@ -475,7 +475,7 @@
 %define;content_family(xx,yy)
   %(%if;(evar.image!="off")
     <div class="image_sheet">
-      %if;(xx.has_image)%apply;link_image("xx")<br%/>%end;
+      %if;(xx.has_image)%apply;link_image("xx")<br>%end;
       %xx;%xx.title; %xx.dates;
     </div>
     <div class="image_sheet">
@@ -486,7 +486,7 @@
       %end;
     </div>
     <div class="image_sheet" style="clear:right;">
-      %if;(yy.has_image)%apply;link_image("yy")<br%/>%end;
+      %if;(yy.has_image)%apply;link_image("yy")<br>%end;
       %apply;somebody1%with;yy%and;yy%and;%end;
     </div>
   %else;
@@ -528,7 +528,7 @@
             onkeypress="javascript:return acc_key(this,event,'sib_1','spo_1','chi_1_1','ancestor_%ancestor.index;','add_par_%l_sosa;','par_%l_sosa;','par_%l_sosa;');"
           %end;
           %apply;link_dates("ancestor")
-          <br%/>
+          <br>
         %end;
       %end;
     %end;
@@ -572,7 +572,7 @@
   %if;has_parents;
     <div><div>
       <span class="menu" style="display:inline;position:relative;background-color:#AAA;">
-        <span style="margin-left:20px"><small>[up to] %apply;ascmax()%apply;implex()</small></span><br/>
+        <span style="margin-left:20px"><small>[up to] %apply;ascmax()%apply;implex()</small></span><br>
         %let;l1;%apply;min(max_anc_level,5)%in;
         <span>
           <span class="ch2" style="margin-top:-4px;">[*ancestors]</span>
@@ -626,7 +626,7 @@
     </div></div>
     <div><div>
     <span class="menu" style="display:inline;position:relative;">
-    <span style="margin-left:15px;"><small>%apply;consang()</small></span><br/>
+    <span style="margin-left:15px;"><small>%apply;consang()</small></span><br>
       <span>
         <span class="ch2" style="margin-top:-4px;">%if;(father.nb_children > 1 or mother.nb_children > 1)[*full siblings]%else;[*relationship]%end;</span>
         %if;(not cancel_links)
@@ -916,7 +916,7 @@
 %end;
 %define;event_tree(z1)
   %reset_count;
-  <br/><span><a href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
+  <br><span><a href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
     %foreach;event_witness;
         %incr_count;i%count;=%event_witness.index;;t%count;=%event.name;;%nn;
         %incr_count;%nn;
@@ -957,7 +957,7 @@
     %if;event.has_date;%apply;on_edate("event")%end;
     %if;event.has_place; • %apply;advanced("birth_place",event.place)%end;
   %if;((bvar.event_age = "yes" or evar.age="on") and has_parents)
-    <br%/> └ %parents_age;.
+    <br> └ %parents_age;.
   %end;
   </span>
 %end;
@@ -1131,11 +1131,11 @@
     %end;
     <p class="data1">
       %if;has_nobility_titles;
-        <br%/><em>%foreach;nobility_title;%nobility_title;<br%/>%end;</em>
+        <br><em>%foreach;nobility_title;%nobility_title;<br>%end;</em>
       %end;
-      %if;(has_linked_pages and has_linked_page.HEAD)%linked_page.HEAD;<br%/>%end;
+      %if;(has_linked_pages and has_linked_page.HEAD)%linked_page.HEAD;<br>%end;
       %if;has_qualifiers;
-        <br%/>
+        <br>
         %apply;lazy_print("")
         %foreach;qualifier;
           %if;not is_first;
@@ -1147,7 +1147,7 @@
       %end;
       %if;has_aliases;
         %apply;lazy_print("")
-        %if;(has_qualifiers)<br%/>%end;
+        %if;(has_qualifiers)<br>%end;
         <em><strong>%nn;
         %foreach;alias;
           %if;(lazy_printed)/%end;
@@ -1157,7 +1157,7 @@
         </strong></em>
       %end;
       %if;(has_public_name or has_qualifiers)
-        %if;(has_aliases or has_qualifiers)<br%/>%end;
+        %if;(has_aliases or has_qualifiers)<br>%end;
         <span style="font-size:13pt">
         %apply;link_s("p",first_name)%sp;
         %apply;link_s("n",surname)
@@ -1165,7 +1165,7 @@
       %end;
       %if;has_first_names_aliases;
         %apply;lazy_print("")
-        <br%/>
+        <br>
         %foreach;first_name_alias;
           %if;(lazy_printed)/%end;
           %lazy_force;
@@ -1174,14 +1174,14 @@
       %end;
       %if;has_surnames_aliases;
         %apply;lazy_print("")
-        <br%/>
+        <br>
         %foreach;surname_alias;
           %if;(lazy_printed)/%end;
           %lazy_force;
           %apply;link_s("n",surname_alias)%nn;
         %end;
       %end;
-      <br%/>
+      <br>
       %if;(is_dead and computable_death_age)[*age at death][:] %apply;curr_age()%end;
       %if;(not is_dead and computable_age)[*age][:] %apply;curr_age()%end;
     </p>
@@ -1200,7 +1200,7 @@
         %foreach;related;%incr_count;%end;
         %foreach;event_witness_relation;%incr_count;%end;
         %let;cnt;%count;%in;
-        <br/><span>%if;(not cancel_links and cnt>1)%apply;relations_tree(l_ref)%end[*relation/relations]1%if;(not cancel_links and cnt>1)</a>%end;</span></div>
+        <br><span>%if;(not cancel_links and cnt>1)%apply;relations_tree(l_ref)%end[*relation/relations]1%if;(not cancel_links and cnt>1)</a>%end;</span></div>
         %foreach;relation;
           <div class="tree" style="clear:both">
             %if;(has_relation_him and has_relation_her)
@@ -1242,7 +1242,7 @@
   %end;
   <div class="notes">
     %if;(has_notes or has_linked_page.BNOTE or has_linked_page.NOTE)
-    <br/>
+    <br>
     <span %if;(not has_linked_pages)class="ch2"%end;>%if;(has_linked_pages and not cancel_links)<a href="%prefix;m=LINKED;%access;" class="ch2"
      title="[*linked pages]">%end;[*note/notes]1%if;(has_linked_pages and not cancel_links)<small>*</small>%end;%if;(has_linked_pages and not cancel_links)</a>%end;</span>
      <div>
@@ -1299,7 +1299,7 @@
 %( <!-- Begin display ancestors /descendants --> %)
 <div class="col2">
   <hr %if;(lwide = "off")style="display:none"%end; %/>
-  <br/><br/>
+  <br><br>
   %apply;anc_families()
   %if;has_families;
     <div style="clear:both"><div>
@@ -1364,7 +1364,7 @@
         %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
         %elseif;(is_male or is_female)
           <a href="%prefix;m=ADD_FAM;ip=%index;" title="[*add::family/families]0 (A)" %l_on1;>👫 [*add::family/families]0</a>%nn;
-          <br%/>
+          <br>
         %end;
       </div>
     %end;

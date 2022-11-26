@@ -84,7 +84,7 @@
         %if;(alias != "") <em>(%alias;)</em>%end;
       %if;(not cancel_links)</a>%end;
     %end;
-      %sp;%dates;<br%/>
+      %sp;%dates;<br>
   %end;
   %if;(evar.t = "F" and evar.tf1 = "csv")
     %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [places]

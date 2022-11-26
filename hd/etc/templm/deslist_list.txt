@@ -26,10 +26,10 @@
            evar.t = "L" and evar.t1 = "")
         %if;(family.desc_level < curlev)
           &rArr; [see further]
-          %apply;lazy_print%with;<br%/>%nl;%end;
+          %apply;lazy_print%with;<br>%nl;%end;
         %elseif;(family.desc_level > curlev)
           &rArr; [see above]
-          %apply;lazy_print%with;<br%/>%nl;%end;
+          %apply;lazy_print%with;<br>%nl;%end;
         %elseif;has_children;
           %family.set_infinite_desc_level;
           %if;(curlev = 0)</div>%nl;%end;
@@ -47,12 +47,12 @@
           %apply;lazy_print%with;%end;
         %else;
           %if;(curlev = 0)%nl;</div>%nl;
-          %else;%apply;lazy_print%with;<br%/>%nl;%end;
+          %else;%apply;lazy_print%with;<br>%nl;%end;
           %end;
         %end;
       %end;
     %else;%nl;
-      %apply;lazy_print%with;<br%/>%nl;%end;
+      %apply;lazy_print%with;<br>%nl;%end;
     %end;
   %end;
 %end;
@@ -61,13 +61,13 @@
   %reset_count;
   <p>
     %if;(evar.t = "F")
-      [*male line/female line]1<br%/>
+      [*male line/female line]1<br>
     %elseif;(evar.t = "M")
-      [*male line/female line]0<br%/>
+      [*male line/female line]0<br>
     %end;
     %if;(evar.t1 = "1" and has_sosa)
       [*branch/branches]0 : Sosa
-    <br%/>
+    <br>
     %end;
     %if;(evar.i1 = "" and evar.p1 = "")
       %apply;togen()
