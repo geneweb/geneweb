@@ -28,7 +28,7 @@
             <a href="%prefix;em=R;ei=%ancestor.mother.index;;m=NG;t=PN;select=%ancestor.father.index;;et=A;spouse=on;image=on"
                title="[relationship computing], [parents]">
                %ancestor.consanguinity;
-            </a><br%/>
+            </a><br>
           </li>
         %end;
         %apply;same()

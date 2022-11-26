@@ -240,13 +240,13 @@
     [*database forum]</a></li>
   <li>%nn;
     %if;(message.next_pos != "")
-       <a href="%prefix;m=FORUM;p=%message.next_pos;" accesskey="N">%nn;
+       <a href="%prefix;m=FORUM&p=%message.next_pos;" accesskey="N">%nn;
        [*message/previous message/previous messages/next message]3 %nn;
        </a>%nn;
     %else;&nbsp;%end;</li>
   <li>
     %if;(message.prev_pos != "")
-       <a href="%prefix;m=FORUM;p=%message.prev_pos;" accesskey="P">%nn;
+       <a href="%prefix;m=FORUM&p=%message.prev_pos;" accesskey="P">%nn;
        [*message/previous message/previous messages/next message]1 %nn;
        </a>%nn;
     %else;&nbsp;%end;</li>
@@ -272,7 +272,7 @@
   %end;
   %if;(evar.m != "FORUM_VIEW")
     <div style="font-size:80%%;float:%right;;margin-%left;:3em">(<a%sp;
-    href="%prefix;m=FORUM_VIEW;p=%message.pos;">[view source]</a>)</div>
+    href="%prefix;m=FORUM_VIEW&p=%message.pos;">[view source]</a>)</div>
   %end;
   <p%col;>
   <b>%message.ident;</b>
@@ -283,7 +283,7 @@
     <b style="color:#999">-%sp;
     %if;(message.wizard != "")
       [wizard/wizards/friend/friends/exterior]0:%sp;
-      <a href="%prefix;m=WIZNOTES;v=%message.wizard;" style="color:#999">%sq;
+      <a href="%prefix;m=WIZNOTES&v=%message.wizard;" style="color:#999">%sq;
       %message.wizard;</a>%sp;
     %end;
     %if;(message.friend != "")
@@ -374,8 +374,9 @@
   %if;(pos != "")
     <tr align="%left;"><td colspan="4">&nbsp;</td></tr>
     <tr align="%left;"><td colspan="4">%nn;
-      <a href="%prefix;m=FORUM;len=%len;;to=%pos;
-      ">[message/previous message/previous messages/next message]2</a></td></tr>
+      <a href="%prefix&m=FORUM&len=%len;&to=%pos;">%nn;
+        [message/previous message/previous messages/next message]2</a>
+    </td></tr>
   %end;
   </table>
 %end;

@@ -49,13 +49,13 @@
     <a id="mf%family.index;" class="date p_%left;" href="#mf%family.index;" %ltmf;
       onclick="window.open('%prefix;m=MOD_FAM;i=%family.index;;ip=%index;;');">%nn;
       <span>&amp;</span>%nn;
-        %if;(nb_children > 1)%nb_children;<br%/>%end;
+        %if;(nb_children > 1)%nb_children;<br>%end;
         %slash_marriage_date; %marriage_place;
     </a>
   %else;
     <span>&amp;</span>%nn;
     %slash_marriage_date; %marriage_place;
-    <br%/>&amp;%nb_children;
+    <br>&amp;%nb_children;
   %end;
 %end;
 
@@ -81,16 +81,16 @@
 
 %define;info3(xx)
   %if;(xx.has_nobility_titles)
-    <em>%xx.nobility_title;</em><br%/>
+    <em>%xx.nobility_title;</em><br>
   %end;
   %if;(xx.has_occupation)
-    <span class="highlight1">%xx.occupation;</span><br%/>
+    <span class="highlight1">%xx.occupation;</span><br>
   %end;
   %if;xx.computable_age;
-    [age] : %xx.age;<br%/>
+    [age] : %xx.age;<br>
   %end;
   %if;(xx.computable_death_age)
-    %xx.death_age;<br%/>
+    %xx.death_age;<br>
   %end;
   %if;(xx.has_consanguinity and (bvar.show_consang != "no" or manitou))
     %xx.consanguinity;
@@ -104,7 +104,7 @@
     %end;
       %apply;symbol1("xx")
       %if;(xx.nb_families > 1)
-        <br%/>%xx.nb_families;&amp;%xx.nb_children;
+        <br>%xx.nb_families;&amp;%xx.nb_children;
       %end;
     %if;(not cancel_links)
       </a>
@@ -118,9 +118,9 @@
 
 %define;link_rel(xx)
   %if;(cancel_links)
-    ==<br%/>xx
+    ==<br>xx
   %else;
-    <a href="%prefix;em=R;ei=%ancestor.index;;m=NG;select=%index;;n=1;t=PN;et=A;spouse=on;image=on;" title="%ancestor; …[relationship]… %self;">==<br%/>xx</a>
+    <a href="%prefix;em=R;ei=%ancestor.index;;m=NG;select=%index;;n=1;t=PN;et=A;spouse=on;image=on;" title="%ancestor; …[relationship]… %self;">==<br>xx</a>
   %end;
 %end;
 

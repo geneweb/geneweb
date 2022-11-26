@@ -127,7 +127,7 @@
       %if;(xx.has_birth_date or xx.has_birth_place)
         <span>%birth_symbol;</span>%xx.slash_birth_date; %xx.birth_place;
       %end;
-      <br%/> 
+      <br> 
       %if;(xx.has_death_date or xx.has_death_place)
         <span>%death_symbol;</span>%xx.slash_death_date; %xx.death_place;
       %end;

@@ -71,7 +71,7 @@
     %in;
     %let;l_mdl1;%if;(l_mdl0 != 99)([maximum] %l_mdl0; [generation/generations]1)%end;%in;
     <legend><input type="submit" value="OK"%/></legend>
-    <label>[*specify::generation/generations]0%l_mdl1;[:]<br%/>
+    <label>[*specify::generation/generations]0%l_mdl1;[:]<br>
       <select style="text-align:center" name="v" size="%max_desc_level;">
         %foreach;descendant_level;
           %if;(level != 0)
@@ -88,60 +88,60 @@
         %end;
       </select>
     </label>
-    <br%/>
+    <br>
     %let;l_on1;onchange="valid('tL')"%in;
     %let;l_on2;onchange="valid('tL1')"%in;
     <label>      <input type="checkbox" name="cgl" value="on" %l_on2; %l_on;
-           %/>[cancel GeneWeb links]</label><br%/>
+           %/>[cancel GeneWeb links]</label><br>
     <label><input type="radio" name="t" value="S" %l_on2; %l_on;
-           %/>[descendants at the generation]</label><br%/>
+           %/>[descendants at the generation]</label><br>
     <label><input type="radio" name="t" value="N" %l_on2; %l_on;
-           %/>[families with encoding]</label><br%/>
+           %/>[families with encoding]</label><br>
     <label><input type="radio" name="t" value="G" %l_on2; %l_on;
-           %/>[index of the descendants]</label><br%/>
+           %/>[index of the descendants]</label><br>
     <label><input type="radio" name="t" value="C" %l_on2; %l_on;
-           %/>[index of the spouses (non descendants)]</label><br%/>
+           %/>[index of the spouses (non descendants)]</label><br>
     <label><input type="radio" name="t" value="A" %l_on2; %l_on;
-           %/>d'Aboville</label><br%/>
+           %/>d'Aboville</label><br>
            <input type="hidden" name="num" value="on" %/>
     <label><input type="radio" name="tl1" value="hrztl" %l_on1; %l_on;
-           %/>[horizontally]</label><br%/>
+           %/>[horizontally]</label><br>
     <label><input type="radio" name="tl1" value="tag" %l_on1; %l_on;
-           %/>[label]</label><br%/>
+           %/>[label]</label><br>
   </fieldset>
   <fieldset>
     <legend>
       <label><input type="radio" id="tL" name="t" value="L" checked="checked" %l_on2; %l_on;
-             %/>[*long display]0</label><br%/>
+             %/>[*long display]0</label><br>
     <label><input type="radio" name="t" value="M" %l_on2; %l_on;
-           %/>[*male line/female line]0</label><br%/>
+           %/>[*male line/female line]0</label><br>
     <label><input type="radio" name="t" value="F" %l_on2; %l_on;
-           %/>[*male line/female line]1</label><br%/>
-    </legend><br%/><br%/><br%/>
+           %/>[*male line/female line]1</label><br>
+    </legend><br><br><br>
     %if;(has_sosa)
       <label style = "display:inline" ><input type="checkbox" name="t1" value="1" %l_on1;
              %if;(evar.t1= "1") checked="checked"%end;%/>[branch/branches]0[:] Sosa</label>
       <label style = "display:inline" >(<input type="checkbox" name="siblings" value="on" %l_on1;
-         %if;(evar.siblings = "on") checked="checked"%end;%/>[siblings])</label><br%/>
+         %if;(evar.siblings = "on") checked="checked"%end;%/>[siblings])</label><br>
     %end;
     <label><input type="checkbox" name="always_surname" value="no" checked="checked" %l_on1; %l_on;
-           %/>[first name/first names]0 <span style="text-decoration:line-through;">[surname/surnames]0</span></label><br%/>
+           %/>[first name/first names]0 <span style="text-decoration:line-through;">[surname/surnames]0</span></label><br>
     <label><input type="checkbox" name="alias" value="on" checked="checked" %l_on1; %l_on;
-           %/>[surname alias], [first name alias]</label><br%/>
+           %/>[surname alias], [first name alias]</label><br>
     <label><input type="checkbox" name="spouse" value="on" checked="checked" %l_on1; %l_on;
-           %/>[include spouses]</label><br%/>
+           %/>[include spouses]</label><br>
     <label><input type="checkbox" name="parents" value="on" checked="checked" %l_on1; %l_on;
-           %/>[parents]</label><br%/>
+           %/>[parents]</label><br>
     <label><input type="checkbox" name="rel" value="on" checked="checked" %l_on1; %l_on;
-           %/>[relation/relations]1</label><br%/>
+           %/>[relation/relations]1</label><br>
     <label><input type="checkbox" name="witn" value="on" checked="checked" %l_on1; %l_on;
-           %/>[witness/witnesses]1</label><br%/>
+           %/>[witness/witnesses]1</label><br>
     <label><input type="checkbox" name="notes" value="on" checked="checked" %l_on1; %l_on;
-           %/>[note/notes]1</label><br%/>
+           %/>[note/notes]1</label><br>
     <label><input type="checkbox" name="src" value="on" checked="checked" %l_on1; %l_on;
-           %/>[source/sources]1</label><br%/>
+           %/>[source/sources]1</label><br>
     <label><input type="checkbox" name="upd" value="on" %l_on1; %l_on;
-           %/>[update]</label><br%/>
+           %/>[update]</label><br>
     <label><input type="checkbox" name="hide" value="on" %l_on1; %l_on;
            %/>[visualize/show/hide/summary]2… </label>
   </fieldset>
@@ -159,8 +159,8 @@
       </label>
     </legend>
     <label><input type="checkbox" name="image" value="on" %l_on1; %l_on;
-           %/>[image/images]1</label><br%/>
-    <label>[border]<input name="bd" size="1" maxlength="2" value="0" %l_on1;%/></label><br%/>
+           %/>[image/images]1</label><br>
+    <label>[border]<input name="bd" size="1" maxlength="2" value="0" %l_on1;%/></label><br>
     <table summary="colors" cellspacing="0" cellpadding="0">
       <tr>
         <td align="%left;">[color] </td>
@@ -175,19 +175,19 @@
     %let;l_on1;onchange="valid('tL')"%in;
     <legend>[*statistics]</legend>
     <label><input type="radio" id="tCAL" name="tl1" value="cal" %l_on1; %l_on;
-           %/>[calendar/calendars]0</label><br%/>
+           %/>[calendar/calendars]0</label><br>
     <label><input type="radio" id="tBMDM" name="tl1" value="bmdm" %l_on1; %l_on;
-           %/>[year/month/day]1</label><br%/>
+           %/>[year/month/day]1</label><br>
     <label><input type="radio" id="tAFM" name="tl1" value="afm" %l_on1; %l_on;
-           %/>[age] ([father/mother]0, [father/mother]1)</label><br%/>
+           %/>[age] ([father/mother]0, [father/mother]1)</label><br>
     <label><input type="radio" id="tAAX" name="tl1" value="aax" %l_on1; %l_on;
-           %/>[age at %s birth date:::x]</label><br%/>
+           %/>[age at %s birth date:::x]</label><br>
     <label><input type="radio" id="tNXD" name="tl1" value="nxd" %l_on1; %l_on;
-           %/>[year/month/day]0 [death] - [year/month/day]0 [death] x</label><br%/>
+           %/>[year/month/day]0 [death] - [year/month/day]0 [death] x</label><br>
     <label><input type="radio" id="tAAD" name="tl1" value="aad" %l_on1; %l_on;
-           %/>[age at death]</label><br%/>
+           %/>[age at death]</label><br>
     <label><input type="radio" id="tMM" name="tl1" value="mm" %l_on1; %l_on;
-           %/>[year/month/day]1 [birth] = [year/month/day]1 [death] ?</label><br%/>
+           %/>[year/month/day]1 [birth] = [year/month/day]1 [death] ?</label><br>
     <label><input type="radio" id="tARS" name="tl1" value="ars" %l_on1; %l_on;
            %/>αἰθήρ</label>
   </fieldset>

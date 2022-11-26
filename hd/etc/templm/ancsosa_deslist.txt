@@ -221,7 +221,7 @@
   %if;(evar.notes = "on")
     %if;(z1.has_notes or z1.has_linked_page.BNOTE or z1.has_linked_page.NOTE)
       <div class="inot"><table><tbody><tr><td>
-        %if;z1.has_linked_page.BNOTE;&gt;&gt; %z1.linked_page.BNOTE;<br%/>%end;
+        %if;z1.has_linked_page.BNOTE;&gt;&gt; %z1.linked_page.BNOTE;<br>%end;
         %if;z1.has_notes;%z1.notes;%end;
         %if;z1.has_linked_page.NOTE;&gt;&gt; %z1.linked_page.NOTE;%end;
       </td></tr></tbody></table></div>
@@ -258,7 +258,7 @@
 %define;somebody_spouse_parent()
   %if;(evar.parents = "on")
     %if;(spouse.has_parents)
-      <br%/><small>[parents] : %apply;link2("spouse.father") [and] %apply;link2("spouse.mother")</small>
+      <br><small>[parents] : %apply;link2("spouse.father") [and] %apply;link2("spouse.mother")</small>
     %elseif;(lupd = "1")
       %sp;<a href="#m%count;" %ltap;
       onclick="window.open('%prefix;m=ADD_PAR;ip=%spouse.index;');"><span class="add">--</span></a>

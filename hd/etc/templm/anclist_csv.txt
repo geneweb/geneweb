@@ -92,10 +92,10 @@
         %incr_count;%count;
         %apply;csv_line1("yy.zz")
         %apply;csv_line2()
-        <br%/>
+        <br>
         %if;(spouse.sosa_in_list = "")
           %incr_count;%count;
-          %apply;csv_line3("spouse","yy.zz",family_cnt)<br%/>
+          %apply;csv_line3("spouse","yy.zz",family_cnt)<br>
         %end;
         %if;(evar.cousins="on" and child.has_families and child.sosa_in_list = "")
           %apply;csv_line("yy.zz",child_cnt)
@@ -104,7 +104,7 @@
     %else;
       %incr_count;%count;
       %apply;csv_line1("yy.zz")%nn;
-       ;;;<br%/>
+       ;;;<br>
     %end;
   %end;
 %end;
@@ -151,7 +151,7 @@
 ;[marriage/marriages]0_first_name_key_val%nn;
 ;[marriage/marriages]0_surname_key_val%nn;
 ;[marriage/marriages]0_occ%nn;
-<br%/>
+<br>
 %reset_count;
 %foreach;ancestor_level(l_v)
   %if;(level != 1 and evar.only != "on" or level = l_v)

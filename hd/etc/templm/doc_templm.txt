@@ -31,10 +31,10 @@
   </td>
 </tr>
 <tr>
-  <td>datalist_fn=%bvar.datalist_fn;<br%/>
-      datalist_sn=%bvar.datalist_sn;<br%/>
-      datalist_occu=%bvar.datalist_occu;<br%/>
-      datalist_place=%bvar.datalist_place;<br%/>
+  <td>datalist_fn=%bvar.datalist_fn;<br>
+      datalist_sn=%bvar.datalist_sn;<br>
+      datalist_occu=%bvar.datalist_occu;<br>
+      datalist_place=%bvar.datalist_place;<br>
       datalist_src=%bvar.datalist_src;</td>
   <td>
     Saisie semi-automatique sur le formulaire individu et famille :

@@ -81,7 +81,7 @@
           %if;(user != "")
             <i>
               %if;(wiz = "")
-                <a href="%prefix;m=HIST;k=%kk;;wiz=%user.v;">%user;</a>%nn;
+                <a href="%prefix;m=HIST&k=%kk;&wiz=%user.v;">%user;</a>%nn;
               %else;
                 %user;
               %end;
@@ -92,7 +92,7 @@
         %if;(bvar.history_diff = "yes")
           <td class="text-center">
             %if;(first_name != "" and person.has_history)
-              <a href="%prefix;m=HIST_DIFF;t=SUM;f=%person.history_file;">
+              <a href="%prefix;m=HIST_DIFF&t=SUM&f=%person.history_file;">
                 <i class="fa fa-history fa-fw" aria-hidden="true" title="[*visualize/show/hide/summary]1 [history]"></i>
                 <span class="sr-only">[history]</span></a>
             %else;

@@ -84,7 +84,7 @@
     %in;
     %let;l_mal1;%if;(l_mal0 != 99)([maximum] %l_mal0; [generation/generations]1)%end;%in;
     <legend><input type="submit" value="Ok"%/></legend>
-    <label>[*specify::generation/generations]0 %l_mal1; :<br%/>
+    <label>[*specify::generation/generations]0 %l_mal1; :<br>
       <select style="text-align:center" name="v" size="%expr(max_anc_level-1)">
         %foreach;ancestor_level;
           %if;(level != 1)
@@ -110,17 +110,17 @@
         %end;
       </select>
     </label>
-    <br%/>
+    <br>
     <label><input type="checkbox" name="only" value="on" %l_on;
-           %/>[only the generation selected]</label><br%/>
+           %/>[only the generation selected]</label><br>
     <label><input type="checkbox" name="cgl" value="on" %l_on;
-           %/>[cancel GeneWeb links]</label><br%/>
+           %/>[cancel GeneWeb links]</label><br>
     <label><input type="radio" id="tZ" name="t" value="Z" %l_on;
-           %/>[table]</label><br%/>
+           %/>[table]</label><br>
     <label><input type="radio" name="t" value="H" %l_on;
-           %/>[horizontally]</label><br%/>
+           %/>[horizontally]</label><br>
     <label><input type="radio" name="t" value="L" %l_on;
-           %/>[list/list (ancestors)]1</label><br%/>
+           %/>[list/list (ancestors)]1</label><br>
   </fieldset>
   <fieldset>
     %let;l_on1;onchange="valid('tF')"%in;
@@ -129,30 +129,30 @@
     </legend>
     <fieldset>
       <label><input type="radio" id="tSB" name="tf1" value="sb" %l_on1; %l_on;
-             %/>[surnames branch]</label><br%/>
+             %/>[surnames branch]</label><br>
       <label><input type="radio" id="tSURN" name="tf1" value="surn" %l_on1; %l_on;
-             %/>[list eclair]0 - [surname/surnames]1 / [places]</label><br%/>
+             %/>[list eclair]0 - [surname/surnames]1 / [places]</label><br>
       <label><input type="radio" id="tPLACE" name="tf1" value="place" %l_on1; %l_on;
-             %/>[list eclair]0 - [places]</label><br%/>
+             %/>[list eclair]0 - [places]</label><br>
       <label><input type="radio" id="tTAG" name="tf1" value="tag" %l_on1; %l_on;
-             %/>étiquette</label><br%/>
+             %/>étiquette</label><br>
     </fieldset>
     <fieldset>
       <legend>[*statistics]</legend>
       <label><input type="radio" id="tCAL" name="tf1" value="cal" %l_on1; %l_on;
-             %/>[calendar/calendars]0</label><br%/>
+             %/>[calendar/calendars]0</label><br>
       <label><input type="radio" id="tBMDM" name="tf1" value="bmdm" %l_on1; %l_on;
-             %/>[year/month/day]1</label><br%/>
+             %/>[year/month/day]1</label><br>
       <label><input type="radio" id="tAFM" name="tf1" value="afm" %l_on1; %l_on;
-             %/>[age] ([father/mother]0, [father/mother]1)</label><br%/>
+             %/>[age] ([father/mother]0, [father/mother]1)</label><br>
       <label><input type="radio" id="tAAX" name="tf1" value="aax" %l_on1; %l_on;
-           %/>[age at %s birth date:::x]</label><br%/>
+           %/>[age at %s birth date:::x]</label><br>
       <label><input type="radio" id="tNXD" name="tf1" value="nxd" %l_on1; %l_on;
-           %/>[year/month/day]0 [death] - [year/month/day]0 [death] x</label><br%/>
+           %/>[year/month/day]0 [death] - [year/month/day]0 [death] x</label><br>
       <label><input type="radio" id="tAAD" name="tf1" value="aad" %l_on1; %l_on;
-             %/>[age at death]</label><br%/>
+             %/>[age at death]</label><br>
       <label><input type="radio" id="tMM" name="tf1" value="mm" %l_on1; %l_on;
-             %/>[year/month/day]1 [birth] = [year/month/day]1 [death] ?</label><br%/>
+             %/>[year/month/day]1 [birth] = [year/month/day]1 [death] ?</label><br>
       <label><input type="radio" id="tARS" name="tf1" value="ars" %l_on1; %l_on;
              %/>Αἰθήρ</label>
     </fieldset>
@@ -185,18 +185,18 @@
         </label>
       </legend>
       <label><input type="radio" name="t1" value="T" %l_on; %l_on1;
-             %if;(evar.t1 = "T") checked="checked"%end;%/>[full tree]</label><br%/>
+             %if;(evar.t1 = "T") checked="checked"%end;%/>[full tree]</label><br>
       <label><input type="radio" name="t1" value="A" %l_on; %l_on1
-             %/>[male line/female line]0</label><br%/>
+             %/>[male line/female line]0</label><br>
       <label><input type="radio" name="t1" value="C" %l_on; %l_on1
-             %/>[male line/female line]1</label><br%/>
+             %/>[male line/female line]1</label><br>
       <label>     <input type="checkbox" name="dag" value="on" %l_on1; %l_on;
-             %/>[dag]</label><br%/>
+             %/>[dag]</label><br>
       <label>     <input type="checkbox" name="marriage" value="on" %l_on1; %l_on;
-             %/>[marriage/marriages]0</label><br%/>
+             %/>[marriage/marriages]0</label><br>
       <label>     <input type="checkbox" name="image" value="on" %l_on1; %l_on;
-             %/>[image/images]1</label><br%/>
-      <label>[border]<input name="bd" size="1" maxlength="2" value="0" %l_on1; %/></label><br%/>
+             %/>[image/images]1</label><br>
+      <label>[border]<input name="bd" size="1" maxlength="2" value="0" %l_on1; %/></label><br>
       <table summary="colors" cellspacing="0" cellpadding="0">
         <tr>
           <td align="%left;">[color] </td>
@@ -262,23 +262,23 @@
              %/>[*long display]</label>
     </legend>
     <label><input type="checkbox" name="siblings" value="on" checked="checked" %l_on1; %l_on;
-           %/>[siblings]</label><br%/>
+           %/>[siblings]</label><br>
     <label><input type="checkbox" name="alias" value="on" checked="checked" %l_on1; %l_on;
-           %/>[surname alias], [first name alias]</label><br%/>
+           %/>[surname alias], [first name alias]</label><br>
     <label><input type="checkbox" name="spouse" value="on" checked="checked" %l_on1; %l_on;
-           %/>[include spouses]</label><br%/>
+           %/>[include spouses]</label><br>
     <label><input type="checkbox" name="parents" value="on" checked="checked" %l_on1; %l_on;
-           %/>[parents]</label><br%/>
+           %/>[parents]</label><br>
     <label><input type="checkbox" name="rel" value="on" checked="checked" %l_on1; %l_on;
-           %/>[relation/relations]1</label><br%/>
+           %/>[relation/relations]1</label><br>
     <label><input type="checkbox" name="witn" value="on" checked="checked" %l_on1; %l_on;
-           %/>[witness/witnesses]1</label><br%/>
+           %/>[witness/witnesses]1</label><br>
     <label><input type="checkbox" name="notes" value="on" checked="checked" %l_on1; %l_on;
-           %/>[note/notes]1</label><br%/>
+           %/>[note/notes]1</label><br>
     <label><input type="checkbox" name="src" value="on" checked="checked" %l_on1; %l_on;
-           %/>[source/sources]1</label><br%/>
+           %/>[source/sources]1</label><br>
     <label><input type="checkbox" name="upd" value="on" %l_on1; %l_on;
-           %/>[update]</label><br%/>
+           %/>[update]</label><br>
     <label><input type="checkbox" name="hide" value="on" %l_on1; %l_on;
            %/>[visualize/show/hide/summary]2 … </label>
   </fieldset>
@@ -294,7 +294,7 @@
                %/>[*missing ancestors]</label>
       </legend>
       <label><input type="checkbox" name="al" value="on" %l_on1; %l_on;
-             %/>[alphabetic order]</label><br%/>
+             %/>[alphabetic order]</label><br>
       <label><input type="checkbox" name="ms" value="on" %l_on1; %l_on;
              %/>[first name/first names]1, [surname/surnames]1 = ??</label>
     </fieldset>
@@ -305,9 +305,9 @@
                %/>[*date/dates]0 &lt;&gt; [exact]</label>
       </legend>
       <label><input type="checkbox" name="M3b" value="b" %l_on1; %l_on;
-             %/>[birth]</label><br%/>
+             %/>[birth]</label><br>
       <label><input type="checkbox" name="M3m" value="m" %l_on1; %l_on;
-             %/>[marriage/marriages]0</label><br%/>
+             %/>[marriage/marriages]0</label><br>
       <label><input type="checkbox" name="M3d" value="d" %l_on1; %l_on;
              %/>[death]</label>
     </fieldset>

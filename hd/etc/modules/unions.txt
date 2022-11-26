@@ -199,8 +199,8 @@
             <sup>%count;</sup>
           %end;
         %end;
-        %if;are_divorced;, [divorced]%divorce_date;%end;
-        %if;are_separated;, [separated]
+        %if;are_divorced;, [divorced] %divorce_date;%end;
+        %if;are_separated;, [separated]%sp;
           %foreach;event;
             %if;(event.name=[separate event]0)%event.date;%end;
           %end;
@@ -222,7 +222,7 @@
           %( On rétablie l'ancienne valeur de count %)
           %apply;init_count(prev_count)
         %end;
-        %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br%/>%nl;%end;
+        %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
       </li>
     %end;
   </ul>
@@ -398,7 +398,7 @@
            %end;
         </div>
       %end;
-      %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br%/>%nl;%end;
+      %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
     %end;
     %if;(are_divorced or are_separated)
       <div class="mb-1 text-muted">
@@ -409,7 +409,7 @@
             %end;
           %end;
         %end;
-        %if;not are_divorced;.%else;%if;are_separated;, [divorced]%else;[*divorced]%end;%divorce_date;.%end;
+        %if;not are_divorced;.%else;%if;are_separated;, [divorced]%else;[*divorced]%end; %divorce_date;.%end;
       </div>
     %end;
     </li></ul>
@@ -440,8 +440,8 @@
         %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
           <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;%nn;
-        %if;are_divorced;, [divorced]0%divorce_date;%sp;%end;
-        %if;are_separated;, [separated]0
+        %if;are_divorced;, [divorced]0 %divorce_date;%sp;%end;
+        %if;are_separated;, [separated]0%sp;
           %foreach;event;
             %if;(event.name=[separate event]0)%event.date;%end;
           %end;
@@ -464,7 +464,7 @@
                       <em>%child;%child.title;%child.dates;</em>
                     %end;%nn;
                     , %apply;loc_long_married("child")%sp;
-                    %apply;short_display_person("spouse")<br%/>
+                    %apply;short_display_person("spouse")<br>
                   %end;
                 %end;
               </li>
@@ -473,7 +473,7 @@
           %( On rétablie l'ancienne valeur de count %)
           %apply;init_count(prev_count)
         %end;
-        %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br%/>%nl;%end;
+        %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
       </li>
     %end;
   </ul>
@@ -503,8 +503,8 @@
         %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)%nn;
           <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;
-        %if;are_divorced;, [divorced]0%divorce_date;%sp;%end;
-        %if;are_separated;, [separated]0
+        %if;are_divorced;, [divorced]0 %divorce_date;%sp;%end;
+        %if;are_separated;, [separated]0%sp;
           %foreach;event;
             %if;(event.name=[separate event]0)%event.date;%end;
           %end;
@@ -558,7 +558,7 @@
                         </ul>
                       </div>
                     %else;
-                      <br/>
+                      <br>
                     %end;
                   %end;
                 %end;
@@ -568,7 +568,7 @@
           %( On rétablie l'ancienne valeur de count %)
           %apply;init_count(prev_count)
         %end;
-        %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br%/>%nl;%end;
+        %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
       </li>
     %end;
   </ul>
@@ -615,7 +615,7 @@
         %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)%nn;
           <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;
-        %if;are_divorced;, [divorced]0%divorce_date;%end;
+        %if;are_divorced;, [divorced]0 %divorce_date;%end;
         %if;are_separated;, [separated]0%end;
         %if;spouse.has_image;
               </td>
@@ -655,7 +655,7 @@
                       <em>%child;%child.title;%child.dates;</em>%end;
                     <em>&nbsp;%apply;long_married_f("child", "lower")</em>
                     %apply;short_display_person_f("spouse")%nn;
-                    %if;are_divorced; [divorced]0%divorce_date;%end;
+                    %if;are_divorced; [divorced]0 %divorce_date;%end;
                     %if;are_separated; [separated]0%end;%nn;
                     %if;(nb_children!=0)
                       &nbsp;[having as children]0
@@ -668,12 +668,12 @@
                               %if;child.has_families;
                                 %foreach;child.family;
                                   %if;(family_cnt!=1)
-                                    <br%/><img width="10" height="10"%sp;
+                                    <br><img width="10" height="10"%sp;
                                             src="%image_prefix;/1pixel.png" alt="1px" title=""%/>
                                     <em>%child;%child.title;%child.dates;</em>%nl;%end;
                                   <em>&nbsp;%apply;long_married_f("child", "lower")</em>
                                   %apply;short_display_person_f("spouse")
-                                  %if;are_divorced; [divorced]0%divorce_date;%end;
+                                  %if;are_divorced; [divorced]0 %divorce_date;%end;
                                   %if;are_separated; [separated]0%end;
                                   %if;(nb_children!=0)
                                     &nbsp;[having as children]0[:]
@@ -697,7 +697,7 @@
                     %else;
                       %if;(child.has_image and family_cnt=1)
                         </td></tr></table>
-                      %else;<br%/>%nl;%end;
+                      %else;<br>%nl;%end;
                     %end;
                   %end;
                 %else;
@@ -707,7 +707,7 @@
             %end;
           </ul>
         %end;
-        %if;(evar_opt="from" and wizard)<em>(%origin_file;)</em><br%/>%nl;%end;
+        %if;(evar_opt="from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
       </li>
     %end;
   </ul>

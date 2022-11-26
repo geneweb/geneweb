@@ -46,7 +46,7 @@
           %end;
         %end;
       %end;
-      %l3;<a href="%prefix;%xx.access;">%xx;</a>%xx.title;%xx.dates;<br%/>
+      %l3;<a href="%prefix;%xx.access;">%xx;</a>%xx.title;%xx.dates;<br>
     %else;
       <tt>ss2%l1;%l2;</tt>%nn;
       %if;(xx.has_parents and curlev > 1)
@@ -58,7 +58,7 @@
           %end;
         %end;
       %end;
-      %l3;%xx;%xx.title;%xx.dates;<br%/>
+      %l3;%xx;%xx.title;%xx.dates;<br>
     %end;
     %if;(xx.has_parents)
       %apply;horizontally1("xx.mother",curlev - 1,"ss3 │ ","ss3 ","ss3   ",z1 * 2 + 1)
@@ -110,7 +110,7 @@
             <a href="%prefix;%xx.father.access;">%xx.father;</a>%nn;
             %xx.father.title;%xx.father.dates;
             %sp;&amp;%if;(marriage_date.year != "")%marriage_date.prec;%marriage_date.year;%end;%sp;
-            %xx.mother; %xx.mother.title;%xx.mother.dates;<br%/>
+            %xx.mother; %xx.mother.title;%xx.mother.dates;<br>
             %if;(evar.siblings = "on" and xx.has_siblings)
               %let;l4;
                 %if;(curlev = evar.v)│%nn;
@@ -125,7 +125,7 @@
                   %if;(child_cnt < 10)─%end;
                   %child_cnt;
                   %if;(is_male)──%elseif(is_female)══%else;◦◦%end;
-                </tt> %child_name; %child.dates;<br%/>
+                </tt> %child_name; %child.dates;<br>
               %end;
             %end;
           %end;
@@ -139,7 +139,7 @@
             %xx.father;
             %xx.father.title;%xx.father.dates;
              %sp;&amp;%if;(marriage_date.year != "")%marriage_date.prec;%marriage_date.year;%end;%sp;
-            %xx.mother; %xx.mother.title;%xx.mother.dates;<br%/>
+            %xx.mother; %xx.mother.title;%xx.mother.dates;<br>
           %end;
         %end;
       %end;
@@ -217,7 +217,7 @@
     %if;(xx.father.has_parents)
       %apply;horizontally3("xx.father",curlev - 1,"ss1   ","ss1","ss1│  ",z1 * 2)
     %end;
-    ss1%l5;%l3;%l7c;%l7e;<br%/>
+    ss1%l5;%l3;%l7c;%l7e;<br>
     ss2%l1;%nn;
     %if;(not cancel_links)
       <a href="%nn;
@@ -241,8 +241,8 @@
           %end;
           %xx.father.title;%xx.father.dates;
           %sp;&amp;<small>%if;(marriage_date.year != "")%marriage_date.prec;%marriage_date.year;%end;</small>
-          %xx.mother;%xx.mother.title;%xx.mother.dates;<br%/>
-          ss3%l6;%l3;%l8b;%l8c;%l8e;<br%/>
+          %xx.mother;%xx.mother.title;%xx.mother.dates;<br>
+          ss3%l6;%l3;%l8b;%l8c;%l8e;<br>
           %if;(evar.siblings = "on" and xx.has_siblings)
             %let;l10;%if;(xx.mother.has_parents and curlev != 2)│ %else;  %end;%in;
             %foreach;child;
@@ -261,14 +261,14 @@
                 %end;
               %in;
               %let;l11e;%if;(l11d > l11a and l11d >= l11b)%apply;line_e(l11d - l11b + 1,sex)%end;%in;
-              ss3%l10;%l7c;%l3; │      %l11c;%l11e;<br%/>
+              ss3%l10;%l7c;%l3; │      %l11c;%l11e;<br>
               ss3%l10;%l7c;%l3;%nn;
               %if;(child_cnt = nb_children) └%else; ├%end;
               %if;(child_cnt < 10)─%end;
               %child_cnt;%nn;
               %if;(is_male)──%elseif(is_female)══%else;◦◦%end;
               %if;(browsing_with_sosa_ref and has_sosa)● %else;  %end;
-              %l11c;%child_name;%child.dates;<br%/>
+              %l11c;%child_name;%child.dates;<br>
             %end;
           %end;
         %end;
@@ -316,11 +316,11 @@
     %end;
   %in;
   <p style="font-family:monospace;line-height:12pt;font-size:12pt;white-space:nowrap;">
-    %apply;space(l_v)%for;i;0;l_x2;0123456789%end;<br%/>
-    %apply;space(l_v)%apply;line_a(l_x2,l_x0)<br%/>
-    %apply;horizontally3("self",l_v,"   ","","   ",2)<br%/>
-    %apply;space(l_v)%for;i;0;l_x2;0123456789%end;<br%/>
-    %apply;space(l_v)%apply;line_a(l_x2,l_x0)<br%/>
+    %apply;space(l_v)%for;i;0;l_x2;0123456789%end;<br>
+    %apply;space(l_v)%apply;line_a(l_x2,l_x0)<br>
+    %apply;horizontally3("self",l_v,"   ","","   ",2)<br>
+    %apply;space(l_v)%for;i;0;l_x2;0123456789%end;<br>
+    %apply;space(l_v)%apply;line_a(l_x2,l_x0)<br>
   </p>
 %elseif;(evar.xy = "on")
   %( horizontally x & y %)

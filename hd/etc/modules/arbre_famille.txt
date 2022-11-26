@@ -78,7 +78,7 @@
       %apply;image_MF("xxx")%)
       %if;(not (cancel_links or xxx.is_restricted))
       <a class="normal_anchor" %nn;
-        href="%prefix;%xxx.access;;"
+        href="%prefix;%xxx.access;"
         title="%apply;a_of_b%with;[*vital record]%and;%if;(xxx="? ?")[unknown person]%else;%xxx;%end;%end;%personinfo;">%nn;
       %end;
       %xxx;
@@ -86,7 +86,7 @@
       </a>
       %end;
       %if;(wizard and not cancel_links)
-        <a class="normal_anchor" href="%prefix;m=MOD_IND;i=%xxx.index;;" %nn;
+        <a class="normal_anchor" href="%prefix;m=MOD_IND&i=%xxx.index;" %nn;
           title="[*modify::] %if;(xxx="? ?")[unknown person]%else;%xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;%end;%personinfo;">%nn;
       %end;
       <span class="text-nowrap font-italic">%nn;

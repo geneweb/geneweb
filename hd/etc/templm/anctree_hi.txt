@@ -229,9 +229,9 @@
   %if;(evar.sosa2="on")<span%else;<tt%end; style="top:%top_;px;left:%left_;px">
     %for;i;0;nn;
       %if;(oo=0)
-        %if;(yy=0)│<br%/>%else;─%if;(evar.sosa2="on" and (evar.v<9 and evar.cpl!="on") or (evar.v<8 and evar.cpl="on") and nn!=1)───%elseif;(evar.sosa2="on" and nn!=1)─%end;%end;
+        %if;(yy=0)│<br>%else;─%if;(evar.sosa2="on" and (evar.v<9 and evar.cpl!="on") or (evar.v<8 and evar.cpl="on") and nn!=1)───%elseif;(evar.sosa2="on" and nn!=1)─%end;%end;
       %elseif;(oo=1)
-        %if;(yy=0)─%if;(evar.sosa2="on" and (evar.v<9 and evar.cpl!="on") or (evar.v<8 and evar.cpl="on") and nn!=1)───%elseif;(evar.sosa2="on" and nn!=1)─%end;%else;│<br%/>%end;
+        %if;(yy=0)─%if;(evar.sosa2="on" and (evar.v<9 and evar.cpl!="on") or (evar.v<8 and evar.cpl="on") and nn!=1)───%elseif;(evar.sosa2="on" and nn!=1)─%end;%else;│<br>%end;
       %end;
     %end;
   </%if;(evar.sosa2="on")span%else;tt%end;>

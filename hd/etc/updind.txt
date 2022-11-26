@@ -370,7 +370,7 @@
 
 %(<!-- one_empty_witness is not used anymore
 %define;one_empty_witness(xcnt, wcnt, evt_name)
-  <br%/>
+  <br>
   <table style="border-width:1;width:700">
     <tr>
       <td><b><i>[*witness/witnesses]0</i></b></td>
@@ -756,10 +756,10 @@
 </h2>
 <div class="card-body">
   <h5 class="card-title"><b>[*other action][:] </b>
-    <a href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" title="[*changed order of person's events]">[*invert::event/events]1</a> |
+    <a href="%prefix;m=CHG_EVT_IND_ORD&i=%index;" title="[*changed order of person's events]">[*invert::event/events]1</a> |
     %if;(bvar.can_send_image != "no" and not has_image_url and first_name != "?" and surname != "?")
-      <a href="%prefix;m=SND_IMAGE;i=%index;">[*modify::]/[delete::]/[add picture]</a>
-    %end; | <a href="%prefix;m=MRG;i=%index;">[*merge::]</a> | <a href="%prefix;m=DEL_IND;i=%index;">[*delete::]</a></h5>
+      <a href="%prefix;m=SND_IMAGE&i=%index;">[*modify::]/[delete::]/[add picture]</a>
+    %end; | <a href="%prefix;m=MRG&i=%index;">[*merge::]</a> | <a href="%prefix;m=DEL_IND&i=%index;">[*delete::]</a></h5>
   <div class="form-group mt-4">
     <div class="row">
       <label for="first_name" class="col-sm-2 col-form-label">[*first name/first names]0</label>

@@ -101,7 +101,7 @@
   <label> └ [color] %for;i;0;8;
         %let;bgi;bg%i;%in;
         <a style="style:inline" class="%bgi;"><input type="radio" name="color" value="%bgi;" %l_on1; %l_on;
-                          %if;(evar.color=bgi) checked="checked"%end;%/></a>%if;(i=3)<br%/>                 %end;
+                          %if;(evar.color=bgi) checked="checked"%end;%/></a>%if;(i=3)<br>                 %end;
       %end;</table>
 %end;
 
@@ -116,7 +116,7 @@
          %if;(evar.t1="CT" and evar.cpl="on")13%elseif;(evar.t1="CT" and evar.cpl="")12%else;%l_emaxv;%end;"
        %end;
   title="%if;(evar.m = "A" and evar.t = "T")[*maximum][:]%nl;[*full tree] %l_emaxv; [generation/generations]1%nl;[*compact tree] H [or] I  13 [generation/generations]1&#013;     [by couple] 14 [generation/generations]1%end;%nl;[*with] [n° Sosa] 12 [generation/generations]1%nl;    [by couple] 13 [generation/generations]1"
-        accesskey="X"/>[generation/generations]1 <code>(X)</code></label><br/>
+        accesskey="X"/>[generation/generations]1 <code>(X)</code></label><br>
 %end;
 
 %define;envkb()
@@ -207,7 +207,7 @@
                          ├ <a href="%prefix;m=A;t=T;v=%l_v;;%access;;dag=on;notab=on" accesskey="/"
                               title="[display by slices/slice width/overlap/total width]0 (/)"
                           >[display by slices/slice width/overlap/total width]0</a>
-         %end;<br%/>
+         %end;<br>
         %apply;border_color()
       </fieldset>
       
@@ -222,7 +222,7 @@
             name="gen" class="number" value="%evar.gen;"
             size="1" placeholder="40"
           %/></label>
-        <br%/><br%/>
+        <br><br>
         %let;l_on1;%in;
         %apply;checkbox("  ","cgl",[*cancel GeneWeb links],"")
         %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
@@ -253,14 +253,14 @@
                          └<input type="checkbox" name="sms" value="on" %l_on;
                         %if;(evar.sms = "on") checked="checked"%end;%/>
                         [visualize/show/hide/summary]1 [missing sosa]</label>
-        <br%/>
+        <br>
         <label title="[*full tree] [with] 256 [n° Sosa] + extra [generation/generations]0
                       = 9 [generation/generations]1">
               <input  type="radio" name="t1" value="m" %l_on;
                 %if;(evar.t1 = "m") checked="checked"%end;
               %/>
               [*mtree]</label>
-        <br%/>
+        <br>
         <label title="">
               <input type="hidden" name="p_mod" value="a6">
               <input  type="radio" name="t1" value="h7" %l_on;
