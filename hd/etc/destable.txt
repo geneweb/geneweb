@@ -189,7 +189,7 @@
   %let;symb;%if;("yyy"="birth")°%elseif;("yyy"="death" and xxx.is_dead)†%end;%in;
   %if;(e.yyy="on" and famx=1)
     <td class="align-middle text-right%if;not cancel_links; table_big_cell%end;
-      %if;(e.hl="on")
+      %if;(e.hl=1)
         %if;((not xxx.has_yyy_date or xxx.yyy_date.month="" or xxx.yyy_date.day="" or xxx.yyy_date.prec!="") 
             and ("yyy"="birth" or (xxx.is_dead and "yyy"="death"))) table-warning
         %elseif;(not xxx.is_dead and "yyy"="death") table-active%end;
@@ -217,7 +217,7 @@
           %elseif;(xxx.has_yyy_note and xxx.has_yyy_source) notesource%nn;
           %end;
         %end;
-        %if;(e.hl="on")
+        %if;(e.hl=1)
           %if;(not xxx.has_yyy_place and ("yyy"="birth" or (xxx.is_dead and "yyy"="death"))) table-warning
           %elseif;(not xxx.is_dead and "yyy"="death") table-active%end;
         %end;"%sp;
@@ -297,7 +297,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
           %elseif;(not has_notes and has_psources) source%nn;
           %elseif;(has_notes and has_psources) notesource%nn;
           %end;
-        %end;%if;(e.hl="on" and ("?" is_substr xxx or xxx.first_name="N." or xxx.first_name="Nn"
+        %end;%if;(e.hl=1 and ("?" is_substr xxx or xxx.first_name="N." or xxx.first_name="Nn"
               or xxx.first_name="Xx" or xxx.first_name="Yy" or xxx.first_name="Xy")) table-warning%end;"%nn;
         %rowspan;%nn;
         %if;(e.ns=1 and (has_notes or has_psources)) tabindex="0"%sp;
@@ -331,7 +331,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
           %elseif;(not xxx.has_notes and xxx.has_psources) sourcespouse%nn;
           %elseif;(xxx.has_notes and xxx.has_psources) notesourcespouse%nn;
           %end;
-        %end;%if;(e.hl="on" and ("?" is_substr xxx or xxx.first_name="N." or xxx.first_name="Nn"
+        %end;%if;(e.hl=1 and ("?" is_substr xxx or xxx.first_name="N." or xxx.first_name="Nn"
               or xxx.first_name="Xx" or xxx.first_name="Yy" or xxx.first_name="Xy")) table-warning%end;"%nn;
         %if;(e.ns=1 and (xxx.has_notes or xxx.has_psources)) tabindex="0"%sp;
           data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"%sp;
@@ -371,7 +371,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
 %( En mode H, conjoints %)
   %if;(e.marr="on" and e.t="H")
     %if;(xxx.nb_families=0)
-      <td%if;(e.hl="on") class="table-active"%end;></td>
+      <td%if;(e.hl=1) class="table-active"%end;></td>
     %else;
       %foreach;xxx.family;
         %if;(family_cnt=fam_cnt)
@@ -382,7 +382,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
               %elseif;(spouse.has_notes and spouse.has_psources) notesource%nn;
               %end;
           %end;
-          %if;(e.hl="on" and ("?" is_substr spouse or spouse.first_name="N." or  spouse.first_name="Nn" or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) table-warning%end;"%nn;
+          %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or  spouse.first_name="Nn" or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) table-warning%end;"%nn;
           %if;(e.ns=1 and (spouse.has_notes or spouse.has_psources)) tabindex="0"%sp;
             data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
             data-content='%if;(spouse.has_notes)%apply;clean_comment_tag(spouse.notes)%end;
@@ -406,14 +406,14 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
 %( Date de mariage %)
   %if;(e.marr_date="on")
     %if;(xxx.nb_families=0)
-      <td%if;(e.hl="on") class="table-active"%end;></td>
+      <td%if;(e.hl=1) class="table-active"%end;></td>
     %else;
       %foreach;xxx.family;
         %if;((nb_families=1 and "yyy"="desc") or (nb_families>1 and
             ((xxx.spouse=zzz and (ddd=family.index)) or
              (xxx=zzz and family_cnt=fam_cnt and e.t="H"))))
           <td class="align-middle text-right%if;not cancel_links; table_big_cell%end;
-            %if;(e.hl="on" and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) table-warning%end;"
+            %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) table-warning%end;"
             rowspan="%if;(e.t="I" and zzz.nb_families=1)2%else;1%end;">
             %if;(wizard and not cancel_links)
               <a class="d-block table_big_anchor" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"%sp;
@@ -434,14 +434,14 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
         %end;
       %end;
       %if;(e.t="I" and nb_families>1 and "yyy"="desc")
-        <td%if;(e.hl="on") class="table-active"%end; title="[*edit family on spouse]"></td>
+        <td%if;(e.hl=1) class="table-active"%end; title="[*edit family on spouse]"></td>
       %end;
     %end;
   %end;
 %( Lieu de mariage %)
   %if;(e.marr_place="on")
     %if;(xxx.nb_families=0)
-      <td%if;(e.hl="on") class="table-active"%end;></td>
+      <td%if;(e.hl=1) class="table-active"%end;></td>
     %else;
       %foreach;xxx.family;
         %if;((nb_families=1 and "yyy"="desc") or
@@ -455,7 +455,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
               %elseif;(has_marriage_note and has_marriage_source) notesource%nn;
               %end;
             %end;
-            %if;(e.hl="on" and marriage_place="") table-warning%end;"
+            %if;(e.hl=1 and marriage_place="") table-warning%end;"
             rowspan="%if;(e.t="I" and zzz.nb_families=1)2%else;1%end;"%nn;
             %if;(e.ns=1 and (has_marriage_note or has_marriage_source)) tabindex="0"
               data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"%sp;
@@ -476,7 +476,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
         %end;
       %end;
       %if;(e.t="I" and nb_families>1 and "yyy"="desc")
-        <td%if;(e.hl="on") class="table-active"%end;></td>
+        <td%if;(e.hl=1) class="table-active"%end;></td>
       %end;
     %end;
   %end;
@@ -519,7 +519,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
 %( Nombre d'enfants %)
   %if;(e.child="on")
     %if;(xxx.nb_families=0)
-      <td%if;(e.hl="on") class="table-active"%end;></td>
+      <td%if;(e.hl=1) class="table-active"%end;></td>
     %else;
       %foreach;xxx.family;
         %if;((nb_families=1 and "yyy"="desc") or (nb_families>1 and
@@ -836,7 +836,8 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
         %if;(e.gen=1 and lev<max_desc_level)
           <tr>
             <th class="text-left" scope="row" colspan="%nb_col;">
-              <span class="ml-1" title="Debug count using cousin.l.v function: %apply;desc_cousin_count_l%with;%expr(lev+1)%end; desc. (should be identical)">[*generation/generations]0 %expr(lev+1) :             %apply;desc_count(lev+1,1,1,0,0)</span>
+              <span class="ml-1" title="Debug count using cousin.l.v function: %apply;desc_cousin_count_l%with;%expr(lev+1)%end; desc. (should be identical)">[*generation/generations]0 %expr(lev+1) : + %cousins.0.3; (%apply;desc_count(lev+1,1,1,0,0))
+               || %apply;desc_cousin_count_l%with;%expr(lev+1)%end; || %cousins2.0.lev; </span>
             </th>
           </tr>
         %end;

@@ -61,6 +61,7 @@
 %let;prev_sibling_access;%get_var.prevsiblingaccess;%in;
 %let;next_sibling_access;%get_var.nextsiblingaccess;%in;
 %if;(e.m="A" or e.m="D")
+<nav class="navbar fixed-bottom navbar-light bg-light justify-content-center">
   <div class="btn-toolbar%if;(e.m="D" or e.dag=1) mt-2%end;" role="toolbar" arial-label="agnatic and cognatic buttons group">
     <div class="btn-group border rounded mr-1" role="group" aria-label="ascendant tree buttons group">
       <a role="button" href="%prefix_base_password;%foreach;env_binding;%if;(env.key!="m" and env.key!="t" and env.key!="dag")%env.key=%env.val;&%end;%end;m=A&t=A"
@@ -188,3 +189,4 @@
     </div>
   </div>
 %end;
+</nav>
