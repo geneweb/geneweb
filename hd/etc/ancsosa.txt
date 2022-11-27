@@ -1112,7 +1112,7 @@
   %let;symb;%if;("xxx"="birth")°%elseif;("xxx"="death" and ancestor.is_dead)†%end;%in;
   %if;(e.xxx="on")
     <td class="align-middle text-right table_big_cell
-      %if;(e.hl="on")
+      %if;(e.hl=1)
         %if;((not ancestor.has_xxx_date or ancestor.xxx_date.month="" or ancestor.xxx_date.day="" or ancestor.xxx_date.prec!="") 
             and ("xxx"="birth" or (ancestor.is_dead and "xxx"="death"))) table-warning
         %elseif;(not ancestor.is_dead and "xxx"="death") table-active%end;
@@ -1141,7 +1141,7 @@
           %elseif;(ancestor.has_xxx_note and ancestor.has_xxx_source) notesource%nn;
           %end;
         %end;
-        %if;(e.hl="on")
+        %if;(e.hl=1)
           %if;(not ancestor.has_xxx_place and ("xxx"="birth" or (ancestor.is_dead and "xxx"="death"))) table-warning
           %elseif;(not ancestor.is_dead and "xxx"="death") table-active%end;
         %end;"%sp;
@@ -1181,7 +1181,7 @@
                     %end;
                   %end;">%nn;
          %else;
-          <a class="table_big_anchor text-danger%if;(e.hl="on") table-warning%end;" title="%apply;a_of_b%with;[*add::parents]%and;%ancestor;%end;"%sp;
+          <a class="table_big_anchor text-danger%if;(e.hl=1) table-warning%end;" title="%apply;a_of_b%with;[*add::parents]%and;%ancestor;%end;"%sp;
            href="%prefix_base_password;m=ADD_PAR&ip=%ancestor.index;">%nn;
          %end;
       %end;
@@ -1206,7 +1206,7 @@
         %elseif;(ancestor.has_notes and ancestor.has_psources) notesource%nn;
         %end;
     %end;
-    %if;(e.hl="on" and ("?" is_substr ancestor or ancestor.first_name="N." or ancestor.first_name="Nn"
+    %if;(e.hl=1 and ("?" is_substr ancestor or ancestor.first_name="N." or ancestor.first_name="Nn"
               or ancestor.first_name="Xx" or ancestor.first_name="Yy" or ancestor.first_name="Xy")) table-warning%end;"%sp;
     %if;(e.ns=1 and (ancestor.has_notes or ancestor.has_psources)) tabindex="0"
       data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
@@ -1247,7 +1247,7 @@
     %foreach;ancestor.family;
       %if;(family_cnt = 1)
         <td class="align-middle
-        %if;(e.hl="on" and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn"
+        %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn"
               or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) table-warning%end;">
           %apply;image_MF("spouse")
           %apply;link%with;%spouse.access;%and;%if;(e.fn="on")%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
@@ -1260,7 +1260,7 @@
     %foreach;ancestor.family;
       %if;(family_cnt = 1)
         <td class="align-middle text-right table_big_cell
-          %if;(e.hl="on" and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) table-warning%end;">
+          %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) table-warning%end;">
           %if;(wizard and not cancel_links)
             <a class="d-block table_big_anchor" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"%sp;
               title="%if;(slash_marriage_date="")[*add::marriage/marriages]0%else;
@@ -1291,7 +1291,7 @@
             %elseif;(has_marriage_note and has_marriage_source) notesource%nn;
             %end;
           %end;
-          %if;(e.hl="on" and marriage_place="") table-warning%end;"%sp;
+          %if;(e.hl=1 and marriage_place="") table-warning%end;"%sp;
           %if;(e.ns=1 and (has_marriage_note or has_marriage_source)) tabindex="0"
             data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
             data-content='%if;(has_marriage_note)%apply;clean_comment_tag(marriage_note)%end;
@@ -1393,7 +1393,7 @@
                   %elseif;(spouse.has_pnotes and spouse.has_psources) notesource%nn;
                   %end;
                 %end;
-                %if;(e.hl="on" and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn"
+                %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn"
               or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) table-warning%end;"
               %if;(e.ns=1 and (spouse.has_psources or spouse.has_pnotes)) tabindex="0"
               data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
@@ -1415,7 +1415,7 @@
           %end;
           %if;(e.marr_date = "on")
             <td class="align-middle text-right table_big_cell
-              %if;(e.hl="on" and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) table-warning%end;">
+              %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) table-warning%end;">
               %if;(wizard and not cancel_links)
                 <a class="d-block table_big_anchor" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
                   title="%if;(slash_marriage_date="")[*add::marriage/marriages]0%else;
@@ -1441,7 +1441,7 @@
                 %elseif;(has_marriage_note and has_marriage_source) notesource%nn;
                 %end;
               %end;
-              %if;(e.hl="on" and marriage_place="") table-warning%end;"
+              %if;(e.hl=1 and marriage_place="") table-warning%end;"
               %if;(e.ns=1 and (has_marriage_note or has_marriage_source)) tabindex="0"
                 data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
                 data-content='%if;(has_marriage_note)%apply;clean_comment_tag(marriage_note)%end;
