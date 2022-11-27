@@ -1599,6 +1599,10 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       match get_env "count2" env with
       | Vcnt c -> str_val (string_of_int !c)
       | _ -> null_val)
+  | "count3" -> (
+      match get_env "count3" env with
+      | Vcnt c -> str_val (string_of_int !c)
+      | _ -> null_val)
   | "divorce_date" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env -> (
@@ -1672,6 +1676,12 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       | _ -> null_val)
   | "incr_count2" -> (
       match get_env "count2" env with
+      | Vcnt c ->
+          incr c;
+          null_val
+      | _ -> null_val)
+  | "incr_count3" -> (
+      match get_env "count3" env with
       | Vcnt c ->
           incr c;
           null_val
@@ -1824,6 +1834,12 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       | _ -> null_val)
   | "reset_count2" -> (
       match get_env "count2" env with
+      | Vcnt c ->
+          c := 0;
+          null_val
+      | _ -> null_val)
+  | "reset_count3" -> (
+      match get_env "count3" env with
       | Vcnt c ->
           c := 0;
           null_val
@@ -4733,6 +4749,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       ("count", Vcnt (ref 0));
       ("count1", Vcnt (ref 0));
       ("count2", Vcnt (ref 0));
+      ("count3", Vcnt (ref 0));
       ("cousins", Vcousl (ref []));
       ("list", Vslist (ref SortedList.empty));
       ("listb", Vslist (ref SortedList.empty));
