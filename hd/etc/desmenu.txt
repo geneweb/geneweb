@@ -342,7 +342,7 @@ function table_spouse_disabled () {
             <label class="custom-control-label" for="t_gen">[*display generation]</label>
           </div>
           <div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input" id="t_hl" name="hl">
+            <input type="checkbox" class="custom-control-input" id="t_hl" name="hl" value="1">
             <label class="custom-control-label" for="t_hl">[*highlight incomplete data]</label>
           </div>
         </div>

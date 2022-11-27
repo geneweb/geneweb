@@ -80,7 +80,7 @@
         <div class="ml-auto">
           <a role="button"
             (% button to switch only between default and templm templates %)
-            href="%prefix_set.templ;%if(e.templ!="templm")templ=templm;%end;%if;(e.digest="")&%suffix;%end;"
+            href="%if(e.templ!="templm")%url_set.templ.templm;%end;%if;(e.digest="")&%suffix;%end;"
             title="%if(e.templ!="templm")templm%else;default template%end;">%nn;
             <span class="fab fa-markdown" aria-hidden="true"></span>%nn;
             <span class="sr-only">switch to %if(evar.templ!="templm")templm%else;default template%end;</span>%nn;

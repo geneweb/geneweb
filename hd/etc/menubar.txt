@@ -22,11 +22,11 @@
 %end;
 %let;p_mod;%if;(b.p_mod!="" and e.p_mod="")%b.p_mod;%elseif;(e.p_mod!="")%e.p_mod;%end;%in;
 %if;(not cancel_links)
-  <div class="d-flex justify-content-between">
-    <nav class="navbar navbar-light navbar-expand-md%nn;
+    <nav class="navbar sticky-top navbar-light bg-white justify-content-center navbar-expand-md pt-1%nn;
       %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
         or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
         or (e.ip!="" and (e.m="ADD_FAM" or e.m="ADD_FAM_OK" or e.m="ADD_PAR"))) mt-5%end;">
+        <div class="btn-toolbar" role="toolbar" arial-label="tedite">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -322,7 +322,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" id="anc_tree" href="%prefix;%access;&m=A&t=T&v=5" %laY;><span class="fa fa-code-fork fa-fw mr-2"></span>[*ascendants tree]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=H&v=5" title="[*horizontal tree]"><span class="fa fa-timeline fa-rotate-90 fa-fw mr-2"></span>[*horizontal tree]</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=A&t=Z&v=7&maxv=%max_anc_level;&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on&gen=1&ns=1%if;(e.image="off")&image=off%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [ancestors]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=Z&v=7&maxv=%max_anc_level;&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on&gen=1&ns=1&hl=1%if;(e.im=0)&im=0%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [ancestors]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=G&v=3&maxv=%max_anc_level;&siblings=on&alias=on&spouse=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><span class="fa fa-newspaper fa-fw mr-2"></span>[*long display]</a>
                 <a class="dropdown-item" href="%prefix;i=%index;&m=A&t=F&tf1=sb&v=%max_anc_level;&maxv=%max_anc_level;"><span class="fa fa-align-justify fa-fw mr-2"></span>[*surnames branch]</a>
                 <div class="dropdown-divider"></div>
@@ -342,7 +342,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;&m=D&t=T&v=4"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*descendants tree]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=D&t=D&v=%max_desc_level;"><span class="fa fa-code-branch fa-rotate-90 fa-fw mr-2"></span>[*descendant tree view]</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=D&t=H&v=%max_desc_level;&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&gen=on&ns=on%if;(e.image="off")&image=off%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [descendants]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=D&t=I&v=%max_desc_level;&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&gen=1&ns=1&hl=1%if;(e.im="0")&im=0%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [descendants]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=D&t=L&v=3&maxv=%max_desc_level;&siblings=on&alias=on&spouse=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><span class="fa fa-newspaper fa-fw mr-2"></span>[*long display]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=D&t=TV&v=4"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*compact descendants tree]</a>
                 <div class="dropdown-divider"></div>
@@ -391,10 +391,9 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
             </li>
           %end;
         </ul>
-      </div>
+      </div></div>
     </nav>
   %include;home
-  </div>
   %if;(evar.m="C" and e.v1!="" or e.v2!="" and not cancel_links)
     %include;buttons_cousins
   %end;

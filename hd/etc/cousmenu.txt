@@ -92,9 +92,10 @@
     %end;
   %apply;link%with;vvv%and;%and;<span class="badge badge-xl badge-%if;(vvv %2 = 1)primary%else;danger%end;"> %expr(count2-count1)</span> ttt%and;%if;(count2=0)disabled%end;%and;%end;
 %end;
-%(%define;cous(vvv,www)
+%define;cous(vvv,www)
 %cousins.vvv.www;
 %end;
+%()
 %let;mx;%expr(e.v+3)%in;
 %let;2mx;%expr(2*mx)%in;
 <table class="table">
@@ -154,25 +155,34 @@ Extra large	.modal-xl	1140px
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title"><small class="text-muted">X chemins vers</small> %cousins.vvv.www; [cousins.vvv.www]
+        <h5 class="modal-title"><small class="text-muted">%cousins.vvv.www.paths; chemins vers</small> %cousins.vvv.www; [cousins.vvv.www]
         </h5
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
+      %let;test;%in;
         %if;(www=0)
           %( copier liste des ancêtres de cousins.txt? %)
         %else;
-          <ul class="list-unstyled card-columns" style="column-count:2">
-            %let;fake;%expr(i+j+2)%in;
-            %for;i;0;fake;<li>%if;(i %2 = 1)2 × %end;Jean Lorem-Ipsum %i<sup>e%if;(i=1)r%end;</sup></li>%end;
+          <ul class="card-columns"%if;(cousins.vvv.www>100) style="column-count:3"%elseif;(cousins.vvv.www>50) style="column-count:2"%end;>
+            %empty_sorted_list;
+            %foreach;cousin;
+              %apply;add_in_sorted_list%with;
+                %cousin.occ; %cousin.surname; %cousin.first_name%and;
+                <li class="list-group-item" title="%cousin.first_name;.%cousin.occ; %cousin.surname;"><a href="%prefix;%cousin.access;">%cousin.first_name; %cousin.surname;%cousin.dates;%if;(cousin.nbr!=2) (%if;(cousin.nbr=1)½%else;%cousin.nbr;%end;)%end;</li>%and;
+                %cousin.cnt%and;
+                %cousin.index%and;
+                %cousin.nbr%end;
+            %end;
+            %foreach;sorted_list_item;%item.2;%end;
           </ul>
         %end;
       </div>
       <div class="modal-footer">
         <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=www" class="btn btn-primary"><i class="fa-solid fa-wave-square"></i> Détail des chemins c(vvv,www)</a>
-        <a role="button" href="%(m=RLM+sommedesindexs…%)" class="btn btn-primary">Graphe RLM (todo)</a>
+        <a role="button" href="%prefix;m=RLM%foreach;sorted_list_item;&i%item.3;=%item.4;%end;&spouse=on" class="btn btn-primary">Graphe RLM (todo) %test;</a>
       </div>
     </div>
   </div>
@@ -207,7 +217,8 @@ Extra large	.modal-xl	1140px
                      %and;%apply;cousin_lex_tt(i,k)
                    %end;
                  </div>
-                 %apply;cous_mod%with;%i;%and;%k;%end;
+                 %let;tot;%apply;cous(i,k)%in;
+                 %if;(tot!=0)%apply;cous_mod(i,k)%end;
                </td>%nn;
              %end;
           %end;
