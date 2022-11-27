@@ -1689,6 +1689,18 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       match get_env "level" env with
       | Vint i -> str_val (string_of_int i)
       | _ -> null_val)
+  | "list_size" -> (
+      match get_env "list" env with
+      | Vslist l -> str_val (string_of_int (SortedList.cardinal !l))
+      | _ -> raise Not_found)
+  | "listb_size" -> (
+      match get_env "listb" env with
+      | Vslist l -> str_val (string_of_int (SortedList.cardinal !l))
+      | _ -> raise Not_found)
+  | "listc_size" -> (
+      match get_env "listc" env with
+      | Vslist l -> str_val (string_of_int (SortedList.cardinal !l))
+      | _ -> raise Not_found)
   | "marriage_place" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env ->
