@@ -51,8 +51,9 @@
   %foreach;ancestor_level;
     %if;(level=vvv+1)
       %foreach;ancestor;
-        %( add ancestor index to listc>item.1 to filter it afterwards with indexes of cousins %)
-        %apply;add_in_sorted_listc(ancestor.index)
+        %( add ancestor index to listc>item.1 to filter it afterwards with indexes of cousins
+        same cousin.l1.0 instead of ancestor loop but it's not ignoring unknown "? ?" %)
+        %if;(ancestor!="? ?")%apply;add_in_sorted_listc(ancestor.index)%end;
         %incr_count1;
         %(%if;(is_first)<span class="text-nowrap">%nn;
         %else;
@@ -138,7 +139,7 @@
                 <li class="list-group-item d-flex justify-content-%if;(cousin.nbr=2)start%else;between%end; align-items-center nbr_%cousin.nbr;" title="%cousin.first_name;.%cousin.occ; %cousin.surname;">
                   <a href="%prefix;m=RLM&i1=%self.index;&i2=%cousin.index;%nn;
                     %( m=RL&p=first_name_key;&n1=%self.surname_key;&b1=B1?&p2=%cousin.first_name_key;&n2=%cousin.surname_key;&b2=B2? %)
-                  ">%cousin.surname; %cousin.first_name;%cousin.dates;</a>
+                  " class="stretched-link">%cousin.surname; %cousin.first_name;%cousin.dates;</a>
                   %if;(cousin.nbr=1 or cousin.nbr>2)
                     <span class="badge badge-%if;(cousin.nbr%2=1)primary%else;success%end; badge-pill">%cousin.nbr;</span>
                   %end;
@@ -173,7 +174,7 @@
   </div>
 </div></div>
 %end;
-
+%cousins.5.0;
 %( table of cousins.i.j-vvv+i (i.k),  
    table size v (asc) × v+%cousins.max_d; (desc) %)
 %define;table(xxx)
