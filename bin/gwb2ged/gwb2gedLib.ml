@@ -190,9 +190,10 @@ let rec display_note_aux opts tagn s len i =
       display_note_aux opts tagn s (len + 1) (!j + 1)
 
 let display_note opts tagn s =
-  let tag = Printf.sprintf "%d NOTE " tagn in
-  Printf.ksprintf (oc opts) "%s" tag;
-  display_note_aux opts tagn (encode opts s) (String.length tag) 0
+  if opts.Gwexport.no_notes <> `nnn && s <> "" then
+    let tag = Printf.sprintf "%d NOTE " tagn in
+    Printf.ksprintf (oc opts) "%s" tag;
+    display_note_aux opts tagn (encode opts s) (String.length tag) 0
 
 let ged_header opts base ifile ofile =
   Printf.ksprintf (oc opts) "0 HEAD\n";
@@ -225,8 +226,9 @@ let ged_header opts base ifile ofile =
   | Gwexport.Ansi -> Printf.ksprintf (oc opts) "1 CHAR ANSI\n"
   | Gwexport.Ascii -> Printf.ksprintf (oc opts) "1 CHAR ASCII\n"
   | Gwexport.Utf8 -> Printf.ksprintf (oc opts) "1 CHAR UTF-8\n");
+  (* only print base_notes if no_notes is `none *)
   if opts.Gwexport.no_notes = `none then
-    match base_notes_read base "" with "" -> () | s -> display_note opts 1 s
+    display_note opts 1 (base_notes_read base "")
 
 let sub_string_index s t =
   let rec loop i j =
@@ -347,7 +349,7 @@ let ged_ev_detail opts n typ d pl note src =
       Printf.ksprintf (oc opts) "\n"
   | None -> ());
   if pl <> "" then Printf.ksprintf (oc opts) "%d PLAC %s\n" n (encode opts pl);
-  if opts.Gwexport.no_notes <> `nnn && note <> "" then display_note opts n note;
+  display_note opts n note;
   if opts.Gwexport.source = None && src <> "" then
     print_sour opts n (encode opts src)
 
@@ -431,6 +433,13 @@ let relation_format_of_witness_kind :
 let oc' opts s = Printf.ksprintf (oc opts) (s ^^ "\n")
 let oc_witness_kind opts wk = oc' opts (relation_format_of_witness_kind wk)
 
+let witness_format opts base per_sel (ip,wk,wnote) =
+ if per_sel ip then
+     Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
+     Printf.ksprintf (oc opts) "3 TYPE INDI\n";
+     oc_witness_kind opts wk;
+     display_note opts 3 (sou base wnote)
+
 let ged_pevent opts base per_sel evt =
   let typ =
     if is_primary_pevents evt.epers_name then (
@@ -446,16 +455,7 @@ let ged_pevent opts base per_sel evt =
   let note = sou base evt.epers_note in
   let src = sou base evt.epers_src in
   ged_ev_detail opts 2 typ date place note src;
-  Array.iter
-    (fun (ip, wk, _wnote) ->
-      (* WNOTE TODO *)
-       if per_sel ip then
-         begin
-           Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
-           Printf.ksprintf (oc opts) "3 TYPE INDI\n";
-           oc_witness_kind opts wk
-         end)
-    evt.epers_witnesses
+  Array.iter (witness_format opts base per_sel) evt.epers_witnesses
 
 let adop_fam_list = ref []
 
@@ -587,8 +587,7 @@ let ged_multimedia_link opts base per =
         Printf.ksprintf (oc opts) "2 FILE %s\n" s)
 
 let ged_note opts base per =
-  if opts.Gwexport.no_notes <> `nnn then
-    match sou base (get_notes per) with "" -> () | s -> display_note opts 1 s
+  display_note opts 1 (sou base (get_notes per))
 
 let ged_tag_fevent base evt =
   match evt.efam_name with
@@ -628,13 +627,7 @@ let ged_fevent opts base per_sel evt =
   let note = sou base evt.efam_note in
   let src = sou base evt.efam_src in
   ged_ev_detail opts 2 typ date place note src;
-  (* TODO HANDLE WNOTES FROM GED *)
-  Array.iter (fun (ip, wk, _wnote) ->
-    if per_sel ip then (
-        Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
-        Printf.ksprintf (oc opts) "3 TYPE INDI\n";
-        oc_witness_kind opts wk))
-    evt.efam_witnesses
+  Array.iter (witness_format opts base per_sel) evt.efam_witnesses
 
 let ged_child opts per_sel chil =
   if per_sel chil then
@@ -650,10 +643,7 @@ let ged_fsource opts base fam =
       | s -> print_sour opts 1 (encode opts s))
 
 let ged_comment opts base fam =
-  if opts.Gwexport.no_notes <> `nnn then
-    match sou base (get_comment fam) with
-    | "" -> ()
-    | s -> display_note opts 1 s
+  display_note opts 1 (sou base (get_comment fam))
 
 let has_personal_infos base per =
   get_parents per <> None
