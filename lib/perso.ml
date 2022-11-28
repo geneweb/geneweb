@@ -1222,7 +1222,7 @@ let cousins_t = ref None
 let max_l1_l2_aux env =
   let max_l1 = match get_env "max_anc_level" env with Vint i -> i | _ -> 5 in
   let max_l2 = match get_env "max_desc_level" env with Vint i -> i | _ -> 5 in
-  (max_l1, max_l2)
+  (max_l1 -1 , 2 * max_l1 + max_l2 + 20)
 
 let init_cousins_cnt _conf base env p () =
   match !cousins_t with
@@ -1230,8 +1230,7 @@ let init_cousins_cnt _conf base env p () =
   | None ->
       let t' =
         let max_l1, max_l2 = max_l1_l2_aux env in
-        let max_l2 = max_l1 + max_l2 in
-        Printf.sprintf "******** big compute for %d x %d ********\n" max_l1
+        Printf.sprintf "******** Compute %d × %d table ********\n" max_l1
           max_l2
         |> !GWPARAM.syslog `LOG_WARNING;
         let rec ascendants acc l i =

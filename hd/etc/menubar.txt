@@ -356,7 +356,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
             <div class="dropdown-menu">
               <a class="dropdown-item" href="%prefix;%access;&m=R" %laR;><span class="fa fa-cog fa-fw mr-2"></span>[*relationship computing]</a>
               <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=C"
+                <a class="dropdown-item" href="%prefix;%access;&m=C&v=7"
                   title="[*relationship link/relationship links]0 [with] [close family]"><span class="fa fa-elevator fa-fw mr-2"></span>[*relationship]</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" %nn;
