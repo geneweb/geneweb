@@ -1165,7 +1165,7 @@ type 'a env =
   | Vcell of cell
   | Vcelll of cell list
   | Vcnt of int ref
-  | Vcousl of (iper * (int * ifam * iper)) list ref
+  | Vcousl of (iper * (ifam * iper * int)) list ref
   | Vdesclevtab of ((iper, int) Marker.t * (ifam, int) Marker.t) lazy_t
   | Vdmark of (iper, bool) Marker.t ref
   | Vslist of SortedList.t ref
@@ -1258,14 +1258,14 @@ let init_cousins_cnt _conf base env p () =
           let l2 = List.map (fun (ip, _, _) -> ip) l2 in
           let rec loop0 acc = function
             | (ipar, ifam0, ipar0) :: l ->
-                let ipar0 = if i = 1 then ipar else ipar0 in
+                let ipar0 = if j = 1 then ipar else ipar0 in
                 let fams = Array.to_list (get_family (poi base ipar)) in
                 let chlds =
                   let rec loop1 acc fams =
                     match fams with
                     | [] -> acc
                     | ifam :: fams ->
-                        let ifam0 = if i = 1 then ifam else ifam0 in
+                        let ifam0 = if j = 1 then ifam else ifam0 in
                         let children =
                           let rec loop2 acc2 children =
                             match children with
@@ -1350,18 +1350,18 @@ let cousins_l1_l2_aux conf base env l1 l2 p =
     Some cousins_cnt.(il1).(il2)
   else None
 
-(* create a new list with (count, ifam, ipar) *)
+(* create a new list with (ifam, ipar, cnt) *)
 let cousins_fold list =
-  let cnt = Hashtbl.create 10000 in
-  List.iter
-    (fun (ip, ifam, ipar) ->
-      if Hashtbl.mem cnt ip then
-        let count, ifam0, ipar0 = Hashtbl.find cnt ip in
-        if ifam0 = ifam && ipar0 = ipar then
-          Hashtbl.replace cnt ip (succ count, ifam0, ipar0)
-        else Hashtbl.replace cnt ip (1, ifam0, ipar0))
-    list;
-  Hashtbl.to_seq cnt |> List.of_seq
+  let list = List.sort compare list in
+  let rec loop full acc (ip0, (ifam0, ipar0, cnt0)) =
+    function
+    | (ip, ifam, ipar) :: l when ip = ip0 && ifam = ifam0 ->
+        loop true acc (ip, (ifam, ipar, (cnt0 +1))) l
+    | (ip, ifam, ipar) :: l ->
+        loop false (if full then ((ip0, (ifam0, ipar0, cnt0)) :: acc) else acc)
+          (ip, (ifam, ipar, 1)) l
+    | [] -> (ip0, (ifam0, ipar0, cnt0)) :: acc
+  in loop false [] (Gwdb.dummy_iper, (Gwdb.dummy_ifam, Gwdb.dummy_iper, 0)) list
 
 let bool_val x = VVbool x
 let str_val x = VVstring x
@@ -2453,7 +2453,14 @@ and eval_num conf n = function
   | _ -> raise Not_found
 
 and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
-  (* TODO factorize this *)
+  | [ "anc_index" ] -> (
+      match get_env "anc_index" env with
+      | Vind p -> VVstring (string_of_iper (get_iper p))
+      | _ -> VVstring "")
+  | [ "anc_f_index" ] -> (
+      match get_env "anc_f_index" env with
+      | Vifam ifam -> VVstring (string_of_ifam ifam)
+      | _ -> VVstring "")
   | "baptism_date" :: sl -> (
       match Date.od_of_cdate (get_baptism p) with
       | Some d when p_auth -> eval_date_field_var conf d sl
@@ -4265,7 +4272,7 @@ let print_foreach conf base print_ast eval_expr =
     let l = match get_env "cousins" env with Vcousl l -> !l | _ -> [] in
     let rec loop cnt = function
       | [] -> ()
-      | (ip, (nbr, ifam, ipar)) :: sll ->
+      | (ip, (ifam, ipar, nbr)) :: sll ->
           let env =
             ("cousin", Vind (pget conf base ip))
             :: ("anc_f_index", Vifam ifam)
