@@ -136,10 +136,15 @@
             %foreach;cousin;
               %apply;add_in_sorted_list%with;%cousin.surname; %cousin.first_name %cousin.occ;%and;%nn;
                 <li class="list-group-item d-flex justify-content-%if;(cousin.nbr=2)start%else;between%end; align-items-center nbr_%cousin.nbr;" title="%cousin.first_name;.%cousin.occ; %cousin.surname;">
-                  <a href="%prefix;%if;(cousin.nbr<2)m=RLM&i1=%self.index;&i2=%cousin.index;
-                  %else;m=NG&em=R&et=A&ep=%self.first_name_key;&en=%self.surname_key;&select=input&n=%cousin.first_name;+%cousin.surname;&fn=&sn=%end;%nn;
-                    %( m=RL&p=first_name_key;&n1=%self.surname_key;&b1=B1?&p2=%cousin.first_name_key;&n2=%cousin.surname_key;&b2=B2? %)
-                  " class="stretched-link">%cousin.surname; %cousin.first_name;%cousin.dates;</a>
+                  <a href="%prefix;%if;(cousin.nbr<3)m=RLM&i1=%self.index;&i2=%cousin.index;&dag=on%nn;
+                  %else;em=R&et=A&ei=%self.index;&i=%cousin.index;%end;"%nn;
+                    %( on affiche le RLM mais est trop court en cas d'implex, comment le forcer à être plus grand ?
+                    m=RL connait l1/l2 mais il manque l'index de ancêtre %ancestor.index; du chemin parcouru 
+                    m=RL&i=%ancestor.index;&l1=vvv&i1=%self.index;&l2=www&i2=%cousin.index;&%if;(cousin.nbr>1)dag=on%end;
+                           fction du access c'est  i i1 i2 ou p/n/oc p1/n1/oc1 p2/n2/oc2 
+                    y'a aussi une autre syntaxe plus obscure ? quand ? pourquoi ?...
+                    m=RL&p=first_name_key;&n1=%self.surname_key;&b1=B1?&p2=%cousin.first_name_key;&n2=%cousin.surname_key;&b2=B2? %)
+                  class="stretched-link">%cousin.surname; %cousin.first_name;%cousin.dates;</a>
                   %if;(cousin.nbr=1 or cousin.nbr>2)
                     <span class="badge badge-%if;(cousin.nbr%2=1)primary%else;success%end; badge-pill">%cousin.nbr;</span>
                   %end;
