@@ -1867,10 +1867,10 @@ let arg_plugins opt doc =
   )
 
 let main () =
-#ifdef WINDOWS
-  Wserver.sock_in := "gwd.sin";
-  Wserver.sock_out := "gwd.sou";
-#endif
+  begin if Sys.win32 then
+    Wserver.sock_in := "gwd.sin";
+    Wserver.sock_out := "gwd.sou"
+  end;
   let usage =
     "Usage: " ^ Filename.basename Sys.argv.(0) ^
     " [options] where options are:"
@@ -1910,28 +1910,30 @@ let main () =
     ; ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock files before writing.")
     ; (arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin." )
     ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
-#ifdef UNIX
-    ; ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
+    ]
+    @
+    if Sys.unix then
+    [ ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
     ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
-#endif
     ]
+    else []
   in
   let speclist = List.sort compare speclist in
   let speclist = Arg.align speclist in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
-#ifdef UNIX
-  default_lang := begin
-    let s = try Sys.getenv "LANG" with Not_found -> "" in
-    if List.mem s Version.available_languages then s
-    else
-      let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
-      if String.length s >= 2 then
-        let s = String.sub s 0 2 in
-        if List.mem s Version.available_languages then s else "en"
-      else "en"
-  end ;
-#endif
+  begin if Sys.unix then
+    default_lang := begin
+      let s = try Sys.getenv "LANG" with Not_found -> "" in
+      if List.mem s Version.available_languages then s
+      else
+        let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
+        if String.length s >= 2 then
+          let s = String.sub s 0 2 in
+          if List.mem s Version.available_languages then s else "en"
+        else "en"
+    end;
+  end;
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
   Geneweb.GWPARAM.syslog := GwdLog.syslog;
@@ -1992,15 +1994,15 @@ let () =
                     or by another program. Solution: kill the other program \
                     or launch GeneWeb with another port number (option -p)";
     flush stderr
-#ifdef UNIX
-  | Unix.Unix_error (Unix.EACCES, "bind", arg) ->
+  | Unix.Unix_error (Unix.EACCES, "bind", arg) as e ->
+      if Sys.unix then (
     Printf.eprintf
       "Error: invalid access to the port %d: users port number less \
        than 1024 are reserved to the system. Solution: do it as root \
        or choose another port number greater than 1024."
       !selected_port;
-    flush stderr;
-#endif
+    flush stderr)
+      else GwdLog.syslog `LOG_CRIT (Printexc.to_string e)
   | Register_plugin_failure (p, `dynlink_error e) ->
     GwdLog.syslog `LOG_CRIT (p ^ ": " ^ Dynlink.error_message e)
   | Register_plugin_failure (p, `string s) ->

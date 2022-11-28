@@ -421,15 +421,14 @@ let treat_request =
   || conf.friend
   || List.assoc_opt "visitor_access" conf.base_env <> Some "no"
   then begin
-#ifdef UNIX
-    begin match bfile with
-      | None -> ()
-      | Some bfile ->
-        let stat = Unix.stat bfile in
-        Unix.setgid stat.Unix.st_gid ;
-        Unix.setuid stat.Unix.st_uid ;
-    end ;
-#endif
+    begin if Sys.unix then
+      match bfile with
+        | None -> ()
+        | Some bfile ->
+          let stat = Unix.stat bfile in
+          Unix.setgid stat.Unix.st_gid ;
+          Unix.setuid stat.Unix.st_uid ;
+    end;
     let plugins =
       match List.assoc_opt "plugins" conf.Config.base_env with
       | None -> []

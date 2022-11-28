@@ -23,12 +23,11 @@ let printer_conf =
 let slashify s =
   String.map (function '\\' -> '/' | c -> c) s
 
-#ifdef UNIX
-let slashify_linux_dos s = s
-#else
 let slashify_linux_dos s =
+  if Sys.unix then s
+  else
   String.map (function '/' -> '\\' | c -> c) s
-#endif
+
 
 let decode s = Mutil.decode (Adef.encoded s)
 let encode s = (Mutil.encode s :> string)
@@ -338,11 +337,7 @@ let only_file_name =
 (* like %l, %L, %P, ... and they may be different! %G  *)
 let macro conf =
   function
-#ifdef UNIX
-  | '/' -> "/"
-#else
-  | '/' -> "\\"
-#endif
+  | '/' -> if Sys.unix then "/" else "\\"
   | 'a' -> strip_spaces (s_getenv conf.env "anon")
   | 'c' -> stringify !setup_dir
   | 'd' -> conf.comm
@@ -701,14 +696,12 @@ and print_selector conf print =
       Not_found -> try Sys.getenv "HOME" with Not_found -> Sys.getcwd ()
   in
   let list =
-#ifdef UNIX
-#else
     let sel =
+      if Sys.unix then sel else
       if String.length sel = 3 && sel.[1] = ':' && sel.[2] = '\\'
       then sel ^ "."
       else sel
     in
-#endif
     try
       let dh = Unix.opendir sel in
       let rec loop list =
@@ -736,13 +729,12 @@ and print_selector conf print =
       (fun x ->
          let d =
            if x = ".." then
-#ifdef UNIX
-             Filename.dirname sel
-#else
-             if sel.[String.length sel - 1] <> '\\'
-             then Filename.dirname sel ^ "\\"
-             else Filename.dirname sel
-#endif
+             if Sys.unix then
+              Filename.dirname sel
+             else
+               if sel.[String.length sel - 1] <> '\\'
+               then Filename.dirname sel ^ "\\"
+               else Filename.dirname sel
            else Filename.concat sel x
          in
          let x = if is_directory d then Filename.concat x "" else x in d, x)
@@ -993,23 +985,19 @@ let ged2gwb_check conf =
   let conf = {conf with env = ("f", "on") :: conf.env} in
   gwc_or_ged2gwb out_name_of_ged conf
 
-#ifdef WINDOWS
 let infer_rc conf rc =
   if rc > 0 then rc
   else
     match p_getenv conf.env "o" with
       Some out_file -> if Sys.file_exists (out_file ^ ".gwb") then 0 else 2
     | _ -> 0
-#endif
 
 let gwc conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir "gwc") in
     exec_f (comm ^ parameters conf.env)
   in
-#ifdef WINDOWS
-  let rc = infer_rc conf rc in
-#endif
+  let rc = if Sys.win32 then infer_rc conf rc else rc in
   let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
   (try Sys.remove gwo with Sys_error _ -> ());
   Printf.eprintf "\n";
@@ -1161,11 +1149,10 @@ let update_nldb_check conf =
 
 let has_gwu dir =
   try
-#ifdef UNIX
-    Array.mem "gwu" (Sys.readdir dir)
-#else
-    Array.exists (fun s -> String.lowercase_ascii s = "gwu.exe") (Sys.readdir dir)
-#endif
+    if Sys.unix then
+      Array.mem "gwu" (Sys.readdir dir)
+    else
+      Array.exists (fun s -> String.lowercase_ascii s = "gwu.exe") (Sys.readdir dir)
   with _ -> false
 
 let recover conf =
@@ -1191,16 +1178,15 @@ let recover conf =
   if init_dir = "" then print_file conf "err_miss.htm"
   else if init_dir = dest_dir then print_file conf "err_smdr.htm"
   else if not (Sys.file_exists init_dir) then print_file conf "err_ndir.htm"
-#ifdef UNIX
-  else if
-      try
-        (Unix.stat (Filename.concat init_dir ".")).Unix.st_ino
-        =
-        (Unix.stat (Filename.concat dest_dir ".")).Unix.st_ino
-      with Unix.Unix_error (_, _, _) -> false
-  then
-    print_file conf "err_smdr.htm"
-#endif
+  else if Sys.unix then
+    if
+        try
+          (Unix.stat (Filename.concat init_dir ".")).Unix.st_ino
+          =
+          (Unix.stat (Filename.concat dest_dir ".")).Unix.st_ino
+        with Unix.Unix_error (_, _, _) -> false
+    then
+      print_file conf "err_smdr.htm"
   else if not dir_has_gwu then print_file conf "err_ngw.htm"
   else print_file conf "recover1.htm"
 
@@ -1288,10 +1274,10 @@ let recover_2 conf =
         in
         Printf.eprintf "$ %s\n" c;
         flush stderr;
-        let rc = Sys.command c in
-#ifdef WINDOWS
-        let rc = infer_rc conf rc in
-#endif
+        let rc =
+          let rc = Sys.command c in
+          if Sys.win32 then infer_rc conf rc else rc
+        in
         Printf.eprintf "\n"; flush stderr; rc
       end
     else rc
@@ -1324,19 +1310,19 @@ let cleanup_1 conf =
   let _ = Sys.command c in
   Printf.eprintf "$ mkdir old\n";
   (try Unix.mkdir "old" 0o755 with Unix.Unix_error (_, _, _) -> ());
-#ifdef UNIX
-  Printf.eprintf "$ rm -rf old/%s\n" in_base_dir ;
-#else
-  Printf.eprintf "$ del old\\%s\\*.*\n" in_base_dir;
-  Printf.eprintf "$ rmdir old\\%s\n" in_base_dir;
-#endif
+  begin if Sys.unix then
+    Printf.eprintf "$ rm -rf old/%s\n" in_base_dir
+  else
+    Printf.eprintf "$ del old\\%s\\*.*\n" in_base_dir;
+    Printf.eprintf "$ rmdir old\\%s\n" in_base_dir
+  end;
   flush stderr;
   Mutil.rm_rf (Filename.concat "old" in_base_dir);
-#ifdef UNIX
-  Printf.eprintf "$ mv %s old/.\n" in_base_dir ;
-#else
-  Printf.eprintf "$ move %s old\\.\n" in_base_dir;
-#endif
+  begin if Sys.unix then
+    Printf.eprintf "$ mv %s old/.\n" in_base_dir
+  else
+    Printf.eprintf "$ move %s old\\.\n" in_base_dir
+  end;
   flush stderr;
   Sys.rename in_base_dir (Filename.concat "old" in_base_dir);
   let c =
@@ -1345,10 +1331,10 @@ let cleanup_1 conf =
   in
   Printf.eprintf "$ %s\n" c;
   flush stderr;
-  let rc = Sys.command c in
-#ifdef WINDOWS
-  let rc = infer_rc conf rc in
-#endif
+  let rc =
+    let rc = Sys.command c in
+    if Sys.win32 then infer_rc conf rc else rc
+  in
   Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then
@@ -1569,12 +1555,12 @@ let gwd_1 conf =
 
 let ged2gwb conf =
   let rc =
-    let comm = stringify (Filename.concat !bin_dir conf.comm) in
-    exec_f (comm ^ " -fne '\"\"'" ^ parameters conf.env)
+    let rc =
+      let comm = stringify (Filename.concat !bin_dir conf.comm) in
+      exec_f (comm ^ " -fne '\"\"'" ^ parameters conf.env)
+    in
+    if Sys.win32 then infer_rc conf rc else rc
   in
-#ifdef WINDOWS
-  let rc = infer_rc conf rc in
-#endif
   Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then print_file conf "bso_err.htm"
@@ -1841,17 +1827,17 @@ let setup (addr, req) comm (env_str : Adef.encoded_string) =
   else setup_comm conf comm
 
 let wrap_setup a b (c : Adef.encoded_string) =
-#ifdef WINDOWS
-  (* another process have been launched, therefore we lost variables;
-     and we cannot parse the arg list again, because of possible spaces
-     in arguments which may appear as separators *)
-  (try default_lang := Sys.getenv "GWLANG" with Not_found -> ());
-  (try setup_dir := Sys.getenv "GWGD" with Not_found -> ());
-  (try bin_dir := Sys.getenv "GWGD" with Not_found -> ());
-#endif
-  try setup a b c with Exit -> ()
+  begin if Sys.win32 then
+    (* another process have been launched, therefore we lost variables;
+       and we cannot parse the arg list again, because of possible spaces
+       in arguments which may appear as separators *)
+    (try default_lang := Sys.getenv "GWLANG" with Not_found -> ());
+      (try setup_dir := Sys.getenv "GWGD" with Not_found -> ());
+      (try bin_dir := Sys.getenv "GWGD" with Not_found -> ());
+    end;
+    try setup a b c with Exit -> ()
 
-let copy_text lang fname =
+  let copy_text lang fname =
   let dir = Filename.concat !setup_dir "setup" in
   let fname = Filename.concat dir fname in
   match try Some (open_in fname) with Sys_error _ -> None with
@@ -1908,18 +1894,16 @@ let speclist =
     "<string>: binary directory (default = value of option -gd)")]
 let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s))
 
-#ifdef UNIX
 let null_reopen flags fd =
   let fd2 = Unix.openfile "/dev/null" flags 0 in
   Unix.dup2 fd2 fd;
   Unix.close fd2
-#endif
 
 let setup_available_languages = ["de"; "en"; "es"; "fr"; "it"; "lv"; "sv"]
 
 let intro () =
   let (default_gwd_lang, default_setup_lang) =
-#ifdef UNIX
+  if Sys.unix then
     let s = try Sys.getenv "LANG" with Not_found -> "" in
     if List.mem s Version.available_languages
     then s, (if List.mem s setup_available_languages then s else "en")
@@ -1931,16 +1915,15 @@ let intro () =
         then s, (if List.mem s setup_available_languages then s else "en")
         else !default_lang, !default_lang
       else !default_lang, !default_lang
-#else
+  else
     !default_lang, !default_lang
-#endif
   in
   Arg.parse speclist anonfun usage;
   if !bin_dir = "" then bin_dir := !setup_dir;
   default_lang := default_setup_lang;
   let (gwd_lang, setup_lang) =
     if !daemon then
-#ifdef UNIX
+      if Sys.unix then
         let setup_lang =
           if String.length !lang_param < 2 then default_setup_lang
           else !lang_param
@@ -1954,9 +1937,8 @@ let intro () =
           end
         else exit 0;
         default_gwd_lang, setup_lang
-#else
-      default_gwd_lang, default_setup_lang
-#endif
+      else
+        default_gwd_lang, default_setup_lang
     else
       let (gwd_lang, setup_lang) =
         if String.length !lang_param < 2 then
@@ -1973,17 +1955,15 @@ let intro () =
   in
   set_gwd_default_language_if_absent gwd_lang;
   default_lang := setup_lang;
-#ifdef WINDOWS
-  Unix.putenv "GWLANG" setup_lang;
-  Unix.putenv "GWGD" !setup_dir;
-#endif
+  begin if Sys.win32 then
+    Unix.putenv "GWLANG" setup_lang;
+    Unix.putenv "GWGD" !setup_dir
+  end;
   Printf.printf "\n";
   flush stdout
 
 let () =
-#ifdef UNIX
-  intro () ;
-#else
-  if Sys.getenv_opt "WSERVER" = None then intro () ;
-#endif
+  if Sys.unix then
+    intro ()
+  else if Sys.getenv_opt "WSERVER" = None then intro ();
   Wserver.f (fun _ -> prerr_endline) None !port 0 None wrap_setup
