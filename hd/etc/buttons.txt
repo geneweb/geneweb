@@ -106,57 +106,57 @@
               %foreach;env_binding;
                 %if;(env.key!="hl" and env.key!="")&%env.key=%env.val;%end;
               %end;
-              %if;(evar.hl!="on")&hl=on%end;" title="%if;(evar.hl="on")[*visualize/show/hide/summary]2 [highlight incomplete data]%else;[*highlight incomplete data]%end;">%nn;
+              %if;(e.hl!=1)&hl=1%end;" title="%if;(e.hl=1)[*visualize/show/hide/summary]2 [highlight incomplete data]%else;[*highlight incomplete data]%end;">%nn;
         <i class="fas fa-highlighter fa-lg fa-fw" aria-hidden="true"></i>%nn;
       </a>
     %end;
-    %if;((evar.m="D" and (evar.t="D" or evar.t="I" or evar.t="H")) or (evar.m="A" and evar.t="H" and evar.force!="on"))
+    %if;((e.m="D" and (e.t="D" or e.t="I" or e.t="H")) or (e.m="A" and e.t="H" and e.force!="on"))
       <a role="button" class="btn btn-link px-0"%sp;
         href="%prefix_base_password;%nn;
-              %if;(not browsing_with_sosa_ref and (evar.m="A" and evar.t="H"))
+              %if;(not browsing_with_sosa_ref and (e.m="A" and e.t="H"))
                 &pz=%first_name_key;&nz=%surname_key;%if;(occ!=0)&oc=%occ;%end;
               %end;
               %foreach;env_binding;
                 %if;(not (env.key="implx" or env.key="force" or env.key=""))&%env.key=%env.val;%end;
               %end;
-              %( if (evar.m="A" and evar.t="H") implex=on means display full implex %)
-              %if;(evar.implx!="on")
-                %if;(not browsing_with_sosa_ref and (evar.m="A" and evar.t="H"))
+              %( if (e.m="A" and e.t="H") implex=on means display full implex %)
+              %if;(e.implx!="on")
+                %if;(not browsing_with_sosa_ref and (e.m="A" and e.t="H"))
                 %else;
                   &implx=on%nn;
                 %end;
               %end;"
-         title="%if;(evar.implx!="on")[*collapse implex]%else;[*display implex]%end;">%nn;
+         title="%if;(e.implx!="on")[*collapse implex]%else;[*display implex]%end;">%nn;
         <i class="fa fa-random fa-lg fa-fw"></i>%nn;
       </a>
     %end;
     <span class="sr-only">—</span>
-    %if;(evar.m="A")
+    %if;(e.m="A")
       <span class="sr-only">—</span>
-      <a role="button" class="btn btn-link px-0%if;(evar.t="Y") disabled%end;"%sp;
+      <a role="button" class="btn btn-link px-0%if;(e.t="Y") disabled%end;"%sp;
         href="%prefix_base_password;%nn;
                  %foreach;env_binding;
                    %if;(env.key!="csv" and env.key!="")&%env.key=%env.val;%end;%nn;
                  %end;
-                 %if;(evar.csv!="on")&csv=on%end;"
-        title="%if;(evar.csv="on")[*visualize/show/hide/summary]2 CSV [and] [visualize/show/hide/summary]1 [table] [ancestors]%else;[*visualize/show/hide/summary]1 CSV%end;">%nn;
-          <i class="fa fa-file-csv fa-lg fa-fw %if;(evar.csv="on")text-danger%end;" aria-hidden="true"></i>%nn;
+                 %if;(e.csv!="on")&csv=on%end;"
+        title="%if;(e.csv="on")[*visualize/show/hide/summary]2 CSV [and] [visualize/show/hide/summary]1 [table] [ancestors]%else;[*visualize/show/hide/summary]1 CSV%end;">%nn;
+          <i class="fa fa-file-csv fa-lg fa-fw %if;(e.csv="on")text-danger%end;" aria-hidden="true"></i>%nn;
       </a>
     %end;
     <span class="sr-only">—</span>
-    %let;couple_table;%prefix_base;%access;&m=A&t=Y%if;(evar.only="on")&only=on%end;%if;(e.im!="")&im=0%end;&v=%evar.v&%in;
-    %if;(evar.csv!="on" and evar.m="A" and evar.t="Z" or evar.t="Y")
+    %let;couple_table;%prefix_base;%access;&m=A&t=Y%if;(e.only="on")&only=on%end;%if;(e.im!="")&im=0%end;&v=%e.v&%in;
+    %if;(e.csv!="on" and e.m="A" and e.t="Z" or e.t="Y")
       <span class="sr-only">—</span>
       <a role="button" class="btn btn-link px-0"
         href="%prefix_base_password;%nn;
                  %foreach;env_binding;
-                   %if;(env.key="t")&t=%if;(evar.t!="Y")Y%else;Z%end;%nn;
+                   %if;(env.key="t")&t=%if;(e.t!="Y")Y%else;Z%end;%nn;
                    %elseif;(env.key!="")&%env.key=%env.val;%end;%nn;
                  %end;%nn;
                  %( ajout des variables par défaut du tableau asc. pour sortir du tableau par couple qui n'en a quasi pas %)
                  %if;(url=couple_table)&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&gen=1&repeat=on&ns=1%end;"
-        title="[*visualize/show/hide/summary]1 [table] %if;(evar.t="Y")[ancestors]%else;[by couple]%end;">%nn;
-          <i class="fa fa-restroom fa-lg fa-fw%if;(evar.t="Y") text-danger%end;" aria-hidden="true"></i>
+        title="[*visualize/show/hide/summary]1 [table] %if;(e.t="Y")[ancestors]%else;[by couple]%end;">%nn;
+          <i class="fa fa-restroom fa-lg fa-fw%if;(e.t="Y") text-danger%end;" aria-hidden="true"></i>
       </a>
     %end;
     <a role="button" class="btn btn-link px-0"%sp;
@@ -167,7 +167,7 @@
             %end;&cgl=on">%nn;
      <i class="fa fa-link fa-fw fa-lg" aria-hidden="true"></i>%nn;
     </a>
-    %if;((evar.m="A" and evar.t="H") or (evar.m="D" and evar.t="D"))
+    %if;((e.m="A" and e.t="H") or (e.m="D" and e.t="D"))
       <button id="btnshowfilter" 
         type="button" class="btn btn-link ml-1 px-0">
         <i class="fas fa-filter ml-1" aria-hidden="true"></i>%nn;
@@ -176,15 +176,15 @@
   </div>
   <div class="input-group-append">
     <span class="input-group ml-1">
-      %if;(evar.v!="")
+      %if;(e.v!="")
       <span class="sr-only">— [*generation/generations]0</span>
       <a role="button" class="btn btn-link ml-1 mr-0 px-0 mr-1
-                              %if;(evar.m="D")%if;(evar.v<2) disabled text-muted%end;
-                              %elseif;(evar.m="A")%if;(evar.v<3) disabled text-muted%end;%end;"
+                              %if;(e.m="D")%if;(e.v<2) disabled text-muted%end;
+                              %elseif;(e.m="A")%if;(e.v<3) disabled text-muted%end;%end;"
         title="[*delete] 1 [generation/generations]0"
         href="%prefix_base_password;%nn;
             %foreach;env_binding;
-              %if;(env.key="v" and evar.v>0)&v=%expr(evar.v-1)%nn;
+              %if;(env.key="v" and e.v>0)&v=%expr(e.v-1)%nn;
               %elseif;(env.key!="")&%env.key=%env.val;%nn;
               %end;
             %end;">%nn;
@@ -193,12 +193,12 @@
       </a>
       <span class="sr-only">/</span>
       <a role="button" class="btn btn-link mx-0 px-0 mr-1
-                              %if;(evar.m="D")%if;(evar.v>=static_max_desc_level)disabled text-muted%end;
-                              %elseif;(evar.m="A")%if;(evar.v>static_max_anc_level)disabled text-muted%end;%end;"
+                              %if;(e.m="D")%if;(e.v>=static_max_desc_level)disabled text-muted%end;
+                              %elseif;(e.m="A")%if;(e.v>static_max_anc_level)disabled text-muted%end;%end;"
         title="[*add] 1 [generation/generations]0"
         href="%prefix_base_password;%nn;
               %foreach;env_binding;
-                %if;(env.key="v")&v=%expr(evar.v+1)%nn;
+                %if;(env.key="v")&v=%expr(e.v+1)%nn;
                 %elseif;(env.key!="")&%env.key=%env.val;%nn;
                 %end;
               %end;">%nn;
@@ -207,33 +207,33 @@
       </a>
       <span class="sr-only"> —</span>
       %end;
-      %if;(evar.v!=0 and istable=1)
+      %if;(e.v!=0 and istable=1)
         <a role="button" class="btn btn-link my-0 px-0 pl-0"
           href="%prefix_base_password;%nn;
                 %foreach;env_binding;
                   %if;(env.key!="only" and env.key!="")&%env.key=%env.val;%end;%nn;
                 %end;
-                %if;(evar.only!="on")&only=on%end;"
-          title="%if;(evar.only!="on")[*visualize/show/hide/summary]1 [only the generation selected]
+                %if;(e.only!="on")&only=on%end;"
+          title="%if;(e.only!="on")[*visualize/show/hide/summary]1 [only the generation selected]
                  %else;[*visualize/show/hide/summary]1%sp;
-                   %if;(evar.m="D")
-                     %apply;togend(evar.v)
-                   %elseif;(evar.m="A")
-                     %apply;togen(evar.v)
+                   %if;(e.m="D")
+                     %apply;togend(e.v)
+                   %elseif;(e.m="A")
+                     %apply;togen(e.v)
                    %end;
                  %end;">%nn;
-              <i class="fa fa-level-up-alt%if;(evar.m="D") fa-flip-vertical%end; fa-fw fa-lg%if;(evar.only!="on") text-danger%end;" aria-hidden="true"></i>%nn;
-              %if;(evar.m="D")
-                %if;(evar.only!="on")%if;(evar.v!=0)[*only] %end;%apply;gend("v")
-                %else;%apply;capitalize%with;%apply;togend%with;%if;(evar.v="")0%else;%evar.v;%end;%end;%end;
+              <i class="fa fa-level-up-alt%if;(e.m="D") fa-flip-vertical%end; fa-fw fa-lg%if;(e.only!="on") text-danger%end;" aria-hidden="true"></i>%nn;
+              %if;(e.m="D")
+                %if;(e.only!="on")%if;(e.v!=0)[*only] %end;%apply;gend("v")
+                %else;%apply;capitalize%with;%apply;togend%with;%if;(e.v="")0%else;%e.v;%end;%end;%end;
                 %end;
-              %elseif;(evar.m="A")
-                %if;(evar.only!="on")[*only] %apply;gen("v")
-                %else;%apply;capitalize%with;%apply;togena%with;%if;(evar.v="")0%else;%evar.v;%end;%end;%end;
+              %elseif;(e.m="A")
+                %if;(e.only!="on")[*only] %apply;gen("v")
+                %else;%apply;capitalize%with;%apply;togena%with;%if;(e.v="")0%else;%e.v;%end;%end;%end;
                 %end;
               %end;
          </a>
-      %elseif;(evar.v=0)
+      %elseif;(e.v=0)
         <span class="btn disabled text-primary pl-0">[*specify::generation/generations]0</span>
       %end;
     </span>
