@@ -114,12 +114,11 @@ let export conf base =
               (get_family (poi base iper)))
           ipers IFS.empty
       in
-      let no_notes =
+      let notes, base_notes =
         match getenv_opt "notes" conf.env with
-        | None -> `none
-        | Some "nn" -> `nn
-        | Some "nnn" -> `nnn
-        | Some _ -> `none
+        | Some "nn" -> true, false
+        | Some "nnn" -> false, false
+        | Some _ | None -> true, true
       in
       let source = getenv_opt "source" conf.env in
       let isolated = getenv_opt "isolated" conf.env <> Some "off" in
@@ -127,7 +126,8 @@ let export conf base =
         {
           Gwexport.default_opts with
           oc = (fname, Output.print_sstring conf, Wserver.close_connection);
-          no_notes;
+          notes;
+          base_notes;
           no_picture = getenv_opt "pictures" conf.env = Some "off";
           source;
           base = Some (Gwdb.bname base, base);
