@@ -1165,7 +1165,7 @@ type 'a env =
   | Vcell of cell
   | Vcelll of cell list
   | Vcnt of int ref
-  | Vcousl of (iper * (ifam * iper * int)) list ref
+  | Vcousl of (iper * (ifam * iper * iper * int)) list ref
   | Vdesclevtab of ((iper, int) Marker.t * (ifam, int) Marker.t) lazy_t
   | Vdmark of (iper, bool) Marker.t ref
   | Vslist of SortedList.t ref
@@ -1350,18 +1350,21 @@ let cousins_l1_l2_aux conf base env l1 l2 p =
     Some cousins_cnt.(il1).(il2)
   else None
 
-(* create a new list with (ifam, ipar, cnt) *)
+(* create a new list (ip, (ifam, ipar1, ipar2, cnt)) from (ip, ifam, ipar) *)
 let cousins_fold list =
   let list = List.sort compare list in
-  let rec loop full acc (ip0, (ifam0, ipar0, cnt0)) =
+  let rec loop full acc (ip0, (ifam0, ipar10, ipar20, cnt0)) =
     function
     | (ip, ifam, ipar) :: l when ip = ip0 && ifam = ifam0 ->
-        loop true acc (ip, (ifam, ipar, (cnt0 +1))) l
+        if ipar = ipar10 then
+          loop true acc (ip, (ifam, ipar, ipar20, (cnt0 +1))) l
+        else
+          loop true acc (ip, (ifam, ipar10, ipar, (cnt0 +1))) l
     | (ip, ifam, ipar) :: l ->
-        loop false (if full then ((ip0, (ifam0, ipar0, cnt0)) :: acc) else acc)
-          (ip, (ifam, ipar, 1)) l
-    | [] -> (ip0, (ifam0, ipar0, cnt0)) :: acc
-  in loop false [] (Gwdb.dummy_iper, (Gwdb.dummy_ifam, Gwdb.dummy_iper, 0)) list
+        loop false (if full then ((ip0, (ifam0, ipar10, ipar20, cnt0)) :: acc) else acc)
+          (ip, (ifam, ipar, Gwdb.dummy_iper, 1)) l
+    | [] -> (ip0, (ifam0, ipar10, ipar20, cnt0)) :: acc
+  in loop false [] (Gwdb.dummy_iper, (Gwdb.dummy_ifam, Gwdb.dummy_iper, Gwdb.dummy_iper, 0)) list
 
 let bool_val x = VVbool x
 let str_val x = VVstring x
@@ -2081,16 +2084,27 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let ep = make_ep conf base (get_iper p) in
           eval_person_field_var conf base env ep loc sl
       | None -> raise Not_found)
-  | "qvar" :: v :: sl ->
-      (* %qvar.index_v.surname;
+  | "p_of_index" :: v :: sl ->
+      (* %p_of_index.index_v.surname;
          direct access to a person whose index value is v
       *)
-      let v0 = iper_of_string v in
-      (* if v0 >= 0 && v0 < nb_of_persons base then *)
-      let ep = make_ep conf base v0 in
-      if is_hidden (fst ep) then raise Not_found
-      else eval_person_field_var conf base env ep loc sl
-  (* else raise Not_found *)
+      let i = int_of_string v in
+      if i >= 0 && i < Gwdb.nb_of_persons base then
+        let ip = iper_of_string v in
+        let ep = make_ep conf base ip in
+        if is_hidden (fst ep) then raise Not_found
+        else eval_person_field_var conf base env ep loc sl
+      else raise Not_found
+  | "f_of_index" :: v :: sl ->
+      (* %f_of_index.index_v.marriage_date;
+         direct access to a family whose index value is v
+      *)
+      let i = int_of_string v in
+      if i >= 0 && i < Gwdb.nb_of_families base then
+        let ifam = ifam_of_string v in
+        let f, c, a = make_efam conf base (get_iper a) ifam in
+        eval_family_field_var conf base env (ifam, f, c, a) loc sl
+      else raise Not_found
   | "svar" :: i :: sl -> (
       (* http://localhost:2317/HenriT_w?m=DAG&p1=henri&n1=duchmol&s1=243&s2=245
          access to sosa si=n of a person pi ni
@@ -2453,8 +2467,12 @@ and eval_num conf n = function
   | _ -> raise Not_found
 
 and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
-  | [ "anc_index" ] -> (
-      match get_env "anc_index" env with
+  | [ "anc1_index" ] -> (
+      match get_env "anc1_index" env with
+      | Vind p -> VVstring (string_of_iper (get_iper p))
+      | _ -> VVstring "")
+  | [ "anc2_index" ] -> (
+      match get_env "anc2_index" env with
       | Vind p -> VVstring (string_of_iper (get_iper p))
       | _ -> VVstring "")
   | [ "anc_f_index" ] -> (
@@ -4272,11 +4290,12 @@ let print_foreach conf base print_ast eval_expr =
     let l = match get_env "cousins" env with Vcousl l -> !l | _ -> [] in
     let rec loop cnt = function
       | [] -> ()
-      | (ip, (ifam, ipar, nbr)) :: sll ->
+      | (ip, (ifam, ipar1, ipar2, nbr)) :: sll ->
           let env =
             ("cousin", Vind (pget conf base ip))
             :: ("anc_f_index", Vifam ifam)
-            :: ("anc_index", Vind (pget conf base ipar))
+            :: ("anc1_index", Vind (pget conf base ipar1))
+            :: ("anc2_index", Vind (pget conf base ipar2))
             :: ("nbr", Vint nbr) :: ("cnt", Vint cnt) :: env
           in
           List.iter (print_ast env ep) al;
