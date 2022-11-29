@@ -11,9 +11,8 @@ type gwexport_opts = {
   img_base_path : string; (* Unused by this module (and not set by options) *)
   keys : string list; (* Key reference of additional persons to select *)
   mem : bool; (* Unused by this module *)
-  no_notes : [ `nn | `nnn | `none ];
-      (* Unused by this module
-         S: Consider simple ADTs *)
+  notes : bool; (* true iff we export notes *)
+  base_notes : bool; (* true iff we export base_notes *)
   no_picture : bool; (* Unused by this module *)
   oc : string * (string -> unit) * (unit -> unit); (* Unused by this module *)
   parentship : bool;
@@ -53,3 +52,4 @@ val select :
 (** [select opts ips]
     Return filters for [iper] and [ifam] to be used when exporting a (portion of a) base.
 *)
+
