@@ -10,8 +10,8 @@ type gwexport_opts = {
   img_base_path : string; (* Unused by this module (and not set by options) *)
   keys : string list; (* Key reference of additional persons to select *)
   mem : bool; (* Unused by this module *)
-  no_notes : [ `nn | `nnn | `none ]; (* Unused by this module
-                                        S: Consider simple ADTs *)
+  notes : bool; (* true iff we export notes *)
+  base_notes : bool; (* true iff we export base_notes *)
   no_picture : bool; (* Unused by this module *)
   oc : string * (string -> unit) * (unit -> unit); (* Unused by this module *)
   parentship : bool; (* If asc, ascdesc and desc are not set & parenting = true, then
@@ -51,4 +51,3 @@ val errmsg : Arg.usage_msg
 val select :
   gwexport_opts ->
   Gwdb.iper list -> (Gwdb.iper -> bool) * (Gwdb.ifam -> bool)
-

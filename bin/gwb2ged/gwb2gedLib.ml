@@ -154,7 +154,7 @@ let rec display_note_aux opts tagn s len i =
       end
 
 let display_note opts tagn s =
-  if opts.Gwexport.no_notes <> `nnn && s <> "" then
+  if opts.Gwexport.notes && s <> "" then
     let tag = Printf.sprintf "%d NOTE " tagn in
     Printf.ksprintf (oc opts) "%s" tag;
     display_note_aux opts tagn (encode opts s) (String.length tag) 0
@@ -191,8 +191,7 @@ let ged_header opts base ifile ofile =
     | Gwexport.Ascii -> Printf.ksprintf (oc opts) "1 CHAR ASCII\n"
     | Gwexport.Utf8 -> Printf.ksprintf (oc opts) "1 CHAR UTF-8\n"
   end;
-  (* only print base_notes if no_notes is `none *)
-  if opts.Gwexport.no_notes = `none then
+  if opts.Gwexport.base_notes then
     display_note opts 1 (base_notes_read base "")
 
 let sub_string_index s t =

@@ -13,7 +13,8 @@ type gwexport_opts =
   ; img_base_path : string
   ; keys : string list
   ; mem : bool
-  ; no_notes : [ `none | `nn | `nnn ]
+  ; notes : bool
+  ; base_notes : bool
   ; no_picture : bool
   ; oc : string * (string -> unit) * (unit -> unit)
   ; parentship : bool
@@ -33,7 +34,8 @@ let default_opts =
   ; img_base_path = ""
   ; keys = []
   ; mem = false
-  ; no_notes = `none
+  ; notes = true
+  ; base_notes = true
   ; no_picture = false
   ; oc = ("", prerr_string, fun () -> close_out stderr)
   ; parentship = false
@@ -78,11 +80,11 @@ let speclist c =
     , "<N> maximum generation of the root's descendants." )
   ; ( "-mem", Arg.Unit (fun () -> c := { !c with mem = true })
     , " save memory space, but slower." )
-  ; ( "-nn", Arg.Unit (fun () -> if !c.no_notes = `none then c := { !c with no_notes = `nn })
-    , " no (database) notes." )
-  ; ( "-nnn", Arg.Unit (fun () -> c := { !c with no_notes = `nnn })
-    , " no notes (implies -nn)." )
-  ; ( "-nopicture", Arg.Unit (fun () -> c := { !c with no_picture = true })
+  ; ( "-no-base-notes", Arg.Unit (fun () -> c := { !c with base_notes = false })
+    , " no database notes." )
+  ; ( "-no-notes", Arg.Unit (fun () -> c := { !c with notes = false; base_notes = false})
+    , " no notes (implies -no-base-notes)." )
+  ; ( "-no-picture", Arg.Unit (fun () -> c := { !c with no_picture = true })
     , " don't extract individual picture." )
   ; ( "-o", Arg.String (fun s ->
           let oc = open_out s in

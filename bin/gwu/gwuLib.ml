@@ -537,7 +537,7 @@ let string_of_witness_kind : Def.witness_kind -> ('a, unit, string, unit) format
   | Witness_Attending -> Some "#atte"
   | Witness_Mentioned -> Some "#ment"
   | Witness_Other     -> Some "#othe"
-  
+
 let print_witness opts base gen p =
   Printf.ksprintf (oc opts) "%s %s%s" (correct_string base (get_surname p))
     (correct_string base (get_first_name p))
@@ -641,7 +641,7 @@ let print_pevent opts base gen e =
          print_witness opts base gen p;
          Printf.ksprintf (oc opts) "\n")
     e.epers_witnesses;
-  let note = if opts.no_notes <> `nnn then sou base e.epers_note else "" in
+  let note = if opts.notes then sou base e.epers_note else "" in
   if note <> "" then
     List.iter (fun line -> Printf.ksprintf (oc opts) "note %s\n" line)
       (lines_list_of_string note)
@@ -747,13 +747,13 @@ let print_fevent opts base gen in_comment e =
          print_witness opts base gen p;
          print_sep ())
     e.efam_witnesses;
-  let note = if opts.no_notes <> `nnn then sou base e.efam_note else "" in
+  let note = if opts.notes then sou base e.efam_note else "" in
   if note <> "" then
     List.iter (fun line -> Printf.ksprintf (oc opts) "note %s" line; print_sep ())
       (lines_list_of_string note)
 
 let print_comment_for_family opts base gen fam =
-  let comm = if opts.no_notes <> `nnn then sou base (get_comment fam) else "" in
+  let comm = if opts.notes then sou base (get_comment fam) else "" in
   (* Si on est en mode old_gw, on mets tous les évènements dans les notes. *)
   (* On supprime les 2 évènements principaux. *)
   let fevents =
@@ -977,7 +977,7 @@ let print_notes_for_person opts base gen p =
          Printf.ksprintf (oc opts) "\n")
       witnesses
   in
-  let notes = if opts.no_notes <> `nnn then sou base (get_notes p) else "" in
+  let notes = if opts.notes then sou base (get_notes p) else "" in
   let surn = s_correct_string (p_surname base p) in
   let fnam = s_correct_string (p_first_name base p) in
   (* Si on n'est en mode old_gw, on mets tous les évènements dans les notes. *)
@@ -1007,7 +1007,7 @@ let print_notes_for_person opts base gen p =
               | Epers_Cremation -> "creamation"
               | _ -> ""
             in
-            let notes = if opts.no_notes <> `nnn then sou base evt.epers_note else "" in
+            let notes = if opts.notes then sou base evt.epers_note else "" in
             if notes <> "" then Printf.ksprintf (oc opts) "%s: %s\n" name notes;
             print_witness_in_notes evt.epers_witnesses;
             loop events
@@ -1024,7 +1024,7 @@ let print_notes_for_person opts base gen p =
   let s =
     let aux g = sou base (g p) in
     let sl =
-      if opts.no_notes <> `nnn
+      if opts.notes
       then [ aux get_notes
            ; aux get_birth_note
            ; aux get_baptism_note
@@ -1047,7 +1047,7 @@ let print_notes_for_person opts base gen p =
     if not !old_gw && opts.source = None then
       List.fold_left begin fun acc e ->
         let acc =
-          if opts.no_notes <> `nnn
+          if opts.notes
           then sou base e.epers_note :: acc
           else acc
         in
@@ -1739,7 +1739,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
             print_isolated_relations opts base gen p
     end (Gwdb.ipers base) ;
   if !(Mutil.verbose) then ProgrBar.finish ();
-  if opts.no_notes = `none then
+  if opts.base_notes then
     let s = base_notes_read base "" in
     let (oc, first, _) = origin_file (base_notes_origin_file base) in
     if s <> "" then
