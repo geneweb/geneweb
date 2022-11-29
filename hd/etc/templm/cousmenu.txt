@@ -19,8 +19,8 @@
 <h2>%evar.t;</h2>
 
 %define;list1(zz)
-  %if;(pvar.zz != "" and evar.tzz != evar.t)
-    <li><a href="%prefix;%pvar.zz.access;">%pvar.zz;</a> %pvar.zz.dates;</li>
+  %if;(p_of_index.zz != "" and evar.tzz != evar.t)
+    <li><a href="%prefix;%p_of_index.zz.access;">%p_of_index.zz;</a> %p_of_index.zz.dates;</li>
     %apply;list1(zz + 1)
   %end;
 %end;

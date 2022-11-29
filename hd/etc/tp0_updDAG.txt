@@ -47,16 +47,16 @@
 
 %define;one_p_line(zz)
   %let;tmp;
-    %if;pvar.zz.has_birth_date; %pvar.zz.slash_birth_date;
-    %elseif;pvar.zz.has_baptism_date; %pvar.zz.slash_baptism_date;
+    %if;p_of_index.zz.has_birth_date; %p_of_index.zz.slash_birth_date;
+    %elseif;p_of_index.zz.has_baptism_date; %p_of_index.zz.slash_baptism_date;
     %end;
     %sp;-%sp;%nn;
-    %if;pvar.zz.has_death_date;%pvar.zz.slash_death_date;
-    %elseif;pvar.zz.has_burial_date;%pvar.zz.slash_burial_date;
-    %elseif;pvar.zz.has_cremation_date;%pvar.zz.slash_cremation_date;
+    %if;p_of_index.zz.has_death_date;%p_of_index.zz.slash_death_date;
+    %elseif;p_of_index.zz.has_burial_date;%p_of_index.zz.slash_burial_date;
+    %elseif;p_of_index.zz.has_cremation_date;%p_of_index.zz.slash_cremation_date;
     %end;
   %in;
-  %apply;pline("zz", pvar.zz.occ, pvar.zz.first_name, pvar.zz.surname, tmp, "")
+  %apply;pline("zz", p_of_index.zz.occ, p_of_index.zz.first_name, p_of_index.zz.surname, tmp, "")
 %end;
 
 %define;one_s_line(zz)
