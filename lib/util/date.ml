@@ -92,6 +92,7 @@ let nb_days_in_month m a =
     [| 31; 28; 31; 30; 31; 30; 31; 31; 30; 31; 30; 31 |].(m - 1)
   else 0
 
+(* TODO use SDN instead *)
 let time_elapsed d1 d2 =
   let prec =
     match (d1.prec, d2.prec) with
@@ -140,6 +141,9 @@ let time_elapsed_opt d1 d2 =
   | After, After | Before, Before -> None
   | _ -> Some (time_elapsed d1 d2)
 
+(* TODO use SDN to compare date (?) *)
+(* use strict = false to compare date as if they are points on a timeline.
+   use strict = true to compare date by taking precision in account. This makes some dates not comparable, do not use to sort a list *)
 let rec compare_dmy_opt ?(strict = false) dmy1 dmy2 =
   match compare dmy1.year dmy2.year with
   | 0 -> compare_month_or_day ~is_day:false strict dmy1 dmy2

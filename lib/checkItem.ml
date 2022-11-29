@@ -469,9 +469,16 @@ let check_order_pfevents get_name get_date warning events =
             | Event.Pevent (Epers_Name _) | Event.Fevent (Efam_Name _) ->
                 loop (e1 :: events)
             | n2 ->
-                if Event.compare_event_name n1 n2 = 1 then warning e1 e2;
+                if Event.compare_event_name n1 n2 = 1 then
+                  (* BUG:
+                     - `sort_events` sorts events like points on a timeline
+                     - date with precision (Before|After) are exlusive
+                     so we can have this sorted list of events:
+                       [ baptism at date n ; birth at date (Before n+1)]
+                       which will raise an invalid warning *)
+                  warning e1 e2;
                 loop (e2 :: events)))
-    | _ -> ()
+    | _l -> ()
   in
   loop events
 

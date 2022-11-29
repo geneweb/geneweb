@@ -1,3 +1,5 @@
+(* TODO this is probably buggy,
+   because geneweb uses month|day = 0 for incomplete dates *)
 (** Convert [Adef.date] to Calendars.d *)
 let to_calendars : Def.dmy -> Calendars.d =
  fun { Def.day; month; year; delta; _ } -> { Calendars.day; month; year; delta }
