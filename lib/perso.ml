@@ -1165,7 +1165,7 @@ type 'a env =
   | Vcell of cell
   | Vcelll of cell list
   | Vcnt of int ref
-  | Vcousl of (iper * (ifam * (iper list) * int)) list ref
+  | Vcousl of (iper * ifam * iper) list ref
   | Vdesclevtab of ((iper, int) Marker.t * (ifam, int) Marker.t) lazy_t
   | Vdmark of (iper, bool) Marker.t ref
   | Vslist of SortedList.t ref
@@ -1350,7 +1350,7 @@ let cousins_l1_l2_aux conf base env l1 l2 p =
     Some cousins_cnt.(il1).(il2)
   else None
 
-(* create a new list of (ip, (ifam, iparlist, count)) from list of (ip, ifam, ipar) *)
+(* create a new list (ip, (ifam, ipar1, ipar2, cnt)) from (ip, ifam, ipar)
 let cousins_fold list =
   let list = List.sort compare list in
   let rec loop full acc (ip0, (ifam0, iparl0, cnt0)) =
@@ -1364,6 +1364,7 @@ let cousins_fold list =
           (ip, (ifam, [ipar], 1)) l
     | [] -> (ip0, (ifam0, iparl0, cnt0)) :: acc
   in loop false [] (Gwdb.dummy_iper, (Gwdb.dummy_ifam, [], 0)) list
+*)
 
 let bool_val x = VVbool x
 let str_val x = VVstring x
@@ -2466,13 +2467,10 @@ and eval_num conf n = function
   | _ -> raise Not_found
 
 and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
-  | [ "anc1_index" ] -> (
-      match get_env "anc1_index" env with
-      | Vind p -> VVstring (string_of_iper (get_iper p))
-      | _ -> VVstring "")
-  | [ "anc2_index" ] -> (
-      match get_env "anc2_index" env with
-      | Vind p -> VVstring (string_of_iper (get_iper p))
+  | "anc" :: sl  -> (
+      match get_env "anc" env with
+      | Vind pa -> eval_person_field_var conf base env
+          (pa, (authorized_age conf base pa)) loc sl
       | _ -> VVstring "")
   | [ "anc_f_index" ] -> (
       match get_env "anc_f_index" env with
@@ -2497,23 +2495,19 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match get_env "cnt" env with
       | Vint cnt -> VVstring (string_of_int cnt)
       | _ -> VVstring "")
-  | [ "cousins"; l1; l2; "paths" ] -> (
+  | [ "cous_paths_cnt"; l1; l2 ] -> (
       let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
       match list1 with
       | Some list1 ->
-          let list2 = List.sort_uniq compare list1 in
-          VVstring (string_of_int (List.length list1 - List.length list2))
-      | None -> VVstring ("%cousins." ^ l1 ^ "." ^ l2 ^ ".paths?"))
-  | [ "cousins"; l1; l2 ] -> (
+          VVstring (string_of_int (List.length list1))
+      | None -> VVstring "no cousin list")
+  | [ "cous_paths"; l1; l2 ] -> (
       let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
       match list1 with
       | Some list1 ->
-          let list2 = cousins_fold list1 in
-          (* first try, list 1 = 2 x list2 !! 2 parents = 2 children! *)
           (match get_env "cousins" env with
-          | Vcousl l -> l := list2
+          | Vcousl l -> l := list1; VVstring ""
           | _ -> raise Not_found);
-          VVstring (string_of_int (List.length list2))
       | None -> raise Not_found)
   | [ "cousins"; "max_a" ] ->
       let max_a, _ = max_l1_l2 conf base env p in
@@ -4285,20 +4279,16 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
         (get_first_names_aliases p)
   in
-  let print_foreach_cousin env al ep _listname =
-    let l = match get_env "cousins" env with Vcousl l -> !l | _ -> [] in
+  let print_foreach_cousin_path env al ep listname =
+    let l = match get_env listname env with Vcousl l -> !l | _ -> [] in
     let rec loop cnt = function
       | [] -> ()
-      | (ip, (ifam, iparl, nbr)) :: sll ->
+      | (ip, ifam, ianc) :: sll ->
           let env =
             ("cousin", Vind (pget conf base ip))
             :: ("anc_f_index", Vifam ifam)
-            :: ("anc1_index", Vind (pget conf base (List.nth iparl 0)))
-            :: ("anc2_index", Vind (pget conf base
-                (if List.length iparl > 1
-                 then List.nth iparl 1
-                 else Gwdb.dummy_iper)))
-            :: ("nbr", Vint nbr) :: ("cnt", Vint cnt) :: env
+            :: ("anc", Vind (pget conf base ianc))
+            :: ("cnt", Vint cnt) :: env
           in
           List.iter (print_ast env ep) al;
           loop (cnt + 1) sll
@@ -4530,7 +4520,7 @@ let print_foreach conf base print_ast eval_expr =
     | "ancestor_tree_line" -> print_foreach_ancestor_tree env el al ep
     | "cell" -> print_foreach_cell env al ep
     | "child" -> print_foreach_child env al ep efam
-    | "cousin" -> print_foreach_cousin env al ep "cousin"
+    | "cous_path" -> print_foreach_cousin_path env al ep "cousins"
     | "cousin_level" -> print_foreach_cousin_level env al ep
     | "descendant_level" -> print_foreach_descendant_level env al ep
     | "event" -> print_foreach_event env al ep
