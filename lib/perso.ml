@@ -1165,7 +1165,7 @@ type 'a env =
   | Vcell of cell
   | Vcelll of cell list
   | Vcnt of int ref
-  | Vcousl of (iper * (ifam * iper * iper * int)) list ref
+  | Vcousl of (iper * (ifam * (iper list) * int)) list ref
   | Vdesclevtab of ((iper, int) Marker.t * (ifam, int) Marker.t) lazy_t
   | Vdmark of (iper, bool) Marker.t ref
   | Vslist of SortedList.t ref
@@ -1350,21 +1350,20 @@ let cousins_l1_l2_aux conf base env l1 l2 p =
     Some cousins_cnt.(il1).(il2)
   else None
 
-(* create a new list (ip, (ifam, ipar1, ipar2, cnt)) from (ip, ifam, ipar) *)
+(* create a new list of (ip, (ifam, iparlist, count)) from list of (ip, ifam, ipar) *)
 let cousins_fold list =
   let list = List.sort compare list in
-  let rec loop full acc (ip0, (ifam0, ipar10, ipar20, cnt0)) =
+  let rec loop full acc (ip0, (ifam0, iparl0, cnt0)) =
     function
     | (ip, ifam, ipar) :: l when ip = ip0 && ifam = ifam0 ->
-        if ipar = ipar10 then
-          loop true acc (ip, (ifam, ipar, ipar20, (cnt0 +1))) l
-        else
-          loop true acc (ip, (ifam, ipar10, ipar, (cnt0 +1))) l
+        loop true acc (ip, (ifam,
+          (if List.mem ipar iparl0 then iparl0 else (ipar :: iparl0)),
+          (cnt0 +1))) l
     | (ip, ifam, ipar) :: l ->
-        loop false (if full then ((ip0, (ifam0, ipar10, ipar20, cnt0)) :: acc) else acc)
-          (ip, (ifam, ipar, Gwdb.dummy_iper, 1)) l
-    | [] -> (ip0, (ifam0, ipar10, ipar20, cnt0)) :: acc
-  in loop false [] (Gwdb.dummy_iper, (Gwdb.dummy_ifam, Gwdb.dummy_iper, Gwdb.dummy_iper, 0)) list
+        loop false (if full then ((ip0, (ifam0, iparl0, cnt0)) :: acc) else acc)
+          (ip, (ifam, [ipar], 1)) l
+    | [] -> (ip0, (ifam0, iparl0, cnt0)) :: acc
+  in loop false [] (Gwdb.dummy_iper, (Gwdb.dummy_ifam, [], 0)) list
 
 let bool_val x = VVbool x
 let str_val x = VVstring x
@@ -4290,12 +4289,15 @@ let print_foreach conf base print_ast eval_expr =
     let l = match get_env "cousins" env with Vcousl l -> !l | _ -> [] in
     let rec loop cnt = function
       | [] -> ()
-      | (ip, (ifam, ipar1, ipar2, nbr)) :: sll ->
+      | (ip, (ifam, iparl, nbr)) :: sll ->
           let env =
             ("cousin", Vind (pget conf base ip))
             :: ("anc_f_index", Vifam ifam)
-            :: ("anc1_index", Vind (pget conf base ipar1))
-            :: ("anc2_index", Vind (pget conf base ipar2))
+            :: ("anc1_index", Vind (pget conf base (List.nth iparl 0)))
+            :: ("anc2_index", Vind (pget conf base
+                (if List.length iparl > 1
+                 then List.nth iparl 1
+                 else Gwdb.dummy_iper)))
             :: ("nbr", Vint nbr) :: ("cnt", Vint cnt) :: env
           in
           List.iter (print_ast env ep) al;
