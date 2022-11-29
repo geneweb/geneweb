@@ -1495,7 +1495,7 @@
 %end;
 
 %define;table_ancestor_to_somebody()
-  %pvar.1.mark_descendants;
+  %p_of_index.1.mark_descendants;
   %foreach;ancestor_level;
     %apply;lazy_print%with;
       <tr><th colspan="7" >%nl;[*generation/generations]0 %level;%nl;</th></tr>
@@ -1583,7 +1583,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     %sp;%surname;
     %if;(alias != "") <em>(%alias;)</em>%end;
   %end;
-  %if;(e.t = "D") [up to] %pvar.1;
+  %if;(e.t = "D") [up to] %p_of_index.1;
   %else;
      %if;(cancel_links and e.v > 4) %apply;togena(e.v)%end;
   %end;
@@ -2005,7 +2005,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 
 %elseif;(e.t = "D")
   %( ancestors up to somebody %)
-  %pvar.1.mark_descendants;
+  %p_of_index.1.mark_descendants;
   <ul>
     %foreach;ancestor_level;
       %apply;lazy_print%with;
@@ -2029,7 +2029,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 
 %elseif;(e.t = "X" or e.t = "Y")
   %if;(e.t = "X")
-    <p>[*only] [up to] %pvar.1; %pvar.1.dates; </p>
+    <p>[*only] [up to] %p_of_index.1; %p_of_index.1.dates; </p>
      %(%if;(not cancel_links)
        <div class="menu">
          %if;(has_sosa)<span><a href="%prefix;m=X&t=X&t1=1&i=%e.i1;&i1=%index;&siblings=on&alias=on&spouse=on&parents=on&rel=on&notes=on&src=on&hide=on&witn=on&v=%e.l;&maxv=%e.l;&l=%e.l;">[*descendants]0</a></span>%end;
