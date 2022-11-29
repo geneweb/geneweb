@@ -87,9 +87,9 @@
 
 %define;tGup()
   %( ;t=G;i1=index;  up to somebody %)
-  <p>[*up to] %pvar.1; %pvar.1.dates;</p>
+  <p>[*up to] %p_of_index.1; %p_of_index.1.dates;</p>
   %reset_count;
-  %pvar.1.mark_descendants;
+  %p_of_index.1.mark_descendants;
   %foreach;ancestor_level;
     %apply;lazy_print%with;
       <h3 class="generation">[*generation/generations]0 %level;</h3>

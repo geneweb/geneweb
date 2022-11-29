@@ -21,20 +21,20 @@
 %define;one_i_line(z1)
     <tr id="srz1">
       <td class="b1"><a tabindex="10000" href="javascript:addPvar(z1,0);">+</a></td>
-      <td><input id="rpz1_occ" name="ocz1" class="occ3" autocomplete="off" size="5" maxlength="8" value="%pvar.z1.occ;"
+      <td><input id="rpz1_occ" name="ocz1" class="occ3" autocomplete="off" size="5" maxlength="8" value="%p_of_index.z1.occ;"
            onkeypress="javascript:return oKP2(event,'p','z1','_occ','')"%/></td>
       <td class="b1"><a tabindex="10000" href="javascript:delS('p','z1','_occ',1,0,'');">x</a></td>
-      <td><input id="rpz1_fn" name="pz1" class="ar" size="30" maxlength="200" value="%pvar.z1.first_name;" onblur="tUC1(this)"%/></td>
-      <td><input id="rpz1_sn" name="nz1" size="30" maxlength="200" value="%pvar.z1.surname;" onblur="tUC(this);jq1('pz1','')"%/></td>
+      <td><input id="rpz1_fn" name="pz1" class="ar" size="30" maxlength="200" value="%p_of_index.z1.first_name;" onblur="tUC1(this)"%/></td>
+      <td><input id="rpz1_sn" name="nz1" size="30" maxlength="200" value="%p_of_index.z1.surname;" onblur="tUC(this);jq1('pz1','')"%/></td>
       <td class="b1"><a tabindex="10000" href="javascript:invertS('p','z1','_occ',0,1,'');">&uarr;</a></td>
       <td class="b1"><span id="pz1_jq1">
-          %if;pvar.z1.has_birth_date; %pvar.z1.slash_birth_date;
-          %elseif;pvar.z1.has_baptism_date; %pvar.z1.slash_baptism_date;
+          %if;p_of_index.z1.has_birth_date; %p_of_index.z1.slash_birth_date;
+          %elseif;p_of_index.z1.has_baptism_date; %p_of_index.z1.slash_baptism_date;
           %end;
            - %nn;
-          %if;pvar.z1.has_death_date;%pvar.z1.slash_death_date;
-          %elseif;pvar.z1.has_burial_date;%pvar.z1.slash_burial_date;
-          %elseif;pvar.z1.has_cremation_date;%pvar.z1.slash_cremation_date;
+          %if;p_of_index.z1.has_death_date;%p_of_index.z1.slash_death_date;
+          %elseif;p_of_index.z1.has_burial_date;%p_of_index.z1.slash_burial_date;
+          %elseif;p_of_index.z1.has_cremation_date;%p_of_index.z1.slash_cremation_date;
           %end;
         </span></td>
       <td class="b1"><a tabindex="10000" href="javascript:invertS('p','z1','_occ',1,1,'');">&darr;</a></td>
@@ -52,13 +52,13 @@
       <td><input id="sz1_sn" name="snz1" size="30" maxlength="200" value="%svar.z1.surname;" onblur="tUC(this);jq1('pz1','')"%/></td>
       <td class="b1"><a tabindex="10000" href="javascript:invertS('p','z1','_occ',0,1,'');">&uarr;</a></td>
       <td class="b1"><span id="pz1_jq1">
-          %if;pvar.z1.has_birth_date; %pvar.z1.slash_birth_date;
-          %elseif;pvar.z1.has_baptism_date; %pvar.z1.slash_baptism_date;
+          %if;p_of_index.z1.has_birth_date; %p_of_index.z1.slash_birth_date;
+          %elseif;p_of_index.z1.has_baptism_date; %p_of_index.z1.slash_baptism_date;
           %end;
            - %nn;
-          %if;pvar.z1.has_death_date;%pvar.z1.slash_death_date;
-          %elseif;pvar.z1.has_burial_date;%pvar.z1.slash_burial_date;
-          %elseif;pvar.z1.has_cremation_date;%pvar.z1.slash_cremation_date;
+          %if;p_of_index.z1.has_death_date;%p_of_index.z1.slash_death_date;
+          %elseif;p_of_index.z1.has_burial_date;%p_of_index.z1.slash_burial_date;
+          %elseif;p_of_index.z1.has_cremation_date;%p_of_index.z1.slash_cremation_date;
           %end;
         </span></td>
       <td class="b1"><a tabindex="10000" href="javascript:invertS('p','z1','_occ',1,1,'');">&darr;</a></td>
@@ -83,25 +83,25 @@
   %if;(evar_iz1 != "")
     <tr id="pz1">
       <td class="b1"><a tabindex="10000" href="javascript:addPvar(z1,0);">+</a></td>
-      <td><input id="pz1_occ" name="ocz1" class="occ3 form-control" autocomplete="off" size="5" maxlength="8" value="%pvar.z1.occ;"
+      <td><input id="pz1_occ" name="ocz1" class="occ3 form-control" autocomplete="off" size="5" maxlength="8" value="%p_of_index.z1.occ;"
            onkeypress="javascript:return oKP2(event,'p','z1','_occ','')"%/></td>
       <td class="b1"><a tabindex="10000" href="javascript:delS('p','z1','_occ',1,0,'');">x</a></td>
-      <td><input id="pz1_fn" name="pz1" class="ar form-control" size="30" maxlength="200" value="%pvar.z1.first_name;" onblur="tUC1(this)"%/></td>
-      <td><input id="pz1_sn" name="nz1" class="form-control" size="30" maxlength="200" value="%pvar.z1.surname;" onblur="tUC(this);jq1('pz1','')"%/></td>
+      <td><input id="pz1_fn" name="pz1" class="ar form-control" size="30" maxlength="200" value="%p_of_index.z1.first_name;" onblur="tUC1(this)"%/></td>
+      <td><input id="pz1_sn" name="nz1" class="form-control" size="30" maxlength="200" value="%p_of_index.z1.surname;" onblur="tUC(this);jq1('pz1','')"%/></td>
       <td class="b1"><a tabindex="10000" href="javascript:invertS('p','z1','_occ',0,1,'');">&uarr;</a></td>
       <td class="b1"><span id="pz1_jq1">
-          %if;pvar.z1.has_birth_date; %pvar.z1.slash_birth_date;
-          %elseif;pvar.z1.has_baptism_date; %pvar.z1.slash_baptism_date;
+          %if;p_of_index.z1.has_birth_date; %p_of_index.z1.slash_birth_date;
+          %elseif;p_of_index.z1.has_baptism_date; %p_of_index.z1.slash_baptism_date;
           %end;
            - %nn;
-          %if;pvar.z1.has_death_date;%pvar.z1.slash_death_date;
-          %elseif;pvar.z1.has_burial_date;%pvar.z1.slash_burial_date;
-          %elseif;pvar.z1.has_cremation_date;%pvar.z1.slash_cremation_date;
+          %if;p_of_index.z1.has_death_date;%p_of_index.z1.slash_death_date;
+          %elseif;p_of_index.z1.has_burial_date;%p_of_index.z1.slash_burial_date;
+          %elseif;p_of_index.z1.has_cremation_date;%p_of_index.z1.slash_cremation_date;
           %end;
         </span></td>
       <td class="b1"><a tabindex="10000" href="javascript:invertS('p','z1','_occ',1,1,'');">&darr;</a></td>
       <td><input id="pz1_t" name="tz1" class="form-control" size="30" maxlength="200" value="%evar.tz1;"
-          %/><input type="hidden" id="pz1_i" name="iz1" size="5" value="%pvar.z1.index;" %/></td>
+          %/><input type="hidden" id="pz1_i" name="iz1" size="5" value="%p_of_index.z1.index;" %/></td>
     </tr>
     %apply;one_pvar(z1+1)
   %end;
@@ -158,8 +158,8 @@
 
 %define;sosa_dag(z1)
   %if;(evar.iz1 != "")
-    %if;(pvar.z1.has_sosa)
-      %apply;add_in_sorted_list(pvar.z1.sosa.v)
+    %if;(p_of_index.z1.has_sosa)
+      %apply;add_in_sorted_list(p_of_index.z1.sosa.v)
     %end;
     %apply;sosa_dag(z1+1)
   %end;

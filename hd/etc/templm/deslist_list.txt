@@ -72,7 +72,7 @@
     %if;(evar.i1 = "" and evar.p1 = "")
       %apply;togen()
     %else;
-      [*up to] %pvar.1; %pvar.1.dates;
+      [*up to] %p_of_index.1; %p_of_index.1.dates;
     %end;
   </p>
   %apply;descendants_by_list("self","self",0,l_v)%nl;

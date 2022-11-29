@@ -189,7 +189,7 @@
 
 %define;tX()
   %( ancestors up to somebody %)
-  %pvar.1.mark_descendants;
+  %p_of_index.1.mark_descendants;
   %foreach;ancestor_level;
     %apply;lazy_print%with;
       <tr><th colspan="7" >%nl;[*generation/generations]0 %level;%nl;</th></tr>
@@ -224,7 +224,7 @@
   %apply;togen()
 %end;
 %if;(evar.t = "X")
-  <p>[*up to] %pvar.1; %pvar.1.dates;</p>
+  <p>[*up to] %p_of_index.1; %p_of_index.1.dates;</p>
   %if;(not cancel_links)
     <div class="menu">
       %if;(has_sosa)<span><a href="%prefix;m=X;t=X;t1=1;i=%evar.i1;;i1=%index;;siblings=on;alias=on;spouse=on;parents=on;rel=on;notes=on;src=on;hide=on;witn=on;v=%evar.l;;maxv=%evar.l;;l=%evar.l;">[*descendants]0</a></span>%end;
