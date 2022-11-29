@@ -521,7 +521,7 @@ let string_of_witness_kind :
   | Witness_Informant -> Some "#info"
   | Witness_Attending -> Some "#atte"
   | Witness_Mentioned -> Some "#ment"
-  | Witness_Other -> Some "#othe"
+  | Witness_Other     -> Some "#othe"
 
 let print_witness opts base gen p =
   Printf.ksprintf (oc opts) "%s %s%s"
@@ -623,7 +623,7 @@ let print_pevent opts base gen e =
          print_witness opts base gen p;
          Printf.ksprintf (oc opts) "\n")
     e.epers_witnesses;
-  let note = if opts.no_notes <> `nnn then sou base e.epers_note else "" in
+  let note = if opts.notes then sou base e.epers_note else "" in
   if note <> "" then
     List.iter
       (fun line -> Printf.ksprintf (oc opts) "note %s\n" line)
@@ -722,7 +722,7 @@ let print_fevent opts base gen in_comment e =
          print_witness opts base gen p;
          print_sep ())
     e.efam_witnesses;
-  let note = if opts.no_notes <> `nnn then sou base e.efam_note else "" in
+  let note = if opts.notes then sou base e.efam_note else "" in
   if note <> "" then
     List.iter
       (fun line ->
@@ -731,7 +731,7 @@ let print_fevent opts base gen in_comment e =
       (lines_list_of_string note)
 
 let print_comment_for_family opts base gen fam =
-  let comm = if opts.no_notes <> `nnn then sou base (get_comment fam) else "" in
+  let comm = if opts.notes then sou base (get_comment fam) else "" in
   (* Si on est en mode old_gw, on mets tous les évènements dans les notes. *)
   (* On supprime les 2 évènements principaux. *)
   let fevents =
@@ -945,7 +945,7 @@ let print_notes_for_person opts base gen p =
          Printf.ksprintf (oc opts) "\n")
       witnesses
   in
-  let notes = if opts.no_notes <> `nnn then sou base (get_notes p) else "" in
+  let notes = if opts.notes then sou base (get_notes p) else "" in
   let surn = s_correct_string (p_surname base p) in
   let fnam = s_correct_string (p_first_name base p) in
   (* Si on n'est en mode old_gw, on mets tous les évènements dans les notes. *)
@@ -1662,7 +1662,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
                 print_isolated_relations opts base gen p)
       (Gwdb.ipers base);
   if !Mutil.verbose then ProgrBar.finish ();
-  if opts.no_notes = `none then (
+  if opts.base_notes then (
     let s = base_notes_read base "" in
     let oc, first, _ = origin_file (base_notes_origin_file base) in
     if s <> "" then (
