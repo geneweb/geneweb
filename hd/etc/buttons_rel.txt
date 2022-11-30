@@ -43,21 +43,21 @@
   <div class="col-3">
     <a href="%prefix_base_password;%nn;
       %foreach;env_binding;%if;(env.key!="image")%env.key;=%env.val;;%end;%end;%nn;
-      %if;(evar.image!="off")image=off;%end;"
-      %if;(evar.dag="on")class="disabled"%end;
-      title="%if;(evar.image!="off")[*visualize/show/hide/summary]2%else;
+      %if;(e.image!="off")image=off;%end;"
+      %if;(e.dag="on")class="disabled"%end;
+      title="%if;(e.image!="off")[*visualize/show/hide/summary]2%else;
           [*visualize/show/hide/summary]1%end; [image/images]0">
-      <i class="far fa-image fa-lg%if;(evar.image!="off") text-danger%end;"></i></a>
+      <i class="far fa-image fa-lg%if;(e.image!="off") text-danger%end;"></i></a>
     <a class="ml-2" href="%prefix_base_password;%nn;
       %foreach;env_binding;%if;(env.key!="spouse")%env.key;=%env.val;;%end;%end;%nn;
-      %if;(evar.spouse!="on")spouse=on;%end;"
-      %if;(evar.dag="on")class="disabled"%end;"
-      title="%if;(evar.spouse!="on")[*visualize/show/hide/summary]1%else;
+      %if;(e.spouse!="on")spouse=on;%end;"
+      %if;(e.dag="on")class="disabled"%end;"
+      title="%if;(e.spouse!="on")[*visualize/show/hide/summary]1%else;
           [*visualize/show/hide/summary]2%end; [spouse/spouses]1">
-      <i class="fa fa-user male p-0"></i>%if;(evar.spouse!="on")<i class="fa fa-user female p-0"></i>%end;</a>
-    %if;(evar.i!="" and evar.ei!="")
+      <i class="fa fa-user male p-0"></i>%if;(e.spouse!="on")<i class="fa fa-user female p-0"></i>%end;</a>
+    %if;(e.i!="" and e.ei!="")
       <a class="ml-2" href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env.key!="" and env.key!="i" and env.key!="ei")%env.key;=%env.val;&%end;%end;&i=%evar.ei;&ei=%evar.i;"
+        %foreach;env_binding;%if;(env.key!="" and env.key!="i" and env.key!="ei")%env.key;=%env.val;&%end;%end;&i=%e.ei;&ei=%e.i;"
         title="[*invert] [person/persons]1"><i class="fa fa-people-arrows fa-fw"></i></a>
     %elseif;(e.i1!="" and person_index.1!="" and e.i2!="" and person_index.2!="")
       <a class="ml-2" href="%prefix_base_password;%nn;
@@ -68,6 +68,7 @@
         &i1=%person_index.2;&i2=%person_index.1;&"
         title="[*invert] [person/persons]1"><i class="fas fa-people-arrows fa-lg fa-fw"></i></a>
     %end;
+    <a class="ml-2" href="%url;&dag=on" target="_blank"><i class="fa fa-random fa-fw" title="[*dag]"></i></a>
     <a class="ml-2" href="%url;&cgl=on" target="_blank"><i class="fa fa-unlink fa-fw" title="[*cancel GeneWeb links]"></i></a>
   </div>
 </div>
