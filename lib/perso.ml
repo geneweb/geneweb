@@ -2527,6 +2527,13 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
   | [ "cousins"; "max_d" ] ->
       let _, max_d = max_l1_l2 conf base env p in
       VVstring (string_of_int max_d)
+  | [ "cousins_cnt"; l1; l2 ] -> (
+      let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
+      match list1 with
+      | Some list ->
+          let list = List.map (fun (ip, _, _) -> ip) list |> List.sort_uniq compare in
+          VVstring (string_of_int (List.length list))
+      | None -> VVstring "no cousin list")
   | "cremated_date" :: sl -> (
       match get_burial p with
       | Cremated cod when p_auth -> (
