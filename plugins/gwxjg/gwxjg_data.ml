@@ -1121,7 +1121,7 @@ let mk_conf conf =
 
 let mk_env_no_base conf =
   let prefix = escaped (Util.commd conf) in
-  let prefix_base = escaped (Util.prefix_base conf) in
+  let prefix_base = escaped (Util.prefix_base_password conf) in
   Tpat
     (function
     | "prefix" -> prefix
@@ -1130,7 +1130,7 @@ let mk_env_no_base conf =
 
 let mk_env conf base =
   let prefix = escaped (Util.commd conf) in
-  let prefix_base = escaped (Util.prefix_base conf) in
+  let prefix_base = escaped (Util.prefix_base_password conf) in
   let sosa_ref =
     box_lazy
     @@ lazy
