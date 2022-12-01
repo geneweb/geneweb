@@ -480,6 +480,7 @@ let searching_fields conf base =
       | Some d1, Some d2 ->
           search ^^^ " "
           ^<^ transl conf "between (date)"
+          ^<^ " "
           ^<^ DateDisplay.string_of_date conf d1
           ^^^ " " ^<^ transl conf "and" ^<^ " "
           ^<^ DateDisplay.string_of_date conf d2
