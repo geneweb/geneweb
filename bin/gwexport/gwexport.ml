@@ -38,7 +38,7 @@ let default_opts =
     no_notes = true;
     base_notes = true;
     no_picture = false;
-    oc = ("", prerr_string, fun () -> close_out stderr);
+    oc = ("", print_string, fun () -> close_out stdout);
     parentship = false;
     picture_path = false;
     source = None;
@@ -97,7 +97,7 @@ let speclist c =
     ( "-no-notes", Arg.Unit (fun () -> c := { !c with notes = false; base_notes = false})
     , " no notes (implies -no-base-notes)." );
     ( "-no-picture", Arg.Unit (fun () -> c := { !c with no_picture = true })
-      " don't extract individual picture." );
+    , " don't extract individual picture." );
     ( "-o",
       Arg.String
         (fun s ->
