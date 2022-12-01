@@ -976,41 +976,55 @@ type 'a read_family =
   | F_fail of string
   (** Exception while reading *)
 
-(** Read succesive family note lines and concat it. *)
-let loop_note line ic =
-  let rec loop_note acc str =
+(** Read succesive lines starting with `tag` and concat them. *)
+let aux_loop_note tag line ic =
+  let tag_len = String.length tag in
+  let rec loop acc str =
     match fields str with
-    | "note" :: tl ->
+    | s::tl when s = tag->
       let note =
         if tl = [] then ""
         else
           String.sub
             str
-            (String.length "note" + 1)
-            (String.length str - String.length "note" - 1)
+            (tag_len + 1)
+            (String.length str - tag_len - 1)
       in
-      loop_note (note :: acc) (input_a_line ic)
-    | _ -> String.concat "\n" (List.rev @@ "" :: acc), str
+      loop (note :: acc) (input_a_line ic)
+    | _l -> acc, str
   in
-  loop_note [] line
+  let acc, line = loop [] line in
+  let note =
+  String.concat "\n" (List.rev @@ "" :: acc) |>
+    Mutil.strip_all_trailing_spaces in
+  note, line
 
-(** Parse witnesses across the lines and returns list of [(wit,wsex,wk)]
+(** Parse note (succesive lines starting with "note") *)
+let loop_note = aux_loop_note "note"
+
+(** Parse wintess note (succesive lines starting with "wnote") *)
+let loop_witness_note = aux_loop_note "wnote"
+
+(** Parse witnesses across the lines and returns list of [(wit,wsex,wk,wnote)]
     where wit is a witness definition/reference, [wsex] is a sex of witness
-    and [wk] is a kind of witness relationship to the family. *)
+    , [wk] is a kind of witness relationship to the family, [wnote] is a witness note. *)
 let loop_witn line ic =
   let rec loop_witn acc str =
     match fields str with
-      ("wit" | "wit:") :: l ->
+    | ("wit" | "wit:") :: l ->
       let (sex, l) =
+        (* TODO factorize sex parsing? *)
         match l with
-          "m:" :: l -> Male, l
+        | "m:" :: l -> Male, l
         | "f:" :: l -> Female, l
         | l -> Neuter, l
       in
       let (wkind, l) = get_event_witness_kind l in
-      let (wk, _, l) = parse_parent str l in
+      let (wit, _, l) = parse_parent str l in
       if l <> [] then failwith str;
-      loop_witn ((wk, sex, wkind, "") :: acc) (input_a_line ic)
+      (* read witness note which starts on a new line *)
+      let wnote, str = loop_witness_note (input_a_line ic) ic in
+      loop_witn ((wit, sex, wkind, wnote) :: acc) str
     | _ -> (List.rev acc, str)
   in
   loop_witn [] line
@@ -1040,6 +1054,7 @@ let read_family ic fname =
       (* read list of witnesses with their sex (if exists) *)
       let (witn, line) =
         let rec loop =
+          (* TODO duplicate of loop_witn ?*)
           function
             Some (str, ("wit" | "wit:") :: l) ->
               let (sex, l) =
@@ -1113,7 +1128,6 @@ let read_family ic fname =
                     let (witn, line) = loop_witn (input_a_line ic) ic in
                     (* On récupère les notes *)
                     let (notes, line) = loop_note line ic in
-                    let notes = Mutil.strip_all_trailing_spaces notes in
                     let evt = name, date, place, cause, src, notes, witn in
                     loop (evt :: fevents) line
               in
@@ -1260,7 +1274,6 @@ let read_family ic fname =
                 let (witn, line) = loop_witn (input_a_line ic) ic in
                 (* On récupère les notes *)
                 let (notes, line) = loop_note line ic in
-                let notes = Mutil.strip_all_trailing_spaces notes in
                 let evt = name, date, place, cause, src, notes, witn in
                 loop (evt :: pevents) line
           in

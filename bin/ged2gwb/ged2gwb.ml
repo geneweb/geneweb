@@ -1309,28 +1309,31 @@ let witness_kind_of_rval rval = match rval with
   | "Mentioned"          -> Witness_Mentioned
   | "Other"              -> Witness_Other
   | _                    -> Witness
-(* WNOTES TODO HANDLE WNOTES *)              
-let find_event_witness gen tag ip r =
+
+let find_event_witness_aux gen i r forward =
   let rec find_witnesses =
     function
-      [] -> []
+    | [] -> []
     | r :: asso_l ->
-        if find_field_with_value "TYPE" tag r.rsons then
-          let witness = forward_pevent_witn gen ip (strip_spaces r.rval) in
-          let witness_kind =
-            match find_field "RELA" r.rsons with
-              Some rr -> witness_kind_of_rval rr.rval
-            | _ -> Witness
-          in
-          (witness, witness_kind, -1) :: find_witnesses asso_l
-        else
-          let witness = forward_pevent_witn gen ip (strip_spaces r.rval) in
-          let witness_kind =
-            match find_field "RELA" r.rsons with
-              Some rr -> witness_kind_of_rval rr.rval
-            | _ -> Witness
-          in
-          (witness, witness_kind, -1) :: find_witnesses asso_l
+        let _b = (* TODO side effect? *)
+          find_field_with_value "TYPE" "INDI" r.rsons in
+        let witness = forward gen i (strip_spaces r.rval) in
+        let witness_kind =
+          match find_field "RELA" r.rsons with
+          | Some rr -> witness_kind_of_rval rr.rval
+          | None -> Witness
+        in
+         let wnote =
+           add_string gen @@
+           (* TODO factorize this *)
+           match find_all_fields "NOTE" r.rsons with
+           | [] -> ""
+           | rl ->
+               let s = treat_notes gen rl in
+               Format.eprintf "EPRINTF DE LA NOTE: %s@." s;
+               s
+         in
+        (witness, witness_kind, wnote) :: find_witnesses asso_l
   in
   let witnesses =
     match find_all_fields "ASSO" r.rsons with
@@ -1339,34 +1342,11 @@ let find_event_witness gen tag ip r =
   in
   Array.of_list witnesses
 
-let find_fevent_witness gen tag ifath r =
-  let rec find_witnesses =
-    function
-      [] -> []
-    | r :: asso_l ->
-        if find_field_with_value "TYPE" tag r.rsons then
-          let witness = forward_fevent_witn gen ifath (strip_spaces r.rval) in
-          let witness_kind =
-            match find_field "RELA" r.rsons with
-              Some rr -> witness_kind_of_rval rr.rval
-            | _ -> Witness
-          in
-          (witness, witness_kind, -1) :: find_witnesses asso_l
-        else
-          let witness = forward_fevent_witn gen ifath (strip_spaces r.rval) in
-          let witness_kind =
-            match find_field "RELA" r.rsons with
-              Some rr -> witness_kind_of_rval rr.rval
-            | _ -> Witness
-          in
-          (witness, witness_kind, -1) :: find_witnesses asso_l
-  in
-  let witnesses =
-    match find_all_fields "ASSO" r.rsons with
-      [] -> []
-    | wl -> find_witnesses wl
-  in
-  Array.of_list witnesses
+let find_event_witness gen ip r =
+  find_event_witness_aux gen ip r forward_pevent_witn
+
+let find_fevent_witness gen ifath r =
+  find_event_witness_aux gen ifath r forward_fevent_witn
 
 let find_pevent_name_from_tag gen tag tagv =
   match tag with
@@ -1474,7 +1454,7 @@ let treat_indi_pevent gen ip r =
                     in
                     loop true "" rl
               in
-              let witnesses = find_event_witness gen "INDI" ip r in
+              let witnesses = find_event_witness gen ip r in
               let evt =
                 {epers_name = name; epers_date = Adef.cdate_of_od date;
                  epers_place = add_string gen place;
@@ -1546,7 +1526,7 @@ let treat_indi_pevent gen ip r =
                      in
                      loop true "" rl
                in
-               let witnesses = find_event_witness gen "INDI" ip r in
+               let witnesses = find_event_witness gen ip r in
                let evt =
                  {epers_name = name; epers_date = Adef.cdate_of_od date;
                   epers_place = add_string gen place;
@@ -2184,7 +2164,7 @@ let treat_fam_fevent gen ifath r =
                     in
                     loop true "" rl
               in
-              let witnesses = find_fevent_witness gen "INDI" ifath r in
+              let witnesses = find_fevent_witness gen ifath r in
               (* Vérification du mariage. *)
               let (name, place) =
                 match name with
@@ -2265,7 +2245,7 @@ let treat_fam_fevent gen ifath r =
                      in
                      loop true "" rl
                in
-               let witnesses = find_fevent_witness gen "INDI" ifath r in
+               let witnesses = find_fevent_witness gen ifath r in
                let evt =
                  {efam_name = name; efam_date = Adef.cdate_of_od date;
                   efam_place = add_string gen place;

@@ -817,6 +817,7 @@ let update_family_with_fevents gen fam =
 let update_fevents_with_family gen fam =
   let empty_string = 0 in
   let evt_marr =
+    (* make a marriage fevent from gen_family's basic marriage info *)
     let name =
       match fam.relation with
       | Married -> Efam_Marriage
