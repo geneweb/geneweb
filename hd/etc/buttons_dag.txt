@@ -45,7 +45,7 @@
         %end;
       %end;
   %end;
-%elseif;(e.em!="R" and e.em!="RLM" and e.m!="A")
+%elseif;(e.em!="R" and e.m!="RLM" and e.m!="A" and e.m!="RL")
   %foreach;father.child;
     %if;is_sibling_before;
       %apply;setvar%with;prevsiblingaccess%and;%child.access;%end;
@@ -55,6 +55,7 @@
       %apply;setvar%with;nextsiblingname%and;%child.first_name; %child.surname;%end;
     %end;
   %end;
+%else;
 %end;
 %let;father_access;%if(dtree=1)%get_var.fatheraccess;%else;%father.access;%end;%in;
 %let;mother_access;%if(dtree=1)%get_var.motheraccess;%else;%mother.access;%end;%in;
