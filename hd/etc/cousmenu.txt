@@ -18,13 +18,13 @@
 </head>
 <body%body_prop;>
 %message_to_wizard;
-<div class="container%if;(e.v!="" and e.v>8)-fluid%end;">
+<div class="container%if;(e.v!="" and e.v>7)-fluid%end;">
 %include;perso_utils
 %include;menubar
 %let;min;%if;(not has_children)1%else;0%end;%in;
 %let;max;%if;(bvar.max_anc_level!="" and bvar.max_anc_level<max_anc_level)%bvar.max_anc_level;%elseif;(static_max_anc_level!="")%static_max_anc_level;%end;%in;
 %define;picklvl(vvv)
-  <a role="button" class="btn btn-sm%if;(e.v!="" and e.v=vvv) disabled font-weight-bold text-white bg-dark%else; bg-transparent%end; p-1%if;(vvv<10) px-2%end;" href="%url_set.v.vvv;"%sp;
+  <a role="button" class="btn btn-sm btn-outline-light %if;(e.v!="" and e.v=vvv) disabled font-weight-bold text-white bg-dark%else; %end; p-1%if;(vvv<10) px-2%end;" href="%url_set.v.vvv;"%sp;
   title="[*ascending/descending (degree)]0 vvv%if;(vvv=0) ([self])%end;">vvv</a>%nn;
 %end;
 <div class="d-flex flex-column">
@@ -63,16 +63,21 @@
  %let;width;%expr((100/(evarv+1))*vvv)%in;
  %if;("ddd"="disabled" and vvv!=0)
  %else;
-   <td%if;(vvv>0) colspan="%expr(vvv+1)"%end; %if;(vvv=0)style="width:%expr(100/lll)%%"%end; class="table-%if;(vvv=0)info%elseif;(vvv %2 = 1)primary%else;danger%end;" >
-     <div class="%if;(vvv>=0)border-right %(border-bottom %)border-%if;(i=0)success%elseif;(vvv%2=1)primary%else;danger%end;%end; d-flex flex-column justify-content-between">
-       <div>vvv/0</div>
-       <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=0"
-        class="btn btn-light ddd w-100" style="height:80px;"
+   <td%if;(vvv>0) colspan="%expr(vvv+1)"%end; %if;(vvv=0)style="width:%expr(100/lll)%%"%end; class="table-%if;(vvv=0)info%elseif;(vvv %2 = 1)primary%else;danger%end;
+   %if;(vvv>=0) border-right border-top-0 border-bottom-0%sp;
+     border-%if;(i=0)success%elseif;(vvv%2=1)primary%else;danger%end;
+   %end;">
+     <div class="d-flex flex-column justify-content-between align-items-center position-relative">
+       <div class="mx-1">vvv/0</div>
+       <div class="flex-grow-1 w-100">
+         <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=0"
+        class="stretched-link btn btn-light ddd" %(style="height:2em;"%)
          data-toggle="tooltip" data-html="true" title="%apply;cousin_lex_tt(vvv,0)">
          %if;(vvv=0)<span class="badge badge-xl badge-success">1</span>%incr_count;%end; ttt%nn;
          <div class="d-flex justify-content-center"><div class="mt-1 mx-3 small text-muted">%apply;list_ancestor(vvv)</div></div></a>
-      %(<div>%expr(100/.(2^vvv)) %%</div>%)
-      </div>
+       </div>
+       %(<div>%expr(100/.(2^vvv)) %%</div>%)
+     </div>
     </td>
   %end;
 %end;
@@ -114,7 +119,7 @@
   %empty_sorted_list;%empty_sorted_listb;
   %foreach;cous_path;
     %apply;add_in_sorted_list%with;%cousin.surname; %cousin.first_name %cousin.dates; %cousin.occ;%and;%nn;
-      <li class="card list-group-item nbr_%cousin.nbr; py-1 px-1 rounded border-top-0 border-bottom-0 border-right-0 border-%if;(cousin.sex=0)primary%else;danger%end;" style="border-left-width: 6px;">%nn;
+      <li class="card list-group-item text-small nbr_%cousin.nbr; py-1 px-1 rounded border-top-0 border-bottom-0 border-right-0 border-%if;(cousin.sex=0)primary%else;danger%end;" style="border-left-width: 6px;">%nn;
         <div class="d-flex align-content-between align-items-start">
           <div class="ml-1 text-truncate text-left text-nowrap align-self-center" style="position:relative">
             <a href="%prefix;em=R&et=A&ei=%self.index;&i=%cousin.index;"
@@ -137,8 +142,8 @@
     %apply;add_in_sorted_listc%with;%cousin.index;%end;
   %end;
 <div class="modal fade" id="modal_vvv_www" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl" style="width:95%%;max-width:1650px;">
-    <div class="modal-content bg-transparent">
+  <div class="modal-dialog modal-xl modal-dialog-centered" style="width:95%%;max-width:%if;(listb_size>127)1600%elseif;(listb_size>31)1200%elseif;(listb_size>9)992%else;576%end;px;">
+    <div class="modal-content bg-transparent  border-0">
       <div class="modal-header position-relative bg-white p-2 pb-1 rounded-lg"">
         %let;extrapaths;%expr(cous_paths_cnt.vvv.www-listb_size)%in;
           <div class="modal-title bg-transparent justify-content-center align-items-center">
@@ -152,10 +157,11 @@
         </div>
       </div>
       <div class="modal-body">
-        <div class="card-columns"%( style="column-count:
-            %elseif;(cous_paths_cnt.vvv.www>128)5%nn;
-            %elseif;(cous_paths_cnt.vvv.www>64)4
-            %else;3%end;"%)>
+        <div class="card-columns" style="column-count:
+            %if;(cous_paths_cnt.vvv.www>511)5%nn;
+            %elseif;(cous_paths_cnt.vvv.www>127)4%nn;
+            %elseif;(cous_paths_cnt.vvv.www>31)3
+            %elseif;(cous_paths_cnt.vvv.www>9)2%else;1%end;">
           %if;(www!=0)
             <ul class="list-group bg-transparent">
               %foreach;sorted_list_item;%item.2;%end;
@@ -198,25 +204,25 @@
               <td class="border-0"></td>
             %end;%)
           %else;
-             %if;(i=0 and j=xxx)
-               %apply;link%with;0%and;j%and;
-               <b>%if;is_male;[him/her]0%elseif;is_female;[him/her]1%end;</b>%nn;
-               %and;disabled%and;%end;
-             %else;
-               <td %if;(j=xxx)style="width:%expr(100/xxx)%%"%end; class="table-%if;(i=0)info%elseif;(i %2 = 1)primary%else;danger%end;
-               %if;(i>=0) border-right border-left-0 border-top-0 border-bottom-0 border-%if;(i=0)success%elseif;(i%2=1)primary%else;danger%end;%end;">
-                 <div class="d-flex flex-column justify-content-between">
-                   <span>%i;/%k</span>
-                   %apply;cous_paths(i,k)
-                   %apply;link_cousin%with;%i;%and;%k;
-                     %and;%apply;cousin_lex(i,k)
-                     %and;%apply;cousin_lex_tt(i,k)
-                   %end;
-                 </div>
-                 %let;tot;%apply;cous%with;%i;%and;%k;%end;%in;
-                 %if;(tot!=0)%apply;cous_mod(i,k)%end;
-               </td>%nn;
-             %end;
+            %if;(i=0 and j=xxx)
+              %apply;link%with;0%and;j%and;
+              <b>%if;is_male;[him/her]0%elseif;is_female;[him/her]1%end;</b>%nn;
+              %and;disabled%and;%end;
+            %else;
+              <td %if;(j=xxx)style="width:%expr(100/xxx)%%"%end; class="table-%if;(i=0)info%elseif;(i %2 = 1)primary%else;danger%end;
+              %if;(i>=0) border-right border-left-0 border-top-0 border-bottom-0 border-%if;(i=0)success%elseif;(i%2=1)primary%else;danger%end;%end;">
+                <div class="d-flex flex-column justify-content-between">
+                  <span>%i;/%k</span>
+                  %apply;cous_paths(i,k)
+                  %apply;link_cousin%with;%i;%and;%k;
+                    %and;%apply;cousin_lex(i,k)
+                    %and;%apply;cousin_lex_tt(i,k)
+                  %end;
+                </div>
+                %let;tot;%apply;cous%with;%i;%and;%k;%end;%in;
+                %if;(tot!=0)%apply;cous_mod(i,k)%end;
+              </td>%nn;
+            %end;
           %end;
         %end;
       </tr>
