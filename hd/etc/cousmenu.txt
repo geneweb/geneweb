@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: cousmenu.txt, v7.1 24/11/2022 02:36:23 ddr a2 Exp $ -->
+  <!-- $Id: cousmenu.txt, v7.1 02/12/2022 09:20:43 ddr a2 Exp $ -->
   <!-- Copyright (c) 1998-2023 INRIA -->
   <title>%nn;
    [*relationship link between]%sp;
@@ -21,22 +21,15 @@
 <div class="container%if;(e.v!="" and e.v>8)-fluid%end;">
 %include;perso_utils
 %include;menubar
-  <h1>%nn;
-    [*link between]%sp;
-    %if;(public_name != "")%public_name;%else;%first_name;%end;
-    %if;(qualifier != "") <em>%qualifier;</em>%end;
-    %sp;%surname;
-    %(%if;(alias != "") <em>(%alias;)</em>%end;%)
-    %sp;[and] [close family]
-  </h1>
 %let;min;%if;(not has_children)1%else;0%end;%in;
 %let;max;%if;(bvar.max_anc_level!="" and bvar.max_anc_level<max_anc_level)%bvar.max_anc_level;%elseif;(static_max_anc_level!="")%static_max_anc_level;%end;%in;
 %define;picklvl(vvv)
-  <a role="button" class="btn btn-light btn-sm%if;((e.v="" and vvv=3) or (e.v!="" and e.v=vvv)) disabled font-weight-bold%end;" href="%url_set.v.vvv;"%sp;
+  <a role="button" class="btn btn-sm%if;(e.v!="" and e.v=vvv) disabled font-weight-bold text-white bg-dark%else; bg-transparent%end; p-1%if;(vvv<10) px-2%end;" href="%url_set.v.vvv;"%sp;
   title="[*ascending/descending (degree)]0 vvv%if;(vvv=0) ([self])%end;">vvv</a>%nn;
 %end;
-<div class="col-auto d-flex justify-content-between btn-toolbar px-3" role="toolbar" aria-label="button to select max ascending level">
-  <div class="ml-auto py-0 btn-group%if;(e.v!="" and e.v>3) mr-4%end; flex-wrap" role="group" aria-label="button v from 0 to max">
+<div class="d-flex flex-column">
+<div class="d-flex align-items-center btn-toolbar px-3" role="toolbar" aria-label="button to select max ascending level">
+  <div class="py-0 btn-group%if;(e.v!="" and e.v>3) mr-4%end; d-flex flex-wrap" role="group" aria-label="button v from 0 to max">
     %for;i;min;max;%apply;picklvl(i)%end;
   </div>
 </div>
@@ -46,22 +39,21 @@
 %end;
 %empty_sorted_listc;
 %define;list_ancestor(vvv)
-  %( TODO remove implexes %)
   %reset_count1;%reset_count2;
   %foreach;ancestor_level;
     %if;(level=vvv+1)
       %foreach;ancestor;
-        %( add ancestor index to listc>item.1 to filter it afterwards with indexes of cousins
-        same cousin.l1.0 instead of ancestor loop but it's not ignoring unknown "? ?" %)
         %if;(ancestor!="? ?")%apply;add_in_sorted_listc(ancestor.index)%end;
         %incr_count1;
-        %(%if;(is_first)<span class="text-nowrap">%nn;
-        %else;
-          %if;(count1%2=1)%if;(ancestor="? ?")%incr_count2;%else;</span> <span class="text-nowrap">%end;%end;
+        %if;(level<5)
+          %if;(is_first)<span class="text-nowrap">%nn;
+          %else;
+            %if;(count1%2=1)%if;(ancestor="? ?")%incr_count2;%else;</span> <span class="text-nowrap">%end;%end;
+          %end;
+          %if;(count1%2=0 and ancestor!="? ?" and count2!=1) & %end;
+          %if;(ancestor!="? ?")%ancestor;%end;
+          %if;(count1%2=0)%reset_count2;%if;(not is_last) • %else;</span>%end;%end;
         %end;
-        %if;(count1%2=0 and ancestor!="? ?" and count2!=1) & %end;
-        %if;(ancestor!="? ?")%ancestor;%end;
-        %if;(count1%2=0)%reset_count2;%if;(not is_last) • %else;</span>%end;%end;%)
       %end;
     %end;
   %end;
@@ -73,7 +65,7 @@
  %else;
    <td%if;(vvv>0) colspan="%expr(vvv+1)"%end; %if;(vvv=0)style="width:%expr(100/lll)%%"%end; class="table-%if;(vvv=0)info%elseif;(vvv %2 = 1)primary%else;danger%end;" >
      <div class="%if;(vvv>=0)border-right %(border-bottom %)border-%if;(i=0)success%elseif;(vvv%2=1)primary%else;danger%end;%end; d-flex flex-column justify-content-between">
-       <div class="%(font-weight-bold%)">vvv/0</div>
+       <div>vvv/0</div>
        <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=0"
         class="btn btn-light ddd w-100" style="height:80px;"
          data-toggle="tooltip" data-html="true" title="%apply;cousin_lex_tt(vvv,0)">
@@ -97,18 +89,16 @@
   %apply;link%with;vvv%and;%and;<span class="badge badge-xl badge-%if;(vvv %2 = 1)primary%else;danger%end;"> %expr(count2-count1)</span> ttt%and;%if;(count2=0)disabled%end;%and;%end;
 %end;
 %define;link_cousin(vvv,www,ttt,sss)
-  %let;cousins_vvv_www_float;%cous_paths_cnt.vvv.www;%in;
-  %let;cousins_vvv_www;%expr(cousins_vvv_www_float)%in;
-  %(%let;cousins_vvv_www;%expr(cousins_vvv_www_float/.1)%in;%)
-  <button type="button" data-toggle="tooltip" data-html="true" title="sss" class="flex-shrink-1 btn btn-light%if;(cousins_vvv_www!="" and cousins_vvv_www=0) disabled%end; position-relative" style="height:80px">
+  %let;cous_paths_cnt_vvv_www;%cous_paths_cnt.vvv.www;%in;
+  %let;cousins_vvv_www;%cousins_cnt.vvv.www;%in;
+  %let;extra_paths_vvv_www;%expr(cous_paths_cnt.vvv.www - cousins_cnt.vvv.www)%in;
+  <button type="button" data-toggle="tooltip" data-html="true" title="sss" class="flex-shrink-1 btn btn-light%if;(cousins_vvv_www!="" and cousins_vvv_www=0) disabled%end; position-relative" style="height:75px">
     <div class="stretched-link h-100" data-toggle="modal" data-target="#modal_vvv_www">%nn;
-    %let;cousins_extra_paths_vvv_www;%expr(2 * cous_paths_cnt.vvv.www - cous_paths_cnt_raw.vvv.www)%in;
     <span class="badge badge-xl badge-%if;(vvv=0)info%elseif;(vvv%2=1)primary%else;danger%end;">%cousins_vvv_www;</span>%nn;
-    %if;(cousins_extra_paths_vvv_www!=0)+<span class="badge badge-xl badge-info">%cousins_extra_paths_vvv_www;</span>%end;
-    %for;i;0;cousins_extra_paths_vvv_www;%incr_count3;%end;
-    <br>ttt</div></button>
+    %if;(extra_paths_vvv_www!=0)<span class="badge badge-xl badge-info ml-1">%extra_paths_vvv_www;</span>%end;<br>ttt</div></button>
   %(<div>%if;(vvv=0)%expr((100/.(2^(vvv+www))))%else;%expr((100/.(2^(vvv+www-1))))%end; %%</div>%)
     %for;i;0;cousins_vvv_www;%incr_count;%end;
+    %for;i;0;extra_paths_vvv_www;%incr_count3;%end;
 %end;
 %define;cousin_lex(vvv,www)
   [cousins.vvv.www]1
@@ -123,60 +113,67 @@
 %define;cous_mod(vvv,www)
   %empty_sorted_list;%empty_sorted_listb;
   %foreach;cous_path;
-    %apply;add_in_sorted_list%with;%cousin.surname; %cousin.first_name %cousin.occ;%and;%nn;
-      <li class="card list-group-item nbr_%cousin.nbr;" title="%(%cousin.first_name;.%cousin.occ; %cousin.surname;%)">%nn;
-        <div class="d-inline text-nowrap">
-          <a href="%prefix;em=R&et=A&ei=%self.index;&i=%cousin.index;"
-            class="%(stretched-link TODO à revoir ou z-index sur le badge ?! %)"
-            data-toggle="tooltip" data-html="true" title="anc_ifam_list %cousin.anc_f_list;">
-            %cousin.surname; %cousin.first_name;<br>%cousin.dates;</a>
-          <a class="badge badge-%if;(cousin.nbr%2=1)primary%else;success%end; ml-1"
+    %apply;add_in_sorted_list%with;%cousin.surname; %cousin.first_name %cousin.dates; %cousin.occ;%and;%nn;
+      <li class="card list-group-item nbr_%cousin.nbr; py-1 px-1 rounded border-top-0 border-bottom-0 border-right-0 border-%if;(cousin.sex=0)primary%else;danger%end;" style="border-left-width: 6px;">%nn;
+        <div class="d-flex align-content-between align-items-start">
+          <div class="ml-1 text-truncate text-left text-nowrap align-self-center" style="position:relative">
+            <a href="%prefix;em=R&et=A&ei=%self.index;&i=%cousin.index;"
+              data-toggle="tooltip" data-html="true"
+              class="stretched-link w-auto" title="%cousin.first_name;.%cousin.occ; %cousin.surname; %(%cousin.dates; bug w. balise <bdo> in dates %) (%cousin.anc_f_list;)" data-anclist="%cousin.anc_f_list;">
+              %cousin.surname; %cousin.first_name %cousin.dates;</a>
+          </div>
+          <div class="ml-auto align-self-center" style="z-index:1;position:relative;">
+            <a class="btn"
             data-toggle="tooltip" data-html="true"
             href="%prefix;m=RL&i=%cousin.anc1.index;&l1=vvv&i1=%self.index;&l2=www&i2=%cousin.index;%if;(cousin.nbr>1)&dag=on%end;"%sp;
             title="%apply;a_of_b%with;%if;(cousin.sex=0)[cousin.0.www]0%else;[cousin.0.www]1%end;%and;%cousin.anc1.first_name; %cousin.anc1.surname;
-           %if;(cousin.anc2!=".....") & %cousin.anc2;%end;%end;">%cousin.nbr;</a>
+            %if;(cousin.anc2!=".....") [and] %cousin.anc2;%end;%end;">
+            %if;(cousin.nbr %2 = 0)<i class="fa-solid fa-user-group"></i>%else;<i class="fa-solid fa-user fa-fw text-%if;(cousin.anc2!=".....")info%else;%if;(cousin.anc1.sex=0)primary%else;danger%end;%end;"></i>%end;%nn;
+            %if;(cousin.nbr>2)<span class="small"><sup>%cousin.nbr;</sup></span>%end;</a>
+          </div>
         </div>
-     </li>%and;%cousin.index;%and;%cousin.cnt;%end;
+     </li>%and;%cousin.cnt;%and;%cousin.index;%end;
     %apply;add_in_sorted_listb%with;%cousin.index;%end;
     %apply;add_in_sorted_listc%with;%cousin.index;%end;
   %end;
 <div class="modal fade" id="modal_vvv_www" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header px-3 pt-2 pb-1">
+  <div class="modal-dialog modal-xl" style="width:95%%;max-width:1650px;">
+    <div class="modal-content bg-transparent">
+      <div class="modal-header position-relative bg-white p-2 pb-1 rounded-lg"">
         %let;extrapaths;%expr(cous_paths_cnt.vvv.www-listb_size)%in;
-        <h3 class="modal-title self-align-center">%listb_size %nn;
-          %if;(cous_paths_cnt.vvv.www=1)[cousins.vvv.www]0%else;[cousins.vvv.www]1%end;<small class="text-muted">%if;(extrapaths!=0) — %extrapaths; chemins en plus%end;</small></h3>
-        <h3 class="order-1"><i class="fa-solid fa-arrow-up-right-dots fa-fw mr-2"></i>vvv <i class="fa-solid fa-arrow-down-long fa-fw"></i>www<br>
-        <small class="text-muted"><i class="fa-solid fa-person-arrow-up-from-line fa-fw"></i> <i class="fa-solid fa-person-arrow-down-to-line fa-fw fa-flip-horizontal mr-1"></i>%expr(vvv+www)</small></h3>
+          <div class="modal-title bg-transparent justify-content-center align-items-center">
+            <a role="button" class="h3 display-4 stretched-link ml-2" style="font-size:2em;font-weight:300;" href="%prefix;m=RLM%foreach;sorted_list_item;&i1=%self.index;&i%expr(item.3+1)=%item.4;%end;&t1=[cousins.vvv.www]" class="btn btn-primary" title="Graphe RLM c(vvv,www)">%listb_size %nn;
+          %if;(cous_paths_cnt.vvv.www=1)[cousins.vvv.www]0%else;[cousins.vvv.www]1%end;</a><small class="text-muted">%if;(extrapaths!=0) (+ %extrapaths;)%end;</small></div>
+          %(<div class="flex-grow-1 bg-transparent"> </div>%)
+        <div class="d-flex ml-auto" style="z-index: 1;position:relative;">
+          <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=www" class="btn btn-light btn-lg" title="voir tous les [relationship link/relationship links]1">
+            <i class="fa-solid fa-arrow-up-right-dots fa-fw mr-2"></i>vvv <i class="fa-solid fa-arrow-down-long fa-fw"></i><span class="font-weight-heavy">www</span></a>
+            %(<small class="text-muted"><i class="fa-solid fa-person-arrow-up-from-line fa-fw ml-3"></i> <i class="fa-solid fa-person-arrow-down-to-line fa-fw fa-flip-horizontal mr-1"></i>%expr(vvv+www)</small>%)
+        </div>
       </div>
       <div class="modal-body">
-        <div class="card-columns" style="column-count: 
-            %if;(cous_paths_cnt.vvv.www>500)8%nn;
-            %elseif;(cous_paths_cnt.vvv.www>250)6%nn;
-            %elseif;(cous_paths_cnt.vvv.www>100)5%nn;
-            %elseif;(cous_paths_cnt.vvv.www>25)4
-            %else;3%end;">
+        <div class="card-columns"%( style="column-count:
+            %elseif;(cous_paths_cnt.vvv.www>128)5%nn;
+            %elseif;(cous_paths_cnt.vvv.www>64)4
+            %else;3%end;"%)>
           %if;(www!=0)
-            <ul class="list-group list-group-flush">
+            <ul class="list-group bg-transparent">
               %foreach;sorted_list_item;%item.2;%end;
-            </ul>
+            </ul
           %end;
         </div>
       </div>
-      <div class="modal-footer">
+      %(<div class="modal-footer">
         %( TODO extraire les nbr pour faire des boutons pour ce c(i,j) là %)
-        <a role="button" class="btn btn-primary"
-                title="filter by nbr = 1">1</a>
-                <a role="button" class="btn btn-primary"
-                title="todo filter by nbr = 2">2</a>
-               <a role="button" class="btn btn-primary"
-                title="todo">…</a>
-                <a role="button" class="btn btn-primary"
-                title="filter by nbr = n">n</a>
-        <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=www" class="btn btn-primary"><i class="fa-solid fa-wave-square"></i> Détail des chemins c(vvv,www)</a>
-        <a role="button" href="%prefix;m=RLM%foreach;sorted_list_item;&i1=%self.index;&i%expr(item.3+1)=%item.4;%end;&t1=[cousins.vvv.www]" class="btn btn-primary">Graphe RLM</a>
-      </div>
+        <a role="button" class="btn btn-light"
+          title="filter by nbr = 1">1</a>
+        <a role="button" class="btn btn-light"
+          title="todo filter by nbr = 2">2</a>
+        <a role="button" class="btn btn-light"
+          title="todo">…</a>
+        <a role="button" class="btn btn-light"
+          title="filter by nbr = n">n</a>
+      </div>%)
     </div>
   </div>
 </div>
@@ -206,9 +203,10 @@
                <b>%if;is_male;[him/her]0%elseif;is_female;[him/her]1%end;</b>%nn;
                %and;disabled%and;%end;
              %else;
-               <td %if;(j=xxx)style="width:%expr(100/xxx)%%"%end; class="table-%if;(i=0)info%elseif;(i %2 = 1)primary%else;danger%end;">
-                 <div class="%if;(i>=0)border-right %(border-bottom %)border-%if;(i=0)success%elseif;(i%2=1)primary%else;danger%end;%end; d-flex flex-column justify-content-between">
-                   <span class="%(font-weight-bold %)">%i;/%k</span>
+               <td %if;(j=xxx)style="width:%expr(100/xxx)%%"%end; class="table-%if;(i=0)info%elseif;(i %2 = 1)primary%else;danger%end;
+               %if;(i>=0) border-right border-left-0 border-top-0 border-bottom-0 border-%if;(i=0)success%elseif;(i%2=1)primary%else;danger%end;%end;">
+                 <div class="d-flex flex-column justify-content-between">
+                   <span>%i;/%k</span>
                    %apply;cous_paths(i,k)
                    %apply;link_cousin%with;%i;%and;%k;
                      %and;%apply;cousin_lex(i,k)
@@ -223,7 +221,7 @@
         %end;
       </tr>
     %end;
-    <tr><td colspan="%xxx;">[coefficient of relationship]<br>[half DNA]<br>[one ancestor counted]</td></tr>
+    <tr><td colspan="%xxx;">%( %( TODO button %) ADN [coefficient of relationship]<br>[half DNA]<br> %)[one ancestor counted]</td></tr>
   </table>
 %end;
 %reset_count;%reset_count3;
@@ -232,21 +230,18 @@
 %else;
   %apply;table(e.v+1)
 %end;
-%let;paths;%expr(count+count3)%in;
-Total[:] %count; %if;(count=1)[person/persons]0%else;[person/persons]1%end;%if;(count3>0) (+ <span class="badge badge-info">%count3;</span> = %paths; %if;(paths=1)[path/paths]0%else;[path/paths]1%end;)%end;. (# ascendants +  # descendants + #cousins > devrait valoir %listc_size; (listc))
-%(Listc_size =  comptage de la liste des indexes des ascendants + des cousins.l1.l2, on peut éventuellement lui fournir les cousins.l1.0 ascendants : c’est le nombre d'individus uniques dans le tableau ça devrait être la même valeur que la somme des comptages !  %)
-
-%(TODO : play with sorted_listb!
-<div class="d-flex flex-wrap">
-indexes des cousins à nbr=1 et nbr>2 :
-%foreach;sorted_listb_item;
-  %if;(item.2!=2)
-    %if;(item.2=1)%item.1;-%nn;
-    %elseif;(item.2 > 2)<span class="bg-light">%item.2;×i%item.1;-</span>%end;
-  %end;
-%end;
-</div>
-%foreach;sorted_listb_item;%item.2;%end; %)
+  <h1 class="order-1">%nn;
+    [*link between]
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") <em>%qualifier;</em>%end;
+    %sp;%surname;
+    %(%if;(alias != "") <em>(%alias;)</em>%end;%)
+    %sp;[and] [close family] [up to] %e.v; [generation/generations]1
+    <span class="text-muted text-small">%listc_size; [individual/individuals]</sp>
+  </h1>
+%(%let;paths;%expr(count+count3)%in;%)
+Total[:] %listc_size; %if;(listc_size=1)[person/persons]0%else;[person/persons]1%end;
+%(%if;(count3>0) (+ <span class="badge badge-info">%count3;</span> = %paths; %if;(paths=1)[path/paths]0%else;[path/paths]1%end;)%end;.%)
 %include;trl
 %include;copyr
 </div>
