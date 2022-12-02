@@ -1,6 +1,13 @@
 
 h1, h2, h3, h4, h5, h6 { font-weight: lighter !important; }
 
+.modal-backdrop {
+   background-color: #808080;
+}
+.tooltip-inner {
+    min-width: 100px;
+    max-width: 100%; 
+}
 #content:focus { outline: none; }
 /* Remove overused p anchor top margin*/
 p {
