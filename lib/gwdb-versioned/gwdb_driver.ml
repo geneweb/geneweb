@@ -117,8 +117,7 @@ end = struct
 
   let load_data base : D.t array = assert false
   
-  let sync base = assert false
-    (*
+  let sync base =
     if not (directory_exists base) then create_files base;
     let tbl = patch base in
     let data = load_data base in
@@ -132,25 +131,24 @@ end = struct
     let len = Hashtbl.length syncdata in
     let accesses = Array.make len 0 in
 
-    seek_out oc (len * 4);
+    let l = Hashtbl.fold (fun k v l -> (k, v) :: l) syncdata [] in
+    let a = Array.of_list l in
+    Array.sort (fun (k, _) (k',_) -> k - k') a;
+    let a = Array.map snd a in
     
-    Hashtbl.iter (fun _ value ->
-        Marshal.to_channel oc value [Marshal.No_sharing];
-      ) syncdata
-      
-        let value = match Hashtbl.find_opt tbl i with
-          | Some v -> v
-          | None -> (* wrong *) data.(i)
-        in
+    output_binary_int oc len;
+    seek_out oc (4 + len * 4);
+    Array.iteri (fun i data ->
         let pos = pos_out oc in
-        Hashtbl.add accesses i pos;
-        Marshal.to_channel oc value [Marshal.No_sharing];
-        Hashtbl.remove tbl i
-      ) data;
-    Hashtbl.iter (fun k v -> assert false
-    ) tbl;
-    close_out oc
-    *)
+        Marshal.to_channel oc data [Marshal.No_sharing];
+        accesses.(i) <- pos
+      ) a;
+    seek_out oc 4;
+    Array.iter (output_binary_int oc) accesses;
+    close_out oc;
+    Files.mv dfile_tmp dfile;
+    Files.rm dfile_tmp;
+    Files.rm (D.patch_file base)
     
 end
 
@@ -301,8 +299,8 @@ module Legacy_driver = struct
   (* TODO : properly sync *)
   let sync ?(scratch=false) ~save_mem base =
     sync ~scratch ~save_mem base;
-    PatchPer.write base;
-    PatchFam.write base
+    PatchPer.sync base;
+    PatchFam.sync base
   
   let make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes) =
     (*let persons = Array.map Translate.as_legacy_person persons in
@@ -320,8 +318,9 @@ module Legacy_driver = struct
         leg_family
       ) families in
     let base = make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes) in
-      (* TODO : properly sync *)
-    sync ~scratch:true ~save_mem:false base;
+    (* TODO : properly sync *)
+    PatchPer.sync base;
+    PatchFam.sync base;
     base
 
 
