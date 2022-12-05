@@ -40,7 +40,7 @@ let log _ = ()
 
 module type Data = sig
   type t
-  type index
+  type index = int
   type base
   val patch_file : base -> string
   val data_file : base -> string
@@ -52,7 +52,7 @@ module Store (D : Data) : sig
   val set : D.base -> D.index -> D.t -> unit
   val unsafe_set : D.index -> D.t -> unit
   val write : D.base -> unit
-  val sync : D.base -> unit
+  val sync : (D.base -> D.t array) -> D.base -> unit
   val empty : unit -> unit
 end = struct
 
@@ -85,7 +85,15 @@ end = struct
     | None -> load base
   
   let get_from_data_file base index =
-    if data_file_exists base then assert false
+    if data_file_exists base then
+      let ic = Secure.open_in (D.data_file base) in
+      let len = input_binary_int ic in
+      assert (index < len);
+      seek_in ic (4 + index * 4);
+      let pos_data = input_binary_int ic in
+      seek_in ic pos_data;
+      let data = (Marshal.from_channel ic : D.t) in
+      Some data
     else None
 
   let get base index =
@@ -104,17 +112,78 @@ end = struct
   let write base =
     let tbl = patch base in
     if not (directory_exists base) then create_files base;
-    let witfile = D.patch_file base in
-    let witfile_tmp = witfile ^ "~" in
-    if Sys.file_exists witfile_tmp then failwith "oups";
-    let oc = Secure.open_out witfile_tmp in
+    let patchfile = D.patch_file base in
+    let patchfile_tmp = patchfile ^ "~" in
+    if Sys.file_exists patchfile_tmp then failwith "oups";
+    let oc = Secure.open_out patchfile_tmp in
     Marshal.to_channel oc tbl [Marshal.No_sharing];
     close_out oc;
-    Files.mv witfile_tmp witfile;
-    Files.rm witfile_tmp
+    Files.mv patchfile_tmp patchfile;
+    Files.rm patchfile_tmp
 
   let empty () = patch_ht := Some (Hashtbl.create 1)
-  let sync base = assert false
+
+  let load_data build_from_scratch base : D.t array =
+    if not (data_file_exists base) then begin
+      log "no data file"; build_from_scratch base
+    end
+    else begin
+      log "some data file found";
+      let ic = Secure.open_in (D.data_file base) in
+      let len = input_binary_int ic in
+      seek_in ic (4 + 4 * len);
+
+      let rec loop i l =
+        if i = 0 then l else
+          let l = (Marshal.from_channel ic : D.t) :: l in
+          loop (i -1) l
+      in
+
+      let data = Array.of_list @@ List.rev (loop len []) in
+      close_in ic;
+      data
+    end
+
+  let sync build_from_scratch base =
+    log "SYNC";
+    if not (directory_exists base) then create_files base;
+    let tbl = patch base in
+
+    log "LOAD";
+
+    let data = load_data build_from_scratch base in
+
+    log "POST LOAD";
+
+    let dfile = D.data_file base in
+    let dfile_tmp = dfile ^ "~" in
+    let oc = Secure.open_out dfile_tmp in
+
+    let syncdata = Hashtbl.create (Array.length data) in
+    Array.iteri (Hashtbl.add syncdata) data;
+    Hashtbl.iter (Hashtbl.replace syncdata) tbl;
+    let len = Hashtbl.length syncdata in
+    let accesses = Array.make len 0 in
+
+    let l = Hashtbl.fold (fun k v l -> (k, v) :: l) syncdata [] in
+    let a = Array.of_list l in
+    Array.sort (fun (k, _) (k',_) -> k - k') a;
+    let a = Array.map snd a in
+    
+    output_binary_int oc len;
+    seek_out oc (4 + len * 4);
+    Array.iteri (fun i data ->
+        let pos = pos_out oc in
+        Marshal.to_channel oc data [Marshal.No_sharing];
+        accesses.(i) <- pos
+      ) a;
+    seek_out oc 4;
+    Array.iter (output_binary_int oc) accesses;
+    close_out oc;
+    Files.mv dfile_tmp dfile;
+    Files.rm dfile_tmp;
+    Files.rm (D.patch_file base);
+    log "END SYNC";
 
 end
 
@@ -261,7 +330,43 @@ module Legacy_driver = struct
           {fe with efam_witnesses = witnesses}
         ) fevents in
     fevents
-    
+
+  let build_from_scratch_pevents base =
+    let persons = Gwdb_legacy.Gwdb_driver.persons base in
+    let notes : istr array array list = List.rev @@ Gwdb_legacy.Gwdb_driver.Collection.fold (fun l p ->
+        let pevents = Gwdb_legacy.Gwdb_driver.get_pevents p in
+        let witness_array_list = List.map (fun pe -> pe.Gwdb_legacy.Dbdisk.epers_witnesses) pevents in
+        let notes = Array.of_list @@ List.map (Array.map (fun _ -> empty_string)) witness_array_list in
+        notes :: l
+      ) [] persons
+    in
+    Array.of_list notes
+
+  let build_from_scratch_fevents base =
+    log "BUILD FEVENTS";
+    let families = Gwdb_legacy.Gwdb_driver.families base in
+    log "BUILD FEVENTS2";
+    let notes : istr array array list = List.rev @@ Gwdb_legacy.Gwdb_driver.Collection.fold (fun l f ->
+        log "SOME FEVENT";
+        let fevents = Gwdb_legacy.Gwdb_driver.get_fevents f in
+        let witness_array_list = List.map (fun fe -> fe.Gwdb_legacy.Dbdisk.efam_witnesses) fevents in
+        let notes = Array.of_list @@ List.map (Array.map (fun _ -> empty_string)) witness_array_list in
+        notes :: l
+      ) [] families
+    in
+    log "FEVENTS BUILT";
+    Array.of_list notes
+
+  (* TODO : properly sync *)
+  let sync ?(scratch=false) ~save_mem base =
+    sync ~scratch ~save_mem base;
+    (*PatchPer.write base;
+      PatchFam.write base*)
+    log "PERS SYNC";
+    PatchPer.sync build_from_scratch_pevents base;
+    log "FAM SYNC";
+    PatchFam.sync build_from_scratch_fevents base
+  
   let make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes) =
     (*let persons = Array.map Translate.as_legacy_person persons in
       let families = Array.map Translate.as_legacy_family families in*)
@@ -274,10 +379,19 @@ module Legacy_driver = struct
       ) persons in
     let families = Array.map (fun f ->
         let leg_family = Translate.as_legacy_family f in
-        PatchPer.unsafe_set f.fam_index (fwitness_notes_of_events f.fevents);
+        PatchFam.unsafe_set f.fam_index (fwitness_notes_of_events f.fevents);
         leg_family
       ) families in
-    make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes)
+    let base = make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes) in
+    (* TODO : properly sync *)
+
+    (*PatchPer.write base;
+    PatchFam.write base;*)
+    log "PERS SYNC";
+    PatchPer.sync build_from_scratch_pevents base;
+    log "FAM SYNC";
+    PatchFam.sync build_from_scratch_fevents base;
+    base
 
 
   let open_base bname =
@@ -462,10 +576,6 @@ module Legacy_driver = struct
         let witness_notes = fwitness_notes base (Gwdb_legacy.Gwdb_driver.get_ifam family) in
         {family; witness_notes} ) coll
 
-  let sync ?(scratch=false) ~save_mem base =
-    sync ~scratch ~save_mem base;
-    PatchPer.write base;
-    PatchFam.write base
   
 end
 
