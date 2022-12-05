@@ -115,7 +115,19 @@ end = struct
 
   let empty () = patch_ht := Some (Hashtbl.create 1)
 
-  let load_data base : D.t array = assert false
+  let load_data base : D.t array =
+    if not (data_file_exists base) then [||]
+    else begin
+      let ic = Secure.open_in (D.data_file base) in
+      let len = input_binary_int ic in
+      seek_in ic len;
+      let rec loop l =
+        let l = try (Marshal.from_channel ic : t) :: l
+          with
+      in
+      loop [];
+      assert false
+    end
   
   let sync base =
     if not (directory_exists base) then create_files base;
