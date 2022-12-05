@@ -115,8 +115,8 @@ end = struct
 
   let empty () = patch_ht := Some (Hashtbl.create 1)
 
-  let load_data base : D.t array =
-    if not (data_file_exists base) then [||]
+  let load_data base : D.t array = assert false
+(*    if not (data_file_exists base) then [||]
     else begin
       let ic = Secure.open_in (D.data_file base) in
       let len = input_binary_int ic in
@@ -124,11 +124,11 @@ end = struct
       let rec loop l =
         let l = try (Marshal.from_channel ic : t) :: l
           with
-      in
+        in
       loop [];
       assert false
     end
-  
+*)
   let sync base =
     if not (directory_exists base) then create_files base;
     let tbl = patch base in
@@ -311,8 +311,10 @@ module Legacy_driver = struct
   (* TODO : properly sync *)
   let sync ?(scratch=false) ~save_mem base =
     sync ~scratch ~save_mem base;
-    PatchPer.sync base;
-    PatchFam.sync base
+    PatchPer.write base;
+    PatchFam.write base
+(*    PatchPer.sync base;
+      PatchFam.sync base*)
   
   let make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes) =
     (*let persons = Array.map Translate.as_legacy_person persons in
@@ -331,8 +333,8 @@ module Legacy_driver = struct
       ) families in
     let base = make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes) in
     (* TODO : properly sync *)
-    PatchPer.sync base;
-    PatchFam.sync base;
+    PatchPer.write base;
+    PatchFam.write base;
     base
 
 
