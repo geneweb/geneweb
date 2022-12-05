@@ -1310,6 +1310,12 @@ let witness_kind_of_rval rval = match rval with
   | "Other"              -> Witness_Other
   | _                    -> Witness
 
+
+let find_and_treat_notes gen rsons =
+  match find_all_fields "NOTE" rsons with
+  | [] -> ""
+  | rl -> treat_notes gen rl
+
 let find_event_witness_aux gen i r forward =
   let rec find_witnesses =
     function
@@ -1324,14 +1330,7 @@ let find_event_witness_aux gen i r forward =
           | None -> Witness
         in
          let wnote =
-           add_string gen @@
-           (* TODO factorize this *)
-           match find_all_fields "NOTE" r.rsons with
-           | [] -> ""
-           | rl ->
-               let s = treat_notes gen rl in
-               Format.eprintf "EPRINTF DE LA NOTE: %s@." s;
-               s
+           find_and_treat_notes gen r.rsons |> add_string gen
          in
         (witness, witness_kind, wnote) :: find_witnesses asso_l
   in
@@ -1426,11 +1425,7 @@ let treat_indi_pevent gen ip r =
                 | _ -> ""
               in
               let reason = "" in
-              let note =
-                match find_all_fields "NOTE" r.rsons with
-                  [] -> ""
-                | rl -> treat_notes gen rl
-              in
+              let note = find_and_treat_notes gen r.rsons in
               (* Si le tag 1 XXX a des infos, on les ajoutes. *)
               let note =
                 let name_info = strip_spaces r.rval in
@@ -1498,11 +1493,7 @@ let treat_indi_pevent gen ip r =
                  | _ -> ""
                in
                let reason = "" in
-               let note =
-                 match find_all_fields "NOTE" r.rsons with
-                   [] -> ""
-                 | rl -> treat_notes gen rl
-               in
+               let note = find_and_treat_notes gen r.rsons in
                (* Si le tag 1 XXX a des infos, on les ajoutes. *)
                let note =
                  let name_info = strip_spaces r.rval in
@@ -1772,11 +1763,7 @@ let add_indi gen r =
     in
     String.concat ", " l
   in
-  let notes =
-    match find_all_fields "NOTE" r.rsons with
-      [] -> ""
-    | rl -> treat_notes gen rl
-  in
+  let notes = find_and_treat_notes gen r.rsons in
   let titles =
     List.map (treat_indi_title gen public_name)
       (find_all_fields "TITL" r.rsons)
@@ -1853,11 +1840,7 @@ let add_indi gen r =
           Some r -> strip_spaces r.rval
         | _ -> ""
       in
-      let note =
-        match find_all_fields "NOTE" r.rsons with
-          [] -> ""
-        | rl -> treat_notes gen rl
-      in
+      let note = find_and_treat_notes gen r.rsons in
       d, p, (note, []), source gen r
     | None -> None, "", ("", []), ("", [])
   in
@@ -1879,11 +1862,7 @@ let add_indi gen r =
           Some r -> strip_spaces r.rval
         | _ -> ""
       in
-      let note =
-        match find_all_fields "NOTE" r.rsons with
-          [] -> ""
-        | rl -> treat_notes gen rl
-      in
+      let note = find_and_treat_notes gen r.rsons in
       d, p, (note, []), source gen r
     | None -> None, "", ("", []), ("", [])
   in
@@ -1908,11 +1887,7 @@ let add_indi gen r =
           | Some r -> strip_spaces r.rval
           | None -> ""
         in
-        let note =
-          match find_all_fields "NOTE" r.rsons with
-          | [] -> ""
-          | rl -> treat_notes gen rl
-        in
+        let note = find_and_treat_notes gen r.rsons in
         d, p, (note, []), source gen r
     | None -> infer_death birth bapt, "", ("", []), ("", [])
   in
@@ -1935,11 +1910,7 @@ let add_indi gen r =
               Some r -> strip_spaces r.rval
             | _ -> ""
           in
-          let note =
-            match find_all_fields "NOTE" r.rsons with
-              [] -> ""
-            | rl -> treat_notes gen rl
-          in
+          let note = find_and_treat_notes gen r.rsons in
           Buried (Date.cdate_of_od d), p, (note, []), source gen r
       | None -> UnknownBurial, "", ("", []), ("", [])
     in
@@ -1961,11 +1932,7 @@ let add_indi gen r =
               Some r -> strip_spaces r.rval
             | _ -> ""
           in
-          let note =
-            match find_all_fields "NOTE" r.rsons with
-              [] -> ""
-            | rl -> treat_notes gen rl
-          in
+          let note = find_and_treat_notes gen r.rsons in
           Cremated (Date.cdate_of_od d), p, (note, []), source gen r
       | None -> UnknownBurial, "", ("", []), ("", [])
     in
@@ -2136,11 +2103,7 @@ let treat_fam_fevent gen ifath r =
                 | _ -> ""
               in
               let reason = "" in
-              let note =
-                match find_all_fields "NOTE" r.rsons with
-                  [] -> ""
-                | rl -> treat_notes gen rl
-              in
+              let note = find_and_treat_notes gen r.rsons in
               (* Si le tag 1 XXX a des infos, on les ajoutes. *)
               let note =
                 let name_info = strip_spaces r.rval in
@@ -2217,11 +2180,7 @@ let treat_fam_fevent gen ifath r =
                  | _ -> ""
                in
                let reason = "" in
-               let note =
-                 match find_all_fields "NOTE" r.rsons with
-                   [] -> ""
-                 | rl -> treat_notes gen rl
-               in
+               let note = find_and_treat_notes gen r.rsons in
                (* Si le tag 1 XXX a des infos, on les ajoutes. *)
                let note =
                  let name_info = strip_spaces r.rval in
@@ -2479,11 +2438,7 @@ let add_fam_norm gen r adop_list =
           [] -> []
         | wl -> heredis_witnesses wl
       in
-      let note =
-        match find_all_fields "NOTE" r.rsons with
-          [] -> ""
-        | rl -> treat_notes gen rl
-      in
+      let note = find_and_treat_notes gen r.rsons in
       u, d, p, (note, []), source gen r, witnesses
     | None -> relation, None, "", ("", []), ("", []), []
   in
@@ -2502,11 +2457,7 @@ let add_fam_norm gen r adop_list =
     | None -> NotDivorced
   in
   let fevents = treat_fam_fevent gen fath r in
-  let comment =
-    match find_all_fields "NOTE" r.rsons with
-      [] -> ""
-    | rl -> treat_notes gen rl
-  in
+  let comment = find_and_treat_notes gen r.rsons in
   let (fsources, fsources_nt) =
     let (s, s_nt) = source gen r in
     if s = "" then !default_source, s_nt else s, s_nt
