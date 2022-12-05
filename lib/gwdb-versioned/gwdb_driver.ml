@@ -189,7 +189,15 @@ module Legacy_driver = struct
     in
     fwitness_notes_tbl := Some tbl;
     tbl
-    
+
+  let init_witness_notes_tbl () =
+    witness_notes_tbl := Some (Hashtbl.create 1);
+    fwitness_notes_tbl := Some (Hashtbl.create 1)
+
+  let get_witness_notes_tbl () = !witness_notes_tbl
+
+  let get_fwitness_notes_tbl () = !fwitness_notes_tbl
+
   let witness_notes_tbl base = match !witness_notes_tbl with
     | Some tbl -> tbl
     | None -> load_witness_notes base
@@ -233,7 +241,7 @@ module Legacy_driver = struct
     let pers_events = genpers.Def.pevents in
     List.iter (fun pers_event ->
         let witnesses = pers_event.Def.epers_witnesses in
-        let wnotes = Array.map (fun (ip, wk, wnote) -> sou base wnote) witnesses in
+        let wnotes = Array.map (fun (_ip, _wk, wnote) -> sou base wnote) witnesses in
         Array.iter (log) wnotes
       ) pers_events
 
@@ -308,8 +316,19 @@ module Legacy_driver = struct
     fevents
     
   let make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes) =
-    let persons = Array.map Translate.as_legacy_person persons in
-    let families = Array.map Translate.as_legacy_family families in
+    (*let persons = Array.map Translate.as_legacy_person persons in
+      let families = Array.map Translate.as_legacy_family families in*)
+    init_witness_notes_tbl ();
+    let persons = Array.map (fun p ->
+        let leg_person = Translate.as_legacy_person p in
+        add_witness_notes (get_witness_notes_tbl () |> Option.get) p.key_index p.pevents;
+        leg_person
+      ) persons in
+    let families = Array.map (fun f ->
+        let leg_family = Translate.as_legacy_family f in
+        add_fwitness_notes (get_fwitness_notes_tbl () |> Option.get) f.fam_index f.fevents;
+        leg_family
+      ) families in
     make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes)
 
 
@@ -495,6 +514,11 @@ module Legacy_driver = struct
     Collection.map (fun family ->
         let witness_notes = fwitness_notes base (Gwdb_legacy.Gwdb_driver.get_ifam family) in
         {family; witness_notes} ) coll
+
+  let sync ?(scratch=false) ~save_mem base =
+    sync ~scratch ~save_mem base;
+    write_witness_notes base;
+    write_fwitness_notes base
 
                          
 end
