@@ -38,174 +38,132 @@ end
 (*let log msg = Log.syslog Log.(`LOG_DEBUG) msg*)
 let log _ = ()
 
-            
+module type Data = sig
+  type t
+  type index
+  type base
+  val patch_file : base -> string
+  val data_file : base -> string
+  val directory : base -> string
+end
+
+module Store (D : Data) : sig
+  val get : D.base -> D.index -> D.t option
+  val set : D.base -> D.index -> D.t -> unit
+  val unsafe_set : D.index -> D.t -> unit
+  val write : D.base -> unit
+  val sync : D.base -> unit
+  val empty : unit -> unit
+end = struct
+
+  type t = (D.index, D.t) Hashtbl.t
+
+  let patch_ht : (D.index, D.t) Hashtbl.t option ref = ref None
+
+  let patch_file_exists base = Sys.file_exists (D.patch_file base)
+  let data_file_exists base = Sys.file_exists (D.data_file base)
+  let directory_exists base = Sys.file_exists (D.directory base)
+
+  let create_files base = Files.mkdir_p (D.directory base)
+
+  let load base =
+    if patch_file_exists base then
+      let file = D.patch_file base in
+      let ic = Secure.open_in file in
+      let tbl = (Marshal.from_channel ic : t) in
+      close_in ic;
+      patch_ht := Some tbl;
+      tbl
+    else begin
+      let tbl = Hashtbl.create 1 in
+      patch_ht := Some tbl;
+      tbl
+    end
+
+  let patch base = match !patch_ht with
+    | Some ht -> ht
+    | None -> load base
+  
+  let get_from_data_file base index =
+    if data_file_exists base then assert false
+    else None
+
+  let get base index =
+    match Hashtbl.find_opt (patch base) index with
+    | Some _v as value -> value
+    | None -> get_from_data_file base index
+
+  let set base index value =
+    let tbl = patch base in
+    Hashtbl.replace tbl index value
+
+  let unsafe_set index value =
+    let tbl = Option.get !patch_ht in
+    Hashtbl.replace tbl index value
+  
+  let write base =
+    let tbl = patch base in
+    if not (directory_exists base) then create_files base;
+    let witfile = D.patch_file base in
+    let witfile_tmp = witfile ^ "~" in
+    if Sys.file_exists witfile_tmp then failwith "oups";
+    let oc = Secure.open_out witfile_tmp in
+    Marshal.to_channel oc tbl [Marshal.No_sharing];
+    close_out oc;
+    Files.mv witfile_tmp witfile;
+    Files.rm witfile_tmp
+
+  let empty () = patch_ht := Some (Hashtbl.create 1)
+  let sync base = assert false
+
+end
+
 module Legacy_driver = struct
 
   include Gwdb_legacy.Gwdb_driver
+  
+  let compatibility_directory = "gnwb25"
+  let compatibility_file = "witness_notes"
+  let fcompatibility_file = "fwitness_notes"
+  let data_file = "witness_notes.dat"
+  let fdata_file = "fwitness_notes.dat"
+
+  module PersonData = struct
+      type t = istr array array
+      type index = iper
+      type base = Gwdb_legacy.Gwdb_driver.base
+      let directory base = Filename.concat (bdir base) compatibility_directory
+      let patch_file base = Filename.concat (directory base) compatibility_file
+      let data_file base = Filename.concat (directory base) data_file
+    end
+  module PatchPer = Store (PersonData)
+
+  module FamilyData = struct
+    type t = istr array array
+    type index = ifam
+    type base = Gwdb_legacy.Gwdb_driver.base
+    let directory base = Filename.concat (bdir base) compatibility_directory
+    let patch_file base = Filename.concat (directory base) fcompatibility_file
+    let data_file base = Filename.concat (directory base) fdata_file
+  end
+  module PatchFam = Store (FamilyData)
+
   let versions = Version.([gnwb20;gnwb21;gnwb22;gnwb23;gnwb24])
 
   type pers_event = (iper, istr) Def.gen_pers_event
 
   type fam_event = (iper, istr) Def.gen_fam_event
 
-  let compatibility_directory = "gnwb25"
-
-  let compat_dir base =
-    Filename.concat (bdir base) compatibility_directory
-                              
-  let compatibility_file = "witness_notes"
-  let fcompatibility_file = "fwitness_notes"
-
-  let compat_file base =
-    Filename.concat (compat_dir base) compatibility_file
-
-  let fcompat_file base =
-    Filename.concat (compat_dir base) fcompatibility_file
-    
-  let compat_exists base =    
-    Sys.file_exists (compat_dir base) && Sys.file_exists (compat_file base) && Sys.file_exists  (fcompat_file base)
-
-  let create_compatibility_files base =
-    let dir = bdir base in
-    log @@ "CREATE COMPAT DIR:" ^ dir;
-    Files.mkdir_p (compat_dir base)
-
-  let witness_notes_tbl : (iper, istr array array) Hashtbl.t option ref =
-    ref None
-  let fwitness_notes_tbl : (ifam, istr array array) Hashtbl.t option ref =
-    ref None
-
   type person = {
       person : Gwdb_legacy.Gwdb_driver.person;
       witness_notes : istr array array
-      (*      base : Gwdb_legacy.Gwdb_driver.base*)
     }
 
   type family = {
       family : Gwdb_legacy.Gwdb_driver.family;
       witness_notes : istr array array
     }
-              
-  let write_witness_notes base tbl_opt = match tbl_opt with
-    | None -> ()
-    | Some tbl ->
-       if not (compat_exists base) then create_compatibility_files base;
-       let witfile = compat_file base in
-       let witfile_tmp = witfile ^ "~" in
-       if Sys.file_exists witfile_tmp then failwith "oups";
-       let oc = Secure.open_out witfile_tmp in
-
-       log "WRITE TBL";
-       Hashtbl.iter (fun iper wnotes ->
-           log @@ "WIPER:" ^ (string_of_int iper);
-           log "WNOTES:";
-           Array.iter (Array.iter (fun istr-> log @@ "ISTR" ^ (string_of_int istr))) wnotes
-         ) tbl;
        
-       Marshal.to_channel oc tbl [Marshal.No_sharing];
-       close_out oc;
-       Files.mv witfile_tmp witfile;
-       Files.rm witfile_tmp
-
-  let write_fwitness_notes base tbl_opt = match tbl_opt with
-    | None -> ()
-    | Some tbl ->
-       if not (compat_exists base) then create_compatibility_files base;
-       let witfile = fcompat_file base in
-       let witfile_tmp = witfile ^ "~" in
-       if Sys.file_exists witfile_tmp then failwith "oups";
-       let oc = Secure.open_out witfile_tmp in
-
-       log "WRITE FTBL";
-       Hashtbl.iter (fun ifam wnotes ->
-           log @@ "WIFAM:" ^ (string_of_int ifam);
-           log "WNOTES:";
-           Array.iter (Array.iter (fun istr-> log @@ "ISTR" ^ (string_of_int istr))) wnotes
-         ) tbl;
-       
-       Marshal.to_channel oc tbl [Marshal.No_sharing];
-       close_out oc;
-       Files.mv witfile_tmp witfile;
-       Files.rm witfile_tmp
-
-       
-  let write_witness_notes base =
-    log "WRITE_WITNESS_NOTES";
-    let tbl_opt = !witness_notes_tbl in
-    write_witness_notes base tbl_opt
-
-  let write_fwitness_notes base =
-    log "WRITE_FWITNESS_NOTES";
-    let tbl_opt = !fwitness_notes_tbl in
-    write_fwitness_notes base tbl_opt
-
-    
-  let load_witness_notes base =
-    log "LOAD WNOTES";
-    let tbl =
-      if compat_exists base then begin
-          log "COMPAT EXISTS";
-          let ic = Secure.open_in (compat_file base) in
-          let tbl = (Marshal.from_channel ic : (iper, istr array array) Hashtbl.t) in
-          close_in ic;
-          log "PRINT NOTES";
-          Hashtbl.iter (fun iper notes ->
-              log ("IPER:" ^ string_of_int iper);
-              Array.iter (Array.iter (fun n ->
-                              log @@ "ISTR:" ^ string_of_int n;
-                              log @@ "NOTE:" ^ sou base n)) notes
-            ) tbl;
-          witness_notes_tbl := Some tbl;
-          tbl
-        end
-      else begin
-          log "NO COMPAT FOUND"; Hashtbl.create 1
-        end
-    in
-    witness_notes_tbl := Some tbl;
-    tbl
-
-  let load_fwitness_notes base =
-    log "LOAD FWNOTES";
-    let tbl =
-      if compat_exists base then begin
-          log "COMPAT EXISTS";
-          let ic = Secure.open_in (fcompat_file base) in
-          let tbl = (Marshal.from_channel ic : (ifam, istr array array) Hashtbl.t) in
-          close_in ic;
-          log "PRINT FNOTES";
-          Hashtbl.iter (fun ifam notes ->
-              log ("IFAM:" ^ string_of_int ifam);
-              Array.iter (Array.iter (fun n ->
-                              log @@ "ISTR:" ^ string_of_int n;
-                              log @@ "NOTE:" ^ sou base n)) notes
-            ) tbl;
-          fwitness_notes_tbl := Some tbl;
-          tbl
-        end
-      else begin
-          log "NO COMPAT FOUND"; Hashtbl.create 1
-        end
-    in
-    fwitness_notes_tbl := Some tbl;
-    tbl
-
-  let init_witness_notes_tbl () =
-    witness_notes_tbl := Some (Hashtbl.create 1);
-    fwitness_notes_tbl := Some (Hashtbl.create 1)
-
-  let get_witness_notes_tbl () = !witness_notes_tbl
-
-  let get_fwitness_notes_tbl () = !fwitness_notes_tbl
-
-  let witness_notes_tbl base = match !witness_notes_tbl with
-    | Some tbl -> tbl
-    | None -> load_witness_notes base
-
-  let fwitness_notes_tbl base = match !fwitness_notes_tbl with
-    | Some tbl -> tbl
-    | None -> load_fwitness_notes base
-            
   let gen_person_of_person p =
     let gen_pers = gen_person_of_person p.person in
     let pevents =
@@ -245,27 +203,16 @@ module Legacy_driver = struct
         Array.iter (log) wnotes
       ) pers_events
 
+  let witness_notes_of_events pevents =
+    Array.of_list @@ List.map (fun pe ->
+        Array.map (fun (_,_,wnote) -> wnote) pe.Def.epers_witnesses)
+      pevents
 
-  let add_witness_notes tbl iper pevents =
-    let a : 'a array = Array.make (List.length pevents) (Array.make 0 empty_string) in
-    List.iteri (fun i pevent ->
-        let witnotes : istr array =
-          Array.map (fun (_, _, wnote) -> wnote) pevent.Def.epers_witnesses
-        in
-        a.(i) <- witnotes
-      ) pevents;
-    Hashtbl.replace tbl iper a
-
-  let add_fwitness_notes tbl ifam fevents =
-    let a : 'a array = Array.make (List.length fevents) (Array.make 0 empty_string) in
-    List.iteri (fun i fevent ->
-        let witnotes : istr array =
-          Array.map (fun (_, _, wnote) -> wnote) fevent.Def.efam_witnesses
-        in
-        a.(i) <- witnotes
-      ) fevents;
-    Hashtbl.replace tbl ifam a
-    
+  let fwitness_notes_of_events fevents =
+    Array.of_list @@ List.map (fun fe ->
+        Array.map (fun (_,_,wnote) -> wnote) fe.Def.efam_witnesses)
+      fevents
+  
   let patch_person base iper genpers =
     log @@ "PATCH PERSON" ^ (string_of_int iper);
     test_on_person base genpers;
@@ -273,8 +220,8 @@ module Legacy_driver = struct
     let pevents = genpers.pevents in
     let genpers = Translate.as_legacy_person genpers in
     patch_person base iper genpers;
-    let tbl = witness_notes_tbl base in
-    add_witness_notes tbl iper pevents
+    let witnotes = witness_notes_of_events pevents in
+    PatchPer.set base iper witnotes
 
   let insert_person base iper genpers =
     log "INSERT PERSON";
@@ -283,15 +230,15 @@ module Legacy_driver = struct
     let pevents = genpers.pevents in
     let genpers = Translate.as_legacy_person genpers in
     insert_person base iper genpers;
-    let tbl = witness_notes_tbl base in
-    add_witness_notes tbl iper pevents
+    let witnotes = witness_notes_of_events pevents in
+    PatchPer.set base iper witnotes
 
   let commit_patches base =
     log "COMMIT LEGACY PATCHES";
     commit_patches base;
     log "COMMIT NOTES PATCHES";
-    write_witness_notes base;
-    write_fwitness_notes base
+    PatchPer.write base;
+    PatchFam.write base
 
   let get_pevents p =
     let pevents = get_pevents p.person in
@@ -318,15 +265,16 @@ module Legacy_driver = struct
   let make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes) =
     (*let persons = Array.map Translate.as_legacy_person persons in
       let families = Array.map Translate.as_legacy_family families in*)
-    init_witness_notes_tbl ();
+    PatchPer.empty ();
+    PatchFam.empty ();
     let persons = Array.map (fun p ->
         let leg_person = Translate.as_legacy_person p in
-        add_witness_notes (get_witness_notes_tbl () |> Option.get) p.key_index p.pevents;
+        PatchPer.unsafe_set p.key_index (witness_notes_of_events p.pevents);
         leg_person
       ) persons in
     let families = Array.map (fun f ->
         let leg_family = Translate.as_legacy_family f in
-        add_fwitness_notes (get_fwitness_notes_tbl () |> Option.get) f.fam_index f.fevents;
+        PatchPer.unsafe_set f.fam_index (fwitness_notes_of_events f.fevents);
         leg_family
       ) families in
     make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes)
@@ -387,36 +335,34 @@ module Legacy_driver = struct
   let gen_union_of_person p = gen_union_of_person p.person
 
   let witness_notes base iper =
-    let tbl = witness_notes_tbl base in
-    match Hashtbl.find_opt tbl iper with
-      | Some notes -> notes
-      | None ->
-         let p = poi base iper in
-         let genpers = Gwdb_legacy.Gwdb_driver.gen_person_of_person p in
-         let pevents = genpers.Gwdb_legacy.Dbdisk.pevents in
-         let witnesses_notes =
-           List.map (fun pe ->
-               let wits = pe.Gwdb_legacy.Dbdisk.epers_witnesses in
-               Array.make (Array.length wits) empty_string) pevents
-         |> Array.of_list
-         in
-         witnesses_notes
+    match PatchPer.get base iper with
+    | Some notes -> notes
+    | None ->
+      let p = poi base iper in
+      let genpers = Gwdb_legacy.Gwdb_driver.gen_person_of_person p in
+      let pevents = genpers.Gwdb_legacy.Dbdisk.pevents in
+      let witnesses_notes =
+        List.map (fun pe ->
+            let wits = pe.Gwdb_legacy.Dbdisk.epers_witnesses in
+            Array.make (Array.length wits) empty_string) pevents
+        |> Array.of_list
+      in
+      witnesses_notes
 
   let fwitness_notes base ifam =
-    let tbl = fwitness_notes_tbl base in
-    match Hashtbl.find_opt tbl ifam with
-      | Some notes -> notes
-      | None ->
-         let f = foi base ifam in
-         let genfam = Gwdb_legacy.Gwdb_driver.gen_family_of_family f in
-         let fevents = genfam.Gwdb_legacy.Dbdisk.fevents in
-         let witnesses_notes =
-           List.map (fun fe ->
-               let wits = fe.Gwdb_legacy.Dbdisk.efam_witnesses in
-               Array.make (Array.length wits) empty_string) fevents
-         |> Array.of_list
-         in
-         witnesses_notes
+    match PatchFam.get base ifam with
+    | Some notes -> notes
+    | None ->
+      let f = foi base ifam in
+      let genfam = Gwdb_legacy.Gwdb_driver.gen_family_of_family f in
+      let fevents = genfam.Gwdb_legacy.Dbdisk.fevents in
+      let witnesses_notes =
+        List.map (fun fe ->
+            let wits = fe.Gwdb_legacy.Dbdisk.efam_witnesses in
+            Array.make (Array.length wits) empty_string) fevents
+        |> Array.of_list
+      in
+      witnesses_notes
 
   let poi base iper =
     {person = poi base iper; witness_notes = witness_notes base iper}
@@ -474,8 +420,8 @@ module Legacy_driver = struct
     let fevents = genfam.Def.fevents in
     let genfam = Translate.as_legacy_family genfam in
     patch_family base ifam genfam;
-    let tbl = fwitness_notes_tbl base in
-    add_fwitness_notes tbl ifam fevents
+    let witnotes = fwitness_notes_of_events fevents in
+    PatchFam.set base ifam witnotes
 
   let insert_family base ifam genfam =
     log "INSERT FAMILY";
@@ -483,8 +429,8 @@ module Legacy_driver = struct
     let fevents = genfam.Def.fevents in
     let genfam = Translate.as_legacy_family genfam in
     insert_family base ifam genfam;
-    let tbl = fwitness_notes_tbl base in
-    add_fwitness_notes tbl ifam fevents
+    let witnotes = fwitness_notes_of_events fevents in
+    PatchFam.set base ifam witnotes
 
   let get_children f = get_children f.family
   let get_comment f = get_comment f.family
@@ -503,6 +449,7 @@ module Legacy_driver = struct
   let get_witnesses f = get_witnesses f.family
   let gen_couple_of_family f = gen_couple_of_family f.family
   let gen_descend_of_family f = gen_descend_of_family f.family
+
   let foi base ifam =
     {family = foi base ifam; witness_notes = fwitness_notes base ifam}
 
@@ -517,10 +464,9 @@ module Legacy_driver = struct
 
   let sync ?(scratch=false) ~save_mem base =
     sync ~scratch ~save_mem base;
-    write_witness_notes base;
-    write_fwitness_notes base
-
-                         
+    PatchPer.write base;
+    PatchFam.write base
+  
 end
 
 module Driver = Compat.Make (Legacy_driver) (Legacy_driver)
