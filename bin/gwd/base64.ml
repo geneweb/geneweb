@@ -5,10 +5,9 @@
 (* Encoding is [A-Z][a-z][0-9]+/= *)
 (* 3 chars = 24 bits = 4 * 6-bit groups -> 4 chars *)
 
-let index64 = Array.make 128 0
-
 (* Init the index *)
-let _ =
+let index64 =
+  let index64 = Array.make 128 0 in
   for i = 0 to 25 do
     index64.(i + Char.code 'A') <- i
   done;
@@ -19,7 +18,8 @@ let _ =
     index64.(i + Char.code '0') <- i + 52
   done;
   index64.(Char.code '+') <- 62;
-  index64.(Char.code '/') <- 63
+  index64.(Char.code '/') <- 63;
+  index64
 
 let decode s =
   let rpos = ref 0 and wpos = ref 0 and len = String.length s in
@@ -40,18 +40,3 @@ let decode s =
     if s.[len - 1] = '=' then if s.[len - 2] = '=' then 2 else 1 else 0
   in
   Bytes.sub_string res 0 (Bytes.length res - cut)
-
-let char64 = Array.make 64 'a'
-
-let _ =
-  for i = 0 to 25 do
-    char64.(i) <- Char.chr (Char.code 'A' + i)
-  done;
-  for i = 0 to 25 do
-    char64.(i + 26) <- Char.chr (Char.code 'a' + i)
-  done;
-  for i = 0 to 9 do
-    char64.(i + 52) <- Char.chr (Char.code '0' + i)
-  done;
-  char64.(62) <- '+';
-  char64.(63) <- '/'
