@@ -600,6 +600,7 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let surname = Tstr (E.surname base p) in
   let surname_aliases = mk_str_lst base (Gwdb.get_surnames_aliases p) in
   let events = Tlist [] in
+  let is_visible_by_visitors = Tbool (Util.is_public conf base p) in
   Tpat
     (function
     | "access" -> access
@@ -619,6 +620,7 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
     | "spouses" -> spouses
     | "surname" -> surname
     | "surname_aliases" -> surname_aliases
+    | "is_visible_by_visitors" -> is_visible_by_visitors
     | _ -> raise Not_found)
 
 and get_sosa_person =
@@ -653,6 +655,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let events = lazy_list (mk_event conf base) events' in
   let birth = find_event conf base (Event.Pevent Epers_Birth) events' in
   let baptism = find_event conf base (Event.Pevent Epers_Baptism) events' in
+  let is_visible_by_visitors = Tbool (Util.is_public conf base p) in
   let death =
     let wrap s = Tpat (function "reason" -> Tsafe s | _ -> raise Not_found) in
     match Gwdb.get_death p with
@@ -776,6 +779,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
     | "surname" -> surname
     | "surname_aliases" -> surname_aliases
     | "titles" -> titles
+    | "is_visible_by_visitors" -> is_visible_by_visitors
     | _ -> raise Not_found)
 
 and mk_fevent ?spouse conf base e =
