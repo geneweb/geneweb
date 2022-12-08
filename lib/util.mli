@@ -584,3 +584,4 @@ val designation : base -> person -> Adef.escaped_string
 (** [designation base p] is [Gutil.designation base p |> escape_html] *)
 
 val has_children : base -> person -> bool
+val is_public : config -> base -> Gwdb.person -> bool
