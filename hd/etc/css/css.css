@@ -17,9 +17,8 @@ p {
 /* Relation menu table */
 #quickrel.table td{
 	padding: 0px;
-	vertical-align: middle;
-	height: 140px;
-}
+	line-height:1em;
+	}
 
 .tooltip.show {
   opacity: 1;

@@ -1162,7 +1162,7 @@ en: cousins 1rd
 fr: cousins
 
     cousins.2.2 tt
-fr: cousins au 1<sup>er</sup> degré<br>cousins germains ou non
+fr: cousins au 1<sup>er</sup> degré<hr>(germains ou non)
 
     cousin.2.3
 fr: un %spetit-cousin/une %spetite-cousine
@@ -2267,7 +2267,7 @@ eo: vivanta
 es: no fallecido/no fallecida/no fallecido(a)
 et: elus
 fi: elossa
-fr: vivant/vivante/vivant(e)
+fr: vivant/vivante/vivant(e)/vivants
 he:  בחיים
 is: ekki látin(n)
 it: non deceduto/non deceduta/non deceduto(a)
@@ -7275,39 +7275,39 @@ fr: tri(s)aïeul·e·s<br>aïeul·e·s des aïeul·e·s
 
     cousins.5.0
 en: great-great-great-grandparents
-fr: arrière-arrière-arrière-grands-parents
+fr: 3×-arrière-grands-parents
 
     cousins.5.0 tt
 en: 3rd-great-grandparents
-fr: trois-fois-arrière-grands-parents<br>3×-arrière-grands-parents<br>quadri(s)aïeul·e·s<br>quartaïeul·e·s
+fr: trois-fois-arrière-grands-parents<br>arrière-arrière-arrière-grands-parents<br>quadri(s)aïeul·e·s<br>quartaïeul·e·s
 
     cousins.6.0
 en: 4th-great-grandparents
-fr: quatre-fois-arrière-grands-parents
+fr: 4×-arrière-grands-parents
 
     cousins.6.0 tt
-fr: 4×-arrière-grands-parents<br>quint(is)aïeuls<br>quinquisaïeuls
+fr: quatre-fois-arrière-grands-parents<br>quint(is)aïeuls<br>quinquisaïeuls
 
     cousins.7.0
 en: 5th-great-grandparents
-fr: cinq-fois-arrière-grands-parents
+fr: 5×-arrière-grands-parents
 
     cousins.7.0 tt
-fr: 5×-arrière-grands-parents<br>sext(is)aïeuls
+fr: cinq-fois-arrière-grands-parents<br>sext(is)aïeuls
 
     cousins.8.0
 en: 6th-great-grandparents
-fr: six-fois-arrière-grands-parents
+fr: 6×-arrière-grands-parents
 
     cousins.8.0 tt
-fr: sept(is)aïeuls
+fr: six-fois-arrière-grands-parents<br>sept(is)aïeuls
 
     cousins.9.0
 en: 7th-great-grandparents
-fr: sept-fois-arrière-grands-parents
+fr: 7×-arrière-grands-parents
 
     cousins.9.0 tt
-fr: octaïeuls
+fr: sept-fois-arrière-grands-parents<br>octaïeuls
 
     cousins.10.0
 en: 8th-great-grandparents
@@ -10858,7 +10858,7 @@ de: Ohne Nachkommen
 en: without posterity
 es: sin descendencia
 fi: ilman jälkeläisiä
-fr: sans descendants
+fr: sans postérité
 it: senza ascendenti
 nl: zonder afstammelingen
 no: uten etterkommere
@@ -14039,7 +14039,7 @@ tr: kardeşler
 ->: siblings
 
     cousins.1.1 tt
-fr: adelphe·s<br>sibling·s<br>cousins germains 50 &#37;,<br>consanguins ou utérins 25 &#37;
+fr: adelphe·s<br>sibling·s<hr>germains 50 &#37;<br>consanguins ou utérins 25 &#37;
 
     siblings of the grandparents
 co: arcizii è arcizie
@@ -14147,7 +14147,7 @@ fr: un %sgrand-cousin au 2<sup>e</sup> degré/une %sgrande-cousine au 2<sup>e</s
 fr: grands-cousins 2<sup>e</sup>
 
     cousins.4.3 tt
-fr: grands-cousins au 2<sup>e</sup> degré<hr><- cousins issus de germains des parents
+fr: grands-cousins au 2<sup>e</sup> degré<hr><- cousins issus de germains des parents et oncles
 
     cousin.4.4
 ->: a 3rd cousin
@@ -14225,7 +14225,7 @@ en: 4th cousins
 fr: cousins 4<sup>e</sup>
 
     cousins.5.5 tt
-fr: cousins issus d’issus d’issus de germains<hr>arrière-petits-cousins
+fr: cousins au quatrième degré<br>cousins issus d’issus d’issus de germains<hr><i>arrière-petits-cousins</i>
 
     cousins.5.6
 fr: petits-cousins 4<sup>e</sup>
@@ -14259,19 +14259,20 @@ fr: quatre-fois-arrière-petits-cousins au quatrième degré
 
     cousins.6.1
 en: third great-granduncles
-fr: trois-fois-arrière-grands-oncles
+fr: 3×-arrière-grands-oncles
 
     cousins.6.1 tt
-fr: frères et sœurs des quadrisaïeuls<hr>trois-fois-arrière-grands-oncles
+fr: trois-fois-arrière-grands-oncles<hr>frères et sœurs des quadrisaïeuls
 
     cousins.6.2
-fr: trois-fois-arrière-grands-cousins
+fr: 3×-arrière-grands-cousins
 
     cousins.6.2 tt
 fr: arrière-arrière-arrière-grands-cousins au premier degré
 
     cousin.6.3
 fr: un arrière-arrière-grand-cousin au 2<sup>e</sup> degré/une arrière-arrière-grande-cousine au 2<sup>e</sup> degré
+
     cousins.6.3
 fr: arrière-arrière-grands-cousins 2<sup>e</sup>
 
@@ -14310,41 +14311,44 @@ fr: arrière-petits-cousins 5<sup>e</sup>
 fr: arrière-petits-cousins au cinquième degré
 
     cousins.6.9
-fr: arrière-arrière-petits-cousins 5<sup>e</sup>
+fr: arrière-petits-cousins 5<sup>e</sup>
 
     cousins.6.9 tt
-fr: deux-fois-arrière-petits-cousins au cinquième degré
+fr: arrière-arrière-petits-cousins au cinquième degré
 
     cousins.6.10
-fr: trois-fois-arrière-petits-cousins 5<sup>e</sup>
+fr: 3×-arrière-petits-cousins 5<sup>e</sup>
 
     cousins.6.10 tt
 fr: trois-fois-arrière-petits-cousins au cinquième degré
 
     cousins.6.11
-fr: quatre-fois-arrière-petits-cousins 5<sup>e</sup>
+fr: 4×-arrière-petits-cousins 5<sup>e</sup>
+
+    cousins.6.11 tt
+fr: quatre-fois-arrière-petits-cousins au cinquième degré
 
     cousins.7.1
 en: fourth great-granduncles
-fr: quatre-fois-arrière-grands-oncles
+fr: 4×-arrière-grands-oncles
 
     cousins.7.1 tt
-fr: frères et sœurs des quinquisaïeuls
+fr: quatre-fois-arrière-grands-oncles<br>frères et sœurs des quinquisaïeuls
 
     cousins.7.2
-fr: quatre-fois-arrière-grands-cousins
+fr: 4×-arrière-grands-cousins
 
     cousins.7.2 tt
-fr: arrrière-arrière-arrière-arrière-grands-cousins au premier degré
+fr: quatre-fois-arrière-grands-cousins<br>arrrière-arrière-arrière-arrière-grands-cousins au premier degré
 
     cousins.7.3
-fr: trois-fois-arrière-grands-cousins 2<sup>e</sup>
+fr: 3×-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.7.3 tt
-fr: arrière-arrière-arrière-grands-cousins au deuxième degré
+fr: trois-fois-arrière-grands-cousins au deuxième degré/arrière-arrière-arrière-grands-cousins au deuxième degré
 
     cousins.7.4
-fr: arrière-arrière-grands-cousins 3<sup>e</sup>
+fr: arrière-arrière-grands-cousins 3<sup>e</sup>
 
     cousins.7.4 tt
 fr: arrière-arrière-grands-cousins au troisième degré
@@ -14384,16 +14388,16 @@ fr: arrière-petits-cousins au sixième degré
 fr: arrière-arrière-petits-cousins 6<sup>e</sup>
 
     cousins.7.10 tt
-fr: deux-fois-arrière-petits-cousins au sixième degré
+fr: arrière-arrière-petits-cousins au sixième degré
 
     cousins.7.11
-fr: trois-fois-arrière-petits-cousins 6<sup>e</sup>
+fr: 3×-arrière-petits-cousins 6<sup>e</sup>
 
     cousins.7.11 tt
 fr: trois-fois-arrière-petits-cousins au sixième degré
 
     cousins.7.12
-fr: quatre-fois-arrière-petits-cousins 6<sup>e</sup>
+fr: 4×-arrière-petits-cousins 6<sup>e</sup>
 
     cousins.7.12 tt
 fr: quatre-fois-arrière-petits-cousins au sixième degré
@@ -14487,25 +14491,25 @@ fr: six-fois-arrière-grands-oncles
 fr: frères et sœurs des octosaïeuls
 
     cousins.9.2
-fr: six-foix-arrière-grands-cousins
+fr: 6×-arrière-grands-cousins
 
     cousins.9.2 tt
 fr: six-foix-arrière-grands-cousins au premier degré
 
     cousins.9.3
-fr: cinq-fois-arrière-grands-cousins 2<sup>e</sup>
+fr: 5×-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.9.3 tt
 fr: cinq-fois-arrière-grands-cousins au deuxième degré
 
     cousins.9.4
-fr: quatre-fois-arrière-grands-cousins 3<sup>e</sup>
+fr: 4×-arrière-grands-cousins 3<sup>e</sup>
 
     cousins.9.4 tt
 fr: quatre-fois-arrière-grands-cousins au troisième degré
 
     cousins.9.5
-fr: trois-fois-arrière-grands-cousins 4<sup>e</sup>
+fr: 3×-arrière-grands-cousins 4<sup>e</sup>
 
     cousins.9.5 tt
 fr: trois-fois-arrière-grands-cousins au quatrième degré
@@ -14519,7 +14523,7 @@ fr: deux-fois-arrière-grands-cousins au cinquième degré
     cousins.9.7
 fr: arrière-grands-cousins 6<sup>e</sup>
 
-    cousins.9.4 tt
+    cousins.9.7 tt
 fr: arrière-grands-cousins au sixième degré
 
     cousins.9.8
@@ -14565,16 +14569,15 @@ fr: quatre-fois-arrière-petits-cousins 8<sup>e</sup>
 fr: quatre-fois-arrière-petits-cousins au huitième degré
 
     coefficient of relationship
-en: The <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient of relationship</a> gives the average percentage of shared DNA between two individuals.
-fr: Le <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient de parenté</a> indique le pourcentage moyen de gènes partagés entre deux individus.
-
-    half DNA
-en: This coefficient is divided by two for “half-relations”: for eg., full siblings 50 &#37; > half-siblings 25 &#37;.
-fr: Ce coefficient est divisé par deux pour les « demi-relations » : par ex., fratrie 50 &#37; > demi-fratrie 25 &#37;.
+en: The <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient of relationship</a> gives the minimum average percentage of shared DNA between two individuals.
+fr: Le <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient de parenté</a> indique le pourcentage moyen minimum de gènes partagés entre deux individus.
 
     one ancestor counted
-en: Descendants of only one ancestor are included in counts (half-siblings/half-cousins, etc.).
-fr: Les descendants d’un ancêtre seulement sont inclus dans les comptages (demi-frères et sœurs, demi-cousins, etc.).
+en: One common ancestor: consanguine and uterine half relationships are included, but their coefficient of parente is half the full equivalent relation.
+fr: Les relations de parenté consanguines et utérines par un seul ancêtre pivot commun sont incluses. Leur coefficient de parenté vaut la moitié de celui de la relation complète équivalente.
+
+    multiple relations
+fr: En cas d’implexes, certains individus auront de multiples liens de parenté (chemins) avec l’individu racine. La parenté entre deux individus dépendra de tous les coefficients de leurs liens de parenté (chemins). [chemins = badges verts] ¡[TODO]!
 
     since the last click
 bg: от последното щракване
