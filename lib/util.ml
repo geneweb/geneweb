@@ -334,10 +334,7 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
             (Format.sprintf "Poorly formatted command: %s" commd);
           commd
   in
-  let s =
-    if conf.cgi then Adef.escaped @@ commd ^ "?" ^ "b=" ^ conf.bname
-    else Adef.escaped @@ commd ^ "?"
-  in
+  let s = Adef.escaped @@ commd ^ "?" in
   let s = if henv then aux s conf.henv else s in
   let s = if senv then aux s conf.senv else s in
   s
