@@ -3417,6 +3417,10 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
             | _ -> null_val
           else null_val
       | _ -> raise Not_found)
+  | "marriage_places" ->
+    List.fold_left
+      (fun acc ifam -> acc ^ (sou base (get_marriage_place (foi base ifam))) ^ "|")
+    "|" (Array.to_list (get_family p)) |> str_val
   | "mother_age_at_birth" ->
       string_of_parent_age conf base ep get_mother |> safe_val
   | "misc_names" ->
@@ -3634,6 +3638,8 @@ and eval_witness_relation_var conf base env
 
 and eval_family_field_var conf base env
     ((_, fam, (ifath, imoth, _), m_auth) as fcd) loc = function
+  | ["date_s"] | ["dates"] ->
+      VVstring (DateDisplay.short_family_dates_text conf base true fam :> string)
   | "father" :: sl -> (
       match get_env "f_link" env with
       | Vbool _ -> raise Not_found
@@ -3651,6 +3657,8 @@ and eval_family_field_var conf base env
           let ep = make_ep conf base imoth in
           eval_person_field_var conf base env ep loc sl)
   | "marriage" :: sl -> eval_family_marriage_field_var fam sl
+  | ["sep_date_s"] | ["sep_dates"] ->
+      VVstring (DateDisplay.short_family_dates_text conf base false fam :> string)
   | [ s ] -> str_val (eval_str_family_field env fcd s)
   | _ -> raise Not_found
 
