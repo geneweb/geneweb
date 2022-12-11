@@ -1182,6 +1182,7 @@ type 'a env =
   | Vsosa of (iper * (Sosa.t * person) option) list ref
   | Vt_sosa of SosaCache.sosa_t option
   | Vtitle of person * title_item
+  | Vvars of (string * string) list ref
   | Vevent of person * istr Event.event_item
   | Vlazyp of string option ref
   | Vlazy of 'a env Lazy.t
@@ -2106,6 +2107,32 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
         let f, c, a = make_efam conf base (get_iper a) ifam in
         eval_family_field_var conf base env (ifam, f, c, a) loc sl
       else raise Not_found
+  | ["set_count"; n; v] ->
+    begin match n with
+    | "1" | "2" | "3" ->
+      begin match get_env ("count" ^ n) env with
+      | Vcnt c -> c := int_of_string v; VVstring ""
+      | _ -> raise Not_found
+      end
+    | _ -> raise Not_found
+    end
+  | ["get_var"; name;] ->
+      begin match get_env ("vars") env with
+      | Vvars lv ->
+          let vv = try List.assoc name !lv
+          with Not_found -> raise Not_found
+          in
+          VVstring vv
+      | _ -> VVstring ("%get_var;" ^ name ^ "?")
+      end
+  | ["set_var"; name; value] ->
+      begin match get_env ("vars") env with
+      | Vvars lv ->
+          if List.mem_assoc name !lv
+          then lv := List.remove_assoc name !lv;
+          lv := (name, value) :: !lv; VVstring ""
+      | _ -> raise Not_found
+      end
   | "svar" :: i :: sl -> (
       (* http://localhost:2317/HenriT_w?m=DAG&p1=henri&n1=duchmol&s1=243&s2=245
          access to sosa si=n of a person pi ni
@@ -4822,6 +4849,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       ("count1", Vcnt (ref 0));
       ("count2", Vcnt (ref 0));
       ("count3", Vcnt (ref 0));
+      ("vars", Vvars (ref []));
       ("cousins", Vcousl (ref []));
       ("list", Vslist (ref SortedList.empty));
       ("listb", Vslist (ref SortedList.empty));
