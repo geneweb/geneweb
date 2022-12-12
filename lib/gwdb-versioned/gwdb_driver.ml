@@ -328,7 +328,7 @@ module Legacy_driver = struct
       ) persons in
     let families = Array.map (fun f ->
         let leg_family = Translate.as_legacy_family f in
-        PatchPer.unsafe_set f.fam_index (fwitness_notes_of_events f.fevents);
+        PatchFam.unsafe_set f.fam_index (fwitness_notes_of_events f.fevents);
         leg_family
       ) families in
     let base = make bname particles ((persons, ascends, unions), (families, couples, descends), string_arrays, base_notes) in
