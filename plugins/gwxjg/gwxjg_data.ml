@@ -586,6 +586,7 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let iper' = Gwdb.get_iper p in
   let module E = Ezgw.Person in
   let access_url = escaped (Util.acces conf base p) in
+  let access = Tbool (Util.is_public conf base p) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
   let first_name = Tstr (E.first_name base p) in
@@ -600,10 +601,10 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let surname = Tstr (E.surname base p) in
   let surname_aliases = mk_str_lst base (Gwdb.get_surnames_aliases p) in
   let events = Tlist [] in
-  let is_visible_by_visitors = Tbool (Util.is_public conf base p) in
   Tpat
     (function
-    | "access" -> access_url
+    | "access_url" -> access_url
+    | "access" -> access
     | "children" -> children
     | "events" -> events
     | "families" -> families
@@ -620,7 +621,6 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
     | "spouses" -> spouses
     | "surname" -> surname
     | "surname_aliases" -> surname_aliases
-    | "is_visible_by_visitors" -> is_visible_by_visitors
     | _ -> raise Not_found)
 
 and get_sosa_person =
@@ -646,6 +646,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let module E = Ezgw.Person in
   let iper' = Gwdb.get_iper p in
   let access_url = escaped (Util.acces conf base p) in
+  let access = Tbool (Util.is_public conf base p) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
   let aliases = mk_str_lst base (Gwdb.get_aliases p) in
@@ -655,7 +656,6 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let events = lazy_list (mk_event conf base) events' in
   let birth = find_event conf base (Event.Pevent Epers_Birth) events' in
   let baptism = find_event conf base (Event.Pevent Epers_Baptism) events' in
-  let is_visible_by_visitors = Tbool (Util.is_public conf base p) in
   let death =
     let wrap s = Tpat (function "reason" -> Tsafe s | _ -> raise Not_found) in
     match Gwdb.get_death p with
@@ -743,7 +743,8 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let sosa = box_lazy @@ lazy (get_sosa_person conf base p) in
   Tpat
     (function
-    | "access" -> access_url
+    | "access_url" -> access_url
+    | "access" -> access
     | "aliases" -> aliases
     | "baptism" -> baptism
     | "birth" -> birth
@@ -779,7 +780,6 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
     | "surname" -> surname
     | "surname_aliases" -> surname_aliases
     | "titles" -> titles
-    | "is_visible_by_visitors" -> is_visible_by_visitors
     | _ -> raise Not_found)
 
 and mk_fevent ?spouse conf base e =
