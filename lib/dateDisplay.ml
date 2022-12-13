@@ -638,7 +638,7 @@ let short_marriage_date_text conf base fam p1 p2 =
 (* ********************************************************************** *)
 let short_family_dates_text conf _base marr_sep fam =
   let marr_dates_aux =
-    match Adef.od_of_cdate (Gwdb.get_marriage fam) with
+    match Date.od_of_cdate (Gwdb.get_marriage fam) with
     | Some d ->
       begin match d with
         | Dgreg (dmy, _) -> Some (prec_year_text conf dmy)
@@ -653,7 +653,7 @@ let short_family_dates_text conf _base marr_sep fam =
         e.efam_name = Efam_Separated)
         (Gwdb.get_fevents fam) with
     | Some e ->
-      begin match Adef.od_of_cdate e.efam_date with
+      begin match Date.od_of_cdate e.efam_date with
         | Some d ->
           begin match d with
             | Dgreg (dmy, _) -> Some (prec_year_text conf dmy)
