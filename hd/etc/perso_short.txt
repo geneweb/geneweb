@@ -34,6 +34,9 @@
     %end;
   %end;
 %end;
+%define;on_side(xx)
+  [*on %s's side:::xx]
+%end;
 %define;relation_type_txt(xx, sex)
   %if;("xx" = [adoptive father/adoptive mother/adoptive parents]2)
     %apply;capitalize(nth([adoptive father/adoptive mother/adoptive parents], sex))
@@ -155,9 +158,9 @@
               %apply;relation_txt()
               %if;xx.computable_marriage_age;
                 %if;(are_married or are_engaged)
-                  %apply;capitalize(nth([groom/bride], xx.sex)): %xx.marriage_age;%sp;
+                  %apply;capitalize(nth([groom/bride], xx.sex))[:] %xx.marriage_age;%sp;
                 %else;
-                  %apply;capitalize(nth([conjoint/conjointe], xx.sex)): %xx.marriage_age;%sp;
+                  %apply;capitalize(nth([conjoint/conjointe], xx.sex))[:] %xx.marriage_age;%sp;
                 %end;
               %end;
               %if;(xx.computable_marriage_age and spouse.computable_marriage_age)
@@ -165,9 +168,9 @@
               %end;
               %if;spouse.computable_marriage_age;
                 %if;(are_married or are_engaged)
-                  %apply;capitalize(nth([groom/bride], spouse.sex)): %spouse.marriage_age;
+                  %apply;capitalize(nth([groom/bride], spouse.sex))[:] %spouse.marriage_age;
                 %else;
-                  %apply;capitalize(nth([conjoint/conjointe], spouse.sex)): %spouse.marriage_age;
+                  %apply;capitalize(nth([conjoint/conjointe], spouse.sex))[:] %spouse.marriage_age;
                 %end;
               %end;
             </td>
@@ -202,7 +205,7 @@
     <table class="fp_marriage_notes">
       <tr>
         <td>
-          <span class="textcolor">[*marriage notes/marriages notes]0:</span> %comment;
+          <span class="textcolor">[*marriage notes/marriages notes]0[:]</span> %comment;
           %if;has_marriage_note;%marriage_note;%end;
         </td>
       </tr>
@@ -1022,7 +1025,7 @@
                     %if;event.has_witnesses;
                       <p style="margin:0;">
                         %foreach;event_witness;
-                          <span>%apply;capitalize(event_witness_kind) :</span>
+                          <span>%apply;capitalize(event_witness_kind)[:]</span>
                           %apply;short_display_person("event_witness")<br>
                         %end;
                       </p>
