@@ -29,41 +29,43 @@
   %include;menubar
   %include;buttons
 %end;
-%let;lvL;
+%let;lvl;
   %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
   %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
 %in;
 <h3>%nn;
   %if;(evar.t = "F")
-    %if;(public_name != "")%public_name;%else;%first_name;%end;
-    %if;(qualifier != "") <em>%qualifier;</em>%end;
-    %sp;%surname;
-    %if;(alias != "") <em>(%alias;)</em>%end;<br>
-    - [*surnames branch] -
+    %apply;a_of_b%with;[*surnames branch]%and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") <em>%qualifier;</em>%end;
+      %sp;%surname;
+      %if;(alias != "") <em>(%alias;)</em>%end;<br>
+    %end;
   %elseif;(evar.t = "E")
-    %if;(public_name != "")%public_name;%else;%first_name;%end;
-    %if;(qualifier != "") <em>%qualifier;</em>%end;
-    %sp;%surname;
-    %if;(alias != "") <em>(%alias;)</em>%end;<br>
-    - [*list eclair] -
+    %apply;a_of_b%with;[*list eclair]%and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") <em>%qualifier;</em>%end;
+      %sp;%surname;
+      %if;(alias != "") <em>(%alias;)</em>%end;<br>
+    %end;
   %else;
     %apply;a_of_b%with;[*ancestors]%and;
       %if;(public_name!="")%public_name;%else;%first_name;%end; %surname; %end;
     %if;(evar.t="D")[up to] %p_of_index.1;
-    %elseif;(evar.t="H")<small class="text-muted">%apply;togena(lvL)</small>
     %end;
   %end;
+  %if;(e.t="H" or e.t="F" or e.t="E")%apply;togena(lvl)%end;
 </h3>
 
 %define;ancestors_by_list(xx, nnn)
   %if;(xx.has_parents and nnn > 1)
     <ul>
-    <li class="male"><a href="%prefix;
-    %xx.father.access;">%xx.father;</a>%xx.father.title;%xx.father.dates;%nl;
-    %apply;ancestors_by_list("xx.father", nnn - 1)</li>
-    <li class="female"><a href="%prefix;
-    %xx.mother.access;">%xx.mother;</a>%xx.mother.title;%xx.mother.dates;%nl;
-    %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
+      <li class="male"><a href="%prefix;
+        %xx.father.access;">%xx.father;</a>%xx.father.title;%xx.father.dates;%nl;
+        %apply;ancestors_by_list("xx.father", nnn - 1)</li>
+      <li class="female"><a href="%prefix;
+        %xx.mother.access;">%xx.mother;</a>%xx.mother.title;%xx.mother.dates;%nl;
+        %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
     </ul>
   %end;
 %end;
@@ -110,7 +112,7 @@
   %if;(evar.t = "L")
     %( by list %)
     <p>%apply;togena(xx).</p>
-    %apply;ancestors_by_list("self", lvL)
+    %apply;ancestors_by_list("self", lvl)
 
   %elseif;(evar.t="H")
     %( horizontal ascendency %)
@@ -138,9 +140,9 @@
           %end;&force=on">[continue]</a> [without implex display]
       %else;
         %if;(evar.force="on")
-          %apply;anc_row_hr("self", lvL, 1, "   ", "──╴", "   ")
+          %apply;anc_row_hr("self", lvl, 1, "   ", "──╴", "   ")
         %else;
-          %apply;anc_row_hr("self", lvL, sosa.v, "   ", "──╴", "   ")
+          %apply;anc_row_hr("self", lvl, sosa.v, "   ", "──╴", "   ")
         %end;
       %end;
     </div>
@@ -347,7 +349,9 @@
     %reset_count;
     %foreach;ancestor_surname(evar.v)
       %incr_count;
+      %let;neg_ancestor_nb_times;%expr(0-ancestor.nb_times)%in;
       %apply;add_in_sorted_list(
+        neg_ancestor_nb_times,
         ancestor.nb_times,
         ancestor.surname_end,
         ancestor.surname_begin,
@@ -358,16 +362,13 @@
         ancestor.date_end.prec,
         ancestor.date_end.year)
     %end;
-
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
-    <p>%apply;togena(nb_gen).</p>
-
     %if;(count > 100)
       <p>
         <span>[*number of branches] : </span>
         %foreach;sorted_list_item;
-          %if;(prev_item.1 != item.1)
-            <a href="#a_%apply;hexa(item.1)">%item.1;</a>
+          %if;(prev_item.2 != item.2)
+            <a href="#a_%apply;hexa(item.2)">%item.2;</a>
           %end;
         %end;
       </p>
@@ -394,7 +395,7 @@
     <ul class="surname_branch_sort">
       %if;(count <= 100)
         <li>%nn;
-        <table class="surname_branch_table">
+        <table class="table table-responsive surname_branch_table">
           <tr class="surname_branch_table_header">
             <th width="30%%">[*surname/surnames]0</th>
             <th width="10%%">[*nb branches]</th>
@@ -403,10 +404,10 @@
           </tr>
       %end;
       %foreach;sorted_list_item;
-        %if;(prev_item.1 != item.1 and count > 100)
+        %if;(prev_item.2 != item.2 and count > 100)
           <li>%nn;
-          <a name="a_%apply;hexa(item.1)">%item.1;</a>
-          <table class="surname_branch_table">
+          <a name="a_%apply;hexa(item.2)">%item.2;</a>
+          <table class="table table-responsive surname_branch_table">
             <tr class="surname_branch_table_header">
               <th width="30%%">[*surname/surnames]0</th>
               <th width="10%%">[*nb branches]</th>
@@ -416,41 +417,41 @@
         %end;
         <tr>
           <td>
-            %item.2;%item.3;
+            %item.3;%item.4;
           </td>
           <td align="center">
             %if;(evar.cgl != "on")
-              <a href="%prefix;m=DAG&%item.4;">%item.1;</a>
+              <a href="%prefix;m=DAG&%item.5;">%item.2;</a>
             %else;
-              %item.1;
+              %item.2;
             %end;
           </td>
           <td>
-            %item.5;
+            %item.6;
           </td>
           <td>
-            %if;(item.6 = "&lt;")
-              /%item.7;
-            %elseif(item.6 = "&gt;")
-              %item.7;/
-            %elseif;(item.6 = "|" or item.6 = "..")
-              %item.7;
+            %if;(item.7 = "&lt;")
+              /%item.8;
+            %elseif(item.7 = "&gt;")
+              %item.8;/
+            %elseif;(item.7 = "|" or item.7 = "..")
+              %item.8;
             %else;
-              %item.6;%item.7;
+              %item.7;%item.8;
             %end;%nn;
             -%nn;
-            %if;(item.8 = "&lt;")
-              /%item.9;
-            %elseif(item.8 = "&gt;")
-              %item.9;/
-            %elseif;(item.8 = "|" or item.8 = "..")
-              %item.9;
+            %if;(item.9 = "&lt;")
+              /%item.10;
+            %elseif(item.9 = "&gt;")
+              %item.10;/
+            %elseif;(item.9 = "|" or item.9 = "..")
+              %item.10;
             %else;
-              %item.8;%item.9;
+              %item.9;%item.10;
             %end;
           </td>
         </tr>
-        %if;(item.1 != next_item.1 and count > 100)
+        %if;(item.2 != next_item.2 and count > 100)
           </table>
           </li>
         %end;
@@ -465,7 +466,6 @@
   %elseif;(evar.t = "F")
     %( surnames branch %)
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
-    <p>%apply;togena(nb_gen).</p>
     <p>[*help surname branch].</p>
     <div class="not_printable" style="margin-bottom:25px;">
       %if;(not cancel_links)
