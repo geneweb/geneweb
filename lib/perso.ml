@@ -1839,6 +1839,10 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       match get_env "item" env with
       | Vslistlm (_ :: ell) -> eval_item_field_var ell sl
       | _ -> raise Not_found)
+  | "nob_title" :: sl -> (
+      match get_env "nob_title" env with
+      | Vtitle (p, t) -> eval_title_field_var conf base env (p, t) loc sl
+      | _ -> raise Not_found)
   | "number_of_ancestors" :: sl -> (
       match get_env "n" env with
       | Vint n -> VVstring (eval_num conf (Sosa.of_int (n - 1)) sl)
@@ -2020,6 +2024,50 @@ and eval_item_field_var ell = function
             VVstring r
         | [] -> null_val
       with Failure _ -> raise Not_found)
+  | _ -> raise Not_found
+
+and eval_title_field_var conf base env (_p, (cnt, name, title, places, dates))
+    _loc = function
+  | [ "is_first" ] ->
+      VVbool
+        (match get_env "first" env with Vbool x -> x | _ -> raise Not_found)
+  | [ "is_main" ] ->
+      VVbool (match name with Tmain | Tnone -> true | Tname _x -> false)
+  | [ "cnt" ] -> VVstring (string_of_int cnt)
+  | [ "name" ] -> (
+      match name with
+      | Tname n -> VVstring (sou base n |> escape_html :> string)
+      | _ -> VVstring "")
+  | [ "title" ] -> VVstring (sou base title |> escape_html :> string)
+  | [ "places" ] ->
+      VVstring
+        (List.fold_left
+           (fun acc pl ->
+             acc
+             ^ (if acc <> "" then ", " else "")
+             ^ (sou base pl |> escape_html :> string))
+           "" places)
+  | [ "dates" ] ->
+      let date_opt_to_string d =
+        match d with
+        | Some (Dgreg (dmy, _)) ->
+            (DateDisplay.string_of_dmy conf dmy :> string)
+        | Some (Dtext d) -> (d |> escape_html :> string)
+        | None -> ""
+      in
+      VVstring
+        (List.fold_left
+           (fun acc (d1, d2) ->
+             acc
+             ^ (if acc <> "" then ", " else "")
+             ^
+             let s =
+               Format.sprintf "%s - %s" (date_opt_to_string d1)
+                 (date_opt_to_string d2)
+             in
+             if s = " - " then "? - ?" else s
+             (* FIXME should it return ""  instead of "? - ?" *))
+           "" dates)
   | _ -> raise Not_found
 
 and eval_relation_field_var conf base env (i, rt, ip, is_relation) loc =
@@ -4031,6 +4079,16 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
         titles
   in
+  let print_foreach_nob_title env al ((p, p_auth) as ep) =
+    if p_auth then
+      let titles = nobility_titles_list conf base p in
+      Mutil.list_iter_first
+        (fun first x ->
+          let env = ("nob_title", Vtitle (p, x)) :: env in
+          let env = ("first", Vbool first) :: env in
+          List.iter (print_ast env ep) al)
+        titles
+  in
   let print_foreach_parent env al ((a, _) as ep) =
     match get_parents a with
     | Some ifam ->
@@ -4229,6 +4287,7 @@ let print_foreach conf base print_ast eval_expr =
     | "family" -> print_foreach_family env al ini_ep ep
     | "first_name_alias" -> print_foreach_first_name_alias env al ep
     | "nobility_title" -> print_foreach_nobility_title env al ep
+    | "nob_title" -> print_foreach_nob_title env al ep
     | "parent" -> print_foreach_parent env al ep
     | "qualifier" -> print_foreach_qualifier env al ep
     | "related" -> print_foreach_related env al ep
