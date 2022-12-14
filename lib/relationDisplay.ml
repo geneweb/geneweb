@@ -846,7 +846,7 @@ let print_main_relationship conf base long p1 p2 rel =
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Perso.interp_templ ~no_headers:true "buttons_rel" conf base 
+  Perso.interp_templ ~no_headers:true "buttons_rel" conf base
     (Gwdb.empty_person base Gwdb.dummy_iper);
   (match p_getenv conf.env "spouse" with
   | Some "on" -> conf.senv <- conf.senv @ [ ("spouse", Mutil.encode "on") ]

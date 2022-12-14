@@ -758,60 +758,6 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   if Array.length t.table = 0 then [||]
   else Dag2html.html_table_struct indi_txt vbar_txt phony d t
 
-let print_slices_menu conf hts =
-  let header n =
-    transl_nth conf "display by slices/slice width/overlap/total width" n
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
-  in
-  let title _ = header 0 in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
-  Perso.interp_templ ~no_headers:true "buttons_rel" conf base 
-    (Gwdb.empty_person base Gwdb.dummy_iper);
-  Output.print_sstring conf {|<form method="get" action="|};
-  Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|"><p>|};
-  hidden_env conf;
-  List.iter
-    (fun (k, v) -> if k <> "slices" then Util.hidden_input conf k v)
-    conf.env;
-  Output.print_sstring conf {|</p><table><tr align="left"><td align="right">|};
-  transl conf "don't group the common branches together"
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf
-    {|<input type="checkbox" name="nogroup" value="on"></td></tr><tr align="left"><td align="right">|};
-  header 1;
-  Output.print_sstring conf
-    {|<input name="dpos" size="5" value="78"></td></tr><tr align="left"><td align="right">|};
-  header 2;
-  Output.print_sstring conf
-    {|<input name="overlap" size="5" value="10"></td></tr><tr align="left"><td align="right">|};
-  header 3;
-  let wid =
-    let min_wid, max_wid, _, _, _ = table_pre_dim hts in
-    Output.printf conf "(%d-%d)\n" min_wid max_wid;
-    max min_wid (min max_wid 78)
-  in
-  Output.printf conf "<input name=\"width\" size=\"5\" value=\"%d\">\n" wid;
-  Output.print_sstring conf {|</td></tr></table><p>|};
-  Output.print_sstring conf
-    {|<p><button type="submit" class="btn btn-secondary btn-lg">|};
-  transl_nth conf "validate/delete" 0
-  |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf {|</button></p></form>|};
-  Hutil.trailer conf
-
-let print_dag_page conf page_title hts next_txt =
-  let title _ = Output.print_string conf page_title in
-  Hutil.header_no_page_title conf title;
-  print_html_table conf hts;
-  if (next_txt : Adef.escaped_string :> string) <> "" then (
-    Output.print_sstring conf {|<p><a href="|};
-    Output.print_string conf (commd conf);
-    Output.print_string conf next_txt;
-    Output.print_sstring conf {|">&gt;&gt;</a></p>|});
-  Hutil.trailer conf
-
 (* *)
 
 type 'a env =
@@ -1038,37 +984,42 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
 
 let include_buttons conf page_title hts next_txt =
   let fname = Util.etc_file_name conf "buttons_rel" in
-  if conf.debug then Output.print_string conf ("\n<!-- begin include " ^ fname ^ " -->\n");
+  if conf.debug then
+    Output.print_sstring conf ("\n<!-- begin include " ^ fname ^ " -->\n");
   Hutil.interp_no_header conf "buttons_rel"
-    {Templ.eval_var = eval_var conf page_title next_txt;
-     Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-     Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-     Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-     Templ.print_foreach = print_foreach conf hts}
+    {
+      Templ.eval_var = eval_var conf page_title next_txt;
+      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
+      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
+      Templ.get_vother;
+      Templ.set_vother;
+      Templ.print_foreach = print_foreach conf hts;
+    }
     [] ();
-  if conf.debug then Output.print_string conf ("\n<!-- end include " ^ fname ^ " -->\n")
+  if conf.debug then
+    Output.print_sstring conf ("\n<!-- end include " ^ fname ^ " -->\n")
 
 let print_dag_page conf page_title hts next_txt =
   let conf =
     let doctype =
       (* changing doctype to transitional because use of
          <hr width=... align=...> *)
-      match p_getenv conf.base_env "doctype" with
-        Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
+      match List.assoc_opt "doctype" conf.base_env with
+      | Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
       | _ -> "xhtml-1.0-trans"
     in
-    {conf with base_env = ("doctype", doctype) :: conf.base_env}
+    { conf with base_env = ("doctype", doctype) :: conf.base_env }
   in
   let title _ = Output.print_string conf page_title in
   Hutil.header_no_page_title conf title;
   include_buttons conf page_title hts next_txt;
   print_html_table conf hts;
-  if next_txt <> "" then
-    begin
-      Output.print_string conf "<p>\n";
-      Output.printf conf "<a href=\"%s%s\">&gt;&gt;</a>\n" (commd conf) next_txt;
-      Output.print_string conf "</p>\n"
-    end;
+  if (next_txt :> string) <> "" then (
+    Output.print_sstring conf "<p>\n";
+    Output.printf conf "<a href=\"%s%s\">&gt;&gt;</a>\n"
+      (commd conf :> string)
+      (next_txt :> string);
+    Output.print_sstring conf "</p>\n");
   Hutil.trailer conf
 
 let print_slices_menu conf page_title hts next_txt =
@@ -1076,62 +1027,68 @@ let print_slices_menu conf page_title hts next_txt =
     Utf8.capitalize_fst
       (transl_nth conf "display by slices/slice width/overlap/total width" n)
   in
-  let title _ = Output.print_string conf (txt 0) in
+  let title _ = Output.print_sstring conf (txt 0) in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   include_buttons conf page_title hts next_txt;
-  Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
-  Output.print_string conf "<p>" ;
+  Output.printf conf "<form method=\"get\" action=\"%s\">\n"
+    (conf.command :> string);
+  Output.print_sstring conf "<p>";
   hidden_env conf;
   List.iter
     (fun (k, v) ->
-       if k = "slices" then ()
-       else
-         Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
-           (Mutil.decode k) (Mutil.decode v))
+      if k = "slices" then ()
+      else
+        Output.printf conf "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
+          (Mutil.decode (Adef.encoded k))
+          (Mutil.decode v))
     conf.env;
-  Output.print_string conf "</p>" ;
-  Output.print_string conf "<table>\n";
-  Output.print_string conf "<tr align=\"left\">\n";
-  Output.print_string conf "<td align=\"right\">\n";
+  Output.print_sstring conf "</p>";
+  Output.print_sstring conf "<table>\n";
+  Output.print_sstring conf "<tr align=\"left\">\n";
+  Output.print_sstring conf "<td align=\"right\">\n";
   Output.printf conf "%s\n"
-    (Utf8.capitalize_fst (transl conf "don't group the common branches together"));
-  Output.print_string conf "<input type=\"checkbox\" name=\"nogroup\" value=\"on\">\n";
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "<tr align=\"left\">\n";
-  Output.print_string conf "<td align=\"right\">\n";
+    (Utf8.capitalize_fst
+       (transl conf "don't group the common branches together"));
+  Output.print_sstring conf
+    "<input type=\"checkbox\" name=\"nogroup\" value=\"on\">\n";
+  Output.print_sstring conf "</td>\n";
+  Output.print_sstring conf "</tr>\n";
+  Output.print_sstring conf "<tr align=\"left\">\n";
+  Output.print_sstring conf "<td align=\"right\">\n";
   Output.printf conf "%s\n" (txt 1);
-  Output.print_string conf "<input name=\"dpos\" size=\"5\" value=\"78\">\n";
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "<tr align=\"left\">\n";
-  Output.print_string conf "<td align=\"right\">\n";
+  Output.print_sstring conf "<input name=\"dpos\" size=\"5\" value=\"78\">\n";
+  Output.print_sstring conf "</td>\n";
+  Output.print_sstring conf "</tr>\n";
+  Output.print_sstring conf "<tr align=\"left\">\n";
+  Output.print_sstring conf "<td align=\"right\">\n";
   Output.printf conf "%s\n" (txt 2);
-  Output.print_string conf "<input name=\"overlap\" size=\"5\" value=\"10\">\n";
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "<tr align=\"left\">\n";
-  Output.print_string conf "<td align=\"right\">\n";
+  Output.print_sstring conf "<input name=\"overlap\" size=\"5\" value=\"10\">\n";
+  Output.print_sstring conf "</td>\n";
+  Output.print_sstring conf "</tr>\n";
+  Output.print_sstring conf "<tr align=\"left\">\n";
+  Output.print_sstring conf "<td align=\"right\">\n";
   Output.printf conf "%s\n" (txt 3);
-  begin let wid =
-    let (min_wid, max_wid, _, _, _) = table_pre_dim hts in
-    Output.printf conf "(%d-%d)\n" min_wid max_wid; max min_wid (min max_wid 78)
-  in
-    Output.printf conf "<input name=\"width\" size=\"5\" value=\"%d\">\n" wid
-  end;
-  Output.print_string conf "</td>\n";
-  Output.print_string conf "</tr>\n";
-  Output.print_string conf "</table>\n";
-  Output.print_string conf "<p>" ;
+  (let wid =
+     let min_wid, max_wid, _, _, _ = table_pre_dim hts in
+     Output.printf conf "(%d-%d)\n" min_wid max_wid;
+     max min_wid (min max_wid 78)
+   in
+   Output.printf conf "<input name=\"width\" size=\"5\" value=\"%d\">\n" wid);
+  Output.print_sstring conf "</td>\n";
+  Output.print_sstring conf "</tr>\n";
+  Output.print_sstring conf "</table>\n";
+  Output.print_sstring conf "<p>";
   Output.printf conf
-    "<p><button type=\"submit\" class=\"btn btn-secondary btn-lg\">%s</button></p>"
+    "<p><button type=\"submit\" class=\"btn btn-secondary \
+     btn-lg\">%s</button></p>"
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
-  Output.print_string conf "</form>\n";
+  Output.print_sstring conf "</form>\n";
   Hutil.trailer conf
 
 let old_print_slices_menu_or_dag_page conf page_title hts next_txt =
-  if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf page_title hts next_txt
+  if p_getenv conf.env "slices" = Some "on" then
+    print_slices_menu conf page_title hts next_txt
   else print_dag_page conf page_title hts next_txt
 
 let print_slices_menu_or_dag_page conf page_title hts next_txt =

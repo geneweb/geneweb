@@ -80,7 +80,7 @@
 
 
 %define;one_pvar(z1) %( i1=;i2=; ... contiguous list of indexes %)
-  %if;(evar_iz1 != "")
+  %if;(evar.iz1 != "")
     <tr id="pz1">
       <td class="b1"><a tabindex="10000" href="javascript:addPvar(z1,0);">+</a></td>
       <td><input id="pz1_occ" name="ocz1" class="occ3 form-control" autocomplete="off" size="5" maxlength="8" value="%pvar.z1.occ;"

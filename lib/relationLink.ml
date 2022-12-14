@@ -623,14 +623,9 @@ let print_relation_ok conf base info =
   in
   Hutil.header_no_page_title conf title;
   Hutil.print_link_to_welcome conf true;
-<<<<<<< HEAD
-  Util.include_template conf conf.env "buttons_rel" (fun () -> ());
-  Output.print_sstring conf {|<p style="clear:both">|};
-=======
-  Perso.interp_templ ~no_headers:true "buttons_rel" conf base 
+  Perso.interp_templ ~no_headers:true "buttons_rel" conf base
     (Gwdb.empty_person base Gwdb.dummy_iper);
-  Output.print_string conf "<p style=\"clear:both\">\n";
->>>>>>> Replace include_templ by interp_templ in relations display
+  Output.print_sstring conf {|<p style="clear:both">|};
   print_relation_path conf base info;
   Hutil.trailer conf
 
@@ -691,8 +686,7 @@ let print_relation_no_dag conf base po ip1 ip2 =
       let td_prop =
         match Util.p_getenv conf.env "color" with
         | None | Some "" -> Adef.safe ""
-        | Some x ->
-            (" class=\"" ^<^ Mutil.encode x ^>^ "\"" :> Adef.safe_string)
+        | Some x -> Format.sprintf {| class="%s"|} x |> Adef.safe
       in
       let info =
         {
