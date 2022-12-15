@@ -6,15 +6,16 @@
 %define;cousin_lex(vvv,www)
   [*cousins.vvv.www]1
 %end;
-  <title>%nn;
-    %apply;a_of_b_gr_eq_lev%with;
-      %apply;cousin_lex(evar.v1,evar.v2)%nn;
-    %and;
-      %if;(public_name != "")%public_name;%else;%first_name;%end;
-      %if;(qualifier != "") %qualifier;%end;
-      %sp;%surname;
-    %end;
-  </title>
+%define;tt()
+  %apply;a_of_b_gr_eq_lev%with;
+    %apply;cousin_lex(evar.v1,evar.v2)%nn;
+  %and;
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") %qualifier;%end;
+    %sp;%surname;
+  %end;
+%end;
+  <title>%apply;tt()</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -153,9 +154,9 @@
 %end;
 
 %if;(count!="" and count>1)
-<a id="RLM" href="%prefix;m=RLM&spouse=on&i1=%index;%foreach;sorted_list_item;%item.1;%end;"><span class="d-inline-block fa-flip-vertical"><i class="fa fa-project-diagram fa-rotate-270 mr-1"></i></span> Graphe RLM</a>
-%if;(evar.v2=0 or evar.v2="")<a id="asc" class="ml-3" href="%prefix;m=A&t=T&%access;&v=%expr(evar.v1+1)"><i class="fa fa-sitemap fa-rotate-180 fa-fw mr-1"></i>Graphe ASC.</a>%end;
-%if;(evar.v1=0 and evar.v2>0)<a id="desc" class="ml-3" href="%prefix;m=D&t=T&%access;&v=%evar.v2;"><i class="fa fa-sitemap fa-fw mr-1"></i>Graphe DESC.</a>%end;
+<a id="RLM" href="%prefix;m=RLM&spouse=on&i1=%index;%foreach;sorted_list_item;%item.1;%end;&tt=%apply;tt()"><span class="d-inline-block fa-flip-vertical"><i class="fa fa-project-diagram fa-rotate-270 mr-1"></i></span> Graphe RLM</a>
+%if;(evar.v2=0 or evar.v2="")<a id="asc" class="ml-3" href="%prefix;m=A&t=T&%access;&spouse=on&v=%expr(evar.v1+1)"><i class="fa fa-sitemap fa-rotate-180 fa-fw mr-1"></i>Graphe ASC.</a>%end;
+%if;(evar.v1=0 and evar.v2>0)<a id="desc" class="ml-3" href="%prefix;m=D&t=T&%access;&spouse=on&v=%evar.v2;"><i class="fa fa-sitemap fa-fw mr-1"></i>Graphe DESC.</a>%end;
 %end;
 
 <div class="my-3">Total[:] %if;(evar.v2=0)%expr(count-count2)%else;%count;%end; %if;(count=0 or count=1)[person/persons]0%else;[person/persons]1%end;.</div>

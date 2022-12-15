@@ -51,11 +51,11 @@
     <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">%nn;
   %end;
   %if;xx.is_male;
-    <i class="fa fa-mars male mr-1"></i>%nn;
+    <i class="fa fa-mars male fa-fw mr-1"></i>%nn;
   %elseif;xx.is_female;
-    <i class="fa fa-venus female mr-2"></i>%nn;
+    <i class="fa fa-venus female fa-fw mr-1"></i>%nn;
   %else;
-    <i class="fa fa-neuter neuter mr-2"></i>%nn;
+    <i class="fa fa-neuter neuter fa-fw mr-1"></i>%nn;
   %end;%nn;
   %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
 %end;
@@ -221,7 +221,7 @@
 %end;
 
 %define;short_display_person(xx)
-  %apply;image_MF("xx")
+  %( %apply;image_MF("xx") to discuss %)
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
@@ -229,7 +229,8 @@
         class="%if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;-underline">%xx;</a>
     %end;
   %end;
-  <span class="text-nowrap">%xx.dates;</span>%if;(xx.title!=""), %xx.title;%end;%nn;
+  <span title="%if;xx.computable_age;%xx.age;%elseif;xx.computable_death_age;%xx.death_age;%end;"
+    class="text-nowrap">%xx.dates;</span>%if;(xx.title!=""), %xx.title;%end;%nn;
 %end;
 
 %define;short_display_person_tree(xx)
@@ -246,7 +247,11 @@
         %if;(not xx.is_dead) mr-5%nn;
         %else;%if;(xx.death_date.year="") mr-4%end;
         %end;
-      %end;%)">%nn;
+      %end;%)"
+       title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;&#013;&#013;%end;
+               %if;(xx.computable_age or xx.computable_death_age)
+                 %if;xx.computable_age;%xx.age;%elseif;xx.computable_death_age;%xx.death_age;%end;
+               %end;">%nn;
     %if;(xx.dates!="")%xx.dates;%nn;
     %elseif;(wizard and not cancel_links)-%nn;
     %elseif;(cancel_links)
@@ -255,17 +260,20 @@
   %if;(wizard and not cancel_links)</a>%end;
 %end;
 
-%define;short_display_person_noname(xx,yy,zz,uu,ii)
-  %if;("ii"="MF")%apply;image_MF("xx")%end;
+%define;short_display_person_noname(xx)
+  %apply;image_MF("xx")
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%if;(xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</b>%else;
     %if;(cancel_links or xx.is_restricted)%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;%nn;
-    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" title="uu%if;("uu"!=""). %end;%xx;">%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
+    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" title="[*Navigation] [with] %xx;">%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
     %end;
   %end;
-  %if;("yy"="br")<br>%end;%if;(wizard and not cancel_links)
-  <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">%end;<span class="text-nowrap font-italic">%xx.dates;</span>%if;(wizard and not cancel_links)</a>%end;%nn;
-  %if;("zz"="age")<br> <span class="text-nowrap">%xx.age;%xx.death_age;</span>%nn;%end;
+  %if;(wizard and not cancel_links)
+  <a href="%prefix;m=MOD_IND&i=%xx.index;">%end;
+  <span class="text-nowrap font-italic"
+  title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;&#013;&#013;%end;
+        %if;(xx.computable_age);%xx.age;%elseif;xx.computable_death_age;%xx.death_age;%end;"%nn;
+  >%xx.dates;</span>%if;(wizard and not cancel_links)</a>%end;%nn;
 %end;
 
 %define;short_display_person_f(xx)
@@ -602,7 +610,7 @@
 
 %define;short_display_siblings_noname()
   %apply;li_SDC("child")
-    %apply;short_display_person_noname("child","","","","MF")%nn;
+    %apply;short_display_person_noname("child")%nn;
   </li>
 %end;
 
@@ -648,7 +656,7 @@
           <br><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="" title=""%/>
           <em>%child;%child.title;%child.dates;</em>
         %end;
-        <em>%apply;long_married_f("child", "lower")</em>
+        %sp;<em>%apply;long_married_f("child", "lower")</em>
         %apply;short_display_person_f("spouse")
       %end;
     %end;
