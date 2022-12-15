@@ -3,6 +3,7 @@
 %( op_m=2 simple with photo %)
 %( op_m=3 complete: name, marriages %)
 %( op_m=4 complete with photo %)
+%( 2 and 4 should be option of 1 and 3 and should be removed %)
 
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 %let;op_fl;1%in; %( flèche frère suivant %)
@@ -33,13 +34,7 @@
               <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
             %end;
             <div class="media-body ml-2 align-self-center">%nn;
-              %if;(bvar.full_siblings="yes")
-                %apply;short_display_person_tree("child")
-              %else;
-                %apply;short_display_person_noname("child","br","","","")
-              %end;
-              %if;child.computable_age;<br>%sp;%child.age;%end;
-              %if;child.computable_death_age;<br>%sp;%child.death_age;%end;
+              %apply;short_display_person_tree("child")
             </div>
           </div>
         %end;
