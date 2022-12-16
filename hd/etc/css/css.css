@@ -1,6 +1,28 @@
 
 h1, h2, h3, h4, h5, h6 { font-weight: lighter !important; }
 
+html {
+  font-size: 1rem;
+}
+
+@include media-breakpoint-up(sm) {
+  html {
+    font-size: 1.2rem;
+  }
+}
+
+@include media-breakpoint-up(md) {
+  html {
+    font-size: 1.4rem;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  html {
+    font-size: 1.6rem;
+  }
+}
+
 .modal-backdrop {
    background-color: #808080;
 }
