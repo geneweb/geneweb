@@ -579,6 +579,8 @@ let treat_request =
           w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_inv
         | "KILL_ANC" ->
           w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print_kill_ancestors
+        | "L" -> w_base @@ fun conf base -> Perso.interp_templ "list" conf base 
+              (Gwdb.empty_person base Gwdb.dummy_iper) 
         | "LB" when conf.wizard || conf.friend ->
           w_base @@ BirthDeathDisplay.print_birth
         | "LD" when conf.wizard || conf.friend ->
