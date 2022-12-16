@@ -819,6 +819,11 @@ tr: Pazar/Pazartesi/Salı/Çarşamba/Perşembe/Cuma/Cumartesi
 en: plugins
 fr: plugins
 
+    restricted access
+co: L’accessu hè riservatu à l’amichi è à i maghi di a basa di dati !
+en: Access restricted to friends and wizards of the database!
+fr: Accès réservé aux amis et magiciens de la base de donnée !
+
     2nd cousins
 af: kleinneef/kleinniggie
 bg: втори братовчеди

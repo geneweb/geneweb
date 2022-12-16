@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+<!-- $Id: welcome.txt, v.7.00 12/01/2020 11:35:58 $ -->
+  <title>GeneWeb – %base.name;</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">	  <link rel="icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
+  %include;css
+  %include;hed
+</head>
+%define;book_of(xx)
+  [book of %s:::xx]%nn;
+%end;
+%define;sosa_rel(xx)
+  [<em>Sosa number</em> relative to %t:::xx]
+%end;
+%define;display_sosa_ref(xx)
+  [*sosa reference: %t:::xx]
+%end;
+%define;get_visitor_access_msg(lg)
+  %if;(bvar.visitor_access_msg_lg!="")
+    %bvar.visitor_access_msg_lg;
+  %else;
+    %if;(bvar.visitor_access_msg_en!="")
+      %bvar.visitor_access_msg_en;
+    %else;[*access restricted to friends and wizards]
+    %end;
+  %end;
+%end;
+
+<body%body_prop;>
+<div class="container">
+  <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-2 mt-lg-4">
+    %if;(bvar.auth_file="" and bvar.wizard_passwd!="" or bvar.friend_passwd!="")
+      <div class="d-none d-lg-block col-2 order-md-1"></div>
+    %end;
+    <div class="col-xs-12 col-md-auto order-md-3 ml-md-auto px-0">
+      <div class="d-flex flex-column">
+        %if;(cgi and (not wizard or not friend))
+          <form class="form-inline" method="post" action="%action;">
+            %hidden;
+            <div class="input-group mt-1">
+              %(<label for="w" class="sr-only">[user/password/cancel]0:[user/password/cancel]1</label>%)
+              <input type="text" class="form-control" name="w" title="[wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0"
+              placeholder="[user/password/cancel]0:[user/password/cancel]1" aria-label="password input" aria-describedby="username:password" autofocus>
+              <div class="input-group-append">
+                <button type="submit" class="btn btn-primary">OK</button>
+              </div>
+            </div>
+          </form>
+        %end;
+        %if;(bvar.auth_file = "")
+          <div class="btn-group btn-group-xs mt-1" role="group">
+          %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
+            %if;(not friend)
+              %if;(not cgi)
+                <a href="%prefix;w=f" class="btn btn-outline-primary text-nowrap" role="button" title="[*wizard/wizards/friend/friends/exterior]2"><i class="fas fa-user mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]2</a>
+              %end;
+            %else;
+              <a href="#" class="btn btn-primary disabled text-nowrap" role="button"><i class="fas fa-user mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]2</a>
+            %end;
+          %end;
+          %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
+            %if;(not wizard)
+              %if;(not cgi)
+                <a href="%prefix;w=w" class="btn btn-outline-success text-nowrap" role="button"  title="[*wizard/wizards/friend/friends/exterior]0"><i class="fas fa-hat-wizard mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]0</a>
+              %end;
+            %else;
+                <a href="#" class="btn btn-success disabled text-nowrap" role="button"><i class="fas fa-hat-wizard mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]0</a>
+            %end;
+          %end;
+          </div>
+        %end;
+        %if;(user.ident != "")<span class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom" title="%if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %user.ident;">%user.ident;</span>%end;
+        %if;((wizard or friend) and 
+             ((bvar.wizard_passwd!="" or bvar.friend_passwd!="") or
+             (bvar.wizard_passwd_file!="" or bvar.friend_passwd_file!="")))
+          <a class="btn btn-outline-danger mt-1 w-100" href="%prefix;w=" role="button"><i class="fas fa-sign-out-alt mr-1" aria-hidden="true"></i>[*disconnect]</a>
+        %end;
+      </div>
+    </div>
+  </div>
+
+[*restricted access]<br>
+
+<div class="text-lg-center text-font-smaller mb-3">
+    %include;version
+</div>
+%include;trl
+%include;copyr
+%include;js
+</body>
+</html>
