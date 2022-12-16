@@ -85,7 +85,7 @@
             <span class="fab fa-markdown" aria-hidden="true"></span>%nn;
             <span class="sr-only">switch to %if(evar.templ!="templm")templm%else;default template%end;</span>%nn;
           </a>
-          GeneWeb v. %version;
+          %include;version
         </div>
         <div class="btn-group">
           <span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer, noopener">INRIA</a> 1998-2019</span>
