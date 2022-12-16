@@ -838,16 +838,14 @@ let set_vother x = Vother x
 
 let rec eval_var conf (page_title : Adef.safe_string)
     (next_txt : Adef.escaped_string) env _xx _loc = function
-  | ["browsing_with_sosa_ref"] ->
-      begin match (Util.p_getenv conf.env "pz", Util.p_getenv conf.env "nz") with
-      | (Some _, Some _) -> VVbool true
-      | (_, _) -> VVbool false
-      end
-  | ["cell_nbr"] ->
-       begin match get_env "cell_nbr" env with
+  | [ "browsing_with_sosa_ref" ] -> (
+      match (Util.p_getenv conf.env "pz", Util.p_getenv conf.env "nz") with
+      | Some _, Some _ -> VVbool true
+      | _, _ -> VVbool false)
+  | [ "cell_nbr" ] -> (
+      match get_env "cell_nbr" env with
       | Vint i -> VVstring (string_of_int i)
-      | _ -> raise Not_found
-      end
+      | _ -> raise Not_found)
   | "dag" :: sl -> (
       match get_env "dag" env with
       | Vdag d -> eval_dag_var conf d sl
@@ -860,41 +858,32 @@ let rec eval_var conf (page_title : Adef.safe_string)
       match get_env "dag_cell_pre" env with
       | Vdcellp s -> VVstring s
       | _ -> raise Not_found)
-  | [ "get_var"; name; ] ->
-      begin match get_env ("vars") env with
-        Vvars lv ->
-          let vv = try List.assoc name !lv
-          with Not_found -> raise Not_found
+  | [ "get_var"; name ] -> (
+      match get_env "vars" env with
+      | Vvars lv ->
+          let vv =
+            try List.assoc name !lv with Not_found -> raise Not_found
           in
           VVstring vv
-      | _ -> raise Not_found
-      end
+      | _ -> raise Not_found)
   | [ "head_title" ] -> VVstring (page_title :> string)
-  | [ "is_first" ] ->
-       begin match get_env "first" env with
-      | Vbool b -> VVbool b
-      | _ -> VVbool false
-      end
-  | [ "is_last" ] ->
-       begin match get_env "last" env with
-      | Vbool b -> VVbool b
-      | _ -> VVbool false
-      end
-  | [ "line_nbr" ] ->
-       begin match get_env "line_nbr" env with
+  | [ "is_first" ] -> (
+      match get_env "first" env with Vbool b -> VVbool b | _ -> VVbool false)
+  | [ "is_last" ] -> (
+      match get_env "last" env with Vbool b -> VVbool b | _ -> VVbool false)
+  | [ "line_nbr" ] -> (
+      match get_env "line_nbr" env with
       | Vint i -> VVstring (string_of_int i)
-      | _ -> raise Not_found
-      end
+      | _ -> raise Not_found)
   | [ "link_next" ] -> VVstring (next_txt :> string)
-  | [ "set_var"; name; value ] ->
-      begin match get_env ("vars") env with
-        Vvars lv ->
-          if List.mem_assoc name !lv
-          then lv := List.remove_assoc name !lv;
-          lv := (name, value) :: !lv; VVstring ""
-      | _ -> raise Not_found
-      end
-    (* TODO set real values *)
+  | [ "set_var"; name; value ] -> (
+      match get_env "vars" env with
+      | Vvars lv ->
+          if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
+          lv := (name, value) :: !lv;
+          VVstring ""
+      | _ -> raise Not_found)
+  (* TODO set real values *)
   | [ "static_max_anc_level" ] -> VVstring "10"
   | [ "static_max_desc_level" ] -> VVstring "10"
   | _ -> raise Not_found
@@ -1027,24 +1016,27 @@ and print_foreach_dag_cell hts print_ast env al =
     match get_env "dag_line" env with Vdline i -> i | _ -> raise Not_found
   in
   for j = 0 to Array.length hts.(i) - 1 do
-    let print_ast = print_ast
-      (("dag_cell", Vdcell hts.(i).(j)) ::
-       ("cell_nbr", Vint j) ::
-       ("first", Vbool (j=0)) ::
-       ("last", Vbool (j = (Array.length hts.(i) - 1))) ::
-      env) ()
+    let print_ast =
+      print_ast
+        (("dag_cell", Vdcell hts.(i).(j))
+        :: ("cell_nbr", Vint j)
+        :: ("first", Vbool (j = 0))
+        :: ("last", Vbool (j = Array.length hts.(i) - 1))
+        :: env)
+        ()
     in
     List.iter print_ast al
   done
 
 and print_foreach_dag_line print_ast env hts al =
   for i = 0 to Array.length hts - 1 do
-    let print_ast = print_ast
-      (("dag_line", Vdline i) ::
-       ("line_nbr", Vint i) ::
-       ("first", Vbool (i=0)) ::
-       ("last", Vbool (i = (Array.length hts - 1))) ::
-      env) ()
+    let print_ast =
+      print_ast
+        (("dag_line", Vdline i) :: ("line_nbr", Vint i)
+        :: ("first", Vbool (i = 0))
+        :: ("last", Vbool (i = Array.length hts - 1))
+        :: env)
+        ()
     in
     List.iter print_ast al
   done
@@ -1123,12 +1115,14 @@ let print_slices_menu_or_dag_page conf page_title hts next_txt =
           done;
         Vdag (tmincol, tcol, colminsz, colsz, ncol)
       in
-      [ ("count", Vcnt (ref 0));
+      [
+        ("count", Vcnt (ref 0));
         ("count1", Vcnt (ref 0));
         ("count2", Vcnt (ref 0));
         ("count3", Vcnt (ref 0));
         ("vars", Vvars (ref []));
-        ("dag", Vlazy (Lazy.from_fun table_pre_dim)) ]
+        ("dag", Vlazy (Lazy.from_fun table_pre_dim));
+      ]
     in
     Hutil.interp conf "dag"
       {
