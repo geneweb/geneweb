@@ -55,10 +55,14 @@ dune-workspace: dune-workspace.in Makefile.config
 
 hd/etc/version.txt:
 	@echo -n "Generating $@..."
-	@echo "GeneWeb[:] [compiled on %s from commit %s:::" > $@
+	@echo "<a href=\"https://github.com/geneweb/geneweb/commit/" > $@
+	@echo "$$(git show -s --pretty=format:'%h"')" >> $@
+	@echo "title=\"[*compiled on %s from commit %s:::" >> $@
 	@echo "$$(date '+%Y-%m-%d'):" >> $@
-	@echo "$$(git show -s --date=short --pretty=format:'<a href="https://github.com/geneweb/geneweb/commit/%h">%h (%cd)</a>')]" >> $@
+	@echo "$$(git show -s --date=short --pretty=format:'%h (%cd)]">')" >> $@
+	@echo "GeneWeb v. %version;</a>" >> $@
 	@echo " Done!"
+
 .PHONY:hd/etc/version.txt
 
 # [End] Generated files section
