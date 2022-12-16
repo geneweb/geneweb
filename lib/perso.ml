@@ -304,6 +304,24 @@ let limit_desc conf =
 
 let infinite = 10000
 
+let get_descendants_at_level base p lev2 =
+  match lev2 with
+  | 0 -> []
+  | n ->
+      let rec loop acc lev fam =
+        Array.fold_left
+          (fun acc ifam ->
+            let children = Array.to_list (get_children (foi base ifam)) in
+            List.fold_left
+              (fun acc ch ->
+                if lev < n then loop acc (lev + 1) (get_family (poi base ch))
+                else if not (List.mem ifam acc) then ifam :: acc
+                else acc)
+              acc children)
+          acc fam
+      in
+      loop [] 1 (get_family p)
+
 let make_desc_level_table conf base max_level p =
   let line =
     match p_getenv conf.env "t" with
@@ -1634,6 +1652,10 @@ and eval_simple_str_var conf base env (_, p_auth) = function
   | "count3" -> (
       match get_env "count3" env with
       | Vcnt c -> str_val (string_of_int !c)
+      | _ -> null_val)
+  | "desc_cnt" -> (
+      match get_env "desc_cnt" env with
+      | Vint c -> str_val (string_of_int c)
       | _ -> null_val)
   | "divorce_date" -> (
       match get_env "fam" env with
@@ -4058,9 +4080,11 @@ let print_foreach conf base print_ast eval_expr =
             Array.iteri
               (fun i ip ->
                 let p = pget conf base ip in
-                let env = ("#loop", Vint 0) :: env in
-                let env = ("child", Vind p) :: env in
-                let env = ("child_cnt", Vint (i + 1)) :: env in
+                let env =
+                  ("#loop", Vint 0) :: ("child", Vind p)
+                  :: ("child_cnt", Vint (i + 1))
+                  :: env
+                in
                 let env =
                   if i = n - 1 && not (is_hidden p) then
                     ("pos", Vstring "prev") :: env
@@ -4078,16 +4102,43 @@ let print_foreach conf base print_ast eval_expr =
                 List.iter
                   (fun ((p, _), baseprefix, can_merge) ->
                     if not can_merge then
-                      let env = ("#loop", Vint 0) :: env in
-                      let env = ("child_link", Vind p) :: env in
-                      let env = ("baseprefix", Vstring baseprefix) :: env in
-                      let env = ("p_link", Vbool true) :: env in
+                      let env =
+                        ("#loop", Vint 0) :: ("child_link", Vind p)
+                        :: ("baseprefix", Vstring baseprefix)
+                        :: ("p_link", Vbool true) :: env
+                      in
                       let ep = (p, true) in
                       List.iter (print_ast env ep) al)
                   children)
               (!GWPARAM_ITL.get_children' conf base (get_iper (fst ep)) fam isp)
         )
     | _ -> ()
+  in
+  let print_foreach_descendant env al (p, _) =
+    let lev = match get_env "level" env with Vint lev -> lev | _ -> 0 in
+    let ifam_l = get_descendants_at_level base p lev in
+    let ip_l =
+      List.flatten
+        (List.fold_left
+           (fun acc ifam -> Array.to_list (get_children (foi base ifam)) :: acc)
+           [] ifam_l)
+    in
+    let rec loop i ip_l =
+      match ip_l with
+      | [] -> ()
+      | ip :: ip_l ->
+          let ep = (poi base ip, true) in
+          let env =
+            ("descendant", Vind (poi base ip))
+            :: ("desc_cnt", Vint i)
+            :: ("first", Vbool (i = 0))
+            :: ("last", Vbool (ip_l = []))
+            :: env
+          in
+          List.iter (print_ast env ep) al;
+          loop (succ i) ip_l
+    in
+    loop 0 ip_l
   in
   let print_foreach_descendant_level env al ep =
     let max_level =
@@ -4600,6 +4651,7 @@ let print_foreach conf base print_ast eval_expr =
     | "child" -> print_foreach_child env al ep efam
     | "cous_path" -> print_foreach_cousin_path env al ep "cousins"
     | "cousin_level" -> print_foreach_cousin_level env al ep
+    | "descendant" -> print_foreach_descendant env al ep
     | "descendant_level" -> print_foreach_descendant_level env al ep
     | "event" -> print_foreach_event env al ep
     | "family" -> print_foreach_family env al ini_ep ep
