@@ -2262,12 +2262,12 @@ co: vivu/viva/vivu(a)
 cs: žijící
 da: levende
 de: nicht verstorben
-en: alive
+en: alive/alive/alive/living·s
 eo: vivanta
 es: no fallecido/no fallecida/no fallecido(a)
 et: elus
 fi: elossa
-fr: vivant/vivante/vivant(e)/vivants
+fr: vivant/vivante/vivant(e)/vivant·s
 he:  בחיים
 is: ekki látin(n)
 it: non deceduto/non deceduta/non deceduto(a)
@@ -5366,12 +5366,12 @@ co: mortu/morta/mortu(a)
 cs: zemřel/zemřela/zemřeli
 da: død
 de: verstorben
-en: died
+en: died/died/died/dead·s
 eo: mortinta
 es: fallecido/fallecida/fallecido(a)
 et: surnud
 fi: kuollut
-fr: mort/morte/mort(e)
+fr: mort/morte/mort(e)/mort·s
 he:   נפטר/ נפטרה
 is: dó
 it: deceduto/deceduta/deceduto(a)
