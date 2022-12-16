@@ -486,7 +486,7 @@ let treat_request =
                 | _ -> person_selected conf base p
             end
         | "A" ->
-          Perso.print_ascend |> w_person |> w_base
+          AscendDisplay.print |> w_person |> w_base
         | "ADD_FAM" ->
           w_wizard @@ w_base @@ UpdateFam.print_add
         | "ADD_FAM_OK" ->
