@@ -171,6 +171,18 @@ let url_set_aux conf evar str =
   (* t is true if evar was present in conf.env. If not, add it *)
   if t || str = "" then url else url ^ Format.sprintf "&%s=%s" evar str
 
+let substr_start_aux n s =
+  let len = String.length s in
+  let rec loop i n str =
+    if n = 0 || i >= len then str
+    else
+      (* Attention aux caractères utf-8 !! *)
+      let nbc = Utf8.nbc s.[i] in
+      let car = String.sub s i nbc in
+      loop (i + nbc) (n - 1) (str ^ car)
+  in
+  loop 0 n ""
+
 let rec eval_variable conf = function
   | [ "bvar"; v ] | [ "b"; v ] -> (
       try List.assoc v conf.base_env with Not_found -> "")
@@ -210,16 +222,15 @@ let rec eval_variable conf = function
   | [ "substr_start"; n; v ] ->
       (* extract the n first characters of string v *)
       let n = int_of_string n in
-      let len = String.length v in
-      let rec loop i n str =
-        if n = 0 || i >= len then str
-        else
-          (* Attention aux caractères utf-8 !! *)
-          let nbc = Utf8.nbc v.[i] in
-          let car = String.sub v i nbc in
-          loop (i + nbc) (n - 1) (str ^ car)
+      substr_start_aux n v
+  | [ "substr_start_e"; n; v ] ->
+      (* extract the n first characters of string v *)
+      let n = int_of_string n in
+      let v =
+        Option.value ~default:""
+          (Util.p_getenv (conf.env @ conf.henv @ conf.senv) v)
       in
-      loop 0 n ""
+      substr_start_aux n v
   | "time" :: sl -> eval_time_var conf sl
   | [ "url_set"; evar ] -> url_set_aux conf evar ""
   | [ "url_set"; evar; str ] -> url_set_aux conf evar str
