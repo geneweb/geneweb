@@ -815,6 +815,10 @@ sl: nedelja/ponedeljek/torek/sreda/četrtek/petek/sobota
 sv: söndag/måndag/tisdag/onsdag/torsdag/fredag/lördag
 tr: Pazar/Pazartesi/Salı/Çarşamba/Perşembe/Cuma/Cumartesi
 
+    plugins
+en: plugins
+fr: plugins
+
     2nd cousins
 af: kleinneef/kleinniggie
 bg: втори братовчеди
