@@ -1959,11 +1959,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | [ "base"; "name" ] -> VVstring conf.bname
   | "base" :: "nb_persons" :: sl ->
       VVstring (eval_int conf (nb_of_persons base) sl)
-  | [ "base"; "real_nb_persons" ] ->
-      VVstring
-        (Mutil.string_of_int_sep
-           (Util.transl conf "(thousand separator)")
-           (Gwdb.nb_of_real_persons base))
+  | "base" :: "real_nb_persons" :: sl ->
+      VVstring (eval_int conf (Gwdb.nb_of_real_persons base) sl)
   | "cell" :: sl -> (
       match get_env "cell" env with
       | Vcell cell -> eval_cell_field_var conf base env cell loc sl
@@ -2411,12 +2408,8 @@ and eval_ancestor_field_var conf base env gp loc = function
           let n = Sosa.twice n in
           VVstring (parent_sosa conf base ip all_gp n get_father)
       | _ -> null_val)
-  | [ "interval" ] -> (
-      let to_string x =
-        Mutil.string_of_int_sep
-          (transl conf "(thousand separator)")
-          (int_of_string @@ Sosa.to_string x)
-      in
+  | "interval" :: sl -> (
+      let to_string x = eval_sosa conf x sl in
       match gp with
       | GP_interv (Some (n1, n2, Some (n3, n4))) ->
           let n2 = Sosa.sub n2 Sosa.one in
@@ -2437,11 +2430,12 @@ and eval_ancestor_field_var conf base env gp loc = function
       | _ -> null_val)
   | "same" :: sl -> (
       match gp with
-      | GP_same (_, n, _) -> VVstring (eval_num conf n sl)
+      | GP_same (_, n, _) -> VVstring (eval_sosa conf n sl)
       | GP_person _ | GP_interv _ | GP_missing _ -> null_val)
   | "anc_sosa" :: sl -> (
       match gp with
-      | GP_person (n, _, _) | GP_same (n, _, _) -> VVstring (eval_num conf n sl)
+      | GP_person (n, _, _) | GP_same (n, _, _) ->
+          VVstring (eval_sosa conf n sl)
       | GP_interv _ | GP_missing _ -> null_val)
   | "spouse" :: sl -> (
       match gp with
@@ -2509,7 +2503,7 @@ and eval_anc_by_surnl_field_var conf base env ep info =
           let ep = make_ep conf base (get_iper p) in
           eval_person_field_var conf base env ep loc sl)
 
-and eval_num conf n = function
+and eval_sosa conf n = function
   | [ "hexa" ] -> Printf.sprintf "0x%X" @@ int_of_string (Sosa.to_string n)
   | [ "octal" ] -> Printf.sprintf "0x%o" @@ int_of_string (Sosa.to_string n)
   | [ "lvl" ] -> string_of_int @@ Sosa.gen n
@@ -2732,7 +2726,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match get_env "sosa" env with
       | Vsosa x -> (
           match get_sosa conf base env x p with
-          | Some (n, _) -> VVstring (eval_num conf n sl)
+          | Some (n, _) -> VVstring (eval_sosa conf n sl)
           | None -> null_val)
       | _ -> raise Not_found)
   | "sosa_next" :: sl -> (
