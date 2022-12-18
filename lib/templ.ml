@@ -623,6 +623,7 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) = function
       | "+" -> VVstring (string_of_int (int e1 + int e2))
       | "-" -> VVstring (string_of_int (int e1 - int e2))
       | "*" -> VVstring (string_of_int (int e1 * int e2))
+      | "|" -> VVstring (string_of_int (int e1 / int e2))
       | "^" -> VVstring (Sosa.to_string (Sosa.exp (num e1) (int e2)))
       | "/" -> VVstring (Sosa.to_string (Sosa.div (num e1) (int e2)))
       | "/." ->

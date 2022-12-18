@@ -320,7 +320,7 @@ and parse_expr_5 = parse
     }
 
 and parse_expr_5_1 e1 = parse
-  | ws* (("*"|"^"|"/"|"%"|"/.") as op) {
+  | ws* (("*" | "^" | "/" | "|" | "%" |"/.") as op) {
       let pos = pos lexbuf in
       let e2 = parse_simple_expr lexbuf in
       parse_expr_5_1 (Aop2 (pos, op, e1, e2)) lexbuf
