@@ -60,36 +60,43 @@
 %define;cousins_cnt(vvv,www)
   %cousins_cnt.vvv.www;
 %end;
+
+%( TODO : si cousin est sosa de la racine ajouter l'icone sosa verte devant le nom
+si mort <3 ans icone bébé, <15 ans enfant ?? %)
 %empty_sorted_list;%empty_sorted_listb;%empty_sorted_listc;
 %define;cous_mod(vvv,www)
   %empty_sorted_list;%empty_sorted_listb;
   %foreach;cous_path;
     %let;cous_isdead;%apply;index("p",cousin.index,"is_dead")%in;
     %let;cous_nodesc;%apply;index("p",cousin.index,"has_children")%in;
+    %let;cous_sex;%apply;index("p",cousin.index,"sex")%in;
     %apply;add_in_sorted_list%with;%cousin.surname; %cousin.first_name %cousin.dates; %cousin.occ;%and;%nn;
-      <li class="card list-group-item text-small nbr_%cousin.nbr; py-1 px-1 rounded border-top-0 border-bottom-0 border-%if;(cousin.sex=0)primary%elseif;(cousin.sex=1)danger%else;dark%end;"%if;(cous_isdead=0) data-alive="%cous_isdead;"%end; style="border-left-width:%if;(cous_isdead=1)5px;background-color:linen;%else;10px;%end;%if;(cous_nodesc!=1)border-style:double;%end;"
-      data-birthdate='%cousin.index;'>%nn;
-        <div class="d-flex align-content-between align-items-start">
-          <div class="d-block flex-grow-1 align-self-center ml-1
-            text-truncate text-left text-nowrap position-relative" style="line-height:1.5rem;">
-            <a href="%prefix;em=R&et=A&ei=%self.index;&i=%cousin.index;"
+      <li class="card text-small nbr_%cousin.nbr; ml-n-1 py-1 pr-1 pl-0 rounded border-top-0 border-bottom-0 border-%if;(cousin.sex=0)primary%elseif;(cousin.sex=1)danger%else;dark%end;"%if;(cous_isdead=0) data-alive="%cous_isdead;"%end; style="border-left-width:%if;(cous_isdead=1)5px;background-color:rgba(245,231,216,0.95);%else;10px;%end;%if;(cous_nodesc!=1)border-style:double;%end;"
+      data-birthdate="%(%apply;index("p",cousin.index,"slash_marriage_date")%)">%nn;
+        <div class="d-flex d-inline justify-content-between align-items-start ml-n2 position-relative " style="z-index:1">
+          <div class="d-block w-auto h-100 pl-0 pr-1 align-self-center bg-dark order-1" title="[navigation] [with]…" data-toggle="tooltip"  style="z-index:1">
+            <a role="button" href="%prefix;%cousin.access;&m=C&v=%e.v;" class="my-3 stretched-link w-auto text-%if;(cous_sex=0)primary%else;danger%end;" style="z-index:1">&bullet;</a>
+          </div>
+          %if;(www!=0)
+            <div class="d-block w-auto align-self-center position-relative order-3" >
+              <a role="button" class="btn px-1 mx-0" data-toggle="tooltip" data-html="true"
+                href="%prefix;m=RL&i=%if;(vvv=0)%self.index;%else;%cousin.anc1.index;%end;&l1=vvv&i1=%self.index;&l2=www&i2=%cousin.index;%nn;
+                %if;(cousin.nbr>1)&dag=on%end;"%sp;
+                title="%apply;a_of_b%with;%if;(cousin.sex=0)[cousin.0.www]0%else;[cousin.0.www]1%end;%and;%cousin.anc1.first_name; %cousin.anc1.surname; %(%cousin.anc1.dates;%)
+                %if;(cousin.anc2!=".....") [and] %cousin.anc2;%end;%end;">
+                %if;(cousin.nbr %2 = 0)<i class="fa-solid fa-user-group"></i>%else;<i class="fa-solid fa-user fa-fw text-%if;(cousin.anc2!=".....")info%else;%if;(cousin.anc1.sex=0)primary%elseif;(cousin.sex=1)danger%else;muted%end;%end;"></i>%end;%nn;
+                <span class="small%if;(cousin.nbr>2)mr-1%end;"><sup>%if;(cousin.nbr>2)%cousin.nbr;%else; %end;</sup></span></a>
+            </div>
+          %end;
+          <div class="d-block mx-auto h-100 align-self-center px-0 order-2
+            text-truncate text-start text-nowrap position-relative" style="line-height:2.0rem;width:85%%;">
+            <a role="button" href="%prefix;em=R&et=A&ei=%self.index;&i=%cousin.index;"
               data-toggle="tooltip" data-html="true" class="stretched-link w-auto%if;(cous_isdead=1) ml-1%end;"
               title="%cousin.first_name;.%cousin.occ; %cousin.surname;
               %(%cousin.dates; bug w. balise <bdo> in dates %) (%cousin.anc_f_list;)"
               data-anclist="%cousin.anc_f_list;">
-              %cousin.surname; %cousin.first_name %cousin.dates;</a>
+              %apply;index%with;p%and;%cousin.index;%and;age%end; %cousin.surname; %cousin.first_name; %cousin.dates;</a>
           </div>
-          %if;(www!=0)
-            <div class="ml-auto align-self-center position-relative" style="z-index:1">
-              <a class="btn px-1 mx-0" data-toggle="tooltip" data-html="true"
-                href="%prefix;m=RL&i=%if;(vvv=0)%self.index;%else;%cousin.anc1.index;%end;&l1=vvv&i1=%self.index;&l2=www&i2=%cousin.index;%nn;
-                %if;(cousin.nbr>1)&dag=on%end;"%sp;
-                title="%apply;a_of_b%with;%if;(cousin.sex=0)[cousin.0.www]0%else;[cousin.0.www]1%end;%and;%cousin.anc1.first_name; %cousin.anc1.surname;%(%apply;index("p",cousin.anc1.index,"sosa.v") not working%)
-                %if;(cousin.anc2!=".....") [and] %cousin.anc2;%end;%end;">
-                %if;(cousin.nbr %2 = 0)<i class="fa-solid fa-user-group"></i>%else;<i class="fa-solid fa-user fa-fw text-%if;(cousin.anc2!=".....")info%else;%if;(cousin.anc1.sex=0)primary%elseif;(cousin.sex=1)danger%else;muted%end;%end;"></i>%end;%nn;
-                %if;(cousin.nbr>2)<span class="small"><sup>%cousin.nbr;</sup></span>%end;</a>
-            </div>
-          %end;
         </div>
      </li>%and;%cousin.cnt;%and;%cousin.index;%end;
     %apply;add_in_sorted_listb%with;%cousin.index;%and;%cous_isdead;%and;%cous_nodesc;%end;
@@ -101,19 +108,19 @@
     %if;(item.3=0)%incr_count2;%end;
   %end;
   <div class="modal fade px-2" id="modal_vvv_www" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y:scroll;">%(tofix : quick hack to allow scrolling on next modal and not body after dismissing a first modal%)
-    <div class="modal-dialog modal-xl%( modal-dialog-centered%)" style="width:98%%;max-width:1400px;
+    <div class="modal-dialog modal-xl%( modal-dialog-centered%)" style="width:100%%;max-width:1500px;
       %(%if;(listb_size>127)1600%elseif;(listb_size>31)1200%elseif;(listb_size>9)992%else;600%end;px;%)">
       <div class="modal-content bg-transparent border-0">
         <div class="%(modal-header %)position-relative p-2 pb-1 rounded-lg%if;(count!=0) bg-white"%else;" style="background-color:linen"%end;>
           %let;extrapaths;%expr(cous_paths_cnt.vvv.www-listb_size)%in;
           <div class="modal-title bg-transparent">
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="d-inline-flex col-auto flex-column align-self-center text-left ml-3">
+            <div class="d-flex justify-content-around align-items-center">
+              <div class="d-inline-flex flex-column justify-content-around align-self-center text-left ml-4%if;(www=0) mr-5%end;">
                 <div>%listb_size %if;(cousins_cnt.vvv.www=1)[person/persons]0%else;[person/persons]1%end;
-                %if;(count!=0)
+                %if;(count!=cousins_cnt.vvv.www)
                   <div>
                     %if;(2*count<cousins_cnt.vvv.www)%count; [alive]3
-                    %else;%expr(cousins_cnt.vvv.www-count) [died]3 <span style="background-color:linen">  </span>
+                    %else;%expr(cousins_cnt.vvv.www-count) [died]3 <span style="background-color: rgba(245,231,216,.7);">  </span>
                     %end;
                   </div>
                 %end;
@@ -122,7 +129,7 @@
                   <div>%count2; [no descendants] ║</div>
                 %end;
               </div>
-              <div class="d-flex justify-content-center text-center align-items-center">
+              <div class="mx-auto text-center align-items-center">
                 <a role="button" class="h2 display-4 stretched-link ml-2"
                   style="font-size:2rem;font-weight:300;" data-toggle="tooltip" data-html="true" 
                   href="%prefix;m=RLM%foreach;sorted_list_item;&i1=%self.index;&i%expr(item.3+1)=%item.4;%end;&t1=[cousins.vvv.www]" class="btn btn-primary" title="Graphe RLM c(vvv,www)">%nn;
@@ -136,7 +143,7 @@
               </div>
               %(<div class="flex-grow-1 bg-transparent"> </div>%)
               %let;cousdown;%apply;cousins_cnt%with;vvv%and;%expr(www+1)%end;%in;
-              <div class="d-flex col-auto justify-content-end align-items-end ml-2" style="z-index:1">
+              <div class="d-flex justify-content-end  align-items-end ml-2" style="z-index:1">
                 <div class="d-inline-flex align-self-center">
                   <div class="d-flex align-items-end">
                     %if;(vvv>0 and www=0)
@@ -152,7 +159,7 @@
                     </div>
                   </div>
                   <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=www" 
-                    class="btn btn-lg btn-light mx-1 my-2">
+                    class="btn btn-lg btn-light mx-3 my-2">
                       <span data-toggle="tooltip" data-html="true" title="voir tous les [relationship link/relationship links]1, %expr(vvv+www) [degree]?">
                         <i class="fa-solid fa-person-arrow-up-from-line"></i>
                         <i class="fa-solid fa-person-arrow-down-to-line fa-fw fa-flip-horizontal"></i>
@@ -164,7 +171,7 @@
           </div>
         </div>
         <div class="modal-body">
-          <div class="card-columns"%( style="column-count:
+          <div class="card-columns px-1"%( style="column-count:
             %if;(cous_paths_cnt.vvv.www>511)5%nn;
             %elseif;(cous_paths_cnt.vvv.www>127)4%nn;
             %elseif;(cous_paths_cnt.vvv.www>31)3
@@ -182,7 +189,6 @@
     </div>
   </div>
 %end;
-%( TODO : si cousin est sosa de la racine ajouter l'icone sosa verte devant le nom ?? %)
 %define;link_cousin(vvv,www)
   %let;extra_paths_vvv_www;%expr(cous_paths_cnt.vvv.www - cousins_cnt.vvv.www)%in;
   %let;width;%expr((100/(e.v+1))*vvv)%in;
@@ -252,17 +258,17 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
                    — nothing if self has no children %)
                         %let;mx;%if;(i=0)1%else;3%end;%in;
                         %for;z;0;mx;
-                          %let;couscntk1;%apply;cousins_cnt%with;%i%and;1%end;%in;
+                          %(%let;couscntk1;%apply;cousins_cnt%with;%i%and;1%end;%in;%)
                          <div style="height:15px" class="col-%if;(i=0)6%else;3%end;
-                           %if;(((couscntk1=0 and z=0) or (couscntk1!=0 and z%2=0))
+                           %if;(((tot_next=0 and z=0) or (tot_next!=0 and z%2=0))
                              and not (i=0 and not has_children)) border-dark border-right%end;"> </div>
                         %end;
                       %else;
-                        %if;(j<max-1)
+                        
                           <div class="col-6 border-dark%if;(tot_next!=0) border-right
                           border-top-0 border-left-0 border-bottom-0%else; border-0%end;" style="height:15px"> </div>
                           <div class="col-6 border-0"> </div>
-                        %end;
+                        
                       %end;
                     </div>
                   </div>
