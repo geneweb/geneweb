@@ -5688,7 +5688,7 @@ co: include e notefonte à u cuntenutu
 de: einschließen der Notizen und Quellen im Inhalt
 en: add notes and sources to content
 es: incluir las notas&#47;fuentes en el contenido
-fr: inclure notes et sources au contenu
+fr: inclure notes et sources
 it: includere le note&#47;fonti al contenuto
 oc: apondre las nòtas dins lo contengut
 pt: incluir as notas&#47;fontes no conteúdo
@@ -17900,8 +17900,8 @@ en: no line break in names
 fr: afficher les noms sans saut de ligne
 
     show first names
-en: show the first names instead of public name
-fr: afficher les prénoms à la place du nom public
+en: show all first names
+fr: afficher tous les prénoms
 
     highlight incomplete data
 en: highlight incomplete data

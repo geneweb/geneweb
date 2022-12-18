@@ -100,7 +100,6 @@ function missing_events_options () {
   }
 }
 --></script>
-
 <h1 class="text-center">%nn;
   %apply;a_of_b%with;
     [*ancestors]%nn;
@@ -117,7 +116,7 @@ function missing_events_options () {
 %end;
 
 <form class="needs-validation" novalidate method="get" action="%action;">
-  <div class="d-flex justify-content-between mx-3">
+  <div class="d-flex justify-content-center w-100 mx-3">
     %hidden;
     %if;access_by_key;
       <input type="hidden" name="p" value="%first_name_key_val;">
@@ -129,7 +128,7 @@ function missing_events_options () {
       <input type="hidden" name="i" value="%index;">
     %end;
     <input type="hidden" name="m" value="A">
-    %( à delete prob<input type="hidden" name="sosab" value="10">%)
+    %( à delete ? <input type="hidden" name="sosab" value="10">%)
     <div class="col-auto px-1 order-1">
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tN" name="t" value="N" checked onclick="no_options()">
@@ -369,7 +368,7 @@ function missing_events_options () {
 
       </div>
     </div>
-    <div class="d-flex flex-column justify-content-between order-2 px-2">
+    <div class="d-flex flex-column order-2 px-2">
       <div class="order-2">
         <hr class="my-2">
         <div class="custom-control custom-radio">
@@ -499,26 +498,31 @@ function missing_events_options () {
               <label class="custom-control-label" for="cgl">[*cancel GeneWeb links]</label>
             </div>
           </div>
-          <div class=" align-self-center">
+          <div class=" align-self-center ml-4">
             <button type="submit" class="btn btn-outline-primary">Ok</button>
           </div>
         </div>
         <div class="order-1">
-          <label class="sr-only" for="v">[*generation/generations]1[:]</label>
-          <select class="custom-select" id="v" name="v" required>
-            <option selected disabled value="">[*specify::generation/generations]0…%nn;</option>
+          <label class="sr-only" for="v1">[*generation/generations]1[:]</label>
+          <select class="custom-select w-md-auto" id="v1" name="v" required>
+            <option selected disabled value="">[*specify::generation/generations]0…%nn;</option>%nn;
             %foreach;ancestor_level;
-                %if;(level>1)
-                <option value="%level;">%nn;
-                  %if;(level= 2)[*to the parents]%nn;
-                  %elseif;(level=3)[*to the grandparents]%nn;
-                  %elseif;(level=4)[*to the great-grandparents]%nn;
-                  %else;
-                    %apply;tothegen%with;
-                      %apply;nth([nth (generation)], level)
-                    %end;
-                  %end;
-                  %if;(level!=1) %number_of_ancestors;%if;(level<20)/%expr((2^level)-2)%end;%end;
+              %if;(level>1)%level;|%nn;
+                %let;mx;%expr(level/10)%in;%nn;
+                %let;dv;%expr(10^(3*mx))%in;%nn;
+                %let;noa;%expr(number_of_ancestors)%in;
+                %let;maxanc;%expr(2^level-2)%in;
+                %let;per;%expr(100*noa/maxanc)%%%in;
+                %let;ttt;%expr((20*mul)-1)%in;
+                <option value="%level;" title="%per;" class="d-flex align-item-stretch w-100" data-style="background: linear-gradient(90deg, rgba(205,205,205,0.4) %per;, white %per;);"
+                  data-stats=" (%number_of_ancestors;/%nn;
+                    %if;(level<17)%maxanc;%elseif;(level<40)%expr(maxanc/dv)%end;
+                    %if;(level>16) %nn;
+                      %if;(mx>9)>10³⁰%elseif;(mx=9)Y²⁷
+                      %elseif;(mx=8)Y²⁴%elseif;(mx=7)Z²¹%elseif;(mx=6)E%elseif;(mx=5)P
+                      %elseif;(mx=4)T%elseif;(mx=3)G%elseif;(mx=2)M%else;k%end;
+                    %end;)">
+                  %apply;tothegen%with;%apply;nth([nth (generation)], level)%end;
                 </option>
               %end;
             %end;
@@ -531,11 +535,22 @@ function missing_events_options () {
     </div>
   </div>
 </form>
-
 %include;trl
 %include;copyr
 </div>
 %include;js
+<script>
+$(document).ready(function() {
+    $("#v1").select2({
+    templateResult: function(el) { return '<span style="' + ($(el.element).data('style') || '') + '" class="' + ($(el.element).prop('class') || '') + '">' + el.text + ($(el.element).data('stats') || '') + '</span>'; },
+    templateSelection: function(el) { return '<span style="' + ($(el.element).data('style') || '') + '" class="' + ($(el.element).prop('class') || '') + '">' + el.text + ($(el.element).data('stats') || '') + '</span>'; },
+    escapeMarkup: function(markup) { return markup; },
+    placeholder: "[*specify::generation/generations]0…%nn;",
+
+    width: "resolve"
+  });
+});
+</script>
 <script>
 (function () {
   'use strict';
@@ -552,7 +567,7 @@ function missing_events_options () {
         form.classList.add('was-validated');
       }, false);
     });
-})();
+});
 </script>
 </body>
 </html>
