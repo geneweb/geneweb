@@ -1957,11 +1957,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Vstring s -> VVstring s
       | _ -> raise Not_found)
   | [ "base"; "name" ] -> VVstring conf.bname
-  | [ "base"; "nb_persons" ] ->
-      VVstring
-        (Mutil.string_of_int_sep
-           (Util.transl conf "(thousand separator)")
-           (nb_of_persons base))
+  | "base" :: "nb_persons" :: sl -> (
+      VVstring (eval_int conf (nb_of_persons base) sl))
   | [ "base"; "real_nb_persons" ] ->
       VVstring
         (Mutil.string_of_int_sep
@@ -2518,6 +2515,13 @@ and eval_num conf n = function
   | [ "lvl" ] -> string_of_int @@ Sosa.gen n
   | [ "v" ] -> Sosa.to_string n
   | [] -> Sosa.to_string_sep (transl conf "(thousand separator)") n
+  | _ -> raise Not_found
+
+and eval_int conf n = function
+  | [ "hexa" ] -> Printf.sprintf "0x%X" n
+  | [ "octal" ] -> Printf.sprintf "0x%o" n
+  | [ "v" ] -> string_of_int n
+  | [] -> Mutil.string_of_int_sep (transl conf "(thousand separator)") n
   | _ -> raise Not_found
 
 and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
