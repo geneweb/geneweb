@@ -513,8 +513,7 @@ function missing_events_options () {
                 %let;noa;%expr(number_of_ancestors)%in;
                 %let;maxanc;%expr(2^level-2)%in;
                 %let;per;%expr(100*noa/maxanc)%%%in;
-                %let;ttt;%expr((20*mul)-1)%in;
-                <option value="%level;" title="%per;" class="d-flex align-item-stretch w-100" data-style="background: linear-gradient(90deg, rgba(205,205,205,0.4) %per;, white %per;);"
+                <option value="%level;" title="%per;" class="d-flex" data-style="background: linear-gradient(90deg, rgba(205,205,205,0.3) %per;, rgba(255,255,255,0) %per;);"
                   data-stats=" (%number_of_ancestors;/%nn;
                     %if;(level<17)%maxanc;%elseif;(level<40)%expr(maxanc/dv)%end;
                     %if;(level>16) %nn;
@@ -546,7 +545,6 @@ $(document).ready(function() {
     templateSelection: function(el) { return '<span style="' + ($(el.element).data('style') || '') + '" class="' + ($(el.element).prop('class') || '') + '">' + el.text + ($(el.element).data('stats') || '') + '</span>'; },
     escapeMarkup: function(markup) { return markup; },
     placeholder: "[*specify::generation/generations]0…%nn;",
-
     width: "resolve"
   });
 });
