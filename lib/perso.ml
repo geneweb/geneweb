@@ -1957,8 +1957,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Vstring s -> VVstring s
       | _ -> raise Not_found)
   | [ "base"; "name" ] -> VVstring conf.bname
-  | "base" :: "nb_persons" :: sl -> (
-      VVstring (eval_int conf (nb_of_persons base) sl))
+  | "base" :: "nb_persons" :: sl ->
+      VVstring (eval_int conf (nb_of_persons base) sl)
   | [ "base"; "real_nb_persons" ] ->
       VVstring
         (Mutil.string_of_int_sep
@@ -3957,7 +3957,7 @@ let print_foreach conf base print_ast eval_expr =
     in
     loop [ GP_person (Sosa.one, get_iper p, None) ] 1 0
   in
-  let print_foreach_ancestor_level2 env al ((p, _) as ep) =
+  let print_foreach_ancestor_at_level env al ((p, _) as ep) =
     let max_lev = "max_anc_level" in
     let max_level = match get_env max_lev env with Vint n -> n | _ -> 0 in
     let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
@@ -4648,7 +4648,7 @@ let print_foreach conf base print_ast eval_expr =
     | "alias" -> print_foreach_alias env al ep
     | "ancestor" -> print_foreach_ancestor env al ep
     | "ancestor_level" -> print_foreach_ancestor_level env el al ep
-    | "ancestor_level2" -> print_foreach_ancestor_level2 env al ep
+    | "ancestor_at_level" -> print_foreach_ancestor_at_level env al ep
     | "ancestor_surname" -> print_foreach_anc_surn env el al loc ep
     | "ancestor_tree_line" -> print_foreach_ancestor_tree env el al ep
     | "cell" -> print_foreach_cell env al ep
