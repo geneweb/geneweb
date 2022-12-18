@@ -483,28 +483,9 @@ function missing_events_options () {
         </div>
       </div>
       <div class="d-flex flex-column order-1">
-        <div class="d-flex order-2 justify-content-between mt-2">
-          <div>
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="only" name="only">
-              <label class="custom-control-label" for="only">[*only the generation selected] <span class="text-primary">✱</span></label>
-            </div>
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="image" name="im" value="0">
-              <label class="custom-control-label" for="image">[*visualize/show/hide/summary]2 [image/images]1 <span class="text-info">✘</span></label>
-            </div>
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="cgl" name="cgl">
-              <label class="custom-control-label" for="cgl">[*cancel GeneWeb links]</label>
-            </div>
-          </div>
-          <div class=" align-self-center ml-4">
-            <button type="submit" class="btn btn-outline-primary">Ok</button>
-          </div>
-        </div>
-        <div class="order-1">
+        <div>
           <label class="sr-only" for="v1">[*generation/generations]1[:]</label>
-          <select class="custom-select w-md-auto" id="v1" name="v" required>
+          <select class="custom-select" id="v1" name="v" required>
             <option selected disabled value="">[*specify::generation/generations]0…%nn;</option>%nn;
             %foreach;ancestor_level;
               %if;(level>1)%level;|%nn;
@@ -513,7 +494,8 @@ function missing_events_options () {
                 %let;noa;%expr(number_of_ancestors)%in;
                 %let;maxanc;%expr(2^level-2)%in;
                 %let;per;%expr(100*noa/maxanc)%%%in;
-                <option value="%level;" title="%per;" class="d-flex" data-style="background: linear-gradient(90deg, rgba(205,205,205,0.3) %per;, rgba(255,255,255,0) %per;);"
+                <option value="%level;" title="%per;" class="d-flex pl-2"
+                  data-style="background: linear-gradient(90deg, rgba(150,170,190,.2) %per;, rgba(255,255,255,0) %per;);"
                   data-stats=" (%number_of_ancestors;/%nn;
                     %if;(level<17)%maxanc;%elseif;(level<40)%expr(maxanc/dv)%end;
                     %if;(level>16) %nn;
@@ -530,6 +512,25 @@ function missing_events_options () {
             <i class="fas fa-exclamation-triangle mr-1"></i>[*specify::generation/generations]1
           </div>
         </div>
+        <div class="d-flex justify-content-between mt-2">
+          <div class=" align-self-center ml-4 order-2">
+            <button type="submit" class="btn btn-outline-primary">Ok</button>
+          </div>
+          <div class="order-1">
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="only" name="only">
+              <label class="custom-control-label" for="only">[*only the generation selected] <span class="text-primary">✱</span></label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="image" name="im" value="0">
+              <label class="custom-control-label" for="image">[*visualize/show/hide/summary]2 [image/images]1 <span class="text-info">✘</span></label>
+            </div>
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="cgl" name="cgl">
+              <label class="custom-control-label" for="cgl">[*cancel GeneWeb links]</label>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -542,7 +543,6 @@ function missing_events_options () {
 $(document).ready(function() {
     $("#v1").select2({
     templateResult: function(el) { return '<span style="' + ($(el.element).data('style') || '') + '" class="' + ($(el.element).prop('class') || '') + '">' + el.text + ($(el.element).data('stats') || '') + '</span>'; },
-    templateSelection: function(el) { return '<span style="' + ($(el.element).data('style') || '') + '" class="' + ($(el.element).prop('class') || '') + '">' + el.text + ($(el.element).data('stats') || '') + '</span>'; },
     escapeMarkup: function(markup) { return markup; },
     placeholder: "[*specify::generation/generations]0…%nn;",
     width: "resolve"
