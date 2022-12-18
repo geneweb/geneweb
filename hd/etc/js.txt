@@ -5,9 +5,16 @@
       integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.bundle.min.js" 
       integrity="sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    %if;(e.m="A" and e.t="")
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"
+      integrity="sha512-4MvcHwcbqXKUHB6Lx3Zb5CEAVoE9u84qN+ZSMM6s7z8IeJriExrV3ND5zRze9mxNlABJ6k864P/Vl8m0Sd3DtQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    %end;
   %else;
     <script src="%static_path;js/jquery.min.js?version=3.6.0"></script>
     <script src="%static_path;js/bootstrap.bundle.min.js?version=4.6.1"></script>
+    %if;(e.m="A" and e.t="")
+      <script src="%static_path;js/select2.min.js?version=4.1.0rc"></script>
+    %end;
   %end;
   %if;(evar.m!="MOD_DATA")
   <script>
@@ -128,4 +135,3 @@
   -->
 </script>
 %end;
-<script src="js/select2.min.js"></script>
