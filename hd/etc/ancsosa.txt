@@ -1600,7 +1600,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
   %( short display; only the selected generation %)
   %reset_count;
   <ul>
-    %foreach;ancestor_level2;
+    %foreach;ancestor_at_level;
       %if;(e.v != "" and level = e.v)
         <li>%nl;<b>%apply;capitalize%with;%apply;gen("v")%end;</b>%nl;
           <ul>%nl;
