@@ -4482,7 +4482,7 @@ de: ungefähre Daten berücksichtigen
 en: include unsure dates
 es: tener en cuenta las fechas aproximadas
 fi: sisällytä epävarmat päivämäärät
-fr: prendre en compte les dates approximatives
+fr: inclure les dates approximatives
 it: prendere in considerazione le date approssimative
 nl: rekening houden met approximatieve data
 no: inkluder usikre datoer
