@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: ancmenu.txt,v 7.00 exp 13/05/2020 18:42:25 $ -->
-  <!-- Copyright (c) 1998-2020 INRIA -->
+  <!-- $Id: ancmenu.txt,v 7.1 exp 18/12/2022 19:03:30 $ -->
+  <!-- Copyright (c) 1998-2023 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
       [*ancestors]%nn;
@@ -29,11 +29,9 @@ function no_options () {
   /* On décoche toutes les options, only/image_off/cgl */
   $('input[type=checkbox][name!="only"][name!="image"][name!="cgl"]').prop('checked', false);
 }
-
 function long_display_options () {
   /* On décoche toutes les options, sauf celles de l’affichage long et only/image_off/cgl. */
   $('input[type="checkbox"]:not([id^=ld_])[name!="only"][name!="image"][name!="cgl"]').prop('checked', false);
-
   /* On coche celles que l’on veut si aucune de l’affichage long n’est cochée. */
   if ($('input[type=checkbox]:not(:checked)[id^=ld_]').length === $('input[type=checkbox][id^=ld_]').length) {
     $('input[type="checkbox"][id=ld_siblings]').prop('checked', true);
@@ -41,11 +39,9 @@ function long_display_options () {
     $('input[type="checkbox"][id=ld_src]').prop('checked', true);
   }
 }
-
 function table_options () {
   /* On décoche toutes les options, sauf celles du tableau et only/image_off/cgl. */
   $('input[type="checkbox"]:not([id^=t_])[name!="only"][name!="image"][name!="cgl"]').prop("checked", false);
-
   /* On coche celles que l’on veut si aucune du tableau n’est cochée. */
   if ($('input[type=checkbox]:not(:checked)[id^=t_]').length === $('input[type=checkbox][id^=t_]').length) {
     $('input[type=checkbox][id=t_num]').prop('checked', true);
@@ -63,11 +59,9 @@ function table_options () {
     $('input[type=checkbox][id=t_repeat]').prop('checked', true);
   }
 }
-
 function book_of_ascendants_options () {
   /* On décoche toutes les options, sauf celles du livre ascendant et only/image_off/cgl. */
   $('input[type=checkbox]:not([id^=boa_])[name!="only"][name!="image"][name!="cgl"]').prop("checked", false);
-
   /* On coche celles que l’on veut si aucune du tableau n’est cochée. */
   if ($('input[type=checkbox]:not(:checked)[id^=boa_]').length === $('input[type=checkbox][id^=boa_]').length) {
     $('input[type=checkbox][id=boa_parents]').prop('checked', true);
@@ -75,12 +69,10 @@ function book_of_ascendants_options () {
     $('input[type=checkbox][id=boa_marr]').prop('checked', true);
   }
 }
-
 function tree_options () {
   /* On décoche toutes les options, image_off/cgl */
   $('input[type=checkbox]:not([id^=tree_])[name!="image"][name!="cgl"]').prop("checked", false);
 }
-
 function missing_ancestors_options () {
   $('input[type=checkbox]:not([id^=ma_])[name!="only"][name!="image"][name!="cgl"]').prop("checked", false);
   if ($('input[type=checkbox]:not(:checked)[id^=ma_]').length === $('input[type=checkbox][id^=ma_]').length) {
@@ -88,7 +80,6 @@ function missing_ancestors_options () {
     $('input[type=checkbox][id=ma_death]').prop('checked', true);
   }
 }
-
 function missing_events_options () {
   $('input[type=checkbox]:not([id^=me_])[name!="only"][name!="image"][name!="cgl"]').prop("checked", false);
   if ($('input[type=checkbox]:not(:checked)[id^=me_]').length === $('input[type=checkbox][id^=me_]').length) {
@@ -110,13 +101,11 @@ function missing_events_options () {
     %if;(alias != "") <em>(%alias;)</em>%end;
   %end;
 </h1>
-
-%define;tothegen(xx)
-  [*to the %s generation:::xx]%nn;
+%define;thegen(xx)
+  [the %s generation:::xx]%nn;
 %end;
-
 <form class="needs-validation" novalidate method="get" action="%action;">
-  <div class="d-flex justify-content-center w-100 mx-3">
+  <div class="d-flex justify-content-around w-100">
     %hidden;
     %if;access_by_key;
       <input type="hidden" name="p" value="%first_name_key_val;">
@@ -129,7 +118,7 @@ function missing_events_options () {
     %end;
     <input type="hidden" name="m" value="A">
     %( à delete ? <input type="hidden" name="sosab" value="10">%)
-    <div class="col-auto px-1 order-1">
+    <div class="px-1 order-1">
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tN" name="t" value="N" checked onclick="no_options()">
         <label class="custom-control-label" for="tN"><i class="fa fa-align-left fa-fw mr-1"></i>[*short display] <span class="text-primary">✱</span></label>
@@ -365,10 +354,9 @@ function missing_events_options () {
           <input type="checkbox" class="custom-control-input" id="me_repeat" name="repeat">
           <label class="custom-control-label" for="me_repeat">[*display smallest sosa number relative to ancestor]</label>
         </div>
-
       </div>
     </div>
-    <div class="d-flex flex-column order-2 px-2">
+    <div class="d-flex flex-column flex-grow-1 order-2 px-1">
       <div class="order-2">
         <hr class="my-2">
         <div class="custom-control custom-radio">
@@ -482,34 +470,41 @@ function missing_events_options () {
           </div>
         </div>
       </div>
-      <div class="d-flex flex-column order-1">
-        <div>
-          <label class="sr-only" for="v1">[*generation/generations]1[:]</label>
-          <select class="custom-select" id="v1" name="v" required>
-            <option selected disabled value="">[*specify::generation/generations]0…%nn;</option>%nn;
+      <div class="d-flex flex-column justify-content-center order-1 mx-3">
+        <div class="d-flex flex-column was-validated">
+          <label class="sr-only" for="v">[*specify::generation/generations]0[:]</label>
+          <select class="custom-select " id="v" name="v" required>
+            <option class="selected disabled" value="">…</option>
             %foreach;ancestor_level;
-              %if;(level>1)%level;|%nn;
-                %let;mx;%expr(level/10)%in;%nn;
-                %let;dv;%expr(10^(3*mx))%in;%nn;
-                %let;noa;%expr(number_of_ancestors)%in;
-                %let;maxanc;%expr(2^level-2)%in;
-                %let;per;%expr(100*noa/maxanc)%%%in;
-                <option value="%level;" title="%per;" class="d-flex pl-2"
-                  data-style="background: linear-gradient(90deg, rgba(150,170,190,.2) %per;, rgba(255,255,255,0) %per;);"
-                  data-stats=" (%number_of_ancestors;/%nn;
-                    %if;(level<17)%maxanc;%elseif;(level<40)%expr(maxanc/dv)%end;
-                    %if;(level>16) %nn;
-                      %if;(mx>9)>10³⁰%elseif;(mx=9)Y²⁷
-                      %elseif;(mx=8)Y²⁴%elseif;(mx=7)Z²¹%elseif;(mx=6)E%elseif;(mx=5)P
-                      %elseif;(mx=4)T%elseif;(mx=3)G%elseif;(mx=2)M%else;k%end;
-                    %end;)">
-                  %apply;tothegen%with;%apply;nth([nth (generation)], level)%end;
+              %if;(level>1)
+                %let;max;%expr(2^level-2)%in;
+                %let;maxat;%expr(2^(level-1))%in;
+                %let;dd;%expr(level/10)%in;
+                %let;pp;%expr(100*number_of_ancestors.v|max)%%%in;
+                %let;ppa;pp%in;
+                %(%let;ppa;%expr(100*number_of_ancestors_at_v.v|max)%%%in;%)
+                <option value="%level;" title="%pp;" class="d-flex pl-2"
+                  %if;(level<85)
+                  data-full=' %number_of_ancestors;/%nn;
+                    %if;(level<17)%max;%else;%expr(max|(10^(3*dd)))%end;'
+                  data-full_style='background: linear-gradient(90deg, rgba(150,170,190,.2) %pp;, rgba(255,255,255,0) %pp;'
+                  data-only=' %(%number_of_ancestors_at_v;%)#/%nn;
+                       %if;(level<17)%maxat;%else;%expr(maxat|(10^(3*dd)))%end;'
+                  data-only_style='background: linear-gradient(270deg, rgba(180,200,220,.2) %ppa;, rgba(255,255,255,0) %ppa;'
+                  %if;(level>16)
+                    data-pref=' %nn;
+                      %if;(dd>9)>10³⁰%elseif;(dd=9)Y%nn;
+                      %elseif;(dd=8)Y%elseif;(dd=7)Z%elseif;(dd=6)E%elseif;(dd=5)P%nn;
+                      %elseif;(dd=4)T%elseif;(dd=3)G%elseif;(dd=2)M%else;k%end;
+                      %end;'>%nn;
+                  %end;
+                  %sp;%apply;thegen%with;%apply;nth([nth (generation)], level)%end;%sp;%nn;
                 </option>
               %end;
             %end;
           </select>
-          <div class="invalid-feedback">
-            <i class="fas fa-exclamation-triangle mr-1"></i>[*specify::generation/generations]1
+          <div class="invalid-feedback ml-1">
+            <i class="fas fa-exclamation-triangle mr-1"></i>[*specify::generation/generations]0
           </div>
         </div>
         <div class="d-flex justify-content-between mt-2">
@@ -540,16 +535,6 @@ function missing_events_options () {
 </div>
 %include;js
 <script>
-$(document).ready(function() {
-    $("#v1").select2({
-    templateResult: function(el) { return '<span style="' + ($(el.element).data('style') || '') + '" class="' + ($(el.element).prop('class') || '') + '">' + el.text + ($(el.element).data('stats') || '') + '</span>'; },
-    escapeMarkup: function(markup) { return markup; },
-    placeholder: "[*specify::generation/generations]0…%nn;",
-    width: "resolve"
-  });
-});
-</script>
-<script>
 (function () {
   'use strict';
   // Fetch all the forms we want to apply custom Bootstrap validation styles to
@@ -566,6 +551,24 @@ $(document).ready(function() {
       }, false);
     });
 });
+</script>
+<script>
+$(document).ready(function() {
+  $("#v").select2({
+    templateResult: function(el) { return '<span class="onlycheck d-block pl-2" style="' + (($('#only').is(':checked')) ? ($(el.element).data('only_style') || '') : ($(el.element).data('full_style') || '')) + '" class="' + ($(el.element).prop('class') || '') + '">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + el.text +  (($('#only').is(':checked')) ? ($(el.element).data('only') || '') : ($(el.element).data('full') || '')) + ($(el.element).data('pref') || '') + '</span>'; },
+    templateSelection: function(el) { return '<span class="onlycheck">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + '</span><span>' + el.text + '</span>'; },
+    escapeMarkup: function(markup) { return markup; },
+    width: "resolve",
+    allowClear: true,
+    placeholder: "… [specify::generation/generations]0",
+    theme: "classic"
+  });
+});
+</script>
+<script>
+  $("body").on('change', '#only', function() {
+   ($('#only').is(':checked')) ? ($('.onlycheck').text("[only]")) : ($('.onlycheck').text("[up to]"))
+  });
 </script>
 </body>
 </html>
