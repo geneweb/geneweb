@@ -2056,6 +2056,10 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       match get_env "nbr_a" env with
       | Vint n -> VVstring (eval_int conf (n - 1) sl)
       | _ -> raise Not_found)
+  | "number_of_ancestors_at_level" :: sl -> (
+      match get_env "nbr_al" env with
+      | Vint n -> VVstring (eval_int conf (n - 1) sl)
+      | _ -> raise Not_found)
   | "number_of_descendants" :: sl -> (
       (* FIXME: what is the difference with number_of_descendants_at_level??? *)
       match get_env "level" env with
@@ -2081,7 +2085,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
               let cnt =
                 Gwdb.Collection.fold
                   (fun cnt ip ->
-                    if Gwdb.Marker.get m ip <= i then cnt + 1 else cnt)
+                    if Gwdb.Marker.get m ip = i then cnt + 1 else cnt)
                   0 (Gwdb.ipers base)
               in
               VVstring (eval_int conf (cnt - 1) sl)
@@ -3932,6 +3936,7 @@ let print_foreach conf base print_ast eval_expr =
     in
     let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
     let rec loop gpl i n =
+      let prev_n = n in
       if i > max_level then ()
       else
         let n =
@@ -3943,7 +3948,9 @@ let print_foreach conf base print_ast eval_expr =
             n gpl
         in
         let env =
-          ("gpl", Vgpl gpl) :: ("level", Vint i) :: ("nbr_a", Vint n) :: env
+          ("gpl", Vgpl gpl) :: ("level", Vint i) :: ("nbr_a", Vint n)
+          :: ("nbr_a_l", Vint (n - prev_n))
+          :: env
         in
         List.iter (print_ast env ep) al;
         let gpl = next_generation conf base mark gpl in
