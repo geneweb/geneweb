@@ -723,7 +723,7 @@ let print_fevent opts base gen in_comment e =
       (lines_list_of_string note)
 
 let print_comment_for_family opts base gen fam =
-  let comm = if opts.notes then sou base (get_comment fam) else "" in
+  let comm = if opts.Gwexport.notes then sou base (get_comment fam) else "" in
   (* Si on est en mode old_gw, on mets tous les évènements dans les notes. *)
   (* On supprime les 2 évènements principaux. *)
   let fevents =
@@ -905,7 +905,7 @@ let notes_aliases bdir =
   | None -> []
 
 let print_notes_for_person opts base gen p =
-  let notes = if opts.notes then sou base (get_notes p) else "" in
+  let notes = if opts.Gwexport.notes then sou base (get_notes p) else "" in
   let surn = s_correct_string (p_surname base p) in
   let fnam = s_correct_string (p_first_name base p) in
   (* Si on n'est en mode old_gw, on mets tous les évènements dans les notes. *)
@@ -935,7 +935,7 @@ let print_notes_for_person opts base gen p =
                  | _ -> ""
                in
                let notes =
-                 if opts.no_notes <> `nnn then sou base evt.epers_note else ""
+                 if opts.Gwexport.notes then sou base evt.epers_note else ""
                in
                if notes <> "" then
                  Printf.ksprintf (oc opts) "%s: %s\n" name notes;
@@ -954,7 +954,7 @@ let print_notes_for_person opts base gen p =
   let s =
     let aux g = sou base (g p) in
     let sl =
-      if opts.no_notes <> `nnn then
+      if opts.Gwexport.notes then
         [
           aux get_notes;
           aux get_birth_note;
@@ -976,7 +976,7 @@ let print_notes_for_person opts base gen p =
       List.fold_left
         (fun acc e ->
           let acc =
-            if opts.no_notes <> `nnn then sou base e.epers_note :: acc else acc
+            if opts.Gwexport.notes then sou base e.epers_note :: acc else acc
           in
           let acc =
             if opts.source = None then sou base e.epers_src :: acc else acc
