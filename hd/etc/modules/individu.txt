@@ -303,7 +303,7 @@
     %if;is_dead;
       <li class="mt-1" title="[*death]">
         <span class="fa-li"><i class="fas fa-skull-crossbones"></i></span>
-        [*died]s
+        %apply;capitalize(died)
         %if;has_death_date; %on_death_date;%end;
         %if;has_death_place; - %death_place;%end;
         %if;(has_linked_page.DEATH and linked_page.DEATH!="") (%linked_page.DEATH;)%end;</li>%nl;
