@@ -35,7 +35,7 @@ let default_opts =
     img_base_path = "";
     keys = [];
     mem = false;
-    no_notes = true;
+    notes = true;
     base_notes = true;
     no_picture = false;
     oc = ("", print_string, fun () -> close_out stdout);
@@ -94,9 +94,15 @@ let speclist c =
       " save memory space, but slower." );
     ( "-no-base-notes", Arg.Unit (fun () -> c := { !c with base_notes = false })
     , " no database notes." );
+    ( "-nn", Arg.Unit (fun () -> c := { !c with base_notes = false })
+    , " no database notes." );
     ( "-no-notes", Arg.Unit (fun () -> c := { !c with notes = false; base_notes = false})
     , " no notes (implies -no-base-notes)." );
+    ( "-nnn", Arg.Unit (fun () -> c := { !c with notes = false; base_notes = false})
+    , " no notes (implies -no-base-notes)." );
     ( "-no-picture", Arg.Unit (fun () -> c := { !c with no_picture = true })
+    , " don't extract individual picture." );
+    ( "-nopicture", Arg.Unit (fun () -> c := { !c with no_picture = true })
     , " don't extract individual picture." );
     ( "-o",
       Arg.String
