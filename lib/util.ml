@@ -503,6 +503,9 @@ let clean_html_tags s l =
     (fun s html_tag -> Str.global_replace (Str.regexp html_tag) "&nbsp;" s)
     s l
 
+let clean_comment_tags s =
+  Str.global_replace (Str.regexp "<!--.*-->") "&nbsp;" s
+
 let hidden_textarea conf k v =
   Output.print_sstring conf {|<textarea style="display:none;" name="|};
   Output.print_string conf (escape_html k);
