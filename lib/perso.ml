@@ -1507,6 +1507,25 @@ let get_nb_marriage_witnesses_of_kind fam wk =
     (fun acc (_, w) -> if wk = w then acc + 1 else acc)
     0 witnesses
 
+let number_of_descendants_aux conf base env all_levels sl eval_int =
+  match get_env "level" env with
+  | Vint i -> (
+      match get_env "desc_level_table" env with
+      | Vdesclevtab t ->
+          let m = fst (Lazy.force t) in
+          let cnt =
+            Gwdb.Collection.fold
+              (fun cnt ip ->
+                if all_levels then
+                  if Gwdb.Marker.get m ip <= i then cnt + 1 else cnt
+                else if Gwdb.Marker.get m ip = i then cnt + 1
+                else cnt)
+              0 (Gwdb.ipers base)
+          in
+          VVstring (eval_int conf (cnt - 1) sl)
+      | _ -> raise Not_found)
+  | _ -> raise Not_found
+
 let rec eval_var conf base env ep loc sl =
   try eval_simple_var conf base env ep sl
   with Not_found -> eval_compound_var conf base env ep loc sl
@@ -2057,40 +2076,13 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Vint n -> VVstring (eval_int conf (n - 1) sl)
       | _ -> raise Not_found)
   | "number_of_ancestors_at_level" :: sl -> (
-      match get_env "nbr_al" env with
+      match get_env "nbr_a_l" env with
       | Vint n -> VVstring (eval_int conf (n - 1) sl)
       | _ -> raise Not_found)
-  | "number_of_descendants" :: sl -> (
-      (* FIXME: what is the difference with number_of_descendants_at_level??? *)
-      match get_env "level" env with
-      | Vint i -> (
-          match get_env "desc_level_table" env with
-          | Vdesclevtab t ->
-              let m = fst (Lazy.force t) in
-              let cnt =
-                Gwdb.Collection.fold
-                  (fun cnt ip ->
-                    if Gwdb.Marker.get m ip <= i then cnt + 1 else cnt)
-                  0 (Gwdb.ipers base)
-              in
-              VVstring (eval_int conf (cnt - 1) sl)
-          | _ -> raise Not_found)
-      | _ -> raise Not_found)
-  | "number_of_descendants_at_level" :: sl -> (
-      match get_env "level" env with
-      | Vint i -> (
-          match get_env "desc_level_table" env with
-          | Vdesclevtab t ->
-              let m = fst (Lazy.force t) in
-              let cnt =
-                Gwdb.Collection.fold
-                  (fun cnt ip ->
-                    if Gwdb.Marker.get m ip = i then cnt + 1 else cnt)
-                  0 (Gwdb.ipers base)
-              in
-              VVstring (eval_int conf (cnt - 1) sl)
-          | _ -> raise Not_found)
-      | _ -> raise Not_found)
+  | "number_of_descendants" :: sl ->
+      number_of_descendants_aux conf base env true sl eval_int
+  | "number_of_descendants_at_level" :: sl ->
+      number_of_descendants_aux conf base env false sl eval_int
   | "parent" :: sl -> (
       match get_env "parent" env with
       | Vind p ->
