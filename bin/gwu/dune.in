@@ -3,7 +3,7 @@
   (public_name geneweb.gwu_lib)
   (wrapped false)
   (libraries geneweb gwexport_lib)
-  (modules gwuLib)
+  (modules gwu_lib)
 )
 
 (executable
