@@ -21,7 +21,19 @@
     )
 )
 
+(executable
+  (name ports)
+  (libraries %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb geneweb.ged2gwb_lib geneweb.gwb2ged_lib geneweb.gwexport_lib geneweb.gwu_lib geneweb.gwc_lib)
+  (modules ports)
+)
+
 (rule
   (action (run ./test.exe) )
+  (alias runtest)
+)
+
+(rule
+  (action (run ./ports.exe) )
+  (deps assets/royal92.ged assets/abc.ged)
   (alias runtest)
 )
