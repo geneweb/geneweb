@@ -39,6 +39,7 @@ function long_display_options () {
     $('input[type="checkbox"][id=ld_src]').prop('checked', true);
   }
 }
+
 function table_options () {
   /* On décoche toutes les options, sauf celles du tableau et only/image_off/cgl. */
   $('input[type="checkbox"]:not([id^=t_])[name!="only"][name!="image"][name!="cgl"]').prop("checked", false);
@@ -473,30 +474,34 @@ function missing_events_options () {
       <div class="d-flex flex-column justify-content-center order-1 mx-3">
         <div class="d-flex flex-column was-validated">
           <label class="sr-only" for="v">[*specify::generation/generations]0[:]</label>
-          <select class="custom-select " id="v" name="v" required>
-            <option class="selected disabled" value="">…</option>
+          <select class="custom-select " id="v" name="v" required title="[up to] 2^n-2 / [only] 2^(n-1)">           
+            <option value=""></option>
             %foreach;ancestor_level;
               %if;(level>1)
-                %let;max;%expr(2^level-2)%in;
-                %let;maxat;%expr(2^(level-1))%in;
+                %let;number_of_ancestors_max;%expr(2^level-2)%in;
+                %let;number_of_ancestors_max_at_level;%expr(2^(level-1))%in;
+                %(! number_of_ancestors texte et number_of_ancestors.v chiffre %)
+                %let;number_of_ancestors_at_level_;%expr(number_of_ancestors_at_level+1)%in;
                 %let;dd;%expr(level/10)%in;
-                %let;pp;%expr(100*number_of_ancestors.v|max)%%%in;
-                %let;ppa;pp%in;
-                %(%let;ppa;%expr(100*number_of_ancestors_at_v.v|max)%%%in;%)
-                <option value="%level;" title="%pp;" class="d-flex pl-2"
-                  %if;(level<85)
-                  data-full=' %number_of_ancestors;/%nn;
-                    %if;(level<17)%max;%else;%expr(max|(10^(3*dd)))%end;'
-                  data-full_style='background: linear-gradient(90deg, rgba(150,170,190,.2) %pp;, rgba(255,255,255,0) %pp;'
-                  data-only=' %(%number_of_ancestors_at_v;%)#/%nn;
-                       %if;(level<17)%maxat;%else;%expr(maxat|(10^(3*dd)))%end;'
-                  data-only_style='background: linear-gradient(270deg, rgba(180,200,220,.2) %ppa;, rgba(255,255,255,0) %ppa;'
-                  %if;(level>16)
-                    data-pref=' %nn;
-                      %if;(dd>9)>10³⁰%elseif;(dd=9)Y%nn;
+                %let;dd_at_level;%expr((level-1)/10)%in;
+                %let;percent;%expr(100*number_of_ancestors.v|number_of_ancestors_max)%in;
+                %let;percent_at_level;%expr(100*number_of_ancestors_at_level_|number_of_ancestors_max_at_level)%in;
+                <option value="%level;" title="" class="d-flex pl-2"
+                  %if;(level<90)
+                    data-full=' (+%number_of_ancestors_at_level_;) %number_of_ancestors;'
+                    data-full_prefix='/%nn;
+                      %if;(level<14)%number_of_ancestors_max;%else;%expr(number_of_ancestors_max|(10^(3*dd)))%end;
+                       %if;(dd>9)>10³⁰%elseif;(dd=9)Y%nn;
                       %elseif;(dd=8)Y%elseif;(dd=7)Z%elseif;(dd=6)E%elseif;(dd=5)P%nn;
-                      %elseif;(dd=4)T%elseif;(dd=3)G%elseif;(dd=2)M%else;k%end;
-                      %end;'>%nn;
+                      %elseif;(dd=4)T%elseif;(dd=3)G%elseif;(dd=2)M%elseif;(dd=1 and level>13)k%else;%end;%if;(percent!=0) %percent;%%%end;'
+                    data-full_style='background: linear-gradient(90deg, rgba(150,170,190,.2) %percent;%%, rgba(255,255,255,0) %percent;%%'
+                    data-only=' %number_of_ancestors_at_level_/%nn;
+                      %if;(level<18)%number_of_ancestors_max_at_level;%else;%expr(number_of_ancestors_max_at_level|(10^(3*dd_at_level)))%end;
+                       %if;(level>100)>10³⁰%elseif;(level>90)Y%nn;
+                      %elseif;(level>80)Y%elseif;(level>70)Z%elseif;(level>60)E%elseif;(level>50)P%nn;
+                      %elseif;(level>40)T%elseif;(level>30)G%elseif;(level>20)M%elseif;(level>17)k%else;%end;
+                      %if;(percent_at_level!=0) %percent_at_level;%%%end;'
+                    data-only_style='background: linear-gradient(90deg, rgba(180,200,220,.2) %percent_at_level;%%, rgba(255,255,255,0) %percent_at_level;%%'>
                   %end;
                   %sp;%apply;thegen%with;%apply;nth([nth (generation)], level)%end;%sp;%nn;
                 </option>
@@ -514,7 +519,7 @@ function missing_events_options () {
           <div class="order-1">
             <div class="custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" id="only" name="only">
-              <label class="custom-control-label" for="only">[*only the generation selected] <span class="text-primary">✱</span></label>
+              <label class="custom-control-label" for="only">[*only the generation selected]<span class="text-primary">✱</span></label>
             </div>
             <div class="custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" id="image" name="im" value="0">
@@ -535,6 +540,24 @@ function missing_events_options () {
 </div>
 %include;js
 <script>
+$(document).ready(function() {
+  $("#v").select2({
+    templateResult: function(el) { return '<span class="onlycheck d-block pl-2" style="' + (($('#only').is(':checked')) ? ($(el.element).data('only_style') || '') : ($(el.element).data('full_style') || '')) + '" class="' + ($(el.element).prop('class') || '') + '">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + el.text +  (($('#only').is(':checked')) ? ($(el.element).data('only') || '') : ($(el.element).data('full') || '') + ($(el.element).data('full_prefix') || '') + ($(el.element).data('percent') || '')) + '</span>'; },
+    templateSelection: function(el) { return '<span class="onlycheck">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + '</span><span>' + el.text + '</span><span>' + ($(el.element).data('full') || '') + '</span>'; },
+    escapeMarkup: function(markup) { return markup; },
+    width: "resolve",
+    allowClear: false,
+    placeholder: "… [specify::generation/generations]0 (max %max_anc_level;)",
+    theme: "classic"
+  });
+});
+</script>
+<script>
+  $("body").on('change', '#only', function() {
+   ($('#only').is(':checked')) ? ($('.onlycheck').text("[only]")) : ($('.onlycheck').text("[up to]"))
+  });
+</script>
+<script>
 (function () {
   'use strict';
   // Fetch all the forms we want to apply custom Bootstrap validation styles to
@@ -551,24 +574,6 @@ function missing_events_options () {
       }, false);
     });
 });
-</script>
-<script>
-$(document).ready(function() {
-  $("#v").select2({
-    templateResult: function(el) { return '<span class="onlycheck d-block pl-2" style="' + (($('#only').is(':checked')) ? ($(el.element).data('only_style') || '') : ($(el.element).data('full_style') || '')) + '" class="' + ($(el.element).prop('class') || '') + '">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + el.text +  (($('#only').is(':checked')) ? ($(el.element).data('only') || '') : ($(el.element).data('full') || '')) + ($(el.element).data('pref') || '') + '</span>'; },
-    templateSelection: function(el) { return '<span class="onlycheck">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + '</span><span>' + el.text + '</span>'; },
-    escapeMarkup: function(markup) { return markup; },
-    width: "resolve",
-    allowClear: true,
-    placeholder: "… [specify::generation/generations]0",
-    theme: "classic"
-  });
-});
-</script>
-<script>
-  $("body").on('change', '#only', function() {
-   ($('#only').is(':checked')) ? ($('.onlycheck').text("[only]")) : ($('.onlycheck').text("[up to]"))
-  });
 </script>
 </body>
 </html>
