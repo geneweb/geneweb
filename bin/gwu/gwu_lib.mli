@@ -19,3 +19,6 @@ val gwu :
   (Gwdb.iper -> bool) * (Gwdb.ifam -> bool) ->
   unit
 (** Prints the `.gw` file. *)
+
+val gwu_simple : export_isolated:bool -> Gwexport.gwexport_opts -> unit
+(** same as [gwu] but with gwu executable parameter and setup *)
