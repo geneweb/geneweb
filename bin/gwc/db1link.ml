@@ -3,21 +3,10 @@
 open Geneweb
 open Gwcomp
 open Def
+open State
 
 (* From OCaml manual, integer in binary format is 4 bytes long. *)
 let sizeof_long = 4
-
-(** Default source field for persons and families without source data *)
-let default_source = ref ""
-
-(** Base consistency check *)
-let do_check = ref true
-
-(** Compute consanguinity *)
-let do_consang = ref false
-
-(** Print base's statistics *)
-let pr_stats = ref false
 
 type person = (int, int, int) Def.gen_person
 (** Extended person's entry in the base *)
@@ -423,7 +412,7 @@ let find_first_available_occ gen fn sn occ =
         anything (just returns its entry and entry's index in the base)
 
      *)
-let insert_undefined gen key =
+let insert_undefined state gen key =
   (* shift person's occurence *)
   let occ = key.pk_occ + gen.g_file_info.f_shift in
   (* person with its position in the base *)
@@ -448,7 +437,7 @@ let insert_undefined gen key =
       (* strore names globally *)
       if key.pk_first_name <> "?" && key.pk_surname <> "?" then
         add_person_by_name gen key.pk_first_name key.pk_surname i
-      else if !Gwcomp.create_all_keys then
+      else if state.create_all_keys then
         add_person_by_name gen key.pk_first_name key.pk_surname i;
       (* extend arrays if needed *)
       new_iper gen;
@@ -517,7 +506,7 @@ let insert_undefined gen key =
         - updates previus index in [gen.g_per_index] in order to point to
           the definition instead of pointing to the reference.
 *)
-let insert_person gen so =
+let insert_person state gen so =
   (* shift person's occurence *)
   let occ = so.occ + gen.g_file_info.f_shift in
   (* person with its position in the base *)
@@ -542,7 +531,7 @@ let insert_person gen so =
       (* strore names globally *)
       if so.first_name <> "?" && so.surname <> "?" then
         add_person_by_name gen so.first_name so.surname i
-      else if !Gwcomp.create_all_keys then
+      else if state.create_all_keys then
         add_person_by_name gen so.first_name so.surname i;
       (* extend arrays if needed *)
       new_iper gen;
@@ -634,7 +623,7 @@ let insert_person gen so =
         notes = empty_string;
         psources =
           unique_string gen
-            (if so.psources = "" then !default_source else so.psources);
+            (if so.psources = "" then state.default_source else so.psources);
         key_index = ip;
       }
     in
@@ -649,9 +638,9 @@ let insert_person gen so =
 (** Insert definition or reference in [gen] and returns its entry and
     entry's index in the [gen.g_base]. Calls [insert_person] for definition
     and [insert_undefined] for reference. *)
-let insert_somebody gen = function
-  | Undefined key -> insert_undefined gen key
-  | Defined so -> insert_person gen so
+let insert_somebody state gen = function
+  | Undefined key -> insert_undefined state gen key
+  | Defined so -> insert_person state gen so
 
 (** Checks if children [ix] doesn't have another parents *)
 let check_parents_not_already_defined gen ix fath moth =
@@ -937,11 +926,11 @@ let update_fevents_with_family gen fam =
     - stores in [gen.g_fam_index] position where person was stored in
       [gen.g_index].
 *)
-let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
+let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
   let fath, ifath, moth, imoth =
     match
-      ( insert_somebody gen (Adef.father co),
-        insert_somebody gen (Adef.mother co) )
+      ( insert_somebody state gen (Adef.father co),
+        insert_somebody state gen (Adef.mother co) )
     with
     (* Look for inverted WIFE/HUSB *)
     | (fath, ifath), (moth, imoth) when fath.m_sex = Female && moth.m_sex = Male
@@ -953,7 +942,7 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
   let witl =
     List.map
       (fun (wit, sex) ->
-        let p, ip = insert_somebody gen wit in
+        let p, ip = insert_somebody state gen wit in
         notice_sex gen p sex;
         (* add father to witness' related persons *)
         p.m_related <- ifath :: p.m_related;
@@ -975,7 +964,7 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
         let witnesses =
           List.map
             (fun (wit, sex, wk, wnote) ->
-              let p, ip = insert_somebody gen wit in
+              let p, ip = insert_somebody state gen wit in
               notice_sex gen p sex;
               p.m_related <- ifath :: p.m_related;
               let wistr = unique_string gen wnote in
@@ -997,7 +986,7 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
   let children =
     Array.map
       (fun key ->
-        let e, ie = insert_person gen key in
+        let e, ie = insert_person state gen key in
         notice_sex gen e key.sex;
         ie)
       deo.children
@@ -1007,7 +996,7 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
   (* insert sources comment *)
   let fsources =
     unique_string gen
-      (if fo.fsources = "" then !default_source else fo.fsources)
+      (if fo.fsources = "" then state.default_source else fo.fsources)
   in
   (* extend arrays if needed *)
   new_ifam gen;
@@ -1094,9 +1083,9 @@ let pevent_name_unique_string gen = function
 
 (** Insert all related to the event information and add it to the person's entry
     in the [gen.g_base] *)
-let insert_pevents fname gen sb pevtl =
+let insert_pevents state fname gen sb pevtl =
   (* insert concered person *)
-  let p, ip = insert_somebody gen sb in
+  let p, ip = insert_somebody state gen sb in
   if p.m_pevents <> [] then (
     Printf.printf "\nFile \"%s\"\n" fname;
     Printf.printf "Individual events already defined for \"%s%s %s\"\n"
@@ -1120,7 +1109,7 @@ let insert_pevents fname gen sb pevtl =
             List.map
               (fun (wit, sex, wk, wnote) ->
                 (* insert witnesses *)
-                let wp, wip = insert_somebody gen wit in
+                let wp, wip = insert_somebody state gen wit in
                 notice_sex gen wp sex;
                 (* add concerned person as witness' relation *)
                 wp.m_related <- ip :: wp.m_related;
@@ -1212,8 +1201,8 @@ let map_option f = function Some x -> Some (f x) | None -> None
 
 (** Insert parent in the base and adjust his sex if needed. Concerned
     person is added in the list of parent's related persons. *)
-let insert_relation_parent gen ip s k =
-  let par, ipar = insert_somebody gen k in
+let insert_relation_parent state gen ip s k =
+  let par, ipar = insert_somebody state gen k in
   par.m_related <- ip :: par.m_related;
   if par.m_sex = Neuter then par.m_sex <- s;
   ipar
@@ -1221,19 +1210,19 @@ let insert_relation_parent gen ip s k =
 (** Convert [(Dune__exe.Gwcomp.somebody, string) Def.gen_relation] to
     [(int, int) Def.gen_relation] and insert all related to relation
     information in the base. *)
-let insert_relation gen ip r =
+let insert_relation state gen ip r =
   {
     r_type = r.r_type;
-    r_fath = map_option (insert_relation_parent gen ip Male) r.r_fath;
-    r_moth = map_option (insert_relation_parent gen ip Female) r.r_moth;
+    r_fath = map_option (insert_relation_parent state gen ip Male) r.r_fath;
+    r_moth = map_option (insert_relation_parent state gen ip Female) r.r_moth;
     r_sources = unique_string gen r.r_sources;
   }
 
 (** Insert all information related to the person's relations and add those
     relations to the person's list of related parents. *)
-let insert_relations fname gen sb sex rl =
+let insert_relations state fname gen sb sex rl =
   (* insert concerned person *)
-  let p, ip = insert_somebody gen sb in
+  let p, ip = insert_somebody state gen sb in
   if p.m_rparents <> [] then (
     Printf.printf "\nFile \"%s\"\n" fname;
     Printf.printf "Relations already defined for \"%s%s %s\"\n"
@@ -1243,16 +1232,16 @@ let insert_relations fname gen sb sex rl =
     check_error gen)
   else (
     notice_sex gen p sex;
-    let rl = List.map (insert_relation gen ip) rl in
+    let rl = List.map (insert_relation state gen ip) rl in
     p.m_rparents <- rl)
 
 (** Insert syntax element read from .gwo file. *)
-let insert_syntax fname gen = function
+let insert_syntax state fname gen = function
   | Family (cpl, fs, ms, witl, fevents, fam, des) ->
-      insert_family gen cpl fs ms witl fevents fam des
+      insert_family state gen cpl fs ms witl fevents fam des
   | Notes (key, str) -> insert_notes fname gen key str
-  | Relations (sb, sex, rl) -> insert_relations fname gen sb sex rl
-  | Pevent (sb, _, pevents) -> insert_pevents fname gen sb pevents
+  | Relations (sb, sex, rl) -> insert_relations state fname gen sb sex rl
+  | Pevent (sb, _, pevents) -> insert_pevents state fname gen sb pevents
   | Bnotes (nfname, str) -> insert_bnotes fname gen nfname str
   | Wnotes (wizid, str) -> insert_wiznote gen wizid str
 
@@ -1596,9 +1585,6 @@ let convert_persons per_index_ic per_ic persons =
       else update_pevents_with_person p)
     persons
 
-(** File containing the particles to use *)
-let particules_file = ref ""
-
 (** Returns list of particles from the file. If filename is empty string
     then returns default particles list *)
 let input_particles = function
@@ -1620,7 +1606,7 @@ let empty_base : cbase =
   }
 
 (** Extract information from the [gen.g_base] and create database *)
-let make_base bname gen per_index_ic per_ic =
+let make_base state bname gen per_index_ic per_ic =
   let _ =
     Printf.eprintf "pcnt %d persons %d\n" gen.g_pcnt
       (Array.length gen.g_base.c_persons);
@@ -1673,7 +1659,7 @@ let make_base bname gen per_index_ic per_ic =
     a
   in
   Gwdb.make bname
-    (input_particles !particules_file)
+    (input_particles state.particules_file)
     ( (persons, ascends, unions),
       (families, couples, descends),
       strings,
@@ -1708,7 +1694,7 @@ let output_command_line bdir =
   close_out oc
 
 (** Link .gwo files and create a database. *)
-let link ~save_mem next_family_fun bdir =
+let link ~save_mem state next_family_fun bdir =
   let tmp_dir = Filename.concat "gw_tmp" bdir in
   Files.mkdir_p tmp_dir;
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
@@ -1759,7 +1745,7 @@ let link ~save_mem next_family_fun bdir =
   (let rec loop () =
      match next_family () with
      | Some fam ->
-         insert_syntax fi.f_curr_src_file gen fam;
+         insert_syntax state fi.f_curr_src_file gen fam;
          loop ()
      | None -> ()
    in
@@ -1772,13 +1758,13 @@ let link ~save_mem next_family_fun bdir =
   Hashtbl.clear gen.g_names;
   Hashtbl.clear fi.f_local_names;
   Gc.compact ();
-  let base = make_base bdir gen per_index_ic per_ic in
+  let base = make_base state bdir gen per_index_ic per_ic in
   Hashtbl.clear gen.g_patch_p;
-  if !do_check && gen.g_pcnt > 0 then (
+  if state.do_check && gen.g_pcnt > 0 then (
     Check.check_base base (set_error base gen) (set_warning base) ignore;
-    if !pr_stats then Stats.(print_stats base @@ stat_base base));
+    if state.pr_stats then Stats.(print_stats base @@ stat_base base));
   if not gen.g_errored then (
-    if !do_consang then ignore @@ ConsangAll.compute base true;
+    if state.do_consang then ignore @@ ConsangAll.compute base true;
     Gwdb.sync ~save_mem base;
     output_wizard_notes bdir gen.g_wiznotes;
     Files.remove_dir tmp_dir;
