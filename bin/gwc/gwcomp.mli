@@ -76,21 +76,10 @@ type gw_syntax =
 val magic_gwo : string
 (** .gwo file header *)
 
-val line_cnt : int ref
-(** Line counter while reading .gw file *)
+val check_magic : string -> in_channel -> unit
+(** Checks a .gwo header and prints fails if header is absent or not compatible. *)
 
-val no_fail : bool ref
-(** Do not raise exception if syntax error occured.
-    Instead print error information on stdout *)
-
-val no_picture : bool ref
-(** Save path to the images *)
-
-val create_all_keys : bool ref
-(** Forces to create all the keys for every persons (even for ? ?).
-    Enabled for gwplus format. *)
-
-val comp_families : string -> unit
+val comp_families : State.t -> string -> unit
 (** Compile .gw file and save result to corresponding .gwo *)
 
 (* Ajout pour l'API *)
