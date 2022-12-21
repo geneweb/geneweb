@@ -486,22 +486,23 @@ function missing_events_options () {
                 %let;dd_at_level;%expr((level-1)/10)%in;
                 %let;percent;%expr(100*number_of_ancestors.v|number_of_ancestors_max)%in;
                 %let;percent_at_level;%expr(100*number_of_ancestors_at_level_|number_of_ancestors_max_at_level)%in;
-                <option value="%level;" title="" class="d-flex pl-2"
+                <option value="%level;" title="" class="d-flex px-2"
                   %if;(level<90)
                     data-full=' (+%number_of_ancestors_at_level_;) %number_of_ancestors;'
                     data-full_prefix='/%nn;
                       %if;(level<14)%number_of_ancestors_max;%else;%expr(number_of_ancestors_max|(10^(3*dd)))%end;
                        %if;(dd>9)>10³⁰%elseif;(dd=9)Y%nn;
                       %elseif;(dd=8)Y%elseif;(dd=7)Z%elseif;(dd=6)E%elseif;(dd=5)P%nn;
-                      %elseif;(dd=4)T%elseif;(dd=3)G%elseif;(dd=2)M%elseif;(dd=1 and level>13)k%else;%end;%if;(percent!=0) %percent;%%%end;'
+                      %elseif;(dd=4)T%elseif;(dd=3)G%elseif;(dd=2)M%elseif;(dd=1 and level>13)k%else;%end;'
                     data-full_style='background: linear-gradient(90deg, rgba(150,170,190,.2) %percent;%%, rgba(255,255,255,0) %percent;%%'
+                    data-percent='%if;(percent!=0) %percent;%%%end;'
                     data-only=' %number_of_ancestors_at_level_/%nn;
                       %if;(level<18)%number_of_ancestors_max_at_level;%else;%expr(number_of_ancestors_max_at_level|(10^(3*dd_at_level)))%end;
                        %if;(level>100)>10³⁰%elseif;(level>90)Y%nn;
                       %elseif;(level>80)Y%elseif;(level>70)Z%elseif;(level>60)E%elseif;(level>50)P%nn;
-                      %elseif;(level>40)T%elseif;(level>30)G%elseif;(level>20)M%elseif;(level>17)k%else;%end;
-                      %if;(percent_at_level!=0) %percent_at_level;%%%end;'
-                    data-only_style='background: linear-gradient(90deg, rgba(180,200,220,.2) %percent_at_level;%%, rgba(255,255,255,0) %percent_at_level;%%'>
+                      %elseif;(level>40)T%elseif;(level>30)G%elseif;(level>20)M%elseif;(level>17)k%else;%end;'
+                    data-only_style='background: linear-gradient(90deg, rgba(180,200,220,.2) %percent_at_level;%%, rgba(255,255,255,0) %percent_at_level;%%'
+                    data-percent_at_level='%if;(percent_at_level!=0) %percent_at_level;%%%end;'>
                   %end;
                   %sp;%apply;thegen%with;%apply;nth([nth (generation)], level)%end;%sp;%nn;
                 </option>
@@ -542,7 +543,7 @@ function missing_events_options () {
 <script>
 $(document).ready(function() {
   $("#v").select2({
-    templateResult: function(el) { return '<span class="onlycheck d-block pl-2" style="' + (($('#only').is(':checked')) ? ($(el.element).data('only_style') || '') : ($(el.element).data('full_style') || '')) + '" class="' + ($(el.element).prop('class') || '') + '">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + el.text +  (($('#only').is(':checked')) ? ($(el.element).data('only') || '') : ($(el.element).data('full') || '') + ($(el.element).data('full_prefix') || '') + ($(el.element).data('percent') || '')) + '</span>'; },
+    templateResult: function(el) { return '<div class="d-flex" style="' + (($('#only').is(':checked')) ? ($(el.element).data('only_style') || '') : ($(el.element).data('full_style') || '')) + '" class="' + ($(el.element).prop('class') || '') + '"><span class="onlycheck flex-grow-1 pl-2">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + el.text + '</span><span>' + (($('#only').is(':checked')) ? ($(el.element).data('only') || '') : ($(el.element).data('full') || '') + ($(el.element).data('full_prefix') || '') + '</span><span class="mr-1 text-right" style="width:2rem">' + ($(el.element).data('percent') || '')) + '</span></div>'; },
     templateSelection: function(el) { return '<span class="onlycheck">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + '</span><span>' + el.text + '</span><span>' + ($(el.element).data('full') || '') + '</span>'; },
     escapeMarkup: function(markup) { return markup; },
     width: "resolve",
@@ -551,8 +552,6 @@ $(document).ready(function() {
     theme: "classic"
   });
 });
-</script>
-<script>
   $("body").on('change', '#only', function() {
    ($('#only').is(':checked')) ? ($('.onlycheck').text("[only]")) : ($('.onlycheck').text("[up to]"))
   });
