@@ -1176,6 +1176,8 @@ type title_item =
   * istr list
   * (date option * date option) list
 
+type path_mode = Paths_cnt_raw | Paths_cnt | Paths
+
 type 'a env =
   | Vallgp of generation_person list
   | Vanc of generation_person
@@ -1243,6 +1245,61 @@ let max_l1_l2_aux env =
   let max_l2 = match get_env "max_desc_level" env with Vint i -> i | _ -> 5 in
   (max_l1 - 1, (2 * max_l1) + max_l2 + 20)
 
+let rec ascendants base acc l i =
+  match l with
+  | [] -> acc
+  | (ip, _, _) :: l -> (
+      match get_parents (poi base ip) with
+      | Some ifam ->
+          let cpl = foi base ifam in
+          let ifath = get_father cpl in
+          let imoth = get_mother cpl in
+          let acc = [ (ifath, [], ifath) ] @ acc in
+          let acc = [ (imoth, [], imoth) ] @ acc in
+          ascendants base acc l i
+      | None -> ascendants base acc l i)
+
+let descendants_aux base liste1 liste2 =
+  let liste2 = List.map (fun (ip, _, _) -> ip) liste2 in
+  let rec loop0 acc = function
+    | (ip, ifaml, ipar0) :: l ->
+        let fams = Array.to_list (get_family (poi base ip)) in
+        let chlds =
+          (* accumuler tous les enfants de ip *)
+          let rec loop1 acc fams =
+            (* iterer sur chaque famille *)
+            match fams with
+            | [] -> acc
+            | ifam :: fams ->
+                let children =
+                  let rec loop2 acc2 children =
+                    match children with
+                    | [] -> acc2
+                    | ipch :: children ->
+                        loop2 ((ipch, ifam :: ifaml, ipar0) :: acc2) children
+                  in
+                  loop2 [] (Array.to_list (get_children (foi base ifam)))
+                in
+                loop1 (acc @ children) fams
+          in
+          loop1 [] fams
+        in
+        let chlds =
+          List.fold_left (* on élimine les enfants présents dans l2 *)
+            (fun acc (ip, ifaml, ipar) ->
+              if List.mem ip liste2 then acc else (ip, ifaml, ipar) :: acc)
+            [] chlds
+        in
+        loop0 (chlds @ acc) l
+    | [] -> acc
+  in
+  loop0 [] liste1
+
+let descendants base cousins_cnt i j =
+  let liste1 = cousins_cnt.(i).(j - 1) in
+  let liste2 = if i > 0 then cousins_cnt.(i - 1).(j - 1) else [] in
+  descendants_aux base liste1 liste2
+
 let init_cousins_cnt _conf base env p () =
   match !cousins_t with
   | Some t -> t
@@ -1251,79 +1308,22 @@ let init_cousins_cnt _conf base env p () =
         let max_l1, max_l2 = max_l1_l2_aux env in
         Printf.sprintf "******** Compute %d × %d table ********\n" max_l1 max_l2
         |> !GWPARAM.syslog `LOG_WARNING;
-        let rec ascendants acc l i =
-          match l with
-          | [] -> acc
-          | (ip, _, _) :: l -> (
-              match get_parents (poi base ip) with
-              | Some ifam ->
-                  let cpl = foi base ifam in
-                  let ifath = get_father cpl in
-                  let imoth = get_mother cpl in
-                  let acc = [ (ifath, [], ifath) ] @ acc in
-                  let acc = [ (imoth, [], imoth) ] @ acc in
-                  ascendants acc l i
-              | None -> ascendants acc l i)
-        in
-        let descendants cousins_cnt i j =
-          let list1 = cousins_cnt.(i).(j - 1) in
-          let list2 = if i > 0 then cousins_cnt.(i - 1).(j - 1) else [] in
-          let list2 = List.map (fun (ip, _, _) -> ip) list2 in
-          let rec loop0 acc = function
-            (* iterer sur les personnes dans list1 *)
-            | (ip, ifaml, ipar0) :: l ->
-                let fams = Array.to_list (get_family (poi base ip)) in
-                let chlds =
-                  (* accumuler tous les enfants de ip *)
-                  let rec loop1 acc fams =
-                    (* iterer sur chaque famille *)
-                    match fams with
-                    | [] -> acc
-                    | ifam :: fams ->
-                        let children =
-                          let rec loop2 acc2 children =
-                            match children with
-                            | [] -> acc2
-                            | ipch :: children ->
-                                loop2
-                                  ((ipch, ifam :: ifaml, ipar0) :: acc2)
-                                  children
-                          in
-                          loop2 []
-                            (Array.to_list (get_children (foi base ifam)))
-                        in
-                        loop1 (acc @ children) fams
-                  in
-                  loop1 [] fams
-                in
-                let chlds =
-                  List.fold_left (* on élimine les enfants présents dans l2 *)
-                    (fun acc (ip, ifaml, ipar) ->
-                      if List.mem ip list2 then acc
-                      else (ip, ifaml, ipar) :: acc)
-                    [] chlds
-                in
-                loop0 (chlds @ acc) l
-            | [] -> acc
-          in
-          loop0 [] list1
-        in
         (* TODO test for Sys.max_array_length *)
         let cousins_cnt = Array.make_matrix (max_l2 + 1) (max_l2 + 1) [] in
         cousins_cnt.(0).(0) <-
           [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper) ];
         let rec loop0 j =
           (* initiate lists of direct descendants *)
-          cousins_cnt.(0).(j) <- descendants cousins_cnt 0 j;
+          cousins_cnt.(0).(j) <- descendants base cousins_cnt 0 j;
           if j < max_l2 then loop0 (j + 1) else ()
         in
         loop0 1;
         let rec loop1 i =
           (* get ascendants *)
-          cousins_cnt.(i).(0) <- ascendants [] cousins_cnt.(i - 1).(0) i;
+          cousins_cnt.(i).(0) <- ascendants base [] cousins_cnt.(i - 1).(0) i;
           let rec loop2 i j =
             (* get descendants of c1, except persons of previous level (c2) *)
-            cousins_cnt.(i).(j) <- descendants cousins_cnt i j;
+            cousins_cnt.(i).(j) <- descendants base cousins_cnt i j;
             if j < max_l2 then loop2 i (j + 1)
             else if i < max_l1 then loop1 (i + 1)
             else ()
@@ -1391,6 +1391,44 @@ let cousins_fold list =
         if first || cnt0 = 0 then acc else (ip0, (ifaml0, iancl0, cnt0)) :: acc
   in
   loop false [] (Gwdb.dummy_iper, ([], [], 0)) list
+
+let anc_cnt_aux base env lev at_to p =
+  let max_anc = match get_env "max_anc_level" env with Vint i -> i | _ -> 5 in
+  let asc_cnt = Array.make max_anc [] in
+  asc_cnt.(0) <- [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper) ];
+  let rec loop1 i =
+    if i > lev then ()
+    else (
+      asc_cnt.(i) <- ascendants base [] asc_cnt.(i - 1) i;
+      loop1 (i + 1))
+  in
+  loop1 1;
+  if at_to then Some asc_cnt.(lev)
+  else
+    let rec loop acc i =
+      if i > lev then Some acc else loop (asc_cnt.(i) @ acc) (i + 1)
+    in
+    loop asc_cnt.(0) 1
+
+let desc_cnt_aux base env lev at_to p =
+  let max_desc =
+    match get_env "max_desc_level" env with Vint i -> i | _ -> 5
+  in
+  let desc_cnt = Array.make (max_desc + 1) [] in
+  desc_cnt.(0) <- [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper) ];
+  let rec loop1 i =
+    if i > lev then ()
+    else (
+      desc_cnt.(i) <- descendants_aux base desc_cnt.(i - 1) [];
+      loop1 (i + 1))
+  in
+  loop1 1;
+  if at_to then Some desc_cnt.(lev)
+  else
+    let rec loop acc i =
+      if i > lev then Some acc else loop (desc_cnt.(i) @ acc) (i + 1)
+    in
+    loop desc_cnt.(1) 2
 
 let bool_val x = VVbool x
 let str_val x = VVstring x
@@ -1522,7 +1560,7 @@ let number_of_descendants_aux conf base env all_levels sl eval_int =
                 else cnt)
               0 (Gwdb.ipers base)
           in
-          VVstring (eval_int conf (cnt - 1) sl)
+          VVstring (eval_int conf (if all_levels then cnt - 1 else cnt) sl)
       | _ -> raise Not_found)
   | _ -> raise Not_found
 
@@ -1951,6 +1989,35 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Vanc gp -> eval_ancestor_field_var conf base env gp loc sl
       | Vanc_surn info -> eval_anc_by_surnl_field_var conf base env ep info sl
       | _ -> raise Not_found)
+  | "descendant" :: sl -> (
+      match get_env "descendant" env with
+      | Vind p ->
+          let ep = (p, authorized_age conf base p) in
+          eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found)
+  | "anc_paths_cnt_raw" :: sl ->
+      eval_anc_paths_cnt conf base env ep Paths_cnt_raw false loc sl
+  | "anc_paths_cnt" :: sl ->
+      eval_anc_paths_cnt conf base env ep Paths_cnt false loc sl
+  | "anc_paths" :: sl -> eval_anc_paths_cnt conf base env ep Paths false loc sl
+  | "anc_paths_at_levl_cnt_raw" :: sl ->
+      eval_anc_paths_cnt conf base env ep Paths_cnt_raw true loc sl
+  | "anc_paths_at_levl_cnt" :: sl ->
+      eval_anc_paths_cnt conf base env ep Paths_cnt true loc sl
+  | "anc_paths_at_levl" :: sl ->
+      eval_anc_paths_cnt conf base env ep Paths true loc sl
+  | "desc_paths_cnt_raw" :: sl ->
+      eval_desc_paths_cnt conf base env ep Paths_cnt_raw false loc sl
+  | "desc_paths_cnt" :: sl ->
+      eval_desc_paths_cnt conf base env ep Paths_cnt false loc sl
+  | "desc_paths" :: sl ->
+      eval_desc_paths_cnt conf base env ep Paths false loc sl
+  | "desc_paths_at_levl_cnt_raw" :: sl ->
+      eval_desc_paths_cnt conf base env ep Paths_cnt_raw true loc sl
+  | "desc_paths_at_levl_cnt" :: sl ->
+      eval_desc_paths_cnt conf base env ep Paths_cnt true loc sl
+  | "desc_paths_at_levl" :: sl ->
+      eval_desc_paths_cnt conf base env ep Paths true loc sl
   | ("baptism_witness" as s) :: sl
   | ("birth_witness" as s) :: sl
   | ("burial_witness" as s) :: sl
@@ -2073,15 +2140,15 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | _ -> raise Not_found)
   | "number_of_ancestors" :: sl -> (
       match get_env "nbr_a" env with
-      | Vint n -> VVstring (eval_int conf (n - 1) sl)
+      | Vint n -> VVstring (eval_int conf n sl)
       | _ -> raise Not_found)
-  | "number_of_ancestors_at_level" :: sl -> (
+  | "number_of_ancestors_at_level" :: sl | "nbr_anc_at_levl" :: sl -> (
       match get_env "nbr_a_l" env with
-      | Vint n -> VVstring (eval_int conf (n - 1) sl)
+      | Vint n -> VVstring (eval_int conf n sl)
       | _ -> raise Not_found)
-  | "number_of_descendants" :: sl ->
+  | "number_of_descendants" :: sl | "nbr_desc" :: sl ->
       number_of_descendants_aux conf base env true sl eval_int
-  | "number_of_descendants_at_level" :: sl ->
+  | "number_of_descendants_at_level" :: sl | "nbr_desc_at_levl" :: sl ->
       number_of_descendants_aux conf base env false sl eval_int
   | "parent" :: sl -> (
       match get_env "parent" env with
@@ -2265,6 +2332,74 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           eval_witness_relation_var conf base env (i, f, c, m) loc sl
       | _ -> raise Not_found)
   | sl -> eval_person_field_var conf base env ep loc sl
+
+and eval_anc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
+  | "level" :: sl -> (
+      match get_env "level" env with
+      | Vint lev -> (
+          match path_mode with
+          | Paths_cnt_raw -> (
+              let list1 = anc_cnt_aux base env lev at_to p in
+              match list1 with
+              | Some list1 ->
+                  VVstring
+                    (eval_int conf
+                       (List.length list1 - if at_to then 0 else 1)
+                       sl)
+              | None -> VVstring "no ancestor list")
+          | Paths_cnt -> (
+              let list1 = anc_cnt_aux base env lev at_to p in
+              match list1 with
+              | Some list ->
+                  VVstring
+                    (eval_int conf
+                       (List.length (cousins_fold list) - if at_to then 0 else 1)
+                       sl)
+              | None -> VVstring "no ancestor list")
+          | Paths -> (
+              let list1 = anc_cnt_aux base env lev at_to p in
+              match list1 with
+              | Some list -> (
+                  match get_env "cousins" env with
+                  | Vcousl l ->
+                      l := cousins_fold list;
+                      VVstring ""
+                  | _ -> VVstring "")
+              | None -> VVstring ""))
+      | _ -> VVstring "")
+  | _ -> VVstring ""
+
+and eval_desc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
+  | "level" :: sl -> (
+      match get_env "level" env with
+      | Vint lev -> (
+          match path_mode with
+          | Paths_cnt_raw -> (
+              let list1 = desc_cnt_aux base env lev at_to p in
+              match list1 with
+              | Some list1 -> VVstring (eval_int conf (List.length list1) sl)
+              | None -> VVstring "no descendant list")
+          | Paths_cnt -> (
+              let list1 = desc_cnt_aux base env lev at_to p in
+              match list1 with
+              | Some list ->
+                  VVstring
+                    (eval_int conf
+                       (List.length (cousins_fold list) - if at_to then 0 else 1)
+                       sl)
+              | None -> VVstring "no descendant list")
+          | Paths -> (
+              let list1 = desc_cnt_aux base env lev at_to p in
+              match list1 with
+              | Some list -> (
+                  match get_env "cousins" env with
+                  | Vcousl l ->
+                      l := cousins_fold list;
+                      VVstring ""
+                  | _ -> raise Not_found)
+              | None -> raise Not_found))
+      | _ -> raise Not_found)
+  | _ -> raise Not_found
 
 and eval_item_field_var ell = function
   | [ s ] -> (
@@ -3929,6 +4064,22 @@ let print_foreach conf base print_ast eval_expr =
               loop false gl
         in
         loop true gpl
+    | Vcousl gpl ->
+        let rec loop first gpl =
+          match gpl with
+          | [] -> ()
+          | (ip, (ifaml, _ipl, _cnt)) :: gpl ->
+              (let ifam = List.nth ifaml 0 in
+               let gp = GP_person (Sosa.one, ip, Some ifam) in
+               let env =
+                 ("ancestor", Vanc gp) :: ("first", Vbool first)
+                 :: ("last", Vbool (gpl = []))
+                 :: env
+               in
+               List.iter (print_ast env ep) al);
+              loop false gpl
+        in
+        loop true !gpl
     | _ -> ()
   in
   let print_foreach_ancestor_level env el al ((p, _) as ep) =
@@ -3941,7 +4092,7 @@ let print_foreach conf base print_ast eval_expr =
     let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
     let rec loop gpl i n =
       let prev_n = n in
-      if i > max_level then ()
+      if i >= max_level then ()
       else
         let n =
           List.fold_left
@@ -3952,7 +4103,8 @@ let print_foreach conf base print_ast eval_expr =
             n gpl
         in
         let env =
-          ("gpl", Vgpl gpl) :: ("level", Vint i) :: ("nbr_a", Vint n)
+          ("gpl", Vgpl gpl) :: ("level", Vint i)
+          :: ("nbr_a", Vint (n - 1))
           :: ("nbr_a_l", Vint (n - prev_n))
           :: env
         in
@@ -3960,7 +4112,7 @@ let print_foreach conf base print_ast eval_expr =
         let gpl = next_generation conf base mark gpl in
         loop gpl (succ i) n
     in
-    loop [ GP_person (Sosa.one, get_iper p, None) ] 1 0
+    loop [ GP_person (Sosa.one, get_iper p, None) ] 0 0
   in
   let print_foreach_ancestor_at_level env al ((p, _) as ep) =
     let max_lev = "max_anc_level" in
@@ -4123,14 +4275,21 @@ let print_foreach conf base print_ast eval_expr =
         )
     | _ -> ()
   in
-  let print_foreach_descendant env al (p, _) =
+  let print_foreach_descendant env al (p, _) count_paths =
     let lev = match get_env "level" env with Vint lev -> lev | _ -> 0 in
     let ifam_l = get_descendants_at_level base p lev in
     let ip_l =
-      List.flatten
-        (List.fold_left
-           (fun acc ifam -> Array.to_list (get_children (foi base ifam)) :: acc)
-           [] ifam_l)
+      if count_paths then
+        let ip_l =
+          match get_env "cousins" env with Vcousl l -> !l | _ -> []
+        in
+        List.map (fun (ip, (_, _, _)) -> ip) ip_l
+      else
+        List.flatten
+          (List.fold_left
+             (fun acc ifam ->
+               Array.to_list (get_children (foi base ifam)) :: acc)
+             [] ifam_l)
     in
     let rec loop i ip_l =
       match ip_l with
@@ -4660,7 +4819,8 @@ let print_foreach conf base print_ast eval_expr =
     | "child" -> print_foreach_child env al ep efam
     | "cous_path" -> print_foreach_cousin_path env al ep "cousins"
     | "cousin_level" -> print_foreach_cousin_level env al ep
-    | "descendant" -> print_foreach_descendant env al ep
+    | "descendant" -> print_foreach_descendant env al ep false
+    | "descendant_cnt" -> print_foreach_descendant env al ep true
     | "descendant_level" -> print_foreach_descendant_level env al ep
     | "event" -> print_foreach_event env al ep
     | "family" -> print_foreach_family env al ini_ep ep
