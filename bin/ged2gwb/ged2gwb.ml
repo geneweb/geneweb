@@ -148,6 +148,7 @@ let () =
   try main ()
   with e ->
     let e = match e with Ploc.Exc (_, e) -> e | _ -> e in
-    Printf.fprintf !State.log_oc "Uncaught exception: %s\n" (Printexc.to_string e);
+    Printf.fprintf !State.log_oc "Uncaught exception: %s\n"
+      (Printexc.to_string e);
     if !State.log_oc != stdout then close_out !State.log_oc;
     exit 2
