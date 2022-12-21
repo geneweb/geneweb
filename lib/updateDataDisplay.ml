@@ -65,6 +65,7 @@ let print_mod_ok conf base =
     Output.print_sstring conf (transl conf ":");
     Output.print_sstring conf " ";
     Output.print_sstring conf (min nb_pers max_updates |> string_of_int);
+    Output.print_sstring conf " ";
     if List.assoc_opt "history" conf.base_env = Some "yes" then (
       Output.print_sstring conf "<a href=\"";
       Output.print_string conf (commd conf);
