@@ -60,7 +60,6 @@
 %define;cousins_cnt(vvv,www)
   %cousins_cnt.vvv.www;
 %end;
-
 %( TODO : si cousin est sosa de la racine ajouter l'icone sosa verte devant le nom
 si mort <3 ans icone bébé, <15 ans enfant ?? %)
 %empty_sorted_list;%empty_sorted_listb;%empty_sorted_listc;
@@ -74,12 +73,12 @@ si mort <3 ans icone bébé, <15 ans enfant ?? %)
       <li class="card text-small nbr_%cousin.nbr; ml-n-1 py-1 pr-1 pl-0 rounded border-top-0 border-bottom-0 border-%if;(cousin.sex=0)primary%elseif;(cousin.sex=1)danger%else;dark%end;"%if;(cous_isdead=0) data-alive="%cous_isdead;"%end; style="border-left-width:%if;(cous_isdead=1)5px;background-color:rgba(245,231,216,0.95);%else;10px;%end;%if;(cous_nodesc!=1)border-style:double;%end;"
       data-birthdate="%(%apply;index("p",cousin.index,"slash_marriage_date")%)">%nn;
         <div class="d-flex d-inline justify-content-between align-items-start ml-n2 position-relative " style="z-index:1">
-          <div class="d-block w-auto h-100 pl-0 pr-1 align-self-center bg-dark order-1" title="[navigation] [with]…" data-toggle="tooltip"  style="z-index:1">
-            <a role="button" href="%prefix;%cousin.access;&m=C&v=%e.v;" class="my-3 stretched-link w-auto text-%if;(cous_sex=0)primary%else;danger%end;" style="z-index:1">&bullet;</a>
+          <div class="d-block w-auto h-100 pl-0 pr-1 align-self-center%( bg-dark%) order-1" title="[navigation] [with]…" data-toggle="tooltip" style="z-index:1">
+            <a role="button" href="%prefix;%cousin.access;&m=C&v=%e.v;" class="my-3 stretched-link w-auto text-%if;(cous_sex=0)primary%else;danger%end;" style="z-index:1">  </a>
           </div>
           %if;(www!=0)
-            <div class="d-block w-auto align-self-center position-relative order-3" >
-              <a role="button" class="btn px-1 mx-0" data-toggle="tooltip" data-html="true"
+            <div class="d-block w-auto align-self-start position-relative order-3" >
+              <a role="button" class="btn px-1 mx-0 stretched-link" data-toggle="tooltip" data-html="true" style="z-index:1"
                 href="%prefix;m=RL&i=%if;(vvv=0)%self.index;%else;%cousin.anc1.index;%end;&l1=vvv&i1=%self.index;&l2=www&i2=%cousin.index;%nn;
                 %if;(cousin.nbr>1)&dag=on%end;"%sp;
                 title="%apply;a_of_b%with;%if;(cousin.sex=0)[cousin.0.www]0%else;[cousin.0.www]1%end;%and;%cousin.anc1.first_name; %cousin.anc1.surname; %(%cousin.anc1.dates;%)
@@ -88,14 +87,15 @@ si mort <3 ans icone bébé, <15 ans enfant ?? %)
                 <span class="small%if;(cousin.nbr>2)mr-1%end;"><sup>%if;(cousin.nbr>2)%cousin.nbr;%else; %end;</sup></span></a>
             </div>
           %end;
+          %(%let;cousin_age;%apply;index("p",cousin.index,"age")%in;%%)
           <div class="d-block mx-auto h-100 align-self-center px-0 order-2
             text-truncate text-start text-nowrap position-relative" style="line-height:2.0rem;width:85%%;">
-            <a role="button" href="%prefix;em=R&et=A&ei=%self.index;&i=%cousin.index;"
+            <a role="button" href="%prefix;em=R&et=A&ei=%self.index;&i=%cousin.index;" style="z-index:1"
               data-toggle="tooltip" data-html="true" class="stretched-link w-auto%if;(cous_isdead=1) ml-1%end;"
-              title="%cousin.first_name;.%cousin.occ; %cousin.surname;
-              %(%cousin.dates; bug w. balise <bdo> in dates %) (%cousin.anc_f_list;)"
-              data-anclist="%cousin.anc_f_list;">
-              %apply;index%with;p%and;%cousin.index;%and;age%end; %cousin.surname; %cousin.first_name; %cousin.dates;</a>
+              title="%cousin.first_name;.%cousin.occ; %cousin.surname;"
+              data-anclist="%cousin.anc_f_list;">%cousin.surname; %cousin.first_name;
+              %cousin.dates;%(%if;(cous_isdead=0) %cousin_age;%end;%)
+            </a>
           </div>
         </div>
      </li>%and;%cousin.cnt;%and;%cousin.index;%end;
