@@ -1394,21 +1394,23 @@ let cousins_fold list =
 
 let anc_cnt_aux base env lev at_to p =
   let max_anc = match get_env "max_anc_level" env with Vint i -> i | _ -> 5 in
-  let asc_cnt = Array.make max_anc [] in
+  let asc_cnt = Array.make (max_anc + 1) [] in
   asc_cnt.(0) <- [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper) ];
   let rec loop1 i =
-    if i > lev then ()
+    if i > lev || i >= Array.length asc_cnt - 1 then ()
     else (
       asc_cnt.(i) <- ascendants base [] asc_cnt.(i - 1) i;
       loop1 (i + 1))
   in
   loop1 1;
-  if at_to then Some asc_cnt.(lev)
+  if at_to then if lev < Array.length asc_cnt then Some asc_cnt.(lev) else None
   else
     let rec loop acc i =
-      if i > lev then Some acc else loop (asc_cnt.(i) @ acc) (i + 1)
+      if i > lev || i >= Array.length asc_cnt - 1 then Some acc
+      else loop (asc_cnt.(i) @ acc) (i + 1)
     in
-    loop asc_cnt.(0) 1
+    (* start at 1 to ignore first gen (i.e. me) *)
+    loop asc_cnt.(1) 1
 
 let desc_cnt_aux base env lev at_to p =
   let max_desc =
@@ -1417,18 +1419,21 @@ let desc_cnt_aux base env lev at_to p =
   let desc_cnt = Array.make (max_desc + 1) [] in
   desc_cnt.(0) <- [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper) ];
   let rec loop1 i =
-    if i > lev then ()
+    if i > lev || i >= Array.length desc_cnt - 1 then ()
     else (
       desc_cnt.(i) <- descendants_aux base desc_cnt.(i - 1) [];
       loop1 (i + 1))
   in
   loop1 1;
-  if at_to then Some desc_cnt.(lev)
+  if at_to then
+    if lev < Array.length desc_cnt then Some desc_cnt.(lev) else None
   else
     let rec loop acc i =
-      if i > lev then Some acc else loop (desc_cnt.(i) @ acc) (i + 1)
+      if i > lev || i >= Array.length desc_cnt - 1 then Some acc
+      else loop (desc_cnt.(i) @ acc) (i + 1)
     in
-    loop desc_cnt.(1) 2
+    (* start at 1 to ignore first gen (i.e. me) *)
+    loop desc_cnt.(1) 1
 
 let bool_val x = VVbool x
 let str_val x = VVstring x
@@ -2346,7 +2351,7 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
                     (eval_int conf
                        (List.length list1 - if at_to then 0 else 1)
                        sl)
-              | None -> VVstring "no ancestor list")
+              | None -> VVstring "")
           | Paths_cnt -> (
               let list1 = anc_cnt_aux base env lev at_to p in
               match list1 with
@@ -2355,7 +2360,7 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
                     (eval_int conf
                        (List.length (cousins_fold list) - if at_to then 0 else 1)
                        sl)
-              | None -> VVstring "no ancestor list")
+              | None -> VVstring "")
           | Paths -> (
               let list1 = anc_cnt_aux base env lev at_to p in
               match list1 with
@@ -4092,7 +4097,7 @@ let print_foreach conf base print_ast eval_expr =
     let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
     let rec loop gpl i n =
       let prev_n = n in
-      if i >= max_level then ()
+      if i > max_level then ()
       else
         let n =
           List.fold_left
@@ -4112,7 +4117,7 @@ let print_foreach conf base print_ast eval_expr =
         let gpl = next_generation conf base mark gpl in
         loop gpl (succ i) n
     in
-    loop [ GP_person (Sosa.one, get_iper p, None) ] 0 0
+    loop [ GP_person (Sosa.one, get_iper p, None) ] 1 0
   in
   let print_foreach_ancestor_at_level env al ((p, _) as ep) =
     let max_lev = "max_anc_level" in
