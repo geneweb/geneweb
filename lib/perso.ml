@@ -2000,11 +2000,11 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | "anc_paths_cnt" :: sl ->
       eval_anc_paths_cnt conf base env ep Paths_cnt false loc sl
   | "anc_paths" :: sl -> eval_anc_paths_cnt conf base env ep Paths false loc sl
-  | "anc_paths_at_levl_cnt_raw" :: sl ->
+  | "anc_paths_at_level_cnt_raw" :: sl ->
       eval_anc_paths_cnt conf base env ep Paths_cnt_raw true loc sl
-  | "anc_paths_at_levl_cnt" :: sl ->
+  | "anc_paths_at_level_cnt" :: sl ->
       eval_anc_paths_cnt conf base env ep Paths_cnt true loc sl
-  | "anc_paths_at_levl" :: sl ->
+  | "anc_paths_at_level" :: sl ->
       eval_anc_paths_cnt conf base env ep Paths true loc sl
   | "desc_paths_cnt_raw" :: sl ->
       eval_desc_paths_cnt conf base env ep Paths_cnt_raw false loc sl
@@ -2012,11 +2012,11 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       eval_desc_paths_cnt conf base env ep Paths_cnt false loc sl
   | "desc_paths" :: sl ->
       eval_desc_paths_cnt conf base env ep Paths false loc sl
-  | "desc_paths_at_levl_cnt_raw" :: sl ->
+  | "desc_paths_at_level_cnt_raw" :: sl ->
       eval_desc_paths_cnt conf base env ep Paths_cnt_raw true loc sl
-  | "desc_paths_at_levl_cnt" :: sl ->
+  | "desc_paths_at_level_cnt" :: sl ->
       eval_desc_paths_cnt conf base env ep Paths_cnt true loc sl
-  | "desc_paths_at_levl" :: sl ->
+  | "desc_paths_at_level" :: sl ->
       eval_desc_paths_cnt conf base env ep Paths true loc sl
   | ("baptism_witness" as s) :: sl
   | ("birth_witness" as s) :: sl
@@ -2142,13 +2142,13 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       match get_env "nbr_a" env with
       | Vint n -> VVstring (eval_int conf n sl)
       | _ -> raise Not_found)
-  | "number_of_ancestors_at_level" :: sl | "nbr_anc_at_levl" :: sl -> (
+  | "number_of_ancestors_at_level" :: sl | "nbr_anc_at_level" :: sl -> (
       match get_env "nbr_a_l" env with
       | Vint n -> VVstring (eval_int conf n sl)
       | _ -> raise Not_found)
   | "number_of_descendants" :: sl | "nbr_desc" :: sl ->
       number_of_descendants_aux conf base env true sl eval_int
-  | "number_of_descendants_at_level" :: sl | "nbr_desc_at_levl" :: sl ->
+  | "number_of_descendants_at_level" :: sl | "nbr_desc_at_level" :: sl ->
       number_of_descendants_aux conf base env false sl eval_int
   | "parent" :: sl -> (
       match get_env "parent" env with
