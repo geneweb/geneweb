@@ -139,7 +139,7 @@ let export conf base =
       Wserver.header
         (Printf.sprintf "Content-disposition: attachment; filename=\"%s\"" fname);
       (match output with
-      | `ged -> Gwb2gedLib.gwb2ged false opts select
+      | `ged -> Gwb2ged_lib.gwb2ged false opts select
       | `gw ->
           GwuLib.prepare_free_occ ~select:(fst select) base;
           Output.print_sstring conf "encoding: utf-8\n";
