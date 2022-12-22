@@ -2077,6 +2077,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Vstring s -> VVstring s
       | _ -> raise Not_found)
   | [ "base"; "name" ] -> VVstring conf.bname
+  | [ "plugin"; plugin ] ->
+      VVbool (List.mem plugin (List.map Filename.basename conf.plugins))
   | "base" :: "nb_persons" :: sl ->
       VVstring (eval_int conf (nb_of_persons base) sl)
   | "base" :: "real_nb_persons" :: sl ->
