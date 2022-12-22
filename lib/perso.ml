@@ -1300,7 +1300,7 @@ let descendants base cousins_cnt i j =
   let liste2 = if i > 0 then cousins_cnt.(i - 1).(j - 1) else [] in
   descendants_aux base liste1 liste2
 
-let init_cousins_cnt _conf base env p () =
+let init_cousins_cnt base env p =
   match !cousins_t with
   | Some t -> t
   | None ->
@@ -1336,11 +1336,9 @@ let init_cousins_cnt _conf base env p () =
       cousins_t := Some t';
       t'
 
-let max_l1_l2 _conf base env p =
+let max_l1_l2 base env p =
   let cousins_cnt =
-    match !cousins_t with
-    | Some t -> t
-    | None -> init_cousins_cnt _conf base env p ()
+    match !cousins_t with Some t -> t | None -> init_cousins_cnt base env p
   in
   let max_l1, max_l2 = max_l1_l2_aux env in
   let max_i =
@@ -1357,12 +1355,12 @@ let max_l1_l2 _conf base env p =
   in
   loop 0 0
 
-let cousins_l1_l2_aux conf base env l1 l2 p =
+let cousins_l1_l2_aux base env l1 l2 p =
   let il1 = int_of_string l1 in
   let il2 = int_of_string l2 in
   let max_l1, max_l2 = max_l1_l2_aux env in
   if il1 <= max_l1 && il2 - il1 <= max_l2 then
-    let cousins_cnt = init_cousins_cnt conf base env p () in
+    let cousins_cnt = init_cousins_cnt base env p in
     (* gros calcul *)
     Some cousins_cnt.(il1).(il2)
   else None
@@ -1392,17 +1390,57 @@ let cousins_fold list =
   in
   loop false [] (Gwdb.dummy_iper, ([], [], 0)) list
 
+let asc_cnt_t = ref None
+let desc_cnt_t = ref None
+
+let init_asc_cnt base env p =
+  match !asc_cnt_t with
+  | Some t -> t
+  | None ->
+      let t' =
+        let max_asc =
+          match get_env "max_anc_level" env with Vint i -> i | _ -> 5
+        in
+        let asc_cnt = Array.make (max_asc + 1) [] in
+        asc_cnt.(0) <- [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper) ];
+        let rec loop1 i =
+          if i > max_asc || i >= Array.length asc_cnt - 1 then ()
+          else (
+            asc_cnt.(i) <- ascendants base [] asc_cnt.(i - 1) i;
+            loop1 (i + 1))
+        in
+        loop1 1;
+        asc_cnt
+      in
+      asc_cnt_t := Some t';
+      t'
+
+let init_desc_cnt base env p =
+  match !desc_cnt_t with
+  | Some t -> t
+  | None ->
+      let t' =
+        let max_desc =
+          match get_env "max_desc_level" env with Vint i -> i | _ -> 5
+        in
+        let desc_cnt = Array.make (max_desc + 1) [] in
+        desc_cnt.(0) <- [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper) ];
+        let rec loop1 i =
+          if i > max_desc || i >= Array.length desc_cnt - 1 then ()
+          else (
+            desc_cnt.(i) <- descendants_aux base desc_cnt.(i - 1) [];
+            loop1 (i + 1))
+        in
+        loop1 1;
+        desc_cnt
+      in
+      desc_cnt_t := Some t';
+      t'
+
 let anc_cnt_aux base env lev at_to p =
-  let max_anc = match get_env "max_anc_level" env with Vint i -> i | _ -> 5 in
-  let asc_cnt = Array.make (max_anc + 1) [] in
-  asc_cnt.(0) <- [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper) ];
-  let rec loop1 i =
-    if i > lev || i >= Array.length asc_cnt - 1 then ()
-    else (
-      asc_cnt.(i) <- ascendants base [] asc_cnt.(i - 1) i;
-      loop1 (i + 1))
+  let asc_cnt =
+    match !asc_cnt_t with Some t -> t | None -> init_asc_cnt base env p
   in
-  loop1 1;
   if at_to then if lev < Array.length asc_cnt then Some asc_cnt.(lev) else None
   else
     let rec loop acc i =
@@ -1413,18 +1451,9 @@ let anc_cnt_aux base env lev at_to p =
     loop asc_cnt.(1) 1
 
 let desc_cnt_aux base env lev at_to p =
-  let max_desc =
-    match get_env "max_desc_level" env with Vint i -> i | _ -> 5
+  let desc_cnt =
+    match !desc_cnt_t with Some t -> t | None -> init_desc_cnt base env p
   in
-  let desc_cnt = Array.make (max_desc + 1) [] in
-  desc_cnt.(0) <- [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper) ];
-  let rec loop1 i =
-    if i > lev || i >= Array.length desc_cnt - 1 then ()
-    else (
-      desc_cnt.(i) <- descendants_aux base desc_cnt.(i - 1) [];
-      loop1 (i + 1))
-  in
-  loop1 1;
   if at_to then
     if lev < Array.length desc_cnt then Some desc_cnt.(lev) else None
   else
@@ -2339,7 +2368,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | sl -> eval_person_field_var conf base env ep loc sl
 
 and eval_anc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
-  | "level" :: sl -> (
+  | sl -> (
       match get_env "level" env with
       | Vint lev -> (
           match path_mode with
@@ -2351,7 +2380,7 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
                     (eval_int conf
                        (List.length list1 - if at_to then 0 else 1)
                        sl)
-              | None -> VVstring "")
+              | None -> raise Not_found)
           | Paths_cnt -> (
               let list1 = anc_cnt_aux base env lev at_to p in
               match list1 with
@@ -2360,7 +2389,7 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
                     (eval_int conf
                        (List.length (cousins_fold list) - if at_to then 0 else 1)
                        sl)
-              | None -> VVstring "")
+              | None -> raise Not_found)
           | Paths -> (
               let list1 = anc_cnt_aux base env lev at_to p in
               match list1 with
@@ -2369,13 +2398,12 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
                   | Vcousl l ->
                       l := cousins_fold list;
                       VVstring ""
-                  | _ -> VVstring "")
-              | None -> VVstring ""))
-      | _ -> VVstring "")
-  | _ -> VVstring ""
+                  | _ -> raise Not_found)
+              | None -> raise Not_found))
+      | _ -> raise Not_found)
 
 and eval_desc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
-  | "level" :: sl -> (
+  | sl -> (
       match get_env "level" env with
       | Vint lev -> (
           match path_mode with
@@ -2383,7 +2411,7 @@ and eval_desc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
               let list1 = desc_cnt_aux base env lev at_to p in
               match list1 with
               | Some list1 -> VVstring (eval_int conf (List.length list1) sl)
-              | None -> VVstring "no descendant list")
+              | None -> raise Not_found)
           | Paths_cnt -> (
               let list1 = desc_cnt_aux base env lev at_to p in
               match list1 with
@@ -2392,7 +2420,7 @@ and eval_desc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
                     (eval_int conf
                        (List.length (cousins_fold list) - if at_to then 0 else 1)
                        sl)
-              | None -> VVstring "no descendant list")
+              | None -> raise Not_found)
           | Paths -> (
               let list1 = desc_cnt_aux base env lev at_to p in
               match list1 with
@@ -2404,7 +2432,6 @@ and eval_desc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
                   | _ -> raise Not_found)
               | None -> raise Not_found))
       | _ -> raise Not_found)
-  | _ -> raise Not_found
 
 and eval_item_field_var ell = function
   | [ s ] -> (
@@ -2705,17 +2732,17 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       | Vint cnt -> VVstring (string_of_int cnt)
       | _ -> VVstring "")
   | [ "cous_paths_cnt_raw"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
+      let list1 = cousins_l1_l2_aux base env l1 l2 p in
       match list1 with
       | Some list1 -> VVstring (string_of_int (List.length list1))
       | None -> VVstring "no cousin list")
   | [ "cous_paths_cnt"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
+      let list1 = cousins_l1_l2_aux base env l1 l2 p in
       match list1 with
       | Some list -> VVstring (string_of_int (List.length (cousins_fold list)))
       | None -> VVstring "no cousin list")
   | [ "cous_paths"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
+      let list1 = cousins_l1_l2_aux base env l1 l2 p in
       match list1 with
       | Some list -> (
           match get_env "cousins" env with
@@ -2725,13 +2752,13 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           | _ -> raise Not_found)
       | None -> raise Not_found)
   | [ "cousins"; "max_a" ] ->
-      let max_a, _ = max_l1_l2 conf base env p in
+      let max_a, _ = max_l1_l2 base env p in
       VVstring (string_of_int max_a)
   | [ "cousins"; "max_d" ] ->
-      let _, max_d = max_l1_l2 conf base env p in
+      let _, max_d = max_l1_l2 base env p in
       VVstring (string_of_int max_d)
   | [ "cousins_cnt"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
+      let list1 = cousins_l1_l2_aux base env l1 l2 p in
       match list1 with
       | Some list ->
           let list =

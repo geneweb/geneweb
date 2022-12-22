@@ -505,12 +505,12 @@ function missing_events_options () {
                 %let;dd;%expr(levelp/10)%in;
                 %let;dd_at_level;%expr(level/10)%in;
                 %let;percent;%expr(100*number_of_ancestors.v|number_of_ancestors_max)%in;
-                %let;percent_paths;%expr(100*anc_paths_cnt_raw.level.v|number_of_ancestors_max)%in;
+                %let;percent_paths;%expr(100*anc_paths_cnt_raw.v|number_of_ancestors_max)%in;
                 %let;percent_plus;%expr(100*(number_of_ancestors.v-number_of_ancestors_at_level.v)|number_of_ancestors_max)%in;
                 %let;percent_at_level;%expr(100*number_of_ancestors_at_level.v|number_of_ancestors_max_at_level)%in;
                 %let;percent_at_level_paths;%expr(100*anc_paths_at_level_cnt_raw.v|number_of_ancestors_max_at_level)%in;
-                %let;extra_paths;%expr(anc_paths_cnt_raw.level.v-anc_paths_cnt.level.v)%in;
-                %let;extra_paths_at_level;%expr(anc_paths_at_level_cnt_raw.level.v-anc_paths_at_level_cnt.level.v)%in;
+                %let;extra_paths;%expr(anc_paths_cnt_raw.v-anc_paths_cnt.v)%in;
+                %let;extra_paths_at_level;%expr(anc_paths_at_level_cnt_raw.v-anc_paths_at_level_cnt.v)%in;
                 <option value="%level;" title="" class="d-flex px-2"
                   %if;(level<90)
                     data-lex='%apply;ancname(level)'
