@@ -25,6 +25,7 @@
 %message_to_wizard;
 %include;perso_header
 <script><!--
+
 function no_options () {
   /* On décoche toutes les options, only/image_off/cgl */
   $('input[type=checkbox][name!="only"][name!="image"][name!="cgl"]').prop('checked', false);
@@ -104,6 +105,9 @@ function missing_events_options () {
 </h1>
 %define;thegen(xx)
   [the %s generation:::xx]%nn;
+%end;
+%define;ancname(xx)
+  %if;([cousins.xx.0]!="[cousins.xx.0]")[cousins.xx.0]%end;
 %end;
 <form class="needs-validation" novalidate method="get" action="%action;">
   <div class="d-flex justify-content-around w-100">
@@ -474,37 +478,40 @@ function missing_events_options () {
       <div class="d-flex flex-column justify-content-center order-1 mx-3">
         <div class="d-flex flex-column was-validated">
           <label class="sr-only" for="v">[*specify::generation/generations]0[:]</label>
-          <select class="custom-select " id="v" name="v" required title="[up to] 2^n-2 / [only] 2^(n-1)">           
+          <select class="custom-select " id="v" name="v" required title="[up to] 2^n-2 / [only] 2^(n-1)">
             <option value=""></option>
             %foreach;ancestor_level;
-              %if;(level>1)
-                %let;number_of_ancestors_max;%expr(2^level-2)%in;
-                %let;number_of_ancestors_max_at_level;%expr(2^(level-1))%in;
-                %(! number_of_ancestors texte et number_of_ancestors.v chiffre %)
-                %let;number_of_ancestors_at_level_;%expr(number_of_ancestors_at_level+1)%in;
-                %let;dd;%expr(level/10)%in;
-                %let;dd_at_level;%expr((level-1)/10)%in;
+              %if;(level>0)
+                %let;levelp;%expr(level+1)%in;
+                %let;number_of_ancestors_max;%expr(2^levelp-2)%in;
+                %let;number_of_ancestors_max_at_level;%expr(2^level)%in;
+                %let;dd;%expr(levelp/10)%in;
+                %let;dd_at_level;%expr(level/10)%in;
                 %let;percent;%expr(100*number_of_ancestors.v|number_of_ancestors_max)%in;
-                %let;percent_at_level;%expr(100*number_of_ancestors_at_level_|number_of_ancestors_max_at_level)%in;
+                %let;percent_at_level;%expr(100*number_of_ancestors_at_level.v|number_of_ancestors_max_at_level)%in;
                 <option value="%level;" title="" class="d-flex px-2"
                   %if;(level<90)
-                    data-full=' (+%number_of_ancestors_at_level_;) %number_of_ancestors;'
-                    data-full_prefix='/%nn;
+                    data-lex='%apply;ancname(level)'
+                    data-noa='%number_of_ancestors;'
+                    data-noa_l='%number_of_ancestors_at_level;'
+                    data-sty=' style="background: linear-gradient(90deg, rgba(150,170,190,.2) %percent;%%, rgba(255,255,255,0) %percent;%%"'
+                    data-sty_l=' style="background: linear-gradient(90deg, rgba(180,200,220,.2) %percent_at_level;%%, rgba(255,255,255,0) %percent_at_level;%%"'
+                    data-pp='/%nn;
+                    %if;(level<61)
                       %if;(level<14)%number_of_ancestors_max;%else;%expr(number_of_ancestors_max|(10^(3*dd)))%end;
                        %if;(dd>9)>10³⁰%elseif;(dd=9)Y%nn;
                       %elseif;(dd=8)Y%elseif;(dd=7)Z%elseif;(dd=6)E%elseif;(dd=5)P%nn;
-                      %elseif;(dd=4)T%elseif;(dd=3)G%elseif;(dd=2)M%elseif;(dd=1 and level>13)k%else;%end;'
-                    data-full_style='background: linear-gradient(90deg, rgba(150,170,190,.2) %percent;%%, rgba(255,255,255,0) %percent;%%'
-                    data-percent='%if;(percent!=0) %percent;%%%end;'
-                    data-only=' %number_of_ancestors_at_level_/%nn;
-                      %if;(level<18)%number_of_ancestors_max_at_level;%else;%expr(number_of_ancestors_max_at_level|(10^(3*dd_at_level)))%end;
-                       %if;(level>100)>10³⁰%elseif;(level>90)Y%nn;
-                      %elseif;(level>80)Y%elseif;(level>70)Z%elseif;(level>60)E%elseif;(level>50)P%nn;
-                      %elseif;(level>40)T%elseif;(level>30)G%elseif;(level>20)M%elseif;(level>17)k%else;%end;'
-                    data-only_style='background: linear-gradient(90deg, rgba(180,200,220,.2) %percent_at_level;%%, rgba(255,255,255,0) %percent_at_level;%%'
-                    data-percent_at_level='%if;(percent_at_level!=0) %percent_at_level;%%%end;'>
+                      %elseif;(dd=4)T%elseif;(dd=3)G%elseif;(dd=2)M%elseif;(dd=1 and level>13)k%else;%end;
+                    %end;%if;(percent!=0) %percent;%%%end;'
+                    data-pp_l='/%nn;
+                      %if;(level<61)
+                        %if;(level<17)%number_of_ancestors_max_at_level;%else;%expr(number_of_ancestors_max_at_level|(10^(3*dd_at_level)))%end;
+                           %if;(level>100)>10³⁰%elseif;(level>90)Y%nn;
+                        %elseif;(level>80)Y%elseif;(level>70)Z%elseif;(level>60)E%elseif;(level>50)P%nn;
+                        %elseif;(level>39)T%elseif;(level>29)G%elseif;(level>18)M%elseif;(level>16)k%else;%end;
+                      %end;%if;(percent_at_level!=0) %percent_at_level;%%%end;'>
                   %end;
-                  %sp;%apply;thegen%with;%apply;nth([nth (generation)], level)%end;%sp;%nn;
+                  %sp;%apply;thegen%with;%apply;nth([nth (generation)], level)%end;%nn;
                 </option>
               %end;
             %end;
@@ -543,8 +550,8 @@ function missing_events_options () {
 <script>
 $(document).ready(function() {
   $("#v").select2({
-    templateResult: function(el) { return '<div class="d-flex" style="' + (($('#only').is(':checked')) ? ($(el.element).data('only_style') || '') : ($(el.element).data('full_style') || '')) + '" class="' + ($(el.element).prop('class') || '') + '"><span class="onlycheck flex-grow-1 pl-2">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + el.text + '</span><span>' + (($('#only').is(':checked')) ? ($(el.element).data('only') || '') : ($(el.element).data('full') || '') + ($(el.element).data('full_prefix') || '') + '</span><span class="mr-1 text-right" style="width:2rem">' + ($(el.element).data('percent') || '')) + '</span></div>'; },
-    templateSelection: function(el) { return '<span class="onlycheck">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + '</span><span>' + el.text + '</span><span>' + ($(el.element).data('full') || '') + '</span>'; },
+    templateResult: function(el) { return '<div class="d-flex justify-content-end"' + (($('#only').is(':checked')) ? ($(el.element).data('sty_l') || '') : ($(el.element).data('sty') || '')) + '" class="' + ($(el.element).prop('class') || '') + '"><div class="flex-grow-1 onlycheck pl-2" title="' + ($(el.element).data('lex') || '') + '">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + el.text + '</div>' + (($('#only').is(':checked')) ? ('') : ('<div>+' + ($(el.element).data('noa_l') || '') + '</div>')) + '<div class="ml-auto text-right pr-2" style="width: 5em;" title="'+ (($('#only').is(':checked')) ? ($(el.element).data('pp_l') || '') : ($(el.element).data('pp') || '')) + '">' + (($('#only').is(':checked')) ? ($(el.element).data('noa_l') || '') : ($(el.element).data('noa') || '')) + '</div></div>'; },
+    templateSelection: function(el) { return '<span class="onlycheck">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + '</span><span>' + el.text + ' (' + ($(el.element).data('noa') || '') + ')</span>'; },
     escapeMarkup: function(markup) { return markup; },
     width: "resolve",
     allowClear: false,

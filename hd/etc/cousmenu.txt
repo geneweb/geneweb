@@ -62,17 +62,19 @@
 %end;
 %( TODO : si cousin est sosa de la racine ajouter l'icone sosa verte devant le nom
 si mort <3 ans icone bébé, <15 ans enfant ?? %)
-%empty_sorted_list;%empty_sorted_listb;%empty_sorted_listc;
+%empty_sorted_list;%empty_sorted_listb;%empty_sorted_listc;%reset_count3;
 %define;cous_mod(vvv,www)
   %empty_sorted_list;%empty_sorted_listb;
   %foreach;cous_path;
     %let;cous_isdead;%apply;index("p",cousin.index,"is_dead")%in;
     %let;cous_nodesc;%apply;index("p",cousin.index,"has_children")%in;
     %let;cous_sex;%apply;index("p",cousin.index,"sex")%in;
-    %apply;add_in_sorted_list%with;%cousin.surname; %cousin.first_name %cousin.dates; %cousin.occ;%and;%nn;
+    %if(cousin.surname="?" and cousin.first_name="?")%incr_count3;
+    %else;
+      %apply;add_in_sorted_list%with;%cousin.surname; %cousin.first_name; %cousin.dates; %cousin.occ;%and;%nn;
       <li class="card text-small nbr_%cousin.nbr; ml-n-1 py-1 pr-1 pl-0 rounded border-top-0 border-bottom-0 border-%if;(cousin.sex=0)primary%elseif;(cousin.sex=1)danger%else;dark%end;"%if;(cous_isdead=0) data-alive="%cous_isdead;"%end; style="border-left-width:%if;(cous_isdead=1)5px;background-color:rgba(245,231,216,0.95);%else;10px;%end;%if;(cous_nodesc!=1)border-style:double;%end;"
-      data-birthdate="%(%apply;index("p",cousin.index,"slash_marriage_date")%)">%nn;
-        <div class="d-flex d-inline justify-content-between align-items-start ml-n2 position-relative " style="z-index:1">
+      data-position="%apply;index("p",cousin.index,"sex")">%nn;
+        <div class="d-flex d-inline justify-content-between align-items-start ml-n2 position-relative" style="z-index:1">
           <div class="d-block w-auto h-100 pl-0 pr-1 align-self-center%( bg-dark%) order-1" title="[navigation] [with]…" data-toggle="tooltip" style="z-index:1">
             <a role="button" href="%prefix;%cousin.access;&m=C&v=%e.v;" class="my-3 stretched-link w-auto text-%if;(cous_sex=0)primary%else;danger%end;" style="z-index:1">  </a>
           </div>
@@ -93,14 +95,15 @@ si mort <3 ans icone bébé, <15 ans enfant ?? %)
             <a role="button" href="%prefix;em=R&et=A&ei=%self.index;&i=%cousin.index;" style="z-index:1"
               data-toggle="tooltip" data-html="true" class="stretched-link w-auto%if;(cous_isdead=1) ml-1%end;"
               title="%cousin.first_name;.%cousin.occ; %cousin.surname;"
-              data-anclist="%cousin.anc_f_list;">%cousin.surname; %cousin.first_name;
+              data-anclist="%cousin.anc_f_list;">%cousin.surname; %cousin.first_name; %count3;
               %cousin.dates;%(%if;(cous_isdead=0) %cousin_age;%end;%)
             </a>
           </div>
         </div>
-     </li>%and;%cousin.cnt;%and;%cousin.index;%end;
-    %apply;add_in_sorted_listb%with;%cousin.index;%and;%cous_isdead;%and;%cous_nodesc;%end;
-    %apply;add_in_sorted_listc%with;%cousin.index;%and;%cous_isdead;%and;%cous_nodesc;%end;
+       </li>%and;%cousin.cnt;%and;%cousin.index;%end;
+      %apply;add_in_sorted_listb%with;%cousin.index;%and;%cous_isdead;%and;%cous_nodesc;%end;
+      %apply;add_in_sorted_listc%with;%cousin.index;%and;%cous_isdead;%and;%cous_nodesc;%end;
+    %end;
   %end;
   %reset_count;%reset_count2;
   %foreach;sorted_listb_item;
@@ -128,6 +131,9 @@ si mort <3 ans icone bébé, <15 ans enfant ?? %)
                 %if;(count2>0)
                   <div>%count2; [no descendants] ║</div>
                 %end;
+                %if;(count3>0)
+                  <div>%count3; [unknown spouse] ? ?</div>
+                %end;
               </div>
               <div class="mx-auto text-center align-items-center">
                 <a role="button" class="h2 display-4 stretched-link ml-2"
@@ -143,11 +149,11 @@ si mort <3 ans icone bébé, <15 ans enfant ?? %)
               </div>
               %(<div class="flex-grow-1 bg-transparent"> </div>%)
               %let;cousdown;%apply;cousins_cnt%with;vvv%and;%expr(www+1)%end;%in;
-              <div class="d-flex justify-content-end  align-items-end ml-2" style="z-index:1">
+              <div class="d-flex justify-content-end align-items-end ml-2" style="z-index:1">
                 <div class="d-inline-flex align-self-center">
                   <div class="d-flex align-items-end">
                     %if;(vvv>0 and www=0)
-                      <button type="button" class="btn btn-sm py-0 mb-1 btn-light" data-dismiss="modal" data-toggle="modal" data-target="#modal_%expr(vvv-1)_www" ><i class="fa-solid fa-arrow-down-long fa-fw fa-rotate-by" style="--fa-rotate-angle: 45deg;" title="%expr(vvv-1)/0" ancestors at g-1" data-toggle="tooltip"></i></button>
+                      <button type="button" class="btn btn-sm py-0 mb-2 btn-light" data-dismiss="modal" data-toggle="modal" data-target="#modal_%expr(vvv-1)_www" ><i class="fa-solid fa-arrow-down-long fa-fw fa-rotate-by" style="--fa-rotate-angle: 45deg;" title="%expr(vvv-1)/0" ancestors at g-1" data-toggle="tooltip"></i></button>
                     %end;
                   </div>
                   <div class="d-inline-flex flex-column ml-2">
@@ -165,6 +171,7 @@ si mort <3 ans icone bébé, <15 ans enfant ?? %)
                         <i class="fa-solid fa-person-arrow-down-to-line fa-fw fa-flip-horizontal"></i>
                       </span>
                   </a>
+                  <button role="button" id="sortbtn" class="btn-light" style="z-index:1;">SORT</button>
                 </div>
               </div>
             </div>
@@ -176,7 +183,7 @@ si mort <3 ans icone bébé, <15 ans enfant ?? %)
             %elseif;(cous_paths_cnt.vvv.www>127)4%nn;
             %elseif;(cous_paths_cnt.vvv.www>31)3
             %elseif;(cous_paths_cnt.vvv.www>9)2%else;1%end;"%)>
-            <ul class="list-group bg-transparent" class="listitems">
+            <ul class="list-group bg-transparent listitems autosort">
               %foreach;sorted_list_item;%item.2;%end;
             </ul>
           </div>
@@ -226,6 +233,7 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
     </div>
   </button>
 %end;
+
 %( table of cousins.j-vvv+i.i c(k,i) | table size = v × (v+%cousins.max_d;)
     == l1 asc./l2 = max_desc (plus longue colonne v2) %)
 %define;table(xxx)
@@ -327,11 +335,14 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
     </div>
   </div>
 </div>
+
 %include;trl
 %include;copyr
 </div>
 %include;js
 <script>
+$.fn.modal.Constructor.prototype.enforceFocus = function() {};
+
 $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
@@ -343,13 +354,20 @@ $(function () {
   function sort_li(a, b) {
     return ($(b).data('birthdate')) < ($(a).data('birthdate')) ? 1 : -1;
   }
-});
-$("#sortbtn").on("click", function() {
+});%)
+%($("#sortbtn").on("click", function() {
   $(".listitems li").sort(sort_li).appendTo('.listitems');
   function sort_li(a, b) {
     return ($(b).data('birthdate')) < ($(a).data('birthdate')) ? 1 : -1;
   }
 });%)
+$("#sortbtn").on("click", function() {
+  $(".listitems.autosort").each(function() {
+      $(this).html($(this).children('li').sort(function(a, b){
+          return ($(b).data('position')) < ($(a).data('position')) ? 1 : -1;
+      }));
+  });
+});
 </script>
 </body>
 </html>
