@@ -398,6 +398,6 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
     %include;buttons_cousins
   %end;
 %end;
-%if;(plugin.v7_im and b.carrousel="on")
+%if;(("v7_im" in plugins) and b.carrousel="on")
   %include;carrousel_display
 %end;
