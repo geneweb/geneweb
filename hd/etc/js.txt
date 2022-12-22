@@ -14,6 +14,7 @@
     <script src="%static_path;js/bootstrap.bundle.min.js?version=4.6.1"></script>
     %if;(e.m="A" and e.t="")
       <script src="%static_path;js/select2.min.js?version=4.1.0rc"></script>
+      <script src="%static_path;js/select2-maximize-height.min.js"></script>
     %end;
   %end;
   %if;(evar.m!="MOD_DATA")
