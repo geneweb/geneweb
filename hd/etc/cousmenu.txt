@@ -60,6 +60,7 @@
 %define;cousins_cnt(vvv,www)
   %cousins_cnt.vvv.www;
 %end;
+
 %( TODO : si cousin est sosa de la racine ajouter l'icone sosa verte devant le nom
 si mort <3 ans icone bébé, <15 ans enfant ?? %)
 %empty_sorted_list;%empty_sorted_listb;%empty_sorted_listc;%reset_count3;

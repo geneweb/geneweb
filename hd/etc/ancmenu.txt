@@ -103,6 +103,23 @@ function missing_events_options () {
     %if;(alias != "") <em>(%alias;)</em>%end;
   %end;
 </h1>
+%(%define;index(ppp,vvv,xxx)
+  %ppp_of_index.vvv.xxx;
+%end;
+%define;anc_paths(vvv)
+  %anc_paths.vvv;
+%end;
+%define;anc_paths_cnt(vvv)
+  %anc_paths_cnt.vvv;
+%end;
+%define;anc_paths_cnt_raw(vvv)
+  %anc_paths_cnt_raw.vvv;
+%end;
+%foreach;ancestor_level;
+%apply;anc_paths(level)
+%apply;anc_paths_cnt(level)
+%apply;anc_paths_cnt_raw(level)
+%end;%)
 %define;thegen(xx)
   [the %s generation:::xx]%nn;
 %end;
@@ -488,13 +505,23 @@ function missing_events_options () {
                 %let;dd;%expr(levelp/10)%in;
                 %let;dd_at_level;%expr(level/10)%in;
                 %let;percent;%expr(100*number_of_ancestors.v|number_of_ancestors_max)%in;
+                %let;percent_paths;%expr(100*anc_paths_cnt_raw.level.v|number_of_ancestors_max)%in;
+                %let;percent_plus;%expr(100*(number_of_ancestors.v-number_of_ancestors_at_level.v)|number_of_ancestors_max)%in;
                 %let;percent_at_level;%expr(100*number_of_ancestors_at_level.v|number_of_ancestors_max_at_level)%in;
+                %let;percent_at_level_paths;%expr(100*anc_paths_at_level_cnt_raw.v|number_of_ancestors_max_at_level)%in;
+                %let;extra_paths;%expr(anc_paths_cnt_raw.level.v-anc_paths_cnt.level.v)%in;
+                %let;extra_paths_at_level;%expr(anc_paths_at_level_cnt_raw.level.v-anc_paths_at_level_cnt.level.v)%in;
                 <option value="%level;" title="" class="d-flex px-2"
                   %if;(level<90)
                     data-lex='%apply;ancname(level)'
-                    data-noa='%number_of_ancestors;'
-                    data-noa_l='%number_of_ancestors_at_level;'
-                    data-sty=' style="background: linear-gradient(90deg, rgba(150,170,190,.2) %percent;%%, rgba(255,255,255,0) %percent;%%"'
+                    data-noa='%number_of_ancestors;%if;(extra_paths!=0)<sup>+%extra_paths;</sup>%end;'
+                    data-noa_l='%number_of_ancestors_at_level;%if;(extra_paths_at_level!=0)<sup>+%extra_paths_at_level;</sup>%end;'
+                    data-sty=' style="background:linear-gradient(90deg,rgba(155,200,255,.5) %percent_plus;%%,
+                                                                       rgba(210,230,255,.5) %percent_plus;%%,
+                                                                       rgba(210,230,255,.5) %percent;%%,
+                                                                       rgba(255,210,180,.5) %percent;%%,
+                                                                       rgba(255,210,180,.5) %percent_paths;%%,
+                                                                       rgba(255,255,255,0) %percent_paths;%%"'
                     data-sty_l=' style="background: linear-gradient(90deg, rgba(180,200,220,.2) %percent_at_level;%%, rgba(255,255,255,0) %percent_at_level;%%"'
                     data-pp='/%nn;
                     %if;(level<61)
@@ -509,7 +536,7 @@ function missing_events_options () {
                            %if;(level>100)>10³⁰%elseif;(level>90)Y%nn;
                         %elseif;(level>80)Y%elseif;(level>70)Z%elseif;(level>60)E%elseif;(level>50)P%nn;
                         %elseif;(level>39)T%elseif;(level>29)G%elseif;(level>18)M%elseif;(level>16)k%else;%end;
-                      %end;%if;(percent_at_level!=0) %percent_at_level;%%%end;'>
+                      %end;%if;(percent_at_level!=0) %percent_at_level;%%%end;'>%nn;
                   %end;
                   %sp;%apply;thegen%with;%apply;nth([nth (generation)], level)%end;%nn;
                 </option>
@@ -550,17 +577,18 @@ function missing_events_options () {
 <script>
 $(document).ready(function() {
   $("#v").select2({
-    templateResult: function(el) { return '<div class="d-flex justify-content-end"' + (($('#only').is(':checked')) ? ($(el.element).data('sty_l') || '') : ($(el.element).data('sty') || '')) + '" class="' + ($(el.element).prop('class') || '') + '"><div class="flex-grow-1 onlycheck pl-2" title="' + ($(el.element).data('lex') || '') + '">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + el.text + '</div>' + (($('#only').is(':checked')) ? ('') : ('<div>+' + ($(el.element).data('noa_l') || '') + '</div>')) + '<div class="ml-auto text-right pr-2" style="width: 5em;" title="'+ (($('#only').is(':checked')) ? ($(el.element).data('pp_l') || '') : ($(el.element).data('pp') || '')) + '">' + (($('#only').is(':checked')) ? ($(el.element).data('noa_l') || '') : ($(el.element).data('noa') || '')) + '</div></div>'; },
-    templateSelection: function(el) { return '<span class="onlycheck">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + '</span><span>' + el.text + ' (' + ($(el.element).data('noa') || '') + ')</span>'; },
+    templateResult: function(el) { return '<div class="d-flex justify-content-end"' + (($('#only').is(':checked')) ? ($(el.element).data('sty_l') || '') : ($(el.element).data('sty') || '')) + '" class="' + ($(el.element).prop('class') || '') + '"><div class="flex-grow-1 onlycheck pl-2" title="' + ($(el.element).data('lex') || '') + '">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + el.text + '</div>' + (($('#only').is(':checked')) ? ('') : ('<div>+' + ($(el.element).data('noa_l') || '') + '</div>')) + '<div class="col-3 px-0 ml-auto text-right pr-2" title="'+ (($('#only').is(':checked')) ? ($(el.element).data('pp_l') || '') : ($(el.element).data('pp') || '')) + '">' + (($('#only').is(':checked')) ? ($(el.element).data('noa_l') || '') : ($(el.element).data('noa') || '')) + '</div></div>'; },
+    templateSelection: function(el) { return '<span class="onlycheck">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + '</span><span>' + el.text + '</span><span class="ml-auto" id="noa"> (' + ($(el.element).data('noa') || '') + ')</span><span id="noa_l" class="d-none"> (' + ($(el.element).data('noa_l') || '') + ')</span>'; },
     escapeMarkup: function(markup) { return markup; },
     width: "resolve",
     allowClear: false,
     placeholder: "… [specify::generation/generations]0 (max %max_anc_level;)",
     theme: "classic"
-  });
+  }).maximizeSelect2Height();
 });
   $("body").on('change', '#only', function() {
-   ($('#only').is(':checked')) ? ($('.onlycheck').text("[only]")) : ($('.onlycheck').text("[up to]"))
+   ($('#only').is(':checked')) ? ($('.onlycheck').text("[only]"), $('#noa').addClass("d-none"), $('#noa_l').removeClass("d-none")) 
+                               : ($('.onlycheck').text("[up to]"), $('#noa').removeClass("d-none"), $('#noa_l').addClass("d-none"))
   });
 </script>
 <script>
