@@ -1448,7 +1448,7 @@ let anc_cnt_aux base env lev at_to p =
       else loop (asc_cnt.(i) @ acc) (i + 1)
     in
     (* start at 1 to ignore first gen (i.e. me) *)
-    loop asc_cnt.(1) 1
+    loop [] 1
 
 let desc_cnt_aux base env lev at_to p =
   let desc_cnt =
@@ -1462,7 +1462,7 @@ let desc_cnt_aux base env lev at_to p =
       else loop (desc_cnt.(i) @ acc) (i + 1)
     in
     (* start at 1 to ignore first gen (i.e. me) *)
-    loop desc_cnt.(1) 1
+    loop [] 0
 
 let bool_val x = VVbool x
 let str_val x = VVstring x
@@ -1885,6 +1885,8 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       match get_env "max_anc_level" env with
       | Vint i -> str_val (string_of_int i)
       | _ -> null_val)
+  | "mode" -> (
+      match get_env "mode" env with Vstring s -> str_val s | _ -> null_val)
   | "static_max_anc_level" -> (
       match get_env "static_max_anc_level" env with
       | Vint i -> str_val (string_of_int i)
@@ -2378,19 +2380,25 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
               let list1 = anc_cnt_aux base env lev at_to p in
               match list1 with
               | Some list1 ->
-                  VVstring
-                    (eval_int conf
-                       (List.length list1 - if at_to then 0 else 1)
-                       sl)
+                  Printf.eprintf "List1 (cnt_raw):\n";
+                  List.iter
+                    (fun (ip, _, _) ->
+                      Printf.eprintf "ip: %s, %s\n" (string_of_iper ip)
+                        (designation base (poi base ip) :> string))
+                    list1;
+                  VVstring (eval_int conf (List.length list1) sl)
               | None -> raise Not_found)
           | Paths_cnt -> (
               let list1 = anc_cnt_aux base env lev at_to p in
               match list1 with
-              | Some list ->
-                  VVstring
-                    (eval_int conf
-                       (List.length (cousins_fold list) - if at_to then 0 else 1)
-                       sl)
+              | Some list1 ->
+                  Printf.eprintf "List1 (cnt):\n";
+                  List.iter
+                    (fun (ip, _) ->
+                      Printf.eprintf "ip: %s, %s\n" (string_of_iper ip)
+                        (designation base (poi base ip) :> string))
+                    (cousins_fold list1);
+                  VVstring (eval_int conf (List.length (cousins_fold list1)) sl)
               | None -> raise Not_found)
           | Paths -> (
               let list1 = anc_cnt_aux base env lev at_to p in
@@ -2418,10 +2426,7 @@ and eval_desc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
               let list1 = desc_cnt_aux base env lev at_to p in
               match list1 with
               | Some list ->
-                  VVstring
-                    (eval_int conf
-                       (List.length (cousins_fold list) - if at_to then 0 else 1)
-                       sl)
+                  VVstring (eval_int conf (List.length (cousins_fold list)) sl)
               | None -> raise Not_found)
           | Paths -> (
               let list1 = desc_cnt_aux base env lev at_to p in
@@ -4092,28 +4097,36 @@ let print_foreach conf base print_ast eval_expr =
                   let env =
                     ("ancestor", Vanc gp) :: ("first", Vbool first)
                     :: ("last", Vbool (gl = []))
-                    :: env
+                    :: ("mode", Vstring "Vgpl") :: env
                   in
                   List.iter (print_ast env ep) al);
               loop false gl
         in
         loop true gpl
-    | Vcousl gpl ->
-        let rec loop first gpl =
-          match gpl with
+    | _ -> ()
+  in
+  let print_foreach_path env al ep =
+    match get_env "cousins" env with
+    | Vcousl l ->
+        let rec loop first l =
+          match l with
           | [] -> ()
-          | (ip, (ifaml, _ipl, _cnt)) :: gpl ->
-              (let ifam = List.nth ifaml 0 in
-               let gp = GP_person (Sosa.one, ip, Some ifam) in
+          | (ip, (ifaml, _ipl, _cnt)) :: l ->
+              (let gp =
+                 GP_person
+                   ( Sosa.one,
+                     ip,
+                     if ifaml <> [] then Some (List.hd ifaml) else None )
+               in
                let env =
                  ("ancestor", Vanc gp) :: ("first", Vbool first)
-                 :: ("last", Vbool (gpl = []))
-                 :: env
+                 :: ("last", Vbool (l = []))
+                 :: ("mode", Vstring "Vcousl") :: env
                in
                List.iter (print_ast env ep) al);
-              loop false gpl
+              loop false l
         in
-        loop true !gpl
+        loop true !l
     | _ -> ()
   in
   let print_foreach_ancestor_level env el al ((p, _) as ep) =
@@ -4332,7 +4345,7 @@ let print_foreach conf base print_ast eval_expr =
           let ep = (poi base ip, true) in
           let env =
             ("descendant", Vind (poi base ip))
-            :: ("desc_cnt", Vint i)
+            :: ("nbr", Vint i)
             :: ("first", Vbool (i = 0))
             :: ("last", Vbool (ip_l = []))
             :: env
@@ -4862,6 +4875,7 @@ let print_foreach conf base print_ast eval_expr =
     | "nobility_title" -> print_foreach_nobility_title env al ep
     | "nob_title" -> print_foreach_nob_title env al ep
     | "parent" -> print_foreach_parent env al ep
+    | "path" -> print_foreach_path env al ep
     | "qualifier" -> print_foreach_qualifier env al ep
     | "related" -> print_foreach_related env al ep
     | "relation" -> print_foreach_relation env al ep
