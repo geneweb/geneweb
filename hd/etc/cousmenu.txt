@@ -62,7 +62,7 @@
 %end;
 
 %( TODO : si cousin est sosa de la racine ajouter l'icone sosa verte devant le nom
-si mort <3 ans icone bébé, <15 ans enfant ?? %)
+si mort <3 ans icone bébé, <15 ans enfant > balises sur l'âge et birth_date.year indispo %)
 %empty_sorted_list;%empty_sorted_listb;%empty_sorted_listc;%reset_count3;
 %define;cous_mod(vvv,www)
   %empty_sorted_list;%empty_sorted_listb;
@@ -75,30 +75,39 @@ si mort <3 ans icone bébé, <15 ans enfant ?? %)
       %apply;add_in_sorted_list%with;%cousin.surname; %cousin.first_name; %cousin.dates; %cousin.occ;%and;%nn;
       <li class="card text-small nbr_%cousin.nbr; ml-n-1 py-1 pr-1 pl-0 rounded border-top-0 border-bottom-0 border-%if;(cousin.sex=0)primary%elseif;(cousin.sex=1)danger%else;dark%end;"%if;(cous_isdead=0) data-alive="%cous_isdead;"%end; style="border-left-width:%if;(cous_isdead=1)5px;background-color:rgba(245,231,216,0.95);%else;10px;%end;%if;(cous_nodesc!=1)border-style:double;%end;"
       data-position="%apply;index("p",cousin.index,"sex")">%nn;
-        <div class="d-flex d-inline justify-content-between align-items-start ml-n2 position-relative" style="z-index:1">
-          <div class="d-block w-auto h-100 pl-0 pr-1 align-self-center%( bg-dark%) order-1" title="[navigation] [with]…" data-toggle="tooltip" style="z-index:1">
-            <a role="button" href="%prefix;%cousin.access;&m=C&v=%e.v;" class="my-3 stretched-link w-auto text-%if;(cous_sex=0)primary%else;danger%end;" style="z-index:1">  </a>
+        <div class="d-inline-flex justify-content-end align-items-start ml-n2 position-relative">
+          <div class="w-auto h-100 pl-0 pr-1 align-self-center order-1">
+            <a role="button" href="%prefix;%cousin.access;&m=C&v=%e.v;" title="[navigation] [with]…
+              class="my-3 w-auto text-%if;(cous_sex=0)primary%else;danger%end;" style="z-index:1">·</a>
           </div>
+          <div class="d-flex align-self-center order-3">
+            <div class="mx-0">
+              <a role="button" class="btn px-1 mx-0%(stretched-link + position-relative + d-block%)" data-toggle="tooltip""href="%prefix;em=R&et=A&ei=%self.index;&i=%cousin.index;"
+                title="calcul de parenté"><i class="fa-solid fa-link fa-sm fa-fw"></i></a>
+            </div>
           %if;(www!=0)
-            <div class="d-block w-auto align-self-start position-relative order-3" >
-              <a role="button" class="btn px-1 mx-0 stretched-link" data-toggle="tooltip" data-html="true" style="z-index:1"
+            <div class="mx-0">
+              <a role="button" class="btn px-1 mx-0" data-toggle="tooltip"
                 href="%prefix;m=RL&i=%if;(vvv=0)%self.index;%else;%cousin.anc1.index;%end;&l1=vvv&i1=%self.index;&l2=www&i2=%cousin.index;%nn;
                 %if;(cousin.nbr>1)&dag=on%end;"%sp;
                 title="%apply;a_of_b%with;%if;(cousin.sex=0)[cousin.0.www]0%else;[cousin.0.www]1%end;%and;%cousin.anc1.first_name; %cousin.anc1.surname; %(%cousin.anc1.dates;%)
                 %if;(cousin.anc2!=".....") [and] %cousin.anc2;%end;%end;">
-                %if;(cousin.nbr %2 = 0)<i class="fa-solid fa-user-group"></i>%else;<i class="fa-solid fa-user fa-fw text-%if;(cousin.anc2!=".....")info%else;%if;(cousin.anc1.sex=0)primary%elseif;(cousin.sex=1)danger%else;muted%end;%end;"></i>%end;%nn;
-                <span class="small%if;(cousin.nbr>2)mr-1%end;"><sup>%if;(cousin.nbr>2)%cousin.nbr;%else; %end;</sup></span></a>
+                %if;(cousin.nbr %2 = 0)<i class="fa-solid fa-user-group fa-sm fa-fw"></i>%else;<i class="fa-solid fa-user fa-sm fa-fw text-%if;(cousin.anc2!=".....")info%else;%if;(cousin.anc1.sex=0)primary%elseif;(cousin.sex=1)danger%else;muted%end;%end;"></i>%end;%nn;
+                %( TODO NBR <span class="small%if;(cousin.nbr>2)mr-1%end;"><sup>%if;(cousin.nbr>2)%cousin.nbr;%else; %end;</sup></span></a>%)
             </div>
           %end;
-          %(%let;cousin_age;%apply;index("p",cousin.index,"age")%in;%%)
-          <div class="d-block mx-auto h-100 align-self-center px-0 order-2
-            text-truncate text-start text-nowrap position-relative" style="line-height:2.0rem;width:85%%;">
-            <a role="button" href="%prefix;em=R&et=A&ei=%self.index;&i=%cousin.index;" style="z-index:1"
-              data-toggle="tooltip" data-html="true" class="stretched-link w-auto%if;(cous_isdead=1) ml-1%end;"
+          </div>
+          %(%let;cousin_age;%apply;index("p",cousin.index,"age.v")%in;%)
+          <div class="d-flex flex-column align-self-center order-2">
+          <div class="text-truncate text-nowrap px-0" style="line-height:2rem;width:80%%">
+            <a role="button" href="%prefix;%cousin.access;"
+              data-toggle="tooltip" class="w-auto%if;(cous_isdead=1) ml-1%end;"
               title="%cousin.first_name;.%cousin.occ; %cousin.surname;"
-              data-anclist="%cousin.anc_f_list;">%cousin.surname; %cousin.first_name; %count3;
-              %cousin.dates;%(%if;(cous_isdead=0) %cousin_age;%end;%)
+              data-anclist="%cousin.anc_f_list;">%cousin.surname; %cousin.first_name;%nn;
             </a>
+            %if;wizard; <a role="button" href="%prefix;&m=MOD_IND&i=%cousin.index;">%end;
+              %cousin.dates;%(%if;(cous_isdead=0) %cousin_age;%end;%)
+            %if;wizard;</a>%end
           </div>
         </div>
        </li>%and;%cousin.cnt;%and;%cousin.index;%end;
@@ -273,11 +282,9 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
                              and not (i=0 and not has_children)) border-dark border-right%end;"> </div>
                         %end;
                       %else;
-                        
-                          <div class="col-6 border-dark%if;(tot_next!=0) border-right
+                        <div class="col-6 border-dark%if;(tot_next!=0) border-right
                           border-top-0 border-left-0 border-bottom-0%else; border-0%end;" style="height:15px"> </div>
-                          <div class="col-6 border-0"> </div>
-                        
+                        <div class="col-6 border-0"> </div>
                       %end;
                     </div>
                   </div>
@@ -342,8 +349,6 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
 </div>
 %include;js
 <script>
-$.fn.modal.Constructor.prototype.enforceFocus = function() {};
-
 $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
@@ -355,20 +360,20 @@ $(function () {
   function sort_li(a, b) {
     return ($(b).data('birthdate')) < ($(a).data('birthdate')) ? 1 : -1;
   }
-});%)
-%($("#sortbtn").on("click", function() {
+});
+$("#sortbtn").on("click", function() {
   $(".listitems li").sort(sort_li).appendTo('.listitems');
   function sort_li(a, b) {
     return ($(b).data('birthdate')) < ($(a).data('birthdate')) ? 1 : -1;
   }
-});%)
+});
 $("#sortbtn").on("click", function() {
   $(".listitems.autosort").each(function() {
       $(this).html($(this).children('li').sort(function(a, b){
           return ($(b).data('position')) < ($(a).data('position')) ? 1 : -1;
       }));
   });
-});
+});%)
 </script>
 </body>
 </html>
