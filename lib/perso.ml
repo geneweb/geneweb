@@ -2390,25 +2390,12 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
           | Paths_cnt_raw -> (
               let list1 = anc_cnt_aux base env lev at_to p in
               match list1 with
-              | Some list1 ->
-                  Printf.eprintf "List1 (cnt_raw):\n";
-                  List.iter
-                    (fun (ip, _, _) ->
-                      Printf.eprintf "ip: %s, %s\n" (string_of_iper ip)
-                        (designation base (poi base ip) :> string))
-                    list1;
-                  VVstring (eval_int conf (List.length list1) sl)
+              | Some list1 -> VVstring (eval_int conf (List.length list1) sl)
               | None -> raise Not_found)
           | Paths_cnt -> (
               let list1 = anc_cnt_aux base env lev at_to p in
               match list1 with
               | Some list1 ->
-                  Printf.eprintf "List1 (cnt):\n";
-                  List.iter
-                    (fun (ip, _) ->
-                      Printf.eprintf "ip: %s, %s\n" (string_of_iper ip)
-                        (designation base (poi base ip) :> string))
-                    (cousins_fold list1);
                   VVstring (eval_int conf (List.length (cousins_fold list1)) sl)
               | None -> raise Not_found)
           | Paths -> (
