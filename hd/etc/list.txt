@@ -154,8 +154,6 @@
 %empty_sorted_list
 %for;i;0;nb;
   %let;myindex;%apply;get_ip(i)%in;
-  One item: i=%i;, index=%myindex;<br>
-  %qvar.6582.first_name;<br>
   %let;first_name;%apply;get_value(myindex, "first_name")%in;
   %let;surname;%apply;get_value(myindex, "surname")%in;
   %let;occ;%apply;get_value(myindex, "occ")%in;
