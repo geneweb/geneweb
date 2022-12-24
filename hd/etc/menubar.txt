@@ -26,7 +26,7 @@
       %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
         or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
         or (e.ip!="" and (e.m="ADD_FAM" or e.m="ADD_FAM_OK" or e.m="ADD_PAR"))) mt-5%end;">
-        <div class="btn-toolbar" role="toolbar" arial-label="tedite">
+      <div class="btn-toolbar" role="toolbar">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
