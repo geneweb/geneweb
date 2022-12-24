@@ -53,15 +53,14 @@ bin/gwrepl/.depend:
 dune-workspace: dune-workspace.in Makefile.config
 	cat $< | sed  -e "s/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g" > $@
 
+COMMIT := $$(git show -s --date=short --pretty=format:'%h (%cd)')
 hd/etc/version.txt:
-	@echo -n "Generating $@..."
-	@echo "<a href=\"https://github.com/geneweb/geneweb/commit/" > $@
-	@echo "$$(git show -s --pretty=format:'%h"')" >> $@
-	@echo "title=\"[*compiled on %s from commit %s:::" >> $@
-	@echo "$$(date '+%Y-%m-%d'):" >> $@
-	@echo "$$(git show -s --date=short --pretty=format:'%h (%cd)]">')" >> $@
+	@echo "generate $@ for commit $(COMMIT)"
+	@echo -n "<a href=\"https://github.com/geneweb/geneweb/commit/" > $@
+	@echo "$$(git show -s --pretty=format:'%h')\"" >> $@
+	@echo -n "  title=\"[*compiled on %s from commit %s:::$$(date '+%Y-%m-%d'):" >> $@
+	@echo -n "$(COMMIT)]\">" >> $@
 	@echo "GeneWeb v. %version;</a>" >> $@
-	@echo " Done!"
 
 .PHONY:hd/etc/version.txt
 
