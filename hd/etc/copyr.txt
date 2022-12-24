@@ -79,7 +79,7 @@
       <div class="d-inline-flex flex-column justify-content-end">
         <div class="ml-auto">
           <a role="button"
-            (% button to switch only between default and templm templates %)
+            %( button to switch only between default and templm templates %)
             href="%if(e.templ!="templm")%url_set.templ.templm;%end;%if;(e.digest="")&%suffix;%end;"
             title="%if(e.templ!="templm")templm%else;default template%end;">%nn;
             <span class="fab fa-markdown" aria-hidden="true"></span>%nn;
