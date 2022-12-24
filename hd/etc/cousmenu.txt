@@ -73,39 +73,33 @@ si mort <3 ans icone bébé, <15 ans enfant > balises sur l'âge et birth_date.
     %if(cousin.surname="?" and cousin.first_name="?")%incr_count3;
     %else;
       %apply;add_in_sorted_list%with;%cousin.surname; %cousin.first_name; %cousin.dates; %cousin.occ;%and;%nn;
-      <li class="card text-small nbr_%cousin.nbr; ml-n-1 py-1 pr-1 pl-0 rounded border-top-0 border-bottom-0 border-%if;(cousin.sex=0)primary%elseif;(cousin.sex=1)danger%else;dark%end;"%if;(cous_isdead=0) data-alive="%cous_isdead;"%end; style="border-left-width:%if;(cous_isdead=1)5px;background-color:rgba(245,231,216,0.95);%else;10px;%end;%if;(cous_nodesc!=1)border-style:double;%end;"
-      data-position="%apply;index("p",cousin.index,"sex")">%nn;
-        <div class="d-inline-flex justify-content-end align-items-start ml-n2 position-relative">
-          <div class="w-auto h-100 pl-0 pr-1 align-self-center order-1">
-            <a role="button" href="%prefix;%cousin.access;&m=C&v=%e.v;" title="[navigation] [with]…
-              class="my-3 w-auto text-%if;(cous_sex=0)primary%else;danger%end;" style="z-index:1">·</a>
+      <li class="card text-small nbr_%cousin.nbr; rounded-lg border-top-0 border-right-0 border-bottom-0 mr-2 border-%if;(cousin.sex=0)primary%elseif;(cousin.sex=1)danger%else;dark%end;"%if;(cous_isdead=0) data-alive="%cous_isdead;"%end; style="border-left-width:5px;%if;(cous_isdead=1)background-color:rgba(245,231,216,0.95);%end;%if;(cous_nodesc!=1)border-style:double;%end;"
+     %( TODO try to sort by data-attribute data-position="%apply;index("p",cousin.index,"sex")"%)>%nn;
+        <div class="d-flex justify-content-between align-items-start ml-n2">
+          <div class="d-block pl-n2 pr-2 align-self-center order-1 position-relative">
+            <a role="button" href="%prefix;%cousin.access;&m=C&v=%e.v;" title="[navigation] [with]…"
+              class="stretched-link py-3"> </a>
           </div>
-          <div class="d-flex align-self-center order-3">
-            <div class="mx-0">
-              <a role="button" class="btn px-1 mx-0%(stretched-link + position-relative + d-block%)" data-toggle="tooltip""href="%prefix;em=R&et=A&ei=%self.index;&i=%cousin.index;"
-                title="calcul de parenté"><i class="fa-solid fa-link fa-sm fa-fw"></i></a>
-            </div>
+          <div class="d-flex flex-column align-self-center order-3 m-0 mr-1">
+            <a href="%prefix;em=R&et=A&ei=%self.index;&i=%cousin.index;"><i class="fa-solid fa-link fa-sm"></i></a>
           %if;(www!=0)
-            <div class="mx-0">
-              <a role="button" class="btn px-1 mx-0" data-toggle="tooltip"
-                href="%prefix;m=RL&i=%if;(vvv=0)%self.index;%else;%cousin.anc1.index;%end;&l1=vvv&i1=%self.index;&l2=www&i2=%cousin.index;%nn;
+              <a href="%prefix;m=RL&i=%if;(vvv=0)%self.index;
+                %else;%cousin.anc1.index;%end;&l1=vvv&i1=%self.index;&l2=www&i2=%cousin.index;%nn;
                 %if;(cousin.nbr>1)&dag=on%end;"%sp;
-                title="%apply;a_of_b%with;%if;(cousin.sex=0)[cousin.0.www]0%else;[cousin.0.www]1%end;%and;%cousin.anc1.first_name; %cousin.anc1.surname; %(%cousin.anc1.dates;%)
+                title="%apply;a_of_b%with;%if;(cousin.sex=0)[cousin.0.www]0%else;[cousin.0.www]1%end;%and;%cousin.anc1.first_name; %cousin.anc1.surname;%( %cousin.anc1.dates;%)
                 %if;(cousin.anc2!=".....") [and] %cousin.anc2;%end;%end;">
-                %if;(cousin.nbr %2 = 0)<i class="fa-solid fa-user-group fa-sm fa-fw"></i>%else;<i class="fa-solid fa-user fa-sm fa-fw text-%if;(cousin.anc2!=".....")info%else;%if;(cousin.anc1.sex=0)primary%elseif;(cousin.sex=1)danger%else;muted%end;%end;"></i>%end;%nn;
-                %( TODO NBR <span class="small%if;(cousin.nbr>2)mr-1%end;"><sup>%if;(cousin.nbr>2)%cousin.nbr;%else; %end;</sup></span></a>%)
-            </div>
+                %if;(cousin.nbr %2 = 0)<i class="fa-solid fa-user-group fa-sm"></i>%else;<i class="fa-solid fa-user fa-sm text-%if;(cousin.anc2!=".....")info%else;%if;(cousin.anc1.sex=0)primary%elseif;(cousin.anc1.sex=1)danger%else;muted%end;%end;"></i>%end;%nn;
+                %(TODO NBR <span class="small%if;(cousin.nbr>2)mr-1%end;"><sup>%if;(cousin.nbr>2)%cousin.nbr;%else; %end;</sup></span>%)
+              </a>
           %end;
           </div>
           %(%let;cousin_age;%apply;index("p",cousin.index,"age.v")%in;%)
-          <div class="d-flex flex-column align-self-center order-2">
-          <div class="text-truncate text-nowrap px-0" style="line-height:2rem;width:80%%">
-            <a role="button" href="%prefix;%cousin.access;"
-              data-toggle="tooltip" class="w-auto%if;(cous_isdead=1) ml-1%end;"
-              title="%cousin.first_name;.%cousin.occ; %cousin.surname;"
-              data-anclist="%cousin.anc_f_list;">%cousin.surname; %cousin.first_name;%nn;
+          <div class="d-block flex-grow-1 justify-content-start align-self-center order-2 text-truncate text-nowrap px-0">
+            <a href="%prefix;%cousin.access;"%if;(cousin.occ!="0") title="occ %cousin.occ;"%end;%sp;
+              style="line-height:2rem;"
+              %(data-anclist="%cousin.anc_f_list;"%)>%cousin.surname; %cousin.first_name;%nn;
             </a>
-            %if;wizard; <a role="button" href="%prefix;&m=MOD_IND&i=%cousin.index;">%end;
+            %if;wizard;<a href="%prefix;&m=MOD_IND&i=%cousin.index;">%end;
               %cousin.dates;%(%if;(cous_isdead=0) %cousin_age;%end;%)
             %if;wizard;</a>%end
           </div>
@@ -120,7 +114,7 @@ si mort <3 ans icone bébé, <15 ans enfant > balises sur l'âge et birth_date.
     %if;(item.2=0)%incr_count;%end;
     %if;(item.3=0)%incr_count2;%end;
   %end;
-  <div class="modal fade px-2" id="modal_vvv_www" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y:scroll;">%(tofix : quick hack to allow scrolling on next modal and not body after dismissing a first modal%)
+  <div class="modal fade px-4" id="modal_vvv_www" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y:scroll;">%(tofix : quick hack to allow scrolling on next modal and not body after dismissing a first modal%)
     <div class="modal-dialog modal-xl%( modal-dialog-centered%)" style="width:100%%;max-width:1500px;
       %(%if;(listb_size>127)1600%elseif;(listb_size>31)1200%elseif;(listb_size>9)992%else;600%end;px;%)">
       <div class="modal-content bg-transparent border-0">
@@ -163,7 +157,7 @@ si mort <3 ans icone bébé, <15 ans enfant > balises sur l'âge et birth_date.
                 <div class="d-inline-flex align-self-center">
                   <div class="d-flex align-items-end">
                     %if;(vvv>0 and www=0)
-                      <button type="button" class="btn btn-sm py-0 mb-2 btn-light" data-dismiss="modal" data-toggle="modal" data-target="#modal_%expr(vvv-1)_www" ><i class="fa-solid fa-arrow-down-long fa-fw fa-rotate-by" style="--fa-rotate-angle: 45deg;" title="%expr(vvv-1)/0" ancestors at g-1" data-toggle="tooltip"></i></button>
+                      <button type="button" class="btn btn-sm py-0 mb-1 btn-light" data-dismiss="modal" data-toggle="modal" data-target="#modal_%expr(vvv-1)_www" ><i class="fa-solid fa-arrow-down-long fa-fw fa-rotate-by" style="--fa-rotate-angle: 45deg;" title="%expr(vvv-1)/0" ancestors at g-1" data-toggle="tooltip"></i></button>
                     %end;
                   </div>
                   <div class="d-inline-flex flex-column ml-2">
@@ -181,19 +175,19 @@ si mort <3 ans icone bébé, <15 ans enfant > balises sur l'âge et birth_date.
                         <i class="fa-solid fa-person-arrow-down-to-line fa-fw fa-flip-horizontal"></i>
                       </span>
                   </a>
-                  <button role="button" id="sortbtn" class="btn-light" style="z-index:1;">SORT</button>
+                  <button role="button" id="sortbtn" class="btn-light" style="z-index:1;">SORT<br>TODO</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div class="modal-body">
-          <div class="card-columns px-1"%( style="column-count:
+          <div class="card-columns"%( style="column-count:
             %if;(cous_paths_cnt.vvv.www>511)5%nn;
             %elseif;(cous_paths_cnt.vvv.www>127)4%nn;
             %elseif;(cous_paths_cnt.vvv.www>31)3
             %elseif;(cous_paths_cnt.vvv.www>9)2%else;1%end;"%)>
-            <ul class="list-group bg-transparent listitems autosort">
+            <ul class="list-group bg-transparent">
               %foreach;sorted_list_item;%item.2;%end;
             </ul>
           </div>
