@@ -54,7 +54,7 @@ if test "$LANG" = "fr"; then
 else
   echo "Starting gwd..."
 fi
-"$DIR/gw/gwd" -hd "$DIR/gw" > gwd.log 2>&1 &
+"$DIR/gw/gwd" -hd "$DIR/gw" > "$DIR/gw/gwd.log" 2>&1 &
 sleep 1
 gwd_pid=`ps -ef|grep '/gwd'|grep -v grep|awk '{print $2}'`
 if test "$gwd_pid" = ""; then
