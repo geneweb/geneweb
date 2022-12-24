@@ -1,4 +1,11 @@
 
+.ancmenu-implex {
+  color: rgb(255,136,46); 
+}
+.ancmenu-implex[aria-selected]{
+  color: rgb(255,255,255); 
+}
+
 h1, h2, h3, h4, h5, h6 { font-weight: lighter !important; }
 
 html {

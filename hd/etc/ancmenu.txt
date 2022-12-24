@@ -463,7 +463,7 @@ function missing_events_options () {
               <label class="custom-control-label" for="t_burial_date" title="[*date of burial]">[*date/dates]0</label>
             </div>
             <div class="custom-control custom-checkbox custom-control-inline">
-              <input type="checkbox" class="custom-control-input"id="t_burial_place" name="burial_place">
+              <input type="checkbox" class="custom-control-input" id="t_burial_place" name="burial_place">
               <label class="custom-control-label" for="t_burial_place">[*burial place]</label>
             </div>
           </div>
@@ -490,7 +490,7 @@ function missing_events_options () {
             <label class="custom-control-label" for="t_hl">[*highlight incomplete data]</label>
           </div>
           <div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input" id="t_repeat" name="repeat" >
+            <input type="checkbox" class="custom-control-input" id="t_repeat" name="repeat">
             <label class="custom-control-label" for="t_repeat">[*display smallest sosa number relative to ancestor]</label>
           </div>
         </div>
@@ -499,9 +499,9 @@ function missing_events_options () {
         <div class="d-flex flex-column was-validated">
           <label class="sr-only" for="v">[*specify::generation/generations]0[:]</label>
           <select class="custom-select " id="v" name="v" required title="[up to] 2^n-2 / [only] 2^(n-1)">
-            <option value=""></option>
+            <option value="" label=" "></option>
             %foreach;ancestor_level;
-              %if;(level>0 and level<15)
+              %if;(level>0)
                 %let;levelp;%expr(level+1)%in;
                 %let;number_of_ancestors_max;%expr(2^levelp-2)%in;
                 %let;number_of_ancestors_max_at_level;%expr(2^level)%in;
@@ -514,44 +514,50 @@ function missing_events_options () {
                 %let;percent_plus;%expr(100*(anc_paths_cnt.v-anc_paths_at_level_cnt.v)|number_of_ancestors_max)%in;
                 %let;percent_at_level;%expr(100*anc_paths_at_level_cnt.v|number_of_ancestors_max_at_level)%in;
                 %let;percent_paths_at_level;%expr(100*anc_paths_at_level_cnt_raw.v|number_of_ancestors_max_at_level)%in;
-                <option value="%level;" title="" class="d-flex px-2"
-                  %if;(level<90)
+                %let;blue;rgba(210,230,255,.5)%in;%let;lred;rgba(255,210,180,.5)%in;%let;whit;rgba(255,255,255,0)%in;
+                <option value="%expr(level+1)" title="" class="d-flex px-2"
+                  %if;(level<90)(%!temporary limit if long to render at high v%)
                     data-lex='%apply;ancname(level)'
                     data-noa='%anc_paths_cnt.v;'
                     data-noa_l='%anc_paths_at_level_cnt.v;'
-                    %if;(extra_paths!=0)data-pth='+%extra_paths;'%end;%sp;
-                    %if;(extra_paths_at_level!=0)data-pth_l='+%extra_paths_at_level;'%end;%sp;
-                    data-sty=' style="background:linear-gradient(90deg,rgba(155,200,255,.5) %percent_plus;%%,
-                                                                       rgba(210,230,255,.5) %percent_plus;%%,
-                                                                       rgba(210,230,255,.5) %percent;%%,
-                                                                       rgba(255,210,180,.5) %percent;%%,
-                                                                       rgba(255,210,180,.5) %percent_paths;%%,
-                                                                       rgba(255,255,255,0) %percent_paths;%%"'
-                    data-sty_l=' style="background: linear-gradient(90deg, rgba(180,200,220,.5) %percent_at_level;%%,
-                                                                           rgba(255,210,180,.5) %percent_at_level;%%,
-                                                                           rgba(255,210,180,.5) %percent_paths_at_level;%%,
-                                                                           rgba(255,255,255,0) %percent_paths_at_level;%%"'
-                    data-pp='/%nn;
-                    %if;(level<61)
-                      %if;(level<14)%number_of_ancestors_max;%else;%expr(number_of_ancestors_max|(10^(3*dd)))%end;
-                       %if;(dd>9)>10³⁰%elseif;(dd=9)Y%nn;
-                      %elseif;(dd=8)Y%elseif;(dd=7)Z%elseif;(dd=6)E%elseif;(dd=5)P%nn;
-                      %elseif;(dd=4)T%elseif;(dd=3)G%elseif;(dd=2)M%elseif;(dd=1 and level>13)k%else;%end;
-                    %end;
-                    %if;(percent!=0) %percent;
-                      %if;(percent_paths!=percent)-%percent_paths;%end; %%
-                    %end;'
-                    data-pp_l='/%nn;
-                      %if;(level<61)
-                        %if;(level<17)%number_of_ancestors_max_at_level;%else;%expr(number_of_ancestors_max_at_level|(10^(3*dd_at_level)))%end;
-                           %if;(level>100)>10³⁰%elseif;(level>90)Y%nn;
+                    %if;(extra_paths!=0)data-path='+%extra_paths;'%end;%sp;
+                    %if;(extra_paths_at_level!=0)data-path_l='+%extra_paths_at_level;'%end;%sp;
+                    data-sty=' style="background:linear-gradient(90deg,
+                      rgba(155,200,255,.5) %percent_plus;%%,%nn;%(lightblue%)
+                      %blue; %percent_plus;%%,%nn;
+                      %blue; %percent;%%,%nn;
+                      %lred; %percent;%%,%nn;
+                      %lred; %percent_paths;%%,%nn;
+                      %whit; %percent_paths;%%"'
+                    data-sty_l=' style="background: linear-gradient(90deg,
+                      rgba(180,200,220,.5) %percent_at_level;%%,%nn;%(lightgrey%)
+                      %lred; %percent_at_level;%%,%nn;
+                      %lred; %percent_paths_at_level;%%,%nn;
+                      %whit; %percent_paths_at_level;%%"'
+                    %( carefull after level 61, number_of_ancestors_max > ocaml max_int;! %)
+                    data-pp='%nn;
+                      %if;(level<61)/%nn;
+                        %if;(level<14)%number_of_ancestors_max;%else;%expr(number_of_ancestors_max|(10^(3*dd)))%end; %nn;
+                        %if;(dd>9)>10³⁰%elseif;(dd=9)Y%nn;
+                        %elseif;(dd=8)Y%elseif;(dd=7)Z%elseif;(dd=6)E%elseif;(dd=5)P%nn;
+                        %elseif;(dd=4)T%elseif;(dd=3)G%elseif;(dd=2)M%elseif;(dd=1 and level>13)k%else;%end;
+                        %if;(percent!=0) (%percent;
+                          %if;(percent_paths!=percent)-%percent_paths;%end; %%)
+                        %else; (%expr(percent*10)
+                          %if;(percent_paths!=percent)-%expr(percent_paths*10)%end; ‰)
+                        %end;
+                      %end;'
+                    data-pp_l='%nn;
+                      %if;(level<61)/%nn;
+                        %if;(level<17)%number_of_ancestors_max_at_level;
+                        %else;%expr(number_of_ancestors_max_at_level|(10^(3*dd_at_level)))%end; %nn;
+                        %if;(level>100)>10³⁰%elseif;(level>90)Y%nn;
                         %elseif;(level>80)Y%elseif;(level>70)Z%elseif;(level>60)E%elseif;(level>50)P%nn;
                         %elseif;(level>39)T%elseif;(level>29)G%elseif;(level>18)M%elseif;(level>16)k%else;%end;
-                      %end;
-                      %if;(percent_at_level!=0) %percent_at_level;
-                        %if;(percent_paths_at_level!=percent_at_level)-%percent_paths_at_level;%end; %%
-                      %end;'>%nn;
-                  %end;
+                        %if;(percent_at_level!=0) (%percent_at_level;
+                          %if;(percent_paths_at_level!=percent_at_level)-%percent_paths_at_level;%end; %%)%end;
+                      %end;'
+                    %end;>%nn;
                   %sp;%apply;thegen%with;%apply;nth([nth (generation)], level+1)%end;%nn;
                 </option>
               %end;
@@ -568,11 +574,11 @@ function missing_events_options () {
           <div class="order-1">
             <div class="custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" id="only" name="only">
-              <label class="custom-control-label" for="only">[*only the generation selected]<span class="text-primary">✱</span></label>
+              <label class="custom-control-label" for="only">[*only the generation selected]<span class="text-primary ml-1">✱</span></label>
             </div>
             <div class="custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" id="image" name="im" value="0">
-              <label class="custom-control-label" for="image">[*visualize/show/hide/summary]2 [image/images]1 <span class="text-info">✘</span></label>
+              <label class="custom-control-label" for="image">[*visualize/show/hide/summary]2 [image/images]1<span class="text-info ml-1">✘</span></label>
             </div>
             <div class="custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" id="cgl" name="cgl">
@@ -588,11 +594,12 @@ function missing_events_options () {
 %include;copyr
 </div>
 %include;js
+%let;redlight2;rgb(255,136,46)%in;
 <script>
 $(document).ready(function() {
   $("#v").select2({
-    templateResult: function(el) { return '<div class="d-flex justify-content-end"' + (($('#only').is(':checked')) ? ($(el.element).data('sty_l') || '') : ($(el.element).data('sty') || '')) + '" class="' + ($(el.element).prop('class') || '') + '"><div class="flex-grow-1 onlycheck pl-2" title="' + ($(el.element).data('lex') || '') + '">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + el.text + '</div>' + (($('#only').is(':checked')) ? ('') : ('<div>+' + ($(el.element).data('noa_l') || '') + '<span class="text-danger">' + ($(el.element).data('pth_l') || '') + '</span></div>')) + '<div class="col-3 px-0 ml-auto text-right pr-2" title="'+ (($('#only').is(':checked')) ? (($(el.element).data('noa_l') || '') + ($(el.element).data('pth_l') || '') + ($(el.element).data('pp_l') || '')) : (($(el.element).data('noa') || '') + ($(el.element).data('pth') || '') + ($(el.element).data('pp') || ''))) + '">' + (($('#only').is(':checked')) ? (($(el.element).data('noa_l') || '') + '<span class="text-danger">' + ($(el.element).data('pth_l') || '') + '</span>') : (($(el.element).data('noa') || '') + '<span class="text-danger">' + ($(el.element).data('pth') || '') + '</span>')) + '</div></div>'; },
-    templateSelection: function(el) { return '<span class="onlycheck">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + '</span><span>' + el.text + '</span><span class="ml-auto noa"> (' + (($('#only').is(':checked')) ? (($(el.element).data('noa_l') || '') + '<span class="text-danger">' + ($(el.element).data('pth_l') || '') + '</span>') : (($(el.element).data('noa') || '') + '<span class="text-danger">' + ($(el.element).data('pth') || '') + '</span>')) + '</span><span class="d-none noa_l"> (' + (($('#only').is(':checked')) ? (($(el.element).data('noa') || '') + '<span class="text-danger">' + ($(el.element).data('pth') || '') + '</span>') : (($(el.element).data('noa_l') || '') + '<span class="text-danger">' + ($(el.element).data('pth_l') || '') + '</span>')) + '</span>)</span>'; },
+    templateResult: function(el) { return '<div class="d-flex justify-content-end"' + (($('#only').is(':checked')) ? ($(el.element).data('sty_l') || '') : ($(el.element).data('sty') || '')) + '" class="' + ($(el.element).prop('class') || '') + '"><div class="d-inline-flex flex-grow-1 onlycheck pl-2" title="' + ($(el.element).data('lex') || '') + '">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + el.text + '</div>' + (($('#only').is(':checked')) ? ('') : ('<div>+' + ($(el.element).data('noa_l') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path_l') || '') + '</span></div>')) + '<span class="col-4 px-0 ml-auto text-right pr-2" title="'+ (($('#only').is(':checked')) ? (($(el.element).data('noa_l') || '') + ($(el.element).data('path_l') || '') + ($(el.element).data('pp_l') || '')) : (($(el.element).data('noa') || '') + ($(el.element).data('path') || '') + ($(el.element).data('pp') || ''))) + '">' + (($('#only').is(':checked')) ? (($(el.element).data('noa_l') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path_l') || '')) : (($(el.element).data('noa') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path') || ''))) + '</span></div></div>'; },
+    templateSelection: function(el) { return '<span class="onlycheck">' + (($('#only').is(':checked')) ? "[only]" : "[up to]") + '</span><span>' + el.text + '</span><span class="ml-auto noa"> ' + (($('#only').is(':checked')) ? ('(' + ($(el.element).data('noa_l') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path_l') || '') + '</span>)') : ('(' + ($(el.element).data('noa') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path') || '') + '</span>)')) + '</span><span class=" d-none noa_l"> ' + (($('#only').is(':checked')) ? ('(' + ($(el.element).data('noa') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path') || '') + '</span>)') : ('(' + ($(el.element).data('noa_l') || '') + '<span class="ancmenu-implex">' + ($(el.element).data('path_l') || '') + '</span>)')) + '</span>'; },
     escapeMarkup: function(markup) { return markup; },
     width: "resolve",
     allowClear: false,
