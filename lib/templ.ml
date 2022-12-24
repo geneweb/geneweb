@@ -528,6 +528,8 @@ let templ_eval_var conf = function
   | [ "just_friend_wizard" ] -> VVbool conf.just_friend_wizard
   | [ "friend" ] -> VVbool conf.friend
   | [ "manitou" ] -> VVbool conf.manitou
+  | [ "plugin"; plugin ] ->
+      VVbool (List.mem plugin (List.map Filename.basename conf.plugins))
   | [ "supervisor" ] -> VVbool conf.supervisor
   | [ "true" ] -> VVbool true
   | [ "wizard" ] -> VVbool conf.wizard
