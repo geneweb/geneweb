@@ -4114,12 +4114,13 @@ let print_foreach conf base print_ast eval_expr =
     | _ -> ()
   in
   let print_foreach_path env al ep =
+    let level = match get_env "level" env with Vint n -> n | _ -> 0 in
     match get_env "cousins" env with
     | Vcousl l ->
         let rec loop first l =
           match l with
           | [] -> ()
-          | (ip, (ifaml, _ipl, _cnt), lev) :: l ->
+          | (ip, (ifaml, _ipl, _cnt), lev) :: l when lev < level ->
               (let gp =
                  GP_person
                    ( Sosa.one,
@@ -4134,11 +4135,11 @@ let print_foreach conf base print_ast eval_expr =
                in
                List.iter (print_ast env ep) al);
               loop false l
+          | _ :: l -> loop false l
         in
         loop true !l
     | _ -> ()
   in
-
   let print_foreach_path_at_level env al ep =
     let level = match get_env "level" env with Vint n -> n | _ -> 0 in
     match get_env "cousins" env with
@@ -4149,7 +4150,7 @@ let print_foreach conf base print_ast eval_expr =
             match gpl with
             | [] -> acc
             | (ip, (ifaml, _ipl, _cnt), lev) :: l ->
-                if lev = level (* TODO manage lev as a list *) then
+                if lev = level - 1 (* TODO manage lev as a list *) then
                   loop2 ((ip, (ifaml, _ipl, _cnt), lev) :: acc) l
                 else loop2 acc l
           in
@@ -4177,7 +4178,6 @@ let print_foreach conf base print_ast eval_expr =
         loop1 true gpl_at_level
     | _ -> ()
   in
-
   let print_foreach_ancestor_level env el al ((p, _) as ep) =
     let max_level =
       match el with
