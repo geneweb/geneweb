@@ -150,7 +150,7 @@
   %elseif;(evar.t = "E" and evar.sort != "")
     %( list eclair sorted by date begin or number of individuals or number of events %)
     %empty_sorted_list;
-    %foreach;ancestor_surname(e.v+1)
+    %foreach;ancestor_surname(e.v)
       %apply;add_in_sorted_list%with;
         %if;(evar.sort = "ind")
           %ancestor.nb_ind;
@@ -306,7 +306,7 @@
       </tr>
       </thead>
       <tbody>
-      %foreach;ancestor_surname(e.v+1)
+      %foreach;ancestor_surname(e.v)
         <tr>
           <td>
             %ancestor.surname_end;%ancestor.surname_begin;
@@ -347,7 +347,7 @@
     %( surnames branch sorted by number of branches %)
     %empty_sorted_list;
     %reset_count;
-    %foreach;ancestor_surname(e.v+1)
+    %foreach;ancestor_surname(e.v)
       %incr_count;
       %let;neg_ancestor_nb_times;%expr(0-ancestor.nb_times)%in;
       %apply;add_in_sorted_list(
@@ -494,7 +494,7 @@
       </tr>
       </thead>
       <tbody>
-      %foreach;ancestor_surname(e.v+1)
+      %foreach;ancestor_surname(e.v)
         <tr>
           <td>
             %ancestor.surname_end;%ancestor.surname_begin;
