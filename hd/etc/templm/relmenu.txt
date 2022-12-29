@@ -189,7 +189,7 @@
     <legend>[*tools]</legend>
     <label>
       <input type="radio" name="et" value="A" %l_on;%/>
-      [*ancestors]
+      [*ancestor/ancestors]1
     </label>
     <br>
     <label>

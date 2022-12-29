@@ -751,7 +751,7 @@ let print_propose_upto conf base p1 p2 rl =
       Output.print_sstring conf
         {|/picto_fleche_bleu.png" alt=""> <span class="smaller">|};
       let s = (person_title_text conf base p : Adef.safe_string :> string) in
-      transl_a_of_b conf (transl conf "ancestors") s s
+      transl_a_of_b conf (transl_nth conf "ancestor/ancestors" 1) s s
       |> translate_eval |> Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf " ";
       (person_title_text conf base a : Adef.safe_string :> string)
