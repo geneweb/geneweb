@@ -1,4 +1,4 @@
-<!-- $Id: modules/arbre_vertical v7.00 11/02/2022 00:48:44 Arbre ascendant vertical -->
+<!-- $Id: modules/arbre_vertical v7.1exp 29/12/2022 04:56:27 Arbre ascendant vertical -->
 %define;a_tree_line()
   %if;(not is_first)
     <tr>
@@ -17,7 +17,7 @@
       %if;(not is_first)
         <td class="text-center"><samp>&nbsp;</samp></td>
       %end;
-      <td colspan="%cell.colspan;"%( style="max-width:%expr(1024/(2^(e.v-1)))px"%) class="text-center align-bottom p-0">%nn;
+      <td colspan="%cell.colspan;"%( style="max-width:%expr(1024/(2^e.v))px"%) class="text-center align-bottom p-0">%nn;
         %if;(cell.is_empty)<samp>&nbsp;</samp>%nn;
         %else;
           %if;(e.im="" and cell.person.has_image)
@@ -240,7 +240,7 @@
     %if;("xx" != "self")<br>│<br>%end;
   %end;%nl;
 %end;
-%let;gen;%if;(e.v!="")%e.v;%else;3%end;%in;
+%let;gen;%if;(e.v!="")%e.v;%else;2%end;%in;
 %if;not cancel_links;
   <div class="d-flex justify-content-center">
     %include;buttons_dag
@@ -254,18 +254,18 @@
       %if;(e.t="A")
         <tr>
           <td class="text-center">
-            %apply;male_line("self", gen)
+            %apply;male_line("self", gen+1)
           </td>
         </tr>
       %elseif;(e.t="C")
         <tr>
           <td class="text-center">
-            %apply;female_line("self", gen)
+            %apply;female_line("self", gen+1)
           </td>
         </tr>
       %end;
     %else;
-      %foreach;ancestor_tree_line(gen)
+      %foreach;ancestor_tree_line(gen+1)
         %apply;a_tree_line()
       %end;
     %end;

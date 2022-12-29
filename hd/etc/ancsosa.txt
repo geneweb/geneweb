@@ -10,21 +10,10 @@
   [the %s generation:::xx]%nn;
 %end;
 %define;togena(xx)
-  %if;(xx = 1)[specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[to the parents]%nn;
-  %elseif;(xx = 3)[to the grandparents]%nn;
-  %elseif;(xx = 4)[to the great-grandparents]%nn;
-  %else;
-    %apply;tothegen%with;
-      %apply;nth([nth (generation)], xx)
-    %end;
-  %end;
-%end;
-%define;togen(xx)
-  %if;(xx = 1)[specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[to the parents]%nn;
-  %elseif;(xx = 3)[to the grandparents]%nn;
-  %elseif;(xx = 4)[to the great-grandparents]%nn;
+  %if;(xx = 0)[specify::generation/generations]0%nn;
+  %elseif;(xx = 1)[to the parents]%nn;
+  %elseif;(xx = 2)[to the grandparents]%nn;
+  %elseif;(xx = 3)[to the great-grandparents]%nn;
   %else;
     %apply;tothegen%with;
       %apply;nth([nth (generation)], xx)
@@ -32,10 +21,10 @@
   %end;
 %end;
 %define;gen(xx)
-  %if;(e.xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(e.xx = 2)[parents]%nn;
-  %elseif;(e.xx = 3)[grand-parents]%nn;
-  %elseif;(e.xx = 4)[great-grand-parents]%nn;
+  %if;(e.xx = 0)[*specify::generation/generations]0%nn;
+  %elseif;(e.xx = 1)[parents]%nn;
+  %elseif;(e.xx = 2)[grand-parents]%nn;
+  %elseif;(e.xx = 3)[great-grand-parents]%nn;
   %else;
     %apply;thegen%with;
       %apply;nth([nth (generation)], e.xx)
@@ -60,7 +49,7 @@
       %end;
       %if;(e.cgl="on" and e.t!="N")
         %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
-        %sp;%apply;togen(nb_gen).
+        %sp;%apply;togena(nb_gen).
       %end;
     %end;
   </title>
@@ -732,13 +721,13 @@
                   %if;event.has_witnesses;
                     <p style="margin:0;">
                       %foreach;event_witness;
-                        <span>%apply;capitalize(event_witness_kind) :</span>
+                        <span>%apply;capitalize(event_witness_kind)[:]</span>
                         %apply;short_display_person("event_witness")<br>
                       %end;
                     </p>
                   %end;
                   %if;event.has_note;<div>%event.note;</div>%end;
-                    %if;event.has_src;<span><em>[*source/sources]1: %event.src;</em></span>%end;
+                    %if;event.has_src;<span><em>[*source/sources]1[:] %event.src;</em></span>%end;
                 </td>
               </tr>
             %end;
@@ -1165,7 +1154,7 @@
 
 %define;table_row()
   %lazy_force;
-  %if;(ancestor.same="" and (ancestor.first_name!="?" and ancestor.surname!="?"))%incr_count;%end;
+  %if;(level!=0 and ancestor.same="" and (ancestor.first_name!="?" and ancestor.surname!="?"))%incr_count;%end;
 %( Sosa %)
   %if;(e.num="on")
     <td class="align-middle text-center table_big_cell lh_implex%if;(ancestor.has_parents) text-alert%end;"
@@ -1500,9 +1489,9 @@
     %apply;lazy_print%with;
       <tr><th colspan="7" >%nl;[*generation/generations]0 %level;%nl;</th></tr>
     %end;
-    %if;(level <= e.l + 1)
+    %if;(level <= e.l)
       %foreach;ancestor;
-        %if;(level != 1 and ancestor.same = "" and (ancestor.is_descendant or ancestor.spouse.is_descendant))
+        %if;(level!=0 and ancestor.same="" and (ancestor.is_descendant or ancestor.spouse.is_descendant))
           %lazy_force;
           %let;l1;%if;(ancestor.is_descendant)class="border border-%if;(ancestor.is_male)info%elseif(ancestor.is_female)danger%end; is_desc_1%ancestor.sex;"%end;%in;
           %apply;one_line(l1)
@@ -1514,7 +1503,7 @@
 
 %define;table_double()
   %foreach;ancestor_level(l_v)
-    %if;(level > 1 and (e.only != "on" or level = l_v))
+    %if;(level>0 and (e.only!="on" or level=l_v))
       <tr><th colspan="7" >%nl;[*generation/generations]0 %level;%nl;</th></tr>
       %foreach;ancestor
           %if;(ancestor.same = "")%incr_count;%end;
@@ -1522,8 +1511,8 @@
       %end;
     %end;
   %end;
-  <tr><td colspan="7">[*total] : %count;%if;(e.only="on")/%expr(2^(l_v-1)-1)
-                         %else;/%expr(2^(l_v)-2)%end; [[person/persons]1@(c)]</td></tr>
+  <tr><td colspan="7">[*total] : %count;%if;(e.only="on")/%expr(2^l_v)
+                         %else;/%expr(2^(l_v+1)-2)%end; [[person/persons]1@(c)]</td></tr>
 %end;
 
 %( Précision des dates intégrée à l’année en utilisant la syntaxe pour leur saisie dans les formulaires
@@ -1599,46 +1588,41 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 %elseif;(e.t = "N" and e.only = "on")
   %( short display; only the selected generation %)
   %reset_count;
-  <ul>
-    %foreach;ancestor_at_level;
-      %if;(e.v != "" and level = e.v)
-        <li>%nl;<b>%apply;capitalize%with;%apply;gen("v")%end;</b>%nl;
-          <ul>%nl;
-            %foreach;ancestor;
-              <li>%sp;
-                %if;(ancestor.interval != "")%ancestor.interval;
-                %else;
-                  %if;(ancestor.same = "")%incr_count;%end;
-                  %ancestor.anc_sosa;%sp;
-                  %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
-                  %apply;link%with;%ancestor.access;%and;
-                    %if;(ancestor.same != "")%ancestor.same;
-                    %else;%ancestor;%end;
-                    %and;%ancestor.index;
-                  %end;
-                  %if;(ancestor.same = "")%ancestor.title;%ancestor.dates;
-                  %else;
-                    %sp;(<a href="#i%ancestor.index;" title="[implex/implexes]0, [see above]">↑</a>)
-                  %end;
-                %end;
-              </li>%nl;
+  %foreach;ancestor_at_level;
+    %if;(e.v>=0 and level=e.v)
+      <ul>%nl;
+        %foreach;ancestor;
+          <li>%sp;
+            %if;(ancestor.interval != "")%ancestor.interval;
+            %else;
+              %if;(ancestor.same = "")%incr_count;%end;
+              %ancestor.anc_sosa;%sp;
+              %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
+              %apply;link%with;%ancestor.access;%and;
+                %if;(ancestor.same != "")%ancestor.same;
+                %else;%ancestor;%end;
+                %and;%ancestor.index;
+              %end;
+              %if;(ancestor.same = "")%ancestor.title;%ancestor.dates;
+              %else;
+                %sp;(<a href="#i%ancestor.index;" title="[implex/implexes]0, [see above]">↑</a>)
+              %end;
             %end;
-          </ul>
-        </li>
-      %end;
+          </li>%nl;
+        %end;
+      </ul>
     %end;
-  </ul>
+  %end;
   <p>[*total][:] %count; [[person/persons]1@(c)]</p>
 
 %elseif;(e.t = "N")
   %( short display %)
   %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
-  <p>%apply;togen(nb_gen).</p>
+  <p>%apply;togena(nb_gen).</p>
   %reset_count;
-  <ul>
     %foreach;ancestor_level(nb_gen)
       %apply;lazy_print%with;
-        <li>%nl;<b>[*generation/generations]0 %level;</b>%nl;
+        %nl;%if;(level!=0)<b>[*generation/generations]0 %level;</b>%nl;%end;
         <ul>%nl;
       %end;
       %foreach;ancestor;
@@ -1667,10 +1651,8 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %end;
       %if;lazy_printed;
         </ul>
-        </li>
       %end;
     %end;
-  </ul>
   <p>[*total][:] %count; [[person/persons]1@(c)]</p>
   %elseif;(e.t = "M" and e.evt = "on")
     %include;miss_evt
@@ -1679,7 +1661,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
   %( missing ancestors alphabetically %)
   %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
   <p>
-    %apply;togen(nb_gen)
+    %apply;togena(nb_gen)
     %apply;living_interval_dates(e.after, e.before).
   </p>
   <div class="not_printable" style="margin-bottom:25px;">
@@ -1821,7 +1803,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
   %( missing ancestors by generation %)
   %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
   <p>
-    %apply;togen(nb_gen)
+    %apply;togena(nb_gen)
     %apply;living_interval_dates(e.after, e.before)
   </p>
   <div class="not_printable" style="margin-bottom:25px;">
@@ -1935,10 +1917,12 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %end;
     </p>
   %end;
-  <h3>
-    <em>%apply;capitalize%with;%apply;gen("v")%end;.</em>
-    <a name="asc">&nbsp;</a>
-  </h3>
+  %if;(e.v!=0)
+    <h3>
+      <em>%apply;capitalize%with;%apply;gen("v")%end;.</em>
+      <a name="asc">&nbsp;</a>
+    </h3>
+  %end;
   %foreach;ancestor_level;
     %if;(e.v != "" and level = e.v)
       %foreach;ancestor;
@@ -1976,11 +1960,11 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
   %end;
   %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
   <p>
-    %apply;togen(nb_gen).
+    %apply;togena(nb_gen).
     <a name="asc">&nbsp;</a>
   </p>
   %foreach;ancestor_level(nb_gen)
-    <h3><em>[*generation/generations]0 %level;</em></h3>
+    %if;(level!=0)<h3><em>[*generation/generations]0 %level;</em></h3>%end;
     %foreach;ancestor;
       %if;(ancestor.same != "")
         <p>
@@ -2063,7 +2047,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %let;nb_col;%count;%in;
       %reset_count;
       %foreach;ancestor_level(l_v)
-        %if;(e.only!="on" and e.gen=1 and level!=1)
+        %if;(e.only!="on" and e.gen=1 and level!=0)
           <tr>
             <th class="text-left" scope="row" colspan="%nb_col;">
               <span class="ml-1">[*generation/generations]0 %level;</span>
@@ -2071,7 +2055,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
           </tr>
         %end;
         %foreach;ancestor;
-          %if;(level>0 and (e.only!="on" or level=l_v))
+          %if;(e.only!="on" or level=l_v)
             <tr>
               %apply;table_row()
             </tr>
@@ -2083,8 +2067,8 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %end;
     </table>
     <div>
-      [*total][:] %count;%if;(e.only="on")/%expr(2^(l_v-1))
-                         %else;/%expr((2^l_v)-1)%end; [[person/persons]1@(c)].
+      [*total][:] %if;(e.only!="on")1+%count;/%expr((2^(l_v+1)-2))
+                  %else;%count;/%expr(2^l_v)%end; [[person/persons]1@(c)].
     </div>
   %else;
     <div class="mt-2">
