@@ -45,7 +45,7 @@
           %foreach;env_binding;
             %if;(env.key = "m")m=A;%elseif;(env.key = "t")t=G;%else;%env.key;=%env.val.decoded;;%end;
           %end;
-        ">[*ancestors]0</a></span>
+        ">[*ancestor/ancestors]1</a></span>
       %end;
       %if;(evar.m = "A" and has_children)
         <span><a %l1; href="%prefix_base_password;%if;(evar.lang != "")lang=%evar.lang;;%end;

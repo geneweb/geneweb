@@ -13,7 +13,7 @@
     %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [places]
     %elseif;(evar.t = "F" and evar.tf1 = "aad") - [*age at death] ([M/F]0, [M/F]1)
     %elseif;(evar.t = "F" and evar.tf1 = "afm") - [*age] ([father/mother]0, [father/mother]1)
-    %else; - [*ancestors] -
+    %else; - [*ancestor/ancestors]1 -
     %end;
   </title>
   <meta name="robots" content="none"%/>
@@ -75,7 +75,7 @@
 <h1>%nn;
   %if;(evar.tf1 != "csv")
     %apply;a_of_b%with;
-      %if;(evar.fam7 = "on")7 [family/families]1%else;[*ancestors]%end;
+      %if;(evar.fam7 = "on")7 [family/families]1%else;[*ancestor/ancestors]1%end;
     %and;
       %if;(not cancel_links)<a href="%prefix;%access;">%end;
         %if;(public_name != "")%public_name;%else;%first_name;%end;

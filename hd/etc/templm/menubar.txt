@@ -81,17 +81,17 @@
           <span class="s_menu">
             %if;has_parents;
               <a href="%l_gwu;;a1=%first_name_key;;a2=%occ;;a3=%surname_key;;o=A%l2;.gw"
-               title="[ancestors] %self;">A%l2;.gw</a>%nn;
+               title="[ancestor/ancestors]1 %self;">A%l2;.gw</a>%nn;
               <a href="%l_gwu;;aws1=%first_name_key;;aws2=%occ;;aws3=%surname_key;;o=AWS%l2;.gw"
-               title="[ancestors] + [full siblings] %self;">AWS%l2;.gw</a>%nn;
+               title="[ancestor/ancestors]1 + [full siblings] %self;">AWS%l2;.gw</a>%nn;
             %end;
             %if;(has_parents and has_children)
               <a href="%l_gwu;;ad1=%first_name_key;;ad2=%occ;;ad3=%surname_key;;maxlev=40;o=AD%l2;.gw"
-               title="[ancestors] + [descendants] %self;">AD%l2;.gw</a>%nn;
+               title="[ancestor/ancestors]1 + [descendants] %self;">AD%l2;.gw</a>%nn;
               %if;(has_sosa and sosa_ref.index != index)
                 %let;l3;As1%apply;initial(sosa_ref.first_name_key)%apply;initial(sosa_ref.surname_key)D%l2;%in;
                 <a href="%l_gwu;;a1=%sosa_ref.first_name_key;;a2=%sosa_ref.occ;;a3=%sosa_ref.surname_key;;d1=%first_name_key;;d2=%occ;;d3=%surname_key;;nsp=on;o=%l3;.gw"
-                 title="%apply;a_of_b%with;[ancestors]%and;%sosa_ref;%end; [up to] %self;">%l3;.gw</a>%nn;
+                 title="%apply;a_of_b%with;[*ancestor/ancestors]1%and;%sosa_ref;%end; [up to] %self;">%l3;.gw</a>%nn;
               %end;
             %end;
             %if;has_children;
@@ -114,7 +114,7 @@
   %end;
   %if;has_parents;
     <span>
-      <a href="%prefix;m=A;%access;">[*ancestors]</a>
+      <a href="%prefix;m=A;%access;">[*ancestor/ancestors]1</a>
       <span class="s_menu">
         <a id="anc_tree" href="%prefix;m=A;t=T;v=4;image=on;marriage=on;%access;" %laY;>[tree]</a>%nn;
         <a href="%prefix;m=A;t=Z;image=%evar.image;;v=7;maxv=%max_anc_level;;%access;">[table]</a>%nn;

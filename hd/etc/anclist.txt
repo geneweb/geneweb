@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: anclist.txt,v 7.00 26/09/2020 12:05:01 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 7.1 exp 26/09/2020 12:05:01 ddr Exp $ -->
   <title>%nn;
     %if;(evar.t = "F")- [*surnames branch] -%nn;
     %else
       %apply;a_of_b%with;
-        %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
+        %if;(evar.t = "M")[*missing ancestors]%else;[*ancestor/ancestors]1%end;
       %and;
         %if;(public_name != "")%public_name;%else;%first_name;%end;
         %if;(qualifier != "") %qualifier;%end;
@@ -49,7 +49,7 @@
       %if;(alias != "") <em>(%alias;)</em>%end;<br>
     %end;
   %else;
-    %apply;a_of_b%with;[*ancestors]%and;
+    %apply;a_of_b%with;[*ancestor/ancestors]1%and;
       %if;(public_name!="")%public_name;%else;%first_name;%end; %surname; %end;
     %if;(evar.t="D")[up to] %p_of_index.1;
     %end;
@@ -106,7 +106,7 @@
   <label class="sr-only mt-2" for="inputxx">Filtre xx</label>
   <input type="text" id="inputxx" placeholder="[surname/surnames]0xx" title="[filter by::surname/surnames]0xx" class="filter%if;(xx>1) extrafilter%end; form-control-sm mr-1%if;(xx!=1) d-none%end;" disabled>
 %end;
-%if;(evar.v = "" or evar.v <= 1)
+%if;(e.v="" and e.v=0)
   [*specify::generation/generations]0.
 %else;
   %if;(evar.t = "L")

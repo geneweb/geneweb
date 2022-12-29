@@ -154,17 +154,17 @@
               %end;
               %if;has_parents;
                 <a href="%l_gwu;;a1=%first_name_key;;a2=%occ;;a3=%surname_key;;o=A%l2;.gw"
-                 title="[ancestors] %self;">A%l2;.gw</a>%nn;
+                 title="[ancestor/ancestors]1 %self;">A%l2;.gw</a>%nn;
                 <a href="%l_gwu;;aws1=%first_name_key;;aws2=%occ;;aws3=%surname_key;;o=AWS%l2;.gw"
-                 title="[ancestors] + [full siblings] %self;">AWS%l2;.gw</a>%nn;
+                 title="[ancestor/ancestors]1 + [full siblings] %self;">AWS%l2;.gw</a>%nn;
               %end;
               %if;(has_parents and has_children)
                 <a href="%l_gwu;;ad1=%first_name_key;;ad2=%occ;;ad3=%surname_key;;maxlev=40;o=AD%l2;.gw"
-                 title="[ancestors] + [descendants] %self;">AD%l2;.gw</a>%nn;
+                 title="[ancestor/ancestors]1 + [descendants] %self;">AD%l2;.gw</a>%nn;
                 %if;(has_sosa and sosa_ref.index != index)
                   %let;l3;As1%apply;initial(sosa_ref.first_name_key)%apply;initial(sosa_ref.surname_key)D%l2;%in;
                   <a href="%l_gwu;;a1=%sosa_ref.first_name_key;;a2=%sosa_ref.occ;;a3=%sosa_ref.surname_key;;d1=%first_name_key;;d2=%occ;;d3=%surname_key;;nsp=on;o=%l3;.gw"
-                   title="%apply;a_of_b%with;[ancestors]%and;%sosa_ref;%end; [up to] %self;">%l3;.gw</a>%nn;
+                   title="%apply;a_of_b%with;[ancestor/ancestors]1%and;%sosa_ref;%end; [up to] %self;">%l3;.gw</a>%nn;
                 %end;
               %end;
               %if;has_children;
@@ -575,7 +575,7 @@
         <span style="margin-left:20px"><small>[up to] %apply;ascmax()%apply;implex()</small></span><br>
         %let;l1;%apply;min(max_anc_level,5)%in;
         <span>
-          <span class="ch2" style="margin-top:-4px;">[*ancestors]</span>
+          <span class="ch2" style="margin-top:-4px;">[*ancestor/ancestors]1</span>
           %if;(not cancel_links)
             <span class="s_menu">
               %if;(max_anc_level>3)
@@ -585,17 +585,17 @@
                   %else;
                     <a href="%prefix;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="");image=%evar.image;%end;%if;(evar.wide!="");wide=%evar.wide;%end;%if;(evar.misc!="");misc=%evar.misc;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;;asclev=%i;"
                     style="%if;((evar.asclev="" and i=3) or i=evar.asclev)background-color:%if;(bvar.css=1)#666;%else;#EEE;%end;%end;width:17px;"
-                    title="%i; [generation/generations]1%nl;%apply;asc(i) [ancestors]">%if;(i<10) %end;%i;</a>
+                    title="%i; [generation/generations]1%nl;%apply;asc(i) [ancestor/ancestors]1">%if;(i<10) %end;%i;</a>
                   %end;
                 %end;
               %end;
               <a id="anc_tree" href="%prefix;m=A;t=T;v=4;image=on;marriage=on;%access;" %laY;>[*ascendants tree]</a>%nn;
               <a href="%prefix;m=A;t=H;v=%l1;;maxv=%max_anc_level;;i=%index;">[*horizontal tree]</a>%nn;
-              <a href="%prefix;m=A;t=Y;image=%evar.image;;v=7;maxv=%max_anc_level;;%access;">[*table] [ancestors]</a>%nn;
+              <a href="%prefix;m=A;t=Y;image=%evar.image;;v=7;maxv=%max_anc_level;;%access;">[*table] [*ancestor/ancestors]1</a>%nn;
               <a href="%prefix;m=A;t=G;v=3;maxv=%max_anc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;upd=on;hide=on;%access;">[*long display]</a>%nn;
               <a href="%prefix;m=A;t=F;tf1=aad;v=%max_anc_level;;maxv=%max_anc_level;;i=%index;">[*age at death]</a>%nn;
               <a href="%prefix;m=A;t=F;tf1=sb;v=5;maxv=%max_anc_level;;i=%index;">[*surnames branch]</a>%nn;
-              <a href="%prefix;m=A;%access;">Menu [tools] [ancestors]</a>%nn;
+              <a href="%prefix;m=A;%access;">Menu [tools] [ancestor/ancestors]1</a>%nn;
             </span>
           %end;
         </span>
@@ -1085,7 +1085,7 @@
     %if;(sosa=1)[*Sosa] 1
     %elseif;(has_sosa and sosa != 1)
       %let;l_sosa_ref;%apply;a_of_b%with;%and;%apply;link_name("sosa_ref")%end;%in;
-      <a href="%prefix;m=A;t=D;image=%evar.image;;i=%sosa_ref.index;;i1=%index;;l=%max_desc_level;" title="%apply;a_of_b%with;[*ancestors]%and;%sosa_ref;%end; [up to] %self;">[*Sosa] %sosa;</a>
+      <a href="%prefix;m=A;t=D;image=%evar.image;;i=%sosa_ref.index;;i1=%index;;l=%max_desc_level;" title="%apply;a_of_b%with;[*ancestor/ancestors]1%and;%sosa_ref;%end; [up to] %self;">[*Sosa] %sosa;</a>
       %l_sosa_ref;
     %end;
     %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)
@@ -1101,8 +1101,8 @@
   %if;(wizard and bvar.can_kill_ancestors="yes")
     <p><strong>/!\ can_kill_ancestors=yes   </strong>
        <a class="del" href="%prefix;m=KILL_ANC;i=%index;" target="ifr"
-          onclick="javascript:deleted(this);" title="[delete::ancestors]0">%nn;
-          %self; <em>/!\ [delete::ancestors]0 /!\</em></a>
+          onclick="javascript:deleted(this);" title="[delete::ancestor/ancestors]0">%nn;
+          %self; <em>/!\ [delete::ancestor/ancestors]0 /!\</em></a>
        <strong>   can_kill_ancestors=yes /!\</strong>
     </p>
   %end;

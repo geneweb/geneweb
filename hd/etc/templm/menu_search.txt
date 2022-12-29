@@ -52,7 +52,7 @@
           %else;
           (0) [spouse/spouses]1<br>
           (1) [siblings]<br>
-          (2 3 4 5 6 7) [n° Sosa] [ancestors]<br>
+          (2 3 4 5 6 7) [n° Sosa] [ancestor/ancestors]1<br>
           (8) [child/children]1<br>
           (9) [child/children]1 Sosa<br>
           (%laDk;) [difference between the two revisions]<br>

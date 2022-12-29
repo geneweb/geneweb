@@ -5,12 +5,12 @@
 
   <title>%nn;
     %if;(l_up = 1)
-      [*ancestors] … [up to] …%nn;
+      [*ancestor/ancestors]1 … [up to] …%nn;
     %elseif;(evar.t = "N" and evar.only = "on")
       [*generation/generations]0 %e.v;
     %else;
       %apply;a_of_b2%with;
-        %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
+        %if;(evar.t = "M")[*missing ancestors]%else;[*ancestor/ancestors]1%end;
       %and;
         %if;(public_name != "")%public_name;%else;%first_name;%end;
         %if;(qualifier != "") %qualifier;%end;
@@ -70,7 +70,7 @@
 
 <h1>%nn;
   %apply;a_of_b2%with;
-    %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
+    %if;(evar.t = "M")[*missing ancestors]%else;[*ancestor/ancestors]1%end;
   %and;
     %if;(not cancel_links)<a href="%prefix;%access;">%end;
       %if;(public_name != "")%public_name;%else;%first_name;%end;
