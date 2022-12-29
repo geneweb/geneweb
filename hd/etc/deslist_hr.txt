@@ -60,7 +60,7 @@
     %let;l21;
       %if;(curlev != 0)
         %if;(not cancel_links)
-          <a href="%prefix;%access&m=D&t=D&v=%l_v;">%child_cnt;</a>%nn;
+          <a href="%prefix;%access;&m=D&t=D&v=%l_v;">%child_cnt;</a>%nn;
         %else;
           %child_cnt;%nn;
         %end;
