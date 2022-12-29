@@ -503,7 +503,7 @@ const a_r = [   50,   50,   50,   50,   80,   70,  100,  150,  130,   90 ];
 const a_m = [ "S1", "C3", "C3", "C3", "R3", "R3", "R2", "R1", "R1", "R1" ];
 
 var ak = Object.keys(ancestor)
-max_gen = 1+Math.trunc(Math.log(Number(ak[ak.length-1].replace( /^S/, "")))/Math.log(2));
+max_gen = 0+Math.trunc(Math.log(Number(ak[ak.length-1].replace( /^S/, "")))/Math.log(2));
 
 var max_r = 0 ;
 for( var i = 0 ; i < max_gen && i < a_r.length ; i++ ) {
@@ -869,7 +869,7 @@ document.getElementById("b-gen-add").onclick = function() {
 	}
 };
 document.getElementById("b-gen-del").onclick = function() {
-	if( max_gen > 1 ) {
+	if( max_gen > 0 ) {
 		var p = ancestor["S1"];
 		var oc = p.oc;
 		if( oc != "" && oc != 0 ) { oc = "&oc=" + oc } else { oc = "" }

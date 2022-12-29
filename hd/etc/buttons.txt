@@ -179,8 +179,7 @@
       %if;(e.v!="")
       <span class="sr-only">— [*generation/generations]0</span>
       <a role="button" class="btn btn-link ml-1 mr-0 px-0 mr-1
-                              %if;(e.m="D")%if;(e.v<2) disabled text-muted%end;
-                              %elseif;(e.m="A")%if;(e.v<3) disabled text-muted%end;%end;"
+                              %if;(e.v<1) disabled text-muted%end;"
         title="[*delete] 1 [generation/generations]0"
         href="%prefix_base_password;%nn;
             %foreach;env_binding;

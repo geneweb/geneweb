@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: anctree.txt,v 5.9 2007-07-25 13:15:19 ddr Exp $ -->
+  <!-- $Id: anctree.txt,v. 7.1exp 29/12/2022 07:25:35 ddr Exp $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -23,13 +23,13 @@
 %message_to_wizard;
 
 <div class="container-fluid">
-%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>4))
+%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
   </div>
   <div class="container">
 %end;
 %include;perso_utils
 %include;menubar
-%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>4))
+%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
   </div>
   <div class="container-fluid">
 %end;
@@ -50,13 +50,13 @@
   This should not happen (probably a bad variable in URL: check t=/t1=)
 %end;
 
-%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>4))
+%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
   </div>
   <div class="container">
 %end;
 %include;trl
 %include;copyr
-%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>4))
+%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
   </div>
 %end;
 </div>
