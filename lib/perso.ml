@@ -864,7 +864,7 @@ let build_surnames_list conf base v p =
   in
   let rec loop lev sosa p surn dp =
     if Gwdb.Marker.get mark (get_iper p) = 0 then ()
-    else if lev = v then
+    else if lev > v then
       if is_hide_names conf p && not (authorized_age conf base p) then ()
       else add_surname sosa p surn dp
     else (
