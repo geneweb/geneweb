@@ -997,7 +997,7 @@ let build_list_eclair conf base v p =
   in
   (* Parcours les ascendants de p et les ajoute dans la Hashtbl. *)
   let rec loop lev p surn =
-    if lev = v then
+    if lev > v then
       if is_hide_names conf p && not (authorized_age conf base p) then ()
       else add_person p surn
     else (
