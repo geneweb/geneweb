@@ -148,7 +148,7 @@
     %end;
     %if;(not cancel_links)
       <span class="ml-2">%nn;
-        <a href="%prefix;%suffix;m=D&t=T&v=1"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="tree desc." title="[*descendants tree] [to the children] ([with] [spouse/spouses]0)"></a>
+        <a href="%prefix;%suffix;&m=D&t=T&v=1"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="tree desc." title="[*descendants tree] [to the children] ([with] [spouse/spouses]0)"></a>
         %( one link to children is enough now that there are buttons on trees !!
         %if;(op_m!=1)
           %if;(max_desc_level>1)
