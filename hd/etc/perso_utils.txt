@@ -159,17 +159,16 @@
 %end;
 
 %define;togena(xx)
-  %if;(xx = 1)[specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[to the parents]%nn;
-  %elseif;(xx = 3)[to the grandparents]%nn;
-  %elseif;(xx = 4)[to the great-grandparents]%nn;
+  %if;(xx = 0)[specify::generation/generations]0%nn;
+  %elseif;(xx = 1)[to the parents]%nn;
+  %elseif;(xx = 2)[to the grandparents]%nn;
+  %elseif;(xx = 3)[to the great-grandparents]%nn;
   %else;
     %apply;tothegen%with;
       %apply;nth([nth (generation)], xx)
     %end;
   %end;
 %end;
-
 %define;togend(xx)
   %if;(xx = 0)[specify::generation/generations]0%nn;
   %elseif;(xx = 1)[to the children]%nn;

@@ -8,26 +8,24 @@
 %end;
 
 %define;togen(xx)
-  %if;(xx = 1)[specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[to the parents]%nn;
-  %elseif;(xx = 3)[to the grandparents]%nn;
-  %elseif;(xx = 4)[to the great-grandparents]%nn;
+  %if;(xx = 0)[specify::generation/generations]0%nn;
+  %elseif;(xx = 1)[to the parents]%nn;
+  %elseif;(xx = 2)[to the grandparents]%nn;
+  %elseif;(xx = 3)[to the great-grandparents]%nn;
   %else;
     %apply;tothegen%with;
       %apply;nth([nth (generation)], xx)
     %end;
   %end;
 %end;
-
 %define;thegen(xx)
   [the %s generation:::xx]%nn;
 %end;
-
 %define;gena(xx)
-  %if;(xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[*the parents]%nn;
-  %elseif;(xx = 3)[*the grandparents]%nn;
-  %elseif;(xx = 4)[*the great-grandparents]%nn;
+  %if;(xx = 0)[*specify::generation/generations]0%nn;
+  %elseif;(xx = 1)[*the parents]%nn;
+  %elseif;(xx = 2)[*the grandparents]%nn;
+  %elseif;(xx = 3)[*the great-grandparents]%nn;
   %else;
     %apply;thegen%with;
       %apply;nth([nth (generation)], xx)
@@ -1080,8 +1078,10 @@
     </span>
     <ul class="fp_ul_summary">
       %foreach;ancestor_level(nb_gen)
-        %apply;lazy_print%with;
-          <li><b>[*generation/generations]0 %level;</b></li>
+        %if;(level>0)
+          %apply;lazy_print%with;
+            <li><b>[*generation/generations]0 %level;</b></li>
+          %end;
         %end;
         %if;(evar.only!="on" or (evar.only="on" and level=evar.v))
           %foreach;ancestor;
