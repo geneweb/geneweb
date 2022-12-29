@@ -15,7 +15,7 @@ let print_ancestors_dag conf base v p =
   let set =
     let rec loop set lev ip =
       let set = Dag.Pset.add ip set in
-      if lev <= 1 then set
+      if lev <= 0 then set
       else
         match get_parents (pget conf base ip) with
         | Some ifam ->
