@@ -33,14 +33,14 @@
 %end;
   <title>%nn;
     %if;(e.t = "D")
-      [*ancestors] ... [up to] ...%nn;
+      [*ancestor/ancestors]1 ... [up to] ...%nn;
     %elseif;(e.t = "N" and e.only = "on")
       [*generation/generations]0 %e.v;
     %else;
       %apply;a_of_b%with;
         %if;(e.t = "M")
           %if;(e.evt = "on")[*missing events]%else;[*missing ancestors]%end;
-        %else;[*ancestors]
+        %else;[*ancestor/ancestors]1
         %end;
       %and;
         %if;(public_name != "")%public_name;%else;%first_name;%end;
@@ -438,7 +438,7 @@
 %define;nb_fam(xx)
   %if;(xx.same = "")
     %if;(not cancel_links)
-      <a href="%prefix;m=A&t=X&i=%index;&i1=%ancestor.index;&l=%level;%if;(e.image!="")&image=%e.image;%end;" title="[*only] [ancestors] [up to] %ancestor;">
+      <a href="%prefix;m=A&t=X&i=%index;&i1=%ancestor.index;&l=%level;%if;(e.image!="")&image=%e.image;%end;" title="[*only] [ancestor/ancestors]1 [up to] %ancestor;">
     %end;
     <br>%apply;symbol1("xx")
     %if;(xx.nb_families > 1)
@@ -1563,7 +1563,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %if;(e.evt = "on")[*missing events]%else;[*missing ancestors]%end;%nn;
     %else;
       %if;(e.only="on" and e.v<5)%apply;capitalize%with;%apply;gen("v")%end;
-      %else;[*ancestors]%nn;
+      %else;[*ancestor/ancestors]1%nn;
       %end;
     %end;
   %and;
@@ -1613,7 +1613,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       </ul>
     %end;
   %end;
-  <p>[*total][:] %count; [[person/persons]1@(c)]</p>
+  <p>[*total][:] %count; [[person/persons]0@(c)]</p>
 
 %elseif;(e.t = "N")
   %( short display %)
@@ -1627,7 +1627,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %end;
       %foreach;ancestor;
         %lazy_force;
-        %if;(ancestor.same = "")%incr_count;%end;
+        %if;(ancestor.same = "")%if;(level!=0)%incr_count;%end;%end;
         <li class="%if;ancestor.has_parents;goway%else;noway%end;">%nn;
           %if;(e.sosab = 16)%ancestor.anc_sosa.hexa;
           %elseif;(e.sosab = 8)%ancestor.anc_sosa.octal;
@@ -1653,7 +1653,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
         </ul>
       %end;
     %end;
-  <p>[*total][:] %count; [[person/persons]1@(c)]</p>
+  <p>[*total][:] 1+%count; [[ancestor/ancestors]1@(c)]</p>
   %elseif;(e.t = "M" and e.evt = "on")
     %include;miss_evt
 
@@ -1797,7 +1797,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       </li>
     %end;
   </ul>
-  <p style="clear:both;">[*total][:] %count; [[person/persons]1@(c)]</p>
+  <p style="clear:both;">[*total][:] %count; [[person/persons]]1@(c)]</p>
 
 %elseif;(e.t = "M")
   %( missing ancestors by generation %)
@@ -1911,7 +1911,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
   %( long display; only the selected generation %)
   %if;((e.notes = "on" or e.src = "on") and e.inline != "on")
     <p class="not_printable">
-      [*see]: <a href="#asc">[*ancestors]</a>%sp;%nn;
+      [*see]: <a href="#asc">[*ancestor/ancestors]1</a>%sp;%nn;
       %if;((e.notes = "on" or e.src = "on") and e.inline != "on")
         | <a href="#ns">[*note/notes]1</a>
       %end;
@@ -1952,7 +1952,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
   %( long display %)
   %if;((e.notes = "on" or e.src = "on") and e.inline != "on")
     <p class="not_printable">
-      [*see]: <a href="#asc">[*ancestors]</a>%sp;%nn;
+      [*see]: <a href="#asc">[*ancestor/ancestors]1</a>%sp;%nn;
       %if;((e.notes = "on" or e.src = "on") and e.inline != "on")
         | <a href="#ns">[*note/notes]1</a>
       %end;
@@ -2017,7 +2017,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
      %(%if;(not cancel_links)
        <div class="menu">
          %if;(has_sosa)<span><a href="%prefix;m=X&t=X&t1=1&i=%e.i1;&i1=%index;&siblings=on&alias=on&spouse=on&parents=on&rel=on&notes=on&src=on&hide=on&witn=on&v=%e.l;&maxv=%e.l;&l=%e.l;">[*descendants]0</a></span>%end;
-         <span><a href="%prefix;m=A&t=G&i=%index;&i1=%e.i1;&siblings=on&alias=on&spouse=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on&l=%e.l;">[*ancestors]0</a></span>
+         <span><a href="%prefix;m=A&t=G&i=%index;&i1=%e.i1;&siblings=on&alias=on&spouse=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on&l=%e.l;">[*ancestor/ancestors]1</a></span>
        </div>
      %end;%)
   %end;

@@ -5,7 +5,7 @@
   <!-- Copyright (c) 1998-2023 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
-      [*ancestors]%nn;
+      [*ancestor/ancestors]1%nn;
     %and;
       %if;(public_name != "")%public_name;%else;%first_name;%end;
       %if;(qualifier != "") %qualifier;%end;
@@ -98,7 +98,7 @@ function missing_events_options () {
 --></script>
 <h1 class="text-center">%nn;
   %apply;a_of_b%with;
-    [*ancestors]%nn;
+    [*ancestor/ancestors]1%nn;
   %and;
     %if;(public_name != "")%public_name;%else;%first_name;%end;
     %if;(qualifier != "") <em>%qualifier;</em>%end;
