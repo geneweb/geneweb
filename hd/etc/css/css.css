@@ -711,7 +711,7 @@ li.desc
 }
 
 
-/* --------------------------- Pyramide des âges -------------------------- */
+/* --------------------------- Pyramide des Ã¢ges -------------------------- */
 
 .pyramid_year
 {
@@ -1161,26 +1161,16 @@ hr.full
   margin-right: 0;
 }
 
-/* --- Ascendants/Descendants liste rédigée --- */
+/* --- Ascendants/Descendants liste rÃ©digÃ©e --- */
 .asc_notes_src_inline, .desc_notes_src_inline
 {
   padding-left:15px;
 }
 
 /* --- Ascendants --- */
-.list_eclair_table
+.list_eclair_table th, .list_eclair_table td
 {
-  border-width:1px;
-  border-style:solid;
-  border-collapse:collapse;
-}
-
-.list_eclair_table th,
-.list_eclair_table td
-{
-  border:1px solid black;
-  vertical-align:top;
-  padding:2px;
+  padding:0 2px;
 }
 
 .surname_branch_sort
