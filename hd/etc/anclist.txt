@@ -58,7 +58,7 @@
 </h3>
 
 %define;ancestors_by_list(xx, nnn)
-  %if;(xx.has_parents and nnn > 1)
+  %if;(xx.has_parents and nnn > 0)
     <ul>
       <li class="male"><a href="%prefix;
         %xx.father.access;">%xx.father;</a>%xx.father.title;%xx.father.dates;%nl;
