@@ -70,8 +70,8 @@
 %define;anc_row_hr(pp, vv, zz, ss1, ss2, ss3)
   %(if;("pp"="self")  <a role="button" onclick="implex('%pp.sosa.v;')"%(filter('%e.surname1;','%e.surname2;','%e.surname3;')"
         "><i class="fa fa-random fa-fw fa-sm mx-1" aria-hidden="true"></i></a><br>%end; %)
-  %if;(vv > 0 and ((pp.surname is_substr e.surname1) or (pp.surname is_substr e.surname2) or (pp.surname is_substr e.surname3)))%)
-  %if;(vv>0)
+  %if;(vv >= 0 and ((pp.surname is_substr e.surname1) or (pp.surname is_substr e.surname2) or (pp.surname is_substr e.surname3)))%)
+  %if;(vv>=0)
     %if;(pp.has_parents and (pp.sosa.v=zz or e.implx!="on"))
       %apply;anc_row_hr("pp.father", vv-1, zz*2, "ss1     ", "ss1 ┌──╴", "ss1 |   ")
     %end;
