@@ -137,7 +137,8 @@ let url_aux ?(pwd = true) conf =
   if conf.cgi then prefix ^ "?" ^ conf.bname ^ String.concat "&" l
   else prefix ^ String.concat "&" l
 
-let url_set_aux conf evar str =
+let url_set_aux conf evar_l str =
+  let evar = List.hd evar_l in
   (* rebuild the current url from conf.env, replacing &evar=xxx by &evar=str () *)
   let url =
     match String.split_on_char '?' (Util.commd conf :> string) with
@@ -157,12 +158,13 @@ let url_set_aux conf evar str =
     List.filter_map
       (fun (k, v) ->
         let v = Adef.as_string @@ v in
-        if k = evar && str <> "" then Some (Format.sprintf "%s=%s" k str)
+        if List.mem k evar_l && str <> "" then
+          Some (Format.sprintf "%s=%s" k str)
         else if
           v = ""
           || (k = "oc" && v = "0")
           || (k = "ocz" && v = "0")
-          || (k = evar && str = "")
+          || (List.mem k evar_l && str = "")
         then None
         else Some (Format.sprintf "%s=%s" k v))
       (conf.henv @ conf.senv @ conf.env)
@@ -232,8 +234,13 @@ let rec eval_variable conf = function
       in
       substr_start_aux n v
   | "time" :: sl -> eval_time_var conf sl
-  | [ "url_set"; evar ] -> url_set_aux conf evar ""
-  | [ "url_set"; evar; str ] -> url_set_aux conf evar str
+  | [ "url_set"; evar ] -> url_set_aux conf [ evar ] ""
+  | [ "url_set2"; evar1; evar2 ] -> url_set_aux conf [ evar1; evar2 ] ""
+  | [ "url_set3"; evar1; evar2; evar3 ] ->
+      url_set_aux conf [ evar1; evar2; evar3 ] ""
+  | [ "url_set_pn" ] ->
+      url_set_aux conf [ "i1"; "i2"; "p1"; "p2"; "n1"; "n2"; "oc11"; "oc2" ] ""
+  | [ "url_set"; evar; str ] -> url_set_aux conf [ evar ] str
   | [ "user"; "ident" ] -> conf.user
   | [ "user"; "name" ] -> conf.username
   | [ s ] -> eval_simple_variable conf s
