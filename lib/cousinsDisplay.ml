@@ -263,7 +263,8 @@ let print_cousins conf base p lev1 lev2 =
       let s = txt_fun (transl_nth conf "a great-nephew/a great-niece" 4) in
       Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
     else (
-      Output.print_sstring conf (Utf8.capitalize_fst (transl_nth conf "ancestor/ancestors" 1));
+      Output.print_sstring conf
+        (Utf8.capitalize_fst (transl_nth conf "ancestor/ancestors" 1));
       Output.print_sstring conf " ";
       Output.print_sstring conf (string_of_int lev1);
       Output.print_sstring conf " / ";

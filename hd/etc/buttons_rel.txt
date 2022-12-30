@@ -1,19 +1,19 @@
 <!-- $Id: buttons_rel.txt v7.01 2022/01/16 19:40:09 $ -->
 <!-- Copyright (c) 1998-2022 INRIA -->
 %( Boutons de configurations et d’options pour les calculs de relations %)
-%let;urlend;%if;(evar.image!="")&image=%evar.image;%end;%nn;
-          %if;(evar.spouse!="")&spouse=%evar.spouse;%end;%nn;
-          %if;(evar.bd!="")&bd=%evar.bd;%end;%nn;
-          %if;(evar.color!="")&color=%evar.color;%end;%nn;
-%in;
+
 <div class="btn-toolbar mt-2 mb-3" role="toolbar" arial-label="config buttons toolbar">
   <div class="col-2">
     %if;(evar.em="R" or ((evar.i!="" and evar.ei!="") or (person_index.1!="" and person_index.2!="")))
       <a class="%if;(link_next="") disabled%end;%if;(evar.et="S") border rounded%end;"
         href="%if(link_next!="")%link_next;%(%else;%nn;
-        %prefix_base_password&em=R&et=S%nn;
+        %prefix;&em=R&et=S%nn;
         %if;(evar.i!="")&i=%evar.i;&ei=%evar.ei;%nn;
-        %elseif;(person_index.1!="")&i=%person_index.1;&ei=%person_index.2;%end;%)%urlend;%end;"
+        %elseif;(person_index.1!="")&i=%person_index.1;&ei=%person_index.2;%end;%)%nn;
+          %if;(evar.image!="")&image=%evar.image;%end;%nn;
+          %if;(evar.spouse!="")&spouse=%evar.spouse;%end;%nn;
+          %if;(evar.bd!="")&bd=%evar.bd;%end;%nn;
+          %if;(evar.color!="")&color=%evar.color;%end;%end;"
         title="[*shortest path]%if;(link_next!=""), [visualize/show/hide/summary]1
          [next relationship path]%end;" accesskey=">">%nn;
         <i class="fas fa-bezier-curve fa-fw"></i>%if;(link_next!="")<i class="fas fa-arrow-right fa-fw"></i>%end;%nn;
@@ -21,18 +21,24 @@
     %end;
     %if;(evar.i!="")
       <a class="ml-2%if;(evar.et="A") border rounded%end;"
-        href="%prefix_base_password&em=R&et=A&i=%evar.i;&ei=%evar.ei;%urlend;"
+        href="%prefix;&em=R&et=A&i=%evar.i;&ei=%evar.ei;%nn;
+          %if;(evar.image!="")&image=%evar.image;%end;%nn;
+          %if;(evar.spouse!="")&spouse=%evar.spouse;%end;%nn;
+          %if;(evar.bd!="")&bd=%evar.bd;%end;%nn;
+          %if;(evar.color!="")&color=%evar.color;%end;%nn;"
         title="[*relationship link/relationship links]1" accesskey="^">%nn;
         <i class="fa fa-user-friends fa-fw"></i></a>
       <a class="ml-2%if;(evar.et="M") border rounded%end;"
-        href="%prefix_base_password&em=R&et=M&i=%evar.i;&ei=%evar.ei;%urlend;"
+        href="%prefix;&em=R&et=M&i=%evar.i;&ei=%evar.ei;%nn;
+          %if;(evar.image!="")&image=%evar.image;%end;%nn;
+          %if;(evar.spouse!="")&spouse=%evar.spouse;%end;%nn;
+          %if;(evar.bd!="")&bd=%evar.bd;%end;%nn;
+          %if;(evar.color!="")&color=%evar.color;%end;"
         title="[*relationship by marriage]" accesskey="-">%nn;
         <i class="fa fa-ring fa-fw"></i></a>
     %end;
     %if;(evar.et="A" or evar.et="M")
-      <a class="ml-4" href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env.key!="" and env.key!="long")%env.key;=%env.val;&%end;%end;
-        %if;(evar.long!="on")long=on%end;"
+      <a class="ml-4" href="%if;(evar.long!="on")%url_set.long.on;%else;%url_set.long;%end;"
         title="%if;(evar.long!="on")[*long display]1%else;
             [*visualize/show/hide/summary]2 [long display]%end; ">%nn;
         <i class="fa fa-chevron-%if;(evar.long="on")up%else;down%end; fa-fw"></i></a>
@@ -41,34 +47,24 @@
     %end;
   </div>
   <div class="col-3">
-    <a href="%prefix_base_password;%nn;
-      %foreach;env_binding;%if;(env.key!="image")%env.key;=%env.val;;%end;%end;%nn;
-      %if;(e.image!="off")image=off;%end;"
+    <a href="%if;(evar.image!="off")%url_set.image.off;%else;%url_set.image;%end;"
       %if;(e.dag="on")class="disabled"%end;
       title="%if;(e.image!="off")[*visualize/show/hide/summary]2%else;
           [*visualize/show/hide/summary]1%end; [image/images]0">
       <i class="far fa-image fa-lg%if;(e.image!="off") text-danger%end;"></i></a>
-    <a class="ml-2" href="%prefix_base_password;%nn;
-      %foreach;env_binding;%if;(env.key!="spouse")%env.key;=%env.val;;%end;%end;%nn;
-      %if;(e.spouse!="on")spouse=on;%end;"
+    <a class="ml-2" href="%if;(evar.spouse!="on")%url_set.spouse.on;%else;%url_set.spouse;%end;"
       %if;(e.dag="on")class="disabled"%end;"
       title="%if;(e.spouse!="on")[*visualize/show/hide/summary]1%else;
           [*visualize/show/hide/summary]2%end; [spouse/spouses]1">
       <i class="fa fa-user male p-0"></i>%if;(e.spouse!="on")<i class="fa fa-user female p-0"></i>%end;</a>
     %if;(e.i!="" and e.ei!="")
-      <a class="ml-2" href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env.key!="" and env.key!="i" and env.key!="ei")%env.key;=%env.val;&%end;%end;&i=%e.ei;&ei=%e.i;"
+      <a class="ml-2" href="%url_set2.i.ei;&i=%e.ei;&ei=%e.i;"
         title="[*invert] [person/persons]1"><i class="fa fa-people-arrows fa-fw"></i></a>
     %elseif;(e.i1!="" and person_index.1!="" and e.i2!="" and person_index.2!="")
-      <a class="ml-2" href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env.key!="" and env.key!="i1" and env.key!="i2" and
-                    env.key!="p1" and env.key!="n1" and env.key!="oc1" and
-                    env.key!="p2" and env.key!="n2" and env.key!="oc2"
-                    )%env.key;=%env.val;&%end;%end;
-        &i1=%person_index.2;&i2=%person_index.1;&"
+      <a class="ml-2" href="%url_set_pn;&i1=%person_index.2;&i2=%person_index.1;&"
         title="[*invert] [person/persons]1"><i class="fas fa-people-arrows fa-lg fa-fw"></i></a>
     %end;
-    <a class="ml-2" href="%url;&dag=on" target="_blank"><i class="fa fa-random fa-fw" title="[*dag]"></i></a>
+    <a class="ml-2" href="%if;(e.dag!="on")%url_set.dag.on;%else;%url_set.dag;%end;" target="_blank"><i class="fa fa-random fa-fw" title="[*dag]"></i></a>
     <a class="ml-2" href="%url;&cgl=on" target="_blank"><i class="fa fa-unlink fa-fw" title="[*cancel GeneWeb links]"></i></a>
   </div>
 </div>
