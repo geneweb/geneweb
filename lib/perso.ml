@@ -2057,28 +2057,24 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       eval_anc_paths_cnt conf base env ep Paths_cnt true loc sl
   | "anc_paths_at_level" :: sl ->
       eval_anc_paths_cnt conf base env ep Paths true loc sl
-  | "cous_paths_0_l2" :: sl -> (
-      match sl with
-      | l2 :: sl ->
-          let l2 = try int_of_string l2 with Failure _ -> raise Not_found in
-          let env =
-            List.map
-              (fun (k, v) -> if k = "level" then ("level", Vint l2) else (k, v))
-              env
-          in
-          eval_desc_paths_cnt conf base env ep Paths true loc sl
-      | _ -> raise Not_found)
-  | "cous_paths_l1_0" :: sl -> (
-      match sl with
-      | l1 :: sl ->
-          let l1 = try int_of_string l1 with Failure _ -> raise Not_found in
-          let env =
-            List.map
-              (fun (k, v) -> if k = "level" then ("level", Vint l1) else (k, v))
-              env
-          in
-          eval_anc_paths_cnt conf base env ep Paths true loc sl
-      | _ -> raise Not_found)
+  | "cous_paths_0_l2" :: l2 :: sl ->
+      let l2 = try int_of_string l2 with Failure _ -> raise Not_found in
+      let env =
+        List.map
+          (fun (k, v) -> if k = "level" then ("level", Vint l2) else (k, v))
+          env
+      in
+      let env = ("level", Vint l2) :: env in
+      eval_desc_paths_cnt conf base env ep Paths true ~l1_l2:(0, l2) loc sl
+  | "cous_paths_l1_0" :: l1 :: sl ->
+      let l1 = try int_of_string l1 with Failure _ -> raise Not_found in
+      let env =
+        List.map
+          (fun (k, v) -> if k = "level" then ("level", Vint l1) else (k, v))
+          env
+      in
+      let env = ("level", Vint l1) :: env in
+      eval_anc_paths_cnt conf base env ep Paths true ~l1_l2:(l1, 0) loc sl
   | "desc_paths_cnt_raw" :: sl ->
       eval_desc_paths_cnt conf base env ep Paths_cnt_raw false loc sl
   | "desc_paths_cnt" :: sl ->
@@ -2426,7 +2422,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | _ -> raise Not_found)
   | sl -> eval_person_field_var conf base env ep loc sl
 
-and eval_anc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
+and eval_anc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
+    _loc = function
   | sl -> (
       match get_env "level" env with
       | Vint lev -> (
@@ -2449,12 +2446,19 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
                   match get_env "cousins" env with
                   | Vcousl l ->
                       l := cousins_fold list;
+                      let l1, l2 = l1_l2 in
+                      (match get_env "v1_v2" env with
+                      | Vcous_level (v1, v2) ->
+                          v1 := l1;
+                          v2 := l2
+                      | _ -> ());
                       VVstring ""
                   | _ -> raise Not_found)
               | None -> raise Not_found))
       | _ -> raise Not_found)
 
-and eval_desc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
+and eval_desc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
+    _loc = function
   | sl -> (
       match get_env "level" env with
       | Vint lev -> (
@@ -2477,9 +2481,25 @@ and eval_desc_paths_cnt conf base env (p, _) path_mode at_to _loc = function
                   match get_env "cousins" env with
                   | Vcousl l ->
                       l := cousins_fold list;
+                      let l1, l2 = l1_l2 in
+                      (match get_env "v1_v2" env with
+                      | Vcous_level (v1, v2) ->
+                          v1 := l1;
+                          v2 := l2
+                      | _ -> ());
                       VVstring ""
-                  | _ -> raise Not_found)
-              | None -> raise Not_found))
+                  | _ -> VVstring "")
+              | None -> (
+                  match get_env "cousins" env with
+                  | Vcousl l ->
+                      l := [];
+                      (match get_env "v1_v2" env with
+                      | Vcous_level (v1, v2) ->
+                          v1 := 0;
+                          v2 := 0
+                      | _ -> ());
+                      VVstring ""
+                  | _ -> VVstring "")))
       | _ -> raise Not_found)
 
 and eval_item_field_var ell = function
