@@ -2057,24 +2057,6 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       eval_anc_paths_cnt conf base env ep Paths_cnt true loc sl
   | "anc_paths_at_level" :: sl ->
       eval_anc_paths_cnt conf base env ep Paths true loc sl
-  | "cous_paths_0_l2" :: l2 :: sl ->
-      let l2 = try int_of_string l2 with Failure _ -> raise Not_found in
-      let env =
-        List.map
-          (fun (k, v) -> if k = "level" then ("level", Vint l2) else (k, v))
-          env
-      in
-      let env = ("level", Vint l2) :: env in
-      eval_desc_paths_cnt conf base env ep Paths true ~l1_l2:(0, l2) loc sl
-  | "cous_paths_l1_0" :: l1 :: sl ->
-      let l1 = try int_of_string l1 with Failure _ -> raise Not_found in
-      let env =
-        List.map
-          (fun (k, v) -> if k = "level" then ("level", Vint l1) else (k, v))
-          env
-      in
-      let env = ("level", Vint l1) :: env in
-      eval_anc_paths_cnt conf base env ep Paths true ~l1_l2:(l1, 0) loc sl
   | "desc_paths_cnt_raw" :: sl ->
       eval_desc_paths_cnt conf base env ep Paths_cnt_raw false loc sl
   | "desc_paths_cnt" :: sl ->
@@ -2827,8 +2809,10 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
                    v2 := try int_of_string l2 with Failure _ -> 0)
                | _ -> ());
               VVstring ""
-          | _ -> raise Not_found)
-      | None -> raise Not_found)
+          | _ ->
+              VVstring (Printf.sprintf "Not found1 with l1=%s, l2=%s\n" l1 l2))
+      | None -> VVstring (Printf.sprintf "Not found2 with l1=%s, l2=%s\n" l1 l2)
+      )
   | [ "cousins"; "max_a" ] ->
       let max_a, _ = max_l1_l2 base env p in
       VVstring (string_of_int max_a)
@@ -4181,7 +4165,7 @@ let print_foreach conf base print_ast eval_expr =
         (get_aliases p)
   in
 
-  let print_foreach_ancestor env al ep =
+  let print_foreach_ascendant env al ep =
     match get_env "gpl" env with
     | Vgpl gpl ->
         let rec loop first gpl =
@@ -4277,7 +4261,7 @@ let print_foreach conf base print_ast eval_expr =
     print_foreach_path_aux level_in_list level env al ep gpl_at_level
   in
 
-  let print_foreach_ancestor_level env el al ((p, _) as ep) =
+  let print_foreach_ascendant_level env el al ((p, _) as ep) =
     let max_level =
       match el with
       | [ [ e ] ] -> eval_int_expr env ep e
@@ -4310,7 +4294,7 @@ let print_foreach conf base print_ast eval_expr =
     loop [ GP_person (Sosa.one, get_iper p, None) ] 0 0
   in
 
-  let print_foreach_ancestor_at_level env al ((p, _) as ep) =
+  let print_foreach_ascendant_at_level env al ((p, _) as ep) =
     let max_lev = "max_anc_level" in
     let max_level = match get_env max_lev env with Vint n -> n | _ -> 0 in
     let mark = Gwdb.iper_marker (Gwdb.ipers base) Sosa.zero in
@@ -4759,31 +4743,64 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
         (get_first_names_aliases p)
   in
-  let print_foreach_cousin_path env al ep listname =
-    let l = match get_env listname env with Vcousl l -> !l | _ -> [] in
-    let rec loop cnt = function
-      | [] -> ()
-      | (ip, (ifaml, iancl, nbr), _lev) :: sll ->
-          let ifaml = List.map (fun ifam -> string_of_ifam ifam) ifaml in
-          let ifaml = String.concat "," ifaml in
-          let env =
-            ("cousin", Vind (pget conf base ip))
-            :: ("anc_f_list", Vstring ifaml)
-            :: ( "anc1",
-                 if List.length iancl > 0 then
-                   Vind (pget conf base (List.nth iancl 0))
-                 else Vind (poi base Gwdb.dummy_iper) )
-            :: ( "anc2",
-                 if List.length iancl > 1 then
-                   Vind (pget conf base (List.nth iancl 1))
-                 else Vind (poi base Gwdb.dummy_iper) )
-            :: ("cnt", Vint cnt) :: ("nbr", Vint nbr) :: env
-          in
-          List.iter (print_ast env ep) al;
-          loop (cnt + 1) sll
+
+  let print_foreach_cousin_path env el al ((p, _) as ep) =
+    let l1, l2 =
+      match el with
+      | [ [ e1 ]; [ e2 ] ] -> (eval_int_expr env ep e1, eval_int_expr env ep e2)
+      | [ [ e1 ] ] -> (eval_int_expr env ep e1, 0)
+      | [] -> (
+          match (p_getenv conf.env "l1", p_getenv conf.env "l2") with
+          | Some v1, Some v2 -> (int_of_string v1, int_of_string v2)
+          | Some v1, _ -> (int_of_string v1, 0)
+          | _, Some v2 -> (0, int_of_string v2)
+          | _ -> (0, 0))
+      | _ -> (0, 0)
     in
-    loop 1 l
+    let level = l1 - l2 in
+    let level = if level < 0 then -level else level in
+    let list1 =
+      cousins_l1_l2_aux base env (string_of_int l1) (string_of_int l2) p
+    in
+    match list1 with
+    | Some list ->
+        Printf.eprintf "Some list %d\n" (List.length list);
+        let rec loop first cnt = function
+          | [] -> ()
+          | (ip, (ifaml, iancl, _cnt), lev_list) :: l -> (
+              (* TODO clarify lev_list *)
+              match level_in_list level lev_list with
+              | Some lev ->
+                  (let lev_cnt = List.length lev_list in
+                   let ifaml =
+                     List.map (fun ifam -> string_of_ifam ifam) ifaml
+                   in
+                   let ifaml = String.concat "," ifaml in
+                   let env =
+                     ("path_end", Vind (poi base ip))
+                     :: ("anc_level", Vint lev)
+                     :: ("anc_f_list", Vstring ifaml)
+                     :: ( "anc1",
+                          if List.length iancl > 0 then
+                            Vind (pget conf base (List.nth iancl 0))
+                          else Vind (poi base Gwdb.dummy_iper) )
+                     :: ( "anc2",
+                          if List.length iancl > 1 then
+                            Vind (pget conf base (List.nth iancl 1))
+                          else Vind (poi base Gwdb.dummy_iper) )
+                     :: ("lev_cnt", Vint lev_cnt) :: ("first", Vbool first)
+                     :: ("cnt", Vint cnt)
+                     :: ("last", Vbool (l = []))
+                     :: ("mode", Vstring "Vcousl") :: env
+                   in
+                   List.iter (print_ast env ep) al);
+                  loop false (cnt + 1) l
+              | None -> loop false (cnt + 1) l)
+        in
+        loop true 1 (List.rev (cousins_fold list))
+    | None -> raise Not_found
   in
+
   let print_foreach_cousin_level env al ((_, _) as ep) =
     let max_level =
       match get_env "max_cous_level" env with Vint n -> n | _ -> 0
@@ -5002,14 +5019,16 @@ let print_foreach conf base print_ast eval_expr =
   in
   let print_simple_foreach env el al ini_ep ep efam loc = function
     | "alias" -> print_foreach_alias env al ep
-    | "ancestor" -> print_foreach_ancestor env al ep
-    | "ancestor_level" -> print_foreach_ancestor_level env el al ep
-    | "ancestor_at_level" -> print_foreach_ancestor_at_level env al ep
+    | "ancestor" | "ascendant" -> print_foreach_ascendant env al ep
+    | "ancestor_level" | "ascendant_level" ->
+        print_foreach_ascendant_level env el al ep
+    | "ancestor_at_level" | "ascendant_at_level" ->
+        print_foreach_ascendant_at_level env al ep
     | "ancestor_surname" -> print_foreach_anc_surn env el al loc ep
     | "ancestor_tree_line" -> print_foreach_ancestor_tree env el al ep
     | "cell" -> print_foreach_cell env al ep
     | "child" -> print_foreach_child env al ep efam
-    | "cous_path" -> print_foreach_cousin_path env al ep "cousins"
+    | "cous_path" -> print_foreach_cousin_path env el al ep
     | "cousin_level" -> print_foreach_cousin_level env al ep
     | "descendant" -> print_foreach_descendant env al ep false
     | "descendant_cnt" -> print_foreach_descendant env al ep true
