@@ -4221,46 +4221,6 @@ let print_foreach conf base print_ast eval_expr =
     loop true 1 (List.rev l)
   in
 
-  let print_foreach_path env al ep =
-    let level =
-      match get_env "level" env with
-      | Vint n -> n
-      | _ -> (
-          match get_env "v1_v2" env with
-          | Vcous_level (n1, n2) -> !n1 - !n2
-          | _ -> 0)
-    in
-    let level = if level < 0 then -level else level in
-    let l = match get_env "cousins" env with Vcousl l -> !l | _ -> [] in
-    print_foreach_path_aux level_less_or_eq_list level env al ep l
-  in
-
-  let print_foreach_path_at_level env al ep =
-    let level =
-      match get_env "level" env with
-      | Vint n -> n
-      | _ -> (
-          match get_env "l1_l2" env with
-          | Vcous_level (n1, n2) -> !n1 - !n2
-          | _ -> 0)
-    in
-    let level = if level < 0 then -level else level in
-    let l = match get_env "cousins" env with Vcousl l -> !l | _ -> [] in
-    let gpl_at_level =
-      (* extraire ancètres at level *)
-      let rec loop2 acc gpl =
-        match gpl with
-        | [] -> acc
-        | (ip, (ifaml, iancl, cnt), lev_list) :: l -> (
-            match level_in_list level lev_list with
-            | Some _l -> loop2 ((ip, (ifaml, iancl, cnt), lev_list) :: acc) l
-            | None -> loop2 acc l)
-      in
-      loop2 [] l
-    in
-    print_foreach_path_aux level_in_list level env al ep gpl_at_level
-  in
-
   let print_foreach_ascendant_level env el al ((p, _) as ep) =
     let max_level =
       match el with
@@ -4311,6 +4271,7 @@ let print_foreach conf base print_ast eval_expr =
     in
     loop [ GP_person (Sosa.one, get_iper p, None) ] 0
   in
+
   let print_foreach_anc_surn env el al loc ((p, _) as ep) =
     let max_level =
       match el with
@@ -4342,6 +4303,7 @@ let print_foreach conf base print_ast eval_expr =
           list
     | _ -> ()
   in
+
   let print_foreach_ancestor_tree env el al ((p, _) as ep) =
     let p, max_level =
       match el with
@@ -4611,6 +4573,7 @@ let print_foreach conf base print_ast eval_expr =
         ()
     | _ -> ()
   in
+
   let print_foreach_witness_relation env al ((p, _) as ep) =
     let l =
       let related = List.sort_uniq compare (get_related p) in
@@ -4654,6 +4617,7 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
       l
   in
+
   let print_foreach_family env al ini_ep (p, _) =
     match get_env "p_link" env with
     | Vbool _ ->
@@ -4733,6 +4697,7 @@ let print_foreach conf base print_ast eval_expr =
           (!GWPARAM_ITL.get_families conf base p)
         |> ignore
   in
+
   let print_foreach_first_name_alias env al ((p, p_auth) as ep) =
     if (not p_auth) && is_hide_names conf p then ()
     else
@@ -4744,11 +4709,18 @@ let print_foreach conf base print_ast eval_expr =
         (get_first_names_aliases p)
   in
 
-  let print_foreach_cousin_path env el al ((p, _) as ep) =
+  let get_level_info conf env el ep =
+    let v1_v2 =
+      match get_env "v1_v2" env with Vcous_level _ -> true | _ -> false
+    in
     let l1, l2 =
       match el with
       | [ [ e1 ]; [ e2 ] ] -> (eval_int_expr env ep e1, eval_int_expr env ep e2)
       | [ [ e1 ] ] -> (eval_int_expr env ep e1, 0)
+      | [] when v1_v2 -> (
+          match get_env "v1_v2" env with
+          | Vcous_level (n1, n2) -> (!n1, !n2)
+          | _ -> (0, 0))
       | [] -> (
           match (p_getenv conf.env "l1", p_getenv conf.env "l2") with
           | Some v1, Some v2 -> (int_of_string v1, int_of_string v2)
@@ -4759,45 +4731,17 @@ let print_foreach conf base print_ast eval_expr =
     in
     let level = l1 - l2 in
     let level = if level < 0 then -level else level in
+    (level, l1, l2)
+  in
+
+  let print_foreach_cousin_path env el al ((p, _) as ep) test_level =
+    let level, l1, l2 = get_level_info conf env el ep in
     let list1 =
       cousins_l1_l2_aux base env (string_of_int l1) (string_of_int l2) p
     in
     match list1 with
     | Some list ->
-        Printf.eprintf "Some list %d\n" (List.length list);
-        let rec loop first cnt = function
-          | [] -> ()
-          | (ip, (ifaml, iancl, _cnt), lev_list) :: l -> (
-              (* TODO clarify lev_list *)
-              match level_in_list level lev_list with
-              | Some lev ->
-                  (let lev_cnt = List.length lev_list in
-                   let ifaml =
-                     List.map (fun ifam -> string_of_ifam ifam) ifaml
-                   in
-                   let ifaml = String.concat "," ifaml in
-                   let env =
-                     ("path_end", Vind (poi base ip))
-                     :: ("anc_level", Vint lev)
-                     :: ("anc_f_list", Vstring ifaml)
-                     :: ( "anc1",
-                          if List.length iancl > 0 then
-                            Vind (pget conf base (List.nth iancl 0))
-                          else Vind (poi base Gwdb.dummy_iper) )
-                     :: ( "anc2",
-                          if List.length iancl > 1 then
-                            Vind (pget conf base (List.nth iancl 1))
-                          else Vind (poi base Gwdb.dummy_iper) )
-                     :: ("lev_cnt", Vint lev_cnt) :: ("first", Vbool first)
-                     :: ("cnt", Vint cnt)
-                     :: ("last", Vbool (l = []))
-                     :: ("mode", Vstring "Vcousl") :: env
-                   in
-                   List.iter (print_ast env ep) al);
-                  loop false (cnt + 1) l
-              | None -> loop false (cnt + 1) l)
-        in
-        loop true 1 (List.rev (cousins_fold list))
+        print_foreach_path_aux test_level level env al ep (cousins_fold list)
     | None -> raise Not_found
   in
 
@@ -4814,6 +4758,7 @@ let print_foreach conf base print_ast eval_expr =
     in
     loop 0
   in
+
   let print_foreach_nobility_title env al ((p, p_auth) as ep) =
     if p_auth then
       let titles = nobility_titles_list conf base p in
@@ -5028,7 +4973,10 @@ let print_foreach conf base print_ast eval_expr =
     | "ancestor_tree_line" -> print_foreach_ancestor_tree env el al ep
     | "cell" -> print_foreach_cell env al ep
     | "child" -> print_foreach_child env al ep efam
-    | "cous_path" -> print_foreach_cousin_path env el al ep
+    | "path" | "cous_path" ->
+        print_foreach_cousin_path env el al ep level_less_or_eq_list
+    | "path_at_level" | "cous_path_at_level" ->
+        print_foreach_cousin_path env el al ep level_in_list
     | "cousin_level" -> print_foreach_cousin_level env al ep
     | "descendant" -> print_foreach_descendant env al ep false
     | "descendant_cnt" -> print_foreach_descendant env al ep true
@@ -5039,8 +4987,6 @@ let print_foreach conf base print_ast eval_expr =
     | "nobility_title" -> print_foreach_nobility_title env al ep
     | "nob_title" -> print_foreach_nob_title env al ep
     | "parent" -> print_foreach_parent env al ep
-    | "path" -> print_foreach_path env al ep
-    | "path_at_level" -> print_foreach_path_at_level env al ep
     | "qualifier" -> print_foreach_qualifier env al ep
     | "related" -> print_foreach_related env al ep
     | "relation" -> print_foreach_relation env al ep
