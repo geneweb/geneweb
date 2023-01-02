@@ -1561,6 +1561,41 @@ let get_note_source conf base ?p auth no_note note_source =
     Notes.source_note_with_env conf base env (sou base note_source)
   else Adef.safe ""
 
+let get_min_max_dates base l =
+  let rec loop (min, max) = function
+    | [] -> (min, max)
+    | (ip, _, _, _) :: l -> (
+        let birth_date, death_date, _ =
+          Gutil.get_birth_death_date (poi base ip)
+        in
+        match (birth_date, death_date) with
+        | Some (Dgreg (b, _)), Some (Dgreg (d, _)) ->
+            loop
+              ( (match b.prec with
+                | After | Before | About | Maybe | OrYear _ | YearInt _ -> min
+                | _ -> if b.year < min then b.year else min),
+                match d.prec with
+                | After | Before | About | Maybe | OrYear _ | YearInt _ -> max
+                | _ -> if d.year > max then d.year else max )
+              l
+        | Some (Dgreg (b, _)), _ ->
+            loop
+              ( (match b.prec with
+                | After | Before | About | Maybe | OrYear _ | YearInt _ -> min
+                | _ -> if b.year < min then b.year else min),
+                max )
+              l
+        | _, Some (Dgreg (d, _)) ->
+            loop
+              ( min,
+                match d.prec with
+                | After | Before | About | Maybe | OrYear _ | YearInt _ -> max
+                | _ -> if d.year > max then d.year else max )
+              l
+        | _, _ -> loop (min, max) l)
+  in
+  loop (4000, 0) l
+
 let date_aux conf p_auth date =
   match (p_auth, Date.od_of_cdate date) with
   | true, Some d ->
@@ -2786,6 +2821,20 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match get_env "cnt" env with
       | Vint cnt -> VVstring (string_of_int cnt)
       | _ -> VVstring "")
+  | [ "cous_paths_min_date"; l1; l2 ] -> (
+      let list1 = cousins_l1_l2_aux base env l1 l2 p in
+      match list1 with
+      | Some list1 ->
+          let min, _max = get_min_max_dates base list1 in
+          VVstring (string_of_int min)
+      | None -> VVstring "")
+  | [ "cous_paths_max_date"; l1; l2 ] -> (
+      let list1 = cousins_l1_l2_aux base env l1 l2 p in
+      match list1 with
+      | Some list1 ->
+          let _min, max = get_min_max_dates base list1 in
+          VVstring (string_of_int max)
+      | None -> VVstring "")
   | [ "cous_paths_cnt_raw"; l1; l2 ] -> (
       let list1 = cousins_l1_l2_aux base env l1 l2 p in
       match list1 with
@@ -4187,7 +4236,7 @@ let print_foreach conf base print_ast eval_expr =
     | _ -> ()
   in
 
-  let print_foreach_path_aux test level env al ep l =
+  let print_foreach_path_aux conf base test level env al ep l =
     let rec loop first cnt l =
       match l with
       | [] -> ()
@@ -4741,7 +4790,8 @@ let print_foreach conf base print_ast eval_expr =
     in
     match list1 with
     | Some list ->
-        print_foreach_path_aux test_level level env al ep (cousins_fold list)
+        print_foreach_path_aux conf base test_level level env al ep
+          (cousins_fold list)
     | None -> raise Not_found
   in
 
