@@ -1839,6 +1839,18 @@ and eval_simple_str_var conf base env (_, p_auth) = function
           l := SortedList.empty;
           null_val
       | _ -> raise Not_found)
+  | "empty_sorted_listd" -> (
+      match get_env "listd" env with
+      | Vslist l ->
+          l := SortedList.empty;
+          null_val
+      | _ -> raise Not_found)
+  | "empty_sorted_liste" -> (
+      match get_env "liste" env with
+      | Vslist l ->
+          l := SortedList.empty;
+          null_val
+      | _ -> raise Not_found)
   | "family_cnt" -> string_of_int_env "family_cnt" env
   | "first_name_alias" -> (
       match get_env "first_name_alias" env with
@@ -1896,6 +1908,14 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       | _ -> raise Not_found)
   | "listc_size" -> (
       match get_env "listc" env with
+      | Vslist l -> str_val (string_of_int (SortedList.cardinal !l))
+      | _ -> raise Not_found)
+  | "listd_size" -> (
+      match get_env "listd" env with
+      | Vslist l -> str_val (string_of_int (SortedList.cardinal !l))
+      | _ -> raise Not_found)
+  | "liste_size" -> (
+      match get_env "liste" env with
       | Vslist l -> str_val (string_of_int (SortedList.cardinal !l))
       | _ -> raise Not_found)
   | "marriage_place" -> (
@@ -5043,6 +5063,8 @@ let print_foreach conf base print_ast eval_expr =
     | "sorted_list_item" -> print_foreach_sorted_list_item env al ep "list"
     | "sorted_listb_item" -> print_foreach_sorted_list_item env al ep "listb"
     | "sorted_listc_item" -> print_foreach_sorted_list_item env al ep "listc"
+    | "sorted_listd_item" -> print_foreach_sorted_list_item env al ep "listd"
+    | "sorted_liste_item" -> print_foreach_sorted_list_item env al ep "liste"
     | "source" -> print_foreach_source env al ep
     | "surname_alias" -> print_foreach_surname_alias env al ep
     | "witness" -> print_foreach_witness env al ep Witness efam
@@ -5214,6 +5236,18 @@ let eval_predefined_apply conf env f vl =
           l := SortedList.add sl !l;
           ""
       | _ -> raise Not_found)
+  | "add_in_sorted_listd", sl -> (
+      match get_env "listd" env with
+      | Vslist l ->
+          l := SortedList.add sl !l;
+          ""
+      | _ -> raise Not_found)
+  | "add_in_sorted_liste", sl -> (
+      match get_env "liste" env with
+      | Vslist l ->
+          l := SortedList.add sl !l;
+          ""
+      | _ -> raise Not_found)
   | "hexa", [ s ] -> Util.hexa_string s
   | "initial", [ s ] ->
       if String.length s = 0 then "" else String.sub s 0 (Utf8.next s 0)
@@ -5301,6 +5335,8 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       ("list", Vslist (ref SortedList.empty));
       ("listb", Vslist (ref SortedList.empty));
       ("listc", Vslist (ref SortedList.empty));
+      ("listd", Vslist (ref SortedList.empty));
+      ("liste", Vslist (ref SortedList.empty));
       ("desc_mark", Vdmark (ref @@ Gwdb.dummy_marker Gwdb.dummy_iper false));
       ("lazy_print", Vlazyp (ref None));
       ("sosa", Vsosa (ref []));
