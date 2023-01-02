@@ -1561,10 +1561,13 @@ let get_note_source conf base ?p auth no_note note_source =
     Notes.source_note_with_env conf base env (sou base note_source)
   else Adef.safe ""
 
-let get_min_max_dates base l =
+let get_min_max_dates conf base l =
   let rec loop (min, max) = function
     | [] -> (min, max)
     | (ip, _, _, _) :: l -> (
+        let max =
+          if get_death (poi base ip) = NotDead then conf.today.year else max
+        in
         let birth_date, death_date, _ =
           Gutil.get_birth_death_date (poi base ip)
         in
@@ -2845,14 +2848,14 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       let list1 = cousins_l1_l2_aux base env l1 l2 p in
       match list1 with
       | Some list1 ->
-          let min, _max = get_min_max_dates base list1 in
+          let min, _max = get_min_max_dates conf base list1 in
           VVstring (string_of_int min)
       | None -> VVstring "")
   | [ "cous_paths_max_date"; l1; l2 ] -> (
       let list1 = cousins_l1_l2_aux base env l1 l2 p in
       match list1 with
       | Some list1 ->
-          let _min, max = get_min_max_dates base list1 in
+          let _min, max = get_min_max_dates conf base list1 in
           VVstring (string_of_int max)
       | None -> VVstring "")
   | [ "cous_paths_cnt_raw"; l1; l2 ] -> (
