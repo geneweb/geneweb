@@ -64,10 +64,23 @@
     %let;cous_isdead;%apply;index("p",path_end.index,"is_dead")%in;
     %let;cous_nodesc;%apply;index("p",path_end.index,"has_children")%in;
     %let;cous_sex;%apply;index("p",path_end.index,"sex")%in;
+    %let;white;rgba(255,255,255,1)%in;
+    %(%apply;add_in_sorted_list;%with;%if;(path_end.birth_date.prec="")%path_end.birth_date.year;%end;%end;
+    %apply;add_in_sorted_list;%with;%if;(path_end.death_date.prec="")%path_end.death_date.year;%end;%end;
+    %let;date_deb;%foreach;sorted_list_item;%if;(prev_item.1="")%item.1;%end;%end;%in;
+    %let;date_fin;%foreach;sorted_list_item;%if;(next_item.1="")%item.1;%end;%end;%in;%)
+    %let;birth_age;%if;(path_end.birth_date.prec="" and path_end.birth_date.year!="")%if;(path_end.birth_date.year <= today.year)%expr(10*(121-(today.year-path_end.birth_date.year))/12)%end;%end;%in;
+    %let;death_age;%if;(path_end.death_date.prec="" and path_end.death_date.year!="")
+      %if;(path_end.death_date.year>today.year-120)%expr(10*(121-(today.year-path_end.death_date.year))/12)%end;%end;%in;
     %if(path_end.surname="?" and path_end.first_name="?")%incr_count3;
     %else;
-      %apply;add_in_sorted_list%with;%path_end.surname; %path_end.first_name; %path_end.dates; %path_end.occ;%and;%nn;
-      <li class="card text-small nbr_%path_end.nbr; rounded-lg border-top-0 border-right-0 border-bottom-0 mr-2 border-%if;(path_end.sex=0)primary%elseif;(path_end.sex=1)danger%else;dark%end;"%if;(cous_isdead=0) data-alive="%cous_isdead;"%end; style="border-left-width:5px;%if;(cous_isdead=1)background-color:rgba(245,231,216,0.95);%end;%if;(cous_nodesc!=1)border-style:double;%end;"
+      %apply;add_in_sorted_list%with;%path_end.dates; %path_end.surname; %path_end.first_name; %path_end.dates; %path_end.occ;%and;%nn;
+      <li class="card text-small nbr_%path_end.nbr; rounded-lg border-top-0 border-right-0 border-bottom-0 mr-2 border-%if;(path_end.sex=0)primary%elseif;(path_end.sex=1)danger%else;dark%end;"%if;(cous_isdead=0) data-alive="%cous_isdead;"%end; style="border-left-width:5px;%if;(cous_isdead=1)
+      %if;(path_end.birth_date.year>today.year-120)
+        background: linear-gradient(90deg, rgba(245,231,216,0.8) %birth_age;%%, %white; %birth_age;%%, %white; %death_age;%%, rgba(245,231,216,0.8) %death_age;%%);
+      %else;background-color:rgba(245,231,216,0.95);
+      %end;
+      %else;background: linear-gradient(90deg, rgba(245,231,216,0.8) %birth_age;%%, %white; %birth_age;%%);%end;%if;(cous_nodesc!=1)border-style:double;%end;"
      %( TODO try to sort by data-attribute data-position="%apply;index("p",path_end.index,"sex")"%)>%nn;
         <div class="d-flex justify-content-between align-items-start ml-n2">
           <div class="d-block pl-n2 pr-2 align-self-center order-1 position-relative">
@@ -82,16 +95,15 @@
                 %if;(path_end.nbr>1)&dag=on%end;"%sp;
                 title="%apply;a_of_b%with;%if;(path_end.sex=0)[cousin.0.www]0%else;[cousin.0.www]1%end;%and;%path_end.anc1.first_name; %path_end.anc1.surname;%( %path_end.anc1.dates;%)
                 %if;(path_end.anc2!=".....") [and] %path_end.anc2;%end;%end;">
-                %if;(path_end.nbr %2 = 0)<i class="fa-solid fa-user-group fa-sm"></i>%else;<i class="fa-solid fa-user fa-sm text-%if;(path_end.anc2!=".....")info%else;%if;(path_end.anc1.sex=0)primary%elseif;(path_end.anc1.sex=1)danger%else;muted%end;%end;"></i>%end;%nn;
+                %if;(path_end.nbr %2 = 0)<i class="fa-solid fa-user-group fa-fw fa-sm"></i>%else;<i class="fa-solid fa-user fa-fw fa-sm text-%if;(path_end.anc2!=".....")info%else;%if;(path_end.anc1.sex=0)primary%elseif;(path_end.anc1.sex=1)danger%else;muted%end;%end;"></i>%end;%nn;
                 %(TODO NBR <span class="small%if;(path_end.nbr>2)mr-1%end;"><sup>%if;(path_end.nbr>2)%path_end.nbr;%else; %end;</sup></span>%)
               </a>
           %end;
           </div>
-          %(%let;cousin_age;%apply;index("p",path_end.index,"age.v")%in;%)
           <div class="d-block flex-grow-1 justify-content-start align-self-center order-2 text-truncate text-nowrap px-0">
             <a href="%prefix;%path_end.access;"%if;(path_end.occ!="0") title="occ %path_end.occ;"%end;%sp;
               style="line-height:2rem;"
-              %(data-anclist="%path_end.anc_f_list;"%)>%path_end.surname; %path_end.first_name;%nn;
+              %(data-anclist="%path_end.anc_f_list;"%)>%(%path_end.nbr; %path_end.lev_cnt; %path_end.anc_level; %)%path_end.surname; %path_end.first_name;%nn;
             </a>
             %if;wizard;<a href="%prefix;&m=MOD_IND&i=%path_end.index;">%end;
               %if;(path_end.dates!="")%path_end.dates;
@@ -120,6 +132,7 @@
             <div class="d-flex justify-content-around align-items-center">
               <div class="d-inline-flex flex-column justify-content-around align-self-center text-left ml-4%if;(www=0) mr-5%end;">
                 <div>%listb_size %if;(cousins_cnt.vvv.www=1)[person/persons]0%else;[person/persons]1%end;
+                   %date_debut;-%date_fin;
                 %if;(count!=cousins_cnt.vvv.www)
                   <div>
                     %if;(2*count<cousins_cnt.vvv.www)%count; [alive]3
@@ -241,15 +254,16 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
   <table id="quickrel" class="table table-responsive-sm mb-0 mt-1 order-3">
     %for;j;1;maxdesc;
       <tr style="height:2rem">%nn;
-        %(<td class="h3 align-center border-0 mr-1">
-          %if;(j>0 and j<=e.v)%expr(e.v+1-j)%else; %end;</td>%)
         %for;i;0;xxx;
           %let;k;%expr(j+i-xxx)%in;
           %if;(k>=0)
               %let;tot;%apply;cous_paths_cnt%with;%i;%and;%k;%end;%in;
               %let;tot_next;%apply;cous_paths_cnt%with;%i;%and;%expr(k+1)%end;%in;
               %if;(i>1 and k=0)
-                <td colspan="%expr(i-1)" class="border-0"> </td>
+               <td class="h4 text-left align-middle border-top-0">%nn;
+                 %expr(xxx-j)%nn;
+               </td>
+               %if;(i>2)<td colspan="%expr(i-2)" class="border-0"> </td>%end;
               %end;
               <td%if;(j=xxx) width="%expr(100/xxx)%%"%end;%if;(i>0 and k=0) colspan="2"%end;%sp;
                 class="border-0 border-top-0 border-bottom-0 border-right-0">
@@ -296,7 +310,7 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
   </table>
 %end;
 %if;(e.v="")
-  %apply;table(6)
+  %apply;table(4)
 %else;
   %apply;table(e.v+1)
 %end;
