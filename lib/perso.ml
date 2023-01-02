@@ -4191,7 +4191,7 @@ let print_foreach conf base print_ast eval_expr =
     let rec loop first cnt l =
       match l with
       | [] -> ()
-      | (ip, (ifaml, iancl, _cnt), lev_list) :: l -> (
+      | (ip, (ifaml, iancl, nbr), lev_list) :: l -> (
           match test level lev_list with
           | Some lev ->
               (let lev_cnt = List.length lev_list in
@@ -4210,9 +4210,9 @@ let print_foreach conf base print_ast eval_expr =
                         Vind (pget conf base (List.nth iancl 1))
                       else Vind (poi base Gwdb.dummy_iper) )
                  :: ("lev_cnt", Vint lev_cnt) :: ("first", Vbool first)
-                 :: ("cnt", Vint cnt)
+                 :: ("cnt", Vint cnt) :: ("nbr", Vint nbr)
                  :: ("last", Vbool (l = []))
-                 :: ("mode", Vstring "Vcousl") :: env
+                 :: env
                in
                List.iter (print_ast env ep) al);
               loop false (cnt + 1) l
