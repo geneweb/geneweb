@@ -8,6 +8,7 @@ open Util
 
 let max_im_wid = 240
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
+let min_max = 4000
 
 let string_of_marriage_text conf base fam =
   let marriage = Date.od_of_cdate (get_marriage fam) in
@@ -1597,7 +1598,7 @@ let get_min_max_dates conf base l =
               l
         | _, _ -> loop (min, max) l)
   in
-  loop (4000, 0) l
+  loop (min_max, -min_max) l
 
 let date_aux conf p_auth date =
   match (p_auth, Date.od_of_cdate date) with
@@ -2848,15 +2849,17 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       let list1 = cousins_l1_l2_aux base env l1 l2 p in
       match list1 with
       | Some list1 ->
-          let min, _max = get_min_max_dates conf base list1 in
-          VVstring (string_of_int min)
+          let min, max = get_min_max_dates conf base list1 in
+          if min = min_max || max = -min_max then VVstring ""
+          else VVstring (string_of_int min)
       | None -> VVstring "")
   | [ "cous_paths_max_date"; l1; l2 ] -> (
       let list1 = cousins_l1_l2_aux base env l1 l2 p in
       match list1 with
       | Some list1 ->
-          let _min, max = get_min_max_dates conf base list1 in
-          VVstring (string_of_int max)
+          let min, max = get_min_max_dates conf base list1 in
+          if min = min_max || max = -min_max then VVstring ""
+          else VVstring (string_of_int max)
       | None -> VVstring "")
   | [ "cous_paths_cnt_raw"; l1; l2 ] -> (
       let list1 = cousins_l1_l2_aux base env l1 l2 p in
