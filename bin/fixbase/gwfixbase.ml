@@ -5,55 +5,6 @@ let aux txt
     (fn :
       ?report:(Fixbase.patch -> unit) -> (int -> int -> unit) -> base -> unit)
     ~v1 ~v2 base n cnt =
-  let string_of_patch =
-    let string_of_p i = Gutil.designation base (poi base i) in
-    let string_of_f i =
-      let fam = foi base i in
-      Printf.sprintf "[%s & %s]"
-        (string_of_p @@ get_father fam)
-        (string_of_p @@ get_mother fam)
-    in
-    function
-    | Fixbase.Fix_NBDS ip ->
-        Printf.sprintf "Fixed pevents for: %s" (string_of_p ip)
-    | Fix_AddedUnion ip -> Printf.sprintf "Added union for: %s" (string_of_p ip)
-    | Fix_AddedParents ip ->
-        Printf.sprintf "Fixed missing parents for: %s" (string_of_p ip)
-    | Fix_ParentDeleted ip ->
-        Printf.sprintf "Deleted parents for: %s" (string_of_p ip)
-    | Fix_AddedChild ifam ->
-        Printf.sprintf "Added child in: %s" (string_of_f ifam)
-    | Fix_RemovedUnion (ip, ifam) ->
-        Printf.sprintf "Removing ifam %s from [%s] unions" (string_of_ifam ifam)
-          (string_of_p ip)
-    | Fix_RemovedDuplicateUnion (ip, ifam) ->
-        Printf.sprintf "Removing duplicate ifam %s from [%s] unions"
-          (string_of_ifam ifam) (string_of_p ip)
-    | Fix_AddedRelatedFromPevent (ip, ip2) | Fix_AddedRelatedFromFevent (ip, ip2)
-      ->
-        Printf.sprintf "Added related %s to %s" (string_of_p ip2)
-          (string_of_p ip)
-    | Fix_MarriageDivorce ifam ->
-        Printf.sprintf "Fixed marriage and/or divorce info of %s"
-          (string_of_f ifam)
-    | Fix_MissingSpouse (ifam, iper) ->
-        Printf.sprintf "Fixed missing spouse (%s) in family %s"
-          (string_of_p iper) (string_of_f ifam)
-    | Fix_WrongUTF8Encoding (ifam_opt, iper_opt, opt) ->
-        Printf.sprintf "Fixed invalid UTF-8 sequence (%s): %s"
-          (match ifam_opt with
-          | Some i -> "ifam " ^ string_of_ifam i
-          | None -> (
-              match iper_opt with
-              | Some i -> "iper " ^ string_of_iper i
-              | None -> assert false))
-          (match opt with
-          | Some (i, i') -> string_of_istr i ^ " -> " ^ string_of_istr i'
-          | None -> "Dtext")
-    | Fix_UpdatedOcc (iper, oocc, nocc) ->
-        Printf.sprintf "Uptated occ for %s: %d -> %d" (string_of_p iper) oocc
-          nocc
-  in
   let i' = ref 0 in
   if v1 then (
     print_endline txt;
@@ -72,7 +23,7 @@ let aux txt
         (fun s ->
           incr cnt;
           ProgrBar.suspend ();
-          print_endline @@ "\t" ^ string_of_patch s;
+          print_endline @@ "\t" ^ Fixbase.string_of_patch base s;
           flush stdout;
           ProgrBar.restart !i' n)
     else Some (fun _ -> incr cnt)
