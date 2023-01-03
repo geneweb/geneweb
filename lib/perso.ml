@@ -8,7 +8,6 @@ open Util
 
 let max_im_wid = 240
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
-let min_max = 4000
 
 let string_of_marriage_text conf base fam =
   let marriage = Date.od_of_cdate (get_marriage fam) in
@@ -1241,11 +1240,57 @@ let warning_use_has_parents_before_parent (fname, bp, ep) var r =
   r
 
 let cousins_t = ref None
+let cousins_dates_t = ref None
 
 let max_l1_l2_aux env =
   let max_l1 = match get_env "max_anc_level" env with Vint i -> i | _ -> 5 in
   let max_l2 = match get_env "max_desc_level" env with Vint i -> i | _ -> 5 in
   (max_l1 - 1, (2 * max_l1) + max_l2 + 20)
+
+let get_min_max_dates conf base l =
+  let dates =
+    let rec loop acc = function
+      | [] -> acc
+      | (ip, _, _, _) :: l -> (
+          let not_dead = get_death (poi base ip) = NotDead in
+          let birth_date, death_date, _ =
+            Gutil.get_birth_death_date (poi base ip)
+          in
+          match (birth_date, death_date) with
+          | Some (Dgreg (b, _)), Some (Dgreg (d, _)) ->
+              let birth =
+                match b.prec with
+                | After | Before | About | Maybe | OrYear _ | YearInt _ -> false
+                | _ -> true
+              in
+              let death =
+                match d.prec with
+                | After | Before | About | Maybe | OrYear _ | YearInt _ -> false
+                | _ -> true
+              in
+              if birth && death then loop (b.year :: d.year :: acc) l
+              else if birth && not death then loop (b.year :: acc) l
+              else if (not birth) && death then loop (d.year :: acc) l
+              else loop acc l
+          | Some (Dgreg (b, _)), _ -> (
+              match b.prec with
+              | After | Before | About | Maybe | OrYear _ | YearInt _ ->
+                  if not_dead then loop (conf.today.year :: acc) l
+                  else loop acc l
+              | _ ->
+                  if not_dead then loop (conf.today.year :: b.year :: acc) l
+                  else loop (b.year :: acc) l)
+          | _, Some (Dgreg (d, _)) -> (
+              match d.prec with
+              | After | Before | About | Maybe | OrYear _ | YearInt _ ->
+                  loop acc l
+              | _ -> loop (d.year :: acc) l)
+          | _, _ ->
+              if not_dead then loop (conf.today.year :: acc) l else loop acc l)
+    in
+    loop [] l
+  in
+  List.sort_uniq compare dates
 
 let rec ascendants base acc l i =
   match l with
@@ -1306,21 +1351,25 @@ let descendants base cousins_cnt i j =
   let liste2 = if i > 0 then cousins_cnt.(i - 1).(j - 1) else [] in
   descendants_aux base liste1 liste2
 
-let init_cousins_cnt base env p =
-  match !cousins_t with
-  | Some t -> t
-  | None ->
-      let t' =
+let init_cousins_cnt conf base env p =
+  match (!cousins_t, !cousins_dates_t) with
+  | Some t, Some d_t -> (t, d_t)
+  | _, _ ->
+      let t', d_t' =
         let max_l1, max_l2 = max_l1_l2_aux env in
         Printf.sprintf "******** Compute %d × %d table ********\n" max_l1 max_l2
         |> !GWPARAM.syslog `LOG_WARNING;
         (* TODO test for Sys.max_array_length *)
         let cousins_cnt = Array.make_matrix (max_l2 + 1) (max_l2 + 1) [] in
+        let cousins_dates = Array.make_matrix (max_l2 + 1) (max_l2 + 1) [] in
         cousins_cnt.(0).(0) <-
           [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
+        cousins_dates.(0).(0) <- get_min_max_dates conf base cousins_cnt.(0).(0);
         let rec loop0 j =
           (* initiate lists of direct descendants *)
           cousins_cnt.(0).(j) <- descendants base cousins_cnt 0 j;
+          cousins_dates.(0).(j) <-
+            get_min_max_dates conf base cousins_cnt.(0).(j);
           if j < max_l2 then loop0 (j + 1) else ()
         in
         loop0 1;
@@ -1330,6 +1379,8 @@ let init_cousins_cnt base env p =
           let rec loop2 i j =
             (* get descendants of c1, except persons of previous level (c2) *)
             cousins_cnt.(i).(j) <- descendants base cousins_cnt i j;
+            cousins_dates.(i).(j) <-
+              get_min_max_dates conf base cousins_cnt.(i).(j);
             if j < max_l2 then loop2 i (j + 1)
             else if i < max_l1 then loop1 (i + 1)
             else ()
@@ -1337,14 +1388,17 @@ let init_cousins_cnt base env p =
           loop2 i 1
         in
         loop1 1;
-        cousins_cnt
+        (cousins_cnt, cousins_dates)
       in
       cousins_t := Some t';
-      t'
+      cousins_dates_t := Some d_t';
+      (t', d_t')
 
-let max_l1_l2 base env p =
-  let cousins_cnt =
-    match !cousins_t with Some t -> t | None -> init_cousins_cnt base env p
+let max_l1_l2 conf base env p =
+  let cousins_cnt, _cousins_dates =
+    match (!cousins_t, !cousins_dates_t) with
+    | Some t, Some d_t -> (t, d_t)
+    | _, _ -> init_cousins_cnt conf base env p
   in
   let max_l1, max_l2 = max_l1_l2_aux env in
   let max_i =
@@ -1361,12 +1415,12 @@ let max_l1_l2 base env p =
   in
   loop 0 0
 
-let cousins_l1_l2_aux base env l1 l2 p =
+let cousins_l1_l2_aux conf base env l1 l2 p =
   let il1 = int_of_string l1 in
   let il2 = int_of_string l2 in
   let max_l1, max_l2 = max_l1_l2_aux env in
   if il1 <= max_l1 && il2 - il1 <= max_l2 then
-    let cousins_cnt = init_cousins_cnt base env p in
+    let cousins_cnt, _cousins_dates = init_cousins_cnt conf base env p in
     (* gros calcul *)
     Some cousins_cnt.(il1).(il2)
   else None
@@ -1561,44 +1615,6 @@ let get_note_source conf base ?p auth no_note note_source =
     in
     Notes.source_note_with_env conf base env (sou base note_source)
   else Adef.safe ""
-
-let get_min_max_dates conf base l =
-  let rec loop (min, max) = function
-    | [] -> (min, max)
-    | (ip, _, _, _) :: l -> (
-        let max =
-          if get_death (poi base ip) = NotDead then conf.today.year else max
-        in
-        let birth_date, death_date, _ =
-          Gutil.get_birth_death_date (poi base ip)
-        in
-        match (birth_date, death_date) with
-        | Some (Dgreg (b, _)), Some (Dgreg (d, _)) ->
-            loop
-              ( (match b.prec with
-                | After | Before | About | Maybe | OrYear _ | YearInt _ -> min
-                | _ -> if b.year < min then b.year else min),
-                match d.prec with
-                | After | Before | About | Maybe | OrYear _ | YearInt _ -> max
-                | _ -> if d.year > max then d.year else max )
-              l
-        | Some (Dgreg (b, _)), _ ->
-            loop
-              ( (match b.prec with
-                | After | Before | About | Maybe | OrYear _ | YearInt _ -> min
-                | _ -> if b.year < min then b.year else min),
-                max )
-              l
-        | _, Some (Dgreg (d, _)) ->
-            loop
-              ( min,
-                match d.prec with
-                | After | Before | About | Maybe | OrYear _ | YearInt _ -> max
-                | _ -> if d.year > max then d.year else max )
-              l
-        | _, _ -> loop (min, max) l)
-  in
-  loop (min_max, -min_max) l
 
 let date_aux conf p_auth date =
   match (p_auth, Date.od_of_cdate date) with
@@ -2845,34 +2861,40 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match get_env "cnt" env with
       | Vint cnt -> VVstring (string_of_int cnt)
       | _ -> VVstring "")
-  | [ "cous_paths_min_date"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux base env l1 l2 p in
-      match list1 with
-      | Some list1 ->
-          let min, max = get_min_max_dates conf base list1 in
-          if min = min_max || max = -min_max then VVstring ""
-          else VVstring (string_of_int min)
-      | None -> VVstring "")
-  | [ "cous_paths_max_date"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux base env l1 l2 p in
-      match list1 with
-      | Some list1 ->
-          let min, max = get_min_max_dates conf base list1 in
-          if min = min_max || max = -min_max then VVstring ""
-          else VVstring (string_of_int max)
-      | None -> VVstring "")
+  | [ "cous_paths_min_date"; l1; l2 ] ->
+      let _cousins_cnt, cousins_dates =
+        match (!cousins_t, !cousins_dates_t) with
+        | Some t, Some d_t -> (t, d_t)
+        | _, _ -> init_cousins_cnt conf base env p
+      in
+      let i = try int_of_string l1 with Failure _ -> raise Not_found in
+      let j = try int_of_string l2 with Failure _ -> raise Not_found in
+      let list = List.rev cousins_dates.(i).(j) in
+      if List.length list > 0 then str_val (string_of_int (List.hd list))
+      else null_val
+  | [ "cous_paths_max_date"; l1; l2 ] ->
+      let _cousins_cnt, cousins_dates =
+        match (!cousins_t, !cousins_dates_t) with
+        | Some t, Some d_t -> (t, d_t)
+        | _, _ -> init_cousins_cnt conf base env p
+      in
+      let i = try int_of_string l1 with Failure _ -> raise Not_found in
+      let j = try int_of_string l2 with Failure _ -> raise Not_found in
+      let list = List.rev cousins_dates.(i).(j) in
+      if List.length list > 0 then str_val (string_of_int (List.hd list))
+      else null_val
   | [ "cous_paths_cnt_raw"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux base env l1 l2 p in
+      let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
       match list1 with
       | Some list1 -> VVstring (string_of_int (List.length list1))
       | None -> VVstring "no cousin list")
   | [ "cous_paths_cnt"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux base env l1 l2 p in
+      let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
       match list1 with
       | Some list -> VVstring (string_of_int (List.length (cousins_fold list)))
       | None -> VVstring "no cousin list")
   | [ "cous_paths"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux base env l1 l2 p in
+      let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
       match list1 with
       | Some list -> (
           match get_env "cousins" env with
@@ -2889,13 +2911,13 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       | None -> VVstring (Printf.sprintf "Not found2 with l1=%s, l2=%s\n" l1 l2)
       )
   | [ "cousins"; "max_a" ] ->
-      let max_a, _ = max_l1_l2 base env p in
+      let max_a, _ = max_l1_l2 conf base env p in
       VVstring (string_of_int max_a)
   | [ "cousins"; "max_d" ] ->
-      let _, max_d = max_l1_l2 base env p in
+      let _, max_d = max_l1_l2 conf base env p in
       VVstring (string_of_int max_d)
   | [ "cousins_cnt"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux base env l1 l2 p in
+      let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
       match list1 with
       | Some list ->
           let list =
@@ -4812,7 +4834,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_cousin_path env el al ((p, _) as ep) test_level =
     let level, l1, l2 = get_level_info conf env el ep in
     let list1 =
-      cousins_l1_l2_aux base env (string_of_int l1) (string_of_int l2) p
+      cousins_l1_l2_aux conf base env (string_of_int l1) (string_of_int l2) p
     in
     match list1 with
     | Some list ->
