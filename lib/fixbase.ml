@@ -532,3 +532,21 @@ let fix_key ?report progress base =
         in
         ignore @@ loop [] rev_list)
     ipers
+
+let check_everything ?report progress base =
+  let all_fn =
+    [|
+      check_NBDS;
+      check_families_parents;
+      check_families_children;
+      check_persons_parents;
+      check_persons_families;
+      check_pevents_witnesses;
+      check_fevents_witnesses;
+      fix_marriage_divorce;
+      fix_missing_spouses;
+      fix_utf8_sequence;
+      fix_key;
+    |]
+  in
+  Array.iter (fun fn -> fn ?report progress base) all_fn
