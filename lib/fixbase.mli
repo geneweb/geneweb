@@ -83,3 +83,7 @@ val fix_key :
   ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 (** For every person in the base, update their occurence number
     if someone with same key (normalized first name and last name, and occurence number) already exists. *)
+
+val check_everything :
+  ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
+(** Apply all checks *)
