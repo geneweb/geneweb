@@ -57,29 +57,40 @@
 %define;cousins_cnt(vvv,www)
   %cousins_cnt.vvv.www;
 %end;
-%empty_sorted_list;%empty_sorted_listb;%empty_sorted_listc;%reset_count3;
+%define;cous_paths_min_date(vvv,www)
+  %cous_paths_min_date.vvv.www;
+%end;
+%define;cous_paths_max_date(vvv,www)
+  %cous_paths_max_date.vvv.www;
+%end;
+%define;setvar(nnn,vvv)
+  %set_var.nnn.vvv;
+%end;
+%define;getvar(nnn)
+  %get_var.nnn;
+%end;
+%empty_sorted_list;%empty_sorted_listb;%empty_sorted_listc;%empty_sorted_listd;%reset_count3;
+
 %define;cous_mod(vvv,www)
   %empty_sorted_list;%empty_sorted_listb;
+  %( failure("hd") %)
+  %(%let;min_date_vvv_www;%apply;cous_paths_min_date%with;vvv%and;www%end;%in;
+  %let;max_date_vvv_www;%apply;cous_paths_max_date%with;vvv%and;www%end;%in;
+  %let;span_vvv_www;%expr(max_date_vvv_www-min_date_vvv_www)%in;%)
   %foreach;cous_path(vvv,www)
     %let;cous_isdead;%apply;index("p",path_end.index,"is_dead")%in;
     %let;cous_nodesc;%apply;index("p",path_end.index,"has_children")%in;
     %let;cous_sex;%apply;index("p",path_end.index,"sex")%in;
     %let;white;rgba(255,255,255,1)%in;
-    %(%apply;add_in_sorted_list;%with;%if;(path_end.birth_date.prec="")%path_end.birth_date.year;%end;%end;
-    %apply;add_in_sorted_list;%with;%if;(path_end.death_date.prec="")%path_end.death_date.year;%end;%end;
-    %let;date_deb;%foreach;sorted_list_item;%if;(prev_item.1="")%item.1;%end;%end;%in;
-    %let;date_fin;%foreach;sorted_list_item;%if;(next_item.1="")%item.1;%end;%end;%in;%)
-    %let;birth_age;%if;(path_end.birth_date.prec="" and path_end.birth_date.year!="")%if;(path_end.birth_date.year <= today.year)%expr(10*(121-(today.year-path_end.birth_date.year))/12)%end;%end;%in;
+    %let;birth_age;%if;(path_end.birth_date.prec="" and path_end.birth_date.year!="")
+      %expr(100-(100*(max_date_vvv_www-path_end.birth_date.year)/span_vvv_www))%end;%in;
     %let;death_age;%if;(path_end.death_date.prec="" and path_end.death_date.year!="")
-      %if;(path_end.death_date.year>today.year-120)%expr(10*(121-(today.year-path_end.death_date.year))/12)%end;%end;%in;
+      %if;(death_age=birth_age and birth_age>0)%expr(birth_age+1)%else;%expr(100-(100*(max_date_vvv_www-path_end.death_date.year)/span_vvv_www))%end;%end;%in;
     %if(path_end.surname="?" and path_end.first_name="?")%incr_count3;
     %else;
-      %apply;add_in_sorted_list%with;%path_end.dates; %path_end.surname; %path_end.first_name; %path_end.dates; %path_end.occ;%and;%nn;
+      %apply;add_in_sorted_list%with;%path_end.dates; %path_end.surname; %path_end.first_name; %path_end.occ;%and;%nn;
       <li class="card text-small nbr_%path_end.nbr; rounded-lg border-top-0 border-right-0 border-bottom-0 mr-2 border-%if;(path_end.sex=0)primary%elseif;(path_end.sex=1)danger%else;dark%end;"%if;(cous_isdead=0) data-alive="%cous_isdead;"%end; style="border-left-width:5px;%if;(cous_isdead=1)
-      %if;(path_end.birth_date.year>today.year-120)
         background: linear-gradient(90deg, rgba(245,231,216,0.8) %birth_age;%%, %white; %birth_age;%%, %white; %death_age;%%, rgba(245,231,216,0.8) %death_age;%%);
-      %else;background-color:rgba(245,231,216,0.95);
-      %end;
       %else;background: linear-gradient(90deg, rgba(245,231,216,0.8) %birth_age;%%, %white; %birth_age;%%);%end;%if;(cous_nodesc!=1)border-style:double;%end;"
      %( TODO try to sort by data-attribute data-position="%apply;index("p",path_end.index,"sex")"%)>%nn;
         <div class="d-flex justify-content-between align-items-start ml-n2">
@@ -132,7 +143,6 @@
             <div class="d-flex justify-content-around align-items-center">
               <div class="d-inline-flex flex-column justify-content-around align-self-center text-left ml-4%if;(www=0) mr-5%end;">
                 <div>%listb_size %if;(cousins_cnt.vvv.www=1)[person/persons]0%else;[person/persons]1%end;
-                   %date_debut;-%date_fin;
                 %if;(count!=cousins_cnt.vvv.www)
                   <div>
                     %if;(2*count<cousins_cnt.vvv.www)%count; [alive]3
@@ -148,7 +158,7 @@
                   <div>%count3; [unknown spouse] ? ?</div>
                 %end;
               </div>
-              <div class="mx-auto text-center align-items-center">
+              <div class="d-flex flex-column mx-auto text-center align-items-center">
                 <a role="button" class="h2 display-4 stretched-link ml-2"
                   style="font-size:2rem;font-weight:300;" data-toggle="tooltip" data-html="true" 
                   href="%prefix;m=RLM%foreach;sorted_list_item;&i1=%self.index;&i%expr(item.3+1)=%item.4;%end;&t1=[cousins.vvv.www]" class="btn btn-primary" title="Graphe RLM c(vvv,www)">%nn;
@@ -159,6 +169,7 @@
                    %end;
                 </a>%nn;
                 <small class="text-muted">%if;(extrapaths!=0) (+ %extrapaths;)%end;</small>
+                <span class="h4">%min_date_vvv_www;-%max_date_vvv_www;</span>
               </div>
               %(<div class="flex-grow-1 bg-transparent"> </div>%)
               %let;cousdown;%apply;cousins_cnt%with;vvv%and;%expr(www+1)%end;%in;
