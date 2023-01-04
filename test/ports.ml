@@ -42,7 +42,7 @@ let gw_import filename =
 
 (* import ged *)
 let base_1 = ged_import original_ged
-let nb_persons_1 = Gwdb.nb_of_persons base_1
+let nb_real_persons_1 = Gwdb.nb_of_real_persons base_1
 let nb_families_1 = Gwdb.nb_of_families base_1
 
 (* export ged *)
@@ -51,11 +51,11 @@ let () = Gwdb.close_base base_1
 
 (* re-import and check *)
 let base_2 = ged_import exported_ged
-let nb_persons_2 = Gwdb.nb_of_persons base_2
+let nb_real_persons_2 = Gwdb.nb_of_real_persons base_2
 let nb_families_2 = Gwdb.nb_of_families base_2
-let () = assert (nb_persons_1 = 3300)
+let () = assert (nb_real_persons_1 = 3010)
 let () = assert (nb_families_1 = 1425)
-let () = assert (nb_persons_1 = nb_persons_2)
+let () = assert (nb_real_persons_1 = nb_real_persons_2)
 let () = assert (nb_families_1 = nb_families_2)
 
 (* export to .gw *)
@@ -64,14 +64,14 @@ let () = Gwdb.close_base base_2
 
 (* import .gw and check *)
 let base_3 = gw_import exported_gw
-let nb_persons_3 = Gwdb.nb_of_persons base_3
+let nb_real_persons_3 = Gwdb.nb_of_real_persons base_3
 let nb_families_3 = Gwdb.nb_of_families base_3
-let () = Gwdb.close_base base_3
 
 (* TODO base_3 has 13 more persons
-   let () = assert (nb_persons_1 = nb_persons_3)
+   let () = assert (nb_real_persons_1 = nb_real_persons_3)
 *)
 let () = assert (nb_families_1 = nb_families_3)
+let () = Gwdb.close_base base_3
 
 (* -- test abc.ged -- *)
 
