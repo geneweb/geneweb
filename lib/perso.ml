@@ -1376,6 +1376,8 @@ let init_cousins_cnt conf base env p =
         let rec loop1 i =
           (* get ascendants *)
           cousins_cnt.(i).(0) <- ascendants base [] cousins_cnt.(i - 1).(0) i;
+          cousins_dates.(i).(0) <-
+            get_min_max_dates conf base cousins_cnt.(i).(0);
           let rec loop2 i j =
             (* get descendants of c1, except persons of previous level (c2) *)
             cousins_cnt.(i).(j) <- descendants base cousins_cnt i j;
@@ -2869,7 +2871,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       in
       let i = try int_of_string l1 with Failure _ -> raise Not_found in
       let j = try int_of_string l2 with Failure _ -> raise Not_found in
-      let list = List.rev cousins_dates.(i).(j) in
+      let list = cousins_dates.(i).(j) in
       if List.length list > 0 then str_val (string_of_int (List.hd list))
       else null_val
   | [ "cous_paths_max_date"; l1; l2 ] ->
