@@ -34,6 +34,6 @@
 
 (rule
   (action (run ./ports.exe) )
-  (deps assets/royal92.ged)
+  (deps assets/royal92.ged assets/abc.ged)
   (alias runtest)
 )
