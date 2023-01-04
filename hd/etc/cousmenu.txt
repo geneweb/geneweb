@@ -74,18 +74,20 @@
 %define;cous_mod(vvv,www)
   %empty_sorted_list;%empty_sorted_listb;
   %( failure("hd") %)
-  %(%let;min_date_vvv_www;%apply;cous_paths_min_date%with;vvv%and;www%end;%in;
+  %let;min_date_vvv_www;%apply;cous_paths_min_date%with;vvv%and;www%end;%in;
   %let;max_date_vvv_www;%apply;cous_paths_max_date%with;vvv%and;www%end;%in;
-  %let;span_vvv_www;%expr(max_date_vvv_www-min_date_vvv_www)%in;%)
+  %let;span_vvv_www;%expr(max_date_vvv_www-min_date_vvv_www)%in;
   %foreach;cous_path(vvv,www)
     %let;cous_isdead;%apply;index("p",path_end.index,"is_dead")%in;
     %let;cous_nodesc;%apply;index("p",path_end.index,"has_children")%in;
     %let;cous_sex;%apply;index("p",path_end.index,"sex")%in;
     %let;white;rgba(255,255,255,1)%in;
-    %let;birth_age;%if;(path_end.birth_date.prec="" and path_end.birth_date.year!="")
-      %expr(100-(100*(max_date_vvv_www-path_end.birth_date.year)/span_vvv_www))%end;%in;
-    %let;death_age;%if;(path_end.death_date.prec="" and path_end.death_date.year!="")
-      %if;(death_age=birth_age and birth_age>0)%expr(birth_age+1)%else;%expr(100-(100*(max_date_vvv_www-path_end.death_date.year)/span_vvv_www))%end;%end;%in;
+    %if;(span_vvv_www!=0)
+      %let;birth_age;%if;(path_end.birth_date.prec="" and path_end.birth_date.year!="")
+        %expr(100-(100*(max_date_vvv_www-path_end.birth_date.year)/span_vvv_www))%end;%in;
+      %let;death_age;%if;(path_end.death_date.prec="" and path_end.death_date.year!="")
+        %if;(death_age=birth_age and birth_age>0)%expr(birth_age+1)%else;%expr(100-(100*(max_date_vvv_www-path_end.death_date.year)/span_vvv_www))%end;%end;%in;
+    %end;
     %if(path_end.surname="?" and path_end.first_name="?")%incr_count3;
     %else;
       %apply;add_in_sorted_list%with;%path_end.dates; %path_end.surname; %path_end.first_name; %path_end.occ;%and;%nn;
