@@ -174,7 +174,7 @@ and eval_event_str conf base env fam = match get_env "cnt" env with
            |> Adef.safe_fn Utf8.capitalize_fst
          in
          let date =
-           match Adef.od_of_cdate e.efam_date with
+           match Date.od_of_cdate e.efam_date with
              Some d -> DateDisplay.string_of_date conf d
            | None -> Adef.safe ""
          in

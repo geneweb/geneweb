@@ -447,7 +447,7 @@ let ged_pevent opts base per_sel evt =
   let src = sou base evt.epers_src in
   ged_ev_detail opts 2 typ date place note src;
   Array.iter
-    (fun (ip, wk, wnote) ->
+    (fun (ip, wk, _wnote) ->
       (* WNOTE TODO *)
        if per_sel ip then
          begin

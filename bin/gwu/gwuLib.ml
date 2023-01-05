@@ -604,7 +604,7 @@ let print_pevent opts base gen e =
   if opts.source = None then print_if_no_empty opts base "#s" e.epers_src;
   Printf.ksprintf (oc opts) "\n";
   Array.iter
-    (fun (ip, wk, wnote) ->
+    (fun (ip, wk, _wnote) ->
       (* WNOTE TODO *)
        if gen.per_sel ip then
          let p = poi base ip in
@@ -926,7 +926,7 @@ let notes_aliases bdir =
 let print_notes_for_person opts base gen p =
   let print_witness_in_notes witnesses =
     Array.iter
-      (fun (ip, wk, wnotes) ->
+      (fun (ip, wk, _wnotes) ->
         (* WNOTES TODO *)
          let p = poi base ip in
          Printf.ksprintf (oc opts) "wit";

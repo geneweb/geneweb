@@ -512,7 +512,7 @@ let check_witness_pevents base warning origin =
   List.iter begin fun evt ->
     match Date.od_of_cdate evt.epers_date with
     | Some (Dgreg (d2, _)) ->
-       Array.iter begin fun (iw, witness_kind, wnotes) ->
+       Array.iter begin fun (iw, witness_kind, _wnotes) ->
          (* WNOTES TODO *)
         let p = poi base iw in
         check_witness_pevents_aux warning origin evt d2
@@ -527,7 +527,7 @@ let check_witness_pevents base warning origin =
     wether it was found associated only with the Mentionned or Other witness kind.
 **)
 let witness_occur : iper -> (iper * witness_kind * istr) array -> bool * bool =
-  let f iper (is_witness, only_mentioned_or_other) (i, wk, wnotes) =
+  let f iper (is_witness, only_mentioned_or_other) (i, wk, _wnotes) =
     (* WNOTES TODO *)
     if i = iper then
       ( true,
