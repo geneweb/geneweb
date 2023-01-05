@@ -1328,7 +1328,7 @@ let get_marriage_witnesses fam =
 let get_nb_marriage_witnesses_of_kind fam wk =
   let witnesses = get_marriage_witnesses fam in
   Array.fold_left
-    (fun acc (_, w) -> if wk = w then acc + 1 else acc)
+    (fun acc (_, w, _) -> if wk = w then acc + 1 else acc)
     0 witnesses
 
 let rec eval_var conf base env ep loc sl =
@@ -3668,66 +3668,6 @@ let print_foreach conf base print_ast eval_expr =
       | [] -> ()
     in
     loop true gen
-  and print_foreach_baptism_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Event.Pevent Epers_Baptism then
-            Array.iteri
-              begin fun i (ip, _, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("baptism_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (Event.events conf base p)
-  and print_foreach_birth_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Event.Pevent Epers_Birth then
-            Array.iteri
-              begin fun i (ip, _, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("birth_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (Event.events conf base p)
-  and print_foreach_burial_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Event.Pevent Epers_Burial then
-            Array.iteri
-              begin fun i (ip, _, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("burial_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (Event.events conf base p)
   and print_foreach_cell env al ep =
     let celll =
       match get_env "celll" env with
@@ -3811,46 +3751,6 @@ let print_foreach conf base print_ast eval_expr =
               (!GWPARAM_ITL.get_children' conf base (get_iper (fst ep)) fam isp)
         )
     | _ -> ()
-  and print_foreach_cremation_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Event.Pevent Epers_Cremation then
-            Array.iteri
-              begin fun i (ip, _, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("cremation_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (Event.events conf base p)
-  and print_foreach_death_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Event.Pevent Epers_Death then
-            Array.iteri
-              begin fun i (ip, _, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("death_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (Event.events conf base p)
   and print_foreach_descendant_level env al ep =
     let max_level =
       match get_env "max_desc_level" env with Vint n -> n | _ -> 0
@@ -3886,7 +3786,7 @@ let print_foreach conf base print_ast eval_expr =
       (fun (name, _, _, _, _, wl, _) ->
         if name = Event.Pevent epers_event then
           Array.iteri
-            (fun i (ip, _) ->
+            (fun i (ip, _, _) ->
               let p = pget conf base ip in
               let env =
                 (epers_event_witness_string, Vind p)
@@ -3943,13 +3843,14 @@ let print_foreach conf base print_ast eval_expr =
     (* On tri les témoins dans le même ordre que les évènements. *)
     let events_witnesses =
       Event.sort_events
-        (fun (_, _, (name, _, _, _, _, _, _)) -> name)
-        (fun (_, _, (_, date, _, _, _, _, _)) -> date)
+        (fun (_, _, _, (name, _, _, _, _, _, _)) -> name)
+        (fun (_, _, _, (_, date, _, _, _, _, _)) -> date)
         events_witnesses
     in
     List.iter
       (fun (p, wk, wnote, evt) ->
-        if p_auth then
+         if p_auth then
+          let wnote = Util.escape_html wnote in
           let env = ("event_witness_relation", Vevent (p, evt)) :: env in
           let env =
             ( "event_witness_relation_kind",
@@ -3965,7 +3866,7 @@ let print_foreach conf base print_ast eval_expr =
     | Vfam (_, fam, _, true) ->
         let _ =
           Array.fold_left
-            (fun (i, first) (ip, wk) ->
+            (fun (i, first) (ip, wk, _wnote) ->
               if wk = witness_kind then (
                 let p = pget conf base ip in
                 let env =
