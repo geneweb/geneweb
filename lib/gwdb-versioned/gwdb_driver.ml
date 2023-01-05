@@ -2,7 +2,7 @@
 module Log = struct
   let oc : out_channel option ref = ref None
 
-  let log fn =
+  let _log fn =
     match !oc with
     | Some oc -> fn oc
     | None -> ()
@@ -18,7 +18,7 @@ module Log = struct
     | `LOG_WARNING
     ]
 
-  let syslog (level : level) msg =
+  let _syslog (level : level) msg =
     let flags = [`LOG_PERROR] in
     let log = Syslog.openlog ~flags @@ Filename.basename @@ Sys.executable_name in
     Syslog.syslog log level msg ;

@@ -865,54 +865,30 @@ let effective_add conf base sp =
 let update_relations_of_related base ip old_related =
   List.iter
     (fun ip1 ->
-      let p1 = poi base ip1 in
-      let rparents, rparents_are_different =
-        List.fold_right
-          (fun rel (list, rad) ->
-            let rfath, rad =
-              match rel.r_fath with
-              | Some ip2 -> if ip2 = ip then (None, true) else (Some ip2, rad)
-              | None -> (None, rad)
-            in
-            let rmoth, rad =
-              match rel.r_moth with
-              | Some ip2 -> if ip2 = ip then (None, true) else (Some ip2, rad)
-              | None -> (None, rad)
-            in
-            if rfath = None && rmoth = None then (list, true)
-            else
-              let rel = { rel with r_fath = rfath; r_moth = rmoth } in
-              (rel :: list, rad))
-          (get_rparents p1) ([], false)
-      in
-      let pevents, pevents_are_different =
-        List.fold_right
-          (fun e (list, rad) ->
-            let witnesses, rad =
-              Array.fold_right
-                (fun (ip2, k) (accu, rad) ->
-                  if ip2 = ip then (accu, true) else ((ip2, k) :: accu, rad))
-                e.epers_witnesses ([], rad)
-            in
-            let e = { e with epers_witnesses = Array.of_list witnesses } in
-            (e :: list, rad))
-          (get_pevents p1) ([], false)
-      in
-      (if rparents_are_different || pevents_are_different then
-       let p = gen_person_of_person p1 in
-       let rparents = if rparents_are_different then rparents else p.rparents in
-       let pevents = if pevents_are_different then pevents else p.pevents in
-       patch_person base ip1 { p with rparents; pevents });
-      let families = get_family p1 in
-      for i = 0 to Array.length families - 1 do
-        let ifam = families.(i) in
-        let fam = foi base ifam in
-        let old_witnesses = Array.to_list (get_witnesses fam) in
-        let new_witnesses = List.filter (( <> ) ip) old_witnesses in
-        let fevents, fevents_are_different =
-          List.fold_right
-            (fun e (list, rad) ->
-              let witnesses, rad =
+       let p1 = poi base ip1 in
+       let (rparents, rparents_are_different) =
+         List.fold_right
+           (fun rel (list, rad) ->
+              let (rfath, rad) =
+                match rel.r_fath with
+                  Some ip2 -> if ip2 = ip then None, true else Some ip2, rad
+                | None -> None, rad
+              in
+              let (rmoth, rad) =
+                match rel.r_moth with
+                  Some ip2 -> if ip2 = ip then None, true else Some ip2, rad
+                | None -> None, rad
+              in
+              if rfath = None && rmoth = None then list, true
+              else
+                let rel = {rel with r_fath = rfath; r_moth = rmoth} in
+                rel :: list, rad)
+           (get_rparents p1) ([], false)
+       in
+       let (pevents, pevents_are_different) =
+         List.fold_right
+           (fun e (list, rad) ->
+              let (witnesses, rad) =
                 Array.fold_right
                   (fun (ip2, k, wnotes) (accu, rad) ->
                      if ip2 = ip then accu, true else (ip2, k, wnotes) :: accu, rad)

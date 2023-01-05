@@ -465,17 +465,10 @@ val array_mem_witn :
   Gwdb.base ->
   iper ->
   (iper * Def.witness_kind * istr) array ->
-  Adef.safe_string option
+  bool * Adef.safe_string * string
 (** [array_mem_witn conf base ip array] checks if [ip] is in [array]
     and returns corresponding [string_of_witness_kind] and witness note if so.
 *)
-
-val array_mem_witn
- : Config.config
- -> Gwdb.base
- -> iper
- -> (iper * Def.witness_kind * istr) array
- -> bool * Adef.safe_string * string
 
 val name_key : Gwdb.base -> string -> string
 (** [name_key base name] is [name],
@@ -593,6 +586,4 @@ val designation : base -> person -> Adef.escaped_string
 val has_children : base -> person -> bool
 val is_public : config -> base -> Gwdb.person -> bool
 
-(** equality between base_warnings *)
-val eq_warning : base -> CheckItem.base_warning -> CheckItem.base_warning -> bool
 
