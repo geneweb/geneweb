@@ -744,10 +744,10 @@ let update_family_with_fevents gen fam =
           (* Pour différencier le fait qu'on recopie le *)
           (* mariage, on met une précision "vers".      *)
           let date =
-            match Adef.od_of_cdate evt.efam_date with
+            match Date.od_of_cdate evt.efam_date with
               Some (Dgreg (dmy, cal)) ->
               let dmy = {dmy with prec = About} in
-              Adef.cdate_of_od (Some (Dgreg (dmy, cal)))
+              Date.cdate_of_od (Some (Dgreg (dmy, cal)))
             | _ -> evt.efam_date
           in
           (* Pour différencier le fait qu'on recopie le *)

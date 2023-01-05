@@ -1018,7 +1018,7 @@ let check_missing_witnesses_names conf get list =
             (UERR_missing_surname
                (transl_nth conf "witness/witnesses" 0 |> Adef.safe))
         else loop (i + 1)
-    in
+      ) in
     loop 0
   in
   let rec loop = function
