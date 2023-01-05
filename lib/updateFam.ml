@@ -183,7 +183,7 @@ and eval_event_str conf base env fam = match get_env "cnt" env with
            |> Adef.safe_fn Utf8.capitalize_fst
          in
          let date =
-           match Adef.od_of_cdate e.efam_date with
+           match Date.od_of_cdate e.efam_date with
              Some d -> DateDisplay.string_of_date conf d
            | None -> Adef.safe ""
          in
@@ -284,7 +284,7 @@ and eval_simple_var conf base env (fam, cpl, des) =
   | ["fsources"]       -> safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
   | ["is_first"]       -> eval_is_first env
   | ["is_last"]        -> eval_is_last env
-  | ["marriage"; s]    -> eval_date_var (Adef.od_of_cdate fam.marriage) s
+  | ["marriage"; s]    -> eval_date_var (Date.od_of_cdate fam.marriage) s
   | ["marriage_place"] -> safe_val (Util.escape_html fam.marriage_place :> Adef.safe_string)
   | ["marriage_note"]  -> safe_val (Util.escape_html fam.marriage_note :> Adef.safe_string)
   | ["marriage_src"]   -> safe_val (Util.escape_html fam.marriage_src :> Adef.safe_string)
