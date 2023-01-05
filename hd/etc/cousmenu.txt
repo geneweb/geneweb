@@ -63,38 +63,42 @@
 %define;cous_paths_max_date(vvv,www)
   %cous_paths_max_date.vvv.www;
 %end;
-%define;setvar(nnn,vvv)
+%(%define;setvar(nnn,vvv)
   %set_var.nnn.vvv;
 %end;
 %define;getvar(nnn)
   %get_var.nnn;
-%end;
-%empty_sorted_list;%empty_sorted_listb;%empty_sorted_listc;%empty_sorted_listd;%reset_count3;
-
+%end;%)
+%empty_sorted_list;%empty_sorted_listb;%empty_sorted_listc;reset_count3;
 %define;cous_mod(vvv,www)
   %empty_sorted_list;%empty_sorted_listb;
-  %( failure("hd") %)
-  %let;min_date_vvv_www;%apply;cous_paths_min_date%with;vvv%and;www%end;%in;
-  %let;max_date_vvv_www;%apply;cous_paths_max_date%with;vvv%and;www%end;%in;
-  %let;span_vvv_www;%expr(max_date_vvv_www-min_date_vvv_www)%in;
+  %( min/max = extremum dates for all individuals at v1/v2 | span = period of the generation %)
+  %let;min_date_vvv_www;%cous_paths_min_date.vvv.www;%in;
+  %let;max_date_vvv_www;%cous_paths_max_date.vvv.www;%in;
   %foreach;cous_path(vvv,www)
     %let;cous_isdead;%apply;index("p",path_end.index,"is_dead")%in;
     %let;cous_nodesc;%apply;index("p",path_end.index,"has_children")%in;
     %let;cous_sex;%apply;index("p",path_end.index,"sex")%in;
-    %let;white;rgba(255,255,255,1)%in;
-    %if;(span_vvv_www!=0)
-      %let;birth_age;%if;(path_end.birth_date.prec="" and path_end.birth_date.year!="")
-        %expr(100-(100*(max_date_vvv_www-path_end.birth_date.year)/span_vvv_www))%end;%in;
-      %let;death_age;%if;(path_end.death_date.prec="" and path_end.death_date.year!="")
-        %if;(death_age=birth_age and birth_age>0)%expr(birth_age+1)%else;%expr(100-(100*(max_date_vvv_www-path_end.death_date.year)/span_vvv_www))%end;%end;%in;
-    %end;
+    %let;birth_prec;%if;(path_end.birth_date.prec="&#60;")1%end;%in;
+    %let;death_prec;%if;(path_end.death_date.prec="&#62;")1%end;%in;
+    %( percent of birth/death into a linear bicolor gradient %)
+    %let;birth_age;%if;((path_end.birth_date.prec="" or path_end.birth_date.prec="&#60;") and path_end.birth_date.year!="" and max_date_vvv_www>min_date_vvv_www)%expr(100-(100*(max_date_vvv_www-path_end.birth_date.year)/(max_date_vvv_www-min_date_vvv_www)))%end;%in;
+    %let;death_age_;%if;((path_end.death_date.prec="" or path_end.death_date.prec="&#62;") and path_end.death_date.year!="" and max_date_vvv_www>min_date_vvv_www)%expr(100-(100*(max_date_vvv_www-path_end.death_date.year)/(max_date_vvv_www-min_date_vvv_www)))%end;%in;
+    %( fix gradient for individual who are dead < 1 year old by forcing a 1% white space %)
+    %let;death_age;%if;(death_age_=birth_age and birth_age>0)%expr(birth_age+1)%else;%death_age_;%end;%in;
+    %let;white;rgba(255,255,255,1)%in;%let;brown;rgba(245,231,216,1)%in;%let;yellow;rgba(255,235,210,1)%in;
     %if(path_end.surname="?" and path_end.first_name="?")%incr_count3;
     %else;
+      %( store all cous_paths individual list item with their 5 buttons in a sorted_list %)
       %apply;add_in_sorted_list%with;%path_end.dates; %path_end.surname; %path_end.first_name; %path_end.occ;%and;%nn;
-      <li class="card text-small nbr_%path_end.nbr; rounded-lg border-top-0 border-right-0 border-bottom-0 mr-2 border-%if;(path_end.sex=0)primary%elseif;(path_end.sex=1)danger%else;dark%end;"%if;(cous_isdead=0) data-alive="%cous_isdead;"%end; style="border-left-width:5px;%if;(cous_isdead=1)
-        background: linear-gradient(90deg, rgba(245,231,216,0.8) %birth_age;%%, %white; %birth_age;%%, %white; %death_age;%%, rgba(245,231,216,0.8) %death_age;%%);
-      %else;background: linear-gradient(90deg, rgba(245,231,216,0.8) %birth_age;%%, %white; %birth_age;%%);%end;%if;(cous_nodesc!=1)border-style:double;%end;"
-     %( TODO try to sort by data-attribute data-position="%apply;index("p",path_end.index,"sex")"%)>%nn;
+      <li class="card text-small nbr_%path_end.nbr; rounded-lg border-top-0 border-bottom-0 mr-2 border-%if;(path_end.sex=0)primary%elseif;(path_end.sex=1)danger%else;dark%end;"
+      %if;(cous_isdead=0) data-alive="%cous_isdead;"%end;
+      style="border-left-width:5px;%nn;
+          %if;(cous_isdead=1)border-right-width:5px;border-right-color:black;background:linear-gradient(90deg,%sp;
+            %if;(birth_age="" and death_age>0)%yellow; 0%%%else;%brown; %if;(birth_prec=1)0%else;%birth_age;%end;%%, %white; %birth_age;%%%end;,%nn;
+            %if;(death_age="" and birth_age>0)%yellow; 100%%%else;%white; %death_age;%%, %brown; %if;(death_prec=1)100%else;%death_age;%end;%%%end;);%nn;
+          %else;background:linear-gradient(90deg, %brown; %birth_age;%%, %white; %birth_age;%%);%end;%nn;
+        %if;(cous_nodesc!=1)border-style:double;%end;" data-date="%birth_age;">%nn;
         <div class="d-flex justify-content-between align-items-start ml-n2">
           <div class="d-block pl-n2 pr-2 align-self-center order-1 position-relative">
             <a role="button" href="%prefix;%path_end.access;&m=C&v=%e.v;" title="[navigation] [with]…"
@@ -116,7 +120,7 @@
           <div class="d-block flex-grow-1 justify-content-start align-self-center order-2 text-truncate text-nowrap px-0">
             <a href="%prefix;%path_end.access;"%if;(path_end.occ!="0") title="occ %path_end.occ;"%end;%sp;
               style="line-height:2rem;"
-              %(data-anclist="%path_end.anc_f_list;"%)>%(%path_end.nbr; %path_end.lev_cnt; %path_end.anc_level; %)%path_end.surname; %path_end.first_name;%nn;
+              %(data-anclist="%path_end.anc_f_list;"%)>%( %cous_isdead; | %birth_age;-%death_age_; | %path_end.birth_date.year; %path_end.death_date.year; || %path_end.nbr; | %path_end.lev_cnt; | %path_end.anc_level; DEBUG %)%path_end.surname; %path_end.first_name;%nn;
             </a>
             %if;wizard;<a href="%prefix;&m=MOD_IND&i=%path_end.index;">%end;
               %if;(path_end.dates!="")%path_end.dates;
@@ -145,9 +149,9 @@
             <div class="d-flex justify-content-around align-items-center">
               <div class="d-inline-flex flex-column justify-content-around align-self-center text-left ml-4%if;(www=0) mr-5%end;">
                 <div>%listb_size %if;(cousins_cnt.vvv.www=1)[person/persons]0%else;[person/persons]1%end;
-                %if;(count!=cousins_cnt.vvv.www)
+                %if;(count!=0 and count!=cousins_cnt.vvv.www)
                   <div>
-                    %if;(2*count<cousins_cnt.vvv.www)%count; [alive]3
+                    %if;(2*count<=cousins_cnt.vvv.www)%count; [alive]3
                     %else;%expr(cousins_cnt.vvv.www-count) [died]3 <span style="background-color: rgba(245,231,216,.7);">  </span>
                     %end;
                   </div>
@@ -192,7 +196,7 @@
                   </div>
                   <a role="button" href="%prefix;%access;&m=C&v1=vvv&v2=www" 
                     class="btn btn-lg btn-light mx-3 my-2">
-                      <span data-toggle="tooltip" data-html="true" title="voir tous les [relationship link/relationship links]1, %expr(vvv+www) [degree]?">
+                      <span data-toggle="tooltip" data-html="true" title="%expr(vvv+www) %if;(vvv+www<2)[degree of kinship]0%else;[degree of kinship]1%end; [show all] [relationship link/relationship links]1)">
                         <i class="fa-solid fa-person-arrow-up-from-line"></i>
                         <i class="fa-solid fa-person-arrow-down-to-line fa-fw fa-flip-horizontal"></i>
                       </span>
@@ -223,7 +227,7 @@
   </div>
 %end;
 %define;link_cousin(vvv,www)
-  %let;extra_paths_vvv_www;%expr(cous_paths_cnt.vvv.www - cousins_cnt.vvv.www)%in;
+  %let;extra_paths_vvv_www;%expr(cous_paths_cnt.vvv.www-cousins_cnt.vvv.www)%in;
   %let;width;%expr((100/(e.v+1))*vvv)%in;
   %let;percent_vvv_www;%expr(100-count*100/cousins_cnt.vvv.www)%in;
   <button type="button" data-toggle="tooltip" data-html="true" 
@@ -259,7 +263,6 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
     </div>
   </button>
 %end;
-
 %( table of cousins.j-vvv+i.i c(k,i) | table size = v × (v+%cousins.max_d;)
     == l1 asc./l2 = max_desc (plus longue colonne v2) %)
 %define;table(xxx)
@@ -359,7 +362,6 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
     </div>
   </div>
 </div>
-
 %include;trl
 %include;copyr
 </div>
