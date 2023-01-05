@@ -1,6 +1,5 @@
 (* Copyright (c) 2006-2007 INRIA *)
 
-open Def
 open Dbdisk
 
 external identity : 'a -> 'a = "%identity"
@@ -19,8 +18,8 @@ let aoi base i = base.data.ascends.get i
 let uoi base i = base.data.unions.get i
 let coi base i = base.data.couples.get i
 let sou base i = base.data.strings.get i
-let p_first_name base p = Mutil.nominative (sou base p.first_name)
-let p_surname base p = Mutil.nominative (sou base p.surname)
+let p_first_name base p = Mutil.nominative (sou base p.Dbdisk.first_name)
+let p_surname base p = Mutil.nominative (sou base p.Dbdisk.surname)
 
 let husbands base p =
   Array.map
@@ -30,10 +29,10 @@ let husbands base p =
       let husband_surname = husband.surname in
       let husband_surnames_aliases = husband.surnames_aliases in
       (husband_surname, husband_surnames_aliases))
-    (uoi base p.key_index).family
+    (uoi base p.Dbdisk.key_index).family
 
 let father_titles_places base p (nobtit : dsk_person -> dsk_title list) =
-  match (aoi base p.key_index).parents with
+  match (aoi base p.Dbdisk.key_index).parents with
   | Some ifam ->
       let cpl = coi base ifam in
       let fath = poi base (Adef.father cpl) in
@@ -95,11 +94,11 @@ let empty_person empty what =
   ; occupation = empty
   ; sex = Neuter
   ; access = IfTitles
-  ; birth = Adef.cdate_None
+  ; birth = Date.cdate_None
   ; birth_place = empty
   ; birth_note = empty
   ; birth_src = empty
-  ; baptism = Adef.cdate_None
+  ; baptism = Date.cdate_None
   ; baptism_place = empty
   ; baptism_note = empty
   ; baptism_src = empty
@@ -118,7 +117,7 @@ let empty_person empty what =
   }
 
 let empty_family empty =
-  { Dbdisk.marriage = Adef.cdate_None
+  { Dbdisk.marriage = Date.cdate_None
   ; marriage_place = empty
   ; marriage_note = empty
   ; marriage_src = empty
@@ -134,7 +133,7 @@ let empty_family empty =
 
 let map_pers_event ?(fd = identity) fp fs e =
   let epers_name =
-    match e.epers_name with
+    match e.Dbdisk.epers_name with
       Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial |
       Epers_Cremation | Epers_Accomplishment | Epers_Acquisition |
       Epers_Adhesion | Epers_BaptismLDS | Epers_BarMitzvah |
@@ -161,13 +160,13 @@ let map_pers_event ?(fd = identity) fp fs e =
   let epers_note = fs e.epers_note in
   let epers_src = fs e.epers_src in
   let epers_witnesses = Array.map (fun (p, w) -> fp p, w) e.epers_witnesses in
-  {epers_name = epers_name; epers_date = epers_date;
+  {Dbdisk.epers_name = epers_name; epers_date = epers_date;
    epers_place = epers_place; epers_reason = epers_reason;
    epers_note = epers_note; epers_src = epers_src;
    epers_witnesses = epers_witnesses}
 
 let map_person_ps ?(fd = identity) fp fs p =
-  { first_name = fs p.first_name
+  { Dbdisk.first_name = fs p.Dbdisk.first_name
   ; surname = fs p.surname
   ; occ = p.occ
   ; image = fs p.image
@@ -207,7 +206,7 @@ let map_person_ps ?(fd = identity) fp fs p =
 
 let map_fam_event ?(fd = identity) fp fs e =
   let efam_name =
-    match e.efam_name with
+    match e.Dbdisk.efam_name with
       Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage |
       Efam_Divorce | Efam_Separated | Efam_Annulation | Efam_MarriageBann |
       Efam_MarriageContract | Efam_MarriageLicense | Efam_PACS |
@@ -221,12 +220,12 @@ let map_fam_event ?(fd = identity) fp fs e =
   let efam_note = fs e.efam_note in
   let efam_src = fs e.efam_src in
   let efam_witnesses = Array.map (fun (p, wkind) -> fp p, wkind) e.efam_witnesses in
-  {efam_name = efam_name; efam_date = efam_date; efam_place = efam_place;
+  {Dbdisk.efam_name = efam_name; efam_date = efam_date; efam_place = efam_place;
    efam_reason = efam_reason; efam_note = efam_note; efam_src = efam_src;
    efam_witnesses = efam_witnesses}
 
 let map_family_ps ?(fd = identity) fp ff fs fam =
-  { marriage = Futil.map_cdate fd fam.marriage
+  { Dbdisk.marriage = Futil.map_cdate fd fam.Dbdisk.marriage
   ; marriage_place = fs fam.marriage_place
   ; marriage_note = fs fam.marriage_note
   ; marriage_src = fs fam.marriage_src

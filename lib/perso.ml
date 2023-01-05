@@ -1368,7 +1368,7 @@ let get_marriage_witnesses fam =
 let get_nb_marriage_witnesses_of_kind fam wk =
   let witnesses = get_marriage_witnesses fam in
   Array.fold_left
-    (fun acc (_, w) -> if wk = w then acc + 1 else acc)
+    (fun acc (_, w, _) -> if wk = w then acc + 1 else acc)
     0 witnesses
 
 let number_of_descendants_aux conf base env all_levels sl eval_int =
@@ -4349,69 +4349,6 @@ let print_foreach conf base print_ast eval_expr =
     in
     loop true gen
   in
-  let print_foreach_baptism_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Event.Pevent Epers_Baptism then
-            Array.iteri
-              begin fun i (ip, _, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("baptism_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (Event.events conf base p)
-  in 
-  let print_foreach_birth_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Event.Pevent Epers_Birth then
-            Array.iteri
-              begin fun i (ip, _, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("birth_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (Event.events conf base p)
-  in
-  let print_foreach_burial_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Event.Pevent Epers_Burial then
-            Array.iteri
-              begin fun i (ip, _, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("burial_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (Event.events conf base p)
-  in
   let print_foreach_cell env al ep =
     let celll =
       match get_env "celll" env with
@@ -4612,7 +4549,7 @@ let print_foreach conf base print_ast eval_expr =
       (fun (name, _, _, _, _, wl, _) ->
         if name = Event.Pevent epers_event then
           Array.iteri
-            (fun i (ip, _) ->
+            (fun i (ip, _, _) ->
               let p = pget conf base ip in
               let env =
                 (epers_event_witness_string, Vind p)
@@ -4669,13 +4606,14 @@ let print_foreach conf base print_ast eval_expr =
     (* On tri les témoins dans le même ordre que les évènements. *)
     let events_witnesses =
       Event.sort_events
-        (fun (_, _, (name, _, _, _, _, _, _)) -> name)
-        (fun (_, _, (_, date, _, _, _, _, _)) -> date)
+        (fun (_, _, _, (name, _, _, _, _, _, _)) -> name)
+        (fun (_, _, _, (_, date, _, _, _, _, _)) -> date)
         events_witnesses
     in
     List.iter
       (fun (p, wk, wnote, evt) ->
-        if p_auth then
+         if p_auth then
+          let wnote = Util.escape_html wnote in
           let env = ("event_witness_relation", Vevent (p, evt)) :: env in
           let env =
             ( "event_witness_relation_kind",
@@ -4690,19 +4628,12 @@ let print_foreach conf base print_ast eval_expr =
     | Vfam (_, fam, _, true) ->
         let _ =
           Array.fold_left
-            (fun (i, first) (ip, wk) ->
-              let p = pget conf base ip in
-              (* TODO if witness_kind = Witness, we might want wk = "" *)
-              let wks =
-                if witness_kind = Witness && wk = Witness then ""
-                else (Util.string_of_witness_kind conf (get_sex p) wk :> string)
-              in
-              let env =
-                ("witness", Vind p) :: ("first", Vbool first)
-                :: ("witness_kind", Vstring wks)
-                :: env
-              in
-              if witness_kind = Witness || witness_kind = wk then (
+            (fun (i, first) (ip, wk, _wnote) ->
+              if wk = witness_kind then (
+                let p = pget conf base ip in
+                let env =
+                  ("witness", Vind p) :: ("first", Vbool first) :: env
+                in
                 List.iter (print_ast env ep) al;
                 (i + 1, false))
               else (i, first))

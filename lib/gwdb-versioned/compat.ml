@@ -1271,7 +1271,7 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
         let coll = Current.Collection.map (fun f -> Current_family f) coll in
         Current_collection coll)
 
-  let dummy_collection x = Collection.Dummy_collection
+  let dummy_collection _x = Collection.Dummy_collection
 
   let iper_marker collection v = match collection with
     | Collection.Legacy_collection c ->
@@ -1291,7 +1291,7 @@ module Make (Legacy : DriverImplCompat) (Current : DriverImpl) : Driver_S = stru
        Marker.Current_marker marker
     | Collection.Dummy_collection -> Marker.Dummy_marker v
                                    
-  let dummy_marker k v = Marker.Dummy_marker v
+  let dummy_marker _k v = Marker.Dummy_marker v
                        
   let read_nldb = Util.wrap_base Legacy.read_nldb Current.read_nldb
   let write_nldb = Util.wrap_base Legacy.write_nldb Current.write_nldb 
