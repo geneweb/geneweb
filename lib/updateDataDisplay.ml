@@ -149,12 +149,7 @@ let string_to_list str =
 
 let unfold_place_long inverted s =
   let pl = Place.fold_place_long inverted s in
-  let s =
-    List.fold_left
-      (fun acc p -> acc ^ (if acc = "" then "" else ", ") ^ p)
-      "" pl
-  in
-  s
+  String.concat ", " pl
 
 let get_env v env = try List.assoc v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
@@ -251,9 +246,13 @@ and eval_compound_var conf base env xx sl =
     | ("escape" | "html_encode") :: sl ->
         (Util.escape_html (loop sl) :> string) (* FIXME? *)
     | "safe" :: sl -> (Util.safe_html (loop sl) :> string) (* FIXME? *)
-    | [ "subs"; n; s ] ->
-        let n = int_of_string n in
-        if String.length s > n then String.sub s 0 (String.length s - n) else ""
+    | [ "subs"; n; s ] -> (
+        match int_of_string_opt n with
+        | Some n ->
+            if String.length s > n then String.sub s 0 (String.length s - n)
+            else (Printf.sprintf "String shorter that requested\n"
+              |> !GWPARAM.syslog `LOG_WARNING; s)
+        | None -> raise Not_found)
     | "printable" :: sl -> only_printable (loop sl)
     | _ -> raise Not_found
   in
@@ -278,19 +277,15 @@ let print_foreach conf print_ast _eval_expr =
     let list = build_list_long conf list in
     let max = List.length list in
     let k = Option.value ~default:"" (p_getenv conf.env "key") in
-    let rec loop cnt = function
-      | (ini_k, (list_v : (istr * string) list)) :: l ->
-          let env =
-            ("cnt", Vint cnt) :: ("max", Vint max) :: ("key", Vstring k)
-            :: ("entry_ini", Vstring ini_k)
-            :: ("list_value", Vlist_value list_v)
-            :: env
-          in
-          List.iter (print_ast env xx) al;
-          loop (cnt + 1) l
-      | [] -> ()
-    in
-    loop 0 list
+    List.iteri (fun i (ini_k, (list_v : (istr * string) list)) -> 
+      let env =
+        ("cnt", Vint i) :: ("max", Vint max) :: ("key", Vstring k)
+        :: ("entry_ini", Vstring ini_k)
+        :: ("list_value", Vlist_value list_v)
+        :: env
+      in
+      List.iter (print_ast env xx) al;
+    ) list
   and print_foreach_substr env xx _el al evar =
     let evar = match p_getenv conf.env evar with Some s -> s | None -> "" in
     let list_of_char = string_to_list evar in
@@ -307,7 +302,10 @@ let print_foreach conf print_ast _eval_expr =
     let rec loop first cnt = function
       | s :: l ->
           if List.length l > 0 then (
-            let tail = List.hd (string_to_list s) in
+            let tail =
+              if String.length s > 0 then List.nth (string_to_list s) 0
+              else ""
+            in
             let env =
               ("substr", Vstring s) :: ("tail", Vstring tail)
               :: ("first", Vbool first) :: ("max", Vint max)
@@ -320,7 +318,7 @@ let print_foreach conf print_ast _eval_expr =
     in
     loop true 0 list_of_sub
   and print_foreach_value env xx al =
-    let list =
+    let l =
       match get_env "list_value" env with
       | Vlist_value l ->
           List.sort
@@ -332,31 +330,23 @@ let print_foreach conf print_ast _eval_expr =
             l
       | _ -> []
     in
-    let max = List.length list in
-    let rec loop cnt = function
-      | (i, s) :: l ->
+    let max = List.length l in
+    List.iteri (fun i (k, s) -> 
           let env =
-            ("cnt", Vint cnt) :: ("max", Vint max) :: ("entry_value", Vstring s)
+            ("cnt", Vint i) :: ("max", Vint max) :: ("entry_value", Vstring s)
             :: ("entry_value_rev", Vstring (unfold_place_long false s))
-            :: ("entry_key", Vstring (string_of_istr i))
+            :: ("entry_key", Vstring (string_of_istr k))
             :: env
           in
           List.iter (print_ast env xx) al;
-          loop (cnt + 1) l
-      | [] -> ()
-    in
-    loop 0 list
+    ) l
   and print_foreach_initial env xx al =
-    let list = match get_env "list" env with Vlist_data l -> l | _ -> [] in
-    let ini_list = build_list_short conf list in
-    let rec loop = function
-      | ini :: l ->
-          let env = ("ini", Vstring ini) :: env in
-          List.iter (print_ast env xx) al;
-          loop l
-      | [] -> ()
-    in
-    loop ini_list
+    let l = match get_env "list" env with Vlist_data l -> l | _ -> [] in
+    let ini_l = build_list_short conf l in
+    List.iter (fun ini ->
+      let env = ("ini", Vstring ini) :: env in
+      List.iter (print_ast env xx) al;
+    ) ini_l
   in
   print_foreach
 

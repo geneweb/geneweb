@@ -138,40 +138,42 @@ let url_aux ?(pwd = true) conf =
   else prefix ^ String.concat "&" l
 
 let url_set_aux conf evar_l str =
-  let evar = List.hd evar_l in
-  (* rebuild the current url from conf.env, replacing &evar=xxx by &evar=str () *)
-  let url =
-    match String.split_on_char '?' (Util.commd conf :> string) with
-    | [] ->
-        Printf.sprintf "Empty Url\n" |> !GWPARAM.syslog `LOG_WARNING;
-        ""
-    | s :: _l -> s ^ "?"
-  in
-  let t =
-    match
-      List.find_opt (fun (k, _) -> k = evar) (conf.henv @ conf.senv @ conf.env)
-    with
-    | Some (_, _) -> true
-    | None -> false
-  in
-  let l =
-    List.filter_map
-      (fun (k, v) ->
-        let v = Adef.as_string @@ v in
-        if List.mem k evar_l && str <> "" then
-          Some (Format.sprintf "%s=%s" k str)
-        else if
-          v = ""
-          || (k = "oc" && v = "0")
-          || (k = "ocz" && v = "0")
-          || (List.mem k evar_l && str = "")
-        then None
-        else Some (Format.sprintf "%s=%s" k v))
-      (conf.henv @ conf.senv @ conf.env)
-  in
-  let url = url ^ String.concat "&" l in
-  (* t is true if evar was present in conf.env. If not, add it *)
-  if t || str = "" then url else url ^ Format.sprintf "&%s=%s" evar str
+  match List.length evar_l with
+  | 0 -> Printf.sprintf "Empty evar list\n" |> !GWPARAM.syslog `LOG_WARNING; ""
+  | _ ->
+    let evar = List.nth evar_l 0 in
+    (* rebuild the current url from conf.env, replacing &evar=xxx by &evar=str () *)
+    let url =
+      match String.split_on_char '?' (Util.commd conf :> string) with
+      | [] ->
+          Printf.sprintf "Empty Url\n" |> !GWPARAM.syslog `LOG_WARNING; ""
+      | s :: _l -> s ^ "?"
+    in
+    let t =
+      match
+        List.find_opt (fun (k, _) -> k = evar) (conf.henv @ conf.senv @ conf.env)
+      with
+      | Some (_, _) -> true
+      | None -> false
+    in
+    let l =
+      List.filter_map
+        (fun (k, v) ->
+          let v = Adef.as_string @@ v in
+          if List.mem k evar_l && str <> "" then
+            Some (Format.sprintf "%s=%s" k str)
+          else if
+            v = ""
+            || (k = "oc" && v = "0")
+            || (k = "ocz" && v = "0")
+            || (List.mem k evar_l && str = "")
+          then None
+          else Some (Format.sprintf "%s=%s" k v))
+        (conf.henv @ conf.senv @ conf.env)
+    in
+    let url = url ^ String.concat "&" l in
+    (* t is true if evar was present in conf.env. If not, add it *)
+    if t || str = "" then url else url ^ Format.sprintf "&%s=%s" evar str
 
 let substr_start_aux n s =
   let len = String.length s in
@@ -221,18 +223,21 @@ let rec eval_variable conf = function
       let amp = if prefix.[String.length prefix - 1] = '?' then "" else "&" in
       if str = "" then prefix
       else prefix ^ Printf.sprintf "%s%s=%s" amp evar str
-  | [ "substr_start"; n; v ] ->
+  | [ "substr_start"; n; v ] -> (
       (* extract the n first characters of string v *)
-      let n = int_of_string n in
-      substr_start_aux n v
-  | [ "substr_start_e"; n; v ] ->
+      match int_of_string_opt n with
+      | Some n -> substr_start_aux n v
+      | None -> raise Not_found)
+  | [ "substr_start_e"; n; v ] -> (
       (* extract the n first characters of string v *)
-      let n = int_of_string n in
-      let v =
-        Option.value ~default:""
-          (Util.p_getenv (conf.env @ conf.henv @ conf.senv) v)
-      in
-      substr_start_aux n v
+      match int_of_string_opt n with
+      | Some n -> 
+          let v =
+            Option.value ~default:""
+              (Util.p_getenv (conf.env @ conf.henv @ conf.senv) v)
+          in
+          substr_start_aux n v
+      | None -> raise Not_found)
   | "time" :: sl -> eval_time_var conf sl
   | [ "url_set"; evar ] -> url_set_aux conf [ evar ] ""
   | [ "url_set2"; evar1; evar2 ] -> url_set_aux conf [ evar1; evar2 ] ""
