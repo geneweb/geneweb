@@ -568,9 +568,9 @@ let rec enrich_tree lst =
 let tree_generation_list conf base gv p =
   let next_gen pol =
     List.fold_right
-      (fun po list ->
+      (fun po l ->
         match po with
-        | Empty -> Empty :: list
+        | Empty -> Empty :: l
         | Cell (p, _, _, _, _, base_prefix) -> (
             match get_parents p with
             | Some ifam -> (
@@ -589,12 +589,12 @@ let tree_generation_list conf base gv p =
                 | Some f, Some m ->
                     Cell (f, fo, Left, true, 1, base_prefix)
                     :: Cell (m, fo, Right, true, 1, base_prefix)
-                    :: list
+                    :: l
                 | Some f, None ->
-                    Cell (f, fo, Alone, true, 1, base_prefix) :: list
+                    Cell (f, fo, Alone, true, 1, base_prefix) :: l
                 | None, Some m ->
-                    Cell (m, fo, Alone, true, 1, base_prefix) :: list
-                | None, None -> Empty :: list)
+                    Cell (m, fo, Alone, true, 1, base_prefix) :: l
+                | None, None -> Empty :: l)
             | None -> (
                 match
                   !GWPARAM_ITL.tree_generation_list conf base base_prefix p
@@ -603,17 +603,17 @@ let tree_generation_list conf base gv p =
                   ->
                     Cell (fath, Some if1, Left, true, 1, base_prefix1)
                     :: Cell (moth, Some if2, Right, true, 1, base_prefix2)
-                    :: list
+                    :: l
                 | Some (fath, ifam, base_prefix), None ->
-                    Cell (fath, Some ifam, Alone, true, 1, base_prefix) :: list
+                    Cell (fath, Some ifam, Alone, true, 1, base_prefix) :: l
                 | None, Some (moth, ifam, base_prefix) ->
-                    Cell (moth, Some ifam, Alone, true, 1, base_prefix) :: list
-                | None, None -> Empty :: list)))
+                    Cell (moth, Some ifam, Alone, true, 1, base_prefix) :: l
+                | None, None -> Empty :: l)))
       pol []
   in
   let gen =
-    let rec loop i gen list =
-      if i = 0 then gen :: list else loop (i - 1) (next_gen gen) (gen :: list)
+    let rec loop i gen l =
+      if i = 0 then gen :: l else loop (i - 1) (next_gen gen) (gen :: l)
     in
     loop (gv - 1) [ Cell (p, None, Center, true, 1, conf.bname) ] []
   in
@@ -1014,13 +1014,13 @@ let build_list_eclair conf base v p =
   (* Construction de la Hashtbl. *)
   loop 1 p (get_surname p);
   (* On parcours la Hashtbl, et on élimine les noms vide (=?) *)
-  let list = ref [] in
+  let l = ref [] in
   Hashtbl.iter
     (fun (istr, place) ht_val ->
       let surn = sou base istr in
       if surn <> "?" then
         let p, db, de, pl = (fun x -> x) !ht_val in
-        list := (surn, place, db, de, p, pl) :: !list)
+        l := (surn, place, db, de, p, pl) :: !l)
     ht;
   (* On trie la liste par nom, puis lieu. *)
   (* TODO don't query db in sort *)
@@ -1042,13 +1042,13 @@ let build_list_eclair conf base v p =
                 (pl2 : Adef.escaped_string :> string)
           | x -> x)
       | x -> x)
-    !list
+    !l
 
 let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) :
     Adef.safe_string =
   match pg with
   | Def.NLDB.PgMisc pg ->
-      let list = List.map snd (List.filter (fun (k, _) -> k = key) il) in
+      let l = List.map snd (List.filter (fun (k, _) -> k = key) il) in
       List.fold_right
         (fun text (str : Adef.safe_string) ->
           try
@@ -1100,13 +1100,13 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) :
                 in
                 if (str :> string) = "" then str1 else str ^^^ ", " ^<^ str1
           with Not_found -> str)
-        list str
+        l str
   | Def.NLDB.PgInd _ | Def.NLDB.PgFam _ | Def.NLDB.PgNotes | Def.NLDB.PgWizard _
     ->
       str
 
 let links_to_ind conf base db key =
-  let list =
+  let l =
     List.fold_left
       (fun pgl (pg, (_, il)) ->
         let record_it =
@@ -1124,7 +1124,7 @@ let links_to_ind conf base db key =
         else pgl)
       [] db
   in
-  List.sort_uniq compare list
+  List.sort_uniq compare l
 
 (* Interpretation of template file *)
 
@@ -1427,12 +1427,12 @@ let cousins_l1_l2_aux conf base env l1 l2 p =
     Some cousins_cnt.(il1).(il2)
   else None
 
-(* create a new list (ip, (ifaml, iancl, cnt), lev) from (ip, ifaml, ipar, lev) *)
-let cousins_fold list =
+(* create a new l (ip, (ifaml, iancl, cnt), lev) from (ip, ifaml, ipar, lev) *)
+let cousins_fold l =
   let same_ifaml ifl1 ifl2 =
     List.for_all2 (fun if1 if2 -> if1 = if2) ifl1 ifl2
   in
-  let list = List.sort compare list in
+  let l = List.sort compare l in
   let rec loop first acc (ip0, (ifaml0, iancl0, cnt0), lev0) = function
     | (ip, ifaml, ianc, lev) :: l when ip = ip0 && same_ifaml ifaml ifaml0 ->
         loop false acc
@@ -1452,10 +1452,12 @@ let cousins_fold list =
         if first || cnt0 = 0 then acc
         else (ip0, (ifaml0, iancl0, cnt0), lev0) :: acc
   in
-  loop false [] (Gwdb.dummy_iper, ([], [], 0), [ 0 ]) list
+  loop false [] (Gwdb.dummy_iper, ([], [], 0), [ 0 ]) l
 
 let asc_cnt_t = ref None
 let desc_cnt_t = ref None
+let max_anc_level_default = 5
+let max_desc_level_default = 5
 
 let init_asc_cnt base env p =
   match !asc_cnt_t with
@@ -1463,18 +1465,14 @@ let init_asc_cnt base env p =
   | None ->
       let t' =
         let max_asc =
-          match get_env "max_anc_level" env with Vint i -> i | _ -> 5
+          match get_env "max_anc_level" env with Vint i -> i | _ -> max_anc_level_default
         in
         let asc_cnt = Array.make (max_asc + 1) [] in
         asc_cnt.(0) <-
           [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
-        let rec loop1 i =
-          if i > max_asc || i >= Array.length asc_cnt - 1 then ()
-          else (
-            asc_cnt.(i) <- ascendants base [] asc_cnt.(i - 1) i;
-            loop1 (i + 1))
-        in
-        loop1 1;
+        for i = 1 to min max_asc ((Array.length asc_cnt) - 1) do
+          asc_cnt.(i) <- ascendants base [] asc_cnt.(i - 1) i;
+        done;
         asc_cnt
       in
       asc_cnt_t := Some t';
@@ -1486,18 +1484,14 @@ let init_desc_cnt base env p =
   | None ->
       let t' =
         let max_desc =
-          match get_env "max_desc_level" env with Vint i -> i | _ -> 5
+          match get_env "max_desc_level" env with Vint i -> i | _ -> max_desc_level_default
         in
         let desc_cnt = Array.make (max_desc + 1) [] in
         desc_cnt.(0) <-
           [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
-        let rec loop1 i =
-          if i > max_desc || i > Array.length desc_cnt - 1 then ()
-          else (
-            desc_cnt.(i) <- descendants_aux base desc_cnt.(i - 1) [];
-            loop1 (i + 1))
-        in
-        loop1 1;
+        for i = 1 to min max_desc ((Array.length desc_cnt) -1) do
+          desc_cnt.(i) <- descendants_aux base desc_cnt.(i - 1) [];
+        done;
         desc_cnt
       in
       desc_cnt_t := Some t';
@@ -2499,12 +2493,12 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
                   VVstring (eval_int conf (List.length (cousins_fold list1)) sl)
               | None -> raise Not_found)
           | Paths -> (
-              let list1 = anc_cnt_aux base env lev at_to p in
-              match list1 with
-              | Some list -> (
+              let l = anc_cnt_aux base env lev at_to p in
+              match l with
+              | Some l -> (
                   match get_env "cousins" env with
-                  | Vcousl l ->
-                      l := cousins_fold list;
+                  | Vcousl cl ->
+                      cl := cousins_fold l;
                       let l1, l2 = l1_l2 in
                       (match get_env "v1_v2" env with
                       | Vcous_level (v1, v2) ->
@@ -2530,16 +2524,16 @@ and eval_desc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
           | Paths_cnt -> (
               let list1 = desc_cnt_aux base env lev at_to p in
               match list1 with
-              | Some list ->
-                  VVstring (eval_int conf (List.length (cousins_fold list)) sl)
+              | Some l ->
+                  VVstring (eval_int conf (List.length (cousins_fold l)) sl)
               | None -> raise Not_found)
           | Paths -> (
-              let list1 = desc_cnt_aux base env lev at_to p in
-              match list1 with
-              | Some list -> (
+              let l = desc_cnt_aux base env lev at_to p in
+              match l with
+              | Some l -> (
                   match get_env "cousins" env with
-                  | Vcousl l ->
-                      l := cousins_fold list;
+                  | Vcousl cl ->
+                      cl := cousins_fold l;
                       let l1, l2 = l1_l2 in
                       (match get_env "v1_v2" env with
                       | Vcous_level (v1, v2) ->
@@ -2550,8 +2544,8 @@ and eval_desc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
                   | _ -> VVstring "")
               | None -> (
                   match get_env "cousins" env with
-                  | Vcousl l ->
-                      l := [];
+                  | Vcousl cl ->
+                      cl := [];
                       (match get_env "v1_v2" env with
                       | Vcous_level (v1, v2) ->
                           v1 := 0;
@@ -2863,55 +2857,50 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match get_env "cnt" env with
       | Vint cnt -> VVstring (string_of_int cnt)
       | _ -> VVstring "")
-  | [ "cous_paths_min_date"; l1; l2 ] ->
+  | [ "cous_paths_min_date"; l1; l2 ] -> (
       let _cousins_cnt, cousins_dates =
         match (!cousins_t, !cousins_dates_t) with
         | Some t, Some d_t -> (t, d_t)
         | _, _ -> init_cousins_cnt conf base env p
       in
-      let i = try int_of_string l1 with Failure _ -> raise Not_found in
-      let j = try int_of_string l2 with Failure _ -> raise Not_found in
-      let list = cousins_dates.(i).(j) in
-      if List.length list > 0 then str_val (string_of_int (List.hd list))
-      else null_val
-  | [ "cous_paths_max_date"; l1; l2 ] ->
+      match int_of_string_opt l1, int_of_string_opt l2 with
+      | Some i, Some j -> (
+          let l = cousins_dates.(i).(j) in
+          match List.length l with
+          | 0 -> null_val (* this case is legit *)
+          | _ -> str_val (string_of_int (List.nth l 0)))
+      | _, _ -> raise Not_found)
+  | [ "cous_paths_max_date"; l1; l2 ] -> (
       let _cousins_cnt, cousins_dates =
         match (!cousins_t, !cousins_dates_t) with
         | Some t, Some d_t -> (t, d_t)
         | _, _ -> init_cousins_cnt conf base env p
       in
-      let i = try int_of_string l1 with Failure _ -> raise Not_found in
-      let j = try int_of_string l2 with Failure _ -> raise Not_found in
-      let list = List.rev cousins_dates.(i).(j) in
-      if List.length list > 0 then str_val (string_of_int (List.hd list))
-      else null_val
+      match int_of_string_opt l1, int_of_string_opt l2 with
+      | Some i, Some j -> (
+          let l = List.rev cousins_dates.(i).(j) in
+          match List.length l with
+          | 0 -> null_val (* this case is legit *)
+          | _ -> str_val (string_of_int (List.nth l 0)))
+      | _, _ -> raise Not_found)
   | [ "cous_paths_cnt_raw"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
-      match list1 with
-      | Some list1 -> VVstring (string_of_int (List.length list1))
-      | None -> VVstring "no cousin list")
+      let l = cousins_l1_l2_aux conf base env l1 l2 p in
+      match l with
+      | Some l -> VVstring (string_of_int (List.length l))
+      | None -> raise Not_found)
   | [ "cous_paths_cnt"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
-      match list1 with
-      | Some list -> VVstring (string_of_int (List.length (cousins_fold list)))
-      | None -> VVstring "no cousin list")
+      let l = cousins_l1_l2_aux conf base env l1 l2 p in
+      match l with
+      | Some l -> VVstring (string_of_int (List.length (cousins_fold l)))
+      | None -> raise Not_found)
   | [ "cous_paths"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
-      match list1 with
-      | Some list -> (
+      let l = cousins_l1_l2_aux conf base env l1 l2 p in
+      match l with
+      | Some l -> (
           match get_env "cousins" env with
-          | Vcousl l ->
-              (l := cousins_fold list;
-               match get_env "v1_v2" env with
-               | Vcous_level (v1, v2) -> (
-                   (v1 := try int_of_string l1 with Failure _ -> 0);
-                   v2 := try int_of_string l2 with Failure _ -> 0)
-               | _ -> ());
-              VVstring ""
-          | _ ->
-              VVstring (Printf.sprintf "Not found1 with l1=%s, l2=%s\n" l1 l2))
-      | None -> VVstring (Printf.sprintf "Not found2 with l1=%s, l2=%s\n" l1 l2)
-      )
+          | Vcousl cl -> (cl := cousins_fold l; null_val)
+          | _ -> raise Not_found)
+      | None -> raise Not_found)
   | [ "cousins"; "max_a" ] ->
       let max_a, _ = max_l1_l2 conf base env p in
       VVstring (string_of_int max_a)
@@ -2919,14 +2908,14 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       let _, max_d = max_l1_l2 conf base env p in
       VVstring (string_of_int max_d)
   | [ "cousins_cnt"; l1; l2 ] -> (
-      let list1 = cousins_l1_l2_aux conf base env l1 l2 p in
-      match list1 with
-      | Some list ->
-          let list =
-            List.map (fun (ip, _, _, _) -> ip) list |> List.sort_uniq compare
+      let l = cousins_l1_l2_aux conf base env l1 l2 p in
+      match l with
+      | Some l ->
+          let l =
+            List.map (fun (ip, _, _, _) -> ip) l |> List.sort_uniq compare
           in
-          VVstring (string_of_int (List.length list))
-      | None -> VVstring "no cousin list")
+          VVstring (string_of_int (List.length l))
+      | None ->  raise Not_found)
   | "cremated_date" :: sl -> (
       match get_burial p with
       | Cremated cod when p_auth -> (
@@ -3817,33 +3806,33 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "marriage_places" ->
       List.fold_left
         (fun acc ifam ->
-          acc ^ sou base (get_marriage_place (foi base ifam)) ^ "|")
-        "|"
+          acc ^ (if acc = "" then "" else "|") ^ sou base (get_marriage_place (foi base ifam)))
+        ""
         (Array.to_list (get_family p))
       |> str_val
   | "mother_age_at_birth" ->
       string_of_parent_age conf base ep get_mother |> safe_val
   | "misc_names" ->
       if p_auth then
-        let list =
+        let l =
           Util.nobtit conf base
           |> Gwdb.person_misc_names base p
           |> List.map Util.escape_html
         in
-        let list =
+        let l =
           let first_name = p_first_name base p in
           let surname = p_surname base p in
           if first_name <> "?" && surname <> "?" then
             (first_name ^ " " ^ surname |> Name.lower |> Util.escape_html)
-            :: list
-          else list
+            :: l
+          else l
         in
-        if list <> [] then
+        if l <> [] then
           "<ul>"
           ^<^ List.fold_left
                 (fun s n -> s ^^^ "<li>" ^<^ n ^>^ "</li>")
                 (Adef.safe "")
-                (list : Adef.escaped_string list :> Adef.safe_string list)
+                (l : Adef.escaped_string list :> Adef.safe_string list)
           ^>^ "</ul>"
           |> safe_val
         else null_val
@@ -4228,24 +4217,16 @@ let eval_transl conf base env upp s c =
   | _ -> Templ.eval_transl conf upp s c
 
 let level_in_list level lev_list =
-  let level = if List.hd lev_list >= 0 then level else -level in
-  if List.mem level lev_list then Some level else None
+  match lev_list with
+  | [] -> None
+  | _ ->
+      let level = if List.nth lev_list 0 >= 0 then level else -level in
+      if List.mem level lev_list then Some level else None
 
 let level_less_or_eq_list level lev_list =
-  if List.hd lev_list >= 0 then
-    let rec loop lev_list =
-      match lev_list with
-      | [] -> None
-      | lev :: lev_list -> if lev <= level then Some lev else loop lev_list
-    in
-    loop lev_list
-  else
-    let rec loop lev_list =
-      match lev_list with
-      | [] -> None
-      | lev :: lev_list -> if lev >= -level then Some lev else loop lev_list
-    in
-    loop lev_list
+  match lev_list with
+  | [] -> None
+  | _ -> List.find_opt (fun lvl -> abs lvl <= level) lev_list
 
 let print_foreach conf base print_ast eval_expr =
   let eval_int_expr env ep e =
@@ -4382,7 +4363,7 @@ let print_foreach conf base print_ast eval_expr =
     (* soit la liste des branches soit la liste éclair.    *)
     match p_getenv conf.env "t" with
     | Some "E" ->
-        let list = build_list_eclair conf base max_level p in
+        let l = build_list_eclair conf base max_level p in
         List.iter
           (fun (a, b, c, d, e, f) ->
             let b = (b : Adef.escaped_string :> Adef.safe_string) in
@@ -4390,16 +4371,16 @@ let print_foreach conf base print_ast eval_expr =
               ("ancestor", Vanc_surn (Eclair (a, b, c, d, e, f, loc))) :: env
             in
             List.iter (print_ast env ep) al)
-          list
+          l
     | Some "F" ->
-        let list = build_surnames_list conf base max_level p in
+        let l = build_surnames_list conf base max_level p in
         List.iter
           (fun (a, (((b, c, d), e), f)) ->
             let env =
               ("ancestor", Vanc_surn (Branch (a, b, c, d, e, f, loc))) :: env
             in
             List.iter (print_ast env ep) al)
-          list
+          l
     | _ -> ()
   in
 
@@ -4517,8 +4498,12 @@ let print_foreach conf base print_ast eval_expr =
     | _ -> ()
   in
   let print_foreach_descendant env al (p, _) count_paths =
-    let lev = match get_env "level" env with Vint lev -> lev | _ -> 0 in
-    let ip_l = match get_env "cousins" env with Vcousl l -> !l | _ -> [] in
+    let lev = match get_env "level" env with Vint lev -> lev | _ -> (
+      !GWPARAM.syslog `LOG_WARNING ("Missing level info"); 0)
+    in
+    let ip_l = match get_env "cousins" env with Vcousl cl -> !cl | _ -> (
+      !GWPARAM.syslog `LOG_WARNING ("Empty cousins list"); [])
+    in
     let ifam_l = get_descendants_at_level base p lev in
     let ip_l =
       if count_paths then List.map (fun (ip, (_, _, _), _) -> ip) ip_l
@@ -4614,7 +4599,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_event_witness_relation env al ((p, p_auth) as ep) =
     let related = List.sort_uniq compare (get_related p) in
     let events_witnesses =
-      let list = ref [] in
+      let l = ref [] in
       (let rec make_list = function
          | ic :: icl ->
              let c = pget conf base ic in
@@ -4624,15 +4609,15 @@ let print_foreach conf base print_ast eval_expr =
                  | None -> ()
                  | Some wk -> (
                      match name with
-                     | Event.Pevent _ -> list := (c, wk, evt) :: !list
+                     | Event.Pevent _ -> l := (c, wk, evt) :: !l
                      | Event.Fevent _ ->
-                         if get_sex c = Male then list := (c, wk, evt) :: !list))
+                         if get_sex c = Male then l := (c, wk, evt) :: !l))
                (Event.sorted_events conf base c);
              make_list icl
          | [] -> ()
        in
        make_list related);
-      !list
+      !l
     in
     (* On tri les témoins dans le même ordre que les évènements. *)
     let events_witnesses =
@@ -4818,13 +4803,22 @@ let print_foreach conf base print_ast eval_expr =
       | [ [ e1 ] ] -> (eval_int_expr env ep e1, 0)
       | [] when v1_v2 -> (
           match get_env "v1_v2" env with
-          | Vcous_level (n1, n2) -> (!n1, !n2)
+          | Vcous_level (v1, v2) -> (!v1, !v2)
           | _ -> (0, 0))
       | [] -> (
-          match (p_getenv conf.env "l1", p_getenv conf.env "l2") with
-          | Some v1, Some v2 -> (int_of_string v1, int_of_string v2)
-          | Some v1, _ -> (int_of_string v1, 0)
-          | _, Some v2 -> (0, int_of_string v2)
+          match (p_getenv conf.env "v1", p_getenv conf.env "v2") with
+          | Some v1, Some v2 -> (
+              match int_of_string_opt v1, int_of_string_opt v2 with
+              | Some v1, Some v2 -> (v1, v2)
+              | _, _ -> raise Not_found)
+          | Some v1, _ -> (
+              match int_of_string_opt v1 with
+              | Some v1 -> (v1, 0)
+              | _ -> raise Not_found)
+          | _, Some v2 -> (
+              match int_of_string_opt v2 with
+              | Some v2 -> (0, v2)
+              | _ -> raise Not_found)
           | _ -> (0, 0))
       | _ -> (0, 0)
     in
@@ -4835,14 +4829,14 @@ let print_foreach conf base print_ast eval_expr =
 
   let print_foreach_cousin_path env el al ((p, _) as ep) test_level =
     let level, l1, l2 = get_level_info conf env el ep in
-    let list1 =
+    let l =
       cousins_l1_l2_aux conf base env (string_of_int l1) (string_of_int l2) p
     in
-    match list1 with
-    | Some list ->
+    match l with
+    | Some l ->
         print_foreach_path_aux conf base test_level level env al ep
-          (cousins_fold list)
-    | None -> raise Not_found
+          (cousins_fold l)
+    | None -> !GWPARAM.syslog `LOG_WARNING ("Empty cousins list")
   in
 
   let print_foreach_cousin_level env al ((_, _) as ep) =
@@ -4912,25 +4906,25 @@ let print_foreach conf base print_ast eval_expr =
   in
   let print_foreach_related env al ((p, p_auth) as ep) =
     if p_auth then
-      let list =
-        let list = List.sort_uniq compare (get_related p) in
+      let l =
+        let l = List.sort_uniq compare (get_related p) in
         List.fold_left
-          (fun list ic ->
+          (fun l ic ->
             let c = pget conf base ic in
-            let rec loop list = function
+            let rec loop l = function
               | r :: rl -> (
                   match r.r_fath with
-                  | Some ip when ip = get_iper p -> loop ((c, r) :: list) rl
+                  | Some ip when ip = get_iper p -> loop ((c, r) :: l) rl
                   | Some _ | None -> (
                       match r.r_moth with
-                      | Some ip when ip = get_iper p -> loop ((c, r) :: list) rl
-                      | Some _ | None -> loop list rl))
-              | [] -> list
+                      | Some ip when ip = get_iper p -> loop ((c, r) :: l) rl
+                      | Some _ | None -> loop l rl))
+              | [] -> l
             in
-            loop list (get_rparents c))
-          [] list
+            loop l (get_rparents c))
+          [] l
       in
-      let list =
+      let l =
         (* TODO don't query db in sort *)
         List.sort
           (fun (c1, _) (c2, _) ->
@@ -4947,13 +4941,13 @@ let print_foreach conf base print_ast eval_expr =
             match (d1, d2) with
             | Some d1, Some d2 -> Date.compare_date d1 d2
             | _ -> -1)
-          (List.rev list)
+          (List.rev l)
       in
       List.iter
         (fun (c, r) ->
           let env = ("rel", Vrel (r, Some c)) :: env in
           List.iter (print_ast env ep) al)
-        list
+        l
   in
   let print_foreach_sorted_list_item env al ep listname =
     let l =

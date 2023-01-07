@@ -4,12 +4,8 @@ open Config
 open Gwdb
 open Util
 
-let rec alphabetic_order_list l1 l2 =
-  if l1 = [] || l2 = [] then
-    if l1 <> [] && l2 = [] then 1 else if l1 = [] && l2 <> [] then -1 else 0
-  else
-    let sort = Gutil.alphabetic_utf_8 (List.hd l1) (List.hd l2) in
-    if sort = 0 then alphabetic_order_list (List.tl l1) (List.tl l2) else sort
+(* max number of persons for which a m=RLM graph will be computed *)
+let max_rlm_nbr_default = 80
 
 let suburb_aux sub nosub s =
   let len = String.length s in
@@ -96,56 +92,67 @@ let compare_places s1 s2 =
 
 let max_rlm_nbr conf =
   match p_getenv conf.env "max_rlm_nbr" with
-  | Some n ->
-      if n = "" then
-        match List.assoc_opt "max_rlm_nbr" conf.base_env with
-        | Some n -> if n = "" then 80 else int_of_string n
-        | None -> 80
-      else int_of_string n
+  | Some n -> (
+        match int_of_string_opt n with
+        | Some n -> n
+        | None -> (
+            match List.assoc_opt "max_rlm_nbr" conf.base_env with
+            | Some n -> (
+                match int_of_string_opt n with
+                | Some n -> n
+                | None -> max_rlm_nbr_default)
+            | None -> max_rlm_nbr_default))
   | None -> (
       match List.assoc_opt "max_rlm_nbr" conf.base_env with
-      | Some n -> if n = "" then 80 else int_of_string n
-      | None -> 80)
+      | Some n -> (
+        match int_of_string_opt n with
+        | Some n -> n
+        | None -> max_rlm_nbr_default)
+      | None -> max_rlm_nbr_default)
 
 (* [String.length s > 0] is always true because we already tested [is_empty_string].
    If it is not true, then the base should be cleaned. *)
 let fold_place_long inverted s =
-  let sub = only_suburb s in
-  let s = without_suburb s in
-  let len = String.length s in
-  (* Trimm spaces after ',' and build reverse String.split_on_char ',' *)
-  let rec loop iend list i ibeg =
-    if i = iend then
-      if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
-    else
-      let list, ibeg =
-        match String.unsafe_get s i with
-        | ',' ->
-            let list =
-              if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
-            in
-            (list, i + 1)
-        | ' ' when i = ibeg -> (list, i + 1)
-        | _ -> (list, ibeg)
-      in
-      loop iend list (i + 1) ibeg
-  in
-  let list =
-    if String.unsafe_get s (len - 1) = ')' then
-      match String.rindex_opt s '(' with
-      | Some i when i < len - 2 ->
-          let j =
-            let rec loop i =
-              if i >= 0 && String.unsafe_get s i = ' ' then loop (i - 1)
-              else i + 1
-            in
-            loop (i - 1)
+  match String.length s with
+  | 0 -> (!GWPARAM.syslog `LOG_WARNING ("Zero length string in fold_place_long!");
+      ([], ""))
+  | _ ->
+      let sub = only_suburb s in
+      let s = without_suburb s in
+      let len = String.length s in
+      (* Trimm spaces after ',' and build reverse String.split_on_char ',' *)
+      let rec loop iend list i ibeg =
+        if i = iend then
+          if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
+        else
+          let list, ibeg =
+            match String.unsafe_get s i with
+            | ',' ->
+                let list =
+                  if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
+                in
+                (list, i + 1)
+            | ' ' when i = ibeg -> (list, i + 1)
+            | _ -> (list, ibeg)
           in
-          String.sub s (i + 1) (len - i - 2) :: loop j [] 0 0
-      | _ -> loop len [] 0 0
-    else loop len [] 0 0
-  in
-  ((if inverted then List.rev list else list), sub)
+          loop iend list (i + 1) ibeg
+      in
+      let list =
+        if String.unsafe_get s (len - 1) = ')' then
+          match String.rindex_opt s '(' with
+          | Some i when i < len - 2 ->
+              let j =
+                let rec loop i =
+                  if i >= 0 && String.unsafe_get s i = ' ' then loop (i - 1)
+                  else i + 1
+                in
+                loop (i - 1)
+              in
+              String.sub s (i + 1) (len - i - 2) :: loop j [] 0 0
+          | _ -> loop len [] 0 0
+        else loop len [] 0 0
+      in
+      ((if inverted then List.rev list else list), sub)
 
 let places_to_string inverse pl =
   (* TODO reverse ??*)
@@ -282,8 +289,9 @@ let find_in conf x ini =
           (fun r p ->
             r || if word then low p = ini else Mutil.contains (low p) ini)
           false x
-      else if word then low (List.hd x) = ini
-      else Mutil.contains (low (List.hd x)) ini)
+      else if word && List.length x > 0 then low (List.nth x 0) = ini
+      else if List.length x > 0 then Mutil.contains (low (List.nth x 0)) ini
+      else false)
     true inil
 
 let get_ip_list (snl : (string * iper list) list) =
@@ -333,10 +341,12 @@ let pps_call conf opt long k places =
 let get_new_list list =
   let new_list =
     let rec loop prev ipl acc = function
-      | ((pl, _), snl) :: l when List.hd pl = prev ->
+      | ((pl, _), snl) :: l when List.length pl > 0 && List.nth pl 0 = prev ->
           loop prev (get_ip_list snl :: ipl) acc l
-      | ((pl, _), _snl) :: l ->
-          loop (List.hd pl) [] ((prev, List.flatten ipl) :: acc) l
+      | ((pl, _), _snl) :: l when List.length pl > 0 ->
+          loop (List.nth pl 0) [] ((prev, List.flatten ipl) :: acc) l
+      | ((_pl, _), _snl) :: l ->
+          loop "" [] ((prev, List.flatten ipl) :: acc) l
       | [] -> acc
     in
     loop "" [] [] list
@@ -391,10 +401,14 @@ let print_html_places_surnames_short conf _base _link_to_ind
   (* regroup entries according to List.hd pl if very=true *)
   let new_list =
     let rec loop prev acc acc_l = function
-      | (pl, ipl) :: list when very && List.hd pl = List.hd prev ->
-          loop pl ((pl, ipl) :: acc) acc_l list
-      | (pl, ipl) :: list when very && List.hd pl <> List.hd prev ->
-          loop pl [ (pl, ipl) ] (if acc <> [] then acc :: acc_l else acc_l) list
+      | (pl, ipl) :: list when very &&
+          List.length pl > 0 && List.length prev > 0 &&
+          List.nth pl 0 = List.nth prev 0 ->
+            loop pl ((pl, ipl) :: acc) acc_l list
+      | (pl, ipl) :: list when very && 
+          List.length pl > 0 && List.length prev > 0 &&
+          List.nth pl 0 <> List.nth prev 0 ->
+            loop pl [ (pl, ipl) ] (if acc <> [] then acc :: acc_l else acc_l) list
       | (pl, ipl) :: list -> loop pl [] ([ (pl, ipl) ] :: acc_l) list
       | [] -> if acc <> [] then acc :: acc_l else acc_l
     in
@@ -408,7 +422,9 @@ let print_html_places_surnames_short conf _base _link_to_ind
     let rec loop0 = function
       | [] -> ()
       | (pl, ipl) :: list when len < max_rlm_nbr conf ->
-          let str = if very then List.hd pl else places_to_string true pl in
+          let str = if very && List.length pl > 0
+            then List.nth pl 0 else places_to_string true pl
+          in
           Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
             (commd conf :> string)
             opt
@@ -434,7 +450,9 @@ let print_html_places_surnames_short conf _base _link_to_ind
             (Utf8.capitalize (transl conf "summary book ascendants"))
             len
       | (pl, _ipl) :: list ->
-          let str = if very then List.hd pl else places_to_string true pl in
+          let str = if very && List.length pl > 0
+            then List.nth pl 0 else places_to_string true pl
+          in
           Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
             (commd conf :> string)
             opt
