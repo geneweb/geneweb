@@ -1134,6 +1134,7 @@ let make_conf from_addr request script_name env =
      supervisor = supervisor; wizard = ar.ar_wizard && not wizard_just_friend;
      is_printed_by_template = true;
      debug = !debug;
+     query_start = Unix.gettimeofday ();
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user; username = ar.ar_name; auth_scheme = ar.ar_scheme;

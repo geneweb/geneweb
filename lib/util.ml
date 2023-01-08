@@ -310,7 +310,7 @@ let unauthorized conf auth_type =
   Output.print_sstring conf "<head><title>Access failed</title></head>\n";
   Output.print_sstring conf "<body><h1>Access failed</h1>\n";
   Output.printf conf "<ul><li>%s</ul>\n" auth_type;
-  Output.print_sstring conf "</body>\n"
+  Output.print_sstring conf "</body>\n</html>\n"
 
 let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
     ?(senv = true) conf : Adef.escaped_string =
