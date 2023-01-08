@@ -421,6 +421,7 @@ let treat_request =
   || conf.friend
   || List.assoc_opt "visitor_access" conf.base_env <> Some "no"
   then begin
+    let query_time = Unix.gettimeofday () in
 #ifdef UNIX
     begin match bfile with
       | None -> ()
@@ -756,6 +757,9 @@ let treat_request =
           w_base @@ WiznotesDisplay.print_search
         | _ -> incorrect_request
       end conf bfile ;
+    if !GwdLog.debug then
+      let query_time = (Unix.gettimeofday ()) -. query_time in
+      Output.print_sstring conf (Printf.sprintf "Query treated in %.3f seconds " query_time) ;
     Output.flush conf ;
   end else begin
     let title _ =
