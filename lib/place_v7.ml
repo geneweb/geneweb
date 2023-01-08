@@ -93,29 +93,30 @@ let compare_places s1 s2 =
 let max_rlm_nbr conf =
   match p_getenv conf.env "max_rlm_nbr" with
   | Some n -> (
-        match int_of_string_opt n with
-        | Some n -> n
-        | None -> (
-            match List.assoc_opt "max_rlm_nbr" conf.base_env with
-            | Some n -> (
-                match int_of_string_opt n with
-                | Some n -> n
-                | None -> max_rlm_nbr_default)
-            | None -> max_rlm_nbr_default))
+      match int_of_string_opt n with
+      | Some n -> n
+      | None -> (
+          match List.assoc_opt "max_rlm_nbr" conf.base_env with
+          | Some n -> (
+              match int_of_string_opt n with
+              | Some n -> n
+              | None -> max_rlm_nbr_default)
+          | None -> max_rlm_nbr_default))
   | None -> (
       match List.assoc_opt "max_rlm_nbr" conf.base_env with
       | Some n -> (
-        match int_of_string_opt n with
-        | Some n -> n
-        | None -> max_rlm_nbr_default)
+          match int_of_string_opt n with
+          | Some n -> n
+          | None -> max_rlm_nbr_default)
       | None -> max_rlm_nbr_default)
 
 (* [String.length s > 0] is always true because we already tested [is_empty_string].
    If it is not true, then the base should be cleaned. *)
 let fold_place_long inverted s =
   match String.length s with
-  | 0 -> (!GWPARAM.syslog `LOG_WARNING ("Zero length string in fold_place_long!");
-      ([], ""))
+  | 0 ->
+      !GWPARAM.syslog `LOG_WARNING "Zero length string in fold_place_long!";
+      ([], "")
   | _ ->
       let sub = only_suburb s in
       let s = without_suburb s in
@@ -129,7 +130,8 @@ let fold_place_long inverted s =
             match String.unsafe_get s i with
             | ',' ->
                 let list =
-                  if i > ibeg then String.sub s ibeg (i - ibeg) :: list else list
+                  if i > ibeg then String.sub s ibeg (i - ibeg) :: list
+                  else list
                 in
                 (list, i + 1)
             | ' ' when i = ibeg -> (list, i + 1)
@@ -345,8 +347,7 @@ let get_new_list list =
           loop prev (get_ip_list snl :: ipl) acc l
       | ((pl, _), _snl) :: l when List.length pl > 0 ->
           loop (List.nth pl 0) [] ((prev, List.flatten ipl) :: acc) l
-      | ((_pl, _), _snl) :: l ->
-          loop "" [] ((prev, List.flatten ipl) :: acc) l
+      | ((_pl, _), _snl) :: l -> loop "" [] ((prev, List.flatten ipl) :: acc) l
       | [] -> acc
     in
     loop "" [] [] list
@@ -401,14 +402,18 @@ let print_html_places_surnames_short conf _base _link_to_ind
   (* regroup entries according to List.hd pl if very=true *)
   let new_list =
     let rec loop prev acc acc_l = function
-      | (pl, ipl) :: list when very &&
-          List.length pl > 0 && List.length prev > 0 &&
-          List.nth pl 0 = List.nth prev 0 ->
-            loop pl ((pl, ipl) :: acc) acc_l list
-      | (pl, ipl) :: list when very && 
-          List.length pl > 0 && List.length prev > 0 &&
-          List.nth pl 0 <> List.nth prev 0 ->
-            loop pl [ (pl, ipl) ] (if acc <> [] then acc :: acc_l else acc_l) list
+      | (pl, ipl) :: list
+        when very
+             && List.length pl > 0
+             && List.length prev > 0
+             && List.nth pl 0 = List.nth prev 0 ->
+          loop pl ((pl, ipl) :: acc) acc_l list
+      | (pl, ipl) :: list
+        when very
+             && List.length pl > 0
+             && List.length prev > 0
+             && List.nth pl 0 <> List.nth prev 0 ->
+          loop pl [ (pl, ipl) ] (if acc <> [] then acc :: acc_l else acc_l) list
       | (pl, ipl) :: list -> loop pl [] ([ (pl, ipl) ] :: acc_l) list
       | [] -> if acc <> [] then acc :: acc_l else acc_l
     in
@@ -422,8 +427,9 @@ let print_html_places_surnames_short conf _base _link_to_ind
     let rec loop0 = function
       | [] -> ()
       | (pl, ipl) :: list when len < max_rlm_nbr conf ->
-          let str = if very && List.length pl > 0
-            then List.nth pl 0 else places_to_string true pl
+          let str =
+            if very && List.length pl > 0 then List.nth pl 0
+            else places_to_string true pl
           in
           Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
             (commd conf :> string)
@@ -450,8 +456,9 @@ let print_html_places_surnames_short conf _base _link_to_ind
             (Utf8.capitalize (transl conf "summary book ascendants"))
             len
       | (pl, _ipl) :: list ->
-          let str = if very && List.length pl > 0
-            then List.nth pl 0 else places_to_string true pl
+          let str =
+            if very && List.length pl > 0 then List.nth pl 0
+            else places_to_string true pl
           in
           Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
             (commd conf :> string)

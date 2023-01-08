@@ -590,10 +590,8 @@ let tree_generation_list conf base gv p =
                     Cell (f, fo, Left, true, 1, base_prefix)
                     :: Cell (m, fo, Right, true, 1, base_prefix)
                     :: l
-                | Some f, None ->
-                    Cell (f, fo, Alone, true, 1, base_prefix) :: l
-                | None, Some m ->
-                    Cell (m, fo, Alone, true, 1, base_prefix) :: l
+                | Some f, None -> Cell (f, fo, Alone, true, 1, base_prefix) :: l
+                | None, Some m -> Cell (m, fo, Alone, true, 1, base_prefix) :: l
                 | None, None -> Empty :: l)
             | None -> (
                 match
@@ -1465,13 +1463,15 @@ let init_asc_cnt base env p =
   | None ->
       let t' =
         let max_asc =
-          match get_env "max_anc_level" env with Vint i -> i | _ -> max_anc_level_default
+          match get_env "max_anc_level" env with
+          | Vint i -> i
+          | _ -> max_anc_level_default
         in
         let asc_cnt = Array.make (max_asc + 1) [] in
         asc_cnt.(0) <-
           [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
-        for i = 1 to min max_asc ((Array.length asc_cnt) - 1) do
-          asc_cnt.(i) <- ascendants base [] asc_cnt.(i - 1) i;
+        for i = 1 to min max_asc (Array.length asc_cnt - 1) do
+          asc_cnt.(i) <- ascendants base [] asc_cnt.(i - 1) i
         done;
         asc_cnt
       in
@@ -1484,13 +1484,15 @@ let init_desc_cnt base env p =
   | None ->
       let t' =
         let max_desc =
-          match get_env "max_desc_level" env with Vint i -> i | _ -> max_desc_level_default
+          match get_env "max_desc_level" env with
+          | Vint i -> i
+          | _ -> max_desc_level_default
         in
         let desc_cnt = Array.make (max_desc + 1) [] in
         desc_cnt.(0) <-
           [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
-        for i = 1 to min max_desc ((Array.length desc_cnt) -1) do
-          desc_cnt.(i) <- descendants_aux base desc_cnt.(i - 1) [];
+        for i = 1 to min max_desc (Array.length desc_cnt - 1) do
+          desc_cnt.(i) <- descendants_aux base desc_cnt.(i - 1) []
         done;
         desc_cnt
       in
@@ -2863,7 +2865,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
         | Some t, Some d_t -> (t, d_t)
         | _, _ -> init_cousins_cnt conf base env p
       in
-      match int_of_string_opt l1, int_of_string_opt l2 with
+      match (int_of_string_opt l1, int_of_string_opt l2) with
       | Some i, Some j -> (
           let l = cousins_dates.(i).(j) in
           match List.length l with
@@ -2876,7 +2878,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
         | Some t, Some d_t -> (t, d_t)
         | _, _ -> init_cousins_cnt conf base env p
       in
-      match int_of_string_opt l1, int_of_string_opt l2 with
+      match (int_of_string_opt l1, int_of_string_opt l2) with
       | Some i, Some j -> (
           let l = List.rev cousins_dates.(i).(j) in
           match List.length l with
@@ -2898,7 +2900,9 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match l with
       | Some l -> (
           match get_env "cousins" env with
-          | Vcousl cl -> (cl := cousins_fold l; null_val)
+          | Vcousl cl ->
+              cl := cousins_fold l;
+              null_val
           | _ -> raise Not_found)
       | None -> raise Not_found)
   | [ "cousins"; "max_a" ] ->
@@ -2915,7 +2919,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
             List.map (fun (ip, _, _, _) -> ip) l |> List.sort_uniq compare
           in
           VVstring (string_of_int (List.length l))
-      | None ->  raise Not_found)
+      | None -> raise Not_found)
   | "cremated_date" :: sl -> (
       match get_burial p with
       | Cremated cod when p_auth -> (
@@ -3806,7 +3810,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "marriage_places" ->
       List.fold_left
         (fun acc ifam ->
-          acc ^ (if acc = "" then "" else "|") ^ sou base (get_marriage_place (foi base ifam)))
+          acc
+          ^ (if acc = "" then "" else "|")
+          ^ sou base (get_marriage_place (foi base ifam)))
         ""
         (Array.to_list (get_family p))
       |> str_val
@@ -3823,8 +3829,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           let first_name = p_first_name base p in
           let surname = p_surname base p in
           if first_name <> "?" && surname <> "?" then
-            (first_name ^ " " ^ surname |> Name.lower |> Util.escape_html)
-            :: l
+            (first_name ^ " " ^ surname |> Name.lower |> Util.escape_html) :: l
           else l
         in
         if l <> [] then
@@ -4498,11 +4503,19 @@ let print_foreach conf base print_ast eval_expr =
     | _ -> ()
   in
   let print_foreach_descendant env al (p, _) count_paths =
-    let lev = match get_env "level" env with Vint lev -> lev | _ -> (
-      !GWPARAM.syslog `LOG_WARNING ("Missing level info"); 0)
+    let lev =
+      match get_env "level" env with
+      | Vint lev -> lev
+      | _ ->
+          !GWPARAM.syslog `LOG_WARNING "Missing level info";
+          0
     in
-    let ip_l = match get_env "cousins" env with Vcousl cl -> !cl | _ -> (
-      !GWPARAM.syslog `LOG_WARNING ("Empty cousins list"); [])
+    let ip_l =
+      match get_env "cousins" env with
+      | Vcousl cl -> !cl
+      | _ ->
+          !GWPARAM.syslog `LOG_WARNING "Empty cousins list";
+          []
     in
     let ifam_l = get_descendants_at_level base p lev in
     let ip_l =
@@ -4808,7 +4821,7 @@ let print_foreach conf base print_ast eval_expr =
       | [] -> (
           match (p_getenv conf.env "v1", p_getenv conf.env "v2") with
           | Some v1, Some v2 -> (
-              match int_of_string_opt v1, int_of_string_opt v2 with
+              match (int_of_string_opt v1, int_of_string_opt v2) with
               | Some v1, Some v2 -> (v1, v2)
               | _, _ -> raise Not_found)
           | Some v1, _ -> (
@@ -4836,7 +4849,7 @@ let print_foreach conf base print_ast eval_expr =
     | Some l ->
         print_foreach_path_aux conf base test_level level env al ep
           (cousins_fold l)
-    | None -> !GWPARAM.syslog `LOG_WARNING ("Empty cousins list")
+    | None -> !GWPARAM.syslog `LOG_WARNING "Empty cousins list"
   in
 
   let print_foreach_cousin_level env al ((_, _) as ep) =

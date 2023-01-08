@@ -250,8 +250,10 @@ and eval_compound_var conf base env xx sl =
         match int_of_string_opt n with
         | Some n ->
             if String.length s > n then String.sub s 0 (String.length s - n)
-            else (Printf.sprintf "String shorter that requested\n"
-              |> !GWPARAM.syslog `LOG_WARNING; s)
+            else (
+              Printf.sprintf "String shorter that requested\n"
+              |> !GWPARAM.syslog `LOG_WARNING;
+              s)
         | None -> raise Not_found)
     | "printable" :: sl -> only_printable (loop sl)
     | _ -> raise Not_found
@@ -277,15 +279,16 @@ let print_foreach conf print_ast _eval_expr =
     let list = build_list_long conf list in
     let max = List.length list in
     let k = Option.value ~default:"" (p_getenv conf.env "key") in
-    List.iteri (fun i (ini_k, (list_v : (istr * string) list)) -> 
-      let env =
-        ("cnt", Vint i) :: ("max", Vint max) :: ("key", Vstring k)
-        :: ("entry_ini", Vstring ini_k)
-        :: ("list_value", Vlist_value list_v)
-        :: env
-      in
-      List.iter (print_ast env xx) al;
-    ) list
+    List.iteri
+      (fun i (ini_k, (list_v : (istr * string) list)) ->
+        let env =
+          ("cnt", Vint i) :: ("max", Vint max) :: ("key", Vstring k)
+          :: ("entry_ini", Vstring ini_k)
+          :: ("list_value", Vlist_value list_v)
+          :: env
+        in
+        List.iter (print_ast env xx) al)
+      list
   and print_foreach_substr env xx _el al evar =
     let evar = match p_getenv conf.env evar with Some s -> s | None -> "" in
     let list_of_char = string_to_list evar in
@@ -303,8 +306,7 @@ let print_foreach conf print_ast _eval_expr =
       | s :: l ->
           if List.length l > 0 then (
             let tail =
-              if String.length s > 0 then List.nth (string_to_list s) 0
-              else ""
+              if String.length s > 0 then List.nth (string_to_list s) 0 else ""
             in
             let env =
               ("substr", Vstring s) :: ("tail", Vstring tail)
@@ -331,22 +333,24 @@ let print_foreach conf print_ast _eval_expr =
       | _ -> []
     in
     let max = List.length l in
-    List.iteri (fun i (k, s) -> 
-          let env =
-            ("cnt", Vint i) :: ("max", Vint max) :: ("entry_value", Vstring s)
-            :: ("entry_value_rev", Vstring (unfold_place_long false s))
-            :: ("entry_key", Vstring (string_of_istr k))
-            :: env
-          in
-          List.iter (print_ast env xx) al;
-    ) l
+    List.iteri
+      (fun i (k, s) ->
+        let env =
+          ("cnt", Vint i) :: ("max", Vint max) :: ("entry_value", Vstring s)
+          :: ("entry_value_rev", Vstring (unfold_place_long false s))
+          :: ("entry_key", Vstring (string_of_istr k))
+          :: env
+        in
+        List.iter (print_ast env xx) al)
+      l
   and print_foreach_initial env xx al =
     let l = match get_env "list" env with Vlist_data l -> l | _ -> [] in
     let ini_l = build_list_short conf l in
-    List.iter (fun ini ->
-      let env = ("ini", Vstring ini) :: env in
-      List.iter (print_ast env xx) al;
-    ) ini_l
+    List.iter
+      (fun ini ->
+        let env = ("ini", Vstring ini) :: env in
+        List.iter (print_ast env xx) al)
+      ini_l
   in
   print_foreach
 
