@@ -241,12 +241,12 @@
         </div>
         <div class="modal-body py-2">
           %foreach;ancestor_level(maxlvl)
-            %if;(level!=1)
+            %if;(level!=0)
               <div class="text-center font-weight-bold mb-2">%nn;
-                %if;(level=2)[*parents]
-                %elseif;(level=3)[*grand-parents]
-                %elseif;(level=4)[*great-grand-parents]
-                %elseif;(level=5)[*great-great-grandparents]
+                %if;(level=1)[*parents]
+                %elseif;(level=2)[*grand-parents]
+                %elseif;(level=3)[*great-grand-parents]
+                %elseif;(level=4)[*great-great-grandparents]
                 %end;%nn;
               </div>
               %reset_count;
@@ -265,7 +265,7 @@
                         &%env.key=%env.val;%nn;
                       %end;
                     %end;%nn;
-                    &v=%expr(evar.v+level-1)">%nn;
+                    &v=%expr(evar.v+level)">%nn;
                     %if;(ancestor.first_name!="?" and ancestor.surname!="?")
                       %ancestor.first_name; %ancestor.surname;%if;(ancestor.dates!="") %ancestor.dates;%end;
                     %end;
