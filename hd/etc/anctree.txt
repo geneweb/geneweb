@@ -28,7 +28,9 @@
   <div class="container">
 %end;
 %include;perso_utils
-%include;menubar
+%if;not cancel_links;
+  %include;menubar
+%end;
 %if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
   </div>
   <div class="container-fluid">
