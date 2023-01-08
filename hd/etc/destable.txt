@@ -35,9 +35,7 @@
    %if;(cancel_links and e.v!=0) %apply;togend(e.v)%end;
 </h1>
 %if;not cancel_links;
-  <div class="d-flex justify-content-center">
-    %include;buttons_dag
-  </div><hr>
+    %include;buttons
 %end;
 %let;central_index;%index;%in;
 
