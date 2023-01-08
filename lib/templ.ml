@@ -899,11 +899,11 @@ let include_hed_trl conf name =
   if conf.debug && name = "trl" then
     begin
       let query_time = (Unix.gettimeofday ()) -. conf.query_start in
-      Output.print_sstring conf "<div class=\"fixed-top\">" ;
+      Output.print_sstring conf "<div class=\"col-1\"><div class=\"fixed-top order-last\">" ;
       Output.print_sstring conf "<span>" ;
       Output.print_sstring conf (Printf.sprintf "Query treated in %.3f seconds " query_time) ;
       Output.print_sstring conf "</span>" ;
-      Output.print_sstring conf "</div>" ;
+      Output.print_sstring conf "</div></div>" ;
       Output.flush conf ;
     end ;
   Util.include_template conf [] name (fun () -> ())
