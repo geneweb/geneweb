@@ -25,7 +25,9 @@
 %include;perso_utils
 %if;not cancel_links;
   %include;menubar
-  %include;buttons
+  <div class="d-flex justify-content-center">
+    %include;buttons_dag
+  </div><hr>
 %end;
 %define;input(xx)
   <label class="sr-only mt-2" for="inputxx">Filtre xx</label>
