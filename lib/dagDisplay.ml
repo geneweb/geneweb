@@ -836,6 +836,29 @@ let get_env v env =
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
+let eval_predefined_apply conf f vl =
+  let vl = List.map (function VVstring s -> s | _ -> raise Not_found) vl in
+  match (f, vl) with
+  | "min", s :: sl -> (
+      try
+        let m =
+          List.fold_right (fun s -> min (int_of_string s)) sl (int_of_string s)
+        in
+        string_of_int m
+      with
+      | Failure _ -> raise Not_found)
+  | "max", s :: sl -> (
+      try
+        let m =
+          List.fold_right
+            (fun s -> max (int_of_string s))
+            sl (int_of_string s)
+        in
+        string_of_int m
+      with
+      | Failure _ -> raise Not_found)
+  | _ -> raise Not_found
+
 let rec eval_var conf (page_title : Adef.safe_string)
     (next_txt : Adef.escaped_string) env _xx _loc = function
   | [ "browsing_with_sosa_ref" ] -> (
@@ -907,6 +930,12 @@ and eval_dag_cell_var conf (colspan, align, td) = function
         | _ -> "")
   | [ "colspan" ] -> VVstring (string_of_int colspan)
   | [ "is_bar" ] -> VVbool (match td with TDbar _ -> true | _ -> false)
+  | [ "is_hr" ] -> (
+      match td with
+      | TDhr RightA | TDhr LeftA | TDhr CenterA -> VVbool true
+      | _ -> VVbool false)
+  | [ "is_hr_center" ] -> (
+      match td with TDhr CenterA -> VVbool true | _ -> VVbool false)
   | [ "is_hr_left" ] -> (
       match td with TDhr LeftA -> VVbool true | _ -> VVbool false)
   | [ "is_hr_right" ] -> (
@@ -920,6 +949,96 @@ and eval_dag_cell_var conf (colspan, align, td) = function
       match td with
       | TDtext s -> VVstring (s : Adef.safe_string :> string)
       | _ -> VVstring "")
+  | [ "index" ] -> (
+      match td with
+      | TDitem (ip, _, _) | TDtext (ip, _) ->
+          (VVstring (string_of_iper ip) : Adef.safe_string :> string)
+      | _ -> VVstring "")
+  | [ "access" ] -> (
+      match td with
+      | TDtext (ip, s) -> VVstring (Util.acces conf base (poi base ip))
+      | _ -> VVstring "")
+  | [ "father"; "access" ] -> (
+      match td with
+      | TDitem (ip, _, _) | TDtext (ip, _) -> (
+          match get_parents (poi base ip) with
+          | Some ifam ->
+              let cpl = foi base ifam in
+              VVstring (Util.acces conf base (poi base (get_father cpl)))
+          | None -> VVstring "")
+      | _ -> VVstring "")
+  | [ "mother"; "access" ] -> (
+      match td with
+      | TDitem (ip, _, _) | TDtext (ip, _) -> (
+          match get_parents (poi base ip) with
+          | Some ifam ->
+              let cpl = foi base ifam in
+              VVstring (Util.acces conf base (poi base (get_mother cpl)))
+          | None -> VVstring "")
+      | _ -> VVstring "")
+  | [ "has_next_sibling" ] -> (
+      match td with
+      | TDitem (ip, _, _) | TDtext (ip, _) -> (
+          match get_parents (poi base ip) with
+          | Some ifam ->
+              let sib = get_children (foi base ifam) in
+              (* array *)
+              let i = ref (-1) in
+              let _ =
+                Array.iteri (fun n s -> if ip = s then i := n else ()) sib
+              in
+              if !i >= 0 && !i < Array.length sib - 1 then VVbool true
+              else VVbool false
+          | None -> VVbool false)
+      | _ -> VVbool false)
+  | [ "has_prev_sibling" ] -> (
+      match td with
+      | TDitem (ip, _, _) | TDtext (ip, _) -> (
+          match get_parents (poi base ip) with
+          | Some ifam ->
+              let sib = get_children (foi base ifam) in
+              (* array *)
+              let i = ref (-1) in
+              let _ =
+                Array.iteri (fun n s -> if ip = s then i := n else ()) sib
+              in
+              if !i >= 1 then VVbool true else VVbool false
+          | None -> VVbool false)
+      | _ -> VVbool false)
+  | [ "next_sibling"; "access" ] -> (
+      match td with
+      | TDitem (ip, _, _) | TDtext (ip, _) -> (
+          match get_parents (poi base ip) with
+          | Some ifam ->
+              let sib = get_children (foi base ifam) in
+              (* array *)
+              let i = ref (-1) in
+              let _ =
+                Array.iteri (fun n s -> if ip = s then i := n else ()) sib
+              in
+              if !i >= 0 && !i < Array.length sib - 1 then
+                let s_ip = sib.(!i + 1) in
+                VVstring (Util.acces conf base (poi base s_ip))
+              else raise Not_found
+          | None -> raise Not_found)
+      | _ -> raise Not_found)
+  | [ "prev_sibling"; "access" ] -> (
+      match td with
+      | TDitem (ip, _, _) | TDtext (ip, _) -> (
+          match get_parents (poi base ip) with
+          | Some ifam ->
+              let sib = get_children (foi base ifam) in
+              (* array *)
+              let i = ref (-1) in
+              let _ =
+                Array.iteri (fun n s -> if ip = s then i := n else ()) sib
+              in
+              if !i >= 1 then
+                let s_ip = sib.(!i - 1) in
+                VVstring (Util.acces conf base (poi base s_ip))
+              else raise Not_found
+          | None -> raise Not_found)
+      | _ -> raise Not_found)
   | _ -> raise Not_found
 
 let rec print_foreach conf hts print_ast _eval_expr env () _loc s sl _el al =
@@ -1128,7 +1247,7 @@ let print_slices_menu_or_dag_page conf page_title hts next_txt =
       {
         Templ.eval_var = eval_var conf page_title next_txt;
         Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-        Templ.eval_predefined_apply = (fun _ -> raise Not_found);
+        Templ.eval_predefined_apply = (fun _ -> eval_predefined_apply conf);
         Templ.get_vother;
         Templ.set_vother;
         Templ.print_foreach = print_foreach conf hts;
