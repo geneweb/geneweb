@@ -49,6 +49,7 @@ type config = {
   wizard : bool;
   is_printed_by_template : bool;
   debug : bool;
+  query_start: float;
   friend : bool;
   just_friend_wizard : bool;
   user : string;
@@ -91,7 +92,7 @@ type config = {
   today : dmy;
   today_wd : int;
   time : int * int * int;
-  ctime : float;
+  ctime : float; (* TODO verify usefulness *)
   mutable output_conf : output_conf;
   (* HTTP printer *)
   (* prefix for image urls:
@@ -121,6 +122,7 @@ let empty =
     api_mode = false;
     is_printed_by_template = false;
     debug = false;
+    query_start = 0.;
     friend = false;
     just_friend_wizard = false;
     user = "";
