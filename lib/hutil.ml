@@ -26,6 +26,9 @@ let gen_print_link_to_welcome f conf right_aligned =
     {|"><span class="fa fa-home fa-lg ml-1 px-0" title="|};
   Output.print_sstring conf (Utf8.capitalize (Util.transl conf "home"));
   Output.print_sstring conf {|"></span></a>|};
+  if conf.debug then
+    Output.print_sstring conf
+     (Printf.sprintf "<span id=\"q_time_d\">00.000</span>") ;
   if right_aligned then Output.print_sstring conf "</div>"
   else Output.print_sstring conf "</p>"
 
@@ -109,9 +112,8 @@ let trailer conf =
   if conf.debug || true then
   begin
     let query_time = (Unix.gettimeofday ()) -. conf.query_start in
-    Output.print_sstring conf "<span id=\"q_time_c\">" ;
-    Output.print_sstring conf (Printf.sprintf "Query treated in (%.3f) seconds " query_time) ;
-    Output.print_sstring conf "</span>" ;
+    Output.print_sstring conf
+      (Printf.sprintf "Query treated in <span id=\"q_time_c\">%.3f</span> seconds " query_time) ;
     Output.flush conf ;
   end ;
   Output.print_sstring conf "</body>\n</html><aaa>\n"
