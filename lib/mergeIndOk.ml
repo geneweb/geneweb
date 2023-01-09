@@ -275,170 +275,164 @@ let reconstitute conf base p1 p2 =
   { p with pevents }
 
 let redirect_relations_of_added_related base p ip2 rel_chil =
-  let (p_related, mod_p) =
+  let p_related, mod_p =
     List.fold_right
       (fun ipc (p_related, mod_p) ->
-         let pc = poi base ipc in
-         let (pc_rparents, _, p_related, mod_p) =
-           List.fold_right
-             (fun r (pc_rparents, mod_pc, p_related, mod_p) ->
-                let (r, mod_pc, p_related, mod_p) =
-                  match r.r_fath with
-                    Some ip when ip = ip2 ->
-                      let (p_related, mod_p) =
-                        if List.mem ipc p_related then p_related, mod_p
-                        else ipc :: p_related, true
-                      in
-                      let r = {r with r_fath = Some p.key_index} in
-                      r, true, p_related, mod_p
-                  | _ -> r, mod_pc, p_related, mod_p
-                in
-                let (r, mod_pc, p_related, mod_p) =
-                  match r.r_moth with
-                    Some ip when ip = ip2 ->
-                      let (p_related, mod_p) =
-                        if List.mem ipc p_related then p_related, mod_p
-                        else ipc :: p_related, true
-                      in
-                      let r = {r with r_moth = Some p.key_index} in
-                      r, true, p_related, mod_p
-                  | _ -> r, mod_pc, p_related, mod_p
-                in
-                r :: pc_rparents, mod_pc, p_related, mod_p)
-             (get_rparents pc) ([], false, p_related, mod_p)
-         in
-         let (pc_pevents, mod_pc, p_related, mod_p) =
-           List.fold_right
-             (fun e (pc_pevents, mod_pc, p_related, _) ->
-                let (e, mod_pc, p_related, mod_p) =
-                  let (witnesses, mod_p, p_related) =
-                    List.fold_right
-                      (fun (ip, k, wnotes) (witnesses, mod_p, p_related) ->
-                         if ip = ip2 then
-                           let (p_related, mod_p) =
-                             if List.mem ipc p_related then p_related, mod_p
-                             else ipc :: p_related, true
-                           in
-                           (p.key_index, k, wnotes) :: witnesses, mod_p, p_related
-                         else (ip, k, wnotes) :: witnesses, mod_p, p_related)
-                      (Array.to_list e.epers_witnesses)
-                      ([], mod_pc, p_related)
-                  in
-                  let e =
-                    {e with epers_witnesses = Array.of_list witnesses}
-                  in
-                  e, true, p_related, mod_p
-                in
-                e :: pc_pevents, mod_pc, p_related, mod_p)
-             (get_pevents pc) ([], false, p_related, mod_p)
-         in
-         (* TODO mod_pc = True tout le temps *)
-         if mod_pc then
-           begin let pc = gen_person_of_person pc in
-             let pc =
-               {pc with rparents = pc_rparents; pevents = pc_pevents}
-             in
-             patch_person base ipc pc
-           end;
-         let (p_related, mod_p) =
-           let rec loop (p_related, mod_p) i =
-             if i = Array.length (get_family pc) then p_related, mod_p
-             else
-               let ifam = (get_family pc).(i) in
-               let fam = gen_family_of_family (foi base ifam) in
-               let (p_related, mod_p) =
-                 if Array.mem ip2 fam.witnesses then
-                   let (p_related, mod_p) =
-                     let rec loop (p_related, mod_p) j =
-                       if j = Array.length fam.witnesses then p_related, mod_p
-                       else
-                         let (p_related, mod_p) =
-                           if fam.witnesses.(j) = ip2 then
-                             begin
-                               fam.witnesses.(j) <- p.key_index;
-                               if List.mem ipc p_related then p_related, mod_p
-                               else ipc :: p_related, true
-                             end
-                           else p_related, mod_p
-                         in
-                         loop (p_related, mod_p) (j + 1)
-                     in
-                     loop (p_related, mod_p) 0
-                   in
-                   patch_family base ifam fam; p_related, mod_p
-                 else p_related, mod_p
-               in
-               let (pc_fevents, mod_pc, p_related, mod_p) =
-                 List.fold_right
-                   (fun e (pc_fevents, _, p_related, mod_p) ->
-                      let (e, mod_pc, p_related, mod_p) =
-                        let (p_related, mod_p) =
-                          let rec loop (p_related, mod_p) j =
-                            if j = Array.length e.efam_witnesses then
-                              p_related, mod_p
-                            else
-                              let (p_related, mod_p) =
-                                let witness_iper, _, _ = e.efam_witnesses.(j) in
-                                if witness_iper = ip2 then
-                                  let (_, wk, wnote) = e.efam_witnesses.(j) in
-                                  e.efam_witnesses.(j) <- p.key_index, wk, wnote;
-                                  if List.mem ipc p_related then
-                                    p_related, mod_p
-                                  else ipc :: p_related, true
-                                else p_related, mod_p
-                              in
-                              loop (p_related, mod_p) (j + 1)
-                          in
-                          loop (p_related, mod_p) 0
+        let pc = poi base ipc in
+        let pc_rparents, _, p_related, mod_p =
+          List.fold_right
+            (fun r (pc_rparents, mod_pc, p_related, mod_p) ->
+              let r, mod_pc, p_related, mod_p =
+                match r.r_fath with
+                | Some ip when ip = ip2 ->
+                    let p_related, mod_p =
+                      if List.mem ipc p_related then (p_related, mod_p)
+                      else (ipc :: p_related, true)
+                    in
+                    let r = { r with r_fath = Some p.key_index } in
+                    (r, true, p_related, mod_p)
+                | _ -> (r, mod_pc, p_related, mod_p)
+              in
+              let r, mod_pc, p_related, mod_p =
+                match r.r_moth with
+                | Some ip when ip = ip2 ->
+                    let p_related, mod_p =
+                      if List.mem ipc p_related then (p_related, mod_p)
+                      else (ipc :: p_related, true)
+                    in
+                    let r = { r with r_moth = Some p.key_index } in
+                    (r, true, p_related, mod_p)
+                | _ -> (r, mod_pc, p_related, mod_p)
+              in
+              (r :: pc_rparents, mod_pc, p_related, mod_p))
+            (get_rparents pc)
+            ([], false, p_related, mod_p)
+        in
+        let pc_pevents, mod_pc, p_related, mod_p =
+          List.fold_right
+            (fun e (pc_pevents, mod_pc, p_related, _) ->
+              let e, mod_pc, p_related, mod_p =
+                let witnesses, mod_p, p_related =
+                  List.fold_right
+                    (fun (ip, k, wnotes) (witnesses, mod_p, p_related) ->
+                      if ip = ip2 then
+                        let p_related, mod_p =
+                          if List.mem ipc p_related then (p_related, mod_p)
+                          else (ipc :: p_related, true)
                         in
-                        e, true, p_related, mod_p
+                        ((p.key_index, k, wnotes) :: witnesses, mod_p, p_related)
+                      else ((ip, k, wnotes) :: witnesses, mod_p, p_related))
+                    (Array.to_list e.epers_witnesses)
+                    ([], mod_pc, p_related)
+                in
+                let e = { e with epers_witnesses = Array.of_list witnesses } in
+                (e, true, p_related, mod_p)
+              in
+              (e :: pc_pevents, mod_pc, p_related, mod_p))
+            (get_pevents pc)
+            ([], false, p_related, mod_p)
+        in
+        (* TODO mod_pc = True tout le temps *)
+        (if mod_pc then
+         let pc = gen_person_of_person pc in
+         let pc = { pc with rparents = pc_rparents; pevents = pc_pevents } in
+         patch_person base ipc pc);
+        let p_related, mod_p =
+          let rec loop (p_related, mod_p) i =
+            if i = Array.length (get_family pc) then (p_related, mod_p)
+            else
+              let ifam = (get_family pc).(i) in
+              let fam = gen_family_of_family (foi base ifam) in
+              let p_related, mod_p =
+                if Array.mem ip2 fam.witnesses then (
+                  let p_related, mod_p =
+                    let rec loop (p_related, mod_p) j =
+                      if j = Array.length fam.witnesses then (p_related, mod_p)
+                      else
+                        let p_related, mod_p =
+                          if fam.witnesses.(j) = ip2 then (
+                            fam.witnesses.(j) <- p.key_index;
+                            if List.mem ipc p_related then (p_related, mod_p)
+                            else (ipc :: p_related, true))
+                          else (p_related, mod_p)
+                        in
+                        loop (p_related, mod_p) (j + 1)
+                    in
+                    loop (p_related, mod_p) 0
+                  in
+                  patch_family base ifam fam;
+                  (p_related, mod_p))
+                else (p_related, mod_p)
+              in
+              let pc_fevents, mod_pc, p_related, mod_p =
+                List.fold_right
+                  (fun e (pc_fevents, _, p_related, mod_p) ->
+                    let e, mod_pc, p_related, mod_p =
+                      let p_related, mod_p =
+                        let rec loop (p_related, mod_p) j =
+                          if j = Array.length e.efam_witnesses then
+                            (p_related, mod_p)
+                          else
+                            let p_related, mod_p =
+                              let witness_iper, _, _ = e.efam_witnesses.(j) in
+                              if witness_iper = ip2 then (
+                                let _, wk, wnote = e.efam_witnesses.(j) in
+                                e.efam_witnesses.(j) <- (p.key_index, wk, wnote);
+                                if List.mem ipc p_related then (p_related, mod_p)
+                                else (ipc :: p_related, true))
+                              else (p_related, mod_p)
+                            in
+                            loop (p_related, mod_p) (j + 1)
+                        in
+                        loop (p_related, mod_p) 0
                       in
-                      e :: pc_fevents, mod_pc, p_related, mod_p)
-                   fam.fevents ([], false, p_related, mod_p)
-               in
-               let () =
-                 (* TODO mod_pc = True tout le temps *)
-                 if mod_pc then
-                   let fam = {fam with fevents = pc_fevents} in
-                   patch_family base ifam fam
-               in
-               loop (p_related, mod_p) (i + 1)
-           in
-           loop (p_related, mod_p) 0
-         in
-         p_related, mod_p)
+                      (e, true, p_related, mod_p)
+                    in
+                    (e :: pc_fevents, mod_pc, p_related, mod_p))
+                  fam.fevents
+                  ([], false, p_related, mod_p)
+              in
+              let () =
+                (* TODO mod_pc = True tout le temps *)
+                if mod_pc then
+                  let fam = { fam with fevents = pc_fevents } in
+                  patch_family base ifam fam
+              in
+              loop (p_related, mod_p) (i + 1)
+          in
+          loop (p_related, mod_p) 0
+        in
+        (p_related, mod_p))
       rel_chil (p.related, false)
   in
-  if mod_p then {p with related = p_related} else p
+  if mod_p then { p with related = p_related } else p
 
 let redirect_added_families base p ip2 p2_family =
   for i = 0 to Array.length p2_family - 1 do
     let ifam = p2_family.(i) in
     let fam = foi base ifam in
     let cpl =
-      if ip2 = get_father fam then
-        begin
-          Array.iter
-            (fun ip ->
-               let w = poi base ip in
-               if not (List.mem p.key_index (get_related w)) then
-                 let w = gen_person_of_person w in
-                 let w = {w with related = p.key_index :: w.related} in
-                 patch_person base ip w)
-            (get_witnesses fam);
-          List.iter
-            (fun evt ->
-               Array.iter
-                 (fun (ip, _, _) ->
-                    let w = poi base ip in
-                    if not (List.mem p.key_index (get_related w)) then
-                      let w = gen_person_of_person w in
-                      let w = {w with related = p.key_index :: w.related} in
-                      patch_person base ip w)
-                 evt.efam_witnesses)
-            (get_fevents fam);
-          Gutil.couple false p.key_index (get_mother fam)
-        end
+      if ip2 = get_father fam then (
+        Array.iter
+          (fun ip ->
+            let w = poi base ip in
+            if not (List.mem p.key_index (get_related w)) then
+              let w = gen_person_of_person w in
+              let w = { w with related = p.key_index :: w.related } in
+              patch_person base ip w)
+          (get_witnesses fam);
+        List.iter
+          (fun evt ->
+            Array.iter
+              (fun (ip, _, _) ->
+                let w = poi base ip in
+                if not (List.mem p.key_index (get_related w)) then
+                  let w = gen_person_of_person w in
+                  let w = { w with related = p.key_index :: w.related } in
+                  patch_person base ip w)
+              evt.efam_witnesses)
+          (get_fevents fam);
+        Gutil.couple false p.key_index (get_mother fam))
       else if ip2 = get_mother fam then
         Gutil.couple false (get_father fam) p.key_index
       else assert false

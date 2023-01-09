@@ -712,93 +712,136 @@ let update_family_with_fevents gen fam =
   (* qui soit mis dans les évènements principaux.           *)
   let rec loop fevents fam =
     match fevents with
-      [] -> fam
-    | evt :: l ->
-      match evt.efam_name with
-        Efam_Engage ->
-        if !found_marriage then loop l fam
-        else
-          let witnesses = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
-          let fam =
-            {fam with relation =
-                        if nsck_std_fields then NoSexesCheckNotMarried else Engaged;
-                      marriage = evt.efam_date; marriage_place = evt.efam_place;
-                      marriage_note = evt.efam_note; marriage_src = evt.efam_src;
-                      witnesses = witnesses}
-          in
-          let () = found_marriage := true in loop l fam
-      | Efam_Marriage ->
-        let witnesses = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
-        let fam =
-          {fam with relation =
-                      if nsck_std_fields then NoSexesCheckMarried else Married;
-                    marriage = evt.efam_date; marriage_place = evt.efam_place;
-                    marriage_note = evt.efam_note; marriage_src = evt.efam_src;
-                    witnesses = witnesses}
-        in
-        let () = found_marriage := true in fam
-      | Efam_MarriageContract ->
-        if !found_marriage then loop l fam
-        else
-          let witnesses = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
-          (* Pour différencier le fait qu'on recopie le *)
-          (* mariage, on met une précision "vers".      *)
-          let date =
-            match Date.od_of_cdate evt.efam_date with
-              Some (Dgreg (dmy, cal)) ->
-              let dmy = {dmy with prec = About} in
-              Date.cdate_of_od (Some (Dgreg (dmy, cal)))
-            | _ -> evt.efam_date
-          in
-          (* Pour différencier le fait qu'on recopie le *)
-          (* mariage, on ne met pas de lieu.            *)
-          let place = unique_string gen "" in
-          let fam =
-            {fam with relation =
-                        if nsck_std_fields then NoSexesCheckMarried else Married;
-                      marriage = date; marriage_place = place;
-                      marriage_note = evt.efam_note; marriage_src = evt.efam_src;
-                      witnesses = witnesses}
-          in
-          let () = found_marriage := true in loop l fam
-      | Efam_NoMention | Efam_MarriageBann | Efam_MarriageLicense |
-        Efam_Annulation | Efam_PACS ->
-        if !found_marriage then loop l fam
-        else
-          let witnesses = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
-          let fam =
-            {fam with relation =
-                        if nsck_std_fields then NoSexesCheckNotMarried
-                        else NoMention;
-                      marriage = evt.efam_date; marriage_place = evt.efam_place;
-                      marriage_note = evt.efam_note; marriage_src = evt.efam_src;
-                      witnesses = witnesses}
-          in
-          let () = found_marriage := true in loop l fam
-      | Efam_NoMarriage ->
-        if !found_marriage then loop l fam
-        else
-          let witnesses = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
-          let fam =
-            {fam with relation =
-                        if nsck_std_fields then NoSexesCheckNotMarried
-                        else NotMarried;
-                      marriage = evt.efam_date; marriage_place = evt.efam_place;
-                      marriage_note = evt.efam_note; marriage_src = evt.efam_src;
-                      witnesses = witnesses}
-          in
-          let () = found_marriage := true in loop l fam
-      | Efam_Divorce ->
-        if !found_divorce then loop l fam
-        else
-          let fam = {fam with divorce = Divorced evt.efam_date} in
-          let () = found_divorce := true in loop l fam
-      | Efam_Separated ->
-        if !found_divorce then loop l fam
-        else
-          let fam = {fam with divorce = Separated} in
-          let () = found_divorce := true in loop l fam
-      | _ -> loop l fam
+    | [] -> fam
+    | evt :: l -> (
+        match evt.efam_name with
+        | Efam_Engage ->
+            if !found_marriage then loop l fam
+            else
+              let witnesses =
+                Array.map (fun (ip, _, _) -> ip) evt.efam_witnesses
+              in
+              let fam =
+                {
+                  fam with
+                  relation =
+                    (if nsck_std_fields then NoSexesCheckNotMarried
+                    else Engaged);
+                  marriage = evt.efam_date;
+                  marriage_place = evt.efam_place;
+                  marriage_note = evt.efam_note;
+                  marriage_src = evt.efam_src;
+                  witnesses;
+                }
+              in
+              let () = found_marriage := true in
+              loop l fam
+        | Efam_Marriage ->
+            let witnesses =
+              Array.map (fun (ip, _, _) -> ip) evt.efam_witnesses
+            in
+            let fam =
+              {
+                fam with
+                relation =
+                  (if nsck_std_fields then NoSexesCheckMarried else Married);
+                marriage = evt.efam_date;
+                marriage_place = evt.efam_place;
+                marriage_note = evt.efam_note;
+                marriage_src = evt.efam_src;
+                witnesses;
+              }
+            in
+            let () = found_marriage := true in
+            fam
+        | Efam_MarriageContract ->
+            if !found_marriage then loop l fam
+            else
+              let witnesses =
+                Array.map (fun (ip, _, _) -> ip) evt.efam_witnesses
+              in
+              (* Pour différencier le fait qu'on recopie le *)
+              (* mariage, on met une précision "vers".      *)
+              let date =
+                match Date.od_of_cdate evt.efam_date with
+                | Some (Dgreg (dmy, cal)) ->
+                    let dmy = { dmy with prec = About } in
+                    Date.cdate_of_od (Some (Dgreg (dmy, cal)))
+                | _ -> evt.efam_date
+              in
+              (* Pour différencier le fait qu'on recopie le *)
+              (* mariage, on ne met pas de lieu.            *)
+              let place = unique_string gen "" in
+              let fam =
+                {
+                  fam with
+                  relation =
+                    (if nsck_std_fields then NoSexesCheckMarried else Married);
+                  marriage = date;
+                  marriage_place = place;
+                  marriage_note = evt.efam_note;
+                  marriage_src = evt.efam_src;
+                  witnesses;
+                }
+              in
+              let () = found_marriage := true in
+              loop l fam
+        | Efam_NoMention | Efam_MarriageBann | Efam_MarriageLicense
+        | Efam_Annulation | Efam_PACS ->
+            if !found_marriage then loop l fam
+            else
+              let witnesses =
+                Array.map (fun (ip, _, _) -> ip) evt.efam_witnesses
+              in
+              let fam =
+                {
+                  fam with
+                  relation =
+                    (if nsck_std_fields then NoSexesCheckNotMarried
+                    else NoMention);
+                  marriage = evt.efam_date;
+                  marriage_place = evt.efam_place;
+                  marriage_note = evt.efam_note;
+                  marriage_src = evt.efam_src;
+                  witnesses;
+                }
+              in
+              let () = found_marriage := true in
+              loop l fam
+        | Efam_NoMarriage ->
+            if !found_marriage then loop l fam
+            else
+              let witnesses =
+                Array.map (fun (ip, _, _) -> ip) evt.efam_witnesses
+              in
+              let fam =
+                {
+                  fam with
+                  relation =
+                    (if nsck_std_fields then NoSexesCheckNotMarried
+                    else NotMarried);
+                  marriage = evt.efam_date;
+                  marriage_place = evt.efam_place;
+                  marriage_note = evt.efam_note;
+                  marriage_src = evt.efam_src;
+                  witnesses;
+                }
+              in
+              let () = found_marriage := true in
+              loop l fam
+        | Efam_Divorce ->
+            if !found_divorce then loop l fam
+            else
+              let fam = { fam with divorce = Divorced evt.efam_date } in
+              let () = found_divorce := true in
+              loop l fam
+        | Efam_Separated ->
+            if !found_divorce then loop l fam
+            else
+              let fam = { fam with divorce = Separated } in
+              let () = found_divorce := true in
+              loop l fam
+        | _ -> loop l fam)
   in
   loop (List.rev fam.fevents) fam
 
@@ -821,7 +864,9 @@ let update_fevents_with_family gen fam =
       | Pacs -> Efam_PACS
       | Residence -> Efam_Residence
     in
-    let witnesses = Array.map (fun ip -> ip, Witness, empty_string) fam.witnesses in
+    let witnesses =
+      Array.map (fun ip -> (ip, Witness, empty_string)) fam.witnesses
+    in
     let evt =
       {
         efam_name = name;
@@ -926,18 +971,20 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
   let fevents =
     List.map
       (fun (name, date, place, reason, src, notes, witl) ->
-         (* insert all event witnesses *)
-         let witnesses =
-           List.map
-             (fun (wit, sex, wk, wnote) ->
-                let (p, ip) = insert_somebody gen wit in
-                notice_sex gen p sex;
-                p.m_related <- ifath :: p.m_related;
-                let wistr = unique_string gen wnote in
-                ip, wk, wistr)
-             witl
-         in
-         {efam_name = fevent_name_unique_string gen name; efam_date = date;
+        (* insert all event witnesses *)
+        let witnesses =
+          List.map
+            (fun (wit, sex, wk, wnote) ->
+              let p, ip = insert_somebody gen wit in
+              notice_sex gen p sex;
+              p.m_related <- ifath :: p.m_related;
+              let wistr = unique_string gen wnote in
+              (ip, wk, wistr))
+            witl
+        in
+        {
+          efam_name = fevent_name_unique_string gen name;
+          efam_date = date;
           efam_place = unique_string gen place;
           efam_reason = unique_string gen reason;
           efam_note = unique_string gen notes;
@@ -1069,20 +1116,22 @@ let insert_pevents fname gen sb pevtl =
     let pevents =
       List.map
         (fun (name, date, place, reason, src, notes, witl) ->
-           let witnesses =
-             List.map
-               (fun (wit, sex, wk, wnote) ->
-                  (* insert witnesses *)
-                  let (wp, wip) = insert_somebody gen wit in
-                  notice_sex gen wp sex;
-                  (* add concerned person as witness' relation *)
-                  wp.m_related <- ip :: wp.m_related;
-                  let wistr = unique_string gen wnote in
-                  wip, wk, wistr)
-               witl
-           in
-           {epers_name = pevent_name_unique_string gen name;
-            epers_date = date; epers_place = unique_string gen place;
+          let witnesses =
+            List.map
+              (fun (wit, sex, wk, wnote) ->
+                (* insert witnesses *)
+                let wp, wip = insert_somebody gen wit in
+                notice_sex gen wp sex;
+                (* add concerned person as witness' relation *)
+                wp.m_related <- ip :: wp.m_related;
+                let wistr = unique_string gen wnote in
+                (wip, wk, wistr))
+              witl
+          in
+          {
+            epers_name = pevent_name_unique_string gen name;
+            epers_date = date;
+            epers_place = unique_string gen place;
             epers_reason = unique_string gen reason;
             epers_note = unique_string gen notes;
             epers_src = unique_string gen src;
@@ -1661,7 +1710,7 @@ let output_command_line bdir =
 (** Link .gwo files and create a database. *)
 let link ~save_mem next_family_fun bdir =
   let tmp_dir = Filename.concat "gw_tmp" bdir in
-  Files.mkdir_p tmp_dir ;
+  Files.mkdir_p tmp_dir;
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
   let tmp_per = Filename.concat tmp_dir "gwc_per" in
   let tmp_fam_index = Filename.concat tmp_dir "gwc_fam_index" in
@@ -1725,18 +1774,14 @@ let link ~save_mem next_family_fun bdir =
   Gc.compact ();
   let base = make_base bdir gen per_index_ic per_ic in
   Hashtbl.clear gen.g_patch_p;
-  if !do_check && gen.g_pcnt > 0 then begin
-    Check.check_base
-      base (set_error base gen) (set_warning base) ignore ;
-    if !pr_stats then Stats.(print_stats base @@ stat_base base) ;
-  end ;
-  if not gen.g_errored then
-    begin
-      if !do_consang then ignore @@ ConsangAll.compute base true ;
-      Gwdb.sync ~save_mem base ;
-      output_wizard_notes bdir gen.g_wiznotes;
-      Files.remove_dir tmp_dir ;
-      output_command_line bdir;
-      true
-    end
+  if !do_check && gen.g_pcnt > 0 then (
+    Check.check_base base (set_error base gen) (set_warning base) ignore;
+    if !pr_stats then Stats.(print_stats base @@ stat_base base));
+  if not gen.g_errored then (
+    if !do_consang then ignore @@ ConsangAll.compute base true;
+    Gwdb.sync ~save_mem base;
+    output_wizard_notes bdir gen.g_wiznotes;
+    Files.remove_dir tmp_dir;
+    output_command_line bdir;
+    true)
   else false

@@ -106,11 +106,11 @@ val update_conf : config -> config
 val bad_date : config -> dmy -> 'a
 val check_greg_day : config -> dmy -> unit
 
-val check_missing_witnesses_names
-  : config
-  -> ('a -> ((string * string * 'b * 'c * 'd) * 'e * string) array)
-  -> 'a list
-  -> update_error option
+val check_missing_witnesses_names :
+  config ->
+  ('a -> ((string * string * 'b * 'c * 'd) * 'e * string) array) ->
+  'a list ->
+  update_error option
 
 val check_missing_name :
   base -> (Gwdb.iper, 'b, string) Def.gen_person -> update_error option

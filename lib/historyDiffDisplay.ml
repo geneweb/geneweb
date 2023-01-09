@@ -82,9 +82,9 @@ let print_clean_ok conf =
       let history = load_person_history conf f in
       let new_history = clean_history 0 history [] in
       let fname = history_path conf f in
-      if new_history = [] then Files.rm fname
+      (if new_history = [] then Files.rm fname
       else
-        begin let ext_flags =
+        let ext_flags =
           [ Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock ]
         in
         match
@@ -94,8 +94,7 @@ let print_clean_ok conf =
         | Some oc ->
             List.iter (fun v -> output_value oc (v : gen_record)) new_history;
             close_out oc
-        | None -> ()
-      end;
+        | None -> ());
       Hutil.trailer conf
   | _ -> Hutil.incorrect_request conf
 
@@ -266,15 +265,15 @@ let string_of_divorce conf divorce =
 
 let string_of_event_witness conf base witnesses =
   (* WNOTES TODO *)
-  Array.fold_right begin fun (ip, wk, _) accu ->
-    let witn = person_of_iper conf base ip in
-    let kind = Util.string_of_witness_kind conf (get_sex @@ poi base ip) wk in
-    if (witn :> string) = ""
-    then (kind ^^^ transl conf ":" ^<^  witn) :: accu
-    else accu
-  end witnesses []
-  |> fun s -> String.concat ", " (s : Adef.safe_string list :> string list)
-  |> Adef.safe
+  Array.fold_right
+    (fun (ip, wk, _) accu ->
+      let witn = person_of_iper conf base ip in
+      let kind = Util.string_of_witness_kind conf (get_sex @@ poi base ip) wk in
+      if (witn :> string) = "" then (kind ^^^ transl conf ":" ^<^ witn) :: accu
+      else accu)
+    witnesses []
+  |> fun s ->
+  String.concat ", " (s : Adef.safe_string list :> string list) |> Adef.safe
 
 let string_of_epers_name conf epers_name =
   match epers_name with
@@ -693,15 +692,14 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) :
   | "fevent_src" -> (
       match get_env "fevent" env with
       | Vfevent (bef, aft, m_auth) ->
-        aux' m_auth bef aft (fun _ x -> escape_html x.efam_src)
-      | _ -> raise Not_found
-    )
+          aux' m_auth bef aft (fun _ x -> escape_html x.efam_src)
+      | _ -> raise Not_found)
   | "fevent_witness" -> (
       match get_env "fevent" env with
       | Vfevent (bef, aft, m_auth) ->
-        aux' m_auth bef aft (fun conf x -> string_of_event_witness conf base x.efam_witnesses)
-      | _ -> raise Not_found
-    )
+          aux' m_auth bef aft (fun conf x ->
+              string_of_event_witness conf base x.efam_witnesses)
+      | _ -> raise Not_found)
   | "comment" -> (
       match get_env "fam" env with
       | Vfam (bef, aft, m_auth) ->
