@@ -35,13 +35,13 @@ let empty_person p =
   && p.pevents = [] && p.notes = empty_string && p.psources = empty_string
 
 let gc ?(dry_run = true) ~save_mem base =
-  base.data.persons.load_array () ;
-  base.data.ascends.load_array () ;
-  base.data.unions.load_array () ;
-  base.data.families.load_array () ;
-  base.data.couples.load_array () ;
-  base.data.descends.load_array () ;
-  base.data.strings.load_array () ;
+  base.data.persons.load_array ();
+  base.data.ascends.load_array ();
+  base.data.unions.load_array ();
+  base.data.families.load_array ();
+  base.data.couples.load_array ();
+  base.data.descends.load_array ();
+  base.data.strings.load_array ();
   let mp = Array.make base.data.persons.len false in
   let mf = Array.make base.data.families.len false in
   let ms = Array.make base.data.strings.len false in
@@ -53,7 +53,7 @@ let gc ?(dry_run = true) ~save_mem base =
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
     if not (empty_person p) then (
-      markp i ;
+      markp i;
       let _ = Dutil.map_person_ps markp marks p in
       let _ = Futil.map_union_f markf @@ base.data.unions.get i in
       let _ = Futil.map_ascend_f markf @@ base.data.ascends.get i in
@@ -120,12 +120,13 @@ let gc ?(dry_run = true) ~save_mem base =
     let src_ifam = Array.get src_ifams in
     let src_istr = Array.get src_istrs in
     let persons =
-      Array.init lenp @@ begin fun i ->
-        { (Dutil.map_person_ps dst_iper dst_istr @@
-             base.data.persons.get @@
-               src_iper i)
-          with key_index = i }
-      end
+      Array.init lenp @@ fun i ->
+      {
+        (Dutil.map_person_ps dst_iper dst_istr
+        @@ base.data.persons.get @@ src_iper i)
+        with
+        key_index = i;
+      }
     in
     let ascends =
       Array.init lenp @@ fun i ->
@@ -136,9 +137,9 @@ let gc ?(dry_run = true) ~save_mem base =
       Futil.map_union_f dst_ifam @@ base.data.unions.get @@ src_iper i
     in
     let families =
-      Array.init lenf @@ begin fun i ->
-        Dutil.map_family_ps dst_iper (fun _ -> i) dst_istr @@ base.data.families.get @@ src_ifam i
-      end
+      Array.init lenf @@ fun i ->
+      Dutil.map_family_ps dst_iper (fun _ -> i) dst_istr
+      @@ base.data.families.get @@ src_ifam i
     in
     let couples =
       Array.init lenf @@ fun i ->
@@ -168,19 +169,19 @@ let gc ?(dry_run = true) ~save_mem base =
           strings,
           bnotes )
     in
-    base'.data.persons.load_array () ;
-    base'.data.ascends.load_array () ;
-    base'.data.unions.load_array () ;
-    base'.data.families.load_array () ;
-    base'.data.couples.load_array () ;
-    base'.data.descends.load_array () ;
-    base'.data.strings.load_array () ;
+    base'.data.persons.load_array ();
+    base'.data.ascends.load_array ();
+    base'.data.unions.load_array ();
+    base'.data.families.load_array ();
+    base'.data.couples.load_array ();
+    base'.data.descends.load_array ();
+    base'.data.strings.load_array ();
     Outbase.output ~save_mem base';
-    base'.data.persons.clear_array () ;
-    base'.data.ascends.clear_array () ;
-    base'.data.unions.clear_array () ;
-    base'.data.families.clear_array () ;
-    base'.data.couples.clear_array () ;
-    base'.data.descends.clear_array () ;
-    base'.data.strings.clear_array () ;
+    base'.data.persons.clear_array ();
+    base'.data.ascends.clear_array ();
+    base'.data.unions.clear_array ();
+    base'.data.families.clear_array ();
+    base'.data.couples.clear_array ();
+    base'.data.descends.clear_array ();
+    base'.data.strings.clear_array ();
     (deletedp, deletedf, deleteds)

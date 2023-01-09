@@ -102,7 +102,7 @@ let bnotes = ref "merge"
 let shift = ref 0
 let files = ref []
 let save_mem = ref false
-          
+
 let speclist =
   [
     ( "-bnotes",
@@ -180,7 +180,7 @@ let main () =
         gwo := (x, separate, bnotes, shift) :: !gwo
       else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\"")))
     (List.rev !files);
-  if not !just_comp then
+  if not !just_comp then (
     let bdir =
       if Filename.check_suffix !out_file ".gwb" then !out_file
       else !out_file ^ ".gwb"

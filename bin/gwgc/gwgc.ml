@@ -18,8 +18,8 @@ let () =
   in
   let dry_run = !dry_run in
   Secure.set_base_dir (Filename.dirname bname);
-  Lock.control (Files.lock_file bname) true ~onerror:Lock.print_try_again @@
-  fun () ->
+  Lock.control (Files.lock_file bname) true ~onerror:Lock.print_try_again
+  @@ fun () ->
   let base = Gwdb.open_base bname in
   let p, f, s = Gwdb.gc ~dry_run ~save_mem:false base in
   Printf.printf

@@ -596,5 +596,3 @@ val has_children : base -> person -> bool
 val get_bases_list : unit -> string list
 
 val is_public : config -> base -> Gwdb.person -> bool
-
-

@@ -784,7 +784,9 @@ let update_fevents_with_family gen fam =
       | Pacs -> Efam_PACS
       | Residence -> Efam_Residence
     in
-    let witnesses = Array.map (fun ip -> ip, Witness, empty_string) fam.witnesses in
+    let witnesses =
+      Array.map (fun ip -> (ip, Witness, empty_string)) fam.witnesses
+    in
     let evt =
       {
         efam_name = name;
@@ -889,18 +891,20 @@ let insert_family gen co fath_sex moth_sex witl fevtl fo deo =
   let fevents =
     List.map
       (fun (name, date, place, reason, src, notes, witl) ->
-         (* insert all event witnesses *)
-         let witnesses =
-           List.map
-             (fun (wit, sex, wk, wnote) ->
-                let (p, ip) = insert_somebody gen wit in
-                notice_sex gen p sex;
-                p.m_related <- ifath :: p.m_related;
-                let wistr = unique_string gen wnote in
-                ip, wk, wistr)
-             witl
-         in
-         {efam_name = fevent_name_unique_string gen name; efam_date = date;
+        (* insert all event witnesses *)
+        let witnesses =
+          List.map
+            (fun (wit, sex, wk, wnote) ->
+              let p, ip = insert_somebody gen wit in
+              notice_sex gen p sex;
+              p.m_related <- ifath :: p.m_related;
+              let wistr = unique_string gen wnote in
+              (ip, wk, wistr))
+            witl
+        in
+        {
+          efam_name = fevent_name_unique_string gen name;
+          efam_date = date;
           efam_place = unique_string gen place;
           efam_reason = unique_string gen reason;
           efam_note = unique_string gen notes;
@@ -1032,20 +1036,22 @@ let insert_pevents fname gen sb pevtl =
     let pevents =
       List.map
         (fun (name, date, place, reason, src, notes, witl) ->
-           let witnesses =
-             List.map
-               (fun (wit, sex, wk, wnote) ->
-                  (* insert witnesses *)
-                  let (wp, wip) = insert_somebody gen wit in
-                  notice_sex gen wp sex;
-                  (* add concerned person as witness' relation *)
-                  wp.m_related <- ip :: wp.m_related;
-                  let wistr = unique_string gen wnote in
-                  wip, wk, wistr)
-               witl
-           in
-           {epers_name = pevent_name_unique_string gen name;
-            epers_date = date; epers_place = unique_string gen place;
+          let witnesses =
+            List.map
+              (fun (wit, sex, wk, wnote) ->
+                (* insert witnesses *)
+                let wp, wip = insert_somebody gen wit in
+                notice_sex gen wp sex;
+                (* add concerned person as witness' relation *)
+                wp.m_related <- ip :: wp.m_related;
+                let wistr = unique_string gen wnote in
+                (wip, wk, wistr))
+              witl
+          in
+          {
+            epers_name = pevent_name_unique_string gen name;
+            epers_date = date;
+            epers_place = unique_string gen place;
             epers_reason = unique_string gen reason;
             epers_note = unique_string gen notes;
             epers_src = unique_string gen src;
@@ -1624,7 +1630,7 @@ let output_command_line bdir =
 (** Link .gwo files and create a database. *)
 let link ~save_mem next_family_fun bdir =
   let tmp_dir = Filename.concat "gw_tmp" bdir in
-  Files.mkdir_p tmp_dir ;
+  Files.mkdir_p tmp_dir;
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
   let tmp_per = Filename.concat tmp_dir "gwc_per" in
   let tmp_fam_index = Filename.concat tmp_dir "gwc_fam_index" in
@@ -1688,18 +1694,14 @@ let link ~save_mem next_family_fun bdir =
   Gc.compact ();
   let base = make_base bdir gen per_index_ic per_ic in
   Hashtbl.clear gen.g_patch_p;
-  if !do_check && gen.g_pcnt > 0 then begin
-    Check.check_base
-      base (set_error base gen) (set_warning base) ignore ;
-    if !pr_stats then Stats.(print_stats base @@ stat_base base) ;
-  end ;
-  if not gen.g_errored then
-    begin
-      if !do_consang then ignore @@ ConsangAll.compute base true ;
-      Gwdb.sync ~save_mem base ;
-      output_wizard_notes bdir gen.g_wiznotes;
-      Files.remove_dir tmp_dir ;
-      output_command_line bdir;
-      true
-    end
+  if !do_check && gen.g_pcnt > 0 then (
+    Check.check_base base (set_error base gen) (set_warning base) ignore;
+    if !pr_stats then Stats.(print_stats base @@ stat_base base));
+  if not gen.g_errored then (
+    if !do_consang then ignore @@ ConsangAll.compute base true;
+    Gwdb.sync ~save_mem base;
+    output_wizard_notes bdir gen.g_wiznotes;
+    Files.remove_dir tmp_dir;
+    output_command_line bdir;
+    true)
   else false

@@ -58,7 +58,7 @@ type gw_syntax =
         * string
         * (somebody * sex * witness_kind * string) list)
         list
-  (** Block that defines events of a person. Specific to gwplus format. Contains:
+      (** Block that defines events of a person. Specific to gwplus format. Contains:
       - Concerned person definition/reference
       - Sex of person
       - List of information about every personal event (name, date,

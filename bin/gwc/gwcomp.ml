@@ -985,22 +985,20 @@ let aux_loop_note tag line ic =
   let tag_len = String.length tag in
   let rec loop acc str =
     match fields str with
-    | s::tl when s = tag ->
+    | s :: tl when s = tag ->
         let note =
           if tl = [] then ""
-          else
-            String.sub str
-              (tag_len + 1)
-              (String.length str - tag_len - 1)
+          else String.sub str (tag_len + 1) (String.length str - tag_len - 1)
         in
         loop (note :: acc) (input_a_line ic)
-    | _l -> acc, str
+    | _l -> (acc, str)
   in
   let acc, line = loop [] line in
   let note =
-  String.concat "\n" (List.rev @@ "" :: acc) |>
-    Mutil.strip_all_trailing_spaces in
-  note, line
+    String.concat "\n" (List.rev @@ ("" :: acc))
+    |> Mutil.strip_all_trailing_spaces
+  in
+  (note, line)
 
 (** Parse note (succesive lines starting with "note") *)
 let loop_note = aux_loop_note "note"
@@ -1015,19 +1013,19 @@ let loop_witn line ic =
   let rec loop_witn acc str =
     match fields str with
     | ("wit" | "wit:") :: l ->
-      let (sex, l) =
-        (* TODO factorize sex parsing? *)
-        match l with
-        | "m:" :: l -> Male, l
-        | "f:" :: l -> Female, l
-        | l -> Neuter, l
-      in
-      let (wkind, l) = get_event_witness_kind l in
-      let (wit, _, l) = parse_parent str l in
-      if l <> [] then failwith str;
-      (* read witness note which starts on a new line *)
-      let wnote, str = loop_witness_note (input_a_line ic) ic in
-      loop_witn ((wit, sex, wkind, wnote) :: acc) str
+        let sex, l =
+          (* TODO factorize sex parsing? *)
+          match l with
+          | "m:" :: l -> (Male, l)
+          | "f:" :: l -> (Female, l)
+          | l -> (Neuter, l)
+        in
+        let wkind, l = get_event_witness_kind l in
+        let wit, _, l = parse_parent str l in
+        if l <> [] then failwith str;
+        (* read witness note which starts on a new line *)
+        let wnote, str = loop_witness_note (input_a_line ic) ic in
+        loop_witn ((wit, sex, wkind, wnote) :: acc) str
     | _ -> (List.rev acc, str)
   in
   loop_witn [] line
@@ -1126,8 +1124,8 @@ let read_family ic fname = function
                     (* On récupère les témoins *)
                     let witn, line = loop_witn (input_a_line ic) ic in
                     (* On récupère les notes *)
-                    let (notes, line) = loop_note line ic in
-                    let evt = name, date, place, cause, src, notes, witn in
+                    let notes, line = loop_note line ic in
+                    let evt = (name, date, place, cause, src, notes, witn) in
                     loop (evt :: fevents) line
               in
               loop [] (input_a_line ic)
@@ -1286,8 +1284,8 @@ let read_family ic fname = function
                 (* On récupère les témoins *)
                 let witn, line = loop_witn (input_a_line ic) ic in
                 (* On récupère les notes *)
-                let (notes, line) = loop_note line ic in
-                let evt = name, date, place, cause, src, notes, witn in
+                let notes, line = loop_note line ic in
+                let evt = (name, date, place, cause, src, notes, witn) in
                 loop (evt :: pevents) line
           in
           loop [] (input_a_line ic)
@@ -1310,30 +1308,32 @@ let comp_families x =
   let out_file = Filename.chop_suffix x ".gw" ^ ".gwo" in
   line_cnt := 0;
   let oc = open_out_bin out_file in
-  begin try
-    let ic = open_in x in
-    (* write header *)
-    output_string oc magic_gwo;
-    (* write source filename *)
-    output_value oc (x : string);
-    let rec loop line encoding =
-      match read_family_1 (ic, encoding) x line with
-        F_some (family, line) ->
-          output_value oc (family : gw_syntax); loop line encoding
-      | F_enc_utf_8 -> loop (read_line (ic, E_utf_8)) E_utf_8
-      | F_gw_plus ->
-          create_all_keys := true; loop (read_line (ic, encoding)) encoding
-      | F_none -> ()
-      | F_fail str ->
-          Printf.printf "File \"%s\", line %d:\n" x !line_cnt;
-          Printf.printf "Error: %s\n" str;
-          flush stdout;
-          loop (read_line (ic, encoding)) encoding
-    in
-    loop (read_line (ic, E_iso_8859_1)) E_iso_8859_1; close_in ic
-  with e ->
-    close_out oc;
-    Files.rm out_file;
-    raise e
-  end;
+  (try
+     let ic = open_in x in
+     (* write header *)
+     output_string oc magic_gwo;
+     (* write source filename *)
+     output_value oc (x : string);
+     let rec loop line encoding =
+       match read_family_1 (ic, encoding) x line with
+       | F_some (family, line) ->
+           output_value oc (family : gw_syntax);
+           loop line encoding
+       | F_enc_utf_8 -> loop (read_line (ic, E_utf_8)) E_utf_8
+       | F_gw_plus ->
+           create_all_keys := true;
+           loop (read_line (ic, encoding)) encoding
+       | F_none -> ()
+       | F_fail str ->
+           Printf.printf "File \"%s\", line %d:\n" x !line_cnt;
+           Printf.printf "Error: %s\n" str;
+           flush stdout;
+           loop (read_line (ic, encoding)) encoding
+     in
+     loop (read_line (ic, E_iso_8859_1)) E_iso_8859_1;
+     close_in ic
+   with e ->
+     close_out oc;
+     Files.rm out_file;
+     raise e);
   close_out oc
