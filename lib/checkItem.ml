@@ -509,19 +509,21 @@ let check_witness_pevents_aux warning origin evt date b d p witness_kind =
   | _ -> ()
 
 let check_witness_pevents base warning origin =
-  List.iter begin fun evt ->
-    match Date.od_of_cdate evt.epers_date with
-    | Some (Dgreg (d2, _)) ->
-       Array.iter begin fun (iw, witness_kind, _wnotes) ->
-         (* WNOTES TODO *)
-        let p = poi base iw in
-        check_witness_pevents_aux warning origin evt d2
-          (Date.od_of_cdate @@ get_birth p)
-          (Date.date_of_death @@ get_death p) p
-          witness_kind
-      end evt.epers_witnesses
-    | _ -> ()
-  end (get_pevents origin)
+  List.iter
+    (fun evt ->
+      match Date.od_of_cdate evt.epers_date with
+      | Some (Dgreg (d2, _)) ->
+          Array.iter
+            (fun (iw, witness_kind, _wnotes) ->
+              (* WNOTES TODO *)
+              let p = poi base iw in
+              check_witness_pevents_aux warning origin evt d2
+                (Date.od_of_cdate @@ get_birth p)
+                (Date.date_of_death @@ get_death p)
+                p witness_kind)
+            evt.epers_witnesses
+      | _ -> ())
+    (get_pevents origin)
 
 (** Returns wether [iper] can be found in the provided associative array and
     wether it was found associated only with the Mentionned or Other witness kind.
@@ -577,24 +579,29 @@ let check_person_dates_as_witness base warning p =
         else acc)
       [] related_p
   in
-  List.iter begin fun fam ->
-    List.iter begin fun evt ->
-      match witness_kind_of_witness_array ip evt.efam_witnesses with
-      | Some Def.Witness_Mentioned | Some Def.Witness_Other ->
-         aux
-           (fun e -> e.efam_date)
-           (fun e -> warning (FWitnessEventBeforeBirth (p, e, get_ifam fam)))
-           (fun _ -> ())
-           evt
-      | Some _ ->
-         aux
-           (fun e -> e.efam_date)
-           (fun e -> warning (FWitnessEventBeforeBirth (p, e, get_ifam fam)))
-           (fun e -> warning (FWitnessEventAfterDeath (p, e, get_ifam fam)))
-           evt
-      | None -> ()
-    end (get_fevents fam)
-  end related_fam ;
+  List.iter
+    (fun fam ->
+      List.iter
+        (fun evt ->
+          match witness_kind_of_witness_array ip evt.efam_witnesses with
+          | Some Def.Witness_Mentioned | Some Def.Witness_Other ->
+              aux
+                (fun e -> e.efam_date)
+                (fun e ->
+                  warning (FWitnessEventBeforeBirth (p, e, get_ifam fam)))
+                (fun _ -> ())
+                evt
+          | Some _ ->
+              aux
+                (fun e -> e.efam_date)
+                (fun e ->
+                  warning (FWitnessEventBeforeBirth (p, e, get_ifam fam)))
+                (fun e ->
+                  warning (FWitnessEventAfterDeath (p, e, get_ifam fam)))
+                evt
+          | None -> ())
+        (get_fevents fam))
+    related_fam;
   let related_pers =
     List.fold_left
       (fun acc ir ->
@@ -726,18 +733,20 @@ let check_witness_fevents_aux warning fam evt date b d p witness_kind =
   | _ -> ()
 
 let check_witness_fevents base warning fam =
-  List.iter begin fun evt ->
-    match Date.od_of_cdate evt.efam_date with
-    | Some (Dgreg (d2, _)) ->
-      Array.iter begin fun (iw, witness_kind, _wnote) ->
-        let p = poi base iw in
-        check_witness_fevents_aux warning fam evt d2
-          (Date.od_of_cdate @@ get_birth p)
-          (Date.date_of_death @@ get_death p) p
-          witness_kind
-      end evt.efam_witnesses
-    | _ -> ()
-  end (get_fevents fam)
+  List.iter
+    (fun evt ->
+      match Date.od_of_cdate evt.efam_date with
+      | Some (Dgreg (d2, _)) ->
+          Array.iter
+            (fun (iw, witness_kind, _wnote) ->
+              let p = poi base iw in
+              check_witness_fevents_aux warning fam evt d2
+                (Date.od_of_cdate @@ get_birth p)
+                (Date.date_of_death @@ get_death p)
+                p witness_kind)
+            evt.efam_witnesses
+      | _ -> ())
+    (get_fevents fam)
 
 let check_parent_marriage_age warning fam p =
   let rec loop = function
@@ -897,19 +906,27 @@ let check_related_person_pevents warning birth_date death_date p iper related_p
               death_date p witness_kind)
     (get_pevents related_p)
 
-let check_related_person_fevents warning base birth_date death_date p iper related_p =
-  Array.iter begin fun i ->
-    let f = foi base i in
-    List.iter begin fun e ->
-      match Date.od_of_cdate e.efam_date with
-      | Some (Dgreg (date, _)) ->
-         let is_witness, only_mentioned = witness_occur iper e.efam_witnesses in
-         if is_witness then
-           let witness_kind = if only_mentioned then Def.Witness_Mentioned else Def.Witness in
-           check_witness_fevents_aux warning f e date birth_date death_date p witness_kind
-      | _ -> ()
-      end (get_fevents f)
-    end (get_family related_p)
+let check_related_person_fevents warning base birth_date death_date p iper
+    related_p =
+  Array.iter
+    (fun i ->
+      let f = foi base i in
+      List.iter
+        (fun e ->
+          match Date.od_of_cdate e.efam_date with
+          | Some (Dgreg (date, _)) ->
+              let is_witness, only_mentioned =
+                witness_occur iper e.efam_witnesses
+              in
+              if is_witness then
+                let witness_kind =
+                  if only_mentioned then Def.Witness_Mentioned else Def.Witness
+                in
+                check_witness_fevents_aux warning f e date birth_date death_date
+                  p witness_kind
+          | _ -> ())
+        (get_fevents f))
+    (get_family related_p)
 
 let check_related_on_person_update warning base birth_date death_date p iper
     irel =

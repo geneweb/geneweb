@@ -182,10 +182,12 @@ let rec reconstitute_events conf ext cnt =
                    ("e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i))
             with Failure _ -> None
           with
-          | None -> [], ext
-          | Some c ->
-              let (witnesses, ext) = loop (i + 1) ext in
-              let var_c = "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_kind" in
+          | None -> ([], ext)
+          | Some c -> (
+              let witnesses, ext = loop (i + 1) ext in
+              let var_c =
+                "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_kind"
+              in
               let wkind =
                 match p_getenv conf.env var_c with
                 | Some "godp" -> Witness_GodParent
@@ -195,18 +197,20 @@ let rec reconstitute_events conf ext cnt =
                 | Some "atte" -> Witness_Attending
                 | Some "ment" -> Witness_Mentioned
                 | Some "othe" -> Witness_Other
-                | Some _ | None ->  Witness
+                | Some _ | None -> Witness
               in
               let wnote =
                 let var_note =
                   "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_note"
                 in
                 match p_getenv conf.env var_note with
-                | Some wnote -> print_endline ("NOTE:" ^ wnote); wnote
+                | Some wnote ->
+                    print_endline ("NOTE:" ^ wnote);
+                    wnote
                 | _ -> ""
               in
-              let c = c, wkind, wnote in
-              begin match
+              let c = (c, wkind, wnote) in
+              match
                 p_getenv conf.env
                   ("e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i)
               with
@@ -221,8 +225,9 @@ let rec reconstitute_events conf ext cnt =
                         if n = 0 then (c :: witnesses, true)
                         else
                           let new_witn =
-                            ("", "", 0, Update.Create (Neuter, None), ""),
-                            Witness, ""
+                            ( ("", "", 0, Update.Create (Neuter, None), ""),
+                              Witness,
+                              "" )
                           in
                           let witnesses = new_witn :: witnesses in
                           loop_witn (n - 1) witnesses
@@ -230,11 +235,12 @@ let rec reconstitute_events conf ext cnt =
                       loop_witn n witnesses
                   | Some _ | None ->
                       let new_witn =
-                        ("", "", 0, Update.Create (Neuter, None), ""), Witness, ""
+                        ( ("", "", 0, Update.Create (Neuter, None), ""),
+                          Witness,
+                          "" )
                       in
                       (c :: new_witn :: witnesses, true))
-              | Some _ | None -> (c :: witnesses, ext)
-            end
+              | Some _ | None -> (c :: witnesses, ext))
         in
         loop 1 ext
       in
@@ -249,7 +255,9 @@ let rec reconstitute_events conf ext cnt =
                   if n = 0 then (witnesses, true)
                   else
                     let new_witn =
-                      ("", "", 0, Update.Create (Neuter, None), ""), Witness, ""
+                      ( ("", "", 0, Update.Create (Neuter, None), ""),
+                        Witness,
+                        "" )
                     in
                     let witnesses = new_witn :: witnesses in
                     loop_witn (n - 1) witnesses
@@ -257,7 +265,7 @@ let rec reconstitute_events conf ext cnt =
                 loop_witn n witnesses
             | Some _ | None ->
                 let new_witn =
-                  ("", "", 0, Update.Create (Neuter, None), ""), Witness, ""
+                  (("", "", 0, Update.Create (Neuter, None), ""), Witness, "")
                 in
                 (new_witn :: witnesses, true))
         | Some _ | None -> (witnesses, ext)
@@ -290,14 +298,17 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
       fevents
   in
 
-  let found_marriage : (
-    Def.relation_kind
-    * Def.cdate
-    * 'string
-    * 'string
-    * 'string
-    * ('person * Def.witness_kind * 'string) array
-  ) option ref = ref None in
+  let found_marriage :
+      (Def.relation_kind
+      * Def.cdate
+      * 'string
+      * 'string
+      * 'string
+      * ('person * Def.witness_kind * 'string) array)
+      option
+      ref =
+    ref None
+  in
 
   let found_divorce : Def.divorce option ref = ref None in
   let mk_marr evt kind =
@@ -522,10 +533,11 @@ let reconstitute_family conf base nsck =
 
 let strip_events fevents =
   let strip_array_witness pl =
-    Array.of_list @@
-    Array.fold_right
-      (fun ((f, _, _, _, _), _, _ as p) pl -> if f = "" then pl else p :: pl)
-      pl []
+    Array.of_list
+    @@ Array.fold_right
+         (fun (((f, _, _, _, _), _, _) as p) pl ->
+           if f = "" then pl else p :: pl)
+         pl []
   in
   List.fold_right
     (fun e accu ->
@@ -574,7 +586,9 @@ let check_family conf fam cpl :
     Update.update_error option * Update.update_error option =
   let err_parents = check_parents conf cpl in
   let err_fevent_witness =
-    Update.check_missing_witnesses_names conf (fun e -> e.efam_witnesses) fam.fevents
+    Update.check_missing_witnesses_names conf
+      (fun e -> e.efam_witnesses)
+      fam.fevents
   in
   (err_fevent_witness, err_parents)
 
@@ -684,7 +698,7 @@ let infer_origin_file conf base ifam ncpl ndes =
 let fwitnesses_of fevents =
   List.fold_left
     (fun ipl e ->
-       Array.fold_left (fun ipl (ip, _, _) -> ip :: ipl) ipl e.efam_witnesses)
+      Array.fold_left (fun ipl (ip, _, _) -> ip :: ipl) ipl e.efam_witnesses)
     [] fevents
 
 (* Lorsqu'on ajout naissance décès par exemple en créant une personne. *)
@@ -795,10 +809,16 @@ let update_family_with_fevents conf base fam =
   let relation, marriage, marriage_place, marriage_note, marriage_src = marr in
   let divorce = div in
   let witnesses = Array.map (fun (ip, _, _) -> ip) witnesses in
-  {fam with marriage = marriage; marriage_place = marriage_place;
-            marriage_note = marriage_note; marriage_src = marriage_src;
-            relation = relation; divorce = divorce;
-            witnesses = witnesses}
+  {
+    fam with
+    marriage;
+    marriage_place;
+    marriage_note;
+    marriage_src;
+    relation;
+    divorce;
+    witnesses;
+  }
 
 let aux_effective_mod conf base nsck sfam scpl sdes fi origin_file =
   let created_p = ref [] in
