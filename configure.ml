@@ -28,8 +28,13 @@ let set_sosa_num () =
   assert (!sosa = `None);
   sosa := `Num
 
-let set_gwdb_legacy () = assert (!gwdb = `None) ; gwdb := `Legacy
-let set_gwdb_versioned () = assert (!gwdb = `None) ; gwdb := `Versioned
+let set_gwdb_legacy () =
+  assert (!gwdb = `None);
+  gwdb := `Legacy
+
+let set_gwdb_versioned () =
+  assert (!gwdb = `None);
+  gwdb := `Versioned
 
 let release = ref false
 
@@ -88,11 +93,9 @@ let () =
   in
   let gwdb_d, gwdb_pkg =
     match !gwdb with
-    | `None
-    | `Versioned ->
-       " -D GENEWEB_GWDB_VERSIONED", "geneweb.gwdb-versioned"
-    | `Legacy ->
-      (" -D GENEWEB_GWDB_LEGACY", "geneweb.gwdb-legacy") ;
+    | `None | `Versioned ->
+        (" -D GENEWEB_GWDB_VERSIONED", "geneweb.gwdb-versioned")
+    | `Legacy -> (" -D GENEWEB_GWDB_LEGACY", "geneweb.gwdb-legacy")
   in
   let dune_profile = if !release then "release" else "dev" in
   let os_type, os_d, ext, rm, strip =

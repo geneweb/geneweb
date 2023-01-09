@@ -167,14 +167,15 @@ type 'string gen_pers_event_name =
   | Epers_Will
   | Epers_Name of 'string
 
-type ('person, 'string) gen_pers_event =
-  { epers_name : 'string gen_pers_event_name;
-    epers_date : cdate;
-    epers_place : 'string;
-    epers_reason : 'string;
-    epers_note : 'string;
-    epers_src : 'string;
-    epers_witnesses : ('person * witness_kind * 'string) array }
+type ('person, 'string) gen_pers_event = {
+  epers_name : 'string gen_pers_event_name;
+  epers_date : cdate;
+  epers_place : 'string;
+  epers_reason : 'string;
+  epers_note : 'string;
+  epers_src : 'string;
+  epers_witnesses : ('person * witness_kind * 'string) array;
+}
 (** Personal event information *)
 
 (** Event name pertaining a family. *)
@@ -193,14 +194,15 @@ type 'string gen_fam_event_name =
   | Efam_Residence
   | Efam_Name of 'string
 
-type ('person, 'string) gen_fam_event =
-  { efam_name : 'string gen_fam_event_name;
-    efam_date : cdate;
-    efam_place : 'string;
-    efam_reason : 'string;
-    efam_note : 'string;
-    efam_src : 'string;
-    efam_witnesses : ('person * witness_kind * 'string) array }
+type ('person, 'string) gen_fam_event = {
+  efam_name : 'string gen_fam_event_name;
+  efam_date : cdate;
+  efam_place : 'string;
+  efam_reason : 'string;
+  efam_note : 'string;
+  efam_src : 'string;
+  efam_witnesses : ('person * witness_kind * 'string) array;
+}
 (** Event information pertaining a family. *)
 
 (** Relation type with parent (if not native) *)

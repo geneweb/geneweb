@@ -135,14 +135,16 @@ type 'string gen_pers_event_name = 'string Def.gen_pers_event_name =
   | Epers_Will
   | Epers_Name of 'string
 
-type ('person, 'string) gen_pers_event = (*('person, 'string) Def.gen_pers_event =*)
-  { epers_name : 'string gen_pers_event_name;
-    epers_date : cdate;
-    epers_place : 'string;
-    epers_reason : 'string;
-    epers_note : 'string;
-    epers_src : 'string;
-    epers_witnesses : ('person * witness_kind) array }
+type ('person, 'string) gen_pers_event = {
+  (*('person, 'string) Def.gen_pers_event =*)
+  epers_name : 'string gen_pers_event_name;
+  epers_date : cdate;
+  epers_place : 'string;
+  epers_reason : 'string;
+  epers_note : 'string;
+  epers_src : 'string;
+  epers_witnesses : ('person * witness_kind) array;
+}
 
 type 'string gen_fam_event_name = 'string Def.gen_fam_event_name =
   | Efam_Marriage
@@ -159,14 +161,16 @@ type 'string gen_fam_event_name = 'string Def.gen_fam_event_name =
   | Efam_Residence
   | Efam_Name of 'string
 
-type ('person, 'string) gen_fam_event = (*('person, 'string) Def.gen_fam_event =*)
-  { efam_name : 'string gen_fam_event_name;
-    efam_date : cdate;
-    efam_place : 'string;
-    efam_reason : 'string;
-    efam_note : 'string;
-    efam_src : 'string;
-    efam_witnesses : ('person * witness_kind) array }
+type ('person, 'string) gen_fam_event = {
+  (*('person, 'string) Def.gen_fam_event =*)
+  efam_name : 'string gen_fam_event_name;
+  efam_date : cdate;
+  efam_place : 'string;
+  efam_reason : 'string;
+  efam_note : 'string;
+  efam_src : 'string;
+  efam_witnesses : ('person * witness_kind) array;
+}
 
 type relation_type = Def.relation_type =
   | Adoption
@@ -197,42 +201,44 @@ type place = Def.place = {
 
 (* person *)
 
-type ('iper, 'person, 'string) gen_person (*= ('iper, 'person, 'string) Def.gen_person*) =
-  { first_name : 'string;
-    surname : 'string;
-    occ : int;
-    image : 'string;
-    public_name : 'string;
-    qualifiers : 'string list;
-    aliases : 'string list;
-    first_names_aliases : 'string list;
-    surnames_aliases : 'string list;
-    titles : 'string gen_title list;
-    rparents : ('person, 'string) gen_relation list;
-    related : 'person list;
-    occupation : 'string;
-    sex : sex;
-    access : access;
-    birth : cdate;
-    birth_place : 'string;
-    birth_note : 'string;
-    birth_src : 'string;
-    baptism : cdate;
-    baptism_place : 'string;
-    baptism_note : 'string;
-    baptism_src : 'string;
-    death : death;
-    death_place : 'string;
-    death_note : 'string;
-    death_src : 'string;
-    burial : burial;
-    burial_place : 'string;
-    burial_note : 'string;
-    burial_src : 'string;
-    pevents : ('person, 'string) gen_pers_event list;
-    notes : 'string;
-    psources : 'string;
-    key_index : 'iper }
+type ('iper, 'person, 'string) gen_person = {
+  first_name : 'string;
+  surname : 'string;
+  occ : int;
+  image : 'string;
+  public_name : 'string;
+  qualifiers : 'string list;
+  aliases : 'string list;
+  first_names_aliases : 'string list;
+  surnames_aliases : 'string list;
+  titles : 'string gen_title list;
+  rparents : ('person, 'string) gen_relation list;
+  related : 'person list;
+  occupation : 'string;
+  sex : sex;
+  access : access;
+  birth : cdate;
+  birth_place : 'string;
+  birth_note : 'string;
+  birth_src : 'string;
+  baptism : cdate;
+  baptism_place : 'string;
+  baptism_note : 'string;
+  baptism_src : 'string;
+  death : death;
+  death_place : 'string;
+  death_note : 'string;
+  death_src : 'string;
+  burial : burial;
+  burial_place : 'string;
+  burial_note : 'string;
+  burial_src : 'string;
+  pevents : ('person, 'string) gen_pers_event list;
+  notes : 'string;
+  psources : 'string;
+  key_index : 'iper;
+}
+(*= ('iper, 'person, 'string) Def.gen_person*)
 
 type 'family gen_ascend = 'family Def.gen_ascend = {
   parents : 'family option;
@@ -243,19 +249,21 @@ type 'family gen_union = 'family Def.gen_union = { family : 'family array }
 
 (* family *)
 
-type ('person, 'ifam, 'string) gen_family = (*('person, 'ifam, 'string) Def.gen_family =*)
-  { marriage : cdate;
-    marriage_place : 'string;
-    marriage_note : 'string;
-    marriage_src : 'string;
-    witnesses : 'person array;
-    relation : relation_kind;
-    divorce : divorce;
-    fevents : ('person, 'string) gen_fam_event list;
-    comment : 'string;
-    origin_file : 'string;
-    fsources : 'string;
-    fam_index : 'ifam }
+type ('person, 'ifam, 'string) gen_family = {
+  (*('person, 'ifam, 'string) Def.gen_family =*)
+  marriage : cdate;
+  marriage_place : 'string;
+  marriage_note : 'string;
+  marriage_src : 'string;
+  witnesses : 'person array;
+  relation : relation_kind;
+  divorce : divorce;
+  fevents : ('person, 'string) gen_fam_event list;
+  comment : 'string;
+  origin_file : 'string;
+  fsources : 'string;
+  fam_index : 'ifam;
+}
 
 type 'person gen_couple = 'person Def.gen_couple (* FIXME: expose its type *)
 

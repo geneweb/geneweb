@@ -1,5 +1,3 @@
-
-
 (* TODO modify according to changes to def *)
 (*
 external legacy_to_def_person :
@@ -21,7 +19,7 @@ let rec legacy_to_def_person value p =
     (* relations with not native parents *)
     rparents = p.rparents;
     (* related persons like (father of witnessed family,
-      concerned person of witnessed event, adopted child, etc.) *)
+       concerned person of witnessed event, adopted child, etc.) *)
     related = p.related;
     occupation = p.occupation;
     sex = p.sex;
@@ -45,19 +43,20 @@ let rec legacy_to_def_person value p =
     pevents = List.map (legacy_to_def_pevent value) p.pevents;
     notes = p.notes;
     psources = p.psources;
-    key_index = p.key_index
+    key_index = p.key_index;
   }
-  
+
 and legacy_to_def_pevent value e =
-  { Def.epers_name = e.Gwdb_legacy.Dbdisk.epers_name;
+  {
+    Def.epers_name = e.Gwdb_legacy.Dbdisk.epers_name;
     epers_date = e.epers_date;
     epers_place = e.epers_place;
     epers_reason = e.epers_reason;
     epers_note = e.epers_note;
     epers_src = e.epers_src;
-    epers_witnesses = Array.map (fun (ip, wk) -> ip, wk, value) e.epers_witnesses
+    epers_witnesses =
+      Array.map (fun (ip, wk) -> (ip, wk, value)) e.epers_witnesses;
   }
-
 
 and as_legacy_person p =
   {
@@ -74,7 +73,7 @@ and as_legacy_person p =
     (* relations with not native parents *)
     rparents = p.rparents;
     (* related persons like (father of witnessed family,
-      concerned person of witnessed event, adopted child, etc.) *)
+       concerned person of witnessed event, adopted child, etc.) *)
     related = p.related;
     occupation = p.occupation;
     sex = p.sex;
@@ -98,30 +97,34 @@ and as_legacy_person p =
     pevents = List.map as_legacy_pevent p.pevents;
     notes = p.notes;
     psources = p.psources;
-    key_index = p.key_index
+    key_index = p.key_index;
   }
 
-and as_legacy_pevent e = 
-  { Gwdb_legacy.Dbdisk.epers_name = e.Def.epers_name;
+and as_legacy_pevent e =
+  {
+    Gwdb_legacy.Dbdisk.epers_name = e.Def.epers_name;
     epers_date = e.epers_date;
     epers_place = e.epers_place;
     epers_reason = e.epers_reason;
     epers_note = e.epers_note;
     epers_src = e.epers_src;
-    epers_witnesses = Array.map (fun (ip, wk, _) -> ip, wk) e.epers_witnesses
+    epers_witnesses = Array.map (fun (ip, wk, _) -> (ip, wk)) e.epers_witnesses;
   }
 
-let legacy_to_def_fevent value fe = {
+let legacy_to_def_fevent value fe =
+  {
     Def.efam_name = fe.Gwdb_legacy.Dbdisk.efam_name;
     efam_date = fe.efam_date;
     efam_place = fe.efam_place;
     efam_reason = fe.efam_reason;
     efam_note = fe.efam_note;
     efam_src = fe.efam_src;
-    efam_witnesses = Array.map (fun (ip, wk) -> ip, wk, value) fe.efam_witnesses
+    efam_witnesses =
+      Array.map (fun (ip, wk) -> (ip, wk, value)) fe.efam_witnesses;
   }
 
-let legacy_to_def_family value f = {
+let legacy_to_def_family value f =
+  {
     Def.marriage = f.Gwdb_legacy.Dbdisk.marriage;
     marriage_place = f.marriage_place;
     marriage_note = f.marriage_note;
@@ -133,21 +136,23 @@ let legacy_to_def_family value f = {
     comment = f.comment;
     origin_file = f.origin_file;
     fsources = f.fsources;
-    fam_index = f.fam_index
+    fam_index = f.fam_index;
   }
-  
 
-let as_legacy_fevent fe = {
+let as_legacy_fevent fe =
+  {
     Gwdb_legacy.Dbdisk.efam_name = fe.Def.efam_name;
     efam_date = fe.efam_date;
     efam_place = fe.efam_place;
     efam_reason = fe.efam_reason;
     efam_note = fe.efam_note;
     efam_src = fe.efam_src;
-    efam_witnesses = Array.map (fun (ip, wk, _wnote) -> ip, wk) fe.efam_witnesses
+    efam_witnesses =
+      Array.map (fun (ip, wk, _wnote) -> (ip, wk)) fe.efam_witnesses;
   }
 
-let as_legacy_family f = {
+let as_legacy_family f =
+  {
     Gwdb_legacy.Dbdisk.marriage = f.Def.marriage;
     marriage_place = f.marriage_place;
     marriage_note = f.marriage_note;
@@ -159,5 +164,5 @@ let as_legacy_family f = {
     comment = f.comment;
     origin_file = f.origin_file;
     fsources = f.fsources;
-    fam_index = f.fam_index
+    fam_index = f.fam_index;
   }

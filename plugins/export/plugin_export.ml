@@ -116,9 +116,9 @@ let export conf base =
       in
       let notes, base_notes =
         match getenv_opt "notes" conf.env with
-        | Some "nn" -> true, false
-        | Some "nnn" -> false, false
-        | Some _ | None -> true, true
+        | Some "nn" -> (true, false)
+        | Some "nnn" -> (false, false)
+        | Some _ | None -> (true, true)
       in
       let source = getenv_opt "source" conf.env in
       let isolated = getenv_opt "isolated" conf.env <> Some "off" in

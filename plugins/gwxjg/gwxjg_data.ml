@@ -443,17 +443,21 @@ and mk_event conf base d =
     match E.witnesses d with
     | [||] -> Tarray [||]
     | w ->
-      let lw = lazy (Array.map (fun (i, _, _) -> get_n_mk_person conf base i) w) in
-      (* We may want to filter on [ip] or [k] before really accessing the person entity *)
-      Tarray begin Array.mapi begin fun i (ip, k, _wnotes) ->
-          let kind = mk_witness_kind k in
-          let iper = Tstr (Gwdb.string_of_iper ip) in
-          Tpat begin function
-            | "kind" -> kind
-            | "iper" -> iper
-            | s -> unbox_pat (Lazy.force lw).(i) @@ s
-          end
-        end w end
+        let lw =
+          lazy (Array.map (fun (i, _, _) -> get_n_mk_person conf base i) w)
+        in
+        (* We may want to filter on [ip] or [k] before really accessing the person entity *)
+        Tarray
+          (Array.mapi
+             (fun i (ip, k, _wnotes) ->
+               let kind = mk_witness_kind k in
+               let iper = Tstr (Gwdb.string_of_iper ip) in
+               Tpat
+                 (function
+                 | "kind" -> kind
+                 | "iper" -> iper
+                 | s -> unbox_pat (Lazy.force lw).(i) @@ s))
+             w)
   in
   let place_raw, place = mk_place conf (E.place base d) in
   let source_raw, source = mk_source_rs conf base (E.src base d) in
@@ -780,13 +784,13 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
 
 and mk_fevent ?spouse conf base e =
   mk_event conf base
-    ( Fevent e.Def.efam_name
-    , e.efam_date
-    , e.efam_place
-    , e.efam_note
-    , e.efam_src
-    , e.efam_witnesses
-    , spouse)
+    ( Fevent e.Def.efam_name,
+      e.efam_date,
+      e.efam_place,
+      e.efam_note,
+      e.efam_src,
+      e.efam_witnesses,
+      spouse )
 
 and mk_pevent conf base e =
   mk_event conf base

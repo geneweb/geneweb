@@ -190,10 +190,10 @@ let rec display_note_aux opts tagn s len i =
       display_note_aux opts tagn s (len + 1) (!j + 1)
 
 let display_note opts tagn s =
-  if opts.Gwexport.notes && s <> "" then
+  if opts.Gwexport.notes && s <> "" then (
     let tag = Printf.sprintf "%d NOTE " tagn in
     Printf.ksprintf (oc opts) "%s" tag;
-    display_note_aux opts tagn (encode opts s) (String.length tag) 0
+    display_note_aux opts tagn (encode opts s) (String.length tag) 0)
 
 let ged_header opts base ifile ofile =
   Printf.ksprintf (oc opts) "0 HEAD\n";
@@ -226,8 +226,7 @@ let ged_header opts base ifile ofile =
   | Gwexport.Ansi -> Printf.ksprintf (oc opts) "1 CHAR ANSI\n"
   | Gwexport.Ascii -> Printf.ksprintf (oc opts) "1 CHAR ASCII\n"
   | Gwexport.Utf8 -> Printf.ksprintf (oc opts) "1 CHAR UTF-8\n");
-  if opts.Gwexport.base_notes then
-    display_note opts 1 (base_notes_read base "")
+  if opts.Gwexport.base_notes then display_note opts 1 (base_notes_read base "")
 
 let sub_string_index s t =
   let rec loop i j =
@@ -432,12 +431,12 @@ let relation_format_of_witness_kind :
 let oc' opts s = Printf.ksprintf (oc opts) (s ^^ "\n")
 let oc_witness_kind opts wk = oc' opts (relation_format_of_witness_kind wk)
 
-let witness_format opts base per_sel (ip,wk,wnote) =
- if per_sel ip then
-     Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
-     Printf.ksprintf (oc opts) "3 TYPE INDI\n";
-     oc_witness_kind opts wk;
-     display_note opts 3 (sou base wnote)
+let witness_format opts base per_sel (ip, wk, wnote) =
+  if per_sel ip then
+    Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
+  Printf.ksprintf (oc opts) "3 TYPE INDI\n";
+  oc_witness_kind opts wk;
+  display_note opts 3 (sou base wnote)
 
 let ged_pevent opts base per_sel evt =
   let typ =
@@ -585,8 +584,7 @@ let ged_multimedia_link opts base per =
         Printf.ksprintf (oc opts) "1 OBJE\n";
         Printf.ksprintf (oc opts) "2 FILE %s\n" s)
 
-let ged_note opts base per =
-  display_note opts 1 (sou base (get_notes per))
+let ged_note opts base per = display_note opts 1 (sou base (get_notes per))
 
 let ged_tag_fevent base evt =
   match evt.efam_name with
@@ -641,8 +639,7 @@ let ged_fsource opts base fam =
       | "" -> ()
       | s -> print_sour opts 1 (encode opts s))
 
-let ged_comment opts base fam =
-  display_note opts 1 (sou base (get_comment fam))
+let ged_comment opts base fam = display_note opts 1 (sou base (get_comment fam))
 
 let has_personal_infos base per =
   get_parents per <> None
