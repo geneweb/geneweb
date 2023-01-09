@@ -350,7 +350,7 @@ let print_err_unknown conf (f, s, o) =
 let delete_topological_sort_v conf _base =
   let bfile = Util.bpath (conf.bname ^ ".gwb") in
   let tstab_file = Filename.concat bfile "tstab_visitor" in
-  Files.rm tstab_file ;
+  Files.rm tstab_file;
   let tstab_file = Filename.concat bfile "restrict" in
   Files.rm tstab_file
 
@@ -1006,8 +1006,8 @@ let check_missing_witnesses_names conf get list =
     let len = Array.length witnesses in
     let rec loop i =
       if i = len then None
-      else (
-        let ((fn, sn, _, _, _), _, _) = Array.get witnesses i in
+      else
+        let (fn, sn, _, _, _), _, _ = Array.get witnesses i in
         if fn = "" && sn = "" then loop (i + 1)
         else if fn = "" || fn = "?" then
           Some
@@ -1018,7 +1018,7 @@ let check_missing_witnesses_names conf get list =
             (UERR_missing_surname
                (transl_nth conf "witness/witnesses" 0 |> Adef.safe))
         else loop (i + 1)
-      ) in
+    in
     loop 0
   in
   let rec loop = function

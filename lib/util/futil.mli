@@ -63,8 +63,8 @@ val map_union_f : ('a -> 'b) -> 'a gen_union -> 'b gen_union
 (** Convert generic type used to represent one of the famillies inside [Def.gen_union] into
     another one. *)
 
-(** Convert generic type used to represent a divorce into another one. *)
 val map_divorce : (Def.date -> Def.date) -> Def.divorce -> Def.divorce
+(** Convert generic type used to represent a divorce into another one. *)
 
 val map_family_ps :
   ?fd:(Def.date -> Def.date) ->
@@ -128,5 +128,4 @@ val gen_person_misc_names :
 
 val map_cdate : (Def.date -> Def.date) -> Adef.cdate -> Adef.cdate
 val map_death : (Def.date -> Def.date) -> Def.death -> Def.death
-val map_burial :(Def.date -> Def.date) -> Def.burial -> Def.burial
-
+val map_burial : (Def.date -> Def.date) -> Def.burial -> Def.burial
