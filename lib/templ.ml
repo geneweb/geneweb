@@ -538,6 +538,7 @@ let templ_eval_var conf = function
       | _ -> VVbool false)
   | [ "cancel_links" ] -> VVbool (Util.p_getenv conf.env "cgl" = Some "on")
   | [ "cgi" ] -> VVbool conf.cgi
+  | [ "debug" ] -> VVbool conf.debug
   | [ "false" ] -> VVbool false
   | [ "has_referer" ] ->
       (* deprecated since version 5.00 *)
@@ -899,11 +900,8 @@ let include_hed_trl conf name =
   if conf.debug && name = "trl" then
     begin
       let query_time = (Unix.gettimeofday ()) -. conf.query_start in
-      Output.print_sstring conf "<div class=\"col-1\"><div class=\"fixed-top order-last\">" ;
-      Output.print_sstring conf "<span>" ;
-      Output.print_sstring conf (Printf.sprintf "Query treated in %.3f seconds " query_time) ;
-      Output.print_sstring conf "</span>" ;
-      Output.print_sstring conf "</div></div>" ;
+      Output.print_sstring conf
+        (Printf.sprintf "Query treated in <span id=\"q_time_c\">%.3f</span> seconds " query_time) ;
       Output.flush conf ;
     end ;
   Util.include_template conf [] name (fun () -> ())
