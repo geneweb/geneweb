@@ -1,7 +1,7 @@
 val save_mem : bool ref
 (** Flag that enables memory saving by calling gc sometimes *)
 
-val output : ?save_mem : bool -> Dbdisk.dsk_base -> unit
+val output : ?save_mem:bool -> Dbdisk.dsk_base -> unit
 (** [output base] uses data section of the [base] to store database on the disk in the files:
 
     - {i base} main file that stores all the arrays of the database

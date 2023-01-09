@@ -108,18 +108,20 @@ module Make (D : ConverterDriver) = struct
 
   let conv_event_witness (i, kind, note) =
     obj
-      [| "person", handler_of_iper i
-       ; "kind", conv_event_witness_kind kind
-       ; "note", str note
+      [|
+        ("person", handler_of_iper i);
+        ("kind", conv_event_witness_kind kind);
+        ("note", str note);
       |]
 
   let conv_fevent_witness (i, kind, note) =
     obj
-      [| "person", handler_of_iper i
-       ; "kind", conv_event_witness_kind kind
-       ; "note", str note
+      [|
+        ("person", handler_of_iper i);
+        ("kind", conv_event_witness_kind kind);
+        ("note", str note);
       |]
-    
+
   let conv_pevent pevent =
     obj
       [|
@@ -159,13 +161,15 @@ module Make (D : ConverterDriver) = struct
 
   let conv_fevent fevent =
     obj
-      [| "date", conv_cdate fevent.efam_date
-       ; "name", conv_fevent_name fevent.efam_name
-       ; "note", str fevent.efam_note
-       ; "place", str fevent.efam_place
-       ; "reason", str fevent.efam_reason
-       ; "src", str fevent.efam_src
-       ; "witnesses", array @@ Array.map conv_fevent_witness fevent.efam_witnesses
+      [|
+        ("date", conv_cdate fevent.efam_date);
+        ("name", conv_fevent_name fevent.efam_name);
+        ("note", str fevent.efam_note);
+        ("place", str fevent.efam_place);
+        ("reason", str fevent.efam_reason);
+        ("src", str fevent.efam_src);
+        ( "witnesses",
+          array @@ Array.map conv_fevent_witness fevent.efam_witnesses );
       |]
 
   let conv_divorce = function
