@@ -132,23 +132,25 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   if !marriage_divorce then fix_marriage_divorce ~v1 ~v2 base nb_fam fix;
   if !invalid_utf8 then fix_utf8_sequence ~v1 ~v2 base nb_fam fix;
   if !key then fix_key ~v1 ~v2 base nb_ind fix;
-  if fast then begin clear_strings_array base ; clear_persons_array base end ;
-  if not !dry_run then begin
-    if !fix <> 0 then begin
-      Gwdb.commit_patches base ;
-      if v1 then begin
-        Printf.printf "%n changes commited\n" !fix ;
-        flush stdout
-      end
-    end
-    else if v1 then begin
-      Printf.printf "No change\n" ;
-      flush stdout
-    end ;
-    if v1 then (Printf.printf "Rebuilding the indexes..\n" ; flush stdout) ;
-    Gwdb.sync ~save_mem:false base ;
-    if v1 then (Printf.printf "Done" ; flush stdout)
-  end
+  if fast then (
+    clear_strings_array base;
+    clear_persons_array base);
+  if not !dry_run then (
+    if !fix <> 0 then (
+      Gwdb.commit_patches base;
+      if v1 then (
+        Printf.printf "%n changes commited\n" !fix;
+        flush stdout))
+    else if v1 then (
+      Printf.printf "No change\n";
+      flush stdout);
+    if v1 then (
+      Printf.printf "Rebuilding the indexes..\n";
+      flush stdout);
+    Gwdb.sync ~save_mem:false base;
+    if v1 then (
+      Printf.printf "Done";
+      flush stdout))
 
 (**/**)
 
@@ -195,20 +197,15 @@ let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
 let main () =
   Arg.parse speclist anonfun usage;
   Secure.set_base_dir (Filename.dirname !bname);
-  if !bname = "" then begin Arg.usage speclist usage; exit 2 end;
-  Lock.control (Files.lock_file !bname) false ~onerror:Lock.print_try_again @@
-  fun () ->
-  if !f_parents
-  || !f_children
-  || !p_parents
-  || !p_families
-  || !pevents_witnesses
-  || !fevents_witnesses
-  || !marriage_divorce
-  || !p_NBDS
-  || !invalid_utf8
-  || !key
-  || !index
+  if !bname = "" then (
+    Arg.usage speclist usage;
+    exit 2);
+  Lock.control (Files.lock_file !bname) false ~onerror:Lock.print_try_again
+  @@ fun () ->
+  if
+    !f_parents || !f_children || !p_parents || !p_families || !pevents_witnesses
+    || !fevents_witnesses || !marriage_divorce || !p_NBDS || !invalid_utf8
+    || !key || !index
   then ()
   else (
     f_parents := true;

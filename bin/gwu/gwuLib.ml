@@ -522,54 +522,50 @@ let string_of_witness_kind :
   | Witness_Informant -> Some "#info"
   | Witness_Attending -> Some "#atte"
   | Witness_Mentioned -> Some "#ment"
-  | Witness_Other     -> Some "#othe"
+  | Witness_Other -> Some "#othe"
 
 let print_witnesses opts base gen ~use_per_sel witnesses =
   let print_witness p =
-    Printf.ksprintf (oc opts) "%s %s%s" (correct_string base (get_surname p))
+    Printf.ksprintf (oc opts) "%s %s%s"
+      (correct_string base (get_surname p))
       (correct_string base (get_first_name p))
-      (if get_new_occ p = 0 then ""
-       else "." ^ string_of_int (get_new_occ p));
-    if Array.length (get_family p) = 0
-    && get_parents p = None
-    && not (Gwdb.Marker.get gen.mark (get_iper p))
-    then begin
+      (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
+    if
+      Array.length (get_family p) = 0
+      && get_parents p = None
+      && not (Gwdb.Marker.get gen.mark (get_iper p))
+    then (
       Gwdb.Marker.set gen.mark (get_iper p) true;
       if has_infos opts base p then print_infos opts base false "" "" p
       else Printf.ksprintf (oc opts) " 0";
-      begin match sou base (get_notes p) with
-        | "" ->
-          if put_events_in_notes base p then gen.notes_pl_p <- p :: gen.notes_pl_p
-        | _ -> gen.notes_pl_p <- p :: gen.notes_pl_p
-      end;
-      if get_pevents p <> [] then gen.pevents_pl_p <- p :: gen.pevents_pl_p
-    end;
+      (match sou base (get_notes p) with
+      | "" ->
+          if put_events_in_notes base p then
+            gen.notes_pl_p <- p :: gen.notes_pl_p
+      | _ -> gen.notes_pl_p <- p :: gen.notes_pl_p);
+      if get_pevents p <> [] then gen.pevents_pl_p <- p :: gen.pevents_pl_p)
   in
   Array.iter
     (fun (ip, wk, wnote) ->
-      if not use_per_sel || gen.per_sel ip then
-       let p = poi base ip in
-       Printf.ksprintf (oc opts) "wit";
-       begin match get_sex p with
-           Male -> Printf.ksprintf (oc opts) " m"
-         | Female -> Printf.ksprintf (oc opts) " f"
-         | _ -> ()
-       end;
-       Printf.ksprintf (oc opts) ": ";
-       let sk = string_of_witness_kind wk in
-       begin match sk with
-       | Some s -> Printf.ksprintf (oc opts) (s ^^ " ")
-       | None -> ()
-       end;
-       print_witness p;
-       Printf.ksprintf (oc opts) "\n";
-       (* print witness note *)
-       if opts.notes && not (is_empty_string wnote) then
-         let wnote = sou base wnote in
-         let wnote_lines = String.split_on_char '\n' wnote in
-         List.iter (Printf.ksprintf (oc opts) "wnote %s\n") wnote_lines
-         ;
-       )
+      if (not use_per_sel) || gen.per_sel ip then (
+        let p = poi base ip in
+        Printf.ksprintf (oc opts) "wit";
+        (match get_sex p with
+        | Male -> Printf.ksprintf (oc opts) " m"
+        | Female -> Printf.ksprintf (oc opts) " f"
+        | _ -> ());
+        Printf.ksprintf (oc opts) ": ";
+        let sk = string_of_witness_kind wk in
+        (match sk with
+        | Some s -> Printf.ksprintf (oc opts) (s ^^ " ")
+        | None -> ());
+        print_witness p;
+        Printf.ksprintf (oc opts) "\n";
+        (* print witness note *)
+        if opts.notes && not (is_empty_string wnote) then
+          let wnote = sou base wnote in
+          let wnote_lines = String.split_on_char '\n' wnote in
+          List.iter (Printf.ksprintf (oc opts) "wnote %s\n") wnote_lines))
     witnesses
 
 let print_pevent opts base gen e =
@@ -797,7 +793,9 @@ let print_family opts base gen m =
   Printf.ksprintf (oc opts) " ";
   print_parent opts base gen m.m_moth;
   Printf.ksprintf (oc opts) "\n";
-  let witnesses = Array.map (fun ip -> ip,Witness,empty_string) (get_witnesses fam) in
+  let witnesses =
+    Array.map (fun ip -> (ip, Witness, empty_string)) (get_witnesses fam)
+  in
   print_witnesses opts base gen ~use_per_sel:true witnesses;
   (match opts.source with
   | None ->
@@ -939,7 +937,8 @@ let print_notes_for_person opts base gen p =
                in
                if notes <> "" then
                  Printf.ksprintf (oc opts) "%s: %s\n" name notes;
-               print_witnesses opts base gen ~use_per_sel:false evt.epers_witnesses;
+               print_witnesses opts base gen ~use_per_sel:false
+                 evt.epers_witnesses;
                loop events
            | _ ->
                print_pevent opts base gen evt;
