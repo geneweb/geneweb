@@ -585,7 +585,8 @@ and mk_str_lst base istrs =
 and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let iper' = Gwdb.get_iper p in
   let module E = Ezgw.Person in
-  let access = escaped (Util.acces conf base p) in
+  let access_url = escaped (Util.acces conf base p) in
+  let access = Tbool (Util.is_public conf base p) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
   let first_name = Tstr (E.first_name base p) in
@@ -602,6 +603,7 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let events = Tlist [] in
   Tpat
     (function
+    | "access_url" -> access_url
     | "access" -> access
     | "children" -> children
     | "events" -> events
@@ -643,7 +645,8 @@ and find_events conf base x events =
 and unsafe_mk_person conf base (p : Gwdb.person) =
   let module E = Ezgw.Person in
   let iper' = Gwdb.get_iper p in
-  let access = escaped (Util.acces conf base p) in
+  let access_url = escaped (Util.acces conf base p) in
+  let access = Tbool (Util.is_public conf base p) in
   let parents, father, mother = mk_ancestors conf base p in
   let families, spouses = mk_families_spouses iper' conf base p in
   let aliases = mk_str_lst base (Gwdb.get_aliases p) in
@@ -740,6 +743,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let sosa = box_lazy @@ lazy (get_sosa_person conf base p) in
   Tpat
     (function
+    | "access_url" -> access_url
     | "access" -> access
     | "aliases" -> aliases
     | "baptism" -> baptism
