@@ -118,7 +118,7 @@
   %include;tools
 
   %apply;tools_ancsosa()
-  %include;trl
+  %base_trailer;
   %include;copyr
 %end;
 </body>

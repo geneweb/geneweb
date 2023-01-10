@@ -1275,7 +1275,7 @@
   </div>
 </form>
 
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

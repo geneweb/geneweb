@@ -160,7 +160,7 @@
 %end;
 
 <div class="my-3">Total[:] %if;(evar.v2=0)%expr(count-count2)%else;%count;%end; %if;(count=0 or count=1)[person/persons]0%else;[person/persons]1%end;.</div>
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

@@ -310,7 +310,7 @@
   %incr_count;
 %end;
 <div id="total" class="mt-2" title="[unfiltered total]">[*total][:] %apply;desc_count(max_desc_level) [descendants] (%count; [person/persons]1 [with] [spouse/spouses]1)</div>
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

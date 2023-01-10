@@ -315,7 +315,7 @@
 </form>
 <div style="clear:both;"></div>
 
-%include;trl
+%base_trailer;
 %include;copyr
 </body>
 </html>

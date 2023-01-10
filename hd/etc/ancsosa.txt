@@ -2113,7 +2113,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     </div>
   %end;
 %end;
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

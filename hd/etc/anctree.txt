@@ -56,7 +56,7 @@
   </div>
   <div class="container">
 %end;
-%include;trl
+%base_trailer;
 %include;copyr
 %if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
   </div>
