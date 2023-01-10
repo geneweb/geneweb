@@ -28,7 +28,7 @@ let gen_print_link_to_welcome f conf right_aligned =
   Output.print_sstring conf {|"></span></a>|};
   if conf.debug then
     Output.print_sstring conf
-     (Printf.sprintf "<span id=\"q_time_d\">00.000</span>") ;
+      (Printf.sprintf "<span id=\"q_time_d\">00.000</span>");
   if right_aligned then Output.print_sstring conf "</div>"
   else Output.print_sstring conf "</p>"
 
@@ -109,13 +109,19 @@ let trailer conf =
   | None -> ());
   Templ.print_copyright conf;
   Util.include_template conf [] "js" (fun () -> ());
-  if conf.debug || true then
-  begin
-    let query_time = (Unix.gettimeofday ()) -. conf.query_start in
+  if conf.debug || true then (
+    let query_time = Unix.gettimeofday () -. conf.query_start in
     Output.print_sstring conf
-      (Printf.sprintf "Query treated in <span id=\"q_time_c\">%.3f</span> seconds " query_time) ;
-    Output.flush conf ;
-  end ;
+      (Printf.sprintf
+         "Query treated in <span id=\"q_time_c\">%.3f</span> seconds "
+         query_time);
+    Output.print_sstring conf "<script>\n";
+    Output.print_sstring conf
+      {|var q_time = document.getElementById("q_time_c").innerHTML;|};
+    Output.print_sstring conf
+      {|document.getElementById("q_time_d").innerHTML = q_time;|};
+    Output.print_sstring conf "</script>\n";
+    Output.flush conf);
   Output.print_sstring conf "</body>\n</html><aaa>\n"
 
 let () =
