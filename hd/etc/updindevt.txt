@@ -44,7 +44,7 @@
 
 %apply;print_event()
 
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

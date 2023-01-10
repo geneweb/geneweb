@@ -155,7 +155,7 @@
   %if;not cancel_links;
     %include;tools
     %apply;tools_anclist()
-    %include;trl
+    %base_trailer;
     %include;copyr
   %end;
 %end;

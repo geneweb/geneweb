@@ -867,7 +867,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
   %else;0 [person/persons]0%end;.
 </div>
 
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

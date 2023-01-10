@@ -255,7 +255,7 @@ zh: 网络家谱
      </td></tr>
   </table>
 <br>
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 </div>

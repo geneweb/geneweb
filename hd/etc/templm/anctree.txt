@@ -244,7 +244,7 @@
   %include;tools
   %apply;tools_anctree()
   <div style="clear:both;"></div>
-  %include;trl
+  %base_trailer;
   %include;copyr
 %end;
 </body>

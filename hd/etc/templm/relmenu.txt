@@ -256,7 +256,7 @@
   </fieldset>
 </form>
 
-%include;trl
+%base_trailer;
 %include;copyr
 </body>
 </html>

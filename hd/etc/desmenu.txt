@@ -395,7 +395,7 @@ function table_spouse_disabled () {
     </div>
   </div>
 </form>
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js
