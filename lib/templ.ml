@@ -897,13 +897,18 @@ let print_copyright conf =
       Output.print_sstring conf "<br>\n")
 
 let include_hed_trl conf name =
-  if conf.debug && name = "trl" then
-    begin
-      let query_time = (Unix.gettimeofday ()) -. conf.query_start in
-      Output.print_sstring conf
-        (Printf.sprintf "Query treated in <span id=\"q_time_c\">%.3f</span> seconds " query_time) ;
-      Output.flush conf ;
-    end ;
+  if conf.debug && name = "trl" then (
+    let query_time = Unix.gettimeofday () -. conf.query_start in
+    Output.print_sstring conf
+      (Printf.sprintf
+         {|Query treated in <span id="q_time_c">%.3f</span> seconds|} query_time);
+    Output.print_sstring conf "<script>\n";
+    Output.print_sstring conf
+      {|var q_time = document.getElementById("q_time_c").innerHTML;|};
+    Output.print_sstring conf
+      {|document.getElementById("q_time_d").innerHTML = q_time;|};
+    Output.print_sstring conf "</script>\n";
+    Output.flush conf);
   Util.include_template conf [] name (fun () -> ())
 
 let rec interp_ast :

@@ -53,7 +53,7 @@ type config = {
   wizard : bool;
   is_printed_by_template : bool;
   debug : bool;
-  query_start: float;
+  query_start : float;
   friend : bool;
   just_friend_wizard : bool;
   user : string;
