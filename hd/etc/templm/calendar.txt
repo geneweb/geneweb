@@ -287,7 +287,7 @@
 </td>
 </tr>
 </table>
-%include;trl
+%base_trailer;
 %include;copyr
 </body>
 </html>

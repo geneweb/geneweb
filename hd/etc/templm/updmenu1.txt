@@ -108,7 +108,7 @@
     <br>
   </p>
 %end;
-  %include;trl
+  %base_trailer;
   %include;copyr
 </body>
 </html>

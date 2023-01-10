@@ -255,7 +255,7 @@
     %end;
 </fieldset>
 </form>
-%include;trl
+%base_trailer;
 %include;copyr
 %include;js
 </body>

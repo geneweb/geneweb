@@ -459,7 +459,7 @@ tr: Tarayıcınız değiştirilen sayfaları otomatik olarak güncellemiyorsa (s
 ]))%)
     </div>
   </div>
-%include;trl
+%base_trailer;
 %include;copyr
 %include;js
 </body>

@@ -211,7 +211,7 @@
     </div>
   </div>
 </form>
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 <script>

@@ -603,7 +603,7 @@ function missing_events_options () {
     </div>
   </div>
 </form>
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

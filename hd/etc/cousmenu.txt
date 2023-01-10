@@ -363,7 +363,7 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
     </div>
   </div>
 </div>
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js
