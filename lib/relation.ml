@@ -243,9 +243,9 @@ let get_shortest_path_relation conf base ip1 ip2 (excl_faml : ifam list) =
       (Option.fold ~none:[] ~some:parse_fam (get_parents (pget conf base iper)))
   in
   let rec make_path path vertex =
-    match List.hd path with
-    | _, Self -> path
-    | _, _ -> (
+    match path with
+    | (_, Self) :: _ -> path
+    | _ -> (
         match Gwdb.Marker.get mark_per vertex with
         | NotVisited -> assert false
         | Visited (_, v, f) -> make_path ((vertex, f) :: path) v)
@@ -376,7 +376,7 @@ let rec belongs_to_branch ip dist = function
       else belongs_to_branch ip dist lens
   | [] -> false
 
-(* FIXME: remove Array.to_list *)
+(* FIXME: remove Array.to_list and List.hd !!*)
 let get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
   let anc, _ = List.hd list in
   let rec loop ip dist =

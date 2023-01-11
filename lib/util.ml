@@ -856,18 +856,19 @@ let update_family_loop conf base p s =
         [] list
     in
     if conf.wizard then
-      if List.length res = 1 then
-        let iper = string_of_iper iper in
-        let ifam = string_of_ifam (List.hd res) in
-        "<a href=\""
-        ^<^ (commd conf :> Adef.safe_string)
-        ^^^ "m=MOD_FAM&i=" ^<^ ifam ^<^ "&ip=" ^<^ iper ^<^ "\">" ^<^ s
-        ^>^ "</a>"
-      else
-        let iper = string_of_iper iper in
-        "<a href=\""
-        ^<^ (commd conf :> Adef.safe_string)
-        ^^^ "m=U&i=" ^<^ iper ^<^ "\">" ^<^ s ^>^ "</a>"
+      match res with
+      | [ res ] ->
+          let iper = string_of_iper iper in
+          let ifam = string_of_ifam res in
+          "<a href=\""
+          ^<^ (commd conf :> Adef.safe_string)
+          ^^^ "m=MOD_FAM&i=" ^<^ ifam ^<^ "&ip=" ^<^ iper ^<^ "\">" ^<^ s
+          ^>^ "</a>"
+      | _ ->
+          let iper = string_of_iper iper in
+          "<a href=\""
+          ^<^ (commd conf :> Adef.safe_string)
+          ^^^ "m=U&i=" ^<^ iper ^<^ "\">" ^<^ s ^>^ "</a>"
     else s
 
 let no_reference _conf _base _p s = s

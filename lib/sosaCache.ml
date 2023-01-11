@@ -206,7 +206,7 @@ let next_sosa s =
     | [] -> (Sosa.zero, dummy_iper)
     | (so, _) :: tl ->
         if Sosa.eq so x then
-          if tl = [] then (Sosa.zero, dummy_iper) else List.hd tl
+          match tl with [] -> (Sosa.zero, dummy_iper) | tl :: _tll -> tl
         else find_n x tl
   in
   let so, ip = find_n s sosa_list in
@@ -223,7 +223,7 @@ let prev_sosa s =
     | [] -> (Sosa.zero, dummy_iper)
     | (so, _) :: tl ->
         if Sosa.eq so x then
-          if tl = [] then (Sosa.zero, dummy_iper) else List.hd tl
+          match tl with [] -> (Sosa.zero, dummy_iper) | tl :: _tll -> tl
         else find_n x tl
   in
   let so, ip = find_n s sosa_list in
