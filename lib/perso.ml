@@ -28,8 +28,12 @@ let string_of_title ?(safe = false) ?(link = true) conf base
     (and_txt : Adef.safe_string) p (nth, name, title, places, dates) =
   let safe_html = if not safe then Util.safe_html else Adef.safe in
   let escape_html = if not safe then Util.escape_html else Adef.escaped in
-  let tit, est = (sou base title, sou base (List.hd places)) in
-  let acc = safe_html (tit ^ " " ^ est) in
+  let place, places_tl =
+    match places with
+    | [] -> (Gwdb.empty_string, [])
+    | place :: places_tl -> (place, places_tl)
+  in
+  let acc = safe_html (sou base title ^ " " ^ sou base place) in
   let href place s =
     if link then
       let href =
@@ -41,7 +45,7 @@ let string_of_title ?(safe = false) ?(link = true) conf base
       geneweb_link conf (href : Adef.encoded_string :> Adef.escaped_string) s
     else s
   in
-  let acc = href (List.hd places) acc in
+  let acc = href place acc in
   let rec loop acc places =
     let acc =
       match places with
@@ -51,12 +55,11 @@ let string_of_title ?(safe = false) ?(link = true) conf base
     in
     match places with
     | place :: places ->
-        let est = safe_html (sou base place) in
-        let acc = acc ^^^ href place est in
+        let acc = acc ^^^ href place (safe_html (sou base place)) in
         loop acc places
     | _ -> acc
   in
-  let acc = loop acc (List.tl places) in
+  let acc = loop acc places_tl in
   let paren =
     match (nth, dates, name) with
     | n, _, _ when n > 0 -> true
@@ -1293,22 +1296,27 @@ let get_min_max_dates conf base l =
 let rec ascendants base acc l i =
   match l with
   | [] -> acc
-  | (ip, _, _, lev) :: l -> (
+  | (ip, _, _, lev :: _ll) :: l -> (
       match get_parents (poi base ip) with
       | Some ifam ->
           let cpl = foi base ifam in
           let ifath = get_father cpl in
           let imoth = get_mother cpl in
-          let acc = [ (ifath, [], ifath, [ List.hd lev + 1 ]) ] @ acc in
-          let acc = [ (imoth, [], imoth, [ List.hd lev + 1 ]) ] @ acc in
+          let acc = [ (ifath, [], ifath, [ lev + 1 ]) ] @ acc in
+          let acc = [ (imoth, [], imoth, [ lev + 1 ]) ] @ acc in
           ascendants base acc l i
       | None -> ascendants base acc l i)
+  | _ :: l ->
+      !GWPARAM.syslog `LOG_WARNING
+        "Unexpected empty level list in ascend computation\n";
+      ascendants base acc l i
 
 (* descendants des ip de liste1 sauf ceux présents dans liste2 *)
 let descendants_aux base liste1 liste2 =
   let liste2 = List.map (fun (ip, _, _, _) -> ip) liste2 in
   let rec loop0 acc = function
-    | (ip, ifaml, ipar0, lev) :: l ->
+    | [] -> acc
+    | (ip, ifaml, ipar0, lev :: _ll) :: l ->
         let fams = Array.to_list (get_family (poi base ip)) in
         let chlds =
           (* accumuler tous les enfants de ip *)
@@ -1323,8 +1331,7 @@ let descendants_aux base liste1 liste2 =
                     | [] -> acc2
                     | ipch :: children ->
                         loop2
-                          ((ipch, ifam :: ifaml, ipar0, [ List.hd lev - 1 ])
-                          :: acc2)
+                          ((ipch, ifam :: ifaml, ipar0, [ lev - 1 ]) :: acc2)
                           children
                   in
                   loop2 [] (Array.to_list (get_children (foi base ifam)))
@@ -1340,7 +1347,10 @@ let descendants_aux base liste1 liste2 =
             [] chlds
         in
         loop0 (chlds @ acc) l
-    | [] -> acc
+    | _ :: l ->
+        !GWPARAM.syslog `LOG_WARNING
+          "Unexpected empty level list in descend computation\n";
+        loop0 acc l
   in
   loop0 [] liste1
 
@@ -4218,14 +4228,13 @@ let eval_transl conf base env upp s c =
 let level_in_list in_or_less level lev_list =
   match lev_list with
   | [] -> None
-  | _ ->
-      if List.nth lev_list 0 = 0 then (
-        !GWPARAM.syslog `LOG_ERR "lev_list starts at 0 but should be +/- 1";
-        None)
-      else
-        List.find_opt
-          (fun lvl -> if in_or_less then abs lvl = level else abs lvl <= level)
-          lev_list
+  | 0 :: _ ->
+      !GWPARAM.syslog `LOG_ERR "lev_list starts at 0 but should be +/- 1";
+      None
+  | lev_list ->
+      List.find_opt
+        (fun lvl -> if in_or_less then abs lvl = level else abs lvl <= level)
+        lev_list
 
 let print_foreach conf base print_ast eval_expr =
   let eval_int_expr env ep e =
@@ -4276,22 +4285,33 @@ let print_foreach conf base print_ast eval_expr =
               (let lev_cnt = List.length lev_list in
                let ifaml = List.map (fun ifam -> string_of_ifam ifam) ifaml in
                let ifaml = String.concat "," ifaml in
+               let ianc_env =
+                 match iancl with
+                 | ianc1 :: ianc2 :: _ ->
+                     [
+                       ("anc1", Vind (pget conf base ianc1));
+                       ("anc2", Vind (pget conf base ianc2));
+                     ]
+                 | ianc1 :: _ ->
+                     [
+                       ("anc1", Vind (pget conf base ianc1));
+                       ("anc2", Vind (poi base Gwdb.dummy_iper));
+                     ]
+                 | _ ->
+                     [
+                       ("anc1", Vind (poi base Gwdb.dummy_iper));
+                       ("anc2", Vind (poi base Gwdb.dummy_iper));
+                     ]
+               in
                let env =
                  ("path_end", Vind (poi base ip))
                  :: ("anc_level", Vint lev)
                  :: ("anc_f_list", Vstring ifaml)
-                 :: ( "anc1",
-                      if List.length iancl > 0 then
-                        Vind (pget conf base (List.nth iancl 0))
-                      else Vind (poi base Gwdb.dummy_iper) )
-                 :: ( "anc2",
-                      if List.length iancl > 1 then
-                        Vind (pget conf base (List.nth iancl 1))
-                      else Vind (poi base Gwdb.dummy_iper) )
                  :: ("lev_cnt", Vint lev_cnt) :: ("first", Vbool first)
                  :: ("cnt", Vint cnt) :: ("nbr", Vint nbr)
                  :: ("last", Vbool (l = []))
                  :: env
+                 @ ianc_env
                in
                List.iter (print_ast env ep) al);
               loop false (cnt + 1) l
