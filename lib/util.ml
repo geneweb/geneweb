@@ -4,6 +4,19 @@ open Config
 open Def
 open Gwdb
 
+let time_debug conf query_time =
+  if conf.debug then
+    Output.print_sstring conf
+      (Printf.sprintf
+         {|
+      Query treated in <span id="q_time_c">%.3f</span> seconds
+      <script>
+      var q_time = document.getElementById("q_time_c").innerHTML;
+      document.getElementById("q_time_d").innerHTML = q_time;
+      </script>
+       |}
+         query_time)
+
 let escape_aux count blit str =
   let strlen = String.length str in
   let rec loop acc i =
