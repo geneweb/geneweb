@@ -291,9 +291,11 @@ let find_in conf x ini =
           (fun r p ->
             r || if word then low p = ini else Mutil.contains (low p) ini)
           false x
-      else if word && List.length x > 0 then low (List.nth x 0) = ini
-      else if List.length x > 0 then Mutil.contains (low (List.nth x 0)) ini
-      else false)
+      else
+        match x with
+        | [] -> false
+        | x :: _ when word -> low x = ini
+        | x :: _ -> Mutil.contains (low x) ini)
     true inil
 
 let get_ip_list (snl : (string * iper list) list) =
@@ -339,18 +341,19 @@ let pps_call conf opt long k places =
        (fun acc p -> acc ^ (if acc <> "" then ", " else "") ^ p)
        "" places)
 
-(* build ip list for all entries having same List.hd pl *)
-let get_new_list list =
+(* build ip list for all entries having same first element in places *)
+let get_new_list l =
   let new_list =
-    let rec loop prev ipl acc = function
-      | ((pl, _), snl) :: l when List.length pl > 0 && List.nth pl 0 = prev ->
-          loop prev (get_ip_list snl :: ipl) acc l
-      | ((pl, _), _snl) :: l when List.length pl > 0 ->
-          loop (List.nth pl 0) [] ((prev, List.flatten ipl) :: acc) l
-      | ((_pl, _), _snl) :: l -> loop "" [] ((prev, List.flatten ipl) :: acc) l
+    let rec loop prev ipl acc l =
+      match l with
       | [] -> acc
+      | ((pl :: _pll, _), snl) :: l when pl = prev ->
+          loop prev (get_ip_list snl :: ipl) acc l
+      | ((pl :: _pll, _), _snl) :: l ->
+          loop pl [] ((prev, List.flatten ipl) :: acc) l
+      | ((_, _), _snl) :: l -> loop "" [] ((prev, List.flatten ipl) :: acc) l
     in
-    loop "" [] [] list
+    loop "" [] [] l
   in
   new_list
 
@@ -399,23 +402,19 @@ let print_html_places_surnames_short conf _base _link_to_ind
         new_list
     else new_list
   in
-  (* regroup entries according to List.hd pl if very=true *)
+  (* regroup entries according to pl if very=true *)
   let new_list =
-    let rec loop prev acc acc_l = function
-      | (pl, ipl) :: list
-        when very
-             && List.length pl > 0
-             && List.length prev > 0
-             && List.nth pl 0 = List.nth prev 0 ->
-          loop pl ((pl, ipl) :: acc) acc_l list
-      | (pl, ipl) :: list
-        when very
-             && List.length pl > 0
-             && List.length prev > 0
-             && List.nth pl 0 <> List.nth prev 0 ->
-          loop pl [ (pl, ipl) ] (if acc <> [] then acc :: acc_l else acc_l) list
-      | (pl, ipl) :: list -> loop pl [] ([ (pl, ipl) ] :: acc_l) list
-      | [] -> if acc <> [] then acc :: acc_l else acc_l
+    let rec loop prev acc acc_l new_list =
+      match (new_list, prev) with
+      | (pl :: pll, ipl) :: list, prev :: _prevl when very && pl = prev ->
+          loop (pl :: pll) ((pl :: pll, ipl) :: acc) acc_l list
+      | (pl :: pll, ipl) :: list, prev :: _prevl when very && pl <> prev ->
+          loop (pl :: pll)
+            [ (pl :: pll, ipl) ]
+            (if acc <> [] then acc :: acc_l else acc_l)
+            list
+      | (pl, ipl) :: list, _ -> loop pl [] ([ (pl, ipl) ] :: acc_l) list
+      | [], _ -> if acc <> [] then acc :: acc_l else acc_l
     in
     loop [ "" ] [] [] new_list
   in
@@ -428,8 +427,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
       | [] -> ()
       | (pl, ipl) :: list when len < max_rlm_nbr conf ->
           let str =
-            if very && List.length pl > 0 then List.nth pl 0
-            else places_to_string true pl
+            match pl with pl :: _ -> pl | _ -> places_to_string true pl
           in
           Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
             (commd conf :> string)
@@ -457,8 +455,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
             len
       | (pl, _ipl) :: list ->
           let str =
-            if very && List.length pl > 0 then List.nth pl 0
-            else places_to_string true pl
+            match pl with pl :: _ -> pl | _ -> places_to_string true pl
           in
           Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
             (commd conf :> string)
@@ -493,14 +490,15 @@ let print_html_places_surnames_long conf base link_to_ind
   let print_sn (sn, ips) (pl, _sub) =
     (* Warn : do same sort_uniq in short mode *)
     let ips = List.sort_uniq compare ips in
-    let len = List.length ips in
     let places = places_to_string true pl in
     Output.printf conf "<a href=\"%s" (commd conf :> string);
-    if link_to_ind && len = 1 then
-      Output.print_string conf (acces conf base @@ pget conf base @@ List.hd ips)
-    else Output.printf conf "m=N&v=%s" (Mutil.encode sn :> string);
-    Output.printf conf "\">%s</a>" sn;
-    print_ip_list conf places opt link_to_ind ips
+    match (link_to_ind, ips) with
+    | true, ips :: _ipsl ->
+        Output.print_string conf (acces conf base @@ pget conf base @@ ips)
+    | _, _ ->
+        Output.printf conf "m=N&v=%s" (Mutil.encode sn :> string);
+        Output.printf conf "\">%s</a>" sn;
+        print_ip_list conf places opt link_to_ind ips
   in
   let print_sn_list (pl, sub) (snl : (string * iper list) list) =
     if List.length pl = 1 then Output.print_sstring conf "<ul>\n";
