@@ -838,21 +838,17 @@ let set_vother x = Vother x
 
 let eval_predefined_apply f vl =
   let vl = List.map (function VVstring s -> s | _ -> raise Not_found) vl in
+  let min_max_aux fn s sl =
+    try
+      let m =
+        List.fold_right (fun s -> fn (int_of_string s)) sl (int_of_string s)
+      in
+      string_of_int m
+    with Failure _ -> raise Not_found
+  in
   match (f, vl) with
-  | "min", s :: sl -> (
-      try
-        let m =
-          List.fold_right (fun s -> min (int_of_string s)) sl (int_of_string s)
-        in
-        string_of_int m
-      with Failure _ -> raise Not_found)
-  | "max", s :: sl -> (
-      try
-        let m =
-          List.fold_right (fun s -> max (int_of_string s)) sl (int_of_string s)
-        in
-        string_of_int m
-      with Failure _ -> raise Not_found)
+  | "min", s :: sl -> min_max_aux min s sl
+  | "max", s :: sl -> min_max_aux max s sl
   | _ -> raise Not_found
 
 let rec eval_var conf (page_title : Adef.safe_string)
