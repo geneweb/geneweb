@@ -138,9 +138,9 @@ let url_aux ?(pwd = true) conf =
   else prefix ^ String.concat "&" l
 
 let url_set_aux conf evar_l str =
-  match List.length evar_l with
-  | 0 ->
-      Printf.sprintf "Empty evar list\n" |> !GWPARAM.syslog `LOG_WARNING;
+  match evar_l with
+  | [] ->
+      !GWPARAM.syslog `LOG_WARNING "Empty evar list\n";
       ""
   | _ ->
       let evar = List.nth evar_l 0 in
@@ -148,7 +148,7 @@ let url_set_aux conf evar_l str =
       let url =
         match String.split_on_char '?' (Util.commd conf :> string) with
         | [] ->
-            Printf.sprintf "Empty Url\n" |> !GWPARAM.syslog `LOG_WARNING;
+            !GWPARAM.syslog `LOG_WARNING "Empty Url\n";
             ""
         | s :: _l -> s ^ "?"
       in
