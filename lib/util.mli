@@ -4,6 +4,9 @@ open Config
 open Def
 open Gwdb
 
+val time_debug : config -> float -> unit
+(** prints the query duration and reports it in the "home" section *)
+
 val cnt_dir : string ref
 (** The directory where counters (e.g. number page displayed) are stored. *)
 
