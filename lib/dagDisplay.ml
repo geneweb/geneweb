@@ -844,7 +844,10 @@ let eval_predefined_apply f vl =
         List.fold_right (fun s -> fn (int_of_string s)) sl (int_of_string s)
       in
       string_of_int m
-    with Failure _ -> raise Not_found
+    with Failure _ ->
+      Printf.sprintf "Incorrect parameter for min/max: %s\n" s
+      |> !GWPARAM.syslog `LOG_WARNING;
+      raise Not_found
   in
   match (f, vl) with
   | "min", s :: sl -> min_max_aux min s sl
