@@ -251,8 +251,7 @@ and eval_compound_var conf base env xx sl =
         | Some n ->
             if String.length s > n then String.sub s 0 (String.length s - n)
             else (
-              Printf.sprintf "String shorter that requested\n"
-              |> !GWPARAM.syslog `LOG_WARNING;
+              !GWPARAM.syslog `LOG_WARNING "String shorter that requested\n";
               s)
         | None -> raise Not_found)
     | "printable" :: sl -> only_printable (loop sl)
@@ -303,20 +302,19 @@ let print_foreach conf print_ast _eval_expr =
     in
     let max = List.length list_of_sub in
     let rec loop first cnt = function
-      | s :: l ->
-          if List.length l > 0 then (
-            let tail =
-              if String.length s > 0 then List.nth (string_to_list s) 0 else ""
-            in
-            let env =
-              ("substr", Vstring s) :: ("tail", Vstring tail)
-              :: ("first", Vbool first) :: ("max", Vint max)
-              :: ("cnt", Vint cnt) :: env
-            in
-            List.iter (print_ast env xx) al;
-            loop false (cnt + 1) l)
-          else () (* dont do last element *)
       | [] -> ()
+      | [ _s ] -> () (* dont do last element *)
+      | s :: l ->
+          let tail =
+            if String.length s > 0 then List.nth (string_to_list s) 0 else ""
+          in
+          let env =
+            ("substr", Vstring s) :: ("tail", Vstring tail)
+            :: ("first", Vbool first) :: ("max", Vint max) :: ("cnt", Vint cnt)
+            :: env
+          in
+          List.iter (print_ast env xx) al;
+          loop false (cnt + 1) l
     in
     loop true 0 list_of_sub
   and print_foreach_value env xx al =
