@@ -1658,6 +1658,23 @@ let number_of_descendants_aux conf base env all_levels sl eval_int =
       | _ -> raise Not_found)
   | _ -> raise Not_found
 
+let cous_paths_dates_aux conf base env p l1 l2 rev =
+  let _cousins_cnt, cousins_dates =
+    match (!cousins_t, !cousins_dates_t) with
+    | Some t, Some d_t -> (t, d_t)
+    | _, _ -> init_cousins_cnt conf base env p
+  in
+  match (int_of_string_opt l1, int_of_string_opt l2) with
+  | Some i, Some j -> (
+      let l =
+        if rev then List.rev cousins_dates.(i).(j)
+        else cousins_dates.(i).(j)
+      in
+      match l with
+      | [] -> null_val (* this case is legit *)
+      | _ -> str_val (string_of_int (List.nth l 0)))
+  | _, _ -> raise Not_found
+
 let rec eval_var conf base env ep loc sl =
   try eval_simple_var conf base env ep sl
   with Not_found -> eval_compound_var conf base env ep loc sl
@@ -2859,32 +2876,10 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match get_env "cnt" env with
       | Vint cnt -> VVstring (string_of_int cnt)
       | _ -> VVstring "")
-  | [ "cous_paths_min_date"; l1; l2 ] -> (
-      let _cousins_cnt, cousins_dates =
-        match (!cousins_t, !cousins_dates_t) with
-        | Some t, Some d_t -> (t, d_t)
-        | _, _ -> init_cousins_cnt conf base env p
-      in
-      match (int_of_string_opt l1, int_of_string_opt l2) with
-      | Some i, Some j -> (
-          let l = cousins_dates.(i).(j) in
-          match List.length l with
-          | 0 -> null_val (* this case is legit *)
-          | _ -> str_val (string_of_int (List.nth l 0)))
-      | _, _ -> raise Not_found)
-  | [ "cous_paths_max_date"; l1; l2 ] -> (
-      let _cousins_cnt, cousins_dates =
-        match (!cousins_t, !cousins_dates_t) with
-        | Some t, Some d_t -> (t, d_t)
-        | _, _ -> init_cousins_cnt conf base env p
-      in
-      match (int_of_string_opt l1, int_of_string_opt l2) with
-      | Some i, Some j -> (
-          let l = List.rev cousins_dates.(i).(j) in
-          match List.length l with
-          | 0 -> null_val (* this case is legit *)
-          | _ -> str_val (string_of_int (List.nth l 0)))
-      | _, _ -> raise Not_found)
+  | [ "cous_paths_min_date"; l1; l2 ] ->
+      cous_paths_dates_aux conf base env p l1 l2 false
+  | [ "cous_paths_max_date"; l1; l2 ] ->
+      cous_paths_dates_aux conf base env p l1 l2 true
   | [ "cous_paths_cnt_raw"; l1; l2 ] -> (
       let l = cousins_l1_l2_aux conf base env l1 l2 p in
       match l with
