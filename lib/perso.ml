@@ -1667,12 +1667,11 @@ let cous_paths_dates_aux conf base env p l1 l2 rev =
   match (int_of_string_opt l1, int_of_string_opt l2) with
   | Some i, Some j -> (
       let l =
-        if rev then List.rev cousins_dates.(i).(j)
-        else cousins_dates.(i).(j)
+        if rev then List.rev cousins_dates.(i).(j) else cousins_dates.(i).(j)
       in
       match l with
       | [] -> null_val (* this case is legit *)
-      | _ -> str_val (string_of_int (List.nth l 0)))
+      | lvl :: _l -> str_val (string_of_int lvl))
   | _, _ -> raise Not_found
 
 let rec eval_var conf base env ep loc sl =
@@ -4216,17 +4215,15 @@ let eval_transl conf base env upp s c =
       if upp then Utf8.capitalize_fst r else r
   | _ -> Templ.eval_transl conf upp s c
 
-let level_in_list level lev_list =
+let level_in_list in_or_less level lev_list =
   match lev_list with
   | [] -> None
   | _ ->
-      let level = if List.nth lev_list 0 >= 0 then level else -level in
-      if List.mem level lev_list then Some level else None
-
-let level_less_or_eq_list level lev_list =
-  match lev_list with
-  | [] -> None
-  | _ -> List.find_opt (fun lvl -> abs lvl <= level) lev_list
+      if List.nth lev_list 0 = 0 then
+        !GWPARAM.syslog `LOG_ERR "lev_list starts at 0 but should be +/- 1";
+      List.find_opt
+        (fun lvl -> if in_or_less then abs lvl = level else abs lvl <= level)
+        lev_list
 
 let print_foreach conf base print_ast eval_expr =
   let eval_int_expr env ep e =
@@ -4267,12 +4264,12 @@ let print_foreach conf base print_ast eval_expr =
     | _ -> ()
   in
 
-  let print_foreach_path_aux conf base test level env al ep l =
+  let print_foreach_path_aux conf base in_or_less level env al ep l =
     let rec loop first cnt l =
       match l with
       | [] -> ()
       | (ip, (ifaml, iancl, nbr), lev_list) :: l -> (
-          match test level lev_list with
+          match level_in_list in_or_less level lev_list with
           | Some lev ->
               (let lev_cnt = List.length lev_list in
                let ifaml = List.map (fun ifam -> string_of_ifam ifam) ifaml in
@@ -4830,19 +4827,18 @@ let print_foreach conf base print_ast eval_expr =
           | _ -> (0, 0))
       | _ -> (0, 0)
     in
-    let level = l1 - l2 in
-    let level = if level < 0 then -level else level in
+    let level = abs l1 - l2 in
     (level, l1, l2)
   in
 
-  let print_foreach_cousin_path env el al ((p, _) as ep) test_level =
+  let print_foreach_cousin_path env el al ((p, _) as ep) in_or_less =
     let level, l1, l2 = get_level_info conf env el ep in
     let l =
       cousins_l1_l2_aux conf base env (string_of_int l1) (string_of_int l2) p
     in
     match l with
     | Some l ->
-        print_foreach_path_aux conf base test_level level env al ep
+        print_foreach_path_aux conf base in_or_less level env al ep
           (cousins_fold l)
     | None -> !GWPARAM.syslog `LOG_WARNING "Empty cousins list"
   in
@@ -5075,10 +5071,9 @@ let print_foreach conf base print_ast eval_expr =
     | "ancestor_tree_line" -> print_foreach_ancestor_tree env el al ep
     | "cell" -> print_foreach_cell env al ep
     | "child" -> print_foreach_child env al ep efam
-    | "path" | "cous_path" ->
-        print_foreach_cousin_path env el al ep level_less_or_eq_list
+    | "path" | "cous_path" -> print_foreach_cousin_path env el al ep false
     | "path_at_level" | "cous_path_at_level" ->
-        print_foreach_cousin_path env el al ep level_in_list
+        print_foreach_cousin_path env el al ep true
     | "cousin_level" -> print_foreach_cousin_level env al ep
     | "descendant" -> print_foreach_descendant env al ep false
     | "descendant_cnt" -> print_foreach_descendant env al ep true
