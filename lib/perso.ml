@@ -4228,12 +4228,9 @@ let eval_transl conf base env upp s c =
 let level_in_list in_or_less level lev_list =
   match lev_list with
   | [] -> None
-  | 0 :: _ ->
-      !GWPARAM.syslog `LOG_ERR "lev_list starts at 0 but should be +/- 1";
-      None
   | lev_list ->
       List.find_opt
-        (fun lvl -> if in_or_less then abs lvl = level else abs lvl <= level)
+        (fun lvl -> if in_or_less then level = abs lvl else level <= abs lvl)
         lev_list
 
 let print_foreach conf base print_ast eval_expr =
