@@ -4219,11 +4219,13 @@ let level_in_list in_or_less level lev_list =
   match lev_list with
   | [] -> None
   | _ ->
-      if List.nth lev_list 0 = 0 then
+      if List.nth lev_list 0 = 0 then (
         !GWPARAM.syslog `LOG_ERR "lev_list starts at 0 but should be +/- 1";
-      List.find_opt
-        (fun lvl -> if in_or_less then abs lvl = level else abs lvl <= level)
-        lev_list
+        None)
+      else
+        List.find_opt
+          (fun lvl -> if in_or_less then abs lvl = level else abs lvl <= level)
+          lev_list
 
 let print_foreach conf base print_ast eval_expr =
   let eval_int_expr env ep e =
