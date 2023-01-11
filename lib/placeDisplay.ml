@@ -14,16 +14,17 @@ let print_html_places_surnames conf base
     let len = List.length ips in
     Output.print_sstring conf "<a href=\"";
     Output.print_string conf (commd conf);
-    if link_to_ind && len = 1 then
-      Output.print_string conf (acces conf base @@ pget conf base @@ List.hd ips)
-    else (
-      Output.print_sstring conf "m=N&v=";
-      Output.print_string conf (Mutil.encode sn));
-    Output.print_sstring conf "\">";
-    Output.print_string conf (escape_html sn);
-    Output.print_sstring conf "</a> (";
-    Output.print_sstring conf (string_of_int len);
-    Output.print_sstring conf ")"
+    match ips with
+    | [ ips ] when link_to_ind ->
+        Output.print_string conf (acces conf base @@ pget conf base @@ ips)
+    | _ ->
+        Output.print_sstring conf "m=N&v=";
+        Output.print_string conf (Mutil.encode sn);
+        Output.print_sstring conf "\">";
+        Output.print_string conf (escape_html sn);
+        Output.print_sstring conf "</a> (";
+        Output.print_sstring conf (string_of_int len);
+        Output.print_sstring conf ")"
   in
   let print_sn_list (snl : (string * iper list) list) =
     let snl =
