@@ -342,8 +342,8 @@ let pps_call conf opt long k places =
        "" places)
 
 (* build ip list for all entries having same first element in places *)
-let get_new_list l =
-  let new_list =
+let get_new_l l =
+  let new_l =
     let rec loop prev ipl acc l =
       match l with
       | [] -> acc
@@ -355,82 +355,90 @@ let get_new_list l =
     in
     loop "" [] [] l
   in
-  new_list
+  new_l
+(* conserve only keep elements of pll *)
+let strip_pl keep pll =
+  if List.length pll <= keep then pll
+  else
+    let rec loop acc i pll =
+      match pll with
+      | [] -> List.rev acc
+      | _ when i > keep -> List.rev acc
+      | pl :: pll -> loop ( pl :: acc) (i + 1) pll
+  in loop [] 1 pll
 
 let print_html_places_surnames_short conf _base _link_to_ind
     (array : ((string list * string) * (string * iper list) list) array) =
+          (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let long = p_getenv conf.env "display" = Some "long" in
-  let very = p_getenv conf.env "very" = Some "on" in
+  let keep = match p_getint conf.env "keep" with | Some t -> t | None -> 1 in
   let a_sort = p_getenv conf.env "a_sort" = Some "on" in
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
   let up = p_getenv conf.env "up" = Some "on" in
   let opt = get_opt conf in
-  let list = Array.to_list array in
-  let list = List.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) list in
+  let l = Array.to_list array in
+  let l = List.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) l in
   (* build new list of (places, ipl) *)
-  let new_list =
-    let rec loop prev_pl acc acc_l = function
-      | ((pl, _sub), snl) :: list when prev_pl = pl ->
-          loop pl (get_ip_list snl :: acc) acc_l list
-      | ((pl, _sub), snl) :: list when acc <> [] ->
-          let acc = List.sort_uniq compare (List.flatten acc) in
-          loop pl [ get_ip_list snl ] ((prev_pl, acc) :: acc_l) list
-      | ((pl, _sub), snl) :: list -> loop pl [ get_ip_list snl ] acc_l list
+  (* accumulate snl according to keep *)
+  let new_l =
+    let rec loop prev_pl acc_snl acc_l = function
+      | ((pl, _sub), snl) :: l when prev_pl = strip_pl keep pl ->
+          loop (strip_pl keep pl) (get_ip_list snl :: acc_snl) acc_l l
+      | ((pl, _sub), snl) :: l when acc_snl <> [] ->
+          let acc_snl = List.sort_uniq compare (List.flatten acc_snl) in
+          loop (strip_pl keep pl) [ get_ip_list snl ] ((prev_pl, acc_snl) :: acc_l) l
+      | ((pl, _sub), snl) :: l ->
+          loop (strip_pl keep pl) [ get_ip_list snl ] acc_l l
       | [] ->
-          let acc = List.sort_uniq compare (List.flatten acc) in
-          (prev_pl, acc) :: acc_l
+          let acc_snl = List.sort_uniq compare (List.flatten acc_snl) in
+          (prev_pl, acc_snl) :: acc_l
     in
-    loop [ "" ] [] [] list
+    loop [] [] [] l
   in
   (* sort *)
-  let new_list =
+  let new_l =
     if a_sort then
       List.sort
         (fun (pl1, _) (pl2, _) -> sort_place_utf8 (pl2, "") (pl1, ""))
-        new_list
+        new_l
     else
       List.sort
         (fun (pl1, _) (pl2, _) -> sort_place_utf8 (pl1, "") (pl2, ""))
-        new_list
+        new_l
   in
-  let new_list =
+  let new_l=
     if f_sort then
       List.sort
         (fun (_, ipl1) (_, ipl2) ->
           if up then List.length ipl1 - List.length ipl2
           else List.length ipl2 - List.length ipl1)
-        new_list
-    else new_list
+        new_l
+    else new_l
   in
-  (* regroup entries according to pl if very=true *)
-  let new_list =
-    let rec loop prev acc acc_l new_list =
-      match (new_list, prev) with
-      | (pl :: pll, ipl) :: list, prev :: _prevl when very && pl = prev ->
-          loop (pl :: pll) ((pl :: pll, ipl) :: acc) acc_l list
-      | (pl :: pll, ipl) :: list, prev :: _prevl when very && pl <> prev ->
-          loop (pl :: pll)
-            [ (pl :: pll, ipl) ]
-            (if acc <> [] then acc :: acc_l else acc_l)
-            list
-      | (pl, ipl) :: list, _ -> loop pl [] ([ (pl, ipl) ] :: acc_l) list
-      | [], _ -> if acc <> [] then acc :: acc_l else acc_l
+  (* accumulate snl entries with same pl value *)
+  let new_l =
+    let rec loop prev acc_snl acc_l new_l =
+      match (new_l, prev) with
+      | (pl, snl) :: l, prev when pl = prev ->
+          loop pl ((pl, snl) :: acc_snl) acc_l l
+      | (pl, snl) :: l, prev when pl <> prev ->
+          loop pl [(pl, snl)]
+            (if acc_snl <> [] then acc_snl :: acc_l else acc_l) l
+      | (pl, snl) :: l, _ ->
+          loop pl [] ([(pl, snl)] :: acc_l) l
+      | [], _ -> if acc_snl <> [] then acc_snl :: acc_l else acc_l
     in
-    loop [ "" ] [] [] new_list
+    loop [ "" ] [] [] new_l
   in
-  (* one entry has one place in mode "very" and possibly several otherwise *)
-  let print_one_entry list =
+  let print_one_entry l =
     let len =
-      List.fold_left (fun acc (_, ipl) -> acc + List.length ipl) 0 list
+      List.fold_left (fun acc (_, ipl) -> acc + List.length ipl) 0 l
     in
-    let rec loop0 = function
+    let rec loop0 l =
+      match l with
       | [] -> ()
-      | (pl, ipl) :: list when len < max_rlm_nbr conf ->
-          let str =
-            match pl with
-            | pl :: _ when very -> pl
-            | _ -> places_to_string true pl
-          in
+      | (pl, ipl) :: l when len < max_rlm_nbr conf ->
+          let str = places_to_string true pl in
           Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
             (commd conf :> string)
             opt
@@ -441,9 +449,9 @@ let print_html_places_surnames_short conf _base _link_to_ind
             opt str len;
           let rec loop1 i = function
             | [] -> ()
-            | (pl, ipl) :: list ->
+            | (pl, ipl) :: l ->
                 let rec loop2 i = function
-                  | [] -> loop1 i list
+                  | [] -> loop1 i l
                   | ip :: ipl ->
                       Output.printf conf "&i%d=%s%s" i (Gwdb.string_of_iper ip)
                         (Printf.sprintf "&p%d=%s" i (places_to_string false pl));
@@ -451,39 +459,35 @@ let print_html_places_surnames_short conf _base _link_to_ind
                 in
                 loop2 i ipl
           in
-          loop1 0 ((pl, ipl) :: list);
+          loop1 0 ((pl, ipl) :: l);
           Output.printf conf "\" title=\"%s\">%d</a>)"
             (Utf8.capitalize (transl conf "summary book ascendants"))
             len
-      | (pl, _ipl) :: list ->
-          let str =
-            match pl with
-            | pl :: _ when very -> pl
-            | _ -> places_to_string true pl
-          in
+      | (pl, _ipl) :: l ->
+          let str = places_to_string true pl in
           Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
             (commd conf :> string)
             opt
             (if long then "long" else "short")
             str str;
           Output.printf conf " (%d)" len;
-          loop0 list
+          loop0 l
     in
-    loop0 list
+    loop0 l
   in
   let rec loop first = function
-    | l1 :: list ->
+    | l1 :: l ->
         Output.print_sstring conf (if first then "" else "; ");
         print_one_entry l1;
-        loop false list
+        loop false l
     | [] -> ()
   in
-  loop true new_list;
+  loop true new_l;
   Output.print_sstring conf "<p>"
 
 let print_html_places_surnames_long conf base link_to_ind
     (array : ((string list * string) * (string * iper list) list) array) =
-  (* (sub_places_list * suburb) * (surname * ip_list) list *)
+          (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let k = match p_getenv conf.env "k" with Some s -> s | _ -> "" in
   let a_sort = p_getenv conf.env "a_sort" = Some "on" in
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
@@ -495,17 +499,23 @@ let print_html_places_surnames_long conf base link_to_ind
     (* Warn : do same sort_uniq in short mode *)
     let ips = List.sort_uniq compare ips in
     let places = places_to_string true pl in
-    Output.printf conf "<a href=\"%s" (commd conf :> string);
-    match (link_to_ind, ips) with
-    | true, ips :: _ipsl ->
-        Output.print_string conf (acces conf base @@ pget conf base @@ ips)
-    | _, _ ->
-        Output.printf conf "m=N&v=%s" (Mutil.encode sn :> string);
-        Output.printf conf "\">%s</a>" sn;
-        print_ip_list conf places opt link_to_ind ips
+    if link_to_ind then
+      match ips with
+      | [ ip ] -> (
+        Output.printf conf "<a href=\"%s" (commd conf :> string);
+        Output.print_string conf (acces conf base @@ pget conf base @@ ip);
+        Output.printf conf "\" title=\"%s\">%s</a>"
+          (sou base (get_first_name (poi base ip)))
+          sn)
+      | _ -> (
+        Output.printf conf "<a href=\"%s" (commd conf :> string);
+        Output.printf conf "m=N&v=%s" (sn :> string);
+        Output.printf conf "\">%s</a>" sn)
+    else
+      Output.printf conf "%s" (sn :> string);
+    print_ip_list conf places opt link_to_ind ips
   in
   let print_sn_list (pl, sub) (snl : (string * iper list) list) =
-    if List.length pl = 1 then Output.print_sstring conf "<ul>\n";
     if sub <> "" then Output.printf conf "<li>%s<ul>\n" sub;
     let snl =
       if f_sort then
@@ -527,8 +537,7 @@ let print_html_places_surnames_long conf base link_to_ind
         print_sn x (pl, sub))
       snl;
     Output.printf conf "\n";
-    if sub <> "" then Output.print_sstring conf "</ul>\n";
-    if List.length pl = 1 then Output.print_sstring conf "</ul>\n"
+    if sub <> "" then Output.print_sstring conf "</ul></li>\n";
   in
   let rec loop prev = function
     | ((pl, sub), snl) :: list ->

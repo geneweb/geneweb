@@ -57,38 +57,38 @@
           (evar.de!="" and evar.de="on") and
           (evar.bu!="" and evar.bu="on")) checked%end;>
         <label class="custom-control-label" title="[*all]"
-          for="all">[*v7 all]</label>
+          for="all">[*all]</label>
       </div>
     </div>
     <div class="form-group">
-      <span>[*v7 matching][:]</span>
+      <span>[*matching][:]</span>
       <div class="custom-control custom-checkbox ml-4">
         <input type="checkbox" class="custom-control-input" name="word"
           id="word" value="on"
           %if;(evar.word!="" and evar.word="on") checked%end;>
-        <label class="custom-control-label" title="[*v7 word match title]"
-          for="word">[*v7 word match]</label>
+        <label class="custom-control-label" title="[*word match title]"
+          for="word">[*word match]</label>
       </div>
       <div class="custom-control custom-checkbox ml-4">
         <input type="checkbox" class="custom-control-input" name="lower"
           id="lower" value="on"
           %if;(evar.lower!="" and evar.lower="on") checked%end;>
-        <label class="custom-control-label" title="[*v7 case sensitive title]"
-          for="lower">[*v7 case sensitive]</label>
+        <label class="custom-control-label" title="[*case sensitive title]"
+          for="lower">[*case sensitive]</label>
       </div>
       <div class="custom-control custom-checkbox ml-4">
         <input type="checkbox" class="custom-control-input" name="any"
           id="any" value="on"
           %if;(evar.any!="" and evar.any="on") checked%end;>
-        <label class="custom-control-label" title="[*v7 any place title]"
-          for="any">[*v7 any place]</label>
+        <label class="custom-control-label" title="[*any place title]"
+          for="any">[*any place]</label>
       </div>
       <input type="text" class=" ml-4" size="2"
         name="max_rlm_nbr" id="max_rlm_nbr" 
         placeholder=%if;(evar.max_rlm_nbr!="")"%evar.max_rlm_nbr;"
           %elseif;(bvar.max_rlm_nbr!="")"%bvar.max_rlm_nbr;"
           %else;"80"%end;>
-      <label class="label ml-1" title="[*v7 max nbr title]">[*v7 max nbr]</label>
+      <label class="label ml-1" title="[*max nbr title]">[*max nbr]</label>
       %if;(evar.display="long")<input type="hidden" name="display" id="display" value="long">%end;
       <button type="submit" class="btn btn-primary btn-sm ml-4"
         title="[*search/case sensitive]0 [surname/surnames]1 /
@@ -100,49 +100,38 @@
 </form>
 <div class="d-flex">
   <div>
-      <a href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env.val!="" and env.key!="k")%nn;
-         &%env.key=%env.val;%end;%nn;
-        %end;%nn;"
-        title="[*v7 all the places]">%nn;
-      [*v7 all the places]</a>
+      <a href="%url_set.k;"
+        title="[*all the places]">%nn;
+      [*all the places]</a>
   </div>
   <div class="ml-4" >
-
   <a role="button" class="ml-auto"
-    href="%prefix_base_password;%nn;
-      %foreach;env_binding;%if;(env.val!="" and env.key!="f_sort"
-      and env.key!="up" and env.key!="a_sort")%nn;
-       &%env.key=%env.val;%end;%nn;
-      %end;%nn;
-      &f_sort=on%if;(evar.up!="on")&up=on%end;%nn;"
-      title="[*sort by/branch/alphabetic order]0 [frequency]">
-      <i class="fas fa-sort-%if;(evar.up!="on")amount-down%else;amount-up%end;%sp;
+    href="%url_set3.a_sort.f_sort.up;%nn;
+      &f_sort=on%if;(e.up!="on")&up=on%end;"
+      %sp;title="[*sort by/branch/alphabetic order]0 [frequency]">
+      <i class="fas fa-sort-%if;(e.up!="on")amount-down%else;amount-up%end;%sp;
         fa-lg"></i>%nn;
   </a>%nn;
   <a role="button" class="ml-auto"
-    href="%prefix_base_password;%nn;
-      %foreach;env_binding;%if;(env.val!="" and env.key!="a_sort"
-        and env.key!="f_sort" and env.key!="up")%nn;
-       &%env.key=%env.val;%end;%nn;
-      %end;%nn;
-      %if;(evar.a_sort!="on")&a_sort=on%end;%nn;"
-      title="[*sort by/branch/alphabetic order]0
+    href="%url_set3.a_sort.f_sort.up;%nn;
+      %if;(e.a_sort!="on")&a_sort=on%end;"
+      %sp;title="[*sort by/branch/alphabetic order]0
         [sort by/branch/alphabetic order]2">
-      <i class="fas fa-sort-%if;(evar.a_sort!="on")alpha-up%else;alpha-down%end;%sp;
+      <i class="fas fa-sort-%if;(e.a_sort!="on")alpha-up%else;alpha-down%end;%sp;
         fa-lg"></i>%nn;
   </a>%nn;
   %if;(e.display!="long")
+    <span class="ml-2 mr-2" title="[*filter n elts in places list];">[*filter][:]</span>
+    <a role="button" class="btn-link ml-auto
+      %if;(e.keep<2 or e.keep="") disabled text-muted%end;"
+      href="%url_set.keep;&keep=%if;(e.keep!="")%expr(e.keep-1)%else;1%end;">
+      <i class="fas fa-minus fa-lg"></i>
+    </a>
+    %if;(e.keep="")1%else;%e.keep;%end;
     <a role="button" class="ml-auto"
-      href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env.val!="" and env.key!="very")%nn;
-         &%env.key=%env.val;%end;%nn;
-        %end;%nn;
-        &very=%if;(evar.very!="on")on%else;off%end;%nn;"
-        title="%if;(evar.very="on")[*short display]%else;[*very short display]%end;">
-        <i class="fas fa-%if;(evar.very="on")plus%else;minus%end;%sp;
-          fa-lg"></i>
-    </a>%nn;
+      href="%url_set.keep;&keep=%if;(e.keep!="")%expr(e.keep+1)%else;1%end;">
+      <i class="fas fa-plus fa-lg"></i>
+    </a>
   %end;
   </div>
 </div>

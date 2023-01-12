@@ -17941,17 +17941,17 @@ co: moduli d’estensione
 en: plugins
 fr: plugins
 
-    v7 all
+    all
 co: tutti
 en: all
 fr: tous
 
-    v7 any place
+    any place
 co: sottu-lochi
 en: sub-places
 fr: sous-lieux
 
-    v7 any place title
+    any place title
 co: circà in a lista di i sottu-lochi
 en: search in the list of sub-places
 fr: rechercher dans la liste des sous-lieux
@@ -17966,12 +17966,12 @@ co: cuncurdanza senza maiuscule nè alette
 en: match with no capitale nor accents
 fr: correspondance sans capitales ni accents
 
-    v7 case sensitive
+    case sensitive
 co: maiuscule è alette
 en: case sensitive
 fr: capitales et accents
 
-    v7 case sensitive title
+    case sensitive title
 co: tene contu di e maiuscule è alette
 en: dont ignore case and accents
 fr: tenir compte des majuscules et accents
@@ -17986,17 +17986,25 @@ co: piattà l’altri nomi
 en: hide other first mames
 fr: cacher les autres prénoms
 
-    v7 matching
+    matching
 co: cuncurdanza
 en: matching
 fr: correspondance
 
-    v7 max nbr
+    filter
+en: filter
+fr: filtrer
+
+    filter n elts in places list
+en: keep first n elements in places list
+fr: ne conserver que n éléments de la liste des places
+
+    max nbr
 co: num mas rel
 en: max rel nbr
 fr: max rel nbr
 
-    v7 max nbr title
+    max nbr title
 co: numeru massimu per e liste di rilazione
 en: max number for relation list
 fr: nombre maximum pour les listes de relations
@@ -18016,17 +18024,17 @@ co: cuncurdanza di parolle sane
 en: match full words
 fr: correspondance de mots entiers
 
-    v7 word match
+    word match
 co: parolla sana
 en: word match
 fr: mot complet
 
-    v7 word match title
+    word match title
 co: paragunà cù u nome sanu d’un locu
 en: match full location name
 fr: comparer avec le nom complet d'un lieu
 
-    v7 all the places
+    all the places
 en: all the places
 fr: tous les lieux
 
