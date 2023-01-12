@@ -3082,16 +3082,20 @@ and eval_bool_person_field conf base env (p, p_auth) =
         | Some "always" ->
           if nb_fam > 0 || (List.length events) > 0 then true else false
         | Some _ | None ->
-            (* Renvoie vrai que si il y a des informations supplémentaires *)
-            (* par rapport aux évènements principaux, i.e. témoins (mais   *)
-            (* on ne prend pas en compte les notes).                       *)
+            (* return true if there is more event information
+               than basic principals events.
+               we do not take in account note on event as they are shown
+               on the note section.
+               but we do take in account witness notes. *)
             let rec loop events nb_principal_pevents nb_marr =
               match events with
               | [] -> false
-              | (name, _, p, n, s, wl, _) :: events ->
-                  let (p, n, s) = sou base p, sou base n, sou base s in
+              | (name, _, p, note, s, wl, _) :: events ->
+                  (* return true if there is a witness_note on a witness *)
+                  if Array.exists (fun (_ip, _witness_kind, wnote) -> not (is_empty_string wnote )) wl then true else
+                  let (p, note, s) = sou base p, sou base note, sou base s in
                   match name with
-                    Pevent pname ->
+                  | Pevent pname ->
                       begin match pname with
                       | Epers_Birth | Epers_Baptism | Epers_Death |
                         Epers_Burial | Epers_Cremation ->
@@ -3113,7 +3117,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
                           else
                             loop events nb_principal_pevents nb_marr
                       | Efam_Divorce | Efam_Separated ->
-                          if p <> "" || n <> "" || s <> "" ||
+                          if p <> "" || note <> "" || s <> "" ||
                              Array.length wl > 0
                           then
                             true
