@@ -427,7 +427,9 @@ let print_html_places_surnames_short conf _base _link_to_ind
       | [] -> ()
       | (pl, ipl) :: list when len < max_rlm_nbr conf ->
           let str =
-            match pl with pl :: _ -> pl | _ -> places_to_string true pl
+            match pl with
+            | pl :: _ when very -> pl
+            | _ -> places_to_string true pl
           in
           Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
             (commd conf :> string)
@@ -455,7 +457,9 @@ let print_html_places_surnames_short conf _base _link_to_ind
             len
       | (pl, _ipl) :: list ->
           let str =
-            match pl with pl :: _ -> pl | _ -> places_to_string true pl
+            match pl with
+            | pl :: _ when very -> pl
+            | _ -> places_to_string true pl
           in
           Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
             (commd conf :> string)
