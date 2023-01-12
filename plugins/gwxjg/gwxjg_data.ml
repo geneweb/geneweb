@@ -452,7 +452,7 @@ and mk_event conf base d =
              (fun i (ip, k, wnote) ->
                let kind = mk_witness_kind k in
                let iper = Tstr (Gwdb.string_of_iper ip) in
-               let note = Tstr (Gwdb.sou base wnote) in
+               let note = safe (Util.safe_html @@ Gwdb.sou base wnote) in
                Tpat
                  (function
                  | "kind" -> kind
