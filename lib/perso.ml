@@ -311,19 +311,26 @@ let get_descendants_at_level base p lev2 =
   match lev2 with
   | 0 -> []
   | n ->
-      let rec loop acc lev fam =
-        Array.fold_left
-          (fun acc ifam ->
-            let children = Array.to_list (get_children (foi base ifam)) in
-            List.fold_left
-              (fun acc ch ->
-                if lev < n then loop acc (lev + 1) (get_family (poi base ch))
-                else if not (List.mem ifam acc) then ifam :: acc
-                else acc)
-              acc children)
-          acc fam
+      (* gather corresponding families in ifam_ht *)
+      let ifam_ht = Hashtbl.create 1024 in
+      let rec loop lev fam =
+        Array.iter
+          (fun ifam ->
+            if lev < n then
+              let children = get_children (foi base ifam) in
+              Array.iter
+                (fun ch -> loop (lev + 1) (get_family (poi base ch)))
+                children
+            else Hashtbl.replace ifam_ht ifam ())
+          fam
       in
-      loop [] 1 (get_family p)
+      loop 1 (get_family p);
+      (* build the list of descendants from the families *)
+      Hashtbl.fold
+        (fun ifam () acc ->
+          let childrens = get_children (foi base ifam) in
+          Array.fold_left (fun acc ch -> ch :: acc) acc childrens)
+        ifam_ht []
 
 let make_desc_level_table conf base max_level p =
   let line =
@@ -4530,15 +4537,9 @@ let print_foreach conf base print_ast eval_expr =
           !GWPARAM.syslog `LOG_WARNING "Empty cousins list";
           []
     in
-    let ifam_l = get_descendants_at_level base p lev in
     let ip_l =
       if count_paths then List.map (fun (ip, (_, _, _), _) -> ip) ip_l
-      else
-        List.flatten
-          (List.fold_left
-             (fun acc ifam ->
-               Array.to_list (get_children (foi base ifam)) :: acc)
-             [] ifam_l)
+      else get_descendants_at_level base p lev
     in
     let rec loop i ip_l =
       match ip_l with
