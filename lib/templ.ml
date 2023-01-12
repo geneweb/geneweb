@@ -137,14 +137,14 @@ let url_aux ?(pwd = true) conf =
   if conf.cgi then prefix ^ "?" ^ conf.bname ^ String.concat "&" l
   else prefix ^ String.concat "&" l
 
+(* when str = "" url_set_aux can reset several evar from evar_l in one call *)
 let url_set_aux conf evar_l str =
   match evar_l with
   | [] ->
       !GWPARAM.syslog `LOG_WARNING "Empty evar list\n";
       ""
-  | _ ->
-      let evar = List.nth evar_l 0 in
-      (* rebuild the current url from conf.env, replacing &evar=xxx by &evar=str () *)
+  | evar :: _l ->
+      (* rebuild the current url from conf.env, replacing &evar=xxx by &evar=str *)
       let url =
         match String.split_on_char '?' (Util.commd conf :> string) with
         | [] ->
@@ -152,14 +152,15 @@ let url_set_aux conf evar_l str =
             ""
         | s :: _l -> s ^ "?"
       in
-      let t =
+      (* if evar is not present in conf.env, it will be added at the end *)
+      let add_evar =
         match
           List.find_opt
             (fun (k, _) -> k = evar)
             (conf.henv @ conf.senv @ conf.env)
         with
-        | Some (_, _) -> true
-        | None -> false
+        | Some (_, _) -> false
+        | None -> true && str <> "" (* only if str <> "" *)
       in
       let l =
         List.filter_map
@@ -177,8 +178,7 @@ let url_set_aux conf evar_l str =
           (conf.henv @ conf.senv @ conf.env)
       in
       let url = url ^ String.concat "&" l in
-      (* t is true if evar was present in conf.env. If not, add it *)
-      if t || str = "" then url else url ^ Format.sprintf "&%s=%s" evar str
+      if add_evar then url ^ Format.sprintf "&%s=%s" evar str else url
 
 let substr_start_aux n s =
   let len = String.length s in
