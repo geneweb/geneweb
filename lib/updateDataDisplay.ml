@@ -306,7 +306,8 @@ let print_foreach conf print_ast _eval_expr =
       | [ _s ] -> () (* dont do last element *)
       | s :: l ->
           let tail =
-            if String.length s > 0 then List.nth (string_to_list s) 0 else ""
+            if String.length s > 0 then String.sub s (String.length s - 1) 1
+            else ""
           in
           let env =
             ("substr", Vstring s) :: ("tail", Vstring tail)
