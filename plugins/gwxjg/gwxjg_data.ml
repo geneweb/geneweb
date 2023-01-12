@@ -449,13 +449,15 @@ and mk_event conf base d =
         (* We may want to filter on [ip] or [k] before really accessing the person entity *)
         Tarray
           (Array.mapi
-             (fun i (ip, k, _wnotes) ->
+             (fun i (ip, k, wnote) ->
                let kind = mk_witness_kind k in
                let iper = Tstr (Gwdb.string_of_iper ip) in
+               let note = Tstr (Gwdb.sou base wnote) in
                Tpat
                  (function
                  | "kind" -> kind
                  | "iper" -> iper
+                 | "note" -> note
                  | s -> unbox_pat (Lazy.force lw).(i) @@ s))
              w)
   in
