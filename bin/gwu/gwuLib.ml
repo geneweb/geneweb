@@ -3,7 +3,6 @@
 open Geneweb
 open Def
 open Gwdb
-open Gwexport
 
 let old_gw = ref false
 let only_file = ref ""
@@ -218,6 +217,7 @@ let lines_list_of_string s =
   loop [] 0 0
 
 let has_infos_not_dates opts base p =
+  let open Gwexport in
   let has_picture_to_export =
     sou base (get_image p) <> "" && not opts.no_picture
   in
@@ -251,7 +251,7 @@ let print_if_not_equal_to opts x base lab is =
     Printf.ksprintf (oc opts) " %s %s" lab (correct_string base is)
 
 let print_src_if_not_equal_to opts x base lab is =
-  match opts.source with
+  match opts.Gwexport.source with
   | None -> if sou base is <> "" then print_if_not_equal_to opts x base lab is
   | Some "" -> ()
   | Some x -> Printf.ksprintf (oc opts) " %s %s" lab (s_correct_string x)
@@ -1500,7 +1500,7 @@ let rs_printf opts s =
 let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
   let to_separate = separate base in
   let out_oc_first = ref true in
-  let _ofile, oc, close = opts.oc in
+  let _ofile, oc, close = opts.Gwexport.oc in
   let origin_file fname =
     if out_dir = "" then (oc, out_oc_first, close)
     else if fname = "" then (oc, out_oc_first, close)
