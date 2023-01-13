@@ -44,6 +44,7 @@ val get_death_text : config -> person -> bool -> Adef.safe_string
 val get_burial_text : config -> person -> bool -> Adef.safe_string
 val get_cremation_text : config -> person -> bool -> Adef.safe_string
 val get_marriage_date_text : config -> family -> bool -> Adef.safe_string
+val get_marriage_witnesses : family -> (iper * Def.witness_kind * istr) array
 
 val linked_page_text :
   Config.config ->
