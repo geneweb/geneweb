@@ -2792,40 +2792,50 @@ and eval_bool_person_field conf base env (p, p_auth) = function
         | Some "always" ->
             if nb_fam > 0 || List.length events > 0 then true else false
         | Some _ | None ->
-            (* Renvoie vrai que si il y a des informations supplémentaires *)
-            (* par rapport aux évènements principaux, i.e. témoins (mais   *)
-            (* on ne prend pas en compte les notes).                       *)
+            (* return true if there is more event information
+               than basic principals events.
+               we do not take in account note on event as they are shown
+               on the note section.
+               but we do take in account witness notes. *)
             let rec loop events nb_principal_pevents nb_marr =
               match events with
               | [] -> false
-              | (name, _, p, n, s, wl, _) :: events -> (
-                  let p, n, s = (sou base p, sou base n, sou base s) in
-                  match name with
-                  | Event.Pevent pname -> (
-                      match pname with
-                      | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
-                      | Epers_Cremation ->
-                          if Array.length wl > 0 then true
-                          else
-                            let nb_principal_pevents =
-                              succ nb_principal_pevents
-                            in
-                            if nb_principal_pevents > 1 then true
+              | (name, _, p, note, s, wl, _) :: events -> (
+                  if
+                    (* return true if there is a witness_note on a witness *)
+                    Array.exists
+                      (fun (_ip, _wk, wnote) -> not (is_empty_string wnote))
+                      wl
+                  then true
+                  else
+                    let p, note, s = (sou base p, sou base note, sou base s) in
+                    match name with
+                    | Event.Pevent pname -> (
+                        match pname with
+                        | Epers_Birth | Epers_Baptism | Epers_Death
+                        | Epers_Burial | Epers_Cremation ->
+                            if Array.length wl > 0 then true
+                            else
+                              let nb_principal_pevents =
+                                succ nb_principal_pevents
+                              in
+                              if nb_principal_pevents > 1 then true
+                              else loop events nb_principal_pevents nb_marr
+                        | _ -> true)
+                    | Fevent fname -> (
+                        match fname with
+                        | Efam_Engage | Efam_Marriage | Efam_NoMention
+                        | Efam_NoMarriage ->
+                            let nb_marr = succ nb_marr in
+                            if nb_marr > nb_fam then true
                             else loop events nb_principal_pevents nb_marr
-                      | _ -> true)
-                  | Fevent fname -> (
-                      match fname with
-                      | Efam_Engage | Efam_Marriage | Efam_NoMention
-                      | Efam_NoMarriage ->
-                          let nb_marr = succ nb_marr in
-                          if nb_marr > nb_fam then true
-                          else loop events nb_principal_pevents nb_marr
-                      | Efam_Divorce | Efam_Separated ->
-                          if
-                            p <> "" || n <> "" || s <> "" || Array.length wl > 0
-                          then true
-                          else loop events nb_principal_pevents nb_marr
-                      | _ -> true))
+                        | Efam_Divorce | Efam_Separated ->
+                            if
+                              p <> "" || note <> "" || s <> ""
+                              || Array.length wl > 0
+                            then true
+                            else loop events nb_principal_pevents nb_marr
+                        | _ -> true))
             in
             loop events 0 0
       else false
