@@ -4518,10 +4518,12 @@ let print_foreach conf base print_ast eval_expr =
             (fun i (ip, wk, wnote) ->
               let p = pget conf base ip in
               let wk = Util.string_of_witness_kind conf (get_sex p) wk in
+              let wnote = Util.escape_html (sou base wnote) in
               let env =
                 ("event_witness", Vind p)
                 :: ("event_witness_kind", Vstring (wk :> string))
-                :: ("event_witness_note", Vstring (sou base wnote))
+                :: ( "event_witness_note",
+                     Vstring (wnote : Adef.escaped_string :> string) )
                 :: ("first", Vbool (i = 0))
                 :: env
               in
