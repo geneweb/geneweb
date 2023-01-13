@@ -1368,6 +1368,8 @@ let init_cousins_cnt conf base env p =
         Printf.sprintf "******** Compute %d × %d table ********\n" max_l1 max_l2
         |> !GWPARAM.syslog `LOG_WARNING;
         (* TODO test for Sys.max_array_length *)
+        let () = load_ascends_array base in
+        let () = load_couples_array base in
         let cousins_cnt = Array.make_matrix (max_l2 + 1) (max_l2 + 1) [] in
         let cousins_dates = Array.make_matrix (max_l2 + 1) (max_l2 + 1) [] in
         cousins_cnt.(0).(0) <-
