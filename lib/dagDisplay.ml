@@ -25,36 +25,51 @@ let image_normal_txt conf base p fname width height =
       (if width = 0 then "" else "max-width:" ^ string_of_int width ^ "px;")
       (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
   in
-  Format.sprintf {|<a href="%sm=IM&%s&k=%s">%s</a>|}
-    (commd conf : Adef.escaped_string :> string)
-    (acces conf base p : Adef.escaped_string :> string)
-    k r
+  (if p_getenv conf.env "cgl" = Some "on" then r
+  else
+    Format.sprintf {|<a href="%sm=IM&%s&k=%s">%s</a>|}
+      (commd conf : Adef.escaped_string :> string)
+      (acces conf base p : Adef.escaped_string :> string)
+      k r)
   |> Adef.safe
 
 let image_url_txt conf url_p url height : Adef.safe_string =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
+  let hed, trl =
+    if p_getenv conf.env "cgl" = Some "on" then ("", "")
+    else
+      ( Format.sprintf {|<a href="%s">|} (url_p : Adef.escaped_string :> string),
+        "</a>" )
+  in
   Format.sprintf
-    {|<a href="%s"><img src="%s" alt="%s" title="%s"
-      style="%s"></a>|}
-    (url_p : Adef.escaped_string :> string)
+    {|%s<img src="%s" alt="%s" title="%s"
+      style="%s">%s|}
+    hed
     (url : Adef.escaped_string :> string)
     image_txt image_txt
     (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
+    trl
   |> Adef.safe
 
 let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
+  let hed, trl =
+    if p_getenv conf.env "cgl" = Some "on" then ("", "")
+    else
+      ( Format.sprintf {|<a href="%s">|} (url_p : Adef.escaped_string :> string),
+        "</a>" )
+  in
   Format.sprintf
-    {|<a href="%s"><img src="%s"%s%s alt="%s" title="%s"
-      style="%s %s">%s</a>|}
-    (url_p : Adef.escaped_string :> string)
+    {|%s<img src="%s"%s%s alt="%s" title="%s"
+      style="%s %s">%s%s|}
+    hed
     (url : Adef.escaped_string :> string)
     (if width = 0 then "" else " width=" ^ string_of_int width)
     (if height = 0 then "" else " height=" ^ string_of_int height)
     image_txt image_txt
     (if width = 0 then "" else "max-width:" ^ string_of_int width ^ "px;")
     (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
-    image_txt
+    image_txt trl
   |> Adef.safe
 
 let image_txt conf base p =
@@ -132,14 +147,16 @@ let print_table conf
           Output.print_sstring conf "\"");
       Output.print_sstring conf ">";
       (match td with
-      | TDitem s -> Output.print_string conf s
-      | TDtext s -> Output.print_string conf s
+      | TDitem (_ip, s, _t) -> Output.print_string conf s
+      | TDtext (_ip, s) -> Output.print_string conf s
       | TDnothing -> Output.print_sstring conf "&nbsp;"
       | TDbar None -> Output.print_sstring conf "|"
       | TDbar (Some (s : Adef.escaped_string)) ->
-          Output.print_sstring conf {|<a style="text-decoration:none" href="|};
-          Output.print_string conf s;
-          Output.print_sstring conf {|">|</a>|}
+          if p_getenv conf.env "cgl" = Some "on" then Output.print_string conf s
+          else (
+            Output.print_sstring conf {|<a style="text-decoration:none" href="|};
+            Output.print_string conf s;
+            Output.print_sstring conf {|">|</a>|})
       | TDhr align -> (
           match align with
           | LeftA ->
@@ -341,8 +358,8 @@ let gen_compute_columns_sizes size_fun
                 if colspan = curr_colspan then
                   let len =
                     match td with
-                    | TDitem s -> size_fun s
-                    | TDtext s -> size_fun s
+                    | TDitem (_ip, s, _t) -> size_fun s
+                    | TDtext (_ip, s) -> size_fun s
                     | _ -> 1
                   in
                   let currsz =
@@ -455,13 +472,14 @@ let table_strip_troublemakers hts =
   for i = 0 to Array.length hts - 1 do
     for j = 0 to Array.length hts.(i) - 1 do
       match hts.(i).(j) with
-      | colspan, align, TDitem s ->
-          hts.(i).(j) <- (colspan, align, TDitem (strip_troublemakers s))
+      | colspan, align, TDitem (ip, s, _t) ->
+          hts.(i).(j) <-
+            (colspan, align, TDitem (ip, strip_troublemakers s, Adef.safe ""))
       | _ -> ()
     done
   done
 
-let table_pre_dim (hts : (int * 'a * 'c Dag2html.table_data) array array) =
+let table_pre_dim (hts : (int * 'a * 'b Dag2html.table_data) array array) =
   table_strip_troublemakers hts;
   let ncol =
     let hts0 = hts.(0) in
@@ -481,6 +499,7 @@ let table_pre_dim (hts : (int * 'a * 'c Dag2html.table_data) array array) =
 
 let print_next_pos conf pos1 pos2 tcol =
   let doit = p_getenv conf.env "notab" = Some "on" in
+  let cgl = p_getenv conf.env "cgl" = Some "on" in
   if doit then (
     let dpos =
       match p_getint conf.env "dpos" with Some dpos -> dpos | None -> 78
@@ -510,6 +529,7 @@ let print_next_pos conf pos1 pos2 tcol =
     in
     Output.print_sstring conf {|<div style="text-align:right">|};
     if pos1 = 0 then Output.print_sstring conf "&nbsp;"
+    else if cgl then Output.print_sstring conf "&lt;&lt;"
     else (
       Output.print_sstring conf "<a href=\"";
       Output.print_string conf (commd conf);
@@ -521,6 +541,7 @@ let print_next_pos conf pos1 pos2 tcol =
       Output.print_sstring conf (string_of_int @@ (pos1 + overlap));
       Output.print_sstring conf "\">&lt;&lt;</a>");
     if pos2 >= tcol then Output.print_sstring conf "&nbsp;"
+    else if cgl then Output.print_sstring conf "&gt;&gt;"
     else (
       Output.print_sstring conf "<a href=\"";
       Output.print_string conf (commd conf);
@@ -535,6 +556,7 @@ let print_next_pos conf pos1 pos2 tcol =
 (* Main print table algorithm with <pre> *)
 
 let print_table_pre conf hts =
+  let cgl = p_getenv conf.env "cgl" = Some "on" in
   let displayed_sub s b e =
     displayed_sub (s : Adef.safe_string :> string) b e |> Adef.safe
   in
@@ -573,7 +595,10 @@ let print_table_pre conf hts =
                 in
                 loop 0 colspan |> displayed_strip s |> Array.of_list
               in
-              match td with TDitem s -> aux s | TDtext s -> aux s | _ -> [||]
+              match td with
+              | TDitem (_ip, s, _t) -> aux s
+              | TDtext (_ip, s) -> aux s
+              | _ -> [||]
             in
             loop (stra :: stral)
               (max max_row (Array.length stra))
@@ -622,7 +647,7 @@ let print_table_pre conf hts =
                   | None -> Adef.safe "|"
                   | Some s ->
                       let s = (s : Adef.escaped_string :> string) in
-                      if s = "" then Adef.safe "|"
+                      if s = "" || cgl then Adef.safe "|"
                       else
                         Adef.safe
                         @@ Printf.sprintf
@@ -668,19 +693,23 @@ let print_table_pre conf hts =
 (* main *)
 
 let print_html_table conf hts =
-  if Util.p_getenv conf.env "notab" <> Some "on" then (
-    Output.print_sstring conf {|<p><div style="text-align:|};
-    Output.print_sstring conf conf.right;
-    Output.print_sstring conf {|"><a href="|};
-    Output.print_string conf (commd conf);
-    List.iter
-      (fun (k, v) ->
-        Output.print_sstring conf k;
-        Output.print_sstring conf "=";
-        Output.print_string conf v;
-        Output.print_sstring conf ";")
-      conf.env;
-    Output.print_sstring conf {|notab=on&slices=on"><tt>//</tt></a></div></p>|});
+  let cgl = p_getenv conf.env "cgl" = Some "on" in
+  if Util.p_getenv conf.env "notab" <> Some "on" then
+    if cgl then Output.print_sstring conf "<tt>//</tt>"
+    else (
+      Output.print_sstring conf {|<p><div style="text-align:|};
+      Output.print_sstring conf conf.right;
+      Output.print_sstring conf {|"><a href="|};
+      Output.print_string conf (commd conf);
+      List.iter
+        (fun (k, v) ->
+          Output.print_sstring conf k;
+          Output.print_sstring conf "=";
+          Output.print_string conf v;
+          Output.print_sstring conf ";")
+        conf.env;
+      Output.print_sstring conf
+        {|notab=on&slices=on"><tt>//</tt></a></div></p>|});
   if
     Util.p_getenv conf.env "notab" = Some "on"
     || Util.p_getenv conf.env "pos2" <> None
@@ -691,9 +720,12 @@ let print_html_table conf hts =
 let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let spouse_on =
-    match Util.p_getenv conf.env "spouse" with Some "on" -> true | _ -> false
+    match Util.p_getenv conf.env "sp" with Some "on" -> true | _ -> false
   in
   let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
+  let indi_ip n =
+    match n.valu with Left ip -> ip | Right _ -> Gwdb.dummy_iper
+  in
   let indi_txt n =
     match n.valu with
     | Left ip ->
@@ -756,7 +788,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let phony n = match n.valu with Left _ -> false | Right _ -> true in
   let t = Dag2html.table_of_dag phony false invert no_group d in
   if Array.length t.table = 0 then [||]
-  else Dag2html.html_table_struct indi_txt vbar_txt phony d t
+  else Dag2html.html_table_struct indi_ip indi_txt vbar_txt phony d t
 
 let print_slices_menu conf hts =
   let header n =
@@ -801,15 +833,19 @@ let print_slices_menu conf hts =
   Hutil.trailer conf
 
 let print_dag_page conf page_title hts next_txt =
+  let cgl = p_getenv conf.env "cgl" = Some "on" in
   let title _ = Output.print_string conf page_title in
   Hutil.header_no_page_title conf title;
-  Util.include_template conf conf.env "buttons_rel" (fun () -> ());
+  if cgl then ()
+  else Util.include_template conf conf.env "buttons_rel" (fun () -> ());
   print_html_table conf hts;
-  if (next_txt : Adef.escaped_string :> string) <> "" then (
-    Output.print_sstring conf {|<p><a href="|};
-    Output.print_string conf (commd conf);
-    Output.print_string conf next_txt;
-    Output.print_sstring conf {|">&gt;&gt;</a></p>|});
+  if (next_txt : Adef.escaped_string :> string) <> "" then
+    if cgl then Output.print_sstring conf {|">&gt;&gt;</p>|}
+    else (
+      Output.print_sstring conf {|<p><a href="|};
+      Output.print_string conf (commd conf);
+      Output.print_string conf next_txt;
+      Output.print_sstring conf {|">&gt;&gt;</a></p>|});
   Hutil.trailer conf
 
 (* *)
@@ -854,7 +890,39 @@ let eval_predefined_apply f vl =
   | "max", s :: sl -> min_max_aux max s sl
   | _ -> raise Not_found
 
-let rec eval_var conf (page_title : Adef.safe_string)
+let parents_access_aux conf base td get_parent =
+  match td with
+  | TDitem (ip, _, _) | TDtext (ip, _) -> (
+      match get_parents (poi base ip) with
+      | Some ifam ->
+          let cpl = foi base ifam in
+          VVstring (Util.acces conf base (poi base (get_parent cpl)) :> string)
+      | None -> VVstring "")
+  | _ -> VVstring ""
+
+let has_sibling_aux base td next_or_prev =
+  match td with
+  | TDitem (ip, _, _) | TDtext (ip, _) -> (
+      match get_parents (poi base ip) with
+      | Some ifam ->
+          let sib = get_children (foi base ifam) in
+          (* array *)
+          let i = ref (-1) in
+          let _ = Array.iteri (fun n s -> if ip = s then i := n else ()) sib in
+          let cond =
+            if next_or_prev then !i >= 0 && !i < Array.length sib - 1
+            else !i >= 1
+          in
+          (cond, if cond then Some sib.(!i + if cond then 1 else -1) else None)
+      | None -> (false, None))
+  | _ -> (false, None)
+
+let sibling_access_aux conf base td next_or_prev =
+  match has_sibling_aux base td next_or_prev with
+  | true, Some s_ip -> VVstring (Util.acces conf base (poi base s_ip) :> string)
+  | _, _ -> raise Not_found
+
+let rec eval_var conf base (page_title : Adef.safe_string)
     (next_txt : Adef.escaped_string) env _xx _loc = function
   | [ "browsing_with_sosa_ref" ] -> (
       match (Util.p_getenv conf.env "pz", Util.p_getenv conf.env "nz") with
@@ -870,7 +938,7 @@ let rec eval_var conf (page_title : Adef.safe_string)
       | _ -> raise Not_found)
   | "dag_cell" :: sl -> (
       match get_env "dag_cell" env with
-      | Vdcell dcell -> eval_dag_cell_var conf dcell sl
+      | Vdcell dcell -> eval_dag_cell_var conf base dcell sl
       | _ -> raise Not_found)
   | [ "dag_cell_pre" ] -> (
       match get_env "dag_cell_pre" env with
@@ -912,7 +980,12 @@ and eval_dag_var _conf (tmincol, tcol, _colminsz, colsz, _ncol) = function
   | [ "ncol" ] -> VVstring (string_of_int (Array.fold_left ( + ) 0 colsz))
   | _ -> raise Not_found
 
-and eval_dag_cell_var conf (colspan, align, td) = function
+and eval_dag_cell_var conf base (colspan, align, td) = function
+  | [ "access" ] -> (
+      match td with
+      | TDtext (ip, _s) ->
+          VVstring (Util.acces conf base (poi base ip) :> string)
+      | _ -> VVstring "")
   | [ "align" ] -> (
       match align with
       | LeftA -> VVstring conf.left
@@ -924,10 +997,19 @@ and eval_dag_cell_var conf (colspan, align, td) = function
         | TDbar (Some s) -> (s : Adef.escaped_string :> string)
         | _ -> "")
   | [ "colspan" ] -> VVstring (string_of_int colspan)
-  (* TODO for next three items, implement TDitem (ip, s, t), TDtext (ip, s) *)
-  | [ "has_next_sibling" ] -> VVstring ""
-  | [ "has_prev_sibling" ] -> VVstring ""
-  | [ "index" ] -> VVstring ""
+  | [ "father"; "access" ] -> parents_access_aux conf base td get_father
+  | [ "has_next_sibling" ] -> (
+      match has_sibling_aux base td true with
+      | true, _ -> VVbool true
+      | _, _ -> VVbool false)
+  | [ "has_prev_sibling" ] -> (
+      match has_sibling_aux base td false with
+      | true, _ -> VVbool true
+      | _, _ -> VVbool false)
+  | [ "index" ] -> (
+      match td with
+      | TDitem (ip, _, _) | TDtext (ip, _) -> VVstring (string_of_iper ip)
+      | _ -> VVstring "")
   | [ "is_bar" ] -> VVbool (match td with TDbar _ -> true | _ -> false)
   | [ "is_hr" ] -> (
       match td with
@@ -942,23 +1024,26 @@ and eval_dag_cell_var conf (colspan, align, td) = function
   | [ "is_nothing" ] -> VVbool (td = TDnothing)
   | [ "item" ] -> (
       match td with
-      | TDitem s -> VVstring (s : Adef.safe_string :> string)
+      | TDitem (_ip, s, _t) -> VVstring (s : Adef.safe_string :> string)
       | _ -> VVstring "")
+  | [ "mother"; "access" ] -> parents_access_aux conf base td get_mother
+  | [ "next_sibling"; "access" ] -> sibling_access_aux conf base td true
+  | [ "prev_sibling"; "access" ] -> sibling_access_aux conf base td false
   | [ "text" ] -> (
       match td with
-      | TDtext s -> VVstring (s : Adef.safe_string :> string)
+      | TDtext (_ip, s) -> VVstring (s : Adef.safe_string :> string)
       | _ -> VVstring "")
   | _ -> raise Not_found
 
 let rec print_foreach conf hts print_ast _eval_expr env () _loc s sl _el al =
   match s :: sl with
   | [ "dag_cell" ] -> print_foreach_dag_cell hts print_ast env al
-  | [ "dag_cell_pre" ] -> print_foreach_dag_cell_pre hts print_ast env al
+  | [ "dag_cell_pre" ] -> print_foreach_dag_cell_pre conf hts print_ast env al
   | [ "dag_line" ] -> print_foreach_dag_line print_ast env hts al
   | [ "dag_line_pre" ] -> print_foreach_dag_line_pre conf hts print_ast env al
   | _ -> raise Not_found
 
-and print_foreach_dag_cell_pre hts print_ast env al =
+and print_foreach_dag_cell_pre conf hts print_ast env al =
   let i =
     match get_env "dag_line" env with Vdline i -> i | _ -> raise Not_found
   in
@@ -1005,7 +1090,9 @@ and print_foreach_dag_cell_pre hts print_ast env al =
               match (s : Adef.escaped_string option :> string option) with
               | None | Some "" -> "|"
               | Some s ->
-                  {|<a style="text-decoration:none" href="|} ^ s ^ {|">|</a>|}
+                  if p_getenv conf.env "cgl" = Some "on" then s
+                  else
+                    {|<a style="text-decoration:none" href="|} ^ s ^ {|">|</a>|}
             in
             let len = displayed_length (Adef.safe s) in
             String.make ((sz - len) / 2) ' '
@@ -1093,8 +1180,8 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
               Array.of_list (displayed_strip s sz)
             in
             match td with
-            | TDitem s -> aux (s :> Adef.safe_string)
-            | TDtext s -> aux s
+            | TDitem (_ip, s, _t) -> aux (s :> Adef.safe_string)
+            | TDtext (_ip, s) -> aux s
             | _ -> [||]
           in
           loop (stra :: stral)
@@ -1121,7 +1208,7 @@ let old_print_slices_menu_or_dag_page conf page_title hts next_txt =
   if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf hts
   else print_dag_page conf page_title hts next_txt
 
-let print_slices_menu_or_dag_page conf page_title hts next_txt =
+let print_slices_menu_or_dag_page conf base page_title hts next_txt =
   if p_getenv conf.env "old" = Some "on" then
     old_print_slices_menu_or_dag_page conf page_title hts next_txt
   else
@@ -1154,7 +1241,7 @@ let print_slices_menu_or_dag_page conf page_title hts next_txt =
     in
     Hutil.interp conf "dag"
       {
-        Templ.eval_var = eval_var conf page_title next_txt;
+        Templ.eval_var = eval_var conf base page_title next_txt;
         Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
         Templ.eval_predefined_apply = (fun _ -> eval_predefined_apply);
         Templ.get_vother;
@@ -1167,7 +1254,7 @@ let make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title
     next_txt =
   let d = make_dag conf base set in
   let hts = make_tree_hts conf base elem_txt vbar_txt invert set spl d in
-  print_slices_menu_or_dag_page conf page_title hts next_txt
+  print_slices_menu_or_dag_page conf base page_title hts next_txt
 
 let print conf base =
   let set = get_dag_elems conf base in
