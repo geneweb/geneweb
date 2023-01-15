@@ -1231,10 +1231,10 @@ let make_conf from_addr request script_name env =
      image_prefix =
        if !images_url <> "" then !images_url
        else if !(Wserver.cgi) then
-					begin match Sys.getenv_opt "GW_STATIC_PATH" with
-					| Some x -> x ^ "../images"
-					| None -> "../distribution/gw/images/"
-					end
+          begin match Sys.getenv_opt "GW_STATIC_PATH" with
+          | Some x -> x ^ "../images"
+          | None -> "../distribution/gw/images/"
+          end
        else "images";
      static_path =
        begin match Sys.getenv_opt "GW_STATIC_PATH" with

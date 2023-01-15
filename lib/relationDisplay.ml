@@ -52,7 +52,7 @@ let old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   let hts =
     DagDisplay.make_tree_hts conf base elem_txt vbar_txt invert set [] d
   in
-  DagDisplay.print_slices_menu_or_dag_page conf page_title hts next_txt
+  DagDisplay.print_slices_menu_or_dag_page conf base page_title hts next_txt
 
 let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   if p_getenv conf.env "new" <> Some "on" then

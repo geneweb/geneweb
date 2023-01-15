@@ -1110,7 +1110,7 @@ let make_tree_hts conf base gv p =
               ^<^ txt ^>^ {|</td></tr></table>|}
             else txt
           in
-          ((2 * ncol) - 1, CenterA, TDitem txt)
+          ((2 * ncol) - 1, CenterA, TDitem (get_iper p, txt, Adef.safe ""))
       | None -> (1, LeftA, TDnothing)
     in
     td :: tdl
@@ -1124,11 +1124,14 @@ let make_tree_hts conf base gv p =
           else
             let ifam = (get_family p).(i) in
             let tdl =
-              if i > 0 then (1, LeftA, TDtext (Adef.safe "...")) :: tdl else tdl
+              if i > 0 then
+                (1, LeftA, TDtext (Gwdb.dummy_iper, Adef.safe "...")) :: tdl
+              else tdl
             in
             let td =
               let fam = foi base ifam in
               let ncol = if v > 1 then fam_nb_column 0 (v - 1) fam else 1 in
+              let sp = pget conf base (Gutil.spouse (get_iper p) fam) in
               let s =
                 let sp = pget conf base (Gutil.spouse (get_iper p) fam) in
                 let txt =
@@ -1152,7 +1155,9 @@ let make_tree_hts conf base gv p =
                   ^^^ {|>|} ^<^ s ^>^ {|</td></tr></table>|}
                 else s
               in
-              ((2 * ncol) - 1, CenterA, TDitem s)
+              ( (2 * ncol) - 1,
+                CenterA,
+                TDitem (get_iper sp, s, Adef.safe "spouse_x") )
             in
             loop (td :: tdl) (i + 1)
         in
@@ -1221,7 +1226,8 @@ let print_tree conf base v p =
     |> Adef.safe
   in
   let hts = make_tree_hts conf base gv p in
-  DagDisplay.print_slices_menu_or_dag_page conf page_title hts (Adef.escaped "")
+  DagDisplay.print_slices_menu_or_dag_page conf base page_title hts
+    (Adef.escaped "")
 
 let print_aboville conf base max_level p =
   let max_level = min (Perso.limit_desc conf) max_level in
@@ -1282,6 +1288,580 @@ let print_aboville conf base max_level p =
 
 let desmenu_print = Perso.interp_templ "desmenu"
 
+(* new descendant tree algorithm *)
+(* based on the work of Jean Vaucher (U of Montreal) *)
+(* - see issue #414 for comments and details *)
+
+(* *****************************************************************
+   L'algo fait un parcours PRE-ORDRE de l'arbre en donnant une colonne
+   initiale "logique" pour chaque personne, par exemple:  X-1 et X+1
+   pour les 2 enfants d'un pere (P) dans la colonne X.
+   Ce "X" initial peut etre augmenté (déplacé à droite) pour 2 raisons:
+
+   a) La case proposée est déjà occupée.  Un tableau global,
+   last_x, garde la position des derniers noeuds dans chaque rangée.
+   On modifie X = max( X, last_x[i]+2)  gardant au moins une colonne
+   vide entre chaque noeud.
+   b) Pour la meme raison, il se peut que les enfants de la personne
+   soient déplacés. ON termine en mettant X a mi-chemin entre les position
+   finale du premier et dernier enfant.
+
+    ***************************************************************** *)
+
+(* one td is [nb_cols * align * content]  see dag2Html.ml *)
+
+(* empty fill over n columns *)
+let td_fill x1 xn = [ (xn - x1, CenterA, TDnothing) ]
+
+(* hbar over xn - x1 columns. First and last are left/right and 50% *)
+let td_hbar x1 xn =
+  match xn - x1 with
+  | 0 -> [ (1, CenterA, TDnothing) ]
+  | 1 -> [ (1, CenterA, TDhr CenterA) ]
+  | _ ->
+      [ (1, LeftA, TDhr LeftA) ]
+      @ [ (xn - x1 - 1, CenterA, TDhr CenterA) ]
+      @ [ (1, RightA, TDhr RightA) ]
+
+(* regular cell, centered, with text as content (may contain |<br>) *)
+let td_cell cols align ip text flags =
+  match align with
+  | "center" -> [ (cols, CenterA, TDitem (ip, Adef.safe text, flags)) ]
+  | "right" -> [ (cols, RightA, TDitem (ip, Adef.safe text, flags)) ]
+  | "left" -> [ (cols, LeftA, TDitem (ip, Adef.safe text, flags)) ]
+  | _ -> [ (0, CenterA, TDitem (ip, Adef.safe text, flags)) ]
+
+(* tdal is   (int   *    list      ) list           *)
+(*           (lastx      list of td) list of rows   *)
+
+(* add elem to row ir. Update lastx *)
+let tdal_add tdal ir elem nx =
+  let tdal =
+    let rec loop tdal new_tdal ir elem nx =
+      match tdal with
+      | [] -> new_tdal
+      | (x, row) :: tdal ->
+          if ir = 0 then
+            let new_row = (nx, row @ elem) in
+            new_row :: loop tdal new_tdal (ir - 1) elem nx
+          else (x, row) :: loop tdal new_tdal (ir - 1) elem nx
+    in
+    loop tdal [] ir elem nx
+  in
+  tdal
+
+let get_bd_td_prop conf =
+  let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
+  let td_prop =
+    match Util.p_getenv conf.env "td" with
+    | Some x -> " " ^ x
+    | _ -> (
+        match Util.p_getenv conf.env "color" with
+        | None | Some "" -> ""
+        | Some x -> " class=\"" ^ x ^ "\"")
+  in
+  (bd, td_prop)
+
+let reference conf base p s =
+  let iper = get_iper p in
+  if is_hidden p then s
+  else
+    String.concat ""
+      [
+        "<a href=\"";
+        (commd conf :> string);
+        (acces conf base p :> string);
+        "\" id=\"i";
+        string_of_iper iper;
+        "\"";
+        " class=\"normal_anchor\"";
+        " title=\"[go on individual page]\">";
+        s;
+        "</a>";
+      ]
+
+let get_text conf base p filler img cgl =
+  let bd, td_prop = get_bd_td_prop conf in
+  let auth = authorized_age conf base p in
+  let txt = person_title_text conf base p in
+  let txt =
+    if cgl then (txt :> string) else reference conf base p (txt :> string)
+  in
+  let txt =
+    if auth then txt ^ (DateDisplay.short_dates_text conf base p :> string)
+    else txt
+  in
+  let vbar_image =
+    if filler && img then
+      Printf.sprintf
+        "<div class=\"flex-grow-1\"><img src=\"%sm=IM&v=vbar.jpg\" \
+         class=\"img-fluid\"></div>\n"
+        (commd conf :> string)
+    else ""
+  in
+  let has_image = Image.get_portrait conf base p |> Option.is_some in
+  let txt =
+    txt
+    ^
+    if has_image && img then (DagDisplay.image_txt conf base p :> string)
+    else vbar_image
+  in
+  let txt =
+    if bd > 0 || td_prop <> "" then
+      Printf.sprintf
+        "<table style=\"border: %dpx solid\"><tr><td \
+         align=\"center\"%s>%s</td></tr></table>"
+        bd td_prop txt
+    else txt
+  in
+  txt
+
+let lastx tdal ir =
+  let x, _ = List.nth tdal ir in
+  x
+
+let _both_parents_in_only_anc p sp only_anc =
+  let ip = get_iper p in
+  let isp = get_iper sp in
+  List.mem ip only_anc && List.mem isp only_anc
+
+let get_spouse base iper ifam =
+  let f = foi base ifam in
+  if iper = get_father f then poi base (get_mother f)
+  else poi base (get_father f)
+
+(* the heart of Jean Vaucher algo                                    *)
+(* to manage sps=on, one must handle different ir numbering *)
+(* insufficient to skip "display" of spouses WIP  default is on *)
+
+(* for the "only" option , prune the family list according to   *)
+(* relationship with target                                     *)
+
+(*
+        /                 |           (except for first row)
+  ir   |               person
+        \                 |           (except if no spouse )
+  ir+1         ---- hbar over spouses ----  (| if only one)
+        /                 |
+  ir+2 |               spouse
+        \                 |           (except if no child)
+  ir+3          --- hbar over children ---- (| if only one)
+
+  option sps=off -> only 3 rows
+  option only  -> ?
+
+*)
+
+let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
+  let lx = lastx tdal ir in
+  let x = if lx + 2 > x0 then lx + 2 else x0 in
+  (*let x1 = x in
+    let xn = x in *)
+  let ifaml = List.rev (Array.to_list (get_family p)) in
+  let ifam_nbr = List.length ifaml in
+  let descendants = ifaml <> [] in
+  (* find right family there *)
+  let ifaml =
+    if only_anc <> [] then
+      List.fold_left
+        (fun acc ifam -> if List.mem ifam only_anc then ifam :: acc else acc)
+        [] ifaml
+    else ifaml
+  in
+  let tdal, x, _x1, _xn =
+    if v >= 1 && ifaml <> [] then
+      let xn = if only_anc = [] then x - List.length ifaml - 1 else x in
+      let tdal, x1, xn =
+        let rec loop ifaml ifam_nbr only_one first last x1 xn tdal =
+          match ifaml with
+          | [] -> (tdal, x1, xn)
+          | ifam :: ifaml ->
+              let tdal, xn =
+                f_pos conf base ifam ifam_nbr only_one first last p (xn + 2) v
+                  (ir + 1) tdal only_anc sps img marr cgl
+              in
+              loop ifaml (ifam_nbr - 1) only_one false
+                (List.length ifaml = 1)
+                (if first then xn else x1)
+                xn tdal
+        in
+        loop ifaml ifam_nbr
+          (List.length ifaml = 1)
+          true
+          (List.length ifaml = 1)
+          0 xn tdal
+      in
+      (tdal, (x1 + xn) / 2, x1, xn)
+    else (tdal, x, x, x)
+    (* ?? correct ?? *)
+  in
+  (* row 1: person *)
+  let vv =
+    match p_getenv conf.env "v" with Some v -> "&v=" ^ v | None -> "&v=4"
+  in
+  let pp = Util.find_person_in_env conf base "" in
+  let pp_index =
+    match pp with Some p -> "&i=" ^ string_of_iper (get_iper p) | None -> ""
+  in
+  let pz = Util.find_person_in_env conf base "z" in
+  let pz_index =
+    match pz with Some p -> "&iz=" ^ string_of_iper (get_iper p) | None -> ""
+  in
+  let txt = get_text conf base p (ifaml <> [] && sps) img cgl in
+  let only =
+    if cgl then "|"
+    else
+      Printf.sprintf "<a href=\"%sm=D&t=TV%s%s%s%s%s%s\" %s title=\"%s\">│</a>"
+        (commd conf :> string)
+        vv pz_index pp_index
+        ("&oi=" ^ string_of_iper (get_iper p))
+        (if sps then "" else "&sp=0")
+        (if img then "" else "&im=0")
+        "class=\"normal_anchor px-3 btn-outline-primary border-0\""
+        (Utf8.capitalize_fst
+           (Util.transl conf "limit tree to ancestors and siblings"))
+  in
+  let txt = if ir > 0 then only ^ "<br>" ^ txt else txt in
+  (* ajouter un marqueur ici si enfants et on ne continue pas !!   *)
+  let continue = only_anc = [] || ifaml <> [] in
+  let br = if img then "" else "<br>" in
+  let txt = if (not continue) && descendants then txt ^ br ^ "+" else txt in
+  let lx = if lx > -1 then lx else -1 in
+  let tdal =
+    tdal_add tdal ir
+      (td_fill lx (x - 1) @ td_cell 1 "center" (get_iper p) txt (Adef.safe ""))
+      x
+  in
+  (* row 2: Hbar over sps *)
+  (* TODO review
+     let tdal =
+       if v >= 1 && ifaml<>[] then
+         let lx = lastx tdal (ir+1) in
+         let lx = if lx > -1 then lx else -1 in
+         if only_anc = [] && x1 <> xn then
+           tdal_add tdal (ir+1)
+             ((td_fill lx (x1 - 1))
+             @ (td_hbar x1 xn))
+             xn
+         else
+           tdal_add tdal (ir+1)
+             ((td_fill lx (x - 1))
+             @ (td_cell 1 "center" Gwdb.dummy_iper (Adef.safe "|") (Adef.safe "")))
+             x
+       else tdal
+     in
+  *)
+  (tdal, x)
+
+(* ifam_nbr = -1 = 1 family, otherwize rank *)
+and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
+    sps img marr cgl =
+  let sp = get_spouse base (get_iper p) ifam in
+  let continue = only_anc = [] || List.mem ifam only_anc in
+  let lx = lastx tdal ir2 + 2 in
+  let x = if lx > x0 then lx else x0 in
+  (*let x1 = x in
+    let xn = x in *)
+  let kids =
+    Array.fold_left
+      (fun l k -> poi base k :: l)
+      []
+      (get_children (foi base ifam))
+  in
+  let tdal, x, x1, xn =
+    if kids <> [] && continue then
+      let xn = x - List.length kids - 1 in
+      let tdal, x1, xn =
+        let rec loop kids first_kid tdal x1 xn =
+          match kids with
+          | [] -> (tdal, x1, xn)
+          | kid :: kids ->
+              let tdal, xn =
+                p_pos conf base kid (xn + 2) (v - 1) (ir2 + 2) tdal only_anc sps
+                  img marr cgl
+              in
+              loop kids false tdal (if first_kid then xn else x1) xn
+        in
+        loop kids true tdal 0 xn
+      in
+      (tdal, (x1 + xn) / 2, x1, xn)
+    else (tdal, x, x, x)
+  in
+  (* row 3: spouses *)
+  let txt = get_text conf base sp (kids <> [] && sps) img cgl in
+  let has_image = Image.get_portrait conf base p |> Option.is_some in
+  let br_sp = if has_image && img then "" else "<br>" in
+  let fam = foi base ifam in
+  let marr_d =
+    if marr then DateDisplay.short_family_dates_text conf base true fam
+    else Adef.safe ""
+  in
+  let m_txt =
+    (* families are scanned in reverse order *)
+    let f_nbr = string_of_int ifam_nbr in
+    "<span class=\"text-nowrap\">"
+    ^ (if last || only_one then "" else "…")
+    ^ (if only_one then " &" else " &<sup>" ^ f_nbr ^ "</sup>")
+    ^ (marr_d :> string)
+    ^ (if first || only_one then "" else "…")
+    ^ "</span>"
+    ^ if only_one && not marr then "" else "<br>"
+  in
+  let txt = txt ^ if kids <> [] then br_sp else "" in
+  let txt = if sps then m_txt ^ txt else m_txt in
+  let txt = if kids <> [] then txt ^ "|" else txt in
+  let flag =
+    string_of_ifam ifam ^ if kids <> [] then "-spouse_no_d" else "-spouse"
+  in
+  let lx = lastx tdal ir2 in
+  let lx = if lx > -1 then lx else -1 in
+  let tdal =
+    if true then
+      tdal_add tdal ir2
+        (td_fill lx (x - 1)
+        @ td_cell 1 "center" (get_iper sp) txt (Adef.safe flag))
+        x
+    else tdal
+  in
+  (* rox 4: Hbar over kids *)
+  if kids <> [] then
+    let lx = lastx tdal (ir2 + 1) in
+    let lx = if lx > -1 then lx else -1 in
+    let tdal =
+      tdal_add tdal (ir2 + 1) (td_fill lx (x1 - 1) @ td_hbar x1 xn) xn
+    in
+    (tdal, x)
+  else (tdal, x)
+
+let complete_rows tdal =
+  let max_col =
+    let rec loop tdal max_col =
+      match tdal with
+      | [] -> max_col
+      | (x, _row) :: tdal -> loop tdal (if x > max_col then x else max_col)
+    in
+    loop tdal (-2)
+  in
+  let tdal =
+    let rec loop tdal new_td =
+      match tdal with
+      | [] -> new_td
+      | (x, row) :: tdal ->
+          if max_col - x > 0 then
+            loop tdal ((max_col, row @ td_fill x max_col) :: new_td)
+          else loop tdal ((x, row) :: new_td)
+    in
+    loop tdal []
+  in
+  List.rev tdal
+
+let init_tdal gv =
+  let rec loop tdal v =
+    match v with
+    | -1 -> tdal (* 4 rows per generation  (3 if sps=off) *)
+    | _ -> loop ((0, []) :: (0, []) :: (0, []) :: (0, []) :: tdal) (v - 1)
+  in
+  loop [] gv
+
+(* bring back spouses together *)
+(* Spouse_no_d, TDnothing, Spouse becomes TDnothing, Spouse_no_d, Spouse *)
+let correct_spouses tdal =
+  let rec regroup row new_row =
+    match row with
+    | (nc1, a1, t1) :: (nc2, a2, t2) :: (nc3, a3, t3) :: row -> (
+        match (t1, t2, t3) with
+        | TDitem (_, _, f1), TDnothing, TDitem (_, _, f3) ->
+            let f11 = String.split_on_char '-' (f1 :> string) in
+            let f31 = String.split_on_char '-' (f3 :> string) in
+            if List.length f11 = 2 && List.length f31 = 2 then
+              let fam1 = List.nth f11 0 in
+              let fl1 = List.nth f11 1 in
+              let fam3 = List.nth f31 0 in
+              let fl3 = List.nth f31 1 in
+              if fam1 = fam3 && fl1 = "spouse_no_d" && fl3 = "spouse" then
+                regroup
+                  ([ (nc3, a3, t3); (nc2, a2, t2) ] @ row)
+                  ([ (nc1, a1, t1) ] @ new_row)
+              else if fam1 = fam3 && fl1 = "spouse" && fl3 = "spouse_no_d" then
+                regroup
+                  ([ (nc1, a1, t1); (nc3, a3, t3) ] @ row)
+                  ([ (nc2, a2, t2) ] @ new_row)
+              else
+                regroup
+                  ([ (nc2, a2, t2); (nc3, a3, t3) ] @ row)
+                  ([ (nc1, a1, t1) ] @ new_row)
+            else
+              regroup
+                ([ (nc2, a2, t2); (nc3, a3, t3) ] @ row)
+                ([ (nc1, a1, t1) ] @ new_row)
+        | _ ->
+            regroup
+              ([ (nc2, a2, t2); (nc3, a3, t3) ] @ row)
+              ([ (nc1, a1, t1) ] @ new_row))
+    | _ -> List.rev (List.rev row @ new_row)
+  in
+  let tdal =
+    let rec loop tdal new_tdal =
+      match tdal with
+      | [] -> new_tdal
+      | row :: tdal -> loop tdal (regroup row [] :: new_tdal)
+    in
+    loop tdal []
+  in
+  List.rev tdal
+
+(* expand cell size if possible *)
+let expand_cell tdal =
+  let rec expand row new_row =
+    match row with
+    | (nc1, a1, t1) :: (nc2, a2, t2) :: (nc3, a3, t3) :: row -> (
+        match (t1, t2, t3) with
+        | TDnothing, TDitem _, TDnothing ->
+            if nc1 > 2 && nc3 > 2 then
+              expand
+                ([ (nc2 + 2, a2, t2); (nc3 - 1, a3, t3) ] @ row)
+                ([ (nc1 - 1, a1, t1) ] @ new_row)
+            else
+              expand
+                ([ (nc2, a2, t2); (nc3, a3, t3) ] @ row)
+                ([ (nc1, a1, t1) ] @ new_row)
+        | _ ->
+            expand
+              ([ (nc2, a2, t2); (nc3, a3, t3) ] @ row)
+              ([ (nc1, a1, t1) ] @ new_row))
+    | _ -> List.rev (List.rev row @ new_row)
+  in
+  let tdal =
+    let rec loop tdal new_tdal =
+      match tdal with
+      | [] -> new_tdal
+      | row :: tdal -> loop tdal (expand row [] :: new_tdal)
+    in
+    loop tdal []
+  in
+  List.rev tdal
+
+(* remove x entry *)
+let clean_rows tdal =
+  let tdal =
+    let rec loop tdal new_tdal =
+      match tdal with
+      | [] -> new_tdal
+      | (_x, row) :: tdal ->
+          let rec loop2 row new_row =
+            match row with
+            | [] -> loop tdal (new_row :: new_tdal)
+            | td :: row -> loop2 row (td :: new_row)
+          in
+          loop2 row []
+    in
+    loop tdal []
+  in
+  List.rev tdal
+
+(* manage vbars    *)
+(* suppress lines containing only vbars *)
+(* in one colums, if there is nothing between two vbars, insert vbars *)
+(* vbar = [1, CenterA,  TDtext "|"] filler is [(xn - x1), CenterA, TDnothing] *)
+let manage_vbars tdal =
+  let vbar_only_in_row row =
+    List.fold_left
+      (fun res (_, _, td) ->
+        if td <> TDnothing && td <> TDtext (Gwdb.dummy_iper, Adef.safe "|") then
+          false && res
+        else true && res)
+      true row
+  in
+  let tdal =
+    List.fold_left
+      (fun acc row -> if vbar_only_in_row row then acc else row :: acc)
+      [] tdal
+  in
+  List.rev tdal
+
+(* build a list of families (ifam) between iap and ip *)
+let rec find_ancestors base iap ip list v =
+  match get_parents (poi base ip) with
+  | Some ifam ->
+      let cpl = foi base ifam in
+      let ifath = get_father cpl in
+      let imoth = get_mother cpl in
+      let list =
+        if v > 1 && not (iap = ifath) then
+          find_ancestors base iap ifath list (v - 1)
+        else list
+      in
+      let list =
+        if v > 1 && not (iap = ifath) then
+          find_ancestors base iap imoth list (v - 1)
+        else list
+      in
+      ifam :: list
+  | None -> list
+
+let make_vaucher_tree_hts conf base gv p =
+  let sps =
+    match Util.p_getenv conf.env "sp" with Some "on" -> false | _ -> true
+  in
+  let marr =
+    match Util.p_getenv conf.env "ma" with Some "on" -> false | _ -> true
+  in
+  let img =
+    match Util.p_getenv conf.env "im" with Some "on" -> false | _ -> true
+  in
+  let cgl =
+    match Util.p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
+  in
+  let only_anc, op =
+    match Util.find_person_in_env_pref conf base "o" with
+    | Some p -> (true, p)
+    | None -> (false, Gwdb.empty_person base Gwdb.dummy_iper)
+  in
+  let only_anc =
+    if only_anc then find_ancestors base (get_iper p) (get_iper op) [] gv
+    else []
+  in
+  let tdal = init_tdal gv in
+  let tdal, _ = p_pos conf base p 0 gv 0 tdal only_anc sps img marr cgl in
+  let tdal = complete_rows tdal in
+  let tdal = clean_rows tdal in
+  let tdal = expand_cell tdal in
+  let tdal = expand_cell tdal in
+  let tdal = correct_spouses tdal in
+  let tdal = manage_vbars tdal in
+  let hts0 = List.fold_left (fun acc row -> Array.of_list row :: acc) [] tdal in
+  let hts = Array.of_list (List.rev hts0) in
+  hts
+
+let safe_vaucher_tree hts =
+  Array.map
+    (fun x ->
+      Array.map
+        (fun (i, al, s) ->
+          match s with
+          | TDitem (ip, s, t) -> (i, al, TDitem (ip, s, t))
+          | TDtext (ip, t) -> (i, al, TDtext (ip, t))
+          | TDhr align -> (i, al, TDhr align)
+          | TDbar s -> (i, al, TDbar s)
+          | TDnothing -> (i, al, TDnothing))
+        x)
+    hts
+
+let print_vaucher_tree conf base v p =
+  let gv = min (limit_by_tree conf) v in
+  let page_title =
+    translate_eval
+      (let s = (Util.gen_person_text conf base p ~html:false :> string) in
+       transl_a_of_gr_eq_gen_lev conf (transl conf "descendants") s s)
+    |> Adef.safe
+  in
+  let hts = make_vaucher_tree_hts conf base gv p in
+  let hts = safe_vaucher_tree hts in
+  (* just to verify hts structure !! *)
+  DagDisplay.print_slices_menu_or_dag_page conf base page_title hts
+    (Adef.escaped "")
+(* ******** end of J Vaucher tree ********* *)
+
 let print conf base p =
   let templ =
     match p_getenv conf.env "t" with
@@ -1302,4 +1882,5 @@ let print conf base p =
     | Some "G", Some v -> display_descendant_index conf base v p
     | Some "C", Some v -> display_spouse_index conf base v p
     | Some "T", Some v -> print_tree conf base v p
+    | Some "TV", Some v -> print_vaucher_tree conf base v p
     | _ -> desmenu_print conf base p

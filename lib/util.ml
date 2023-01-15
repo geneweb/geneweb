@@ -2413,11 +2413,9 @@ let print_tips_relationship conf =
 let display_options conf =
   let s =
     Adef.escaped
-    @@ if p_getenv conf.env "image" = Some "off" then "&image=off" else ""
+    @@ if p_getenv conf.env "im" = Some "off" then "&im=off" else ""
   in
-  let s =
-    if p_getenv conf.env "marriage" = Some "on" then s ^>^ "&marriage=on" else s
-  in
+  let s = if p_getenv conf.env "ma" = Some "on" then s ^>^ "&ma=on" else s in
   let s =
     match p_getenv conf.env "bd" with
     | Some i -> s ^^^ "&bd=" ^<^ (Mutil.encode i :> Adef.escaped_string)
