@@ -1,4 +1,5 @@
 (* $Id: dag2html.ml,v 5.0 2005-12-13 11:51:26 ddr Exp $ *)
+open Gwdb
 
 type 'a dag = { mutable dag : 'a node array }
 and 'a node = { mutable pare : idag list; valu : 'a; mutable chil : idag list }
@@ -33,8 +34,8 @@ let new_ghost_id =
 type align = LeftA | CenterA | RightA
 
 type 'a table_data =
-  | TDitem of 'a
-  | TDtext of Adef.safe_string
+  | TDitem of iper * 'a * Adef.safe_string
+  | TDtext of iper * Adef.safe_string
   | TDhr of align
   | TDbar of Adef.escaped_string option
   | TDnothing
@@ -42,14 +43,18 @@ type 'a table_data =
 type 'a html_table_line = (int * align * 'a table_data) array
 type 'a html_table = 'a html_table_line array
 
-let html_table_struct indi_txt vbar_txt phony d t =
+let html_table_struct indi_ip indi_txt vbar_txt phony d t =
   let phony = function
     | Elem e -> phony d.dag.(int_of_idag e)
     | Ghost _ -> false
     | Nothing -> true
   in
   let elem_txt = function
-    | Elem e -> TDitem (indi_txt d.dag.(int_of_idag e))
+    | Elem e ->
+        TDitem
+          ( indi_ip d.dag.(int_of_idag e),
+            indi_txt d.dag.(int_of_idag e),
+            Adef.safe "" )
     | Ghost _ -> TDbar None
     | Nothing -> TDnothing
   in

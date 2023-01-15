@@ -137,8 +137,8 @@ Person:            Child1     Child2          Child3
           %reset_count1;
           %foreach;family;%if;(nb_children>1)%incr_count1;%end;%end;
           %(count1=has children%)
-          %if;(evar.spouse!="on" and nnn<evarv-1 and count1>0)│%end;
-          %if;(evar.spouse="on" and lll=nnn)
+          %if;(e.sp!="on" and nnn<evarv-1 and count1>0)│%end;
+          %if;(e.sp="on" and lll=nnn)
             %let;test;%apply;has_relation()%in;
             %foreach;family; %( TODO verify & expand %)
               %if;are_pacs;|%nn;
@@ -178,7 +178,7 @@ Person:            Child1     Child2          Child3
               %end;
               <span class="text-nowrap">
                 %(count1=has children%)
-                %if;(count1>0 or evar.spouse="on")
+                %if;(count1>0 or e.sp="on")
                   %if;(not cancel_links)
                     <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
                       title="[*update::family/families]0 of %first_name; %surname; (%occ;)
@@ -187,7 +187,7 @@ Person:            Child1     Child2          Child3
                   %else;&
                   %end;
                 %end;
-                %if(evar.marriage="on" and (evar.spouse="on" or count1>0))
+                %if(e.ma="on" and (e.sp="on" or count1>0))
                   %if;(family.marriage_date.year!="") %marriage_date.year;%else; -%end;
                 %end;
               </span>
@@ -245,8 +245,8 @@ Person:            Child1     Child2          Child3
     %end;
   %end;
 %end;
-%let;evarv;%if;(evar.v!="")%evar.v;%else;3%end;%in;
-%let;evarborder;%if;(evar.border="" or evar.border="0")0%else;1%end;%in;
+%let;evarv;%if;(e.v!="")%e.v;%else;3%end;%in;
+%let;evarborder;%if;(e.border="" or e.border="0")0%else;1%end;%in;
 %let;baseindex;%index;%in;
 <h2 id="a">[*descendants tree]</h2>
 %include;buttons_dag

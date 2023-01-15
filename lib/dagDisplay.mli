@@ -17,6 +17,7 @@ val make_tree_hts :
 
 val print_slices_menu_or_dag_page :
   Config.config ->
+  Gwdb.base ->
   Adef.safe_string ->
   (int * Dag2html.align * Adef.safe_string Dag2html.table_data) array array ->
   Adef.escaped_string ->
