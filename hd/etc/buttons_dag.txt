@@ -139,27 +139,27 @@
       <div class="d-flex align-self-center mt-1">
         <div class="border rounded mr-1">
           <a role="button" class="btn btn-sm btn-outline-%if;(e.dag=1)primary font-weight-bold border-2%elseif;(e.t="C" or e.t="A" or e.t="TV")dark disabled border-0%else;primary border-0%end;"
-        href="%if;(e.dag="")%url_set.dag.1;%else;%url_set.dag;%end;"
+        href="%if;(e.dag="")%url_set.dag.on;%else;%url_set.dag;%end;"
         title="%if;(e.dag="")[*dag on/dag off]0%else;[*dag on/dag off]1%end; ([dag])">
           <i class="fa fa-random fa-fw fa-lg"></i>Dag</a>
         </div>
         <div class="border rounded mr-1">
           <a role="button" class="btn btn-sm btn-outline-primary border-%if;(e.im="")2%else;0%end; h-100"
-            href="%if;(e.im="")%url_set.im.0;%else;%url_set.im;%end;"
+            href="%if;(e.im="")%url_set.im.off;%else;%url_set.im;%end;"
             title="%if;(e.im="")[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [image/images]1">
             <i class="fa fa-image fa-sm mr-1"></i>[*image/images]1
           </a>
         </div>
         <div class="border rounded mr-1">
           <a role="button" class="btn btn-sm btn-outline-%if;(e.dag=1 or e.t="C" or e.t="A")dark disabled border-0%else;primary%end; border-%if;(e.ma="")2%else;0%end; w-100 h-100"
-            href="%if;(e.ma="")%url_set.ma.0;%else;%url_set.ma;%end;"
+            href="%if;(e.ma="")%url_set.ma.on;%else;%url_set.ma;%end;"
             title="%if;(e.ma="")[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [date of marriage]">
             <i class="fa fa-venus-mars fa-sm mr-1"></i>[*marriage/marriages]1
           </a>
         </div>
         <div class="border rounded mr-1">
           <a role="button" class="btn btn-sm btn-outline-%if;(e.m="A")dark disabled border-0%else;primary %end; border-%if;(e.sp="")2%else;0%end; w-100 h-100"
-            href="%if;(e.sp="")%url_set.sp.0;%else;%url_set.sp;%end;"
+            href="%if;(e.sp="")%url_set.sp.on;%else;%url_set.sp;%end;"
             title="%if;(e.sp="")[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [spouse/spouses]1">
             <i class="fa fa-user-plus fa-sm mr-1"></i>[*spouse/spouses]1
           </a>
