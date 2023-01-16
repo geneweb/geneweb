@@ -75,7 +75,7 @@ let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
 let image_txt conf base p =
   Adef.safe
   @@
-  match p_getenv conf.env "image" with
+  match p_getenv conf.env "im" with
   | Some "off" -> ""
   | Some _ | None -> (
       match Image.get_portrait_with_size conf base p with

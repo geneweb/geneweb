@@ -448,7 +448,9 @@ let print_elem conf base paths precision (n, pll) =
         (surname_without_particle base n |> Util.escape_html);
       Output.print_sstring conf " ";
       gen_person_text ~sn:false conf base p
-      |> reference conf base p |> Output.print_string conf;
+      (* FIXME où est ce reference ?? <> au reference l.1384 *)
+      |> reference conf base p
+      |> Output.print_string conf;
       Output.print_sstring conf " ";
       Output.print_string conf (surname_particle base n |> Util.escape_html);
       Output.print_sstring conf "</strong>";
@@ -976,6 +978,18 @@ let display_descendant_with_table conf base max_lev p =
 
 let make_tree_hts conf base gv p =
   let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
+  let sps =
+    match Util.p_getenv conf.env "sp" with Some "on" -> true | _ -> false
+  in
+  let _marr =
+    match Util.p_getenv conf.env "ma" with Some "on" -> true | _ -> false
+  in
+  let img =
+    match Util.p_getenv conf.env "im" with Some "off" -> false | _ -> true
+  in
+  let _cgl =
+    match Util.p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
+  in
   let td_prop =
     match Util.p_getenv conf.env "color" with
     | None | Some "" -> Adef.safe ""
@@ -1102,7 +1116,9 @@ let make_tree_hts conf base gv p =
             if auth then txt ^^^ DateDisplay.short_dates_text conf base p
             else txt
           in
-          let txt = txt ^^^ DagDisplay.image_txt conf base p in
+          let txt =
+            if img then txt ^^^ DagDisplay.image_txt conf base p else txt
+          in
           let txt =
             if bd > 0 || (td_prop :> string) <> "" then
               {|<table style="border:|} ^<^ string_of_int bd
@@ -1205,8 +1221,10 @@ let make_tree_hts conf base gv p =
         Array.of_list (List.rev tdl) :: tdal
       in
       let tdal =
-        let tdl = List.fold_left (spouses_txt v) [] gen in
-        Array.of_list (List.rev tdl) :: tdal
+        if sps then
+          let tdl = List.fold_left (spouses_txt v) [] gen in
+          Array.of_list (List.rev tdl) :: tdal
+        else tdal
       in
       if v > 1 then loop tdal gen (next_gen gen) (v - 1) else tdal
     in
@@ -1363,8 +1381,11 @@ let get_bd_td_prop conf =
   (bd, td_prop)
 
 let reference conf base p s =
+  let cgl =
+    match Util.p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
+  in
   let iper = get_iper p in
-  if is_hidden p then s
+  if is_hidden p || cgl then s
   else
     String.concat ""
       [
@@ -1801,13 +1822,13 @@ let rec find_ancestors base iap ip list v =
 
 let make_vaucher_tree_hts conf base gv p =
   let sps =
-    match Util.p_getenv conf.env "sp" with Some "on" -> false | _ -> true
+    match Util.p_getenv conf.env "sp" with Some "on" -> true | _ -> false
   in
   let marr =
-    match Util.p_getenv conf.env "ma" with Some "on" -> false | _ -> true
+    match Util.p_getenv conf.env "ma" with Some "on" -> true | _ -> false
   in
   let img =
-    match Util.p_getenv conf.env "im" with Some "on" -> false | _ -> true
+    match Util.p_getenv conf.env "im" with Some "off" -> false | _ -> true
   in
   let cgl =
     match Util.p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
