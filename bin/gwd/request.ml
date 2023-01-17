@@ -771,7 +771,29 @@ let treat_request =
     transl conf "reserved to friends or wizards"
     |> Utf8.capitalize_fst
     |> Output.print_sstring conf ;
+    let user = transl_nth conf "user/password/cancel" 0 in
+    let passwd = transl_nth conf "user/password/cancel" 1 in
     Output.print_sstring conf ".</li></ul>" ;
+    Output.print_sstring conf 
+      (Printf.sprintf {|
+        <form class="form-inline" method="post" action="%s">
+          <div class="input-group mt-1">
+            <input type="hidden" name="b" value="%s">
+            <input type="text" class="form-control" name="w"
+              title="%s/%s %s" placeholder="%s:%s"
+              aria-label="password input"
+              aria-describedby="username:password" autofocus>
+            <label for="w" class="sr-only">%s:%s</label>
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </div>
+        </form>
+      |} (conf.command :> string) (conf.bname)
+      (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
+      (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
+      passwd user passwd user passwd
+      );
     Hutil.trailer conf
   end
   in
