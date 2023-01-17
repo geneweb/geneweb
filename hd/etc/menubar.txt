@@ -346,7 +346,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 <a class="dropdown-item" href="%prefix;%access;&m=D&t=L&v=3&maxv=%max_desc_level;&siblings=on&alias=on&spouse=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><span class="fa fa-newspaper fa-fw mr-2"></span>[*long display]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=D&t=TV&v=4"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*compact descendants tree]</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=D&t=V&%if;(e.v!="")v=%e.v;%else;v=3%end;&spouse=on&marriage=on"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*descendants tree] (new)</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=D&t=V&%if;(e.v!="")v=%e.v;%else;v=3%end;&sp=on&ma=on"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*descendants tree] (new)</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=D&t=A&num=on&v=%max_desc_level;"><span class="fa fa-code-branch fa-flip-vertical fa-fw mr-2"></span>D’Aboville</a>
               </div>
             </li>

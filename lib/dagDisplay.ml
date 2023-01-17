@@ -860,6 +860,7 @@ type 'a env =
   | Vdlinep of
       (int * Adef.safe_string array array * int * int option * int option)
   | Vint of int
+  | Vind of person
   | Vlazy of 'a env Lazy.t
   | Vother of 'a
   | Vnone
@@ -913,14 +914,14 @@ let has_sibling_aux base td next_or_prev =
             if next_or_prev then !i >= 0 && !i < Array.length sib - 1
             else !i >= 1
           in
-          (cond, if cond then Some sib.(!i + if cond then 1 else -1) else None)
-      | None -> (false, None))
-  | _ -> (false, None)
+          if cond then Some sib.(!i + if next_or_prev then 1 else -1) else None
+      | None -> None)
+  | _ -> None
 
 let sibling_access_aux conf base td next_or_prev =
   match has_sibling_aux base td next_or_prev with
-  | true, Some s_ip -> VVstring (Util.acces conf base (poi base s_ip) :> string)
-  | _, _ -> raise Not_found
+  | Some s_ip -> VVstring (Util.acces conf base (poi base s_ip) :> string)
+  | None -> raise Not_found
 
 let rec eval_var conf base (page_title : Adef.safe_string)
     (next_txt : Adef.escaped_string) env _xx _loc = function
@@ -1000,12 +1001,12 @@ and eval_dag_cell_var conf base (colspan, align, td) = function
   | [ "father"; "access" ] -> parents_access_aux conf base td get_father
   | [ "has_next_sibling" ] -> (
       match has_sibling_aux base td true with
-      | true, _ -> VVbool true
-      | _, _ -> VVbool false)
+      | Some _ -> VVbool true
+      | None -> VVbool false)
   | [ "has_prev_sibling" ] -> (
       match has_sibling_aux base td false with
-      | true, _ -> VVbool true
-      | _, _ -> VVbool false)
+      | Some _ -> VVbool true
+      | None -> VVbool false)
   | [ "index" ] -> (
       match td with
       | TDitem (ip, _, _) | TDtext (ip, _) -> VVstring (string_of_iper ip)
@@ -1212,6 +1213,11 @@ let print_slices_menu_or_dag_page conf base page_title hts next_txt =
   if p_getenv conf.env "old" = Some "on" then
     old_print_slices_menu_or_dag_page conf page_title hts next_txt
   else
+    let p =
+      match find_person_in_env conf base "" with
+      | Some p -> p
+      | None -> poi base Gwdb.dummy_iper
+    in
     let env =
       let table_pre_dim () =
         let tmincol, tcol, colminsz, colsz, ncol = table_pre_dim hts in
@@ -1231,6 +1237,8 @@ let print_slices_menu_or_dag_page conf base page_title hts next_txt =
         Vdag (tmincol, tcol, colminsz, colsz, ncol)
       in
       [
+        ("p", Vind p);
+        ("p_auth", Vbool (authorized_age conf base p));
         ("count", Vcnt (ref 0));
         ("count1", Vcnt (ref 0));
         ("count2", Vcnt (ref 0));
