@@ -273,7 +273,7 @@ Person:            Child1     Child2          Child3
     <tr>
       %apply;descendants_at_level("self",0,v,"hbars","center",icount)
     </tr>
-    %if;(e.sp!=0)
+    %if;(e.sp="on")
       <tr>
         %apply;descendants_at_level("self",0,v,"spouse","center",icount)
       </tr>
