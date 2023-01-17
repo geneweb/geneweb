@@ -860,6 +860,8 @@ type 'a env =
   | Vdlinep of
       (int * Adef.safe_string array array * int * int option * int option)
   | Vint of int
+  | Vsstring of Adef.safe_string
+  | Vestring of Adef.escaped_string
   | Vind of person
   | Vlazy of 'a env Lazy.t
   | Vother of 'a
@@ -923,8 +925,7 @@ let sibling_access_aux conf base td next_or_prev =
   | Some s_ip -> VVstring (Util.acces conf base (poi base s_ip) :> string)
   | None -> raise Not_found
 
-let rec eval_var conf base (page_title : Adef.safe_string)
-    (next_txt : Adef.escaped_string) env _xx _loc = function
+let rec eval_var conf base env _xx _loc = function
   | [ "browsing_with_sosa_ref" ] -> (
       match (Util.p_getenv conf.env "pz", Util.p_getenv conf.env "nz") with
       | Some _, Some _ -> VVbool true
@@ -953,7 +954,10 @@ let rec eval_var conf base (page_title : Adef.safe_string)
           in
           VVstring vv
       | _ -> raise Not_found)
-  | [ "head_title" ] -> VVstring (page_title :> string)
+  | [ "head_title" ] -> (
+      match get_env "p_title" env with
+      | Vsstring s -> VVstring (s :> string)
+      | _ -> VVstring "")
   | [ "is_first" ] -> (
       match get_env "first" env with Vbool b -> VVbool b | _ -> VVbool false)
   | [ "is_last" ] -> (
@@ -962,7 +966,10 @@ let rec eval_var conf base (page_title : Adef.safe_string)
       match get_env "line_nbr" env with
       | Vint i -> VVstring (string_of_int i)
       | _ -> raise Not_found)
-  | [ "link_next" ] -> VVstring (next_txt :> string)
+  | [ "link_next" ] -> (
+      match get_env "next_txt" env with
+      | Vestring s -> VVstring (s :> string)
+      | _ -> VVstring "")
   | [ "set_var"; name; value ] -> (
       match get_env "vars" env with
       | Vvars lv ->
@@ -1245,11 +1252,14 @@ let print_slices_menu_or_dag_page conf base page_title hts next_txt =
         ("count3", Vcnt (ref 0));
         ("vars", Vvars (ref []));
         ("dag", Vlazy (Lazy.from_fun table_pre_dim));
+        ("p_title", Vsstring page_title);
+        ("next_text", Vestring next_txt);
       ]
     in
+
     Hutil.interp conf "dag"
       {
-        Templ.eval_var = eval_var conf base page_title next_txt;
+        Templ.eval_var = eval_var conf base;
         Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
         Templ.eval_predefined_apply = (fun _ -> eval_predefined_apply);
         Templ.get_vother;
