@@ -1343,11 +1343,7 @@ let td_hbar x1 xn =
 
 (* regular cell, centered, with text as content (may contain |<br>) *)
 let td_cell cols align ip text flags =
-  match align with
-  | "center" -> [ (cols, CenterA, TDitem (ip, Adef.safe text, flags)) ]
-  | "right" -> [ (cols, RightA, TDitem (ip, Adef.safe text, flags)) ]
-  | "left" -> [ (cols, LeftA, TDitem (ip, Adef.safe text, flags)) ]
-  | _ -> [ (0, CenterA, TDitem (ip, Adef.safe text, flags)) ]
+  [ (cols, align, TDitem (ip, Adef.safe text, flags)) ]
 
 (* tdal is   (int   *    list      ) list           *)
 (*           (lastx      list of td) list of rows   *)
@@ -1387,19 +1383,13 @@ let reference conf base p s =
   let iper = get_iper p in
   if is_hidden p || cgl then s
   else
-    String.concat ""
-      [
-        "<a href=\"";
-        (commd conf :> string);
-        (acces conf base p :> string);
-        "\" id=\"i";
-        string_of_iper iper;
-        "\"";
-        " class=\"normal_anchor\"";
-        " title=\"[go on individual page]\">";
-        s;
-        "</a>";
-      ]
+    Printf.sprintf
+      {|<a href="%s%s" id="i%s" class="normal_anchor" title="%s">%s</a>|}
+      (commd conf :> string)
+      (acces conf base p :> string)
+      (string_of_iper iper)
+      (Utf8.capitalize_fst (Util.transl conf "open individual page"))
+      s
 
 let get_text conf base p filler img cgl =
   let bd, td_prop = get_bd_td_prop conf in
@@ -1550,7 +1540,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
   let lx = if lx > -1 then lx else -1 in
   let tdal =
     tdal_add tdal ir
-      (td_fill lx (x - 1) @ td_cell 1 "center" (get_iper p) txt (Adef.safe ""))
+      (td_fill lx (x - 1) @ td_cell 1 CenterA (get_iper p) txt (Adef.safe ""))
       x
   in
   (* row 2: Hbar over sps *)
@@ -1567,7 +1557,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
          else
            tdal_add tdal (ir+1)
              ((td_fill lx (x - 1))
-             @ (td_cell 1 "center" Gwdb.dummy_iper (Adef.safe "|") (Adef.safe "")))
+             @ (td_cell 1 CenterA Gwdb.dummy_iper (Adef.safe "|") (Adef.safe "")))
              x
        else tdal
      in
@@ -1640,7 +1630,7 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
     if true then
       tdal_add tdal ir2
         (td_fill lx (x - 1)
-        @ td_cell 1 "center" (get_iper sp) txt (Adef.safe flag))
+        @ td_cell 1 CenterA (get_iper sp) txt (Adef.safe flag))
         x
     else tdal
   in
