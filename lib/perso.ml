@@ -4189,31 +4189,40 @@ and string_of_int_env var env =
 
 let eval_transl conf base env upp s c =
   match c with
-  | "n" | "s" | "w" | "f" | "c" ->
+  | "n" | "s" | "w" | "f" | "c" | "e" | "t" ->
       let n =
         match c with
         | "n" -> (
-            (* replaced by %apply;nth([...],sex) *)
-            match get_env "p" env with
-            | Vind p -> 1 - index_of_sex (get_sex p)
-            | _ -> 2)
+            (* select nth value *)
+            (* replaced by %apply;nth([...],sex) or "s" below *)
+            match get_env "count" env with Vcnt i -> !i | _ -> 0)
         | "s" -> (
+            (* male/female/neuter *)
             match get_env "child" env with
             | Vind p -> index_of_sex (get_sex p)
             | _ -> (
                 match get_env "p" env with
                 | Vind p -> index_of_sex (get_sex p)
-                | _ -> 2))
+                | _ ->
+                    Printf.sprintf "Sex of unknown person"
+                    |> !GWPARAM.syslog `LOG_WARNING;
+                    assert false))
         | "w" -> (
+            (* witness/witnesses *)
             match get_env "fam" env with
             | Vfam (_, fam, _, _) ->
                 if Array.length (get_witnesses fam) <= 1 then 0 else 1
             | _ -> 0)
         | "f" -> (
+            (* family/families *)
             match get_env "p" env with
             | Vind p -> if Array.length (get_family p) <= 1 then 0 else 1
-            | _ -> 0)
+            | _ ->
+                Printf.sprintf "families of unknown person"
+                |> !GWPARAM.syslog `LOG_WARNING;
+                assert false)
         | "c" -> (
+            (* child/children *)
             match get_env "fam" env with
             | Vfam (_, fam, _, _) ->
                 if Array.length (get_children fam) <= 1 then 0 else 1
@@ -4227,7 +4236,34 @@ let eval_transl conf base env upp s c =
                         0 (get_family p)
                     in
                     if n <= 1 then 0 else 1
-                | _ -> 0))
+                | _ ->
+                    Printf.sprintf "Children of unknown person"
+                    |> !GWPARAM.syslog `LOG_WARNING;
+                    assert false))
+        | "e" -> (
+            (* singular/plural for events *)
+            match get_env "p" env with
+            | Vind p -> (
+                match Event.events conf base p with
+                | [] -> 0
+                | [ _e ] -> 0
+                | _ -> 1)
+            | _ ->
+                Printf.sprintf "Events of unknown person"
+                |> !GWPARAM.syslog `LOG_WARNING;
+                assert false)
+        | "t" -> (
+            (* singular/plural  titles *)
+            match get_env "p" env with
+            | Vind p -> (
+                match Util.nobtit conf base p with
+                | [] -> 0
+                | [ _t ] -> 0
+                | _ -> 1)
+            | _ ->
+                Printf.sprintf "Titles of unknown person"
+                |> !GWPARAM.syslog `LOG_WARNING;
+                assert false)
         | _ -> assert false
       in
       let r = Util.translate_eval (Util.transl_nth conf s n) in
