@@ -1,30 +1,42 @@
-GeneWeb 7.00
+GeneWeb 7.01
 
 Ouvrez la page START.htm
 
-Si vous avez l'intention d'ouvrir une base, vous devez avoir d�marr� le programme gwd
-en double cliquant sur l'icone gwd.bat (Windows), gwd.command (macOS) or gwd (Linux).
-Si vous avez l'intention de g�rer ou cr�er une base, vous devez avoir d�marr� le programme gwsetup
-en double cliquant sur l'icone gwsetup.bat (Windows), gwsetup.command (macOS) or gwsetup (Linux).
+Si vous avez l'intention d'ouvrir une base, vous devez avoir démarré le
+programme gwd en double cliquant sur l'icone gwd.bat (Windows),
+gwd.sh (macOS ou Linux).
+Si vous avez l'intention de gérer ou créer une base, vous devez avoir
+démarré le programme gwsetup en double cliquant sur l'icone
+gwsetup.bat (Windows), gwsetup.sh (macOS ou Linux).
 
-Sur macOS, geneweb.command tue les versions pr�c�dentes, ouvre les deux programmes et
-minimise la fen�tre correspondante.
-   
+Sur macOS (peut être aussi sur Linux), geneweb.command tue les versions
+précédentes, ouvre les deux programmes, minimise la fenêtre correspondante
+et ouvre START.htm.
+
+Installation en mode CGI
+
+Avant d'exécuter le script install-cgi.sh, vous devez renseigner dans ce fichier,
+et dans le fichier install-cgi/gwd.cgi les informations concernant votre installation :
+- WEB-ROOT : la racine web de votre serveur Apache
+- MY-BASES : le dossier de vos bases
+
      -----------------
 
-Voir le fichier CHANGES (en anglais) dans ce repertoire-ci pour les
-changements par rapport aux versions precedentes.
+Voir le fichier CHANGES (en anglais) dans ce répertoire pour les
+changements par rapport aux versions précédentes.
 
      -----------------
 
-GeneWeb est Copyright (c) 1998-2017 INRIA.
-Cr�ateur d'origine Daniel de Rauglaudre
+GeneWeb est Copyright (c) 1998-2023 INRIA.
+Créateur d'origine Daniel de Rauglaudre
 
 Remarques, suggestions, questions, rapports d'erreur sur:
-	https://github.com/geneweb/geneweb/issues
-	or
-	https://groups.yahoo.com/neo/groups/GeneWeb/info
+  https://github.com/geneweb/geneweb/issues
+  or
+  https://groups.yahoo.com/neo/groups/GeneWeb/info
 
-Veuillez preciser le numero de version ci-dessus et le systeme sur lequel
-vous tournez (Unix, Windows, Mac).
+Veuillez préciser le numéro de version ci-dessus, le système sur lequel
+vous tournez (Unix, Windows, Mac) et si possible le numéro de commit
+qui apparaît si vous positionnez la souris au dessus du numéro
+de version sur la page d'accueil (welcome.txt).
 
