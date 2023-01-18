@@ -19,7 +19,7 @@
 
 <form class="form-inline d-flex justify-content-center my-2" method="get" action="%prefix;">
   <input type="hidden" name="lang" value="%evar.lang;">
-  <input name="b" class="form-control col-4">
+  <input type="submit" name="b" class="form-control col-4">
   <button type="submit" class="btn btn-outline-secondary ml-2" value="">Ok</button>
 </form>
 

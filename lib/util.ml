@@ -5,17 +5,23 @@ open Def
 open Gwdb
 
 let time_debug conf query_time =
+  let show =
+    match List.assoc_opt "show_query_time" conf.base_env with
+    | Some "on" -> ""
+    | _ -> {|class="text-muted"|}
+  in
   if conf.debug then
     Output.print_sstring conf
       (Printf.sprintf
          {|
-      Query treated in <span id="q_time_c">%.3f</span> seconds
+      <span %s>Query treated in </span><span id="q_time_c" %s>%.3f</span>
+      <span %s> seconds</span>
       <script>
       var q_time = document.getElementById("q_time_c").innerHTML;
       document.getElementById("q_time_d").innerHTML = q_time;
       </script>
        |}
-         query_time)
+         show show query_time show)
 
 let escape_aux count blit str =
   let strlen = String.length str in

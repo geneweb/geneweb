@@ -769,7 +769,6 @@ let treat_request =
     Output.print_sstring conf conf.bname ;
     Output.print_sstring conf {|" |} ;
     transl conf "reserved to friends or wizards"
-    |> Utf8.capitalize_fst
     |> Output.print_sstring conf ;
     let user = transl_nth conf "user/password/cancel" 0 in
     let passwd = transl_nth conf "user/password/cancel" 1 in
