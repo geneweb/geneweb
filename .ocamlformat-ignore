@@ -1,5 +1,5 @@
 plugins/forum/plugin_forum.cppo.ml
-bin/ged2gwb/ged2gwb.ml
+bin/ged2gwb/ged2gwb_lib.ml
 bin/gwd/gwd.ml
 bin/gwd/gwdLog.ml
 bin/gwd/request.ml
