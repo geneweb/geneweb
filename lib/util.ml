@@ -8,7 +8,7 @@ let time_debug conf query_time =
   let show =
     match List.assoc_opt "show_query_time" conf.base_env with
     | Some "on" -> ""
-    | _ -> {|class="text-muted"|}
+    | _ -> {|style="display:none"|}
   in
   if conf.debug then
     Output.print_sstring conf
@@ -343,6 +343,8 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
         else c ^^^ k ^<^ "=" ^<^ (v :> Adef.escaped_string) ^>^ "&")
   in
   let commd = conf.command in
+  (* in CGI mode, b=bname is part of env *)
+  (* in daemon mode, commd contains bname *)
   let commd =
     if pwd then commd
     else
