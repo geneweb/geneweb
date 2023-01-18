@@ -15,7 +15,9 @@ let link_to_referer conf =
 
 let gen_print_link_to_welcome f conf right_aligned =
   if right_aligned then
-    Output.printf conf "<div class=\"btn-group float-%s mt-2\">\n" conf.right
+    Output.printf conf
+      "<div class=\"d-flex flex-column mt-2 fixed_top_btn_col float-%s\">\n"
+      conf.right
   else Output.print_sstring conf "<p>\n";
   f ();
   let str = link_to_referer conf in

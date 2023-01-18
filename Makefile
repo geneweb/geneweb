@@ -96,6 +96,7 @@ generated: $(GENERATED_FILES_DEP)
 install uninstall build distrib: $(GENERATED_FILES_DEP)
 
 fmt:
+	$(RM) -r $(DISTRIB_DIR)
 	dune build @fmt --auto-promote
 
 # [BEGIN] Installation / Distribution section
@@ -119,8 +120,8 @@ BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
 
 distrib: ## Build the project and copy what is necessary for distribution
 distrib:
-	dune build -p geneweb --profile $(DUNE_PROFILE)
 	$(RM) -r $(DISTRIB_DIR)
+	dune build -p geneweb --profile $(DUNE_PROFILE)
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
 	cp CHANGES $(DISTRIB_DIR)/CHANGES.txt
@@ -129,15 +130,16 @@ distrib:
 	cp etc/LISEZMOI.txt $(DISTRIB_DIR)/.
 	cp etc/START.htm $(DISTRIB_DIR)/.
 	cp -R etc/install-cgi $(DISTRIB_DIR)
+	cp etc/install-cgi.sh $(DISTRIB_DIR)
 	if test $(OS_TYPE) = "Win"; then \
 	  cp etc/Windows/gwd.bat $(DISTRIB_DIR); \
 	  cp etc/Windows/gwsetup.bat $(DISTRIB_DIR); \
 	  cp -f etc/Windows/README.txt $(DISTRIB_DIR)/README.txt; \
 	  cp -f etc/Windows/LISEZMOI.txt $(DISTRIB_DIR)/LISEZMOI.txt; \
 	elif test $(OS_TYPE) = "Darwin"; then \
-	  cp etc/gwd.sh $(DISTRIB_DIR)/gwd.command; \
-	  cp etc/gwsetup.sh $(DISTRIB_DIR)/gwsetup.command; \
-	  cp etc/macOS/geneweb.command $(DISTRIB_DIR); \
+	  cp etc/gwd.sh $(DISTRIB_DIR); \
+	  cp etc/gwsetup.sh $(DISTRIB_DIR); \
+	  cp etc/macOS/geneweb.sh $(DISTRIB_DIR); \
 	else \
 	  cp etc/gwd.sh $(DISTRIB_DIR)/gwd.sh; \
 	  cp etc/gwsetup.sh $(DISTRIB_DIR)/gwsetup.sh; \

@@ -1,4 +1,4 @@
-GeneWeb 7.00
+GeneWeb 7.01
 
 Open the START.htm page
 
@@ -9,7 +9,14 @@ by double clicking on the gwsetup.bat (Windows), gwsetup.command (macOS) or gwse
 
 On macOS geneweb.command will kill previous versions, start both programs and minimises 
 the corresponding window.
-   
+
+Installation in CGI mode
+
+Before executing install-cgi.sh, you must adjust some of your own configuration
+in the install-cgi.sh script and in install-cgi/gwd.cgi:
+- WEB-ROOT : the web root of your Apache server
+- MY-BASES : your bases folder
+
      -----------------
 
 See the file CHANGES in the present directory for the changes since
@@ -17,13 +24,14 @@ the previous versions.
 
      -----------------
 
-GeneWeb is Copyright (c) 1998-2017 INRIA.
+GeneWeb is Copyright (c) 1998-2023 INRIA.
 Original creator Daniel de Rauglaudre
 
 Remarks, suggestions, questions, bug reports to:
-	https://github.com/geneweb/geneweb/issues
-	or
-	https://groups.yahoo.com/neo/groups/GeneWeb/info
+  https://github.com/geneweb/geneweb/issues
+  or
+  https://groups.yahoo.com/neo/groups/GeneWeb/info
 
-Please specify the version number above and the system you use (Unix,
-Windows, Mac)
+Please specify the version number above, the system you use (Unix,
+Windows, Mac) and if possible the commit number shown when positionning the
+mouse over the version number on the welcome page.
