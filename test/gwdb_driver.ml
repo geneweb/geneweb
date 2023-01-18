@@ -211,3 +211,4 @@ and write_nldb _ = assert false
 let no_couple = Adef.couple dummy_iper dummy_iper
 let eq_iper _ = assert false
 let eq_ifam _ = assert false
+let gc ?dry_run:_ ~save_mem:_ _ = assert false
