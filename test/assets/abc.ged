@@ -4,10 +4,10 @@
 2 NAME gwb2ged
 2 CORP INRIA
 3 ADDR http://www.geneweb.org
-2 DATA abc.gwb
-1 DATE 18 JAN 2023
-2 TIME 16:23:00
-1 FILE abc.ged
+2 DATA a.gwb
+1 DATE 20 JAN 2023
+2 TIME 15:58:04
+1 FILE abc_title.ged
 1 GEDC
 2 VERS 5.5.1
 2 FORM LINEAGE-LINKED
@@ -19,7 +19,7 @@
 2 DATE 05 MAR 1991
 2 PLAC Avignon
 1 TITL This is a title, This is a Fief, 1
-2 NOTE
+2 NOTE This is a title name
 1 FAMS @F1@
 0 @I2@ INDI
 1 NAME a /A/
