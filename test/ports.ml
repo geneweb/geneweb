@@ -84,10 +84,12 @@ let base =
 
 let () = assert (Gwdb.nb_of_persons base = 3)
 
-let a =
-  match Gwdb.person_of_key base "a" "A" 0 with
-  | None -> failwith {|person "a A" not found|}
+let get_person fn sn =
+  match Gwdb.person_of_key base fn sn 0 with
+  | None -> failwith (Format.sprintf {|person "%s %s" not found|} fn sn)
   | Some iper -> Gwdb.poi base iper
+
+let a = get_person "a" "A"
 
 (* check birth event *)
 let () =
@@ -167,3 +169,17 @@ let () =
     wnote
     = "This is a witness note on a diploma event\n\
        -- this is the second line of the witness note --")
+
+(* check title *)
+let () =
+  let b = get_person "b" "B" in
+  match Gwdb.get_titles b with
+  | [ title ] ->
+      assert (Gwdb.sou base title.t_ident = "This is a title");
+      assert (Gwdb.sou base title.t_place = "This is a Fief");
+      assert (
+        match title.t_name with
+        | Tmain | Tnone -> false
+        | Tname i -> Gwdb.sou base i = "This is a title name");
+      assert (title.t_nth = 1)
+  | _l -> assert false
