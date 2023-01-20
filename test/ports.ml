@@ -109,7 +109,9 @@ let () =
 (* check family marriage event *)
 let () =
   let fam = Gwdb.foi base (Gwdb.get_family a).(0) in
-  assert (Gwdb.sou base (Gwdb.get_comment fam) = "This is a comment on a family");
+  assert (
+    Gwdb.sou base (Gwdb.get_comment fam)
+    = "This is a comment on a family\n\nthis is a line after an empty line");
   let fevents = Gwdb.get_fevents fam in
   let marriage =
     match

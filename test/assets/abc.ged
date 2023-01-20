@@ -6,8 +6,8 @@
 3 ADDR http://www.geneweb.org
 2 DATA a.gwb
 1 DATE 20 JAN 2023
-2 TIME 15:58:04
-1 FILE abc_title.ged
+2 TIME 17:09:54
+1 FILE abc.ged
 1 GEDC
 2 VERS 5.5.1
 2 FORM LINEAGE-LINKED
@@ -62,4 +62,6 @@
 1 HUSB @I1@
 1 WIFE @I2@
 1 NOTE This is a comment on a family
+2 CONT
+2 CONT this is a line after an empty line
 0 TRLR
