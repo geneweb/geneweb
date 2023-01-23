@@ -2,3 +2,4 @@
  (name test)
  (modules test sosa_test place_test calendar_test wiki_test merge_test util_test)
  (libraries alcotest geneweb %%%GWDB_PKG%%% %%%SOSA_PKG%%% fmt))
+
