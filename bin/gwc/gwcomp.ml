@@ -65,7 +65,7 @@ type gw_syntax =
   | Bnotes of string * string
       (** Block that defines database notes and extended pages.
       First string represents name of extended page ("" for
-      database notes, only one for file). Second is note's
+      database notes, only one per file). Second is note's
       or page's content. *)
   | Wnotes of string * string
       (** Block that defines wizard notes. First string represents
@@ -1207,12 +1207,12 @@ let read_family state ic fname = function
       F_some (Bnotes ("", notes), read_line state ic)
   (* Extended page block *)
   | Some (str, [ "page-ext"; _ ]) ->
-      let p =
+      let page_title =
         let len = String.length "page-ext" + 1 in
         String.sub str len (String.length str - len)
       in
       let notes = read_notes_db state ic "end page-ext" in
-      F_some (Bnotes (p, notes), read_line state ic)
+      F_some (Bnotes (page_title, notes), read_line state ic)
   (* Used before version 5.00. Notes block *)
   | Some (_, [ "notes" ]) ->
       let notes = read_notes state ic in
