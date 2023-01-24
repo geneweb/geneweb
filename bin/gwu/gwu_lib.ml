@@ -389,8 +389,6 @@ type gen = {
   mutable pevents_pl_p : person list;
 }
 
-let map_notes aliases f = try List.assoc f aliases with Not_found -> f
-
 let add_linked_files gen from s some_linked_files =
   let slen = String.length s in
   let rec loop new_linked_files i =
@@ -415,17 +413,18 @@ let add_linked_files gen from s some_linked_files =
             String.sub b 0 k
           with Not_found -> b
         in
-        let fname = map_notes gen.notes_alias fname in
-        let f = from () in
+        let fname =
+          Option.value ~default:fname (List.assoc_opt fname gen.notes_alias)
+        in
         let new_linked_files =
-          try
-            let r = List.assoc fname gen.ext_files in
-            if List.mem f !r then () else r := f :: !r;
-            new_linked_files
-          with Not_found ->
-            let lf = (fname, ref [ f ]) in
-            gen.ext_files <- lf :: gen.ext_files;
-            lf :: new_linked_files
+          match List.assoc_opt fname gen.ext_files with
+          | Some r ->
+              if List.mem from !r then () else r := from :: !r;
+              new_linked_files
+          | None ->
+              let lf = (fname, ref [ from ]) in
+              gen.ext_files <- lf :: gen.ext_files;
+              lf :: new_linked_files
         in
         loop new_linked_files j
       else loop new_linked_files (i + 1)
@@ -822,7 +821,7 @@ let print_family opts base gen m =
         m.m_chil;
       Printf.ksprintf (oc opts) "end\n");
   Gwdb.Marker.set gen.fam_done m.m_ifam true;
-  let f _ =
+  let from =
     Printf.sprintf "family \"%s.%d %s\" & \"%s.%d %s\""
       (p_first_name base m.m_fath)
       (get_new_occ m.m_fath) (p_surname base m.m_fath)
@@ -853,7 +852,7 @@ let print_family opts base gen m =
     in
     String.concat " " (List.map (sou base) sl)
   in
-  ignore (add_linked_files gen f s [] : _ list)
+  ignore (add_linked_files gen from s [] : _ list)
 
 let get_persons_with_notes m list =
   let list =
@@ -933,7 +932,7 @@ let print_notes_for_person opts base gen p =
      in
      loop (get_pevents p));
     Printf.ksprintf (oc opts) "end notes\n");
-  let f _ =
+  let from =
     Printf.sprintf "person \"%s.%d %s\"" (p_first_name base p) (get_new_occ p)
       (p_surname base p)
   in
@@ -972,7 +971,7 @@ let print_notes_for_person opts base gen p =
     else sl
   in
   let s = String.concat " " s in
-  ignore (add_linked_files gen f s [] : _ list)
+  ignore (add_linked_files gen from s [] : _ list)
 
 let print_notes opts base gen ml =
   let pl = List.fold_right get_persons_with_notes ml gen.notes_pl_p in
@@ -1295,19 +1294,6 @@ let connected_families base fam_sel ifam cpl =
   in
   loop [ ifam ] [] [ get_father cpl ]
 
-let read_file_contents fname =
-  match try Some (open_in fname) with Sys_error _ -> None with
-  | Some ic -> (
-      let len = ref 0 in
-      try
-        let rec loop () =
-          len := Buff.store !len (input_char ic);
-          loop ()
-        in
-        loop ()
-      with End_of_file -> Buff.get !len)
-  | None -> ""
-
 type separate = ToSeparate | NotScanned | BeingScanned | Scanned
 
 let rec find_ancestors base surn p list =
@@ -1618,7 +1604,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
       Printf.ksprintf oc "notes-db\n";
       rs_printf opts s;
       Printf.ksprintf oc "\nend notes-db\n";
-      ignore (add_linked_files gen (fun _ -> "database notes") s [] : _ list));
+      ignore (add_linked_files gen "database notes" s [] : _ list));
     (try
        let files =
          Sys.readdir (Filename.concat in_dir (base_wiznotes_dir base))
@@ -1626,15 +1612,16 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
        Array.sort compare files;
        for i = 0 to Array.length files - 1 do
          let file = files.(i) in
-         if Filename.check_suffix file ".txt" then
+         if Filename.check_suffix file ".txt" then (
            let wfile =
              List.fold_left Filename.concat in_dir
                [ base_wiznotes_dir base; file ]
            in
-           let s = read_file_contents wfile in
+           let ic = open_in wfile in
+           let s = Mutil.input_file_ic ic in
+           close_in ic;
            ignore
-             (add_linked_files gen (fun _ -> "wizard \"" ^ file ^ "\"") s []
-               : _ list)
+             (add_linked_files gen ("wizard \"" ^ file ^ "\"") s [] : _ list))
        done
      with Sys_error _ -> ());
     let rec loop = function
@@ -1643,12 +1630,12 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
           let fn =
             match NotesLinks.check_file_name f with
             | Some (dl, f) -> List.fold_right Filename.concat dl f
-            | None -> "bad"
+            | None -> (* TODO error here? *) "bad"
           in
           let s = base_notes_read base fn in
           let files =
             add_linked_files gen
-              (fun _ -> Printf.sprintf "extended page \"%s\"" f)
+              (Printf.sprintf "extended page \"%s\"" f)
               s files
           in
           loop files
@@ -1659,7 +1646,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
         let fn =
           match NotesLinks.check_file_name f with
           | Some (dl, f) -> List.fold_right Filename.concat dl f
-          | None -> "bad"
+          | None -> (* TODO error here? *) "bad"
         in
         let s = String.trim (base_notes_read base fn) in
         if s <> "" then (
@@ -1691,7 +1678,10 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
             List.fold_left Filename.concat in_dir
               [ base_wiznotes_dir base; file ]
           in
-          let s = String.trim (read_file_contents wfile) in
+          let ic = open_in wfile in
+          let content = Mutil.input_file_ic ic in
+          close_in ic;
+          let s = String.trim content in
           Printf.ksprintf oc "\nwizard-note %s\n" wizid;
           rs_printf opts s;
           Printf.ksprintf oc "\nend wizard-note\n")

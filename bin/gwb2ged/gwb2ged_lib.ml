@@ -195,7 +195,34 @@ let ged_header opts base ifile ofile =
   | Gwexport.Ansi -> Printf.ksprintf (oc opts) "1 CHAR ANSI\n"
   | Gwexport.Ascii -> Printf.ksprintf (oc opts) "1 CHAR ASCII\n"
   | Gwexport.Utf8 -> Printf.ksprintf (oc opts) "1 CHAR UTF-8\n");
-  if opts.Gwexport.base_notes then display_note opts 1 (base_notes_read base "")
+  if opts.Gwexport.base_notes then
+    (* TODO we lose the "title"/page name *)
+    let wiki_notes =
+      let main_notes = base_notes_read base "" in
+      (* read notes_d folder *)
+      (* TODO use a Path module *)
+      let path =
+        Filename.concat (Gwdb.bname base ^ ".gwb") (Gwdb.base_notes_dir base)
+      in
+      let wiki_filenames =
+        if Sys.file_exists path then Sys.readdir path else [||]
+      in
+      let wiki_pages =
+        Array.fold_left
+          (fun acc filename ->
+            if Filename.check_suffix filename ".txt" then (
+              let file = Filename.concat path filename in
+              let ic = open_in file in
+              let content = Mutil.input_file_ic ic in
+              close_in ic;
+              content :: acc)
+            else acc)
+          [] wiki_filenames
+      in
+      (* main notes should be first *)
+      main_notes :: wiki_pages
+    in
+    List.iter (fun s -> display_note opts 1 s) wiki_notes
 
 let sub_string_index s t =
   let rec loop i j =
