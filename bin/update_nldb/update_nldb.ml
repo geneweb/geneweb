@@ -35,19 +35,6 @@ let notes_links s =
   in
   loop [] [] 1 0
 
-let read_file_contents fname =
-  match try Some (open_in fname) with Sys_error _ -> None with
-  | Some ic -> (
-      let len = ref 0 in
-      try
-        let rec loop () =
-          len := Buff.store !len (input_char ic);
-          loop ()
-        in
-        loop ()
-      with End_of_file -> Buff.get !len)
-  | None -> ""
-
 let compute base bdir =
   let bdir =
     if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
@@ -68,18 +55,21 @@ let compute base bdir =
      let files = Sys.readdir (Filename.concat bdir (base_wiznotes_dir base)) in
      for i = 0 to Array.length files - 1 do
        let file = files.(i) in
-       if Filename.check_suffix file ".txt" then
+       if Filename.check_suffix file ".txt" then (
          let wizid = Filename.chop_suffix file ".txt" in
          let wfile =
            List.fold_left Filename.concat bdir [ base_wiznotes_dir base; file ]
          in
-         let list = notes_links (read_file_contents wfile) in
+         let ic = open_in wfile in
+         let content = Mutil.input_file_ic ic in
+         close_in ic;
+         let list = notes_links content in
          if list = ([], []) then ()
          else (
            Printf.eprintf "%s... " wizid;
            flush stderr;
            let pg = NLDB.PgWizard wizid in
-           db := NotesLinks.add_in_db !db pg list)
+           db := NotesLinks.add_in_db !db pg list))
      done;
      Printf.eprintf "\n";
      flush stderr
