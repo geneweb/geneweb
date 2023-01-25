@@ -605,7 +605,6 @@ let list_slice a b list =
     else []
   in list_slice a (b - a) list
 
-(* TODO make it close ic? *)
 let input_file_ic ic =
   let len = in_channel_length ic in
   if Sys.unix then
@@ -627,6 +626,12 @@ let input_file_ic ic =
           loop ()
         | exception End_of_file -> Buffer.contents buffer
       in loop ()
+
+let read_file_content filename =
+  let ic = Secure.open_in filename in
+  let s = input_file_ic ic in
+  close_in ic;
+  s
 
 let normalize_utf_8 s =
   let b = Buffer.create (String.length s * 3) in
