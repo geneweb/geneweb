@@ -227,6 +227,9 @@ val input_file_ic : in_channel -> string
     the result is meaningless.
 *)
 
+val read_file_content : string -> string
+(** [read_file_content filename] Reads the content of the file with full path [filename]. *)
+
 val normalize_utf_8 : string -> string
 (** [normalize_utf_8 s]
     Return [s] normalized using

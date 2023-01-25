@@ -55,21 +55,19 @@ let compute base bdir =
      let files = Sys.readdir (Filename.concat bdir (base_wiznotes_dir base)) in
      for i = 0 to Array.length files - 1 do
        let file = files.(i) in
-       if Filename.check_suffix file ".txt" then (
+       if Filename.check_suffix file ".txt" then
          let wizid = Filename.chop_suffix file ".txt" in
          let wfile =
            List.fold_left Filename.concat bdir [ base_wiznotes_dir base; file ]
          in
-         let ic = open_in wfile in
-         let content = Mutil.input_file_ic ic in
-         close_in ic;
+         let content = Mutil.read_file_content wfile in
          let list = notes_links content in
          if list = ([], []) then ()
          else (
            Printf.eprintf "%s... " wizid;
            flush stderr;
            let pg = NLDB.PgWizard wizid in
-           db := NotesLinks.add_in_db !db pg list))
+           db := NotesLinks.add_in_db !db pg list)
      done;
      Printf.eprintf "\n";
      flush stderr
