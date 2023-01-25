@@ -210,12 +210,10 @@ let ged_header opts base ifile ofile =
       let wiki_pages =
         Array.fold_left
           (fun acc filename ->
-            if Filename.check_suffix filename ".txt" then (
+            if Filename.check_suffix filename ".txt" then
               let file = Filename.concat path filename in
-              let ic = open_in file in
-              let content = Mutil.input_file_ic ic in
-              close_in ic;
-              content :: acc)
+              let content = Mutil.read_file_content file in
+              content :: acc
             else acc)
           [] wiki_filenames
       in
