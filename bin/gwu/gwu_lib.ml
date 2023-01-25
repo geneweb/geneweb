@@ -1612,16 +1612,14 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
        Array.sort compare files;
        for i = 0 to Array.length files - 1 do
          let file = files.(i) in
-         if Filename.check_suffix file ".txt" then (
+         if Filename.check_suffix file ".txt" then
            let wfile =
              List.fold_left Filename.concat in_dir
                [ base_wiznotes_dir base; file ]
            in
-           let ic = open_in wfile in
-           let s = Mutil.input_file_ic ic in
-           close_in ic;
+           let s = Mutil.read_file_content wfile in
            ignore
-             (add_linked_files gen ("wizard \"" ^ file ^ "\"") s [] : _ list))
+             (add_linked_files gen ("wizard \"" ^ file ^ "\"") s [] : _ list)
        done
      with Sys_error _ -> ());
     let rec loop = function
@@ -1678,9 +1676,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
             List.fold_left Filename.concat in_dir
               [ base_wiznotes_dir base; file ]
           in
-          let ic = open_in wfile in
-          let content = Mutil.input_file_ic ic in
-          close_in ic;
+          let content = Mutil.read_file_content wfile in
           let s = String.trim content in
           Printf.ksprintf oc "\nwizard-note %s\n" wizid;
           rs_printf opts s;
