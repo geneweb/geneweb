@@ -158,11 +158,54 @@ let rec display_note_aux opts tagn s len i =
     (oc opts) (Buffer.contents b);
     display_note_aux opts tagn s (len + 1) (!j + 1)
 
-let display_note opts tagn s =
+let display_note opts ?source_page tagn s =
   if opts.Gwexport.notes && s <> "" then (
     let tag = Printf.sprintf "%d NOTE " tagn in
     Printf.ksprintf (oc opts) "%s" tag;
-    display_note_aux opts tagn (encode opts s) (String.length tag) 0)
+    display_note_aux opts tagn (encode opts s) (String.length tag) 0);
+  match source_page with
+  | None -> ()
+  | Some source_page ->
+      (* source_page is used to add a source with page information;
+         so we can re-import wiki notes and correctly re-link them together *)
+      Printf.ksprintf (oc opts) "%d SOUR\n" (tagn + 1);
+      Printf.ksprintf (oc opts) "%d PAGE %s\n" (tagn + 2) source_page
+
+let write_base_notes opts base =
+  (* TODO WIKI what about wizard notes *)
+  (* TODO WIKI we lose the "title"/page name *)
+  (* list of (filename, file_content) *)
+  let wiki_notes =
+    (* read base notes (wiki) folder *)
+    (* TODO use a Path module *)
+    let path =
+      Filename.concat (Gwdb.bname base ^ ".gwb") (Gwdb.base_notes_dir base)
+    in
+    let wiki_filenames =
+      if Sys.file_exists path then Sys.readdir path else [||]
+    in
+    let wiki_pages =
+      Array.fold_left
+        (fun acc filename ->
+          if Filename.check_suffix filename ".txt" then
+            let file = Filename.concat path filename in
+            let content = Mutil.read_file_content file in
+            (filename, content) :: acc
+          else acc)
+        [] wiki_filenames
+    in
+    (* TODO WIKI base_notes should be a file in base notes folder `base.gwb/notes_d`;
+       currently by default it is the file `base.gwb/notes`;
+       rename it "index.txt" or "index.wiki" *)
+    let main_notes = ("notes", base_notes_read base "") in
+    (* main notes should be first in gedcom *)
+    main_notes :: wiki_pages
+  in
+  List.iter
+    (fun (filename, content) ->
+      let source_page = Printf.sprintf "geneweb wiki notes: %s" filename in
+      display_note opts 1 ~source_page content)
+    wiki_notes
 
 let ged_header opts base ifile ofile =
   Printf.ksprintf (oc opts) "0 HEAD\n";
@@ -195,32 +238,7 @@ let ged_header opts base ifile ofile =
   | Gwexport.Ansi -> Printf.ksprintf (oc opts) "1 CHAR ANSI\n"
   | Gwexport.Ascii -> Printf.ksprintf (oc opts) "1 CHAR ASCII\n"
   | Gwexport.Utf8 -> Printf.ksprintf (oc opts) "1 CHAR UTF-8\n");
-  if opts.Gwexport.base_notes then
-    (* TODO we lose the "title"/page name *)
-    let wiki_notes =
-      let main_notes = base_notes_read base "" in
-      (* read notes_d folder *)
-      (* TODO use a Path module *)
-      let path =
-        Filename.concat (Gwdb.bname base ^ ".gwb") (Gwdb.base_notes_dir base)
-      in
-      let wiki_filenames =
-        if Sys.file_exists path then Sys.readdir path else [||]
-      in
-      let wiki_pages =
-        Array.fold_left
-          (fun acc filename ->
-            if Filename.check_suffix filename ".txt" then
-              let file = Filename.concat path filename in
-              let content = Mutil.read_file_content file in
-              content :: acc
-            else acc)
-          [] wiki_filenames
-      in
-      (* main notes should be first *)
-      main_notes :: wiki_pages
-    in
-    List.iter (fun s -> display_note opts 1 s) wiki_notes
+  if opts.Gwexport.base_notes then write_base_notes opts base
 
 let sub_string_index s t =
   let rec loop i j =
