@@ -157,7 +157,10 @@ let default_timeout tmout =
 
 let on_timeout = ref default_timeout
 
-let set_on_timeout timeout_f = on_timeout := timeout_f
+let set_on_timeout timeout_f = on_timeout := (fun tmout ->
+    timeout_f tmout;
+    wflush ();
+    exit 0)
 
 let treat_connection tmout callback addr fd =
   printing_state := Nothing;
