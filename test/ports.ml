@@ -185,3 +185,33 @@ let () =
         | Tname i -> Gwdb.sou base i = "This is a title name");
       assert (title.t_nth = 1)
   | _l -> assert false
+
+(* -- test base notes (wiki) -- *)
+
+(* TODO do the same but for wizard notes *)
+let () =
+  (* TODO gedcom import concatenate all wiki notes together in the main note.
+     Instead it should recreate all the files and link them together by using
+     the exported source page information *)
+  (* empty string is for reading the main note,
+     which is the starting point of the wiki *)
+  let wiki = Gwdb.base_notes_read base "" in
+  let s =
+    {|= Wiki notes! =
+
+I '''love''' wikitext!
+
+Here is a bullet list:
+* ''first item''
+* ''second item''
+* ...
+
+== Subsection ==
+
+I also like [[[geneweb]]]
+= GeneWeb =
+
+'''GeneWeb''' est un logiciel de généalogie libre et gratuit doté d'une
+interface web, utilisable aussi bien sur un ordinateur non connecté à Internet qu'en service web. Initialement conçu en 1997 par Daniel de Rauglaudre, il utilise des techniques de calcul de parenté et de consanguinité innovantes, mises au point par Daniel de Rauglaudre et Didier Rémy, directeur de recherche à l'Institut national de recherche en informatique et en automatique.|}
+  in
+  assert (wiki = s)
