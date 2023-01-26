@@ -1710,9 +1710,10 @@ let geneweb_server () =
           end
         else exit 0;
        Mutil.mkdir_p ~perm:0o777 (Filename.concat !Util.cnt_dir "cnt")
-    end;
-  Wserver.f GwdLog.syslog !selected_addr !selected_port !conn_timeout
-    (if Sys.unix then !max_clients else None) connection
+  end;
+  let max_clients = (if Sys.unix then !max_clients else None) in
+  Wserver.f ~syslog:GwdLog.syslog ~addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
+     ~max_clients ~handler:connection
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
