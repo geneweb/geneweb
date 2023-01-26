@@ -1986,4 +1986,10 @@ let () =
 #else
   if Sys.getenv_opt "WSERVER" = None then intro () ;
 #endif
-  Wserver.f (fun _ -> prerr_endline) None !port 0 None wrap_setup
+  Wserver.f ~syslog:(fun _ -> prerr_endline)
+  ~addr:None
+  ~port:!port
+  ~timeout:0
+  ~max_clients:None
+  ~handler:wrap_setup
+
