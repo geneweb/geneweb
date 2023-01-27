@@ -771,6 +771,9 @@ let treat_request =
     transl conf "reserved to friends or wizards"
     |> Utf8.capitalize_fst
     |> Output.print_sstring conf ;
+    let base_name =
+      if conf.cgi then (Printf.sprintf "b=%s&" conf.bname) else ""
+    in
     let user = transl_nth conf "user/password/cancel" 0 in
     let passwd = transl_nth conf "user/password/cancel" 1 in
     Output.print_sstring conf ".</li></ul>" ;
