@@ -770,14 +770,15 @@ let treat_request =
     Output.print_sstring conf {|" |} ;
     transl conf "reserved to friends or wizards"
     |> Output.print_sstring conf ;
+    let base_name =
+      if conf.cgi then (Printf.sprintf "b=%s&" conf.bname) else ""
+    in
     let user = transl_nth conf "user/password/cancel" 0 in
     let passwd = transl_nth conf "user/password/cancel" 1 in
     Output.print_sstring conf ".</li></ul>" ;
-    Output.print_sstring conf 
-      (Printf.sprintf {|
-        <form class="form-inline" method="post" action="%s">
-          <div class="input-group mt-1">
-            <input type="hidden" name="b" value="%s">
+    let body =
+      if conf.cgi then
+        Printf.sprintf {|
             <input type="text" class="form-control" name="w"
               title="%s/%s %s" placeholder="%s:%s"
               aria-label="password input"
@@ -785,13 +786,32 @@ let treat_request =
             <label for="w" class="sr-only">%s:%s</label>
             <div class="input-group-append">
               <button type="submit" class="btn btn-primary">OK</button>
-            </div>
+            </div> |}
+            (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
+            (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
+            passwd user passwd user passwd
+      else
+        Printf.sprintf {|
+            <div>
+              %s%s <a href="%s?%sw=f"> %s</a><br>
+              %s%s <a href="%s?%sw=w"> %s</a>
+            </div> |}
+            (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
+            (conf.command :> string) base_name
+            (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
+            (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
+            (conf.command :> string) base_name
+            (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
+    in
+    Output.print_sstring conf 
+      (Printf.sprintf {|
+        <form class="form-inline" method="post" action="%s">
+          <div class="input-group mt-1">
+            <input type="hidden" name="b" value="%s">
+            %s
           </div>
         </form>
-      |} (conf.command :> string) (conf.bname)
-      (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
-      (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
-      passwd user passwd user passwd
+      |} (conf.command :> string) (conf.bname) body
       );
     Hutil.trailer conf
   end
