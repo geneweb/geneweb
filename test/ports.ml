@@ -1,4 +1,6 @@
-(* tests for import/export of .ged and .gw *)
+(** tests for import/export of .ged and .gw *)
+
+(* TODO use https://gedcom.io/tools/#example-familysearch-gedcom-70-files to test gedcom v7.0 *)
 
 let original_ged = Filename.concat "assets" "royal92.ged"
 let exported_ged = Filename.concat "assets" "royal92_exported.ged"
