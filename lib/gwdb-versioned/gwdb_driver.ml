@@ -51,10 +51,26 @@ module Store (D : Data) : sig
   val write : D.base -> unit
   val sync : (D.base -> D.t array) -> D.base -> unit
   val empty : unit -> unit
+  val close_data_file : unit -> unit
 end = struct
   type t = (D.index, D.t) Hashtbl.t
 
   let patch_ht : (D.index, D.t) Hashtbl.t option ref = ref None
+
+  let data_file_in_channel : in_channel option ref = ref None
+
+  let open_data_file base = match !data_file_in_channel with
+    | Some ic -> ic
+    | None ->
+      let file = D.data_file base in
+      let ic = Secure.open_in file in
+      data_file_in_channel := Some ic;
+      ic
+
+  let close_data_file () = match !data_file_in_channel with
+    | Some ic -> close_in ic
+    | None -> ()
+  
   let patch_file_exists base = Sys.file_exists (D.patch_file base)
   let data_file_exists base = Sys.file_exists (D.data_file base)
   let directory_exists base = Sys.file_exists (D.directory base)
@@ -77,14 +93,13 @@ end = struct
 
   let get_from_data_file base index =
     if data_file_exists base then (
-      let ic = Secure.open_in (D.data_file base) in
+      let ic = open_data_file base in
       let len = input_binary_int ic in
       assert (index < len);
       seek_in ic (4 + (index * 4));
       let pos_data = input_binary_int ic in
       seek_in ic pos_data;
       let data = (Marshal.from_channel ic : D.t) in
-      close_in ic;
       Some data)
     else None
 
@@ -121,7 +136,7 @@ end = struct
       build_from_scratch base)
     else (
       log "some data file found";
-      let ic = Secure.open_in (D.data_file base) in
+      let ic = open_data_file base in
       let len = input_binary_int ic in
       seek_in ic (4 + (4 * len));
 
@@ -133,7 +148,6 @@ end = struct
       in
 
       let data = Array.of_list @@ List.rev (loop len []) in
-      close_in ic;
       data)
 
   let sync build_from_scratch base =
@@ -456,7 +470,9 @@ module Legacy_driver = struct
 
   let close_base base =
     log "CLOSING THE BASE";
-    close_base base
+    close_base base;
+    PatchPer.close_data_file ();
+    PatchFam.close_data_file ()
 
   let empty_person base iper =
     let p = empty_person base iper in
