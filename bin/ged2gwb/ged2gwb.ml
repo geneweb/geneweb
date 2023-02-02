@@ -5,12 +5,11 @@ let anonfun s =
   else raise (Arg.Bad "Cannot treat several GEDCOM files")
 
 let errmsg = "Usage: ged2gwb [<ged>] [options] where options are:"
-let out_file = ref "a"
 
 let speclist =
   [
     ( "-o",
-      Arg.String (fun s -> out_file := s),
+      Arg.String (fun s -> State.out_file := s),
       "<file> Output database (default: \"a\")." );
     ("-f", Arg.Set State.force, "Remove database if already existing");
     ( "-log",
