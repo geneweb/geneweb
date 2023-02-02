@@ -503,6 +503,8 @@ module Legacy_driver = struct
   let gen_union_of_person p = gen_union_of_person p.person
 
   let witness_notes base iper =
+    if iper = dummy_iper then [||]
+    else
     match PatchPer.get base iper with
     | Some notes -> notes
     | None ->
@@ -520,6 +522,8 @@ module Legacy_driver = struct
         witnesses_notes
 
   let fwitness_notes base ifam =
+    if ifam = dummy_ifam then [||]
+    else
     match PatchFam.get base ifam with
     | Some notes -> notes
     | None ->
