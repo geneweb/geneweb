@@ -84,6 +84,7 @@ end = struct
       let pos_data = input_binary_int ic in
       seek_in ic pos_data;
       let data = (Marshal.from_channel ic : D.t) in
+      close_in ic;
       Some data)
     else None
 
