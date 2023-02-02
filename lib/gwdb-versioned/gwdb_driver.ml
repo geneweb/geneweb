@@ -60,7 +60,9 @@ end = struct
   let data_file_in_channel : in_channel option ref = ref None
 
   let open_data_file base = match !data_file_in_channel with
-    | Some ic -> ic
+    | Some ic ->
+      seek_in ic 0;
+      ic
     | None ->
       let file = D.data_file base in
       let ic = Secure.open_in file in
