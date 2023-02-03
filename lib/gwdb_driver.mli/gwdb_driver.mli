@@ -519,7 +519,7 @@ val base_notes_read : base -> string -> string
     (either database note either extended page). *)
 
 val base_notes_read_first_line : base -> string -> string
-(** [base_notes_read base fname] read and return first line of [fname] note *)
+(** [base_notes_read_first_line base fname] read and return first line of [fname] note *)
 
 val base_notes_are_empty : base -> string -> bool
 (** Says if note has empty content *)
@@ -536,7 +536,7 @@ val base_wiznotes_dir : base -> string
 val date_of_last_change : base -> float
 (** Returns last modification time of the database on disk *)
 
-(** Collections of elemetns *)
+(** Collections of elements *)
 module Collection : sig
   type 'a t
   (** Collections are sets of elements you want to traverse. *)

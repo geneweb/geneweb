@@ -627,6 +627,12 @@ let input_file_ic ic =
         | exception End_of_file -> Buffer.contents buffer
       in loop ()
 
+let read_file_content filename =
+  let ic = Secure.open_in filename in
+  let s = input_file_ic ic in
+  close_in ic;
+  s
+
 let normalize_utf_8 s =
   let b = Buffer.create (String.length s * 3) in
   let n = Uunf.create `NFC in

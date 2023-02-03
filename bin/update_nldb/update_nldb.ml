@@ -35,19 +35,6 @@ let notes_links s =
   in
   loop [] [] 1 0
 
-let read_file_contents fname =
-  match try Some (open_in fname) with Sys_error _ -> None with
-  | Some ic -> (
-      let len = ref 0 in
-      try
-        let rec loop () =
-          len := Buff.store !len (input_char ic);
-          loop ()
-        in
-        loop ()
-      with End_of_file -> Buff.get !len)
-  | None -> ""
-
 let compute base bdir =
   let bdir =
     if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
@@ -73,7 +60,8 @@ let compute base bdir =
          let wfile =
            List.fold_left Filename.concat bdir [ base_wiznotes_dir base; file ]
          in
-         let list = notes_links (read_file_contents wfile) in
+         let content = Mutil.read_file_content wfile in
+         let list = notes_links content in
          if list = ([], []) then ()
          else (
            Printf.eprintf "%s... " wizid;

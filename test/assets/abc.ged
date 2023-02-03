@@ -1,0 +1,93 @@
+0 HEAD
+1 SOUR GeneWeb
+2 VERS 7.0.0
+2 NAME gwb2ged
+2 CORP INRIA
+3 ADDR http://www.geneweb.org
+2 DATA abc.gwb
+1 DATE 25 JAN 2023
+2 TIME 18:10:45
+1 FILE abc.ged
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+1 NOTE = Wiki notes! =
+2 CONT 
+2 CONT I '''love''' wikitext!
+2 CONT 
+2 CONT Here is a bullet list:
+2 CONT * ''first item''
+2 CONT * ''second item''
+2 CONT * ...
+2 CONT 
+2 CONT == Subsection ==
+2 CONT 
+2 CONT I also like [[[geneweb]]]
+2 SOUR
+3 PAGE geneweb wiki notes: notes
+1 NOTE = GeneWeb =
+2 CONT 
+2 CONT '''GeneWeb''' est un logiciel de généalogie libre et gratuit doté d'une
+2 CONC  interface web, utilisable aussi bien sur un ordinateur non connecté à 
+2 CONC Internet qu'en service web. Initialement conçu en 1997 par Daniel de Ra
+2 CONC uglaudre, il utilise des techniques de calcul de parenté et de consangu
+2 CONC inité innovantes, mises au point par Daniel de Rauglaudre et Didier Rém
+2 CONC y, directeur de recherche à l'Institut national de recherche en informa
+2 CONC tique et en automatique.
+2 CONT 
+2 SOUR
+3 PAGE geneweb wiki notes: geneweb.txt
+0 @I1@ INDI
+1 NAME b /B/
+1 SEX M
+1 BIRT
+2 DATE 05 MAR 1991
+2 PLAC Avignon
+1 TITL This is a title, This is a Fief, 1
+2 NOTE This is a title name
+1 FAMS @F1@
+0 @I2@ INDI
+1 NAME a /A/
+1 SEX M
+1 BIRT
+2 DATE 01 JAN 1990
+2 PLAC Paris
+2 NOTE This is a note on a birth event
+2 SOUR This is a source on a birth event
+1 EVEN
+2 TYPE Degree
+2 NOTE This is a note on a diploma event
+2 SOUR This is a source on a diploma event
+2 ASSO @I3@
+3 TYPE INDI
+3 RELA Witness
+3 NOTE This is a witness note on a diploma event
+4 CONT -- this is the second line of the witness note --
+1 FAMS @F1@
+1 NOTE This is a note on an individual
+0 @I3@ INDI
+1 NAME c /C/
+1 SEX F
+1 ASSO @F1@
+2 TYPE FAM
+2 RELA witness
+1 ASSO @F1@
+2 TYPE FAM
+2 RELA witness
+0 @F1@ FAM
+1 MARR
+2 DATE 18 MAY 2013
+2 PLAC Lyon
+2 NOTE This is a note on a marriage event
+2 SOUR This is a source on a marriage event
+2 ASSO @I3@
+3 TYPE INDI
+3 RELA Attending
+3 NOTE This is a witness note on a marriage event
+1 HUSB @I1@
+1 WIFE @I2@
+1 NOTE This is a comment on a family
+2 CONT 
+2 CONT this is a line after an empty line
+0 TRLR

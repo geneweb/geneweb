@@ -29,6 +29,8 @@ type patch =
       Gwdb.ifam option * Gwdb.iper option * (Gwdb.istr * Gwdb.istr) option
   | Fix_UpdatedOcc of Gwdb.iper * int * int
 
+val string_of_patch : Gwdb.base -> patch -> string
+
 val check_NBDS :
   ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 (** For every person in the base synchronise his birth, death, baptism and burial events with
@@ -81,3 +83,7 @@ val fix_key :
   ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 (** For every person in the base, update their occurence number
     if someone with same key (normalized first name and last name, and occurence number) already exists. *)
+
+val check_everything :
+  ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
+(** Apply all checks *)
