@@ -143,24 +143,23 @@ let sockaddr_of_string s = Unix.ADDR_UNIX s
 let default_timeout tmout =
   if !printing_state = Nothing then http Def.OK;
   if !printing_state <> Contents then (
-    output_string !wserver_oc
-      "Content-type: text/html; charset=iso-8859-1";
+    output_string !wserver_oc "Content-type: text/html; charset=iso-8859-1";
     printnl ();
     printnl ();
     printf "<head><title>Time out</title></head>\n";
     printf "<body>");
-  printf
-    "<h1>Time out</h1><p>Computation time > %d second(s)</p></body>"
-    tmout;
+  printf "<h1>Time out</h1><p>Computation time > %d second(s)</p></body>" tmout;
   wflush ();
   exit 0
 
 let on_timeout = ref default_timeout
 
-let set_on_timeout timeout_f = on_timeout := (fun tmout ->
-    timeout_f tmout;
-    wflush ();
-    exit 0)
+let set_on_timeout timeout_f =
+  on_timeout :=
+    fun tmout ->
+      timeout_f tmout;
+      wflush ();
+      exit 0
 
 let treat_connection tmout callback addr fd =
   printing_state := Nothing;

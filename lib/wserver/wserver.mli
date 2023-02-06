@@ -3,16 +3,17 @@
 (* module [Wserver]: elementary web service *)
 
 val f :
-  syslog:([ `LOG_EMERG
-   | `LOG_ALERT
-   | `LOG_CRIT
-   | `LOG_ERR
-   | `LOG_WARNING
-   | `LOG_NOTICE
-   | `LOG_INFO
-   | `LOG_DEBUG ] ->
-  string ->
-  unit) ->
+  syslog:
+    ([ `LOG_EMERG
+     | `LOG_ALERT
+     | `LOG_CRIT
+     | `LOG_ERR
+     | `LOG_WARNING
+     | `LOG_NOTICE
+     | `LOG_INFO
+     | `LOG_DEBUG ] ->
+    string ->
+    unit) ->
   addr:string option ->
   port:int ->
   timeout:int ->
