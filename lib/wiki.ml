@@ -180,10 +180,11 @@ let syntax_links conf wi s =
             let f = wi.wi_file_path (fname_of_path fpath) in
             if Sys.file_exists f then "" else " style=\"color:red\""
           in
+          let anchor = if anchor = "" then "" else "#" ^ encode anchor in
           let t =
-            Printf.sprintf "<a href=\"%sm=%s&f=%s%s\"%s>%s</a>"
+            Printf.sprintf {|<a href="%sm=%s&f=%s%s"%s>%s</a>|}
               (commd conf : Adef.escaped_string :> string)
-              (encode wi.wi_mode) (encode fname) (encode anchor) c text
+              (encode wi.wi_mode) (encode fname) anchor c text
           in
           loop quot_lev pos j (Buff.mstore len t)
       | NotesLinks.WLperson (j, (fn, sn, oc), name, _) ->

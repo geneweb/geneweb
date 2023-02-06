@@ -44,14 +44,20 @@ let misc_notes_link s i =
       in
       if j > i + 6 then
         let b = String.sub s (i + 3) (j - i - 6) in
+        (* anchor does not contains the leading '#' *)
         let fname, anchor, text =
-          try
-            let k = String.rindex b '/' in
-            let j = try String.rindex_from b k '#' with Not_found -> k in
-            ( String.sub b 0 j,
-              String.sub b j (k - j),
-              String.sub b (k + 1) (String.length b - k - 1) )
-          with Not_found -> (b, "", b)
+          match String.rindex_opt b '/' with
+          | None -> (b, "", b)
+          | Some k ->
+              (* anchor_start = k implies empty anchor *)
+              let fname_len, anchor_start =
+                match String.rindex_from_opt b k '#' with
+                | None -> (k, k)
+                | Some j -> (j, min (j + 1) k)
+              in
+              ( String.sub b 0 fname_len,
+                String.sub b anchor_start (k - anchor_start),
+                String.sub b (k + 1) (String.length b - k - 1) )
         in
         match check_file_name fname with
         | Some pg_path -> WLpage (j, pg_path, fname, anchor, text)
