@@ -449,6 +449,29 @@ let possible_father warning x father =
 let child_has_sex warning child =
   if get_sex child = Neuter then warning (UndefinedSex child)
 
+(* used by check_order_pfevents to ignore some date warnings:
+   - `sort_events` sorts events like points on a timeline
+   - date with precision (Before|After) are exlusive
+   so we can have this sorted list of events:
+   [ baptism at date n ; birth at date (Before n+1)]
+   which will raise an invalid warning *)
+let ignore_less_than_one_day_apart_warning get_date e1 e2 =
+  let d1 = get_date e1 |> Date.cdate_to_dmy_opt in
+  let d2 = get_date e2 |> Date.cdate_to_dmy_opt in
+  match (d1, d2) with
+  | None, _ | _, None -> false
+  | Some d1, Some d2 -> (
+      match Date.time_elapsed_opt d1 d2 with
+      | None -> false
+      | Some date_diff -> (
+          let one_day =
+            Date.{ day = 1; month = 0; year = 0; prec = Sure; delta = 0 }
+          in
+          match Date.compare_dmy_opt date_diff one_day with
+          | None -> false
+          | Some i ->
+              if i <= 0 then d1.prec = After || d2.prec = Before else false))
+
 (* this check if events chronology is sound (e.g. no baptism before birth *)
 let check_order_pfevents get_name get_date warning events =
   let events = Event.sort_events get_name get_date events in
@@ -462,14 +485,11 @@ let check_order_pfevents get_name get_date warning events =
             | Event.Pevent (Epers_Name _) | Event.Fevent (Efam_Name _) ->
                 loop (e1 :: events)
             | n2 ->
-                if Event.compare_event_name n1 n2 = 1 then
-                  (* BUG:
-                     - `sort_events` sorts events like points on a timeline
-                     - date with precision (Before|After) are exlusive
-                     so we can have this sorted list of events:
-                       [ baptism at date n ; birth at date (Before n+1)]
-                       which will raise an invalid warning *)
-                  warning e1 e2;
+                if
+                  Event.compare_event_name n1 n2 = 1
+                  && not
+                     @@ ignore_less_than_one_day_apart_warning get_date e1 e2
+                then warning e1 e2;
                 loop (e2 :: events)))
     | _l -> ()
   in
