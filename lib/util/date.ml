@@ -120,6 +120,7 @@ let nb_days_in_month m a =
   else 0
 
 (* TODO use SDN instead *)
+(* elapsed time should not be represented by a date.  *)
 let time_elapsed d1 d2 =
   let prec =
     match (d1.prec, d2.prec) with
