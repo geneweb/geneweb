@@ -53,10 +53,6 @@ let strictly_older age year =
   | Before -> false
   | Sure | About | Maybe | After | OrYear _ | YearInt _ -> age.year > year
 
-let odate = function
-  | Some (Dgreg (d, _)) -> Some d
-  | Some (Dtext _) | None -> None
-
 let obirth x = get_birth x |> Date.cdate_to_dmy_opt
 
 let title_dates warning p t =
@@ -203,10 +199,7 @@ let check_difference_age_between_cpl warning fath moth =
   let find_date p =
     match Date.cdate_to_dmy_opt (get_birth p) with
     | Some d -> Some d
-    | None -> (
-        match Date.cdate_to_dmy_opt (get_baptism p) with
-        | None -> None
-        | Some d -> Some d)
+    | None -> Date.cdate_to_dmy_opt (get_baptism p)
   in
   match find_date fath with
   | None -> ()
@@ -361,7 +354,7 @@ let changed_marriages_order base warning p =
 let close_siblings warning x np ifam =
   match np with
   | Some (elder, d1) -> (
-      match odate @@ Date.od_of_cdate (get_birth x) with
+      match Date.cdate_to_dmy_opt (get_birth x) with
       | None -> ()
       | Some d2 ->
           Date.time_elapsed_opt d1 d2
