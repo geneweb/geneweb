@@ -367,6 +367,7 @@ let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
         else " (" ^<^ gregorian_precision conf d ^>^ ")"
       in
       let d1 = Calendar.julian_of_gregorian d in
+      (* Julian calendar new year's date changes across time and space *)
       let year_prec =
         if
           (d1.month > 0 && d1.month < 3)
