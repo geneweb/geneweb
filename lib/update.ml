@@ -1034,18 +1034,20 @@ let check_greg_day conf d =
 let reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
   | Some d, false ->
-      let d, cal =
+      let calendar =
         match p_getenv conf.env (var ^ "_cal") with
         | Some "G" | None ->
             check_greg_day conf d;
-            (d, Dgregorian)
-        | Some "J" -> (Calendar.gregorian_of_julian d, Djulian)
-        | Some "F" -> (Calendar.gregorian_of_french d, Dfrench)
-        | Some "H" -> (Calendar.gregorian_of_hebrew d, Dhebrew)
-        | _ -> (d, Dgregorian)
+            Dgregorian
+        | Some "J" -> Djulian
+        | Some "F" -> Dfrench
+        | Some "H" -> Dhebrew
+        | _ -> Dgregorian
       in
-      Some (Dgreg (d, cal))
-  | Some d, true -> Some (Dgreg (Calendar.gregorian_of_french d, Dfrench))
+      let date = Date.convert ~from:calendar ~to_:Dgregorian d in
+      Some (Dgreg (date, calendar))
+  | Some d, true ->
+      Some (Dgreg (Date.convert ~from:Dfrench ~to_:Dgregorian d, Dfrench))
   | None, _ -> (
       match p_getenv conf.env (var ^ "_text") with
       | Some _ ->

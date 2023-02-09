@@ -368,11 +368,11 @@ let ged_date_dmy opts dt cal =
 let ged_date opts = function
   | Dgreg (d, Dgregorian) -> ged_date_dmy opts d Dgregorian
   | Dgreg (d, Djulian) ->
-      ged_date_dmy opts (Calendar.julian_of_gregorian d) Djulian
+      ged_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Djulian d) Djulian
   | Dgreg (d, Dfrench) ->
-      ged_date_dmy opts (Calendar.french_of_gregorian d) Dfrench
+      ged_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Dfrench d) Dfrench
   | Dgreg (d, Dhebrew) ->
-      ged_date_dmy opts (Calendar.hebrew_of_gregorian d) Dhebrew
+      ged_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Dhebrew d) Dhebrew
   | Dtext t -> Printf.ksprintf (oc opts) "(%s)" t
 
 let print_sour opts n s = Printf.ksprintf (oc opts) "%d SOUR %s\n" n s

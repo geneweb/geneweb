@@ -676,7 +676,8 @@ let eval_var conf ifun env ep loc sl =
         | Some (Vbind (_, v)) -> VVstring (Mutil.decode v)
         | _ -> raise Not_found)
     | "today" :: sl ->
-        TemplDate.eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
+        let sdn = Date.to_sdn ~from:Dgregorian conf.today in
+        TemplDate.eval_date_var conf sdn sl
     | s :: sl -> (
         match (get_val ifun.get_vother s env, sl) with
         | Some (VVother f), sl -> f sl

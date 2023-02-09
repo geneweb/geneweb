@@ -610,13 +610,7 @@ let make_date n1 n2 n3 =
 
 let recover_date cal = function
   | Dgreg (d, Dgregorian) ->
-    let d =
-      match cal with
-      | Dgregorian -> d
-      | Djulian -> Calendar.gregorian_of_julian d
-      | Dfrench -> Calendar.gregorian_of_french d
-      | Dhebrew -> Calendar.gregorian_of_hebrew d
-    in
+    let d = Date.convert ~from:cal ~to_:Dgregorian d in
     Dgreg (d, cal)
   | d -> d
 
@@ -653,25 +647,14 @@ EXTEND
           | Begin (d, cal) -> Dgreg ({d with prec = After}, cal)
           | End (d, cal) -> Dgreg ({d with prec = Before}, cal)
           | BeginEnd ((d1, cal1), (d2, cal2)) ->
+              let dmy2 = Date.convert ~from:Dgregorian ~to_:cal2 d2 in
               let dmy2 =
-                match cal2 with
-                | Dgregorian ->
-                    {day2 = d2.day; month2 = d2.month;
-                     year2 = d2.year; delta2 = 0}
-                | Djulian ->
-                    let dmy2 = Calendar.julian_of_gregorian d2 in
-                    {day2 = dmy2.day; month2 = dmy2.month;
-                     year2 = dmy2.year; delta2 = 0}
-                | Dfrench ->
-                    let dmy2 = Calendar.french_of_gregorian d2 in
-                    {day2 = dmy2.day; month2 = dmy2.month;
-                     year2 = dmy2.year; delta2 = 0}
-                | Dhebrew ->
-                    let dmy2 = Calendar.hebrew_of_gregorian d2 in
-                    {day2 = dmy2.day; month2 = dmy2.month;
-                     year2 = dmy2.year; delta2 = 0}
+                (* convert to Def.dmy2 *)
+                {day2 = dmy2.day; month2 = dmy2.month;
+                 year2 = dmy2.year; delta2 = 0}
               in
-              Dgreg ({d1 with prec = YearInt dmy2}, cal1) end
+              Dgreg ({d1 with prec = YearInt dmy2}, cal1)
+          end
       | (d, cal) = date -> Dgreg (d, cal)
       | s = TEXT -> Dtext s ] ]
   ;
@@ -694,11 +677,11 @@ EXTEND
   date_calendar:
     [ [ "@"; "#"; ID "DGREGORIAN"; "@"; d = date_greg -> (d, Dgregorian)
       | "@"; "#"; ID "DJULIAN"; "@"; d = date_greg ->
-          (Calendar.gregorian_of_julian d, Djulian)
+          (Date.convert ~from:Djulian ~to_:Dgregorian d, Djulian)
       | "@"; "#"; ID "DFRENCH"; ID "R"; "@"; d = date_fren ->
-          (Calendar.gregorian_of_french d, Dfrench)
+          (Date.convert ~from:Dfrench ~to_:Dgregorian d, Dfrench)
       | "@"; "#"; ID "DHEBREW"; "@"; d = date_hebr ->
-          (Calendar.gregorian_of_hebrew d, Dhebrew)
+          (Date.convert ~from:Dhebrew ~to_:Dgregorian d, Dhebrew)
       | d = date_greg -> (d, Dgregorian) ] ]
   ;
   date_greg:

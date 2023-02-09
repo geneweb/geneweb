@@ -422,6 +422,7 @@ val print_alphab_list :
   config -> ('a -> string) -> ('a -> unit) -> 'a list -> unit
 
 val short_f_month : int -> string
+(** 2 letters to represent the month in the french republican calendar *)
 
 (* Reading password file *)
 

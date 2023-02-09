@@ -27,6 +27,7 @@ type date = Adef.date =
   | Dgreg of dmy * calendar
   (* textual form of the date *)
   | Dtext of string
+(* TODO change for Calendars.kind *)
 
 (** Alias to [Adef.calendar] *)
 and calendar = Adef.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
