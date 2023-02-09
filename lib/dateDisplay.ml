@@ -8,9 +8,9 @@ open Gwdb
 let get_wday conf = function
   | Dgreg (({ prec = Sure; delta = 0 } as d), _) when d.day <> 0 && d.month <> 0
     ->
-      let jd = Calendar.sdn_of_gregorian d in
+      let jd = Date.to_sdn ~from:Dgregorian d in
       let wday =
-        let jd_today = Calendar.sdn_of_gregorian conf.today in
+        let jd_today = Date.to_sdn ~from:Dgregorian conf.today in
         let x = conf.today_wd - jd_today + jd in
         if x < 0 then 6 + ((x + 1) mod 7) else x mod 7
       in
@@ -338,7 +338,8 @@ let gregorian_precision conf d =
   if d.delta = 0 then string_of_dmy conf d
   else
     let d2 =
-      Calendar.gregorian_of_sdn d.prec (Calendar.sdn_of_gregorian d + d.delta)
+      let sdn = d.delta + Date.to_sdn ~from:Dgregorian d in
+      Date.gregorian_of_sdn ~prec:d.prec sdn
     in
     Adef.safe
     @@ transl conf "between (date)"
@@ -358,45 +359,45 @@ let string_of_date_aux ?(link = true) ?(dmy = string_of_dmy)
          (s :> string)
   in
   function
-  | Dgreg (d, Dgregorian) ->
-      let s = dmy conf d in
-      if link && d.day > 0 then mk_link 'g' d s else s
-  | Dgreg (d, Djulian) ->
-      let cal_prec =
-        if d.year < 1582 then Adef.safe ""
-        else " (" ^<^ gregorian_precision conf d ^>^ ")"
-      in
-      let d1 = Calendar.julian_of_gregorian d in
-      (* Julian calendar new year's date changes across time and space *)
-      let year_prec =
-        if
-          (d1.month > 0 && d1.month < 3)
-          || (d1.month = 3 && d1.day > 0 && d1.day < 25)
-        then Printf.sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
-        else ""
-      in
-      let s =
-        dmy conf d1 ^^^ year_prec ^<^ sep
-        ^^^ transl_nth conf "gregorian/julian/french/hebrew" 1
-        ^<^ cal_prec
-      in
-      if link && d1.day > 0 then mk_link 'j' d1 s else s
-  | Dgreg (d, Dfrench) -> (
-      let d1 = Calendar.french_of_gregorian d in
-      let s = string_of_on_french_dmy conf d1 in
-      let s = if link && d1.day > 0 then mk_link 'f' d1 s else s in
-      match d.prec with
-      | Sure | About | Before | After | Maybe ->
-          s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
-      | OrYear _ | YearInt _ -> s)
-  | Dgreg (d, Dhebrew) -> (
-      let d1 = Calendar.hebrew_of_gregorian d in
-      let s = string_of_on_hebrew_dmy conf d1 in
-      match d.prec with
-      | Sure | About | Before | After | Maybe ->
-          s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
-      | OrYear _ | YearInt _ -> s)
   | Dtext t -> "(" ^<^ (Util.escape_html t :> Adef.safe_string) ^>^ ")"
+  | Dgreg (d, calendar) -> (
+      let d1 = Date.convert ~from:Dgregorian ~to_:calendar d in
+      match calendar with
+      | Dgregorian ->
+          let s = dmy conf d in
+          if link && d.day > 0 then mk_link 'g' d s else s
+      | Djulian ->
+          let cal_prec =
+            if d.year < 1582 then Adef.safe ""
+            else " (" ^<^ gregorian_precision conf d ^>^ ")"
+          in
+          (* Julian calendar new year's date changes across time and space *)
+          let year_prec =
+            if
+              (d1.month > 0 && d1.month < 3)
+              || (d1.month = 3 && d1.day > 0 && d1.day < 25)
+            then Printf.sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
+            else ""
+          in
+          let s =
+            dmy conf d1 ^^^ year_prec ^<^ sep
+            ^^^ transl_nth conf "gregorian/julian/french/hebrew" 1
+            ^<^ cal_prec
+          in
+          if link && d1.day > 0 then mk_link 'j' d1 s else s
+      | Dfrench -> (
+          let s = string_of_on_french_dmy conf d1 in
+          let s = if link && d1.day > 0 then mk_link 'f' d1 s else s in
+          match d.prec with
+          | Sure | About | Before | After | Maybe ->
+              s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
+          | OrYear _ | YearInt _ -> s)
+      | Dhebrew -> (
+          let s = string_of_on_hebrew_dmy conf d1 in
+          match d.prec with
+          | Sure | About | Before | After | Maybe ->
+              s ^^^ sep ^^^ " (" ^<^ gregorian_precision conf d ^>^ ")"
+          | OrYear _ | YearInt _ -> s))
 
 let string_of_ondate ?link conf d =
   (string_of_date_aux ?link ~dmy:string_of_on_dmy conf d :> string)
@@ -432,21 +433,19 @@ let string_slash_of_date conf date =
   match date with
   | Dtext t -> (Util.escape_html t :> Adef.safe_string)
   | Dgreg (d, cal) -> (
+      let d1 = Date.convert ~from:Dgregorian ~to_:cal d in
       Adef.safe
       @@
       match cal with
       | Dgregorian -> slashify_dmy (decode_dmy conf d) d
       | Djulian ->
-          let d1 = Calendar.julian_of_gregorian d in
           slashify_dmy (translate_dmy conf (decode_dmy conf d1) Djulian true) d1
           ^ " ("
           ^ transl_nth conf "gregorian/julian/french/hebrew" 1
           ^ ")"
       | Dfrench ->
-          let d1 = Calendar.french_of_gregorian d in
           slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dfrench true) d1
       | Dhebrew ->
-          let d1 = Calendar.french_of_gregorian d in
           slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dhebrew true) d1
           ^ " ("
           ^ transl_nth conf "gregorian/julian/french/hebrew" 3

@@ -220,3 +220,67 @@ let cdate_of_death = function
 
 let dmy_of_death death = Option.bind (cdate_of_death death) cdate_to_dmy_opt
 let date_of_death death = Option.bind (cdate_of_death death) od_of_cdate
+
+(* TODO handle day|month = 0 *)
+let to_calendars ~from dmy =
+  let { Def.day; month; year; delta; _ } = dmy in
+  match from with
+  | Dgregorian ->
+      Calendars.make Gregorian ~day ~month ~year ~delta |> Result.get_ok
+  | Djulian ->
+      Calendars.make Julian ~day ~month ~year ~delta
+      |> Result.get_ok |> Calendars.to_gregorian
+  | Dfrench ->
+      Calendars.make French ~day ~month ~year ~delta
+      |> Result.get_ok |> Calendars.to_gregorian
+  | Dhebrew ->
+      Calendars.make Hebrew ~day ~month ~year ~delta
+      |> Result.get_ok |> Calendars.to_gregorian
+
+let of_calendars_raw ~prec date =
+  let { Calendars.day; month; year; delta; _ } = date in
+  { Def.day; month; year; delta; prec }
+
+let rec convert ~from ~to_ d =
+  let convert_prec prec =
+    let convert_dmy2 dmy2 =
+      let { day2; month2; year2; delta2 } = dmy2 in
+      let date =
+        convert ~from ~to_
+          {
+            day = day2;
+            month = month2;
+            year = year2;
+            delta = delta2;
+            prec = Def.Sure (*dummy prec*);
+          }
+      in
+      let { day; month; year; delta } = date in
+      { day2 = day; month2 = month; year2 = year; delta2 = delta }
+    in
+    match prec with
+    | (Sure | About | Maybe | Before | After) as p -> p
+    | OrYear dmy2 -> OrYear (convert_dmy2 dmy2)
+    | YearInt dmy2 -> YearInt (convert_dmy2 dmy2)
+  in
+  let prec = convert_prec d.prec in
+  let d = to_calendars ~from d in
+  match to_ with
+  | Dgregorian -> Calendars.to_gregorian d |> of_calendars_raw ~prec
+  | Djulian -> Calendars.to_julian d |> of_calendars_raw ~prec
+  | Dfrench -> Calendars.to_french d |> of_calendars_raw ~prec
+  | Dhebrew -> Calendars.to_hebrew d |> of_calendars_raw ~prec
+
+let to_sdn ~from d = to_calendars ~from d |> Calendars.to_sdn
+
+let gregorian_of_sdn ~prec sdn =
+  Calendars.gregorian_of_sdn sdn |> of_calendars_raw ~prec
+
+let julian_of_sdn ~prec sdn =
+  Calendars.julian_of_sdn sdn |> of_calendars_raw ~prec
+
+let french_of_sdn ~prec sdn =
+  Calendars.french_of_sdn sdn |> of_calendars_raw ~prec
+
+let hebrew_of_sdn ~prec sdn =
+  Calendars.hebrew_of_sdn sdn |> of_calendars_raw ~prec

@@ -379,7 +379,7 @@ and eval_create c = function
       match c with
       | Update.Create (_, Some { ci_birth_date = Some (Dgreg (dmy, Dfrench)) })
         ->
-          let dmy = Calendar.french_of_gregorian dmy in
+          let dmy = Date.convert ~from:Dgregorian ~to_:Dfrench dmy in
           if dmy.day <> 0 then string_of_int dmy.day else ""
       | Update.Create (_, Some { ci_birth_date = Some (Dgreg ({ day = d }, _)) })
         when d <> 0 ->
@@ -391,7 +391,7 @@ and eval_create c = function
       match c with
       | Update.Create (_, Some { ci_birth_date = Some (Dgreg (dmy, Dfrench)) })
         ->
-          let dmy = Calendar.french_of_gregorian dmy in
+          let dmy = Date.convert ~from:Dgregorian ~to_:Dfrench dmy in
           if dmy.month <> 0 then short_f_month dmy.month else ""
       | Update.Create
           (_, Some { ci_birth_date = Some (Dgreg ({ month = m }, _)) })
@@ -409,11 +409,9 @@ and eval_create c = function
       match c with
       | Update.Create (_, Some ci) -> (
           match ci.ci_birth_date with
-          | Some (Dgreg (dmy, Dfrench)) ->
-              let dmy = Calendar.french_of_gregorian dmy in
+          | Some (Dgreg (dmy, calendar)) ->
+              let dmy = Date.convert ~from:Dgregorian ~to_:calendar dmy in
               add_precision (string_of_int dmy.year) dmy.prec
-          | Some (Dgreg ({ year = y; prec = p }, _)) ->
-              add_precision (string_of_int y) p
           | Some _ -> ""
           | None -> if ci.ci_public then "p" else "")
       | _ -> "")
@@ -421,26 +419,22 @@ and eval_create c = function
       str_val
       @@
       match c with
-      | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, Dfrench)) })
+      | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, calendar)) })
         ->
-          let dmy = Calendar.french_of_gregorian dmy in
+          let dmy = Date.convert ~from:Dgregorian ~to_:calendar dmy in
           if dmy.day <> 0 then string_of_int dmy.day else ""
-      | Update.Create (_, Some { ci_death_date = Some (Dgreg ({ day = d }, _)) })
-        when d <> 0 ->
-          string_of_int d
       | _ -> "")
   | "death_month" -> (
       str_val
       @@
       match c with
-      | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, Dfrench)) })
-        ->
-          let dmy = Calendar.french_of_gregorian dmy in
-          short_f_month dmy.month
-      | Update.Create
-          (_, Some { ci_death_date = Some (Dgreg ({ month = m }, _)) })
-        when m <> 0 ->
-          string_of_int m
+      | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, calendar)) })
+        -> (
+          let dmy = Date.convert ~from:Dgregorian ~to_:calendar dmy in
+          match calendar with
+          | Dfrench -> short_f_month dmy.month
+          | Dgregorian | Djulian | Dhebrew ->
+              if dmy.month <> 0 then string_of_int dmy.month else "")
       | _ -> "")
   | "death_place" -> (
       match c with
@@ -451,14 +445,10 @@ and eval_create c = function
       str_val
       @@
       match c with
-      | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, Dfrench)) })
+      | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, calendar)) })
         ->
-          let dmy = Calendar.french_of_gregorian dmy in
+          let dmy = Date.convert ~from:Dgregorian ~to_:calendar dmy in
           add_precision (string_of_int dmy.year) dmy.prec
-      | Update.Create
-          (_, Some { ci_death_date = Some (Dgreg ({ year = y; prec = p }, _)) })
-        ->
-          add_precision (string_of_int y) p
       | Update.Create (_, Some { ci_death = death; ci_death_date = None }) -> (
           match death with DeadDontKnowWhen -> "+" | NotDead -> "-" | _ -> "")
       | _ -> "")

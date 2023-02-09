@@ -144,7 +144,8 @@ let eval_julian_day conf =
   let open Adef in
   let getint v = match Util.p_getint conf.env v with Some x -> x | _ -> 0 in
   List.fold_left
-    (fun d (var, cal, conv, max_month) ->
+    (fun d (var, cal, max_month) ->
+      let conv d = Date.to_sdn ~from:cal d in
       let yy =
         match Util.p_getenv conf.env ("y" ^ var) with
         | Some v -> (
@@ -191,12 +192,12 @@ let eval_julian_day conf =
           | _, _, _, _, Some _, _ -> conv { dt with day = dd - 1 }
           | _, _, _, _, _, Some _ -> conv { dt with day = dd + 1 }
           | _ -> d))
-    (Calendar.sdn_of_gregorian conf.today)
+    (Date.to_sdn ~from:Dgregorian conf.today)
     [
-      ("g", Dgregorian, Calendar.sdn_of_gregorian, 12);
-      ("j", Djulian, Calendar.sdn_of_julian, 12);
-      ("f", Dfrench, Calendar.sdn_of_french, 13);
-      ("h", Dhebrew, Calendar.sdn_of_hebrew, 13);
+      ("g", Dgregorian, 12);
+      ("j", Djulian, 12);
+      ("f", Dfrench, 13);
+      ("h", Dhebrew, 13);
     ]
 
 (* *)
@@ -216,7 +217,7 @@ let eval_var conf env jd _loc =
       | _ -> raise Not_found)
   | "date" :: sl -> TemplDate.eval_date_var conf jd sl
   | "today" :: sl ->
-      TemplDate.eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
+      TemplDate.eval_date_var conf (Date.to_sdn ~from:Dgregorian conf.today) sl
   | _ -> raise Not_found
 
 let print_foreach print_ast eval_expr =

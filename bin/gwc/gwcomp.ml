@@ -261,13 +261,13 @@ let date_of_string s i =
           match s.[i] with
           | 'G' -> Some (Dgreg (d, Dgregorian), i + 1)
           | 'J' ->
-              let d = Calendar.gregorian_of_julian d in
+              let d = Date.convert ~from:Djulian ~to_:Dgregorian d in
               Some (Dgreg (d, Djulian), i + 1)
           | 'F' ->
-              let d = Calendar.gregorian_of_french d in
+              let d = Date.convert ~from:Dfrench ~to_:Dgregorian d in
               Some (Dgreg (d, Dfrench), i + 1)
           | 'H' ->
-              let d = Calendar.gregorian_of_hebrew d in
+              let d = Date.convert ~from:Dhebrew ~to_:Dgregorian d in
               Some (Dgreg (d, Dhebrew), i + 1)
           | _ -> Some (Dgreg (d, Dgregorian), i))
     | d -> d

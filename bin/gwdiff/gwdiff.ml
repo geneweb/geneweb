@@ -126,7 +126,7 @@ let compatible_str_field istr1 istr2 =
     upper bound. *)
 let dmy_to_sdn_range_l dmy =
   let sdn_of_dmy dmy =
-    let sdn = Calendar.sdn_of_gregorian dmy in
+    let sdn = Date.to_sdn ~from:Dgregorian dmy in
     let sdn = if dmy.month = 0 || dmy.day = 0 then sdn + 1 else sdn in
     let sdn2 =
       if dmy.delta != 0 then sdn + dmy.delta
@@ -147,7 +147,7 @@ let dmy_to_sdn_range_l dmy =
             delta = dmy.delta;
           }
         in
-        let sdn2 = Calendar.sdn_of_gregorian dmy2 in
+        let sdn2 = Date.to_sdn ~from:Dgregorian dmy2 in
         if dmy2.prec = Before then sdn2 - 1 else sdn2
     in
     (sdn, sdn2)

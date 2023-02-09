@@ -86,3 +86,25 @@ val cdate_of_od : date option -> cdate
 (** Optional date to [cdate] *)
 
 (* TODO date_to_dmy? *)
+
+(* TODO this is buggy,
+   because geneweb uses month|day = 0 for incomplete dates *)
+(* we use Def.calendar for now instead of 'a Calendars.kind *)
+
+val to_sdn : from:Def.calendar -> Def.dmy -> int
+(** Convert a [Def.dmy] in calendar [from] to SDN *)
+
+val convert : from:Def.calendar -> to_:Def.calendar -> Def.dmy -> Def.dmy
+(** [convert ~from ~to_ dmy] Converts a [dmy] from calendar [from] to calendar [to_]; Correctly convert [dmy.prec] *)
+
+val gregorian_of_sdn : prec:Def.precision -> int -> Def.dmy
+(** Convert SDN to [Def.dmy] in gregorian calendar *)
+
+val julian_of_sdn : prec:Def.precision -> int -> Def.dmy
+(** Convert SDN to [Def.dmy] in julian calendar *)
+
+val french_of_sdn : prec:Def.precision -> int -> Def.dmy
+(** Convert SDN to [Def.dmy] in french calendar *)
+
+val hebrew_of_sdn : prec:Def.precision -> int -> Def.dmy
+(** Convert SDN to [Def.dmy] in hebrew calendar *)
