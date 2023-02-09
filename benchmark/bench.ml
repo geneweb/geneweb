@@ -92,10 +92,12 @@ let bench () =
                 in
                 for day = 1 to len do
                   let d =
-                    { Def.day; month; year; delta = 0; prec = Def.Sure }
+                    Calendars.make Gregorian ~day ~month ~year ~delta:0
+                    |> Result.get_ok
                   in
-                  (Sys.opaque_identity ignore)
-                    (Calendar.julian_of_sdn Def.Sure @@ Calendar.sdn_of_julian d)
+                  ignore
+                    (Sys.opaque_identity
+                       (Calendars.julian_of_sdn @@ Calendars.to_sdn d))
                 done
               done
           done)

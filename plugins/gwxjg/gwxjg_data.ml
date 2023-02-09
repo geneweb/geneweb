@@ -262,9 +262,9 @@ and to_gregorian_aux calendar d =
   let d = to_dmy d in
   match calendar with
   | "Dgregorian" -> d
-  | "Djulian" -> Calendar.gregorian_of_julian d
-  | "Dfrench" -> Calendar.gregorian_of_french d
-  | "Dhebrew" -> Calendar.gregorian_of_hebrew d
+  | "Djulian" -> Date.convert ~from:Djulian ~to_:Dgregorian d
+  | "Dfrench" -> Date.convert ~from:Dfrench ~to_:Dgregorian d
+  | "Dhebrew" -> Date.convert ~from:Dhebrew ~to_:Dgregorian d
   | _ -> assert false
 
 and of_calendar d =
@@ -319,10 +319,10 @@ and module_DATE conf =
     func_arg2_no_kw (fun dst d ->
         let convert fn = mk_dmy @@ fn @@ to_dmy d in
         match unbox_string @@ dst with
-        | "Dgregorian" -> convert (fun x -> x)
-        | "Djulian" -> convert Calendar.julian_of_gregorian
-        | "Dfrench" -> convert Calendar.french_of_gregorian
-        | "Dhebrew" -> convert Calendar.hebrew_of_gregorian
+        | "Dgregorian" -> convert Fun.id
+        | "Djulian" -> convert (Date.convert ~from:Dgregorian ~to_:Djulian)
+        | "Dfrench" -> convert (Date.convert ~from:Dgregorian ~to_:Dfrench)
+        | "Dhebrew" -> convert (Date.convert ~from:Dgregorian ~to_:Dhebrew)
         | s -> failwith @@ "Unknown calendar: " ^ s)
   in
   Tpat

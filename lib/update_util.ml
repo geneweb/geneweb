@@ -88,10 +88,8 @@ let eval_date_field = function
   | None -> None
   | Some d -> (
       match d with
-      | Dgreg (d, Dgregorian) -> Some d
-      | Dgreg (d, Djulian) -> Some (Calendar.julian_of_gregorian d)
-      | Dgreg (d, Dfrench) -> Some (Calendar.french_of_gregorian d)
-      | Dgreg (d, Dhebrew) -> Some (Calendar.hebrew_of_gregorian d)
+      | Dgreg (d, calendar) ->
+          Some (Date.convert ~from:Dgregorian ~to_:calendar d)
       | Dtext _ -> None)
 
 let eval_is_cal cal = function

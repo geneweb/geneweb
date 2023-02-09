@@ -184,13 +184,13 @@ let correct_string_no_colon base is =
 let gen_print_date opts no_colon = function
   | Dgreg (d, Dgregorian) -> print_date_dmy opts d
   | Dgreg (d, Djulian) ->
-      print_date_dmy opts (Calendar.julian_of_gregorian d);
+      print_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Djulian d);
       Printf.ksprintf (oc opts) "J"
   | Dgreg (d, Dfrench) ->
-      print_date_dmy opts (Calendar.french_of_gregorian d);
+      print_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Dfrench d);
       Printf.ksprintf (oc opts) "F"
   | Dgreg (d, Dhebrew) ->
-      print_date_dmy opts (Calendar.hebrew_of_gregorian d);
+      print_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Dhebrew d);
       Printf.ksprintf (oc opts) "H"
   | Dtext t ->
       (* Dans le cas d'une date texte pour un titre, on échappe les ':' *)
