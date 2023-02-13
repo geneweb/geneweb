@@ -30,12 +30,12 @@
   %if;(is_dead and computable_death_age
                and birth_date.day != "" and birth_date.prec = ""
                and death_date.day != "" and death_date.prec = "")
-    %if;(death_date.gregorian_day > birth_date.gregorian_day)
-      %expr(death_date.gregorian_day - birth_date.gregorian_day)
+    %if;(death_date.julian_day > birth_date.julian_day)
+      %expr(death_date.julian_day - birth_date.julian_day)
     %else;0%end;
   %elseif;(computable_age and has_birth_date and birth_date.day != "" and birth_date.prec = "")
-    %if;(today.gregorian_day > birth_date.gregorian_day)
-      %expr(today.gregorian_day - birth_date.gregorian_day)
+    %if;(today.julian_day > birth_date.julian_day)
+      %expr(today.julian_day - birth_date.julian_day)
     %else;0%end;
   %end;
 %in;
