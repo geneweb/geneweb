@@ -51,6 +51,69 @@ let gregorian_round_trip label to_g of_g =
     (label ^ " <-> gregorian round trip ")
     to_g of_g (data_sure @ data_oryear)
 
+let data_incomplete =
+  [
+    ( Def.{ day = 0; month = 1; year = 1900; delta = 0; prec = Sure },
+      Def.{ day = 1; month = 2; year = 1900; delta = 0; prec = Before } );
+    ( Def.{ day = 0; month = 12; year = 1900; delta = 0; prec = Sure },
+      Def.{ day = 1; month = 1; year = 1901; delta = 0; prec = Before } );
+    ( Def.{ day = 0; month = 0; year = 1900; delta = 0; prec = Sure },
+      Def.{ day = 1; month = 1; year = 1901; delta = 0; prec = Before } );
+    ( Def.{ day = 3; month = 0; year = 1900; delta = 0; prec = Sure },
+      Def.{ day = 1; month = 1; year = 1901; delta = 0; prec = Before } );
+    ( Def.
+        {
+          day = 1;
+          month = 2;
+          year = 1900;
+          delta = 0;
+          prec = OrYear Def.{ day2 = 0; month2 = 1; year2 = 1900; delta2 = 0 };
+        },
+      Def.
+        {
+          day = 1;
+          month = 2;
+          year = 1900;
+          delta = 0;
+          prec = OrYear Def.{ day2 = 1; month2 = 2; year2 = 1900; delta2 = 0 };
+        } );
+    ( Def.
+        {
+          day = 1;
+          month = 2;
+          year = 1900;
+          delta = 0;
+          prec = OrYear Def.{ day2 = 3; month2 = 0; year2 = 1900; delta2 = 0 };
+        },
+      Def.
+        {
+          day = 1;
+          month = 2;
+          year = 1900;
+          delta = 0;
+          prec = OrYear Def.{ day2 = 1; month2 = 1; year2 = 1901; delta2 = 0 };
+        } );
+    ( Def.
+        {
+          day = 0;
+          month = 2;
+          year = 1900;
+          delta = 0;
+          prec = OrYear Def.{ day2 = 3; month2 = 4; year2 = 1900; delta2 = 0 };
+        },
+      Def.{ day = 1; month = 3; year = 1900; delta = 0; prec = Before } );
+  ]
+
+(* test incomplete date *)
+let incomplete_date label to_t of_t =
+  let printer = Def_show.show_dmy in
+  let label = "incomplete_date - " ^ label in
+  List.mapi
+    (fun i (d1, d2) ->
+      label ^ string_of_int i >:: fun _ ->
+      assert_equal ~printer d2 (of_t (to_t d1)))
+    data_incomplete
+
 let suite =
   [
     "Calendar"
@@ -75,5 +138,8 @@ let suite =
              (Date.convert ~from:Dgregorian ~to_:Dfrench)
          @ gregorian_round_trip "hebrew"
              (Date.convert ~from:Dhebrew ~to_:Dgregorian)
-             (Date.convert ~from:Dgregorian ~to_:Dhebrew);
+             (Date.convert ~from:Dgregorian ~to_:Dhebrew)
+         @ incomplete_date "julian"
+             (Date.convert ~from:Djulian ~to_:Dgregorian)
+             (Date.convert ~from:Dgregorian ~to_:Djulian);
   ]
