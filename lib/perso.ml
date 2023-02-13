@@ -2443,13 +2443,9 @@ and eval_date_field_var conf d = function
       | _ -> null_val)
   | [ "julian_day" ] -> (
       match d with
-      | Dgreg (dmy, _) -> VVstring (string_of_int (Calendar.sdn_of_julian dmy))
-      | _ -> null_val)
-  | [ "gregorian_day" ] -> (
-      match d with
       | Dgreg (dmy, _) ->
           VVstring (string_of_int (Calendar.sdn_of_gregorian dmy))
-      | _ -> VVstring "")
+      | _ -> null_val)
   | [ "month" ] -> (
       match d with
       | Dgreg (dmy, _) -> VVstring (DateDisplay.month_text dmy)
