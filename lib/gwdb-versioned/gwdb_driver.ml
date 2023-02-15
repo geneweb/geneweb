@@ -134,10 +134,10 @@ end = struct
 
   let load_data build_from_scratch base : D.t array =
     if not (data_file_exists base) then (
-      log "no data file";
+      (*      log "no data file";*)
       build_from_scratch base)
     else (
-      log "some data file found";
+      (*      log "some data file found";*)
       let ic = open_data_file base in
       let len = input_binary_int ic in
       seek_in ic (4 + (4 * len));
@@ -153,15 +153,15 @@ end = struct
       data)
 
   let sync build_from_scratch base =
-    log "SYNC";
+    (*    log "SYNC";*)
     if not (directory_exists base) then create_files base;
     let tbl = patch base in
 
-    log "LOAD";
+    (*    log "LOAD";*)
 
     let data = load_data build_from_scratch base in
 
-    log "POST LOAD";
+    (*    log "POST LOAD";*)
 
     let dfile = D.data_file base in
     let dfile_tmp = dfile ^ "~" in
@@ -191,8 +191,8 @@ end = struct
     close_out oc;
     Files.mv dfile_tmp dfile;
     Files.rm dfile_tmp;
-    Files.rm (D.patch_file base);
-    log "END SYNC"
+    Files.rm (D.patch_file base)
+    (*    log "END SYNC"*)
 end
 
 module Legacy_driver = struct
@@ -277,7 +277,7 @@ module Legacy_driver = struct
     let nop = no_person iper in
     Translate.legacy_to_def_person empty_string nop
 
-  let test_on_person base genpers =
+  let _test_on_person base genpers =
     let pers_events = genpers.Def.pevents in
     List.iter
       (fun pers_event ->
@@ -303,29 +303,29 @@ module Legacy_driver = struct
          fevents
 
   let patch_person base iper genpers =
-    log @@ "PATCH PERSON" ^ string_of_int iper;
+(*    log @@ "PATCH PERSON" ^ string_of_int iper;
     test_on_person base genpers;
-    log "LETS PATCH";
-    let pevents = genpers.pevents in
+      log "LETS PATCH"; *)
+    let pevents = genpers.Def.pevents in
     let genpers = Translate.as_legacy_person genpers in
     patch_person base iper genpers;
     let witnotes = witness_notes_of_events pevents in
     PatchPer.set base iper witnotes
 
   let insert_person base iper genpers =
-    log "INSERT PERSON";
+(*    log "INSERT PERSON";
     test_on_person base genpers;
-    log "LETS INSERT";
-    let pevents = genpers.pevents in
+      log "LETS INSERT";*)
+    let pevents = genpers.Def.pevents in
     let genpers = Translate.as_legacy_person genpers in
     insert_person base iper genpers;
     let witnotes = witness_notes_of_events pevents in
     PatchPer.set base iper witnotes
 
   let commit_patches base =
-    log "COMMIT LEGACY PATCHES";
+    (*    log "COMMIT LEGACY PATCHES";*)
     commit_patches base;
-    log "COMMIT NOTES PATCHES";
+    (*    log "COMMIT NOTES PATCHES";*)
     PatchPer.write base;
     PatchFam.write base
 
@@ -387,14 +387,14 @@ module Legacy_driver = struct
     Array.of_list notes
 
   let build_from_scratch_fevents base =
-    log "BUILD FEVENTS";
+    (*    log "BUILD FEVENTS";*)
     let families = Gwdb_legacy.Gwdb_driver.families base in
-    log "BUILD FEVENTS2";
+    (* log "BUILD FEVENTS2"; *)
     let notes : istr array array list =
       List.rev
       @@ Gwdb_legacy.Gwdb_driver.Collection.fold
            (fun l f ->
-             log "SOME FEVENT";
+            (*log "SOME FEVENT";*)
              let fevents = Gwdb_legacy.Gwdb_driver.get_fevents f in
              let witness_array_list =
                List.map (fun fe -> fe.Gwdb_legacy.Dbdisk.efam_witnesses) fevents
@@ -408,7 +408,7 @@ module Legacy_driver = struct
              notes :: l)
            [] families
     in
-    log "FEVENTS BUILT";
+    (*    log "FEVENTS BUILT";*)
     Array.of_list notes
 
   (* TODO : properly sync *)
@@ -416,9 +416,9 @@ module Legacy_driver = struct
     sync ~scratch ~save_mem base;
     (*PatchPer.write base;
       PatchFam.write base*)
-    log "PERS SYNC";
+    (*    log "PERS SYNC"; *)
     PatchPer.sync build_from_scratch_pevents base;
-    log "FAM SYNC";
+    (*    log "FAM SYNC";*)
     PatchFam.sync build_from_scratch_fevents base
 
   let make bname particles
@@ -458,20 +458,20 @@ module Legacy_driver = struct
 
     (*PatchPer.write base;
       PatchFam.write base;*)
-    log "PERS SYNC";
+    (*    log "PERS SYNC";*)
     PatchPer.sync build_from_scratch_pevents base;
-    log "FAM SYNC";
+    (*    log "FAM SYNC";*)
     PatchFam.sync build_from_scratch_fevents base;
     base
 
   let open_base bname =
-    log @@ "BNAME:" ^ bname;
+    (*    log @@ "BNAME:" ^ bname;*)
     let base = open_base bname in
-    log @@ "Bdir:" ^ bdir base;
+    (*    log @@ "Bdir:" ^ bdir base;*)
     base
 
   let close_base base =
-    log "CLOSING THE BASE";
+    (*    log "CLOSING THE BASE";*)
     close_base base;
     PatchPer.close_data_file ();
     PatchFam.close_data_file ()
@@ -618,9 +618,9 @@ module Legacy_driver = struct
     Translate.legacy_to_def_family empty_string nof
 
   let patch_family base ifam genfam =
-    log @@ "PATCH FAMILY" ^ string_of_int ifam;
+    (*    log @@ "PATCH FAMILY" ^ string_of_int ifam;*)
     (* TODO HANDLE WNOTES *)
-    log "LETS PATCH";
+    (*    log "LETS PATCH";*)
     let fevents = genfam.Def.fevents in
     let genfam = Translate.as_legacy_family genfam in
     patch_family base ifam genfam;
@@ -628,8 +628,8 @@ module Legacy_driver = struct
     PatchFam.set base ifam witnotes
 
   let insert_family base ifam genfam =
-    log "INSERT FAMILY";
-    log "LETS INSERT";
+(*    log "INSERT FAMILY";
+      log "LETS INSERT";*)
     let fevents = genfam.Def.fevents in
     let genfam = Translate.as_legacy_family genfam in
     insert_family base ifam genfam;
