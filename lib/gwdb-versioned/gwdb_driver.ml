@@ -238,8 +238,15 @@ module Legacy_driver = struct
     base : Gwdb_legacy.Gwdb_driver.base;
     mutable witness_notes : istr array array option;
   }
+
+  type family = {
+    family : Gwdb_legacy.Gwdb_driver.family;
+    base : Gwdb_legacy.Gwdb_driver.base;
+    mutable witness_notes : istr array array option;
+  }
+
   
-  let get_pers_wit_notes p ie iw = match p.witness_notes with
+  let get_pers_wit_notes (p : person) ie iw = match p.witness_notes with
     | Some a when Array.length a > 0 -> a.(ie).(iw)
     | Some a -> empty_string
     | None ->
@@ -258,10 +265,26 @@ module Legacy_driver = struct
           p.witness_notes <- Some [||];
           empty_string
 
-  type family = {
-    family : Gwdb_legacy.Gwdb_driver.family;
-    witness_notes : istr array array;
-  }
+  let get_fam_wit_notes (f : family) ie iw = match f.witness_notes with
+    | Some a when Array.length a > 0 -> a.(ie).(iw)
+    | Some a -> empty_string
+    | None ->
+      let ifam = Gwdb_legacy.Gwdb_driver.get_ifam f.family in
+      if ifam = dummy_ifam then begin
+        f.witness_notes <- Some [||];
+        empty_string
+      end
+      else
+        let notes = PatchFam.get f.base (Gwdb_legacy.Gwdb_driver.get_ifam f.family) in
+        match notes with
+        | Some wnotes ->
+          f.witness_notes <- notes;
+          wnotes.(ie).(iw)
+        | None ->
+          f.witness_notes <- Some [||];
+          empty_string
+  
+
 
   let gen_person_of_person p =
     let gen_pers = gen_person_of_person p.person in
@@ -372,10 +395,10 @@ module Legacy_driver = struct
       List.mapi
         (fun i fe ->
           let fe = Translate.legacy_to_def_fevent empty_string fe in
-          let wnotes = f.witness_notes.(i) in
+          let wnotes_f = get_fam_wit_notes f i in
           let witnesses =
             Array.mapi
-              (fun i (ip, wk, _) -> (ip, wk, wnotes.(i)))
+              (fun i (ip, wk, _) -> (ip, wk, wnotes_f i))
               fe.efam_witnesses
           in
           { fe with efam_witnesses = witnesses })
@@ -559,7 +582,7 @@ module Legacy_driver = struct
         in
         witnesses_notes
 *)
-  let fwitness_notes base ifam =
+(*  let fwitness_notes base ifam =
     if ifam = dummy_ifam then [||]
     else
     match PatchFam.get base ifam with
@@ -577,7 +600,7 @@ module Legacy_driver = struct
           |> Array.of_list
         in
         witnesses_notes
-
+*)
   let poi base iper =
     { person = poi base iper; base; witness_notes = None }
 
@@ -596,7 +619,7 @@ module Legacy_driver = struct
 
   let empty_family base ifam =
     let f = empty_family base ifam in
-    { family = f; witness_notes = [||] }
+    { family = f; base; witness_notes = Some [||] }
 
   let gen_family_of_family f =
     let gen_fam = gen_family_of_family f.family in
@@ -606,7 +629,7 @@ module Legacy_driver = struct
           let fe = Translate.legacy_to_def_fevent empty_string fe in
           let efam_witnesses =
             Array.mapi
-              (fun iw (ip, wk, _) -> (ip, wk, f.witness_notes.(ie).(iw)))
+              (fun iw (ip, wk, _) -> (ip, wk, get_fam_wit_notes f ie iw))
               fe.efam_witnesses
           in
           { fe with efam_witnesses })
@@ -618,14 +641,14 @@ module Legacy_driver = struct
   let family_of_gen_family base (genfam, gen_couple, gen_descend) =
     let fevents = genfam.Def.fevents in
     let witness_notes =
-      List.map
+      Some (List.map
         (fun fe -> Array.map (fun (_, _, wnote) -> wnote) fe.Def.efam_witnesses)
         fevents
-      |> Array.of_list
+      |> Array.of_list)
     in
     let genfam = Translate.as_legacy_family genfam in
     let family = family_of_gen_family base (genfam, gen_couple, gen_descend) in
-    { family; witness_notes }
+    { family; base; witness_notes }
 
   let no_family ifam =
     let nof = no_family ifam in
@@ -669,17 +692,14 @@ module Legacy_driver = struct
   let gen_descend_of_family f = gen_descend_of_family f.family
 
   let foi base ifam =
-    { family = foi base ifam; witness_notes = fwitness_notes base ifam }
+    { family = foi base ifam; base; witness_notes = None }
 
   let families ?(select = fun _ -> true) base =
-    let select f = select { family = f; witness_notes = [||] } in
+    let select f = select { family = f; base; witness_notes = Some [||] } in
     let coll = families ~select base in
     Collection.map
       (fun family ->
-        let witness_notes =
-          fwitness_notes base (Gwdb_legacy.Gwdb_driver.get_ifam family)
-        in
-        { family; witness_notes })
+        { family; base; witness_notes = None })
       coll
 end
 
