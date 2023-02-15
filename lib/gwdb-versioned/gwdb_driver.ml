@@ -235,8 +235,28 @@ module Legacy_driver = struct
 
   type person = {
     person : Gwdb_legacy.Gwdb_driver.person;
-    witness_notes : istr array array;
+    base : Gwdb_legacy.Gwdb_driver.base;
+    mutable witness_notes : istr array array option;
   }
+  
+  let get_pers_wit_notes p ie iw = match p.witness_notes with
+    | Some a when Array.length a > 0 -> a.(ie).(iw)
+    | Some a -> empty_string
+    | None ->
+      let iper = Gwdb_legacy.Gwdb_driver.get_iper p.person in
+      if iper = dummy_iper then begin
+        p.witness_notes <- Some [||];
+        empty_string
+      end
+      else
+        let notes = PatchPer.get p.base (Gwdb_legacy.Gwdb_driver.get_iper p.person) in
+        match notes with
+        | Some wnotes ->
+          p.witness_notes <- notes;
+          wnotes.(ie).(iw)
+        | None ->
+          p.witness_notes <- Some [||];
+          empty_string
 
   type family = {
     family : Gwdb_legacy.Gwdb_driver.family;
@@ -251,7 +271,7 @@ module Legacy_driver = struct
           let pe = Translate.legacy_to_def_pevent empty_string pe in
           let epers_witnesses =
             Array.mapi
-              (fun iw (ip, wk, _) -> (ip, wk, p.witness_notes.(ie).(iw)))
+              (fun iw (ip, wk, _) -> (ip, wk, get_pers_wit_notes p ie iw))
               pe.epers_witnesses
           in
           { pe with epers_witnesses })
@@ -262,16 +282,16 @@ module Legacy_driver = struct
 
   let person_of_gen_person base (genpers, gen_ascend, gen_union) =
     let pevents = genpers.Def.pevents in
-    let witness_notes =
-      List.map
+    let witness_notes = 
+      Some (List.map
         (fun pe ->
           Array.map (fun (_, _, wnote) -> wnote) pe.Def.epers_witnesses)
         pevents
-      |> Array.of_list
+      |> Array.of_list)
     in
     let genpers = Translate.as_legacy_person genpers in
     let person = person_of_gen_person base (genpers, gen_ascend, gen_union) in
-    { person; witness_notes }
+    { person; base; witness_notes }
 
   let no_person iper =
     let nop = no_person iper in
@@ -335,10 +355,10 @@ module Legacy_driver = struct
       List.mapi
         (fun i pe ->
           let pe = Translate.legacy_to_def_pevent empty_string pe in
-          let wnotes = p.witness_notes.(i) in
+          let wnotes_f = get_pers_wit_notes p i in
           let witnesses =
             Array.mapi
-              (fun i (ip, wk, _) -> (ip, wk, wnotes.(i)))
+              (fun i (ip, wk, _) -> (ip, wk, wnotes_f i))
               pe.epers_witnesses
           in
           { pe with epers_witnesses = witnesses })
@@ -478,7 +498,7 @@ module Legacy_driver = struct
 
   let empty_person base iper =
     let p = empty_person base iper in
-    { person = p; witness_notes = [||] }
+    { person = p; base; witness_notes = Some [||] }
 
   let get_access p = get_access p.person
   let get_aliases p = get_aliases p.person
@@ -520,7 +540,7 @@ module Legacy_driver = struct
   let gen_ascend_of_person p = gen_ascend_of_person p.person
   let gen_union_of_person p = gen_union_of_person p.person
 
-  let witness_notes base iper =
+(*  let witness_notes base iper =
     if iper = dummy_iper then [||]
     else
     match PatchPer.get base iper with
@@ -538,7 +558,7 @@ module Legacy_driver = struct
           |> Array.of_list
         in
         witnesses_notes
-
+*)
   let fwitness_notes base ifam =
     if ifam = dummy_ifam then [||]
     else
@@ -559,14 +579,11 @@ module Legacy_driver = struct
         witnesses_notes
 
   let poi base iper =
-    { person = poi base iper; witness_notes = witness_notes base iper }
+    { person = poi base iper; base; witness_notes = None }
 
   let base_visible_get base (f : person -> bool) iper =
     let f person =
-      let witness_notes =
-        witness_notes base (Gwdb_legacy.Gwdb_driver.get_iper person)
-      in
-      f { person; witness_notes }
+      f { person; base; witness_notes = None }
     in
     base_visible_get base f iper
 
@@ -574,10 +591,7 @@ module Legacy_driver = struct
     let coll = persons base in
     Collection.map
       (fun person ->
-        let witness_notes =
-          witness_notes base (Gwdb_legacy.Gwdb_driver.get_iper person)
-        in
-        { person; witness_notes })
+        { person; base; witness_notes = None })
       coll
 
   let empty_family base ifam =
