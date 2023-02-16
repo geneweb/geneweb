@@ -70,7 +70,9 @@ end = struct
       ic
 
   let close_data_file () = match !data_file_in_channel with
-    | Some ic -> close_in ic
+    | Some ic ->
+      close_in ic;
+      data_file_in_channel := None
     | None -> ()
   
   let patch_file_exists base = Sys.file_exists (D.patch_file base)
@@ -189,6 +191,7 @@ end = struct
     seek_out oc 4;
     Array.iter (output_binary_int oc) accesses;
     close_out oc;
+    close_data_file ();
     Files.mv dfile_tmp dfile;
     Files.rm dfile_tmp;
     Files.rm (D.patch_file base)
