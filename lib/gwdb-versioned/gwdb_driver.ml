@@ -198,7 +198,7 @@ end
 module Legacy_driver = struct
   include Gwdb_legacy.Gwdb_driver
 
-  let compatibility_directory = "gnwb25"
+  let compatibility_directory = "gnwb25-2"
   let compatibility_file = "witness_notes"
   let fcompatibility_file = "fwitness_notes"
   let data_file = "witness_notes.dat"
