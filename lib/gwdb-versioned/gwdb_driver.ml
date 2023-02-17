@@ -250,7 +250,7 @@ module Legacy_driver = struct
 
   
   let get_pers_wit_notes (p : person) ie iw = match p.witness_notes with
-    | Some a when Array.length a > 0 -> a.(ie).(iw)
+    | Some a when Array.length a > 0 && Array.length a.(ie) > 0 -> a.(ie).(iw)
     | Some a -> empty_string
     | None ->
       let iper = Gwdb_legacy.Gwdb_driver.get_iper p.person in
@@ -263,13 +263,15 @@ module Legacy_driver = struct
         match notes with
         | Some wnotes ->
           p.witness_notes <- notes;
-          wnotes.(ie).(iw)
+          if Array.length wnotes = 0 then empty_string
+          else if Array.length wnotes.(ie) = 0 then empty_string
+          else wnotes.(ie).(iw)
         | None ->
           p.witness_notes <- Some [||];
           empty_string
 
   let get_fam_wit_notes (f : family) ie iw = match f.witness_notes with
-    | Some a when Array.length a > 0 -> a.(ie).(iw)
+    | Some a when Array.length a > 0 && Array.length a.(ie) > 0 -> a.(ie).(iw)
     | Some a -> empty_string
     | None ->
       let ifam = Gwdb_legacy.Gwdb_driver.get_ifam f.family in
@@ -282,7 +284,9 @@ module Legacy_driver = struct
         match notes with
         | Some wnotes ->
           f.witness_notes <- notes;
-          wnotes.(ie).(iw)
+          if Array.length wnotes = 0 then empty_string
+          else if Array.length wnotes.(ie) = 0 then empty_string
+          else wnotes.(ie).(iw)
         | None ->
           f.witness_notes <- Some [||];
           empty_string
@@ -334,19 +338,32 @@ module Legacy_driver = struct
         Array.iter log wnotes)
       pers_events
 
-  let witness_notes_of_events pevents =
-    Array.of_list
-    @@ List.map
-         (fun pe ->
-           Array.map (fun (_, _, wnote) -> wnote) pe.Def.epers_witnesses)
-         pevents
+  let witness_notes_of_events pevents : istr array array =
+    let l = List.map
+        (fun pe ->
+           let a = Array.map (fun (_, _, wnote) -> wnote) pe.Def.epers_witnesses in
+           if Array.exists (fun wnote -> not (is_empty_string wnote)) a then
+             a
+           else [||]
+        )
+        pevents
+    in
+    let has_data = List.exists (fun a -> Array.length a <> 0) l in
+    if has_data then Array.of_list l else [||]
+    
+  let fwitness_notes_of_events fevents : istr array array =
+    let l = List.map
+        (fun fe ->
+           let a = Array.map (fun (_, _, wnote) -> wnote) fe.Def.efam_witnesses in
+           if Array.exists (fun wnote -> not (is_empty_string wnote)) a then
+             a
+           else [||]
+        )
+        fevents
+    in
+    let has_data = List.exists (fun a -> Array.length a <> 0) l in
+    if has_data then Array.of_list l else [||]
 
-  let fwitness_notes_of_events fevents =
-    Array.of_list
-    @@ List.map
-         (fun fe ->
-           Array.map (fun (_, _, wnote) -> wnote) fe.Def.efam_witnesses)
-         fevents
 
   let patch_person base iper genpers =
 (*    log @@ "PATCH PERSON" ^ string_of_int iper;
@@ -431,7 +448,7 @@ module Legacy_driver = struct
            [] persons
     in
     Array.of_list notes
-
+  
   let build_from_scratch_fevents base =
     (*    log "BUILD FEVENTS";*)
     let families = Gwdb_legacy.Gwdb_driver.families base in
@@ -457,6 +474,14 @@ module Legacy_driver = struct
     (*    log "FEVENTS BUILT";*)
     Array.of_list notes
 
+  let build_from_scratch_pevents base =
+    let persons = Gwdb_legacy.Gwdb_driver.persons base in
+    Gwdb_legacy.Gwdb_driver.Collection.fold (fun l p -> [||] :: l) [] persons |> Array.of_list
+    
+  let build_from_scratch_fevents base =
+    let families = Gwdb_legacy.Gwdb_driver.families base in
+    Gwdb_legacy.Gwdb_driver.Collection.fold (fun l f -> [||] :: l) [] families |> Array.of_list
+  
   (* TODO : properly sync *)
   let sync ?(scratch = false) ~save_mem base =
 
