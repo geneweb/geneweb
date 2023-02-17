@@ -474,8 +474,13 @@ module Legacy_driver = struct
     (*    log "FEVENTS BUILT";*)
     Array.of_list notes
 
-  let build_from_scratch_pevents base = [||]
-  let build_from_scratch_fevents base = [||]
+  let build_from_scratch_pevents base =
+    let persons = Gwdb_legacy.Gwdb_driver.persons base in
+    Gwdb_legacy.Gwdb_driver.Collection.fold (fun l p -> [||] :: l) [] persons |> Array.of_list
+    
+  let build_from_scratch_fevents base =
+    let families = Gwdb_legacy.Gwdb_driver.families base in
+    Gwdb_legacy.Gwdb_driver.Collection.fold (fun l f -> [||] :: l) [] families |> Array.of_list
   
   (* TODO : properly sync *)
   let sync ?(scratch = false) ~save_mem base =
