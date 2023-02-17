@@ -90,6 +90,7 @@ val strictly_after_private_years : config -> Date.dmy -> bool
 val authorized_age : config -> base -> person -> bool
 (** Alias to !GWPARAM.p_auth *)
 
+(* TODO see if it can be removed from mli; it is used in geneanet's geneweb-plugin-api *)
 val is_old_person : config -> (iper, iper, istr) gen_person -> bool
 val start_with_vowel : string -> bool
 

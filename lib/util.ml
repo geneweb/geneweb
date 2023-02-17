@@ -65,6 +65,18 @@ let escape_attribute =
           Bytes.unsafe_set buf ibuf c;
           loop (istr + 1) (ibuf + 1))
 
+(* aswer the question "should we show p's names and other private stuffs?";
+   takes into account if you are a wizard or not *)
+(* TODO ??
+   - change conf.hide_names to not take in account wizard|friend;
+   - take into account wizard|friend in this function
+   - and authorized_age
+   - rename to is_hidden
+   ??
+*)
+(* it is always combined with a p_auth or authorized_age
+   TODO : diff between p_auth and authorized_age *)
+(* TODO why not conf.hide_names && not Util.is_public *)
 let is_hide_names conf p = conf.hide_names || get_access p = Private
 let cnt_dir = ref Filename.current_dir_name
 
@@ -537,8 +549,11 @@ let nobtit conf base p =
 let strictly_after_private_years conf a =
   if a.Date.year > conf.private_years then true
   else if a.year < conf.private_years then false
-  else a.month > 0 || a.day > 0
+  else
+    (* TODO why true if a.year = conf.private_years and unknown day or month? *)
+    a.month > 0 || a.day > 0
 
+(* TODO why do we have both is_old_person and p_auth *)
 let is_old_person conf p =
   match
     ( Date.cdate_to_dmy_opt p.birth,
@@ -557,6 +572,8 @@ let is_old_person conf p =
       let a = Date.time_elapsed d conf.today in
       strictly_after_private_years conf a
   | None, None, DontKnowIfDead, None ->
+      (* TODO is_old_person is supposed to check if p is older than conf.private_years;
+         do not check access here *)
       p.access <> Private && conf.public_if_no_date
   | _ -> false
 
@@ -578,6 +595,9 @@ let string_gen_person base p = Futil.map_person_ps (fun p -> p) (sou base) p
 let string_gen_family base fam =
   Futil.map_family_ps (fun p -> p) (fun f -> f) (sou base) fam
 
+(* TODO
+   should it be is_empty_name instead? (deleted person have surname and first_name = "?")
+   I don't think it is possible to have surname = empty_string *)
 let is_empty_person p = is_empty_string (get_surname p)
 
 let is_empty_name p =
@@ -590,6 +610,7 @@ let is_public conf base p =
      && get_access p = IfTitles
      && nobtit conf base p <> []
   || is_old_person conf (gen_person_of_person p)
+(* || ( is_contemporain p and conf.hide_private_names ) *)
 
 (* ********************************************************************** *)
 (* [Fonc] accessible_by_key :
@@ -610,7 +631,7 @@ let is_public conf base p =
     [Rem] : Exporté en clair hors de ce module.                           *)
 let accessible_by_key conf base p fn sn =
   conf.access_by_key
-  && (not (fn = "?" || sn = "?"))
+  && (not ((* should it be is_empty_person here? *) fn = "?" || sn = "?"))
   && ((not (is_hide_names conf p))
      || is_public conf base p || conf.friend || conf.wizard)
 
@@ -1974,12 +1995,12 @@ let rchild_type_text conf t n =
   | FosterParent ->
       transl_nth conf "foster son/foster daughter/foster child" n |> Adef.safe
 
-exception Ok
-
 let has_nephews_or_nieces conf base p =
+  let exception Ok in
   try
     let a = p in
     match get_parents a with
+    | None -> false
     | Some ifam ->
         let fam = foi base ifam in
         Array.iter
@@ -1993,7 +2014,6 @@ let has_nephews_or_nieces conf base p =
                 (get_family (pget conf base ip)))
           (get_children fam);
         false
-    | _ -> false
   with Ok -> true
 
 let h s = Digest.to_hex (Digest.string s)
