@@ -65,9 +65,7 @@ let escape_attribute =
           Bytes.unsafe_set buf ibuf c;
           loop (istr + 1) (ibuf + 1))
 
-let is_hide_names conf p =
-  if conf.hide_names || get_access p = Private then true else false
-
+let is_hide_names conf p = conf.hide_names || get_access p = Private
 let cnt_dir = ref Filename.current_dir_name
 
 let search_in_path p s =
