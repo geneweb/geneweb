@@ -121,8 +121,8 @@ val is_restricted : config -> base -> iper -> bool
 (** Tells if person is restrited to acccess. If mode `use_restrict` is
     disabled returns always [false]. *)
 
-val is_hidden : person -> bool
-(** Tells if person is hiden (if his surname is empty) *)
+val is_empty_person : person -> bool
+(** Tells if person is an empty person (a placeholder: his surname is empty) *)
 
 val pget : config -> base -> iper -> person
 (** Returns person with giving id from the base.

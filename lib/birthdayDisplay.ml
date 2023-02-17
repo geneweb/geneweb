@@ -309,9 +309,9 @@ let print_marriage conf base month =
           if
             m = month
             && authorized_age conf base father
-            && (not (is_hidden father))
+            && (not (is_empty_person father))
             && authorized_age conf base mother
-            && not (is_hidden mother)
+            && not (is_empty_person mother)
           then tab.(pred d) <- (fam, y) :: tab.(pred d)
       | _ -> ())
     (Gwdb.ifams base);
@@ -560,8 +560,8 @@ let print_menu_marriage conf base =
           if conf.use_restrict then (
             let father = pget conf base (get_father fam) in
             let mother = pget conf base (get_mother fam) in
-            if (not (is_hidden father)) && not (is_hidden mother) then
-              update_list fam)
+            if (not (is_empty_person father)) && not (is_empty_person mother)
+            then update_list fam)
           else update_list fam
       | _ -> ())
     (Gwdb.ifams base);

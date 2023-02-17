@@ -860,11 +860,11 @@ let build_surnames_list conf base v p =
             && not (eq_istr surn (get_surname moth))
           then add_surname sosa p surn dp;
           let sosa = Sosa.twice sosa in
-          (if not (is_hidden fath) then
+          (if not (is_empty_person fath) then
            let dp1 = merge_date_place conf base surn dp fath in
            loop (lev + 1) sosa fath (get_surname fath) dp1);
           let sosa = Sosa.inc sosa 1 in
-          if not (is_hidden moth) then
+          if not (is_empty_person moth) then
             let dp2 = merge_date_place conf base surn dp moth in
             loop (lev + 1) sosa moth (get_surname moth) dp2
       | None -> add_surname sosa p surn dp)
@@ -982,8 +982,10 @@ let build_list_eclair conf base v p =
           let cpl = foi base ifam in
           let fath = pget conf base (get_father cpl) in
           let moth = pget conf base (get_mother cpl) in
-          if not (is_hidden fath) then loop (lev + 1) fath (get_surname fath);
-          if not (is_hidden moth) then loop (lev + 1) moth (get_surname moth)
+          if not (is_empty_person fath) then
+            loop (lev + 1) fath (get_surname fath);
+          if not (is_empty_person moth) then
+            loop (lev + 1) moth (get_surname moth)
       | None -> ())
   in
   (* Construction de la Hashtbl. *)
@@ -1913,7 +1915,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       let v0 = iper_of_string v in
       (* if v0 >= 0 && v0 < nb_of_persons base then *)
       let ep = make_ep conf base v0 in
-      if is_hidden (fst ep) then raise Not_found
+      if is_empty_person (fst ep) then raise Not_found
       else eval_person_field_var conf base env ep loc sl
   (* else raise Not_found *)
   | "svar" :: i :: sl -> (
@@ -2900,7 +2902,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
           List.fold_left
             (fun l ip ->
               let rp = pget conf base ip in
-              if is_hidden rp then l else ip :: l)
+              if is_empty_person rp then l else ip :: l)
             [] (get_related p)
         in
         get_rparents p <> [] || related <> []
@@ -2965,7 +2967,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "is_male" -> get_sex p = Male
   | "is_private" -> get_access p = Private
   | "is_public" -> get_access p = Public
-  | "is_restricted" -> is_hidden p
+  | "is_restricted" -> is_empty_person p
   | _ -> raise Not_found
 
 and eval_str_person_field conf base env ((p, p_auth) as ep) = function
@@ -3736,10 +3738,10 @@ let print_foreach conf base print_ast eval_expr =
                 let env = ("child", Vind p) :: env in
                 let env = ("child_cnt", Vint (i + 1)) :: env in
                 let env =
-                  if i = n - 1 && not (is_hidden p) then
+                  if i = n - 1 && not (is_empty_person p) then
                     ("pos", Vstring "prev") :: env
                   else if i = n then ("pos", Vstring "self") :: env
-                  else if i = n + 1 && not (is_hidden p) then
+                  else if i = n + 1 && not (is_empty_person p) then
                     ("pos", Vstring "next") :: env
                   else env
                 in

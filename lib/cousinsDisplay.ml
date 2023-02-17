@@ -26,7 +26,7 @@ let cnt_sp = ref 0
 
 let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
   let reference _ _ p (s : Adef.safe_string) =
-    if is_hidden p then s
+    if is_empty_person p then s
     else
       let href =
         commd conf ^^^ "m=RL&"
@@ -53,7 +53,7 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
       "<a href=\"" ^<^ (href :> Adef.safe_string) ^^^ "\">" ^<^ s ^>^ "</a>"
   in
   let reference_sp p3 _ _ p s =
-    if is_hidden p then s
+    if is_empty_person p then s
     else
       let href =
         commd conf ^^^ "m=RL&"

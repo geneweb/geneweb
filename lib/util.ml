@@ -578,7 +578,7 @@ let string_gen_person base p = Futil.map_person_ps (fun p -> p) (sou base) p
 let string_gen_family base fam =
   Futil.map_family_ps (fun p -> p) (fun f -> f) (sou base) fam
 
-let is_hidden p = is_empty_string (get_surname p)
+let is_empty_person p = is_empty_string (get_surname p)
 
 let is_empty_name p =
   Gwdb.is_quest_string (Gwdb.get_surname p)
@@ -670,7 +670,7 @@ let x_x_txt = Adef.safe "x x"
 let gen_person_text ?(escape = true) ?(html = true) ?(sn = true) ?(chk = true)
     ?(p_first_name = p_first_name) ?(p_surname = p_surname) conf base p =
   let esc = if escape then esc else Adef.safe in
-  if is_hidden p then restricted_txt
+  if is_empty_person p then restricted_txt
   else if chk && is_hide_names conf p && not (authorized_age conf base p) then
     x_x_txt
   else
@@ -791,7 +791,7 @@ let wprint_geneweb_link conf href s =
 
 let reference_flags with_id conf base p (s : Adef.safe_string) =
   let iper = get_iper p in
-  if is_hidden p then s
+  if is_empty_person p then s
   else
     "<a href=\""
     ^<^ (commd conf ^^^ acces conf base p :> Adef.safe_string)
@@ -821,7 +821,7 @@ let reference_noid = reference_flags false
                  contenant la boucle, soit vers le menu de mise à jour.
     [Rem] : Exporté en clair hors de ce module.                              *)
 let update_family_loop conf base p s =
-  if is_hidden p then s
+  if is_empty_person p then s
   else
     let iper = get_iper p in
     let list = get_family p in
@@ -1766,7 +1766,7 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
       let i = Gwdb.iper_of_string i in
       if Gwdb.iper_exists base i then
         let p = pget conf base i in
-        if is_hidden p then None else Some p
+        if is_empty_person p then None else Some p
       else None
   | _ -> (
       match (p_getenv conf.env env_p, p_getenv conf.env env_n) with
@@ -1775,7 +1775,7 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
           match person_of_key base p n occ with
           | Some ip ->
               let p = pget conf base ip in
-              if is_hidden p then None
+              if is_empty_person p then None
               else if (not (is_hide_names conf p)) || authorized_age conf base p
               then Some p
               else None
@@ -1806,7 +1806,7 @@ let default_sosa_ref conf base =
         match Gutil.person_ht_find_all base n with
         | [ ip ] ->
             let p = pget conf base ip in
-            if is_hidden p then None else Some p
+            if is_empty_person p then None else Some p
         | _ -> None)
   | None -> None
 
