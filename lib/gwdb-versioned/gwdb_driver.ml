@@ -250,7 +250,7 @@ module Legacy_driver = struct
 
   
   let get_pers_wit_notes (p : person) ie iw = match p.witness_notes with
-    | Some a when Array.length a > 0 -> a.(ie).(iw)
+    | Some a when Array.length a > 0 && Array.length a.(ie) > 0 -> a.(ie).(iw)
     | Some a -> empty_string
     | None ->
       let iper = Gwdb_legacy.Gwdb_driver.get_iper p.person in
@@ -271,7 +271,7 @@ module Legacy_driver = struct
           empty_string
 
   let get_fam_wit_notes (f : family) ie iw = match f.witness_notes with
-    | Some a when Array.length a > 0 -> a.(ie).(iw)
+    | Some a when Array.length a > 0 && Array.length a.(ie) > 0 -> a.(ie).(iw)
     | Some a -> empty_string
     | None ->
       let ifam = Gwdb_legacy.Gwdb_driver.get_ifam f.family in
@@ -446,8 +446,6 @@ module Legacy_driver = struct
            [] persons
     in
     Array.of_list notes
-
-  let build_from_scratch_pevents base = [||]
   
   let build_from_scratch_fevents base =
     (*    log "BUILD FEVENTS";*)
@@ -474,7 +472,6 @@ module Legacy_driver = struct
     (*    log "FEVENTS BUILT";*)
     Array.of_list notes
 
-  let build_from_scratch_fevents base = [||]
   
   (* TODO : properly sync *)
   let sync ?(scratch = false) ~save_mem base =
