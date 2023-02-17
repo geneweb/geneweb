@@ -2951,13 +2951,16 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | Vdmark r -> Gwdb.Marker.get !r (get_iper p)
       | _ -> raise Not_found)
   | "is_female" -> get_sex p = Female
+  | "is_male" -> get_sex p = Male
   | "is_invisible" ->
       let conf = { conf with wizard = false; friend = false } in
+      (* TODO use is_hidden (?) *)
       not (authorized_age conf base p)
-  | "is_male" -> get_sex p = Male
   | "is_private" -> get_access p = Private
   | "is_public" -> get_access p = Public
-  | "is_restricted" -> is_empty_person p
+  | "is_restricted" ->
+      (* TODO why is it not Util.is_restricted *)
+      is_empty_person p
   | _ -> raise Not_found
 
 and eval_str_person_field conf base env ((p, p_auth) as ep) = function

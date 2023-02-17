@@ -736,7 +736,6 @@ let error_person conf err =
     Hutil.trailer conf);
   raise @@ Update.ModErr err
 
-(* TODO EVENT put this in Event *)
 let strip_pevents p =
   let strip_array_witness pl =
     let pl =
@@ -860,6 +859,9 @@ let effective_add conf base sp =
   | Some p' -> Update.print_create_conflict conf base (poi base p') ""
   | None -> ());
   let created_p = ref [] in
+  (* TODO this insert an empty person with surname = empty_string ;
+     looks like the only place we insert a person with empty_string *)
+  (* is this just to get a iper? *)
   let pi = insert_person base (no_person dummy_iper) no_ascend no_union in
   let np =
     Futil.map_person_ps
