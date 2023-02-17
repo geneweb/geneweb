@@ -459,13 +459,14 @@ module Legacy_driver = struct
 
   (* TODO : properly sync *)
   let sync ?(scratch = false) ~save_mem base =
-    sync ~scratch ~save_mem base;
+
     (*PatchPer.write base;
       PatchFam.write base*)
     (*    log "PERS SYNC"; *)
     PatchPer.sync build_from_scratch_pevents base;
     (*    log "FAM SYNC";*)
-    PatchFam.sync build_from_scratch_fevents base
+    PatchFam.sync build_from_scratch_fevents base;
+    sync ~scratch ~save_mem base
 
   let make bname particles
       ( (persons, ascends, unions),
