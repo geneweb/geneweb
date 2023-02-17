@@ -531,7 +531,7 @@ let print_one_branch conf base bh psn =
     print_branch conf base psn x p
   else (
     Output.print_sstring conf "<li>";
-    if is_hidden p then Output.print_sstring conf "&lt;&lt;"
+    if is_empty_person p then Output.print_sstring conf "&lt;&lt;"
     else
       wprint_geneweb_link conf (Util.acces conf base p) (Adef.safe "&lt;&lt;");
     Output.print_sstring conf "<ul>";
