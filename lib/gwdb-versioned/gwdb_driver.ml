@@ -348,7 +348,8 @@ module Legacy_driver = struct
         )
         pevents
     in
-    Array.of_list l
+    let has_data = List.exists (fun a -> Array.length a <> 0) l in
+    if has_data then Array.of_list l else [||]
     
   let fwitness_notes_of_events fevents : istr array array =
     let l = List.map
@@ -360,7 +361,8 @@ module Legacy_driver = struct
         )
         fevents
     in
-    Array.of_list l
+    let has_data = List.exists (fun a -> Array.length a <> 0) l in
+    if has_data then Array.of_list l else [||]
 
 
   let patch_person base iper genpers =
@@ -472,6 +474,8 @@ module Legacy_driver = struct
     (*    log "FEVENTS BUILT";*)
     Array.of_list notes
 
+  let build_from_scratch_pevents base = [||]
+  let build_from_scratch_fevents base = [||]
   
   (* TODO : properly sync *)
   let sync ?(scratch = false) ~save_mem base =
