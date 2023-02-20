@@ -100,7 +100,7 @@ end = struct
   let cache () = match !cache_ht with
     | Some ht -> ht
     | None ->
-      let tbl = Hashtbl.create 1 in
+      let tbl = Hashtbl.create 10 in
       cache_ht := Some tbl;
       tbl
   
@@ -367,7 +367,13 @@ module Legacy_driver = struct
         pevents
     in
     let has_data = List.exists (fun a -> Array.length a <> 0) l in
-    if has_data then Array.of_list l else [||]
+    if has_data then begin
+      (*print_endline "has_data";*)
+      Array.of_list l
+    end else begin
+        (*      print_endline "no data";*)
+      [||]
+    end
     
   let fwitness_notes_of_events fevents : istr array array =
     let l = List.map
@@ -495,7 +501,7 @@ module Legacy_driver = struct
   let build_from_scratch_pevents base =
     let persons = Gwdb_legacy.Gwdb_driver.persons base in
     let max_index, data = Gwdb_legacy.Gwdb_driver.Collection.fold (fun (max_index, l) p ->
-        print_endline @@ string_of_int (get_iper p);
+        (*print_endline @@ string_of_int (get_iper p);*)
         let iper = get_iper p in
         max max_index iper, ((iper, [||]) :: l)) (0, []) persons
     in
@@ -506,7 +512,7 @@ module Legacy_driver = struct
   let build_from_scratch_fevents base =
     let families = Gwdb_legacy.Gwdb_driver.families base in
     let max_index, data = Gwdb_legacy.Gwdb_driver.Collection.fold (fun (max_index, l) f ->
-        print_endline @@ string_of_int (get_ifam f);
+        (*print_endline @@ string_of_int (get_ifam f);*)
         let ifam = get_ifam f in
         max max_index ifam, ((ifam, [||]) :: l)) (0, []) families
     in
