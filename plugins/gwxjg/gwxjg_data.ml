@@ -359,7 +359,11 @@ and ppget conf base p =
   if not (Util.authorized_age conf base p) then
     if conf.use_restrict then
       get_iper p |> Gwdb.empty_person base |> unsafe_mk_person conf base
-    else if conf.hide_names || get_access p = Private then
+    else if
+      (* TODO should be is_hidden (?) *)
+      (conf.hide_private_names && not (conf.wizard || conf.friend))
+      || get_access p = Private
+    then
       let lazy_p =
         lazy (unbox_pat @@ unsafe_mk_semi_public_person conf base p)
       in
