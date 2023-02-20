@@ -137,7 +137,8 @@ end = struct
   let load_data build_from_scratch base : D.t array =
     if not (data_file_exists base) then (
       (*      log "no data file";*)
-      build_from_scratch base)
+      build_from_scratch base
+    )
     else (
       (*      log "some data file found";*)
       let ic = open_data_file base in
@@ -473,25 +474,43 @@ module Legacy_driver = struct
     in
     (*    log "FEVENTS BUILT";*)
     Array.of_list notes
-
+  
   let build_from_scratch_pevents base =
     let persons = Gwdb_legacy.Gwdb_driver.persons base in
-    Gwdb_legacy.Gwdb_driver.Collection.fold (fun l p -> [||] :: l) [] persons |> Array.of_list
+    let max_index, data = Gwdb_legacy.Gwdb_driver.Collection.fold (fun (max_index, l) p ->
+        print_endline @@ string_of_int (get_iper p);
+        let iper = get_iper p in
+        max max_index iper, ((iper, [||]) :: l)) (0, []) persons
+    in
+    let d = Array.make (max_index + 1) ([||]) in
+    List.iter (fun (i, v) -> Array.unsafe_set d i v ) data;
+    d
     
   let build_from_scratch_fevents base =
     let families = Gwdb_legacy.Gwdb_driver.families base in
-    Gwdb_legacy.Gwdb_driver.Collection.fold (fun l f -> [||] :: l) [] families |> Array.of_list
+    let max_index, data = Gwdb_legacy.Gwdb_driver.Collection.fold (fun (max_index, l) f ->
+        print_endline @@ string_of_int (get_ifam f);
+        let ifam = get_ifam f in
+        max max_index ifam, ((ifam, [||]) :: l)) (0, []) families
+    in
+    let d = Array.make (max_index + 1) ([||]) in
+    List.iter (fun (i, v) -> Array.unsafe_set d i v ) data;
+    d
   
   (* TODO : properly sync *)
   let sync ?(scratch = false) ~save_mem base =
 
+    sync ~scratch ~save_mem base;
+    let bname = Gwdb_legacy.Gwdb_driver.bdir base in
+    close_base base;
+    let base = Gwdb_legacy.Gwdb_driver.open_base bname in
     (*PatchPer.write base;
       PatchFam.write base*)
     (*    log "PERS SYNC"; *)
     PatchPer.sync build_from_scratch_pevents base;
     (*    log "FAM SYNC";*)
-    PatchFam.sync build_from_scratch_fevents base;
-    sync ~scratch ~save_mem base
+    PatchFam.sync build_from_scratch_fevents base
+
 
   let make bname particles
       ( (persons, ascends, unions),
