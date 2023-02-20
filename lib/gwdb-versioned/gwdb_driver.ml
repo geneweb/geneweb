@@ -59,6 +59,8 @@ end = struct
 
   let data_file_in_channel : in_channel option ref = ref None
 
+  let cache_ht  : (D.index, D.t) Hashtbl.t option ref = ref None
+  
   let open_data_file base = match !data_file_in_channel with
     | Some ic ->
       seek_in ic 0;
@@ -80,7 +82,7 @@ end = struct
   let directory_exists base = Sys.file_exists (D.directory base)
   let create_files base = Files.mkdir_p (D.directory base)
 
-  let load base =
+  let load_patch base =
     if patch_file_exists base then (
       let file = D.patch_file base in
       let ic = Secure.open_in file in
@@ -93,8 +95,15 @@ end = struct
       patch_ht := Some tbl;
       tbl
 
-  let patch base = match !patch_ht with Some ht -> ht | None -> load base
+  let patch base = match !patch_ht with Some ht -> ht | None -> load_patch base
 
+  let cache () = match !cache_ht with
+    | Some ht -> ht
+    | None ->
+      let tbl = Hashtbl.create 1 in
+      cache_ht := Some tbl;
+      tbl
+  
   let get_from_data_file base index =
     if data_file_exists base then (
       let ic = open_data_file base in
@@ -104,13 +113,21 @@ end = struct
       let pos_data = input_binary_int ic in
       seek_in ic pos_data;
       let data = (Marshal.from_channel ic : D.t) in
+      let c = cache () in
+      Hashtbl.replace c index data;
       Some data)
     else None
 
+  let get_from_cache base index = match !cache_ht with
+    | Some ht -> Hashtbl.find_opt ht index
+    | None -> None
+  
   let get base index =
     match Hashtbl.find_opt (patch base) index with
     | Some _v as value -> value
-    | None -> get_from_data_file base index
+    | None -> match get_from_cache base index with
+      | Some _v as value -> value
+      | None -> get_from_data_file base index
 
   let set base index value =
     let tbl = patch base in
@@ -260,7 +277,7 @@ module Legacy_driver = struct
         empty_string
       end
       else
-        let notes = PatchPer.get p.base (Gwdb_legacy.Gwdb_driver.get_iper p.person) in
+        let notes = PatchPer.get p.base iper in
         match notes with
         | Some wnotes ->
           p.witness_notes <- notes;
@@ -281,7 +298,7 @@ module Legacy_driver = struct
         empty_string
       end
       else
-        let notes = PatchFam.get f.base (Gwdb_legacy.Gwdb_driver.get_ifam f.family) in
+        let notes = PatchFam.get f.base ifam in
         match notes with
         | Some wnotes ->
           f.witness_notes <- notes;
@@ -743,7 +760,7 @@ module Legacy_driver = struct
     { family = foi base ifam; base; witness_notes = None }
 
   let families ?(select = fun _ -> true) base =
-    let select f = select { family = f; base; witness_notes = Some [||] } in
+    let select f = select { family = f; base; witness_notes = None } in
     let coll = families ~select base in
     Collection.map
       (fun family ->
