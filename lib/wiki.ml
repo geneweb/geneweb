@@ -206,7 +206,11 @@ let syntax_links conf wi s =
             else
               Printf.sprintf "<a href=\"%s\" style=\"color:red\">%s</a>"
                 (commd conf :> string)
-                (if conf.hide_names then "x x" else escape name)
+                (* TODO how do we know this person is private here?
+                   TODO should be is_hidden (?) *)
+                (if conf.hide_private_names && not (conf.wizard || conf.friend)
+                then "x x"
+                else escape name)
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLwizard (j, wiz, name) ->

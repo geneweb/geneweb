@@ -77,7 +77,11 @@ let escape_attribute =
 (* it is always combined with a p_auth or authorized_age
    TODO : diff between p_auth and authorized_age *)
 (* TODO why not conf.hide_names && not Util.is_public *)
-let is_hide_names conf p = conf.hide_names || get_access p = Private
+(* bug: is_hide_names if true if person is Private but with age > private_year *)
+let is_hide_names conf p =
+  (conf.hide_private_names && not (conf.wizard || conf.friend))
+  || get_access p = Private
+
 let cnt_dir = ref Filename.current_dir_name
 
 let search_in_path p s =
@@ -610,7 +614,6 @@ let is_public conf base p =
      && get_access p = IfTitles
      && nobtit conf base p <> []
   || is_old_person conf (gen_person_of_person p)
-(* || ( is_contemporain p and conf.hide_private_names ) *)
 
 (* ********************************************************************** *)
 (* [Fonc] accessible_by_key :
