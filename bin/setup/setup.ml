@@ -1058,7 +1058,7 @@ let connex ok_file conf =
     else if uname = "Linux" then
       (* non testé ! *)
       Sys.command ("xterm -e \" " ^ commnd ^ " \" ")
-    else if Sys.win32 then
+    else if not Sys.unix then
       (* à compléter et tester ! *)
       let commnd = (stringify (Filename.concat !bin_dir "connex")) ^ " " ^
                    parameters_1 conf.env in
