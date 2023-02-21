@@ -71,8 +71,6 @@ GENERATED_FILES_DEP = \
 	dune-workspace \
 	hd/etc/version.txt \
 	lib/dune \
-	lib/gwdb/dune \
-	lib/core/dune \
 	lib/gwlib.ml \
 	lib/util/dune \
 	benchmark/dune \
