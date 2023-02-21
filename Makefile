@@ -72,7 +72,6 @@ GENERATED_FILES_DEP = \
 	hd/etc/version.txt \
 	lib/dune \
 	lib/gwlib.ml \
-	lib/util/dune \
 	benchmark/dune \
 	bin/connex/dune \
 	bin/consang/dune \
