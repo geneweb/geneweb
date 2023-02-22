@@ -602,5 +602,9 @@ val designation : base -> person -> Adef.escaped_string
 (** [designation base p] is [Gutil.designation base p |> escape_html] *)
 
 val has_children : base -> person -> bool
+
+val is_fully_visible_to_visitors : config -> base -> Gwdb.person -> bool
+(** [is_fully_visible_to_visitors conf base p] is true iff [p] is fully visible for a visitor *)
+
 val is_public : config -> base -> Gwdb.person -> bool
 val list_cmp : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool

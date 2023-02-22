@@ -2953,9 +2953,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "is_female" -> get_sex p = Female
   | "is_male" -> get_sex p = Male
   | "is_invisible" ->
-      let conf = { conf with wizard = false; friend = false } in
-      (* TODO use is_hidden (?) *)
-      not (authorized_age conf base p)
+      not (is_fully_visible_to_visitors conf base p)
       (* TODO remove is_private/public ? *)
   | "is_private" -> get_access p = Private
   | "is_public" -> get_access p = Public
