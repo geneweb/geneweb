@@ -608,6 +608,11 @@ let is_empty_name p =
   Gwdb.is_quest_string (Gwdb.get_surname p)
   && Gwdb.is_quest_string (Gwdb.get_first_name p)
 
+let is_fully_visible_to_visitors conf base p =
+  let conf = { conf with wizard = false; friend = false } in
+  authorized_age conf base p
+
+(* TODO should probably not exists *)
 let is_public conf base p =
   get_access p = Public
   || conf.public_if_titles
