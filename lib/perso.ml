@@ -2959,7 +2959,6 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       (* TODO remove is_private/public ? *)
   | "is_private" -> get_access p = Private
   | "is_public" -> get_access p = Public
-  | "is_publicly_visible" -> is_public conf base p
   | "hide_private_names" -> conf.hide_private_names
   | "is_restricted" ->
       (* TODO why is it not Util.is_restricted *)
