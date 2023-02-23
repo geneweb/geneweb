@@ -25,10 +25,10 @@ let put_events_in_notes base p =
       match pevents with
       | [] -> false
       | evt :: events -> (
-          match evt.epers_name with
+          match (get_pevent_name evt) with
           | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
           | Epers_Cremation ->
-              if sou base evt.epers_note <> "" || evt.epers_witnesses <> [||]
+              if sou base (get_pevent_note evt) <> "" || (get_pevent_witnesses evt) <> [||]
               then true
               else loop events
           | _ -> true)
@@ -559,7 +559,7 @@ let print_witnesses opts base gen ~use_per_sel witnesses =
     witnesses
 
 let print_pevent opts base gen e =
-  (match e.epers_name with
+  (match get_pevent_name e with
   | Epers_Birth -> Printf.ksprintf (oc opts) "#birt"
   | Epers_Baptism -> Printf.ksprintf (oc opts) "#bapt"
   | Epers_Death -> Printf.ksprintf (oc opts) "#deat"
@@ -612,15 +612,15 @@ let print_pevent opts base gen e =
   | Epers_Will -> Printf.ksprintf (oc opts) "#will"
   | Epers_Name s -> Printf.ksprintf (oc opts) "#%s" (correct_string base s));
   Printf.ksprintf (oc opts) " ";
-  let epers_date = Date.od_of_cdate e.epers_date in
+  let epers_date = Date.od_of_cdate (get_pevent_date e) in
   print_date_option opts epers_date;
-  print_if_no_empty opts base "#p" e.epers_place;
+  print_if_no_empty opts base "#p" (get_pevent_place e);
   (* TODO *)
   (*print_if_no_empty opts base "#c" e.epers_cause;*)
-  if opts.source = None then print_if_no_empty opts base "#s" e.epers_src;
+  if opts.source = None then print_if_no_empty opts base "#s" (get_pevent_src e);
   Printf.ksprintf (oc opts) "\n";
-  print_witnesses opts base gen ~use_per_sel:true e.epers_witnesses;
-  let note = if opts.notes then sou base e.epers_note else "" in
+  print_witnesses opts base gen ~use_per_sel:true (get_pevent_witnesses_and_notes e);
+  let note = if opts.notes then sou base (get_pevent_note e) else "" in
   print_multiline opts "note" note
 
 let get_persons_with_pevents m list =
@@ -675,7 +675,7 @@ let print_fevent opts base gen in_comment e =
     if not in_comment then Printf.ksprintf (oc opts) "\n"
     else Printf.ksprintf (oc opts) " "
   in
-  (match e.efam_name with
+  (match get_fevent_name e with
   | Efam_Marriage -> Printf.ksprintf (oc opts) "#marr"
   | Efam_NoMarriage -> Printf.ksprintf (oc opts) "#nmar"
   | Efam_NoMention -> Printf.ksprintf (oc opts) "#nmen"
@@ -690,14 +690,14 @@ let print_fevent opts base gen in_comment e =
   | Efam_Residence -> Printf.ksprintf (oc opts) "#resi"
   | Efam_Name n -> Printf.ksprintf (oc opts) "#%s" (correct_string base n));
   Printf.ksprintf (oc opts) " ";
-  let efam_date = Date.od_of_cdate e.efam_date in
+  let efam_date = Date.od_of_cdate (get_fevent_date e) in
   print_date_option opts efam_date;
-  print_if_no_empty opts base "#p" e.efam_place;
+  print_if_no_empty opts base "#p" (get_fevent_place e);
   (*print_if_no_empty opts base "#c" e.efam_cause;*)
-  if opts.source = None then print_if_no_empty opts base "#s" e.efam_src;
+  if opts.source = None then print_if_no_empty opts base "#s" (get_fevent_src e);
   print_sep ();
-  print_witnesses opts base gen ~use_per_sel:true e.efam_witnesses;
-  let note = if opts.notes then sou base e.efam_note else "" in
+  print_witnesses opts base gen ~use_per_sel:true (get_fevent_witnesses_and_notes e);
+  let note = if opts.notes then sou base (get_fevent_note e) else "" in
   let note_lines = String.split_on_char '\n' note in
   if note <> "" then
     List.iter
@@ -713,7 +713,7 @@ let print_comment_for_family opts base gen fam =
   let fevents =
     List.filter
       (fun evt ->
-        match evt.efam_name with
+        match get_fevent_name evt with
         | Efam_Divorce | Efam_Engage | Efam_Marriage | Efam_NoMarriage
         | Efam_NoMention | Efam_Separated ->
             false
@@ -842,8 +842,8 @@ let print_family opts base gen m =
           | [] -> accu
           | evt :: l ->
               let acc =
-                evt.efam_note
-                :: (if opts.source = None then evt.efam_src :: accu else accu)
+                get_fevent_note evt
+                :: (if opts.source = None then (get_fevent_src evt) :: accu else accu)
               in
               loop l acc
         in
@@ -905,12 +905,12 @@ let print_notes_for_person opts base gen p =
        match pevents with
        | [] -> ()
        | evt :: events -> (
-           match evt.epers_name with
+           match get_pevent_name evt with
            | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
            | Epers_Cremation ->
                let name =
                  (* TODO use Check.string_of_epers_name instead? *)
-                 match evt.epers_name with
+                 match get_pevent_name evt with
                  | Epers_Birth -> "birth"
                  | Epers_Baptism -> "baptism"
                  | Epers_Death -> "death"
@@ -919,12 +919,12 @@ let print_notes_for_person opts base gen p =
                  | _ -> ""
                in
                let notes =
-                 if opts.Gwexport.notes then sou base evt.epers_note else ""
+                 if opts.Gwexport.notes then sou base (get_pevent_note evt) else ""
                in
                if notes <> "" then
                  Printf.ksprintf (oc opts) "%s: %s\n" name notes;
                print_witnesses opts base gen ~use_per_sel:false
-                 evt.epers_witnesses;
+                 (get_pevent_witnesses_and_notes evt);
                loop events
            | _ ->
                print_pevent opts base gen evt;
@@ -961,10 +961,10 @@ let print_notes_for_person opts base gen p =
       List.fold_left
         (fun acc e ->
           let acc =
-            if opts.Gwexport.notes then sou base e.epers_note :: acc else acc
+            if opts.Gwexport.notes then sou base (get_pevent_note e) :: acc else acc
           in
           let acc =
-            if opts.source = None then sou base e.epers_src :: acc else acc
+            if opts.source = None then sou base (get_pevent_src e) :: acc else acc
           in
           acc)
         sl (get_pevents p)
