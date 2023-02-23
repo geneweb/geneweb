@@ -2533,16 +2533,17 @@ let record_visited conf ip =
 (**/**)
 
 (* TODO OCaml 4.13 : use Array.find_opt *)
-let array_mem_witn conf base x a =
-  let fst (a, _, _) = a in
-  let snd (_, b, _) = b in
-  let thd (_, _, c) = c in
+let array_mem_witn conf base x a na =
+  let get_note i = match na with
+    | Some a when i < Array.length a -> a.(i)
+    | _ -> empty_string
+  in
   let rec loop i =
     if i = Array.length a then (false, Adef.safe "", "")
     else if x = fst a.(i) then
       ( true,
         string_of_witness_kind conf (get_sex @@ poi base x) (snd a.(i)),
-        sou base (thd a.(i)) )
+        sou base (get_note i) )
     else loop (i + 1)
   in
   loop 0

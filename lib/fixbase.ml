@@ -310,8 +310,7 @@ let check_pevents_witnesses ?report progress base =
       let ip = get_iper p in
       List.iter
         (fun evt ->
-          let fst' (x, _, __) = x in
-          let witn = Array.map fst' evt.epers_witnesses in
+          let witn = Array.map fst (get_pevent_witnesses evt) in
           for j = 0 to Array.length witn - 1 do
             let ip2 = witn.(j) in
             let p2 = poi base ip2 in
@@ -336,8 +335,7 @@ let check_fevents_witnesses ?report progress base =
       let ifath = get_father fam in
       List.iter
         (fun evt ->
-          let fst' (x, _, _) = x in
-          let witn = Array.map fst' evt.efam_witnesses in
+          let witn = Array.map fst (get_fevent_witnesses evt) in
           for j = 0 to Array.length witn - 1 do
             let ip = witn.(j) in
             let p = poi base ip in
@@ -359,7 +357,7 @@ let fix_marriage_divorce ?report progress base =
   Gwdb.Collection.iteri
     (fun i fam ->
       progress i nb_fam;
-      let fevents = get_fevents fam in
+      let fevents = List.map gen_fevent_of_fam_event (get_fevents fam) in
       let relation0 = get_relation fam in
       let marriage0 = get_marriage fam in
       let marriage_place0 = get_marriage_place fam in

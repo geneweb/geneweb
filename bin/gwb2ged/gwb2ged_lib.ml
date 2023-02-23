@@ -363,8 +363,8 @@ let ged_ev_detail opts n typ d pl note src =
   if opts.Gwexport.source = None && src <> "" then
     print_sour opts n (encode opts src)
 
-let ged_tag_pevent base evt =
-  match evt.epers_name with
+let ged_tag_pevent base evt_name =
+  match evt_name with
   | Epers_Birth -> "BIRT"
   | Epers_Baptism -> "BAPM"
   | Epers_Death -> "DEAT"
@@ -451,21 +451,23 @@ let witness_format opts base per_sel (ip, wk, wnote) =
   display_note opts 3 (sou base wnote)
 
 let ged_pevent opts base per_sel evt =
+  let name = get_pevent_name evt in
   let typ =
-    if is_primary_pevents evt.epers_name then (
-      let tag = ged_tag_pevent base evt in
+    if is_primary_pevents name then (
+      let tag = ged_tag_pevent base name in
       Printf.ksprintf (oc opts) "1 %s" tag;
       "")
     else (
       Printf.ksprintf (oc opts) "1 EVEN";
-      ged_tag_pevent base evt)
+      ged_tag_pevent base name)
   in
-  let date = Date.od_of_cdate evt.epers_date in
-  let place = sou base evt.epers_place in
-  let note = sou base evt.epers_note in
-  let src = sou base evt.epers_src in
+  let date = Date.od_of_cdate (get_pevent_date evt) in
+  let place = sou base (get_pevent_place evt) in
+  let note = sou base (get_pevent_note evt) in
+  let src = sou base (get_pevent_src evt) in
   ged_ev_detail opts 2 typ date place note src;
-  Array.iter (witness_format opts base per_sel) evt.epers_witnesses
+  let witnesses = get_pevent_witnesses_and_notes evt in
+  Array.iter (witness_format opts base per_sel) witnesses
 
 let adop_fam_list = ref []
 
@@ -598,8 +600,8 @@ let ged_multimedia_link opts base per =
 
 let ged_note opts base per = display_note opts 1 (sou base (get_notes per))
 
-let ged_tag_fevent base evt =
-  match evt.efam_name with
+let ged_tag_fevent base evt_name =
+  match evt_name with
   | Efam_Marriage -> "MARR"
   | Efam_NoMarriage -> "unmarried"
   | Efam_NoMention -> "nomen"
@@ -622,21 +624,23 @@ let is_primary_fevents = function
   | _ -> false
 
 let ged_fevent opts base per_sel evt =
+  let name = get_fevent_name evt in
   let typ =
-    if is_primary_fevents evt.efam_name then (
-      let tag = ged_tag_fevent base evt in
+    if is_primary_fevents name then (
+      let tag = ged_tag_fevent base name in
       Printf.ksprintf (oc opts) "1 %s" tag;
       "")
     else (
       Printf.ksprintf (oc opts) "1 EVEN";
-      ged_tag_fevent base evt)
+      ged_tag_fevent base name)
   in
-  let date = Date.od_of_cdate evt.efam_date in
-  let place = sou base evt.efam_place in
-  let note = sou base evt.efam_note in
-  let src = sou base evt.efam_src in
+  let date = Date.od_of_cdate (get_fevent_date evt) in
+  let place = sou base (get_fevent_place evt) in
+  let note = sou base (get_fevent_note evt) in
+  let src = sou base (get_fevent_src evt) in
   ged_ev_detail opts 2 typ date place note src;
-  Array.iter (witness_format opts base per_sel) evt.efam_witnesses
+  let witnesses = get_fevent_witnesses_and_notes evt in
+  Array.iter (witness_format opts base per_sel) witnesses
 
 let ged_child opts per_sel chil =
   if per_sel chil then
