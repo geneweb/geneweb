@@ -1,10 +1,60 @@
 open Def
 open Gwdb
 
-type 'a event_name =
-  | Pevent of 'a gen_pers_event_name
-  | Fevent of 'a gen_fam_event_name
+type per
+type fam
 
+type 'a event_name =
+  | Pevent of 'a Def.gen_pers_event_name
+  | Fevent of 'a Def.gen_fam_event_name
+
+let pevent_name s = Pevent s
+let fevent_name s = Fevent s
+
+type 'a event_item = {
+  name :'a event_name;
+  date : cdate;
+  place : istr;
+  note : istr;
+  src : istr;
+  witnesses : (iper * witness_kind) array;
+  witness_notes : istr array option;
+  spouse : iper option
+}
+
+let get_name : 'a event_item -> 'a event_name = fun ei -> ei.name
+let get_date : 'a event_item -> Def.cdate = fun ei -> ei.date
+let get_place : 'a event_item -> istr = fun ei -> ei.place
+let get_note : 'a event_item -> istr = fun ei -> ei.note
+let get_src : 'a event_item -> istr = fun ei -> ei.src
+let get_witnesses : 'a event_item -> (iper * Def.witness_kind) array = fun ei -> ei.witnesses
+let get_witness_notes : 'a event_item ->  istr array option = fun ei -> ei.witness_notes
+let get_spouse_iper : 'a event_item -> iper option = fun ei -> ei.spouse
+let get_witnesses_and_notes : 'a event_item -> (iper * Def.witness_kind * istr) array = fun ei ->
+  let get_notes i = match ei.witness_notes with
+    | Some notes when Array.length notes > 0 -> notes.(i)
+    | _ -> empty_string
+  in
+  Array.init (Array.length ei.witnesses) (fun i ->
+      let ip, wk = ei.witnesses.(i) in
+      ip, wk, get_notes i
+    )
+
+let has_witnesses : 'a event_item -> bool = fun ei -> Array.length ei.witnesses > 0
+
+let event_item_of_pevent = assert false
+let event_item_of_fevent = assert false
+  (*           let name = Event.Fevent (get_fevent_name evt) in
+          let date = get_fevent_date evt in
+          let place = get_fevent_place evt in
+          let note = get_fevent_note evt in
+          let src = get_fevent_src evt in
+          let wl = get_fevent_witnesses_and_notes evt in
+          
+          let x = (name, date, place, note, src, wl, Some isp) in
+               x :: fam_fevents*)
+
+let create = assert false
 (*
    On ignore les événements personnalisés.
    Dans l'ordre de priorité :
@@ -47,29 +97,21 @@ let compare get_name get_date e1 e2 =
 let sort_events get_name get_date events =
   List.stable_sort (fun e1 e2 -> compare get_name get_date e1 e2) events
 
-type 'a event_item =
-  'a event_name
-  * cdate
-  * istr
-  * istr
-  * istr
-  * (iper * witness_kind * istr) array
-  * iper option
-
 let events conf base p =
   if not (Util.authorized_age conf base p) then []
   else
     let pevents =
       List.fold_right
         (fun evt events ->
-          let name = Pevent evt.epers_name in
-          let date = evt.epers_date in
-          let place = evt.epers_place in
-          let note = evt.epers_note in
-          let src = evt.epers_src in
-          let wl = evt.epers_witnesses in
-          let x = (name, date, place, note, src, wl, None) in
-          x :: events)
+          let name = Pevent (get_pevent_name evt) in
+          let date = get_pevent_date evt in
+          let place = get_pevent_place evt in
+          let note = get_pevent_note evt in
+          let src = get_pevent_src evt in
+          let witnesses = get_pevent_witnesses evt in
+          let witness_notes = Some (get_pevent_witness_notes evt) in
+          let event_item = {name; date; place; note; src; witnesses; witness_notes; spouse = None} in
+          event_item  :: events)
         (get_pevents p) []
     in
     let fevents =
@@ -84,14 +126,16 @@ let events conf base p =
             if m_auth then
               List.fold_right
                 (fun evt fam_fevents ->
-                  let name = Fevent evt.efam_name in
-                  let date = evt.efam_date in
-                  let place = evt.efam_place in
-                  let note = evt.efam_note in
-                  let src = evt.efam_src in
-                  let wl = evt.efam_witnesses in
-                  let x = (name, date, place, note, src, wl, Some isp) in
-                  x :: fam_fevents)
+                  let name = Fevent (get_fevent_name evt) in
+                  let date = get_fevent_date evt in
+                  let place = get_fevent_place evt in
+                  let note = get_fevent_note evt in
+                  let src = get_fevent_src evt in
+                  let witnesses = get_fevent_witnesses evt in
+                  let witness_notes = Some (get_fevent_witness_notes evt) in
+                  let spouse = Some isp in
+                  let event_item = {name; date; place; note; src; witnesses; witness_notes; spouse} in
+                  event_item :: fam_fevents)
                 (get_fevents fam) []
             else []
           in
@@ -102,6 +146,4 @@ let events conf base p =
 
 let sorted_events conf base p =
   let unsorted_events = events conf base p in
-  let get_name (n, _, _, _, _, _, _) = n in
-  let get_date (_, date, _, _, _, _, _) = date in
   sort_events get_name get_date unsorted_events

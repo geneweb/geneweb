@@ -405,7 +405,7 @@ let print_list_aux conf base title list printer =
     printer conf base list;
     Output.print_sstring conf "</ul>")
 
-let print_order_changed conf print_list before after =
+let print_order_changed conf print_list (before : 'a array) (after : 'a array) =
   let bef_d, aft_d = Difference.f before after in
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf
@@ -419,7 +419,7 @@ let someone_strong_n_short_dates conf base p =
   (someone_strong base p :> Adef.safe_string)
   ^^^ DateDisplay.short_dates_text conf base p
 
-let print_warning conf base = function
+let print_warning conf base (w : CheckItem.base_warning) = match w with
   | BigAgeBetweenSpouses (p1, p2, a) ->
       Output.printf conf
         (fcapitale
@@ -504,7 +504,7 @@ let print_warning conf base = function
       let print_list arr diff_arr =
         Array.iteri
           (fun i evt ->
-            let name = Util.string_of_fevent_name conf base evt.efam_name in
+            let name = Util.string_of_fevent_name conf base (get_fevent_name evt) in
             Output.print_sstring conf "<li";
             if diff_arr.(i) then
               Output.print_sstring conf {| style="background:pink"|};
@@ -522,7 +522,7 @@ let print_warning conf base = function
       let print_list arr diff_arr =
         Array.iteri
           (fun i evt ->
-            let name = Util.string_of_pevent_name conf base evt.epers_name in
+            let name = Util.string_of_pevent_name conf base (get_pevent_name evt) in
             Output.print_sstring conf "<li";
             if diff_arr.(i) then
               Output.print_sstring conf {| style="background:pink"|};
@@ -585,18 +585,18 @@ let print_warning conf base = function
       Output.printf conf
         (fcapitale (ftransl conf "%t's %s before his/her %s"))
         (fun _ -> (someone_strong base p :> string))
-        (Util.string_of_fevent_name conf base e1.efam_name :> string)
-        (Util.string_of_fevent_name conf base e2.efam_name :> string)
+        (Util.string_of_fevent_name conf base (get_fevent_name e1) :> string)
+        (Util.string_of_fevent_name conf base (get_fevent_name e2) :> string)
   | FWitnessEventAfterDeath (p, e, _) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
         (fun _ -> (someone_strong_n_short_dates conf base p :> string))
-        (Util.string_of_fevent_name conf base e.efam_name :> string)
+        (Util.string_of_fevent_name conf base (get_fevent_name e) :> string)
   | FWitnessEventBeforeBirth (p, e, _) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
         (fun _ -> (someone_strong_n_short_dates conf base p :> string))
-        (Util.string_of_fevent_name conf base e.efam_name :> string)
+        (Util.string_of_fevent_name conf base (get_fevent_name e) :> string)
   | IncoherentSex (p, _, _) ->
       Output.printf conf
         (fcapitale
@@ -661,18 +661,18 @@ let print_warning conf base = function
       Output.printf conf
         (fcapitale (ftransl conf "%t's %s before his/her %s"))
         (fun _ -> (someone_strong base p :> string))
-        (Util.string_of_pevent_name conf base e1.epers_name :> string)
-        (Util.string_of_pevent_name conf base e2.epers_name :> string)
+        (Util.string_of_pevent_name conf base (get_pevent_name e1) :> string)
+        (Util.string_of_pevent_name conf base (get_pevent_name e2) :> string)
   | PWitnessEventAfterDeath (p, e, _origin) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
         (fun _ -> (someone_strong_n_short_dates conf base p :> string))
-        (Util.string_of_pevent_name conf base e.epers_name :> string)
+        (Util.string_of_pevent_name conf base (get_pevent_name e) :> string)
   | PWitnessEventBeforeBirth (p, e, _origin) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
         (fun _ -> (someone_strong_n_short_dates conf base p :> string))
-        (Util.string_of_pevent_name conf base e.epers_name :> string)
+        (Util.string_of_pevent_name conf base (get_pevent_name e) :> string)
   | TitleDatesError (p, t) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t has incorrect title dates: %t"))
@@ -702,13 +702,13 @@ let print_warning conf base = function
       Output.printf conf (ftransl conf "married at age %t") (fun _ ->
           (DateDisplay.string_of_age conf a :> string))
 
-let print_warnings conf base wl =
+let print_warnings conf base (wl : CheckItem.base_warning list) =
   print_list_aux conf base "warnings" wl @@ fun conf base wl ->
   (* On rend la liste unique, parce qu'il se peut qu'un warning soit *)
   (* levé par plusieurs fonctions différents selon le context.       *)
   let wl = List.sort_uniq compare wl in
   List.iter
-    (fun w ->
+    (fun (w : CheckItem.base_warning) ->
       Output.print_sstring conf "<li>";
       print_warning conf base w;
       Output.print_sstring conf "</li>")

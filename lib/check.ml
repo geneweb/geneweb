@@ -90,7 +90,7 @@ let print_base_error oc base = function
   | BadSexOfMarriedPerson p ->
       Printf.fprintf oc "%s bad sex for a married person\n" (designation base p)
 
-let print_base_warning oc base = function
+let print_base_warning oc base (w : CheckItem.base_warning) = match w with
   | BigAgeBetweenSpouses (p1, p2, a) ->
       Printf.fprintf oc
         "The difference of age between %s and %s is quite important: %d\n"
@@ -148,16 +148,16 @@ let print_base_warning oc base = function
       Printf.fprintf oc "- %s\n" (designation base p2)
   | FEventOrder (p, e1, e2) ->
       Printf.fprintf oc "%s's %s before his/her %s\n" (designation base p)
-        (string_of_efam_name base e1.efam_name)
-        (string_of_efam_name base e2.efam_name)
+        (string_of_efam_name base (get_fevent_name e1))
+        (string_of_efam_name base (get_fevent_name e2))
   | FWitnessEventAfterDeath (p, e, _fam) ->
       Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "witnessed the %s after his/her death\n"
-        (string_of_efam_name base e.efam_name)
+        (string_of_efam_name base (get_fevent_name e))
   | FWitnessEventBeforeBirth (p, e, _fam) ->
       Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "witnessed the %s before his/her birth\n"
-        (string_of_efam_name base e.efam_name)
+        (string_of_efam_name base (get_fevent_name e))
   | IncoherentSex (p, fixed, not_fixed) ->
       Printf.fprintf oc "%s sex not coherent with relations"
         (designation base p);
@@ -207,16 +207,16 @@ let print_base_warning oc base = function
         (designation base (poi base hom))
   | PEventOrder (p, e1, e2) ->
       Printf.fprintf oc "%s's %s before his/her %s\n" (designation base p)
-        (string_of_epers_name base e1.epers_name)
-        (string_of_epers_name base e2.epers_name)
+        (string_of_epers_name base (get_pevent_name e1))
+        (string_of_epers_name base (get_pevent_name e2))
   | PWitnessEventAfterDeath (p, e, _origin) ->
       Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "witnessed the %s after his/her death\n"
-        (string_of_epers_name base e.epers_name)
+        (string_of_epers_name base (get_pevent_name e))
   | PWitnessEventBeforeBirth (p, e, _origin) ->
       Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "witnessed the %s before his/her birth\n"
-        (string_of_epers_name base e.epers_name)
+        (string_of_epers_name base (get_pevent_name e))
   | TitleDatesError (p, t) ->
       Printf.fprintf oc "%s " (designation base p);
       Printf.fprintf oc "has incorrect title dates as:\n";
