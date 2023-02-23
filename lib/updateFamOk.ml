@@ -686,6 +686,11 @@ let fwitnesses_of fevents =
       Array.fold_left (fun ipl (ip, _, _) -> ip :: ipl) ipl e.efam_witnesses)
     [] fevents
 
+let fwitnesses_of_fam_event fam_events =
+  List.fold_left (fun l fevent ->
+      Array.fold_left (fun l (ip, _) -> ip :: l) l (get_fevent_witnesses fevent)
+    ) [] fam_events
+
 (* Lorsqu'on ajout naissance décès par exemple en créant une personne. *)
 let patch_person_with_pevents base ip =
   let p = poi base ip |> gen_person_of_person in
@@ -933,7 +938,7 @@ let effective_mod conf base nsck sfam scpl sdes =
         patch_ascend base ip (find_asc ip))
     ndes.children;
   let ol =
-    Array.fold_right (fun x acc -> x :: acc) owitnesses (fwitnesses_of ofevents)
+    Array.fold_right (fun x acc -> x :: acc) owitnesses (fwitnesses_of_fam_event ofevents)
   in
   let nl =
     Array.fold_right
@@ -1073,7 +1078,8 @@ let all_checks_family conf base ifam gen_fam cpl des scdo =
       | ChangedOrderOfMarriages (p, _, after) ->
           patch_union base (get_iper p) { family = after }
       | ChangedOrderOfFamilyEvents (ifam, _, after) ->
-          patch_family base ifam { gen_fam with fevents = after }
+        let gen_after = List.map gen_fevent_of_fam_event after in
+          patch_family base ifam { gen_fam with fevents = gen_after }
       | _ -> ())
     wl;
   (wl, ml)
@@ -1483,7 +1489,7 @@ let print_change_event_order conf base =
       let fevents =
         List.fold_right
           (fun (id, _) accu ->
-            try Hashtbl.find ht id :: accu
+            try (Hashtbl.find ht id |> gen_fevent_of_fam_event) :: accu
             with Not_found -> failwith "Sorting event")
           sorted_fevents []
       in
@@ -1502,7 +1508,8 @@ let print_change_event_order conf base =
         List.iter
           (function
             | ChangedOrderOfFamilyEvents (ifam, _, after) ->
-                patch_family base ifam { fam with fevents = after }
+              let gen_after = List.map gen_fevent_of_fam_event after in
+              patch_family base ifam { fam with fevents = gen_after }
             | _ -> ())
           !wl;
         List.rev !wl

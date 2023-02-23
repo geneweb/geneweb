@@ -164,16 +164,9 @@ module Family = struct
 
   let events (_, fam, (_, _, isp), auth) =
     if auth then
-      List.fold_right
-        (fun evt fam_fevents ->
-          let name = Event.Fevent evt.efam_name in
-          let date = evt.efam_date in
-          let place = evt.efam_place in
-          let note = evt.efam_note in
-          let src = evt.efam_src in
-          let wl = evt.efam_witnesses in
-          let x = (name, date, place, note, src, wl, Some isp) in
-          x :: fam_fevents)
+      List.fold_right (fun evt fam_fevents ->
+          let ei = Event.event_item_of_fevent evt in
+          ei :: fam_fevents)
         (get_fevents fam) []
     else []
 
@@ -207,13 +200,13 @@ module Family = struct
 end
 
 module Event = struct
-  let name conf base (n, _, _, _, _, _, _) =
-    match n with
+  let name conf base ei =
+    match Event.get_name ei with
     | Event.Pevent name -> Util.string_of_pevent_name conf base name
     | Event.Fevent name -> Util.string_of_fevent_name conf base name
 
-  let kind (n, _, _, _, _, _, _) =
-    match n with
+  let kind ei =
+    match Event.get_name ei with
     | Event.Pevent Epers_Birth -> "EPERS_BIRTH"
     | Pevent Epers_Baptism -> "EPERS_BAPTISM"
     | Pevent Epers_Death -> "EPERS_DEATH"
@@ -279,17 +272,20 @@ module Event = struct
     | Pevent (Epers_Name _) -> "EPERS"
     | Fevent (Efam_Name _) -> "EFAM"
 
-  let date (_, d, _, _, _, _, _) = Date.od_of_cdate d
-  let place base (_, _, p, _, _, _, _) = sou base p
 
-  let note conf base (_, _, _, n, _, _, _) =
+  let date ei = Date.od_of_cdate (Event.get_date ei)
+
+  let place = Event.get_place
+
+  let note conf base e =
+    let n = Event.get_note e in
     if conf.no_note then "" else sou base n
 
-  let src base (_, _, _, _, s, _, _) = sou base s
-
-  let witnesses (_, _, _, _, _, w, _) :
+  let src base e = sou base (Event.get_src e)
+  
+  let witnesses e :
       (Gwdb.iper * Def.witness_kind * Gwdb.istr) array =
-    w
+    Event.get_witnesses_and_notes e
 
-  let spouse_opt (_, _, _, _, _, _, isp) = isp
+  let spouse_opt = Event.get_spouse_iper
 end
