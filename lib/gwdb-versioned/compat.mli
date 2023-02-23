@@ -23,9 +23,18 @@ module type Driver_S = sig
   type title = istr Def.gen_title
   (** Database implementation for [Def.gen_title] *)
 
-  type pers_event = (iper, istr) Def.gen_pers_event
+  type pers_event (*= (iper, istr) Def.gen_pers_event*)
   (** Database implementation for [Def.pers_event] *)
 
+  val get_pevent_name : pers_event -> istr Def.gen_pers_event_name
+  val get_pevent_date : pers_event ->  Def.cdate
+  val get_pevent_place : pers_event -> istr
+  val get_pevent_reason : pers_event -> istr
+  val get_pevent_note : pers_event -> istr
+  val get_pevent_src : pers_event -> istr
+  val get_pevent_witnesses : pers_event -> (iper * Def.witness_kind) array
+  val get_pevent_witness_notes : pers_event -> istr array
+  
   type fam_event = (iper, istr) Def.gen_fam_event
   (** Database implementation for [Def.fam_event] *)
 

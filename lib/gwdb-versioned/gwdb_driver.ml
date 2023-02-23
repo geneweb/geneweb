@@ -251,7 +251,13 @@ module Legacy_driver = struct
 
   let versions = Version.[ gnwb20; gnwb21; gnwb22; gnwb23; gnwb24 ]
 
-  type pers_event = (iper, istr) Def.gen_pers_event
+  (*type pers_event = (iper, istr) Def.gen_pers_event*)
+
+  type pers_event = {
+    events : Gwdb_legacy.Gwdb_driver.pers_event;
+    witness_notes : istr array
+  }
+
   type fam_event = (iper, istr) Def.gen_fam_event
 
   type person = {
@@ -433,6 +439,18 @@ module Legacy_driver = struct
     in
     pevents
 
+  let get_pevents p = assert false
+  let get_pevent_name pe = assert false
+
+  let get_pevent_date pe = assert false
+
+  let get_pevent_place pe = assert false
+  let get_pevent_reason pe = assert false
+  let get_pevent_note pe = assert false
+  let get_pevent_src pe = assert false
+  let get_pevent_witnesses pe = assert false
+  let get_pevent_witness_notes pe =assert false
+  
   let get_fevents f =
     let fevents = get_fevents f.family in
     let fevents =
@@ -450,6 +468,18 @@ module Legacy_driver = struct
     in
     fevents
 
+  let get_fevents p = assert false
+  let get_fevent_name pe = assert false
+
+  let get_fevent_date pe = assert false
+
+  let get_fevent_place pe = assert false
+  let get_fevent_reason pe = assert false
+  let get_fevent_note pe = assert false
+  let get_fevent_src pe = assert false
+  let get_fevent_witnesses pe = assert false
+  let get_fevent_witness_notes pe =assert false
+  
   let build_from_scratch_pevents base =
     let persons = Gwdb_legacy.Gwdb_driver.persons base in
     let notes : istr array array list =

@@ -185,7 +185,7 @@ let reconstitute conf base ifam1 fam1 fam2 =
       fevents =
         merge_possible_event
           (Futil.map_fam_event (sorp base) (sou base))
-          get_fevents;
+          get_gen_fam_events;
       comment = merge_strings base (get_comment fam1) ", " (get_comment fam2);
       origin_file = sou base (get_origin_file fam1);
       fsources = merge_strings base (get_fsources fam1) ", " (get_fsources fam2);

@@ -23,8 +23,17 @@ module type Driver_S = sig
   type title = istr Def.gen_title
   (** Database implementation for [Def.gen_title] *)
 
-  type pers_event = (iper, istr) Def.gen_pers_event
+  type pers_event (*= (iper, istr) Def.gen_pers_event*)
   (** Database implementation for [Def.pers_event] *)
+
+  val get_pevent_name : pers_event -> istr Def.gen_pers_event_name
+  val get_pevent_date : pers_event ->  Def.cdate
+  val get_pevent_place : pers_event -> istr
+  val get_pevent_reason : pers_event -> istr
+  val get_pevent_note : pers_event -> istr
+  val get_pevent_src : pers_event -> istr
+  val get_pevent_witnesses : pers_event -> (iper * Def.witness_kind) array
+  val get_pevent_witness_notes : pers_event -> istr array
 
   type fam_event = (iper, istr) Def.gen_fam_event
   (** Database implementation for [Def.fam_event] *)
@@ -706,7 +715,11 @@ struct
   type iper = int
   type relation = (iper, istr) Def.gen_relation
   type title = istr Def.gen_title
-  type pers_event = (iper, istr) Def.gen_pers_event
+      
+  type pers_event =
+    | Legacy_pevent of Legacy.pers_event
+    | Current_pevent of Current.pers_event
+                          
   type fam_event = (iper, istr) Def.gen_fam_event
 
   type string_person_index =
@@ -756,6 +769,17 @@ struct
 
   let log _ = ()
 
+  let get_pevent_name pe = assert false
+
+  let get_pevent_date pe = assert false
+
+  let get_pevent_place pe = assert false
+  let get_pevent_reason pe = assert false
+  let get_pevent_note pe = assert false
+  let get_pevent_src pe = assert false
+  let get_pevent_witnesses pe = assert false
+  let get_pevent_witness_notes pe =assert false
+  
   let open_base bname =
     let bname =
       if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
@@ -830,7 +854,15 @@ struct
     Util.wrap_person Legacy.get_occupation Current.get_occupation
 
   let get_parents = Util.wrap_person Legacy.get_parents Current.get_parents
-  let get_pevents = Util.wrap_person Legacy.get_pevents Current.get_pevents
+
+  let get_pevents = Util.wrap_person
+      (fun p ->
+         let l = Legacy.get_pevents p in
+         List.map (fun pe -> Legacy_pevent pe) l)
+      (fun p ->
+         let l = Current.get_pevents p in
+         List.map (fun pe -> Current_pevent pe) l)
+      
   let get_psources = Util.wrap_person Legacy.get_psources Current.get_psources
 
   let get_public_name =
