@@ -39,11 +39,29 @@ type relation = (iper, istr) Def.gen_relation
 type title = istr Def.gen_title
 (** Database implementation for [Def.gen_title] *)
 
-type pers_event = (iper, istr) Def.gen_pers_event
+type pers_event (*= (iper, istr) Def.gen_pers_event*)
 (** Database implementation for [Def.pers_event] *)
 
-type fam_event = (iper, istr) Def.gen_fam_event
+val get_pevent_name : pers_event -> istr Def.gen_pers_event_name
+val get_pevent_date : pers_event ->  Def.cdate
+val get_pevent_place : pers_event -> istr
+val get_pevent_reason : pers_event -> istr
+val get_pevent_note : pers_event -> istr
+val get_pevent_src : pers_event -> istr
+val get_pevent_witnesses : pers_event -> (iper * Def.witness_kind) array
+val get_pevent_witness_notes : pers_event -> istr array
+
+type fam_event (*= (iper, istr) Def.gen_fam_event*)
 (** Database implementation for [Def.fam_event] *)
+
+val get_fevent_name : fam_event -> istr Def.gen_fam_event_name
+val get_fevent_date : fam_event ->  Def.cdate
+val get_fevent_place : fam_event -> istr
+val get_fevent_reason : fam_event -> istr
+val get_fevent_note : fam_event -> istr
+val get_fevent_src : fam_event -> istr
+val get_fevent_witnesses : fam_event -> (iper * Def.witness_kind) array
+val get_fevent_witness_notes : fam_event -> istr array
 
 type string_person_index
 (** Data structure for optimised search throughout index by name
@@ -177,6 +195,8 @@ val get_father : family -> iper
 val get_fevents : family -> fam_event list
 (** Get family's event list *)
 
+val get_gen_fam_events : family -> (iper, istr) Def.gen_fam_event list
+
 val get_first_name : person -> istr
 (** Get person's first name id *)
 
@@ -230,6 +250,8 @@ val get_parents : person -> ifam option
 
 val get_pevents : person -> pers_event list
 (** Get person's event list *)
+
+val get_gen_pers_events : person -> (iper, istr) Def.gen_pers_event list
 
 val get_psources : person -> istr
 (** Get person's sources id *)

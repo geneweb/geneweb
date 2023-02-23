@@ -28,9 +28,9 @@ let get_data conf =
   | Some "occu" -> ([ get_occupation ], [], [], [])
   | Some "place" ->
       ( [ get_birth_place; get_baptism_place; get_death_place; get_burial_place ],
-        [ (fun evt -> evt.epers_place) ],
+        [ (fun evt -> get_pevent_place evt) ],
         [ get_marriage_place ],
-        [ (fun evt -> evt.efam_place) ] )
+        [ (fun evt -> get_fevent_place evt) ] )
   | Some "src" ->
       ( [
           get_birth_src;
@@ -39,9 +39,9 @@ let get_data conf =
           get_burial_src;
           get_psources;
         ],
-        [ (fun evt -> evt.epers_src) ],
+        [ (fun evt -> get_pevent_src evt) ],
         [ get_marriage_src; get_fsources ],
-        [ (fun evt -> evt.efam_src) ] )
+        [ (fun evt -> get_fevent_src evt) ] )
   | Some "fn" -> ([ get_first_name ], [], [], [])
   | Some "sn" -> ([ get_surname ], [], [], [])
   | _ -> ([], [], [], [])
@@ -207,7 +207,7 @@ let update_person conf base old new_input p =
             let s_evt = sou base pl_evt in
             let place = if old = s_evt then new_istr else pl_evt in
             { evt with epers_place = place })
-          (get_pevents p)
+          (get_gen_pers_events p)
       in
       {
         (gen_person_of_person p) with
@@ -241,7 +241,7 @@ let update_person conf base old new_input p =
             let s_evt = sou base src_evt in
             let src = if old = s_evt then new_istr else src_evt in
             { evt with epers_src = src })
-          (get_pevents p)
+          (get_gen_pers_events p)
       in
       {
         (gen_person_of_person p) with
@@ -342,7 +342,7 @@ let update_family conf base old new_istr fam =
             let s_evt = sou base pl_evt in
             let place = if old = s_evt then new_istr else pl_evt in
             { evt with efam_place = place })
-          (get_fevents fam)
+          (get_gen_fam_events fam)
       in
       { (gen_family_of_family fam) with marriage_place; fevents }
   | Some "src" ->
@@ -360,7 +360,7 @@ let update_family conf base old new_istr fam =
             let s_evt = sou base src_evt in
             let src = if old = s_evt then new_istr else src_evt in
             { evt with efam_src = src })
-          (get_fevents fam)
+          (get_gen_fam_events fam)
       in
       { (gen_family_of_family fam) with marriage_src; fsources; fevents }
   | _ -> gen_family_of_family fam
