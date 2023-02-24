@@ -2040,34 +2040,26 @@ and eval_title_field_var conf base env (_p, (cnt, name, title, places, dates))
       | _ -> VVstring "")
   | [ "title" ] -> VVstring (sou base title |> escape_html :> string)
   | [ "places" ] ->
-      VVstring
-        (List.fold_left
-           (fun acc pl ->
-             acc
-             ^ (if acc <> "" then ", " else "")
-             ^ (sou base pl |> escape_html :> string))
-           "" places)
+      let places =
+        List.map (fun pl -> (sou base pl |> escape_html :> string)) places
+      in
+      VVstring (String.concat ", " places)
   | [ "dates" ] ->
       let date_opt_to_string d =
         match d with
         | Some (Dgreg (dmy, _)) ->
             (DateDisplay.string_of_dmy conf dmy :> string)
         | Some (Dtext d) -> (d |> escape_html :> string)
-        | None -> ""
+        | None -> "?"
       in
-      VVstring
-        (List.fold_left
-           (fun acc (d1, d2) ->
-             acc
-             ^ (if acc <> "" then ", " else "")
-             ^
-             let s =
-               Format.sprintf "%s - %s" (date_opt_to_string d1)
-                 (date_opt_to_string d2)
-             in
-             if s = " - " then "? - ?" else s
-             (* FIXME should it return ""  instead of "? - ?" *))
-           "" dates)
+      let dates =
+        List.map
+          (fun (d1, d2) ->
+            Format.sprintf "%s - %s" (date_opt_to_string d1)
+              (date_opt_to_string d2))
+          dates
+      in
+      VVstring (String.concat ", " dates)
   | _ -> raise Not_found
 
 and eval_relation_field_var conf base env (i, rt, ip, is_relation) loc =
