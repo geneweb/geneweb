@@ -217,26 +217,22 @@ let dump = ref false
 let ofile = ref ""
 
 let speclist =
-  [
-    ("-dry-run", Arg.Set dry_run, " do not commit changes (only print)");
-    ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
-    ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
-    ("-fast", Arg.Set fast, " fast mode. Needs more memory.");
-    ("-families-parents", Arg.Set f_parents, " missing doc");
-    ("-families-children", Arg.Set f_children, " missing doc");
-    ("-persons-NBDS", Arg.Set p_parents, " missing doc");
-    ("-persons-parents", Arg.Set p_parents, " missing doc");
-    ("-persons-families", Arg.Set p_families, " missing doc");
-    ("-pevents-witnesses", Arg.Set pevents_witnesses, " missing doc");
-    ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc");
-    ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc");
-    ("-person-key", Arg.Set key, " missing doc");
-    ("-dump", Arg.Set dump, " dump list of persons");
-    ("-o", Arg.String (fun x -> ofile := x), " dump list of persons in ofile");
-    ( "-index",
-      Arg.Set index,
-      " rebuild index. It is automatically enabled by any other option." );
-    ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc");
+  [ ("-dry-run", Arg.Set dry_run, " do not commit changes (only print)")
+  ; ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode")
+  ; ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode")
+  ; ("-fast", Arg.Set fast, " fast mode. Needs more memory.")
+  ; ("-families-parents", Arg.Set f_parents, " missing doc")
+  ; ("-families-children", Arg.Set f_children, " missing doc")
+  ; ("-persons-NBDS", Arg.Set p_parents, " missing doc")
+  ; ("-persons-parents", Arg.Set p_parents, " missing doc")
+  ; ("-persons-families", Arg.Set p_families, " missing doc")
+  ; ("-pevents-witnesses", Arg.Set pevents_witnesses, " missing doc")
+  ; ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc")
+  ; ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc")
+  ; ("-person-key", Arg.Set key, " fix duplicate keys")
+  ; ("-index", Arg.Set index, " rebuild index. It is automatically enable by any other option.")
+  ; ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc")
+  ; ("-utf8_key", Arg.Set utf8_key, " check potential utf8 key conflicts")
   ]
   |> List.sort compare |> Arg.align
 

@@ -494,3 +494,93 @@ let fix_key ?report progress base =
         in
         ignore @@ loop [] rev_list)
     ipers
+
+(* Scan a base to identify potential conflicts arising when:
+   - replacing ’ by ' in the lower function
+   - properly treating supplementary Latin accented characters (for vietnameese)
+   resolution typically consists in changing the occ number (+1)
+*)
+
+let special_utf_8 s =
+  let s =
+    if String.length s = 3 &&
+       Char.code s.[0] = 0xE2 &&
+       Char.code s.[1] = 0x80 &&
+      (Char.code s.[2] = 0x98 || (* ’ apostrophes typo *)
+       Char.code s.[2] = 0x99) then " "
+    else s
+  in
+  if String.length s > 0 &&
+     Char.code s.[0] < 0x80 then match s.[0] with
+      | 'a'..'z' | 'A'..'Z' | '0'..'9' | '.' -> s
+      | _ -> " "
+  else s
+
+let string_unaccent ?(special = false) lower s =
+  let rec copy i len =
+    if i = String.length s then Buff.get len
+    else
+      let t, j = Name.unaccent_utf_8 lower s i in
+      let t = if special then special_utf_8 t else t in
+      copy j (Buff.mstore len t)
+  in
+  copy 0 0
+
+let scan_utf8_conflicts ?report progress base =
+  let rec new_occ fn sn occ htoc =
+    let oc = string_of_int occ in
+    let v1 = string_unaccent ~special:true true (fn ^ "." ^ oc ^ " " ^ sn) in
+    match
+      Gwdb.person_of_key base
+        (string_unaccent ~special:true true fn)
+        (string_unaccent ~special:true true sn)
+        occ
+    with
+    (* Fail : changes have not been commmited yet !! *)
+    (* works only for first conflict *)
+    | Some _ip ->
+        let occ =
+          match Hashtbl.find_opt htoc v1 with
+          | Some occ' -> occ' + 1
+          | None -> occ + 1
+        in
+        new_occ fn sn occ htoc
+    | _ -> occ
+  in
+  let nb_ind = Gwdb.nb_of_persons base in
+  let ht = Hashtbl.create nb_ind in
+  let htoc = Hashtbl.create 100 in
+  (* up to 100 changes! *)
+  let ipers = Gwdb.ipers base in
+  Gwdb.Collection.iteri
+    (fun i ip ->
+      progress i nb_ind;
+      let p = poi base ip in
+      let fn = Gwdb.sou base (Gwdb.get_first_name p) in
+      let sn = Gwdb.sou base (Gwdb.get_surname p) in
+      let occ = string_of_int (Gwdb.get_occ p) in
+      let ip0 =
+        match
+          Gwdb.person_of_key base
+            (string_unaccent ~special:true true fn)
+            (string_unaccent ~special:true true sn)
+            (int_of_string occ)
+        with
+        | Some ip -> ip
+        | _ -> Gwdb.dummy_iper
+      in
+      let v = fn ^ "." ^ occ ^ " " ^ sn in
+      let v1 = string_unaccent ~special:true true (fn ^ "." ^ occ ^ " " ^ sn) in
+      if fn <> "?" && sn <> "?" then
+        if not (Hashtbl.mem ht v1) then Hashtbl.add ht v1 v1
+        else (
+          Printf.printf "conflit %s (index: %d) avec %s (%s)...\n" v i
+            (Hashtbl.find ht v1) (string_of_iper ip0);
+          let occ' = new_occ fn sn (int_of_string occ) htoc in
+          Hashtbl.add htoc v1 occ';
+          Gwdb.patch_person base ip
+            { (Gwdb.gen_person_of_person (poi base ip)) with occ = occ' };
+          match report with
+          | Some fn -> fn (Fix_UpdatedOcc (ip, int_of_string occ, occ'))
+          | None -> ()))
+    ipers
