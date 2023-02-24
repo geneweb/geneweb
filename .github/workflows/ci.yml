@@ -21,7 +21,6 @@ jobs:
           - os: ubuntu-latest
             ocaml-version: 4.08.0
     runs-on: ${{ matrix.os }}
-    runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v2
