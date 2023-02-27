@@ -357,7 +357,7 @@ let fix_marriage_divorce ?report progress base =
   Gwdb.Collection.iteri
     (fun i fam ->
       progress i nb_fam;
-      let fevents = get_gen_fam_events fam in
+      let fevents = List.map gen_fevent_of_fam_event (get_fevents fam) in
       let relation0 = get_relation fam in
       let marriage0 = get_marriage fam in
       let marriage_place0 = get_marriage_place fam in

@@ -819,6 +819,11 @@ let pwitnesses_of pevents =
       Array.fold_left (fun ipl (ip, _, _) -> ip :: ipl) ipl e.epers_witnesses)
     [] pevents
 
+let pwitnesses_of_pers_events pevents =
+  List.fold_left (fun l e ->
+      Array.fold_left (fun l (ip, _) -> ip :: l) l (get_pevent_witnesses e)
+    ) [] pevents
+
 (* sp.death *)
 let effective_mod ?prerr ?skip_conflict conf base sp =
   let pi = sp.key_index in
@@ -842,7 +847,7 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
   let np = { np with related = get_related op } in
   let ol_rparents = rparents_of (get_rparents op) in
   let nl_rparents = rparents_of np.rparents in
-  let ol_pevents = pwitnesses_of (get_pevents op) in
+  let ol_pevents = pwitnesses_of_pers_events (get_pevents op) in
   let nl_pevents = pwitnesses_of np.pevents in
   let ol = List.append ol_rparents ol_pevents in
   let nl = List.append nl_rparents nl_pevents in
@@ -890,6 +895,7 @@ let update_relations_of_related base ip old_related =
           (get_rparents p1) ([], false)
       in
       let pevents, pevents_are_different =
+        let p1_pevents = get_pevents p1 |> List.map gen_pevent_of_pers_event in
         List.fold_right
           (fun e (list, rad) ->
             let witnesses, rad =
@@ -901,7 +907,7 @@ let update_relations_of_related base ip old_related =
             in
             let e = { e with epers_witnesses = Array.of_list witnesses } in
             (e :: list, rad))
-          (get_pevents p1) ([], false)
+          p1_pevents ([], false)
       in
       (if rparents_are_different || pevents_are_different then
        let p = gen_person_of_person p1 in
@@ -915,6 +921,7 @@ let update_relations_of_related base ip old_related =
         let old_witnesses = Array.to_list (get_witnesses fam) in
         let new_witnesses = List.filter (( <> ) ip) old_witnesses in
         let fevents, fevents_are_different =
+          let fam_events = get_fevents fam |> List.map gen_fevent_of_fam_event in
           List.fold_right
             (fun e (list, rad) ->
               let witnesses, rad =
@@ -926,7 +933,7 @@ let update_relations_of_related base ip old_related =
               in
               let e = { e with efam_witnesses = Array.of_list witnesses } in
               (e :: list, rad))
-            (get_fevents fam) ([], false)
+            fam_events ([], false)
         in
         if new_witnesses <> old_witnesses || fevents_are_different then
           let fam = gen_family_of_family fam in
@@ -1059,7 +1066,8 @@ let all_checks_person base p a u =
       | ChangedOrderOfChildren (ifam, _, _, after) ->
           patch_descend base ifam { children = after }
       | ChangedOrderOfPersonEvents (_, _, after) ->
-          patch_person base p.key_index { p with pevents = after }
+        let gen_after = List.map gen_pevent_of_pers_event after in
+        patch_person base p.key_index { p with pevents = gen_after }
       | _ -> ())
     wl;
   wl
@@ -1236,7 +1244,7 @@ let print_change_event_order conf base =
       let pevents =
         List.fold_right
           (fun (id, _) accu ->
-            try Hashtbl.find ht id :: accu
+            try (Hashtbl.find ht id |> gen_pevent_of_pers_event) :: accu
             with Not_found -> failwith "Sorting event")
           sorted_pevents []
       in

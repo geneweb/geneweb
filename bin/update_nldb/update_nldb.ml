@@ -129,9 +129,9 @@ let compute base bdir =
       add_string @@ get_burial_src p;
       add_string @@ get_psources p;
       List.iter
-        (fun { epers_note; epers_src } ->
-          add_string epers_note;
-          add_string epers_src)
+        (fun pe ->
+          add_string (get_pevent_note pe);
+          add_string (get_pevent_src pe))
         (get_pevents p);
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()
@@ -150,9 +150,9 @@ let compute base bdir =
       add_string @@ get_marriage_note fam;
       add_string @@ get_marriage_src fam;
       List.iter
-        (fun { efam_note; efam_src; _ } ->
-          add_string @@ efam_note;
-          add_string @@ efam_src)
+        (fun fe ->
+          add_string @@ get_fevent_note fe;
+          add_string @@ get_fevent_src fe)
         (get_fevents fam);
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()

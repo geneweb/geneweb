@@ -181,25 +181,25 @@ and eval_event_str conf base env fam =
         let fam = foi base fam.fam_index in
         let e = List.nth (get_fevents fam) (i - 1) in
         let name =
-          Util.string_of_fevent_name conf base e.efam_name
+          Util.string_of_fevent_name conf base (get_fevent_name e)
           |> Adef.safe_fn Utf8.capitalize_fst
         in
         let date =
-          match Date.od_of_cdate e.efam_date with
+          match Date.od_of_cdate (get_fevent_date e) with
           | Some d -> DateDisplay.string_of_date conf d
           | None -> Adef.safe ""
         in
-        let place = Util.string_of_place conf (sou base e.efam_place) in
-        let note = Util.safe_html (sou base e.efam_note) in
-        let src = Util.safe_html (sou base e.efam_src) in
+        let place = Util.string_of_place conf (sou base (get_fevent_place e)) in
+        let note = Util.safe_html (sou base (get_fevent_note e)) in
+        let src = Util.safe_html (sou base (get_fevent_src e)) in
         let wit =
           Array.fold_right
-            (fun (w, _, _) accu ->
+            (fun (w, _) accu ->
               (transl_nth conf "witness/witnesses" 0
               ^<^ transl conf ":"
               ^<^ Util.gen_person_text conf base (poi base w))
               :: accu)
-            e.efam_witnesses []
+            (get_fevent_witnesses e) []
         in
         let s =
           String.concat ", "

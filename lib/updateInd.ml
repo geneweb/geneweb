@@ -120,15 +120,15 @@ and eval_simple_var conf base env p = function
             let p = poi base p.key_index in
             let e = List.nth (get_pevents p) (i - 1) in
             let name =
-              Util.string_of_pevent_name conf base e.epers_name
+              Util.string_of_pevent_name conf base (get_pevent_name e)
               |> Adef.safe_fn Utf8.capitalize_fst
             in
             let date =
-              match Date.od_of_cdate e.epers_date with
+              match Date.od_of_cdate (get_pevent_date e) with
               | Some d -> DateDisplay.string_of_date conf d
               | None -> Adef.safe ""
             in
-            let place = Util.string_of_place conf (sou base e.epers_place) in
+            let place = Util.string_of_place conf (sou base (get_pevent_place e)) in
             ([ name; date; (place :> Adef.safe_string) ]
               : Adef.safe_string list
               :> string list)
