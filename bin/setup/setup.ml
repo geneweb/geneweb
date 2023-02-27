@@ -1835,13 +1835,13 @@ let setup (addr, req) comm (env_str : Adef.encoded_string) =
   else setup_comm conf comm
 
 let wrap_setup a b (c : Adef.encoded_string) =
-  ((if not Sys.unix then
+  if not Sys.unix then (
     (* another process have been launched, therefore we lost variables;
        and we cannot parse the arg list again, because of possible spaces
        in arguments which may appear as separators *)
-    try default_lang := Sys.getenv "GWLANG" with Not_found -> ());
-   (try setup_dir := Sys.getenv "GWGD" with Not_found -> ());
-   try bin_dir := Sys.getenv "GWGD" with Not_found -> ());
+    (try default_lang := Sys.getenv "GWLANG" with Not_found -> ());
+    (try setup_dir := Sys.getenv "GWGD" with Not_found -> ());
+    try bin_dir := Sys.getenv "GWGD" with Not_found -> ());
   try setup a b c with Exit -> ()
 
 let copy_text lang fname =
@@ -1854,12 +1854,11 @@ let copy_text lang fname =
       copy_from_stream conf print_string (Stream.of_channel ic);
       flush stdout;
       close_in ic
-  | _ ->
+  | None ->
       Printf.printf "\nCannot access file \"%s\".\n" fname;
       Printf.printf "Type \"Enter\" to exit\n? ";
       flush stdout;
-      let _ = input_line stdin in
-      ();
+      let _s = input_line stdin in
       exit 2
 
 let set_gwd_default_language_if_absent lang =
