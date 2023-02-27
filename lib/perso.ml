@@ -2048,15 +2048,18 @@ and eval_title_field_var conf base env (_p, (cnt, name, title, places, dates))
       let date_opt_to_string d =
         match d with
         | Some (Dgreg (dmy, _)) ->
-            (DateDisplay.string_of_dmy conf dmy :> string)
-        | Some (Dtext d) -> (d |> escape_html :> string)
-        | None -> "?"
+            Some (DateDisplay.string_of_dmy conf dmy :> string)
+        | Some (Dtext d) -> Some (d |> escape_html :> string)
+        | None -> None
       in
       let dates =
         List.map
           (fun (d1, d2) ->
-            Format.sprintf "%s - %s" (date_opt_to_string d1)
-              (date_opt_to_string d2))
+            match (date_opt_to_string d1, date_opt_to_string d2) with
+            | Some s1, Some s2 -> Format.sprintf "%s - %s" s1 s2
+            | Some s1, None -> Format.sprintf "%s -" s1
+            | None, Some s2 -> Format.sprintf "- %s" s2
+            | None, None -> "")
           dates
       in
       VVstring (String.concat ", " dates)
