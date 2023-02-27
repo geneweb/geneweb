@@ -1207,14 +1207,15 @@ let recover conf =
   if init_dir = "" then print_file conf "err_miss.htm"
   else if init_dir = dest_dir then print_file conf "err_smdr.htm"
   else if not (Sys.file_exists init_dir) then print_file conf "err_ndir.htm"
-  else if Sys.unix then
-    if
-      try
-        (Unix.stat (Filename.concat init_dir ".")).Unix.st_ino
-        = (Unix.stat (Filename.concat dest_dir ".")).Unix.st_ino
-      with Unix.Unix_error (_, _, _) -> false
-    then print_file conf "err_smdr.htm";
-  if not dir_has_gwu then print_file conf "err_ngw.htm"
+  else if
+    Sys.unix
+    &&
+    try
+      (Unix.stat (Filename.concat init_dir ".")).Unix.st_ino
+      = (Unix.stat (Filename.concat dest_dir ".")).Unix.st_ino
+    with Unix.Unix_error (_, _, _) -> false
+  then print_file conf "err_smdr.htm"
+  else if not dir_has_gwu then print_file conf "err_ngw.htm"
   else print_file conf "recover1.htm"
 
 let recover_1 conf =
