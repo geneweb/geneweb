@@ -3794,16 +3794,11 @@ let print_foreach conf base print_ast eval_expr =
     if p_auth then
       match get_env "event" env with
       | Vevent (_, event_item) ->
-        let get_wnote i = match Event.get_witness_notes event_item with
-          | Some wn when i < Array.length wn -> wn.(i)
-          | _ -> empty_string
-        in
           Array.iteri
-            (fun i (ip, wk) ->
+            (fun i (ip, wk, wnote) ->
               let p = pget conf base ip in
               let wk = Util.string_of_witness_kind conf (get_sex p) wk in
-              let note = get_wnote i in
-              let wnote = Util.escape_html (sou base note) in
+              let wnote = Util.escape_html (sou base wnote) in
               let env =
                 ("event_witness", Vind p)
                 :: ("event_witness_kind", Vstring (wk :> string))
@@ -3813,7 +3808,7 @@ let print_foreach conf base print_ast eval_expr =
                 :: env
               in
               List.iter (print_ast env ep) al)
-            (Event.get_witnesses event_item)
+            (Event.get_witnesses_and_notes event_item)
       | _ -> ()
   in
   let print_foreach_event_witness_relation env al ((p, p_auth) as ep) =

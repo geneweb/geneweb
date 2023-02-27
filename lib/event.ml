@@ -30,9 +30,31 @@ let get_src : 'a event_item -> istr = fun ei -> ei.src
 let get_witnesses : 'a event_item -> (iper * Def.witness_kind) array = fun ei -> ei.witnesses
 let get_witness_notes : 'a event_item ->  istr array option = fun ei -> ei.witness_notes
 let get_spouse_iper : 'a event_item -> iper option = fun ei -> ei.spouse
+let get_witnesses_and_notes : 'a event_item -> (iper * Def.witness_kind * istr) array = fun ei ->
+  let get_notes i = match ei.witness_notes with
+    | Some notes when Array.length notes > 0 -> notes.(i)
+    | _ -> empty_string
+  in
+  Array.init (Array.length ei.witnesses) (fun i ->
+      let ip, wk = ei.witnesses.(i) in
+      ip, wk, get_notes i
+    )
 
 let has_witnesses : 'a event_item -> bool = fun ei -> Array.length ei.witnesses > 0
 
+let event_item_of_pevent = assert false
+let event_item_of_fevent = assert false
+  (*           let name = Event.Fevent (get_fevent_name evt) in
+          let date = get_fevent_date evt in
+          let place = get_fevent_place evt in
+          let note = get_fevent_note evt in
+          let src = get_fevent_src evt in
+          let wl = get_fevent_witnesses_and_notes evt in
+          
+          let x = (name, date, place, note, src, wl, Some isp) in
+               x :: fam_fevents*)
+
+let create = assert false
 (*
    On ignore les événements personnalisés.
    Dans l'ordre de priorité :

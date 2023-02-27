@@ -34,9 +34,24 @@ module type Driver_S = sig
   val get_pevent_src : pers_event -> istr
   val get_pevent_witnesses : pers_event -> (iper * Def.witness_kind) array
   val get_pevent_witness_notes : pers_event -> istr array
-
-  type fam_event = (iper, istr) Def.gen_fam_event
+  val get_pevent_witnesses_and_notes : pers_event -> (iper * Def.witness_kind * istr) array
+  val gen_pevent_of_pers_event : pers_event -> (iper, istr) Def.gen_pers_event
+  val pers_event_of_gen_pevent : (iper, istr) Def.gen_pers_event -> pers_event
+  
+  type fam_event (*= (iper, istr) Def.gen_fam_event*)
   (** Database implementation for [Def.fam_event] *)
+
+  val get_fevent_name : fam_event -> istr Def.gen_fam_event_name
+  val get_fevent_date : fam_event ->  Def.cdate
+  val get_fevent_place : fam_event -> istr
+  val get_fevent_reason : fam_event -> istr
+  val get_fevent_note : fam_event -> istr
+  val get_fevent_src : fam_event -> istr
+  val get_fevent_witnesses : fam_event -> (iper * Def.witness_kind) array
+  val get_fevent_witness_notes : fam_event -> istr array
+  val get_fevent_witnesses_and_notes : fam_event -> (iper * Def.witness_kind * istr) array
+  val gen_fevent_of_fam_event : fam_event -> (iper, istr) Def.gen_fam_event
+  val fam_event_of_gen_fevent : (iper, istr) Def.gen_fam_event -> fam_event
 
   type string_person_index
   (** Data structure for optimised search throughout index by name
@@ -720,7 +735,9 @@ struct
     | Legacy_pevent of Legacy.pers_event
     | Current_pevent of Current.pers_event
                           
-  type fam_event = (iper, istr) Def.gen_fam_event
+  type fam_event =
+    | Legacy_fevent of Legacy.fam_event
+    | Current_fevent of Current.fam_event
 
   type string_person_index =
     | Legacy_string_person_index of Legacy.string_person_index
@@ -770,15 +787,28 @@ struct
   let log _ = ()
 
   let get_pevent_name pe = assert false
-
   let get_pevent_date pe = assert false
-
   let get_pevent_place pe = assert false
   let get_pevent_reason pe = assert false
   let get_pevent_note pe = assert false
   let get_pevent_src pe = assert false
   let get_pevent_witnesses pe = assert false
-  let get_pevent_witness_notes pe =assert false
+  let get_pevent_witness_notes pe = assert false
+  let get_pevent_witnesses_and_notes pe = assert false
+  let gen_pevent_of_pers_event pe = assert false
+  let pers_event_of_gen_pevent pe = assert false
+    
+  let get_fevent_name fe = assert false
+  let get_fevent_date fe = assert false
+  let get_fevent_place fe = assert false
+  let get_fevent_reason fe = assert false
+  let get_fevent_note fe = assert false
+  let get_fevent_src fe = assert false
+  let get_fevent_witnesses fe = assert false
+  let get_fevent_witness_notes fe = assert false
+  let get_fevent_witnesses_and_notes fe = assert false
+  let gen_fevent_of_fam_event fe = assert false
+  let fam_event_of_gen_fevent fe = assert false
   
   let open_base bname =
     let bname =
@@ -948,7 +978,9 @@ struct
   let get_divorce = Util.wrap_family Legacy.get_divorce Current.get_divorce
   let get_father = Util.wrap_family Legacy.get_father Current.get_father
   let get_mother = Util.wrap_family Legacy.get_mother Current.get_mother
-  let get_fevents = Util.wrap_family Legacy.get_fevents Current.get_fevents
+  let get_fevents = Util.wrap_family
+      (fun f -> List.map (fun f -> Legacy_fevent f) (Legacy.get_fevents f))
+      (fun f -> List.map (fun f -> Current_fevent f) (Current.get_fevents f))
   let get_fsources = Util.wrap_family Legacy.get_fsources Current.get_fsources
   let get_ifam = Util.wrap_family Legacy.get_ifam Current.get_ifam
 

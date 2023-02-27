@@ -16,19 +16,24 @@ val get_note : 'a event_item -> istr
 val get_src : 'a event_item -> istr
 val get_witnesses : 'a event_item -> (iper * Def.witness_kind) array
 val get_witness_notes : 'a event_item ->  istr array option
+val get_witnesses_and_notes : 'a event_item -> (iper * Def.witness_kind * istr) array
 val get_spouse_iper : 'a event_item -> iper option
 
 val has_witnesses : 'a event_item -> bool
 
 val pevent_name : 'a Def.gen_pers_event_name -> 'a event_name
 val fevent_name : 'a Def.gen_fam_event_name -> 'a event_name
+
+val event_item_of_pevent : pers_event -> istr event_item
+val event_item_of_fevent : fam_event -> istr event_item
+
 (*val create :
   name:'a event_name ->
   date:Def.cdate ->
   place:istr ->
   note:istr ->
   src:istr ->
-  witnesses:(iper * Def.witness_kind) array ->
+  witnesses:(iper * Def.witness_kind * istr) array ->
   witness_notes:istr array ->
   sp_iper: iper option ->
   'a event_item

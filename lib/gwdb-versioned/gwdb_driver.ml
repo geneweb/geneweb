@@ -802,6 +802,32 @@ module Legacy_driver = struct
       (fun family ->
         { family; base; witness_notes = None })
       coll
+
+    let get_pevent_name pe = assert false
+
+  let get_pevent_date pe = assert false
+
+  let get_pevent_place pe = assert false
+  let get_pevent_reason pe = assert false
+  let get_pevent_note pe = assert false
+  let get_pevent_src pe = assert false
+  let get_pevent_witnesses pe = assert false
+  let get_pevent_witness_notes pe =assert false
+  let get_pevent_witnesses_and_notes pe = assert false
+  let gen_pevent_of_pers_event pe = assert false
+  let pers_event_of_gen_pevent pe = assert false
+  let get_fevent_name fe = assert false
+  let get_fevent_date fe = assert false
+  let get_fevent_place fe = assert false
+  let get_fevent_reason fe = assert false
+  let get_fevent_note fe = assert false
+  let get_fevent_src fe = assert false
+  let get_fevent_witnesses fe = assert false
+  let get_fevent_witness_notes fe = assert false
+  let get_fevent_witnesses_and_notes fe = assert false
+  let gen_fevent_of_fam_event fe = assert false
+  let fam_event_of_gen_fevent fe = assert false
+
 end
 
 module Driver = Compat.Make (Legacy_driver) (Legacy_driver)

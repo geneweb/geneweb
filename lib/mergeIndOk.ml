@@ -259,7 +259,7 @@ let reconstitute conf base p1 p2 =
         merge_strings base (get_burial_note p1) "<br>\n" (get_burial_note p2);
       burial_src =
         merge_strings base (get_burial_src p1) ", " (get_burial_src p2);
-      pevents = list (Futil.map_pers_event (sorp base) (sou base)) get_gen_pers_events;
+      pevents = list (Futil.map_pers_event (sorp base) (sou base)) (fun p -> List.map gen_pevent_of_pers_event (get_pevents p));
       notes = merge_strings base (get_notes p1) "<br>\n" (get_notes p2);
       psources = merge_strings base (get_psources p1) ", " (get_psources p2);
       key_index = get_iper p1;
@@ -269,8 +269,11 @@ let reconstitute conf base p1 p2 =
   (* de la fusion des évènements principaux.   *)
   let pevents =
     merge_primary_events
-      (Futil.map_pers_event (sorp base) (sou base))
-      get_gen_pers_events p
+      (fun pe ->
+         let pe = gen_pevent_of_pers_event pe in
+         Futil.map_pers_event (sorp base) (sou base) pe
+      )
+      get_pevents p
   in
   { p with pevents }
 
@@ -329,7 +332,7 @@ let redirect_relations_of_added_related base p ip2 rel_chil =
                 (e, true, p_related, mod_p)
               in
               (e :: pc_pevents, mod_pc, p_related, mod_p))
-            (get_gen_pers_events pc)
+            (List.map gen_pevent_of_pers_event (get_pevents pc))
             ([], false, p_related, mod_p)
         in
         (* TODO mod_pc = True tout le temps *)
@@ -431,7 +434,7 @@ let redirect_added_families base p ip2 p2_family =
                   let w = { w with related = p.key_index :: w.related } in
                   patch_person base ip w)
               evt.efam_witnesses)
-          (get_gen_fam_events fam);
+          (List.map gen_fevent_of_fam_event (get_fevents fam));
         Gutil.couple false p.key_index (get_mother fam))
       else if ip2 = get_mother fam then
         Gutil.couple false (get_father fam) p.key_index
