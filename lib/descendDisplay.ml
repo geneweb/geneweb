@@ -1371,7 +1371,7 @@ let get_bd_td_prop conf =
   let td_prop =
     match Util.p_getenv conf.env "td" with
     | Some x -> " " ^ x
-    | _ -> (
+    | None -> (
         match Util.p_getenv conf.env "color" with
         | None | Some "" -> ""
         | Some x -> " class=\"" ^ x ^ "\"")
