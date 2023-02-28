@@ -863,23 +863,26 @@ let get_env v env =
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 
+(* TODO should vl be Vint list and f = max|min, not a string?*)
 let eval_predefined_apply f vl =
   let vl = List.map (function VVstring s -> s | _ -> raise Not_found) vl in
-  let min_max_aux fn s sl =
-    try
-      let m =
-        List.fold_right (fun s -> fn (int_of_string s)) sl (int_of_string s)
-      in
-      string_of_int m
-    with Failure _ ->
-      Printf.sprintf "Incorrect parameter for min/max: %s\n" s
-      |> !GWPARAM.syslog `LOG_WARNING;
-      raise Not_found
+  let f, first_element, l =
+    match (f, vl) with
+    | "min", s :: sl -> (min, s, sl)
+    | "max", s :: sl -> (max, s, sl)
+    | _ -> raise Not_found
   in
-  match (f, vl) with
-  | "min", s :: sl -> min_max_aux min s sl
-  | "max", s :: sl -> min_max_aux max s sl
-  | _ -> raise Not_found
+  try
+    let m =
+      List.fold_left
+        (fun acc s -> f acc (int_of_string s))
+        (int_of_string first_element)
+        l
+    in
+    string_of_int m
+  with Failure _ ->
+    !GWPARAM.syslog `LOG_WARNING "Incorrect parameter for eval_predefined_apply";
+    raise Not_found
 
 let parents_access_aux conf base td get_parent =
   match td with
