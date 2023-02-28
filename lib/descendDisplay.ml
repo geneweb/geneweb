@@ -1336,10 +1336,12 @@ let td_hbar x1 xn =
   match xn - x1 with
   | 0 -> [ (1, CenterA, TDnothing) ]
   | 1 -> [ (1, CenterA, TDhr CenterA) ]
-  | _ ->
-      [ (1, LeftA, TDhr LeftA) ]
-      @ [ (xn - x1 - 1, CenterA, TDhr CenterA) ]
-      @ [ (1, RightA, TDhr RightA) ]
+  | _n ->
+      [
+        (1, LeftA, TDhr LeftA);
+        (xn - x1 - 1, CenterA, TDhr CenterA);
+        (1, RightA, TDhr RightA);
+      ]
 
 (* regular cell, centered, with text as content (may contain |<br>) *)
 let td_cell cols align ip text flags =
