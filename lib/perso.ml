@@ -1003,24 +1003,28 @@ let build_list_eclair conf base v p =
             (Date.od_of_cdate (get_marriage fam)))
         (get_family p))
   in
+
+  (* TODO do we have a get_ascendants function? *)
   (* Parcours les ascendants de p et les ajoute dans la Hashtbl. *)
-  let rec loop lev p surn =
+  let rec loop lev p =
+    let surn = get_surname p in
     if lev > v then
       if is_hide_names conf p && not (authorized_age conf base p) then ()
       else add_person p surn
-    else (
-      add_person p surn;
-      match get_parents p with
-      | Some ifam ->
-          let cpl = foi base ifam in
-          let fath = pget conf base (get_father cpl) in
-          let moth = pget conf base (get_mother cpl) in
-          if not (is_hidden fath) then loop (lev + 1) fath (get_surname fath);
-          if not (is_hidden moth) then loop (lev + 1) moth (get_surname moth)
-      | None -> ())
+    else add_person p surn;
+    match get_parents p with
+    | None -> ()
+    | Some ifam ->
+        let cpl = foi base ifam in
+        let fath = pget conf base (get_father cpl) in
+        let moth = pget conf base (get_mother cpl) in
+        if not (is_hidden fath) then loop (lev + 1) fath;
+        if not (is_hidden moth) then loop (lev + 1) moth
   in
   (* Construction de la Hashtbl. *)
-  loop 1 p (get_surname p);
+  loop 1 p;
+
+  (* TODO do it at insertion time *)
   (* On parcours la Hashtbl, et on élimine les noms vide (=?) *)
   let l = ref [] in
   Hashtbl.iter
@@ -1303,16 +1307,17 @@ let get_min_max_dates conf base l =
 let rec ascendants base acc l i =
   match l with
   | [] -> acc
+  (* TODO type for this tuple?; why list of level? *)
   | (ip, _, _, lev :: _ll) :: l -> (
       match get_parents (poi base ip) with
+      | None -> ascendants base acc l i
       | Some ifam ->
           let cpl = foi base ifam in
           let ifath = get_father cpl in
           let imoth = get_mother cpl in
           let acc = [ (ifath, [], ifath, [ lev + 1 ]) ] @ acc in
           let acc = [ (imoth, [], imoth, [ lev + 1 ]) ] @ acc in
-          ascendants base acc l i
-      | None -> ascendants base acc l i)
+          ascendants base acc l i)
   | _ :: l ->
       !GWPARAM.syslog `LOG_WARNING
         "Unexpected empty level list in ascend computation\n";
