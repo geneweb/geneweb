@@ -33,44 +33,31 @@ let image_normal_txt conf base p fname width height =
       k r)
   |> Adef.safe
 
-let image_url_txt conf url_p url height : Adef.safe_string =
+let image_url_txt conf url_p url ~width ~height =
+  let width = Option.value ~default:0 width in
   let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
-  let hed, trl =
-    if p_getenv conf.env "cgl" = Some "on" then ("", "")
-    else
-      ( Format.sprintf {|<a href="%s">|} (url_p : Adef.escaped_string :> string),
-        "</a>" )
+  let size =
+    Format.sprintf "%s %s"
+      (if width = 0 then "" else Format.sprintf {|width="%d"|} width)
+      (if height = 0 then "" else Format.sprintf {|height="%d"|} height)
   in
-  Format.sprintf
-    {|%s<img src="%s" alt="%s" title="%s"
-      style="%s">%s|}
-    hed
-    (url : Adef.escaped_string :> string)
-    image_txt image_txt
-    (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
-    trl
-  |> Adef.safe
-
-let image_url_txt_with_size conf url_p url width height : Adef.safe_string =
-  let image_txt = Utf8.capitalize_fst (transl_nth conf "image/images" 0) in
-  let hed, trl =
-    if p_getenv conf.env "cgl" = Some "on" then ("", "")
-    else
-      ( Format.sprintf {|<a href="%s">|} (url_p : Adef.escaped_string :> string),
-        "</a>" )
+  let style =
+    Format.sprintf "%spx;%spx;"
+      (if width = 0 then "" else "max-width:" ^ string_of_int width)
+      (if height = 0 then "" else "max-height:" ^ string_of_int height)
   in
-  Format.sprintf
-    {|%s<img src="%s"%s%s alt="%s" title="%s"
-      style="%s %s">%s%s|}
-    hed
-    (url : Adef.escaped_string :> string)
-    (if width = 0 then "" else " width=" ^ string_of_int width)
-    (if height = 0 then "" else " height=" ^ string_of_int height)
-    image_txt image_txt
-    (if width = 0 then "" else "max-width:" ^ string_of_int width ^ "px;")
-    (if height = 0 then "" else "max-height:" ^ string_of_int height ^ "px;")
-    image_txt trl
-  |> Adef.safe
+  let s =
+    Format.sprintf {|<img src="%s" alt="%s" title="%s" %s style="%s">|}
+      (url : Adef.escaped_string :> string)
+      image_txt image_txt size style
+  in
+  Adef.safe
+  @@
+  if p_getenv conf.env "cgl" = Some "on" then s
+  else
+    Format.sprintf {|<a href="%s">%s</a>|}
+      (url_p : Adef.escaped_string :> string)
+      s
 
 let image_txt conf base p =
   Adef.safe
@@ -90,10 +77,11 @@ let image_txt conf base p =
           {|<br><center><table border="0"><tr align="left"><td>|}
           ^ (image_normal_txt conf base p s w h |> Adef.as_string)
           ^ "</td></tr></table></center>"
-      | Some (`Url url, Some (wid, hei)) ->
+      | Some (`Url url, Some (width, height)) ->
           let url_p = commd conf ^^^ acces conf base p in
           {|<br><center><table border="0"><tr align="left"><td>|}
-          ^ (image_url_txt_with_size conf url_p (Util.escape_html url) wid hei
+          ^ (image_url_txt conf url_p (Util.escape_html url) ~width:(Some width)
+               ~height
             |> Adef.as_string)
           ^ {|</td></tr></table></center>|}
       | Some (`Url url, None) ->
@@ -102,7 +90,7 @@ let image_txt conf base p =
           (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
           {|<br><center><table border="0" style="height:|}
           ^ string_of_int height ^ {|px"><tr align="left"><td>|}
-          ^ (image_url_txt conf url_p (Util.escape_html url) height
+          ^ (image_url_txt conf url_p (Util.escape_html url) ~width:None ~height
             |> Adef.as_string)
           ^ "</td></tr></table></center>\n")
 
