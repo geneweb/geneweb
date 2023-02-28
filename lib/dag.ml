@@ -4,6 +4,7 @@ open Def
 open Gwdb
 open Util
 
+(* TODO use a set.. *)
 module Pset = struct
   type t = iper list
   type elt = iper

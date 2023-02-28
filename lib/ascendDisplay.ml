@@ -13,6 +13,7 @@ let limit_by_tree conf =
 let print_ancestors_dag conf base v p =
   let v = min (limit_by_tree conf) v in
   let set =
+    (* TODO this should be a get_ancestors_set lvl ip *)
     let rec loop set lev ip =
       let set = Dag.Pset.add ip set in
       if lev <= 0 then set
