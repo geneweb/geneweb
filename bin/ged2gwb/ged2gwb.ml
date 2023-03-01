@@ -134,7 +134,7 @@ let main () =
       Printf.fprintf !State.log_oc "\n"
     in
     let base_warning = function
-      | Def.UndefinedSex _ -> ()
+      | Geneweb.Warning.UndefinedSex _ -> ()
       | x ->
           Geneweb.Check.print_base_warning !State.log_oc base x;
           Printf.fprintf !State.log_oc "\n"
