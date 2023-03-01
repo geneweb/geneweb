@@ -91,7 +91,7 @@ let print_base_error oc base = function
       Printf.fprintf oc "%s bad sex for a married person\n" (designation base p)
 
 let print_base_warning oc base = function
-  | BigAgeBetweenSpouses (p1, p2, a) ->
+  | Warning.BigAgeBetweenSpouses (p1, p2, a) ->
       Printf.fprintf oc
         "The difference of age between %s and %s is quite important: %d\n"
         (designation base p1) (designation base p2) a.year
@@ -262,7 +262,7 @@ let rec check_ancestors base warning year year_tab ip ini_p =
         | CheckInfered (CheckBefore y')
         | CheckInfered (CheckOther y') ) )
       when y >= y' ->
-        warning (IncoherentAncestorDate (Lazy.force p, p'))
+        warning (Warning.IncoherentAncestorDate (Lazy.force p, p'))
     | _ -> ()
   in
   if Gwdb.Marker.get year_tab ip = dummy_date then (

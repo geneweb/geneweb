@@ -2619,7 +2619,7 @@ let auth_warning conf base w =
     pauth (get_father fam |> poi base) && pauth (get_mother fam |> poi base)
   in
   match w with
-  | BigAgeBetweenSpouses (p1, p2, _) -> pauth p1 && pauth p2
+  | Warning.BigAgeBetweenSpouses (p1, p2, _) -> pauth p1 && pauth p2
   | BirthAfterDeath p -> pauth p
   | ChildrenNotInOrder (ifam, _, elder, x) ->
       pauth elder && pauth x && fauth ifam

@@ -1068,7 +1068,7 @@ let all_checks_family conf base ifam gen_fam cpl des scdo =
   let wl, ml = (List.sort_uniq compare !wl, List.sort_uniq compare !ml) in
   List.iter
     (function
-      | ChangedOrderOfMarriages (p, _, after) ->
+      | Warning.ChangedOrderOfMarriages (p, _, after) ->
           patch_union base (get_iper p) { family = after }
       | ChangedOrderOfFamilyEvents (ifam, _, after) ->
           patch_family base ifam { gen_fam with fevents = after }
@@ -1504,7 +1504,7 @@ let print_change_event_order conf base =
         CheckItem.family base warning fam.fam_index nfam;
         List.iter
           (function
-            | ChangedOrderOfFamilyEvents (ifam, _, after) ->
+            | Warning.ChangedOrderOfFamilyEvents (ifam, _, after) ->
                 patch_family base ifam { fam with fevents = after }
             | _ -> ())
           !wl;

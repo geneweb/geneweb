@@ -3272,7 +3272,7 @@ let main () =
       Check.print_base_error !log_oc base x; Printf.fprintf !log_oc "\n"
     in
     let base_warning = function
-      | UndefinedSex _ -> ()
+      | Warning.UndefinedSex _ -> ()
       | x ->
         Check.print_base_warning !log_oc base x; Printf.fprintf !log_oc "\n"
     in

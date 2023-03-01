@@ -821,7 +821,7 @@ and mk_warning conf base =
       a
   in
   function
-  | Def.BigAgeBetweenSpouses (f, m, a) ->
+  | Warning.BigAgeBetweenSpouses (f, m, a) ->
       Tset
         [
           Tsafe "BigAgeBetweenSpouses";

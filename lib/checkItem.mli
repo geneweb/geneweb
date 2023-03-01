@@ -7,11 +7,11 @@ type base_error = person Def.error
 (** Database specification error *)
 
 type base_warning =
-  (iper, person, ifam, family, title, pers_event, fam_event) Def.warning
+  (iper, person, ifam, family, title, pers_event, fam_event) Warning.warning
 (** Database specification warning *)
 
 (* *)
-type base_misc = (person, family, title) Def.misc
+type base_misc = (person, family, title) Warning.misc
 
 val check_siblings :
   ?onchange:bool ->

@@ -1,7 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Def
-
 type cdate = Adef.cdate =
   | Cgregorian of int
   | Cjulian of int
@@ -10,6 +8,34 @@ type cdate = Adef.cdate =
   | Ctext of string
   | Cdate of Adef.date
   | Cnone
+
+type date = Def.date =
+  | Dgreg of dmy * calendar
+  (* textual form of the date *)
+  | Dtext of string
+(* TODO change for Calendars.kind *)
+
+and calendar = Def.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+
+and dmy = Def.dmy = {
+  day : int;
+  month : int;
+  year : int;
+  prec : precision;
+  delta : int;
+}
+
+and dmy2 = Def.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
+
+and precision = Def.precision =
+  | Sure
+  | About
+  | Maybe
+  | Before
+  | After
+  | OrYear of dmy2
+  (* inteval *)
+  | YearInt of dmy2
 
 (* compress concrete date if it's possible *)
 let compress d =
@@ -47,8 +73,8 @@ let uncompress x =
   { day; month; year; prec; delta = 0 }
 
 (* TODO *)
-let adef_to_def_date : Adef.date -> Def.date = Obj.magic
-let def_to_adef_date : Def.date -> Adef.date = Obj.magic
+let adef_to_def_date : Adef.date -> date = Obj.magic
+let def_to_adef_date : date -> Adef.date = Obj.magic
 
 let date_of_cdate = function
   | Cgregorian i -> Dgreg (uncompress i, Dgregorian)
@@ -218,7 +244,7 @@ let cdate_to_dmy_opt cdate =
   | Some (Dtext _) | None -> None
 
 let cdate_of_death = function
-  | Death (_, cd) -> Some cd
+  | Def.Death (_, cd) -> Some cd
   | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead ->
       None
 

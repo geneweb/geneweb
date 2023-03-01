@@ -4,9 +4,9 @@ open Gwdb
 type base_error = person error
 
 type base_warning =
-  (iper, person, ifam, family, title, pers_event, fam_event) warning
+  (iper, person, ifam, family, title, pers_event, fam_event) Warning.warning
 
-type base_misc = (person, family, title) misc
+type base_misc = (person, family, title) Warning.misc
 
 (* Constants used for computing the warnings. *)
 let max_age_btw_cpl = 50
@@ -61,7 +61,7 @@ let title_dates warning p t =
   match (t_date_start, t_date_end) with
   | None, None -> ()
   | Some d1, Some d2 when strictly_after d1 d2 ->
-      warning (TitleDatesError (p, t))
+      warning (Warning.TitleDatesError (p, t))
   | _ -> (
       match Date.od_of_cdate (get_birth p) with
       | None -> ()
@@ -79,7 +79,7 @@ let check_person_age warning p =
   let aux d1 d2 =
     Date.time_elapsed_opt d1 d2
     |> Option.iter @@ fun a ->
-       if a.year < 0 then warning (BirthAfterDeath p)
+       if a.year < 0 then warning (Warning.BirthAfterDeath p)
        else if d2.year > lim_date_death then (
          if strictly_older a max_death_after_lim_date_death then
            warning (DeadOld (p, a)))
@@ -158,7 +158,7 @@ let try_to_fix_relation_sex base warning p_ref =
         else changed_related)
       (get_related p_ref) []
   in
-  warning (IncoherentSex (p_ref, !fixed, !not_fixed));
+  warning (Warning.IncoherentSex (p_ref, !fixed, !not_fixed));
   if !fixed > 0 then Some changed_related else None
 
 let related_sex_is_coherent base warning p_ref =
@@ -211,7 +211,7 @@ let check_difference_age_between_cpl warning fath moth =
           else Date.time_elapsed_opt d2 d1)
           |> Option.iter @@ fun a ->
              if strictly_older a max_age_btw_cpl then
-               warning (BigAgeBetweenSpouses (fath, moth, a)))
+               warning (Warning.BigAgeBetweenSpouses (fath, moth, a)))
 
 (*
  * Semi sort children by birth dates.
@@ -342,7 +342,7 @@ let changed_marriages_order base warning p =
     a;
   let a = Array.map (fun (f, _) -> f) a in
   if a <> b then (
-    warning (ChangedOrderOfMarriages (p, b, a));
+    warning (Warning.ChangedOrderOfMarriages (p, b, a));
     let rec loop i fam =
       if i = Array.length fam then ()
       else (
@@ -353,6 +353,7 @@ let changed_marriages_order base warning p =
 
 let close_siblings warning x np ifam =
   match np with
+  | None -> ()
   | Some (elder, d1) -> (
       match Date.cdate_to_dmy_opt (get_birth x) with
       | None -> ()
@@ -364,8 +365,7 @@ let close_siblings warning x np ifam =
                d.year = 0
                && d.month < max_month_btw_sibl
                && (d.month <> 0 || d.day >= max_days_btw_sibl)
-             then warning (CloseChildren (ifam, elder, x)))
-  | None -> ()
+             then warning (Warning.CloseChildren (ifam, elder, x)))
 
 let born_after_his_elder_sibling warning x b np ifam des =
   match np with
@@ -374,7 +374,7 @@ let born_after_his_elder_sibling warning x b np ifam des =
       match b with
       | Some d2 ->
           if strictly_after_dmy d1 d2 then
-            warning (ChildrenNotInOrder (ifam, des, elder, x))
+            warning (Warning.ChildrenNotInOrder (ifam, des, elder, x))
       | None -> (
           match Date.dmy_of_death (get_death x) with
           | None -> ()
@@ -402,7 +402,7 @@ let child_born_after_his_parent warning x parent =
           | None -> ()
           | Some g2 ->
               if strictly_after_dmy g1 g2 then
-                warning (ParentBornAfterChild (parent, x))
+                warning (Warning.ParentBornAfterChild (parent, x))
               else
                 Date.time_elapsed_opt g1 g2
                 |> Option.iter @@ fun a ->
@@ -429,7 +429,7 @@ let child_born_before_mother_death warning x mother =
       | None -> ()
       | Some d2 ->
           if strictly_after_dmy d1 d2 then
-            warning (MotherDeadBeforeChildBirth (mother, x)))
+            warning (Warning.MotherDeadBeforeChildBirth (mother, x)))
 
 let possible_father warning x father =
   match Date.cdate_to_dmy_opt (get_birth x) with
@@ -442,12 +442,13 @@ let possible_father warning x father =
             | { prec = OrYear dmy2 } -> dmy2.year2
             | { year = a } -> a
           in
-          if d1.year > a2 + 1 then warning (DeadTooEarlyToBeFather (father, x))
+          if d1.year > a2 + 1 then
+            warning (Warning.DeadTooEarlyToBeFather (father, x))
       | Some _ | None -> ())
   | Some _ | None -> ()
 
 let child_has_sex warning child =
-  if get_sex child = Neuter then warning (UndefinedSex child)
+  if get_sex child = Neuter then warning (Warning.UndefinedSex child)
 
 (* this check if events chronology is sound (e.g. no baptism before birth *)
 let check_order_pfevents get_name get_date warning events =
@@ -479,7 +480,7 @@ let check_order_pevents warning p =
   check_order_pfevents
     (fun evt -> Event.Pevent evt.epers_name)
     (fun evt -> evt.epers_date)
-    (fun e1 e2 -> warning (PEventOrder (p, e1, e2)))
+    (fun e1 e2 -> warning (Warning.PEventOrder (p, e1, e2)))
     (get_pevents p)
 
 let check_order_fevents base warning fam =
@@ -487,13 +488,13 @@ let check_order_fevents base warning fam =
   check_order_pfevents
     (fun evt -> Event.Fevent evt.efam_name)
     (fun evt -> evt.efam_date)
-    (fun e1 e2 -> warning (FEventOrder (p, e1, e2)))
+    (fun e1 e2 -> warning (Warning.FEventOrder (p, e1, e2)))
     (get_fevents fam)
 
 let check_witness_pevents_aux warning origin evt date b d p witness_kind =
   match (b, d) with
   | Some (Dgreg (d1, _)), _ when strictly_before_dmy date d1 ->
-      warning (PWitnessEventBeforeBirth (p, evt, origin))
+      warning (Warning.PWitnessEventBeforeBirth (p, evt, origin))
   | _, Some (Dgreg (d3, _)) when strictly_after_dmy date d3 ->
       if
         witness_kind <> Def.Witness_Mentioned
@@ -579,7 +580,8 @@ let check_person_dates_as_witness base warning p =
               aux
                 (fun e -> e.efam_date)
                 (fun e ->
-                  warning (FWitnessEventBeforeBirth (p, e, get_ifam fam)))
+                  warning
+                    (Warning.FWitnessEventBeforeBirth (p, e, get_ifam fam)))
                 (fun _ -> ())
                 evt
           | Some _ ->
@@ -614,7 +616,7 @@ let check_person_dates_as_witness base warning p =
       | Def.Witness_Mentioned | Def.Witness_Other ->
           aux
             (fun e -> e.epers_date)
-            (fun e -> warning (PWitnessEventBeforeBirth (p, e, r)))
+            (fun e -> warning (Warning.PWitnessEventBeforeBirth (p, e, r)))
             (fun _ -> ())
             evt
       | _ ->
@@ -640,7 +642,7 @@ let check_siblings ?(onchange = true) base warning (ifam, fam) callback =
       match sort_children base b with
       | None -> b
       | Some (b, a) ->
-          warning (ChangedOrderOfChildren (ifam, fam, b, a));
+          warning (Warning.ChangedOrderOfChildren (ifam, fam, b, a));
           a)
     else get_children fam
   in
@@ -710,12 +712,12 @@ let check_sources base misc ifam fam =
     let fath = poi base (get_father cpl) in
     let moth = poi base (get_mother cpl) in
     if has_person_sources fath && has_person_sources moth then ()
-    else misc MissingSources
+    else misc Warning.MissingSources
 
 let check_witness_fevents_aux warning fam evt date b d p witness_kind =
   match (b, d) with
   | Some (Dgreg (d1, _)), _ when strictly_before_dmy date d1 ->
-      warning (FWitnessEventBeforeBirth (p, evt, get_ifam fam))
+      warning (Warning.FWitnessEventBeforeBirth (p, evt, get_ifam fam))
   | _, Some (Dgreg (d3, _)) when strictly_after_dmy date d3 ->
       if
         witness_kind <> Def.Witness_Mentioned
@@ -747,8 +749,8 @@ let check_parent_marriage_age warning fam p =
         | Some (Dgreg (g2, _) as d2) -> (
             match Date.date_of_death (get_death p) with
             | Some d1 when strictly_after d2 d1 ->
-                warning (MarriageDateAfterDeath p)
-            | _ -> (
+                warning (Warning.MarriageDateAfterDeath p)
+            | Some _ | None -> (
                 match Date.od_of_cdate (get_birth p) with
                 | Some (Dgreg (g1, _) as d1) ->
                     if strictly_before d2 d1 then
@@ -794,7 +796,8 @@ let check_possible_duplicate_family ?p base warning family father mother =
       let fn, sn = (first_name person, surname person) in
       (* Parent is strictly the same *)
       if eq_iper parent' current_parent_iper then
-        warning (PossibleDuplicateFam (ifam, ifam')) (*  Homonymous parents *)
+        warning (Warning.PossibleDuplicateFam (ifam, ifam'))
+        (*  Homonymous parents *)
       else if fn = current_parent_fn && sn = current_parent_sn then
         warning (PossibleDuplicateFamHomonymous (ifam, ifam', parent_source))
       else ()
@@ -834,7 +837,7 @@ let changed_pevents_order warning p =
       (fun evt -> evt.epers_date)
       a
   in
-  if a <> b then warning (ChangedOrderOfPersonEvents (p, a, b))
+  if a <> b then warning (Warning.ChangedOrderOfPersonEvents (p, a, b))
 
 let changed_fevents_order warning (ifam, fam) =
   let a =
@@ -844,7 +847,8 @@ let changed_fevents_order warning (ifam, fam) =
       (get_fevents fam)
   in
   let b = get_fevents fam in
-  if compare b a <> 0 then warning (ChangedOrderOfFamilyEvents (ifam, b, a))
+  if compare b a <> 0 then
+    warning (Warning.ChangedOrderOfFamilyEvents (ifam, b, a))
 
 (* main *)
 
@@ -1000,7 +1004,8 @@ let eq_family f1 f2 = eq_ifam (get_ifam f1) (get_ifam f2)
 
 let eq_warning base w1 w2 =
   match (w1, w2) with
-  | PossibleDuplicateFam (f1, f2), PossibleDuplicateFam (f1', f2') ->
+  | ( Warning.PossibleDuplicateFam (f1, f2),
+      Warning.PossibleDuplicateFam (f1', f2') ) ->
       (eq_ifam f1 f1' && eq_ifam f2 f2') || (eq_ifam f1 f2' && eq_ifam f2 f1')
   | ( PossibleDuplicateFamHomonymous (f1, f2, _),
       PossibleDuplicateFamHomonymous (f1', f2', _) ) ->
