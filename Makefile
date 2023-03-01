@@ -200,7 +200,11 @@ bench: | $(GENERATED_FILES_DEP)
 	dune build @runbench
 .PHONY: bench
 
-BENCH_FILE ?= /tmp/geneweb-bench.bin
+ifeq ($(OS),Windows_NT)     # is Windows_NT on XP, 2000, 7, Vista, 10...
+    BENCH_FILE ?= `whoami`\AppData\Local\Temp\geneweb-bench.bin
+else
+    BENCH_FILE ?= /tmp/geneweb-bench.bin
+endif
 
 bench-marshal: ## Run benchmarks and record the result
 bench-marshal: | $(GENERATED_FILES_DEP)
