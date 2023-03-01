@@ -141,7 +141,6 @@ let interp conf fname ifun env ep = gen_interp true conf fname ifun env ep
 (* Calendar request *)
 
 let eval_julian_day conf =
-  let open Adef in
   let getint v = match Util.p_getint conf.env v with Some x -> x | _ -> 0 in
   List.fold_left
     (fun d (var, cal, max_month) ->

@@ -23,7 +23,7 @@ val select_family :
   (Gwdb.family * Def.dmy * Def.calendar) list * int
 (** Same as [select_person] but dealing with families *)
 
-val death_date : Gwdb.person -> Adef.date option
+val death_date : Gwdb.person -> Def.date option
 (** Returns person's death date (if exists) *)
 
 val make_population_pyramid :

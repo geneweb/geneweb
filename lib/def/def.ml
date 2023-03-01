@@ -22,30 +22,17 @@ type ('a, 'b) choice = Left of 'a | Right of 'b
 type cdate = Adef.cdate
 (** Alias to [Adef.cdate] *)
 
-(** Alias to [Adef.date] *)
-type date = Adef.date =
+type date =
   | Dgreg of dmy * calendar
   (* textual form of the date *)
   | Dtext of string
 (* TODO change for Calendars.kind *)
 
-(** Alias to [Adef.calendar] *)
-and calendar = Adef.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+and calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+and dmy = { day : int; month : int; year : int; prec : precision; delta : int }
+and dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
 
-and dmy = Adef.dmy = {
-  day : int;
-  month : int;
-  year : int;
-  prec : precision;
-  delta : int;
-}
-(** Alias to [Adef.dmy] *)
-
-and dmy2 = Adef.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
-(** Alias to [Adef.dmy2] *)
-
-(** Alias to [Adef.precision] *)
-and precision = Adef.precision =
+and precision =
   | Sure
   | About
   | Maybe

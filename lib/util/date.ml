@@ -8,7 +8,7 @@ type cdate = Adef.cdate =
   | Cfrench of int
   | Chebrew of int
   | Ctext of string
-  | Cdate of date
+  | Cdate of Adef.date
   | Cnone
 
 (* compress concrete date if it's possible *)
@@ -46,27 +46,31 @@ let uncompress x =
   in
   { day; month; year; prec; delta = 0 }
 
+(* TODO *)
+let adef_to_def_date : Adef.date -> Def.date = Obj.magic
+let def_to_adef_date : Def.date -> Adef.date = Obj.magic
+
 let date_of_cdate = function
   | Cgregorian i -> Dgreg (uncompress i, Dgregorian)
   | Cjulian i -> Dgreg (uncompress i, Djulian)
   | Cfrench i -> Dgreg (uncompress i, Dfrench)
   | Chebrew i -> Dgreg (uncompress i, Dhebrew)
-  | Cdate d -> d
+  | Cdate d -> adef_to_def_date d
   | Ctext t -> Dtext t
   | Cnone -> failwith "date_of_cdate"
 
 let cdate_of_date d =
   match d with
+  | Dtext t -> Ctext t
   | Dgreg (g, cal) -> (
       match compress g with
+      | None -> Cdate (def_to_adef_date d)
       | Some i -> (
           match cal with
           | Dgregorian -> Cgregorian i
           | Djulian -> Cjulian i
           | Dfrench -> Cfrench i
-          | Dhebrew -> Chebrew i)
-      | None -> Cdate d)
-  | Dtext t -> Ctext t
+          | Dhebrew -> Chebrew i))
 
 let cdate_of_od = function Some d -> cdate_of_date d | None -> Cnone
 
