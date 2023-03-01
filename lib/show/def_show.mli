@@ -1,7 +1,7 @@
-type date = Adef.date = Dgreg of dmy * calendar | Dtext of string
-and calendar = Adef.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+type date = Def.date = Dgreg of dmy * calendar | Dtext of string
+and calendar = Def.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
 
-and dmy = Adef.dmy = {
+and dmy = Def.dmy = {
   day : int;
   month : int;
   year : int;
@@ -9,9 +9,9 @@ and dmy = Adef.dmy = {
   delta : int;
 }
 
-and dmy2 = Adef.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
+and dmy2 = Def.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
 
-and precision = Adef.precision =
+and precision = Def.precision =
   | Sure
   | About
   | Maybe
