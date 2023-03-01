@@ -142,6 +142,8 @@ module IFS = Util.IfamSet
 (* S: Does it mean private persons whose birth year is before 'max_year'
    are uncensored? *)
 
+(* TODO this should not be redefined here *)
+
 (** [is_censored_person max_year person_name]
     Returns [true] iff the person has a birth date that is after max_year and
     its visibility is not public
@@ -149,7 +151,7 @@ module IFS = Util.IfamSet
 let is_censored_person threshold p =
   match Date.cdate_to_dmy_opt (get_birth p) with
   | None -> false
-  | Some dmy -> dmy.Adef.year >= threshold && get_access p != Def.Public
+  | Some dmy -> dmy.year >= threshold && get_access p != Def.Public
 
 (** [is_censored_couple base max_year family]
     Returns [true] if either the father or the mother of a given family in the

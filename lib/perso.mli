@@ -102,7 +102,7 @@ val nobility_titles_list :
   * istr Def.gen_title_name
   * istr
   * istr list
-  * (Adef.date option * Adef.date option) list)
+  * (Def.date option * Def.date option) list)
   list
 
 val has_history : config -> base -> person -> bool -> bool
