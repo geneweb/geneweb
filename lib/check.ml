@@ -237,7 +237,7 @@ type check_date =
 
 let min_year_of p =
   let aux = function
-    | { prec = After; year } -> CheckAfter year
+    | { Date.prec = After; year } -> CheckAfter year
     | { prec = Before; year } -> CheckBefore year
     | { year } -> CheckOther year
   in

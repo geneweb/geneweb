@@ -1,7 +1,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Def
+open Date
 open Gwdb
 
 val get_wday : config -> date -> string
@@ -18,7 +18,7 @@ val code_hebrew_date : config -> int -> int -> int -> string
     translated to the current language.
 *)
 
-val string_of_dmy : Config.config -> Def.dmy -> Adef.safe_string
+val string_of_dmy : Config.config -> dmy -> Adef.safe_string
 (** Converts and translate date to the textual representation for the giving language. Considers precision. *)
 
 val string_of_date : config -> date -> Adef.safe_string
@@ -83,13 +83,13 @@ val code_french_year : config -> int -> string
 
 val string_of_date_aux :
   ?link:bool ->
-  ?dmy:(Config.config -> Def.dmy -> Adef.safe_string) ->
+  ?dmy:(Config.config -> Date.dmy -> Adef.safe_string) ->
   ?sep:Adef.safe_string ->
   Config.config ->
-  Def.date ->
+  Date.date ->
   Adef.safe_string
 (** Same as [string_of_ondate] except :
-    - Conversion function for [Def.dmy] could be passed in in [dmy] argument
+    - Conversion function for [Date.dmy] could be passed in in [dmy] argument
     - Doesn't consider phrase declination as [string_of_ondate] does. *)
 
 (**/**)

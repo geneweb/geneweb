@@ -90,13 +90,13 @@ val empty_family : 'string -> (_, unit, 'string) Dbdisk.gen_family
 *)
 
 val map_person_ps :
-  ?fd:(Def.date -> Def.date) ->
+  ?fd:(Date.date -> Date.date) ->
   ('b -> 'd) ->
   ('c -> 'e) ->
   ('a, 'b, 'c) Dbdisk.gen_person ->
   ('a, 'd, 'e) Dbdisk.gen_person
 (** Convert:
-    
+
     - Generic type used to represent related persons (parents, witnesses of a personal event, etc.)
     of [Def.gen_person] into another one.
     - Generic type used to represent another large part of information of [Def.gen_person]
@@ -105,7 +105,7 @@ val map_person_ps :
     Generic type that is used to represent indexation key isn't converted. *)
 
 val map_family_ps :
-  ?fd:(Def.date -> Def.date) ->
+  ?fd:(Date.date -> Date.date) ->
   ('a -> 'b) ->
   ('c -> 'd) ->
   ('e -> 'f) ->

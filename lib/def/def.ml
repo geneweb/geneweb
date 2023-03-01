@@ -22,26 +22,6 @@ type ('a, 'b) choice = Left of 'a | Right of 'b
 type cdate = Adef.cdate
 (** Alias to [Adef.cdate] *)
 
-type date =
-  | Dgreg of dmy * calendar
-  (* textual form of the date *)
-  | Dtext of string
-(* TODO change for Calendars.kind *)
-
-and calendar = Dgregorian | Djulian | Dfrench | Dhebrew
-and dmy = { day : int; month : int; year : int; prec : precision; delta : int }
-and dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
-
-and precision =
-  | Sure
-  | About
-  | Maybe
-  | Before
-  | After
-  | OrYear of dmy2
-  (* inteval *)
-  | YearInt of dmy2
-
 (** Relation kind between couple in the family *)
 type relation_kind =
   | Married

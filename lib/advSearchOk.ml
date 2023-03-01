@@ -9,8 +9,11 @@ let get_number var key env = p_getint env (var ^ "_" ^ key)
 
 let reconstitute_date_dmy conf var =
   match get_number var "yyyy" conf.env with
+  | None -> None
   | Some y -> (
       match get_number var "mm" conf.env with
+      | None ->
+          Some Date.{ day = 0; month = 0; year = y; prec = Sure; delta = 0 }
       | Some m -> (
           match get_number var "dd" conf.env with
           | Some d ->
@@ -20,14 +23,12 @@ let reconstitute_date_dmy conf var =
           | None ->
               if m >= 1 && m <= 12 then
                 Some { day = 0; month = m; year = y; prec = Sure; delta = 0 }
-              else None)
-      | None -> Some { day = 0; month = 0; year = y; prec = Sure; delta = 0 })
-  | None -> None
+              else None))
 
 let reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
-  | Some d -> Some (Dgreg (d, Dgregorian))
   | None -> None
+  | Some d -> Some (Date.Dgreg (d, Dgregorian))
 
 let rec skip_spaces x i =
   if i = String.length x then i
@@ -165,19 +166,19 @@ let advanced_search conf base max_answers =
     authorized_age conf base p
     &&
     match (d1, d2) with
-    | Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) -> (
+    | Some (Date.Dgreg (d1, _)), Some (Date.Dgreg (d2, _)) -> (
         match df () with
-        | Some (Dgreg (d, _)) ->
+        | Some (Date.Dgreg (d, _)) ->
             Date.compare_dmy d d1 >= 0 && Date.compare_dmy d d2 <= 0
-        | _ -> false)
+        | Some (Dtext _) | None -> false)
     | Some (Dgreg (d1, _)), _ -> (
         match df () with
         | Some (Dgreg (d, _)) -> Date.compare_dmy d d1 >= 0
-        | _ -> false)
+        | Some (Dtext _) | None -> false)
     | _, Some (Dgreg (d2, _)) -> (
         match df () with
         | Some (Dgreg (d, _)) -> Date.compare_dmy d d2 <= 0
-        | _ -> false)
+        | Some (Dtext _) | None -> false)
     | _ -> empty_default_value
   in
   let match_sex p empty_default_value =

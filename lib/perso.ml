@@ -92,7 +92,7 @@ let string_of_title ?(safe = false) ?(link = true) conf base
              in
              let acc =
                match date_end with
-               | Some (Dgreg (d, _)) ->
+               | Some (Date.Dgreg (d, _)) ->
                    if d.month <> 0 then acc ^>^ " - " else acc ^>^ "-"
                | Some (Dtext _) -> acc ^>^ " - "
                | _ -> acc
@@ -1141,12 +1141,18 @@ end)
 *)
 type ancestor_surname_info =
   | Branch of
-      (string * date option * date option * string * person * Sosa.t list * loc)
+      (string
+      * Date.date option
+      * Date.date option
+      * string
+      * person
+      * Sosa.t list
+      * loc)
   | Eclair of
       (string
       * Adef.safe_string
-      * date option
-      * date option
+      * Date.date option
+      * Date.date option
       * person
       * iper list
       * loc)
@@ -1156,7 +1162,7 @@ type title_item =
   * istr gen_title_name
   * istr
   * istr list
-  * (date option * date option) list
+  * (Date.date option * Date.date option) list
 
 type 'a env =
   | Vallgp of generation_person list

@@ -1,8 +1,10 @@
-type date = [%import: Def.date] [@@deriving show { with_path = false }]
-and calendar = [%import: Def.calendar] [@@deriving show { with_path = false }]
-and dmy = [%import: Def.dmy] [@@deriving show { with_path = false }]
-and dmy2 = [%import: Def.dmy2] [@@deriving show { with_path = false }]
-and precision = [%import: Def.precision] [@@deriving show { with_path = false }]
+type date = [%import: Date.date] [@@deriving show { with_path = false }]
+and calendar = [%import: Date.calendar] [@@deriving show { with_path = false }]
+and dmy = [%import: Date.dmy] [@@deriving show { with_path = false }]
+and dmy2 = [%import: Date.dmy2] [@@deriving show { with_path = false }]
+
+and precision = [%import: Date.precision]
+[@@deriving show { with_path = false }]
 
 type cdate = Adef.cdate
 

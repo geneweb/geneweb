@@ -85,7 +85,7 @@ val nobtit : config -> base -> person -> title list
     that respects constraints imposed by [conf.allowed_titles] and
     [conf.denied_titles] *)
 
-val strictly_after_private_years : config -> dmy -> bool
+val strictly_after_private_years : config -> Date.dmy -> bool
 
 val authorized_age : config -> base -> person -> bool
 (** Alias to !GWPARAM.p_auth *)
@@ -276,10 +276,10 @@ val surname_without_particle : base -> string -> string
 val specify_homonymous : config -> base -> person -> bool -> unit
 
 val get_approx_birth_date_place :
-  config -> base -> person -> date option * Adef.safe_string
+  config -> base -> person -> Date.date option * Adef.safe_string
 
 val get_approx_death_date_place :
-  config -> base -> person -> date option * Adef.safe_string
+  config -> base -> person -> Date.date option * Adef.safe_string
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 

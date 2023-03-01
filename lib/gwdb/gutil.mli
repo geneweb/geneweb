@@ -77,7 +77,7 @@ val find_free_occ : base -> string -> string -> int
 (** Find first free occurence number for the person with specified first name
     and surname. *)
 
-val get_birth_death_date : person -> date option * date option * bool
+val get_birth_death_date : person -> Date.date option * Date.date option * bool
 (** [get_birth_death p]
     Return [(birth, death, approx)]. If birth/death date can not be found,
     baptism/burial date is used and [approx] is set to [true] (it is [false]

@@ -1,4 +1,3 @@
-open Def
 open Gwdb
 
 (** Authentication scheme data type *)
@@ -92,7 +91,7 @@ type config = {
   auth_file : string;
   border : int;
   mutable n_connect : (int * int * int * (string * float) list) option;
-  today : dmy;
+  today : Date.dmy;
   today_wd : int;
   time : int * int * int;
   ctime : float;

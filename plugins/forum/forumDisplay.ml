@@ -2,7 +2,6 @@
 
 open Geneweb
 open Config
-open Def
 open TemplAst
 open Util
 open Forum

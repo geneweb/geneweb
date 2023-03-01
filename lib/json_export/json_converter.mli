@@ -27,10 +27,10 @@ end
 
 (** Functor building JSON convertion functions of the Geneweb data types. *)
 module Make : functor (D : ConverterDriver) -> sig
-  val conv_dmy : Def.dmy -> D.t
+  val conv_dmy : Date.dmy -> D.t
   (** Convert [dmy] to JSON *)
 
-  val conv_dmy2 : Def.dmy2 -> D.t
+  val conv_dmy2 : Date.dmy2 -> D.t
   (** Convert [dmy2] to JSON *)
 
   val conv_cdate : Def.cdate -> D.t

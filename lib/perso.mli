@@ -102,7 +102,7 @@ val nobility_titles_list :
   * istr Def.gen_title_name
   * istr
   * istr list
-  * (Def.date option * Def.date option) list)
+  * (Date.date option * Date.date option) list)
   list
 
 val has_history : config -> base -> person -> bool -> bool
@@ -119,6 +119,6 @@ val string_of_title :
   * istr Def.gen_title_name
   * istr
   * istr list
-  * (Def.date option * Def.date option) list ->
+  * (Date.date option * Date.date option) list ->
   Adef.safe_string
 (** Optionnal [link] argument is passed to {!val:DateDisplay.string_of_ondate} *)

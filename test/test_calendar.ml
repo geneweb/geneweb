@@ -3,14 +3,14 @@ open OUnit2
 
 let data_sure =
   [
-    Def.{ day = 1; month = 1; year = 1900; delta = 0; prec = Sure };
-    Def.{ day = 2; month = 1; year = 1900; delta = 0; prec = Sure };
-    Def.{ day = 3; month = 2; year = 1900; delta = 0; prec = Sure };
+    Date.{ day = 1; month = 1; year = 1900; delta = 0; prec = Sure };
+    Date.{ day = 2; month = 1; year = 1900; delta = 0; prec = Sure };
+    Date.{ day = 3; month = 2; year = 1900; delta = 0; prec = Sure };
   ]
 
 let data_oryear =
   [
-    Def.
+    Date.
       {
         day = 1;
         month = 1;
@@ -18,7 +18,7 @@ let data_oryear =
         delta = 0;
         prec = OrYear { day2 = 1; month2 = 1; year2 = 1901; delta2 = 0 };
       };
-    Def.
+    Date.
       {
         day = 1;
         month = 1;
@@ -26,7 +26,7 @@ let data_oryear =
         delta = 0;
         prec = OrYear { day2 = 1; month2 = 1; year2 = 1901; delta2 = 0 };
       };
-    Def.
+    Date.
       {
         day = 1;
         month = 1;
@@ -53,55 +53,55 @@ let gregorian_round_trip label to_g of_g =
 
 let data_incomplete =
   [
-    ( Def.{ day = 0; month = 1; year = 1900; delta = 0; prec = Sure },
-      Def.{ day = 1; month = 2; year = 1900; delta = 0; prec = Before } );
-    ( Def.{ day = 0; month = 12; year = 1900; delta = 0; prec = Sure },
-      Def.{ day = 1; month = 1; year = 1901; delta = 0; prec = Before } );
-    ( Def.{ day = 0; month = 0; year = 1900; delta = 0; prec = Sure },
-      Def.{ day = 1; month = 1; year = 1901; delta = 0; prec = Before } );
-    ( Def.{ day = 3; month = 0; year = 1900; delta = 0; prec = Sure },
-      Def.{ day = 1; month = 1; year = 1901; delta = 0; prec = Before } );
-    ( Def.
+    ( Date.{ day = 0; month = 1; year = 1900; delta = 0; prec = Sure },
+      Date.{ day = 1; month = 2; year = 1900; delta = 0; prec = Before } );
+    ( Date.{ day = 0; month = 12; year = 1900; delta = 0; prec = Sure },
+      Date.{ day = 1; month = 1; year = 1901; delta = 0; prec = Before } );
+    ( Date.{ day = 0; month = 0; year = 1900; delta = 0; prec = Sure },
+      Date.{ day = 1; month = 1; year = 1901; delta = 0; prec = Before } );
+    ( Date.{ day = 3; month = 0; year = 1900; delta = 0; prec = Sure },
+      Date.{ day = 1; month = 1; year = 1901; delta = 0; prec = Before } );
+    ( Date.
         {
           day = 1;
           month = 2;
           year = 1900;
           delta = 0;
-          prec = OrYear Def.{ day2 = 0; month2 = 1; year2 = 1900; delta2 = 0 };
+          prec = OrYear Date.{ day2 = 0; month2 = 1; year2 = 1900; delta2 = 0 };
         },
-      Def.
+      Date.
         {
           day = 1;
           month = 2;
           year = 1900;
           delta = 0;
-          prec = OrYear Def.{ day2 = 1; month2 = 2; year2 = 1900; delta2 = 0 };
+          prec = OrYear Date.{ day2 = 1; month2 = 2; year2 = 1900; delta2 = 0 };
         } );
-    ( Def.
+    ( Date.
         {
           day = 1;
           month = 2;
           year = 1900;
           delta = 0;
-          prec = OrYear Def.{ day2 = 3; month2 = 0; year2 = 1900; delta2 = 0 };
+          prec = OrYear Date.{ day2 = 3; month2 = 0; year2 = 1900; delta2 = 0 };
         },
-      Def.
+      Date.
         {
           day = 1;
           month = 2;
           year = 1900;
           delta = 0;
-          prec = OrYear Def.{ day2 = 1; month2 = 1; year2 = 1901; delta2 = 0 };
+          prec = OrYear Date.{ day2 = 1; month2 = 1; year2 = 1901; delta2 = 0 };
         } );
-    ( Def.
+    ( Date.
         {
           day = 0;
           month = 2;
           year = 1900;
           delta = 0;
-          prec = OrYear Def.{ day2 = 3; month2 = 4; year2 = 1900; delta2 = 0 };
+          prec = OrYear Date.{ day2 = 3; month2 = 4; year2 = 1900; delta2 = 0 };
         },
-      Def.{ day = 1; month = 3; year = 1900; delta = 0; prec = Before } );
+      Date.{ day = 1; month = 3; year = 1900; delta = 0; prec = Before } );
   ]
 
 (* test incomplete date *)
