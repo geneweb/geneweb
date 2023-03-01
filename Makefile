@@ -218,7 +218,7 @@ bench-tabulate: | $(GENERATED_FILES_DEP)
 
 clean:
 	@echo -n "Cleaning..."
-	@$(RM) $(GENERATED_FILES_DEP) lib/*_piqi*.ml
+	@$(RM) $(GENERATED_FILES_DEP)
 	@$(RM) -r $(DISTRIB_DIR)
 	@dune clean
 	@echo " Done!"
