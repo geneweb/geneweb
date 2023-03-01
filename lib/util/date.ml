@@ -9,25 +9,21 @@ type cdate = Adef.cdate =
   | Cdate of Adef.date
   | Cnone
 
-type date = Def.date =
+type date =
+  (* dmy is the date in gregorian format;
+     calendar is the calendar in which we should display this date;
+     e.g. if calendar = Dhebrew, we should convert dmy from gregorian
+     to hebrew before printing
+  *)
   | Dgreg of dmy * calendar
   (* textual form of the date *)
   | Dtext of string
-(* TODO change for Calendars.kind *)
 
-and calendar = Def.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+and calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+and dmy = { day : int; month : int; year : int; prec : precision; delta : int }
+and dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
 
-and dmy = Def.dmy = {
-  day : int;
-  month : int;
-  year : int;
-  prec : precision;
-  delta : int;
-}
-
-and dmy2 = Def.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
-
-and precision = Def.precision =
+and precision =
   | Sure
   | About
   | Maybe
@@ -36,6 +32,18 @@ and precision = Def.precision =
   | OrYear of dmy2
   (* inteval *)
   | YearInt of dmy2
+
+(* TODO ?? change types for :
+   type t =
+     | Dgreg of date * calendar
+     | Dtext of string
+
+   type date = dmy * precision
+*)
+
+(* TODO !! *)
+let adef_to_def_date : Adef.date -> date = Obj.magic
+let def_to_adef_date : date -> Adef.date = Obj.magic
 
 (* compress concrete date if it's possible *)
 let compress d =
@@ -71,10 +79,6 @@ let uncompress x =
     | _ -> Sure
   in
   { day; month; year; prec; delta = 0 }
-
-(* TODO *)
-let adef_to_def_date : Adef.date -> date = Obj.magic
-let def_to_adef_date : date -> Adef.date = Obj.magic
 
 let date_of_cdate = function
   | Cgregorian i -> Dgreg (uncompress i, Dgregorian)
@@ -344,7 +348,7 @@ let to_sdn ~from d =
 
 let of_calendars_raw ~prec date =
   let { Calendars.day; month; year; delta; _ } = date in
-  { Def.day; month; year; delta; prec }
+  { day; month; year; delta; prec }
 
 let gregorian_of_sdn ~prec sdn =
   Calendars.gregorian_of_sdn sdn |> of_calendars_raw ~prec

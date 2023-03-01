@@ -2,6 +2,7 @@
 
 open Geneweb
 open Def
+open Date
 
 type person = (int, int, int) Def.gen_person
 type ascend = int Def.gen_ascend

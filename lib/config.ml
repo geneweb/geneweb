@@ -1,6 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Def
 open Gwdb
 
 type auth_scheme_kind =
@@ -88,7 +87,7 @@ type config = {
   auth_file : string;
   border : int;
   mutable n_connect : (int * int * int * (string * float) list) option;
-  today : dmy;
+  today : Date.dmy;
   today_wd : int;
   time : int * int * int;
   ctime : float;
@@ -160,7 +159,7 @@ let empty =
     auth_file = "";
     border = 0;
     n_connect = None;
-    today = { Def.day = 0; month = 0; year = 0; delta = 0; prec = Def.Sure };
+    today = { Date.day = 0; month = 0; year = 0; delta = 0; prec = Date.Sure };
     today_wd = 0;
     time = (0, 0, 0);
     ctime = 0.;

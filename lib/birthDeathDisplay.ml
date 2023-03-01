@@ -80,7 +80,7 @@ let print_death conf base =
             Output.print_string conf month_txt;
             Output.print_sstring conf "<ul>");
           let age, ages_sum, ages_nb =
-            let sure d = d.prec = Sure in
+            let sure d = d.Date.prec = Sure in
             match Date.cdate_to_dmy_opt (get_birth p) with
             | None -> (None, ages_sum, ages_nb)
             | Some d1 ->
@@ -234,7 +234,7 @@ let print_longest_lived conf base =
       | Some bd, Death (_, cd) -> (
           match Date.cdate_to_dmy_opt cd with
           | None -> None
-          | Some dd -> Some (Dgreg (Date.time_elapsed bd dd, Dgregorian)))
+          | Some dd -> Some (Date.Dgreg (Date.time_elapsed bd dd, Dgregorian)))
       | _ -> None
     else None
   in
@@ -253,7 +253,7 @@ let print_longest_lived conf base =
       Output.print_sstring conf "</strong>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       Output.print_sstring conf " (";
-      Output.print_sstring conf (string_of_int d.year);
+      Output.print_sstring conf (string_of_int d.Date.year);
       Output.print_sstring conf " ";
       Output.print_sstring conf (transl conf "years old");
       Output.print_sstring conf ")";
@@ -418,8 +418,8 @@ let print_population_pyramid conf base =
   let limit = match p_getint conf.env "lim" with Some x -> x | _ -> 0 in
   let at_date =
     match p_getint conf.env "y" with
-    | Some i -> { year = i; month = 31; day = 12; prec = Sure; delta = 0 }
     | None -> conf.today
+    | Some i -> { year = i; month = 31; day = 12; prec = Sure; delta = 0 }
   in
   let nb_intervals = 150 / interval in
   let men, wom =

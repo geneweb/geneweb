@@ -537,7 +537,7 @@ let nobtit conf base p =
   Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p
 
 let strictly_after_private_years conf a =
-  if a.year > conf.private_years then true
+  if a.Date.year > conf.private_years then true
   else if a.year < conf.private_years then false
   else a.month > 0 || a.day > 0
 

@@ -1,6 +1,5 @@
 open Geneweb
 open OUnit2
-open Def
 
 let mutil_contains _ =
   let str = "foo bar" in
@@ -175,7 +174,7 @@ let datedisplay_string_of_date _ =
   in
   let test aaa cal (d, m, y) =
     let date =
-      Dgreg ({ day = d; month = m; year = y; prec = Sure; delta = 0 }, cal)
+      Date.Dgreg ({ day = d; month = m; year = y; prec = Sure; delta = 0 }, cal)
     in
     let bbb = DateDisplay.string_of_date conf date in
     assert_equal aaa bbb

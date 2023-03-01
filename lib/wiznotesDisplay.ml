@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Def
 open Util
 
 let dir conf base =
@@ -122,16 +121,17 @@ let print_wizards_by_date conf list =
       ( (fun tm -> tm.Unix.tm_mon),
         fun tm ->
           let dmy =
-            {
-              year = tm.Unix.tm_year + 1900;
-              month = tm.Unix.tm_mon + 1;
-              day = 0;
-              prec = Sure;
-              delta = 0;
-            }
+            Date.
+              {
+                year = tm.Unix.tm_year + 1900;
+                month = tm.Unix.tm_mon + 1;
+                day = 0;
+                prec = Sure;
+                delta = 0;
+              }
           in
           Dgreg (dmy, Dgregorian)
-          |> (DateDisplay.string_of_ondate conf :> Def.date -> string)
+          |> (DateDisplay.string_of_ondate conf :> Date.date -> string)
           |> Utf8.capitalize_fst |> Output.print_sstring conf );
       ( (fun tm -> tm.Unix.tm_year),
         fun tm ->
@@ -373,13 +373,14 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   if Sys.file_exists wfile then (
     let tm = Unix.localtime date in
     let dmy =
-      {
-        day = tm.Unix.tm_mday;
-        month = tm.Unix.tm_mon + 1;
-        year = 1900 + tm.Unix.tm_year;
-        prec = Sure;
-        delta = 0;
-      }
+      Date.
+        {
+          day = tm.Unix.tm_mday;
+          month = tm.Unix.tm_mon + 1;
+          year = 1900 + tm.Unix.tm_year;
+          prec = Sure;
+          delta = 0;
+        }
     in
     Output.print_sstring conf "<p><tt>(";
     Output.print_string conf

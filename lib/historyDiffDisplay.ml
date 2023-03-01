@@ -911,7 +911,7 @@ let eval_predefined_apply conf _env f vl =
         let month = int_of_string (String.sub date_txt 5 2) in
         let day = int_of_string (String.sub date_txt 8 2) in
         let date =
-          Dgreg ({ day; month; year; prec = Sure; delta = 0 }, Dgregorian)
+          Date.Dgreg ({ day; month; year; prec = Sure; delta = 0 }, Dgregorian)
         in
         let time = String.sub date_txt 11 8 in
         DateDisplay.string_of_date conf date ^>^ ", " ^ time

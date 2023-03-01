@@ -74,7 +74,7 @@ let hebrew_txt =
 
 let ged_month cal m =
   match cal with
-  | Dgregorian | Djulian ->
+  | Date.Dgregorian | Djulian ->
       if m >= 1 && m <= Array.length month_txt then month_txt.(m - 1)
       else failwith "ged_month"
   | Dfrench ->
@@ -287,13 +287,13 @@ let ged_sex opts per =
   | Neuter -> ()
 
 let ged_calendar opts = function
-  | Dgregorian -> ()
+  | Date.Dgregorian -> ()
   | Djulian -> Printf.ksprintf (oc opts) "@#DJULIAN@ "
   | Dfrench -> Printf.ksprintf (oc opts) "@#DFRENCH R@ "
   | Dhebrew -> Printf.ksprintf (oc opts) "@#DHEBREW@ "
 
 let ged_date_dmy opts dt cal =
-  (match dt.prec with
+  (match dt.Date.prec with
   | Sure -> ()
   | About -> Printf.ksprintf (oc opts) "ABT "
   | Maybe -> Printf.ksprintf (oc opts) "EST "
@@ -323,7 +323,7 @@ let ged_date_dmy opts dt cal =
   | _ -> ()
 
 let ged_date opts = function
-  | Dgreg (d, Dgregorian) -> ged_date_dmy opts d Dgregorian
+  | Date.Dgreg (d, Dgregorian) -> ged_date_dmy opts d Dgregorian
   | Dgreg (d, Djulian) ->
       ged_date_dmy opts (Date.convert ~from:Dgregorian ~to_:Djulian d) Djulian
   | Dgreg (d, Dfrench) ->

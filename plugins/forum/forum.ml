@@ -2,12 +2,11 @@
 
 open Geneweb
 open Config
-open Def
 open Util
 
 type message = {
   m_time : string;
-  m_date : date;
+  m_date : Date.date;
   m_hour : string;
   m_waiting : bool;
   m_from : string;
@@ -271,7 +270,7 @@ let read_message conf ic =
         let y = int_of_string (String.sub date 0 4) in
         let m = int_of_string (String.sub date 5 2) in
         let d = int_of_string (String.sub date 8 2) in
-        Dgreg
+        Date.Dgreg
           ({ year = y; month = m; day = d; prec = Sure; delta = 0 }, Dgregorian)
       with Failure _ | Invalid_argument _ -> Dtext date
     in

@@ -13,7 +13,7 @@ type update_error =
   | UERR_already_defined of base * person * string
   | UERR_own_ancestor of base * person
   | UERR_digest
-  | UERR_bad_date of Def.dmy
+  | UERR_bad_date of Date.dmy
   | UERR_missing_field of Adef.safe_string
   | UERR_already_has_parents of base * person
   | UERR_missing_surname of Adef.safe_string
@@ -23,10 +23,10 @@ type update_error =
 exception ModErr of update_error
 
 type create_info = {
-  ci_birth_date : date option;
+  ci_birth_date : Date.date option;
   ci_birth_place : string;
   ci_death : death;
-  ci_death_date : date option;
+  ci_death_date : Date.date option;
   ci_death_place : string;
   ci_occupation : string;
   ci_public : bool;
@@ -36,7 +36,7 @@ type create = Create of sex * create_info option | Link
 type key = string * string * int * create * string
 
 val infer_death : config -> base -> person -> death
-val infer_death_bb : config -> date option -> date option -> death
+val infer_death_bb : config -> Date.date option -> Date.date option -> death
 
 val infer_death_from_parents : config -> base -> family -> death
 (** [infer_death_from_parents conf base fam] infer death status for a new children in this family *)
@@ -100,11 +100,11 @@ val digest_person : (iper, key, string) gen_person -> Digest.t
 val digest_family :
   (key, _, string) gen_family * key gen_couple * key gen_descend -> Digest.t
 
-val reconstitute_date : config -> string -> date option
+val reconstitute_date : config -> string -> Date.date option
 val print_someone : config -> base -> person -> unit
 val update_conf : config -> config
-val bad_date : config -> dmy -> 'a
-val check_greg_day : config -> dmy -> unit
+val bad_date : config -> Date.dmy -> 'a
+val check_greg_day : config -> Date.dmy -> unit
 
 val check_missing_witnesses_names :
   config ->

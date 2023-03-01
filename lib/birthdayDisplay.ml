@@ -120,7 +120,7 @@ let gen_print conf base mois f_scan dead_people =
   Hutil.trailer conf
 
 let print_anniversary_list conf base dead_people dt liste =
-  let a_ref = dt.year in
+  let a_ref = dt.Date.year in
   Output.print_sstring conf "<ul>\n";
   List.iter
     (fun (p, a, date_event, txt_of) ->
@@ -232,12 +232,12 @@ let propose_months conf mode =
 
 let day_after d =
   let day, r =
-    if d.day >= Date.nb_days_in_month d.month d.year then (1, 1)
+    if d.Date.day >= Date.nb_days_in_month d.month d.year then (1, 1)
     else (succ d.day, 0)
   in
   let month, r = if d.month + r > 12 then (1, 1) else (d.month + r, 0) in
   let year = d.year + r in
-  { day; month; year; prec = Sure; delta = 0 }
+  Date.{ day; month; year; prec = Sure; delta = 0 }
 
 let print_anniv conf base day_name fphrase wd dt = function
   | [] ->
@@ -363,7 +363,8 @@ let print_marriage_day conf base day_name fphrase wd dt = function
       print_anniversaries_of_marriage conf base list
 
 let match_dates conf base p d1 d2 =
-  if d1.day = d2.day && d1.month = d2.month then authorized_age conf base p
+  if d1.Date.day = d2.Date.day && d1.month = d2.month then
+    authorized_age conf base p
   else if
     d1.day = 29 && d1.month = 2 && d2.day = 1 && d2.month = 3
     && not (Date.leap_year d2.year)
@@ -519,7 +520,7 @@ let print_menu_dead conf base =
       Util.hidden_input conf "m" @@ Adef.encoded "AD")
 
 let match_mar_dates conf base cpl d1 d2 =
-  if d1.day = d2.day && d1.month = d2.month then
+  if d1.Date.day = d2.Date.day && d1.month = d2.month then
     authorized_age conf base (pget conf base (get_father cpl))
     && authorized_age conf base (pget conf base (get_mother cpl))
   else if
