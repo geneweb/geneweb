@@ -19,11 +19,11 @@ ODOC_DIR=$(BUILD_DIR)/_doc/_html
 # [BEGIN] Generated files section
 
 lib/gwlib.ml:
-	@echo -n "Generating $@..."
+	@echo -n "Generating $@…"
 	@echo "let prefix =" > $@
 	@echo "  try Sys.getenv \"GWPREFIX\"" >> $@
 	@echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
-	@echo " Done!"
+	@echo " Done."
 
 CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D) $(SOSA_D)
 
@@ -32,7 +32,7 @@ ifeq ($(DUNE_PROFILE),dev)
 endif
 
 %/dune: %/dune.in Makefile.config
-	@echo -n "Generating $@..." \
+	@echo -n "Generating $@…" \
 	&& cat $< \
 	| cppo -n $(CPPO_D) \
 	| sed \
@@ -42,25 +42,26 @@ endif
 	-e "s/%%%SYSLOG_PKG%%%/$(SYSLOG_PKG)/g" \
 	-e "s/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g" \
 	> $@ \
-	&& echo " Done!"
+	&& echo " Done."
 
 bin/gwrepl/.depend:
-	@echo -n "Generating $@..."
+	@echo -n "Generating $@…"
 	@pwd > $@
 	@dune top bin/gwrepl >> $@
-	@echo " Done!"
+	@echo " Done."
 
 dune-workspace: dune-workspace.in Makefile.config
 	cat $< | sed  -e "s/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g" > $@
 
 COMMIT := $$(git show -s --date=short --pretty=format:'%h (%cd)')
 hd/etc/version.txt:
-	@echo "generate $@ for commit $(COMMIT)"
 	@echo -n "<a href=\"https://github.com/geneweb/geneweb/commit/" > $@
 	@echo "$$(git show -s --pretty=format:'%h')\"" >> $@
 	@echo -n "  title=\"[*compiled on %s from commit %s:::$$(date '+%Y-%m-%d'):" >> $@
 	@echo -n "$(COMMIT)]\">" >> $@
 	@echo "GeneWeb v. %version;</a>" >> $@
+	@echo "Last commit is $(COMMIT)."
+	@echo "Generating $@… Done."
 
 .PHONY:hd/etc/version.txt
 
@@ -205,7 +206,7 @@ bench: | $(GENERATED_FILES_DEP)
 	dune build @runbench
 .PHONY: bench
 
-BENCH_FILE ?= /tmp/geneweb-bench.bin
+BENCH_FILE?=geneweb-bench.bin
 
 bench-marshal: ## Run benchmarks and record the result
 bench-marshal: | $(GENERATED_FILES_DEP)
@@ -219,21 +220,22 @@ endif
 bench-tabulate: ## Read BENCH_FILE and print a report
 bench-tabulate: | $(GENERATED_FILES_DEP)
 	dune exec benchmark/bench.exe -- --tabulate ${BENCH_FILE}
+	@$(RM) $(BENCH_FILE)
 .PHONY: bench-tabulate
 
 clean:
-	@echo -n "Cleaning..."
-	@$(RM) $(GENERATED_FILES_DEP) lib/*_piqi*.ml
+	@echo -n "Cleaning…"
+	@$(RM) $(GENERATED_FILES_DEP)
 	@$(RM) -r $(DISTRIB_DIR)
 	@dune clean
-	@echo " Done!"
+	@echo " Done."
 .PHONY: clean
 
 ci: ## Run unit tests and benchmark with different configurations
 ci:
-	@ocaml ./configure.ml && BENCH_NAME=vanilla $(MAKE) -s clean test bench-marshal clean
-	@ocaml ./configure.ml --sosa-num && BENCH_NAME=num $(MAKE) -s clean test bench-marshal clean
-	@ocaml ./configure.ml --sosa-zarith && BENCH_NAME=zarith $(MAKE) -s clean test bench-marshal clean
+	@ocaml ./configure.ml && BENCH_NAME=vanilla $(MAKE) -s clean test bench-marshal
+	@ocaml ./configure.ml --sosa-num && BENCH_NAME=num $(MAKE) -s clean test bench-marshal
+	@ocaml ./configure.ml --sosa-zarith && BENCH_NAME=zarith $(MAKE) -s clean test bench-marshal
 	@$(MAKE) -s bench-tabulate
 .PHONY: ci
 
