@@ -1,7 +1,7 @@
-type date = Def.date = Dgreg of dmy * calendar | Dtext of string
-and calendar = Def.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+type date = Date.date = Dgreg of dmy * calendar | Dtext of string
+and calendar = Date.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
 
-and dmy = Def.dmy = {
+and dmy = Date.dmy = {
   day : int;
   month : int;
   year : int;
@@ -9,9 +9,9 @@ and dmy = Def.dmy = {
   delta : int;
 }
 
-and dmy2 = Def.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
+and dmy2 = Date.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
 
-and precision = Def.precision =
+and precision = Date.precision =
   | Sure
   | About
   | Maybe

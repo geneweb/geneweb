@@ -1,25 +1,17 @@
 (* Copyright (c) 1998-2007 INRIA *)
 type cdate = Def.cdate
 
-type date = Def.date =
+type date =
   | Dgreg of dmy * calendar
   (* textual form of the date *)
   | Dtext of string
 (* TODO change for Calendars.kind *)
 
-and calendar = Def.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+and calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+and dmy = { day : int; month : int; year : int; prec : precision; delta : int }
+and dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
 
-and dmy = Def.dmy = {
-  day : int;
-  month : int;
-  year : int;
-  prec : precision;
-  delta : int;
-}
-
-and dmy2 = Def.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
-
-and precision = Def.precision =
+and precision =
   | Sure
   | About
   | Maybe

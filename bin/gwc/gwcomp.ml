@@ -169,7 +169,7 @@ let date_of_string s i =
   in
   let precision, i =
     match s.[i] with
-    | '~' -> (About, succ i)
+    | '~' -> (Date.About, succ i)
     | '?' -> (Maybe, succ i)
     | '>' -> (After, succ i)
     | '<' -> (Before, succ i)
@@ -182,6 +182,7 @@ let date_of_string s i =
   let error n = failwith (Printf.sprintf "date_of_string%d %s" n s) in
   let dmy2 year2 i =
     match skip_slash i with
+    | None -> ((0, 0, year2), i)
     | Some i -> (
         let month2 = year2 in
         let year2, i = champ i in
@@ -196,7 +197,6 @@ let date_of_string s i =
         | None ->
             if month2 < 1 || month2 > 13 then error 4
             else ((0, month2, year2), i))
-    | None -> ((0, 0, year2), i)
   in
   let date =
     match skip_slash i with
@@ -215,13 +215,15 @@ let date_of_string s i =
             if month < 1 || month > 13 then error 2
             else if day < 1 || day > 31 then error 3
             else
-              let d = { day; month; year; prec = precision; delta = 0 } in
-              Some (Dgreg (d, Dgregorian), i)
+              let d = Date.{ day; month; year; prec = precision; delta = 0 } in
+              Some (Date.Dgreg (d, Dgregorian), i)
         | None ->
             if year = 0 then None
             else if month < 1 || month > 13 then error 4
             else
-              let d = { day = 0; month; year; prec = precision; delta = 0 } in
+              let d =
+                Date.{ day = 0; month; year; prec = precision; delta = 0 }
+              in
               Some (Dgreg (d, Dgregorian), i))
     | None ->
         if undefined then
@@ -232,7 +234,9 @@ let date_of_string s i =
             Some (Dtext txt, String.length s)
           else failwith ("date_of_string " ^ s)
         else
-          let d = { day = 0; month = 0; year; prec = precision; delta = 0 } in
+          let d =
+            Date.{ day = 0; month = 0; year; prec = precision; delta = 0 }
+          in
           Some (Dgreg (d, Dgregorian), i)
   in
   let date =
@@ -242,12 +246,12 @@ let date_of_string s i =
         else if s.[i] = '|' then
           let year2, i = champ (succ i) in
           let (day2, month2, year2), i = dmy2 year2 i in
-          let dmy2 = { day2; month2; year2; delta2 = 0 } in
+          let dmy2 = Date.{ day2; month2; year2; delta2 = 0 } in
           Some (Dgreg ({ d with prec = OrYear dmy2 }, cal), i)
         else if i + 1 < String.length s && s.[i] = '.' && s.[i + 1] = '.' then
           let year2, i = champ (i + 2) in
           let (day2, month2, year2), i = dmy2 year2 i in
-          let dmy2 = { day2; month2; year2; delta2 = 0 } in
+          let dmy2 = Date.{ day2; month2; year2; delta2 = 0 } in
           Some (Dgreg ({ d with prec = YearInt dmy2 }, cal), i)
         else Some (dt, i)
     | Some ((Dtext _ as dt), i) -> Some (dt, i)
@@ -256,7 +260,7 @@ let date_of_string s i =
   let date =
     match date with
     | Some (Dgreg (d, _), i) -> (
-        if i = String.length s then Some (Dgreg (d, Dgregorian), i)
+        if i = String.length s then Some (Date.Dgreg (d, Dgregorian), i)
         else
           match s.[i] with
           | 'G' -> Some (Dgreg (d, Dgregorian), i + 1)

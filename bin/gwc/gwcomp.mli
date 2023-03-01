@@ -84,5 +84,5 @@ val comp_families : State.t -> string -> unit
 
 (* Ajout pour l'API *)
 
-val date_of_string : string -> int -> date option
+val date_of_string : string -> int -> Date.date option
 (** Parses [Def.date] from string that starts at pos [i] inside [s] *)

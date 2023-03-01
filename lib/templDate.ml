@@ -2,7 +2,6 @@
 (* Copyright (c) 2007 INRIA *)
 
 open Config
-open Def
 open TemplAst
 open Util
 

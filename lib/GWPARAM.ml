@@ -101,7 +101,7 @@ module Default = struct
         | None -> none ()
         | Some d ->
             let a = Date.time_elapsed d conf.today in
-            if a.Def.year > conf.Config.private_years then true
+            if a.Date.year > conf.Config.private_years then true
             else if a.year < conf.private_years then false
             else a.month > 0 || a.day > 0
       in

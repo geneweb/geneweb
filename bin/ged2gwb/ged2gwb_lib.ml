@@ -594,7 +594,7 @@ let make_date n1 n2 n3 =
                 else 0, 0
       in
       let (d, m) = if m < 1 || m > 13 then 0, 0 else d, m in
-      {day = d; month = m; year = y; prec = Sure; delta = 0}
+      Date.{day = d; month = m; year = y; prec = Sure; delta = 0}
   | None, Some m, Some y ->
       let m =
         match m with
@@ -609,9 +609,9 @@ let make_date n1 n2 n3 =
   | _ -> raise (Stream.Error "bad date")
 
 let recover_date cal = function
-  | Dgreg (d, Dgregorian) ->
+  | Date.Dgreg (d, Dgregorian) ->
     let d = Date.convert ~from:cal ~to_:Dgregorian d in
-    Dgreg (d, cal)
+    Date.Dgreg (d, cal)
   | d -> d
 
 [@@@ocaml.warning "-27"]
@@ -650,7 +650,7 @@ EXTEND
               let dmy2 = Date.convert ~from:Dgregorian ~to_:cal2 d2 in
               let dmy2 =
                 (* convert to Def.dmy2 *)
-                {day2 = dmy2.day; month2 = dmy2.month;
+                Date.{day2 = dmy2.day; month2 = dmy2.month;
                  year2 = dmy2.year; delta2 = 0}
               in
               Dgreg ({d1 with prec = YearInt dmy2}, cal1)
@@ -780,7 +780,7 @@ let preg_match pattern subject =
 
 let date_of_field d =
   if d = "" then None
-  else if preg_match "^[0-9]+$" d && String.length d > 8 then Some (Dtext d)
+  else if preg_match "^[0-9]+$" d && String.length d > 8 then Some (Date.Dtext d)
   else
     let s = Stream.of_string (String.uppercase_ascii d) in
     !state.date_str <- d;
@@ -902,12 +902,12 @@ let this_year =
 
 let infer_death birth bapt =
   match birth, bapt with
-  | Some (Dgreg (d, _)), _ ->
+  | Some (Date.Dgreg (d, _)), _ ->
     let a = this_year - d.year in
     if a > !state.dead_years then DeadDontKnowWhen
     else if a < !state.alive_years then NotDead
     else DontKnowIfDead
-  | _, Some (Dgreg (d, _)) ->
+  | _, Some (Date.Dgreg (d, _)) ->
     let a = this_year - d.year in
     if a > !state.dead_years then DeadDontKnowWhen
     else if a < !state.alive_years then NotDead
@@ -3063,9 +3063,9 @@ let check_parents_sex persons families couples strings =
   done
 
 let neg_year_dmy = function
-  | {day = d; month = m; year = y; prec = OrYear dmy2} ->
+  | Date.{day = d; month = m; year = y; prec = OrYear dmy2} ->
     let dmy2 = {dmy2 with year2 = -abs dmy2.year2} in
-    {day = d; month = m; year = -abs y; prec = OrYear dmy2; delta = 0}
+    Date.{day = d; month = m; year = -abs y; prec = OrYear dmy2; delta = 0}
   | {day = d; month = m; year = y; prec = YearInt dmy2} ->
     let dmy2 = {dmy2 with year2 = -abs dmy2.year2} in
     {day = d; month = m; year = -abs y; prec = YearInt dmy2; delta = 0}
@@ -3073,7 +3073,7 @@ let neg_year_dmy = function
     {day = d; month = m; year = -abs y; prec = p; delta = 0}
 
 let neg_year = function
-  | Dgreg (d, cal) -> Dgreg (neg_year_dmy d, cal)
+  | Date.Dgreg (d, cal) -> Date.Dgreg (neg_year_dmy d, cal)
   | x -> x
 
 let neg_year_cdate cd = Date.cdate_of_date (neg_year (Date.date_of_cdate cd))

@@ -132,20 +132,21 @@ let dmy_to_sdn_range_l dmy =
       if dmy.delta != 0 then sdn + dmy.delta
       else
         let dmy2 =
-          {
-            year =
-              (if dmy.month = 0 || (dmy.month = 12 && dmy.day = 0) then
-               dmy.year + 1
-              else dmy.year);
-            month =
-              (if dmy.month = 0 then 1
-              else if dmy.day = 0 then
-                if dmy.month = 12 then 1 else dmy.month + 1
-              else dmy.month);
-            day = (if dmy.day = 0 then 1 else dmy.day);
-            prec = (if dmy.month = 0 || dmy.day = 0 then Before else Sure);
-            delta = dmy.delta;
-          }
+          Date.
+            {
+              year =
+                (if dmy.month = 0 || (dmy.month = 12 && dmy.day = 0) then
+                 dmy.year + 1
+                else dmy.year);
+              month =
+                (if dmy.month = 0 then 1
+                else if dmy.day = 0 then
+                  if dmy.month = 12 then 1 else dmy.month + 1
+                else dmy.month);
+              day = (if dmy.day = 0 then 1 else dmy.day);
+              prec = (if dmy.month = 0 || dmy.day = 0 then Before else Sure);
+              delta = dmy.delta;
+            }
         in
         let sdn2 = Date.to_sdn ~from:Dgregorian dmy2 in
         if dmy2.prec = Before then sdn2 - 1 else sdn2
@@ -153,7 +154,7 @@ let dmy_to_sdn_range_l dmy =
     (sdn, sdn2)
   in
   (* S: calls to sdn_of_dmy dmy can be factorized *)
-  match dmy.prec with
+  match dmy.Date.prec with
   | Sure ->
       let sdn1, sdn2 = sdn_of_dmy dmy in
       [ (Some sdn1, Some sdn2) ]
@@ -224,13 +225,13 @@ let compatible_dmys dmy1 dmy2 =
 let compatible_dates date1 date2 =
   let compatible_cals cal1 cal2 =
     match (cal1, cal2) with
-    | Dgregorian, Djulian | Dgregorian, Dfrench -> true
+    | Date.Dgregorian, Date.Djulian | Dgregorian, Dfrench -> true
     | _ -> cal1 = cal2
   in
   if date1 = date2 then true
   else
     match (date1, date2) with
-    | Dgreg (dmy1, cal1), Dgreg (dmy2, cal2) ->
+    | Date.Dgreg (dmy1, cal1), Date.Dgreg (dmy2, cal2) ->
         compatible_dmys dmy1 dmy2 && compatible_cals cal1 cal2
     | Dgreg (_, _), Dtext _ -> false
     | Dtext _, _ -> true

@@ -88,16 +88,16 @@ let eval_date_field = function
   | None -> None
   | Some d -> (
       match d with
-      | Dgreg (d, calendar) ->
+      | Date.Dgreg (d, calendar) ->
           Some (Date.convert ~from:Dgregorian ~to_:calendar d)
       | Dtext _ -> None)
 
 let eval_is_cal cal = function
-  | Some (Dgreg (_, x)) -> if x = cal then "1" else ""
+  | Some (Date.Dgreg (_, x)) -> if x = cal then "1" else ""
   | Some (Dtext _) | None -> ""
 
 let eval_is_prec cond = function
-  | Some (Dgreg ({ prec = x }, _)) -> if cond x then "1" else ""
+  | Some (Date.Dgreg ({ prec = x }, _)) -> if cond x then "1" else ""
   | Some (Dtext _) | None -> ""
 
 (* TODO : rewrite, looks bad *)
@@ -107,7 +107,7 @@ let eval_date_var od s =
   match s with
   | "calendar" -> (
       match od with
-      | Some (Dgreg (_, Dgregorian)) -> "gregorian"
+      | Some (Date.Dgreg (_, Dgregorian)) -> "gregorian"
       | Some (Dgreg (_, Djulian)) -> "julian"
       | Some (Dgreg (_, Dfrench)) -> "french"
       | Some (Dgreg (_, Dhebrew)) -> "hebrew"

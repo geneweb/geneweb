@@ -12,15 +12,16 @@ let get_k conf =
       try int_of_string (List.assoc "latest_event" conf.base_env)
       with Not_found | Failure _ -> 20)
 
-let select (type a) (module Q : Pqueue.S with type elt = a * dmy * calendar)
-    nb_of iterator get get_date conf base =
+let select (type a)
+    (module Q : Pqueue.S with type elt = a * Date.dmy * Date.calendar) nb_of
+    iterator get get_date conf base =
   let n = min (max 0 (get_k conf)) (nb_of base) in
   let ref_date =
     match p_getint conf.env "by" with
     | Some by ->
         let bm = Option.value ~default:(-1) (p_getint conf.env "bm") in
         let bd = Option.value ~default:(-1) (p_getint conf.env "bd") in
-        Some { day = bd; month = bm; year = by; prec = Sure; delta = 0 }
+        Some Date.{ day = bd; month = bm; year = by; prec = Sure; delta = 0 }
     | None -> None
   in
   let q, len =
@@ -28,6 +29,7 @@ let select (type a) (module Q : Pqueue.S with type elt = a * dmy * calendar)
       (fun (q, len) i ->
         let x = get base i in
         match get_date x with
+        | Some (Date.Dtext _) | None -> (q, len)
         | Some (Dgreg (d, cal)) ->
             let aft =
               match ref_date with
@@ -38,8 +40,7 @@ let select (type a) (module Q : Pqueue.S with type elt = a * dmy * calendar)
             else
               let e = (x, d, cal) in
               if len < n then (Q.add e q, len + 1)
-              else (snd (Q.take (Q.add e q)), len)
-        | _ -> (q, len))
+              else (snd (Q.take (Q.add e q)), len))
       (Q.empty, 0) (iterator base)
   in
   let rec loop list q =
@@ -51,13 +52,13 @@ let select (type a) (module Q : Pqueue.S with type elt = a * dmy * calendar)
   loop [] q
 
 module PQ = Pqueue.Make (struct
-  type t = Gwdb.person * Def.dmy * Def.calendar
+  type t = Gwdb.person * Date.dmy * Date.calendar
 
   let leq (_, x, _) (_, y, _) = Date.compare_dmy x y <= 0
 end)
 
 module PQ_oldest = Pqueue.Make (struct
-  type t = Gwdb.person * Def.dmy * Def.calendar
+  type t = Gwdb.person * Date.dmy * Date.calendar
 
   let leq (_, x, _) (_, y, _) = Date.compare_dmy y x <= 0
 end)
@@ -69,13 +70,13 @@ let select_person conf base get_date find_oldest =
     nb_of_persons Gwdb.ipers (pget conf) get_date conf base
 
 module FQ = Pqueue.Make (struct
-  type t = Gwdb.family * Def.dmy * Def.calendar
+  type t = Gwdb.family * Date.dmy * Date.calendar
 
   let leq (_, x, _) (_, y, _) = Date.compare_dmy x y <= 0
 end)
 
 module FQ_oldest = Pqueue.Make (struct
-  type t = Gwdb.family * Def.dmy * Def.calendar
+  type t = Gwdb.family * Date.dmy * Date.calendar
 
   let leq (_, x, _) (_, y, _) = Date.compare_dmy y x <= 0
 end)

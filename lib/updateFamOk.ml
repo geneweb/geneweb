@@ -11,10 +11,10 @@ open Update_util
 let removed_string = ref []
 
 type create_info = Update.create_info = {
-  ci_birth_date : date option;
+  ci_birth_date : Date.date option;
   ci_birth_place : string;
   ci_death : death;
-  ci_death_date : date option;
+  ci_death_date : Date.date option;
   ci_death_place : string;
   ci_occupation : string;
   ci_public : bool;

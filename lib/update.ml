@@ -14,7 +14,7 @@ type update_error =
   | UERR_already_defined of base * person * string
   | UERR_own_ancestor of base * person
   | UERR_digest
-  | UERR_bad_date of Def.dmy
+  | UERR_bad_date of Date.dmy
   | UERR_missing_field of Adef.safe_string
   | UERR_already_has_parents of base * person
   | UERR_missing_surname of Adef.safe_string
@@ -23,11 +23,12 @@ type update_error =
 
 exception ModErr of update_error
 
+(* TODO duplicate *)
 type create_info = {
-  ci_birth_date : date option;
+  ci_birth_date : Date.date option;
   ci_birth_place : string;
   ci_death : death;
-  ci_death_date : date option;
+  ci_death_date : Date.date option;
   ci_death_place : string;
   ci_occupation : string;
   ci_public : bool;
@@ -50,7 +51,7 @@ let infer_death_from_cdate conf ?(max_age = maximum_lifespan) cdate =
 
 let infer_death_bb conf birth bapt =
   let infer_death_from_odate conf = function
-    | Some (Dgreg (d, _)) -> infer_death_from_dmy conf d
+    | Some (Date.Dgreg (d, _)) -> infer_death_from_dmy conf d
     | Some (Dtext _) | None -> DontKnowIfDead
   in
   match infer_death_from_odate conf birth with
@@ -895,10 +896,11 @@ let reconstitute_date_dmy2 conf var =
   match get_number var "oryear" conf.env with
   | Some y -> (
       match m with
+      | None -> Date.{ day2 = 0; month2 = 0; year2 = y; delta2 = 0 }
       | Some m -> (
           match get_number var "orday" conf.env with
           | Some d ->
-              let dmy2 = { day2 = d; month2 = m; year2 = y; delta2 = 0 } in
+              let dmy2 = Date.{ day2 = d; month2 = m; year2 = y; delta2 = 0 } in
               if
                 dmy2.day2 >= 1 && dmy2.day2 <= 31 && dmy2.month2 >= 1
                 && dmy2.month2 <= 13
@@ -907,12 +909,11 @@ let reconstitute_date_dmy2 conf var =
                 let d = Date.dmy_of_dmy2 dmy2 in
                 bad_date conf d
           | None ->
-              let dmy2 = { day2 = 0; month2 = m; year2 = y; delta2 = 0 } in
+              let dmy2 = Date.{ day2 = 0; month2 = m; year2 = y; delta2 = 0 } in
               if dmy2.month2 >= 1 && dmy2.month2 <= 13 then dmy2
               else
                 let d = Date.dmy_of_dmy2 dmy2 in
-                bad_date conf d)
-      | None -> { day2 = 0; month2 = 0; year2 = y; delta2 = 0 })
+                bad_date conf d))
   | None -> raise @@ ModErr (UERR_missing_field (Adef.safe "oryear"))
 
 let reconstitute_date_dmy conf var =
@@ -951,10 +952,11 @@ let reconstitute_date_dmy conf var =
   in
   let d =
     match int_of_field y with
+    | None -> None
     | Some y -> (
         let prec =
           match prec with
-          | Some "about" -> About
+          | Some "about" -> Date.About
           | Some "maybe" -> Maybe
           | Some "before" -> Before
           | Some "after" -> After
@@ -973,19 +975,20 @@ let reconstitute_date_dmy conf var =
           | Some _ | None -> Sure
         in
         match m with
+        | None -> Some Date.{ day = 0; month = 0; year = y; prec; delta = 0 }
         | Some m -> (
             match get_number var "dd" conf.env with
-            | Some d ->
-                let d = { day = d; month = m; year = y; prec; delta = 0 } in
+            | Some day ->
+                let d = Date.{ day; month = m; year = y; prec; delta = 0 } in
                 if d.day >= 1 && d.day <= 31 && d.month >= 1 && d.month <= 13
                 then Some d
                 else bad_date conf d
             | None ->
-                let d = { day = 0; month = m; year = y; prec; delta = 0 } in
+                let d =
+                  Date.{ day = 0; month = m; year = y; prec; delta = 0 }
+                in
                 if d.month >= 1 && d.month <= 13 then Some d
-                else bad_date conf d)
-        | None -> Some { day = 0; month = 0; year = y; prec; delta = 0 })
-    | None -> None
+                else bad_date conf d))
   in
   (d, force_f_cal)
 
@@ -1029,7 +1032,7 @@ let check_missing_witnesses_names conf get list =
   loop list
 
 let check_greg_day conf d =
-  if d.day > Date.nb_days_in_month d.month d.year then bad_date conf d
+  if d.Date.day > Date.nb_days_in_month d.month d.year then bad_date conf d
 
 let reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
@@ -1038,14 +1041,14 @@ let reconstitute_date conf var =
         match p_getenv conf.env (var ^ "_cal") with
         | Some "G" | None ->
             check_greg_day conf d;
-            Dgregorian
+            Date.Dgregorian
         | Some "J" -> Djulian
         | Some "F" -> Dfrench
         | Some "H" -> Dhebrew
         | _ -> Dgregorian
       in
       let date = Date.convert ~from:calendar ~to_:Dgregorian d in
-      Some (Dgreg (date, calendar))
+      Some (Date.Dgreg (date, calendar))
   | Some d, true ->
       Some (Dgreg (Date.convert ~from:Dfrench ~to_:Dgregorian d, Dfrench))
   | None, _ -> (

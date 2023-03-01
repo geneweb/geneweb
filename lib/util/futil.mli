@@ -3,12 +3,12 @@
 open Def
 
 val map_title_strings :
-  ?fd:(Def.date -> Def.date) -> ('a -> 'b) -> 'a gen_title -> 'b gen_title
+  ?fd:(Date.date -> Date.date) -> ('a -> 'b) -> 'a gen_title -> 'b gen_title
 (** Convert generic type used to represent name, id and the place of [Def.gen_title] into
     another one. If [fd] is present, apply it on the date of the start and date of the end of a title *)
 
 val map_pers_event :
-  ?fd:(Def.date -> Def.date) ->
+  ?fd:(Date.date -> Date.date) ->
   ('a -> 'c) ->
   ('b -> 'd) ->
   ('a, 'b) gen_pers_event ->
@@ -21,7 +21,7 @@ val map_pers_event :
     If [fd] is present, apply it on date of the personal event.  *)
 
 val map_fam_event :
-  ?fd:(Def.date -> Def.date) ->
+  ?fd:(Date.date -> Date.date) ->
   ('a -> 'c) ->
   ('b -> 'd) ->
   ('a, 'b) gen_fam_event ->
@@ -41,7 +41,7 @@ val map_relation_ps :
     - Generic type used to represent sources of [Def.gen_relation] into another one. *)
 
 val map_person_ps :
-  ?fd:(Def.date -> Def.date) ->
+  ?fd:(Date.date -> Date.date) ->
   ('b -> 'd) ->
   ('c -> 'e) ->
   ('a, 'b, 'c) gen_person ->
@@ -63,11 +63,11 @@ val map_union_f : ('a -> 'b) -> 'a gen_union -> 'b gen_union
 (** Convert generic type used to represent one of the famillies inside [Def.gen_union] into
     another one. *)
 
-val map_divorce : (Def.date -> Def.date) -> Def.divorce -> Def.divorce
+val map_divorce : (Date.date -> Date.date) -> Def.divorce -> Def.divorce
 (** Convert generic type used to represent a divorce into another one. *)
 
 val map_family_ps :
-  ?fd:(Def.date -> Def.date) ->
+  ?fd:(Date.date -> Date.date) ->
   ('a -> 'b) ->
   ('c -> 'd) ->
   ('e -> 'f) ->
@@ -126,6 +126,6 @@ val gen_person_misc_names :
     It can contain duplicates. Strings are used raw (not lowered).
  *)
 
-val map_cdate : (Def.date -> Def.date) -> Adef.cdate -> Adef.cdate
-val map_death : (Def.date -> Def.date) -> Def.death -> Def.death
-val map_burial : (Def.date -> Def.date) -> Def.burial -> Def.burial
+val map_cdate : (Date.date -> Date.date) -> Adef.cdate -> Adef.cdate
+val map_death : (Date.date -> Date.date) -> Def.death -> Def.death
+val map_burial : (Date.date -> Date.date) -> Def.burial -> Def.burial

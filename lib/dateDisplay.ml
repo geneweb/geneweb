@@ -2,6 +2,7 @@
 
 open Config
 open Def
+open Date
 open Util
 open Gwdb
 
@@ -475,14 +476,14 @@ let string_of_age conf a =
       else "0"
 
 (* ************************************************************************ *)
-(*  [Fonc] prec_text : config -> Def.dmy -> string                          *)
+(*  [Fonc] prec_text : config -> Date.dmy -> string                          *)
 
 (* ************************************************************************ *)
 
 (** [Description] : Renvoie la précision d'une date.
     [Args] :
       - conf : configuration de la base
-      - d    : Def.dmy
+      - d    : Date.dmy
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
 let prec_text conf d =
@@ -499,25 +500,25 @@ let prec_text conf d =
   | Sure -> ""
 
 (* ************************************************************************ *)
-(*  [Fonc] month_text : Def.dmy -> string                                   *)
+(*  [Fonc] month_text : Date.dmy -> string                                   *)
 
 (* ************************************************************************ *)
 
 (** [Description] : Renvoie le mois d'une date.
     [Args] :
-      - d : Def.dmy
+      - d : Date.dmy
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
 let month_text d = if d.month = 0 then "" else string_of_int d.month
 
 (* ************************************************************************ *)
-(*  [Fonc] year_text : Def.dmy -> string                                    *)
+(*  [Fonc] year_text : Date.dmy -> string                                    *)
 
 (* ************************************************************************ *)
 
 (** [Description] : Renvoie l'année d'une date.
     [Args] :
-      - d : Def.dmy
+      - d : Date.dmy
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
 let year_text d =
@@ -529,14 +530,14 @@ let year_text d =
   | _ -> string_of_int d.year
 
 (* ************************************************************************ *)
-(*  [Fonc] prec_year_text : config -> Def.dmy -> string                     *)
+(*  [Fonc] prec_year_text : config -> Date.dmy -> string                     *)
 
 (* ************************************************************************ *)
 
 (** [Description] : Renvoie la précision d'une date et l'année de la date.
     [Args] :
       - conf : configuration de la base
-      - d    : Def.dmy
+      - d    : Date.dmy
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
 let prec_year_text conf d =

@@ -163,7 +163,7 @@ and dtext_eq =
     (Jg_runtime.jg_obj_lookup d1 "__str__"
     = Jg_runtime.jg_obj_lookup d2 "__str__")
 
-and mk_dmy { Def.day; month; year; delta; prec } =
+and mk_dmy { Date.day; month; year; delta; prec } =
   let day = Tint day in
   let month = Tint month in
   let year = Tint year in
@@ -179,7 +179,7 @@ and mk_dmy { Def.day; month; year; delta; prec } =
     | _ -> raise Not_found)
 
 and mk_date = function
-  | Def.Dtext s ->
+  | Date.Dtext s ->
       Tpat
         (function
         | "__str__" -> Tstr s
@@ -188,19 +188,19 @@ and mk_date = function
         | "__Dtext__" -> Tbool true
         | _ -> raise Not_found)
   | Dgreg (d, c) ->
-      let year = Tint d.Def.year in
-      let month = Tint d.Def.month in
-      let day = Tint d.Def.day in
-      let prec = to_prec d.Def.prec in
+      let year = Tint d.Date.year in
+      let month = Tint d.Date.month in
+      let day = Tint d.Date.day in
+      let prec = to_prec d.Date.prec in
       let d2 =
-        match d.Def.prec with
+        match d.Date.prec with
         | OrYear d2 | YearInt d2 ->
             mk_dmy
               {
-                Def.day = d2.Def.day2;
-                month = d2.Def.month2;
-                year = d2.Def.year2;
-                prec = Def.Sure;
+                Date.day = d2.Date.day2;
+                month = d2.Date.month2;
+                year = d2.Date.year2;
+                prec = Date.Sure;
                 delta = 0;
               }
         | _ -> Tnull
@@ -227,7 +227,7 @@ and mk_date = function
 and to_dmy d =
   let int s = match Jg_runtime.jg_obj_lookup d s with Tint i -> i | _ -> 0 in
   {
-    Def.day = int "day";
+    Date.day = int "day";
     month = int "month";
     year = int "year";
     prec = of_prec d;
@@ -236,10 +236,15 @@ and to_dmy d =
 
 and to_dmy2 d =
   let int s = match Jg_runtime.jg_obj_lookup d s with Tint i -> i | _ -> 0 in
-  { Def.day2 = int "day"; month2 = int "month"; year2 = int "year"; delta2 = 0 }
+  {
+    Date.day2 = int "day";
+    month2 = int "month";
+    year2 = int "year";
+    delta2 = 0;
+  }
 
 and to_prec = function
-  | Def.Sure -> Tsafe "sure"
+  | Date.Sure -> Tsafe "sure"
   | About -> Tsafe "about"
   | Maybe -> Tsafe "maybe"
   | Before -> Tsafe "before"
@@ -249,7 +254,7 @@ and to_prec = function
 
 and of_prec d =
   match Jg_runtime.jg_obj_lookup d "prec" with
-  | Tsafe "sure" -> Def.Sure
+  | Tsafe "sure" -> Date.Sure
   | Tsafe "about" -> About
   | Tsafe "maybe" -> Maybe
   | Tsafe "before" -> Before
@@ -269,10 +274,10 @@ and to_gregorian_aux calendar d =
 
 and of_calendar d =
   match Jg_runtime.jg_obj_lookup d "calendar" with
-  | Tsafe "Dgregorian" -> Def.Dgregorian
-  | Tsafe "Djulian" -> Def.Djulian
-  | Tsafe "Dfrench" -> Def.Dfrench
-  | Tsafe "Dhebrew" -> Def.Dhebrew
+  | Tsafe "Dgregorian" -> Date.Dgregorian
+  | Tsafe "Djulian" -> Date.Djulian
+  | Tsafe "Dfrench" -> Date.Dfrench
+  | Tsafe "Dhebrew" -> Date.Dhebrew
   | _ -> assert false
 
 and module_DATE conf =
@@ -294,7 +299,7 @@ and module_DATE conf =
   let death_symbol = Tsafe (DateDisplay.death_symbol conf) in
   let string_of_date_aux fn =
     func_arg1_no_kw @@ fun d ->
-    try safe (Def.Dgreg (to_dmy d, of_calendar d) |> fn conf)
+    try safe (Date.Dgreg (to_dmy d, of_calendar d) |> fn conf)
     with e ->
       if Jg_runtime.jg_obj_lookup d "__Dtext__" = Tbool true then
         Jg_runtime.jg_obj_lookup d "__str__"
