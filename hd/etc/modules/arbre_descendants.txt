@@ -40,7 +40,7 @@
     </a>
   %end;
   <br>
-  %if;(e.im!="")
+  %if;(e.im!="off")
     %if;xxx.has_image;
       %if;not cancel_links;
         <a href="%xxx.image_url;" class="normal_anchor" %nn;
