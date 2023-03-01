@@ -1042,7 +1042,7 @@ let relation_sex_is_coherent base warning p =
       (match r.r_fath with
       | Some ip ->
           let p = poi base ip in
-          if get_sex p <> Male then warning (IncoherentSex (p, 0, 0))
+          if get_sex p <> Male then warning (Warning.IncoherentSex (p, 0, 0))
       | None -> ());
       match r.r_moth with
       | Some ip ->
@@ -1063,7 +1063,7 @@ let all_checks_person base p a u =
   let wl = List.sort_uniq compare !wl in
   List.iter
     (function
-      | ChangedOrderOfChildren (ifam, _, _, after) ->
+      | Warning.ChangedOrderOfChildren (ifam, _, _, after) ->
           patch_descend base ifam { children = after }
       | ChangedOrderOfPersonEvents (_, _, after) ->
         patch_person base p.key_index { p with pevents = after }

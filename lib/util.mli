@@ -573,7 +573,7 @@ val sprintf_today : Config.config -> Adef.safe_string
     Uses {!val:Mutil.sprintf_date} in order to print datetime defined in [conf]. *)
 
 val auth_warning :
-  config -> base -> ('a, person, ifam, 'b, 'c, 'd, 'e) warning -> bool
+  config -> base -> ('a, person, ifam, 'b, 'c, 'd, 'e) Warning.warning -> bool
 (** [auth_warning conf base w]
     Check if current user has enough right in order to see [w] *)
 

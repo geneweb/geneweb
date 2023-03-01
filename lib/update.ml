@@ -420,7 +420,7 @@ let someone_strong_n_short_dates conf base p =
   ^^^ DateDisplay.short_dates_text conf base p
 
 let print_warning conf base (w : CheckItem.base_warning) = match w with
-  | BigAgeBetweenSpouses (p1, p2, a) ->
+  | Warning.BigAgeBetweenSpouses (p1, p2, a) ->
       Output.printf conf
         (fcapitale
            (ftransl conf
@@ -728,7 +728,7 @@ let print_warnings conf base (wl : CheckItem.base_warning list) =
       - unit
     [Rem] : Non exporté en clair hors de ce module.                          *)
 let print_misc conf _base = function
-  | MissingSources ->
+  | Warning.MissingSources ->
       Output.print_sstring conf "<em>";
       Output.printf conf "%s\n"
         (Utf8.capitalize_fst (transl conf "missing sources"));

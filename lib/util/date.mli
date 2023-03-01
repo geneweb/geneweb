@@ -1,6 +1,33 @@
 (* Copyright (c) 1998-2007 INRIA *)
+type cdate = Def.cdate
 
-open Def
+type date = Def.date =
+  | Dgreg of dmy * calendar
+  (* textual form of the date *)
+  | Dtext of string
+(* TODO change for Calendars.kind *)
+
+and calendar = Def.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
+
+and dmy = Def.dmy = {
+  day : int;
+  month : int;
+  year : int;
+  prec : precision;
+  delta : int;
+}
+
+and dmy2 = Def.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
+
+and precision = Def.precision =
+  | Sure
+  | About
+  | Maybe
+  | Before
+  | After
+  | OrYear of dmy2
+  (* inteval *)
+  | YearInt of dmy2
 
 val leap_year : int -> bool
 (** Says if the given year is a leap year. *)
@@ -9,7 +36,7 @@ val nb_days_in_month : int -> int -> int
 (** Returns number of days for the given month and year for
     gregorian calendar. Takes into account leap years. *)
 
-val time_elapsed : Def.dmy -> Def.dmy -> Def.dmy
+val time_elapsed : dmy -> dmy -> dmy
 (** [time_elapsed start stop]
     Compute the time elapsed between [start] and [stop].
     If [stop] is prior to [start], resulting [dmy]'s field
@@ -22,15 +49,15 @@ val time_elapsed : Def.dmy -> Def.dmy -> Def.dmy
     Used to compare only gregorian calendar's dates.
  *)
 
-val time_elapsed_opt : Def.dmy -> Def.dmy -> Def.dmy option
+val time_elapsed_opt : dmy -> dmy -> dmy option
 (** Same as [time_elapsed], but will return [None]
     if computation is not possible
     (e.g. time_elapsed_opt /1839 /1859). *)
 
 (* TODO add date_of_burial/event?  *)
-val dmy_of_death : Def.death -> Def.dmy option
+val dmy_of_death : Def.death -> dmy option
 
-val date_of_death : Def.death -> Def.date option
+val date_of_death : Def.death -> date option
 (** Returns date of death if present. *)
 
 val dmy_of_dmy2 : dmy2 -> dmy
@@ -89,22 +116,22 @@ val cdate_of_od : date option -> cdate
 
 (* TODO this is buggy,
    because geneweb uses month|day = 0 for incomplete dates *)
-(* we use Def.calendar for now instead of 'a Calendars.kind *)
+(* we use calendar for now instead of 'a Calendars.kind *)
 
-val to_sdn : from:Def.calendar -> Def.dmy -> int
-(** Convert a [Def.dmy] in calendar [from] to SDN *)
+val to_sdn : from:calendar -> dmy -> int
+(** Convert a [dmy] in calendar [from] to SDN *)
 
-val convert : from:Def.calendar -> to_:Def.calendar -> Def.dmy -> Def.dmy
+val convert : from:calendar -> to_:calendar -> dmy -> dmy
 (** [convert ~from ~to_ dmy] Converts a [dmy] from calendar [from] to calendar [to_]; Correctly convert [dmy.prec] *)
 
-val gregorian_of_sdn : prec:Def.precision -> int -> Def.dmy
-(** Convert SDN to [Def.dmy] in gregorian calendar *)
+val gregorian_of_sdn : prec:precision -> int -> dmy
+(** Convert SDN to [dmy] in gregorian calendar *)
 
-val julian_of_sdn : prec:Def.precision -> int -> Def.dmy
-(** Convert SDN to [Def.dmy] in julian calendar *)
+val julian_of_sdn : prec:precision -> int -> dmy
+(** Convert SDN to [dmy] in julian calendar *)
 
-val french_of_sdn : prec:Def.precision -> int -> Def.dmy
-(** Convert SDN to [Def.dmy] in french calendar *)
+val french_of_sdn : prec:precision -> int -> dmy
+(** Convert SDN to [dmy] in french calendar *)
 
-val hebrew_of_sdn : prec:Def.precision -> int -> Def.dmy
-(** Convert SDN to [Def.dmy] in hebrew calendar *)
+val hebrew_of_sdn : prec:precision -> int -> dmy
+(** Convert SDN to [dmy] in hebrew calendar *)

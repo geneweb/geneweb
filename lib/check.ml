@@ -94,7 +94,7 @@ let print_base_warning oc base (w : CheckItem.base_warning) =
   let get_fevent_name e = e.efam_name in
   let get_pevent_name e = e.epers_name in
   match w with
-  | BigAgeBetweenSpouses (p1, p2, a) ->
+  | Warning.BigAgeBetweenSpouses (p1, p2, a) ->
       Printf.fprintf oc
         "The difference of age between %s and %s is quite important: %d\n"
         (designation base p1) (designation base p2) a.year
@@ -265,7 +265,7 @@ let rec check_ancestors base warning year year_tab ip ini_p =
         | CheckInfered (CheckBefore y')
         | CheckInfered (CheckOther y') ) )
       when y >= y' ->
-        warning (IncoherentAncestorDate (Lazy.force p, p'))
+        warning (Warning.IncoherentAncestorDate (Lazy.force p, p'))
     | _ -> ()
   in
   if Gwdb.Marker.get year_tab ip = dummy_date then (

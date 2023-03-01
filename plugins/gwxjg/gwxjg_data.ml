@@ -816,7 +816,7 @@ and mk_warning conf base =
       a
   in
   fun (warning : CheckItem.base_warning) -> match warning with
-  | Def.BigAgeBetweenSpouses (f, m, a) ->
+  | Warning.BigAgeBetweenSpouses (f, m, a) ->
       Tset
         [
           Tsafe "BigAgeBetweenSpouses";
