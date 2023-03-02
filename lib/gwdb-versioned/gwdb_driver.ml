@@ -517,7 +517,39 @@ module Legacy_driver = struct
   let get_pevent_src pe = pe.pevent.epers_src
   let get_pevent_witnesses pe = pe.pevent.epers_witnesses
   let get_pevent_witness_notes pe = pe.pwitness_notes
-  
+
+  let get_pevent_witnesses_and_notes pe =
+    let len = Array.length pe.pevent.epers_witnesses in
+    Array.init len (fun iw ->
+        let ip, wk = pe.pevent.epers_witnesses.(iw) in
+        let wnote = pe.pwitness_notes.(iw) in
+        ip, wk, wnote
+      )
+
+  let gen_pevent_of_pers_event pe =
+    let genpers = Translate.legacy_to_def_pevent empty_string pe.pevent in
+    let len = Array.length pe.pevent.epers_witnesses in
+    let epers_witnesses = Array.init len (fun i ->
+        let ip, wk = pe.pevent.epers_witnesses.(i) in
+        let wnote = pe.pwitness_notes.(i) in
+        ip, wk, wnote
+      ) in
+    {genpers with epers_witnesses}
+    
+  let pers_event_of_gen_pevent base genpers = assert false
+
+  let gen_fevent_of_fam_event fe =
+    let genfam = Translate.legacy_to_def_fevent empty_string fe.fevent in
+    let len = Array.length fe.fevent.efam_witnesses in
+    let efam_witnesses = Array.init len (fun i ->
+        let ip, wk = fe.fevent.efam_witnesses.(i) in
+        let wnote = fe.fwitness_notes.(i) in
+        ip, wk, wnote
+      ) in
+    {genfam with efam_witnesses}
+    
+  let fam_event_of_gen_fevent base genfam = assert false
+    
 (*  let get_fevents f =
     let fevents = get_fevents f.family in
     let fevents =
@@ -555,6 +587,14 @@ module Legacy_driver = struct
   let get_fevent_src fe = fe.fevent.efam_src
   let get_fevent_witnesses fe = fe.fevent.efam_witnesses
   let get_fevent_witness_notes fe = fe.fwitness_notes
+
+  let get_fevent_witnesses_and_notes fe =
+    let len = Array.length fe.fevent.efam_witnesses in
+    Array.init len (fun iw ->
+        let ip, wk = fe.fevent.efam_witnesses.(iw) in
+        let wnote = fe.fwitness_notes.(iw) in
+        ip, wk, wnote
+      )
   
   let build_from_scratch_pevents base =
     let persons = Gwdb_legacy.Gwdb_driver.persons base in
@@ -878,31 +918,6 @@ module Legacy_driver = struct
       (fun family ->
         { family; base; witness_notes = None })
       coll
-
-    let get_pevent_name pe = assert false
-
-  let get_pevent_date pe = assert false
-
-  let get_pevent_place pe = assert false
-  let get_pevent_reason pe = assert false
-  let get_pevent_note pe = assert false
-  let get_pevent_src pe = assert false
-  let get_pevent_witnesses pe = assert false
-  let get_pevent_witness_notes pe =assert false
-  let get_pevent_witnesses_and_notes pe = assert false
-  let gen_pevent_of_pers_event pe = assert false
-  let pers_event_of_gen_pevent base pe = assert false
-  let get_fevent_name fe = assert false
-  let get_fevent_date fe = assert false
-  let get_fevent_place fe = assert false
-  let get_fevent_reason fe = assert false
-  let get_fevent_note fe = assert false
-  let get_fevent_src fe = assert false
-  let get_fevent_witnesses fe = assert false
-  let get_fevent_witness_notes fe = assert false
-  let get_fevent_witnesses_and_notes fe = assert false
-  let gen_fevent_of_fam_event fe = assert false
-  let fam_event_of_gen_fevent base fe = assert false
 
 end
 
