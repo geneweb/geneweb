@@ -2741,3 +2741,12 @@ let get_bases_list () =
   Unix.closedir dh;
   list := List.sort compare !list;
   !list
+
+let list_cmp cmp l1 l2 =
+  let rec aux l1 l2 = match l1, l2 with
+    | x :: xs , y :: ys when cmp x y -> aux xs ys
+    | [], [] -> true
+    | _ -> false
+  in
+  aux l1 l2
+
