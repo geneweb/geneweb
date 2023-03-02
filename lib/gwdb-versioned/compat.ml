@@ -36,7 +36,7 @@ module type Driver_S = sig
   val get_pevent_witness_notes : pers_event -> istr array
   val get_pevent_witnesses_and_notes : pers_event -> (iper * Def.witness_kind * istr) array
   val gen_pevent_of_pers_event : pers_event -> (iper, istr) Def.gen_pers_event
-  val pers_event_of_gen_pevent : (iper, istr) Def.gen_pers_event -> pers_event
+  val pers_event_of_gen_pevent : base -> (iper, istr) Def.gen_pers_event -> pers_event
   
   type fam_event (*= (iper, istr) Def.gen_fam_event*)
   (** Database implementation for [Def.fam_event] *)
@@ -51,7 +51,7 @@ module type Driver_S = sig
   val get_fevent_witness_notes : fam_event -> istr array
   val get_fevent_witnesses_and_notes : fam_event -> (iper * Def.witness_kind * istr) array
   val gen_fevent_of_fam_event : fam_event -> (iper, istr) Def.gen_fam_event
-  val fam_event_of_gen_fevent : (iper, istr) Def.gen_fam_event -> fam_event
+  val fam_event_of_gen_fevent : base -> (iper, istr) Def.gen_fam_event -> fam_event
 
   type string_person_index
   (** Data structure for optimised search throughout index by name
@@ -757,6 +757,12 @@ struct
       (Current.string_person_index -> 'a) ->
       string_person_index ->
       'a
+
+    val wrap_pevent :
+      (Legacy.pers_event -> 'a) -> (Current.pers_event -> 'a) -> pers_event -> 'a
+
+    val wrap_fevent :
+      (Legacy.fam_event -> 'a) -> (Current.fam_event -> 'a) -> fam_event -> 'a
   end = struct
     let wrap_base legacyf currentf = function
       | Legacy_base b -> legacyf b
@@ -773,6 +779,15 @@ struct
     let wrap_spi legacyf currentf = function
       | Legacy_string_person_index spi -> legacyf spi
       | Current_string_person_index spi -> currentf spi
+
+  let wrap_pevent legacyf currentf = function
+      | Legacy_pevent pe -> legacyf pe
+      | Current_pevent pe -> currentf pe
+
+  let wrap_fevent legacyf currentf = function
+      | Legacy_fevent fe -> legacyf fe
+      | Current_fevent fe -> currentf fe
+  
   end
 
   let string_of_iper = string_of_int
@@ -786,29 +801,41 @@ struct
 
   let log _ = ()
 
-  let get_pevent_name pe = assert false
-  let get_pevent_date pe = assert false
-  let get_pevent_place pe = assert false
-  let get_pevent_reason pe = assert false
-  let get_pevent_note pe = assert false
-  let get_pevent_src pe = assert false
-  let get_pevent_witnesses pe = assert false
-  let get_pevent_witness_notes pe = assert false
-  let get_pevent_witnesses_and_notes pe = assert false
-  let gen_pevent_of_pers_event pe = assert false
-  let pers_event_of_gen_pevent pe = assert false
-    
-  let get_fevent_name fe = assert false
-  let get_fevent_date fe = assert false
-  let get_fevent_place fe = assert false
-  let get_fevent_reason fe = assert false
-  let get_fevent_note fe = assert false
-  let get_fevent_src fe = assert false
-  let get_fevent_witnesses fe = assert false
-  let get_fevent_witness_notes fe = assert false
-  let get_fevent_witnesses_and_notes fe = assert false
-  let gen_fevent_of_fam_event fe = assert false
-  let fam_event_of_gen_fevent fe = assert false
+  let get_pevent_name = Util.wrap_pevent Legacy.get_pevent_name Current.get_pevent_name
+  let get_pevent_date = Util.wrap_pevent Legacy.get_pevent_date Current.get_pevent_date
+  let get_pevent_place = Util.wrap_pevent Legacy.get_pevent_place Current.get_pevent_place
+  let get_pevent_reason = Util.wrap_pevent Legacy.get_pevent_reason Current.get_pevent_reason
+  let get_pevent_note = Util.wrap_pevent Legacy.get_pevent_note Current.get_pevent_note
+  let get_pevent_src = Util.wrap_pevent Legacy.get_pevent_src Current.get_pevent_src
+  let get_pevent_witnesses = Util.wrap_pevent Legacy.get_pevent_witnesses Current.get_pevent_witnesses
+  let get_pevent_witness_notes = Util.wrap_pevent Legacy.get_pevent_witness_notes Current.get_pevent_witness_notes
+  let get_pevent_witnesses_and_notes = Util.wrap_pevent Legacy.get_pevent_witnesses_and_notes Current.get_pevent_witnesses_and_notes
+  let gen_pevent_of_pers_event = Util.wrap_pevent Legacy.gen_pevent_of_pers_event Current.gen_pevent_of_pers_event
+  let pers_event_of_gen_pevent base pe = match base with
+    | Legacy_base base ->
+      let pe = Legacy.pers_event_of_gen_pevent base pe in
+      Legacy_pevent pe
+    | Current_base base ->
+      let pe = Current.pers_event_of_gen_pevent base pe in
+      Current_pevent pe
+
+  let get_fevent_name = Util.wrap_fevent Legacy.get_fevent_name Current.get_fevent_name
+  let get_fevent_date = Util.wrap_fevent Legacy.get_fevent_date Current.get_fevent_date
+  let get_fevent_place = Util.wrap_fevent Legacy.get_fevent_place Current.get_fevent_place
+  let get_fevent_reason = Util.wrap_fevent Legacy.get_fevent_reason Current.get_fevent_reason
+  let get_fevent_note = Util.wrap_fevent Legacy.get_fevent_note Current.get_fevent_note
+  let get_fevent_src = Util.wrap_fevent Legacy.get_fevent_src Current.get_fevent_src
+  let get_fevent_witnesses = Util.wrap_fevent Legacy.get_fevent_witnesses Current.get_fevent_witnesses
+  let get_fevent_witness_notes = Util.wrap_fevent Legacy.get_fevent_witness_notes Current.get_fevent_witness_notes
+  let get_fevent_witnesses_and_notes = Util.wrap_fevent Legacy.get_fevent_witnesses_and_notes Current.get_fevent_witnesses_and_notes
+  let gen_fevent_of_fam_event = Util.wrap_fevent Legacy.gen_fevent_of_fam_event Current.gen_fevent_of_fam_event
+  let fam_event_of_gen_fevent base pe = match base with
+    | Legacy_base base ->
+      let pe = Legacy.fam_event_of_gen_fevent base pe in
+      Legacy_fevent pe
+    | Current_base base ->
+      let pe = Current.fam_event_of_gen_fevent base pe in
+      Current_fevent pe
   
   let open_base bname =
     let bname =

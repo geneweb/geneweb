@@ -2509,7 +2509,7 @@ let record_visited conf ip =
 (* TODO OCaml 4.13 : use Array.find_opt *)
 let array_mem_witn conf base x a na =
   let get_note i = match na with
-    | Some a when i < Array.length a -> a.(i)
+    | a when i < Array.length a -> a.(i)
     | _ -> empty_string
   in
   let rec loop i =
