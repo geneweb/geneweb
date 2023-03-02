@@ -429,6 +429,9 @@ and mk_witness_kind = function
   | Def.Witness_Mentioned -> Tsafe "WITNESS_MENTIONED"
   | Def.Witness_Other -> Tsafe "WITNESS_OTHER"
 
+and mk_pevent conf base e = mk_event conf base (Event.event_item_of_pevent e)
+and mk_fevent conf base e = mk_event conf base (Event.event_item_of_fevent e)
+
 and mk_event conf base (evt : 'a Event.event_item) =
   let module E = Ezgw.Event in
   let date = match E.date evt with Some d -> mk_date d | None -> Tnull in
@@ -802,7 +805,7 @@ and mk_warning conf base =
       List.iteri (fun i x -> a.(i) <- fn x) l;
       a
   in
-  function
+  fun (warning : CheckItem.base_warning) -> match warning with
   | Def.BigAgeBetweenSpouses (f, m, a) ->
       Tset
         [
@@ -844,8 +847,8 @@ and mk_warning conf base =
           Tarray (Array.map box_bool aft_d);
         ]
   | ChangedOrderOfFamilyEvents (_ifam, before, after) ->
-      let before = array_of_list_map (mk_event conf base) before in
-      let after = array_of_list_map (mk_event conf base) after in
+      let before = array_of_list_map (mk_fevent conf base) before in
+      let after = array_of_list_map (mk_fevent conf base) after in
       let bef_d, aft_d = Difference.f before after in
       Tset
         [
@@ -856,8 +859,8 @@ and mk_warning conf base =
           Tarray (Array.map box_bool aft_d);
         ]
   | ChangedOrderOfPersonEvents (_p, before, after) ->
-      let before = array_of_list_map (mk_event conf base) before in
-      let after = array_of_list_map (mk_event conf base) after in
+      let before = array_of_list_map (mk_pevent conf base) before in
+      let after = array_of_list_map (mk_pevent conf base) after in
       let bef_d, aft_d = Difference.f before after in
       Tset
         [
@@ -910,15 +913,15 @@ and mk_warning conf base =
         [
           Tsafe "FEventOrder";
           unsafe_mk_person conf base p;
-          mk_event conf base e1;
-          mk_event conf base e2;
+          mk_fevent conf base e1;
+          mk_fevent conf base e2;
         ]
   | FWitnessEventAfterDeath (p, e, ifam) ->
       Tset
         [
           Tsafe "FWitnessEventAfterDeath";
           unsafe_mk_person conf base p;
-          mk_event conf base e;
+          mk_fevent conf base e;
           get_fam ifam;
         ]
   | FWitnessEventBeforeBirth (p, e, ifam) ->
@@ -926,7 +929,7 @@ and mk_warning conf base =
         [
           Tsafe "FWitnessEventBeforeBirth";
           unsafe_mk_person conf base p;
-          mk_event conf base e;
+          mk_fevent conf base e;
           get_fam ifam;
         ]
   | IncoherentAncestorDate (p1, p2) ->
@@ -983,15 +986,15 @@ and mk_warning conf base =
         [
           Tsafe "PEventOrder";
           unsafe_mk_person conf base p;
-          mk_event conf base e1;
-          mk_event conf base e2;
+          mk_pevent conf base e1;
+          mk_pevent conf base e2;
         ]
   | PWitnessEventAfterDeath (p, e, origin) ->
       Tset
         [
           Tsafe "PWitnessEventAfterDeath";
           unsafe_mk_person conf base p;
-          mk_event conf base e;
+          mk_pevent conf base e;
           unsafe_mk_person conf base origin;
         ]
   | PWitnessEventBeforeBirth (p, e, origin) ->
@@ -999,7 +1002,7 @@ and mk_warning conf base =
         [
           Tsafe "PWitnessEventBeforeBirth";
           unsafe_mk_person conf base p;
-          mk_event conf base e;
+          mk_pevent conf base e;
           unsafe_mk_person conf base origin;
         ]
   | TitleDatesError (p, t) ->
