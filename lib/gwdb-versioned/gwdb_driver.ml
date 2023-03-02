@@ -823,15 +823,29 @@ module Legacy_driver = struct
         in
         witnesses_notes
 *)
-  let poi_ht : (iper, person) Hashtbl.t = Hashtbl.create 0
-  let foi_ht : (ifam, family) Hashtbl.t = Hashtbl.create 0
+  let poi_ht : (iper, person) Hashtbl.t option ref = ref None
+  let foi_ht : (ifam, family) Hashtbl.t option ref = ref None
 
+  let find_poi iper = match !poi_ht with
+    | Some ht -> Hashtbl.find_opt ht iper
+    | None -> poi_ht := Some (Hashtbl.create 1); None
+  let find_foi ifam = match !foi_ht with
+    | Some ht -> Hashtbl.find_opt ht ifam
+    | None -> foi_ht := Some (Hashtbl.create 1); None
+
+  let set_poi iper data = match !poi_ht with
+    | Some ht -> Hashtbl.add ht iper data
+    | _ -> assert false
+  let set_foi ifam data = match !foi_ht with
+    | Some ht -> Hashtbl.add ht ifam data
+    | _ -> assert false
+  
   let poi base iper =
-    match Hashtbl.find_opt poi_ht iper with
+    match find_poi iper with
     | Some p -> p
     | None ->
       let p = { person = poi base iper; base; witness_notes = None } in
-      Hashtbl.add poi_ht iper p;
+      set_poi iper p;
       p
 
   let base_visible_get base (f : person -> bool) iper =
@@ -922,11 +936,11 @@ module Legacy_driver = struct
   let gen_descend_of_family f = gen_descend_of_family f.family
 
   let foi base ifam =
-    match Hashtbl.find_opt foi_ht ifam with
+    match find_foi ifam with
     | Some f -> f
     | None ->
       let f = { family = foi base ifam; base; witness_notes = None } in
-      Hashtbl.add foi_ht ifam f;
+      set_foi ifam f;
       f
     
 
