@@ -531,7 +531,7 @@ module Legacy_driver = struct
     List.mapi (fun ie pevent ->
         { pevent; event_person = p; event_index = ie; pwitness_notes = None; witnesses = None })
       pevents
-      
+  
   let get_pevent_name pe = pe.pevent.epers_name
 
   let get_pevent_date pe = pe.pevent.epers_date
@@ -569,6 +569,12 @@ module Legacy_driver = struct
     
   let pers_event_of_gen_pevent base genpers = assert false
 
+  let eq_pevent p1 p2 =
+    p1.pevent = p2.pevent
+
+  let eq_fevent f1 f2 =
+    f1.fevent = f2.fevent
+  
   let gen_fevent_of_fam_event fe =
     let genfam = Translate.legacy_to_def_fevent empty_string fe.fevent in
     let len = Array.length fe.fevent.efam_witnesses in
