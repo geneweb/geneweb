@@ -37,6 +37,8 @@ module type Driver_S = sig
   val get_pevent_witnesses_and_notes : pers_event -> (iper * Def.witness_kind * istr) array
   val gen_pevent_of_pers_event : pers_event -> (iper, istr) Def.gen_pers_event
   val pers_event_of_gen_pevent : base -> (iper, istr) Def.gen_pers_event -> pers_event
+
+  val eq_pevent : pers_event -> pers_event -> bool
   
   type fam_event (*= (iper, istr) Def.gen_fam_event*)
   (** Database implementation for [Def.fam_event] *)
@@ -53,6 +55,8 @@ module type Driver_S = sig
   val gen_fevent_of_fam_event : fam_event -> (iper, istr) Def.gen_fam_event
   val fam_event_of_gen_fevent : base -> (iper, istr) Def.gen_fam_event -> fam_event
 
+  val eq_fevent : fam_event -> fam_event -> bool
+  
   type string_person_index
   (** Data structure for optimised search throughout index by name
     (surname or first name). *)
@@ -819,6 +823,16 @@ struct
       let pe = Current.pers_event_of_gen_pevent base pe in
       Current_pevent pe
 
+  let eq_pevent p1 p2 = match p1, p2 with
+    | Legacy_pevent p1, Legacy_pevent p2 -> Legacy.eq_pevent p1 p2
+    | Current_pevent p1, Current_pevent p2 -> Current.eq_pevent p1 p2
+    | _ -> assert false
+
+  let eq_fevent f1 f2 = match f1, f2 with
+    | Legacy_fevent f1, Legacy_fevent f2 -> Legacy.eq_fevent f1 f2
+    | Current_fevent f1, Current_fevent f2 -> Current.eq_fevent f1 f2
+    | _ -> assert false
+  
   let get_fevent_name = Util.wrap_fevent Legacy.get_fevent_name Current.get_fevent_name
   let get_fevent_date = Util.wrap_fevent Legacy.get_fevent_date Current.get_fevent_date
   let get_fevent_place = Util.wrap_fevent Legacy.get_fevent_place Current.get_fevent_place
