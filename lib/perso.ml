@@ -2609,13 +2609,25 @@ and eval_item_field_var ell = function
       with Failure _ -> raise Not_found)
   | _ -> raise Not_found
 
-and eval_title_field_var conf base env (_p, (cnt, name, title, places, dates))
+and eval_title_field_var conf base env (p, (cnt, name, title, places, dates))
     _loc = function
   | [ "is_first" ] ->
       VVbool
         (match get_env "first" env with Vbool x -> x | _ -> raise Not_found)
-  | [ "is_main" ] ->
-      VVbool (match name with Tmain | Tnone -> true | Tname _x -> false)
+  | [ "is_main" ] -> (
+      let titles = nobility_titles_list conf base p in
+      let has_main =
+        List.fold_left
+          (fun acc (_, name, _, _, _) ->
+            acc || match name with Tmain -> true | _ -> false)
+          false titles
+      in
+      match name with
+      | Tmain -> VVbool true
+      | _ ->
+          if has_main then VVbool false
+          else
+            VVbool (match get_env "first" env with Vbool x -> x | _ -> false))
   | [ "cnt" ] -> VVstring (string_of_int cnt)
   | [ "name" ] -> (
       match name with
