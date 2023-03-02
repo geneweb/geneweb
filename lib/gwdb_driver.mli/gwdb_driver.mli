@@ -39,6 +39,13 @@ type relation = (iper, istr) Def.gen_relation
 type title = istr Def.gen_title
 (** Database implementation for [Def.gen_title] *)
 
+type string_person_index
+(** Data structure for optimised search throughout index by name
+    (surname or first name). *)
+
+type base
+(** The database representation. *)
+
 type pers_event (*= (iper, istr) Def.gen_pers_event*)
 (** Database implementation for [Def.pers_event] *)
 
@@ -52,7 +59,7 @@ val get_pevent_witnesses : pers_event -> (iper * Def.witness_kind) array
 val get_pevent_witness_notes : pers_event -> istr array
 val get_pevent_witnesses_and_notes : pers_event -> (iper * Def.witness_kind * istr) array
 val gen_pevent_of_pers_event : pers_event -> (iper, istr) Def.gen_pers_event
-val pers_event_of_gen_pevent : (iper, istr) Def.gen_pers_event -> pers_event
+val pers_event_of_gen_pevent : base -> (iper, istr) Def.gen_pers_event -> pers_event
 
 type fam_event (*= (iper, istr) Def.gen_fam_event*)
 (** Database implementation for [Def.fam_event] *)
@@ -67,15 +74,8 @@ val get_fevent_witnesses : fam_event -> (iper * Def.witness_kind) array
 val get_fevent_witness_notes : fam_event -> istr array
 val get_fevent_witnesses_and_notes : fam_event -> (iper * Def.witness_kind * istr) array
 val gen_fevent_of_fam_event : fam_event -> (iper, istr) Def.gen_fam_event
-val fam_event_of_gen_fevent : (iper, istr) Def.gen_fam_event -> fam_event
+val fam_event_of_gen_fevent : base -> (iper, istr) Def.gen_fam_event -> fam_event
   
-type string_person_index
-(** Data structure for optimised search throughout index by name
-    (surname or first name). *)
-
-type base
-(** The database representation. *)
-
 val open_base : string -> base
 (** Open database associated with (likely situated in) the specified directory. *)
 
