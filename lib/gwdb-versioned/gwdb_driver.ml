@@ -1,3 +1,8 @@
+
+module Lazy = struct
+  include Lazy
+  let map f x = lazy (f (Lazy.force x))
+end
 module Log = struct
   let oc : out_channel option ref = ref None
   let _log fn = match !oc with Some oc -> fn oc | None -> ()
