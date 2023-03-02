@@ -258,16 +258,6 @@ module Legacy_driver = struct
 
   (*type pers_event = (iper, istr) Def.gen_pers_event*)
 
-  type pers_event = {
-    pevent : Gwdb_legacy.Gwdb_driver.pers_event;
-    pwitness_notes : istr array
-  }
-
-  type fam_event = {
-    fevent : Gwdb_legacy.Gwdb_driver.fam_event;
-    fwitness_notes : istr array
-  }
-
   type person = {
     person : Gwdb_legacy.Gwdb_driver.person;
     base : Gwdb_legacy.Gwdb_driver.base;
@@ -279,6 +269,23 @@ module Legacy_driver = struct
     base : Gwdb_legacy.Gwdb_driver.base;
     mutable witness_notes : istr array array option;
   }
+  
+  type pers_event = {
+    pevent : Gwdb_legacy.Gwdb_driver.pers_event;
+    event_index : int;
+    event_person : person;
+    mutable pwitness_notes : istr array option;
+    mutable witnesses : (iper * Def.witness_kind * istr) array option
+  }
+
+  type fam_event = {
+    fevent : Gwdb_legacy.Gwdb_driver.fam_event;
+    event_index : int;
+    event_family : family;
+    mutable fwitness_notes : istr array option;
+    mutable witnesses : (iper * Def.witness_kind * istr) array option
+  }
+
 
   let get_pers_full_wit_notes (p : person) = match p.witness_notes with
     | Some a when Array.length a > 0 ->
@@ -380,7 +387,7 @@ module Legacy_driver = struct
   
 
 
-  let gen_person_of_person p =
+  let gen_person_of_person (p : person) =
     let gen_pers = gen_person_of_person p.person in
     let pevents =
       List.mapi
@@ -502,14 +509,27 @@ module Legacy_driver = struct
     in
     pevents
 *)
-  let get_pevents p =
+
+  let pwitness_notes_of_pevent (pe : pers_event) = match pe.pwitness_notes with
+    | Some a -> a
+    | None ->
+      let wlen = Array.length pe.pevent.epers_witnesses in
+      let a = Array.init wlen (get_pers_wit_notes pe.event_person pe.event_index) in
+      pe.pwitness_notes <- Some a;
+      a
+
+  let fwitness_notes_of_fevent (fe : fam_event) = match fe.fwitness_notes with
+    | Some a -> a
+    | None ->
+      let wlen = Array.length fe.fevent.efam_witnesses in
+      let a = Array.init wlen (get_fam_wit_notes fe.event_family fe.event_index) in
+      fe.fwitness_notes <- Some a;
+      a
+  
+  let get_pevents (p : person) =
     let pevents = Gwdb_legacy.Gwdb_driver.get_pevents p.person in
-    let pnotes = get_pers_full_wit_notes p in
     List.mapi (fun ie pevent ->
-        let pevent_notes = pnotes ie in
-        let len = Array.length pevent.Gwdb_legacy.Dbdisk.epers_witnesses in
-        let pwitness_notes = Array.init len pevent_notes in
-        { pevent; pwitness_notes })
+        { pevent; event_person = p; event_index = ie; pwitness_notes = None; witnesses = None })
       pevents
       
   let get_pevent_name pe = pe.pevent.epers_name
@@ -521,22 +541,28 @@ module Legacy_driver = struct
   let get_pevent_note pe = pe.pevent.epers_note
   let get_pevent_src pe = pe.pevent.epers_src
   let get_pevent_witnesses pe = pe.pevent.epers_witnesses
-  let get_pevent_witness_notes pe = pe.pwitness_notes
+  let get_pevent_witness_notes pe = pwitness_notes_of_pevent pe
 
-  let get_pevent_witnesses_and_notes pe =
-    let len = Array.length pe.pevent.epers_witnesses in
-    Array.init len (fun iw ->
-        let ip, wk = pe.pevent.epers_witnesses.(iw) in
-        let wnote = pe.pwitness_notes.(iw) in
-        ip, wk, wnote
-      )
+  let get_pevent_witnesses_and_notes (pe : pers_event) = match pe.witnesses with
+    | Some a -> a
+    | None ->
+      let len = Array.length pe.pevent.epers_witnesses in
+      let wnotes = pwitness_notes_of_pevent pe in
+      let a = Array.init len (fun iw ->
+          let ip, wk = pe.pevent.epers_witnesses.(iw) in
+          let wnote = wnotes.(iw) in
+          ip, wk, wnote
+        ) in
+      pe.witnesses <- Some a;
+      a
 
   let gen_pevent_of_pers_event pe =
     let genpers = Translate.legacy_to_def_pevent empty_string pe.pevent in
     let len = Array.length pe.pevent.epers_witnesses in
+    let wnotes = pwitness_notes_of_pevent pe in
     let epers_witnesses = Array.init len (fun i ->
         let ip, wk = pe.pevent.epers_witnesses.(i) in
-        let wnote = pe.pwitness_notes.(i) in
+        let wnote = wnotes.(i) in
         ip, wk, wnote
       ) in
     {genpers with epers_witnesses}
@@ -546,9 +572,10 @@ module Legacy_driver = struct
   let gen_fevent_of_fam_event fe =
     let genfam = Translate.legacy_to_def_fevent empty_string fe.fevent in
     let len = Array.length fe.fevent.efam_witnesses in
+    let wnotes = fwitness_notes_of_fevent fe in
     let efam_witnesses = Array.init len (fun i ->
         let ip, wk = fe.fevent.efam_witnesses.(i) in
-        let wnote = fe.fwitness_notes.(i) in
+        let wnote = wnotes.(i) in
         ip, wk, wnote
       ) in
     {genfam with efam_witnesses}
@@ -572,14 +599,10 @@ module Legacy_driver = struct
     in
     fevents
 *)
-  let get_fevents f =
+  let get_fevents (f : family) =
     let fevents = Gwdb_legacy.Gwdb_driver.get_fevents f.family in
-    let fnotes = get_fam_full_wit_notes f in
     List.mapi (fun ie fevent ->
-        let fevent_notes = fnotes ie in
-        let len = Array.length fevent.Gwdb_legacy.Dbdisk.efam_witnesses in
-        let fwitness_notes = Array.init len fevent_notes in
-        { fevent; fwitness_notes })
+        { fevent; fwitness_notes = None; event_index = ie;  witnesses = None; event_family = f})
       fevents
 
   let get_fevent_name fe = fe.fevent.efam_name
@@ -591,13 +614,14 @@ module Legacy_driver = struct
   let get_fevent_note fe = fe.fevent.efam_note
   let get_fevent_src fe = fe.fevent.efam_src
   let get_fevent_witnesses fe = fe.fevent.efam_witnesses
-  let get_fevent_witness_notes fe = fe.fwitness_notes
+  let get_fevent_witness_notes fe = fwitness_notes_of_fevent fe
 
   let get_fevent_witnesses_and_notes fe =
     let len = Array.length fe.fevent.efam_witnesses in
+    let wnotes = fwitness_notes_of_fevent fe in
     Array.init len (fun iw ->
         let ip, wk = fe.fevent.efam_witnesses.(iw) in
-        let wnote = fe.fwitness_notes.(iw) in
+        let wnote = wnotes.(iw) in
         ip, wk, wnote
       )
   
