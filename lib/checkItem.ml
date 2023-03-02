@@ -846,7 +846,8 @@ let changed_pevents_order warning p =
       (fun evt -> get_pevent_date evt)
       a
   in
-  if a <> b then warning (ChangedOrderOfPersonEvents (p, a, b))
+  let same = List.compare (fun a b -> if not (eq_pevent a b) then -1 else 0) a b <> 0 in
+  if not same then warning (ChangedOrderOfPersonEvents (p, a, b))
 
 let changed_fevents_order warning (ifam, fam) =
   let a =
@@ -856,7 +857,8 @@ let changed_fevents_order warning (ifam, fam) =
       (get_fevents fam)
   in
   let b = get_fevents fam in
-  if compare b a <> 0 then warning (ChangedOrderOfFamilyEvents (ifam, b, a))
+  let same = List.compare (fun a b -> if not (eq_fevent a b) then -1 else 0) a b <> 0 in
+  if not same then warning (ChangedOrderOfFamilyEvents (ifam, b, a))
 
 (* main *)
 
