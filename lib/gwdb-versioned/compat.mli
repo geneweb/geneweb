@@ -38,7 +38,7 @@ module type Driver_S = sig
   val gen_pevent_of_pers_event : pers_event -> (iper, istr) Def.gen_pers_event
   val pers_event_of_gen_pevent : base -> (iper, istr) Def.gen_pers_event -> pers_event
 
-  
+  val eq_pevent : pers_event -> pers_event -> bool
   
   type fam_event (*= (iper, istr) Def.gen_fam_event*)
   (** Database implementation for [Def.fam_event] *)
@@ -54,6 +54,8 @@ module type Driver_S = sig
   val get_fevent_witnesses_and_notes : fam_event -> (iper * Def.witness_kind * istr) array
   val gen_fevent_of_fam_event : fam_event -> (iper, istr) Def.gen_fam_event
   val fam_event_of_gen_fevent : base -> (iper, istr) Def.gen_fam_event -> fam_event
+
+  val eq_fevent : fam_event -> fam_event -> bool
   
   type string_person_index
   (** Data structure for optimised search throughout index by name
