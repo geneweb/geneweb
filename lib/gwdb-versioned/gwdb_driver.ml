@@ -823,8 +823,16 @@ module Legacy_driver = struct
         in
         witnesses_notes
 *)
+  let poi_ht : (iper, person) Hashtbl.t = Hashtbl.create 0
+  let foi_ht : (ifam, family) Hashtbl.t = Hashtbl.create 0
+
   let poi base iper =
-    { person = poi base iper; base; witness_notes = None }
+    match Hashtbl.find_opt poi_ht iper with
+    | Some p -> p
+    | None ->
+      let p = { person = poi base iper; base; witness_notes = None } in
+      Hashtbl.add poi_ht iper p;
+      p
 
   let base_visible_get base (f : person -> bool) iper =
     let f person =
@@ -914,7 +922,14 @@ module Legacy_driver = struct
   let gen_descend_of_family f = gen_descend_of_family f.family
 
   let foi base ifam =
-    { family = foi base ifam; base; witness_notes = None }
+    match Hashtbl.find_opt foi_ht ifam with
+    | Some f -> f
+    | None ->
+      let f = { family = foi base ifam; base; witness_notes = None } in
+      Hashtbl.add foi_ht ifam f;
+      f
+    
+
 
   let families ?(select = fun _ -> true) base =
     let select f = select { family = f; base; witness_notes = None } in
