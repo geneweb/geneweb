@@ -3832,7 +3832,7 @@ let print_foreach conf base print_ast eval_expr =
                  let mem, wk, wnote =
                    Util.array_mem_witn conf base (get_iper p)
                      (Event.get_witnesses event_item)
-                     (Some (Event.get_witness_notes event_item))
+                     (Event.get_witness_notes event_item)
                  in
                  if mem then
                    match Event.get_name event_item with
