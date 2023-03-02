@@ -586,3 +586,5 @@ val designation : base -> person -> Adef.escaped_string
 
 val has_children : base -> person -> bool
 val is_public : config -> base -> Gwdb.person -> bool
+
+val list_cmp : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool
