@@ -469,7 +469,7 @@ val array_mem_witn :
   Gwdb.base ->
   iper ->
   (iper * Def.witness_kind) array ->
-  istr array option ->
+  istr array ->
   bool * Adef.safe_string * string
 (** [array_mem_witn conf base ip array] checks if [ip] is in [array]
     and returns corresponding [string_of_witness_kind] and witness note if so.
