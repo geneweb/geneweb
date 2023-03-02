@@ -1,5 +1,3 @@
-(* Copyright (c) 1998-2007 INRIA *)
-
 type cdate = Adef.cdate =
   | Cgregorian of int
   | Cjulian of int
@@ -9,21 +7,20 @@ type cdate = Adef.cdate =
   | Cdate of Adef.date
   | Cnone
 
-type date =
-  (* dmy is the date in gregorian format;
-     calendar is the calendar in which we should display this date;
-     e.g. if calendar = Dhebrew, we should convert dmy from gregorian
-     to hebrew before printing
-  *)
-  | Dgreg of dmy * calendar
-  (* textual form of the date *)
-  | Dtext of string
+type date = Adef.date = Dgreg of dmy * calendar | Dtext of string
+and calendar = Adef.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
 
-and calendar = Dgregorian | Djulian | Dfrench | Dhebrew
-and dmy = { day : int; month : int; year : int; prec : precision; delta : int }
-and dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
+and dmy = Adef.dmy = {
+  day : int;
+  month : int;
+  year : int;
+  prec : precision;
+  delta : int;
+}
 
-and precision =
+and dmy2 = Adef.dmy2 = { day2 : int; month2 : int; year2 : int; delta2 : int }
+
+and precision = Adef.precision =
   | Sure
   | About
   | Maybe
@@ -40,10 +37,6 @@ and precision =
 
    type date = dmy * precision
 *)
-
-(* TODO !! *)
-let adef_to_def_date : Adef.date -> date = Obj.magic
-let def_to_adef_date : date -> Adef.date = Obj.magic
 
 (* compress concrete date if it's possible *)
 let compress d =
@@ -85,7 +78,7 @@ let date_of_cdate = function
   | Cjulian i -> Dgreg (uncompress i, Djulian)
   | Cfrench i -> Dgreg (uncompress i, Dfrench)
   | Chebrew i -> Dgreg (uncompress i, Dhebrew)
-  | Cdate d -> adef_to_def_date d
+  | Cdate d -> d
   | Ctext t -> Dtext t
   | Cnone -> failwith "date_of_cdate"
 
@@ -94,7 +87,7 @@ let cdate_of_date d =
   | Dtext t -> Ctext t
   | Dgreg (g, cal) -> (
       match compress g with
-      | None -> Cdate (def_to_adef_date d)
+      | None -> Cdate d
       | Some i -> (
           match cal with
           | Dgregorian -> Cgregorian i
