@@ -255,12 +255,12 @@ module Legacy_driver = struct
 
   type pers_event = {
     pevent : Gwdb_legacy.Gwdb_driver.pers_event;
-    pwitness_notes : istr array
+    pwitness_notes : istr array Lazy.t
   }
 
   type fam_event = {
     fevent : Gwdb_legacy.Gwdb_driver.fam_event;
-    fwitness_notes : istr array
+    fwitness_notes : istr array Lazy.t
   }
 
   type person = {
@@ -499,11 +499,11 @@ module Legacy_driver = struct
 *)
   let get_pevents p =
     let pevents = Gwdb_legacy.Gwdb_driver.get_pevents p.person in
-    let pnotes = get_pers_full_wit_notes p in
+    let pnotes = lazy (get_pers_full_wit_notes p) in
     List.mapi (fun ie pevent ->
-        let pevent_notes = pnotes ie in
+        let pevent_notes = Lazy.map (fun pnotes -> pnotes ie) pnotes in
         let len = Array.length pevent.Gwdb_legacy.Dbdisk.epers_witnesses in
-        let pwitness_notes = Array.init len pevent_notes in
+        let pwitness_notes = Lazy.map (fun pevent_notes -> Array.init len pevent_notes) pevent_notes in
         { pevent; pwitness_notes })
       pevents
       
@@ -516,13 +516,13 @@ module Legacy_driver = struct
   let get_pevent_note pe = pe.pevent.epers_note
   let get_pevent_src pe = pe.pevent.epers_src
   let get_pevent_witnesses pe = pe.pevent.epers_witnesses
-  let get_pevent_witness_notes pe = pe.pwitness_notes
+  let get_pevent_witness_notes pe = Lazy.force pe.pwitness_notes
 
   let get_pevent_witnesses_and_notes pe =
     let len = Array.length pe.pevent.epers_witnesses in
     Array.init len (fun iw ->
         let ip, wk = pe.pevent.epers_witnesses.(iw) in
-        let wnote = pe.pwitness_notes.(iw) in
+        let wnote = (Lazy.force pe.pwitness_notes).(iw) in
         ip, wk, wnote
       )
 
@@ -531,7 +531,7 @@ module Legacy_driver = struct
     let len = Array.length pe.pevent.epers_witnesses in
     let epers_witnesses = Array.init len (fun i ->
         let ip, wk = pe.pevent.epers_witnesses.(i) in
-        let wnote = pe.pwitness_notes.(i) in
+        let wnote = (Lazy.force pe.pwitness_notes).(i) in
         ip, wk, wnote
       ) in
     {genpers with epers_witnesses}
@@ -543,7 +543,7 @@ module Legacy_driver = struct
     let len = Array.length fe.fevent.efam_witnesses in
     let efam_witnesses = Array.init len (fun i ->
         let ip, wk = fe.fevent.efam_witnesses.(i) in
-        let wnote = fe.fwitness_notes.(i) in
+        let wnote = (Lazy.force fe.fwitness_notes).(i) in
         ip, wk, wnote
       ) in
     {genfam with efam_witnesses}
@@ -569,11 +569,11 @@ module Legacy_driver = struct
 *)
   let get_fevents f =
     let fevents = Gwdb_legacy.Gwdb_driver.get_fevents f.family in
-    let fnotes = get_fam_full_wit_notes f in
+    let fnotes = lazy (get_fam_full_wit_notes f) in
     List.mapi (fun ie fevent ->
-        let fevent_notes = fnotes ie in
+        let fevent_notes = Lazy.map (fun fnotes -> fnotes ie) fnotes in
         let len = Array.length fevent.Gwdb_legacy.Dbdisk.efam_witnesses in
-        let fwitness_notes = Array.init len fevent_notes in
+        let fwitness_notes = Lazy.map (fun fevent_notes -> Array.init len fevent_notes) fevent_notes in
         { fevent; fwitness_notes })
       fevents
 
@@ -586,13 +586,13 @@ module Legacy_driver = struct
   let get_fevent_note fe = fe.fevent.efam_note
   let get_fevent_src fe = fe.fevent.efam_src
   let get_fevent_witnesses fe = fe.fevent.efam_witnesses
-  let get_fevent_witness_notes fe = fe.fwitness_notes
+  let get_fevent_witness_notes fe = Lazy.force fe.fwitness_notes
 
   let get_fevent_witnesses_and_notes fe =
     let len = Array.length fe.fevent.efam_witnesses in
     Array.init len (fun iw ->
         let ip, wk = fe.fevent.efam_witnesses.(iw) in
-        let wnote = fe.fwitness_notes.(iw) in
+        let wnote = (Lazy.force fe.fwitness_notes).(iw) in
         ip, wk, wnote
       )
   
