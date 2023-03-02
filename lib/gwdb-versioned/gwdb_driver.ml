@@ -254,11 +254,14 @@ module Legacy_driver = struct
   (*type pers_event = (iper, istr) Def.gen_pers_event*)
 
   type pers_event = {
-    events : Gwdb_legacy.Gwdb_driver.pers_event;
-    witness_notes : istr array
+    pevent : Gwdb_legacy.Gwdb_driver.pers_event;
+    pwitness_notes : istr array
   }
 
-  type fam_event = (iper, istr) Def.gen_fam_event
+  type fam_event = {
+    fevent : Gwdb_legacy.Gwdb_driver.fam_event;
+    fwitness_notes : istr array
+  }
 
   type person = {
     person : Gwdb_legacy.Gwdb_driver.person;
@@ -272,6 +275,33 @@ module Legacy_driver = struct
     mutable witness_notes : istr array array option;
   }
 
+  let get_pers_full_wit_notes (p : person) = match p.witness_notes with
+    | Some a when Array.length a > 0 ->
+      fun ie ->
+        if Array.length a.(ie) > 0 then
+          fun iw -> a.(ie).(iw)
+        else
+          fun _iw -> empty_string
+    | Some a ->
+      fun ie iw -> empty_string 
+    | None ->
+      let iper = Gwdb_legacy.Gwdb_driver.get_iper p.person in
+      if iper = dummy_iper then begin
+        p.witness_notes <- Some [||];
+        fun _ie _iw -> empty_string
+      end
+      else
+        let notes = PatchPer.get p.base iper in
+        match notes with
+        | Some wnotes ->
+          p.witness_notes <- notes;
+          if Array.length wnotes = 0 then fun _ie _iw -> empty_string
+          else fun ie ->
+            if Array.length wnotes.(ie) = 0 then fun _iw -> empty_string
+            else fun iw -> wnotes.(ie).(iw)
+        | None ->
+          p.witness_notes <- Some [||];
+          fun _ie _iw -> empty_string
   
   let get_pers_wit_notes (p : person) ie iw = match p.witness_notes with
     | Some a when Array.length a > 0 && Array.length a.(ie) > 0 -> a.(ie).(iw)
@@ -294,6 +324,34 @@ module Legacy_driver = struct
           p.witness_notes <- Some [||];
           empty_string
 
+  let get_fam_full_wit_notes f = match f.witness_notes with
+    | Some a when Array.length a > 0 ->
+      fun ie ->
+        if Array.length a.(ie) > 0 then
+          fun iw -> a.(ie).(iw)
+        else
+          fun _iw -> empty_string
+    | Some a ->
+      fun ie iw -> empty_string 
+    | None ->
+      let ifam = Gwdb_legacy.Gwdb_driver.get_ifam f.family in
+      if ifam = dummy_ifam then begin
+        f.witness_notes <- Some [||];
+        fun _ie _iw -> empty_string
+      end
+      else
+        let notes = PatchFam.get f.base ifam in
+        match notes with
+        | Some wnotes ->
+          f.witness_notes <- notes;
+          if Array.length wnotes = 0 then fun _ie _iw -> empty_string
+          else fun ie ->
+            if Array.length wnotes.(ie) = 0 then fun _iw -> empty_string
+            else fun iw -> wnotes.(ie).(iw)
+        | None ->
+          f.witness_notes <- Some [||];
+          fun _ie _iw -> empty_string
+  
   let get_fam_wit_notes (f : family) ie iw = match f.witness_notes with
     | Some a when Array.length a > 0 && Array.length a.(ie) > 0 -> a.(ie).(iw)
     | Some a -> empty_string
@@ -421,7 +479,7 @@ module Legacy_driver = struct
     (*    log "COMMIT NOTES PATCHES";*)
     PatchPer.write base;
     PatchFam.write base
-
+(*
   let get_pevents p =
     let pevents = get_pevents p.person in
     let pevents =
@@ -438,20 +496,29 @@ module Legacy_driver = struct
         pevents
     in
     pevents
+*)
+  let get_pevents p =
+    let pevents = Gwdb_legacy.Gwdb_driver.get_pevents p.person in
+    let pnotes = get_pers_full_wit_notes p in
+    List.mapi (fun ie pevent ->
+        let pevent_notes = pnotes ie in
+        let len = Array.length pevent.Gwdb_legacy.Dbdisk.epers_witnesses in
+        let pwitness_notes = Array.init len pevent_notes in
+        { pevent; pwitness_notes })
+      pevents
+      
+  let get_pevent_name pe = pe.pevent.epers_name
 
-  let get_pevents p = assert false
-  let get_pevent_name pe = assert false
+  let get_pevent_date pe = pe.pevent.epers_date
 
-  let get_pevent_date pe = assert false
-
-  let get_pevent_place pe = assert false
-  let get_pevent_reason pe = assert false
-  let get_pevent_note pe = assert false
-  let get_pevent_src pe = assert false
-  let get_pevent_witnesses pe = assert false
-  let get_pevent_witness_notes pe =assert false
+  let get_pevent_place pe = pe.pevent.epers_place
+  let get_pevent_reason pe = pe.pevent.epers_reason
+  let get_pevent_note pe = pe.pevent.epers_note
+  let get_pevent_src pe = pe.pevent.epers_src
+  let get_pevent_witnesses pe = pe.pevent.epers_witnesses
+  let get_pevent_witness_notes pe = pe.pwitness_notes
   
-  let get_fevents f =
+(*  let get_fevents f =
     let fevents = get_fevents f.family in
     let fevents =
       List.mapi
@@ -467,18 +534,27 @@ module Legacy_driver = struct
         fevents
     in
     fevents
+*)
+  let get_fevents f =
+    let fevents = Gwdb_legacy.Gwdb_driver.get_fevents f.family in
+    let fnotes = get_fam_full_wit_notes f in
+    List.mapi (fun ie fevent ->
+        let fevent_notes = fnotes ie in
+        let len = Array.length fevent.Gwdb_legacy.Dbdisk.efam_witnesses in
+        let fwitness_notes = Array.init len fevent_notes in
+        { fevent; fwitness_notes })
+      fevents
 
-  let get_fevents p = assert false
-  let get_fevent_name pe = assert false
+  let get_fevent_name fe = fe.fevent.efam_name
 
-  let get_fevent_date pe = assert false
+  let get_fevent_date fe = fe.fevent.efam_date
 
-  let get_fevent_place pe = assert false
-  let get_fevent_reason pe = assert false
-  let get_fevent_note pe = assert false
-  let get_fevent_src pe = assert false
-  let get_fevent_witnesses pe = assert false
-  let get_fevent_witness_notes pe =assert false
+  let get_fevent_place fe = fe.fevent.efam_place
+  let get_fevent_reason fe = fe.fevent.efam_reason
+  let get_fevent_note fe = fe.fevent.efam_note
+  let get_fevent_src fe = fe.fevent.efam_src
+  let get_fevent_witnesses fe = fe.fevent.efam_witnesses
+  let get_fevent_witness_notes fe = fe.fwitness_notes
   
   let build_from_scratch_pevents base =
     let persons = Gwdb_legacy.Gwdb_driver.persons base in
@@ -815,7 +891,7 @@ module Legacy_driver = struct
   let get_pevent_witness_notes pe =assert false
   let get_pevent_witnesses_and_notes pe = assert false
   let gen_pevent_of_pers_event pe = assert false
-  let pers_event_of_gen_pevent pe = assert false
+  let pers_event_of_gen_pevent base pe = assert false
   let get_fevent_name fe = assert false
   let get_fevent_date fe = assert false
   let get_fevent_place fe = assert false
@@ -826,7 +902,7 @@ module Legacy_driver = struct
   let get_fevent_witness_notes fe = assert false
   let get_fevent_witnesses_and_notes fe = assert false
   let gen_fevent_of_fam_event fe = assert false
-  let fam_event_of_gen_fevent fe = assert false
+  let fam_event_of_gen_fevent base fe = assert false
 
 end
 
