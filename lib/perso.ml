@@ -1316,16 +1316,25 @@ let date_aux conf p_auth date =
       else DateDisplay.string_of_ondate conf d |> safe_val
   | _ -> null_val
 
-let get_marriage_witnesses fam =
+
+let get_marriage_events fam =
   let fevents = Gwdb.get_fevents fam in
-  let marriages =
-    List.filter (fun fe -> get_fevent_name fe = Efam_Marriage) fevents
-  in
+  List.filter (fun fe -> get_fevent_name fe = Efam_Marriage) fevents
+
+let get_marriage_witnesses fam =
+  let marriages = get_marriage_events fam in
   let witnesses =
     List.map (fun marriage -> get_fevent_witnesses marriage) marriages
   in
   witnesses |> Array.concat
 
+let get_marriage_witnesses_and_notes fam =
+  let marriages = get_marriage_events fam in
+  let witnesses =
+    List.map (fun marriage -> get_fevent_witnesses_and_notes marriage) marriages
+  in
+  witnesses |> Array.concat
+  
 let get_nb_marriage_witnesses_of_kind fam wk =
   let witnesses = get_marriage_witnesses fam in
   Array.fold_left
