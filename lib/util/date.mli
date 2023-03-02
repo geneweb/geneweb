@@ -1,11 +1,14 @@
-(* Copyright (c) 1998-2007 INRIA *)
 type cdate = Def.cdate
 
 type date =
+  (* dmy is the date in gregorian format;
+     calendar is the calendar in which we should display this date;
+     e.g. if calendar = Dhebrew, we should convert dmy from gregorian
+     to hebrew before printing
+  *)
   | Dgreg of dmy * calendar
   (* textual form of the date *)
   | Dtext of string
-(* TODO change for Calendars.kind *)
 
 and calendar = Dgregorian | Djulian | Dfrench | Dhebrew
 and dmy = { day : int; month : int; year : int; prec : precision; delta : int }
@@ -108,7 +111,6 @@ val cdate_of_od : date option -> cdate
 
 (* TODO this is buggy,
    because geneweb uses month|day = 0 for incomplete dates *)
-(* we use calendar for now instead of 'a Calendars.kind *)
 
 val to_sdn : from:calendar -> dmy -> int
 (** Convert a [dmy] in calendar [from] to SDN *)
