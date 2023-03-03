@@ -43,15 +43,23 @@ let strictly_after d1 d2 =
   | Date.Dgreg (d1, _), Date.Dgreg (d2, _) -> strictly_after_dmy d1 d2
   | _ -> false
 
+(* TODO this use prec on a elapsed_time. should elapsed_time have a prec?
+   except maybe in jingoo template this is the only place elapsed_time needs a prec *)
 let strictly_younger age year =
+  (*
   match age.Date.prec with
   | After -> false
   | Sure | About | Maybe | Before | OrYear _ | YearInt _ -> age.year < year
+  *)
+  age.Date.nb_year < year
 
 let strictly_older age year =
+  (*
   match age.Date.prec with
   | Before -> false
   | Sure | About | Maybe | After | OrYear _ | YearInt _ -> age.year > year
+  *)
+  age.Date.nb_year > year
 
 let obirth x = get_birth x |> Date.cdate_to_dmy_opt
 
@@ -78,13 +86,13 @@ let title_dates warning p t =
 let check_person_age warning p =
   let aux d1 d2 =
     Date.time_elapsed_opt d1 d2
-    |> Option.iter @@ fun a ->
-       if a.Date.year < 0 then warning (Warning.BirthAfterDeath p)
+    |> Option.iter @@ fun age ->
+       if age.Date.nb_year < 0 then warning (Warning.BirthAfterDeath p)
        else if d2.Date.year > lim_date_death then (
-         if strictly_older a max_death_after_lim_date_death then
-           warning (DeadOld (p, a)))
-       else if strictly_older a max_death_before_lim_date_death then
-         warning (DeadOld (p, a))
+         if strictly_older age max_death_after_lim_date_death then
+           warning (DeadOld (p, age)))
+       else if strictly_older age max_death_before_lim_date_death then
+         warning (DeadOld (p, age))
   in
   (* On pourrait faire un calcul sur la descendance ou l'ascendance si  *)
   (* on ne trouve rien ... mais c'est peut être un peu trop gourmand    *)
@@ -359,12 +367,12 @@ let close_siblings warning x np ifam =
       | None -> ()
       | Some d2 ->
           Date.time_elapsed_opt d1 d2
-          |> Option.iter @@ fun d ->
+          |> Option.iter @@ fun age ->
              (* On vérifie les jumeaux ou naissances proches. *)
              if
-               d.Date.year = 0
-               && d.month < max_month_btw_sibl
-               && (d.month <> 0 || d.day >= max_days_btw_sibl)
+               age.Date.nb_year = 0
+               && age.nb_month < max_month_btw_sibl
+               && (age.nb_month <> 0 || age.nb_day >= max_days_btw_sibl)
              then warning (Warning.CloseChildren (ifam, elder, x)))
 
 let born_after_his_elder_sibling warning x b np ifam des =
@@ -405,9 +413,9 @@ let child_born_after_his_parent warning x parent =
                 warning (Warning.ParentBornAfterChild (parent, x))
               else
                 Date.time_elapsed_opt g1 g2
-                |> Option.iter @@ fun a ->
-                   if strictly_younger a min_parent_age then
-                     warning (ParentTooYoung (parent, a, x)))
+                |> Option.iter @@ fun age ->
+                   if strictly_younger age min_parent_age then
+                     warning (ParentTooYoung (parent, age, x)))
       | Some g2 ->
           if strictly_after_dmy g1 g2 then
             warning (ParentBornAfterChild (parent, x))
@@ -684,7 +692,7 @@ let check_siblings ?(onchange = true) base warning (ifam, fam) callback =
   | Some ((d1, p1), (d2, p2)) ->
       Date.time_elapsed_opt d1 d2
       |> Option.iter @@ fun e ->
-         if e.Date.year > max_siblings_gap then
+         if e.Date.nb_year > max_siblings_gap then
            warning (DistantChildren (ifam, p1, p2))
 
 let check_children ?(onchange = true) base warning (ifam, fam) fath moth =
