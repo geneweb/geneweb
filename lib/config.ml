@@ -68,6 +68,8 @@ type config = {
   mutable setup_link : bool;
   access_by_key : bool;
   private_years : int;
+  private_years_death : int;
+  private_years_marriage : int;
   hide_names : bool;
   use_restrict : bool;
   no_image : bool;
@@ -141,6 +143,8 @@ let empty =
     setup_link = false;
     access_by_key = false;
     private_years = 0;
+    private_years_death = 0;
+    private_years_marriage = 0;
     hide_names = false;
     use_restrict = false;
     no_image = false;

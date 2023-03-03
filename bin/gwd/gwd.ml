@@ -1129,6 +1129,10 @@ let make_conf from_addr request script_name env =
     with Not_found -> false
   in
   let wizard_just_friend = if manitou then false else wizard_just_friend in
+  let private_years = 
+    try int_of_string (List.assoc "private_years" base_env) with
+    Not_found | Failure _ -> 150
+  in
   let conf =
     {from = from_addr;
      api_mode = false;
@@ -1170,9 +1174,14 @@ let make_conf from_addr request script_name env =
        begin try List.assoc "access_by_key" base_env = "yes" with
          Not_found -> ar.ar_wizard && ar.ar_friend
        end;
-     private_years =
-       begin try int_of_string (List.assoc "private_years" base_env) with
-         Not_found | Failure _ -> 150
+     private_years = private_years;
+     private_years_death =
+       begin try int_of_string (List.assoc "private_years_death" base_env) with
+         Not_found | Failure _ -> private_years
+       end;
+     private_years_marriage =
+       begin try int_of_string (List.assoc "private_years_marriage" base_env) with
+         Not_found | Failure _ -> private_years
        end;
      hide_names =
        if ar.ar_wizard || ar.ar_friend then false
