@@ -81,3 +81,7 @@ val fix_key :
   ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
 (** For every person in the base, update their occurence number
     if someone with same key (normalized first name and last name, and occurence number) already exists. *)
+
+val scan_utf8_conflicts :
+  ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
+(** Scan base for potential conflicts due to apostrophs and fancy accented characters*)

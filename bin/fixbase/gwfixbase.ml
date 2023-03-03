@@ -108,9 +108,12 @@ let fix_utf8_sequence =
 
 let fix_key = aux "Fix duplicate keys" Fixbase.fix_key
 
+let scan_utf8_conflicts =
+  aux "Scan for possible UTF-8 conflicts" Fixbase.scan_utf8_conflicts
+
 let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key bname =
+    ~invalid_utf8 ~key ~utf8_key bname =
   let v1 = !verbosity >= 1 in
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
@@ -132,6 +135,7 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   if !marriage_divorce then fix_marriage_divorce ~v1 ~v2 base nb_fam fix;
   if !invalid_utf8 then fix_utf8_sequence ~v1 ~v2 base nb_fam fix;
   if !key then fix_key ~v1 ~v2 base nb_ind fix;
+  if !utf8_key then scan_utf8_conflicts ~v1 ~v2 base nb_ind fix;
   if fast then (
     clear_strings_array base;
     clear_persons_array base);
@@ -167,6 +171,7 @@ let fevents_witnesses = ref false
 let marriage_divorce = ref false
 let invalid_utf8 = ref false
 let key = ref false
+let utf8_key = ref false
 let index = ref false
 let dry_run = ref false
 
@@ -184,11 +189,12 @@ let speclist =
     ("-pevents-witnesses", Arg.Set pevents_witnesses, " missing doc");
     ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc");
     ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc");
-    ("-person-key", Arg.Set key, " missing doc");
     ( "-index",
       Arg.Set index,
       " rebuild index. It is automatically enable by any other option." );
     ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc");
+    ("-key", Arg.Set key, " fix duplicate keys");
+    ("-utf8_key", Arg.Set utf8_key, " check potential utf8 conflicts");
   ]
 
 let anonfun i = bname := i
@@ -205,7 +211,7 @@ let main () =
   if
     !f_parents || !f_children || !p_parents || !p_families || !pevents_witnesses
     || !fevents_witnesses || !marriage_divorce || !p_NBDS || !invalid_utf8
-    || !key || !index
+    || !key || !utf8_key || !index
   then ()
   else (
     f_parents := true;
@@ -217,9 +223,10 @@ let main () =
     marriage_divorce := true;
     p_NBDS := true;
     invalid_utf8 := true;
-    key := true);
+    key := true;
+    utf8_key := true);
   check ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS ~p_parents
     ~p_families ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key !bname
+    ~invalid_utf8 ~key ~utf8_key !bname
 
 let _ = main ()
