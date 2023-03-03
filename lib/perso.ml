@@ -620,10 +620,9 @@ let get_date_place conf base auth_for_all_anc p =
           d1 (get_family p)
     in
     let d2 =
-      match get_death p with
-      | Death (_, cd) -> Some (Date.date_of_cdate cd)
-      | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead
-        -> (
+      match Date.date_of_death (get_death p) with
+      | Some d -> Some d
+      | None -> (
           match get_burial p with
           | Buried cod | Cremated cod -> Date.od_of_cdate cod
           | UnknownBurial -> None)
@@ -956,13 +955,7 @@ let build_list_eclair conf base v p =
       add_surname p surn (get_birth_place p) (Date.od_of_cdate (get_birth p));
       add_surname p surn (get_baptism_place p)
         (Date.od_of_cdate (get_baptism p));
-      let death =
-        match get_death p with
-        | Death (_, cd) -> Some (Date.date_of_cdate cd)
-        | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead
-          ->
-            None
-      in
+      let death = Date.date_of_death (get_death p) in
       add_surname p surn (get_death_place p) death;
       let burial =
         match get_burial p with
@@ -2258,12 +2251,11 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           | None -> null_val)
       | Buried _ | Cremated _ | UnknownBurial -> null_val)
   | "death_date" :: sl -> (
-      match get_death p with
-      | Death (_, cd) when p_auth ->
-          eval_date_field_var conf (Date.date_of_cdate cd) sl
-      | Death _ | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead
-      | OfCourseDead ->
-          null_val)
+      if not p_auth then null_val
+      else
+        match Date.date_of_death (get_death p) with
+        | Some d -> eval_date_field_var conf d sl
+        | None -> null_val)
   | "event" :: sl -> (
       match get_env "event" env with
       | Vevent (_, e) -> eval_event_field_var conf base env ep e loc sl
