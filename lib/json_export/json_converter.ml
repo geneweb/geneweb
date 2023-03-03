@@ -48,7 +48,7 @@ module Make (D : ConverterDriver) = struct
 
   (** gwdb to json  *)
 
-  let conv_dmy dmy =
+  let conv_dmy (dmy : Date.dmy) =
     obj
       [|
         ("day", int dmy.Date.day);

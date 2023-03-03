@@ -536,10 +536,10 @@ let p_getint env label =
 let nobtit conf base p =
   Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p
 
-let strictly_after_private_years conf a =
-  if a.Date.year > conf.private_years then true
-  else if a.year < conf.private_years then false
-  else a.month > 0 || a.day > 0
+let strictly_after_private_years conf age =
+  if age.Date.nb_year > conf.private_years then true
+  else if age.nb_year < conf.private_years then false
+  else age.nb_month > 0 || age.nb_day > 0
 
 let is_old_person conf p =
   match

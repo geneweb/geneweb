@@ -88,8 +88,8 @@ let print_death conf base =
                   let a = Date.time_elapsed d1 d in
                   let ages_sum =
                     match get_sex p with
-                    | Male -> (fst ages_sum + a.year, snd ages_sum)
-                    | Female -> (fst ages_sum, snd ages_sum + a.year)
+                    | Male -> (fst ages_sum + a.nb_year, snd ages_sum)
+                    | Female -> (fst ages_sum, snd ages_sum + a.nb_year)
                     | Neuter -> ages_sum
                   in
                   let ages_nb =
@@ -131,7 +131,7 @@ let print_death conf base =
         Output.print_sstring conf ") : ";
         Output.print_string conf
           (DateDisplay.string_of_age conf
-             { day = 0; month = 0; year = sum / nb; delta = 0; prec = Sure });
+             { nb_day = 0; nb_month = 0; nb_year = sum / nb });
         Output.print_sstring conf "<br>")
     in
     aux 0 (fst ages_nb) (fst ages_sum);
@@ -228,13 +228,28 @@ let print_oldest_alive conf base =
   Hutil.trailer conf
 
 let print_longest_lived conf base =
+  (* TODO dive into select_person, I think it shoud not take a "get_date" but a comparison function *)
   let get_longest p =
     if Util.authorized_age conf base p then
       match (Date.cdate_to_dmy_opt (get_birth p), get_death p) with
       | Some bd, Death (_, cd) -> (
           match Date.cdate_to_dmy_opt cd with
           | None -> None
-          | Some dd -> Some (Date.Dgreg (Date.time_elapsed bd dd, Dgregorian)))
+          | Some dd ->
+              (* TODO cheat by converting elapsed_time to date; but i think we should select by having a comparison on elapsed_time not date here *)
+              let { Date.nb_day; nb_month; nb_year } =
+                Date.time_elapsed bd dd
+              in
+              let date =
+                {
+                  Date.day = nb_day;
+                  month = nb_month;
+                  year = nb_year;
+                  delta = 0;
+                  prec = Sure;
+                }
+              in
+              Some (Date.Dgreg (date, Dgregorian)))
       | _ -> None
     else None
   in

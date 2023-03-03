@@ -452,21 +452,21 @@ let string_slash_of_date conf date =
           ^ transl_nth conf "gregorian/julian/french/hebrew" 3
           ^ ")")
 
-let string_of_age conf a =
+let string_of_age conf age =
   Adef.safe
   @@
-  match a with
-  | { day = 0; month = 0; year = y } ->
+  match age with
+  | { nb_day = 0; nb_month = 0; nb_year = y } ->
       if y > 1 then string_of_int y ^ " " ^ transl conf "years old"
       else if y = 1 then transl conf "one year old"
       else transl conf "birth"
-  | { day = 0; month = m; year = y } ->
+  | { nb_day = 0; nb_month = m; nb_year = y } ->
       if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
       else if y > 0 || m > 1 then
         string_of_int ((y * 12) + m) ^ " " ^ transl conf "months old"
       else if m = 1 then transl conf "one month old"
       else transl conf "less than one month old"
-  | { day = d; month = m; year = y } ->
+  | { nb_day = d; nb_month = m; nb_year = y } ->
       if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
       else if y > 0 || m > 1 then
         string_of_int ((y * 12) + m) ^ " " ^ transl conf "months old"

@@ -30,6 +30,8 @@ and precision = Adef.precision =
   (* inteval *)
   | YearInt of dmy2
 
+type elapsed_time = { nb_day : int; nb_month : int; nb_year : int }
+
 (* compress concrete date if it's possible *)
 let compress d =
   let simple =
@@ -110,56 +112,6 @@ let nb_days_in_month m a =
   else if m >= 1 && m <= 12 then
     [| 31; 28; 31; 30; 31; 30; 31; 31; 30; 31; 30; 31 |].(m - 1)
   else 0
-
-(* TODO use SDN instead *)
-(* elapsed time should not be represented by a date.  *)
-let time_elapsed d1 d2 =
-  let prec =
-    match (d1.prec, d2.prec) with
-    | Sure, Sure -> Sure
-    | (Maybe | Sure | About), (Maybe | Sure | About) -> Maybe
-    | (About | Maybe | Sure | Before), (After | Sure | Maybe | About) -> After
-    | (About | Maybe | Sure | After), (Before | Sure | Maybe | About) -> Before
-    | _ -> Maybe
-  in
-  match d1 with
-  | { day = 0; month = 0; year = a1 } ->
-      { day = 0; month = 0; year = d2.year - a1; prec; delta = 0 }
-  | { day = 0; month = m1; year = a1 } -> (
-      match d2 with
-      | { day = 0; month = 0; year = a2 } ->
-          { day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
-      | { day = 0; month = m2; year = a2 } ->
-          let month, r = if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1) in
-          let year = a2 - a1 - r in
-          { day = 0; month; year; prec; delta = 0 }
-      | { month = m2; year = a2 } ->
-          let month, r = if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1) in
-          let year = a2 - a1 - r in
-          { day = 0; month; year; prec; delta = 0 })
-  | { day = j1; month = m1; year = a1 } -> (
-      match d2 with
-      | { day = 0; month = 0; year = a2 } ->
-          { day = 0; month = 0; year = a2 - a1; prec; delta = 0 }
-      | { day = 0; month = m2; year = a2 } ->
-          let month, r = if m1 <= m2 then (m2 - m1, 0) else (m2 - m1 + 12, 1) in
-          let year = a2 - a1 - r in
-          { day = 0; month; year; prec; delta = 0 }
-      | { day = j2; month = m2; year = a2 } ->
-          let day, r =
-            if j1 <= j2 then (j2 - j1, 0)
-            else (j2 - j1 + nb_days_in_month m1 a1, 1)
-          in
-          let month, r =
-            if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
-          in
-          let year = a2 - a1 - r in
-          { day; month; year; prec; delta = 0 })
-
-let time_elapsed_opt d1 d2 =
-  match (d1.prec, d2.prec) with
-  | After, After | Before, Before -> None
-  | _ -> Some (time_elapsed d1 d2)
 
 let cdate_to_dmy_opt cdate =
   match od_of_cdate cdate with
@@ -345,3 +297,14 @@ let compare_date d1 d2 =
   | Dgreg (_, _), Dtext _ -> 1
   | Dtext _, Dgreg (_, _) -> -1
   | Dtext _, Dtext _ -> 0
+
+let time_elapsed d1 d2 =
+  let sdn1 = to_sdn ~from:Dgregorian d1 in
+  let sdn2 = to_sdn ~from:Dgregorian d2 in
+  (* TODO *)
+  { nb_day = sdn2 - sdn1; nb_month = 0; nb_year = 0 }
+
+let time_elapsed_opt d1 d2 =
+  match (d1.prec, d2.prec) with
+  | After, After | Before, Before -> None
+  | _ -> Some (time_elapsed d1 d2)

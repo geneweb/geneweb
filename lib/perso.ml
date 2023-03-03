@@ -632,6 +632,8 @@ let get_date_place conf base auth_for_all_anc p =
       else
         match d2 with
         | Some (Dgreg (d, _)) ->
+            (* TODO looks bad
+               Util.strictly_after_private_years should probably not be in .mli *)
             let a = Date.time_elapsed d conf.today in
             Util.strictly_after_private_years conf a
         | _ -> false
@@ -2551,12 +2553,14 @@ and eval_str_event_field conf base (p, p_auth)
         | ( Some ({ prec = Sure | About | Maybe } as d1),
             Some ({ prec = Sure | About | Maybe } as d2) )
           when d1 <> d2 ->
-            let a = Date.time_elapsed d1 d2 in
+            let age =
+              Date.time_elapsed d1 d2 |> DateDisplay.string_of_age conf
+            in
             let s =
               if (not approx) && d1.prec = Sure && d2.prec = Sure then ""
               else transl_decline conf "possibly (date)" "" ^ " "
             in
-            safe_val (s ^<^ DateDisplay.string_of_age conf a)
+            safe_val (s ^<^ age)
         | _ -> null_val
       else null_val
   | "name" -> (
@@ -2662,15 +2666,17 @@ and eval_bool_person_field conf base env (p, p_auth) = function
         | _ -> false
       else false
   | "computable_death_age" ->
+      (* TODO what ?? *)
       if p_auth then
         match Gutil.get_birth_death_date p with
         | ( Some (Dgreg (({ prec = Sure | About | Maybe } as d1), _)),
             Some (Dgreg (({ prec = Sure | About | Maybe } as d2), _)),
             _ )
           when d1 <> d2 ->
-            let a = Date.time_elapsed d1 d2 in
-            a.year > 0
-            || (a.year = 0 && (a.month > 0 || (a.month = 0 && a.day > 0)))
+            let age = Date.time_elapsed d1 d2 in
+            age.nb_year > 0
+            || age.nb_year = 0
+               && (age.nb_month > 0 || (age.nb_month = 0 && age.nb_day > 0))
         | _ -> false
       else false
   | "computable_marriage_age" -> (
@@ -2683,9 +2689,11 @@ and eval_bool_person_field conf base env (p, p_auth) = function
             with
             | ( Some ({ prec = Sure | About | Maybe } as d1),
                 Some ({ prec = Sure | About | Maybe } as d2) ) ->
-                let a = Date.time_elapsed d1 d2 in
-                a.year > 0
-                || (a.year = 0 && (a.month > 0 || (a.month = 0 && a.day > 0)))
+                let age = Date.time_elapsed d1 d2 in
+                (* TODO this is age <> 0 *)
+                age.nb_year > 0
+                || age.nb_year = 0
+                   && (age.nb_month > 0 || (age.nb_month = 0 && age.nb_day > 0))
             | _ -> false
           else false
       | _ -> raise Not_found)

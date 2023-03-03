@@ -41,8 +41,8 @@ let maximum_lifespan = 125
 
 let infer_death_from_dmy conf ?(max_age = maximum_lifespan) d =
   (* TODO this max_age should be related to private_years_marriage *)
-  let age = (Date.time_elapsed d conf.today).year in
-  if age > max_age then OfCourseDead else DontKnowIfDead
+  let age = Date.time_elapsed d conf.today in
+  if age.nb_year > max_age then OfCourseDead else DontKnowIfDead
 
 let infer_death_from_cdate conf ?(max_age = maximum_lifespan) cdate =
   match Date.cdate_to_dmy_opt cdate with
@@ -421,7 +421,7 @@ let someone_strong_n_short_dates conf base p =
   ^^^ DateDisplay.short_dates_text conf base p
 
 let print_warning conf base = function
-  | Warning.BigAgeBetweenSpouses (p1, p2, a) ->
+  | Warning.BigAgeBetweenSpouses (p1, p2, age) ->
       Output.printf conf
         (fcapitale
            (ftransl conf
@@ -430,7 +430,7 @@ let print_warning conf base = function
         (fun _ -> (someone_strong base p2 :> string));
       Output.print_sstring conf (transl conf ":");
       Output.print_sstring conf " ";
-      Output.print_string conf (DateDisplay.string_of_age conf a)
+      Output.print_string conf (DateDisplay.string_of_age conf age)
   | BirthAfterDeath p ->
       Output.printf conf (ftransl conf "%t died before his/her birth") (fun _ ->
           (someone_strong_n_short_dates conf base p :> string))
@@ -568,13 +568,13 @@ let print_warning conf base = function
       print_first_name_strong conf base p2;
       Output.print_string conf (DateDisplay.short_dates_text conf base p2);
       Output.print_sstring conf "</li></ul>"
-  | DeadOld (p, a) ->
+  | DeadOld (p, age) ->
       Output.print_string conf (someone_strong base p);
       Output.print_sstring conf " ";
       Output.print_sstring conf
         (transl_nth conf "died at an advanced age" @@ index_of_sex @@ get_sex p);
       Output.print_sstring conf "(";
-      Output.print_string conf (DateDisplay.string_of_age conf a);
+      Output.print_string conf (DateDisplay.string_of_age conf age);
       Output.print_sstring conf ")"
   | DeadTooEarlyToBeFather (father, child) ->
       Output.printf conf
@@ -627,12 +627,12 @@ let print_warning conf base = function
       Output.print_sstring conf (transl conf "is born after his/her child");
       Output.print_sstring conf " ";
       Output.print_string conf (someone_strong base c)
-  | ParentTooYoung (p, a, _) ->
+  | ParentTooYoung (p, age, _) ->
       Output.print_string conf (someone_strong base p);
       Output.print_sstring conf " ";
       Output.print_sstring conf (transl conf "is a very young parent");
       Output.print_sstring conf " (";
-      Output.print_string conf (DateDisplay.string_of_age conf a);
+      Output.print_string conf (DateDisplay.string_of_age conf age);
       Output.print_sstring conf ")"
   | ParentTooOld (p, a, _) ->
       Output.print_string conf (someone_strong base p);
@@ -697,11 +697,11 @@ let print_warning conf base = function
       Output.printf conf
         (fcapitale (ftransl conf "undefined sex for %t"))
         (fun _ -> (someone_strong base p :> string))
-  | YoungForMarriage (p, a, _) | OldForMarriage (p, a, _) ->
+  | YoungForMarriage (p, age, _) | OldForMarriage (p, age, _) ->
       Output.print_string conf (someone_strong base p);
       Output.print_sstring conf " ";
       Output.printf conf (ftransl conf "married at age %t") (fun _ ->
-          (DateDisplay.string_of_age conf a :> string))
+          (DateDisplay.string_of_age conf age :> string))
 
 let print_warnings conf base wl =
   print_list_aux conf base "warnings" wl @@ fun conf base wl ->
@@ -1031,7 +1031,7 @@ let check_missing_witnesses_names conf get list =
   in
   loop list
 
-let check_greg_day conf d =
+let check_greg_day conf (d : Date.dmy) =
   if d.Date.day > Date.nb_days_in_month d.month d.year then bad_date conf d
 
 let reconstitute_date conf var =

@@ -43,7 +43,7 @@ val string_slash_of_date : config -> date -> Adef.safe_string
 (** Returns date in format dd/mm/yyyy. Format could be different for other languages (defined by [!dates order]
     keyword in the lexicon). *)
 
-val string_of_age : config -> dmy -> Adef.safe_string
+val string_of_age : config -> elapsed_time -> Adef.safe_string
 (** Returns textual representation of the age represented by [dmy]. *)
 
 val prec_year_text : config -> dmy -> string

@@ -97,10 +97,10 @@ module Default = struct
         match d with
         | None -> none ()
         | Some d ->
-            let a = Date.time_elapsed d conf.today in
-            if a.Date.year > conf.Config.private_years then true
-            else if a.year < conf.private_years then false
-            else a.month > 0 || a.day > 0
+            let age = Date.time_elapsed d conf.today in
+            if age.nb_year > conf.Config.private_years then true
+            else if age.nb_year < conf.private_years then false
+            else age.nb_month > 0 || age.nb_day > 0
       in
       check_date (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) @@ fun () ->
       check_date (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt) @@ fun () ->

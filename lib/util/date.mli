@@ -24,6 +24,8 @@ and precision =
   (* inteval *)
   | YearInt of dmy2
 
+type elapsed_time = { nb_day : int; nb_month : int; nb_year : int }
+
 val leap_year : int -> bool
 (** Says if the given year is a leap year. *)
 
@@ -31,7 +33,7 @@ val nb_days_in_month : int -> int -> int
 (** Returns number of days for the given month and year for
     gregorian calendar. Takes into account leap years. *)
 
-val time_elapsed : dmy -> dmy -> dmy
+val time_elapsed : dmy -> dmy -> elapsed_time
 (** [time_elapsed start stop]
     Compute the time elapsed between [start] and [stop].
     If [stop] is prior to [start], resulting [dmy]'s field
@@ -44,7 +46,7 @@ val time_elapsed : dmy -> dmy -> dmy
     Used to compare only gregorian calendar's dates.
  *)
 
-val time_elapsed_opt : dmy -> dmy -> dmy option
+val time_elapsed_opt : dmy -> dmy -> elapsed_time option
 (** Same as [time_elapsed], but will return [None]
     if computation is not possible
     (e.g. time_elapsed_opt /1839 /1859). *)
