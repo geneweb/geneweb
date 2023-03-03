@@ -89,7 +89,7 @@ val nobtit : config -> base -> person -> title list
     that respects constraints imposed by [conf.allowed_titles] and
     [conf.denied_titles] *)
 
-val strictly_after_private_years : config -> dmy -> bool
+val strictly_after_private_years : dmy -> int -> bool
 
 val authorized_age : config -> base -> person -> bool
 (** Alias to !GWPARAM.p_auth *)

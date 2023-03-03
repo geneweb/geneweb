@@ -93,18 +93,25 @@ module Default = struct
     let death = Gwdb.get_death p in
     if death = NotDead then conf.private_years < 1
     else
-      let check_date d none =
+      let check_date d lim none =
         match d with
         | None -> none ()
         | Some d ->
             let a = Date.time_elapsed d conf.today in
-            if a.Def.year > conf.Config.private_years then true
+            if a.Def.year > lim then true
             else if a.year < conf.private_years then false
             else a.month > 0 || a.day > 0
       in
-      check_date (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) @@ fun () ->
-      check_date (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt) @@ fun () ->
-      check_date (Gwdb.get_death p |> Date.dmy_of_death) @@ fun () ->
+      check_date (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) conf.private_years
+      @@ fun () ->
+      check_date
+        (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt)
+        conf.private_years
+      @@ fun () ->
+      check_date
+        (Gwdb.get_death p |> Date.dmy_of_death)
+        conf.private_years_death
+      @@ fun () ->
       (Gwdb.get_access p <> Def.Private && conf.public_if_no_date)
       ||
       let families = Gwdb.get_family p in
@@ -114,6 +121,7 @@ module Default = struct
         && check_date
              (Array.get families i |> Gwdb.foi base |> Gwdb.get_marriage
             |> Date.cdate_to_dmy_opt)
+             conf.private_years_marriage
              (fun () -> loop (i + 1))
       in
       loop 0

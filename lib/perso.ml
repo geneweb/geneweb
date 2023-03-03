@@ -660,7 +660,7 @@ let get_date_place conf base auth_for_all_anc p =
         match d2 with
         | Some (Dgreg (d, _)) ->
             let a = Date.time_elapsed d conf.today in
-            Util.strictly_after_private_years conf a
+            Util.strictly_after_private_years a conf.private_years_death
         | _ -> false
     in
     let pl =
