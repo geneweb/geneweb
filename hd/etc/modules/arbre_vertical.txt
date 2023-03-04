@@ -90,10 +90,10 @@
                          %apply;a_of_b%with;%expr(cell.family.sep_date_s-cell.family.marriage_date.year) [years old]%and;[relation/relations]0%end;%nn;
                        %elseif;(cell.family.sep_date_s="" and not (("-" in cell.family.date_s) and cell.family.father.is_dead and cell.family.mother.is_dead))
                          %apply;a_of_b%with;%expr(today.year-cell.family.marriage_date.year) [years old]%if;(spouses_dead=1) (?!)%end;%and;[relation/relations]0%end;
-                         %if;(spouses_dead=1)&#013;&#013;Please let both spouses rest in peace!%end;
+                         %if;(spouses_dead=1)&#10;&#10;Please let both spouses rest in peace!%end;
                        %end;%nn;
                      %end;
-                     %if;wizard;&#013;&#013;%nn;
+                     %if;wizard;&#10;&#10;%nn;
                        %if;(cell.family.marriage_date.year="")[*add::marriage/marriages]0
                        %else;[*update::family/families]0%end; %cell.family.father; [and] %cell.family.mother;
                      %end;">%nn;
@@ -150,7 +150,7 @@
                    %end;
                  %end;
                  %if;(widow_period!="")
-                   %apply;a_of_b%with;&#013;&#013;
+                   %apply;a_of_b%with;&#10;&#10;
                      %if;(fw=0 or fw=5)%cell.family.mother;%else;%cell.family.father;%end;%sp;
                      %if;(fw=0 or fw=5)[widower/widow]1%else;[widower/widow]0%end;%sp;
                      %if;(fw=5 or fw=6)[for/since]1%else;[for/since]0%end;%sp;
@@ -162,7 +162,7 @@
                    %and;
                      %if;(fw=0 or fw=5)%cell.family.father;%else;%cell.family.mother;%end;
                    %end;
-                   %if;(widow_period>100)&#013;Please let both spouses rest in peace!%end;
+                   %if;(widow_period>100)&#10;Please let both spouses rest in peace!%end;
                  %end;">%if;(not ("-" in cell.family.date_s))—%end;%if;(fw=2 or fw=4)?%end;%widow_year;</span>
               %else;
                 %cell.family.date_s;

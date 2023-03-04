@@ -125,7 +125,7 @@
   %if;(cancel_links) aaa
   %else;
     <a href="%prefix;bbb"
-      title="%apply;a_of_b%with;Sosa sss%and;%self;%end;&#013;
+      title="%apply;a_of_b%with;Sosa sss%and;%self;%end;&#10;
              %apply;a_of_b%with;Sosa ttt%and%sosa_ref;%end">aaa</a>%nn;
   %end;
 %end;

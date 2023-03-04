@@ -144,17 +144,17 @@
           %if;(evar.sosa2!="on")<tt>%end;<a id="s%ancestor.anc_sosa.v;" style="top:%top;px;left:%left;px;" %nn;
           %if;(ancestor.same != "")%apply;implex1(ancestor.same.v)%end;
           href="%prefix;%ancestor.access;%if;(evar.nav="on")%nav;%end;"%if;(evar.nav!="on") target="_blank"%end;
-          title="[*generation/generations]0 %level; – Sosa %if;("ancestor.interval" != "") = Sosa %ancestor.interval;%else;%ancestor.anc_sosa; & %expr(ancestor.anc_sosa+1)%end;&#013;
-            %if;(ancestor.is_male) ♂%else; ♀%end; %ancestor; (%ancestor.occ)&#013;
+          title="[*generation/generations]0 %level; – Sosa %if;("ancestor.interval" != "") = Sosa %ancestor.interval;%else;%ancestor.anc_sosa; & %expr(ancestor.anc_sosa+1)%end;&#10;
+            %if;(ancestor.is_male) ♂%else; ♀%end; %ancestor; (%ancestor.occ)&#10;
             %if;(ancestor.birth_date.year != "")° %ancestor.birth_date.year;%end;
             %if;(ancestor.birth_date.year != "" and ancestor.is_dead) – %end;
-            %if;(ancestor.birth_date.year = "" and ancestor.death_date.year != "")†%else;%ancestor.death_date.year;%end;&#013;
-            %if;(not ancestor.has_parents) [*missing parents].&#013;%end;
+            %if;(ancestor.birth_date.year = "" and ancestor.death_date.year != "")†%else;%ancestor.death_date.year;%end;&#10;
+            %if;(not ancestor.has_parents) [*missing parents].&#10;%end;
             %if;(ancestor.same = "")
-              %if;(ancestor.spouse.is_male) ♂%else; ♀%end; %ancestor.spouse; (%ancestor.spouse.occ)&#013;
+              %if;(ancestor.spouse.is_male) ♂%else; ♀%end; %ancestor.spouse; (%ancestor.spouse.occ)&#10;
               %if;(ancestor.spouse.birth_date.year != "")° %ancestor.spouse.birth_date.year;%end;
               %if;(ancestor.spouse.birth_date.year != "" and ancestor.spouse.is_dead) – %end;
-              %if;(ancestor.spouse.birth_date.year = "" and ancestor.spouse.death_date.year != "")†%else;%ancestor.spouse.death_date.year;%end;&#013;
+              %if;(ancestor.spouse.birth_date.year = "" and ancestor.spouse.death_date.year != "")†%else;%ancestor.spouse.death_date.year;%end;&#10;
               %if;(not ancestor.spouse.has_parents) [*missing parents].%end;
             %end;">
             %if;(evar.sosa2 != "on")
@@ -173,7 +173,7 @@
           %let;top4;%expr(topxx_yy(ancestor.anc_sosa.v)*hb)%in;
           %let;left4;%expr(leftxx_yy(ancestor.anc_sosa.v)*wb)%in;
           <a style="top:%top4;px;left:%left4;px;" href="%prefix;m=ADD_PAR;ip=%ancestor.index;" target="_blank"
-          title="[*missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#013;
+          title="[*missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#10;
           [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v;%end; %ancestor;">%if;(evar.sms="on")·%else; %end;</a>
         %end;
       %end;
@@ -191,11 +191,11 @@
         %if;(evar.sosa2!="on")<tt>%end;<a id="s%ancestor.anc_sosa.v;" style="top:%top;px;left:%left;px;" %nn;
         %if;(ancestor.same != "")%apply;implex1(ancestor.same.v)%end;
         href="%prefix;%ancestor.access;%if;(evar.nav="on")%nav;%end;"%if;(evar.nav!="on") target="_blank"%end;
-        title="Sosa %ancestor.anc_sosa;%if;(ancestor.same != "") = Sosa %ancestor.same;%end; – [*generation/generations]0 %level;&#013;
-          %if;(ancestor.is_male) ♂%else; ♀%end; %ancestor; (%ancestor.occ)&#013;
+        title="Sosa %ancestor.anc_sosa;%if;(ancestor.same != "") = Sosa %ancestor.same;%end; – [*generation/generations]0 %level;&#10;
+          %if;(ancestor.is_male) ♂%else; ♀%end; %ancestor; (%ancestor.occ)&#10;
           %if;(ancestor.birth_date.year != "")° %ancestor.birth_date.year;%end;
           %if;(ancestor.birth_date.year != "" and ancestor.is_dead) – %end;
-          %if;(ancestor.birth_date.year = "" and ancestor.death_date.year != "")†%else;%ancestor.death_date.year;%end;&#013;
+          %if;(ancestor.birth_date.year = "" and ancestor.death_date.year != "")†%else;%ancestor.death_date.year;%end;&#10;
           %if;(not ancestor.has_parents) [*missing parents].%end;">
         %if;(evar.sosa2 != "on")
             %if;(ancestor.same != "")x %apply;implex()
@@ -212,12 +212,12 @@
           %let;top2;%expr(topxx_yy(ancestor.anc_sosa.v*2)*hb)%in;
           %let;left2;%expr(leftxx_yy(ancestor.anc_sosa.v*2)*wb)%in;
           <a style="top:%top2;px;left:%left2;px;" href="%prefix;m=ADD_PAR;ip=%ancestor.index;" 
-          title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#013;
+          title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#10;
           [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v; %ancestor;%end;">%if;(evar.sms="on")·%else; %end;</a>
           %let;top3;%expr(topxx_yy(ancestor.anc_sosa.v*2+1)*hb)%in;
           %let;left3;%expr(leftxx_yy(ancestor.anc_sosa.v*2+1)*wb)%in;
           <a style="top:%top3;px;left:%left3;px" href="%prefix;m=ADD_PAR;ip=%ancestor.index;" target="_blank"
-          title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#013;
+          title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#10;
           [*add] %apply;a_of_b%with;[the parents]%and;%ancestor; Sosa %ancestor.anc_sosa.v;%end;">%if;(evar.sms="on")·%else; %end;</a>
         %end;
       %end;

@@ -115,7 +115,7 @@
   max="%if;(evar.m = "A")
          %if;(evar.t1="CT" and evar.cpl="on")13%elseif;(evar.t1="CT" and evar.cpl="")12%else;%l_emaxv;%end;"
        %end;
-  title="%if;(evar.m = "A" and evar.t = "T")[*maximum][:]%nl;[*full tree] %l_emaxv; [generation/generations]1%nl;[*compact tree] H [or] I  13 [generation/generations]1&#013;     [by couple] 14 [generation/generations]1%end;%nl;[*with] [n° Sosa] 12 [generation/generations]1%nl;    [by couple] 13 [generation/generations]1"
+  title="%if;(evar.m = "A" and evar.t = "T")[*maximum][:]%nl;[*full tree] %l_emaxv; [generation/generations]1%nl;[*compact tree] H [or] I  13 [generation/generations]1&#10;     [by couple] 14 [generation/generations]1%end;%nl;[*with] [n° Sosa] 12 [generation/generations]1%nl;    [by couple] 13 [generation/generations]1"
         accesskey="X"/>[generation/generations]1 <code>(X)</code></label><br>
 %end;
 

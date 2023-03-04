@@ -88,14 +88,14 @@
         <div class="border rounded mr-1">
           <a role="button" class="btn btn-sm btn-outline-%if;(father_access="")dark disabled%else;primary%end; border-0" href="%prefix_base_password;&%father_access;&%nn;
             %foreach;env_binding;%if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="i" or env.key="v"))%env.key;=%env.val;&%end;%end;v=%if;(e.m="D")%expr(e.v+1)%else;%e.v;%end;"
-            title="[*navigation] %if;(dtree="1")[father/mother]0[:]&#013;%father_access;&#013;v=%expr(e.v+1)%else;%father.first_name; %father_surname; ([father/mother]0)%end;">%nn;
+            title="[*navigation] %if;(dtree="1")[father/mother]0[:]&#10;%father_access;&#10;v=%expr(e.v+1)%else;%father.first_name; %father_surname; ([father/mother]0)%end;">%nn;
             <i class="fas fa-arrow-turn-up fa-flip-horizontal fa-sm mr-2"></i>[*father/mother]0%nn;
           </a>
         </div>
         <div class="border rounded">
           <a role="button" class="btn btn-sm btn-outline-%if;(mother_access="")dark disabled%else;primary%end; border-0" href="%prefix_base_password;&%mother_access;&%nn;
             %foreach;env_binding;%if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="i" or env.key="v"))%env.key;=%env.val;&%end;%end;v=%if;(e.m="D")%expr(e.v+1)%else;%e.v;%end;"
-            title="[*navigation] %if;(dtree="1")[father/mother]1[:]&#013;%mother_access;&#013;v=%expr(e.v+1)%else;%mother.first_name; %mother_surname; ([father/mother]1)%end;">%nn;
+            title="[*navigation] %if;(dtree="1")[father/mother]1[:]&#10;%mother_access;&#10;v=%expr(e.v+1)%else;%mother.first_name; %mother_surname; ([father/mother]1)%end;">%nn;
             [*father/mother]1<i class="fas fa-arrow-turn-up fa-sm ml-2"></i></a>
         </div>
       </div>

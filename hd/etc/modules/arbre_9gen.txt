@@ -152,7 +152,7 @@
 %if;(evar.cgl!="on")<a href="%prefix;%access;">%end;%first_name; %surname;<br>
 %if;(birth_date.year != "")%birth_date.year;%end
 %if;(birth_date.year != "" and is_dead) – %end;
-%if;(birth_date.year = "" and death_date.year != "")†%else;%death_date.year;%end;&#013;
+%if;(birth_date.year = "" and death_date.year != "")†%else;%death_date.year;%end;&#10;
 %if;(evar.cgl!="on")</a>%end;
 </div>
 </h3>
@@ -162,7 +162,7 @@
       %ancestor.first_name %ancestor.surname; xxx<br>
       %if;(ancestor.birth_date.year != "")° %ancestor.birth_date.year;%end
       %if;(ancestor.birth_date.year != "" and ancestor.is_dead) – %end;
-      %if;(ancestor.birth_date.year = "" and ancestor.death_date.year != "")†%else;%ancestor.death_date.year;%end;&#013;
+      %if;(ancestor.birth_date.year = "" and ancestor.death_date.year != "")†%else;%ancestor.death_date.year;%end;&#10;
     %end;
   %end;
 
@@ -240,7 +240,7 @@
       %ancestor.first_name; %ancestor.surname;%if;(evar.cgl!="on")</a>%end;<br>
       %if;(ancestor.birth_date.year != "")%ancestor.birth_date.year;%end
           %if;(ancestor.birth_date.year != "" and ancestor.is_dead) – %end;
-          %if;(ancestor.birth_date.year = "" and ancestor.death_date.year != "")†%else;%ancestor.death_date.year;%end;&#013;<br>
+          %if;(ancestor.birth_date.year = "" and ancestor.death_date.year != "")†%else;%ancestor.death_date.year;%end;&#10;<br>
       <table style="width:%wid;px; align:center"><tr>
       <td style="width:35%%">%if;(evar.image!="off")
         %if;(ancestor.has_image)<img src="%ancestor.image_url;" height="50px"%/>%end;
@@ -264,7 +264,7 @@
         %if;(evar.cgl!="on")</a>%end;<br>
         %if;(ancestor.spouse.birth_date.year != "")%ancestor.spouse.birth_date.year;%end
         %if;(ancestor.spouse.birth_date.year != "" and ancestor.spouse.is_dead) – %end;
-        %if;(ancestor.spouse.birth_date.year = "" and ancestor.spouse.death_date.year != "")†%else;%ancestor.spouse.death_date.year;%end;&#013;
+        %if;(ancestor.spouse.birth_date.year = "" and ancestor.spouse.death_date.year != "")†%else;%ancestor.spouse.death_date.year;%end;&#10;
       %end;
       %if;(level> 4)
         %if;(evar.cgl!="on")
