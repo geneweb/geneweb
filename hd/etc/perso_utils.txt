@@ -93,18 +93,18 @@
 %define;type_wedding()
   %if;are_married;
     %if;(nb_children != 0)
-      <img src="%image_prefix;/married.png" alt="[married]" title="[married]"%/>
+      <img src="%image_prefix;/married.png" alt="[married]" title="[married]">
     %else;
-      <img src="%image_prefix;/married_no_descendants.png" alt="[married]" title="[married]"%/>
+      <img src="%image_prefix;/married_no_descendants.png" alt="[married]" title="[married]">
     %end;
   %elseif;are_not_married;
-    <img src="%image_prefix;/not_married.png" alt="[not married]" title="[not married]"%/>
+    <img src="%image_prefix;/not_married.png" alt="[not married]" title="[not married]">
   %elseif;are_engaged;
-    <img src="%image_prefix;/engaged.png" alt="[engaged]" title="[engaged]"%/>
+    <img src="%image_prefix;/engaged.png" alt="[engaged]" title="[engaged]">
   %elseif;is_no_sexes_check;
-    <img src="%image_prefix;/not_married.png" alt="[relationship]" title="[relationship]"%/>
+    <img src="%image_prefix;/not_married.png" alt="[relationship]" title="[relationship]">
   %elseif;is_no_mention;
-    <img src="%image_prefix;/not_married.png" alt="[with]" title="[with]"%/>
+    <img src="%image_prefix;/not_married.png" alt="[with]" title="[with]">
   %end;
 %end;
 
@@ -598,7 +598,7 @@
 %end;
 
 %define;not_married_no_descendants()
-  <img src="%image_prefix;/not_married_no_descendants.png" alt="[not married],&nbsp;[no descendants]" title="[not married],&nbsp;[no descendants]"%/>
+  <img src="%image_prefix;/not_married_no_descendants.png" alt="[not married],&nbsp;[no descendants]" title="[not married],&nbsp;[no descendants]">
 %end;
 
 %define;short_display_siblings()
@@ -619,7 +619,7 @@
     %if;child.has_families;
       %foreach;child.family;
         %if;(family_cnt!=1)
-          <br><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="1px"%/>
+          <br><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="1px">
           <em>%child;%child.title;%child.dates;</em>
         %end;
         <span class="ml-1">%apply;long_married_f("child", "lower")</span>
@@ -639,11 +639,11 @@
             %if;(evar.cgl!="on")
               <a href="%child.image_html_url;">
                 <img src="%child.image_url;"%sp;
-                  %child.image_small_size; style="border: none" alt="" title="[image/images]0"%/>
+                  %child.image_small_size; style="border: none" alt="" title="[image/images]0">
               </a>
             %else;
               <img src="%child.image_url;"%sp;
-                %child.image_small_size; style="border: none" alt="" title="[image/images]0"%/>
+                %child.image_small_size; style="border: none" alt="" title="[image/images]0">
             %end;
           </td>
           <td style="vertical-align: middle">
@@ -652,7 +652,7 @@
     %if;child.has_families;
       %foreach;child.family;
         %if;(family_cnt!=1)
-          <br><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="" title=""%/>
+          <br><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="" title="">
           <em>%child;%child.title;%child.dates;</em>
         %end;
         %sp;<em>%apply;long_married_f("child", "lower")</em>
@@ -682,11 +682,11 @@
               %if;(evar.cgl!="on")
                 <a href="%spouse.image_html_url;">
                   <img src="%spouse.image_url;"%sp;
-                    %spouse.image_small_size; style="border: none" alt="" title="[image/images]0"%/>
+                    %spouse.image_small_size; style="border: none" alt="" title="[image/images]0">
                 </a>
               %else;
                 <img src="%spouse.image_url;"%sp;
-                  %spouse.image_small_size; style="border: none" alt="" title="[image/images]0"%/>
+                  %spouse.image_small_size; style="border: none" alt="" title="[image/images]0">
               %end;
             </td>
           </tr>

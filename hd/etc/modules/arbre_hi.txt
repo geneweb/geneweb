@@ -140,7 +140,7 @@
             href='%prefix;%aaaaccess;'
             title="%aaafirst_name; %aaasurname; (%aaaocc;)">
             %if;(aaahas_image)
-              <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"%/>
+              <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
             %end;
           </a>
           <a class="big_anchor_1m list-group-item-action"
@@ -152,14 +152,14 @@
             href='%prefix;%aaaaccess;'
             title="%aaafirst_name; %aaasurname; (%aaaocc;)">
             %if;(aaahas_image)
-            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"%/>
+            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
             %end;
           </a>
           <a class="big_anchor_her list-group-item-action"
             href='%prefix;%aaaspouse.access;'
             title="%aaaspouse;">
             %if;(aaaspouse.has_image)
-            <img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0"%/>
+            <img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0">
             %end;
           </a>
           <a class="big_anchor_him_m list-group-item-action"
@@ -182,7 +182,7 @@
         %if;(evarcpl!="on")
           <div class="d-flex">
           %if;(aaahas_image)
-            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"%/>
+            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
           %end;
           <span style="margin:0 0 2px 0;text-align:center;width:%dw1;px;font-size:%fs1;px;">
             %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;
@@ -191,7 +191,7 @@
         %else;
           <div class="d-flex justify-content-between">
           %if;(aaahas_image)%nn;
-            <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"%/></div>%nn;
+            <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"></div>%nn;
           %else;
             <div style="margin:0 0 2px 0;width:%imsz;px"></div>
           %end;%nn;
@@ -199,7 +199,7 @@
             %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;%nn;
           </div>%nn;
           %if;(aaaspouse.has_image)%nn;
-            <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0"%/></div>%nn;
+            <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0"></div>%nn;
           %end;%nn;
           </div>
         %end;

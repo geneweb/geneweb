@@ -117,7 +117,7 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
 %apply;login()
 </div>
 <div style="margin-top:1.7em;margin-left:1.7em">
-  <img src="%image_prefix;/gwlogo.png" width="280" alt="GeneWeb logo"%/>
+  <img src="%image_prefix;/gwlogo.png" width="280" alt="GeneWeb logo">
 </div>
 <div style="margin-left:7.5em">
 %if;(bvar.motd != "")%apply;interp(bvar.motd)%end;

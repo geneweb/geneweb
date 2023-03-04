@@ -229,10 +229,10 @@
     <h2 class="my-1" id="c">[*time line]%nn;
       %if;(not cancel_links)
         <a %apply;relations_tree(l_ref)>
-          <img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree"/>
+          <img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree">
         </a>%nn;
       %else;
-        <img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree"/>
+        <img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree">
       %end;%nn;
     </h2>%nn;
     %if;(not cancel_links)
@@ -511,10 +511,10 @@
                   %if;(event.has_witnesses)
                     %if;(not cancel_links)
                       <a class="" %apply;event_tree(index)>%nn;
-                        <img src="%image_prefix;/gui_create.png" class="ml-2 mb-1" height="16" alt="Tree"/>
+                        <img src="%image_prefix;/gui_create.png" class="ml-2 mb-1" height="16" alt="Tree">
                       </a>
                     %else;
-                      <img src="%image_prefix;/gui_create.png" class="ml-2 mb-1" height="16" alt="Tree"/>
+                      <img src="%image_prefix;/gui_create.png" class="ml-2 mb-1" height="16" alt="Tree">
                     %end;
                   %end;
                 %end;

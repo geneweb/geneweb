@@ -12,13 +12,13 @@
           %if;father.father.has_image;
             %if;(not cancel_links)
               <a href="%father.father.image_url;" target="_blank">
-                <img class="rounded" %father.father.image_small_size;%sp;src="%father.father.image_url;" alt="[image/images]0" title="%father.father; ([a grandfather/a grandmother/a grandparent]0)"%/>
+                <img class="rounded" %father.father.image_small_size;%sp;src="%father.father.image_url;" alt="[image/images]0" title="%father.father; ([a grandfather/a grandmother/a grandparent]0)">
               </a>
             %else;
-              <img class="rounded" %father.father.image_small_size;%sp;src="%father.father.image_url;" alt="[image/images]0" title="%father.father; ([a grandfather/a grandmother/a grandparent]0)"%/>
+              <img class="rounded" %father.father.image_small_size;%sp;src="%father.father.image_url;" alt="[image/images]0" title="%father.father; ([a grandfather/a grandmother/a grandparent]0)">
             %end;
           %elseif;(bvar.default_image="yes")
-            <img  height="75" src="%image_prefix;/img_unknown_man.png" alt="[missing image]"%/>
+            <img  height="75" src="%image_prefix;/img_unknown_man.png" alt="[missing image]">
           %end;
           <br>
           %apply;short_display_person_tree("father.father")</td>
@@ -27,13 +27,13 @@
           %if;father.mother.has_image;
             %if;(not cancel_links)
               <a href="%father.mother.image_url;" target="_blank">
-                <img class="rounded" %father.mother.image_small_size;%sp;src="%father.mother.image_url;" alt="[image/images]0" title="%father.mother; ([a grandfather/a grandmother/a grandparent]1)"%/>
+                <img class="rounded" %father.mother.image_small_size;%sp;src="%father.mother.image_url;" alt="[image/images]0" title="%father.mother; ([a grandfather/a grandmother/a grandparent]1)">
               </a>
             %else;
-              <img class="rounded" %father.mother.image_small_size;%sp;src="%father.mother.image_url;" alt="[image/images]0" title="%father.mother; ([a grandfather/a grandmother/a grandparent]1)"%/>
+              <img class="rounded" %father.mother.image_small_size;%sp;src="%father.mother.image_url;" alt="[image/images]0" title="%father.mother; ([a grandfather/a grandmother/a grandparent]1)">
             %end;
           %elseif;(bvar.default_image="yes")
-            <img height="75" src="%image_prefix;/img_unknown_woman.png" alt="[missing image]"%/>
+            <img height="75" src="%image_prefix;/img_unknown_woman.png" alt="[missing image]">
           %end;
           <br>
           %apply;short_display_person_tree("father.mother")</td>
@@ -46,13 +46,13 @@
           %if;mother.father.has_image;
             %if;(not cancel_links)
               <a href="%mother.father.image_url;" target="_blank">
-                <img class="rounded" %mother.father.image_small_size;%sp;src="%mother.father.image_url;" alt="[image/images]0" title="%mother.father; ([a grandfather/a grandmother/a grandparent]0)"%/>
+                <img class="rounded" %mother.father.image_small_size;%sp;src="%mother.father.image_url;" alt="[image/images]0" title="%mother.father; ([a grandfather/a grandmother/a grandparent]0)">
               </a>
             %else;
-              <img class="rounded" %mother.father.image_small_size;%sp;src="%mother.father.image_url;" alt="[image/images]0" title="%mother.father; ([a grandfather/a grandmother/a grandparent]0)"%/>
+              <img class="rounded" %mother.father.image_small_size;%sp;src="%mother.father.image_url;" alt="[image/images]0" title="%mother.father; ([a grandfather/a grandmother/a grandparent]0)">
             %end;
           %elseif;(bvar.default_image="yes")
-            <img height="75" src="%image_prefix;/img_unknown_man.png" alt="[missing image]"%/>
+            <img height="75" src="%image_prefix;/img_unknown_man.png" alt="[missing image]">
           %end;
           <br>
           %apply;short_display_person_tree("mother.father")</td>
@@ -61,13 +61,13 @@
           %if;mother.mother.has_image;
             %if;(not cancel_links)
               <a href="%mother.mother.image_url;" target="_blank">
-                <img class="rounded image_small_size" %mother.mother.image_small_size;%sp;src="%mother.mother.image_url;" alt="[image/images]0" title="%mother.mother; ([a grandfather/a grandmother/a grandparent]1)"%/>
+                <img class="rounded image_small_size" %mother.mother.image_small_size;%sp;src="%mother.mother.image_url;" alt="[image/images]0" title="%mother.mother; ([a grandfather/a grandmother/a grandparent]1)">
               </a>
             %else;
-              <img class="rounded image_small_size" %mother.mother.image_small_size;%sp;src="%mother.mother.image_url;" alt="[image/images]0" title="%mother.mother; ([a grandfather/a grandmother/a grandparent]1)"%/>
+              <img class="rounded image_small_size" %mother.mother.image_small_size;%sp;src="%mother.mother.image_url;" alt="[image/images]0" title="%mother.mother; ([a grandfather/a grandmother/a grandparent]1)">
             %end;
           %elseif;(bvar.default_image="yes")
-            <img height="75" src="%image_prefix;/img_unknown_woman.png" alt="[missing image]"%/>
+            <img height="75" src="%image_prefix;/img_unknown_woman.png" alt="[missing image]">
           %end;
           <br>
           %apply;short_display_person_tree("mother.mother")</td>
@@ -139,12 +139,12 @@
       <td colspan="5" class="align-bottom">%nn;
         %if;father.has_image;
           <a href="%father.image_url; " target="_blank">
-            <img class="rounded" %father.image_small_size;%sp;src="%father.image_url;" alt="[image/images]0"%/>
+            <img class="rounded" %father.image_small_size;%sp;src="%father.image_url;" alt="[image/images]0">
           </a>
           <br>
         %elseif;(father.has_parents and mother.has_image)
           %if;(bvar.default_image="yes")
-            <img class="rounded image_small_size" src="%image_prefix;/img_unknown_man.png" alt="[missing image]"%/>
+            <img class="rounded image_small_size" src="%image_prefix;/img_unknown_man.png" alt="[missing image]">
             <br>
           %else;
             <span class="image_small_size rounded px-3 pt-1 pb-2 text-muted" %father.image_small_size;>?</span>
@@ -159,12 +159,12 @@
       <td colspan="5" class="align-bottom">%nn;
         %if;mother.has_image;
           <a href="%mother.image_url;" target="_blank">
-            <img class="rounded" %mother.image_small_size;%sp;src="%mother.image_url;" alt="[image/images]0"%/>
+            <img class="rounded" %mother.image_small_size;%sp;src="%mother.image_url;" alt="[image/images]0">
           </a>
           <br>
         %elseif;(mother.has_parents and father.has_image)
           %if;(bvar.default_image="yes")
-            <img class="rounded image_small_size" src="%image_prefix;/img_unknown_woman.png" alt="[missing image]"%/>
+            <img class="rounded image_small_size" src="%image_prefix;/img_unknown_woman.png" alt="[missing image]">
             <br>
           %else;
             <span class="image_small_size rounded px-3 pt-1 pb-2 text-muted" %father.image_small_size;>?</span>

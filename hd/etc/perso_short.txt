@@ -136,7 +136,7 @@
 %define;display_union(xx)
   <table class="fp_table" cellspacing="0">
     <tr>
-      <td width="28"><img src="%image_prefix;/marriage.png"%/></td>
+      <td width="28"><img src="%image_prefix;/marriage.png"></td>
       <td>
         <table>
           <tr>
@@ -682,7 +682,7 @@
         <td align="right">
           %if;(evar.sosa = "on" and xx.has_sosa)
             <span>
-              <img src="%image_prefix;/sosa.png" alt="sosa" title="sosa"/> [*Sosa] %xx.sosa;
+              <img src="%image_prefix;/sosa.png" alt="sosa" title="sosa"> [*Sosa] %xx.sosa;
             </span>
           %end;
         </td>
@@ -693,7 +693,7 @@
         <table width="100%%">
           <tr>
             <td width="30">
-              <img src="%xx.image_url;"%xx.image_size; alt="[image/images]0" border="0"%/>
+              <img src="%xx.image_url;"%xx.image_size; alt="[image/images]0" border="0">
             </td>
             <td valign="top">
       %end;
@@ -726,7 +726,7 @@
         %if;((xx.has_aliases or xx.has_nobility_titles or xx.has_occupation) and
              ((xx.has_birth_date or xx.has_birth_place) or (xx.has_baptism_date or xx.has_baptism_place) or
              (xx.has_death_date or xx.has_death_place) or (xx.has_burial_date or xx.has_burial_place)))
-          <li><hr%/></li>
+          <li><hr></li>
         %end;
         %if;(xx.has_birth_date or xx.has_birth_place)
           <li>
@@ -1071,10 +1071,10 @@
   %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
   %if;(evar.v > 1)
     <span width=100%%">
-      <hr%/>
+      <hr>
       %apply;capitalize(nth([summary book ascendants], 3))%nn;
       %if(evar.only="on"). [*only] %apply;gena(nb_gen)%else;%sp;%apply;togen(nb_gen)%end;.
-      <hr%/>
+      <hr>
     </span>
     <ul class="fp_ul_summary">
       %foreach;ancestor_level(nb_gen)

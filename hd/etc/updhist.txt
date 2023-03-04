@@ -63,7 +63,7 @@
             <a href="%prefix;%person.access;">%person;</a>, %person.title;
             %person.dates;
             %if;(bvar.show_invisible = "on" and wizard and person.is_invisible)
-              <img src="%image_prefix;/restricted.png"%wid_hei;restricted.png; alt=" (x)"%/>%nn;
+              <img src="%image_prefix;/restricted.png"%wid_hei;restricted.png; alt=" (x)">%nn;
             %end;
           %elseif;is_note;
             - <a href="%prefix;m=NOTES%if;(note.page != "");f=%note.page.v;%end;

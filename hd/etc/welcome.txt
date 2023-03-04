@@ -92,9 +92,9 @@ fr: Accès réservé aux amis et magiciens de la base de donnée !
       %if;(bvar.welcome_logo!="")
         <img src="%prefix;m=IM;v=%bvar.welcome_logo;"
            style="%if;(bvar.welcome_logo_style!="")%bvar.welcome_logo_style;%end;"
-           alt="MyBase" title="MyBase"/>
+           alt="MyBase" title="MyBase">
       %else;
-        %(<img src="%image_prefix;/gwlogo.png" alt="GeneWeb" title="GeneWeb"/>%)
+        %(<img src="%image_prefix;/gwlogo.png" alt="GeneWeb" title="GeneWeb">%)
       %end;
       <h1 class="font-weight-bolder">%apply;capitalize%with;[database]%end; %base.name;</h1>
       %if;(bvar.visitor_access!="no")<span class="font-weight-light h2">%base.nb_persons; [person/persons]1%end;</span>

@@ -19,17 +19,17 @@
               %if;(evar.cgl!="on")
                 <a href="%child.image_url;" class="align-self-center" target="_blank">
                   <img class="small_image rounded align-self-center" src="%child.image_url;" alt="[image/images]0" 
-                    title="%child; (%if;(child.is_male)[a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;)"%/>
+                    title="%child; (%if;(child.is_male)[a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;)">
               </a>
               %else;
                 <img class="small_image rounded align-self-center"%nn;
                   src="%child.image_url;" alt="[image/images]0"%nn;
-                  title="%child; (%if;(child.is_male)[a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;)"%/>
+                  title="%child; (%if;(child.is_male)[a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;)">
               %end;
             %elseif;(bvar.default_image="yes")
               <img class="small_image rounded align-self-center ml-2"%nn;
                 src="%image_prefix;/img_unknown_%if;(child.is_female)wo%elseif;(child.is_male)%else;u_%end;man.png" alt="[missing image]"%nn;
-                title="%if;(child.is_male)[*a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[*a brother/a sister/a sibling]2%end;"%/>
+                title="%if;(child.is_male)[*a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[*a brother/a sister/a sibling]2%end;">
             %else;
               <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
             %end;
@@ -64,7 +64,7 @@
       %if;(count=0)<span class="fa fa-caret-left invisible"></span>%end;
       <a href="%prefix;%father.access;&m=D&t=T&v=1">%nn;
       <img class="px-1 mb-1" src="%image_prefix;/gui_create.png" height="20" alt="Tree"
-        title="[*tree] [siblings] ([with] [spouse/spouses]1)"/>%nn;
+        title="[*tree] [siblings] ([with] [spouse/spouses]1)">%nn;
       </a>%nn;
       %foreach;father.child;
         %if;is_sibling_after;

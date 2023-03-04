@@ -271,7 +271,7 @@
 %end;
 
 %define;image_sosa(xxx,yyy)
-  <img src="%image_prefix;/sosa.png" style="border: none" alt="sosa" title="[direct ancestor of %s:::xxx], [*Sosa] yyy"%/>%nn;
+  <img src="%image_prefix;/sosa.png" style="border: none" alt="sosa" title="[direct ancestor of %s:::xxx], [*Sosa] yyy">%nn;
 %end;
 
 %define;display_sosa(xx)
@@ -387,7 +387,7 @@
 
 %define;imgtdz(xx)
   %if;(e.image!="off" and xx.has_image)
-    <img class="imgtdz img-fluid w-50" src="%xx.image_url;" %lai; title="%xx;"%/>%nn;
+    <img class="imgtdz img-fluid w-50" src="%xx.image_url;" %lai; title="%xx;">%nn;
   %end;
 %end;
 
@@ -1668,14 +1668,14 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     <table class="display_search">
       <tr>
         <td><b>[*sort by/generation/alphabetic order]0</b></td>
-        <td><img src="%image_prefix;/picto_branch.png"%/></td>
+        <td><img src="%image_prefix;/picto_branch.png"></td>
         <td>
           <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;%nn;
             &t=%e.t;&v=%e.v;&birth=%e.birth;&death=%e.death;&spouse=%e.spouse;&al="
           >[sort by/generation/alphabetic order]1
           </a>
         </td>
-        <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
+        <td><img src="%image_prefix;/picto_alphabetic_order.png"></td>
         <td>[sort by/generation/alphabetic order]2</td>
       </tr>
     </table>
@@ -1810,9 +1810,9 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     <table class="display_search">
       <tr>
         <td><b>[*sort by/generation/alphabetic order]0</b></td>
-        <td><img src="%image_prefix;/picto_branch.png"%/></td>
+        <td><img src="%image_prefix;/picto_branch.png"></td>
         <td>[sort by/generation/alphabetic order]1</td>
-        <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
+        <td><img src="%image_prefix;/picto_alphabetic_order.png"></td>
         <td>
           <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&t=%e.t;&v=%e.v;&birth=%e.birth;&death=%e.death;&spouse=%e.spouse;&al=on">
             [sort by/generation/alphabetic order]2
@@ -1944,7 +1944,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     %end;
   %end;
   %if;((e.notes = "on" or e.src = "on") and e.inline != "on")
-    <p><hr%/></p>
+    <p><hr></p>
     <p>%apply;long_display_notes()</p>
   %end;
 
@@ -1983,7 +1983,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     %end;
   %end;
   %if;((e.notes = "on" or e.src = "on") and e.inline != "on")
-    <p><hr%/></p>
+    <p><hr></p>
     <p>%apply;long_display_notes()</p>
   %end;
 

@@ -67,9 +67,9 @@
         %if;(evar.cgl != "on")
           <a href="%cell.person.image_html_url;"
             ><img src="%cell.person.image_url;"%cell.person.image_small_size; border="0" alt="[image/images]0"
-          %/></a>
+          ></a>
         %else;
-          <img src="%cell.person.image_url;"%cell.person.image_small_size; border="0" alt="[image/images]0"%/>
+          <img src="%cell.person.image_url;"%cell.person.image_small_size; border="0" alt="[image/images]0">
         %end;
       %end;
       %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")

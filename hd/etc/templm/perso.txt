@@ -375,7 +375,7 @@
 %define;link_image(xx)
   <a %l_on1; class="image"
     href="%xx.image_html_url;">
-    <img src="%xx.image_url;" alt="[image/images]0"%/>
+    <img src="%xx.image_url;" alt="[image/images]0">
   </a>
 %end;
 %define;somebody(xx)
@@ -1125,7 +1125,7 @@
     %if;(has_image and evar.image!="off")
     <div>
      <a href="%image_html_url;" %l_on1;>
-       <img class="person_img" src="%image_url;" alt="[image/images]0"%/>
+       <img class="person_img" src="%image_url;" alt="[image/images]0">
      </a>
     </div>
     %end;
