@@ -123,7 +123,7 @@
             title="(-1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]1 (max %maxlev;)">−</a>
         %end;
         %for;i;minv;maxv;
-          <a role="button" id="v%i;" class="btn px-%if;(i<10)2%else;1%end; py-0 btn-outline-primary border-%if;(evarv=i)2 rounded disabled font-weight-bold%else;0%end;" %if;(evarv!=i)href="%apply;urlv%with;v%and;%expr(i)%end;"%end;
+          <a role="button" id="v%i;" class="btn px-%if;(i<10)2%else;1%end; py-0 btn-outline-primary border-%if;(evarv=i)2 rounded disabled font-weight-bold%else;0%end;" %if;(evarv!=i)href="%apply;urlv%with;v%and;%expr(i)%end;"%end;%sp;
             title="%if;(evarv!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
             %end; %if;(i=maxlev)(max)%end;">%i;%(%if;(evarv=i)<br>^%end;%)</a>
         %end;
