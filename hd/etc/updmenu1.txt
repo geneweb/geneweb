@@ -99,7 +99,7 @@
                 </select>
               </form>
             </div>
-            <hr class="separateur"/>
+            <hr class="separateur">
           %end;
           <div>
             <ul>

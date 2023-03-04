@@ -1298,7 +1298,7 @@
 %( <!-- End display relations, notes, sources --> %)
 %( <!-- Begin display ancestors /descendants --> %)
 <div class="col2">
-  <hr %if;(lwide = "off")style="display:none"%end; %/>
+  <hr %if;(lwide = "off")style="display:none"%end;>
   <br><br>
   %apply;anc_families()
   %if;has_families;
@@ -1354,7 +1354,7 @@
          style="border:0px;font-size:17px" title="[*invert::event/events]1 [family/families]0">⇳</a></span>%)
         %apply;content_family("self","spouse")
         %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em>%nl;%end;
-        %if;(evar.image="on" and nb_families > 1)<hr style="clear:both;"%/>%end;
+        %if;(evar.image="on" and nb_families > 1)<hr style="clear:both;">%end;
       
     %end;
     </div>

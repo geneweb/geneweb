@@ -121,7 +121,7 @@
     %foreach;cell;
       %if;(not is_first)
         <td colspan="1" align="center">%nn;
-        %if;(cell.is_right)<hr class="full"%/>%nn;
+        %if;(cell.is_right)<hr class="full">%nn;
         %end;
         </td>
       %end;
@@ -130,8 +130,8 @@
          %elseif;cell.is_right;%left;
          %else;center%end;">%nn;
       %if;cell.is_empty;%nn;
-      %elseif;cell.is_left;<hr class="%right;"%/>%nn;
-      %elseif;cell.is_right;<hr class="%left;"%/>%nn;
+      %elseif;cell.is_left;<hr class="%right;">%nn;
+      %elseif;cell.is_right;<hr class="%left;">%nn;
       %end;
       </td>
     %end;

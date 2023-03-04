@@ -989,7 +989,7 @@
           <td>
             %foreach;xx.family;
               %apply;display_union("xx")
-              %if;(family_cnt != xx.nb_families)<hr class="fp_family_separator"%/>%end;
+              %if;(family_cnt != xx.nb_families)<hr class="fp_family_separator">%end;
             %end;
           </td>
         </tr>
