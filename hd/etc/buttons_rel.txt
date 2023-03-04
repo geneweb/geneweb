@@ -1,7 +1,5 @@
-<!-- $Id: buttons_rel.txt v7.01 2022/01/16 19:40:09 $ -->
-<!-- Copyright (c) 1998-2022 INRIA -->
-%( Boutons de configurations et d’options pour les calculs de relations %)
-
+<!-- $Id: buttons_rel.txt v7.1exp 04/03/2023 10:50:56 hg a2 $ -->
+%( Boutons de configurations et dâ€™options pour les calculs de relations %)
 <div class="btn-toolbar mt-2 mb-3" role="toolbar" arial-label="config buttons toolbar">
   <div class="col-2">
     %if;(evar.em="R" or ((evar.i!="" and evar.ei!="") or (person_index.1!="" and person_index.2!="")))
