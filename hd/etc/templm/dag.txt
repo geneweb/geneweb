@@ -126,11 +126,11 @@
       %elseif;(dag_cell.text != "")%dag_cell.text;
       %else;
         %if;dag_cell.is_hr_left;
-          <hr class="%left;"%/>%nn;
+          <hr class="%left;">%nn;
         %elseif;dag_cell.is_hr_right;
-          <hr class="%right;"%/>%nn;
+          <hr class="%right;">%nn;
         %else;
-          <hr class="full"%/>%nn;
+          <hr class="full">%nn;
         %end;
       %end;
       </td>

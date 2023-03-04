@@ -44,7 +44,7 @@
 </head>
 
 %define;tools()
-  <hr %/>
+  <hr>
   <form id="tools" name="tools" method="get" action="%action;">
     <fieldset>
       <legend>[*tools]0 <input type="submit" value="Ok"%/></legend>

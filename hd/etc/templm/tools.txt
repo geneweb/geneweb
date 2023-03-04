@@ -144,7 +144,7 @@
 
 %define;tools_perso()
   %let;l_on1;%in;
-  <hr style="clear:both"/>
+  <hr style="clear:both">
   <form id="tools" style="display:block" name="tools" method="get" action="%action;">
     <fieldset style="border:0">
       <legend style="font-weight:bold">[*tools] <input type="submit" value="Ok"%/></legend>
@@ -172,7 +172,7 @@
 %end;
 
 %define;tools_anctree()
-  <hr style="clear:both"/>
+  <hr style="clear:both">
   <form id="tools" style="display:block" name="tools" method="get" action="%action;">
     <fieldset style="border:0">
       <input type="hidden" name="t" value="T" %l_on;
@@ -278,7 +278,7 @@
 %end;
 
 %define;tools_dag()
-  <hr %/>
+  <hr>
   <form id="tools" name="tools" method="get" action="%action;">
     <fieldset>
       <legend>[*tools]0 <input type="submit" value="Ok"%/></legend>
@@ -364,7 +364,7 @@
 %end;
 
 %define;tools_anclist()
-  <hr style="clear:both;" %/>
+  <hr style="clear:both;">
   <form id="tools" name="tools" method="get" action="%action;">
     <fieldset>
       <legend>[*tools]0 %if;(evar.fam7 = "on")[family time line]1 %end;<input type="submit" value="Ok"%/></legend>
@@ -445,7 +445,7 @@
 %end;
 
 %define;tools_ancsosa()
-  <hr %/>
+  <hr>
   <form id="tools" name="tools" method="get" action="%action;">
     <fieldset>
       <legend>[*tools]0 <input type="submit" value="Ok"%/></legend>
@@ -510,7 +510,7 @@
 %end;
 
 %define;tools_deslist()
-  <hr %/>
+  <hr>
   <form id="tools" name="tools" method="get" action="%action;">
     <fieldset>
       <legend>[*tools]0 %if;(evar.tl1!="hrtzl")[statistics] %end;<input type="submit" value="Ok"%/></legend>
