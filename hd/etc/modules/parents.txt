@@ -71,15 +71,15 @@
         %if;father.has_image;
           %if;(evar.cgl!="on") 
             <a href="%father.image_html_url;"><img %father.image_medium_size;%sp;
-             src="%father.image_url;" style="border: none" alt="" title="[image/images]0"%/></a>
+             src="%father.image_url;" style="border: none" alt="" title="[image/images]0"></a>
           %else;
             <img %father.image_medium_size;%sp;
-             src="%father.image_url;" style="border: none" alt="" title="[image/images]0"%/>
+             src="%father.image_url;" style="border: none" alt="" title="[image/images]0">
           %end;
         %elseif;(bvar.default_image="yes")
           <img class="small_image rounded align-self-center ml-2"
             src="%image_prefix;/img_unknown_%if;(father.is_female)wo%elseif;(father.is_male)%else;u_%end;man.png" alt="[missing image]"
-            title="%if;(father.is_male)[father/mother]0%else;[father/mother]1%end;"%/>
+            title="%if;(father.is_male)[father/mother]0%else;[father/mother]1%end;">
         %else;
           <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
         %end;
@@ -105,16 +105,16 @@
         %if;mother.has_image;
           %if;(evar.cgl!="on") 
             <a href="%mother.image_html_url;"><img %mother.image_medium_size;%sp;
-             src="%mother.image_url;" style="border: none" alt="" title="[image/images]0"%/>
+             src="%mother.image_url;" style="border: none" alt="" title="[image/images]0">
             </a>
           %else;
             <img %mother.image_medium_size;%sp;
-             src="%mother.image_url;" style="border: none" alt="" title="[image/images]0"%/>
+             src="%mother.image_url;" style="border: none" alt="" title="[image/images]0">
           %end;
         %elseif;(bvar.default_image="yes")
           <img class="small_image rounded align-self-center ml-2" 
             src="%image_prefix;/img_unknown_%if;(mother.is_female)wo%elseif;(mother.is_male)%else;u_%end;man.png" alt="[missing image]" 
-            title="%if;(mother.is_male)[father/mother]0%else;[father/mother]1%end;"%/>
+            title="%if;(mother.is_male)[father/mother]0%else;[father/mother]1%end;">
         %else;
           <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
         %end;
@@ -151,17 +151,17 @@
             <a href="%parent.image_url;" class="align-self-center" target="_blank">
               <img class="small_image rounded align-self-center"
                 src="%parent.image_url;" alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;"
-                title="%parent; (%if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;)"%/>
+                title="%parent; (%if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;)">
             </a>
           %else;
             <img class="small_image rounded align-self-center"
               src="%parent.image_url;" alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;"
-              title="%parent; (%if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;)"%/>
+              title="%parent; (%if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;)">
           %end;
         %elseif;(bvar.default_image="yes")
           <img class="small_image rounded align-self-center ml-2"
             src="%image_prefix;/img_unknown_%if;(parent.is_female)wo%elseif;(parent.is_male)%else;u_%end;man.png" alt="[missing image]"
-            title="%if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;"%/>
+            title="%if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;">
         %else;
           <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
         %end;

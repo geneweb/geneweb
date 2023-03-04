@@ -243,11 +243,11 @@
           %if;(ancestor.birth_date.year = "" and ancestor.death_date.year != "")†%else;%ancestor.death_date.year;%end;&#10;<br>
       <table style="width:%wid;px; align:center"><tr>
       <td style="width:35%%">%if;(evar.image!="off")
-        %if;(ancestor.has_image)<img src="%ancestor.image_url;" height="50px"%/>%end;
+        %if;(ancestor.has_image)<img src="%ancestor.image_url;" height="50px">%end;
       %end;</td>
       <td style="width:30%%">&nbsp;&amp;%if;(evar.marriage="on")%ancestor.family.marriage_date.year;%end;&nbsp;</td>
       <td style="width:35%%">%if;(evar.image!="off")
-        %if;(ancestor.spouse.has_image)<img src="%ancestor.spouse.image_url;" height="50px"%/>%end;
+        %if;(ancestor.spouse.has_image)<img src="%ancestor.spouse.image_url;" height="50px">%end;
       %end;</td>
       </tr></table>
         %if;(evar.cgl!="on")

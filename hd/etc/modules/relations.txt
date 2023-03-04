@@ -81,7 +81,7 @@
     %if;(cnt>0)
       %if;(not cancel_links)
         <a %apply;relations_tree(l_ref)>%nn;
-          <img class="ml-2 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="Tree"%/>%nn;
+          <img class="ml-2 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="Tree">%nn;
         </a>%nn;
       %end;
     %end;
@@ -122,7 +122,7 @@
   <h2 id="relations" >[*relation/relations]1
   %if;(not cancel_links)
     <a %apply;relations_tree(l_ref)>
-    <img src="%image_prefix;/gui_create.png" height="20" alt="Tree"/>
+    <img src="%image_prefix;/gui_create.png" height="20" alt="Tree">
     </a>
   %end;
   </h2>

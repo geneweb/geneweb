@@ -510,7 +510,7 @@
     [*total][:] %expr(count-1) [[person/persons]1@(c)]%sp;
     ([spouses not included]).
     %if;((evar.notes="on" or evar.src="on") and evar.inline != "on")
-      <p><hr%/></p>
+      <p><hr></p>
       <h3 class="highlight">
         %if;(evar.notes = "on")[*note/notes]1%else;[*source/sources]1%end;
         <a name="ns">&nbsp;</a>

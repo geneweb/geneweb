@@ -23,7 +23,7 @@
           %if;(e.im="" and cell.person.has_image)
             %if;not cancel_links;<a href="%cell.person.image_html_url;">%end;
             <img class="rounded mb-1" src="%cell.person.image_url;"%cell.person.image_small_size;%sp;%nn;
-             alt="[image/images]0" title="[image/images]0"%/>%nn;
+             alt="[image/images]0" title="[image/images]0">%nn;
             %if;not cancel_links;</a>%end;<br>
           %end;
           %( Checking if the ancestors are falsly alive by verifying three first generations (self/parents/grand-parents births)
@@ -220,7 +220,7 @@
       <br>
       %if;not cancel_links;<a href="%xx.image_html_url;">%end;
       <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
-       alt="[image/images]0" title="[image/images]0"%/>
+       alt="[image/images]0" title="[image/images]0">
       %if;not cancel_links;</a>%end;
     %end;
     %if;("xx" != "self")<br>│<br>%end;
@@ -234,7 +234,7 @@
       <br>
       %if;not cancel_links;<a href="%xx.image_html_url;">%end;
       <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
-       alt="[image/images]0" title="[image/images]0"%/>%nn;
+       alt="[image/images]0" title="[image/images]0">%nn;
       %if;not cancel_links;</a>%end;
     %end;
     %if;("xx" != "self")<br>│<br>%end;

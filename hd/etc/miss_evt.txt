@@ -111,7 +111,7 @@
 %define;display_edit_ind_btn(label)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_IND&i=%ancestor.index;#label">
-      <img class="not_printable" src="%image_prefix;/picto_edit_big.png" title="[edit person]"%/>
+      <img class="not_printable" src="%image_prefix;/picto_edit_big.png" title="[edit person]">
     </a>
   %else;
     &nbsp;
@@ -121,7 +121,7 @@
 %define;display_edit_fam_btn()
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%ancestor.index;#marr">
-      <img class="not_printable" src="%image_prefix;/picto_edit_big.png" title="[edit family]"%/>
+      <img class="not_printable" src="%image_prefix;/picto_edit_big.png" title="[edit family]">
     </a>
   %else;
     &nbsp;

@@ -47,7 +47,7 @@
           target="_blank" title="[*image/images]0 %xxx;">%nn;
       %end;
         <img class="small_image %if;not cancel_links;fade_image%end; align-self-center rounded ml-0 pr-0" %nn;
-          src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
+          src="%xxx.image_url;" alt="[image/images]0">%nn;
       %if;not cancel_links;</a>%end;
     %elseif;(bvar.default_image="yes")
       %if;(wizard and not cancel_links)
@@ -57,7 +57,7 @@
       %end;
       <img class="small_image align-self-center rounded ml-0" style="height:70%%"
         src="%image_prefix;/img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png"
-        alt="[missing image]"%/>
+        alt="[missing image]">
       %if;(wizard and not cancel_links)</a>%end;
     %else;
       <span class="small_image noimage rounded display-4 text-center%nn;

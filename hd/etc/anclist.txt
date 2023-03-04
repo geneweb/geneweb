@@ -276,9 +276,9 @@
       <table class="display_search">
         <tr>
           <td><b>[*sort by/branch/alphabetic order]0</b></td>
-          <td><img src="%image_prefix;/picto_branch.png"%/></td>
+          <td><img src="%image_prefix;/picto_branch.png"></td>
           <td>[sort by/branch/alphabetic order]1</td>
-          <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
+          <td><img src="%image_prefix;/picto_alphabetic_order.png"></td>
           <td>
             <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;">
               [sort by/branch/alphabetic order]2
@@ -368,13 +368,13 @@
       <table class="display_search">
         <tr>
           <td><b>[*sort by/branch/alphabetic order]0</b></td>
-          <td><img src="%image_prefix;/picto_branch.png"%/></td>
+          <td><img src="%image_prefix;/picto_branch.png"></td>
           <td>
             <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;&sort=on">
               [sort by/branch/alphabetic order]1
             </a>
           </td>
-          <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
+          <td><img src="%image_prefix;/picto_alphabetic_order.png"></td>
           <td>[sort by/branch/alphabetic order]2</td>
         </tr>
       </table>

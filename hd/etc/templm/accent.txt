@@ -153,7 +153,7 @@ document.getElementsByName("notes")[0].onkeypress =
     <span class="s_menu">
       <a onclick="return insertTags('<br>\n','','')"
          href="javascript:;" title="= shift + enter">&lt;br/&gt;</a>
-      <a onclick="return insertTags('\n<hr/>\n','','')" href="javascript:;">&lt;hr/&gt;
+      <a onclick="return insertTags('\n<hr>\n','','')" href="javascript:;">&lt;hr/&gt;
         (————————)</a>
       <a onclick="return insertTags('','<table border>\n<tr>\n<th>A1</th>\n<th>B1</th>\n</tr><tr>\n<td>A2</td>\n<td>B2</td>\n</tr><tr>\n<td>A3</td>\n<td>B3</td>\n</tr>\n</table>','')" href="javascript:;">&lt;table&gt;</a>
       <a onclick="return insertTags('&lt;img alt=&quot;?&quot; src=&quot;%%sm=IM;s=xxx.jpg&quot;%/&gt;','','')"
