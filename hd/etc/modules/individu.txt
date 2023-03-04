@@ -1,4 +1,4 @@
-<!-- $Id: modules/individu.txt v. 7.01 26/11/2022 01:39:18 ddr hg mr a2 -->
+<!-- $Id: modules/individu.txt v7.1exp 04/03/2023 09:04:59 ddr hg mr a2 -->
 %( options
 0: skip
 1: standard
@@ -232,8 +232,14 @@
     %if;(z2 = 1)[year/month/day]1%else;[months old]%end;
     %if;(z3 > 0), %end;
   %end;
-  %if;(z3 >= 0)z3 %nn;
-    %if;(z3 = 0 or z3 = 1)[year/month/day]2%else;[days old]%end;
+  %if;(z1+z2=0)
+    %if;(z3 >=0)z3 %nn;
+      %if;(z3 = 0 or z3 = 1)[year/month/day]2%else;[days old]%end;
+    %end;
+  %else;
+    %if;(z3 > 0)z3 %nn;
+      %if;(z3 = 1)[year/month/day]2%else;[days old]%end;
+    %end;
   %end;
   %if;(l_nbd > 999) (%expr(l_nbd/1000)[(thousand separator)]%apply;remainder(l_nbd) [days old])%nn;
   %elseif;(l_nbd > 31) (%l_nbd; [days old])%end;
@@ -272,7 +278,6 @@
   %end;
   %if;(computable_age)
     %if;(birth_date.year!= "" and today.year >= birth_date.year and l_nbd != "")%apply;compute_age("today","birth_date")%else;%age;%end;
-    %if;birthday; ([happy birthday to you!])%end;
   %end;
 %end;
 %define;etat_civil()
@@ -281,13 +286,18 @@
       <li title="[*birth]">
         <span class="fa-li"><i class="fas fa-baby"></i></span>
         %if;has_birth_date;[*born]s %on_birth_date;
-          %if;birthday; ([happy birthday to you!])%end;
           %if;has_birth_place; - %birth_place;%end;
         %else;
           %if;has_birth_place;[*born]s - %birth_place;
           %end;
         %end;
-      </li>%nl;
+      </li>
+      %if;birthday;
+        <li>
+          <span class="fa-li"><i class="fa-solid fa-cake-candles"></i></span>
+          [*happy birthday to you!]
+        </li>
+      %end;
     %end;
     %if;(has_baptism_date or has_baptism_place)
       <li title="[*baptism]">
