@@ -195,7 +195,7 @@
       %foreach;cell;
         %if;(not is_first)
           <td colspan="1" class="text-center px-0 py-0">%nn;
-          %if;(cell.is_right)<hr class="full;">%nn;
+          %if;(cell.is_right)<hr class="full">%nn;
           %else;%(<samp>&nbsp;</samp>%)%end;
           </td>
         %end;
