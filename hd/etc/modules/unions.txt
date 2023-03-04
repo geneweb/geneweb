@@ -1,11 +1,10 @@
-<!-- $Id: modules/unions.txt v 7.00 19/03/2018 07:46:01 hg -->
+<!-- $Id: modules/unions.txt v7.1exp 04/03/2023 09:15:07 hg -->
 %( op_m=1 simple: name %)
 %( op_m=2 photos: simple with photo %)
 %( op_m=3 evolved: spouse parents and children's spouse %)
 %( op_m=4 complete: evolved up to grand-children %)
 %( op_m=5 photos: complete with photos of spouse and children %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
-
 %define;relations_tree(z1)
     %reset_count;
     href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
@@ -21,7 +20,6 @@
       %end;
     " title="[*relations tree]"
 %end;
-
 %define;list_witness_of_kind(kindx)
   %reset_count;
   %foreach;event_witness;
@@ -45,18 +43,13 @@
   %end;
   %end;
 %end;
-
 %define;in_full(ccc,maj)
   %if;(maj=1)%apply;capitalize%with;%apply;nth%with;[n (number)]%and;ccc%end;%end;
   %else;%apply;nth%with;[n (number)]%and;ccc%end;
   %end;
 %end;
-
-%(
-  Copie des fonctions qui se trouvent dans perso.txt dont la SEULE
-  modification est que la phrase NE commence PAS par une majuscule.
-%)
-
+%( Copie des fonctions qui se trouvent dans perso.txt dont la SEULE
+   modification est que la phrase NE commence PAS par une majuscule. %)
 %define;loc_married_to(sexx, date)
   %if;(sexx = 0 or sexx = 2)
     %if;are_married;[married%t to:::date]0%nn;
@@ -74,7 +67,6 @@
     %end;
   %end;
 %end;
-
 %define;loc_long_married(xx)
   %apply;loc_married_to%with;%xx.sex%and;
     %if;(on_marriage_date = "")
@@ -84,16 +76,13 @@
     %end;
   %end;
 %end;
-
-%(
-   ATTENTION: on n'utilise pas max_desc_level parce que c'est extremement
+%( ATTENTION: on n'utilise pas max_desc_level parce que c'est extremement
    gourmand sur les gros arbre puisqu'on calcule toute la descendance.
-   Or on n'a besoin de seulement savoir s'il y a des arrière petits
-   enfant, d'où le code ci-dessous :
+   or on n’a besoin de seulement savoir s’il y a des arrière-petits-
+   enfants, d’où le code ci-dessous :
    1 si on a des enfants
-   2 si on a des petits enfants
-   3 si on a des arrières petits enfants
-%)
+   2 si on a des petits-enfants
+   3 si on a des arrières-petits-enfants %)
 %reset_count;
 %if;has_children;
   %incr_count;
@@ -118,7 +107,6 @@
     %end;
   %end;
 %end;
-
 %if;has_families;
   %foreach;family
     %reset_count2;
@@ -165,7 +153,6 @@
     %end;
   </h2>
 %end;
-
 %if;(op_m=1 and has_families)
   <ul class="marriage_perso">
     %( On remet les compteurs à zéro et on commence à compter à 1 - synchro with notes.txt %)
@@ -227,10 +214,8 @@
       </li>
     %end;
   </ul>
-
 %elseif;(op_m=2 and has_families)
-  %reset_count;
-  %reset_count2;
+  %reset_count;%reset_count2;
   %foreach;family;
     %incr_count;
     %if;(spouse.has_image)%incr_count2;%end;
@@ -268,7 +253,7 @@
       %end;
     %end;
     %if;(count2>0)
-      <div class="d-flex justify-content-between mt-1">
+      <div class="d-flex mt-1">
         %if;spouse.has_image;
           %if;(not cancel_links)
             <a href="%spouse.image_url;" class="align-self-start" target="_blank">%nn;
@@ -285,7 +270,7 @@
         <div class="flex-column">
           %if;(spouse.has_parents)
             <div class="d-inline-flex mt-1 align-self-center">
-             <div class="mx-1 text-center align-self-center">
+             <div class="ml-1 mr-2 text-center align-self-center">
                %apply;a_of_b%with;%if;spouse.is_male;[son/daughter/child]0%nn;
                  %elseif;spouse.is_female;[son/daughter/child]1%nn;%end;%and;%end;
               </div>
@@ -348,13 +333,13 @@
       %end;
       </div>
       %if;has_children;
-          %let;prev_count;%count;%in; %( On sauvegarde l'ancienne valeur de count %)
+          %let;prev_count;%count;%in; %( on garde la précédente valeur de count %)
           <div class="d-flex flex-column align-content-start ml-2 mt-1">
             <div class="w-100">[having as children]0%if;(nb_children>1) %apply;in_full%with;%nb_children;%and;0%end; [child/children]1%end;[:]</div>
             %reset_count1;
             %foreach;child;
               %incr_count1;
-              <div class="d-flex flex-row mt-1">%count1;
+              <div class="d-flex flex-row mt-1">%count1;.
                 %if;child.has_image;
                   %if;(not cancel_links)
                     <a href="%child.image_url;" class="align-self-center" target="_blank">%nn;
@@ -381,7 +366,6 @@
           </div>
           %apply;init_count(prev_count) %( On rétablie l'ancienne valeur de count %)
         %end;
-      
       %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br>%nl;%end;
     %end;
     %if;(are_divorced or are_separated)
@@ -399,7 +383,6 @@
     </li></ul>
     %reset_count2;
   %end;
-
 %elseif;(op_m=3 and has_families)
   <ul class="marriage_perso">
     %( On remet les compteurs à zéro et on commence à compter à 1 %)
@@ -461,7 +444,6 @@
       </li>
     %end;
   </ul>
-
 %elseif;(op_m=4 and has_families)
   <ul class="marriage_perso">
     %( On remet les compteurs à zéro et on commence à compter à 1 %)
@@ -556,7 +538,6 @@
       </li>
     %end;
   </ul>
-
 %elseif;(op_m=5 and has_families)
   <ul>
     %reset_count;
