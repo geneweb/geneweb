@@ -247,7 +247,7 @@
         %else;%if;(xx.death_date.year="") mr-4%end;
         %end;
       %end;%)"
-       title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;&#013;&#013;%end;
+       title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;&#10;&#10;%end;
                %if;(xx.computable_age or xx.computable_death_age)
                  %if;xx.computable_age;%xx.age;%elseif;xx.computable_death_age;%xx.death_age;%end;
                %end;">%nn;
@@ -270,7 +270,7 @@
   %if;(wizard and not cancel_links)
   <a href="%prefix;m=MOD_IND&i=%xx.index;">%end;
   <span class="text-nowrap font-italic"
-  title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;&#013;&#013;%end;
+  title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;&#10;&#10;%end;
         %if;(xx.computable_age);%xx.age;%elseif;xx.computable_death_age;%xx.death_age;%end;"%nn;
   >%xx.dates;</span>%if;(wizard and not cancel_links)</a>%end;%nn;
 %end;
