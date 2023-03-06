@@ -1093,8 +1093,7 @@ let all_checks_family conf base ifam gen_fam cpl des scdo =
       | ChangedOrderOfMarriages (p, _, after) ->
           patch_union base (get_iper p) { family = after }
       | ChangedOrderOfFamilyEvents (ifam, _, after) ->
-        let gen_after = List.map gen_fevent_of_fam_event after in
-          patch_family base ifam { gen_fam with fevents = gen_after }
+          patch_family base ifam { gen_fam with fevents = after }
       | _ -> ())
     wl;
   (wl, ml)
@@ -1528,8 +1527,7 @@ let print_change_event_order conf base =
         List.iter
           (function
             | ChangedOrderOfFamilyEvents (ifam, _, after) ->
-              let gen_after = List.map gen_fevent_of_fam_event after in
-              patch_family base ifam { fam with fevents = gen_after }
+              patch_family base ifam { fam with fevents = after }
             | _ -> ())
           !wl;
         List.rev !wl
