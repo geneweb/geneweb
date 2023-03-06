@@ -27,6 +27,9 @@ val fevent_name : 'a Def.gen_fam_event_name -> 'a event_name
 val event_item_of_pevent : pers_event -> istr event_item
 val event_item_of_fevent : ?sp:iper -> fam_event -> istr event_item
 
+val event_item_of_gen_pevent : (iper, istr) Def.gen_pers_event -> istr event_item
+val event_item_of_gen_fevent : ?sp:iper -> (iper,istr) Def.gen_fam_event -> istr event_item
+
 val compare_event_name : 'a event_name -> 'a event_name -> int
 
 val sort_events :

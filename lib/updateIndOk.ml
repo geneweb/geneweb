@@ -1066,8 +1066,7 @@ let all_checks_person base p a u =
       | ChangedOrderOfChildren (ifam, _, _, after) ->
           patch_descend base ifam { children = after }
       | ChangedOrderOfPersonEvents (_, _, after) ->
-        let gen_after = List.map gen_pevent_of_pers_event after in
-        patch_person base p.key_index { p with pevents = gen_after }
+        patch_person base p.key_index { p with pevents = after }
       | _ -> ())
     wl;
   wl

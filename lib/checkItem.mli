@@ -7,7 +7,7 @@ type base_error = person Def.error
 (** Database specification error *)
 
 type base_warning =
-  (iper, person, ifam, family, title, pers_event, fam_event) Def.warning
+  (iper, person, ifam, family, title, (iper, istr) Def.gen_pers_event, (iper, istr) Def.gen_fam_event) Def.warning
 (** Database specification warning *)
 
 (* *)

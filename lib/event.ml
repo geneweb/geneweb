@@ -25,25 +25,61 @@ let fevent_name s = Fevent s
 type 'a event_item =
     PE of Gwdb.pers_event * 'a event_name
   | FE of Gwdb.fam_event * 'a event_name * iper option
+  | DPE of (iper, istr) Def.gen_pers_event * 'a event_name
+  | DFE of (iper,  istr) Def.gen_fam_event * 'a event_name * iper option
 
-let wrap p f (e : 'a event_item) = match e with
+let wrap p f defp deff (e : 'a event_item) = match e with
   | PE (e, _) -> p e
   | FE (e, _, _) -> f e
+  | DPE (e, _) -> defp e
+  | DFE (e, _, _) -> deff e
 
-let get_name ei = match ei with
-    PE (_, name) | FE (_, name, _) -> name
+let get_name = function
+    PE (_, name)
+  | FE (_, name, _) -> name
+  | DPE (_, name)
+  | DFE (_, name, _) -> name
 
-let get_date ei = wrap get_pevent_date get_fevent_date ei
-let get_place ei = wrap get_pevent_place get_fevent_place ei
-let get_note ei = wrap get_pevent_note get_fevent_note ei
-let get_src ei = wrap get_pevent_src get_fevent_src ei
-let get_witnesses ei = wrap get_pevent_witnesses get_fevent_witnesses ei
-let get_witness_notes ei = wrap get_pevent_witness_notes get_fevent_witness_notes ei
+let get_date ei = wrap get_pevent_date get_fevent_date
+    (fun e -> e.epers_date)
+    (fun e -> e.efam_date)
+    ei
+
+let get_place ei = wrap get_pevent_place get_fevent_place
+    (fun e -> e.epers_place)
+    (fun e -> e.efam_place)
+    ei
+
+let get_note ei = wrap get_pevent_note get_fevent_note
+    (fun e -> e.epers_note)
+    (fun e -> e.efam_note)
+    ei
+
+let get_src ei = wrap get_pevent_src get_fevent_src
+    (fun e -> e.epers_src)
+    (fun e -> e.efam_src)
+    ei
+
+let get_witnesses ei = wrap get_pevent_witnesses get_fevent_witnesses
+    (fun e -> Array.map (fun (a,b,_) -> a, b) e.epers_witnesses)
+    (fun e -> Array.map (fun (a,b,_) -> a, b) e.efam_witnesses)
+    ei
+
+let get_witness_notes ei =
+  wrap get_pevent_witness_notes get_fevent_witness_notes
+    (fun e -> Array.map (fun (_,_,n) -> n) e.epers_witnesses)
+    (fun e -> Array.map (fun (_,_,n) -> n) e.efam_witnesses)
+    ei
+
 let get_witnesses_and_notes ei =
-  wrap get_pevent_witnesses_and_notes get_fevent_witnesses_and_notes ei
+  wrap get_pevent_witnesses_and_notes get_fevent_witnesses_and_notes
+    (fun e -> e.epers_witnesses)
+    (fun e -> e.efam_witnesses)
+    ei
+    
 let get_spouse_iper ei = match ei with
-  | PE _ -> None
-  | FE (_, _, sp) -> sp
+  | PE _ | DPE _ -> None
+  | FE (_, _, sp) | DFE (_, _, sp)-> sp
 (*let get_witnesses_and_notes ei =
   let get_notes i = match ei.witness_notes with
     | Some notes when Array.length notes > 0 -> notes.(i)
@@ -55,11 +91,19 @@ let get_spouse_iper ei = match ei with
     )
 *)
 let has_witnesses ei =
-  let witnesses = get_witnesses ei in
-  Array.length witnesses > 0
+  let nb_witnesses = match ei with
+    | PE _
+    | FE (_, _, _) -> Array.length (get_witnesses ei)
+    | DPE (e, _) -> Array.length e.epers_witnesses
+    | DFE (e, _, _) -> Array.length e.efam_witnesses
+  in
+  nb_witnesses > 0
 
 let event_item_of_pevent pe = PE (pe, pevent_name (Gwdb.get_pevent_name pe))
 let event_item_of_fevent ?sp fe = FE (fe, fevent_name (Gwdb.get_fevent_name fe), sp)
+
+let event_item_of_gen_pevent evt = DPE (evt, pevent_name evt.epers_name)
+let event_item_of_gen_fevent ?sp evt = DFE (evt, fevent_name evt.efam_name, sp)
 
 (*
    On ignore les événements personnalisés.
