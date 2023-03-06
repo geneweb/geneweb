@@ -504,7 +504,7 @@ let print_warning conf base (w : CheckItem.base_warning) = match w with
       let print_list arr diff_arr =
         Array.iteri
           (fun i evt ->
-            let name = Util.string_of_fevent_name conf base (get_fevent_name evt) in
+            let name = Util.string_of_fevent_name conf base (evt.efam_name) in
             Output.print_sstring conf "<li";
             if diff_arr.(i) then
               Output.print_sstring conf {| style="background:pink"|};
@@ -522,7 +522,7 @@ let print_warning conf base (w : CheckItem.base_warning) = match w with
       let print_list arr diff_arr =
         Array.iteri
           (fun i evt ->
-            let name = Util.string_of_pevent_name conf base (get_pevent_name evt) in
+            let name = Util.string_of_pevent_name conf base (evt.epers_name) in
             Output.print_sstring conf "<li";
             if diff_arr.(i) then
               Output.print_sstring conf {| style="background:pink"|};
@@ -585,18 +585,18 @@ let print_warning conf base (w : CheckItem.base_warning) = match w with
       Output.printf conf
         (fcapitale (ftransl conf "%t's %s before his/her %s"))
         (fun _ -> (someone_strong base p :> string))
-        (Util.string_of_fevent_name conf base (get_fevent_name e1) :> string)
-        (Util.string_of_fevent_name conf base (get_fevent_name e2) :> string)
+        (Util.string_of_fevent_name conf base (e1.efam_name) :> string)
+        (Util.string_of_fevent_name conf base (e2.efam_name) :> string)
   | FWitnessEventAfterDeath (p, e, _) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
         (fun _ -> (someone_strong_n_short_dates conf base p :> string))
-        (Util.string_of_fevent_name conf base (get_fevent_name e) :> string)
+        (Util.string_of_fevent_name conf base (e.efam_name) :> string)
   | FWitnessEventBeforeBirth (p, e, _) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
         (fun _ -> (someone_strong_n_short_dates conf base p :> string))
-        (Util.string_of_fevent_name conf base (get_fevent_name e) :> string)
+        (Util.string_of_fevent_name conf base (e.efam_name) :> string)
   | IncoherentSex (p, _, _) ->
       Output.printf conf
         (fcapitale
@@ -661,18 +661,18 @@ let print_warning conf base (w : CheckItem.base_warning) = match w with
       Output.printf conf
         (fcapitale (ftransl conf "%t's %s before his/her %s"))
         (fun _ -> (someone_strong base p :> string))
-        (Util.string_of_pevent_name conf base (get_pevent_name e1) :> string)
-        (Util.string_of_pevent_name conf base (get_pevent_name e2) :> string)
+        (Util.string_of_pevent_name conf base (e1.epers_name) :> string)
+        (Util.string_of_pevent_name conf base (e2.epers_name) :> string)
   | PWitnessEventAfterDeath (p, e, _origin) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
         (fun _ -> (someone_strong_n_short_dates conf base p :> string))
-        (Util.string_of_pevent_name conf base (get_pevent_name e) :> string)
+        (Util.string_of_pevent_name conf base (e.epers_name) :> string)
   | PWitnessEventBeforeBirth (p, e, _origin) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
         (fun _ -> (someone_strong_n_short_dates conf base p :> string))
-        (Util.string_of_pevent_name conf base (get_pevent_name e) :> string)
+        (Util.string_of_pevent_name conf base (e.epers_name) :> string)
   | TitleDatesError (p, t) ->
       Output.printf conf
         (fcapitale (ftransl conf "%t has incorrect title dates: %t"))
