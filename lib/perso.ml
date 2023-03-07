@@ -3313,13 +3313,12 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       p_auth && has_witness_for_event conf base p (Event.Pevent Epers_Death)
   | "has_event" ->
       if p_auth then
-        let events = Event.events conf base p in
-        let nb_fam = Array.length (get_family p) in
-        match List.assoc_opt "has_events" conf.base_env with
-        | Some "never" -> false
-        | Some "always" ->
-            if nb_fam > 0 || List.length events > 0 then true else false
-        | Some _ | None ->
+          match List.assoc_opt "has_events" conf.base_env with
+          | Some "never" -> false
+          | Some "always" -> Array.length (get_family p) > 0 || List.length (Event.events conf base p) > 0
+          | Some _ | None ->
+            let events = Event.events conf base p in
+            let nb_fam = Array.length (get_family p) in
             (* return true if there is more event information
                than basic principals events.
                we do not take in account note on event as they are shown
@@ -3329,39 +3328,39 @@ and eval_bool_person_field conf base env (p, p_auth) = function
               match events with
               | [] -> false
               | event_item :: events -> (
-                  if Event.has_witness_note event_item then true
-                      (* return true if there is a witness_note on a witness *)
-                  else
-                    match Event.get_name event_item with
-                    | Event.Pevent pname -> (
-                        match pname with
-                        | Epers_Birth | Epers_Baptism | Epers_Death
-                        | Epers_Burial | Epers_Cremation ->
-                            if Event.has_witnesses event_item then true
-                            else
-                              let nb_principal_pevents =
-                                succ nb_principal_pevents
-                              in
-                              if nb_principal_pevents > 1 then true
-                              else loop events nb_principal_pevents nb_marr
-                        | _ -> true)
-                    | Fevent fname -> (
-                        match fname with
-                        | Efam_Engage | Efam_Marriage | Efam_NoMention
-                        | Efam_NoMarriage ->
-                            let nb_marr = succ nb_marr in
-                            if nb_marr > nb_fam then true
-                            else loop events nb_principal_pevents nb_marr
-                        | Efam_Divorce | Efam_Separated ->
-                          let place = Event.get_place event_item in
-                          let note = Event.get_note event_item in
-                          let src = Event.get_src event_item in
-                            if
-                              sou base place <> "" || sou base note <> "" || sou base src <> ""
-                              || Event.has_witnesses event_item
-                            then true
-                            else loop events nb_principal_pevents nb_marr
-                        | _ -> true))
+                  match Event.get_name event_item with
+                  | Event.Pevent pname -> (
+                      match pname with
+                      | Epers_Birth | Epers_Baptism | Epers_Death
+                      | Epers_Burial | Epers_Cremation ->
+                        if Event.has_witnesses event_item then true
+                        else
+                          let nb_principal_pevents =
+                            succ nb_principal_pevents
+                          in
+                          if nb_principal_pevents > 1 then true
+                          else if Event.has_witness_note event_item then true
+                          else loop events nb_principal_pevents nb_marr
+                      | _ -> true)
+                  | Fevent fname -> (
+                      match fname with
+                      | Efam_Engage | Efam_Marriage | Efam_NoMention
+                      | Efam_NoMarriage ->
+                        let nb_marr = succ nb_marr in
+                        if nb_marr > nb_fam then true
+                        else if Event.has_witness_note event_item then true
+                        else loop events nb_principal_pevents nb_marr
+                      | Efam_Divorce | Efam_Separated ->
+                        let place = Event.get_place event_item in
+                        let note = Event.get_note event_item in
+                        let src = Event.get_src event_item in
+                        if
+                          sou base place <> "" || sou base note <> "" || sou base src <> ""
+                          || Event.has_witnesses event_item
+                        then true
+                        else if Event.has_witness_note event_item then true
+                        else loop events nb_principal_pevents nb_marr
+                      | _ -> true))
             in
             loop events 0 0
       else false
