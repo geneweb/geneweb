@@ -2816,7 +2816,6 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                             succ nb_principal_pevents
                           in
                           if nb_principal_pevents > 1 then true
-                          else if Event.has_witness_note event_item then true
                           else loop events nb_principal_pevents nb_marr
                       | _ -> true)
                   | Fevent fname -> (
@@ -2825,7 +2824,6 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                       | Efam_NoMarriage ->
                         let nb_marr = succ nb_marr in
                         if nb_marr > nb_fam then true
-                        else if Event.has_witness_note event_item then true
                         else loop events nb_principal_pevents nb_marr
                       | Efam_Divorce | Efam_Separated ->
                         let place = Event.get_place event_item in
@@ -2835,11 +2833,15 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                           sou base place <> "" || sou base note <> "" || sou base src <> ""
                           || Event.has_witnesses event_item
                         then true
-                        else if Event.has_witness_note event_item then true
                         else loop events nb_principal_pevents nb_marr
                       | _ -> true))
             in
-            loop events 0 0
+            let rec loop' = function
+              | [] -> false
+              | event_item :: _events when Event.has_witness_note event_item -> true
+              | _ :: events -> loop' events
+            in
+            loop events 0 0 (*|| loop' events*)
       else false
   | "has_families" ->
       Array.length (get_family p) > 0
