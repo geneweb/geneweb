@@ -3329,14 +3329,9 @@ and eval_bool_person_field conf base env (p, p_auth) = function
               match events with
               | [] -> false
               | event_item :: events -> (
-                  (*if
-                    (* return true if there is a witness_note on a witness *)
-                    Array.exists
-                      (fun (_ip, _wk , wnote) -> not (is_empty_string wnote))
-                      wl
-                  then true
-                    else*)
-                  (*let p, note, s = sou base p, sou base note, sou base s in*)
+                  if Event.has_witness_note event_item then true
+                      (* return true if there is a witness_note on a witness *)
+                  else
                     match Event.get_name event_item with
                     | Event.Pevent pname -> (
                         match pname with
