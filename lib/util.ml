@@ -938,8 +938,7 @@ let std_color conf (s : Adef.safe_string) =
 
 let index_of_sex = function Male -> 0 | Female -> 1 | Neuter -> 2
 
-let string_of_pevent_name conf base epers_name =
-  match epers_name with
+let string_of_pevent_name_without_base conf = function
   | Epers_Birth -> Adef.safe @@ transl conf "birth"
   | Epers_Baptism -> Adef.safe @@ transl conf "baptism"
   | Epers_Death -> Adef.safe @@ transl conf "death"
@@ -992,9 +991,9 @@ let string_of_pevent_name conf base epers_name =
   | Epers_ScellentSpouseLDS -> Adef.safe @@ transl conf "scellentSpouseLDS"
   | Epers_VenteBien -> Adef.safe @@ transl conf "venteBien"
   | Epers_Will -> Adef.safe @@ transl conf "will"
-  | Epers_Name n -> (escape_html (sou base n) :> Adef.safe_string)
+  | _ -> failwith "bad argument in Util.string_of_pevent_without_base"
 
-let string_of_fevent_name conf base = function
+let string_of_fevent_name_without_base conf = function
   | Efam_Marriage -> Adef.safe @@ transl conf "marriage event"
   | Efam_NoMarriage -> Adef.safe @@ transl conf "no marriage event"
   | Efam_NoMention -> Adef.safe @@ transl conf "no mention"
@@ -1007,7 +1006,17 @@ let string_of_fevent_name conf base = function
   | Efam_MarriageLicense -> Adef.safe @@ transl conf "marriage licence"
   | Efam_PACS -> Adef.safe @@ transl conf "PACS"
   | Efam_Residence -> Adef.safe @@ transl conf "residence"
+  | _ -> failwith "bad argument in Util.string_of_fevent_without_base"
+
+let string_of_pevent_name conf base epers_name =
+  match epers_name with
+  | Epers_Name n -> (escape_html (sou base n) :> Adef.safe_string)
+  | _ -> string_of_pevent_name_without_base conf epers_name
+
+let string_of_fevent_name conf base efam_name =
+  match efam_name with
   | Efam_Name n -> (escape_html (sou base n) :> Adef.safe_string)
+  | _ -> string_of_fevent_name_without_base conf efam_name
 
 let string_of_witness_kind conf sex witness_kind =
   let n = if witness_kind = Witness then 0 else index_of_sex sex in

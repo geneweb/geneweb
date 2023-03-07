@@ -326,6 +326,12 @@ val std_color : config -> Adef.safe_string -> Adef.safe_string
 val index_of_sex : sex -> int
 (** Sex index used in translations (0 for male, 1 for female, 2 for neuter) *)
 
+val string_of_pevent_name_without_base :
+  config -> 'a gen_pers_event_name -> Adef.safe_string
+
+val string_of_fevent_name_without_base :
+  config -> 'a gen_fam_event_name -> Adef.safe_string
+
 val string_of_pevent_name :
   config -> base -> istr gen_pers_event_name -> Adef.safe_string
 
