@@ -99,6 +99,12 @@ let has_witnesses ei =
   in
   nb_witnesses > 0
 
+let has_witness_note ei = match ei with
+    | PE (e, _) -> Array.exists (fun n -> not (is_empty_string n)) (get_pevent_witness_notes e)
+    | FE (e, _, _) -> Array.exists (fun n -> not (is_empty_string n)) (get_fevent_witness_notes e)
+    | DPE (e, _) ->    Array.exists (fun (_, _, n) -> not (is_empty_string n)) e.epers_witnesses
+    | DFE (e, _, _) -> Array.exists (fun (_, _, n) -> not (is_empty_string n)) e.efam_witnesses  
+
 let event_item_of_pevent pe = PE (pe, pevent_name (Gwdb.get_pevent_name pe))
 let event_item_of_fevent ?sp fe = FE (fe, fevent_name (Gwdb.get_fevent_name fe), sp)
 
