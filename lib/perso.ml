@@ -2841,7 +2841,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
               | event_item :: _events when Event.has_witness_note event_item -> true
               | _ :: events -> loop' events
             in
-            loop events 0 0 (*|| loop' events*)
+            loop events 0 0 || loop' events
       else false
   | "has_families" ->
       Array.length (get_family p) > 0
