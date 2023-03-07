@@ -511,7 +511,7 @@ module Legacy_driver = struct
     | Some a -> a
     | None ->
       let wlen = Array.length pe.pevent.epers_witnesses in
-      let a = Array.init wlen (get_pers_wit_notes pe.event_person pe.event_index) in
+      let a = Array.init wlen (get_pers_full_wit_notes pe.event_person pe.event_index) in
       pe.pwitness_notes <- Some a;
       a
 
@@ -519,7 +519,7 @@ module Legacy_driver = struct
     | Some a -> a
     | None ->
       let wlen = Array.length fe.fevent.efam_witnesses in
-      let a = Array.init wlen (get_fam_wit_notes fe.event_family fe.event_index) in
+      let a = Array.init wlen (get_fam_full_wit_notes fe.event_family fe.event_index) in
       fe.fwitness_notes <- Some a;
       a
   
