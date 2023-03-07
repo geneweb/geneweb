@@ -21,6 +21,8 @@ val get_spouse_iper : 'a event_item -> iper option
 
 val has_witnesses : 'a event_item -> bool
 
+val has_witness_note : 'a event_item -> bool
+
 val pevent_name : 'a Def.gen_pers_event_name -> 'a event_name
 val fevent_name : 'a Def.gen_fam_event_name -> 'a event_name
 
