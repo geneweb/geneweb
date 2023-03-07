@@ -2788,7 +2788,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       p_auth && (not conf.no_note) && sou base (get_death_note p) <> ""
   | "has_death_witnesses" ->
       p_auth && has_witness_for_event conf base p (Event.Pevent Epers_Death)
-  | "has_event" ->
+  | "has_event" -> false &&
       if p_auth then
           match List.assoc_opt "has_events" conf.base_env with
           | Some "never" -> false
