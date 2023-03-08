@@ -2,28 +2,26 @@ val select_person_by_date :
   Config.config ->
   Gwdb.base ->
   (Gwdb.person -> Date.date option) ->
+  ascending:bool ->
   (Gwdb.person * (Date.dmy * Date.calendar)) list * int
-(** [select_person conf base get_date find_oldest] select 20 persons
+(** [select_person_by_date conf base get_date ~ascending] select 20 persons by default
     from the base according to the one of their date (birth, death,
     marriage, specific event, etc.) that could be get with [get_date].
-    Returns sorted by date persons that have the latest (if [find_oldest]
-    is false) or oldest (otherwise) date. Selection could be different depending
+    Returns sorted by date persons that have the latest or oldest date depending on [~ascending].
+    Selection could be different depending
     on environement [conf.env]. These variables affect the selection:
       k - allows to modify default value (20) of selected persons
       by,bm,bd - allows to set reference date (all dates after the reference
                  one aren't selected)
     Returns also the number of selected persons *)
 
-(* TODO why list * int *)
-
-(* TODO make selecT_person polymorph *)
-
-(* TODO docu *)
 val select_person_by_elapsed_time :
   Config.config ->
   Gwdb.base ->
   (Gwdb.person -> Date.elapsed_time option) ->
+  ascending:bool ->
   (Gwdb.person * Date.elapsed_time) list * int
+(** Same as [select_person_by_date] but for elapsed_time instead of date *)
 
 val select_family :
   Config.config ->
