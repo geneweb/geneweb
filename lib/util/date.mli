@@ -132,3 +132,5 @@ val french_of_sdn : prec:precision -> int -> dmy
 
 val hebrew_of_sdn : prec:precision -> int -> dmy
 (** Convert SDN to [dmy] in hebrew calendar *)
+
+val compare_elapsed_time : elapsed_time -> elapsed_time -> int

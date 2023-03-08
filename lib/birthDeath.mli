@@ -1,9 +1,8 @@
-val select_person :
+val select_person_by_date :
   Config.config ->
   Gwdb.base ->
   (Gwdb.person -> Date.date option) ->
-  bool ->
-  (Gwdb.person * Date.dmy * Date.calendar) list * int
+  (Gwdb.person * (Date.dmy * Date.calendar)) list * int
 (** [select_person conf base get_date find_oldest] select 20 persons
     from the base according to the one of their date (birth, death,
     marriage, specific event, etc.) that could be get with [get_date].
@@ -15,12 +14,23 @@ val select_person :
                  one aren't selected)
     Returns also the number of selected persons *)
 
+(* TODO why list * int *)
+
+(* TODO make selecT_person polymorph *)
+
+(* TODO docu *)
+val select_person_by_elapsed_time :
+  Config.config ->
+  Gwdb.base ->
+  (Gwdb.person -> Date.elapsed_time option) ->
+  (Gwdb.person * Date.elapsed_time) list * int
+
 val select_family :
   Config.config ->
   Gwdb.base ->
   (Gwdb.family -> Date.date option) ->
   bool ->
-  (Gwdb.family * Date.dmy * Date.calendar) list * int
+  (Gwdb.family * (Date.dmy * Date.calendar)) list * int
 (** Same as [select_person] but dealing with families *)
 
 val death_date : Gwdb.person -> Date.date option

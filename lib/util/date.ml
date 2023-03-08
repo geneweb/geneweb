@@ -340,3 +340,12 @@ let time_elapsed_opt d1 d2 =
   match (d1.prec, d2.prec) with
   | After, After | Before, Before -> None
   | _ -> Some (time_elapsed d1 d2)
+
+let time_elapsed_to_sdn a =
+  let { nb_day; nb_month; nb_year } = a in
+  (* TODO *)
+  nb_day + (30 * nb_month) + (365 * nb_year)
+
+(* TODO ? *)
+let compare_elapsed_time a b =
+  Int.compare (time_elapsed_to_sdn a) (time_elapsed_to_sdn b)
