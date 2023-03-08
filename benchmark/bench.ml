@@ -177,7 +177,8 @@ let bench () =
            [ conf ]
       :: bench_w_base "BirthDeath.select_person" ~t:10
            (fun base get ->
-             (Sys.opaque_identity BirthDeath.select_person) conf base get true
+             (Sys.opaque_identity BirthDeath.select_person_by_date)
+               conf base get ~ascending:false
              |> Sys.opaque_identity ignore)
            [ (fun p -> Date.od_of_cdate (Gwdb.get_birth p)) ]
       :: suite
