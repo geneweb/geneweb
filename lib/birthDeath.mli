@@ -15,12 +15,12 @@ val select_person_by_date :
                  one aren't selected)
     Returns also the number of selected persons *)
 
-val select_person_by_elapsed_time :
+val select_person_by_duration :
   Config.config ->
   Gwdb.base ->
-  (Gwdb.person -> Date.elapsed_time option) ->
+  (Gwdb.person -> Duration.t option) ->
   ascending:bool ->
-  (Gwdb.person * Date.elapsed_time) list * int
+  (Gwdb.person * Duration.t) list * int
 (** Same as [select_person_by_date] but for elapsed_time instead of date *)
 
 val select_family :

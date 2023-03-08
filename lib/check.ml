@@ -92,6 +92,7 @@ let print_base_error oc base = function
 
 let print_base_warning oc base = function
   | Warning.BigAgeBetweenSpouses (p1, p2, a) ->
+      let a = Duration.to_display a in
       Printf.fprintf oc
         "The difference of age between %s and %s is quite important: %d\n"
         (designation base p1) (designation base p2) a.nb_year
@@ -131,6 +132,7 @@ let print_base_warning oc base = function
       Printf.fprintf oc "- %s\n" (designation base c1);
       Printf.fprintf oc "- %s\n" (designation base c2)
   | DeadOld (p, a) ->
+      let a = Duration.to_display a in
       Printf.fprintf oc "%s died at the advanced age of %d years old\n"
         (designation base p) a.nb_year
   | DeadTooEarlyToBeFather (father, child) ->
@@ -184,9 +186,11 @@ let print_base_warning oc base = function
       Printf.fprintf oc "%s born after his/her child %s\n"
         (designation base parent) (designation base child)
   | ParentTooOld (p, a, _) ->
+      let a = Duration.to_display a in
       Printf.fprintf oc "%s was parent at age of %d\n" (designation base p)
         a.nb_year
   | ParentTooYoung (p, a, _) ->
+      let a = Duration.to_display a in
       Printf.fprintf oc "%s was parent at age of %d\n" (designation base p)
         a.nb_year
   | PossibleDuplicateFam (f1, f2) ->
@@ -224,6 +228,7 @@ let print_base_warning oc base = function
   | UndefinedSex p ->
       Printf.fprintf oc "Undefined sex for %s\n" (designation base p)
   | YoungForMarriage (p, a, _) | OldForMarriage (p, a, _) ->
+      let a = Duration.to_display a in
       Printf.fprintf oc "%s married at age %d\n" (designation base p) a.nb_year
 
 type check_date =

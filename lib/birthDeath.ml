@@ -82,19 +82,19 @@ let select_person_by_date conf base get_date ~ascending =
     ~iterator ~get_key ~get_value ~nb ~filter:(date_filter conf)
 
 module PQ_elapsed = Pqueue.Make (struct
-  type t = Gwdb.person * Date.elapsed_time
+  type t = Gwdb.person * Duration.t
 
-  let leq (_, x) (_, y) = Date.compare_elapsed_time x y <= 0
+  let leq (_, x) (_, y) = Duration.compare x y <= 0
 end)
 
 (* TODO have a make_module leq = ... *)
 module PQ_elapsed_reverse = Pqueue.Make (struct
-  type t = Gwdb.person * Date.elapsed_time
+  type t = Gwdb.person * Duration.t
 
-  let leq (_, x) (_, y) = Date.compare_elapsed_time y x <= 0
+  let leq (_, x) (_, y) = Duration.compare y x <= 0
 end)
 
-let select_person_by_elapsed_time conf base get_elapsed_time ~ascending =
+let select_person_by_duration conf base get_elapsed_time ~ascending =
   let iterator = Gwdb.ipers base in
   let get_key = pget conf base in
   let nb = nb_of_persons base |> clamp_to_conf_nb conf in
@@ -144,7 +144,9 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
         | None -> ()
         | Some dmy ->
             if Date.compare_dmy dmy at_date <= 0 then
-              let age = Date.time_elapsed dmy at_date in
+              let age =
+                Duration.time_elapsed dmy at_date |> Duration.to_display
+              in
               let j = min nb_intervals (age.nb_year / interval) in
               if
                 (dea = NotDead || (dea = DontKnowIfDead && age.nb_year < limit))

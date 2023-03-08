@@ -178,8 +178,9 @@ and mk_dmy { Date.day; month; year; delta; prec } =
     | "prec" -> prec
     | _ -> raise Not_found)
 
-and mk_elapsed_time = function
-  | { Date.nb_day; nb_month; nb_year } ->
+and mk_duration = function
+  (* TODO *)
+  | Duration.{ nb_day; nb_month; nb_year } ->
       Tpat
         (function
         | "day" -> Tint nb_day
@@ -233,10 +234,14 @@ and mk_date = function
         | "__eq__" -> date_eq
         | _ -> raise Not_found)
 
-and to_elapsed_time d =
+and to_duration_display _d =
+  (*
   let int s = match Jg_runtime.jg_obj_lookup d s with Tint i -> i | _ -> 0 in
   (* TODO change for int "nb_day" ? *)
-  { Date.nb_day = int "day"; nb_month = int "month"; nb_year = int "year" }
+  (* TODO this is problematic; why do we build dates from jingoo*)
+  Duration.{ nb_day = int "day"; nb_month = int "month"; nb_year = int "year" }
+  *)
+  assert false
 
 and to_dmy d =
   let int s = match Jg_runtime.jg_obj_lookup d s with Tint i -> i | _ -> 0 in
@@ -329,14 +334,14 @@ and module_DATE conf =
   in
   let string_of_age =
     func_arg1_no_kw (fun d ->
-        safe (DateDisplay.string_of_age conf (to_elapsed_time d)))
+        safe (DateDisplay.string_of_age conf (to_duration_display d)))
   in
   let sub =
     func_arg2_no_kw (fun d1 d2 ->
-        (* TODO or do we add type elapsed to jingoo types?? *)
+        (* TODO add duration to jingoo *)
         let dmy =
-          let Date.{ nb_day; nb_month; nb_year } =
-            Date.time_elapsed (to_dmy d2) (to_dmy d1)
+          let Duration.{ nb_day; nb_month; nb_year } =
+            Duration.time_elapsed (to_dmy d2) (to_dmy d1) |> Duration.to_display
           in
           Date.
             {
@@ -861,7 +866,7 @@ and mk_warning conf base =
           Tsafe "BigAgeBetweenSpouses";
           unsafe_mk_person conf base f;
           unsafe_mk_person conf base m;
-          mk_elapsed_time age;
+          mk_duration (Duration.to_display age);
         ]
   | BirthAfterDeath p ->
       Tset [ Tsafe "BirthAfterDeath"; unsafe_mk_person conf base p ]
@@ -945,7 +950,11 @@ and mk_warning conf base =
         ]
   | DeadOld (p, age) ->
       Tset
-        [ Tsafe "DeadOld"; unsafe_mk_person conf base p; mk_elapsed_time age ]
+        [
+          Tsafe "DeadOld";
+          unsafe_mk_person conf base p;
+          mk_duration (Duration.to_display age);
+        ]
   | DeadTooEarlyToBeFather (father, child) ->
       Tset
         [
@@ -1000,7 +1009,7 @@ and mk_warning conf base =
         [
           Tsafe "OldForMarriage";
           unsafe_mk_person conf base p;
-          mk_elapsed_time age;
+          mk_duration (Duration.to_display age);
           get_n_mk_family conf base i (Gwdb.foi base i);
         ]
   | ParentBornAfterChild (p1, p2) ->
@@ -1015,7 +1024,7 @@ and mk_warning conf base =
         [
           Tsafe "ParentTooOld";
           unsafe_mk_person conf base p;
-          mk_elapsed_time age;
+          mk_duration (Duration.to_display age);
           unsafe_mk_person conf base c;
         ]
   | ParentTooYoung (p, age, c) ->
@@ -1023,7 +1032,7 @@ and mk_warning conf base =
         [
           Tsafe "ParentTooYoung";
           unsafe_mk_person conf base p;
-          mk_elapsed_time age;
+          mk_duration (Duration.to_display age);
           unsafe_mk_person conf base c;
         ]
   | PEventOrder (p, e1, e2) ->
@@ -1064,7 +1073,7 @@ and mk_warning conf base =
         [
           Tsafe "YoungForMarriage";
           unsafe_mk_person conf base p;
-          mk_elapsed_time age;
+          mk_duration (Duration.to_display age);
           get_fam i;
         ]
   | PossibleDuplicateFam (ifam1, ifam2) ->

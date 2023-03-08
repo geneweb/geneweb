@@ -41,7 +41,8 @@ let maximum_lifespan = 125
 
 let infer_death_from_dmy conf ?(max_age = maximum_lifespan) d =
   (* TODO this max_age should be related to private_years_marriage *)
-  let age = Date.time_elapsed d conf.today in
+  (* TODO make max_age a duration *)
+  let age = Duration.time_elapsed d conf.today |> Duration.to_display in
   if age.nb_year > max_age then OfCourseDead else DontKnowIfDead
 
 let infer_death_from_cdate conf ?(max_age = maximum_lifespan) cdate =

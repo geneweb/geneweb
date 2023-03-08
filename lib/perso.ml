@@ -634,7 +634,7 @@ let get_date_place conf base auth_for_all_anc p =
         | Some (Dgreg (d, _)) ->
             (* TODO looks bad
                Util.strictly_after_private_years should probably not be in .mli *)
-            let a = Date.time_elapsed d conf.today in
+            let a = Duration.time_elapsed d conf.today in
             Util.strictly_after_private_years conf a
         | _ -> false
     in
@@ -2554,7 +2554,7 @@ and eval_str_event_field conf base (p, p_auth)
             Some ({ prec = Sure | About | Maybe } as d2) )
           when d1 <> d2 ->
             let age =
-              Date.time_elapsed d1 d2 |> DateDisplay.string_of_age conf
+              Duration.time_elapsed d1 d2 |> DateDisplay.string_of_age conf
             in
             let s =
               if (not approx) && d1.prec = Sure && d2.prec = Sure then ""
@@ -2673,7 +2673,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
             Some (Dgreg (({ prec = Sure | About | Maybe } as d2), _)),
             _ )
           when d1 <> d2 ->
-            let age = Date.time_elapsed d1 d2 in
+            let age = Duration.time_elapsed d1 d2 |> Duration.to_display in
             age.nb_year > 0
             || age.nb_year = 0
                && (age.nb_month > 0 || (age.nb_month = 0 && age.nb_day > 0))
@@ -2689,8 +2689,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
             with
             | ( Some ({ prec = Sure | About | Maybe } as d1),
                 Some ({ prec = Sure | About | Maybe } as d2) ) ->
-                let age = Date.time_elapsed d1 d2 in
-                (* TODO this is age <> 0 *)
+                let age = Duration.time_elapsed d1 d2 |> Duration.to_display in
+                (* TODO is this age > 0? *)
                 age.nb_year > 0
                 || age.nb_year = 0
                    && (age.nb_month > 0 || (age.nb_month = 0 && age.nb_day > 0))
@@ -2961,7 +2961,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "age" -> (
       match (p_auth, Date.cdate_to_dmy_opt (get_birth p), get_death p) with
       | true, Some d, NotDead ->
-          Date.time_elapsed d conf.today
+          Duration.time_elapsed d conf.today
           |> DateDisplay.string_of_age conf
           |> safe_val
       | _ -> null_val)
@@ -3041,7 +3041,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
             Some (Dgreg (({ prec = Sure | About | Maybe } as d2), _)),
             approx )
           when d1 <> d2 ->
-            let a = Date.time_elapsed d1 d2 in
+            let a = Duration.time_elapsed d1 d2 in
             let s =
               if (not approx) && d1.prec = Sure && d2.prec = Sure then ""
               else transl_decline conf "possibly (date)" "" ^ " "
@@ -3124,7 +3124,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
             with
             | ( Some ({ prec = Sure | About | Maybe } as d1),
                 Some ({ prec = Sure | About | Maybe } as d2) ) ->
-                Date.time_elapsed d1 d2
+                Duration.time_elapsed d1 d2
                 |> DateDisplay.string_of_age conf
                 |> safe_val
             | _ -> null_val
@@ -3473,7 +3473,7 @@ and string_of_parent_age conf base (p, p_auth) parent : Adef.safe_string =
             Date.cdate_to_dmy_opt (get_birth p) )
         with
         | Some d1, Some d2 ->
-            Date.time_elapsed d1 d2 |> DateDisplay.string_of_age conf
+            Duration.time_elapsed d1 d2 |> DateDisplay.string_of_age conf
         | _ -> Adef.safe ""
       else Adef.safe ""
   | None -> raise Not_found

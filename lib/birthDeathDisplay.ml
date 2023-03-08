@@ -87,11 +87,11 @@ let print_death conf base =
             | None -> (None, ages_sum, ages_nb)
             | Some d1 ->
                 if sure d1 && sure d && d1 <> d then
-                  let a = Date.time_elapsed d1 d in
+                  let age = Duration.time_elapsed d1 d in
                   let ages_sum =
                     match get_sex p with
-                    | Male -> (fst ages_sum + a.nb_year, snd ages_sum)
-                    | Female -> (fst ages_sum, snd ages_sum + a.nb_year)
+                    | Male -> (Duration.add (fst ages_sum) age, snd ages_sum)
+                    | Female -> (fst ages_sum, Duration.add (snd ages_sum) age)
                     | Neuter -> ages_sum
                   in
                   let ages_nb =
@@ -100,7 +100,7 @@ let print_death conf base =
                     | Female -> (fst ages_nb, snd ages_nb + 1)
                     | Neuter -> ages_nb
                   in
-                  (Some a, ages_sum, ages_nb)
+                  (Some age, ages_sum, ages_nb)
                 else (None, ages_sum, ages_nb)
           in
           Output.print_sstring conf "<li><b>";
@@ -120,7 +120,7 @@ let print_death conf base =
             age;
           Output.print_sstring conf "</li>";
           (month_txt, ages_sum, ages_nb))
-        (Adef.safe "", (0, 0), (0, 0))
+        (Adef.safe "", (Duration.of_sdn 0, Duration.of_sdn 0), (0, 0))
         l
     in
     Output.print_sstring conf "</ul></li></ul>";
@@ -132,8 +132,7 @@ let print_death conf base =
         Output.print_sstring conf (transl_nth conf "M/F" sex);
         Output.print_sstring conf ") : ";
         Output.print_string conf
-          (DateDisplay.string_of_age conf
-             { nb_day = 0; nb_month = 0; nb_year = sum / nb });
+          (DateDisplay.string_of_age conf (Duration.div sum nb));
         Output.print_sstring conf "<br>")
     in
     aux 0 (fst ages_nb) (fst ages_sum);
@@ -223,7 +222,7 @@ let print_oldest_alive conf base =
         (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
       Output.print_sstring conf "</em>";
       if get_death p = NotDead && d.prec = Sure then (
-        let a = Date.time_elapsed d conf.today in
+        let a = Duration.time_elapsed d conf.today in
         Output.print_sstring conf " <em>(";
         Output.print_string conf (DateDisplay.string_of_age conf a);
         Output.print_sstring conf ")</em>");
@@ -239,13 +238,11 @@ let print_longest_lived conf base =
       | Some bd, Death (_, cd) -> (
           match Date.cdate_to_dmy_opt cd with
           | None -> None
-          | Some dd -> Some (Date.time_elapsed bd dd))
+          | Some dd -> Some (Duration.time_elapsed bd dd))
       | _ -> None
     else None
   in
-  let l, len =
-    select_person_by_elapsed_time conf base get_age ~ascending:false
-  in
+  let l, len = select_person_by_duration conf base get_age ~ascending:false in
   let title _ =
     Printf.sprintf (fcapitale (ftransl conf "the %d who lived the longest")) len
     |> Output.print_sstring conf
@@ -260,8 +257,9 @@ let print_longest_lived conf base =
       Output.print_sstring conf "</strong>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       (* why not use DateDisplay.string_of_age here? *)
+      let age = Duration.to_display age in
       Output.print_sstring conf " (";
-      Output.print_sstring conf (string_of_int age.Date.nb_year);
+      Output.print_sstring conf (string_of_int age.nb_year);
       Output.print_sstring conf " ";
       Output.print_sstring conf (transl conf "years old");
       Output.print_sstring conf ")";

@@ -97,7 +97,10 @@ module Default = struct
         match d with
         | None -> none ()
         | Some d ->
-            let age = Date.time_elapsed d conf.today in
+            (* TODO private years should be duration *)
+            let age =
+              Duration.time_elapsed d conf.today |> Duration.to_display
+            in
             if age.nb_year > conf.Config.private_years then true
             else if age.nb_year < conf.private_years then false
             else age.nb_month > 0 || age.nb_day > 0

@@ -7,6 +7,8 @@ type cdate = Adef.cdate =
   | Cdate of Adef.date
   | Cnone
 
+(* TODO dates should be sdn intervals... *)
+
 type date = Adef.date = Dgreg of dmy * calendar | Dtext of string
 and calendar = Adef.calendar = Dgregorian | Djulian | Dfrench | Dhebrew
 
@@ -29,8 +31,6 @@ and precision = Adef.precision =
   | OrYear of dmy2
   (* inteval *)
   | YearInt of dmy2
-
-type elapsed_time = { nb_day : int; nb_month : int; nb_year : int }
 
 (* compress concrete date if it's possible *)
 let compress d =
@@ -297,23 +297,3 @@ let compare_date d1 d2 =
   | Dgreg (_, _), Dtext _ -> 1
   | Dtext _, Dgreg (_, _) -> -1
   | Dtext _, Dtext _ -> 0
-
-let time_elapsed d1 d2 =
-  let sdn1 = to_sdn ~from:Dgregorian d1 in
-  let sdn2 = to_sdn ~from:Dgregorian d2 in
-  (* TODO *)
-  { nb_day = sdn2 - sdn1; nb_month = 0; nb_year = 0 }
-
-let time_elapsed_opt d1 d2 =
-  match (d1.prec, d2.prec) with
-  | After, After | Before, Before -> None
-  | _ -> Some (time_elapsed d1 d2)
-
-let time_elapsed_to_sdn a =
-  let { nb_day; nb_month; nb_year } = a in
-  (* TODO *)
-  nb_day + (30 * nb_month) + (365 * nb_year)
-
-(* TODO ? *)
-let compare_elapsed_time a b =
-  Int.compare (time_elapsed_to_sdn a) (time_elapsed_to_sdn b)

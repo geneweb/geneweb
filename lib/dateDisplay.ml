@@ -453,10 +453,11 @@ let string_slash_of_date conf date =
           ^ ")")
 
 let string_of_age conf age =
+  let age = Duration.to_display age in
   Adef.safe
   @@
   match age with
-  | { nb_day = 0; nb_month = 0; nb_year = y } ->
+  | Duration.{ nb_day = 0; nb_month = 0; nb_year = y } ->
       if y > 1 then string_of_int y ^ " " ^ transl conf "years old"
       else if y = 1 then transl conf "one year old"
       else transl conf "birth"

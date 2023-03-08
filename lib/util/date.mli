@@ -1,5 +1,7 @@
 type cdate = Def.cdate
 
+(* TODO use private so we can't build invalid dates *)
+
 type date =
   (* dmy is the date in gregorian format;
      calendar is the calendar in which we should display this date;
@@ -24,32 +26,12 @@ and precision =
   (* inteval *)
   | YearInt of dmy2
 
-type elapsed_time = { nb_day : int; nb_month : int; nb_year : int }
-
 val leap_year : int -> bool
 (** Says if the given year is a leap year. *)
 
 val nb_days_in_month : int -> int -> int
 (** Returns number of days for the given month and year for
     gregorian calendar. Takes into account leap years. *)
-
-val time_elapsed : dmy -> dmy -> elapsed_time
-(** [time_elapsed start stop]
-    Compute the time elapsed between [start] and [stop].
-    If [stop] is prior to [start], resulting [dmy]'s field
-    are negative (but correct).
-    Resulting [prec] can be:
-    - [Sure] for exact duration
-    - [Before] for "less than" duration
-    - [After] for "more than" duration
-    - [Maybe] for other cases
-    Used to compare only gregorian calendar's dates.
- *)
-
-val time_elapsed_opt : dmy -> dmy -> elapsed_time option
-(** Same as [time_elapsed], but will return [None]
-    if computation is not possible
-    (e.g. time_elapsed_opt /1839 /1859). *)
 
 (* TODO add date_of_burial/event?  *)
 val dmy_of_death : Def.death -> dmy option
@@ -121,5 +103,3 @@ val french_of_sdn : prec:precision -> int -> dmy
 
 val hebrew_of_sdn : prec:precision -> int -> dmy
 (** Convert SDN to [dmy] in hebrew calendar *)
-
-val compare_elapsed_time : elapsed_time -> elapsed_time -> int
