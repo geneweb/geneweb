@@ -5,44 +5,34 @@ open Def
 open Gwdb
 open Util
 
-let get_k conf =
-  match p_getint conf.env "k" with
-  | Some x -> x
-  | _ -> (
-      try int_of_string (List.assoc "latest_event" conf.base_env)
-      with Not_found | Failure _ -> 20)
-
-let select (type a)
-    (module Q : Pqueue.S with type elt = a * Date.dmy * Date.calendar) nb_of
-    iterator get get_date conf base =
-  let n = min (max 0 (get_k conf)) (nb_of base) in
-  let ref_date =
-    match p_getint conf.env "by" with
-    | Some by ->
-        let bm = Option.value ~default:(-1) (p_getint conf.env "bm") in
-        let bd = Option.value ~default:(-1) (p_getint conf.env "bd") in
-        Some Date.{ day = bd; month = bm; year = by; prec = Sure; delta = 0 }
-    | None -> None
+let clamp_to_conf_nb conf nb =
+  (* ?? .. *)
+  let get_k conf =
+    match p_getint conf.env "k" with
+    | Some x -> x
+    | None -> (
+        try int_of_string (List.assoc "latest_event" conf.base_env)
+        with Not_found | Failure _ -> 20)
   in
+  min (max 0 (get_k conf)) nb
+
+let select (type key value) (module Q : Pqueue.S with type elt = key * value)
+    ~iterator ~get_key ~get_value ~nb ~filter =
   let q, len =
     Gwdb.Collection.fold
       (fun (q, len) i ->
-        let x = get base i in
-        match get_date x with
-        | Some (Date.Dtext _) | None -> (q, len)
-        | Some (Dgreg (d, cal)) ->
-            let aft =
-              match ref_date with
-              | Some ref_date -> Date.compare_dmy ref_date d <= 0
-              | None -> false
-            in
-            if aft then (q, len)
+        let x = get_key i in
+        match get_value x with
+        | None -> (q, len)
+        | Some item ->
+            if not (filter item) then (q, len)
             else
-              let e = (x, d, cal) in
-              if len < n then (Q.add e q, len + 1)
+              let e = (x, item) in
+              if len < nb then (Q.add e q, len + 1)
               else (snd (Q.take (Q.add e q)), len))
-      (Q.empty, 0) (iterator base)
+      (Q.empty, 0) iterator
   in
+  (* TODO Q.to_list? *)
   let rec loop list q =
     if Q.is_empty q then (list, len)
     else
@@ -51,39 +41,79 @@ let select (type a)
   in
   loop [] q
 
-module PQ = Pqueue.Make (struct
-  type t = Gwdb.person * Date.dmy * Date.calendar
+(* this is used to filter date before/after a date defined in conf.env *)
+(* this do not make sense in the case of elapsed_time (to get oldest persons) *)
+let date_filter conf =
+  match p_getint conf.env "by" with
+  | None -> fun _d -> true
+  | Some by ->
+      (* TODO making and comparing a date with negative value is a bad idea *)
+      let bm = Option.value ~default:(-1) (p_getint conf.env "bm") in
+      let bd = Option.value ~default:(-1) (p_getint conf.env "bd") in
+      let ref_date =
+        Date.{ day = bd; month = bm; year = by; prec = Sure; delta = 0 }
+      in
+      fun (d, _cal) -> Date.compare_dmy ref_date d > 0
 
-  let leq (_, x, _) (_, y, _) = Date.compare_dmy x y <= 0
+module PQ = Pqueue.Make (struct
+  type t = Gwdb.person * (Date.dmy * Date.calendar)
+
+  (* TODO leq must define a total order, is Date.compare_dmy a total order...? *)
+  let leq (_, (x, _)) (_, (y, _)) = Date.compare_dmy x y <= 0
 end)
+
+let select_person_by_date conf base get_date =
+  let iterator = Gwdb.ipers base in
+  let get_key = pget conf base in
+  let nb = nb_of_persons base |> clamp_to_conf_nb conf in
+  let get_value p =
+    match get_date p with
+    | Some (Date.Dgreg (d, cal)) -> Some (d, cal)
+    | Some (Dtext _) | None -> None
+  in
+  select
+    (module PQ)
+    ~iterator ~get_key ~get_value ~nb ~filter:(date_filter conf)
 
 module PQ_oldest = Pqueue.Make (struct
-  type t = Gwdb.person * Date.dmy * Date.calendar
+  type t = Gwdb.person * Date.elapsed_time
 
-  let leq (_, x, _) (_, y, _) = Date.compare_dmy y x <= 0
+  let leq (_, x) (_, y) = Date.compare_elapsed_time y x <= 0
 end)
 
-let select_person conf base get_date find_oldest =
+let select_person_by_elapsed_time conf base get_elapsed_time =
+  let iterator = Gwdb.ipers base in
+  let get_key = pget conf base in
+  let nb = nb_of_persons base |> clamp_to_conf_nb conf in
   select
-    (if find_oldest then (module PQ_oldest) else (module PQ))
-    nb_of_persons Gwdb.ipers (pget conf) get_date conf base
+    (module PQ_oldest)
+    ~iterator ~get_key ~get_value:get_elapsed_time ~nb
+    ~filter:(fun _item -> true)
 
 module FQ = Pqueue.Make (struct
-  type t = Gwdb.family * Date.dmy * Date.calendar
+  type t = Gwdb.family * (Date.dmy * Date.calendar)
 
-  let leq (_, x, _) (_, y, _) = Date.compare_dmy x y <= 0
+  let leq (_, (x, _)) (_, (y, _)) = Date.compare_dmy x y <= 0
 end)
 
 module FQ_oldest = Pqueue.Make (struct
-  type t = Gwdb.family * Date.dmy * Date.calendar
+  type t = Gwdb.family * (Date.dmy * Date.calendar)
 
-  let leq (_, x, _) (_, y, _) = Date.compare_dmy y x <= 0
+  let leq (_, (x, _)) (_, (y, _)) = Date.compare_dmy y x <= 0
 end)
 
 let select_family conf base get_date find_oldest =
+  let iterator = Gwdb.ifams base in
+  let get_key = Gwdb.foi base in
+  let nb = nb_of_families base |> clamp_to_conf_nb conf in
+  let get_value fam =
+    match get_date fam with
+    | Some (Date.Dgreg (d, cal)) -> Some (d, cal)
+    | Some (Dtext _) | None -> None
+  in
   select
     (if find_oldest then (module FQ_oldest) else (module FQ))
-    nb_of_families Gwdb.ifams Gwdb.foi get_date conf base
+    ~iterator ~get_key ~get_value ~nb ~filter:(date_filter conf)
 
 let death_date p = Date.date_of_death (get_death p)
 
