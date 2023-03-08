@@ -12,7 +12,9 @@ let month_txt conf d cal =
 
 let print_birth conf base =
   let l, len =
-    select_person_by_date conf base (fun p -> Date.od_of_cdate (get_birth p))
+    select_person_by_date conf base
+      (fun p -> Date.od_of_cdate (get_birth p))
+      ~ascending:false
   in
   let title _ =
     Output.printf conf (fcapitale (ftransl conf "the latest %d births")) len
@@ -58,7 +60,7 @@ let print_birth conf base =
   Hutil.trailer conf
 
 let print_death conf base =
-  let l, len = select_person_by_date conf base death_date in
+  let l, len = select_person_by_date conf base death_date ~ascending:false in
   let title _ =
     Printf.sprintf
       (fcapitale (ftransl conf "the latest %t deaths"))
@@ -196,7 +198,10 @@ let print_oldest_alive conf base =
     | Death _ | DontKnowIfDead | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
         None
   in
-  let l, len = select_person_by_date conf base get_oldest_alive in
+  (* TODO this should be in reversed order *)
+  let l, len =
+    select_person_by_date conf base get_oldest_alive ~ascending:true
+  in
   let title _ =
     Printf.sprintf
       (fcapitale (ftransl conf "the %d oldest perhaps still alive"))
@@ -238,7 +243,9 @@ let print_longest_lived conf base =
       | _ -> None
     else None
   in
-  let list, len = select_person_by_elapsed_time conf base get_age in
+  let l, len =
+    select_person_by_elapsed_time conf base get_age ~ascending:false
+  in
   let title _ =
     Printf.sprintf (fcapitale (ftransl conf "the %d who lived the longest")) len
     |> Output.print_sstring conf
@@ -252,6 +259,7 @@ let print_longest_lived conf base =
       Output.print_string conf (referenced_person_text conf base p);
       Output.print_sstring conf "</strong>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
+      (* why not use DateDisplay.string_of_age here? *)
       Output.print_sstring conf " (";
       Output.print_sstring conf (string_of_int age.Date.nb_year);
       Output.print_sstring conf " ";
@@ -259,7 +267,7 @@ let print_longest_lived conf base =
       Output.print_sstring conf ")";
       Output.print_sstring conf ".";
       Output.print_sstring conf "</li>")
-    list;
+    l;
   Output.print_sstring conf "</ul>";
   Hutil.trailer conf
 

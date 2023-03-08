@@ -42,7 +42,6 @@ let select (type key value) (module Q : Pqueue.S with type elt = key * value)
   loop [] q
 
 (* this is used to filter date before/after a date defined in conf.env *)
-(* this do not make sense in the case of elapsed_time (to get oldest persons) *)
 let date_filter conf =
   match p_getint conf.env "by" with
   | None -> fun _d -> true
@@ -55,14 +54,21 @@ let date_filter conf =
       in
       fun (d, _cal) -> Date.compare_dmy ref_date d > 0
 
-module PQ = Pqueue.Make (struct
+module PQ_date = Pqueue.Make (struct
   type t = Gwdb.person * (Date.dmy * Date.calendar)
 
-  (* TODO leq must define a total order, is Date.compare_dmy a total order...? *)
+  (* TODO leq must define a total order, does Date.compare_dmy really define a total order...? *)
   let leq (_, (x, _)) (_, (y, _)) = Date.compare_dmy x y <= 0
 end)
 
-let select_person_by_date conf base get_date =
+(* TODO have a make_module leq = ... *)
+module PQ_date_reverse = Pqueue.Make (struct
+  type t = Gwdb.person * (Date.dmy * Date.calendar)
+
+  let leq (_, (x, _)) (_, (y, _)) = Date.compare_dmy y x <= 0
+end)
+
+let select_person_by_date conf base get_date ~ascending =
   let iterator = Gwdb.ipers base in
   let get_key = pget conf base in
   let nb = nb_of_persons base |> clamp_to_conf_nb conf in
@@ -72,21 +78,28 @@ let select_person_by_date conf base get_date =
     | Some (Dtext _) | None -> None
   in
   select
-    (module PQ)
+    (if ascending then (module PQ_date_reverse) else (module PQ_date))
     ~iterator ~get_key ~get_value ~nb ~filter:(date_filter conf)
 
-module PQ_oldest = Pqueue.Make (struct
+module PQ_elapsed = Pqueue.Make (struct
+  type t = Gwdb.person * Date.elapsed_time
+
+  let leq (_, x) (_, y) = Date.compare_elapsed_time x y <= 0
+end)
+
+(* TODO have a make_module leq = ... *)
+module PQ_elapsed_reverse = Pqueue.Make (struct
   type t = Gwdb.person * Date.elapsed_time
 
   let leq (_, x) (_, y) = Date.compare_elapsed_time y x <= 0
 end)
 
-let select_person_by_elapsed_time conf base get_elapsed_time =
+let select_person_by_elapsed_time conf base get_elapsed_time ~ascending =
   let iterator = Gwdb.ipers base in
   let get_key = pget conf base in
   let nb = nb_of_persons base |> clamp_to_conf_nb conf in
   select
-    (module PQ_oldest)
+    (if ascending then (module PQ_elapsed_reverse) else (module PQ_elapsed))
     ~iterator ~get_key ~get_value:get_elapsed_time ~nb
     ~filter:(fun _item -> true)
 
