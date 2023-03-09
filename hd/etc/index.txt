@@ -19,14 +19,13 @@
 
 <form class="form-inline d-flex justify-content-center my-2" method="get" action="%prefix;">
   <input type="hidden" name="lang" value="%evar.lang;">
-  <input name="b" class="form-control col-4">
+  <input name="b" placeholder="%bases_list;"  class="form-control col-4">
   <button type="submit" class="btn btn-outline-secondary ml-2" value="">Ok</button>
 </form>
 
 %( TODO find server name and port number %)
-%if;(not cgi)
-  <a href="http://localhost:2316/gwsetup?v=list.htm">[*available genealogies]</a>
-%end;
+[*available genealogies][:]<br>
+%bases_list;
 </div>
 
 <h3 class="text-center mt-5">[*select lang]</h3>

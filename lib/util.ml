@@ -2721,3 +2721,17 @@ let has_children base u =
       let des = foi base ifam in
       Array.length (get_children des) > 0)
     (get_family u)
+
+let get_bases_list () =
+  let list = ref [] in
+  let dh = Unix.opendir (!GWPARAM.bpath "") in
+  (try
+     while true do
+       let e = Unix.readdir dh in
+       if Filename.check_suffix e ".gwb" then
+         list := Filename.chop_suffix e ".gwb" :: !list
+     done
+   with End_of_file -> ());
+  Unix.closedir dh;
+  list := List.sort compare !list;
+  !list
