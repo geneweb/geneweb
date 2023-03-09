@@ -30,7 +30,7 @@ jobs:
           ocaml-version: ${{ matrix.ocaml-version }}
       - name: setup
         run: |
-          opam install dune ocamlformat
+          opam install dune ocamlformat.0.24.1
           opam exec -- dune build @fmt
           opam pin add . -y --no-action
           opam depext -y geneweb
