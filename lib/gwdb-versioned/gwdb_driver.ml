@@ -819,19 +819,46 @@ module Legacy_driver = struct
   let poi_ht : (iper, person) Hashtbl.t option ref = ref None
   let foi_ht : (ifam, family) Hashtbl.t option ref = ref None
 
-  let find_poi iper = match !poi_ht with
-    | Some ht -> Hashtbl.find_opt ht iper
-    | None -> poi_ht := Some (Hashtbl.create 1); None
-  let find_foi ifam = match !foi_ht with
+  let reset_poi_ht () = match !poi_ht with
+    | Some ht -> Hashtbl.clear ht
+    | None -> ()    
+
+  let reset_foi_ht () = match !foi_ht with
+    | Some ht -> Hashtbl.clear ht
+    | None -> ()    
+  
+  let cache_foi_poi = ref true
+
+  let set_fpoi_cache base b =
+    reset_poi_ht ();
+    reset_foi_ht ();
+    cache_foi_poi := b
+  
+  let find_poi iper =
+    if not !cache_foi_poi then None
+    else
+      match !poi_ht with
+      | Some ht -> Hashtbl.find_opt ht iper
+      | None -> poi_ht := Some (Hashtbl.create 1); None
+
+  let find_foi ifam =
+    if not !cache_foi_poi then None
+    else
+    match !foi_ht with
     | Some ht -> Hashtbl.find_opt ht ifam
     | None -> foi_ht := Some (Hashtbl.create 1); None
 
-  let set_poi iper data = match !poi_ht with
-    | Some ht -> Hashtbl.add ht iper data
-    | _ -> assert false
-  let set_foi ifam data = match !foi_ht with
-    | Some ht -> Hashtbl.add ht ifam data
-    | _ -> assert false
+  let set_poi iper data =
+    if !cache_foi_poi then
+      match !poi_ht with
+      | Some ht -> Hashtbl.add ht iper data
+      | _ -> assert false
+
+  let set_foi ifam data =
+    if !cache_foi_poi then
+      match !foi_ht with
+      | Some ht -> Hashtbl.add ht ifam data
+      | _ -> assert false
   
   let poi base iper =
     match find_poi iper with
