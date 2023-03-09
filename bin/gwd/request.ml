@@ -461,11 +461,11 @@ let treat_request =
         let incorrect_request conf _ = incorrect_request conf in
         match m with
         | "" ->
-           let base =
-             match bfile with
-             | None -> None
-             | Some bfile -> try Some (Gwdb.open_base bfile) with _ -> None
-           in
+          let base =
+            match bfile with
+            | None -> None
+            | Some bfile -> try Some (Gwdb.open_base bfile) with _ -> None
+          in
           if base <> None then
             w_base @@
             if only_special_env conf.env then SrcfileDisplay.print_start
@@ -477,7 +477,7 @@ let treat_request =
           else if conf.bname = ""
           then fun conf _ -> include_template conf [] "index" (fun () -> propose_base conf)
           else
-            w_base begin
+            w_base begin (* print_start -> welcome.txt *)
               if only_special_env conf.env then SrcfileDisplay.print_start
               else w_person @@ fun conf base p ->
                 match p_getenv conf.env "ptempl" with

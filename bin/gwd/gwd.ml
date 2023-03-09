@@ -1055,6 +1055,10 @@ let make_conf from_addr request script_name env =
       | [ bname ; access ] -> bname, access
       | _ -> assert false
     in
+    let bases = Util.get_bases_list () in
+    let bname =
+      if bname = "" && List.length bases = 1 then List.nth bases 0 else bname
+    in
     let (passwd, env, access_type) =
       let has_passwd = List.mem_assoc "w" env in
       let (x, env) = extract_assoc "w" env in
