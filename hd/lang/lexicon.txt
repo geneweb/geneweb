@@ -2843,13 +2843,13 @@ sv: samtidigt
 tr: aynı zamanda
 
     available genealogies
-co: lista di e genealugie dispunibule (impiegheghja gwsetup)
-de: Liste der verfügbaren Genealogien (verwende gwsetup)
-en: list of available genealogies (use gwsetup)
-fr: listes des généalogies disponibles (utilise gwsetup)
-pt: lista das genealogias disponíveis (utilize gwsetup)
-sv: lista över tillgängliga släktdatabaser (använd gwsetup)
-tr: mevcut şecere listesi (gwsetup kullanın)
+co: lista di e genealugie dispunibule
+de: Liste der verfügbaren Genealogien
+en: list of available genealogies
+fr: listes des généalogies disponibles
+pt: lista das genealogias disponíveis
+sv: lista över tillgängliga släktdatabaser
+tr: Mevcut şecere listesi
 
     average age at death
 bg: средна продължителност на живота

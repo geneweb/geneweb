@@ -1121,6 +1121,11 @@ and print_simple_variable conf = function
   | "base_trailer" -> include_hed_trl conf "trl"
   | "body_prop" -> print_body_prop conf
   | "copyright" -> print_copyright conf
+  | "number_of_bases" ->
+      Output.print_sstring conf
+        (string_of_int (List.length (Util.get_bases_list ())))
+  | "bases_list" ->
+      Output.print_sstring conf (String.concat ", " (Util.get_bases_list ()))
   | "hidden" -> Util.hidden_env conf
   | "message_to_wizard" -> Util.message_to_wizard conf
   | _ -> raise Not_found

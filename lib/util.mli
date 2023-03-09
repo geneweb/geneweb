@@ -588,3 +588,4 @@ val designation : base -> person -> Adef.escaped_string
 (** [designation base p] is [Gutil.designation base p |> escape_html] *)
 
 val has_children : base -> person -> bool
+val get_bases_list : unit -> string list
