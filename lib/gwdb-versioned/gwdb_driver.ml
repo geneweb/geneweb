@@ -48,20 +48,20 @@ end
 
 module Store (D : Data) : sig
   val get : D.base -> D.index -> D.t option
-  val set : D.base -> D.index -> D.t -> unit
-  val unsafe_set : D.index -> D.t -> unit
+  val set : D.base -> D.index -> D.t option -> unit
+  val unsafe_set : D.index -> D.t option -> unit
   val write : D.base -> unit
-  val sync : (D.base -> D.t array) -> D.base -> unit
+  val sync : (D.base -> D.t option array) -> D.base -> unit
   val empty : unit -> unit
   val close_data_file : unit -> unit
 end = struct
-  type t = (D.index, D.t) Hashtbl.t
+  type t = (D.index, D.t option) Hashtbl.t
 
-  let patch_ht : (D.index, D.t) Hashtbl.t option ref = ref None
+  let patch_ht : (D.index, D.t option) Hashtbl.t option ref = ref None
 
   let data_file_in_channel : in_channel option ref = ref None
 
-  let cache_ht  : (D.index, D.t) Hashtbl.t option ref = ref None
+  let cache_ht  : (D.index, D.t option) Hashtbl.t option ref = ref None
   
   let open_data_file base = match !data_file_in_channel with
     | Some ic ->
@@ -113,11 +113,16 @@ end = struct
       assert (index < len);
       seek_in ic (4 + (index * 4));
       let pos_data = input_binary_int ic in
-      seek_in ic pos_data;
-      let data = (Marshal.from_channel ic : D.t) in
-      let c = cache () in
-      Hashtbl.replace c index data;
-      Some data)
+      if pos_data <> -1 then begin
+        seek_in ic pos_data;
+        let data = (Marshal.from_channel ic : D.t) in
+        let c = cache () in
+        Hashtbl.replace c index (Some data);
+        Some data
+      end
+      else
+        None
+    )
     else None
 
   let get_from_cache base index = match !cache_ht with
@@ -126,9 +131,9 @@ end = struct
   
   let get base index =
     match Hashtbl.find_opt (patch base) index with
-    | Some _v as value -> value
+    | Some v -> v
     | None -> match get_from_cache base index with
-      | Some _v as value -> value
+      | Some v -> v
       | None -> get_from_data_file base index
 
   let set base index value =
@@ -153,7 +158,7 @@ end = struct
 
   let empty () = patch_ht := Some (Hashtbl.create 1)
 
-  let load_data build_from_scratch base : D.t array =
+  let load_data build_from_scratch base : D.t option array =
     if not (data_file_exists base) then (
       (*      log "no data file";*)
       build_from_scratch base
@@ -162,13 +167,22 @@ end = struct
       (*      log "some data file found";*)
       let ic = open_data_file base in
       let len = input_binary_int ic in
+      let get_pos i =
+        seek_in ic (4 + 4 * i);
+        let pos = input_binary_int ic in
+        pos
+      in
+
       seek_in ic (4 + (4 * len));
 
       let rec loop i l =
         if i = 0 then l
         else
-          let l = (Marshal.from_channel ic : D.t) :: l in
-          loop (i - 1) l
+          let index = get_pos (i - 1) in
+          if index = -1 then None :: l
+          else
+            let l = Some (Marshal.from_channel ic : D.t) :: l in
+            loop (i - 1) l
       in
 
       let data = Array.of_list @@ List.rev (loop len []) in
@@ -204,9 +218,12 @@ end = struct
     seek_out oc (4 + (len * 4));
     Array.iteri
       (fun i data ->
-        let pos = pos_out oc in
-        Marshal.to_channel oc data [ Marshal.No_sharing ];
-        accesses.(i) <- pos)
+         match data with
+         | Some data ->
+           let pos = pos_out oc in
+           Marshal.to_channel oc data [ Marshal.No_sharing ];
+           accesses.(i) <- pos
+         | None -> accesses.(i) <- -1)
       a;
     seek_out oc 4;
     Array.iter (output_binary_int oc) accesses;
@@ -304,8 +321,7 @@ module Legacy_driver = struct
         match notes with
         | Some wnotes ->
           p.witness_notes <- notes;
-          if Array.length wnotes = 0 then fun _ie _iw -> empty_string
-          else fun ie ->
+          fun ie ->
             if Array.length wnotes.(ie) = 0 then fun _iw -> empty_string
             else fun iw -> wnotes.(ie).(iw)
         | None ->
@@ -326,8 +342,7 @@ module Legacy_driver = struct
         match notes with
         | Some wnotes ->
           p.witness_notes <- notes;
-          if Array.length wnotes = 0 then empty_string
-          else if Array.length wnotes.(ie) = 0 then empty_string
+          if Array.length wnotes.(ie) = 0 then empty_string
           else wnotes.(ie).(iw)
         | None ->
           p.witness_notes <- Some [||];
@@ -353,8 +368,7 @@ module Legacy_driver = struct
         match notes with
         | Some wnotes ->
           f.witness_notes <- notes;
-          if Array.length wnotes = 0 then fun _ie _iw -> empty_string
-          else fun ie ->
+          fun ie ->
             if Array.length wnotes.(ie) = 0 then fun _iw -> empty_string
             else fun iw -> wnotes.(ie).(iw)
         | None ->
@@ -375,8 +389,7 @@ module Legacy_driver = struct
         match notes with
         | Some wnotes ->
           f.witness_notes <- notes;
-          if Array.length wnotes = 0 then empty_string
-          else if Array.length wnotes.(ie) = 0 then empty_string
+          if Array.length wnotes.(ie) = 0 then empty_string
           else wnotes.(ie).(iw)
         | None ->
           f.witness_notes <- Some [||];
@@ -429,7 +442,7 @@ module Legacy_driver = struct
         Array.iter log wnotes)
       pers_events
 
-  let witness_notes_of_events pevents : istr array array =
+  let witness_notes_of_events pevents : istr array array option =
     let l = List.map
         (fun pe ->
            let a = Array.map (fun (_, _, wnote) -> wnote) pe.Def.epers_witnesses in
@@ -442,13 +455,13 @@ module Legacy_driver = struct
     let has_data = List.exists (fun a -> Array.length a <> 0) l in
     if has_data then begin
       (*print_endline "has_data";*)
-      Array.of_list l
+      Some (Array.of_list l)
     end else begin
         (*      print_endline "no data";*)
-      [||]
+      None
     end
     
-  let fwitness_notes_of_events fevents : istr array array =
+  let fwitness_notes_of_events fevents : istr array array option =
     let l = List.map
         (fun fe ->
            let a = Array.map (fun (_, _, wnote) -> wnote) fe.Def.efam_witnesses in
@@ -459,7 +472,7 @@ module Legacy_driver = struct
         fevents
     in
     let has_data = List.exists (fun a -> Array.length a <> 0) l in
-    if has_data then Array.of_list l else [||]
+    if has_data then Some (Array.of_list l) else None
 
 
   let patch_person base iper genpers =
@@ -628,62 +641,15 @@ module Legacy_driver = struct
         ip, wk, wnote
       )
   
-  let build_from_scratch_pevents base =
-    let persons = Gwdb_legacy.Gwdb_driver.persons base in
-    let notes : istr array array list =
-      List.rev
-      @@ Gwdb_legacy.Gwdb_driver.Collection.fold
-           (fun l p ->
-             let pevents = Gwdb_legacy.Gwdb_driver.get_pevents p in
-             let witness_array_list =
-               List.map
-                 (fun pe -> pe.Gwdb_legacy.Dbdisk.epers_witnesses)
-                 pevents
-             in
-             let notes =
-               Array.of_list
-               @@ List.map
-                    (Array.map (fun _ -> empty_string))
-                    witness_array_list
-             in
-             notes :: l)
-           [] persons
-    in
-    Array.of_list notes
-  
-  let build_from_scratch_fevents base =
-    (*    log "BUILD FEVENTS";*)
-    let families = Gwdb_legacy.Gwdb_driver.families base in
-    (* log "BUILD FEVENTS2"; *)
-    let notes : istr array array list =
-      List.rev
-      @@ Gwdb_legacy.Gwdb_driver.Collection.fold
-           (fun l f ->
-            (*log "SOME FEVENT";*)
-             let fevents = Gwdb_legacy.Gwdb_driver.get_fevents f in
-             let witness_array_list =
-               List.map (fun fe -> fe.Gwdb_legacy.Dbdisk.efam_witnesses) fevents
-             in
-             let notes =
-               Array.of_list
-               @@ List.map
-                    (Array.map (fun _ -> empty_string))
-                    witness_array_list
-             in
-             notes :: l)
-           [] families
-    in
-    (*    log "FEVENTS BUILT";*)
-    Array.of_list notes
   
   let build_from_scratch_pevents base =
     let persons = Gwdb_legacy.Gwdb_driver.persons base in
     let max_index, data = Gwdb_legacy.Gwdb_driver.Collection.fold (fun (max_index, l) p ->
         (*print_endline @@ string_of_int (get_iper p);*)
         let iper = get_iper p in
-        max max_index iper, ((iper, [||]) :: l)) (0, []) persons
+        max max_index iper, ((iper, None) :: l)) (0, []) persons
     in
-    let d = Array.make (max_index + 1) ([||]) in
+    let d = Array.make (max_index + 1) (None) in
     List.iter (fun (i, v) -> Array.unsafe_set d i v ) data;
     d
     
@@ -692,9 +658,9 @@ module Legacy_driver = struct
     let max_index, data = Gwdb_legacy.Gwdb_driver.Collection.fold (fun (max_index, l) f ->
         (*print_endline @@ string_of_int (get_ifam f);*)
         let ifam = get_ifam f in
-        max max_index ifam, ((ifam, [||]) :: l)) (0, []) families
+        max max_index ifam, ((ifam, None) :: l)) (0, []) families
     in
-    let d = Array.make (max_index + 1) ([||]) in
+    let d = Array.make (max_index + 1) (None) in
     List.iter (fun (i, v) -> Array.unsafe_set d i v ) data;
     d
   
