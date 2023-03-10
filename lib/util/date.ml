@@ -30,14 +30,6 @@ and precision = Adef.precision =
   (* inteval *)
   | YearInt of dmy2
 
-(* TODO ?? change types for :
-   type t =
-     | Dgreg of date * calendar
-     | Dtext of string
-
-   type date = dmy * precision
-*)
-
 (* compress concrete date if it's possible *)
 let compress d =
   let simple =
@@ -249,34 +241,7 @@ let cdate_of_death = function
 let dmy_of_death death = Option.bind (cdate_of_death death) cdate_to_dmy_opt
 let date_of_death death = Option.bind (cdate_of_death death) od_of_cdate
 
-(* TODO check this *)
-let to_valid_dmy ~day ~month ~year =
-  (* check if day|month are valid, day|month=0 are considered okay in is_valid_dmy_with_zeros *)
-  (* TODO better checks : it depends on the calendar ... *)
-  (* TODO should be in Calendars *)
-  let is_valid_dmy_with_zeros ~day ~month = not (day > 31 || month > 12) in
-
-  (* convert a dmy that can have day|month = 0 to a valid one *)
-  (* convert dmy.prec too *)
-  (* assume dmy is_valid_dmy_with_zeros *)
-  let to_valid ~day ~month ~year =
-    let day, month, year =
-      match (day, month) with
-      | 0, 0 -> (1, 1, year + 1)
-      | _day, 0 -> (1, 1, year + 1)
-      | 0, month ->
-          if month = 12 (* TODO depends on calendar *) then (1, 1, year + 1)
-          else (1, month + 1, year)
-      | day, month -> (day, month, year)
-    in
-    (day, month, year)
-  in
-
-  if is_valid_dmy_with_zeros ~day ~month then Ok (to_valid ~day ~month ~year)
-  else
-    (* TODO exception instead? *)
-    (* we should never allow a not is_valid_dmy_with_zeros dmy to exists *)
-    Error "invalid dmy"
+(* Calendars library wrapper *)
 
 let to_calendars ~from ~day ~month ~year ~delta =
   match from with
@@ -292,53 +257,29 @@ let to_calendars ~from ~day ~month ~year ~delta =
       Calendars.make Hebrew ~day ~month ~year ~delta
       |> Result.get_ok |> Calendars.to_gregorian
 
-(* TODO change Def.calendar for Calendars.kind *)
-(* TODO what if prec contains unknown day|month too... *)
-(* do not work well with prec (and delta ?) *)
-let convert ~from ~to_ d =
-  let convert ~day ~month ~year ~delta =
-    let to_tuple date =
-      let { Calendars.day; month; year; delta; _ } = date in
-      (day, month, year, delta)
-    in
-    match to_valid_dmy ~day ~month ~year with
-    | Error e -> failwith e
-    | Ok (day, month, year) -> (
-        let d = to_calendars ~from ~day ~month ~year ~delta in
-        match to_ with
-        | Dgregorian -> Calendars.to_gregorian d |> to_tuple
-        | Djulian -> Calendars.to_julian d |> to_tuple
-        | Dfrench -> Calendars.to_french d |> to_tuple
-        | Dhebrew -> Calendars.to_hebrew d |> to_tuple)
-  in
-  let convert_dmy2 dmy2 =
-    let day2, month2, year2, delta2 =
-      convert ~day:dmy2.day2 ~month:dmy2.month2 ~year:dmy2.year2
-        ~delta:dmy2.delta2
-    in
-    { day2; month2; year2; delta2 }
-  in
-  let { day; month; year; delta; prec } = d in
-  let prec =
-    (* if days or month are unknown we change prec to Before *)
-    (* TODO use interval instead to lose less information? *)
-    if day = 0 || month = 0 then Before
-    else
-      (* convert prec if OrYear|YearInt *)
-      match prec with
-      | (Sure | About | Maybe | Before | After) as p -> p
-      | OrYear dmy2 -> OrYear (convert_dmy2 dmy2)
-      | YearInt dmy2 -> YearInt (convert_dmy2 dmy2)
-  in
-  let day, month, year, delta = convert ~day ~month ~year ~delta in
-  { day; month; year; delta; prec }
+let max_month_of cal =
+  match cal with Dgregorian | Djulian -> 12 | Dfrench | Dhebrew -> 13
 
+let partial_date_upper_bound ~from ~day ~month ~year =
+  let day, month, year =
+    match (day, month) with
+    | 0, 0 -> (1, 1, year + 1)
+    | _day, 0 -> (1, 1, year + 1)
+    | 0, month ->
+        if month = max_month_of from then (1, 1, year + 1)
+        else (1, month + 1, year)
+    | day, month -> (day, month, year)
+  in
+  (day, month, year)
+
+let partial_date_lower_bound ~day ~month ~year = (max 1 day, max 1 month, year)
+
+(* [to_sdn] does not work if day|month are unknown
+   so we return sdn of [partial_date_lower_bound d] instead *)
 let to_sdn ~from d =
   let { day; month; year; delta } = d in
-  match to_valid_dmy ~day ~month ~year with
-  | Error e -> failwith e
-  | Ok (day, month, year) ->
-      to_calendars ~from ~day ~month ~year ~delta |> Calendars.to_sdn
+  let day, month, year = partial_date_lower_bound ~day ~month ~year in
+  to_calendars ~from ~day ~month ~year ~delta |> Calendars.to_sdn
 
 let of_calendars_raw ~prec date =
   let { Calendars.day; month; year; delta; _ } = date in
@@ -355,3 +296,76 @@ let french_of_sdn ~prec sdn =
 
 let hebrew_of_sdn ~prec sdn =
   Calendars.hebrew_of_sdn sdn |> of_calendars_raw ~prec
+
+(* Geneweb uses day|month=0 for partially known dates, this makes converting dates troublesome
+   In the case of partial date we use dmy.delta to define an interval:
+     [dmy; dmy.delta = to_sdn(dmy) + d.delta (in SDN) [
+   If we convert a partial date and convert it back, we try to recover the fact
+   that it was a partial date.
+
+   BUG : with day>0 and month=0 we do not recover a partial date correctly. *)
+let convert ~from ~to_ dmy =
+  let dmy_tuple_of_sdn ~to_ sdn =
+    let to_tuple date =
+      let { Calendars.day; month; year; delta; _ } = date in
+      (day, month, year, delta)
+    in
+    match to_ with
+    | Dgregorian -> Calendars.gregorian_of_sdn sdn |> to_tuple
+    | Djulian -> Calendars.julian_of_sdn sdn |> to_tuple
+    | Dfrench -> Calendars.french_of_sdn sdn |> to_tuple
+    | Dhebrew -> Calendars.hebrew_of_sdn sdn |> to_tuple
+  in
+  (* code addapted from Calendars *)
+  let convert_aux ~from ~to_ ~day ~month ~year ~delta =
+    let to_sdn ~from ~day ~month ~year ~delta =
+      to_calendars ~from ~day ~month ~year ~delta |> Calendars.to_sdn
+    in
+    let sdn_min =
+      let day, month, year = partial_date_lower_bound ~day ~month ~year in
+      to_sdn ~from ~day ~month ~year ~delta
+    in
+    let sdn_max =
+      let day, month, year = partial_date_upper_bound ~from ~day ~month ~year in
+      let sdn_max = to_sdn ~from ~day ~month ~year ~delta in
+      (* we want sdn_min < sdn_max; add + 1 if needed *)
+      if sdn_min = sdn_max then sdn_max + 1 else sdn_max
+    in
+    let day_min, month_min, year_min, delta_min =
+      dmy_tuple_of_sdn ~to_ sdn_min
+    in
+    let day_max, month_max, year_max, _delta_max =
+      dmy_tuple_of_sdn ~to_ (sdn_max + delta)
+    in
+    (* if min date and max date looks like they came from a partial date,
+       reconstitute it as a partial date (with day|month = 0) *)
+    if day_min = 1 && day_max = 1 then
+      if month_min = 1 && month_max = 1 then
+        if year_min + 1 = year_max then (0, 0, year_min, 0)
+        else (day_min, month_min, year_min, sdn_max + delta - sdn_min - 1)
+      else if
+        month_min + 1 = month_max
+        || (month_min = max_month_of to_ && year_min + 1 = year_max)
+      then (0, month_min, year_min, delta_min)
+      else (day_min, month_min, year_min, sdn_max + delta - sdn_min - 1)
+    else (day_min, month_min, year_min, sdn_max + delta - sdn_min - 1)
+  in
+
+  let convert_dmy2 ~from ~to_ { day2; month2; year2; delta2 } =
+    let day2, month2, year2, delta2 =
+      convert_aux ~from ~to_ ~day:day2 ~month:month2 ~year:year2 ~delta:delta2
+    in
+    { day2; month2; year2; delta2 }
+  in
+
+  let { day; month; year; delta; prec } = dmy in
+  let day, month, year, delta =
+    convert_aux ~from ~to_ ~day ~month ~year ~delta
+  in
+  match prec with
+  | (Sure | About | Maybe | Before | After) as p ->
+      { day; month; year; delta; prec = p }
+  | OrYear dmy2 ->
+      { day; month; year; delta; prec = OrYear (convert_dmy2 ~from ~to_ dmy2) }
+  | YearInt dmy2 ->
+      { day; month; year; delta; prec = YearInt (convert_dmy2 ~from ~to_ dmy2) }
