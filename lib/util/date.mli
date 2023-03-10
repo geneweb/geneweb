@@ -109,14 +109,15 @@ val cdate_of_od : date option -> cdate
 
 (* TODO date_to_dmy? *)
 
-(* TODO this is buggy,
-   because geneweb uses month|day = 0 for incomplete dates *)
-
 val to_sdn : from:calendar -> dmy -> int
-(** Convert a [dmy] in calendar [from] to SDN *)
+(** Convert a [dmy] in calendar [from] to SDN
+    if dmy is a partial date (month|day = 0) then return the SDN of a lower bound *)
 
 val convert : from:calendar -> to_:calendar -> dmy -> dmy
-(** [convert ~from ~to_ dmy] Converts a [dmy] from calendar [from] to calendar [to_]; Correctly convert [dmy.prec] *)
+(** [convert ~from ~to_ dmy] Converts a [dmy] from calendar [from] to calendar [to_];
+    Correctly convert [dmy.prec]
+    Can convert partial date, and recover partial dates after converting them back,
+    by using dmy.delta to define a date interval *)
 
 val gregorian_of_sdn : prec:precision -> int -> dmy
 (** Convert SDN to [dmy] in gregorian calendar *)
