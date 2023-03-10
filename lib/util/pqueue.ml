@@ -56,3 +56,12 @@ module Make (Ord : OrderedType) = struct
     let t, ts = getMin ts in
     (t.node, union (List.rev t.list) ts)
 end
+
+let make : type a. (a -> a -> bool) -> (module S with type elt = a) =
+ fun leq ->
+  let module M : OrderedType with type t = a = struct
+    type t = a
+
+    let leq = leq
+  end in
+  (module Make (M))

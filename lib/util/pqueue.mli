@@ -46,3 +46,6 @@ end
 
 (** Functor that creates instance of priority queue from given element type. *)
 module Make (Ord : OrderedType) : S with type elt = Ord.t
+
+val make : ('a -> 'a -> bool) -> (module S with type elt = 'a)
+(** Creates an OrderedType from a total ordering function *)

@@ -54,20 +54,6 @@ let date_filter conf =
       in
       fun (d, _cal) -> Date.compare_dmy ref_date d > 0
 
-module PQ_date = Pqueue.Make (struct
-  type t = Gwdb.person * (Date.dmy * Date.calendar)
-
-  (* TODO leq must define a total order, does Date.compare_dmy really define a total order...? *)
-  let leq (_, (x, _)) (_, (y, _)) = Date.compare_dmy x y <= 0
-end)
-
-(* TODO have a make_module leq = ... *)
-module PQ_date_reverse = Pqueue.Make (struct
-  type t = Gwdb.person * (Date.dmy * Date.calendar)
-
-  let leq (_, (x, _)) (_, (y, _)) = Date.compare_dmy y x <= 0
-end)
-
 let select_person_by_date conf base get_date ~ascending =
   let iterator = Gwdb.ipers base in
   let get_key = pget conf base in
@@ -77,43 +63,32 @@ let select_person_by_date conf base get_date ~ascending =
     | Some (Date.Dgreg (d, cal)) -> Some (d, cal)
     | Some (Dtext _) | None -> None
   in
-  select
-    (if ascending then (module PQ_date_reverse) else (module PQ_date))
-    ~iterator ~get_key ~get_value ~nb ~filter:(date_filter conf)
-
-module PQ_elapsed = Pqueue.Make (struct
-  type t = Gwdb.person * Date.elapsed_time
-
-  let leq (_, x) (_, y) = Date.compare_elapsed_time x y <= 0
-end)
-
-(* TODO have a make_module leq = ... *)
-module PQ_elapsed_reverse = Pqueue.Make (struct
-  type t = Gwdb.person * Date.elapsed_time
-
-  let leq (_, x) (_, y) = Date.compare_elapsed_time y x <= 0
-end)
+  let leq :
+      Gwdb.person * (Date.dmy * Date.calendar) ->
+      Gwdb.person * (Date.dmy * Date.calendar) ->
+      bool =
+   fun a b ->
+    (* TODO does `Date.compare_dmy` really define a total order? *)
+    let f (_, (x, _)) (_, (y, _)) = Date.compare_dmy x y <= 0 in
+    if ascending then f b a else f a b
+  in
+  select (Pqueue.make leq) ~iterator ~get_key ~get_value ~nb
+    ~filter:(date_filter conf)
 
 let select_person_by_elapsed_time conf base get_elapsed_time ~ascending =
   let iterator = Gwdb.ipers base in
   let get_key = pget conf base in
   let nb = nb_of_persons base |> clamp_to_conf_nb conf in
-  select
-    (if ascending then (module PQ_elapsed_reverse) else (module PQ_elapsed))
-    ~iterator ~get_key ~get_value:get_elapsed_time ~nb
+  let leq :
+      Gwdb.person * Date.elapsed_time -> Gwdb.person * Date.elapsed_time -> bool
+      =
+   fun a b ->
+    let f (_, x) (_, y) = Date.compare_elapsed_time x y <= 0 in
+    if ascending then f b a else f a b
+  in
+
+  select (Pqueue.make leq) ~iterator ~get_key ~get_value:get_elapsed_time ~nb
     ~filter:(fun _item -> true)
-
-module FQ = Pqueue.Make (struct
-  type t = Gwdb.family * (Date.dmy * Date.calendar)
-
-  let leq (_, (x, _)) (_, (y, _)) = Date.compare_dmy x y <= 0
-end)
-
-module FQ_oldest = Pqueue.Make (struct
-  type t = Gwdb.family * (Date.dmy * Date.calendar)
-
-  let leq (_, (x, _)) (_, (y, _)) = Date.compare_dmy y x <= 0
-end)
 
 let select_family conf base get_date find_oldest =
   let iterator = Gwdb.ifams base in
@@ -124,9 +99,16 @@ let select_family conf base get_date find_oldest =
     | Some (Date.Dgreg (d, cal)) -> Some (d, cal)
     | Some (Dtext _) | None -> None
   in
-  select
-    (if find_oldest then (module FQ_oldest) else (module FQ))
-    ~iterator ~get_key ~get_value ~nb ~filter:(date_filter conf)
+  let leq :
+      Gwdb.family * (Date.dmy * Date.calendar) ->
+      Gwdb.family * (Date.dmy * Date.calendar) ->
+      bool =
+   fun a b ->
+    let f (_, (x, _)) (_, (y, _)) = Date.compare_dmy x y <= 0 in
+    if find_oldest then f b a else f a b
+  in
+  select (Pqueue.make leq) ~iterator ~get_key ~get_value ~nb
+    ~filter:(date_filter conf)
 
 let death_date p = Date.date_of_death (get_death p)
 
