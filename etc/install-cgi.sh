@@ -96,8 +96,6 @@ fi
 
 cp Lenna.jpg $BASES/src/test/images/aatest.jpg
 cp Lenna.jpg $BASES/images/test/tiny.0.mouse.jpg
-cp Lenna-full.jpg $BASES/src/test/images/
-cp Lenna-icon.jpg $BASES/src/test/images/
 
 $BIN_DIR/gwc -f -o $BASES/test test.gw
 
