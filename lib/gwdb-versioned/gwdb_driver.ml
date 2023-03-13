@@ -300,6 +300,31 @@ module Legacy_driver = struct
     mutable witnesses : (iper * Def.witness_kind * istr) array option
   }
 
+  let poi_ht : (iper, person) Hashtbl.t option ref = ref None
+  let foi_ht : (ifam, family) Hashtbl.t option ref = ref None
+
+  let find_poi iper = match !poi_ht with
+    | Some ht -> Hashtbl.find_opt ht iper
+    | None -> poi_ht := Some (Hashtbl.create 1); None
+  let find_foi ifam = match !foi_ht with
+    | Some ht -> Hashtbl.find_opt ht ifam
+    | None -> foi_ht := Some (Hashtbl.create 1); None
+
+  let set_poi iper data = match !poi_ht with
+    | Some ht -> Hashtbl.add ht iper data
+    | _ -> assert false
+  let set_foi ifam data = match !foi_ht with
+    | Some ht -> Hashtbl.add ht ifam data
+    | _ -> assert false
+
+  let clear_poi iper = match !poi_ht with
+    | Some ht -> Hashtbl.remove ht iper
+    | _ -> ()
+
+  let clear_foi ifam = match !foi_ht with
+    | Some ht -> Hashtbl.remove ht ifam
+    | _ -> ()
+  
 
   let get_pers_full_wit_notes (p : person) = match p.witness_notes with
     | Some a when Array.length a > 0 ->
@@ -483,7 +508,8 @@ module Legacy_driver = struct
     let genpers = Translate.as_legacy_person genpers in
     patch_person base iper genpers;
     let witnotes = witness_notes_of_events pevents in
-    PatchPer.set base iper witnotes
+    PatchPer.set base iper witnotes;
+    clear_poi iper
 
   let insert_person base iper genpers =
 (*    log "INSERT PERSON";
@@ -493,7 +519,8 @@ module Legacy_driver = struct
     let genpers = Translate.as_legacy_person genpers in
     insert_person base iper genpers;
     let witnotes = witness_notes_of_events pevents in
-    PatchPer.set base iper witnotes
+    PatchPer.set base iper witnotes;
+    clear_poi iper
 
   let commit_patches base =
     (*    log "COMMIT LEGACY PATCHES";*)
@@ -816,22 +843,7 @@ module Legacy_driver = struct
         in
         witnesses_notes
 *)
-  let poi_ht : (iper, person) Hashtbl.t option ref = ref None
-  let foi_ht : (ifam, family) Hashtbl.t option ref = ref None
 
-  let find_poi iper = match !poi_ht with
-    | Some ht -> Hashtbl.find_opt ht iper
-    | None -> poi_ht := Some (Hashtbl.create 1); None
-  let find_foi ifam = match !foi_ht with
-    | Some ht -> Hashtbl.find_opt ht ifam
-    | None -> foi_ht := Some (Hashtbl.create 1); None
-
-  let set_poi iper data = match !poi_ht with
-    | Some ht -> Hashtbl.add ht iper data
-    | _ -> assert false
-  let set_foi ifam data = match !foi_ht with
-    | Some ht -> Hashtbl.add ht ifam data
-    | _ -> assert false
   
   let poi base iper =
     match find_poi iper with
@@ -899,7 +911,8 @@ module Legacy_driver = struct
     let genfam = Translate.as_legacy_family genfam in
     patch_family base ifam genfam;
     let witnotes = fwitness_notes_of_events fevents in
-    PatchFam.set base ifam witnotes
+    PatchFam.set base ifam witnotes;
+    clear_foi ifam
 
   let insert_family base ifam genfam =
 (*    log "INSERT FAMILY";
@@ -908,7 +921,8 @@ module Legacy_driver = struct
     let genfam = Translate.as_legacy_family genfam in
     insert_family base ifam genfam;
     let witnotes = fwitness_notes_of_events fevents in
-    PatchFam.set base ifam witnotes
+    PatchFam.set base ifam witnotes;
+    clear_foi ifam
 
   let get_children f = get_children f.family
   let get_comment f = get_comment f.family
