@@ -698,8 +698,6 @@ module type Driver_S = sig
 
   val gc :
     ?dry_run:bool -> save_mem:bool -> base -> int list * int list * int list
-
-  val set_fpoi_cache : base -> bool -> unit
 end
 
 module type DriverImpl = sig
@@ -1452,6 +1450,4 @@ struct
     Util.wrap_base
       (Legacy.gc ~dry_run ~save_mem)
       (Current.gc ~dry_run ~save_mem)
-
-  let set_fpoi_cache = Util.wrap_base (Legacy.set_fpoi_cache) (Current.set_fpoi_cache)
 end
