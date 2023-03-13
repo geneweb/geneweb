@@ -92,10 +92,11 @@ end = struct
       close_in ic;
       patch_ht := Some tbl;
       tbl)
-    else
+    else begin
       let tbl = Hashtbl.create 1 in
       patch_ht := Some tbl;
       tbl
+    end
 
   let patch base = match !patch_ht with Some ht -> ht | None -> load_patch base
 
@@ -164,6 +165,7 @@ end = struct
       build_from_scratch base
     )
     else (
+      print_endline "data file";
       (*      log "some data file found";*)
       let ic = open_data_file base in
       let len = input_binary_int ic in
@@ -179,7 +181,7 @@ end = struct
         if i = 0 then l
         else
           let index = get_pos (i - 1) in
-          if index = -1 then None :: l
+          if index = -1 then loop (i - 1) (None :: l)
           else
             let l = Some (Marshal.from_channel ic : D.t) :: l in
             loop (i - 1) l
@@ -194,7 +196,6 @@ end = struct
     let tbl = patch base in
 
     (*    log "LOAD";*)
-
     let data = load_data build_from_scratch base in
 
     (*    log "POST LOAD";*)
@@ -303,19 +304,51 @@ module Legacy_driver = struct
   let poi_ht : (iper, person) Hashtbl.t option ref = ref None
   let foi_ht : (ifam, family) Hashtbl.t option ref = ref None
 
-  let find_poi iper = match !poi_ht with
-    | Some ht -> Hashtbl.find_opt ht iper
-    | None -> poi_ht := Some (Hashtbl.create 1); None
-  let find_foi ifam = match !foi_ht with
+
+  let reset_poi_ht () = match !poi_ht with
+    | Some ht ->
+      Hashtbl.clear ht;
+      poi_ht := None
+    | None -> ()    
+
+  let reset_foi_ht () = match !foi_ht with
+    | Some ht ->
+      Hashtbl.clear ht;
+      foi_ht := None
+    | None -> ()    
+  
+  let cache_foi_poi = ref true
+
+  let set_fpoi_cache base b =
+    reset_poi_ht ();
+    reset_foi_ht ();
+    cache_foi_poi := b
+  
+  let find_poi iper =
+    if not !cache_foi_poi then None
+    else
+      match !poi_ht with
+      | Some ht -> Hashtbl.find_opt ht iper
+      | None -> poi_ht := Some (Hashtbl.create 1); None
+
+  let find_foi ifam =
+    if not !cache_foi_poi then None
+    else
+    match !foi_ht with
     | Some ht -> Hashtbl.find_opt ht ifam
     | None -> foi_ht := Some (Hashtbl.create 1); None
 
-  let set_poi iper data = match !poi_ht with
-    | Some ht -> Hashtbl.add ht iper data
-    | _ -> assert false
-  let set_foi ifam data = match !foi_ht with
-    | Some ht -> Hashtbl.add ht ifam data
-    | _ -> assert false
+  let set_poi iper data =
+    if !cache_foi_poi then
+      match !poi_ht with
+      | Some ht -> Hashtbl.add ht iper data
+      | _ -> ()
+
+  let set_foi ifam data =
+    if !cache_foi_poi then
+      match !foi_ht with
+      | Some ht -> Hashtbl.add ht ifam data
+      | _ -> ()
 
   let clear_poi iper = match !poi_ht with
     | Some ht -> Hashtbl.remove ht iper
@@ -843,7 +876,6 @@ module Legacy_driver = struct
         in
         witnesses_notes
 *)
-
   
   let poi base iper =
     match find_poi iper with
