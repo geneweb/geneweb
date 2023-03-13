@@ -83,7 +83,7 @@ let cousins_dates_t = ref None
 
 (* determine dimensions of 2D arrays *)
 (* TODO verify dimensions *)
-let max_l1_l2_aux max_a_l max_d_l = (max_a_l, max_a_l + max_d_l + 1)
+let max_l1_l2_aux max_a_l max_d_l = (max_a_l + 1, max_a_l + max_d_l + 2)
 
 let update_min_max (min, max) date =
   ((if date < min then date else min), if date > max then date else max)
