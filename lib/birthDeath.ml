@@ -63,6 +63,7 @@ module PQ_oldest = Pqueue.Make (struct
 end)
 
 let select_person conf base get_date find_oldest =
+  Gwdb.load_persons_array base;
   select
     (if find_oldest then (module PQ_oldest) else (module PQ))
     nb_of_persons Gwdb.ipers (pget conf) get_date conf base
@@ -80,6 +81,7 @@ module FQ_oldest = Pqueue.Make (struct
 end)
 
 let select_family conf base get_date find_oldest =
+  Gwdb.load_families_array base;
   select
     (if find_oldest then (module FQ_oldest) else (module FQ))
     nb_of_families Gwdb.ifams Gwdb.foi get_date conf base
@@ -90,6 +92,7 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
   let men = Array.make (nb_intervals + 1) 0 in
   let wom = Array.make (nb_intervals + 1) 0 in
   (* TODO? Load person array *)
+  Gwdb.load_persons_array base;
   Gwdb.Collection.iter
     (fun i ->
       let p = pget conf base i in
