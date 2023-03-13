@@ -92,10 +92,11 @@ end = struct
       close_in ic;
       patch_ht := Some tbl;
       tbl)
-    else
+    else begin
       let tbl = Hashtbl.create 1 in
       patch_ht := Some tbl;
       tbl
+    end
 
   let patch base = match !patch_ht with Some ht -> ht | None -> load_patch base
 
@@ -164,6 +165,7 @@ end = struct
       build_from_scratch base
     )
     else (
+      print_endline "data file";
       (*      log "some data file found";*)
       let ic = open_data_file base in
       let len = input_binary_int ic in
@@ -179,7 +181,7 @@ end = struct
         if i = 0 then l
         else
           let index = get_pos (i - 1) in
-          if index = -1 then None :: l
+          if index = -1 then loop (i - 1) (None :: l)
           else
             let l = Some (Marshal.from_channel ic : D.t) :: l in
             loop (i - 1) l
@@ -194,7 +196,6 @@ end = struct
     let tbl = patch base in
 
     (*    log "LOAD";*)
-
     let data = load_data build_from_scratch base in
 
     (*    log "POST LOAD";*)
@@ -305,11 +306,15 @@ module Legacy_driver = struct
 
 
   let reset_poi_ht () = match !poi_ht with
-    | Some ht -> Hashtbl.clear ht
+    | Some ht ->
+      Hashtbl.clear ht;
+      poi_ht := None
     | None -> ()    
 
   let reset_foi_ht () = match !foi_ht with
-    | Some ht -> Hashtbl.clear ht
+    | Some ht ->
+      Hashtbl.clear ht;
+      foi_ht := None
     | None -> ()    
   
   let cache_foi_poi = ref true
@@ -337,13 +342,13 @@ module Legacy_driver = struct
     if !cache_foi_poi then
       match !poi_ht with
       | Some ht -> Hashtbl.add ht iper data
-      | _ -> assert false
+      | _ -> ()
 
   let set_foi ifam data =
     if !cache_foi_poi then
       match !foi_ht with
       | Some ht -> Hashtbl.add ht ifam data
-      | _ -> assert false
+      | _ -> ()
 
   let clear_poi iper = match !poi_ht with
     | Some ht -> Hashtbl.remove ht iper
