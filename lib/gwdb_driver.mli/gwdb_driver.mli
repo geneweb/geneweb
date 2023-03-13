@@ -697,3 +697,5 @@ val sync : ?scratch:bool -> save_mem:bool -> base -> unit
 
 val gc :
   ?dry_run:bool -> save_mem:bool -> base -> int list * int list * int list
+
+val set_fpoi_cache : base -> bool -> unit
