@@ -821,6 +821,8 @@ module Legacy_driver = struct
     PatchPer.sync build_from_scratch_pevents base;
     (*    log "FAM SYNC";*)
     PatchFam.sync build_from_scratch_fevents base;
+    PatchPer.move_data_file base;
+    PatchFam.move_data_file base;
     base
 
   let open_base bname =
