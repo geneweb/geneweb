@@ -171,21 +171,17 @@ end = struct
     if Sys.file_exists patchfile_tmp then failwith "Error while writing patch file : temporary file remained";
     let oc = Secure.open_out patchfile_tmp in
     Marshal.to_channel oc tbl [ Marshal.No_sharing ];
-    close_out oc(*;
-    Files.mv patchfile_tmp patchfile;
-                  Files.rm patchfile_tmp*)
+    close_out oc
 
   let empty () = patch_ht := Some (Hashtbl.create 1)
 
   let load_data build_from_scratch base : D.t option array =
-    if not (data_file_exists base) then (
-      (*      log "no data file";*)
+    if not (data_file_exists base) then
       build_from_scratch base
-    )
     else (
-      (*      log "some data file found";*)
       let ic = open_data_file base in
       let len = input_binary_int ic in
+
       let get_pos i =
         seek_in ic (4 + 4 * i);
         let pos = input_binary_int ic in
@@ -210,14 +206,11 @@ end = struct
       data)
 
   let sync build_from_scratch base =
-    (*    log "SYNC";*)
+
     if not (directory_exists base) then create_files base;
+
     let tbl = patch base in
-
-    (*    log "LOAD";*)
     let data = load_data build_from_scratch base in
-
-    (*    log "POST LOAD";*)
 
     let dfile = D.data_file base in
     let dfile_tmp = D.tmp_file dfile in
@@ -250,11 +243,7 @@ end = struct
     seek_out oc 4;
     Array.iter (output_binary_int oc) accesses;
     close_out oc;
-    close_data_file ()(*;
-    Files.mv dfile_tmp dfile;
-    Files.rm dfile_tmp;
-                        Files.rm (D.patch_file base)*)
-    (*    log "END SYNC"*)
+    close_data_file ()
 end
 
 module Legacy_driver = struct
@@ -301,8 +290,6 @@ module Legacy_driver = struct
   module PatchFam = Store (FamilyData)
 
   let versions = Version.[ gnwb20; gnwb21; gnwb22; gnwb23; gnwb24 ]
-
-  (*type pers_event = (iper, istr) Def.gen_pers_event*)
 
   type person = {
     person : Gwdb_legacy.Gwdb_driver.person;
@@ -542,13 +529,9 @@ module Legacy_driver = struct
         pevents
     in
     let has_data = List.exists (fun a -> Array.length a <> 0) l in
-    if has_data then begin
-      (*print_endline "has_data";*)
+    if has_data then
       Some (Array.of_list l)
-    end else begin
-        (*      print_endline "no data";*)
-      None
-    end
+    else None
     
   let fwitness_notes_of_events fevents : istr array array option =
     let l = List.map
@@ -565,9 +548,6 @@ module Legacy_driver = struct
 
 
   let patch_person base iper genpers =
-(*    log @@ "PATCH PERSON" ^ string_of_int iper;
-    test_on_person base genpers;
-      log "LETS PATCH"; *)
     let pevents = genpers.Def.pevents in
     let genpers = Translate.as_legacy_person genpers in
     patch_person base iper genpers;
@@ -576,9 +556,6 @@ module Legacy_driver = struct
     clear_poi iper
 
   let insert_person base iper genpers =
-(*    log "INSERT PERSON";
-    test_on_person base genpers;
-      log "LETS INSERT";*)
     let pevents = genpers.Def.pevents in
     let genpers = Translate.as_legacy_person genpers in
     insert_person base iper genpers;
@@ -587,31 +564,11 @@ module Legacy_driver = struct
     clear_poi iper
 
   let commit_patches base =
-    (*    log "COMMIT LEGACY PATCHES";*)
     commit_patches base;
-    (*    log "COMMIT NOTES PATCHES";*)
     PatchPer.write base;
     PatchFam.write base;
     PatchPer.move_patch_file base;
     PatchFam.move_patch_file base
-(*
-  let get_pevents p =
-    let pevents = get_pevents p.person in
-    let pevents =
-      List.mapi
-        (fun i pe ->
-          let pe = Translate.legacy_to_def_pevent empty_string pe in
-          let wnotes_f = get_pers_wit_notes p i in
-          let witnesses =
-            Array.mapi
-              (fun i (ip, wk, _) -> (ip, wk, wnotes_f i))
-              pe.epers_witnesses
-          in
-          { pe with epers_witnesses = witnesses })
-        pevents
-    in
-    pevents
-*)
 
   let pwitness_notes_of_pevent (pe : pers_event) = match pe.pwitness_notes with
     | Some a -> a
@@ -691,23 +648,6 @@ module Legacy_driver = struct
     
   let fam_event_of_gen_fevent base genfam = assert false
     
-(*  let get_fevents f =
-    let fevents = get_fevents f.family in
-    let fevents =
-      List.mapi
-        (fun i fe ->
-          let fe = Translate.legacy_to_def_fevent empty_string fe in
-          let wnotes_f = get_fam_wit_notes f i in
-          let witnesses =
-            Array.mapi
-              (fun i (ip, wk, _) -> (ip, wk, wnotes_f i))
-              fe.efam_witnesses
-          in
-          { fe with efam_witnesses = witnesses })
-        fevents
-    in
-    fevents
-*)
   let get_fevents (f : family) =
     let fevents = Gwdb_legacy.Gwdb_driver.get_fevents f.family in
     List.mapi (fun ie fevent ->
@@ -738,7 +678,6 @@ module Legacy_driver = struct
   let build_from_scratch_pevents base =
     let persons = Gwdb_legacy.Gwdb_driver.persons base in
     let max_index, data = Gwdb_legacy.Gwdb_driver.Collection.fold (fun (max_index, l) p ->
-        (*print_endline @@ string_of_int (get_iper p);*)
         let iper = get_iper p in
         max max_index iper, ((iper, None) :: l)) (0, []) persons
     in
@@ -749,29 +688,21 @@ module Legacy_driver = struct
   let build_from_scratch_fevents base =
     let families = Gwdb_legacy.Gwdb_driver.families base in
     let max_index, data = Gwdb_legacy.Gwdb_driver.Collection.fold (fun (max_index, l) f ->
-        (*print_endline @@ string_of_int (get_ifam f);*)
         let ifam = get_ifam f in
         max max_index ifam, ((ifam, None) :: l)) (0, []) families
     in
     let d = Array.make (max_index + 1) (None) in
     List.iter (fun (i, v) -> Array.unsafe_set d i v ) data;
     d
-  
-  (* TODO : properly sync *)
-  let sync ?(scratch = false) ~save_mem base =
 
-    sync ~scratch ~save_mem base;
-    let bname = Gwdb_legacy.Gwdb_driver.bdir base in
-    close_base base;
-    let base = Gwdb_legacy.Gwdb_driver.open_base bname in
-    (*PatchPer.write base;
-      PatchFam.write base*)
-    (*    log "PERS SYNC"; *)
+  let sync ?(scratch = false) ~save_mem base =
     let dir = Filename.concat (bdir base) compatibility_directory in
     if scratch && Sys.file_exists dir then Files.remove_dir dir;
     PatchPer.sync build_from_scratch_pevents base;
-    (*    log "FAM SYNC";*)
     PatchFam.sync build_from_scratch_fevents base;
+
+    sync ~scratch ~save_mem base;
+
     PatchPer.move_data_file base;
     PatchPer.remove_patch_file base;
     PatchFam.move_data_file base;
@@ -783,8 +714,6 @@ module Legacy_driver = struct
         (families, couples, descends),
         string_arrays,
         base_notes ) =
-    (*let persons = Array.map Translate.as_legacy_person persons in
-      let families = Array.map Translate.as_legacy_family families in*)
     PatchPer.empty ();
     PatchFam.empty ();
     let persons =
@@ -811,28 +740,19 @@ module Legacy_driver = struct
           base_notes )
     in
 
-    (* TODO : properly sync *)
 
-    (*PatchPer.write base;
-      PatchFam.write base;*)
-    (*    log "PERS SYNC";*)
     let dir = Filename.concat (bdir base) compatibility_directory in
     if Sys.file_exists dir then Files.remove_dir dir;
     PatchPer.sync build_from_scratch_pevents base;
-    (*    log "FAM SYNC";*)
+
     PatchFam.sync build_from_scratch_fevents base;
     PatchPer.move_data_file base;
     PatchFam.move_data_file base;
     base
 
-  let open_base bname =
-    (*    log @@ "BNAME:" ^ bname;*)
-    let base = open_base bname in
-    (*    log @@ "Bdir:" ^ bdir base;*)
-    base
+  let open_base = open_base
 
   let close_base base =
-    (*    log "CLOSING THE BASE";*)
     close_base base;
     PatchPer.close_data_file ();
     PatchFam.close_data_file ()
@@ -880,45 +800,6 @@ module Legacy_driver = struct
   let get_titles p = get_titles p.person
   let gen_ascend_of_person p = gen_ascend_of_person p.person
   let gen_union_of_person p = gen_union_of_person p.person
-
-(*  let witness_notes base iper =
-    if iper = dummy_iper then [||]
-    else
-    match PatchPer.get base iper with
-    | Some notes -> notes
-    | None ->
-        let p = poi base iper in
-        let genpers = Gwdb_legacy.Gwdb_driver.gen_person_of_person p in
-        let pevents = genpers.Gwdb_legacy.Dbdisk.pevents in
-        let witnesses_notes =
-          List.map
-            (fun pe ->
-              let wits = pe.Gwdb_legacy.Dbdisk.epers_witnesses in
-              Array.make (Array.length wits) empty_string)
-            pevents
-          |> Array.of_list
-        in
-        witnesses_notes
-*)
-(*  let fwitness_notes base ifam =
-    if ifam = dummy_ifam then [||]
-    else
-    match PatchFam.get base ifam with
-    | Some notes -> notes
-    | None ->
-        let f = foi base ifam in
-        let genfam = Gwdb_legacy.Gwdb_driver.gen_family_of_family f in
-        let fevents = genfam.Gwdb_legacy.Dbdisk.fevents in
-        let witnesses_notes =
-          List.map
-            (fun fe ->
-              let wits = fe.Gwdb_legacy.Dbdisk.efam_witnesses in
-              Array.make (Array.length wits) empty_string)
-            fevents
-          |> Array.of_list
-        in
-        witnesses_notes
-*)
   
   let poi base iper =
     match find_poi iper with
@@ -979,9 +860,6 @@ module Legacy_driver = struct
     Translate.legacy_to_def_family empty_string nof
 
   let patch_family base ifam genfam =
-    (*    log @@ "PATCH FAMILY" ^ string_of_int ifam;*)
-    (* TODO HANDLE WNOTES *)
-    (*    log "LETS PATCH";*)
     let fevents = genfam.Def.fevents in
     let genfam = Translate.as_legacy_family genfam in
     patch_family base ifam genfam;
@@ -990,8 +868,6 @@ module Legacy_driver = struct
     clear_foi ifam
 
   let insert_family base ifam genfam =
-(*    log "INSERT FAMILY";
-      log "LETS INSERT";*)
     let fevents = genfam.Def.fevents in
     let genfam = Translate.as_legacy_family genfam in
     insert_family base ifam genfam;
@@ -1024,8 +900,6 @@ module Legacy_driver = struct
       let f = { family = foi base ifam; base; witness_notes = None } in
       set_foi ifam f;
       f
-    
-
 
   let families ?(select = fun _ -> true) base =
     let select f = select { family = f; base; witness_notes = None } in
