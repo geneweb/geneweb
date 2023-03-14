@@ -564,9 +564,9 @@ module Legacy_driver = struct
     clear_poi iper
 
   let commit_patches base =
-    commit_patches base;
     PatchPer.write base;
     PatchFam.write base;
+    commit_patches base;
     PatchPer.move_patch_file base;
     PatchFam.move_patch_file base
 
