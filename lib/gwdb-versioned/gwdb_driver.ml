@@ -188,7 +188,7 @@ end = struct
           end
       in
 
-      let data = Array.of_list @@ List.rev (loop len []) in
+      let data = Array.of_list @@ loop len [] in
       data)
 
   let sync build_from_scratch base =
