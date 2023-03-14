@@ -51,7 +51,7 @@ module Store (D : Data) : sig
   val set : D.base -> D.index -> D.t option -> unit
   val unsafe_set : D.index -> D.t option -> unit
   val write : D.base -> unit
-  val sync : bool -> (D.base -> D.t option array) -> D.base -> unit
+  val sync : (D.base -> D.t option array) -> D.base -> unit
   val empty : unit -> unit
   val close_data_file : unit -> unit
 end = struct
@@ -781,7 +781,7 @@ module Legacy_driver = struct
       PatchFam.write base;*)
     (*    log "PERS SYNC";*)
     let dir = Filename.concat (bdir base) compatibility_directory in
-    if scratch && Sys.file_exists dir then Files.remove_dir dir;
+    if Sys.file_exists dir then Files.remove_dir dir;
     PatchPer.sync build_from_scratch_pevents base;
     (*    log "FAM SYNC";*)
     PatchFam.sync build_from_scratch_fevents base;
