@@ -150,7 +150,7 @@ end = struct
     if not (directory_exists base) then create_files base;
     let patchfile = D.patch_file base in
     let patchfile_tmp = patchfile ^ "~" in
-    if Sys.file_exists patchfile_tmp then failwith "oups";
+    if Sys.file_exists patchfile_tmp then failwith "Error while writing patch file : temporary file remained";
     let oc = Secure.open_out patchfile_tmp in
     Marshal.to_channel oc tbl [ Marshal.No_sharing ];
     close_out oc;
@@ -735,6 +735,8 @@ module Legacy_driver = struct
     (*PatchPer.write base;
       PatchFam.write base*)
     (*    log "PERS SYNC"; *)
+    let dir = Filename.concat (bdir base) compatibility_directory in
+    if scratch && Sys.file_exists dir then Files.remove_dir dir;
     PatchPer.sync build_from_scratch_pevents base;
     (*    log "FAM SYNC";*)
     PatchFam.sync build_from_scratch_fevents base
@@ -778,6 +780,8 @@ module Legacy_driver = struct
     (*PatchPer.write base;
       PatchFam.write base;*)
     (*    log "PERS SYNC";*)
+    let dir = Filename.concat (bdir base) compatibility_directory in
+    if Sys.file_exists dir then Files.remove_dir dir;
     PatchPer.sync build_from_scratch_pevents base;
     (*    log "FAM SYNC";*)
     PatchFam.sync build_from_scratch_fevents base;
