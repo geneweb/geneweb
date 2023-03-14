@@ -44,6 +44,7 @@ module type Data = sig
   val patch_file : base -> string
   val data_file : base -> string
   val directory : base -> string
+  val tmp_file : string -> string
 end
 
 module Store (D : Data) : sig
@@ -54,6 +55,9 @@ module Store (D : Data) : sig
   val sync : (D.base -> D.t option array) -> D.base -> unit
   val empty : unit -> unit
   val close_data_file : unit -> unit
+  val move_data_file : D.base -> unit
+  val move_patch_file : D.base -> unit
+  val remove_patch_file : D.base -> unit
 end = struct
   type t = (D.index, D.t option) Hashtbl.t
 
@@ -84,6 +88,20 @@ end = struct
   let directory_exists base = Sys.file_exists (D.directory base)
   let create_files base = Files.mkdir_p (D.directory base)
 
+  let move_data_file base =
+    let dataf = D.data_file base in
+    let tmp = D.tmp_file dataf in
+    Files.mv tmp dataf
+
+  let move_patch_file base =
+    let patchf = D.patch_file base in
+    let tmp = D.tmp_file patchf in
+    Files.mv tmp patchf
+
+  let remove_patch_file base =
+    let patchf = D.patch_file base in
+    Files.rm patchf
+  
   let load_patch base =
     if patch_file_exists base then (
       let file = D.patch_file base in
@@ -149,13 +167,13 @@ end = struct
     let tbl = patch base in
     if not (directory_exists base) then create_files base;
     let patchfile = D.patch_file base in
-    let patchfile_tmp = patchfile ^ "~" in
+    let patchfile_tmp = D.tmp_file patchfile in
     if Sys.file_exists patchfile_tmp then failwith "Error while writing patch file : temporary file remained";
     let oc = Secure.open_out patchfile_tmp in
     Marshal.to_channel oc tbl [ Marshal.No_sharing ];
-    close_out oc;
+    close_out oc(*;
     Files.mv patchfile_tmp patchfile;
-    Files.rm patchfile_tmp
+                  Files.rm patchfile_tmp*)
 
   let empty () = patch_ht := Some (Hashtbl.create 1)
 
@@ -202,7 +220,9 @@ end = struct
     (*    log "POST LOAD";*)
 
     let dfile = D.data_file base in
-    let dfile_tmp = dfile ^ "~" in
+    let dfile_tmp = D.tmp_file dfile in
+    if Sys.file_exists dfile_tmp then failwith "Error while writing data file : temporary file remained";
+
     let oc = Secure.open_out dfile_tmp in
 
     let syncdata = Hashtbl.create (Array.length data) in
@@ -230,10 +250,10 @@ end = struct
     seek_out oc 4;
     Array.iter (output_binary_int oc) accesses;
     close_out oc;
-    close_data_file ();
+    close_data_file ()(*;
     Files.mv dfile_tmp dfile;
     Files.rm dfile_tmp;
-    Files.rm (D.patch_file base)
+                        Files.rm (D.patch_file base)*)
     (*    log "END SYNC"*)
 end
 
@@ -246,14 +266,23 @@ module Legacy_driver = struct
   let data_file = "witness_notes.dat"
   let fdata_file = "fwitness_notes.dat"
 
+  let directory base = Filename.concat (bdir base) compatibility_directory
+  let patch_file base = Filename.concat (directory base) compatibility_file
+  let data_file base = Filename.concat (directory base) data_file
+  let fpatch_file base = Filename.concat (directory base) fcompatibility_file
+  let fdata_file base = Filename.concat (directory base) fdata_file
+
+  let tmp_file fname = fname ^ "~"
+  
   module PersonData = struct
     type t = istr array array
     type index = iper
     type base = Gwdb_legacy.Gwdb_driver.base
 
-    let directory base = Filename.concat (bdir base) compatibility_directory
-    let patch_file base = Filename.concat (directory base) compatibility_file
-    let data_file base = Filename.concat (directory base) data_file
+    let directory = directory
+    let patch_file = patch_file
+    let data_file = data_file
+    let tmp_file = tmp_file
   end
 
   module PatchPer = Store (PersonData)
@@ -263,9 +292,10 @@ module Legacy_driver = struct
     type index = ifam
     type base = Gwdb_legacy.Gwdb_driver.base
 
-    let directory base = Filename.concat (bdir base) compatibility_directory
-    let patch_file base = Filename.concat (directory base) fcompatibility_file
-    let data_file base = Filename.concat (directory base) fdata_file
+    let directory = directory
+    let patch_file = fpatch_file
+    let data_file = fdata_file
+    let tmp_file = tmp_file
   end
 
   module PatchFam = Store (FamilyData)
@@ -561,7 +591,9 @@ module Legacy_driver = struct
     commit_patches base;
     (*    log "COMMIT NOTES PATCHES";*)
     PatchPer.write base;
-    PatchFam.write base
+    PatchFam.write base;
+    PatchPer.move_patch_file base;
+    PatchFam.move_patch_file base
 (*
   let get_pevents p =
     let pevents = get_pevents p.person in
@@ -739,7 +771,11 @@ module Legacy_driver = struct
     if scratch && Sys.file_exists dir then Files.remove_dir dir;
     PatchPer.sync build_from_scratch_pevents base;
     (*    log "FAM SYNC";*)
-    PatchFam.sync build_from_scratch_fevents base
+    PatchFam.sync build_from_scratch_fevents base;
+    PatchPer.move_data_file base;
+    PatchPer.remove_patch_file base;
+    PatchFam.move_data_file base;
+    PatchFam.remove_patch_file base
 
 
   let make bname particles
