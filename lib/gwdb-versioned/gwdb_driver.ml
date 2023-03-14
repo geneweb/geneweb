@@ -165,7 +165,6 @@ end = struct
       build_from_scratch base
     )
     else (
-      print_endline "data file";
       (*      log "some data file found";*)
       let ic = open_data_file base in
       let len = input_binary_int ic in
@@ -180,11 +179,13 @@ end = struct
       let rec loop i l =
         if i = 0 then l
         else
-          let index = get_pos (i - 1) in
-          if index = -1 then loop (i - 1) (None :: l)
-          else
+          let pos = get_pos (i - 1) in
+          if pos = -1 then loop (i - 1) (None :: l)
+          else begin
+            seek_in ic pos;
             let l = Some (Marshal.from_channel ic : D.t) :: l in
             loop (i - 1) l
+          end
       in
 
       let data = Array.of_list @@ List.rev (loop len []) in
