@@ -3,7 +3,7 @@
  (libraries geneweb geneweb.gwd_lib geneweb.wserver)
  (modes
   (native plugin))
- (modules plugin_forum))
+ (modules forum forumDisplay plugin_forum))
 
 (alias
  (name plugin)
