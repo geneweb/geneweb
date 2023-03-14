@@ -191,11 +191,9 @@ end = struct
       let data = Array.of_list @@ List.rev (loop len []) in
       data)
 
-  let sync scratch build_from_scratch base =
+  let sync build_from_scratch base =
     (*    log "SYNC";*)
-    let dir_exists = directory_exists base in
-    if scratch && dir_exists then Files.rm (D.directory base);
-    if not dir_exists then create_files base;
+    if not (directory_exists base) then create_files base;
     let tbl = patch base in
 
     (*    log "LOAD";*)
@@ -737,9 +735,11 @@ module Legacy_driver = struct
     (*PatchPer.write base;
       PatchFam.write base*)
     (*    log "PERS SYNC"; *)
-    PatchPer.sync scratch build_from_scratch_pevents base;
+    let dir = Filename.concat (bdir base) compatibility_directory in
+    if scratch && Sys.file_exists dir then Files.remove_dir dir;
+    PatchPer.sync build_from_scratch_pevents base;
     (*    log "FAM SYNC";*)
-    PatchFam.sync scratch build_from_scratch_fevents base
+    PatchFam.sync build_from_scratch_fevents base
 
 
   let make bname particles
@@ -780,9 +780,11 @@ module Legacy_driver = struct
     (*PatchPer.write base;
       PatchFam.write base;*)
     (*    log "PERS SYNC";*)
-    PatchPer.sync true build_from_scratch_pevents base;
+    let dir = Filename.concat (bdir base) compatibility_directory in
+    if scratch && Sys.file_exists dir then Files.remove_dir dir;
+    PatchPer.sync build_from_scratch_pevents base;
     (*    log "FAM SYNC";*)
-    PatchFam.sync true build_from_scratch_fevents base;
+    PatchFam.sync build_from_scratch_fevents base;
     base
 
   let open_base bname =
