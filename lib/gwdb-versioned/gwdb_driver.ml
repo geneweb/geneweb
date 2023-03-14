@@ -51,7 +51,7 @@ module Store (D : Data) : sig
   val set : D.base -> D.index -> D.t option -> unit
   val unsafe_set : D.index -> D.t option -> unit
   val write : D.base -> unit
-  val sync : (D.base -> D.t option array) -> D.base -> unit
+  val sync : bool -> (D.base -> D.t option array) -> D.base -> unit
   val empty : unit -> unit
   val close_data_file : unit -> unit
 end = struct
@@ -150,7 +150,7 @@ end = struct
     if not (directory_exists base) then create_files base;
     let patchfile = D.patch_file base in
     let patchfile_tmp = patchfile ^ "~" in
-    if Sys.file_exists patchfile_tmp then failwith "oups";
+    if Sys.file_exists patchfile_tmp then failwith "Error while writing patch file : temporary file remained";
     let oc = Secure.open_out patchfile_tmp in
     Marshal.to_channel oc tbl [ Marshal.No_sharing ];
     close_out oc;
@@ -191,9 +191,11 @@ end = struct
       let data = Array.of_list @@ List.rev (loop len []) in
       data)
 
-  let sync build_from_scratch base =
+  let sync scratch build_from_scratch base =
     (*    log "SYNC";*)
-    if not (directory_exists base) then create_files base;
+    let dir_exists = directory_exists base in
+    if scratch && dir_exists then Files.rm (D.directory base);
+    if not dir_exists then create_files base;
     let tbl = patch base in
 
     (*    log "LOAD";*)
@@ -735,9 +737,9 @@ module Legacy_driver = struct
     (*PatchPer.write base;
       PatchFam.write base*)
     (*    log "PERS SYNC"; *)
-    PatchPer.sync build_from_scratch_pevents base;
+    PatchPer.sync scratch build_from_scratch_pevents base;
     (*    log "FAM SYNC";*)
-    PatchFam.sync build_from_scratch_fevents base
+    PatchFam.sync scratch build_from_scratch_fevents base
 
 
   let make bname particles
@@ -778,9 +780,9 @@ module Legacy_driver = struct
     (*PatchPer.write base;
       PatchFam.write base;*)
     (*    log "PERS SYNC";*)
-    PatchPer.sync build_from_scratch_pevents base;
+    PatchPer.sync true build_from_scratch_pevents base;
     (*    log "FAM SYNC";*)
-    PatchFam.sync build_from_scratch_fevents base;
+    PatchFam.sync true build_from_scratch_fevents base;
     base
 
   let open_base bname =
