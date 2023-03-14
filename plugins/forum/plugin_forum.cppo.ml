@@ -1,10 +1,3 @@
-module Forum = struct
-  #include "forum.ml"
-end
-module ForumDisplay = struct
-  #include "forumDisplay.ml"
-end
-
 open Geneweb
 open Config
 
