@@ -759,19 +759,13 @@ module Legacy_driver = struct
   
   (* TODO : properly sync *)
   let sync ?(scratch = false) ~save_mem base =
-
-    sync ~scratch ~save_mem base;
-    let bname = Gwdb_legacy.Gwdb_driver.bdir base in
-    close_base base;
-    let base = Gwdb_legacy.Gwdb_driver.open_base bname in
-    (*PatchPer.write base;
-      PatchFam.write base*)
-    (*    log "PERS SYNC"; *)
     let dir = Filename.concat (bdir base) compatibility_directory in
     if scratch && Sys.file_exists dir then Files.remove_dir dir;
     PatchPer.sync build_from_scratch_pevents base;
-    (*    log "FAM SYNC";*)
     PatchFam.sync build_from_scratch_fevents base;
+
+    sync ~scratch ~save_mem base;
+
     PatchPer.move_data_file base;
     PatchPer.remove_patch_file base;
     PatchFam.move_data_file base;
