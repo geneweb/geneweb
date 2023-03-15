@@ -124,7 +124,9 @@ let speclist =
     ( "-nopicture",
       Arg.Set Gwcomp.no_picture,
       " Do not create associative pictures" );
-    ("-o", Arg.Set_string out_file, "<file> Output database (default: a.gwb)");
+    ( "-o",
+      Arg.Set_string out_file,
+      "<file> Output database (default: a.gwb). Alphanumerics and -" );
     ( "-particles",
       Arg.Set_string Db1link.particules_file,
       "<file> Particles file (default = predefined particles)" );
@@ -153,9 +155,27 @@ let errmsg =
   \  object files end with .gwo\n\
    and [options] are:"
 
+(* same function in bin/setup/setup.ml *)
+let good_name s =
+  let rec loop i =
+    if i = String.length s then true
+    else
+      match s.[i] with
+      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' -> loop (i + 1)
+      | _ -> false
+  in
+  loop 0
+
 let main () =
   Mutil.verbose := false;
   Arg.parse speclist anonfun errmsg;
+  if not (good_name (Filename.basename !out_file)) then (
+    (* Util.transl conf not available !*)
+    Printf.printf "The database name \"%s\" contains a forbidden character./n"
+      !out_file;
+    Printf.printf "Allowed characters: a..z, A..Z, 0..9, -";
+    flush stdout;
+    exit 2);
   Secure.set_base_dir (Filename.dirname !out_file);
   let gwo = ref [] in
   List.iter

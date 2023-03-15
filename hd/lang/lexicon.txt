@@ -953,7 +953,15 @@ sl: <em>številka"Sosa"</em>, v odnosu z %t
 sv: <em>annummer</em> med %t som proband (Kekules system)
 tr: <em>Sosa sayısı</em> %t'e göre
 
-    a cousin
+    the database name %s contains a forbidden character.
+en: the database name "%s" contains a forbidden character.
+fr: le nom de la base "%s" contient un caractère interdit.
+
+    allowed characters
+en: allowed characters
+fr: caractères autorisés
+
+    a %s cousin
 af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
 bg: %sи братовчед/%sа братовчедка
 br: ur c'henderv a live an %s derez/ur geniterv a live an %s derez/ ur c'h(g)enderv(ez) a live an %s derez
@@ -1140,12 +1148,12 @@ co: un cuginu/una cugina
 cs: bratranec/sestřenice
 da: en fætter/en kusine
 de: ein:d:+em Cousin/eine:d:+r Cousine
-en: a %scousin
+en: a cousin
 eo: kuzo/kuzino
 es: un primo/una prima
 et: nõbu:g:--o
 fi: serkku:g:--un
-fr: un %scousin/une %scousine/un·e %s·cousin·e
+fr: un cousin/une cousine/un·e·cousin·e
 he:  בן-דוד/ בת-דוד
 is: systkynabarn
 it: un cugino/una cugina
