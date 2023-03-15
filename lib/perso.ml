@@ -3333,13 +3333,26 @@ and eval_bool_person_field conf base env (p, p_auth) = function
                       match pname with
                       | Epers_Birth | Epers_Baptism | Epers_Death
                       | Epers_Burial | Epers_Cremation ->
-                        if Event.has_witnesses event_item then true
-                        else
-                          let nb_principal_pevents =
-                            succ nb_principal_pevents
-                          in
-                          if nb_principal_pevents > 1 then true
-                          else loop events nb_principal_pevents nb_marr
+                          if Event.has_witnesses event_item then true
+                          else (
+                            (match pname with
+                            | Epers_Birth ->
+                                nb_principal_pevents.(0) <-
+                                  succ nb_principal_pevents.(0)
+                            | Epers_Baptism ->
+                                nb_principal_pevents.(1) <-
+                                  succ nb_principal_pevents.(1)
+                            | Epers_Death ->
+                                nb_principal_pevents.(2) <-
+                                  succ nb_principal_pevents.(2)
+                            | Epers_Burial | Epers_Cremation ->
+                                nb_principal_pevents.(3) <-
+                                  succ nb_principal_pevents.(3)
+                            | _ -> ());
+                            if
+                              Array.exists (fun i -> i > 1) nb_principal_pevents
+                            then true
+                            else loop events nb_principal_pevents nb_marr)
                       | _ -> true)
                   | Fevent fname -> (
                       match fname with
@@ -3364,7 +3377,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
               | event_item :: _events when Event.has_witness_note event_item -> true
               | _ :: events -> loop' events
             in
-            loop events 0 0 || loop' events
+            loop events [|0;0;0;0|] 0 || loop' events
       else false
   | "has_families" ->
       Array.length (get_family p) > 0
