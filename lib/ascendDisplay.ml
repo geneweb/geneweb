@@ -47,7 +47,7 @@ let print conf base p =
       Util.p_getenv conf.env "dag",
       p_getint conf.env "v" )
   with
-  | Some "T", Some "1", Some v -> print_ancestors_dag conf base v p
+  | Some "T", Some "on", Some v -> print_ancestors_dag conf base v p
   | _ ->
       let templ =
         match Util.p_getenv conf.env "t" with
