@@ -1047,9 +1047,6 @@ let reconstitute_date conf var =
         | Some "H" -> Dhebrew
         | _ -> Dgregorian
       in
-      (* TODO if this is a complete date OK
-         else do something horrible like convert
-         to gregorian and if day =0 set gregorian_date.day to 0 *)
       let date = Date.convert ~from:calendar ~to_:Dgregorian d in
       Some (Date.Dgreg (date, calendar))
   | Some d, true ->
