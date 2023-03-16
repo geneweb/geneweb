@@ -119,13 +119,13 @@ let print_wizards_by_date conf list =
   let sep_period_list =
     [
       ( (fun tm -> tm.Unix.tm_mon),
-        fun tm ->
+        fun (tm : Unix.tm) ->
           let dmy =
             Date.
               {
-                year = tm.Unix.tm_year + 1900;
-                month = tm.Unix.tm_mon + 1;
-                day = 0;
+                year = tm.tm_year + 1900;
+                month = tm.tm_mon + 1;
+                day = tm.tm_mday;
                 prec = Sure;
                 delta = 0;
               }
