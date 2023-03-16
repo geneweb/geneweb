@@ -425,3 +425,6 @@ val empty_family : 'string -> (_, unit, 'string) Def.gen_family
 (** [empty_family empty] returns a Def.gen_person with string field initialized
     initialized with [empty] and only empty arrays/lists.
 *)
+
+val good_name : string -> bool
+(** test the base name fir accepted characters: a..z, A..Z, - *)

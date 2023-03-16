@@ -858,16 +858,6 @@ let exec_f comm =
   flush stderr;
   Sys.command s
 
-let good_name s =
-  let rec loop i =
-    if i = String.length s then true
-    else
-      match s.[i] with
-        'a'..'z' | 'A'..'Z' | '0'..'9' | '-' -> loop (i + 1)
-      | _ -> false
-  in
-  loop 0
-
 let out_name_of_ged in_file =
   let f = Filename.basename in_file in
   if Filename.check_suffix f ".ged" then Filename.chop_suffix f ".ged"
@@ -948,7 +938,7 @@ let simple conf =
   if ged <> "" && not (Sys.file_exists ged) then
     print_file conf "err_unkn.htm"
   else if out_file = "" then print_file conf "err_miss.htm"
-  else if not (good_name out_file) then print_file conf "err_name.htm"
+  else if not (Mutil.good_name out_file) then print_file conf "err_name.htm"
   else print_file conf "bso.htm"
 
 let gwc_or_ged2gwb out_name_of_in_name conf =
@@ -982,7 +972,7 @@ let gwc_or_ged2gwb out_name_of_in_name conf =
   if in_file = "" || out_file = "" then print_file conf "err_miss.htm"
   else if not (Sys.file_exists in_file) && not (String.contains fname '*')
   then print_file conf "err_unkn.htm"
-  else if not (good_name out_file) then print_file conf "err_name.htm"
+  else if not (Mutil.good_name out_file) then print_file conf "err_name.htm"
   else print_file conf "bso.htm"
 
 let gwc_check conf =
@@ -1223,7 +1213,7 @@ let recover_1 conf =
   let out_file = if out_file = "" then in_file else out_file in
   let conf = conf_with_env conf "o" out_file in
   if in_file = "" then print_file conf "err_miss.htm"
-  else if not (good_name out_file) then print_file conf "err_name.htm"
+  else if not (Mutil.good_name out_file) then print_file conf "err_name.htm"
   else
     let (old_to_src, o_opt, tmp, src_to_new) =
       if not by_gedcom then "gwu", " > ", "tmp.gw", "gwc"
@@ -1359,7 +1349,7 @@ let rec check_new_names conf l1 l2 =
   match l1, l2 with
     (k, v) :: l, x :: m ->
       if k <> x then begin print_file conf "err_outd.htm"; raise Exit end
-      else if not (good_name v) then
+      else if not (Mutil.good_name v) then
         let conf = {conf with env = ("o", v) :: conf.env} in
         print_file conf "err_name.htm"; raise Exit
       else check_new_names conf l m
@@ -1409,7 +1399,7 @@ let merge conf =
   let bases = selected conf.env in
   if out_file = "" || List.length bases < 2 then
     print_file conf "err_miss.htm"
-  else if not (good_name out_file) then print_file conf "err_name.htm"
+  else if not (Mutil.good_name out_file) then print_file conf "err_name.htm"
   else print_file conf "merge_1.htm"
 
 let merge_1 conf =

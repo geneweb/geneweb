@@ -155,21 +155,10 @@ let errmsg =
   \  object files end with .gwo\n\
    and [options] are:"
 
-(* same function in bin/setup/setup.ml *)
-let good_name s =
-  let rec loop i =
-    if i = String.length s then true
-    else
-      match s.[i] with
-      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' -> loop (i + 1)
-      | _ -> false
-  in
-  loop 0
-
 let main () =
   Mutil.verbose := false;
   Arg.parse speclist anonfun errmsg;
-  if not (good_name (Filename.basename !out_file)) then (
+  if not (Mutil.good_name (Filename.basename !out_file)) then (
     (* Util.transl conf not available !*)
     Printf.eprintf "The database name \"%s\" contains a forbidden character./n"
       !out_file;
