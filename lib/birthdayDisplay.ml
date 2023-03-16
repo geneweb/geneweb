@@ -231,6 +231,7 @@ let propose_months conf mode =
   end_centered conf
 
 let day_after d =
+  (* TODO this should be done with Calendars and SDN instead *)
   let day, r =
     if d.Date.day >= Date.nb_days_in_month d.month d.year then (1, 1)
     else (succ d.day, 0)
