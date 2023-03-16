@@ -1167,3 +1167,13 @@ let empty_family empty =
   ; fsources = empty
   ; fam_index = ()
   }
+
+let good_name s =
+  let rec loop i =
+    if i = String.length s then true
+    else
+      match s.[i] with
+        'a'..'z' | 'A'..'Z' | '0'..'9' | '-' -> loop (i + 1)
+      | _ -> false
+  in
+  loop 0
