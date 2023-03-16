@@ -419,7 +419,7 @@ let print_population_pyramid conf base =
   let at_date =
     match p_getint conf.env "y" with
     | None -> conf.today
-    | Some i -> { year = i; month = 31; day = 12; prec = Sure; delta = 0 }
+    | Some i -> { day = 31; month = 12; year = i; prec = Sure; delta = 0 }
   in
   let nb_intervals = 150 / interval in
   let men, wom =
