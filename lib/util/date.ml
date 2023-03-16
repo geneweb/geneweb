@@ -243,20 +243,6 @@ let date_of_death death = Option.bind (cdate_of_death death) od_of_cdate
 
 (* Calendars library wrapper *)
 
-let to_calendars ~from ~day ~month ~year ~delta =
-  match from with
-  | Dgregorian ->
-      Calendars.make Gregorian ~day ~month ~year ~delta |> Result.get_ok
-  | Djulian ->
-      Calendars.make Julian ~day ~month ~year ~delta
-      |> Result.get_ok |> Calendars.to_gregorian
-  | Dfrench ->
-      Calendars.make French ~day ~month ~year ~delta
-      |> Result.get_ok |> Calendars.to_gregorian
-  | Dhebrew ->
-      Calendars.make Hebrew ~day ~month ~year ~delta
-      |> Result.get_ok |> Calendars.to_gregorian
-
 let max_month_of cal =
   match cal with Dgregorian | Djulian -> 12 | Dfrench | Dhebrew -> 13
 
@@ -274,12 +260,31 @@ let partial_date_upper_bound ~from ~day ~month ~year =
 
 let partial_date_lower_bound ~day ~month ~year = (max 1 day, max 1 month, year)
 
+(* In the case of partial date Calendars.make fail.
+   So we convert a lower or upper bound of the date depending on [lower] instead *)
+let to_calendars ~from ~day ~month ~year ~delta ~lower =
+  let bound =
+    if lower then partial_date_lower_bound else partial_date_upper_bound ~from
+  in
+  let day, month, year = bound ~day ~month ~year in
+  match from with
+  | Dgregorian ->
+      Calendars.make Gregorian ~day ~month ~year ~delta |> Result.get_ok
+  | Djulian ->
+      Calendars.make Julian ~day ~month ~year ~delta
+      |> Result.get_ok |> Calendars.to_gregorian
+  | Dfrench ->
+      Calendars.make French ~day ~month ~year ~delta
+      |> Result.get_ok |> Calendars.to_gregorian
+  | Dhebrew ->
+      Calendars.make Hebrew ~day ~month ~year ~delta
+      |> Result.get_ok |> Calendars.to_gregorian
+
 (* [to_sdn] does not work if day|month are unknown
    so we return sdn of [partial_date_lower_bound d] instead *)
 let to_sdn ~from d =
   let { day; month; year; delta } = d in
-  let day, month, year = partial_date_lower_bound ~day ~month ~year in
-  to_calendars ~from ~day ~month ~year ~delta |> Calendars.to_sdn
+  to_calendars ~from ~day ~month ~year ~delta ~lower:true |> Calendars.to_sdn
 
 let of_calendars_raw ~prec date =
   let { Calendars.day; month; year; delta; _ } = date in
@@ -318,16 +323,15 @@ let convert ~from ~to_ dmy =
   in
   (* code addapted from Calendars *)
   let convert_aux ~from ~to_ ~day ~month ~year ~delta =
-    let to_sdn ~from ~day ~month ~year ~delta =
-      to_calendars ~from ~day ~month ~year ~delta |> Calendars.to_sdn
-    in
     let sdn_min =
-      let day, month, year = partial_date_lower_bound ~day ~month ~year in
-      to_sdn ~from ~day ~month ~year ~delta
+      to_calendars ~from ~day ~month ~year ~delta ~lower:true
+      |> Calendars.to_sdn
     in
     let sdn_max =
-      let day, month, year = partial_date_upper_bound ~from ~day ~month ~year in
-      let sdn_max = to_sdn ~from ~day ~month ~year ~delta in
+      let sdn_max =
+        to_calendars ~from ~day ~month ~year ~delta ~lower:false
+        |> Calendars.to_sdn
+      in
       (* we want sdn_min < sdn_max; add + 1 if needed *)
       if sdn_min = sdn_max then sdn_max + 1 else sdn_max
     in
