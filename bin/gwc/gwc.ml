@@ -171,9 +171,9 @@ let main () =
   Arg.parse speclist anonfun errmsg;
   if not (good_name (Filename.basename !out_file)) then (
     (* Util.transl conf not available !*)
-    Printf.printf "The database name \"%s\" contains a forbidden character./n"
+    Printf.eprintf "The database name \"%s\" contains a forbidden character./n"
       !out_file;
-    Printf.printf "Allowed characters: a..z, A..Z, 0..9, -";
+    Printf.eprintf "Allowed characters: a..z, A..Z, 0..9, -";
     flush stdout;
     exit 2);
   Secure.set_base_dir (Filename.dirname !out_file);
@@ -183,7 +183,7 @@ let main () =
       if Filename.check_suffix x ".gw" then (
         (try Gwcomp.comp_families x
          with e ->
-           Printf.printf "File \"%s\", line %d:\n" x !line_cnt;
+           Printf.eprintf "File \"%s\", line %d:\n" x !line_cnt;
            raise e);
         gwo := (x ^ "o", separate, bnotes, shift) :: !gwo)
       else if Filename.check_suffix x ".gwo" then
@@ -196,7 +196,7 @@ let main () =
       else !out_file ^ ".gwb"
     in
     if (not !force) && Sys.file_exists bdir then (
-      Printf.printf
+      Printf.eprintf
         "The database \"%s\" already exists. Use option -f to overwrite it."
         !out_file;
       flush stdout;
