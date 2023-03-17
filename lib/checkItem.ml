@@ -24,9 +24,7 @@ let max_siblings_gap = 50
 
 (* Check if d1 < d2 *)
 let strictly_before_dmy d1 d2 =
-  match Date.compare_dmy_opt ~strict:true d1 d2 with
-  | Some x -> x < 0
-  | None -> false
+  match Date.compare_dmy_strict d1 d2 with Some x -> x < 0 | None -> false
 
 let strictly_before d1 d2 =
   match (d1, d2) with
@@ -34,9 +32,7 @@ let strictly_before d1 d2 =
   | _ -> false
 
 let strictly_after_dmy d1 d2 =
-  match Date.compare_dmy_opt ~strict:true d1 d2 with
-  | Some x -> x > 0
-  | None -> false
+  match Date.compare_dmy_strict d1 d2 with Some x -> x > 0 | None -> false
 
 let strictly_after d1 d2 =
   match (d1, d2) with
