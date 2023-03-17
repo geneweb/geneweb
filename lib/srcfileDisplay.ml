@@ -161,11 +161,11 @@ let extract_date s =
 let string_of_start_date conf =
   let r = count conf in
   match extract_date r.start_date with
+  | None -> Util.safe_html r.start_date
   | Some (d, m, y) ->
-      Dgreg
+      Date.Dgreg
         ({ day = d; month = m; year = y; prec = Sure; delta = 0 }, Dgregorian)
       |> DateDisplay.string_of_date conf
-  | _ -> Util.safe_html r.start_date
 
 let string_of_int_sep_aux conf n =
   Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") n
