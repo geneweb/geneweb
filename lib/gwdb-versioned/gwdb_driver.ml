@@ -563,6 +563,10 @@ module Legacy_driver = struct
     PatchPer.set base iper witnotes;
     clear_poi iper
 
+  let delete_person base iper =
+    Gwdb_legacy.Gwdb_driver.delete_person base iper;
+    clear_poi iper
+
   let commit_patches base =
     PatchPer.write base;
     PatchFam.write base;
@@ -873,6 +877,10 @@ module Legacy_driver = struct
     insert_family base ifam genfam;
     let witnotes = fwitness_notes_of_events fevents in
     PatchFam.set base ifam witnotes;
+    clear_foi ifam
+
+  let delete_family base ifam =
+    Gwdb_legacy.Gwdb_driver.delete_family base ifam;
     clear_foi ifam
 
   let get_children f = get_children f.family
