@@ -136,7 +136,7 @@ let print_wizards_by_date conf list =
                 delta = 0;
               }
           in
-          Dgreg (dmy, Dgregorian)
+          Date.Dgreg (dmy, Dgregorian)
           |> (DateDisplay.string_of_ondate conf :> Date.date -> string)
           |> Utf8.capitalize_fst |> Output.print_sstring conf );
       ( (fun tm -> tm.Unix.tm_year),
