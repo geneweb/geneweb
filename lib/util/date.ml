@@ -161,73 +161,6 @@ let time_elapsed_opt d1 d2 =
   | After, After | Before, Before -> None
   | _ -> Some (time_elapsed d1 d2)
 
-(* TODO use SDN to compare date (?) *)
-(* use strict = false to compare date as if they are points on a timeline.
-   use strict = true to compare date by taking precision in account. This makes some dates not comparable, do not use to sort a list *)
-let rec compare_dmy_opt ?(strict = false) dmy1 dmy2 =
-  match compare dmy1.year dmy2.year with
-  | 0 -> compare_month_or_day ~is_day:false strict dmy1 dmy2
-  | x -> eval_strict strict dmy1 dmy2 x
-
-and compare_month_or_day ~is_day strict dmy1 dmy2 =
-  (* compare a known month|day with a unknown one (0) *)
-  let compare_with_unknown_value ~strict ~unkonwn ~known =
-    match unkonwn.prec with
-    | After -> Some 1
-    | Before -> Some (-1)
-    | _other -> if strict then None else compare_prec false unkonwn known
-  in
-  (* if we are comparing months the next comparison to do is on days
-      else if we are comparing days it is compare_prec *)
-  let x, y, next_comparison =
-    if is_day then (dmy1.day, dmy2.day, compare_prec)
-    else (dmy1.month, dmy2.month, compare_month_or_day ~is_day:true)
-  in
-  (* 0 means month|day is unknow*)
-  match (x, y) with
-  | 0, 0 -> compare_prec strict dmy1 dmy2
-  | 0, _ -> compare_with_unknown_value ~strict ~unkonwn:dmy1 ~known:dmy2
-  | _, 0 ->
-      (* swap dmy1 and dmy2 *)
-      Option.map Int.neg
-      @@ compare_with_unknown_value ~strict ~unkonwn:dmy2 ~known:dmy1
-  | m1, m2 -> (
-      match Int.compare m1 m2 with
-      | 0 -> next_comparison strict dmy1 dmy2
-      | x -> eval_strict strict dmy1 dmy2 x)
-
-and compare_prec strict dmy1 dmy2 =
-  match (dmy1.prec, dmy2.prec) with
-  | (Sure | About | Maybe), (Sure | About | Maybe) -> Some 0
-  | After, After | Before, Before -> Some 0
-  | OrYear dmy1, OrYear dmy2 | YearInt dmy1, YearInt dmy2 ->
-      compare_dmy_opt ~strict (dmy_of_dmy2 dmy1) (dmy_of_dmy2 dmy2)
-  | _, After | Before, _ -> Some (-1)
-  | After, _ | _, Before -> Some 1
-  | _ -> Some 0
-
-and eval_strict strict dmy1 dmy2 x =
-  if strict then
-    match x with
-    | -1 when dmy1.prec = After || dmy2.prec = Before -> None
-    | 1 when dmy1.prec = Before || dmy2.prec = After -> None
-    | x -> Some x
-  else Some x
-
-exception Not_comparable
-
-let compare_dmy ?(strict = false) dmy1 dmy2 =
-  match compare_dmy_opt ~strict dmy1 dmy2 with
-  | None -> raise Not_comparable
-  | Some x -> x
-
-let compare_date ?(strict = false) d1 d2 =
-  match (d1, d2) with
-  | Dgreg (dmy1, _), Dgreg (dmy2, _) -> compare_dmy ~strict dmy1 dmy2
-  | Dgreg (_, _), Dtext _ -> if strict then raise Not_comparable else 1
-  | Dtext _, Dgreg (_, _) -> if strict then raise Not_comparable else -1
-  | Dtext _, Dtext _ -> if strict then raise Not_comparable else 0
-
 let cdate_to_dmy_opt cdate =
   match od_of_cdate cdate with
   | Some (Dgreg (d, _)) -> Some d
@@ -373,3 +306,43 @@ let convert ~from ~to_ dmy =
       { day; month; year; delta; prec = OrYear (convert_dmy2 ~from ~to_ dmy2) }
   | YearInt dmy2 ->
       { day; month; year; delta; prec = YearInt (convert_dmy2 ~from ~to_ dmy2) }
+
+let rec compare_dmy dmy1 dmy2 =
+  let sdn1 = to_sdn ~from:Dgregorian dmy1 in
+  let sdn2 = to_sdn ~from:Dgregorian dmy2 in
+  let c = Int.compare sdn1 sdn2 in
+  if c <> 0 then c
+  else
+    let c =
+      match (dmy1.prec, dmy2.prec) with
+      | (Sure | About | Maybe), (Sure | About | Maybe) -> 0
+      | After, After | Before, Before -> 0
+      | OrYear dmy1, OrYear dmy2 | YearInt dmy1, YearInt dmy2 ->
+          compare_dmy (dmy_of_dmy2 dmy1) (dmy_of_dmy2 dmy2)
+      | _, After | Before, _ -> -1
+      | After, _ | _, Before -> 1
+      | _ -> 0
+    in
+    if c <> 0 then c
+    else
+      (* we consider partially known date to be less than kwown date *)
+      match ((dmy1.day, dmy1.month), (dmy2.day, dmy2.month)) with
+      | (0, 0), (0, 0) -> 0
+      | (0, 0), (_, _) -> -1
+      | (_, _), (0, 0) -> 1
+      | (0, _), (_, _) -> -1
+      | (_, _), (0, _) -> 1
+      | (_, _), (_, _) -> 0
+
+let compare_dmy_strict dmy1 dmy2 =
+  match compare_dmy dmy1 dmy2 with
+  | -1 when dmy1.prec = After || dmy2.prec = Before -> None
+  | 1 when dmy1.prec = Before || dmy2.prec = After -> None
+  | c -> Some c
+
+let compare_date d1 d2 =
+  match (d1, d2) with
+  | Dgreg (dmy1, _), Dgreg (dmy2, _) -> compare_dmy dmy1 dmy2
+  | Dgreg (_, _), Dtext _ -> 1
+  | Dtext _, Dgreg (_, _) -> -1
+  | Dtext _, Dtext _ -> 0

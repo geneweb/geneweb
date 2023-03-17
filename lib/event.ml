@@ -145,10 +145,9 @@ let compare get_name get_date e1 e2 =
   | Some d1 -> (
       match Date.cdate_to_dmy_opt (get_date e2) with
       | None -> compare_event_name (get_name e1) (get_name e2)
-      | Some d2 -> (
-          match Date.compare_dmy_opt ~strict:false d1 d2 with
-          | Some 0 | None -> compare_event_name (get_name e1) (get_name e2)
-          | Some x -> x))
+      | Some d2 ->
+          let x = Date.compare_dmy d1 d2 in
+          if x = 0 then compare_event_name (get_name e1) (get_name e2) else x)
 
 let sort_events get_name get_date events =
   List.stable_sort (fun e1 e2 -> compare get_name get_date e1 e2) events
