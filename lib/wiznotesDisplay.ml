@@ -29,11 +29,18 @@ let read_auth_file fname =
           (w1 ^ w2, w2 ^ w1, i)
         with Not_found -> (wizname, wizname, 0)
       in
+      (* wizname may contain key: wizname|fn.occ.sn *)
+      let wizname =
+        match String.index_opt wizname '|' with
+        | None -> wizname
+        | Some i -> String.sub wizname 0 i
+      in
       (au.au_user, (wizname, (wizorder, islash))))
     data
 
 let read_wizard_notes fname =
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
+  | None -> ("", 0.)
   | Some ic ->
       let date, len =
         try
@@ -55,21 +62,21 @@ let read_wizard_notes fname =
       in
       let len = loop len in
       (Buff.get len, date)
-  | None -> ("", 0.)
 
 let write_wizard_notes fname nn =
   if nn = "" then Mutil.rm fname
   else
     match try Some (Secure.open_out fname) with Sys_error _ -> None with
+    | None -> ()
     | Some oc ->
         Printf.fprintf oc "WIZNOTES\n%.0f\n" (Unix.time ());
         output_string oc nn;
         output_string oc "\n";
         close_out oc
-    | None -> ()
 
 let wiznote_date wfile =
   match try Some (Secure.open_in wfile) with Sys_error _ -> None with
+  | None -> ("", 0.)
   | Some ic ->
       let date =
         try
@@ -82,7 +89,6 @@ let wiznote_date wfile =
       in
       close_in ic;
       (wfile, date)
-  | None -> ("", 0.)
 
 let print_wizards_by_alphabetic_order conf list =
   let wprint_elem (wz, (wname, (_, islash)), wfile, stm) =
@@ -303,7 +309,7 @@ let print_main conf base auth_file =
     Output.print_string conf (commd conf);
     Output.print_sstring conf {|m=WIZNOTES&o=H">|};
     Output.print_sstring conf (transl conf "here");
-    Output.print_sstring conf "</a>";
+    Output.print_sstring conf "</a> ";
     Output.print_sstring conf
       (transl conf "for the list ordered by the date of the last modification");
     Output.print_sstring conf ".</em></p>";
