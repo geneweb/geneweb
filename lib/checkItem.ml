@@ -13,17 +13,17 @@ let max_age_btw_cpl = Duration.of_years 50
 let min_btw_sibl = Duration.of_days 10
 let max_btw_sibl = Duration.of_months 7
 
-(* this looks bad, should be defined elsewhere *)
-let lim_date_death = 1900
-let max_death_after_lim_date_death = Duration.of_years 105
-let max_death_before_lim_date_death = Duration.of_years 100
-
 let min_parent_age = Duration.of_years 11
 let max_father_age = Duration.of_years 70
 let max_mother_age = Duration.of_years 55
 let min_age_marriage = (* ..... *) Duration.of_years 12
 let max_age_marriage = Duration.of_years 100
 let max_siblings_gap = Duration.of_years 50
+
+(* this looks bad, should be defined elsewhere *)
+let lim_date_death = 1900
+let max_death_after_lim_date_death = Duration.of_years 105
+let max_death_before_lim_date_death = Duration.of_years 100
 
 (* Check if d1 < d2 *)
 let strictly_before_dmy d1 d2 =
