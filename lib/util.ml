@@ -536,10 +536,8 @@ let p_getint env label =
 let nobtit conf base p =
   Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p
 
-let strictly_after_private_years conf a =
-  if a.Date.year > conf.private_years then true
-  else if a.year < conf.private_years then false
-  else a.month > 0 || a.day > 0
+let strictly_after_private_years conf age =
+  age.Duration.sdn > conf.private_years.sdn
 
 let is_old_person conf p =
   match
@@ -548,15 +546,15 @@ let is_old_person conf p =
       p.death,
       Date.dmy_of_death p.death )
   with
-  | _, _, NotDead, _ when conf.private_years > 0 -> false
+  | _, _, NotDead, _ when conf.private_years.sdn > 0 -> false
   | Some d, _, _, _ ->
-      let a = Date.time_elapsed d conf.today in
+      let a = Duration.time_elapsed d conf.today in
       strictly_after_private_years conf a
   | _, Some d, _, _ ->
-      let a = Date.time_elapsed d conf.today in
+      let a = Duration.time_elapsed d conf.today in
       strictly_after_private_years conf a
   | _, _, _, Some d ->
-      let a = Date.time_elapsed d conf.today in
+      let a = Duration.time_elapsed d conf.today in
       strictly_after_private_years conf a
   | None, None, DontKnowIfDead, None ->
       p.access <> Private && conf.public_if_no_date

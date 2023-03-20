@@ -178,6 +178,16 @@ and mk_dmy { Date.day; month; year; delta; prec } =
     | "prec" -> prec
     | _ -> raise Not_found)
 
+and mk_duration = function
+  (* TODO *)
+  | Duration.{ nb_day; nb_month; nb_year } ->
+      Tpat
+        (function
+        | "day" -> Tint nb_day
+        | "month" -> Tint nb_month
+        | "year" -> Tint nb_year
+        | _ -> raise Not_found)
+
 and mk_date = function
   | Date.Dtext s ->
       Tpat
@@ -223,6 +233,15 @@ and mk_date = function
         | "__compare__" -> date_compare
         | "__eq__" -> date_eq
         | _ -> raise Not_found)
+
+and to_duration_display _d =
+  (*
+  let int s = match Jg_runtime.jg_obj_lookup d s with Tint i -> i | _ -> 0 in
+  (* TODO change for int "nb_day" ? *)
+  (* TODO this is problematic; why do we build dates from jingoo*)
+  Duration.{ nb_day = int "day"; nb_month = int "month"; nb_year = int "year" }
+  *)
+  assert false
 
 and to_dmy d =
   let int s = match Jg_runtime.jg_obj_lookup d s with Tint i -> i | _ -> 0 in
@@ -314,11 +333,26 @@ and module_DATE conf =
         Tstr (DateDisplay.code_french_year conf (unbox_int i)))
   in
   let string_of_age =
-    func_arg1_no_kw (fun d -> safe (DateDisplay.string_of_age conf (to_dmy d)))
+    func_arg1_no_kw (fun d ->
+        safe (DateDisplay.string_of_age conf (to_duration_display d)))
   in
   let sub =
     func_arg2_no_kw (fun d1 d2 ->
-        mk_dmy @@ Date.time_elapsed (to_dmy d2) (to_dmy d1))
+        (* TODO add duration to jingoo *)
+        let dmy =
+          let Duration.{ nb_day; nb_month; nb_year } =
+            (Duration.time_elapsed (to_dmy d2) (to_dmy d1)).display
+          in
+          Date.
+            {
+              day = nb_day;
+              month = nb_month;
+              year = nb_year;
+              prec = Sure;
+              delta = 0;
+            }
+        in
+        mk_dmy dmy)
   in
   let calendar =
     func_arg2_no_kw (fun dst d ->
@@ -826,13 +860,13 @@ and mk_warning conf base =
       a
   in
   function
-  | Warning.BigAgeBetweenSpouses (f, m, a) ->
+  | Warning.BigAgeBetweenSpouses (f, m, age) ->
       Tset
         [
           Tsafe "BigAgeBetweenSpouses";
           unsafe_mk_person conf base f;
           unsafe_mk_person conf base m;
-          mk_date (Dgreg (a, Dgregorian));
+          mk_duration age.display;
         ]
   | BirthAfterDeath p ->
       Tset [ Tsafe "BirthAfterDeath"; unsafe_mk_person conf base p ]
@@ -914,12 +948,10 @@ and mk_warning conf base =
           unsafe_mk_person conf base c1;
           unsafe_mk_person conf base c2;
         ]
-  | DeadOld (p, a) ->
+  | DeadOld (p, age) ->
       Tset
         [
-          Tsafe "DeadOld";
-          unsafe_mk_person conf base p;
-          mk_date (Dgreg (a, Dgregorian));
+          Tsafe "DeadOld"; unsafe_mk_person conf base p; mk_duration age.display;
         ]
   | DeadTooEarlyToBeFather (father, child) ->
       Tset
@@ -970,12 +1002,12 @@ and mk_warning conf base =
           unsafe_mk_person conf base p1;
           unsafe_mk_person conf base p2;
         ]
-  | OldForMarriage (p, a, i) ->
+  | OldForMarriage (p, age, i) ->
       Tset
         [
           Tsafe "OldForMarriage";
           unsafe_mk_person conf base p;
-          mk_date (Dgreg (a, Dgregorian));
+          mk_duration age.display;
           get_n_mk_family conf base i (Gwdb.foi base i);
         ]
   | ParentBornAfterChild (p1, p2) ->
@@ -985,20 +1017,20 @@ and mk_warning conf base =
           unsafe_mk_person conf base p1;
           unsafe_mk_person conf base p2;
         ]
-  | ParentTooOld (p, a, c) ->
+  | ParentTooOld (p, age, c) ->
       Tset
         [
           Tsafe "ParentTooOld";
           unsafe_mk_person conf base p;
-          mk_date (Dgreg (a, Dgregorian));
+          mk_duration age.display;
           unsafe_mk_person conf base c;
         ]
-  | ParentTooYoung (p, a, c) ->
+  | ParentTooYoung (p, age, c) ->
       Tset
         [
           Tsafe "ParentTooYoung";
           unsafe_mk_person conf base p;
-          mk_date (Dgreg (a, Dgregorian));
+          mk_duration age.display;
           unsafe_mk_person conf base c;
         ]
   | PEventOrder (p, e1, e2) ->
@@ -1034,12 +1066,12 @@ and mk_warning conf base =
         ]
   | UndefinedSex p ->
       Tset [ Tsafe "UndefinedSex"; unsafe_mk_person conf base p ]
-  | YoungForMarriage (p, a, i) ->
+  | YoungForMarriage (p, age, i) ->
       Tset
         [
           Tsafe "YoungForMarriage";
           unsafe_mk_person conf base p;
-          mk_date (Dgreg (a, Dgregorian));
+          mk_duration age.display;
           get_fam i;
         ]
   | PossibleDuplicateFam (ifam1, ifam2) ->

@@ -790,7 +790,7 @@ let print_person_table conf base p lab =
                transl_decline conf "possibly (date)" ""
                |> Output.print_sstring conf;
                Output.print_sstring conf " ");
-             Date.time_elapsed d1 d2
+             Duration.time_elapsed d1 d2
              |> DateDisplay.string_of_age conf
              |> Output.print_string conf
          | _ -> ());

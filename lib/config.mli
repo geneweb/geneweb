@@ -69,7 +69,7 @@ type config = {
   public_if_no_date : bool;
   mutable setup_link : bool;
   access_by_key : bool;
-  private_years : int;
+  private_years : Duration.t;
   hide_names : bool;
   use_restrict : bool;
   no_image : bool;

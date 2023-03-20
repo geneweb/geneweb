@@ -2,10 +2,8 @@
 
 (** Database warnings attached to the specification of the person, family, relation, etc. *)
 type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
-  | BigAgeBetweenSpouses of
-      'person
-      * 'person
-      * Date.dmy (* Age differece between couples is greater then 50 years *)
+  | BigAgeBetweenSpouses of 'person * 'person * Duration.t
+    (* Age differece between couples is greater then 50 years *)
   | BirthAfterDeath of 'person  (** Person is born after his death *)
   | IncoherentSex of 'person * int * int  (** Incoherent sex of person *)
   | ChangedOrderOfChildren of 'family * 'descend * 'iper array * 'iper array
@@ -20,7 +18,7 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
       (** Children aren't ordered *)
   | CloseChildren of 'family * 'person * 'person
       (** Age difference between two child is less then 7 month (except for twins) *)
-  | DeadOld of 'person * Date.dmy
+  | DeadOld of 'person * Duration.t
       (** Dead old (at the age older then 109 after 1900 year and older then 100 before) *)
   | DeadTooEarlyToBeFather of 'person * 'person
       (** Children is born in more then 1 year after his father's death *)
@@ -41,9 +39,9 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
       (** Children is born after his mother's death *)
   | ParentBornAfterChild of 'person * 'person
       (** Parent is born after one of his children *)
-  | ParentTooOld of 'person * Date.dmy * 'person
+  | ParentTooOld of 'person * Duration.t * 'person
       (** Person became a parent at age older then 55 years for mother and 70 for father *)
-  | ParentTooYoung of 'person * Date.dmy * 'person
+  | ParentTooYoung of 'person * Duration.t * 'person
       (** Person became a parent at age younger then 11 years old *)
   | PEventOrder of 'person * 'pevent * 'pevent
       (** Personal events haven't been ordered correctly *)
@@ -58,9 +56,9 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
   | TitleDatesError of 'person * 'title
       (** Title's start date is after end date or person is born after title dates *)
   | UndefinedSex of 'person  (** Person has undefined sex (Neuter) *)
-  | YoungForMarriage of 'person * Date.dmy * 'family
+  | YoungForMarriage of 'person * Duration.t * 'family
       (** Person is married before he was 12 years old *)
-  | OldForMarriage of 'person * Date.dmy * 'family
+  | OldForMarriage of 'person * Duration.t * 'family
       (** Person is married after he was 100 years old *)
 
 (** Missing sources warning *)

@@ -11,8 +11,10 @@ let month_txt conf d cal =
   (d : Adef.safe_string :> string) |> Utf8.capitalize_fst |> Adef.safe
 
 let print_birth conf base =
-  let list, len =
-    select_person conf base (fun p -> Date.od_of_cdate (get_birth p)) false
+  let l, len =
+    select_person_by_date conf base
+      (fun p -> Date.od_of_cdate (get_birth p))
+      ~ascending:false
   in
   let title _ =
     Output.printf conf (fcapitale (ftransl conf "the latest %d births")) len
@@ -22,7 +24,7 @@ let print_birth conf base =
   Output.print_sstring conf "<ul>\n";
   ignore
   @@ List.fold_left
-       (fun (last_month_txt, was_future) (p, d, cal) ->
+       (fun (last_month_txt, was_future) (p, (d, cal)) ->
          let month_txt = month_txt conf d cal in
          let future = Date.compare_dmy d conf.today = 1 in
          if (not future) && was_future then (
@@ -53,12 +55,12 @@ let print_birth conf base =
          Output.print_sstring conf "</li>";
          (month_txt, future))
        (Adef.safe "", false)
-       list;
+       l;
   Output.print_sstring conf "</ul></li></ul>";
   Hutil.trailer conf
 
 let print_death conf base =
-  let list, len = select_person conf base death_date false in
+  let l, len = select_person_by_date conf base death_date ~ascending:false in
   let title _ =
     Printf.sprintf
       (fcapitale (ftransl conf "the latest %t deaths"))
@@ -67,11 +69,11 @@ let print_death conf base =
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  if list <> [] then (
+  if l <> [] then (
     Output.print_sstring conf "<ul>";
     let _, ages_sum, ages_nb =
       List.fold_left
-        (fun (last_month_txt, ages_sum, ages_nb) (p, d, cal) ->
+        (fun (last_month_txt, ages_sum, ages_nb) (p, (d, cal)) ->
           let month_txt = month_txt conf d cal in
           if month_txt <> last_month_txt then (
             if (last_month_txt :> string) <> "" then
@@ -85,11 +87,11 @@ let print_death conf base =
             | None -> (None, ages_sum, ages_nb)
             | Some d1 ->
                 if sure d1 && sure d && d1 <> d then
-                  let a = Date.time_elapsed d1 d in
+                  let age = Duration.time_elapsed d1 d in
                   let ages_sum =
                     match get_sex p with
-                    | Male -> (fst ages_sum + a.year, snd ages_sum)
-                    | Female -> (fst ages_sum, snd ages_sum + a.year)
+                    | Male -> (Duration.add (fst ages_sum) age, snd ages_sum)
+                    | Female -> (fst ages_sum, Duration.add (snd ages_sum) age)
                     | Neuter -> ages_sum
                   in
                   let ages_nb =
@@ -98,7 +100,7 @@ let print_death conf base =
                     | Female -> (fst ages_nb, snd ages_nb + 1)
                     | Neuter -> ages_nb
                   in
-                  (Some a, ages_sum, ages_nb)
+                  (Some age, ages_sum, ages_nb)
                 else (None, ages_sum, ages_nb)
           in
           Output.print_sstring conf "<li><b>";
@@ -118,11 +120,13 @@ let print_death conf base =
             age;
           Output.print_sstring conf "</li>";
           (month_txt, ages_sum, ages_nb))
-        (Adef.safe "", (0, 0), (0, 0))
-        list
+        ( Adef.safe "",
+          (Duration.of_sdn ~prec:Exact 0, Duration.of_sdn ~prec:Exact 0),
+          (0, 0) )
+        l
     in
     Output.print_sstring conf "</ul></li></ul>";
-    let aux sex nb sum =
+    let aux sex nb age_sum =
       if nb >= 3 then (
         transl conf "average age at death"
         |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -131,7 +135,7 @@ let print_death conf base =
         Output.print_sstring conf ") : ";
         Output.print_string conf
           (DateDisplay.string_of_age conf
-             { day = 0; month = 0; year = sum / nb; delta = 0; prec = Sure });
+             (Duration.of_sdn ~prec:Undefined (age_sum.Duration.sdn / nb)));
         Output.print_sstring conf "<br>")
     in
     aux 0 (fst ages_nb) (fst ages_sum);
@@ -196,7 +200,9 @@ let print_oldest_alive conf base =
     | Death _ | DontKnowIfDead | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
         None
   in
-  let list, len = select_person conf base get_oldest_alive true in
+  let l, len =
+    select_person_by_date conf base get_oldest_alive ~ascending:true
+  in
   let title _ =
     Printf.sprintf
       (fcapitale (ftransl conf "the %d oldest perhaps still alive"))
@@ -207,7 +213,7 @@ let print_oldest_alive conf base =
   Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<ul>\n";
   List.iter
-    (fun (p, d, cal) ->
+    (fun (p, (d, cal)) ->
       Output.print_sstring conf "<li><b>";
       Output.print_string conf (referenced_person_text conf base p);
       Output.print_sstring conf "</b>, ";
@@ -218,27 +224,27 @@ let print_oldest_alive conf base =
         (DateDisplay.string_of_ondate conf (Dgreg (d, cal)));
       Output.print_sstring conf "</em>";
       if get_death p = NotDead && d.prec = Sure then (
-        let a = Date.time_elapsed d conf.today in
+        let a = Duration.time_elapsed d conf.today in
         Output.print_sstring conf " <em>(";
         Output.print_string conf (DateDisplay.string_of_age conf a);
         Output.print_sstring conf ")</em>");
       Output.print_sstring conf ".</li>")
-    list;
+    l;
   Output.print_sstring conf "</ul>";
   Hutil.trailer conf
 
 let print_longest_lived conf base =
-  let get_longest p =
+  let get_age p =
     if Util.authorized_age conf base p then
       match (Date.cdate_to_dmy_opt (get_birth p), get_death p) with
       | Some bd, Death (_, cd) -> (
           match Date.cdate_to_dmy_opt cd with
           | None -> None
-          | Some dd -> Some (Date.Dgreg (Date.time_elapsed bd dd, Dgregorian)))
+          | Some dd -> Some (Duration.time_elapsed bd dd))
       | _ -> None
     else None
   in
-  let list, len = select_person conf base get_longest false in
+  let l, len = select_person_by_duration conf base get_age ~ascending:false in
   let title _ =
     Printf.sprintf (fcapitale (ftransl conf "the %d who lived the longest")) len
     |> Output.print_sstring conf
@@ -247,29 +253,30 @@ let print_longest_lived conf base =
   Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<ul>";
   List.iter
-    (fun (p, d, _) ->
+    (fun (p, age) ->
       Output.print_sstring conf "<li><strong>";
       Output.print_string conf (referenced_person_text conf base p);
       Output.print_sstring conf "</strong>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
+      (* why not use DateDisplay.string_of_age here? *)
       Output.print_sstring conf " (";
-      Output.print_sstring conf (string_of_int d.Date.year);
+      Output.print_sstring conf (string_of_int age.Duration.display.nb_year);
       Output.print_sstring conf " ";
       Output.print_sstring conf (transl conf "years old");
       Output.print_sstring conf ")";
       Output.print_sstring conf ".";
       Output.print_sstring conf "</li>")
-    list;
+    l;
   Output.print_sstring conf "</ul>";
   Hutil.trailer conf
 
-let print_marr_or_eng conf base title list =
+let print_marr_or_eng conf base title l =
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<ul>\n";
   ignore
   @@ List.fold_left
-       (fun (last_month_txt, was_future) (fam, d, cal) ->
+       (fun (last_month_txt, was_future) (fam, (d, cal)) ->
          let month_txt = month_txt conf d cal in
          let future = Date.compare_dmy d conf.today > 0 in
          if (not future) && was_future then (
@@ -314,12 +321,12 @@ let print_marr_or_eng conf base title list =
          Output.print_sstring conf "</li>";
          (month_txt, future))
        (Adef.safe "", false)
-       list;
+       l;
   Output.print_sstring conf "</ul></li></ul>";
   Hutil.trailer conf
 
 let print_marriage conf base =
-  let list, len =
+  let l, len =
     select_family conf base
       (fun fam ->
         let rel = get_relation fam in
@@ -332,10 +339,10 @@ let print_marriage conf base =
     Printf.sprintf (fcapitale (ftransl conf "the latest %d marriages")) len
     |> Output.print_sstring conf
   in
-  print_marr_or_eng conf base title list
+  print_marr_or_eng conf base title l
 
 let print_oldest_engagements conf base =
-  let list, len =
+  let l, len =
     select_family conf base
       (fun fam ->
         if get_relation fam = Engaged then
@@ -355,7 +362,7 @@ let print_oldest_engagements conf base =
       len
     |> Output.print_sstring conf
   in
-  print_marr_or_eng conf base title list
+  print_marr_or_eng conf base title l
 
 let old_print_statistics conf =
   let title _ =
