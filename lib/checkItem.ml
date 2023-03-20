@@ -39,27 +39,19 @@ let strictly_after d1 d2 =
   | Date.Dgreg (d1, _), Date.Dgreg (d2, _) -> strictly_after_dmy d1 d2
   | _ -> false
 
-(* TODO this use prec on a elapsed_time. should elapsed_time have a prec?
-   except maybe in jingoo template this is the only place elapsed_time needs a prec *)
 let strictly_younger age year =
-  (*
-  match age.Date.prec with
-  | After -> false
-  | Sure | About | Maybe | Before | OrYear _ | YearInt _ -> age.year < year
-  *)
-  (* TODO make year a Duration.t *)
-  let age = Duration.to_display age in
-  age.nb_year < year
+  match age.Duration.prec with
+  | More -> false
+  | Less | Exact | Unknown ->
+      (* TODO make year a Duration.t *)
+      age.display.nb_year < year
 
 let strictly_older age year =
-  (*
-  match age.Date.prec with
-  | Before -> false
-  | Sure | About | Maybe | After | OrYear _ | YearInt _ -> age.year > year
-  *)
-  (* TODO make year a Duration.t *)
-  let age = Duration.to_display age in
-  age.nb_year > year
+  match age.Duration.prec with
+  | Less -> false
+  | More | Exact | Unknown ->
+      (* TODO make year a Duration.t *)
+      age.display.nb_year > year
 
 let obirth x = get_birth x |> Date.cdate_to_dmy_opt
 
@@ -87,7 +79,7 @@ let check_person_age warning p =
   let aux d1 d2 =
     Duration.time_elapsed_opt d1 d2
     |> Option.iter @@ fun age ->
-       if Duration.to_sdn age < 0 then warning (Warning.BirthAfterDeath p)
+       if age.Duration.sdn < 0 then warning (Warning.BirthAfterDeath p)
        else if d2.Date.year > lim_date_death then (
          if strictly_older age max_death_after_lim_date_death then
            warning (DeadOld (p, age)))
@@ -370,11 +362,13 @@ let close_siblings warning x np ifam =
           |> Option.iter @@ fun age ->
              (* On vérifie les jumeaux ou naissances proches. *)
              (* TODO change max_month_btw_sibl and max_days_btw_sibl for a duration *)
-             let age = Duration.to_display age in
+             let { Duration.nb_day; nb_month; nb_year } =
+               age.Duration.display
+             in
              if
-               age.nb_year = 0
-               && age.nb_month < max_month_btw_sibl
-               && (age.nb_month <> 0 || age.nb_day >= max_days_btw_sibl)
+               nb_year = 0
+               && nb_month < max_month_btw_sibl
+               && (nb_month <> 0 || nb_day >= max_days_btw_sibl)
              then warning (Warning.CloseChildren (ifam, elder, x)))
 
 let born_after_his_elder_sibling warning x b np ifam des =
@@ -695,8 +689,7 @@ let check_siblings ?(onchange = true) base warning (ifam, fam) callback =
       Duration.time_elapsed_opt d1 d2
       |> Option.iter @@ fun e ->
          (* TODO max_siblings_gap to duration *)
-         let nb_year = (Duration.to_display e).nb_year in
-         if nb_year > max_siblings_gap then
+         if e.Duration.display.nb_year > max_siblings_gap then
            warning (DistantChildren (ifam, p1, p2))
 
 let check_children ?(onchange = true) base warning (ifam, fam) fath moth =

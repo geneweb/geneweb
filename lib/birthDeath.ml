@@ -144,12 +144,11 @@ let make_population_pyramid ~nb_intervals ~interval ~limit ~at_date conf base =
         | None -> ()
         | Some dmy ->
             if Date.compare_dmy dmy at_date <= 0 then
-              let age =
-                Duration.time_elapsed dmy at_date |> Duration.to_display
-              in
-              let j = min nb_intervals (age.nb_year / interval) in
+              let age = Duration.time_elapsed dmy at_date in
+              let j = min nb_intervals (age.display.nb_year / interval) in
               if
-                (dea = NotDead || (dea = DontKnowIfDead && age.nb_year < limit))
+                (dea = NotDead
+                || (dea = DontKnowIfDead && age.display.nb_year < limit))
                 ||
                 match Date.dmy_of_death dea with
                 | None -> false

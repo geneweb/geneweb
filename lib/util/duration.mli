@@ -1,9 +1,9 @@
 type display = { nb_day : int; nb_month : int; nb_year : int }
-type t
+type precision = Less | Exact | More | Unknown
+type t = private { sdn : int; prec : precision; display : display }
 
 val of_sdn : int -> t
 val compare : t -> t -> int
-val to_display : t -> display
 
 val time_elapsed : Date.dmy -> Date.dmy -> t
 (** [time_elapsed start stop]
@@ -23,4 +23,3 @@ val add : t -> t -> t
 
 (* int? *)
 val div : t -> int -> t
-val to_sdn : t -> int

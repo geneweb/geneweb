@@ -256,9 +256,8 @@ let print_longest_lived conf base =
       Output.print_sstring conf "</strong>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       (* why not use DateDisplay.string_of_age here? *)
-      let age = Duration.to_display age in
       Output.print_sstring conf " (";
-      Output.print_sstring conf (string_of_int age.nb_year);
+      Output.print_sstring conf (string_of_int age.Duration.display.nb_year);
       Output.print_sstring conf " ";
       Output.print_sstring conf (transl conf "years old");
       Output.print_sstring conf ")";

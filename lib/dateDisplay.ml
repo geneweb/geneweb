@@ -453,7 +453,7 @@ let string_slash_of_date conf date =
           ^ ")")
 
 let string_of_age conf age =
-  let age = Duration.to_display age in
+  let age = age.Duration.display in
   Adef.safe
   @@
   match age with

@@ -2673,10 +2673,11 @@ and eval_bool_person_field conf base env (p, p_auth) = function
             Some (Dgreg (({ prec = Sure | About | Maybe } as d2), _)),
             _ )
           when d1 <> d2 ->
-            let age = Duration.time_elapsed d1 d2 |> Duration.to_display in
-            age.nb_year > 0
-            || age.nb_year = 0
-               && (age.nb_month > 0 || (age.nb_month = 0 && age.nb_day > 0))
+            let { Duration.nb_day; nb_month; nb_year } =
+              (Duration.time_elapsed d1 d2).display
+            in
+            nb_year > 0
+            || (nb_year = 0 && (nb_month > 0 || (nb_month = 0 && nb_day > 0)))
         | _ -> false
       else false
   | "computable_marriage_age" -> (
@@ -2689,11 +2690,13 @@ and eval_bool_person_field conf base env (p, p_auth) = function
             with
             | ( Some ({ prec = Sure | About | Maybe } as d1),
                 Some ({ prec = Sure | About | Maybe } as d2) ) ->
-                let age = Duration.time_elapsed d1 d2 |> Duration.to_display in
+                let { Duration.nb_day; nb_month; nb_year } =
+                  (Duration.time_elapsed d1 d2).display
+                in
                 (* TODO is this age > 0? *)
-                age.nb_year > 0
-                || age.nb_year = 0
-                   && (age.nb_month > 0 || (age.nb_month = 0 && age.nb_day > 0))
+                nb_year > 0
+                || nb_year = 0
+                   && (nb_month > 0 || (nb_month = 0 && nb_day > 0))
             | _ -> false
           else false
       | _ -> raise Not_found)

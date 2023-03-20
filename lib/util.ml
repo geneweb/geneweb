@@ -538,10 +538,10 @@ let nobtit conf base p =
 
 let strictly_after_private_years conf age =
   (* TODO make private_years a duration ? *)
-  let age = Duration.to_display age in
-  if age.nb_year > conf.private_years then true
-  else if age.nb_year < conf.private_years then false
-  else age.nb_month > 0 || age.nb_day > 0
+  let { Duration.nb_day; nb_month; nb_year } = age.Duration.display in
+  if nb_year > conf.private_years then true
+  else if nb_year < conf.private_years then false
+  else nb_month > 0 || nb_day > 0
 
 let is_old_person conf p =
   match
