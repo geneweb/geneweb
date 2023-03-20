@@ -197,7 +197,6 @@ let print_oldest_alive conf base =
     | Death _ | DontKnowIfDead | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
         None
   in
-  (* TODO this should be in reversed order *)
   let l, len =
     select_person_by_date conf base get_oldest_alive ~ascending:true
   in
