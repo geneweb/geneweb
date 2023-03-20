@@ -19,3 +19,6 @@ val time_elapsed_opt : Date.dmy -> Date.dmy -> t option
     (e.g. time_elapsed_opt /1839 /1859). *)
 
 val add : t -> t -> t
+val of_years : int -> t
+val of_months : int -> t
+val of_days : int -> t

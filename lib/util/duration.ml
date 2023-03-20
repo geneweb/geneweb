@@ -1,5 +1,7 @@
 type display = { nb_day : int; nb_month : int; nb_year : int }
 type precision = Less | Exact | More | Undefined
+
+(* TODO should we consider sdn interval instead? ..... *)
 type t = { sdn : int; prec : precision; display : display }
 
 let compare a b = Int.compare a.sdn b.sdn
@@ -21,6 +23,11 @@ let date_prec_to_duration_prec = function
 let of_sdn ~prec sdn =
   let { Date.day; month; year } = Date.gregorian_of_sdn ~prec:Sure sdn in
   { sdn; prec; display = { nb_day = day; nb_month = month; nb_year = year } }
+
+(* TODO check this *)
+let of_years i = of_sdn ~prec:Exact (365 * i)
+let of_months i = of_sdn ~prec:Exact (30 * i)
+let of_days i = of_sdn ~prec:Exact i
 
 (* I think nb_day depends on the original dates we computed the elapsed_time on ... so we compute displayable_elapsed_time here, so elapsed_time is not juste = sdn
    TODO do we care about this?
