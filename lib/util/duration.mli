@@ -1,8 +1,8 @@
 type display = { nb_day : int; nb_month : int; nb_year : int }
-type precision = Less | Exact | More | Unknown
+type precision = Less | Exact | More | Undefined
 type t = private { sdn : int; prec : precision; display : display }
 
-val of_sdn : int -> t
+val of_sdn : prec:precision -> int -> t
 val compare : t -> t -> int
 
 val time_elapsed : Date.dmy -> Date.dmy -> t
@@ -18,8 +18,4 @@ val time_elapsed_opt : Date.dmy -> Date.dmy -> t option
     if computation is not possible
     (e.g. time_elapsed_opt /1839 /1859). *)
 
-(* just use sdn intead ? *)
 val add : t -> t -> t
-
-(* int? *)
-val div : t -> int -> t

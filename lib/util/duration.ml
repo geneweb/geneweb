@@ -1,7 +1,5 @@
 type display = { nb_day : int; nb_month : int; nb_year : int }
-
-(* TODO do we really neewd a precision on duration..? *)
-type precision = Less | Exact | More | Unknown
+type precision = Less | Exact | More | Undefined
 type t = { sdn : int; prec : precision; display : display }
 
 let compare a b = Int.compare a.sdn b.sdn
@@ -12,26 +10,22 @@ let compute_prec p1 p2 =
   | Exact, Exact -> Exact
   | (Less | Exact), (Less | Exact) -> Less
   | (More | Exact), (More | Exact) -> More
-  | Less, More | More, Less | Unknown, _ | _, Unknown -> Unknown
+  | Less, More | More, Less | Undefined, _ | _, Undefined -> Undefined
 
 let date_prec_to_duration_prec = function
   | Date.Sure -> Exact
   | Before -> Less
   | After -> More
-  | Maybe | About | YearInt _ | OrYear _ -> Unknown
+  | Maybe | About | YearInt _ | OrYear _ -> Undefined
 
-(*
-TODO
-let displayable_time_elapsed dmy1 dmy2 =
-  time_elapsed dmy1 dmy2 |> to_displayable_duration
-  *)
-let of_sdn sdn =
-  (* TODO better display *)
-  { sdn; prec = Exact; display = { nb_day = sdn; nb_month = 0; nb_year = 0 } }
+let of_sdn ~prec sdn =
+  let { Date.day; month; year } = Date.gregorian_of_sdn ~prec:Sure sdn in
+  { sdn; prec; display = { nb_day = day; nb_month = month; nb_year = year } }
 
 (* I think nb_day depends on the original dates we computed the elapsed_time on ... so we compute displayable_elapsed_time here, so elapsed_time is not juste = sdn
    TODO do we care about this?
 *)
+(* TODO check this; maybe just keep old version; maybe it handled unknown date correctly? *)
 let time_elapsed d1 d2 =
   let Date.{ day = j1; month = m1; year = a1 } = d1 in
   let Date.{ day = j2; month = m2; year = a2 } = d2 in
@@ -60,11 +54,4 @@ let time_elapsed_opt d1 d2 =
 let add a b =
   let sdn = a.sdn + b.sdn in
   let prec = compute_prec a.prec b.prec in
-  (* TODO better display *)
-  { sdn; prec; display = { nb_day = sdn; nb_month = 0; nb_year = 0 } }
-
-(* TODO remove? *)
-let div a n =
-  let sdn = a.sdn / n in
-  (* TODO better display *)
-  { sdn; prec = a.prec; display = { nb_day = sdn; nb_month = 0; nb_year = 0 } }
+  of_sdn ~prec sdn

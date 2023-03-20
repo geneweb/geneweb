@@ -42,14 +42,14 @@ let strictly_after d1 d2 =
 let strictly_younger age year =
   match age.Duration.prec with
   | More -> false
-  | Less | Exact | Unknown ->
+  | Less | Exact | Undefined ->
       (* TODO make year a Duration.t *)
       age.display.nb_year < year
 
 let strictly_older age year =
   match age.Duration.prec with
   | Less -> false
-  | More | Exact | Unknown ->
+  | More | Exact | Undefined ->
       (* TODO make year a Duration.t *)
       age.display.nb_year > year
 

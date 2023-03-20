@@ -120,11 +120,13 @@ let print_death conf base =
             age;
           Output.print_sstring conf "</li>";
           (month_txt, ages_sum, ages_nb))
-        (Adef.safe "", (Duration.of_sdn 0, Duration.of_sdn 0), (0, 0))
+        ( Adef.safe "",
+          (Duration.of_sdn ~prec:Exact 0, Duration.of_sdn ~prec:Exact 0),
+          (0, 0) )
         l
     in
     Output.print_sstring conf "</ul></li></ul>";
-    let aux sex nb sum =
+    let aux sex nb age_sum =
       if nb >= 3 then (
         transl conf "average age at death"
         |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -132,7 +134,8 @@ let print_death conf base =
         Output.print_sstring conf (transl_nth conf "M/F" sex);
         Output.print_sstring conf ") : ";
         Output.print_string conf
-          (DateDisplay.string_of_age conf (Duration.div sum nb));
+          (DateDisplay.string_of_age conf
+             (Duration.of_sdn ~prec:Undefined (age_sum.Duration.sdn / nb)));
         Output.print_sstring conf "<br>")
     in
     aux 0 (fst ages_nb) (fst ages_sum);
