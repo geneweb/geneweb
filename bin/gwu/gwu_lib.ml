@@ -744,6 +744,9 @@ let print_empty_family opts base p =
 
 let print_family opts base gen m =
   let fam = m.m_fam in
+  let fath, moth = m.m_fath, m.m_moth in
+  if eq_iper (get_iper fath) dummy_iper || eq_iper (get_iper moth) dummy_iper then ()
+  else begin
   Printf.ksprintf (oc opts) "fam ";
   print_parent opts base gen m.m_fath;
   Printf.ksprintf (oc opts) " +";
@@ -853,7 +856,7 @@ let print_family opts base gen m =
     String.concat " " (List.map (sou base) sl)
   in
   ignore (add_linked_files gen from s [] : _ list)
-
+end
 let get_persons_with_notes m list =
   let list =
     let fath = m.m_fath in
