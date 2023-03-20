@@ -24,7 +24,6 @@ let of_sdn ~prec sdn =
   let { Date.day; month; year } = Date.gregorian_of_sdn ~prec:Sure sdn in
   { sdn; prec; display = { nb_day = day; nb_month = month; nb_year = year } }
 
-(* TODO check this *)
 let of_years i = of_sdn ~prec:Exact (365 * i)
 let of_months i = of_sdn ~prec:Exact (30 * i)
 let of_days i = of_sdn ~prec:Exact i

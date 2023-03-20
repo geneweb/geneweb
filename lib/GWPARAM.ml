@@ -91,19 +91,14 @@ module Default = struct
        && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
     ||
     let death = Gwdb.get_death p in
-    if death = NotDead then conf.private_years < 1
+    if death = NotDead then conf.private_years.sdn < (Duration.of_years 1).sdn
     else
       let check_date d none =
         match d with
         | None -> none ()
         | Some d ->
-            (* TODO private years should be duration *)
-            let { Duration.nb_day; nb_month; nb_year } =
-              (Duration.time_elapsed d conf.today).display
-            in
-            if nb_year > conf.Config.private_years then true
-            else if nb_year < conf.private_years then false
-            else nb_month > 0 || nb_day > 0
+            let age = Duration.time_elapsed d conf.today in
+            age.sdn > conf.Config.private_years.sdn
       in
       check_date (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) @@ fun () ->
       check_date (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt) @@ fun () ->

@@ -537,11 +537,7 @@ let nobtit conf base p =
   Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p
 
 let strictly_after_private_years conf age =
-  (* TODO make private_years a duration ? *)
-  let { Duration.nb_day; nb_month; nb_year } = age.Duration.display in
-  if nb_year > conf.private_years then true
-  else if nb_year < conf.private_years then false
-  else nb_month > 0 || nb_day > 0
+  age.Duration.sdn > conf.private_years.sdn
 
 let is_old_person conf p =
   match
@@ -550,7 +546,7 @@ let is_old_person conf p =
       p.death,
       Date.dmy_of_death p.death )
   with
-  | _, _, NotDead, _ when conf.private_years > 0 -> false
+  | _, _, NotDead, _ when conf.private_years.sdn > 0 -> false
   | Some d, _, _, _ ->
       let a = Duration.time_elapsed d conf.today in
       strictly_after_private_years conf a

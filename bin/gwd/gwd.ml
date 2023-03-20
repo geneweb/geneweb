@@ -1168,8 +1168,9 @@ let make_conf from_addr request script_name env =
          Not_found -> ar.ar_wizard && ar.ar_friend
        end;
      private_years =
-       begin try int_of_string (List.assoc "private_years" base_env) with
-         Not_found | Failure _ -> 150
+       begin match List.assoc_opt "private_years" base_env with
+       | None -> Duration.of_years 150
+       | Some s -> Duration.of_years (int_of_string s)
        end;
      hide_names =
        if ar.ar_wizard || ar.ar_friend then false
