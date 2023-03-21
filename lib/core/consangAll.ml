@@ -36,7 +36,6 @@ let consang_array base =
   (fget, cget, cset, patched)
 
 let compute ?(verbosity = 2) base from_scratch =
-  let () = Gwdb.set_fpoi_cache base false in
   let () = load_ascends_array base in
   let () = load_couples_array base in
   let fget, cget, cset, patched = consang_array base in
@@ -140,5 +139,4 @@ let compute ?(verbosity = 2) base from_scratch =
      flush stderr;
      ());
   if !patched then Gwdb.commit_patches base;
-  let () = Gwdb.set_fpoi_cache base true in
   !patched

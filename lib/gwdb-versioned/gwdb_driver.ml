@@ -916,7 +916,29 @@ module Legacy_driver = struct
       (fun family ->
         { family; base; witness_notes = None })
       coll
+  
+  let wrap_pid clear patch insert delete =
+    let patch b i d = patch b i d; clear i in
+    let insert b i d = insert b i d; clear i in
+    let delete b i = delete b i; clear i in
+    patch, insert, delete
 
+  let wrap_iper_pid p i d = wrap_pid clear_poi p i d
+
+  let wrap_ifam_pid p i d = wrap_pid clear_foi p i d
+
+  let patch_ascend, insert_ascend, delete_ascend =
+    wrap_iper_pid patch_ascend insert_ascend delete_ascend
+
+  let patch_union, insert_union, delete_union =
+    wrap_iper_pid patch_union insert_union delete_union
+
+  let patch_descend, insert_descend, delete_descend =
+    wrap_ifam_pid patch_descend insert_descend delete_descend
+
+  let patch_couple, insert_couple, delete_couple =
+    wrap_ifam_pid patch_couple insert_couple delete_couple
+  
 end
 
 module Driver = Compat.Make (Legacy_driver) (Legacy_driver)
