@@ -22,3 +22,4 @@ val add : t -> t -> t
 val of_years : int -> t
 val of_months : int -> t
 val of_days : int -> t
+val pp_duration_debug : Format.formatter -> t -> unit

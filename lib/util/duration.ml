@@ -10,6 +10,7 @@ let compare a b = Int.compare a.sdn b.sdn
 let compute_prec p1 p2 =
   match (p1, p2) with
   | Exact, Exact -> Exact
+  (* TODO NO Less, Less is undefined *)
   | (Less | Exact), (Less | Exact) -> Less
   | (More | Exact), (More | Exact) -> More
   | Less, More | More, Less | Undefined, _ | _, Undefined -> Undefined
@@ -21,6 +22,7 @@ let date_prec_to_duration_prec = function
   | Maybe | About | YearInt _ | OrYear _ -> Undefined
 
 let of_sdn ~prec sdn =
+  (* TODO no fix display *)
   let { Date.day; month; year } = Date.gregorian_of_sdn ~prec:Sure sdn in
   { sdn; prec; display = { nb_day = day; nb_month = month; nb_year = year } }
 
@@ -61,3 +63,15 @@ let add a b =
   let sdn = a.sdn + b.sdn in
   let prec = compute_prec a.prec b.prec in
   of_sdn ~prec sdn
+
+(* -- TODO put un Def_show ? -- *)
+let prec_to_string = function
+  | Exact -> "Exact"
+  | Less -> "Less"
+  | More -> "More"
+  | Undefined -> "Undefined"
+
+let pp_duration_debug fmt d =
+  Format.fprintf fmt "{sdn: %d;prec: %s;display: {%d; %d; %d}" d.sdn
+    (prec_to_string d.prec) d.display.nb_day d.display.nb_month
+    d.display.nb_year
