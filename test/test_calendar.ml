@@ -1,4 +1,3 @@
-(* TODO move test to Calendars; test case with day|month = 0 *)
 open OUnit2
 
 let data_sure =
@@ -126,17 +125,24 @@ let chronology =
       delta = 0;
       prec = YearInt Date.{ day2 = 13; month2 = 12; year2 = 1986; delta2 = 0 };
     };
-    { day = 0; month = 0; year = 1986; delta = 0; prec = Before };
-    (*
-    { day = 0; month = 0; year = 1986; delta = 0; prec = Sure };
-    { day = 0; month = 0; year = 1986; delta = 0; prec = After };
-    { day = 31; month = 12; year = 1986; delta = 0; prec = Sure };
-    *)
+    { day = 0; month = 0; year = 1902; delta = 0; prec = Before };
+    { day = 0; month = 0; year = 1902; delta = 0; prec = Sure };
+    { day = 0; month = 0; year = 1902; delta = 0; prec = After };
+    { day = 31; month = 12; year = 1902; delta = 0; prec = Sure };
   ]
 
 let duration_between_chronology_items =
   let open Duration in
-  [ of_sdn ~prec:Exact 0; of_sdn ~prec:Exact 2; of_years 1; of_days 1; add (of_years (1986-1901)) (of_days 3) ;(* of_sdn ~prec:More 0 *) ]
+  [
+    of_sdn ~prec:Exact 0;
+    of_sdn ~prec:Exact 2;
+    of_years ~prec:Undefined 1;
+    of_days ~prec:Undefined 1;
+    sub (of_years ~prec:Undefined 1) (of_days 3);
+    of_sdn ~prec:More 0;
+    of_sdn ~prec:More 0;
+    of_sdn ~prec:Less 364;
+  ]
 
 let check_chronology () =
   let shuffle l =
@@ -161,7 +167,7 @@ let check_elapsed_time () =
   let cmp a b =
     (* TODO test prec too *)
     (* Duration should not be compared with '=' because they can have same duration (SDN) but different display ... *)
-    Duration.compare a b = 0
+    Duration.compare a b = 0 && a.prec = b.prec
   in
   let shift_list l =
     (* shift by one *)
@@ -176,9 +182,7 @@ let check_elapsed_time () =
   List.map
     (fun ((a, b), duration) ->
       "elapsed_time - " >:: fun _ ->
-      assert_equal ~printer ~cmp
-        duration
-        (Duration.time_elapsed a b))
+      assert_equal ~printer ~cmp duration (Duration.time_elapsed a b))
     l
 
 let suite =
