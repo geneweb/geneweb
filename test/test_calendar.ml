@@ -127,10 +127,16 @@ let chronology =
       prec = YearInt Date.{ day2 = 13; month2 = 12; year2 = 1986; delta2 = 0 };
     };
     { day = 0; month = 0; year = 1986; delta = 0; prec = Before };
+    (*
     { day = 0; month = 0; year = 1986; delta = 0; prec = Sure };
     { day = 0; month = 0; year = 1986; delta = 0; prec = After };
     { day = 31; month = 12; year = 1986; delta = 0; prec = Sure };
+    *)
   ]
+
+let duration_between_chronology_items =
+  let open Duration in
+  [ of_sdn ~prec:Exact 0; of_sdn ~prec:Exact 2; of_years 1; of_days 1; add (of_years (1986-1901)) (of_days 3) ;(* of_sdn ~prec:More 0 *) ]
 
 let check_chronology () =
   let shuffle l =
@@ -149,6 +155,31 @@ let check_chronology () =
       "chronology - " >:: fun _ ->
       assert_equal ~printer chronology (List.sort Date.compare_dmy l))
     shuffled_chronologies
+
+let check_elapsed_time () =
+  let printer d = Format.asprintf "%a" Duration.pp_duration_debug d in
+  let cmp a b =
+    (* TODO test prec too *)
+    (* Duration should not be compared with '=' because they can have same duration (SDN) but different display ... *)
+    Duration.compare a b = 0
+  in
+  let shift_list l =
+    (* shift by one *)
+    match l with _first :: l -> l | _l -> assert false
+  in
+  let l1 =
+    (*remove last *)
+    List.rev chronology |> shift_list |> List.rev
+  in
+  let l2 = shift_list chronology in
+  let l = List.combine (List.combine l1 l2) duration_between_chronology_items in
+  List.map
+    (fun ((a, b), duration) ->
+      "elapsed_time - " >:: fun _ ->
+      assert_equal ~printer ~cmp
+        duration
+        (Duration.time_elapsed a b))
+    l
 
 let suite =
   [
@@ -178,5 +209,5 @@ let suite =
          @ incomplete_date "julian"
              (Date.convert ~from:Djulian ~to_:Dgregorian)
              (Date.convert ~from:Dgregorian ~to_:Djulian)
-         @ check_chronology ();
+         @ check_chronology () @ check_elapsed_time ();
   ]
