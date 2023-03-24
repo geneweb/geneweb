@@ -10,12 +10,10 @@ let compare a b = Int.compare a.sdn b.sdn
 let compute_prec p1 p2 =
   match (p1, p2) with
   | Exact, Exact -> Exact
-  (* TODO NO Less, Less is undefined *)
   | (Less | Exact), (Less | Exact) -> Less
   | (More | Exact), (More | Exact) -> More
   | Less, More | More, Less | Undefined, _ | _, Undefined -> Undefined
 
-(* TODO FIX/ refacto*)
 (* compute precission of a duration made from 2 durations for SUB *)
 let compute_prec_sub p1 p2 =
   match (p1, p2) with
