@@ -77,13 +77,15 @@ let () = assert (nb_families_1 = nb_families_3)
 let () = Gwdb.close_base base_3
 
 (* -- test abc.ged -- *)
-
 (* test on a base made from a ged import -> gw export -> gw import *)
 let base =
   let base = ged_import (Filename.concat "assets" "abc.ged") in
+  print_endline "abc gw export";
   gw_export base "abc.gw";
+  print_endline "abc gw import";
   gw_import "abc.gw"
 
+let () = print_endline "imported"
 let () = assert (Gwdb.nb_of_persons base = 3)
 
 let get_person fn sn =
@@ -117,13 +119,13 @@ let () =
   let fevents = Gwdb.get_fevents fam in
   let marriage =
     match
-      List.filter (fun event -> event.Def.efam_name = Def.Efam_Marriage) fevents
+      List.filter (fun event -> Gwdb.get_fevent_name event = Def.Efam_Marriage) fevents
     with
     | [] -> failwith "no Efam_Marriage"
     | e :: [] -> e
     | _l -> failwith "duplicate Efam_Marriage"
   in
-  (match Date.cdate_to_dmy_opt marriage.efam_date with
+  (match Date.cdate_to_dmy_opt (Gwdb.get_fevent_date marriage) with
   | None -> failwith "no marriage date"
   | Some dmy ->
       assert (
@@ -132,13 +134,13 @@ let () =
         = 0));
 
   assert (
-    Gwdb.sou base marriage.efam_note = "This is a note on a marriage event");
+    Gwdb.sou base (Gwdb.get_fevent_note marriage) = "This is a note on a marriage event");
   assert (
-    Gwdb.sou base marriage.efam_src = "This is a source on a marriage event");
-  assert (Gwdb.sou base marriage.efam_place = "Lyon");
+    Gwdb.sou base (Gwdb.get_fevent_src marriage) = "This is a source on a marriage event");
+  assert (Gwdb.sou base (Gwdb.get_fevent_place marriage) = "Lyon");
   let witness, witness_kind, wnote =
-    assert (Array.length marriage.efam_witnesses = 1);
-    let w, wk, wnote = marriage.efam_witnesses.(0) in
+    assert (Array.length (Gwdb.get_fevent_witnesses marriage) = 1);
+    let w, wk, wnote = (Gwdb.get_fevent_witnesses_and_notes marriage).(0) in
     (Gwdb.poi base w, wk, Gwdb.sou base wnote)
   in
   assert (Gwdb.sou base (Gwdb.get_first_name witness) = "c");
@@ -152,18 +154,18 @@ let () =
   let diploma =
     match
       List.filter
-        (fun event -> event.Def.epers_name = Def.Epers_Diploma)
+        (fun event -> Gwdb.get_pevent_name event = Def.Epers_Diploma)
         pevents
     with
     | [] -> failwith "no Epers_Diploma"
     | e :: [] -> e
     | _l -> failwith "duplicate Epers_Diploma"
   in
-  assert (Gwdb.sou base diploma.epers_note = "This is a note on a diploma event");
+  assert (Gwdb.sou base (Gwdb.get_pevent_note diploma) = "This is a note on a diploma event");
   assert (
-    Gwdb.sou base diploma.epers_src = "This is a source on a diploma event");
+    Gwdb.sou base (Gwdb.get_pevent_src diploma) = "This is a source on a diploma event");
   let _w, witness_kind, wnote =
-    let witnesses = diploma.epers_witnesses in
+    let witnesses = Gwdb.get_pevent_witnesses_and_notes diploma in
     assert (Array.length witnesses = 1);
     let w, wk, wnote = witnesses.(0) in
     (w, wk, Gwdb.sou base wnote)

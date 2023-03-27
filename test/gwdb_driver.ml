@@ -208,6 +208,35 @@ and string_of_istr = string_of_int
 and sync ?scratch:_ = assert false
 and write_nldb _ = assert false
 
+and get_pevent_name _ = assert false
+and get_pevent_date _ = assert false
+and get_pevent_place _ = assert false
+and get_pevent_reason _ = assert false
+and get_pevent_note _ = assert false
+and get_pevent_src _ = assert false
+and get_pevent_witnesses _ = assert false
+and get_pevent_witness_notes _ = assert false
+and get_pevent_witnesses_and_notes _ = assert false
+and gen_pevent_of_pers_event _ = assert false
+and pers_event_of_gen_pevent _  _ = assert false
+
+and get_fevent_name _ = assert false
+and get_fevent_date _ = assert false
+and get_fevent_place _ = assert false
+and get_fevent_reason _ = assert false
+and get_fevent_note _ = assert false
+and get_fevent_src _ = assert false
+and get_fevent_witnesses _ = assert false
+and get_fevent_witness_notes _ = assert false
+and get_fevent_witnesses_and_notes _ = assert false
+and gen_fevent_of_fam_event _ = assert false
+and fam_event_of_gen_fevent _  _ = assert false
+
+and eq_pevent _ _ = assert false
+and eq_fevent _ _ = assert false
+
+and set_fpoi_cache _ = assert false
+
 let no_couple = Adef.couple dummy_iper dummy_iper
 let eq_iper _ = assert false
 let eq_ifam _ = assert false
