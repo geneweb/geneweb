@@ -938,7 +938,29 @@ module Legacy_driver = struct
 
   let patch_couple, insert_couple, delete_couple =
     wrap_ifam_pid patch_couple insert_couple delete_couple
-  
+
+  let load_clear_array load clear =
+    let load_array base =
+      set_fpoi_cache base false;
+      load base
+    in
+    let clear_array base =
+      clear base;
+      set_fpoi_cache base true
+    in load_array, clear_array
+
+  let load_ascends_array, clear_ascends_array =
+    load_clear_array load_ascends_array clear_ascends_array
+
+  let load_descends_array, clear_descends_array =
+    load_clear_array load_descends_array clear_descends_array
+
+  let load_unions_array, clear_unions_array =
+    load_clear_array load_unions_array clear_unions_array
+
+  let load_couples_array, clear_couples_array =
+    load_clear_array load_couples_array clear_couples_array
+
 end
 
 module Driver = Compat.Make (Legacy_driver) (Legacy_driver)
