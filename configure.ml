@@ -36,12 +36,18 @@ let set_gwdb_versioned () =
   assert (!gwdb = `None);
   gwdb := `Versioned
 
+let set_test_back_end () =
+  assert (!gwdb = `None);
+  gwdb := `Dummy
+    
 let release = ref false
+
 
 let speclist =
   [
     ("--gwdb-versioned", Arg.Unit set_gwdb_versioned, "Use versioned backend");
     ("--gwdb-legacy", Arg.Unit set_gwdb_legacy, " Use legacy backend");
+    ("--gwdb-test", Arg.Unit set_test_back_end, " Use test backend");
     ( "--release",
       Arg.Set release,
       " Use release profile: no debug informations (defaut: "
@@ -96,6 +102,7 @@ let () =
     | `None | `Versioned ->
         (" -D GENEWEB_GWDB_VERSIONED", "geneweb.gwdb-versioned")
     | `Legacy -> (" -D GENEWEB_GWDB_LEGACY", "geneweb.gwdb-legacy")
+    | `Dummy -> (" -D GENEWEB_DUMMY_GWDB", "geneweb.dummy_gwdb")
   in
   let dune_profile = if !release then "release" else "dev" in
   let os_type, os_d, ext, rm, strip =
