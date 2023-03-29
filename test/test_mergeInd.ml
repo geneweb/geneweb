@@ -2,30 +2,32 @@ open Geneweb
 open OUnit2
 open Def
 
-let empty_string = 0
-let quest_string = 1
-let ascend parents = { Gwdb.no_ascend with Def.parents }
-let descend children = { Def.children }
-let union family = { Def.family }
-let couple a b = Adef.couple a b
 
-let person i =
-  { (Mutil.empty_person empty_string quest_string) with occ = i; key_index = i }
-
-let family i = { (Mutil.empty_family empty_string) with fam_index = i }
-let iper (i : int) : Gwdb.iper = Obj.magic i
-
-let test_is_ancestor =
-  let child = person 0 in
-  let father = person 1 in
-  let mother = person 2 in
+let create_base () : Gwdb.base =
+  let open Gnwb_utils in
+  
+  let ichild, ifath, imoth = iper 0, iper 1, iper 2 in
+  let child = person ichild in
+  let father = person ifath in
+  let mother = person imoth in
   let persons = [| child; father; mother |] in
-  let ascends = [| ascend (Some 0); ascend None; ascend None |] in
-  let unions = [| union [||]; union [| 0 |]; union [| 0 |] |] in
-  let families = [| family 0 |] in
-  let couples = [| couple 1 2 |] in
-  let descends = [| descend [| 0 |] |] in
-  let strings = [| ""; "?" |] in
+
+  let ifam0 = ifam 0 in
+  let families = [| family ifam0 |] in
+  let unions = [|
+    union ~families:[||];
+    union ~families:[| ifam0 |];
+    union ~families:[| ifam0 |]
+  |] in
+
+  let ascends = [|
+    ascend ~parents:(Some (ifam 0));
+    ascend ~parents:None;
+    ascend ~parents:None
+  |] in
+  let couples = [| couple ~father:ifath ~mother:imoth |] in
+  let descends = [| descend ~children:[| ichild |] |] in
+  let strings = default_strings () in
   let base_notes =
     { nread = (fun _ _ -> ""); norigin_file = ""; efiles = (fun () -> []) }
   in
@@ -35,7 +37,11 @@ let test_is_ancestor =
       strings,
       base_notes )
   in
-  let base = Gwdb.make "" [] data in
+  Gwdb.make "" [] data
+
+let test_is_ancestor =
+  let open Gnwb_utils.Gwdb_utils in
+  let base = create_base () in
   let child = Gwdb.poi base (iper 0) in
   let father = Gwdb.poi base (iper 1) in
   let mother = Gwdb.poi base (iper 2) in

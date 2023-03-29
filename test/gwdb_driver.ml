@@ -35,8 +35,8 @@ type base = {
   mutable strings : string array;
 }
 
-type family = base * ifam
-type person = base * iper
+type family = base * (iper, ifam, istr) Def.gen_family
+type person = base * (iper, iper, istr) Def.gen_person
 type relation = (iper, istr) Def.gen_relation
 type string_person_index
 type title = istr Def.gen_title
@@ -91,7 +91,7 @@ module Person = struct
     }
 
   let empty_person (base : base) (iper : iper) : person =
-    base, assert false (*create_empty_person empty_string empty_string iper*)
+    base, create_empty_person empty_string empty_string iper
 
   let get_first_name (_, p) = p.first_name
   let get_surname (_, p) = p.surname
@@ -131,7 +131,7 @@ module Person = struct
 
   let get_consang (base, p) = base.ascends.(p.key_index).consang
   let get_family (base, p) = base.unions.(p.key_index).family
-  let get_parents (base, p) = assert false
+  let get_parents (base, p) = base.ascends.(p.key_index).parents
   let get_pevents (_, p) = p.pevents
   let get_psources (_, p) = p.psources
   let get_related (_, p) = p.related
@@ -142,8 +142,8 @@ module Person = struct
   let gen_person_of_person (_, p) = p
   let gen_ascend_of_person (base, p) = base.ascends.(p.key_index)
   let gen_union_of_person (base, p) = base.unions.(p.key_index)
-  let person_of_gen_person base p = base, p
-  let poi base iper = base.persons.(iper)
+  let person_of_gen_person base (p, a, u) = base, p
+  let poi base iper = base, base.persons.(iper)
 
   let no_person ip = create_empty_person empty_string empty_string ip
 
@@ -184,7 +184,7 @@ module Family = struct
  let get_origin_file (_, f) = f.origin_file
  let get_fsources (_, f) = f.fsources
  let get_ifam (_, f) = f.fam_index
- let get_children (base, f) = base.descends.(f.fam_index)
+ let get_children (base, f) = base.descends.(f.fam_index).children
  let get_father (base, f) = base.couples.(f.fam_index) |> Adef.father
  let get_mother (base, f) = base.couples.(f.fam_index) |> Adef.mother
  let get_parent_array (base, f) = base.couples.(f.fam_index) |> Adef.parent_array
@@ -193,8 +193,8 @@ module Family = struct
  let gen_couple_of_family (base, f) = base.couples.(f.fam_index)
  let gen_descend_of_family (base, f) = base.descends.(f.fam_index)
  let gen_family_of_family (_, f) = f
- let family_of_gen_family base f = base, f
- let foi base ifam = base.families.(ifam)
+ let family_of_gen_family base (f, c, d) = base, f
+ let foi base ifam = base, base.families.(ifam)
  let no_family ifam = create_empty_family empty_string ifam
 end
 
@@ -282,10 +282,11 @@ let insert_string base s =
   let len = Array.length base.strings in
   let a = Array.init (len + 1) (fun i -> base.strings.(i)) in
   a.(len) <- s;
-  base.strings <- a
+  base.strings <- a;
+  len
 
 let commit_patches _base = ()
-let commit_notes _base = ()
+let commit_notes _base _ _ = ()
 
 let new_iper base =
   Array.length base.persons
@@ -325,7 +326,7 @@ let delete_family base ifam =
   let delf = Family.create_empty_family empty_string dummy_ifam in
   patch_family base ifam delf
 
-let delete_ascend base ip asc =
+let delete_ascend base ip =
   patch_ascend base ip { parents = None; consang = Adef.no_consang }
 
 let delete_union base ip =
@@ -342,9 +343,9 @@ let person_of_key base fn sn occ = assert false
 
 let persons_of_name base name = assert false
 
-let persons_of_first_name base fn = assert false
+let persons_of_first_name base = assert false
 
-let persons_of_surname base sn = assert false
+let persons_of_surname base = assert false
 
 let spi_first spi str = assert false
 
@@ -378,9 +379,11 @@ let clear_families_array base = assert false
 let read_nldb _ = assert false
 let write_nldb _ = assert false
 
-let make = assert false
-let sync = assert false
-let gc _ = assert false
+let make _bname _particles ((persons, ascends, unions), (families, couples, descends), strings, _notes) =
+  { persons; ascends; unions; families; couples; descends; strings }
+  
+let sync ?scratch ~save_mem _base = assert false
+let gc ?dry_run ~save_mem base = assert false
 let set_fpoi_cache base = assert false
 
 module Collection = struct
@@ -454,194 +457,18 @@ module Marker = struct
   let set ({ set; _ } : _ t) k = set k
 end
 
-let dummy_marker = assert false
-let ifam_marker = assert false
-let iper_marker = assert false
-let families = assert false
-let persons = assert false
-let dummy_collection = assert false
-let ifams = assert false
-let ipers = assert false
-let date_of_last_change = assert false
-let base_wiznotes_dir = assert false
-let base_notes_dir = assert false
-let base_notes_origin_file = assert false
-let base_notes_are_empty = assert false
-let base_notes_read_first_line = assert false
-let base_notes_read = assert false
-(*
-let rec base_notes_are_empty _ = assert false
-and base_notes_dir _ = assert false
-and base_notes_origin_file _ = assert false
-and base_notes_read _ = assert false
-and base_notes_read_first_line _ = assert false
-and base_particles _ = assert false
-and base_strings_of_first_name _ = assert false
-and base_strings_of_surname _ = assert false
-and base_visible_get _ = assert false
-and base_visible_write _ = assert false
-and base_wiznotes_dir _ = assert false
-and bname _ = assert false
-and clear_ascends_array _ = ()
-and clear_couples_array _ = ()
-and clear_descends_array _ = ()
-and clear_families_array _ = ()
-and clear_persons_array _ = ()
-and clear_strings_array _ = ()
-and clear_unions_array _ = ()
-and close_base _ = assert false
-and commit_notes _ = assert false
-and commit_patches _ = assert false
-and date_of_last_change _ = assert false
-and delete_ascend _ = assert false
-and delete_couple _ = assert false
-and delete_descend _ = assert false
-and delete_family _ = assert false
-and delete_person _ = assert false
-and delete_union _ = assert false
-and dummy_collection _ = assert false
-
-and dummy_marker _ = assert false
-and empty_family _ = assert false
-and empty_person _ = assert false
-and empty_string = 0
-and eq_istr = ( = )
-and families ?select:_ _ = assert false
-and family_of_gen_family _ = assert false
-and foi base i = (base, i)
-and gen_ascend_of_person _ = assert false
-and gen_couple_of_family _ = assert false
-and gen_descend_of_family _ = assert false
-and gen_family_of_family _ = assert false
-and gen_person_of_person _ = assert false
-and gen_union_of_person _ = assert false
-and get_access _ = assert false
-and get_aliases _ = assert false
-and get_baptism _ = assert false
-and get_baptism_note _ = assert false
-and get_baptism_place _ = assert false
-and get_baptism_src _ = assert false
-and get_birth _ = assert false
-and get_birth_note _ = assert false
-and get_birth_place _ = assert false
-and get_birth_src _ = assert false
-and get_burial _ = assert false
-and get_burial_note _ = assert false
-and get_burial_place _ = assert false
-and get_burial_src _ = assert false
-and get_children _ = assert false
-and get_comment _ = assert false
-and get_consang _ = assert false
-and get_death _ = assert false
-and get_death_note _ = assert false
-and get_death_place _ = assert false
-and get_death_src _ = assert false
-and get_divorce _ = assert false
-and get_family (base, i) = (Array.get base.unions i).family
-and get_father (base, i) = Adef.father (Array.get base.couples i)
-and get_fevents _ = assert false
-and get_first_name _ = assert false
-and get_first_names_aliases _ = assert false
-and get_fsources _ = assert false
-and get_ifam (_base, i) = i
-and get_image _ = assert false
-and get_iper (_base, i) = i
-and get_marriage _ = assert false
-and get_marriage_note _ = assert false
-and get_marriage_place _ = assert false
-and get_marriage_src _ = assert false
-and get_mother (base, i) = Adef.mother (Array.get base.couples i)
-and get_notes _ = assert false
-and get_occ _ = assert false
-and get_occupation _ = assert false
-and get_origin_file _ = assert false
-and get_parent_array _ = assert false
-and get_parents (base, i) = (Array.get base.ascends i).parents
-and get_pevents _ = assert false
-and get_psources _ = assert false
-and get_public_name _ = assert false
-and get_qualifiers _ = assert false
-and get_related _ = assert false
-and get_relation _ = assert false
-and get_rparents _ = assert false
-and get_sex _ = assert false
-and get_surname _ = assert false
-and get_surnames_aliases _ = assert false
-and get_titles _ = assert false
-and get_witnesses _ = assert false
-and ifam_exists _ = assert false
-and ifam_marker _ = assert false
-
-and ifams ?select:_ _ = assert false
-and insert_ascend _ = assert false
-and insert_couple _ = assert false
-and insert_descend _ = assert false
-and insert_family _ = assert false
-and insert_person _ = assert false
-and insert_string _ = assert false
-and insert_union _ = assert false
-and iper_exists _ = assert false
-and iper_marker _ = assert false
-
-and ipers _ = assert false
-and is_empty_string i = eq_istr empty_string i
-and is_quest_string i = eq_istr quest_string i
-
-and load_ascends_array _ = ()
-and load_couples_array _ = ()
-and load_descends_array _ = ()
-and load_families_array _ = ()
-and load_persons_array _ = ()
-and load_strings_array _ = ()
-and load_unions_array _ = ()
-
-and make _ _
-    ((persons, ascends, unions), (families, couples, descends), strings, _) =
-  { persons; ascends; unions; families; couples; descends; strings }
-
-and nb_of_families _ = assert false
-and nb_of_persons _ = assert false
-and nb_of_real_persons _ = assert false
-and new_ifam _ = assert false
-and new_iper _ = assert false
-and no_ascend = { Def.parents = None; consang = Adef.no_consang }
-and no_descend = { Def.children = [||] }
-and no_family ifam = { (Mutil.empty_family empty_string) with fam_index = ifam }
-
-and no_person ip =
-  { (Mutil.empty_person empty_string quest_string) with key_index = ip }
-
-and no_union = { Def.family = [||] }
-
-and patch_ascend _ = assert false
-and patch_couple _ = assert false
-and patch_descend _ = assert false
-and patch_family _ = assert false
-and patch_person _ = assert false
-and patch_union _ = assert false
-and person_of_gen_person _ = assert false
-and person_of_key _ = assert false
-and persons _ = assert false
-and persons_of_first_name _ = assert false
-and persons_of_name _ = assert false
-and persons_of_surname _ = assert false
-and poi base i = (base, i)
-and quest_string = 1
-and read_nldb _ = assert false
-and sou _ = assert false
-and spi_find _ = assert false
-and spi_first _ = assert false
-and spi_next _ = assert false
-
-and sync ?scratch:_ = assert false
-and write_nldb _ = assert false
-
-
-
-and set_fpoi_cache _ = assert false
-
-let no_couple = Adef.couple dummy_iper dummy_iper
-let eq_iper _ = assert false
-let eq_ifam _ = assert false
-let gc ?dry_run:_ ~save_mem:_ _ = assert false
-*)
+let dummy_marker base = assert false
+let ifam_marker _ = assert false
+let iper_marker _ = assert false
+let families ?select _ = assert false
+let persons _ = assert false
+let dummy_collection _ = assert false
+let ifams ?select _ = assert false
+let ipers _ = assert false
+let date_of_last_change _ = assert false
+let base_wiznotes_dir _ = assert false
+let base_notes_dir _ = assert false
+let base_notes_origin_file _ = assert false
+let base_notes_are_empty _ = assert false
+let base_notes_read_first_line _ = assert false
+let base_notes_read _ = assert false
