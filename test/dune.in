@@ -1,3 +1,11 @@
+(library
+  (name dummy_gwdb)
+  (public_name geneweb.dummy_gwdb)
+  (libraries geneweb.def geneweb.util stdlib-shims)
+  (implements geneweb.gwdb_driver)
+  (modules gwdb_driver)
+)
+
 (test
   (name test)
   (modules test sosa_test place_test date_test wiki_test merge_test util_test ports_test)

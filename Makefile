@@ -74,6 +74,7 @@ GENERATED_FILES_DEP = \
 	lib/system_util/dune \
 	lib/gwdb-legacy/dune \
 	lib/gwdb-versioned/dune \
+	test/dune \
 	benchmark/dune \
 	bin/connex/dune \
 	bin/consang/dune \
@@ -89,7 +90,7 @@ GENERATED_FILES_DEP = \
 	bin/gwu/dune \
 	bin/setup/dune \
 	bin/update_nldb/dune \
-	test/dune \
+
 
 generated: $(GENERATED_FILES_DEP)
 
@@ -195,6 +196,7 @@ opendoc: doc
 
 test: ## Run tests
 test: | $(GENERATED_FILES_DEP)
+	ocaml ./configure.ml --release
 	dune build @runtest
 .PHONY: test
 
@@ -229,7 +231,7 @@ clean:
 
 ci: ## Run tests, skip known failures
 ci:
-	@ocaml ./configure.ml && $(MAKE) -s clean build && GENEWEB_CI=on dune runtest
+	@ocaml ./configure.ml --gwdb-test --release && $(MAKE) -s clean build && GENEWEB_CI=on dune runtest
 
 .PHONY: ci
 
