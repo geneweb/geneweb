@@ -718,6 +718,8 @@ module Legacy_driver = struct
         (families, couples, descends),
         string_arrays,
         base_notes ) =
+    let fpoi_cache = !cache_foi_poi in
+    set_fpoi_cache () false;
     PatchPer.empty ();
     PatchFam.empty ();
     let persons =
@@ -752,6 +754,8 @@ module Legacy_driver = struct
     PatchFam.sync build_from_scratch_fevents base;
     PatchPer.move_data_file base;
     PatchFam.move_data_file base;
+
+    set_fpoi_cache () fpoi_cache;
     base
 
   let open_base = open_base
@@ -759,7 +763,9 @@ module Legacy_driver = struct
   let close_base base =
     close_base base;
     PatchPer.close_data_file ();
-    PatchFam.close_data_file ()
+    PatchFam.close_data_file ();
+    reset_poi_ht ();
+    reset_foi_ht ()
 
   let empty_person base iper =
     let p = empty_person base iper in
