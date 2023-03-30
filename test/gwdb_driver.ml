@@ -238,7 +238,7 @@ include Person
 include FamEvent
 include Family
 
-let open_base _ = assert false
+let open_base _ = print_endline "open"; assert false
 
 let close_base _ = assert false
 
@@ -338,46 +338,6 @@ let delete_descend base ifam =
 let delete_couple base ifam =
   patch_couple base ifam (Adef.couple dummy_iper dummy_iper)
 
-(* TODO : implement *)
-let person_of_key base fn sn occ = assert false
-
-let persons_of_name base name = assert false
-
-let persons_of_first_name base = assert false
-
-let persons_of_surname base = assert false
-
-let spi_first spi str = assert false
-
-let spi_next spi istr = assert false
-
-let spi_find spi istr = assert false
-
-let base_visible_get bsae pf iper = assert false
-
-let base_visible_write base = assert false
-let base_particles base=assert false
-let base_strings_of_first_name base str = assert false
-let base_strings_of_surname base str = assert false
-
-let load_ascends_array base = assert false
-let load_unions_array base = assert false
-let load_couples_array base = assert false
-let load_descends_array base = assert false
-let load_strings_array base = assert false
-let load_persons_array base = assert false
-let load_families_array base = assert false
-
-let clear_ascends_array base = assert false
-let clear_unions_array base = assert false
-let clear_couples_array base = assert false
-let clear_descends_array base = assert false
-let clear_strings_array base = assert false
-let clear_persons_array base = assert false
-let clear_families_array base = assert false
-
-let read_nldb _ = assert false
-let write_nldb _ = assert false
 
 let make _bname _particles ((persons, ascends, unions), (families, couples, descends), strings, _notes) =
   { persons; ascends; unions; families; couples; descends; strings }
@@ -457,6 +417,44 @@ module Marker = struct
   let set ({ set; _ } : _ t) k = set k
 end
 
+(* TODO : implement *)
+let person_of_key base fn sn occ = assert false
+
+let persons_of_name base name = assert false
+
+let persons_of_first_name base = assert false
+
+let persons_of_surname base = assert false
+
+let spi_first spi str = assert false
+
+let spi_next spi istr = assert false
+
+let spi_find spi istr = assert false
+
+let base_visible_get bsae pf iper = assert false
+
+let base_visible_write base = assert false
+let base_particles base=assert false
+let base_strings_of_first_name base str = assert false
+let base_strings_of_surname base str = assert false
+
+let load_ascends_array base = assert false
+let load_unions_array base = assert false
+let load_couples_array base = assert false
+let load_descends_array base = assert false
+let load_strings_array base = assert false
+let load_persons_array base = assert false
+let load_families_array base = assert false
+
+let clear_ascends_array base = assert false
+let clear_unions_array base = assert false
+let clear_couples_array base = assert false
+let clear_descends_array base = assert false
+let clear_strings_array base = assert false
+let clear_persons_array base = assert false
+let clear_families_array base = assert false
+
 let dummy_marker base = assert false
 let ifam_marker _ = assert false
 let iper_marker _ = assert false
@@ -469,6 +467,8 @@ let date_of_last_change _ = assert false
 let base_wiznotes_dir _ = assert false
 let base_notes_dir _ = assert false
 let base_notes_origin_file _ = assert false
-let base_notes_are_empty _ = assert false
-let base_notes_read_first_line _ = assert false
+let base_notes_are_empty _ _ = true (* TODO : change later     *)
+let base_notes_read_first_line _ = assert false 
 let base_notes_read _ = assert false
+let read_nldb _ = []
+let write_nldb _ = assert false

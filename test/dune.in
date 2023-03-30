@@ -17,8 +17,8 @@
     test_place
     test_sosa
     test_utils
-    test_utils
     test_wiki
+    test_page
     test_fiche
     gnwb_utils
     )

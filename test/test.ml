@@ -8,6 +8,7 @@ let _ =
     Test_place.suite;
     Test_sosa.suite;
     Test_utils.suite;
-    Test_wiki.suite
-  ])
+    Test_wiki.suite;
+  ]);
+  Test_fiche.run ()
 
