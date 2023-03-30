@@ -47,6 +47,23 @@ val w_person :
 (* Used internally by [gwd]. Not intended to be used by other programs. *)
 val treat_request : Config.config -> unit
 
+(* Used internally for testing purposes only. Not intended to be used by other programs. *)
+val mode_handler :
+  w_wizard:((Geneweb.Config.config -> string option -> unit) ->
+   Geneweb.Config.config -> string option -> unit) ->
+  w_person:((Geneweb.Config.config -> Gwdb.base -> Gwdb.person -> unit) ->
+   Geneweb.Config.config -> Gwdb.base -> unit) ->
+  w_base:((Geneweb.Config.config -> Gwdb.base -> unit) ->
+   Geneweb.Config.config -> string option -> unit) ->
+  w_lock:((Geneweb.Config.config -> string option -> unit) ->
+   Geneweb.Config.config -> string option -> unit) ->
+  incorrect_request:(Geneweb.Config.config -> unit) ->
+  conf:Geneweb.Config.config ->
+  bfile:string option ->
+  m:string ->
+  unit
+
+
 (**/**)
 
 (**/**)
