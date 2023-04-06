@@ -235,7 +235,7 @@ let rec reconstitute_pevents conf ext cnt =
                 in
                 match p_getenv conf.env var_note with
                 | Some wnote ->
-                  (*print_endline ("NOTE:" ^ wnote);*)
+                    (*print_endline ("NOTE:" ^ wnote);*)
                     wnote
                 | _ -> ""
               in
@@ -820,9 +820,10 @@ let pwitnesses_of pevents =
     [] pevents
 
 let pwitnesses_of_pers_events pevents =
-  List.fold_left (fun l e ->
-      Array.fold_left (fun l (ip, _) -> ip :: l) l (get_pevent_witnesses e)
-    ) [] pevents
+  List.fold_left
+    (fun l e ->
+      Array.fold_left (fun l (ip, _) -> ip :: l) l (get_pevent_witnesses e))
+    [] pevents
 
 (* sp.death *)
 let effective_mod ?prerr ?skip_conflict conf base sp =
@@ -921,7 +922,9 @@ let update_relations_of_related base ip old_related =
         let old_witnesses = Array.to_list (get_witnesses fam) in
         let new_witnesses = List.filter (( <> ) ip) old_witnesses in
         let fevents, fevents_are_different =
-          let fam_events = get_fevents fam |> List.map gen_fevent_of_fam_event in
+          let fam_events =
+            get_fevents fam |> List.map gen_fevent_of_fam_event
+          in
           List.fold_right
             (fun e (list, rad) ->
               let witnesses, rad =
@@ -1066,7 +1069,7 @@ let all_checks_person base p a u =
       | ChangedOrderOfChildren (ifam, _, _, after) ->
           patch_descend base ifam { children = after }
       | ChangedOrderOfPersonEvents (_, _, after) ->
-        patch_person base p.key_index { p with pevents = after }
+          patch_person base p.key_index { p with pevents = after }
       | _ -> ())
     wl;
   wl

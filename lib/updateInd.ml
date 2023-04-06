@@ -128,7 +128,9 @@ and eval_simple_var conf base env p = function
               | Some d -> DateDisplay.string_of_date conf d
               | None -> Adef.safe ""
             in
-            let place = Util.string_of_place conf (sou base (get_pevent_place e)) in
+            let place =
+              Util.string_of_place conf (sou base (get_pevent_place e))
+            in
             ([ name; date; (place :> Adef.safe_string) ]
               : Adef.safe_string list
               :> string list)

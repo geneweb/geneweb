@@ -331,14 +331,14 @@ val digest : string -> string
     Returns the (128 bits long, using MD5 algorithm) digest of [s].
   *)
 
-val empty_person : 'string -> 'string -> (unit, _, 'string) Def.gen_person
+val empty_person : 'string -> 'string -> (unit, 'a, 'string) Def.gen_person
 (** [empty_person empty quest] returns a Def.gen_person with
     [first_name] and [surname] initialized to [quest],
     other 'string field initialized to [empty], and
     only empty arrays/lists.
 *)
 
-val empty_family : 'string -> (_, unit, 'string) Def.gen_family
+val empty_family : 'string -> ('a, unit, 'string) Def.gen_family
 (** [empty_family empty] returns a Def.gen_person with string field initialized
     initialized with [empty] and only empty arrays/lists.
 *)

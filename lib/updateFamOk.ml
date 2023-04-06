@@ -205,7 +205,7 @@ let rec reconstitute_events conf ext cnt =
                 in
                 match p_getenv conf.env var_note with
                 | Some wnote ->
-                  (* print_endline ("NOTE:" ^ wnote); *)
+                    (* print_endline ("NOTE:" ^ wnote); *)
                     wnote
                 | _ -> ""
               in
@@ -702,9 +702,10 @@ let fwitnesses_of fevents =
     [] fevents
 
 let fwitnesses_of_fam_event fam_events =
-  List.fold_left (fun l fevent ->
-      Array.fold_left (fun l (ip, _) -> ip :: l) l (get_fevent_witnesses fevent)
-    ) [] fam_events
+  List.fold_left
+    (fun l fevent ->
+      Array.fold_left (fun l (ip, _) -> ip :: l) l (get_fevent_witnesses fevent))
+    [] fam_events
 
 (* Lorsqu'on ajout naissance décès par exemple en créant une personne. *)
 let patch_person_with_pevents base ip =
@@ -953,7 +954,10 @@ let effective_mod conf base nsck sfam scpl sdes =
         patch_ascend base ip (find_asc ip))
     ndes.children;
   let ol =
-    Array.fold_right (fun x acc -> x :: acc) owitnesses (fwitnesses_of_fam_event ofevents)
+    Array.fold_right
+      (fun x acc -> x :: acc)
+      owitnesses
+      (fwitnesses_of_fam_event ofevents)
   in
   let nl =
     Array.fold_right
@@ -1527,7 +1531,7 @@ let print_change_event_order conf base =
         List.iter
           (function
             | ChangedOrderOfFamilyEvents (ifam, _, after) ->
-              patch_family base ifam { fam with fevents = after }
+                patch_family base ifam { fam with fevents = after }
             | _ -> ())
           !wl;
         List.rev !wl
