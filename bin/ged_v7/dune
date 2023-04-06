@@ -1,0 +1,7 @@
+(executable
+ (name ged_v7)
+ (public_name geneweb.ged_v7)
+ (modules ged_v7)
+ (libraries ged_v7 geneweb.gwdb-versioned geneweb_sosa_zarith geneweb))
+
+; TODO make a dune.in

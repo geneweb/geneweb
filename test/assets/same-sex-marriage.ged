@@ -1,0 +1,15 @@
+﻿0 HEAD
+1 GEDC
+2 VERS 7.0
+0 @I1@ INDI
+1 NAME John /Doe/
+1 SEX M
+1 FAMS @F1@
+0 @I2@ INDI
+1 NAME Richard /Roe/
+1 SEX M
+1 FAMS @F1@
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+0 TRLR

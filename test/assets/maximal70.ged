@@ -1,0 +1,850 @@
+﻿0 HEAD
+1 GEDC
+2 VERS 7.0
+1 SCHMA
+2 TAG _SKYPEID http://xmlns.com/foaf/0.1/skypeID
+2 TAG _JABBERID http://xmlns.com/foaf/0.1/jabberID
+1 SOUR https://gedcom.io/
+2 VERS 0.4
+2 NAME GEDCOM Steering Committee
+2 CORP FamilySearch
+3 ADDR Family History Department, 15 East South Temple Street, Salt Lake City, UT 84150 USA
+4 ADR1 Family History Department
+4 ADR2 15 East South Temple Street
+4 ADR3 Salt Lake City, UT 84150 USA
+4 CITY Salt Lake City
+4 STAE UT
+4 POST 84150
+4 CTRY USA
+3 PHON +1 (555) 555-1212
+3 PHON +1 (555) 555-1234
+3 EMAIL GEDCOM@FamilySearch.org
+3 EMAIL GEDCOM@example.com
+3 FAX +1 (555) 555-1212
+3 FAX +1 (555) 555-1234
+3 WWW http://gedcom.io
+3 WWW http://gedcom.info
+2 DATA HEAD-SOUR-DATA
+3 DATE 1 NOV 2022
+4 TIME 8:38
+3 COPR copyright statement
+1 DEST https://gedcom.io/
+1 DATE 10 JUN 2022
+2 TIME 15:43:20.48Z
+1 SUBM @U1@
+1 COPR another copyright statement
+1 LANG en-US
+1 PLAC
+2 FORM City, County, State, Country
+1 NOTE American English
+2 MIME text/plain
+2 LANG en-GB
+2 TRAN British English
+2 SOUR @S1@
+3 PAGE 1
+2 SOUR @S1@
+3 PAGE 2
+0 @F1@ FAM
+1 RESN CONFIDENTIAL, LOCKED
+1 NCHI 2
+2 TYPE Type of children
+2 HUSB
+3 AGE 25y
+4 PHRASE Adult
+2 WIFE
+3 AGE 25y
+4 PHRASE Adult
+1 RESI Residence
+2 TYPE Type of residence
+2 HUSB
+3 AGE 25y
+4 PHRASE Adult
+2 WIFE
+3 AGE 25y
+4 PHRASE Adult
+1 FACT Fact
+2 TYPE Type of fact
+2 HUSB
+3 AGE 25y
+4 PHRASE Adult
+2 WIFE
+3 AGE 25y
+4 PHRASE Adult
+1 ANUL Y
+1 CENS Y
+1 DIV Y
+1 DIVF Y
+1 ENGA Y
+1 MARB Y
+1 MARC Y
+1 MARL Y
+1 MARS Y
+1 MARR Y
+2 HUSB
+3 AGE 25y
+4 PHRASE Adult
+2 WIFE
+3 AGE 25y
+4 PHRASE Adult
+2 DATE 27 MAR 2022
+3 TIME 16:02
+3 PHRASE Afternoon
+2 PLAC Place
+2 ADDR Address
+2 PHON +1 (555) 555-1212
+2 PHON +1 (555) 555-1234
+2 EMAIL GEDCOM@FamilySearch.org
+2 EMAIL GEDCOM@example.com
+2 FAX +1 (555) 555-1212
+2 FAX +1 (555) 555-1234
+2 WWW http://gedcom.io
+2 WWW http://gedcom.info
+2 AGNC Agency
+2 RELI Religion
+2 CAUS Cause
+2 RESN CONFIDENTIAL, LOCKED
+2 SDATE 27 MAR 2022
+3 TIME 16:03
+3 PHRASE Afternoon
+2 ASSO @VOID@
+3 ROLE OFFICIATOR
+2 ASSO @VOID@
+3 ROLE WITN
+3 NOTE Note text
+2 SNOTE @N1@
+2 SOUR @S1@
+3 PAGE 1
+2 SOUR @S1@
+3 PAGE 2
+2 OBJE @O1@
+2 OBJE @O2@
+2 UID bbcc0025-34cb-4542-8cfb-45ba201c9c2c
+2 UID 9ead4205-5bad-4c05-91c1-0aecd3f5127d
+1 EVEN Event
+2 TYPE Event type
+1 NO DIV
+2 DATE FROM 1700 TO 1800
+3 PHRASE No date phrase
+2 NOTE Note text
+2 SNOTE @N2@
+2 SOUR @S1@
+3 PAGE 1
+2 SOUR @S1@
+3 PAGE 2
+1 NO ANUL
+1 HUSB @I1@
+2 PHRASE Husband phrase
+1 WIFE @I2@
+2 PHRASE Wife phrase
+1 CHIL @I4@
+2 PHRASE First child
+1 CHIL @VOID@
+2 PHRASE Second child
+1 ASSO @I3@
+2 PHRASE Association text
+2 ROLE OTHER
+3 PHRASE Role text
+2 NOTE Note text
+2 SNOTE @N1@
+2 SOUR @S1@
+3 PAGE 1
+2 SOUR @S2@
+3 PAGE 2
+1 ASSO @VOID@
+2 ROLE CLERGY
+1 SUBM @U1@
+1 SUBM @U2@
+1 SUBM @VOID@
+1 SLGS
+2 DATE 27 MAR 2022
+3 TIME 15:47
+3 PHRASE Afternoon
+2 TEMP LOGAN
+2 PLAC Place
+2 STAT COMPLETED
+3 DATE 27 MAR 2022
+4 TIME 15:48
+2 NOTE Note text
+2 SNOTE @N1@
+2 SOUR @S1@
+3 PAGE 1
+2 SOUR @S2@
+3 PAGE 2
+1 SLGS
+2 DATE 27 MAR 2022
+2 STAT CANCELED
+3 DATE 27 MAR 2022
+1 SLGS
+2 DATE 27 MAR 2022
+2 STAT EXCLUDED
+3 DATE 27 MAR 2022
+1 SLGS
+2 DATE 27 MAR 2022
+2 STAT DNS
+3 DATE 27 MAR 2022
+1 SLGS
+2 DATE 27 MAR 2022
+2 STAT DNS_CAN
+3 DATE 27 MAR 2022
+1 SLGS
+2 DATE 27 MAR 2022
+2 STAT PRE_1970
+3 DATE 27 MAR 2022
+1 SLGS
+2 DATE 27 MAR 2022
+2 STAT UNCLEARED
+3 DATE 27 MAR 2022
+1 REFN 1
+2 TYPE User-generated identifier
+1 REFN 10
+2 TYPE User-generated identifier
+1 UID f096b664-5e40-40e2-bb72-c1664a46fe45
+1 UID 1f76f868-8a36-449c-af0d-a29247b3ab50
+1 EXID 123
+2 TYPE http://example.com
+1 EXID 456
+2 TYPE http://example.com
+1 NOTE Note text
+1 SNOTE @N1@
+1 SOUR @S1@
+2 PAGE 1
+2 QUAY 1
+1 SOUR @S2@
+2 PAGE 2
+2 QUAY 2
+1 OBJE @O1@
+1 OBJE @O2@
+1 OBJE @VOID@
+2 TITL Title
+1 CHAN
+2 DATE 27 MAR 2022
+3 TIME 08:56
+2 NOTE Change date note 1
+2 NOTE Change date note 2
+1 CREA
+2 DATE 27 MAR 2022
+3 TIME 08:55
+0 @F2@ FAM
+1 MARR
+2 DATE 1998
+1 CHIL @I1@
+0 @I1@ INDI
+1 RESN CONFIDENTIAL, LOCKED
+1 NAME Lt. Cmndr. Joseph "John" /de Allen/ jr.
+2 TYPE OTHER
+3 PHRASE Name type phrase
+2 NPFX Lt. Cmndr.
+2 GIVN Joseph
+2 NICK John
+2 SPFX de
+2 SURN Allen
+2 NSFX jr.
+2 TRAN npfx John /spfx Doe/ nsfx
+3 LANG en-GB
+3 NPFX npfx
+3 GIVN John
+3 NICK John
+3 SPFX spfx
+3 SURN Doe
+3 NSFX nsfx
+2 TRAN John /Doe/
+3 LANG en-CA
+2 NOTE Note text
+2 SNOTE @N1@
+2 SNOTE @VOID@
+2 SOUR @S1@
+3 PAGE 1
+2 SOUR @S2@
+1 NAME John /Doe/
+2 TYPE BIRTH
+1 NAME Aka
+2 TYPE AKA
+1 NAME Immigrant Name
+2 TYPE IMMIGRANT
+1 SEX M
+1 CAST Caste
+2 TYPE Caste type
+1 DSCR Description
+2 TYPE Description type
+2 SOUR @VOID@
+3 PAGE Entire source
+1 EDUC Education
+2 TYPE Education type
+1 IDNO ID number
+2 TYPE ID number type
+1 NATI Nationality
+2 TYPE Nationality type
+1 NCHI 2
+2 TYPE nchi type
+1 NMR 2
+2 TYPE nmr type
+1 OCCU occu
+2 TYPE occu type
+1 PROP prop
+2 TYPE prop type
+1 RELI reli
+2 TYPE reli type
+1 RESI resi
+2 TYPE resi type
+1 SSN ssn
+2 TYPE ssn type
+1 TITL titl
+2 TYPE titl type
+1 FACT fact
+2 TYPE fact type
+1 BAPM
+2 TYPE bapm type
+1 BAPM Y
+1 BARM
+2 TYPE barm type
+1 BASM
+2 TYPE basm type
+1 BLES
+2 TYPE bles type
+1 BURI
+2 TYPE buri type
+2 DATE 30 MAR 2022
+1 CENS
+2 TYPE cens type
+1 CHRA
+2 TYPE chra type
+1 CONF
+2 TYPE conf type
+1 CREM
+2 TYPE crem type
+1 DEAT
+2 TYPE deat type
+2 DATE 28 MAR 2022
+2 PLAC Somewhere
+2 ADDR Address
+2 PHON +1 (555) 555-1212
+2 PHON +1 (555) 555-1234
+2 EMAIL GEDCOM@FamilySearch.org
+2 EMAIL GEDCOM@example.com
+2 FAX +1 (555) 555-1212
+2 FAX +1 (555) 555-1234
+2 WWW http://gedcom.io
+2 WWW http://gedcom.info
+2 AGNC Agency
+2 RELI Religion
+2 CAUS Cause of death
+2 RESN CONFIDENTIAL, LOCKED
+2 SDATE 28 MAR 2022
+3 TIME 16:47
+3 PHRASE sdate phrase
+2 ASSO @I3@
+3 ROLE CHIL
+2 ASSO @VOID@
+3 ROLE PARENT
+2 NOTE Note text
+2 SNOTE @N1@
+2 SOUR @S1@
+3 PAGE 1
+2 SOUR @S2@
+3 PAGE 2
+2 OBJE @O1@
+2 OBJE @O2@
+2 UID 82092878-6f4f-4bca-ad59-d1ae87c5e521
+2 UID daf4b8c0-4141-42c4-bec8-01d1d818dfaf
+1 EMIG
+2 TYPE emig type
+1 FCOM
+2 TYPE fcom type
+1 GRAD
+2 TYPE grad type
+1 IMMI
+2 TYPE immi type
+1 NATU
+2 TYPE natu type
+1 ORDN
+2 TYPE ordn type
+1 PROB
+2 TYPE prob type
+1 RETI
+2 TYPE reti type
+1 WILL
+2 TYPE will type
+1 ADOP
+2 TYPE adop type
+2 FAMC @VOID@
+3 ADOP BOTH
+4 PHRASE Adoption phrase
+1 ADOP
+2 FAMC @VOID@
+3 ADOP HUSB
+1 ADOP
+2 FAMC @VOID@
+3 ADOP WIFE
+1 BIRT
+2 TYPE birth type
+2 DATE 1 JAN 2000
+1 CHR
+2 TYPE chr type
+2 DATE 9 JAN 2000
+2 AGE 8d
+3 PHRASE Age phrase
+1 EVEN Event
+2 TYPE Event type
+1 NO NATU
+2 DATE FROM 1700 TO 1800
+3 PHRASE No date phrase
+2 NOTE Note text
+2 SNOTE @N1@
+2 SOUR @S1@
+3 PAGE 1
+2 SOUR @S1@
+3 PAGE 2
+1 NO EMIG
+1 BAPL
+2 STAT BIC
+3 DATE 27 MAR 2022
+1 BAPL
+2 DATE 27 MAR 2022
+1 CONL
+2 STAT INFANT
+3 DATE 27 MAR 2022
+1 CONL
+2 DATE 27 MAR 2022
+1 ENDL
+2 STAT CHILD
+3 DATE 27 MAR 2022
+1 ENDL
+2 DATE 27 MAR 2022
+1 INIL
+2 STAT EXCLUDED
+3 DATE 27 MAR 2022
+1 INIL
+2 DATE 27 MAR 2022
+1 SLGC
+2 DATE 27 MAR 2022
+3 TIME 15:47
+3 PHRASE Afternoon
+2 TEMP SLAKE
+2 FAMC @VOID@
+1 SLGC
+2 PLAC Place
+2 STAT COMPLETED
+3 DATE 27 MAR 2022
+4 TIME 15:48
+2 NOTE Note text
+2 SNOTE @N1@
+2 SOUR @S1@
+3 PAGE 1
+2 SOUR @S2@
+3 PAGE 2
+2 FAMC @VOID@
+1 SLGC
+2 FAMC @F2@
+1 FAMC @VOID@
+2 PEDI OTHER
+3 PHRASE Other type
+2 STAT CHALLENGED
+3 PHRASE Phrase
+1 FAMC @VOID@
+2 PEDI FOSTER
+1 FAMC @VOID@
+2 PEDI SEALING
+1 FAMC @F2@
+2 PEDI ADOPTED
+2 STAT PROVEN
+1 FAMC @F2@
+2 PEDI BIRTH
+2 STAT DISPROVEN
+1 FAMS @VOID@
+2 NOTE Note text
+2 SNOTE @N1@
+1 FAMS @F1@
+1 SUBM @U1@
+1 SUBM @U2@
+1 ASSO @VOID@
+2 PHRASE Mr Stockdale
+2 ROLE FRIEND
+1 ASSO @VOID@
+2 ROLE NGHBR
+1 ASSO @VOID@
+2 ROLE FATH
+1 ASSO @VOID@
+2 ROLE GODP
+1 ASSO @VOID@
+2 ROLE HUSB
+1 ASSO @VOID@
+2 ROLE MOTH
+1 ASSO @VOID@
+2 ROLE MULTIPLE
+1 ASSO @VOID@
+2 ROLE SPOU
+1 ASSO @VOID@
+2 ROLE WIFE
+1 ALIA @VOID@
+1 ALIA @I3@
+2 PHRASE Alias
+1 ANCI @U1@
+1 ANCI @VOID@
+1 DESI @U1@
+1 DESI @VOID@
+1 REFN 1
+2 TYPE User-generated identifier
+1 REFN 10
+2 TYPE User-generated identifier
+1 UID 3d75b5eb-36e9-40b3-b79f-f088b5c18595
+1 UID cb49c361-7124-447e-b587-4c6d36e51825
+1 EXID 123
+2 TYPE http://example.com
+1 EXID 456
+2 TYPE http://example.com
+1 NOTE Note text
+1 SNOTE @N1@
+1 SOUR @S1@
+2 PAGE 1
+2 QUAY 3
+1 SOUR @S2@
+1 OBJE @O1@
+1 OBJE @O2@
+1 CHAN
+2 DATE 27 MAR 2022
+3 TIME 08:56
+2 NOTE Change date note 1
+2 NOTE Change date note 2
+1 CREA
+2 DATE 27 MAR 2022
+3 TIME 08:55
+0 @I2@ INDI
+1 NAME Maiden Name
+2 TYPE MAIDEN
+1 NAME Married Name
+2 TYPE MARRIED
+1 NAME Professional Name
+2 TYPE PROFESSIONAL
+1 SEX F
+1 FAMS @F1@
+0 @I3@ INDI
+1 SEX X
+0 @I4@ INDI
+1 SEX U
+1 FAMC @F1@
+0 @O1@ OBJE
+1 RESN CONFIDENTIAL, LOCKED
+1 FILE file:///path/to/file1
+2 FORM text/plain
+3 MEDI OTHER
+4 PHRASE Transcript
+1 FILE media/original.mp3
+2 FORM audio/mp3
+3 MEDI AUDIO
+2 TITL Object title
+2 TRAN media/derived.oga
+3 FORM audio/ogg
+2 TRAN media/transcript.vtt
+3 FORM text/vtt
+1 REFN 1
+2 TYPE User-generated identifier
+1 REFN 10
+2 TYPE User-generated identifier
+1 UID 69ebdd0e-c78c-4b81-873f-dc8ac30a48b9
+1 UID 79cae8c4-e673-4e4f-bc5d-13b02d931302
+1 EXID 123
+2 TYPE http://example.com
+1 EXID 456
+2 TYPE http://example.com
+1 NOTE American English
+2 MIME text/plain
+2 LANG en-US
+2 TRAN British English
+3 MIME text/plain
+3 LANG en-GB
+2 TRAN Canadian English
+3 MIME text/plain
+3 LANG en-CA
+2 SOUR @S1@
+3 PAGE 1
+2 SOUR @S2@
+3 PAGE 2
+1 SNOTE @N1@
+1 SOUR @S1@
+2 PAGE 1
+2 DATA
+3 DATE 28 MAR 2022
+4 TIME 10:29
+4 PHRASE Morning
+3 TEXT Text 1
+4 MIME text/plain
+4 LANG en-US
+3 TEXT Text 2
+4 MIME text/plain
+4 LANG en-US
+2 EVEN BIRT
+3 PHRASE Event phrase
+3 ROLE OTHER
+4 PHRASE Role phrase
+2 QUAY 0
+2 OBJE @O1@
+3 CROP
+4 TOP 0
+4 LEFT 0
+4 HEIGHT 100
+4 WIDTH 100
+3 TITL Title
+2 OBJE @O1@
+3 CROP
+4 TOP 100
+4 LEFT 100
+3 TITL Title
+2 NOTE American English
+3 MIME text/plain
+3 LANG en-GB
+3 TRAN British English
+3 SOUR @S1@
+4 PAGE 1
+3 SOUR @S2@
+4 PAGE 2
+2 SNOTE @N1@
+1 SOUR @S1@
+2 PAGE 2
+1 CHAN
+2 DATE 27 MAR 2022
+3 TIME 08:56
+2 NOTE Change date note 1
+2 NOTE Change date note 2
+1 CREA
+2 DATE 27 MAR 2022
+3 TIME 08:55
+0 @O2@ OBJE
+1 RESN PRIVACY
+1 FILE http://host.example.com/path/to/file2
+2 FORM text/plain
+3 MEDI ELECTRONIC
+0 @R1@ REPO
+1 NAME Repository 1
+1 ADDR Family History Department, 15 East South Temple Street, Salt Lake City, UT 84150 USA
+2 ADR1 Family History Department
+2 ADR2 15 East South Temple Street
+2 ADR3 Salt Lake City, UT 84150 USA
+2 CITY Salt Lake City
+2 STAE UT
+2 POST 84150
+2 CTRY USA
+1 PHON +1 (555) 555-1212
+1 PHON +1 (555) 555-1234
+1 EMAIL GEDCOM@FamilySearch.org
+1 EMAIL GEDCOM@example.com
+1 FAX +1 (555) 555-1212
+1 FAX +1 (555) 555-1234
+1 WWW http://gedcom.io
+1 WWW http://gedcom.info
+1 NOTE Note text
+1 SNOTE @N1@
+1 REFN 1
+2 TYPE User-generated identifier
+1 REFN 10
+2 TYPE User-generated identifier
+1 UID efa7885b-c806-4590-9f1b-247797e4c96d
+1 UID d530f6ab-cfd4-44cd-ab2c-e40bddb76bf8
+1 EXID 123
+2 TYPE http://example.com
+1 EXID 456
+2 TYPE http://example.com
+1 CHAN
+2 DATE 27 MAR 2022
+3 TIME 08:56
+2 NOTE Change date note 1
+2 NOTE Change date note 2
+1 CREA
+2 DATE 27 MAR 2022
+3 TIME 08:55
+0 @R2@ REPO
+1 NAME Repository 2
+0 @N1@ SNOTE Shared note 1
+1 MIME text/plain
+1 LANG en-US
+1 TRAN Shared note 1
+2 MIME text/plain
+2 LANG en-GB
+1 TRAN Shared note 1
+2 MIME text/plain
+2 LANG en-CA
+1 SOUR @S1@
+2 PAGE 1
+1 SOUR @S2@
+2 PAGE 2
+1 REFN 1
+2 TYPE User-generated identifier
+1 REFN 10
+2 TYPE User-generated identifier
+1 UID 6efbee0b-96a1-43ea-83c8-828ec71c54d7
+1 UID 4094d92a-5525-44ec-973d-6c527aa5535a
+1 EXID 123
+2 TYPE http://example.com
+1 EXID 456
+2 TYPE http://example.com
+1 CHAN
+2 DATE 27 MAR 2022
+3 TIME 08:56
+2 NOTE Change date note 1
+2 NOTE Change date note 2
+1 CREA
+2 DATE 27 MAR 2022
+3 TIME 08:55
+0 @N2@ SNOTE Shared note 2
+0 @S1@ SOUR
+1 DATA
+2 EVEN BIRT, DEAT
+3 DATE FROM 1701 TO 1800
+4 PHRASE 18th century
+3 PLAC Some City, Some County, Some State, Some Country
+4 FORM City, County, State, Country
+4 LANG en-US
+4 TRAN Some City, Some County, Some State, Some Country
+5 LANG en-GB
+4 TRAN Some City, Some County, Some State, Some Country
+5 LANG en
+4 MAP
+5 LATI N18.150944
+5 LONG E168.150944
+4 EXID 123
+5 TYPE http://example.com
+4 EXID 456
+5 TYPE http://example.com
+4 NOTE American English
+5 MIME text/plain
+5 LANG en-GB
+5 TRAN British English
+5 SOUR @S1@
+6 PAGE 1
+5 SOUR @S2@
+6 PAGE 2
+4 SNOTE @N1@
+2 EVEN MARR
+3 DATE FROM 1701 TO 1800
+4 PHRASE 18th century
+2 AGNC Agency name
+2 NOTE American English
+3 MIME text/plain
+3 LANG en-GB
+3 TRAN British English
+3 SOUR @S1@
+4 PAGE 1
+3 SOUR @S2@
+4 PAGE 2
+2 SNOTE @N1@
+1 AUTH Author
+1 TITL Title
+1 ABBR Abbreviation
+1 PUBL Publication info
+1 TEXT Source text
+2 MIME text/plain
+2 LANG en-US
+1 REPO @R1@
+2 NOTE Note text
+2 SNOTE @N1@
+2 CALN Call number
+3 MEDI BOOK
+4 PHRASE Booklet
+1 REPO @R2@
+2 CALN Call number
+3 MEDI VIDEO
+2 CALN Call number
+3 MEDI CARD
+2 CALN Call number
+3 MEDI FICHE
+2 CALN Call number
+3 MEDI FILM
+2 CALN Call number
+3 MEDI MAGAZINE
+2 CALN Call number
+3 MEDI MANUSCRIPT
+2 CALN Call number
+3 MEDI MAP
+2 CALN Call number
+3 MEDI NEWSPAPER
+2 CALN Call number
+3 MEDI PHOTO
+2 CALN Call number
+3 MEDI TOMBSTONE
+1 REFN 1
+2 TYPE User-generated identifier
+1 REFN 10
+2 TYPE User-generated identifier
+1 UID f065a3e8-5c03-4b4a-a89d-6c5e71430a8d
+1 UID 9441c3f3-74df-42b4-bbc1-fed42fd7f536
+1 EXID 123
+2 TYPE http://example.com
+1 EXID 456
+2 TYPE http://example.com
+1 NOTE Note text
+1 SNOTE @N1@
+1 OBJE @O1@
+1 OBJE @O2@
+1 CHAN
+2 DATE 27 MAR 2022
+3 TIME 08:56
+2 NOTE Change date note 1
+2 NOTE Change date note 2
+1 CREA
+2 DATE 27 MAR 2022
+3 TIME 08:55
+0 @S2@ SOUR
+1 TITL Source Two
+0 @U1@ SUBM
+1 NAME GEDCOM Steering Committee
+1 ADDR Family History Department, 15 East South Temple Street, Salt Lake City, UT 84150 USA
+2 ADR1 Family History Department
+2 ADR2 15 East South Temple Street
+2 ADR3 Salt Lake City, UT 84150 USA
+2 CITY Salt Lake City
+2 STAE UT
+2 POST 84150
+2 CTRY USA
+1 PHON +1 (555) 555-1212
+1 PHON +1 (555) 555-1234
+1 EMAIL GEDCOM@FamilySearch.org
+1 EMAIL GEDCOM@example.com
+1 FAX +1 (555) 555-1212
+1 FAX +1 (555) 555-1234
+1 WWW http://gedcom.io
+1 WWW http://gedcom.info
+1 OBJE @O1@
+2 CROP
+3 TOP 0
+3 LEFT 0
+3 HEIGHT 100
+3 WIDTH 100
+2 TITL Title
+1 OBJE @O1@
+2 CROP
+3 TOP 100
+3 LEFT 100
+2 TITL Title
+1 LANG en-US
+1 LANG en-GB
+1 REFN 1
+2 TYPE User-generated identifier
+1 REFN 10
+2 TYPE User-generated identifier
+1 UID 24132fe0-26f6-4f87-9924-389a4f40f0ec
+1 UID b451c8df-5550-473b-a55c-ed31e65c60c8
+1 EXID 123
+2 TYPE http://example.com
+1 EXID 456
+2 TYPE http://example.com
+1 NOTE American English
+2 MIME text/plain
+2 LANG en-GB
+2 TRAN British English
+2 SOUR @S1@
+3 PAGE 1
+2 SOUR @S2@
+3 PAGE 2
+1 SNOTE @N1@
+1 CHAN
+2 DATE 27 MAR 2022
+3 TIME 08:56
+2 NOTE Change date note 1
+2 NOTE Change date note 2
+1 CREA
+2 DATE 27 MAR 2022
+3 TIME 08:55
+1 _SKYPEID example.person
+1 _JABBERID person@example.com
+0 @U2@ SUBM
+1 NAME Submitter 2
+0 TRLR
