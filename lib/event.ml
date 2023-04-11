@@ -136,9 +136,21 @@ let compare_event_name name1 name2 =
   | _, Pevent Epers_Funeral -> -1
   | Pevent Epers_Death, _ -> 1
   | _, Pevent Epers_Death -> -1
+  (* put Fevent after Pevent *)
+  | Fevent _, Pevent _ -> 1
+  | Pevent _, Fevent _ -> -1
   | _ -> 0
-(*TODO Fevent??*)
 
+(* this do not define a preorder (no transitivity);
+   can not be used to sort a list
+   ex:
+    let a,b,c events with
+      a.date = 2022;
+      b.date = None;
+      c.date = 2000
+    we can have a <= b and b <= c because of event name.
+    but we do not have a <= c
+*)
 let compare get_name get_date e1 e2 =
   match Date.cdate_to_dmy_opt (get_date e1) with
   | None -> compare_event_name (get_name e1) (get_name e2)
@@ -150,8 +162,22 @@ let compare get_name get_date e1 e2 =
           | Some 0 | None -> compare_event_name (get_name e1) (get_name e2)
           | Some x -> x))
 
+(* try to handle the fact that events are not well ordered *)
 let sort_events get_name get_date events =
-  List.stable_sort (fun e1 e2 -> compare get_name get_date e1 e2) events
+  let dated, undated =
+    List.fold_left
+      (fun (dated, undated) e ->
+        match Date.cdate_to_dmy_opt (get_date e) with
+        | None -> (dated, e :: undated)
+        | Some _d -> (e :: dated, undated))
+      ([], []) events
+  in
+  let cmp = compare get_name get_date in
+  (* sort events with dates separately to make sure
+     that dates are in correct order *)
+  let l1 = List.sort cmp dated in
+  let l2 = List.sort cmp undated in
+  List.merge cmp l1 l2
 
 let events conf base p =
   if not (Util.authorized_age conf base p) then []
