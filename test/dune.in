@@ -12,6 +12,7 @@
   (modules
     test
     test_calendar
+    test_chronology
     test_mergeInd
     test_place
     test_sosa
