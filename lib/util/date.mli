@@ -78,6 +78,8 @@ val compare_date : date -> date -> int
     [Dtext] dates are always considered prior to any [Dgreg] date,
     and equal to any other [Dtext] date. *)
 
+val compare_date_strict : date -> date -> int option
+
 val cdate_None : cdate
 (** Absent compressed date *)
 

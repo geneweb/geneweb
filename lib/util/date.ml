@@ -346,3 +346,8 @@ let compare_date d1 d2 =
   | Dgreg (_, _), Dtext _ -> 1
   | Dtext _, Dgreg (_, _) -> -1
   | Dtext _, Dtext _ -> 0
+
+let compare_date_strict d1 d2 =
+  match (d1, d2) with
+  | Dgreg (dmy1, _), Dgreg (dmy2, _) -> compare_dmy_strict dmy1 dmy2
+  | Dgreg (_, _), Dtext _ | Dtext _, Dgreg (_, _) | Dtext _, Dtext _ -> None
