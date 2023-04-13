@@ -4,7 +4,14 @@ open Gwdb
 type base_error = person error
 
 type base_warning =
-  (iper, person, ifam, family, title, (iper, istr) Def.gen_pers_event, (iper, istr) Def.gen_fam_event) Warning.warning
+  ( iper,
+    person,
+    ifam,
+    family,
+    title,
+    (iper, istr) Def.gen_pers_event,
+    (iper, istr) Def.gen_fam_event )
+  Warning.warning
 
 type base_misc = (person, family, title) Warning.misc
 
@@ -24,9 +31,7 @@ let max_siblings_gap = 50
 
 (* Check if d1 < d2 *)
 let strictly_before_dmy d1 d2 =
-  match Date.compare_dmy_opt ~strict:true d1 d2 with
-  | Some x -> x < 0
-  | None -> false
+  match Date.compare_dmy_strict d1 d2 with Some x -> x < 0 | None -> false
 
 let strictly_before d1 d2 =
   match (d1, d2) with
@@ -34,9 +39,7 @@ let strictly_before d1 d2 =
   | _ -> false
 
 let strictly_after_dmy d1 d2 =
-  match Date.compare_dmy_opt ~strict:true d1 d2 with
-  | Some x -> x > 0
-  | None -> false
+  match Date.compare_dmy_strict d1 d2 with Some x -> x > 0 | None -> false
 
 let strictly_after d1 d2 =
   match (d1, d2) with
@@ -500,7 +503,10 @@ let check_order_pevents (warning : base_warning -> unit) p =
   check_order_pfevents
     (fun evt -> Event.Pevent (get_pevent_name evt))
     (fun evt -> get_pevent_date evt)
-    (fun e1 e2 -> warning (Warning.PEventOrder (p, gen_pevent_of_pers_event e1, gen_pevent_of_pers_event e2)))
+    (fun e1 e2 ->
+      warning
+        (Warning.PEventOrder
+           (p, gen_pevent_of_pers_event e1, gen_pevent_of_pers_event e2)))
     (get_pevents p)
 
 let check_order_fevents base (warning : base_warning -> unit) fam =
@@ -508,18 +514,26 @@ let check_order_fevents base (warning : base_warning -> unit) fam =
   check_order_pfevents
     (fun evt -> Event.Fevent (get_fevent_name evt))
     (fun evt -> get_fevent_date evt)
-    (fun e1 e2 -> warning (Warning.FEventOrder (p, gen_fevent_of_fam_event e1, gen_fevent_of_fam_event e2)))
+    (fun e1 e2 ->
+      warning
+        (Warning.FEventOrder
+           (p, gen_fevent_of_fam_event e1, gen_fevent_of_fam_event e2)))
     (get_fevents fam)
 
-let check_witness_pevents_aux (warning : base_warning -> unit) origin evt date b d p witness_kind =
+let check_witness_pevents_aux (warning : base_warning -> unit) origin evt date b
+    d p witness_kind =
   match (b, d) with
   | Some (Date.Dgreg (d1, _)), _ when strictly_before_dmy date d1 ->
-      warning (Warning.PWitnessEventBeforeBirth (p, gen_pevent_of_pers_event evt, origin))
+      warning
+        (Warning.PWitnessEventBeforeBirth
+           (p, gen_pevent_of_pers_event evt, origin))
   | _, Some (Date.Dgreg (d3, _)) when strictly_after_dmy date d3 ->
       if
         witness_kind <> Def.Witness_Mentioned
         && witness_kind <> Def.Witness_Other
-      then warning (PWitnessEventAfterDeath (p, gen_pevent_of_pers_event evt, origin))
+      then
+        warning
+          (PWitnessEventAfterDeath (p, gen_pevent_of_pers_event evt, origin))
   | _ -> ()
 
 let check_witness_pevents base (warning : base_warning -> unit) origin =
@@ -602,16 +616,22 @@ let check_person_dates_as_witness base (warning : base_warning -> unit) p =
               aux
                 (fun e -> get_fevent_date e)
                 (fun e ->
-                  warning (Warning.FWitnessEventBeforeBirth (p, gen_fevent_of_fam_event e, get_ifam fam)))
+                  warning
+                    (Warning.FWitnessEventBeforeBirth
+                       (p, gen_fevent_of_fam_event e, get_ifam fam)))
                 (fun _ -> ())
                 evt
           | Some _ ->
               aux
                 (fun e -> get_fevent_date e)
                 (fun e ->
-                  warning (FWitnessEventBeforeBirth (p, gen_fevent_of_fam_event e, get_ifam fam)))
+                  warning
+                    (FWitnessEventBeforeBirth
+                       (p, gen_fevent_of_fam_event e, get_ifam fam)))
                 (fun e ->
-                  warning (FWitnessEventAfterDeath (p, gen_fevent_of_fam_event e, get_ifam fam)))
+                  warning
+                    (FWitnessEventAfterDeath
+                       (p, gen_fevent_of_fam_event e, get_ifam fam)))
                 evt
           | None -> ())
         (get_fevents fam))
@@ -637,14 +657,21 @@ let check_person_dates_as_witness base (warning : base_warning -> unit) p =
       | Def.Witness_Mentioned | Def.Witness_Other ->
           aux
             (fun e -> get_pevent_date e)
-            (fun e -> warning (Warning.PWitnessEventBeforeBirth (p, gen_pevent_of_pers_event e, r)))
+            (fun e ->
+              warning
+                (Warning.PWitnessEventBeforeBirth
+                   (p, gen_pevent_of_pers_event e, r)))
             (fun _ -> ())
             evt
       | _ ->
           aux
             (fun e -> get_pevent_date e)
-            (fun e -> warning (PWitnessEventBeforeBirth (p, gen_pevent_of_pers_event e, r)))
-            (fun e -> warning (PWitnessEventAfterDeath (p, gen_pevent_of_pers_event e, r)))
+            (fun e ->
+              warning
+                (PWitnessEventBeforeBirth (p, gen_pevent_of_pers_event e, r)))
+            (fun e ->
+              warning
+                (PWitnessEventAfterDeath (p, gen_pevent_of_pers_event e, r)))
             evt)
     related_pers
 
@@ -735,15 +762,20 @@ let check_sources base misc ifam fam =
     if has_person_sources fath && has_person_sources moth then ()
     else misc Warning.MissingSources
 
-let check_witness_fevents_aux (warning : base_warning -> unit) fam evt date b d p witness_kind =
+let check_witness_fevents_aux (warning : base_warning -> unit) fam evt date b d
+    p witness_kind =
   match (b, d) with
   | Some (Date.Dgreg (d1, _)), _ when strictly_before_dmy date d1 ->
-      warning (Warning.FWitnessEventBeforeBirth (p, gen_fevent_of_fam_event evt, get_ifam fam))
+      warning
+        (Warning.FWitnessEventBeforeBirth
+           (p, gen_fevent_of_fam_event evt, get_ifam fam))
   | _, Some (Date.Dgreg (d3, _)) when strictly_after_dmy date d3 ->
       if
         witness_kind <> Def.Witness_Mentioned
         && witness_kind <> Def.Witness_Other
-      then warning (FWitnessEventAfterDeath (p, gen_fevent_of_fam_event evt, get_ifam fam))
+      then
+        warning
+          (FWitnessEventAfterDeath (p, gen_fevent_of_fam_event evt, get_ifam fam))
   | _ -> ()
 
 let check_witness_fevents base (warning : base_warning -> unit) fam =
@@ -765,31 +797,31 @@ let check_witness_fevents base (warning : base_warning -> unit) fam =
 let check_parent_marriage_age warning fam p =
   let rec loop = function
     | [] -> ()
-    | evt :: list ->
-      let evt_name = get_fevent_name evt in
-      match evt_name with
-      | Efam_Marriage | Efam_PACS -> (
-          match Date.od_of_cdate (get_fevent_date evt) with
-          | Some (Dgreg (g2, _) as d2) -> (
-              match Date.date_of_death (get_death p) with
-              | Some d1 when strictly_after d2 d1 ->
-                warning (Warning.MarriageDateAfterDeath p)
-              | _ -> (
-                  match Date.od_of_cdate (get_birth p) with
-                  | Some (Dgreg (g1, _) as d1) ->
-                    if strictly_before d2 d1 then
-                      warning (MarriageDateBeforeBirth p)
-                    else
-                      Date.time_elapsed_opt g1 g2
-                      |> Option.iter @@ fun e ->
-                      if strictly_younger e min_age_marriage then
-                        warning (YoungForMarriage (p, e, get_ifam fam))
-                      else if strictly_older e max_age_marriage then
-                        warning (OldForMarriage (p, e, get_ifam fam))
-                      else loop list
-                  | Some (Dtext _) | None -> loop list))
-          | _ -> loop list)
-      | _  -> loop list
+    | evt :: list -> (
+        let evt_name = get_fevent_name evt in
+        match evt_name with
+        | Efam_Marriage | Efam_PACS -> (
+            match Date.od_of_cdate (get_fevent_date evt) with
+            | Some (Dgreg (g2, _) as d2) -> (
+                match Date.date_of_death (get_death p) with
+                | Some d1 when strictly_after d2 d1 ->
+                    warning (Warning.MarriageDateAfterDeath p)
+                | _ -> (
+                    match Date.od_of_cdate (get_birth p) with
+                    | Some (Dgreg (g1, _) as d1) ->
+                        if strictly_before d2 d1 then
+                          warning (MarriageDateBeforeBirth p)
+                        else
+                          Date.time_elapsed_opt g1 g2
+                          |> Option.iter @@ fun e ->
+                             if strictly_younger e min_age_marriage then
+                               warning (YoungForMarriage (p, e, get_ifam fam))
+                             else if strictly_older e max_age_marriage then
+                               warning (OldForMarriage (p, e, get_ifam fam))
+                             else loop list
+                    | Some (Dtext _) | None -> loop list))
+            | _ -> loop list)
+        | _ -> loop list)
   in
   loop (get_fevents fam)
 
@@ -866,7 +898,6 @@ let changed_pevents_order warning p =
     let a = List.map gen_pevent_of_pers_event a in
     let b = List.map gen_pevent_of_pers_event b in
     warning (Warning.ChangedOrderOfPersonEvents (p, a, b))
-
 
 let changed_fevents_order warning (ifam, fam) =
   let a =

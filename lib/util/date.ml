@@ -161,9 +161,9 @@ let time_elapsed_opt d1 d2 =
   | After, After | Before, Before -> None
   | _ -> Some (time_elapsed d1 d2)
 
-(* TODO use SDN to compare date (?) *)
 (* use strict = false to compare date as if they are points on a timeline.
    use strict = true to compare date by taking precision in account. This makes some dates not comparable, do not use to sort a list *)
+(* it is always Some _ if strict = false *)
 let rec compare_dmy_opt ?(strict = false) dmy1 dmy2 =
   match compare dmy1.year dmy2.year with
   | 0 -> compare_month_or_day ~is_day:false strict dmy1 dmy2
@@ -214,19 +214,24 @@ and eval_strict strict dmy1 dmy2 x =
     | x -> Some x
   else Some x
 
-exception Not_comparable
-
-let compare_dmy ?(strict = false) dmy1 dmy2 =
-  match compare_dmy_opt ~strict dmy1 dmy2 with
-  | None -> raise Not_comparable
+let compare_dmy dmy1 dmy2 =
+  match compare_dmy_opt ~strict:false dmy1 dmy2 with
+  | None -> (* can't happen *) assert false
   | Some x -> x
 
-let compare_date ?(strict = false) d1 d2 =
+let compare_dmy_strict dmy1 dmy2 = compare_dmy_opt ~strict:true dmy1 dmy2
+
+let compare_date d1 d2 =
   match (d1, d2) with
-  | Dgreg (dmy1, _), Dgreg (dmy2, _) -> compare_dmy ~strict dmy1 dmy2
-  | Dgreg (_, _), Dtext _ -> if strict then raise Not_comparable else 1
-  | Dtext _, Dgreg (_, _) -> if strict then raise Not_comparable else -1
-  | Dtext _, Dtext _ -> if strict then raise Not_comparable else 0
+  | Dgreg (dmy1, _), Dgreg (dmy2, _) -> compare_dmy dmy1 dmy2
+  | Dgreg (_, _), Dtext _ -> 1
+  | Dtext _, Dgreg (_, _) -> -1
+  | Dtext _, Dtext _ -> 0
+
+let compare_date_strict d1 d2 =
+  match (d1, d2) with
+  | Dgreg (dmy1, _), Dgreg (dmy2, _) -> compare_dmy_strict dmy1 dmy2
+  | Dgreg (_, _), Dtext _ | Dtext _, Dgreg (_, _) | Dtext _, Dtext _ -> None
 
 let cdate_to_dmy_opt cdate =
   match od_of_cdate cdate with
@@ -373,3 +378,15 @@ let convert ~from ~to_ dmy =
       { day; month; year; delta; prec = OrYear (convert_dmy2 ~from ~to_ dmy2) }
   | YearInt dmy2 ->
       { day; month; year; delta; prec = YearInt (convert_dmy2 ~from ~to_ dmy2) }
+
+let compare_date d1 d2 =
+  match (d1, d2) with
+  | Dgreg (dmy1, _), Dgreg (dmy2, _) -> compare_dmy dmy1 dmy2
+  | Dgreg (_, _), Dtext _ -> 1
+  | Dtext _, Dgreg (_, _) -> -1
+  | Dtext _, Dtext _ -> 0
+
+let compare_date_strict d1 d2 =
+  match (d1, d2) with
+  | Dgreg (dmy1, _), Dgreg (dmy2, _) -> compare_dmy_opt ~strict:true dmy1 dmy2
+  | Dgreg (_, _), Dtext _ | Dtext _, Dgreg (_, _) | Dtext _, Dtext _ -> None
