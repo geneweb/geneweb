@@ -221,24 +221,29 @@ end = struct
     let syncdata = Hashtbl.create (Array.length data) in
     Array.iteri (Hashtbl.add syncdata) data;
     Hashtbl.iter (Hashtbl.replace syncdata) tbl;
-    let len = Hashtbl.length syncdata in
-    let accesses = Array.make len 0 in
 
-    let l = Hashtbl.fold (fun k v l -> (k, v) :: l) syncdata [] in
+
+    let max_index, l = Hashtbl.fold (fun k v (max_index, l) ->
+        let max_index = max max_index k in max_index, (k, v) :: l)
+        syncdata (-1,[])
+    in
+
     let a = Array.of_list l in
     Array.sort (fun (k, _) (k', _) -> k - k') a;
-    let a = Array.map snd a in
 
+    let len = max_index + 1 in
+    let accesses = Array.make len (-1) in
+    
     output_binary_int oc len;
     seek_out oc (4 + (len * 4));
-    Array.iteri
-      (fun i data ->
+    Array.iter
+      (fun (index, data) ->
          match data with
          | Some data ->
            let pos = pos_out oc in
            Marshal.to_channel oc data [ Marshal.No_sharing ];
-           accesses.(i) <- pos
-         | None -> accesses.(i) <- -1)
+           accesses.(index) <- pos
+         | None -> accesses.(index) <- -1)
       a;
     seek_out oc 4;
     Array.iter (output_binary_int oc) accesses;
@@ -686,7 +691,9 @@ module Legacy_driver = struct
         max max_index iper, ((iper, None) :: l)) (0, []) persons
     in
     let d = Array.make (max_index + 1) (None) in
-    List.iter (fun (i, v) -> Array.unsafe_set d i v ) data;
+    List.iter (fun (i, v) ->
+        if i = -1 then ()
+        else Array.unsafe_set d i v ) data;
     d
     
   let build_from_scratch_fevents base =
@@ -696,7 +703,9 @@ module Legacy_driver = struct
         max max_index ifam, ((ifam, None) :: l)) (0, []) families
     in
     let d = Array.make (max_index + 1) (None) in
-    List.iter (fun (i, v) -> Array.unsafe_set d i v ) data;
+    List.iter (fun (i, v) ->
+        if i = -1 then ()
+        else Array.unsafe_set d i v ) data;
     d
 
   let sync ?(scratch = false) ~save_mem base =
