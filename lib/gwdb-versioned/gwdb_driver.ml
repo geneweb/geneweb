@@ -129,18 +129,21 @@ end = struct
     if data_file_exists base then (
       let ic = open_data_file base in
       let len = input_binary_int ic in
-      assert (index < len);
-      seek_in ic (4 + (index * 4));
-      let pos_data = input_binary_int ic in
-      if pos_data <> -1 then begin
-        seek_in ic pos_data;
-        let data = (Marshal.from_channel ic : D.t) in
-        let c = cache () in
-        Hashtbl.replace c index (Some data);
-        Some data
+      if not (index < len) then None
+      else begin
+        assert (index < len);
+        seek_in ic (4 + (index * 4));
+        let pos_data = input_binary_int ic in
+        if pos_data <> -1 then begin
+          seek_in ic pos_data;
+          let data = (Marshal.from_channel ic : D.t) in
+          let c = cache () in
+          Hashtbl.replace c index (Some data);
+          Some data
+        end
+        else
+          None
       end
-      else
-        None
     )
     else None
 
