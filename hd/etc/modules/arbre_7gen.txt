@@ -1,5 +1,4 @@
-<!-- arbre_7gen.txt 28/03/2017 20:02:13 Arbre 7 generations -->
-
+<!-- $Id: modules/arbre_7gen.txt v7.0 27/06/2018 18:47:46 $ -->
 %define;descendants(curlev, maxlev, f_cnt)
   <ul>
   %if;(has_families)
@@ -71,7 +70,7 @@
   %xx.title;%xx.dates;
 %end;
 
-<!--  Arbre 7 generations 3+1+3 -->
+%( Arbre 7 générations 3+1+3 %)
 %if;(has_parents or has_children)
 %let;gpcol;40%%%in;
 %let;sbcol;20%%%in;
@@ -117,7 +116,7 @@
                %if;(nb_families!=1)
                  %family_cnt;
                %end;
-               <!-- <a href="%prefix;%spouse.access;"> %spouse;</a><br>%spouse.dates;&nbsp; -->
+               %( <a href="%prefix;%spouse.access;"> %spouse;</a><br>%spouse.dates;&nbsp; %)
                %apply;short_display_person("spouse")
              </td>
            </tr>
@@ -152,7 +151,7 @@
 
  <table style="width:100%%;border:0;cellspacing:0;cellpading:0"> %( Listes %)
    <tr>
-     <!--  Parents, Grand Parents, .. -->
+     %( Parents, grand-parents... %)
      <td style="width=%gpcol;">
        %if;has_parents;
        <table style="width:100%%;border:0;cellspacing:0;cellpading:0">
@@ -204,7 +203,7 @@
        %end;
      </td>
 
-     <!-- Siblings        -->
+     %(-- Siblings %)
      <td style="width:%sbcol;;text-align:center">
        <table style="width:100%%;border:0;cellspacing:0;cellpadding:0">
          %if;has_siblings;
@@ -219,7 +218,7 @@
                <td style="width:1"></td>
                <td style="align:center;valign:middle">%child.child_name;<br>%child.dates;&nbsp;</td>
                <td style="width:1"></td>
-               <!-- ajouter mariage en dessous -->
+               %( ajouter mariage en dessous %)
              %else;
                <td style="width:1"></td>
                <td style="align:center;valign:middle">
@@ -235,7 +234,7 @@
          %end;
        </table>
      </td>
-     <!--  Enfants, Petits Enfants, .. -->
+     %( Enfants, petits-enfants... %)
      <td style="width:%chcol;">
        %let;maxlev;2%in;
        %if;has_families;

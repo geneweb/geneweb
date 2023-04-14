@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: perso.txt,v7.00 01/03/2018 11:44:53 $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: perso.txt v7.1 04/03/2023 10:39:01 $ -->
+  <!-- Copyright (c) 1998--2007 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;

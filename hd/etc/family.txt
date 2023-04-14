@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: family.txt v 7.00 exp 30/10/2017 13:28:29 hg -->
+  <!-- $Id: family.txt v7.1 30/10/2017 13:28:29 -->
 <title>%nn;
   %if;has_public_name;
     %if;has_qualifiers;%public_name; %qualifier;

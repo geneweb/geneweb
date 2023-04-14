@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: dag.txt, v7.xx 04/02/2022 14:45:14 ddr hg a2 $ -->
-  <!-- Copyright (c) 1998-2022 INRIA -->
+  <!-- $Id: dag.txt v7.1 04/02/2022 14:45:14 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(e.slices = "on")[*display by slices/slice width/overlap/total width]0%nn;
     %else;%apply;capitalize(head_title)%end;

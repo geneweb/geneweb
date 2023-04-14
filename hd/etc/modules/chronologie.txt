@@ -1,4 +1,4 @@
-<!-- $Id: modules/chronologie.txt v 7.00 05/04/2017 03:27:35 -->
+<!-- $Id: modules/chronologie.txt v7.1 04/03/2023 09:51:04 $ -->
 %define;event_tree(z1)
   %reset_count;
   href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;

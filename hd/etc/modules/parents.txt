@@ -1,4 +1,4 @@
-<!-- $Id: modules/parents.txt v 7.00 20/11/2016 06:10:01 hg -->
+<!-- $Id: modules/parents.txt v7.1 04/03/2023 09:51:04 $ -->
 %( op_m=1 simple: name %)
 %( op_m=3 simple with photo in 2 cols %)
 %( op_m=2 evolved: name, occupation %)
@@ -140,7 +140,7 @@
   </table>
   </div>
 
-<!-- Parents photo -->
+%( Parents photo %)
 %elseif;(op_m=2 and has_parents)
   <h2>[*parents]</h2>
   <div class="d-inline-flex flex-wrap">

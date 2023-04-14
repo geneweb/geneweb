@@ -1,4 +1,4 @@
-<!-- $Id: js.txt, v7.1 09/02/2022 23:51:17 $ -->
+<!-- $Id: js.txt v7.1 22/12/2022 07:15:46 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"

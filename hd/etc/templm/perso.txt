@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: perso.txt,v7 29/02/2016 11:08:07 A2 Exp$ -->
+  <!-- $Id: templm/perso.txt v7.0 29/02/2016 11:08:07 $ -->
   <title>%apply;capitalize(self.first_name) %apply;capitalize(self.surname)%if(occ!=0) (%occ;)%end; - #%index;</title>
   <meta name="robots" content="none"%/>
   <meta charset="utf-8">

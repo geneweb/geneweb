@@ -1,6 +1,5 @@
-  <!-- $Id: arbre_h7.txt,v 7.00 2016/05/02 23:28:26 mr Exp $ -->
+  <!-- $Id: modules/arbre_h7.txt v7.1 04/03/2023 10:39:01 $ -->
   <link type="text/css" href="%static_path;modules/arbre_h7%bvar.css;.css" media="all" rel="stylesheet" %/>
-
   %let;l_fs;%if;(evar.fs != "")%evar.fs;%else;9%end;%in;
   %let;l_wi;%if;(evar.wi != "")%evar.wi;%else;980%end;%in;
   %let;l_he;%if;(evar.he != "")%evar.he;%else;600%end;%in;
@@ -43,7 +42,6 @@
    -->
   </script>
 </head>
-
 %if;(not cancel_links)
   <div class="col-12 d-flex justify-content-end">
     %let;evsib;%if;(evar.siblings!="")%evar.siblings;%end;%in;

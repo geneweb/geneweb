@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <!-- $Id: doc_templm.txt,v 7.00 07/02/2016 23:04:55 A2 $ -->
+  <!-- $Id: templm/doc_templm.txt v7.0 07/02/2016 23:04:55 $ -->
   <title>Config templm</title>
   <meta name="robots" content="none"%/>
   <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>

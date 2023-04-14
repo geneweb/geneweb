@@ -1,4 +1,4 @@
-<!-- $Id: ancsosa_deslist.txt,v 7.00 2015/01/15 21:11:34 mr Exp $ -->
+<!-- $Id: templm/ancsosa_deslist.txt v7.0 2015/01/15 21:11:34 $ -->
 
   %let;ldsp;%if;(evar.hide="on")dsp0%else;dsp1%end;%in;
   <style id="style0" type="text/css">.dsp0{display:none}</style>

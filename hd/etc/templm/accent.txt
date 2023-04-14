@@ -1,4 +1,4 @@
-<!-- $Id: accent.txt,v 7.00 2016/02/04 21:32:06 mr Exp $ -->
+<!-- $Id: templm/accent.txt v7.0 2016/02/04 21:32:06 $ -->
 %( How to : Copy this file to bases/etc/ %)
 <script ><!--
 document.getElementsByName("notes")[0].onkeypress = 

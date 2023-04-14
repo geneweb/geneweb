@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: deslist.txt,v 7.00 2016/02/04 21:22:17 mr Exp $ -->
+  <!-- $Id: templm/deslist.txt v7.0 2016/02/04 21:22:17 $ -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;

@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: ancmenu.txt,v 7.00 2016/02/04 21:20:22 mr Exp $ -->
+  <!-- $Id: templm/ancmenu.txt v7.0 2016/02/04 21:20:22 $ -->
   <title>%nn;
     %apply;a_of_b%with;
       [*ancestor/ancestors]1%nn;

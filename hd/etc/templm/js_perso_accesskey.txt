@@ -1,4 +1,4 @@
-<!-- $Id: js_perso_accesskey.txt,v 08/02/2016 05:44:54 A2 Exp $ -->
+<!-- $Id: templm/js_perso_accesskey.txt v7.0 08/02/2016 05:44:54 $ -->
 <script src=%static_path;templm/js_perso_accesskey.js></script>%(
    To personalize the descriptions of shortcuts, change the character under | column
 trl       |   in accordance with the definitions of shortucts in js_perso_accesskey.js case "_"%)

@@ -1,4 +1,4 @@
-<!-- $Id: menu_search.txt,v 7.00exp 08/02/2016 05:44:45 A2 Exp $ -->
+<!-- $Id: templm/menu_search.txt v7.0 08/02/2016 05:44:45 $ -->
 %include;js_perso_accesskey
 %define;lang(x)
   %apply;nth%with;

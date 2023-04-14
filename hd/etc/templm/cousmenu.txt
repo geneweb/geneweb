@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: cousmenu.txt,v 7.00 2014/12/13 16:55:44 mr Exp $ -->
+  <!-- $Id: templm/cousmenu.txt v7.0 2014/12/13 16:55:44 $ -->
   %( used to create list for dag %)
 
   <title>[*link between] %self; [and]0…</title>

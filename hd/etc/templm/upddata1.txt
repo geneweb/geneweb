@@ -3,7 +3,7 @@
    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: upddata1.txt,v 7.00 2016/01/31 00:01:16 mr Exp $ -->
+  <!-- $Id: templm/upddata1.txt v7.0 2016/01/31 00:01:16 $ -->
   <title>%title;</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>

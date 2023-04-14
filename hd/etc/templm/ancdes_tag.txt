@@ -1,4 +1,4 @@
-<!-- $Id: ancdes_tag.txt,v 7.00 2015/01/19 20:52:03 mr Exp $ -->
+<!-- $Id: templm/ancdes_tag.txt v7.0 2015/01/19 20:52:03 $ -->
 
 %define;tool()
   <script type="text/javascript">

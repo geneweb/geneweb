@@ -1,4 +1,4 @@
-<!-- $Id: modules/arbres.txt v 7.00 28/03/2017 19:53:53 hg -->
+<!-- $Id: modules/arbres.txt v7.0 28/04/2017 09:34:30 $ -->
 %(
 Options
 1: arbre vertical

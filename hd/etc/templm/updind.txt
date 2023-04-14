@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="%lang;">
 <head>
-<!-- $Id: updind.txt,v 7.00 2016/03/21 15:22:41 a2 mr Exp$ -->
+<!-- $Id: templm/updind.txt v7.0 2016/03/21 15:22:41 $ -->
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
       [*merge::person/persons]1 # %index;

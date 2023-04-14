@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: ancmenu.txt,v 7.1 exp 18/12/2022 19:03:30 $ -->
-  <!-- Copyright (c) 1998-2023 INRIA -->
+  <!-- $Id: ancmenu.txt v7.1 10/01/2023 20:01:49 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
       [*ancestor/ancestors]1%nn;

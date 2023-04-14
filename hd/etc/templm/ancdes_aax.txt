@@ -1,4 +1,4 @@
-<!-- $Id: ancdes_aax.txt,v 7.00 2014/11/22 21:42:28 mr Exp $ -->
+<!-- $Id: templm/ancdes_aax.txt v7.0 2014/11/22 21:42:28 $ -->
 
 %include;ancdes_stat
 

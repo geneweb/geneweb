@@ -1,6 +1,5 @@
-<!-- Copyright (c) 1998-2019 INRIA -->
+<-- $Id: buttons_fnames.txt v7.1 $ -->
 %( Boutons de configurations et d'options %)
-
 <div class="d-flex">
   <a href="%prefix_base_password;%nn;
     %foreach;env_binding;%if;(env.val!="" and env.key!="reset" and 
@@ -37,4 +36,3 @@
     title="[*v7 refresh fnames cache]"><i class="fa fa-sync-alt mr-2 mt-2"></i></i>
   </a>
 </div>
-<!-- fin buttons -->

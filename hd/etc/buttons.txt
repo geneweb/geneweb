@@ -1,5 +1,5 @@
 <!-- $Id: buttons.txt v7.1 26/11/2022 00:12:36 $ -->
-<!-- Copyright (c) 1998-2023 INRIA -->
+<!-- Copyright (c) 1998-2007 INRIA -->
 %( Boutons de configurations et d'options %) 
 %let;istable;%if;((evar.m="D" and (evar.t="H" or evar.t="I")) or (evar.m="A" and (evar.t="Z" or evar.t="Y")))1%end;%in;
 <div class="button-group" role="group" aria-label="nav buttons">

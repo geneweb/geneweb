@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: anclist.txt,v 7.1 exp 26/09/2020 12:05:01 ddr Exp $ -->
+  <!-- $Id: anclist.txt v7.1 04/03/2023 09:51:04 $ -->
   <title>%nn;
     %if;(e.t = "F")- [*surnames branch] -%nn;
     %else

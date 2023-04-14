@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: deslist_hr.txt,v 7.00 24/09/2020 21:32:34 gwmr Exp $ -->
-  <!-- Copyright (c) 1998-2020 INRIA -->
+  <!-- $Id: deslist_hr.txt v7.1 09/01/2023 00:02:45 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;

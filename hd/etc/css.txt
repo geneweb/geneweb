@@ -1,4 +1,4 @@
-<!-- $Id: css.txt, v7.1 24/11/2022 08:05:59 $ -->
+<!-- $Id: css.txt v7.1 28/03/2023 03:32:53 $ -->
 <style>/* Put here only properties that uses variables */
 li.folder { list-style-type: disc; list-style-image: url('%image_prefix;/folder.png'); }
 li.file { list-style-type: circle; list-style-image: url('%image_prefix;/file.png'); }

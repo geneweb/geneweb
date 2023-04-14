@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: ancsosa.txt,v7.1 23/11/2022 04:15:38 $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: ancsosa.txt v7.1 04/03/2022 09:51:04 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
 %define;tothegen(xx)
   [to the %s generation:::xx]%nn;
 %end;

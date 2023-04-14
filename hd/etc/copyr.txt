@@ -1,4 +1,4 @@
-<!-- copyr.txt v7.1 26/11/2022 18:43:32 -->
+<!-- $Id: copyr.txt v7.1 26/11/2022 18:43:32 $ -->
 %define;language(x)
   %apply;nth%with;
     /af/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lt/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/tr/zh/

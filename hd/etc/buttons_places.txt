@@ -1,5 +1,5 @@
-<!-- $Id: buttons_places.txt v7.00 28/01/2019 05:47:07 $ -->
-<!-- Copyright (c) 1998-2019 INRIA -->
+<!-- $Id: buttons_places.txt v7.1 12/01/2023 18:54:37 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
 %( Boutons de configurations et d'options %)
 
 <form class="form-group mx-1" name="evt_url" method="get" action="%action;">

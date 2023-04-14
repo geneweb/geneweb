@@ -1,4 +1,4 @@
-<!-- $Id: modules/relations.txt v 7.00 20/11/2016 06:10:01 hg -->
+<!-- $Id: modules/relations.txt v7.1 04/30/2023 09:51:04 $ -->
 %( op_m=1 Relations  %)
 %( op_m=2 Relations complete (events) %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;

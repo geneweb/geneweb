@@ -1,4 +1,4 @@
-<!-- $Id: modules/unions.txt v7.1exp 04/03/2023 09:15:07 hg -->
+<!-- $Id: modules/unions.txt v7.1 04/03/2023 09:51:04 $ -->
 %( op_m=1 simple: name %)
 %( op_m=2 photos: simple with photo %)
 %( op_m=3 evolved: spouse parents and children's spouse %)

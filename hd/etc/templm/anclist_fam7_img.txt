@@ -1,4 +1,4 @@
-<!-- $Id: anclist_fam7_img.txt,v 7.00 2015/01/07 11:39:17 mr Exp $ -->
+<!-- $Id: templm/anclist_fam7_img.txt v7.0 2015/01/07 11:39:17 $ -->
 
 %let;ref_index;%index;%in;
 %let;ref_sex;%if(is_male)[him/her]0%elseif;(is_female)[him/her]1%else;0%end;%in;
