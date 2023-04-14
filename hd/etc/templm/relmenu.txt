@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: relmenu.txt,v 7.00 2015/04/20 15:57:16 mr Exp $ -->
+  <!-- $Id: templm/relmenu.txt v7.0 2015/04/20 15:57:16 $ -->
   %( <!-- cousmenu.txt is included in relmenu1.txt --> %)
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;

@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anclist.txt,v 7.00 2015/07/05 13:23:34 mr Exp $ -->
+  <!-- $Id: templm/anclist.txt v7.0 2015/07/05 13:23:34 $ -->
   %let;l_v0;%evar.v;%in;
   %let;l_v;%if;(bvar.max_anc_level = "")%l_v0;%elseif;(bvar.max_anc_level > l_v0)%l_v0;%else;%bvar.max_anc_level;%end;%in;
   <title>%nn;

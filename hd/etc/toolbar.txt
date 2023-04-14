@@ -1,4 +1,4 @@
-<!-- $Id: toolbar.txt, v7.0-exp 22/06/2018 07:25:22 flh Exp $ -->
+<!-- $Id: toolbar.txt v7.0 16/06/2019 00:03:14 $ -->
 <script><!--
 function insertTags (tagOpen, tagClose, sampleText) {
   var t = document.getElementById("notes_comments")

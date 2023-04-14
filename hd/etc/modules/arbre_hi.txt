@@ -1,4 +1,4 @@
-  <!-- $Id: arbre_hi.txt -->
+  <!-- $Id: modules/arbre_hi.txt v7.1 04/03/2023 09:51:04 $-->
 %let;evarv;%if;(evar.v!="")%evar.v;%else;5%end;%in;
 %let;evart;%if;(evar.t!="")%evar.t;%else;T%end;%in;
 %let;evart1;%if;(evar.t1!="")%evar.t1;%else;CT%end;%in;

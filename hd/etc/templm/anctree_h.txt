@@ -1,4 +1,4 @@
-  <!-- $Id: anctree_h.txt,v 7.00 2015/12/10 16:10:23 mr Exp $ -->
+  <!-- $Id: templm/anctree_h.txt v7.0 2015/12/10 16:10:23 $ -->
 
   <style type="text/css">
     #htree{position:relative;font-family:monospace;font-size:20pt;width:30cm;height:30cm;border:solid 1px #000;}

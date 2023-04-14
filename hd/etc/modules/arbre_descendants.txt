@@ -1,4 +1,4 @@
-<!-- $Id: modules/arbre_descendants v7.00 2017/12/04 20:02:08 hg -->
+<!-- $Id: modules/arbre_descendants.txt v7.1 04/03/2023 09:51:04 $ -->
 %define;display_person(xxx)
   %if;(not cancel_links)
   <div class="list-group-item px-0 mx-0 border-0">

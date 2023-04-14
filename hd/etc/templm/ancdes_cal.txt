@@ -1,4 +1,4 @@
-<!-- $Id: ancdes_cal.txt,v 7.00 2014/11/25 21:14:52 mr Exp $ -->
+<!-- $Id: templm/ancdes_cal.txt v7.0 2014/11/25 21:14:52 $ -->
 
 %( table calendar nb day-month tf1/tl1 = cal %)
 

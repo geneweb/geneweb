@@ -1,4 +1,4 @@
-<!-- $Id: menubar.txt,v 1.0 2015/03/25 12:32:46 mr Exp $ -->
+<!-- $Id: templm/menubar.txt v7.0 2015/03/25 12:32:46 $ -->
 %if;(evar.m!="SND_IMAGE" and evar.m!="MRG")
 %define;navsosa(xx)
   [*navigation with %t as Sosa reference:::xx].

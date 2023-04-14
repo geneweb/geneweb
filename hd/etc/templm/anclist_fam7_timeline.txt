@@ -1,4 +1,4 @@
-<!-- $Id: anclist_fam7_timeline.txt,v 7.00 2014/11/12 14:33:31 mr Exp $ -->
+<!-- $Id: templm/anclist_fam7_timeline.txt v7.0 2014/11/12 14:33:31 $ -->
 
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
 %let;lurl;%prefix;m=A;t=F;fam7=on;tf1=fam73;cousins=%evar.cousins;;spouse=%evar.spouse;;maxv=%evar.maxv;;v=%evar.v;;%in;

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: updmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: updmenu1.txt v7.1 04/03/2023 10:39:01 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*update]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">

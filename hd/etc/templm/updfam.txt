@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 7.00 2016/03/21 22:16:53 a2 mr Exp $ -->
+  <!-- $Id: templm/updfam.txt v7.0 2016/03/21 22:16:53 $ -->
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0%nn;
@@ -20,7 +20,7 @@
   %include;js_upd
   %include;hed
   %include;updind_updfam
-%( <!-- Begin define  --> %)
+%( <!-- Begin define --> %)
 %let;lt1;<abbr title="%ak1;%ak2;%ak3;%ak7;">#</abbr>%in;
 %let;lt2;<abbr title="%lta;%ltb;%ltc;">[date/dates]0</abbr>%in;
 %let;lt3;

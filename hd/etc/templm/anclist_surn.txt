@@ -1,4 +1,4 @@
-<!-- $Id: anclist_surn.txt,v 7.00 2014/11/26 21:27:08 mr Exp $ -->
+<!-- $Id: anclist_surn.txt v7.0 2014/11/26 21:27:08 $ -->
 
 %( list eclair tf1 = surn %)
   %apply;togen()

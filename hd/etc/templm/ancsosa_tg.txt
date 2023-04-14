@@ -1,4 +1,4 @@
-<!-- $Id: ancsosa_tg.txt,v 7.00 2014/11/20 11:45:02 mr Exp $ -->
+<!-- $Id: templm/ancsosa_tg.txt v7.0 2014/11/20 11:45:02 $ -->
 
 %include;ancsosa_deslist
 

@@ -1,4 +1,4 @@
-<!-- $Id: ancdes_afm.txt,v 7.00 2014/11/24 16:28:06 mr Exp $ -->
+<!-- $Id: templm/ancdes_afm.txt v7.0 2014/11/24 16:28:06 $ -->
 
 %( age father mother by generation tf1/tl1 = afm %)
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: welcome.txt,v 7.00 2015/08/14 16:19:14 mr Exp $ -->
+  <!-- $Id: templm/welcome.txt v7.0 2015/08/14 16:19:14 $ -->
   <title>GeneWeb - %apply;capitalize(base.name)</title>
   <meta name="robots" content="none"/>
   <meta charset="utf-8">

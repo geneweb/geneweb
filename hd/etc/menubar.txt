@@ -1,4 +1,4 @@
-<!-- $Id: menubar.txt v7.1 26/11/2022 17:53:50 -->
+<!-- $Id: menubar.txt v7.1 17/01/2023 14:11:53 $ -->
 %let;laA;title="[*add::family/families]0 (A)" accesskey="A"%in;
 %let;laD;title="[*difference between the two revisions] (D)" accesskey="D"%in;
 %let;laI;title="[*send::image/images]0 (I)" accesskey="I"%in;

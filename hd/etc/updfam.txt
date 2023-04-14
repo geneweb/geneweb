@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updfam.txt,v 7.00 exp 13/05/2020 17:53:58 $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: updfam.txt v7.1 10/012023 20:01:49 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">

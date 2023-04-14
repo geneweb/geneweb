@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: cousins.txt, v7.1 12/10/2021 20:47:51 Exp $ -->
-  <!-- Copyright (c) 1998-2021 INRIA -->
+  <!-- $Id: cousins.txt v7.1 12/10/2021 20:47:51 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
 %define;cousin_lex(vvv,www)
   [*cousins.vvv.www]1
 %end;

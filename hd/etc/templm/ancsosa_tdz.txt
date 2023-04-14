@@ -1,4 +1,4 @@
-<!-- $Id: ancsosa_tdz.txt,v 7.00 2015/04/15 23:36:21 mr Exp $ -->
+<!-- $Id: templm/ancsosa_tdz.txt v7.0 15/04/2015 23:36:21 $ -->
 
 %let;lai;alt="[image/images]0"%in;
 %let;ltap;%if;(wizard and not cancel_links) title="[add::parents]" %end;%in;

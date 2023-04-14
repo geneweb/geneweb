@@ -1,4 +1,4 @@
-<!-- $Id: ancdes_bmdm.txt,v 7.00 2015/01/23 14:37:11 mr Exp $ -->
+<!-- $Id: templm/ancdes_bmdm.txt v7.0 2015/01/23 14:37:11 $ -->
 
 %( birth death : month week_day moon_age tf1/tl1 = bmdm %)
 

@@ -1,4 +1,4 @@
-<!-- $Id: home.txt, v7.00-exp 06/02/2022 01:52:52 $ -->
+<!-- $Id: home.txt v7.1 04/03/2023 09:31:52 $ -->
 %define;display_sosa_ref(xx)
   [*sosa reference: %t:::xx]
 %end;

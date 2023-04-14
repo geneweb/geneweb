@@ -1,4 +1,4 @@
-<!-- $Id: upd_datalist.txt,v 7.00 210/02/2016 07:29:34 mr Exp $ -->
+<!-- $Id: templm/upd_datalist.txt v7.0 21/02/2016 07:29:34 $ -->
 %define;dlist(z1)
   <datalist id="dlz1">
   <option id="oz1">0</option>

@@ -1,4 +1,4 @@
-<!-- $Id: modules/gr_parents.txt v 7.00 20/11/2016 06:10:01 hg  -->
+<!-- $Id: modules/gr_parents.txt v7.0 27/06/2018 18:47:46 $ -->
 %( op_m=1 maternal gr_parents & uncles, parents & siblings, paternal gr_parents  & uncles in 3 columns %)
 %( op_m=2 maternal gr_parents & uncles, paternal gr_parents & uncles in 2 columns %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;

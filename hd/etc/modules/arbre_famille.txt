@@ -1,5 +1,4 @@
-<!-- $Id: modules/arbre_famille.txt v 7.00 30/10/2017 22:03:29 hg/a2 -->
-
+<!-- $Id: modules/arbre_famille.txt v7.1 04/03/2023 09:51:04 $ -->
 %define;short_display_person_image(xxx,yyy,zzz)
   %let;personinfo;%if;("xxx"="child")%sp;(%childrank;)%nn;
                   %elseif;("xxx"="child.spouse")

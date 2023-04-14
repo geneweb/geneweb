@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: cousmenu.txt, v7.1 12/12/2022 10:44:01 ddr a2 Exp $ -->
-  <!-- Copyright (c) 1998-2023 INRIA -->
+  <!-- $Id: cousmenu.txt v7.1 12/12/2022 10:44:01 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     [*relationship link between]%sp;
     %if;(public_name != "")%public_name;%else;%first_name;%end;

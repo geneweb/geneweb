@@ -1,4 +1,4 @@
-<!-- $Id: modules/individu.txt v7.1exp 04/03/2023 09:04:59 ddr hg mr a2 -->
+<!-- $Id: modules/individu.txt v7.1 04/03/2023 09:51:04 $ -->
 %( options
 0: skip
 1: standard

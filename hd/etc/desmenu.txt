@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: desmenu.txt v 7.00 26/05/2020 19:10:25 $ -->
-  <!-- Copyright (c) 1998-2020 INRIA -->
+  <!-- $Id: desmenu.txt v7.1 27/11/2022 19:54:13 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;

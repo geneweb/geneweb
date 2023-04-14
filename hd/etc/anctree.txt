@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: anctree.txt,v. 7.1exp 29/12/2022 07:25:35 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: anctree.txt v7.1 10/01/2023 20:01:49 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;

@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updhist_diff.txt, v. 7 12/07/2017 21:31:27 flh a2 Exp $ -->
-  <!-- Copyright (c) 2006-2017 INRIA -->
+  <!-- $Id: updhist_diff.txt v7.1 10/01/2023 20:01:49 $ -->
   <title>[*revision history]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">

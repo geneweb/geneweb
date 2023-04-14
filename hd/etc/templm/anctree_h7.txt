@@ -1,4 +1,4 @@
-  <!-- $Id: anctree_h7.txt,v 7.00 2016/05/02 23:28:26 mr Exp $ -->
+  <!-- $Id: templm/anctree_h7.txt v7.0 2016/05/02 23:28:26 $ -->
   <link type="text/css" href="%static_path;/modules/arbre_h7%bvar.css;.css" media="all" rel="stylesheet" %/>
 
   %let;l_fs;%if;(evar.fs != "")%evar.fs;%else;9%end;%in;

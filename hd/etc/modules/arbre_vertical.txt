@@ -1,4 +1,5 @@
-<!-- $Id: modules/arbre_vertical v7.1exp 29/12/2022 04:56:27 Arbre ascendant vertical -->
+<!-- $Id: modules/arbre_vertical.txt v7.1 04/03/2023 10:39:16 $ -->
+%( Arbre ascendant vertical %)
 %define;a_tree_line()
   %if;(not is_first)
     <tr>

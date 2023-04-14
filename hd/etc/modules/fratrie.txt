@@ -1,4 +1,4 @@
-<!-- $Id: modules/fratrie.txt v 7.00 28/03/2017 20:05:48 hg -->
+<!-- $Id: modules/fratrie.txt v7.1 04/03/2023 09:51:04 $ -->
 %( op_m=1 simple: name %)
 %( op_m=2 simple with photo %)
 %( op_m=3 complete: name, marriages %)
@@ -187,7 +187,7 @@
         %end;
       %end;
     %end;
-<!--  modules/freresoeur_complet (deux listes de demi frères côte à côte) -->
+%( frères et sœurs complet : deux listes de demi-frères côte-à-côte %)
 %elseif;(op_m=3 and has_parents and (half_father != 0 or half_mother != 0))
   <h2>[*half-brothers/half-sisters/half-siblings]2</h2>
   <table style="border:%border;;width:100%">
@@ -248,7 +248,7 @@
         %end;
       </tr>
     </table>
-<!--  Freres et soeurs complet photo (from templf) -->
+%( Freres et soeurs complet photo (from templf) %)
 %elseif;(op_m=4 and has_parents and (half_father != 0 or half_mother != 0))
   <table style="border-width:%border;;width:100%%">
     <tr>

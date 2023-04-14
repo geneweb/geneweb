@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: updmenu1.txt,v 7.00 2015/03/25 14:51:55 mr Exp $ -->
+  <!-- $Id: templm/updmenu1.txt v7.0 2015/03/25 14:51:55 $ -->
   <title>[*update]</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>

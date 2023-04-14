@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: dag.txt,v 7.00 2015/04/30 11:14:09 mr Exp $ -->
+  <!-- $Id: templm/dag.txt v7.0 2015/04/30 11:14:09 $ -->
   <title>%head_title;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>

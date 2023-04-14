@@ -1,4 +1,4 @@
-<!-- $Id: tools.txt,v 2016/02/04 21:27:03 A2 Exp $ -->
+<!-- $Id: templm/tools.txt v7.0 2016/02/04 21:27:03 $ -->
 
   %let;l_fs;%if;(evar.fs != "")%evar.fs;%else;15%end;%in;
   %let;l_wi;%if;(evar.wi != "")%evar.wi;%else;980%end;%in;

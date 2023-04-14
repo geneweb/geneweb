@@ -1,5 +1,5 @@
 <!-- $Id: buttons_dag.txt v7.1 26/11/2022 00:12:27 $ -->
-<!-- Copyright (c) 1998-2022 INRIA -->
+<!-- Copyright (c) 1998-2007 INRIA -->
 %( Boutons de configurations et d’options pour les arbres et DAG %)
 %define;urlv(x,y)
   %url_set.x.y;

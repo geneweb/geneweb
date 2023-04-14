@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-<!-- $Id: welcome.txt, v.7.00 12/01/2020 11:35:58 $ -->
+<!-- $Id: welcome.txt v7.1 04/03/2023 09:51:04 $ -->
   <title>GeneWeb – %base.name;</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">

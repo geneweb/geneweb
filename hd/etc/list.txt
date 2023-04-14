@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: list.txt, v7 21/01/2019 02:58:13 hg Exp $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: list.txt v7.1 04/03/2023 09:51:04 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     [*list/list (ancestors)] [of] [person/persons]0%if;(evar.surn!="") [by] [surname/surnames]0%end; [by] [place]%nn;
   </title>

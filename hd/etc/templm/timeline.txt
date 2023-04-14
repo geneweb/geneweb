@@ -1,4 +1,4 @@
-<!-- timeline1 2015/12/15 22:50:46 mr -->
+<!-- $Id: templm/timeline1.txt 2015/12/15 22:50:46 $ -->
 %(
    timeline contains:
    self events 

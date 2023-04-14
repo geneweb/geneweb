@@ -1,5 +1,5 @@
-<!-- $Id: modules/arbre_hi_tools.txt v7.00 2017/11/18 20:02:08 Arbre ascendant (vertical) -->
-
+<!-- $Id: modules/arbre_hi_tools.txt v7.0 27/06/2018 18:47:46 $ -->
+%( Arbre ascendant vertical %)
 %let;evarv;%if;(evar.v!="")%evar.v;%else;5%end;%in;
 %let;evarscl;%if;(evar.scale!="")%evar.scale;%else;100%end;%in;
 %let;evarfs;%if;(evar.fs!="")%evar.fs;%else;17%end;%in;

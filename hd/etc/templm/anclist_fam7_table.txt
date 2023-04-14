@@ -1,4 +1,4 @@
-<!-- $Id: anclist_fam7_table.txt,v 7.00 2014/11/12 14:33:31 mr Exp $ -->
+<!-- $Id: templm/anclist_fam7_table.txt v7.0 2014/11/12 14:33:31 $ -->
 
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;

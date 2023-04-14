@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: destable.txt v7.00 02/04/2018 13:42:12 $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: destable.txt v7.1 10/01/2023 20:01:49 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
 <title>%nn;
   %apply;a_of_b%with;[*descendants]%and;%self;%end;
      %sp;[up to] %e.v; %if;(e.v>1)[generation/generations]1%else;[generation/generations]0%end;

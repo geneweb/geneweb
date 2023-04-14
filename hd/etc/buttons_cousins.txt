@@ -1,4 +1,4 @@
-<!-- $Id: cousins_tools.txt, v7.1 26/11/2022 07:40:20 $ -->
+<!-- $Id: cousins_tools.txt v7.1 26/11/2022 07:40:20 $ -->
 %define;url(vvv,ttt)
   %prefix_base_password;
   %foreach;env_binding;

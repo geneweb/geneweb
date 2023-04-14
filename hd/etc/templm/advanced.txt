@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: advanced.txt,v 7.00 2015/01/23 14:36:06 mr Exp $ -->
+  <!-- $Id: templm/advanced.txt v7.0 2015/01/23 14:36:06 $ -->
   <title>[*advanced request]</title>
   <meta name="robots" content="none"%/>
   <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>

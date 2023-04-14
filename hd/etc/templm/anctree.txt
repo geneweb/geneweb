@@ -1,7 +1,7 @@
 ﻿%doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anctree.txt,v 7.00 2015/12/10 21:34:32 mr Exp $ -->
+  <!-- $Id: templm/anctree.txt v7.0 2015/12/10 21:34:32 $ -->
   %let;l_v0;%if;(evar.maxv!="" and evar.v > evar.maxv)%evar.maxv;%else;%evar.v;%end;%in;
   %let;l_v;%if;(bvar.max_anc_tree = "" or evar.t != "T")%l_v0;%elseif;(bvar.max_anc_tree > l_v0)%l_v0;%else;%bvar.max_anc_tree;%end;%in;
   <title>%nn;
