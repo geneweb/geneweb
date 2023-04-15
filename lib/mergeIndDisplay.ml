@@ -95,11 +95,20 @@ let print_differences conf base branches p1 p2 =
       match Image.get_portrait conf base p with
       | Some (`Url url) ->
           ({|<img src="|} ^<^ escape_html url
-           ^>^ {|" style="max-width:75px;max-height:100px">|}
+           ^>^ {|" style="max-width:75px;max-height:100px">|} ^ url
             :> Adef.safe_string)
       | Some (`Path path) ->
-          (* TODO: ?? *)
-          (escape_html path :> Adef.safe_string)
+          let k = Image.default_portrait_filename base p in
+          let s = Unix.stat path in
+          Printf.sprintf
+            {|<img src="%sm=IM&d=%s&%s&k=%s" \
+              style="max-width:75px;max-height:100px"> %s|}
+            (commd conf :> string)
+            (string_of_int
+            @@ int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
+            (acces conf base p : Adef.escaped_string :> string)
+            k path
+          |> Adef.safe
       | None -> Adef.safe "");
   string_field
     (transl conf "public name" |> Adef.safe)
