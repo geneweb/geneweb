@@ -35,6 +35,7 @@ let print_differences conf base branches p1 p2 =
         Output.print_sstring conf {|>|};
         Output.printf conf {|<label class="custom-control-label" for="|};
         Output.print_sstring conf name;
+        Output.print_sstring conf (string_of_int i);
         Output.print_sstring conf {|">|};
         Output.print_string conf x;
         Output.print_sstring conf {|</label></div>|}
