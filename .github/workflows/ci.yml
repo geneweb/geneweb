@@ -35,5 +35,9 @@ jobs:
           opam pin add . -y --no-action
           opam depext -y geneweb
           opam install -y ./*.opam --deps-only --with-test
+      - name: makedistrib
+        run: |
+          opam exec -- ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release
+          opam exec -- make distrib
       - name: makeci
         run: opam exec -- make ci
