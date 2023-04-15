@@ -74,6 +74,11 @@ let print conf base p =
         Output.print_sstring conf "<label class=\"custom-control-label\" for=\"";
         Output.print_string conf (get_iper p |> string_of_iper |> Mutil.encode);
         Output.print_sstring conf "\">";
+        Output.print_sstring conf
+          (Printf.sprintf "%s.%d %s"
+             (get_first_name p |> sou base)
+             (get_occ p)
+             (get_surname p |> sou base));
         Output.print_sstring conf "</label></div>")
       list;
   Output.print_sstring conf
