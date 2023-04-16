@@ -833,8 +833,12 @@ let wprint_geneweb_link conf href s =
   Output.print_string conf (geneweb_link conf href s)
 
 let reference_flags with_id conf base p (s : Adef.safe_string) =
+  let cgl =
+    match p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
+  in
   let iper = get_iper p in
-  if is_hidden p then s
+  (* let is_hidden = is_empty_string (get_surname p) !! *)
+  if is_hidden p || cgl then s
   else
     "<a href=\""
     ^<^ (commd conf ^^^ acces conf base p :> Adef.safe_string)
