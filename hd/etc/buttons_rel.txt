@@ -8,7 +8,7 @@
         %prefix;&em=R&et=S%nn;
         %if;(e.i!="")&i=%e.i;&ei=%e.ei;%nn;
         %elseif;(person_index.1!="")&i=%person_index.1;&ei=%person_index.2;%end;%)%nn;
-          %if;(e.im!="")&image=%e.im;%end;%nn;
+          %if;(e.im!="")&im=%e.im;%end;%nn;
           %if;(e.sp!="")&sp=%e.sp;%end;%nn;
           %if;(e.bd!="")&bd=%e.bd;%end;%nn;
           %if;(e.color!="")&color=%e.color;%end;%end;"
@@ -45,16 +45,14 @@
     %end;
   </div>
   <div class="col-3">
-    <a href="%if;(e.im!="off")%url_set.im.off;%else;%url_set.im;%end;"
-      %if;(e.dag="on")class="disabled"%end;
-      title="%if;(e.im!="off")[*visualize/show/hide/summary]2%else;
+    <a href="%if;(not (e.im="off" or e.im=0))%url_set.im.off;%else;%url_set.im;%end;"
+      title="%if;(not (e.im="off" or e.im=0))[*visualize/show/hide/summary]2%else;
           [*visualize/show/hide/summary]1%end; [image/images]0">
-      <i class="far fa-image fa-lg%if;(e.im!="off") text-danger%end;"></i></a>
-    <a class="ml-2" href="%if;(e.sp!="on")%url_set.sp.on;%else;%url_set.sp;%end;"
-      %if;(e.dag="on")class="disabled"%end;"
-      title="%if;(e.sp!="on")[*visualize/show/hide/summary]1%else;
+      <i class="far fa-image fa-lg%if;(not (e.im="off" or e.im=0)) text-danger%end;"></i></a>
+    <a class="ml-2" href="%if;(not (e.sp="on" or e.sp=1 or e.spouse="on"))%url_set2.sp.spouse;&sp=on%else;%url_set2.sp.spouse;%end;"
+      title="%if;(not (e.sp="on" or e.sp=1 or e.spouse="on"))[*visualize/show/hide/summary]1%else;
           [*visualize/show/hide/summary]2%end; [spouse/spouses]1">
-      <i class="fa fa-user male p-0"></i>%if;(e.sp!="on")<i class="fa fa-user female p-0"></i>%end;</a>
+      <i class="fa fa-user male p-0"></i>%if;(not (e.sp="on" or e.spouse="on"))<i class="fa fa-user female p-0"></i>%end;</a>
     %if;(e.i!="" and e.ei!="")
       <a class="ml-2" href="%url_set2.i.ei;&i=%e.ei;&ei=%e.i;"
         title="[*invert] [person/persons]1"><i class="fa fa-people-arrows fa-fw"></i></a>
