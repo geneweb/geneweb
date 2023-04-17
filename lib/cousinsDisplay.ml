@@ -39,11 +39,16 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
         ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2))
         ^<^ ((if (List.assoc_opt "spouse" conf.env :> string option) = Some "on"
              then Adef.encoded "&spouse=on"
+             else if (List.assoc_opt "sp" conf.env :> string option) = Some "on"
+            then Adef.encoded "&sp=on"
              else Adef.encoded "")
              ^^^ (if
                   (List.assoc_opt "image" conf.env :> string option)
                   = Some "off"
                  then Adef.encoded "&image=off"
+                 else if
+                 (List.assoc_opt "im" conf.env :> string option) = Some "off"
+                then Adef.encoded "&im=off"
                  else Adef.encoded "")
              ^^^ "&bd="
              ^<^ Option.value ~default:(Adef.encoded "0")
@@ -416,7 +421,7 @@ let print_anniv conf base p dead_people level =
       ^<^ string_of_int (sosa_of_persons conf base down_br)
       ^<^ (if spouse = None then "&" ^<^ acces_n conf base (Adef.escaped "4") c
           else Adef.escaped "")
-      ^>^ "&spouse=on"
+      ^>^ "&sp=on"
     in
     "<a href=\""
     ^<^ (href :> Adef.safe_string)

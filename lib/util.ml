@@ -2430,10 +2430,12 @@ let display_options conf =
   let s =
     Adef.escaped
     @@
-    if
-      p_getenv conf.env "im" = Some "off"
-      || p_getenv conf.env "image" = Some "off"
+    if p_getenv conf.env "im" = Some "off" 
+      || p_getenv conf.env "im" = Some "0"
     then "&im=off"
+    else if
+      || p_getenv conf.env "image" = Some "off"
+    then "&image=off"
     else ""
   in
   let s = if p_getenv conf.env "ma" = Some "on" then s ^>^ "&ma=on" else s in

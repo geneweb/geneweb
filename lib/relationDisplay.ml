@@ -86,7 +86,10 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
   in
   commd conf ^^^ "em=R&ei=" ^<^ string_of_iper ip1 ^<^ "&i="
   ^<^ string_of_iper ip2
-  ^<^ (if p_getenv conf.env "spouse" = Some "on" then "&spouse=on" else "")
+  ^<^ (if p_getenv conf.env "sp" = Some "on" || p_getint conf.env "sp" = Some 1
+      then "&sp=on"
+      else if p_getenv conf.env "spouse" = Some "on" then "&spouse=on"
+      else "")
   ^<^ bd ^^^ color ^>^ "&et=S" ^ sl
 
 let print_relation_path conf base ip1 ip2 path ifam excl_faml =
@@ -492,8 +495,11 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
     Adef.escaped
     @@
     if
-      p_getenv conf.env "im" = Some "off"
-      || p_getenv conf.env "image" = Some "off"
+      p_getenv conf.env "image" = Some "off"
+    then "&image=off"
+    else if
+      || p_getenv conf.env "im" = Some "off"
+      || p_getenv conf.env "im" = Some "0"
     then "&im=off"
     else ""
   in
@@ -546,8 +552,11 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
     Adef.escaped
     @@
     if
-      p_getenv conf.env "im" = Some "off"
-      || p_getenv conf.env "image" = Some "off"
+      p_getenv conf.env "image" = Some "off"
+    then "&image=off"
+    else if
+      || p_getenv conf.env "im" = Some "off"
+      || p_getenv conf.env "im" = Some "0"
     then "&im=off"
     else ""
   in
@@ -729,9 +738,11 @@ let print_dag_links conf base p1 p2 rl =
               if i <> 0 then Output.print_sstring conf ",";
               Output.print_sstring conf (string_of_int x))
             l2;
-          if
+          if p_getenv conf.env "image" = Some "off" then
+            Output.print_sstring conf "&image=off"
+          else if
             p_getenv conf.env "im" = Some "off"
-            || p_getenv conf.env "image" = Some "off"
+            || p_getenv conf.env "im" = Some "0"
           then Output.print_sstring conf "&im=off";
           if p_getenv conf.env "bd" = Some "on" then
             Output.print_sstring conf "&bd=on";
@@ -859,8 +870,10 @@ let print_main_relationship conf base long p1 p2 rel =
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Util.include_template conf conf.env "buttons_rel" (fun () -> ());
-  (match p_getenv conf.env "spouse" with
-  | Some "on" -> conf.senv <- conf.senv @ [ ("spouse", Mutil.encode "on") ]
+  (match (p_getenv conf.env "spouse", p_getenv conf.env "sp") with
+  | Some "on", _ -> conf.senv <- conf.senv @ [ ("spouse", Mutil.encode "on") ]
+  | _, Some "on" | _, Some "1" ->
+      conf.senv <- conf.senv @ [ ("sp", Mutil.encode "on") ]
   | _ -> ());
   (match p_getenv conf.env "cgl" with
   | Some "on" -> conf.senv <- conf.senv @ [ ("cgl", Mutil.encode "on") ]

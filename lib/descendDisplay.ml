@@ -979,7 +979,9 @@ let display_descendant_with_table conf base max_lev p =
 let make_tree_hts conf base gv p =
   let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
   let sps =
-    match Util.p_getenv conf.env "sp" with Some "on" -> true | _ -> false
+    match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
+    | Some "on", _ | _, Some "on" -> true
+    | _, _ -> false
   in
   let _marr =
     match Util.p_getenv conf.env "ma" with Some "on" -> true | _ -> false
@@ -1816,7 +1818,9 @@ let rec find_ancestors base iap ip list v =
 
 let make_vaucher_tree_hts conf base gv p =
   let sps =
-    match Util.p_getenv conf.env "sp" with Some "on" -> true | _ -> false
+    match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
+    | Some "on", _ | _, Some "on" -> true
+    | _, _ -> false
   in
   let marr =
     match Util.p_getenv conf.env "ma" with Some "on" -> true | _ -> false
