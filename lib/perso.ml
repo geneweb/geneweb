@@ -2705,7 +2705,13 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       in
       let i = try int_of_string l1 with Failure _ -> raise Not_found in
       let j = try int_of_string l2 with Failure _ -> raise Not_found in
-      let min, _ = cousins_dates.(i).(j) in
+      let min, _ =
+        if
+          i + 1 > Array.length cousins_dates
+          || j + 1 > Array.length cousins_dates.(i)
+        then (-1, -1)
+        else cousins_dates.(i).(j)
+      in
       VVstring (string_of_int min)
   | [ "cous_paths_max_date"; l1; l2 ] ->
       let max_a_l =
@@ -2725,7 +2731,13 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       in
       let i = try int_of_string l1 with Failure _ -> raise Not_found in
       let j = try int_of_string l2 with Failure _ -> raise Not_found in
-      let _, max = cousins_dates.(i).(j) in
+      let _, max =
+        if
+          i + 1 > Array.length cousins_dates
+          || j + 1 > Array.length cousins_dates.(i)
+        then (-1, -1)
+        else cousins_dates.(i).(j)
+      in
       VVstring (string_of_int max)
   | [ "cous_paths_cnt_raw"; l1; l2 ] -> (
       let max_a_l =
@@ -2741,7 +2753,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       let l = Cousins.cousins_l1_l2_aux base max_a_l max_d_l l1 l2 p in
       match l with
       | Some l -> VVstring (string_of_int (List.length l))
-      | None -> raise Not_found)
+      | None -> VVstring "-1")
   | [ "cous_paths_cnt"; l1; l2 ] -> (
       let max_a_l =
         match get_env "max_anc_level" env with
@@ -2757,7 +2769,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match l with
       | Some l ->
           VVstring (string_of_int (List.length (Cousins.cousins_fold l)))
-      | None -> raise Not_found)
+      | None -> VVstring "-1")
   | [ "cous_paths"; l1; l2 ] -> (
       let max_a_l =
         match get_env "max_anc_level" env with
@@ -2777,7 +2789,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
               cl := Cousins.cousins_fold l;
               null_val
           | _ -> raise Not_found)
-      | None -> raise Not_found)
+      | None -> VVstring "-1")
   | [ "cous_implx_cnt"; l1; l2 ] ->
       let max_a_l =
         match get_env "max_anc_level" env with
@@ -2835,7 +2847,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
             List.map (fun (ip, _, _, _) -> ip) l |> List.sort_uniq compare
           in
           VVstring (string_of_int (List.length l))
-      | None -> raise Not_found)
+      | None -> VVstring "-1")
   | "cremated_date" :: sl -> (
       match get_burial p with
       | Cremated cod when p_auth -> (

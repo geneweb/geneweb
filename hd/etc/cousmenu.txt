@@ -267,13 +267,14 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
 %( table of cousins.j-vvv+i.i c(k,i) | table size = v × (v+%cousins.max_d;)
     == l1 asc./l2 = max_desc (plus longue colonne v2) %)
 %define;table(xxx)
+  %let;maxanc;%cousins.max_a;%in;
   %let;maxdesc;%expr(cousins.max_d+xxx)%in;
   <table id="quickrel" class="table table-responsive-sm mb-0 mt-1 order-3">
     %for;j;1;maxdesc;
       <tr style="height:2rem">%nn;
         %for;i;0;xxx;
           %let;k;%expr(j+i-xxx)%in;
-          %if;(k>=0)
+          %if;(k>=0 and i<maxanc)
               %let;tot;%apply;cous_paths_cnt%with;%i;%and;%k;%end;%in;
               %let;tot_next;%apply;cous_paths_cnt%with;%i;%and;%expr(k+1)%end;%in;
               %if;(i>1 and k=0)
@@ -334,11 +335,12 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
 %( page title + counts shown at top of page using flex order %)
   <div class="d-flex justify-content-between order-2 mt-1">%nn;
     <h3 class="h4">[*link between]
+      %let;max;%if;(cousins.max_a < e.v)%cousins.max_a;%else;%e.v;%end;%in;
       %if;(public_name != "")%public_name;%else;%first_name;%end;
       %if;(qualifier != "") <em>%qualifier;</em>%end;
       %sp;%surname;
       %(%if;(alias != "") <em>(%alias;)</em>%end;%)
-      %sp;[and] [close family] [up to] %e.v; [generation/generations]1%( montantes [and] %expr(e.v+cousins.max_d) descendantes…%)
+      %sp;[and] [close family] [up to] %max; [generation/generations]1%( montantes [and] %expr(e.v+cousins.max_d) descendantes…%)
     </h3>
     <div class="d-flex flex-column justify-content-end text-right">
       %( quick count ascendants | TODO : filter by index to reduce asc./desc. implexes %)
