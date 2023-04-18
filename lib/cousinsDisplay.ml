@@ -37,22 +37,21 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
         ^<^ acces_n conf base (Adef.escaped "2") p2
         ^^^ "&b2="
         ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2))
-        ^<^ ((if (List.assoc_opt "spouse" conf.env :> string option) = Some "on"
+        ^<^ (if (List.assoc_opt "spouse" conf.env :> string option) = Some "on"
              then Adef.encoded "&spouse=on"
              else if (List.assoc_opt "sp" conf.env :> string option) = Some "on"
-            then Adef.encoded "&sp=on"
-             else Adef.encoded "")
-             ^^^ (if
-                  (List.assoc_opt "image" conf.env :> string option)
-                  = Some "off"
-                 then Adef.encoded "&image=off"
-                 else if
-                 (List.assoc_opt "im" conf.env :> string option) = Some "off"
-                then Adef.encoded "&im=off"
-                 else Adef.encoded "")
-             ^^^ "&bd="
-             ^<^ Option.value ~default:(Adef.encoded "0")
-                   (List.assoc_opt "bd" conf.env)
+             then Adef.encoded "&sp=on"
+             else Adef.encoded ""
+              :> Adef.escaped_string)
+        ^^^ (if Util.p_getenv conf.env "image" = Some "off" then
+               Adef.encoded "&image=off"
+             else if Util.p_getenv conf.env "im" = Some "off" then
+               Adef.encoded "&im=off"
+             else Adef.encoded ""
+              :> Adef.escaped_string)
+        ^^^ "&bd="
+        ^<^ (Option.value ~default:(Adef.encoded "0")
+               (List.assoc_opt "bd" conf.env)
               :> Adef.escaped_string)
       in
       "<a href=\"" ^<^ (href :> Adef.safe_string) ^^^ "\">" ^<^ s ^>^ "</a>"
@@ -71,17 +70,21 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
         ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2))
         ^<^ "&"
         ^<^ acces_n conf base (Adef.escaped "4") p3
-        ^^^ ((if (List.assoc_opt "spouse" conf.env :> string option) = Some "on"
-             then Adef.encoded "&spouse=on"
-             else Adef.encoded "")
-             ^^^ (if
-                  (List.assoc_opt "image" conf.env :> string option)
-                  = Some "off"
-                 then Adef.encoded "&image=off"
-                 else Adef.encoded "")
-             ^^^ "&bd="
-             ^<^ Option.value ~default:(Adef.encoded "0")
-                   (List.assoc_opt "bd" conf.env)
+        ^^^ (if Util.p_getenv conf.env "sp" = Some "on" then
+               Adef.encoded "&sp=on"
+             else if Util.p_getenv conf.env "spouse" = Some "on" then
+               Adef.encoded "&spouse=on"
+             else Adef.encoded ""
+              :> Adef.escaped_string)
+        ^^^ (if Util.p_getenv conf.env "im" = Some "off" then
+               Adef.encoded "&im=off"
+             else if Util.p_getenv conf.env "image" = Some "off" then
+               Adef.encoded "&image=off"
+             else Adef.encoded ""
+              :> Adef.escaped_string)
+        ^^^ "&bd="
+        ^<^ (Option.value ~default:(Adef.encoded "0")
+               (List.assoc_opt "bd" conf.env)
               :> Adef.escaped_string)
       in
       "<a href=\"" ^<^ (href :> Adef.safe_string) ^^^ "\">" ^<^ s ^>^ "</a>"
