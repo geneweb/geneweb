@@ -135,24 +135,26 @@ let get_min_max_dates base l =
   in
   loop (10000, -10000) l
 
-let rec ascendants base acc l i =
+let rec ascendants base acc l =
   match l with
   | [] -> acc
   (* TODO type for this tuple?; why list of level? *)
   | (ip, _, _, lev :: _ll) :: l -> (
       match get_parents (poi base ip) with
-      | None -> ascendants base acc l i
+      | None ->
+          let _ = Printf.eprintf "No parents (%d)\n" (List.length l) in
+          ascendants base acc l
       | Some ifam ->
           let cpl = foi base ifam in
           let ifath = get_father cpl in
           let imoth = get_mother cpl in
           let acc = [ (ifath, [], ifath, [ lev + 1 ]) ] @ acc in
           let acc = [ (imoth, [], imoth, [ lev + 1 ]) ] @ acc in
-          ascendants base acc l i)
+          ascendants base acc l)
   | _ :: l ->
       !GWPARAM.syslog `LOG_WARNING
         "Unexpected empty level list in ascend computation\n";
-      ascendants base acc l i
+      ascendants base acc l
 
 (* descendants des ip de liste1 sauf ceux présents dans liste2 *)
 let descendants_aux base liste1 liste2 =
@@ -229,7 +231,7 @@ let init_cousins_cnt base max_a_l max_d_l p =
         loop0 1;
         let rec loop1 i =
           (* get ascendants *)
-          cousins_cnt.(i).(0) <- ascendants base [] cousins_cnt.(i - 1).(0) i;
+          cousins_cnt.(i).(0) <- ascendants base [] cousins_cnt.(i - 1).(0);
           cousins_dates.(i).(0) <- get_min_max_dates base cousins_cnt.(i).(0);
           let rec loop2 i j =
             (* get descendants of c1, except persons of previous level (c2) *)
@@ -355,7 +357,7 @@ let init_asc_cnt base max_a_l p =
         asc_cnt.(0) <-
           [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
         for i = 1 to max_a_l do
-          asc_cnt.(i) <- ascendants base [] asc_cnt.(i - 1) i
+          asc_cnt.(i) <- ascendants base [] asc_cnt.(i - 1)
         done;
         asc_cnt
       in
