@@ -85,7 +85,7 @@
     %let;birth_age;%if;((path_end.birth_date.prec="" or path_end.birth_date.prec="&#60;") and path_end.birth_date.year!="" and max_date_vvv_www>min_date_vvv_www)%expr(100-(100*(max_date_vvv_www-path_end.birth_date.year)/(max_date_vvv_www-min_date_vvv_www)))%end;%in;
     %let;death_age_;%if;((path_end.death_date.prec="" or path_end.death_date.prec="&#62;") and path_end.death_date.year!="" and max_date_vvv_www>min_date_vvv_www)%expr(100-(100*(max_date_vvv_www-path_end.death_date.year)/(max_date_vvv_www-min_date_vvv_www)))%end;%in;
     %( fix gradient for individual who are dead < 1 year old by forcing a 1% white space %)
-    %let;death_age;%if;(death_age_=birth_age and birth_age>0)%expr(birth_age+1)%else;%death_age_;%end;%in;
+    %let;death_age;%if;(death_age_!="" and birth_age!= "" and death_age_=birth_age and birth_age>0)%expr(birth_age+1)%else;%death_age_;%end;%in;
     %let;white;%if;(cous_isdead=1)rgba(245,245,235,1)%else;rgba(255,255,255,1)%end;%in;%let;brown;rgba(245,231,216,1)%in;%let;yellow;rgba(255,235,210,1)%in;
     %if(path_end.surname="?" and path_end.first_name="?")%incr_count3;
     %else;
@@ -94,8 +94,8 @@
       <li class="card text-small nbr_%path_end.nbr; rounded-lg border-top-0 border-bottom-0 mr-2 border-%if;(path_end.sex=0)primary%elseif;(path_end.sex=1)danger%else;dark%end;"
       style="border-left-width:5px;%nn;
           %if;(cous_isdead=1)border-right-width:5px;border-right-color:black;background:linear-gradient(90deg,%sp;
-            %if;(birth_age="" and death_age>0)%yellow; 0%%%else;%brown; %if;(birth_prec=1)0%else;%birth_age;%end;%%, %white; %birth_age;%%%end;,%nn;
-            %if;(death_age="" and birth_age>0)%yellow; 100%%%else;%white; %death_age;%%, %brown; %if;(death_prec=1)100%else;%death_age;%end;%%%end;);%nn;
+            %if;(birth_age="" and death_age!="" and death_age>0)%yellow; 0%%%else;%brown; %if;(birth_prec=1)0%else;%birth_age;%end;%%, %white; %birth_age;%%%end;,%nn;
+            %if;(death_age="" and birth_age!="" and birth_age>0)%yellow; 100%%%else;%white; %death_age;%%, %brown; %if;(death_prec=1)100%else;%death_age;%end;%%%end;);%nn;
           %else;background:linear-gradient(90deg, %brown; %birth_age;%%, %white; %birth_age;%%);%end;%nn;
         %if;(cous_nodesc!=1)border-style:double;%end;" data-surname="%path_end.surname_key; %path_end.first_name_key;%path_end.birth_date.year;" data-birth_year="%path_end.birth_date.year;%path_end.birth_date.month;%path_end.birth_date.day;%path_end.birth_date.prec;%path_end.surname_key;%path_end.first_name_key;"
         %( TODO toggle between n function in jquery? 

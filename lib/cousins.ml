@@ -142,7 +142,6 @@ let rec ascendants base acc l =
   | (ip, _, _, lev :: _ll) :: l -> (
       match get_parents (poi base ip) with
       | None ->
-          let _ = Printf.eprintf "No parents (%d)\n" (List.length l) in
           ascendants base acc l
       | Some ifam ->
           let cpl = foi base ifam in
