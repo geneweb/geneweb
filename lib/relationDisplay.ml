@@ -86,8 +86,7 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
   in
   commd conf ^^^ "em=R&ei=" ^<^ string_of_iper ip1 ^<^ "&i="
   ^<^ string_of_iper ip2
-  ^<^ (if p_getenv conf.env "sp" = Some "on" || p_getint conf.env "sp" = Some 1
-      then "&sp=on"
+  ^<^ (if p_getenv conf.env "sp" = Some "on" then "&sp=on"
       else if p_getenv conf.env "spouse" = Some "on" then "&spouse=on"
       else "")
   ^<^ bd ^^^ color ^>^ "&et=S" ^ sl
@@ -499,7 +498,10 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
     then "&image=off"
     else if
       || p_getenv conf.env "im" = Some "off"
+<<<<<<< HEAD
       || p_getenv conf.env "im" = Some "0"
+=======
+>>>>>>> Suppress test for sp/im=0/1 in ml code
     then "&im=off"
     else ""
   in
@@ -740,10 +742,15 @@ let print_dag_links conf base p1 p2 rl =
             l2;
           if p_getenv conf.env "image" = Some "off" then
             Output.print_sstring conf "&image=off"
+<<<<<<< HEAD
           else if
             p_getenv conf.env "im" = Some "off"
             || p_getenv conf.env "im" = Some "0"
           then Output.print_sstring conf "&im=off";
+=======
+          else if p_getenv conf.env "im" = Some "off" then
+            Output.print_sstring conf "&im=off";
+>>>>>>> Suppress test for sp/im=0/1 in ml code
           if p_getenv conf.env "bd" = Some "on" then
             Output.print_sstring conf "&bd=on";
           Output.print_sstring conf {|&dag=on">|};
@@ -872,8 +879,7 @@ let print_main_relationship conf base long p1 p2 rel =
   Util.include_template conf conf.env "buttons_rel" (fun () -> ());
   (match (p_getenv conf.env "spouse", p_getenv conf.env "sp") with
   | Some "on", _ -> conf.senv <- conf.senv @ [ ("spouse", Mutil.encode "on") ]
-  | _, Some "on" | _, Some "1" ->
-      conf.senv <- conf.senv @ [ ("sp", Mutil.encode "on") ]
+  | _, Some "on" -> conf.senv <- conf.senv @ [ ("sp", Mutil.encode "on") ]
   | _ -> ());
   (match p_getenv conf.env "cgl" with
   | Some "on" -> conf.senv <- conf.senv @ [ ("cgl", Mutil.encode "on") ]

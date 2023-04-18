@@ -356,16 +356,11 @@ let sign_text conf base sign info b1 b2 c1 c2 =
     ^<^ Sosa.to_string (old_sosa_of_branch conf base ((info.ip, info.sp) :: b2))
     ^<^ "&c1=" ^<^ string_of_int c1 ^<^ "&c2=" ^<^ string_of_int c2
     ^<^ Adef.escaped
-          (if
-           p_getenv conf.env "sp" = Some "on" || p_getint conf.env "sp" = Some 1
-          then "&sp=on"
+          (if p_getenv conf.env "sp" = Some "on" then "&sp=on"
           else if p_getenv conf.env "spouse" = Some "on" then "&spouse=on"
           else "")
     ^^^ Adef.escaped
-          (if
-           p_getenv conf.env "im" = Some "off"
-           || p_getint conf.env "im" = Some 0
-          then "&im=off"
+          (if p_getenv conf.env "im" = Some "off" then "&im=off"
           else if p_getenv conf.env "image" = Some "off" then "&image=off"
           else "")
     ^^^ (match p_getenv conf.env "bd" with

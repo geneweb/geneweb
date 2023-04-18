@@ -63,7 +63,7 @@ let image_txt conf base p =
   Adef.safe
   @@
   match (p_getenv conf.env "im", p_getenv conf.env "image") with
-  | Some "off", _ | Some "0", _ | _, Some "off" -> ""
+  | Some "off", _ | _, Some "off" -> ""
   | _, _ -> (
       match Image.get_portrait_with_size conf base p with
       | None -> ""
@@ -709,7 +709,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let spouse_on =
     match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
-    | Some "on", _ | Some "1", _ | _, Some "on" -> true
+    | Some "on", _ | _, Some "on" -> true
     | _, _ -> false
   in
   let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
