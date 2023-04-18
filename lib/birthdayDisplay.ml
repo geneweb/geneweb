@@ -8,6 +8,7 @@ open Util
 type date_event = DeBirth | DeDeath of death_reason
 
 let print_anniversary_day conf base dead_people liste =
+  let a_ref = conf.today.year in
   Output.print_sstring conf "<ul>";
   List.iter
     (fun (p, a, date_event, txt_of) ->
@@ -17,7 +18,16 @@ let print_anniversary_day conf base dead_people liste =
       if not dead_people then (
         Output.print_sstring conf " <em>";
         Output.print_sstring conf (string_of_int a);
-        Output.print_sstring conf "</em>")
+        Output.print_sstring conf "</em>";
+        Output.print_sstring conf ", ";
+        match a_ref - a with
+        | 0 -> Output.print_sstring conf (transl conf "birth")
+        | 1 -> Output.print_sstring conf (transl conf "one year old")
+        | n ->
+            Output.print_sstring conf (string_of_int n);
+            Output.print_sstring conf " ";
+            Output.print_sstring conf (transl conf "years old")
+        (* TODO insert age *))
       else (
         Output.print_sstring conf ", <em>";
         (Output.print_sstring conf
@@ -142,17 +152,20 @@ let print_anniversary_list conf base dead_people dt liste =
         Output.print_sstring conf ")</em>")
       else (
         Output.print_string conf (txt_of conf base p);
+        (* TODO year of birth *)
         match get_death p with
-        | NotDead ->
+        | NotDead -> (
             Output.print_sstring conf " <em>";
-            (match a_ref - a with
+            Output.print_sstring conf (string_of_int a);
+            Output.print_sstring conf "</em>";
+            Output.print_sstring conf ", ";
+            match a_ref - a with
             | 0 -> Output.print_sstring conf (transl conf "birth")
             | 1 -> Output.print_sstring conf (transl conf "one year old")
             | n ->
                 Output.print_sstring conf (string_of_int n);
                 Output.print_sstring conf " ";
-                Output.print_sstring conf (transl conf "years old"));
-            Output.print_sstring conf "</em>"
+                Output.print_sstring conf (transl conf "years old"))
         | _ -> ());
       Output.print_sstring conf "</li>")
     liste;
@@ -224,7 +237,7 @@ let propose_months conf mode =
   done;
   Output.print_sstring conf "</select>";
   Output.print_sstring conf
-    {|<button type="submit" class="btn btn-secondary btn-lg">|};
+    {|<button type="submit" class="btn btn-primary btn-lg ml-2">|};
   transl_nth conf "validate/delete" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</button></p></form></td></tr></table>";
