@@ -1,4 +1,4 @@
-(* Copyright (c) 1998-2018 INRIA *)
+(* Copyright (c) 1998-2007 INRIA *)
 
 open Config
 open Def

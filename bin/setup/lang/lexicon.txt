@@ -1,5 +1,5 @@
 # $Id: lexicon.txt,v 7.0 2020-11-09 01:53:16 Exp $
-# Copyright (c) 1998-2020 INRIA
+# Copyright (c) 1998-2007 INRIA
 
     !doc
 co: <a href="http://geneweb.tuxfamily.org/wiki/manual" target="_blank">doc</a>
