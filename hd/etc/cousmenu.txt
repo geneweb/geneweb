@@ -24,14 +24,15 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-<div class="container%if;(e.v!="" and e.v>6)-fluid%end;">
+%let;e_v;%if(e.v!="")%e.v;%else;4%end;%in;
+<div class="container%if;(e_v>6)-fluid%end;">
 <div class="d-flex flex-column justify-content-center">
 %include;perso_utils
 %include;menubar
 %let;min;%if;(not has_children)1%else;0%end;%in;
 %let;max;%if;(bvar.max_anc_level!="" and bvar.max_anc_level<max_anc_level)%bvar.max_anc_level;%elseif;(static_max_anc_level!="")%static_max_anc_level;%end;%in;
 %define;picklvl(vvv)
-  <a role="button" class="btn btn-sm btn-light %if;(e.v!="" and e.v=vvv) disabled font-weight-bold text-white bg-dark%else; %end; p-1%if;(vvv<10) px-2%end;" href="%url_set.v.vvv;"%sp;
+  <a role="button" class="btn btn-sm btn-light %if;(e_v=vvv) disabled font-weight-bold text-white bg-dark%else; %end; p-1%if;(vvv<10) px-2%end;" href="%url_set.v.vvv;"%sp;
   title="[*ascending/descending (degree)]0 vvv%if;(vvv=0)[:] [person/persons]0 [and] [descendants]%end;">vvv</a>%nn;
 %end;
 <div class="d-flex flex-column align-self-center order-1">
@@ -69,6 +70,7 @@
 %define;getvar(nnn)
   %get_var.nnn;
 %end;%)
+
 %empty_sorted_list;%empty_sorted_listb;%empty_sorted_listc;%reset_count3;
 %define;cous_mod(vvv,www)
   %empty_sorted_list;%empty_sorted_listb;
@@ -102,7 +104,7 @@
          data-age="%if;((path_end.death_date.year-path_end.birth_date.year<10 and cous_isdead=1) or (today.year-path_end.birth_date.year<10 and cous_isdead=0))0%end;%if;(cous_isdead=1)%expr(path_end.death_date.year-path_end.birth_date.year)%else;%expr(today.year-path_end.birth_date.year)%end;%path_end.surname_key;%path_end.first_name_key;%path_end.birth_date.year;"%)>%nn;
         <div class="d-flex justify-content-between align-items-start ml-n2">
           <div class="d-block pl-n2 pr-2 align-self-center order-1 position-relative">
-            <a role="button" href="%prefix;%path_end.access;&m=C&v=%e.v;" title="[navigation] [with]…"
+            <a role="button" href="%prefix;%path_end.access;&m=C&v=%e_v;" title="[navigation] [with]…"
               class="stretched-link py-3"> </a>
           </div>
           <div class="d-flex flex-column align-self-center order-3 m-0 mr-1">
@@ -189,7 +191,7 @@
                   </div>
                   <div class="d-inline-flex flex-column ml-2">
                     <div>
-                      <button type="button" class="btn btn-sm py-0 mt-2 btn-light%if;(vvv=e.v and www=0) disabled%end;" data-dismiss="modal" data-toggle="modal" data-target="#modal_%if;(www=0)%expr(vvv+1)_0%else;vvv_%expr(www-1)%end;"><span title="%if(www=0)%expr(vvv+1)/0%else;vvv/%expr(www-1)%end;" data-toggle="tooltip" data-html="true"><i class="fa-solid fa-arrow-up-%if;(www=0)right-dots%else;long%end; fa-fw"></i>vvv</span></button>
+                      <button type="button" class="btn btn-sm py-0 mt-2 btn-light%if;(vvv=e_v and www=0) disabled%end;" data-dismiss="modal" data-toggle="modal" data-target="#modal_%if;(www=0)%expr(vvv+1)_0%else;vvv_%expr(www-1)%end;"><span title="%if(www=0)%expr(vvv+1)/0%else;vvv/%expr(www-1)%end;" data-toggle="tooltip" data-html="true"><i class="fa-solid fa-arrow-up-%if;(www=0)right-dots%else;long%end; fa-fw"></i>vvv</span></button>
                     </div>
                     <div>
                       <button type="button" class="btn btn-sm py-0 mt-1 btn-light%if;(cousdown=0) disabled%end;" data-dismiss="modal" data-toggle="modal" data-target="#modal_vvv_%expr(www+1)"><span title="vvv/%expr(www+1)" data-toggle="tooltip" data-html="true"><i class="fa-solid fa-arrow-down-long fa-fw"></i>www</span></button>
@@ -229,7 +231,7 @@
 %end;
 %define;link_cousin(vvv,www)
   %let;extra_paths_vvv_www;%expr(cous_paths_cnt.vvv.www-cousins_cnt.vvv.www)%in;
-  %let;width;%expr((100/(e.v+1))*vvv)%in;
+  %let;width;%expr((100/(e_v+1))*vvv)%in;
   %let;percent_vvv_www;%expr(100-count*100/cousins_cnt.vvv.www)%in;
   <button type="button" data-toggle="tooltip" data-html="true" 
     class="p-1 mx-1 btn-light position-relative%if;(vvv+www=0) disabled%end; %if;(percent_vvv_www=0)border-0%end;"
@@ -327,47 +329,45 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
     </tr>
   </table>
 %end;
-%if;(e.v="")
-  %apply;table(4)
-%else;
-  %apply;table(e.v+1)
-%end;
+
+%apply;table(e_v+1)
+
 %( page title + counts shown at top of page using flex order %)
-  <div class="d-flex justify-content-between order-2 mt-1">%nn;
-    <h3 class="h4">[*link between]
-      %let;max;%if;(cousins.max_a < e.v)%cousins.max_a;%else;%e.v;%end;%in;
-      %if;(public_name != "")%public_name;%else;%first_name;%end;
-      %if;(qualifier != "") <em>%qualifier;</em>%end;
-      %sp;%surname;
-      %(%if;(alias != "") <em>(%alias;)</em>%end;%)
-      %sp;[and] [close family] [up to] %max; [generation/generations]1%( montantes [and] %expr(e.v+cousins.max_d) descendantes…%)
-    </h3>
-    <div class="d-flex flex-column justify-content-end text-right">
-      %( quick count ascendants | TODO : filter by index to reduce asc./desc. implexes %)
-      %reset_count;
-      %if;has_parents;
-        %for;i;0;e.v;
-          %let;tt;%apply;cousins_cnt%with;%expr(i+1)%and;0%end;%in;
-          %for;j;0;tt;%incr_count;%end;
-        %end;
+<div class="d-flex justify-content-between order-2 mt-1">%nn;
+  <h3 class="h4">[*link between]
+    %let;max;%if;(cousins.max_a < e_v)%cousins.max_a;%else;%e_v;%end;%in;
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") <em>%qualifier;</em>%end;
+    %sp;%surname;
+    %(%if;(alias != "") <em>(%alias;)</em>%end;%)
+    %sp;[and] [close family] [up to] %max; [generation/generations]1%( montantes [and] %expr(e_v+cousins.max_d) descendantes…%)
+  </h3>
+  <div class="d-flex flex-column justify-content-end text-right">
+    %( quick count ascendants | TODO : filter by index to reduce asc./desc. implexes %)
+    %reset_count;
+    %if;has_parents;
+      %for;i;0;e_v;
+        %let;tt;%apply;cousins_cnt%with;%expr(i+1)%and;0%end;%in;
+        %for;j;0;tt;%incr_count;%end;
       %end;
-      <span class="text-muted" title="Ancestor/Descendant/Persons/Living">%count;A%nn;
-      %reset_count;
-      %if;has_children;
-        %for;i;1;cousins.max_d;
-          %let;tt;%apply;cousins_cnt%with;0%and;%i%end;%in;
-          %for;j;0;tt;%incr_count;%end;
-        %end;
+    %end;
+    <span class="text-muted" title="Ancestor/Descendant/Persons/Living">%count;A%nn;
+    %reset_count;
+    %if;has_children;
+      %for;i;1;cousins.max_d;
+        %let;tt;%apply;cousins_cnt%with;0%and;%i%end;%in;
+        %for;j;0;tt;%incr_count;%end;
       %end;
-      /%count;D
-      %reset_count;%foreach;sorted_listc_item;%if;(item.2=0)%incr_count;%end;%end;%nn;
-      %listc_size;P/%count;L</span>
-    </div>
+    %end;
+    /%count;D
+    %reset_count;%foreach;sorted_listc_item;%if;(item.2=0)%incr_count;%end;%end;%nn;
+    %listc_size;P/%count;L</span>
   </div>
 </div>
+</div> %(<div class="d-flex %)
 %base_trailer;
 %include;copyr
-</div>
+</div> %(<div class="container %)
 %include;js
 <script>
 $(function () {
