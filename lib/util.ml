@@ -759,6 +759,8 @@ let max_ancestor_level conf base ip max_lvl =
   loop 0 ip;
   !x
 
+let max_descendant_level _conf _base _ip _max_lvl = 120
+
 let main_title conf base p =
   let titles = nobtit conf base p in
   match List.find_opt (fun x -> x.t_name = Tmain) titles with

@@ -81,10 +81,6 @@ let today_year = tm.Unix.tm_year + 1900
 let cousins_t = ref None
 let cousins_dates_t = ref None
 
-(* determine dimensions of 2D arrays *)
-(* TODO verify dimensions *)
-let max_l1_l2_aux max_a_l max_d_l = (max_a_l + 1, max_a_l + max_d_l + 2)
-
 let update_min_max (min, max) date =
   ((if date < min then date else min), if date > max then date else max)
 
@@ -141,8 +137,7 @@ let rec ascendants base acc l =
   (* TODO type for this tuple?; why list of level? *)
   | (ip, _, _, lev :: _ll) :: l -> (
       match get_parents (poi base ip) with
-      | None ->
-          ascendants base acc l
+      | None -> ascendants base acc l
       | Some ifam ->
           let cpl = foi base ifam in
           let ifath = get_father cpl in
@@ -203,20 +198,22 @@ let descendants base cousins_cnt i j =
   let liste2 = if i > 0 then cousins_cnt.(i - 1).(j - 1) else [] in
   descendants_aux base liste1 liste2
 
-let init_cousins_cnt base max_a_l max_d_l p =
+let init_cousins_cnt conf base p =
+  let max_a_l = Util.max_ancestor_level conf base (get_iper p) 120 in
+  let max_d_l = Util.max_descendant_level conf base (get_iper p) 120 in
   match (!cousins_t, !cousins_dates_t) with
   | Some t, Some d_t -> (t, d_t)
   | _, _ ->
       let t', d_t' =
-        let max_l1, max_l2 = max_l1_l2_aux max_a_l max_d_l in
-        Printf.sprintf "******** Compute %d × %d table ********\n" max_l1 max_l2
+        Printf.sprintf "******** Compute %d × %d table ********\n" max_a_l
+          max_d_l
         |> !GWPARAM.syslog `LOG_WARNING;
         (* TODO test for Sys.max_array_length *)
         let () = load_ascends_array base in
         let () = load_couples_array base in
-        let cousins_cnt = Array.make_matrix (max_l2 + 1) (max_l2 + 1) [] in
+        let cousins_cnt = Array.make_matrix (max_a_l + 1) (max_d_l + 1) [] in
         let cousins_dates =
-          Array.make_matrix (max_l2 + 1) (max_l2 + 1) (0, 0)
+          Array.make_matrix (max_a_l + 1) (max_d_l + 1) (0, 0)
         in
         cousins_cnt.(0).(0) <-
           [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
@@ -225,7 +222,9 @@ let init_cousins_cnt base max_a_l max_d_l p =
           (* initiate lists of direct descendants *)
           cousins_cnt.(0).(j) <- descendants base cousins_cnt 0 j;
           cousins_dates.(0).(j) <- get_min_max_dates base cousins_cnt.(0).(j);
-          if j < max_l2 then loop0 (j + 1) else ()
+          if j < Array.length cousins_cnt.(0) - 1 && cousins_cnt.(0).(j) <> []
+          then loop0 (j + 1)
+          else ()
         in
         loop0 1;
         let rec loop1 i =
@@ -236,8 +235,11 @@ let init_cousins_cnt base max_a_l max_d_l p =
             (* get descendants of c1, except persons of previous level (c2) *)
             cousins_cnt.(i).(j) <- descendants base cousins_cnt i j;
             cousins_dates.(i).(j) <- get_min_max_dates base cousins_cnt.(i).(j);
-            if j < max_l2 then loop2 i (j + 1)
-            else if i < max_l1 then loop1 (i + 1)
+            if j < Array.length cousins_cnt.(0) - 1 && cousins_cnt.(i).(j) <> []
+            then loop2 i (j + 1)
+            else if
+              i < Array.length cousins_cnt - 1 && cousins_cnt.(i).(0) <> []
+            then loop1 (i + 1)
             else ()
           in
           loop2 i 1
@@ -247,40 +249,44 @@ let init_cousins_cnt base max_a_l max_d_l p =
       in
       cousins_t := Some t';
       cousins_dates_t := Some d_t';
+      flush stderr;
       (t', d_t')
 
 (* determine non empty max ancestor level (max_i)
    and non empty max descendant level
 *)
-let max_l1_l2 base max_a_l max_d_l p =
+let max_l1_l2 conf base p =
   let cousins_cnt, _cousins_dates =
     match (!cousins_t, !cousins_dates_t) with
     | Some t, Some d_t -> (t, d_t)
-    | _, _ -> init_cousins_cnt base max_a_l max_d_l p
+    | _, _ -> init_cousins_cnt conf base p
   in
-  let max_l1, max_l2 = max_l1_l2_aux max_a_l max_d_l in
-  let max_i =
+  let max_i = Array.length cousins_cnt in
+  let max_j = Array.length cousins_cnt.(0) in
+  let max_a =
     let rec loop0 i =
-      if cousins_cnt.(i).(0) <> [] && i < max_l1 then loop0 (i + 1) else i
+      if cousins_cnt.(i).(0) <> [] && i < max_i - 1 then loop0 (i + 1) else i
     in
     loop0 0
   in
   let rec loop i j =
     if cousins_cnt.(i).(j) <> [] then
-      if j < max_l2 then loop i (j + 1) else (max_i, j - i)
-    else if i < max_l1 && j < max_l2 then loop (i + 1) (j + 1)
-    else (max_i, j - i)
+      if j < max_j then loop i (j + 1) else (max_a, j - i)
+    else if i < max_i - 1 && j < max_j - 1 then loop (i + 1) (j + 1)
+    else (max_a, j - i)
   in
   loop 0 0
 
-let cousins_l1_l2_aux base max_a_l max_d_l l1 l2 p =
+let cousins_l1_l2_aux conf base l1 l2 p =
   let il1 = int_of_string l1 in
   let il2 = int_of_string l2 in
-  let max_l1, max_l2 = max_l1_l2_aux max_a_l max_d_l in
-  if il1 <= max_l1 && il2 - il1 <= max_l2 then
-    let cousins_cnt, _cousins_dates = init_cousins_cnt base max_a_l max_d_l p in
-    (* gros calcul *)
-    Some cousins_cnt.(il1).(il2)
+  let cousins_cnt, _cousins_dates =
+    match (!cousins_t, !cousins_dates_t) with
+    | Some t, Some d_t -> (t, d_t)
+    | _, _ -> init_cousins_cnt conf base p
+  in
+  if il1 < Array.length cousins_cnt && il2 - il1 < Array.length cousins_cnt.(0)
+  then Some cousins_cnt.(il1).(il2)
   else None
 
 (* create a new l (ip, (ifamll, iancl, cnt), lev) from (ip, ifaml, ianc, lev) *)
@@ -347,7 +353,8 @@ let asc_cnt_t = ref None
 let desc_cnt_t = ref None
 
 (* tableau des ascendants de p *)
-let init_asc_cnt base max_a_l p =
+let init_asc_cnt conf base p =
+  let max_a_l = Util.max_ancestor_level conf base (get_iper p) 120 in
   match !asc_cnt_t with
   | Some t -> t
   | None ->
@@ -364,7 +371,8 @@ let init_asc_cnt base max_a_l p =
       t'
 
 (* tableau des ascendants de p *)
-let init_desc_cnt base max_d_l p =
+let init_desc_cnt conf base p =
+  let max_d_l = Util.max_descendant_level conf base (get_iper p) 120 in
   match !desc_cnt_t with
   | Some t -> t
   | None ->
@@ -380,9 +388,9 @@ let init_desc_cnt base max_d_l p =
       desc_cnt_t := Some t';
       t'
 
-let anc_cnt_aux base max_a_l lev at_to p =
+let anc_cnt_aux conf base lev at_to p =
   let asc_cnt =
-    match !asc_cnt_t with Some t -> t | None -> init_asc_cnt base max_a_l p
+    match !asc_cnt_t with Some t -> t | None -> init_asc_cnt conf base p
   in
   if at_to then if lev < Array.length asc_cnt then Some asc_cnt.(lev) else None
   else
@@ -392,9 +400,9 @@ let anc_cnt_aux base max_a_l lev at_to p =
     in
     loop [] 1
 
-let desc_cnt_aux base max_d_l lev at_to p =
+let desc_cnt_aux conf base lev at_to p =
   let desc_cnt =
-    match !desc_cnt_t with Some t -> t | None -> init_desc_cnt base max_d_l p
+    match !desc_cnt_t with Some t -> t | None -> init_desc_cnt conf base p
   in
   if at_to then
     if lev < Array.length desc_cnt then Some desc_cnt.(lev) else None
