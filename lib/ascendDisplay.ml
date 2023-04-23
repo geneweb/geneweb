@@ -11,6 +11,7 @@ let limit_by_tree conf =
   | None -> 7
 
 let print_ancestors_dag conf base v p =
+  let mf = match p_getenv conf.env "mf" with Some "1" -> true | _ -> false in
   let v = min (limit_by_tree conf) v in
   let set =
     (* TODO this should be a get_ancestors_set lvl ip *)
@@ -21,8 +22,12 @@ let print_ancestors_dag conf base v p =
         match get_parents (pget conf base ip) with
         | Some ifam ->
             let cpl = foi base ifam in
-            let set = loop set (lev - 1) (get_mother cpl) in
-            loop set (lev - 1) (get_father cpl)
+            if mf then
+              let set = loop set (lev - 1) (get_father cpl) in
+              loop set (lev - 1) (get_mother cpl)
+            else
+              let set = loop set (lev - 1) (get_mother cpl) in
+              loop set (lev - 1) (get_father cpl)
         | None -> set
     in
     loop Dag.Pset.empty v (get_iper p)
