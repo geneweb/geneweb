@@ -576,6 +576,7 @@ let rec enrich_tree lst =
     gv: number of generations
     p: person *)
 let tree_generation_list conf base gv p =
+  let mf = match p_getenv conf.env "mf" with Some "1" -> true | _ -> false in
   let next_gen pol =
     List.fold_right
       (fun po l ->
@@ -597,9 +598,14 @@ let tree_generation_list conf base gv p =
                 let base_prefix = conf.bname in
                 match (fath, moth) with
                 | Some f, Some m ->
-                    Cell (f, fo, Left, true, 1, base_prefix)
-                    :: Cell (m, fo, Right, true, 1, base_prefix)
-                    :: l
+                    if mf then
+                      Cell (m, fo, Left, true, 1, base_prefix)
+                      :: Cell (f, fo, Right, true, 1, base_prefix)
+                      :: l
+                    else
+                      Cell (f, fo, Left, true, 1, base_prefix)
+                      :: Cell (m, fo, Right, true, 1, base_prefix)
+                      :: l
                 | Some f, None -> Cell (f, fo, Alone, true, 1, base_prefix) :: l
                 | None, Some m -> Cell (m, fo, Alone, true, 1, base_prefix) :: l
                 | None, None -> Empty :: l)
@@ -609,9 +615,14 @@ let tree_generation_list conf base gv p =
                 with
                 | Some (fath, if1, base_prefix1), Some (moth, if2, base_prefix2)
                   ->
-                    Cell (fath, Some if1, Left, true, 1, base_prefix1)
-                    :: Cell (moth, Some if2, Right, true, 1, base_prefix2)
-                    :: l
+                    if mf then
+                      Cell (moth, Some if2, Left, true, 1, base_prefix1)
+                      :: Cell (fath, Some if1, Right, true, 1, base_prefix2)
+                      :: l
+                    else
+                      Cell (fath, Some if1, Left, true, 1, base_prefix1)
+                      :: Cell (moth, Some if2, Right, true, 1, base_prefix2)
+                      :: l
                 | Some (fath, ifam, base_prefix), None ->
                     Cell (fath, Some ifam, Alone, true, 1, base_prefix) :: l
                 | None, Some (moth, ifam, base_prefix) ->
