@@ -245,7 +245,7 @@
 %if;not cancel_links;
   <div class="d-flex justify-content-center">
     %include;buttons_dag
-  </div><hr>
+  </div>
 %end;
 %if;has_parents;
   <table class="tree-vert mx-auto my-3" style="border-width:%border;">
