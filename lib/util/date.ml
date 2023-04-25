@@ -315,6 +315,7 @@ let hebrew_of_sdn ~prec sdn =
 
    BUG : with day>0 and month=0 we do not recover a partial date correctly. *)
 let convert ~from ~to_ dmy =
+  if from = to_ then dmy else
   let dmy_tuple_of_sdn ~to_ sdn =
     let to_tuple date =
       let { Calendars.day; month; year; delta; _ } = date in

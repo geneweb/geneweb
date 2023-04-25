@@ -154,7 +154,9 @@ let compare_event_name name1 name2 =
   (* put Fevent after Pevent *)
   | Fevent _, Pevent _ -> 1
   | Pevent _, Fevent _ -> -1
-  | _ -> 0
+  (* this is to make event order stable; depends on type definition order! *)
+  | Fevent e1, Fevent e2 -> compare e1 e2
+  | Pevent e1, Pevent e2 -> compare e1 e2
 
 (* this do not define a preorder (no transitivity);
    can not be used to sort a list
