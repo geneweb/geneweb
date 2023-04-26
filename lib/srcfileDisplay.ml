@@ -148,13 +148,10 @@ let source_file_name conf fname =
   let fname1 =
     List.fold_right Filename.concat
       [ Util.base_path [ "src" ] bname; lang ]
-      (Filename.basename fname ^ ".txt")
+      (fname ^ ".txt")
   in
   if Sys.file_exists fname1 then fname1
-  else
-    Filename.concat
-      (Util.base_path [ "src" ] bname)
-      (Filename.basename fname ^ ".txt")
+  else Filename.concat (Util.base_path [ "src" ] bname) (fname ^ ".txt")
 
 let extract_date s =
   try Scanf.sscanf s "%d/%d/%d" (fun d m y -> Some (d, m, y)) with _ -> None

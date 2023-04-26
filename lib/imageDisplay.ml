@@ -103,10 +103,19 @@ let print_image_file conf fname =
 let print_portrait conf base p =
   match Image.get_portrait conf base p with
   | Some (`Path path) ->
-      Result.fold ~ok:ignore
-        ~error:(fun _ -> Hutil.incorrect_request conf)
-        (print_image_file conf path)
-  | Some (`Url _) | None -> Hutil.incorrect_request conf
+      if Mutil.start_with "http" 0 path then Hutil.incorrect_request conf
+      else
+        Result.fold ~ok:ignore
+          ~error:(fun _ -> Hutil.incorrect_request conf)
+          (print_image_file conf path)
+  | Some (`Url url) ->
+      Util.html conf;
+      Output.print_sstring conf "<head><title>";
+      Output.print_sstring conf (Util.transl_nth conf "image/images" 0);
+      Output.print_sstring conf "</title></head><body>";
+      Output.print_sstring conf (Printf.sprintf {|<img src=%s>|} url);
+      Output.print_sstring conf "</body></html>"
+  | None -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
 (*  [Fonc] print_source : Config.config -> string -> unit               *)
@@ -122,12 +131,10 @@ let print_portrait conf base p =
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 let print_source conf f =
   let fname = if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f in
-  if fname = Filename.basename fname then
-    let fname = Image.source_filename conf.bname fname in
-    Result.fold ~ok:ignore
-      ~error:(fun _ -> Hutil.incorrect_request conf)
-      (print_image_file conf fname)
-  else Hutil.incorrect_request conf
+  let fname = Image.source_filename conf.bname fname in
+  Result.fold ~ok:ignore
+    ~error:(fun _ -> Hutil.incorrect_request conf)
+    (print_image_file conf fname)
 
 (* ************************************************************************** *)
 (*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
