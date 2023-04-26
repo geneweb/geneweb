@@ -5,7 +5,7 @@
   %and;x%end;
 %end;
 %define;set_lang(l1)
-  %if;(b.default_lang!="l1")%url_set.lang.l1;%else;%url_set.lang;%end;
+  %if;(b.default_lang!="l1")%url_set2.lang.file;&lang=l1;%else;%url_set2.lang.file;%end;
 %end;
 %define;language_link()
   %for;i;1;31;
@@ -36,38 +36,38 @@
           </button>
           %if;(not is_printed_by_template)
             <div class="dropdown-menu scrollable-lang short" aria-labelledby="dropdownMenu1">
-              <a class="dropdown-item" href="%prefix_set.lang.af;%if;(e.digest="")&%suffix;%end;">af</a>
-              <a class="dropdown-item" href="%prefix_set.lang.bg;%if;(e.digest="")&%suffix;%end;">bg</a>
-              <a class="dropdown-item" href="%prefix_set.lang.br;%if;(e.digest="")&%suffix;%end;">br</a>
-              <a class="dropdown-item" href="%prefix_set.lang.ca;%if;(e.digest="")&%suffix;%end;">ca</a>
-              <a class="dropdown-item" href="%prefix_set.lang.co;%if;(e.digest="")&%suffix;%end;">co</a>
-              <a class="dropdown-item" href="%prefix_set.lang.cs;%if;(e.digest="")&%suffix;%end;">cs</a>
-              <a class="dropdown-item" href="%prefix_set.lang.da;%if;(e.digest="")&%suffix;%end;">da</a>
-              <a class="dropdown-item" href="%prefix_set.lang.de;%if;(e.digest="")&%suffix;%end;">de</a>
-              <a class="dropdown-item" href="%prefix_set.lang.en;%if;(e.digest="")&%suffix;%end;">en</a>
-              <a class="dropdown-item" href="%prefix_set.lang.eo;%if;(e.digest="")&%suffix;%end;">eo</a>
-              <a class="dropdown-item" href="%prefix_set.lang.es;%if;(e.digest="")&%suffix;%end;">es</a>
-              <a class="dropdown-item" href="%prefix_set.lang.et;%if;(e.digest="")&%suffix;%end;">et</a>
-              <a class="dropdown-item" href="%prefix_set.lang.fi;%if;(e.digest="")&%suffix;%end;">fi</a>
-              <a class="dropdown-item" href="%prefix_set.lang.fr;%if;(e.digest="")&%suffix;%end;">fr</a>
-              <a class="dropdown-item" href="%prefix_set.lang.he;%if;(e.digest="")&%suffix;%end;">he</a>
-              <a class="dropdown-item" href="%prefix_set.lang.is;%if;(e.digest="")&%suffix;%end;">is</a>
-              <a class="dropdown-item" href="%prefix_set.lang.it;%if;(e.digest="")&%suffix;%end;">it</a>
-              <a class="dropdown-item" href="%prefix_set.lang.lt;%if;(e.digest="")&%suffix;%end;">lt</a>
-              <a class="dropdown-item" href="%prefix_set.lang.lv;%if;(e.digest="")&%suffix;%end;">lv</a>
-              <a class="dropdown-item" href="%prefix_set.lang.nl;%if;(e.digest="")&%suffix;%end;">nl</a>
-              <a class="dropdown-item" href="%prefix_set.lang.no;%if;(e.digest="")&%suffix;%end;">no</a>
-              <a class="dropdown-item" href="%prefix_set.lang.oc;%if;(e.digest="")&%suffix;%end;">oc</a>
-              <a class="dropdown-item" href="%prefix_set.lang.pl;%if;(e.digest="")&%suffix;%end;">pl</a>
-              <a class="dropdown-item" href="%prefix_set.lang.pt;%if;(e.digest="")&%suffix;%end;">pt</a>
-              <a class="dropdown-item" href="%prefix_set.lang.pt-br;%if;(e.digest="")&%suffix;%end;">pt-br</a>
-              <a class="dropdown-item" href="%prefix_set.lang.ro;%if;(e.digest="")&%suffix;%end;">ro</a>
-              <a class="dropdown-item" href="%prefix_set.lang.ru;%if;(e.digest="")&%suffix;%end;">ru</a>
-              <a class="dropdown-item" href="%prefix_set.lang.sk;%if;(e.digest="")&%suffix;%end;">sk</a>
-              <a class="dropdown-item" href="%prefix_set.lang.sl;%if;(e.digest="")&%suffix;%end;">sl</a>
-              <a class="dropdown-item" href="%prefix_set.lang.sv;%if;(e.digest="")&%suffix;%end;">sv</a>
-              <a class="dropdown-item" href="%prefix_set.lang.tr;%if;(e.digest="")&%suffix;%end;">tr</a>
-              <a class="dropdown-item" href="%prefix_set.lang.zh;%if;(e.digest="")&%suffix;%end;">zh</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=af;">af</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=bg;">bg</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=br;">br</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=ca;">ca</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=co;">co</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=cs;">cs</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=da;">da</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=de;">de</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=en;">en</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=eo;">eo</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=es;">es</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=et;">et</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=fi;">fi</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=fr;">fr</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=he;">he</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=is;">is</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=it;">it</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=lt;">lt</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=lv;">lv</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=nl;">nl</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=no;">no</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=oc;">oc</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=pl;">pl</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=pt;">pt</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=pt-br;">pt-br</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=ro;">ro</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=ru;">ru</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=sk;">sk</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=sl;">sl</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=sv;">sv</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=tr;">tr</a>
+              <a class="dropdown-item" href="%url_set2.lang.file;&lang=zh;">zh</a>
             </div>
           %else;
             <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1" title="lang">
@@ -80,7 +80,7 @@
         <div class="ml-auto">
           <a role="button"
             %( button to switch only between default and templm templates %)
-            href="%if(e.templ!="templm")%url_set.templ.templm;%end;%if;(e.digest="")&%suffix;%end;"
+            href="%if(e.templ!="templm")%url_set2.templ.file;templ=templm%end;"
             title="%if(e.templ!="templm")templm%else;default template%end;">%nn;
             <span class="fab fa-markdown" aria-hidden="true"></span>%nn;
             <span class="sr-only">switch to %if(evar.templ!="templm")templm%else;default template%end;</span>%nn;
