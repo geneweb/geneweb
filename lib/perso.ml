@@ -1517,7 +1517,7 @@ and eval_simple_bool_var conf base env =
       if v <> "" then SrcfileDisplay.source_file_name conf v |> Sys.file_exists
       else raise Not_found
 
-and eval_simple_str_var conf base env (_, p_auth) = function
+and eval_simple_str_var conf base env (p, p_auth) = function
   | "alias" -> (
       match get_env "alias" env with
       | Vstring s -> s |> Util.escape_html |> safe_val
@@ -1643,6 +1643,25 @@ and eval_simple_str_var conf base env (_, p_auth) = function
           incr c;
           null_val
       | _ -> null_val)
+  (* carrousel *)
+  | "idigest" -> Image.default_portrait_filename base p |> str_val
+  | "img_cnt" -> (
+      match get_env "img_cnt" env with
+      | Vint cnt -> VVstring (string_of_int cnt)
+      | _ -> VVstring "")
+  | "keydir_img" -> (
+      match get_env "keydir_img" env with
+      | Vstring s -> str_val s
+      | _ -> null_val)
+  | "keydir_img_key" -> (
+      match get_env "keydir_img" env with
+      | Vstring s -> str_val (Mutil.tr '+' ' ' s)
+      | _ -> null_val)
+  | "keydir_notes" -> (
+      match get_env "keydir_img" env with
+      | Vstring s -> str_val (Filename.remove_extension s ^ ".txt")
+      | _ -> null_val)
+  (* end carrousel *)
   | "lazy_force" -> (
       match get_env "lazy_print" env with
       | Vlazyp r -> (
@@ -2164,6 +2183,15 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let np_auth = authorized_age conf base np in
           eval_person_field_var conf base env (np, np_auth) loc sl
       | None -> raise Not_found)
+  | [ "random"; "init" ] ->
+      Random.self_init ();
+      VVstring ""
+  | [ "random"; "bits" ] -> (
+      try VVstring (string_of_int (Random.bits ()))
+      with Failure _ | Invalid_argument _ -> raise Not_found)
+  | [ "random"; s ] -> (
+      try VVstring (string_of_int (Random.int (int_of_string s)))
+      with Failure _ | Invalid_argument _ -> raise Not_found)
   | "related" :: sl -> (
       match get_env "rel" env with
       | Vrel ({ r_type = rt }, Some p) ->
@@ -3374,12 +3402,16 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       if (not p_auth) && is_hide_names conf p then false
       else get_first_names_aliases p <> []
   | "has_history" -> has_history conf base p p_auth
-  | "has_image" -> Image.get_portrait conf base p |> Option.is_some
+  | "has_image" | "has_portrait" ->
+      Image.get_portrait conf base p |> Option.is_some
   | "has_image_url" -> (
       match Image.get_portrait conf base p with
-      | Some (`Url _url) -> true
-      | Some (`Path _fname) -> false
-      | None -> false)
+      | Some src -> Mutil.start_with "http" 0 (Image.src_to_string src)
+      | _ -> false)
+  (* carrousel *)
+  | "has_keydir" -> Image.get_portrait conf base p |> Option.is_some
+  | "has_old_image" | "has_old_portrait" ->
+      Image.get_old_portrait conf base p |> Option.is_some
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && Util.nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
@@ -3614,6 +3646,71 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match get_env "p_link" env with
       | Vbool _ -> null_val
       | _ -> get_iper p |> string_of_iper |> Mutil.encode |> safe_val)
+  (* carrousel functions *)
+  | "keydir" -> Image.default_portrait_filename base p |> str_val
+  | "keydir_img_nbr" ->
+      string_of_int (List.length (Image.get_keydir_files conf base p false))
+      |> str_val
+  | "keydir_old_img_nbr" ->
+      string_of_int (List.length (Image.get_keydir_files conf base p true))
+      |> str_val
+  | "keydir_img_notes" -> (
+      match get_env "keydir_img" env with
+      | Vstring f ->
+          let ext = Filename.extension f in
+          let fname = Filename.chop_suffix f ext in
+          Image.get_keydir_img_notes conf base p fname |> str_val
+      | _ -> raise Not_found)
+  | "keydir_img_src" -> (
+      match get_env "keydir_img" env with
+      | Vstring f -> (
+          let ext = Filename.extension f in
+          let fname = Filename.chop_suffix f ext in
+          let n = Image.get_keydir_img_notes conf base p fname in
+          match String.index_opt n '\n' with
+          | Some i -> (
+              let s1 =
+                if String.length n > i then
+                  String.sub n (i + 1) (String.length n - i - 1)
+                else ""
+              in
+              match String.index_opt s1 '\n' with
+              | Some j -> String.sub s1 0 j |> str_val
+              | None -> "" |> str_val)
+          | None -> "" |> str_val)
+      | _ -> raise Not_found)
+  | "keydir_img_title" -> (
+      match get_env "keydir_img" env with
+      | Vstring f -> (
+          let ext = Filename.extension f in
+          let fname = Filename.chop_suffix f ext in
+          let n = Image.get_keydir_img_notes conf base p fname in
+          match String.index_opt n '\n' with
+          | Some i -> String.sub n 0 i |> str_val
+          | None -> "" |> str_val)
+      | _ -> raise Not_found)
+  | "portrait" -> (
+      (* TODO what do we want here? can we remove this? *)
+      match Image.get_portrait conf base p with
+      | Some (`Path s) -> str_val s
+      | Some (`Url u) -> str_val u
+      | None -> null_val)
+  | "portrait_name" -> (
+      match Image.get_portrait conf base p with
+      | Some (`Path s) -> str_val (Filename.basename s)
+      | Some (`Url u) -> str_val u (* ?? *)
+      | None -> null_val)
+  | "portrait_saved" -> (
+      match Image.get_old_portrait conf base p with
+      | Some (`Path s) -> str_val s
+      | Some (`Url u) -> str_val u
+      | None -> null_val)
+  | "portrait_saved_name" -> (
+      match Image.get_old_portrait conf base p with
+      | Some (`Path s) -> str_val (Filename.basename s)
+      | Some (`Url u) -> str_val u (* ?? *)
+      | None -> null_val)
+  | "X" -> str_val Filename.dir_sep (* end carrousel functions *)
   | "mark_descendants" -> (
       match get_env "desc_mark" env with
       | Vdmark r ->
@@ -4961,6 +5058,23 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
         (get_surnames_aliases p)
   in
+  (* carrousel *)
+  let print_foreach_img_in_keydir env al ((p, p_auth) as ep) old =
+    let list = Image.get_keydir_files conf base p old in
+    if (not p_auth) && is_hide_names conf p then ()
+    else
+      let rec loop first cnt = function
+        | a :: l ->
+            let env = ("keydir_img", Vstring a) :: env in
+            let env = ("first", Vbool first) :: env in
+            let env = ("last", Vbool (l = [])) :: env in
+            let env = ("img_cnt", Vint cnt) :: env in
+            List.iter (print_ast env ep) al;
+            loop false (cnt + 1) l
+        | [] -> ()
+      in
+      loop true 1 list
+  in
   let print_simple_foreach env el al ini_ep ep efam loc = function
     | "alias" -> print_foreach_alias env al ep
     | "ancestor" | "ascendant" -> print_foreach_ascendant env al ep
@@ -4982,6 +5096,8 @@ let print_foreach conf base print_ast eval_expr =
     | "event" -> print_foreach_event env al ep
     | "family" -> print_foreach_family env al ini_ep ep
     | "first_name_alias" -> print_foreach_first_name_alias env al ep
+    | "img_in_keydir" -> print_foreach_img_in_keydir env al ep false
+    | "img_in_keydir_old" -> print_foreach_img_in_keydir env al ep true
     | "nobility_title" -> print_foreach_nobility_title env al ep
     | "nob_title" -> print_foreach_nob_title env al ep
     | "parent" -> print_foreach_parent env al ep

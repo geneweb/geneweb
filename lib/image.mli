@@ -54,3 +54,13 @@ val get_portrait :
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.
     - [Some src] with [src] the url or path of [p]'s portrait.
 *)
+
+val get_old_portrait :
+  config -> base -> person -> [> `Path of string | `Url of string ] option
+(** [get_portrait conf base p] is
+    - [None] if we don't have access to [p]'s portrait or it doesn't exist.
+    - [Some src] with [src] the url or path of [p]'s portrait.
+*)
+
+val get_keydir_files : config -> base -> person -> bool -> string list
+val get_keydir_img_notes : config -> base -> person -> string -> string
