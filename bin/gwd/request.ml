@@ -555,10 +555,9 @@ let treat_request =
         | "F" ->
           w_base @@ w_person @@ Perso.interp_templ "family"
         | "H" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
+          w_base @@ fun conf base -> ( match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print conf base f
-            | None -> incorrect_request conf base
-          end
+            | None -> incorrect_request conf base)
         | "HIST" ->
           w_base @@ History.print
         | "HIST_CLEAN" ->
@@ -754,7 +753,19 @@ let treat_request =
           w_base @@ WiznotesDisplay.print
         | "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
           w_base @@ WiznotesDisplay.print_search
-        | _ -> incorrect_request
+        | _ ->
+            let title _ =
+              transl conf "error"
+              |> Utf8.capitalize_fst
+              |> Output.print_sstring conf
+            in
+            Hutil.rheader conf title ;
+            Output.print_sstring conf
+              ((transl conf "error unknown command m="
+                |> Utf8.capitalize_fst) ^ 
+              m);
+            Hutil.trailer conf;
+            incorrect_request
       end conf bfile ;
   end else begin
     let title _ =

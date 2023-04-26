@@ -23,6 +23,7 @@ let full_portrait_path conf base p =
   let s = default_portrait_filename base p in
   let f = Filename.concat (Util.base_path [ "images" ] conf.bname) s in
   if Sys.file_exists (f ^ ".jpg") then Some (`Path (f ^ ".jpg"))
+  else if Sys.file_exists (f ^ ".jpeg") then Some (`Path (f ^ ".jpeg"))
   else if Sys.file_exists (f ^ ".png") then Some (`Path (f ^ ".png"))
   else if Sys.file_exists (f ^ ".gif") then Some (`Path (f ^ ".gif"))
   else None
@@ -139,20 +140,6 @@ let size_from_path fname =
   in
   res
 
-let rename_portrait conf base p (nfn, nsn, noc) =
-  match full_portrait_path conf base p with
-  | Some (`Path old_f) -> (
-      let s = default_portrait_filename_of_key nfn nsn noc in
-      let f = Filename.concat (Util.base_path [ "images" ] conf.bname) s in
-      let new_f = f ^ Filename.extension old_f in
-      try Sys.rename old_f new_f
-      with Sys_error e ->
-        !GWPARAM.syslog `LOG_ERR
-          (Format.sprintf
-             "Error renaming portrait: old_path=%s new_path=%s : %s" old_f new_f
-             e))
-  | None -> ()
-
 let src_to_string = function `Url s | `Path s -> s
 
 let scale_to_fit ~max_w ~max_h ~w ~h =
@@ -228,6 +215,103 @@ let parse_src_with_size_info conf s =
       (Format.sprintf "Error parsing portrait source with size info %s" s);
     Error "Failed to parse url with size info"
 
+let get_portrait conf base p =
+  if has_access_to_portrait conf base p then
+    match src_of_string conf (sou base (get_image p)) with
+    | `Src_with_size_info _s as s_info -> (
+        match parse_src_with_size_info conf s_info with
+        | Error _e -> None
+        | Ok (s, _size) -> Some s)
+    | `Url _s as url -> Some url
+    | `Path p as path -> if Sys.file_exists p then Some path else None
+    | `Empty -> (
+        match full_portrait_path conf base p with
+        | None -> None
+        | Some path -> Some path)
+  else None
+
+(* In images/keydir we store either
+   - the old portrait as the original keydir.jpg/png/tif image
+   - the url to the portrait as content of a url.txt file
+*)
+let get_old_portrait conf base p =
+  let key = default_portrait_filename base p in
+  let p_dir =
+    String.concat Filename.dir_sep [ Util.base_path [ "images" ] conf.bname ]
+  in
+  let f = Filename.concat (Filename.concat p_dir "saved") key in
+  (* TODO test for legal extensions *)
+  if Sys.file_exists (f ^ ".jpg") then Some (`Path (f ^ ".jpg"))
+  else if Sys.file_exists (f ^ ".jpeg") then Some (`Path (f ^ ".jpeg"))
+  else if Sys.file_exists (f ^ ".png") then Some (`Path (f ^ ".png"))
+  else if Sys.file_exists (f ^ ".gif") then Some (`Path (f ^ ".gif"))
+  else None
+
+let rename_portrait conf base p (nfn, nsn, noc) =
+  match get_portrait conf base p with
+  | Some (`Path old_f) -> (
+      let s = default_portrait_filename_of_key nfn nsn noc in
+      let f = Filename.concat (Util.base_path [ "images" ] conf.bname) s in
+      let new_f = f ^ Filename.extension old_f in
+      try Sys.rename old_f new_f
+      with Sys_error e ->
+        !GWPARAM.syslog `LOG_ERR
+          (Format.sprintf
+             "Error renaming portrait: old_path=%s new_path=%s : %s" old_f new_f
+             e))
+  | Some (`Url _url) -> () (* old url still applies *)
+  | None -> ()
+
+(* For carrousel ************************************ *)
+
+let get_keydir_img_notes conf base p fname =
+  let k = default_portrait_filename base p in
+  let fname =
+    String.concat Filename.dir_sep
+      [ Util.base_path [ "src" ] conf.bname; "images"; k; fname ^ ".txt" ]
+  in
+  let s =
+    if Sys.file_exists fname then (
+      let ic = Secure.open_in fname in
+      let s = really_input_string ic (in_channel_length ic) in
+      close_in ic;
+      s)
+    else ""
+  in
+  s
+
+(* get list of files in keydir *)
+let get_keydir_files conf base p old =
+  let k = default_portrait_filename base p in
+  let f =
+    String.concat Filename.dir_sep
+      [
+        Util.base_path [ "src" ] conf.bname;
+        "images";
+        k;
+        (if old then "saved" else "");
+      ]
+  in
+  try
+    if Sys.is_directory f then
+      Array.fold_right
+        (fun f1 l ->
+          if
+            f1.[0] <> '.'
+            && Filename.extension f1 <> ".txt"
+            && (Filename.extension f1 = ".jpg"
+               || Filename.extension f1 = ".jpeg"
+               || Filename.extension f1 = ".gif"
+               || Filename.extension f1 = ".png")
+          then (* TODO vérifier ici le type des images autorisées  *)
+            f1 :: l
+          else l)
+        (Sys.readdir f) []
+    else []
+  with Sys_error _ -> []
+
+(* end carrousel ************************************ *)
+
 let get_portrait_with_size conf base p =
   if has_access_to_portrait conf base p then
     match src_of_string conf (sou base (get_image p)) with
@@ -244,19 +328,4 @@ let get_portrait_with_size conf base p =
         match full_portrait_path conf base p with
         | None -> None
         | Some path -> Some (path, size_from_path path |> Result.to_option))
-  else None
-
-let get_portrait conf base p =
-  if has_access_to_portrait conf base p then
-    match src_of_string conf (sou base (get_image p)) with
-    | `Src_with_size_info _s as s_info -> (
-        match parse_src_with_size_info conf s_info with
-        | Error _e -> None
-        | Ok (s, _size) -> Some s)
-    | `Url _s as url -> Some url
-    | `Path p as path -> if Sys.file_exists p then Some path else None
-    | `Empty -> (
-        match full_portrait_path conf base p with
-        | None -> None
-        | Some path -> Some path)
   else None

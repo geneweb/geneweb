@@ -122,7 +122,8 @@ let () =
       content ();
       trailer conf
 
-let incorrect_request conf = !GWPARAM.output_error conf Def.Bad_Request
+let incorrect_request ?(comment = "") conf =
+  !GWPARAM.output_error conf Def.Bad_Request ~content:(Adef.safe comment)
 
 let error_cannot_access conf fname =
   !GWPARAM.output_error conf Def.Not_Found

@@ -1,12 +1,12 @@
 (library
  (name plugin_v7_im_lib)
  (libraries geneweb geneweb.gwd_lib geneweb.util)
- (modules v7_im_sendImage)
+ (modules imageCarrousel)
  (wrapped true))
 
 (executable
  (name plugin_v7_im)
- (libraries geneweb.gwd_lib plugin_v7_im_lib)
+ (libraries geneweb geneweb.gwd_lib plugin_v7_im_lib)
  (embed_in_plugin_libraries plugin_v7_im_lib)
  (modes
   (native plugin))
@@ -14,4 +14,6 @@
 
 (alias
  (name plugin)
- (deps plugin_v7_im.cmxs))
+ (deps
+  (source_tree assets)
+  plugin_v7_im.cmxs))
