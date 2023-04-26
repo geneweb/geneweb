@@ -100,7 +100,7 @@ val cdate_of_od : date option -> cdate
 
 (* TODO date_to_dmy? *)
 
-val to_sdn : from:calendar -> dmy -> int
+val to_sdn : from:calendar -> ?lower:bool -> dmy -> int
 (** Convert a [dmy] in calendar [from] to SDN
     if dmy is a partial date (month|day = 0) then return the SDN of a lower bound *)
 
