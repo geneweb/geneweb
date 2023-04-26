@@ -25,6 +25,10 @@ fr: sélect. fichier
 en: portrait
 fr: portrait
 
+    add portrait
+en: modify portrait
+fr: ajouter un portrait
+
     modify portrait
 en: modify portrait
 fr: modifier le portrait

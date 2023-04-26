@@ -2359,27 +2359,6 @@ let reduce_list size list =
   List.rev sublist
 
 (* ********************************************************************** *)
-(*  [Fonc] print_reference : config -> string -> int -> string -> unit    *)
-
-(* ********************************************************************** *)
-
-(** [Description] : Affiche la référence d'une personne
-    [Args] :
-      - conf : configuration de la base
-      - fn   : first name
-      - occ  : occ
-      - sn   : surname
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                           *)
-let print_reference conf fn occ sn =
-  Output.print_sstring conf "<span class=\"reference\">";
-  Output.printf conf " (%s %s.%d %s)"
-    (transl conf "reference key")
-    (Name.lower fn) occ (Name.lower sn);
-  Output.print_sstring conf "</span>"
-
-(* ********************************************************************** *)
 (*  [Fonc] gen_print_tips : conf -> string -> unit                        *)
 
 (* ********************************************************************** *)

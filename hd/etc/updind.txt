@@ -3,12 +3,14 @@
 <head>
   <!-- $Id: updind.txt v7.1 10/01/2023 20:01:49 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
+  %let;mrg;%if;(e.m="MRG_IND_OK" or e.m="MRG_MOD_IND_OK")1%end;%in;
+  %let;mod;%if;(e.m="MOD_IND" or e.m="MOD_IND_OK")1%end;%in;
   <title>%nn;
-    %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
-      [*merge::person/persons]1 # %index;
-    %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
-      [*modify::person/persons]0 # %index;
-    %else;[*add::person/persons]0%end;
+    %if;(mrg=1)[*merge::person/persons]1
+    %elseif;(mod=1)[*modify::person/persons]0
+    %else;[*add::person/persons]0
+    %end;
+    # %index;%nn;
   </title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -718,7 +720,7 @@
     %hidden;
     <input type="hidden" name="digest" value="%digest;"%/>
     <input type="hidden" name="i" value="%index;"%/>
-    %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
+    %if;(mrg=1)
       %if;(evar_i2 != "")
         <input type="hidden" name="i2" value="%evar_i2;">
       %end;
@@ -736,28 +738,22 @@
         %end;
       %end;
       <input type="hidden" name="m" value="MRG_MOD_IND_OK"%/>
-    %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
+    %elseif;(mod=1)
       <input type="hidden" name="m" value="MOD_IND_OK"%/>
     %else;
       <input type="hidden" name="m" value="ADD_IND_OK"%/>
     %end;
   </div>
 <div class="card">
-<h2 class="card-header">%nn;
-  %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
-    [*merge::person/persons]1[:] %first_name; %surname;
-    %if;(first_name != "?" and surname != "?")
-      %sp;<span class="reference">([reference key][:] %first_name;.%if;(occ = "")0%else;%occ;%end; %surname)</span>
-    %end;
-  %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
-    [*modify::person/persons]0[:] %first_name;.%if;(occ = "")0%else;%occ;%end; %surname;
-  %else;
-    [*add::person/persons]0%end;
+<h2 class="card-header%if;(mrg=1) mt-5%end;">%nn;
+  %if;(mrg=1)[*merge::person/persons]1
+  %elseif;(mod=1)[*modify::person/persons]0
+  %else;[*add:person/persons]0%end;[:] %first_name;.%occ %surname;%nn;
 </h2>
 <div class="card-body">
   <h5 class="card-title"><b>[*other action][:] </b>
     <a href="%prefix;m=CHG_EVT_IND_ORD&i=%index;" title="[*changed order of person's events]">[*invert::event/events]1</a> |
-    %if;(bvar.can_send_image != "no" and not has_image_url and first_name != "?" and surname != "?")
+    %if;(first_name!="?" and surname!="?")
       <a href="%prefix;m=SND_IMAGE&i=%index;">[*modify::]/[delete::]/[add picture]</a>
     %end; | <a href="%prefix;m=MRG&i=%index;">[*merge::]</a> | <a href="%prefix;m=DEL_IND&i=%index;">[*delete::]</a></h5>
   <div class="form-group mt-4">
