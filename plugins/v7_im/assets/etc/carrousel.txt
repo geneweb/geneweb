@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: carrousel.txt, v7.00-exp 07/12/2022 01:23:51 hg a2 $ -->
-  <!-- Copyright (c) 1998-2019 INRIA -->
+  <!-- $Id: carrousel.txt v7.1 04/05/2023 18:19:02 $ -->
   <title>[*add]/[delete::image/images]0 #%index;</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -124,9 +123,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
             [*select] [image/images]0%nn;
           </label>
         </div>
-        <button class="btn btn-primary ml-2 col-2 snd-btn-others"
-          type="submit" disabled>[*send]
-        </button>
+        <button class="btn btn-primary ml-2 col-2 snd-btn-others" type="submit" disabled>[*send]</button>
         %(TODO: print only if old img already exists%)
         <div class="small col-12 mt-1">
           [*previous image]
@@ -139,8 +136,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
         <textarea class="form-control col-12" id="notes_comments"
           name="notes" rows="5" placeholder="[*image comment]" disabled>
         </textarea>
-        <button class="btn btn-primary mt-2 col-12 btn-update-comment"
-          type="submit" disabled>
+        <button class="btn btn-primary mt-2 col-12 btn-update-comment" type="submit" disabled>
           <span id="which_img_show">[*send image with comment]</span></button>
       </form>
     </div>

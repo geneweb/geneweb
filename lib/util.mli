@@ -448,8 +448,6 @@ val is_hide_names : config -> person -> bool
 val reduce_list : int -> 'a list -> 'a list
 (** [reduce_list n l] takes [n] first elements from the list [l] *)
 
-val print_reference : config -> string -> int -> string -> unit
-
 val gen_print_tips : config -> Adef.safe_string -> unit
 (** Print a tip with the specified text *)
 

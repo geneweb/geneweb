@@ -239,7 +239,7 @@ let print_confirm_c conf base save_m report =
 (* we need print_link_delete_image in the send function *)
 let print_link_delete_image conf base p =
   if Option.is_some @@ Image.get_portrait conf base p then (
-    Output.print_sstring conf {|<p><a href="|};
+    Output.print_sstring conf {|<p><a class="btn btn-primary" href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf "m=DEL_IMAGE&i=";
     Output.print_string conf (get_iper p |> string_of_iper |> Mutil.encode);
@@ -260,14 +260,11 @@ let print_send_image conf base p =
       |> transl_decline conf "add" |> Utf8.capitalize_fst
       |> Output.print_sstring conf;
     if not h then (
-      let fn = p_first_name base p in
-      let sn = p_surname base p in
       Output.print_sstring conf (transl conf ":");
       Output.print_sstring conf " ";
-      Output.print_string conf (Util.escape_html fn);
-      Output.print_sstring conf " ";
-      Output.print_string conf (Util.escape_html sn);
-      Util.print_reference conf fn (get_occ p) sn)
+      Output.print_string conf (Util.escape_html (p_first_name base p));
+      Output.printf conf ".%d " (get_occ p);
+      Output.print_string conf (Util.escape_html (p_surname base p));)
   in
   let digest = Update.digest_person (UpdateInd.string_person_of base p) in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
@@ -286,7 +283,7 @@ let print_send_image conf base p =
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf " ";
   Output.print_sstring conf
-    {| <input type="file" class="form-control" name="file" size="50" maxlength="250" accept="image/*"></p>|};
+    {| <input type="file" class="form-control-file" name="file" accept="image/*"></p>|};
   (match
      Option.map int_of_string @@ List.assoc_opt "max_images_size" conf.base_env
    with
@@ -296,7 +293,7 @@ let print_send_image conf base p =
       Output.print_sstring conf " bytes)</p>"
   | None -> ());
   Output.print_sstring conf
-    {|<button type="submit" class="btn btn-secondary btn-lg mt-2">|};
+    {|<button type="submit" class="btn btn-primary mt-2">|};
   transl_nth conf "validate/delete" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</button></form>";
@@ -515,8 +512,8 @@ let print_delete_image conf base p =
   Util.hidden_input conf "m" (Adef.encoded "DEL_IMAGE_OK");
   Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);
   Output.print_sstring conf
-    {|<p><button type="submit" class="btn btn-secondary btn-lg">|};
-  transl_nth conf "validate/delete" 0
+    {|<p><button type="submit" class="btn btn-primary">|};
+  transl_nth conf "validate/delete" 1
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|</button></p></form>|};
   Hutil.trailer conf

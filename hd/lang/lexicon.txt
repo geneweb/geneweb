@@ -12848,22 +12848,6 @@ pt: reduzir/aumentar
 sv: minska/öka
 tr: azalt/arttır
 
-    reference key
-co: referenza
-de: Referenz
-en: ID
-es: referencia
-fi: referenssi
-fr: référence
-it: riferimento
-nl: referentie
-no: referanse
-oc: referéncia
-pt: referência
-ru: ID
-sv: referens
-tr: kimlik (ID)
-
     region
 co: rughjone
 de: Region
