@@ -149,6 +149,19 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
       %if;(has_portrait or has_old_portrait)
         <h1 class="display-4">[*portrait]0</h1>
         %if;has_portrait;
+          %if;has_image_url;
+          <div class="d-flex mt-1">
+            <a role="button" href="%portrait;" target="_blank" rel="noopener"%sp;
+            data-toggle="tooltip" data-html="true" data-placement="left"
+            title='<strong>[*see] [portrait]</strong><br><span class="small">%portrait;</span>
+                   <br><img class="rounded my-1" src="%portrait;"
+                   width="185px">'%nn;
+            >
+              <i class="far fa-file-image fa-fw text-primary"></i>
+            </a>
+            %portrait;
+          </div>
+          %else;
           <div class="d-flex mt-1">
             <a role="button" href="%prefix;kch=%random.bits;&m=IM_C&i=%index;" target="_blank" rel="noopener"%sp;
             data-toggle="tooltip" data-html="true" data-placement="left"
