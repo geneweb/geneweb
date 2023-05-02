@@ -208,7 +208,10 @@ let init_cousins_cnt conf base p =
         Printf.sprintf "******** Compute %d × %d table ********\n" max_a_l
           max_d_l
         |> !GWPARAM.syslog `LOG_WARNING;
-        (* TODO test for Sys.max_array_length *)
+        if
+          max_a_l + 1 > Sys.max_array_length
+          || max_d_l + 1 > Sys.max_array_length
+        then failwith "Cousins table too large for system";
         let () = load_ascends_array base in
         let () = load_couples_array base in
         let cousins_cnt = Array.make_matrix (max_a_l + 1) (max_d_l + 1) [] in
