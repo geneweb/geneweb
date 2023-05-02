@@ -577,10 +577,16 @@ let treat_request =
                 if Filename.check_suffix f ".txt" then
                   let f = Filename.chop_suffix f ".txt" in
                   SrcfileDisplay.print_source conf base f
-                else (
-                 match Util.p_getenv conf.env "t" with
-                 | Some "H" -> ImageDisplay.print_html conf
-                 | _ -> ImageDisplay.print_source conf f)
+                else ImageDisplay.print_source conf f
+          | _ -> incorrect_request conf base)
+        | "DOCH" ->
+          w_base @@ fun conf base -> (
+          match Util.p_getenv conf.env "s" with
+          | Some f ->
+                if Filename.check_suffix f ".txt" then
+                  let f = Filename.chop_suffix f ".txt" in
+                  SrcfileDisplay.print_source conf base f
+                else ImageDisplay.print_html conf
           | _ -> incorrect_request conf base)
         | "F" ->
           w_base @@ w_person @@ Perso.interp_templ "family"

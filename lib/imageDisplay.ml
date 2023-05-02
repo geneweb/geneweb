@@ -18,7 +18,6 @@ let print_placeholder_gendered_portrait conf p size =
 
 (* ************************************************************************** *)
 (*  [Fonc] content : string -> int -> string -> unit                          *)
-
 (* ************************************************************************** *)
 
 (** [Description] : Envoie les en-têtes de contenu et de cache pour un fichier
@@ -90,7 +89,6 @@ let print_image_file conf fname =
 
 (* ************************************************************************** *)
 (*  [Fonc] print_portrait : Config.config -> Gwdb.base -> Gwdb.person -> unit *)
-
 (* ************************************************************************** *)
 
 (** [Description] : Affiche l'image d'une personne en réponse HTTP.
@@ -115,18 +113,6 @@ let print_portrait conf base p =
       Output.print_sstring conf "</body></html>"
   | None -> Hutil.incorrect_request conf
 
-(* ************************************************************************** *)
-(*  [Fonc] print_source : Config.config -> string -> unit               *)
-
-(* ************************************************************************** *)
-
-(** [Description] : Affiche une image à partir de son basename uniquement en
-                    la cherchant dans les dossiers d'images.
-    [Args] :
-      - config : configuration de la requête
-      - f : basename de l'image
-    [Retour] : aucun
-    [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 let print_source conf f =
   let fname = if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f in
   let fname = Image.source_filename conf fname in
@@ -134,9 +120,6 @@ let print_source conf f =
     ~error:(fun _ -> Hutil.incorrect_request conf)
     (print_image_file conf fname)
 
-(* ************************************************************************** *)
-(*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
-(* ************************************************************************** *)
 let print conf base =
   match Util.p_getenv conf.env "s" with
   | Some f -> print_source conf f
@@ -145,9 +128,6 @@ let print conf base =
       | Some p -> print_portrait conf base p
       | None -> Hutil.incorrect_request conf)
 
-(* ************************************************************************** *)
-(*  [Fonc] print_html : config -> 'a -> unit                                  *)
-(* ************************************************************************** *)
 let print_html conf =
   Util.html conf;
   Output.print_sstring conf "<head><title>";
