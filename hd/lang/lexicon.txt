@@ -81,6 +81,10 @@ fr: continuer
 en: without implex display
 fr: sans afficher les implexes
 
+    delete picture
+en: delete picture
+fr: supprimer le portrait
+
     %1 of %2
 af: %1 van %2
 bg: %1 на :a:%2

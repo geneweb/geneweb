@@ -177,8 +177,13 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
           %if;(not (b.wizard_just_friend="yes") and wizard)
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD&i=%index;" title="[*changed order of person's events]"><span class="fa fa-sort fa-fw mr-2"></span>[*invert::event/events]1</a>
-                %if;(b.can_send_image != "no" and image = "" and first_name != "?" and surname != "?")
-                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE&i=%index;" %laI;><span class="far fa-file-image fa-fw mr-2"></span>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
+                %if;(b.can_send_image != "no" and not has_image and first_name != "?" and surname != "?")
+                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE&i=%index;" %laI;>
+                    <i class="far fa-file-image fa-fw mr-2"></i>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
+                %end;
+                %if;(b.can_send_image != "no" and has_image and first_name != "?" and surname != "?")
+                  <a class="dropdown-item" href="%prefix;m=DEL_IMAGE&i=%index;" %laI;>
+                    <i class="far fa-file-image fa-fw mr-2"></i>[*delete picture]</a>
                 %end;
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;m=MRG&i=%index;" title="[*merge] %first_name;.%occ; %surname; [with]…"><span class="fa fa-compress fa-fw text-danger mr-2"></span>[*merge::person/persons]1</a>
