@@ -462,6 +462,15 @@ let treat_request =
         let incorrect_request ?(comment = "") conf _ =
           incorrect_request ~comment:comment conf
         in
+        let doc_aux conf base print =
+          match Util.p_getenv conf.env "s" with
+          | Some f ->
+                if Filename.check_suffix f ".txt" then
+                  let f = Filename.chop_suffix f ".txt" in
+                  SrcfileDisplay.print_source conf base f
+                else print conf f
+          | _ -> incorrect_request conf
+        in
         match m with
         | "" ->
           let base =
@@ -571,23 +580,11 @@ let treat_request =
         | "DEL_IND_OK" ->
           w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_del
         | "DOC" ->
-          w_base @@ fun conf base -> (
-          match Util.p_getenv conf.env "s" with
-          | Some f ->
-                if Filename.check_suffix f ".txt" then
-                  let f = Filename.chop_suffix f ".txt" in
-                  SrcfileDisplay.print_source conf base f
-                else ImageDisplay.print_source conf f
-          | _ -> incorrect_request conf base)
+          w_base @@ fun conf base -> doc_aux conf base
+            ImageDisplay.print_source
         | "DOCH" ->
-          w_base @@ fun conf base -> (
-          match Util.p_getenv conf.env "s" with
-          | Some f ->
-                if Filename.check_suffix f ".txt" then
-                  let f = Filename.chop_suffix f ".txt" in
-                  SrcfileDisplay.print_source conf base f
-                else ImageDisplay.print_html conf
-          | _ -> incorrect_request conf base)
+          w_base @@ fun conf base -> doc_aux conf base
+            (fun conf _base -> ImageDisplay.print_html conf)
         | "F" ->
           w_base @@ w_person @@ Perso.interp_templ "family"
         | "H" ->
