@@ -129,17 +129,30 @@ let print conf base =
       | None -> Hutil.incorrect_request conf)
 
 let print_html conf =
-  Util.html conf;
-  Output.print_sstring conf "<head><title>";
-  Output.print_sstring conf (Util.transl_nth conf "image/images" 0);
-  Output.print_sstring conf "</title></head><body><img src=\"";
-  Output.print_string conf (Util.commd conf);
-  Mutil.list_iter_first
-    (fun first (k, v) ->
-      let v = if k = "m" then Adef.encoded "IM" else v in
-      if not first then Output.print_sstring conf "&";
-      Output.print_sstring conf k;
-      Output.print_sstring conf "=";
-      Output.print_string conf v)
-    conf.env;
-  Output.print_sstring conf "\"></body></html>"
+  let ext =
+    match Util.p_getenv conf.env "s" with
+    | Some f -> Filename.extension f
+    | _ -> ""
+  in
+  match ext with
+  | ".htm" | ".html" | ".pdf" ->
+      let title _ = Output.print_sstring conf "Error" in
+      Hutil.header conf title;
+      Output.print_sstring conf
+        "<body><ul><li>DOCH not available for html and pdf.";
+      Hutil.trailer conf
+  | _ ->
+      Util.html conf;
+      Output.print_sstring conf "<head><title>";
+      Output.print_sstring conf (Util.transl_nth conf "image/images" 0);
+      Output.print_sstring conf "</title></head><body><img src=\"";
+      Output.print_string conf (Util.commd conf);
+      Mutil.list_iter_first
+        (fun first (k, v) ->
+          let v = if k = "m" then Adef.encoded "IM" else v in
+          if not first then Output.print_sstring conf "&";
+          Output.print_sstring conf k;
+          Output.print_sstring conf "=";
+          Output.print_string conf v)
+        conf.env;
+      Output.print_sstring conf "\"></body></html>"
