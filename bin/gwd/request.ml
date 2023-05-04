@@ -469,7 +469,7 @@ let treat_request =
                   let f = Filename.chop_suffix f ".txt" in
                   SrcfileDisplay.print_source conf base f
                 else print conf f
-          | _ -> incorrect_request conf
+          | _ -> incorrect_request conf base
         in
         match m with
         | "" ->
