@@ -2033,6 +2033,10 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       match find_person_in_env conf base "" with
       | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
       | None -> raise Not_found)
+  (* person_index.x -> i=, p=, n=, oc= *)
+  (* person_index.1 -> i1=, p1=, n1=, oc1= *)
+  (* person_index.2 -> i2=, p2=, n2=, oc2= *)
+  (* person_index.e -> ei=, ep=, en=, eoc= *)
   | [ "person_index"; x ] -> (
       let find_person =
         match x with "e" -> find_person_in_env_pref | _ -> find_person_in_env

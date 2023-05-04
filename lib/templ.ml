@@ -244,12 +244,17 @@ let rec eval_variable conf = function
           substr_start_aux n v
       | None -> raise Not_found)
   | "time" :: sl -> eval_time_var conf sl
+  (* clear some variables in url *)
   | [ "url_set"; evar ] -> url_set_aux conf [ evar ] ""
   | [ "url_set2"; evar1; evar2 ] -> url_set_aux conf [ evar1; evar2 ] ""
   | [ "url_set3"; evar1; evar2; evar3 ] ->
       url_set_aux conf [ evar1; evar2; evar3 ] ""
+  | [ "url_set_p" ] -> url_set_aux conf [ "i"; "p"; "n"; "oc" ] ""
+  | [ "url_set_p1" ] -> url_set_aux conf [ "i1"; "p1"; "n1"; "oc1" ] ""
+  | [ "url_set_p2" ] -> url_set_aux conf [ "i2"; "p2"; "n2"; "oc2" ] ""
   | [ "url_set_pn" ] ->
-      url_set_aux conf [ "i1"; "i2"; "p1"; "p2"; "n1"; "n2"; "oc11"; "oc2" ] ""
+      url_set_aux conf [ "i1"; "i2"; "p1"; "p2"; "n1"; "n2"; "oc1"; "oc2" ] ""
+  (* when only one variable is involved, set it to a new value *)
   | [ "url_set"; evar; str ] -> url_set_aux conf [ evar ] str
   | [ "user"; "ident" ] -> conf.user
   | [ "user"; "name" ] -> conf.username
