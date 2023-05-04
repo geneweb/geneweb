@@ -59,8 +59,8 @@ let raw_get conf key =
 let insert_saved fname =
   let l = String.split_on_char Filename.dir_sep.[0] fname |> List.rev in
   let l =
-    (if List.length l >= 2 then List.hd l :: "saved" :: List.tl l
-    else if List.length l = 1 then List.hd l :: [ "saved" ]
+    (if List.length l >= 2 then List.hd l :: "old" :: List.tl l
+    else if List.length l = 1 then List.hd l :: [ "old" ]
     else l)
     |> List.rev
   in
@@ -81,7 +81,7 @@ let move_file_to_saved conf fname bfname =
       let new_file = fname ^ ext in
       if Sys.file_exists new_file then (
         let old_dir =
-          Filename.concat (Util.base_path [ "images" ] conf.bname) "saved"
+          Filename.concat (Util.base_path [ "images" ] conf.bname) "old"
         in
         let old_file = Filename.concat old_dir bfname ^ ext in
         Mutil.rm old_file;
@@ -94,7 +94,7 @@ let move_file_to_saved conf fname bfname =
 
 let move_file_to_save dir file =
   try
-    let save_dir = Filename.concat dir "saved" in
+    let save_dir = Filename.concat dir "old" in
     let fname = Filename.basename file in
     if not (Sys.file_exists save_dir) then Mutil.mkdir_p save_dir;
     let orig_file = Filename.concat dir fname in
@@ -197,7 +197,7 @@ let get_extension conf saved keydir =
   let f =
     if saved then
       String.concat Filename.dir_sep
-        [ Util.base_path [ "images" ] conf.bname; "saved"; keydir ]
+        [ Util.base_path [ "images" ] conf.bname; "old"; keydir ]
     else
       String.concat Filename.dir_sep
         [ Util.base_path [ "images" ] conf.bname; keydir ]
@@ -440,7 +440,7 @@ let effective_send_c_ok conf base p file file_name mode =
     Filename.concat full_dir
       (if mode = "portraits" then keydir ^ extension_of_type typ else file_name)
   in
-  let save_dir = Filename.concat full_dir "saved" in
+  let save_dir = Filename.concat full_dir "old" in
   if mode = "portraits" then
     (* if saved portrait exists, move it to images *)
     match Image.get_old_portrait conf base p with
@@ -584,7 +584,7 @@ let effective_delete_c_ok conf base p =
   (* TODO verify we dont destroy a saved image
       having the same name as portrait! *)
   if saved then
-    Mutil.rm (String.concat Filename.dir_sep [ full_dir; "saved"; file ])
+    Mutil.rm (String.concat Filename.dir_sep [ full_dir; "old"; file ])
   else if move_file_to_save full_dir file = 0 then
     incorrect conf "effective delete";
   let changed =
@@ -612,7 +612,7 @@ let effective_reset_c_ok conf base p =
    let file_in_old =
      String.concat Filename.dir_sep
        [
-         Util.base_path [ "images" ] conf.bname; "saved"; file_name ^ ext_saved;
+         Util.base_path [ "images" ] conf.bname; "old"; file_name ^ ext_saved;
        ]
    in
    let file_in_portraits =
@@ -630,7 +630,7 @@ let effective_reset_c_ok conf base p =
           Util.base_path [ "src" ] conf.bname;
           "images";
           keydir;
-          "saved";
+          "old";
           file_name;
         ]
     in
