@@ -1952,19 +1952,6 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
         | [] -> raise Not_found
       in
       loop env
-  | "event_witness_relation" :: sl -> (
-      match get_env "event_witness_relation" env with
-      | Vevent (p, e) ->
-          eval_event_witness_relation_var conf base env (p, e) loc sl
-      | _ -> raise Not_found)
-  | "event_witness_relation_kind" :: _ -> (
-      match get_env "event_witness_relation_kind" env with
-      | Vstring wk -> VVstring wk
-      | _ -> raise Not_found)
-  | "event_witness_kind" :: _ -> (
-      match get_env "event_witness_kind" env with
-      | Vstring s -> VVstring s
-      | _ -> raise Not_found)
   | "family" :: sl -> (
       (* TODO ???
          let mode_local =
@@ -4437,48 +4424,6 @@ let print_foreach conf base print_ast eval_expr =
           loop (succ i) ip_l
     in
     loop 0 ip_l
-  in
-  let print_foreach_cremation_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Event.Pevent Epers_Cremation then
-            Array.iteri
-              begin fun i (ip, _, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("cremation_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (Event.events conf base p)
-  in
-  let print_foreach_death_witness env al (p, _ as ep) =
-    let rec loop pevents =
-      match pevents with
-        [] -> ()
-      | (name, _, _, _, _, wl, _) :: events ->
-          if name = Event.Pevent Epers_Death then
-            Array.iteri
-              begin fun i (ip, _, _) ->
-                let p = pget conf base ip in
-                let env =
-                  ("death_witness", Vind p)
-                  :: ("first", Vbool (i = 0))
-                  :: env
-                in
-                List.iter (print_ast env ep) al
-              end
-              wl
-          else loop events
-    in
-    loop (Event.events conf base p)
   in
   let print_foreach_descendant_level env al ep =
     let max_level =

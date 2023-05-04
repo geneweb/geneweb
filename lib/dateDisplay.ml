@@ -648,14 +648,15 @@ let short_family_dates_text conf _base marr_sep fam =
     match
       List.find_opt
         (fun e ->
-          e.efam_name = Efam_Divorce
-          || e.efam_name = Efam_Annulation
-          || e.efam_name = Efam_Separated)
+           let name = Gwdb.get_fevent_name e in
+           name = Efam_Divorce
+           || name = Efam_Annulation
+           || name = Efam_Separated)
         (Gwdb.get_fevents fam)
     with
     | None -> None
     | Some e -> (
-        match Date.cdate_to_dmy_opt e.efam_date with
+        match Date.cdate_to_dmy_opt (Gwdb.get_fevent_date e) with
         | None -> Some ""
         | Some dmy -> Some (prec_year_text conf dmy))
   in
