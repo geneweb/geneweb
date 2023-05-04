@@ -239,7 +239,7 @@ let get_old_portrait conf base p =
   let p_dir =
     String.concat Filename.dir_sep [ Util.base_path [ "images" ] conf.bname ]
   in
-  let f = Filename.concat (Filename.concat p_dir "saved") key in
+  let f = Filename.concat (Filename.concat p_dir "old") key in
   (* TODO test for legal extensions *)
   if Sys.file_exists (f ^ ".jpg") then Some (`Path (f ^ ".jpg"))
   else if Sys.file_exists (f ^ ".jpeg") then Some (`Path (f ^ ".jpeg"))
@@ -283,17 +283,20 @@ let get_keydir_img_notes conf base p fname =
 (* get list of files in keydir *)
 let get_keydir_files conf base p old =
   let k = default_portrait_filename base p in
+  let _ = Printf.eprintf "Keydir= %s\n" k in
   let f =
     String.concat Filename.dir_sep
       [
         Util.base_path [ "src" ] conf.bname;
         "images";
         k;
-        (if old then "saved" else "");
+        (if old then "old" else "");
       ]
   in
+  let _ = Printf.eprintf "full dir= %s\n" f in
   try
     if Sys.is_directory f then
+      let _ = Printf.eprintf "full dir is a directory\n" in
       Array.fold_right
         (fun f1 l ->
           if
@@ -307,7 +310,9 @@ let get_keydir_files conf base p old =
             f1 :: l
           else l)
         (Sys.readdir f) []
-    else []
+    else
+      let _ = Printf.eprintf "full dir is not a directory\n" in
+      []
   with Sys_error _ -> []
 
 (* end carrousel ************************************ *)

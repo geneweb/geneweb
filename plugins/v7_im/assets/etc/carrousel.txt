@@ -37,15 +37,15 @@
 %end;
 %define;alert_content()
   %if;(evar.mode="others" or evar.mode="comment")
-    <samp>%if;(evar.em="RESET_IMAGE_C_OK")images%X;%keydir;%X;saved%X;%evar.file_name; <strong>></strong> %end;images%X;%keydir;%if;(evar.delete="on")%X;saved%end;%X;%nn;
+    <samp>%if;(evar.em="RESET_IMAGE_C_OK")images%X;%keydir;%X;old%X;%evar.file_name; <strong>></strong> %end;images%X;%keydir;%if;(evar.delete="on")%X;old%end;%X;%nn;
     %if;(evar.notes!="")%evar.file_name_2;.txt%else;%evar.file_name;%end;</samp>
   %else;
     %if;(evar.em="SND_IMAGE_C_OK" or evar.em="RESET_IMAGE_C_OK")
-      <samp>%evar.file_name;</samp> %if;(evar.em="RESET_IMAGE_C_OK")<samp>%portraits_store;%X;saved%X;%portrait_saved;</samp>
+      <samp>%evar.file_name;</samp> %if;(evar.em="RESET_IMAGE_C_OK")<samp>%portraits_store;%X;old%X;%portrait_saved;</samp>
       <strong> <</strong>%end;<strong>> </strong><samp>%portraits_store;%X;%portrait;</samp>%nn;
       %(%if;(evar.em="DEL IMAGE_C_OK" or evar.em="RESET_IMAGE_C_OK")%portrait;%else;%evar.file_name;%end;</samp>%)
     %elseif;(evar.em="DEL_IMAGE_C_OK")
-      %if;(evar.delete!="on")<samp>portrait%X;%portrait_saved;</samp> <strong>></strong> <samp>portraits%X;saved%X;%portrait_saved;</samp>
+      %if;(evar.delete!="on")<samp>portrait%X;%portrait_saved;</samp> <strong>></strong> <samp>portraits%X;old%X;%portrait_saved;</samp>
       %else;<samp>portraits%X;saved%X;%keydir;(.gif/jpg/png)</samp>%end;
     %end;
   %end;
@@ -65,7 +65,7 @@
 %in;
 %let;saved_portraits_store;
   %if;(bvar.reorg="on")%base.name;.gwb%X;documents%X;portraits%nn;
-  %else;images%X;%base.name;%X;saved%nn;
+  %else;images%X;%base.name;%X;old%nn;
   %end;%nn;
 %in;
 %let;images_store;
@@ -151,8 +151,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
             data-toggle="tooltip" data-html="true" data-placement="left"
             title='<strong>[*see] [portrait]</strong><br><span class="small">%portrait;</span>
                    <br><img class="rounded my-1" src="%portrait;"
-                   width="185px">'%nn;
-            >
+                   width="185px">'>
               <i class="far fa-file-image fa-fw text-primary"></i>
             </a>
             %portrait;
@@ -163,8 +162,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
             data-toggle="tooltip" data-html="true" data-placement="left"
             title='<strong>[*see] [portrait]</strong><br><span class="small">%portrait;</span>
                    <br><img class="rounded my-1" src="%prefix;kch=%random.bits;&m=IM_C&i=%index;"
-                   width="185px">'%nn;
-            >
+                   width="185px">'>
               <i class="far fa-file-image fa-fw text-primary"></i>
             </a>
             <span class="invisible"><i class="fas fa-retweet fa-rotate-90 fa-fw text-primary"></i></span>
@@ -173,27 +171,25 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
                data-toggle="tooltip" data-html="true" data-placement="left"
                title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete] [portrait]</strong><br><span class="small">%portrait;</span>
                       <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;"
-                      width="185px">'%nn;
-            >
+                      width="185px">'>
               <i class="far fa-trash-alt text-warning"></i>%nn;
             </a>
           </div>
+          %end;
         %end;
         %if;has_old_portrait;
           <div class="d-flex mt-1">
             <a role="button" href="%prefix;kch=%random.bits;&m=IM_C_S&i=%index;" target="_blank" rel="noopener"
               data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong>[*see] [portrait] [saved]0</strong><br><span class="small">%portrait_saved;%X;</span>
-                     <br><img class="rounded my-1" src="%prefix;kch=%random.bits;&m=IM_C_S&i=%index;" width="185px">'%nn;
-            >
+                     <br><img class="rounded my-1" src="%prefix;kch=%random.bits;&m=IM_C_S&i=%index;" width="185px">'>
               <i class="far fa-file-image fa-fw text-primary"></i>
             </a>%nn;
             <a role="button" href="%prefix;kch=%random.bits;&m=RESET_IMAGE_C_OK&i=%index;&idigest=%idigest;"
                data-toggle="tooltip" data-html="true" data-placement="left"
                title='<i class="fa fa-retweet fa-rotate-90 text-success mr-1"></i><strong>[*restore] [portrait] [saved]0</strong><br><span class="small">%portrait_saved;</span>
                       <br><img class="rounded my-1" src="%prefix;kch=%random.bits;&m=IM_C_S&i=%index;"
-                      width="185px">'%nn;
-            >
+                      width="185px">'>
               <i class="fas fa-retweet fa-rotate-90 fa-fw text-success"></i>
             </a>
             <strong><samp class="text-truncate">%saved_portraits_store;%X;</samp></strong><samp>%portrait_saved_name;</samp>
@@ -201,8 +197,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
               data-toggle="tooltip" data-html="true" data-placement="left"
                title='<i class="far fa-trash-alt text-danger mr-1"></i><strong>[*delete] [portrait] [saved]0</strong><br><span class="small">%portrait_saved;</span>
                       <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;"
-                      width="185px">'%nn;
-            >
+                      width="185px">'>
               <i class="far fa-trash-alt text-danger"></i>
             </a>
           </div>
@@ -216,58 +211,53 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
       %end;
       %if;(keydir_img_nbr>0)
         <h1 class="display-4">[*image/images]1</h1>
-        %if;(keydir_img_nbr>0)
-          <div class="d-flex align-items-center">
-            <i class="fa fa-folder-open fa-lg text-warning mx-2" aria-hidden="true"></i>
-            <strong><samp class="text-truncate" title="%images_store;%X;%keydir;">%images_store;%X;%keydir;%X;</samp></strong>
-            <div class="ml-auto">(%keydir_img_nbr; %if;(keydir_img_nbr>1)[image/images]1%else;[image/images]0%end;)</div>
-          </div>
-          %foreach;img_in_keydir;
-            <div class="d-flex mt-1">
-              <a role="button" href="%prefix;m=IM_C&i=%index;&s=%keydir_img_key;"
-                target="_blank" rel="noopener" data-toggle="tooltip" data-html="true" data-placement="left"
-                title='<strong><i class="fas fa-images fa-xs mr-1"></i>[*see] [image/images]0</strong>
+        <div class="d-flex align-items-center">
+          <i class="fa fa-folder-open fa-lg text-warning mx-2" aria-hidden="true"></i>
+          <strong><samp class="text-truncate" title="%images_store;%X;%keydir;">%images_store;%X;%keydir;%X;</samp></strong>
+          <div class="ml-auto">(%keydir_img_nbr; %if;(keydir_img_nbr>1)[image/images]1%else;[image/images]0%end;)</div>
+        </div>
+        %foreach;img_in_keydir;
+          <div class="d-flex mt-1">
+            <a role="button" href="%prefix;m=IM_C&i=%index;&s=%keydir_img_key;"
+              target="_blank" rel="noopener" data-toggle="tooltip" data-html="true" data-placement="left"
+              title='<strong><i class="fas fa-images fa-xs mr-1"></i>[*see] [image/images]0</strong>
+                     <br><span class="small">%keydir_img;</span>
+                     <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;&s=%keydir_img_key;"
+                     width="185px">
+                     <br><small>%keydir_img_title;%if;(keydir_img_src!="")<br>(%keydir_img_src;)%end;</small>'>
+              <i class="far fa-file-image fa-fw text-primary"></i>
+            </a>
+            <a role="button" href="#" id="notes_%img_cnt;" class="text-%if;(keydir_img_notes="")danger%else;primary%end;"
+              onclick='get_notes(%img_cnt;, "%keydir_img;"); return false;' data-comment="%keydir_img_notes;"
+              data-toggle="tooltip" data-html="true" data-placement="bottom"
+              title='<strong><i class="far fa-file fa-fw mr-1"></i>
+                     %if;(keydir_img_notes="")[*add]%else;[*modify]%end; [comment]</strong>
+                     <br><span class="small">%keydir_notes;</span>
+                     <br><span class="small" style="text-align: left;">%nn;
+                          %(<strong>[*titre][:]</strong> %keydir_img_title;
+                          %if;(keydir_img_src!="")<br><strong>[*source][:]</strong>%keydir_img_src;%end;
+                     <br>[*comment][:]%)<br>%keydir_img_notes;</span>'>
+              <i class="far fa-file-alt fa-fw"></i>%nn;
+            </a>
+            <samp class="text-truncate ml-1" title="%images_store;%X;%keydir;%X;%keydir_img;">%keydir_img;</samp>
+            <div class="ml-auto col-1">
+              <a role="button" href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&file_name=%keydir_img_key;&mode=others&idigest=%idigest;"
+                data-toggle="tooltip" data-html="true" data-placement="left"
+                title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete] [image/images]0</strong>
                        <br><span class="small">%keydir_img;</span>
                        <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;&s=%keydir_img_key;"
-                       width="185px">
-                       <br><small>%keydir_img_title;%if;(keydir_img_src!="")<br>(%keydir_img_src;)%end;</small>'%nn;
-              >
-                <i class="far fa-file-image fa-fw text-primary"></i>
+                       width="185px">'>
+                <i class="far fa-trash-alt text-warning"></i>
               </a>
-              <a role="button" href="#" id="notes_%img_cnt;" class="text-%if;(keydir_img_notes="")danger%else;primary%end;"
-                onclick='get_notes(%img_cnt;, "%keydir_img;"); return false;' data-comment="%keydir_img_notes;"
-                data-toggle="tooltip" data-html="true" data-placement="bottom"
-                title='<strong><i class="far fa-file fa-fw mr-1"></i>
-                       %if;(keydir_img_notes="")[*add]%else;[*modify]%end; [comment]</strong>
-                       <br><span class="small">%keydir_notes;</span>
-                       <br><span class="small" style="text-align: left;">%nn;
-                            %(<strong>[*titre][:]</strong> %keydir_img_title;
-                            %if;(keydir_img_src!="")<br><strong>[*source][:]</strong>%keydir_img_src;%end;
-                       <br>[*comment][:]%)<br>%keydir_img_notes;</span>'
-              >
-                <i class="far fa-file-alt fa-fw"></i>%nn;
-              </a>
-              <samp class="text-truncate ml-1" title="%images_store;%X;%keydir;%X;%keydir_img;">%keydir_img;</samp>
-              <div class="ml-auto col-1">
-                <a role="button" href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&file_name=%keydir_img_key;&mode=others&idigest=%idigest;"
-                  data-toggle="tooltip" data-html="true" data-placement="left"
-                  title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete] [image/images]0</strong>
-                         <br><span class="small">%keydir_img;</span>
-                         <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;&s=%keydir_img_key;"
-                         width="185px">'%nn;
-                >
-                  <i class="far fa-trash-alt text-warning"></i>
-                </a>
-              </div>
             </div>
-          %end;
+          </div>
         %end;
       %end;
       %if;(keydir_old_img_nbr>0)
         <h1 class="display-4">[*saved images]1</h1>
         <div class="d-flex align-items-center">
           <i class="fa fa-folder-open fa-lg text-warning mx-2" aria-hidden="true"></i>
-          <strong><samp class="text-truncate" title="%images_store;%X;%keydir;%X;saved%X;">%images_store%X;%keydir;%X;saved%X;</samp></strong>
+          <strong><samp class="text-truncate" title="%images_store;%X;%keydir;%X;old%X;">%images_store%X;%keydir;%X;old%X;</samp></strong>
           <div class="ml-auto">(%keydir_old_img_nbr; %if;(keydir_old_img_nbr>1)[image/images]1%else;[image/images]0%end;)</div>
         </div>
         %foreach;img_in_keydir_old;
@@ -287,7 +277,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
             >
               <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i>%nn;
             </a>
-            <samp class="text-truncate ml-1" title="%images_store;%X;saved%X;%keydir_img;">%keydir_img;</samp>
+            <samp class="text-truncate ml-1" title="%images_store;%X;old%X;%keydir_img;">%keydir_img;</samp>
             <div class="ml-auto col-1">
               <a role="button" href="%prefix;m=DEL_IMAGE_C_OK&i=%index%nn;
                 &idigest=%idigest;&file_name=%keydir_img_key;&mode=others%nn;
