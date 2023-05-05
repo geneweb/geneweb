@@ -250,15 +250,55 @@ let get_old_portrait conf base p =
 let rename_portrait conf base p (nfn, nsn, noc) =
   match get_portrait conf base p with
   | Some (`Path old_f) -> (
-      let s = default_portrait_filename_of_key nfn nsn noc in
-      let f = Filename.concat (Util.base_path [ "images" ] conf.bname) s in
+      let new_s = default_portrait_filename_of_key nfn nsn noc in
+      let old_s = default_portrait_filename base p in
+      let f = Filename.concat (Util.base_path [ "images" ] conf.bname) new_s in
       let new_f = f ^ Filename.extension old_f in
-      try Sys.rename old_f new_f
-      with Sys_error e ->
-        !GWPARAM.syslog `LOG_ERR
-          (Format.sprintf
-             "Error renaming portrait: old_path=%s new_path=%s : %s" old_f new_f
-             e))
+      (try Sys.rename old_f new_f
+       with Sys_error e ->
+         !GWPARAM.syslog `LOG_ERR
+           (Format.sprintf
+              "Error renaming portrait: old_path=%s new_path=%s : %s" old_f
+              new_f e));
+      let new_s_f =
+        String.concat Filename.dir_sep
+          [
+            Util.base_path [ "images" ] conf.bname;
+            "old";
+            new_s ^ Filename.extension old_f;
+          ]
+      in
+      let old_s_f =
+        String.concat Filename.dir_sep
+          [
+            Util.base_path [ "images" ] conf.bname;
+            "old";
+            old_s ^ Filename.extension old_f;
+          ]
+      in
+      (if Sys.file_exists old_s_f then
+       try Sys.rename old_s_f new_s_f
+       with Sys_error e ->
+         !GWPARAM.syslog `LOG_ERR
+           (Format.sprintf
+              "Error renaming old portrait: old_path=%s new_path=%s : %s" old_f
+              new_f e));
+      (* check for saved pictures in src/base/images/keydir *)
+      let old_d =
+        String.concat Filename.dir_sep
+          [ Util.base_path [ "src" ] conf.bname; "images"; old_s ]
+      in
+      let new_d =
+        String.concat Filename.dir_sep
+          [ Util.base_path [ "src" ] conf.bname; "images"; new_s ]
+      in
+      if Sys.file_exists old_d then
+        try Sys.rename old_d new_d
+        with Sys_error e ->
+          !GWPARAM.syslog `LOG_ERR
+            (Format.sprintf
+               "Error renaming portrait: old_path=%s new_path=%s : %s" old_d
+               new_d e))
   | Some (`Url _url) -> () (* old url still applies *)
   | None -> ()
 
@@ -283,20 +323,13 @@ let get_keydir_img_notes conf base p fname =
 (* get list of files in keydir *)
 let get_keydir_files conf base p old =
   let k = default_portrait_filename base p in
-  let _ = Printf.eprintf "Keydir= %s\n" k in
   let f =
     String.concat Filename.dir_sep
-      [
-        Util.base_path [ "src" ] conf.bname;
-        "images";
-        k;
-        (if old then "old" else "");
-      ]
+      [ Util.base_path [ "src" ] conf.bname; "images"; k ]
   in
-  let _ = Printf.eprintf "full dir= %s\n" f in
+  let f = if old then Filename.concat f "old" else f in
   try
     if Sys.is_directory f then
-      let _ = Printf.eprintf "full dir is a directory\n" in
       Array.fold_right
         (fun f1 l ->
           if
@@ -310,10 +343,10 @@ let get_keydir_files conf base p old =
             f1 :: l
           else l)
         (Sys.readdir f) []
-    else
-      let _ = Printf.eprintf "full dir is not a directory\n" in
-      []
-  with Sys_error _ -> []
+    else []
+  with Sys_error e ->
+    !GWPARAM.syslog `LOG_ERR (Format.sprintf "Keydir error: %s, %s" f e);
+    []
 
 (* end carrousel ************************************ *)
 

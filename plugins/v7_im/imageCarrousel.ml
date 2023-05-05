@@ -72,31 +72,12 @@ let write_file fname content =
   flush oc;
   close_out oc
 
-(* Move fname to saved_dir if it exists with some extension.
-   Returns the number of moved files *)
-let move_file_to_saved conf fname bfname =
-  List.fold_left
-    (fun cnt typ ->
-      let ext = extension_of_type typ in
-      let new_file = fname ^ ext in
-      if Sys.file_exists new_file then (
-        let old_dir =
-          Filename.concat (Util.base_path [ "images" ] conf.bname) "old"
-        in
-        let old_file = Filename.concat old_dir bfname ^ ext in
-        Mutil.rm old_file;
-        Mutil.mkdir_p old_dir;
-        (try Unix.rename new_file old_file
-         with Unix.Unix_error (_, _, _) -> ());
-        cnt + 1)
-      else cnt)
-    0 image_types
-
-let move_file_to_save dir file =
+let move_file_to_save file dir =
+  (* previous version iterated on file types *)
   try
     let save_dir = Filename.concat dir "old" in
-    let fname = Filename.basename file in
     if not (Sys.file_exists save_dir) then Mutil.mkdir_p save_dir;
+    let fname = Filename.basename file in
     let orig_file = Filename.concat dir fname in
     let saved_file = Filename.concat save_dir fname in
     (* TODO handle rn errors *)
@@ -149,6 +130,7 @@ let dump_bad_image conf s =
   match List.assoc_opt "dump_bad_images" conf.base_env with
   | Some "yes" -> (
       try
+        (* Where will "bad-image"end up? *)
         let oc = Secure.open_out_bin "bad-image" in
         output_string oc s;
         flush oc;
@@ -156,38 +138,29 @@ let dump_bad_image conf s =
       with Sys_error _ -> ())
   | _ -> ()
 
-let swap_files conf file1 file2 txt =
-  let tmp_file =
+(* swap files between new and old folder *)
+let swap_files_aux dir file =
+  let old_file =
+    String.concat Filename.dir_sep [ dir; "old"; Filename.basename file ]
+  in
+  if Sys.file_exists old_file then (
+    let tmp_file = String.concat Filename.dir_sep [ dir; "tempfile.tmp" ] in
+    rn file tmp_file;
+    rn old_file file;
+    rn tmp_file old_file)
+
+let swap_files file =
+  let dir = Filename.dirname file in
+  let fname = Filename.basename file in
+  swap_files_aux dir file;
+  let txt_file =
     String.concat Filename.dir_sep
-      [ Util.base_path [ "images" ] conf.bname; "tempfile.tmp" ]
+      [ dir; Filename.chop_extension fname ^ ".txt" ]
   in
-  let ext_1 = Filename.extension file1 in
-  let ext_2 = Filename.extension file2 in
-  rn file1 tmp_file;
-  rn file2 (Filename.remove_extension file1 ^ ext_2);
-  rn tmp_file (Filename.remove_extension file2 ^ ext_1);
-  if txt then (
-    let tmp_file_t =
-      String.concat Filename.dir_sep
-        [ Util.base_path [ "images" ] conf.bname; "tempfile.tmp" ]
-    in
-    let file1_t = Filename.remove_extension file1 ^ ".txt" in
-    let file2_t = Filename.remove_extension file2 ^ ".txt" in
-    rn file1_t tmp_file_t;
-    rn file2_t file1_t;
-    rn tmp_file_t file2_t)
+  swap_files_aux dir txt_file
 
-let rename_files file1 file2 txt =
-  rn file1 file2;
-  if txt then
-    let file1_t = Filename.remove_extension file1 ^ ".txt" in
-    let file2_t = Filename.remove_extension file2 ^ ".txt" in
-    rn file1_t file2_t
-
-let clean_saved_portrait dir bfname =
-  let file =
-    Filename.remove_extension (String.concat Filename.dir_sep [ dir; bfname ])
-  in
+let clean_saved_portrait file =
+  let file = Filename.remove_extension file in
   Mutil.rm (file ^ ".jpg");
   Mutil.rm (file ^ ".jpeg");
   Mutil.rm (file ^ ".png");
@@ -225,14 +198,17 @@ let print_confirm_c conf base save_m report =
         if save_m = "REFRESH" then new_env
         else ("em", Adef.encoded save_m) :: new_env
       in
-      let new_env = ("idigest", Adef.encoded digest) :: new_env in
-      let new_env = ("report", Adef.encoded report) :: new_env in
+      let new_env =
+        ("idigest", Adef.encoded digest)
+        :: ("report", Adef.encoded report)
+        :: new_env
+      in
       let conf = { conf with env = new_env } in
       Perso.interp_templ "carrousel" conf base p
   | None -> Hutil.incorrect_request conf
 
 (* ************************************************************************ *)
-(*  send, delete, reset and print functions                                        *)
+(*  send, delete, reset and print functions                                 *)
 (*                                                                          *)
 (* ************************************************************************ *)
 
@@ -264,7 +240,7 @@ let print_send_image conf base p =
       Output.print_sstring conf " ";
       Output.print_string conf (Util.escape_html (p_first_name base p));
       Output.printf conf ".%d " (get_occ p);
-      Output.print_string conf (Util.escape_html (p_surname base p));)
+      Output.print_string conf (Util.escape_html (p_surname base p)))
   in
   let digest = Update.digest_person (UpdateInd.string_person_of base p) in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
@@ -312,6 +288,9 @@ let print_sent conf base p =
   Hutil.trailer conf
 
 let effective_send_ok conf base p file =
+  let mode =
+    try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
+  in
   let strm = Stream.of_string file in
   let request, content = Wserver.get_request_and_content strm in
   let content =
@@ -342,20 +321,16 @@ let effective_send_ok conf base p file =
             error_too_big_image conf base p (String.length content) len
         | _ -> (typ, content))
   in
-  let bfname = Image.default_portrait_filename base p in
-  let bfdir =
-    let bfdir = Util.base_path [ "images" ] conf.bname in
-    if Sys.file_exists bfdir then bfdir
-    else
-      let d = Filename.concat (Secure.base_dir ()) "images" in
-      let d1 = Filename.concat d conf.bname in
-      (try Unix.mkdir d 0o777 with Unix.Unix_error (_, _, _) -> ());
-      (try Unix.mkdir d1 0o777 with Unix.Unix_error (_, _, _) -> ());
-      d1
+  let fname = Image.default_portrait_filename base p in
+  let dir = Util.base_path [ "images" ] conf.bname in
+  if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
+  let fname =
+    Filename.concat dir
+      (if mode = "portraits" then fname ^ extension_of_type typ else fname)
   in
-  let fname = Filename.concat bfdir bfname in
-  let _moved = move_file_to_saved conf fname bfname in
-  write_file (fname ^ extension_of_type typ) content;
+  let fname = Filename.concat dir fname in
+  let _moved = move_file_to_save fname dir in
+  write_file fname content;
   let changed =
     U_Send_image (Util.string_gen_person base (gen_person_of_person p))
   in
@@ -374,7 +349,10 @@ let print_send_ok conf base =
   else Update.error_digest conf
 
 (* carrousel *)
-let effective_send_c_ok conf base p file file_name mode =
+let effective_send_c_ok conf base p file file_name =
+  let mode =
+    try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
+  in
   let notes =
     match Util.p_getenv conf.env "notes" with
     | Some v ->
@@ -414,69 +392,33 @@ let effective_send_c_ok conf base p file file_name mode =
           | _ -> (typ, content))
     else (GIF, content (* we dont care which type, content = "" *))
   in
-  let keydir = Image.default_portrait_filename base p in
-  let full_dir =
+  let fname = Image.default_portrait_filename base p in
+  let dir =
     if mode = "portraits" then
       String.concat Filename.dir_sep [ Util.base_path [ "images" ] conf.bname ]
     else
       String.concat Filename.dir_sep
-        [ Util.base_path [ "src" ] conf.bname; "images"; keydir ]
+        [ Util.base_path [ "src" ] conf.bname; "images"; fname ]
   in
-  (* TODO is this necessary ?? *)
-  let _ =
-    if not (Sys.file_exists full_dir) then (
-      let d1 =
-        String.concat Filename.dir_sep
-          [ Util.base_path [ "images" ] conf.bname ]
-      in
-      let d2 =
-        String.concat Filename.dir_sep
-          [ Util.base_path [ "src" ] conf.bname; "images"; keydir ]
-      in
-      Mutil.mkdir_p d1;
-      Mutil.mkdir_p d2)
+  if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
+  let fname =
+    Filename.concat dir
+      (if mode = "portraits" then fname ^ extension_of_type typ else file_name)
   in
-  let full_name =
-    Filename.concat full_dir
-      (if mode = "portraits" then keydir ^ extension_of_type typ else file_name)
-  in
-  let save_dir = Filename.concat full_dir "old" in
   if mode = "portraits" then
-    (* if saved portrait exists, move it to images *)
-    match Image.get_old_portrait conf base p with
-    | Some (`Path old_portrait) ->
-        let fname = Filename.basename old_portrait in
-        let img_dir =
-          String.concat Filename.dir_sep
-            [ Util.base_path [ "src" ] conf.bname; "images"; keydir ]
-        in
-        rn old_portrait
-          (Filename.concat img_dir
-             ((if Sys.file_exists (Filename.concat img_dir fname) then "~"
-              else "")
-             ^ fname))
-    | Some (`Url _url) -> () (* remember url in text file ?? *)
-    | _ -> (
-        ();
-        (* move portrait to saved portraits *)
-        match Image.get_portrait conf base p with
-        | Some (`Path portrait) ->
-            rn portrait (Filename.concat save_dir (Filename.basename portrait))
-        | Some (`Url _url) -> () (* ??? *)
-        | _ -> ())
-  else if content <> "" then (
-    if Sys.file_exists full_name then
-      rn full_name (Filename.concat save_dir (Filename.basename full_name));
-    if Sys.file_exists (Filename.remove_extension full_name ^ ".txt") then
-      rn
-        (Filename.remove_extension full_name ^ ".txt")
-        (Filename.concat save_dir
-           (Filename.remove_extension (Filename.basename full_name) ^ ".txt")));
-
-  if content <> "" then write_file full_name content;
+    match Image.get_portrait conf base p with
+    | Some (`Path portrait) ->
+        if move_file_to_save portrait dir = 0 then
+          incorrect conf "effective send (portrait)"
+    | Some (`Url _url) -> () (* ??? remember url in a text file ? *)
+    | _ -> ()
+  else if content <> "" then
+    if Sys.file_exists fname then
+      if move_file_to_save fname dir = 0 then
+        incorrect conf "effective send (image)";
+  if content <> "" then write_file fname content;
   if notes <> Adef.safe "" then
-    write_file (Filename.remove_extension full_name ^ ".txt") (notes :> string);
-
+    write_file (Filename.remove_extension fname ^ ".txt") (notes :> string);
   let changed =
     U_Send_image (Util.string_gen_person base (gen_person_of_person p))
   in
@@ -530,10 +472,9 @@ let print_deleted conf base p =
   Hutil.trailer conf
 
 let effective_delete_ok conf base p =
-  let bfname = Image.default_portrait_filename base p in
-  let fname = Filename.concat (Util.base_path [ "images" ] conf.bname) bfname in
-  if move_file_to_saved conf fname bfname = 0 then
-    incorrect conf "effective delete";
+  let fname = Image.default_portrait_filename base p in
+  let dir = Filename.concat (Util.base_path [ "images" ] conf.bname) fname in
+  if move_file_to_save fname dir = 0 then incorrect conf "effective delete";
   let changed =
     U_Delete_image (Util.string_gen_person base (gen_person_of_person p))
   in
@@ -561,7 +502,7 @@ let print_del conf base =
 (* if delete=on permanently deletes the file in old folder *)
 
 let effective_delete_c_ok conf base p =
-  let keydir = Image.default_portrait_filename base p in
+  let fname = Image.default_portrait_filename base p in
   let file_name =
     try (List.assoc "file_name" conf.env :> string) with Not_found -> ""
   in
@@ -569,24 +510,23 @@ let effective_delete_c_ok conf base p =
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
-  let saved =
+  let delete =
     try List.assoc "delete" conf.env = Adef.encoded "on"
     with Not_found -> false
   in
-  let ext = get_extension conf saved keydir in
-  let file = if file_name = "" then keydir ^ ext else file_name in
-  let full_dir =
+  let ext = get_extension conf delete fname in
+  let file = if file_name = "" then fname ^ ext else file_name in
+  let dir =
     if mode = "portraits" then Util.base_path [ "images" ] conf.bname
     else
       String.concat Filename.dir_sep
-        [ Util.base_path [ "src" ] conf.bname; "images"; keydir ]
+        [ Util.base_path [ "src" ] conf.bname; "images"; fname ]
   in
+  if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
   (* TODO verify we dont destroy a saved image
       having the same name as portrait! *)
-  if saved then
-    Mutil.rm (String.concat Filename.dir_sep [ full_dir; "old"; file ])
-  else if move_file_to_save full_dir file = 0 then
-    incorrect conf "effective delete";
+  if delete then Mutil.rm (String.concat Filename.dir_sep [ dir; "old"; file ])
+  else if move_file_to_save file dir = 0 then incorrect conf "effective delete";
   let changed =
     U_Delete_image (Util.string_gen_person base (gen_person_of_person p))
   in
@@ -604,43 +544,19 @@ let effective_reset_c_ok conf base p =
   let file_name =
     try (List.assoc "file_name" conf.env :> string) with Not_found -> ""
   in
-  (if mode = "portraits" then
-   let file_name = keydir in
-   let ext_saved = get_extension conf true keydir in
-   let ext = get_extension conf false keydir in
-   let ext = if ext = "." then ext_saved else ext in
-   let file_in_old =
-     String.concat Filename.dir_sep
-       [
-         Util.base_path [ "images" ] conf.bname; "old"; file_name ^ ext_saved;
-       ]
-   in
-   let file_in_portraits =
-     String.concat Filename.dir_sep
-       [ Util.base_path [ "images" ] conf.bname; file_name ^ ext ]
-   in
-   if Sys.file_exists file_in_portraits then
-     swap_files conf file_in_old file_in_portraits false
-   else rename_files file_in_old file_in_portraits false
-  else
-    let file_name = file_name in
-    let file_in_old =
+  let file_name = if mode = "portraits" then keydir else file_name in
+  let ext_saved = get_extension conf true keydir in
+  let ext = get_extension conf false keydir in
+  let ext = if ext = "." then ext_saved else ext in
+  let file_in_new =
+    if mode = "portraits" then
       String.concat Filename.dir_sep
-        [
-          Util.base_path [ "src" ] conf.bname;
-          "images";
-          keydir;
-          "old";
-          file_name;
-        ]
-    in
-    let file_in_src =
+        [ Util.base_path [ "images" ] conf.bname; file_name ^ ext ]
+    else
       String.concat Filename.dir_sep
         [ Util.base_path [ "src" ] conf.bname; "images"; keydir; file_name ]
-    in
-    if Sys.file_exists file_in_src then
-      swap_files conf file_in_old file_in_src true
-    else rename_files file_in_old file_in_src true);
+  in
+  swap_files file_in_new;
   file_name
 
 (* ************************************************************************** *)
@@ -698,7 +614,7 @@ let print_main_c conf base =
                       with Not_found -> ""
                     in
                     if digest = idigest then
-                      (conf, effective_send_c_ok conf base p file file_name mode)
+                      (conf, effective_send_c_ok conf base p file file_name)
                     else (conf, "idigest error")
                 | Some "DEL_IMAGE_C_OK" ->
                     let idigest =
@@ -713,7 +629,6 @@ let print_main_c conf base =
                       try (List.assoc "idigest" conf.env :> string)
                       with Not_found -> ""
                     in
-                    Printf.eprintf "Idigest: |%s|\n" idigest;
                     if digest = idigest then
                       (conf, effective_reset_c_ok conf base p)
                     else (conf, "idigest error")
