@@ -20,8 +20,7 @@ let () =
     true
   in
   let wrap fn conf base_name =
-    if conf.wizard && can_send_image conf then w_base fn conf base_name
-    else false
+    if can_send_image conf then w_base fn conf base_name else false
   in
   Gwd_lib.GwdPlugin.register ~ns
     [
