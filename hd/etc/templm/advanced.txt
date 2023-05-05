@@ -8,7 +8,6 @@
   <meta http-equiv="content-style-type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include;css
-  %include;hed
 </head>
 %let;ltd; title="[year/month/day]2" class="d" size="2" maxlength="2" %in;
 %let;ltm; title="[year/month/day]1" class="m" size="2" maxlength="2" %in;
@@ -36,6 +35,7 @@
 %end;
 
 <body%body_prop; id="upd" %if;(evar.focus != "")onload="javascript:document.getElementById('%evar.focus;').focus();%ol1;"%end;>
+%include;hed
 %message_to_wizard;
 
 %if;(evar.birth1_yyyy != "" or evar.death2_yyyy != "")

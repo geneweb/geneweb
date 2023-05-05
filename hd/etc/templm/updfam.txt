@@ -18,7 +18,6 @@
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"/>
   %include;css
   %include;js_upd
-  %include;hed
   %include;updind_updfam
 %( <!-- Begin define --> %)
 %let;lt1;<abbr title="%ak1;%ak2;%ak3;%ak7;">#</abbr>%in;
@@ -150,6 +149,7 @@
 %( <!-- End define --> %)
 </head>
 <body%body_prop; id="upd" %apply;load_focus()>
+%include;hed
 %message_to_wizard;
 <form name="upd" method="post" action="%action;">
 <div id="jq" style="display:none"> </div>

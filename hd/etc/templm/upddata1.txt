@@ -10,7 +10,6 @@
   <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include;css
-  %include;hed
   <script type="text/javascript">
   <!--
 
@@ -133,6 +132,7 @@
 %end;
 
 <body%body_prop;>
+%include;hed
 <div id="nx_span" style="display:none">a</div>
 <div id="nx_a" style="display:none">a</div>
 

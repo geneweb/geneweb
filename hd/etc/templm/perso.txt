@@ -21,7 +21,6 @@
        .image_sheet {font-size: 71%%;}
     %end;
   </style>
-  %include;hed
 </head>
 %( <!-- Begin define --> %)
 %include;tools
@@ -1095,6 +1094,7 @@
 %end;
 %( <!-- End define --> %)
 <body%body_prop; id="perso">
+%include;hed
 <div class="container" onclick="void(0);">
 %message_to_wizard;
 %if;(evar.del = "on")<h1 class="del">[*delete::] [person/persons]0 (-) [or] [family/families]0 (&)</h1>

@@ -19,9 +19,9 @@
     %end;
   </title>
   %include;css
-  %include;hed
 </head>
 <body%body_prop; id="family">
+%include;hed
 %message_to_wizard;
 <div class="container">
 %( do not use %include;perso_header %)

@@ -7,9 +7,9 @@
   <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include;css
-  %include;hed
 </head>
 <body%body_prop;>
+%include;hed
 %message_to_wizard;
 <h1>Configuration de templm dans /bases/%base.name;.gwf</h1>
 <h2>Documentation en ligne</h2>

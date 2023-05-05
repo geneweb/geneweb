@@ -26,7 +26,6 @@
   <meta name="format-detection" content="telephone=no"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include;css
-  %include;hed
 </head>
 
 %( <!-- Begin define --> %)
@@ -66,6 +65,7 @@
 
 %(   Main   %)
 <body%body_prop; id="ancsosa">
+%include;hed
 %message_to_wizard;
 
 <h1>%nn;

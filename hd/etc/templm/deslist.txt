@@ -17,7 +17,6 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include;css
-  %include;hed
 </head>
 
 %( <!-- Begin define --> %)
@@ -57,6 +56,7 @@
 
 %(   Main   %)
 <body%body_prop; id="deslist">
+%include;hed
   %message_to_wizard;
   <h1>%nn;
     %apply;a_of_b_gr_eq_lev%with;

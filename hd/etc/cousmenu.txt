@@ -14,7 +14,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   %include;favicon
   %include;css
-  %include;hed
 </head>
 %(TODO :
 * highlight/filter by nbr
@@ -23,6 +22,7 @@
 * highlight sur les cases avec des individus vivants + counts
 %)
 <body%body_prop;>
+%include;hed
 %message_to_wizard;
 <div class="container%if;(e.v!="" and e.v>6)-fluid%end;">
 <div class="d-flex flex-column justify-content-center">

@@ -10,7 +10,6 @@
   <link rel="icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
   %include;css
-  %include;hed
 </head>
 %define;book_of(xx)
   [book of %s:::xx]%nn;
@@ -38,6 +37,7 @@ fr: Accès réservé aux amis et magiciens de la base de donnée !
 %end;
 
 <body%body_prop;>
+%include;hed
 <div class="container">
   <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-2 mt-lg-4">
     %if;(bvar.auth_file="" and bvar.wizard_passwd!="" or bvar.friend_passwd!="")

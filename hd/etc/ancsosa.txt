@@ -58,9 +58,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include;css
-%include;hed
 </head>
 <body%body_prop; id="ancsosa">
+%include;hed
 %message_to_wizard;
 <div class="container-fluid">
 
