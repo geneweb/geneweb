@@ -8,7 +8,6 @@
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
   %include;css
-  %include;hed
 </head>
 
 %define;pline(znz,zocz,zfnz,zsnz,zbdz,zparamz)
@@ -91,6 +90,7 @@
 %end;
 
 <body%body_prop;>
+%include;hed
 <div class="container-fluid">
 
 <form id="upd" method="post" action="%action;">

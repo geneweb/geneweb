@@ -15,7 +15,6 @@
   %include;css
   %include;js_upd
   %include;updind_updfam
-  %include;hed
 </head>
 %(<!-- Begin define -->%)
 %let;l_r_father; placeholder="M" %in;
@@ -84,6 +83,7 @@
 %end;
 %(<!-- End define -->%)
 <body%body_prop; id="upd" %apply;load_focus()>
+%include;hed
 <div class="container-fluid">
 %message_to_wizard;
 <form name="upd" method="post" action="%action;">

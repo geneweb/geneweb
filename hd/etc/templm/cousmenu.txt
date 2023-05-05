@@ -10,9 +10,9 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   %include;favicon
   %include;css
-  %include;hed
 </head>
 <body%body_prop;>
+%include;hed
 %message_to_wizard;
 
 <h1>[*link between] <a href="%prefix;%access;">%self;</a> %dates; [and]0…</h1>

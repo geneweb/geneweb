@@ -17,7 +17,6 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include;css
-  %include;hed
 </head>
 
 %define;checkbox(cc,xx,yy,uu)
@@ -45,6 +44,7 @@
 %end;
 
 <body%body_prop; id="menutxt">
+%include;hed
 %message_to_wizard;
 <h1>%nn;
   %apply;a_of_b%with;

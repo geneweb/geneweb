@@ -14,9 +14,9 @@
      text-align: left;
     }
   </style>
-  %include;hed
 </head>
 <body%body_prop; id="menutxt">
+%include;hed
 %message_to_wizard;
 
 <h1>%nn;

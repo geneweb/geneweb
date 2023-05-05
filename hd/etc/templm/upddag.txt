@@ -10,9 +10,9 @@
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include;css
   %include;templm/js_upd
-  %include;hed
 </head>
 <body%body_prop; id="dag">
+%include;hed
 %message_to_wizard;
 %include;templm/updind_updfam
 

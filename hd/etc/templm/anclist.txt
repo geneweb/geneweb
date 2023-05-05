@@ -27,7 +27,6 @@
       var varZIndex = 1;
     //-->
   </script>
-  %include;hed
 </head>
 %(<!-- Begin define --> %)
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
@@ -71,6 +70,7 @@
 
 %(<!-- End define --> %)
 <body%body_prop; id="anclist">
+%include;hed
 %message_to_wizard;
 <h1>%nn;
   %if;(evar.tf1 != "csv")

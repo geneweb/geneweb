@@ -8,7 +8,6 @@
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include;css
-  %include;hed
 </head>
 
 %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%in;
@@ -112,6 +111,7 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
 %end;
 
 <body%body_prop; id="welcome">
+%include;hed
 <div class="container">
 <div style="float:right;margin-top:1.8em;margin-right:1.8em;">
 %apply;login()

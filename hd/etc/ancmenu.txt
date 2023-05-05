@@ -18,9 +18,9 @@
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include;favicon
   %include;css
-  %include;hed
 </head>
 <body%body_prop;>
+%include;hed
 <div class="container ml-xs-auto">
 %message_to_wizard;
 %include;perso_header
