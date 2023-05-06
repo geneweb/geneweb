@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updind.txt v7.1 10/01/2023 20:01:49 $ -->
+  <!-- $Id: updind.txt v7.1 06/05/2023 19:31:21 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   %let;mrg;%if;(e.m="MRG_IND_OK" or e.m="MRG_MOD_IND_OK")1%end;%in;
   %let;mod;%if;(e.m="MOD_IND" or e.m="MOD_IND_OK")1%end;%in;
@@ -748,7 +748,7 @@
 <h2 class="card-header%if;(mrg=1) mt-5%end;">%nn;
   %if;(mrg=1)[*merge::person/persons]1
   %elseif;(mod=1)[*modify::person/persons]0
-  %else;[*add:person/persons]0%end;[:] %first_name;.%occ %surname;%nn;
+  %else;[*add:person/persons]0%end;[:] %first_name; %surname; %if;(occ!="")(%occ)%end;
 </h2>
 <div class="card-body">
   <h5 class="card-title"><b>[*other action][:] </b>

@@ -10279,7 +10279,7 @@ co: mudificà a fiura
 cs: změnit :a: obrázek
 da: ændre billede
 de: Bild ändern
-en: update Picture
+en: update picture
 eo: modifi :a: bildo:a:+n
 es: modificar imagen
 et: muuda :g: pilt
