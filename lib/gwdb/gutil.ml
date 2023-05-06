@@ -6,8 +6,7 @@ open Gwdb
 let designation base p =
   let first_name = p_first_name base p in
   let nom = p_surname base p in
-  Mutil.iso_8859_1_of_utf_8
-    (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom)
+  first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom
 
 let father = Adef.father
 let mother = Adef.mother
