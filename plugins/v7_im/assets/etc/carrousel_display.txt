@@ -1,90 +1,73 @@
-%( Carousel of keydir images in a modal %)
+%( a carousel of all the images in keydir shown in a basic Bootstrap 4 modal %)
 <div class="modal fade" id="carousel_modal" tabindex="-1" role="dialog" aria-labelledby="carouselmodal" aria-hidden="true">
-  <div class="modal-dialog%( modal-lg%)" role="document">
+  <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="carouselmodal">
-          <a href="%prefix;m=SND_IMAGE_C&i=%index;" title="[*add]/[delete] [image/images]1">
-            <i class="far fa-folder-open fa-fw mr-1" aria-hidden="true"></i>%first_name; %surname;%if;(occ!="0") (%occ;)%end; |
-            <i class="far fa-image fa-fw mr-1" aria-hidden="true"></i>%keydir_img_nbr;%nn;
+      <h5 class="modal-header d-inline-flex justify-content-between">
+        <a href="%prefix;m=SND_IMAGE_C&i=%index;"
+          title="[*add]/[delete] [image/images]1 (%if;has_portrait;1 [portrait]/%keydir_img_nbr; %if;(keydir_img_nbr>1)[image/images]1%else;[image/images]0%end;)">
+          %if;has_portrait;1<i class="fas fa-image-portrait ml-1 mr-2" aria-hidden="true"></i>%end;
+          %keydir_img_nbr;<i class="far fa-image fa-fw ml-1" aria-hidden="true" title=""></i>%nn;
+        </a>
+        <span>
+          %if;(public_name!="")%public_name;%else;%first_name;%end; %surname;
+        </span>
+        <div class="btn-group">
+          <a role="button" class="btn btn-link p-0 " href="#carousel" data-slide="prev">
+             <i class="fa fa-chevron-left fa-fw " aria-hidden="true" title="[*previous]"></i>
+            <span class="sr-only">[*previous]</span>
+          </a>%nn;
+          <a role="button" class="btn btn-link p-0" href="#carousel" data-slide="next">
+            <i class="fa fa-chevron-right fa-fw" aria-hidden="true" title="[*next]"></i>
+            <span class="sr-only">[*next]</span>
           </a>
-        </h5>
-        <button class="btn btn-link btn-sm ml-2" type="button" data-target="#carousel" data-slide="prev">
-          <i class="fa fa-chevron-left" aria-hidden="true"></i>
-          <span class="sr-only">Previous</span>
-        </button>
-        <button class="btn btn-link btn-sm ml-1" type="button" data-target="#carousel" data-slide="next">
-          <i class="fa fa-chevron-right" aria-hidden="true"></i>
-          <span class="sr-only">Next</span>
-        </button>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-      %if;(keydir_img_nbr>0)
-        <div class="modal-body">
-          %(navigation buttons | TODO: manage active, better looking too! with <li> active></li>%)
-          <!--<div class="btn-group btn-group-sm d-flex justify-content-center " role="group" aria-label="Slider button group">
-            <button class="btn btn-light mr-2" type="button" data-target="#carousel" data-slide="prev">
-              <i class="fa fa-chevron-left" aria-hidden="true"></i>
-              <span class="sr-only">Previous</span>
-            </button>
-            %let;keydirmax;%if;(keydir_img_nbr>9)9%else;%keydir_img_nbr;%end;%in;
-            %for;i;0;keydirmax;
-               <button class="btn btn-light%if;(keydirmax>5 and (i=3 or i=6)) ml-2%end;"
-                 type="button" data-target="#carousel" data-slide-to="%i;"%( title="%expr(i+1)"%)>
-                <i class="fas fa-circle" aria-hidden="true"></i>
-                <span class="sr-only">%expr(i+1)</span>
-              </button>
-            %end;
-            %if;(keydir_img_nbr>9)<button class="btn btn-light mx-1" type="button" href="#TODO">+10</button>%end;
-            <button class="btn btn-light ml-2" type="button" data-target="#carousel" data-slide="next">
-              <i class="fa fa-chevron-right" aria-hidden="true"></i>
-              <span class="sr-only">Next</span>
-            </button>
-          </div> -->
-          %(the carousel itself inside the body of the modal%)
-          <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="3000">
-            <ol class="carousel-indicators">
-              %for;i;0;keydirmax;
-                <li %if;(i=0)class="active"%end; data-target="#carousel" data-slide-to="%i;"></li>
-              %end;
-            </ol>
-            <div class="carousel-inner"%( style="max-height:600px;%)>
-              %reset_count;
-              %if;has_keydir;
-                %foreach;img_in_keydir;
-                  %incr_count;
-                  <div class="carousel-item%if;is_first; active%end;">
-                    <a class="h-75" href="%prefix;m=IM_C&i=%index;&s=%keydir_img;"
-                       target="_blank" rel="noopener">
-                       <img class="d-block w-100"
-                       src="%prefix;m=IM_C&i=%index;&s=%keydir_img;"
-                       alt="%count; slide">
-                    </a>
-                    <div class="carousel-caption d-none d-md-block%( text-dark%)">
-                      <h5>%keydir_img;
-                      <br>%keydir_img_notes;</h5>
-                      <p>%count;/%keydir_img_nbr;</p>
-                    </div>
-                  </div>
-                %end;
-              %end;
-            </div>
-            <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="sr-only">Next</span>
-            </a>
-          </div>
         </div>
-      %end;
-      %(<div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>%)
+      </h5>
+      <div class="modal-body d-flex justify-content-center">
+        %let;maximg;%if;has_portrait;%expr(keydir_img_nbr+1)%else;%keydir_img_nbr;%end;%in;
+        <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="5000">
+          %(<ol class="carousel-indicators">
+            %for;i;0;maximg;
+            <li %if;(i=0)class="active"%end; data-target="#carousel" data-slide-to="%i;"></li>
+             %end;
+          </ol>%)
+          <div class="carousel-inner">
+            %reset_count;
+            %if;(has_portrait)%incr_count;
+              <div class="carousel-item active">
+                <a href="%prefix;m=IM&i=%index;" target="_blank" rel="noopener">
+                  <img class="img-fluid" src="%prefix;m=IM&i=%index;" alt="[*portrait]">
+                </a>
+                <div class="position-relative d-none d-md-block">
+                  <span>[portrait]</span>
+                  <small">%count;/%maximg;</small>
+                </div>
+              </div>
+            %end;
+            %if;has_keydir;
+              %foreach;img_in_keydir;
+                %incr_count;
+                <div class="carousel-item%if;(not has_portrait and is_first) active%end;">
+                  <a href="%prefix;m=IM_C&i=%index;&s=%keydir_img;" target="_blank" rel="noopener">
+                     <img class="img-fluid" src="%prefix;m=IM_C&i=%index;&s=%keydir_img;" alt="%count; slide">
+                  </a>
+                  <div class="position-relative d-inline-flex w-100 d-none d-md-block">
+                    <span>%keydir_img_notes;</span>
+                    <small class="ml-auto">%keydir_img; %count;/%maximg;</small>
+                  </div>
+                </div>
+              %end;
+            %end;
+          </div>
+          %(<a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>%)
+        </div>
+      </div>
     </div>
   </div>
 </div>

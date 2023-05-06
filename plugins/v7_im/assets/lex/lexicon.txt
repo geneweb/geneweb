@@ -3,34 +3,38 @@ en: carrousel
 fr: carrousel
 
     display carrousel
-en: display carrousel
-fr: afficher le carrousel
+en: display the carrousel of images
+fr: afficher le carrousel d’images
 
     plugins
 en: plugins
 fr: plugins
 
-# carrousel
-
     warning refresh
 en: refresh the page only after having clicked on the main icon as this would repeat the swap action.
-fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l'icone car cela répéterait l'échange des images.
+fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l’icone car cela répéterait l’échange des images.
 
     select input
 de: wählen
 en: choose file
 fr: sélect. fichier
 
+    browse
+de: durchsuchen
+en: browse
+fr: parcourir
+
     portrait
+de: Porträt
 en: portrait
 fr: portrait
 
     add portrait
-en: modify portrait
+en: add a portrait
 fr: ajouter un portrait
 
     modify portrait
-en: modify portrait
+en: modify the portrait
 fr: modifier le portrait
 
     saved images
@@ -83,7 +87,7 @@ fr: une sauvegarde pré-existante du portrait sera supprimée.
 
     store image
 en: the selected image will be copied to
-fr: l'image sélectionnée sera enregistrée dans
+fr: l’image sélectionnée sera enregistrée dans
 
     add image
 en: add an image
@@ -102,7 +106,13 @@ en: add a comment for the image.
 fr: ajouter un commentaire à l’image.
 
     update image comment
-en: update image comment
+en: update the comment of the image
 fr: mettre à jour le commentaire de l’image
 
+    previous
+en: previous
+fr: précédent
 
+    next
+en: next
+fr: suivant
