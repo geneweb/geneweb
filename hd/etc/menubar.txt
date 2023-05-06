@@ -1,7 +1,7 @@
 <!-- $Id: menubar.txt v7.1 17/01/2023 14:11:53 $ -->
 %let;laA;title="[*add::family/families]0 (A)" accesskey="A"%in;
 %let;laD;title="[*difference between the two revisions] (D)" accesskey="D"%in;
-%let;laI;title="[*send::image/images]0 (I)" accesskey="I"%in;
+%let;laI;title="[*add]/[delete::image/images]1 (I)" accesskey="I"%in;
 %let;laL;title="[*add::parents] [of] %first_name;%if;(occ!=0).%occ%end; %surname; (L)" accesskey="L"%in;
 %let;laP;title="[*modify::person/persons]0 %first_name;%if;(occ!=0).%occ%end; %surname; (P)" accesskey="P"%in;
 %let;laR;title="[*relationship computing] (R)" accesskey="R"%in;
@@ -178,7 +178,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD&i=%index;" title="[*changed order of person's events]"><span class="fa fa-sort fa-fw mr-2"></span>[*invert::event/events]1</a>
                 %if;(first_name != "?"and surname!="?")
-                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE&i=%index;" %laI;>
+                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE&i=%index;">
                     <i class="far fa-file-image fa-fw mr-2"></i>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
                 %end;
                 <div class="dropdown-divider"></div>
@@ -375,18 +375,17 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
           </li>
           %if;(keydir_img_nbr>0)
             <li class="nav-item">
-              <a class="nav-link" data-toggle="modal" data-target="#carousel_modal"
-                title="[*photos & documents]">
-                <span class="fa fa-images fa-fw" aria-hidden="true"></span>%nn;
+              <a class="nav-link text-secondary" data-toggle="modal" data-target="#carousel_modal"
+                title="[*display carrousel]">
+                <span class="far fa-image fa-fw" aria-hidden="true"></span>%nn;
                 <span class="sr-only">[*image/images]1</span>%nn;
               </a>
             </li>
           %end;
-          <li class="nav-item">
-            <a class="nav-link"href="%prefix;m=SND_IMAGE_C&i=%index;"
-              title="[*add]/[remove] [image/images]0">
+          <li class="nav-item %if;(keydir_img_nbr>0) d-none%end;">
+            <a class="nav-link text-secondary" href="%prefix;m=SND_IMAGE_C&i=%index;" %laI;>
               <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
-              <span class="sr-only">[*add]/[remove] [image/images]0</span>%nn;
+              <span class="sr-only">[*add]/[delete] [image/images]1</span>%nn;
             </a>
           </li>
         </ul>
@@ -397,6 +396,6 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
     %include;buttons_cousins
   %end;
 %end;
-%if;(plugin.v7_im and b.carrousel="on")
-  %include;carrousel_display
+%if;(keydir_img_nbr>0)
+%include;carrousel_display
 %end;

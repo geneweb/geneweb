@@ -8,9 +8,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include.css;
-  %include.hed;
 </head>
 <body%body_prop; id="person">
+%include.hed;
 <div class="container">
 %message_to_wizard;
 %include.perso_header;
@@ -18,9 +18,7 @@
   file_name must be defined
   mode="comment" then only the comment file is updated
   keydir is “on” if we are dealing with “others” images %)
-
 %random.init;
-
 %define;alert_header()
   %if;(evar.mode="others")
     %if;(evar.em="SND_IMAGE_C_OK")[*image received]%if;(evar.notes!="") [with comment]%end;
@@ -80,6 +78,7 @@ en: Warning: picture management functions are not fully operative in CGI mode!!
 fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement en mode CGI!!
 ]
 %end;
+
 %if;(wizard)
   <div class="row mb-1">
     %( *** Col 1 *** %)
@@ -95,8 +94,8 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
         <div class="custom-file col">
           <input type="file" name="file"
             class="custom-file-input custom-portrait"
-            id="portrait_file" accept="image/*" lang="%lang;">
-          <label class="custom-file-label text-truncate"
+              id="portrait_file" accept="image/*"%if;(not has_portrait) autofocus%end;>
+          <label class="custom-file-label text-truncate" data-browse="[*browse]"
             for="portrait_file">[*select] [image/images]0</label>
         </div>
         <button class="btn btn-primary ml-2 col-2 snd-btn-portrait"
@@ -117,9 +116,9 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
         %( with the radiobutton of the old folder content (right column) %)
         <input type="hidden" name="file_name_2" id="file_name_2" value="">
         <div class="custom-file col">
-          <input type="file" name="file" class="custom-file-input custom-others"%sp;
-            id="others_file" accept="image/*" lang="%lang;" autofocus%( multiple%)>
-          <label class="custom-file-label text-truncate" for="others_file">%nn;
+          <input type="file" name="file" class="custom-file-input custom-others"
+            id="others_file" accept="image/*"%if;has_portrait; autofocus%end;%( multiple%)>
+          <label class="custom-file-label text-truncate" for="others_file"  data-browse="[*browse]">%nn;
             [*select] [image/images]0%nn;
           </label>
         </div>
@@ -131,7 +130,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
         <div class="d-flex col">
           <h1 class="display-4">
             %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*comment]</h1>
-          <span class="mb-1 ml-auto align-self-end">%include.toolbar;</span>
+          <span class="mb-1 px-0 ml-auto align-self-end col-2">%include.toolbar;</span>
         </div>
         <textarea class="form-control col-12" id="notes_comments"
           name="notes" rows="5" placeholder="[*image comment]" disabled>
@@ -265,16 +264,13 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
             <a role="button" href="%prefix;m=IM_C_S&i=%index;&s=%keydir_img_key;" target="_blank" rel="noopener"
                data-toggle="tooltip" data-html="true" data-placement="left"
                title='<strong>[*see] [saved images]0</strong><br><span class="small">%keydir_img;</span>
-              <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%keydir_img_key;"
-              width="185px">'%nn;
-            >
+              <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%keydir_img_key;" width="185px">'%nn;>
               <i class="far fa-file-image fa-fw text-primary"></i>%nn;
-            </a>%nn;
+            </a>
             <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=others&file_name=%keydir_img_key;&idigest=%idigest;"
                data-toggle="tooltip" data-html="true" data-placement="top"
                title='<i class="fa fa-retweet fa-rotate-90 text-success mr-1"></i><strong>[*restore] [saved images]0</strong><br><span class="small">%keydir_img;</span>
-                      <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%keydir_img_key;" width="185px">'%nn;
-            >
+                      <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%keydir_img_key;" width="185px">'>
               <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i>%nn;
             </a>
             <samp class="text-truncate ml-1" title="%images_store;%X;old%X;%keydir_img;">%keydir_img;</samp>
@@ -285,9 +281,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
                   data-toggle="tooltip" data-html="true" data-placement="left"
                   title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete] [saved images]0</strong>
                          <br><span class="small">%keydir_img;</span>
-                         <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%keydir_img_key;"
-                         width="185px">'%nn;
-              >
+                         <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%keydir_img_key;" width="185px">'>
                 <i class="far fa-trash-alt text-danger fa-fw text-primary"></i>%nn;
               </a>
             </div>
