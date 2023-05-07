@@ -11704,6 +11704,7 @@ oc: lo
 pl: dnia
 pt: a
 ro: la
+ru:
 sk: dňa
 sv: den
 tr: -da,-de
@@ -11721,6 +11722,7 @@ lt:
 oc: lo
 pl: w :a:
 pt: em
+ru: в
 sv: på
 tr: -da,-de
 
