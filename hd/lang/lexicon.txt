@@ -7495,37 +7495,38 @@ sv: har en familj
 tr: eş ve çocuklar biliniyor
 
     having as children
-af: met as kinders
-bg: деца
-br: anezho ez eo bet ganet bugale
-ca: fills
-co: cù
-cs: měli spolu děti
-da: børn
-de: ihre Kinder
-en: with
-eo: havis ido(j)n
-es: con
-et: lapsed
-fi: lapset
-fr: dont
-he:    עם ילדים
-is: börn
-it: da cui
-lt: vaikai
-lv: bērni
-nl: en hun kinderen
-no: med
-oc: enfants
-pl: dzieci
-pt: tiveram
-ro: cu copii
-ru: имели детей
-sk: mali spolu deti
-sl: otroci
-sv: med
-tr: ile
-zh: 生有子女
+af: met kind/met %s kinders
+ar: طفلهم / أطفالهم ٪S
+bg: c дете/c %s деца
+br: o bugel/o %s bugel
+ca: amb fill/amb %s fills
+co: cù u zitellu/cù %s figlioli
+cs: jejich dítě/jejich %s děti
+da: med barn/med %s børn
+de: ihr Kind/ihre %s Kinder
+en: with child/with %s children
+eo: havis idon/havis %s idojn
+es: con un niño/con %s hijos
+et: nende laps/nende %s last
+fi: heidän lapsensa/heidän %s lastaan
+fr: dont un enfant/dont %s enfants
+he: הילד שלהם / ילדיהם %S
+is: með barn/með %s börn
+it: con figlio/con %s figli
+lt: ar vienu bērnu/ar %s bērniem
+lv: su vaikais/su %s vaikais
+nl: hun kind/hun &s kinderen
+no: med barn/med %s barn
+oc: сæ фæллон/сæ %s фæсарæнтæ
+pl: ich dziecko/ich %s dzieci
+pt: com filho/com %s filhos
+ro: cu copil/cu %s copii
+ru: их ребенок/ %s их детей
+sk: ich dieťa/ich %s deti
+sl: z enim otrokom/s %s otroki
+sv: deras barn/deras %s barn
+tr: bir çocukla/%s çocuklu
+zh: 有孩子/有%s個孩子
 
     having no family
 co: ùn avendu nisuna famiglia
