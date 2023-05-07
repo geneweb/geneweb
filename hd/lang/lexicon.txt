@@ -10909,21 +10909,25 @@ ru: события
 sv: antal händelser
 tr: etkinliklerin sayısı
 
+    open this individual page
+en: open this individual page
+fr: ouvrir la page individuelle
+
     nb individuals
-co: numeru d’individuu
-de: Individuen
-en: individuals
-es: núm. individuos
+co: numeru d’individu
+de: Anzahl der Individuen
+en: number of individuals
+es: número de individuos
 fi: henkilöiden lukumäärä
 fr: nombre d’individus
-it: n° individui
+it: numero d'individui
 nl: aantal personen
-no: individer
-oc: nbre individús
-pt: nº pessoas
-ru: люди
+no: antall individer
+oc: nombre d'individus
+pt: número de pessoas
+ru: количество людей
 sv: antal individer
-tr: bireyler
+tr: bireylerin sayısı
 
     NB: you should try another relationship computing mode
 co: andate puru à pruvà torna impieghendu un altru modu di calculu
@@ -11624,22 +11628,6 @@ pt: número de eventos
 ru: количество событий
 sv: antal händelser
 tr: etkinliklerin sayısı
-
-    number of individuals
-co: numeru d’individu
-de: Anzahl der Individuen
-en: number of individuals
-es: número de individuos
-fi: henkilöiden lukumäärä
-fr: nombre d’individus
-it: numero d'individui
-nl: aantal personen
-no: antall individer
-oc: nombre d'individus
-pt: número de pessoas
-ru: количество людей
-sv: antal individer
-tr: bireylerin sayısı
 
     number of living persons:
 bg: брой на живите лица:
