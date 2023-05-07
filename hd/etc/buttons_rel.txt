@@ -5,7 +5,7 @@
     %if;(evar.em="R" or ((evar.i!="" and evar.ei!="") or (person_index.1!="" and person_index.2!="")))
       <a class="%if;(link_next="") disabled%end;%if;(evar.et="S") border rounded%end;"
         href="%if(link_next!="")%link_next;%(%else;%nn;
-        %prefix;&em=R&et=S%nn;
+        %prefix;em=R&et=S%nn;
         %if;(evar.i!="")&i=%evar.i;&ei=%evar.ei;%nn;
         %elseif;(person_index.1!="")&i=%person_index.1;&ei=%person_index.2;%end;%)%nn;
           %if;(evar.image!="")&image=%evar.image;%end;%nn;
@@ -19,7 +19,7 @@
     %end;
     %if;(evar.i!="")
       <a class="ml-2%if;(evar.et="A") border rounded%end;"
-        href="%prefix;&em=R&et=A&i=%evar.i;&ei=%evar.ei;%nn;
+        href="%prefix;em=R&et=A&i=%evar.i;&ei=%evar.ei;%nn;
           %if;(evar.image!="")&image=%evar.image;%end;%nn;
           %if;(evar.spouse!="")&spouse=%evar.spouse;%end;%nn;
           %if;(evar.bd!="")&bd=%evar.bd;%end;%nn;
@@ -27,7 +27,7 @@
         title="[*relationship link/relationship links]1" accesskey="^">%nn;
         <i class="fa fa-user-friends fa-fw"></i></a>
       <a class="ml-2%if;(evar.et="M") border rounded%end;"
-        href="%prefix;&em=R&et=M&i=%evar.i;&ei=%evar.ei;%nn;
+        href="%prefix;em=R&et=M&i=%evar.i;&ei=%evar.ei;%nn;
           %if;(evar.image!="")&image=%evar.image;%end;%nn;
           %if;(evar.spouse!="")&spouse=%evar.spouse;%end;%nn;
           %if;(evar.bd!="")&bd=%evar.bd;%end;%nn;
