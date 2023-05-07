@@ -1208,7 +1208,7 @@ type 'a env =
   | Vcell of cell
   | Vcelll of cell list
   | Vcnt of int ref
-  | Vcousl of (iper * (ifam list * iper list * int) * int list) list ref
+  | Vcousl of (iper * (ifam list list * iper list * int) * int list) list ref
   | Vcous_level of int ref * int ref
   | Vdesclevtab of ((iper, int) Marker.t * (ifam, int) Marker.t) lazy_t
   | Vdmark of (iper, bool) Marker.t ref
@@ -2720,6 +2720,19 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
               null_val
           | _ -> raise Not_found)
       | None -> raise Not_found)
+  | [ "cous_implx_cnt"; l1; l2 ] -> (
+      let max_a_l =
+        match get_env "max_anc_level" env with
+        | Vint i -> i
+        | _ -> max_anc_level_default
+      in
+      let max_d_l =
+        match get_env "max_desc_level" env with
+        | Vint i -> i
+        | _ -> max_desc_level_default
+      in
+      let cnt = Cousins.cousins_implex_cnt base max_a_l max_d_l l1 l2 p in
+      VVstring (string_of_int cnt))
   | [ "cousins"; "max_a" ] ->
       let max_a_l =
         match get_env "max_anc_level" env with
@@ -4153,12 +4166,10 @@ let print_foreach conf base print_ast eval_expr =
     let rec loop first cnt l =
       match l with
       | [] -> ()
-      | (ip, (ifaml, iancl, nbr), lev_list) :: l -> (
+      | (ip, (_, iancl, nbr), lev_list) :: l -> (
           match level_in_list in_or_less level lev_list with
           | Some lev ->
               (let lev_cnt = List.length lev_list in
-               let ifaml = List.map (fun ifam -> string_of_ifam ifam) ifaml in
-               let ifaml = String.concat "," ifaml in
                let ianc_env =
                  match iancl with
                  | ianc1 :: ianc2 :: _ ->
@@ -4180,7 +4191,6 @@ let print_foreach conf base print_ast eval_expr =
                let env =
                  ("path_end", Vind (poi base ip))
                  :: ("anc_level", Vint lev)
-                 :: ("anc_f_list", Vstring ifaml)
                  :: ("lev_cnt", Vint lev_cnt) :: ("first", Vbool first)
                  :: ("cnt", Vint cnt) :: ("nbr", Vint nbr)
                  :: ("last", Vbool (l = []))
