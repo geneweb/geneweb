@@ -187,14 +187,23 @@
   </div>
 </div>
 %elseif;(e.m="RLM")
-  <div class="d-flex justify-content-between">
+  <div class="btn-toolbar" role="toolbar" arial-label="agnatic and cognatic buttons group">
     <div class="mt-2 mb-4 h2">[*multi relations graph]</div>
-    <div class="btn-toolbar mt-4 mr-2" role="toolbar"aria-label="Toolbar for dag/images/edit tree buttons" style='%if;(e.wide="on")transform:translateX(-40px)%end;'>
-      <div class="btn-group ml-2">
-        <a role="button" href="%prefix_base_password;m=TP&v=upd%e.m;&%nn;
-         %foreach;env_binding;%if(env.key!="m" and env.val!="")%env.key;=%env.val;&%end;%end;">
-        <span class="far fa-edit fa-lg mb-1" title="[*edit tree]"></span>
-        </a>
+    <div class="d-flex justify-content-between">
+      <div class="btn-toolbar mt-4 mr-2" role="toolbar"aria-label="Toolbar for dag/images/edit tree buttons" style='%if;(e.wide="on")transform:translateX(-40px)%end;'>
+        <div class="btn-group ml-2">
+          <a role="button" href="%prefix_base_password;m=TP&v=upd%e.m;&%nn;
+           %foreach;env_binding;%if(env.key!="m" and env.val!="")%env.key;=%env.val;&%end;%end;">
+          <span class="far fa-edit fa-lg mb-1" title="[*edit tree]"></span>
+          </a>
+        </div>
+        <div class="btn-group ml-2">
+          <a role="button" class="btn btn-sm btn-outline-primary border-%if;(e.im="")2%else;0%end; h-100"
+            href="%if;(e.im="")%url_set.im.off;%else;%url_set.im;%end;"
+            title="%if;(e.im="")[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [image/images]1">
+            <i class="fa fa-image fa-lg mr-1"></i>
+          </a>
+        </div>
       </div>
     </div>
   </div>
