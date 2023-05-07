@@ -18204,9 +18204,9 @@ fr: correspondance
 en: filter
 fr: filtrer
 
-    filter n elts in places list
-en: keep first n elements in places list
-fr: ne conserver que n éléments de la liste des places
+    place filter
+en: number of elements kept in places list
+fr: nombre d'éléments à conserver dans la liste des places
 
     max nbr
 co: num mas rel
