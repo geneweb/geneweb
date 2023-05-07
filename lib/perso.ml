@@ -1712,6 +1712,23 @@ and eval_simple_str_var conf base env (p, p_auth) = function
                 |> safe_val
               else null_val
           | _ -> raise Not_found))
+  | "marriage_place_raw" -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) when mode_local env ->
+          if m_auth then
+            get_marriage_place fam |> sou base
+            |> Util.raw_string_of_place conf
+            |> str_val
+          else null_val
+      | _ -> (
+          match get_env "fam_link" env with
+          | Vfam (_, fam, _, m_auth) ->
+              if m_auth then
+                get_marriage_place fam |> sou base
+                |> Util.raw_string_of_place conf
+                |> str_val
+              else null_val
+          | _ -> raise Not_found))
   | "marriage_note" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
@@ -3563,6 +3580,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       if p_auth then
         get_birth_place p |> sou base |> Util.string_of_place conf |> safe_val
       else null_val
+  | "birth_place_raw" ->
+      if p_auth then sou base (get_birth_place p) |> str_val else null_val
   | "birth_note" ->
       get_birth_note p |> get_note_source conf base ~p p_auth conf.no_note
   | "birth_source" ->
@@ -3571,6 +3590,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       if p_auth then
         get_baptism_place p |> sou base |> Util.string_of_place conf |> safe_val
       else null_val
+  | "baptism_place_raw" ->
+      if p_auth then sou base (get_baptism_place p) |> str_val else null_val
   | "baptism_note" ->
       get_baptism_note p |> get_note_source conf base ~p p_auth conf.no_note
   | "baptism_source" ->
@@ -3579,6 +3600,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       if p_auth then
         get_burial_place p |> sou base |> Util.string_of_place conf |> safe_val
       else null_val
+  | "burial_place_raw" ->
+      if p_auth then sou base (get_burial_place p) |> str_val else null_val
   | "burial_note" ->
       get_burial_note p |> get_note_source conf base ~p p_auth conf.no_note
   | "burial_source" ->
@@ -3605,6 +3628,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       if p_auth then
         get_burial_place p |> sou base |> Util.string_of_place conf |> safe_val
       else null_val
+  | "cremation_place_raw" ->
+      if p_auth then sou base (get_burial_place p) |> str_val else null_val
   | "dates" ->
       if p_auth then DateDisplay.short_dates_text conf base p |> safe_val
       else null_val
@@ -3627,6 +3652,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       if p_auth then
         get_death_place p |> sou base |> Util.string_of_place conf |> safe_val
       else null_val
+  | "death_place_raw" ->
+      if p_auth then sou base (get_death_place p) |> str_val else null_val
   | "death_note" ->
       get_death_note p |> get_note_source conf base ~p p_auth conf.no_note
   | "death_source" ->
