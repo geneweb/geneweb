@@ -22,11 +22,11 @@
 %end;
 %let;p_mod;%if;(b.p_mod!="" and e.p_mod="")%b.p_mod;%elseif;(e.p_mod!="")%e.p_mod;%end;%in;
 %if;(not cancel_links)
-    <nav class="navbar sticky-top navbar-light bg-white justify-content-center navbar-expand-md pt-1%nn;
+    <nav class="navbar sticky-top navbar-light opacity-0 justify-content-center navbar-expand-md pt-1%nn;
       %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
         or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
         or (e.ip!="" and (e.m="ADD_FAM" or e.m="ADD_FAM_OK" or e.m="ADD_PAR"))) mt-5%end;">
-      <div class="btn-toolbar" role="toolbar">
+      <div class="btn-toolbar bg-white" role="toolbar">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
