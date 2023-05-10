@@ -2961,6 +2961,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "is_restricted" ->
       (* TODO why is it not Util.is_restricted *)
       is_empty_person p
+  | "is_contemporary" -> !GWPARAM.is_contemporary conf base p
   | _ -> raise Not_found
 
 and eval_str_person_field conf base env ((p, p_auth) as ep) = function
