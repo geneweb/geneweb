@@ -43,6 +43,9 @@ val output_error :
     Also send [headers] and use [content] (typically a HTML string describing the error) if provided.
 *)
 
+val is_contemporary : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
+(** Check if a person is contemporary *)
+
 val p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
 (** Check if a person should be displayed or not *)
 
