@@ -25,10 +25,12 @@ let put_events_in_notes base p =
       match pevents with
       | [] -> false
       | evt :: events -> (
-          match (get_pevent_name evt) with
+          match get_pevent_name evt with
           | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
           | Epers_Cremation ->
-              if sou base (get_pevent_note evt) <> "" || (get_pevent_witnesses evt) <> [||]
+              if
+                sou base (get_pevent_note evt) <> ""
+                || get_pevent_witnesses evt <> [||]
               then true
               else loop events
           | _ -> true)
@@ -619,7 +621,8 @@ let print_pevent opts base gen e =
   (*print_if_no_empty opts base "#c" e.epers_cause;*)
   if opts.source = None then print_if_no_empty opts base "#s" (get_pevent_src e);
   Printf.ksprintf (oc opts) "\n";
-  print_witnesses opts base gen ~use_per_sel:true (get_pevent_witnesses_and_notes e);
+  print_witnesses opts base gen ~use_per_sel:true
+    (get_pevent_witnesses_and_notes e);
   let note = if opts.notes then sou base (get_pevent_note e) else "" in
   print_multiline opts "note" note
 
@@ -696,7 +699,8 @@ let print_fevent opts base gen in_comment e =
   (*print_if_no_empty opts base "#c" e.efam_cause;*)
   if opts.source = None then print_if_no_empty opts base "#s" (get_fevent_src e);
   print_sep ();
-  print_witnesses opts base gen ~use_per_sel:true (get_fevent_witnesses_and_notes e);
+  print_witnesses opts base gen ~use_per_sel:true
+    (get_fevent_witnesses_and_notes e);
   let note = if opts.notes then sou base (get_fevent_note e) else "" in
   let note_lines = String.split_on_char '\n' note in
   if note <> "" then
@@ -744,119 +748,122 @@ let print_empty_family opts base p =
 
 let print_family opts base gen m =
   let fam = m.m_fam in
-  let fath, moth = m.m_fath, m.m_moth in
-  if eq_iper (get_iper fath) dummy_iper || eq_iper (get_iper moth) dummy_iper then ()
-  else begin
-  Printf.ksprintf (oc opts) "fam ";
-  print_parent opts base gen m.m_fath;
-  Printf.ksprintf (oc opts) " +";
-  print_date_option opts (Date.od_of_cdate (get_marriage fam));
-  let print_sexes s =
-    let c x =
-      match get_sex x with Male -> 'm' | Female -> 'f' | Neuter -> '?'
-    in
-    Printf.ksprintf (oc opts) " %s %c%c" s (c m.m_fath) (c m.m_moth)
-  in
-  (match get_relation fam with
-  | Married -> ()
-  | NotMarried -> Printf.ksprintf (oc opts) " #nm"
-  | Engaged -> Printf.ksprintf (oc opts) " #eng"
-  | NoSexesCheckNotMarried -> print_sexes "#nsck"
-  | NoSexesCheckMarried -> print_sexes "#nsckm"
-  | NoMention -> print_sexes "#noment"
-  | MarriageBann -> print_sexes "#banns"
-  | MarriageContract -> print_sexes "#contract"
-  | MarriageLicense -> print_sexes "#license"
-  | Pacs -> print_sexes "#pacs"
-  | Residence -> print_sexes "#residence");
-  print_if_no_empty opts base "#mp" (get_marriage_place fam);
-  if opts.source = None then
-    print_if_no_empty opts base "#ms" (get_marriage_src fam);
-  (match get_divorce fam with
-  | NotDivorced -> ()
-  | Separated -> Printf.ksprintf (oc opts) " #sep"
-  | Divorced d ->
-      let d = Date.od_of_cdate d in
-      Printf.ksprintf (oc opts) " -";
-      print_date_option opts d);
-  Printf.ksprintf (oc opts) " ";
-  print_parent opts base gen m.m_moth;
-  Printf.ksprintf (oc opts) "\n";
-  let witnesses =
-    Array.map (fun ip -> (ip, Witness, empty_string)) (get_witnesses fam)
-  in
-  print_witnesses opts base gen ~use_per_sel:true witnesses;
-  (match opts.source with
-  | None ->
-      if sou base (get_fsources fam) <> "" then
-        Printf.ksprintf (oc opts) "src %s\n"
-          (correct_string base (get_fsources fam))
-  | Some "" -> ()
-  | Some x -> Printf.ksprintf (oc opts) "src %s\n" (s_correct_string x));
-  let csrc =
-    match common_children_sources base m.m_chil with
-    | Some s ->
-        Printf.ksprintf (oc opts) "csrc %s\n" (s_correct_string s);
-        s
-    | _ -> ""
-  in
-  let cbp =
-    match common_children_birth_place base m.m_chil with
-    | Some s ->
-        Printf.ksprintf (oc opts) "cbp %s\n" (s_correct_string s);
-        s
-    | _ -> ""
-  in
-  print_comment_for_family opts base gen fam;
-  if (not !old_gw) && get_fevents fam <> [] then (
-    Printf.ksprintf (oc opts) "fevt\n";
-    List.iter (print_fevent opts base gen false) (get_fevents fam);
-    Printf.ksprintf (oc opts) "end fevt\n");
-  (match Array.length m.m_chil with
-  | 0 -> ()
-  | _ ->
-      let fam_surname = get_surname m.m_fath in
-      Printf.ksprintf (oc opts) "beg\n";
-      Array.iter
-        (fun p ->
-          if gen.per_sel (get_iper p) then
-            print_child opts base fam_surname csrc cbp p)
-        m.m_chil;
-      Printf.ksprintf (oc opts) "end\n");
-  Gwdb.Marker.set gen.fam_done m.m_ifam true;
-  let from =
-    Printf.sprintf "family \"%s.%d %s\" & \"%s.%d %s\""
-      (p_first_name base m.m_fath)
-      (get_new_occ m.m_fath) (p_surname base m.m_fath)
-      (p_first_name base m.m_moth)
-      (get_new_occ m.m_moth) (p_surname base m.m_moth)
-  in
-  let s =
-    let sl =
-      let acc =
-        [ get_comment fam; get_marriage_note fam; get_marriage_src fam ]
+  let fath, moth = (m.m_fath, m.m_moth) in
+  if eq_iper (get_iper fath) dummy_iper || eq_iper (get_iper moth) dummy_iper
+  then ()
+  else (
+    Printf.ksprintf (oc opts) "fam ";
+    print_parent opts base gen m.m_fath;
+    Printf.ksprintf (oc opts) " +";
+    print_date_option opts (Date.od_of_cdate (get_marriage fam));
+    let print_sexes s =
+      let c x =
+        match get_sex x with Male -> 'm' | Female -> 'f' | Neuter -> '?'
       in
-      if opts.source = None then get_fsources fam :: acc else acc
+      Printf.ksprintf (oc opts) " %s %c%c" s (c m.m_fath) (c m.m_moth)
     in
-    let sl =
-      if not !old_gw then
-        let rec loop l accu =
-          match l with
-          | [] -> accu
-          | evt :: l ->
-              let acc =
-                get_fevent_note evt
-                :: (if opts.source = None then (get_fevent_src evt) :: accu else accu)
-              in
-              loop l acc
+    (match get_relation fam with
+    | Married -> ()
+    | NotMarried -> Printf.ksprintf (oc opts) " #nm"
+    | Engaged -> Printf.ksprintf (oc opts) " #eng"
+    | NoSexesCheckNotMarried -> print_sexes "#nsck"
+    | NoSexesCheckMarried -> print_sexes "#nsckm"
+    | NoMention -> print_sexes "#noment"
+    | MarriageBann -> print_sexes "#banns"
+    | MarriageContract -> print_sexes "#contract"
+    | MarriageLicense -> print_sexes "#license"
+    | Pacs -> print_sexes "#pacs"
+    | Residence -> print_sexes "#residence");
+    print_if_no_empty opts base "#mp" (get_marriage_place fam);
+    if opts.source = None then
+      print_if_no_empty opts base "#ms" (get_marriage_src fam);
+    (match get_divorce fam with
+    | NotDivorced -> ()
+    | Separated -> Printf.ksprintf (oc opts) " #sep"
+    | Divorced d ->
+        let d = Date.od_of_cdate d in
+        Printf.ksprintf (oc opts) " -";
+        print_date_option opts d);
+    Printf.ksprintf (oc opts) " ";
+    print_parent opts base gen m.m_moth;
+    Printf.ksprintf (oc opts) "\n";
+    let witnesses =
+      Array.map (fun ip -> (ip, Witness, empty_string)) (get_witnesses fam)
+    in
+    print_witnesses opts base gen ~use_per_sel:true witnesses;
+    (match opts.source with
+    | None ->
+        if sou base (get_fsources fam) <> "" then
+          Printf.ksprintf (oc opts) "src %s\n"
+            (correct_string base (get_fsources fam))
+    | Some "" -> ()
+    | Some x -> Printf.ksprintf (oc opts) "src %s\n" (s_correct_string x));
+    let csrc =
+      match common_children_sources base m.m_chil with
+      | Some s ->
+          Printf.ksprintf (oc opts) "csrc %s\n" (s_correct_string s);
+          s
+      | _ -> ""
+    in
+    let cbp =
+      match common_children_birth_place base m.m_chil with
+      | Some s ->
+          Printf.ksprintf (oc opts) "cbp %s\n" (s_correct_string s);
+          s
+      | _ -> ""
+    in
+    print_comment_for_family opts base gen fam;
+    if (not !old_gw) && get_fevents fam <> [] then (
+      Printf.ksprintf (oc opts) "fevt\n";
+      List.iter (print_fevent opts base gen false) (get_fevents fam);
+      Printf.ksprintf (oc opts) "end fevt\n");
+    (match Array.length m.m_chil with
+    | 0 -> ()
+    | _ ->
+        let fam_surname = get_surname m.m_fath in
+        Printf.ksprintf (oc opts) "beg\n";
+        Array.iter
+          (fun p ->
+            if gen.per_sel (get_iper p) then
+              print_child opts base fam_surname csrc cbp p)
+          m.m_chil;
+        Printf.ksprintf (oc opts) "end\n");
+    Gwdb.Marker.set gen.fam_done m.m_ifam true;
+    let from =
+      Printf.sprintf "family \"%s.%d %s\" & \"%s.%d %s\""
+        (p_first_name base m.m_fath)
+        (get_new_occ m.m_fath) (p_surname base m.m_fath)
+        (p_first_name base m.m_moth)
+        (get_new_occ m.m_moth) (p_surname base m.m_moth)
+    in
+    let s =
+      let sl =
+        let acc =
+          [ get_comment fam; get_marriage_note fam; get_marriage_src fam ]
         in
-        loop (get_fevents fam) sl
-      else sl
+        if opts.source = None then get_fsources fam :: acc else acc
+      in
+      let sl =
+        if not !old_gw then
+          let rec loop l accu =
+            match l with
+            | [] -> accu
+            | evt :: l ->
+                let acc =
+                  get_fevent_note evt
+                  ::
+                  (if opts.source = None then get_fevent_src evt :: accu
+                  else accu)
+                in
+                loop l acc
+          in
+          loop (get_fevents fam) sl
+        else sl
+      in
+      String.concat " " (List.map (sou base) sl)
     in
-    String.concat " " (List.map (sou base) sl)
-  in
-  ignore (add_linked_files gen from s [] : _ list)
-end
+    ignore (add_linked_files gen from s [] : _ list))
+
 let get_persons_with_notes m list =
   let list =
     let fath = m.m_fath in
@@ -922,7 +929,8 @@ let print_notes_for_person opts base gen p =
                  | _ -> ""
                in
                let notes =
-                 if opts.Gwexport.notes then sou base (get_pevent_note evt) else ""
+                 if opts.Gwexport.notes then sou base (get_pevent_note evt)
+                 else ""
                in
                if notes <> "" then
                  Printf.ksprintf (oc opts) "%s: %s\n" name notes;
@@ -964,10 +972,12 @@ let print_notes_for_person opts base gen p =
       List.fold_left
         (fun acc e ->
           let acc =
-            if opts.Gwexport.notes then sou base (get_pevent_note e) :: acc else acc
+            if opts.Gwexport.notes then sou base (get_pevent_note e) :: acc
+            else acc
           in
           let acc =
-            if opts.source = None then sou base (get_pevent_src e) :: acc else acc
+            if opts.source = None then sou base (get_pevent_src e) :: acc
+            else acc
           in
           acc)
         sl (get_pevents p)
