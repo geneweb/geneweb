@@ -466,6 +466,24 @@
       </div>
     </div>
   </div>
+  <div class="row">
+    <label for="excnt_witnwcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
+    <div class="col-5">
+       <input class="form-control" type="text" name="excnt_witnwcnt_occu" value="%witness.create.occupation;" id="witnxcnt_occu" placeholder="[*occupation/occupations]0" %readonly;>
+    </div>
+    <div class="col-sm-auto mt-2">
+    <label class="form-check-label">[*of course dead]</label>
+      <input class="form-check-input col" type="checkbox" name="excnt_witnwcnt_od">
+    </div>
+  %end;
+  %(  end if new witness %)
+  </div>
+  <div class="row">
+    <label for="excnt_witnwcnt_note" class="col-2 col-form-label">[*note/notes]1</label>
+    <div class="col-5">
+      <input name="excnt_witnwcnt_note" class="form-control" type="text" size="40" maxlength="800" value="%fwitness_note;" id="excnt_witnwcnt_note">
+    </div>
+  </div>
 %end;
 
 %define;one_fevent(xcnt, has_fevents)
