@@ -322,22 +322,25 @@ let cousins_implex_cnt base max_a_l max_d_l l1 l2 p =
     match cousl with
     | [] -> cnt
     | (ip, _, _) :: cousl ->
-        loop0 cousl 
+        loop0 cousl
           (let rec loop1 cnt j =
-            if j = 0 then cnt
-            else
-              loop1 
-                (let cousl_j = cousins_cnt.(il1).(j) in
-                let rec loop2 cousl_j cnt =
-                  match cousl_j with
-                  | [] -> cnt
-                  | (ipj, _, _, _) :: cousl_j -> 
-                    if ip = ipj then loop2 cousl_j (cnt + 1)
-                    else loop2 cousl_j cnt
-                in loop2 cousl_j cnt) (j - 1)
-          in loop1 cnt (il2 - 1))
-  in loop0 cousl0 0
-
+             if j = 0 then cnt
+             else
+               loop1
+                 (let cousl_j = cousins_cnt.(il1).(j) in
+                  let rec loop2 cousl_j cnt =
+                    match cousl_j with
+                    | [] -> cnt
+                    | (ipj, _, _, _) :: cousl_j ->
+                        if ip = ipj then loop2 cousl_j (cnt + 1)
+                        else loop2 cousl_j cnt
+                  in
+                  loop2 cousl_j cnt)
+                 (j - 1)
+           in
+           loop1 cnt (il2 - 1))
+  in
+  loop0 cousl0 0
 
 let asc_cnt_t = ref None
 let desc_cnt_t = ref None

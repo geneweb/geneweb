@@ -505,7 +505,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
       %end;
     %end;
   %else;
-    %if;(xxx.spouse.has_families)
+    %if;(xxx.has_families and xxx.spouse.has_families)
       %foreach;xxx.spouse.family;
         %if;xxx.spouse.has_children;
           %foreach;xxx.spouse.child;
