@@ -1,9 +1,6 @@
 open Def
 open Gwdb
 
-type per
-type fam
-
 type 'a event_name =
   | Pevent of 'a Def.gen_pers_event_name
   | Fevent of 'a Def.gen_fam_event_name
