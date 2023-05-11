@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: ancsosa.txt v7.1 04/03/2022 09:51:04 $ -->
+  <!-- $Id: ancsosa.txt v7.1 10/05/2023 04:58:54 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
 %define;tothegen(xx)
   [to the %s generation:::xx]%nn;
@@ -1399,7 +1399,7 @@
                        %end;"%nn;
               %end;>
               %apply;image_MF("spouse")
-              %apply;link%with;%spouse.access;%and;%if;(fn="on")%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
+              %apply;link%with;%spouse.access;%and;%if;(e.fn="on")%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
             </td>
           %end;
           %if;(e.marr_date = "on")

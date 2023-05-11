@@ -94,6 +94,8 @@ val cousins_implex_cnt :
   (* down l2 generations *)
   person ->
   int
+(** for a list of "cousins" at level l1 l2,
+    cousins_implex computes cousins already seen at levels l < l2. *)
 
 val cousins_fold :
   (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int list) list ->
