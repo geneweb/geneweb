@@ -437,7 +437,7 @@ and mk_fevent conf base sp e =
   in
   mk_event conf base ei
 
-and mk_fevent' conf base sp e =
+and mk_fevent' conf base e =
   mk_event conf base (Event.event_item_of_gen_fevent e)
 and mk_pevent' conf base e =
   mk_event conf base (Event.event_item_of_gen_pevent e)
@@ -857,8 +857,8 @@ and mk_warning conf base =
           Tarray (Array.map box_bool aft_d);
         ]
   | ChangedOrderOfFamilyEvents (_ifam, before, after) ->
-      let before = array_of_list_map (mk_fevent' conf base None) before in
-      let after = array_of_list_map (mk_fevent' conf base None) after in
+      let before = array_of_list_map (mk_fevent' conf base) before in
+      let after = array_of_list_map (mk_fevent' conf base) after in
       let bef_d, aft_d = Difference.f before after in
       Tset
         [
@@ -923,15 +923,15 @@ and mk_warning conf base =
         [
           Tsafe "FEventOrder";
           unsafe_mk_person conf base p;
-          mk_fevent' conf base None e1;
-          mk_fevent' conf base None e2;
+          mk_fevent' conf base e1;
+          mk_fevent' conf base e2;
         ]
   | FWitnessEventAfterDeath (p, e, ifam) ->
       Tset
         [
           Tsafe "FWitnessEventAfterDeath";
           unsafe_mk_person conf base p;
-          mk_fevent' conf base None e;
+          mk_fevent' conf base e;
           get_fam ifam;
         ]
   | FWitnessEventBeforeBirth (p, e, ifam) ->
@@ -939,7 +939,7 @@ and mk_warning conf base =
         [
           Tsafe "FWitnessEventBeforeBirth";
           unsafe_mk_person conf base p;
-          mk_fevent' conf base None e;
+          mk_fevent' conf base e;
           get_fam ifam;
         ]
   | IncoherentAncestorDate (p1, p2) ->
