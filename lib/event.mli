@@ -15,22 +15,24 @@ val get_place : 'a event_item -> istr
 val get_note : 'a event_item -> istr
 val get_src : 'a event_item -> istr
 val get_witnesses : 'a event_item -> (iper * Def.witness_kind) array
-val get_witness_notes : 'a event_item ->  istr array
-val get_witnesses_and_notes : 'a event_item -> (iper * Def.witness_kind * istr) array
+val get_witness_notes : 'a event_item -> istr array
+
+val get_witnesses_and_notes :
+  'a event_item -> (iper * Def.witness_kind * istr) array
+
 val get_spouse_iper : 'a event_item -> iper option
-
 val has_witnesses : 'a event_item -> bool
-
 val has_witness_note : 'a event_item -> bool
-
 val pevent_name : 'a Def.gen_pers_event_name -> 'a event_name
 val fevent_name : 'a Def.gen_fam_event_name -> 'a event_name
-
 val event_item_of_pevent : pers_event -> istr event_item
 val event_item_of_fevent : ?sp:iper -> fam_event -> istr event_item
 
-val event_item_of_gen_pevent : (iper, istr) Def.gen_pers_event -> istr event_item
-val event_item_of_gen_fevent : ?sp:iper -> (iper,istr) Def.gen_fam_event -> istr event_item
+val event_item_of_gen_pevent :
+  (iper, istr) Def.gen_pers_event -> istr event_item
+
+val event_item_of_gen_fevent :
+  ?sp:iper -> (iper, istr) Def.gen_fam_event -> istr event_item
 
 val compare_event_name : 'a event_name -> 'a event_name -> int
 
