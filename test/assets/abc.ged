@@ -29,7 +29,7 @@
 1 NOTE = GeneWeb =
 2 CONT
 2 CONT '''GeneWeb''' est un logiciel de généalogie libre et gratuit doté d'une
-2 CONC  interface web, utilisable aussi bien sur un ordinateur non connecté à
+2 CONC  interface web, utilisable aussi bien sur un ordinateur non connecté à 
 2 CONC Internet qu'en service web. Initialement conçu en 1997 par Daniel de Ra
 2 CONC uglaudre, il utilise des techniques de calcul de parenté et de consangu
 2 CONC inité innovantes, mises au point par Daniel de Rauglaudre et Didier Rém
@@ -63,6 +63,7 @@
 3 TYPE INDI
 3 RELA Witness
 3 NOTE This is a witness note on a diploma event
+4 CONT this is the second line of the witness note
 1 FAMS @F1@
 1 NOTE This is a note on an individual
 0 @I3@ INDI
