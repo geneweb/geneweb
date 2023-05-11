@@ -365,6 +365,12 @@
         </div>
       </div>
     </div>
+    <div class="row">
+      <label for="excnt_witnwcnt_note" class="col-2 col-form-label">[*note/notes]1</label>
+      <div class="col-5">
+	<input name="excnt_witnwcnt_note" class="form-control" type="text" size="40" maxlength="800" value="%witness_note;" id="excnt_witnwcnt_note">
+      </div>
+    </div>
   </div>
 %end;
 
