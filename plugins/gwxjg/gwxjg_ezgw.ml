@@ -164,7 +164,8 @@ module Family = struct
 
   let events (_, fam, (_, _, isp), auth) =
     if auth then
-      List.fold_right (fun evt fam_fevents ->
+      List.fold_right
+        (fun evt fam_fevents ->
           let ei = Event.event_item_of_fevent ~sp:isp evt in
           ei :: fam_fevents)
         (get_fevents fam) []
@@ -272,9 +273,7 @@ module Event = struct
     | Pevent (Epers_Name _) -> "EPERS"
     | Fevent (Efam_Name _) -> "EFAM"
 
-
   let date ei = Date.od_of_cdate (Event.get_date ei)
-
   let place = Event.get_place
 
   let note conf base e =
@@ -282,9 +281,8 @@ module Event = struct
     if conf.no_note then "" else sou base n
 
   let src base e = sou base (Event.get_src e)
-  
-  let witnesses e :
-      (Gwdb.iper * Def.witness_kind * Gwdb.istr) array =
+
+  let witnesses e : (Gwdb.iper * Def.witness_kind * Gwdb.istr) array =
     Event.get_witnesses_and_notes e
 
   let spouse_opt = Event.get_spouse_iper

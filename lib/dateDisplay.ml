@@ -648,10 +648,8 @@ let short_family_dates_text conf _base marr_sep fam =
     match
       List.find_opt
         (fun e ->
-           let name = Gwdb.get_fevent_name e in
-           name = Efam_Divorce
-           || name = Efam_Annulation
-           || name = Efam_Separated)
+          let name = Gwdb.get_fevent_name e in
+          name = Efam_Divorce || name = Efam_Annulation || name = Efam_Separated)
         (Gwdb.get_fevents fam)
     with
     | None -> None
