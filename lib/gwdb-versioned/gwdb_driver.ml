@@ -34,7 +34,7 @@ end = struct
         ic
     | None ->
         let file = D.data_file base in
-        let ic = Secure.open_in file in
+        let ic = Secure.open_in_bin file in
         data_file_in_channel := Some ic;
         ic
 
@@ -67,7 +67,7 @@ end = struct
   let load_patch base =
     if patch_file_exists base then (
       let file = D.patch_file base in
-      let ic = Secure.open_in file in
+      let ic = Secure.open_in_bin file in
       let tbl = (Marshal.from_channel ic : t) in
       close_in ic;
       patch_ht := Some tbl;
@@ -132,7 +132,7 @@ end = struct
     let patchfile_tmp = D.tmp_file patchfile in
     if Sys.file_exists patchfile_tmp then
       failwith "Error while writing patch file : temporary file remained";
-    let oc = Secure.open_out patchfile_tmp in
+    let oc = Secure.open_out_bin patchfile_tmp in
     Marshal.to_channel oc tbl [ Marshal.No_sharing ];
     close_out oc
 
@@ -177,7 +177,7 @@ end = struct
     if Sys.file_exists dfile_tmp then
       failwith "Error while writing data file : temporary file remained";
 
-    let oc = Secure.open_out dfile_tmp in
+    let oc = Secure.open_out_bin dfile_tmp in
 
     let syncdata = Hashtbl.create (Array.length data) in
     Array.iteri (Hashtbl.add syncdata) data;
