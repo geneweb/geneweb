@@ -1,0 +1,67 @@
+name: release
+
+on:
+  push:
+    tags:
+      - v**
+
+jobs:
+
+  release:
+
+    strategy:
+
+      fail-fast: false
+
+      matrix:
+
+        include:
+          - os: macos-latest
+            ocaml-version: 4.14.0
+            geneweb-archive: geneweb-macos.zip
+          - os: unbuntu-latest
+            ocaml-version: 4.14.0
+            geneweb-archive: geneweb-linux.zip
+          - os: windows-latest
+            ocaml-version: 4.14.0
+            geneweb-archive: geneweb-windows.zip
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: setup-ocaml
+        uses: avsm/setup-ocaml@v1
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
+
+      - name: setup
+        run: |
+          opam install dune ocamlformat.0.24.1
+          opam exec -- dune build @fmt
+          opam pin add . -y --no-action
+          opam depext -y geneweb
+          opam install -y ./*.opam --deps-only --with-test
+
+      # Build the distribution
+      - name: Build the distribution
+        run: opam exec -- ocaml ./configure.ml --release && make distrib
+
+      # Archive distribution for release
+      - name: Archive Release
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          filename: ${{ matrix.geneweb-archive }}
+          directory: distribution
+
+      # Upload the distribution
+      - name: Upload distribution to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ matrix.geneweb-archive }}
+          tag: ${{ github.ref }}
