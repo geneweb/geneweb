@@ -103,11 +103,9 @@ let print_image_file conf fname =
 let print_portrait conf base p =
   match Image.get_portrait conf base p with
   | Some (`Path path) ->
-      if Mutil.start_with "http" 0 path then Hutil.incorrect_request conf
-      else
-        Result.fold ~ok:ignore
-          ~error:(fun _ -> Hutil.incorrect_request conf)
-          (print_image_file conf path)
+      Result.fold ~ok:ignore
+        ~error:(fun _ -> Hutil.incorrect_request conf)
+        (print_image_file conf path)
   | Some (`Url url) ->
       Util.html conf;
       Output.print_sstring conf "<head><title>";

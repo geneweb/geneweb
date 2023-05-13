@@ -62,5 +62,6 @@ val get_old_portrait :
     - [Some src] with [src] the url or path of [p]'s portrait.
 *)
 
-val get_keydir_files : config -> base -> person -> bool -> string list
+val get_keydir_files : config -> base -> person -> string list
+val get_keydir_old_files : config -> base -> person -> string list
 val get_keydir_img_notes : config -> base -> person -> string -> string
