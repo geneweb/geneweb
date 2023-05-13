@@ -23,36 +23,36 @@
         </div>
       </h5>
       <div class="modal-body d-flex justify-content-center">
-        %let;maximg;%if;has_portrait;%expr(keydir_img_nbr+1)%else;%keydir_img_nbr;%end;%in;
         <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="5000">
-          %(<ol class="carousel-indicators">
+        %( let;maximg;%if;has_portrait;%expr(keydir_img_nbr+1)%else;%keydir_img_nbr;%end;%in;
+            <ol class="carousel-indicators">
             %for;i;0;maximg;
             <li %if;(i=0)class="active"%end; data-target="#carousel" data-slide-to="%i;"></li>
              %end;
           </ol>%)
           <div class="carousel-inner">
             %reset_count;
-            %if;(has_portrait)%incr_count;
+            %if;(has_portrait)
               <div class="carousel-item active">
                 <a href="%prefix;m=IM&i=%index;" target="_blank" rel="noopener">
                   <img class="img-fluid" src="%prefix;m=IM&i=%index;" alt="[*portrait]">
                 </a>
                 <div class="position-relative d-none d-md-block">
                   <span>[portrait]</span>
-                  <small">%count;/%maximg;</small>
                 </div>
               </div>
             %end;
             %if;has_keydir;
-              %foreach;img_in_keydir;
-                %incr_count;
+              %foreach;img_in_keydir;%incr_count;
                 <div class="carousel-item%if;(not has_portrait and is_first) active%end;">
                   <a href="%prefix;m=IM_C&i=%index;&s=%keydir_img;" target="_blank" rel="noopener">
                      <img class="img-fluid" src="%prefix;m=IM_C&i=%index;&s=%keydir_img;" alt="%count; slide">
                   </a>
                   <div class="position-relative d-inline-flex w-100 d-none d-md-block">
                     <span>%keydir_img_notes;</span>
-                    <small class="ml-auto">%keydir_img; %count;/%maximg;</small>
+                    %if;(keydir_img_notes!="")<br>%end;
+                    <span>[image/images]0 %count;/%keydir_img_nbr;[:] </span>
+                    <small class="ml-auto">%keydir_img; </small>
                   </div>
                 </div>
               %end;
