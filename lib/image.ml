@@ -16,17 +16,20 @@ let default_portrait_filename base p =
   default_portrait_filename_of_key (p_first_name base p) (p_surname base p)
     (get_occ p)
 
+let get_file_with_ext f =
+  if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
+  else if Sys.file_exists (f ^ ".jpeg") then Some (f ^ ".jpeg")
+  else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")
+  else if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
+  else None
+
 (** [full_portrait_path conf base p] is [Some path] if [p] has a portrait.
     [path] is a the full path of the file with file extension. *)
 let full_portrait_path conf base p =
   (* TODO why is extension not in filename..? *)
   let s = default_portrait_filename base p in
   let f = Filename.concat (Util.base_path [ "images" ] conf.bname) s in
-  if Sys.file_exists (f ^ ".jpg") then Some (`Path (f ^ ".jpg"))
-  else if Sys.file_exists (f ^ ".jpeg") then Some (`Path (f ^ ".jpeg"))
-  else if Sys.file_exists (f ^ ".png") then Some (`Path (f ^ ".png"))
-  else if Sys.file_exists (f ^ ".gif") then Some (`Path (f ^ ".gif"))
-  else None
+  match get_file_with_ext f with Some f -> Some (`Path f) | None -> None
 
 let source_filename bname src =
   let fname1 =
@@ -224,10 +227,7 @@ let get_portrait conf base p =
         | Ok (s, _size) -> Some s)
     | `Url _s as url -> Some url
     | `Path p as path -> if Sys.file_exists p then Some path else None
-    | `Empty -> (
-        match full_portrait_path conf base p with
-        | None -> None
-        | Some path -> Some path)
+    | `Empty -> full_portrait_path conf base p
   else None
 
 (* In images/keydir we store either
@@ -235,16 +235,13 @@ let get_portrait conf base p =
    - the url to the portrait as content of a url.txt file
 *)
 let get_old_portrait conf base p =
-  let key = default_portrait_filename base p in
-  let p_dir =
-    String.concat Filename.dir_sep [ Util.base_path [ "images" ] conf.bname ]
-  in
-  let f = Filename.concat (Filename.concat p_dir "old") key in
-  (* TODO test for legal extensions *)
-  if Sys.file_exists (f ^ ".jpg") then Some (`Path (f ^ ".jpg"))
-  else if Sys.file_exists (f ^ ".jpeg") then Some (`Path (f ^ ".jpeg"))
-  else if Sys.file_exists (f ^ ".png") then Some (`Path (f ^ ".png"))
-  else if Sys.file_exists (f ^ ".gif") then Some (`Path (f ^ ".gif"))
+  if has_access_to_portrait conf base p then
+    let key = default_portrait_filename base p in
+    let p_dir =
+      String.concat Filename.dir_sep [ Util.base_path [ "images" ] conf.bname ]
+    in
+    let f = Filename.concat (Filename.concat p_dir "old") key in
+    match get_file_with_ext f with Some f -> Some (`Path f) | None -> None
   else None
 
 let rename_portrait conf base p (nfn, nsn, noc) =
@@ -253,7 +250,8 @@ let rename_portrait conf base p (nfn, nsn, noc) =
       let new_s = default_portrait_filename_of_key nfn nsn noc in
       let old_s = default_portrait_filename base p in
       let f = Filename.concat (Util.base_path [ "images" ] conf.bname) new_s in
-      let new_f = f ^ Filename.extension old_f in
+      let old_ext = Filename.extension old_f in
+      let new_f = f ^ old_ext in
       (try Sys.rename old_f new_f
        with Sys_error e ->
          !GWPARAM.syslog `LOG_ERR
@@ -262,43 +260,19 @@ let rename_portrait conf base p (nfn, nsn, noc) =
               new_f e));
       let new_s_f =
         String.concat Filename.dir_sep
-          [
-            Util.base_path [ "images" ] conf.bname;
-            "old";
-            new_s ^ Filename.extension old_f;
-          ]
+          [ Util.base_path [ "images" ] conf.bname; "old"; new_s ^ old_ext ]
       in
       let old_s_f =
         String.concat Filename.dir_sep
-          [
-            Util.base_path [ "images" ] conf.bname;
-            "old";
-            old_s ^ Filename.extension old_f;
-          ]
+          [ Util.base_path [ "images" ] conf.bname; "old"; old_s ^ old_ext ]
       in
-      (if Sys.file_exists old_s_f then
-       try Sys.rename old_s_f new_s_f
-       with Sys_error e ->
-         !GWPARAM.syslog `LOG_ERR
-           (Format.sprintf
-              "Error renaming old portrait: old_path=%s new_path=%s : %s" old_f
-              new_f e));
-      (* check for saved pictures in src/base/images/keydir *)
-      let old_d =
-        String.concat Filename.dir_sep
-          [ Util.base_path [ "src" ] conf.bname; "images"; old_s ]
-      in
-      let new_d =
-        String.concat Filename.dir_sep
-          [ Util.base_path [ "src" ] conf.bname; "images"; new_s ]
-      in
-      if Sys.file_exists old_d then
-        try Sys.rename old_d new_d
+      if Sys.file_exists old_s_f then
+        try Sys.rename old_s_f new_s_f
         with Sys_error e ->
           !GWPARAM.syslog `LOG_ERR
             (Format.sprintf
-               "Error renaming portrait: old_path=%s new_path=%s : %s" old_d
-               new_d e))
+               "Error renaming old portrait: old_path=%s new_path=%s : %s" old_f
+               new_f e))
   | Some (`Url _url) -> () (* old url still applies *)
   | None -> ()
 
@@ -321,7 +295,7 @@ let get_keydir_img_notes conf base p fname =
   s
 
 (* get list of files in keydir *)
-let get_keydir_files conf base p old =
+let get_keydir_files_aux conf base p old =
   let k = default_portrait_filename base p in
   let f =
     String.concat Filename.dir_sep
@@ -332,13 +306,11 @@ let get_keydir_files conf base p old =
     if Sys.is_directory f then
       Array.fold_right
         (fun f1 l ->
+          let ext = Filename.extension f1 in
           if
             f1.[0] <> '.'
-            && Filename.extension f1 <> ".txt"
-            && (Filename.extension f1 = ".jpg"
-               || Filename.extension f1 = ".jpeg"
-               || Filename.extension f1 = ".gif"
-               || Filename.extension f1 = ".png")
+            && ext <> ".txt"
+            && (ext = ".jpg" || ext = ".jpeg" || ext = ".gif" || ext = ".png")
           then (* TODO vérifier ici le type des images autorisées  *)
             f1 :: l
           else l)
@@ -347,6 +319,9 @@ let get_keydir_files conf base p old =
   with Sys_error e ->
     !GWPARAM.syslog `LOG_ERR (Format.sprintf "Keydir error: %s, %s" f e);
     []
+
+let get_keydir_files conf base p = get_keydir_files_aux conf base p false
+let get_keydir_old_files conf base p = get_keydir_files_aux conf base p true
 
 (* end carrousel ************************************ *)
 

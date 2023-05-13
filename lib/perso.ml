@@ -3649,10 +3649,10 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   (* carrousel functions *)
   | "keydir" -> Image.default_portrait_filename base p |> str_val
   | "keydir_img_nbr" ->
-      string_of_int (List.length (Image.get_keydir_files conf base p false))
+      string_of_int (List.length (Image.get_keydir_files conf base p))
       |> str_val
   | "keydir_old_img_nbr" ->
-      string_of_int (List.length (Image.get_keydir_files conf base p true))
+      string_of_int (List.length (Image.get_keydir_old_files conf base p))
       |> str_val
   | "keydir_img_notes" -> (
       match get_env "keydir_img" env with
@@ -5060,7 +5060,10 @@ let print_foreach conf base print_ast eval_expr =
   in
   (* carrousel *)
   let print_foreach_img_in_keydir env al ((p, p_auth) as ep) old =
-    let list = Image.get_keydir_files conf base p old in
+    let list =
+      if old then Image.get_keydir_old_files conf base p
+      else Image.get_keydir_files conf base p
+    in
     if (not p_auth) && is_hide_names conf p then ()
     else
       let rec loop first cnt = function
