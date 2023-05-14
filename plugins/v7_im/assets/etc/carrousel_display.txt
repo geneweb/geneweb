@@ -1,10 +1,11 @@
 %( a carousel of all the images in keydir shown in a basic Bootstrap 4 modal %)
+<!-- begin carrousel_display.txt -->
 <div class="modal fade" id="carousel_modal" tabindex="-1" role="dialog" aria-labelledby="carouselmodal" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <h5 class="modal-header d-inline-flex justify-content-between">
         <a href="%prefix;m=SND_IMAGE_C&i=%index;"
-          title="[*add]/[delete] [image/images]1 (%if;has_portrait;1 [portrait]/%keydir_img_nbr; %if;(keydir_img_nbr>1)[image/images]1%else;[image/images]0%end;)">
+          title="[*add]/[delete] [image/images]1 (%if;has_portrait;1 [portrait]%end;/%keydir_img_nbr; %if;(keydir_img_nbr>1)[image/images]1%else;[image/images]0%end;)">
           %if;has_portrait;1<i class="fas fa-image-portrait ml-1 mr-2" aria-hidden="true"></i>%end;
           %keydir_img_nbr;<i class="far fa-image fa-fw ml-1" aria-hidden="true" title=""></i>%nn;
         </a>
@@ -71,3 +72,4 @@
     </div>
   </div>
 </div>
+<!-- end carrousel_display.txt -->
