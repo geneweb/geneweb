@@ -473,8 +473,10 @@ let print_deleted conf base p =
 
 let effective_delete_ok conf base p =
   let fname = Image.default_portrait_filename base p in
-  let dir = Filename.concat (Util.base_path [ "images" ] conf.bname) fname in
-  if move_file_to_save fname dir = 0 then incorrect conf "effective delete";
+  let ext = get_extension conf false fname in
+  let dir = Util.base_path [ "images" ] conf.bname in
+  if move_file_to_save (fname ^ ext) dir = 0 then
+    incorrect conf "effective delete";
   let changed =
     U_Delete_image (Util.string_gen_person base (gen_person_of_person p))
   in
@@ -494,7 +496,7 @@ let print_del conf base =
   | Some ip -> (
       let p = poi base (iper_of_string ip) in
       match Image.get_portrait conf base p with
-      | Some _src -> print_delete_image conf base p
+      | Some _ -> print_delete_image conf base p
       | None -> Hutil.incorrect_request conf)
 
 (*carrousel *)
