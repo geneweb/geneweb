@@ -1,5 +1,61 @@
+GeneWeb version 7.01
+---------------------
+
+This changelog describes in more details changes introduced in 7.0 and 7.1.
+
+- Various corrections and marginal updates in template files.
+
+- Addition of a collections of "cousins" template commands. 
+  Using these commands, the "Relationship" item on the last or next to last
+  menubar item on the right will provide a comprehensive table of potential
+  "cousins" relationships, counting v1 generations up and v2 generations down.
+
+- Update of the "places by surname" command (available on the welcome page).
+  List of persons related to a given place are now explicitely provided as
+  well as the possibility to construct a multi-relation tree between these
+  persons. A link back into the places dictionnary is also provided.
+
+- Addition of a "carrousel" mechanism allowing archival of several pictures
+  associated with a person beyond the existing portrait.
+
+- New command m=DOC (similar to m=SRC) allowing taking into account .pdf and
+  .html files.
+  <a href="%sm=DOC&s=file.pdf">Pdf file</a> will display the content of the 
+  pdf file.
+  Contrary to image files, pdf and html files cannot be included in a
+  <img src="..."> command.
+  Arguments to m=SRC and m=DOC can now be located into sub-folders of the
+  current images/basename and src/basename folders.
+
+- In templates, images (portraits) are displayed by default, and spouses
+  are not. Most of the templates provide buttons to change this setting as
+  well as other parameters.
+  When no button is available, manually adding im=off and/or sp=on in the
+  URL should work.
+  
+- In ancestor trees, a new option allows to choose the order of display
+  of father and mother. Default is father to the left.
+
+- A new visitor_access=no parameter in the .gwf file prevents access to the
+  base to anyone but friends ans wizards.
+
+- The lexicon supports an alias mechanism allowing for several names fir
+  the same set of translations.
+
+- Access to the server without supplying a base name opens index.txt which
+  allows capture of the base name. A list of available bases is provided.
+  Is only one base exists, its welcome page is directly opened.
+
+- Homonyms lists are expanded, including parents and spouses names to
+  facilitate identification.
+
+- In the authentification files for wizards and friends, username can be
+  expanded into username|userkey where userkey is first_name.ocurence.surname
+  of the user in this base.
+
+
 GeneWeb version 7.0.0
---------------------
+---------------------
 
 This changelog note tries to reconstruct changes in GeneWeb since version 6.08.
 It may miss some details which might be added later if relevants.
