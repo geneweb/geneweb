@@ -34,9 +34,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: setup-ocaml
-        uses: avsm/setup-ocaml@v1
+        uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-version: ${{ matrix.ocaml-version }}
+          ocaml-compiler: ${{ matrix.ocaml-version }}
 
       - name: setup
         run: |
