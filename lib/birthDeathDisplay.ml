@@ -10,6 +10,24 @@ let month_txt conf d cal =
   let d = DateDisplay.string_of_date conf (Dgreg ({ d with day = 0 }, cal)) in
   (d : Adef.safe_string :> string) |> Utf8.capitalize_fst |> Adef.safe
 
+let list_aux_1 conf d cal last_month_txt was_future =
+  let month_txt = month_txt conf d cal in
+  let future = Date.compare_dmy d conf.today = 1 in
+  if (not future) && was_future then (
+    Output.print_sstring conf "</li></ul></li></ul><p><ul><li>";
+    Output.print_string conf month_txt;
+    Output.print_sstring conf "<ul>")
+  else if month_txt <> last_month_txt then (
+    if (last_month_txt :> string) <> "" then
+      Output.print_sstring conf "</ul></li>";
+    Output.print_sstring conf "<li>";
+    Output.print_string conf month_txt;
+    Output.print_sstring conf "<ul>");
+  (month_txt, future)
+
+let list_aux_2 conf =
+  Output.print_sstring conf "</ul></li>"
+
 let print_birth conf base =
   let list, len =
     select_person conf base (fun p -> Date.od_of_cdate (get_birth p)) false
@@ -23,18 +41,9 @@ let print_birth conf base =
   ignore
   @@ List.fold_left
        (fun (last_month_txt, was_future) (p, d, cal) ->
-         let month_txt = month_txt conf d cal in
-         let future = Date.compare_dmy d conf.today = 1 in
-         if (not future) && was_future then (
-           Output.print_sstring conf "</li></ul></li></ul><p><ul><li>";
-           Output.print_string conf month_txt;
-           Output.print_sstring conf "<ul>")
-         else if month_txt <> last_month_txt then (
-           if (last_month_txt :> string) <> "" then
-             Output.print_sstring conf "</ul></li>";
-           Output.print_sstring conf "<li>";
-           Output.print_string conf month_txt;
-           Output.print_sstring conf "<ul>");
+         let (month_txt, future) =
+           list_aux_1 conf d cal last_month_txt was_future
+         in
          Output.print_sstring conf "<li><b>";
          Output.print_string conf (referenced_person_text conf base p);
          Output.print_sstring conf "</b>, ";
@@ -54,7 +63,7 @@ let print_birth conf base =
          (month_txt, future))
        (Adef.safe "", false)
        list;
-  Output.print_sstring conf "</ul></li></ul>";
+  list_aux_2 conf;
   Hutil.trailer conf
 
 let print_death conf base =
@@ -270,18 +279,9 @@ let print_marr_or_eng conf base title list =
   ignore
   @@ List.fold_left
        (fun (last_month_txt, was_future) (fam, d, cal) ->
-         let month_txt = month_txt conf d cal in
-         let future = Date.compare_dmy d conf.today > 0 in
-         if (not future) && was_future then (
-           Output.print_sstring conf "</ul></li></ul><ul><li>";
-           Output.print_string conf month_txt;
-           Output.print_sstring conf "<ul>")
-         else if month_txt <> last_month_txt then (
-           if (last_month_txt :> string) = "" then
-             Output.print_sstring conf "</ul></li>";
-           Output.print_sstring conf "<li>";
-           Output.print_string conf month_txt;
-           Output.print_sstring conf "<ul>");
+         let (month_txt, future) =
+           list_aux_1 conf d cal last_month_txt was_future
+         in
          Output.print_sstring conf "<li><b>";
          Output.print_string conf
            (referenced_person_text conf base (pget conf base (get_father fam)));
@@ -315,7 +315,7 @@ let print_marr_or_eng conf base title list =
          (month_txt, future))
        (Adef.safe "", false)
        list;
-  Output.print_sstring conf "</ul></li></ul>";
+  list_aux_2 conf;
   Hutil.trailer conf
 
 let print_marriage conf base =
