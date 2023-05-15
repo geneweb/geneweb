@@ -6,25 +6,14 @@
   (libraries
 	geneweb.gwdb-legacy
 	geneweb.def
-;;	geneweb.dsk_format
-	syslog
   )
   (modules
 	gwdb_driver
-;;	gwdb_gnwb25
-;;	gwdb_gnwb26
-;;	gw_formats
-  	;;dsk_format
-	;;format
-	;;partition
 	version
 	translate
 	compat
   )
   (private_modules
-;;	gw_formats
-;;	gwdb_gnwb25
-;;	gwdb_gnwb26
 	translate
   )
 )
