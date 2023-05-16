@@ -172,6 +172,12 @@ let has_access_to_portrait conf base p =
      || not (Mutil.contains (sou base img) "/private/"))
 (* TODO: privacy settings should be in db not in url *)
 
+(** [has_access_to_images conf base p] is true iif ???. *)
+let has_access_to_images conf base p =
+  (not conf.no_image)
+  && Util.authorized_age conf base p
+  && Util.is_hide_names conf p
+
 let get_portrait_path conf base p =
   if has_access_to_portrait conf base p then full_portrait_path conf base p
   else None

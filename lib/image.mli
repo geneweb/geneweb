@@ -39,6 +39,8 @@ val get_portrait_path : config -> base -> person -> [> `Path of string ] option
     - [Some path] with [path] the full path with extension of [p]'s portrait.
 *)
 
+val has_access_to_images : config -> base -> person -> bool
+
 val get_portrait_with_size :
   config ->
   base ->
