@@ -168,28 +168,20 @@ let places_to_string inverse pl =
 exception List_too_long
 
 let get_opt conf =
-  let add_birth = p_getenv conf.env "bi" = Some "on" in
-  let add_baptism = p_getenv conf.env "ba" = Some "on" in
-  let add_death = p_getenv conf.env "de" = Some "on" in
-  let add_burial = p_getenv conf.env "bu" = Some "on" in
-  let add_marriage = p_getenv conf.env "ma" = Some "on" in
-  let f_sort = p_getenv conf.env "f_sort" = Some "on" in
-  let up = p_getenv conf.env "up" = Some "on" in
-  let a_sort = p_getenv conf.env "a_sort" = Some "on" in
-  let lower = p_getenv conf.env "lower" = Some "on" in
-  let word = p_getenv conf.env "word" = Some "on" in
-  let any = p_getenv conf.env "any" = Some "on" in
-  (if add_birth then "&bi=on" else "")
-  ^ (if add_baptism then "&ba=on" else "")
-  ^ (if add_death then "&de=on" else "")
-  ^ (if add_burial then "&bu=on" else "")
-  ^ (if add_marriage then "&ma=on" else "")
-  ^ (if f_sort then "&f_sort=on" else "")
-  ^ (if up then "&up=on" else "")
-  ^ (if a_sort then "&a_sort=on" else "")
-  ^ (if lower then "&lower=on" else "")
-  ^ (if word then "&word=on" else "")
-  ^ if any then "&any=on" else ""
+  (if p_getenv conf.env "bi" = Some "on" then "&bi=on" else "")
+  ^ (if p_getenv conf.env "ba" = Some "on" then "&ba=on" else "")
+  ^ (if p_getenv conf.env "de" = Some "on" then "&de=on" else "")
+  ^ (if p_getenv conf.env "bu" = Some "on" then "&bu=on" else "")
+  ^ (if p_getenv conf.env "ma" = Some "on" then "&ma=on" else "")
+  ^ (if p_getenv conf.env "f_sort" = Some "on" then "&f_sort=on" else "")
+  ^ (if p_getenv conf.env "up" = Some "on" then "&up=on" else "")
+  ^ (if p_getenv conf.env "a_sort" = Some "on" then "&a_sort=on" else "")
+  ^ (if p_getenv conf.env "lower" = Some "on" then "&lower=on" else "")
+  ^ (if p_getenv conf.env "word" = Some "on" then "&word=on" else "")
+  ^ (if p_getenv conf.env "any" = Some "on" then "&any=on" else "")
+  ^
+  let k = match p_getenv conf.env "keep" with Some k -> k | None -> "1" in
+  if k <> "1" then "&keep=" ^ k else ""
 
 let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
     ~add_marriage (dummy_key : 'a) (dummy_value : 'c)
@@ -370,7 +362,7 @@ let strip_pl keep pll =
     loop [] 1 pll
 
 let print_html_places_surnames_short conf _base _link_to_ind
-    (array : ((string list * string) * (string * iper list) list) array) =
+    (arry : ((string list * string) * (string * iper list) list) array) =
   (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let long = p_getenv conf.env "display" = Some "long" in
   let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
@@ -378,7 +370,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
   let up = p_getenv conf.env "up" = Some "on" in
   let opt = get_opt conf in
-  let l = Array.to_list array in
+  let l = Array.to_list arry in
   let l = List.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) l in
   (* build new list of (places, ipl) *)
   (* accumulate snl according to keep *)
@@ -424,9 +416,9 @@ let print_html_places_surnames_short conf _base _link_to_ind
   let new_l =
     let rec loop prev acc_snl acc_l new_l =
       match (new_l, prev) with
-      | (pl, snl) :: l, prev when pl = prev ->
+      | (pl, snl) :: l, prev when prev = strip_pl keep pl ->
           loop pl ((pl, snl) :: acc_snl) acc_l l
-      | (pl, snl) :: l, prev when pl <> prev ->
+      | (pl, snl) :: l, prev when prev <> strip_pl keep pl ->
           loop pl
             [ (pl, snl) ]
             (if acc_snl <> [] then acc_snl :: acc_l else acc_l)
@@ -490,14 +482,14 @@ let print_html_places_surnames_short conf _base _link_to_ind
   Output.print_sstring conf "<p>"
 
 let print_html_places_surnames_long conf base link_to_ind
-    (array : ((string list * string) * (string * iper list) list) array) =
+    (arry : ((string list * string) * (string * iper list) list) array) =
   (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let k = match p_getenv conf.env "k" with Some s -> s | _ -> "" in
   let a_sort = p_getenv conf.env "a_sort" = Some "on" in
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
   let up = p_getenv conf.env "up" = Some "on" in
   let opt = get_opt conf in
-  let list = Array.to_list array in
+  let list = Array.to_list arry in
   let list = List.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) list in
   let print_sn (sn, ips) (pl, _sub) =
     (* Warn : do same sort_uniq in short mode *)
@@ -630,16 +622,12 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
     else ""
   in
   let href =
-    if short then ""
-    else
-      Printf.sprintf "href=\"%sm=PPS%s%s%s\" title=\"%s\""
-        (commd conf :> string)
-        opt
-        (if long then "&display=short" else "&display=long")
-        (match p_getenv conf.env "k" with
-        | Some ini -> "&k=" ^ ini
-        | None -> "")
-        t
+    Printf.sprintf "href=\"%sm=PPS%s%s%s\" title=\"%s\""
+      (commd conf :> string)
+      opt
+      (if long then "&display=short" else "&display=long")
+      (match p_getenv conf.env "k" with Some ini -> "&k=" ^ ini | None -> "")
+      t
   in
   Output.printf conf "<p>\n<a %s>%s</a>" href
     (Utf8.capitalize
