@@ -5059,13 +5059,12 @@ let print_foreach conf base print_ast eval_expr =
         (get_surnames_aliases p)
   in
   (* carrousel *)
-  let print_foreach_img_in_keydir env al ((p, p_auth) as ep) old =
+  let print_foreach_img_in_keydir env al ((p, _p_auth) as ep) old =
     let list =
       if old then Image.get_keydir_old_files conf base p
       else Image.get_keydir_files conf base p
     in
-    if (not p_auth) && is_hide_names conf p then ()
-    else
+    if Image.has_access_to_images conf base p then
       let rec loop first cnt = function
         | a :: l ->
             let env = ("keydir_img", Vstring a) :: env in
@@ -5077,6 +5076,7 @@ let print_foreach conf base print_ast eval_expr =
         | [] -> ()
       in
       loop true 1 list
+    else ()
   in
   let print_simple_foreach env el al ini_ep ep efam loc = function
     | "alias" -> print_foreach_alias env al ep
