@@ -18236,8 +18236,8 @@ en: all the places
 fr: tous les lieux
 
     v7 list too long
-en: list too long
-fr: liste trop longue
+en: list too long (try increasing filter value)
+fr: liste trop longue (augmentez la valeur du filtre)
 
     path/paths
 en: path/paths
