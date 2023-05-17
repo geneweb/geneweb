@@ -188,11 +188,14 @@ let sort_events get_name get_date events =
         | Some _d -> (e :: dated, undated))
       ([], []) events
   in
+  (* we need this to keep the input with same date ordered
+     by their creation order *)
+  let dated, undated = List.rev dated, List.rev undated in
   let cmp = compare get_name get_date in
   (* sort events with dates separately to make sure
      that dates are in correct order *)
-  let l1 = List.sort cmp dated in
-  let l2 = List.sort cmp undated in
+  let l1 = List.stable_sort cmp dated in
+  let l2 = List.stable_sort cmp undated in
   List.merge cmp l1 l2
 
 let events conf base p =
