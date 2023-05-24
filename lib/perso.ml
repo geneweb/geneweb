@@ -3409,6 +3409,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_qualifiers" ->
       if (not p_auth) && is_hide_names conf p then false
       else get_qualifiers p <> []
+  (* TODO what should this be *)
   | "has_relations" ->
       if p_auth && conf.use_restrict then
         let related =
@@ -4500,42 +4501,42 @@ let print_foreach conf base print_ast eval_expr =
       | _ -> ()
   in
   let print_foreach_event_witness_relation env al ((p, p_auth) as ep) =
-    let related = List.sort_uniq compare (get_related p) in
-    let events_witnesses =
-      let list = ref [] in
-      (let rec make_list = function
-         | ic :: icl ->
-             let c = pget conf base ic in
-             List.iter
-               (fun event_item ->
-                 let mem, wk, wnote =
-                   Util.array_mem_witn conf base (get_iper p)
-                     (Event.get_witnesses event_item)
-                     (Event.get_witness_notes event_item)
-                 in
-                 if mem then
-                   match Event.get_name event_item with
-                   | Event.Fevent _ ->
-                       if get_sex c = Male then
-                         list := (c, wk, wnote, event_item) :: !list
-                   | _ -> list := (c, wk, wnote, event_item) :: !list)
-               (Event.events conf base c);
-             make_list icl
-         | [] -> ()
-       in
-       make_list related);
-      !list
-    in
-    (* On tri les témoins dans le même ordre que les évènements. *)
-    let events_witnesses =
-      Event.sort_events
-        (fun (_, _, _, ei) -> Event.get_name ei)
-        (fun (_, _, _, ei) -> Event.get_date ei)
-        events_witnesses
-    in
-    List.iter
-      (fun (p, wk, wnote, evt) ->
-        if p_auth then
+    if p_auth then
+      let related = List.sort_uniq compare (get_related p) in
+      let events_witnesses =
+        let list = ref [] in
+        (let rec make_list = function
+           | ic :: icl ->
+               let c = pget conf base ic in
+               List.iter
+                 (fun event_item ->
+                   let mem, wk, wnote =
+                     Util.array_mem_witn conf base (get_iper p)
+                       (Event.get_witnesses event_item)
+                       (Event.get_witness_notes event_item)
+                   in
+                   if mem then
+                     match Event.get_name event_item with
+                     | Event.Fevent _ ->
+                         if get_sex c = Male then
+                           list := (c, wk, wnote, event_item) :: !list
+                     | _ -> list := (c, wk, wnote, event_item) :: !list)
+                 (Event.events conf base c);
+               make_list icl
+           | [] -> ()
+         in
+         make_list related);
+        !list
+      in
+      (* On tri les témoins dans le même ordre que les évènements. *)
+      let events_witnesses =
+        Event.sort_events
+          (fun (_, _, _, ei) -> Event.get_name ei)
+          (fun (_, _, _, ei) -> Event.get_date ei)
+          events_witnesses
+      in
+      List.iter
+        (fun (p, wk, wnote, evt) ->
           let wnote = Util.escape_html wnote in
           let env = ("event_witness_relation", Vevent (p, evt)) :: env in
           let env =
@@ -4546,7 +4547,7 @@ let print_foreach conf base print_ast eval_expr =
             :: env
           in
           List.iter (print_ast env ep) al)
-      events_witnesses
+        events_witnesses
   in
   let print_foreach_witness env al ep witness_kind = function
     | Vfam (_, fam, _, true) ->
@@ -4844,23 +4845,21 @@ let print_foreach conf base print_ast eval_expr =
           [] l
       in
       let l =
+        (* sort by using baptism or birth date *)
+        let get_date_opt c =
+          match Date.od_of_cdate (get_baptism c) with
+          | None -> Date.od_of_cdate (get_birth c)
+          | x -> x
+        in
         (* TODO don't query db in sort *)
         List.sort
           (fun (c1, _) (c2, _) ->
-            let d1 =
-              match Date.od_of_cdate (get_baptism c1) with
-              | None -> Date.od_of_cdate (get_birth c1)
-              | x -> x
-            in
-            let d2 =
-              match Date.od_of_cdate (get_baptism c2) with
-              | None -> Date.od_of_cdate (get_birth c2)
-              | x -> x
-            in
+            let d1 = get_date_opt c1 in
+            let d2 = get_date_opt c2 in
             match (d1, d2) with
             | Some d1, Some d2 -> Date.compare_date d1 d2
             | _ -> -1)
-          (List.rev l)
+          (List.rev l (* TODO why rev? *))
       in
       List.iter
         (fun (c, r) ->
@@ -4942,7 +4941,7 @@ let print_foreach conf base print_ast eval_expr =
           match get_burial p with
           | Cremated _cdate -> "cremation"
           | Buried _cdate -> "burial"
-          | UnknownBurial -> "burial" (* TODOWHY what should we print here *)
+          | UnknownBurial -> "burial" (* TODO what should we print here *)
         in
         insert
           (transl_nth conf buri_crem_lex 0)
