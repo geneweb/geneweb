@@ -3410,17 +3410,17 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       if (not p_auth) && is_hide_names conf p then false
       else get_qualifiers p <> []
   (* TODO what should this be *)
-  | "has_relations" ->
-      if p_auth && conf.use_restrict then
-        let related =
-          List.fold_left
-            (fun l ip ->
-              let rp = pget conf base ip in
-              if is_hidden rp then l else ip :: l)
-            [] (get_related p)
-        in
-        get_rparents p <> [] || related <> []
-      else p_auth && (get_rparents p <> [] || get_related p <> [])
+  | "has_relations" -> p_auth && get_rparents p <> []
+  | "has_related" ->
+      p_auth
+      &&
+      if conf.use_restrict then
+        List.exists
+          (fun ip ->
+            let rp = pget conf base ip in
+            not (is_hidden rp))
+          (get_related p)
+      else get_related p <> []
   | "has_siblings" -> (
       match get_parents p with
       | Some ifam -> Array.length (get_children (foi base ifam)) > 1

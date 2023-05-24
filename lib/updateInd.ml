@@ -209,7 +209,8 @@ and eval_simple_var conf base env p = function
       bool_val (loop p.pevents)
   | [ "has_first_names_aliases" ] -> bool_val (p.first_names_aliases <> [])
   | [ "has_qualifiers" ] -> bool_val (p.qualifiers <> [])
-  | [ "has_relations" ] -> bool_val (p.rparents <> [])
+  | [ "has_relations" ] ->
+      (* TODO not the same has in perso.ml? *) bool_val (p.rparents <> [])
   | [ "has_surnames_aliases" ] -> bool_val (p.surnames_aliases <> [])
   | [ "has_titles" ] -> bool_val (p.titles <> [])
   | [ "image" ] -> safe_val (Util.escape_html p.image :> Adef.safe_string)
