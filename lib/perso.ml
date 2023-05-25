@@ -3832,42 +3832,44 @@ let print_foreach conf base print_ast eval_expr =
       | _ -> ()
   in
   let print_foreach_event_witness_relation env al ((p, p_auth) as ep) =
-    let related = List.sort_uniq compare (get_related p) in
-    let events_witnesses =
-      let list = ref [] in
-      (let rec make_list = function
-         | ic :: icl ->
-             let c = pget conf base ic in
-             List.iter
-               (fun event_item ->
-                 let mem, wk, wnote =
-                   Util.array_mem_witn conf base (get_iper p)
-                     (Event.get_witnesses event_item)
-                     (Event.get_witness_notes event_item)
-                 in
-                 if mem then
-                   match Event.get_name event_item with
-                   | Event.Fevent _ ->
-                       if get_sex c = Male then
-                         list := (c, wk, wnote, event_item) :: !list
-                   | _ -> list := (c, wk, wnote, event_item) :: !list)
-               (Event.events conf base c);
-             make_list icl
-         | [] -> ()
-       in
-       make_list related);
-      !list
-    in
-    (* On tri les témoins dans le même ordre que les évènements. *)
-    let events_witnesses =
-      Event.sort_events
-        (fun (_, _, _, ei) -> Event.get_name ei)
-        (fun (_, _, _, ei) -> Event.get_date ei)
-        events_witnesses
-    in
-    List.iter
-      (fun (p, wk, wnote, evt) ->
-        if p_auth then
+    if p_auth then
+      let related = List.sort_uniq compare (get_related p) in
+      let events_witnesses =
+        let list = ref [] in
+        (let rec make_list = function
+           | ic :: icl ->
+               let c = pget conf base ic in
+               List.iter
+                 (fun event_item ->
+                   match
+                     Util.array_mem_witn conf base (get_iper p)
+                       (Event.get_witnesses event_item)
+                       (Event.get_witness_notes event_item)
+                   with
+                   | None -> ()
+                   | Some (wk, wnote) -> (
+                       match Event.get_name event_item with
+                       | Event.Fevent _ ->
+                           if get_sex c = Male then
+                             list := (c, wk, wnote, event_item) :: !list
+                       | _ -> list := (c, wk, wnote, event_item) :: !list))
+                 (Event.events conf base c);
+               make_list icl
+           | [] -> ()
+         in
+         make_list related);
+        !list
+      in
+      (* On tri les témoins dans le même ordre que les évènements. *)
+      let events_witnesses =
+        Event.sort_events
+          (fun (_, _, _, ei) -> Event.get_name ei)
+          (fun (_, _, _, ei) -> Event.get_date ei)
+          events_witnesses
+      in
+      List.iter
+        (fun (p, wk, wnote, evt) ->
+          let wk = string_of_witness_kind conf (get_sex p) wk in
           let wnote = Util.escape_html wnote in
           let env = ("event_witness_relation", Vevent (p, evt)) :: env in
           let env =
@@ -3878,7 +3880,7 @@ let print_foreach conf base print_ast eval_expr =
             :: env
           in
           List.iter (print_ast env ep) al)
-      events_witnesses
+        events_witnesses
   in
 
   let print_foreach_witness env al ep witness_kind = function
