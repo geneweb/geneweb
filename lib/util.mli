@@ -476,7 +476,7 @@ val array_mem_witn :
   iper ->
   (iper * Def.witness_kind) array ->
   istr array ->
-  bool * Adef.safe_string * string
+  (Def.witness_kind * string) option
 (** [array_mem_witn conf base ip array] checks if [ip] is in [array]
     and returns corresponding [string_of_witness_kind] and witness note if so.
 *)
