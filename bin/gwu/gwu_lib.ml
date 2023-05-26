@@ -517,17 +517,16 @@ let print_multiline opts tag s =
   let lines = String.split_on_char '\n' s in
   List.iter (Printf.ksprintf (oc opts) "%s %s\n" tag) lines
 
+let is_isolated p =
+  Option.is_none (get_parents p) && Array.length (get_family p) = 0
+
 let print_witnesses opts base gen ~use_per_sel witnesses =
   let print_witness p =
     Printf.ksprintf (oc opts) "%s %s%s"
       (correct_string base (get_surname p))
       (correct_string base (get_first_name p))
       (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
-    if
-      Array.length (get_family p) = 0
-      && get_parents p = None
-      && not (Gwdb.Marker.get gen.mark (get_iper p))
-    then (
+    if is_isolated p && not (Gwdb.Marker.get gen.mark (get_iper p)) then (
       Gwdb.Marker.set gen.mark (get_iper p) true;
       if has_infos opts base p then print_infos opts base false "" "" p
       else Printf.ksprintf (oc opts) " 0";
