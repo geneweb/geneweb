@@ -331,16 +331,20 @@ let print_foreach conf print_ast _eval_expr =
       | _ -> []
     in
     let max = List.length l in
-    List.iteri
-      (fun i (k, s) ->
-        let env =
-          ("cnt", Vint i) :: ("max", Vint max) :: ("entry_value", Vstring s)
-          :: ("entry_value_rev", Vstring (unfold_place_long false s))
-          :: ("entry_key", Vstring (string_of_istr k))
-          :: env
-        in
-        List.iter (print_ast env xx) al)
-      l
+    let rec loop i l prev =
+      match l with
+      | [] -> ()
+      | (k, s) :: l -> (
+          let env =
+            ("cnt", Vint i) :: ("max", Vint max) :: ("entry_value", Vstring s)
+            :: ("entry_value_rev", Vstring (unfold_place_long false s))
+            :: ("entry_key", Vstring (string_of_istr k))
+            :: ("first", Vbool (Place.without_suburb s <> prev))
+            :: env
+          in
+          List.iter (print_ast env xx) al;
+          loop (i + 1) l (Place.without_suburb s))
+    in loop 0 l ""
   and print_foreach_initial env xx al =
     let l = match get_env "list" env with Vlist_data l -> l | _ -> [] in
     let ini_l = build_list_short conf l in
