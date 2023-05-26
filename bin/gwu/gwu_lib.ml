@@ -458,12 +458,15 @@ let print_parent opts base gen p =
     else if first_name <> "?" && surname <> "?" then
       Printf.ksprintf (oc opts) " 0"
 
+let print_sex oc opts p =
+  match get_sex p with
+  | Male -> Printf.ksprintf (oc opts) " #m"
+  | Female -> Printf.ksprintf (oc opts) " #f"
+  | Neuter -> ()
+
 let print_child opts base fam_surname csrc cbp p =
   Printf.ksprintf (oc opts) "-";
-  (match get_sex p with
-  | Male -> Printf.ksprintf (oc opts) " h"
-  | Female -> Printf.ksprintf (oc opts) " f"
-  | _ -> ());
+  print_sex oc opts p;
   Printf.ksprintf (oc opts) " %s"
     (s_correct_string (sou base (get_first_name p)));
   if p_first_name base p = "?" && p_surname base p = "?" then ()
@@ -542,10 +545,7 @@ let print_witnesses opts base gen ~use_per_sel witnesses =
       if (not use_per_sel) || gen.per_sel ip then (
         let p = poi base ip in
         Printf.ksprintf (oc opts) "wit";
-        (match get_sex p with
-        | Male -> Printf.ksprintf (oc opts) " m"
-        | Female -> Printf.ksprintf (oc opts) " f"
-        | _ -> ());
+        print_sex oc opts p;
         Printf.ksprintf (oc opts) ": ";
         let sk = string_of_witness_kind wk in
         (match sk with
@@ -1184,10 +1184,7 @@ let print_relations_for_person opts base gen def_p is_definition p =
       def_p := p :: !def_p;
       if has_infos opts base p then print_infos opts base false "" "" p
       else Printf.ksprintf (oc opts) " 0";
-      match get_sex p with
-      | Male -> Printf.ksprintf (oc opts) " #h"
-      | Female -> Printf.ksprintf (oc opts) " #f"
-      | Neuter -> ());
+      print_sex oc opts p);
     Printf.ksprintf (oc opts) "\n";
     Printf.ksprintf (oc opts) "beg\n";
     List.iter (print_relation_for_person opts base gen def_p) (get_rparents p);
