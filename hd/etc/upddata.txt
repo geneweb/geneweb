@@ -235,6 +235,14 @@
                     </div>
                     <div class="input-group-append">
                       <button type="submit" class="btn btn-primary" title="[*modify]">OK</button>
+                      %if;(evar.data="place" and suburb="")
+                        <div class="custom-control custom-checkbox ml-2">
+                        <input type="checkbox" class="custom-control-input ml-3" name="all"
+                          id="all" value="on" checked>
+                        <label class="custom-control-label" title="[*apply to same places with suburb (wip)]"
+                          for="all">[*all]</label>
+                        </div>
+                      %end;
                     </div>
                   </div>
                 </form>
