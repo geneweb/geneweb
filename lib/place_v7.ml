@@ -167,7 +167,7 @@ let places_to_string inverse pl =
 
 exception List_too_long
 
-let get_opt conf =
+let get_opt conf bump =
   (if p_getenv conf.env "bi" = Some "on" then "&bi=on" else "")
   ^ (if p_getenv conf.env "ba" = Some "on" then "&ba=on" else "")
   ^ (if p_getenv conf.env "de" = Some "on" then "&de=on" else "")
@@ -180,8 +180,9 @@ let get_opt conf =
   ^ (if p_getenv conf.env "word" = Some "on" then "&word=on" else "")
   ^ (if p_getenv conf.env "any" = Some "on" then "&any=on" else "")
   ^
-  let k = match p_getenv conf.env "keep" with Some k -> k | None -> "1" in
-  if k <> "1" then "&keep=" ^ k else ""
+  let k = match p_getint conf.env "keep" with Some k -> k | None -> 1 in
+  let k = if bump then k + 1 else k in
+  if k <> 1 then "&keep=" ^ (string_of_int k) else ""
 
 let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
     ~add_marriage (dummy_key : 'a) (dummy_value : 'c)
@@ -369,9 +370,10 @@ let print_html_places_surnames_short conf _base _link_to_ind
   let a_sort = p_getenv conf.env "a_sort" = Some "on" in
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
   let up = p_getenv conf.env "up" = Some "on" in
-  let opt = get_opt conf in
+  let opt = get_opt conf (p_getenv conf.env "bump" = Some "on") in
   let l = Array.to_list arry in
   let l = List.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) l in
+  let l = List.rev l in
   (* build new list of (places, ipl) *)
   (* accumulate snl according to keep *)
   let new_l =
@@ -433,40 +435,36 @@ let print_html_places_surnames_short conf _base _link_to_ind
     let rec loop0 l =
       match l with
       | [] -> ()
-      | (pl, ipl) :: l when len < max_rlm_nbr conf ->
+      | (pl, ipl) :: l ->
           let str = places_to_string true pl in
-          Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
+          Output.printf conf "<a href=\"%sm=PPS%s&display=%s%s&k=%s\">%s</a>\n"
             (commd conf :> string)
             opt
             (if long then "long" else "short")
+            ("&bump=on")
             str str;
-          Output.printf conf " (<a href=\"%sm=L%s&k=%s&nb=%d"
-            (commd conf :> string)
-            opt str len;
-          let rec loop1 i = function
-            | [] -> ()
-            | (pl, ipl) :: l ->
-                let rec loop2 i = function
-                  | [] -> loop1 i l
-                  | ip :: ipl ->
-                      Output.printf conf "&i%d=%s%s" i (Gwdb.string_of_iper ip)
-                        (Printf.sprintf "&p%d=%s" i (places_to_string false pl));
-                      loop2 (i + 1) ipl
-                in
-                loop2 i ipl
-          in
-          loop1 0 ((pl, ipl) :: l);
-          Output.printf conf "\" title=\"%s\">%d</a>)"
-            (Utf8.capitalize (transl conf "summary book ascendants"))
-            len
-      | (pl, _ipl) :: l ->
-          let str = places_to_string true pl in
-          Output.printf conf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
-            (commd conf :> string)
-            opt
-            (if long then "long" else "short")
-            str str;
-          Output.printf conf " (%d)" len;
+          if len < max_rlm_nbr conf then (
+            Output.printf conf " (<a href=\"%sm=L%s&k=%s&nb=%d"
+              (commd conf :> string)
+              opt str len;
+            let rec loop1 i = function
+              | [] -> ()
+              | (pl, ipl) :: l ->
+                  let rec loop2 i = function
+                    | [] -> loop1 i l
+                    | ip :: ipl ->
+                        Output.printf conf "&i%d=%s%s" i (Gwdb.string_of_iper ip)
+                          (Printf.sprintf "&p%d=%s" i (places_to_string false pl));
+                        loop2 (i + 1) ipl
+                  in
+                  loop2 i ipl
+            in
+            loop1 0 ((pl, ipl) :: l);
+            Output.printf conf "\" title=\"%s\">%d</a>)"
+              (Utf8.capitalize (transl conf "summary book ascendants"))
+              len)
+          else
+            Output.printf conf " (%d)" len;
           loop0 l
     in
     loop0 l
@@ -488,9 +486,10 @@ let print_html_places_surnames_long conf base link_to_ind
   let a_sort = p_getenv conf.env "a_sort" = Some "on" in
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
   let up = p_getenv conf.env "up" = Some "on" in
-  let opt = get_opt conf in
-  let list = Array.to_list arry in
-  let list = List.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) list in
+  let opt = get_opt conf  (p_getenv conf.env "bump" = Some "on") in
+  let l = Array.to_list arry in
+  let l = List.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) l in
+  let l = List.rev l in
   let print_sn (sn, ips) (pl, _sub) =
     (* Warn : do same sort_uniq in short mode *)
     let ips = List.sort_uniq compare ips in
@@ -535,7 +534,7 @@ let print_html_places_surnames_long conf base link_to_ind
     if sub <> "" then Output.print_sstring conf "</ul></li>\n"
   in
   let rec loop prev = function
-    | ((pl, sub), snl) :: list ->
+    | ((pl, sub), snl) :: l ->
         let rec loop1 prev (pl, sub) =
           match (prev, pl) with
           | [], l2 ->
@@ -555,11 +554,11 @@ let print_html_places_surnames_long conf base link_to_ind
         in
         loop1 prev (pl, sub);
         print_sn_list (pl, sub) snl;
-        loop pl list
+        loop pl l
     | [] -> List.iter (fun _ -> Output.print_sstring conf "</ul></li>\n") prev
   in
   Output.print_sstring conf "<ul>\n";
-  loop [] list;
+  loop [] l;
   Output.print_sstring conf "</ul>\n"
 
 let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
@@ -574,11 +573,11 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
       (fun prev p ->
         (* add one ip to a list flagged by surname *)
         let value = (get_surname p, get_iper p) in
-        match prev with Some list -> value :: list | None -> [ value ])
+        match prev with Some l -> value :: l | None -> [ value ])
       (fun v ->
         let v = List.sort (fun (a, _) (b, _) -> compare a b) v in
-        let rec loop acc list =
-          match (list, acc) with
+        let rec loop acc l =
+          match (l, acc) with
           | [], _ -> acc
           | (sn, iper) :: tl_list, (sn', iper_list) :: tl_acc
             when sou base sn = sn' ->
@@ -595,7 +594,7 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
       (Utf8.capitalize (transl conf "place"))
       (Utf8.capitalize (transl_nth conf "surname/surnames" 0))
   in
-  let opt = get_opt conf in
+  let opt = get_opt conf (p_getenv conf.env "bump" = Some "on") in
   let long = p_getenv conf.env "display" = Some "long" in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -622,10 +621,10 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
     else ""
   in
   let href =
-    Printf.sprintf "href=\"%sm=PPS%s%s%s\" title=\"%s\""
+    Printf.sprintf "href=\"%sm=PPS%s&display=%s%s\" title=\"%s\""
       (commd conf :> string)
       opt
-      (if long then "&display=short" else "&display=long")
+      (if long then "short" else "long")
       (match p_getenv conf.env "k" with Some ini -> "&k=" ^ ini | None -> "")
       t
   in
