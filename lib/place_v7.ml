@@ -167,7 +167,7 @@ let places_to_string inverse pl =
 
 exception List_too_long
 
-let get_opt conf bump =
+let get_opt conf =
   (if p_getenv conf.env "bi" = Some "on" then "&bi=on" else "")
   ^ (if p_getenv conf.env "ba" = Some "on" then "&ba=on" else "")
   ^ (if p_getenv conf.env "de" = Some "on" then "&de=on" else "")
@@ -179,10 +179,6 @@ let get_opt conf bump =
   ^ (if p_getenv conf.env "lower" = Some "on" then "&lower=on" else "")
   ^ (if p_getenv conf.env "word" = Some "on" then "&word=on" else "")
   ^ (if p_getenv conf.env "any" = Some "on" then "&any=on" else "")
-  ^
-  let k = match p_getint conf.env "keep" with Some k -> k | None -> 1 in
-  let k = if bump then k + 1 else k in
-  if k <> 1 then "&keep=" ^ (string_of_int k) else ""
 
 let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
     ~add_marriage (dummy_key : 'a) (dummy_value : 'c)
@@ -324,11 +320,12 @@ let print_ip_list conf places opt link_to_ind ipl =
     Output.print_sstring conf (head ^ body ^ tail)
 
 (** print a call to m=PPS with a new k value *)
-let pps_call conf opt long k places =
-  Printf.sprintf "<a href=\"%sm=PPS%s&display=%s&k=%s\">%s</a>\n"
+let pps_call conf opt long keep k places =
+  Printf.sprintf "<a href=\"%sm=PPS%s&display=%s&keep=%s&k=%s\">%s</a>\n"
     (commd conf :> string)
     opt
     (if long then "long" else "short")
+    (string_of_int keep)
     k
     (List.fold_left
        (fun acc p -> acc ^ (if acc <> "" then ", " else "") ^ p)
@@ -370,7 +367,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
   let a_sort = p_getenv conf.env "a_sort" = Some "on" in
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
   let up = p_getenv conf.env "up" = Some "on" in
-  let opt = get_opt conf (p_getenv conf.env "bump" = Some "on") in
+  let opt = get_opt conf in
   let l = Array.to_list arry in
   let l = List.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) l in
   let l = List.rev l in
@@ -398,11 +395,11 @@ let print_html_places_surnames_short conf _base _link_to_ind
   let new_l =
     if a_sort then
       List.sort
-        (fun (pl1, _) (pl2, _) -> sort_place_utf8 (pl2, "") (pl1, ""))
+        (fun (pl1, _) (pl2, _) -> sort_place_utf8 (pl1, "") (pl2, ""))
         new_l
     else
       List.sort
-        (fun (pl1, _) (pl2, _) -> sort_place_utf8 (pl1, "") (pl2, ""))
+        (fun (pl1, _) (pl2, _) -> sort_place_utf8 (pl2, "") (pl1, ""))
         new_l
   in
   let new_l =
@@ -437,11 +434,11 @@ let print_html_places_surnames_short conf _base _link_to_ind
       | [] -> ()
       | (pl, ipl) :: l ->
           let str = places_to_string true pl in
-          Output.printf conf "<a href=\"%sm=PPS%s&display=%s%s&k=%s\">%s</a>\n"
+          Output.printf conf "<a href=\"%sm=PPS%s&display=%s&keep=%s&k=%s\">%s</a>\n"
             (commd conf :> string)
             opt
             (if long then "long" else "short")
-            ("&bump=on")
+            (string_of_int (keep + 1))
             str str;
           if len < max_rlm_nbr conf then (
             Output.printf conf " (<a href=\"%sm=L%s&k=%s&nb=%d"
@@ -483,10 +480,11 @@ let print_html_places_surnames_long conf base link_to_ind
     (arry : ((string list * string) * (string * iper list) list) array) =
   (* (sub_places_list * suburb) * (surname * ip_list) list *)
   let k = match p_getenv conf.env "k" with Some s -> s | _ -> "" in
+  let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
   let a_sort = p_getenv conf.env "a_sort" = Some "on" in
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
   let up = p_getenv conf.env "up" = Some "on" in
-  let opt = get_opt conf  (p_getenv conf.env "bump" = Some "on") in
+  let opt = get_opt conf in
   let l = Array.to_list arry in
   let l = List.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) l in
   let l = List.rev l in
@@ -510,7 +508,7 @@ let print_html_places_surnames_long conf base link_to_ind
     print_ip_list conf places opt link_to_ind ips
   in
   let print_sn_list (pl, sub) (snl : (string * iper list) list) =
-    if sub <> "" then Output.printf conf "<li>%s<ul>\n" sub;
+    Output.printf conf "<li>%s\n" (if sub <> "" then sub else "");
     let snl =
       if f_sort then
         List.sort
@@ -521,8 +519,8 @@ let print_html_places_surnames_long conf base link_to_ind
       else
         List.sort
           (fun (p1, _) (p2, _) ->
-            if a_sort then Gutil.alphabetic_order p2 p1
-            else Gutil.alphabetic_order p1 p2)
+            if a_sort then Gutil.alphabetic_order p1 p2
+            else Gutil.alphabetic_order p2 p1)
           snl
     in
     Mutil.list_iter_first
@@ -531,7 +529,18 @@ let print_html_places_surnames_long conf base link_to_ind
         print_sn x (pl, sub))
       snl;
     Output.printf conf "\n";
-    if sub <> "" then Output.print_sstring conf "</ul></li>\n"
+    Output.print_sstring conf "</li>\n"
+  in
+  let l =
+    List.sort
+      (fun ((pl1, _), _) ((pl2, _), _) ->
+        if a_sort then Gutil.alphabetic_order
+          ( if List.length pl1 > 1 then List.nth pl1 1 else "")
+          ( if List.length pl2 > 1 then List.nth pl2 1 else "")
+        else Gutil.alphabetic_order
+          ( if List.length pl2 > 1 then List.nth pl2 1 else "")
+          ( if List.length pl1 > 1 then List.nth pl1 1 else ""))
+      l
   in
   let rec loop prev = function
     | ((pl, sub), snl) :: l ->
@@ -541,7 +550,7 @@ let print_html_places_surnames_long conf base link_to_ind
               List.iter
                 (fun x ->
                   Output.printf conf "<li>%s<ul>\n"
-                    (pps_call conf opt true k [ x ]))
+                    (pps_call conf opt true keep k [ x ]))
                 l2
           | x1 :: l1, x2 :: l2 ->
               if x1 = x2 then loop1 l1 (l2, sub)
@@ -550,7 +559,8 @@ let print_html_places_surnames_long conf base link_to_ind
                   (fun _ -> Output.print_sstring conf "</ul></li>\n")
                   (x1 :: l1);
                 loop1 [] (x2 :: l2, sub))
-          | _ -> () (* FIXME was assert false!! *)
+          | _ -> Output.print_sstring conf "</ul></li>\n"
+                 (* FIXME was assert false!! *)
         in
         loop1 prev (pl, sub);
         print_sn_list (pl, sub) snl;
@@ -594,8 +604,9 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
       (Utf8.capitalize (transl conf "place"))
       (Utf8.capitalize (transl_nth conf "surname/surnames" 0))
   in
-  let opt = get_opt conf (p_getenv conf.env "bump" = Some "on") in
+  let opt = get_opt conf in
   let long = p_getenv conf.env "display" = Some "long" in
+  let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Hutil.interp_no_header conf "buttons_places"
@@ -621,10 +632,11 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
     else ""
   in
   let href =
-    Printf.sprintf "href=\"%sm=PPS%s&display=%s%s\" title=\"%s\""
+    Printf.sprintf "href=\"%sm=PPS%s&display=%s&keep=%s%s\" title=\"%s\""
       (commd conf :> string)
       opt
       (if long then "short" else "long")
+      (string_of_int keep)
       (match p_getenv conf.env "k" with Some ini -> "&k=" ^ ini | None -> "")
       t
   in
