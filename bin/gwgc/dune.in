@@ -4,6 +4,6 @@
   (public_name geneweb.gwgc)
   (modules gwgc)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (libraries unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
+  (libraries unix str %%%GWDB_PKG%%% geneweb)
 )
 #endif

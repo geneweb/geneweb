@@ -40,11 +40,6 @@ let partition_map p l =
 
 let ( // ) = Filename.concat
 
-let if_sosa_zarith out fn =
-  Printf.fprintf out "\n#ifdef SOSA_ZARITH\n";
-  fn ();
-  Printf.fprintf out "\n#endif\n"
-
 let () =
   let opam_swich_prefix = Sys.getenv "OPAM_SWITCH_PREFIX" in
   let opam_swich_prefix_lib = opam_swich_prefix // "lib" in
@@ -159,7 +154,7 @@ let () =
   (let print_dir d = Printf.fprintf out {|"%s";|} d in
    Printf.fprintf out {|let directories=[||};
    List.iter print_dir directories;
-   if_sosa_zarith out (fun () -> print_dir ("etc" // "lib" // "stublibs"));
+   print_dir ("etc" // "lib" // "stublibs");
    Printf.fprintf out {||];;|});
   (let aux s list =
      Printf.fprintf out {|let %s=[||} s;
@@ -185,7 +180,7 @@ let () =
         "ocaml" // "stublibs" // "dllcamlstr.so";
         "ocaml" // "stublibs" // "dllunix.so";
       ];
-    if_sosa_zarith out (fun () -> aux ("stublibs" // "dllzarith.so")));
+    aux ("stublibs" // "dllzarith.so"));
   Printf.fprintf out {||];;|};
   let b = Buffer.create 1024 in
   let aux =

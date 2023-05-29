@@ -2,6 +2,6 @@
   (name setup)
   (public_name geneweb.setup)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (libraries unix str wserver %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
+  (libraries unix str wserver %%%GWDB_PKG%%% geneweb)
   (modules setup)
 )
