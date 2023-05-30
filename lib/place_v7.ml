@@ -178,7 +178,7 @@ let get_opt conf =
   ^ (if p_getenv conf.env "a_sort" = Some "on" then "&a_sort=on" else "")
   ^ (if p_getenv conf.env "lower" = Some "on" then "&lower=on" else "")
   ^ (if p_getenv conf.env "word" = Some "on" then "&word=on" else "")
-  ^ (if p_getenv conf.env "any" = Some "on" then "&any=on" else "")
+  ^ if p_getenv conf.env "any" = Some "on" then "&any=on" else ""
 
 let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
     ~add_marriage (dummy_key : 'a) (dummy_value : 'c)
@@ -325,8 +325,7 @@ let pps_call conf opt long keep k places =
     (commd conf :> string)
     opt
     (if long then "long" else "short")
-    (string_of_int keep)
-    k
+    (string_of_int keep) k
     (List.fold_left
        (fun acc p -> acc ^ (if acc <> "" then ", " else "") ^ p)
        "" places)
@@ -368,9 +367,8 @@ let print_html_places_surnames_short conf _base _link_to_ind
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
   let up = p_getenv conf.env "up" = Some "on" in
   let opt = get_opt conf in
+  Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
   let l = Array.to_list arry in
-  let l = List.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) l in
-  let l = List.rev l in
   (* build new list of (places, ipl) *)
   (* accumulate snl according to keep *)
   let new_l =
@@ -434,7 +432,8 @@ let print_html_places_surnames_short conf _base _link_to_ind
       | [] -> ()
       | (pl, ipl) :: l ->
           let str = places_to_string true pl in
-          Output.printf conf "<a href=\"%sm=PPS%s&display=%s&keep=%s&k=%s\">%s</a>\n"
+          Output.printf conf
+            "<a href=\"%sm=PPS%s&display=%s&keep=%s&k=%s\">%s</a>\n"
             (commd conf :> string)
             opt
             (if long then "long" else "short")
@@ -450,8 +449,10 @@ let print_html_places_surnames_short conf _base _link_to_ind
                   let rec loop2 i = function
                     | [] -> loop1 i l
                     | ip :: ipl ->
-                        Output.printf conf "&i%d=%s%s" i (Gwdb.string_of_iper ip)
-                          (Printf.sprintf "&p%d=%s" i (places_to_string false pl));
+                        Output.printf conf "&i%d=%s%s" i
+                          (Gwdb.string_of_iper ip)
+                          (Printf.sprintf "&p%d=%s" i
+                             (places_to_string false pl));
                         loop2 (i + 1) ipl
                   in
                   loop2 i ipl
@@ -460,8 +461,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
             Output.printf conf "\" title=\"%s\">%d</a>)"
               (Utf8.capitalize (transl conf "summary book ascendants"))
               len)
-          else
-            Output.printf conf " (%d)" len;
+          else Output.printf conf " (%d)" len;
           loop0 l
     in
     loop0 l
@@ -485,9 +485,20 @@ let print_html_places_surnames_long conf base link_to_ind
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
   let up = p_getenv conf.env "up" = Some "on" in
   let opt = get_opt conf in
+  Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
   let l = Array.to_list arry in
-  let l = List.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) l in
-  let l = List.rev l in
+  (* sort global list according to a_sort, f_sort *)
+  let l =
+    if f_sort then
+      List.sort
+        (fun (_, ipl1) (_, ipl2) ->
+          if up then List.length ipl1 - List.length ipl2
+          else List.length ipl2 - List.length ipl1)
+        l
+    else if a_sort then
+      List.sort (fun (p1, _) (p2, _) -> sort_place_utf8 p2 p1) l
+    else l
+  in
   let print_sn (sn, ips) (pl, _sub) =
     (* Warn : do same sort_uniq in short mode *)
     let ips = List.sort_uniq compare ips in
@@ -510,6 +521,7 @@ let print_html_places_surnames_long conf base link_to_ind
   let print_sn_list (pl, sub) (snl : (string * iper list) list) =
     Output.printf conf "<li>%s\n" (if sub <> "" then sub else "");
     let snl =
+      (* sort surname list according to a_sort, f_sort *)
       if f_sort then
         List.sort
           (fun (_, ipl1) (_, ipl2) ->
@@ -519,8 +531,8 @@ let print_html_places_surnames_long conf base link_to_ind
       else
         List.sort
           (fun (p1, _) (p2, _) ->
-            if a_sort then Gutil.alphabetic_order p1 p2
-            else Gutil.alphabetic_order p2 p1)
+            if a_sort then Gutil.alphabetic_order p2 p1
+            else Gutil.alphabetic_order p1 p2)
           snl
     in
     Mutil.list_iter_first
@@ -531,17 +543,7 @@ let print_html_places_surnames_long conf base link_to_ind
     Output.printf conf "\n";
     Output.print_sstring conf "</li>\n"
   in
-  let l =
-    List.sort
-      (fun ((pl1, _), _) ((pl2, _), _) ->
-        if a_sort then Gutil.alphabetic_order
-          ( if List.length pl1 > 1 then List.nth pl1 1 else "")
-          ( if List.length pl2 > 1 then List.nth pl2 1 else "")
-        else Gutil.alphabetic_order
-          ( if List.length pl2 > 1 then List.nth pl2 1 else "")
-          ( if List.length pl1 > 1 then List.nth pl1 1 else ""))
-      l
-  in
+
   let rec loop prev = function
     | ((pl, sub), snl) :: l ->
         let rec loop1 prev (pl, sub) =
@@ -560,7 +562,7 @@ let print_html_places_surnames_long conf base link_to_ind
                   (x1 :: l1);
                 loop1 [] (x2 :: l2, sub))
           | _ -> Output.print_sstring conf "</ul></li>\n"
-                 (* FIXME was assert false!! *)
+          (* FIXME was assert false!! *)
         in
         loop1 prev (pl, sub);
         print_sn_list (pl, sub) snl;
@@ -577,7 +579,7 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
     try List.assoc "places_inverted" conf.base_env = "yes"
     with Not_found -> false
   in
-  let array =
+  let arry =
     get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
       ~add_marriage ([], "") [] (fold_place_long inverted) filter
       (fun prev p ->
@@ -598,7 +600,7 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
         loop [] v)
       max_length
   in
-  Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) array;
+  Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
   let title _ =
     Output.printf conf "%s / %s"
       (Utf8.capitalize (transl conf "place"))
@@ -645,9 +647,9 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
        (transl conf (if long then "short display" else "long display")));
   if short then Output.printf conf " (%s)\n" t;
   Output.printf conf "<p>\n";
-  if array <> [||] then
-    if long then print_html_places_surnames_long conf base link_to_ind array
-    else print_html_places_surnames_short conf base link_to_ind array;
+  if arry <> [||] then
+    if long then print_html_places_surnames_long conf base link_to_ind arry
+    else print_html_places_surnames_short conf base link_to_ind arry;
   Output.printf conf "</form>\n";
   Hutil.trailer conf
 
