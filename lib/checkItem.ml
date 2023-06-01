@@ -1147,10 +1147,18 @@ let eq_warning base w1 w2 =
 
 let person_warnings conf base p =
   let w = ref [] in
+
+  let filter_close_children =
+    let is_one p p1 p2 = eq_person p p1 || eq_person p p2 in
+    function
+    | Warning.CloseChildren (_, p1, p2) when not (is_one p p1 p2) -> false
+    | _ -> true
+  in
+
   let filter x =
-    if
-      (not (List.exists (eq_warning base x) !w))
-      && Util.auth_warning conf base x
+    if filter_close_children x
+    && (not (List.exists (eq_warning base x) !w))
+    && Util.auth_warning conf base x
     then w := x :: !w
   in
   ignore @@ person base filter p;
