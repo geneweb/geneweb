@@ -5070,23 +5070,22 @@ let print_foreach conf base print_ast eval_expr =
   in
   (* carrousel *)
   let print_foreach_img_in_keydir env al ((p, _p_auth) as ep) old =
-    if Image.has_access_to_images conf base p then
-      let l =
-        List.sort String.compare
-          (if old then Image.get_keydir_old_files conf base p
-          else Image.get_keydir_files conf base p)
-      in
-      let rec loop first cnt = function
-        | [] -> ()
-        | a :: l ->
-            let env = ("keydir_img", Vstring a) :: env in
-            let env = ("first", Vbool first) :: env in
-            let env = ("last", Vbool (l = [])) :: env in
-            let env = ("img_cnt", Vint cnt) :: env in
-            List.iter (print_ast env ep) al;
-            loop false (cnt + 1) l
-      in
-      loop true 1 l
+    let l =
+      List.sort String.compare
+        (if old then Image.get_keydir_old_files conf base p
+        else Image.get_keydir_files conf base p)
+    in
+    let rec loop first cnt = function
+      | [] -> ()
+      | a :: l ->
+          let env = ("keydir_img", Vstring a) :: env in
+          let env = ("first", Vbool first) :: env in
+          let env = ("last", Vbool (l = [])) :: env in
+          let env = ("img_cnt", Vint cnt) :: env in
+          List.iter (print_ast env ep) al;
+          loop false (cnt + 1) l
+    in
+    loop true 1 l
   in
   let print_simple_foreach env el al ini_ep ep efam loc = function
     | "alias" -> print_foreach_alias env al ep
