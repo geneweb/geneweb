@@ -309,17 +309,16 @@ let get_keydir_files_aux conf base p old =
   let f = if old then Filename.concat f "old" else f in
   try
     if Sys.is_directory f then
-      Array.fold_right
-        (fun f1 l ->
+      Array.fold_left
+        (fun acc f1 ->
           let ext = Filename.extension f1 in
           if
-            f1 <> "" &&
-            f1.[0] <> '.'
-            && (Array.mem ext authorized_image_file_extension)
-          then
-            f1 :: l
-          else l)
-        (Sys.readdir f) []
+            f1 <> ""
+            && f1.[0] <> '.'
+            && Array.mem ext authorized_image_file_extension
+          then f1 :: acc
+          else acc)
+        [] (Sys.readdir f)
     else []
   with Sys_error e ->
     !GWPARAM.syslog `LOG_ERR (Format.sprintf "Keydir error: %s, %s" f e);
