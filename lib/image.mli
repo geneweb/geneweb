@@ -39,8 +39,6 @@ val get_portrait_path : config -> base -> person -> [> `Path of string ] option
     - [Some path] with [path] the full path with extension of [p]'s portrait.
 *)
 
-val has_access_to_images : config -> base -> person -> bool
-
 val get_portrait_with_size :
   config ->
   base ->
@@ -63,6 +61,8 @@ val get_old_portrait :
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.
     - [Some src] with [src] the url or path of [p]'s portrait.
 *)
+
+(* -- Carrousel -- *)
 
 val get_keydir_files : config -> base -> person -> string list
 val get_keydir_old_files : config -> base -> person -> string list
