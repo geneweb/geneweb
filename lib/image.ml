@@ -2,6 +2,10 @@ open Config
 open Gwdb
 
 let prefix conf = Util.escape_html conf.image_prefix
+let portrait_folder conf = Util.base_path [ "images" ] conf.bname
+
+let carrousel_folder conf =
+  Filename.concat (Util.base_path [ "src" ] conf.bname) "images"
 
 (** [default_portrait_filename_of_key fn sn occ] is the default filename of the corresponding person's portrait. WITHOUT its file extenssion.
  e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
@@ -30,19 +34,14 @@ let get_file_with_ext f =
 let full_portrait_path conf base p =
   (* TODO why is extension not in filename..? *)
   let s = default_portrait_filename base p in
-  let f = Filename.concat (Util.base_path [ "images" ] conf.bname) s in
+  let f = Filename.concat (portrait_folder conf) s in
   match get_file_with_ext f with Some f -> Some (`Path f) | None -> None
 
-let source_filename bname src =
-  let fname1 =
-    List.fold_right Filename.concat
-      [ Util.base_path [ "src" ] bname; "images" ]
-      src
-  in
-  let fname2 =
+let source_filename conf src =
+  let fname1 = Filename.concat (carrousel_folder conf) src in
+  if Sys.file_exists fname1 then fname1
+  else
     List.fold_right Filename.concat [ Secure.base_dir (); "src"; "images" ] src
-  in
-  if Sys.file_exists fname1 then fname1 else fname2
 
 let path_of_filename src =
   let fname1 =
@@ -199,9 +198,7 @@ let urlorpath_of_string conf s =
     match List.assoc_opt "images_path" conf.base_env with
     | Some p when p <> "" -> `Path (Filename.concat p s)
     | Some _ | None ->
-        let fname =
-          Filename.concat (Util.base_path [ "images" ] conf.bname) s
-        in
+        let fname = Filename.concat (portrait_folder conf) s in
         `Path fname
   else `Path s
 
@@ -245,10 +242,9 @@ let get_portrait conf base p =
 let get_old_portrait conf base p =
   if has_access_to_portrait conf base p then
     let key = default_portrait_filename base p in
-    let p_dir =
-      String.concat Filename.dir_sep [ Util.base_path [ "images" ] conf.bname ]
+    let f =
+      Filename.concat (Filename.concat (portrait_folder conf) "old") key
     in
-    let f = Filename.concat (Filename.concat p_dir "old") key in
     match get_file_with_ext f with Some f -> Some (`Path f) | None -> None
   else None
 
@@ -257,7 +253,7 @@ let rename_portrait conf base p (nfn, nsn, noc) =
   | Some (`Path old_f) -> (
       let new_s = default_portrait_filename_of_key nfn nsn noc in
       let old_s = default_portrait_filename base p in
-      let f = Filename.concat (Util.base_path [ "images" ] conf.bname) new_s in
+      let f = Filename.concat (portrait_folder conf) new_s in
       let old_ext = Filename.extension old_f in
       let new_f = f ^ old_ext in
       (try Sys.rename old_f new_f
@@ -268,11 +264,11 @@ let rename_portrait conf base p (nfn, nsn, noc) =
               new_f e));
       let new_s_f =
         String.concat Filename.dir_sep
-          [ Util.base_path [ "images" ] conf.bname; "old"; new_s ^ old_ext ]
+          [ portrait_folder conf; "old"; new_s ^ old_ext ]
       in
       let old_s_f =
         String.concat Filename.dir_sep
-          [ Util.base_path [ "images" ] conf.bname; "old"; old_s ^ old_ext ]
+          [ portrait_folder conf; "old"; old_s ^ old_ext ]
       in
       if Sys.file_exists old_s_f then
         try Sys.rename old_s_f new_s_f
@@ -292,7 +288,7 @@ let get_keydir_img_notes conf base p fname =
     let k = default_portrait_filename base p in
     let fname =
       String.concat Filename.dir_sep
-        [ Util.base_path [ "src" ] conf.bname; "images"; k; fname ^ ".txt" ]
+        [ carrousel_folder conf; k; fname ^ ".txt" ]
     in
     if Sys.file_exists fname then (
       let ic = Secure.open_in fname in
@@ -306,10 +302,7 @@ let get_keydir_files_aux conf base p old =
   if not (has_access_to_images conf base p) then []
   else
     let k = default_portrait_filename base p in
-    let f =
-      String.concat Filename.dir_sep
-        [ Util.base_path [ "src" ] conf.bname; "images"; k ]
-    in
+    let f = Filename.concat (carrousel_folder conf) k in
     let f = if old then Filename.concat f "old" else f in
     try
       if Sys.is_directory f then
