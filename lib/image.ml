@@ -287,42 +287,46 @@ let rename_portrait conf base p (nfn, nsn, noc) =
 (* For carrousel ************************************ *)
 
 let get_keydir_img_notes conf base p fname =
-  let k = default_portrait_filename base p in
-  let fname =
-    String.concat Filename.dir_sep
-      [ Util.base_path [ "src" ] conf.bname; "images"; k; fname ^ ".txt" ]
-  in
-  if Sys.file_exists fname then (
-    let ic = Secure.open_in fname in
-    let s = really_input_string ic (in_channel_length ic) in
-    close_in ic;
-    if s = "" then None else Some s)
-  else None
+  if not (has_access_to_images conf base p) then None
+  else
+    let k = default_portrait_filename base p in
+    let fname =
+      String.concat Filename.dir_sep
+        [ Util.base_path [ "src" ] conf.bname; "images"; k; fname ^ ".txt" ]
+    in
+    if Sys.file_exists fname then (
+      let ic = Secure.open_in fname in
+      let s = really_input_string ic (in_channel_length ic) in
+      close_in ic;
+      if s = "" then None else Some s)
+    else None
 
 (* get list of files in keydir *)
 let get_keydir_files_aux conf base p old =
-  let k = default_portrait_filename base p in
-  let f =
-    String.concat Filename.dir_sep
-      [ Util.base_path [ "src" ] conf.bname; "images"; k ]
-  in
-  let f = if old then Filename.concat f "old" else f in
-  try
-    if Sys.is_directory f then
-      Array.fold_left
-        (fun acc f1 ->
-          let ext = Filename.extension f1 in
-          if
-            f1 <> ""
-            && f1.[0] <> '.'
-            && Array.mem ext authorized_image_file_extension
-          then f1 :: acc
-          else acc)
-        [] (Sys.readdir f)
-    else []
-  with Sys_error e ->
-    !GWPARAM.syslog `LOG_ERR (Format.sprintf "Keydir error: %s, %s" f e);
-    []
+  if not (has_access_to_images conf base p) then []
+  else
+    let k = default_portrait_filename base p in
+    let f =
+      String.concat Filename.dir_sep
+        [ Util.base_path [ "src" ] conf.bname; "images"; k ]
+    in
+    let f = if old then Filename.concat f "old" else f in
+    try
+      if Sys.is_directory f then
+        Array.fold_left
+          (fun acc f1 ->
+            let ext = Filename.extension f1 in
+            if
+              f1 <> ""
+              && f1.[0] <> '.'
+              && Array.mem ext authorized_image_file_extension
+            then f1 :: acc
+            else acc)
+          [] (Sys.readdir f)
+      else []
+    with Sys_error e ->
+      !GWPARAM.syslog `LOG_ERR (Format.sprintf "Keydir error: %s, %s" f e);
+      []
 
 let get_keydir_files conf base p = get_keydir_files_aux conf base p false
 let get_keydir_old_files conf base p = get_keydir_files_aux conf base p true
