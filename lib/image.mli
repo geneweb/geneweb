@@ -66,4 +66,4 @@ val get_old_portrait :
 
 val get_keydir_files : config -> base -> person -> string list
 val get_keydir_old_files : config -> base -> person -> string list
-val get_keydir_img_notes : config -> base -> person -> string -> string
+val get_keydir_img_notes : config -> base -> person -> string -> string option

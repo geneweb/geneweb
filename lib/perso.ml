@@ -3659,35 +3659,45 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Vstring f ->
           let ext = Filename.extension f in
           let fname = Filename.chop_suffix f ext in
-          Image.get_keydir_img_notes conf base p fname |> str_val
+          Option.value ~default:""
+            (Image.get_keydir_img_notes conf base p fname)
+          |> str_val
       | _ -> raise Not_found)
   | "keydir_img_src" -> (
       match get_env "keydir_img" env with
       | Vstring f -> (
           let ext = Filename.extension f in
           let fname = Filename.chop_suffix f ext in
-          let n = Image.get_keydir_img_notes conf base p fname in
-          match String.index_opt n '\n' with
-          | Some i -> (
-              let s1 =
-                if String.length n > i then
-                  String.sub n (i + 1) (String.length n - i - 1)
-                else ""
-              in
-              match String.index_opt s1 '\n' with
-              | Some j -> String.sub s1 0 j |> str_val
-              | None -> "" |> str_val)
-          | None -> "" |> str_val)
+          str_val
+          @@
+          match Image.get_keydir_img_notes conf base p fname with
+          | None -> ""
+          | Some notes -> (
+              match String.index_opt notes '\n' with
+              | None -> ""
+              | Some i -> (
+                  let s1 =
+                    if String.length notes > i then
+                      String.sub notes (i + 1) (String.length notes - i - 1)
+                    else ""
+                  in
+                  match String.index_opt s1 '\n' with
+                  | Some j -> String.sub s1 0 j
+                  | None -> "")))
       | _ -> raise Not_found)
   | "keydir_img_title" -> (
       match get_env "keydir_img" env with
       | Vstring f -> (
           let ext = Filename.extension f in
           let fname = Filename.chop_suffix f ext in
-          let n = Image.get_keydir_img_notes conf base p fname in
-          match String.index_opt n '\n' with
-          | Some i -> String.sub n 0 i |> str_val
-          | None -> "" |> str_val)
+          str_val
+          @@
+          match Image.get_keydir_img_notes conf base p fname with
+          | None -> ""
+          | Some notes -> (
+              match String.index_opt notes '\n' with
+              | None -> ""
+              | Some i -> String.sub notes 0 i))
       | _ -> raise Not_found)
   | "portrait" -> (
       (* TODO what do we want here? can we remove this? *)

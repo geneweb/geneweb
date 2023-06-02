@@ -290,15 +290,12 @@ let get_keydir_img_notes conf base p fname =
     String.concat Filename.dir_sep
       [ Util.base_path [ "src" ] conf.bname; "images"; k; fname ^ ".txt" ]
   in
-  let s =
-    if Sys.file_exists fname then (
-      let ic = Secure.open_in fname in
-      let s = really_input_string ic (in_channel_length ic) in
-      close_in ic;
-      s)
-    else ""
-  in
-  s
+  if Sys.file_exists fname then (
+    let ic = Secure.open_in fname in
+    let s = really_input_string ic (in_channel_length ic) in
+    close_in ic;
+    if s = "" then None else Some s)
+  else None
 
 (* get list of files in keydir *)
 let get_keydir_files_aux conf base p old =
