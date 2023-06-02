@@ -4,7 +4,7 @@ open Gwdb
 val scale_to_fit : max_w:int -> max_h:int -> w:int -> h:int -> int * int
 (** [scale_to_fit ~max_w ~max_h ~w ~h] is the {(width, height)} of a proportionally scaled {(w, h)} rectangle so it can fit in a {(max_w, max_h)} rectangle *)
 
-val source_filename : string -> string -> string
+val source_filename : config -> string -> string
 (** Returns path to the image file with the giving name in directory {i src/}. *)
 
 val prefix : config -> Adef.escaped_string
