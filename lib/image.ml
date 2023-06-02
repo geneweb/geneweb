@@ -16,12 +16,14 @@ let default_portrait_filename base p =
   default_portrait_filename_of_key (p_first_name base p) (p_surname base p)
     (get_occ p)
 
+let authorized_image_file_extension = [| ".jpg"; ".jpeg"; ".png"; ".gif" |]
+
 let get_file_with_ext f =
-  if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
-  else if Sys.file_exists (f ^ ".jpeg") then Some (f ^ ".jpeg")
-  else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")
-  else if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
-  else None
+  let exists ext =
+    let fname = f ^ ext in
+    if Sys.file_exists fname then Some fname else None
+  in
+  Array.find_map exists authorized_image_file_extension
 
 (** [full_portrait_path conf base p] is [Some path] if [p] has a portrait.
     [path] is a the full path of the file with file extension. *)
@@ -311,10 +313,10 @@ let get_keydir_files_aux conf base p old =
         (fun f1 l ->
           let ext = Filename.extension f1 in
           if
+            f1 <> "" &&
             f1.[0] <> '.'
-            && ext <> ".txt"
-            && (ext = ".jpg" || ext = ".jpeg" || ext = ".gif" || ext = ".png")
-          then (* TODO vérifier ici le type des images autorisées  *)
+            && (Array.mem ext authorized_image_file_extension)
+          then
             f1 :: l
           else l)
         (Sys.readdir f) []
