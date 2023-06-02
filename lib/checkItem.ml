@@ -477,16 +477,23 @@ let ignore_less_than_one_day_apart_warning get_date e1 e2 =
         d1.prec = After || d2.prec = Before
 
 (* this check if events chronology is sound (e.g. no baptism before birth *)
-let check_order_pfevents get_name get_date warning events =
-  let events = Event.sort_events get_name get_date events in
+let check_order_pevents warning p =
+  let get_name = (fun evt -> Event.Pevent (get_pevent_name evt)) in
+  let get_date = (fun evt -> get_pevent_date evt) in
+  let warning = (fun e1 e2 ->
+      warning
+        (Warning.PEventOrder
+           (p, gen_pevent_of_pers_event e1, gen_pevent_of_pers_event e2)))
+  in
+  let events = Event.sort_events get_name get_date (get_pevents p) in
   let rec loop = function
     | e1 :: e2 :: events -> (
         match get_name e1 with
-        | Event.Pevent (Epers_Name _) | Event.Fevent (Efam_Name _) ->
+        | Event.Pevent (Epers_Name _) ->
             loop (e2 :: events)
         | n1 -> (
             match get_name e2 with
-            | Event.Pevent (Epers_Name _) | Event.Fevent (Efam_Name _) ->
+            | Event.Pevent (Epers_Name _) ->
                 loop (e1 :: events)
             | n2 ->
                 if
@@ -498,27 +505,6 @@ let check_order_pfevents get_name get_date warning events =
     | _l -> ()
   in
   loop events
-
-let check_order_pevents (warning : base_warning -> unit) p =
-  check_order_pfevents
-    (fun evt -> Event.Pevent (get_pevent_name evt))
-    (fun evt -> get_pevent_date evt)
-    (fun e1 e2 ->
-      warning
-        (Warning.PEventOrder
-           (p, gen_pevent_of_pers_event e1, gen_pevent_of_pers_event e2)))
-    (get_pevents p)
-
-let check_order_fevents base (warning : base_warning -> unit) fam =
-  let p = poi base (get_father fam) in
-  check_order_pfevents
-    (fun evt -> Event.Fevent (get_fevent_name evt))
-    (fun evt -> get_fevent_date evt)
-    (fun e1 e2 ->
-      warning
-        (Warning.FEventOrder
-           (p, gen_fevent_of_fam_event e1, gen_fevent_of_fam_event e2)))
-    (get_fevents fam)
 
 (* TODO refacto in a check_witness_fpevents *)
 let check_witness_pevents_aux (warning : base_warning -> unit) origin evt date birth_opt
@@ -933,8 +919,6 @@ let person ?(onchange = true) base (warning : base_warning -> unit) p =
 let family ?(onchange = true) base (warning : base_warning -> unit) ifam fam =
   let fath = poi base @@ get_father fam in
   let moth = poi base @@ get_mother fam in
-  (* check order of familial events *)
-  check_order_fevents base warning fam;
   (* check family's witnesses *)
   check_witness_fevents base warning fam;
   (* check parents marraige *)
