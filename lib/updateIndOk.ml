@@ -228,7 +228,6 @@ let rec reconstitute_pevents conf ext cnt =
                 | Some "othe" -> Witness_Other
                 | _ -> Witness
               in
-              (* WNOTES TODO GET ACTUAL WNOTE *)
               let wnote =
                 let var_note =
                   "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_note"
