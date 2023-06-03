@@ -142,7 +142,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
         <textarea class="form-control col-12" id="image_note"
           name="note" rows="5" placeholder="[*note/notes]0" disabled>
         </textarea>
-        <button class="btn btn-primary mt-2 col-12 btn-update-note" type="submit" disabled>
+        <button class="btn btn-primary mt-2 col-12 btn-update-note-source" type="submit" disabled>
           <span id="which_img_show">[*send image with note and source]</span></button>
       </form>
     </div>
@@ -280,7 +280,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
             </a>
             <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=others&file_name=%carrousel_img_key;&idigest=%idigest;"
                data-toggle="tooltip" data-html="true" data-placement="top"
-               title='<i class="fa fa-retweet fa-rotate-90 text-success mr-1"></i><strong>[*restore] [saved images]0</strong><br><span class="small">%carrousel_img;</span>
+               title='<i class="fa fa-retweet fa-rotate-90 text-success mr-1"></i><strong>[*restore saved image]</strong><br><span class="small">%carrousel_img;</span>
                       <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%carrousel_img_key;" width="185px">'>
               <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i>%nn;
             </a>
@@ -338,23 +338,23 @@ $('.xxx').change(function() {
 %apply;input_snd("custom-others","snd-btn-others")
 $('#image_note').bind('input propertychange', function() {
   if(this.value.length){
-  $('.btn-update-note').attr('disabled', false);
+  $('.btn-update-note-source').attr('disabled', false);
   }
 });
 $('#image_source').bind('input propertychange', function() {
   if(this.value.length){
-  $('.btn-update-source').attr('disabled', false);
+  $('.btn-update-note-source').attr('disabled', false);
   }
 });
 $('.fa-file-alt').click(function() {
   $('.custom-others').attr('disabled', true);
-  $('textarea').attr('disabled', false);
-  $('textarea').focus();4
+  $('#image_note').attr('disabled', false);
+  $('#image_note').focus();4
 });
 $('.fa-file-archive').click(function() {
   $('.custom-others').attr('disabled', true);
-  $('textarea').attr('disabled', false);
-  $('textarea').focus();1
+  $('#image_source').attr('disabled', false);
+  $('#image_source').focus();1
 });
 %( Initialize Bootstrap toast, tooltip and popover component, dismiss on next click function,
   TODO: choose one and delete the other %)
@@ -379,8 +379,8 @@ document.getElementById("image_note").value=item.dataset.note;
 document.getElementById("which_img_show").textContent="[*update image note] "+name;
 document.getElementById("file_name_2").value=name;
 document.getElementById("mode_2").value="note";
-var ta = document.querySelector('textarea');
-autosize.update(ta);
+%(var ta = document.getElementById("image_note");
+autosize.update(ta);%)
 }
 function get_source (cnt, name) {
 var item = document.getElementById("source_"+cnt);
@@ -388,8 +388,8 @@ document.getElementById("image_source").value=item.dataset.source;
 document.getElementById("which_img_show").textContent="[*update image source] "+name;
 document.getElementById("file_name_2").value=name;
 document.getElementById("mode_2").value="source";
-var ta = document.querySelector('textarea');
-autosize.update(ta);
+%(var ta = document.getElementById("image_source");
+autosize.update(ta);%)
 }
 </script>
 %( Possible heavier futur script to manage multiple files inputs

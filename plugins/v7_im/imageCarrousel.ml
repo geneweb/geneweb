@@ -625,8 +625,8 @@ let print_main_c conf base =
                     in
                     let conf = { conf with env = new_env } in
                     let file =
-                      if mode <> "note" then (raw_get conf "file" :> string)
-                      else "file_name"
+                      if mode = "note" || mode = "source" then "file_name"
+                      else (raw_get conf "file" :> string)
                     in
                     let idigest =
                       try (List.assoc "idigest" conf.env :> string)
