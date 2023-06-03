@@ -166,18 +166,19 @@ let scale_to_fit ~max_w ~max_h ~w ~h =
 (** [has_access_to_portrait conf base p] is true iif we can see [p]'s portrait. *)
 let has_access_to_portrait conf base p =
   let img = get_image p in
-  (not conf.no_image)
+  (conf.wizard || conf.friend) ||
+  ((not conf.no_image)
   && Util.authorized_age conf base p
-  && ((not (is_empty_string img)) || full_portrait_path conf base p <> None)
-  && (conf.wizard || conf.friend
-     || not (Mutil.contains (sou base img) "/private/"))
+  && (( not (is_empty_string img)) || full_portrait_path conf base p <> None)
+  && ( not (Mutil.contains (sou base img) "/private/")))
 (* TODO: privacy settings should be in db not in url *)
 
-(** [has_access_to_images conf base p] is true iif ???. *)
-let has_access_to_images conf base p =
-  (not conf.no_image)
+(** [has_access_to_carrousel conf base p] is true iif ???. *)
+let has_access_to_carrousel conf base p =
+  (conf.wizard || conf.friend ) ||
+  ((not conf.no_image)
   && Util.authorized_age conf base p
-  && Util.is_hide_names conf p
+  && (not (Util.is_hide_names conf p)))
 
 let get_portrait_path conf base p =
   if has_access_to_portrait conf base p then full_portrait_path conf base p
@@ -282,13 +283,14 @@ let rename_portrait conf base p (nfn, nsn, noc) =
 
 (* For carrousel ************************************ *)
 
-let get_carrousel_img_notes conf base p fname =
-  if not (has_access_to_images conf base p) then None
+
+let get_carrousel_img_aux conf base p fname kind =
+  if not (has_access_to_carrousel conf base p) then None
   else
     let k = default_portrait_filename base p in
     let fname =
       String.concat Filename.dir_sep
-        [ carrousel_folder conf; k; fname ^ ".txt" ]
+        [ carrousel_folder conf; k; fname ^ kind ]
     in
     if Sys.file_exists fname then (
       let ic = Secure.open_in fname in
@@ -297,9 +299,15 @@ let get_carrousel_img_notes conf base p fname =
       if s = "" then None else Some s)
     else None
 
+let get_carrousel_img_note conf base p fname =
+  get_carrousel_img_aux conf base p fname ".txt"
+
+let get_carrousel_img_src conf base p fname =
+  get_carrousel_img_aux conf base p fname ".src"
+
 (* get list of files in carrousel *)
 let get_carrousel_files_aux conf base p old =
-  if not (has_access_to_images conf base p) then []
+  if not (has_access_to_carrousel conf base p) then []
   else
     let k = default_portrait_filename base p in
     let f = Filename.concat (carrousel_folder conf) k in
