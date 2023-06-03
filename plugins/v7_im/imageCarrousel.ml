@@ -85,6 +85,9 @@ let move_file_to_save file dir =
     let orig_file_t = Filename.remove_extension orig_file ^ ".txt" in
     let saved_file_t = Filename.remove_extension saved_file ^ ".txt" in
     if Sys.file_exists orig_file_t then rn orig_file_t saved_file_t;
+    let orig_file_s = Filename.remove_extension orig_file ^ ".src" in
+    let saved_file_s = Filename.remove_extension saved_file ^ ".src" in
+    if Sys.file_exists orig_file_s then rn orig_file_s saved_file_s;
     1
   with _ -> 0
 
@@ -157,23 +160,26 @@ let swap_files file =
     String.concat Filename.dir_sep
       [ dir; Filename.chop_extension fname ^ ".txt" ]
   in
-  swap_files_aux dir txt_file
+  swap_files_aux dir txt_file;
+  let src_file =
+    String.concat Filename.dir_sep
+      [ dir; Filename.chop_extension fname ^ ".src" ]
+  in
+  swap_files_aux dir src_file
 
 let clean_saved_portrait file =
   let file = Filename.remove_extension file in
-  Mutil.rm (file ^ ".jpg");
-  Mutil.rm (file ^ ".jpeg");
-  Mutil.rm (file ^ ".png");
-  Mutil.rm (file ^ ".gif")
+  Array.iter (fun ext -> Mutil.rm (file ^ ext))
+    Image.authorized_image_file_extension
 
-let get_extension conf saved carrousel =
+let get_extension conf saved fname =
   let f =
     if saved then
       String.concat Filename.dir_sep
-        [ Util.base_path [ "images" ] conf.bname; "old"; carrousel ]
+        [ Util.base_path [ "images" ] conf.bname; "old"; fname ]
     else
       String.concat Filename.dir_sep
-        [ Util.base_path [ "images" ] conf.bname; carrousel ]
+        [ Util.base_path [ "images" ] conf.bname; fname ]
   in
   if Sys.file_exists (f ^ ".jpg") then ".jpg"
   else if Sys.file_exists (f ^ ".jpeg") then ".jpeg"
@@ -353,8 +359,15 @@ let effective_send_c_ok conf base p file file_name =
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
-  let notes =
-    match Util.p_getenv conf.env "notes" with
+  let note =
+    match Util.p_getenv conf.env "note" with
+    | Some v ->
+        Util.safe_html
+          (Util.only_printable_or_nl (Mutil.strip_all_trailing_spaces v))
+    | None -> Adef.safe ""
+  in
+  let source =
+    match Util.p_getenv conf.env "source" with
     | Some v ->
         Util.safe_html
           (Util.only_printable_or_nl (Mutil.strip_all_trailing_spaces v))
@@ -363,7 +376,7 @@ let effective_send_c_ok conf base p file file_name =
   let strm = Stream.of_string file in
   let request, content = Wserver.get_request_and_content strm in
   let content =
-    if mode = "note" then ""
+    if mode = "note" || mode = "source" then ""
     else
       let s =
         let rec loop len (strm__ : _ Stream.t) =
@@ -417,16 +430,20 @@ let effective_send_c_ok conf base p file file_name =
       if move_file_to_save fname dir = 0 then
         incorrect conf "effective send (image)";
   if content <> "" then write_file fname content;
-  if notes <> Adef.safe "" then
-    write_file (Filename.remove_extension fname ^ ".txt") (notes :> string);
+  if note <> Adef.safe "" then
+    write_file (Filename.remove_extension fname ^ ".txt") (note :> string);
+  if source <> Adef.safe "" then
+    write_file (Filename.remove_extension fname ^ ".src") (source :> string);
   let changed =
     U_Send_image (Util.string_gen_person base (gen_person_of_person p))
   in
   History.record conf base changed
     (if mode = "portraits" then "si"
-    else if file_name <> "" && notes <> Adef.safe "" then "sb"
+    else if file_name <> "" && note <> Adef.safe "" &&
+      source <> Adef.safe "" then "sb"
     else if file_name <> "" then "so"
-    else if notes <> Adef.safe "" then "sc"
+    else if note <> Adef.safe "" then "sc"
+    else if source <> Adef.safe "" then "ss"
     else "sn");
   file_name
 

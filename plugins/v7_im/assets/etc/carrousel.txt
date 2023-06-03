@@ -129,18 +129,18 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
         </div>
         <div class="d-flex col">
           <h1 class="display-4">
-            %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*source]</h1>
+            %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*source/sources]0</h1>
         </div>
         <textarea class="form-control col-12" id="image_source"
-          name="notes" rows="1" placeholder="[*image source]" disabled>
+          name="source" rows="1" placeholder="[*source/sources]0" disabled>
         </textarea>
         <div class="d-flex col">
           <h1 class="display-4">
-            %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*note]</h1>
+            %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*note/notes]0</h1>
           <span class="mb-1 px-0 ml-auto align-self-end col-2">%include.toolbar;</span>
         </div>
         <textarea class="form-control col-12" id="image_note"
-          name="notes" rows="5" placeholder="[*image note]" disabled>
+          name="note" rows="5" placeholder="[*note/notes]0" disabled>
         </textarea>
         <button class="btn btn-primary mt-2 col-12 btn-update-note" type="submit" disabled>
           <span id="which_img_show">[*send image with note and source]</span></button>
@@ -155,7 +155,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
           <div class="d-flex mt-1">
             <a role="button" href="%portrait;" target="_blank" rel="noopener"%sp;
             data-toggle="tooltip" data-html="true" data-placement="left"
-            title='<strong>[*see] [portrait]</strong><br><span class="small">%portrait;</span>
+            title='<strong>[*see portrait]</strong><br><span class="small">%portrait;</span>
                    <br><img class="rounded my-1" src="%portrait;"
                    width="185px">'>
               <i class="far fa-file-image fa-fw text-primary"></i>
@@ -166,7 +166,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
           <div class="d-flex mt-1">
             <a role="button" href="%prefix;kch=%random.bits;&m=IM_C&i=%index;" target="_blank" rel="noopener"%sp;
             data-toggle="tooltip" data-html="true" data-placement="left"
-            title='<strong>[*see] [portrait]</strong><br><span class="small">%portrait;</span>
+            title='<strong>[*see portrait]</strong><br><span class="small">%portrait;</span>
                    <br><img class="rounded my-1" src="%prefix;kch=%random.bits;&m=IM_C&i=%index;"
                    width="185px">'>
               <i class="far fa-file-image fa-fw text-primary"></i>
@@ -175,7 +175,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
             <strong><samp class="text-truncate">%portraits_store;%X;</samp></strong><samp>%portrait_name;</samp>
             <a role="button" class="ml-auto col-1"  href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&idigest=%idigest;"
                data-toggle="tooltip" data-html="true" data-placement="left"
-               title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete] [portrait]</strong><br><span class="small">%portrait;</span>
+               title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete portrait]</strong><br><span class="small">%portrait;</span>
                       <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;"
                       width="185px">'>
               <i class="far fa-trash-alt text-warning"></i>%nn;
@@ -187,13 +187,13 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
           <div class="d-flex mt-1">
             <a role="button" href="%prefix;kch=%random.bits;&m=IM_C_S&i=%index;" target="_blank" rel="noopener"
               data-toggle="tooltip" data-html="true" data-placement="left"
-              title='<strong>[*see] [portrait] [saved]0</strong><br><span class="small">%portrait_saved;%X;</span>
+              title='<strong>[*see portrait saved]0</strong><br><span class="small">%portrait_saved;%X;</span>
                      <br><img class="rounded my-1" src="%prefix;kch=%random.bits;&m=IM_C_S&i=%index;" width="185px">'>
               <i class="far fa-file-image fa-fw text-primary"></i>
             </a>%nn;
             <a role="button" href="%prefix;kch=%random.bits;&m=RESET_IMAGE_C_OK&i=%index;&idigest=%idigest;"
                data-toggle="tooltip" data-html="true" data-placement="left"
-               title='<i class="fa fa-retweet fa-rotate-90 text-success mr-1"></i><strong>[*restore] [portrait] [saved]0</strong><br><span class="small">%portrait_saved;</span>
+               title='<i class="fa fa-retweet fa-rotate-90 text-success mr-1"></i><strong>[*restore portrait saved]0</strong><br><span class="small">%portrait_saved;</span>
                       <br><img class="rounded my-1" src="%prefix;kch=%random.bits;&m=IM_C_S&i=%index;"
                       width="185px">'>
               <i class="fas fa-retweet fa-rotate-90 fa-fw text-success"></i>
@@ -201,21 +201,21 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
             <strong><samp class="text-truncate">%saved_portraits_store;%X;</samp></strong><samp>%portrait_saved_name;</samp>
             <a role="button" class="ml-auto col-1" href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&idigest=%idigest;&delete=on"
               data-toggle="tooltip" data-html="true" data-placement="left"
-               title='<i class="far fa-trash-alt text-danger mr-1"></i><strong>[*delete] [portrait] [saved]0</strong><br><span class="small">%portrait_saved;</span>
+               title='<i class="far fa-trash-alt text-danger mr-1"></i><strong>[*delete portrait saved]0</strong><br><span class="small">%portrait_saved;</span>
                       <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;"
                       width="185px">'>
               <i class="far fa-trash-alt text-danger"></i>
             </a>
           </div>
           <table style="line-height:0.8;" class="mt-2"><tr>
-          <td style="vertical-align:top"><a class="d_flex mt-1" href="%prefix;&m=REFRESH&i=%index;" title="[*add]/[delete] [image/images]0">
+          <td style="vertical-align:top"><a class="d_flex mt-1" href="%prefix;&m=REFRESH&i=%index;" title="[*add image]">
             <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
           </a></td><td>&nbsp;</td>
           <td><small>[*warning refresh]</small>%nn;</td>
           </tr></table>
         %end;
       %end;
-      %if;(carrousel_img_nbr>0)
+      %if;(has_carrousel)
         <h1 class="display-4">[*image/images]1</h1>
         <div class="d-flex align-items-center">
           <i class="fa fa-folder-open fa-lg text-warning mx-2" aria-hidden="true"></i>
@@ -230,38 +230,30 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
                      <br><span class="small">%carrousel_img;</span>
                      <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img_key;"
                      width="185px">
-                     <br><small>%carrousel_img_title;%if;(carrousel_img_src!="")<br>(%carrousel_img_src;)%end;</small>'>
+                     '>
               <i class="far fa-file-image fa-fw text-primary"></i>
             </a>
-            <a role="button" href="#" id="notes_%img_cnt;" class="text-%if;(carrousel_img_note="")danger%else;primary%end;"
-              onclick='get_notes(%img_cnt;, "%carrousel_img;"); return false;' data-notet="%carrousel_img_notes;"
+            <a role="button" href="#" id="note_%img_cnt;" class="text-%if;(carrousel_img_note="")danger%else;primary%end;"
+              onclick='get_note(%img_cnt;, "%carrousel_img;"); return false;' data-note="%carrousel_img_note;"
               data-toggle="tooltip" data-html="true" data-placement="bottom"
               title='<strong><i class="far fa-file fa-fw mr-1"></i>
-                     %if;(carrousel_img_note="")[*add]%else;[*modify]%end; [note]</strong>
-                     <br><span class="small">%carrousel_note;</span>
-                     <br><span class="small" style="text-align: left;">%nn;
-                          %(<strong>[*titre][:]</strong> %carrousel_img_title;
-                          %if;(carrousel_img_src!="")<br><strong>[*source][:]</strong>%carrousel_img_src;%end;
-                     <br>[*note][:]%)<br>%carrousel_img_note;</span>'>
+                     %if;(carrousel_img_note="")[*add note]%else;[*modify note]%end;</strong>
+                     <br><span class="small"><br>%carrousel_img_note;</span>'>
               <i class="far fa-file-alt fa-fw"></i>%nn;
             </a>
-            <a role="button" href="#" id="source_%img_cnt;" class="text-%if;(carrousel_img_source="")danger%else;primary%end;"
-              onclick='get_notes(%img_cnt;, "%carrousel_img;"); return false;' data-notet="%carrousel_img_source;"
+            <a role="button" href="#" id="source_%img_cnt;" class="text-%if;(carrousel_img_src="")danger%else;primary%end;"
+              onclick='get_source(%img_cnt;, "%carrousel_img;"); return false;' data-source="%carrousel_img_src;"
               data-toggle="tooltip" data-html="true" data-placement="bottom"
               title='<strong><i class="far fa-file fa-fw mr-1"></i>
-                     %if;(carrousel_img_source="")[*add]%else;[*modify]%end; [source]</strong>
-                     <br><span class="small">%carrousel_source;</span>
-                     <br><span class="small" style="text-align: left;">%nn;
-                          %(<strong>[*titre][:]</strong> %carrousel_img_title;
-                          %if;(carrousel_img_src!="")<br><strong>[*source][:]</strong>%carrousel_img_src;%end;
-                     <br>[*note][:]%)<br>%carrousel_img_source;</span>'>
-              <i class="far fa-file-alt fa-fw"></i>%nn;
+                     %if;(carrousel_img_src="")[*add source]%else;[*modify source]%end;</strong>
+                     <br><span class="small"><br>%carrousel_img_src;</span>'>
+              <i class="far fa-file-archive fa-fw"></i>%nn;
             </a>
             <samp class="text-truncate ml-1" title="%images_store;%X;%carrousel;%X;%carrousel_img;">%carrousel_img;</samp>
             <div class="ml-auto col-1">
               <a role="button" href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&file_name=%carrousel_img_key;&mode=others&idigest=%idigest;"
                 data-toggle="tooltip" data-html="true" data-placement="left"
-                title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete] [image/images]0</strong>
+                title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete image]</strong>
                        <br><span class="small">%carrousel_img;</span>
                        <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img_key;"
                        width="185px">'>
@@ -298,7 +290,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
                 &idigest=%idigest;&file_name=%carrousel_img_key;&mode=others%nn;
                 &delete=on"%sp;
                   data-toggle="tooltip" data-html="true" data-placement="left"
-                  title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete] [saved images]0</strong>
+                  title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete saved image]</strong>
                          <br><span class="small">%carrousel_img;</span>
                          <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%carrousel_img_key;" width="185px">'>
                 <i class="far fa-trash-alt text-danger fa-fw text-primary"></i>%nn;
@@ -307,7 +299,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
           </div>
         %end;
         <table style="line-height:0.8;" class="mt-2"><tr>
-        <td style="vertical-align:top"><a class="d_flex mt-1" href="%prefix;&m=REFRESH&i=%index;" title="[*add]/[delete] [image/images]0">
+        <td style="vertical-align:top"><a class="d_flex mt-1" href="%prefix;&m=REFRESH&i=%index;" title="[*add image]/[delete image]">
           <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
         </a></td><td>&nbsp;</td>
         <td><small>[*warning refresh]</small>%nn;</td>
@@ -359,6 +351,11 @@ $('.fa-file-alt').click(function() {
   $('textarea').attr('disabled', false);
   $('textarea').focus();4
 });
+$('.fa-file-archive').click(function() {
+  $('.custom-others').attr('disabled', true);
+  $('textarea').attr('disabled', false);
+  $('textarea').focus();1
+});
 %( Initialize Bootstrap toast, tooltip and popover component, dismiss on next click function,
   TODO: choose one and delete the other %)
 $(function () {
@@ -376,13 +373,21 @@ $( document).ready(function () {
 $(function () {
   $('.toast').toast()
 })%)
-function get_notes (cnt, name) {
-var item = document.getElementById("notes_"+cnt);
+function get_note (cnt, name) {
+var item = document.getElementById("note_"+cnt);
 document.getElementById("image_note").value=item.dataset.note;
-document.getElementById("image_source").value=item.dataset.source;
 document.getElementById("which_img_show").textContent="[*update image note] "+name;
 document.getElementById("file_name_2").value=name;
 document.getElementById("mode_2").value="note";
+var ta = document.querySelector('textarea');
+autosize.update(ta);
+}
+function get_source (cnt, name) {
+var item = document.getElementById("source_"+cnt);
+document.getElementById("image_source").value=item.dataset.source;
+document.getElementById("which_img_show").textContent="[*update image source] "+name;
+document.getElementById("file_name_2").value=name;
+document.getElementById("mode_2").value="source";
 var ta = document.querySelector('textarea');
 autosize.update(ta);
 }
