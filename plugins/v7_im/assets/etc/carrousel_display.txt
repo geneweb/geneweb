@@ -4,12 +4,15 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <h5 class="modal-header d-inline-flex justify-content-between">
+        %if;wizard;
         <a href="%prefix;m=SND_IMAGE_C&i=%index;"
           title="[*add]/[delete] [image/images]1 (%if;has_portrait;1 [portrait]%end;/%carrousel_img_nbr; %if;(carrousel_img_nbr>1)[image/images]1%else;[image/images]0%end;)">
+        %end;
           %if;has_portrait;1<i class="fas fa-image-portrait ml-1 mr-2" aria-hidden="true"></i>%end;
-          %carrousel_img_nbr;<i class="far fa-image fa-fw ml-1" aria-hidden="true" title=""></i>%nn;
+          %carrousel_img_nbr;<i class="far fa-image fa-fw ml-1" aria-hidden="true"></i>%nn;
+        %if;wizard;
         </a>
-        <span>
+        %end;
           %if;(public_name!="")%public_name;%else;%first_name;%end; %surname;
         </span>
         <div class="btn-group">

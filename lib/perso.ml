@@ -1657,9 +1657,13 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       match get_env "carrousel_img" env with
       | Vstring s -> str_val (Mutil.tr '+' ' ' s)
       | _ -> null_val)
-  | "carrousel_notes" -> (
+  | "carrousel_note" -> (
       match get_env "carrousel_img" env with
       | Vstring s -> str_val (Filename.remove_extension s ^ ".txt")
+      | _ -> null_val)
+  | "carrousel_src" -> (
+      match get_env "carrousel_img" env with
+      | Vstring s -> str_val (Filename.remove_extension s ^ ".src")
       | _ -> null_val)
   (* end carrousel *)
   | "lazy_force" -> (
@@ -3657,50 +3661,23 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "carrousel_old_img_nbr" ->
       string_of_int (List.length (Image.get_carrousel_old_files conf base p))
       |> str_val
-  | "carrousel_img_notes" -> (
+  | "carrousel_img_note" -> (
       match get_env "carrousel_img" env with
       | Vstring f ->
           let ext = Filename.extension f in
           let fname = Filename.chop_suffix f ext in
           Option.value ~default:""
-            (Image.get_carrousel_img_notes conf base p fname)
+            (Image.get_carrousel_img_note conf base p fname)
           |> str_val
       | _ -> raise Not_found)
   | "carrousel_img_src" -> (
       match get_env "carrousel_img" env with
-      | Vstring f -> (
+      | Vstring f ->
           let ext = Filename.extension f in
           let fname = Filename.chop_suffix f ext in
-          str_val
-          @@
-          match Image.get_carrousel_img_notes conf base p fname with
-          | None -> ""
-          | Some notes -> (
-              match String.index_opt notes '\n' with
-              | None -> ""
-              | Some i -> (
-                  let s1 =
-                    if String.length notes > i then
-                      String.sub notes (i + 1) (String.length notes - i - 1)
-                    else ""
-                  in
-                  match String.index_opt s1 '\n' with
-                  | Some j -> String.sub s1 0 j
-                  | None -> "")))
-      | _ -> raise Not_found)
-  | "carrousel_img_title" -> (
-      match get_env "carrousel_img" env with
-      | Vstring f -> (
-          let ext = Filename.extension f in
-          let fname = Filename.chop_suffix f ext in
-          str_val
-          @@
-          match Image.get_carrousel_img_notes conf base p fname with
-          | None -> ""
-          | Some notes -> (
-              match String.index_opt notes '\n' with
-              | None -> ""
-              | Some i -> String.sub notes 0 i))
+          Option.value ~default:""
+            (Image.get_carrousel_img_src conf base p fname)
+          |> str_val
       | _ -> raise Not_found)
   | "portrait" -> (
       (* TODO what do we want here? can we remove this? *)
