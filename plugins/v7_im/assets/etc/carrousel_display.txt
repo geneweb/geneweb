@@ -1,13 +1,13 @@
-%( a carousel of all the images in keydir shown in a basic Bootstrap 4 modal %)
+%( a carousel of all the images in carrousel shown in a basic Bootstrap 4 modal %)
 <!-- begin carrousel_display.txt -->
 <div class="modal fade" id="carousel_modal" tabindex="-1" role="dialog" aria-labelledby="carouselmodal" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <h5 class="modal-header d-inline-flex justify-content-between">
         <a href="%prefix;m=SND_IMAGE_C&i=%index;"
-          title="[*add]/[delete] [image/images]1 (%if;has_portrait;1 [portrait]%end;/%keydir_img_nbr; %if;(keydir_img_nbr>1)[image/images]1%else;[image/images]0%end;)">
+          title="[*add]/[delete] [image/images]1 (%if;has_portrait;1 [portrait]%end;/%carrousel_img_nbr; %if;(carrousel_img_nbr>1)[image/images]1%else;[image/images]0%end;)">
           %if;has_portrait;1<i class="fas fa-image-portrait ml-1 mr-2" aria-hidden="true"></i>%end;
-          %keydir_img_nbr;<i class="far fa-image fa-fw ml-1" aria-hidden="true" title=""></i>%nn;
+          %carrousel_img_nbr;<i class="far fa-image fa-fw ml-1" aria-hidden="true" title=""></i>%nn;
         </a>
         <span>
           %if;(public_name!="")%public_name;%else;%first_name;%end; %surname;
@@ -25,7 +25,7 @@
       </h5>
       <div class="modal-body d-flex justify-content-center">
         <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="5000">
-        %( let;maximg;%if;has_portrait;%expr(keydir_img_nbr+1)%else;%keydir_img_nbr;%end;%in;
+        %( let;maximg;%if;has_portrait;%expr(carrousel_img_nbr+1)%else;%carrousel_img_nbr;%end;%in;
             <ol class="carousel-indicators">
             %for;i;0;maximg;
             <li %if;(i=0)class="active"%end; data-target="#carousel" data-slide-to="%i;"></li>
@@ -43,17 +43,17 @@
                 </div>
               </div>
             %end;
-            %if;has_keydir;
-              %foreach;img_in_keydir;%incr_count;
+            %if;has_carrousel;
+              %foreach;img_in_carrousel;%incr_count;
                 <div class="carousel-item%if;(not has_portrait and is_first) active%end;">
-                  <a href="%prefix;m=IM_C&i=%index;&s=%keydir_img;" target="_blank" rel="noopener">
-                     <img class="img-fluid" src="%prefix;m=IM_C&i=%index;&s=%keydir_img;" alt="%count; slide">
+                  <a href="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" target="_blank" rel="noopener">
+                     <img class="img-fluid" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" alt="%count; slide">
                   </a>
                   <div class="position-relative d-inline-flex w-100 d-none d-md-block">
-                    <span>%keydir_img_notes;</span>
-                    %if;(keydir_img_notes!="")<br>%end;
-                    <span>[image/images]0 %count;/%keydir_img_nbr;[:] </span>
-                    <small class="ml-auto">%keydir_img; </small>
+                    <span>%carrousel_img_notes;</span>
+                    %if;(carrousel_img_notes!="")<br>%end;
+                    <span>[image/images]0 %count;/%carrousel_img_nbr;[:] </span>
+                    <small class="ml-auto">%carrousel_img; </small>
                   </div>
                 </div>
               %end;

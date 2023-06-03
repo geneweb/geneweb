@@ -1649,16 +1649,16 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       match get_env "img_cnt" env with
       | Vint cnt -> VVstring (string_of_int cnt)
       | _ -> VVstring "")
-  | "keydir_img" -> (
-      match get_env "keydir_img" env with
+  | "carrousel_img" -> (
+      match get_env "carrousel_img" env with
       | Vstring s -> str_val s
       | _ -> null_val)
-  | "keydir_img_key" -> (
-      match get_env "keydir_img" env with
+  | "carrousel_img_key" -> (
+      match get_env "carrousel_img" env with
       | Vstring s -> str_val (Mutil.tr '+' ' ' s)
       | _ -> null_val)
-  | "keydir_notes" -> (
-      match get_env "keydir_img" env with
+  | "carrousel_notes" -> (
+      match get_env "carrousel_img" env with
       | Vstring s -> str_val (Filename.remove_extension s ^ ".txt")
       | _ -> null_val)
   (* end carrousel *)
@@ -3404,12 +3404,15 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_history" -> has_history conf base p p_auth
   | "has_image" | "has_portrait" ->
       Image.get_portrait conf base p |> Option.is_some
-  | "has_image_url" -> (
+  | "has_image_url" | "has_portrait_url" -> (
       match Image.get_portrait conf base p with
       | Some src -> Mutil.start_with "http" 0 (Image.src_to_string src)
       | _ -> false)
   (* carrousel *)
-  | "has_keydir" -> Image.get_portrait conf base p |> Option.is_some
+  | "has_carrousel" -> 
+      Sys.file_exists (Filename.concat
+        (Image.carrousel_folder conf)
+        (Image.default_portrait_filename base p))
   | "has_old_image" | "has_old_portrait" ->
       Image.get_old_portrait conf base p |> Option.is_some
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
@@ -3647,30 +3650,30 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Vbool _ -> null_val
       | _ -> get_iper p |> string_of_iper |> Mutil.encode |> safe_val)
   (* carrousel functions *)
-  | "keydir" -> Image.default_portrait_filename base p |> str_val
-  | "keydir_img_nbr" ->
-      string_of_int (List.length (Image.get_keydir_files conf base p))
+  | "carrousel" -> Image.default_portrait_filename base p |> str_val
+  | "carrousel_img_nbr" ->
+      string_of_int (List.length (Image.get_carrousel_files conf base p))
       |> str_val
-  | "keydir_old_img_nbr" ->
-      string_of_int (List.length (Image.get_keydir_old_files conf base p))
+  | "carrousel_old_img_nbr" ->
+      string_of_int (List.length (Image.get_carrousel_old_files conf base p))
       |> str_val
-  | "keydir_img_notes" -> (
-      match get_env "keydir_img" env with
+  | "carrousel_img_notes" -> (
+      match get_env "carrousel_img" env with
       | Vstring f ->
           let ext = Filename.extension f in
           let fname = Filename.chop_suffix f ext in
           Option.value ~default:""
-            (Image.get_keydir_img_notes conf base p fname)
+            (Image.get_carrousel_img_notes conf base p fname)
           |> str_val
       | _ -> raise Not_found)
-  | "keydir_img_src" -> (
-      match get_env "keydir_img" env with
+  | "carrousel_img_src" -> (
+      match get_env "carrousel_img" env with
       | Vstring f -> (
           let ext = Filename.extension f in
           let fname = Filename.chop_suffix f ext in
           str_val
           @@
-          match Image.get_keydir_img_notes conf base p fname with
+          match Image.get_carrousel_img_notes conf base p fname with
           | None -> ""
           | Some notes -> (
               match String.index_opt notes '\n' with
@@ -3685,14 +3688,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
                   | Some j -> String.sub s1 0 j
                   | None -> "")))
       | _ -> raise Not_found)
-  | "keydir_img_title" -> (
-      match get_env "keydir_img" env with
+  | "carrousel_img_title" -> (
+      match get_env "carrousel_img" env with
       | Vstring f -> (
           let ext = Filename.extension f in
           let fname = Filename.chop_suffix f ext in
           str_val
           @@
-          match Image.get_keydir_img_notes conf base p fname with
+          match Image.get_carrousel_img_notes conf base p fname with
           | None -> ""
           | Some notes -> (
               match String.index_opt notes '\n' with
@@ -5069,16 +5072,16 @@ let print_foreach conf base print_ast eval_expr =
         (get_surnames_aliases p)
   in
   (* carrousel *)
-  let print_foreach_img_in_keydir env al ((p, _p_auth) as ep) old =
+  let print_foreach_img_in_carrousel env al ((p, _p_auth) as ep) old =
     let l =
       List.sort String.compare
-        (if old then Image.get_keydir_old_files conf base p
-        else Image.get_keydir_files conf base p)
+        (if old then Image.get_carrousel_old_files conf base p
+        else Image.get_carrousel_files conf base p)
     in
     let rec loop first cnt = function
       | [] -> ()
       | a :: l ->
-          let env = ("keydir_img", Vstring a) :: env in
+          let env = ("carrousel_img", Vstring a) :: env in
           let env = ("first", Vbool first) :: env in
           let env = ("last", Vbool (l = [])) :: env in
           let env = ("img_cnt", Vint cnt) :: env in
@@ -5108,8 +5111,8 @@ let print_foreach conf base print_ast eval_expr =
     | "event" -> print_foreach_event env al ep
     | "family" -> print_foreach_family env al ini_ep ep
     | "first_name_alias" -> print_foreach_first_name_alias env al ep
-    | "img_in_keydir" -> print_foreach_img_in_keydir env al ep false
-    | "img_in_keydir_old" -> print_foreach_img_in_keydir env al ep true
+    | "img_in_carrousel" -> print_foreach_img_in_carrousel env al ep false
+    | "img_in_carrousel_old" -> print_foreach_img_in_carrousel env al ep true
     | "nobility_title" -> print_foreach_nobility_title env al ep
     | "nob_title" -> print_foreach_nob_title env al ep
     | "parent" -> print_foreach_parent env al ep

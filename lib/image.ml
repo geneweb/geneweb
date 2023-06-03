@@ -235,8 +235,8 @@ let get_portrait conf base p =
     | `Empty -> full_portrait_path conf base p
   else None
 
-(* In images/keydir we store either
-   - the old portrait as the original keydir.jpg/png/tif image
+(* In images/carrousel we store either
+   - the old portrait as the original carrousel.jpg/png/tif image
    - the url to the portrait as content of a url.txt file
 *)
 let get_old_portrait conf base p =
@@ -282,7 +282,7 @@ let rename_portrait conf base p (nfn, nsn, noc) =
 
 (* For carrousel ************************************ *)
 
-let get_keydir_img_notes conf base p fname =
+let get_carrousel_img_notes conf base p fname =
   if not (has_access_to_images conf base p) then None
   else
     let k = default_portrait_filename base p in
@@ -297,8 +297,8 @@ let get_keydir_img_notes conf base p fname =
       if s = "" then None else Some s)
     else None
 
-(* get list of files in keydir *)
-let get_keydir_files_aux conf base p old =
+(* get list of files in carrousel *)
+let get_carrousel_files_aux conf base p old =
   if not (has_access_to_images conf base p) then []
   else
     let k = default_portrait_filename base p in
@@ -318,11 +318,11 @@ let get_keydir_files_aux conf base p old =
           [] (Sys.readdir f)
       else []
     with Sys_error e ->
-      !GWPARAM.syslog `LOG_ERR (Format.sprintf "Keydir error: %s, %s" f e);
+      !GWPARAM.syslog `LOG_ERR (Format.sprintf "carrousel error: %s, %s" f e);
       []
 
-let get_keydir_files conf base p = get_keydir_files_aux conf base p false
-let get_keydir_old_files conf base p = get_keydir_files_aux conf base p true
+let get_carrousel_files conf base p = get_carrousel_files_aux conf base p false
+let get_carrousel_old_files conf base p = get_carrousel_files_aux conf base p true
 
 (* end carrousel ************************************ *)
 

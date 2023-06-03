@@ -1,6 +1,9 @@
 open Config
 open Gwdb
 
+val portrait_folder : config -> string
+val carrousel_folder : config -> string
+
 val scale_to_fit : max_w:int -> max_h:int -> w:int -> h:int -> int * int
 (** [scale_to_fit ~max_w ~max_h ~w ~h] is the {(width, height)} of a proportionally scaled {(w, h)} rectangle so it can fit in a {(max_w, max_h)} rectangle *)
 
@@ -64,6 +67,6 @@ val get_old_portrait :
 
 (* -- Carrousel -- *)
 
-val get_keydir_files : config -> base -> person -> string list
-val get_keydir_old_files : config -> base -> person -> string list
-val get_keydir_img_notes : config -> base -> person -> string -> string option
+val get_carrousel_files : config -> base -> person -> string list
+val get_carrousel_old_files : config -> base -> person -> string list
+val get_carrousel_img_notes : config -> base -> person -> string -> string option
