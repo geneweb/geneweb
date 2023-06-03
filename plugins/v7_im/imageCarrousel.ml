@@ -166,14 +166,14 @@ let clean_saved_portrait file =
   Mutil.rm (file ^ ".png");
   Mutil.rm (file ^ ".gif")
 
-let get_extension conf saved keydir =
+let get_extension conf saved carrousel =
   let f =
     if saved then
       String.concat Filename.dir_sep
-        [ Util.base_path [ "images" ] conf.bname; "old"; keydir ]
+        [ Util.base_path [ "images" ] conf.bname; "old"; carrousel ]
     else
       String.concat Filename.dir_sep
-        [ Util.base_path [ "images" ] conf.bname; keydir ]
+        [ Util.base_path [ "images" ] conf.bname; carrousel ]
   in
   if Sys.file_exists (f ^ ".jpg") then ".jpg"
   else if Sys.file_exists (f ^ ".jpeg") then ".jpeg"
@@ -363,7 +363,7 @@ let effective_send_c_ok conf base p file file_name =
   let strm = Stream.of_string file in
   let request, content = Wserver.get_request_and_content strm in
   let content =
-    if mode = "comment" then ""
+    if mode = "note" then ""
     else
       let s =
         let rec loop len (strm__ : _ Stream.t) =
@@ -542,13 +542,13 @@ let effective_reset_c_ok conf base p =
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
-  let keydir = Image.default_portrait_filename base p in
+  let carrousel = Image.default_portrait_filename base p in
   let file_name =
     try (List.assoc "file_name" conf.env :> string) with Not_found -> ""
   in
-  let file_name = if mode = "portraits" then keydir else file_name in
-  let ext_saved = get_extension conf true keydir in
-  let ext = get_extension conf false keydir in
+  let file_name = if mode = "portraits" then carrousel else file_name in
+  let ext_saved = get_extension conf true carrousel in
+  let ext = get_extension conf false carrousel in
   let ext = if ext = "." then ext_saved else ext in
   let file_in_new =
     if mode = "portraits" then
@@ -556,7 +556,7 @@ let effective_reset_c_ok conf base p =
         [ Util.base_path [ "images" ] conf.bname; file_name ^ ext ]
     else
       String.concat Filename.dir_sep
-        [ Util.base_path [ "src" ] conf.bname; "images"; keydir; file_name ]
+        [ Util.base_path [ "src" ] conf.bname; "images"; carrousel; file_name ]
   in
   swap_files file_in_new;
   file_name
@@ -608,7 +608,7 @@ let print_main_c conf base =
                     in
                     let conf = { conf with env = new_env } in
                     let file =
-                      if mode <> "comment" then (raw_get conf "file" :> string)
+                      if mode <> "note" then (raw_get conf "file" :> string)
                       else "file_name"
                     in
                     let idigest =
