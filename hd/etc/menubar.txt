@@ -373,7 +373,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
               %end;
             </div>
           </li>
-          %if;(keydir_img_nbr>0)
+          %if;(carrousel_img_nbr>0)
             <li class="nav-item">
               <a class="nav-link text-secondary" data-toggle="modal" data-target="#carousel_modal"
                 title="[*display carrousel]">
@@ -382,7 +382,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
               </a>
             </li>
           %end;
-          <li class="nav-item %if;(keydir_img_nbr>0) d-none%end;">
+          <li class="nav-item %if;(carrousel_img_nbr>0) d-none%end;">
             <a class="nav-link text-secondary" href="%prefix;m=SND_IMAGE_C&i=%index;" %laI;>
               <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
               <span class="sr-only">[*add]/[delete] [image/images]1</span>%nn;
@@ -396,6 +396,6 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
     %include;buttons_cousins
   %end;
 %end;
-%if;(keydir_img_nbr>0)
+%if;(carrousel_img_nbr>0)
 %include;carrousel_display
 %end;

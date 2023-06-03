@@ -16,26 +16,26 @@
 %include.perso_header;
 %( Logic for variables:
   file_name must be defined
-  mode="comment" then only the comment file is updated
-  keydir is “on” if we are dealing with “others” images %)
+  mode="note" then only the note file is updated
+  carrousel is “on” if we are dealing with “others” images %)
 %random.init;
 %define;alert_header()
   %if;(evar.mode="others")
-    %if;(evar.em="SND_IMAGE_C_OK")[*image received]%if;(evar.notes!="") [with comment]%end;
+    %if;(evar.em="SND_IMAGE_C_OK")[*image received]%if;(evar.notes!="") [with note]%end;
     %elseif;(evar.em="DEL_IMAGE_C_OK")[*image deleted]%sp;
       %if;(evar.delete!="on")[and] [saved]1%end;
     %elseif;(evar.em="RESET_IMAGE_C_OK")[*image/images]0 [restored]1%nn;
     %end;
   %else;
-    %if;(evar.em="SND_IMAGE_C_OK")%if;(evar.mode="comment")[*comment] [update]%else;[*portrait] [uploaded]0%end;%nn;
+    %if;(evar.em="SND_IMAGE_C_OK")%if;(evar.mode="note")[*note] [update]%else;[*portrait] [uploaded]0%end;%nn;
     %elseif;(evar.em="DEL_IMAGE_C_OK")[*portrait] [deleted]0%if;(evar.delete!="on") [and] [saved]0%end;%nn;
     %elseif;(evar.em="RESET_IMAGE_C_OK")[*portrait] [restored]0%nn;
     %end;%nn;
   %end;
 %end;
 %define;alert_content()
-  %if;(evar.mode="others" or evar.mode="comment")
-    <samp>%if;(evar.em="RESET_IMAGE_C_OK")images%X;%keydir;%X;old%X;%evar.file_name; <strong>></strong> %end;images%X;%keydir;%if;(evar.delete="on")%X;old%end;%X;%nn;
+  %if;(evar.mode="others" or evar.mode="note")
+    <samp>%if;(evar.em="RESET_IMAGE_C_OK")images%X;%carrousel;%X;old%X;%evar.file_name; <strong>></strong> %end;images%X;%carrousel;%if;(evar.delete="on")%X;old%end;%X;%nn;
     %if;(evar.notes!="")%evar.file_name_2;.txt%else;%evar.file_name;%end;</samp>
   %else;
     %if;(evar.em="SND_IMAGE_C_OK" or evar.em="RESET_IMAGE_C_OK")
@@ -44,12 +44,12 @@
       %(%if;(evar.em="DEL IMAGE_C_OK" or evar.em="RESET_IMAGE_C_OK")%portrait;%else;%evar.file_name;%end;</samp>%)
     %elseif;(evar.em="DEL_IMAGE_C_OK")
       %if;(evar.delete!="on")<samp>portrait%X;%portrait_saved;</samp> <strong>></strong> <samp>portraits%X;old%X;%portrait_saved;</samp>
-      %else;<samp>portraits%X;saved%X;%keydir;(.gif/jpg/png)</samp>%end;
+      %else;<samp>portraits%X;saved%X;%carrousel;(.gif/jpg/png)</samp>%end;
     %end;
   %end;
 %end;
 %define;alert_color()
-  %if;(evar.mode="comment")primary
+  %if;(evar.mode="note")primary
   %elseif;(evar.em="SND_IMAGE_C_OK" or evar.em="RESET_IMAGE_C_OK")success
   %elseif;(evar.em="DEL_IMAGE_C_OK" and evar.delete="on")danger
   %else;warning
@@ -112,7 +112,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
         <input type="hidden" name="mode" id="mode_2" value="others">
         <input type="hidden" name="idigest" value=%idigest;>
         %( file_name is automatically provided by the type="file" item %)
-        %( file_name_2 is used when updating the comment file after selection %)
+        %( file_name_2 is used when updating the note file after selection %)
         %( with the radiobutton of the old folder content (right column) %)
         <input type="hidden" name="file_name_2" id="file_name_2" value="">
         <div class="custom-file col">
@@ -129,14 +129,21 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
         </div>
         <div class="d-flex col">
           <h1 class="display-4">
-            %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*comment]</h1>
+            %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*source]</h1>
+        </div>
+        <textarea class="form-control col-12" id="image_source"
+          name="notes" rows="1" placeholder="[*image source]" disabled>
+        </textarea>
+        <div class="d-flex col">
+          <h1 class="display-4">
+            %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*note]</h1>
           <span class="mb-1 px-0 ml-auto align-self-end col-2">%include.toolbar;</span>
         </div>
-        <textarea class="form-control col-12" id="notes_comments"
-          name="notes" rows="5" placeholder="[*image comment]" disabled>
+        <textarea class="form-control col-12" id="image_note"
+          name="notes" rows="5" placeholder="[*image note]" disabled>
         </textarea>
-        <button class="btn btn-primary mt-2 col-12 btn-update-comment" type="submit" disabled>
-          <span id="which_img_show">[*send image with comment]</span></button>
+        <button class="btn btn-primary mt-2 col-12 btn-update-note" type="submit" disabled>
+          <span id="which_img_show">[*send image with note and source]</span></button>
       </form>
     </div>
     %( *** Col 2 *** image cache disabled with a kch=%random.bits; %)
@@ -208,43 +215,55 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
           </tr></table>
         %end;
       %end;
-      %if;(keydir_img_nbr>0)
+      %if;(carrousel_img_nbr>0)
         <h1 class="display-4">[*image/images]1</h1>
         <div class="d-flex align-items-center">
           <i class="fa fa-folder-open fa-lg text-warning mx-2" aria-hidden="true"></i>
-          <strong><samp class="text-truncate" title="%images_store;%X;%keydir;">%images_store;%X;%keydir;%X;</samp></strong>
-          <div class="ml-auto">(%keydir_img_nbr; %if;(keydir_img_nbr>1)[image/images]1%else;[image/images]0%end;)</div>
+          <strong><samp class="text-truncate" title="%images_store;%X;%carrousel;">%images_store;%X;%carrousel;%X;</samp></strong>
+          <div class="ml-auto">(%carrousel_img_nbr; %if;(carrousel_img_nbr>1)[image/images]1%else;[image/images]0%end;)</div>
         </div>
-        %foreach;img_in_keydir;
+        %foreach;img_in_carrousel;
           <div class="d-flex mt-1">
-            <a role="button" href="%prefix;m=IM_C&i=%index;&s=%keydir_img_key;"
+            <a role="button" href="%prefix;m=IM_C&i=%index;&s=%carrousel_img_key;"
               target="_blank" rel="noopener" data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong><i class="fas fa-images fa-xs mr-1"></i>[*see] [image/images]0</strong>
-                     <br><span class="small">%keydir_img;</span>
-                     <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;&s=%keydir_img_key;"
+                     <br><span class="small">%carrousel_img;</span>
+                     <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img_key;"
                      width="185px">
-                     <br><small>%keydir_img_title;%if;(keydir_img_src!="")<br>(%keydir_img_src;)%end;</small>'>
+                     <br><small>%carrousel_img_title;%if;(carrousel_img_src!="")<br>(%carrousel_img_src;)%end;</small>'>
               <i class="far fa-file-image fa-fw text-primary"></i>
             </a>
-            <a role="button" href="#" id="notes_%img_cnt;" class="text-%if;(keydir_img_notes="")danger%else;primary%end;"
-              onclick='get_notes(%img_cnt;, "%keydir_img;"); return false;' data-comment="%keydir_img_notes;"
+            <a role="button" href="#" id="notes_%img_cnt;" class="text-%if;(carrousel_img_note="")danger%else;primary%end;"
+              onclick='get_notes(%img_cnt;, "%carrousel_img;"); return false;' data-notet="%carrousel_img_notes;"
               data-toggle="tooltip" data-html="true" data-placement="bottom"
               title='<strong><i class="far fa-file fa-fw mr-1"></i>
-                     %if;(keydir_img_notes="")[*add]%else;[*modify]%end; [comment]</strong>
-                     <br><span class="small">%keydir_notes;</span>
+                     %if;(carrousel_img_note="")[*add]%else;[*modify]%end; [note]</strong>
+                     <br><span class="small">%carrousel_note;</span>
                      <br><span class="small" style="text-align: left;">%nn;
-                          %(<strong>[*titre][:]</strong> %keydir_img_title;
-                          %if;(keydir_img_src!="")<br><strong>[*source][:]</strong>%keydir_img_src;%end;
-                     <br>[*comment][:]%)<br>%keydir_img_notes;</span>'>
+                          %(<strong>[*titre][:]</strong> %carrousel_img_title;
+                          %if;(carrousel_img_src!="")<br><strong>[*source][:]</strong>%carrousel_img_src;%end;
+                     <br>[*note][:]%)<br>%carrousel_img_note;</span>'>
               <i class="far fa-file-alt fa-fw"></i>%nn;
             </a>
-            <samp class="text-truncate ml-1" title="%images_store;%X;%keydir;%X;%keydir_img;">%keydir_img;</samp>
+            <a role="button" href="#" id="source_%img_cnt;" class="text-%if;(carrousel_img_source="")danger%else;primary%end;"
+              onclick='get_notes(%img_cnt;, "%carrousel_img;"); return false;' data-notet="%carrousel_img_source;"
+              data-toggle="tooltip" data-html="true" data-placement="bottom"
+              title='<strong><i class="far fa-file fa-fw mr-1"></i>
+                     %if;(carrousel_img_source="")[*add]%else;[*modify]%end; [source]</strong>
+                     <br><span class="small">%carrousel_source;</span>
+                     <br><span class="small" style="text-align: left;">%nn;
+                          %(<strong>[*titre][:]</strong> %carrousel_img_title;
+                          %if;(carrousel_img_src!="")<br><strong>[*source][:]</strong>%carrousel_img_src;%end;
+                     <br>[*note][:]%)<br>%carrousel_img_source;</span>'>
+              <i class="far fa-file-alt fa-fw"></i>%nn;
+            </a>
+            <samp class="text-truncate ml-1" title="%images_store;%X;%carrousel;%X;%carrousel_img;">%carrousel_img;</samp>
             <div class="ml-auto col-1">
-              <a role="button" href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&file_name=%keydir_img_key;&mode=others&idigest=%idigest;"
+              <a role="button" href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&file_name=%carrousel_img_key;&mode=others&idigest=%idigest;"
                 data-toggle="tooltip" data-html="true" data-placement="left"
                 title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete] [image/images]0</strong>
-                       <br><span class="small">%keydir_img;</span>
-                       <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;&s=%keydir_img_key;"
+                       <br><span class="small">%carrousel_img;</span>
+                       <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img_key;"
                        width="185px">'>
                 <i class="far fa-trash-alt text-warning"></i>
               </a>
@@ -252,36 +271,36 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
           </div>
         %end;
       %end;
-      %if;(keydir_old_img_nbr>0)
+      %if;(carrousel_old_img_nbr>0)
         <h1 class="display-4">[*saved images]1</h1>
         <div class="d-flex align-items-center">
           <i class="fa fa-folder-open fa-lg text-warning mx-2" aria-hidden="true"></i>
-          <strong><samp class="text-truncate" title="%images_store;%X;%keydir;%X;old%X;">%images_store%X;%keydir;%X;old%X;</samp></strong>
-          <div class="ml-auto">(%keydir_old_img_nbr; %if;(keydir_old_img_nbr>1)[image/images]1%else;[image/images]0%end;)</div>
+          <strong><samp class="text-truncate" title="%images_store;%X;%carrousel;%X;old%X;">%images_store%X;%carrousel;%X;old%X;</samp></strong>
+          <div class="ml-auto">(%carrousel_old_img_nbr; %if;(carrousel_old_img_nbr>1)[image/images]1%else;[image/images]0%end;)</div>
         </div>
-        %foreach;img_in_keydir_old;
+        %foreach;img_in_carrousel_old;
           <div class="d-flex mt-1">
-            <a role="button" href="%prefix;m=IM_C_S&i=%index;&s=%keydir_img_key;" target="_blank" rel="noopener"
+            <a role="button" href="%prefix;m=IM_C_S&i=%index;&s=%carrousel_img_key;" target="_blank" rel="noopener"
                data-toggle="tooltip" data-html="true" data-placement="left"
-               title='<strong>[*see] [saved images]0</strong><br><span class="small">%keydir_img;</span>
-              <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%keydir_img_key;" width="185px">'%nn;>
+               title='<strong>[*see] [saved images]0</strong><br><span class="small">%carrousel_img;</span>
+              <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%carrousel_img_key;" width="185px">'%nn;>
               <i class="far fa-file-image fa-fw text-primary"></i>%nn;
             </a>
-            <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=others&file_name=%keydir_img_key;&idigest=%idigest;"
+            <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=others&file_name=%carrousel_img_key;&idigest=%idigest;"
                data-toggle="tooltip" data-html="true" data-placement="top"
-               title='<i class="fa fa-retweet fa-rotate-90 text-success mr-1"></i><strong>[*restore] [saved images]0</strong><br><span class="small">%keydir_img;</span>
-                      <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%keydir_img_key;" width="185px">'>
+               title='<i class="fa fa-retweet fa-rotate-90 text-success mr-1"></i><strong>[*restore] [saved images]0</strong><br><span class="small">%carrousel_img;</span>
+                      <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%carrousel_img_key;" width="185px">'>
               <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i>%nn;
             </a>
-            <samp class="text-truncate ml-1" title="%images_store;%X;old%X;%keydir_img;">%keydir_img;</samp>
+            <samp class="text-truncate ml-1" title="%images_store;%X;old%X;%carrousel_img;">%carrousel_img;</samp>
             <div class="ml-auto col-1">
               <a role="button" href="%prefix;m=DEL_IMAGE_C_OK&i=%index%nn;
-                &idigest=%idigest;&file_name=%keydir_img_key;&mode=others%nn;
+                &idigest=%idigest;&file_name=%carrousel_img_key;&mode=others%nn;
                 &delete=on"%sp;
                   data-toggle="tooltip" data-html="true" data-placement="left"
                   title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete] [saved images]0</strong>
-                         <br><span class="small">%keydir_img;</span>
-                         <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%keydir_img_key;" width="185px">'>
+                         <br><span class="small">%carrousel_img;</span>
+                         <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;&s=%carrousel_img_key;" width="185px">'>
                 <i class="far fa-trash-alt text-danger fa-fw text-primary"></i>%nn;
               </a>
             </div>
@@ -325,9 +344,14 @@ $('.xxx').change(function() {
 <script>
 %apply;input_snd("custom-portrait","snd-btn-portrait")
 %apply;input_snd("custom-others","snd-btn-others")
-$('#notes_comments').bind('input propertychange', function() {
+$('#image_note').bind('input propertychange', function() {
   if(this.value.length){
-  $('.btn-update-comment').attr('disabled', false);
+  $('.btn-update-note').attr('disabled', false);
+  }
+});
+$('#image_source').bind('input propertychange', function() {
+  if(this.value.length){
+  $('.btn-update-source').attr('disabled', false);
   }
 });
 $('.fa-file-alt').click(function() {
@@ -354,10 +378,11 @@ $(function () {
 })%)
 function get_notes (cnt, name) {
 var item = document.getElementById("notes_"+cnt);
-document.getElementById("notes_comments").value=item.dataset.comment;
-document.getElementById("which_img_show").textContent="[*update image comment] "+name;
+document.getElementById("image_note").value=item.dataset.note;
+document.getElementById("image_source").value=item.dataset.source;
+document.getElementById("which_img_show").textContent="[*update image note] "+name;
 document.getElementById("file_name_2").value=name;
-document.getElementById("mode_2").value="comment";
+document.getElementById("mode_2").value="note";
 var ta = document.querySelector('textarea');
 autosize.update(ta);
 }
