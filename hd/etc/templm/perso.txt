@@ -125,7 +125,7 @@
             <a id="hist" href="%prefix;m=HIST_DIFF;t=DIFF;f=%history_file;;new=0;old=1" style="display:inline-block;width:125px" %laD;>≏ [*last diff]</a>
             <a href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;" style="display:inline-block;width:125px" title="[*revision history]">∴ [*history]</a>
           %end;
-          %if;(bvar.can_send_image != "no" and not has_image_url and first_name != "?" and surname != "?")
+          %if;(bvar.can_send_image != "no" and not has_portrait_url and first_name != "?" and surname != "?")
           <a href="%prefix;m=SND_IMAGE;i=%index;" style="display:inline-block;width:125px" %laI; >🎴 [*send::image/images]0</a>%nn;
             %if;(auto_image_file_name != "")<a href="%prefix;m=DEL_IMAGE;i=%index;" style="color:red;display:inline-block;width:125px"><small>[*delete::image/images]0</small></a>%end;
           %end;

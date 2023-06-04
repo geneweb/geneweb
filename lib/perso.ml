@@ -1619,6 +1619,8 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | Vfam (_, fam, _, _) ->
           get_fsources fam |> sou base |> Util.safe_html |> safe_val
       | _ -> null_val)
+  | "url" -> (
+      match get_env "url" env with Vstring x -> str_val x | _ -> str_val "")
   | "incr_count" -> (
       match get_env "count" env with
       | Vcnt c ->
@@ -3412,11 +3414,16 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       match Image.get_portrait conf base p with
       | Some src -> Mutil.start_with "http" 0 (Image.src_to_string src)
       | _ -> false)
+  | "has_old_image_url" | "has_old_portrait_url" -> (
+      match Image.get_old_portrait conf base p with
+      | Some src -> Mutil.start_with "http" 0 (Image.src_to_string src)
+      | _ -> false)
   (* carrousel *)
-  | "has_carrousel" -> 
-      Sys.file_exists (Filename.concat
-        (Image.carrousel_folder conf)
-        (Image.default_portrait_filename base p))
+  | "has_carrousel" ->
+      Sys.file_exists
+        (Filename.concat
+           (Image.carrousel_folder conf)
+           (Image.default_portrait_filename base p))
   | "has_old_image" | "has_old_portrait" ->
       Image.get_old_portrait conf base p |> Option.is_some
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
@@ -5058,10 +5065,24 @@ let print_foreach conf base print_ast eval_expr =
     let rec loop first cnt = function
       | [] -> ()
       | a :: l ->
-          let env = ("carrousel_img", Vstring a) :: env in
-          let env = ("first", Vbool first) :: env in
-          let env = ("last", Vbool (l = [])) :: env in
-          let env = ("img_cnt", Vint cnt) :: env in
+          let url =
+            if Filename.extension a = ".url" then (
+              let k = Image.default_portrait_filename base p in
+              let f = Filename.concat (Image.carrousel_folder conf) k in
+              let f = if old then Filename.concat f "old" else f in
+              let fname = Filename.concat f a in
+              let ic = Secure.open_in fname in
+              let line = input_line ic in
+              close_in ic;
+              line)
+            else ""
+          in
+          let env =
+            ("carrousel_img", Vstring a)
+            :: ("first", Vbool first)
+            :: ("last", Vbool (l = []))
+            :: ("url", Vstring url) :: ("img_cnt", Vint cnt) :: env
+          in
           List.iter (print_ast env ep) al;
           loop false (cnt + 1) l
     in
