@@ -142,34 +142,38 @@ let dump_bad_image conf s =
   | _ -> ()
 
 (* swap files between new and old folder *)
-let swap_files_aux dir file =
+let swap_files_aux dir file mode =
   let old_file =
     String.concat Filename.dir_sep [ dir; "old"; Filename.basename file ]
   in
   if Sys.file_exists old_file then (
-    let tmp_file = String.concat Filename.dir_sep [ dir; "tempfile.tmp" ] in
-    rn file tmp_file;
-    rn old_file file;
-    rn tmp_file old_file)
+    if mode = "portrait" && Filename.extension old_file = ".url" then ()
+      (* TODO update url image for person *)
+    else
+      let tmp_file = String.concat Filename.dir_sep [ dir; "tempfile.tmp" ] in
+      rn file tmp_file;
+      rn old_file file;
+      rn tmp_file old_file)
 
-let swap_files file =
+let swap_files file mode =
   let dir = Filename.dirname file in
   let fname = Filename.basename file in
-  swap_files_aux dir file;
+  swap_files_aux dir file mode;
   let txt_file =
     String.concat Filename.dir_sep
       [ dir; Filename.chop_extension fname ^ ".txt" ]
   in
-  swap_files_aux dir txt_file;
+  swap_files_aux dir txt_file mode;
   let src_file =
     String.concat Filename.dir_sep
       [ dir; Filename.chop_extension fname ^ ".src" ]
   in
-  swap_files_aux dir src_file
+  swap_files_aux dir src_file mode
 
 let clean_saved_portrait file =
   let file = Filename.remove_extension file in
-  Array.iter (fun ext -> Mutil.rm (file ^ ext))
+  Array.iter
+    (fun ext -> Mutil.rm (file ^ ext))
     Image.authorized_image_file_extension
 
 let get_extension conf saved fname =
@@ -294,6 +298,7 @@ let print_sent conf base p =
   Hutil.trailer conf
 
 let effective_send_ok conf base p file =
+  Printf.eprintf "Effective Send %s\n" file;
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
@@ -356,8 +361,15 @@ let print_send_ok conf base =
 
 (* carrousel *)
 let effective_send_c_ok conf base p file file_name =
+  Printf.eprintf "Effective Send C %s\n" file_name;
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
+  in
+  let image_url =
+    try (List.assoc "image_url" conf.env :> string) with Not_found -> ""
+  in
+  let image_name =
+    try (List.assoc "image_name" conf.env :> string) with Not_found -> ""
   in
   let note =
     match Util.p_getenv conf.env "note" with
@@ -376,7 +388,7 @@ let effective_send_c_ok conf base p file file_name =
   let strm = Stream.of_string file in
   let request, content = Wserver.get_request_and_content strm in
   let content =
-    if mode = "note" || mode = "source" then ""
+    if mode = "note" || mode = "source" || image_url <> "" then ""
     else
       let s =
         let rec loop len (strm__ : _ Stream.t) =
@@ -423,24 +435,55 @@ let effective_send_c_ok conf base p file file_name =
     | Some (`Path portrait) ->
         if move_file_to_save portrait dir = 0 then
           incorrect conf "effective send (portrait)"
-    | Some (`Url _url) -> () (* ??? remember url in a text file ? *)
+    | Some (`Url url) -> (
+        let fname = Image.default_portrait_filename base p in
+        let dir = Filename.concat dir "old" in
+        if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
+        let fname = Filename.concat dir fname ^ ".url" in
+        try write_file fname url
+        with _ ->
+          incorrect conf
+            (Printf.sprintf "effective send (effective send url portrait %s)"
+               fname)
+        (* TODO update person to supress url image *))
     | _ -> ()
   else if content <> "" then
     if Sys.file_exists fname then
       if move_file_to_save fname dir = 0 then
         incorrect conf "effective send (image)";
-  if content <> "" then write_file fname content;
+  if content <> "" then
+    try write_file fname content
+    with _ ->
+      incorrect conf
+        (Printf.sprintf "effective send (writing content file %s)" fname)
+  else if image_url <> "" then
+    let fname = Filename.concat dir image_name ^ ".url" in
+    try write_file fname image_url
+    with _ ->
+      incorrect conf
+        (Printf.sprintf "effective send (writing .url file %s)" fname)
+  else ();
   if note <> Adef.safe "" then
-    write_file (Filename.remove_extension fname ^ ".txt") (note :> string);
+    let fname = Filename.remove_extension fname ^ ".txt" in
+    try write_file fname (note :> string)
+    with _ ->
+      incorrect conf
+        (Printf.sprintf "effective send (writing .txt file %s)" fname)
+  else ();
   if source <> Adef.safe "" then
-    write_file (Filename.remove_extension fname ^ ".src") (source :> string);
+    let fname = Filename.remove_extension fname ^ ".src" in
+    try write_file fname (source :> string)
+    with _ ->
+      incorrect conf
+        (Printf.sprintf "effective send (writing .txt file %s)" fname)
+  else ();
   let changed =
     U_Send_image (Util.string_gen_person base (gen_person_of_person p))
   in
   History.record conf base changed
     (if mode = "portraits" then "si"
-    else if file_name <> "" && note <> Adef.safe "" &&
-      source <> Adef.safe "" then "sb"
+    else if file_name <> "" && note <> Adef.safe "" && source <> Adef.safe ""
+   then "sb"
     else if file_name <> "" then "so"
     else if note <> Adef.safe "" then "sc"
     else if source <> Adef.safe "" then "ss"
@@ -575,7 +618,7 @@ let effective_reset_c_ok conf base p =
       String.concat Filename.dir_sep
         [ Util.base_path [ "src" ] conf.bname; "images"; carrousel; file_name ]
   in
-  swap_files file_in_new;
+  swap_files file_in_new mode;
   file_name
 
 (* ************************************************************************** *)
