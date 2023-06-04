@@ -49,12 +49,18 @@
             %if;has_carrousel;
               %foreach;img_in_carrousel;%incr_count;
                 <div class="carousel-item%if;(not has_portrait and is_first) active%end;">
-                  <a href="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" target="_blank" rel="noopener">
-                     <img class="img-fluid" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" alt="%count; slide">
-                  </a>
+                  %if;(url!="")
+                    <a href="%url;" target="_blank" rel="noopener">
+                      url image
+                    </a>
+                  %else;
+                    <a href="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" target="_blank" rel="noopener">
+                      <img class="img-fluid" src="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" alt="%count; slide">
+                    </a>
+                  %end;
                   <div class="position-relative d-inline-flex w-100 d-none d-md-block">
-                    <span>%carrousel_img_notes;</span>
-                    %if;(carrousel_img_notes!="")<br>%end;
+                    <span>%carrousel_img_note;</span>
+                    %if;(carrousel_img_note!="")<br>%end;
                     <span>[image/images]0 %count;/%carrousel_img_nbr;[:] </span>
                     <small class="ml-auto">%carrousel_img; </small>
                   </div>

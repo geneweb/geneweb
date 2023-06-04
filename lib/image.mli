@@ -3,7 +3,6 @@ open Gwdb
 
 val portrait_folder : config -> string
 val carrousel_folder : config -> string
-
 val authorized_image_file_extension : string array
 
 val scale_to_fit : max_w:int -> max_h:int -> w:int -> h:int -> int * int

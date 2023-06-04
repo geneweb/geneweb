@@ -23,11 +23,13 @@ let default_portrait_filename base p =
 let authorized_image_file_extension = [| ".jpg"; ".jpeg"; ".png"; ".gif" |]
 
 let get_file_with_ext f =
-  let exists ext =
-    let fname = f ^ ext in
-    if Sys.file_exists fname then Some fname else None
-  in
-  Array.find_map exists authorized_image_file_extension
+  if Sys.file_exists (f ^ ".url") then Some (f ^ ".url")
+  else
+    let exists ext =
+      let fname = f ^ ext in
+      if Sys.file_exists fname then Some fname else None
+    in
+    Array.find_map exists authorized_image_file_extension
 
 (** [full_portrait_path conf base p] is [Some path] if [p] has a portrait.
     [path] is a the full path of the file with file extension. *)
@@ -166,19 +168,19 @@ let scale_to_fit ~max_w ~max_h ~w ~h =
 (** [has_access_to_portrait conf base p] is true iif we can see [p]'s portrait. *)
 let has_access_to_portrait conf base p =
   let img = get_image p in
-  (conf.wizard || conf.friend) ||
-  ((not conf.no_image)
-  && Util.authorized_age conf base p
-  && (( not (is_empty_string img)) || full_portrait_path conf base p <> None)
-  && ( not (Mutil.contains (sou base img) "/private/")))
+  (conf.wizard || conf.friend)
+  || (not conf.no_image)
+     && Util.authorized_age conf base p
+     && ((not (is_empty_string img)) || full_portrait_path conf base p <> None)
+     && not (Mutil.contains (sou base img) "/private/")
 (* TODO: privacy settings should be in db not in url *)
 
 (** [has_access_to_carrousel conf base p] is true iif ???. *)
 let has_access_to_carrousel conf base p =
-  (conf.wizard || conf.friend ) ||
-  ((not conf.no_image)
-  && Util.authorized_age conf base p
-  && (not (Util.is_hide_names conf p)))
+  (conf.wizard || conf.friend)
+  || (not conf.no_image)
+     && Util.authorized_age conf base p
+     && not (Util.is_hide_names conf p)
 
 let get_portrait_path conf base p =
   if has_access_to_portrait conf base p then full_portrait_path conf base p
@@ -188,12 +190,7 @@ let get_portrait_path conf base p =
 let urlorpath_of_string conf s =
   let http = "http://" in
   let https = "https://" in
-  (* TODO OCaml 4.13: use String.starts_with *)
-  if
-    String.length s > String.length http
-    && String.sub s 0 (String.length http) = http
-    || String.length s > String.length https
-       && String.sub s 0 (String.length https) = https
+  if String.starts_with ~prefix:http s || String.starts_with ~prefix:https s
   then `Url s
   else if Filename.is_implicit s then
     match List.assoc_opt "images_path" conf.base_env with
@@ -246,7 +243,14 @@ let get_old_portrait conf base p =
     let f =
       Filename.concat (Filename.concat (portrait_folder conf) "old") key
     in
-    match get_file_with_ext f with Some f -> Some (`Path f) | None -> None
+    match get_file_with_ext f with
+    | Some f when Filename.extension f = ".url" ->
+        let ic = open_in f in
+        let url = input_line ic in
+        close_in ic;
+        Some (`Url url)
+    | Some f -> Some (`Path f)
+    | None -> None
   else None
 
 let rename_portrait conf base p (nfn, nsn, noc) =
@@ -283,14 +287,12 @@ let rename_portrait conf base p (nfn, nsn, noc) =
 
 (* For carrousel ************************************ *)
 
-
 let get_carrousel_img_aux conf base p fname kind =
   if not (has_access_to_carrousel conf base p) then None
   else
     let k = default_portrait_filename base p in
     let fname =
-      String.concat Filename.dir_sep
-        [ carrousel_folder conf; k; fname ^ kind ]
+      String.concat Filename.dir_sep [ carrousel_folder conf; k; fname ^ kind ]
     in
     if Sys.file_exists fname then (
       let ic = Secure.open_in fname in
@@ -313,14 +315,14 @@ let get_carrousel_files_aux conf base p old =
     let f = Filename.concat (carrousel_folder conf) k in
     let f = if old then Filename.concat f "old" else f in
     try
-      if Sys.is_directory f then
+      if (Sys.file_exists f) && (Sys.is_directory f) then
         Array.fold_left
           (fun acc f1 ->
             let ext = Filename.extension f1 in
             if
               f1 <> ""
               && f1.[0] <> '.'
-              && Array.mem ext authorized_image_file_extension
+              && (Array.mem ext authorized_image_file_extension || ext = ".url")
             then f1 :: acc
             else acc)
           [] (Sys.readdir f)
@@ -330,7 +332,9 @@ let get_carrousel_files_aux conf base p old =
       []
 
 let get_carrousel_files conf base p = get_carrousel_files_aux conf base p false
-let get_carrousel_old_files conf base p = get_carrousel_files_aux conf base p true
+
+let get_carrousel_old_files conf base p =
+  get_carrousel_files_aux conf base p true
 
 (* end carrousel ************************************ *)
 

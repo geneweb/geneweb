@@ -19,6 +19,14 @@ de: wählen
 en: choose file
 fr: sélect. fichier
 
+    ou
+en: or
+fr: ou
+
+    url
+en: url
+fr: url
+
     browse
 de: durchsuchen
 en: browse
@@ -53,6 +61,10 @@ fr: modifier le portrait
 en: modify the note
 fr: modifier la note
 
+    modify source
+en: modify the source
+fr: modifier la source
+
     see portrait
 en: see portrait
 fr: voir le portrait
@@ -76,6 +88,10 @@ fr: supprimer une image
     delete image saved
 en: delete saved image
 fr: supprimer une image sauvegardés
+
+    restore image saved
+en: restore saved image
+fr: restaurer une image sauvegardés
 
     restore portrait
 en: restore portrait
