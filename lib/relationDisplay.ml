@@ -885,15 +885,8 @@ let print_main_relationship conf base long p1 p2 rel =
         Output.print_sstring conf
           (transl_nth conf "try another/relationship computing" 1);
         Output.print_sstring conf ".</span></p>")
-  | Some (rl, _, relationship) ->
-      let a1 = p1 in
-      let a2 = p2 in
-      let all_by_marr =
-        List.for_all
-          (function Some _, _, _, _ | _, Some _, _, _ -> true | _ -> false)
-          rl
-      in
-      let _ =
+  | Some (rl, _, _relationship) ->
+      let _int =
         List.fold_left
           (fun i sol ->
             print_solution conf base long i p1 p2 sol;
@@ -903,21 +896,6 @@ let print_main_relationship conf base long p1 p2 rel =
       in
       Output.print_sstring conf "\n";
       if long then () else print_dag_links conf base p1 p2 rl;
-      if
-        (not all_by_marr)
-        && authorized_age conf base p1
-        && authorized_age conf base p2
-        && get_consang a1 != Adef.fix (-1)
-        && get_consang a2 != Adef.fix (-1)
-      then (
-        Output.print_sstring conf "<p>\n";
-        Output.printf conf "<em>%s%s %s%%</em>"
-          (Utf8.capitalize_fst (transl conf "relationship"))
-          (Util.transl conf ":")
-          (string_of_decimal_num conf
-             (round_2_dec
-                (Adef.float_of_fix (Adef.fix_of_float relationship) *. 100.0)));
-        Output.print_sstring conf "</p>\n");
       print_propose_upto conf base p1 p2 rl);
   Hutil.trailer conf
 
