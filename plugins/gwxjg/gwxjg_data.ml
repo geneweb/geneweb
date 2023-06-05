@@ -435,8 +435,10 @@ and mk_witness_kind = function
   | Def.Witness_Other -> Tsafe "WITNESS_OTHER"
 
 and mk_pevent conf base e = mk_event conf base (Event.event_item_of_pevent e)
+
 and mk_fevent conf base sp e =
-  let ei = match sp with
+  let ei =
+    match sp with
     | Some sp -> Event.event_item_of_fevent ~sp e
     | None -> Event.event_item_of_fevent e
   in
@@ -444,6 +446,7 @@ and mk_fevent conf base sp e =
 
 and mk_fevent' conf base sp e =
   mk_event conf base (Event.event_item_of_gen_fevent e)
+
 and mk_pevent' conf base e =
   mk_event conf base (Event.event_item_of_gen_pevent e)
 
@@ -820,233 +823,234 @@ and mk_warning conf base =
       List.iteri (fun i x -> a.(i) <- fn x) l;
       a
   in
-  fun (warning : CheckItem.base_warning) -> match warning with
-  | Warning.BigAgeBetweenSpouses (f, m, a) ->
-      Tset
-        [
-          Tsafe "BigAgeBetweenSpouses";
-          unsafe_mk_person conf base f;
-          unsafe_mk_person conf base m;
-          mk_date (Dgreg (a, Dgregorian));
-        ]
-  | BirthAfterDeath p ->
-      Tset [ Tsafe "BirthAfterDeath"; unsafe_mk_person conf base p ]
-  | IncoherentSex (p, i1, i2) ->
-      Tset
-        [
-          Tsafe "BirthAfterDeath";
-          unsafe_mk_person conf base p;
-          Tint i1;
-          Tint i2;
-        ]
-  | ChangedOrderOfChildren (ifam, _descend, before, after) ->
-      let bef_d, aft_d = Difference.f before after in
-      Tset
-        [
-          Tsafe "ChangedOrderOfChildren";
-          get_fam ifam;
-          Tarray (Array.map (get_n_mk_person conf base) before);
-          Tarray (Array.map (get_n_mk_person conf base) after);
-          Tarray (Array.map box_bool bef_d);
-          Tarray (Array.map box_bool aft_d);
-        ]
-  | ChangedOrderOfMarriages (p, before, after) ->
-      let bef_d, aft_d = Difference.f before after in
-      Tset
-        [
-          Tsafe "ChangedOrderOfMarriages";
-          unsafe_mk_person conf base p;
-          Tarray (Array.map get_fam before);
-          Tarray (Array.map get_fam after);
-          Tarray (Array.map box_bool bef_d);
-          Tarray (Array.map box_bool aft_d);
-        ]
-  | ChangedOrderOfFamilyEvents (_ifam, before, after) ->
-      let before = array_of_list_map (mk_fevent' conf base None) before in
-      let after = array_of_list_map (mk_fevent' conf base None) after in
-      let bef_d, aft_d = Difference.f before after in
-      Tset
-        [
-          Tsafe "ChangedOrderOfFamilyEvents";
-          Tarray before;
-          Tarray after;
-          Tarray (Array.map box_bool bef_d);
-          Tarray (Array.map box_bool aft_d);
-        ]
-  | ChangedOrderOfPersonEvents (_p, before, after) ->
-      let before = array_of_list_map (mk_pevent' conf base) before in
-      let after = array_of_list_map (mk_pevent' conf base) after in
-      let bef_d, aft_d = Difference.f before after in
-      Tset
-        [
-          Tsafe "ChangedOrderOfPersonEvents";
-          Tarray before;
-          Tarray after;
-          Tarray (Array.map box_bool bef_d);
-          Tarray (Array.map box_bool aft_d);
-        ]
-  | ChildrenNotInOrder (ifam, _descend, elder, x) ->
-      Tset
-        [
-          Tsafe "ChildrenNotInOrder";
-          get_fam ifam;
-          unsafe_mk_person conf base elder;
-          unsafe_mk_person conf base x;
-        ]
-  | CloseChildren (ifam, c1, c2) ->
-      Tset
-        [
-          Tsafe "CloseChildren";
-          get_fam ifam;
-          unsafe_mk_person conf base c1;
-          unsafe_mk_person conf base c2;
-        ]
-  | DistantChildren (ifam, c1, c2) ->
-      Tset
-        [
-          Tsafe "DistantChildren";
-          get_fam ifam;
-          unsafe_mk_person conf base c1;
-          unsafe_mk_person conf base c2;
-        ]
-  | DeadOld (p, a) ->
-      Tset
-        [
-          Tsafe "DeadOld";
-          unsafe_mk_person conf base p;
-          mk_date (Dgreg (a, Dgregorian));
-        ]
-  | DeadTooEarlyToBeFather (father, child) ->
-      Tset
-        [
-          Tsafe "DeadTooEarlyToBeFather";
-          unsafe_mk_person conf base father;
-          unsafe_mk_person conf base child;
-        ]
-  | FEventOrder (p, e1, e2) ->
-      Tset
-        [
-          Tsafe "FEventOrder";
-          unsafe_mk_person conf base p;
-          mk_fevent' conf base None e1;
-          mk_fevent' conf base None e2;
-        ]
-  | FWitnessEventAfterDeath (p, e, ifam) ->
-      Tset
-        [
-          Tsafe "FWitnessEventAfterDeath";
-          unsafe_mk_person conf base p;
-          mk_fevent' conf base None e;
-          get_fam ifam;
-        ]
-  | FWitnessEventBeforeBirth (p, e, ifam) ->
-      Tset
-        [
-          Tsafe "FWitnessEventBeforeBirth";
-          unsafe_mk_person conf base p;
-          mk_fevent' conf base None e;
-          get_fam ifam;
-        ]
-  | IncoherentAncestorDate (p1, p2) ->
-      Tset
-        [
-          Tsafe "IncoherentAncestorDate";
-          unsafe_mk_person conf base p1;
-          unsafe_mk_person conf base p2;
-        ]
-  | MarriageDateAfterDeath p ->
-      Tset [ Tsafe "MarriageDateAfterDeath"; unsafe_mk_person conf base p ]
-  | MarriageDateBeforeBirth p ->
-      Tset [ Tsafe "MarriageDateBeforeBirth"; unsafe_mk_person conf base p ]
-  | MotherDeadBeforeChildBirth (p1, p2) ->
-      Tset
-        [
-          Tsafe "MotherDeadBeforeChildBirth";
-          unsafe_mk_person conf base p1;
-          unsafe_mk_person conf base p2;
-        ]
-  | OldForMarriage (p, a, i) ->
-      Tset
-        [
-          Tsafe "OldForMarriage";
-          unsafe_mk_person conf base p;
-          mk_date (Dgreg (a, Dgregorian));
-          get_n_mk_family conf base i (Gwdb.foi base i);
-        ]
-  | ParentBornAfterChild (p1, p2) ->
-      Tset
-        [
-          Tsafe "ParentBornAfterChild";
-          unsafe_mk_person conf base p1;
-          unsafe_mk_person conf base p2;
-        ]
-  | ParentTooOld (p, a, c) ->
-      Tset
-        [
-          Tsafe "ParentTooOld";
-          unsafe_mk_person conf base p;
-          mk_date (Dgreg (a, Dgregorian));
-          unsafe_mk_person conf base c;
-        ]
-  | ParentTooYoung (p, a, c) ->
-      Tset
-        [
-          Tsafe "ParentTooYoung";
-          unsafe_mk_person conf base p;
-          mk_date (Dgreg (a, Dgregorian));
-          unsafe_mk_person conf base c;
-        ]
-  | PEventOrder (p, e1, e2) ->
-      Tset
-        [
-          Tsafe "PEventOrder";
-          unsafe_mk_person conf base p;
-          mk_pevent' conf base e1;
-          mk_pevent' conf base e2;
-        ]
-  | PWitnessEventAfterDeath (p, e, origin) ->
-      Tset
-        [
-          Tsafe "PWitnessEventAfterDeath";
-          unsafe_mk_person conf base p;
-          mk_pevent' conf base e;
-          unsafe_mk_person conf base origin;
-        ]
-  | PWitnessEventBeforeBirth (p, e, origin) ->
-      Tset
-        [
-          Tsafe "PWitnessEventBeforeBirth";
-          unsafe_mk_person conf base p;
-          mk_pevent' conf base e;
-          unsafe_mk_person conf base origin;
-        ]
-  | TitleDatesError (p, t) ->
-      Tset
-        [
-          Tsafe "TitleDatesError";
-          unsafe_mk_person conf base p;
-          mk_title conf base t;
-        ]
-  | UndefinedSex p ->
-      Tset [ Tsafe "UndefinedSex"; unsafe_mk_person conf base p ]
-  | YoungForMarriage (p, a, i) ->
-      Tset
-        [
-          Tsafe "YoungForMarriage";
-          unsafe_mk_person conf base p;
-          mk_date (Dgreg (a, Dgregorian));
-          get_fam i;
-        ]
-  | PossibleDuplicateFam (ifam1, ifam2) ->
-      Tset [ Tsafe "PossibleDuplicateFam"; get_fam ifam1; get_fam ifam2 ]
-  | PossibleDuplicateFamHomonymous (ifam1, ifam2, p) ->
-      Tset
-        [
-          Tsafe "PossibleDuplicateFamHomonymous";
-          get_fam ifam1;
-          get_fam ifam2;
-          unsafe_mk_person conf base p;
-        ]
+  fun (warning : CheckItem.base_warning) ->
+    match warning with
+    | Warning.BigAgeBetweenSpouses (f, m, a) ->
+        Tset
+          [
+            Tsafe "BigAgeBetweenSpouses";
+            unsafe_mk_person conf base f;
+            unsafe_mk_person conf base m;
+            mk_date (Dgreg (a, Dgregorian));
+          ]
+    | BirthAfterDeath p ->
+        Tset [ Tsafe "BirthAfterDeath"; unsafe_mk_person conf base p ]
+    | IncoherentSex (p, i1, i2) ->
+        Tset
+          [
+            Tsafe "BirthAfterDeath";
+            unsafe_mk_person conf base p;
+            Tint i1;
+            Tint i2;
+          ]
+    | ChangedOrderOfChildren (ifam, _descend, before, after) ->
+        let bef_d, aft_d = Difference.f before after in
+        Tset
+          [
+            Tsafe "ChangedOrderOfChildren";
+            get_fam ifam;
+            Tarray (Array.map (get_n_mk_person conf base) before);
+            Tarray (Array.map (get_n_mk_person conf base) after);
+            Tarray (Array.map box_bool bef_d);
+            Tarray (Array.map box_bool aft_d);
+          ]
+    | ChangedOrderOfMarriages (p, before, after) ->
+        let bef_d, aft_d = Difference.f before after in
+        Tset
+          [
+            Tsafe "ChangedOrderOfMarriages";
+            unsafe_mk_person conf base p;
+            Tarray (Array.map get_fam before);
+            Tarray (Array.map get_fam after);
+            Tarray (Array.map box_bool bef_d);
+            Tarray (Array.map box_bool aft_d);
+          ]
+    | ChangedOrderOfFamilyEvents (_ifam, before, after) ->
+        let before = array_of_list_map (mk_fevent' conf base None) before in
+        let after = array_of_list_map (mk_fevent' conf base None) after in
+        let bef_d, aft_d = Difference.f before after in
+        Tset
+          [
+            Tsafe "ChangedOrderOfFamilyEvents";
+            Tarray before;
+            Tarray after;
+            Tarray (Array.map box_bool bef_d);
+            Tarray (Array.map box_bool aft_d);
+          ]
+    | ChangedOrderOfPersonEvents (_p, before, after) ->
+        let before = array_of_list_map (mk_pevent' conf base) before in
+        let after = array_of_list_map (mk_pevent' conf base) after in
+        let bef_d, aft_d = Difference.f before after in
+        Tset
+          [
+            Tsafe "ChangedOrderOfPersonEvents";
+            Tarray before;
+            Tarray after;
+            Tarray (Array.map box_bool bef_d);
+            Tarray (Array.map box_bool aft_d);
+          ]
+    | ChildrenNotInOrder (ifam, _descend, elder, x) ->
+        Tset
+          [
+            Tsafe "ChildrenNotInOrder";
+            get_fam ifam;
+            unsafe_mk_person conf base elder;
+            unsafe_mk_person conf base x;
+          ]
+    | CloseChildren (ifam, c1, c2) ->
+        Tset
+          [
+            Tsafe "CloseChildren";
+            get_fam ifam;
+            unsafe_mk_person conf base c1;
+            unsafe_mk_person conf base c2;
+          ]
+    | DistantChildren (ifam, c1, c2) ->
+        Tset
+          [
+            Tsafe "DistantChildren";
+            get_fam ifam;
+            unsafe_mk_person conf base c1;
+            unsafe_mk_person conf base c2;
+          ]
+    | DeadOld (p, a) ->
+        Tset
+          [
+            Tsafe "DeadOld";
+            unsafe_mk_person conf base p;
+            mk_date (Dgreg (a, Dgregorian));
+          ]
+    | DeadTooEarlyToBeFather (father, child) ->
+        Tset
+          [
+            Tsafe "DeadTooEarlyToBeFather";
+            unsafe_mk_person conf base father;
+            unsafe_mk_person conf base child;
+          ]
+    | FEventOrder (p, e1, e2) ->
+        Tset
+          [
+            Tsafe "FEventOrder";
+            unsafe_mk_person conf base p;
+            mk_fevent' conf base None e1;
+            mk_fevent' conf base None e2;
+          ]
+    | FWitnessEventAfterDeath (p, e, ifam) ->
+        Tset
+          [
+            Tsafe "FWitnessEventAfterDeath";
+            unsafe_mk_person conf base p;
+            mk_fevent' conf base None e;
+            get_fam ifam;
+          ]
+    | FWitnessEventBeforeBirth (p, e, ifam) ->
+        Tset
+          [
+            Tsafe "FWitnessEventBeforeBirth";
+            unsafe_mk_person conf base p;
+            mk_fevent' conf base None e;
+            get_fam ifam;
+          ]
+    | IncoherentAncestorDate (p1, p2) ->
+        Tset
+          [
+            Tsafe "IncoherentAncestorDate";
+            unsafe_mk_person conf base p1;
+            unsafe_mk_person conf base p2;
+          ]
+    | MarriageDateAfterDeath p ->
+        Tset [ Tsafe "MarriageDateAfterDeath"; unsafe_mk_person conf base p ]
+    | MarriageDateBeforeBirth p ->
+        Tset [ Tsafe "MarriageDateBeforeBirth"; unsafe_mk_person conf base p ]
+    | MotherDeadBeforeChildBirth (p1, p2) ->
+        Tset
+          [
+            Tsafe "MotherDeadBeforeChildBirth";
+            unsafe_mk_person conf base p1;
+            unsafe_mk_person conf base p2;
+          ]
+    | OldForMarriage (p, a, i) ->
+        Tset
+          [
+            Tsafe "OldForMarriage";
+            unsafe_mk_person conf base p;
+            mk_date (Dgreg (a, Dgregorian));
+            get_n_mk_family conf base i (Gwdb.foi base i);
+          ]
+    | ParentBornAfterChild (p1, p2) ->
+        Tset
+          [
+            Tsafe "ParentBornAfterChild";
+            unsafe_mk_person conf base p1;
+            unsafe_mk_person conf base p2;
+          ]
+    | ParentTooOld (p, a, c) ->
+        Tset
+          [
+            Tsafe "ParentTooOld";
+            unsafe_mk_person conf base p;
+            mk_date (Dgreg (a, Dgregorian));
+            unsafe_mk_person conf base c;
+          ]
+    | ParentTooYoung (p, a, c) ->
+        Tset
+          [
+            Tsafe "ParentTooYoung";
+            unsafe_mk_person conf base p;
+            mk_date (Dgreg (a, Dgregorian));
+            unsafe_mk_person conf base c;
+          ]
+    | PEventOrder (p, e1, e2) ->
+        Tset
+          [
+            Tsafe "PEventOrder";
+            unsafe_mk_person conf base p;
+            mk_pevent' conf base e1;
+            mk_pevent' conf base e2;
+          ]
+    | PWitnessEventAfterDeath (p, e, origin) ->
+        Tset
+          [
+            Tsafe "PWitnessEventAfterDeath";
+            unsafe_mk_person conf base p;
+            mk_pevent' conf base e;
+            unsafe_mk_person conf base origin;
+          ]
+    | PWitnessEventBeforeBirth (p, e, origin) ->
+        Tset
+          [
+            Tsafe "PWitnessEventBeforeBirth";
+            unsafe_mk_person conf base p;
+            mk_pevent' conf base e;
+            unsafe_mk_person conf base origin;
+          ]
+    | TitleDatesError (p, t) ->
+        Tset
+          [
+            Tsafe "TitleDatesError";
+            unsafe_mk_person conf base p;
+            mk_title conf base t;
+          ]
+    | UndefinedSex p ->
+        Tset [ Tsafe "UndefinedSex"; unsafe_mk_person conf base p ]
+    | YoungForMarriage (p, a, i) ->
+        Tset
+          [
+            Tsafe "YoungForMarriage";
+            unsafe_mk_person conf base p;
+            mk_date (Dgreg (a, Dgregorian));
+            get_fam i;
+          ]
+    | PossibleDuplicateFam (ifam1, ifam2) ->
+        Tset [ Tsafe "PossibleDuplicateFam"; get_fam ifam1; get_fam ifam2 ]
+    | PossibleDuplicateFamHomonymous (ifam1, ifam2, p) ->
+        Tset
+          [
+            Tsafe "PossibleDuplicateFamHomonymous";
+            get_fam ifam1;
+            get_fam ifam2;
+            unsafe_mk_person conf base p;
+          ]
 
 let module_OPT =
   let map =

@@ -23,40 +23,52 @@ module type Driver_S = sig
   type title = istr Def.gen_title
   (** Database implementation for [Def.gen_title] *)
 
-  type pers_event (*= (iper, istr) Def.gen_pers_event*)
+  type pers_event
   (** Database implementation for [Def.pers_event] *)
+  (*= (iper, istr) Def.gen_pers_event*)
 
   val get_pevent_name : pers_event -> istr Def.gen_pers_event_name
-  val get_pevent_date : pers_event ->  Def.cdate
+  val get_pevent_date : pers_event -> Def.cdate
   val get_pevent_place : pers_event -> istr
   val get_pevent_reason : pers_event -> istr
   val get_pevent_note : pers_event -> istr
   val get_pevent_src : pers_event -> istr
   val get_pevent_witnesses : pers_event -> (iper * Def.witness_kind) array
   val get_pevent_witness_notes : pers_event -> istr array
-  val get_pevent_witnesses_and_notes : pers_event -> (iper * Def.witness_kind * istr) array
+
+  val get_pevent_witnesses_and_notes :
+    pers_event -> (iper * Def.witness_kind * istr) array
+
   val gen_pevent_of_pers_event : pers_event -> (iper, istr) Def.gen_pers_event
-  val pers_event_of_gen_pevent : base -> (iper, istr) Def.gen_pers_event -> pers_event
+
+  val pers_event_of_gen_pevent :
+    base -> (iper, istr) Def.gen_pers_event -> pers_event
 
   val eq_pevent : pers_event -> pers_event -> bool
-  
-  type fam_event (*= (iper, istr) Def.gen_fam_event*)
+
+  type fam_event
   (** Database implementation for [Def.fam_event] *)
+  (*= (iper, istr) Def.gen_fam_event*)
 
   val get_fevent_name : fam_event -> istr Def.gen_fam_event_name
-  val get_fevent_date : fam_event ->  Def.cdate
+  val get_fevent_date : fam_event -> Def.cdate
   val get_fevent_place : fam_event -> istr
   val get_fevent_reason : fam_event -> istr
   val get_fevent_note : fam_event -> istr
   val get_fevent_src : fam_event -> istr
   val get_fevent_witnesses : fam_event -> (iper * Def.witness_kind) array
   val get_fevent_witness_notes : fam_event -> istr array
-  val get_fevent_witnesses_and_notes : fam_event -> (iper * Def.witness_kind * istr) array
+
+  val get_fevent_witnesses_and_notes :
+    fam_event -> (iper * Def.witness_kind * istr) array
+
   val gen_fevent_of_fam_event : fam_event -> (iper, istr) Def.gen_fam_event
-  val fam_event_of_gen_fevent : base -> (iper, istr) Def.gen_fam_event -> fam_event
+
+  val fam_event_of_gen_fevent :
+    base -> (iper, istr) Def.gen_fam_event -> fam_event
 
   val eq_fevent : fam_event -> fam_event -> bool
-  
+
   type string_person_index
   (** Data structure for optimised search throughout index by name
     (surname or first name). *)
@@ -736,11 +748,11 @@ struct
   type iper = int
   type relation = (iper, istr) Def.gen_relation
   type title = istr Def.gen_title
-      
+
   type pers_event =
     | Legacy_pevent of Legacy.pers_event
     | Current_pevent of Current.pers_event
-                          
+
   type fam_event =
     | Legacy_fevent of Legacy.fam_event
     | Current_fevent of Current.fam_event
@@ -765,7 +777,10 @@ struct
       'a
 
     val wrap_pevent :
-      (Legacy.pers_event -> 'a) -> (Current.pers_event -> 'a) -> pers_event -> 'a
+      (Legacy.pers_event -> 'a) ->
+      (Current.pers_event -> 'a) ->
+      pers_event ->
+      'a
 
     val wrap_fevent :
       (Legacy.fam_event -> 'a) -> (Current.fam_event -> 'a) -> fam_event -> 'a
@@ -786,14 +801,13 @@ struct
       | Legacy_string_person_index spi -> legacyf spi
       | Current_string_person_index spi -> currentf spi
 
-  let wrap_pevent legacyf currentf = function
+    let wrap_pevent legacyf currentf = function
       | Legacy_pevent pe -> legacyf pe
       | Current_pevent pe -> currentf pe
 
-  let wrap_fevent legacyf currentf = function
+    let wrap_fevent legacyf currentf = function
       | Legacy_fevent fe -> legacyf fe
       | Current_fevent fe -> currentf fe
-  
   end
 
   let string_of_iper = string_of_int
@@ -807,52 +821,102 @@ struct
 
   let log _ = ()
 
-  let get_pevent_name = Util.wrap_pevent Legacy.get_pevent_name Current.get_pevent_name
-  let get_pevent_date = Util.wrap_pevent Legacy.get_pevent_date Current.get_pevent_date
-  let get_pevent_place = Util.wrap_pevent Legacy.get_pevent_place Current.get_pevent_place
-  let get_pevent_reason = Util.wrap_pevent Legacy.get_pevent_reason Current.get_pevent_reason
-  let get_pevent_note = Util.wrap_pevent Legacy.get_pevent_note Current.get_pevent_note
-  let get_pevent_src = Util.wrap_pevent Legacy.get_pevent_src Current.get_pevent_src
-  let get_pevent_witnesses = Util.wrap_pevent Legacy.get_pevent_witnesses Current.get_pevent_witnesses
-  let get_pevent_witness_notes = Util.wrap_pevent Legacy.get_pevent_witness_notes Current.get_pevent_witness_notes
-  let get_pevent_witnesses_and_notes = Util.wrap_pevent Legacy.get_pevent_witnesses_and_notes Current.get_pevent_witnesses_and_notes
-  let gen_pevent_of_pers_event = Util.wrap_pevent Legacy.gen_pevent_of_pers_event Current.gen_pevent_of_pers_event
-  let pers_event_of_gen_pevent base pe = match base with
-    | Legacy_base base ->
-      let pe = Legacy.pers_event_of_gen_pevent base pe in
-      Legacy_pevent pe
-    | Current_base base ->
-      let pe = Current.pers_event_of_gen_pevent base pe in
-      Current_pevent pe
+  let get_pevent_name =
+    Util.wrap_pevent Legacy.get_pevent_name Current.get_pevent_name
 
-  let eq_pevent p1 p2 = match p1, p2 with
+  let get_pevent_date =
+    Util.wrap_pevent Legacy.get_pevent_date Current.get_pevent_date
+
+  let get_pevent_place =
+    Util.wrap_pevent Legacy.get_pevent_place Current.get_pevent_place
+
+  let get_pevent_reason =
+    Util.wrap_pevent Legacy.get_pevent_reason Current.get_pevent_reason
+
+  let get_pevent_note =
+    Util.wrap_pevent Legacy.get_pevent_note Current.get_pevent_note
+
+  let get_pevent_src =
+    Util.wrap_pevent Legacy.get_pevent_src Current.get_pevent_src
+
+  let get_pevent_witnesses =
+    Util.wrap_pevent Legacy.get_pevent_witnesses Current.get_pevent_witnesses
+
+  let get_pevent_witness_notes =
+    Util.wrap_pevent Legacy.get_pevent_witness_notes
+      Current.get_pevent_witness_notes
+
+  let get_pevent_witnesses_and_notes =
+    Util.wrap_pevent Legacy.get_pevent_witnesses_and_notes
+      Current.get_pevent_witnesses_and_notes
+
+  let gen_pevent_of_pers_event =
+    Util.wrap_pevent Legacy.gen_pevent_of_pers_event
+      Current.gen_pevent_of_pers_event
+
+  let pers_event_of_gen_pevent base pe =
+    match base with
+    | Legacy_base base ->
+        let pe = Legacy.pers_event_of_gen_pevent base pe in
+        Legacy_pevent pe
+    | Current_base base ->
+        let pe = Current.pers_event_of_gen_pevent base pe in
+        Current_pevent pe
+
+  let eq_pevent p1 p2 =
+    match (p1, p2) with
     | Legacy_pevent p1, Legacy_pevent p2 -> Legacy.eq_pevent p1 p2
     | Current_pevent p1, Current_pevent p2 -> Current.eq_pevent p1 p2
     | _ -> assert false
 
-  let eq_fevent f1 f2 = match f1, f2 with
+  let eq_fevent f1 f2 =
+    match (f1, f2) with
     | Legacy_fevent f1, Legacy_fevent f2 -> Legacy.eq_fevent f1 f2
     | Current_fevent f1, Current_fevent f2 -> Current.eq_fevent f1 f2
     | _ -> assert false
-  
-  let get_fevent_name = Util.wrap_fevent Legacy.get_fevent_name Current.get_fevent_name
-  let get_fevent_date = Util.wrap_fevent Legacy.get_fevent_date Current.get_fevent_date
-  let get_fevent_place = Util.wrap_fevent Legacy.get_fevent_place Current.get_fevent_place
-  let get_fevent_reason = Util.wrap_fevent Legacy.get_fevent_reason Current.get_fevent_reason
-  let get_fevent_note = Util.wrap_fevent Legacy.get_fevent_note Current.get_fevent_note
-  let get_fevent_src = Util.wrap_fevent Legacy.get_fevent_src Current.get_fevent_src
-  let get_fevent_witnesses = Util.wrap_fevent Legacy.get_fevent_witnesses Current.get_fevent_witnesses
-  let get_fevent_witness_notes = Util.wrap_fevent Legacy.get_fevent_witness_notes Current.get_fevent_witness_notes
-  let get_fevent_witnesses_and_notes = Util.wrap_fevent Legacy.get_fevent_witnesses_and_notes Current.get_fevent_witnesses_and_notes
-  let gen_fevent_of_fam_event = Util.wrap_fevent Legacy.gen_fevent_of_fam_event Current.gen_fevent_of_fam_event
-  let fam_event_of_gen_fevent base pe = match base with
+
+  let get_fevent_name =
+    Util.wrap_fevent Legacy.get_fevent_name Current.get_fevent_name
+
+  let get_fevent_date =
+    Util.wrap_fevent Legacy.get_fevent_date Current.get_fevent_date
+
+  let get_fevent_place =
+    Util.wrap_fevent Legacy.get_fevent_place Current.get_fevent_place
+
+  let get_fevent_reason =
+    Util.wrap_fevent Legacy.get_fevent_reason Current.get_fevent_reason
+
+  let get_fevent_note =
+    Util.wrap_fevent Legacy.get_fevent_note Current.get_fevent_note
+
+  let get_fevent_src =
+    Util.wrap_fevent Legacy.get_fevent_src Current.get_fevent_src
+
+  let get_fevent_witnesses =
+    Util.wrap_fevent Legacy.get_fevent_witnesses Current.get_fevent_witnesses
+
+  let get_fevent_witness_notes =
+    Util.wrap_fevent Legacy.get_fevent_witness_notes
+      Current.get_fevent_witness_notes
+
+  let get_fevent_witnesses_and_notes =
+    Util.wrap_fevent Legacy.get_fevent_witnesses_and_notes
+      Current.get_fevent_witnesses_and_notes
+
+  let gen_fevent_of_fam_event =
+    Util.wrap_fevent Legacy.gen_fevent_of_fam_event
+      Current.gen_fevent_of_fam_event
+
+  let fam_event_of_gen_fevent base pe =
+    match base with
     | Legacy_base base ->
-      let pe = Legacy.fam_event_of_gen_fevent base pe in
-      Legacy_fevent pe
+        let pe = Legacy.fam_event_of_gen_fevent base pe in
+        Legacy_fevent pe
     | Current_base base ->
-      let pe = Current.fam_event_of_gen_fevent base pe in
-      Current_fevent pe
-  
+        let pe = Current.fam_event_of_gen_fevent base pe in
+        Current_fevent pe
+
   let open_base bname =
     let bname =
       if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
@@ -928,14 +992,15 @@ struct
 
   let get_parents = Util.wrap_person Legacy.get_parents Current.get_parents
 
-  let get_pevents = Util.wrap_person
+  let get_pevents =
+    Util.wrap_person
       (fun p ->
-         let l = Legacy.get_pevents p in
-         List.map (fun pe -> Legacy_pevent pe) l)
+        let l = Legacy.get_pevents p in
+        List.map (fun pe -> Legacy_pevent pe) l)
       (fun p ->
-         let l = Current.get_pevents p in
-         List.map (fun pe -> Current_pevent pe) l)
-      
+        let l = Current.get_pevents p in
+        List.map (fun pe -> Current_pevent pe) l)
+
   let get_psources = Util.wrap_person Legacy.get_psources Current.get_psources
 
   let get_public_name =
@@ -1021,9 +1086,12 @@ struct
   let get_divorce = Util.wrap_family Legacy.get_divorce Current.get_divorce
   let get_father = Util.wrap_family Legacy.get_father Current.get_father
   let get_mother = Util.wrap_family Legacy.get_mother Current.get_mother
-  let get_fevents = Util.wrap_family
+
+  let get_fevents =
+    Util.wrap_family
       (fun f -> List.map (fun f -> Legacy_fevent f) (Legacy.get_fevents f))
       (fun f -> List.map (fun f -> Current_fevent f) (Current.get_fevents f))
+
   let get_fsources = Util.wrap_family Legacy.get_fsources Current.get_fsources
   let get_ifam = Util.wrap_family Legacy.get_ifam Current.get_ifam
 
@@ -1453,5 +1521,6 @@ struct
       (Legacy.gc ~dry_run ~save_mem)
       (Current.gc ~dry_run ~save_mem)
 
-  let set_fpoi_cache = Util.wrap_base (Legacy.set_fpoi_cache) (Current.set_fpoi_cache)
+  let set_fpoi_cache =
+    Util.wrap_base Legacy.set_fpoi_cache Current.set_fpoi_cache
 end

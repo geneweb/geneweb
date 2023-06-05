@@ -2517,9 +2517,8 @@ let record_visited conf ip =
 
 (* TODO OCaml 4.13 : use Array.find_opt *)
 let array_mem_witn conf base x a na =
-  let get_note i = match na with
-    | a when i < Array.length a -> a.(i)
-    | _ -> empty_string
+  let get_note i =
+    match na with a when i < Array.length a -> a.(i) | _ -> empty_string
   in
   let rec loop i =
     if i = Array.length a then (false, Adef.safe "", "")
@@ -2712,8 +2711,9 @@ let has_children base u =
     (get_family u)
 
 let list_cmp cmp l1 l2 =
-  let rec aux l1 l2 = match l1, l2 with
-    | x :: xs , y :: ys when cmp x y -> aux xs ys
+  let rec aux l1 l2 =
+    match (l1, l2) with
+    | x :: xs, y :: ys when cmp x y -> aux xs ys
     | [], [] -> true
     | _ -> false
   in
