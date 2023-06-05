@@ -203,7 +203,7 @@ let update_person conf base old new_input p =
       let pevents =
         List.map
           (fun evt ->
-             let evt = gen_pevent_of_pers_event evt in
+            let evt = gen_pevent_of_pers_event evt in
             let pl_evt = evt.epers_place in
             let s_evt = sou base pl_evt in
             let place = if old = s_evt then new_istr else pl_evt in
@@ -339,7 +339,7 @@ let update_family conf base old new_istr fam =
       let fevents =
         List.map
           (fun evt ->
-             let evt = gen_fevent_of_fam_event evt in
+            let evt = gen_fevent_of_fam_event evt in
             let pl_evt = evt.efam_place in
             let s_evt = sou base pl_evt in
             let place = if old = s_evt then new_istr else pl_evt in
@@ -358,7 +358,7 @@ let update_family conf base old new_istr fam =
       let fevents =
         List.map
           (fun evt ->
-             let evt = gen_fevent_of_fam_event evt in
+            let evt = gen_fevent_of_fam_event evt in
             let src_evt = evt.efam_src in
             let s_evt = sou base src_evt in
             let src = if old = s_evt then new_istr else src_evt in

@@ -46,10 +46,9 @@ let main () =
         Gwdb.load_strings_array base);
       try
         Sys.catch_break true;
-        if ConsangAll.compute ~verbosity:!verbosity base !scratch then begin
+        if ConsangAll.compute ~verbosity:!verbosity base !scratch then (
           print_endline "now syncing";
-          Gwdb.sync ~save_mem:!save_mem base
-        end
+          Gwdb.sync ~save_mem:!save_mem base)
       with Consang.TopologicalSortError p ->
         Printf.printf "\nError: loop in database, %s is his/her own ancestor.\n"
           (Gutil.designation base p);
