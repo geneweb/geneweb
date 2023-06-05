@@ -444,7 +444,7 @@ and mk_fevent conf base sp e =
   in
   mk_event conf base ei
 
-and mk_fevent' conf base sp e =
+and mk_fevent' conf base _sp e =
   mk_event conf base (Event.event_item_of_gen_fevent e)
 
 and mk_pevent' conf base e =

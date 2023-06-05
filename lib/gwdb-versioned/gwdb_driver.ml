@@ -1,39 +1,3 @@
-module Log = struct
-  let oc : out_channel option ref = ref None
-  let _log fn = match !oc with Some oc -> fn oc | None -> ()
-
-  type level =
-    [ `LOG_ALERT
-    | `LOG_CRIT
-    | `LOG_DEBUG
-    | `LOG_EMERG
-    | `LOG_ERR
-    | `LOG_INFO
-    | `LOG_NOTICE
-    | `LOG_WARNING ]
-
-  let _syslog (level : level) msg =
-    let flags = [ `LOG_PERROR ] in
-    let log =
-      Syslog.openlog ~flags @@ Filename.basename @@ Sys.executable_name
-    in
-    Syslog.syslog log level msg;
-    Syslog.closelog log;
-    Printexc.print_backtrace stderr
-  (* let log msg =
-       let tm = Unix.(time () |> localtime) in
-       let level = "DEBUG" in
-       Printf.eprintf "[%s]: %s %s\n"
-         (Mutil.sprintf_date tm : Adef.safe_string :> string) level msg
-     (*let log = Syslog.openlog ~flags @@ Filename.basename @@ Sys.executable_name in
-       Syslog.syslog log level msg ;
-       Syslog.closelog log ;
-       if !debug then Printexc.print_backtrace stderr *)*)
-end
-
-(*let log msg = Log.syslog Log.(`LOG_DEBUG) msg*)
-let log _ = ()
-
 module type Data = sig
   type t
   type index = int
@@ -142,7 +106,7 @@ end = struct
         else None)
     else None
 
-  let get_from_cache base index =
+  let get_from_cache _base index =
     match !cache_ht with Some ht -> Hashtbl.find_opt ht index | None -> None
 
   let get base index =
@@ -340,7 +304,7 @@ module Legacy_driver = struct
 
   let cache_foi_poi = ref true
 
-  let set_fpoi_cache base b =
+  let set_fpoi_cache _base b =
     reset_poi_ht ();
     reset_foi_ht ();
     cache_foi_poi := b
@@ -383,7 +347,7 @@ module Legacy_driver = struct
         fun ie ->
           if Array.length a.(ie) > 0 then fun iw -> a.(ie).(iw)
           else fun _iw -> empty_string
-    | Some a -> fun ie iw -> empty_string
+    | Some _a -> fun _ie _iw -> empty_string
     | None -> (
         let iper = Gwdb_legacy.Gwdb_driver.get_iper p.person in
         if iper = dummy_iper then (
@@ -404,7 +368,7 @@ module Legacy_driver = struct
   let get_pers_wit_notes (p : person) ie iw =
     match p.witness_notes with
     | Some a when Array.length a > 0 && Array.length a.(ie) > 0 -> a.(ie).(iw)
-    | Some a -> empty_string
+    | Some _a -> empty_string
     | None -> (
         let iper = Gwdb_legacy.Gwdb_driver.get_iper p.person in
         if iper = dummy_iper then (
@@ -421,13 +385,13 @@ module Legacy_driver = struct
               p.witness_notes <- Some [||];
               empty_string)
 
-  let get_fam_full_wit_notes f =
+  let get_fam_full_wit_notes (f : family) =
     match f.witness_notes with
     | Some a when Array.length a > 0 ->
         fun ie ->
           if Array.length a.(ie) > 0 then fun iw -> a.(ie).(iw)
           else fun _iw -> empty_string
-    | Some a -> fun ie iw -> empty_string
+    | Some _a -> fun _ie _iw -> empty_string
     | None -> (
         let ifam = Gwdb_legacy.Gwdb_driver.get_ifam f.family in
         if ifam = dummy_ifam then (
@@ -448,7 +412,7 @@ module Legacy_driver = struct
   let get_fam_wit_notes (f : family) ie iw =
     match f.witness_notes with
     | Some a when Array.length a > 0 && Array.length a.(ie) > 0 -> a.(ie).(iw)
-    | Some a -> empty_string
+    | Some _a -> empty_string
     | None -> (
         let ifam = Gwdb_legacy.Gwdb_driver.get_ifam f.family in
         if ifam = dummy_ifam then (
@@ -499,17 +463,6 @@ module Legacy_driver = struct
   let no_person iper =
     let nop = no_person iper in
     Translate.legacy_to_def_person empty_string nop
-
-  let _test_on_person base genpers =
-    let pers_events = genpers.Def.pevents in
-    List.iter
-      (fun pers_event ->
-        let witnesses = pers_event.Def.epers_witnesses in
-        let wnotes =
-          Array.map (fun (_ip, _wk, wnote) -> sou base wnote) witnesses
-        in
-        Array.iter log wnotes)
-      pers_events
 
   let witness_notes_of_events pevents : istr array array option =
     let l =
@@ -639,7 +592,7 @@ module Legacy_driver = struct
     in
     { genpers with epers_witnesses }
 
-  let pers_event_of_gen_pevent base genpers = assert false
+  let pers_event_of_gen_pevent _base _genpers = assert false
   let eq_pevent p1 p2 = p1.pevent = p2.pevent
   let eq_fevent f1 f2 = f1.fevent = f2.fevent
 
@@ -655,7 +608,7 @@ module Legacy_driver = struct
     in
     { genfam with efam_witnesses }
 
-  let fam_event_of_gen_fevent base genfam = assert false
+  let fam_event_of_gen_fevent _base _genfam = assert false
 
   let get_fevents (f : family) =
     let fevents = Gwdb_legacy.Gwdb_driver.get_fevents f.family in
