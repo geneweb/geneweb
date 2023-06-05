@@ -142,33 +142,44 @@ let dump_bad_image conf s =
   | _ -> ()
 
 (* swap files between new and old folder *)
-let swap_files_aux dir file mode =
+(* [| ".jpg"; ".jpeg"; ".png"; ".gif" |] *)
+
+let swap_files_aux dir file ext old_ext =
   let old_file =
     String.concat Filename.dir_sep [ dir; "old"; Filename.basename file ]
   in
-  if Sys.file_exists old_file then (
-    if mode = "portrait" && Filename.extension old_file = ".url" then ()
-      (* TODO update url image for person *)
-    else
-      let tmp_file = String.concat Filename.dir_sep [ dir; "tempfile.tmp" ] in
-      rn file tmp_file;
-      rn old_file file;
-      rn tmp_file old_file)
+  let file, old_file =
+    match ext, old_ext with
+    | _, ".url" -> file, (Filename.chop_extension file) ^ ".url"
+    | ".url", ext ->
+        (Filename.chop_extension file) ^ ".url",
+        (Filename.chop_extension old_file) ^ ext
+    | _, _ -> file, old_file
+  in
+  let tmp_file = String.concat Filename.dir_sep [ dir; "tempfile.tmp" ] in
+  (* TODO si file.url n'existe pas, il faut la créer *)
+  if ext <> old_ext then (
+    if Sys.file_exists old_file then rn old_file ((Filename.chop_extension file) ^ old_ext);
+    if Sys.file_exists file then rn file ((Filename.chop_extension old_file) ^ ext))
+  else (
+    if Sys.file_exists file then rn file tmp_file;
+    if Sys.file_exists old_file then rn old_file file;
+    if Sys.file_exists tmp_file then rn tmp_file old_file)
 
-let swap_files file mode =
+let swap_files file ext old_ext =
   let dir = Filename.dirname file in
   let fname = Filename.basename file in
-  swap_files_aux dir file mode;
+  swap_files_aux dir file ext old_ext;
   let txt_file =
     String.concat Filename.dir_sep
       [ dir; Filename.chop_extension fname ^ ".txt" ]
   in
-  swap_files_aux dir txt_file mode;
+  swap_files_aux dir txt_file ext old_ext;
   let src_file =
     String.concat Filename.dir_sep
       [ dir; Filename.chop_extension fname ^ ".src" ]
   in
-  swap_files_aux dir src_file mode
+  swap_files_aux dir src_file ext old_ext
 
 let clean_saved_portrait file =
   let file = Filename.remove_extension file in
@@ -189,6 +200,7 @@ let get_extension conf saved fname =
   else if Sys.file_exists (f ^ ".jpeg") then ".jpeg"
   else if Sys.file_exists (f ^ ".png") then ".png"
   else if Sys.file_exists (f ^ ".gif") then ".gif"
+  else if Sys.file_exists (f ^ ".url") then ".url"
   else "."
 
 let print_confirm_c conf base save_m report =
@@ -298,7 +310,6 @@ let print_sent conf base p =
   Hutil.trailer conf
 
 let effective_send_ok conf base p file =
-  Printf.eprintf "Effective Send %s\n" file;
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
@@ -361,7 +372,6 @@ let print_send_ok conf base =
 
 (* carrousel *)
 let effective_send_c_ok conf base p file file_name =
-  Printf.eprintf "Effective Send C %s\n" file_name;
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
@@ -607,9 +617,14 @@ let effective_reset_c_ok conf base p =
     try (List.assoc "file_name" conf.env :> string) with Not_found -> ""
   in
   let file_name = if mode = "portraits" then carrousel else file_name in
-  let ext_saved = get_extension conf true carrousel in
-  let ext = get_extension conf false carrousel in
-  let ext = if ext = "." then ext_saved else ext in
+  let ext = get_extension conf false file_name in
+  let old_ext = get_extension conf true file_name in
+  let ext =
+    match Image.get_portrait conf base p with
+    | Some src -> if Mutil.start_with "http" 0 (Image.src_to_string src)
+        then ".url" else ext
+    | _ -> ext
+  in
   let file_in_new =
     if mode = "portraits" then
       String.concat Filename.dir_sep
@@ -618,7 +633,16 @@ let effective_reset_c_ok conf base p =
       String.concat Filename.dir_sep
         [ Util.base_path [ "src" ] conf.bname; "images"; carrousel; file_name ]
   in
-  swap_files file_in_new mode;
+  if Sys.file_exists file_in_new then ()
+  else (
+    match Image.get_portrait conf base p with
+    | Some (`Url url) -> (
+        try write_file file_in_new url
+        with _ ->
+          incorrect conf
+            (Printf.sprintf "reset portrait (swap file %s)" file_in_new))
+    | _ -> ());
+  swap_files file_in_new ext old_ext;
   file_name
 
 (* ************************************************************************** *)

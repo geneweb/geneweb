@@ -198,7 +198,10 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
               src=%if;has_old_portrait_url;"%portrait_saved;"%else;"%prefix;kch=%random.bits;&m=IM_C_S&i=%index;"%end;
                    width="185px">'>
               <i class="far fa-file-image fa-fw text-primary"></i></a>
-            <span class="invisible"><i class="fas fa-retweet fa-rotate-90 fa-fw text-primary"></i></span>
+            <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=portraits&file_name=%portrait;&idigest=%idigest;"
+               title="[*restore portrait saved]">
+              <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i>%nn;
+            </a>
             <strong><samp class="text-truncate">%saved_portraits_store;%X;</samp></strong><samp>
             %if;has_old_portrait_url;%carrousel;.url%else;%portrait_saved_name;%end;</samp>
             <a role="button" class="ml-auto col-1" href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&idigest=%idigest;&delete=on"
