@@ -555,7 +555,7 @@ let print_witnesses opts base gen ~use_per_sel witnesses =
         print_witness p;
         Printf.ksprintf (oc opts) "\n";
         (* print witness note *)
-        if opts.notes && not (is_empty_string wnote) then
+        if opts.notes && (not !old_gw) && not (is_empty_string wnote) then
           let wnote = sou base wnote in
           print_multiline opts "wnote" wnote))
     witnesses
