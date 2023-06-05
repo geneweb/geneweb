@@ -7,7 +7,8 @@ let portrait_folder conf = Util.base_path [ "images" ] conf.bname
 let carrousel_folder conf =
   Filename.concat (Util.base_path [ "src" ] conf.bname) "images"
 
-(** [default_portrait_filename_of_key fn sn occ] is the default filename of the corresponding person's portrait. WITHOUT its file extenssion.
+(** [default_portrait_filename_of_key fn sn occ] is the default filename 
+ of the corresponding person's portrait. WITHOUT its file extenssion.
  e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
  *)
 let default_portrait_filename_of_key first_name surname occ =
