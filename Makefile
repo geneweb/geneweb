@@ -102,7 +102,7 @@ fmt:
 
 # [BEGIN] Installation / Distribution section
 
-build: ## Build the geneweb package (librairies and binaries)
+build: ## Build the geneweb package (libraries and binaries)
 build:
 	-dune build @fmt --auto-promote
 	dune build -p geneweb --profile $(DUNE_PROFILE)

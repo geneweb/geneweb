@@ -1,4 +1,4 @@
-﻿; Script generated mannualy for Windows 64 bits
+﻿; Script generated manually for Windows 64 bits
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "GeneWeb"

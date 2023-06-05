@@ -11,9 +11,9 @@ This changelog describes in more details changes introduced in 7.0 and 7.1.
   "cousins" relationships, counting v1 generations up and v2 generations down.
 
 - Update of the "places by surname" command (available on the welcome page).
-  List of persons related to a given place are now explicitely provided as
+  List of persons related to a given place are now explicitly provided as
   well as the possibility to construct a multi-relation tree between these
-  persons. A link back into the places dictionnary is also provided.
+  persons. A link back into the places dictionary is also provided.
 
 - Addition of a "carrousel" mechanism allowing archival of several pictures
   associated with a person beyond the existing portrait.
@@ -37,7 +37,7 @@ This changelog describes in more details changes introduced in 7.0 and 7.1.
   of father and mother. Default is father to the left.
 
 - A new visitor_access=no parameter in the .gwf file prevents access to the
-  base to anyone but friends ans wizards.
+  base to anyone but friends and wizards.
 
 - The lexicon supports an alias mechanism allowing for several names fir
   the same set of translations.
@@ -49,7 +49,7 @@ This changelog describes in more details changes introduced in 7.0 and 7.1.
 - Homonyms lists are expanded, including parents and spouses names to
   facilitate identification.
 
-- In the authentification files for wizards and friends, username can be
+- In the authentication files for wizards and friends, username can be
   expanded into username|userkey where userkey is first_name.ocurence.surname
   of the user in this base.
 
@@ -66,7 +66,7 @@ It may miss some details which might be added later if relevants.
 
 - Code revision: GeneWeb code has been profoundly reorganised:
   - files are now separated into a /bin and /lib folders.
-  - some functions have been isolated as external librairies and/or separate
+  - some functions have been isolated as external libraries and/or separate
     repositories (contrib, unidecode)
   - some files have been split in two parts, isolating the display functions from
     the other functions
@@ -148,7 +148,7 @@ GeneWeb version 6.06
 
 * ! New ! You can try the new graphical interface of GeneWeb. It's supposed
   to replace gwsetup at the end. Right now, it's a beta version so every
-  thing is not finnished yet. Feedback is welcome.
+  thing is not finished yet. Feedback is welcome.
 * Add three new warnings : ChangedOrderOfMarriages, CloseSiblings and
   ParentTooOld. Activate the warning YoungForMarriage.
 * Change totally the way to notify and record the changes of a base. There is
@@ -170,7 +170,7 @@ GeneWeb version 6.06
   Plus, this page is available as a template. For those who changed the values
   in updind and updfam template for the fields place, source, occupation,
   beware to put the right value in the upddata template.
-* Add a field in the advanced request to search in the marriage informations.
+* Add a field in the advanced request to search in the marriage information.
   This is just a small evolution, it is not meant to add other searching
   fields again and again.
 * Add the occupation in the edition of a family form. One can create a
@@ -203,7 +203,7 @@ GeneWeb version 6.05
 * New organization of the relationship computing page. Cousin and Relation
   are now in the same page. Should be easier to use (javascript must be
   activated).
-* New ouput in the ascendants and descendants menu : display in table.
+* New output in the ascendants and descendants menu : display in table.
 * Added a link to browse in the descendants tree as in the ascendants tree.
 * Added a warning in case the source field is not complete. Beware, it may
   not behave as you think.
@@ -227,7 +227,7 @@ GeneWeb version 6.05
   an anniversary (birth, marriage, death...)
 * Lifting of gwsetup. I hope the menu is a bit clearer.
 * Some modifications in perso.txt (modify menu ...)
-* Add the option -add_lexicon to dictionnaries.
+* Add the option -add_lexicon to dictionaries.
 * Add the option -nopicture in order not to import picture of GEDCOM/GW.
 * Added the template of the 5.02 version (named templ502).
 * Update copyright
@@ -239,7 +239,7 @@ Dominique DERAM :
 * Update of template A, B, C, D, F, H :
 ** New directory templx for the templates anclist, ancsosa, anctree.
    It will be used by the template a, b, c, d, f, h.
-** Update copyrigth
+** Update copyright
 ** Various fix of minors bugs and improvements.
 
 Mickaël Rouesné:
@@ -252,7 +252,7 @@ Mickaël Rouesné:
        bottom of the page.
      - Vertical Family Tree with 4 generations.
      - Open the update individual/family form in a new page and automatic
-       relead after clicking on the [x] at the bottom of the page.
+       reload after clicking on the [x] at the bottom of the page.
 ** ancmenu, ancsosa, anclist, anctree : fix bug in evar.v.
 ** ancsosa : improve the surname list, add occupations, update style.
 
@@ -287,7 +287,7 @@ GeneWeb version 6.04
 * Added an option in the ged2gwb tool. It behaves like previously, i.e. default
   relation for a couple is Married. If someone prefer, one can use the option
   -rs_no_mention to set the relation status to NoMention.
-* Added a new instruction in the template langage : FOR.
+* Added a new instruction in the template language : FOR.
   It is a simple instruction, and could be improved later but for now it works
   like this :
   for (i=MIN; i<MAX; i++) => in template language : %for;i;MIN;MAX .... %end;
@@ -302,7 +302,7 @@ GeneWeb version 6.04
   OUTPUT => 42; 0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 42
 * Added an option to *not* try a getHostByName. Could slow down on windows.
   One should add -no_host_address to gwd to use this feature.
-* New implementation of the fonction that calculate if a person has a sosa
+* New implementation of the function that calculate if a person has a sosa
   number or not. Much more efficient than the previous one !
 * It is now NOT possible to add or modify a family in which the first
   name or the surname of a person is not specify. => It can break the
@@ -314,7 +314,7 @@ GeneWeb version 6.04
   individual page
 * Added the operator '/' (DIV) in the template language
 * Fix the calculus in case there is more than a thousand number in templm
-* Fix the duplicates of adresse in gwc2. Now the book of places if
+* Fix the duplicates of address in gwc2. Now the book of places if
   working completely in gwc1 and gwc2
 
 Daniel de Rauglaudre:
@@ -359,7 +359,7 @@ GeneWeb version 6.03
   !!! Beware !!! This functionality is not completely functional when
   using gwc2. You can not edit twice the same place. If you want to
   edit more than one time one place, you have to do a consang between
-  each modifications (because it will recalculate the indexs).
+  each modifications (because it will recalculate the indexes).
 * Fix the regression of rtl/ltr display in some pages
 * When using ged2gwb, the status of a family is now by default
   NoMention.
@@ -399,15 +399,15 @@ that it can be printed now.
 * Added a patch in the calculus of the sosa until the number of person in the
 database is well managed.
 * Some esthetic changes
-* Change "href=#" by "void" because internet explorer does'nt support it (go
+* Change "href=#" by "void" because internet explorer doesn't support it (go
 to the top of the page).
 * Fix bug (in the source code, not the template) in updating a death date from
 OfCourseDead to Dead if there is actually a date of death.
-* Deleting the documentation (DOC ans WDOC) and the associated request.
+* Deleting the documentation (DOC and WDOC) and the associated request.
 * Added an option to activate/deactivate the forum.
 * Added an option to turn on/off the counter for visiting web pages.
 * Change the order of displaying the note/source in the individual page. The
-family note/source comes before the informations of death of the individual.
+family note/source comes before the information of death of the individual.
 * Added execution rights to configure and camlp5_comm.sh. Geneweb can now be
 compiled out of box (I mean after svn co).
 * Fix bug in the GeneWeb server in CGI mode. Should not answer 200 OK.
@@ -422,7 +422,7 @@ GeneWeb version 6.01
 --------------------
 
 For this version, you will not find a tag of GeneWeb 6.01 because I forgot it.
-Few changes since 6.00 (which was set up to start a new developpement of
+Few changes since 6.00 (which was set up to start a new development of
 GeneWeb).
 * Add an option to display the day of a date.
 * Add notes/sources in the descendants list.
@@ -436,7 +436,7 @@ Sorry, I forgot to add the "new" feature for this version. Hopefully there
 is basically no new feature.
 
 * Add a picto sosa next to a person after a research (by first name/surname).
-* Fix bug in hidding individual of the same family.
+* Fix bug in hiding individual of the same family.
 * Fix bug in showing individual by first name whereas there were hidden.
 * Use of css sheetstyle to customize the pages.
 
@@ -495,7 +495,7 @@ The new version number (5.00) is in honour of this new encoding.
 * New features : Wiki syntax and miscellaneous Notes
   - [06 Oct 05] It is now possible to use a specific ("Wiki") syntax
     inside database notes, individual notes, wizard notes and database
-    forum. It is also possible to add new "miscelleneous notes". The
+    forum. It is also possible to add new "miscellaneous notes". The
     syntax is close to the one used by Wikipedia (see Web). In database
     notes and wizard notes, an automatic summary is displayed. Wiki syntax
     and HTML syntax can be both used in the same page. The Wiki syntax is:
@@ -523,14 +523,14 @@ The new version number (5.00) is in honour of this new encoding.
       individual with key (firstname, surname, oc) with 'text' displayed.
       Simplified syntaxes: if oc = 0, [[fn/sn/t]] can be used, and
       [[fn/sn]] is equivalent to [[fn/sn/0/fn sn]].
-    - The syntax [[[name/text]]] makes a link to a "miscelleneous note"
+    - The syntax [[[name/text]]] makes a link to a "miscellaneous note"
       (new feature), an independent page which can be edited (if updating
       allowed), and using Wiki syntax also. The page name is 'name' (only
       letters, digits and '_' allowed) and 'text' is displayed as link. If
       the page does not exist, the link is displayed in red. These new
       pages are saved by gwu only if they did not become isolated (= no
       more linked by database notes, individual notes, wizard notes nor
-      another (recursively) linked miscelleneous note). Simplified syntax
+      another (recursively) linked miscellaneous note). Simplified syntax
       [[[name]]] displays 'name' as link text.
     - If there is a line containing '__NOTOC__' the summary is not displayed.
     - If there is a line containing '__TOC__' the summary is displayed at
@@ -709,10 +709,10 @@ GeneWeb version 4.08
 * Base configuration files (base.gwf)
   - [22 Oct 02] Added configuration variable public_if_no_date: all
     persons having no date are considered as public, except if their
-    "access" field has been explicitely set to "Private" (default: no).
+    "access" field has been explicitly set to "Private" (default: no).
   - [22 Oct 02] Added configuration variable propose_place_surnames to
     propose or not the displaying by place / surnames in the welcome
-    page (defaut: yes).
+    page (default: yes).
   - [31 Aug 02] Added configuration variable max_cousins_level to specify
     the maximum level of displayed cousins (default: 5)
 
@@ -1118,7 +1118,7 @@ GeneWeb version 4.01
     (was displayed like that before only for the case "John of Bar, duke of
     Bar").
   - [14 Mar 01] Added option "-blang": if no language is specified in
-    the request (i.e. explicitely selected by a flag, for example), choose
+    the request (i.e. explicitly selected by a flag, for example), choose
     preferably the user preferred language (the one of his browser) rather
     than the default database language.
   - [13 Mar 01] Fixed problem in displaying "anniversaries month"
@@ -1169,7 +1169,7 @@ The new version number (4.00) is in honour of:
   - [04 Mar 01] Added version for MacOS X.
   - [03 Mar 01] Changed Linux rpm package installation; it uses now
     another directory for databases (/home/geneweb/bases). Not removed
-    when unstallation, it can be used for the future GeneWeb versions,
+    when uninstallation, it can be used for the future GeneWeb versions,
     without requiring it to be moved.
   - [23 Fev 01] Windows version: added an "installer" (therefore
     an installation normally easier). The databases are put in
@@ -1492,7 +1492,7 @@ GeneWeb version 3.09
     more using their connections. Applies only to wizards defined in the
     file of the variable "wizard_passwd_file" of the file base.gwf.
   - [26 Oct 00] In forum, added "<table>..</table>" around messages
-    to prevent unterminated tags to perturbate the other messages.
+    to prevent unterminated tags to perturb the other messages.
   - [24 Oct 00] In family updating, when there is a name conflict while
     creating a person, now proposes to try again with the first free number
     Lightly changed the interface for the same situation in person updating
@@ -1557,7 +1557,7 @@ GeneWeb version 3.08
 
 * GeneWeb Service/CGI (gwd)
   - [25 Sep 00] When wizard or friend access failure, now display the
-    page without the priviliged access (instead of just saying "access
+    page without the privileged access (instead of just saying "access
     failure").
   - [21 Sep 00] When modifying a person, forbid now to let his/her
     first name or surname as just "?", because it can cause problems
@@ -1728,7 +1728,7 @@ GeneWeb version 3.07
 
 * Gedcom to GeneWeb (ged2gwb)
   - [09 Aug 00] Added a consistency check: in some gedcoms (from bad
-    genealogy softwares), it happens that a person can be noticed as
+    genealogy software), it happens that a person can be noticed as
     "spouse" (FAMS) of a family without being however neither husband
     (HUSB) nor wife (WIFE) in that family. In the GeneWeb database, the
     symptom was that the pages concerning this "spouse" (particularly
@@ -1769,7 +1769,7 @@ GeneWeb version 3.06
   - [20 Jun 00] Added Latvian version (Janeks Kamerovskis).
 
 * GeneWeb Service/CGI (gwd)
-  - [04 Jul 00] Put all statitics in a different page (accessible only
+  - [04 Jul 00] Put all statistics in a different page (accessible only
     to "wizards" and "friends").
   - [04 Jul 00] Added the computation of the persons who lived the longest.
   - [27 Jun 00] When typing a name holding a number, searches also with
@@ -1865,7 +1865,7 @@ GeneWeb version 3.05
   - [02 May 00] [technical] In Unix version now, each request gets the
     user id and the group id of the owner of the database directory
     (base.gwb). No error if cannot change to these ids. Deleted the gwd
-    options -setuid and -setgid now unuseful.
+    options -setuid and -setgid now useless.
   - [30 Apr 00] Fixed little problem with displaying by places for the ones
     containing several (at least two) indications between parentheses.
 
@@ -1954,7 +1954,7 @@ GeneWeb version 3.04
 * Base configuration files (base.gwf)
   - [31 Mar 00] Added variable "places_inverted" (default no) to specify that
     places are ordered more-general-less-general (e.g. "USA, New York"
-    instead of "New York, USA"). Important to specify correcty this variable
+    instead of "New York, USA"). Important to specify correctly this variable
     for the new displaying by places/surnames.
 
 * Lexicon (lang/lexicon.txt)
@@ -2007,7 +2007,7 @@ GeneWeb version 3.03
     relationship trees, instead of the persons.
   - [04 Mar 00] In person and family forms, added input area to specify
     a number greater than 1 of titles and children to insert.
-  - [24 Feb 00] In latest births and deaths pages, display monthes.
+  - [24 Feb 00] In latest births and deaths pages, display months.
   - [02 Feb 00] In personal pages, relations are now displayed before notes.
   - [20 Jan 00] When sorting the children, use now the baptism date
     when there is no birth date.
@@ -2191,7 +2191,7 @@ Thanks to Emmanuelle Visseaux.
   - [Oct 26, 99] Added Icelandic (Ólafur Sigurgeirsson).
 
 * Setup program (gwsetup)
-  - [Oct 28, 99] Added option -p to select another port number (defaut: 2316).
+  - [Oct 28, 99] Added option -p to select another port number (default: 2316).
 
 * GeneWeb Service/CGI (gwd)
   - [Oct 24, 99] In display by surname, added a specific indication for
@@ -2359,7 +2359,7 @@ GeneWeb version 2.06
 * GeneWeb Service/CGI (gwd)
   - [Aug 19, 99] Fixed bug: the "back" button which appears after error
     in update used to forget the selected language.
-  - [Aug 19, 99] Added more informations (places) in descendants display
+  - [Aug 19, 99] Added more information (places) in descendants display
     by list.
   - [Aug 18, 99] Added a link to the documentation (close to the copyright).
   - [Aug 14..21, 99] Added a ility to put notes for the database itself (for
@@ -2488,7 +2488,7 @@ GeneWeb version 2.05
 
 * GeneWeb to Gedcom (gwb2ged)
   - [Jul 15, 99] Added option "-charset" whose values can be "ANSEL" or
-    "ASCII": "ASCII" is the default. Deleted option "-ascii" now unuseful.
+    "ASCII": "ASCII" is the default. Deleted option "-ascii" now useless.
   - [Jul 2, 99] Generate now dates of the form "FROM..TO.." for titles.
 
 * Base configuration files (base.gwf)
@@ -3104,7 +3104,7 @@ GeneWeb Version 1.07
     for personal records where "DEAT" exists but is empty.
 
 * gwb2ged:
-  - start now pointers with 1 instead of 0 because some softwares seem not
+  - start now pointers with 1 instead of 0 because some software seem not
     to accept @I0@ and @F0@.
   - generate always ANSEL encoding
 
@@ -3240,7 +3240,7 @@ Other changes:
   - added option -lang: default language
   - changed: displaying shortcuts when accessing by titles: for example,
     if there is only one king in the database, and it is "king of France",
-    selecting "king" directy displays "kings of France".
+    selecting "king" directly displays "kings of France".
 
 * gwb2gw has been renamed gwu.
 

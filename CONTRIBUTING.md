@@ -22,7 +22,7 @@ Some reasons why a PR could be refused:
 - PR is not meeting one of the previous points.
 - PR is not meeting
   [milestones](https://github.com/geneweb/geneweb/milestones) goals.
-- PR is conflicting with another PR, and the latter is being prefered.
+- PR is conflicting with another PR, and the latter is being preferred.
 - PR slows down GeneWeb, or it obviously does to many
   computations for the task being accomplished. It needs to be
   optimized.
@@ -30,7 +30,7 @@ Some reasons why a PR could be refused:
 - PR contains commented code: remove it.
 - PR adds new features or changes the behavior of GeneWeb without
   having be approved by the current project owners first.
-- PR is too big and needs to be splitted in many smaller ones.
+- PR is too big and needs to be split in many smaller ones.
 - PR is not formatted with ocamlformat
 
 If a PR stays in a stale/WIP/POC state for too long, it may be closed

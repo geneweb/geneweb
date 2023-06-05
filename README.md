@@ -14,7 +14,7 @@ with a Web interface and can be used off-line or as a Web service.
 ## Installation (for users)
 
 WARNING: before installing a new version of GeneWeb, it is highly recommended to save
-your bases into .gw formated files.
+your bases into .gw formatted files.
 
 When installing a version of GeneWeb with the "pre-release" qualifier, you are
 participating to the collective test effort (thanks for your contribution). You should keep aside the previous version 
@@ -27,7 +27,7 @@ of the GitHub repository (https://github.com/geneweb/geneweb/issues)
 Download the file corresponding to your environment from
 the [releases page](https://github.com/geneweb/geneweb/releases).
 
-Extract the distribution folder and place it at the location of your choice. You may alse rename it.
+Extract the distribution folder and place it at the location of your choice. You may also rename it.
 Its content is as follows (this example is for a Mac distribution.
 Other distributions are very similar):
 ```
@@ -54,7 +54,7 @@ TBD
 ### MacOS
 
 Apple provides a security mechanism preventing users from executing application
-which are not provided by authenticated developpers. Such applications cannot be started
+which are not provided by authenticated developers. Such applications cannot be started
 by double-clicking on their icons.
 Apple provides a two step mechanism circumventing this security:
 * right-click on the application icon (```gwd``` and ```gwsetup```). This will pop-up a window
@@ -89,7 +89,7 @@ Quite similar to the MacOS solution, without the security check.
 
 See [Contributor guidelines](CONTRIBUTING.md).
 
-### Installation (for developpers)
+### Installation (for developers)
 
 See [geneweb.opam](./geneweb.opam).
 
@@ -99,7 +99,7 @@ See [geneweb.opam](./geneweb.opam).
    ```
    $ ocaml ./configure.ml
    ```
-2. Build the distibution
+2. Build the distribution
    ```
    $ make clean distrib
    ```
@@ -113,7 +113,7 @@ $ ocaml ./configure.ml --help
 
 * Try to keep the same coding style as the existing one.
 * New code should not contain any trailing whitespace.
-* Each pull request should have a single clear purpose. If it containes
+* Each pull request should have a single clear purpose. If it contains
   multiple unrelated changes, those changes should be split into
   separate pull requests.
 * If the PR needs to be update, push force.
