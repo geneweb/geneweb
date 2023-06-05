@@ -33,5 +33,5 @@ Remarks, suggestions, questions, bug reports to:
   https://framalistes.org/sympa/subscribe/geneweb
 
 Please specify the version number above, the system you use (Unix,
-Windows, Mac) and if possible the commit number shown when positionning the
+Windows, Mac) and if possible the commit number shown when positioning the
 mouse over the version number on the welcome page.

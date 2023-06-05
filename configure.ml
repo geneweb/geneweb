@@ -39,11 +39,11 @@ let speclist =
     ("--gwdb-legacy", Arg.Unit set_gwdb_legacy, " Use legacy backend");
     ( "--release",
       Arg.Set release,
-      " Use release profile: no debug informations (defaut: "
+      " Use release profile: no debug information (default: "
       ^ string_of_bool !release ^ ")" );
     ( "--debug",
       Arg.Clear release,
-      " Use dev profile: no optimization, debug informations (default: "
+      " Use dev profile: no optimization, debug information (default: "
       ^ string_of_bool (not !release)
       ^ ")" );
     ( "--sosa-legacy",

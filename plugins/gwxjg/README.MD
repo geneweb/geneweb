@@ -4,7 +4,7 @@
 structure to Jingoo's type system. Below, see a quick reference of which
 structures and which fields are accessible from a Jingoo template.
 
-If you (approximatively) know how to read OCaml code, the best is to read
+If you (approximately) know how to read OCaml code, the best is to read
 [Data module](data.ml), where everything is defined.
 
 Alternatively, here is a simplified view of what you get when using `gwxjg`
