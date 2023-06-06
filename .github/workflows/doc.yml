@@ -10,9 +10,9 @@ jobs:
       - name: checkout-code
         uses: actions/checkout@v3
       - name: setup-ocaml
-        uses: avsm/setup-ocaml@v1
+        uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-version: 4.14.0
+          ocaml-compiler: 4.14.0
       - name: setup
         run: |
              opam pin add . -y --no-action
