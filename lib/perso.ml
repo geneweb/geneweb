@@ -3847,12 +3847,9 @@ let print_foreach conf base print_ast eval_expr =
                        (Event.get_witness_notes event_item)
                    with
                    | None -> ()
-                   | Some (wk, wnote) -> (
-                       match Event.get_name event_item with
-                       | Event.Fevent _ ->
-                           if get_sex c = Male then
-                             list := (c, wk, wnote, event_item) :: !list
-                       | _ -> list := (c, wk, wnote, event_item) :: !list))
+                   | Some (wk, wnote) ->
+                       (* TODO if it is a Fevent we need both person of the pair *)
+                       list := (c, wk, wnote, event_item) :: !list)
                  (Event.events conf base c);
                make_list icl
            | [] -> ()
@@ -4090,48 +4087,45 @@ let print_foreach conf base print_ast eval_expr =
   in
   let print_foreach_related env al ((p, p_auth) as ep) =
     if p_auth then
-      let list =
-        let list = List.sort_uniq compare (get_related p) in
+      let l =
+        let l = List.sort_uniq compare (get_related p) in
         List.fold_left
-          (fun list ic ->
+          (fun acc ic ->
             let c = pget conf base ic in
-            let rec loop list = function
+            let rec loop acc = function
+              | [] -> acc
               | r :: rl -> (
                   match r.r_fath with
-                  | Some ip when ip = get_iper p -> loop ((c, r) :: list) rl
+                  | Some ip when ip = get_iper p -> loop ((c, r) :: acc) rl
                   | Some _ | None -> (
                       match r.r_moth with
-                      | Some ip when ip = get_iper p -> loop ((c, r) :: list) rl
-                      | Some _ | None -> loop list rl))
-              | [] -> list
+                      | Some ip when ip = get_iper p -> loop ((c, r) :: acc) rl
+                      | Some _ | None -> loop acc rl))
             in
-            loop list (get_rparents c))
-          [] list
+            loop acc (get_rparents c))
+          [] l
       in
-      let list =
+      let l =
         (* TODO don't query db in sort *)
+        let get_date x =
+          match Date.od_of_cdate (get_baptism x) with
+          | None -> Date.od_of_cdate (get_birth x)
+          | x -> x
+        in
         List.sort
           (fun (c1, _) (c2, _) ->
-            let d1 =
-              match Date.od_of_cdate (get_baptism c1) with
-              | None -> Date.od_of_cdate (get_birth c1)
-              | x -> x
-            in
-            let d2 =
-              match Date.od_of_cdate (get_baptism c2) with
-              | None -> Date.od_of_cdate (get_birth c2)
-              | x -> x
-            in
+            let d1 = get_date c1 in
+            let d2 = get_date c2 in
             match (d1, d2) with
             | Some d1, Some d2 -> Date.compare_date d1 d2
             | _ -> -1)
-          (List.rev list)
+          l
       in
       List.iter
         (fun (c, r) ->
           let env = ("rel", Vrel (r, Some c)) :: env in
           List.iter (print_ast env ep) al)
-        list
+        l
   in
   let print_foreach_sorted_list_item env al ep listname =
     let l =
