@@ -316,7 +316,7 @@ let get_carrousel_files_aux conf base p old =
     let f = Filename.concat (carrousel_folder conf) k in
     let f = if old then Filename.concat f "old" else f in
     try
-      if (Sys.file_exists f) && (Sys.is_directory f) then
+      if Sys.file_exists f && Sys.is_directory f then
         Array.fold_left
           (fun acc f1 ->
             let ext = Filename.extension f1 in
