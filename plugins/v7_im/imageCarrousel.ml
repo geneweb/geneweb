@@ -148,19 +148,11 @@ let swap_files_aux dir file ext old_ext =
   let old_file =
     String.concat Filename.dir_sep [ dir; "old"; Filename.basename file ]
   in
-  let file, old_file =
-    match ext, old_ext with
-    | _, ".url" -> file, (Filename.chop_extension file) ^ ".url"
-    | ".url", ext ->
-        (Filename.chop_extension file) ^ ".url",
-        (Filename.chop_extension old_file) ^ ext
-    | _, _ -> file, old_file
-  in
   let tmp_file = String.concat Filename.dir_sep [ dir; "tempfile.tmp" ] in
-  (* TODO si file.url n'existe pas, il faut la créer *)
   if ext <> old_ext then (
-    if Sys.file_exists old_file then rn old_file ((Filename.chop_extension file) ^ old_ext);
-    if Sys.file_exists file then rn file ((Filename.chop_extension old_file) ^ ext))
+    if Sys.file_exists file then rn file (Filename.chop_extension old_file ^ ext);
+    if Sys.file_exists old_file then
+      rn old_file (Filename.chop_extension file ^ old_ext))
   else (
     if Sys.file_exists file then rn file tmp_file;
     if Sys.file_exists old_file then rn old_file file;
@@ -461,13 +453,15 @@ let effective_send_c_ok conf base p file file_name =
     if Sys.file_exists fname then
       if move_file_to_save fname dir = 0 then
         incorrect conf "effective send (image)";
+  let fname =
+    if image_url <> "" then Filename.concat dir image_name ^ ".url" else fname
+  in
   if content <> "" then
     try write_file fname content
     with _ ->
       incorrect conf
         (Printf.sprintf "effective send (writing content file %s)" fname)
   else if image_url <> "" then
-    let fname = Filename.concat dir image_name ^ ".url" in
     try write_file fname image_url
     with _ ->
       incorrect conf
@@ -576,9 +570,9 @@ let print_del conf base =
 let effective_delete_c_ok conf base p =
   let fname = Image.default_portrait_filename base p in
   let file_name =
-    try (List.assoc "file_name" conf.env :> string) with Not_found -> ""
+    try List.assoc "file_name" conf.env with Not_found -> Adef.encoded ""
   in
-  (*let file_name = Mutil.decode file_name in *)
+  let file_name = (Mutil.decode file_name :> string) in
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
@@ -614,15 +608,17 @@ let effective_reset_c_ok conf base p =
   in
   let carrousel = Image.default_portrait_filename base p in
   let file_name =
-    try (List.assoc "file_name" conf.env :> string) with Not_found -> ""
+    try List.assoc "file_name" conf.env with Not_found -> Adef.encoded ""
   in
+  let file_name = (Mutil.decode file_name :> string) in
   let file_name = if mode = "portraits" then carrousel else file_name in
   let ext = get_extension conf false file_name in
   let old_ext = get_extension conf true file_name in
   let ext =
     match Image.get_portrait conf base p with
-    | Some src -> if Mutil.start_with "http" 0 (Image.src_to_string src)
-        then ".url" else ext
+    | Some src ->
+        if Mutil.start_with "http" 0 (Image.src_to_string src) then ".url"
+        else ext
     | _ -> ext
   in
   let file_in_new =
@@ -633,8 +629,8 @@ let effective_reset_c_ok conf base p =
       String.concat Filename.dir_sep
         [ Util.base_path [ "src" ] conf.bname; "images"; carrousel; file_name ]
   in
-  if Sys.file_exists file_in_new then ()
-  else (
+  (if Sys.file_exists file_in_new then ()
+  else
     match Image.get_portrait conf base p with
     | Some (`Url url) -> (
         try write_file file_in_new url
