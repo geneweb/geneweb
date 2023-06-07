@@ -1655,10 +1655,6 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       match get_env "carrousel_img" env with
       | Vstring s -> str_val s
       | _ -> null_val)
-  | "carrousel_img_key" -> (
-      match get_env "carrousel_img" env with
-      | Vstring s -> str_val (Mutil.tr '+' ' ' s)
-      | _ -> null_val)
   | "carrousel_note" -> (
       match get_env "carrousel_img" env with
       | Vstring s -> str_val (Filename.remove_extension s ^ ".txt")
