@@ -189,18 +189,25 @@ let rec display_note_aux opts tagn s len i =
       (oc opts) (Buffer.contents b);
       display_note_aux opts tagn s (len + 1) (!j + 1)
 
-let display_note opts ?source_page tagn s =
+let display_note opts tagn s =
   if opts.Gwexport.notes && s <> "" then (
     let tag = Printf.sprintf "%d NOTE " tagn in
     Printf.ksprintf (oc opts) "%s" tag;
-    display_note_aux opts tagn (encode opts s) (String.length tag) 0);
-  match source_page with
-  | None -> ()
-  | Some source_page ->
-      (* source_page is used to add a source with page information;
-         so we can re-import wiki notes and correctly re-link them together *)
-      Printf.ksprintf (oc opts) "%d SOUR\n" (tagn + 1);
-      Printf.ksprintf (oc opts) "%d PAGE %s\n" (tagn + 2) source_page
+    display_note_aux opts tagn (encode opts s) (String.length tag) 0)
+
+let display_wiki opts wiki_notes =
+  if opts.Gwexport.notes then
+    (let tagn = 1 in
+     let tag = Printf.sprintf "%d _GW_CHRONICLE\n" tagn in
+     Printf.ksprintf (oc opts) "%s" tag;
+     List.iter (fun (filename, content) ->
+         if content <> "" then (
+           Printf.ksprintf (oc opts) "%d FILE %s\n" (tagn + 1) filename;
+           let tag = Printf.sprintf "%d NOTE " (tagn + 2) in
+           Printf.ksprintf (oc opts) "%s" tag;
+           display_note_aux opts (tagn + 2) (encode opts content)
+             (String.length tag) 0)))
+      wiki_notes
 
 let write_base_notes opts base =
   (* TODO WIKI what about wizard notes *)
@@ -232,11 +239,7 @@ let write_base_notes opts base =
     (* main notes should be first in gedcom *)
     main_notes :: wiki_pages
   in
-  List.iter
-    (fun (filename, content) ->
-      let source_page = Printf.sprintf "geneweb wiki notes: %s" filename in
-      display_note opts 1 ~source_page content)
-    wiki_notes
+  display_wiki opts wiki_notes
 
 let ged_header opts base ifile ofile =
   Printf.ksprintf (oc opts) "0 HEAD\n";
