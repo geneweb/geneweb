@@ -77,13 +77,6 @@
   %end;%nn;
 %in;
 
-%if;(cgi)
-[
-en: Warning: picture management functions are not fully operative in CGI mode!!
-fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement en mode CGI!!
-]
-%end;
-
 %if;(wizard)
   <div class="row mb-1">
     %( *** Col 1 *** %)
@@ -92,6 +85,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
         %(<i class="fa fa-portrait fa-fw mr-1"></i>%)
         %if;(has_portrait)[*modify portrait]%else;[*add portrait]%end;</h1>
       <form class="form-row" method="post" action="%action;" enctype="multipart/form-data">
+        %if;(cgi)<input type="hidden" name="b" value="%e.b;">%end;
         <input type="hidden" name="m" value="SND_IMAGE_C_OK">
         <input type="hidden" name="i" value="%index;">
         <input type="hidden" name="notes" value="">
@@ -112,6 +106,7 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
       <h1 class="display-4">
       %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*add image]</h1>
       <form class="form-row" method="post" action="%action;" enctype="multipart/form-data">
+        %if;(cgi)<input type="hidden" name="b" value="%e.b;">%end;
         <input type="hidden" name="m" value="SND_IMAGE_C_OK">
         <input type="hidden" name="i" value="%index;">
         <input type="hidden" name="mode" id="mode_2" value="others">
