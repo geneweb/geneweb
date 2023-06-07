@@ -100,7 +100,7 @@ let () =
   | Some dmy ->
       assert (
         Date.compare_dmy dmy
-          { day = 1; month = 1; year = 1990; prec = Def.Sure; delta = 0 }
+          { day = 1; month = 1; year = 1990; prec = Date.Sure; delta = 0 }
         = 0));
   assert (
     Gwdb.sou base (Gwdb.get_birth_note a) = "This is a note on a birth event");
@@ -111,34 +111,44 @@ let () =
 (* check family marriage event *)
 let () =
   let fam = Gwdb.foi base (Gwdb.get_family a).(0) in
+  (* TODO <br> bug at import https://github.com/geneweb/geneweb/issues/1002 *)
   assert (
     Gwdb.sou base (Gwdb.get_comment fam)
     = "This is a comment on a family\n\nthis is a line after an empty line");
   let fevents = Gwdb.get_fevents fam in
   let marriage =
     match
-      List.filter (fun event -> event.Def.efam_name = Def.Efam_Marriage) fevents
+      List.filter_map
+        (fun event ->
+          let event = Geneweb.Event.event_item_of_fevent event in
+          if Geneweb.Event.get_name event = Fevent Def.Efam_Marriage then
+            Some event
+          else None)
+        fevents
     with
     | [] -> failwith "no Efam_Marriage"
     | e :: [] -> e
     | _l -> failwith "duplicate Efam_Marriage"
   in
-  (match Date.cdate_to_dmy_opt marriage.efam_date with
+  (match Date.cdate_to_dmy_opt (Geneweb.Event.get_date marriage) with
   | None -> failwith "no marriage date"
   | Some dmy ->
       assert (
         Date.compare_dmy dmy
-          { day = 18; month = 05; year = 2013; prec = Def.Sure; delta = 0 }
+          { day = 18; month = 05; year = 2013; prec = Date.Sure; delta = 0 }
         = 0));
 
   assert (
-    Gwdb.sou base marriage.efam_note = "This is a note on a marriage event");
+    Gwdb.sou base (Geneweb.Event.get_note marriage)
+    = "This is a note on a marriage event");
   assert (
-    Gwdb.sou base marriage.efam_src = "This is a source on a marriage event");
-  assert (Gwdb.sou base marriage.efam_place = "Lyon");
+    Gwdb.sou base (Geneweb.Event.get_src marriage)
+    = "This is a source on a marriage event");
+  assert (Gwdb.sou base (Geneweb.Event.get_place marriage) = "Lyon");
   let witness, witness_kind, wnote =
-    assert (Array.length marriage.efam_witnesses = 1);
-    let w, wk, wnote = marriage.efam_witnesses.(0) in
+    let witnesses = Geneweb.Event.get_witnesses_and_notes marriage in
+    assert (Array.length witnesses = 1);
+    let w, wk, wnote = witnesses.(0) in
     (Gwdb.poi base w, wk, Gwdb.sou base wnote)
   in
   assert (Gwdb.sou base (Gwdb.get_first_name witness) = "c");
@@ -151,19 +161,26 @@ let () =
   let pevents = Gwdb.get_pevents a in
   let diploma =
     match
-      List.filter
-        (fun event -> event.Def.epers_name = Def.Epers_Diploma)
+      List.filter_map
+        (fun event ->
+          let event = Geneweb.Event.event_item_of_pevent event in
+          if Geneweb.Event.get_name event = Pevent Def.Epers_Diploma then
+            Some event
+          else None)
         pevents
     with
     | [] -> failwith "no Epers_Diploma"
     | e :: [] -> e
     | _l -> failwith "duplicate Epers_Diploma"
   in
-  assert (Gwdb.sou base diploma.epers_note = "This is a note on a diploma event");
   assert (
-    Gwdb.sou base diploma.epers_src = "This is a source on a diploma event");
+    Gwdb.sou base (Geneweb.Event.get_note diploma)
+    = "This is a note on a diploma event");
+  assert (
+    Gwdb.sou base (Geneweb.Event.get_src diploma)
+    = "This is a source on a diploma event");
   let _w, witness_kind, wnote =
-    let witnesses = diploma.epers_witnesses in
+    let witnesses = Geneweb.Event.get_witnesses_and_notes diploma in
     assert (Array.length witnesses = 1);
     let w, wk, wnote = witnesses.(0) in
     (w, wk, Gwdb.sou base wnote)
