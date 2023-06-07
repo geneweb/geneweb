@@ -228,12 +228,12 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
         %foreach;img_in_carrousel;
           <div class="d-flex mt-1">
             <a role="button"
-              href=%if;(url!="")"%url;"%else;"%prefix;m=IM_C&i=%index;&s=%carrousel_img_key;"%end;
+              href=%if;(url!="")"%url;"%else;"%prefix;m=IM_C&i=%index;&s=%carrousel_img;"%end;
               target="_blank" rel="noopener" data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong><i class="fas fa-images fa-xs mr-1"></i>[*see] [image/images]0</strong>
                      <br><span class="small">%carrousel_img;</span>
                      <br><img class="rounded my-1"
-              src=%if;(url!="")"%url;"%else;"%prefix;m=IM_C&i=%index;&s=%carrousel_img_key;"%end;
+              src=%if;(url!="")"%url;"%else;"%prefix;m=IM_C&i=%index;&s=%carrousel_img;"%end;
                      width="185px">
                      '>
               <i class="far fa-file-image fa-fw text-primary"></i></a>
@@ -254,12 +254,12 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
             <samp class="text-truncate ml-1" title="%images_store;%X;%carrousel;%X;%carrousel_img;">%carrousel_img;</samp>
             <div class="ml-auto col-1">
               <a role="button"
-                href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&file_name=%carrousel_img_key;&mode=others&idigest=%idigest;"
+                href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&file_name=%carrousel_img;&mode=others&idigest=%idigest;"
                 data-toggle="tooltip" data-html="true" data-placement="left"
                 title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete image]</strong>
                        <br><span class="small">%carrousel_img;</span>
                        <br><img class="rounded my-1"
-                src=%if;(url!="")"%url;"%else;"%prefix;m=IM_C&i=%index;&s=%carrousel_img_key;"%end;
+                src=%if;(url!="")"%url;"%else;"%prefix;m=IM_C&i=%index;&s=%carrousel_img;"%end;
                 width="185px">'>
                 <i class="far fa-trash-alt text-warning"></i></a>
             </div>
@@ -276,15 +276,15 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
         %foreach;img_in_carrousel_old;
           <div class="d-flex mt-1">
             <a role="button"
-              href=%if;(url!="")"%url;"%else;"%prefix;m=IM_C_S&i=%index;&s=%carrousel_img_key;"%end;
+              href=%if;(url!="")"%url;"%else;"%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;"%end;
               target="_blank" rel="noopener" data-toggle="tooltip" data-html="true" data-placement="left"
               title='<strong><i class="fas fa-images fa-xs mr-1"></i>[*see] [saved images]0</strong>
                      <br><span class="small">%carrousel_img;</span>
                      <br><img class="rounded my-1"
-              src=%if;(url!="")"%url;"%else;"%prefix;m=IM_C_S&i=%index;&s=%carrousel_img_key;"%end;
+              src=%if;(url!="")"%url;"%else;"%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;"%end;
               width="185px">'>
               <i class="far fa-file-image fa-fw text-primary"></i></a>
-            <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=others&file_name=%carrousel_img_key;&idigest=%idigest;"
+            <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=others&file_name=%carrousel_img;&idigest=%idigest;"
                %if;(url!="")%else;data-toggle="tooltip" data-html="true" data-placement="top"%end;
                title="[*restore image saved]">
               <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i></a>
@@ -292,13 +292,13 @@ fr: Attention : les fonctions de gestion des images ne fonctionne pas pleinement
             <div class="ml-auto col-1">
               <a role="button"
                 href="%prefix;m=DEL_IMAGE_C_OK&i=%index%nn;
-                  &idigest=%idigest;&file_name=%carrousel_img_key;&mode=others%nn;
+                  &idigest=%idigest;&file_name=%carrousel_img;&mode=others%nn;
                   &delete=on"%sp;
                 data-toggle="tooltip" data-html="true" data-placement="left"
                 title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete image saved]</strong>
                          <br><span class="small">%carrousel_img;</span>
                          <br><img class="rounded my-1"
-                src=%if;(url!="")"%url;"%else;"%prefix;m=IM_C_S&i=%index;&s=%carrousel_img_key;"%end;
+                src=%if;(url!="")"%url;"%else;"%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;"%end;
                 width="185px">'>
                 <i class="far fa-trash-alt text-danger fa-fw text-primary"></i></a>
             </div>
