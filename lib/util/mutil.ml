@@ -938,7 +938,7 @@ let gen_decode strip_spaces (s : Adef.encoded_string) : string =
   let rec need_decode i =
     if i < String.length s then
       match s.[i] with
-      | '%' -> true
+      | '%' | '+' -> true
       | _ -> need_decode (succ i)
     else false
   in
@@ -959,6 +959,7 @@ let gen_decode strip_spaces (s : Adef.encoded_string) : string =
         '%' when i + 2 < String.length s ->
           let v = hexa_val s.[i+1] * 16 + hexa_val s.[i+2] in
           Bytes.set s1 i1 (Char.chr v); i + 3
+        | '+' -> Bytes.set s1 i1 ' '; succ i
         | x -> Bytes.set s1 i1 x; succ i
       in
       copy_decode_in s1 i (succ i1)
