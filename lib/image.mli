@@ -69,6 +69,22 @@ val get_old_portrait :
 (* -- Carrousel -- *)
 
 val get_carrousel_files : config -> base -> person -> string list
+
+val get_carrousel_img :
+  config ->
+  base ->
+  person ->
+  string ->
+  [> `Path of string | `Url of string ] option
+
 val get_carrousel_old_files : config -> base -> person -> string list
+
+val get_carrousel_old_img :
+  config ->
+  base ->
+  person ->
+  string ->
+  [> `Path of string | `Url of string ] option
+
 val get_carrousel_img_note : config -> base -> person -> string -> string option
 val get_carrousel_img_src : config -> base -> person -> string -> string option
