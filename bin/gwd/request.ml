@@ -163,7 +163,8 @@ let specify conf base n pl =
   Output.print_sstring conf "</ul>" ;
   Hutil.trailer conf
 
-let incorrect_request conf = Hutil.incorrect_request conf
+let incorrect_request ?(comment = "") conf =
+  Hutil.incorrect_request ~comment:comment conf
 
 let person_selected conf base p =
   match p_getenv conf.senv "em" with
@@ -458,7 +459,9 @@ let treat_request =
             end ;
           | None -> ()
         end ;
-        let incorrect_request conf _ = incorrect_request conf in
+        let incorrect_request ?(comment = "") conf _ =
+          incorrect_request ~comment:comment conf
+        in
         match m with
         | "" ->
           let base =
@@ -754,18 +757,11 @@ let treat_request =
         | "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
           w_base @@ WiznotesDisplay.print_search
         | _ ->
-            let title _ =
-              transl conf "error"
-              |> Utf8.capitalize_fst
-              |> Output.print_sstring conf
+            w_base @@ fun conf base ->
+            let str =
+              (Printf.sprintf "failing plugin or unknown command m=%s" m)
             in
-            Hutil.rheader conf title ;
-            Output.print_sstring conf
-              ((transl conf "error unknown command m="
-                |> Utf8.capitalize_fst) ^ 
-              m);
-            Hutil.trailer conf;
-            incorrect_request
+            incorrect_request ~comment:str conf base
       end conf bfile ;
   end else begin
     let title _ =
