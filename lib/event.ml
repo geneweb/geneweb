@@ -148,32 +148,19 @@ let compare_event_name name1 name2 =
   | _, Pevent Epers_Funeral -> -1
   | Pevent Epers_Death, _ -> 1
   | _, Pevent Epers_Death -> -1
-  (* put Fevent after Pevent *)
-  | Fevent _, Pevent _ -> 1
-  | Pevent _, Fevent _ -> -1
-  (* this is to make event order stable; depends on type definition order! *)
-  | Fevent e1, Fevent e2 -> compare e1 e2
-  | Pevent e1, Pevent e2 -> compare e1 e2
+  | _, _ -> 0
 
-(* this do not define a preorder (no transitivity);
-   can not be used to sort a list
-   ex:
-    let a,b,c events with
-      a.date = 2022;
-      b.date = None;
-      c.date = 2000
-    we can have a <= b and b <= c because of event name.
-    but we do not have a <= c
-*)
-let compare get_name get_date e1 e2 =
-  match Date.cdate_to_dmy_opt (get_date e1) with
-  | None -> compare_event_name (get_name e1) (get_name e2)
-  | Some d1 -> (
-      match Date.cdate_to_dmy_opt (get_date e2) with
-      | None -> compare_event_name (get_name e1) (get_name e2)
-      | Some d2 ->
-          let x = Date.compare_dmy d1 d2 in
-          if x = 0 then compare_event_name (get_name e1) (get_name e2) else x)
+let better_compare_event_name name1 name2 =
+  let c = compare_event_name name1 name2 in
+  if c <> 0 then c
+  else
+    match (name1, name2) with
+    (* put Fevent after Pevent *)
+    | Fevent _, Pevent _ -> 1
+    | Pevent _, Fevent _ -> -1
+    (* this is to make event order stable; depends on type definition order! *)
+    | Fevent e1, Fevent e2 -> compare e1 e2
+    | Pevent e1, Pevent e2 -> compare e1 e2
 
 (* try to handle the fact that events are not well ordered *)
 let sort_events get_name get_date events =
@@ -188,7 +175,31 @@ let sort_events get_name get_date events =
   (* we need this to keep the input with same date ordered
      by their creation order *)
   let dated, undated = (List.rev dated, List.rev undated) in
-  let cmp = compare get_name get_date in
+
+  (* this do not define a preorder (no transitivity);
+     can not be used to sort a list
+     ex:
+      let a,b,c events with
+        a.date = Some 2022;
+        b.date = None;
+        c.date = Some 2000;
+      we can have a <= b and b <= c because of event name.
+      but we do not have a <= c
+  *)
+  let cmp e1 e2 =
+    let cmp_name e1 e2 =
+      better_compare_event_name (get_name e1) (get_name e2)
+    in
+    match Date.cdate_to_dmy_opt (get_date e1) with
+    | None -> cmp_name e1 e2
+    | Some d1 -> (
+        match Date.cdate_to_dmy_opt (get_date e2) with
+        | None -> cmp_name e1 e2
+        | Some d2 ->
+            let x = Date.compare_dmy d1 d2 in
+            if x = 0 then cmp_name e1 e2 else x)
+  in
+
   (* sort events with dates separately to make sure
      that dates are in correct order *)
   let l1 = List.stable_sort cmp dated in
