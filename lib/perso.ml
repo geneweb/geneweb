@@ -3415,11 +3415,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | Some src -> Mutil.start_with "http" 0 (Image.src_to_string src)
       | _ -> false)
   (* carrousel *)
-  | "has_carrousel" ->
-      Sys.file_exists
-        (Filename.concat
-           (Image.carrousel_folder conf)
-           (Image.default_portrait_filename base p))
+  | "has_carrousel" -> Image.get_carrousel_files conf base p <> []
+  | "has_old_carrousel" -> Image.get_carrousel_old_files conf base p <> []
   | "has_old_image" | "has_old_portrait" ->
       Image.get_old_portrait conf base p |> Option.is_some
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
@@ -5062,16 +5059,12 @@ let print_foreach conf base print_ast eval_expr =
       | [] -> ()
       | a :: l ->
           let url =
-            if Filename.extension a = ".url" then (
-              let k = Image.default_portrait_filename base p in
-              let f = Filename.concat (Image.carrousel_folder conf) k in
-              let f = if old then Filename.concat f "old" else f in
-              let fname = Filename.concat f a in
-              let ic = Secure.open_in fname in
-              let line = input_line ic in
-              close_in ic;
-              line)
-            else ""
+            match
+              if old then Image.get_carrousel_img conf base p a
+              else Image.get_carrousel_old_img conf base p a
+            with
+            | Some (`Url url) -> url
+            | _ -> ""
           in
           let env =
             ("carrousel_img", Vstring a)

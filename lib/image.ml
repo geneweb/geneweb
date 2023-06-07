@@ -302,6 +302,26 @@ let get_carrousel_img_aux conf base p fname kind =
       if s = "" then None else Some s)
     else None
 
+let get_carrousel_url_aux conf base p old fname =
+  if not (has_access_to_carrousel conf base p) then None
+  else
+    let k = default_portrait_filename base p in
+    let fname =
+      if old then
+        String.concat Filename.dir_sep [ carrousel_folder conf; k; fname ]
+      else
+        String.concat Filename.dir_sep
+          [ carrousel_folder conf; k; "old"; fname ]
+    in
+    if Sys.file_exists fname then
+      if Filename.extension fname = ".url" then (
+        let ic = Secure.open_in fname in
+        let line = input_line ic in
+        close_in ic;
+        Some (`Url line))
+      else Some (`Path fname)
+    else None
+
 let get_carrousel_img_note conf base p fname =
   get_carrousel_img_aux conf base p fname ".txt"
 
@@ -334,8 +354,14 @@ let get_carrousel_files_aux conf base p old =
 
 let get_carrousel_files conf base p = get_carrousel_files_aux conf base p false
 
+let get_carrousel_img conf base p fname =
+  get_carrousel_url_aux conf base p false fname
+
 let get_carrousel_old_files conf base p =
   get_carrousel_files_aux conf base p true
+
+let get_carrousel_old_img conf base p fname =
+  get_carrousel_url_aux conf base p true fname
 
 (* end carrousel ************************************ *)
 
