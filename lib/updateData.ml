@@ -23,7 +23,6 @@ module IstrSet = Set.Make (struct
   let compare = compare
 end)
 
-
 (* if env parameter "all" is "on", then we should search for places
    without suburb.
    Later, we should update places values while keeping the suburb value.
