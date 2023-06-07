@@ -8,17 +8,6 @@ type 'a event_name =
 let pevent_name s = Pevent s
 let fevent_name s = Fevent s
 
-(*type 'a event_item = {
-  name :'a event_name;
-  date : cdate;
-  place : istr;
-  note : istr;
-  src : istr;
-  witnesses : (iper * witness_kind) array;
-  witness_notes : istr array option;
-  spouse : iper option
-  }*)
-
 type 'a event_item =
   | PE of Gwdb.pers_event * 'a event_name
   | FE of Gwdb.fam_event * 'a event_name * iper option
