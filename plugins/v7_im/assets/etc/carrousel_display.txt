@@ -59,10 +59,13 @@
                     </a>
                   %end;
                   <div class="position-relative d-inline-flex w-100 d-none d-md-block">
-                    <span>%carrousel_img_note;</span>
-                    %if;(carrousel_img_note!="")<br>%end;
                     <span>[image/images]0 %count;/%carrousel_img_nbr;[:] </span>
                     <small class="ml-auto">%carrousel_img; </small>
+                    %if;(carrousel_img_src!="")<br>
+                    <span><strong>[*source/sources]0[:] </strong>%carrousel_img_src;</span>%end;
+                    %if;(carrousel_img_note!="")<br>
+                    <span><strong>[*note/notes]0[:] </strong>%carrousel_img_note;</span>%end;
+                    
                   </div>
                 </div>
               %end;
