@@ -339,6 +339,7 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
           List.mem k excl
           || (trim && (k = "oc" || k = "ocz") && (v :> string) = "0")
           || (v :> string) = ""
+          || k = "b"
         then c
         else c ^^^ k ^<^ "=" ^<^ (v :> Adef.escaped_string) ^>^ "&")
   in
@@ -355,7 +356,14 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
             (Format.sprintf "Poorly formatted command: %s" commd);
           commd
   in
-  let s = Adef.escaped @@ commd ^ "?" in
+  let s =
+    Adef.escaped
+    @@
+    if conf.cgi then
+      if conf.cgi_passwd = "" then commd ^ "?b=" ^ conf.bname ^ "&"
+      else commd ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd ^ "&"
+    else commd ^ "?"
+  in
   let s = if henv then aux s conf.henv else s in
   let s = if senv then aux s conf.senv else s in
   s
