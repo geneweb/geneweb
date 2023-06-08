@@ -3865,10 +3865,10 @@ let print_foreach conf base print_ast eval_expr =
           events_witnesses
       in
       List.iter
-        (fun (p, wk, wnote, evt) ->
+        (fun (related_person, wk, wnote, evt) ->
           let wk = string_of_witness_kind conf (get_sex p) wk in
           let wnote = Util.escape_html wnote in
-          let env = ("event_witness_relation", Vevent (p, evt)) :: env in
+          let env = ("event_witness_relation", Vevent (related_person, evt)) :: env in
           let env =
             ( "event_witness_relation_kind",
               Vstring (wk : Adef.safe_string :> string) )
