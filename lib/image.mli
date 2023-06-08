@@ -69,13 +69,7 @@ val get_old_portrait :
 (* -- Carrousel -- *)
 
 val get_carrousel_imgs :
-  config ->
-  base ->
-  person ->
-  ([> `Path of string | `Url of string ] * string * string) list
+  config -> base -> person -> (string * string * string * string) list
 
 val get_carrousel_old_imgs :
-  config ->
-  base ->
-  person ->
-  ([> `Path of string | `Url of string ] * string * string) list
+  config -> base -> person -> (string * string * string * string) list

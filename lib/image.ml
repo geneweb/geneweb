@@ -247,8 +247,8 @@ let get_portrait conf base p =
   else None
 
 (* In images/carrousel we store either
-   - the old portrait as the original carrousel.jpg/png/tif image
-   - the url to the portrait as content of a url.txt file
+   - the image as the original image.jpg/png/tif image
+   - the url to the image as content of a image.url text file
 *)
 let get_old_portrait conf base p =
   if has_access_to_portrait conf base p then
@@ -312,14 +312,16 @@ let get_portrait_with_size conf base p =
 (* For carrousel ************************************ *)
 
 let carrousel_file_path conf base p fname old =
-  let k =
-    let k = default_portrait_filename base p in
-    if old then Filename.concat k "old" else k
+  let dir =
+    let dir = default_portrait_filename base p in
+    if old then Filename.concat dir "old" else dir
   in
-  String.concat Filename.dir_sep [ carrousel_folder conf; k; fname ]
+  String.concat Filename.dir_sep [ carrousel_folder conf; dir; fname ]
 
 let get_carrousel_file_content conf base p fname kind old =
-  let fname = carrousel_file_path conf base p fname old ^ kind in
+  let fname =
+    Filename.chop_extension (carrousel_file_path conf base p fname old) ^ kind
+  in
   if Sys.file_exists fname then (
     let ic = Secure.open_in fname in
     let s = really_input_string ic (in_channel_length ic) in
@@ -333,17 +335,14 @@ let get_carrousel_img_aux conf base p old =
     Option.value ~default:""
       (get_carrousel_file_content conf base p fname ".txt" false)
   in
-
   let get_carrousel_img_src fname =
     Option.value ~default:""
       (get_carrousel_file_content conf base p fname ".src" false)
   in
-
   let get_carrousel_img fname =
     let path = carrousel_file_path conf base p fname old in
-    find_img_opt path
+    find_img_opt (Filename.chop_extension path)
   in
-
   if not (has_access_to_carrousel conf base p) then []
   else
     let f = carrousel_file_path conf base p "" old in
@@ -359,8 +358,14 @@ let get_carrousel_img_aux conf base p old =
             then
               match get_carrousel_img f1 with
               | None -> acc
-              | Some img ->
-                  (img, get_carrousel_img_src f1, get_carrousel_img_note f1)
+              | Some (`Path path) ->
+                  (path, "", get_carrousel_img_src f1, get_carrousel_img_note f1)
+                  :: acc
+              | Some (`Url url) ->
+                  ( Filename.chop_extension (Filename.basename f1) ^ ".url",
+                    url,
+                    get_carrousel_img_src f1,
+                    get_carrousel_img_note f1 )
                   :: acc
             else acc)
           [] (Sys.readdir f)
