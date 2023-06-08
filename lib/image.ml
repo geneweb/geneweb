@@ -7,7 +7,7 @@ let portrait_folder conf = Util.base_path [ "images" ] conf.bname
 let carrousel_folder conf =
   Filename.concat (Util.base_path [ "src" ] conf.bname) "images"
 
-(** [default_portrait_filename_of_key fn sn occ] is the default filename 
+(** [default_portrait_filename_of_key fn sn occ] is the default filename
  of the corresponding person's portrait. WITHOUT its file extenssion.
  e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
  *)
@@ -23,14 +23,21 @@ let default_portrait_filename base p =
 
 let authorized_image_file_extension = [| ".jpg"; ".jpeg"; ".png"; ".gif" |]
 
-let get_file_with_ext f =
-  if Sys.file_exists (f ^ ".url") then Some (f ^ ".url")
-  else
-    let exists ext =
-      let fname = f ^ ext in
-      if Sys.file_exists fname then Some fname else None
-    in
-    Array.find_map exists authorized_image_file_extension
+let find_img_opt f =
+  let exists ext =
+    let fname = f ^ ext in
+    if Sys.file_exists fname then Some fname else None
+  in
+  match exists ".url" with
+  | Some f ->
+      let ic = open_in f in
+      let url = input_line ic in
+      close_in ic;
+      Some (`Url url)
+  | None -> (
+      match Array.find_map exists authorized_image_file_extension with
+      | None -> None
+      | Some f -> Some (`Path f))
 
 (** [full_portrait_path conf base p] is [Some path] if [p] has a portrait.
     [path] is a the full path of the file with file extension. *)
@@ -38,7 +45,12 @@ let full_portrait_path conf base p =
   (* TODO why is extension not in filename..? *)
   let s = default_portrait_filename base p in
   let f = Filename.concat (portrait_folder conf) s in
-  match get_file_with_ext f with Some f -> Some (`Path f) | None -> None
+  match find_img_opt f with
+  | Some (`Path _) as full_path -> full_path
+  | Some (`Url _)
+  (* should not happen, there is only ".url" file in carrousel folder *)
+  | None ->
+      None
 
 let source_filename conf src =
   let fname1 = Filename.concat (carrousel_folder conf) src in
@@ -244,14 +256,7 @@ let get_old_portrait conf base p =
     let f =
       Filename.concat (Filename.concat (portrait_folder conf) "old") key
     in
-    match get_file_with_ext f with
-    | Some f when Filename.extension f = ".url" ->
-        let ic = open_in f in
-        let url = input_line ic in
-        close_in ic;
-        Some (`Url url)
-    | Some f -> Some (`Path f)
-    | None -> None
+    find_img_opt f
   else None
 
 let rename_portrait conf base p (nfn, nsn, noc) =
@@ -286,15 +291,37 @@ let rename_portrait conf base p (nfn, nsn, noc) =
   | Some (`Url _url) -> () (* old url still applies *)
   | None -> ()
 
+let get_portrait_with_size conf base p =
+  if has_access_to_portrait conf base p then
+    match src_of_string conf (sou base (get_image p)) with
+    | `Src_with_size_info _s as s_info -> (
+        match parse_src_with_size_info conf s_info with
+        | Error _e -> None
+        | Ok (s, size) -> Some (s, Some size))
+    | `Url _s as url -> Some (url, None)
+    | `Path p as path ->
+        if Sys.file_exists p then
+          Some (path, size_from_path path |> Result.to_option)
+        else None
+    | `Empty -> (
+        match full_portrait_path conf base p with
+        | None -> None
+        | Some path -> Some (path, size_from_path path |> Result.to_option))
+  else None
+
 (* For carrousel ************************************ *)
 
-let get_carrousel_img_aux conf base p fname kind =
+let carrousel_file_path conf base p fname old =
+  let k =
+    let k = default_portrait_filename base p in
+    if old then Filename.concat k "old" else k
+  in
+  String.concat Filename.dir_sep [ carrousel_folder conf; k; fname ]
+
+let get_carrousel_file_content conf base p fname kind old =
   if not (has_access_to_carrousel conf base p) then None
   else
-    let k = default_portrait_filename base p in
-    let fname =
-      String.concat Filename.dir_sep [ carrousel_folder conf; k; fname ^ kind ]
-    in
+    let fname = carrousel_file_path conf base p fname old ^ kind in
     if Sys.file_exists fname then (
       let ic = Secure.open_in fname in
       let s = really_input_string ic (in_channel_length ic) in
@@ -302,39 +329,23 @@ let get_carrousel_img_aux conf base p fname kind =
       if s = "" then None else Some s)
     else None
 
-let get_carrousel_url_aux conf base p old fname =
+let get_carrousel_img_aux conf base p old fname =
   if not (has_access_to_carrousel conf base p) then None
   else
-    let k = default_portrait_filename base p in
-    let fname =
-      if old then
-        String.concat Filename.dir_sep [ carrousel_folder conf; k; fname ]
-      else
-        String.concat Filename.dir_sep
-          [ carrousel_folder conf; k; "old"; fname ]
-    in
-    if Sys.file_exists fname then
-      if Filename.extension fname = ".url" then (
-        let ic = Secure.open_in fname in
-        let line = input_line ic in
-        close_in ic;
-        Some (`Url line))
-      else Some (`Path fname)
-    else None
+    let path = carrousel_file_path conf base p fname old in
+    find_img_opt path
 
 let get_carrousel_img_note conf base p fname =
-  get_carrousel_img_aux conf base p fname ".txt"
+  get_carrousel_file_content conf base p fname ".txt" false
 
 let get_carrousel_img_src conf base p fname =
-  get_carrousel_img_aux conf base p fname ".src"
+  get_carrousel_file_content conf base p fname ".src" false
 
 (* get list of files in carrousel *)
 let get_carrousel_files_aux conf base p old =
   if not (has_access_to_carrousel conf base p) then []
   else
-    let k = default_portrait_filename base p in
-    let f = Filename.concat (carrousel_folder conf) k in
-    let f = if old then Filename.concat f "old" else f in
+    let f = carrousel_file_path conf base p "" old in
     try
       if Sys.file_exists f && Sys.is_directory f then
         Array.fold_left
@@ -354,31 +365,13 @@ let get_carrousel_files_aux conf base p old =
 
 let get_carrousel_files conf base p = get_carrousel_files_aux conf base p false
 
-let get_carrousel_img conf base p fname =
-  get_carrousel_url_aux conf base p false fname
-
 let get_carrousel_old_files conf base p =
   get_carrousel_files_aux conf base p true
 
+let get_carrousel_img conf base p fname =
+  get_carrousel_img_aux conf base p false fname
+
 let get_carrousel_old_img conf base p fname =
-  get_carrousel_url_aux conf base p true fname
+  get_carrousel_img_aux conf base p true fname
 
 (* end carrousel ************************************ *)
-
-let get_portrait_with_size conf base p =
-  if has_access_to_portrait conf base p then
-    match src_of_string conf (sou base (get_image p)) with
-    | `Src_with_size_info _s as s_info -> (
-        match parse_src_with_size_info conf s_info with
-        | Error _e -> None
-        | Ok (s, size) -> Some (s, Some size))
-    | `Url _s as url -> Some (url, None)
-    | `Path p as path ->
-        if Sys.file_exists p then
-          Some (path, size_from_path path |> Result.to_option)
-        else None
-    | `Empty -> (
-        match full_portrait_path conf base p with
-        | None -> None
-        | Some path -> Some (path, size_from_path path |> Result.to_option))
-  else None
