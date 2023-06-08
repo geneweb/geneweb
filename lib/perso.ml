@@ -3415,8 +3415,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | Some src -> Mutil.start_with "http" 0 (Image.src_to_string src)
       | _ -> false)
   (* carrousel *)
-  | "has_carrousel" -> Image.get_carrousel_files conf base p <> []
-  | "has_old_carrousel" -> Image.get_carrousel_old_files conf base p <> []
+  | "has_carrousel" -> Image.get_carrousel_imgs conf base p <> []
+  | "has_old_carrousel" -> Image.get_carrousel_old_imgs conf base p <> []
   | "has_old_image" | "has_old_portrait" ->
       Image.get_old_portrait conf base p |> Option.is_some
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
@@ -3656,28 +3656,18 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   (* carrousel functions *)
   | "carrousel" -> Image.default_portrait_filename base p |> str_val
   | "carrousel_img_nbr" ->
-      string_of_int (List.length (Image.get_carrousel_files conf base p))
+      string_of_int (List.length (Image.get_carrousel_imgs conf base p))
       |> str_val
   | "carrousel_old_img_nbr" ->
-      string_of_int (List.length (Image.get_carrousel_old_files conf base p))
+      string_of_int (List.length (Image.get_carrousel_old_imgs conf base p))
       |> str_val
   | "carrousel_img_note" -> (
-      match get_env "carrousel_img" env with
-      | Vstring f ->
-          let ext = Filename.extension f in
-          let fname = Filename.chop_suffix f ext in
-          Option.value ~default:""
-            (Image.get_carrousel_img_note conf base p fname)
-          |> str_val
+      match get_env "carrousel_img_note" env with
+      | Vstring note -> str_val note
       | _ -> raise Not_found)
   | "carrousel_img_src" -> (
-      match get_env "carrousel_img" env with
-      | Vstring f ->
-          let ext = Filename.extension f in
-          let fname = Filename.chop_suffix f ext in
-          Option.value ~default:""
-            (Image.get_carrousel_img_src conf base p fname)
-          |> str_val
+      match get_env "carrousel_img_source" env with
+      | Vstring source -> str_val source
       | _ -> raise Not_found)
   | "portrait" -> (
       (* TODO what do we want here? can we remove this? *)
@@ -5051,23 +5041,22 @@ let print_foreach conf base print_ast eval_expr =
   (* carrousel *)
   let print_foreach_img_in_carrousel env al ((p, _p_auth) as ep) old =
     let l =
-      List.sort String.compare
-        (if old then Image.get_carrousel_old_files conf base p
-        else Image.get_carrousel_files conf base p)
+      let l =
+        (if old then Image.get_carrousel_old_imgs else Image.get_carrousel_imgs)
+          conf base p
+      in
+      List.sort
+        (fun (a, _, _) (b, _, _) ->
+          String.compare (Image.src_to_string a) (Image.src_to_string b))
+        l
     in
     let rec loop first cnt = function
       | [] -> ()
-      | a :: l ->
-          let url =
-            match
-              if old then Image.get_carrousel_img conf base p a
-              else Image.get_carrousel_old_img conf base p a
-            with
-            | Some (`Url url) -> url
-            | _ -> ""
-          in
+      | (img, source, note) :: l ->
+          let url = match img with `Url url -> url | `Path _ -> "" in
           let env =
-            ("carrousel_img", Vstring a)
+            ("carrousel_img_source", Vstring source)
+            :: ("carrousel_img_note", Vstring note)
             :: ("first", Vbool first)
             :: ("last", Vbool (l = []))
             :: ("url", Vstring url) :: ("img_cnt", Vint cnt) :: env
