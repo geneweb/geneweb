@@ -3847,9 +3847,16 @@ let print_foreach conf base print_ast eval_expr =
                        (Event.get_witness_notes event_item)
                    with
                    | None -> ()
-                   | Some (wk, wnote) ->
-                       (* TODO if it is a Fevent we need both person of the pair *)
-                       list := (c, wk, wnote, event_item) :: !list)
+                   | Some (wk, wnote) -> (
+                       match wk with
+                       | Witness_GodParent ->
+                           (* already shown in relationship *)
+                           ()
+                       | Witness | Witness_CivilOfficer
+                       | Witness_ReligiousOfficer | Witness_Informant
+                       | Witness_Attending | Witness_Mentioned | Witness_Other
+                         ->
+                           list := (c, wk, wnote, event_item) :: !list))
                  (Event.events conf base c);
                make_list icl
            | [] -> ()
@@ -3868,7 +3875,9 @@ let print_foreach conf base print_ast eval_expr =
         (fun (related_person, wk, wnote, evt) ->
           let wk = string_of_witness_kind conf (get_sex p) wk in
           let wnote = Util.escape_html wnote in
-          let env = ("event_witness_relation", Vevent (related_person, evt)) :: env in
+          let env =
+            ("event_witness_relation", Vevent (related_person, evt)) :: env
+          in
           let env =
             ( "event_witness_relation_kind",
               Vstring (wk : Adef.safe_string :> string) )
