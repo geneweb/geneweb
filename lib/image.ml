@@ -319,30 +319,31 @@ let carrousel_file_path conf base p fname old =
   String.concat Filename.dir_sep [ carrousel_folder conf; k; fname ]
 
 let get_carrousel_file_content conf base p fname kind old =
-  if not (has_access_to_carrousel conf base p) then None
-  else
-    let fname = carrousel_file_path conf base p fname old ^ kind in
-    if Sys.file_exists fname then (
-      let ic = Secure.open_in fname in
-      let s = really_input_string ic (in_channel_length ic) in
-      close_in ic;
-      if s = "" then None else Some s)
-    else None
-
-let get_carrousel_img_aux conf base p old fname =
-  if not (has_access_to_carrousel conf base p) then None
-  else
-    let path = carrousel_file_path conf base p fname old in
-    find_img_opt path
-
-let get_carrousel_img_note conf base p fname =
-  get_carrousel_file_content conf base p fname ".txt" false
-
-let get_carrousel_img_src conf base p fname =
-  get_carrousel_file_content conf base p fname ".src" false
+  let fname = carrousel_file_path conf base p fname old ^ kind in
+  if Sys.file_exists fname then (
+    let ic = Secure.open_in fname in
+    let s = really_input_string ic (in_channel_length ic) in
+    close_in ic;
+    if s = "" then None else Some s)
+  else None
 
 (* get list of files in carrousel *)
-let get_carrousel_files_aux conf base p old =
+let get_carrousel_img_aux conf base p old =
+  let get_carrousel_img_note fname =
+    Option.value ~default:""
+      (get_carrousel_file_content conf base p fname ".txt" false)
+  in
+
+  let get_carrousel_img_src fname =
+    Option.value ~default:""
+      (get_carrousel_file_content conf base p fname ".src" false)
+  in
+
+  let get_carrousel_img fname =
+    let path = carrousel_file_path conf base p fname old in
+    find_img_opt path
+  in
+
   if not (has_access_to_carrousel conf base p) then []
   else
     let f = carrousel_file_path conf base p "" old in
@@ -355,7 +356,12 @@ let get_carrousel_files_aux conf base p old =
               f1 <> ""
               && f1.[0] <> '.'
               && (Array.mem ext authorized_image_file_extension || ext = ".url")
-            then f1 :: acc
+            then
+              match get_carrousel_img f1 with
+              | None -> acc
+              | Some img ->
+                  (img, get_carrousel_img_src f1, get_carrousel_img_note f1)
+                  :: acc
             else acc)
           [] (Sys.readdir f)
       else []
@@ -363,15 +369,7 @@ let get_carrousel_files_aux conf base p old =
       !GWPARAM.syslog `LOG_ERR (Format.sprintf "carrousel error: %s, %s" f e);
       []
 
-let get_carrousel_files conf base p = get_carrousel_files_aux conf base p false
-
-let get_carrousel_old_files conf base p =
-  get_carrousel_files_aux conf base p true
-
-let get_carrousel_img conf base p fname =
-  get_carrousel_img_aux conf base p false fname
-
-let get_carrousel_old_img conf base p fname =
-  get_carrousel_img_aux conf base p true fname
+let get_carrousel_imgs conf base p = get_carrousel_img_aux conf base p false
+let get_carrousel_old_imgs conf base p = get_carrousel_img_aux conf base p true
 
 (* end carrousel ************************************ *)
