@@ -1656,12 +1656,12 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | Vstring s -> str_val s
       | _ -> null_val)
   | "carrousel_note" -> (
-      match get_env "carrousel_img" env with
-      | Vstring s -> str_val (Filename.remove_extension s ^ ".txt")
+      match get_env "carrousel_note" env with
+      | Vstring s -> str_val s
       | _ -> null_val)
   | "carrousel_src" -> (
-      match get_env "carrousel_img" env with
-      | Vstring s -> str_val (Filename.remove_extension s ^ ".src")
+      match get_env "carrousel_src" env with
+      | Vstring s -> str_val s
       | _ -> null_val)
   (* end carrousel *)
   | "lazy_force" -> (
@@ -3666,7 +3666,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Vstring note -> str_val note
       | _ -> raise Not_found)
   | "carrousel_img_src" -> (
-      match get_env "carrousel_img_source" env with
+      match get_env "carrousel_img_src" env with
       | Vstring source -> str_val source
       | _ -> raise Not_found)
   | "portrait" -> (
@@ -5045,17 +5045,14 @@ let print_foreach conf base print_ast eval_expr =
         (if old then Image.get_carrousel_old_imgs else Image.get_carrousel_imgs)
           conf base p
       in
-      List.sort
-        (fun (a, _, _) (b, _, _) ->
-          String.compare (Image.src_to_string a) (Image.src_to_string b))
-        l
+      List.sort (fun (a, _, _, _) (b, _, _, _) -> String.compare a b) l
     in
     let rec loop first cnt = function
       | [] -> ()
-      | (img, source, note) :: l ->
-          let url = match img with `Url url -> url | `Path _ -> "" in
+      | (name, url, src, note) :: l ->
           let env =
-            ("carrousel_img_source", Vstring source)
+            ("carrousel_img", Vstring (Filename.basename name))
+            :: ("carrousel_img_src", Vstring src)
             :: ("carrousel_img_note", Vstring note)
             :: ("first", Vbool first)
             :: ("last", Vbool (l = []))
