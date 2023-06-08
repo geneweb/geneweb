@@ -3408,11 +3408,11 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       Image.get_portrait conf base p |> Option.is_some
   | "has_image_url" | "has_portrait_url" -> (
       match Image.get_portrait conf base p with
-      | Some src -> Mutil.start_with "http" 0 (Image.src_to_string src)
+      | Some (`Url _url) -> true
       | _ -> false)
   | "has_old_image_url" | "has_old_portrait_url" -> (
       match Image.get_old_portrait conf base p with
-      | Some src -> Mutil.start_with "http" 0 (Image.src_to_string src)
+      | Some (`Url _url) -> true
       | _ -> false)
   (* carrousel *)
   | "has_carrousel" -> Image.get_carrousel_imgs conf base p <> []
