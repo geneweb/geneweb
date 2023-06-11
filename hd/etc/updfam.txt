@@ -336,6 +336,7 @@ $(document).ready(function(){
   <select class="form-control custom-select font-weight-bold" id="fevent_selectxcnt" onchange="show_fevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
     <option value="">[*custom event]</option>
     <option disabled>──────────</option>
+    <option value=""> - </option>
     <option value="#marr" %if;(event.e_name = "#marr" or event.e_name="") selected %end;>[*marriage event]</option>
     <option value="#nmar" %if;(event.e_name = "#nmar") selected%end;>[*no marriage event]</option>
     <option value="#enga" %if;(event.e_name = "#enga") selected%end;>[*engage event]</option>
@@ -400,13 +401,13 @@ $(document).ready(function(){
     </div>
     <div class="col-md-3">
       <select class="form-control" name="excnt_witnwcnt_kind">
-	<option value="" %if;(fwitness_kind = "") selected="selected" %end;>[*witness/witnesses]0</option>
-	<option value="info" %if;(fwitness_kind = "info") selected="selected" %end;>[*informant/informant/informant]2</option>
+  <option value="" %if;(fwitness_kind = "") selected="selected" %end;>[*witness/witnesses]0</option>
+  <option value="info" %if;(fwitness_kind = "info") selected="selected" %end;>[*informant/informant/informant]2</option>
         <option value="atte" %if;(fwitness_kind = "atte") selected="selected" %end;>[*present/present/present]2</option>
-	<option value="ment" %if;(fwitness_kind = "ment") selected="selected" %end;>[*mentioned/mentioned/mentioned]2</option>
-	<option value="offi" %if;(fwitness_kind = "offi") selected="selected" %end;>[*civil registrar/civil registrar/civil registrar]2</option>
-	<option value="reli" %if;(fwitness_kind = "reli") selected="selected" %end;>[*parrish registrar/parrish registrar/parrish registrar]2</option>
-	<option value="othe" %if;(fwitness_kind = "othe") selected="selected" %end;>[*other/other/other]2</option>
+  <option value="ment" %if;(fwitness_kind = "ment") selected="selected" %end;>[*mentioned/mentioned/mentioned]2</option>
+  <option value="offi" %if;(fwitness_kind = "offi") selected="selected" %end;>[*civil registrar/civil registrar/civil registrar]2</option>
+  <option value="reli" %if;(fwitness_kind = "reli") selected="selected" %end;>[*parrish registrar/parrish registrar/parrish registrar]2</option>
+  <option value="othe" %if;(fwitness_kind = "othe") selected="selected" %end;>[*other/other/other]2</option>
       </select>
     </div>
   </div>
