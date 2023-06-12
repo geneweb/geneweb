@@ -589,33 +589,45 @@ let get_related_parents conf base p =
 let get_event_witnessed conf base p =
   let related = List.sort_uniq Stdlib.compare (Gwdb.get_related p) in
   let events_witnesses =
-    let list = ref [] in
+    let l = ref [] in
+    let ignore_fevents =
+      (* ignore fevent with spouse in this because they are already in [l] *)
+      Hashtbl.create 16
+    in
     (let rec make_list = function
+       | [] -> ()
        | ic :: icl ->
+           Hashtbl.add ignore_fevents ic ();
            let c = Util.pget conf base ic in
            List.iter
              (fun event_item ->
-               match
-                 Util.array_mem_witn conf base (get_iper p)
-                   (Event.get_witnesses event_item)
-                   (Event.get_witness_notes event_item)
-               with
-               | None -> ()
-               | Some (wk, wnote) -> (
-                   match wk with
-                   | Witness_GodParent ->
-                       (* already shown in relationship *)
-                       ()
-                   | Witness | Witness_CivilOfficer | Witness_ReligiousOfficer
-                   | Witness_Informant | Witness_Attending | Witness_Mentioned
-                   | Witness_Other ->
-                       list := (c, wk, wnote, event_item) :: !list))
+               (* check for duplicate Fevent *)
+               let is_duplicate_fevent =
+                 match Event.get_spouse_iper event_item with
+                 | None -> false
+                 | Some isp -> Hashtbl.mem ignore_fevents isp
+               in
+               if not is_duplicate_fevent then
+                 match
+                   Util.array_mem_witn conf base (get_iper p)
+                     (Event.get_witnesses event_item)
+                     (Event.get_witness_notes event_item)
+                 with
+                 | None -> ()
+                 | Some (wk, wnote) -> (
+                     match wk with
+                     | Witness_GodParent ->
+                         (* already shown in relationship *)
+                         ()
+                     | Witness | Witness_CivilOfficer | Witness_ReligiousOfficer
+                     | Witness_Informant | Witness_Attending | Witness_Mentioned
+                     | Witness_Other ->
+                         l := (c, wk, wnote, event_item) :: !l))
              (Event.events conf base c);
            make_list icl
-       | [] -> ()
      in
      make_list related);
-    !list
+    !l
   in
   (* On tri les témoins dans le même ordre que les évènements. *)
   Event.sort_events
