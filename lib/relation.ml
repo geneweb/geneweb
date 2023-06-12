@@ -549,3 +549,76 @@ let compute_relationship conf base by_marr p1 p2 =
         all_sol ([], Sosa.zero)
     in
     if sl = [] then None else Some (sl, total, rel)
+
+(* ----------- *)
+
+let get_related_parents conf base p =
+  let l =
+    let l = List.sort_uniq compare (get_related p) in
+    List.fold_left
+      (fun acc ic ->
+        let c = pget conf base ic in
+        let rec loop acc = function
+          | [] -> acc
+          | r :: rl -> (
+              match r.r_fath with
+              | Some ip when ip = get_iper p -> loop ((c, r) :: acc) rl
+              | Some _ | None -> (
+                  match r.r_moth with
+                  | Some ip when ip = get_iper p -> loop ((c, r) :: acc) rl
+                  | Some _ | None -> loop acc rl))
+        in
+        loop acc (get_rparents c))
+      [] l
+  in
+  (* TODO don't query db in sort *)
+  let get_date x =
+    match Date.od_of_cdate (get_baptism x) with
+    | None -> Date.od_of_cdate (get_birth x)
+    | x -> x
+  in
+  List.sort
+    (fun (c1, _) (c2, _) ->
+      let d1 = get_date c1 in
+      let d2 = get_date c2 in
+      match (d1, d2) with
+      | Some d1, Some d2 -> Date.compare_date d1 d2
+      | _ -> -1)
+    l
+
+let get_event_witnessed conf base p =
+  let related = List.sort_uniq Stdlib.compare (Gwdb.get_related p) in
+  let events_witnesses =
+    let list = ref [] in
+    (let rec make_list = function
+       | ic :: icl ->
+           let c = Util.pget conf base ic in
+           List.iter
+             (fun event_item ->
+               match
+                 Util.array_mem_witn conf base (get_iper p)
+                   (Event.get_witnesses event_item)
+                   (Event.get_witness_notes event_item)
+               with
+               | None -> ()
+               | Some (wk, wnote) -> (
+                   match wk with
+                   | Witness_GodParent ->
+                       (* already shown in relationship *)
+                       ()
+                   | Witness | Witness_CivilOfficer | Witness_ReligiousOfficer
+                   | Witness_Informant | Witness_Attending | Witness_Mentioned
+                   | Witness_Other ->
+                       list := (c, wk, wnote, event_item) :: !list))
+             (Event.events conf base c);
+           make_list icl
+       | [] -> ()
+     in
+     make_list related);
+    !list
+  in
+  (* On tri les témoins dans le même ordre que les évènements. *)
+  Event.sort_events
+    (fun (_, _, _, ei) -> Event.get_name ei)
+    (fun (_, _, _, ei) -> Event.get_date ei)
+    events_witnesses

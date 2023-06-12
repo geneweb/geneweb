@@ -3831,44 +3831,7 @@ let print_foreach conf base print_ast eval_expr =
   in
   let print_foreach_event_witness_relation env al ((p, p_auth) as ep) =
     if p_auth then
-      let related = List.sort_uniq compare (get_related p) in
-      let events_witnesses =
-        let list = ref [] in
-        (let rec make_list = function
-           | ic :: icl ->
-               let c = pget conf base ic in
-               List.iter
-                 (fun event_item ->
-                   match
-                     Util.array_mem_witn conf base (get_iper p)
-                       (Event.get_witnesses event_item)
-                       (Event.get_witness_notes event_item)
-                   with
-                   | None -> ()
-                   | Some (wk, wnote) -> (
-                       match wk with
-                       | Witness_GodParent ->
-                           (* already shown in relationship *)
-                           ()
-                       | Witness | Witness_CivilOfficer
-                       | Witness_ReligiousOfficer | Witness_Informant
-                       | Witness_Attending | Witness_Mentioned | Witness_Other
-                         ->
-                           list := (c, wk, wnote, event_item) :: !list))
-                 (Event.events conf base c);
-               make_list icl
-           | [] -> ()
-         in
-         make_list related);
-        !list
-      in
-      (* On tri les témoins dans le même ordre que les évènements. *)
-      let events_witnesses =
-        Event.sort_events
-          (fun (_, _, _, ei) -> Event.get_name ei)
-          (fun (_, _, _, ei) -> Event.get_date ei)
-          events_witnesses
-      in
+      let events_witnesses = Relation.get_event_witnessed conf base p in
       List.iter
         (fun (related_person, wk, wnote, evt) ->
           let wk = string_of_witness_kind conf (get_sex p) wk in
@@ -3920,7 +3883,7 @@ let print_foreach conf base print_ast eval_expr =
                 let fam = foi base ifam in
                 if Array.mem (get_iper p) (get_witnesses fam) then
                   l := (ifam, fam) :: !l)
-              (get_family (pget conf base ic)))
+              (get_family c))
         related;
       !l
     in
@@ -4094,40 +4057,7 @@ let print_foreach conf base print_ast eval_expr =
   in
   let print_foreach_related env al ((p, p_auth) as ep) =
     if p_auth then
-      let l =
-        let l = List.sort_uniq compare (get_related p) in
-        List.fold_left
-          (fun acc ic ->
-            let c = pget conf base ic in
-            let rec loop acc = function
-              | [] -> acc
-              | r :: rl -> (
-                  match r.r_fath with
-                  | Some ip when ip = get_iper p -> loop ((c, r) :: acc) rl
-                  | Some _ | None -> (
-                      match r.r_moth with
-                      | Some ip when ip = get_iper p -> loop ((c, r) :: acc) rl
-                      | Some _ | None -> loop acc rl))
-            in
-            loop acc (get_rparents c))
-          [] l
-      in
-      let l =
-        (* TODO don't query db in sort *)
-        let get_date x =
-          match Date.od_of_cdate (get_baptism x) with
-          | None -> Date.od_of_cdate (get_birth x)
-          | x -> x
-        in
-        List.sort
-          (fun (c1, _) (c2, _) ->
-            let d1 = get_date c1 in
-            let d2 = get_date c2 in
-            match (d1, d2) with
-            | Some d1, Some d2 -> Date.compare_date d1 d2
-            | _ -> -1)
-          l
-      in
+      let l = Relation.get_related_parents conf base p in
       List.iter
         (fun (c, r) ->
           let env = ("rel", Vrel (r, Some c)) :: env in
