@@ -2519,7 +2519,7 @@ let record_visited conf ip =
 (**/**)
 
 (* TODO OCaml 4.13 : use Array.find_opt *)
-let array_mem_witn conf base ip witnesses wnotes =
+let array_mem_witn _conf base ip witnesses wnotes =
   let get_note i =
     if i < Array.length wnotes then sou base wnotes.(i)
     else sou base empty_string

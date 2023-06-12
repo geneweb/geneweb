@@ -2901,9 +2901,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       &&
       if conf.use_restrict then
         List.exists
-          (fun ip ->
-            let rp = pget conf base ip in
-            not (is_hidden rp))
+          (fun ip -> Option.is_some (pget_opt conf base ip))
           (get_related p)
       else get_related p <> []
   | "has_siblings" -> (
