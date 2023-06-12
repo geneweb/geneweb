@@ -3869,7 +3869,7 @@ let print_foreach conf base print_ast eval_expr =
         ()
     | _ -> ()
   in
-  let print_foreach_witness_relation env al ((p, _) as ep) =
+  let print_foreach_marriage_witnessed env al ((p, _) as ep) =
     let l =
       let related = List.sort_uniq compare (get_related p) in
       let l = ref [] in
@@ -4219,7 +4219,7 @@ let print_foreach conf base print_ast eval_expr =
     | "death_witness" -> print_foreach_epers_event_witness env al ep Epers_Death
     | "event_witness" -> print_foreach_event_witness env al ep
     | "event_witness_relation" -> print_foreach_event_witness_relation env al ep
-    | "witness_relation" -> print_foreach_witness_relation env al ep
+    | "witness_relation" -> print_foreach_marriage_witnessed env al ep
     | _ -> raise Not_found
   in
   let print_foreach env ini_ep loc s sl ell al =
