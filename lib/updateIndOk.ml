@@ -6,6 +6,16 @@ open Gwdb
 open Util
 open Update_util
 
+type create_info = Update.create_info = {
+  ci_birth_date : date option;
+  ci_birth_place : string;
+  ci_death : death;
+  ci_death_date : date option;
+  ci_death_place : string;
+  ci_occupation : string;
+  ci_public : bool;
+}
+
 (* Liste des string dont on a supprimé un caractère.       *)
 (* Utilisé pour le message d'erreur lors de la validation. *)
 let removed_string = ref []
@@ -214,6 +224,38 @@ let rec reconstitute_pevents conf ext cnt =
           with
           | Some c -> (
               let witnesses, ext = loop (i + 1) ext in
+              let public =
+                match
+                  p_getenv conf.env
+                    ("e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i
+                   ^ "_pub")
+                with
+                | Some "on" -> true
+                | _ -> false
+              in
+              let c =
+                match c with
+                | fn, sn, occ, Update.Create (s, Some ci), var ->
+                    ( fn,
+                      sn,
+                      occ,
+                      Update.Create (s, Some { ci with ci_public = public }),
+                      var )
+                | fn, sn, occ, Update.Create (s, None), var ->
+                    let ci =
+                      {
+                        ci_birth_date = None;
+                        ci_birth_place = "";
+                        ci_death = DontKnowIfDead;
+                        ci_death_date = None;
+                        ci_death_place = "";
+                        ci_occupation = "";
+                        ci_public = public;
+                      }
+                    in
+                    (fn, sn, occ, Update.Create (s, Some ci), var)
+                | _ -> c
+              in
               let var_c =
                 "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_kind"
               in

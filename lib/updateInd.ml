@@ -480,17 +480,126 @@ and eval_person_var (fn, sn, oc, create, _) = function
       match create with
       | Update.Create (_, _) -> bool_val true
       | _ -> bool_val false)
-  | [ "create"; "sex" ] -> (
-      match create with
-      | Update.Create (Male, _) -> str_val "male"
-      | Update.Create (Female, _) -> str_val "female"
-      | Update.Create (Neuter, _) -> str_val "neuter"
-      | _ -> str_val "")
+  | [ "create"; s ] -> eval_create create s
   | [ "first_name" ] -> safe_val (Util.escape_html fn :> Adef.safe_string)
   | [ "link" ] -> bool_val (create = Update.Link)
   | [ "occ" ] -> str_val (if oc = 0 then "" else string_of_int oc)
   | [ "surname" ] -> safe_val (Util.escape_html sn :> Adef.safe_string)
   | _ -> raise Not_found
+
+(* TODO : looks bad *)
+and eval_create c = function
+  | "birth_day" -> (
+      str_val
+      @@
+      match c with
+      | Update.Create (_, Some { ci_birth_date = Some (Dgreg (dmy, Dfrench)) })
+        ->
+          let dmy = Calendar.french_of_gregorian dmy in
+          if dmy.day <> 0 then string_of_int dmy.day else ""
+      | Update.Create (_, Some { ci_birth_date = Some (Dgreg ({ day = d }, _)) })
+        when d <> 0 ->
+          string_of_int d
+      | _ -> "")
+  | "birth_month" -> (
+      str_val
+      @@
+      match c with
+      | Update.Create (_, Some { ci_birth_date = Some (Dgreg (dmy, Dfrench)) })
+        ->
+          let dmy = Calendar.french_of_gregorian dmy in
+          if dmy.month <> 0 then short_f_month dmy.month else ""
+      | Update.Create
+          (_, Some { ci_birth_date = Some (Dgreg ({ month = m }, _)) })
+        when m <> 0 ->
+          string_of_int m
+      | _ -> "")
+  | "birth_place" -> (
+      match c with
+      | Update.Create (_, Some { ci_birth_place = pl }) ->
+          safe_val (Util.escape_html pl :> Adef.safe_string)
+      | _ -> str_val "")
+  | "birth_year" -> (
+      str_val
+      @@
+      match c with
+      | Update.Create (_, Some ci) -> (
+          match ci.ci_birth_date with
+          | Some (Dgreg (dmy, Dfrench)) ->
+              let dmy = Calendar.french_of_gregorian dmy in
+              add_precision (string_of_int dmy.year) dmy.prec
+          | Some (Dgreg ({ year = y; prec = p }, _)) ->
+              add_precision (string_of_int y) p
+          | Some _ -> ""
+          | None -> if ci.ci_public then "p" else "")
+      | _ -> "")
+  | "death_day" -> (
+      str_val
+      @@
+      match c with
+      | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, Dfrench)) })
+        ->
+          let dmy = Calendar.french_of_gregorian dmy in
+          if dmy.day <> 0 then string_of_int dmy.day else ""
+      | Update.Create (_, Some { ci_death_date = Some (Dgreg ({ day = d }, _)) })
+        when d <> 0 ->
+          string_of_int d
+      | _ -> "")
+  | "death_month" -> (
+      str_val
+      @@
+      match c with
+      | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, Dfrench)) })
+        ->
+          let dmy = Calendar.french_of_gregorian dmy in
+          short_f_month dmy.month
+      | Update.Create
+          (_, Some { ci_death_date = Some (Dgreg ({ month = m }, _)) })
+        when m <> 0 ->
+          string_of_int m
+      | _ -> "")
+  | "death_place" -> (
+      match c with
+      | Update.Create (_, Some { ci_death_place = pl }) ->
+          safe_val (Util.escape_html pl :> Adef.safe_string)
+      | _ -> str_val "")
+  | "death_year" -> (
+      str_val
+      @@
+      match c with
+      | Update.Create (_, Some { ci_death_date = Some (Dgreg (dmy, Dfrench)) })
+        ->
+          let dmy = Calendar.french_of_gregorian dmy in
+          add_precision (string_of_int dmy.year) dmy.prec
+      | Update.Create
+          (_, Some { ci_death_date = Some (Dgreg ({ year = y; prec = p }, _)) })
+        ->
+          add_precision (string_of_int y) p
+      | Update.Create (_, Some { ci_death = death; ci_death_date = None }) -> (
+          match death with DeadDontKnowWhen -> "+" | NotDead -> "-" | _ -> "")
+      | _ -> "")
+  | "occupation" -> (
+      match c with
+      | Update.Create (_, Some { ci_occupation = occupation }) ->
+          safe_val (Util.escape_html occupation :> Adef.safe_string)
+      | _ -> str_val "")
+  | "sex" -> (
+      str_val
+      @@
+      match c with
+      | Update.Create (Male, _) -> "male"
+      | Update.Create (Female, _) -> "female"
+      | Update.Create (Neuter, _) -> "neuter"
+      | _ -> "")
+  | _ -> raise Not_found
+
+and add_precision s p =
+  match p with
+  | Maybe -> "?" ^ s
+  | Before -> "&lt;" ^ s
+  | After -> "&gt;" ^ s
+  | About -> "/" ^ s ^ "/"
+  | Sure | OrYear _ | YearInt _ -> s
 
 and eval_is_death_reason dr = function
   | Death (dr1, _) -> bool_val (dr = dr1)

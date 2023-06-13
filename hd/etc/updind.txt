@@ -194,6 +194,59 @@
   </div>
 %end;
 
+%define;small_date(kind,xvar,xx,verbose)
+  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2" %readonly;%in;
+  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2" %readonly;%in;
+  %let;year_input;pattern="[?><~/-+]?\d*/?" size="4" maxlength="8" %readonly;%in;
+  <div class="row">
+    <span class="col-sm-2 col-form-label">[*kind]</span>
+    <div class="col-sm-auto form-inline">
+      %if;([!dates order]0 = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
+        <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
+        <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
+        <label for="xvar_mm" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]1</label>
+        <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
+        <label for="xvar=yyyy" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]0</label>
+        <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
+      %elseif;([!dates order]0 = "mmddyyyy")
+        <label for="xvar_mm" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]1</label>
+        <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
+        <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
+        <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
+        <label for="xvar=yyyy" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]0</label>
+        <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
+      %else;
+        <label for="xvar=yyyy" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]0</label>
+        <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
+        <label for="xvar_mm" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]1</label>
+        <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
+        <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
+        <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
+      %end;
+    </div>
+    <label for="xvar_pl" class="%if;(verbose=true)sr-only%end; col-sm-1 col-form-label">[place]</label>%nn;
+    <div class="col-sm">
+      <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[*place]" %readonly;>
+    </div>
+  </div>
+%end;
+
+%define;birth(xvar,xx,verbose)
+  %apply;small_date("birth","xvarb","xx","verbose")
+%end;
+
+%define;death(xvar,xx,verbose)
+  %apply;small_date("death","xvard","xx","verbose")
+%end;
+
+%define;w_birth(xcnt, wcnt,xx,verbose)
+  %apply;small_date("birth","excnt_witnwcnt_b","witness","verbose")
+%end;
+
+%define;w_death(xcnt, wcnt,xx,verbose)
+  %apply;small_date("death","excnt_witnwcnt_d","witness","verbose")
+%end;
+
 %define;note(xx)
   <div class="row">
     <label for="xx_note" class="col-2 col-form-label">[*note/notes]1</label>
@@ -312,6 +365,7 @@
 %end;
 
 %define;one_witness(xcnt, wcnt, evt_name)
+  <hr>
   <div class="form-group mt-1">
     <div class="row">
       <h5 class="col-form-label col-2">[*witness/witness/witnesses]0 wcnt </h5>
@@ -323,15 +377,15 @@
       </div>
       <div class="col-3">
         <select class="form-control" name="excnt_witnwcnt_kind">
+          <option value=""> - </option>
           <option value="" %if;(witness_kind = "") selected="selected" %end;>[*witness/witnesses]0</option>
-    <option value=""> - </option>
-    <option value="godp" %if;(witness_kind = "godp" or "evt_name" = "#bapt" and witness_kind != "") selected="selected" %end; %if;("evt_name" != "#bapt")style="display:none;"%end;>[*godfather/godmother/godparents]2</option>
-    <option value="info" %if;(witness_kind = "info") selected="selected" %end;>[*informant/informant/informant]2</option>
-    <option value="atte" %if;(witness_kind = "atte") selected="selected" %end;>[*present/present/present]2</option>
-    <option value="ment" %if;(witness_kind = "ment") selected="selected" %end;>[*mentioned/mentioned/mentioned]2</option>
-    <option value="offi" %if;(witness_kind = "offi") selected="selected" %end;>[*civil registrar/civil registrar/civil registrar]2</option>
-    <option value="reli" %if;(witness_kind = "reli") selected="selected" %end;>[*parrish registrar/parrish registrar/parrish registrar]2</option>
-    <option value="othe" %if;(witness_kind = "othe") selected="selected" %end;>[*other/other/other]2</option>
+          <option value="godp" %if;(witness_kind = "godp" or "evt_name" = "#bapt" and witness_kind != "") selected="selected" %end; %if;("evt_name" != "#bapt")style="display:none;"%end;>[*godfather/godmother/godparents]2</option>
+          <option value="info" %if;(witness_kind = "info") selected="selected" %end;>[*informant/informant/informant]2</option>
+          <option value="atte" %if;(witness_kind = "atte") selected="selected" %end;>[*present/present/present]2</option>
+          <option value="ment" %if;(witness_kind = "ment") selected="selected" %end;>[*mentioned/mentioned/mentioned]2</option>
+          <option value="offi" %if;(witness_kind = "offi") selected="selected" %end;>[*civil registrar/civil registrar/civil registrar]2</option>
+          <option value="reli" %if;(witness_kind = "reli") selected="selected" %end;>[*parrish registrar/parrish registrar/parrish registrar]2</option>
+          <option value="othe" %if;(witness_kind = "othe") selected="selected" %end;>[*other/other/other]2</option>
         </select>
       </div>
     </div>
@@ -350,24 +404,45 @@
       <div class="col-5">
         <input type="text" class="form-control" name="excnt_witnwcnt_sn" maxlength="200" value="%witness.surname;" id="excnt_witnwcnt_sn" placeholder="[*surname/surnames]0">
       </div>
-      <span class="col col-form-label">[*sex]</span>
-      <div class="col mt-2">
-        <div class="form-check form-check-inline">
-          <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="M" %if;(witness.create.sex = "male") checked%end; title="[*male/female/neuter]0"%/>[M/F]0
-          </label>
-        </div>
-        <div class="form-check form-check-inline">
-          <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="N" %if;(witness.create.sex = "neuter") checked%end; title="[*male/female/neuter]2"%/>?
-          </label>
-        </div>
-        <div class="form-check form-check-inline">
-          <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="F" %if;(witness.create.sex = "female") checked%end; title="[*male/female/neuter]1"%/>[M/F]1
-          </label>
+    %( if new witness %)
+    %if;(witness.surname="" and witness.first_name="")
+    <span class="col-sm-auto col-form-label">[*sex]</span>
+    <div class="col-sm-auto mt-2">
+      <div class="form-check form-check-inline">
+        <label class="form-check-label">
+          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="M" %if;(witness.create.sex="male")checked%end;%/> [M/F]0
+        </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <label class="form-check-label">
+          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="N" %if;(witness.create.sex="neuter")checked%end;%/> ?
+        </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <label class="form-check-label">
+          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="F" %if;(witness.create.sex="female")checked%end;%/> [M/F]1
+        </label>
+      </div>
+    </div>
+    <div class="col-sm-auto mt-2">
+      <label class="form-check-label">
+        <input class="form-check-input" type="checkbox" name="excnt_witnwcnt_pub">[*public]
+      </label>
+    </div>
+    <div class="col-sm-auto mt-2">
+      <div id="witnxcnt_div">
+        %apply;w_birth(xcnt, wcnt, "witness", "true")
+        %apply;w_death(xcnt, wcnt, "witness", "true")
+        <div class="row">
+          <label for="excnt_witnwcnt_occupation" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
+          <div class="col-sm">
+             <input class="form-control" type="text" name="excnt_witnwcnt_occupation" value="%witness.create.occupation;" id="witnxcnt_occupation" placeholder="[*occupation/occupations]0" %readonly;>
+          </div>
         </div>
       </div>
+    </div>
+    %end;
+    %(  end if new witness %)
     </div>
   </div>
 %end;
