@@ -16,6 +16,17 @@ type create_info = Update.create_info = {
   ci_public : bool;
 }
 
+let ci_empty =
+  {
+    ci_birth_date = None;
+    ci_birth_place = "";
+    ci_death = DontKnowIfDead;
+    ci_death_date = None;
+    ci_death_place = "";
+    ci_occupation = "";
+    ci_public = false;
+  }
+
 (* Liste des string dont on a supprimé un caractère.       *)
 (* Utilisé pour le message d'erreur lors de la validation. *)
 let removed_string = ref []
@@ -234,27 +245,18 @@ let rec reconstitute_pevents conf ext cnt =
                 | _ -> false
               in
               let c =
-                match c with
-                | fn, sn, occ, Update.Create (s, Some ci), var ->
-                    ( fn,
-                      sn,
-                      occ,
-                      Update.Create (s, Some { ci with ci_public = public }),
-                      var )
-                | fn, sn, occ, Update.Create (s, None), var ->
-                    let ci =
-                      {
-                        ci_birth_date = None;
-                        ci_birth_place = "";
-                        ci_death = DontKnowIfDead;
-                        ci_death_date = None;
-                        ci_death_place = "";
-                        ci_occupation = "";
-                        ci_public = public;
-                      }
-                    in
-                    (fn, sn, occ, Update.Create (s, Some ci), var)
-                | _ -> c
+                let fn, sn, occ, update, var = c in
+                let x =
+                  match update with
+                  | Update.Create (s, Some ci) ->
+                      Some (s, { ci with ci_public = public })
+                  | Update.Create (s, None) ->
+                      Some (s, { ci_empty with ci_public = public })
+                  | Update.Link -> None
+                in
+                match x with
+                | Some (s, ci) -> (fn, sn, occ, Update.Create (s, Some ci), var)
+                | None -> (fn, sn, occ, Update.Link, var)
               in
               let var_c =
                 "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_kind"
