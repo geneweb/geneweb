@@ -139,61 +139,42 @@ let compare_event_name name1 name2 =
   | _, Pevent Epers_Death -> -1
   | _, _ -> 0
 
-let better_compare_event_name name1 name2 =
-  let c = compare_event_name name1 name2 in
-  if c <> 0 then c
-  else
-    match (name1, name2) with
-    (* put Fevent after Pevent *)
-    | Fevent _, Pevent _ -> 1
-    | Pevent _, Fevent _ -> -1
-    (* this is to make event order stable; depends on type definition order! *)
-    | Fevent e1, Fevent e2 -> compare e1 e2
-    | Pevent e1, Pevent e2 -> compare e1 e2
-
-(* try to handle the fact that events are not well ordered *)
 let sort_events get_name get_date events =
-  let dated, undated =
-    List.fold_left
-      (fun (dated, undated) e ->
-        match Date.cdate_to_dmy_opt (get_date e) with
-        | None -> (dated, e :: undated)
-        | Some _d -> (e :: dated, undated))
-      ([], []) events
+  let cmp (i1, e1) (i2, e2) =
+    let cmp_name e1 e2 = compare_event_name (get_name e1) (get_name e2) in
+    let c =
+      match Date.cdate_to_dmy_opt (get_date e1) with
+      | None -> cmp_name e1 e2
+      | Some d1 -> (
+          match Date.cdate_to_dmy_opt (get_date e2) with
+          | None -> cmp_name e1 e2
+          | Some d2 ->
+              let x = Date.compare_dmy d1 d2 in
+              if x = 0 then cmp_name e1 e2 else x)
+    in
+    if c = 0 then
+      (* compare order of creation of events by user *)
+      Int.compare i1 i2
+    else c
   in
+
   (* we need this to keep the input with same date ordered
      by their creation order *)
-  let dated, undated = (List.rev dated, List.rev undated) in
+  let events = List.mapi (fun i e -> (i, e)) events in
 
-  (* this do not define a preorder (no transitivity);
-     can not be used to sort a list
-     ex:
-      let a,b,c events with
-        a.date = Some 2022;
-        b.date = None;
-        c.date = Some 2000;
-      we can have a <= b and b <= c because of event name.
-      but we do not have a <= c
-  *)
-  let cmp e1 e2 =
-    let cmp_name e1 e2 =
-      better_compare_event_name (get_name e1) (get_name e2)
-    in
-    match Date.cdate_to_dmy_opt (get_date e1) with
-    | None -> cmp_name e1 e2
-    | Some d1 -> (
-        match Date.cdate_to_dmy_opt (get_date e2) with
-        | None -> cmp_name e1 e2
-        | Some d2 ->
-            let x = Date.compare_dmy d1 d2 in
-            if x = 0 then cmp_name e1 e2 else x)
+  let dated, undated =
+    List.fold_left
+      (fun (dated, undated) ((_i, e) as item) ->
+        match Date.cdate_to_dmy_opt (get_date e) with
+        | None -> (dated, item :: undated)
+        | Some _d -> (item :: dated, undated))
+      ([], []) events
   in
 
-  (* sort events with dates separately to make sure
-     that dates are in correct order *)
-  let l1 = List.stable_sort cmp dated in
-  let l2 = List.stable_sort cmp undated in
-  List.merge cmp l1 l2
+  let l1 = List.sort cmp dated in
+  let l2 = List.sort cmp undated in
+  let l = List.merge cmp l1 l2 in
+  List.map (fun (_i, e) -> e) l
 
 let events conf base p =
   if not (Util.authorized_age conf base p) then []
