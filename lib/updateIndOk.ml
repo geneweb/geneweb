@@ -6,27 +6,6 @@ open Gwdb
 open Util
 open Update_util
 
-type create_info = Update.create_info = {
-  ci_birth_date : date option;
-  ci_birth_place : string;
-  ci_death : death;
-  ci_death_date : date option;
-  ci_death_place : string;
-  ci_occupation : string;
-  ci_public : bool;
-}
-
-let ci_empty =
-  {
-    ci_birth_date = None;
-    ci_birth_place = "";
-    ci_death = DontKnowIfDead;
-    ci_death_date = None;
-    ci_death_place = "";
-    ci_occupation = "";
-    ci_public = false;
-  }
-
 (* Liste des string dont on a supprimé un caractère.       *)
 (* Utilisé pour le message d'erreur lors de la validation. *)
 let removed_string = ref []
@@ -235,29 +214,7 @@ let rec reconstitute_pevents conf ext cnt =
           with
           | Some c -> (
               let witnesses, ext = loop (i + 1) ext in
-              let public =
-                match
-                  p_getenv conf.env
-                    ("e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i
-                   ^ "_pub")
-                with
-                | Some "on" -> true
-                | _ -> false
-              in
-              let c =
-                let fn, sn, occ, update, var = c in
-                let x =
-                  match update with
-                  | Update.Create (s, Some ci) ->
-                      Some (s, { ci with ci_public = public })
-                  | Update.Create (s, None) ->
-                      Some (s, { ci_empty with ci_public = public })
-                  | Update.Link -> None
-                in
-                match x with
-                | Some (s, ci) -> (fn, sn, occ, Update.Create (s, Some ci), var)
-                | None -> (fn, sn, occ, Update.Link, var)
-              in
+              let c = update_ci conf c cnt i in
               let var_c =
                 "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_kind"
               in
@@ -368,10 +325,17 @@ let reconstitute_relation_parent conf var key sex =
       let occ =
         try int_of_string (getn conf var (key ^ "_occ")) with Failure _ -> 0
       in
+      let public =
+        match p_getenv conf.env (var ^ "_" ^ key ^ "_pub") with
+        | Some "on" -> true
+        | _ -> false
+      in
       let create =
         (* why is it key ^ "_p" here *)
         match getn conf var (key ^ "_p") with
-        | "create" -> Update.Create (sex, None)
+        | "create" ->
+            Update.Create
+              (sex, Some { Update_util.ci_empty with ci_public = public })
         | _ -> Update.Link
       in
       Some (fn, sn, occ, create, var ^ "_" ^ key)
