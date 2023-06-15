@@ -407,45 +407,42 @@
       <div class="col-5">
         <input type="text" class="form-control" name="excnt_witnwcnt_sn" maxlength="200" value="%witness.surname;" id="excnt_witnwcnt_sn" placeholder="[*surname/surnames]0">
       </div>
-    %( if new witness %)
+      %( if new witness %)
     %if;(witness.surname="" and witness.first_name="")
-    <span class="col-sm-auto col-form-label">[*sex]</span>
-    <div class="col-sm-auto mt-2">
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="M" %if;(witness.create.sex="male")checked%end;%/> [M/F]0
-        </label>
-      </div>
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="N" %if;(witness.create.sex="neuter")checked%end;%/> ?
-        </label>
-      </div>
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="F" %if;(witness.create.sex="female")checked%end;%/> [M/F]1
-        </label>
-      </div>
-    </div>
-    <div class="col-sm-auto mt-2">
-      <label class="form-check-label">
-        <input class="form-check-input" type="checkbox" name="excnt_witnwcnt_pub">[*public]
-      </label>
-    </div>
-    <div class="col-sm-auto mt-2">
-      <div id="witnxcnt_div">
-        %apply;w_birth(xcnt, wcnt, "witness", "true")
-        %apply;w_death(xcnt, wcnt, "witness", "true")
-        <div class="row">
-          <label for="excnt_witnwcnt_occupation" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
-          <div class="col-sm">
-             <input class="form-control" type="text" name="excnt_witnwcnt_occupation" value="%witness.create.occupation;" id="witnxcnt_occupation" placeholder="[*occupation/occupations]0" %readonly;>
-          </div>
+      <span class="col-sm-auto col-form-label">[*sex]</span>
+      <div class="col-sm-auto mt-2">
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="M" %if;(witness.create.sex="male")checked%end;%/> [M/F]0
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="N" %if;(witness.create.sex="neuter")checked%end;%/> ?
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="F" %if;(witness.create.sex="female")checked%end;%/> [M/F]1
+          </label>
         </div>
       </div>
+      <div class="col-sm-auto mt-2">
+        <label class="form-check-label">[*public]</label>
+          <input class="form-check-input col" type="checkbox" name="excnt_witnwcnt_pub">
+      </div>
     </div>
+    <div class="row">
+      <label for="excnt_witnwcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
+      <div class="col-5">
+         <input class="form-control" type="text" name="excnt_witnwcnt_occu" value="%witness.create.occupation;" id="witnxcnt_occu" placeholder="[*occupation/occupations]0" %readonly;>
+      </div>
+      <div class="col-sm-auto mt-2">
+      <label class="form-check-label">[*of course dead]</label>
+        <input class="form-check-input col" type="checkbox" name="excnt_witnwcnt_od">
+      </div>
     %end;
-    %(  end if new witness %)
+      %(  end if new witness %)
     </div>
   </div>
 %end;
@@ -1239,9 +1236,22 @@
         <input type="text" class="form-control" name="rxcnt_xvar_sn" maxlength="200" value="%relation.xrel.surname;" id="rxcnt_xvar_sn" placeholder="[*surname/surnames]0">
       </div>
       <p class="col-sm-2 mt-1">([sex]0 xsex)</p>
+    %if;(relation.xrel.surname="" and relation.xrel.first_name="")
       <div>
-        <input type="checkbox"  name="rxcnt_xvar_pub" id="rxcnt_xvar_pub"> [*public]
+        <label for="rxcnt_xvar_pub">[*public]</label>
+        <input type="checkbox" name="rxcnt_xvar_pub" id="rxcnt_xvar_pub">
       </div>
+    </div>
+    <div class="row">
+      <label for="rxcnt_xvar_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
+      <div class="col-5">
+         <input class="form-control" type="text" name="rxcnt_xvar_occu" id="rxcnt_xvar_occu" placeholder="[*occupation/occupations]0" %readonly;>
+      </div>
+      <div class="col-sm-auto mt-2">
+      <label for="rxcnt_xvar_od">[*of course dead]</label>
+        <input class="form-check-input col" type="checkbox" name="rxcnt_xvar_od">
+      </div>
+    %end;
     </div>
   </div>
 %end;
