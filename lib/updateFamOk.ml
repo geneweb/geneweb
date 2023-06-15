@@ -32,7 +32,7 @@ let reconstitute_parent_or_child conf var default_surname =
     in
     let d = Update.reconstitute_date conf (var ^ "d") in
     let dpl = getn conf (var ^ "d") "pl" in
-    let occupation = only_printable (getn conf var "occupation") in
+    let occupation = only_printable (getn conf var "occu") in
     let public = getn conf (var ^ "b") "yyyy" = "p" in
     {
       ci_birth_date = b;
