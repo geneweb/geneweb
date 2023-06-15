@@ -161,13 +161,31 @@ let time_elapsed_opt d1 d2 =
   | After, After | Before, Before -> None
   | _ -> Some (time_elapsed d1 d2)
 
+let dmy_lower_bound dmy =
+  { dmy with day = max 1 dmy.day; month = max 1 dmy.month }
+
 (* use strict = false to compare date as if they are points on a timeline.
    use strict = true to compare date by taking precision in account. This makes some dates not comparable, do not use to sort a list *)
 (* it is always Some _ if strict = false *)
 let rec compare_dmy_opt ?(strict = false) dmy1 dmy2 =
-  match compare dmy1.year dmy2.year with
-  | 0 -> compare_month_or_day ~is_day:false strict dmy1 dmy2
-  | x -> eval_strict strict dmy1 dmy2 x
+  let cmp dmy1 dmy2 =
+    match compare dmy1.year dmy2.year with
+    | 0 -> compare_month_or_day ~is_day:false strict dmy1 dmy2
+    | x -> eval_strict strict dmy1 dmy2 x
+  in
+  let c_opt = cmp dmy1 dmy2 in
+  if c_opt <> Some 0 then c_opt
+  else
+    (* if dmys were incomplete and equal we do it again on lower_bound because
+       incomplete dmy should be less than full dmy (?...) *)
+    Some
+      (match ((dmy1.day, dmy1.month), (dmy2.day, dmy2.month)) with
+      | (0, 0), (0, 0) -> 0
+      | (0, 0), (_, _) -> -1
+      | (_, _), (0, 0) -> 1
+      | (0, _), (_, _) -> -1
+      | (_, _), (0, _) -> 1
+      | (_, _), (_, _) -> 0)
 
 and compare_month_or_day ~is_day strict dmy1 dmy2 =
   (* compare a known month|day with a unknown one (0) *)
@@ -251,28 +269,23 @@ let date_of_death death = Option.bind (cdate_of_death death) od_of_cdate
 let max_month_of cal =
   match cal with Dgregorian | Djulian -> 12 | Dfrench | Dhebrew -> 13
 
-let partial_date_upper_bound ~from ~day ~month ~year =
+let dmy_upper_bound ~from dmy =
   let day, month, year =
-    match (day, month) with
-    | 0, 0 -> (1, 1, year + 1)
-    | _day, 0 -> (1, 1, year + 1)
+    match (dmy.day, dmy.month) with
+    | 0, 0 -> (1, 1, dmy.year + 1)
+    | _day, 0 -> (1, 1, dmy.year + 1)
     | 0, month ->
-        if month = max_month_of from then (1, 1, year + 1)
-        else (1, month + 1, year)
-    | day, month -> (day, month, year)
+        if month = max_month_of from then (1, 1, dmy.year + 1)
+        else (1, month + 1, dmy.year)
+    | day, month -> (day, month, dmy.year)
   in
-  (day, month, year)
-
-let partial_date_lower_bound ~day ~month ~year = (max 1 day, max 1 month, year)
+  { dmy with day; month; year }
 
 (* [to_sdn] does not work if day|month are unknown
    so we return sdn of partial_date_(lower|upper)_bound instead *)
 let to_sdn ~from ?(lower = true) d =
-  let { day; month; year; delta } = d in
-  let bound =
-    if lower then partial_date_lower_bound else partial_date_upper_bound ~from
-  in
-  let day, month, year = bound ~day ~month ~year in
+  let bound = if lower then dmy_lower_bound else dmy_upper_bound ~from in
+  let { day; month; year; delta } = bound d in
   let make kind =
     match Calendars.make kind ~day ~month ~year ~delta with
     | Error e ->
