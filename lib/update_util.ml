@@ -78,25 +78,43 @@ let reconstitute_somebody removed_string conf var =
   let create = getn_p conf var sex in
   (first_name, surname, occ, create, var)
 
-let update_ci conf c cnt i =
+let update_ci conf create key =
   let public =
-    match
-      p_getenv conf.env
-        ("e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_pub")
-    with
-    | Some "on" -> true
-    | _ -> false
+    match p_getenv conf.env (key ^ "_pub") with Some "on" -> true | _ -> false
   in
-  let fn, sn, occ, update, var = c in
+  let death =
+    match p_getenv conf.env (key ^ "_od") with
+    | Some "on" -> OfCourseDead
+    | _ -> DontKnowIfDead
+  in
+  let occupation =
+    match p_getenv conf.env (key ^ "_occu") with Some s -> s | _ -> ""
+  in
   let x =
-    match update with
-    | Update.Create (s, Some ci) -> Some (s, { ci with ci_public = public })
-    | Update.Create (s, None) -> Some (s, { ci_empty with ci_public = public })
+    match create with
+    | Update.Create (s, Some ci) ->
+        Some
+          ( s,
+            {
+              ci with
+              ci_public = public;
+              ci_occupation = occupation;
+              ci_death = death;
+            } )
+    | Update.Create (s, None) ->
+        Some
+          ( s,
+            {
+              ci_empty with
+              ci_public = public;
+              ci_occupation = occupation;
+              ci_death = death;
+            } )
     | Update.Link -> None
   in
   match x with
-  | Some (s, ci) -> (fn, sn, occ, Update.Create (s, Some ci), var)
-  | None -> (fn, sn, occ, Update.Link, var)
+  | Some (s, ci) -> Update.Create (s, Some ci)
+  | None -> Update.Link
 
 (* -- Template stuff -- *)
 
