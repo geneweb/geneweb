@@ -1222,13 +1222,14 @@ let print_mod ?prerr o_conf base =
   in
   print_mod_aux conf base callback
 
+(* This is to change event input order
+   event input order is used to order event with "equal" date *)
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
   | Some s ->
       let p = poi base (iper_of_string s) in
       let o_p = Util.string_gen_person base (gen_person_of_person p) in
-      (* TODO_EVENT use Event.sorted_event *)
       let ht = Hashtbl.create 50 in
       let _ =
         List.fold_left

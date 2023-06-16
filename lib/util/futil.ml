@@ -28,28 +28,37 @@ let map_title_strings ?(fd = identity) f t =
     t_nth = t.t_nth;
   }
 
+let map_epers fs evt =
+  match evt with
+  | ( Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial | Epers_Cremation
+    | Epers_Accomplishment | Epers_Acquisition | Epers_Adhesion
+    | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah | Epers_Benediction
+    | Epers_ChangeName | Epers_Circumcision | Epers_Confirmation
+    | Epers_ConfirmationLDS | Epers_Decoration | Epers_DemobilisationMilitaire
+    | Epers_Diploma | Epers_Distinction | Epers_Dotation | Epers_DotationLDS
+    | Epers_Education | Epers_Election | Epers_Emigration
+    | Epers_Excommunication | Epers_FamilyLinkLDS | Epers_FirstCommunion
+    | Epers_Funeral | Epers_Graduate | Epers_Hospitalisation | Epers_Illness
+    | Epers_Immigration | Epers_ListePassenger | Epers_MilitaryDistinction
+    | Epers_MilitaryPromotion | Epers_MilitaryService
+    | Epers_MobilisationMilitaire | Epers_Naturalisation | Epers_Occupation
+    | Epers_Ordination | Epers_Property | Epers_Recensement | Epers_Residence
+    | Epers_Retired | Epers_ScellentChildLDS | Epers_ScellentParentLDS
+    | Epers_ScellentSpouseLDS | Epers_VenteBien | Epers_Will ) as evt ->
+      evt
+  | Epers_Name s -> Epers_Name (fs s)
+
+let map_efam fs evt =
+  match evt with
+  | ( Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
+    | Efam_Divorce | Efam_Separated | Efam_Annulation | Efam_MarriageBann
+    | Efam_MarriageContract | Efam_MarriageLicense | Efam_PACS | Efam_Residence
+      ) as evt ->
+      evt
+  | Efam_Name s -> Efam_Name (fs s)
+
 let map_pers_event ?(fd = identity) fp fs e =
-  let epers_name =
-    match e.epers_name with
-    | ( Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
-      | Epers_Cremation | Epers_Accomplishment | Epers_Acquisition
-      | Epers_Adhesion | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah
-      | Epers_Benediction | Epers_ChangeName | Epers_Circumcision
-      | Epers_Confirmation | Epers_ConfirmationLDS | Epers_Decoration
-      | Epers_DemobilisationMilitaire | Epers_Diploma | Epers_Distinction
-      | Epers_Dotation | Epers_DotationLDS | Epers_Education | Epers_Election
-      | Epers_Emigration | Epers_Excommunication | Epers_FamilyLinkLDS
-      | Epers_FirstCommunion | Epers_Funeral | Epers_Graduate
-      | Epers_Hospitalisation | Epers_Illness | Epers_Immigration
-      | Epers_ListePassenger | Epers_MilitaryDistinction
-      | Epers_MilitaryPromotion | Epers_MilitaryService
-      | Epers_MobilisationMilitaire | Epers_Naturalisation | Epers_Occupation
-      | Epers_Ordination | Epers_Property | Epers_Recensement | Epers_Residence
-      | Epers_Retired | Epers_ScellentChildLDS | Epers_ScellentParentLDS
-      | Epers_ScellentSpouseLDS | Epers_VenteBien | Epers_Will ) as evt ->
-        evt
-    | Epers_Name s -> Epers_Name (fs s)
-  in
+  let epers_name = map_epers fs e.epers_name in
   let epers_date = map_cdate fd e.epers_date in
   let epers_place = fs e.epers_place in
   let epers_reason = fs e.epers_reason in
@@ -69,15 +78,7 @@ let map_pers_event ?(fd = identity) fp fs e =
   }
 
 let map_fam_event ?(fd = identity) fp fs e =
-  let efam_name =
-    match e.efam_name with
-    | ( Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
-      | Efam_Divorce | Efam_Separated | Efam_Annulation | Efam_MarriageBann
-      | Efam_MarriageContract | Efam_MarriageLicense | Efam_PACS
-      | Efam_Residence ) as evt ->
-        evt
-    | Efam_Name s -> Efam_Name (fs s)
-  in
+  let efam_name = map_efam fs e.efam_name in
   let efam_date = map_cdate fd e.efam_date in
   let efam_place = fs e.efam_place in
   let efam_reason = fs e.efam_reason in

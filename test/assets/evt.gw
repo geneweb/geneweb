@@ -1,0 +1,73 @@
+encoding: utf-8
+gwplus
+
+fam A a 0 0 #crem +1990 B b 0
+fevt
+#marr 1990
+#nmar
+#nmen
+#enga
+#div"
+#sep"
+#anul
+#marb
+#marc
+#marl
+#pacs
+#resi
+#cutsomfevent
+end fevt
+
+pevt A a
+#birt
+#bapt
+#acco
+#acqu
+#adhe
+#awar
+#bapl
+#barm
+#basm
+#bles
+#cens 1994
+#chgn 1994
+#circ 1994
+#conf 1994
+#conl 1995
+#degr 1996
+#demm 1997
+#dist 1998
+#dotl 1999
+#educ 2000
+#elec
+#emig
+#endl
+#exco
+#fcom
+#flkl
+#grad
+#hosp
+#illn
+#immi
+#lpas
+#mdis
+#mobm
+#mpro
+#mser
+#natu
+#occu
+#ordn
+#prop
+#resi
+#reti
+#slgc
+#slgp
+#slgs
+#vteb
+#will
+#custompevent
+#deat
+#fune
+#crem
+#buri
+end pevt

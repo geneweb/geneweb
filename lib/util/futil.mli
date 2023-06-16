@@ -7,6 +7,9 @@ val map_title_strings :
 (** Convert generic type used to represent name, id and the place of [Def.gen_title] into
     another one. If [fd] is present, apply it on the date of the start and date of the end of a title *)
 
+val map_epers : ('a -> 'b) -> 'a gen_pers_event_name -> 'b gen_pers_event_name
+val map_efam : ('a -> 'b) -> 'a gen_fam_event_name -> 'b gen_fam_event_name
+
 val map_pers_event :
   ?fd:(Date.date -> Date.date) ->
   ('a -> 'c) ->

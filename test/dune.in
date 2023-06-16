@@ -9,3 +9,24 @@
              geneweb.gwc_lib
              %%%GWDB_PKG%%% %%%SOSA_PKG%%% fmt)
   (deps assets/royal92.ged assets/abc.ged))
+
+(test
+ (name event)
+ (libraries
+  geneweb.gwdb-versioned
+  geneweb_sosa_zarith
+  geneweb
+  geneweb.ged2gwb_lib
+  geneweb.gwc_lib
+  geneweb.def_show)
+ (modules event)
+ (deps assets/abc.ged assets/evt2.gw))
+
+(cram
+ (deps
+  ../distribution/gw/gwb2ged
+  ../distribution/gw/ged2gwb
+  ../distribution/gw/gwc
+  ../distribution/gw/gwu
+  ./assets/evt.gw
+  ./assets/abc.ged))

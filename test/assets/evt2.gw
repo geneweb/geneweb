@@ -1,0 +1,20 @@
+fam A a 8/6/1900 !26/6/1900 13/12/2000 +17/6/1930 B b 0
+fevt
+#marc 17/6/1930
+#marr 17/6/1930
+end fevt
+
+pevt A a
+#deat 13/12/2000
+#birt 08/06/1900
+#resi
+#grad 1921
+#hosp 1921
+#bapt 26/06/1900
+#mobm
+#illn 1921
+#elec 03/1921
+#emig 01/03/1921
+#endl 01/03/1921
+#exco 1950
+end pevt
