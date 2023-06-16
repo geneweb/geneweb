@@ -164,23 +164,17 @@ let rec reconstitute_events conf ext cnt =
       in
       let witnesses, ext =
         let rec loop i ext =
+          let key = "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i in
           match
-            try
-              Some
-                (reconstitute_somebody conf
-                   ("e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i))
-            with Failure _ -> None
+            try Some (reconstitute_somebody conf key) with Failure _ -> None
           with
           | None -> ([], ext)
-          | Some c -> (
+          | Some (fn, sn, occ, create, var) -> (
               let witnesses, ext = loop (i + 1) ext in
-              let c = update_ci conf c cnt i in
+              let create = update_ci conf create key in
+              let c = (fn, sn, occ, create, var) in
               let c =
-                match
-                  p_getenv conf.env
-                    ("e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i
-                   ^ "_kind")
-                with
+                match p_getenv conf.env (key ^ "_kind") with
                 | Some "godp" -> (c, Witness_GodParent)
                 | Some "offi" -> (c, Witness_CivilOfficer)
                 | Some "reli" -> (c, Witness_ReligiousOfficer)

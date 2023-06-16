@@ -206,20 +206,17 @@ let rec reconstitute_pevents conf ext cnt =
       in
       let witnesses, ext =
         let rec loop i ext =
+          let key = "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i in
           match
-            try
-              let var = "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i in
-              Some (reconstitute_somebody conf var)
-            with Failure _ -> None
+            try Some (reconstitute_somebody conf key) with Failure _ -> None
           with
-          | Some c -> (
+          | Some (fn, sn, occ, create, var) -> (
               let witnesses, ext = loop (i + 1) ext in
-              let c = update_ci conf c cnt i in
-              let var_c =
-                "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_kind"
-              in
+              let create = update_ci conf create key in
+              let c = (fn, sn, occ, create, var) in
+              let key_c = key ^ "_kind" in
               let c =
-                match p_getenv conf.env var_c with
+                match p_getenv conf.env key_c with
                 | Some "godp" -> (c, Witness_GodParent)
                 | Some "offi" -> (c, Witness_CivilOfficer)
                 | Some "reli" -> (c, Witness_ReligiousOfficer)
@@ -325,19 +322,13 @@ let reconstitute_relation_parent conf var key sex =
       let occ =
         try int_of_string (getn conf var (key ^ "_occ")) with Failure _ -> 0
       in
-      let public =
-        match p_getenv conf.env (var ^ "_" ^ key ^ "_pub") with
-        | Some "on" -> true
-        | _ -> false
-      in
       let create =
         (* why is it key ^ "_p" here *)
         match getn conf var (key ^ "_p") with
-        | "create" ->
-            Update.Create
-              (sex, Some { Update_util.ci_empty with ci_public = public })
+        | "create" -> Update.Create (sex, None)
         | _ -> Update.Link
       in
+      let create = Update_util.update_ci conf create (var ^ "_" ^ key) in
       Some (fn, sn, occ, create, var ^ "_" ^ key)
 
 let reconstitute_relation conf var =
