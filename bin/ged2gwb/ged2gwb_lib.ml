@@ -1408,7 +1408,7 @@ let find_pevent_name_from_tag gen tag tagv =
   | "CREM" -> Epers_Cremation
   | "accomplishment" -> Epers_Accomplishment
   | "acquisition" -> Epers_Acquisition
-  | "award" | "distinction" -> Epers_Distinction
+  | "distinction" -> Epers_Distinction
   | "BAPL" | "lds baptism" -> Epers_BaptismLDS
   | "BARM" -> Epers_BarMitzvah
   | "BASM" -> Epers_BatMitzvah
@@ -1418,7 +1418,7 @@ let find_pevent_name_from_tag gen tag tagv =
   | "CONF" -> Epers_Confirmation
   | "CONL" | "lds confirmation" -> Epers_ConfirmationLDS
   | "degree" -> Epers_Diploma
-  | "DECO" -> Epers_Decoration
+  | "DECO" | "award" -> Epers_Decoration
   | "lds dotation" | "lds endowment" -> Epers_DotationLDS
   | "EDUC" -> Epers_Education
   | "election" -> Epers_Election
