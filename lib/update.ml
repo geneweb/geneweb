@@ -1151,6 +1151,7 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
                 ci_death_place = dpl;
               } ->
               (dead, dpl)
+          | Some { ci_death = OfCourseDead } -> (OfCourseDead, "")
           | Some _ | None -> (infer_death_bb conf birth baptism, "")
         in
         let occupation =
