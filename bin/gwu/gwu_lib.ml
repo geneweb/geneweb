@@ -528,7 +528,9 @@ let string_of_witness_kind :
 
 let print_multiline opts tag s =
   let lines = String.split_on_char '\n' s in
-  List.iter (Printf.ksprintf (oc opts) "%s %s\n" tag) lines
+  List.iter
+    (fun s -> if s <> "" then Printf.ksprintf (oc opts) "%s %s\n" tag s)
+    lines
 
 let is_isolated p =
   Option.is_none (get_parents p) && Array.length (get_family p) = 0
