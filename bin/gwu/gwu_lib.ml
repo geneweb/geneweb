@@ -954,7 +954,7 @@ let print_notes_for_person opts base gen p =
                  | Epers_Baptism -> "baptism"
                  | Epers_Death -> "death"
                  | Epers_Burial -> "burial"
-                 | Epers_Cremation -> "creamation"
+                 | Epers_Cremation -> "cremation"
                  | _ -> ""
                in
                let notes =
