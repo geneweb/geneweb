@@ -615,9 +615,12 @@ let print_pevent opts base gen e =
   | Epers_VenteBien -> Printf.ksprintf (oc opts) "#vteb"
   | Epers_Will -> Printf.ksprintf (oc opts) "#will"
   | Epers_Name s -> Printf.ksprintf (oc opts) "#%s" (correct_string base s));
-  Printf.ksprintf (oc opts) " ";
   let epers_date = Date.od_of_cdate (get_pevent_date e) in
-  print_date_option opts epers_date;
+  (match epers_date with
+  | None -> ()
+  | Some d ->
+      Printf.ksprintf (oc opts) " ";
+      print_date opts d);
   print_if_no_empty opts base "#p" (get_pevent_place e);
   (* TODO *)
   (*print_if_no_empty opts base "#c" e.epers_cause;*)
@@ -694,9 +697,12 @@ let print_fevent opts base gen in_comment e =
   | Efam_PACS -> Printf.ksprintf (oc opts) "#pacs"
   | Efam_Residence -> Printf.ksprintf (oc opts) "#resi"
   | Efam_Name n -> Printf.ksprintf (oc opts) "#%s" (correct_string base n));
-  Printf.ksprintf (oc opts) " ";
   let efam_date = Date.od_of_cdate (get_fevent_date e) in
-  print_date_option opts efam_date;
+  (match efam_date with
+  | None -> ()
+  | Some d ->
+      Printf.ksprintf (oc opts) " ";
+      print_date opts d);
   print_if_no_empty opts base "#p" (get_fevent_place e);
   (*print_if_no_empty opts base "#c" e.efam_cause;*)
   if opts.source = None then print_if_no_empty opts base "#s" (get_fevent_src e);
