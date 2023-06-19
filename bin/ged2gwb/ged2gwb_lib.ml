@@ -1436,7 +1436,7 @@ let find_pevent_name_from_tag gen tag tagv =
   | "CONL" | "lds confirmation" -> Epers_ConfirmationLDS
   | "degree" -> Epers_Diploma
   | "DECO" | "award" -> Epers_Decoration
-  | "lds dotation" | "lds endowment" -> Epers_DotationLDS
+  | "dotationlds" | "lds dotation" | "lds endowment" -> Epers_DotationLDS
   | "EDUC" -> Epers_Education
   | "election" -> Epers_Election
   | "EMIG" -> Epers_Emigration
