@@ -25,9 +25,6 @@ let list_aux_1 conf d cal last_month_txt was_future =
     Output.print_sstring conf "<ul>");
   (month_txt, future)
 
-let list_aux_2 conf =
-  Output.print_sstring conf "</ul></li>"
-
 let print_birth conf base =
   let list, len =
     select_person conf base (fun p -> Date.od_of_cdate (get_birth p)) false
@@ -41,7 +38,7 @@ let print_birth conf base =
   ignore
   @@ List.fold_left
        (fun (last_month_txt, was_future) (p, d, cal) ->
-         let (month_txt, future) =
+         let month_txt, future =
            list_aux_1 conf d cal last_month_txt was_future
          in
          Output.print_sstring conf "<li><b>";
@@ -63,7 +60,7 @@ let print_birth conf base =
          (month_txt, future))
        (Adef.safe "", false)
        list;
-  list_aux_2 conf;
+  Output.print_sstring conf "</ul></li>";
   Hutil.trailer conf
 
 let print_death conf base =
@@ -279,7 +276,7 @@ let print_marr_or_eng conf base title list =
   ignore
   @@ List.fold_left
        (fun (last_month_txt, was_future) (fam, d, cal) ->
-         let (month_txt, future) =
+         let month_txt, future =
            list_aux_1 conf d cal last_month_txt was_future
          in
          Output.print_sstring conf "<li><b>";
@@ -315,7 +312,7 @@ let print_marr_or_eng conf base title list =
          (month_txt, future))
        (Adef.safe "", false)
        list;
-  list_aux_2 conf;
+  Output.print_sstring conf "</ul></li>";
   Hutil.trailer conf
 
 let print_marriage conf base =
