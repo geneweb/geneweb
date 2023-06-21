@@ -285,10 +285,10 @@ $(document).ready(function(){
   %apply;small_date("death","excnt_witnwcnt_d","fwitness","verbose")
 %end;
 
-%define;parent(xcnt,xx)
+%define;parent(xcnt,xx,psex)
   <div class="row">
-    <label for="paxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0 <span class="font-weight-bold text-uppercase">%if;(bvar.multi_parents!="yes")%parent.himher;%nn;
-      %else;pxcnt%end;</span></label>
+    <label for="paxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0 <span class="font-weight-bold text-uppercase">pxcnt%nn;
+    %sp;%sp;(%apply;nth_c%with;MFN%and;psex%end;)</span></label>
     <div class="col-sm-8">
       <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0" %if;(evar.m="ADD_FAM" and xx.first_name="")autofocus%end;>
     </div>
@@ -586,13 +586,15 @@ $(document).ready(function(){
       <div class="row">
         <div class="col-11">
           %foreach;parent;
+            %let;ps;%parent.sex;%in;
+            %let;os;%parent.sexes;%in;
             %if;(cnt!=1 and bvar.multi_parents="yes")<hr class="w-100">%end;
-            %apply;parent(cnt, "parent")
+            %apply;parent(cnt, "parent", ps)
             %if;(bvar.multi_parents="yes")%apply;insert_parent(cnt)%end;
-            %if;(bvar.multi_parents!="yes" and cnt=1)
+            %if;(cnt=2)
               <div class="form-check my-2">
                 <label class="form-check-label">
-                <input type="checkbox" class="form-check-input" name="nsck" value="on"%if;(mrel="nsck" or mrel="nsckm") checked%end;%/>
+                <input type="checkbox" class="form-check-input" name="nsck" value="on"%if;(os=3) checked%end;%/>
                   [*no sexes check]
                 </label>
               </div>
