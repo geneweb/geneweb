@@ -52,6 +52,7 @@ let safe_val = Update_util.safe_val
 let get_env v env = try List.assoc v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
+let sexes = ref (-1)
 
 module ExtOption = struct
   let bind o f = match o with Some v -> f v | None -> None
@@ -86,15 +87,15 @@ let witness_person_of_event_opt env e =
 
 let ( >>= ) x f = ExtOption.bind x f
 
-let rec eval_fwitness env fam sl =
+let rec eval_fwitness conf base env fam sl =
   let fwitness_opt =
     family_events_opt env fam >>= fun e ->
-    witness_person_of_event_opt env e >>= fun p -> eval_key_opt p sl
+    witness_person_of_event_opt env e >>= fun p -> eval_key_opt conf base p sl
   in
   match fwitness_opt with Some fw -> fw | None -> raise Not_found
 
 (* TODO : function logic around array length is not clear  *)
-and eval_child env des sl =
+and eval_child conf base env des sl =
   let k =
     match get_env "cnt" env with
     | Vint i ->
@@ -105,7 +106,7 @@ and eval_child env des sl =
         else raise Not_found
     | _ -> raise Not_found
   in
-  eval_key k sl
+  eval_key conf base k sl
 
 and eval_var conf base env (fam, cpl, des) _loc sl =
   try eval_special_var conf base sl
@@ -135,7 +136,7 @@ and eval_is_last env =
   match get_env "last" env with Vbool x -> bool_val x | _ -> raise Not_found
 
 (* TODO : feels like it could be simpler *)
-and eval_parent conf env cpl sl =
+and eval_parent conf base env cpl sl =
   match get_env "cnt" env with
   | Vint i ->
       let arr = Gutil.parent_array cpl in
@@ -146,11 +147,11 @@ and eval_parent conf env cpl sl =
           ("", "", 0, Update.Create (Neuter, None), "")
         else raise Not_found
       in
-      eval_parent' conf env k sl
+      eval_parent' conf base env k sl
   | _ -> raise Not_found
 
 (* TODO : more array length logic *)
-and eval_witness env fam sl =
+and eval_witness conf base env fam sl =
   match get_env "cnt" env with
   | Vint i ->
       let i = i - 1 in
@@ -160,7 +161,7 @@ and eval_witness env fam sl =
           ("", "", 0, Update.Create (Neuter, None), "")
         else raise Not_found
       in
-      eval_key k sl
+      eval_key conf base k sl
   | _ -> raise Not_found
 
 (* TODO : rewrite, looks bad *)
@@ -241,13 +242,13 @@ and eval_event_date env fam s =
 
 and eval_simple_var conf base env (fam, cpl, des) = function
   | [ "bvar"; v ] -> eval_bvar conf v
-  | "child" :: sl -> eval_child env des sl
+  | "child" :: sl -> eval_child conf base env des sl
   | [ "cnt" ] -> eval_int_env "cnt" env
   | [ "comment" ] -> safe_val (Util.escape_html fam.comment :> Adef.safe_string)
   | [ "digest" ] -> eval_string_env "digest" env
   | [ "divorce" ] -> eval_divorce fam
   | [ "divorce"; s ] -> eval_divorce' fam s
-  | "father" :: sl -> eval_key (Gutil.father cpl) sl
+  | "father" :: sl -> eval_key conf base (Gutil.father cpl) sl
   | [ "fsources" ] ->
       safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
   | [ "is_first" ] -> eval_is_first env
@@ -259,13 +260,14 @@ and eval_simple_var conf base env (fam, cpl, des) = function
       safe_val (Util.escape_html fam.marriage_note :> Adef.safe_string)
   | [ "marriage_src" ] ->
       safe_val (Util.escape_html fam.marriage_src :> Adef.safe_string)
+  | "mother" :: sl -> eval_key conf base (Gutil.mother cpl) sl
   | [ "mrel" ] -> str_val (eval_relation_kind fam.relation)
   | [ "nb_fevents" ] -> str_val (string_of_int (List.length fam.fevents))
   | [ "origin_file" ] ->
       safe_val (Util.escape_html fam.origin_file :> Adef.safe_string)
-  | "parent" :: sl -> eval_parent conf env cpl sl
+  | "parent" :: sl -> eval_parent conf base env cpl sl
   | [ "wcnt" ] -> eval_int_env "wcnt" env
-  | "witness" :: sl -> eval_witness env fam sl
+  | "witness" :: sl -> eval_witness conf base env fam sl
   | [ "has_fevents" ] -> bool_val (fam.fevents <> [])
   | "event" :: sl ->
       let e = family_events_opt env fam in
@@ -273,7 +275,7 @@ and eval_simple_var conf base env (fam, cpl, des) = function
   | [ "event_date"; s ] -> eval_event_date env fam s
   | [ "event_str" ] -> eval_event_str conf base env fam
   | [ "has_fwitness" ] -> eval_has_fwitness env fam
-  | "fwitness" :: sl -> eval_fwitness env fam sl
+  | "fwitness" :: sl -> eval_fwitness conf base env fam sl
   | [ "fwitness_kind" ] -> eval_fwitness_kind env fam
   | [ s ] -> eval_default_var conf s
   | _ -> raise Not_found
@@ -316,7 +318,7 @@ and eval_event_var e = function
       | _ -> str_val "")
   | _ -> raise Not_found
 
-and eval_parent' conf env k = function
+and eval_parent' conf base env k = function
   | [ "himher" ] ->
       let s =
         match get_env "cnt" env with
@@ -326,18 +328,41 @@ and eval_parent' conf env k = function
         | _ -> "???"
       in
       str_val s
-  | sl -> eval_key k sl
+  | sl -> eval_key conf base k sl
 
-and eval_key (fn, sn, oc, create, _) = function
+and get_parent_sex conf base fn sn oc =
+  match Gwdb.person_of_key base fn sn oc with
+  | Some ip -> (
+      match pget conf base ip with
+      | p -> (
+          match get_sex p with Male -> 0 | Female -> 1 | Neuter -> 2))
+  | _ -> -1
+
+and eval_key conf base (fn, sn, oc, create, _) = function
   | [ "create" ] -> str_val (if create <> Update.Link then "create" else "link")
   | [ "create"; s ] -> Update_util.eval_create create s
   | [ "first_name" ] -> safe_val (Util.escape_html fn :> Adef.safe_string)
   | [ "occ" ] -> str_val (if oc = 0 then "" else string_of_int oc)
   | [ "surname" ] -> safe_val (Util.escape_html sn :> Adef.safe_string)
-  | [ "sex" ] -> Update_util.eval_create create "sex"
+  | [ "sex" ] ->
+      if create = Update.Link then (
+        let sex = get_parent_sex conf base fn sn oc in
+        str_val (string_of_int sex))
+      else Update_util.eval_create create "sex"
+  | [ "sexes" ] ->
+      (* this is somewhat of a hack to determine same sex situations *)
+      (* updateFam.ml does not provide adequate mechanisms to test   *)
+      (* for the other parent's sex                                  *)
+      (* a possible better mechanism would be to implement a         *)
+      (* previous_parent_sex env variable in print_foreach_parent    *)
+      if create = Update.Link then (
+        let sex = get_parent_sex conf base fn sn oc in
+        sexes := if !sexes = -1 then sex else if !sexes = sex then 3 else 4;
+        str_val (string_of_int !sexes))
+      else Update_util.eval_create create "sex"
   | _ -> raise Not_found
 
-and eval_key_opt p sl = Some (eval_key p sl)
+and eval_key_opt conf base p sl = Some (eval_key conf base p sl)
 
 and eval_relation_kind = function
   | Married -> "marr"
