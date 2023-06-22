@@ -488,6 +488,13 @@ let treat_request =
                   Perso.interp_templ t conf base p
                 | _ -> person_selected conf base p
             end
+
+
+
+
+
+
+
         | "A" ->
           AscendDisplay.print |> w_person |> w_base
         | "ADD_FAM" ->
@@ -551,6 +558,14 @@ let treat_request =
           w_wizard @@ w_base @@ UpdateFam.print_del
         | "DEL_FAM_OK" ->
           w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_del
+
+        | "DEL_IMAGE" ->
+          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_del
+        | "DEL_IMAGE_OK" ->
+          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_del_ok
+        | "DEL_IMAGE_C_OK" ->
+          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+
         | "DEL_IND" ->
           w_wizard @@ w_base @@ UpdateInd.print_del
         | "DEL_IND_OK" ->
@@ -571,6 +586,13 @@ let treat_request =
           w_base @@ HistoryDiffDisplay.print
         | "HIST_SEARCH" ->
           w_base @@ History.print_search
+
+        | "IM_C" ->
+          w_base @@ ImageCarrousel.print_c ~saved:false
+        | "IM_C_S" ->
+          w_base @@ ImageCarrousel.print_c ~saved:true
+
+
         | "IM" ->
           w_base @@ ImageDisplay.print
         | "IMH" ->
@@ -704,6 +726,11 @@ let treat_request =
             | Some v -> Some.search_first_name_print conf base v
             | None -> AllnDisplay.print_first_names conf base
           end
+
+
+        | "PERSO" ->
+          w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
+
         | "POP_PYR" when conf.wizard || conf.friend ->
           w_base @@ BirthDeathDisplay.print_population_pyramid
         | "PS" ->
@@ -712,6 +739,8 @@ let treat_request =
           w_base @@ Place_v7.print_all_places_surnames
         | "R" ->
           w_base @@ w_person @@ relation_print
+        | "REFRESH" ->
+          w_base @@ w_person @@ Perso.interp_templ "carrousel"
         | "REQUEST" ->
           w_wizard @@ fun _ _ ->
             Output.status conf Def.OK;
@@ -720,12 +749,25 @@ let treat_request =
               Output.print_sstring conf s ;
               Output.print_sstring conf "\n"
             end conf.Config.request ;
+
+        | "RESET_IMAGE_C_OK" ->
+          w_base @@ ImageCarrousel.print_main_c
+
         | "RL" ->
           w_base @@ RelationLink.print
         | "RLM" ->
           w_base @@ RelationDisplay.print_multi
         | "S" ->
           w_base @@ fun conf base -> SearchName.print conf base specify unknown
+
+        | "SND_IMAGE" -> w_wizard @@w_lock @@ w_base @@ ImageCarrousel.print
+        | "SND_IMAGE_OK" ->
+           w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_send_ok
+        | "SND_IMAGE_C" ->
+          w_base @@ w_person @@ Perso.interp_templ "carrousel"
+        | "SND_IMAGE_C_OK" ->
+          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+
         | "SRC" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print_source conf base f
