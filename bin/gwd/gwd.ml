@@ -398,12 +398,14 @@ let unauth_server conf ar =
       (if ar.ar_can_stale then ",stale=true" else "")
   else
     Output.header conf "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
-  let url =
-    conf.bname ^<^ "?" ^<^
+  let env =
     List.fold_left
-      (fun s (k, v) -> if (s : Adef.encoded_string :> string) = "" then k ^<^ "=" ^<^ v else s ^^^ "&" ^<^ k ^<^ "=" ^<^ v)
-      (Adef.encoded "") (conf.henv @ conf.senv @ conf.env)
+      (fun l (k, v) ->
+        if k = "" || (k = "oc" && (int_of_string (Mutil.decode v)) = 0)
+        then l else (k ^ "=" ^ (Mutil.decode v)) :: l)
+      [] (conf.henv @ conf.senv @ conf.env)
   in
+  let env = String.concat "&" env in
   let txt i = transl_nth conf "wizard/wizards/friend/friends/exterior" i in
   let typ = txt (if ar.ar_passwd = "w" then 0 else 2) in
   let title h =
@@ -416,18 +418,20 @@ let unauth_server conf ar =
   title false;
   Output.print_sstring conf "</h1>\n";
   Output.print_sstring conf "<dl>\n";
-  begin let (alt_bind, alt_access) =
-    if ar.ar_passwd = "w" then "&w=f", txt 2 else "&w=w", txt 0
-  in
+  begin
+    let (alt_bind, alt_access) =
+      if ar.ar_passwd = "w" then "w=f", txt 2 else "w=w", txt 0
+    in
     Output.print_sstring conf "<dd>\n";
     Output.print_sstring conf "<ul>\n";
     Output.print_sstring conf "<li>\n";
-    Output.printf conf "%s : <a href=\"%s%s\">%s</a>" (transl conf "access") (url : Adef.encoded_string :> string)
-      alt_bind alt_access;
+    Output.printf conf {|%s : <a href="%s?%s%s%s">%s</a>|}
+      (transl conf "access") conf.bname env
+      (if env = "" then "" else "&") alt_bind alt_access;
     Output.print_sstring conf "</li>\n";
     Output.print_sstring conf "<li>\n";
-    Output.printf conf "%s : <a href=\"%s\">%s</a>" (transl conf "access") (url : Adef.encoded_string :> string)
-      (txt 4);
+    Output.printf conf {|%s : <a href="%s?%s">%s</a>|}
+      (transl conf "access") conf.bname env (txt 4);
     Output.print_sstring conf "</li>\n";
     Output.print_sstring conf "</ul>\n";
     Output.print_sstring conf "</dd>\n"
