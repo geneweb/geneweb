@@ -178,6 +178,9 @@ let scale_to_fit ~max_w ~max_h ~w ~h =
   in
   (w, h)
 
+let is_not_private_img _conf fname =
+  not (Mutil.contains fname ("private" ^ Filename.dir_sep))
+
 (** [has_access_to_portrait conf base p] is true iif we can see [p]'s portrait. *)
 let has_access_to_portrait conf base p =
   let img = get_image p in
@@ -185,7 +188,7 @@ let has_access_to_portrait conf base p =
   || (not conf.no_image)
      && Util.authorized_age conf base p
      && ((not (is_empty_string img)) || full_portrait_path conf base p <> None)
-     && not (Mutil.contains (sou base img) "/private/")
+     && is_not_private_img conf (sou base img)
 (* TODO: privacy settings should be in db not in url *)
 
 (** [has_access_to_carrousel conf base p] is true iif ???. *)
