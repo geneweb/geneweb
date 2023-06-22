@@ -73,3 +73,6 @@ val get_carrousel_imgs :
 
 val get_carrousel_old_imgs :
   config -> base -> person -> (string * string * string * string) list
+
+val is_not_private_img : config -> string -> bool
+(** determines if image is private (pathname contains "private/") *)
