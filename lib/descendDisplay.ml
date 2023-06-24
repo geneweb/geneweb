@@ -985,7 +985,9 @@ let make_tree_hts conf base gv p =
     match Util.p_getenv conf.env "ma" with Some "on" -> true | _ -> false
   in
   let img =
-    match Util.p_getenv conf.env "im" with Some "off" -> false | _ -> true
+    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
+    | Some "off", _ | _, Some "off" -> false
+    | _, _ -> true
   in
   let _cgl =
     match Util.p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
@@ -1820,7 +1822,9 @@ let make_vaucher_tree_hts conf base gv p =
     match Util.p_getenv conf.env "ma" with Some "on" -> true | _ -> false
   in
   let img =
-    match Util.p_getenv conf.env "im" with Some "off" -> false | _ -> true
+    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
+    | Some "off", _ | _, Some "off" -> false
+    | _, _ -> true
   in
   let cgl =
     match Util.p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
