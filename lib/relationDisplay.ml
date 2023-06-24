@@ -490,7 +490,12 @@ let string_of_big_int conf i =
 let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
   let image_opt =
     Adef.escaped
-    @@ if p_getenv conf.env "image" = Some "off" then "&image=off" else ""
+    @@
+    if
+      p_getenv conf.env "im" = Some "off"
+      || p_getenv conf.env "image" = Some "off"
+    then "&im=off"
+    else ""
   in
   Output.print_sstring conf "<ul>";
   List.iter
@@ -539,7 +544,12 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
   let pp1, pp2, (x1, x2, list), reltab = sol in
   let image_opt =
     Adef.escaped
-    @@ if p_getenv conf.env "image" = Some "off" then "&image=off" else ""
+    @@
+    if
+      p_getenv conf.env "im" = Some "off"
+      || p_getenv conf.env "image" = Some "off"
+    then "&im=off"
+    else ""
   in
   Output.print_sstring conf {|<ul class="li_relationship"><li>|};
   transl conf "indeed," |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -719,8 +729,10 @@ let print_dag_links conf base p1 p2 rl =
               if i <> 0 then Output.print_sstring conf ",";
               Output.print_sstring conf (string_of_int x))
             l2;
-          if p_getenv conf.env "image" = Some "off" then
-            Output.print_sstring conf "&image=off";
+          if
+            p_getenv conf.env "im" = Some "off"
+            || p_getenv conf.env "image" = Some "off"
+          then Output.print_sstring conf "&im=off";
           if p_getenv conf.env "bd" = Some "on" then
             Output.print_sstring conf "&bd=on";
           Output.print_sstring conf {|&dag=on">|};
