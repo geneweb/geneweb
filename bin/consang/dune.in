@@ -3,5 +3,5 @@
   (public_name geneweb.consang)
   (modules consang)
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
-  (libraries unix %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
+  (libraries unix %%%GWDB_PKG%%% geneweb)
 )
