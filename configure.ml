@@ -91,7 +91,7 @@ let () =
     | `None | `Legacy -> (" -D GENEWEB_GWDB_LEGACY", "geneweb.gwdb-legacy")
   in
   let dune_profile = if !release then "release" else "dev" in
-  let os_type, os_d, ext, rm, strip =
+  let os_type, ext, rm, strip =
     match
       let p = Unix.open_process_in "uname -s" in
       let line = input_line p in
@@ -99,8 +99,8 @@ let () =
       line
     with
     | ("Linux" | "Darwin" | "FreeBSD") as os_type ->
-        (os_type, " -D UNIX", "", "/bin/rm -f", "strip")
-    | _ -> ("Win", " -D WINDOWS", ".exe", "rm -f", "true")
+        (os_type, "", "/bin/rm -f", "strip")
+    | _ -> ("Win", ".exe", "rm -f", "true")
   in
   let ch = open_out "Makefile.config" in
   let writeln s = output_string ch @@ s ^ "\n" in
@@ -111,7 +111,6 @@ let () =
   var "RM" rm;
   var "EXT" ext;
   var "GWDB_D" gwdb_d;
-  var "OS_D" os_d;
   var "SOSA_D" sosa_d;
   var "SYSLOG_D" syslog_d;
   var "GWDB_PKG" gwdb_pkg;

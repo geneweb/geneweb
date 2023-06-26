@@ -25,7 +25,7 @@ lib/gwlib.ml:
 	@echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 	@echo " Done."
 
-CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D) $(SOSA_D)
+CPPO_D=$(GWDB_D) $(SYSLOG_D) $(SOSA_D)
 
 ifeq ($(DUNE_PROFILE),dev)
     CPPO_D+= -D DEBUG
@@ -71,10 +71,7 @@ GENERATED_FILES_DEP = \
 	dune-workspace \
 	hd/etc/version.txt \
 	lib/dune \
-	lib/gwdb/dune \
-	lib/core/dune \
 	lib/gwlib.ml \
-	lib/util/dune \
 	benchmark/dune \
 	bin/connex/dune \
 	bin/consang/dune \
