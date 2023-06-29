@@ -174,15 +174,15 @@ let rec compare_dmy_opt ?(strict = false) dmy1 dmy2 =
     | x -> eval_strict strict dmy1 dmy2 x
   in
   let c_opt = cmp dmy1 dmy2 in
-  if c_opt <> Some 0 then c_opt
+  if c_opt <> Some 0 || dmy1.prec <> Sure || dmy2.prec <> Sure then c_opt
   else
-    (* if dmys were incomplete and equal we do it again on lower_bound because
-       incomplete dmy should be less than full dmy (?...) *)
+    (* we want incomplete date with prec = Sure to be before others *)
     Some
       (match ((dmy1.day, dmy1.month), (dmy2.day, dmy2.month)) with
       | (0, 0), (0, 0) -> 0
       | (0, 0), (_, _) -> -1
       | (_, _), (0, 0) -> 1
+      | (0, _), (0, _) -> 0
       | (0, _), (_, _) -> -1
       | (_, _), (0, _) -> 1
       | (_, _), (_, _) -> 0)
