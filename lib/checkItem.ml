@@ -1145,9 +1145,10 @@ let person_warnings conf base p =
   in
 
   let filter x =
-    if filter_close_children x
-    && (not (List.exists (eq_warning base x) !w))
-    && Util.auth_warning conf base x
+    if
+      filter_close_children x
+      && (not (List.exists (eq_warning base x) !w))
+      && Util.auth_warning conf base x
     then w := x :: !w
   in
   ignore @@ person base filter p;
