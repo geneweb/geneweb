@@ -255,6 +255,27 @@ let init_cousins_cnt conf base p =
       flush stderr;
       (t', d_t')
 
+(* for cousins_dates.(l1).(l2) determine min or max date *)
+let min_max_date conf base p min_max l1 l2 =
+  let _cousins_cnt, cousins_dates =
+    match (!cousins_t, !cousins_dates_t) with
+    | Some t, Some d_t -> (t, d_t)
+    | _, _ -> init_cousins_cnt conf base p
+  in
+  let i = try int_of_string l1 with Failure _ -> -1 in
+  let j = try int_of_string l2 with Failure _ -> -1 in
+  match i, j with
+  | -1, _ | _, -1 -> None
+  | _, _ ->
+    let min, max =
+      if
+        i + 1 > Array.length cousins_dates
+        || j + 1 > Array.length cousins_dates.(i)
+      then (-1, -1)
+      else cousins_dates.(i).(j)
+    in
+    if min_max then Some min else Some max
+
 (* determine non empty max ancestor level (max_i)
    and non empty max descendant level
 *)

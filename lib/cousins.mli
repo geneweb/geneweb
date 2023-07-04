@@ -62,8 +62,12 @@ val init_cousins_cnt :
   - a 2D array of tuples (min, max) for dates of cousins at l1, l2
 *)
 
+val min_max_date : config -> base -> person -> bool -> string -> string -> int option
+(** for cousins_dates.(l1).(l2) determine min or max date *)
+
 val max_l1_l2 : config -> base -> person -> int * int
-(** obtain the (min, max) value for cousins at l1, l2 *)
+(** determine non empty max ancestor level (l1)
+   and non empty max descendant level *)
 
 val cousins_l1_l2_aux :
   config ->
