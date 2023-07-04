@@ -26,8 +26,7 @@ let print_anniversary_day conf base dead_people liste =
         | n ->
             Output.print_sstring conf (string_of_int n);
             Output.print_sstring conf " ";
-            Output.print_sstring conf (transl conf "years old")
-        (* TODO insert age *))
+            Output.print_sstring conf (transl conf "years old"))
       else (
         Output.print_sstring conf ", <em>";
         (Output.print_sstring conf
