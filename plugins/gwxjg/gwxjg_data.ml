@@ -764,6 +764,42 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let surname = Tstr (E.surname base p) in
   let surname_aliases = mk_str_lst base (Gwdb.get_surnames_aliases p) in
   let sosa = box_lazy @@ lazy (get_sosa_person conf base p) in
+  let parent_marriage, parent_others_marriage =
+    match Gwdb.get_parents p with
+    | None -> (None, [])
+    | Some ifam ->
+        let fam = Gwdb.foi base ifam in
+        let father = Gwdb.get_father fam in
+        let mother = Gwdb.get_mother fam in
+        let parent_marriage =
+          List.find_opt
+            (fun fe -> Gwdb.get_fevent_name fe = Efam_Marriage)
+            (Gwdb.get_fevents fam)
+        in
+
+        let other_marriage_events ip =
+          Array.to_list (Gwdb.get_family (Gwdb.poi base ip))
+          |> List.filter (( <> ) ifam)
+          |> List.map (fun ifam -> Gwdb.get_fevents (Gwdb.foi base ifam))
+          |> List.map (fun fevents ->
+                 List.filter
+                   (fun e -> Gwdb.get_fevent_name e = Efam_Marriage)
+                   fevents)
+          |> List.concat
+          |> List.map Event.event_item_of_fevent
+        in
+
+        ( parent_marriage,
+          other_marriage_events father @ other_marriage_events mother )
+  in
+  let parent_marriage =
+    match parent_marriage with
+    | None -> Tnull
+    | Some ev -> mk_event conf base (Event.event_item_of_fevent ev)
+  in
+  let parent_others_marriage =
+    lazy_list (mk_event conf base) parent_others_marriage
+  in
   Tpat
     (function
     | "access_url" -> access_url
@@ -803,6 +839,8 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
     | "surname" -> surname
     | "surname_aliases" -> surname_aliases
     | "titles" -> titles
+    | "parent_marriage" -> parent_marriage
+    | "parent_others_marriage" -> parent_others_marriage
     | _ -> raise Not_found)
 
 (* take optionnal p parameter for spouse things? *)
