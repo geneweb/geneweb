@@ -141,6 +141,12 @@ let tnf s = "[" ^ s ^ "]"
 let transl conf w = try Hashtbl.find conf.lexicon w with Not_found -> tnf w
 
 let transl_nth conf w n =
+  let len = String.length w in
+  let w =
+    if len > 3 && w.[len - 1] = ':' && w.[len - 2] = ':' && w.[len - 3] = ':'
+    then String.sub w 0 (len - 3)
+    else w
+  in
   try nth_field (Hashtbl.find conf.lexicon w) n
   with Not_found -> tnf (nth_field w n)
 
