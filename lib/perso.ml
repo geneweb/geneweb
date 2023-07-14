@@ -4098,7 +4098,7 @@ let eval_transl conf base env upp s c =
                 assert false)
         | _ -> assert false
       in
-      let r = Util.translate_eval (Util.transl_nth conf s n) in
+      let r = Templ.eval_transl_lexicon conf upp s (string_of_int n) in
       if upp then Utf8.capitalize_fst r else r
   | _ -> Templ.eval_transl conf upp s c
 
