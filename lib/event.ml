@@ -106,11 +106,11 @@ let has_witness_note ei =
 
 let event_item_of_pevent pe = PE (pe, pevent_name (Gwdb.get_pevent_name pe))
 
-let event_item_of_fevent ?sp fe =
+let event_item_of_fevent ~sp fe =
   FE (fe, fevent_name (Gwdb.get_fevent_name fe), sp)
 
 let event_item_of_gen_pevent evt = DPE (evt, pevent_name evt.epers_name)
-let event_item_of_gen_fevent ?sp evt = DFE (evt, fevent_name evt.efam_name, sp)
+let event_item_of_gen_fevent ~sp evt = DFE (evt, fevent_name evt.efam_name, sp)
 
 (*
    On ignore les événements personnalisés.
@@ -210,7 +210,8 @@ let events conf base p =
           if not m_auth then events
           else
             List.fold_right
-              (fun fe events -> event_item_of_fevent ~sp:isp fe :: events)
+              (fun fe events ->
+                event_item_of_fevent ~sp:(Some isp) fe :: events)
               (get_fevents fam) events)
         (get_family p) pevents
     in

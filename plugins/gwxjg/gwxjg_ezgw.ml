@@ -166,7 +166,7 @@ module Family = struct
     if auth then
       List.fold_right
         (fun evt fam_fevents ->
-          let ei = Event.event_item_of_fevent ~sp:isp evt in
+          let ei = Event.event_item_of_fevent ~sp:(Some isp) evt in
           ei :: fam_fevents)
         (get_fevents fam) []
     else []

@@ -437,15 +437,11 @@ and mk_witness_kind = function
 and mk_pevent conf base e = mk_event conf base (Event.event_item_of_pevent e)
 
 and mk_fevent conf base sp e =
-  let ei =
-    match sp with
-    | Some sp -> Event.event_item_of_fevent ~sp e
-    | None -> Event.event_item_of_fevent e
-  in
+  let ei = Event.event_item_of_fevent ~sp e in
   mk_event conf base ei
 
 and mk_fevent' conf base _sp e =
-  mk_event conf base (Event.event_item_of_gen_fevent e)
+  mk_event conf base (Event.event_item_of_gen_fevent ~sp:None e)
 
 and mk_pevent' conf base e =
   mk_event conf base (Event.event_item_of_gen_pevent e)
@@ -766,50 +762,48 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
   let sosa = box_lazy @@ lazy (get_sosa_person conf base p) in
   let parent_marriage, father_re_marriages, mother_re_marriages =
     match Gwdb.get_parents p with
-    | None -> (None, [], [])
+    | None -> (Tnull, Tlist [], Tlist [])
     | Some ifam ->
         let fam = Gwdb.foi base ifam in
         let father = Gwdb.get_father fam in
         let mother = Gwdb.get_mother fam in
         let parent_marriage =
-          List.find_opt
-            (fun fe -> Gwdb.get_fevent_name fe = Efam_Marriage)
-            (Gwdb.get_fevents fam)
+          match
+            List.find_opt
+              (fun fe -> Gwdb.get_fevent_name fe = Efam_Marriage)
+              (Gwdb.get_fevents fam)
+          with
+          | None -> Tnull
+          | Some ev ->
+              mk_event conf base
+                (Event.event_item_of_fevent ~sp:(Some (Gwdb.get_mother fam)) ev)
+        in
+
+        (* needed to make event_item with spouse correctly set *)
+        let get_spouse ifam ip =
+          let family = Gwdb.foi base ifam in
+          let father = Gwdb.get_father family in
+          if ip <> father then father else Gwdb.get_mother family
         in
 
         let other_marriage_events ip =
           Array.to_list (Gwdb.get_family (Gwdb.poi base ip))
           |> List.filter (( <> ) ifam)
           |> List.map (fun ifam ->
-                 ( Gwdb.get_fevents (Gwdb.foi base ifam),
-                   (* we need to get spouse of ip in this family *)
-                   let family = Gwdb.foi base ifam in
-                   let father = Gwdb.get_father family in
-                   if ip <> father then father else Gwdb.get_mother family ))
+                 (Gwdb.get_fevents (Gwdb.foi base ifam), get_spouse ifam ip))
           |> List.map (fun (fevents, spouse) ->
                  List.filter
                    (fun e -> Gwdb.get_fevent_name e = Efam_Marriage)
                    fevents
                  |> List.map (fun e -> (e, spouse)))
           |> List.concat
-          |> List.map (fun (fevents, sp) ->
-                 Event.event_item_of_fevent ~sp fevents)
+          |> List.map (fun (fevents, spouse) ->
+                 Event.event_item_of_fevent ~sp:(Some spouse) fevents)
         in
 
         ( parent_marriage,
-          other_marriage_events father,
-          other_marriage_events mother )
-  in
-  let parent_marriage =
-    match parent_marriage with
-    | None -> Tnull
-    | Some ev -> mk_event conf base (Event.event_item_of_fevent ev)
-  in
-  let father_re_marriages =
-    lazy_list (mk_event conf base) father_re_marriages
-  in
-  let mother_re_marriages =
-    lazy_list (mk_event conf base) mother_re_marriages
+          lazy_list (mk_event conf base) (other_marriage_events father),
+          lazy_list (mk_event conf base) (other_marriage_events mother) )
   in
   Tpat
     (function
