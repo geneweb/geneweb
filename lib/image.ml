@@ -203,8 +203,7 @@ let get_portrait_path conf base p =
 let urlorpath_of_string conf s =
   let http = "http://" in
   let https = "https://" in
-  if String.starts_with ~prefix:http s || String.starts_with ~prefix:https s
-  then `Url s
+  if Mutil.start_with http 0 s || Mutil.start_with https 0 s then `Url s
   else if Filename.is_implicit s then
     match List.assoc_opt "images_path" conf.base_env with
     | Some p when p <> "" -> `Path (Filename.concat p s)
