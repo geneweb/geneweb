@@ -29,12 +29,19 @@
   <span>string <span class="arrow">&#45;&gt;</span></span>
   <span><a href="../../Gwdb/index.html#type-person">Gwdb.person</a> <span class="arrow">&#45;&gt;</span></span>
   <span><span><span>(<a href="../../Gwdb_driver/index.html#type-iper">Gwdb_driver.iper</a> * <span><a href="../../Gwdb_driver/index.html#type-ifam">Gwdb_driver.ifam</a> list</span> * <a href="../../Gwdb_driver/index.html#type-iper">Gwdb_driver.iper</a> * <span>int list</span>)</span> list</span>
-    option</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-cousins_fold"><a href="#val-cousins_fold" class="anchor"></a><code><span><span class="keyword">val</span> cousins_fold : 
+    option</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-cousins_implex_cnt"><a href="#val-cousins_implex_cnt" class="anchor"></a><code><span><span class="keyword">val</span> cousins_implex_cnt : 
+  <span><a href="../../Gwdb/index.html#type-base">Gwdb.base</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span>string <span class="arrow">&#45;&gt;</span></span>
+  <span>string <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../Gwdb/index.html#type-person">Gwdb.person</a> <span class="arrow">&#45;&gt;</span></span>
+  int</span></code></div><div class="spec-doc"><p>for a list of &quot;cousins&quot; at level l1 l2, cousins_implex computes cousins already seen at levels l &lt; l2.</p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-cousins_fold"><a href="#val-cousins_fold" class="anchor"></a><code><span><span class="keyword">val</span> cousins_fold : 
   <span><span><span>(<a href="../../Gwdb_driver/index.html#type-iper">Gwdb_driver.iper</a> * <span><a href="../../Gwdb_driver/index.html#type-ifam">Gwdb_driver.ifam</a> list</span> * <a href="../../Gwdb_driver/index.html#type-iper">Gwdb_driver.iper</a> * <span>int list</span>)</span> list</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span>(<a href="../../Gwdb_driver/index.html#type-iper">Gwdb_driver.iper</a>
-   * <span>(<span><a href="../../Gwdb_driver/index.html#type-ifam">Gwdb_driver.ifam</a> list</span> * <span><a href="../../Gwdb_driver/index.html#type-iper">Gwdb_driver.iper</a> list</span> * int)</span>
+   * <span>(<span><span><a href="../../Gwdb_driver/index.html#type-ifam">Gwdb_driver.ifam</a> list</span> list</span> * <span><a href="../../Gwdb_driver/index.html#type-iper">Gwdb_driver.iper</a> list</span> * int)</span>
    * <span>int list</span>)</span>
-    list</span></span></code></div><div class="spec-doc"><p>create a new list of (ip, (ifaml, iancl, cnt), lev) from list of (ip, ifaml, ipar, lev) The effect is to assemble multiple items under a single ip</p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-anc_cnt_aux"><a href="#val-anc_cnt_aux" class="anchor"></a><code><span><span class="keyword">val</span> anc_cnt_aux : 
+    list</span></span></code></div><div class="spec-doc"><p>create a new list of (ip, (ifamll, iancl, cnt), lev) from list of (ip, ifaml, ianc, lev) The effect is to assemble multiple items under a single ip</p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-anc_cnt_aux"><a href="#val-anc_cnt_aux" class="anchor"></a><code><span><span class="keyword">val</span> anc_cnt_aux : 
   <span><a href="../../Gwdb/index.html#type-base">Gwdb.base</a> <span class="arrow">&#45;&gt;</span></span>
   <span>int <span class="arrow">&#45;&gt;</span></span>
   <span>int <span class="arrow">&#45;&gt;</span></span>
