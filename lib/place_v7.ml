@@ -168,17 +168,26 @@ let places_to_string inverse pl =
 exception List_too_long
 
 let get_opt conf =
-  (if p_getenv conf.env "bi" = Some "on" then "&bi=on" else "")
-  ^ (if p_getenv conf.env "ba" = Some "on" then "&ba=on" else "")
-  ^ (if p_getenv conf.env "de" = Some "on" then "&de=on" else "")
-  ^ (if p_getenv conf.env "bu" = Some "on" then "&bu=on" else "")
-  ^ (if p_getenv conf.env "ma" = Some "on" then "&ma=on" else "")
-  ^ (if p_getenv conf.env "f_sort" = Some "on" then "&f_sort=on" else "")
-  ^ (if p_getenv conf.env "up" = Some "on" then "&up=on" else "")
-  ^ (if p_getenv conf.env "a_sort" = Some "on" then "&a_sort=on" else "")
-  ^ (if p_getenv conf.env "lower" = Some "on" then "&lower=on" else "")
-  ^ (if p_getenv conf.env "word" = Some "on" then "&word=on" else "")
-  ^ if p_getenv conf.env "any" = Some "on" then "&any=on" else ""
+  let to_url_param s =
+    if p_getenv conf.env s = Some "on" then Printf.sprintf "&%s=on" s else ""
+  in
+  let l =
+    List.map to_url_param
+      [
+        "bi";
+        "ba";
+        "de";
+        "bu";
+        "ma";
+        "f_sort";
+        "up";
+        "a_sort";
+        "lower";
+        "word";
+        "any";
+      ]
+  in
+  String.concat "" l
 
 let get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
     ~add_marriage (dummy_key : 'a) (dummy_value : 'c)
