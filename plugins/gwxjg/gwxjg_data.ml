@@ -780,13 +780,20 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
         let other_marriage_events ip =
           Array.to_list (Gwdb.get_family (Gwdb.poi base ip))
           |> List.filter (( <> ) ifam)
-          |> List.map (fun ifam -> Gwdb.get_fevents (Gwdb.foi base ifam))
-          |> List.map (fun fevents ->
+          |> List.map (fun ifam ->
+                 ( Gwdb.get_fevents (Gwdb.foi base ifam),
+                   (* we need to get spouse of ip in this family *)
+                   let family = Gwdb.foi base ifam in
+                   let father = Gwdb.get_father family in
+                   if ip <> father then father else Gwdb.get_mother family ))
+          |> List.map (fun (fevents, spouse) ->
                  List.filter
                    (fun e -> Gwdb.get_fevent_name e = Efam_Marriage)
-                   fevents)
+                   fevents
+                 |> List.map (fun e -> (e, spouse)))
           |> List.concat
-          |> List.map Event.event_item_of_fevent
+          |> List.map (fun (fevents, sp) ->
+                 Event.event_item_of_fevent ~sp fevents)
         in
 
         ( parent_marriage,
