@@ -221,6 +221,7 @@
 
 %define;short_display_person(xx)
   %( %apply;image_MF("xx") to discuss %)
+  %sp;
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
