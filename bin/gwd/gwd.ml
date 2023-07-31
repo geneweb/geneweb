@@ -502,7 +502,7 @@ let get_actlog check_from utm from_addr base_password =
     let ic = Secure.open_in fname in
       let tmout = float_of_int !login_timeout in
       let rec loop changed r list =
-        match input_line ic with (* 1638508393 ::1/HenriP_tlrhmitst w hg *)
+        match input_line ic with
         | line ->
             let i = index line ' ' in
             let tm = float_of_string (String.sub line 0 i) in
