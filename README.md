@@ -77,12 +77,11 @@ Quite similar to the MacOS solution, without the security check.
 
 ## Resources
 
-* Documentation: http://geneweb.tuxfamily.org/wiki/GeneWeb
+* Documentation: https://geneweb.tuxfamily.org/wiki/GeneWeb
 * Mailing list: https://framalistes.org/sympa/subscribe/geneweb
 * IRC: irc://irc.freenode.net/geneweb
 * Git: https://github.com/geneweb/geneweb
-* Forum: http://www.geneanet.org/forum/GeneWeb-85
-* Facebook group: http://www.facebook.com/geneweb
+* Forum: https://www.geneanet.org/forum/GeneWeb-85
 * Wikipedia: https://en.wikipedia.org/wiki/GeneWeb
 
 ## Contribute
