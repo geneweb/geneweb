@@ -334,8 +334,7 @@ and get_parent_sex conf base fn sn oc =
   match Gwdb.person_of_key base fn sn oc with
   | Some ip -> (
       match pget conf base ip with
-      | p -> (
-          match get_sex p with Male -> 0 | Female -> 1 | Neuter -> 2))
+      | p -> ( match get_sex p with Male -> 0 | Female -> 1 | Neuter -> 2))
   | _ -> -1
 
 and eval_key conf base (fn, sn, oc, create, _) = function
@@ -345,9 +344,9 @@ and eval_key conf base (fn, sn, oc, create, _) = function
   | [ "occ" ] -> str_val (if oc = 0 then "" else string_of_int oc)
   | [ "surname" ] -> safe_val (Util.escape_html sn :> Adef.safe_string)
   | [ "sex" ] ->
-      if create = Update.Link then (
+      if create = Update.Link then
         let sex = get_parent_sex conf base fn sn oc in
-        str_val (string_of_int sex))
+        str_val (string_of_int sex)
       else Update_util.eval_create create "sex"
   | [ "sexes" ] ->
       (* this is somewhat of a hack to determine same sex situations *)
