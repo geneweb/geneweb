@@ -36,18 +36,18 @@
 %(
 Allows to change the background color, put a background pattern, or change the c
 olor of the text or the links. Its syntax is the one of HTML accepted in the tag
- "&lt;body&gt;" before the ">". See your HTML documentation. Example:
+ "&lt;body&gt;" before the ">". See your CSS and HTML documentation. Example:
 %)
 <p>
 <pre>
-     text=#CC0000 vlink=yellow
+     style="background-color:lightblue; text:#CC0000; vlink:yellow"
 </pre>
 <p>
 [Some interesting variables…]
 <ul>
 <li>background:
 [background image] (<a href="gwsetup?lang=%l;o=%a;v=backg.htm">[Note]</a>)
-<li>bgcolor:
+<li>background-color:
 [background color]
 <li>text:
 [text color]
@@ -76,147 +76,147 @@ database.
 </td>
 </tr>
 <tr align=left>
-<td bgcolor="#FFFFFF">
+<td style="background-color:#FFFFFF">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#FFFFFF text=#333333 link=#006699 vlink=#999900">
+value='style="background-color:#FFFFFF text:#333333 link:#006699 vlink:#999900"'>
 <font color="#333333">[text|link|vlink]0</font>
 <font color="#006699">[text|link|vlink]1</font>
 <font color="#999900">[text|link|vlink]2</font>
 </td>
-<td bgcolor="#FFFFEE">
+<td style="background-color:#FFFFEE">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#FFFFEE text=#000000 link=#006699 vlink=#990000">
+value='style="background-color:#FFFFEE; text:#000000; link:#006699; vlink:#990000"'>
 <font color="#000000">[text|link|vlink]0</font>
 <font color="#006699">[text|link|vlink]1</font>
 <font color="#990000">[text|link|vlink]2</font>
 </td>
-<td bgcolor="#CCCCCC">
+<td style="background-color:#CCCCCC">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#CCCCCC text=#000000 link=#0000CC vlink=#660066">
+value='style="background-color:#CCCCCC; text:#000000; link:#0000CC; vlink:#660066"'>
 <font color="#000000">[text|link|vlink]0</font>
 <font color="#0000CC">[text|link|vlink]1</font>
 <font color="#660066">[text|link|vlink]2</font>
 </td>
 </tr>
 <tr align=left>
-<td bgcolor="#FFFF00">
+<td style="background-color:#FFFF00">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#FFFF00 text=#FF6600 link=#FF0033 vlink=#336633">
+value='style="background-color:#FFFF00; text:#FF6600; link:#FF0033; vlink:#336633"'>
 <font color="#FF6600">[text|link|vlink]0</font>
 <font color="#FF0033">[text|link|vlink]1</font>
 <font color="#336633">[text|link|vlink]2</font>
 </td>
-<td bgcolor="#CCCC66">
+<td style="background-color:#CCCC66">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#CCCC66 text=#330000 link=#CC0000 vlink=#003300">
+value='style="background-color:#CCCC66; text:#330000; link:#CC0000; vlink:#003300"'>
 <font color="#330000">[text|link|vlink]0</font>
 <font color="#CC0000">[text|link|vlink]1</font>
 <font color="#003300">[text|link|vlink]2</font>
 </td>
-<td bgcolor="#FFFF99">
+<td style="background-color:#FFFF99">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#FFFF99 text=#330000 link=#CC0000 vlink=#333333">
+value='style="background-color:#FFFF99; text:#330000; link:#CC0000; vlink:#333333"'>
 <font color="#330000">[text|link|vlink]0</font>
 <font color="#CC0000">[text|link|vlink]1</font>
 <font color="#333333">[text|link|vlink]2</font>
 </td>
 </tr>
 <tr align=left>
-<td bgcolor="#99CCCC">
+<td style="background-color:#99CCCC">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#99CCCC text=#000066 link=#0000CC vlink=#003366">
+value='style="background-color:#99CCCC; text:#000066; link:#0000CC; vlink:#003366"'>
 <font color="#000066">[text|link|vlink]0</font>
 <font color="#0000CC">[text|link|vlink]1</font>
 <font color="#003366">[text|link|vlink]2</font>
 </td>
-<td bgcolor="#CC99FF">
+<td style="background-color:#CC99FF">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#CC99FF text=#000000 link=#FF0033 vlink=#660066">
+value='style="background-color:#CC99FF; text:#000000; link:#FF0033; vlink:#660066"'>
 <font color="#000000">[text|link|vlink]0</font>
 <font color="#FF0033">[text|link|vlink]1</font>
 <font color="#660066">[text|link|vlink]2</font>
 </td>
-<td bgcolor="#CCFF99">
+<td style="background-color:#CCFF99">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#CCFF99 text=#666600 link=#006699 vlink=#003300">
+value='style="background-color:#CCFF99; text:#666600; link:#006699; vlink:#003300"'>
 <font color="#666600">[text|link|vlink]0</font>
 <font color="#006699">[text|link|vlink]1</font>
 <font color="#003300">[text|link|vlink]2</font>
 </td>
 </tr>
 <tr align=left>
-<td bgcolor="#FFCC00">
+<td style="background-color:#FFCC00">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#FFCC00 text=#330000 link=#CC0000 vlink=#660066">
+value='style="background-color:#FFCC00; text:#330000; link:#CC0000; vlink:#660066"'>
 <font color="#330000">[text|link|vlink]0</font>
 <font color="#CC0000">[text|link|vlink]1</font>
 <font color="#660066">[text|link|vlink]2</font>
 </td>
-<td bgcolor="#00FF33">
+<td style="background-color:#00FF33">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#00FF33 text=#0000CC link=#FF0099 vlink=#660066">
+value='style="background-color:#00FF33; text:#0000CC; link:#FF0099; vlink:#660066"'>
 <font color="#0000CC">[text|link|vlink]0</font>
 <font color="#FF0099">[text|link|vlink]1</font>
 <font color="#660066">[text|link|vlink]2</font>
 </td>
-<td bgcolor="#006699">
+<td style="background-color:#006699">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#006699 text=#CCFFCC link=#FFFF00 vlink=#00FFFF">
+value='style="background-color:#006699; text:#CCFFCC; link:#FFFF00; vlink:#00FFFF"'>
 <font color="#CCFFCC">[text|link|vlink]0</font>
 <font color="#FFFF00">[text|link|vlink]1</font>
 <font color="#00FFFF">[text|link|vlink]2</font>
 </td>
 </tr>
 <tr align=left>
-<td bgcolor="#330000">
+<td style="background-color:#330000">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#330000 text=#FF6666 link=#FFCC00 vlink=#CCFF99">
+value='style="background-color:#330000; text:#FF6666; link:#FFCC00; vlink:#CCFF99"'>
 <font color="#FF6666">[text|link|vlink]0</font>
 <font color="#FFCC00">[text|link|vlink]1</font>
 <font color="#CCFF99">[text|link|vlink]2</font>
 </td>
-<td bgcolor="#003300">
+<td style="background-color:#003300">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#003300 text=#CCCC66 link=#FFFFFF vlink=#FFFF00">
+value='style="background-color:#003300; text:#CCCC66; link:#FFFFFF; vlink:#FFFF00">
 <font color="#CCCC66">[text|link|vlink]0</font>
 <font color="#FFFFFF">[text|link|vlink]1</font>
 <font color="#FFFF00">[text|link|vlink]2</font>
 </td>
-<td bgcolor="#333333">
+<td style="background-color:#333333">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#333333 text=#CCCCCC link=#FF6666 vlink=#CCCC66">
+value='style="background-color:#333333; text:#CCCCCC; link:#FF6666; vlink:#CCCC66"'>
 <font color="#CCCCCC">[text|link|vlink]0</font>
 <font color="#FF6666">[text|link|vlink]1</font>
 <font color="#CCCC66">[text|link|vlink]2</font>
 </td>
 </tr>
 <tr align=left>
-<td bgcolor="#666600">
+<td style="background-color:"#666600">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#666600 text=#FFFFFF link=#FFFF00 vlink=#99CCFF">
+value='style="background-color:#666600; text:#FFFFFF; link:#FFFF00; vlink:#99CCFF">
 <font color="#FFFFFF">[text|link|vlink]0</font>
 <font color="#FFFF00">[text|link|vlink]1</font>
 <font color="#99CCFF">[text|link|vlink]2</font>
 </td>
-<td bgcolor="#000000">
+<td style="background-color:#000000">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#000000 text=#99CCFF link=#FFFF00 vlink=#CCCC66">
+value='style="background-color:#000000; text:#99CCFF; link:#FFFF00; vlink:#CCCC66"'>
 <font color="#99CCFF">[text|link|vlink]0</font>
 <font color="#FFFF00">[text|link|vlink]1</font>
 <font color="#CCCC66">[text|link|vlink]2</font>
 </td>
-<td bgcolor="#333333">
+<td style="background-color:#333333">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#333333 text=#FFFFFF link=#99CCFF vlink=#CC99FF">
+value='style="background-color:#333333; text:#FFFFFF; link:#99CCFF; vlink:#CC99FF"'>
 <font color="#FFFFFF">[text|link|vlink]0</font>
 <font color="#99CCFF">[text|link|vlink]1</font>
 <font color="#CC99FF">[text|link|vlink]2</font>
 </td>
 </tr>
 <tr align=left>
-<td bgcolor="#CC0000">
+<td style="background-color:#CC0000">
 <input type=radio name=proposed_body_prop
-value="bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF">
+value='style="background-color:#CC0000; text:#FFFFFF; link:#FFFF00; vlink:#00FFFF"'>
 <font color="#FFFFFF">[text|link|vlink]0</font>
 <font color="#FFFF00">[text|link|vlink]1</font>
 <font color="#00FFFF">[text|link|vlink]2</font>
