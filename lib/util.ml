@@ -1663,10 +1663,9 @@ let husband_wife conf base p all =
         let conjoint = pget conf base conjoint in
         if not @@ is_empty_name conjoint then
           Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
-             |> translate_eval
-             |> Adef.safe
+          |> translate_eval |> Adef.safe
         else Adef.safe ""
-      else (transl conf "marriages with") |> Adef.safe
+      else transl conf "marriages with" |> Adef.safe
     else Adef.safe ""
   in
   let res =
@@ -1675,12 +1674,14 @@ let husband_wife conf base p all =
         let fam = foi base (get_family p).(i) in
         let conjoint = Gutil.spouse (get_iper p) fam in
         let conjoint = pget conf base conjoint in
-        if not @@ is_empty_name conjoint
-        then
+        if not @@ is_empty_name conjoint then
           let res =
             res
-            ^>^ translate_eval (" " ^<^ gen_person_text conf base conjoint ^^^ relation_date conf fam
-                                :> string)
+            ^>^ translate_eval
+                  (" "
+                   ^<^ gen_person_text conf base conjoint
+                   ^^^ relation_date conf fam
+                    :> string)
             ^ ","
           in
           if all then loop (i + 1) res else res
@@ -1691,8 +1692,8 @@ let husband_wife conf base p all =
   in
   let res = (res :> string) in
   let res =
-    if String.length res > 1
-    then (String.sub res 0 (String.length res - 1)) else res
+    if String.length res > 1 then String.sub res 0 (String.length res - 1)
+    else res
   in
   Adef.safe res
 
