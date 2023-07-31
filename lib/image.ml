@@ -2,8 +2,13 @@ open Config
 open Gwdb
 
 let prefix conf = Util.escape_html conf.image_prefix
+let portrait_folder conf = Util.base_path [ "images" ] conf.bname
 
-(** [default_portrait_filename_of_key fn sn occ] is the default filename of the corresponding person's portrait. WITHOUT its file extenssion.
+let carrousel_folder conf =
+  Filename.concat (Util.base_path [ "src" ] conf.bname) "images"
+
+(** [default_portrait_filename_of_key fn sn occ] is the default filename
+ of the corresponding person's portrait. WITHOUT its file extenssion.
  e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
  *)
 let default_portrait_filename_of_key first_name surname occ =
@@ -16,27 +21,42 @@ let default_portrait_filename base p =
   default_portrait_filename_of_key (p_first_name base p) (p_surname base p)
     (get_occ p)
 
+let authorized_image_file_extension = [| ".jpg"; ".jpeg"; ".png"; ".gif" |]
+
+let find_img_opt f =
+  let exists ext =
+    let fname = f ^ ext in
+    if Sys.file_exists fname then Some fname else None
+  in
+  match exists ".url" with
+  | Some f ->
+      let ic = open_in f in
+      let url = input_line ic in
+      close_in ic;
+      Some (`Url url)
+  | None -> (
+      match Mutil.array_find_map exists authorized_image_file_extension with
+      | None -> None
+      | Some f -> Some (`Path f))
+
 (** [full_portrait_path conf base p] is [Some path] if [p] has a portrait.
     [path] is a the full path of the file with file extension. *)
 let full_portrait_path conf base p =
   (* TODO why is extension not in filename..? *)
   let s = default_portrait_filename base p in
-  let f = Filename.concat (Util.base_path [ "images" ] conf.bname) s in
-  if Sys.file_exists (f ^ ".jpg") then Some (`Path (f ^ ".jpg"))
-  else if Sys.file_exists (f ^ ".png") then Some (`Path (f ^ ".png"))
-  else if Sys.file_exists (f ^ ".gif") then Some (`Path (f ^ ".gif"))
-  else None
+  let f = Filename.concat (portrait_folder conf) s in
+  match find_img_opt f with
+  | Some (`Path _) as full_path -> full_path
+  | Some (`Url _)
+  (* should not happen, there is only ".url" file in carrousel folder *)
+  | None ->
+      None
 
-let source_filename bname src =
-  let fname1 =
-    List.fold_right Filename.concat
-      [ Util.base_path [ "src" ] bname; "images" ]
-      src
-  in
-  let fname2 =
+let source_filename conf src =
+  let fname1 = Filename.concat (carrousel_folder conf) src in
+  if Sys.file_exists fname1 then fname1
+  else
     List.fold_right Filename.concat [ Secure.base_dir (); "src"; "images" ] src
-  in
-  if Sys.file_exists fname1 then fname1 else fname2
 
 let path_of_filename src =
   let fname1 =
@@ -139,20 +159,6 @@ let size_from_path fname =
   in
   res
 
-let rename_portrait conf base p (nfn, nsn, noc) =
-  match full_portrait_path conf base p with
-  | Some (`Path old_f) -> (
-      let s = default_portrait_filename_of_key nfn nsn noc in
-      let f = Filename.concat (Util.base_path [ "images" ] conf.bname) s in
-      let new_f = f ^ Filename.extension old_f in
-      try Sys.rename old_f new_f
-      with Sys_error e ->
-        !GWPARAM.syslog `LOG_ERR
-          (Format.sprintf
-             "Error renaming portrait: old_path=%s new_path=%s : %s" old_f new_f
-             e))
-  | None -> ()
-
 let src_to_string = function `Url s | `Path s -> s
 
 let scale_to_fit ~max_w ~max_h ~w ~h =
@@ -175,12 +181,19 @@ let scale_to_fit ~max_w ~max_h ~w ~h =
 (** [has_access_to_portrait conf base p] is true iif we can see [p]'s portrait. *)
 let has_access_to_portrait conf base p =
   let img = get_image p in
-  (not conf.no_image)
-  && Util.authorized_age conf base p
-  && ((not (is_empty_string img)) || full_portrait_path conf base p <> None)
-  && (conf.wizard || conf.friend
-     || not (Mutil.contains (sou base img) "/private/"))
+  (conf.wizard || conf.friend)
+  || (not conf.no_image)
+     && Util.authorized_age conf base p
+     && ((not (is_empty_string img)) || full_portrait_path conf base p <> None)
+     && not (Mutil.contains (sou base img) "/private/")
 (* TODO: privacy settings should be in db not in url *)
+
+(** [has_access_to_carrousel conf base p] is true iif ???. *)
+let has_access_to_carrousel conf base p =
+  (conf.wizard || conf.friend)
+  || (not conf.no_image)
+     && Util.authorized_age conf base p
+     && not (Util.is_hide_names conf p)
 
 let get_portrait_path conf base p =
   if has_access_to_portrait conf base p then full_portrait_path conf base p
@@ -190,20 +203,12 @@ let get_portrait_path conf base p =
 let urlorpath_of_string conf s =
   let http = "http://" in
   let https = "https://" in
-  (* TODO OCaml 4.13: use String.starts_with *)
-  if
-    String.length s > String.length http
-    && String.sub s 0 (String.length http) = http
-    || String.length s > String.length https
-       && String.sub s 0 (String.length https) = https
-  then `Url s
+  if Mutil.start_with http 0 s || Mutil.start_with https 0 s then `Url s
   else if Filename.is_implicit s then
     match List.assoc_opt "images_path" conf.base_env with
     | Some p when p <> "" -> `Path (Filename.concat p s)
     | Some _ | None ->
-        let fname =
-          Filename.concat (Util.base_path [ "images" ] conf.bname) s
-        in
+        let fname = Filename.concat (portrait_folder conf) s in
         `Path fname
   else `Path s
 
@@ -228,6 +233,63 @@ let parse_src_with_size_info conf s =
       (Format.sprintf "Error parsing portrait source with size info %s" s);
     Error "Failed to parse url with size info"
 
+let get_portrait conf base p =
+  if has_access_to_portrait conf base p then
+    match src_of_string conf (sou base (get_image p)) with
+    | `Src_with_size_info _s as s_info -> (
+        match parse_src_with_size_info conf s_info with
+        | Error _e -> None
+        | Ok (s, _size) -> Some s)
+    | `Url _s as url -> Some url
+    | `Path p as path -> if Sys.file_exists p then Some path else None
+    | `Empty -> full_portrait_path conf base p
+  else None
+
+(* In images/carrousel we store either
+   - the image as the original image.jpg/png/tif image
+   - the url to the image as content of a image.url text file
+*)
+let get_old_portrait conf base p =
+  if has_access_to_portrait conf base p then
+    let key = default_portrait_filename base p in
+    let f =
+      Filename.concat (Filename.concat (portrait_folder conf) "old") key
+    in
+    find_img_opt f
+  else None
+
+let rename_portrait conf base p (nfn, nsn, noc) =
+  match get_portrait conf base p with
+  | Some (`Path old_f) -> (
+      let new_s = default_portrait_filename_of_key nfn nsn noc in
+      let old_s = default_portrait_filename base p in
+      let f = Filename.concat (portrait_folder conf) new_s in
+      let old_ext = Filename.extension old_f in
+      let new_f = f ^ old_ext in
+      (try Sys.rename old_f new_f
+       with Sys_error e ->
+         !GWPARAM.syslog `LOG_ERR
+           (Format.sprintf
+              "Error renaming portrait: old_path=%s new_path=%s : %s" old_f
+              new_f e));
+      let new_s_f =
+        String.concat Filename.dir_sep
+          [ portrait_folder conf; "old"; new_s ^ old_ext ]
+      in
+      let old_s_f =
+        String.concat Filename.dir_sep
+          [ portrait_folder conf; "old"; old_s ^ old_ext ]
+      in
+      if Sys.file_exists old_s_f then
+        try Sys.rename old_s_f new_s_f
+        with Sys_error e ->
+          !GWPARAM.syslog `LOG_ERR
+            (Format.sprintf
+               "Error renaming old portrait: old_path=%s new_path=%s : %s" old_f
+               new_f e))
+  | Some (`Url _url) -> () (* old url still applies *)
+  | None -> ()
+
 let get_portrait_with_size conf base p =
   if has_access_to_portrait conf base p then
     match src_of_string conf (sou base (get_image p)) with
@@ -246,17 +308,72 @@ let get_portrait_with_size conf base p =
         | Some path -> Some (path, size_from_path path |> Result.to_option))
   else None
 
-let get_portrait conf base p =
-  if has_access_to_portrait conf base p then
-    match src_of_string conf (sou base (get_image p)) with
-    | `Src_with_size_info _s as s_info -> (
-        match parse_src_with_size_info conf s_info with
-        | Error _e -> None
-        | Ok (s, _size) -> Some s)
-    | `Url _s as url -> Some url
-    | `Path p as path -> if Sys.file_exists p then Some path else None
-    | `Empty -> (
-        match full_portrait_path conf base p with
-        | None -> None
-        | Some path -> Some path)
+(* For carrousel ************************************ *)
+
+let carrousel_file_path conf base p fname old =
+  let dir =
+    let dir = default_portrait_filename base p in
+    if old then Filename.concat dir "old" else dir
+  in
+  String.concat Filename.dir_sep [ carrousel_folder conf; dir; fname ]
+
+let get_carrousel_file_content conf base p fname kind old =
+  let fname =
+    Filename.chop_extension (carrousel_file_path conf base p fname old) ^ kind
+  in
+  if Sys.file_exists fname then (
+    let ic = Secure.open_in fname in
+    let s = really_input_string ic (in_channel_length ic) in
+    close_in ic;
+    if s = "" then None else Some s)
   else None
+
+(* get list of files in carrousel *)
+let get_carrousel_img_aux conf base p old =
+  let get_carrousel_img_note fname =
+    Option.value ~default:""
+      (get_carrousel_file_content conf base p fname ".txt" false)
+  in
+  let get_carrousel_img_src fname =
+    Option.value ~default:""
+      (get_carrousel_file_content conf base p fname ".src" false)
+  in
+  let get_carrousel_img fname =
+    let path = carrousel_file_path conf base p fname old in
+    find_img_opt (Filename.chop_extension path)
+  in
+  if not (has_access_to_carrousel conf base p) then []
+  else
+    let f = carrousel_file_path conf base p "" old in
+    try
+      if Sys.file_exists f && Sys.is_directory f then
+        Array.fold_left
+          (fun acc f1 ->
+            let ext = Filename.extension f1 in
+            if
+              f1 <> ""
+              && f1.[0] <> '.'
+              && (Array.mem ext authorized_image_file_extension || ext = ".url")
+            then
+              match get_carrousel_img f1 with
+              | None -> acc
+              | Some (`Path path) ->
+                  (path, "", get_carrousel_img_src f1, get_carrousel_img_note f1)
+                  :: acc
+              | Some (`Url url) ->
+                  ( Filename.chop_extension (Filename.basename f1) ^ ".url",
+                    url,
+                    get_carrousel_img_src f1,
+                    get_carrousel_img_note f1 )
+                  :: acc
+            else acc)
+          [] (Sys.readdir f)
+      else []
+    with Sys_error e ->
+      !GWPARAM.syslog `LOG_ERR (Format.sprintf "carrousel error: %s, %s" f e);
+      []
+
+let get_carrousel_imgs conf base p = get_carrousel_img_aux conf base p false
+let get_carrousel_old_imgs conf base p = get_carrousel_img_aux conf base p true
+
+(* end carrousel ************************************ *)

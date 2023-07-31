@@ -35,7 +35,7 @@
     <br>
     <a href="%prefix;m=MOD_IND;i=%index;" title="[*modify::person/persons]0 (P)" accesskey="P">[*modify::] (P)</a>
     <br>
-    %if;(bvar.can_send_image != "no" and not has_image_url
+    %if;(bvar.can_send_image != "no" and not has_portrait_url
       and first_name != "?" and surname != "?")
       <a href="%prefix;m=SND_IMAGE;i=%index;">[*send::image/images]0</a>
       <br>

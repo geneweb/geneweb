@@ -714,24 +714,24 @@ let get_mar_date str = function
           with _ -> ((v, Male, Female), c :: l)
         in
         match l with
-        | "#nm" :: l -> ((NotMarried, Male, Female), l)
-        | "#eng" :: l -> ((Engaged, Male, Female), l)
-        | "#noment" :: c :: l when String.length c = 2 ->
-            decode_sex NoMention c l
-        | "#noment" :: l -> ((NoMention, Male, Female), l)
-        | "#nsck" :: c :: l when String.length c = 2 ->
-            decode_sex NoSexesCheckNotMarried c l
-        | "#nsckm" :: c :: l when String.length c = 2 ->
-            decode_sex NoSexesCheckMarried c l
-        | "#banns" :: c :: l when String.length c = 2 ->
-            decode_sex MarriageBann c l
-        | "#contract" :: c :: l when String.length c = 2 ->
-            decode_sex MarriageContract c l
-        | "#license" :: c :: l when String.length c = 2 ->
-            decode_sex MarriageLicense c l
-        | "#pacs" :: c :: l when String.length c = 2 -> decode_sex Pacs c l
-        | "#residence" :: c :: l when String.length c = 2 ->
-            decode_sex Residence c l
+        | "#nm" :: l' -> ((NotMarried, Male, Female), l')
+        | "#eng" :: l' -> ((Engaged, Male, Female), l')
+        | "#noment" :: c :: l' when String.length c = 2 ->
+            decode_sex NoMention c l'
+        | "#noment" :: l' -> ((NoMention, Male, Female), l')
+        | "#nsck" :: c :: l' when String.length c = 2 ->
+            decode_sex NoSexesCheckNotMarried c l'
+        | "#nsckm" :: c :: l' when String.length c = 2 ->
+            decode_sex NoSexesCheckMarried c l'
+        | "#banns" :: c :: l' when String.length c = 2 ->
+            decode_sex MarriageBann c l'
+        | "#contract" :: c :: l' when String.length c = 2 ->
+            decode_sex MarriageContract c l'
+        | "#license" :: c :: l' when String.length c = 2 ->
+            decode_sex MarriageLicense c l'
+        | "#pacs" :: c :: l' when String.length c = 2 -> decode_sex Pacs c l'
+        | "#residence" :: c :: l' when String.length c = 2 ->
+            decode_sex Residence c l'
         | _ -> ((Married, Male, Female), l)
       in
       let place, l = get_field "#mp" l in
@@ -739,11 +739,11 @@ let get_mar_date str = function
       let src, l = get_field "#ms" l in
       let divorce, l =
         match l with
-        | x :: l when x.[0] = '-' ->
+        | x :: l' when x.[0] = '-' ->
             if String.length x > 1 then
-              (Divorced (Date.cdate_of_od (date_of_string x 1)), l)
-            else (Divorced Date.cdate_None, l)
-        | "#sep" :: l -> (Separated, l)
+              (Divorced (Date.cdate_of_od (date_of_string x 1)), l')
+            else (Divorced Date.cdate_None, l')
+        | "#sep" :: l' -> (Separated, l')
         | _ -> (NotDivorced, l)
       in
       (relation, mar, place, note, src, divorce, l)

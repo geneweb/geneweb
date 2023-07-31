@@ -1208,7 +1208,7 @@ type 'a env =
   | Vcell of cell
   | Vcelll of cell list
   | Vcnt of int ref
-  | Vcousl of (iper * (ifam list * iper list * int) * int list) list ref
+  | Vcousl of (iper * (ifam list list * iper list * int) * int list) list ref
   | Vcous_level of int ref * int ref
   | Vdesclevtab of ((iper, int) Marker.t * (ifam, int) Marker.t) lazy_t
   | Vdmark of (iper, bool) Marker.t ref
@@ -1517,7 +1517,7 @@ and eval_simple_bool_var conf base env =
       if v <> "" then SrcfileDisplay.source_file_name conf v |> Sys.file_exists
       else raise Not_found
 
-and eval_simple_str_var conf base env (_, p_auth) = function
+and eval_simple_str_var conf base env (p, p_auth) = function
   | "alias" -> (
       match get_env "alias" env with
       | Vstring s -> s |> Util.escape_html |> safe_val
@@ -1619,6 +1619,8 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       | Vfam (_, fam, _, _) ->
           get_fsources fam |> sou base |> Util.safe_html |> safe_val
       | _ -> null_val)
+  | "url" -> (
+      match get_env "url" env with Vstring x -> str_val x | _ -> str_val "")
   | "incr_count" -> (
       match get_env "count" env with
       | Vcnt c ->
@@ -1643,6 +1645,25 @@ and eval_simple_str_var conf base env (_, p_auth) = function
           incr c;
           null_val
       | _ -> null_val)
+  (* carrousel *)
+  | "idigest" -> Image.default_portrait_filename base p |> str_val
+  | "img_cnt" -> (
+      match get_env "img_cnt" env with
+      | Vint cnt -> VVstring (string_of_int cnt)
+      | _ -> VVstring "")
+  | "carrousel_img" -> (
+      match get_env "carrousel_img" env with
+      | Vstring s -> str_val s
+      | _ -> null_val)
+  | "carrousel_note" -> (
+      match get_env "carrousel_note" env with
+      | Vstring s -> str_val s
+      | _ -> null_val)
+  | "carrousel_src" -> (
+      match get_env "carrousel_src" env with
+      | Vstring s -> str_val s
+      | _ -> null_val)
+  (* end carrousel *)
   | "lazy_force" -> (
       match get_env "lazy_print" env with
       | Vlazyp r -> (
@@ -2164,6 +2185,15 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let np_auth = authorized_age conf base np in
           eval_person_field_var conf base env (np, np_auth) loc sl
       | None -> raise Not_found)
+  | [ "random"; "init" ] ->
+      Random.self_init ();
+      VVstring ""
+  | [ "random"; "bits" ] -> (
+      try VVstring (string_of_int (Random.bits ()))
+      with Failure _ | Invalid_argument _ -> raise Not_found)
+  | [ "random"; s ] -> (
+      try VVstring (string_of_int (Random.int (int_of_string s)))
+      with Failure _ | Invalid_argument _ -> raise Not_found)
   | "related" :: sl -> (
       match get_env "rel" env with
       | Vrel ({ r_type = rt }, Some p) ->
@@ -2720,6 +2750,19 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
               null_val
           | _ -> raise Not_found)
       | None -> raise Not_found)
+  | [ "cous_implx_cnt"; l1; l2 ] ->
+      let max_a_l =
+        match get_env "max_anc_level" env with
+        | Vint i -> i
+        | _ -> max_anc_level_default
+      in
+      let max_d_l =
+        match get_env "max_desc_level" env with
+        | Vint i -> i
+        | _ -> max_desc_level_default
+      in
+      let cnt = Cousins.cousins_implex_cnt base max_a_l max_d_l l1 l2 p in
+      VVstring (string_of_int cnt)
   | [ "cousins"; "max_a" ] ->
       let max_a_l =
         match get_env "max_anc_level" env with
@@ -3374,12 +3417,21 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       if (not p_auth) && is_hide_names conf p then false
       else get_first_names_aliases p <> []
   | "has_history" -> has_history conf base p p_auth
-  | "has_image" -> Image.get_portrait conf base p |> Option.is_some
-  | "has_image_url" -> (
+  | "has_image" | "has_portrait" ->
+      Image.get_portrait conf base p |> Option.is_some
+  | "has_image_url" | "has_portrait_url" -> (
       match Image.get_portrait conf base p with
       | Some (`Url _url) -> true
-      | Some (`Path _fname) -> false
-      | None -> false)
+      | _ -> false)
+  | "has_old_image_url" | "has_old_portrait_url" -> (
+      match Image.get_old_portrait conf base p with
+      | Some (`Url _url) -> true
+      | _ -> false)
+  (* carrousel *)
+  | "has_carrousel" -> Image.get_carrousel_imgs conf base p <> []
+  | "has_old_carrousel" -> Image.get_carrousel_old_imgs conf base p <> []
+  | "has_old_image" | "has_old_portrait" ->
+      Image.get_old_portrait conf base p |> Option.is_some
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && Util.nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
@@ -3474,7 +3526,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       not (authorized_age conf base p)
   | "is_male" -> get_sex p = Male
   | "is_private" -> get_access p = Private
-  | "is_public" -> get_access p = Public
+  | "is_public" -> Util.is_public conf base p
   | "is_restricted" -> is_hidden p
   | _ -> raise Not_found
 
@@ -3614,6 +3666,44 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match get_env "p_link" env with
       | Vbool _ -> null_val
       | _ -> get_iper p |> string_of_iper |> Mutil.encode |> safe_val)
+  (* carrousel functions *)
+  | "carrousel" -> Image.default_portrait_filename base p |> str_val
+  | "carrousel_img_nbr" ->
+      string_of_int (List.length (Image.get_carrousel_imgs conf base p))
+      |> str_val
+  | "carrousel_old_img_nbr" ->
+      string_of_int (List.length (Image.get_carrousel_old_imgs conf base p))
+      |> str_val
+  | "carrousel_img_note" -> (
+      match get_env "carrousel_img_note" env with
+      | Vstring note -> str_val note
+      | _ -> raise Not_found)
+  | "carrousel_img_src" -> (
+      match get_env "carrousel_img_src" env with
+      | Vstring source -> str_val source
+      | _ -> raise Not_found)
+  | "portrait" -> (
+      (* TODO what do we want here? can we remove this? *)
+      match Image.get_portrait conf base p with
+      | Some (`Path s) -> str_val s
+      | Some (`Url u) -> str_val u
+      | None -> null_val)
+  | "portrait_name" -> (
+      match Image.get_portrait conf base p with
+      | Some (`Path s) -> str_val (Filename.basename s)
+      | Some (`Url u) -> str_val u (* ?? *)
+      | None -> null_val)
+  | "portrait_saved" -> (
+      match Image.get_old_portrait conf base p with
+      | Some (`Path s) -> str_val s
+      | Some (`Url u) -> str_val u
+      | None -> null_val)
+  | "portrait_saved_name" -> (
+      match Image.get_old_portrait conf base p with
+      | Some (`Path s) -> str_val (Filename.basename s)
+      | Some (`Url u) -> str_val u (* ?? *)
+      | None -> null_val)
+  | "X" -> str_val Filename.dir_sep (* end carrousel functions *)
   | "mark_descendants" -> (
       match get_env "desc_mark" env with
       | Vdmark r ->
@@ -4098,7 +4188,7 @@ let eval_transl conf base env upp s c =
                 assert false)
         | _ -> assert false
       in
-      let r = Util.translate_eval (Util.transl_nth conf s n) in
+      let r = Templ.eval_transl_lexicon conf upp s (string_of_int n) in
       if upp then Utf8.capitalize_fst r else r
   | _ -> Templ.eval_transl conf upp s c
 
@@ -4153,12 +4243,10 @@ let print_foreach conf base print_ast eval_expr =
     let rec loop first cnt l =
       match l with
       | [] -> ()
-      | (ip, (ifaml, iancl, nbr), lev_list) :: l -> (
+      | (ip, (_, iancl, nbr), lev_list) :: l -> (
           match level_in_list in_or_less level lev_list with
           | Some lev ->
               (let lev_cnt = List.length lev_list in
-               let ifaml = List.map (fun ifam -> string_of_ifam ifam) ifaml in
-               let ifaml = String.concat "," ifaml in
                let ianc_env =
                  match iancl with
                  | ianc1 :: ianc2 :: _ ->
@@ -4179,10 +4267,9 @@ let print_foreach conf base print_ast eval_expr =
                in
                let env =
                  ("path_end", Vind (poi base ip))
-                 :: ("anc_level", Vint lev)
-                 :: ("anc_f_list", Vstring ifaml)
-                 :: ("lev_cnt", Vint lev_cnt) :: ("first", Vbool first)
-                 :: ("cnt", Vint cnt) :: ("nbr", Vint nbr)
+                 :: ("anc_level", Vint lev) :: ("lev_cnt", Vint lev_cnt)
+                 :: ("first", Vbool first) :: ("cnt", Vint cnt)
+                 :: ("nbr", Vint nbr)
                  :: ("last", Vbool (l = []))
                  :: env
                  @ ianc_env
@@ -4961,6 +5048,31 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
         (get_surnames_aliases p)
   in
+  (* carrousel *)
+  let print_foreach_img_in_carrousel env al ((p, _p_auth) as ep) old =
+    let l =
+      let l =
+        (if old then Image.get_carrousel_old_imgs else Image.get_carrousel_imgs)
+          conf base p
+      in
+      List.sort (fun (a, _, _, _) (b, _, _, _) -> String.compare a b) l
+    in
+    let rec loop first cnt = function
+      | [] -> ()
+      | (name, url, src, note) :: l ->
+          let env =
+            ("carrousel_img", Vstring (Filename.basename name))
+            :: ("carrousel_img_src", Vstring src)
+            :: ("carrousel_img_note", Vstring note)
+            :: ("first", Vbool first)
+            :: ("last", Vbool (l = []))
+            :: ("url", Vstring url) :: ("img_cnt", Vint cnt) :: env
+          in
+          List.iter (print_ast env ep) al;
+          loop false (cnt + 1) l
+    in
+    loop true 1 l
+  in
   let print_simple_foreach env el al ini_ep ep efam loc = function
     | "alias" -> print_foreach_alias env al ep
     | "ancestor" | "ascendant" -> print_foreach_ascendant env al ep
@@ -4982,6 +5094,8 @@ let print_foreach conf base print_ast eval_expr =
     | "event" -> print_foreach_event env al ep
     | "family" -> print_foreach_family env al ini_ep ep
     | "first_name_alias" -> print_foreach_first_name_alias env al ep
+    | "img_in_carrousel" -> print_foreach_img_in_carrousel env al ep false
+    | "img_in_carrousel_old" -> print_foreach_img_in_carrousel env al ep true
     | "nobility_title" -> print_foreach_nobility_title env al ep
     | "nob_title" -> print_foreach_nob_title env al ep
     | "parent" -> print_foreach_parent env al ep

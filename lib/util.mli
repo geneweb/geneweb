@@ -128,6 +128,12 @@ val is_restricted : config -> base -> iper -> bool
 val is_hidden : person -> bool
 (** Tells if person is hiden (if his surname is empty) *)
 
+val is_public : config -> base -> person -> bool
+(** Tells if person is public
+    - access=Public or
+    - IfTitle and has titles or
+    - is_old_person) *)
+
 val pget : config -> base -> iper -> person
 (** Returns person with giving id from the base.
     Wrapper around `Gwdb.poi` defined such as:
@@ -447,8 +453,6 @@ val is_hide_names : config -> person -> bool
 
 val reduce_list : int -> 'a list -> 'a list
 (** [reduce_list n l] takes [n] first elements from the list [l] *)
-
-val print_reference : config -> string -> int -> string -> unit
 
 val gen_print_tips : config -> Adef.safe_string -> unit
 (** Print a tip with the specified text *)

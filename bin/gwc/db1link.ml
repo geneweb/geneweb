@@ -700,7 +700,7 @@ let fevent_name_unique_string gen = function
   | Efam_Name n -> Efam_Name (unique_string gen n)
 
 (** Update family by looking up information inferred from family events *)
-let update_family_with_fevents gen fam =
+let update_family_with_fevents _gen fam =
   let found_marriage = ref false in
   let found_divorce = ref false in
   let nsck_std_fields =
@@ -710,21 +710,34 @@ let update_family_with_fevents gen fam =
   in
   (* On veut cette fois ci que ce soit le dernier évènement *)
   (* qui soit mis dans les évènements principaux.           *)
+  let convert relation =
+    match relation with
+    | Efam_Marriage ->
+        if nsck_std_fields then Some NoSexesCheckMarried else Some Married
+    | Efam_NoMarriage ->
+        if nsck_std_fields then Some NoSexesCheckNotMarried else Some NotMarried
+    | Efam_Engage -> Some Engaged
+    | Efam_NoMention -> Some NoMention
+    | Efam_MarriageBann -> Some MarriageBann
+    | Efam_MarriageContract -> Some MarriageContract
+    | Efam_MarriageLicense -> Some MarriageLicense
+    | Efam_PACS -> Some Pacs
+    | Efam_Residence -> Some Residence
+    | _ -> None
+  in
   let rec loop fevents fam =
     match fevents with
     | [] -> fam
     | evt :: l -> (
-        match evt.efam_name with
-        | Efam_Engage ->
+        match convert evt.efam_name with
+        | Some relation' ->
             if !found_marriage then loop l fam
             else
               let witnesses = Array.map fst evt.efam_witnesses in
               let fam =
                 {
                   fam with
-                  relation =
-                    (if nsck_std_fields then NoSexesCheckNotMarried
-                    else Engaged);
+                  relation = relation';
                   marriage = evt.efam_date;
                   marriage_place = evt.efam_place;
                   marriage_note = evt.efam_note;
@@ -734,104 +747,21 @@ let update_family_with_fevents gen fam =
               in
               let () = found_marriage := true in
               loop l fam
-        | Efam_Marriage ->
-            let witnesses = Array.map fst evt.efam_witnesses in
-            let fam =
-              {
-                fam with
-                relation =
-                  (if nsck_std_fields then NoSexesCheckMarried else Married);
-                marriage = evt.efam_date;
-                marriage_place = evt.efam_place;
-                marriage_note = evt.efam_note;
-                marriage_src = evt.efam_src;
-                witnesses;
-              }
-            in
-            let () = found_marriage := true in
-            fam
-        | Efam_MarriageContract ->
-            if !found_marriage then loop l fam
-            else
-              let witnesses = Array.map fst evt.efam_witnesses in
-              (* Pour différencier le fait qu'on recopie le *)
-              (* mariage, on met une précision "vers".      *)
-              let date =
-                match Date.od_of_cdate evt.efam_date with
-                | Some (Dgreg (dmy, cal)) ->
-                    let dmy = { dmy with prec = About } in
-                    Date.cdate_of_od (Some (Dgreg (dmy, cal)))
-                | Some (Dtext _) | None -> evt.efam_date
-              in
-              (* Pour différencier le fait qu'on recopie le *)
-              (* mariage, on ne met pas de lieu.            *)
-              let place = unique_string gen "" in
-              let fam =
-                {
-                  fam with
-                  relation =
-                    (if nsck_std_fields then NoSexesCheckMarried else Married);
-                  marriage = date;
-                  marriage_place = place;
-                  marriage_note = evt.efam_note;
-                  marriage_src = evt.efam_src;
-                  witnesses;
-                }
-              in
-              let () = found_marriage := true in
-              loop l fam
-        | Efam_NoMention | Efam_MarriageBann | Efam_MarriageLicense
-        | Efam_Annulation | Efam_PACS ->
-            if !found_marriage then loop l fam
-            else
-              let witnesses = Array.map fst evt.efam_witnesses in
-              let fam =
-                {
-                  fam with
-                  relation =
-                    (if nsck_std_fields then NoSexesCheckNotMarried
-                    else NoMention);
-                  marriage = evt.efam_date;
-                  marriage_place = evt.efam_place;
-                  marriage_note = evt.efam_note;
-                  marriage_src = evt.efam_src;
-                  witnesses;
-                }
-              in
-              let () = found_marriage := true in
-              loop l fam
-        | Efam_NoMarriage ->
-            if !found_marriage then loop l fam
-            else
-              let witnesses = Array.map fst evt.efam_witnesses in
-              let fam =
-                {
-                  fam with
-                  relation =
-                    (if nsck_std_fields then NoSexesCheckNotMarried
-                    else NotMarried);
-                  marriage = evt.efam_date;
-                  marriage_place = evt.efam_place;
-                  marriage_note = evt.efam_note;
-                  marriage_src = evt.efam_src;
-                  witnesses;
-                }
-              in
-              let () = found_marriage := true in
-              loop l fam
-        | Efam_Divorce ->
-            if !found_divorce then loop l fam
-            else
-              let fam = { fam with divorce = Divorced evt.efam_date } in
-              let () = found_divorce := true in
-              loop l fam
-        | Efam_Separated ->
-            if !found_divorce then loop l fam
-            else
-              let fam = { fam with divorce = Separated } in
-              let () = found_divorce := true in
-              loop l fam
-        | _ -> loop l fam)
+        | None -> (
+            match evt.efam_name with
+            | Efam_Divorce ->
+                if !found_divorce then loop l fam
+                else
+                  let fam = { fam with divorce = Divorced evt.efam_date } in
+                  let () = found_divorce := true in
+                  loop l fam
+            | Efam_Separated ->
+                if !found_divorce then loop l fam
+                else
+                  let fam = { fam with divorce = Separated } in
+                  let () = found_divorce := true in
+                  loop l fam
+            | _ -> loop l fam))
   in
   loop (List.rev fam.fevents) fam
 

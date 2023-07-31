@@ -141,6 +141,12 @@ let tnf s = "[" ^ s ^ "]"
 let transl conf w = try Hashtbl.find conf.lexicon w with Not_found -> tnf w
 
 let transl_nth conf w n =
+  let len = String.length w in
+  let w =
+    if len > 3 && w.[len - 1] = ':' && w.[len - 2] = ':' && w.[len - 3] = ':'
+    then String.sub w 0 (len - 3)
+    else w
+  in
   try nth_field (Hashtbl.find conf.lexicon w) n
   with Not_found -> tnf (nth_field w n)
 
@@ -339,6 +345,7 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
           List.mem k excl
           || (trim && (k = "oc" || k = "ocz") && (v :> string) = "0")
           || (v :> string) = ""
+          || k = "b"
         then c
         else c ^^^ k ^<^ "=" ^<^ (v :> Adef.escaped_string) ^>^ "&")
   in
@@ -355,7 +362,14 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
             (Format.sprintf "Poorly formatted command: %s" commd);
           commd
   in
-  let s = Adef.escaped @@ commd ^ "?" in
+  let s =
+    Adef.escaped
+    @@
+    if conf.cgi then
+      if conf.cgi_passwd = "" then commd ^ "?b=" ^ conf.bname ^ "&"
+      else commd ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd ^ "&"
+    else commd ^ "?"
+  in
   let s = if henv then aux s conf.henv else s in
   let s = if senv then aux s conf.senv else s in
   s
@@ -2357,27 +2371,6 @@ let reduce_list size list =
   in
   let sublist = loop size 0 [] list in
   List.rev sublist
-
-(* ********************************************************************** *)
-(*  [Fonc] print_reference : config -> string -> int -> string -> unit    *)
-
-(* ********************************************************************** *)
-
-(** [Description] : Affiche la référence d'une personne
-    [Args] :
-      - conf : configuration de la base
-      - fn   : first name
-      - occ  : occ
-      - sn   : surname
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                           *)
-let print_reference conf fn occ sn =
-  Output.print_sstring conf "<span class=\"reference\">";
-  Output.printf conf " (%s %s.%d %s)"
-    (transl conf "reference key")
-    (Name.lower fn) occ (Name.lower sn);
-  Output.print_sstring conf "</span>"
 
 (* ********************************************************************** *)
 (*  [Fonc] gen_print_tips : conf -> string -> unit                        *)

@@ -1,10 +1,14 @@
 open Config
 open Gwdb
 
+val portrait_folder : config -> string
+val carrousel_folder : config -> string
+val authorized_image_file_extension : string array
+
 val scale_to_fit : max_w:int -> max_h:int -> w:int -> h:int -> int * int
 (** [scale_to_fit ~max_w ~max_h ~w ~h] is the {(width, height)} of a proportionally scaled {(w, h)} rectangle so it can fit in a {(max_w, max_h)} rectangle *)
 
-val source_filename : string -> string -> string
+val source_filename : config -> string -> string
 (** Returns path to the image file with the giving name in directory {i src/}. *)
 
 val prefix : config -> Adef.escaped_string
@@ -54,3 +58,18 @@ val get_portrait :
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.
     - [Some src] with [src] the url or path of [p]'s portrait.
 *)
+
+val get_old_portrait :
+  config -> base -> person -> [> `Path of string | `Url of string ] option
+(** [get_portrait conf base p] is
+    - [None] if we don't have access to [p]'s portrait or it doesn't exist.
+    - [Some src] with [src] the url or path of [p]'s portrait.
+*)
+
+(* -- Carrousel -- *)
+
+val get_carrousel_imgs :
+  config -> base -> person -> (string * string * string * string) list
+
+val get_carrousel_old_imgs :
+  config -> base -> person -> (string * string * string * string) list

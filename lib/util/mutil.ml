@@ -178,13 +178,16 @@ let nominative s =
     Some _ -> decline 'n' s
   | _ -> s
 
-let mkdir_p ?(perm = 0o755) x =
-  let rec loop x =
-    let y = Filename.dirname x in
-    if y <> x && String.length y < String.length x then loop y;
-    try Unix.mkdir x perm with Unix.Unix_error (_, _, _) -> ()
+let mkdir_p ?(perm = 0o755) d =
+  let rec loop d =
+    let d1 = Filename.dirname d in
+    if d1 <> d && String.length d1 < String.length d then loop d1;
+    if not (Sys.file_exists d) then
+      try Unix.mkdir d perm
+      with Unix.Unix_error (_, _, _) ->
+        Printf.eprintf "Failed mkdir: %s\n" d
   in
-  loop x
+  loop d
 
 let rec remove_dir d =
   begin try
@@ -564,6 +567,17 @@ let rec list_find_map f = function
       | None -> list_find_map f l
     end
 
+let array_find_map f a =
+  let n = Array.length a in
+  let rec loop i =
+    if i = n then None
+    else
+      match f (Array.unsafe_get a i) with
+      | None -> loop (succ i)
+      | Some _ as r -> r
+  in
+  loop 0
+
 let rec list_last = function
   | [ ] -> raise (Failure "list_last")
   | [ x ] -> x
@@ -935,8 +949,8 @@ let gen_decode strip_spaces (s : Adef.encoded_string) : string =
   let rec need_decode i =
     if i < String.length s then
       match s.[i] with
-      '%' | '+' -> true
-          | _ -> need_decode (succ i)
+      | '%' | '+' -> true
+      | _ -> need_decode (succ i)
     else false
   in
   let rec compute_len i i1 =

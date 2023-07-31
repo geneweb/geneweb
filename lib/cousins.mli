@@ -82,13 +82,28 @@ val cousins_l1_l2_aux :
   (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int list) list
   option
 
+val cousins_implex_cnt :
+  base ->
+  int ->
+  (* max ancestors level *)
+  int ->
+  (* max descendants level *)
+  string ->
+  (* up l1 generations *)
+  string ->
+  (* down l2 generations *)
+  person ->
+  int
+(** for a list of "cousins" at level l1 l2,
+    cousins_implex computes cousins already seen at levels l < l2. *)
+
 val cousins_fold :
   (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int list) list ->
   (Gwdb_driver.iper
-  * (Gwdb_driver.ifam list * Gwdb_driver.iper list * int)
+  * (Gwdb_driver.ifam list list * Gwdb_driver.iper list * int)
   * int list)
   list
-(** create a new list of (ip, (ifaml, iancl, cnt), lev) from list of (ip, ifaml, ipar, lev)
+(** create a new list of (ip, (ifamll, iancl, cnt), lev) from list of (ip, ifaml, ianc, lev)
   The effect is to assemble multiple items under a single ip
 *)
 

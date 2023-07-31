@@ -282,17 +282,17 @@ let cousins_l1_l2_aux base max_a_l max_d_l l1 l2 p =
     Some cousins_cnt.(il1).(il2)
   else None
 
-(* create a new l (ip, (ifaml, iancl, cnt), lev) from (ip, ifaml, ipar, lev) *)
+(* create a new l (ip, (ifamll, iancl, cnt), lev) from (ip, ifaml, ianc, lev) *)
 let cousins_fold l =
-  let same_ifaml ifl1 ifl2 =
+  let _same_ifaml ifl1 ifl2 =
     List.for_all2 (fun if1 if2 -> if1 = if2) ifl1 ifl2
   in
   let l = List.sort compare l in
   let rec loop first acc (ip0, (ifaml0, iancl0, cnt0), lev0) = function
-    | (ip, ifaml, ianc, lev) :: l when ip = ip0 && same_ifaml ifaml ifaml0 ->
+    | (ip, ifaml, ianc, lev) :: l when ip = ip0 ->
         loop false acc
           ( ip,
-            ( ifaml,
+            ( ifaml :: ifaml0,
               (if List.mem ianc iancl0 then iancl0 else ianc :: iancl0),
               cnt0 + 1 ),
             lev @ lev0 )
@@ -301,13 +301,46 @@ let cousins_fold l =
         loop false
           (if first || cnt0 = 0 then acc
           else (ip0, (ifaml0, iancl0, cnt0), lev0) :: acc)
-          (ip, (ifaml, [ ianc ], 1), lev)
+          (ip, ([ ifaml ], [ ianc ], 1), lev)
           l
     | [] ->
         if first || cnt0 = 0 then acc
         else (ip0, (ifaml0, iancl0, cnt0), lev0) :: acc
   in
   loop false [] (Gwdb.dummy_iper, ([], [], 0), [ 0 ]) l
+
+let cousins_implex_cnt base max_a_l max_d_l l1 l2 p =
+  let il1 = int_of_string l1 in
+  let il2 = int_of_string l2 in
+  let cousins_cnt, _cousins_dates =
+    match (!cousins_t, !cousins_dates_t) with
+    | Some t, Some d_t -> (t, d_t)
+    | _, _ -> init_cousins_cnt base max_a_l max_d_l p
+  in
+  let cousl0 = cousins_fold cousins_cnt.(il1).(il2) in
+  let rec loop0 cousl cnt =
+    match cousl with
+    | [] -> cnt
+    | (ip, _, _) :: cousl ->
+        loop0 cousl
+          (let rec loop1 cnt j =
+             if j = 0 then cnt
+             else
+               loop1
+                 (let cousl_j = cousins_cnt.(il1).(j) in
+                  let rec loop2 cousl_j cnt =
+                    match cousl_j with
+                    | [] -> cnt
+                    | (ipj, _, _, _) :: cousl_j ->
+                        if ip = ipj then loop2 cousl_j (cnt + 1)
+                        else loop2 cousl_j cnt
+                  in
+                  loop2 cousl_j cnt)
+                 (j - 1)
+           in
+           loop1 cnt (il2 - 1))
+  in
+  loop0 cousl0 0
 
 let asc_cnt_t = ref None
 let desc_cnt_t = ref None
