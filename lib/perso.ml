@@ -2705,17 +2705,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           | _ -> raise Not_found)
       | None -> VVstring "-1")
   | [ "cous_implx_cnt"; l1; l2 ] ->
-      let max_a_l =
-        match get_env "max_anc_level" env with
-        | Vint i -> i
-        | _ -> max_anc_level_default
-      in
-      let max_d_l =
-        match get_env "max_desc_level" env with
-        | Vint i -> i
-        | _ -> max_desc_level_default
-      in
-      let cnt = Cousins.cousins_implex_cnt base max_a_l max_d_l l1 l2 p in
+      let cnt = Cousins.cousins_implex_cnt conf base l1 l2 p in
       VVstring (string_of_int cnt)
   | [ "cousins"; "max_a" ] ->
       let max_a, _ = Cousins.max_l1_l2 conf base p in

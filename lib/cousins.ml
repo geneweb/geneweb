@@ -264,17 +264,17 @@ let min_max_date conf base p min_max l1 l2 =
   in
   let i = try int_of_string l1 with Failure _ -> -1 in
   let j = try int_of_string l2 with Failure _ -> -1 in
-  match i, j with
+  match (i, j) with
   | -1, _ | _, -1 -> None
   | _, _ ->
-    let min, max =
-      if
-        i + 1 > Array.length cousins_dates
-        || j + 1 > Array.length cousins_dates.(i)
-      then (-1, -1)
-      else cousins_dates.(i).(j)
-    in
-    if min_max then Some min else Some max
+      let min, max =
+        if
+          i + 1 > Array.length cousins_dates
+          || j + 1 > Array.length cousins_dates.(i)
+        then (-1, -1)
+        else cousins_dates.(i).(j)
+      in
+      if min_max then Some min else Some max
 
 (* determine non empty max ancestor level (max_i)
    and non empty max descendant level
@@ -340,13 +340,13 @@ let cousins_fold l =
   in
   loop false [] (Gwdb.dummy_iper, ([], [], 0), [ 0 ]) l
 
-let cousins_implex_cnt base max_a_l max_d_l l1 l2 p =
+let cousins_implex_cnt conf base l1 l2 p =
   let il1 = int_of_string l1 in
   let il2 = int_of_string l2 in
   let cousins_cnt, _cousins_dates =
     match (!cousins_t, !cousins_dates_t) with
     | Some t, Some d_t -> (t, d_t)
-    | _, _ -> init_cousins_cnt base max_a_l max_d_l p
+    | _, _ -> init_cousins_cnt conf base p
   in
   let cousl0 = cousins_fold cousins_cnt.(il1).(il2) in
   let rec loop0 cousl cnt =
