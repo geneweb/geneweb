@@ -5620,6 +5620,22 @@ pt: árvore de descendentes
 sv: träd av ättlingar
 tr: nesil ağacı
 
+    compact descendants tree
+en: compact descendants tree
+fr: arbre de descendance compact
+
+    partial
+en: limited to ancestors and siblings
+fr: limité aux ascendants et leurs frères et soeurs
+
+    open individual page
+en: open individual page
+fr: ouvrir la page individuelle
+
+    new tree with this individual
+en: new tree with this individual
+fr: nouvel arbre à partir de cet individu
+
     died
 af: oorlede
 ar: توفي
@@ -10897,6 +10913,10 @@ ru: навигация
 sl: pregled
 sv: navigering
 tr: navigasyon
+
+    navigation with this individual
+en: navigation in tree with this individual
+fr: naviguer dans l'arbre avec cet individu
 
     navigation with %t as Sosa reference
 af: stap met %t as Sosa verwysing

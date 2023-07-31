@@ -21,14 +21,14 @@
   %if;(e.oc!="")&oc=%e.oc;%end;%in; %(%access does not work %)
 <div class="container-fluid">
 %include;home
-<h1 class="h3">
+<h1 class="h1">
   %if;(e.slices="on")
     [*display by slices/slice width/overlap/total width]0
   %else;
-    %if;(e.m="D")[*descendants tree]%if;(e.t="TV") [compact] ou réduit ?%( TODO %)%end;
+    %if;(e.m="D")[*compact descendants tree]
     %elseif;(e.m="A")[*ascendants tree]
     %else;[*relation/relations]0 ([shortest path])%end;
-    %if;(e.oi!="") [partial]%end;
+    %if;(e.oi!="") <span style="font-size:60%%""> ([partial])</span>%end;
     %if;(e.dag="on") + [dag]%end;
   %end;
 </h1>
@@ -169,7 +169,7 @@
                 %if;(not (env.key="i" or env.key="p" or env.key="n" or env.key="oc" or
                           env.key="m" or env.key="t"))%env.key;=%env.val;&%end;%end;"
                 class="stretched-link"
-                title="[*navigation] on tree [with] this individual" style="line-height:1rem"></a>
+                title="[*navigation with this individual] " style="line-height:1rem"></a>
               %end;
           %end;
           <div class="d-flex-row flex-column justify-content-between%if;(dag_cell.item!="") mx-1%end;">%dag_cell.item;</div>

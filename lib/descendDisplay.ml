@@ -1409,7 +1409,8 @@ let get_text conf base p filler img cgl =
     else txt
   in
   let vbar_image =
-    if filler && img then
+    (* TODO check if necessary *)
+    if filler && img && false then
       Printf.sprintf
         "<div class=\"flex-grow-1\"><img src=\"%sm=IM&v=vbar.jpg\" \
          class=\"img-fluid\"></div>\n"
@@ -1535,8 +1536,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
         (if sps then "" else "&sp=0")
         (if img then "" else "&im=0")
         "class=\"normal_anchor px-3 btn-outline-primary border-0\""
-        (Utf8.capitalize_fst
-           (Util.transl conf "limit tree to ancestors and siblings"))
+        (Utf8.capitalize_fst (Util.transl conf "partial"))
   in
   let txt = if ir > 0 then only ^ "<br>" ^ txt else txt in
   (* ajouter un marqueur ici si enfants et on ne continue pas !!   *)
@@ -1626,7 +1626,7 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
   in
   let txt = txt ^ if kids <> [] then br_sp else "" in
   let txt = if sps then m_txt ^ txt else m_txt in
-  let txt = if kids <> [] then txt ^ "|" else txt in
+  let txt = if kids <> [] then txt ^ "<br>|" else txt in
   let flag =
     string_of_ifam ifam ^ if kids <> [] then "-spouse_no_d" else "-spouse"
   in
@@ -1819,15 +1819,17 @@ let rec find_ancestors base iap ip list v =
 let make_vaucher_tree_hts conf base gv p =
   let sps =
     match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
-    | Some "on", _ | _, Some "on" -> true
+    | Some "on", _ | Some "1", _ | _, Some "on" -> true
     | _, _ -> false
   in
   let marr =
-    match Util.p_getenv conf.env "ma" with Some "on" -> true | _ -> false
+    match (Util.p_getenv conf.env "ma", Util.p_getenv conf.env "marriage") with
+    | Some "on", _ | Some "1", _ | _, Some "on" -> true
+    | _, _ -> false
   in
   let img =
     match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
-    | Some "off", _ | _, Some "off" -> false
+    | Some "off", _ | Some "0", _ | _, Some "off" -> false
     | _, _ -> true
   in
   let cgl =
