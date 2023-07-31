@@ -170,6 +170,12 @@ val list_find_map : ('a -> 'b option) -> 'a list -> 'b option
     backported into GeneWeb
   *)
 
+val array_find_map : ('a -> 'b option) -> 'a array -> 'b option
+(** [array_find_map f a] applies [f] to the elements of [a] in order, and returns the
+    first result of the form [Some v], or [None] if none exist.
+    TODO OCaml 4.13; use Stdlib
+*)
+
 val list_rev_iter : ('a -> unit) -> 'a list -> unit
 (** [list_rev_iter f l] gives the same result as [List.rev l |> List.iter fn],
     but without creating intermediate list (not tail-recursive).
