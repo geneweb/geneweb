@@ -1171,6 +1171,9 @@ type 'a env =
   | Vslist of SortedList.t ref
   | Vslistlm of string list list
   | Vind of person
+  (* TODO Vfam should not have m_auth (last bool parameter)
+     we should only have a Vfam if m_auth is true;
+     this would remove many test and be safer *)
   | Vfam of ifam * family * (iper * iper * iper) * bool
   | Vrel of relation * person option
   | Vbool of bool
@@ -1280,6 +1283,7 @@ let make_ep conf base ip =
   let p_auth = authorized_age conf base p in
   (p, p_auth)
 
+(* TODO this should be a (fam * cpl) option; None if m_auth is false *)
 let make_efam conf base ip ifam =
   let fam = foi base ifam in
   let ifath = get_father fam in
