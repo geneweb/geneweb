@@ -109,16 +109,6 @@ You can have a description of available configuration options using
 $ ocaml ./configure.ml --help
 ```
 
-### Coding style
-
-* Try to keep the same coding style as the existing one.
-* New code should not contain any trailing whitespace.
-* Each pull request should have a single clear purpose. If it contains
-  multiple unrelated changes, those changes should be split into
-  separate pull requests.
-* If the PR needs to be update, push force.
-* When submitting a new feature/function, write documentation and tests if it is relevant.
-
 ## Copyright
 
 All files marked in this distribution are Copyright (c) 1998-2016 INRIA
