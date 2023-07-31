@@ -493,15 +493,9 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
   let image_opt =
     Adef.escaped
     @@
-    if
-      p_getenv conf.env "image" = Some "off"
-    then "&image=off"
+    if p_getenv conf.env "image" = Some "off" then "&image=off"
     else if
-      || p_getenv conf.env "im" = Some "off"
-<<<<<<< HEAD
-      || p_getenv conf.env "im" = Some "0"
-=======
->>>>>>> Suppress test for sp/im=0/1 in ml code
+      p_getenv conf.env "im" = Some "off" || p_getenv conf.env "im" = Some "0"
     then "&im=off"
     else ""
   in
@@ -553,12 +547,9 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
   let image_opt =
     Adef.escaped
     @@
-    if
-      p_getenv conf.env "image" = Some "off"
-    then "&image=off"
+    if p_getenv conf.env "image" = Some "off" then "&image=off"
     else if
-      || p_getenv conf.env "im" = Some "off"
-      || p_getenv conf.env "im" = Some "0"
+      p_getenv conf.env "im" = Some "off" || p_getenv conf.env "im" = Some "0"
     then "&im=off"
     else ""
   in
@@ -742,15 +733,10 @@ let print_dag_links conf base p1 p2 rl =
             l2;
           if p_getenv conf.env "image" = Some "off" then
             Output.print_sstring conf "&image=off"
-<<<<<<< HEAD
           else if
             p_getenv conf.env "im" = Some "off"
             || p_getenv conf.env "im" = Some "0"
           then Output.print_sstring conf "&im=off";
-=======
-          else if p_getenv conf.env "im" = Some "off" then
-            Output.print_sstring conf "&im=off";
->>>>>>> Suppress test for sp/im=0/1 in ml code
           if p_getenv conf.env "bd" = Some "on" then
             Output.print_sstring conf "&bd=on";
           Output.print_sstring conf {|&dag=on">|};
