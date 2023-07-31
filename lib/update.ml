@@ -150,6 +150,8 @@ let rec infer_death conf base p =
 
 (* ************************************************************************** *)
 
+(* ************************************************************************** *)
+
 (** [Description] : Print several information to distinguish homonyms. The
       information includes name of the person, name of the parents,
       name of the spouse.
@@ -159,17 +161,16 @@ let rec infer_death conf base p =
       - p    : person
     [Retour] : unit
     [Rem] : Not visible.                                                      *)
-(* ************************************************************************** *)
 let print_person_parents_and_spouses conf base p =
-  Output.print_sstring conf {|<a href="|} ;
-  Output.print_string conf (commd conf) ;
-  Output.print_string conf (acces conf base p) ;
-  Output.print_sstring conf {|">|} ;
-  Output.print_string conf (escape_html @@ p_first_name base p) ;
-  Output.print_sstring conf "." ;
-  Output.print_sstring conf (string_of_int @@ get_occ p) ;
-  Output.print_sstring conf " " ;
-  Output.print_string conf (escape_html @@ p_surname base p) ;
+  Output.print_sstring conf {|<a href="|};
+  Output.print_string conf (commd conf);
+  Output.print_string conf (acces conf base p);
+  Output.print_sstring conf {|">|};
+  Output.print_string conf (escape_html @@ p_first_name base p);
+  Output.print_sstring conf ".";
+  Output.print_sstring conf (string_of_int @@ get_occ p);
+  Output.print_sstring conf " ";
+  Output.print_string conf (escape_html @@ p_surname base p);
   Output.print_sstring conf "</a>";
   Output.print_string conf (DateDisplay.short_dates_text conf base p);
   let cop = Util.child_of_parent conf base p in
