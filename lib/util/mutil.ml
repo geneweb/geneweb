@@ -567,6 +567,17 @@ let rec list_find_map f = function
       | None -> list_find_map f l
     end
 
+let array_find_map f a =
+  let n = Array.length a in
+  let rec loop i =
+    if i = n then None
+    else
+      match f (Array.unsafe_get a i) with
+      | None -> loop (succ i)
+      | Some _ as r -> r
+  in
+  loop 0
+
 let rec list_last = function
   | [ ] -> raise (Failure "list_last")
   | [ x ] -> x

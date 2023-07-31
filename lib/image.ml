@@ -35,7 +35,7 @@ let find_img_opt f =
       close_in ic;
       Some (`Url url)
   | None -> (
-      match Array.find_map exists authorized_image_file_extension with
+      match Mutil.array_find_map exists authorized_image_file_extension with
       | None -> None
       | Some f -> Some (`Path f))
 
