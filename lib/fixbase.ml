@@ -495,17 +495,20 @@ let fix_key ?report progress base =
 
 let special_utf_8 s =
   let s =
-    if String.length s = 3 &&
-       Char.code s.[0] = 0xE2 &&
-       Char.code s.[1] = 0x80 &&
-      (Char.code s.[2] = 0x98 || (* ’ apostrophes typo *)
-       Char.code s.[2] = 0x99) then " "
+    if
+      String.length s = 3
+      && Char.code s.[0] = 0xE2
+      && Char.code s.[1] = 0x80
+      && (Char.code s.[2] = 0x98
+         || (* ’ apostrophes typo *)
+         Char.code s.[2] = 0x99)
+    then " "
     else s
   in
-  if String.length s > 0 &&
-     Char.code s.[0] < 0x80 then match s.[0] with
-      | 'a'..'z' | 'A'..'Z' | '0'..'9' | '.' -> s
-      | _ -> " "
+  if String.length s > 0 && Char.code s.[0] < 0x80 then
+    match s.[0] with
+    | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '.' -> s
+    | _ -> " "
   else s
 
 let string_unaccent ?(special = false) lower s =
