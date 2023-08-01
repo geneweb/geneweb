@@ -545,7 +545,6 @@ let scan_utf8_conflicts ?report progress base =
   let nb_ind = Gwdb.nb_of_persons base in
   let ht = Hashtbl.create nb_ind in
   let htoc = Hashtbl.create 100 in
-  (* up to 100 changes! *)
   let ipers = Gwdb.ipers base in
   Gwdb.Collection.iteri
     (fun i ip ->

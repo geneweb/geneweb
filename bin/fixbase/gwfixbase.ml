@@ -51,6 +51,8 @@ let aux txt
           | Some (i, i') -> string_of_istr i ^ " -> " ^ string_of_istr i'
           | None -> "Dtext")
     | Fix_UpdatedOcc (iper, oocc, nocc) ->
+        (* TODO check NLDB entries and warn user of possible updates needed *)
+        (* see UpdateIndOk.print_mod_ok for an implementation *)
         Printf.sprintf "Uptated occ for %s: %d -> %d" (string_of_p iper) oocc
           nocc
   in
