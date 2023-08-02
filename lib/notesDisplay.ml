@@ -116,6 +116,35 @@ let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
   Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines;
   Hutil.trailer conf
 
+let linked_list conf base pgl =
+  List.fold_left
+    (fun acc pg ->
+      match pg with
+      | Def.NLDB.PgInd ip ->
+          let p = pget conf base ip in
+          let str =
+            Printf.sprintf "%s %s\n"
+              (Util.referenced_person_title_text conf base p :> string)
+              (DateDisplay.short_dates_text conf base p :> string)
+          in
+          acc ^ str
+      | Def.NLDB.PgFam ifam ->
+          let fam = Gwdb.foi base ifam in
+          let fath = pget conf base (Gwdb.get_father fam) in
+          let moth = pget conf base (Gwdb.get_mother fam) in
+          let str =
+            Printf.sprintf "%s %s &amp; %s %s\n"
+              (Util.referenced_person_title_text conf base fath :> string)
+              (DateDisplay.short_dates_text conf base fath :> string)
+              (Util.referenced_person_title_text conf base moth :> string)
+              (DateDisplay.short_dates_text conf base moth :> string)
+          in
+          acc ^ str
+      | Def.NLDB.PgNotes -> acc ^ "\n" ^ (transl_nth conf "note/notes" 1)
+      | Def.NLDB.PgMisc fnotes -> acc ^ "\n" ^ (Util.escape_html fnotes :> string)
+      | Def.NLDB.PgWizard wizname -> acc ^ "\n" ^ (Util.escape_html wizname :> string))
+    "" pgl
+
 let print_linked_list conf base pgl =
   Output.print_sstring conf "<ul>";
   List.iter

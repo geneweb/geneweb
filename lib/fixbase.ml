@@ -574,6 +574,7 @@ let scan_utf8_conflicts ?report progress base =
           Hashtbl.add htoc v1 occ';
           Gwdb.patch_person base ip
             { (Gwdb.gen_person_of_person (poi base ip)) with occ = occ' };
+          (* TODO change portrait filename if not dry_run *)
           match report with
           | Some fn -> fn (Fix_UpdatedOcc (ip, int_of_string occ, occ'))
           | None -> ()))

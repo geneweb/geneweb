@@ -1,7 +1,7 @@
 open Geneweb
 open Gwdb
 
-let aux txt
+let aux conf txt
     (fn :
       ?report:(Fixbase.patch -> unit) -> (int -> int -> unit) -> base -> unit)
     ~v1 ~v2 base n cnt =
@@ -53,8 +53,23 @@ let aux txt
     | Fix_UpdatedOcc (iper, oocc, nocc) ->
         (* TODO check NLDB entries and warn user of possible updates needed *)
         (* see UpdateIndOk.print_mod_ok for an implementation *)
-        Printf.sprintf "Uptated occ for %s: %d -> %d" (string_of_p iper) oocc
-          nocc
+        let ofn = sou base (get_first_name (poi base iper)) in
+        let osn = sou base (get_surname (poi base iper)) in
+        let okey = (Name.lower ofn, Name.lower osn, oocc) in
+        let pgl =
+          let db = Gwdb.read_nldb base in
+          let db = Notes.merge_possible_aliases conf db in
+          Perso.links_to_ind conf base db okey
+        in
+        let notes_list =
+          if pgl <> [] then
+            Printf.sprintf "\n%s\n%s"
+             (Util.transl conf "notes to be updated")
+             (NotesDisplay.linked_list conf base pgl)
+          else ""
+        in
+        Printf.sprintf "Uptated occ for %s: %d -> %d%s" (string_of_p iper) oocc
+          nocc notes_list
   in
   let i' = ref 0 in
   if v1 then (
@@ -82,36 +97,39 @@ let aux txt
   fn ?report progress base;
   if v1 then ProgrBar.finish ()
 
-let check_NBDS = aux "Check persons' NBDS" Fixbase.check_NBDS
+let check_NBDS conf =
+  aux conf "Check persons' NBDS" Fixbase.check_NBDS
 
-let check_families_parents =
-  aux "Check families' parents" Fixbase.check_families_parents
+let check_families_parents conf =
+  aux conf "Check families' parents" Fixbase.check_families_parents
 
-let check_families_children =
-  aux "Check families' children" Fixbase.check_families_children
+let check_families_children conf =
+  aux conf "Check families' children" Fixbase.check_families_children
 
-let check_persons_parents =
-  aux "Check persons' parents" Fixbase.check_persons_parents
+let check_persons_parents conf =
+  aux conf "Check persons' parents" Fixbase.check_persons_parents
 
-let check_persons_families =
-  aux "Check persons' families" Fixbase.check_persons_families
+let check_persons_families conf =
+  aux conf "Check persons' families" Fixbase.check_persons_families
 
-let check_pevents_witnesses =
-  aux "Check persons' events witnesses" Fixbase.check_pevents_witnesses
+let check_pevents_witnesses conf =
+  aux conf "Check persons' events witnesses"
+    Fixbase.check_pevents_witnesses
 
-let check_fevents_witnesses =
-  aux "Check family events witnesses" Fixbase.check_fevents_witnesses
+let check_fevents_witnesses conf =
+  aux conf "Check family events witnesses" Fixbase.check_fevents_witnesses
 
-let fix_marriage_divorce =
-  aux "Fix families' marriage and divorce" Fixbase.fix_marriage_divorce
+let fix_marriage_divorce conf =
+  aux conf "Fix families' marriage and divorce"
+    Fixbase.fix_marriage_divorce
 
-let fix_utf8_sequence =
-  aux "Fix invalid UTF-8 sequence" Fixbase.fix_utf8_sequence
+let fix_utf8_sequence conf =
+  aux conf "Fix invalid UTF-8 sequence" Fixbase.fix_utf8_sequence
 
-let fix_key = aux "Fix duplicate keys" Fixbase.fix_key
+let fix_key conf = aux conf "Fix duplicate keys" Fixbase.fix_key
 
-let scan_utf8_conflicts =
-  aux "Scan for possible UTF-8 conflicts" Fixbase.scan_utf8_conflicts
+let scan_utf8_conflicts conf =
+  aux conf "Scan for possible UTF-8 conflicts" Fixbase.scan_utf8_conflicts
 
 let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
@@ -121,23 +139,27 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   if not v1 then Mutil.verbose := false;
   let fast = !fast in
   let base = Gwdb.open_base bname in
+  let conf = Config.empty in
   let fix = ref 0 in
   let nb_fam = nb_of_families base in
   let nb_ind = nb_of_persons base in
   if fast then (
     load_strings_array base;
     load_persons_array base);
-  if !f_parents then check_families_parents ~v1 ~v2 base nb_fam fix;
-  if !f_children then check_families_children ~v1 ~v2 base nb_fam fix;
-  if !p_parents then check_persons_parents ~v1 ~v2 base nb_ind fix;
-  if !p_NBDS then check_NBDS base ~v1 ~v2 nb_ind fix;
-  if !p_families then check_persons_families ~v1 ~v2 base nb_ind fix;
-  if !pevents_witnesses then check_pevents_witnesses ~v1 ~v2 base nb_ind fix;
-  if !fevents_witnesses then check_fevents_witnesses ~v1 ~v2 base nb_fam fix;
-  if !marriage_divorce then fix_marriage_divorce ~v1 ~v2 base nb_fam fix;
-  if !invalid_utf8 then fix_utf8_sequence ~v1 ~v2 base nb_fam fix;
-  if !key then fix_key ~v1 ~v2 base nb_ind fix;
-  if !utf8_key then scan_utf8_conflicts ~v1 ~v2 base nb_ind fix;
+  if !f_parents then check_families_parents conf ~v1 ~v2 base nb_fam fix;
+  if !f_children then check_families_children conf ~v1 ~v2 base nb_fam fix;
+  if !p_parents then check_persons_parents conf ~v1 ~v2 base nb_ind fix;
+  if !p_NBDS then check_NBDS conf ~v1 ~v2 base nb_ind fix;
+  if !p_families then check_persons_families conf ~v1 ~v2 base nb_ind fix;
+  if !pevents_witnesses then
+    check_pevents_witnesses conf ~v1 ~v2 base nb_ind fix;
+  if !fevents_witnesses then
+    check_fevents_witnesses conf ~v1 ~v2 base nb_fam fix;
+  if !marriage_divorce then
+    fix_marriage_divorce conf ~v1 ~v2 base nb_fam fix;
+  if !invalid_utf8 then fix_utf8_sequence conf ~v1 ~v2 base nb_fam fix;
+  if !key then fix_key conf ~v1 ~v2 base nb_ind fix;
+  if !utf8_key then scan_utf8_conflicts conf ~v1 ~v2 base nb_ind fix;
   if fast then (
     clear_strings_array base;
     clear_persons_array base);
