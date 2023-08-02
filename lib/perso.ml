@@ -5239,8 +5239,9 @@ let eval_predefined_apply conf env f vl =
 let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
   template_file := templ_fname ^ ".txt";
   let ep = (p, authorized_age conf base p) in
-  (* TODO what is this? what are those "120" *)
-  let emal = match p_getint conf.env "v" with Some i -> i | None -> 120 in
+  let emal =
+    match p_getint conf.env "v" with Some i -> i | None -> Cousins.mal
+  in
   let env =
     let sosa_ref = Util.find_sosa_ref conf base in
     if sosa_ref <> None then SosaCache.build_sosa_ht conf base;
@@ -5254,25 +5255,33 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       Lazy.from_fun dlt
     in
     let desc_level_table_m =
-      let dlt () = make_desc_level_table conf base 120 p in
+      let dlt () = make_desc_level_table conf base Cousins.mdl p in
       Lazy.from_fun dlt
     in
     let desc_level_table_l_save =
       let dlt () = make_desc_level_table conf base emal p in
       Lazy.from_fun dlt
     in
-    let mal () = Vint (max_ancestor_level conf base (get_iper p) emal + 1) in
+    let mal () =
+      Vint (Cousins.max_ancestor_level conf base (get_iper p) (emal + 1))
+    in
     (* Static max ancestor level *)
-    let smal () = Vint (max_ancestor_level conf base (get_iper p) 120 + 1) in
+    let smal () =
+      Vint (Cousins.max_ancestor_level conf base (get_iper p) Cousins.mal)
+    in
     (* Sosa_ref max ancestor level *)
     let srmal () =
       match Util.find_sosa_ref conf base with
       | Some sosa_ref ->
-          Vint (max_ancestor_level conf base (get_iper sosa_ref) 120 + 1)
+          Vint
+            (Cousins.max_ancestor_level conf base (get_iper sosa_ref)
+               Cousins.mal)
       | None -> Vint 0
     in
     let mcl () = Vint (Cousins.max_cousin_level conf base p) in
-    (* Récupère le nombre maximal de niveaux de descendance en prenant en compte les liens inter-arbres (limité à 10 générations car problématique en terme de perf). *)
+    (* Récupère le nombre maximal de niveaux de descendance en prenant en
+       compte les liens inter-arbres (limité à 10 générations car
+       problématique en terme de perf). *)
     let mdl () =
       Vint
         (max

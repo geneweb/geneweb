@@ -193,9 +193,6 @@ val main_title : config -> base -> person -> title option
 (** Returns main person's title. If person doesn't have it, then returns first title
     from the list. *)
 
-val max_ancestor_level : config -> base -> iper -> int -> int
-val max_descendant_level : config -> base -> iper -> int -> int
-
 val titled_person_text : config -> base -> person -> title -> Adef.safe_string
 (** Returns person's first name and surname text description depending on
     person's title *)

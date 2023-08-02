@@ -13,7 +13,15 @@ val cousins_dates_t : (int * int) array array option ref
 val default_max_cnt : int
 (** Default number of relatives that could be listed at the same page *)
 
+val mal : int
+(** max value of max_ancestor_level *)
+
+val mdl : int
+(** max value of max_descendant_level *)
+
 val max_cousin_level : config -> base -> person -> int
+val max_ancestor_level : config -> base -> iper -> int -> int
+val max_descendant_level : config -> base -> iper -> int -> int
 
 val children_of_fam : base -> ifam -> iper list
 (** Retruns list of children of the giving family *)
