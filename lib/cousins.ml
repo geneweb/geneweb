@@ -6,13 +6,10 @@ open Util
 
 let default_max_cnt = 2000
 
-let max_cousin_level conf base p =
+let max_cousin_level conf _base _p =
   let default_max_cousin_lvl = 6 in
-  let max_lvl =
-    try int_of_string (List.assoc "max_cousins_level" conf.Config.base_env)
-    with Not_found | Failure _ -> default_max_cousin_lvl
-  in
-  Util.max_ancestor_level conf base (get_iper p) max_lvl + 1
+  try int_of_string (List.assoc "max_cousins_level" conf.Config.base_env)
+  with Not_found | Failure _ -> default_max_cousin_lvl
 
 let children_of base u =
   Array.fold_right
@@ -80,9 +77,42 @@ let tm = Unix.localtime (Unix.time ())
 let today_year = tm.Unix.tm_year + 1900
 let cousins_t = ref None
 let cousins_dates_t = ref None
+let mal = 120
+let mdl = 120
 
 let update_min_max (min, max) date =
   ((if date < min then date else min), if date > max then date else max)
+
+let max_ancestor_level conf base ip max_lvl =
+  let x = ref 0 in
+  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
+  (* Loading ITL cache, up to 10 generations. *)
+  let () = !GWPARAM_ITL.init_cache conf base ip 10 0 0 in
+  let rec loop level ip =
+    (* Ne traite pas l'index s'il a déjà été traité. *)
+    (* Pose surement probleme pour des implexes. *)
+    if not @@ Gwdb.Marker.get mark ip then (
+      (* Met à jour le tableau d'index pour indiquer que l'index est traité. *)
+      Gwdb.Marker.set mark ip true;
+      x := max !x level;
+      if !x <> max_lvl then
+        match get_parents (pget conf base ip) with
+        | Some ifam ->
+            let cpl = foi base ifam in
+            loop (succ level) (get_father cpl);
+            loop (succ level) (get_mother cpl)
+        | _ ->
+            x :=
+              max !x
+                (!GWPARAM_ITL.max_ancestor_level
+                   conf base ip conf.bname max_lvl level))
+  in
+  loop 0 ip;
+  !x
+
+let max_descendant_level _conf _base _ip _max_lvl =
+  (* TODO we should compute this value *)
+  120
 
 let get_min_max_dates base l =
   let rec loop (min, max) = function
@@ -199,8 +229,8 @@ let descendants base cousins_cnt i j =
   descendants_aux base liste1 liste2
 
 let init_cousins_cnt conf base p =
-  let max_a_l = Util.max_ancestor_level conf base (get_iper p) 120 in
-  let max_d_l = Util.max_descendant_level conf base (get_iper p) 120 in
+  let max_a_l = max_ancestor_level conf base (get_iper p) mal in
+  let max_d_l = max_descendant_level conf base (get_iper p) mdl in
   match (!cousins_t, !cousins_dates_t) with
   | Some t, Some d_t -> (t, d_t)
   | _, _ ->
@@ -378,7 +408,7 @@ let desc_cnt_t = ref None
 
 (* tableau des ascendants de p *)
 let init_asc_cnt conf base p =
-  let max_a_l = Util.max_ancestor_level conf base (get_iper p) 120 in
+  let max_a_l = max_ancestor_level conf base (get_iper p) mal in
   match !asc_cnt_t with
   | Some t -> t
   | None ->
@@ -396,7 +426,7 @@ let init_asc_cnt conf base p =
 
 (* tableau des ascendants de p *)
 let init_desc_cnt conf base p =
-  let max_d_l = Util.max_descendant_level conf base (get_iper p) 120 in
+  let max_d_l = max_descendant_level conf base (get_iper p) mdl in
   match !desc_cnt_t with
   | Some t -> t
   | None ->
