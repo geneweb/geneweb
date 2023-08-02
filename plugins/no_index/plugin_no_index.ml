@@ -12,7 +12,7 @@ let url_no_index conf base pwd =
       let p = Util.pget conf base i in
       if
         (Util.is_hide_names conf p && not (Util.authorized_age conf base p))
-        || Util.is_hidden p
+        || Util.is_empty_person p
       then None
       else
         let f = scratch (Gwdb.get_first_name p) in

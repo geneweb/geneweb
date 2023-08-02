@@ -69,32 +69,10 @@ module Default = struct
                   | Some fn -> output_file conf fn
                   | None -> Output.print_sstring conf "")))
 
-  (** Calcul les droits de visualisation d'une personne en
-      fonction de son age.
-      Renvoie (dans l'ordre des tests) :
-      - Vrai si : magicien ou ami ou la personne est public
-      - Vrai si : la personne est en si_titre, si elle a au moins un
-                  titre et que public_if_title = yes dans le fichier gwf
-      - Faux si : la personne n'est pas décédée et private_years > 0
-      - Vrai si : la personne est plus agée (en fonction de la date de
-                  naissance ou de la date de baptème) que privates_years
-      - Faux si : la personne est plus jeune (en fonction de la date de
-                  naissance ou de la date de baptème) que privates_years
-      - Vrai si : la personne est décédée depuis plus de privates_years
-      - Faux si : la personne est décédée depuis moins de privates_years
-      - Vrai si : la personne a entre 80 et 120 ans et qu'elle n'est pas
-                  privée et public_if_no_date = yes
-      - Vrai si : la personne s'est mariée depuis plus de private_years
-      - Faux dans tous les autres cas *)
-  let p_auth conf base p =
-    conf.Config.wizard || conf.friend
-    || Gwdb.get_access p = Public
-    || conf.public_if_titles
-       && Gwdb.get_access p = IfTitles
-       && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
-    ||
+  let is_contemporary conf base p =
+    not @@
     let death = Gwdb.get_death p in
-    if death = NotDead then conf.private_years < 1
+    if death = NotDead then conf.Config.private_years < 1
     else
       let check_date d none =
         match d with
@@ -120,6 +98,31 @@ module Default = struct
              (fun () -> loop (i + 1))
       in
       loop 0
+
+  (** Calcul les droits de visualisation d'une personne en
+      fonction de son age.
+      Renvoie (dans l'ordre des tests) :
+      - Vrai si : magicien ou ami ou la personne est public
+      - Vrai si : la personne est en si_titre, si elle a au moins un
+                  titre et que public_if_title = yes dans le fichier gwf
+      - Faux si : la personne n'est pas décédée et private_years > 0
+      - Vrai si : la personne est plus agée (en fonction de la date de
+                  naissance ou de la date de baptème) que privates_years
+      - Faux si : la personne est plus jeune (en fonction de la date de
+                  naissance ou de la date de baptème) que privates_years
+      - Vrai si : la personne est décédée depuis plus de privates_years
+      - Faux si : la personne est décédée depuis moins de privates_years
+      - Vrai si : la personne a entre 80 et 120 ans et qu'elle n'est pas
+                  privée et public_if_no_date = yes
+      - Vrai si : la personne s'est mariée depuis plus de private_years
+      - Faux dans tous les autres cas *)
+  let p_auth conf base p =
+    conf.Config.wizard || conf.friend
+    || Gwdb.get_access p = Public
+    || conf.public_if_titles
+       && Gwdb.get_access p = IfTitles
+       && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
+    || not (is_contemporary conf base p)
 
   let syslog (level : syslog_level) msg =
     let tm = Unix.(time () |> localtime) in
@@ -159,6 +162,7 @@ let init = ref Default.init
 let base_path = ref Default.base_path
 let bpath = ref Default.bpath
 let output_error = ref Default.output_error
+let is_contemporary = ref Default.is_contemporary
 let p_auth = ref Default.p_auth
 let syslog = ref Default.syslog
 

@@ -123,6 +123,9 @@ let insert_descend = patch_descend
 
 let delete_person base ip =
   patch_person base ip
+    (* TODO this is almost like no_person:
+       { (Mutil.empty_person empty_string quest_string) with key_index = ip }
+    *)
     {
       first_name = quest_string;
       surname = quest_string;

@@ -112,13 +112,14 @@ let display_descendants_level conf base max_level ancestor =
   Output.print_sstring conf ".<p>";
   print_alphab_list conf
     (fun (p, _) ->
-      if is_hidden p then "?"
+      if is_empty_person p then "?"
       else String.sub (p_surname base p) (Mutil.initial (p_surname base p)) 1)
     (fun (p, c) ->
       Output.print_sstring conf " ";
       Output.print_string conf (referenced_person_title_text conf base p);
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
-      if (not (is_hidden p)) && c > 1 then Output.printf conf " <em>(%d)</em>" c;
+      if (not (is_empty_person p)) && c > 1 then
+        Output.printf conf " <em>(%d)</em>" c;
       Output.print_sstring conf "\n")
     list;
   Hutil.trailer conf

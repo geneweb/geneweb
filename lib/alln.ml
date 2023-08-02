@@ -63,7 +63,10 @@ let select_names conf base is_surnames ini limit =
                           ips
                       then 1
                       else 0
-                    else if conf.hide_names then
+                    else if
+                      (* TODO should be is_hidden (?) *)
+                      conf.hide_private_names && not (conf.wizard || conf.friend)
+                    then
                       if
                         List.exists
                           (fun i -> Util.authorized_age conf base (poi base i))
@@ -77,7 +80,10 @@ let select_names conf base is_surnames ini limit =
                         (fun acc i ->
                           if is_restricted conf base i then acc else acc + 1)
                         0 ips
-                    else if conf.hide_names then
+                    else if
+                      (* TODO should be is_hidden (?) *)
+                      conf.hide_private_names && not (conf.wizard || conf.friend)
+                    then
                       List.fold_left
                         (fun acc i ->
                           if Util.authorized_age conf base (poi base i) then

@@ -1171,12 +1171,10 @@ let make_conf from_addr request script_name env =
        begin try int_of_string (List.assoc "private_years" base_env) with
          Not_found | Failure _ -> 150
        end;
-     hide_names =
-       if ar.ar_wizard || ar.ar_friend then false
-       else
-         begin try List.assoc "hide_private_names" base_env = "yes" with
-           Not_found -> false
-         end;
+     hide_private_names =
+       begin try List.assoc "hide_private_names" base_env = "yes" with
+         Not_found -> false
+       end;
      use_restrict =
        if ar.ar_wizard || ar.ar_friend then false
        else
