@@ -213,6 +213,7 @@ val person_title : config -> base -> person -> Adef.safe_string
     person isn't granted returns empty string *)
 
 val child_of_parent : config -> base -> person -> Adef.safe_string
+val pnoc : base -> person -> string * string * int
 
 val mod_ind_link : config -> person -> Adef.safe_string -> Adef.safe_string
 (** [mod_ind_link conf base p s] creates a hyperlink with the URL "?m=MOD_IND&i={iper}"

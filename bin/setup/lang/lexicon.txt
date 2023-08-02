@@ -299,6 +299,18 @@ lv: :
 nl: :
 sv: :
 
+    notes to be updated
+en: notes or pages to be updated
+fr: notes ou pages qui doivent être mises à jour
+
+    wizard page of
+en: wizard page of
+fr: page magicien de
+
+    notes of
+en: notes of
+fr: notes de
+
     <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
 aa: bsi_connex.htm
 co: <span style="color:#FF0000;">AVERTIMENTU</span> : a cumanda -del squasseghja certe famiglie di manera irriversibile. Forse seria una bella idea d’avè un archiviu di salvaguardia.

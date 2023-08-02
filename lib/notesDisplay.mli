@@ -9,6 +9,7 @@ val linked_list :
   Config.config ->
   Gwdb.base ->
   (Gwdb.iper, Gwdb.ifam) Def.NLDB.page list ->
+  string ->
   string
 (** builds a string with the page list in argument *)
 

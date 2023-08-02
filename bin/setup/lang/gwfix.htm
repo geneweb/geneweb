@@ -23,6 +23,8 @@
 <form method="GET" action="gwfixbase">
 <input type="hidden" name="opt" value="check">
 <input type="hidden" name="lang" value="%l">
+<input type="hidden" name="server" value="%m">
+<input type="hidden" name="gwd_p" value="%P">
 
 <table>
 <tr>
@@ -135,6 +137,30 @@
 <tr align="left">
 <td><input type="checkbox" name="marriage-divorce" value="on">   </td>
 <td>[marriage divorce.]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="person-key" value="on">   </td>
+<td>[checks for possible apostrophe conflicts]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="utf8_key" value="on">   </td>
+<td>[checks for possible utf8 related conflicts]
+</td>
+</tr>
+</table>
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="invalud_utf8" value="on">   </td>
+<td>[checks for invalid utf8 characters]
 </td>
 </tr>
 </table>

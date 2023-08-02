@@ -169,6 +169,8 @@ let parameters =
         if k = "" || s = "" then loop comm env
         else if k = "opt" then loop comm env
         else if k = "anon" then loop (comm ^ " " ^ stringify s) env
+        else if k = "gwd_p" && s <> "" then loop (comm ^ " -gwd_p " ^ stringify s ) env
+        else if k = "server" then loop (comm ^ " -server " ^ stringify s) env
         else
           begin match numbered_key k with
             Some (k, '1') ->

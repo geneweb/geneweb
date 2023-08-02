@@ -1,6 +1,25 @@
 open Geneweb
 open Gwdb
 
+let bname = ref ""
+let verbosity = ref 2
+let fast = ref false
+let f_parents = ref false
+let f_children = ref false
+let p_parents = ref false
+let p_families = ref false
+let p_NBDS = ref false
+let pevents_witnesses = ref false
+let fevents_witnesses = ref false
+let marriage_divorce = ref false
+let invalid_utf8 = ref false
+let key = ref false
+let utf8_key = ref false
+let index = ref false
+let dry_run = ref false
+let server = ref "localhost"
+let gwd_port = ref 2317
+
 let aux conf txt
     (fn :
       ?report:(Fixbase.patch -> unit) -> (int -> int -> unit) -> base -> unit)
@@ -51,8 +70,6 @@ let aux conf txt
           | Some (i, i') -> string_of_istr i ^ " -> " ^ string_of_istr i'
           | None -> "Dtext")
     | Fix_UpdatedOcc (iper, oocc, nocc) ->
-        (* TODO check NLDB entries and warn user of possible updates needed *)
-        (* see UpdateIndOk.print_mod_ok for an implementation *)
         let ofn = sou base (get_first_name (poi base iper)) in
         let osn = sou base (get_surname (poi base iper)) in
         let okey = (Name.lower ofn, Name.lower osn, oocc) in
@@ -61,11 +78,17 @@ let aux conf txt
           let db = Notes.merge_possible_aliases conf db in
           Perso.links_to_ind conf base db okey
         in
+        let commd =
+          Printf.sprintf "%s://%s:%s/%s?" "http"
+            (* TODO/FIXME how do we test for http/https? *) !server
+            (string_of_int !gwd_port)
+            conf.bname (* FIXME we also need password or token !! *)
+        in
         let notes_list =
           if pgl <> [] then
-            Printf.sprintf "\n%s\n%s"
-             (Util.transl conf "notes to be updated")
-             (NotesDisplay.linked_list conf base pgl)
+            Printf.sprintf {|<br><span style="color:#FF0000;">%s</span><br>%s|}
+              (Util.transl conf "notes to be updated")
+              (NotesDisplay.linked_list conf base pgl commd)
           else ""
         in
         Printf.sprintf "Uptated occ for %s: %d -> %d%s" (string_of_p iper) oocc
@@ -97,8 +120,7 @@ let aux conf txt
   fn ?report progress base;
   if v1 then ProgrBar.finish ()
 
-let check_NBDS conf =
-  aux conf "Check persons' NBDS" Fixbase.check_NBDS
+let check_NBDS conf = aux conf "Check persons' NBDS" Fixbase.check_NBDS
 
 let check_families_parents conf =
   aux conf "Check families' parents" Fixbase.check_families_parents
@@ -113,15 +135,13 @@ let check_persons_families conf =
   aux conf "Check persons' families" Fixbase.check_persons_families
 
 let check_pevents_witnesses conf =
-  aux conf "Check persons' events witnesses"
-    Fixbase.check_pevents_witnesses
+  aux conf "Check persons' events witnesses" Fixbase.check_pevents_witnesses
 
 let check_fevents_witnesses conf =
   aux conf "Check family events witnesses" Fixbase.check_fevents_witnesses
 
 let fix_marriage_divorce conf =
-  aux conf "Fix families' marriage and divorce"
-    Fixbase.fix_marriage_divorce
+  aux conf "Fix families' marriage and divorce" Fixbase.fix_marriage_divorce
 
 let fix_utf8_sequence conf =
   aux conf "Fix invalid UTF-8 sequence" Fixbase.fix_utf8_sequence
@@ -139,7 +159,7 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   if not v1 then Mutil.verbose := false;
   let fast = !fast in
   let base = Gwdb.open_base bname in
-  let conf = Config.empty in
+  let conf = { Config.empty with bname } in
   let fix = ref 0 in
   let nb_fam = nb_of_families base in
   let nb_ind = nb_of_persons base in
@@ -155,16 +175,19 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     check_pevents_witnesses conf ~v1 ~v2 base nb_ind fix;
   if !fevents_witnesses then
     check_fevents_witnesses conf ~v1 ~v2 base nb_fam fix;
-  if !marriage_divorce then
-    fix_marriage_divorce conf ~v1 ~v2 base nb_fam fix;
+  if !marriage_divorce then fix_marriage_divorce conf ~v1 ~v2 base nb_fam fix;
   if !invalid_utf8 then fix_utf8_sequence conf ~v1 ~v2 base nb_fam fix;
   if !key then fix_key conf ~v1 ~v2 base nb_ind fix;
   if !utf8_key then scan_utf8_conflicts conf ~v1 ~v2 base nb_ind fix;
   if fast then (
     clear_strings_array base;
     clear_persons_array base);
+  if v1 then (
+    Printf.printf "%n changes found\n" !fix;
+    flush stdout);
   if not !dry_run then (
     if !fix <> 0 then (
+      (* more than 0 fixes *)
       Gwdb.commit_patches base;
       if v1 then (
         Printf.printf "%n changes commited\n" !fix;
@@ -175,29 +198,17 @@ let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     if v1 then (
       Printf.printf "Rebuilding the indexes..\n";
       flush stdout);
-    Gwdb.sync base;
-    if v1 then (
-      Printf.printf "Done";
-      flush stdout))
+    Gwdb.sync base)
+  else Printf.printf "No commits\n";
+  if v1 then (
+    Printf.printf "Done\n";
+    flush stdout);
+  Printf.printf {|<span style="color:#FF0000;">WARNING WIP</span><br>|};
+  Printf.printf "- Portraits have not been renamed<br>";
+  Printf.printf
+    "- Wizard access to the pages to be modified is not provided<br>"
 
 (**/**)
-
-let bname = ref ""
-let verbosity = ref 2
-let fast = ref false
-let f_parents = ref false
-let f_children = ref false
-let p_parents = ref false
-let p_families = ref false
-let p_NBDS = ref false
-let pevents_witnesses = ref false
-let fevents_witnesses = ref false
-let marriage_divorce = ref false
-let invalid_utf8 = ref false
-let key = ref false
-let utf8_key = ref false
-let index = ref false
-let dry_run = ref false
 
 let speclist =
   [
@@ -214,11 +225,13 @@ let speclist =
     ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc");
     ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc");
     ("-person-key", Arg.Set key, " fix duplicate keys");
+    ("-utf8_key", Arg.Set utf8_key, " check potential utf8 key conflicts");
+    ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc");
     ( "-index",
       Arg.Set index,
       " rebuild index. It is automatically enable by any other option." );
-    ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc");
-    ("-utf8_key", Arg.Set utf8_key, " check potential utf8 key conflicts");
+    ("-server", Arg.String (fun s -> server := s), " missing doc");
+    ("-gwd_p", Arg.Int (fun x -> gwd_port := x), " missing doc");
   ]
 
 let anonfun i = bname := i

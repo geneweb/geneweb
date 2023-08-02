@@ -477,6 +477,8 @@ let fix_key ?report progress base =
                           (Gwdb.gen_person_of_person (poi base ip)) with
                           occ = occ';
                         };
+                      (* TODO change portrait filename if not dry_run *)
+                      (* How do we get dry_run?? *)
                       (match report with
                       | Some fn -> fn (Fix_UpdatedOcc (ip, occ, occ'))
                       | None -> ());
@@ -546,6 +548,7 @@ let scan_utf8_conflicts ?report progress base =
   let ht = Hashtbl.create nb_ind in
   let htoc = Hashtbl.create 100 in
   let ipers = Gwdb.ipers base in
+  let portraits_list = ref [] in
   Gwdb.Collection.iteri
     (fun i ip ->
       progress i nb_ind;
@@ -575,6 +578,7 @@ let scan_utf8_conflicts ?report progress base =
           Gwdb.patch_person base ip
             { (Gwdb.gen_person_of_person (poi base ip)) with occ = occ' };
           (* TODO change portrait filename if not dry_run *)
+          portraits_list := (fn, sn, occ, occ') :: !portraits_list;
           match report with
           | Some fn -> fn (Fix_UpdatedOcc (ip, int_of_string occ, occ'))
           | None -> ()))
