@@ -722,7 +722,9 @@ let update_family_with_fevents _gen fam =
         | Some relation' ->
             if !found_marriage then loop l fam
             else
-              let witnesses = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
+              let witnesses =
+                Array.map (fun (ip, _, _) -> ip) evt.efam_witnesses
+              in
               let fam =
                 {
                   fam with

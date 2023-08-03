@@ -69,7 +69,9 @@ let speclist =
     ("-nofail", Arg.Set no_fail, " No failure in case of error");
     ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database");
     ("-nopicture", Arg.Set no_picture, " Do not create associative pictures");
-    ("-o", Arg.Set_string out_file, "<file> Output database (default: a.gwb). Alphanumerics and -");
+    ( "-o",
+      Arg.Set_string out_file,
+      "<file> Output database (default: a.gwb). Alphanumerics and -" );
     ( "-particles",
       Arg.Set_string particules_file,
       "<file> Particles file (default = predefined particles)" );

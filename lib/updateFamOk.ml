@@ -168,22 +168,23 @@ let rec reconstitute_events conf ext cnt =
           match
             try Some (reconstitute_somebody conf key) with Failure _ -> None
           with
-          | None -> [], ext
-          | Some (fn, sn, occ, create, var) ->
-             let (witnesses, ext) = loop (i + 1) ext in
-             let create = update_ci conf create key in
-             let c = (fn, sn, occ, create, var) in
-             let key_wkind = key ^ "_kind" in
-             let wkind = match p_getenv conf.env key_wkind with
-               | Some "godp" -> Witness_GodParent
-               | Some "offi" -> Witness_CivilOfficer
-               | Some "reli" -> Witness_ReligiousOfficer
-               | Some "info" -> Witness_Informant
-               | Some "atte" -> Witness_Attending
-               | Some "ment" -> Witness_Mentioned
-               | Some "othe" -> Witness_Other
-               | Some _ | None ->  Witness
-             in
+          | None -> ([], ext)
+          | Some (fn, sn, occ, create, var) -> (
+              let witnesses, ext = loop (i + 1) ext in
+              let create = update_ci conf create key in
+              let c = (fn, sn, occ, create, var) in
+              let key_wkind = key ^ "_kind" in
+              let wkind =
+                match p_getenv conf.env key_wkind with
+                | Some "godp" -> Witness_GodParent
+                | Some "offi" -> Witness_CivilOfficer
+                | Some "reli" -> Witness_ReligiousOfficer
+                | Some "info" -> Witness_Informant
+                | Some "atte" -> Witness_Attending
+                | Some "ment" -> Witness_Mentioned
+                | Some "othe" -> Witness_Other
+                | Some _ | None -> Witness
+              in
               let wnote =
                 let var_note =
                   "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_note"
@@ -225,7 +226,7 @@ let rec reconstitute_events conf ext cnt =
                           "" )
                       in
                       (c :: new_witn :: witnesses, true))
-              | Some _ | None -> (c :: witnesses, ext)
+              | Some _ | None -> (c :: witnesses, ext))
         in
         loop 1 ext
       in

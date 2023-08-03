@@ -261,41 +261,45 @@ and eval_event_date env fam s =
   in
   eval_date_var od s
 
-and eval_simple_var conf base env (fam, cpl, des) =
-  function
-  | ["bvar"; v]        -> eval_bvar conf v
-  | "child" :: sl      -> eval_child conf base env des sl
-  | ["cnt"]            -> eval_int_env "cnt" env
-  | ["comment"]        -> safe_val (Util.escape_html fam.comment :> Adef.safe_string)
-  | ["digest"]         -> eval_string_env "digest" env
-  | ["divorce"]        -> eval_divorce fam
-  | ["divorce"; s]     -> eval_divorce' fam s
-  | "father" :: sl     -> eval_key conf base (Gutil.father cpl) sl
-  | ["fsources"]       -> safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
-  | ["is_first"]       -> eval_is_first env
-  | ["is_last"]        -> eval_is_last env
-  | ["marriage"; s]    -> eval_date_var (Date.od_of_cdate fam.marriage) s
-  | ["marriage_place"] -> safe_val (Util.escape_html fam.marriage_place :> Adef.safe_string)
-  | ["marriage_note"]  -> safe_val (Util.escape_html fam.marriage_note :> Adef.safe_string)
-  | ["marriage_src"]   -> safe_val (Util.escape_html fam.marriage_src :> Adef.safe_string)
-  | "mother" :: sl     -> eval_key conf base (Gutil.mother cpl) sl
-  | ["mrel"]           -> str_val (eval_relation_kind fam.relation)
-  | ["nb_fevents"]     -> str_val (string_of_int (List.length fam.fevents))
-  | ["origin_file"]    -> safe_val (Util.escape_html fam.origin_file :> Adef.safe_string)
-  | "parent" :: sl     -> eval_parent conf base env cpl sl
-  | ["wcnt"]           -> eval_int_env "wcnt" env
-  | "witness" :: sl    -> eval_witness conf base env fam sl
-  | ["has_fevents"]    -> bool_val (fam.fevents <> [])
-  | "event" :: sl      ->
-     let e = family_events_opt env fam in
-     eval_event_var e sl
-  | ["event_date"; s]  -> eval_event_date env fam s
-  | ["event_str"]      -> eval_event_str conf base env fam
-  | ["has_fwitness"]   -> eval_has_fwitness env fam
-  | "fwitness" :: sl   -> eval_fwitness conf base env fam sl
-  | ["fwitness_kind"]  -> eval_fwitness_kind env fam
-  | ["fwitness_note"]  -> eval_fwitness_note env fam
-  | [s]                -> eval_default_var conf s
+and eval_simple_var conf base env (fam, cpl, des) = function
+  | [ "bvar"; v ] -> eval_bvar conf v
+  | "child" :: sl -> eval_child conf base env des sl
+  | [ "cnt" ] -> eval_int_env "cnt" env
+  | [ "comment" ] -> safe_val (Util.escape_html fam.comment :> Adef.safe_string)
+  | [ "digest" ] -> eval_string_env "digest" env
+  | [ "divorce" ] -> eval_divorce fam
+  | [ "divorce"; s ] -> eval_divorce' fam s
+  | "father" :: sl -> eval_key conf base (Gutil.father cpl) sl
+  | [ "fsources" ] ->
+      safe_val (Util.escape_html fam.fsources :> Adef.safe_string)
+  | [ "is_first" ] -> eval_is_first env
+  | [ "is_last" ] -> eval_is_last env
+  | [ "marriage"; s ] -> eval_date_var (Date.od_of_cdate fam.marriage) s
+  | [ "marriage_place" ] ->
+      safe_val (Util.escape_html fam.marriage_place :> Adef.safe_string)
+  | [ "marriage_note" ] ->
+      safe_val (Util.escape_html fam.marriage_note :> Adef.safe_string)
+  | [ "marriage_src" ] ->
+      safe_val (Util.escape_html fam.marriage_src :> Adef.safe_string)
+  | "mother" :: sl -> eval_key conf base (Gutil.mother cpl) sl
+  | [ "mrel" ] -> str_val (eval_relation_kind fam.relation)
+  | [ "nb_fevents" ] -> str_val (string_of_int (List.length fam.fevents))
+  | [ "origin_file" ] ->
+      safe_val (Util.escape_html fam.origin_file :> Adef.safe_string)
+  | "parent" :: sl -> eval_parent conf base env cpl sl
+  | [ "wcnt" ] -> eval_int_env "wcnt" env
+  | "witness" :: sl -> eval_witness conf base env fam sl
+  | [ "has_fevents" ] -> bool_val (fam.fevents <> [])
+  | "event" :: sl ->
+      let e = family_events_opt env fam in
+      eval_event_var e sl
+  | [ "event_date"; s ] -> eval_event_date env fam s
+  | [ "event_str" ] -> eval_event_str conf base env fam
+  | [ "has_fwitness" ] -> eval_has_fwitness env fam
+  | "fwitness" :: sl -> eval_fwitness conf base env fam sl
+  | [ "fwitness_kind" ] -> eval_fwitness_kind env fam
+  | [ "fwitness_note" ] -> eval_fwitness_note env fam
+  | [ s ] -> eval_default_var conf s
   | _ -> raise Not_found
 
 and eval_date_var = Update_util.eval_date_var
