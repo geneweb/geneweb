@@ -208,21 +208,26 @@ let () =
      which is the starting point of the wiki *)
   let wiki = Gwdb.base_notes_read base "" in
   let s =
-    {|= Wiki notes! =<br>
-<br>
-I '''love''' wikitext!<br>
-<br>
-Here is a bullet list:<br>
-* ''first item''<br>
-* ''second item''<br>
-* ...<br>
-<br>
-== Subsection ==<br>
-<br>
-I also like [[[geneweb]]]<br>
-= GeneWeb =<br>
-<br>
-'''GeneWeb''' est un logiciel de généalogie libre et gratuit doté d'une
-interface web, utilisable aussi bien sur un ordinateur non connecté à Internet qu'en service web. Initialement conçu en 1997 par Daniel de Rauglaudre, il utilise des techniques de calcul de parenté et de consanguinité innovantes, mises au point par Daniel de Rauglaudre et Didier Rémy, directeur de recherche à l'Institut national de recherche en informatique et en automatique.<br>|}
+    "= Wiki notes! =<br>\n\
+     <br>\n\
+     I '''love''' wikitext!<br>\n\
+     <br>\n\
+     Here is a bullet list:<br>\n\
+     * ''first item''<br>\n\
+     * ''second item''<br>\n\
+     * ...<br>\n\
+     <br>\n\
+     == Subsection ==<br>\n\
+     <br>\n\
+     I also like [[[geneweb]]]<br>\n\
+     = GeneWeb =<br>\n\
+     <br>\n\
+     '''GeneWeb''' est un logiciel de généalogie libre et gratuit doté d'une\n\
+     interface web, utilisable aussi bien sur un ordinateur non connecté à \
+     Internet qu'en service web. Initialement conçu en 1997 par Daniel de \
+     Rauglaudre, il utilise des techniques de calcul de parenté et de \
+     consanguinité innovantes, mises au point par Daniel de Rauglaudre et \
+     Didier Rémy, directeur de recherche à l'Institut national de recherche en \
+     informatique et en automatique.<br>"
   in
   assert (wiki = s)
