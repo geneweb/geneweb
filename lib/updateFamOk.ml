@@ -225,7 +225,7 @@ let rec reconstitute_events conf ext cnt =
                           "" )
                       in
                       (c :: new_witn :: witnesses, true))
-              | Some _ | None -> (c :: witnesses, ext))
+              | Some _ | None -> (c :: witnesses, ext)
         in
         loop 1 ext
       in
