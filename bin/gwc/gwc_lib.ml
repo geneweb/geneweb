@@ -91,7 +91,7 @@ let make_base ~save_mem state =
       if Filename.check_suffix x ".gw" then (
         (try Gwcomp.comp_families state x
          with e ->
-           Printf.printf "File \"%s\", line %d:\n" x state.line_cnt;
+           Printf.eprintf "File \"%s\", line %d:\n" x state.line_cnt;
            raise e);
         gwo := (x ^ "o", separate, bnotes, shift) :: !gwo)
       else if Filename.check_suffix x ".gwo" then
@@ -104,7 +104,7 @@ let make_base ~save_mem state =
       else state.out_file ^ ".gwb"
     in
     if (not state.force) && Sys.file_exists bdir then (
-      Printf.printf
+      Printf.eprintf
         "The database \"%s\" already exists. Use option -f to overwrite it."
         state.out_file;
       flush stdout;
