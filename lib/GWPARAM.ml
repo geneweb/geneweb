@@ -70,7 +70,8 @@ module Default = struct
                   | None -> Output.print_sstring conf "")))
 
   let is_contemporary conf base p =
-    not @@
+    not
+    @@
     let death = Gwdb.get_death p in
     if death = NotDead then conf.Config.private_years < 1
     else
