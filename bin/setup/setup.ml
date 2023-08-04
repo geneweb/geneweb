@@ -169,8 +169,6 @@ let parameters =
         if k = "" || s = "" then loop comm env
         else if k = "opt" then loop comm env
         else if k = "anon" then loop (comm ^ " " ^ stringify s) env
-        else if k = "gwd_p" && s <> "" then loop (comm ^ " -gwd_p " ^ stringify s ) env
-        else if k = "server" then loop (comm ^ " -server " ^ stringify s) env
         else
           begin match numbered_key k with
             Some (k, '1') ->
@@ -1045,6 +1043,9 @@ let gwdiff ok_file conf =
 let gwfixbase_check conf =
   print_file conf "bsi_fix.htm"
 
+let gwfixutf8_check conf =
+  print_file conf "bsi_fix.htm"
+
 let gwfixbase ok_file conf =
   let rc =
     let comm = stringify (Filename.concat !bin_dir conf.comm) in
@@ -1095,6 +1096,17 @@ let cache_files ok_file conf =
   in
   flush stderr;
   if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
+
+let gwfixutf8 ok_file conf =
+  let rc =
+    let comm = stringify (Filename.concat !bin_dir conf.comm) in
+    exec_f (comm ^ parameters conf.env)
+  in
+  Printf.eprintf "\n";
+  flush stderr;
+  if rc > 1 then print_file conf "bsi_err.htm"
+  else
+    print_file conf ok_file
 
 let connex_check conf =
   print_file conf "bsi_connex.htm"
@@ -1772,6 +1784,11 @@ let setup_comm_ok conf =
        begin match p_getenv conf.env "opt" with
       | Some "check" -> gwfixbase_check conf
       | _ -> gwfixbase "gwfix_ok.htm" conf
+      end
+  | "gwfixutf8" ->
+       begin match p_getenv conf.env "opt" with
+      | Some "check" -> gwfixutf8_check conf
+      | _ -> gwfixutf8 "gwfix_ok.htm" conf
       end
 
   | x ->

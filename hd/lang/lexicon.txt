@@ -7571,7 +7571,6 @@ ru: эмиграция
 sv: utvandring
 tr: göç
 
-<<<<<<< HEAD
     end
 af: einde
 bg: край
@@ -7603,7 +7602,7 @@ sk: koniec
 sl: konec
 sv: slutar
 tr: son
-=======
+
     notes to be updated
 en: notes or pages to be updated
 fr: notes ou pages qui doivent être mises à jour
@@ -7647,7 +7646,6 @@ sk: poznámky zmenené
 sl: zaznamek spremenjen
 sv: noteringar modifierade
 tr: notlar değiştirildi
->>>>>>> report pages to be changed. Missing: portraits changes
 
     engage event
 co: spusaticciu

@@ -33,6 +33,11 @@ val rename_portrait : config -> base -> person -> string * string * int -> unit
 val src_to_string : [< `Path of string | `Url of string ] -> string
 (** [src_to_string src] is [src] as a string *)
 
+val src_of_string :
+  config ->
+  string ->
+  [ `Empty | `Path of string | `Src_with_size_info of string | `Url of string ]
+
 (* TODO this should be removed *)
 val get_portrait_path : config -> base -> person -> [> `Path of string ] option
 (** [get_portrait_path conf base p] is
