@@ -341,7 +341,6 @@ let effective_send_ok conf base p file =
     Filename.concat dir
       (if mode = "portraits" then fname ^ extension_of_type typ else fname)
   in
-  let fname = Filename.concat dir fname in
   let _moved = move_file_to_save fname dir in
   write_file fname content;
   let changed =
@@ -675,6 +674,9 @@ let print_main_c conf base =
                         try (List.assoc "file_name_2" conf.env :> string)
                         with Not_found -> ""
                       else file_name
+                    in
+                    let file_name =
+                      (Mutil.decode (Adef.encoded file_name) :> string)
                     in
                     let file_name_2 = Filename.remove_extension file_name in
                     let new_env =
