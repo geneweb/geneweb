@@ -49,7 +49,7 @@ jobs:
       # Build the distribution
       - name: Build the distribution
         run: |
-          opam exec -- ocaml ./configure.ml --release
+          opam exec -- ocaml ./configure.ml --sosa-legacy --gwdb-legacy --release
           opam exec -- make distrib
 
       # Archive distribution for release
