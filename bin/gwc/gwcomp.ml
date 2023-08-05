@@ -1149,7 +1149,7 @@ let read_family ic fname = function
               divorce;
               fevents = [];
               comment = comm;
-              origin_file = fname;
+              origin_file = Filename.basename fname;
               fsources = fsrc;
               fam_index = Gwdb.dummy_ifam;
             }
@@ -1171,7 +1171,7 @@ let read_family ic fname = function
               divorce;
               fevents = [];
               comment = comm;
-              origin_file = fname;
+              origin_file = Filename.basename fname;
               fsources = fsrc;
               fam_index = Gwdb.dummy_ifam;
             }
