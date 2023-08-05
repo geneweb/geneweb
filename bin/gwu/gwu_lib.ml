@@ -1492,13 +1492,14 @@ let rs_printf opts s =
   loop true 0
 
 let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
+  if out_dir <> "" && not (Sys.file_exists out_dir) then Files.mkdir_p out_dir;
   let to_separate = separate base in
   let out_oc_first = ref true in
   let _ofile, oc, close = opts.Gwexport.oc in
   let origin_file fname =
-    if out_dir = "" then (oc, out_oc_first, close)
-    else if fname = "" then (oc, out_oc_first, close)
+    if fname = "" || out_dir = "" then (oc, out_oc_first, close)
     else
+      let fname = Filename.basename fname in
       try Hashtbl.find src_oc_ht fname
       with Not_found ->
         let oc = open_out (Filename.concat out_dir fname) in
@@ -1538,6 +1539,8 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
           if to_separate ifam then (oc, out_oc_first, close)
           else origin_file (sou base (get_origin_file fam))
         in
+        let f, _ooc, c = opts.oc in
+        let opts = { opts with oc = (f, oc, c) } in
         let ml =
           List.fold_right
             (fun ifam ml ->
@@ -1609,6 +1612,8 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
               then ()
               else
                 let oc, _first, _ = origin_file (base_notes_origin_file base) in
+                let f, _ooc, c = opts.oc in
+                let opts = { opts with oc = (f, oc, c) } in
                 Printf.ksprintf oc "\n";
                 print_empty_family opts base p;
                 print_notes_for_person opts base gen p;
@@ -1619,6 +1624,8 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
   if opts.base_notes then (
     let s = base_notes_read base "" in
     let oc, first, _ = origin_file (base_notes_origin_file base) in
+    let f, _ooc, c = opts.oc in
+    let opts = { opts with oc = (f, oc, c) } in
     if s <> "" then (
       if not !first then Printf.ksprintf oc "\n";
       first := false;

@@ -1199,12 +1199,26 @@ de: fevents' Trauzeugen.
 en: fevents' witnesses.
 fr: fevents' witnesses.
 
-    Files were reconstructed in the original sources directory.<br> Data created without origin file has been directed to the file %o or to comm.log. It is up to you to manage this new source file, or to merge this data into existing files.
+    Files were reconstructed in the designated directory.
 aa: gwu_ok.htm
-co: I schedarii sò stati ricustituiti in u cartulare d’origine.<br> I novi dati senza schedariu d’origine sò stati inversiati ver di u schedariu %o o ver di comm.log. Tocca à voi d’amministrà stu novu schedariu .gw o d’aghjunghje sti dati à i schedarii esistente.
-de: Dateien wurden wiederhergestellt im Original Quellverzeichnis.<br>erstellte Daten ohne Originaldatei wurden in die Datei %o oder comm.log umgelenkt. Es liegt an Ihnen die neue Quelldatei zu verwalten, oder sie mit existierenden Dateien zusammenzuführen.
-en: Files were reconstructed in the original sources directory.<br> Data created without origin file has been directed to the file %o or to comm.log. It is up to you to manage this new source file, or to merge this data into existing files.
-fr: Les fichiers ont été reconstitués dans le dossier d'origine.<br> Les nouvelles données sans fichier d'origine ont été redirigées vers le fichier %o ou vers comm.log. Il vous revient la tâche de gérer ce nouveau fichier .gw ou d'ajouter ces  données aux fichiers existants.
+co: I schedarii sò stati ricustituiti in u -odir cartulare.
+de: Dateien wurden wiederhergestellt im -odir Quellverzeichnis .
+en: Files were reconstructed in the designated directory (-odir).
+fr: Les fichiers ont été reconstitués dans le dossier désigné (-odir).
+
+    Data created without origin file
+aa: gwu_ok.htm
+co: I novi dati senza schedariu d’origine sò stati inversiati ver di u schedariu %o o ver di comm.log.
+de: Erstellte Daten ohne Originaldatei wurden in die Datei %o oder comm.log umgelenkt.
+en: Data created without origin file has been directed to the file %o or to comm.log.
+fr: Les nouvelles données sans fichier d'origine ont été redirigées vers le fichier %o ou vers comm.log.
+
+    It is up to you to manage
+aa: gwu_ok.htm
+co: Tocca à voi d’amministrà stu novu schedariu .gw o d’aghjunghje sti dati à i schedarii esistente.
+de: Es liegt an Ihnen die neue Quelldatei zu verwalten, oder sie mit existierenden Dateien zusammenzuführen.
+en: It is up to you to manage this new source file, or to merge this data into existing files.
+fr: Il vous revient la tâche de gérer ce nouveau fichier .gw ou d'ajouter ces  données aux fichiers existants.
 
     First name
 aa: gwb2ged.htm
@@ -3321,6 +3335,10 @@ en: This file is in the directory "%w".
 es: Este fichero se encuentra en la carpeta "%w".
 fr: Ce fichier se trouve dans le répertoire "%w".
 it: Questo file si trova nella directory "%w".
+
+    This file is in the directory
+en: This file is in the directory:
+fr: Ce fichier est dans le dossier :
 
     This has built a file named "%o".
 aa: gw2gd_ok.htm
