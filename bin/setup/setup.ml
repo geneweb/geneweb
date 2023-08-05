@@ -356,6 +356,7 @@ let macro conf =
   | 'q' -> Version.txt
   | 'u' -> Filename.dirname (abs_setup_dir ())
   | 'x' -> stringify !bin_dir
+  | 'v' -> strip_spaces (s_getenv conf.env "odir")
   | 'w' -> slashify (Sys.getcwd ())
   | 'y' -> Filename.basename (Lazy.force only_file_name)
   | 'z' -> string_of_int !port
