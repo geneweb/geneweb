@@ -41,6 +41,22 @@ let dump_persons bname ofile =
   Printf.eprintf "             %d real persons , %d ?.0 ?, %d+%d=%d (%d)\n"
     real_count !undef real_count !undef check !nb_ind_init
 
+let bname = ref ""
+let verbosity = ref 2
+let fast = ref false
+let f_parents = ref false
+let f_children = ref false
+let p_parents = ref false
+let p_families = ref false
+let p_NBDS = ref false
+let pevents_witnesses = ref false
+let fevents_witnesses = ref false
+let marriage_divorce = ref false
+let index = ref false
+let dry_run = ref false
+let server = ref "localhost"
+let gwd_port = ref 2317
+
 let aux txt
     (fn :
       ?report:(Fixbase.patch -> unit) ->
@@ -83,21 +99,6 @@ let aux txt
     | Fix_MissingSpouse (ifam, iper) ->
         Printf.sprintf "Fixed missing spouse (%s) in family %s"
           (string_of_p iper) (string_of_f ifam)
-    | Fix_WrongUTF8Encoding (ifam_opt, iper_opt, opt) ->
-        Printf.sprintf "Fixed invalid UTF-8 sequence (%s): %s"
-          (match ifam_opt with
-          | Some i -> "ifam " ^ Driver.Ifam.to_string i
-          | None -> (
-              match iper_opt with
-              | Some i -> "iper " ^ Driver.Iper.to_string i
-              | None -> assert false))
-          (match opt with
-          | Some (i, i') ->
-              Driver.Istr.to_string i ^ " -> " ^ Driver.Istr.to_string i'
-          | None -> "Dtext")
-    | Fix_UpdatedOcc (iper, oocc, nocc) ->
-        Printf.sprintf "Uptated occ for %s: %d -> %d" (string_of_p iper) oocc
-          nocc
   in
   let i' = ref 0 in
   if v1 then (
@@ -148,14 +149,9 @@ let check_fevents_witnesses =
 let fix_marriage_divorce =
   aux "Fix families' marriage and divorce" Fixbase.fix_marriage_divorce
 
-let fix_utf8_sequence =
-  aux "Fix invalid UTF-8 sequence" Fixbase.fix_utf8_sequence
-
-let fix_key = aux "Fix duplicate keys" Fixbase.fix_key
-
-let check base ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
+let check ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     ~p_families ~p_NBDS ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key =
+    bname =
   let v1 = !verbosity >= 1 in
   let v2 = !verbosity >= 2 in
   if not v1 then Mutil.verbose := false;
@@ -169,13 +165,11 @@ let check base ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
   if !f_parents then check_families_parents ~v1 ~v2 base nb_fam fix;
   if !f_children then check_families_children ~v1 ~v2 base nb_fam fix;
   if !p_parents then check_persons_parents ~v1 ~v2 base nb_ind fix;
-  if !p_NBDS then check_NBDS base ~v1 ~v2 nb_ind fix;
+  if !p_NBDS then check_NBDS ~v1 ~v2 base nb_ind fix;
   if !p_families then check_persons_families ~v1 ~v2 base nb_ind fix;
   if !pevents_witnesses then check_pevents_witnesses ~v1 ~v2 base nb_ind fix;
   if !fevents_witnesses then check_fevents_witnesses ~v1 ~v2 base nb_fam fix;
   if !marriage_divorce then fix_marriage_divorce ~v1 ~v2 base nb_fam fix;
-  if !invalid_utf8 then fix_utf8_sequence ~v1 ~v2 base nb_fam fix;
-  if !key then fix_key ~v1 ~v2 base nb_ind fix;
   if fast then (
     Driver.clear_strings_array base;
     Driver.clear_persons_array base);
@@ -191,48 +185,33 @@ let check base ~dry_run ~verbosity ~fast ~f_parents ~f_children ~p_parents
     if v1 then (
       Printf.printf "Rebuilding the indexes..\n";
       flush stdout);
-    Driver.sync base;
-    if v1 then (
-      Printf.printf "Done\n";
-      flush stdout))
+    Gwdb.sync base)
+  else Printf.printf "No commits\n";
+  if v1 then (
+    Printf.printf "Done\n";
+    flush stdout)
 
 (**/**)
 
-let bname = ref ""
-let verbosity = ref 2
-let fast = ref false
-let f_parents = ref false
-let f_children = ref false
-let p_parents = ref false
-let p_families = ref false
-let p_NBDS = ref false
-let pevents_witnesses = ref false
-let fevents_witnesses = ref false
-let marriage_divorce = ref false
-let invalid_utf8 = ref false
-let key = ref false
-let index = ref false
-let dry_run = ref false
-let dump = ref false
-let ofile = ref ""
-
 let speclist =
-  [ ("-dry-run", Arg.Set dry_run, " do not commit changes (only print)")
-  ; ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode")
-  ; ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode")
-  ; ("-fast", Arg.Set fast, " fast mode. Needs more memory.")
-  ; ("-families-parents", Arg.Set f_parents, " missing doc")
-  ; ("-families-children", Arg.Set f_children, " missing doc")
-  ; ("-persons-NBDS", Arg.Set p_parents, " missing doc")
-  ; ("-persons-parents", Arg.Set p_parents, " missing doc")
-  ; ("-persons-families", Arg.Set p_families, " missing doc")
-  ; ("-pevents-witnesses", Arg.Set pevents_witnesses, " missing doc")
-  ; ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc")
-  ; ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc")
-  ; ("-person-key", Arg.Set key, " fix duplicate keys")
-  ; ("-index", Arg.Set index, " rebuild index. It is automatically enable by any other option.")
-  ; ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc")
-  ; ("-utf8_key", Arg.Set utf8_key, " check potential utf8 key conflicts")
+  [
+    ("-dry-run", Arg.Set dry_run, " do not commit changes (only print)");
+    ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
+    ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
+    ("-fast", Arg.Set fast, " fast mode. Needs more memory.");
+    ("-families-parents", Arg.Set f_parents, " missing doc");
+    ("-families-children", Arg.Set f_children, " missing doc");
+    ("-persons-NBDS", Arg.Set p_parents, " missing doc");
+    ("-persons-parents", Arg.Set p_parents, " missing doc");
+    ("-persons-families", Arg.Set p_families, " missing doc");
+    ("-pevents-witnesses", Arg.Set pevents_witnesses, " missing doc");
+    ("-fevents-witnesses", Arg.Set fevents_witnesses, " missing doc");
+    ("-marriage-divorce", Arg.Set marriage_divorce, " missing doc");
+    ( "-index",
+      Arg.Set index,
+      " rebuild index. It is automatically enable by any other option." );
+    ("-server", Arg.String (fun s -> server := s), " missing doc");
+    ("-gwd_p", Arg.Int (fun x -> gwd_port := x), " missing doc");
   ]
   |> List.sort compare |> Arg.align
 
@@ -262,8 +241,7 @@ let main () =
   Lock.control ~on_exn ~wait:false ~lock_file @@ fun () ->
   if
     !f_parents || !f_children || !p_parents || !p_families || !pevents_witnesses
-    || !fevents_witnesses || !marriage_divorce || !p_NBDS || !invalid_utf8
-    || !key || !index
+    || !fevents_witnesses || !marriage_divorce || !p_NBDS || !index
   then ()
   else (
     f_parents := true;
@@ -273,12 +251,8 @@ let main () =
     pevents_witnesses := true;
     fevents_witnesses := true;
     marriage_divorce := true;
-    p_NBDS := true;
-    invalid_utf8 := true;
-    key := true);
-  check base ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS ~p_parents
-    ~p_families ~pevents_witnesses ~fevents_witnesses ~marriage_divorce
-    ~invalid_utf8 ~key;
-  if !dump then dump_persons !bname !ofile
+    p_NBDS := true);
+  check ~dry_run ~fast ~verbosity ~f_parents ~f_children ~p_NBDS ~p_parents
+    ~p_families ~pevents_witnesses ~fevents_witnesses ~marriage_divorce !bname
 
 let _ = main ()

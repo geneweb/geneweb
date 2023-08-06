@@ -344,37 +344,21 @@ let linked_page_rows conf base pg pgl =
            (wizname :> string)
            (Utf8.capitalize_fst (transl conf "base wizard notes")))
 
-let create_gallery_item conf fnotes nenv s =
-  let img_url, img_name = Notes.json_extract_img conf s
-  and title = try List.assoc "TITLE" nenv with Not_found -> "" in
-  Printf.sprintf
-    {|<div class="imap-gallery"><a href="%sm=NOTES&f=%s"><img src="%s" \
-       title="%s | %s" alt="%s"></a>%s</div>|}
-    (commd conf :> string)
-    fnotes img_url fnotes img_name img_name title
+let linked_list _conf base pgl =
+  let str =
+  List.fold_left
+    (fun acc pg ->
+        match pg with
+        | Def.NLDB.PgInd ip -> acc ^ (Gutil.designation base (Gwdb.poi base ip)) ^ "<br>"
+        | _ -> acc)
+      "" pgl;
+  in
+  Printf.sprintf {|
+  <span>
+  %s
+  </span>|} str
 
-let print_linked_list_gallery conf base pgl =
-  Output.printf conf "<div class=\"d-flex flex-wrap mt-3\">\n";
-  List.iter
-    (function
-      | Def.NLDB.PgMisc fnotes ->
-          let nenv, s = read_notes base fnotes in
-          let typ = try List.assoc "TYPE" nenv with Not_found -> "" in
-          let restrict_l =
-            try List.assoc "RESTRICT" nenv with Not_found -> ""
-          in
-          let restrict_l =
-            if restrict_l = "" then [] else String.split_on_char ',' restrict_l
-          in
-          if
-            (restrict_l = [] || not (is_restricted conf base restrict_l))
-            && (typ = "gallery" || typ = "album")
-          then Wserver.printf "%s" (create_gallery_item conf fnotes nenv s)
-      | _ -> ())
-    pgl;
-  Output.print_sstring conf "</div>\n"
-
-let print_linked_list_standard conf base pgl =
+let print_linked_list conf base pgl =
   Output.print_sstring conf
     "\n<table class=\"table table-borderless table-striped w-auto mt-3\">";
   List.iter

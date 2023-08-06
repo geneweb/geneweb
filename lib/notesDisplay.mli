@@ -5,9 +5,14 @@ val print_linked_list :
   unit
 (** Displays the page list in argument *)
 
-val print_what_links : Config.config -> Geneweb_db.Driver.base -> string -> unit
+val linked_list :
+  Config.config ->
+  Gwdb.base ->
+  (Gwdb.iper, Gwdb.ifam) Def.NLDB.page list ->
+  string
+(** Produces a string displaying the list of modified ip *)
 
-val print : Config.config -> Geneweb_db.Driver.base -> unit
+val print : Config.config -> Gwdb.base -> unit
 (** Displays the base notes *)
 
 val print_json : Config.config -> Geneweb_db.Driver.base -> unit

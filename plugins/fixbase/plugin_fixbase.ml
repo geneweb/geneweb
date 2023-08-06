@@ -129,8 +129,7 @@ let fixbase_ok conf base =
       | Fix_AddedParents ip
       | Fix_ParentDeleted ip
       | Fix_AddedRelatedFromPevent (ip, _)
-      | Fix_AddedRelatedFromFevent (ip, _)
-      | Fix_UpdatedOcc (ip, _, _) ->
+      | Fix_AddedRelatedFromFevent (ip, _) ->
           ipers := ip :: !ipers
       | Fix_RemovedUnion (iper, ifam)
       | Fix_RemovedDuplicateUnion (iper, ifam)
@@ -139,8 +138,6 @@ let fixbase_ok conf base =
           ipers := iper :: !ipers
       | Fix_MarriageDivorce ifam | Fix_AddedChild ifam ->
           ifams := ifam :: !ifams
-      | Fix_WrongUTF8Encoding (ifam, iper, istr) ->
-          istrs := (ifam, iper, istr) :: !istrs
     in
     let progress (_ : int) (_ : int) = () in
     let enabled = List.exists (UI.enabled conf) in
@@ -175,6 +172,7 @@ let fixbase_ok conf base =
     opt "fevents_witnesses" Fixbase.check_fevents_witnesses;
     opt "marriage_divorce" Fixbase.fix_marriage_divorce;
     opt "missing_spouses" Fixbase.fix_missing_spouses;
+<<<<<<< HEAD
     opt "invalid_utf8" Fixbase.fix_utf8_sequence;
     opt "p_key" Fixbase.fix_key;
     opt "p_key" Fixbase.fix_key;
@@ -184,6 +182,14 @@ let fixbase_ok conf base =
     Driver.clear_unions_array base;
     Driver.clear_descends_array base;
     Driver.clear_ascends_array base;
+=======
+    clear_persons_array base;
+    clear_strings_array base;
+    clear_families_array base;
+    clear_unions_array base;
+    clear_descends_array base;
+    clear_ascends_array base;
+>>>>>>> remove utf8 stuff from fixbase, put it all in gwfixutf8
     let ifneq x1 x2 label s =
       if x1 <> x2 then (
         Output.print_sstring conf {|<tr><td><b>|};
