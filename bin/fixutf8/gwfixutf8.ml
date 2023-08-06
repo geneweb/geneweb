@@ -33,6 +33,10 @@ let of_pevent e = (e.epers_date, e.epers_place, e.epers_note, e.epers_src)
 let find_pevent names pevents =
   List.find_opt (fun x -> List.mem x.epers_name names) pevents
 
+(* check for malformed Utf8 characters
+   Apply corrections
+*)
+
 let fix_utf8_sequence ?report progress base =
   let normalize_utf_8_date ifam iper s =
     let s' = Mutil.normalize_utf_8 s in
@@ -83,6 +87,12 @@ let fix_utf8_sequence ?report progress base =
       in
       if p' <> p then Gwdb.patch_person base iper p')
     (Gwdb.persons base)
+
+(* Identify conflicting keys.
+   Change occ to resolve
+   scan_utf8_conflicts seems to be doing a better job
+     (detects conflicting apostrophs)!!
+*)
 
 let fix_key ?report progress base =
   let nb_ind = nb_of_persons base in
@@ -155,12 +165,6 @@ let fix_key ?report progress base =
         ignore @@ loop [] rev_list)
     ipers
 
-(* Scan a base to identify potential conflicts arising when:
-   - replacing ’ by ' in the lower function
-   - properly treating supplementary Latin accented characters (for vietnameese)
-   resolution typically consists in changing the occ number (+1)
-*)
-
 let special_utf_8 s =
   let s =
     if
@@ -188,6 +192,12 @@ let string_unaccent ?(special = false) lower s =
       copy j (Buff.mstore len t)
   in
   copy 0 0
+
+(* Scan a base to identify potential conflicts arising when:
+   - replacing ’ by ' in the lower function
+   - properly treating supplementary Latin accented characters (for vietnameese)
+   resolution typically consists in changing the occ number (+1)
+*)
 
 let scan_utf8_conflicts ?report progress base =
   let rec new_occ fn sn occ htoc =
@@ -431,7 +441,7 @@ let main () =
   Arg.parse speclist anonfun usage;
   Secure.set_base_dir (Filename.dirname !bname);
   if !bname = "" then (
-    Arg.usage speclist usage;
+    Printf.eprintf "Missing base name\n";
     exit 2);
   Lock.control (Mutil.lock_file !bname) false ~onerror:Lock.print_try_again
   @@ fun () ->

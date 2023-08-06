@@ -25,9 +25,6 @@ type patch =
   | Fix_AddedRelatedFromFevent of Gwdb.iper * Gwdb.iper
   | Fix_MarriageDivorce of Gwdb.ifam
   | Fix_MissingSpouse of Gwdb.ifam * Gwdb.iper
-  | Fix_WrongUTF8Encoding of
-      Gwdb.ifam option * Gwdb.iper option * (Gwdb.istr * Gwdb.istr) option
-  | Fix_UpdatedOcc of Gwdb.iper * int * int
 
 val check_NBDS :
   ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
@@ -72,16 +69,3 @@ val fix_missing_spouses :
     If this situation happens, an explaination is that the person has been incorrectly deleted,
     instead of just erasing their personal details.
 *)
-
-val fix_utf8_sequence :
-  ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
-(** For every person's and family's field, remplace it with normalized UTF8 version. *)
-
-val fix_key :
-  ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
-(** For every person in the base, update their occurence number
-    if someone with same key (normalized first name and last name, and occurence number) already exists. *)
-
-val scan_utf8_conflicts :
-  ?report:(patch -> unit) -> (int -> int -> unit) -> Gwdb.base -> unit
-(** Scan base for potential conflicts due to apostrophs and fancy accented characters*)
