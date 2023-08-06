@@ -24,6 +24,8 @@ et dans le fichier install-cgi/gwd.cgi les informations concernant votre install
 
 Voir le fichier CHANGES (en anglais) dans ce répertoire pour les
 changements par rapport aux versions précédentes.
+les changements sont aussi décrits dans la page download de la documentation WiKi :
+https://geneweb.tuxfamily.org/wiki/download
 
      -----------------
 
