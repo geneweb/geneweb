@@ -402,3 +402,6 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
 %if;(carrousel_img_nbr>0)
 %include;carrousel_display
 %end;
+%if;(e.lexcheck=1)
+  %include;lexcheck
+%end;

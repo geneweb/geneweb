@@ -12,18 +12,11 @@
 %define;getvar(nnn)
   %get_var.nnn;
 %end;
-%define;half(xxx,yyy,ccc)
-  %if;(ccc>0)
-    [xxx:::yyy]s
-  %else;
-    [*xxx:::yyy]s
-  %end;
-%end;
-%define;cousin(l1,l2,dd,ccc)
+%define;cousin(l1,l2,dd,cc)
   %if;([cousin.l1.l2]!="[cousin.l1.l2]")
-    %apply;half("cousin.l1.l2","dd",ccc)
+    %if;(cc>0)[cousin.l1.l2:::dd]s%else;[*cousin.l1.l2:::dd]s%end;
   %else;
-    %if;(ccc>0)[close family]0
+    %if;(cc>0)[close family]0
     %else;[*close family]0
     %end; (<small class="text-muted">l1/l2</small>)
   %end;

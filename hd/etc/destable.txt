@@ -273,7 +273,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
         %if;("ch_cnt"="1" and not cancel_links)</a>%end;
       </td>
     %elseif;(e.t="I")
-      <td class="text-center align-middle%if;not cancel_links; table_big_cell%end;%if;(implx!=0) implex%end;">
+      <td class="text-center align-middle%if;not cancel_links; table_big_cell%if;(implx!=0) implex%end;%end;">
       %if;(not cancel_links)
         <a class="table_big_anchor" title="[*navigation] [with] %xxx"%sp;
           href="%prefix_base_password;%spouse.access;%nn;
