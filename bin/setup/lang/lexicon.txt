@@ -1355,7 +1355,7 @@ de: aus einer GEDCOM Quelldatei
 en: from a GEDCOM source file
 es: a partir de un fichero fuente GEDCOM
 fi: GEDCOM lähdetiedostosta
-fr: à aprtir d'un fichier source GEDCOM
+fr: à partir d'un fichier source GEDCOM
 it: partendo da un file sorgente GEDCOM
 lv: no GEDCOM datnes
 sv: från en GEDCOM källfil

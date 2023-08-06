@@ -21,6 +21,8 @@ in the install-cgi.sh script and in install-cgi/gwd.cgi:
 
 See the file CHANGES in the present directory for the changes since
 the previous versions.
+Changes are also reported in the download documentation WiKi page
+https://geneweb.tuxfamily.org/wiki/download
 
      -----------------
 
