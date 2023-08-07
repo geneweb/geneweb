@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: ancsosa.txt v7.1 10/05/2023 04:58:54 $ -->
+  <!-- $Id: ancsosa.txt v7.0.1-α3 09/08/2023 13:37:57 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
 %define;tothegen(xx)
   [to the %s generation:::xx]%nn;
@@ -293,7 +293,6 @@
   %xx.title;%xx.dates;
 %end;
 
-
 %define;married_to(is_male, date_place)
   %if;("is_male" = 1)
     %if;are_married;[married%t to:::date_place]0%nn;
@@ -356,18 +355,24 @@
   %end;
 %end;
 
-%define;link_marriage1(xx)
+%define;link_marriage1(yy)
   %if;(wizard and not cancel_links)
-    <a id="mf%family.index;" class="date p_%left;" href="#mf%family.index;" %ltmf;
-      onclick="window.open('%prefix;m=MOD_FAM&i=%family.index;&ip=%index;');">%nn;
-      <span>&amp;</span>%nn;
-        %if;(nb_children >= 1)%nb_children;<br>%end;
-        %slash_marriage_date; %marriage_place;
+    <a id="mf%family.index;" class="date p_%left;" href="#mf%family.index;"
+      onclick="window.open('%prefix;m=MOD_FAM;i=%family.index;;ip=%index;;');">%nn;
+  %end;
+      <div><span class="sure_dates%ancestor.has_linked_page.MARRIAGEA;%ancestor.spouse.has_linked_page.MARRIAGEA;
+        %if;((marriage_date.prec != "" or on_marriage_date = "" or marriage_place = "") and (are_married or not_are_married)) not_sure_dates%end;"
+        title="%if;(wizard)([modify::family/families]0)%end;
+          %if;(yy=0 and spouse.surname!="?" and spouse.first_name!="?")&#010;
+            %if;(are_not_married)([*not married])&#010;%end;
+            %if;(ancestor.is_male)[*him/her]0 %if;(are_not_married)[with]%else;[married%t to:::]0%end;
+            %elseif;(ancestor.is_female)[*him/her]1 %if;(are_not_married)[with]%else;[married%t to:::]1%end;
+            %end; %spouse;&#010;
+            %if;(nb_children>0)%nb_children; %end;%if;(nb_children=0)[*no descendants]%elseif(nb_children>1)[child/children]1%else;[child/children]0%end;%end;"
+        %if;(yy=0) style="color:%if;(ancestor.same!="")#fff069c9;%else;%if;(ancestor.is_male)blue;%elseif(ancestor.is_female)red;%end;font-size:small;%end;"%end;>
+        %nb_children;· %slash_marriage_date; %marriage_place; %if;(are_not_married)–%end;</span></div>
+  %if;(wizard and not cancel_links)
     </a>
-  %else;
-    <span>&amp;</span>%nn;
-    %slash_marriage_date; %marriage_place;
-    <br>&amp;%nb_children;
   %end;
 %end;
 
@@ -386,7 +391,7 @@
 %end;
 
 %define;imgtdz(xx)
-  %if;(e.image!="off" and xx.has_image)
+  %if;(e.im!=0 and e.image!="off" and xx.has_image)
     <img class="imgtdz img-fluid w-50" src="%xx.image_url;" %lai; title="%xx;">%nn;
   %end;
 %end;
@@ -480,28 +485,53 @@
     </td>
 %end;
 
+%define;month(mmm)
+  %if;(mmm.month="")%if;(mmm.prec="&gt;")12%else;00%end;
+  %elseif;(mmm.month<10)0%mmm.month;%else;%mmm.month;%end;
+%end;
+
+%define;day(ddd)
+  %if;(ddd.day="")%if;(ddd.prec="&gt;")32%else;00%end;
+  %elseif;(ddd.day<10)0%ddd.day;%else;%ddd.day;%end;
+%end;
+
+%define;dprec(ddd)
+  %if;(ddd.prec="&lt;")2%elseif;(ddd.prec="&gt;")2%else;2%end;
+%end;
+
+%define;addlist(xxx)
+  %apply;add_in_sorted_list%with;
+    %if;(e.rev=1)-%end;%ancestor.marriage_date.year;%nn;
+    %and;%apply;month("ancestor.marriage_date")%nn;
+    %and;%apply;day("ancestor.marriage_date")%nn;
+    %and;%apply;dprec("ancestor.marriage_date")%nn;
+    %and;%apply;link_marriage1(xxx)%end;
+%end;
+
 %define;one_line(z1)
   %if;(ancestor.anc_sosa.v % 2 = 0)
     <tr id="i%ancestor.anc_sosa.v;">
       %apply;male_line("ancestor","z1")
       <td class="align-middle" style="text-align:%left;">
+        %end;
       %if;(ancestor.same = "")
         %foreach;ancestor.family;
-          %if;(family.index = ancestor.family.index)
-            %apply;link_marriage1("ancestor")
+          %if;(ancestor.is_male and family.index = ancestor.family.index)
+            %apply;addlist(1)
+          %elseif;(ancestor.is_male or (ancestor.is_female and family.index != ancestor.family.index))
+            %apply;addlist(0)
           %end;
         %end;
       %end;
-      </td>
-  %end;
   %if;(ancestor.anc_sosa.v % 2 = 1)
+              %foreach;sorted_list_item;%item.5;%end;
+            %empty_sorted_list;
+            </td>
     %apply;female_line("ancestor","z1")</tr>
   %end;
 %end;
 
-%(
-  Long display
-%)
+%( Long display %)
 
 %define;child_notes(spec)
   %if;(child.sosa_in_list = "" and
@@ -1484,10 +1514,10 @@
 %end;
 
 %define;table_ancestor_to_somebody()
-  %p_of_index.1.mark_descendants;
+  %pvar.1.mark_descendants;
   %foreach;ancestor_level;
     %apply;lazy_print%with;
-      <tr><th colspan="7" >%nl;[*generation/generations]0 %level;%nl;</th></tr>
+      %if;(e.gen=1)<tr><th colspan="7" >%nl;[*generation/generations]0 %level;%nl;</th></tr>%end;
     %end;
     %if;(level <= e.l)
       %foreach;ancestor;
@@ -1504,9 +1534,9 @@
 %define;table_double()
   %foreach;ancestor_level(l_v)
     %if;(level>0 and (e.only!="on" or level=l_v))
-      <tr><th colspan="7" >%nl;[*generation/generations]0 %level;%nl;</th></tr>
-      %foreach;ancestor
-          %if;(ancestor.same = "")%incr_count;%end;
+      %if;(e.gen=1)<tr><th colspan="7">%nl;[*generation/generations]0 %level;%nl;</th></tr>%end;
+      %foreach;ancestor;
+          %if;(ancestor.same="" and ancestor.first_name!="?" and ancestor.surname!="?")%incr_count;%end;
           %apply;one_line("")
       %end;
     %end;
@@ -1570,12 +1600,13 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     %if;(public_name != "")%public_name;%else;%first_name;%end;
     %if;(qualifier != "") <em>%qualifier;</em>%end;
     %sp;%surname;
-    %if;(alias != "") <em>(%alias;)</em>%end;
+    %if;(alias != "") <em>(%alias;)</em>%end; %dates;
   %end;
   %if;(e.t = "D") [up to] %p_of_index.1;
   %else;
      %if;(cancel_links and e.v > 4) %apply;togena(e.v)%end;
   %end;
+  %if;(e.t="X")…<br>[only] [up to] %pvar.1; %pvar.1.dates;%end;
 </h1>
 %end;
 
@@ -2012,17 +2043,9 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
   </ul>
 
 %elseif;(e.t = "X" or e.t = "Y")
-  %if;(e.t = "X")
-    <p>[*only] [up to] %p_of_index.1; %p_of_index.1.dates; </p>
-     %(%if;(not cancel_links)
-       <div class="menu">
-         %if;(has_sosa)<span><a href="%prefix;m=X&t=X&t1=1&i=%e.i1;&i1=%index;&siblings=on&alias=on&spouse=on&parents=on&rel=on&notes=on&src=on&hide=on&witn=on&v=%e.l;&maxv=%e.l;&l=%e.l;">[*descendants]0</a></span>%end;
-         <span><a href="%prefix;m=A&t=G&i=%index;&i1=%e.i1;&siblings=on&alias=on&spouse=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on&l=%e.l;">[*ancestor/ancestors]1</a></span>
-       </div>
-     %end;%)
-  %end;
+  %empty_sorted_list;
   %reset_count;
-  <table class="table table-sm table-hover table-bordered text-center short_display_table">
+  <table class="table table-sm table-bordered text-center short_display_table">
     <colgroup>
       <col width="10"%/>
       <col width="400"%/>
