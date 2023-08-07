@@ -2043,6 +2043,8 @@ let () =
                     or launch GeneWeb with another port number (option -p)";
     flush stderr
 #ifdef UNIX
+  | Unix.Unix_error (Unix.ENOTCONN, _, _ ) ->
+    GwdLog.syslog `LOG_WARNING ({|Unix.Unix_error(Unix.ENOTCONN, "shutdown", "")|})
   | Unix.Unix_error (Unix.EACCES, "bind", arg) ->
     Printf.eprintf
       "Error: invalid access to the port %d: users port number less \
