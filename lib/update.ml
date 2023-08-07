@@ -172,6 +172,9 @@ let print_person_parents_and_spouses conf base p =
   Output.print_sstring conf " ";
   Output.print_string conf (escape_html @@ p_surname base p);
   Output.print_sstring conf "</a>";
+  let pub_name = sou base (get_public_name p) in
+  if pub_name <> "" then
+    Output.print_sstring conf (Printf.sprintf " (%s)" pub_name);
   Output.print_string conf (DateDisplay.short_dates_text conf base p);
   let cop = Util.child_of_parent conf base p in
   if String.length (cop :> string) > 0 then (
