@@ -1,6 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let txt = "7.0.1-𝝰2"
+let txt = "7.0.1-𝝰3"
 
 let available_languages =
   [
