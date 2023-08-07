@@ -1,4 +1,4 @@
-<!-- $Id: buttons.txt v7.1 26/11/2022 00:12:36 $ -->
+<!-- $Id: buttons.txt v7.0.1-α3 08/08/2023 00:46:50 $ -->
 <!-- Copyright (c) 1998-2007 INRIA -->
 %( Boutons de configurations et d'options %) 
 %let;istable;%if;((evar.m="D" and (evar.t="H" or evar.t="I")) or (evar.m="A" and (evar.t="Z" or evar.t="Y")))1%end;%in;
@@ -144,17 +144,16 @@
       </a>
     %end;
     <span class="sr-only">—</span>
-    %let;couple_table;%prefix_base;%access;&m=A&t=Y%if;(e.only="on")&only=on%end;%if;(e.im!="")&im=0%end;&v=%e.v&%in;
-    %if;(e.csv!="on" and e.m="A" and e.t="Z" or e.t="Y")
+    %if;(e.csv!="on" and e.m="A" and (e.t="Z" or e.t="Y"))
       <span class="sr-only">—</span>
       <a role="button" class="btn btn-link px-0"
-        href="%prefix_base_password;%nn;
+        href="%prefix_base_password;%access;&m=A%nn;
                  %foreach;env_binding;
                    %if;(env.key="t")&t=%if;(e.t!="Y")Y%else;Z%end;%nn;
-                   %elseif;(env.key!="")&%env.key=%env.val;%end;%nn;
+                   %elseif;(env.key="v" or env.key="maxv" or env.key="only" or env.key="im" or env.key="gen")&%env.key=%env.val;%end;%nn;
                  %end;%nn;
                  %( ajout des variables par défaut du tableau asc. pour sortir du tableau par couple qui n'en a quasi pas %)
-                 %if;(url=couple_table)&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&gen=1&repeat=on&ns=1%end;"
+                 %if;(e.t="Y")&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on%end;"
         title="[*visualize/show/hide/summary]1 [table] %if;(e.t="Y")[ancestor/ancestors]1%else;[by couple]%end;">%nn;
           <i class="fa fa-restroom fa-lg fa-fw%if;(e.t="Y") text-danger%end;" aria-hidden="true"></i>
       </a>
