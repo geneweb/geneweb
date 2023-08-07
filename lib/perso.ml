@@ -2374,26 +2374,14 @@ and eval_item_field_var ell = function
       with Failure _ -> raise Not_found)
   | _ -> raise Not_found
 
-and eval_title_field_var conf base env (p, (cnt, name, title, places, dates))
+and eval_title_field_var conf base env (_p, (nth, name, title, places, dates))
     _loc = function
   | [ "is_first" ] ->
       VVbool
         (match get_env "first" env with Vbool x -> x | _ -> raise Not_found)
   | [ "is_main" ] -> (
-      let titles = nobility_titles_list conf base p in
-      let has_main =
-        List.fold_left
-          (fun acc (_, name, _, _, _) ->
-            acc || match name with Tmain -> true | _ -> false)
-          false titles
-      in
-      match name with
-      | Tmain -> VVbool true
-      | _ ->
-          if has_main then VVbool false
-          else
-            VVbool (match get_env "first" env with Vbool x -> x | _ -> false))
-  | [ "cnt" ] -> VVstring (string_of_int cnt)
+      match name with Tmain -> bool_val true | _ -> bool_val false)
+  | [ "nth" ] -> VVstring (string_of_int nth)
   | [ "name" ] -> (
       match name with
       | Tname n -> VVstring (sou base n |> escape_html :> string)
@@ -2423,6 +2411,24 @@ and eval_title_field_var conf base env (p, (cnt, name, title, places, dates))
           dates
       in
       VVstring (String.concat ", " dates)
+  | [ "date_begin" ] -> (
+      match dates with
+      | [ (d, _) ] -> (
+          match d with
+          | Some (Dgreg (dmy, _)) ->
+              VVstring (DateDisplay.string_of_dmy conf dmy :> string)
+          | Some (Dtext d) -> VVstring (d |> escape_html :> string)
+          | None -> null_val)
+      | _ -> VVstring "multiple dates")
+  | [ "date_end" ] -> (
+      match dates with
+      | [ (_, d) ] -> (
+          match d with
+          | Some (Dgreg (dmy, _)) ->
+              VVstring (DateDisplay.string_of_dmy conf dmy :> string)
+          | Some (Dtext d) -> VVstring (d |> escape_html :> string)
+          | None -> null_val)
+      | _ -> VVstring "multiple dates")
   | _ -> raise Not_found
 
 and eval_relation_field_var conf base env (i, rt, ip, is_relation) loc =
