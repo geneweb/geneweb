@@ -294,7 +294,7 @@ sv: Applicera på en databas
 
     Are you sure you want to delete these databases?
 aa: delete_1.htm
-co: Site sicuru di vulè squassà ste base di dati ?
+co: Da veru, vulete squassà ste base di dati ?
 de: Bist du sicher, daß du diese Datenbanken löschen möchtest?
 en: Are you sure you want to delete these databases?
 es: Esta Ud seguro de querer suprimir estas bases?
@@ -306,7 +306,7 @@ sv: Är du säker att du vill radera dessa databaser?
 
     Ask for deleting branches whose size <= that value.
 aa: connex.htm
-co: Dumandà di squassà i cumpunenti di dimensione <= à stu valore.
+co: Dumandà di squassà e ghjembe di dimensione <= à stu valore.
 de: Frage nach dem löschen von Zweigen dessen Größe <= diesem Wert sind.
 en: Ask for deleting branches whose size <= that value.
 fr: Demander à détruire les composantes de taille <= à cette valeur.
@@ -355,7 +355,7 @@ sv: Databasen har blivit omdöpt.
 
     But it does not hold the command "gwu" required to transfer your database. Are you sure it is a %G distribution directory
 aa: err_ngw.htm
-co: Ma ùn cuntene micca a cumanda « gwu » richiesta per u trasferimentu di a vostra basa di dati. Site sicuru chì ghjè un cartulare d’una distribuzione %G
+co: Ma ùn cuntene micca a cumanda « gwu » richiesta per u trasferimentu di a vostra basa di dati. Site veramente sicuri chì ghjè un cartulare d’una distribuzione %G
 de: Dieses Verzeichnis enthält aber nicht das Kommando "gwu", welches nötig ist, um die Datenbank zu übertragen. Bist Du sicher, daß dieses Verzeichnis ein %G-Installationsverzeichnis ist
 en: But it does not hold the command "gwu" required to transfer your database. Are you sure it is a %G distribution directory
 es: Pero ella no contiene el comando "gwu" necesario para transferir su base de datos. ¿está Ud. seguro de que se trata bien de una carpeta de una distribución %G
@@ -937,7 +937,7 @@ fr: Ne pas extraire les images individuelles (portraits).
 
     empty
 aa: welcome.htm
-co: à partesi d'un schedariu viota
+co: à partesi d’un schedariu viotu
 de: aus einer leer Datei
 en: from an empty file
 es: a partir de un fichero vacío
@@ -1273,7 +1273,7 @@ sv: För en given databas, kan du ändå ändra detta val genom att konfigurera 
 
     For a radical cleaning up, select your database by clicking on the associated button
 aa: cleanup.htm
-co: Per una nettata forte, selezziunate a vostra basa di dati clicchendu nant’à u buttone assuciatu
+co: Per una nettata forte, selezziunate a vostra basa di dati via un cliccu nant’à u buttone assuciatu
 de: Um radikal aufzuräumen, wähle deine Datenbank aus, indem du  den zugehörigen Schalter anklickst
 en: For a radical cleaning up, select your database by clicking on the associated button
 es: Para realizar una limplieza minuciosa, seleccione su base de datos cliqueando en el botón asociado
@@ -1555,7 +1555,7 @@ sv: Om "-" är valt, är det franska.
 
     If do NOT want that your images are installed in the standard place (databases directory, sub-directory "images", sub-sub-directory "%a"), indicate here the path to the directory you want to use. This path is an URL: if it is a Web site, it must start with <tt>http://</tt>, if it is a local directory, it must start with <tt>file://</tt>. <p> This concerns the images which are indicated in the person form, field "image". This does not concern the images installed by the link "send image" which are installed as a standard name in a standard place.
 aa: gwf_1.htm
-co: S’è ùn vulete micca chì e vostre fiure sianu installate in u locu predefinitu (cartulare di e base, sottu-cartulare « images », sottu-sottu-cartulare « %a »), indicate quì u chjassu d’accessu à u cartulare chì vò vulete impiegà. Stu chjassu d’accessu hè un indirizzu URL : s’è ghjè un situ web, u chjassu deve principià da <tt>http://</tt> è in casu di cartulare lucale, u principiu serà <tt>file://</tt>. <p> Què hè vera solu per e fiure chì sò indicate in u campu « image » di u furmulariu di e persone; Ùn ghjova micca per e fiure installate da u liame « mandà fiure » chì, elle, sò installate cù un nome predefinitu in u cartulare predefinitu.
+co: S’è ùn vulete micca chì e vostre fiure sianu installate in u locu predefinitu (cartulare di e base, sottucartulare « images », sottusottucartulare « %a »), indicate quì u chjassu d’accessu à u cartulare chì vò vulete impiegà. Stu chjassu d’accessu hè un indirizzu URL : s’è ghjè un situ web, u chjassu deve principià da <tt>http://</tt> è in casu di cartulare lucale, u principiu serà <tt>file://</tt>. <p> Què hè vera solu per e fiure chì sò indicate in u campu « image » di u furmulariu di e persone; Ùn ghjova micca per e fiure installate da u liame « mandà fiure » chì, elle, sò installate cù un nome predefinitu in u cartulare predefinitu.
 de: Wenn Du NICHT möchtest, dass deine Bilder am Standardort (Datenbankverzeichnis, Unterverzeichnis "images", Unter-Unterverzeichnis "%a") abgelegt werden, gib hier den Pfad zu dem Verzeichnis an, dass Du benutzen möchtest. Dieser Pfad ist ein URL: Wenn es sich um eine Webadresse handelt, muss sie mit <tt>http://</tt> beginnen, falls es ein lokales Verzeichnis ist, mit <tt>file://</tt>. <p> Dies betrifft die Bilder, die im Personenformular im Feld "Bild" eingegeben wurden, nicht aber Bilder, die über den Link "Bild senden" hochgeladen wurden. Letztere werden mit Standardnamen im Standardverzeichnis installiert.
 en: If do NOT want that your images are installed in the standard place (databases directory, sub-directory "images", sub-sub-directory "%a"), indicate here the path to the directory you want to use. This path is an URL: if it is a Web site, it must start with <tt>http://</tt>, if it is a local directory, it must start with <tt>file://</tt>. <p> This concerns the images which are indicated in the person form, field "image". This does not concern the images installed by the link "send image" which are installed as a standard name in a standard place.
 fr: Si vous désirez que vos images ne soient pas installées dans l’endroit standard (répertoire des bases, sous-répertoire "images", sous-sous-répertoire "%a"), indiquez ici le chemin d’accès au répertoire que vous voulez utiliser. Ce chemin d’accès est une URL : si c’est un site Web, il doit commencer par <tt>http://</tt>, si c’est un répertoire local, il doit commencer par <tt>file://</tt>. <p> Cela ne concerne que les images qui sont indiquées dans le formulaire des personnes, champ "image". Cela ne concerne pas les images installées par le lien "envoyer images" qui, elles, sont installées avec un nom standard dans le répertoire standard.
@@ -1671,7 +1671,7 @@ sv: Om du ändrar namnet på din databas, men databasen har funnits ett bra tag 
 
     If you gave a text to put in the bottom of the pages, this text is recorded in the file named "%a.trl" in the subdirectory "lang" of the directory "%w".
 aa: gwf_ok.htm
-co: S’è vò avete datu un testu à piazzà à u bassu di e pagine, stu testu serà arregistratu in u schedariu di nome « %a.trl » in u sottu-cartulare « lang » di u cartulare « %w ».
+co: S’è vò avete datu un testu à piazzà à u bassu di e pagine, stu testu serà arregistratu in u schedariu di nome « %a.trl » in u sottucartulare « lang » di u cartulare « %w ».
 de: Falls du einen Text angegeben hast, der am Fuß der Seiten angezeigt werden soll, wurde er in der Datei "%a.trl" im Unterverzeichnis "lang" des Verzeichnisses "%w" gespeichert.
 en: If you gave a text to put in the bottom of the pages, this text is recorded in the file named "%a.trl" in the subdirectory "lang" of the directory "%w".
 es: Si Ud. ha escogido la opción de agregar un texto en la parte inferior de las páginas, este texto es registrado en el fichero denominado "%a.trl" en la sub-carpeta "lang" de la carpeta "%w".
@@ -2117,7 +2117,7 @@ sv: ingen utskrift
 
     Not public even if titles (see -epn option).
 aa: ged2gwb.htm
-co: Ùn micca cunsiderà cum’è publicu s’è un titulu hè statu abbentatu (fighjà l’ozzione -epn).
+co: Ùn micca cunsiderà cum’è publicu s’è un titulu hè statu avventatu (fighjà l’ozzione -epn).
 de: nicht öffentlich sogar bei Titeln (siehe -epn Option).
 en: Not public even if titles (see -epn option).
 fr: Ne pas considérer comme public si un titre a été détecté (voir option -epn).
@@ -2141,7 +2141,7 @@ lv: Nr
 
     Once done, select the databases you want to merge by pushing their associated buttons:
 aa: merge.htm
-co: Quandu hè fattu, selezziunate e base di dati ch’ellu ci vole à unisce clicchendu nant’à u so buttone assuciatu :
+co: Quandu hè fattu, selezziunate e base di dati ch’ellu ci vole à unisce via un cliccu nant’à u so buttone assuciatu :
 de: Wenn das geschehen ist, wähle die Datenbanken, die du zusammenführen möchtest:
 en: Once done, select the databases you want to merge by pushing their associated buttons:
 fr: Une fois fait, sélectionnez les bases que vous voulez fusionner en cliquant sur leur bouton associé:
@@ -2233,14 +2233,14 @@ sv: Det finns andra parametrar för kommandot "gwd", men de kan inte konfigurera
 
     Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
 aa: connex.htm
-co: Inversureghja i risultati ver di basename/notes_d/connex.txt (-o deve stà viotu è notes_d deve esiste).
+co: Inversureghja i risultati versu basename/notes_d/connex.txt (-o deve stà viotu è notes_d deve esiste).
 de: Ausgabe erfolgt in basename/notes_d/connex.txt (-o muss leer bleiben und notes_d muss existieren).
 en: Output results in basename/notes_d/connex.txt (-o must stay empty and notes_d must exist).
 fr: Redirige le résultat vers basename/notes_d/connex.txt (-o doit rester vide et notes_d doit exister).
 
     Output results to this file.
 aa: connex.htm
-co: Inversureghja i risultati ver di stu schedariu.
+co: Inversureghja i risultati versu stu schedariu.
 de: Ausgabe erfolgt in diese Datei.
 en: Output results to this file.
 fr: Rediriger les résultats vers ce fichier.
@@ -2678,7 +2678,7 @@ sv: Sök
 
     Select the database or databases you want to delete, by clicking on the associated buttons.
 aa: delete.htm
-co: Selezziunate a basa o e base di dati ch’ellu ci vole à squassà clicchendu nant’à u so buttone assuciatu.
+co: Selezziunate a basa o e base di dati ch’ellu ci vole à squassà via un cliccu nant’à u so buttone assuciatu.
 de: Wähle die Datenbanken, die du löschen möchtest, mit dem zugehörigen Schalter.
 en: Select the database or databases you want to delete, by clicking on the associated buttons.
 es: Seleccione  la o las  bases que Ud desea destruir cliqueando  en el, o los, botones asociados:
@@ -2747,7 +2747,7 @@ fr: Sélectionnez le nom du fichier source, ou naviguez dans vos dossiers.
 
     Select your database by clicking on the associated button
 aa: gwf.htm
-co: Selezziunate a vostra basa di dati clicchendu nant’à u buttone assuciatu
+co: Selezziunate a vostra basa di dati via un cliccu nant’à u buttone assuciatu
 de: Bitte wähle deine Datenbank mit dem zugehörigen Schalter
 en: Select your database by clicking on the corresponding button
 es: Seleccione Ud. su base de datos cliqueando en el botón asociado
@@ -2766,7 +2766,7 @@ fr: Sélectionnez la première base de données 
 
     Select your GEDCOM file by clicking on the file or navigating in your folders.
 aa: ged2gwb.htm
-co: Selezziunate u vostru schedariu GEDCOM clicchendu nant’à u so nome, o navigate in i vostri cartulari.
+co: Selezziunate u vostru schedariu GEDCOM via un cliccu nant’à u so nome, o navigate in i vostri cartulari.
 de: Bitte eingeben vollständiger Name deiner GEDCOM-Datei.
 en: Select your GEDCOM file by clicking on the file or navigating in your folders.
 es: Agregue Ud el nombre completo de su fichero GEDCOM.
@@ -2882,14 +2882,14 @@ sv: Startkatalog och databas
 
     Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 aa: gwdiff.htm
-co: Persona di principu in a prima basa.<br> <span style="color:#FF0000;">Parametru ubblicatoriu</span>
+co: Persona di principiu in a prima basa.<br> <span style="color:#FF0000;">Parametru ubblicatoriu</span>
 de: Startperson in der ersten base.<br> <span style="color:#FF0000;">Pflicht Parameter</span>
 en: Starting person in first base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 fr: Personne racine dans la première base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
 
     Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 aa: gwdiff.htm
-co: Persona di principu in a seconda basa.<br> <span style="color:#FF0000;">Parametru ubblicatoriu</span>
+co: Persona di principiu in a seconda basa.<br> <span style="color:#FF0000;">Parametru ubblicatoriu</span>
 de: Startperson in der zweiten base.<br> <span style="color:#FF0000;">Pflicht Parameter</span>
 en: Starting person in second base.<br> <span style="color:#FF0000;">Mandatory parameter</span>
 fr: Personne racine dans la seconde base.<br> <span style="color:#FF0000;">Paramètre obligatoire</span>
@@ -2981,7 +2981,7 @@ sv: Hur de accentuerade tecknen är kodade är normalt specifierat i GEDCOM-huvu
 
     The advanced request allows to make researches in the data base. As it is very incomplete, it is hidden by default. Select "no" below to set it.
 aa: gwf_1.htm
-co: A richiesta esperta permette di fà ricerche cù criterii nant’à a basa. Cum’è hè assai incompleta, hè predefinita piattata. Selezziunate « Innò » quaghjò per rimettela.
+co: A richiesta esperta permette di fà ricerche cù criterii nant’à a basa. Cum’ella hè assai incumpleta, hè predefinita piattata. Selezziunate « Innò » quaghjò per rimettela.
 de: Die erweiterte Suche erlaubt es, Recherchen gemäß bestimmter Kriterien auf der Datenbank durchzuführen. Da sie sehr unvollständig implementiert it, ist sie per Default verborgen. Wähle "Nein", um sie zu aktivieren.
 en: The advanced request allows to make researches in the data base. As it is very incomplete, it is hidden by default. Select "no" below to set it.
 fr: La requête évoluée permet de faire des recherches avec critères sur la base. Comme elle est très incomplète, elle est cachée par défaut. Sélectionnez "non" ci-dessous pour la remettre.
@@ -3936,7 +3936,7 @@ sv: Du valde samma katalog som denna %G distribution.
 
     Your database has been completely rebuilt: the old version is on the subdirectory "old" of the directory "%w". You can recover it in case of problem.
 aa: clean_ok.htm
-co: A vostra basa di dati hè stata cumpletamente ricustruita : a vechja versione si trova in u sottu-cartulare « old » di u cartulare « %w ». Ci pudete ricuperalla in casu di prublema.
+co: A vostra basa di dati hè stata cumpletamente ricustruita : a vechja versione si trova in u sottucartulare « old » di u cartulare « %w ». Ci puderete ricuperalla in casu di prublema.
 de: Die Datenbank wurde erfolgreich neu erzeugt: Die alte Version steht im Unterverzeichnis "old" im Verzeichnis "%w". Falls es Probleme geben sollte, kannst du die alte Version wiederherstellen.
 en: Your database has been completely rebuilt: the old version is on the subdirectory "old" of the directory "%w". You can recover it in case of problem.
 es: Su base ha sido completamente reconstruida: la versión  anterior se encuentra en la sub-carpeta "old" de la carpeta "%w". Ud podrá recuperarla en caso de problema.
