@@ -70,14 +70,17 @@ tr: af=Afrikaans/bg=Bulgarca/br=Bretonca/ca=Katalanca/co=Korsikaca/cs=Çekçe/da
 zh: af=南非語/bg=保加利亚语/br=布列塔尼语/ca=加泰罗尼亚语/co=科西嘉岛/cs=捷克语/da=丹麦语/de=德语/en=英语/eo=世界语/es=西班牙语/et=爱沙尼亚语/fi=芬兰语/fr=法语/he=希伯来语/is=冰岛语/it=意大利语/lv=拉脱维亚语/nl=荷蘭語/no=挪威语/oc=奥克语/pl=波兰语/pt=葡萄牙語/pt-br= 巴西葡萄牙语/ro=羅馬尼亞語/ru=俄语/sk=斯洛伐克语/sl=斯洛文尼亚语/sv= 瑞典語/tr=土耳其/zh=中文
 
     redefine
+co: ridefinisce
 en: redefine
 fr: redéfinir
 
     continue
+co: cuntinuà
 en: continue
 fr: continuer
 
     without implex display
+co: senza affissà l’implessi
 en: without implex display
 fr: sans afficher les implexes
 
@@ -114,7 +117,7 @@ sv: %1 till %2
 tr: %1 / %2
 
     %d %s starting with %s
-co: %d %s principiendu da « %s »
+co: %d %s principiendu da « %s »
 de: %d %s beginnend mit „%s”
 en: %d %s starting with “%s”
 es: %d %s comenzando con "%s"
@@ -816,193 +819,240 @@ sv: söndag/måndag/tisdag/onsdag/torsdag/fredag/lördag
 tr: Pazar/Pazartesi/Salı/Çarşamba/Perşembe/Cuma/Cumartesi
 
     carrousel
+co: carusellu
 en: carrousel
 fr: carrousel
 
     display carrousel
+co: affissà u carusellu di fiure
 en: display the carrousel of images
 fr: afficher le carrousel d’images
 
     plugins
+co: moduli d’estensione
 en: plugins
 fr: plugins
 
     warning refresh
+co: attualizà a pagina solu dopu à un cliccu nant’à l’icona principale osinnò si ripiteria u scambiu di e fiure.
 en: refresh the page only after having clicked on the main icon as this would repeat the swap action.
 fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l’icone car cela répéterait l’échange des images.
 
     select input
+co: sceglie un schedariu
 de: wählen
 en: choose file
 fr: sélect. fichier
 
     ou
+co: o
 en: or
 fr: ou
 
     url
+co: indirizzu web
 en: url
 fr: url
 
     browse
+co: navigà
 de: durchsuchen
 en: browse
 fr: parcourir
 
     portrait
+co: ritrattu
 de: Porträt
 en: portrait
 fr: portrait
 
     add portrait
+co: aghjunghje un ritrattu
 en: add a portrait
 fr: ajouter un portrait
 
     add image
+co: aghjunghje una fiura
 en: add an image
 fr: ajouter une image
 
     add note
+co: aghjunghje una nota
 en: add a note
 fr: ajouter une note
 
     add source
+co: aghjunghje una fonte
 en: add a source
 fr: ajouter une source
 
     modify portrait
+co: mudificà u ritrattu
 en: modify the portrait
 fr: modifier le portrait
 
     modify note
+co: mudificà a nota
 en: modify the note
 fr: modifier la note
 
     modify source
+co: mudificà a fonte
 en: modify the source
 fr: modifier la source
 
     see portrait
+co: vede u ritrattu
 en: see portrait
 fr: voir le portrait
 
     see portrait saved
+co: vede u ritrattu arregistratu
 en: see saved portrait
 fr: voir le portrait sauvegardé
 
     delete portrait
+co: squassà u ritrattu
 en: delete portrait
 fr: supprimer le portrait
 
     delete portrait saved
+co: squassà u ritrattu arregistratu
 en: delete saved portrait
 fr: supprimer le portrait sauvegardé
 
     delete image
+co: squassà a fiura
 en: delete image
 fr: supprimer une image
 
     delete image saved
+co: squassà a fiura arregistrata
 en: delete saved image
-fr: supprimer une image sauvegardés
+fr: supprimer une image sauvegardée
 
     restore image saved
+co: risturà una fiura arregistrata
 en: restore saved image
-fr: restaurer une image sauvegardés
+fr: restaurer une image sauvegardée
 
     restore portrait
+co: risturà u ritrattu
 en: restore portrait
 fr: restaurer le portrait
 
     restore portrait saved
+co: risturà u ritrattu arregistratu
 en: restore saved portrait
 fr: restaurer le portrait sauvegardé
 
     saved images
+co: fiura arregistrata/fiure arregistrate
 en: saved image/saved images
 fr: image sauvegardée/images sauvegardées
 
     with note
-en: with a note
-fr: avec ue note
+co: cù una nota
+en: with a note
+fr: avec une note
 
     send image with note and source
+co: mandà a fiura selezziunata cù nota è fonte
 en: send selected image with note and source
 fr: envoyer l’image selectionée avec note et source
 
     uploaded
+co: incaricatu/incaricata
 en: uploaded
 fr: envoyé/envoyée
 
     save
+co: arregistrà
 en: save
 fr: sauvegarder
 
     saved
+co: arregistratu/arregistrata
 en: saved
 fr: sauvegardé/sauvegardée
 
     deleted
+co: squassatu/squassata
 en: deleted
 fr: supprimé/supprimée
 
     restore
+co: risturà
 en: restore
 fr: restaurer
 
     restored
+co: risturatu/risturata
 en: restored
 fr: restauré/restaurée
 
     save portrait
-en: the existing portait will be saved to
+co: u ritrattu esistente serà arregistratu in
+en: the existing portrait will be saved to
 fr: le portrait existant sera sauvegardé dans
 
     previous portrait
-en: a possible previous version of the saved portait will be deleted.
+co: un arregistramentu precedente di u ritrattu, s’ellu esiste, serà squassatu.
+en: a possible previous version of the saved portrait will be deleted.
 fr: une sauvegarde pré-existante du portrait sera supprimée.
 
     store image
+co: a fiura selezziunata serà piazzata in
 en: the selected image will be copied to
 fr: l’image sélectionnée sera enregistrée dans
 
     add image
+co: aghjunghje una fiura
 en: add an image
 fr: ajouter une image
 
     save image
+co: una fiura cù un nome simile serà dispiazzata in
 en: an image with a similar name will moved to
 fr: si une image du même nom existe déjà, elle sera sauvegardée dans
 
     previous image
+co: s’è una fiura cù u listessu nome esiste dighjà in u cartulare di salvaguardia, sta fiura serà squassata.
 en: if an image with the same name already exists in the saved, it will be deleted.
 fr: si une image du même nom existe déjà dans le sous-répertoire de sauvegarde, elle sera supprimée.
 
     image note
+co: aghjunghje una nota per a fiura.
 en: add a note for the image.
 fr: ajouter une note pour l’image.
 
     image source
+co: aghjunghje una fonte per a fiura.
 en: add a source for the image.
 fr: ajouter une source pour l’image.
 
     update image note
+co: mudificà a nota di a fiura
 en: update image note
 fr: mettre à jour la note de l’image
 
     update image source
+co: mudificà a fonte di a fiura
 en: update image source
 fr: mettre à jour la source de l’image
 
     previous
+co: precedente
 en: previous
 fr: précédent
 
     next
+co: seguente
 en: next
 fr: suivant
 
     plugins
+co: moduli d’estensione
 en: plugins
 fr: plugins
 
@@ -1141,10 +1191,12 @@ sv: <em>annummer</em> med %t som proband (Kekules system)
 tr: <em>Sosa sayısı</em> %t'e göre
 
     the database name %s contains a forbidden character.
+co: u nome di a basa di dati « %s » cuntene un caratteru difesu.
 en: the database name "%s" contains a forbidden character.
 fr: le nom de la base "%s" contient un caractère interdit.
 
     allowed characters
+co: caratteri permessi
 en: allowed characters
 fr: caractères autorisés
 
@@ -1185,7 +1237,7 @@ af: 'n kleinneef/'n kleinniggie
 bg: втори братовчед/втора братовчедка
 br: ur c'hevenderv/ur gevendervez/ur c'h(g)evenderv(ez)
 ca: un cosí segon/una cosina segona/un(a) cosí(na) segon(a)
-co: un cuginu à u secondu gradu/una cugina à u secondu gradu/un(a) cuginu(a) à u secondu gradu
+co: un cuginu à u %s gradu/una cugina à u %s gradu/un(a) cuginu(a) à u %s gradu
 cs: bratranec z druhého kolena/sestřenice z druhého kolena
 da: en fætter af 2. grad/en kusine af 2. grad
 de: ein:d:+em Cousin 2. Grades/eine:d:+r Cousine 2. Grades
@@ -1290,7 +1342,7 @@ af: 'n broer/'n sister/'n sibbe
 bg: брат/сестра/брат или сестра
 br: ur breur/ur c'hoar/ur breur pe ur c'hoar
 ca: un germà/una germana/un(a) germà(na)
-co: un fratellu/una surella/un fratellu o una surella
+co: un %sfratellu/una %surella/un %sfratellu o una surella
 cs: bratr/sestra/sourozenec
 da: en broder/en søster/en broder eller en søster
 de: ein Bruder/eine Schwester/ein Bruder oder eine Schwester
@@ -1362,6 +1414,7 @@ tr: bir kuzeni
 ->: a cousin
 
     cousins.2.2
+co: cugini
 en: cousins 1rd
 fr: cousins
 
@@ -1598,14 +1651,17 @@ sv: en gammel-nevö/en gammel-niece
 tr: bir büyük yeğen/bir büyük yeğen/büyük yeğen/büyük yeğen/büyük yeğenler ve büyük yeğenler
 
     cousin.1.3
+co: un %sniputinu/una %sniputina/un %sniputinu o una niputina
 en: un %sgrandnephew/a %sgrandniece/a %sgrandnephew
 fr: un %spetit-neveu/une %spetite-nièce/un %spetit-neveu
 
     cousins.1.3
+co: niputinu/niputini/niputina/niputine
 en: grandnephew/grandnephews/grandniece/grandnieces
 fr: petit-neveu/petits-neveux/petite-nièce/petites-nièces
 
     cousins.1.3 tt
+co: niputini è niputine
 en: great-nephews and great-nieces
 fr: arrière-neveux et arrière-nièces (soutenu)<br>enfant d’un neveu ou d’une nièce
 
@@ -1755,7 +1811,7 @@ af: 'n broerskind/'n susterskind///broers- en susterskinders
 bg: племенник/племенница/племенници/племеннички/племенници и племеннички
 br: un niz/un nizez/nized/nizezed/nized ha nizezed
 ca: un nebot/una neboda/nebots/nebodes/nebots i nebodes
-co: un nipote/una nipote/nipoti/nipoti/nipoti
+co: un %snipote/una %snipote/nipoti/nipote/nipoti è nipote
 cs: synovec/neteř/synovci/neteře/synovci a neteře
 da: en nevø/en niece/nevøer/niecer/nevøer og niecer
 de: ein:d:+em Neffe:d:+n/eine:d:+r Nichte/Neffen/Nichten/Neffen und Nichten
@@ -1786,6 +1842,7 @@ tr: bir yeğen/bir yeğen/yeğenler/yeğenler/yeğenler ve yeğenler
 ->: a nephew/a niece
 
     cousins.1.2
+co: nipoti è nipote
 en: nephew and nieces
 fr: neveux et nièces
 
@@ -2462,7 +2519,7 @@ af: in die lewe
 bg: жив/жива/жив(а)
 br: bev c'hoazh
 ca: viu/viva/viu(va)
-co: vivu/viva/vivu(a)
+co: vivu/viva/vivu(a)/vivi
 cs: žijící
 da: levende
 de: nicht verstorben
@@ -2654,7 +2711,7 @@ af: 'n oom/'n tante
 bg: чичо/леля/вуйчо/леля
 br: un eontr/ur voereb
 ca: un oncle/una tia
-co: un ziu/una zia/zii/zie/zii è zie
+co: un %sziu/una %szia/zii/zie/zii è zie
 cs: strýc/teta
 da: en onkel/en tante
 de: ein:d:+em Onkel/eine:d:+r Tante
@@ -2682,6 +2739,7 @@ sv: en farbror/en faster/en morbror/en moster
 tr: bir amca/bir teyze/amcalar/teyzeler/amcalar ve teyzeler
 
     ascending/descending (degree)
+co: gradu d’ascendenza/gradu di discendenza/gradi d’ascendenza/gradi di discendenza
 de: aufsteigender Grad/absteigender Grad/aufsteigender Grade/absteigender Grade
 en: ascending degree/descending degree/ascending degrees/descending degrees
 fr: degré ascendant/degré descendant/degrés ascendants/degrés descendants
@@ -2691,7 +2749,7 @@ af: /voorouers
 bg: /предци
 br: /hendadoù
 ca: ascendent/ascendents
-co: /antenati
+co: antenatu/antenati
 cs: /předkové
 da: /forfædre
 de: Vorfahre/orfahren
@@ -2724,7 +2782,7 @@ af: voorsate
 bg: предци
 br: hendadoù
 ca: avantpassats
-co: qualchì antenatu
+co: antenati
 cs: předkové
 da: forfædre
 de: Vorfahren
@@ -2979,7 +3037,7 @@ sv: är
 tr: vardır
 
     area code
-co: codice di cumuna
+co: codice pustale
 de: Ortskennziffer
 en: code
 es: código postal
@@ -3634,7 +3692,7 @@ tr: doğum günleri
 zh: 出生于今日的记录
 
     book of %s
-co: lista di i %s
+co: libru di i %s
 de: %s-Lexikon
 en: book of %s
 es: lista de %s
@@ -3666,7 +3724,7 @@ sv: förteckning över förfäder
 tr: soy kitabı
 
     books
-co: dizziunarii
+co: libri
 de: Wörterbücher
 en: books
 fr: dictionnaires
@@ -4143,7 +4201,7 @@ af: verander kinders se name
 bg: да се промени име на дете
 br: kemm anvioù ar vugale
 ca: canviar els noms dels fills
-co: cambià u nome di i zitelli
+co: mudificà a casata di i zitelli
 cs: změnit jména dětí
 da: ændre børns navne
 de: Namen der Kinder ändern
@@ -4175,7 +4233,7 @@ af: verander dit self
 bg: променете сами номера
 br: dibabit un niver all
 ca: elegiu-ne un altre
-co: sceglitene un altru
+co: sciglitene un altru
 cs: změnit číslo
 da: vælg et andet
 de: ändere die Nummer selbst
@@ -4203,7 +4261,7 @@ sv: ändra det själv
 tr: kendin değiştir
 
     change name
-co: cambiu di nome
+co: cambià a casata
 de: Namenswechsel
 en: change surname
 es: cambio de apellido
@@ -4251,7 +4309,7 @@ sv: ändrade ordningen för barnen
 tr: çocukların sırasını değiştirme
 
     changed order of family's events
-co: cambiu di l’ordine di l’avvenimenti famigliale
+co: cambiu di l’ordine di l’evenimenti famigliale
 de: ändern der Reihenfolge familiärer Ereignisse
 en: change order of family events
 es: cambio del orden de los acontecimientos familiares
@@ -4280,7 +4338,7 @@ sv: ändrade ordningen för giftermål
 tr: evlilik düzeni değiştirildi
 
     changed order of person's events
-co: cambiu di l’ordine di l’avvenimenti di l’individuu
+co: cambiu di l’ordine di l’evenimenti di l’individuu
 de: ändern der Reihenfolge bei Ereignissen des Individuums
 en: change order of individual events
 es: cambio del orden de los acontecimientos del individuo
@@ -4374,6 +4432,7 @@ tr: oğulları/kızları/çocukları
 ->: child/children
 
     cousins.0.1 tt
+co: figlioli è figliole
 en: sons and daughters
 fr: fils et filles, enfants
 
@@ -4462,7 +4521,7 @@ af: druk
 bg: щракнете
 br: klikit
 ca: premeu
-co: cliccà
+co: fate un cliccu
 cs: klikněte
 da: klik
 de: klicke
@@ -4494,7 +4553,7 @@ af: druk "%s"
 bg: щракнете на "%s"
 br: klikit war "%s"
 ca: premeu sobre "%s"
-co: cliccà nant’à « %s »
+co: fate un cliccu nant’à « %s »
 cs: klikněte "%s"
 da: klik »%s«
 de: klicke auf „%s”
@@ -4661,7 +4720,7 @@ sv: skapad av %s fån commit %s
 tr: %s üzerinde %s kaydetmeden derlendi
 
     compute all marriages
-co: include tutti i cumpagni
+co: calculà per tutte l’unioni
 de: Lebenspartner mit einschließen
 en: compute all marriages
 es: incluir todos los cónyuges
@@ -4677,7 +4736,7 @@ sv: ta med alla giftermål
 tr: eşleri dahil et
 
     compute approximatives dates
-co: include e date micca esatte
+co: include e date apprussimative
 de: ungefähre Daten berücksichtigen
 en: include unsure dates
 es: tener en cuenta las fechas aproximadas
@@ -4786,7 +4845,7 @@ af: gaan voort met die samevoeging
 bg: да продължи обединяването
 br: derc'hel da gendeuziñ
 ca: continuar la fusió
-co: cuntinuà a currezzione ?
+co: cuntinuà a currezzione ?
 cs: pokračovat ve spojování
 da: fortsæt sammenføjning
 de: Zusammenführung fortsetzen
@@ -4880,6 +4939,7 @@ sv: kopiera länken
 tr: bağlantıyı panoya kopyala
 
     copy permalink
+co: cupià u permaliame
 en: copy the permalink
 fr: copier le permalien
 
@@ -5068,7 +5128,7 @@ sv: kremering
 tr: ölü yakma
 
     custom event
-co: avvenimentu persunalizatu
+co: evenimentu persunalizatu
 de: benutzerdefiniertes Ereignis
 en: custom event
 fr: événement personnalisé
@@ -5334,7 +5394,7 @@ sv: dagar
 tr: eski günler
 
     dd/mm/yyyy
-co: GG/MM/AAAA
+co: gg/mm/aaaa
 de: TT/MM/JJJJ
 en: dd/mm/yyyy
 fr: jj/mm/aaaa
@@ -5347,7 +5407,7 @@ af: oorlede
 bg: смърт
 br: marv
 ca: defunció
-co: trapassu
+co: morte
 cs: úmrtí
 da: død
 de: Tod
@@ -5375,7 +5435,7 @@ sv: död
 tr: ölüm
 
     death date and death place
-co: data è locu di trapassu
+co: data è locu di a morte
 de: Datum und Ort des Ablebens
 en: date and place of death
 es: fecha y lugar de defunción
@@ -5391,7 +5451,7 @@ sv: dödsdatum och dödsplats
 tr: ölüm tarihi ve yeri
 
     death place
-co: locu di trapassu
+co: locu di a morte
 de: Sterbeort
 en: place of death
 es: lugar de defunción
@@ -5407,7 +5467,7 @@ sv: dödsplats
 tr: ölüm yeri
 
     death src
-co: fonte di trapassu
+co: fonte di a morte
 de: Ouellenangabe-Ableben
 en: source of death
 es: fuente defunción
@@ -5438,7 +5498,7 @@ sv: medaljer
 tr: madalya
 
     degree of kinship
-co: gradu di parentia
+co: gradu di parentia/gradi di parentia
 de: Grad der Elternschaft
 en: degree of kinship/degrees of kinship
 fr: degré de parenté/degrés de parenté
@@ -5566,7 +5626,7 @@ ar: توفي
 bg: починал/починала/починал(а)
 br: marvet
 ca: mort/morta/mort(a)
-co: mortu/morta/mortu(a)
+co: mortu/morta/mortu(a)/morti
 cs: zemřel/zemřela/zemřeli
 da: død
 de: verstorben
@@ -5884,7 +5944,7 @@ sv: visa vigseldatum
 tr: evlilik tarihini göster
 
     display notes and sources inline
-co: include e notefonte à u cuntenutu
+co: include note è fonte à u cuntenutu
 de: einschließen der Notizen und Quellen im Inhalt
 en: add notes and sources to content
 es: incluir las notas&#47;fuentes en el contenido
@@ -5929,7 +5989,7 @@ sv: visa anförlusten
 tr: soyağacı daralmasını göster
 
     display spouse
-co: affissà u(a) cumpagnu(a)
+co: affissà cumpagnu(a)
 de: Ehepartner anzeigen
 en: display spouse
 es: editar cónyuge
@@ -5945,7 +6005,7 @@ sv: visa makar
 tr: eşini göster
 
     display this marriage in this order
-co: dispiazzà st’unione à a so pusizione
+co: cambià l’ordine di l’unioni
 de: diese Verbindung an seine Position setzen
 en: change order of marriage
 es: colocar esta unión en posición
@@ -6067,7 +6127,7 @@ af: moet nie takke van ooreenstemende oorsprong saamvoeg nie
 bg: да не се обединяват общите клонове
 br: n'eo ket dav kendastum ar skourroù boutin
 ca: no reagrupar les branques comunes
-co: ùn adunisce micca e ghjembe cummune
+co: ùn adunisce micca e ghjembe cumune
 cs: nespojovat spolecné vetve
 da: slå ikke fælles anelinier sammen
 de: gemeinsame Zweige nicht zusammenfassen
@@ -6385,7 +6445,7 @@ tr: alan
 zh: 地点
 
     event/events
-co: avvenimentu/avvenimenti
+co: evenimentu/evenimenti
 de: Ereignis/Ereignisse
 en: event/events
 es: evento/eventos
@@ -6400,14 +6460,14 @@ sv: händelse/Händelse
 tr: etkinlik/etkinlikler
 
     events to which %s was witness
-co: avvenimenti induve %s era testimoniu
+co: evenimenti induve %s era testimoniu
 de: Ereignisse, von denen %s Zeuge war
 en: events to which %s was witness
 fr: évènements auxquels %s était témoin
 tr: %s'in tanık olduğu etkinlikler
 
     events tree
-co: arburu di l’avvenimenti
+co: arburu di l’evenimenti
 de: Baum der Ereignisse
 en: tree of events
 fr: arbre des événements
@@ -7461,12 +7521,14 @@ tr: büyük-büyük-ebeveynler
 fr: bisaïeul·e·s
 
     great-great-grandparents
+co: arcicaccaroni
 de: Ururgroßelternteil
 en: great-great-grandparents
 eo: prapraavo
 fr: arrière-arrière-grands-parents
 
     cousin.4.0
+co: un arcicaccarone/una arcicaccarona/un arcicaccarone
 en: a great-great-grandfather/a great-great-grandmother/a great-great-grandparent
 fr: un arrière-arrière-grand-père/une arrière-arrière-grand-mère/un arrière-arrière-grand-parent
 
@@ -7627,6 +7689,7 @@ sv: halvsyskon
 tr: üvey kardeşler
 
     half-relationship
+co: mezu/meza/mezi
 en: half-/half-/half-/ 
 fr: demi-/demie-/demi-/ 
 
@@ -7679,7 +7742,7 @@ sv: gratulerar på födelsedagen!
 tr: doğum günün kutlu olsun!
 
     having a family
-co: avendu una famiglia
+co: moglia è figlioli sò cunnisciuti
 de: hat einen Lebenspartner und/oder Kinder
 en: spouse and children are known
 es: tiene un cónyuge y/o hijos
@@ -7700,7 +7763,7 @@ ar: طفلهم / أطفالهم ٪S
 bg: c дете/c %s деца
 br: o bugel/o %s bugel
 ca: amb fill/amb %s fills
-co: cù u zitellu/cù %s figlioli
+co: cù figliolu(a)/cù %s figlioli
 cs: jejich dítě/jejich %s děti
 da: med barn/med %s børn
 de: ihr Kind/ihre %s Kinder
@@ -9093,7 +9156,7 @@ sv: länk
 tr: bağlantı
 
     link back to parents
-co: liame di ritornu ver di i genitori
+co: liame di ritornu versu i genitori
 en: link back to parents
 fr: lien retour vers les parents
 no: lenke til foreldre
@@ -9102,6 +9165,7 @@ sv: länk tillbaka till föräldrarna
 tr: ebeveynlere geri bağlantı
 
     no more
+co: micca di più
 en: no more
 fr: pas d’autres
 
@@ -9250,7 +9314,7 @@ sv: passagerarlista
 tr: yolcu Listesi
 
     lists and charts
-co: arburi, liste è stati
+co: grafichi è liste
 de: Stammbäume, Listen und Zustände
 en: charts and lists
 es: árboles, listas y estados
@@ -9712,13 +9776,13 @@ tr: evlilik notları/evlilik notları
     marriage of %t after his/her death
 co: matrimoniu di %t dopu a so morte
 en: marriage of %t after his/her death
-fr: marriage de %t après son décès
+fr: mariage de %t après son décès
 lt: santuoka po %t mirties
 
     marriage of %t before his/her birth
 co: matrimoniu di %t nanzu a so nascita
 en: marriage of %t before his/her birth
-fr: marriage de %t avant sa naissance
+fr: mariage de %t avant sa naissance
 lt: %t susituokė prieš gimdamas 
 
     marriage place
@@ -9804,8 +9868,9 @@ sv: äktenskap/äktenskap
 tr: eş/eşler
 
     marriages with
+co: rilazioni o matrimonii cù
 en: relations or marriages with
-fr: relations ou marriages avec
+fr: relations ou mariages avec
 
     married
 af: getroud
@@ -10292,7 +10357,7 @@ sv: datum saknas
 tr: tarih yok
 
     missing events
-co: avvenimenti assente
+co: evenimenti assente
 de: Fehlende Ereignisse
 en: missing events
 es: faltan eventos
@@ -10459,7 +10524,7 @@ sv: ändra
 tr: güncelleme
 
     modify family %s event order
-co: intervertisce l’avvenimenti di a famiglia %s
+co: intervertisce l’evenimenti di a famiglia %s
 en: permute the events of family %s
 fr: permuter les événements de la famille %s
 pt: permutar os eventos da família %s
@@ -10467,7 +10532,7 @@ sv: ändra ordningen för %s familjehändelser
 tr: %s ailesinin etkinliklerini değiştir
 
     modify person event order
-co: intervertisce l’avvenimenti individuali
+co: intervertisce l’evenimenti individuali
 en: permute personnal events
 fr: permuter les événéments individuels
 pt: permutar os eventos individuais
@@ -10618,7 +10683,7 @@ sv: flytta upp/flytta ner/flytta pekaren uppåt/flytta pekaren nedåt
 tr: yukarı taşı/aşağı taşı/imleci yukarı taşı/imleci aşağı taşı
 
     msg error disconnected
-co: per disgrazia, pudete aghjunghje solu famiglie chì sò cunnettate à l’altre.<br>Sta restrizione hè stata aghjunta da u pruprietariu di a basa di dati.
+co: per disgrazia, pudete aghjunghje solu famiglie chì sò cunnesse à l’altre.<br />Sta ristrizzione hè stata aghjunta da u pruprietariu di a basa di dati.
 de: sorry, Sie können nur Familien hinzufügen, die mit dem Rest in Verbindung stehen. <br> Diese Einschränkung wurde durch den Eigentümer der Datenbank hinzugefügt.
 en: sorry, you can add only families connected to the rest.<br>This restriction has been added by this database owner.
 fr: désolé, vous ne pouvez ajouter que des familles connectées au reste.<br>Cette restriction a été ajoutée par le propriétaire de cette base de données.
@@ -10898,7 +10963,7 @@ sv: barn
 tr: çocuklar
 
     nb events
-co: num. avvenimenti
+co: num. evenimenti
 de: Ereignisse
 en: number of events
 es: núm. eventos
@@ -10914,6 +10979,7 @@ sv: antal händelser
 tr: etkinliklerin sayısı
 
     open this individual page
+co: apre a pagina individuale
 en: open this individual page
 fr: ouvrir la page individuelle
 
@@ -10966,7 +11032,7 @@ sv: ny uppdatering
 tr: düzenlemeye devam et
 
     new name
-co: novu nome
+co: nome novu
 en: new name
 fr: nouveau nom
 no: nytt navn
@@ -11084,7 +11150,7 @@ sv: ingen födelsedag
 tr: doğum günü yok
 
     no descendants
-co: senza discendente
+co: senza discendenza
 de: Ohne Nachkommen
 en: without posterity
 es: sin descendencia
@@ -11423,7 +11489,7 @@ tr: notlar değiştirildi
 
     notes summary
 bg: резюме на бележките
-co: cumpiendu di e note diverse
+co: riassuntu di e note diverse
 de: Zusammenfassung sonstiger Notizen
 en: notes summary
 es: sumario de notas diversas
@@ -11443,7 +11509,7 @@ af: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16d
 bg: n-ти/първи/втори/трети/четвърти/пети/шести/седми/осми/девети/десети/единадесети/дванадесети/тринадесети/четиринадесети/петнадесети/шестнадесети/седемнадесети/осемнадесети/деветнадесети/двадесети/21-и/22-и/23-и/24-и/25-и/26-и/27-и/28-и/29-и/30-и/31-и/32-и/33-и/34-и/35-и/36-и/37-и/38-и/39-и/40-и/41-и/42-и/43-и/44-и/45-и/46-и/47-и/48-и/49-и/50-и/51-и/52-и/53-и/54-и/55-и/56-и/57-и/58-и/59-и/60-и/61-и/62-и/63-и/64-и/65-и/66-и/67-и/68-и/69-и/70-и/71-и/72-и/73-и/74-и/75-и/76-и/77-и/78-и/79-и/80-и/81-и/82-и/83-и/84-и/85-и/86-и/87-и/88-и/89-и/90-и/91-и/92-и/93-и/94-и/95-и/96-и/97-и/98-и/99-и
 br: n-vet/1añ/eil/3de/4re/5vet/6vet/7vet/8vet/9vet/10vet/11vet/12vet/13vet/14vet/15vet/16vet/17vet/18vet/19vet/20vet/21vet/22vet/23vet/24vet/25vet/26vet/27vet/28vet/29vet/30vet/31vet/32vet/33vet/34vet/35vet/36vet/37vet/38vet/39vet/40vet/41vet/42vet/43vet/44vet/45vet/46vet/47vet/48vet/49vet/50vet/51vet/52vet/53vet/54vet/55vet/56vet/57vet/58vet/59vet/60vet/61vet/62vet/63vet/64vet/65vet/66vet/67vet/68vet/69vet/70vet/71vet/72vet/73vet/74vet/75vet/76vet/77vet/78vet/79vet/80vet/81vet/82vet/83vet/84vet/85vet/86vet/87vet/88vet/89vet/90vet/91vet/92vet/93vet/94vet/95vet/96vet/97vet/98vet/99vet/100vet/101vet/102vet/103vet/104vet
 ca: n-èssim/1er/2on/3er/4rt/5è/6è/7è/8è/9è/10è/11è/12è/13è/14è/15è/16è/17è/18è/19è/20è/21è/22mo/23è/24è/25è/26è/27è/28è/29è/30è/31è/32è/33è/34è/35è/36è/37è/38è/39è/40è/41è/42è/43è/44è/45è/46è/47è/48è/49è/50è/51è/52è/53è/54è/55è/56è/57è/58è/59è/60è/61è/62è/63è/64è/65è/66è/67è/68è/69è/70è/71è/72è/73è/74è/75è/76è/77è/78è/79è/80è/81è/82è/83è/84è/85è/86è/87è/88è/89è/90è/91è/92è/93è/94è/95è/96è/97è/98è/99è
-co: n-esimu/1<sup>u</sup>/2<sup>u</sup>/3<sup>u</sup>/4<sup>u</sup>/5<sup>u</sup>/6<sup>u</sup>/7<sup>u</sup>/8<sup>u</sup>/9<sup>u</sup>/10<sup>u</sup>/11<sup>u</sup>/12<sup>u</sup>/13<sup>u</sup>/14<sup>u</sup>/15<sup>u</sup>/16<sup>u</sup>/17<sup>u</sup>/18<sup>u</sup>/19<sup>u</sup>/20<sup>u</sup>/21<sup>u</sup>/22<sup>u</sup>/23<sup>u</sup>/24<sup>u</sup>/25<sup>u</sup>/26<sup>u</sup>/27<sup>u</sup>/28<sup>u</sup>/29<sup>u</sup>/30<sup>u</sup>/31<sup>u</sup>/32<sup>u</sup>/33<sup>u</sup>/34<sup>u</sup>/35<sup>u</sup>/36<sup>u</sup>/37<sup>u</sup>/38<sup>u</sup>/39<sup>u</sup>/40<sup>u</sup>/41<sup>u</sup>/42<sup>u</sup>/43<sup>u</sup>/44<sup>u</sup>/45<sup>u</sup>/46<sup>u</sup>/47<sup>u</sup>/48<sup>u</sup>/49<sup>u</sup>/50<sup>u</sup>/51<sup>u</sup>/52<sup>u</sup>/53<sup>u</sup>/54<sup>u</sup>/55<sup>u</sup>/56<sup>u</sup>/57<sup>u</sup>/58<sup>u</sup>/59<sup>u</sup>/60<sup>u</sup>/61<sup>u</sup>/62<sup>u</sup>/63<sup>u</sup>/64<sup>u</sup>/65<sup>u</sup>/66<sup>u</sup>/67<sup>u</sup>/68<sup>u</sup>/69<sup>u</sup>/70<sup>u</sup>/71<sup>u</sup>/72<sup>u</sup>/73<sup>u</sup>/74<sup>u</sup>/75<sup>u</sup>/76<sup>u</sup>/77<sup>u</sup>/78<sup>u</sup>/79<sup>u</sup>/80<sup>u</sup>/81<sup>u</sup>/82<sup>u</sup>/83<sup>u</sup>/84<sup>u</sup>/85<sup>u</sup>/86<sup>u</sup>/87<sup>u</sup>/88<sup>u</sup>/89<sup>u</sup>/90<sup>u</sup>/91<sup>u</sup>/92<sup>u</sup>/93<sup>u</sup>/94<sup>u</sup>/95<sup>u</sup>/96<sup>u</sup>/97<sup>u</sup>/98<sup>u</sup>/99<sup>u</sup>
+co: n<sup>esimu</sup>/1<sup>u</sup>/2<sup>u</sup>/3<sup>u</sup>/4<sup>u</sup>/5<sup>u</sup>/6<sup>u</sup>/7<sup>u</sup>/8<sup>u</sup>/9<sup>u</sup>/10<sup>u</sup>/11<sup>u</sup>/12<sup>u</sup>/13<sup>u</sup>/14<sup>u</sup>/15<sup>u</sup>/16<sup>u</sup>/17<sup>u</sup>/18<sup>u</sup>/19<sup>u</sup>/20<sup>u</sup>/21<sup>u</sup>/22<sup>u</sup>/23<sup>u</sup>/24<sup>u</sup>/25<sup>u</sup>/26<sup>u</sup>/27<sup>u</sup>/28<sup>u</sup>/29<sup>u</sup>/30<sup>u</sup>/31<sup>u</sup>/32<sup>u</sup>/33<sup>u</sup>/34<sup>u</sup>/35<sup>u</sup>/36<sup>u</sup>/37<sup>u</sup>/38<sup>u</sup>/39<sup>u</sup>/40<sup>u</sup>/41<sup>u</sup>/42<sup>u</sup>/43<sup>u</sup>/44<sup>u</sup>/45<sup>u</sup>/46<sup>u</sup>/47<sup>u</sup>/48<sup>u</sup>/49<sup>u</sup>/50<sup>u</sup>/51<sup>u</sup>/52<sup>u</sup>/53<sup>u</sup>/54<sup>u</sup>/55<sup>u</sup>/56<sup>u</sup>/57<sup>u</sup>/58<sup>u</sup>/59<sup>u</sup>/60<sup>u</sup>/61<sup>u</sup>/62<sup>u</sup>/63<sup>u</sup>/64<sup>u</sup>/65<sup>u</sup>/66<sup>u</sup>/67<sup>u</sup>/68<sup>u</sup>/69<sup>u</sup>/70<sup>u</sup>/71<sup>u</sup>/72<sup>u</sup>/73<sup>u</sup>/74<sup>u</sup>/75<sup>u</sup>/76<sup>u</sup>/77<sup>u</sup>/78<sup>u</sup>/79<sup>u</sup>/80<sup>u</sup>/81<sup>u</sup>/82<sup>u</sup>/83<sup>u</sup>/84<sup>u</sup>/85<sup>u</sup>/86<sup>u</sup>/87<sup>u</sup>/88<sup>u</sup>/89<sup>u</sup>/90<sup>u</sup>/91<sup>u</sup>/92<sup>u</sup>/93<sup>u</sup>/94<sup>u</sup>/95<sup>u</sup>/96<sup>u</sup>/97<sup>u</sup>/98<sup>u</sup>/99<sup>u</sup>
 cs: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 da: ordenstal/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 de: n-ten/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
@@ -11618,7 +11684,7 @@ sv: antal barn
 tr: çocuk sayısı
 
     number of events
-co: numeru d’avvenimenti
+co: numeru d’evenimenti
 de: Anzahl der Ereignisse
 en: number of events
 es: número de eventos
@@ -11888,6 +11954,7 @@ sv: från %ss släktsida
 tr: %s tarafında
 
     on %s's siblings side
+co: di u latu di i fratelli o surelle di %s
 en: on %s's siblings side
 fr: du côté des frères et soeurs de %s
 
@@ -12206,6 +12273,7 @@ tr: diğer eylem
 zh: 其他行動
 
     other/other/other
+co: altru/altra/altra(u)
 de: anderer/andere/andere
 en: other/other/other
 es: otro/otra/otro
@@ -12218,7 +12286,7 @@ pt: outro/outra/outro
 sv: annat/annat/annat
 
     PACS
-co: Pacs
+co: PACS
 de: verfestigte Lebensgemeinschaft
 en: civil marriage
 es: Pacs
@@ -12232,7 +12300,7 @@ sv: borgerligt äktenskap
 tr: sivil evlilik
 
     pacsed%t to
-co: Pacs%t cù
+co: PACS%t cù
 de: Eheähnliches Verhältnis%t mit
 en: civil solidarity pact%t with
 es: pacto civil de solidaridad%t con
@@ -12505,7 +12573,7 @@ sv: personer med samma namn
 tr: aynı adı taşıyan kişiler
 
     photos & documents
-co: fiure è ducumenti
+co: ducumenti è fiure
 de: Fotos & Dokumente
 en: archive & pictures
 es: fotos & documentos
@@ -13019,7 +13087,7 @@ sv: erkännande far/erkännande mor/erkännande föräldrar
 tr: baba tarafından tanınan/anne tarafından tanınan/tarafından tanınan
 
     reduce/increase
-co: riduce/aummentà
+co: riduce/aumentà
 de: vermindern/erhöhen
 en: reduce/increase
 fr: réduire/augmenter
@@ -13405,7 +13473,7 @@ sv: pensionerad
 tr: emeklilik
 
     revision history
-co: cronolugia di i revisioni
+co: cronolugia di e revisioni
 de: Verlauf der Revisionen
 en: revision history
 es: histórico de las revisiones
@@ -13577,6 +13645,7 @@ sv: sök alla
 tr: arama
 
     search %s on Geneanet
+co: ricercà %s nant’à Geneanet
 en: search %s on Geneanet
 fr: rechercher %s sur Geneanet
 
@@ -13790,14 +13859,17 @@ sv: välj
 tr: seç
 
     extend
+co: stende à un antenatu vicinu
 en: extend to a near ancestor
 fr: étendre à un ancêtre proche
 
     choose an ancestor
+co: sceglie un antenatu
 en: choose an ancestor
 fr: choisir un ancêtre
 
     close
+co: chjode
 en: close
 fr: fermer
 
@@ -13834,7 +13906,7 @@ sv: välj en månad för att visa alla födelsedagar.
 tr: tüm yıldönümlerini görmek için bir ay seçin.
 
     select a spouse
-co: selezziunà un(a) cumpagnu(a) :
+co: selezziunà un(a) cumpagnu(a)
 de: Partner auswählen
 en: select spouse
 es: elija un cónyuge
@@ -13903,7 +13975,7 @@ sv: klicka på personen som du vill räkna ut släktskapsgraden med.
 tr: aile bağlantısını hesaplamak için aşağıda bir kişiyi tıklayın.
 
     select the two revisions you want to compare
-co: selezziunà e duie revisioni ch’ellu ci vole à paragunà
+co: selezziunà e duie revisioni ch’ellu ci vole à paragunà.
 de: wählen Sie zwei zu vergleichende Revisionen.
 en: select revisions to view history.
 es: seleccione las dos revisiones que quiere comparar.
@@ -14247,7 +14319,7 @@ tr: kardeşler
 fr: adelphe·s<br>sibling·s<hr>germains 50 &#37;<br>consanguins ou utérins 25 &#37;
 
     siblings of the grandparents
-co: arcizii è arcizie
+co: arcizii
 de: Großonkel und Großtanten
 en: granduncles
 fr: grands-oncles
@@ -14774,10 +14846,12 @@ fr: quatre-fois-arrière-petits-cousins 8<sup>e</sup>
 fr: quatre-fois-arrière-petits-cousins au huitième degré
 
     coefficient of relationship
+co: U <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">cuefficiente di e rilazioni</a> indicheghja u percentuale medianu minimu di geni spartiti trà dui individui.
 en: The <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient of relationship</a> gives the minimum average percentage of shared DNA between two individuals.
 fr: Le <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient de parenté</a> indique le pourcentage moyen minimum de gènes partagés entre deux individus.
 
     one ancestor counted
+co: E relazioni di parentia cunsanguine è uterine per un antenatu cumunu unicu sò incluse ma u so cuefficiente di parentia vale a metà di quellu di a relazione sana equivalente.
 en: One common ancestor: consanguine and uterine half relationships are included, but their coefficient of parente is half the full equivalent relation.
 fr: Les relations de parenté consanguines et utérines par un seul ancêtre pivot commun sont incluses. Leur coefficient de parenté vaut la moitié de celui de la relation complète équivalente.
 
@@ -14838,7 +14912,7 @@ sv: visas efter:/grenar/alfabetisk ordning
 tr: satır/alfabetik sıraya göre sırala
 
     sort by/date begin/alphabetic order/nb individuals/nb events
-co: urganizà da :/data di principiu/ordine alfabeticu/numeru d’individuu/numeru d’avvenimenti
+co: urganizà da :/data di principiu/ordine alfabeticu/numeru d’individuu/numeru d’evenimenti
 de: sortieren nach: /Anfangsdatum/Alphabet/Anzahl der Individuen/Anzahl der Ereignisse
 en: sort by/date/alphabetical order/number of individuals/number of events
 es: organizar por: fecha de inicio/orden alfabético/numero de individuos/número de eventos
@@ -15896,6 +15970,7 @@ zh: 父/母/a parent
 ->: parents
 
     cousins.1.0 tt
+co: babbu è mamma
 en: father and mother
 fr: père et mère<br>géniteur et génitrice
 
@@ -15997,7 +16072,7 @@ af: die volgende kinders van %t and %t is nie in die regte volgorde nie
 bg: следните деца на %t и %t не са в хронологичен ред
 br: ar vugale-mañ, re %t ha %t n'int ket en urzh mat
 ca: els fills següents de %t i %t no estan en ordre cronològic
-co: i zitelli di %t è %t chì seguitanu ùn sò micca in l’ordine
+co: quelli zitelli di %t è %t ùn sò micca in l’ordine
 cs: následující děti rodičů %t a %t nejsou v chronologickém pořadí
 da: de følgende børn af %t og %t er ikke i kronologisk orden
 de: die folgenden Kinder von %t und %t sind nicht geordnet
@@ -16060,10 +16135,12 @@ tr: torunlar
 ->: a grandson/a granddaughter/a grandchild
 
     cousins.0.2
+co: figliulinu/figliulini
 en: grandchild/grandchildren
 fr: petit-enfant/petits-enfants
 
     cousins.0.2 tt
+co: zitelli di u so figliolu o di a so figliola
 en: children of one’s son or daughters
 fr: enfants de son fils ou de sa fille
 
@@ -16071,10 +16148,12 @@ fr: enfants de son fils ou de sa fille
 ->: a great-grandson/a great-granddaughter/a great-grandchild
 
     cousins.0.3
+co: arcifigliulinu/arcifigliulini
 en: great-grandchild/great-grandchildren
 fr: arrière-petit-enfant/arrière-petits-enfants
 
     cousins.0.3 tt
+co: zitelli di u so figliulinu o di a so figliulina
 en: children of one’s grandson or granddaughter
 fr: enfants de son petit-fils ou de sa petite-fille
 
@@ -16646,7 +16725,7 @@ af: om die eerste te sien
 bg: за да видите първата родствена връзка
 br: evit gwelout al liamm kentañ
 ca: per veure el primer vincle de parentesc
-co: per fighjà u primu
+co: vede u primu liame di parentia
 cs: zobrazit první
 da: for at se det første
 de: , um die erste zu sehen
@@ -17787,7 +17866,7 @@ sv: vittne/vittnen
 tr: tanık/tanıklar
 
     witnesses at his events
-co: testimoni à i so avvenimenti
+co: testimoni à i so evenimenti
 de: Zeugen zu seinen Ereignissen
 en: witnesses at his events
 fr: témoins à ses évènements
@@ -17795,7 +17874,7 @@ sv: vittnen vid hans händelser
 tr: etkinliklerinde tanıklar
 
     witnesses to events of
-co: testimoni à l’avvenimenti di
+co: testimoni à l’evenimenti di
 de: Zeugen zu Ereignissen von
 en: witnesses to events of
 fr: témoins aux évènements de
@@ -17803,7 +17882,7 @@ sv: vittnen vid händelser för
 tr: etkinliklerinin tanıkları
 
     witnesses to my events and godparents
-co: testimoni à i mo avvenimenti è cumpare/cummare
+co: testimoni à i mo evenimenti è cumpare/cummare
 de: Zeugen zu meinen Ereignissen und Taufzeugen
 en: witnesses to my events and godparents
 fr: témoins à mes évènements et parrains/marraines
@@ -18081,54 +18160,67 @@ sv: ditt meddelande väntar på godkännande
 tr: mesajınız doğrulama için bekliyor
 
     add filter
+co: aghjunghje un filtru
 en: add a filter
 fr: ajouter un filtre
 
     filter by
+co: filtrà da
 en: filter by
 fr: filtrer par
 
     clear filters
+co: squassà tutti i filtri
 en: clear every filters
 fr: effacer tous les filtres
 
     unfiltered total
+co: tutale micca filtratu
 en: unfiltered total
 fr: total non filtré
 
     no line break in names
+co: affissà e casate senza saltu di linea
 en: no line break in names
 fr: afficher les noms sans saut de ligne
 
     show first names
+co: affissà tutti i nomi
 en: show all first names
 fr: afficher tous les prénoms
 
     highlight incomplete data
+co: sopralineà i dati incumpleti
 en: highlight incomplete data
 fr: surligner les données incomplètes
 
     edit family on spouse
+co: mudificà e famiglie via un cliccu nant’à a data di matrimoniu di a linea d’un cunghjuntu
 en: edit the families by clicking on the date of marriage of the row of one spouses
 fr: modifier les familles en cliquant sur la date de mariage sur la ligne d’un conjoint
 
     colored corner
+co: un scornu culuritu indicheghja l’esistenza di nota (turchinu), di fonte (giallu) o di i dui (verde) per un evenimentu. Tandu si pò affissà i dati in un finestrinu via un cliccu nant’à u sfondulu di e cellule.
 en: a colored corner shows the existence of notes (blue), sources (yellow) or both (green) for an event. The data are then displayable in a pop-up by clicking on the background of cells.
 fr: un coin coloré indique l’existence de notes (bleu), sources (jaune) ou des deux (vert) pour un événement. Ces données sont ensuite affichables dans une fenêtre surgissante en cliquant sur le fond des cases.
 
     modify the size of images to
+co: mudificà a dimensione di e fiure à
 en: modify the size of images to
 fr: modifier la taille des images à
 
     passing by
+co: passendu da
 en: passing by
 fr: en passant par
 
     widower/widow
+co: veduvu/veduva
 en: widower/widow
 fr: veuf/veuve
 
     for/since
+co: durante/dapoi
 en: for/since
 fr: pendant/depuis
 
@@ -18148,12 +18240,12 @@ en: all
 fr: tous
 
     any place
-co: sottu-lochi
+co: sottulochi
 en: sub-places
 fr: sous-lieux
 
     any place title
-co: circà in a lista di i sottu-lochi
+co: circà in a lista di i sottulochi
 en: search in the list of sub-places
 fr: rechercher dans la liste des sous-lieux
 
@@ -18193,10 +18285,12 @@ en: matching
 fr: correspondance
 
     filter
+co: filtrà
 en: filter
 fr: filtrer
 
     place filter
+co: numeru d’elementi cunservati in a lista di i lochi
 en: number of elements kept in places list
 fr: nombre d'éléments à conserver dans la liste des places
 
@@ -18236,18 +18330,22 @@ en: match full location name
 fr: comparer avec le nom complet d'un lieu
 
     all the places
+co: tutti i lochi
 en: all the places
 fr: tous les lieux
 
     v7 list too long
+co: lista troppu longa (pruvate d’aumentà u valore di u filtru)
 en: list too long (try increasing filter value)
 fr: liste trop longue (augmentez la valeur du filtre)
 
     path/paths
+co: chjassu/chjassi
 en: path/paths
 fr: chemin/chemins
 
     very short display
-en: veru short display
+co: affissera corta corta
+en: very short display
 fr: affichage très court
 
