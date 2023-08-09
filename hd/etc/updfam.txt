@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updfam.txt v7.1 10/012023 20:01:49 $ -->
+  <!-- $Id: updfam.txt v7.1 01/09/2023 01:25:29 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   <title>%nn;
-    %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
+    %if;(evar_m="ADD_FAM" or evar_m="ADD_FAM_OK")
       [*add::family/families]0%nn;
-    %elseif;(evar_m = "ADD_PAR" or evar_m = "ADD_PAR_OK")[*add::parents]0%nn;
-    %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
+    %elseif;(evar_m="ADD_PAR" or evar_m="ADD_PAR_OK")[*add::parents]0%nn;
+    %elseif;(evar_m="MOD_FAM" or evar_m="MOD_FAM_OK")
       [*modify::family/families]0 # %evar_i;
-    %elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
-             evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
+    %elseif;(evar_m="MRG_DUP_FAM_Y_N" or evar_m="MRG_FAM" or
+             evar_m="MRG_FAM_OK" or evar_m="MRG_MOD_FAM_OK")
       [*merge::family/families]1 # %evar_i;
     %end;
   </title>
@@ -41,33 +41,6 @@
   </div>
 %end;
 
-%define;pa_hide_script(xcnt)
-$(document).ready(function(){
-  $("#paxcnt_p").on('change',function() {
-      if(this.value == "link")
-        $("#paxcnt_div").hide();
-      else
-        $("#paxcnt_div").show();
-      %($("#paxcnt_occu").prop('readonly', true);%)
-   }).change();
-});
-%end;
-
-%define;ch_hide_script(xcnt)
-$(document).ready(function(){
-  $("#chxcnt_p").on('change',function() {
-      if(this.value == "link"){
-        $("#chxcnt_div").hide();
-        $("#chxcnt_sex_div").hide();
-       }
-      else {
-        $("#chxcnt_div").show();
-        $("#chxcnt_sex_div").show();
-       }
-   }).change();
-});
-%end;
-
 %define;date(xlab,xvar,xdt)
   %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2" %readonly;%in;
   %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2" %readonly;%in;
@@ -77,49 +50,49 @@ $(document).ready(function(){
       xlab
     </div>
     <div class="col col-sm-auto form-inline">
-      %if;([!dates order]0 = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
+      %if;([!dates order]0="ddmmyy" or [!dates order]0="ddmmyyyy" or [!dates order]0="dmyyyy")
         <label>
-          <input type="text" class="form-control" name="xvar_dd" value="%xdt.day;" %day_input;%/>
+          <input type="text" class="form-control" name="xvar_dd" value="%xdt.day;" %day_input;>
           <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
         </label>
         <label>
           <span id="xvar_mm_sel">
-            <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_mm" value="%xdt.month;" %month_input;%/>
+            <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_mm" value="%xdt.month;" %month_input;>
           </span>
           <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
         </label>
         <label>
-          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_yyyy" value="%xdt.year;" %year_input;%/>
+          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_yyyy" value="%xdt.year;" %year_input;>
           <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
         </label>
-      %elseif;([!dates order]0 = "mmddyyyy")
+      %elseif;([!dates order]0="mmddyyyy")
         <label>
           <span id="xvar_mm_sel">
-            <input type="text" class="form-control" name="xvar_mm" value="%xdt.month;" %month_input;%/>
+            <input type="text" class="form-control" name="xvar_mm" value="%xdt.month;" %month_input;>
           </span>
           <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
         </label>
         <label>
-          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_dd" value="%xdt.day;" %day_input;%/>
+          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_dd" value="%xdt.day;" %day_input;>
           <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
         </label>
         <label>
-          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_yyyy" value="%xdt.year;" %year_input;%/>
+          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_yyyy" value="%xdt.year;" %year_input;>
           <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
         </label>
       %else;
         <label>
-          <input type="text" class="form-control" name="xvar_yyyy" value="%xdt.year;" %year_input;%/>
+          <input type="text" class="form-control" name="xvar_yyyy" value="%xdt.year;" %year_input;>
           <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
         </label>
         <label>
           <span id="xvar_mm_sel">
-            <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_mm" value="%xdt.month;" %month_input;%/>
+            <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_mm" value="%xdt.month;" %month_input;>
           </span>
           <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
         </label>
         <label>
-          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_dd" value="%xdt.day;" %day_input;%/>
+          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_dd" value="%xdt.day;" %day_input;>
           <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
         </label>
       %end;
@@ -127,31 +100,31 @@ $(document).ready(function(){
     <div class="col-10 col-lg ml-auto form-inline">
       <label for="xvar_prec" class="sr-only col-form-label">[precision]0</label>
       <select class="form-control pl-lg-1 pr-lg-0 px-xl-2" name="xvar_prec" id="xvar_prec" xcond>
-        %(<option value="-" %if;(xdt.prec = "") selected%end;>&nbsp;</option>%)
-        <option value="sure" %if;(xdt.prec = "sure") selected%end;>[exact]0</option>
-        <option value="about" %if;(xdt.prec = "about") selected%end;>[about (date)]0</option>
-        <option value="maybe" %if;(xdt.prec = "maybe") selected%end;>[possibly (date)]0</option>
-        <option value="before" %if;(xdt.prec = "before") selected%end;>[before (date)]0</option>
-        <option value="after" %if;(xdt.prec = "after") selected%end;>[after (date)]0</option>
-        <option value="oryear" %if;(xdt.prec = "oryear") selected%end;>…[or]…</option>
-        <option value="yearint" %if;(xdt.prec = "yearint") selected%end;>…[between (date)]…</option>
+        %(<option value="-"%if;(xdt.prec="") selected%end;>&nbsp;</option>%)
+        <option value="sure"%if;(xdt.prec="sure") selected%end;>[exact]0</option>
+        <option value="about"%if;(xdt.prec="about") selected%end;>[about (date)]0</option>
+        <option value="maybe"%if;(xdt.prec="maybe") selected%end;>[possibly (date)]0</option>
+        <option value="before"%if;(xdt.prec="before") selected%end;>[before (date)]0</option>
+        <option value="after"%if;(xdt.prec="after") selected%end;>[after (date)]0</option>
+        <option value="oryear"%if;(xdt.prec="oryear") selected%end;>…[or]…</option>
+        <option value="yearint"%if;(xdt.prec="yearint") selected%end;>…[between (date)]…</option>
       </select>
       <label for="xvar_cal" class="sr-only col-form-label">[calendar/calendars]0</label>
       <select class="form-control pl-lg-1 pr-lg-0 px-xl-2 ml-sm-1 ml-md-3" name="xvar_cal" id="xvar_cal" onchange="changeCalendar('xvar_mm_sel','xvar_mm','%xdt.month;',this),%nn;
                                         changeCalendar('xvar_ormonth_sel','xvar_ormonth','%xdt.ormonth;',this)" xcond>
-        <option value="" %if;(xdt.calendar = "") selected%end;>
+        <option value=""%if;(xdt.calendar="") selected%end;>
           -
         </option>
-        <option value="G" %if;(xdt.calendar = "gregorian") selected%end;>
+        <option value="G"%if;(xdt.calendar="gregorian") selected%end;>
           [*gregorian/julian/french/hebrew]0
         </option>
-        <option value="J" %if;(xdt.calendar = "julian") selected%end;>
+        <option value="J"%if;(xdt.calendar="julian") selected%end;>
           [*gregorian/julian/french/hebrew]1
         </option>
-        <option value="F" %if;(xdt.calendar = "french") selected%end;>
+        <option value="F"%if;(xdt.calendar="french") selected%end;>
           [*gregorian/julian/french/hebrew]2
         </option>
-        <option value="H" %if;(xdt.calendar = "hebrew") selected%end;>
+        <option value="H"%if;(xdt.calendar="hebrew") selected%end;>
           [*gregorian/julian/french/hebrew]3
         </option>
       </select>
@@ -160,56 +133,56 @@ $(document).ready(function(){
   <div class="row">
     <div class="col-sm-1 col-md-2"></div>
     <div class="col col-sm-auto form-inline">
-      %if;([!dates order]0 = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
+      %if;([!dates order]0="ddmmyy" or [!dates order]0="ddmmyyyy" or [!dates order]0="dmyyyy")
         <label>
-          <input type="text" class="form-control" name="xvar_orday" value="%xdt.orday;" %day_input;%/>
+          <input type="text" class="form-control" name="xvar_orday" value="%xdt.orday;" %day_input;>
           <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
         </label>
         <label>
           <span id="xvar_ormonth_sel">
-            <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_ormonth" value="%xdt.ormonth;" %month_input;%/>
+            <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_ormonth" value="%xdt.ormonth;" %month_input;>
           </span>
           <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
         </label>
         <label>
-          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_oryear" value="%xdt.oryear;" %year_input;%/>
+          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_oryear" value="%xdt.oryear;" %year_input;>
           <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
         </label>
-      %elseif;([!dates order]0 = "mmddyyyy")
+      %elseif;([!dates order]0="mmddyyyy")
         <label>
           <span id="xvar_ormonth_sel">
-            <input type="text" class="form-control" name="xvar_ormonth" value="%xdt.ormonth;" %month_input;%/>
+            <input type="text" class="form-control" name="xvar_ormonth" value="%xdt.ormonth;" %month_input;>
           </span>
           <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
         </label>
         <label>
-          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_orday" value="%xdt.orday;" %day_input;%/>
+          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_orday" value="%xdt.orday;" %day_input;>
           <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
         </label>
         <label>
-          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_oryear" value="%xdt.oryear;" %year_input;%/>
+          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_oryear" value="%xdt.oryear;" %year_input;>
           <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
         </label>
       %else;
         <label>
-          <input type="text" class="form-control" name="xvar_oryear" value="%xdt.oryear;" %year_input;%/>
+          <input type="text" class="form-control" name="xvar_oryear" value="%xdt.oryear;" %year_input;>
           <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
         </label>
         <label>
           <span id="xvar_ormonth_sel">
-            <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_ormonth" value="%xdt.ormonth;" %month_input;%/>
+            <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_ormonth" value="%xdt.ormonth;" %month_input;>
           </span>
           <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
         </label>
         <label>
-          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_orday" value="%xdt.orday;" %day_input;%/>
+          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_orday" value="%xdt.orday;" %day_input;>
           <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
         </label>
       %end;
     </div>
     <div class="col-10 col-lg">
       <label for="xvar_text" class="col-form-label sr-only"></label>
-      <input type="text" class="form-control" name="xvar_text" maxlength="100" value="%xdt.text;" id="xvar_text" placeholder="…[or] [text]0" xcond%/>
+      <input type="text" class="form-control" name="xvar_text" maxlength="100" value="%xdt.text;" id="xvar_text" placeholder="…[or] [text]0" xcond>
     </div>
   </div>
 %end;
@@ -239,26 +212,26 @@ $(document).ready(function(){
   <div class="row">
     <span class="col-sm-2 col-form-label">[*kind]</span>
     <div class="col-sm-auto form-inline">
-      %if;([!dates order]0 = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
-        <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
+      %if;([!dates order]0="ddmmyy" or [!dates order]0="ddmmyyyy" or [!dates order]0="dmyyyy")
+        <label for="xvar_dd" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]2</label>
         <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
-        <label for="xvar_mm" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]1</label>
+        <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
         <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
-        <label for="xvar=yyyy" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]0</label>
+        <label for="xvar=yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
         <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
-      %elseif;([!dates order]0 = "mmddyyyy")
-        <label for="xvar_mm" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]1</label>
+      %elseif;([!dates order]0="mmddyyyy")
+        <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
         <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
-        <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
+        <label for="xvar_dd" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]2</label>
         <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
-        <label for="xvar=yyyy" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]0</label>
+        <label for="xvar=yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
         <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
       %else;
-        <label for="xvar=yyyy" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]0</label>
+        <label for="xvar=yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
         <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
-        <label for="xvar_mm" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]1</label>
+        <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
         <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
-        <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
+        <label for="xvar_dd" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]2</label>
         <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
       %end;
     </div>
@@ -286,11 +259,11 @@ $(document).ready(function(){
 %end;
 
 %define;parent(xcnt,xx,psex)
-  <div class="row">
-    <label for="paxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0 <span class="font-weight-bold text-uppercase">pxcnt%nn;
-    %sp;%sp;(%apply;nth_c%with;MFN%and;psex%end;)</span></label>
+  <div class="row%if;(xcnt>1) mt-2%end;">
+    <label for="paxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0 <span class="font-weight-bold text-uppercase">pxcnt
+     (%apply;nth_c%with;[M/F]0[M/F]1N%and;psex%end;)</span></label>
     <div class="col-sm-8">
-      <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0" %if;(evar.m="ADD_FAM" and xx.first_name="")autofocus%end;>
+      <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0"%if;(evar.m="ADD_FAM" and xx.first_name="") autofocus%end;>
     </div>
     <label for="paxcnt_occ" class="col-auto col-form-label sr-only">[*number]</label>
     <div class="col-sm-2">
@@ -303,19 +276,19 @@ $(document).ready(function(){
       <input class="form-control" type="text" name="paxcnt_sn" value="%xx.surname" id="paxcnt_sn" placeholder="[*surname/surnames]0">
     </div>
     <div class="col-sm-2">
-      <select class="form-control" id="paxcnt_p" name="paxcnt_p">
-        <option value="create" %if;(xx.create = "create")selected%end;>[*create]0</option>
-        <option value="link" %if;(xx.create = "link")selected%end;>[*link]0</option>
+      <select class="form-control" id="paxcnt_p_selct" name="paxcnt_p">
+        <option value="create"%if;(xx.create="create") selected%end;>[*create]0</option>
+        <option value="link"%if;(xx.create="link") selected%end;>[*link]0</option>
       </select>
     </div>
   </div>
-  <div id="paxcnt_div">
+  <div id="paxcnt_p_selct_data">
     %apply;birth("paxcnt","xx","true")
     %apply;death("paxcnt","xx","true")
     <div class="row">
       <label for="paxcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
       <div class="col-sm">
-        <input class="form-control" name="paxcnt_occu" id="paxcnt_occu" maxlength="300" placeholder="[*occupation/occupations]0" value="%xx.create.occupation;">
+        <input class="form-control" name="paxcnt_occu" id="paxcnt_occu" placeholder="[*occupation/occupations]0" value="%xx.create.occupation;">
       </div>
     </div>
   </div>
@@ -330,10 +303,10 @@ $(document).ready(function(){
           %for;i;1;6;<option>%i;</option> %end;
         </select>
         <div class="input-group-append">
-          <label class="btn btn-outline-secondary"> [parents]0
+          <label class="btn btn-outline-primary"> [parents]0
             <input class="ml-1" type="checkbox" name="ins_paxcnt" value="on">
           </label>
-          <button type="submit" class="btn btn-outline-secondary" title="[*insert::event/events]0/[event/events]1">OK</button>
+          <button type="submit" class="btn btn-outline-primary" title="[*insert::event/events]0/[event/events]1">OK</button>
         </div>
       </div>
     </div>
@@ -344,19 +317,19 @@ $(document).ready(function(){
   <select class="form-control custom-select font-weight-bold" id="fevent_selectxcnt" onchange="show_fevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
     <option value="">[*custom event]</option>
     <option disabled>──────────</option>
-    <option value=""> - </option>
-    <option value="#marr" %if;(event.e_name = "#marr" or event.e_name="") selected %end;>[*marriage event]</option>
-    <option value="#nmar" %if;(event.e_name = "#nmar") selected%end;>[*no marriage event]</option>
-    <option value="#enga" %if;(event.e_name = "#enga") selected%end;>[*engage event]</option>
-    <option value="#nmen" %if;(event.e_name = "#nmen") selected%end;>[*no mention]</option>
-    <option value="#marb" %if;(event.e_name = "#marb") selected%end;>[*marriage bann]</option>
-    <option value="#marc" %if;(event.e_name = "#marc") selected%end;>[*marriage contract]</option>
-    <option value="#marl" %if;(event.e_name = "#marl") selected%end;>[*marriage licence]</option>
-    <option value="#pacs" %if;(event.e_name = "#pacs") selected%end;>[*PACS]</option>
-    <option value="#div"  %if;(event.e_name = "#div")  selected%end;>[*divorce event]</option>
-    <option value="#sep"  %if;(event.e_name = "#sep")  selected%end;>[*separate event]</option>
-    <option value="#anul" %if;(event.e_name = "#anul") selected%end;>[*annulation]</option>
-    <option value="#resi" %if;(event.e_name = "#resi") selected%end;>[*residence]</option>
+    <option value="">-</option>
+    <option value="#marr"%if;(event.e_name="#marr" or event.e_name="") selected%end;>[*marriage event]</option>
+    <option value="#nmar"%if;(event.e_name="#nmar") selected%end;>[*no marriage event]</option>
+    <option value="#enga"%if;(event.e_name="#enga") selected%end;>[*engage event]</option>
+    <option value="#nmen"%if;(event.e_name="#nmen") selected%end;>[*no mention]</option>
+    <option value="#marb"%if;(event.e_name="#marb") selected%end;>[*marriage bann]</option>
+    <option value="#marc"%if;(event.e_name="#marc") selected%end;>[*marriage contract]</option>
+    <option value="#marl"%if;(event.e_name="#marl") selected%end;>[*marriage licence]</option>
+    <option value="#pacs"%if;(event.e_name="#pacs") selected%end;>[*PACS]</option>
+    <option value="#div"%if;(event.e_name="#div") selected%end;>[*divorce event]</option>
+    <option value="#sep"%if;(event.e_name="#sep") selected%end;>[*separate event]</option>
+    <option value="#anul"%if;(event.e_name="#anul") selected%end;>[*annulation]</option>
+    <option value="#resi"%if;(event.e_name="#resi") selected%end;>[*residence]</option>
   </select>
 %end;
 
@@ -369,10 +342,10 @@ $(document).ready(function(){
           %for;i;1;11;<option>%i;</option> %end;
         </select>
         <div class="input-group-append">
-          <label class="btn btn-outline-secondary"> [event/events]0/[event/events]1
+          <label class="btn btn-outline-primary"> [event/events]0/[event/events]1
             <input class="ml-1" type="checkbox" name="ins_eventxcnt" value="on">
           </label>
-          <button type="submit" class="btn btn-outline-secondary" title="[*insert::event/events]0/[event/events]1">OK</button>
+          <button type="submit" class="btn btn-outline-primary" title="[*insert::event/events]0/[event/events]1">OK</button>
         </div>
       </div>
     </div>
@@ -388,10 +361,10 @@ $(document).ready(function(){
           %for;i;1;11;<option>%i;</option> %end;
         </select>
         <div class="input-group-append">
-          <label class="btn btn-outline-secondary"> [witness/witness/witnesses]0/[witness/witness/witnesses]2
+          <label class="btn btn-outline-primary"> [witness/witness/witnesses]0/[witness/witness/witnesses]2
             <input class="ml-1" type="checkbox" name="excnt_ins_witnwcnt" value="on">
           </label>
-        <button type="submit" class="btn btn-outline-secondary" title="[*insert::witness/witness/witnesses]0/[witness/witness/witnesses]2">OK</button>
+        <button type="submit" class="btn btn-outline-primary" title="[*insert::witness/witness/witnesses]0/[witness/witness/witnesses]2">OK</button>
         </div>
       </div>
     </div>
@@ -400,81 +373,96 @@ $(document).ready(function(){
 
 %define;one_witness(xcnt, wcnt)
   <hr>
-  <div class="row mt-3">
-    <h5 class="col-md-2 col-form-label">[*witness/witness/witnesses]0 wcnt</h5>
-    <div class="col-md-2">
-      <select class="form-control" name="excnt_witnwcnt_p">
-        %if;((fwitness.surname="" and fwitness.first_name="") or fwitness.create = "create")
-          <option value="create "%if;(fwitness.create = "create") selected%end;>[*create]0</option>
-        %else;
-          <option value="link" %if;(fwitness.create = "link") selected%end;>[*link]0</option>
+  <div class="form-group mt-1">
+    <div class="row">
+      <h5 class="col-form-label col-2">[*witness/witness/witnesses]0 wcnt</h5>
+      <div class="col-2">
+        <select class="form-control" name="excnt_witnwcnt_p" id="excnt_witnwcnt_p_selct">
+          <option value="create"%if;((fwitness.surname="" and fwitness.first_name="") or fwitness.create="create") selected%end;>[*create]0</option>
+          <option value="link"%if;(fwitness.create="link") selected%end;>[*link]0</option>
+        </select>
+      </div>
+      <div id="excnt_witnwcnt_p_selct_kind" class="col-4">
+        <select class="form-control" name="excnt_witnwcnt_kind">
+          <option value=""%if;(fwitness_kind="") selected%end;>[*witness/witnesses]0</option>
+          <option value="info"%if;(fwitness_kind="info") selected%end;>[*informant/informant/informant]2</option>
+          <option value="atte"%if;(fwitness_kind="atte") selected%end;>[*present/present/present]2</option>
+          <option value="ment"%if;(fwitness_kind="ment") selected%end;>[*mentioned/mentioned/mentioned]2</option>
+          <option value="offi"%if;(fwitness_kind="offi") selected%end;>[*civil registrar/civil registrar/civil registrar]2</option>
+          <option value="reli"%if;(fwitness_kind="reli") selected%end;>[*parrish registrar/parrish registrar/parrish registrar]2</option>
+          <option value="othe"%if;(fwitness_kind="othe") selected%end;>[*other/other/other]2</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <label for="excnt_witnwcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" name="excnt_witnwcnt_fn" id="excnt_witnwcnt_fn" 
+          value="%fwitness.first_name;"placeholder="[*first name/first names]0">
+      </div>
+      <label for="excnt_witnwcnt_occ" class="col-sm-auto col-form-label">[*number]0</label>
+      <div class="col-sm-2">
+        <input type="number" class="form-control" name="excnt_witnwcnt_occ" id="excnt_witnwcnt_occ"
+          min="0" value="%fwitness.occ;" placeholder="#">
+       </div>
+    </div>
+    <div class="row">
+      <label for="excnt_witnwcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
+      <div class="col-sm-6">
+        <input type="text" class="form-control" name="excnt_witnwcnt_sn" id="excnt_witnwcnt_sn"
+          value="%fwitness.surname;" placeholder="[*surname/surnames]0">
+      </div>
+      <div id="excnt_witnwcnt_p_selct_mod" class="col-form-label ml-2">
+        %if;(fwitness.index!="-1")
+          <a href="%prefix_base_password;m=MOD_IND&i=%fwitness.index;" title="[*modify::person/persons]0
+            %fwitness.first_name;%if;(fwitness.occ!="").%fwitness.occ%end; %fwitness.surname;">
+            <i class="fa fa-user-edit fa-fw %if;(fwitness.sex=1)fe%end;male ml-2 mr-1" aria-hidden="true"
+              aria-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%fwitness.sex;%end;"></i>
+            [*modify] %apply;nth%with;[nth]%and;%wcnt;%end; [witness/witness/witnesses]0</a>
+          </a>
         %end;
-     </select>
-    </div>
-    <div class="col-md-3">
-      <select class="form-control" name="excnt_witnwcnt_kind">
-        <option value=""> - </option>
-        <option value="" %if;(fwitness_kind = "") selected="selected" %end;>[*witness/witnesses]0</option>
-        <option value="info" %if;(fwitness_kind = "info") selected="selected" %end;>[*informant/informant/informant]2</option>
-        <option value="atte" %if;(fwitness_kind = "atte") selected="selected" %end;>[*present/present/present]2</option>
-        <option value="ment" %if;(fwitness_kind = "ment") selected="selected" %end;>[*mentioned/mentioned/mentioned]2</option>
-        <option value="offi" %if;(fwitness_kind = "offi") selected="selected" %end;>[*civil registrar/civil registrar/civil registrar]2</option>
-        <option value="reli" %if;(fwitness_kind = "reli") selected="selected" %end;>[*parrish registrar/parrish registrar/parrish registrar]2</option>
-        <option value="othe" %if;(fwitness_kind = "othe") selected="selected" %end;>[*other/other/other]2</option>
-      </select>
-    </div>
-  </div>
-  <div class="row">
-    <label for="excnt_witnwcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0</label>
-    <div class="col-sm-5">
-      <input type="text" class="form-control" name="excnt_witnwcnt_fn" value="%fwitness.first_name;" id="excnt_witnwcnt_fn" placeholder="[*first name/first names]0">
-    </div>
-    <label for="excnt_witnwcnt_occ" class="col-sm-auto col-form-label">[*number]0</label>
-    <div class="col-sm-auto">
-      <input type="number" class="form-control" name="excnt_witnwcnt_occ" min="0"  value="%if;(fwitness.occ="")0%else;%fwitness.occ;%end;" id="excnt_witnwcnt_occ">
-    </div>
-  </div>
-  <div class="row">
-    <label for="excnt_witnwcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
-    <div class="col-sm-5">
-      <input type="text" class="form-control" name="excnt_witnwcnt_sn" maxlength="200" value="%fwitness.surname;" id="excnt_witnwcnt_sn" placeholder="[*surname/surnames]0">
-    </div>
-  %( if new witness %)
-  %if;(fwitness.surname="" and fwitness.first_name="")
-    <span class="col-sm-auto col-form-label">[*sex]</span>
-    <div class="col-sm-auto mt-2">
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="M" %if;(fwitness.create.sex="male")checked%end;%/> [M/F]0
-        </label>
       </div>
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="N" %if;(fwitness.create.sex="neuter")checked%end;%/> ?
-        </label>
-      </div>
-      <div class="form-check form-check-inline">
-        <label class="form-check-label">
-          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="F" %if;(fwitness.create.sex="female")checked%end;%/> [M/F]1
-        </label>
+      <div id="excnt_witnwcnt_p_selct_sex" class="col-form-label">
+        <div class="form-inline">
+          <div class="col-sm-auto">[*sex]</div>
+          <div class="form-check form-check-inline ml-5">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
+              value="M"%if;(fwitness.create.sex="male") checked%end;>[M/F]0
+          </label>
+          </div>
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
+                value="N"%if;(fwitness.create.sex="neuter") checked%end;>?
+            </label>
+          </div>
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex"
+                value="F"%if;(fwitness.create.sex="female") checked%end;>[M/F]1
+            </label>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="col-sm-auto mt-2">
-      <label class="form-check-label">[*public]</label>
-        <input class="form-check-input col" type="checkbox" name="excnt_witnwcnt_pub">
+    <div class="row" id="excnt_witnwcnt_p_selct_data">
+      <label for="excnt_witnwcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
+      <div class="col-sm-6">
+        <input class="form-control" type="text" name="excnt_witnwcnt_occu" id="excnt_witnwcnt_occu"
+           value="%fwitness.create.occupation;" placeholder="[*occupation/occupations]0" %readonly;>
+      </div>
+      <div class="form-inline col-sm-auto">
+        <div class="custom-control custom-checkbox mr-3">
+          <input class="custom-control-input" type="checkbox" name="excnt_witnwcnt_od" id="excnt_witnwcnt_od">
+          <label for="excnt_witnwcnt_od" class="custom-control-label">[*of course dead]</label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input class="custom-control-input" type="checkbox" name="excnt_witnwcnt_pub" id="excnt_witnwcnt_pub">
+          <label for="excnt_witnwcnt_pub" class="custom-control-label">[*public]</label>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="row">
-    <label for="excnt_witnwcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
-    <div class="col-5">
-       <input class="form-control" type="text" name="excnt_witnwcnt_occu" value="%witness.create.occupation;" id="witnxcnt_occu" placeholder="[*occupation/occupations]0" %readonly;>
-    </div>
-    <div class="col-sm-auto mt-2">
-    <label class="form-check-label">[*of course dead]</label>
-      <input class="form-check-input col" type="checkbox" name="excnt_witnwcnt_od">
-    </div>
-  %end;
-  %(  end if new witness %)
   </div>
 %end;
 
@@ -486,7 +474,7 @@ $(document).ready(function(){
     </div>
     <div class="col-sm-7">
       <label id="fevent_label_selectorxcnt" style="display:none" class="other_evts w-100">
-        <input type="text" class="form-control font-weight-bold" name="e_namexcnt" value="%if;(event.e_name = "")#marr%else;%event.e_name;%end;" id="e_namexcnt" placeholder="[*event/events]0">
+        <input type="text" class="form-control font-weight-bold" name="e_namexcnt" value="%if;(event.e_name="")#marr%else;%event.e_name;%end;" id="e_namexcnt" placeholder="[*event/events]0">
       </label>
     </div>
   </div>
@@ -509,7 +497,7 @@ $(document).ready(function(){
       %if;(event.e_src!="")
         <textarea class="form-control" name="e_srcxcnt" rows="1" id="e_srcxcnt" placeholder="[*source/sources]0" %l_on1s;>%event.e_src;</textarea>
       %else;
-        <input class="form-control" name="e_srcxcnt" maxlength="1000" id="e_srcxcnt" placeholder="[*source/sources]0" value="%event.e_src;"%/>
+        <input class="form-control" name="e_srcxcnt" maxlength="1000" id="e_srcxcnt" placeholder="[*source/sources]0" value="%event.e_src;">
       %end;
     </div>
   </div>
@@ -531,19 +519,18 @@ $(document).ready(function(){
 %end
 
 %define;card_header(xx,yy)
-  <div class="anchor_upd" id="xx"> </div>
-  <h3 class="card-header pt-1 pb-0 text-center"><label for="xx">[*yy]1</label></h3>
+  <h3 class="card-header pt-1 pb-0 text-center" id="xx"><label for="xx">[*yy]1</label></h3>
 %end;
 
-<h1 %if;((evar.m="ADD_FAM" or evar.m="ADD_FAM_OK") and evar.ip="")class="mt-5"%end;>%nn;
+<h1%if;((evar.m="ADD_FAM" or evar.m="ADD_FAM_OK") and evar.ip="") class="mt-5"%end;>%nn;
   %if;(evar_m="ADD_FAM" or evar_m="ADD_FAM_OK")
     [*add::family/families]0
-  %elseif;(evar_m = "ADD_PAR" or evar_m="ADD_PAR_OK")
+  %elseif;(evar_m="ADD_PAR" or evar_m="ADD_PAR_OK")
     [*add::parents] %foreach;child;%child.first_name;%if;(child.occ!="").%child.occ;%end; %child.surname;%end;
-  %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
+  %elseif;(evar_m="MOD_FAM" or evar_m="MOD_FAM_OK")
     [*modify::family/families]0 # %evar_i;
-  %elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
-           evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
+  %elseif;(evar_m="MRG_DUP_FAM_Y_N" or evar_m="MRG_FAM" or
+           evar_m="MRG_FAM_OK" or evar_m="MRG_MOD_FAM_OK")
     [*merge::family/families]1 # %evar_i;
   %end;
 </h1>
@@ -554,29 +541,29 @@ $(document).ready(function(){
   </div>
   <p class="my-0">
     %hidden;
-    <input type="hidden" name="digest" value="%digest;"%/>
-    %if;(evar_ip != "")<input type="hidden" name="ip" value="%evar_ip;"%/>%nl;%end;
-    %if;(evar_i != "")<input type="hidden" name="i" value="%evar_i;"%/>%nl;%end;
-    %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
-      <input type="hidden" name="m" value="ADD_FAM_OK"%/>%nl;
-    %elseif;(evar_m = "ADD_PAR" or evar_m="ADD_PAR_OK")
-      <input type="hidden" name="m" value="ADD_PAR_OK"%/>%nl;
-    %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
-      <input type="hidden" name="m" value="MOD_FAM_OK"%/>%nl;
-    %elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
-             evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
-      <input type="hidden" name="i2" value="%evar_i2;"%/>
-      %if;(evar_ini1 != "" and evar_ini2 != "")
-        <input type="hidden" name="ini1" value="%evar_ini1;"%/>
-        <input type="hidden" name="ini2" value="%evar_ini2;"%/>
+    <input type="hidden" name="digest" value="%digest;">
+    %if;(evar_ip!="")<input type="hidden" name="ip" value="%evar_ip;">%nl;%end;
+    %if;(evar_i!="")<input type="hidden" name="i" value="%evar_i;">%nl;%end;
+    %if;(evar_m="ADD_FAM" or evar_m="ADD_FAM_OK")
+      <input type="hidden" name="m" value="ADD_FAM_OK">%nl;
+    %elseif;(evar_m="ADD_PAR" or evar_m="ADD_PAR_OK")
+      <input type="hidden" name="m" value="ADD_PAR_OK">%nl;
+    %elseif;(evar_m="MOD_FAM" or evar_m="MOD_FAM_OK")
+      <input type="hidden" name="m" value="MOD_FAM_OK">%nl;
+    %elseif;(evar_m="MRG_DUP_FAM_Y_N" or evar_m="MRG_FAM" or
+             evar_m="MRG_FAM_OK" or evar_m="MRG_MOD_FAM_OK")
+      <input type="hidden" name="i2" value="%evar_i2;">
+      %if;(evar_ini1!="" and evar_ini2!="")
+        <input type="hidden" name="ini1" value="%evar_ini1;">
+        <input type="hidden" name="ini2" value="%evar_ini2;">
       %end;
-      %if;(evar.iexcl != "")
-        <input type="hidden" name="iexcl" value="%evar.iexcl;"%/>
+      %if;(evar.iexcl!="")
+        <input type="hidden" name="iexcl" value="%evar.iexcl;">
       %end;
-      %if;(evar.fexcl != "")
-        <input type="hidden" name="fexcl" value="%evar.fexcl;"%/>
+      %if;(evar.fexcl!="")
+        <input type="hidden" name="fexcl" value="%evar.fexcl;">
       %end;
-      <input type="hidden" name="m" value="MRG_MOD_FAM_OK"%/>%nl;
+      <input type="hidden" name="m" value="MRG_MOD_FAM_OK">%nl;
     %end;
   </p>
 
@@ -584,27 +571,24 @@ $(document).ready(function(){
     %apply;card_header("parents","parents")
     <div class="card-body">
       <div class="row">
-        <div class="col-11">
           %foreach;parent;
-            %let;ps;%parent.sex;%in;
             %let;os;%parent.sexes;%in;
             %if;(cnt!=1 and bvar.multi_parents="yes")<hr class="w-100">%end;
-            %apply;parent(cnt, "parent", ps)
-            %if;(bvar.multi_parents="yes")%apply;insert_parent(cnt)%end;
+            <div class="col-11">
+              %apply;parent(cnt,"parent",parent.sex)
+              %if;(bvar.multi_parents="yes")%apply;insert_parent(cnt)%end;
+            </div>
             %if;(cnt=2)
-              <div class="form-check my-2">
-                <label class="form-check-label">
-                <input type="checkbox" class="form-check-input" name="nsck" value="on"%if;(os=3) checked%end;%/>
-                  [*no sexes check]
-                </label>
+              <div class="custom-control custom-checkbox mt-2 ml-3">
+                <input type="checkbox" class="custom-control-input" name="nsck" id="nsck" value="on"%if;(os=3) checked%end;>
+                <label for="nsck" class="custom-control-label">[*no sexes check]</label>
               </div>
             %end;
           %end;
-        </div>
-        <button type="submit" class="btn btn-outline-success col mt-auto mr-2" title="[*validate/delete]0" aria-label="[*validate/delete]0">
-          <span class="font-weight-bold text-uppercase sr-only">[*validate/delete]0</span>
-          <i class="fa fa-share fa-rotate-180 fa-fw ml-1" aria-hidden="true"></i>
-        </button>
+          <button type="submit" class="btn btn-primary col-1 ml-auto mr-2" title="[*validate/delete]0" aria-label="[*validate/delete]0">
+            <span class="font-weight-bold text-uppercase sr-only">[*validate/delete]0</span>
+            <i class="fa fa-share fa-rotate-180 fa-fw ml-1" aria-hidden="true"></i>
+          </button>
       </div>
     </div>
   </div>
@@ -634,10 +618,10 @@ $(document).ready(function(){
         %for;i;1;11;<option>%i;</option>%end;
       </select>
       <div class="input-group-append">
-        <label class="btn btn-outline-secondary"> [child/children]0/[child/children]1
+        <label class="btn btn-outline-primary"> [child/children]0/[child/children]1
           <input class="ml-1" type="checkbox" name="ins_chxcnt" value="on">
         </label>
-        <button type="submit" class="btn btn-outline-secondary" title="[*insert::child/children]0/[child/children]1">OK</button>
+        <button type="submit" class="btn btn-outline-primary" title="[*insert::child/children]0/[child/children]1">OK</button>
       </div>
     </div>
   </div>
@@ -646,11 +630,11 @@ $(document).ready(function(){
 %define;invert_children(xcnt)
   <div class="form-inline col-3">
     <div class="input-group">
-      <label class="btn btn-outline-secondary" title="[*invert] [child/children]0 %expr(xcnt-1) [and] xcnt"><span class="far fa-user"></span> %expr(xcnt-1) <span class="fa fa-exchange-alt mx-2"></span> <span class="far fa-user"></span> xcnt
+      <label class="btn btn-outline-primary" title="[*invert] [child/children]0 %expr(xcnt-1) [and] xcnt"><span class="far fa-user"></span> %expr(xcnt-1) <span class="fa fa-exchange-alt mx-2"></span> <span class="far fa-user"></span> xcnt
         <input class="ml-2" type="checkbox" name="inv_chxcnt" value="on">
       </label>
       <div class="input-group-append">
-        <button type="submit" class="btn btn-outline-secondary">OK</button>
+        <button type="submit" class="btn btn-outline-primary">OK</button>
       </div>
     </div>
   </div>
@@ -661,9 +645,9 @@ $(document).ready(function(){
     <hr class="w-100">
     <h5 class="col-form-label col-sm-2 text-uppercase">%apply;nth%with;[nth]%and;%cnt;%end; [*child/children]0</h5>
     <div class="col-sm-2">
-      <select class="form-control" name="chxcnt_p" id="chxcnt_p">
-        <option value="link"%if;(child.create = "link") selected%end;>[*link]0</option>
-        <option value="create"%if;(child.create = "create") selected%end;>[*create]0</option>
+      <select class="form-control" name="chxcnt_p" id="chxcnt_p_selct">
+        <option value="link"%if;(child.create="link") selected%end;>[*link]0</option>
+        <option value="create"%if;(child.create="create") selected%end;>[*create]0</option>
       </select>
     </div>
   </div>
@@ -682,30 +666,42 @@ $(document).ready(function(){
     <div class="col-sm-6">
       <input class="form-control" type="text" name="chxcnt_sn" value="%child.surname;" id="chxcnt_sn" placeholder="%father.surname;">
     </div>
-    <div id="chxcnt_sex_div">
+    <div id="chxcnt_p_selct_mod" class="col-form-label ml-2">
+      %if;(child.index!="-1")
+        <a href="%prefix_base_password;m=MOD_IND&i=%child.index;" title="[*modify::person/persons]0
+          %child.first_name;%if;(child.occ!="").%child.occ%end; %child.surname;">
+          <i class="fa fa-user-edit fa-fw %if;(child.sex=1)fe%end;male ml-2 mr-1" aria-hidden="true"
+            arial-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%child.sex;%end;"></i>
+          [*modify] %apply;nth%with;[nth]%and;%cnt;%end; [child/children]0</a>
+      %end;
+    </div>
+    <div id="chxcnt_p_selct_sex">
       <div class="d-inline-flex">
         <span class="col-sm-auto col-form-label">[*sex]</span>
         <div class="col-sm-auto mt-2">
           <div class="form-check form-check-inline">
             <label class="form-check-label">
-              <input class="form-check-input" type="radio" name="chxcnt_sex" value="M" %if;(child.create.sex="male")checked%end;%/> [M/F]0
+              <input class="form-check-input" type="radio" name="chxcnt_sex"
+                value="M"%if;(child.create.sex="male") checked%end;>[M/F]0
             </label>
           </div>
           <div class="form-check form-check-inline">
             <label class="form-check-label">
-              <input class="form-check-input" type="radio" name="chxcnt_sex" value="N" %if;(child.create.sex="neuter")checked%end;%/> ?
+              <input class="form-check-input" type="radio" name="chxcnt_sex"
+                value="N"%if;(child.create.sex="neuter") checked%end;>?
             </label>
           </div>
           <div class="form-check form-check-inline">
             <label class="form-check-label">
-              <input class="form-check-input" type="radio" name="chxcnt_sex" value="F" %if;(child.create.sex="female")checked%end;%/> [M/F]1
+              <input class="form-check-input" type="radio" name="chxcnt_sex"
+                value="F"%if;(child.create.sex="female") checked%end;>[M/F]1
             </label>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div id="chxcnt_div">
+  <div id="chxcnt_p_selct_data">
     %apply;birth("chxcnt", "child", "true")
     %apply;death("chxcnt", "child", "true")
     <div class="row">
@@ -723,7 +719,7 @@ $(document).ready(function(){
       <div class="row">
         %apply;insert_child("0")
         %foreach;child;
-          %if;(cnt != 1)
+          %if;(cnt!=1)
             %apply;invert_children(cnt)
           %end;
           </div>
@@ -743,7 +739,7 @@ $(document).ready(function(){
         <label for="psrc" class="col-sm-2 col-form-label">[[*person/persons]1]</label>
         <div class="col-sm-10">
           <textarea class="form-control" rows="1" name="psrc" id="psrc" placeholder="[*source/sources]1 [person/persons]1">
-            %if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;
+            %if;(evar_psrc!="")%evar_psrc;%else;%evar_dsrc;%end;
           </textarea>
         </div>
       </div>
@@ -753,20 +749,20 @@ $(document).ready(function(){
           %if;(fsources!="")
             <textarea class="form-control" name="src" rows="1" id="src" placeholder="[*source/sources]1 [family/families]0" %l_on1s;>%fsources;</textarea>
           %else;
-            <input class="form-control" name="src" maxlength="1000" id="src" placeholder="[*source/sources]1 [family/families]0" value="%fsources;"%/>
+            <input class="form-control" name="src" id="src" placeholder="[*source/sources]1 [family/families]0" value="%fsources;">
           %end;
         </div>
         <div class="col-sm-1">
           <label class="form-check-label">
-            <input type="checkbox" name="rdsrc" value="on" %if;(evar_rdsrc = "on")checked%end;%/>
+            <input type="checkbox" name="rdsrc" value="on" %if;(evar_rdsrc="on")checked%end;>
           </label>
         </div>
       </div>
     </div>
   </div>
 
-  %if;(bvar.origin_file = "on")
-    <input type="text" name="origin_file" size="50" maxlength="200" value="%origin_file;"%/>
+  %if;(bvar.origin_file="on")
+    <input type="text" name="origin_file" size="50" maxlength="200" value="%origin_file;">
   %end;
 
   <div class="card">
@@ -776,7 +772,7 @@ $(document).ready(function(){
       %include;toolbar
       </div>
       <textarea class="col-9 form-control" id="notes_comments" name="comment" rows="16">%comment;</textarea>%sq;
-      <button type="submit" class="btn btn-outline-success btn-lg col-4 py-3 mt-2 mb-3 mx-auto order-3" title="[*validate/delete]0" aria-label="[*validate/delete]0">
+      <button type="submit" class="btn btn-primary btn-lg col-4 py-3 mt-2 mb-3 mx-auto order-3" title="[*validate/delete]0" aria-label="[*validate/delete]0">
         <span class="font-weight-bold text-uppercase">[*validate/delete]0</span><i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
       </button>
       <div class="col my-1 mr-2 text-monospace">
@@ -785,177 +781,40 @@ $(document).ready(function(){
     </div>
   </div>
 </form>
-
 %base_trailer;
 %include;copyr
 </div>
 %include;js
+%include;upd_js
 <script>
-<!--
-function changeCalendar(e,v,m,c) {
-  var mv = m;
-  switch (m) {
-  case "VD": mv = 1; break;
-  case "BR": mv = 2; break;
-  case "FM": mv = 3; break;
-  case "NI": mv = 4; break;
-  case "PL": mv = 5; break;
-  case "VT": mv = 6; break;
-  case "GE": mv = 7; break;
-  case "FL": mv = 8; break;
-  case "PR": mv = 9; break;
-  case "ME": mv = 10; break;
-  case "TH": mv = 11; break;
-  case "FT": mv = 12; break;
-  case "JC": mv = 13; break;
+function show_fevent_label(xxname, xcnt) {
+  var selector = document.getElementById('fevent_select' + xcnt);
+  var label = document.getElementById('fevent_label_selector' + xcnt);
+  var input = document.getElementById('e_name' + xcnt);
+  if (selector.value == "") {
+    if (xxname.charAt(0) == "#") {
+      input.value = "";
+    } else {
+      input.value = xxname;
+    }
+  } else {
+    input.value = selector.value;
   }
-  switch(c.options%[c.selectedIndex%].value) {
-  case 'G':
-  case 'J':
-    document.getElementById(e).innerHTML = '\
-<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
-<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
--</option>\
-<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
-[(month)]0</option>\
-<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
-[(month)]1</option>\
-<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
-[(month)]2</option>\
-<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
-[(month)]3</option>\
-<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
-[(month)]4</option>\
-<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
-[(month)]5</option>\
-<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
-[(month)]6</option>\
-<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
-[(month)]7</option>\
-<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
-[(month)]8</option>\
-<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
-[(month)]9</option>\
-<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
-[(month)]10</option>\
-<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
-[(month)]11</option>\
-</select>\
-';
-    break;
-  case 'F':
-    document.getElementById(e).innerHTML = '\
-<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
-<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
--</option>\
-<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
-[(french revolution month)]0</option>\
-<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
-[(french revolution month)]1</option>\
-<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
-[(french revolution month)]2</option>\
-<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
-[(french revolution month)]3</option>\
-<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
-[(french revolution month)]4</option>\
-<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
-[(french revolution month)]5</option>\
-<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
-[(french revolution month)]6</option>\
-<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
-[(french revolution month)]7</option>\
-<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
-[(french revolution month)]8</option>\
-<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
-[(french revolution month)]9</option>\
-<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
-[(french revolution month)]10</option>\
-<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
-[(french revolution month)]11</option>\
-<option value="13"' + (mv == 13 ? ' selected' : '') + '>%nn;
-[(french revolution month)]12</option>\
-</select>\
-';
-    break;
-  case 'H':
-    document.getElementById(e).innerHTML = '\
-<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
-<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
--</option>\
-<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
-[(hebrew month)]0</option>\
-<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
-[(hebrew month)]1</option>\
-<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
-[(hebrew month)]2</option>\
-<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
-[(hebrew month)]3</option>\
-<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
-[(hebrew month)]4</option>\
-<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
-[(hebrew month)]5</option>\
-<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
-[(hebrew month)]6</option>\
-<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
-[(hebrew month)]7</option>\
-<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
-[(hebrew month)]8</option>\
-<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
-[(hebrew month)]9</option>\
-<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
-[(hebrew month)]10</option>\
-<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
-[(hebrew month)]11</option>\
-<option value="13"' + (mv == 13 ? ' selected' : '') + '>%nn;
-[(hebrew month)]12</option>\
-</select>\
-';
-    break;
+  if (selector.value == "" || selector.value.charAt(0) != "#") {
+    label.style.display = 'inline';
+  } else {
+    label.style.display = 'none';
   }
 }
--->
-</script>
-<script>
-  function show_fevent_label(xxname, xcnt) {
-    var selector = document.getElementById('fevent_select' + xcnt);
-    var label = document.getElementById('fevent_label_selector' + xcnt);
-    var input = document.getElementById('e_name' + xcnt);
-    if (selector.value == "") {
-      if (xxname.charAt(0) == "#") {
-        input.value = "";
-      }
-      else {
-        input.value = xxname;
-      }
+$(document).ready(function() {
+  //show evt perso
+  $(".other_evts").each(function() {
+    var inp = $(this).find("input").first();
+    if (inp.val().charAt(0) != "#" && inp.val() != "") {
+      $(this).show();
     }
-    else {
-      input.value = selector.value;
-    }
-    if (selector.value == "" || selector.value.charAt(0) != "#") {
-      label.style.display = 'inline';
-    }
-    else {
-      label.style.display = 'none';
-    }
-  }
-
-  $(document).ready(function(){
-     //show evt perso
-     $(".other_evts").each(function(){
-       var inp = $(this).find("input").first();
-       if(inp.val().charAt(0) != "#" && inp.val() != ""){
-         $(this).show();
-       }
-     });
   });
-</script>
-<script>
-%foreach;parent;
-  %apply;pa_hide_script(cnt)
-%end;
-%foreach;child;
-  %apply;ch_hide_script(cnt)
-%end;
+});
 </script>
 </body>
 </html>
