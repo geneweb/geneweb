@@ -8,12 +8,12 @@
 %( TODO : fix static_levels for dag, atm fixed at 12! %)
 %let;maxlev;
   %if;(e.m="A")
-    %apply;min%with;%if;(b.max_anc_tree!="")%b.max_anc_tree;%end;
-               %and;%if;(b.max_anc_level!="")%b.max_anc_level;%end;
+    %apply;min%with;%if;(b.max_anc_tree!="")%b.max_anc_tree;%else;12%end;
+               %and;%if;(b.max_anc_level!="")%b.max_anc_level;%else;12%end;
                %and;%static_max_anc_level;%end;
   %elseif;(e.m="D")
-    %apply;min%with;%if;(b.max_desc_tree!="")%b.max_desc_tree;%end;
-               %and;%if;(b.max_desc_level!="")%b.max_desc_level;%end;
+    %apply;min%with;%if;(b.max_desc_tree!="")%b.max_desc_tree;%else;12%end;
+               %and;%if;(b.max_desc_level!="")%b.max_desc_level;%else;12%end;
                %and;%static_max_desc_level;%end;
   %else;%expr(12)
   %end;

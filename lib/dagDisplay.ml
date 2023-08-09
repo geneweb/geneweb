@@ -63,7 +63,7 @@ let image_txt conf base p =
   Adef.safe
   @@
   match (p_getenv conf.env "im", p_getenv conf.env "image") with
-  | Some "off", _ | _, Some "off" -> ""
+  | Some "off", _ | Some "0", _ | _, Some "off" -> ""
   | _, _ -> (
       match Image.get_portrait_with_size conf base p with
       | None -> ""
