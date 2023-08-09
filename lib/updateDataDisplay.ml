@@ -66,7 +66,7 @@ let print_mod_ok conf base =
     Output.print_sstring conf " ";
     Output.print_sstring conf (min nb_pers max_updates |> string_of_int);
     if List.assoc_opt "history" conf.base_env = Some "yes" then (
-      Output.print_sstring conf "<a href=\"";
+      Output.print_sstring conf " <a href=\"";
       Output.print_string conf (commd conf);
       Output.print_sstring conf "m=HIST&k=20\">";
       Output.print_sstring conf
@@ -218,12 +218,11 @@ and eval_simple_str_var conf _base env _xx = function
       let ini = Option.value ~default:"" (p_getenv conf.env "s") in
       let book_of, title = translate_title conf in
       let result =
-        if ini = "" then Printf.sprintf " (%d %s)" len title
+        if ini = "" then Printf.sprintf "%d %s" len title
         else
-          " - "
-          ^ Printf.sprintf (ftransl conf "%d %s starting with %s") len title ini
+          Printf.sprintf (ftransl conf "%d %s starting with %s") len title ini
       in
-      Utf8.capitalize_fst book_of ^ result
+      Utf8.capitalize_fst book_of ^ "<br>" ^ result
   | _ -> raise Not_found
 
 and eval_compound_var conf base env xx sl =
