@@ -40,7 +40,7 @@
     </a>
   %end;
   <br>
-  %if;(e.im!="off")
+  %if;(e.im="on" or e.im=1 or e.im="")
     %if;xxx.has_image;
       %if;not cancel_links;
         <a href="%xxx.image_url;" class="normal_anchor" %nn;
@@ -137,8 +137,8 @@ Person:            Child1     Child2          Child3
           %reset_count1;
           %foreach;family;%if;(nb_children>1)%incr_count1;%end;%end;
           %(count1=has children%)
-          %if;(e.sp!="on" and nnn<evarv-1 and count1>0)│%end;
-          %if;(e.sp="on" and lll=nnn)
+          %if;(not (e.sp="on" or e.sp=1) and nnn<evarv-1 and count1>0)│%end;
+          %if;((e.sp="on" or e.sp=1) and lll=nnn)
             %let;test;%apply;has_relation()%in;
             %foreach;family; %( TODO verify & expand %)
               %if;are_pacs;|%nn;
@@ -178,7 +178,7 @@ Person:            Child1     Child2          Child3
               %end;
               <span class="text-nowrap">
                 %(count1=has children%)
-                %if;(count1>0 or e.sp="on")
+                %if;(count1>0 or e.sp="on" or e.sp=1)
                   %if;(not cancel_links)
                     <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
                       title="[*update::family/families]0 of %first_name; %surname; (%occ;)
@@ -187,7 +187,7 @@ Person:            Child1     Child2          Child3
                   %else;&
                   %end;
                 %end;
-                %if(e.ma="on" and (e.sp="on" or count1>0))
+                %if((e.ma="on" or e.ma=1) and (e.sp="on" or e.sp=1 or count1>0))
                   %if;(family.marriage_date.year!="") %marriage_date.year;%else; -%end;
                 %end;
               </span>
@@ -273,7 +273,7 @@ Person:            Child1     Child2          Child3
     <tr>
       %apply;descendants_at_level("self",0,v,"hbars","center",icount)
     </tr>
-    %if;(e.sp="on")
+    %if;(e.sp="on" or e.sp=1)
       <tr>
         %apply;descendants_at_level("self",0,v,"spouse","center",icount)
       </tr>
