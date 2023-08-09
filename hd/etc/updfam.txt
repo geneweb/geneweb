@@ -406,6 +406,7 @@ $(document).ready(function(){
       <select class="form-control" name="excnt_witnwcnt_p">
         %if;((fwitness.surname="" and fwitness.first_name="") or fwitness.create = "create")
           <option value="create "%if;(fwitness.create = "create") selected%end;>[*create]0</option>
+          <option value="link" %if;(fwitness.create = "link") selected%end;>[*link]0</option>
         %else;
           <option value="link" %if;(fwitness.create = "link") selected%end;>[*link]0</option>
         %end;
