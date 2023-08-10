@@ -23,7 +23,28 @@
 %end;
 %if;(not cancel_links)
   <div class="d-flex justify-content-end mx-2 my-2" id="copyr">
-    %if;(connections!="")<div class="mr-auto align-self-center">%connections;</div>%end;
+    %if;(connections.total!="")
+      <div class="mr-auto align-self-center">
+        %if;(connections.wizards>0)
+          %if;(wizard)
+            <a href="%prefix;m=CONN_WIZ">%connections.wizards;</a>
+          %else;%connections.wizards;
+          %end;%nn;
+          %if;(connections.wizards=1) [wizard/wizards/friend/friends/exterior]0%nn;
+          %else; ["wizard/wizards/friend/friends/exterior"]1%nn;
+          %end;%nn;
+        %if;(connections.friends>0), %connections.friends;
+          %if;(connections.friends=1) [wizard/wizards/friend/friends/exterior]2%nn;
+          %else; ["wizard/wizards/friend/friends/exterior"]3
+          %end;
+        %end;
+        %if;(connections.total>0), %connections.total;%nn;
+          %if;(connections.total=1) [connection/connections]0%nn;
+          %else;[connection/connections]1%nn;
+          %end;%nn;
+        %end;
+      </div>
+    %end;
     <div class="d-flex">
       %if;(evar.templ="")
         <div class="btn-group dropup align-self-center">

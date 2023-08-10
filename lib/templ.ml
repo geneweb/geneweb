@@ -195,6 +195,18 @@ let substr_start_aux n s =
 let rec eval_variable conf = function
   | [ "bvar"; v ] | [ "b"; v ] -> (
       try List.assoc v conf.base_env with Not_found -> "")
+  | [ "connections"; "wizards" ] -> (
+      match conf.n_connect with
+      | Some (_c, cw, _cf, _) -> if cw > 0 then Printf.sprintf "%d" cw else ""
+      | None -> "")
+  | [ "connections"; "friends" ] -> (
+      match conf.n_connect with
+      | Some (_c, _cw, cf, _) -> if cf > 0 then Printf.sprintf "%d" cf else ""
+      | None -> "")
+  | [ "connections"; "total" ] -> (
+      match conf.n_connect with
+      | Some (c, _cw, _cf, _) -> if c > 0 then Printf.sprintf "%d" c else ""
+      | None -> "")
   | [ "evar"; v; "ns" ] | [ "e"; v; "ns" ] -> (
       try
         let vv = List.assoc v (conf.env @ conf.henv) in

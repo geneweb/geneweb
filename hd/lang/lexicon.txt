@@ -4780,18 +4780,18 @@ pt: confirmação LDS
 sv: konfirmation (LDS)
 tr: onay (LDS)
 
-    connections
+    connection/connections
 bg: потребителски връзки
 co: cunnessioni
 cs: spojenia
 da: forbindelser
 de: Verbindungen
-en: connections
+en: connectionconnections
 eo: konektoj
 es: conexiones
 et: ühendused
 fi: yhteydet
-fr: connexions
+fr: connexion/connexions
 he: קישורים
 it: connessioni
 lt: sąsajos
