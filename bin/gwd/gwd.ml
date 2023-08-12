@@ -1747,8 +1747,7 @@ let geneweb_server () =
                    http://%s:%d/base\n"
             !selected_port !selected_port hostn !selected_port;
           Printf.eprintf "where \"base\" is the name of the database\n\
-                   Type %s to stop the service\n"
-            "control C"
+                   Type “Ctrl+C” to stop the service\n"
         end;
       flush stderr;
       if !daemon then
