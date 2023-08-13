@@ -78,7 +78,7 @@
       %if;(not is_first)
         <td class="text-center py-0">%nn;
         %if;cell.is_right;
-          %if;(e.ma!="0")
+          %if;(e.ma!=0)
             %if;(wizard and not cancel_links)
               <a href="%prefix_base_password;m=MOD_FAM&i=%cell.family.index;&ip=%index;"
             %else;
@@ -112,7 +112,7 @@
                       %if;(cell.family.mother.death_date.year>cell.family.father.death_date.year)0%else;3%end;
                     %elseif;cell.family.mother.is_dead;2%else;5%end;
                   %elseif;(cell.family.mother.death_date.year!="" and cell.family.mother.death_date.prec="")
-                    %if;(cell.family.father.death_date.year!="" and (cell.father.father.death_date.prec="&#62;" or cell.family.father.death_date.prec="?"))
+                    %if;(cell.family.father.death_date.year!="" and (cell.family.father.death_date.prec="&#62;" or cell.family.father.death_date.prec="?"))
                       %if;(cell.family.father.death_date.year>cell.family.mother.death_date.year)3%else;0%end;
                     %elseif;cell.family.father.is_dead;4%else;6%end;
                   %end;
@@ -213,62 +213,38 @@
     </tr>
   %end;
 %end;
-%define;male_line(xx, yy)
-  %if;(yy>0)
-    %if;(xx.has_parents)%apply;male_line("xx.father", yy - 1)%end;
-    <a href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;(e.im="" and xx.has_image)
-      <br>
-      %if;not cancel_links;<a href="%xx.image_html_url;">%end;
-      <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
-       alt="[image/images]0" title="[image/images]0">
-      %if;not cancel_links;</a>%end;
+%( male/agnatic t=A and female/cognatic t=C lines %)
+%define;line(xx, vv)
+  %if;(vv>0)
+    %if;(xx.has_parents)
+      %apply;line%with;%if;(e.t="A")xx.father%else;xx.mother%end;%and;%expr(vv-1)%end;
     %end;
-    %if;("xx" != "self")<br>│<br>%end;
-  %end;%nl;
-%end;
-%define;female_line(xx, yy)
-  %if;(yy>0)
-    %if;(xx.has_parents)%apply;female_line("xx.mother", yy - 1)%end;
-    <a href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;(e.im="" and xx.has_image)
-      <br>
-      %if;not cancel_links;<a href="%xx.image_html_url;">%end;
-      <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
-       alt="[image/images]0" title="[image/images]0">%nn;
-      %if;not cancel_links;</a>%end;
+    %if;not cancel_links;<a href="%prefix_base_password;%xx.access">%end;%xx;
+    %if;not cancel_links;</a>%end;%xx.title;
+    %if;not cancel_links;<a href="%prefix_base_password;%xx.index">%end;<i>%xx.dates;</i>
+    %if;not cancel_links;</a>%end;
+    %if;(xx.has_image and e.im!=0)
+      <div>
+        %if;not cancel_links;<a href="%xx.image_html_url;">%end;
+        <img class="rounded" src="%xx.image_url;"%xx.image_small_size;
+          alt="[image/images]0 %xx;" title="[image/images]0">%nn;
+        %if;not cancel_links;</a>%end;
+      </div>
     %end;
-    %if;("xx" != "self")<br>│<br>%end;
+    %if;(xx!=self)<div>|</div>%end;
   %end;%nl;
-%end;
-%let;gen;%if;(e.v!="")%e.v;%else;2%end;%in;
-%if;not cancel_links;
-  <div class="d-flex justify-content-center">
-    %include;buttons_dag
-  </div>
 %end;
 %if;has_parents;
-  <table class="tree-vert mx-auto my-3" style="border-width:%border;">
+  <table class="tree-vert mx-auto my-2">
     %if;(e.t="T" and e.t1="m")
       %include;modules/arbre_9gen
     %elseif(e.t="A" or e.t="C")
-      %if;(e.t="A")
-        <tr>
-          <td class="text-center">
-            %apply;male_line("self", gen+1)
-          </td>
-        </tr>
-      %elseif;(e.t="C")
-        <tr>
-          <td class="text-center">
-            %apply;female_line("self", gen+1)
-          </td>
-        </tr>
-      %end;
+      <tr><td class="text-center">%apply;line("self",e.v+1)</td></tr>
     %else;
-      %foreach;ancestor_tree_line(gen+1)
+      %foreach;ancestor_tree_line(e.v+1)
         %apply;a_tree_line()
       %end;
     %end;
   </table>
 %end;
+%include;buttons_dag
