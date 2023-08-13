@@ -317,7 +317,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
           %end;
           %if;has_parents;
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-secondary %if;(e.m="A")active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"><span class="fa fa-code-fork fa-fw" title="[*ancestor/ancestors]1"></span></a>
+              <a class="nav-link dropdown-toggle text-secondary%if;(e.m="A") active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"><span class="fa fa-code-fork fa-fw" title="[*ancestor/ancestors]1"></span></a>
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="%prefix;%access;&m=A"><span class="fa fa-cog fa-fw mr-2"></span>[*ancestor/ancestors]1</a>
                 <div class="dropdown-divider"></div>
@@ -331,13 +331,13 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=h7&wide=on" title="[Arbre 7 gen]"><span class="fa fa-border-none fa-fw mr-2"></span>7 [generation/generations]1</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=m" title="[Arbre 9 gen]"><span class="fa fa-chess-board fa-fw mr-2"></span>9 [generation/generations]1</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=5"><span class="fa fa-chart-pie fa-fw mr-2"></span>[*v7 fanchart]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=5"><span class="fa fa-chart-pie fa-fw mr-2"></span>[*fanchart]</a>
               </div>
             </li>
           %end;
           %if;has_children;
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-secondary %if;(e.m="D")active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"><span class="fa fa-sitemap fa-fw" title="[*descendants]"></span></a>
+              <a class="nav-link dropdown-toggle text-secondary%if;(e.m="D") active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"><span class="fa fa-sitemap fa-fw" title="[*descendants]"></span></a>
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="%prefix;%access;&m=D"><span class="fa fa-cog fa-fw mr-2"></span>[*descendants]</a>
                 <div class="dropdown-divider"></div>
@@ -352,18 +352,15 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
             </li>
           %end;
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-secondary %if;(e.m="R" or e.m="F" or (e.m="C" and e.t="AN"))active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false" title="[*relationship]"><span class="fa fa-user-friends"></span></a>
+            <a class="nav-link dropdown-toggle text-secondary%if;(e.m="R" or e.m="F" or (e.m="C" and e.t="AN")) active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false" title="[*relationship]"><span class="fa fa-user-friends"></span></a>
             <div class="dropdown-menu">
               <a class="dropdown-item" href="%prefix;%access;&m=R" %laR;><span class="fa fa-cog fa-fw mr-2"></span>[*relationship computing]</a>
               <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=C&v=7"
+                <a class="dropdown-item" href="%prefix;m=C&%access;&v=3"
                   title="[*relationship link/relationship links]0 [with] [close family]"><span class="fa fa-elevator fa-fw mr-2"></span>[*relationship]</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" %nn;
-                href="%prefix;%access;&m=F%nn;
-                  %if;(b.default_fnav_images="off")&im=off;%end;%nn;
-                  %if;(b.default_fnav_semi="on")&semi=on;%end;%nn;
-                  %if;(b.default_fnav_spouse="on")&sp=on;%end;" title="[*family/families]0">
+                href="%prefix;m=F&%access;%if;(e.im=0)&im=0%end;" title="[*family/families]0">
                 <span class="fa fa-users fa-fw mr-2"></span>[*family/families]0
               </a>
               %if;(died = "" and (wizard or friend))

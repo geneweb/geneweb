@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: relmenu.txt v7.1 10/01/2023 20:01:49 $ -->
+  <!-- $Id: relmenu.txt v7.1 05/09/2023 21:35:33 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -35,7 +35,7 @@
       %if;access_by_key;
         <input type="hidden" name="ep" value="%first_name_key_val;">
         <input type="hidden" name="en" value="%surname_key_val;">
-        %if;(occ != "0")
+        %if;(occ!="0")
           <input type="hidden" name="eoc" value="%occ;">
         %end;
       %else
@@ -93,17 +93,17 @@
     <div class="col-4">
       %hidden;
       <div id="rel_form_search" onclick="document.getElementById('radio_R').checked = 'checked'; main();">
-        <input type="hidden" name="em" value="R"%/>
+        <input type="hidden" name="em" value="R">
         %if;access_by_key;
-          <input type="hidden" name="ep" value="%first_name_key_val;"%/>
-          <input type="hidden" name="en" value="%surname_key_val;"%/>
-          %if;(occ != "0")
-            <input type="hidden" name="eoc" value="%occ;"%/>
+          <input type="hidden" name="ep" value="%first_name_key_val;">
+          <input type="hidden" name="en" value="%surname_key_val;">
+          %if;(occ!=0)
+            <input type="hidden" name="eoc" value="%occ;">
           %end;
         %else
-          <input type="hidden" name="ei" value="%index;"%/>
+          <input type="hidden" name="ei" value="%index;">
         %end;
-        <input type="hidden" name="m" value="NG"%/>
+        <input type="hidden" name="m" value="NG">
         <div class="custom-control custom-radio">
           <input type="radio" class="custom-control-input" id="radio_R" name="select" value="input" onclick="main()" checked>
           <label class="custom-control-label" for="radio_R">[*search/case sensitive]0 [any individual in the base][:]</label>
@@ -147,58 +147,14 @@
               <label class="custom-control-label" for="long">[*long display]</label>
             </div>
             <div class="custom-control custom-checkbox">
-              <input type=checkbox class="custom-control-input" id="spouse" name="spouse">
-              <label class="custom-control-label" for="spouse">[*display spouse]</label>
+              <input type=checkbox class="custom-control-input" id="spouse" name="sp" value="1">
+              <label class="custom-control-label" for="spouse">[*visualize/show/hide/summary]2 [spouse/spouses]</label>
             </div>
             <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="image" name="image" value="off">
+              <input type="checkbox" class="custom-control-input" id="image" name="im" value="0">
               <label class="custom-control-label" for="image">[*visualize/show/hide/summary]2 [image/images]1 <span class="text-info">✘</span></label>
             </div>
           </div>
-          %(
-          <div class="form-group row ml-2 mt-3">
-            <label class="col-form-label ml-4" for="bd">[*border][:]</label>
-            <div class="input-group col-6">
-              <input type="number" class="form-control" id="bd" name="bd" min="0" max="15" placeholder="0">
-              <div class="input-group-append">
-                <div class="input-group-text">px</div>
-              </div>
-            </div>
-          </div>
-          <fieldset class="form-group ml-2 mt-2">
-            <legend class="col-form-label ml-4 pt-0">[*color][:]</legend>
-            <div class="flex-row align-item-center">
-              <div class="form-check form-check-inline mx-0 px-1">
-                <input class="form-check-input" type="radio" id="color" name="color" value="" checked>
-                <label class="form-check-label" for="color">0</label>
-              </div>
-              <div class="form-check form-check-inline mx-0 px-1 bg1">
-                <input class="form-check-input" type="radio" id="color1" name="color" value="bg1">
-                <label class="form-check-label" for="color1">1</label>
-              </div>
-              <div class="form-check form-check-inline bg2 mx-0 px-1">
-                <input class="form-check-input" type="radio" id="color2" name="color" value="bg2">
-                <label class="form-check-label" for="color2">2</label>
-              </div>
-              <div class="form-check form-check-inline bg3 mx-0 px-1">
-                <input class="form-check-input" type="radio" id="color3" name="color" value="bg3">
-                <label class="form-check-label" for="color3">3</label>
-              </div>
-              <div class="form-check form-check-inline bg4 mx-0 px-1">
-                <input class="form-check-input" type="radio" id="color4" name="color" value="bg4">
-                <label class="form-check-label" for="color4">4</label>
-              </div>
-              <div class="form-check form-check-inline bg5 mx-0 px-1">
-                <input class="form-check-input" type="radio" id="color5" name="color" value="bg5">
-                <label class="form-check-label" for="color5">5</label>
-              </div>
-              <div class="form-check form-check-inline bg6 mx-0 px-1">
-                <input class="form-check-input" type="radio" id="color6" name="color" value="bg6">
-                <label class="form-check-label" for="color6">6</label>
-              </div>
-            </div>
-          </fieldset>
-          %)
         </div>
       </div>
     </div>
