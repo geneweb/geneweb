@@ -128,7 +128,7 @@ distrib:
 	cp CHANGES $(DISTRIB_DIR)/CHANGES.txt
 	cp LICENSE $(DISTRIB_DIR)/LICENSE.txt
 	cp etc/README.txt $(DISTRIB_DIR)/.
-	cp etc/LISEZ\ MOI.txt $(DISTRIB_DIR)/.
+	cp etc/LISEZMOI.txt $(DISTRIB_DIR)/.
 	cp etc/START.htm $(DISTRIB_DIR)/.
 	cp -R etc/install-cgi $(DISTRIB_DIR)
 	cp etc/install-cgi.sh $(DISTRIB_DIR)
@@ -136,7 +136,7 @@ distrib:
 	  cp etc/Windows/gwd.bat $(DISTRIB_DIR); \
 	  cp etc/Windows/gwsetup.bat $(DISTRIB_DIR); \
 	  cp -f etc/Windows/README.txt $(DISTRIB_DIR)/README.txt; \
-	  cp -f etc/Windows/LISEZ\ MOI.txt $(DISTRIB_DIR)/LISEZ\ MOI.txt; \
+	  cp -f etc/Windows/LISEZMOI.txt $(DISTRIB_DIR)/LISEZMOI.txt; \
 	elif test $(OS_TYPE) = "Darwin"; then \
 	  cp etc/gwd.sh $(DISTRIB_DIR); \
 	  cp etc/gwsetup.sh $(DISTRIB_DIR); \
