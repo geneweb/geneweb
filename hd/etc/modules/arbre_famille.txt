@@ -1,4 +1,4 @@
-<!-- $Id: modules/arbre_famille.txt v7.1 04/03/2023 09:51:04 $ -->
+<!-- $Id: modules/arbre_famille.txt v7.1 13/08/2023 23:29:59 $ -->
 %define;short_display_person_image(xxx,yyy,zzz)
   %let;personinfo;%if;("xxx"="child")%sp;(%childrank;)%nn;
                   %elseif;("xxx"="child.spouse")
@@ -40,16 +40,14 @@
                     %end;
                   %end;
   %in;
-  <div class="d-flex pl-0 pr-0 %if;(evar.image!="off")py-0%end; w-100 justify-content-start list-group-item list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; ">
+  
+  <div class="d-flex pl-0 pr-0 %if;(e.im!=0)py-0%end; w-100 justify-content-start list-group-item list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; ">
     %if;(not (cancel_links or xxx.is_restricted))
-      <a href="%xxx.bname_prefix;%evm;%xxx.access;;%nn;
-        %if;(evar.image="off")image=off;%end;%nn;
-        %if;(evar.semi="on")semi=on;%end;%nn;
-        %if;(evar.spouse="on")spouse=on;%end;" %nn;
+      <a href="%xxx.bname_prefix;%xxx.access;&m=F%if;(e.sp=0)&sp=0%end;%if;(e.half=0)&half=0%end;%if;(e.im=0)&im=0%end;"
         class="big_anchor list-group-item-action" title="[*navigation] %xxx;%personinfo;">
       </a>
     %end;
-    %if;(evar.image!="off" and ("yyy"="yes" or "yyy"="force"))
+    %if;(e.im!=0 and ("yyy"="yes" or "yyy"="force"))
       %if;xxx.has_image;
         %if;not cancel_links;
           <a href="%xxx.image_url;" class="normal_anchor" %nn;
@@ -58,9 +56,9 @@
           <img class="small_image %if;not cancel_links;fade_image%end; align-self-center rounded ml-0 pr-0" %nn;
             src="%xxx.image_url;" alt="[image/images]0">%nn;
         %if;not cancel_links;</a>%end;
-      %elseif;(bvar.default_image="yes")
+      %elseif;(b.default_image="yes")
         %if;(wizard and not cancel_links)
-          <a href="%xxx.bname_prefix;m=SND_IMAGE;i=%xxx.index;" %nn;
+          <a href="%xxx.bname_prefix;m=SND_IMAGE;i=%xxx.index;"
             class="normal_anchor" target="_blank" %nn;
             title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;%personinfo;">%nn;
         %end;
@@ -120,6 +118,10 @@
   %if;("xx"="")<div class="col-4 p-2"></div>%end;
 %end;
 
+%define;on_side(xx)
+  [on %s's side:::xx]
+%end;
+
 %define;ancestorlv4(vv,ww,xx,yy,zz)
   %foreach;vv_level(4)
     %foreach;ancestor
@@ -130,7 +132,7 @@
       %end;
       %if;(level=4)
         %if;(ancestor.anc_sosa.v=ww or ancestor.anc_sosa.v=xx or ancestor.anc_sosa.v=yy or ancestor.anc_sosa.v=zz)
-          <div class="col-3 px-0 border border-bottom-0 border-%if;(not ancestor.has_parents)light%else;%if;(ancestor.is_male)primary%else;danger%end;%end; rounded-top text-center text-nowrap align-self-center
+          <div style="height:40px" class="col-3 px-0 border border-bottom-0 border-%if;(not ancestor.has_parents)light%else;%if;(ancestor.is_male)primary%else;danger%end;%end; rounded-top text-center text-nowrap align-self-center
             list-group-item-%if;(not ancestor.is_restricted)
                               %if;(ancestor.has_sosa)warning
                               %elseif;ancestor.is_male;primary%else;danger
@@ -144,7 +146,7 @@
             %if;(ancestor.anc_sosa.v=11 or ancestor.anc_sosa.v=15)border-left-0%end;">%nn;
             %if;(not ancestor.is_restricted)
               <a class="big_anchor list-group-item-action rounded-%if;ancestor.is_male;left%else;right%end;" 
-                href="%ancestor.bname_prefix;%ancestor.access;;%evm;"
+                href="%ancestor.bname_prefix;%ancestor.access;;m=F"
                 title="[*navigation] %ancestor;
                        &#010;%apply;a_of_b%with;[*n° Sosa] %ancestor.anc_sosa.v;%and;%if;("vv"="spouse")%spouse;%else;%self;%end;%end;
                        %if;(ancestor.has_sosa and self!=sosa_ref)
@@ -180,13 +182,13 @@
 
 %define;short_display_person_spouse_image(xx,yy)
   %apply;short_display_person_image("xx", "yes", "yy")
-  %if;(evar.spouse!="")
+  %if;(e.sp!=0)
     %foreach;child.family;
       <div class="d-flex flex-row">
-        <div class="%if;(evar.image!="off")d-flex flex-column%else;align-self-center%end;">
-          %if;(evar.image!="off")%apply;border()%end;
+        <div class="%if;(e.image!="off")d-flex flex-column%else;align-self-center%end;">
+          %if;(e.im!=0)%apply;border()%end;
           <span class="align-self-center %if;(child.marriage_date.year="")mx-4%else;ml-1 mr-2%end;  text-nowrap">&%if;(child.marriage_date.year!="")<a title="&%sp;%slash_marriage_date;%sp;%marriage_place;">%child.marriage_date.year;%end;</a></span>
-          %if;(evar.image!="off" and nb_children>0)
+          %if;(e.im!=0 and nb_children>0)
             <div class="text-center">
               %if;(not cancel_links)
                 <a title="%nn;
@@ -218,48 +220,34 @@
   %end;
 %end;
 
-%let;evm;%if;(evar.m="F")m=F;%end;%in;
-%let;prefx;%if;(evar.m="F")%prefix_set.pmod;%else;%prefix;%end;%in;
+%let;prefx;%if;(e.m="F")%prefix_set.pmod;%else;%prefix;%end;%in;
 %if;(not cancel_links)
-  <div class="col-12 d-flex justify-content-end">
-    %let;evfam;%if;(evar.fam!="" and evar.fam!=1)%evar.fam;%end;%in;
-    %let;evsemi;%if;(evar.semi!="")%evar.semi;%end;%in;
-    %let;evspou;%if;(evar.spouse!="")%evar.spouse;%end;%in;
+  <div class="d-flex justify-content-end">
     <div class="text-right mr-3">
-      <a href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env.key!="image")%env.key=%env.val;;%end;%end;%nn;
-        %if;(evar.image!="off")image=off;%end;"
-        class="btn btn-outline-secondary btn-sm border-0 px-0"
-        title="%if;(evar.image="off")[*visualize/show/hide/summary]1%else;%nn;
-           [*visualize/show/hide/summary]2%end; [image/images]0"
-      ><i class="fa fa-image fa-fw"></i>
-        <i class="fa fa-toggle-%if;(evar.image="off")off%else;on%end; text-muted"></i>
+      <a href="%if;(e.im!=0)%url_set.im.0;%else;%url_set.im;%end;"
+        class="btn btn-outline-%if;(e.im=0)primary%else;danger%end;"
+        title="%if;(e.im!=0)[*visualize/show/hide/summary]2%else;%nn;
+           [*visualize/show/hide/summary]1%end; [image/images]0">
+        <i class="fa fa-image fa-fw"></i>
       </a>
-      <a href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env.key!="semi")%env.key=%env.val;;%end;%end;%nn;
-        %if;(evar.semi!="on")semi=on;%end;"
-        class="btn btn-outline-secondary btn-sm border-0 px-0"
-        title="%if;(evar.semi!="on")[*visualize/show/hide/summary]1%else;%nn;
-           [*visualize/show/hide/summary]2%end; [half-brothers/half-sisters/half-siblings]2"
-      ><span class="mx-1">½</span>
-        <i class="fa fa-toggle-%if;(evar.semi!="on")off%else;on%end; text-muted"></i>
+      <a href="%if;(e.half!=0)%url_set.half.0;%else;%url_set.half;%end;"
+        class="btn btn-outline-%if;(e.half=0)primary%else;danger%end;"
+        title="%if;(e.half!=0)[*visualize/show/hide/summary]2%else;%nn;
+           [*visualize/show/hide/summary]1%end; [half-brothers/half-sisters/half-siblings]2">
+        ½%nn;
       </a>
-      <a href="%prefix_base_password;%nn;
-        %foreach;env_binding;%if;(env.key!="spouse")%env.key=%env.val;;%end;%end;%nn;
-        %if;(evar.spouse!="on")spouse=on;%end;"
-        class="btn btn-outline-secondary btn-sm border-0 px-0"
-        title="%if;(evar.spouse!="on")[*visualize/show/hide/summary]1%else;%nn;
-           [*visualize/show/hide/summary]2%end; [spouse/spouses]1"
-      ><span class="mx-1"><span class="fa fa-user-plus" aria-hidden="true"></span>%nn;
-           <span class="fa fa-user" aria-hidden="true"></span></span>
-        <i class="fa fa-toggle-%if;(evar.spouse!="on")off%else;on%end; text-muted"></i>
+      <a href="%if;(e.sp!=0)%url_set.sp.0;%else;%url_set.sp;%end;"
+        class="btn btn-outline-%if;(e.sp=0)primary%else;danger%end;"
+        title="%if;(e.sp!=0)[*visualize/show/hide/summary]2%else;%nn;
+           [*visualize/show/hide/summary]1%end; [spouse/spouses]1">
+        <i class="fa fa-user-plus fa-flip-horizontal" aria-hidden="true"></i>
       </a>
     </div>
   </div>
 %end;
-%if;((p_mod="zz" or p_mod="") and evar.m!="F")<div class="col-12%if;(evar.wide!="on") col-lg-8%end;">
+%if;((p_mod="zz" or p_mod="") and e.m!="F")<div class="col-12%if;(e.wide!="on") col-lg-8%end;">
 %end;
-%let;fam_cnt;%if;(evar.fam!="")%evar.fam;%else;1%end;%in;
+%let;fam_cnt;%if;(e.fam!="")%e.fam;%else;1%end;%in;
 <div class="col-12 d-flex mt-2">
   %( Grand-parents et parents individu %)
   <div class="col-6 px-0 mr-1 align-self-end">
@@ -389,7 +377,7 @@
       %let;moth;%mother.index;%in;
       %foreach;father.family;
         <div class="row px-0 ml-1">
-          %if;(father.spouse.index=moth or evar.semi!="")
+          %if;(father.spouse.index=moth or e.half!=0)
             <div class="col list-group order-2">
               %reset_count;%reset_count1;%reset_count2;
               %foreach;child;
@@ -435,7 +423,7 @@
                     [*a brother/a sister/a sibling]2
                   %end;
                 %end;
-              %elseif;(count>0 and evar.semi!="")
+              %elseif;(count>0 and e.half!=0)
                 %if;(count1!=0 and count2=0)
                   %if;(count1=1)[*a half-brother/a half-sister/a half-sibling]0
                   %elseif;(count1>1)%apply;in_full(count1,1) [half-brothers/half-sisters/half-siblings]0
@@ -457,7 +445,7 @@
       %end;
       %foreach;mother.family;
         <div class="row mt-1 ml-1">
-          %if;(mother.spouse.index!=fath and evar.semi!="")
+          %if;(mother.spouse.index!=fath and e.half!=0)
             <div class="col list-group order-2">
               %reset_count;%reset_count1;%reset_count2;
               %foreach;child;
@@ -507,15 +495,15 @@
   %( Enfants %)
   <div class="%if;not has_families;d-none%else;col%end; px-0">
     <div class="d-flex flex-column">
-      <div class="%if;(evar.image!="off")mt-3%end; px-0">
+      <div class="%if;(e.im!=0)mt-3%end; px-0">
         %let;nb_ch_tot;%nb_children;%in;
         %foreach;family;
           %if;(family_cnt=fam_cnt)
-            %if;(spouse!="" or (evar.semi!="" and nb_ch_tot>0))
+            %if;(spouse!="" or (e.half!=0 and nb_ch_tot>0))
               <div class="border border-dark border-top-0 border-left-0 border-right-0 text-center">%if;(on_marriage_date!="" and  marriage_date.year!="")<a title="&%sp;%slash_marriage_date;%sp;%marriage_place;">&%marriage_date.year;%end;</a>%if;(nb_children!=0)  %nb_children;<i class="fa fa-child fa-fw"></i>%end;
               </div>
             %end;
-            %if;(has_children or (evar.semi!="" and nb_ch_tot>0))
+            %if;(has_children or (e.half!=0 and nb_ch_tot>0))
               <div class="border border-dark border-bottom-0 border-top-0 border-left-0 w-50">&#8203;<br>&#8203;</div>
             %end;
           %end;
@@ -543,7 +531,7 @@
           %end;
         %end;
         %foreach;family;
-          %if;(family_cnt!=fam_cnt and nb_children>0 and evar.semi!="")
+          %if;(family_cnt!=fam_cnt and nb_children>0 and e.half!=0)
             %reset_count;%reset_count1;%reset_count2;
             %foreach;child;
               %incr_count;
@@ -592,7 +580,9 @@
       </div>
     </div>
   </div>
-
+%define;url(xxx,yyy)
+  %url_set.xxx.yyy;
+%end;
   %( Conjoint et sa fratrie %)
   <div class="%if;not has_families;d-none%else;col%end; pl-0 pr-2">
     %( Conjoint·s %)
@@ -612,9 +602,7 @@
                %apply;short_display_person_image("spouse", "yes", "")
              %else;
               <a class="d-flex list-group-item list-group-item-dark ml-2 pl-0 pr-2 py-0"
-                href="%prefix_base_password;%nn;
-                  %foreach;env_binding;%if;(env.key!="fam")%env.key=%env.val;;%end;%end;%nn;
-                  %if;(family_cnt!=1)fam=%family_cnt;;%end;"
+                href="%apply;url%with;fam%and;%if;(family_cnt!=1)%family_cnt;%end;%end;"
                 title="[*visualize/show/hide/summary]1 %spouse;%spouserank;">
                 <span class="ml-2">(%family_cnt;)</span>
                 <span class="ml-1">%spouse;</span>
@@ -654,7 +642,7 @@
         %let;spmothfn;%if;(self.spouse.mother.public_name!="")%self.spouse.mother.public_name%else;%self.spouse.mother.first_name;%end;%in;
         %foreach;spouse.father.family;
           <div class="row ml-1">
-            %if;(spouse=spfath or spouse=spmoth or evar.semi!="")
+            %if;(spouse=spfath or spouse=spmoth or e.half!=0)
               <div class="col list-group order-2">
                 %reset_count;%reset_count1;%reset_count2;
                 %foreach;child;
@@ -696,7 +684,7 @@
                   %else;
                     %apply;in_full(count,1) [a sibling-in-law/siblings-in-law]1
                   %end;
-                %elseif;(evar.semi!="")
+                %elseif;(e.half!=0)
                   %if;(count2=0 and count1!=0)
                     %if;(count1=1)[*a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law]0
                     %elseif;(count1>1)%apply;in_full(count1,1) [a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law]1
@@ -718,7 +706,7 @@
         %end;
         %foreach;spouse.mother.family;
           <div class="row ml-1">
-            %if;(not (spouse=spfath or spouse=spmoth) and evar.semi!="")
+            %if;(not (spouse=spfath or spouse=spmoth) and e.half!=0)
               <div class="col list-group order-2">
                 %reset_count;%reset_count1;%reset_count2;
                 %foreach;child;
@@ -741,7 +729,7 @@
                   %end;
                 %end;
               </div>
-              %if;(count>0 and evar.semi!="")
+              %if;(count>0 and e.half!=0)
                 <div class="col-12 mt-1 order-1">
                   %if;(not (spouse=spfath or spouse=spmoth))
                     %if;(count2=0 and count1!=0)

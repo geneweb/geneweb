@@ -18368,7 +18368,7 @@ co: durante/dapoi
 en: for/since
 fr: pendant/depuis
 
-    v7 fanchart
+    fanchart
 co: arburu in banderetta
 en: fanchart
 fr: arbre en éventail
