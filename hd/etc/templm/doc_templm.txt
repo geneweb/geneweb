@@ -14,8 +14,8 @@
 <h1>Configuration de templm dans /bases/%base.name;.gwf</h1>
 <h2>Documentation en ligne</h2>
 <ul>
-<li><a href="http://geneweb.tuxfamily.org/wiki/templm%if;((bvar.defaut_lang="fr" and evar.lang="") or evar.lang="fr")/fr%end;">http://geneweb.tuxfamily.org/wiki/templm%if;((bvar.defaut_lang="fr" and evar.lang="") or evar.lang="fr")/fr%end;</a></li>
-<li><a href="http://geneweb.tuxfamily.org/wiki/shortcuts%if;((bvar.defaut_lang="fr" and evar.lang="") or evar.lang="fr")/fr#Raccourcis_claviers_suppl.C3.A9mentaires_de_templm%else;#Templm_additional_shortcuts%end;">http://geneweb.tuxfamily.org/wiki/shortcuts%if;((bvar.defaut_lang="fr" and evar.lang="") or evar.lang="fr")/fr#Raccourcis_claviers_supplémentaires_de_templm%else;#templm_additional_shortcuts%end;</a></li>
+<li><a href="http://geneweb.tuxfamily.org/wiki/templm%if;((bvar.default_lang="fr" and evar.lang="") or evar.lang="fr")/fr%end;">http://geneweb.tuxfamily.org/wiki/templm%if;((bvar.default_lang="fr" and evar.lang="") or evar.lang="fr")/fr%end;</a></li>
+<li><a href="http://geneweb.tuxfamily.org/wiki/shortcuts%if;((bvar.default_lang="fr" and evar.lang="") or evar.lang="fr")/fr#Raccourcis_claviers_suppl.C3.A9mentaires_de_templm%else;#Templm_additional_shortcuts%end;">http://geneweb.tuxfamily.org/wiki/shortcuts%if;((bvar.default_lang="fr" and evar.lang="") or evar.lang="fr")/fr#Raccourcis_claviers_supplémentaires_de_templm%else;#templm_additional_shortcuts%end;</a></li>
 </ul>
 %let;l1;%if;(bvar.setup_http != "")%bvar.setup_http;%else;http://localhost:2316/%end;%in;
 <p class="button"><a href="%l1;gwf?lang=fr;anon=%base.name;#a_3">[*modify] les options par défaut de %base.name;.gwf [with] gwsetup</a></p>
