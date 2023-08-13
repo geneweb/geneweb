@@ -4727,7 +4727,7 @@ co: cunnessioni
 cs: spojenia
 da: forbindelser
 de: Verbindungen
-en: connectionconnections
+en: connection/connections
 eo: konektoj
 es: conexiones
 et: ühendused

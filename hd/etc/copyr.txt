@@ -22,101 +22,99 @@
   [compiled on %s from commit %s:::xx:yy]
 %end;
 %if;(not cancel_links)
-  <div class="d-flex justify-content-end mx-2 my-2" id="copyr">
-    %if;(connections.total!="")
-      <div class="mr-auto align-self-center">
-        %if;(connections.wizards>0)
-          %if;(wizard)
-            <a href="%prefix;m=CONN_WIZ">%connections.wizards;</a>
-          %else;%connections.wizards;
-          %end;%nn;
-          %if;(connections.wizards=1) [wizard/wizards/friend/friends/exterior]0%nn;
-          %else; ["wizard/wizards/friend/friends/exterior"]1%nn;
-          %end;%nn;
-        %if;(connections.friends>0), %connections.friends;
-          %if;(connections.friends=1) [wizard/wizards/friend/friends/exterior]2%nn;
-          %else; ["wizard/wizards/friend/friends/exterior"]3
-          %end;
-        %end;
-        %if;(connections.total>0), %connections.total;%nn;
-          %if;(connections.total=1) [connection/connections]0%nn;
-          %else;[connection/connections]1%nn;
-          %end;%nn;
+  <div class="d-flex ml-auto  justify-content-end m-2" id="copyr">
+    %if;(evar.templ="")
+      <div class="btn-group dropup align-self-center">
+        <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+          title="%if;(evar.lang!="")%apply;capitalize%with;%apply;language_name(evar.lang)%end;%end;">%nn;
+          <span class="sr-only">lang</span>%nn;
+          <span class="text-uppercase" title="[*select lang] %apply;language_name(lang)">%lang;</span>%nn;
+          <span class="sr-only">, [select lang]</span>%nn;
+        </button>
+        %if;(not is_printed_by_template)
+          <div class="dropdown-menu scrollable-lang short" aria-labelledby="dropdownMenu1">
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=af">af</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=bg">bg</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=br">br</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=ca">ca</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=co">co</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=cs">cs</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=da">da</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=de">de</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=en">en</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=eo">eo</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=es">es</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=et">et</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=fi">fi</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=fr">fr</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=he">he</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=is">is</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=it">it</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=lt">lt</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=lv">lv</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=nl">nl</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=no">no</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=oc">oc</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=pl">pl</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=pt">pt</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=pt-br">pt-br</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=ro">ro</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=ru">ru</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=sk">sk</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=sl">sl</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=sv">sv</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=tr">tr</a>
+            <a class="dropdown-item" href="%url_set2.lang.file;&lang=zh">zh</a>
+          </div>
+        %else;
+          <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1" title="lang">
+            %apply;language_link()
+          </div>
         %end;
       </div>
     %end;
-    <div class="d-flex">
-      %if;(evar.templ="")
-        <div class="btn-group dropup align-self-center">
-          <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-            title="%if;(evar.lang!="")%apply;capitalize%with;%apply;language_name(evar.lang)%end;%end;">%nn;
-            <span class="sr-only">lang</span>%nn;
-            <span class="text-uppercase" title="[*select lang] %apply;language_name(lang)">%lang;</span>%nn;
-            <span class="sr-only">, [select lang]</span>%nn;
-          </button>
-          %if;(not is_printed_by_template)
-            <div class="dropdown-menu scrollable-lang short" aria-labelledby="dropdownMenu1">
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=af">af</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=bg">bg</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=br">br</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=ca">ca</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=co">co</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=cs">cs</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=da">da</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=de">de</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=en">en</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=eo">eo</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=es">es</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=et">et</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=fi">fi</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=fr">fr</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=he">he</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=is">is</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=it">it</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=lt">lt</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=lv">lv</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=nl">nl</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=no">no</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=oc">oc</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=pl">pl</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=pt">pt</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=pt-br">pt-br</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=ro">ro</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=ru">ru</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=sk">sk</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=sl">sl</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=sv">sv</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=tr">tr</a>
-              <a class="dropdown-item" href="%url_set2.lang.file;&lang=zh">zh</a>
-            </div>
-          %else;
-            <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1" title="lang">
-              %apply;language_link()
-            </div>
+    %if;(connections.total!="")
+      <div class="d-flex flex-column align-self-center align-items-center ml-2 small">
+        %if;(connections.friends!="" and connections.friends>0)<span>%connections.friends; %nn;
+          %if;(connections.friends=1)[wizard/wizards/friend/friends/exterior]2
+          %else;[wizard/wizards/friend/friends/exterior]3
+          %end;</span>
+        %end;
+        %if;(connections.wizards!="" and connections.wizards>0)
+          %if;(wizard)
+            <a href="%prefix;m=CONN_WIZ">%connections.wizards;%nn;
+          %else;%connections.wizards;%nn;
+          %end; %nn;
+          %if;(connections.wizards=1)[wizard/wizards/friend/friends/exterior]0
+          %else;[wizard/wizards/friend/friends/exterior]1
           %end;
-        </div>
-      %end;
-      <div class="d-inline-flex flex-column justify-content-end">
-        <div class="ml-auto">
-          <a role="button"
-            %( button to switch only between default and templm templates %)
-            href="%if(e.templ!="templm")%url_set2.templ.file;&templ=templm%end;"
-            title="%if(e.templ!="templm")templm%else;default template%end;">%nn;
-            <i class="fab fa-markdown" aria-hidden="true"></i>%nn;
-            <span class="sr-only">switch to %if(evar.templ!="templm")templm%else;default template%end;</span>%nn;
-          </a>
-          %include;version
-        </div>
-        <div class="btn-group">
-          <span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer, noopener">INRIA</a> 1998-2007</span>
-          <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang="fr" or lang="de" or lang="nl" or lang="ru" or lang="sv")/%lang;%end;" class="ml-1"
-            target="_blank" rel="noreferrer, noopener" title="Documentation GeneWeb">%nn;
-            <i class="fab fa-wikipedia-w"></i></a>%nn;
-          <a href="https://github.com/geneweb/geneweb" class="ml-1"
-            target="_blank" rel="noreferrer, noopener" title="GeneWeb on Github">%nn;
-            <i class="fab fa-github"></i></a>
-        </div>
+          %if;(wizard)</a>%end;
+        %if;(connections.total>0)<span>%connections.total; %nn;
+          %if;(connections.total=1)[connection/connections]0
+          %else;[connection/connections]1
+          %end;</span>
+        %end;
+      </div>
+    %end;
+    <div class="d-inline-flex flex-column justify-content-end align-self-center ml-3">
+      <div class="ml-auto">
+        <a role="button"
+          %( button to switch only between default and templm templates %)
+          href="%if(e.templ!="templm")%url_set2.templ.file;&templ=templm%end;"
+          title="%if(e.templ!="templm")templm%else;default template%end;">%nn;
+          <i class="fab fa-markdown" aria-hidden="true"></i>%nn;
+          <span class="sr-only">switch to %if(evar.templ!="templm")templm%else;default template%end;</span>%nn;
+        </a>%nn;%include;version
+      </div>
+      <div class="btn-group">
+        <span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer, noopener">INRIA</a> 1998-2007</span>
+        <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang="fr" or lang="de" or lang="nl" or lang="ru" or lang="sv")/%lang;%end;" class="ml-1"
+          target="_blank" rel="noreferrer, noopener" title="Documentation GeneWeb">%nn;
+          <i class="fab fa-wikipedia-w"></i></a>%nn;
+        <a href="https://github.com/geneweb/geneweb" class="ml-1"
+          target="_blank" rel="noreferrer, noopener" title="GeneWeb on Github">%nn;
+          <i class="fab fa-github"></i></a>
       </div>
     </div>
   </div>
