@@ -41,6 +41,7 @@ module Default = struct
     fun ?(headers = []) ?(content : Adef.safe_string option) conf code ->
       Output.status conf code;
       List.iter (Output.header conf "%s") headers;
+      Output.print_string conf (Adef.encoded "<h1>Incorrect request</h1>");
       match content with
       | Some content -> Output.print_string conf content
       | None -> (
