@@ -145,15 +145,15 @@ let url_set_aux conf evar_l str =
       ""
   | evar :: _l ->
       (* rebuild the current url from conf.env, replacing &evar=xxx by &evar=str *)
-      let url =
+      let href =
         match String.split_on_char '?' (Util.commd conf :> string) with
         | [] ->
             !GWPARAM.syslog `LOG_WARNING "Empty Url\n";
             ""
-        | s :: _l -> s ^ "?"
+        | s :: _l -> s
       in
       (* if evar is not present in conf.env, it will be added at the end *)
-      let add_evar =
+      let _fadd_evar =
         match
           List.find_opt
             (fun (k, _) -> k = evar)
@@ -162,23 +162,29 @@ let url_set_aux conf evar_l str =
         | Some (_, _) -> false
         | None -> true && str <> "" (* only if str <> "" *)
       in
+      let new_evar = if str <> "" then [ (evar, Adef.encoded str) ] else [] in
+      let kl = ref [] in
       let l =
         List.filter_map
           (fun (k, v) ->
             let v = Adef.as_string @@ v in
-            if List.mem k evar_l && str <> "" then
-              Some (Format.sprintf "%s=%s" k str)
-            else if
-              v = ""
-              || (k = "oc" && v = "0")
-              || (k = "ocz" && v = "0")
-              || (List.mem k evar_l && str = "")
-            then None
-            else Some (Format.sprintf "%s=%s" k v))
-          (conf.henv @ conf.senv @ conf.env)
+            match (k, v) with
+            | _, "" -> None (* empty *)
+            | "oc", "0" | "ocz", "0" -> None (* occ null *)
+            | _, _ when List.mem k !kl -> None (* already done *)
+            | k, _ when List.mem k evar_l && k <> evar -> None (* 2 and 3 *)
+            | k, _ when k = evar && str = "" -> None (* 1 *)
+            | k, _ when k = evar && str <> "" -> (* 1 *)
+                kl := k :: !kl;
+                Some (Format.sprintf "%s=%s" k str)
+            | _, _ -> (* others *)
+                kl := k :: !kl;
+                Some (Format.sprintf "%s=%s" k v))
+          (new_evar @ conf.henv @ conf.senv @ conf.env)
       in
-      let url = url ^ String.concat "&" l in
-      if add_evar then url ^ Format.sprintf "&%s=%s" evar str else url
+      let url = String.concat "&" l in
+      Format.sprintf "%s?%s" href
+        (if url <> "" then Format.sprintf "%s" url else "")
 
 let substr_start_aux n s =
   let len = String.length s in
@@ -257,8 +263,13 @@ let rec eval_variable conf = function
       | None -> raise Not_found)
   | "time" :: sl -> eval_time_var conf sl
   (* clear some variables in url *)
+  (* set the first variable to a new value if <> "" *)
+  | [ "url_set"; evar; str ] -> url_set_aux conf [ evar ] str
   | [ "url_set"; evar ] -> url_set_aux conf [ evar ] ""
+  | [ "url_set2"; evar1; evar2; str ] -> url_set_aux conf [ evar1; evar2 ] str
   | [ "url_set2"; evar1; evar2 ] -> url_set_aux conf [ evar1; evar2 ] ""
+  | [ "url_set3"; evar1; evar2; evar3; str ] ->
+      url_set_aux conf [ evar1; evar2; evar3 ] str
   | [ "url_set3"; evar1; evar2; evar3 ] ->
       url_set_aux conf [ evar1; evar2; evar3 ] ""
   | [ "url_set_p" ] -> url_set_aux conf [ "i"; "p"; "n"; "oc" ] ""
@@ -266,8 +277,8 @@ let rec eval_variable conf = function
   | [ "url_set_p2" ] -> url_set_aux conf [ "i2"; "p2"; "n2"; "oc2" ] ""
   | [ "url_set_pn" ] ->
       url_set_aux conf [ "i1"; "i2"; "p1"; "p2"; "n1"; "n2"; "oc1"; "oc2" ] ""
-  (* when only one variable is involved, set it to a new value *)
-  | [ "url_set"; evar; str ] -> url_set_aux conf [ evar ] str
+  | [ "url_set_pz" ] ->
+      url_set_aux conf [ "iz"; "pz"; "nz"; "ocz" ] ""
   | [ "user"; "ident" ] -> conf.user
   | [ "user"; "name" ] -> conf.username
   | [ "user"; "key" ] -> conf.userkey
