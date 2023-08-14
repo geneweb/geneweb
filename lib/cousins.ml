@@ -246,7 +246,7 @@ let init_cousins_cnt conf base p =
         let () = load_couples_array base in
         let cousins_cnt = Array.make_matrix (max_a_l + 1) (max_d_l + 1) [] in
         let cousins_dates =
-          Array.make_matrix (max_a_l + 1) (max_d_l + 1) (0, 0)
+          Array.make_matrix (max_a_l + 2) (max_d_l + 2) (0, 0)
         in
         cousins_cnt.(0).(0) <-
           [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
@@ -413,7 +413,7 @@ let init_asc_cnt conf base p =
   | Some t -> t
   | None ->
       let t' =
-        let asc_cnt = Array.make (max_a_l + 1) [] in
+        let asc_cnt = Array.make (max_a_l + 2) [] in
         asc_cnt.(0) <-
           [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
         for i = 1 to max_a_l do
@@ -431,7 +431,7 @@ let init_desc_cnt conf base p =
   | Some t -> t
   | None ->
       let t' =
-        let desc_cnt = Array.make (max_d_l + 1) [] in
+        let desc_cnt = Array.make (max_d_l + 2) [] in
         desc_cnt.(0) <-
           [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
         for i = 1 to min max_d_l (Array.length desc_cnt - 1) do
