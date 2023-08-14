@@ -128,13 +128,13 @@ let incorrect_request ?(comment = "") conf =
 let person_selected conf base p =
   match p_getenv conf.senv "em" with
     Some "R" -> relation_print conf base p
-  | Some _ -> incorrect_request conf
+  | Some _ -> incorrect_request conf ~comment:"error #9"
   | None -> record_visited conf (get_iper p); Perso.print conf base p
 
 let person_selected_with_redirect conf base p =
   match p_getenv conf.senv "em" with
   | Some "R" -> relation_print conf base p
-  | Some _ -> incorrect_request conf
+  | Some _ -> incorrect_request conf ~comment:"error #8"
   | None ->
     Wserver.http_redirect_temporarily
       (commd conf ^^^ Util.acces conf base p :> string)
@@ -176,7 +176,7 @@ let very_unknown conf _ =
       Hutil.rheader conf title;
       Hutil.print_link_to_welcome conf false;
       Hutil.trailer conf
-    | None -> incorrect_request conf
+    | None -> Hutil.incorrect_request conf ~comment:"error #1"
 
 (* Print Not found page *)
 let unknown conf n =
@@ -289,7 +289,7 @@ let make_senv conf base =
     let ip =
       match person_of_key base vp vn voc with
       | Some ip -> ip
-      | None -> incorrect_request conf; raise Exit
+      | None -> Hutil.incorrect_request conf ~comment:"error #2"; raise Exit
     in
     let vi = string_of_iper ip in
     set_senv conf (Mutil.encode vm) (Mutil.encode vi)
@@ -428,7 +428,7 @@ let treat_request =
                   let f = Filename.chop_suffix f ".txt" in
                   SrcfileDisplay.print_source conf base f
                 else print conf f
-          | _ -> incorrect_request conf base
+          | _ -> incorrect_request conf ~comment:"error #3" base
         in
         match m with
         | "" ->
@@ -456,12 +456,6 @@ let treat_request =
                   Perso.interp_templ t conf base p
                 | _ -> person_selected conf base p
             end
-
-
-
-
-
-
 
         | "A" ->
           AscendDisplay.print |> w_person |> w_base
@@ -549,7 +543,7 @@ let treat_request =
         | "H" ->
           w_base @@ fun conf base -> ( match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print conf base f
-            | None -> incorrect_request conf base)
+            | None -> incorrect_request conf base ~comment:"error #4")
         | "HIST" ->
           w_base @@ History.print
         | "HIST_CLEAN" ->
@@ -683,7 +677,7 @@ let treat_request =
                     Some.search_first_name_print conf base fn
                   | None, Some sn ->
                     Some.search_surname_print conf base unknown sn
-                  | None, None -> incorrect_request conf base
+                  | None, None -> incorrect_request conf base ~comment:"error #5"
               end
             | Some i ->
               relation_print conf base
@@ -745,7 +739,7 @@ let treat_request =
         | "SRC" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print_source conf base f
-            | _ -> incorrect_request conf base
+            | _ -> incorrect_request conf base ~comment:"error #6"
           end
         | "STAT" ->
           w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
@@ -760,7 +754,7 @@ let treat_request =
               | _ -> Perso.interp_templ ("tp0_" ^ f) conf base
                        (Gwdb.empty_person base Gwdb.dummy_iper)
               end
-            | None -> incorrect_request conf base
+            | None -> incorrect_request conf base ~comment:"error #7"
             end
         | "TT" ->
           w_base @@ TitleDisplay.print
@@ -774,10 +768,7 @@ let treat_request =
           w_base @@ WiznotesDisplay.print_search
         | _ ->
             w_base @@ fun conf base ->
-            let str =
-              (Printf.sprintf "failing plugin or unknown command m=%s" m)
-            in
-            incorrect_request ~comment:str conf base
+            incorrect_request conf base ~comment:"error #10"
       end conf bfile ;
   end else begin
     let title _ =
