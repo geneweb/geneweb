@@ -19,7 +19,7 @@
       %nl;
       <div id="trl" style="clear:both;">
         <ul>
-          <li><a href="%url_set2.lang.templ;">default</a></li>
+          <li><a href="%url_set.templ;">default</a></li>
           <li><a href="%url_set.templ.templm;">templm</a></li>
         </ul>
       </div>
