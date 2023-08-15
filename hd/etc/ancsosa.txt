@@ -1152,7 +1152,7 @@
 
 %define;place_popup(xxx)
   %if;(e.xxx_place="on")
-    <td%if;(ancestor.nb_families>1 and (e.marr = "on" or e.marr_date = "on" or e.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;%sp;
+    <td%if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end;%sp;
       class="align-middle%nn;
         %if;(e.ns=1)
           %if;(ancestor.has_xxx_note and not ancestor.has_xxx_source) note%nn;
@@ -1188,7 +1188,7 @@
 %( Sosa %)
   %if;(e.num="on")
     <td class="align-middle text-center table_big_cell lh_implex%if;(ancestor.has_parents) text-alert%end;"
-    %if;(ancestor.nb_families>1 and (e.marr = "on" or e.marr_date = "on" or e.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;>%nn;
+    %if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end;>%nn;
       %if;(ancestor.anc_sosa!=1 and not cancel_links)
         %if;ancestor.has_parents;
           <a class="table_big_anchor" title="[*navigation] [with] %ancestor;%nn;
@@ -1211,13 +1211,13 @@
       %if;(ancestor.anc_sosa!=1 and not cancel_links)
         </a>
       %end;
-      %if;(ancestor.same != "" and e.repeat = "on" and e.num="on")
+      %if;(ancestor.same != "" and e.repeat="on" and e.num="on")
         %apply;implex()
       %end;
     </td>
   %end;
 %( Ancêtre %)
-  <td%if;(ancestor.nb_families>1 and (e.marr = "on" or e.marr_date = "on" or e.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;%sp;
+  <td%if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end;%sp;
       class="align-middle%if;(ancestor.nb_families > 1) border-bottom-0%end;%if;(e.nowrap="on") text-nowrap%end; pl-2%nn;
     %if;(e.ns=1)
         %if;(ancestor.has_notes and not ancestor.has_psources) note%nn;
@@ -1244,7 +1244,7 @@
         %apply;image_MF("ancestor")
         %apply;link%with;%ancestor.access;%and;%if;(e.fn=1)%ancestor.first_name; %ancestor.surname;%else;%ancestor;%end;%and;%ancestor.index;%end;
         %if;(e.tt=1 and ancestor.title!=""), %ancestor.title;%end;
-        %if;(ancestor.same != "" and e.repeat = "on" and e.num!="on")
+        %if;(ancestor.same != "" and e.repeat="on" and e.num!="on")
           %apply;implex()
         %end;
       </div>
@@ -1262,7 +1262,8 @@
 %( Lieu de baptême %)
   %apply;place_popup%with;baptism%end;
 %( Conjoints %)
-  %if;(e.marr = "on")
+  %if;(e.marr="on")
+    %if;(ancestor=self and not ancestor.has_families)<td%if;(e.hl=1) class="table-active"%end;></td>%end;%(self is single%)
     %foreach;ancestor.family;
       %if;(family_cnt = 1)
         <td class="align-middle
@@ -1275,7 +1276,8 @@
     %end;
   %end;
 %( Date du mariage %)
-  %if;(e.marr_date = "on")
+  %if;(e.marr_date="on")
+    %if;(ancestor=self and not ancestor.has_families)<td%if;(e.hl=1) class="table-active"%end;></td>%end;%(self is single%)
     %foreach;ancestor.family;
       %if;(family_cnt = 1)
         <td class="align-middle text-right table_big_cell
@@ -1300,11 +1302,12 @@
     %end;
   %end;
 %( Lieu du mariage %)
-  %if;(e.marr_place = "on")
+  %if;(e.marr_place="on")
+    %if;(ancestor=self and not ancestor.has_families)<td%if;(e.hl=1) class="table-active"%end;></td>%end;%(self is single%)
     %foreach;ancestor.family;
       %if;(family_cnt = 1)
         <td class="align-middle%nn;
-          %if;(e.ns="on")
+          %if;(e.ns=1)
             %if;(has_marriage_note and not has_marriage_source) note%nn;
             %elseif;(not has_marriage_note and has_marriage_source) source%nn;
             %elseif;(has_marriage_note and has_marriage_source) notesource%nn;
@@ -1335,11 +1338,11 @@
     %end;
   %end;
 %( Nombre d'enfants %)
-  %if;(e.child = "on")
-    %if;(ancestor.nb_families = 0)
-      <td>&nbsp;</td>
+  %if;(e.child="on")
+    %if;(ancestor.nb_families=0)
+      <td%if;(e.hl=1) class="table-active"%end;></td>
     %else;
-      %if;(e.marr = "on" or e.marr_date = "on" or e.marr_place = "on")
+      %if;(e.marr="on" or e.marr_date="on" or e.marr_place="on")
         %foreach;ancestor.family;
           %if;(family_cnt = 1)
             <td class="border-top-0 align-middle text-center
@@ -1363,7 +1366,6 @@
                            %end;
                          %end;"%nn;
                 %end;>
-            
             %nb_children;</td>
           %end;
         %end;
@@ -1381,15 +1383,15 @@
 %( Lieu de la sépulture %)
   %apply;place_popup%with;burial%end;
 %( Âge %)
-  %if;(e.age = "on")
-    <td class="align-middle text-center"%if;(ancestor.nb_families>1 and (e.marr = "on" or e.marr_date = "on" or e.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;>%nn;
+  %if;(e.age="on")
+    <td class="align-middle text-center"%if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end;>%nn;
       %if;ancestor.computable_death_age;%ancestor.death_age;%end;%nn;
       %if;ancestor.computable_age;%ancestor.age;%end;%nn;
     </td>
   %end;
 %( Profession %)
-  %if;(e.occu = "on")
-    <td class="align-middle"%if;(ancestor.nb_families>1 and (e.marr = "on" or e.marr_date = "on" or e.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;>%nn;
+  %if;(e.occu="on")
+    <td class="align-middle"%if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end;>%nn;
       %if;(ancestor.has_occupation)
         %ancestor.occupation%nn;
       %else;
@@ -1400,11 +1402,11 @@
 %end;
 
 %define;table_family()
-  %if;(e.marr = "on" or e.marr_date = "on" or e.marr_place = "on")
+  %if;(e.marr="on" or e.marr_date="on" or e.marr_place="on")
     %foreach;ancestor.family;
       %if;(family_cnt != 1)
         <tr>
-          %if;(e.marr = "on")
+          %if;(e.marr="on")
             <td class="border-top-0 align-middle
                 %if;(e.ns=1)
                   %if;(spouse.has_pnotes and not spouse.has_psources) note%nn;
@@ -1432,7 +1434,7 @@
               %apply;link%with;%spouse.access;%and;%if;(e.fn="on")%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
             </td>
           %end;
-          %if;(e.marr_date = "on")
+          %if;(e.marr_date="on")
             <td class="align-middle text-right table_big_cell
               %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) table-warning%end;">
               %if;(wizard and not cancel_links)
@@ -1452,7 +1454,7 @@
               %end;
             </td>
           %end;
-          %if;(e.marr_place = "on")
+          %if;(e.marr_place="on")
             <td class="border-top-0 align-middle
               %if;(e.ns=1)
                 %if;(has_marriage_note and not has_marriage_source) note%nn;
@@ -1483,7 +1485,7 @@
               %end;
             </td>
           %end;
-          %if;(e.child = "on")
+          %if;(e.child="on")
             <td class="text-center align-middle%nn;
               %if;(e.ns=1)
                 %if;(has_fnotes and not has_fsources) note%nn;
