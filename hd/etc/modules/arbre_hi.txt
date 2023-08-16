@@ -380,13 +380,12 @@
 %end;
 
 %define;graph(xx,yy,zz) %( xx gen ; yy mode I ou H; zz 1=single 2=couple %)
-  %let;levelup;%expr(xx+1)%in;
-  %let;leveldown;%expr(xx-1)%in;
+  %let;x_1;%expr(xx-1)%in;
   %let;hb;%if;(evarso="on" and boxsize=2)%expr(hbs*2)%elseif;(evarso="on")%hbs;%else;%hbc;%end;%in;
   %let;wb;%if;(evarso="on" and boxsize=2)%expr(wbs*2)%elseif;(evarso="on")%wbs;%else;%wbc;%end;%in;
   %let;wb2;%if;(evarso="on" and boxsize=2))%expr(wb1*2)%elseif;(evarso="on")%wb1;%else;%wbc;%end;%in;
   %if;(zz=2)  %( par couple %)
-    %foreach;ancestor_level(levelup)
+    %foreach;ancestor_level(xx)
       %foreach;ancestor;
         %if;(ancestor.anc_sosa.v %2=0)
           %let;anc_sosahalf;%expr(ancestor.anc_sosa.v/2)%in;
@@ -441,7 +440,7 @@
       %end;
     %end;
   %else; %( single %)
-    %foreach;ancestor_level(xx)
+    %foreach;ancestor_level(x_1)
       %foreach;ancestor;
         %let;top;%expr(topxx_yy(ancestor.anc_sosa.v)*hb)%in; %( top left corner %)
         %let;left;%expr(leftxx_yy(ancestor.anc_sosa.v)*wb)%in;
@@ -472,7 +471,7 @@
         %end;
       %end;
     %end;
-    %foreach;ancestor_level(leveldown)
+    %foreach;ancestor_level(x_1)
       %foreach;ancestor;
         %if;(not ancestor.has_parents and evarsms="on")
           %let;top2;%expr(topxx_yy(ancestor.anc_sosa.v*2)*hb)%in;
