@@ -866,6 +866,14 @@ de: Porträt
 en: portrait
 fr: portrait
 
+    to carrousel
+en: to carrousel
+fr: au carrousel
+
+    from carrousel
+en: from carrousel
+fr: du carrousel
+
     add portrait
 co: aghjunghje un ritrattu
 en: add a portrait
