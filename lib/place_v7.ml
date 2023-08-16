@@ -271,11 +271,12 @@ let find_in conf x ini =
   let inil =
     if List.length inil = 1 then
       match String.index_opt ini '(' with
-      | Some index ->
+      | Some index when index > 0 ->
           [
             String.sub ini 0 (index - 1);
             String.sub ini index (String.length ini - index);
           ]
+      | Some _index -> [ ini ]
       | None -> [ ini ]
     else inil
   in
