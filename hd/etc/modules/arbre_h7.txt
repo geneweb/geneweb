@@ -157,7 +157,7 @@
           %end;
         %end;
       %end;
-      %if;(level = 1)
+      %if;(level = 0)
         <table id="pc1"><tr><td>
           %if;(evar.siblings = "on" and has_parents)
             %foreach;father.child;
