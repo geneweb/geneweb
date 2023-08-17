@@ -174,17 +174,31 @@ let url_set_aux conf evar_l str =
             | _, _ when List.mem k !kl -> None (* already done *)
             | k, _ when List.mem k evar_l && k <> evar -> None (* 2 and 3 *)
             | k, _ when k = evar && str = "" -> None (* 1 *)
-            | k, _ when k = evar && str <> "" -> (* 1 *)
+            | "lang", v when not (List.mem k evar_l) ->
+                (* lang not in evar list, default_lang *)
+                if v = conf.default_lang || v = "" then None
+                else (
+                  kl := k :: !kl;
+                  Some (Format.sprintf "%s=%s" k v))
+            | "lang", v ->
+                (* lang in evar list, default_lang *)
+                let v = if str <> "" then str else v in
+                if v = conf.default_lang || v = "" then None
+                else (
+                  kl := k :: !kl;
+                  Some (Format.sprintf "%s=%s" k v))
+            | k, _ when k = evar && str <> "" ->
+                (* 1 *)
                 kl := k :: !kl;
                 Some (Format.sprintf "%s=%s" k str)
-            | _, _ -> (* others *)
+            | _, _ ->
+                (* others *)
                 kl := k :: !kl;
                 Some (Format.sprintf "%s=%s" k v))
           (new_evar @ conf.henv @ conf.senv @ conf.env)
       in
       let url = String.concat "&" l in
-      Format.sprintf "%s?%s" href
-        (if url <> "" then Format.sprintf "%s" url else "")
+      Format.sprintf "%s?%s" href url
 
 let substr_start_aux n s =
   let len = String.length s in
@@ -277,8 +291,7 @@ let rec eval_variable conf = function
   | [ "url_set_p2" ] -> url_set_aux conf [ "i2"; "p2"; "n2"; "oc2" ] ""
   | [ "url_set_pn" ] ->
       url_set_aux conf [ "i1"; "i2"; "p1"; "p2"; "n1"; "n2"; "oc1"; "oc2" ] ""
-  | [ "url_set_pz" ] ->
-      url_set_aux conf [ "iz"; "pz"; "nz"; "ocz" ] ""
+  | [ "url_set_pz" ] -> url_set_aux conf [ "iz"; "pz"; "nz"; "ocz" ] ""
   | [ "user"; "ident" ] -> conf.user
   | [ "user"; "name" ] -> conf.username
   | [ "user"; "key" ] -> conf.userkey

@@ -5,7 +5,7 @@
   %and;x%end;
 %end;
 %define;set_lang(l1)
-  %if;(b.default_lang!="l1")%url_set2.lang.file;lang=l1%else;%url_set2.lang.file;%end;
+  %if;(b.default_lang!="l1")%url_set2.lang.file.l1;%else;%url_set2.lang.file;%end;
 %end;
 %define;language_link()
   %for;i;1;31;
@@ -34,38 +34,38 @@
         </button>
         %if;(not is_printed_by_template)
           <div class="dropdown-menu scrollable-lang short" aria-labelledby="dropdownMenu1">
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=af">af</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=bg">bg</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=br">br</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=ca">ca</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=co">co</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=cs">cs</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=da">da</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=de">de</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=en">en</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=eo">eo</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=es">es</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=et">et</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=fi">fi</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=fr">fr</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=he">he</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=is">is</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=it">it</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=lt">lt</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=lv">lv</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=nl">nl</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=no">no</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=oc">oc</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=pl">pl</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=pt">pt</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=pt-br">pt-br</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=ro">ro</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=ru">ru</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=sk">sk</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=sl">sl</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=sv">sv</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=tr">tr</a>
-            <a class="dropdown-item" href="%url_set2.lang.file;lang=zh">zh</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.af;">af</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.bg;">bg</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.br;">br</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.ca;">ca</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.co;">co</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.cs;">cs</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.da;">da</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.de;">de</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.en;">en</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.eo;">eo</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.es;">es</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.et;">et</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.fi;">fi</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.fr;">fr</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.he;">he</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.is;">is</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.it;">it</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.lt;">lt</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.lv;">lv</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.nl;">nl</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.no;">no</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.oc;">oc</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.pl;">pl</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.pt;">pt</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.pt-br;">pt-br</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.ro;">ro</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.ru;">ru</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.sk;">sk</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.sl;">sl</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.sv;">sv</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.tr;">tr</a>
+            <a class="dropdown-item" href="%url_set2.lang.file.zh;">zh</a>
           </div>
         %else;
           <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1" title="lang">
@@ -102,7 +102,7 @@
       <div class="ml-auto">
         <a role="button"
           %( button to switch only between default and templm templates %)
-          href="%if(e.templ!="templm")%url_set2.templ.file;templ=templm%end;"
+          href="%if(e.templ!="templm")%url_set2.templ.file.templm;%end;"
           title="%if(e.templ!="templm")templm%else;default template%end;">%nn;
           <i class="fab fa-markdown" aria-hidden="true"></i>%nn;
           <span class="sr-only">switch to %if(evar.templ!="templm")templm%else;default template%end;</span>%nn;

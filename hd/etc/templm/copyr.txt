@@ -10,7 +10,7 @@
             <a href="%referer;"><img src="%image_prefix;/left.png" %wid_hei;left.png; alt="&lt;&lt;" title="[*back]"></a>
           %end;
           <a href="%prefix;"><img src="%image_prefix;/up.png" %wid_hei;up.pnd; alt="^^" title="[*home]"></a>
-          <a href="%url;cgl=on" target="_blank"><img style="border-width: thin"%sp;
+          <a href="%url_set.cgl.on;" target="_blank"><img style="border-width: thin"%sp;
             src="%image_prefix;/right.png"%wid_hei;right.png; alt="" title="[*cancel GeneWeb links]"></a>
         </td></tr>
       </table>
@@ -19,8 +19,8 @@
       %nl;
       <div id="trl" style="clear:both;">
         <ul>
-          <li><a href="%prefix_set.templ;templ=&%suffix;">default</a></li>
-          <li><a href="%prefix_set.templ;templ=templm&%suffix;">templm</a></li>
+          <li><a href="%url_set.templ;">default</a></li>
+          <li><a href="%url_set.templ.templm;">templm</a></li>
         </ul>
       </div>
     %end;
@@ -34,7 +34,7 @@
 %define;language_link()
   %for;i;1;30;
     %let;l1;%apply;lang(i)%in;
-    <a class="dropdown-item" href="%prefix_base_password;lang=%l1;&templ=%evar.templ;&%suffix;">%l1; %apply;language_name(l1)</a>
+    <a class="dropdown-item" href="%url_set2.lang.templ.l1;templ=%evar.templ;">%l1; %apply;language_name(l1)</a>
   %end;
 %end;
 <div id="footer" style="clear:both;">
