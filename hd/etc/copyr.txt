@@ -1,4 +1,4 @@
-<!-- $Id: copyr.txt v7.1 22/06/2023 13:11:10 $ -->
+<!-- $Id: copyr.txt v7.1 15/08/2023 17:58:58 $ -->
 %define;language(x)
   %apply;nth%with;
     /af/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lt/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/tr/zh/
@@ -11,8 +11,8 @@
   %for;i;1;31;
     %let;l1;%apply;language(i)%in;
     %if;(lang!=l1)
-      <a class="dropdown-item" id="lang_%l1;"
-        href="%apply;set_lang(l1)">%nn;
+      <a class="dropdown-item%if;(l1=b.default_lang) bg-warning%end;" id="lang_%l1;" 
+        href="%apply;set_lang(l1)" title="%if;(l1=b.default_lang)default %end;lang %l1;">%nn;
        <code>%if;(l1!="pt-br")%l1;&nbsp;&nbsp;&nbsp;%else;%l1;%end;%sp;</code>%nn;
        %apply;capitalize%with;%apply;language_name(l1)%end;</a>
     %end;
@@ -23,11 +23,11 @@
 %end;
 %if;(not cancel_links)
   <div class="d-flex ml-auto  justify-content-end m-2" id="copyr">
-    %if;(evar.templ="")
+    %if;(e.templ="")
       <div class="btn-group dropup align-self-center">
         <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-          title="%if;(evar.lang!="")%apply;capitalize%with;%apply;language_name(evar.lang)%end;%end;">%nn;
+          title="%if;(e.lang!="")%apply;capitalize%with;%apply;language_name(e.lang)%end;%end;">%nn;
           <span class="sr-only">lang</span>%nn;
           <span class="text-uppercase" title="[*select lang] %apply;language_name(lang)">%lang;</span>%nn;
           <span class="sr-only">, [select lang]</span>%nn;
@@ -68,7 +68,7 @@
             <a class="dropdown-item" href="%url_set2.lang.file.zh;">zh</a>
           </div>
         %else;
-          <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1" title="lang">
+          <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1">
             %apply;language_link()
           </div>
         %end;
@@ -89,6 +89,7 @@
           %if;(connections.wizards=1)[wizard/wizards/friend/friends/exterior]0
           %else;[wizard/wizards/friend/friends/exterior]1
           %end;
+            <span class="sr-only">switch to %if(e.templ!="templm")templm%else;default template%end;</span>%nn;
           %if;(wizard)</a>%end;
         %end;
         %if;(connections.total>0)<span>%connections.total; %nn;
@@ -105,7 +106,7 @@
           href="%if(e.templ!="templm")%url_set2.templ.file.templm;%end;"
           title="%if(e.templ!="templm")templm%else;default template%end;">%nn;
           <i class="fab fa-markdown" aria-hidden="true"></i>%nn;
-          <span class="sr-only">switch to %if(evar.templ!="templm")templm%else;default template%end;</span>%nn;
+          <span class="sr-only">switch to %if(e.templ!="templm")templm%else;default template%end;</span>%nn;
         </a>%nn;%include;version
       </div>
       <div class="btn-group">
