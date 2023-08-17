@@ -2380,7 +2380,12 @@ and eval_title_field_var conf base env (_p, (nth, name, title, places, dates))
       VVbool
         (match get_env "first" env with Vbool x -> x | _ -> raise Not_found)
   | [ "is_main" ] -> (
-      match name with Tmain -> bool_val true | _ -> bool_val false)
+      match name with
+      | Tmain -> bool_val true
+      | _ -> (
+          match get_env "first" env with
+          | Vbool x -> bool_val x
+          | _ -> bool_val false))
   | [ "nth" ] -> VVstring (string_of_int nth)
   | [ "name" ] -> (
       match name with
