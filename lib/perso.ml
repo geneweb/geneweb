@@ -5326,11 +5326,20 @@ let eval_predefined_apply conf env f vl =
           r := Some v;
           ""
       | _ -> raise Not_found)
-  | "min", s :: sl -> (
+  | "min", sl -> (
       try
-        let m =
-          List.fold_right (fun s -> min (int_of_string s)) sl (int_of_string s)
+        let sl =
+          List.map (fun s -> if s = "" then max_int else int_of_string s) sl
         in
+        let m = List.fold_left min max_int sl in
+        string_of_int m
+      with Failure _ -> raise Not_found)
+  | "max", sl -> (
+      try
+        let sl =
+          List.map (fun s -> if s = "" then 0 - max_int else int_of_string s) sl
+        in
+        let m = List.fold_left max (-max_int) sl in
         string_of_int m
       with Failure _ -> raise Not_found)
   | "clean_html_tags", [ s ] ->

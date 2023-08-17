@@ -865,7 +865,18 @@ let set_vother x = Vother x
 
 (* TODO should vl be Vint list and f = max|min, not a string?*)
 let eval_predefined_apply f vl =
-  let vl = List.map (function VVstring s -> s | _ -> raise Not_found) vl in
+  let vl =
+    List.map
+      (function
+        | VVstring "" -> (
+            match f with
+            | "min" -> max_int
+            | "max" -> 0 - max_int
+            | _ -> raise Not_found)
+        | VVstring s -> int_of_string s
+        | _ -> raise Not_found)
+      vl
+  in
   let f, first_element, l =
     match (f, vl) with
     | "min", s :: sl -> (min, s, sl)
@@ -873,12 +884,7 @@ let eval_predefined_apply f vl =
     | _ -> raise Not_found
   in
   try
-    let m =
-      List.fold_left
-        (fun acc s -> f acc (int_of_string s))
-        (int_of_string first_element)
-        l
-    in
+    let m = List.fold_left (fun acc s -> f acc s) first_element l in
     string_of_int m
   with Failure _ ->
     !GWPARAM.syslog `LOG_WARNING "Incorrect parameter for eval_predefined_apply";
