@@ -19,24 +19,14 @@
       %nl;
       <div id="trl" style="clear:both;">
         <ul>
-          <li><a href="%url_set.templ;">default</a></li>
+          <li><a href="%url_set2.lang.templ;">default</a></li>
           <li><a href="%url_set.templ.templm;">templm</a></li>
         </ul>
       </div>
     %end;
   %end;
 %end;
-%define;lang(x)
-  %apply;nth%with;
-    /af/bg/br/ca/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/zh/
-  %and;x%end;
-%end;
-%define;language_link()
-  %for;i;1;30;
-    %let;l1;%apply;lang(i)%in;
-    <a class="dropdown-item" href="%url_set2.lang.templ.l1;templ=%evar.templ;">%l1; %apply;language_name(l1)</a>
-  %end;
-%end;
+%( contrary to copyr.txt, see templm/search_menu for language choice %)
 <div id="footer" style="clear:both;">
   <table style="border:0;">
     <tr>
