@@ -2704,9 +2704,12 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
               null_val
           | _ -> raise Not_found)
       | None -> VVstring "-1")
-  | [ "cous_implx_cnt"; l1; l2 ] ->
-      let cnt = Cousins.cousins_implex_cnt conf base l1 l2 p in
-      VVstring (string_of_int cnt)
+  | [ "cous_implx_cnt"; l1; l2 ] -> (
+      match p_getenv conf.env "c_implex" with
+      | Some "on" | Some "1" ->
+          let cnt = Cousins.cousins_implex_cnt conf base l1 l2 p in
+          VVstring (string_of_int cnt)
+      | _ -> VVstring "")
   | [ "cousins"; "max_a" ] ->
       let max_a, _ = Cousins.max_l1_l2 conf base p in
       VVstring (string_of_int max_a)
