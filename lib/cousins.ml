@@ -371,6 +371,7 @@ let cousins_fold l =
   loop false [] (Gwdb.dummy_iper, ([], [], 0), [ 0 ]) l
 
 let cousins_implex_cnt conf base l1 l2 p =
+  (* warning, this is expensive: two nested loops *)
   let il1 = int_of_string l1 in
   let il2 = int_of_string l2 in
   let cousins_cnt, _cousins_dates =
