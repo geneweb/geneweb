@@ -549,6 +549,7 @@ let compute_relationship conf base by_marr p1 p2 =
     if sl = [] then None else Some (sl, total, rel)
 
 (* ----------- *)
+(* TODO cache both function ? *)
 
 let get_related_parents conf base p =
   let l =
@@ -617,6 +618,7 @@ let get_event_witnessed conf base p =
                      match wk with
                      | Witness_GodParent ->
                          (* already shown in relationship *)
+                         (* TODO do not remove it if not in relationship (get_related_parents) *)
                          ()
                      | Witness | Witness_CivilOfficer | Witness_ReligiousOfficer
                      | Witness_Informant | Witness_Attending | Witness_Mentioned
