@@ -129,6 +129,30 @@ type search_type =
   | PartialKey
   | DefaultSurname
 
+let search_for_fn_or_pn conf base fn pl =
+  List.fold_left
+    (fun pl p ->
+      if search_reject_p conf base p then pl
+      else
+        let fn1 =
+          get_first_name p |> sou base |> Name.lower |> Name.abbrev |> cut_words
+        in
+        let fn2 =
+          get_public_name p |> sou base |> Name.lower |> Name.abbrev
+          |> cut_words
+        in
+        let fnl = cut_words fn in
+        let exact = false in
+        (* TODO manage exact options according to mode *)
+        if
+          if exact then fnl = fn1 || fnl = fn2
+          else
+            List.fold_left (fun res fn -> res || List.mem fn fn1) false fnl
+            || List.fold_left (fun res fn -> res || List.mem fn fn2) false fnl
+        then p :: pl
+        else pl)
+    [] pl
+
 let search conf base an search_order specify unknown =
   let rec loop l =
     match l with
@@ -171,6 +195,7 @@ let search conf base an search_order specify unknown =
         let conf =
           { conf with env = ("surname", Adef.encoded sn) :: conf.env }
         in
+        (* find all bearers of sn using advanced_search *)
         let list, len = AdvSearchOk.advanced_search conf base max_answers in
         let list =
           if len > max_answers then Util.reduce_list max_answers list else list
@@ -181,30 +206,8 @@ let search conf base an search_order specify unknown =
             record_visited conf (get_iper p);
             Perso.print conf base p
         | pl -> (
-            let pl =
-              List.fold_left
-                (fun pl p ->
-                  if search_reject_p conf base p then pl
-                  else
-                    let fn1 =
-                      Name.abbrev (Name.lower (sou base (get_first_name p)))
-                    in
-                    let fn2 =
-                      Name.abbrev (Name.lower (sou base (get_public_name p)))
-                    in
-                    let fnl = cut_words fn in
-                    if
-                      (* TODO manage exact options *)
-                      List.fold_left
-                        (fun res fn -> res || List.mem fn (cut_words fn1))
-                        false fnl
-                      || List.fold_left
-                           (fun res fn -> res || List.mem fn (cut_words fn2))
-                           false fnl
-                    then p :: pl
-                    else pl)
-                [] pl
-            in
+            (* check first_names or public_names in list of persons *)
+            let pl = search_for_fn_or_pn conf base fn pl in
             match pl with
             | [] -> loop l
             | [ p ] ->
@@ -249,25 +252,7 @@ let search conf base an search_order specify unknown =
                 record_visited conf (get_iper p);
                 Perso.print conf base p
             | pl -> (
-                let pl =
-                  List.fold_left
-                    (fun pl p ->
-                      if search_reject_p conf base p then pl
-                      else
-                        let fn1 =
-                          Name.abbrev (Name.lower (sou base (get_first_name p)))
-                        in
-                        let fn2 =
-                          Name.abbrev
-                            (Name.lower (sou base (get_public_name p)))
-                        in
-                        if
-                          List.mem fn (cut_words fn1)
-                          || List.mem fn (cut_words fn2)
-                        then p :: pl
-                        else pl)
-                    [] pl
-                in
+                let pl = search_for_fn_or_pn conf base fn pl in
                 match pl with
                 | [] -> loop l
                 | [ p ] ->
