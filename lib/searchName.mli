@@ -17,9 +17,6 @@ val search_by_name : config -> base -> string -> person list
 (** Search persons by name that has format {i "firstname surname"}. Dublicates are possible. Empty persons, persons with private
     names or persons to which there are no rights to access are not listed. *)
 
-val search_partial_key : config -> base -> string -> person list
-(** Calls [search_key_aux] with [aux] fonction that makes calls to [search_by_name] if result is empty. *)
-
 val search_by_sosa : config -> base -> string -> person list
 
 val search_by_key : config -> base -> string -> person list
