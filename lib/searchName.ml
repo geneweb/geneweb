@@ -61,7 +61,7 @@ let search_by_name conf base n =
   | Some i ->
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
-      let list, _ =
+      let p_of_sn_l, _ =
         Some.persons_of_fsname conf base base_strings_of_surname
           (spi_find (persons_of_surname base))
           get_surname sn
@@ -76,9 +76,14 @@ let search_by_name conf base n =
                 let fn1 =
                   Name.abbrev (Name.lower (sou base (get_first_name p)))
                 in
-                if List.mem fn (cut_words fn1) then p :: pl else pl)
+                let fn2 =
+                  Name.abbrev (Name.lower (sou base (get_public_name p)))
+                in
+                if List.mem fn (cut_words fn1) || List.mem fn (cut_words fn2)
+                then p :: pl
+                else pl)
             pl ipl)
-        [] list
+        [] p_of_sn_l
   | None -> []
 
 let search_key_aux aux conf base an =
@@ -101,10 +106,6 @@ let search_key_aux aux conf base an =
   in
   let acc = aux conf base acc an in
   Gutil.sort_uniq_person_list base acc
-
-let search_partial_key =
-  search_key_aux (fun conf base acc an ->
-      if acc = [] then search_by_name conf base an else acc)
 
 let search_approx_key = search_key_aux select_approx_key
 
@@ -157,6 +158,7 @@ let search conf base an search_order specify unknown =
         | [] -> loop l
         | _ -> Some.search_first_name_print conf base an)
     | ApproxKey :: l -> (
+        Printf.eprintf "ApproxKey: %s\n" an;
         let pl = search_approx_key conf base an in
         match pl with
         | [] -> loop l
@@ -165,9 +167,60 @@ let search conf base an search_order specify unknown =
             Perso.print conf base p
         | pl -> specify conf base an pl)
     | PartialKey :: l -> (
-        let pl = search_partial_key conf base an in
+        let pl = search_by_name conf base an in
         match pl with
-        | [] -> loop l
+        | [] -> (
+            (* try advanced search *)
+            let max_answers = 100 in
+            let n1 = Name.abbrev (Name.lower an) in
+            let fn, sn =
+              match String.index_opt n1 ' ' with
+              | Some i ->
+                  ( String.sub n1 0 i,
+                    String.sub n1 (i + 1) (String.length n1 - i - 1) )
+              | _ -> ("", n1)
+            in
+            let conf =
+              { conf with env = ("surname", Adef.encoded sn) :: conf.env }
+            in
+            let p_of_sn_l, len =
+              AdvSearchOk.advanced_search conf base max_answers
+            in
+            let p_of_sn_l =
+              if len > max_answers then Util.reduce_list max_answers p_of_sn_l
+              else p_of_sn_l
+            in
+            match p_of_sn_l with
+            | [] -> loop l
+            | [ p ] ->
+                record_visited conf (get_iper p);
+                Perso.print conf base p
+            | pl -> (
+                let pl =
+                  List.fold_left
+                    (fun pl p ->
+                      if search_reject_p conf base p then pl
+                      else
+                        let fn1 =
+                          Name.abbrev (Name.lower (sou base (get_first_name p)))
+                        in
+                        let fn2 =
+                          Name.abbrev
+                            (Name.lower (sou base (get_public_name p)))
+                        in
+                        if
+                          List.mem fn (cut_words fn1)
+                          || List.mem fn (cut_words fn2)
+                        then p :: pl
+                        else pl)
+                    [] pl
+                in
+                match pl with
+                | [] -> loop l
+                | [ p ] ->
+                    record_visited conf (get_iper p);
+                    Perso.print conf base p
+                | pl -> specify conf base an pl))
         | [ p ] ->
             record_visited conf (get_iper p);
             Perso.print conf base p
