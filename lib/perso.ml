@@ -2895,15 +2895,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       if (not p_auth) && is_hide_names conf p then false
       else get_qualifiers p <> []
   (* TODO what should this be *)
-  | "has_relations" -> p_auth && get_rparents p <> []
-  | "has_related" ->
-      p_auth
-      &&
-      if conf.use_restrict then
-        List.exists
-          (fun ip -> Option.is_some (pget_opt conf base ip))
-          (get_related p)
-      else get_related p <> []
+  | "has_relations" -> p_auth && Relation.get_related_parents conf base p <> []
+  | "has_related" -> p_auth && Relation.get_event_witnessed conf base p <> []
   | "has_siblings" -> (
       match get_parents p with
       | Some ifam -> Array.length (get_children (foi base ifam)) > 1

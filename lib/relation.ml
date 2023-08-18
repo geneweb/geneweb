@@ -596,6 +596,7 @@ let get_event_witnessed conf base p =
        | [] -> ()
        | ic :: icl ->
            Hashtbl.add ignore_fevents ic ();
+           (* TODO should it be pget_opt here? *)
            let c = Util.pget conf base ic in
            List.iter
              (fun event_item ->
