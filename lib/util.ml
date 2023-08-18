@@ -783,8 +783,11 @@ let is_restricted (conf : config) base (ip : iper) =
   in
   if conf.use_restrict then base_visible_get base fct ip else false
 
-let pget (conf : config) base ip =
-  if is_restricted conf base ip then Gwdb.empty_person base ip else poi base ip
+let pget_opt conf base ip =
+  if is_restricted conf base ip then None else Some (poi base ip)
+
+let pget conf base ip =
+  Option.value ~default:(Gwdb.empty_person base ip) (pget_opt conf base ip)
 
 let string_gen_person base p = Futil.map_person_ps (fun p -> p) (sou base) p
 

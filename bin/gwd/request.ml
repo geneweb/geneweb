@@ -33,7 +33,7 @@ let find_all conf base an =
       | _ -> [], false
     else [], false
   | _ ->
-    let acc = SearchName.search_by_key conf base an in
+    let acc = Option.to_list @@ SearchName.search_by_key conf base an in
     if acc <> [] then acc, false
     else
       ( SearchName.search_key_aux begin fun conf base acc an ->
@@ -109,6 +109,7 @@ let specify conf base n pl =
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
+  (* TODO set possible limit to number of persons displayed (ptll) *)
   Output.print_sstring conf "<ul>\n";
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
