@@ -594,48 +594,45 @@ let get_event_witnessed conf base p =
       (* ignore fevent with spouse in this because they are already in [l] *)
       Hashtbl.create 16
     in
-    (let rec make_list = function
-       | [] -> ()
-       | ic :: icl ->
-           Hashtbl.add ignore_fevents ic ();
-           (* TODO should it be pget_opt here? *)
-           let c = Util.pget conf base ic in
-           List.iter
-             (fun event_item ->
-               (* check for duplicate Fevent *)
-               let is_duplicate_fevent =
-                 match Event.get_spouse_iper event_item with
-                 | None -> false
-                 | Some isp -> Hashtbl.mem ignore_fevents isp
-               in
-               if not is_duplicate_fevent then
-                 match
-                   Util.array_mem_witn conf base (get_iper p)
-                     (Event.get_witnesses event_item)
-                     (Event.get_witness_notes event_item)
-                 with
-                 | None -> ()
-                 | Some (wk, wnote) -> (
-                     match wk with
-                     | Witness_GodParent ->
-                         (* TODO we can be Witness_GodParent but not have a relation Godparent... *)
-                         (* if [p] is the GodParent of [c] in relationship we remove it here
-                            to not duplicate information *)
-                         if
-                           not
-                           @@ List.exists
-                                (fun (related, relation) ->
-                                  related = c && relation.r_type == GodParent)
-                                related_parents
-                         then l := (c, wk, wnote, event_item) :: !l
-                     | Witness | Witness_CivilOfficer | Witness_ReligiousOfficer
-                     | Witness_Informant | Witness_Attending | Witness_Mentioned
-                     | Witness_Other ->
-                         l := (c, wk, wnote, event_item) :: !l))
-             (Event.events conf base c);
-           make_list icl
-     in
-     make_list related);
+    List.iter
+      (fun ic ->
+        Hashtbl.add ignore_fevents ic ();
+        (* TODO should it be pget_opt here? *)
+        let c = Util.pget conf base ic in
+        List.iter
+          (fun event_item ->
+            (* check for duplicate Fevent *)
+            let is_duplicate_fevent =
+              match Event.get_spouse_iper event_item with
+              | None -> false
+              | Some isp -> Hashtbl.mem ignore_fevents isp
+            in
+            if not is_duplicate_fevent then
+              match
+                Util.array_mem_witn conf base (get_iper p)
+                  (Event.get_witnesses event_item)
+                  (Event.get_witness_notes event_item)
+              with
+              | None -> ()
+              | Some (wk, wnote) -> (
+                  match wk with
+                  | Witness_GodParent ->
+                      (* TODO we can be Witness_GodParent but not have a relation Godparent... *)
+                      (* if [p] is the GodParent of [c] in relationship we remove it here
+                         to not duplicate information *)
+                      if
+                        not
+                        @@ List.exists
+                             (fun (related, relation) ->
+                               related = c && relation.r_type == GodParent)
+                             related_parents
+                      then l := (c, wk, wnote, event_item) :: !l
+                  | Witness | Witness_CivilOfficer | Witness_ReligiousOfficer
+                  | Witness_Informant | Witness_Attending | Witness_Mentioned
+                  | Witness_Other ->
+                      l := (c, wk, wnote, event_item) :: !l))
+          (Event.events conf base c))
+      related;
     !l
   in
   (* On tri les témoins dans le même ordre que les évènements. *)
