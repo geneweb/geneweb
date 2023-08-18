@@ -4,8 +4,6 @@ open Def
 open Gwdb
 open Util
 
-let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
-
 (* find shortest path :
  * parents, siblings, mates and children are at distance 1.
  *)
