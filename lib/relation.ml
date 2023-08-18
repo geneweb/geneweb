@@ -587,6 +587,7 @@ let get_related_parents conf base p =
 
 let get_event_witnessed conf base p =
   let related = List.sort_uniq Stdlib.compare (Gwdb.get_related p) in
+  let related_parents = get_related_parents conf base p in
   let events_witnesses =
     let l = ref [] in
     let ignore_fevents =
@@ -617,9 +618,16 @@ let get_event_witnessed conf base p =
                  | Some (wk, wnote) -> (
                      match wk with
                      | Witness_GodParent ->
-                         (* already shown in relationship *)
-                         (* TODO do not remove it if not in relationship (get_related_parents) *)
-                         ()
+                         (* TODO we can be Witness_GodParent but not have a relation Godparent... *)
+                         (* if [p] is the GodParent of [c] in relationship we remove it here
+                            to not duplicate information *)
+                         if
+                           not
+                           @@ List.exists
+                                (fun (related, relation) ->
+                                  related = c && relation.r_type == GodParent)
+                                related_parents
+                         then l := (c, wk, wnote, event_item) :: !l
                      | Witness | Witness_CivilOfficer | Witness_ReligiousOfficer
                      | Witness_Informant | Witness_Attending | Witness_Mentioned
                      | Witness_Other ->
