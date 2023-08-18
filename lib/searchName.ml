@@ -124,6 +124,7 @@ type search_type =
   | Key
   | Surname
   | FirstName
+  | FullName
   | ApproxKey
   | PartialKey
   | DefaultSurname
@@ -157,8 +158,60 @@ let search conf base an search_order specify unknown =
         match pl with
         | [] -> loop l
         | _ -> Some.search_first_name_print conf base an)
+    | FullName :: l -> (
+        let max_answers =
+          match p_getint conf.env "max" with Some n -> n | None -> 100
+        in
+        let fn =
+          match p_getenv conf.env "p" with Some fn -> fn | None -> ""
+        in
+        let sn =
+          match p_getenv conf.env "n" with Some sn -> sn | None -> ""
+        in
+        let conf =
+          { conf with env = ("surname", Adef.encoded sn) :: conf.env }
+        in
+        let list, len = AdvSearchOk.advanced_search conf base max_answers in
+        let list =
+          if len > max_answers then Util.reduce_list max_answers list else list
+        in
+        match list with
+        | [] -> loop l
+        | [ p ] ->
+            record_visited conf (get_iper p);
+            Perso.print conf base p
+        | pl -> (
+            let pl =
+              List.fold_left
+                (fun pl p ->
+                  if search_reject_p conf base p then pl
+                  else
+                    let fn1 =
+                      Name.abbrev (Name.lower (sou base (get_first_name p)))
+                    in
+                    let fn2 =
+                      Name.abbrev (Name.lower (sou base (get_public_name p)))
+                    in
+                    let fnl = cut_words fn in
+                    if
+                      (* TODO manage exact options *)
+                      List.fold_left
+                        (fun res fn -> res || List.mem fn (cut_words fn1))
+                        false fnl
+                      || List.fold_left
+                           (fun res fn -> res || List.mem fn (cut_words fn2))
+                           false fnl
+                    then p :: pl
+                    else pl)
+                [] pl
+            in
+            match pl with
+            | [] -> loop l
+            | [ p ] ->
+                record_visited conf (get_iper p);
+                Perso.print conf base p
+            | pl -> specify conf base an pl))
     | ApproxKey :: l -> (
-        Printf.eprintf "ApproxKey: %s\n" an;
         let pl = search_approx_key conf base an in
         match pl with
         | [] -> loop l
@@ -250,7 +303,7 @@ let print conf base specify unknown =
   in
   match (real_input "p", real_input "n") with
   | Some fn, Some sn ->
-      let order = [ Key; ApproxKey; PartialKey ] in
+      let order = [ FullName ] in
       search conf base (fn ^ " " ^ sn) order specify unknown
   | Some fn, None ->
       let order = [ FirstName ] in
