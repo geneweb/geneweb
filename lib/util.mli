@@ -1,5 +1,4 @@
 (* Copyright (c) 1998-2007 INRIA *)
-
 open Config
 open Def
 open Gwdb
@@ -143,16 +142,18 @@ val is_public : config -> base -> person -> bool
 
 val private_txt : config -> string -> string
 
-val pget : config -> base -> iper -> person
-(** Returns person with giving id from the base.
+val pget_opt : config -> base -> iper -> person option
+(** Returns person option with giving id from the base.
     Wrapper around `Gwdb.poi` defined such as:
-    - if `conf.use_restrict` (option defined in .gwf file):
+    - Some ip: if user have permissions or `use_restrict` disabled.
+    - None: if `conf.use_restrict` (option defined in .gwf file):
       checks that the user has enought rights to see
       corresponding person (see `authorized_age`).
       If the user does not have enought permissions, returns
-      an empty person.
-    - just an alias to `Gwdb.poi` if `use_restrict` disabled.
-*)
+      None. *)
+
+val pget : config -> base -> iper -> person
+(** Value of [pget_opt], map None to empty_person *)
 
 val string_gen_person :
   base -> (iper, iper, istr) gen_person -> (iper, iper, string) gen_person
