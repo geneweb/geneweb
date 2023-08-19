@@ -28,26 +28,27 @@
   </tr>
 %end;
 %define;one_pvar(zz)
-  %if(e.izz != "" or e.pzz != "")
+  %if(e.izz!="" or e.pzz!="")
     %let;tmp;
-      %if;p_of_index.zz.has_birth_date;° %p_of_index.zz.slash_birth_date;
-      %elseif;p_of_index.zz.has_baptism_date;%p_of_index.zz.slash_baptism_date;
+      %if;pvar.zz.has_birth_date;° %pvar.zz.slash_birth_date;
+      %elseif;pvar.zz.has_baptism_date;%pvar.zz.slash_baptism_date;
       %end;
       <br>
-      %if;p_of_index.zz.has_death_date;† %p_of_index.zz.slash_death_date;
-      %elseif;p_of_index.zz.has_burial_date;%p_of_index.zz.slash_burial_date;
-      %elseif;p_of_index.zz.has_cremation_date;%p_of_index.zz.slash_cremation_date;
+      %if;pvar.zz.has_death_date;† %pvar.zz.slash_death_date;
+      %elseif;pvar.zz.has_burial_date;%pvar.zz.slash_burial_date;
+      %elseif;pvar.zz.has_cremation_date;%pvar.zz.slash_cremation_date;
       %end;
     %in;
-    %apply;one_pvar_line("zz", p_of_index.zz.occ, p_of_index.zz.first_name, p_of_index.zz.surname, tmp, e.tzz, "")
+    %apply;one_pvar_line("zz", pvar.zz.occ, pvar.zz.first_name, pvar.zz.surname, tmp, e.tzz, "")
     %apply;one_pvar(zz+1)
   %end;
 %end;
 %define;my_hidden(xx)
-  %if(e.xx != "")<input type="hidden" name="xx" value="%e.xx;">%end;
+  %if(e.xx!="")<input type="hidden" name="xx" value="%e.xx;">%end;
 %end;
-<body%body_prop;>
 %include;hed
+<body%body_prop;>
+
 <div class="container-fluid">
 <form id="upd" method="post" action="%action;">
   <div class="d-flex justify-content-end m-2">
@@ -72,16 +73,15 @@
     </thead>
     <tbody>
       %apply;one_pvar_line("", "", "", "", "", "", " id='template_line' style='display:none;'")
-      %if(e.i0 != "" and e.p0 != "")
+      %if(e.i0!="" and e.p0!="")
         %apply;one_pvar(0)
       %else;
         %apply;one_pvar(1)
       %end;
       <tr class="last_row">
-        <td>
-          <i class="fa fa-plus row_add_before"></i>
+        <td colspan="7">
+          <i class="fa fa-plus row_add_before w-100"></i>
         </td>
-        <td></td><td></td><td></td><td></td><td></td><td></td>
       </tr>
     </tbody>
   </table>

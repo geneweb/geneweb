@@ -49,7 +49,7 @@
   %else;
     %apply;a_of_b%with;[*ancestor/ancestors]1%and;
       %if;(public_name!="")%public_name;%else;%first_name;%end; %surname; %end;
-    %if;(e.t="D")[up to] %p_of_index.1;
+    %if;(e.t="D")[up to] %pvar.1;
     %end;
   %end;%nn;
   %if;(e.t="H" or e.t="F" or e.t="E") %apply;togena(lvl)%end;
