@@ -265,7 +265,7 @@
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%if;(xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</b>%else;
     %if;(cancel_links or xx.is_restricted)%if;(b.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;%nn;
-    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" title="[*Navigation] [with] %xx;">%if;(b.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
+    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" title="[*visualize/show/hide/summary]1 %xx;">%if;(b.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
     %end;
   %end;
   %if;(wizard and not cancel_links)
@@ -590,8 +590,8 @@
   %foreach;xx.mother.family;
     %if;(spouse.access=xx.father.access)
       %if;(marriage_date.year!="")
-        %if;(wizard and not cancel_links)<a href="%prefix&m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">%end;
-        <span class="text-nowrap">%family.date_s;</span>
+        %if;(wizard and not cancel_links)<a href="%prefix&m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">%end;%nn;
+        %family.date_s;%nn;
         %if;(wizard and not cancel_links)</a>%end;
       %else;&nbsp;%end;
     %end;
