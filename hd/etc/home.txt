@@ -1,4 +1,4 @@
-<!-- $Id: home.txt v7.1 04/03/2023 09:31:52 $ -->
+<!-- $Id: home.txt v7.1 18/08/2023 18:14:51 $ -->
 %define;display_sosa_ref(xx)
   [*sosa reference: %t:::xx]
 %end;
@@ -19,7 +19,7 @@
           <span class="sr-only">[*back]</span>%nn;
         </a>
       %end;
-      %if;debug;<span id="q_time_d">00.0000</span>%end;
+      %if;debug;<span class="small" id="q_time_d">00.0000</span>%end;
     </div>
   </div>
   <div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">

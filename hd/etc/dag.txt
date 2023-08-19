@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: dag.txt v7.1 04/02/2022 14:45:14 $ -->
+  <!-- $Id: dag.txt v7.1 18/08/2023 15:06:13 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
-    %if;(e.slices = "on")[*display by slices/slice width/overlap/total width]0%nn;
+    %if;(e.slices="on")[*display by slices/slice width/overlap/total width]0%nn;
     %else;%apply;capitalize(head_title)%end;
   </title>
   <meta name="robots" content="none">
@@ -18,34 +18,45 @@
 %message_to_wizard;
 %( TODO include;menubar %index, %foreach;family, do not work in this context %)
 %let;prefix_a;%prefix_base_password&p=%e.p;&n=%e.n;%nn;
-  %if;(e.oc!="")&oc=%e.oc;%end;%in; %(%access does not work %)
+  %if;(e.oc!="")&oc=%e.oc;%end;%in; %( %access; does not work %)
 <div class="container-fluid">
 %include;home
-<h1 class="h1">
-  %if;(e.slices="on")
-    [*display by slices/slice width/overlap/total width]0
-  %else;
-    %if;(e.m="D")[*compact descendants tree]
-    %elseif;(e.m="A")[*ascendants tree]
-    %else;[*relation/relations]0 ([shortest path])%end;
-    %if;(e.oi!="") <span style="font-size:60%%""> ([partial])</span>%end;
-    %if;(e.dag="on") + [dag]%end;
-  %end;
-</h1>
-%if;(e.t="A" or e.t="C")
-  <h2 class="h4">
-    %if;(e.t = "A")[*male line/female line]0%nn;
-    %elseif;(e.t = "C")[*male line/female line]1%nn;
+<div class="d-flex justify-content-between">
+  <div class="h1">%nn;
+    %if;(e.slices="on")
+      [*display by slices/slice width/overlap/total width]0
+    %else;
+      %( %apply;a_of_b%with; unavailble on dag %)
+      %if;(e.m="D")
+        %if;(e.t="TV")[*compact descendants tree]%nn;
+        %else;[*descendants tree]%nn;
+        %end;
+      %elseif;(e.m="A")[*ascendants tree]%nn;
+      %elseif;(e.m="RLM")[*multi relations graph]%nn;
+      %else;[*relation/relations]0 ([shortest path])%end;
+      %if;(e.oi!="") <span style="font-size:60%%""> ([partial])</span>%end;
+      %if;(e.dag="on") + [dag]%end;
     %end;
-  </h2>
-%end;
-%if;not cancel_links;
-  <div class="d-flex justify-content-center">
-    %include;buttons_dag
-  </div><hr>
-%end;
+  </div>
+  %if;(e.t="A" or e.t="C")
+    <div class="h4">
+      %if;(e.t="A")[*male line/female line]0%nn;
+      %elseif;(e.t="C")[*male line/female line]1%nn;
+      %end;
+    </div>
+  %end;
+  %if;not cancel_links;
+    %if;(e.m="RLM")
+      %include;buttons_dag
+    %else;
+      <div class="d-flex justify-content-center">
+        %include;buttons_dag
+      </div>
+    %end;
+  %end;
+</div>
 %if;(e.m="A" or e.m="D")
-  %if;(e.slices = "on")
+  %if;(e.slices="on")
     <form method="GET" action="%action;">
     <p>
     %hidden;
@@ -109,23 +120,23 @@
     %let;overlap;%if;(e.overlap != "")%e.overlap;%else;10%end;%in;
     %if;(pos1 != 0 or pos2 < dag.ncol)
       <div style="text-align:right">
-        %if;(pos1 = 0)&nbsp;%nn;
+        %if;(pos1=0)&nbsp;%nn;
         %else;
           <a href="%prefix_base_password;%nn;
             %foreach;env_binding;%nn;
               %if;(env.key != "pos1" and env.key != "pos2")%env.key;=%env.val;;%end;%nn;
             %end;%nn;
-            pos1=%expr(pos1 + overlap - dpos);%nn;
-            pos2=%expr(pos1 + overlap);">&lt;&lt;</a>
+            pos1=%expr(pos1+overlap-dpos);%nn;
+            pos2=%expr(pos1+overlap);">&lt;&lt;</a>
         %end;%nl
-        %if;(pos2 >= dag.ncol)&nbsp;%nn;
+        %if;(pos2>=dag.ncol)&nbsp;%nn;
         %else;
           <a href="%prefix_base_password;%nn;
             %foreach;env_binding;%nn;
-              %if;(env.key != "pos1" and env.key != "pos2")%env.key;=%env.val;;%end;%nn;
+              %if;(env.key!="pos1" and env.key!="pos2")%env.key;=%env.val;;%end;%nn;
             %end;%nn;
-            pos1=%expr(pos2 - overlap);%nn;
-            pos2=%expr(pos2 - overlap + dpos);">&gt;&gt;</a>
+            pos1=%expr(pos2-overlap);%nn;
+            pos2=%expr(pos2-overlap+dpos);">&gt;&gt;</a>
         %end;%nl;
       </div>
     %end;
@@ -152,12 +163,12 @@
         align="%dag_cell.align;">
         %if;dag_cell.is_nothing;&nbsp;%nn;
         %elseif;dag_cell.is_bar;
-          %if;(dag_cell.bar_link != "" and not cancel_links and e.em!="R")
+          %if;(dag_cell.bar_link!="" and not cancel_links and e.em!="R")
              %( added em!=R here condition because first button_rel is static and does the same %)
             <a href="%dag_cell.bar_link;%if;(e.im=0)&im=0%end;" title="[*navigate on tree]">│</a>%nn;
           %else;│%end;
-        %elseif;(dag_cell.text != "")%dag_cell.text;
-        %elseif;(dag_cell.item != "")
+        %elseif;(dag_cell.text!="")%dag_cell.text;
+        %elseif;(dag_cell.item!="")
           %if;(line_nbr!=0 and dag_cell.index!="-1")
             <div class="position-relative list-group-item-action">
               %if;(e.m="RLM")

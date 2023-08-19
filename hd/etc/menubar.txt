@@ -35,8 +35,8 @@
           %( personnal modules selection menu %)
           <li class="nav-item dropdown">
             <a id="load_once_p_mod" class="nav-link dropdown-toggle text-secondary dropdown-toggle-split" data-toggle="dropdown"
-              href="#" role="button" aria-haspopup="true" aria-expanded="false" title="[*module]1"%( data-offset="10,20"%)>
-              <span class="fas fa-address-card fa-fw" aria-hidden="true"></span>
+              href="#" role="button" aria-haspopup="true" aria-expanded="false" title="[*module]1"%( data-offset="10,20"%)>%nn;
+              <span class="fas fa-address-card fa-fw mr-1" aria-hidden="true"></span>%nn;
               <span class="sr-only">[*module]1</span>%nn;
             </a>
             <div class="dropdown-menu">

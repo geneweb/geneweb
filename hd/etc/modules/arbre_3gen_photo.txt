@@ -1,20 +1,22 @@
-<!-- $Id: modules/arbre_3gen_photo.txt v7.1 04/03/2023 09:51:04 $ -->
+<!-- $Id: modules/arbre_3gen_photo.txt v7.1 19/08/2023 15:07:38 $ -->
 %( Arbre 3 générations vertical avec photos ancêtres, sans individu principal si fratrie %)
 %( TODO: W3C warning align and width elements on table are obsolete > use CSS instead %)
 %( op 1 = small tree 85% size | 2 = normal size %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 %if;has_parents;
-  <table class="mx-auto text-center%if;(op_m=2) small%end;" style="line-height:1rem">
+  <table class="mx-auto text-center%if;(op_m=2) small%end;" style="line-height:0.9rem">
     <tr>%nn;
       %if;father.has_parents;
         <td colspan="4" class="align-bottom">%nn;
           %if;father.father.has_image;
             %if;(not cancel_links)
               <a href="%father.father.image_url;" target="_blank">
-                <img class="rounded" %father.father.image_small_size; src="%father.father.image_url;" alt="[image/images]0" title="%father.father; ([a grandfather/a grandmother/a grandparent]0)">
+                <img class="rounded" %father.father.image_small_size; src="%father.father.image_url;"
+                  alt="[image/images]0" title="%father.father; ([a grandfather/a grandmother/a grandparent]0)">
               </a>
             %else;
-              <img class="rounded" %father.father.image_small_size; src="%father.father.image_url;" alt="[image/images]0" title="%father.father; ([a grandfather/a grandmother/a grandparent]0)">
+              <img class="rounded" %father.father.image_small_size; src="%father.father.image_url;"
+                alt="[image/images]0" title="%father.father; ([a grandfather/a grandmother/a grandparent]0)">
             %end;
           %elseif;(b.default_image="yes")
             <img  height="75" src="%image_prefix;/img_unknown_man.png" alt="[missing image]">
@@ -26,10 +28,12 @@
           %if;father.mother.has_image;
             %if;(not cancel_links)
               <a href="%father.mother.image_url;" target="_blank">
-                <img class="rounded" %father.mother.image_small_size; src="%father.mother.image_url;" alt="[image/images]0" title="%father.mother; ([a grandfather/a grandmother/a grandparent]1)">
+                <img class="rounded" %father.mother.image_small_size; src="%father.mother.image_url;"
+                  alt="[image/images]0" title="%father.mother; ([a grandfather/a grandmother/a grandparent]1)">
               </a>
             %else;
-              <img class="rounded" %father.mother.image_small_size; src="%father.mother.image_url;" alt="[image/images]0" title="%father.mother; ([a grandfather/a grandmother/a grandparent]1)">
+              <img class="rounded" %father.mother.image_small_size; src="%father.mother.image_url;"
+                alt="[image/images]0" title="%father.mother; ([a grandfather/a grandmother/a grandparent]1)">
             %end;
           %elseif;(b.default_image="yes")
             <img height="75" src="%image_prefix;/img_unknown_woman.png" alt="[missing image]">
@@ -45,10 +49,12 @@
           %if;mother.father.has_image;
             %if;(not cancel_links)
               <a href="%mother.father.image_url;" target="_blank">
-                <img class="rounded" %mother.father.image_small_size; src="%mother.father.image_url;" alt="[image/images]0" title="%mother.father; ([a grandfather/a grandmother/a grandparent]0)">
+                <img class="rounded" %mother.father.image_small_size; src="%mother.father.image_url;"
+                  alt="[image/images]0" title="%mother.father; ([a grandfather/a grandmother/a grandparent]0)">
               </a>
             %else;
-              <img class="rounded" %mother.father.image_small_size; src="%mother.father.image_url;" alt="[image/images]0" title="%mother.father; ([a grandfather/a grandmother/a grandparent]0)">
+              <img class="rounded" %mother.father.image_small_size; src="%mother.father.image_url;" 
+                alt="[image/images]0" title="%mother.father; ([a grandfather/a grandmother/a grandparent]0)">
             %end;
           %elseif;(b.default_image="yes")
             <img height="75" src="%image_prefix;/img_unknown_man.png" alt="[missing image]">
@@ -60,10 +66,12 @@
           %if;mother.mother.has_image;
             %if;(not cancel_links)
               <a href="%mother.mother.image_url;" target="_blank">
-                <img class="rounded" %mother.mother.image_small_size; src="%mother.mother.image_url;" alt="[image/images]0" title="%mother.mother; ([a grandfather/a grandmother/a grandparent]1)">
+                <img class="rounded" %mother.mother.image_small_size; src="%mother.mother.image_url;"
+                  alt="[image/images]0" title="%mother.mother; ([a grandfather/a grandmother/a grandparent]1)">
               </a>
             %else;
-              <img class="rounded" %mother.mother.image_small_size; src="%mother.mother.image_url;" alt="[image/images]0" title="%mother.mother; ([a grandfather/a grandmother/a grandparent]1)">
+              <img class="rounded" %mother.mother.image_small_size; src="%mother.mother.image_url;"
+                alt="[image/images]0" title="%mother.mother; ([a grandfather/a grandmother/a grandparent]1)">
             %end;
           %elseif;(b.default_image="yes")
             <img height="75" src="%image_prefix;/img_unknown_woman.png" alt="[missing image]">
@@ -96,13 +104,13 @@
     <tr>
       %if;father.has_parents;
         <td></td>
-        <td colspan="2" style="padding:0" align="%right;">
+        <td colspan="2" class="p-0" align="%right;">
           <hr dir="ltr" width="50%%" align="%right;">
         </td>
-        <td colspan="3" style="padding:0">
+        <td colspan="3" class="p-0">
           <hr width="100%%">
         </td>
-        <td colspan="2" style="padding:0" align="%left;">
+        <td colspan="2" class="p-0" align="%left;">
           <hr dir="ltr" width="50%%" align="%left;">
         </td>
         <td></td>
@@ -110,13 +118,13 @@
       <td></td>
       %if;mother.has_parents;
         <td></td>
-        <td colspan="2" style="padding:0" align="%right;">
+        <td colspan="2" class="p-0" align="%right;">
           <hr dir="ltr" width="50%%" align="%right;">
         </td>
-        <td colspan="3" style="padding:0">
+        <td colspan="3" class="p-0">
           <hr width="100%%">
         </td>
-        <td colspan="2" style="padding:0" align="%left;">
+        <td colspan="2" class="p-0" align="%left;">
           <hr dir="ltr" width="50%%" align="%left;">
         </td>
         <td></td>
@@ -125,13 +133,13 @@
     <tr>
       %if;father.has_parents;
         <td colspan="3"></td>
-        <td colspan="3">│</td>
+        <td colspan="3" class="pt-0">│</td>
         <td colspan="3"></td>
       %end;
       <td></td>
       %if;mother.has_parents;
         <td colspan="3"></td>
-        <td colspan="3">│</td>
+        <td colspan="3" class="pt-0">│</td>
         <td colspan="3"></td>
       %end;
     </tr>
@@ -176,23 +184,24 @@
     </tr>
     <tr>
       <td colspan="3"></td>
-      <td colspan="3">│<br>│</td>
-      <td colspan="2"></td>
-      <td colspan="3" class="small align-text-center text-center font-italic col-1 px-1">%nn;
-        %apply;display_date_marriage_parent("self")</td>
-   <td colspan="2"></td>
-      <td colspan="3">│<br>│</td>
+      <td colspan="3">│</td>
+      <td colspan="1"></td>
+      <td colspan="5" class="small align-text-center text-center font-italic col-1 px-0">%nn;
+        %apply;display_date_marriage_parent("self")%nn;
+      </td>
+      <td colspan="1"></td>
+      <td colspan="3">│</td>
       <td colspan="3"></td>
     </tr>
     <tr>
       <td colspan="3"></td>
-      <td colspan="3" style="padding:0" align="%right;">
+      <td colspan="3" class="p-0" align="%right;">
         <hr dir="ltr" width="50%%" align="%right;">
       </td>
-      <td colspan="7" style="padding:0">
+      <td colspan="7" class="p-0">
         <hr width="100%%">
       </td>
-      <td colspan="3" style="padding:0" align="%left;">
+      <td colspan="3" class="p-0" align="%left;">
         <hr dir="ltr" width="50%%" align="%left;">
       </td>
       <td colspan="3"></td>
