@@ -106,23 +106,6 @@ function missing_events_options () {
     %if;(alias != "") <em>(%alias;)</em>%end;
   %end;
 </h1>
-%(%define;index(ppp,vvv,xxx)
-  %ppp_of_index.vvv.xxx;
-%end;
-%define;anc_paths(vvv)
-  %anc_paths.vvv;
-%end;
-%define;anc_paths_cnt(vvv)
-  %anc_paths_cnt.vvv;
-%end;
-%define;anc_paths_cnt_raw(vvv)
-  %anc_paths_cnt_raw.vvv;
-%end;
-%foreach;ancestor_level;
-%apply;anc_paths(level)
-%apply;anc_paths_cnt(level)
-%apply;anc_paths_cnt_raw(level)
-%end;%)
 %define;thegen(xx)
   [the %s generation:::xx]%nn;
 %end;
