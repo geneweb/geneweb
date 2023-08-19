@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: perso.txt v7.1 04/03/2023 10:39:01 $ -->
+  <!-- $Id: perso.txt v7.1 19/08/2023 02:16:52 $ -->
   <!-- Copyright (c) 1998--2007 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -31,31 +31,31 @@
 %define;init_nb_asc(tplnum)
   %let;templ;%bvar.perso_module_tplnum;%in
   %if;(templ = "famille" or templ = "arbre_3gen_v" or templ = "arbre_3gen_v_photo")
-    %if;(count < 3)
+    %if;(count<3)
       %reset_count;%incr_count;%incr_count;%incr_count;
     %end;
   %elseif;(templ = "arbre_4gen_v")
-    %if;(count < 4)
+    %if;(count<4)
       %reset_count;%incr_count;%incr_count;%incr_count;%incr_count;
     %end;
   %elseif;(templ = "arbre_5gen_h")
-    %if;(count < 5)
+    %if;(count<5)
       %reset_count;%incr_count;%incr_count;%incr_count;%incr_count;%incr_count;
     %end;
   %else;
-    %if;(count < 1)
+    %if;(count<1)
       %reset_count;%incr_count;
     %end;
   %end;
 %end;
 %define;init_nb_desc(tplnum)
   %let;templ;%bvar.perso_module_tplnum;%in
-  %if;(templ = "unions")
-    %if;(count < 3)
+  %if;(templ="unions")
+    %if;(count<3)
       %reset_count;%incr_count;%incr_count;%incr_count;
     %end;
   %else;
-    %if;(count < 1)
+    %if;(count<1)
       %reset_count;%incr_count;
     %end;
   %end;
@@ -63,12 +63,12 @@
 
 %define;init_from_gen_desc(tplnum)
   %let;templ;%bvar.perso_module_tplnum;%in
-  %if;(templ = "family")
-    %if;(count < 3)
+  %if;(templ="family")
+    %if;(count<3)
       %reset_count;%incr_count;%incr_count;%incr_count;
     %end;
   %else;
-    %if;(count < 1)
+    %if;(count<1)
       %reset_count;%incr_count;
     %end;
   %end;
@@ -89,19 +89,15 @@
      </div>
   %end;
  <div class="row">
-    %(be carefull h1 is col-12 for full width then an opening <div class="col-8"> is individu.txt %)
+    %(be carefull h1 is col-12 for full width then an opening <div class="col-8"> in individu.txt %)
       %let;op_m;3%in;%include;modules/individu
       %let;op_m;2%in;%include;modules/unions
       %let;op_m;1%in;%include;modules/chronologie
       %let;op_m;1%in;%include;modules/notes
       %let;op_m;2%in;%include;modules/sources
     %if;(p_mod="" or p_mod="zz")</div>%end; %( end of <div class="col-8"> from individu.txt %)
-    <div class="col-4">
-      %if;has_parents;
-        <div class="collapse show" id="collapseExample2">
-          %let;op_m;2%in;%include;modules/arbre_3gen_photo
-        </div>
-      %end;
+    <div class="col-4 pl-0 ml-0">
+      %let;op_m;2%in;%include;modules/arbre_3gen_photo
       %let;op_m;1%in;%include;modules/fratrie
       %let;op_m;1%in;%include;modules/relations
     </div>
@@ -120,7 +116,7 @@
   </div>
 %end;
 
-%if;(evar.opt = "misc")
+%if;(evar.opt="misc")
   %misc_names;<p>
 %end;
 %if;(not cancel_links)
