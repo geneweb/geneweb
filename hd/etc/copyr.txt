@@ -90,6 +90,7 @@
           %else;[wizard/wizards/friend/friends/exterior]1
           %end;
           %if;(wizard)</a>%end;
+        %end;
         %if;(connections.total>0)<span>%connections.total; %nn;
           %if;(connections.total=1)[connection/connections]0
           %else;[connection/connections]1
