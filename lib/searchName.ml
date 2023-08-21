@@ -4,6 +4,8 @@ open Config
 open Gwdb
 open Util
 
+let default_max_answers = 100
+
 (* TODO use function from Util instead? *)
 let empty_sn_or_fn base p =
   is_empty_string (get_surname p)
@@ -169,7 +171,7 @@ let search conf base an search_order specify unknown =
         | _ -> Some.search_first_name_print conf base an)
     | FullName :: l -> (
         let max_answers =
-          match p_getint conf.env "max" with Some n -> n | None -> 100
+          Option.value ~default:default_max_answers (p_getint conf.env "max")
         in
         let fn =
           match p_getenv conf.env "p" with Some fn -> fn | None -> ""
@@ -212,7 +214,6 @@ let search conf base an search_order specify unknown =
         match pl with
         | [] -> (
             (* try advanced search *)
-            let max_answers = 100 in
             (* TODO use split_normalize here? why only split on the first ' '? *)
             let n1 = Name.abbrev (Name.lower an) in
             let fn, sn =
@@ -226,10 +227,11 @@ let search conf base an search_order specify unknown =
               { conf with env = ("surname", Adef.encoded sn) :: conf.env }
             in
             let p_of_sn_l, len =
-              AdvSearchOk.advanced_search conf base max_answers
+              AdvSearchOk.advanced_search conf base default_max_answers
             in
             let p_of_sn_l =
-              if len > max_answers then Util.reduce_list max_answers p_of_sn_l
+              if len > default_max_answers then
+                Util.reduce_list default_max_answers p_of_sn_l
               else p_of_sn_l
             in
             match p_of_sn_l with
