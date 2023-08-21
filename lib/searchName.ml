@@ -4,6 +4,7 @@ open Config
 open Gwdb
 open Util
 
+(* TODO use function from Util instead? *)
 let empty_sn_or_fn base p =
   is_empty_string (get_surname p)
   || is_quest_string (get_surname p)
@@ -35,6 +36,8 @@ let select_approx_key conf base pl k =
       else pl)
     pl []
 
+let split_normalize s = cut_words (Name.abbrev (Name.lower s))
+
 (* search functions *)
 
 let search_by_sosa conf base an =
@@ -51,13 +54,16 @@ let search_by_sosa conf base an =
       else []
   | _ -> []
 
+(* TODO use function from Util instead? *)
 let search_reject_p conf base p =
   empty_sn_or_fn base p
   || (Util.is_hide_names conf p && not (Util.authorized_age conf base p))
 
 let search_by_name conf base n =
+  (* TODO use split_normalize here? why only split on the first ' '? *)
   let n1 = Name.abbrev (Name.lower n) in
   match String.index_opt n1 ' ' with
+  | None -> []
   | Some i ->
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
@@ -73,18 +79,11 @@ let search_by_name conf base n =
               let p = pget conf base ip in
               if search_reject_p conf base p then pl
               else
-                let fn1 =
-                  Name.abbrev (Name.lower (sou base (get_first_name p)))
-                in
-                let fn2 =
-                  Name.abbrev (Name.lower (sou base (get_public_name p)))
-                in
-                if List.mem fn (cut_words fn1) || List.mem fn (cut_words fn2)
-                then p :: pl
-                else pl)
+                let fn1_l = split_normalize (sou base (get_first_name p)) in
+                let fn2_l = split_normalize (sou base (get_public_name p)) in
+                if List.mem fn fn1_l || List.mem fn fn2_l then p :: pl else pl)
             pl ipl)
         [] p_of_sn_l
-  | None -> []
 
 let search_key_aux aux conf base an =
   let acc = Gutil.person_not_a_key_find_all base an in
@@ -134,21 +133,18 @@ let search_for_fn_or_pn conf base fn pl =
     (fun pl p ->
       if search_reject_p conf base p then pl
       else
-        let fn1 =
-          get_first_name p |> sou base |> Name.lower |> Name.abbrev |> cut_words
-        in
-        let fn2 =
-          get_public_name p |> sou base |> Name.lower |> Name.abbrev
-          |> cut_words
-        in
-        let fnl = cut_words fn in
+        let fn1_l = get_first_name p |> sou base |> split_normalize in
+        let fn2_l = get_public_name p |> sou base |> split_normalize in
+        let fn_l = cut_words fn in
         let exact = false in
         (* TODO manage exact options according to mode *)
         if
-          if exact then fnl = fn1 || fnl = fn2
+          if exact then fn_l = fn1_l || fn_l = fn2_l
           else
-            List.fold_left (fun res fn -> res || List.mem fn fn1) false fnl
-            || List.fold_left (fun res fn -> res || List.mem fn fn2) false fnl
+            List.fold_left (fun res fn -> res || List.mem fn fn1_l) false fn_l
+            || List.fold_left
+                 (fun res fn -> res || List.mem fn fn2_l)
+                 false fn_l
         then p :: pl
         else pl)
     [] pl
@@ -228,6 +224,7 @@ let search conf base an search_order specify unknown =
         | [] -> (
             (* try advanced search *)
             let max_answers = 100 in
+            (* TODO use split_normalize here? why only split on the first ' '? *)
             let n1 = Name.abbrev (Name.lower an) in
             let fn, sn =
               match String.index_opt n1 ' ' with
