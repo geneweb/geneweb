@@ -44,15 +44,15 @@ let search_by_sosa conf base an =
   let sosa_ref = Util.find_sosa_ref conf base in
   let sosa_nb = try Some (Sosa.of_string an) with _ -> None in
   match (sosa_ref, sosa_nb) with
+  | None, _ | _, None -> None
   | Some p, Some n ->
       if n <> Sosa.zero then
         match
           Util.branch_of_sosa conf base n (pget conf base @@ get_iper p)
         with
-        | Some (p :: _) -> [ p ]
-        | _ -> []
-      else []
-  | _ -> []
+        | Some (p :: _) -> Some p
+        | _ -> None
+      else None
 
 (* TODO use function from Util instead? *)
 let search_reject_p conf base p =
@@ -111,10 +111,11 @@ let search_approx_key = search_key_aux select_approx_key
 (* recherche par clé, i.e. prenom.occ nom *)
 let search_by_key conf base an =
   match Gutil.person_of_string_key base an with
+  | None -> None
   | Some ip ->
+      (* TODO use Util.pget_opt here instead?? *)
       let p = Util.pget conf base ip in
-      if search_reject_p conf base p then [] else [ p ]
-  | None -> []
+      if search_reject_p conf base p then None else Some p
 
 (* main *)
 
@@ -154,20 +155,17 @@ let search conf base an search_order specify unknown =
     match l with
     | [] -> unknown conf an
     | Sosa :: l -> (
-        let pl = search_by_sosa conf base an in
-        match pl with
-        | [ p ] ->
+        match search_by_sosa conf base an with
+        | None -> loop l
+        | Some p ->
             record_visited conf (get_iper p);
-            Perso.print conf base p
-        | _ -> loop l)
+            Perso.print conf base p)
     | Key :: l -> (
-        let pl = search_by_key conf base an in
-        match pl with
-        | [] -> loop l
-        | [ p ] ->
+        match search_by_key conf base an with
+        | None -> loop l
+        | Some p ->
             record_visited conf (get_iper p);
-            Perso.print conf base p
-        | pl -> specify conf base an pl)
+            Perso.print conf base p)
     | Surname :: l -> (
         let pl = Some.search_surname conf base an in
         match pl with
