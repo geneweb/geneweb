@@ -76,12 +76,12 @@ let search_by_name conf base n =
         (fun pl (_, _, ipl) ->
           List.fold_left
             (fun pl ip ->
-              let p = pget conf base ip in
-              if search_reject_p conf base p then pl
-              else
-                let fn1_l = split_normalize (sou base (get_first_name p)) in
-                let fn2_l = split_normalize (sou base (get_public_name p)) in
-                if List.mem fn fn1_l || List.mem fn fn2_l then p :: pl else pl)
+              match Util.pget_opt conf base ip with
+              | None -> pl
+              | Some p ->
+                  let fn1_l = split_normalize (sou base (get_first_name p)) in
+                  let fn2_l = split_normalize (sou base (get_public_name p)) in
+                  if List.mem fn fn1_l || List.mem fn fn2_l then p :: pl else pl)
             pl ipl)
         [] p_of_sn_l
 
@@ -96,13 +96,7 @@ let search_key_aux aux conf base an =
       | None -> (an, acc)
     else (an, acc)
   in
-  let acc =
-    Mutil.filter_map
-      (fun i ->
-        let p = Util.pget conf base i in
-        if search_reject_p conf base p then None else Some p)
-      acc
-  in
+  let acc = Mutil.filter_map (fun i -> Util.pget_opt conf base i) acc in
   let acc = aux conf base acc an in
   Gutil.sort_uniq_person_list base acc
 
@@ -112,10 +106,7 @@ let search_approx_key = search_key_aux select_approx_key
 let search_by_key conf base an =
   match Gutil.person_of_string_key base an with
   | None -> None
-  | Some ip ->
-      (* TODO use Util.pget_opt here instead?? *)
-      let p = Util.pget conf base ip in
-      if search_reject_p conf base p then None else Some p
+  | Some ip -> Util.pget_opt conf base ip
 
 (* main *)
 
