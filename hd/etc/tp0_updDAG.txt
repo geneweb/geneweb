@@ -9,63 +9,64 @@
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
   %include;css
 </head>
-
+<body%body_prop;>
+%include;hed
+%let;mid;%sp;class="align-middle"%in;
 %define;pline(znz,zocz,zfnz,zsnz,zbdz,zparamz)
   <tr class="row_p"zparamz>
     <td>
-     <span class="fa fa-user-plus row_add_p_before"></span>
-     <span class="fa fa-long-arrow-alt-up row_move_up"></span>
-     <br>
-     <span class="fa fa-user-minus row_del"></span>
-     <span class="fa fa-long-arrow-alt-down row_move_down"></span>
+     <i class="fa fa-plus row_add_before"></i>
+     <i class="fa fa-minus row_del"></i>
+   </td>
+   <td>
+     <i class="fa fa-long-arrow-alt-up row_move_up"></i>
+     <i class="fa fa-long-arrow-alt-down row_move_down"></i>
     </td>
-    <td><input name="oc" class="form-control reset_bd_text" size="5" value="zocz"></td>
-    <td><input name="p" class="form-control reset_bd_text" size="30" value="zfnz"></td>
-    <td><input name="n" class="form-control reset_bd_text" size="30" value="zsnz"></td>
-    <td class="bd_text">zbdz</td>
-    <td>sosa_ref</td>
+    <td%mid;><input name="oc" class="form-control reset_bd_text" size="5" value="zocz"></td>
+    <td%mid;><input name="p" class="form-control reset_bd_text" size="30" value="zfnz"></td>
+    <td%mid;><input name="n" class="form-control reset_bd_text" size="30" value="zsnz"></td>
+    <td class="bd_text align-middle">zbdz</td>
+    <td%mid;><input name="t" class="form-control" size="30" value="ztz"></td>
   </tr>
 %end;
-
 %define;sline(znz,zocz,zfnz,zsnz,zbdz,zsz,zparamz)
   <tr class="row_s"zparamz>
     <td>
-     <span class="fa fa-plus row_add_s_before"></span>
-     <span class="fa fa-long-arrow-alt-up row_move_up"></span>
-     <br>
-     <span class="fa fa-minus row_del"></span>
-     <span class="fa fa-long-arrow-alt-down row_move_down"></span>
+     <i class="fa fa-plus row_add_before"></i>
+     <i class="fa fa-minus row_del"></i>
+   </td>
+   <td>
+     <i class="fa fa-long-arrow-alt-up row_move_up"></i>
+     <i class="fa fa-long-arrow-alt-down row_move_down"></i>
     </td>
-    <td class="n_p_oc">zocz</td>
-    <td class="n_p_oc">zfnz</td>
-    <td class="n_p_oc">zsnz</td>
-    <td class="n_p_oc">zbdz</td>
-    <td><input name="s" class="form-control reset_n_p_oc" size="30" value="zsz"</td>
+    <td class="n_p_oc align-middle">zocz</td>
+    <td class="n_p_oc align-middle">zfnz</td>
+    <td class="n_p_oc align-middle">zsnz</td>
+    <td class="n_p_oc align-middle">zbdz</td>
+    <td%mid;><input name="s" class="form-control reset_n_p_oc" size="30" value="zsz"</td>
   </tr>
 %end;
-
 %define;one_p_line(zz)
   %let;tmp;
-    %if;pvar.zz.has_birth_date; %pvar.zz.slash_birth_date;
+    %if;pvar.zz.has_birth_date;° %pvar.zz.slash_birth_date;
     %elseif;pvar.zz.has_baptism_date; %pvar.zz.slash_baptism_date;
     %end;
-    %sp;-%sp;%nn;
-    %if;pvar.zz.has_death_date;%pvar.zz.slash_death_date;
+    <br>
+    %if;pvar.zz.has_death_date;! %pvar.zz.slash_death_date;
     %elseif;pvar.zz.has_burial_date;%pvar.zz.slash_burial_date;
     %elseif;pvar.zz.has_cremation_date;%pvar.zz.slash_cremation_date;
     %end;
   %in;
   %apply;pline("zz", pvar.zz.occ, pvar.zz.first_name, pvar.zz.surname, tmp, "")
 %end;
-
 %define;one_s_line(zz)
   %if(evar.szz != "")
     %let;tmp;
-      %if;svar.zz.has_birth_date; %svar.zz.slash_birth_date;
+      %if;svar.zz.has_birth_date;° %svar.zz.slash_birth_date;
       %elseif;svar.zz.has_baptism_date; %svar.zz.slash_baptism_date;
       %end;
-      %sp;-%sp;%nn;
-      %if;svar.zz.has_death_date;%svar.zz.slash_death_date;
+      <br>
+      %if;svar.zz.has_death_date;† %svar.zz.slash_death_date;
       %elseif;svar.zz.has_burial_date;%svar.zz.slash_burial_date;
       %elseif;svar.zz.has_cremation_date;%svar.zz.slash_cremation_date;
       %end;
@@ -73,7 +74,6 @@
     %apply;sline("zz", svar.zz.occ, svar.zz.first_name, svar.zz.surname, tmp, evar.szz, "")
   %end;
 %end;
-
 %define;one_svar(zz)
   %if(evar.izz != "" or evar.pzz != "")
     %apply;one_p_line("zz")
@@ -84,36 +84,29 @@
     %apply;one_svar(zz+1)
   %end;
 %end;
-
 %define;my_hidden(xx)
-  %if(evar.xx != "")<input type="hidden" name="xx" value="%evar.xx;">%end;
+  %if(evar.xx!="")<input type="hidden" name="xx" value="%evar.xx;">%end;
 %end;
-
-<body%body_prop;>
-%include;hed
 <div class="container-fluid">
-
 <form id="upd" method="post" action="%action;">
-  <div class="row justify-content-center">
-    <h2 class="mx-auto">[*edit tree]</h2>
-    <input type="submit" class="btn btn-primary mx-auto" value="OK">
+  <div class="d-flex justify-content-end m-2">
+    <div class="h2">[*edit tree]</div>
+    <input type="submit" class="btn btn-primary ml-auto" value="OK">
   </div>
-
   %hidden;
   <input type="hidden" name="m" value='DAG'>
   %apply;my_hidden("spouse")
   %apply;my_hidden("image")
   %apply;my_hidden("bd")
   %apply;my_hidden("new")
-  <table class="table table-sm">
+  <table class="table table-hover table-sm">
     <thead>
       <tr>
-        <td></td>
-        <td>#</td>
-        <td>[*first name/first names]0</td>
-        <td>[*surname/surnames]0</td>
-        <td>[*birth] - [*death]</td>
-        <td>Sosa</td>
+        <td></td><td></td><td>#</td>
+        <td%mid;>[*first name/first names]0</td>
+        <td%mid;>[*surname/surnames]0</td>
+        <td%mid;>[*birth]<br>[*death]</td>
+        <td%mid;>Sosa</td>
       </tr>
     </thead>
     <tbody>
@@ -126,12 +119,11 @@
         <br>
         <span class="fa fa-plus row_add_s_before">
        </td>
-       <td></td><td></td><td></td><td></td><td></td>
+       <td></td><td></td><td></td><td></td><td></td><td></td>
       </tr>
     </tbody>
   </table>
 </form>
-
 %if(not cancel_links)
   %base_trailer;
   %include;copyr
@@ -142,10 +134,10 @@
 $(document).on( "click", ".row_add_p_before", function() {
   $(this).closest("tr").before( $("#template_line_p").clone().removeAttr("id").removeAttr("style").get(0) );
   $(this).closest("tr").before( $("#template_line_s").clone().removeAttr("id").removeAttr("style").get(0) );
-} );
+});
 $(document).on( "click", ".row_add_s_before", function() {
   $(this).closest("tr").before( $("#template_line_s").clone().removeAttr("id").removeAttr("style").get(0) );
-} );
+});
 $(document).on( "click", ".row_del", function() {
   var row = $(this).closest( "tr" );
   if( row.attr("class") == "row_p" ) {
@@ -160,7 +152,7 @@ $(document).on( "click", ".row_del", function() {
       row.remove();
     }
   }
-} );
+});
 $(document).on( "click", ".row_move_up", function() {
   var row = $(this).closest( "tr" );
   if( row.attr("class") == "row_s" ) {
@@ -196,13 +188,13 @@ $(document).on( "click", ".row_move_down", function() {
       } );
     }
   }
-} );
+});
 $(document).on( "change", ".reset_bd_text", function() {
   $(this).closest( "tr" ).children( ".bd_text").html( "" );
 } );
 $(document).on( "change", ".reset_n_p_oc", function() {
   $(this).closest( "tr" ).children( ".n_p_oc").html( "" );
-} );
+});
 $("#upd").submit( function() {
   var gi = 1;
 
@@ -225,7 +217,7 @@ $("#upd").submit( function() {
     }
   });
   $(this).unbind('submit').submit();
-} );
+});
 </script>
 </body>
 </html>

@@ -9,6 +9,8 @@
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
   %include;css
 </head>
+<body%body_prop;>
+%include;hed
 %let;mid;%sp;class="align-middle"%in;
 %define;one_pvar_line(znz,zocz,zfnz,zsnz,zbdz,ztz,zparamz)
   <trzparamz>
@@ -46,9 +48,6 @@
 %define;my_hidden(xx)
   %if(e.xx!="")<input type="hidden" name="xx" value="%e.xx;">%end;
 %end;
-%include;hed
-<body%body_prop;>
-
 <div class="container-fluid">
 <form id="upd" method="post" action="%action;">
   <div class="d-flex justify-content-end m-2">
@@ -86,7 +85,6 @@
     </tbody>
   </table>
 </form>
-
 %if(not cancel_links)
   %base_trailer;
   %include;copyr
