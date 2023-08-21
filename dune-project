@@ -2,6 +2,10 @@
 
 (name geneweb)
 
+; ignore formatting of generated dune file
+(formatting
+ (enabled_for ocaml))
+
 (generate_opam_files true)
 (license GPL-2.0-only)
 (authors "Daniel de Rauglaudre")
