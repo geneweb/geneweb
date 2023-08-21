@@ -121,13 +121,13 @@ type search_type =
   | DefaultSurname
 
 let search_for_fn_or_pn conf base fn pl =
+  let fn_l = cut_words fn in
   List.fold_left
     (fun pl p ->
       if search_reject_p conf base p then pl
       else
         let fn1_l = get_first_name p |> sou base |> split_normalize in
         let fn2_l = get_public_name p |> sou base |> split_normalize in
-        let fn_l = cut_words fn in
         let exact = false in
         (* TODO manage exact options according to mode *)
         if
