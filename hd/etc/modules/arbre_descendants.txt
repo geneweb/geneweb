@@ -1,7 +1,7 @@
 <!-- $Id: modules/arbre_descendants.txt v7.1 04/03/2023 09:51:04 $ -->
 %define;display_person(xxx)
-  %if;(not cancel_links)
   <div class="list-group-item px-0 mx-0 border-0">
+  %if;(not cancel_links)
     <a href="%prefix_set.pmod;%xxx.access;;m=D;t=V;%foreach;env_binding;%nn;
         %if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="m" or env.key="t"))%nn;
           %env.key;=%env.val;;%nn;
@@ -95,6 +95,18 @@
     %incr_count;
   %end;
 %end;
+
+%define;multiple_marriages(lll)
+  %reset_count;
+  %if;(nb_families>1)%incr_count;%end;
+  %foreach;descendant_level;
+    %foreach;descendant;
+      %if;(level=lll and descendant.nb_families>1);%incr_count;%end;
+    %end;
+  %end;
+  %count;
+%end;
+
 %(
 Person:                             Root
 if(nb_families>1):                   |
@@ -116,6 +128,7 @@ Person:            Child1     Child2          Child3
   %elseif;(lll<=nnn)
     %if;(lll=nnn and "xxx"!="")
       %( Print information at level lll %)
+      %let;has_multiple_marriages;1%in;
       %if;("ttt"="hbarc" and lll>0 and "xxx"!="self")
         %( Horizontal bar linking childrens%)
         %if;("fff"="none")
@@ -130,15 +143,15 @@ Person:            Child1     Child2          Child3
         %else;
           <td colspan="www" class="text-center"></td><td>&nbsp;</td>
         %end;
-      %elseif;("ttt"="person" and "ttt"!="spouse" and "xxx"!="")
+      %elseif;("ttt"="person" and "xxx"!="")
         <td colspan="www" class="text-center" style="vertical-align:top">
         %if;(xxx.index!=baseindex)│%end;%apply;display_person("xxx")
         %if;(xxx.has_families)
           %reset_count1;
           %foreach;family;%if;(nb_children>1)%incr_count1;%end;%end;
           %(count1=has children%)
-          %if;(not (e.sp="on" or e.sp=1) and nnn<evarv-1 and count1>0)│%end;
-          %if;((e.sp="on" or e.sp=1) and lll=nnn)
+          %if;(not (e_sp=1) and nnn<evarv-1 and count1>0)│%end;
+          %if;((e_sp=1) and lll=nnn)
             %let;test;%apply;has_relation()%in;
             %foreach;family; %( TODO verify & expand %)
               %if;are_pacs;|%nn;
@@ -152,11 +165,7 @@ Person:            Child1     Child2          Child3
         <td></td><td></td>
       %end;
       %if;has_families;
-        %reset_count2;
-        %reset_count1;
-        %foreach;family;%if;(nb_children>0)%incr_count1;%end;%end;
         %foreach;family;
-          %incr_count2;
           %reset_count;
           %apply;fam_nb_column(evarv+1-lll)
           %let;fcount;%expr(2*count-1)%in;
@@ -169,7 +178,7 @@ Person:            Child1     Child2          Child3
             %else;none%nn;
             %end;%nn;
           %in;
-          %if;("ttt"="hbars")
+          %if;("ttt"="hbars" and (e_ma=1 or e_sp=1 or has_multiple_marriages=1))
             <td colspan="%fcount;" class="text-center">
               %if;(fmpos="right")<hr class="%fmpos;" style="valign:top;border-top: 2px dashed">
               %elseif;(fmpos="center")<hr class="%fmpos;" style="valign:top;border-top: 2px dashed">
@@ -177,32 +186,28 @@ Person:            Child1     Child2          Child3
               %elseif;(fmpos="none")
               %end;
               <span class="text-nowrap">
-                %(count1=has children%)
-                %if;(count1>0 or e.sp=1 or e.sp="on")
+                %if;(e_ma=1 or e_sp=1)
                   %if;(not cancel_links)
                     <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
                       title="[*update::family/families]0 of %first_name; %surname; (%occ;)
                         [and] %spouse.first_name; %spouse.surname; (%spouse.occ;)"
-                    >&%if;(nb_families>1)<sup>%count2;</sup>%end;</a>
+                    >&%if;(nb_families>1)<sup>%family_cnt;</sup>%end;</a>
                   %else;&
                   %end;
-                %end;
-                %if;((count1>0 or e.sp=1 or e.sp="on") and (e.ma=1 or e.ma="on"))
                   %if;(family.marriage_date.year!="") %marriage_date.year;%else; -%end;
                 %end;
               </span>
             </td>
             <td>&nbsp;</td>
-          %elseif;("ttt"="spouse" and (e.sp=1 or e.sp="on"))
+          %elseif;("ttt"="spouse")
             <td colspan="%fcount;" class="text-center" style="vertical-align:top">
               %apply;display_person("spouse")
-              %if;(has_children)│%end;
             </td><td>&nbsp;</td>
-          %elseif;("ttt"="vbars")
-            %if;(nb_children>0)
-              <td colspan="%fcount;" class="text-center">│</td><td></td>
+          %elseif;("ttt"="vbars" and 1=2)
+            %if;(has_children)
+              <td colspan="%fcount;" class="text-center">│y</td><td></td>
             %else;
-              <td colspan="%fcount;" class="text-center"></td><td></td>
+              <td colspan="%fcount;" class="text-center">y</td><td></td>
             %end;
           %end;
         %end;
@@ -246,6 +251,8 @@ Person:            Child1     Child2          Child3
   %end;
 %end;
 %let;e_v;%if;(e.v!="")%e.v;%else;3%end;%in;
+%let;e_sp;%if;(e.sp=1 or e.sp="on")1%else;0%end;%in;
+%let;e_ma;%if;(e.ma=1 or e.ma="on")1%else;0%end;%in;
 %let;evarborder;%if;(e.border="" or e.border="0")0%else;1%end;%in;
 %let;baseindex;%index;%in;
 <h1 id="a">[*descendants tree]</h1>
@@ -265,20 +272,16 @@ Person:            Child1     Child2          Child3
   <tr>
     %apply;descendants_at_level("self",0,v,"person","center",icount)
   </tr>
-  %if;(v=evarv-1)
+  <tr>
+    %apply;descendants_at_level("self",0,v,"hbars","center",icount)
+  </tr>
+  %if;(e_sp=1)
     <tr>
       %apply;descendants_at_level("self",0,v,"spouse","center",icount)
     </tr>
   %end;
-  %if;(v<evarv-1)
-    <tr>
-      %apply;descendants_at_level("self",0,v,"hbars","center",icount)
-    </tr>
-    %if;(e.sp=1 or e.sp="on")
-      <tr>
-        %apply;descendants_at_level("self",0,v,"spouse","center",icount)
-      </tr>
-    %end;
-  %end;
+  <tr>
+    %apply;descendants_at_level("self",0,v,"vbars","center",icount)
+  </tr>
 %end;
 </table>
