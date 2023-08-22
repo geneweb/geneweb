@@ -8,20 +8,19 @@ let time_debug conf query_time =
   let show =
     match List.assoc_opt "show_query_time" conf.base_env with
     | Some "on" -> ""
-    | _ -> {|style="display:none"|}
+    | _ -> {| style="display:none"|}
   in
   if conf.debug then
     Output.print_sstring conf
       (Printf.sprintf
          {|
-      <span %s>Query treated in </span><span id="q_time_c" %s>%.3f</span>
-      <span %s> seconds</span>
+      <span%s>Query treated in <span id="q_time_c">%.3f</span> s.</span>
       <script>
-      var q_time = document.getElementById("q_time_c").innerHTML;
-      document.getElementById("q_time_d").innerHTML = q_time;
+        var q_time = document.getElementById("q_time_c").innerHTML;
+        document.getElementById("q_time_d").innerHTML = q_time;
       </script>
-       |}
-         show show query_time show)
+        |}
+         show query_time)
 
 let escape_aux count blit str =
   let strlen = String.length str in
