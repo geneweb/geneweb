@@ -19,7 +19,7 @@
           <span class="sr-only">[*back]</span>%nn;
         </a>
       %end;
-      %if;debug;<span class="small" id="q_time_d">00.0000</span>%end;
+      %if;(debug and b.show_query_time!="on")<span class="small" id="q_time_d"></span>%end;
     </div>
   </div>
   <div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
