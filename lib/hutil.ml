@@ -8,29 +8,26 @@ let link_to_referer conf =
   let back = Utf8.capitalize_fst (Util.transl conf "back") in
   if (referer :> string) <> "" then
     ({|<a href="|} ^<^ referer
-     ^>^ {|"><span class="fa fa-arrow-left fa-lg" title="|} ^ back
-     ^ {|"></span></a>|}
+     ^>^ {|"><i class="fa fa-arrow-left fa-lg" title="|} ^ back ^ {|"></i></a>|}
       :> Adef.safe_string)
   else Adef.safe ""
 
 let gen_print_link_to_welcome f conf right_aligned =
-  if right_aligned then
+  if right_aligned then (
+    Output.print_sstring conf "<div class=\"d-flex flex-column";
     Output.printf conf
-      "<div class=\"d-flex flex-column mt-2 fixed_top_btn_col float-%s\">\n"
-      conf.right
+      " align-items-center mt-2 fixed_top_btn_col float-%s\">\n" conf.right)
   else Output.print_sstring conf "<p>\n";
   f ();
   let str = link_to_referer conf in
   if (str :> string) <> "" then Output.print_string conf str;
   Output.print_sstring conf {|<a href="|};
   Output.print_string conf (Util.commd ~senv:false conf);
-  Output.print_sstring conf
-    {|"><span class="fa fa-home fa-lg ml-1 px-0" title="|};
+  Output.print_sstring conf {|"><i class="fa fa-home fa-lg" title="|};
   Output.print_sstring conf (Utf8.capitalize (Util.transl conf "home"));
-  Output.print_sstring conf {|"></span></a>|};
+  Output.print_sstring conf {|"></i></a>|};
   if conf.debug then
-    Output.print_sstring conf
-      (Printf.sprintf "<span id=\"q_time_d\">00.000</span>");
+    Output.print_sstring conf "<span class=\"small\" id=\"q_time_d\"></span>";
   if right_aligned then Output.print_sstring conf "</div>"
   else Output.print_sstring conf "</p>"
 
@@ -38,12 +35,18 @@ let print_link_to_welcome = gen_print_link_to_welcome (fun () -> ())
 
 (* S: use Util.include_template for "hed"? *)
 let header_without_http conf title =
-  Output.print_sstring conf "<!DOCTYPE html><head><title>";
+  Output.print_sstring conf "<!DOCTYPE html>\n";
+  Output.print_sstring conf "<html lang=\"TODO:lang _variable\">\n";
+  Output.print_sstring conf "<head>\n<title>";
   title true;
-  Output.print_sstring conf "</title><meta name=\"robots\" content=\"none\">";
+  Output.print_sstring conf "</title>\n";
+  Output.print_sstring conf "<meta name=\"robots\" content=\"none\">\n";
   Output.print_sstring conf "<meta charset=\"";
   Output.print_sstring conf conf.charset;
-  Output.print_sstring conf "\">";
+  Output.print_sstring conf "\">\n";
+  Output.print_sstring conf "<meta name=\"viewport\" content=\"";
+  Output.print_sstring conf "width=device-width, initial-scale=1,";
+  Output.print_sstring conf " shrink-to-fit=no\">\n";
   Output.print_sstring conf {|<link rel="shortcut icon" href="|};
   Output.print_string conf (Image.prefix conf);
   Output.print_sstring conf {|/favicon_gwd.png">|};
@@ -56,7 +59,7 @@ let header_without_http conf title =
   (match Util.open_etc_file conf "hed" with
   | Some (ic, _) -> Templ.copy_from_templ conf [] ic
   | None -> ());
-  Output.print_sstring conf "\n</head>\n";
+  Output.print_sstring conf "</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
     with Not_found -> ""
