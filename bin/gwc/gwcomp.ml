@@ -1323,8 +1323,8 @@ let comp_families state x =
            loop (read_line state (ic, encoding)) encoding
        | F_none -> ()
        | F_fail str ->
-           Printf.printf "File \"%s\", line %d:\n" x state.line_cnt;
-           Printf.printf "Error: %s\n" str;
+           Printf.eprintf "File \"%s\", line %d:\n" x state.line_cnt;
+           Printf.eprintf "Error: %s\n" str;
            flush stdout;
            loop (read_line state (ic, encoding)) encoding
      in
