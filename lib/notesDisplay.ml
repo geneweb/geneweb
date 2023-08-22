@@ -6,38 +6,36 @@ open Util
 open Notes
 
 let print_search_form conf from_note =
-  Output.print_sstring conf "<table>\n";
-  Output.print_sstring conf "<tr>\n";
-  Output.printf conf "<td align=\"%s\">\n" conf.right;
+  Output.print_sstring conf "<div class=\"form-group\">\n";
   Output.printf conf "<form method=\"get\" action=\"%s\">\n" conf.command;
-  Output.print_sstring conf "<p>\n";
   hidden_env conf;
+  Output.print_sstring conf "<div class=\"form-check form-check-inline\">";
   Output.print_sstring conf
     {|<input type="hidden" name="m" value="MISC_NOTES_SEARCH">|};
-  Output.print_sstring conf {|<input name="s" size="30" maxlength="40" value="|};
-  (match p_getenv conf.env "s" with
-  | Some s -> Output.print_string conf (Util.escape_html s)
-  | None -> ());
-  Output.print_sstring conf {|">|};
   (match from_note with
   | Some n ->
       Output.print_sstring conf {|<input type="hidden" name="z" value="|};
       Output.print_string conf (Util.escape_html n);
       Output.print_sstring conf {|">|}
   | None -> ());
-  Output.print_sstring conf "<br>\n";
-  Output.print_sstring conf "<label>\n";
-  Output.printf conf "<input type=\"checkbox\" name=\"c\" value=\"on\"%s>\n"
+  Output.print_sstring conf {|<input type="text" name="s" size="40"|};
+  Output.print_sstring conf {| class="form-control col-8" value="|};
+  (match p_getenv conf.env "s" with
+  | Some s -> Output.print_string conf (Util.escape_html s)
+  | None -> ());
+  Output.print_sstring conf "\">";
+  Output.print_sstring conf "<input type=\"checkbox\" name=\"c\" value=\"on\"";
+  Output.printf conf " class=\"form-check-input ml-2\" id=\"case\"%s>"
     (match p_getenv conf.env "c" with
-    | Some "on" -> " checked=\"checked\""
+    | Some "on" -> " checked"
     | Some _ | None -> "");
-  Output.printf conf "%s\n" (transl_nth conf "search/case sensitive" 1);
-  Output.print_sstring conf "</label>\n";
-  Output.print_sstring conf
-    {|<button type="submit" class="btn btn-secondary btn-lg">|};
+  Output.print_sstring conf "<label class=\"form-check-label\" for=\"case\">";
+  Output.printf conf "%s" (transl_nth conf "search/case sensitive" 1);
+  Output.print_sstring conf "</label></div>\n";
+  Output.print_sstring conf {|<button type="submit" class="btn btn-primary">|};
   transl_nth conf "search/case sensitive" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</button></p></form></td></tr></table>"
+  Output.print_sstring conf "</button>\n</form>\n</div>"
 
 let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   Hutil.header_no_page_title conf (fun _ ->
@@ -233,13 +231,13 @@ let print_what_links conf base fnotes =
       Output.print_string conf (Util.escape_html fnotes);
       Output.print_sstring conf "]")
     else (
-      Output.print_sstring conf {|<tt>[<a href="|};
+      Output.print_sstring conf {|<span><a href="|};
       Output.print_string conf (commd conf);
       Output.print_sstring conf "m=NOTES&f=";
       Output.print_string conf (Mutil.encode fnotes);
       Output.print_sstring conf {|">|};
-      Output.print_string conf (Util.escape_html fnotes);
-      Output.print_sstring conf "</a>]</tt>")
+      Output.print_sstring conf fnotes;
+      Output.print_sstring conf "</a></span>")
   in
   let db = notes_links_db conf base false in
   Hutil.header conf title;
@@ -387,7 +385,7 @@ let print_misc_notes conf base =
               let f = file_path conf base (path_of_fnotes f) in
               if Sys.file_exists f then "" else " style=\"color:red\""
             in
-            Output.print_sstring conf {|<li class="file"><tt>[<a href="|};
+            Output.print_sstring conf {|<li class="file"><a href="|};
             Output.print_string conf (commd conf);
             Output.print_sstring conf {|m=NOTES&f=|};
             Output.print_string conf (Mutil.encode f);
@@ -395,7 +393,7 @@ let print_misc_notes conf base =
             Output.print_sstring conf c;
             Output.print_sstring conf ">";
             Output.print_string conf (Util.escape_html r);
-            Output.print_sstring conf "</a>]</tt>";
+            Output.print_sstring conf "</a>";
             if (txt :> string) <> "" then (
               Output.print_sstring conf (transl conf ":");
               Output.print_sstring conf " ";
