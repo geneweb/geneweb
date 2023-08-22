@@ -125,14 +125,14 @@ let check_error gen = gen.g_errored <- true
 
 (** Function that will be called if base's checker will find an error *)
 let set_error base gen x =
-  Printf.printf "Error: ";
-  Check.print_base_error stdout base x;
+  Printf.eprintf "Error: ";
+  Check.print_base_error stderr base x;
   check_error gen
 
 (** Function that will be called if base's checker will find a warning *)
 let set_warning base x =
-  Printf.printf "Warning: ";
-  Check.print_base_warning stdout base x
+  Printf.eprintf "Warning: ";
+  Check.print_base_warning stderr base x
 
 (** Returns person's entry from [base] at position [i] *)
 let poi base i = base.c_persons.(i)
@@ -394,14 +394,15 @@ let find_first_available_occ gen fn sn occ =
 let print_oc_aux = function 0 -> "" | n -> "." ^ string_of_int n
 
 let print_two_spellings n1 p1 oc1 n2 p2 oc2 =
-  Printf.printf "Person defined with two spellings: \"%s%s %s\" & \"%s%s %s\"\n"
-    p1 (print_oc_aux oc1) n1 p2 (print_oc_aux oc2) n2
+  Printf.eprintf
+    "Person defined with two spellings: \"%s%s %s\" & \"%s%s %s\"\n" p1
+    (print_oc_aux oc1) n1 p2 (print_oc_aux oc2) n2
 
 let print_person_already_defined n1 p1 oc1 n2 p2 oc2 =
-  Printf.printf "Person already defined: \"%s%s %s\"" p1 (print_oc_aux oc1) n1;
+  Printf.eprintf "Person already defined: \"%s%s %s\"" p1 (print_oc_aux oc1) n1;
   if p1 <> p2 || n1 <> n2 then
-    Printf.printf "as name: \"%s%s %s\"\n" p2 (print_oc_aux oc2) n2
-  else Printf.printf "\n"
+    Printf.eprintf "as name: \"%s%s %s\"\n" p2 (print_oc_aux oc2) n2
+  else Printf.eprintf "\n"
 
 (** Insert person's reference in the base and modifies all coresponding
     fields in [gen] and returns its entry and entry's index in the base.
@@ -562,7 +563,7 @@ let insert_person state gen so =
       (p_surname gen.g_base x)
       (p_first_name gen.g_base x)
       occ;
-    flush stdout;
+    flush stderr;
     check_error gen)
   else gen.g_def.(ip) <- true;
   if not gen.g_errored then
@@ -581,11 +582,11 @@ let insert_person state gen so =
       || sou gen.g_base x.m_surname <> so.surname
     then (
       (* print error about person defined with two spellings *)
-      Printf.printf "\nPerson defined with two spellings:\n";
-      Printf.printf "  \"%s%s %s\"\n" so.first_name
+      Printf.eprintf "\nPerson defined with two spellings:\n";
+      Printf.eprintf "  \"%s%s %s\"\n" so.first_name
         (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
         so.surname;
-      Printf.printf "  \"%s%s %s\"\n"
+      Printf.eprintf "  \"%s%s %s\"\n"
         (p_first_name gen.g_base x)
         (match occ with 0 -> "" | n -> "." ^ string_of_int n)
         (p_surname gen.g_base x);
@@ -660,7 +661,7 @@ let check_parents_not_already_defined gen ix fath moth =
       let cpl = coi gen.g_base int in
       let p = Adef.father cpl in
       let m = Adef.mother cpl in
-      Printf.printf
+      Printf.eprintf
         "I cannot add \"%s\", child of \"%s\" & \"%s\", because this persons \
          still exists as child of \"%s\" & \"%s\".\n"
         (designation gen.g_base x)
@@ -668,7 +669,7 @@ let check_parents_not_already_defined gen ix fath moth =
         (designation gen.g_base moth)
         (designation gen.g_base (poi gen.g_base p))
         (designation gen.g_base (poi gen.g_base m));
-      flush stdout;
+      flush stderr;
       (*
               x.birth := Adef.cdate_None;
               x.death := DontKnowIfDead;
@@ -680,7 +681,7 @@ let check_parents_not_already_defined gen ix fath moth =
 let notice_sex gen p s =
   if p.m_sex = Neuter then p.m_sex <- s
   else if p.m_sex <> s && s <> Neuter then
-    Printf.printf "Inconsistency about the sex of %s %s\n"
+    Printf.eprintf "Inconsistency about the sex of %s %s\n"
       (p_first_name gen.g_base p)
       (p_surname gen.g_base p)
 
@@ -1015,8 +1016,8 @@ let insert_pevents state fname gen sb pevtl =
   (* insert concered person *)
   let p, ip = insert_somebody state gen sb in
   if p.m_pevents <> [] then (
-    Printf.printf "\nFile \"%s\"\n" fname;
-    Printf.printf "Individual events already defined for \"%s%s %s\"\n"
+    Printf.eprintf "\nFile \"%s\"\n" fname;
+    Printf.eprintf "Individual events already defined for \"%s%s %s\"\n"
       (sou gen.g_base p.m_first_name)
       (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
       (sou gen.g_base p.m_surname);
@@ -1070,20 +1071,20 @@ let insert_notes fname gen key str =
   | Some ip ->
       let p = poi gen.g_base ip in
       if sou gen.g_base p.m_notes <> "" then (
-        Printf.printf "\nFile \"%s\"\n" fname;
-        Printf.printf "Notes already defined for \"%s%s %s\"\n"
+        Printf.eprintf "\nFile \"%s\"\n" fname;
+        Printf.eprintf "Notes already defined for \"%s%s %s\"\n"
           key.pk_first_name
           (if occ = 0 then "" else "." ^ string_of_int occ)
           key.pk_surname;
         check_error gen)
       else p.m_notes <- unique_string gen str
   | None ->
-      Printf.printf "File \"%s\"\n" fname;
-      Printf.printf "*** warning: undefined person: \"%s%s %s\"\n"
+      Printf.eprintf "File \"%s\"\n" fname;
+      Printf.eprintf "*** warning: undefined person: \"%s%s %s\"\n"
         key.pk_first_name
         (if occ = 0 then "" else "." ^ string_of_int occ)
         key.pk_surname;
-      flush stdout
+      flush stderr
 
 (** Changes [gen.g_base.c_bnotes] to take into account [nfname] page
     and its content [str] that is treated by the way mentioned in
@@ -1152,8 +1153,8 @@ let insert_relations state fname gen sb sex rl =
   (* insert concerned person *)
   let p, ip = insert_somebody state gen sb in
   if p.m_rparents <> [] then (
-    Printf.printf "\nFile \"%s\"\n" fname;
-    Printf.printf "Relations already defined for \"%s%s %s\"\n"
+    Printf.eprintf "\nFile \"%s\"\n" fname;
+    Printf.eprintf "Relations already defined for \"%s%s %s\"\n"
       (sou gen.g_base p.m_first_name)
       (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
       (sou gen.g_base p.m_surname);
