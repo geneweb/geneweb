@@ -10,6 +10,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: lighter !important; }
 
 html {
   font-size: 1rem;
+  scroll-padding-top: 52px;
 }
 
 @include media-breakpoint-up(sm) {
