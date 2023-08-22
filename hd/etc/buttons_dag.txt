@@ -158,6 +158,7 @@
             <i class="fa fa-image fa-sm mr-1"></i>[*image/images]1
           </a>
         </div>
+        %if;(e.m!="D" or e.t!="V")
         <div class="border rounded mr-1">
           <a role="button" class="btn btn-sm btn-outline-%if;(e.dag=1 or e.t="C" or e.t="A")dark disabled border-0%else;primary%end; border-%if;(e.ma="")2%else;0%end; w-100 h-100"
             href="%if;(e.ma="" or e.ma=0)%url_set.ma.1;%else;%url_set.ma;%end;"
@@ -165,6 +166,7 @@
             <i class="fa fa-venus-mars fa-sm mr-1"></i>[*marriage/marriages]1
           </a>
         </div>
+        %end;
         <div class="border rounded mr-1">
           <a role="button" class="btn btn-sm btn-outline-%if;(e.m="A")dark disabled border-0%else;primary %end; border-%if;(e.sp="")2%else;0%end; w-100 h-100"
             href="%if;(e.sp="" or e.sp=0)%url_set.sp.1;%else;%url_set.sp;%end;"

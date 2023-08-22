@@ -907,6 +907,8 @@ let eval_var conf ifun env ep loc sl =
         | _ -> raise Not_found)
     | "today" :: sl ->
         TemplDate.eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
+    | [ "trace"; s ] -> (Printf.eprintf "%s; " s; VVstring "")
+    | [ "tracenl"; s ] -> (Printf.eprintf "%s\n" s; VVstring "")
     | s :: sl -> (
         match (get_val ifun.get_vother s env, sl) with
         | Some (VVother f), sl -> f sl
