@@ -47,13 +47,6 @@ let next_family_fun_templ gwo_list fi =
                 None)
         | None -> None
       in
-      let bnotes_of_string = function
-        | "merge" -> `merge
-        | "erase" -> `erase
-        | "first" -> `first
-        | "drop" -> `drop
-        | _ -> assert false
-      in
       match r with
       | Some fam -> Some fam
       | None -> (
@@ -67,7 +60,7 @@ let next_family_fun_templ gwo_list fi =
               fi.Db1link.f_curr_src_file <- input_value ic;
               fi.Db1link.f_curr_gwo_file <- x;
               fi.Db1link.f_separate <- separate;
-              fi.Db1link.f_bnotes <- bnotes_of_string bnotes;
+              fi.Db1link.f_bnotes <- bnotes;
               fi.Db1link.f_shift <- shift;
               Hashtbl.clear fi.Db1link.f_local_names;
               ic_opt := Some ic;

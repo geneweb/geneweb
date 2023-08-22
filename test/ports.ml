@@ -37,7 +37,7 @@ let gw_import filename =
   let base_filename = Filename.concat Filename.current_dir_name "royal_gw" in
   let state = Gwc_lib.State.default in
   (* set file to import *)
-  let files = [ (filename, false, "merge", 0) ] in
+  let files = [ (filename, false, `merge, 0) ] in
   let state = { state with files; force = true; out_file = base_filename } in
   Gwc_lib.make_base ~save_mem:false state;
   Gwdb.open_base base_filename
