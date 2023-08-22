@@ -2,7 +2,7 @@ let just_comp = ref false
 let out_file = ref (Filename.concat Filename.current_dir_name "a")
 let force = ref false
 let separate = ref false
-let bnotes = ref "merge"
+let bnotes = ref `merge
 let shift = ref 0
 let files = ref []
 let no_fail = ref false
@@ -52,11 +52,13 @@ let make_state () =
 let speclist =
   [
     ( "-bnotes",
-      Arg.Set_string bnotes,
+      Arg.String (fun s -> bnotes := Gwc_lib.State.bnotes_of_string s),
       "[drop|erase|first|merge] Behavior for base notes of the next file. \
        [drop]: dropped. [erase]: erase the current content. [first]: dropped \
        if current content is not empty. [merge]: concatenated to the current \
-       content. Default: " ^ !bnotes ^ "" );
+       content. Default: "
+      ^ Gwc_lib.State.bnotes_to_string !bnotes
+      ^ "" );
     ("-c", Arg.Set just_comp, " Only compiling");
     ("-cg", Arg.Set do_consang, " Compute consanguinity");
     ( "-ds",
@@ -90,7 +92,7 @@ let anonfun x =
   else if Filename.check_suffix x ".gwo" then ()
   else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\""));
   separate := false;
-  bnotes := "merge";
+  bnotes := `merge;
   files := (x, sep, bn, !shift) :: !files
 
 let errmsg =
