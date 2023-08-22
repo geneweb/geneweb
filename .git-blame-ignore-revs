@@ -2,7 +2,7 @@
 # to make git blame ignore commits in this file
 
 #First ocamlformat commit:
-a1f95e70a530ea60ee4a13715eb52f06a7a02710
+1fee3ecd7cbed8152320449ca766804288d8d613
 
 #ocamlformat sosa_(array|num)
 da7c849491f10f9c723b0bf6020a87026ca3f7ec
