@@ -75,7 +75,7 @@ let move_file_to_save file dir =
   (* previous version iterated on file types *)
   try
     let save_dir = Filename.concat dir "old" in
-    if not (Sys.file_exists save_dir) then Mutil.mkdir_p save_dir;
+    if not (Sys.file_exists save_dir) then Files.mkdir_p save_dir;
     let fname = Filename.basename file in
     let orig_file = Filename.concat dir fname in
     let saved_file = Filename.concat save_dir fname in
@@ -175,7 +175,7 @@ let swap_files file ext old_ext =
 let clean_saved_portrait file =
   let file = Filename.remove_extension file in
   Array.iter
-    (fun ext -> Mutil.rm (file ^ ext))
+    (fun ext -> Files.rm (file ^ ext))
     Image.authorized_image_file_extension
 
 let get_extension conf saved fname =
@@ -336,7 +336,7 @@ let effective_send_ok conf base p file =
   in
   let fname = Image.default_portrait_filename base p in
   let dir = Util.base_path [ "images" ] conf.bname in
-  if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
+  if not (Sys.file_exists dir) then Files.mkdir_p dir;
   let fname =
     Filename.concat dir
       (if mode = "portraits" then fname ^ extension_of_type typ else fname)
@@ -425,7 +425,7 @@ let effective_send_c_ok conf base p file file_name =
       String.concat Filename.dir_sep
         [ Util.base_path [ "src" ] conf.bname; "images"; fname ]
   in
-  if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
+  if not (Sys.file_exists dir) then Files.mkdir_p dir;
   let fname =
     Filename.concat dir
       (if mode = "portraits" then fname ^ extension_of_type typ else file_name)
@@ -438,7 +438,7 @@ let effective_send_c_ok conf base p file file_name =
     | Some (`Url url) -> (
         let fname = Image.default_portrait_filename base p in
         let dir = Filename.concat dir "old" in
-        if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
+        if not (Sys.file_exists dir) then Files.mkdir_p dir;
         let fname = Filename.concat dir fname ^ ".url" in
         try write_file fname url
         with _ ->
@@ -586,10 +586,10 @@ let effective_delete_c_ok conf base p =
       String.concat Filename.dir_sep
         [ Util.base_path [ "src" ] conf.bname; "images"; fname ]
   in
-  if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
+  if not (Sys.file_exists dir) then Files.mkdir_p dir;
   (* TODO verify we dont destroy a saved image
       having the same name as portrait! *)
-  if delete then Mutil.rm (String.concat Filename.dir_sep [ dir; "old"; file ])
+  if delete then Files.rm (String.concat Filename.dir_sep [ dir; "old"; file ])
   else if move_file_to_save file dir = 0 then incorrect conf "effective delete";
   let changed =
     U_Delete_image (Util.string_gen_person base (gen_person_of_person p))

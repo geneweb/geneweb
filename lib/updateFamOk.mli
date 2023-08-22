@@ -4,7 +4,7 @@ val reconstitute_from_fevents :
   ('person, 'string) Def.gen_fam_event list ->
   (Def.relation_kind * Def.cdate * 'string * 'string * 'string)
   * Def.divorce
-  * ('person * Def.witness_kind) array
+  * ('person * Def.witness_kind * 'string) array
 (** [reconstitute_from_fevents nsck empty_string family_events]
     Iterate over family's events and returns a tuple with:
 
@@ -87,7 +87,7 @@ val print_change_event_order : Config.config -> Gwdb.base -> unit
 
 val check_family :
   Config.config ->
-  (string * string * _ * _ * _, _, _) Def.gen_family ->
+  (string * string * _ * _ * _, _, string) Def.gen_family ->
   (string * string * _ * _ * _) Def.gen_couple ->
   Update.update_error option * Update.update_error option
 (** [check_family conf fam cpl]

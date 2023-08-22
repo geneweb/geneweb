@@ -336,6 +336,12 @@ val std_color : config -> Adef.safe_string -> Adef.safe_string
 val index_of_sex : sex -> int
 (** Sex index used in translations (0 for male, 1 for female, 2 for neuter) *)
 
+val string_of_pevent_name_without_base :
+  config -> 'a gen_pers_event_name -> Adef.safe_string
+
+val string_of_fevent_name_without_base :
+  config -> 'a gen_fam_event_name -> Adef.safe_string
+
 val string_of_pevent_name :
   config -> base -> istr gen_pers_event_name -> Adef.safe_string
 
@@ -473,9 +479,10 @@ val array_mem_witn :
   Gwdb.base ->
   iper ->
   (iper * Def.witness_kind) array ->
-  Adef.safe_string option
+  istr array ->
+  bool * Adef.safe_string * string
 (** [array_mem_witn conf base ip array] checks if [ip] is in [array]
-    and returns corresponding [string_of_witness_kind] if so.
+    and returns corresponding [string_of_witness_kind] and witness note if so.
 *)
 
 val name_key : Gwdb.base -> string -> string
@@ -593,3 +600,4 @@ val designation : base -> person -> Adef.escaped_string
 
 val has_children : base -> person -> bool
 val get_bases_list : unit -> string list
+val list_cmp : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool

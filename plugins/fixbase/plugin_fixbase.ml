@@ -379,8 +379,8 @@ let fixbase_ok conf base =
     let tstab () =
       if UI.enabled conf "tstab" then (
         let bname = Util.base_path [] (bname base ^ ".gwb") in
-        Mutil.rm (Filename.concat bname "tstab_visitor");
-        Mutil.rm (Filename.concat bname "tstab");
+        Files.rm (Filename.concat bname "tstab_visitor");
+        Files.rm (Filename.concat bname "tstab");
         Output.print_sstring conf {|<p>|};
         Output.print_sstring conf (Util.transl conf "plugin_fixbase_ok_tstab");
         Output.print_sstring conf {|</p>|})
@@ -418,7 +418,7 @@ let fixbase_ok conf base =
   if dry_run then process ()
   else
     Lock.control
-      (Mutil.lock_file @@ Util.base_path [] (conf.bname ^ ".gwb"))
+      (Files.lock_file @@ Util.base_path [] (conf.bname ^ ".gwb"))
       false
       ~onerror:(fun () -> !GWPARAM.output_error conf Def.Service_Unavailable)
       process

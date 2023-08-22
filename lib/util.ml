@@ -980,8 +980,7 @@ let std_color conf (s : Adef.safe_string) =
 
 let index_of_sex = function Male -> 0 | Female -> 1 | Neuter -> 2
 
-let string_of_pevent_name conf base epers_name =
-  match epers_name with
+let string_of_pevent_name_without_base conf = function
   | Epers_Birth -> Adef.safe @@ transl conf "birth"
   | Epers_Baptism -> Adef.safe @@ transl conf "baptism"
   | Epers_Death -> Adef.safe @@ transl conf "death"
@@ -1034,9 +1033,9 @@ let string_of_pevent_name conf base epers_name =
   | Epers_ScellentSpouseLDS -> Adef.safe @@ transl conf "scellentSpouseLDS"
   | Epers_VenteBien -> Adef.safe @@ transl conf "venteBien"
   | Epers_Will -> Adef.safe @@ transl conf "will"
-  | Epers_Name n -> (escape_html (sou base n) :> Adef.safe_string)
+  | _ -> failwith "bad argument in Util.string_of_pevent_without_base"
 
-let string_of_fevent_name conf base = function
+let string_of_fevent_name_without_base conf = function
   | Efam_Marriage -> Adef.safe @@ transl conf "marriage event"
   | Efam_NoMarriage -> Adef.safe @@ transl conf "no marriage event"
   | Efam_NoMention -> Adef.safe @@ transl conf "no mention"
@@ -1049,7 +1048,17 @@ let string_of_fevent_name conf base = function
   | Efam_MarriageLicense -> Adef.safe @@ transl conf "marriage licence"
   | Efam_PACS -> Adef.safe @@ transl conf "PACS"
   | Efam_Residence -> Adef.safe @@ transl conf "residence"
+  | _ -> failwith "bad argument in Util.string_of_fevent_without_base"
+
+let string_of_pevent_name conf base epers_name =
+  match epers_name with
+  | Epers_Name n -> (escape_html (sou base n) :> Adef.safe_string)
+  | _ -> string_of_pevent_name_without_base conf epers_name
+
+let string_of_fevent_name conf base efam_name =
+  match efam_name with
   | Efam_Name n -> (escape_html (sou base n) :> Adef.safe_string)
+  | _ -> string_of_fevent_name_without_base conf efam_name
 
 let string_of_witness_kind conf sex witness_kind =
   let n = if witness_kind = Witness then 0 else index_of_sex sex in
@@ -1872,7 +1881,7 @@ let write_default_sosa conf key =
   in
   List.iter (fun (k, v) -> Stdlib.output_string oc (k ^ "=" ^ v ^ "\n")) gwf;
   close_out oc;
-  Mutil.rm (fname ^ "~");
+  Files.rm (fname ^ "~");
   Sys.rename fname (fname ^ "~");
   try Sys.rename tmp_fname fname with Sys_error _ -> ()
 
@@ -1903,9 +1912,9 @@ let create_topological_sort conf base =
           Filename.concat bfile "tstab_visitor"
         else Filename.concat bfile "tstab"
       in
-      Mutil.read_or_create_value ~magic:Mutil.executable_magic tstab_file
+      Files.read_or_create_value ~magic:Mutil.executable_magic tstab_file
         (fun () ->
-          Lock.control (Mutil.lock_file bfile) false
+          Lock.control (Files.lock_file bfile) false
             ~onerror:(fun () ->
               let () = load_ascends_array base in
               let () = load_couples_array base in
@@ -2542,11 +2551,16 @@ let record_visited conf ip =
 (**/**)
 
 (* TODO OCaml 4.13 : use Array.find_opt *)
-let array_mem_witn conf base x a =
+let array_mem_witn conf base x a na =
+  let get_note i =
+    match na with a when i < Array.length a -> a.(i) | _ -> empty_string
+  in
   let rec loop i =
-    if i = Array.length a then None
+    if i = Array.length a then (false, Adef.safe "", "")
     else if x = fst a.(i) then
-      Some (string_of_witness_kind conf (get_sex @@ poi base x) (snd a.(i)))
+      ( true,
+        string_of_witness_kind conf (get_sex @@ poi base x) (snd a.(i)),
+        sou base (get_note i) )
     else loop (i + 1)
   in
   loop 0
@@ -2744,3 +2758,12 @@ let get_bases_list () =
   Unix.closedir dh;
   list := List.sort compare !list;
   !list
+
+let list_cmp cmp l1 l2 =
+  let rec aux l1 l2 =
+    match (l1, l2) with
+    | x :: xs, y :: ys when cmp x y -> aux xs ys
+    | [], [] -> true
+    | _ -> false
+  in
+  aux l1 l2

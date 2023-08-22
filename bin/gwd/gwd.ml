@@ -177,8 +177,8 @@ let load_lexicon =
     match Hashtbl.find_opt lexicon_cache fname with
     | Some lex -> lex
     | None ->
-       let lex =
-        Mutil.read_or_create_value ~wait:true ~magic:Mutil.random_magic fname
+      let lex =
+        Files.read_or_create_value ~wait:true ~magic:Mutil.random_magic fname
           begin fun () ->
             let ht = Hashtbl.create 0 in
             let rec rev_iter fn = function
@@ -1759,10 +1759,11 @@ let geneweb_server () =
             null_reopen [Unix.O_WRONLY] Unix.stderr
           end
         else exit 0;
-       Mutil.mkdir_p ~perm:0o777 (Filename.concat !Util.cnt_dir "cnt")
-    end;
-  Wserver.f GwdLog.syslog !selected_addr !selected_port !conn_timeout
-    (if Sys.unix then !max_clients else None) connection
+       Files.mkdir_p ~perm:0o777 (Filename.concat !Util.cnt_dir "cnt")
+  end;
+  let max_clients = (if Sys.unix then !max_clients else None) in
+  Wserver.f ~syslog:GwdLog.syslog ~addr:!selected_addr ~port:!selected_port ~timeout:!conn_timeout
+     ~max_clients ~handler:connection
 
 let cgi_timeout conf tmout _ =
   Output.header conf "Content-type: text/html; charset=iso-8859-1";
@@ -1846,7 +1847,7 @@ let slashify s =
   String.init (String.length s) conv_char
 
 let make_cnt_dir x =
-  Mutil.mkdir_p x;
+  Files.mkdir_p x;
   if Sys.unix then ()
   else
     begin

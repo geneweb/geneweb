@@ -1,4 +1,8 @@
-val gc : ?dry_run:bool -> Dbdisk.dsk_base -> int list * int list * int list
+val gc :
+  ?dry_run:bool ->
+  save_mem:bool ->
+  Dbdisk.dsk_base ->
+  int list * int list * int list
 (** [gc ~dry_run base] launch garbage collector over that analyse database [base] that detects
     all deleted or empty elements that aren't referenced by anyone (unmarked element). If [dry_run]
     is unset then performs memory compacting by eliminating all unmarked elements from all database

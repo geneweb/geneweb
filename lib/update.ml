@@ -355,15 +355,15 @@ let print_err_unknown conf (f, s, o) =
 let delete_topological_sort_v conf _base =
   let bfile = Util.bpath (conf.bname ^ ".gwb") in
   let tstab_file = Filename.concat bfile "tstab_visitor" in
-  Mutil.rm tstab_file;
+  Files.rm tstab_file;
   let tstab_file = Filename.concat bfile "restrict" in
-  Mutil.rm tstab_file
+  Files.rm tstab_file
 
 let delete_topological_sort conf base =
   let _ = delete_topological_sort_v conf base in
   let bfile = Util.bpath (conf.bname ^ ".gwb") in
   let tstab_file = Filename.concat bfile "tstab" in
-  Mutil.rm tstab_file
+  Files.rm tstab_file
 
 let print_someone conf base p =
   Output.printf conf "%s%s %s" (p_first_name base p)
@@ -410,7 +410,7 @@ let print_list_aux conf base title list printer =
     printer conf base list;
     Output.print_sstring conf "</ul>")
 
-let print_order_changed conf print_list before after =
+let print_order_changed conf print_list (before : 'a array) (after : 'a array) =
   let bef_d, aft_d = Difference.f before after in
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf
@@ -424,7 +424,8 @@ let someone_strong_n_short_dates conf base p =
   (someone_strong base p :> Adef.safe_string)
   ^^^ DateDisplay.short_dates_text conf base p
 
-let print_warning conf base = function
+let print_warning conf base (w : CheckItem.base_warning) =
+  match w with
   | BigAgeBetweenSpouses (p1, p2, a) ->
       Output.printf conf
         (fcapitale
@@ -707,13 +708,13 @@ let print_warning conf base = function
       Output.printf conf (ftransl conf "married at age %t") (fun _ ->
           (DateDisplay.string_of_age conf a :> string))
 
-let print_warnings conf base wl =
+let print_warnings conf base (wl : CheckItem.base_warning list) =
   print_list_aux conf base "warnings" wl @@ fun conf base wl ->
   (* On rend la liste unique, parce qu'il se peut qu'un warning soit *)
   (* levé par plusieurs fonctions différents selon le context.       *)
   let wl = List.sort_uniq compare wl in
   List.iter
-    (fun w ->
+    (fun (w : CheckItem.base_warning) ->
       Output.print_sstring conf "<li>";
       print_warning conf base w;
       Output.print_sstring conf "</li>")
@@ -1012,7 +1013,7 @@ let check_missing_witnesses_names conf get list =
     let rec loop i =
       if i = len then None
       else
-        let (fn, sn, _, _, _), _ = Array.get witnesses i in
+        let (fn, sn, _, _, _), _, _ = Array.get witnesses i in
         if fn = "" && sn = "" then loop (i + 1)
         else if fn = "" || fn = "?" then
           Some

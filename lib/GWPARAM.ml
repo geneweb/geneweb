@@ -57,14 +57,17 @@ module Default = struct
           in
           let fname lang =
             code ^ "-" ^ lang ^ ".html"
-            |> Filename.concat "etc" |> Mutil.search_asset_opt
+            |> Filename.concat "etc" |> Files.search_asset_opt
           in
           match fname conf.lang with
           | Some fn -> output_file conf fn
           | None -> (
               match fname "en" with
               | Some fn -> output_file conf fn
-              | None -> Output.print_sstring conf ""))
+              | None -> (
+                  match fname "en" with
+                  | Some fn -> output_file conf fn
+                  | None -> Output.print_sstring conf "")))
 
   (** Calcul les droits de visualisation d'une personne en
       fonction de son age.

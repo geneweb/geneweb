@@ -3,21 +3,22 @@
 (* module [Wserver]: elementary web service *)
 
 val f :
-  ([ `LOG_EMERG
-   | `LOG_ALERT
-   | `LOG_CRIT
-   | `LOG_ERR
-   | `LOG_WARNING
-   | `LOG_NOTICE
-   | `LOG_INFO
-   | `LOG_DEBUG ] ->
-  string ->
-  unit) ->
-  string option ->
-  int ->
-  int ->
-  int option ->
-  (Unix.sockaddr * string list -> string -> Adef.encoded_string -> unit) ->
+  syslog:
+    ([ `LOG_EMERG
+     | `LOG_ALERT
+     | `LOG_CRIT
+     | `LOG_ERR
+     | `LOG_WARNING
+     | `LOG_NOTICE
+     | `LOG_INFO
+     | `LOG_DEBUG ] ->
+    string ->
+    unit) ->
+  addr:string option ->
+  port:int ->
+  timeout:int ->
+  max_clients:int option ->
+  handler:(Unix.sockaddr * string list -> string -> Adef.encoded_string -> unit) ->
   unit
 (** [ Wserver.f syslog addr port tmout maxc g ]
     Starts an elementary httpd server at port [port] in the current
@@ -86,6 +87,8 @@ val stop_server : string ref
     one request is necessary to unfreeze the server to make it check
     that this file exits. Default "STOP_SERVER". Can have relative
     or absolute path. *)
+
+val set_on_timeout : (int -> unit) -> unit
 
 val cgi : bool ref
 (** CGI (Common Gateway Interface) mode (default false). *)

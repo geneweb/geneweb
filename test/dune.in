@@ -5,7 +5,7 @@
   (modules gwdb_driver)
 )
 
-(executable
+(test
   (name test)
   (libraries %%%SOSA_PKG%%% dummy_gwdb geneweb geneweb_def_show oUnit stdlib-shims)
   (preprocess (pps ppx_deriving.show))
@@ -21,7 +21,9 @@
     )
 )
 
-(rule
-  (action (run ./test.exe) )
-  (alias runtest)
+(test
+  (name ports)
+  (libraries %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb geneweb.ged2gwb_lib geneweb.gwb2ged_lib geneweb.gwexport_lib geneweb.gwu_lib geneweb.gwc_lib)
+  (modules ports)
+  (deps assets/royal92.ged assets/abc.ged)
 )

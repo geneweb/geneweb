@@ -59,7 +59,7 @@ let read_wizard_notes fname =
   | None -> ("", 0.)
 
 let write_wizard_notes fname nn =
-  if nn = "" then Mutil.rm fname
+  if nn = "" then Files.rm fname
   else
     match try Some (Secure.open_out fname) with Sys_error _ -> None with
     | Some oc ->
@@ -630,7 +630,7 @@ let do_change_wizard_visibility conf base x set_vis =
     if (not found) && not set_vis then Printf.fprintf oc "%s\n" conf.user;
     close_out oc;
     let file = Filename.concat wddir "connected.deny" in
-    Mutil.rm file;
+    Files.rm file;
     Sys.rename tmp_file file);
   do_connected_wizards conf base x
 

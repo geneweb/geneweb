@@ -189,10 +189,54 @@ let rec display_note_aux opts tagn s len i =
       (oc opts) (Buffer.contents b);
       display_note_aux opts tagn s (len + 1) (!j + 1)
 
-let display_note opts tagn s =
-  let tag = Printf.sprintf "%d NOTE " tagn in
-  Printf.ksprintf (oc opts) "%s" tag;
-  display_note_aux opts tagn (encode opts s) (String.length tag) 0
+let display_note opts ?source_page tagn s =
+  if opts.Gwexport.notes && s <> "" then (
+    let tag = Printf.sprintf "%d NOTE " tagn in
+    Printf.ksprintf (oc opts) "%s" tag;
+    display_note_aux opts tagn (encode opts s) (String.length tag) 0);
+  match source_page with
+  | None -> ()
+  | Some source_page ->
+      (* source_page is used to add a source with page information;
+         so we can re-import wiki notes and correctly re-link them together *)
+      Printf.ksprintf (oc opts) "%d SOUR\n" (tagn + 1);
+      Printf.ksprintf (oc opts) "%d PAGE %s\n" (tagn + 2) source_page
+
+let write_base_notes opts base =
+  (* TODO WIKI what about wizard notes *)
+  (* TODO WIKI we lose the "title"/page name *)
+  (* list of (filename, file_content) *)
+  let wiki_notes =
+    (* read base notes (wiki) folder *)
+    (* TODO use a Path module *)
+    let path =
+      Filename.concat (Gwdb.bname base ^ ".gwb") (Gwdb.base_notes_dir base)
+    in
+    let wiki_filenames =
+      if Sys.file_exists path then Sys.readdir path else [||]
+    in
+    let wiki_pages =
+      Array.fold_left
+        (fun acc filename ->
+          if Filename.check_suffix filename ".txt" then
+            let file = Filename.concat path filename in
+            let content = Mutil.read_file_content file in
+            (filename, content) :: acc
+          else acc)
+        [] wiki_filenames
+    in
+    (* TODO WIKI base_notes should be a file in base notes folder `base.gwb/notes_d`;
+       currently by default it is the file `base.gwb/notes`;
+       rename it "index.txt" or "index.wiki" *)
+    let main_notes = ("notes", base_notes_read base "") in
+    (* main notes should be first in gedcom *)
+    main_notes :: wiki_pages
+  in
+  List.iter
+    (fun (filename, content) ->
+      let source_page = Printf.sprintf "geneweb wiki notes: %s" filename in
+      display_note opts 1 ~source_page content)
+    wiki_notes
 
 let ged_header opts base ifile ofile =
   Printf.ksprintf (oc opts) "0 HEAD\n";
@@ -225,8 +269,7 @@ let ged_header opts base ifile ofile =
   | Gwexport.Ansi -> Printf.ksprintf (oc opts) "1 CHAR ANSI\n"
   | Gwexport.Ascii -> Printf.ksprintf (oc opts) "1 CHAR ASCII\n"
   | Gwexport.Utf8 -> Printf.ksprintf (oc opts) "1 CHAR UTF-8\n");
-  if opts.Gwexport.no_notes = `none then
-    match base_notes_read base "" with "" -> () | s -> display_note opts 1 s
+  if opts.Gwexport.base_notes then write_base_notes opts base
 
 let sub_string_index s t =
   let rec loop i j =
@@ -347,12 +390,12 @@ let ged_ev_detail opts n typ d pl note src =
       Printf.ksprintf (oc opts) "\n"
   | None -> ());
   if pl <> "" then Printf.ksprintf (oc opts) "%d PLAC %s\n" n (encode opts pl);
-  if opts.Gwexport.no_notes <> `nnn && note <> "" then display_note opts n note;
+  display_note opts n note;
   if opts.Gwexport.source = None && src <> "" then
     print_sour opts n (encode opts src)
 
-let ged_tag_pevent base evt =
-  match evt.epers_name with
+let ged_tag_pevent base evt_name =
+  match evt_name with
   | Epers_Birth -> "BIRT"
   | Epers_Baptism -> "BAPM"
   | Epers_Death -> "DEAT"
@@ -431,28 +474,31 @@ let relation_format_of_witness_kind :
 let oc' opts s = Printf.ksprintf (oc opts) (s ^^ "\n")
 let oc_witness_kind opts wk = oc' opts (relation_format_of_witness_kind wk)
 
+let witness_format opts base per_sel (ip, wk, wnote) =
+  if per_sel ip then
+    Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
+  Printf.ksprintf (oc opts) "3 TYPE INDI\n";
+  oc_witness_kind opts wk;
+  display_note opts 3 (sou base wnote)
+
 let ged_pevent opts base per_sel evt =
+  let name = get_pevent_name evt in
   let typ =
-    if is_primary_pevents evt.epers_name then (
-      let tag = ged_tag_pevent base evt in
+    if is_primary_pevents name then (
+      let tag = ged_tag_pevent base name in
       Printf.ksprintf (oc opts) "1 %s" tag;
       "")
     else (
       Printf.ksprintf (oc opts) "1 EVEN";
-      ged_tag_pevent base evt)
+      ged_tag_pevent base name)
   in
-  let date = Date.od_of_cdate evt.epers_date in
-  let place = sou base evt.epers_place in
-  let note = sou base evt.epers_note in
-  let src = sou base evt.epers_src in
+  let date = Date.od_of_cdate (get_pevent_date evt) in
+  let place = sou base (get_pevent_place evt) in
+  let note = sou base (get_pevent_note evt) in
+  let src = sou base (get_pevent_src evt) in
   ged_ev_detail opts 2 typ date place note src;
-  Array.iter
-    (fun (ip, wk) ->
-      if per_sel ip then (
-        Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
-        Printf.ksprintf (oc opts) "3 TYPE INDI\n";
-        oc_witness_kind opts wk))
-    evt.epers_witnesses
+  let witnesses = get_pevent_witnesses_and_notes evt in
+  Array.iter (witness_format opts base per_sel) witnesses
 
 let adop_fam_list = ref []
 
@@ -583,12 +629,10 @@ let ged_multimedia_link opts base per =
         Printf.ksprintf (oc opts) "1 OBJE\n";
         Printf.ksprintf (oc opts) "2 FILE %s\n" s)
 
-let ged_note opts base per =
-  if opts.Gwexport.no_notes <> `nnn then
-    match sou base (get_notes per) with "" -> () | s -> display_note opts 1 s
+let ged_note opts base per = display_note opts 1 (sou base (get_notes per))
 
-let ged_tag_fevent base evt =
-  match evt.efam_name with
+let ged_tag_fevent base evt_name =
+  match evt_name with
   | Efam_Marriage -> "MARR"
   | Efam_NoMarriage -> "unmarried"
   | Efam_NoMention -> "nomen"
@@ -611,27 +655,23 @@ let is_primary_fevents = function
   | _ -> false
 
 let ged_fevent opts base per_sel evt =
+  let name = get_fevent_name evt in
   let typ =
-    if is_primary_fevents evt.efam_name then (
-      let tag = ged_tag_fevent base evt in
+    if is_primary_fevents name then (
+      let tag = ged_tag_fevent base name in
       Printf.ksprintf (oc opts) "1 %s" tag;
       "")
     else (
       Printf.ksprintf (oc opts) "1 EVEN";
-      ged_tag_fevent base evt)
+      ged_tag_fevent base name)
   in
-  let date = Date.od_of_cdate evt.efam_date in
-  let place = sou base evt.efam_place in
-  let note = sou base evt.efam_note in
-  let src = sou base evt.efam_src in
+  let date = Date.od_of_cdate (get_fevent_date evt) in
+  let place = sou base (get_fevent_place evt) in
+  let note = sou base (get_fevent_note evt) in
+  let src = sou base (get_fevent_src evt) in
   ged_ev_detail opts 2 typ date place note src;
-  Array.iter
-    (fun (ip, wk) ->
-      if per_sel ip then (
-        Printf.ksprintf (oc opts) "2 ASSO @I%d@\n" (int_of_iper ip + 1);
-        Printf.ksprintf (oc opts) "3 TYPE INDI\n";
-        oc_witness_kind opts wk))
-    evt.efam_witnesses
+  let witnesses = get_fevent_witnesses_and_notes evt in
+  Array.iter (witness_format opts base per_sel) witnesses
 
 let ged_child opts per_sel chil =
   if per_sel chil then
@@ -646,11 +686,7 @@ let ged_fsource opts base fam =
       | "" -> ()
       | s -> print_sour opts 1 (encode opts s))
 
-let ged_comment opts base fam =
-  if opts.Gwexport.no_notes <> `nnn then
-    match sou base (get_comment fam) with
-    | "" -> ()
-    | s -> display_note opts 1 s
+let ged_comment opts base fam = display_note opts 1 (sou base (get_comment fam))
 
 let has_personal_infos base per =
   get_parents per <> None

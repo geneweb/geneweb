@@ -39,18 +39,58 @@ type relation = (iper, istr) Def.gen_relation
 type title = istr Def.gen_title
 (** Database implementation for [Def.gen_title] *)
 
-type pers_event = (iper, istr) Def.gen_pers_event
-(** Database implementation for [Def.pers_event] *)
-
-type fam_event = (iper, istr) Def.gen_fam_event
-(** Database implementation for [Def.fam_event] *)
-
 type string_person_index
 (** Data structure for optimised search throughout index by name
     (surname or first name). *)
 
 type base
 (** The database representation. *)
+
+type pers_event
+(** Database implementation for [Def.pers_event] *)
+(*= (iper, istr) Def.gen_pers_event*)
+
+val get_pevent_name : pers_event -> istr Def.gen_pers_event_name
+val get_pevent_date : pers_event -> Def.cdate
+val get_pevent_place : pers_event -> istr
+val get_pevent_reason : pers_event -> istr
+val get_pevent_note : pers_event -> istr
+val get_pevent_src : pers_event -> istr
+val get_pevent_witnesses : pers_event -> (iper * Def.witness_kind) array
+val get_pevent_witness_notes : pers_event -> istr array
+
+val get_pevent_witnesses_and_notes :
+  pers_event -> (iper * Def.witness_kind * istr) array
+
+val gen_pevent_of_pers_event : pers_event -> (iper, istr) Def.gen_pers_event
+
+val pers_event_of_gen_pevent :
+  base -> (iper, istr) Def.gen_pers_event -> pers_event
+
+val eq_pevent : pers_event -> pers_event -> bool
+
+type fam_event
+(** Database implementation for [Def.fam_event] *)
+(*= (iper, istr) Def.gen_fam_event*)
+
+val get_fevent_name : fam_event -> istr Def.gen_fam_event_name
+val get_fevent_date : fam_event -> Def.cdate
+val get_fevent_place : fam_event -> istr
+val get_fevent_reason : fam_event -> istr
+val get_fevent_note : fam_event -> istr
+val get_fevent_src : fam_event -> istr
+val get_fevent_witnesses : fam_event -> (iper * Def.witness_kind) array
+val get_fevent_witness_notes : fam_event -> istr array
+
+val get_fevent_witnesses_and_notes :
+  fam_event -> (iper * Def.witness_kind * istr) array
+
+val gen_fevent_of_fam_event : fam_event -> (iper, istr) Def.gen_fam_event
+
+val fam_event_of_gen_fevent :
+  base -> (iper, istr) Def.gen_fam_event -> fam_event
+
+val eq_fevent : fam_event -> fam_event -> bool
 
 val open_base : string -> base
 (** Open database associated with (likely situated in) the specified directory. *)
@@ -519,7 +559,7 @@ val base_notes_read : base -> string -> string
     (either database note either extended page). *)
 
 val base_notes_read_first_line : base -> string -> string
-(** [base_notes_read base fname] read and return first line of [fname] note *)
+(** [base_notes_read_first_line base fname] read and return first line of [fname] note *)
 
 val base_notes_are_empty : base -> string -> bool
 (** Says if note has empty content *)
@@ -536,7 +576,7 @@ val base_wiznotes_dir : base -> string
 val date_of_last_change : base -> float
 (** Returns last modification time of the database on disk *)
 
-(** Collections of elemetns *)
+(** Collections of elements *)
 module Collection : sig
   type 'a t
   (** Collections are sets of elements you want to traverse. *)
@@ -548,18 +588,18 @@ module Collection : sig
   (** [map fn c]
       Return a collection corresponding to [c]
       where [fn] would have been applied to each of its elements.
-  *)
+   *)
 
   val iter : ('a -> unit) -> 'a t -> unit
   (** [iter fn c]
       Apply [fn] would have been applied to each elements of [c].
-  *)
+   *)
 
   val iteri : (int -> 'a -> unit) -> 'a t -> unit
   (** [iter fn c]
       Apply [fn i] would have been applied to each elements of [c]
       where [i] is the index (starting with 0) of the element.
-  *)
+   *)
 
   val fold : ?from:int -> ?until:int -> ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
   (** [fold fn acc c]
@@ -568,19 +608,19 @@ module Collection : sig
       collection, and second element is the current element being combined.
       [acc] is the starting combined value.
       Start at [from]-nth and finish with [until]-nth element (included).
-  *)
+   *)
 
   val fold_until : ('a -> bool) -> ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
   (** [fold_until continue fn acc c]
       Same as [fold fn acc c], but computation stops as soon as [continue]
       is not satisfied by combined value anymore.
-  *)
+   *)
 
   val iterator : 'a t -> unit -> 'a option
   (** [iterator c]
       Return a function returning [Some next_element] when it is called,
       or [None] if you reached the end of the collection.
-  *)
+   *)
 end
 
 (** Markers for elements inside [Collection.t] *)
@@ -591,12 +631,12 @@ module Marker : sig
   val get : ('k, 'v) t -> 'k -> 'v
   (** [get marker key]
       Return the annotation associated to [key].
-  *)
+   *)
 
   val set : ('k, 'v) t -> 'k -> 'v -> unit
   (** [set marker key value]
       Set [value] as annotation associated to [key].
-  *)
+   *)
 end
 
 (** {2 Useful collections} *)
@@ -654,7 +694,7 @@ val read_nldb : base -> (iper, ifam) Def.NLDB.t
 
 val write_nldb : base -> (iper, ifam) Def.NLDB.t -> unit
 
-val sync : ?scratch:bool -> base -> unit
+val sync : ?scratch:bool -> save_mem:bool -> base -> unit
 (** [sync scratch base]
     Ensure that everything is synced on disk.
 
@@ -666,3 +706,8 @@ val sync : ?scratch:bool -> base -> unit
     the whole database. Otherwise, only changes that occured
     since the last [sync] call are treated.
 *)
+
+val gc :
+  ?dry_run:bool -> save_mem:bool -> base -> int list * int list * int list
+
+val set_fpoi_cache : base -> bool -> unit

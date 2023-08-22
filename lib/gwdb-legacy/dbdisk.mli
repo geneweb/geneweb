@@ -135,8 +135,8 @@ type 'string gen_pers_event_name = 'string Def.gen_pers_event_name =
   | Epers_Will
   | Epers_Name of 'string
 
-type ('person, 'string) gen_pers_event =
-      ('person, 'string) Def.gen_pers_event = {
+type ('person, 'string) gen_pers_event = {
+  (*('person, 'string) Def.gen_pers_event =*)
   epers_name : 'string gen_pers_event_name;
   epers_date : cdate;
   epers_place : 'string;
@@ -161,7 +161,8 @@ type 'string gen_fam_event_name = 'string Def.gen_fam_event_name =
   | Efam_Residence
   | Efam_Name of 'string
 
-type ('person, 'string) gen_fam_event = ('person, 'string) Def.gen_fam_event = {
+type ('person, 'string) gen_fam_event = {
+  (*('person, 'string) Def.gen_fam_event =*)
   efam_name : 'string gen_fam_event_name;
   efam_date : cdate;
   efam_place : 'string;
@@ -200,8 +201,7 @@ type place = Def.place = {
 
 (* person *)
 
-type ('iper, 'person, 'string) gen_person =
-      ('iper, 'person, 'string) Def.gen_person = {
+type ('iper, 'person, 'string) gen_person = {
   first_name : 'string;
   surname : 'string;
   occ : int;
@@ -238,6 +238,7 @@ type ('iper, 'person, 'string) gen_person =
   psources : 'string;
   key_index : 'iper;
 }
+(*= ('iper, 'person, 'string) Def.gen_person*)
 
 type 'family gen_ascend = 'family Def.gen_ascend = {
   parents : 'family option;
@@ -248,8 +249,8 @@ type 'family gen_union = 'family Def.gen_union = { family : 'family array }
 
 (* family *)
 
-type ('person, 'ifam, 'string) gen_family =
-      ('person, 'ifam, 'string) Def.gen_family = {
+type ('person, 'ifam, 'string) gen_family = {
+  (*('person, 'ifam, 'string) Def.gen_family =*)
   marriage : cdate;
   marriage_place : 'string;
   marriage_note : 'string;

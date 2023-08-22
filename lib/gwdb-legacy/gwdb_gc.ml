@@ -34,7 +34,7 @@ let empty_person p =
   && p.burial_src = empty_string
   && p.pevents = [] && p.notes = empty_string && p.psources = empty_string
 
-let gc ?(dry_run = true) base =
+let gc ?(dry_run = true) ~save_mem base =
   base.data.persons.load_array ();
   base.data.ascends.load_array ();
   base.data.unions.load_array ();
@@ -54,7 +54,7 @@ let gc ?(dry_run = true) base =
     let p = base.data.persons.get i in
     if not (empty_person p) then (
       markp i;
-      let _ = Futil.map_person_ps markp marks p in
+      let _ = Dutil.map_person_ps markp marks p in
       let _ = Futil.map_union_f markf @@ base.data.unions.get i in
       let _ = Futil.map_ascend_f markf @@ base.data.ascends.get i in
       ())
@@ -64,7 +64,7 @@ let gc ?(dry_run = true) base =
       let f = base.data.families.get i in
       (* if family wasn't deleted *)
       if f.fam_index <> dummy_ifam then
-        let _ = Futil.map_family_ps markp markf marks f in
+        let _ = Dutil.map_family_ps markp markf marks f in
         let _ = Futil.map_couple_p false markp @@ base.data.couples.get i in
         let _ = Futil.map_descend_p markp @@ base.data.descends.get i in
         ()
@@ -122,7 +122,7 @@ let gc ?(dry_run = true) base =
     let persons =
       Array.init lenp @@ fun i ->
       {
-        (Futil.map_person_ps dst_iper dst_istr
+        (Dutil.map_person_ps dst_iper dst_istr
         @@ base.data.persons.get @@ src_iper i)
         with
         key_index = i;
@@ -138,7 +138,7 @@ let gc ?(dry_run = true) base =
     in
     let families =
       Array.init lenf @@ fun i ->
-      Futil.map_family_ps dst_iper (fun _ -> i) dst_istr
+      Dutil.map_family_ps dst_iper (fun _ -> i) dst_istr
       @@ base.data.families.get @@ src_ifam i
     in
     let couples =
@@ -176,7 +176,7 @@ let gc ?(dry_run = true) base =
     base'.data.couples.load_array ();
     base'.data.descends.load_array ();
     base'.data.strings.load_array ();
-    Outbase.output base';
+    Outbase.output ~save_mem base';
     base'.data.persons.clear_array ();
     base'.data.ascends.clear_array ();
     base'.data.unions.clear_array ();

@@ -23,8 +23,8 @@ type relationship = {
 
 type relationship_info = {
   (* Information about topological rank for each person *)
-  tstab : (Gwdb.iper, int) Gwdb.Marker.t;
-  reltab : (Gwdb.iper, relationship) Gwdb.Marker.t;
+  tstab : (Gwdb.iper, int) Marker.t;
+  reltab : (Gwdb.iper, relationship) Marker.t;
   mutable queue : Gwdb.iper list array;
 }
 (** Computation consanguinity state for every person in the base *)
@@ -35,14 +35,14 @@ exception TopologicalSortError of person
 val topological_sort :
   Gwdb.base ->
   (Gwdb.base -> Gwdb.iper -> Gwdb.person) ->
-  (Gwdb.iper, int) Gwdb.Marker.t
+  (Gwdb.iper, int) Marker.t
 (** Returns result of topological sort of persons. Result is represented as marker that associates to every person in the base his
     topologic rank (let's suppose [r]). Global rule is : if person p1 is ancestor of p2 then r(p1) > r(p2). For example, all leaf
     persons (without children) have rank 0, their parents (if no another child that has child themself) - rank 1, parents of their
     parents - rank 2, etc. Raises [TopologicalSortError] if person is directly or undirectly is ancestor of himself (cycle). *)
 
 val make_relationship_info :
-  base -> (Gwdb.iper, int) Gwdb.Marker.t -> relationship_info
+  base -> (Gwdb.iper, int) Marker.t -> relationship_info
 (** Initialise relationship info. *)
 
 (* Returns relationship rate between two person and common ancestors (is exists). *)

@@ -173,17 +173,29 @@ let rec reconstitute_events conf ext cnt =
               let witnesses, ext = loop (i + 1) ext in
               let create = update_ci conf create key in
               let c = (fn, sn, occ, create, var) in
-              let c =
-                match p_getenv conf.env (key ^ "_kind") with
-                | Some "godp" -> (c, Witness_GodParent)
-                | Some "offi" -> (c, Witness_CivilOfficer)
-                | Some "reli" -> (c, Witness_ReligiousOfficer)
-                | Some "info" -> (c, Witness_Informant)
-                | Some "atte" -> (c, Witness_Attending)
-                | Some "ment" -> (c, Witness_Mentioned)
-                | Some "othe" -> (c, Witness_Other)
-                | Some _ | None -> (c, Witness)
+              let key_wkind = key ^ "_kind" in
+              let wkind =
+                match p_getenv conf.env key_wkind with
+                | Some "godp" -> Witness_GodParent
+                | Some "offi" -> Witness_CivilOfficer
+                | Some "reli" -> Witness_ReligiousOfficer
+                | Some "info" -> Witness_Informant
+                | Some "atte" -> Witness_Attending
+                | Some "ment" -> Witness_Mentioned
+                | Some "othe" -> Witness_Other
+                | Some _ | None -> Witness
               in
+              let wnote =
+                let var_note =
+                  "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_note"
+                in
+                match p_getenv conf.env var_note with
+                | Some wnote ->
+                    (* print_endline ("NOTE:" ^ wnote); *)
+                    wnote
+                | _ -> ""
+              in
+              let c = (c, wkind, wnote) in
               match
                 p_getenv conf.env
                   ("e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i)
@@ -200,7 +212,8 @@ let rec reconstitute_events conf ext cnt =
                         else
                           let new_witn =
                             ( ("", "", 0, Update.Create (Neuter, None), ""),
-                              Witness )
+                              Witness,
+                              "" )
                           in
                           let witnesses = new_witn :: witnesses in
                           loop_witn (n - 1) witnesses
@@ -208,7 +221,9 @@ let rec reconstitute_events conf ext cnt =
                       loop_witn n witnesses
                   | Some _ | None ->
                       let new_witn =
-                        (("", "", 0, Update.Create (Neuter, None), ""), Witness)
+                        ( ("", "", 0, Update.Create (Neuter, None), ""),
+                          Witness,
+                          "" )
                       in
                       (c :: new_witn :: witnesses, true))
               | Some _ | None -> (c :: witnesses, ext))
@@ -226,7 +241,9 @@ let rec reconstitute_events conf ext cnt =
                   if n = 0 then (witnesses, true)
                   else
                     let new_witn =
-                      (("", "", 0, Update.Create (Neuter, None), ""), Witness)
+                      ( ("", "", 0, Update.Create (Neuter, None), ""),
+                        Witness,
+                        "" )
                     in
                     let witnesses = new_witn :: witnesses in
                     loop_witn (n - 1) witnesses
@@ -234,7 +251,7 @@ let rec reconstitute_events conf ext cnt =
                 loop_witn n witnesses
             | Some _ | None ->
                 let new_witn =
-                  (("", "", 0, Update.Create (Neuter, None), ""), Witness)
+                  (("", "", 0, Update.Create (Neuter, None), ""), Witness, "")
                 in
                 (new_witn :: witnesses, true))
         | Some _ | None -> (witnesses, ext)
@@ -266,13 +283,14 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
       (fun evt -> evt.efam_date)
       fevents
   in
+
   let found_marriage :
       (Def.relation_kind
       * Def.cdate
       * 'string
       * 'string
       * 'string
-      * ('person * Def.witness_kind) array)
+      * ('person * Def.witness_kind * 'string) array)
       option
       ref =
     ref None
@@ -503,7 +521,8 @@ let strip_events fevents =
   let strip_array_witness pl =
     Array.of_list
     @@ Array.fold_right
-         (fun (((f, _, _, _, _), _) as p) pl -> if f = "" then pl else p :: pl)
+         (fun (((f, _, _, _, _), _, _) as p) pl ->
+           if f = "" then pl else p :: pl)
          pl []
   in
   List.fold_right
@@ -665,8 +684,14 @@ let infer_origin_file conf base ifam ncpl ndes =
 let fwitnesses_of fevents =
   List.fold_left
     (fun ipl e ->
-      Array.fold_left (fun ipl (ip, _) -> ip :: ipl) ipl e.efam_witnesses)
+      Array.fold_left (fun ipl (ip, _, _) -> ip :: ipl) ipl e.efam_witnesses)
     [] fevents
+
+let fwitnesses_of_fam_event fam_events =
+  List.fold_left
+    (fun l fevent ->
+      Array.fold_left (fun l (ip, _) -> ip :: l) l (get_fevent_witnesses fevent))
+    [] fam_events
 
 (* Lorsqu'on ajout naissance décès par exemple en créant une personne. *)
 let patch_person_with_pevents base ip =
@@ -775,7 +800,7 @@ let update_family_with_fevents conf base fam =
   in
   let relation, marriage, marriage_place, marriage_note, marriage_src = marr in
   let divorce = div in
-  let witnesses = Array.map fst witnesses in
+  let witnesses = Array.map (fun (ip, _, _) -> ip) witnesses in
   {
     fam with
     marriage;
@@ -915,7 +940,10 @@ let effective_mod conf base nsck sfam scpl sdes =
         patch_ascend base ip (find_asc ip))
     ndes.children;
   let ol =
-    Array.fold_right (fun x acc -> x :: acc) owitnesses (fwitnesses_of ofevents)
+    Array.fold_right
+      (fun x acc -> x :: acc)
+      owitnesses
+      (fwitnesses_of_fam_event ofevents)
   in
   let nl =
     Array.fold_right
@@ -1470,7 +1498,7 @@ let print_change_event_order conf base =
       let fevents =
         List.fold_right
           (fun (id, _) accu ->
-            try Hashtbl.find ht id :: accu
+            try (Hashtbl.find ht id |> gen_fevent_of_fam_event) :: accu
             with Not_found -> failwith "Sorting event")
           sorted_fevents []
       in

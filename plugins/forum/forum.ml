@@ -73,9 +73,13 @@ module MF : MF = struct
       if pos < 0 then not_a_pos else { p_ord = true; p_ext = 0; p_pos = pos }
     with Failure _ -> (
       try
-        Scanf.sscanf s "%d-%d" (fun a b ->
-            { p_ord = a = 0; p_ext = a; p_pos = b })
-      with Scanf.Scan_failure _ -> not_a_pos)
+        let pos = int_of_string s in
+        if pos < 0 then not_a_pos else { p_ord = true; p_ext = 0; p_pos = pos }
+      with Failure _ -> (
+        try
+          Scanf.sscanf s "%d-%d" (fun a b ->
+              { p_ord = a = 0; p_ext = a; p_pos = b })
+        with Scanf.Scan_failure _ -> not_a_pos))
 
   let extend fname f =
     let tmp = fname ^ "~" in
@@ -94,7 +98,7 @@ module MF : MF = struct
         close_in ic
     | None -> ());
     close_out oc;
-    Mutil.rm fname;
+    Files.rm fname;
     Sys.rename tmp fname
 
   let patch fname pos str =
@@ -120,7 +124,7 @@ module MF : MF = struct
          loop 0);
         close_in ic;
         close_out oc;
-        Mutil.rm fname;
+        Files.rm fname;
         Sys.rename tmp_fname fname
     | None -> ()
 

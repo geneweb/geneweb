@@ -55,7 +55,9 @@ let map_pers_event ?(fd = identity) fp fs e =
   let epers_reason = fs e.epers_reason in
   let epers_note = fs e.epers_note in
   let epers_src = fs e.epers_src in
-  let epers_witnesses = Array.map (fun (p, w) -> (fp p, w)) e.epers_witnesses in
+  let epers_witnesses =
+    Array.map (fun (p, w, wnote) -> (fp p, w, fs wnote)) e.epers_witnesses
+  in
   {
     epers_name;
     epers_date;
@@ -81,7 +83,11 @@ let map_fam_event ?(fd = identity) fp fs e =
   let efam_reason = fs e.efam_reason in
   let efam_note = fs e.efam_note in
   let efam_src = fs e.efam_src in
-  let efam_witnesses = Array.map (fun (p, w) -> (fp p, w)) e.efam_witnesses in
+  let efam_witnesses =
+    Array.map
+      (fun (p, wkind, wnote) -> (fp p, wkind, fs wnote))
+      e.efam_witnesses
+  in
   {
     efam_name;
     efam_date;

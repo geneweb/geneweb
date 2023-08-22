@@ -35,19 +35,6 @@ let notes_links s =
   in
   loop [] [] 1 0
 
-let read_file_contents fname =
-  match try Some (open_in fname) with Sys_error _ -> None with
-  | Some ic -> (
-      let len = ref 0 in
-      try
-        let rec loop () =
-          len := Buff.store !len (input_char ic);
-          loop ()
-        in
-        loop ()
-      with End_of_file -> Buff.get !len)
-  | None -> ""
-
 let compute base bdir =
   let bdir =
     if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
@@ -73,7 +60,8 @@ let compute base bdir =
          let wfile =
            List.fold_left Filename.concat bdir [ base_wiznotes_dir base; file ]
          in
-         let list = notes_links (read_file_contents wfile) in
+         let content = Mutil.read_file_content wfile in
+         let list = notes_links content in
          if list = ([], []) then ()
          else (
            Printf.eprintf "%s... " wizid;
@@ -141,9 +129,9 @@ let compute base bdir =
       add_string @@ get_burial_src p;
       add_string @@ get_psources p;
       List.iter
-        (fun { epers_note; epers_src } ->
-          add_string epers_note;
-          add_string epers_src)
+        (fun pe ->
+          add_string (get_pevent_note pe);
+          add_string (get_pevent_src pe))
         (get_pevents p);
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()
@@ -162,9 +150,9 @@ let compute base bdir =
       add_string @@ get_marriage_note fam;
       add_string @@ get_marriage_src fam;
       List.iter
-        (fun { efam_note; efam_src; _ } ->
-          add_string @@ efam_note;
-          add_string @@ efam_src)
+        (fun fe ->
+          add_string @@ get_fevent_note fe;
+          add_string @@ get_fevent_src fe)
         (get_fevents fam);
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()

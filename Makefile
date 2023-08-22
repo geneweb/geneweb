@@ -75,6 +75,9 @@ GENERATED_FILES_DEP = \
 	lib/core/dune \
 	lib/gwlib.ml \
 	lib/util/dune \
+	lib/system_util/dune \
+	lib/gwdb-legacy/dune \
+	lib/gwdb-versioned/dune \
 	benchmark/dune \
 	bin/connex/dune \
 	bin/consang/dune \

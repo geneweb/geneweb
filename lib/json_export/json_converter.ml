@@ -106,10 +106,20 @@ module Make (D : ConverterDriver) = struct
   let handler_of_iper i = str @@ Gwdb_driver.string_of_iper i
   let handler_of_ifam i = str @@ Gwdb_driver.string_of_ifam i
 
-  let conv_event_witness (i, kind) =
+  let conv_event_witness (i, kind, note) =
     obj
       [|
-        ("person", handler_of_iper i); ("kind", conv_event_witness_kind kind);
+        ("person", handler_of_iper i);
+        ("kind", conv_event_witness_kind kind);
+        ("note", str note);
+      |]
+
+  let conv_fevent_witness (i, kind, note) =
+    obj
+      [|
+        ("person", handler_of_iper i);
+        ("kind", conv_event_witness_kind kind);
+        ("note", str note);
       |]
 
   let conv_pevent pevent =
@@ -159,7 +169,7 @@ module Make (D : ConverterDriver) = struct
         ("reason", str fevent.efam_reason);
         ("src", str fevent.efam_src);
         ( "witnesses",
-          array @@ Array.map conv_event_witness fevent.efam_witnesses );
+          array @@ Array.map conv_fevent_witness fevent.efam_witnesses );
       |]
 
   let conv_divorce = function

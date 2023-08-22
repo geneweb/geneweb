@@ -215,17 +215,31 @@ let rec reconstitute_pevents conf ext cnt =
               let create = update_ci conf create key in
               let c = (fn, sn, occ, create, var) in
               let key_c = key ^ "_kind" in
-              let c =
+              let wkind =
                 match p_getenv conf.env key_c with
-                | Some "godp" -> (c, Witness_GodParent)
-                | Some "offi" -> (c, Witness_CivilOfficer)
-                | Some "reli" -> (c, Witness_ReligiousOfficer)
-                | Some "info" -> (c, Witness_Informant)
-                | Some "atte" -> (c, Witness_Attending)
-                | Some "ment" -> (c, Witness_Mentioned)
-                | Some "othe" -> (c, Witness_Other)
-                | _ -> (c, Witness)
+                | Some "godp" -> Witness_GodParent
+                | Some "offi" -> Witness_CivilOfficer
+                | Some "reli" -> Witness_ReligiousOfficer
+                | Some "info" -> Witness_Informant
+                | Some "atte" -> Witness_Attending
+                | Some "ment" -> Witness_Mentioned
+                | Some "othe" -> Witness_Other
+                | _ -> Witness
               in
+              (* WNOTES TODO GET ACTUAL WNOTE *)
+              let wnote =
+                let var_note =
+                  "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_note"
+                in
+                match p_getenv conf.env var_note with
+                | Some wnote ->
+                    (*print_endline ("NOTE:" ^ wnote);*)
+                    wnote
+                | _ -> ""
+              in
+
+              let c = (c, wkind, wnote) in
+
               let var_w =
                 "e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i
               in
@@ -241,7 +255,9 @@ let rec reconstitute_pevents conf ext cnt =
                         if n = 0 then (c :: witnesses, true)
                         else
                           let new_witn =
-                            (("", "", 0, Update.Create (Neuter, None), ""), wk)
+                            ( ("", "", 0, Update.Create (Neuter, None), ""),
+                              wk,
+                              "" )
                           in
                           let witnesses = new_witn :: witnesses in
                           loop_witn (n - 1) witnesses
@@ -249,7 +265,7 @@ let rec reconstitute_pevents conf ext cnt =
                       loop_witn n witnesses
                   | _ ->
                       let new_witn =
-                        (("", "", 0, Update.Create (Neuter, None), ""), wk)
+                        (("", "", 0, Update.Create (Neuter, None), ""), wk, "")
                       in
                       (c :: new_witn :: witnesses, true))
               | _ -> (c :: witnesses, ext))
@@ -268,7 +284,7 @@ let rec reconstitute_pevents conf ext cnt =
                   if n = 0 then (witnesses, true)
                   else
                     let new_witn =
-                      (("", "", 0, Update.Create (Neuter, None), ""), wk)
+                      (("", "", 0, Update.Create (Neuter, None), ""), wk, "")
                     in
                     let witnesses = new_witn :: witnesses in
                     loop_witn (n - 1) witnesses
@@ -276,7 +292,7 @@ let rec reconstitute_pevents conf ext cnt =
                 loop_witn n witnesses
             | Some _ | None ->
                 let new_witn =
-                  (("", "", 0, Update.Create (Neuter, None), ""), wk)
+                  (("", "", 0, Update.Create (Neuter, None), ""), wk, "")
                 in
                 (new_witn :: witnesses, true))
         | Some _ | None -> (witnesses, ext)
@@ -725,7 +741,8 @@ let strip_pevents p =
   let strip_array_witness pl =
     let pl =
       Array.fold_right
-        (fun (((f, _, _, _, _), _) as p) pl -> if f = "" then pl else p :: pl)
+        (fun (((f, _, _, _, _), _, _) as p) pl ->
+          if f = "" then pl else p :: pl)
         pl []
     in
     Array.of_list pl
@@ -798,7 +815,13 @@ let rparents_of rparents =
 let pwitnesses_of pevents =
   List.fold_left
     (fun ipl e ->
-      Array.fold_left (fun ipl (ip, _) -> ip :: ipl) ipl e.epers_witnesses)
+      Array.fold_left (fun ipl (ip, _, _) -> ip :: ipl) ipl e.epers_witnesses)
+    [] pevents
+
+let pwitnesses_of_pers_events pevents =
+  List.fold_left
+    (fun l e ->
+      Array.fold_left (fun l (ip, _) -> ip :: l) l (get_pevent_witnesses e))
     [] pevents
 
 (* sp.death *)
@@ -824,7 +847,7 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
   let np = { np with related = get_related op } in
   let ol_rparents = rparents_of (get_rparents op) in
   let nl_rparents = rparents_of np.rparents in
-  let ol_pevents = pwitnesses_of (get_pevents op) in
+  let ol_pevents = pwitnesses_of_pers_events (get_pevents op) in
   let nl_pevents = pwitnesses_of np.pevents in
   let ol = List.append ol_rparents ol_pevents in
   let nl = List.append nl_rparents nl_pevents in
@@ -872,17 +895,19 @@ let update_relations_of_related base ip old_related =
           (get_rparents p1) ([], false)
       in
       let pevents, pevents_are_different =
+        let p1_pevents = get_pevents p1 |> List.map gen_pevent_of_pers_event in
         List.fold_right
           (fun e (list, rad) ->
             let witnesses, rad =
               Array.fold_right
-                (fun (ip2, k) (accu, rad) ->
-                  if ip2 = ip then (accu, true) else ((ip2, k) :: accu, rad))
+                (fun (ip2, k, wnotes) (accu, rad) ->
+                  if ip2 = ip then (accu, true)
+                  else ((ip2, k, wnotes) :: accu, rad))
                 e.epers_witnesses ([], rad)
             in
             let e = { e with epers_witnesses = Array.of_list witnesses } in
             (e :: list, rad))
-          (get_pevents p1) ([], false)
+          p1_pevents ([], false)
       in
       (if rparents_are_different || pevents_are_different then
        let p = gen_person_of_person p1 in
@@ -896,17 +921,21 @@ let update_relations_of_related base ip old_related =
         let old_witnesses = Array.to_list (get_witnesses fam) in
         let new_witnesses = List.filter (( <> ) ip) old_witnesses in
         let fevents, fevents_are_different =
+          let fam_events =
+            get_fevents fam |> List.map gen_fevent_of_fam_event
+          in
           List.fold_right
             (fun e (list, rad) ->
               let witnesses, rad =
                 Array.fold_right
-                  (fun (ip2, k) (accu, rad) ->
-                    if ip2 = ip then (accu, true) else ((ip2, k) :: accu, rad))
+                  (fun (ip2, wkind, wnote) (accu, rad) ->
+                    if ip2 = ip then (accu, true)
+                    else ((ip2, wkind, wnote) :: accu, rad))
                   e.efam_witnesses ([], rad)
               in
               let e = { e with efam_witnesses = Array.of_list witnesses } in
               (e :: list, rad))
-            (get_fevents fam) ([], false)
+            fam_events ([], false)
         in
         if new_witnesses <> old_witnesses || fevents_are_different then
           let fam = gen_family_of_family fam in
@@ -1216,7 +1245,7 @@ let print_change_event_order conf base =
       let pevents =
         List.fold_right
           (fun (id, _) accu ->
-            try Hashtbl.find ht id :: accu
+            try (Hashtbl.find ht id |> gen_pevent_of_pers_event) :: accu
             with Not_found -> failwith "Sorting event")
           sorted_pevents []
       in

@@ -82,7 +82,7 @@ let print_clean_ok conf =
       let history = load_person_history conf f in
       let new_history = clean_history 0 history [] in
       let fname = history_path conf f in
-      (if new_history = [] then Mutil.rm fname
+      (if new_history = [] then Files.rm fname
       else
         let ext_flags =
           [ Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock ]
@@ -264,8 +264,9 @@ let string_of_divorce conf divorce =
   | Separated -> transl conf "separated" |> Adef.safe
 
 let string_of_event_witness conf base witnesses =
+  (* WNOTES TODO *)
   Array.fold_right
-    (fun (ip, wk) accu ->
+    (fun (ip, wk, _) accu ->
       let witn = person_of_iper conf base ip in
       let kind = Util.string_of_witness_kind conf (get_sex @@ poi base ip) wk in
       if (witn :> string) = "" then (kind ^^^ transl conf ":" ^<^ witn) :: accu

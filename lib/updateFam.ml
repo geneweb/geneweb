@@ -80,7 +80,7 @@ let family_events_opt env fam =
 let witness_person_of_event_opt env e =
   match get_env "wcnt" env with
   | Vint i when i - 1 >= 0 && i - 1 < Array.length e.efam_witnesses ->
-      Some (fst e.efam_witnesses.(i - 1))
+      Some ((fun (p, _, _) -> p) e.efam_witnesses.(i - 1))
   | Vint i when i - 1 >= 0 && i - 1 < 2 && Array.length e.efam_witnesses < 2 ->
       Some ("", "", 0, Update.Create (Neuter, None), "")
   | _ -> None
@@ -172,17 +172,17 @@ and eval_event_str conf base env fam =
         let fam = foi base fam.fam_index in
         let e = List.nth (get_fevents fam) (i - 1) in
         let name =
-          Util.string_of_fevent_name conf base e.efam_name
+          Util.string_of_fevent_name conf base (get_fevent_name e)
           |> Adef.safe_fn Utf8.capitalize_fst
         in
         let date =
-          match Date.od_of_cdate e.efam_date with
+          match Date.od_of_cdate (get_fevent_date e) with
           | Some d -> DateDisplay.string_of_date conf d
           | None -> Adef.safe ""
         in
-        let place = Util.string_of_place conf (sou base e.efam_place) in
-        let note = Util.safe_html (sou base e.efam_note) in
-        let src = Util.safe_html (sou base e.efam_src) in
+        let place = Util.string_of_place conf (sou base (get_fevent_place e)) in
+        let note = Util.safe_html (sou base (get_fevent_note e)) in
+        let src = Util.safe_html (sou base (get_fevent_src e)) in
         let wit =
           Array.fold_right
             (fun (w, _) accu ->
@@ -190,7 +190,7 @@ and eval_event_str conf base env fam =
               ^<^ transl conf ":"
               ^<^ Util.gen_person_text conf base (poi base w))
               :: accu)
-            e.efam_witnesses []
+            (get_fevent_witnesses e) []
         in
         let s =
           String.concat ", "
@@ -223,7 +223,28 @@ and eval_fwitness_kind env fam =
           | Vint i ->
               let i = i - 1 in
               if i >= 0 && i < Array.length e.efam_witnesses then
-                eval_witness_kind (snd e.efam_witnesses.(i))
+                eval_witness_kind ((fun (_, wk, _) -> wk) e.efam_witnesses.(i))
+              else if i >= 0 && i < 2 && Array.length e.efam_witnesses < 2 then
+                str_val ""
+              else raise Not_found
+          | _ -> raise Not_found)
+      | None -> raise Not_found)
+  | _ -> raise Not_found
+
+and eval_fwitness_note env fam =
+  match get_env "cnt" env with
+  | Vint i -> (
+      let e =
+        try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None
+      in
+      match e with
+      | Some e -> (
+          match get_env "wcnt" env with
+          | Vint i ->
+              let i = i - 1 in
+              if i >= 0 && i < Array.length e.efam_witnesses then
+                let _, _, wnote = e.efam_witnesses.(i) in
+                safe_val (Util.escape_html wnote :> Adef.safe_string)
               else if i >= 0 && i < 2 && Array.length e.efam_witnesses < 2 then
                 str_val ""
               else raise Not_found
@@ -277,6 +298,7 @@ and eval_simple_var conf base env (fam, cpl, des) = function
   | [ "has_fwitness" ] -> eval_has_fwitness env fam
   | "fwitness" :: sl -> eval_fwitness conf base env fam sl
   | [ "fwitness_kind" ] -> eval_fwitness_kind env fam
+  | [ "fwitness_note" ] -> eval_fwitness_note env fam
   | [ s ] -> eval_default_var conf s
   | _ -> raise Not_found
 
