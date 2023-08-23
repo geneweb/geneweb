@@ -162,8 +162,9 @@ let url_set_aux conf evar_l str =
         | Some (_, _) -> false
         | None -> true && str <> "" (* only if str <> "" *)
       in
-      let new_evar = if str <> "" then [ (evar, Adef.encoded str) ] else [] in
       let kl = ref [] in
+      let conf_l = conf.henv @ conf.senv @ conf.env in
+      let conf_l = List.filter (fun (k, _v) -> k <> evar) conf_l in
       let l =
         List.filter_map
           (fun (k, v) ->
@@ -195,10 +196,11 @@ let url_set_aux conf evar_l str =
                 (* others *)
                 kl := k :: !kl;
                 Some (Format.sprintf "%s=%s" k v))
-          (new_evar @ conf.henv @ conf.senv @ conf.env)
+          conf_l
       in
       let url = String.concat "&" l in
-      Format.sprintf "%s?%s" href url
+      Format.sprintf "%s?%s%s" href url
+        (if str = "" then "" else Printf.sprintf "&%s=%s" evar str)
 
 let substr_start_aux n s =
   let len = String.length s in
@@ -520,13 +522,13 @@ and eval_transl_lexicon conf upp s c =
   let r =
     let nth = try Some (int_of_string c) with Failure _ -> None in
     match split_at_coloncolon s with
-    | None ->
-        let s2 =
-          match nth with
-          | Some n -> Util.transl_nth conf s n
-          | None -> Util.transl conf s
-        in
-        if c = "n" then s2 else Mutil.nominative s2
+    | None -> (
+        try apply_format conf nth s ""
+        with Failure _ ->
+          raise Not_found
+          (* TODO check the use of if c = "n" then s else Mutil.nominative s
+             nominative expects a : in the string !
+             THis maa conflict with the *))
     | Some (s1, s2) -> (
         try
           if String.length s2 > 0 && s2.[0] = '|' then
@@ -547,6 +549,7 @@ and eval_transl_lexicon conf upp s c =
             let s2 = s3 ^ s5 in
             Util.transl_decline conf s1 s2
           else if String.length s2 > 0 && s2.[0] = ':' then
+            (* this is a third colon *)
             let s2 = String.sub s2 1 (String.length s2 - 1) in
             try apply_format conf nth s1 s2 with Failure _ -> raise Not_found
           else raise Not_found
@@ -907,8 +910,12 @@ let eval_var conf ifun env ep loc sl =
         | _ -> raise Not_found)
     | "today" :: sl ->
         TemplDate.eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
-    | [ "trace"; s ] -> (Printf.eprintf "%s; " s; VVstring "")
-    | [ "tracenl"; s ] -> (Printf.eprintf "%s\n" s; VVstring "")
+    | [ "trace"; s ] ->
+        Printf.eprintf "%s; " s;
+        VVstring ""
+    | [ "tracenl"; s ] ->
+        Printf.eprintf "%s\n" s;
+        VVstring ""
     | s :: sl -> (
         match (get_val ifun.get_vother s env, sl) with
         | Some (VVother f), sl -> f sl
