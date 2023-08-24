@@ -2895,7 +2895,9 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       if (not p_auth) && is_hide_names conf p then false
       else get_qualifiers p <> []
   (* TODO what should this be *)
-  | "has_relations" -> p_auth && Relation.get_related_parents conf base p <> []
+  | "has_relations" ->
+      p_auth
+      && (Relation.get_related_parents conf base p <> [] || get_rparents p <> [])
   | "has_related" -> p_auth && Relation.get_event_witnessed conf base p <> []
   | "has_siblings" -> (
       match get_parents p with
