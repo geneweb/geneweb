@@ -561,6 +561,7 @@ and eval_transl_lexicon conf upp s c =
           in
           Util.transl_decline conf s1 s3)
   in
+  let r = Util.simple_decline conf r in
   let r = Util.translate_eval r in
   if upp then Utf8.capitalize_fst r else r
 

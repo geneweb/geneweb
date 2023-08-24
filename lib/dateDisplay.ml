@@ -44,7 +44,7 @@ let code_date conf encoding d m y =
               if k < j && j + 2 < len && encoding.[j + 1] = '%' then
                 let s = apply_date_code encoding.[j + 2] in
                 let s1 =
-                  if start_with_vowel s then
+                  if start_with_vowel conf s then
                     String.sub encoding (k + 1) (j - k - 1)
                   else String.sub encoding (i + 1) (k - i - 1)
                 in
