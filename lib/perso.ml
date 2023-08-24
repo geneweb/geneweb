@@ -3825,6 +3825,7 @@ let print_foreach conf base print_ast eval_expr =
       | _ -> ()
   in
   let print_foreach_event_witness_relation env al ((p, p_auth) as ep) =
+    (* This is the category "Presence at event" *)
     if p_auth then
       let events_witnesses = Relation.get_event_witnessed conf base p in
       List.iter
@@ -3865,13 +3866,26 @@ let print_foreach conf base print_ast eval_expr =
     | _ -> ()
   in
   let print_foreach_marriage_witnessed env al ((p, _) as ep) =
+    (* TODO put this in Relation *)
+    (* TODO check if this works;
+       in geneanet's template we have a "%foreach;witness_relation;"
+       in the Relations category, but it doesn't seems to print anything.
+       But witnessing a family event is correctly printed im the
+       Presence to event category.
+       maybe it is because we use Gwdb.get_witnesses here and
+       Def.gen_family.witnesses is not in sync with witneses of events in
+       Def.gen_family.fevents *)
     let l =
       let related = List.sort_uniq compare (get_related p) in
       let l = ref [] in
       List.iter
         (fun ic ->
           let c = pget conf base ic in
-          (* TODOWHY: only on Male? probably bugged on same sex or neuter couples *)
+          (* TODO: we iter only on family if it is a Male to not have duplicate
+             because in related (Gwdb.get_related) we have the father and
+             the mother of the family.
+             This should be changed because it does not work on same
+             sex/neuter couples *)
           if get_sex c = Male then
             Array.iter
               (fun ifam ->
@@ -4042,6 +4056,9 @@ let print_foreach conf base print_ast eval_expr =
         (get_qualifiers p)
   in
   let print_foreach_relation env al ((p, p_auth) as ep) =
+    (* TODO print_foreach_relation and print_foreach_related
+       should be merged *)
+    (* This is to print relation attached to [p] (Gwdb.get_rparents) *)
     if p_auth then
       Mutil.list_iter_first
         (fun first r ->
@@ -4051,6 +4068,8 @@ let print_foreach conf base print_ast eval_expr =
         (get_rparents p)
   in
   let print_foreach_related env al ((p, p_auth) as ep) =
+    (* This is to print relation of [p], that are not attached to [p]
+       but attached to persons related to [p] *)
     if p_auth then
       let l = Relation.get_related_parents conf base p in
       List.iter

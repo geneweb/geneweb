@@ -551,9 +551,18 @@ let compute_relationship conf base by_marr p1 p2 =
 (* ----------- *)
 (* TODO cache both function ? *)
 
+(*
+    A relation between two person is only attached to one person (no symmetry in relation type)
+    If two persons have a relation, the relation information is only in one of them
+    To get all relations of a person [p] you need to get relations attached to [p]
+    with [Gwdb.get_rparents p] and all relations attached to other persons that have a relation with [p]
+    use [Gwdb.get_related p] to get a list of person that have a relation with [p]
+*)
 let get_related_parents conf base p =
   let l =
+    (* persons related to [p] *)
     let l = List.sort_uniq compare (get_related p) in
+    (* for each person related to [p] we look for relations they have with [p] *)
     List.fold_left
       (fun acc ic ->
         let c = pget conf base ic in
