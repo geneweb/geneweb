@@ -624,7 +624,7 @@ let get_event_witnessed conf base p =
                         not
                         @@ List.exists
                              (fun (related, relation) ->
-                               related = c && relation.r_type == GodParent)
+                               related = c && relation.r_type = GodParent)
                              related_parents
                       then l := (c, wk, wnote, event_item) :: !l
                   | Witness | Witness_CivilOfficer | Witness_ReligiousOfficer
