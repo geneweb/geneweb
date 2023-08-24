@@ -200,19 +200,21 @@ let events conf base p =
   else
     let pevents = List.map event_item_of_pevent (get_pevents p) in
     let events =
+      (* append fevents *)
       Array.fold_right
         (fun ifam events ->
           let fam = foi base ifam in
           let isp = Gutil.spouse (get_iper p) fam in
-          (* I think we try to get fevents from the spouse to filter fevents
-             with restricted spouse *)
-          match Util.pget_opt conf base isp with
-          | None -> events
-          | Some _p ->
-              List.fold_right
-                (fun fe events ->
-                  event_item_of_fevent ~sp:(Some isp) fe :: events)
-                (get_fevents fam) events)
+          (* filter family event with contemporary spouse *)
+          let m_auth =
+            Util.authorized_age conf base (Util.pget conf base isp)
+          in
+          if not m_auth then events
+          else
+            List.fold_right
+              (fun fe events ->
+                event_item_of_fevent ~sp:(Some isp) fe :: events)
+              (get_fevents fam) events)
         (get_family p) pevents
     in
     events
