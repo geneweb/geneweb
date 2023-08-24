@@ -95,7 +95,7 @@ val authorized_age : config -> base -> person -> bool
 (** Alias to !GWPARAM.p_auth *)
 
 val is_old_person : config -> (iper, iper, istr) gen_person -> bool
-val start_with_vowel : string -> bool
+val start_with_vowel : config -> string -> bool
 
 val acces_n :
   config -> base -> Adef.escaped_string -> person -> Adef.escaped_string
@@ -301,6 +301,7 @@ val transl : config -> string -> string
 val transl_nth : config -> string -> int -> string
 (** [transl_nth conf w n] translate word [w] and returns [n]'th field of its translation (with [nth_field]). *)
 
+val simple_decline : config -> string -> string
 val transl_decline : config -> string -> string -> string
 val ftransl : config -> ('a, 'b) format2 -> ('a, 'b) format2
 val ftransl_nth : config -> ('a, 'b) format2 -> int -> ('a, 'b) format2

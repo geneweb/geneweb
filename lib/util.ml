@@ -101,10 +101,10 @@ let search_in_assets = search_in_path Secure.assets
 
 (* Internationalization *)
 
-let start_with_vowel s =
+let start_with_vowel conf s =
   if String.length s > 0 then
     let s, _ = Name.unaccent_utf_8 true s 0 in
-    match s.[0] with 'a' | 'e' | 'i' | 'o' | 'u' -> true | _ -> false
+    List.mem s.[0] conf.vowels
   else false
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
@@ -177,7 +177,36 @@ let gen_decline_basic wt s =
 let transl_decline conf w s =
   Translate.eval (gen_decline_basic (transl conf w) s)
 
-let gen_decline wt s1 s2 s2_raw =
+(* in string s, handle xxx[aa|bb]Xcc according to X status (vowel) *)
+let simple_decline conf wt =
+  let len = String.length wt in
+  let rec loop i =
+    if i >= len then ""
+    else
+      let s, i =
+        match wt.[i] with
+        | '[' -> (
+            try
+              let j = String.index_from wt i ']' in
+              let k = String.index_from wt i '|' in
+              if k < j && j + 2 < len then
+                let s2 = String.sub wt (j + 1) 1 in
+                let s =
+                  if start_with_vowel conf s2 then
+                    String.sub wt (i + 1) (k - i - 1)
+                  else String.sub wt (k + 1) (j - k - 1)
+                  (*    [aa|bb]  *)
+                in
+                (s, j)
+              else raise Not_found
+            with Not_found -> (String.sub wt i (len - i), len))
+        | c -> (String.make 1 c, i)
+      in
+      s ^ loop (i + 1)
+  in
+  loop 0
+
+let gen_decline conf wt s1 s2 s2_raw =
   let string_of = function '1' -> Some s1 | '2' -> Some s2 | _ -> None in
   let len = String.length wt in
   let rec loop i =
@@ -202,8 +231,8 @@ let gen_decline wt s1 s2 s2_raw =
                 match string_of wt.[j + 2] with
                 | Some s ->
                     let s =
-                      if start_with_vowel s2_raw then
-                        String.sub wt (k + 1) (j - k - 1) ^ s (* [aa|bb]  *)
+                      if start_with_vowel conf s2_raw then
+                        String.sub wt (k + 1) (j - k - 1) ^ s (*    [aa|bb]  *)
                       else String.sub wt (i + 1) (k - i - 1) ^ s (* i  k  j  *)
                     in
                     (s, j + 2)
@@ -217,10 +246,10 @@ let gen_decline wt s1 s2 s2_raw =
   loop 0
 
 let transl_a_of_b conf x y1 y2 =
-  gen_decline (transl_nth conf "%1 of %2" 0) x y1 y2
+  gen_decline conf (transl_nth conf "%1 of %2" 0) x y1 y2
 
 let transl_a_of_gr_eq_gen_lev conf x y1 y2 =
-  gen_decline (transl_nth conf "%1 of %2" 1) x y1 y2
+  gen_decline conf (transl_nth conf "%1 of %2" 1) x y1 y2
 
 let check_format ini_fmt (r : string) =
   let s = string_of_format ini_fmt in
