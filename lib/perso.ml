@@ -1673,6 +1673,8 @@ and eval_simple_str_var conf base env (_, p_auth) = function
   | "relation_type" -> (
       match get_env "rel" env with
       | Vrel (r, None) -> (
+          (* TODO the int in relation_type is for the sex, so I think this is bugged on
+             homosexual couples *)
           match (r.r_fath, r.r_moth) with
           | Some _, None -> relation_type_text conf r.r_type 0 |> safe_val
           | None, Some _ -> relation_type_text conf r.r_type 1 |> safe_val
@@ -1964,22 +1966,26 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let np_auth = authorized_age conf base np in
           eval_person_field_var conf base env (np, np_auth) loc sl
       | None -> raise Not_found)
+  (* in "related" and "relation(_him/her)"
+     Vrel (relation * iper option):
+       relation contains the optional adoptive father/mother
+       the iper option is the person which has the relation attached to (the adoptive child)
+  *)
   | "related" :: sl -> (
       match get_env "rel" env with
       | Vrel ({ r_type = rt }, Some p) ->
-          eval_relation_field_var conf base env
-            (index_of_sex (get_sex p), rt, get_iper p, false)
-            loc sl
+          eval_relation_field_var conf base env rt (get_iper p)
+            ~is_relation:false loc sl
       | _ -> raise Not_found)
   | "relation_her" :: sl -> (
       match get_env "rel" env with
       | Vrel ({ r_moth = Some ip; r_type = rt }, None) ->
-          eval_relation_field_var conf base env (1, rt, ip, true) loc sl
+          eval_relation_field_var conf base env rt ip ~is_relation:true loc sl
       | _ -> raise Not_found)
   | "relation_him" :: sl -> (
       match get_env "rel" env with
       | Vrel ({ r_fath = Some ip; r_type = rt }, None) ->
-          eval_relation_field_var conf base env (0, rt, ip, true) loc sl
+          eval_relation_field_var conf base env rt ip ~is_relation:true loc sl
       | _ -> raise Not_found)
   | "self" :: sl -> eval_person_field_var conf base env ep loc sl
   | "sosa_ref" :: sl -> (
@@ -2028,9 +2034,10 @@ and eval_item_field_var ell = function
       with Failure _ -> raise Not_found)
   | _ -> raise Not_found
 
-and eval_relation_field_var conf base env (i, rt, ip, is_relation) loc =
-  function
+(* is_relation is used to specify the direction of the relation *)
+and eval_relation_field_var conf base env rt ip ~is_relation loc = function
   | [ "type" ] ->
+      let i = index_of_sex (get_sex (pget conf base ip)) in
       if is_relation then safe_val (relation_type_text conf rt i)
       else safe_val (rchild_type_text conf rt i)
   | sl ->
