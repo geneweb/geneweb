@@ -2892,7 +2892,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   (* TODO what should this be *)
   | "has_relations" ->
       p_auth
-      && (Relation.get_related_parents conf base p <> [] || get_rparents p <> [])
+      && (get_rparents p <> [] || Relation.get_related_parents conf base p <> [])
   | "has_related" -> p_auth && Relation.get_event_witnessed conf base p <> []
   | "has_siblings" -> (
       match get_parents p with
