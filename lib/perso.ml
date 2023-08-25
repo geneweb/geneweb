@@ -2899,7 +2899,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   (* TODO what should this be *)
   | "has_relations" ->
       p_auth
-      && (get_rparents p <> [] || Relation.get_related_parents conf base p <> [])
+      && (get_rparents p <> [] || Relation.get_others_related conf base p <> [])
   | "has_related" -> p_auth && Relation.get_event_witnessed conf base p <> []
   | "has_siblings" -> (
       match get_parents p with
@@ -4003,7 +4003,7 @@ let print_foreach conf base print_ast eval_expr =
     (* This is to print relation of [p], that are not attached to [p]
        but attached to persons related to [p] *)
     if p_auth then
-      let l = Relation.get_related_parents conf base p in
+      let l = Relation.get_others_related conf base p in
       List.iter
         (fun (c, r) ->
           let env = ("rel", Vrel (r, Some c)) :: env in

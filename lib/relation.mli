@@ -73,7 +73,7 @@ val simplify_path :
 (* ----------- *)
 (* TODO put them in perso.ml? *)
 
-val get_related_parents : config -> base -> person -> (person * relation) list
+val get_others_related : config -> base -> person -> (person * relation) list
 
 val get_event_witnessed :
   config ->

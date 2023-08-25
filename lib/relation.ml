@@ -558,7 +558,8 @@ let compute_relationship conf base by_marr p1 p2 =
     with [Gwdb.get_rparents p] and all relations attached to other persons that have a relation with [p]
     use [Gwdb.get_related p] to get a list of person that have a relation with [p]
 *)
-let get_related_parents conf base p =
+(* TODO rename this *)
+let get_others_related conf base p =
   let l =
     (* persons related to [p] *)
     let l = List.sort_uniq compare (get_related p) in
@@ -596,7 +597,7 @@ let get_related_parents conf base p =
 
 let get_event_witnessed conf base p =
   let related = List.sort_uniq Stdlib.compare (Gwdb.get_related p) in
-  let related_parents = get_related_parents conf base p in
+  let related_parents = get_others_related conf base p in
   let events_witnesses =
     let l = ref [] in
     let ignore_fevents =
