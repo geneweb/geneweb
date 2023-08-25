@@ -1744,22 +1744,17 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let ep = (p, authorized_age conf base p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
-  | "event_witness_relation" :: sl -> (
-      match get_env "event_witness_relation" env with
-      | Vevent (p, e) ->
-          eval_event_witness_relation_var conf base env (p, e) loc sl
+  | "event_witnessed" :: sl -> (
+      match get_env "event_witnessed" env with
+      | Vevent (p, e) -> eval_event_witnessed_var conf base env (p, e) loc sl
       | _ -> raise Not_found)
-  | "event_witness_relation_kind" :: _ -> (
-      match get_env "event_witness_relation_kind" env with
+  | "event_witness_kind" :: _ -> (
+      match get_env "event_witness_kind" env with
       | Vstring wk -> VVstring wk
       | _ -> raise Not_found)
   | "event_witness_note" :: _ -> (
       match get_env "event_witness_note" env with
       | Vstring wnote -> VVstring wnote
-      | _ -> raise Not_found)
-  | "event_witness_kind" :: _ -> (
-      match get_env "event_witness_kind" env with
-      | Vstring s -> VVstring s
       | _ -> raise Not_found)
   | [ "base"; "name" ] -> VVstring conf.bname
   | [ "base"; "nb_persons" ] ->
@@ -2618,7 +2613,7 @@ and eval_event_field_var conf base env (p, p_auth) event_item loc = function
         eval_str_event_field conf base (p, p_auth) event_item s)
   | _ -> raise Not_found
 
-and eval_event_witness_relation_var conf base env (p, e) loc = function
+and eval_event_witnessed_var conf base env (p, e) loc = function
   | "event" :: sl ->
       let ep = (p, authorized_age conf base p) in
       eval_event_field_var conf base env ep e loc sl
@@ -3812,7 +3807,7 @@ let print_foreach conf base print_ast eval_expr =
             (Event.get_witnesses_and_notes event_item)
       | _ -> ()
   in
-  let print_foreach_event_witness_relation env al ((p, p_auth) as ep) =
+  let print_foreach_event_witnessed env al ((p, p_auth) as ep) =
     (* This is the category "Presence at event" *)
     if p_auth then
       let events_witnesses = Relation.get_event_witnessed conf base p in
@@ -3820,12 +3815,9 @@ let print_foreach conf base print_ast eval_expr =
         (fun (related_person, wk, wnote, evt) ->
           let wk = string_of_witness_kind conf (get_sex p) wk in
           let wnote = Util.escape_html wnote in
+          let env = ("event_witnessed", Vevent (related_person, evt)) :: env in
           let env =
-            ("event_witness_relation", Vevent (related_person, evt)) :: env
-          in
-          let env =
-            ( "event_witness_relation_kind",
-              Vstring (wk : Adef.safe_string :> string) )
+            ("event_witness_kind", Vstring (wk : Adef.safe_string :> string))
             :: ( "event_witness_note",
                  Vstring (wnote : Adef.escaped_string :> string) )
             :: env
@@ -4164,7 +4156,7 @@ let print_foreach conf base print_ast eval_expr =
         print_foreach_epers_event_witness env al ep Epers_Cremation
     | "death_witness" -> print_foreach_epers_event_witness env al ep Epers_Death
     | "event_witness" -> print_foreach_event_witness env al ep
-    | "event_witness_relation" -> print_foreach_event_witness_relation env al ep
+    | "event_witnessed" -> print_foreach_event_witnessed env al ep
     | _ -> raise Not_found
   in
   let print_foreach env ini_ep loc s sl ell al =
