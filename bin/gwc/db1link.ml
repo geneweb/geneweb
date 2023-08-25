@@ -1204,8 +1204,6 @@ let insert_bnotes fname gen nfname str =
 let insert_wiznote gen wizid str =
   gen.g_wiznotes <- (wizid, str) :: gen.g_wiznotes
 
-let map_option f = function Some x -> Some (f x) | None -> None
-
 (** Insert parent in the base and adjust his sex if needed. Concerned
     person is added in the list of parent's related persons. *)
 let insert_relation_parent state gen ip s k =
@@ -1220,8 +1218,8 @@ let insert_relation_parent state gen ip s k =
 let insert_relation state gen ip r =
   {
     r_type = r.r_type;
-    r_fath = map_option (insert_relation_parent state gen ip Male) r.r_fath;
-    r_moth = map_option (insert_relation_parent state gen ip Female) r.r_moth;
+    r_fath = Option.map (insert_relation_parent state gen ip Male) r.r_fath;
+    r_moth = Option.map (insert_relation_parent state gen ip Female) r.r_moth;
     r_sources = unique_string gen r.r_sources;
   }
 
