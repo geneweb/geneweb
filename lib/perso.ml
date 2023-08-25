@@ -2014,11 +2014,6 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let ep = (p, authorized_age conf base p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
-  | "witness_relation" :: sl -> (
-      match get_env "fam" env with
-      | Vfam (i, f, c, m) ->
-          eval_witness_relation_var conf base env (i, f, c, m) loc sl
-      | _ -> raise Not_found)
   | sl -> eval_person_field_var conf base env ep loc sl
 
 and eval_item_field_var ell = function
@@ -3337,20 +3332,6 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "title" -> person_title conf base p |> safe_val
   | _ -> raise Not_found
 
-and eval_witness_relation_var conf base env
-    ((_, _, (ip1, ip2, _), m_auth) as fcd) loc = function
-  | [] ->
-      if not m_auth then null_val
-      else
-        Printf.sprintf
-          (ftransl conf "witness at marriage of %s and %s")
-          (pget conf base ip1 |> referenced_person_title_text conf base
-            :> string)
-          (pget conf base ip2 |> referenced_person_title_text conf base
-            :> string)
-        |> str_val
-  | sl -> eval_family_field_var conf base env fcd loc sl
-
 and eval_family_field_var conf base env
     ((_, fam, (ifath, imoth, _), m_auth) as fcd) loc = function
   | "father" :: sl -> (
@@ -3865,62 +3846,6 @@ let print_foreach conf base print_ast eval_expr =
         ()
     | _ -> ()
   in
-  let print_foreach_marriage_witnessed env al ((p, _) as ep) =
-    (* TODO put this in Relation *)
-    (* TODO check if this works;
-       in geneanet's template we have a "%foreach;witness_relation;"
-       in the Relations category, but it doesn't seems to print anything.
-       But witnessing a family event is correctly printed im the
-       Presence to event category.
-       maybe it is because we use Gwdb.get_witnesses here and
-       Def.gen_family.witnesses is not in sync with witneses of events in
-       Def.gen_family.fevents *)
-    let l =
-      let related = List.sort_uniq compare (get_related p) in
-      let l = ref [] in
-      List.iter
-        (fun ic ->
-          let c = pget conf base ic in
-          (* TODO: we iter only on family if it is a Male to not have duplicate
-             because in related (Gwdb.get_related) we have the father and
-             the mother of the family.
-             This should be changed because it does not work on same
-             sex/neuter couples *)
-          if get_sex c = Male then
-            Array.iter
-              (fun ifam ->
-                let fam = foi base ifam in
-                if Array.mem (get_iper p) (get_witnesses fam) then
-                  l := (ifam, fam) :: !l)
-              (get_family c))
-        related;
-      !l
-    in
-    let l =
-      List.sort
-        (fun (_, fam1) (_, fam2) ->
-          match
-            ( Date.od_of_cdate (get_marriage fam1),
-              Date.od_of_cdate (get_marriage fam2) )
-          with
-          | Some d1, Some d2 -> Date.compare_date d1 d2
-          | _ -> 0)
-        l
-    in
-    List.iter
-      (fun (ifam, fam) ->
-        let ifath = get_father fam in
-        let imoth = get_mother fam in
-        let cpl = (ifath, imoth, imoth) in
-        let m_auth =
-          authorized_age conf base (pget conf base ifath)
-          && authorized_age conf base (pget conf base imoth)
-        in
-        if m_auth then
-          let env = ("fam", Vfam (ifam, fam, cpl, true)) :: env in
-          List.iter (print_ast env ep) al)
-      l
-  in
   let print_foreach_family env al ini_ep (p, _) =
     match get_env "p_link" env with
     | Vbool _ ->
@@ -4233,7 +4158,6 @@ let print_foreach conf base print_ast eval_expr =
     | "death_witness" -> print_foreach_epers_event_witness env al ep Epers_Death
     | "event_witness" -> print_foreach_event_witness env al ep
     | "event_witness_relation" -> print_foreach_event_witness_relation env al ep
-    | "witness_relation" -> print_foreach_marriage_witnessed env al ep
     | _ -> raise Not_found
   in
   let print_foreach env ini_ep loc s sl ell al =

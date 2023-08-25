@@ -116,10 +116,6 @@
   [*navigation with %t as Sosa reference:::xxx]
 %end;
 
-%define;witness_relation(xxx, yyy)
-  [*witness at marriage of %s and %s:::xxx:yyy]
-%end;
-
 %define;age_at_birth_of(xxx)
   [age at %s birth date:::xxx]%sp;
 %end;
