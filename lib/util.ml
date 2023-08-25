@@ -1948,36 +1948,26 @@ let only_printable_or_nl = gen_only_printable true
 let only_printable = gen_only_printable false
 
 let relation_type_text conf t n =
-  match t with
-  | Adoption ->
-      transl_nth conf "adoptive father/adoptive mother/adoptive parents" n
-      |> Adef.safe
-  | Recognition ->
-      transl_nth conf
-        "recognizing father/recognizing mother/recognizing parents" n
-      |> Adef.safe
-  | CandidateParent ->
-      transl_nth conf "candidate father/candidate mother/candidate parents" n
-      |> Adef.safe
-  | GodParent -> transl_nth conf "godfather/godmother/godparents" n |> Adef.safe
-  | FosterParent ->
-      transl_nth conf "foster father/foster mother/foster parents" n
-      |> Adef.safe
+  let s =
+    match t with
+    | Adoption -> "adoptive father/adoptive mother/adoptive parents"
+    | Recognition -> "recognizing father/recognizing mother/recognizing parents"
+    | CandidateParent -> "candidate father/candidate mother/candidate parents"
+    | GodParent -> "godfather/godmother/godparents"
+    | FosterParent -> "foster father/foster mother/foster parents"
+  in
+  Adef.safe @@ transl_nth conf s n
 
 let rchild_type_text conf t n =
-  match t with
-  | Adoption ->
-      transl_nth conf "adoptive son/adoptive daughter/adoptive child" n
-      |> Adef.safe
-  | Recognition ->
-      transl_nth conf "recognized son/recognized daughter/recognized child" n
-      |> Adef.safe
-  | CandidateParent ->
-      transl_nth conf "candidate son/candidate daughter/candidate child" n
-      |> Adef.safe
-  | GodParent -> transl_nth conf "godson/goddaughter/godchild" n |> Adef.safe
-  | FosterParent ->
-      transl_nth conf "foster son/foster daughter/foster child" n |> Adef.safe
+  let s =
+    match t with
+    | Adoption -> "adoptive son/adoptive daughter/adoptive child"
+    | Recognition -> "recognized son/recognized daughter/recognized child"
+    | CandidateParent -> "candidate son/candidate daughter/candidate child"
+    | GodParent -> "godson/goddaughter/godchild"
+    | FosterParent -> "foster son/foster daughter/foster child"
+  in
+  Adef.safe @@ transl_nth conf s n
 
 exception Ok
 
