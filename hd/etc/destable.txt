@@ -599,7 +599,7 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
         %if;(wizard and not cancel_links)
           <a class="small" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;" title="[*modify::family/families]0 %xxx; [and] %xxx.spouse;">
           %if;(slash_marriage_date != "")%slash_marriage_date;%else;<span class="fa fa-venus-mars
-            %if;((xxx.is_male and spouse.xxx.is_female) or (xxx.is_female and xxx.spouse.is_female))venus-mars%elseif;(xxx.is_male and spouse.xxx.is_male)mars-double%else;(xxx.is_female and spouse.xxx.is_female)venus-double%end; fa-rotate-180 small"></span>%end;</a>%nn;
+            %if;((xxx.is_male and xxx.spouse.is_female) or (xxx.is_female and xxx.spouse.is_male))venus-mars%elseif;(xxx.is_male and xxx.spouse.is_male)mars-double%else;(xxx.is_female and xxx.spouse.is_female)venus-double%end; fa-rotate-180 small"></span>%end;</a>%nn;
         %else;
           %slash_marriage_date;%nn;
         %end;
@@ -700,10 +700,10 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
         %if;(wizard and not cancel_links)
           <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;" title="[*modify::family/families]0 %xxx; [and] %xxx.spouse;">
           %if;(marriage_date.year != "")<span class="nowrap">%marriage_date.year;</span>%else;<span class="fa fa-venus-mars
-            %if;((xxx.is_male and spouse.xxx.is_female) or
-                (xxx.is_female and xxx.spouse.is_female))venus-mars%nn;
-            %elseif;(xxx.is_male and spouse.xxx.is_male)mars-double%nn;
-            %else;(xxx.is_female and spouse.xxx.is_female)venus-double%nn;
+            %if;((xxx.is_male and xxx.spouse.is_female) or
+                (xxx.is_female and xxx.spouse.is_male))venus-mars%nn;
+            %elseif;(xxx.is_male and xxx.spouse.is_male)mars-double%nn;
+            %else;(xxx.is_female and xxx.spouse.is_female)venus-double%nn;
             %end; fa-rotate-180 small"></span>%end;</a>%nn;
         %else;
           %marriage_date.year;%nn;
