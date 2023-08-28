@@ -487,27 +487,23 @@ let reconstitute_family conf base nsck =
   let relation =
     match parents with
     | [ father; mother ] -> (
-        let father_sex =
-          match father with
+        let get_sex p =
+          match p with
           | _, _, _, Update.Create (sex, _), _ -> sex
           | f, s, o, Update.Link, _ -> (
               match person_of_key base f s o with
               | Some ip -> get_sex (poi base ip)
-              | _ -> Neuter)
+              | None -> Neuter)
         in
-        let mother_sex =
-          match mother with
-          | _, _, _, Update.Create (sex, _), _ -> sex
-          | f, s, o, Update.Link, _ -> (
-              match person_of_key base f s o with
-              | Some ip -> get_sex (poi base ip)
-              | _ -> Neuter)
-        in
-        match (father_sex, mother_sex) with
+        match (get_sex father, get_sex mother) with
         | Male, Male | Female, Female -> (
             match relation with
             | Married -> NoSexesCheckMarried
-            | _ -> NoSexesCheckNotMarried)
+            | NotMarried | Engaged | NoSexesCheckNotMarried | NoMention
+            | NoSexesCheckMarried | MarriageBann | MarriageContract
+            | MarriageLicense | Pacs | Residence ->
+                (* TODO this doesn't look correct *)
+                NoSexesCheckNotMarried)
         | _ -> relation)
     | _ -> relation
   in
