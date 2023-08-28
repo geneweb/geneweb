@@ -96,6 +96,7 @@ let get_new_occ p =
 type mfam = {
   m_ifam : ifam;
   m_fam : family;
+  (* TODO rename as m_parent1 m_parent2 to avoid same sex bugs *)
   m_fath : person;
   m_moth : person;
   m_chil : person array;
@@ -764,19 +765,24 @@ let print_empty_family opts base p =
 
 let print_family opts base gen m =
   let fam = m.m_fam in
-  let fath, moth = (m.m_fath, m.m_moth) in
+  let fath, moth =
+    (* check for inversion of father/mother *)
+    if get_sex m.m_fath = Female && get_sex m.m_moth = Male then
+      (m.m_moth, m.m_fath)
+    else (m.m_fath, m.m_moth)
+  in
   if eq_iper (get_iper fath) dummy_iper || eq_iper (get_iper moth) dummy_iper
   then ()
   else (
     Printf.ksprintf (oc opts) "fam ";
-    print_parent opts base gen m.m_fath;
+    print_parent opts base gen fath;
     Printf.ksprintf (oc opts) " +";
     print_date_option opts (Date.od_of_cdate (get_marriage fam));
     let print_sexes s =
       let c x =
         match get_sex x with Male -> 'm' | Female -> 'f' | Neuter -> '?'
       in
-      Printf.ksprintf (oc opts) " %s %c%c" s (c m.m_fath) (c m.m_moth)
+      Printf.ksprintf (oc opts) " %s %c%c" s (c fath) (c moth)
     in
     let relation =
       (* calling Update_util.map_nosexcheck should not be needed here
@@ -818,7 +824,7 @@ let print_family opts base gen m =
         Printf.ksprintf (oc opts) " -";
         print_date_option opts d);
     Printf.ksprintf (oc opts) " ";
-    print_parent opts base gen m.m_moth;
+    print_parent opts base gen moth;
     Printf.ksprintf (oc opts) "\n";
     let witnesses =
       Array.map (fun ip -> (ip, Witness, empty_string)) (get_witnesses fam)
@@ -853,7 +859,7 @@ let print_family opts base gen m =
     (match Array.length m.m_chil with
     | 0 -> ()
     | _ ->
-        let fam_surname = get_surname m.m_fath in
+        let fam_surname = get_surname fath in
         Printf.ksprintf (oc opts) "beg\n";
         Array.iter
           (fun p ->
@@ -864,10 +870,8 @@ let print_family opts base gen m =
     Gwdb.Marker.set gen.fam_done m.m_ifam true;
     let from =
       Printf.sprintf "family \"%s.%d %s\" & \"%s.%d %s\""
-        (p_first_name base m.m_fath)
-        (get_new_occ m.m_fath) (p_surname base m.m_fath)
-        (p_first_name base m.m_moth)
-        (get_new_occ m.m_moth) (p_surname base m.m_moth)
+        (p_first_name base fath) (get_new_occ fath) (p_surname base fath)
+        (p_first_name base moth) (get_new_occ moth) (p_surname base moth)
     in
     let s =
       let sl =
