@@ -1250,7 +1250,6 @@ let print_add o_conf base =
     | Some err, _ | _, Some err -> error_family conf err
     | None, None ->
         let sfam, sdes = strip_family sfam sdes in
-        let nsck = p_getenv conf.env "nsck" = Some "on" in
         let ifam, fam, cpl, des = effective_add conf base nsck sfam scpl sdes in
         let () = patch_parent_with_pevents base cpl in
         let () = patch_children_with_pevents base des in
