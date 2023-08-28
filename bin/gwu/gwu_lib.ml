@@ -770,7 +770,24 @@ let print_family opts base gen m =
       in
       Printf.ksprintf (oc opts) " %s %c%c" s (c m.m_fath) (c m.m_moth)
     in
-    (match get_relation fam with
+    let relation =
+      (* calling Update_util.map_nosexcheck should not be needed here
+         because this mapping should already have been done in UpdateFamOk
+         but in case of a buggy base we redo the mapping here
+
+         we need to do this mapping because in the case of Married|NotMarried|Engaged
+         sexes are not printed and are assumed to be Male,Female at import
+
+         TODO I think it is still bugged in case of a couple with Neuter sex
+      *)
+      let relation = get_relation fam in
+      let fath_sex = get_sex fath in
+      let moth_sex = get_sex moth in
+      match (fath_sex, moth_sex) with
+      | Male, Male | Female, Female -> Update_util.map_nosexcheck relation
+      | _ -> relation
+    in
+    (match relation with
     | Married -> ()
     | NotMarried -> Printf.ksprintf (oc opts) " #nm"
     | Engaged -> Printf.ksprintf (oc opts) " #eng"

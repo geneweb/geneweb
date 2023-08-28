@@ -379,14 +379,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
   let marr =
     if nsck then
       let relation, date, place, note, src = marr in
-      let relation =
-        match relation with
-        | Married -> NoSexesCheckMarried
-        | ( NotMarried | Engaged | NoSexesCheckNotMarried | NoMention
-          | NoSexesCheckMarried | MarriageBann | MarriageContract
-          | MarriageLicense | Pacs | Residence ) as x ->
-            x
-      in
+      let relation = Update_util.map_nosexcheck relation in
       (relation, date, place, note, src)
     else marr
   in
@@ -471,6 +464,9 @@ let reconstitute_family conf base nsck =
   let relation, marriage, marriage_place, marriage_note, marriage_src = marr in
   (* Si parents de même sex ... Pas de mode multi parent. *)
   let relation =
+    (* I think relation here is unused because latter we get it from reconstitute_from_fevents,
+       in which relations others than Married are not mapped to NoSexesCheckNotMarried,
+       this would explain why it does not cause a bug *)
     match parents with
     | [ father; mother ] -> (
         let get_sex p =
@@ -483,12 +479,12 @@ let reconstitute_family conf base nsck =
         in
         match (get_sex father, get_sex mother) with
         | Male, Male | Female, Female -> (
+            (* TODO this doesn't look correct and should probably be Update_util.map_nosexcheck *)
             match relation with
             | Married -> NoSexesCheckMarried
             | NotMarried | Engaged | NoSexesCheckNotMarried | NoMention
             | NoSexesCheckMarried | MarriageBann | MarriageContract
             | MarriageLicense | Pacs | Residence ->
-                (* TODO this doesn't look correct *)
                 NoSexesCheckNotMarried)
         | _ -> relation)
     | _ -> relation
