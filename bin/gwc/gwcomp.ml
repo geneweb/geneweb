@@ -712,6 +712,12 @@ let get_mar_date str = function
           try ((v, decode_sex 0, decode_sex 1), l)
           with _ -> ((v, Male, Female), c :: l)
         in
+        (* Sexes are not specified in the case of (Married|NotMarried|Engaged)
+           In those cases sexes are assumed to be (Male,Female)
+           So in the case of same sex couple, to specify sexes, we map
+            | Married -> NoSexesCheckMarried
+            | NotMarried -> NoSexesCheckNotMarried
+           See Update_util.map_nosexcheck *)
         match l with
         | "#nm" :: l -> ((NotMarried, Male, Female), l)
         | "#eng" :: l -> ((Engaged, Male, Female), l)
