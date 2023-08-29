@@ -91,7 +91,7 @@
       %end;
       %if;(evar.m="D" and (evar.marr="on" or evar.marr_place="on" or evar.marr_date="on"))
         <span class="sr-only">—</span>
-        <a role="button" class="btn btn-link ml-1 px-0%if;(evar.t!="H") text-danger%end;"
+        <a role="button" class="btn btn-link ml-1 px-0%if;(evar.t!="I") text-danger%end;"
            href="%prefix_base_password;%nn;
                  %foreach;env_binding;
                    %if;(env.key="t")&t=%if;(evar.t="H")I%elseif;(evar.t="I")H%end;%nn;
