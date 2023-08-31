@@ -341,13 +341,16 @@ and eval_key conf base (fn, sn, oc, create, _) = function
   | [ "create" ] -> str_val (if create <> Update.Link then "create" else "link")
   | [ "create"; s ] -> Update_util.eval_create create s
   | [ "first_name" ] -> safe_val (Util.escape_html fn :> Adef.safe_string)
-  | [ "occ" ] -> str_val (if oc = 0 then "" else string_of_int oc)
+  | [ "occ" ] -> str_val (string_of_int oc)
   | [ "surname" ] -> safe_val (Util.escape_html sn :> Adef.safe_string)
   | [ "sex" ] ->
       if create = Update.Link then
         let sex = get_parent_sex conf base fn sn oc in
         str_val (string_of_int sex)
       else Update_util.eval_create create "sex"
+  | [ "index" ] -> (match person_of_key base fn sn oc with
+      | Some ip -> str_val (string_of_iper ip)
+      | _ -> str_val (string_of_iper Gwdb.dummy_iper))
   | [ "sexes" ] ->
       (* this is somewhat of a hack to determine same sex situations *)
       (* updateFam.ml does not provide adequate mechanisms to test   *)

@@ -235,7 +235,7 @@ and eval_simple_var conf base env p = function
           incr c;
           str_val ""
       | _ -> str_val "")
-  | [ "occ" ] -> str_val (if p.occ <> 0 then string_of_int p.occ else "")
+  | [ "occ" ] -> str_val (string_of_int p.occ)
   | [ "occupation" ] ->
       safe_val (Util.escape_html p.occupation :> Adef.safe_string)
   | [ "of_course_dead" ] -> bool_val (p.death = OfCourseDead)
@@ -249,7 +249,7 @@ and eval_simple_var conf base env p = function
             try Some (List.nth p.rparents (i - 1)) with Failure _ -> None)
         | _ -> None
       in
-      eval_relation_var r sl
+      eval_relation_var base r sl
   | [ "sources" ] -> safe_val (Util.escape_html p.psources :> Adef.safe_string)
   | [ "surname" ] -> safe_val (Util.escape_html p.surname :> Adef.safe_string)
   | [ "surname_alias" ] -> eval_string_env "surname_alias" env
@@ -313,7 +313,7 @@ and eval_simple_var conf base env p = function
                     then ("", "", 0, Update.Create (Neuter, None), "")
                     else raise Not_found
                   in
-                  eval_person_var k sl
+                  eval_person_var base k sl
               | _ -> raise Not_found)
           | None -> raise Not_found)
       | _ -> raise Not_found)
@@ -449,21 +449,21 @@ and eval_title_var t = function
       | _ -> str_val "")
   | _ -> raise Not_found
 
-and eval_relation_var r = function
+and eval_relation_var base r = function
   | "r_father" :: sl ->
       let x =
         match r with
         | Some { r_fath = Some x } -> x
         | _ -> ("", "", 0, Update.Create (Neuter, None), "")
       in
-      eval_person_var x sl
+      eval_person_var base x sl
   | "r_mother" :: sl ->
       let x =
         match r with
         | Some { r_moth = Some x } -> x
         | _ -> ("", "", 0, Update.Create (Neuter, None), "")
       in
-      eval_person_var x sl
+      eval_person_var base x sl
   | [ "rt_adoption" ] -> eval_is_relation_type Adoption r
   | [ "rt_candidate_parent" ] -> eval_is_relation_type CandidateParent r
   | [ "rt_empty" ] -> (
@@ -475,7 +475,7 @@ and eval_relation_var r = function
   | [ "rt_recognition" ] -> eval_is_relation_type Recognition r
   | _ -> raise Not_found
 
-and eval_person_var (fn, sn, oc, create, _) = function
+and eval_person_var base (fn, sn, oc, create, _) = function
   | [ "create" ] -> (
       match create with
       | Update.Create (_, _) -> bool_val true
@@ -483,8 +483,19 @@ and eval_person_var (fn, sn, oc, create, _) = function
   | [ "create"; s ] -> Update_util.eval_create create s
   | [ "first_name" ] -> safe_val (Util.escape_html fn :> Adef.safe_string)
   | [ "link" ] -> bool_val (create = Update.Link)
-  | [ "occ" ] -> str_val (if oc = 0 then "" else string_of_int oc)
+  | [ "occ" ] -> str_val (string_of_int oc)
   | [ "surname" ] -> safe_val (Util.escape_html sn :> Adef.safe_string)
+  | [ "index" ] -> (
+      match person_of_key base fn sn oc with
+      | Some ip -> str_val (string_of_iper ip)
+      | _ -> str_val (string_of_iper Gwdb.dummy_iper))
+  | [ "sex" ] ->
+      let sex =
+        match person_of_key base fn sn oc with
+        | Some ip -> get_sex (poi base ip) |> index_of_sex |> string_of_int
+        | _ -> Neuter |> index_of_sex |> string_of_int
+      in
+      str_val sex
   | _ -> raise Not_found
 
 and eval_is_death_reason dr = function
