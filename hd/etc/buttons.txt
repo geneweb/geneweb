@@ -50,7 +50,7 @@
   </a>
 </div>
 %define;size_btn(xxx,yyy)
-    <a role="button" class="btn btn-link px-0%if;(e.csv="on" or e.t="Y" or e.im=0) disabled%end;"
+    <a role="button" class="btn btn-link px-0%if;(e.csv=1 or e.t="Y" or e.im=0) disabled%end;"
       title="[*modify the size of images to] xxx px"
       href="%prefix_base_password;%nn;
              %foreach;env_binding;
@@ -63,15 +63,15 @@
   <div class="button-group" role="group" aria-label="nav buttons">
     %if;(istable=1)
       %( TODO allfn sur table/couple %)
-      <a role="button" class="btn btn-link mx-0 px-0 mr-1 %if;(e.t="Y" or e.csv="on") disabled%end;"
+      <a role="button" class="btn btn-link mx-0 px-0 mr-1 %if;(e.t="Y" or e.csv=1) disabled%end;"
         href="%if;(e.fn=1)%url_set.fn;%else;%url_set.fn.1;%end;" title="[*visualize/show/hide/summary]1 %if;(e.fn=1)[public name]%else;[first name/first names]1%end;">%nn;
         <i class="fas fa-address-%if;(e.fn=1)book%else;card%end; fa-fw fa-lg" aria-hidden="true"></i>%nn;
       </a>
-      <a role="button" class="btn btn-link mx-0 px-0 mr-1 %if;(e.t="Y" or e.csv="on") disabled%end;%if;(e.tt=1) text-danger%end;"
+      <a role="button" class="btn btn-link mx-0 px-0 mr-1 %if;(e.t="Y" or e.csv=1) disabled%end;%if;(e.tt=1) text-danger%end;"
         href="%if;(e.tt=1)%url_set.tt;%else;%url_set.tt.1;%end;" title="%if;(e.tt=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [title/titles]1">%nn;
         <i class="fas fa-crown fa-fw fa-lg" aria-hidden="true"></i>%nn;
       </a>
-      <a role="button" class="btn btn-link mx-0 px-0%if;(e.csv="on") disabled%end;%if;(e.im=0) text-danger%end;"
+      <a role="button" class="btn btn-link mx-0 px-0%if;(e.csv=1) disabled%end;%if;(e.im=0) text-danger%end;"
         href="%if;(e.im!=0)%url_set.im.0;%else;%url_set.im;%end;"
           title="%if;(e.im!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [image/images]1">%nn;
         <i class="fa fa-image fa-lg fa-fw" aria-hidden="true"></i>%nn;
@@ -82,7 +82,7 @@
       %apply;size_btn(120,"fa-lg")
       %if;(e.templ="")
       <span class="sr-only">—</span>
-      <a role="button" class="btn btn-link px-0%if;(e.ns=1) text-danger%end;%if;(e.t="Y" or e.csv="on") disabled%end;"
+      <a role="button" class="btn btn-link px-0%if;(e.ns=1) text-danger%end;%if;(e.t="Y" or e.csv=1) disabled%end;"
         title="%if;(e.ns=1)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [note/notes]1 [and] [source/sources]1%if;(e.ns=""). [*colored corner]%end;"
         href="%if;(e.ns=1)%url_set.ns;%else;%url_set.ns.1;%end;">
         <i class="far fa-sticky-note fa-flip-vertical fa-lg fa-fw mb-1 mr-1" aria-hidden="true"></i>%nn;
@@ -101,7 +101,7 @@
           <i class="fas fa-info fa-lg mr-1" aria-hidden="true"></i><i class="fa fa-male" aria-hidden="true"></i><i class="fa fa-female" aria-hidden="true"></i>
         </a>
       %end;
-      <a role="button" class="btn btn-link px-0%if;(e.csv="on" or e.t="Y") disabled%else;%if;(e.hl=1) text-warning%end;%end;"
+      <a role="button" class="btn btn-link px-0%if;(e.csv=1 or e.t="Y") disabled%else;%if;(e.hl=1) text-warning%end;%end;"
         href="%prefix_base_password;%nn;
               %foreach;env_binding;
                 %if;(env.key!="hl" and env.key!="")&%env.key=%env.val;%end;
@@ -134,13 +134,9 @@
     %if;(e.m="A")
       <span class="sr-only">—</span>
       <a role="button" class="btn btn-link px-0%if;(e.t="Y") disabled%end;"%sp;
-        href="%prefix_base_password;%nn;
-                 %foreach;env_binding;
-                   %if;(env.key!="csv" and env.key!="")&%env.key=%env.val;%end;%nn;
-                 %end;
-                 %if;(e.csv!="on")&csv=on%end;"
-        title="%if;(e.csv="on")[*visualize/show/hide/summary]2 CSV [and] [visualize/show/hide/summary]1 [table] [ancestor/ancestors]1%else;[*visualize/show/hide/summary]1 CSV%end;">%nn;
-          <i class="fa fa-file-csv fa-lg fa-fw %if;(e.csv="on")text-danger%end;" aria-hidden="true"></i>%nn;
+        href="%if(e.csv!=1)%url_set.csv.1;%else;%url_set.csv;%end;"
+        title="%if;(e.csv=1)[*visualize/show/hide/summary]2 CSV [and] [visualize/show/hide/summary]1 [table] [ancestor/ancestors]1%else;[*visualize/show/hide/summary]1 CSV%end;">%nn;
+          <i class="fa fa-file-csv fa-lg fa-fw %if;(e.csv=1)text-danger%end;" aria-hidden="true"></i>%nn;
       </a>
     %end;
     <span class="sr-only">—</span>

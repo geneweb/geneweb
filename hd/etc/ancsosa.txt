@@ -2065,7 +2065,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
   </table>
 
 %elseif;(e.t = "Z")
-  %if;(e.csv!="on")
+  %if;(e.csv!=1)
     %reset_count;
     <table class="table table-hover ascends_table mt-1">
       %apply;table_header()
@@ -2124,11 +2124,6 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       ;family_index%nn;<br>
       %reset_count;
       %foreach;ancestor_level(l_v)
-        %if;(e.only!="on" or (e.only="on" and level=e.v))
-          %if;(e.gen=1)
-            [*generation/generations]0 %level;<br>
-          %end;
-        %end;
         %foreach;ancestor;
           %if;(level>0 and (e.only!="on" or level=l_v))
             %apply;csv_row("ancestor")
