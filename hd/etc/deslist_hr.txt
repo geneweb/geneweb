@@ -160,7 +160,7 @@
         %end;
       %end;
     %in;
-    %let;l231;%if;(is_male)━%elseif(is_female)─%else;╍%end;%in;
+    %let;l231;%if;(is_male)━━%elseif(is_female)──%else;╍%end;%in;
     %let;l24;
       %if;(browsing_with_sosa_ref and has_sosa)
         %if;(has_siblings)◀%else;◁%end;
