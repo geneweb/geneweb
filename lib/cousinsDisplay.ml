@@ -25,6 +25,16 @@ let cnt = ref 0
 let cnt_sp = ref 0
 
 let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
+  let sps =
+    match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
+  in
+  let img =
+    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
+  in
   let reference _ _ p (s : Adef.safe_string) =
     if is_hidden p then s
     else
@@ -37,17 +47,9 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
         ^<^ acces_n conf base (Adef.escaped "2") p2
         ^^^ "&b2="
         ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2))
-        ^<^ (if (List.assoc_opt "spouse" conf.env :> string option) = Some "on"
-             then Adef.encoded "&spouse=on"
-             else if (List.assoc_opt "sp" conf.env :> string option) = Some "on"
-             then Adef.encoded "&sp=on"
-             else Adef.encoded ""
+        ^<^ (if sps then Adef.encoded "" else Adef.encoded "&sp=0"
               :> Adef.escaped_string)
-        ^^^ (if Util.p_getenv conf.env "image" = Some "off" then
-               Adef.encoded "&image=off"
-             else if Util.p_getenv conf.env "im" = Some "off" then
-               Adef.encoded "&im=off"
-             else Adef.encoded ""
+        ^^^ (if img then Adef.encoded "" else Adef.encoded "&im=0"
               :> Adef.escaped_string)
         ^^^ "&bd="
         ^<^ (Option.value ~default:(Adef.encoded "0")
@@ -70,17 +72,9 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
         ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2))
         ^<^ "&"
         ^<^ acces_n conf base (Adef.escaped "4") p3
-        ^^^ (if Util.p_getenv conf.env "sp" = Some "on" then
-               Adef.encoded "&sp=on"
-             else if Util.p_getenv conf.env "spouse" = Some "on" then
-               Adef.encoded "&spouse=on"
-             else Adef.encoded ""
+        ^^^ (if sps then Adef.encoded "" else Adef.encoded "&sp=0"
               :> Adef.escaped_string)
-        ^^^ (if Util.p_getenv conf.env "im" = Some "off" then
-               Adef.encoded "&im=off"
-             else if Util.p_getenv conf.env "image" = Some "off" then
-               Adef.encoded "&image=off"
-             else Adef.encoded ""
+        ^^^ (if img then Adef.encoded "" else Adef.encoded "&im=0"
               :> Adef.escaped_string)
         ^^^ "&bd="
         ^<^ (Option.value ~default:(Adef.encoded "0")
@@ -422,9 +416,9 @@ let print_anniv conf base p dead_people level =
             (Option.fold ~none:c ~some:(pget conf base) spouse)
       ^^^ "&b2="
       ^<^ string_of_int (sosa_of_persons conf base down_br)
-      ^<^ (if spouse = None then "&" ^<^ acces_n conf base (Adef.escaped "4") c
-          else Adef.escaped "")
-      ^>^ "&sp=on"
+      ^<^
+      if spouse = None then "&" ^<^ acces_n conf base (Adef.escaped "4") c
+      else Adef.escaped ""
     in
     "<a href=\""
     ^<^ (href :> Adef.safe_string)

@@ -63,7 +63,7 @@ let image_txt conf base p =
   Adef.safe
   @@
   match (p_getenv conf.env "im", p_getenv conf.env "image") with
-  | Some "off", _ | Some "0", _ | _, Some "off" -> ""
+  | Some ("off" | "0"), _ | _, Some "off" -> ""
   | _, _ -> (
       match Image.get_portrait_with_size conf base p with
       | None -> ""
@@ -709,8 +709,8 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let spouse_on =
     match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
-    | Some "on", _ | Some "1", _ | _, Some "on" -> true
-    | _, _ -> false
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
   in
   let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
   let indi_ip n =
@@ -781,6 +781,7 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   else Dag2html.html_table_struct indi_ip indi_txt vbar_txt phony d t
 
 let print_slices_menu conf hts =
+  let cgl = p_getenv conf.env "cgl" = Some "on" in
   let header n =
     transl_nth conf "display by slices/slice width/overlap/total width" n
     |> Utf8.capitalize_fst |> Output.print_sstring conf
@@ -788,7 +789,7 @@ let print_slices_menu conf hts =
   let title _ = header 0 in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Util.include_template conf conf.env "buttons_rel" (fun () -> ());
+  if cgl then () else Hutil.interp_no_env conf "buttons_rel";
   Output.print_sstring conf {|<form method="get" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|"><p>|};
@@ -826,8 +827,10 @@ let print_dag_page conf page_title hts next_txt =
   let cgl = p_getenv conf.env "cgl" = Some "on" in
   let title _ = Output.print_string conf page_title in
   Hutil.header_no_page_title conf title;
-  if cgl then ()
-  else Util.include_template conf conf.env "buttons_rel" (fun () -> ());
+  (* title goes into <title> ... </title> *)
+  (* page title is handled by buttons_rel!! *)
+  (* TODO manage page title if cgl on !! *)
+  if cgl then () else Hutil.interp_no_env conf "buttons_rel";
   print_html_table conf hts;
   if (next_txt : Adef.escaped_string :> string) <> "" then
     if cgl then Output.print_sstring conf {|">&gt;&gt;</p>|}
@@ -1252,7 +1255,7 @@ let print_slices_menu_or_dag_page conf base page_title hts next_txt =
         ("vars", Vvars (ref []));
         ("dag", Vlazy (Lazy.from_fun table_pre_dim));
         ("p_title", Vsstring page_title);
-        ("next_text", Vestring next_txt);
+        ("next_txt", Vestring next_txt);
       ]
     in
 

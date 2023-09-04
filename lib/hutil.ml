@@ -149,6 +149,24 @@ let interp_no_header conf fname ifun env ep =
 
 let interp conf fname ifun env ep = gen_interp true conf fname ifun env ep
 
+type 'a env = Vint of int | Vother of 'a | Vnone
+
+let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_vother = function Vother x -> Some x | _ -> None
+let set_vother x = Vother x
+
+let interp_no_env conf fname =
+  interp_no_header conf fname
+    {
+      Templ.eval_var = (fun _ -> raise Not_found);
+      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
+      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
+      Templ.get_vother;
+      Templ.set_vother;
+      Templ.print_foreach = (fun _ -> raise Not_found);
+    }
+    [] ()
+
 (* Calendar request *)
 
 let eval_julian_day conf =
@@ -211,12 +229,6 @@ let eval_julian_day conf =
     ]
 
 (* *)
-
-type 'a env = Vint of int | Vother of 'a | Vnone
-
-let get_env v env = try List.assoc v env with Not_found -> Vnone
-let get_vother = function Vother x -> Some x | _ -> None
-let set_vother x = Vother x
 
 let eval_var conf env jd _loc =
   let open TemplAst in

@@ -186,15 +186,16 @@
   <div class="btn-group ml-auto align-items-center mr-5" role="group" arial-label="RLM button group">
     <a class="btn btn-outline-primary border-0" title="[*edit tree]"
       href="%url_set2.m.v.TP;&v=upd%e.m;">
-      <i class="far fa-edit fa-lg fa-fw"></i> [*modify]
-    </a>
+      <i class="far fa-edit fa-lg fa-fw"></i> [*modify]</a>
     <a role="button" class="btn btn-outline-%if;(e.im=0)primary%else;danger%end; ml-1 border-0"
       href="%if;(e.im!=0)%url_set.im.0;%else;%url_set.im;%end;"
       title="%if;(e.im!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [image/images]1">
-      <i class="fa fa-image fa-lg fa-fw"></i> [*image/images]1
-    </a>
+      <i class="fa fa-image fa-lg fa-fw"></i> [*image/images]1</a>
+    <a role="button" class="btn btn-sm btn-outline-%if;(e.m="A")dark disabled border-0%else;primary %end; border-%if;(e.sp!=0)2%else;0%end; w-100 h-100"
+      href="%if;(e.sp!=0)%url_set.sp.0;%else;%url_set.sp;%end;"
+      title="%if;(e.sp!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [spouse/spouses]1">
+      <i class="fa fa-user-plus fa-sm mr-1"></i>[*spouse/spouses]1</a>
     <a role="button" class="btn btn-outline-primary ml-1 border-0" href="%url_set.cgl.on;"
-      title="[cancel links]"><i class="fa fa-unlink fa-lg fa-fw"></i> Cgl
-    </a>
+      title="[cancel links]"><i class="fa fa-unlink fa-lg fa-fw"></i> Cgl</a>
   </div>
 %end;

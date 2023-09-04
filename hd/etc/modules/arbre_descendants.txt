@@ -40,7 +40,7 @@
     </a>
   %end;
   <br>
-  %if;(e.im="on" or e.im=1 or e.im="")
+  %if;(e.im=0)
     %if;xxx.has_image;
       %if;not cancel_links;
         <a href="%xxx.image_url;" class="normal_anchor" %nn;
@@ -251,8 +251,9 @@ Person:            Child1     Child2          Child3
   %end;
 %end;
 %let;e_v;%if;(e.v!="")%e.v;%else;3%end;%in;
-%let;e_sp;%if;(e.sp=1 or e.sp="on")1%else;0%end;%in;
-%let;e_ma;%if;(e.ma=1 or e.ma="on")1%else;0%end;%in;
+%let;e_sp;%if;(e.sp!="")0%else;1%end;%in;
+%let;e_ma;%if;(e.ma!="")0%else;1%end;%in;
+%let;e_im;%if;(e.im!="")0%else;1%end;%in;
 %let;evarborder;%if;(e.border="" or e.border="0")0%else;1%end;%in;
 %let;baseindex;%index;%in;
 <h1 id="a">[*descendants tree]</h1>
