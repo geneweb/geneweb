@@ -14,13 +14,6 @@
   %include;favicon
   %include;css
 </head>
-%define;nth_cousins(xx)
-  %let;xx;xx-1;%in;
-  [*%s cousins:::xx]%nn;
-%end;
-%define;relative_sosa(sosa_link)
-  [<em>Sosa number</em> relative to %t:::sosa_link]
-%end;
 <body%body_prop; onload="main()">
 %include;hed
 <div class="container">

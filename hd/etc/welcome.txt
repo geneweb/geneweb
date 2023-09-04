@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
@@ -14,9 +15,6 @@
 %define;book_of(xx)
   [book of %s:::xx]%nn;
 %end;
-%define;sosa_rel(xx)
-  [<em>Sosa number</em> relative to %t:::xx]
-%end;
 %define;display_sosa_ref(xx)
   [*sosa reference: %t:::xx]
 %end;
@@ -31,7 +29,6 @@
     %end;
   %end;
 %end;
-
 <body%body_prop;>
 %include;hed
 <div class="container">
