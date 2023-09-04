@@ -2427,15 +2427,18 @@ let print_tips_relationship conf =
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                           *)
 let display_options conf =
-  let s =
-    Adef.escaped
-    @@
-    if p_getenv conf.env "im" = Some "off" || p_getenv conf.env "im" = Some "0"
-    then "&im=off"
-    else if p_getenv conf.env "image" = Some "off" then "&image=off"
-    else ""
+  let img =
+    match (p_getenv conf.env "im", p_getenv conf.env "spouse") with
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
   in
-  let s = if p_getenv conf.env "ma" = Some "on" then s ^>^ "&ma=on" else s in
+  let mar =
+    match (p_getenv conf.env "ma", p_getenv conf.env "spouse") with
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
+  in
+  let s = Adef.escaped @@ if img then "&im=0" else "" in
+  let s = if mar then s else s ^>^ "&ma=0" in
   let s =
     match p_getenv conf.env "bd" with
     | Some i -> s ^^^ "&bd=" ^<^ (Mutil.encode i :> Adef.escaped_string)

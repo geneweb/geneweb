@@ -357,8 +357,6 @@ and eval_simple_variable conf = function
         :> string)
   | "lang" -> conf.lang
   | "left" -> conf.left
-  | "link_next" -> (
-      match Util.p_getenv conf.env "link_next" with Some vv -> vv | None -> "")
   | "nl" -> "\n"
   | "nn" -> ""
   | "plugins" ->

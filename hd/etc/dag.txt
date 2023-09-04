@@ -33,9 +33,9 @@
         %end;
       %elseif;(e.m="A")[*ascendants tree]%nn;
       %elseif;(e.m="RLM")[*multi relations graph]%nn;
-      %else;[*relation/relations]0 ([shortest path])%end;
+      %else;[*shortest path]%end;
       %if;(e.oi!="") <span style="font-size:60%%""> ([partial])</span>%end;
-      %if;(e.dag="on") + [dag]%end;
+      %if;(e.dag="on") ([dag])%end;
     %end;
   </div>
   %if;(e.t="A" or e.t="C")
@@ -45,12 +45,14 @@
       %end;
     </div>
   %end;
-  %if;not cancel_links;
-    %if;(e.m="RLM")
-      %include;buttons_dag
-    %else;
+  %if;(not cancel_links)
+    %if;(e.m="A" or e.m="D")
       <div class="d-flex justify-content-center">
         %include;buttons_dag
+      </div>
+    %elseif;(e.m="RL" or e.m="RLM")
+      <div class="row">
+        %include;buttons_rel
       </div>
     %end;
   %end;
@@ -170,7 +172,7 @@
         %elseif;(dag_cell.text!="")%dag_cell.text;
         %elseif;(dag_cell.item!="")
           %if;(line_nbr!=0 and dag_cell.index!="-1")
-            %if;(e.m="RLM" or e.dag="on")
+            %if;(e.m="RLM" or e.dag="on" or e.em="R")
               <a href="%prefix;i=%dag_cell.index;" title="[*open this individual page]"></a>
             %else;
               <div class="position-relative list-group-item-action">

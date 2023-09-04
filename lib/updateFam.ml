@@ -348,7 +348,8 @@ and eval_key conf base (fn, sn, oc, create, _) = function
         let sex = get_parent_sex conf base fn sn oc in
         str_val (string_of_int sex)
       else Update_util.eval_create create "sex"
-  | [ "index" ] -> (match person_of_key base fn sn oc with
+  | [ "index" ] -> (
+      match person_of_key base fn sn oc with
       | Some ip -> str_val (string_of_iper ip)
       | _ -> str_val (string_of_iper Gwdb.dummy_iper))
   | [ "sexes" ] ->

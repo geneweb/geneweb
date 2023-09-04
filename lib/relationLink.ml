@@ -228,15 +228,8 @@ let someone_text conf base ip =
   ^^^ DateDisplay.short_dates_text conf base p
 
 let spouse_text conf base end_sp ip ipl =
-  match
-    ( ipl,
-      ( p_getenv conf.env "sp",
-        p_getenv conf.env "spouse",
-        p_getenv conf.env "opt" ) )
-  with
-  | ( (ips, _) :: _,
-      (Some "on", _, _ | Some "1", _, _ | _, Some "on", _ | _, _, Some "spouse")
-    ) -> (
+  match (ipl, (p_getenv conf.env "sp", p_getenv conf.env "opt")) with
+  | (ips, _) :: _, (None, _ | _, Some "spouse") -> (
       let a = pget conf base ips in
       match get_parents a with
       | Some ifam ->
@@ -345,6 +338,16 @@ let include_marr conf base (n : Adef.escaped_string) =
   | None -> Adef.escaped ""
 
 let sign_text conf base sign info b1 b2 c1 c2 =
+  let sps =
+    match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
+  in
+  let img =
+    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "spouse") with
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
+  in
   let href =
     commd conf ^^^ "m=RL&"
     ^<^ acces_n conf base (Adef.escaped "1") (pget conf base info.ip1)
@@ -355,14 +358,8 @@ let sign_text conf base sign info b1 b2 c1 c2 =
     ^<^ "&b2="
     ^<^ Sosa.to_string (old_sosa_of_branch conf base ((info.ip, info.sp) :: b2))
     ^<^ "&c1=" ^<^ string_of_int c1 ^<^ "&c2=" ^<^ string_of_int c2
-    ^<^ Adef.escaped
-          (if p_getenv conf.env "sp" = Some "on" then "&sp=on"
-          else if p_getenv conf.env "spouse" = Some "on" then "&spouse=on"
-          else "")
-    ^^^ Adef.escaped
-          (if p_getenv conf.env "im" = Some "off" then "&im=off"
-          else if p_getenv conf.env "image" = Some "off" then "&image=off"
-          else "")
+    ^<^ Adef.escaped (if sps then "" else "&sp=0")
+    ^^^ Adef.escaped (if img then "" else "&im=0")
     ^^^ (match p_getenv conf.env "bd" with
         | None | Some ("0" | "") -> Adef.escaped ""
         | Some x -> "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string))
@@ -636,7 +633,7 @@ let print_relation_ok conf base info =
   Hutil.print_link_to_welcome conf true;
   (match p_getenv conf.env "cgl" with
   | Some "on" -> ()
-  | _ -> Util.include_template conf conf.env "buttons_rel" (fun () -> ()));
+  | _ -> Hutil.interp_no_env conf "buttons_rel");
   Output.print_sstring conf {|<p style="clear:both">|};
   print_relation_path conf base info;
   Hutil.trailer conf

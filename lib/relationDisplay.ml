@@ -67,6 +67,11 @@ let print_relationship_dag conf base elem_txt vbar_txt path next_txt =
       page_title next_txt
 
 let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
+  let sps =
+    match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
+  in
   let bd =
     match p_getenv conf.env "bd" with
     | None | Some ("0" | "") -> Adef.escaped ""
@@ -86,9 +91,7 @@ let next_relation_link_txt conf ip1 ip2 excl_faml : Adef.escaped_string =
   in
   commd conf ^^^ "em=R&ei=" ^<^ string_of_iper ip1 ^<^ "&i="
   ^<^ string_of_iper ip2
-  ^<^ (if p_getenv conf.env "sp" = Some "on" then "&sp=on"
-      else if p_getenv conf.env "spouse" = Some "on" then "&spouse=on"
-      else "")
+  ^<^ (if sps then "" else "&sp=0")
   ^<^ bd ^^^ color ^>^ "&et=S" ^ sl
 
 let print_relation_path conf base ip1 ip2 path ifam excl_faml =
@@ -135,6 +138,9 @@ let print_shortest_path conf base p1 p2 =
         let s1 = gen_person_title_text reference conf base p1 in
         let s2 = gen_person_title_text reference conf base p2 in
         Hutil.header_no_page_title conf title;
+        (match p_getenv conf.env "cgl" with
+        | Some "on" -> ()
+        | _ -> Hutil.interp_no_env conf "buttons_rel");
         if excl_faml = [] then (
           Output.print_sstring conf "<h1>";
           title false;
@@ -493,11 +499,9 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
   let image_opt =
     Adef.escaped
     @@
-    if p_getenv conf.env "image" = Some "off" then "&image=off"
-    else if
-      p_getenv conf.env "im" = Some "off" || p_getenv conf.env "im" = Some "0"
-    then "&im=off"
-    else ""
+    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
+    | Some "off", _ | Some "0", _ | _, Some "off" -> "&im=0"
+    | _, _ -> ""
   in
   Output.print_sstring conf "<ul>";
   List.iter
@@ -547,11 +551,9 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
   let image_opt =
     Adef.escaped
     @@
-    if p_getenv conf.env "image" = Some "off" then "&image=off"
-    else if
-      p_getenv conf.env "im" = Some "off" || p_getenv conf.env "im" = Some "0"
-    then "&im=off"
-    else ""
+    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
+    | Some "off", _ | Some "0", _ | _, Some "off" -> "&im=0"
+    | _, _ -> ""
   in
   Output.print_sstring conf {|<ul class="li_relationship"><li>|};
   transl conf "indeed," |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -649,6 +651,16 @@ let print_dag_links conf base p1 p2 rl =
     let compare = compare
   end in
   let module M = Map.Make (O) in
+  let sps =
+    match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
+  in
+  let img =
+    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
+  in
   let anc_map =
     List.fold_left
       (fun anc_map (pp1, pp2, (x1, x2, list), _) ->
@@ -731,12 +743,8 @@ let print_dag_links conf base p1 p2 rl =
               if i <> 0 then Output.print_sstring conf ",";
               Output.print_sstring conf (string_of_int x))
             l2;
-          if p_getenv conf.env "image" = Some "off" then
-            Output.print_sstring conf "&image=off"
-          else if
-            p_getenv conf.env "im" = Some "off"
-            || p_getenv conf.env "im" = Some "0"
-          then Output.print_sstring conf "&im=off";
+          if not img then Output.print_sstring conf "&im=0";
+          if not sps then Output.print_sstring conf "&sp=0";
           if p_getenv conf.env "bd" = Some "on" then
             Output.print_sstring conf "&bd=on";
           Output.print_sstring conf {|&dag=on">|};
@@ -843,6 +851,11 @@ let print_path conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
     list;
   Output.print_sstring conf "\n"
 
+type 'a env = Vother of 'a | Vnone
+
+let get_vother = function Vother x -> Some x | _ -> None
+let set_vother x = Vother x
+
 let print_main_relationship conf base long p1 p2 rel =
   let total =
     match rel with None -> Sosa.zero | Some (_, total, _) -> total
@@ -862,11 +875,13 @@ let print_main_relationship conf base long p1 p2 rel =
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
-  Util.include_template conf conf.env "buttons_rel" (fun () -> ());
-  (match (p_getenv conf.env "spouse", p_getenv conf.env "sp") with
-  | Some "on", _ -> conf.senv <- conf.senv @ [ ("spouse", Mutil.encode "on") ]
-  | _, Some "on" -> conf.senv <- conf.senv @ [ ("sp", Mutil.encode "on") ]
-  | _ -> ());
+  (match p_getenv conf.env "cgl" with
+  | Some "on" -> ()
+  | _ -> Hutil.interp_no_env conf "buttons_rel");
+  (match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
+  | Some ("off" | "0"), _ | _, Some "off" ->
+      conf.senv <- conf.senv @ [ ("sp", Mutil.encode "0") ]
+  | _, _ -> ());
   (match p_getenv conf.env "cgl" with
   | Some "on" -> conf.senv <- conf.senv @ [ ("cgl", Mutil.encode "on") ]
   | _ -> ());

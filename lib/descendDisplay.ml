@@ -980,17 +980,17 @@ let make_tree_hts conf base gv p =
   let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
   let sps =
     match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
-    | Some "on", _ | Some "1", _ | _, Some "on" -> true
-    | _, _ -> false
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
   in
   let _marr =
     match (Util.p_getenv conf.env "ma", Util.p_getenv conf.env "marriage") with
-    | Some "on", _ | Some "1", _ | _, Some "on" -> true
-    | _, _ -> false
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
   in
   let img =
     match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
-    | Some "off", _ | Some "0", _ | _, Some "off" -> false
+    | Some ("off" | "0"), _ | _, Some "off" -> false
     | _, _ -> true
   in
   let _cgl =
@@ -1821,17 +1821,17 @@ let rec find_ancestors base iap ip list v =
 let make_vaucher_tree_hts conf base gv p =
   let sps =
     match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
-    | Some "on", _ | Some "1", _ | _, Some "on" -> true
-    | _, _ -> false
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
   in
   let marr =
     match (Util.p_getenv conf.env "ma", Util.p_getenv conf.env "marriage") with
-    | Some "on", _ | Some "1", _ | _, Some "on" -> true
-    | _, _ -> false
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
   in
   let img =
     match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
-    | Some "off", _ | Some "0", _ | _, Some "off" -> false
+    | Some ("off" | "0"), _ | _, Some "off" -> false
     | _, _ -> true
   in
   let cgl =

@@ -245,7 +245,7 @@ let make_henv conf base =
 let special_vars =
   [ "alwsurn"; "cgl"; "dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et";
     "iz"; "long"; "manitou"; "nz"; "ocz";
-    "p_mod"; "pure_xhtml"; "pz"; "size"; "spouse"; "templ"; "wide" ]
+    "p_mod"; "pure_xhtml"; "pz"; "size"; "templ"; "wide" ]
 
 let only_special_env env = List.for_all (fun (x, _) -> List.mem x special_vars) env
 
@@ -258,9 +258,7 @@ let make_senv conf base =
     in
     let conf =
       { conf with senv = ["em", vm; "ei", vi] }
-      |> aux "image" "off"
       |> aux "long" "on"
-      |> aux "spouse" "on"
     in
     let conf =
       match p_getenv conf.env "et" with
