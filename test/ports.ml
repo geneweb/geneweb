@@ -119,7 +119,7 @@ let () =
     match
       List.filter_map
         (fun event ->
-          let event = Geneweb.Event.event_item_of_fevent event in
+          let event = Geneweb.Event.event_item_of_fevent ~sp:None event in
           if Geneweb.Event.get_name event = Fevent Def.Efam_Marriage then
             Some event
           else None)
