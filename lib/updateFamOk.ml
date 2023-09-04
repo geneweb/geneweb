@@ -379,6 +379,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
         | Efam_Annulation -> loop l
         | Efam_Name _ -> loop l)
   in
+  (* WARNING event input order is important for display order do not reverse it *)
   loop (List.rev fevents);
   (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
   let marr, wit =
@@ -531,6 +532,7 @@ let reconstitute_family conf base nsck =
   and des = { children = Array.of_list children } in
   (fam, cpl, des, ext)
 
+(* WARNING event input order is important for display order do not reverse it *)
 let strip_events fevents =
   let strip_array_witness pl =
     Array.of_list
@@ -550,6 +552,7 @@ let strip_events fevents =
       else accu)
     fevents []
 
+(* WARNING event input order is important for display order do not reverse it *)
 let strip_array_persons pl =
   Array.of_list
   @@ Array.fold_right

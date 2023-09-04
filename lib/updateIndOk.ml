@@ -736,8 +736,8 @@ let error_person conf err =
     Hutil.trailer conf);
   raise @@ Update.ModErr err
 
-(* TODO EVENT put this in Event *)
 let strip_pevents p =
+  (* WARNING event input order is important for display order do not reverse it *)
   let strip_array_witness pl =
     let pl =
       Array.fold_right
@@ -896,6 +896,7 @@ let update_relations_of_related base ip old_related =
       in
       let pevents, pevents_are_different =
         let p1_pevents = get_pevents p1 |> List.map gen_pevent_of_pers_event in
+        (* WARNING event input order is important for display order do not reverse it *)
         List.fold_right
           (fun e (list, rad) ->
             let witnesses, rad =
@@ -924,6 +925,7 @@ let update_relations_of_related base ip old_related =
           let fam_events =
             get_fevents fam |> List.map gen_fevent_of_fam_event
           in
+          (* WARNING event input order is important for display order do not reverse it *)
           List.fold_right
             (fun e (list, rad) ->
               let witnesses, rad =
@@ -1223,7 +1225,8 @@ let print_mod ?prerr o_conf base =
   print_mod_aux conf base callback
 
 (* This is to change event input order
-   event input order is used to order event with "equal" date *)
+   WARNING: event input order is used to order event with "equal" date
+            be careful to not reverse it *)
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
   | None -> Hutil.incorrect_request conf
