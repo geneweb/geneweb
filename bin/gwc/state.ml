@@ -1,10 +1,25 @@
+type bnotes = [ `merge | `erase | `first | `drop ]
+
+let bnotes_of_string = function
+  | "merge" -> `merge
+  | "erase" -> `erase
+  | "first" -> `first
+  | "drop" -> `drop
+  | _ -> failwith "invalid bnotes parameter"
+
+let bnotes_to_string = function
+  | `merge -> "merge"
+  | `erase -> "erase"
+  | `first -> "first"
+  | `drop -> "drop"
+
 type t = {
   just_comp : bool;
   out_file : string;
   force : bool;
   separate : bool;
   (* TODO use type for bnotes *)
-  bnotes : string;
+  bnotes : bnotes;
   shift : int;
   no_fail : bool;
       (** Do not raise exception if syntax error occured.
@@ -13,7 +28,7 @@ type t = {
   mutable create_all_keys : bool;
       (** Forces to create all the keys for every persons (even for ? ?).
     Enabled for gwplus format. *)
-  mutable files : (string * bool * string * int) list;
+  mutable files : (string * bool * bnotes * int) list;
   mutable line_cnt : int;  (** Line counter while reading .gw file *)
   default_source : string;
       (** Default source field for persons and families without source data *)
@@ -30,7 +45,7 @@ let default =
     out_file = Filename.concat Filename.current_dir_name "a";
     force = false;
     separate = false;
-    bnotes = "merge";
+    bnotes = `merge;
     shift = 0;
     files = [];
     no_fail = false;

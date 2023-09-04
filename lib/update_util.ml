@@ -359,3 +359,23 @@ let eval_create c = function
       | Update.Create (Neuter, _) -> "neuter"
       | _ -> "")
   | _ -> raise Not_found
+
+(* In the case of same sex couple we map
+   (Married|NotMarried) to NoSexesCheck(Married|NotMarried)
+   This to not lose sex information at .gw export
+   And also for use of a checkbox (conf.env "nsck" parameter)
+   to assert that it is indeed a same sex couple and not an error
+   and show an error if couple is of same sex and checkbox is not checked
+
+   TODO :
+     - error on same sex couple with unchecked checkbox does not seems to work
+     - This should probably be used on couples with Neuter persons
+     - we should have Engaged -> NoSexesCheckEngaged
+     - It would be better to not have NoSexesCheck* variants *)
+let map_nosexcheck = function
+  | Married -> NoSexesCheckMarried
+  | NotMarried -> NoSexesCheckNotMarried
+  | ( Engaged | NoSexesCheckNotMarried | NoMention | NoSexesCheckMarried
+    | MarriageBann | MarriageContract | MarriageLicense | Pacs | Residence ) as
+    x ->
+      x

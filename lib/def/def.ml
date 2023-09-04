@@ -215,6 +215,7 @@ type relation_type =
 
 type ('person, 'string) gen_relation = {
   r_type : relation_type;
+  (* TODO rename as r_parent1 r_parent2 to avoid same sex bugs *)
   r_fath : 'person option;
   r_moth : 'person option;
   r_sources : 'string;

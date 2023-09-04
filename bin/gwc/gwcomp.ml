@@ -383,10 +383,9 @@ let get_burial l =
       | [] -> (Cremated Date.cdate_None, l))
   | _ -> (UnknownBurial, l)
 
-(** Parse sex of person *)
-let get_optional_sexe = function
-  | "h" :: l -> (Male, l)
-  | "f" :: l -> (Female, l)
+let get_optional_sex = function
+  | ("#m" | "#m:" (* legacy *) | "m:" | "h" | "#h") :: tl -> (Male, tl)
+  | ("#f" | "#f:" (* legacy *) | "f:" | "f") :: tl -> (Female, tl)
   | l -> (Neuter, l)
 
 (** Parses int that starts at the position [i] inside [x].
@@ -709,6 +708,12 @@ let get_mar_date str = function
           try ((v, decode_sex 0, decode_sex 1), l)
           with _ -> ((v, Male, Female), c :: l)
         in
+        (* Sexes are not specified in the case of (Married|NotMarried|Engaged)
+           In those cases sexes are assumed to be (Male,Female)
+           So in the case of same sex couple, to specify sexes, we map
+            | Married -> NoSexesCheckMarried
+            | NotMarried -> NoSexesCheckNotMarried
+           See Update_util.map_nosexcheck *)
         match l with
         | "#nm" :: l' -> ((NotMarried, Male, Female), l')
         | "#eng" :: l' -> ((Engaged, Male, Female), l')
@@ -1012,13 +1017,7 @@ let loop_witn state line ic =
   let rec loop_witn acc str =
     match fields str with
     | ("wit" | "wit:") :: l ->
-        let sex, l =
-          (* TODO factorize sex parsing? *)
-          match l with
-          | "m:" :: l -> (Male, l)
-          | "f:" :: l -> (Female, l)
-          | l -> (Neuter, l)
-        in
+        let sex, l = get_optional_sex l in
         let wkind, l = get_event_witness_kind l in
         let wit, _, l = parse_parent state str l in
         if l <> [] then failwith str;
@@ -1054,12 +1053,7 @@ let read_family state ic fname = function
         let rec loop = function
           (* TODO duplicate of loop_witn ?*)
           | Some (str, ("wit" | "wit:") :: l) ->
-              let sex, l =
-                match l with
-                | "m:" :: l -> (Male, l)
-                | "f:" :: l -> (Female, l)
-                | l -> (Neuter, l)
-              in
+              let sex, l = get_optional_sex l in
               let wk, _, l = parse_parent state str l in
               if l <> [] then failwith str;
               let witn, line = loop (read_line state ic) in
@@ -1150,7 +1144,7 @@ let read_family state ic fname = function
             let rec loop children =
               match read_line state ic with
               | Some (str, "-" :: l) ->
-                  let sex, l = get_optional_sexe l in
+                  let sex, l = get_optional_sex l in
                   let child, l = parse_child state str surname sex csrc cbp l in
                   if l <> [] then failwith str else loop (child :: children)
               | Some (_, [ "end" ]) -> children
@@ -1244,13 +1238,7 @@ let read_family state ic fname = function
   | Some (str, "rel" :: l) -> (
       (* get considered person *)
       let sb, _, l = parse_parent state str l in
-
-      let sex, l =
-        match l with
-        | "#h" :: l -> (Male, l)
-        | "#f" :: l -> (Female, l)
-        | l -> (Neuter, l)
-      in
+      let sex, l = get_optional_sex l in
       if l <> [] then failwith "str"
       else
         match read_line state ic with
@@ -1337,8 +1325,8 @@ let comp_families state x =
            loop (read_line state (ic, encoding)) encoding
        | F_none -> ()
        | F_fail str ->
-           Printf.printf "File \"%s\", line %d:\n" x state.line_cnt;
-           Printf.printf "Error: %s\n" str;
+           Printf.eprintf "File \"%s\", line %d:\n" x state.line_cnt;
+           Printf.eprintf "Error: %s\n" str;
            flush stdout;
            loop (read_line state (ic, encoding)) encoding
      in

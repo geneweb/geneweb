@@ -96,6 +96,7 @@ let get_new_occ p =
 type mfam = {
   m_ifam : ifam;
   m_fam : family;
+  (* TODO rename as m_parent1 m_parent2 to avoid same sex bugs *)
   m_fath : person;
   m_moth : person;
   m_chil : person array;
@@ -458,12 +459,24 @@ let print_parent opts base gen p =
     else if first_name <> "?" && surname <> "?" then
       Printf.ksprintf (oc opts) " 0"
 
+let print_sex legacy =
+  let m, f =
+    if !old_gw then
+      match legacy with
+      | `h_f -> ("h", "f")
+      | `m_f -> ("m", "f")
+      | `croisillon_h_f -> ("#h", "#f")
+    else ("#m", "#f")
+  in
+  fun oc opts p ->
+    match get_sex p with
+    | Male -> Printf.ksprintf (oc opts) " %s" m
+    | Female -> Printf.ksprintf (oc opts) " %s" f
+    | Neuter -> ()
+
 let print_child opts base fam_surname csrc cbp p =
   Printf.ksprintf (oc opts) "-";
-  (match get_sex p with
-  | Male -> Printf.ksprintf (oc opts) " h"
-  | Female -> Printf.ksprintf (oc opts) " f"
-  | _ -> ());
+  print_sex `h_f oc opts p;
   Printf.ksprintf (oc opts) " %s"
     (s_correct_string (sou base (get_first_name p)));
   if p_first_name base p = "?" && p_surname base p = "?" then ()
@@ -515,7 +528,12 @@ let string_of_witness_kind :
 
 let print_multiline opts tag s =
   let lines = String.split_on_char '\n' s in
-  List.iter (Printf.ksprintf (oc opts) "%s %s\n" tag) lines
+  List.iter
+    (fun s -> if s <> "" then Printf.ksprintf (oc opts) "%s %s\n" tag s)
+    lines
+
+let is_isolated p =
+  Option.is_none (get_parents p) && Array.length (get_family p) = 0
 
 let print_witnesses opts base gen ~use_per_sel witnesses =
   let print_witness p =
@@ -523,11 +541,7 @@ let print_witnesses opts base gen ~use_per_sel witnesses =
       (correct_string base (get_surname p))
       (correct_string base (get_first_name p))
       (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
-    if
-      Array.length (get_family p) = 0
-      && get_parents p = None
-      && not (Gwdb.Marker.get gen.mark (get_iper p))
-    then (
+    if is_isolated p && not (Gwdb.Marker.get gen.mark (get_iper p)) then (
       Gwdb.Marker.set gen.mark (get_iper p) true;
       if has_infos opts base p then print_infos opts base false "" "" p
       else Printf.ksprintf (oc opts) " 0";
@@ -543,10 +557,7 @@ let print_witnesses opts base gen ~use_per_sel witnesses =
       if (not use_per_sel) || gen.per_sel ip then (
         let p = poi base ip in
         Printf.ksprintf (oc opts) "wit";
-        (match get_sex p with
-        | Male -> Printf.ksprintf (oc opts) " m"
-        | Female -> Printf.ksprintf (oc opts) " f"
-        | _ -> ());
+        print_sex `m_f oc opts p;
         Printf.ksprintf (oc opts) ": ";
         let sk = string_of_witness_kind wk in
         (match sk with
@@ -555,7 +566,7 @@ let print_witnesses opts base gen ~use_per_sel witnesses =
         print_witness p;
         Printf.ksprintf (oc opts) "\n";
         (* print witness note *)
-        if opts.notes && not (is_empty_string wnote) then
+        if opts.notes && (not !old_gw) && not (is_empty_string wnote) then
           let wnote = sou base wnote in
           print_multiline opts "wnote" wnote))
     witnesses
@@ -613,9 +624,12 @@ let print_pevent opts base gen e =
   | Epers_VenteBien -> Printf.ksprintf (oc opts) "#vteb"
   | Epers_Will -> Printf.ksprintf (oc opts) "#will"
   | Epers_Name s -> Printf.ksprintf (oc opts) "#%s" (correct_string base s));
-  Printf.ksprintf (oc opts) " ";
   let epers_date = Date.od_of_cdate (get_pevent_date e) in
-  print_date_option opts epers_date;
+  (match epers_date with
+  | None -> ()
+  | Some d ->
+      Printf.ksprintf (oc opts) " ";
+      print_date opts d);
   print_if_no_empty opts base "#p" (get_pevent_place e);
   (* TODO *)
   (*print_if_no_empty opts base "#c" e.epers_cause;*)
@@ -692,9 +706,12 @@ let print_fevent opts base gen in_comment e =
   | Efam_PACS -> Printf.ksprintf (oc opts) "#pacs"
   | Efam_Residence -> Printf.ksprintf (oc opts) "#resi"
   | Efam_Name n -> Printf.ksprintf (oc opts) "#%s" (correct_string base n));
-  Printf.ksprintf (oc opts) " ";
   let efam_date = Date.od_of_cdate (get_fevent_date e) in
-  print_date_option opts efam_date;
+  (match efam_date with
+  | None -> ()
+  | Some d ->
+      Printf.ksprintf (oc opts) " ";
+      print_date opts d);
   print_if_no_empty opts base "#p" (get_fevent_place e);
   (*print_if_no_empty opts base "#c" e.efam_cause;*)
   if opts.source = None then print_if_no_empty opts base "#s" (get_fevent_src e);
@@ -748,21 +765,43 @@ let print_empty_family opts base p =
 
 let print_family opts base gen m =
   let fam = m.m_fam in
-  let fath, moth = (m.m_fath, m.m_moth) in
+  let fath, moth =
+    (* check for inversion of father/mother *)
+    if get_sex m.m_fath = Female && get_sex m.m_moth = Male then
+      (m.m_moth, m.m_fath)
+    else (m.m_fath, m.m_moth)
+  in
   if eq_iper (get_iper fath) dummy_iper || eq_iper (get_iper moth) dummy_iper
   then ()
   else (
     Printf.ksprintf (oc opts) "fam ";
-    print_parent opts base gen m.m_fath;
+    print_parent opts base gen fath;
     Printf.ksprintf (oc opts) " +";
     print_date_option opts (Date.od_of_cdate (get_marriage fam));
     let print_sexes s =
       let c x =
         match get_sex x with Male -> 'm' | Female -> 'f' | Neuter -> '?'
       in
-      Printf.ksprintf (oc opts) " %s %c%c" s (c m.m_fath) (c m.m_moth)
+      Printf.ksprintf (oc opts) " %s %c%c" s (c fath) (c moth)
     in
-    (match get_relation fam with
+    let relation =
+      (* calling Update_util.map_nosexcheck should not be needed here
+         because this mapping should already have been done in UpdateFamOk
+         but in case of a buggy base we redo the mapping here
+
+         we need to do this mapping because in the case of Married|NotMarried|Engaged
+         sexes are not printed and are assumed to be Male,Female at import
+
+         TODO I think it is still bugged in case of a couple with Neuter sex
+      *)
+      let relation = get_relation fam in
+      let fath_sex = get_sex fath in
+      let moth_sex = get_sex moth in
+      match (fath_sex, moth_sex) with
+      | Male, Male | Female, Female -> Update_util.map_nosexcheck relation
+      | _ -> relation
+    in
+    (match relation with
     | Married -> ()
     | NotMarried -> Printf.ksprintf (oc opts) " #nm"
     | Engaged -> Printf.ksprintf (oc opts) " #eng"
@@ -785,7 +824,7 @@ let print_family opts base gen m =
         Printf.ksprintf (oc opts) " -";
         print_date_option opts d);
     Printf.ksprintf (oc opts) " ";
-    print_parent opts base gen m.m_moth;
+    print_parent opts base gen moth;
     Printf.ksprintf (oc opts) "\n";
     let witnesses =
       Array.map (fun ip -> (ip, Witness, empty_string)) (get_witnesses fam)
@@ -820,7 +859,7 @@ let print_family opts base gen m =
     (match Array.length m.m_chil with
     | 0 -> ()
     | _ ->
-        let fam_surname = get_surname m.m_fath in
+        let fam_surname = get_surname fath in
         Printf.ksprintf (oc opts) "beg\n";
         Array.iter
           (fun p ->
@@ -831,10 +870,8 @@ let print_family opts base gen m =
     Gwdb.Marker.set gen.fam_done m.m_ifam true;
     let from =
       Printf.sprintf "family \"%s.%d %s\" & \"%s.%d %s\""
-        (p_first_name base m.m_fath)
-        (get_new_occ m.m_fath) (p_surname base m.m_fath)
-        (p_first_name base m.m_moth)
-        (get_new_occ m.m_moth) (p_surname base m.m_moth)
+        (p_first_name base fath) (get_new_occ fath) (p_surname base fath)
+        (p_first_name base moth) (get_new_occ moth) (p_surname base moth)
     in
     let s =
       let sl =
@@ -925,7 +962,7 @@ let print_notes_for_person opts base gen p =
                  | Epers_Baptism -> "baptism"
                  | Epers_Death -> "death"
                  | Epers_Burial -> "burial"
-                 | Epers_Cremation -> "creamation"
+                 | Epers_Cremation -> "cremation"
                  | _ -> ""
                in
                let notes =
@@ -1006,16 +1043,16 @@ let is_isolated p =
 let is_definition_for_parent p =
   match get_parents p with Some _ -> false | None -> true
 
-let get_isolated_related base m list =
+let get_isolated_related base gen m list =
   let concat_isolated p_relation ip list =
     let p = poi base ip in
     if List.mem_assq p list then list
     else if is_isolated p then
       match get_rparents p with
-      | { r_fath = Some x } :: _ when x = get_iper p_relation ->
-          list @ [ (p, true) ]
-      | { r_fath = None; r_moth = Some x } :: _ when x = get_iper p_relation ->
-          list @ [ (p, true) ]
+      | ({ r_fath = Some x; _ } | { r_moth = Some x; _ }) :: _ ->
+          if x = get_iper p_relation then
+            list @ [ (p, not (Gwdb.Marker.get gen.mark (get_iper p))) ]
+          else list
       | _ -> list
     else list
   in
@@ -1185,10 +1222,7 @@ let print_relations_for_person opts base gen def_p is_definition p =
       def_p := p :: !def_p;
       if has_infos opts base p then print_infos opts base false "" "" p
       else Printf.ksprintf (oc opts) " 0";
-      match get_sex p with
-      | Male -> Printf.ksprintf (oc opts) " #h"
-      | Female -> Printf.ksprintf (oc opts) " #f"
-      | Neuter -> ());
+      print_sex `croisillon_h_f oc opts p);
     Printf.ksprintf (oc opts) "\n";
     Printf.ksprintf (oc opts) "beg\n";
     List.iter (print_relation_for_person opts base gen def_p) (get_rparents p);
@@ -1196,7 +1230,7 @@ let print_relations_for_person opts base gen def_p is_definition p =
 
 let print_relations opts base gen ml =
   let pl = List.fold_right (get_persons_with_relations base) ml [] in
-  let pl = List.fold_right (get_isolated_related base) ml pl in
+  let pl = List.fold_right (get_isolated_related base gen) ml pl in
   let pl =
     List.fold_right
       (fun p pl -> if list_memf eq_key_fst p pl then pl else p :: pl)
