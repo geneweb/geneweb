@@ -459,22 +459,38 @@ let child_has_sex warning child =
    so we can have this sorted list of events:
    [ baptism at date n ; birth at date (Before n+1)]
    which will raise an invalid warning *)
-let ignore_less_than_one_day_apart_warning get_date e1 e2 =
+let ignore_less_than_one_day_apart_warning d1 d2 =
+  let sdn1 = Date.to_sdn ~from:Dgregorian d1 in
+  let sdn2 = Date.to_sdn ~from:Dgregorian d2 in
+  if sdn1 > sdn2 then
+    (* e1 is supposed to be before e2, so this shouldn't happen *)
+    false
+  else if sdn2 - sdn1 > 1 then
+    (* the two dates are more than on day appart, we don't ignore warnings *)
+    false
+  else (* they are one day appart *)
+    d1.prec = After || d2.prec = Before
+
+(* ignore warning if it is due to an incomplete date
+   and that we can not really order by date because years, or months+years of both dates match
+   this is because incomplete are ordered before completes ones for display *)
+let ignore_incomplete_date_warning d1 d2 =
+  (* todo: not sure about condition on prec *)
+  (not (d1.Date.prec = Before))
+  && (not (d2.Date.prec = After))
+  &&
+  let day = if d1.day = 0 then d2.day else d1.day in
+  let month = if d1.month = 0 then d2.month else d1.month in
+  day = d2.day && month = d2.month && d1.year = d2.year
+
+let ignore_warning get_date e1 e2 =
   let d1_opt = get_date e1 |> Date.cdate_to_dmy_opt in
   let d2_opt = get_date e2 |> Date.cdate_to_dmy_opt in
   match (d1_opt, d2_opt) with
   | None, _ | _, None -> false
   | Some d1, Some d2 ->
-      let sdn1 = Date.to_sdn ~from:Dgregorian d1 in
-      let sdn2 = Date.to_sdn ~from:Dgregorian d2 in
-      if sdn1 > sdn2 then
-        (* e1 is supposed to be before e2, so this shouldn't happen *)
-        false
-      else if sdn2 - sdn1 > 1 then
-        (* the two dates are more than on day appart, we don't ignore warnings *)
-        false
-      else (* they are one day appart *)
-        d1.prec = After || d2.prec = Before
+      ignore_incomplete_date_warning d1 d2
+      || ignore_less_than_one_day_apart_warning d1 d2
 
 (* this check if events chronology is sound (e.g. no baptism before birth *)
 let check_order_pevents warning p =
@@ -496,8 +512,8 @@ let check_order_pevents warning p =
             | n2 ->
                 if
                   Event.compare_event_name n1 n2 = 1
-                  && not
-                     @@ ignore_less_than_one_day_apart_warning get_date e1 e2
+                  && (* check if we have to ignore this warning for arcane reasons *)
+                  (not @@ ignore_warning get_date e1 e2)
                 then warning e1 e2;
                 loop (e2 :: events)))
     | _l -> ()
