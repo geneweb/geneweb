@@ -135,10 +135,10 @@ let search_for_fn_or_pn conf base fn pl =
         if
           if exact then fn_l = fn1_l || fn_l = fn2_l
           else
-            List.fold_left (fun res fn -> res || List.mem fn fn1_l) false fn_l
-            || List.fold_left
-                 (fun res fn -> res || List.mem fn fn2_l)
-                 false fn_l
+            let tbl = Hashtbl.create 512 in
+            List.iter (fun k -> Hashtbl.add tbl k ()) fn1_l;
+            List.iter (fun k -> Hashtbl.add tbl k ()) fn2_l;
+            List.exists (Hashtbl.mem tbl) fn_l
         then p :: pl
         else pl)
     [] pl
