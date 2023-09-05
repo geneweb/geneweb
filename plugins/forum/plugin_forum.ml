@@ -1,5 +1,6 @@
 open Geneweb
 open Config
+open Plugin_forum_lib
 
 let ns = "forum"
 

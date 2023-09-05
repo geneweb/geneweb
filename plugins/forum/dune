@@ -1,9 +1,19 @@
+(library
+ (name plugin_forum_lib)
+ (public_name geneweb.plugin_forum_lib)
+ (libraries geneweb)
+ (flags
+  (:standard -w -42-40))
+ (modules forum forumDisplay))
+
 (executable
  (name plugin_forum)
- (libraries geneweb geneweb.gwd_lib geneweb.wserver)
+ (libraries geneweb geneweb.gwd_lib geneweb.wserver plugin_forum_lib)
+ (embed_in_plugin_libraries plugin_forum_lib)
+ (flags -linkall)
  (modes
   (native plugin))
- (modules forum forumDisplay plugin_forum))
+ (modules plugin_forum))
 
 (alias
  (name plugin)
