@@ -154,7 +154,7 @@
     %foreach;dag_line;
       <tr align="left">
       %foreach;dag_cell;
-        <td class="%if;(e.m="D")align-top%elseif;(e.m="A")align-bottom%end; px-0 text-monopace"
+        <td class="%if;(e.m="D" or e.m="RL")align-top%elseif;(e.m="A")align-bottom%end; px-0 text-monopace"
           %if;(dag_cell.colspan>1) colspan="%dag_cell.colspan;"%end;
           style="line-height:%if;(dag_cell.item!="")1%nn;
                              %elseif;dag_cell.is_bar;1%nn;
