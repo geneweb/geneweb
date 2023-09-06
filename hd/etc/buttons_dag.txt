@@ -146,25 +146,23 @@
           <i class="fa fa-random fa-fw fa-lg"></i>Dag</a>
         </div>
         <div class="border rounded mr-1">
-          <a role="button" class="btn btn-sm btn-outline-primary border-%if;(e.im="")2%else;0%end; h-100"
-            href="%if;(e.im="" or e.im=1)%url_set.im.0;%else;%url_set.im;%end;"
-            title="%if;(e.im="" or e.im=1)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [image/images]1">
+          <a role="button" class="btn btn-sm btn-outline-primary border-%if;(e.im="" or e.im!=0)2%else;0%end; h-100"
+            href="%if;(e.im="" or e.im!=0)%url_set.im.0;%else;%url_set.im;%end;"
+            title="%if;(e.im="" or e.im!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [image/images]1">
             <i class="fa fa-image fa-sm mr-1"></i>[*image/images]1
           </a>
         </div>
-        %if;(e.m!="D" or e.t!="V")
         <div class="border rounded mr-1">
-          <a role="button" class="btn btn-sm btn-outline-%if;(e.dag=1 or e.t="C" or e.t="A")dark disabled border-0%else;primary%end; border-%if;(e.ma="")2%else;0%end; w-100 h-100"
-            href="%if;(e.ma="" or e.ma=0)%url_set.ma.1;%else;%url_set.ma;%end;"
-            title="%if;(e.ma="" or e.ma=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [date of marriage]">
+          <a role="button" class="btn btn-sm btn-outline-%if;(e.dag=1 or e.t="C" or e.t="V")dark disabled border-0%else;primary%end; border-%if;(e.ma="" or e.ma!=0)2%else;0%end; w-100 h-100"
+            href="%if;(e.ma="" or e.ma!=0)%url_set.ma.0;%else;%url_set.ma%end;"
+            title="%if;(e.ma="" or e.ma!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [date of marriage]">
             <i class="fa fa-venus-mars fa-sm mr-1"></i>[*marriage/marriages]1
           </a>
         </div>
-        %end;
         <div class="border rounded mr-1">
-          <a role="button" class="btn btn-sm btn-outline-%if;(e.m="A")dark disabled border-0%else;primary %end; border-%if;(e.sp="")2%else;0%end; w-100 h-100"
-            href="%if;(e.sp="" or e.sp=0)%url_set.sp.1;%else;%url_set.sp;%end;"
-            title="%if;(e.sp="" or e.sp=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [spouse/spouses]1">
+          <a role="button" class="btn btn-sm btn-outline-%if;(e.m="A")dark disabled border-0%else;primary %end; border-%if;(e.sp="" or e.sp=1)2%else;0%end; w-100 h-100"
+            href="%if;(e.sp=1)%url_set.sp;%else;%url_set.sp.1;%end;"
+            title="%if;(e.sp=1)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [spouse/spouses]1">
             <i class="fa fa-user-plus fa-sm mr-1"></i>[*spouse/spouses]1
           </a>
         </div>
