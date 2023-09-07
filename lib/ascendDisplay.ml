@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Def
 open Gwdb
 open Util
 
@@ -37,8 +36,12 @@ let print_ancestors_dag conf base v p =
   let options = Util.display_options conf in
   let vbar_txt ip =
     let p = pget conf base ip in
-    commd conf ^^^ "m=A&t=T&dag=on&v=" ^<^ string_of_int v ^<^ "&" ^<^ options
-    ^^^ "&" ^<^ acces conf base p
+    Printf.sprintf {|%s%s&m=A&t=T&dag=on&v=%d%s |}
+      (commd conf :> string)
+      (acces conf base p :> string)
+      v
+      (options :> string)
+    |> Adef.escaped
   in
   let page_title =
     Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe

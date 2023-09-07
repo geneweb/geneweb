@@ -2436,16 +2436,16 @@ let print_tips_relationship conf =
     [Rem] : Exporté en clair hors de ce module.                           *)
 let display_options conf =
   let img =
-    match (p_getenv conf.env "im", p_getenv conf.env "spouse") with
+    match (p_getenv conf.env "im", p_getenv conf.env "image") with
     | Some ("off" | "0"), _ | _, Some "off" -> false
     | _, _ -> true
   in
   let mar =
-    match (p_getenv conf.env "ma", p_getenv conf.env "spouse") with
+    match (p_getenv conf.env "ma", p_getenv conf.env "marriage") with
     | Some ("off" | "0"), _ | _, Some "off" -> false
     | _, _ -> true
   in
-  let s = Adef.escaped @@ if img then "&im=0" else "" in
+  let s = Adef.escaped @@ if img then "" else "&im=0" in
   let s = if mar then s else s ^>^ "&ma=0" in
   let s =
     match p_getenv conf.env "bd" with
