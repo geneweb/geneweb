@@ -318,11 +318,8 @@ let carrousel_file_path conf base p fname old =
     let dir = default_portrait_filename base p in
     if old then Filename.concat dir "old" else dir
   in
-  let f =
-    String.concat Filename.dir_sep [ carrousel_folder conf; dir; fname ]
-  in
-  if f.[String.length f - 1] = '\\' then String.sub f 0 (String.length f - 1)
-  else f
+  String.concat Filename.dir_sep
+    ([ carrousel_folder conf; dir ] @ if fname = "" then [] else [ fname ])
 
 let get_carrousel_file_content conf base p fname kind old =
   let fname =
