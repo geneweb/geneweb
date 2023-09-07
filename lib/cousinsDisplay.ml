@@ -38,50 +38,36 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
   let reference _ _ p (s : Adef.safe_string) =
     if is_hidden p then s
     else
-      let href =
-        commd conf ^^^ "m=RL&"
-        ^<^ acces_n conf base (Adef.escaped "1") p1
-        ^^^ "&b1="
-        ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b1))
-        ^<^ "&"
-        ^<^ acces_n conf base (Adef.escaped "2") p2
-        ^^^ "&b2="
-        ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2))
-        ^<^ (if sps then Adef.encoded "" else Adef.encoded "&sp=0"
-              :> Adef.escaped_string)
-        ^^^ (if img then Adef.encoded "" else Adef.encoded "&im=0"
-              :> Adef.escaped_string)
-        ^^^ "&bd="
-        ^<^ (Option.value ~default:(Adef.encoded "0")
-               (List.assoc_opt "bd" conf.env)
-              :> Adef.escaped_string)
-      in
-      "<a href=\"" ^<^ (href :> Adef.safe_string) ^^^ "\">" ^<^ s ^>^ "</a>"
+      Printf.sprintf {|<a href="%sm=RL&%s&b1=%s&%s&b2=%s%s%s&bd=%s">%s</a>|}
+        (commd conf :> string)
+        (acces_n conf base (Adef.escaped "1") p1 :> string)
+        (Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b1)))
+        (acces_n conf base (Adef.escaped "2") p2 :> string)
+        (Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2)))
+        (if sps then "" else "&sp=0")
+        (if img then "" else "&im=0")
+        (Option.value ~default:(Adef.encoded "0") (List.assoc_opt "bd" conf.env)
+          :> string)
+        (s :> string)
+      |> Adef.safe
   in
-  let reference_sp p3 _ _ p s =
+
+  let reference_sp p3 _ _ p (s : Adef.safe_string) =
     if is_hidden p then s
     else
-      let href =
-        commd conf ^^^ "m=RL&"
-        ^<^ acces_n conf base (Adef.escaped "1") p1
-        ^^^ "&b1="
-        ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b1))
-        ^<^ "&"
-        ^<^ acces_n conf base (Adef.escaped "2") p2
-        ^^^ "&b2="
-        ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2))
-        ^<^ "&"
-        ^<^ acces_n conf base (Adef.escaped "4") p3
-        ^^^ (if sps then Adef.encoded "" else Adef.encoded "&sp=0"
-              :> Adef.escaped_string)
-        ^^^ (if img then Adef.encoded "" else Adef.encoded "&im=0"
-              :> Adef.escaped_string)
-        ^^^ "&bd="
-        ^<^ (Option.value ~default:(Adef.encoded "0")
-               (List.assoc_opt "bd" conf.env)
-              :> Adef.escaped_string)
-      in
-      "<a href=\"" ^<^ (href :> Adef.safe_string) ^^^ "\">" ^<^ s ^>^ "</a>"
+      Printf.sprintf {|<a href="%sm=RL&%s&b1=%s&%s&b2=%s&%s%s%s&bd=%s">%s</a>|}
+        (commd conf :> string)
+        (acces_n conf base (Adef.escaped "1") p1 :> string)
+        (Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b1)))
+        (acces_n conf base (Adef.escaped "2") p2 :> string)
+        (Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2)))
+        (acces_n conf base (Adef.escaped "4") p3 :> string)
+        (if sps then "" else "&sp=0")
+        (if img then "" else "&im=0")
+        (Option.value ~default:(Adef.encoded "0") (List.assoc_opt "bd" conf.env)
+          :> string)
+        (s :> string)
+      |> Adef.safe
   in
   let print_nospouse _ =
     SosaCache.print_sosa conf base p2 true;
@@ -408,23 +394,18 @@ let print_anniv conf base p dead_people level =
       set S.empty
   in
   let txt_of (up_sosa, down_br, spouse) conf base c =
-    let href : Adef.escaped_string =
-      commd conf ^^^ "m=RL&"
-      ^<^ acces_n conf base (Adef.escaped "1") p
-      ^^^ "&b1=" ^<^ string_of_int up_sosa ^<^ "&"
-      ^<^ acces_n conf base (Adef.escaped "2")
-            (Option.fold ~none:c ~some:(pget conf base) spouse)
-      ^^^ "&b2="
-      ^<^ string_of_int (sosa_of_persons conf base down_br)
-      ^<^
-      if spouse = None then "&" ^<^ acces_n conf base (Adef.escaped "4") c
-      else Adef.escaped ""
-    in
-    "<a href=\""
-    ^<^ (href :> Adef.safe_string)
-    ^^^ "\">"
-    ^<^ person_title_text conf base c
-    ^>^ "</a>"
+    Printf.sprintf {|<a href="m=RL&%s&b1=%d&%s&b2=%d%s">%s</a>|}
+      (acces_n conf base (Adef.escaped "1") p :> string)
+      up_sosa
+      (acces_n conf base (Adef.escaped "2")
+         (Option.fold ~none:c ~some:(pget conf base) spouse)
+        :> string)
+      (sosa_of_persons conf base down_br)
+      (if spouse = None then
+       "&" ^ (acces_n conf base (Adef.escaped "4") c :> string)
+      else "")
+      (person_title_text conf base c :> string)
+    |> Adef.safe
   in
   let f_scan =
     let list = ref (S.fold (fun ip b list -> (ip, b) :: list) set []) in
