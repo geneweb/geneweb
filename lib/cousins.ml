@@ -77,13 +77,18 @@ let tm = Unix.localtime (Unix.time ())
 let today_year = tm.Unix.tm_year + 1900
 let cousins_t = ref None
 let cousins_dates_t = ref None
-let mal = 120
-let mdl = 120
+let mal = 12
+let mdl = 12
 
 let update_min_max (min, max) date =
   ((if date < min then date else min), if date > max then date else max)
 
 let max_ancestor_level conf base ip max_lvl =
+  let max_lvl =
+    match List.assoc_opt "max_anc_level" conf.Config.base_env with
+    | Some v -> int_of_string v
+    | _ -> max_lvl
+  in
   let x = ref 0 in
   let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
   (* Loading ITL cache, up to 10 generations. *)
@@ -110,9 +115,11 @@ let max_ancestor_level conf base ip max_lvl =
   loop 0 ip;
   !x
 
-let max_descendant_level _conf _base _ip _max_lvl =
+let max_descendant_level conf _base _ip max_lvl =
   (* TODO we should compute this value *)
-  120
+  match List.assoc_opt "max_desc_level" conf.Config.base_env with
+  | Some v -> int_of_string v
+  | _ -> max_lvl
 
 let get_min_max_dates base l =
   let rec loop (min, max) = function
@@ -244,9 +251,9 @@ let init_cousins_cnt conf base p =
         then failwith "Cousins table too large for system";
         let () = load_ascends_array base in
         let () = load_couples_array base in
-        let cousins_cnt = Array.make_matrix (max_a_l + 1) (max_d_l + 1) [] in
+        let cousins_cnt = Array.make_matrix (max_a_l + 2) (max_d_l + 2) [] in
         let cousins_dates =
-          Array.make_matrix (max_a_l + 2) (max_d_l + 2) (0, 0)
+          Array.make_matrix (max_a_l + 3) (max_d_l + 3) (0, 0)
         in
         cousins_cnt.(0).(0) <-
           [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
