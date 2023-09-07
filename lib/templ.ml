@@ -168,30 +168,37 @@ let url_set_aux conf evar_l str =
       let l =
         List.filter_map
           (fun (k, v) ->
+            (* provess all env variables in senv, henv, env *)
             let v = Adef.as_string @@ v in
             match (k, v) with
-            | _, "" -> None (* empty *)
-            | "oc", "0" | "ocz", "0" -> None (* occ null *)
+            | "oc", "0" | "ocz", "0" -> None (* ignore occ null *)
             | _, _ when List.mem k !kl -> None (* already done *)
-            | k, _ when List.mem k evar_l && k <> evar -> None (* 2 and 3 *)
-            | k, _ when k = evar && str = "" -> None (* 1 *)
+            | k, _ when List.mem k evar_l && k <> evar ->
+                (* there can be 1, 2 or 3 evar in evar_l *)
+                (* evar is the first one, which can be set to a new value *)
+                (* evar 2 and 3 are removed *)
+                None
             | "lang", v when not (List.mem k evar_l) ->
-                (* lang not in evar list, default_lang *)
+                (* lang not in evar list, ignore if default_lang *)
                 if v = conf.default_lang || v = "" then None
                 else (
                   kl := k :: !kl;
                   Some (Format.sprintf "%s=%s" k v))
             | "lang", v ->
-                (* lang in evar list, default_lang *)
+                (* lang in evar list, set it to str unless default_lang *)
                 let v = if str <> "" then str else v in
                 if v = conf.default_lang || v = "" then None
                 else (
                   kl := k :: !kl;
                   Some (Format.sprintf "%s=%s" k v))
+            | k, _ when k = evar && str = "" ->
+                (* evar is set to "" -> ignore *)
+                None
             | k, _ when k = evar && str <> "" ->
-                (* 1 *)
+                (* set evar to str if not empty *)
                 kl := k :: !kl;
                 Some (Format.sprintf "%s=%s" k str)
+            | _, "" -> None (* empty *)
             | _, _ ->
                 (* others *)
                 kl := k :: !kl;
