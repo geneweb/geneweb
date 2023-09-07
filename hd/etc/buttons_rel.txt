@@ -6,22 +6,27 @@
   <div class="d-flex">
     %if;(e.em="R" or ((e.i!="" and e.ei!="") or (person_index.1!="" and person_index.2!="")))
       <a class="%if;(link_next="") disabled%end;%if;(e.et="S") border rounded%end;"
-        href="%if(link_next!="")%link_next;%(%else;%nn;
-        %prefix;&em=R&et=S%nn;
-        %if;(e.i!="")&i=%e.i;&ei=%e.ei;%nn;
-        %elseif;(person_index.1!="")&i=%person_index.1;&ei=%person_index.2;%end;%)%nn;
+        href="%if(link_next!="")%link_next;%nn;
+          %else;%nn;
+            %prefix;&em=R&et=S%nn;
+            %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
+            %else;&i=%person_index.1;&ei=%person_index.2;%end;%nn;
+          %end;%nn;
           %if;(e_im=0)&im=0%end;%nn;
           %if;(e_sp=0)&sp=0%end;%nn;
           %if;(e.bd!="")&bd=%e.bd;%end;%nn;
-          %if;(e.color!="")&color=%e.color;%end;%end;"
+          %if;(e.color!="")&color=%e.color;%end;"
         title="[*shortest path]%if;(link_next!=""), [visualize/show/hide/summary]1
          [next relationship path]%end;" accesskey=">">%nn;
         <i class="fas fa-bezier-curve fa-fw"></i>%if;(link_next!="")<i class="fas fa-arrow-right fa-fw"></i>%end;%nn;
       </a>
     %end;
-    %if;(e.i!="")
+    %if;((e.i!="" and e.ei!="") or (person_index.1!="" and person_index.2!=""))
       <a class="ml-2%if;(e.et="A") border rounded%end;"
-        href="%prefix;&em=R&et=A&i=%e.i;&ei=%e.ei;%nn;
+        href="%prefix;&em=R&et=A%nn;
+          %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
+          %else;&i=%person_index.1;&ei=%person_index.2;%nn;
+          %end;%nn;
           %if;(e_im=0)&im=0%end;%nn;
           %if;(e_sp=0)&sp=0%end;%nn;
           %if;(e.bd!="")&bd=%e.bd;%end;%nn;
@@ -29,7 +34,10 @@
         title="[*relationship link/relationship links]1" accesskey="^">%nn;
         <i class="fa fa-user-friends fa-fw"></i></a>
       <a class="ml-2%if;(e.et="M") border rounded%end;"
-        href="%prefix;&em=R&et=M&i=%e.i;&ei=%e.ei;%nn;
+        href="%prefix;&em=R&et=M
+          %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
+          %else;&i=%person_index.1;&ei=%person_index.2;%nn;
+          %end;%nn;
           %if;(e_im=0)&im=0%end;%nn;
           %if;(e_sp=0)&sp=0%end;%nn;
           %if;(e.bd!="")&bd=%e.bd;%end;%nn;

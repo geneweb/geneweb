@@ -224,7 +224,7 @@ let descendants_aux base liste1 liste2 =
         in
         loop0 (chlds @ acc) l
     | _ :: l ->
-        !GWPARAM.syslog `LOG_WARNING
+        !GWPARAM.syslog `LOG_INFO
           "Unexpected empty level list in descend computation\n";
         loop0 acc l
   in
