@@ -4034,7 +4034,7 @@ and string_of_parent_age conf base (p, p_auth) parent : Adef.safe_string =
 and string_of_int_env var env =
   match get_env var env with
   | Vint x -> string_of_int x |> str_val
-  | _ -> raise Not_found
+  | _ -> str_val "0"
 
 let eval_transl conf base env upp s c =
   match c with
