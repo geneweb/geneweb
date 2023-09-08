@@ -19,61 +19,51 @@
 %( TODO include;menubar %index, %foreach;family, do not work in this context %)
 %let;prefix_a;%prefix_base_password&p=%e.p;&n=%e.n;%nn;
   %if;(e.oc!="")&oc=%e.oc;%end;%in; %( %access; does not work %)
-<div class="container-fluid">
+<div class="container%if;(e.m="A" and e.t="T" and e.v>3)-fluid%end;">
 %include;home
-<div class="d-flex justify-content-between">
-  <div class="h1">%nn;
-    %if;(e.slices="on")
-      [*display by slices/slice width/overlap/total width]0
-    %else;
-      %( %apply;a_of_b%with; unavailble on dag %)
-      %if;(e.m="D")
-        %if;(e.t="TV")[*compact descendants tree]%nn;
-        %else;[*descendants tree]%nn;
-        %end;
-      %elseif;(e.m="A")[*ascendants tree]%nn;
-      %elseif;(e.m="RLM")[*multi relations graph]%nn;
-      %else;[*shortest path]%end;
-      %if;(e.oi!="") <span style="font-size:60%%""> ([partial])</span>%end;
-      %if;(e.dag="on") ([dag])%end;
+%define;of(xx)
+  [of%s:::xx]
+%end;
+<h3 class="mt-1 ml-2 text-no-wrap">%nn;
+  %if;(e.slices="on")
+    [*display by slices/slice width/overlap/total width]0
+  %elseif;(e.m="D")
+    %if;(e.t="TV")[*compact descendants tree]%nn;
+    %else;[*descendants tree]%nn;
     %end;
-  </div>
-  %if;(e.t="A" or e.t="C")
-    <div class="h4">
-      %if;(e.t="A")[*male line/female line]0%nn;
-      %elseif;(e.t="C")[*male line/female line]1%nn;
-      %end;
+  %elseif;(e.m="A")[*ascendants tree]%nn;
+  %elseif;(e.m="RLM")[*multi relations graph]%nn;
+  %else;[*shortest path]%end; %%apply;of%with;%apply;capitalize(e.p)%end; %apply;capitalize(e.n)
+  %( !! %a_of_b or %self unavailable on dag !! %)
+  <small class="text-muted ml-1 user-select-none">(%e.v; [generation/generations]1%if;(e.oi!=""), [partial])%elseif;(e.dag="on"), [dag])%end;
+    %(%apply;togend(e.v) also unavailable %)</small>
+</h3>
+%if;(not cancel_links)
+  %if;(e.m="A" or e.m="D")
+    <div class="d-flex justify-content-center">
+      %include;buttons_dag
+    </div>
+  %elseif;(e.m="RL" or e.m="RLM")
+    <div class="row">
+      %include;buttons_rel
     </div>
   %end;
-  %if;(not cancel_links)
-    %if;(e.m="A" or e.m="D")
-      <div class="d-flex justify-content-center">
-        %include;buttons_dag
-      </div>
-    %elseif;(e.m="RL" or e.m="RLM")
-      <div class="row">
-        %include;buttons_rel
-      </div>
-    %end;
-  %end;
-</div>
+%end;
 %if;(e.m="A" or e.m="D")
   %if;(e.slices="on")
     <form method="GET" action="%action;">
-    <p>
     %hidden;
     %foreach;env_binding;
       %if;(env.key != "slices")
-        <input type="hidden" name="%env.key;" value="%env.val.decoded;"%/>
+        <input type="hidden" name="%env.key;" value="%env.val.decoded;">
       %end;
     %end;
-    </p>
     <table>
     <tr align="%left;">
       <td align="%right;">
         <label>
         [*don't group the common branches together]
-        <input type="checkbox" name="nogroup" value="on"%/>
+        <input type="checkbox" name="nogroup" value="on">
         </label>
       </td>
     </tr>
@@ -81,7 +71,7 @@
       <td align="%right;">
         <label>
         [*display by slices/slice width/overlap/total width]1
-        <input name="dpos" size="5" value="78"%/>
+        <input name="dpos" size="5" value="78">
         </label>
       </td>
     </tr>
@@ -89,7 +79,7 @@
       <td align="%right;">
         <label>
         [*display by slices/slice width/overlap/total width]2
-        <input name="overlap" size="5" value="10"%/>
+        <input name="overlap" size="5" value="10">
         </label>
       </td>
     </tr>
@@ -97,16 +87,16 @@
       <td align="%right;">
         <label>
         [*display by slices/slice width/overlap/total width]3
-        (%dag.min_wid;-%dag.max_wid;)
+        (% dag.min_wid;-%dag.max_wid ;)
         <input name="width" size="5" value="%nn;
           %if;(dag.max_wid <= 78)%dag.max_wid;
           %elseif;(dag.min_wid >= 78)%dag.min_wid;
-          %else;78%end;"%/>
+          %else;78%end;">
         </label>
       </td>
     </tr>
     </table>
-    <p><input type="submit" value="Ok"%/></p>
+    <p><input type="submit" value="OK"></p>
     </form>
   %end;
 %end;
@@ -167,7 +157,7 @@
         %elseif;dag_cell.is_bar;
           %if;(dag_cell.bar_link!="" and not cancel_links and e.em!="R")
              %( added em!=R here condition because first button_rel is static and does the same %)
-            <a href="%dag_cell.bar_link;%if;(e.im=0)&im=0%end;" title="[*navigate on tree]">│</a>%nn;
+            <a href="%dag_cell.bar_link;" title="[*navigate on tree]">│</a>%nn;
           %else;│%end;
         %elseif;(dag_cell.text!="")%dag_cell.text;
         %elseif;(dag_cell.item!="")
@@ -180,11 +170,11 @@
                 %if;(not (env.key="i" or env.key="p" or env.key="n" or env.key="oc" or
                           env.key="m" or env.key="t"))%env.key;=%env.val;&%end;%end;"
                 class="stretched-link"
-                title="[*navigation with this individual] " style="line-height:1rem"></a>
+                title="[*navigation with this individual]"></a>
               <div>
             %end;
           %end;
-          <div class="d-flex-row flex-column justify-content-between%if;(dag_cell.item!="") mx-1%end;">%dag_cell.item;</div>
+          <div class="d-flex flex-column justify-content-between%if;(dag_cell.item!="") mx-1%end;">%dag_cell.item;</div>
         %else;
           %( TODO : trouver une condition pour un hr stylisé pour les conjoints %)
           %if;dag_cell.is_hr_left;
