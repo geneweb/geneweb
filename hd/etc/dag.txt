@@ -170,23 +170,19 @@
         %elseif;(dag_cell.text!="")%dag_cell.text;
         %elseif;(dag_cell.item!="")
           %if;(line_nbr!=0 and dag_cell.index!="-1")
-            <div class="position-relative list-group-item-action">
-              %if;(e.m="RLM")
-              <a href="%prefix;i=%dag_cell.index;"
-                class="stretched-link"
-                title="[*open this individual page]" style="line-height:1rem"></a>
-              %else;
-              <a href="%prefix_set.pmod;i=%dag_cell.index;&m=D&t=TV&%foreach;env_binding;%nn;
+            %if;(e.m="RLM" or e.dag="on")
+              <a href="%prefix;i=%dag_cell.index;" title="[*open this individual page]"></a>
+            %else;
+              <div class="position-relative list-group-item-action">
+                <a href="%prefix_set.pmod;i=%dag_cell.index;&m=D&t=TV&%foreach;env_binding;%nn;
                 %if;(not (env.key="i" or env.key="p" or env.key="n" or env.key="oc" or
                           env.key="m" or env.key="t"))%env.key;=%env.val;&%end;%end;"
                 class="stretched-link"
                 title="[*navigation with this individual] " style="line-height:1rem"></a>
-              %end;
+              <div>
+            %end;
           %end;
           <div class="d-flex-row flex-column justify-content-between%if;(dag_cell.item!="") mx-1%end;">%dag_cell.item;</div>
-          %if;(line_nbr!=0 and dag_cell.index!="-1")
-            </div>
-          %end;
         %else;
           %( TODO : trouver une condition pour un hr stylisé pour les conjoints %)
           %if;dag_cell.is_hr_left;
@@ -205,7 +201,6 @@
   %end;
 %end;
 %base_trailer;
-%include;copyr
 </div>
 %include;js
 </body>
