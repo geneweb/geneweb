@@ -136,12 +136,14 @@
               %in;
               %if;(fw!="" and (cell.family.date_s=cell.family.marriage_date.year)and cell.family.sep_date_s="")
                  %( DEBUG %fw;|%widow_year;|%widow_period;<br> %)
-                <span class="font-italic">%cell.family.date_s;</span>%nn;
-                <span class="small font-weight-bold
-                  %if;(fw=3)text-secondary%elseif;(fw=0)text-primary%nn;
-                  %elseif;(fw=5 or fw=6)
-                    %if;(widow_period!="" and widow_period>100)text-danger%nn;
-                    %else;text-success%end;
+                <span class="small" style="font-size:8px;">%cell.family.date_s;</span>%nn;
+                <span style="font-size:8px;" class="%nn;
+                  %if;(not cancel_links)small%sp;
+                    %if;(fw=3)text-secondary%elseif;(fw=0)text-primary%nn;
+                    %elseif;(fw=5 or fw=6)
+                      %if;(widow_period!="" and widow_period>100)text-danger%nn;
+                      %else;text-success%end;
+                    %end;
                   %end;"
                  title="%nn;
                  %if;(widow_year!="")
@@ -164,7 +166,7 @@
                      %if;(fw=0 or fw=5)%cell.family.father;%else;%cell.family.mother;%end;
                    %end;
                    %if;(widow_period>100)&#10;Please let both spouses rest in peace!%end;
-                 %end;">%if;(not ("-" in cell.family.date_s))—%end;%if;(fw=2 or fw=4)?%end;%widow_year;</span>
+                 %end;">%if;(not ("-" in cell.family.date_s))-%end;%if;(fw=2 or fw=4)?%end;%widow_year;</span>
               %else;
                 %cell.family.date_s;
                 %end;

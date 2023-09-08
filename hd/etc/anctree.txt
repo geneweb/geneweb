@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: anctree.txt v7.1 10/01/2023 20:01:49 $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+<!-- $Id: anctree.txt v7.1 04/09/2023 03:23:40 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
-    %if;(evar.t = "A")[*male line/female line]0%nn;
-    %elseif;(evar.t = "C")[*male line/female line]1%nn;
+    %if;(e.t="A")[*male line/female line]0%nn;
+    %elseif;(e.t="C")[*male line/female line]1%nn;
     %else[*ascendants tree]%end;
-    %if;(evar.t = "A" or evar.t = "C"):%sp;
-      %if;(public_name != "")%public_name;%else;%first_name;%end;
-      %if;(qualifier != "") %qualifier;%end; %surname;
+    %if;(e.t="A" or e.t="C"):%sp;
+      %if;(public_name!="")%public_name;%else;%first_name;%end;
+      %if;(qualifier!="") %qualifier;%end; %surname;
     %end;
   </title>
   <meta name="robots" content="none">
@@ -21,45 +21,31 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-
 <div class="container-fluid">
-%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
-  </div>
-  <div class="container">
-%end;
 %include;perso_utils
 %if;not cancel_links;
   %include;menubar
 %end;
-%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
-  </div>
-  <div class="container-fluid">
-%end;
-%if;(evar.t="T" and evar.t1="7")
+
+%if;(e.t="T" and e.t1="7")
   %include;modules/arbre_7gen
-%elseif;(evar.t="T" and evar.t1="h7")
+%elseif;(e.t="T" and e.t1="h7")
   %include;modules/arbre_h7
-%elseif;(evar.t="T" and evar.t1="m") %(m for compatibility with existing arbre_9gen %)
+%elseif;(e.t="T" and e.t1="m") %(m for compatibility with existing arbre_9gen %)
   %include;modules/arbre_9gen
-%elseif;(evar.t="T" and evar.t1="CT") %(CT for compatibility with templm %)
+%elseif;(e.t="T" and e.t1="CT") %(CT for compatibility with templm %)
   %include;modules/arbre_hi_tools
   %include;templm/tools
   %include;modules/arbre_hi_indexes
   %include;modules/arbre_hi
-%elseif;(evar.t="A" or evar.t="C" or evar.t="T")
+%elseif;(e.t="A" or e.t="C" or e.t="T")
   %include;modules/arbre_vertical 
 %else;
   This should not happen (probably a bad variable in URL: check t=/t1=)
 %end;
-
-%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
-  </div>
-  <div class="container">
-%end;
 %base_trailer;
+%if;(e.t!="T" and e.t!="A" and e.t!="C" and e.t1="")
 %include;copyr
-%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
-  </div>
 %end;
 </div>
 %include;js
