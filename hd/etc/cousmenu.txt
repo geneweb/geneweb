@@ -85,8 +85,8 @@
     %let;birth_prec;%if;(path_end.birth_date.prec="&#60;")1%end;%in;
     %let;death_prec;%if;(path_end.death_date.prec="&#62;")1%end;%in;
     %( percent of birth/death into a linear bicolor gradient %)
-    %let;birth_age;%if;((path_end.birth_date.prec="" or path_end.birth_date.prec="&#60;") and path_end.birth_date.year!="" and max_date_vvv_www>min_date_vvv_www)%expr(100-(100*(max_date_vvv_www-path_end.birth_date.year)/(max_date_vvv_www-min_date_vvv_www)))%end;%in;
-    %let;death_age_;%if;((path_end.death_date.prec="" or path_end.death_date.prec="&#62;") and path_end.death_date.year!="" and max_date_vvv_www>min_date_vvv_www)%expr(100-(100*(max_date_vvv_www-path_end.death_date.year)/(max_date_vvv_www-min_date_vvv_www)))%end;%in;
+    %let;birth_age;%if;((path_end.birth_date.prec="" or path_end.birth_date.prec="<") and path_end.birth_date.year!="" and max_date_vvv_www>min_date_vvv_www)%expr(100-(100*(max_date_vvv_www-path_end.birth_date.year)/(max_date_vvv_www-min_date_vvv_www)))%end;%in;
+    %let;death_age_;%if;((path_end.death_date.prec="" or path_end.death_date.prec=">") and path_end.death_date.year!="" and max_date_vvv_www>min_date_vvv_www)%expr(100-(100*(max_date_vvv_www-path_end.death_date.year)/(max_date_vvv_www-min_date_vvv_www)))%end;%in;
     %( fix gradient for individual who are dead < 1 year old by forcing a 1% white space %)
     %let;death_age;%if;(death_age_!="" and birth_age!= "" and death_age_=birth_age and birth_age>0)%expr(birth_age+1)%else;%death_age_;%end;%in;
     %let;white;%if;(cous_isdead=1)rgba(245,245,235,1)%else;rgba(255,255,255,1)%end;%in;%let;brown;rgba(245,231,216,1)%in;%let;yellow;rgba(255,235,210,1)%in;
@@ -253,7 +253,7 @@
     <div class="d-flex justify-content-around stretched-link h-100"
       data-toggle="modal" data-target="#modal_vvv_www"%if;(percent_vvv_www!=0 and percent_vvv_www!=100) 
 style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vvv_www>1)%expr(percent_vvv_www-1)%else;1%end;%%, rgba(248,249,250,0) %if;(percent_vvv_www<99)%expr(percent_vvv_www+1)%else;100%end;%%"%end;>
-      <div class="order-2 w-75 align-self-center text-bottom">
+      <div class="order-2 w-75 align-self-center text-bottom ml-1">
         %if;(i=0 and k=0)%if;is_male;[him/her]0%elseif;is_female;[him/her]1%end;%else;%apply;cousin_lex(i,k)%end;
       </div>
       <div class="d-flex justify-content-end align-self-center text-right">
@@ -272,7 +272,7 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
 %define;table(xxx)
   %let;maxanc;%cousins.max_a;%in;
   %let;maxdesc;%expr(cousins.max_d+xxx)%in;
-  <table id="quickrel" class="table table-responsive-sm mb-0 mt-1 order-3">
+  <table id="quickrel" class="table table-responsive-sm mb-0 mt-1 order-3 col-%if;(e.v=1)8%elseif;(e.v=0)4%end;">
     %for;j;1;maxdesc;
       <tr style="height:2rem">%nn;
         %for;i;0;xxx;
@@ -281,10 +281,10 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
               %let;tot;%apply;cous_paths_cnt%with;%i;%and;%k;%end;%in;
               %let;tot_next;%apply;cous_paths_cnt%with;%i;%and;%expr(k+1)%end;%in;
               %if;(i>1 and k=0)
-               <td class="h4 text-left align-middle border-top-0">%nn;
+               <td class="h4 font-weight-light user-select-none text-left align-middle border-top-0 pb-3">%nn;
                  %expr(xxx-j)%nn;
                </td>
-               %if;(i>2)<td colspan="%expr(i-2)" class="border-0"> </td>%end;
+               %if;(i>2)<td colspan="%expr(i-2)" class="border-0"></td>%end;
               %end;
               <td%if;(j=xxx) width="%expr(100/xxx)%%"%end;%if;(i>0 and k=0) colspan="2"%end;%sp;
                 class="border-0 border-top-0 border-bottom-0 border-right-0">
@@ -307,8 +307,8 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
                         %end;
                       %else;
                         <div class="col-6 border-dark%if;(tot_next!=0) border-right
-                          border-top-0 border-left-0 border-bottom-0%else; border-0%end;" style="height:15px"> </div>
-                        <div class="col-6 border-0"> </div>
+                          border-top-0 border-left-0 border-bottom-0%else; border-0%end;" style="height:15px"></div>
+                        <div class="col-6 border-0"></div>
                       %end;
                     </div>
                   </div>
@@ -319,29 +319,24 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
         %(<td class="h3 align-top border-0">%if;(j>1)%expr(j-1)%else; %end;</td>%)
       </tr>
     %end;
-    <tr>
-      <td class="border-0" colspan="%expr(xxx+1)">
-        <div class="d-flex flex-column justify-items-center mt-2">
-          <span><i class="fa-solid fa-dna fa-sm mr-1"></i>[coefficient of relationship]</span>
-          <span><i class="fa-solid fa-user fa-sm mr-1"></i>[one ancestor counted]</span>
-          <span><i class="fa-solid fa-warning fa-sm text-danger mr-1"></i>[multiple relations]</span>
-        </div>
-      </td>
-    </tr>
   </table>
+  <div class="d-flex flex-column justify-items-center order-4 mt-2">
+    <span><i class="fa-solid fa-dna fa-sm mr-1"></i>[coefficient of relationship]</span>
+    <span><i class="fa-solid fa-user fa-sm mr-1"></i>[one ancestor counted]</span>
+    <span><i class="fa-solid fa-warning fa-sm text-danger mr-1"></i>[multiple relations]</span>
+  </div>
 %end;
 
 %apply;table(e_v+1)
 
 %( page title + counts shown at top of page using flex order %)
 <div class="d-flex justify-content-between order-2 mt-1">%nn;
-  <h3 class="h4">[*link between]
+  <h3 class="">[*link between]
     %let;max;%if;(cousins.max_a < e_v)%cousins.max_a;%else;%e_v;%end;%in;
     %if;(public_name != "")%public_name;%else;%first_name;%end;
-    %if;(qualifier != "") <em>%qualifier;</em>%end;
-    %sp;%surname;
+    %if;(qualifier != "") <em>%qualifier;</em>%end; %surname;%sp;
     %(%if;(alias != "") <em>(%alias;)</em>%end;%)
-    %sp;[and] [close family] [up to] %max; [generation/generations]1%( montantes [and] %expr(e_v+cousins.max_d) descendantes…%)
+    %if;(e.v=0)[and] [a descendant]0%else;[and] [close family] [up to] %max; [generation/generations]1%end;%( montantes [and] %expr(e_v+cousins.max_d) descendantes…%)
   </h3>
   <div class="d-flex flex-column justify-content-end text-right">
     %( quick count ascendants | TODO : filter by index to reduce asc./desc. implexes %)
