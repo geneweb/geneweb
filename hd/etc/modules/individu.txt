@@ -233,9 +233,7 @@
     %if;(z3 > 0)z3 %nn;
       %if;(z3 = 1)[year/month/day]2%else;[days old]%end;
     %end;
-  %end;
-  %if;(l_nbd > 999) (%expr(l_nbd/1000)[(thousand separator)]%apply;remainder(l_nbd) [days old])%nn;
-  %elseif;(l_nbd > 31) (%l_nbd; [days old])%end;
+  %end;%if;(lang="en") old%end
 %end;
 %define;compute_age(z1,z2)
   %( test for z1.year has been done before call %)
@@ -328,7 +326,11 @@
       <li class="mt-1" title="%nn;
         %if;(is_dead and computable_death_age)[*age at death]
         %elseif;(not is_dead and computable_age)[*age]
-        %end;"><span class="fa-li"><i class="far fa-id-card"></i></span>
+        %end;
+        = %if;(l_nbd > 999)%expr(l_nbd/1000)[(thousand separator)]%apply;remainder(l_nbd) [days old]%nn;
+        %elseif;(l_nbd > 31)%l_nbd; [days old]%nn;
+        %end;%if;(lang="en") old%end;">
+        <span class="fa-li"><i class="far fa-id-card"></i></span>
         %if;(is_dead and computable_death_age)
           %if;(death_date.month!="" and death_date.day!=""
            and birth_date.month!="" and birth_date.day!="")%apply;curr_age()%else;~ %death_age;%end;
