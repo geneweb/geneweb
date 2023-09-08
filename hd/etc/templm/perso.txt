@@ -571,7 +571,7 @@
   %if;has_parents;
     <div><div>
       <span class="menu" style="display:inline;position:relative;background-color:#AAA;">
-        <span style="margin-left:20px"><small>[up to] %apply;ascmax()%apply;implex()</small></span><br>
+        <span style="margin-left:20px"><small>%apply;ascmax()%apply;implex()</small></span><br>
         %let;l1;%apply;min(max_anc_level,5)%in;
         <span>
           <span class="ch2" style="margin-top:-4px;">[*ancestor/ancestors]1</span>
@@ -1045,8 +1045,9 @@
   %if;has_children;
     %foreach;descendant_level;
       %if;(max_desc_level > 1 and level = max_desc_level)
-        %if;(level!= 1 and level!=0)[up to] %number_of_descendants;%nn;
-          %sp;à %level; [generation/generations]1
+        %if;(level!= 1 and level!=0)[up to] %level;%nn;
+          %if;(level = "1") [generation/generations]0%else; [generation/generations]1%end;%nn;
+          %sp;(%number_of_descendants;)
         %end;
       %end;
     %end;
@@ -1059,9 +1060,9 @@
 %end;
 %define;ascmax()
   %foreach;ancestor_level;
-    %if;(level = max_anc_level)
-      %number_of_ancestors; à %level;
-      %if;(level = "1") [generation/generations]0%else; [generation/generations]1%end;
+    %if;(level = max_anc_level)[up to] %level;%nn;
+      %if;(level = "1") [generation/generations]0%else; [generation/generations]1%end;%nn;
+      %sp;(%number_of_ancestors;)
     %end;
   %end;
 %end;
