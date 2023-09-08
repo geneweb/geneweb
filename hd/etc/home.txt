@@ -1,26 +1,30 @@
-<!-- $Id: home.txt v7.1 18/08/2023 18:14:51 $ -->
+<!-- $Id: home.txt v7.1 07/09/2023 00:49:55 $ -->
 %define;display_sosa_ref(xx)
   [*sosa reference: %t:::xx]
 %end;
 %if;(not cancel_links)
-  <div class="float-left">
-    <div class="d-flex flex-column mt-2 fixed_top_btn%if;(evar.m!="A")_col %end; %if;(evar.wide="on")fixed_top_btn_wide%end;">
-      <a role="button" class="btn btn-link ml-0 p-0" href="%prefix;">%nn;
-        <i class="fa fa-home fa-fw" title="[*home]" aria-hidden="true"></i>%nn;
-        <i class="sr-only">[*home]</i>%nn;
+  <div class="d-flex flex-column fixed_top_btn%if;((e.m="A" or e.m="D") and (e.t="T" or e.t="TV" or e.t=""))_tree%end;
+    %if;(evar.wide="on") fixed_top_btn_wide%end;">
+    <a role="button" class="btn btn-sm btn-link p-0  border-0" href="%prefix;" title="[*home]">%nn;
+      <i class="fa fa-home fa-fw fa-sm" aria-hidden="true"></i>%nn;
+      <i class="sr-only">[*home]</i>%nn;
+    </a>
+    %if;(referer!="")
+      <a role="button" class="btn btn-sm btn-link p-0  border-0" href="%referer;" title="[*back]">%nn;
+        <i class="fa fa-arrow-left fa-fw fa-sm" aria-hidden="true"></i>%nn;
+        <span class="sr-only">[*back]</span>%nn;
       </a>
-      <a role="button" class="btn btn-link text-primary ml-0 p-0" data-toggle="modal" data-target="#searchmodal" accesskey="S">%nn;
-        <i class="fa fa-search fa-fw" title="[*search/case sensitive]0" aria-hidden="true"></i>%nn;
-        <span class="sr-only">[*search/case sensitive]0</span>%nn;
-      </a>
-      %if;(referer!="")
-        <a role="button" class="btn btn-link ml-0 p-0" href="%referer;" title="Revenir en arrière">%nn;
-          <i class="fa fa-arrow-left fa-fw" title="[*back]" aria-hidden="true"></i>%nn;
-          <span class="sr-only">[*back]</span>%nn;
-        </a>
-      %end;
-      %if;(debug and b.show_query_time!="on")<span class="small" id="q_time_d"></span>%end;
-    </div>
+    %end;
+    <a role="button" class="btn btn-sm btn-link text-primary p-0  border-0" data-toggle="modal" data-target="#searchmodal"
+      accesskey="S" title="[*search/case sensitive]0">%nn;
+      <i class="fa fa-search fa-fw fa-sm" aria-hidden="true"></i>%nn;
+      <span class="sr-only">[*search/case sensitive]0</span>%nn;
+    </a>
+    %if;(debug and b.show_query_time!="on")
+      <div class="p-0 border-0" title="" id="q_time_d">
+        <i class="fa fa-hourglass-half fa-fw fa-xs p-0"></i>
+      </div>
+    %end;
   </div>
   <div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
