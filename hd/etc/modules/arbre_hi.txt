@@ -389,7 +389,7 @@
       %foreach;ancestor;
         %if;(ancestor.anc_sosa.v %2=0)
           %let;anc_sosahalf;%expr(ancestor.anc_sosa.v/2)%in;
-          %let;anc_sosasamehalf;%expr(ancestor.same/2)%in;
+          %let;anc_sosasamehalf;%if;(ancestor.same!="")%expr(ancestor.same/2)%else;0%end;%in;
           %let;top;%expr(topxx_yy(anc_sosahalf)*hb)%in; %( top left corner %)
           %let;left;%expr(leftxx_yy(anc_sosahalf)*wb)%in;
           %let;top1;%expr(topxx_yy(anc_sosahalf)*hb+6)%in; %( offset for implex liens %)
@@ -446,8 +446,8 @@
         %let;left;%expr(leftxx_yy(ancestor.anc_sosa.v)*wb)%in;
         %let;top1;%expr(topxx_yy(ancestor.anc_sosa.v)*hb+6)%in; %( offset for implex liens %)
         %let;left1;%expr(leftxx_yy(ancestor.anc_sosa.v)*wb+4)%in;
-        %let;top2;%expr(topxx_yy(ancestor.same.v)*hb+6)%in;
-        %let;left2;%expr(leftxx_yy(ancestor.same.v)*wb+4)%in;
+        %let;top2;%if;(ancestor.same!="")%expr(topxx_yy(ancestor.same.v)*hb+6)%end;%in;
+        %let;left2;%if;(ancestor.same!="")%expr(leftxx_yy(ancestor.same.v)*wb+4)%end;%in;
         %let;bb;%if;(evarso="on")1%else;0%end;%in;
         %let;bg;%if;(ancestor.same!="")CBFECE;%elseif(evarcpl="on")%apply;bg(level-1)%else;%apply;bg(level)%end;%in;
         %if;(evarso!="on")
@@ -584,13 +584,13 @@ Arbre des ancêtres de %first_name; %surname; %dates;
       %if;(evarso="on")
         %if;(evarv < 13 and evarcpl="on")
           <div id="hi-tree1" style="width:%wids;px;height:%higs;px">
-          %apply;graph(evarv-1,"I",2)
-          %apply;graphlinks(evarv-1,"I")
+          %apply;graph(evarv,"I",2)
+          %apply;graphlinks(evarv,"I")
           </div>
         %elseif;(evarv < 12 and evarcpl!="on")
           <div id="hi-tree1" style="width:%wids;px;height:%higs;px">
-          %apply;graph(evarv,"I",1)
-          %apply;graphlinks(evarv,"I")
+          %apply;graph(evarv+1,"I",1)
+          %apply;graphlinks(evarv+1,"I")
           </div>
         %else;
           [*compact tree][:] [specify::generation/generations]0 %if;(evarcpl="on")< 13.%else;< 12.%end;
@@ -598,13 +598,13 @@ Arbre des ancêtres de %first_name; %surname; %dates;
       %elseif;(evarso!="on")
         %if;(evarv < 14 and evarcpl="on")
           <div id="hi-tree1" style="width:%widc;px;height:%higc;px">
-          %apply;graph(evarv-1,"I",2)
-          %apply;graphlinks(evarv-1,"I")
+          %apply;graph(evarv,"I",2)
+          %apply;graphlinks(evarv,"I")
           </div>
         %elseif;(evarv < 13 and evarcpl!="on")
           <div id="hi-tree1" style="width:%widc;px;height:%higc;px">
-          %apply;graph(evarv,"I",1)
-          %apply;graphlinks(evarv,"I")
+          %apply;graph(evarv+1,"I",1)
+          %apply;graphlinks(evarv+1,"I")
           </div>
         %else;
           [*compact tree][couples][:] [specify::generation/generations]0%if;(evarcpl="on")< 14.%else;< 13.%end;
@@ -614,13 +614,13 @@ Arbre des ancêtres de %first_name; %surname; %dates;
       %if;(evarso="on")
         %if;(evarv < 13 and evarcpl="on")
           <div id="hi-tree1" style="width:%wids;px;height:%higs;px">
-          %apply;graph(evarv-1,"H",2)
-          %apply;graphlinks(evarv-1,"H")
+          %apply;graph(evarv,"H",2)
+          %apply;graphlinks(evarv,"H")
           </div>
         %elseif;(evarv < 12 and evarcpl!="on")
           <div id="hi-tree1" style="width:%wids;px;height:%higs;px">
-          %apply;graph(evarv,"H",1)
-          %apply;graphlinks(evarv,"H")
+          %apply;graph(evarv+1,"H",1)
+          %apply;graphlinks(evarv+1,"H")
           </div>
         %else;
           [*compact tree][:] [specify::generation/generations]0%if;(evarcpl="on")< 13.%else;< 12.%end;
@@ -628,13 +628,13 @@ Arbre des ancêtres de %first_name; %surname; %dates;
       %elseif;(evarso!="on")
         %if;(evarv < 14 and evarcpl="on")
           <div id="hi-tree1" style="width:%widc;px;height:%higc;px">
-          %apply;graph(evarv-1,"H",2)
-          %apply;graphlinks(evarv-1,"H")
+          %apply;graph(evarv,"H",2)
+          %apply;graphlinks(evarv,"H")
           </div>
         %elseif;(evarv < 13 and evarcpl!="on")
           <div id="hi-tree1" style="width:%widc;px;height:%higc;px">
-          %apply;graph(evarv,"H",1)
-          %apply;graphlinks(evarv,"H")
+          %apply;graph(evarv+1,"H",1)
+          %apply;graphlinks(evarv+1,"H")
           </div>
         %else;
           [*compact tree][:] [specify::generation/generations]0%if;(evarcpl="on")< 14.%else;< 13.%end;
