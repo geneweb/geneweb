@@ -5,10 +5,10 @@
     <tr>
       %foreach;cell;
         %if;(not is_first)
-          <td class="text-center"><samp>&nbsp;</samp></td>
+          <td></td>
         %end;
         <td colspan="%cell.colspan;" class="text-center py-0 mx-0">%nn;
-          %if;(cell.is_empty or cell.is_top)<samp>&nbsp;</samp>%else;│%end;
+          %if;(cell.is_empty or cell.is_top)%else;│%end;
         </td>
       %end;
     </tr>
@@ -16,10 +16,10 @@
   <tr>
     %foreach;cell;
       %if;(not is_first)
-        <td class="text-center"><samp>&nbsp;</samp></td>
+        <td></td>
       %end;
-      <td colspan="%cell.colspan;" class="text-center align-bottom p-0"%( style="max-width:%expr(1024/(2^e.v))px"%)>%nn;
-        %if;(cell.is_empty)<samp>&nbsp;</samp>%nn;
+      <td colspan="%expr(cell.colspan)" class="text-center align-bottom p-0 fix_size">%nn;
+        %if;(cell.is_empty)%nn;
         %else;
           %if;(e.im="" and cell.person.has_image)
             %if;not cancel_links;<a href="%cell.person.image_html_url;">%end;
@@ -172,15 +172,15 @@
                 %end;
             %end;
             %if;(wizard and not cancel_links)</a>%elseif;friend;</span>%end;
-         %else;
-            <samp>&nbsp;</samp>
+          %else;
+            
           %end;
-        %else;<samp>&nbsp;</samp>
+        %else;
         %end;
         </td>
       %end;
-      <td colspan="%cell.colspan;" class="text-center py-0">%nn;
-        %if;cell.is_empty;<samp>&nbsp;</samp>%nn;
+      <td colspan="%expr(cell.colspan)" class="text-center py-0">%nn;
+        %if;cell.is_empty;
         %elseif;(cancel_links)│%nn;
         %else;
           <a href="%cell.person.bname_prefix;%cell.person.access;%nn;
@@ -197,16 +197,16 @@
     <tr>
       %foreach;cell;
         %if;(not is_first)
-          <td colspan="1" class="text-center px-0 py-0">%nn;
+          <td class="text-center px-0 py-0">%nn;
           %if;(cell.is_right)<hr class="full">%nn;
-          %else;%(<samp>&nbsp;</samp>%)%end;
+          %else;%end;
           </td>
         %end;
         <td colspan="%cell.colspan;" class="px-0 py-0 text-%nn;
            %if;cell.is_left;%right;
            %elseif;cell.is_right;%left;
            %else;center%end;">%nn;
-          %if;cell.is_empty;%(<samp>&nbsp;</samp>%)%nn;
+          %if;cell.is_empty;%nn;
           %elseif;cell.is_left;<hr class="%right;">%nn;
           %elseif;cell.is_right;<hr class="%left;">%nn;
           %else;%(│%)%end;
@@ -250,3 +250,14 @@
   </table>
 %end;
 %include;buttons_dag
+%(<script>
+window.addEventListener('load', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const e_v = urlParams.get('v');
+  const width = window.innerWidth;
+  var size = 2*width/(2^(e_v+1));
+  console.log(size);
+  alert(size);
+  $('.fix_size').css("max-width", size);
+})
+</script>%)

@@ -61,7 +61,7 @@
       %if;(wizard and not cancel_links)</a>%end;
     %else;
       <span class="small_image noimage rounded display-4 text-center%nn;
-        text-muted ml-0" style="height:100px">%bvar.default_image_no;</span>
+        text-muted ml-0 h-100">%bvar.default_image_no;</span>
     %end;
   %end;
   </div>
@@ -144,7 +144,7 @@ Person:            Child1     Child2          Child3
           <td colspan="www" class="text-center"></td><td>&nbsp;</td>
         %end;
       %elseif;("ttt"="person" and "xxx"!="")
-        <td colspan="www" class="text-center" style="vertical-align:top">
+        <td colspan="www" class="text-center align-top">
         %if;(xxx.index!=baseindex)│%end;%apply;display_person("xxx")
         %if;(xxx.has_families)
           %reset_count1;
@@ -200,7 +200,7 @@ Person:            Child1     Child2          Child3
             </td>
             <td>&nbsp;</td>
           %elseif;("ttt"="spouse")
-            <td colspan="%fcount;" class="text-center" style="vertical-align:top">
+            <td colspan="%fcount;" class="text-center align-top">
               %apply;display_person("spouse")
             </td><td>&nbsp;</td>
           %elseif;("ttt"="vbars" and 1=2)

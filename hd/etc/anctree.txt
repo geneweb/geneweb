@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-<!-- $Id: anctree.txt v7.1 04/09/2023 03:23:40 $ -->
+<!-- $Id: anctree.txt v7.1 07/09/2023 04:06:52 $ -->
 <!-- Copyright (c) 1998-2007 INRIA -->
-  <title>%nn;
+%define;ttl()
+  %apply;a_of_b%with;
     %if;(e.t="A")[*male line/female line]0%nn;
     %elseif;(e.t="C")[*male line/female line]1%nn;
-    %else[*ascendants tree]%end;
-    %if;(e.t="A" or e.t="C"):%sp;
-      %if;(public_name!="")%public_name;%else;%first_name;%end;
-      %if;(qualifier!="") %qualifier;%end; %surname;
-    %end;
-  </title>
+    %else;[*ascendants tree]%end;%nn;
+  %and;%self;%end; %nn;
+%end;
+  <title>%apply;ttl()</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -26,7 +25,6 @@
 %if;not cancel_links;
   %include;menubar
 %end;
-
 %if;(e.t="T" and e.t1="7")
   %include;modules/arbre_7gen
 %elseif;(e.t="T" and e.t1="h7")
@@ -39,6 +37,9 @@
   %include;modules/arbre_hi_indexes
   %include;modules/arbre_hi
 %elseif;(e.t="A" or e.t="C" or e.t="T")
+  <h3 class="ml-3 text-no-wrap">%nn;
+    %apply;ttl()<small class="text-muted font-weight-lighter">%apply;togena(e.v)</small>
+  </h3>
   %include;modules/arbre_vertical 
 %else;
   This should not happen (probably a bad variable in URL: check t=/t1=)
