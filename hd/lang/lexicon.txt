@@ -116,6 +116,10 @@ sl: %1 od :g:%2
 sv: %1 till %2
 tr: %1 / %2
 
+    of%s
+en: of %s
+fr: d[’|e ]%s
+
     %d %s starting with %s
 co: %d %s principiendu da « %s »
 de: %d %s beginnend mit „%s”
@@ -14992,7 +14996,7 @@ en: One common ancestor: consanguine and uterine half relationships are included
 fr: Les relations de parenté consanguines et utérines par un seul ancêtre pivot commun sont incluses. Leur coefficient de parenté vaut la moitié de celui de la relation complète équivalente.
 
     multiple relations
-fr: En cas d’implexes, certains individus auront de multiples liens de parenté (chemins) avec l’individu racine. La parenté entre deux individus dépendra de tous les coefficients de leurs liens de parenté (chemins). [chemins = badges verts] ¡[TODO]!
+fr: En cas d’implexes, certains individus auront de multiples liens de parenté (chemins) avec l’individu racine. La parenté entre deux individus dépendra de tous les coefficients de leurs liens de parenté (chemins).
 
     since the last click
 bg: от последното щракване
