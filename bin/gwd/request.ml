@@ -400,7 +400,8 @@ let treat_request =
     let m = Option.value ~default:"" (p_getenv conf.env "m") in
     if not @@ try_plugin plugins conf bfile m
     then begin
-        if List.assoc_opt "counter" conf.base_env <> Some "no"
+        if List.assoc_opt "counter" conf.base_env <> Some "no" &&
+          m <> "IM" && m <> "IM_C" && m <> "SRC" && m <> "DOC"
         then begin
           match
             if only_special_env conf.env
