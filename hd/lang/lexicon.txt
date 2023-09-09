@@ -18497,3 +18497,6 @@ co: affissera corta corta
 en: very short display
 fr: affichage très court
 
+    remove %s column
+en: click on this header to remove the column(s) “%s”
+fr: cliquer sur cette en-tête pour supprimer la ou les colonne(s) « %s »
