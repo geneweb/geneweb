@@ -46,19 +46,21 @@
       %end;
   %end;
 %elseif;(e.em!="R" and e.m!="RLM" and e.m!="RL" and e.dag!="on")
-  %foreach;father.child;
-    %if;is_sibling_before;
-      %apply;setvar%with;prevsiblingaccess%and;%child.access;%end;
-      %apply;setvar%with;prevsiblingname%and;%child.first_name; %child.surname;%end;
-    %elseif;is_sibling_after;
-      %apply;setvar%with;nextsiblingaccess%and;%child.access;%end;
-      %apply;setvar%with;nextsiblingname%and;%child.first_name; %child.surname;%end;
+  %if;has_parents;
+    %foreach;father.child;
+      %if;is_sibling_before;
+        %apply;setvar%with;prevsiblingaccess%and;%child.access;%end;
+        %apply;setvar%with;prevsiblingname%and;%child.first_name; %child.surname;%end;
+      %elseif;is_sibling_after;
+        %apply;setvar%with;nextsiblingaccess%and;%child.access;%end;
+        %apply;setvar%with;nextsiblingname%and;%child.first_name; %child.surname;%end;
+      %end;
     %end;
   %end;
 %else;
 %end;
-%let;father_access;%if(dtree=1)%get_var.fatheraccess;%else;%father.access;%end;%in;
-%let;mother_access;%if(dtree=1)%get_var.motheraccess;%else;%mother.access;%end;%in;
+%let;father_access;%if(dtree=1)%get_var.fatheraccess;%else;%if;has_parents;%father.access;%end;%end;%in;
+%let;mother_access;%if(dtree=1)%get_var.motheraccess;%else;%if;has_parents;%mother.access;%end;%end;%in;
 %let;prev_sibling_access;%get_var.prevsiblingaccess;%in;
 %let;next_sibling_access;%get_var.nextsiblingaccess;%in;
 %if;(not cancel_links and (e.m="A" or e.m="D"))
