@@ -769,7 +769,6 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
     %apply;families_of_one_p("self", npref)
   %end;
 %end;
-
 %define;desc_count(vvv,ooo,nnn,ttt,ccc)%( lev,only=1,name=1,total=1,count2 %)
   %reset_count1;%reset_count2;
   %foreach;descendant_level;
@@ -808,15 +807,6 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
   %end;
 %end;
 
-%define;cousins_l(lll)
-  %cousins_cnt.0.lll;
-%end;
-%define;cousins_p(lll)
-  %cous_paths_cnt.0.lll;
-%end;
-%define;cousins_r(lll)
-  %cous_paths_cnt_raw.0.lll;
-%end;
 %define;cousins_i(lll)
   %cous_implx_cnt.0.lll;
 %end;
@@ -843,22 +833,11 @@ zzz est lui même si yyy="desc" ou son conjoint si yyy="spous"
     %if;(e.only!="on")
       %apply;one_child("self", "-1", "", 1)
       %for;lev;0;max;
-        %let;nbd1;%apply;cousins_l(lev+1)%in;
-        %let;nbd2;%apply;cousins_p(lev+1)%in;
-        %let;nbd3;%apply;cousins_r(lev+1)%in;
         %if;(e.gen=1 and lev<max_desc_level)
           <tr>
             <th class="text-left" scope="row" colspan="%nb_col;">
-              <span class="ml-1">[*generation/generations]0 %expr(lev+1)[:]
-              %if;(nbd1=nbd2)
-                %apply;desc_count(lev+1,1,1,0,0)
-              %else;
-                %apply;desc_count(lev+1,1,1,0,0),
-                (%apply;cousins_l(lev+1) [descendants at the generation])
-              %end;
-              %let;implx;%apply;cousins_i(lev+1)%in;
-              %if;(implx>0) et %implx; descendants déjà vu précédemment%end;
-              </span>
+              <span class="ml-1" title="Debug count using cousin.l.v function: %apply;desc_cousin_count_l%with;%expr(lev+1)%end; desc. (should be identical)">[*generation/generations]0 %expr(lev+1) : + %cousins_cnt.0.3; (%apply;desc_count(lev+1,1,1,0,0))
+               || %apply;desc_cousin_count_l%with;%expr(lev+1)%end; || %cousins2.0.lev; </span>
             </th>
           </tr>
         %end;
