@@ -1021,6 +1021,9 @@ let rec interp_ast :
         | "nth", [ VVstring s1; VVstring s2 ] ->
             let n = try int_of_string s2 with Failure _ -> 0 in
             Util.translate_eval (Util.nth_field s1 n)
+        | "nth_0", [ VVstring s1; VVstring s2 ] ->
+            let n = try int_of_string s2 with Failure _ -> 0 in
+            if Util.nth_field s1 n = "" then "0" else Util.nth_field s1 n
         | "nth_c", [ VVstring s1; VVstring s2 ] -> (
             let n = try int_of_string s2 with Failure _ -> 0 in
             try Char.escaped (String.get s1 n) with Invalid_argument _ -> "")
