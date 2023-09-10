@@ -2858,6 +2858,10 @@ sl: predniki
 sv: anor
 tr: atalar
 
+    ancestors tree of %s %s
+en: ancestors tree of %s %s
+fr: arbre des ancêtres d[’|e ]%s %s
+
     and
 af: en
 ar: و
