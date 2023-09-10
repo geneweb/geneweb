@@ -33,10 +33,11 @@
     %end;
   %elseif;(e.m="A")[*ascendants tree]%nn;
   %elseif;(e.m="RLM")[*multi relations graph]%nn;
-  %else;[*shortest path]%end; %%apply;of%with;%apply;capitalize(e.p)%end; %apply;capitalize(e.n)
+  %else;[*shortest path]%end; %apply;of%with;%apply;capitalize(e.p)%end; %apply;capitalize(e.n)
   %( !! %a_of_b or %self unavailable on dag !! %)
+  %( but the new management of [d'|e ] is ok! %)
   <small class="text-muted ml-1 user-select-none">(%e.v; [generation/generations]1%if;(e.oi!=""), [partial])%elseif;(e.dag="on"), [dag])%end;
-    %(%apply;togend(e.v) also unavailable %)</small>
+    %(%apply;togend(e.v) also unavailable %))</small>
 </h3>
 %if;(not cancel_links)
   %if;(e.m="A" or e.m="D")
