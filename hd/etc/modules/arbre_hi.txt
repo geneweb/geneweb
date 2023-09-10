@@ -564,7 +564,11 @@
   %end;
 %end;
 
-Arbre des ancêtres de %first_name; %surname; %dates;
+%define;my_title(aa, bb, cc)
+ [*aa:::bb:cc]
+%end;
+
+%apply;my_title%with;ancestors tree of %%s %%s%and;%first_name;%and;%surname;%end; %dates
 %let;boxsize;%if;((evarv<9 and evarcpl!="on") or (evarv<10 and evarcpl="on"))2%else;1%end;%in;
 %if;((evarcpl="on" and evarv < 4) or (evarcpl!="on" and evarv < 3))
   [*compact tree][:] [specify::generation/generations]0 > 3.
