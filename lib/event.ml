@@ -139,9 +139,20 @@ let compare_event_name name1 name2 =
   | _, Pevent Epers_Death -> -1
   | _, _ -> 0
 
+let good_event_name_order n1 n2 = compare_event_name n1 n2 <> 1
+
 let sort_events get_name get_date events =
   let cmp (i1, e1) (i2, e2) =
-    let cmp_name e1 e2 = compare_event_name (get_name e1) (get_name e2) in
+    let cmp_name e1 e2 =
+      match (get_name e1, get_name e2) with
+      | Pevent (Epers_Name _), _
+      | _, Pevent (Epers_Name _)
+      | Fevent (Efam_Name _), _
+      | _, Fevent (Efam_Name _) ->
+          (* we want to ignore custom event for ordering by event name *)
+          0
+      | n1, n2 -> compare_event_name n1 n2
+    in
     let c =
       match Date.cdate_to_dmy_opt (get_date e1) with
       | None -> cmp_name e1 e2
@@ -152,16 +163,17 @@ let sort_events get_name get_date events =
               let x = Date.compare_dmy d1 d2 in
               if x = 0 then cmp_name e1 e2 else x)
     in
-    if c = 0 then
-      (* compare order of creation of events by user *)
-      Int.compare i1 i2
-    else c
+    (* if we could not compare by date or dates are considered equals
+       and event name does not specify a special ordering (no event before birth etc)
+       we use the input order to compare event *)
+    if c = 0 then Int.compare i1 i2 else c
   in
 
   (* we need this to keep the input with same date ordered
      by their creation order *)
   let events = List.mapi (fun i e -> (i, e)) events in
 
+  (* we split event with dates and no dates, because undated event breaks transitivity *)
   let dated, undated =
     List.fold_left
       (fun (dated, undated) ((_i, e) as item) ->
@@ -171,9 +183,9 @@ let sort_events get_name get_date events =
       ([], []) events
   in
 
-  let l1 = List.sort cmp dated in
-  let l2 = List.sort cmp undated in
-  let l = List.merge cmp l1 l2 in
+  let dated = List.sort cmp dated in
+  let undated = List.sort cmp undated in
+  let l = List.merge cmp dated undated in
   List.map (fun (_i, e) -> e) l
 
 let events conf base p =

@@ -511,7 +511,7 @@ let check_order_pevents warning p =
             | Event.Pevent (Epers_Name _) -> loop (e1 :: events)
             | n2 ->
                 if
-                  Event.compare_event_name n1 n2 = 1
+                  (not (Event.good_event_name_order n1 n2))
                   && (* check if we have to ignore this warning for arcane reasons *)
                   (not @@ ignore_warning get_date e1 e2)
                 then warning e1 e2;

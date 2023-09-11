@@ -31,7 +31,7 @@ val event_item_of_gen_pevent :
 val event_item_of_gen_fevent :
   sp:iper option -> (iper, istr) Def.gen_fam_event -> istr event_item
 
-val compare_event_name : 'a event_name -> 'a event_name -> int
+val good_event_name_order : 'a event_name -> 'a event_name -> bool
 
 val sort_events :
   ('a -> 'b event_name) -> ('a -> Adef.cdate) -> 'a list -> 'a list
