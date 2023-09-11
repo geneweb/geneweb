@@ -20,7 +20,7 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-<div class="container-fluid">
+<div class="container-fluid pb-6">
 %include;perso_utils
 %if;not cancel_links;
   %include;menubar
