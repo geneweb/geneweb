@@ -5,16 +5,22 @@ fevt
 end fevt
 
 pevt A a
+#custom_4 13/12/2000
 #deat 13/12/2000
+#custom_5 13/12/2000
+#custom_1
 #birt 08/06/1900
 #resi
 #grad 1921
 #hosp 1921
 #bapt 26/06/1900
 #mobm
+#custom_2 01/03/1900
 #illn 1921
 #elec 03/1921
 #emig 01/03/1921
+#custom_3 01/03/1921
 #endl 01/03/1921
 #exco 1950
+#custom_6
 end pevt

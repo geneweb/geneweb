@@ -1,3 +1,4 @@
+(* todo cram test for this *)
 (* test event order with evt2.gw *)
 (* event input order is conserved at gw import/export;
    but nothing in gedcom specify this order! *)
@@ -26,32 +27,34 @@ let print_event_names base events =
     (fun e ->
       let name =
         match e with
-        | Event.Pevent e ->
-            let e = Futil.map_epers (Gwdb.sou base) e in
-            Def_show.show_gen_pers_event_name pp e
-        | Fevent e ->
-            let e = Futil.map_efam (Gwdb.sou base) e in
-            Def_show.show_gen_fam_event_name pp e
+        | Event.Pevent e -> Def_show.show_gen_pers_event_name pp e
+        | Fevent e -> Def_show.show_gen_fam_event_name pp e
       in
       Format.eprintf "%s@." name)
     events
 
 let good_order =
   [
-    Pevent Epers_Birth;
+    Pevent (Epers_Name "custom 1");
     Pevent Epers_Residence;
+    Pevent Epers_MobilisationMilitaire;
+    Pevent (Epers_Name "custom 2");
+    Pevent Epers_Birth;
     Pevent Epers_Baptism;
     Pevent Epers_Graduate;
     Pevent Epers_Hospitalisation;
-    Pevent Epers_MobilisationMilitaire;
     Pevent Epers_Illness;
     Pevent Epers_Election;
     Pevent Epers_Emigration;
+    Pevent (Epers_Name "custom 3");
     Pevent Epers_Dotation;
     Fevent Efam_MarriageContract;
     Fevent Efam_Marriage;
     Pevent Epers_Excommunication;
+    Pevent (Epers_Name "custom 4");
     Pevent Epers_Death;
+    Pevent (Epers_Name "custom 5");
+    Pevent (Epers_Name "custom 6");
   ]
 
 let base = gw_import (Filename.concat "assets" "evt2.gw")
@@ -59,10 +62,15 @@ let base = gw_import (Filename.concat "assets" "evt2.gw")
 let events =
   let conf = { Config.empty with wizard = true } in
   let p = get_person base "a" "A" in
-  Event.sorted_events conf base p |> List.map get_name
+  Event.sorted_events conf base p
+  |> List.map get_name
+  |> List.map (fun e ->
+         match e with
+         | Pevent e -> Pevent (Futil.map_epers (Gwdb.sou base) e)
+         | Fevent e -> Fevent (Futil.map_efam (Gwdb.sou base) e))
 
 let () =
-  assert (List.length events = 14);
+  assert (List.length events = List.length good_order);
   if events <> good_order then (
     Format.eprintf "bad order: @.";
     print_event_names base events;

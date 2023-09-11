@@ -1,14 +1,14 @@
 encoding: utf-8
 gwplus
 
-fam A a 0 0 #crem +1990 B b 0
+fam A a 0 0 #crem +1990 #sep B b 0
 fevt
 #marr 1990
 #nmar
 #nmen
 #enga
-#div"
-#sep"
+#div
+#sep
 #anul
 #marb
 #marc
@@ -25,6 +25,7 @@ pevt A a
 #acqu
 #adhe
 #awar
+#custompevent
 #bapl
 #barm
 #basm
@@ -35,6 +36,7 @@ pevt A a
 #conf 1994
 #conl 1995
 #degr 1996
+#custompevent 1996
 #demm 1997
 #dist 1998
 #dotl 1999
@@ -69,5 +71,6 @@ pevt A a
 #deat
 #fune
 #crem
+#custompevent
 #buri
 end pevt

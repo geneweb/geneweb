@@ -2,7 +2,7 @@ Import evt.gw -> Export a.gw
   $ ../distribution/gw/gwc ./assets/evt.gw
   pcnt 2 persons 3
   fcnt 1 families 1
-  scnt 11 strings 15
+  scnt 9 strings 15
   $ ../distribution/gw/gwu a > a.gw
   ............................................................############################################################ 
 
@@ -30,6 +30,9 @@ To ged and back to gw
   *** create surname index
   *** create first name index
   *** ok
+  a.0 A's burial before his/her diploma
+  
+
 
 TODO input order of event is lost after gedcom export
 TODO missing fevt: #resi and #pacs in fevt
@@ -42,17 +45,17 @@ TODO missing pevt: #crem #acco #acqu #adhe #awar #elec #exco
   encoding: utf-8
   gwplus
   
-  fam A a #occu Y 0 0 #crem +1990 B b 0
+  fam A a #occu Y 0 0 #crem +1990 #sep B b 0
   fevt
   #anul
+  #div
   #enga
   #marr 1990
   #marb
   #marc
   #marl
+  #sep
   #cutsomfevent
-  #sep"
-  #div"
   #nmen
   #nmar
   end fevt
@@ -79,16 +82,19 @@ TODO missing pevt: #crem #acco #acqu #adhe #awar #elec #exco
   #slgs
   #slgc
   #will
-  #custompevent
   #circ 1994
   #chgn 1994
   #conl 1995
+  #deat
+  #crem
+  #buri
+  #custompevent
+  #custompevent
+  #custompevent 1996
   #degr 1996
   #demm 1997
   #dist 1998
   #dotl 1999
   #educ 2000
-  #deat
-  #crem
-  #buri
+  #custompevent
   end pevt
