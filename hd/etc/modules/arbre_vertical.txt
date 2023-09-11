@@ -236,14 +236,15 @@
     %if;(xx!=self)<div>|</div>%end;
   %end;%nl;
 %end;
+%let;e_v;%if;(e.v!="")%e.v;%else;3%end;%in;
 %if;has_parents;
   <table class="tree-vert mx-auto my-2">
     %if;(e.t="T" and e.t1="m")
       %include;modules/arbre_9gen
     %elseif(e.t="A" or e.t="C")
-      <tr><td class="text-center">%apply;line("self",e.v+1)</td></tr>
+      <tr><td class="text-center">%apply;line("self",e_v+1)</td></tr>
     %else;
-      %foreach;ancestor_tree_line(e.v+1)
+      %foreach;ancestor_tree_line(e_v+1)
         %apply;a_tree_line()
       %end;
     %end;
