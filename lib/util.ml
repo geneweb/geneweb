@@ -2042,9 +2042,8 @@ let has_nephews_or_nieces conf base p =
     | _ -> false
   with Ok -> true
 
-let h s = Digest.to_hex (Digest.string s)
-
 let is_that_user_and_password auth_scheme user passwd =
+  let h s = Digest.to_hex (Digest.string s) in
   match auth_scheme with
   | NoAuth -> false
   | TokenAuth ts -> user = ts.ts_user && passwd = ts.ts_pass

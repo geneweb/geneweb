@@ -5512,7 +5512,7 @@ let print ?no_headers conf base p =
   in
   match passwd with
   | Some (src, passwd)
-    when is_that_user_and_password conf.auth_scheme "" passwd = false ->
+    when not (is_that_user_and_password conf.auth_scheme "" passwd) ->
       Util.unauthorized conf src
   | Some _ | None -> interp_templ ?no_headers "perso" conf base p
 
