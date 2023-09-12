@@ -1,27 +1,4 @@
-(library
-  (name dummy_gwdb)
-  (libraries geneweb.def geneweb.util stdlib-shims)
-  (implements geneweb.gwdb_driver)
-  (modules gwdb_driver)
-)
-
-(executable
+(test
   (name test)
-  (libraries %%%SOSA_PKG%%% dummy_gwdb geneweb geneweb_def_show oUnit stdlib-shims)
-  (preprocess (pps ppx_deriving.show))
-  (modules
-    test
-    test_calendar
-    test_mergeInd
-    test_place
-    test_sosa
-    test_utils
-    test_utils
-    test_wiki
-    )
-)
-
-(rule
-  (action (run ./test.exe) )
-  (alias runtest)
-)
+  (modules test sosa_test place_test calendar_test wiki_test merge_test util_test)
+  (libraries alcotest geneweb %%%GWDB_PKG%%% %%%SOSA_PKG%%% fmt))
