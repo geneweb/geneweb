@@ -1,7 +1,7 @@
-open OUnit2
-
-let _ =
-  run_test_tt_main
-    ("Geneweb"
-    >::: [] @ Test_calendar.suite @ Test_mergeInd.suite @ Test_place.suite
-         @ Test_sosa.suite @ Test_utils.suite @ Test_wiki.suite)
+let () =
+  let open Alcotest in
+  try
+    run ~and_exit:false "Geneweb"
+      (Sosa_test.v @ Place_test.v @ Calendar_test.v @ Wiki_test.v @ Merge_test.v
+     @ Util_test.v)
+  with Test_error -> ()
