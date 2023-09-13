@@ -1,9 +1,9 @@
-;;(test
-;;  (name ports)
-;;  (libraries %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb geneweb.ged2gwb_lib geneweb.gwb2ged_lib geneweb.gwexport_lib geneweb.gwu_lib geneweb.gwc_lib)
-;;  (modules ports)
-;;  (deps assets/royal92.ged assets/abc.ged)
-;;)
+(test
+  (name ports)
+  (libraries %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb geneweb.ged2gwb_lib geneweb.gwb2ged_lib geneweb.gwexport_lib geneweb.gwu_lib geneweb.gwc_lib)
+  (modules ports)
+  (deps assets/royal92.ged assets/abc.ged)
+)
 
 (test
  (name test)

@@ -154,6 +154,7 @@ let util_escape_html _ =
       :> string)
 
 let datedisplay_string_of_date _ =
+  let open Date in
   let conf = Config.empty in
   let conf = { conf with env = ("lang", Adef.encoded "co") :: conf.env } in
   Hashtbl.add conf.lexicon "(date)"

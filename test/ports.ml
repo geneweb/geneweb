@@ -114,7 +114,9 @@ let () =
   (* TODO <br> bug at import https://github.com/geneweb/geneweb/issues/1002 *)
   assert (
     Gwdb.sou base (Gwdb.get_comment fam)
-    = "This is a comment on a family\n\nthis is a line after an empty line");
+    = "This is a comment on a family<br>\n\
+       <br>\n\
+       this is a line after an empty line");
   let fevents = Gwdb.get_fevents fam in
   let marriage =
     match
@@ -188,7 +190,7 @@ let () =
   assert (witness_kind = Def.Witness);
   assert (
     wnote
-    = "This is a witness note on a diploma event\n\
+    = "This is a witness note on a diploma event<br>\n\
        -- this is the second line of the witness note --")
 
 (* check title *)
@@ -216,21 +218,21 @@ let () =
      which is the starting point of the wiki *)
   let wiki = Gwdb.base_notes_read base "" in
   let s =
-    {|= Wiki notes! =
-
-I '''love''' wikitext!
-
-Here is a bullet list:
-* ''first item''
-* ''second item''
-* ...
-
-== Subsection ==
-
-I also like [[[geneweb]]]
-= GeneWeb =
-
+    {|= Wiki notes! =<br>
+<br>
+I '''love''' wikitext!<br>
+<br>
+Here is a bullet list:<br>
+* ''first item''<br>
+* ''second item''<br>
+* ...<br>
+<br>
+== Subsection ==<br>
+<br>
+I also like [[[geneweb]]]<br>
+= GeneWeb =<br>
+<br>
 '''GeneWeb''' est un logiciel de généalogie libre et gratuit doté d'une
-interface web, utilisable aussi bien sur un ordinateur non connecté à Internet qu'en service web. Initialement conçu en 1997 par Daniel de Rauglaudre, il utilise des techniques de calcul de parenté et de consanguinité innovantes, mises au point par Daniel de Rauglaudre et Didier Rémy, directeur de recherche à l'Institut national de recherche en informatique et en automatique.|}
+interface web, utilisable aussi bien sur un ordinateur non connecté à Internet qu'en service web. Initialement conçu en 1997 par Daniel de Rauglaudre, il utilise des techniques de calcul de parenté et de consanguinité innovantes, mises au point par Daniel de Rauglaudre et Didier Rémy, directeur de recherche à l'Institut national de recherche en informatique et en automatique.<br>|}
   in
   assert (wiki = s)
