@@ -35,26 +35,30 @@ let print_link_to_welcome = gen_print_link_to_welcome (fun () -> ())
 
 (* S: use Util.include_template for "hed"? *)
 let header_without_http conf title =
-  Output.print_sstring conf "<!DOCTYPE html>\n";
-  Output.print_sstring conf "<html lang=\"TODO:lang _variable\">\n";
-  Output.print_sstring conf "<head>\n<title>";
+  let str1 =
+    Printf.sprintf {|
+<!DOCTYPE html>
+<html lang="%s">
+<head>
+<title>|}
+      conf.lang
+  in
+  let str2 =
+    Printf.sprintf
+      {|
+</title>
+<meta name="robots" content="none">
+<meta charset="%s">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="shortcut icon" href="%s/favicon_gwd.png">
+<link rel="apple-touch-icon" href="%s/favicon_gwd.png">|}
+      conf.charset
+      (Image.prefix conf :> string)
+      (Image.prefix conf :> string)
+  in
+  Output.print_sstring conf str1;
   title true;
-  Output.print_sstring conf "</title>\n";
-  Output.print_sstring conf "<meta name=\"robots\" content=\"none\">\n";
-  Output.print_sstring conf "<meta charset=\"";
-  Output.print_sstring conf conf.charset;
-  Output.print_sstring conf "\">\n";
-  Output.print_sstring conf "<meta name=\"viewport\" content=\"";
-  Output.print_sstring conf "width=device-width, initial-scale=1,";
-  Output.print_sstring conf " shrink-to-fit=no\">\n";
-  Output.print_sstring conf {|<link rel="shortcut icon" href="|};
-  Output.print_string conf (Image.prefix conf);
-  Output.print_sstring conf {|/favicon_gwd.png">|};
-  Output.print_sstring conf {|<link rel="apple-touch-icon" href="|};
-  Output.print_string conf (Image.prefix conf);
-  Output.print_sstring conf {|/favicon_gwd.png">|};
-  Output.print_sstring conf
-    {|<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">|};
+  Output.print_sstring conf str2;
   Util.include_template conf [] "css" (fun () -> ());
   (match Util.open_etc_file conf "hed" with
   | Some (ic, _) -> Templ.copy_from_templ conf [] ic
