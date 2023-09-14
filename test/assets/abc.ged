@@ -63,7 +63,6 @@
 3 TYPE INDI
 3 RELA Witness
 3 NOTE This is a witness note on a diploma event
-4 CONT -- this is the second line of the witness note --
 1 FAMS @F1@
 1 NOTE This is a note on an individual
 0 @I3@ INDI
