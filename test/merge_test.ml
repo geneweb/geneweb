@@ -35,16 +35,19 @@ let test_is_ancestor () =
       strings,
       base_notes )
   in
-  let base = Gwdb.make "" [] data in
+  let base = Gwdb.make "is_ancestor_base" [] data in
+  (* TODO Gwdb.close_base does not clear_ascends_array *)
+  Gwdb.clear_ascends_array base;
   let child = Gwdb.poi base (iper 0) in
   let father = Gwdb.poi base (iper 1) in
   let mother = Gwdb.poi base (iper 2) in
-  (check bool) "is_ancetor child father" false
+  (check bool) "is_ancestor child father" false
     (MergeInd.is_ancestor base child father);
-  (check bool) "is_ancetor father child" true
+  (check bool) "is_ancestor father child" true
     (MergeInd.is_ancestor base father child);
-  (check bool) "is_ancetor mother child" true
+  (check bool) "is_ancestor mother child" true
     (MergeInd.is_ancestor base mother child);
+  Gwdb.close_base base;
   ()
 
 let v =
