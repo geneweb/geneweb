@@ -25,16 +25,8 @@ let cnt = ref 0
 let cnt_sp = ref 0
 
 let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
-  let sps =
-    match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
-    | Some ("off" | "0"), _ | _, Some "off" -> false
-    | _, _ -> true
-  in
-  let img =
-    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
-    | Some ("off" | "0"), _ | _, Some "off" -> false
-    | _, _ -> true
-  in
+  let sps = Util.get_opt conf "sp" true in
+  let img = Util.get_opt conf "im" true in
   let reference _ _ p (s : Adef.safe_string) =
     if is_hidden p then s
     else

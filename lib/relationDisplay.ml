@@ -496,13 +496,7 @@ let string_of_big_int conf i =
   glop i
 
 let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
-  let image_opt =
-    Adef.escaped
-    @@
-    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
-    | Some "off", _ | Some "0", _ | _, Some "off" -> "&im=0"
-    | _, _ -> ""
-  in
+  let img = Util.get_opt conf "im" true in
   Output.print_sstring conf "<ul>";
   List.iter
     (fun (a, n) ->
@@ -514,47 +508,40 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
       Output.print_sstring conf
         (transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
       Output.print_sstring conf "</em>\n";
-      if not long then (
+      if not long then
         let propose_dag = n > 1 && n <= 10 in
-        Output.print_sstring conf ":\n ";
         let dp1 = match pp1 with Some p -> p | _ -> p1 in
         let dp2 = match pp2 with Some p -> p | _ -> p2 in
-        Output.print_sstring conf "<img src=\"";
-        Output.print_string conf (Image.prefix conf);
-        Output.print_sstring conf "/picto_rel_small.png\" alt=\"\">";
-        let href =
-          commd conf ^^^ "m=RL&" ^<^ acces conf base a ^^^ "&l1="
-          ^<^ string_of_int x1 ^<^ "&"
-          ^<^ acces_n conf base (Adef.escaped "1") dp1
-          ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
-          ^<^ acces_n conf base (Adef.escaped "2") dp2
-          ^^^ (if pp1 = None then Adef.escaped ""
-              else "&" ^<^ acces_n conf base (Adef.escaped "3") p1)
-          ^^^ (if pp2 = None then Adef.escaped ""
-              else "&" ^<^ acces_n conf base (Adef.escaped "4") p2)
-          ^^^ (if propose_dag then Adef.escaped "&dag=on" else Adef.escaped "")
-          ^^^ image_opt
+        let str =
+          Printf.sprintf
+            {|:
+          "<img src="%s/picto_rel_small.png" alt="">
+           <a href="%s">%s%s</a></li>|}
+            (Image.prefix conf :> string)
+            (commd conf ^^^ "m=RL&" ^<^ acces conf base a ^^^ "&l1="
+             ^<^ string_of_int x1 ^<^ "&"
+             ^<^ acces_n conf base (Adef.escaped "1") dp1
+             ^^^ "&l2=" ^<^ string_of_int x2 ^<^ "&"
+             ^<^ acces_n conf base (Adef.escaped "2") dp2
+             ^^^ (if pp1 = None then Adef.escaped ""
+                 else "&" ^<^ acces_n conf base (Adef.escaped "3") p1)
+             ^^^ (if pp2 = None then Adef.escaped ""
+                 else "&" ^<^ acces_n conf base (Adef.escaped "4") p2)
+             ^^^ (if propose_dag then Adef.escaped "&dag=on"
+                 else Adef.escaped "")
+             ^>^ if img then "" else "&im=0"
+              :> string)
+            (transl conf "see" |> Utf8.capitalize_fst)
+            (if n > 1 && not propose_dag then transl conf " the first branch"
+            else "")
         in
-        Output.print_sstring conf {|<a href="|};
-        Output.print_string conf href;
-        Output.print_sstring conf {|">|};
-        transl conf "see" |> Utf8.capitalize_fst |> Output.print_sstring conf;
-        if n > 1 && not propose_dag then
-          Output.print_sstring conf (transl conf " the first branch");
-        Output.print_sstring conf "</a>");
-      Output.print_sstring conf "</li>")
+        Output.print_sstring conf str)
     list;
   Output.print_sstring conf "</ul>"
 
 let print_solution_not_ancestor conf base long p1 p2 sol =
+  let img = Util.get_opt conf "im" true in
   let pp1, pp2, (x1, x2, list), reltab = sol in
-  let image_opt =
-    Adef.escaped
-    @@
-    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
-    | Some "off", _ | Some "0", _ | _, Some "off" -> "&im=0"
-    | _, _ -> ""
-  in
   Output.print_sstring conf {|<ul class="li_relationship"><li>|};
   transl conf "indeed," |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf " <ul>";
@@ -587,7 +574,7 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
           ^^^ (if pp2 = None then Adef.escaped ""
               else "&" ^<^ acces_n conf base (Adef.escaped "4") p2)
           ^^^ (if propose_dag then Adef.escaped "&dag=on" else Adef.escaped "")
-          ^^^ image_opt
+          ^>^ if img then "" else "&im=0"
         in
         Output.print_sstring conf {|<a href="|};
         Output.print_string conf href;
@@ -651,16 +638,8 @@ let print_dag_links conf base p1 p2 rl =
     let compare = compare
   end in
   let module M = Map.Make (O) in
-  let sps =
-    match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
-    | Some ("off" | "0"), _ | _, Some "off" -> false
-    | _, _ -> true
-  in
-  let img =
-    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
-    | Some ("off" | "0"), _ | _, Some "off" -> false
-    | _, _ -> true
-  in
+  let sps = Util.get_opt conf "sp" true in
+  let img = Util.get_opt conf "im" true in
   let anc_map =
     List.fold_left
       (fun anc_map (pp1, pp2, (x1, x2, list), _) ->
@@ -770,29 +749,31 @@ let print_propose_upto conf base p1 p2 rl =
           rl 0
       in
       let p, a = if x1 = 0 then (p2, p1) else (p1, p2) in
-      Output.print_sstring conf {|<p><img src="|};
-      Output.print_string conf (Image.prefix conf);
-      Output.print_sstring conf
-        {|/picto_fleche_bleu.png" alt=""> <span class="smaller">|};
       let s = (person_title_text conf base p : Adef.safe_string :> string) in
-      transl_a_of_b conf (transl_nth conf "ancestor/ancestors" 1) s s
-      |> translate_eval |> Utf8.capitalize_fst |> Output.print_sstring conf;
-      Output.print_sstring conf " ";
-      (person_title_text conf base a : Adef.safe_string :> string)
-      |> transl_decline conf "up to"
-      |> Output.print_sstring conf;
-      Output.print_sstring conf {|&nbsp;<img src="|};
-      Output.print_string conf (Image.prefix conf);
-      Output.print_sstring conf {|/picto_rel_asc.png" alt=""> <a href="|};
-      Output.print_string conf (commd conf);
-      Output.print_string conf (acces conf base p);
-      Output.print_sstring conf "&m=A&t=D&";
-      Output.print_string conf (acces_n conf base (Adef.escaped "1") a);
-      Output.print_sstring conf "&l=";
-      Output.print_sstring conf (string_of_int maxlen);
-      Output.print_sstring conf {|">|};
-      transl conf "see" |> Utf8.capitalize_fst |> Output.print_sstring conf;
-      Output.print_sstring conf "</a></span></p>"
+      let str =
+        Printf.sprintf
+          {|
+          <p>
+          <img src="%s/picto_fleche_bleu.png" alt="">
+            <span class="smaller">
+            %s %s <img src="%s/picto_rel_asc.png" alt="">
+            <a href="%s%s&m=A&t=D&%s&l=%s">%s</a>
+            </span>
+          </p>
+        |}
+          (Image.prefix conf :> string)
+          (transl_a_of_b conf (transl_nth conf "ancestor/ancestors" 1) s s
+          |> translate_eval |> Utf8.capitalize_fst)
+          ((person_title_text conf base a : Adef.safe_string :> string)
+          |> transl_decline conf "up to")
+          (Image.prefix conf :> string)
+          (commd conf :> string)
+          (acces conf base p :> string)
+          (acces_n conf base (Adef.escaped "1") a :> string)
+          (string_of_int maxlen)
+          (transl conf "see" |> Utf8.capitalize_fst)
+      in
+      Output.print_sstring conf str
   | _ -> ()
 
 let print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
