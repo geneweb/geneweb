@@ -1,11 +1,11 @@
 (test
-  (name ports)
-  (libraries %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb geneweb.ged2gwb_lib geneweb.gwb2ged_lib geneweb.gwexport_lib geneweb.gwu_lib geneweb.gwc_lib)
-  (modules ports)
-  (deps assets/royal92.ged assets/abc.ged)
-)
-
-(test
   (name test)
-  (modules test sosa_test place_test date_test wiki_test merge_test util_test)
-  (libraries alcotest geneweb %%%GWDB_PKG%%% %%%SOSA_PKG%%% fmt))
+  (modules test sosa_test place_test date_test wiki_test merge_test util_test ports_test)
+  (libraries alcotest geneweb
+             geneweb.ged2gwb_lib
+             geneweb.gwb2ged_lib
+             geneweb.gwexport_lib
+             geneweb.gwu_lib
+             geneweb.gwc_lib
+             %%%GWDB_PKG%%% %%%SOSA_PKG%%% fmt)
+  (deps assets/royal92.ged assets/abc.ged))
