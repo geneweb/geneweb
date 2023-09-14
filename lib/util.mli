@@ -459,6 +459,9 @@ val gen_print_tips : config -> Adef.safe_string -> unit
 val print_tips_relationship : config -> unit
 (** Print a tip that tells to {i Click an individual below to calculate the family link.} *)
 
+val get_opt : config -> string -> bool -> bool
+(** get option value for evar "im", "sp", "ma". Default value is defined by third param *)
+
 val display_options : config -> Adef.escaped_string
 
 type cache_visited_t = (string, (iper * string) list) Hashtbl.t

@@ -344,7 +344,7 @@ let sign_text conf base sign info b1 b2 c1 c2 =
     | _, _ -> true
   in
   let img =
-    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "spouse") with
+    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
     | Some ("off" | "0"), _ | _, Some "off" -> false
     | _, _ -> true
   in

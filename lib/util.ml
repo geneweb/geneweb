@@ -2428,6 +2428,22 @@ let print_tips_relationship conf =
 
 (* ********************************************************************** *)
 
+let get_opt conf evar default =
+  match evar with
+  | "im" -> (
+      match (p_getenv conf.env evar, p_getenv conf.env "image") with
+      | Some ("off" | "0"), _ | _, Some "off" -> not default
+      | _, _ -> default)
+  | "sp" -> (
+      match (p_getenv conf.env evar, p_getenv conf.env "spouse") with
+      | Some ("off" | "0"), _ | _, Some "off" -> default
+      | _, _ -> default)
+  | "ma" -> (
+      match (p_getenv conf.env evar, p_getenv conf.env "marriage") with
+      | Some ("off" | "0"), _ | _, Some "off" -> default
+      | _, _ -> default)
+  | _ -> failwith "bad get_opt parameter"
+
 (** [Description] : Recherche dans l'URL les options d'affichage qui sont
                     données et renvoie la concaténation de ces options.
     [Args] :
