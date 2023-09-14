@@ -60,39 +60,57 @@ let image_url_txt conf url_p url ~width ~height =
       s
 
 let image_txt conf base p =
+  let img = Util.get_opt conf "im" true in
   Adef.safe
   @@
-  match (p_getenv conf.env "im", p_getenv conf.env "image") with
-  | Some ("off" | "0"), _ | _, Some "off" -> ""
-  | _, _ -> (
-      match Image.get_portrait_with_size conf base p with
-      | None -> ""
-      | Some (`Path s, size_opt) ->
-          let max_w, max_h = (100, 75) in
-          let w, h =
-            match size_opt with
-            | Some (w, h) -> Image.scale_to_fit ~max_w ~max_h ~w ~h
-            | None -> (0, max_h)
-          in
-          {|<br><center><table border="0"><tr align="left"><td>|}
-          ^ (image_normal_txt conf base p s w h |> Adef.as_string)
-          ^ "</td></tr></table></center>"
-      | Some (`Url url, Some (width, height)) ->
-          let url_p = commd conf ^^^ acces conf base p in
-          {|<br><center><table border="0"><tr align="left"><td>|}
-          ^ (image_url_txt conf url_p (Util.escape_html url) ~width:(Some width)
-               ~height
-            |> Adef.as_string)
-          ^ {|</td></tr></table></center>|}
-      | Some (`Url url, None) ->
-          let url_p = commd conf ^^^ acces conf base p in
-          let height = 75 in
-          (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
-          {|<br><center><table border="0" style="height:|}
-          ^ string_of_int height ^ {|px"><tr align="left"><td>|}
-          ^ (image_url_txt conf url_p (Util.escape_html url) ~width:None ~height
-            |> Adef.as_string)
-          ^ "</td></tr></table></center>\n")
+  if img then
+    match Image.get_portrait_with_size conf base p with
+    | None -> ""
+    | Some (`Path s, size_opt) ->
+        let max_w, max_h = (100, 75) in
+        let w, h =
+          match size_opt with
+          | Some (w, h) -> Image.scale_to_fit ~max_w ~max_h ~w ~h
+          | None -> (0, max_h)
+        in
+        Printf.sprintf
+          {|
+            <br>
+            <center>
+              <table border="0">
+                <tr align="left"><td>%s</td></tr>
+              </table>
+            </center>|}
+          (image_normal_txt conf base p s w h |> Adef.as_string)
+    | Some (`Url url, Some (width, height)) ->
+        let url_p = commd conf ^^^ acces conf base p in
+        Printf.sprintf
+          {|
+            <br>
+            <center>
+              <table border="0">
+                <tr align="left"><td>%s</td></tr>
+              </table>
+            </center>|}
+          (image_url_txt conf url_p (Util.escape_html url) ~width:(Some width)
+             ~height
+          |> Adef.as_string)
+    | Some (`Url url, None) ->
+        let url_p = commd conf ^^^ acces conf base p in
+        let height = 75 in
+        (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
+        Printf.sprintf
+          {|
+            <br>
+            <center>
+              <table border="0" style="height:%spx">
+                <tr align="left"><td>%s"</td></tr>
+              </table>
+            </center>|}
+          (string_of_int height)
+          (image_url_txt conf url_p (Util.escape_html url) ~width:None ~height
+          |> Adef.as_string)
+  else ""
 
 type item = Item of person * Adef.safe_string
 

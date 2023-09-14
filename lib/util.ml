@@ -2431,16 +2431,16 @@ let print_tips_relationship conf =
 let get_opt conf evar default =
   match evar with
   | "im" -> (
-      match (p_getenv conf.env evar, p_getenv conf.env "image") with
+      match (p_getenv conf.env "im", p_getenv conf.env "image") with
       | Some ("off" | "0"), _ | _, Some "off" -> not default
       | _, _ -> default)
   | "sp" -> (
-      match (p_getenv conf.env evar, p_getenv conf.env "spouse") with
-      | Some ("off" | "0"), _ | _, Some "off" -> default
+      match (p_getenv conf.env "sp", p_getenv conf.env "spouse") with
+      | Some ("off" | "0"), _ | _, Some "off" -> not default
       | _, _ -> default)
   | "ma" -> (
-      match (p_getenv conf.env evar, p_getenv conf.env "marriage") with
-      | Some ("off" | "0"), _ | _, Some "off" -> default
+      match (p_getenv conf.env "ma", p_getenv conf.env "marriage") with
+      | Some ("off" | "0"), _ | _, Some "off" -> not default
       | _, _ -> default)
   | _ -> failwith "bad get_opt parameter"
 
@@ -2451,16 +2451,8 @@ let get_opt conf evar default =
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                           *)
 let display_options conf =
-  let img =
-    match (p_getenv conf.env "im", p_getenv conf.env "image") with
-    | Some ("off" | "0"), _ | _, Some "off" -> false
-    | _, _ -> true
-  in
-  let mar =
-    match (p_getenv conf.env "ma", p_getenv conf.env "marriage") with
-    | Some ("off" | "0"), _ | _, Some "off" -> false
-    | _, _ -> true
-  in
+  let img = get_opt conf "im" true in
+  let mar = get_opt conf "ma" true in
   let s = Adef.escaped @@ if img then "" else "&im=0" in
   let s = if mar then s else s ^>^ "&ma=0" in
   let s =

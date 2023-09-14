@@ -338,16 +338,8 @@ let include_marr conf base (n : Adef.escaped_string) =
   | None -> Adef.escaped ""
 
 let sign_text conf base sign info b1 b2 c1 c2 =
-  let sps =
-    match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
-    | Some ("off" | "0"), _ | _, Some "off" -> false
-    | _, _ -> true
-  in
-  let img =
-    match (Util.p_getenv conf.env "im", Util.p_getenv conf.env "image") with
-    | Some ("off" | "0"), _ | _, Some "off" -> false
-    | _, _ -> true
-  in
+  let sps = Util.get_opt conf "sp" true in
+  let img = Util.get_opt conf "im" true in
   let href =
     commd conf ^^^ "m=RL&"
     ^<^ acces_n conf base (Adef.escaped "1") (pget conf base info.ip1)
