@@ -307,9 +307,7 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
         let p = poi base ip in
         if Gwdb.Marker.get year_tab ip = dummy_date then
           check_ancestors base warning dummy_date year_tab ip p;
-        match CheckItem.person ~onchange:false base warning p with
-        | Some ippl -> List.iter changed_p ippl
-        | None -> ())
+        List.iter changed_p (CheckItem.person ~onchange:false base warning p))
       persons;
     ProgrBar.finish ())
   else
@@ -318,9 +316,7 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
         let p = poi base ip in
         if Gwdb.Marker.get year_tab ip = dummy_date then
           check_ancestors base warning dummy_date year_tab ip p;
-        match CheckItem.person ~onchange:false base warning p with
-        | Some ippl -> List.iter changed_p ippl
-        | None -> ())
+        List.iter changed_p (CheckItem.person ~onchange:false base warning p))
       persons;
   if not mem then (
     Gwdb.clear_unions_array base;

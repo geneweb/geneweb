@@ -162,7 +162,7 @@ let try_to_fix_relation_sex base warning p_ref =
       (get_related p_ref) []
   in
   warning (Warning.IncoherentSex (p_ref, !fixed, !not_fixed));
-  if !fixed > 0 then Some changed_related else None
+  if !fixed > 0 then changed_related else []
 
 let related_sex_is_coherent base warning p_ref =
   let p_index = Some (get_iper p_ref) in
@@ -194,8 +194,8 @@ let related_sex_is_coherent base warning p_ref =
   in
   match new_sex with
   | Some g ->
-      if get_sex p_ref != g then Some [ (get_iper p_ref, p_ref, Some g, None) ]
-      else None
+      if get_sex p_ref != g then [ (get_iper p_ref, p_ref, Some g, None) ]
+      else []
   | None -> try_to_fix_relation_sex base warning p_ref
 
 let check_difference_age_between_cpl warning fath moth =
@@ -453,7 +453,7 @@ let possible_father warning x father =
 let child_has_sex warning child =
   if get_sex child = Neuter then warning (Warning.UndefinedSex child)
 
-(* used by check_order_pfevents to ignore some date warnings:
+(* used by check_order_pevents to ignore some date warnings:
    - `sort_events` sorts events like points on a timeline
    - date with precision (Before|After) are exlusive
    so we can have this sorted list of events:

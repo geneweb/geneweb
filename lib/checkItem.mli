@@ -36,7 +36,7 @@ val person :
   base ->
   (base_warning -> unit) ->
   person ->
-  (iper * person * Def.sex option * relation list option) list option
+  (iper * person * Def.sex option * relation list option) list
 (** [person onchange base warn p] checks person's properties:
 
     - personal events

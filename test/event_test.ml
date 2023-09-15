@@ -69,9 +69,10 @@ let events =
          | Pevent e -> Pevent (Futil.map_epers (Gwdb.sou base) e)
          | Fevent e -> Fevent (Futil.map_efam (Gwdb.sou base) e))
 
-let () =
-  assert (List.length events = List.length good_order);
-  if events <> good_order then (
-    Format.eprintf "bad order: @.";
-    print_event_names base events;
-    assert false)
+open Alcotest
+
+let test_order () =
+  (check int) "lengths" (List.length good_order) (List.length events);
+  (check bool) "events = good_order" true (events = good_order)
+
+let v = [ ("event-order", [ test_case "Event order" `Quick test_order ]) ]
