@@ -632,6 +632,27 @@ and eval_transl_inline conf s =
   fst @@ Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
 
 and eval_transl_lexicon conf upp s c =
+  let scan_for_transl s c =
+    (* scans for a single bracketed translation [to be translated] *)
+    (* the space after translation can be used to force a choice *)
+    (* if no choice, then c is used *)
+    let j = match String.index_opt s '[' with Some j -> j | None -> -1 in
+    let k = match String.index_opt s ']' with Some k -> k | None -> -1 in
+    let c =
+      if String.length s = k then c
+      else if String.length s > k + 1 && s.[k + 1] <> ' ' then
+        String.make 1 s.[k + 1]
+      else c
+    in
+    if j = -1 || k = -1 then s
+    else
+      String.sub s 0 j
+      ^ String.sub s j (k - j + 1)
+      ^ c
+      ^
+      if String.length s = k + 1 || String.length s = k + 2 then ""
+      else String.sub s (k + 2) (String.length s - k - 2)
+  in
   let r =
     let nth = try Some (int_of_string c) with Failure _ -> None in
     match split_at_coloncolon s with
@@ -640,32 +661,30 @@ and eval_transl_lexicon conf upp s c =
         with Failure _ ->
           raise Not_found
           (* TODO check the use of if c = "n" then s else Mutil.nominative s
-             nominative expects a : in the string !
-             This may conflict with the  ??*))
+             nominative expects a : in the string ! *))
     | Some (s1, s2) -> (
         try
           if String.length s2 > 0 && s2.[0] = '|' then
             let i = 1 in
             let j = String.rindex s2 '|' in
             if j = 0 then
+              (* missing second | *)
               let s2 = String.sub s2 i (String.length s2 - j - 1) in
               try apply_format conf nth s1 s2
               with Failure _ -> raise Not_found
             else
               let s3 =
                 let s = String.sub s2 i (j - i) in
-                let s = s ^ c in
+                (* scan s for potential translates *)
+                let s = scan_for_transl s c in
                 let astl =
                   Templ_parser.parse_templ conf (Lexing.from_string s)
                 in
+                (* parse_templ handles only text, evars and translations *)
+                (* more complex parsing (%surname;, %if; ...) not available *)
                 List.fold_left (fun s a -> s ^ eval_ast conf a) "" astl
               in
               let s4 = String.sub s2 (j + 1) (String.length s2 - j - 1) in
-              let _s5 =
-                match nth with
-                | Some n -> Util.transl_nth conf s4 n
-                | None -> Util.transl conf s4
-              in
               let s2 = s3 ^ s4 in
               try apply_format conf nth s1 s2
               with Failure _ -> raise Not_found
