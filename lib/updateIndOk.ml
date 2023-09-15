@@ -1061,7 +1061,7 @@ let all_checks_person base p a u =
     if not (List.exists (CheckItem.eq_warning base w) !wl) then wl := w :: !wl
   in
   let pp = person_of_gen_person base (p, a, u) in
-  ignore @@ CheckItem.person base warning pp;
+  CheckItem.person base warning pp;
   relation_sex_is_coherent base warning p;
   CheckItem.on_person_update base warning pp;
   let wl = List.sort_uniq compare !wl in
