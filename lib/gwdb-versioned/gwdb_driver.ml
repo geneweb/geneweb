@@ -721,11 +721,6 @@ module Legacy_driver = struct
 
   let open_base = open_base
 
-  let close_base base =
-    close_base base;
-    PatchPer.close_data_file ();
-    PatchFam.close_data_file ()
-
   let empty_person base iper =
     let p = empty_person base iper in
     { person = p; base; witness_notes = Some [||] }
@@ -928,6 +923,19 @@ module Legacy_driver = struct
 
   let load_couples_array, clear_couples_array =
     load_clear_array load_couples_array clear_couples_array
+
+  let close_base base =
+    close_base base;
+    PatchPer.close_data_file ();
+    PatchFam.close_data_file ();
+    clear_ascends_array base;
+    clear_unions_array base;
+    clear_couples_array base;
+    clear_descends_array base;
+    clear_strings_array base;
+    clear_persons_array base;
+    clear_families_array base;
+    ()
 end
 
 module Driver = Compat.Make (Legacy_driver) (Legacy_driver)
