@@ -35,7 +35,7 @@ let test_is_ancestor () =
       strings,
       base_notes )
   in
-  let base = Gwdb.make "" [] data in
+  let base = Gwdb.make "is_ancestor_base" [] data in
   let child = Gwdb.poi base (iper 0) in
   let father = Gwdb.poi base (iper 1) in
   let mother = Gwdb.poi base (iper 2) in
