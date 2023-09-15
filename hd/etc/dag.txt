@@ -21,23 +21,32 @@
   %if;(e.oc!="")&oc=%e.oc;%end;%in; %( %access; does not work %)
 <div class="container%if;(e.m="A" and e.t="T" and e.v>3)-fluid%end;">
 %include;home
-%define;of(xx)
-  [of%s:::xx]
+%define;of(xxx)
+  [of%s:::xxx]
 %end;
+%define;of_c(xxx)
+  %let;sss;%apply;capitalize%with;xxx%end;%in;
+  %apply;of%with;%sss;%end;
+%end;
+
 <h3 class="mt-1 ml-2 text-no-wrap">%nn;
   %if;(e.slices="on")
     [*display by slices/slice width/overlap/total width]0
   %elseif;(e.m="D")
-    %if;(e.t="TV")[*compact descendants tree]%nn;
-    %else;[*descendants tree]%nn;
+    %if;(e.t="TV")[*compact descendants tree]
+    %else;[*descendants tree]
     %end;
-  %elseif;(e.m="A")[*ascendants tree]%nn;
-  %elseif;(e.m="RLM")[*multi relations graph]%nn;
-  %else;[*shortest path]%end; %apply;of%with;%apply;capitalize(e.p)%end; %apply;capitalize(e.n)
-  %( !! %a_of_b or %self unavailable on dag !! %)
-  %( but the new management of [d'|e ] is ok! %)
-  <small class="text-muted ml-1 user-select-none">(%e.v; [generation/generations]1%if;(e.oi!=""), [partial])%elseif;(e.dag="on"), [dag])%end;
+  %elseif;(e.m="A")[*ascendants tree]
+  %elseif;(e.m="RLM")[*multi relations graph]
+  %else;[*shortest path]
+  %end;
+  %if;(e.m!="RLM")
+    %apply;of%with;%apply;capitalize(e.p)%end; %apply;capitalize(e.n)
+    %( !! %a_of_b or %self unavailable on dag !! %)
+    %( but the new management of [d'|e ] is ok! %)
+    <small class="text-muted ml-1 user-select-none">(%e.v; [generation/generations]1%if;(e.oi!=""), [partial])%elseif;(e.dag="on"), [dag])%end;
     %(%apply;togend(e.v) also unavailable %))</small>
+  %end;
 </h3>
 %if;(not cancel_links)
   %if;(e.m="A" or e.m="D")
