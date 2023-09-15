@@ -136,7 +136,12 @@ let main () =
     let base_warning = function
       | Geneweb.Warning.UndefinedSex _ -> ()
       | x ->
-          Geneweb.Check.print_base_warning !State.log_oc base x;
+          let fmt =
+            let oc = !State.log_oc in
+            Format.make_formatter (Stdlib.output_substring oc) (fun () ->
+                Stdlib.flush oc)
+          in
+          Geneweb.Check.print_base_warning fmt base x;
           Printf.fprintf !State.log_oc "\n"
     in
     Geneweb.Check.check_base base base_error base_warning;

@@ -7,7 +7,8 @@ open Gwdb
 val print_base_error : out_channel -> base -> CheckItem.base_error -> unit
 (** Print database specification error on the giving channel *)
 
-val print_base_warning : out_channel -> base -> CheckItem.base_warning -> unit
+val print_base_warning :
+  Format.formatter -> base -> CheckItem.base_warning -> unit
 (** Print database specification warning on the giving channel *)
 
 val check_base :

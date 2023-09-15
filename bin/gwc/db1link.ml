@@ -132,7 +132,13 @@ let set_error base gen x =
 (** Function that will be called if base's checker will find a warning *)
 let set_warning base x =
   Printf.printf "Warning: ";
-  Check.print_base_warning stdout base x
+  let stdout_formatter =
+    let oc = stdout in
+    (* TODO caml doc outdated? *)
+    Format.make_formatter (Stdlib.output_substring oc) (fun () ->
+        Stdlib.flush oc)
+  in
+  Check.print_base_warning stdout_formatter base x
 
 (** Returns person's entry from [base] at position [i] *)
 let poi base i = base.c_persons.(i)
