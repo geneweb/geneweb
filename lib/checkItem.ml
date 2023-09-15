@@ -931,7 +931,7 @@ let person ?(onchange = true) base (warning : base_warning -> unit) p =
   List.iter (title_dates warning p) (get_titles p);
   (* check order of personal events *)
   if onchange then changed_pevents_order warning p;
-  related_sex_is_coherent base warning p
+  ignore @@ related_sex_is_coherent base warning p
 
 let family ?(onchange = true) base (warning : base_warning -> unit) ifam fam =
   let fath = poi base @@ get_father fam in

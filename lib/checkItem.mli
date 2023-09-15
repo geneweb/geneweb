@@ -31,12 +31,7 @@ val check_siblings :
     Checks birth date consistency between siblings.
     Also calls [callback] with each child. *)
 
-val person :
-  ?onchange:bool ->
-  base ->
-  (base_warning -> unit) ->
-  person ->
-  (iper * person * Def.sex option * relation list option) list
+val person : ?onchange:bool -> base -> (base_warning -> unit) -> person -> unit
 (** [person onchange base warn p] checks person's properties:
 
     - personal events

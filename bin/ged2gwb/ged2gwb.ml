@@ -139,7 +139,7 @@ let main () =
           Geneweb.Check.print_base_warning !State.log_oc base x;
           Printf.fprintf !State.log_oc "\n"
     in
-    Geneweb.Check.check_base base base_error base_warning ignore;
+    Geneweb.Check.check_base base base_error base_warning;
     flush !State.log_oc);
   if !State.log_oc != stdout then close_out !State.log_oc
 
