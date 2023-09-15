@@ -118,7 +118,7 @@ tr: %1 / %2
 
     of%s
 en: of %s
-fr: d[’|e ]%s
+fr: d[e |’]%s
 
     %d %s starting with %s
 co: %d %s principiendu da « %s »

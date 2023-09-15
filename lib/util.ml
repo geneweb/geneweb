@@ -201,8 +201,8 @@ let simple_decline conf wt =
                 let s2 = String.sub wt (j + 1) 1 in
                 let s =
                   if start_with_vowel conf s2 then
-                    String.sub wt (i + 1) (k - i - 1)
-                  else String.sub wt (k + 1) (j - k - 1)
+                    String.sub wt (k + 1) (j - k - 1)
+                  else String.sub wt (i + 1) (k - i - 1)
                   (*    [aa|bb]  *)
                 in
                 (s, j)
