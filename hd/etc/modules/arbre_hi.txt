@@ -431,8 +431,8 @@
               width:%wb2;px;height:%hb4;px;">
             <a href="%prefix_set.all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"
               target="_blank"
-              title="[missing:::sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#010; %nn;
-              [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v;%end; %ancestor; (%left4;-%top4;)"
+              title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#010; %nn;
+              [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v;%end; %ancestor;"
             >%if;(evarso="on")•%else;·%end;</a>
           </div>
         %(apply;linesosa(ancestor.anc_sosa.v, xx+1, "yy", left, top%)
@@ -483,7 +483,7 @@
               width:%wb2;px;height:%hb4;px;">
             <a href="%prefix_set.all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"
               title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#010;%nn;
-              [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v; %ancestor;%end; (%left2;-%top2;)"
+              [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v; %ancestor;%end;"
             >%if;(evarso="on")•%else;·%end;</a>
           </div>
           %let;top3;%expr(topxx_yy(ancestor.anc_sosa.v*2+1)*hb)%in;
@@ -494,7 +494,7 @@
             <a href="%prefix_set.all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"
               target="_blank"
               title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#010;%nn;
-              [*add] %apply;a_of_b%with;[the parents]%and;%ancestor; Sosa %ancestor.anc_sosa.v;%end; (%left3;-%top3;)"
+              [*add] %apply;a_of_b%with;[the parents]%and;%ancestor; Sosa %ancestor.anc_sosa.v;%end;"
             >%if;(evarso="on")•%else;·%end;</a>
           </div>
         %end;
