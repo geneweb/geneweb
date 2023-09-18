@@ -696,61 +696,30 @@ let searching_fields conf base =
   in
   (* Search type can be AND or OR. *)
   let search_type = get_search_type gets in
-  let bapt_date_field_name =
-    get_event_field_name gets "date" "bapt" search_type
-  in
-  let birth_date_field_name =
-    get_event_field_name gets "date" "birth" search_type
-  in
-  let death_date_field_name =
-    get_event_field_name gets "date" "death" search_type
-  in
-  let burial_date_field_name =
-    get_event_field_name gets "date" "burial" search_type
-  in
-  let marriage_date_field_name =
-    get_event_field_name gets "date" "marriage" search_type
-  in
-  let bapt_place_field_name =
-    get_event_field_name gets "place" "bapt" search_type
-  in
-  let birth_place_field_name =
-    get_event_field_name gets "place" "birth" search_type
-  in
-  let death_place_field_name =
-    get_event_field_name gets "place" "death" search_type
-  in
-  let burial_place_field_name =
-    get_event_field_name gets "place" "burial" search_type
-  in
-  let marriage_place_field_name =
-    get_event_field_name gets "place" "marriage" search_type
-  in
   let search = "" in
   let search = string_field "first_name" search in
   let search = string_field "surname" search in
   let search = sosa_field search in
-  let event_search = "" in
-  let event_search =
-    get_event_field_request birth_place_field_name birth_date_field_name "born"
+  let build_event_search event_search (s1, s2) =
+    let burial_date_field_name =
+      get_event_field_name gets "date" s1 search_type
+    in
+    let burial_place_field_name =
+      get_event_field_name gets "place" s1 search_type
+    in
+    get_event_field_request burial_place_field_name burial_date_field_name s2
       event_search search_type
   in
-  let event_search =
-    get_event_field_request bapt_place_field_name bapt_date_field_name
-      "baptized" event_search search_type
+  let events =
+    [|
+      ("burial", "buried");
+      ("death", "died");
+      ("marriage", "married");
+      ("bapt", "baptized");
+      ("birth", "born");
+    |]
   in
-  let event_search =
-    get_event_field_request marriage_place_field_name marriage_date_field_name
-      "married" event_search search_type
-  in
-  let event_search =
-    get_event_field_request death_place_field_name death_date_field_name "died"
-      event_search search_type
-  in
-  let event_search =
-    get_event_field_request burial_place_field_name burial_date_field_name
-      "buried" event_search search_type
-  in
+  let event_search = Array.fold_left build_event_search "" events in
   let search =
     if search = "" then event_search
     else if event_search = "" then search
@@ -769,6 +738,9 @@ let searching_fields conf base =
     | And -> search
   in
   let search =
+    let marriage_place_field_name =
+      get_event_field_name gets "place" "marriage" search_type
+    in
     if not (test_string marriage_place_field_name || test_date "marriage") then
       let sep = if search <> "" then ", " else "" in
       if gets "married" = "Y" then search ^ sep ^ transl conf "having a family"
