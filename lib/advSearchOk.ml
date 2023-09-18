@@ -1,7 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
-open Def
 open Gwdb
 open Util
 
@@ -642,17 +641,17 @@ let searching_fields conf base =
       | Some d1, Some d2 ->
           Printf.sprintf "%s %s %s %s %s" search
             (transl conf "between (date)")
-            (DateDisplay.string_of_date conf d1)
+            (DateDisplay.string_of_date conf d1 :> string)
             (transl conf "and")
-            (DateDisplay.string_of_date conf d2)
+            (DateDisplay.string_of_date conf d2 :> string)
       | Some d1, _ ->
           Printf.sprintf "%s %s %s" search
             (transl conf "after (date)")
-            (DateDisplay.string_of_date conf d1)
+            (DateDisplay.string_of_date conf d1 :> string)
       | _, Some d2 ->
           Printf.sprintf "%s %s %s" search
             (transl conf "before (date)")
-            (DateDisplay.string_of_date conf d2)
+            (DateDisplay.string_of_date conf d2 :> string)
       | _ -> search
     in
     if test_string place_prefix_field_name then
@@ -685,7 +684,7 @@ let searching_fields conf base =
           let s =
             Printf.sprintf
               (ftransl conf "direct ancestor of %s")
-              (Util.person_text conf base p)
+              (Util.gen_person_text conf base p :> string (* TODO check this *))
           in
           if search = "" then s
           else if s = "" then search
@@ -775,4 +774,4 @@ let searching_fields conf base =
     else search
   in
   let sep = if search <> "" then "," else "" in
-  string_field "occu" (search ^ sep)
+  Adef.safe @@ string_field "occu" (search ^ sep)
