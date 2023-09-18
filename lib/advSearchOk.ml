@@ -58,12 +58,6 @@ let string_incl x y =
 
 let abbrev_lower x = Name.abbrev (Name.lower x)
 
-(* Get the field name of an event criteria depending of the search type. *)
-let get_event_field_name gets event_criteria event_name search_type =
-  if search_type <> "OR" then event_name ^ "_" ^ event_criteria
-  else if "on" = gets ("event_" ^ event_name) then event_criteria
-  else ""
-
 module Fields : sig
   type search = And | Or
   type name = string
@@ -397,6 +391,19 @@ end = struct
   end
 end
 
+(* Get the field name of an event criteria depending of the search type. *)
+let get_event_field_name gets event_criteria event_name search_type =
+  match search_type with
+  | Fields.And -> event_name ^ "_" ^ event_criteria
+  | Or -> if "on" = gets ("event_" ^ event_name) then event_criteria else ""
+
+(* Search type can be AND or OR. *)
+let get_search_type gets =
+  match gets "search_type" with
+  | "AND" -> Fields.And
+  | "OR" -> Fields.Or
+  | s -> failwith @@ "unsupported advanced search mode : " ^ s
+
 (*
   Search for other persons in the base matching with the provided infos.
 
@@ -463,13 +470,7 @@ let advanced_search conf base max_answers =
       (fun s -> List.map Name.lower @@ Name.split_sname s)
       (getss "surname")
   in
-  (* Search type can be AND or OR. *)
-  let search_type =
-    match gets "search_type" with
-    | "AND" -> Fields.And
-    | "OR" -> Fields.Or
-    | s -> failwith @@ "unsupported advanced search mode : " ^ s
-  in
+  let search_type = get_search_type gets in
 
   let exact_place = "on" = gets "exact_place" in
 
@@ -664,7 +665,8 @@ let searching_fields conf base =
       event_name search search_type =
     (* Separator character depends on search type operator, a comma for AND search, a slash for OR search. *)
     let sep =
-      if search <> "" then if search_type <> "OR" then ", " else " / " else ""
+      if search <> "" then if search_type <> Fields.Or then ", " else " / "
+      else ""
     in
     let search =
       if test_string place_prefix_field_name || test_date date_prefix_field_name
@@ -672,7 +674,7 @@ let searching_fields conf base =
       else search
     in
     (* The place and date have to be shown after each event only for the AND request. *)
-    if search_type <> "OR" then
+    if search_type <> Or then
       get_place_date_request place_prefix_field_name date_prefix_field_name
         search
     else search
@@ -693,7 +695,7 @@ let searching_fields conf base =
     else search
   in
   (* Search type can be AND or OR. *)
-  let search_type = gets "search_type" in
+  let search_type = get_search_type gets in
   let bapt_date_field_name =
     get_event_field_name gets "date" "bapt" search_type
   in
@@ -756,13 +758,15 @@ let searching_fields conf base =
   in
   (* Adding the place and date at the end for the OR request. *)
   let search =
-    if
-      search_type = "OR"
-      && (gets "place" != ""
-         || gets "date2_yyyy" != ""
-         || gets "date1_yyyy" != "")
-    then get_place_date_request "place" "date" search
-    else search
+    match search_type with
+    | Fields.Or ->
+        if
+          gets "place" != ""
+          || gets "date2_yyyy" != ""
+          || gets "date1_yyyy" != ""
+        then get_place_date_request "place" "date" search
+        else search
+    | And -> search
   in
   let search =
     if not (test_string marriage_place_field_name || test_date "marriage") then
