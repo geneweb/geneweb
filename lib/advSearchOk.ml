@@ -117,10 +117,13 @@ module AdvancedSearchMatch : sig
     occupation:string ->
     first_name_list:string list list ->
     surname_list:string list list ->
+    alias_list:string list list ->
     skip_fname:bool ->
     skip_sname:bool ->
+    skip_alias:bool ->
     exact_first_name:bool ->
     exact_surname:bool ->
+    exact_alias:bool ->
     bool
 
   val match_marriage :
@@ -338,9 +341,14 @@ end = struct
     wrap_match_name ~base ~search_list:surname_list ~get:get_surnames_aliases
       ~exact ~split:Name.split_sname
 
+  let match_alias ~base ~alias_list ~exact =
+    wrap_match_name ~base ~search_list:alias_list ~get:get_aliases ~exact
+      ~split:(*TODO which split to use?? *) Name.split_sname
+
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~base ~p ~sex ~married ~occupation ~first_name_list
-      ~surname_list ~skip_fname ~skip_sname ~exact_first_name ~exact_surname =
+      ~surname_list ~alias_list ~skip_fname ~skip_sname ~skip_alias
+      ~exact_first_name ~exact_surname ~exact_alias =
     match_sex ~p ~sex
     && (skip_fname
        || match_first_name ~base ~first_name_list ~exact:exact_first_name p
@@ -349,6 +357,7 @@ end = struct
     && (skip_sname
        || match_surname ~base ~surname_list ~exact:exact_surname p
        || match_surnames_aliases ~base ~surname_list ~exact:exact_surname p)
+    && (skip_alias || match_alias ~base ~alias_list ~exact:exact_alias p)
     && match_married ~p ~married
     && match_occupation ~base ~p ~occupation
 
@@ -490,21 +499,29 @@ let advanced_search conf base max_answers =
       (fun s -> List.map Name.lower @@ Name.split_sname s)
       (getss "surname")
   in
+  let alias_list =
+    List.map
+      (fun s ->
+        List.map Name.lower
+        @@ (* TODO which spil function to use here *) Name.split_sname s)
+      (getss "alias")
+  in
   let search_type = get_search_type gets in
 
   let exact_place = "on" = gets "exact_place" in
 
   let match_person ?(skip_fname = false) ?(skip_sname = false)
-      ((list, len) as acc) p search_type =
+      ?(skip_alias = false) ((list, len) as acc) p search_type =
     let auth = authorized_age conf base p in
 
     let civil_match =
       lazy
         (match_civil_status ~base ~p ~sex:(gets "sex") ~married:(gets "married")
-           ~occupation:(gets "occu") ~skip_fname ~skip_sname
-           ~first_name_list:fn_list ~surname_list:sn_list
+           ~occupation:(gets "occu") ~skip_fname ~skip_sname ~skip_alias
+           ~first_name_list:fn_list ~surname_list:sn_list ~alias_list
            ~exact_first_name:(gets "exact_first_name" = "on")
-           ~exact_surname:(gets "exact_surname" = "on"))
+           ~exact_surname:(gets "exact_surname" = "on")
+           ~exact_alias:(gets "exact_alias" = "on"))
     in
 
     let pmatch =
