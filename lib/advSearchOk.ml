@@ -306,29 +306,49 @@ end = struct
     in
     fun x -> List.exists (eq x) search_list
 
-  let match_first_name ~base ~first_name_list ~exact =
-    if first_name_list = [] then fun _ -> true
+  let wrap_match_name ~base ~search_list ~get ~exact ~split =
+    if search_list = [] then fun _ -> true
     else
-      let eq = match_name ~search_list:first_name_list ~exact in
+      let eq = match_name ~search_list ~exact in
       fun p ->
         eq
-          (List.map Name.lower @@ Name.split_fname @@ sou base
-         @@ get_first_name p)
+          (List.flatten
+             (List.map
+                (fun name -> List.map Name.lower (split name))
+                (List.map (sou base) (get p))))
+
+  let match_first_name ~base ~first_name_list ~exact =
+    wrap_match_name ~base ~search_list:first_name_list
+      ~get:(fun p ->
+        (* wrap it in a list so it works on aliases too *) [ get_first_name p ])
+      ~exact ~split:Name.split_fname
+
+  (* we use [first_name_list] as the list of aliases to search for.
+     so searching for a first name will also look at first name aliases *)
+  let match_first_names_aliases ~base ~first_name_list ~exact =
+    wrap_match_name ~base ~search_list:first_name_list
+      ~get:get_first_names_aliases ~exact ~split:Name.split_fname
 
   let match_surname ~base ~surname_list ~exact =
-    if surname_list = [] then fun _ -> true
-    else
-      let eq = match_name ~search_list:surname_list ~exact in
-      fun p ->
-        eq (List.map Name.lower @@ Name.split_sname @@ sou base @@ get_surname p)
+    wrap_match_name ~base ~search_list:surname_list
+      ~get:(fun p -> [ get_surname p ])
+      ~exact ~split:Name.split_sname
+
+  let match_surnames_aliases ~base ~surname_list ~exact =
+    wrap_match_name ~base ~search_list:surname_list ~get:get_surnames_aliases
+      ~exact ~split:Name.split_sname
 
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~base ~p ~sex ~married ~occupation ~first_name_list
       ~surname_list ~skip_fname ~skip_sname ~exact_first_name ~exact_surname =
     match_sex ~p ~sex
     && (skip_fname
-       || match_first_name ~base ~first_name_list ~exact:exact_first_name p)
-    && (skip_sname || match_surname ~base ~surname_list ~exact:exact_surname p)
+       || match_first_name ~base ~first_name_list ~exact:exact_first_name p
+       || match_first_names_aliases ~base ~first_name_list
+            ~exact:exact_first_name p)
+    && (skip_sname
+       || match_surname ~base ~surname_list ~exact:exact_surname p
+       || match_surnames_aliases ~base ~surname_list ~exact:exact_surname p)
     && match_married ~p ~married
     && match_occupation ~base ~p ~occupation
 
