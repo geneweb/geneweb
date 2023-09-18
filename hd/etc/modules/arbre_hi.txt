@@ -121,17 +121,18 @@
 
 %(a=ancestor, s=sosa, p=has_parents, bg=background, t=top, l=left  %)
 %define;boxsosa(aaa, sss, ppp, bgg, lll, ttt)
-    <div id="s%aaaanc_sosa.v;"
-      style='position:absolute;border:solid 1px;top:tttpx;left:lllpx;
+    %let;bg_col;bgg%in;
+    <div id="s%aaaanc_sosa.v;"%nn;
+      style='position:absolute;border:solid 1px;top:tttpx;left:lllpx;%nn;
       %if;(evarcpl="on")
-        %if;(not aaahas_parents)border-left: 2px solid;%end;
-        %if;(not aaaspouse.has_parents)border-right: 2px solid;%end;
+        %if;(not aaahas_parents)border-left: 2px solid;%end;%nn;
+        %if;(not aaaspouse.has_parents)border-right: 2px solid;%end;%nn;
       %elseif;(not aaahas_parents)
-         border-top:2px solid;
+         border-top:2px solid;%nn;
       %end;
       width:%if;(boxsize=2)%expr(wb1*2)%else;%wb1;%end;px;%nn;
       height:%if;(boxsize=2)%expr(hb1*2)%else;%hb1;%end;px;%nn;
-      background-color:#bgg;'
+      background-color:%if;(bg_col="")#FFFFFF%else;#bgg;%end;;zindex:2'
     >
       %let;imsz;%if;(boxsize=2)15%else;8%end;%in;
       %if;(evar.cgl!="on")
@@ -155,6 +156,7 @@
             <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
             %end;
           </a>
+          %if;(aaasame="")
           <a class="big_anchor_her list-group-item-action"
             href='%prefix;%aaaspouse.access;'
             title="%aaaspouse;">
@@ -162,14 +164,17 @@
             <img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0">
             %end;
           </a>
+          %end;
           <a class="big_anchor_him_m list-group-item-action"
             href="%prefix_set.all;%apply;prefix_all();m=MOD_IND&i=%aaaindex;"
             title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)">
           </a>
+          %if;(aaasame="")
           <a class="big_anchor_her_m list-group-item-action"
             href="%prefix_set.all;%apply;prefix_all();m=MOD_IND&i=%aaaspouse.index;"
             title="Modifier %aaaspouse;">
           </a>
+          %end;
         %end;
       %else;
         %let;width;%if;(boxsize=2)%expr(wb1*2)%else;%wb1;%end;%in;
