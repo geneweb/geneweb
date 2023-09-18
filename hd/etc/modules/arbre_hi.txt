@@ -383,7 +383,7 @@
   %let;x_1;%expr(xx-1)%in;
   %let;hb;%if;(evarso="on" and boxsize=2)%expr(hbs*2)%elseif;(evarso="on")%hbs;%else;%hbc;%end;%in;
   %let;wb;%if;(evarso="on" and boxsize=2)%expr(wbs*2)%elseif;(evarso="on")%wbs;%else;%wbc;%end;%in;
-  %let;wb2;%if;(evarso="on" and boxsize=2))%expr(wb1*2)%elseif;(evarso="on")%wb1;%else;%wbc;%end;%in;
+  %let;wb2;%if;(evarso="on" and boxsize=2)%expr(wb1*2)%elseif;(evarso="on")%wb1;%else;%wbc;%end;%in;
   %if;(zz=2)  %( par couple %)
     %foreach;ancestor_level(xx)
       %foreach;ancestor;
@@ -423,9 +423,9 @@
       %foreach;ancestor;
         %let;top4;%expr(topxx_yy(ancestor.anc_sosa.v)*hb)%in;
         %let;left4;%expr(leftxx_yy(ancestor.anc_sosa.v)*wb)%in;
-        %let;hb4;%expr(hb/2)%in;
+        %let;hb4;%expr(hb-4)%in;
         %let;bb;%if;(evarso="on")1%else;0%end;%in;
-        %if;(not ancestor.has_parents and evarsms="on")
+        %if;(not ancestor.has_parents and evarsms="on" and level<e.v)
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top4;px;left:%left4;px;
               width:%wb2;px;height:%hb4;px;">
@@ -435,7 +435,7 @@
               [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v;%end; %ancestor;"
             >%if;(evarso="on")•%else;·%end;</a>
           </div>
-        %(apply;linesosa(ancestor.anc_sosa.v, xx+1, "yy", left, top%)
+        %(apply;linesosa(ancestor.anc_sosa.v*2, xx+1, "yy", left4, top4%)
         %end;
       %end;
     %end;
@@ -473,10 +473,10 @@
     %end;
     %foreach;ancestor_level(x_1)
       %foreach;ancestor;
-        %if;(not ancestor.has_parents and evarsms="on")
+        %if;(not ancestor.has_parents and evarsms="on" and level<e.v)
           %let;top2;%expr(topxx_yy(ancestor.anc_sosa.v*2)*hb)%in;
           %let;left2;%expr(leftxx_yy(ancestor.anc_sosa.v*2)*wb)%in;
-          %let;hb4;%expr(hb/2)%in;
+          %let;hb4;%expr(hb-4)%in;
           %let;bb;%if;(evarso="on")1%else;0%end;%in;
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top2;px;left:%left2;px;
