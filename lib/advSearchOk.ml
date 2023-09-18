@@ -15,7 +15,8 @@ let reconstitute_date_dmy conf var =
           match get_number var "dd" conf.env with
           | Some d ->
               if d >= 1 && d <= 31 && m >= 1 && m <= 12 then
-                Some { day = d; month = m; year = y; prec = Sure; delta = 0 }
+                Some
+                  Date.{ day = d; month = m; year = y; prec = Sure; delta = 0 }
               else None
           | None ->
               if m >= 1 && m <= 12 then
@@ -26,7 +27,7 @@ let reconstitute_date_dmy conf var =
 
 let reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
-  | Some d -> Some (Dgreg (d, Dgregorian))
+  | Some d -> Some (Date.Dgreg (d, Dgregorian))
   | None -> None
 
 let rec skip_spaces x i =
@@ -136,14 +137,14 @@ module AdvancedSearchMatch : sig
     p:Gwdb.person ->
     values:string list ->
     default:bool ->
-    dates:Def.date option * Def.date option ->
+    dates:Date.date option * Date.date option ->
     bool
 
   module type Match = sig
     val match_baptism :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Def.date option * Def.date option ->
+      dates:Date.date option * Date.date option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -151,7 +152,7 @@ module AdvancedSearchMatch : sig
     val match_birth :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Def.date option * Def.date option ->
+      dates:Date.date option * Date.date option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -159,7 +160,7 @@ module AdvancedSearchMatch : sig
     val match_burial :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Def.date option * Def.date option ->
+      dates:Date.date option * Date.date option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -167,7 +168,7 @@ module AdvancedSearchMatch : sig
     val match_death :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Def.date option * Def.date option ->
+      dates:Date.date option * Date.date option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -179,9 +180,9 @@ end = struct
   let match_date ~p ~df ~default ~dates =
     let d1, d2 = dates in
     match (d1, d2) with
-    | Some (Dgreg (d1, _)), Some (Dgreg (d2, _)) -> (
+    | Some (Date.Dgreg (d1, _)), Some (Date.Dgreg (d2, _)) -> (
         match df p with
-        | Some (Dgreg (d, _)) ->
+        | Some (Date.Dgreg (d, _)) ->
             Date.compare_dmy d d1 >= 0 && Date.compare_dmy d d2 <= 0
         | _ -> false)
     | Some (Dgreg (d1, _)), _ -> (
@@ -254,7 +255,7 @@ end = struct
     match (d1, d2) with
     | Some d1, Some d2 ->
         test_date_place (fun fam ->
-            match Adef.od_of_cdate (get_marriage fam) with
+            match Date.od_of_cdate (get_marriage fam) with
             | Some (Dgreg (_, _) as d) ->
                 if Date.compare_date d d1 < 0 then false
                 else if Date.compare_date d2 d < 0 then false
@@ -262,13 +263,13 @@ end = struct
             | _ -> false)
     | Some d1, _ ->
         test_date_place (fun fam ->
-            match Adef.od_of_cdate (get_marriage fam) with
+            match Date.od_of_cdate (get_marriage fam) with
             | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
                 if Date.compare_date d d1 < 0 then false else true
             | _ -> false)
     | _, Some d2 ->
         test_date_place (fun fam ->
-            match Adef.od_of_cdate (get_marriage fam) with
+            match Date.od_of_cdate (get_marriage fam) with
             | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
                 if Date.compare_date d d2 > 0 then false else true
             | _ -> false)
@@ -283,7 +284,7 @@ end = struct
         (abbrev_lower @@ sou base @@ get_occupation p)
 
   let date_wrapper get_date =
-    match_date ~df:(fun p -> Adef.od_of_cdate (get_date p))
+    match_date ~df:(fun p -> Date.od_of_cdate (get_date p))
 
   let match_baptism_date = date_wrapper get_baptism
   let match_birth_date = date_wrapper get_birth
@@ -291,7 +292,7 @@ end = struct
   let match_burial_date =
     let get_burial p =
       match get_burial p with
-      | Buried cod | Cremated cod -> Adef.od_of_cdate cod
+      | Buried cod | Cremated cod -> Date.od_of_cdate cod
       | _ -> None
     in
     match_date ~df:get_burial
@@ -299,7 +300,7 @@ end = struct
   let match_death_date =
     let get_death p =
       match get_death p with
-      | Death (_, cd) -> Some (Adef.date_of_cdate cd)
+      | Death (_, cd) -> Some (Date.date_of_cdate cd)
       | _ -> None
     in
     match_date ~df:get_death
@@ -342,7 +343,7 @@ end = struct
     val match_baptism :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Def.date option * Def.date option ->
+      dates:Date.date option * Date.date option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -350,7 +351,7 @@ end = struct
     val match_birth :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Def.date option * Def.date option ->
+      dates:Date.date option * Date.date option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -358,7 +359,7 @@ end = struct
     val match_burial :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Def.date option * Def.date option ->
+      dates:Date.date option * Date.date option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -366,7 +367,7 @@ end = struct
     val match_death :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Def.date option * Def.date option ->
+      dates:Date.date option * Date.date option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -399,17 +400,17 @@ end
 
 (*
   Search for other persons in the base matching with the provided infos.
-  
+
   On search semantic:
 
    Search can be set to be exact on the first name and/or the surname,
    if no first name or surname is provided then the search ignores the
    parameter in both the exact and the loose case.
-   
+
    - When search is loose it is only necessary for each name atom (name atoms
    for "Jean-Pierre" are: [Jean] [Pierre]) to be found at least once in another
    person's name atoms in the base.
-   
+
    - When search is exact, it is necessary for each atom to be found exactly the
    number of times it occurs in the given name but order is not considered for
    a person from the base to match. (ie. "Pierre-Jean de Bourbon de Vallois" matches
