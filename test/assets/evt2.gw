@@ -24,3 +24,8 @@ pevt A a
 #exco 1950
 #custom_6
 end pevt
+
+pevt B b
+#birt 04/1900
+#deat 1900
+end pevt
