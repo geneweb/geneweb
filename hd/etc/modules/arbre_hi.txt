@@ -218,7 +218,7 @@
           %if;(aaasame!="")%apply;implex1(aaasame.v)%end;%nn;
           title='[*generation/generations]0 %level; – Sosa %nn;
             %if;(evarcpl="")%aaaanc_sosa; %if;(aaasame!="")=Sosa %aaasame;%end;
-            %else;%aaaanc_sosa; & %expr(aaaanc_sosa+1)%nn;
+            %else;%aaaanc_sosa; & %expr(aaaanc_sosa.v+1)%nn;
             %end;&#010;%nn;
             %if;(aaais_male) ♂%else; ♀%end; %aaafirst_name; %aaasurname; %if;(aaaocc!="" or aaaocc!=0)(%aaaocc;)%end;&#010;%nn;
             %if;(aaabirth_date.year!="")° %aaabirth_date.year;%end;%nn;
@@ -265,8 +265,8 @@
       %elseif;(ss>=4096 and ss<8192)13%nn;
       %else;14%end;
     %in;
-    %let;www;%apply;nth%with;///4/4/8/8/16/16/32/32/64/64/128%and;ll%end;%in;
-    %let;hhh;%apply;nth%with;///4/8/8/16/16/32/32/64/64/128%and;ll%end;%in;
+    %let;www;%apply;nth%with;///4/4/8/8/16/16/32/32/64/64/128/128/%and;ll%end;%in;
+    %let;hhh;%apply;nth%with;///4/8/8/16/16/32/32/64/64/128/128/%and;ll%end;%in;
     %let;ddd;%apply;nth%with;/1/2/4/4/8/8/16/16/256/512/1024/2048/4096/8192%and;%if;("yy"="H")%lev;%else;%expr(lev-1)%end;%end;%in;
     %let;or;%nn;
       %if;("yy"="H")%apply;nth%with;/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/%and;%lev;%end;%nn;
@@ -296,9 +296,9 @@
       %if;(aaasame!="")%apply;implex1(aaasame.v)%end;
       title='[*generation/generations]0 %level; – Sosa %nn;
         %if;(evarcpl="")%aaaanc_sosa; %if;(aaasame!="")=Sosa %aaasame;%end;
-        %else;%aaaanc_sosa; & %expr(aaaanc_sosa+1)%nn;
+        %else;%aaaanc_sosa; & %expr(aaaanc_sosa.v+1)%nn;
         %end;&#010;%nn;
-        %(if;("aaainterval"!="")=Sosa %aaainterval;;%else;%aaaanc_sosa; & %expr(aaaanc_sosa+1)%end;&#010;%)%nn;
+        %(if;("aaainterval"!="")=Sosa %aaainterval;;%else;%aaaanc_sosa; & %expr(aaaanc_sosa.v+1)%end;&#010;%)%nn;
         %if;(aaais_male) ♂%else; ♀%end; %aaafirst_name; %aaasurname; %if;(aaaocc!="" or aaaocc!=0)(%aaaocc;)%end;&#010;%nn;
         %if;(aaabirth_date.year!="")° %aaabirth_date.year;%end;%nn;
         %if;(aaabirth_date.year!="" and aaais_dead) – %end;%nn;
@@ -433,7 +433,7 @@
         %if;(not ancestor.has_parents and evarsms="on" and level<e.v)
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top4;px;left:%left4;px;
-              width:%wb2;px;height:%hb4;px;">
+              width:%wb2;px;height:%hb4;px;background-color:#FFFFFF">
             <a href="%prefix_set.all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"
               target="_blank"
               title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#010; %nn;
@@ -485,7 +485,7 @@
           %let;bb;%if;(evarso="on")1%else;0%end;%in;
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top2;px;left:%left2;px;
-              width:%wb2;px;height:%hb4;px;">
+              width:%wb2;px;height:%hb4;px;background-color:#FFFFFF">
             <a href="%prefix_set.all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"
               title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#010;%nn;
               [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v; %ancestor;%end;"
@@ -495,7 +495,7 @@
           %let;left3;%expr(leftxx_yy(ancestor.anc_sosa.v*2+1)*wb)%in;
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top3;px;left:%left3;px;
-              width:%wb2;px;height:%hb4;px;">
+              width:%wb2;px;height:%hb4;px;background-color:#FFFFFF">
             <a href="%prefix_set.all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"
               target="_blank"
               title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#010;%nn;
