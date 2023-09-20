@@ -52,6 +52,7 @@ let string_incl x y =
   loop 0
 
 let abbrev_lower x = Name.abbrev (Name.lower x)
+let sex_of_string = function "M" -> Def.Male | "F" -> Female | _ -> Neuter
 
 module Fields : sig
   type search = And | Or
@@ -111,7 +112,7 @@ module AdvancedSearchMatch : sig
   val match_civil_status :
     base:Gwdb.base ->
     p:Gwdb.person ->
-    sex:string ->
+    sex:Def.sex ->
     married:string ->
     occupation:string ->
     first_name_list:string list list ->
@@ -201,12 +202,7 @@ end = struct
     let places = List.map abbrev_lower places in
     List.exists (fun place -> cmp place value) places
 
-  let sex_cmp p = function
-    | "M" -> get_sex p = Male
-    | "F" -> get_sex p = Female
-    | _ -> true
-
-  let match_sex ~p ~sex = if sex = "" then true else sex_cmp p sex
+  let match_sex ~p ~sex = if sex = Def.Neuter then true else get_sex p = sex
 
   let married_cmp p = function
     | "Y" -> get_family p <> [||]
@@ -547,9 +543,11 @@ let advanced_search conf base max_answers =
 
     let civil_match =
       lazy
-        (match_civil_status ~base ~p ~sex:(gets "sex") ~married:(gets "married")
-           ~occupation:(gets "occu") ~skip_fname ~skip_sname ~skip_alias
-           ~first_name_list:fn_list ~surname_list:sn_list ~alias_list
+        (match_civil_status ~base ~p
+           ~sex:(gets "sex" |> sex_of_string)
+           ~married:(gets "married") ~occupation:(gets "occu") ~skip_fname
+           ~skip_sname ~skip_alias ~first_name_list:fn_list
+           ~surname_list:sn_list ~alias_list
            ~exact_first_name:(gets "exact_first_name" = "on")
            ~exact_surname:(gets "exact_surname" = "on")
            ~exact_alias:(gets "exact_alias" = "on"))
