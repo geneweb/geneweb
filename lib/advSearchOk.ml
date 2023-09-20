@@ -203,15 +203,19 @@ end = struct
         | _ -> false)
     | _ -> default
 
-  let do_compare ~p ~places ~get ~cmp =
-    let s = abbrev_lower @@ get p in
-    List.exists (fun s' -> cmp (abbrev_lower s') s) places
+  let do_compare ~places ~get ~cmp =
+    (* places are the places we search for *)
+    let places = List.map abbrev_lower places in
+    (* values wraped in get function for lazy evaluation? should warp un a unit -> string list instead *)
+    (* values are person/familly baptism/death/... places *)
+    let values = List.map abbrev_lower (get ()) in
+    (* n2 *)
+    List.exists
+      (fun value -> List.exists (fun place -> cmp place value) places)
+      values
 
-  let apply_to_field_places_raw ~cmp ~p ~places ~get ~default =
-    if places = [] then default else do_compare ~p ~places ~get ~cmp
-
-  let apply_to_field_places ~get ~cmp ~base =
-    apply_to_field_places_raw ~get:(fun p -> sou base @@ get p) ~cmp
+  let apply_to_field_places ~cmp ~places ~get ~default =
+    if places = [] then default else do_compare ~places ~get ~cmp
 
   let sex_cmp p = function
     | "M" -> get_sex p = Male
@@ -232,17 +236,22 @@ end = struct
     let cmp = if exact_place then ( = ) else string_incl in
     f ~cmp
 
-  let match_baptism_place =
-    exact_place_wrapper @@ apply_to_field_places ~get:get_baptism_place
+  let match_baptism_place ~base ~p =
+    exact_place_wrapper
+    @@ apply_to_field_places ~get:(fun () ->
+           [ sou base @@ get_baptism_place p ])
 
-  let match_birth_place =
-    exact_place_wrapper @@ apply_to_field_places ~get:get_birth_place
+  let match_birth_place ~base ~p =
+    exact_place_wrapper
+    @@ apply_to_field_places ~get:(fun () -> [ sou base @@ get_birth_place p ])
 
-  let match_death_place =
-    exact_place_wrapper @@ apply_to_field_places ~get:get_death_place
+  let match_death_place ~base ~p =
+    exact_place_wrapper
+    @@ apply_to_field_places ~get:(fun () -> [ sou base @@ get_death_place p ])
 
-  let match_burial_place =
-    exact_place_wrapper @@ apply_to_field_places ~get:get_burial_place
+  let match_burial_place ~base ~p =
+    exact_place_wrapper
+    @@ apply_to_field_places ~get:(fun () -> [ sou base @@ get_burial_place p ])
 
   let match_other_events_place =
     (* TODO *)
@@ -258,8 +267,8 @@ end = struct
           if authorized_age conf base sp then
             df fam
             && (places = []
-               || do_compare ~p:fam ~places
-                    ~get:(fun f -> sou base @@ get_marriage_place f)
+               || do_compare ~places
+                    ~get:(fun () -> [ sou base @@ get_marriage_place fam ])
                     ~cmp)
           else false)
         (get_family p)
@@ -427,7 +436,7 @@ end = struct
     let match_and date_f place_f ~(base : Gwdb.base) ~p ~dates
         ~(places : string list) ~(exact_place : bool) =
       date_f ~p ~default:true ~dates
-      && place_f ~exact_place ~base ~p ~places ~default:true
+      && place_f ~base ~p ~exact_place ~places ~default:true
 
     let match_baptism = match_and match_baptism_date match_baptism_place
     let match_birth = match_and match_birth_date match_birth_place
