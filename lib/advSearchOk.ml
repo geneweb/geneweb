@@ -73,11 +73,13 @@ module Fields : sig
     val death_date : name
     val burial_date : name
     val marriage_date : name
+    val other_events_date : name
     val bapt_place : name
     val birth_place : name
     val death_place : name
     val burial_place : name
     val marriage_place : name
+    val other_events_place : name
   end
 end = struct
   type search = And | Or
@@ -97,11 +99,13 @@ end = struct
     let death_date = date_field "death"
     let burial_date = date_field "burial"
     let marriage_date = date_field "marriage"
+    let other_events_date = date_field "other_events"
     let bapt_place = place_field "bapt"
     let birth_place = place_field "birth"
     let death_place = place_field "death"
     let burial_place = place_field "burial"
     let marriage_place = place_field "marriage"
+    let other_events_place = place_field "other_events"
   end
 end
 
@@ -162,6 +166,14 @@ module AdvancedSearchMatch : sig
       bool
 
     val match_death :
+      base:Gwdb.base ->
+      p:Gwdb.person ->
+      dates:Date.date option * Date.date option ->
+      places:string list ->
+      exact_place:bool ->
+      bool
+
+    val match_other_events :
       base:Gwdb.base ->
       p:Gwdb.person ->
       dates:Date.date option * Date.date option ->
@@ -232,6 +244,10 @@ end = struct
   let match_burial_place =
     exact_place_wrapper @@ apply_to_field_values ~get:get_burial_place
 
+  let match_other_events_place =
+    (* TODO *)
+    assert false
+
   let match_marriage ~cmp ~conf ~base ~p ~values ~default ~dates =
     let d1, d2 = dates in
     let test_date_place df =
@@ -300,6 +316,10 @@ end = struct
       | _ -> None
     in
     match_date ~df:get_death
+
+  let match_other_events_date =
+    (* TODO *)
+    assert false
 
   let match_name ~search_list ~exact : string list -> bool =
     let eq : string list -> string list -> bool =
@@ -393,6 +413,14 @@ end = struct
       places:string list ->
       exact_place:bool ->
       bool
+
+    val match_other_events :
+      base:Gwdb.base ->
+      p:Gwdb.person ->
+      dates:Date.date option * Date.date option ->
+      places:string list ->
+      exact_place:bool ->
+      bool
   end
 
   module And = struct
@@ -405,6 +433,9 @@ end = struct
     let match_birth = match_and match_birth_date match_birth_place
     let match_burial = match_and match_burial_date match_burial_place
     let match_death = match_and match_death_date match_death_place
+
+    let match_other_events =
+      match_and match_other_events_date match_other_events_place
   end
 
   module Or = struct
@@ -417,6 +448,9 @@ end = struct
     let match_birth = match_or match_birth_date match_birth_place
     let match_burial = match_or match_burial_date match_burial_place
     let match_death = match_or match_death_date match_death_place
+
+    let match_other_events =
+      match_or match_other_events_date match_other_events_place
   end
 end
 
@@ -544,6 +578,9 @@ let advanced_search conf base max_answers =
           && match_marriage ~conf ~base ~p ~exact_place ~default:true
                ~values:(getss Fields.AND.marriage_place)
                ~dates:(getd Fields.AND.marriage_date)
+          && And.match_other_events ~base ~p ~exact_place
+               ~dates:(getd Fields.AND.other_events_date)
+               ~places:(getss Fields.AND.other_events_place)
       | Fields.Or ->
           let match_f or_f and_f =
             or_f ~base ~p ~dates:(getd Fields.OR.date)
