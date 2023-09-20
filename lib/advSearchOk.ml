@@ -301,11 +301,11 @@ end = struct
       string_incl (abbrev_lower occupation)
         (abbrev_lower @@ sou base @@ get_occupation p)
 
-  let date_wrapper get_date =
-    match_date ~df:(fun p -> Date.od_of_cdate (get_date p))
+  let match_baptism_date =
+    match_date ~df:(fun p -> Date.od_of_cdate (get_birth p))
 
-  let match_baptism_date = date_wrapper get_baptism
-  let match_birth_date = date_wrapper get_birth
+  let match_birth_date =
+    match_date ~df:(fun p -> Date.od_of_cdate (get_birth p))
 
   let match_burial_date =
     let get_burial p =
