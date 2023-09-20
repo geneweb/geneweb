@@ -228,9 +228,24 @@ end = struct
   let match_burial_place ~base ~p ~places ~cmp =
     do_compare ~places ~cmp ~value:(sou base @@ get_burial_place p)
 
-  let match_other_events_place =
-    (* TODO *)
-    assert false
+  let match_other_events_place ~base ~p ~places ~cmp =
+    let pevents = Gwdb.get_pevents p in
+    let fevents =
+      List.flatten @@ Array.to_list
+      @@ Array.map Gwdb.get_fevents
+           (Array.map (Gwdb.foi base) (Gwdb.get_family p))
+    in
+    (* wrap value in unit -> string to be lazy ?*)
+    let pevent_places =
+      List.map (fun e () -> sou base @@ Gwdb.get_pevent_place e) pevents
+    in
+    let fevent_places =
+      List.map (fun e () -> sou base @@ Gwdb.get_fevent_place e) fevents
+    in
+    let event_places = pevent_places @ fevent_places in
+    List.exists
+      (fun value_f -> do_compare ~places ~cmp ~value:(value_f ()))
+      event_places
 
   let match_marriage ~cmp ~conf ~base ~p ~places ~default ~dates =
     let d1, d2 = dates in
@@ -280,13 +295,13 @@ end = struct
       string_incl (abbrev_lower occupation)
         (abbrev_lower @@ sou base @@ get_occupation p)
 
-  let match_baptism_date =
+  let match_baptism_date ~base:_ =
     match_date ~df:(fun p -> Date.cdate_to_dmy_opt (get_birth p))
 
-  let match_birth_date =
+  let match_birth_date ~base:_ =
     match_date ~df:(fun p -> Date.cdate_to_dmy_opt (get_birth p))
 
-  let match_burial_date =
+  let match_burial_date ~base:_ =
     let get_burial p =
       match get_burial p with
       | Buried cod | Cremated cod -> Date.cdate_to_dmy_opt cod
@@ -294,12 +309,32 @@ end = struct
     in
     match_date ~df:get_burial
 
-  let match_death_date =
+  let match_death_date ~base:_ =
     match_date ~df:(fun p -> Date.dmy_of_death (get_death p))
 
-  let match_other_events_date =
-    (* TODO *)
-    assert false
+  let match_other_events_date ~base ~p ~default ~dates =
+    let pevents = Gwdb.get_pevents p in
+    let fevents =
+      List.flatten @@ Array.to_list
+      @@ Array.map Gwdb.get_fevents
+           (Array.map (Gwdb.foi base) (Gwdb.get_family p))
+    in
+    (* wrap value in unit -> dmy to be lazy ?*)
+    let pevent_dates =
+      List.map
+        (fun e () -> Date.cdate_to_dmy_opt @@ Gwdb.get_pevent_date e)
+        pevents
+    in
+    let fevent_dates =
+      List.map
+        (fun e () -> Date.cdate_to_dmy_opt @@ Gwdb.get_fevent_date e)
+        fevents
+    in
+    let event_dates = pevent_dates @ fevent_dates in
+    List.exists
+      (fun event_date_f ->
+        match_date ~p ~default ~dates ~df:(fun _p -> event_date_f ()))
+      event_dates
 
   let match_name ~search_list ~exact : string list -> bool =
     let eq : string list -> string list -> bool =
@@ -413,7 +448,7 @@ end = struct
         if places = [] then fun ~base:_ ~p:_ ~places:_ ~cmp:_ -> default
         else place_f
       in
-      date_f ~p ~default ~dates && place_f ~base ~p ~places ~cmp
+      date_f ~base ~p ~default ~dates && place_f ~base ~p ~places ~cmp
 
     let match_baptism = match_and match_baptism_date match_baptism_place
     let match_birth = match_and match_birth_date match_birth_place
@@ -434,7 +469,7 @@ end = struct
         if places = [] then fun ~base:_ ~p:_ ~places:_ ~cmp:_ -> default
         else place_f
       in
-      date_f ~p ~default ~dates || place_f ~base ~p ~places ~cmp
+      date_f ~base ~p ~default ~dates || place_f ~base ~p ~places ~cmp
 
     let match_baptism = match_or match_baptism_date match_baptism_place
     let match_birth = match_or match_birth_date match_birth_place
