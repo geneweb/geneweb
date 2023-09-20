@@ -181,6 +181,8 @@ module AdvancedSearchMatch : sig
   module Or : Match
 end = struct
   let match_date ~p ~df ~default ~dates =
+    (* df gives the date of the event *)
+    (* d1,d2 are the date range in which the event should be *)
     let d1, d2 = dates in
     match (d1, d2) with
     | Some d1, Some d2 -> (
@@ -193,16 +195,11 @@ end = struct
         match df p with Some d -> Date.compare_dmy d d2 <= 0 | None -> false)
     | None, None -> default
 
-  let do_compare ~places ~get ~cmp =
+  let do_compare ~places ~value ~cmp =
+    (* value is person/familly baptism/death/... place *)
     (* places are the places we search for *)
     let places = List.map abbrev_lower places in
-    (* values wraped in get function for lazy evaluation? should warp un a unit -> string list instead *)
-    (* values are person/familly baptism/death/... places *)
-    let values = List.map abbrev_lower (get ()) in
-    (* n2 *)
-    List.exists
-      (fun value -> List.exists (fun place -> cmp place value) places)
-      values
+    List.exists (fun place -> cmp place value) places
 
   let sex_cmp p = function
     | "M" -> get_sex p = Male
@@ -224,21 +221,16 @@ end = struct
     f ~cmp
 
   let match_baptism_place ~base ~p ~places ~cmp =
-    (* wrap place in a list because there is multiple places in the case of other_events *)
-    let get () = [ sou base @@ get_baptism_place p ] in
-    do_compare ~places ~get ~cmp
+    do_compare ~places ~cmp ~value:(sou base @@ get_baptism_place p)
 
   let match_birth_place ~base ~p ~places ~cmp =
-    let get () = [ sou base @@ get_birth_place p ] in
-    do_compare ~places ~get ~cmp
+    do_compare ~places ~cmp ~value:(sou base @@ get_birth_place p)
 
   let match_death_place ~base ~p ~places ~cmp =
-    let get () = [ sou base @@ get_death_place p ] in
-    do_compare ~places ~get ~cmp
+    do_compare ~places ~cmp ~value:(sou base @@ get_death_place p)
 
   let match_burial_place ~base ~p ~places ~cmp =
-    let get () = [ sou base @@ get_burial_place p ] in
-    do_compare ~places ~get ~cmp
+    do_compare ~places ~cmp ~value:(sou base @@ get_burial_place p)
 
   let match_other_events_place =
     (* TODO *)
@@ -255,7 +247,7 @@ end = struct
             df fam
             && (places = []
                || do_compare ~places
-                    ~get:(fun () -> [ sou base @@ get_marriage_place fam ])
+                    ~value:(sou base @@ get_marriage_place fam)
                     ~cmp)
           else false)
         (get_family p)
