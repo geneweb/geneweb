@@ -416,14 +416,16 @@ end = struct
   end
 
   module And = struct
+    let default = true
+
     let match_and date_f place_f ~(base : Gwdb.base) ~p ~dates
         ~(places : string list) ~(exact_place : bool) =
       let cmp = if exact_place then ( = ) else string_incl in
       let place_f =
-        if places = [] then fun ~base:_ ~p:_ ~places:_ ~cmp:_ -> true
+        if places = [] then fun ~base:_ ~p:_ ~places:_ ~cmp:_ -> default
         else place_f
       in
-      date_f ~p ~default:true ~dates && place_f ~base ~p ~places ~cmp
+      date_f ~p ~default ~dates && place_f ~base ~p ~places ~cmp
 
     let match_baptism = match_and match_baptism_date match_baptism_place
     let match_birth = match_and match_birth_date match_birth_place
@@ -435,14 +437,16 @@ end = struct
   end
 
   module Or = struct
+    let default = false
+
     let match_or date_f place_f ~(base : Gwdb.base) ~p ~dates
         ~(places : string list) ~(exact_place : bool) =
       let cmp = if exact_place then ( = ) else string_incl in
       let place_f =
-        if places = [] then fun ~base:_ ~p:_ ~places:_ ~cmp:_ -> false
+        if places = [] then fun ~base:_ ~p:_ ~places:_ ~cmp:_ -> default
         else place_f
       in
-      date_f ~p ~default:false ~dates || place_f ~base ~p ~places ~cmp
+      date_f ~p ~default ~dates || place_f ~base ~p ~places ~cmp
 
     let match_baptism = match_or match_baptism_date match_baptism_place
     let match_birth = match_or match_birth_date match_birth_place
