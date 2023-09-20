@@ -236,22 +236,21 @@ end = struct
     let cmp = if exact_place then ( = ) else string_incl in
     f ~cmp
 
-  let match_baptism_place ~base ~p =
-    exact_place_wrapper
-    @@ apply_to_field_places ~get:(fun () ->
-           [ sou base @@ get_baptism_place p ])
+  let match_baptism_place ~base ~p ~places ~default ~cmp =
+    apply_to_field_places ~places ~default ~cmp ~get:(fun () ->
+        [ sou base @@ get_baptism_place p ])
 
-  let match_birth_place ~base ~p =
-    exact_place_wrapper
-    @@ apply_to_field_places ~get:(fun () -> [ sou base @@ get_birth_place p ])
+  let match_birth_place ~base ~p ~places ~default ~cmp =
+    apply_to_field_places ~places ~default ~cmp ~get:(fun () ->
+        [ sou base @@ get_birth_place p ])
 
-  let match_death_place ~base ~p =
-    exact_place_wrapper
-    @@ apply_to_field_places ~get:(fun () -> [ sou base @@ get_death_place p ])
+  let match_death_place ~base ~p ~places ~default ~cmp =
+    apply_to_field_places ~places ~default ~cmp ~get:(fun () ->
+        [ sou base @@ get_death_place p ])
 
-  let match_burial_place ~base ~p =
-    exact_place_wrapper
-    @@ apply_to_field_places ~get:(fun () -> [ sou base @@ get_burial_place p ])
+  let match_burial_place ~base ~p ~places ~default ~cmp =
+    apply_to_field_places ~places ~default ~cmp ~get:(fun () ->
+        [ sou base @@ get_burial_place p ])
 
   let match_other_events_place =
     (* TODO *)
@@ -435,8 +434,9 @@ end = struct
   module And = struct
     let match_and date_f place_f ~(base : Gwdb.base) ~p ~dates
         ~(places : string list) ~(exact_place : bool) =
+      let cmp = if exact_place then ( = ) else string_incl in
       date_f ~p ~default:true ~dates
-      && place_f ~base ~p ~exact_place ~places ~default:true
+      && place_f ~base ~p ~places ~default:true ~cmp
 
     let match_baptism = match_and match_baptism_date match_baptism_place
     let match_birth = match_and match_birth_date match_birth_place
@@ -450,8 +450,9 @@ end = struct
   module Or = struct
     let match_or date_f place_f ~(base : Gwdb.base) ~p ~dates
         ~(places : string list) ~(exact_place : bool) =
+      let cmp = if exact_place then ( = ) else string_incl in
       date_f ~p ~default:false ~dates
-      || place_f ~exact_place ~base ~p ~places ~default:false
+      || place_f ~base ~p ~places ~default:false ~cmp
 
     let match_baptism = match_or match_baptism_date match_baptism_place
     let match_birth = match_or match_birth_date match_birth_place
