@@ -24,11 +24,6 @@ let reconstitute_date_dmy conf var =
       | None -> Some { day = 0; month = 0; year = y; prec = Sure; delta = 0 })
   | None -> None
 
-let reconstitute_date conf var =
-  match reconstitute_date_dmy conf var with
-  | Some d -> Some (Date.Dgreg (d, Dgregorian))
-  | None -> None
-
 let rec skip_spaces x i =
   if i = String.length x then i
   else if String.unsafe_get x i = ' ' then skip_spaces x (i + 1)
@@ -137,14 +132,14 @@ module AdvancedSearchMatch : sig
     p:Gwdb.person ->
     places:string list ->
     default:bool ->
-    dates:Date.date option * Date.date option ->
+    dates:Date.dmy option * Date.dmy option ->
     bool
 
   module type Match = sig
     val match_baptism :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.date option * Date.date option ->
+      dates:Date.dmy option * Date.dmy option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -152,7 +147,7 @@ module AdvancedSearchMatch : sig
     val match_birth :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.date option * Date.date option ->
+      dates:Date.dmy option * Date.dmy option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -160,7 +155,7 @@ module AdvancedSearchMatch : sig
     val match_burial :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.date option * Date.date option ->
+      dates:Date.dmy option * Date.dmy option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -168,7 +163,7 @@ module AdvancedSearchMatch : sig
     val match_death :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.date option * Date.date option ->
+      dates:Date.dmy option * Date.dmy option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -176,7 +171,7 @@ module AdvancedSearchMatch : sig
     val match_other_events :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.date option * Date.date option ->
+      dates:Date.dmy option * Date.dmy option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -188,15 +183,15 @@ end = struct
   let match_date ~p ~df ~default ~dates =
     let d1, d2 = dates in
     match (d1, d2) with
-    | Some (Date.Dgreg (d1, _)), Some (Date.Dgreg (d2, _)) -> (
+    | Some d1, Some d2 -> (
         match df p with
         | Some d -> Date.compare_dmy d d1 >= 0 && Date.compare_dmy d d2 <= 0
         | None -> false)
-    | Some (Dgreg (d1, _)), _ -> (
+    | Some d1, None -> (
         match df p with Some d -> Date.compare_dmy d d1 >= 0 | None -> false)
-    | _, Some (Dgreg (d2, _)) -> (
+    | None, Some d2 -> (
         match df p with Some d -> Date.compare_dmy d d2 <= 0 | None -> false)
-    | _ -> default
+    | None, None -> default
 
   let do_compare ~places ~get ~cmp =
     (* places are the places we search for *)
@@ -268,25 +263,26 @@ end = struct
     match (d1, d2) with
     | Some d1, Some d2 ->
         test_date_place (fun fam ->
-            match Date.od_of_cdate (get_marriage fam) with
-            | Some (Dgreg (_, _) as d) ->
-                if Date.compare_date d d1 < 0 then false
-                else if Date.compare_date d2 d < 0 then false
+            match Date.cdate_to_dmy_opt (get_marriage fam) with
+            | Some d ->
+                if Date.compare_dmy d d1 < 0 then false
+                else if Date.compare_dmy d2 d < 0 then false
                 else true
-            | _ -> false)
-    | Some d1, _ ->
+            | None -> false)
+    | Some d1, None ->
         test_date_place (fun fam ->
-            match Date.od_of_cdate (get_marriage fam) with
-            | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-                if Date.compare_date d d1 < 0 then false else true
-            | _ -> false)
-    | _, Some d2 ->
+            match Date.cdate_to_dmy_opt (get_marriage fam) with
+            | Some d when authorized_age conf base p ->
+                if Date.compare_dmy d d1 < 0 then false else true
+            | Some _ | None -> false)
+    | None, Some d2 ->
         test_date_place (fun fam ->
-            match Date.od_of_cdate (get_marriage fam) with
-            | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-                if Date.compare_date d d2 > 0 then false else true
-            | _ -> false)
-    | _ -> if places = [] then default else test_date_place (fun _ -> true)
+            match Date.cdate_to_dmy_opt (get_marriage fam) with
+            | Some d when authorized_age conf base p ->
+                if Date.compare_dmy d d2 > 0 then false else true
+            | Some _ | None -> false)
+    | None, None ->
+        if places = [] then default else test_date_place (fun _ -> true)
 
   let match_marriage = exact_place_wrapper match_marriage
 
@@ -381,7 +377,7 @@ end = struct
     val match_baptism :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.date option * Date.date option ->
+      dates:Date.dmy option * Date.dmy option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -389,7 +385,7 @@ end = struct
     val match_birth :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.date option * Date.date option ->
+      dates:Date.dmy option * Date.dmy option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -397,7 +393,7 @@ end = struct
     val match_burial :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.date option * Date.date option ->
+      dates:Date.dmy option * Date.dmy option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -405,7 +401,7 @@ end = struct
     val match_death :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.date option * Date.date option ->
+      dates:Date.dmy option * Date.dmy option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -413,7 +409,7 @@ end = struct
     val match_other_events :
       base:Gwdb.base ->
       p:Gwdb.person ->
-      dates:Date.date option * Date.date option ->
+      dates:Date.dmy option * Date.dmy option ->
       places:string list ->
       exact_place:bool ->
       bool
@@ -498,7 +494,8 @@ let advanced_search conf base max_answers =
     try Hashtbl.find hd x
     with Not_found ->
       let v =
-        (reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2"))
+        ( reconstitute_date_dmy conf (x ^ "1"),
+          reconstitute_date_dmy conf (x ^ "2") )
       in
       Hashtbl.add hd x v;
       v
@@ -683,8 +680,8 @@ let advanced_search conf base max_answers =
 *)
 let searching_fields conf base =
   let test_date x =
-    reconstitute_date conf (x ^ "1") <> None
-    || reconstitute_date conf (x ^ "2") <> None
+    reconstitute_date_dmy conf (x ^ "1") <> None
+    || reconstitute_date_dmy conf (x ^ "2") <> None
   in
   let gets x =
     match p_getenv conf.env x with
@@ -705,7 +702,7 @@ let searching_fields conf base =
   in
   let test_string x = gets x <> "" in
   let getd x =
-    (reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2"))
+    (reconstitute_date_dmy conf (x ^ "1"), reconstitute_date_dmy conf (x ^ "2"))
   in
   let sex = match gets "sex" with "M" -> 0 | "F" -> 1 | _ -> 2 in
   (* Fonction pour tester un simple champ texte (e.g: first_name). *)
@@ -720,17 +717,17 @@ let searching_fields conf base =
       | Some d1, Some d2 ->
           Printf.sprintf "%s %s %s %s %s" search
             (transl conf "between (date)")
-            (DateDisplay.string_of_date conf d1 :> string)
+            (DateDisplay.string_of_dmy conf d1 :> string)
             (transl conf "and")
-            (DateDisplay.string_of_date conf d2 :> string)
+            (DateDisplay.string_of_dmy conf d2 :> string)
       | Some d1, _ ->
           Printf.sprintf "%s %s %s" search
             (transl conf "after (date)")
-            (DateDisplay.string_of_date conf d1 :> string)
+            (DateDisplay.string_of_dmy conf d1 :> string)
       | _, Some d2 ->
           Printf.sprintf "%s %s %s" search
             (transl conf "before (date)")
-            (DateDisplay.string_of_date conf d2 :> string)
+            (DateDisplay.string_of_dmy conf d2 :> string)
       | _ -> search
     in
     if test_string place_prefix_field_name then
