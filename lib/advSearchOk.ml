@@ -344,41 +344,47 @@ end = struct
     in
     fun x -> List.exists (eq x) search_list
 
-  let wrap_match_name ~base ~search_list ~get ~exact ~split =
-    if search_list = [] then fun _ -> true
+  let wrap_match_name ~base ~search_list ~get ~exact ~split ~p =
+    if search_list = [] then true
     else
       let eq = match_name ~search_list ~exact in
-      fun p ->
-        eq
-          (List.flatten
-             (List.map
-                (fun name -> List.map Name.lower (split name))
-                (List.map (sou base) (get p))))
+      eq (List.map Name.lower @@ split @@ sou base @@ get p)
 
-  let match_first_name ~base ~first_name_list ~exact =
-    wrap_match_name ~base ~search_list:first_name_list
-      ~get:(fun p ->
-        (* wrap it in a list so it works on aliases too *) [ get_first_name p ])
-      ~exact ~split:Name.split_fname
+  let match_first_name ~base ~first_name_list ~exact ~p =
+    wrap_match_name ~base ~search_list:first_name_list ~get:get_first_name
+      ~exact ~split:Name.split_fname ~p
 
   (* we use [first_name_list] as the list of aliases to search for.
      so searching for a first name will also look at first name aliases *)
-  let match_first_names_aliases ~base ~first_name_list ~exact =
-    wrap_match_name ~base ~search_list:first_name_list
-      ~get:get_first_names_aliases ~exact ~split:Name.split_fname
+  let match_first_names_aliases ~base ~first_name_list ~exact ~p =
+    let gets =
+      List.map (fun alias _p -> alias) (Gwdb.get_first_names_aliases p)
+    in
+    List.exists
+      (fun get ->
+        wrap_match_name ~base ~search_list:first_name_list ~get ~exact
+          ~split:Name.split_fname ~p)
+      gets
 
-  let match_surname ~base ~surname_list ~exact =
-    wrap_match_name ~base ~search_list:surname_list
-      ~get:(fun p -> [ get_surname p ])
-      ~exact ~split:Name.split_sname
+  let match_surname ~base ~surname_list ~exact ~p =
+    wrap_match_name ~base ~search_list:surname_list ~get:get_surname ~exact
+      ~split:Name.split_sname ~p
 
-  let match_surnames_aliases ~base ~surname_list ~exact =
-    wrap_match_name ~base ~search_list:surname_list ~get:get_surnames_aliases
-      ~exact ~split:Name.split_sname
+  let match_surnames_aliases ~base ~surname_list ~exact ~p =
+    let gets = List.map (fun alias _ -> alias) (Gwdb.get_surnames_aliases p) in
+    List.exists
+      (fun get ->
+        wrap_match_name ~base ~search_list:surname_list ~get ~exact
+          ~split:Name.split_sname ~p)
+      gets
 
-  let match_alias ~base ~alias_list ~exact =
-    wrap_match_name ~base ~search_list:alias_list ~get:get_aliases ~exact
-      ~split:(*TODO which split to use?? *) Name.split_sname
+  let match_alias ~base ~alias_list ~exact ~p =
+    let gets = List.map (fun alias _ -> alias) (Gwdb.get_aliases p) in
+    List.exists
+      (fun get ->
+        wrap_match_name ~base ~search_list:alias_list ~get ~exact
+          ~split:(*TODO which split to use?? *) Name.split_sname ~p)
+      gets
 
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~base ~p ~sex ~married ~occupation ~first_name_list
@@ -386,13 +392,13 @@ end = struct
       ~exact_first_name ~exact_surname ~exact_alias =
     match_sex ~p ~sex
     && (skip_fname
-       || match_first_name ~base ~first_name_list ~exact:exact_first_name p
+       || match_first_name ~base ~first_name_list ~exact:exact_first_name ~p
        || match_first_names_aliases ~base ~first_name_list
-            ~exact:exact_first_name p)
+            ~exact:exact_first_name ~p)
     && (skip_sname
-       || match_surname ~base ~surname_list ~exact:exact_surname p
-       || match_surnames_aliases ~base ~surname_list ~exact:exact_surname p)
-    && (skip_alias || match_alias ~base ~alias_list ~exact:exact_alias p)
+       || match_surname ~base ~surname_list ~exact:exact_surname ~p
+       || match_surnames_aliases ~base ~surname_list ~exact:exact_surname ~p)
+    && (skip_alias || match_alias ~base ~alias_list ~exact:exact_alias ~p)
     && match_married ~p ~married
     && match_occupation ~base ~p ~occupation
 
