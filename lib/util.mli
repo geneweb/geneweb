@@ -409,8 +409,8 @@ val only_printable : string -> string
 val only_printable_or_nl : string -> string
 (** Same as [only_printable] but also accepts '\n'. *)
 
-val relation_type_text : config -> relation_type -> int -> Adef.safe_string
-val rchild_type_text : config -> relation_type -> int -> Adef.safe_string
+val relation_type_text : config -> relation_type -> sex -> Adef.safe_string
+val rchild_type_text : config -> relation_type -> sex -> Adef.safe_string
 val has_nephews_or_nieces : config -> base -> person -> bool
 val browser_doesnt_have_tables : config -> bool
 val doctype : Adef.safe_string

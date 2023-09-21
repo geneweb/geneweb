@@ -1668,17 +1668,17 @@ and eval_simple_str_var conf base env (_, p_auth) = function
   | "related_type" -> (
       match get_env "rel" env with
       | Vrel (r, Some c) ->
-          rchild_type_text conf r.r_type (index_of_sex (get_sex c)) |> safe_val
+          rchild_type_text conf r.r_type (get_sex c) |> safe_val
       | _ -> raise Not_found)
   | "relation_type" -> (
       match get_env "rel" env with
       | Vrel (r, None) -> (
-          (* TODO the int in relation_type is for the sex, so I think this is bugged on
-             homosexual couples *)
+          safe_val
+          @@
           match (r.r_fath, r.r_moth) with
-          | Some _, None -> relation_type_text conf r.r_type 0 |> safe_val
-          | None, Some _ -> relation_type_text conf r.r_type 1 |> safe_val
-          | Some _, Some _ -> relation_type_text conf r.r_type 2 |> safe_val
+          | Some ip, None | None, Some ip ->
+              relation_type_text conf r.r_type (get_sex (poi base ip))
+          | Some _, Some _ -> relation_type_text conf r.r_type Neuter
           | None, None -> raise Not_found)
       | _ -> raise Not_found)
   | "reset_count" -> (
@@ -1964,8 +1964,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   (* in "related" and "relation(_him/her)"
      Vrel (relation * iper option):
        relation contains the optional adoptive father/mother
-       the iper option is the person which has the relation attached to (the adoptive child)
-  *)
+       the iper option is the person which has the relation attached to (the adoptive child) *)
   | "related" :: sl -> (
       match get_env "rel" env with
       | Vrel ({ r_type = rt }, Some p) ->
@@ -2032,9 +2031,9 @@ and eval_item_field_var ell = function
 (* is_relation is used to specify the direction of the relation *)
 and eval_relation_field_var conf base env rt ip ~is_relation loc = function
   | [ "type" ] ->
-      let i = index_of_sex (get_sex (pget conf base ip)) in
-      if is_relation then safe_val (relation_type_text conf rt i)
-      else safe_val (rchild_type_text conf rt i)
+      let sex = get_sex (pget conf base ip) in
+      if is_relation then safe_val (relation_type_text conf rt sex)
+      else safe_val (rchild_type_text conf rt sex)
   | sl ->
       let ep = make_ep conf base ip in
       eval_person_field_var conf base env ep loc sl

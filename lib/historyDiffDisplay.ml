@@ -189,7 +189,7 @@ let string_of_related conf base ip related : Adef.safe_string =
             | r :: l -> (
                 match r.r_fath with
                 | Some ifath when ifath = ip ->
-                    Util.rchild_type_text conf r.r_type 2
+                    Util.rchild_type_text conf r.r_type Neuter
                 | _ -> loop l)
           in
           loop (get_rparents c)
@@ -207,7 +207,7 @@ let string_of_rparents conf base rparents : Adef.safe_string =
       match (rp.r_fath, rp.r_moth) with
       | Some ip1, Some ip2 -> (
           let rel =
-            (Util.relation_type_text conf rp.r_type 2
+            (Util.relation_type_text conf rp.r_type Neuter
               : Adef.safe_string
               :> string)
             |> Utf8.capitalize_fst
@@ -225,7 +225,7 @@ let string_of_rparents conf base rparents : Adef.safe_string =
           if (p :> string) = "" then accu
           else
             (Utf8.capitalize_fst
-               (Util.relation_type_text conf rp.r_type 2
+               (Util.relation_type_text conf rp.r_type Neuter
                  : Adef.safe_string
                  :> string)
             ^<^ transl conf ":" ^<^ p)
@@ -235,7 +235,7 @@ let string_of_rparents conf base rparents : Adef.safe_string =
           if (p :> string) = "" then accu
           else
             (Utf8.capitalize_fst
-               (Util.relation_type_text conf rp.r_type 2
+               (Util.relation_type_text conf rp.r_type Neuter
                  : Adef.safe_string
                  :> string)
             ^<^ transl conf ":" ^<^ p)
