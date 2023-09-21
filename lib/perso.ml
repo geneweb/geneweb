@@ -1531,9 +1531,14 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       | _ -> raise Not_found)
   | "family_cnt" -> string_of_int_env "family_cnt" env
   | "first_name_alias" -> (
+      (* TODO safe_html or escape html? *)
       match get_env "first_name_alias" env with
       | Vstring s -> s |> Util.escape_html |> safe_val
       | _ -> null_val)
+  | "surname_alias" -> (
+      match get_env "surname_alias" env with
+      | Vstring s -> s |> Util.safe_html |> safe_val
+      | _ -> raise Not_found)
   | "fsources" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, _) ->
@@ -1717,10 +1722,6 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       | _ -> raise Not_found)
   | "source_type" -> (
       match get_env "src_typ" env with
-      | Vstring s -> s |> Util.safe_html |> safe_val
-      | _ -> raise Not_found)
-  | "surname_alias" -> (
-      match get_env "surname_alias" env with
       | Vstring s -> s |> Util.safe_html |> safe_val
       | _ -> raise Not_found)
   | s ->
