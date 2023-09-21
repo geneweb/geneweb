@@ -1947,7 +1947,7 @@ let gen_only_printable or_nl s =
 let only_printable_or_nl = gen_only_printable true
 let only_printable = gen_only_printable false
 
-let relation_type_text conf t n =
+let relation_type_text conf t sex =
   let s =
     match t with
     | Adoption -> "adoptive father/adoptive mother/adoptive parents"
@@ -1956,9 +1956,9 @@ let relation_type_text conf t n =
     | GodParent -> "godfather/godmother/godparents"
     | FosterParent -> "foster father/foster mother/foster parents"
   in
-  Adef.safe @@ transl_nth conf s n
+  Adef.safe @@ transl_nth conf s (index_of_sex sex)
 
-let rchild_type_text conf t n =
+let rchild_type_text conf t sex =
   let s =
     match t with
     | Adoption -> "adoptive son/adoptive daughter/adoptive child"
@@ -1967,7 +1967,7 @@ let rchild_type_text conf t n =
     | GodParent -> "godson/goddaughter/godchild"
     | FosterParent -> "foster son/foster daughter/foster child"
   in
-  Adef.safe @@ transl_nth conf s n
+  Adef.safe @@ transl_nth conf s (index_of_sex sex)
 
 exception Ok
 
