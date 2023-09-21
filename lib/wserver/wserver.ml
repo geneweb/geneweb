@@ -32,7 +32,7 @@ let skip_possible_remaining_chars fd =
 let close_connection () =
   if not !connection_closed then (
     wflush ();
-    Unix.shutdown !wserver_sock Unix.SHUTDOWN_SEND;
+    (try Unix.shutdown !wserver_sock Unix.SHUTDOWN_SEND with _ -> ());
     skip_possible_remaining_chars !wserver_sock;
     (* Closing the channel flushes the data and closes the underlying file descriptor *)
     close_out !wserver_oc;
