@@ -124,11 +124,13 @@
     %let;bg_col;bgg%in;
     <div id="s%aaaanc_sosa.v;"%nn;
       style='position:absolute;border:solid 1px;top:tttpx;left:lllpx;%nn;
-      %if;(evarcpl="on")
-        %if;(not aaahas_parents)border-left: 2px solid;%end;%nn;
-        %if;(not aaaspouse.has_parents)border-right: 2px solid;%end;%nn;
-      %elseif;(not aaahas_parents)
-         border-top:2px solid;%nn;
+      %if;(aaasame="")
+        %if;(evarcpl="on")
+          %if;(not aaahas_parents)border-left: 3px solid;%end;%nn;
+          %if;(not aaaspouse.has_parents)border-right: 3px solid;%end;%nn;
+        %elseif;(not aaahas_parents )
+           border-top:3px solid;%nn;
+        %end;
       %end;
       width:%if;(boxsize=2)%expr(wb1*2)%else;%wb1;%end;px;%nn;
       height:%if;(boxsize=2)%expr(hb1*2)%else;%hb1;%end;px;%nn;
@@ -267,7 +269,9 @@
     %in;
     %let;www;%apply;nth%with;///4/4/8/8/16/16/32/32/64/64/128/128/%and;ll%end;%in;
     %let;hhh;%apply;nth%with;///4/8/8/16/16/32/32/64/64/128/128/%and;ll%end;%in;
-    %let;ddd;%apply;nth%with;/1/2/4/4/8/8/16/16/256/512/1024/2048/4096/8192%and;%if;("yy"="H")%lev;%else;%expr(lev-1)%end;%end;%in;
+    %let;ddd;%apply;nth%with;/1/2/4/4/8/8/16/16/32/32/64/64/128/128/256/256/512/512/%and;%nn;
+        %if;("yy"="H")%lev;%else;%expr(lev-1)%end;%end;%nn;
+    %in;
     %let;or;%nn;
       %if;("yy"="H")%apply;nth%with;/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/%and;%lev;%end;%nn;
       %else;%apply;nth%with;/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/%and;%lev;%end;%nn;
@@ -593,13 +597,13 @@
       %if;(evarso="on")
         %if;(evarv < 13 and evarcpl="on")
           <div id="hi-tree1" style="width:%wids;px;height:%higs;px">
-          %apply;graph(evarv,"I",2)
           %apply;graphlinks(evarv,"I")
+          %apply;graph(evarv,"I",2)
           </div>
         %elseif;(evarv < 12 and evarcpl!="on")
           <div id="hi-tree1" style="width:%wids;px;height:%higs;px">
-          %apply;graph(evarv+1,"I",1)
           %apply;graphlinks(evarv+1,"I")
+          %apply;graph(evarv+1,"I",1)
           </div>
         %else;
           [*compact tree][:] [specify::generation/generations]0 %if;(evarcpl="on")< 13.%else;< 12.%end;
@@ -607,13 +611,13 @@
       %elseif;(evarso!="on")
         %if;(evarv < 14 and evarcpl="on")
           <div id="hi-tree1" style="width:%widc;px;height:%higc;px">
-          %apply;graph(evarv,"I",2)
           %apply;graphlinks(evarv,"I")
+          %apply;graph(evarv,"I",2)
           </div>
         %elseif;(evarv < 13 and evarcpl!="on")
           <div id="hi-tree1" style="width:%widc;px;height:%higc;px">
-          %apply;graph(evarv+1,"I",1)
           %apply;graphlinks(evarv+1,"I")
+          %apply;graph(evarv+1,"I",1)
           </div>
         %else;
           [*compact tree][couples][:] [specify::generation/generations]0%if;(evarcpl="on")< 14.%else;< 13.%end;
@@ -623,13 +627,13 @@
       %if;(evarso="on")
         %if;(evarv < 13 and evarcpl="on")
           <div id="hi-tree1" style="width:%wids;px;height:%higs;px">
-          %apply;graph(evarv,"H",2)
           %apply;graphlinks(evarv,"H")
+          %apply;graph(evarv,"H",2)
           </div>
         %elseif;(evarv < 12 and evarcpl!="on")
           <div id="hi-tree1" style="width:%wids;px;height:%higs;px">
-          %apply;graph(evarv+1,"H",1)
           %apply;graphlinks(evarv+1,"H")
+          %apply;graph(evarv+1,"H",1)
           </div>
         %else;
           [*compact tree][:] [specify::generation/generations]0%if;(evarcpl="on")< 13.%else;< 12.%end;
@@ -637,13 +641,13 @@
       %elseif;(evarso!="on")
         %if;(evarv < 14 and evarcpl="on")
           <div id="hi-tree1" style="width:%widc;px;height:%higc;px">
-          %apply;graph(evarv,"H",2)
           %apply;graphlinks(evarv,"H")
+          %apply;graph(evarv,"H",2)
           </div>
         %elseif;(evarv < 13 and evarcpl!="on")
           <div id="hi-tree1" style="width:%widc;px;height:%higc;px">
-          %apply;graph(evarv+1,"H",1)
           %apply;graphlinks(evarv+1,"H")
+          %apply;graph(evarv+1,"H",1)
           </div>
         %else;
           [*compact tree][:] [specify::generation/generations]0%if;(evarcpl="on")< 14.%else;< 13.%end;
