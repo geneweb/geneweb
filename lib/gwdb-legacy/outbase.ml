@@ -127,8 +127,7 @@ let output_strings_hash tmp_strings_inx base =
   close_out oc
 
 (* Associate istr to persons.
-   A person is associated with its first name/surname and aliases
-*)
+   A person is associated with its first name and surname *)
 let output_name_index_aux cmp get base names_inx names_dat =
   let ht = Dutil.IntHT.create 0 in
   for i = 0 to base.data.persons.len - 1 do
