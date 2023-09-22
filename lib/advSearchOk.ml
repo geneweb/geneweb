@@ -679,6 +679,7 @@ let advanced_search conf base max_answers =
         |> List.flatten |> List.sort_uniq compare
       in
       let skip_fname, skip_sname, list =
+        (* TODO how is the logic on skip_fname skip_sname works and is cocrect? *)
         if sn_list <> [] then
           ( false,
             true,
