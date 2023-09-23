@@ -160,7 +160,7 @@
           %if;(dag_cell.colspan>1) colspan="%dag_cell.colspan;"%end;
           style="line-height:%if;(dag_cell.item!="")1%nn;
                              %elseif;dag_cell.is_bar;1%nn;
-                             %elseif;dag_cell.is_nothing;0%end;;"%nn;
+                             %elseif;dag_cell.is_nothing;0%else;0%end;;"%nn;
         %if;(e.im="") valign="bottom"%end;
         align="%dag_cell.align;">
         %if;dag_cell.is_nothing;&nbsp;%nn;
