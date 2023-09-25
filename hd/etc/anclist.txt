@@ -317,7 +317,7 @@
           </td>
           <td align="center">
             %if;(e.cgl != "on")
-              <a href="%prefix;m=DAG&%item.5;">%item.2;</a>
+              <a href="%prefix;m=DAG&%item.5;&sn=%item.3;%item.4;">%item.2;</a>
             %else;
               %item.2;
             %end;
@@ -397,7 +397,7 @@
           </td>
           <td align="center">
             %if;(e.cgl != "on")
-              <a href="%prefix;m=DAG&%ancestor.sosa_access;">%ancestor.nb_times;</a>
+              <a href="%prefix;m=DAG&%ancestor.sosa_access;&sn=%ancestor.surname;">%ancestor.nb_times;</a>
             %else;
               %ancestor.nb_times;
             %end;
