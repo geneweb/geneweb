@@ -35,6 +35,7 @@ let make_name_index base =
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
     (* not ? ? *)
+    (* TODO p.surname ? *)
     if p.first_name <> 1 && p.first_name <> 1 then
       List.iter (fun i -> Array.set t i @@ (p.key_index :: Array.get t i))
       @@ Mutil.list_map_sort_uniq Dutil.name_index
