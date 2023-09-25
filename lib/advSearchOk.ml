@@ -391,15 +391,14 @@ end = struct
       ~surname_list ~alias_list ~skip_fname ~skip_sname ~skip_alias
       ~exact_first_name ~exact_surname ~exact_alias =
     match_sex ~p ~sex
-    && (skip_fname || first_name_list = []
+    && (first_name_list = []
        || match_first_name ~base ~first_name_list ~exact:exact_first_name ~p
        || match_first_names_aliases ~base ~first_name_list
             ~exact:exact_first_name ~p)
-    && (skip_sname || surname_list = []
+    && (surname_list = []
        || match_surname ~base ~surname_list ~exact:exact_surname ~p
        || match_surnames_aliases ~base ~surname_list ~exact:exact_surname ~p)
-    && (skip_alias || alias_list = []
-       || match_alias ~base ~alias_list ~exact:exact_alias ~p)
+    && (alias_list = [] || match_alias ~base ~alias_list ~exact:exact_alias ~p)
     && match_married ~p ~married
     && match_occupation ~base ~p ~occupation
 
@@ -581,6 +580,7 @@ let advanced_search conf base max_answers =
 
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ?(skip_alias = false) p search_type =
+    (* TODO rm skips *)
     let auth = authorized_age conf base p in
 
     let civil_match () =
