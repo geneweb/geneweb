@@ -118,9 +118,6 @@ module AdvancedSearchMatch : sig
     first_name_list:string list list ->
     surname_list:string list list ->
     alias_list:string list list ->
-    skip_fname:bool ->
-    skip_sname:bool ->
-    skip_alias:bool ->
     exact_first_name:bool ->
     exact_surname:bool ->
     exact_alias:bool ->
@@ -388,8 +385,7 @@ end = struct
 
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~base ~p ~sex ~married ~occupation ~first_name_list
-      ~surname_list ~alias_list ~skip_fname ~skip_sname ~skip_alias
-      ~exact_first_name ~exact_surname ~exact_alias =
+      ~surname_list ~alias_list ~exact_first_name ~exact_surname ~exact_alias =
     match_sex ~p ~sex
     && (first_name_list = []
        || match_first_name ~base ~first_name_list ~exact:exact_first_name ~p
@@ -578,17 +574,14 @@ let advanced_search conf base max_answers =
 
   let exact_place = "on" = gets "exact_place" in
 
-  let match_person ?(skip_fname = false) ?(skip_sname = false)
-      ?(skip_alias = false) p search_type =
-    (* TODO rm skips *)
+  let match_person p search_type =
     let auth = authorized_age conf base p in
 
     let civil_match () =
       match_civil_status ~base ~p
         ~sex:(gets "sex" |> sex_of_string)
-        ~married:(gets "married") ~occupation:(gets "occu") ~skip_fname
-        ~skip_sname ~skip_alias ~first_name_list:fn_list ~surname_list:sn_list
-        ~alias_list
+        ~married:(gets "married") ~occupation:(gets "occu")
+        ~first_name_list:fn_list ~surname_list:sn_list ~alias_list
         ~exact_first_name:(gets "exact_first_name" = "on")
         ~exact_surname:(gets "exact_surname" = "on")
         ~exact_alias:(gets "exact_alias" = "on")
@@ -683,20 +676,16 @@ let advanced_search conf base max_answers =
         |> List.map (spi_find @@ persons_of base)
         |> List.flatten |> List.sort_uniq compare
       in
-      let skip_fname, skip_sname, list =
+      let l =
         (* TODO how is the logic on skip_fname skip_sname works and is cocrect? *)
         if sn_list <> [] then
-          ( false,
-            true,
-            list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
-              Name.split_sname sn_list
-              (gets "exact_surname" = "on") )
+          list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
+            Name.split_sname sn_list
+            (gets "exact_surname" = "on")
         else
-          ( true,
-            false,
-            list_aux Gwdb.base_strings_of_first_name Gwdb.persons_of_first_name
-              Name.split_fname fn_list
-              (gets "exact_first_name" = "on") )
+          list_aux Gwdb.base_strings_of_first_name Gwdb.persons_of_first_name
+            Name.split_fname fn_list
+            (gets "exact_first_name" = "on")
       in
       let rec loop ((_, len) as acc) l =
         if len > max_answers then acc
@@ -704,10 +693,7 @@ let advanced_search conf base max_answers =
           match l with
           | [] -> acc
           | ip :: l ->
-              let p_opt =
-                match_person ~skip_fname ~skip_sname (pget conf base ip)
-                  search_type
-              in
+              let p_opt = match_person (pget conf base ip) search_type in
               let acc =
                 match p_opt with
                 | Some p -> (p :: fst acc, snd acc + 1)
@@ -715,7 +701,7 @@ let advanced_search conf base max_answers =
               in
               loop acc l
       in
-      loop ([], 0) list
+      loop ([], 0) l
     else
       Gwdb.Collection.fold_until
         (fun (_, len) -> len <= max_answers)
