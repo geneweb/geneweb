@@ -572,7 +572,7 @@ let advanced_search conf base max_answers =
     List.map
       (fun s ->
         List.map Name.lower
-        @@ (* TODO which spil function to use here *) Name.split_sname s)
+        @@ (* TODO which split function to use here *) Name.split_sname s)
       (getss "alias")
   in
   let search_type = get_search_type gets in
@@ -580,29 +580,28 @@ let advanced_search conf base max_answers =
   let exact_place = "on" = gets "exact_place" in
 
   let match_person ?(skip_fname = false) ?(skip_sname = false)
-      ?(skip_alias = false) ((list, len) as acc) p search_type =
+      ?(skip_alias = false) p search_type =
     let auth = authorized_age conf base p in
 
-    let civil_match =
-      lazy
-        (match_civil_status ~base ~p
-           ~sex:(gets "sex" |> sex_of_string)
-           ~married:(gets "married") ~occupation:(gets "occu") ~skip_fname
-           ~skip_sname ~skip_alias ~first_name_list:fn_list
-           ~surname_list:sn_list ~alias_list
-           ~exact_first_name:(gets "exact_first_name" = "on")
-           ~exact_surname:(gets "exact_surname" = "on")
-           ~exact_alias:(gets "exact_alias" = "on"))
+    let civil_match () =
+      match_civil_status ~base ~p
+        ~sex:(gets "sex" |> sex_of_string)
+        ~married:(gets "married") ~occupation:(gets "occu") ~skip_fname
+        ~skip_sname ~skip_alias ~first_name_list:fn_list ~surname_list:sn_list
+        ~alias_list
+        ~exact_first_name:(gets "exact_first_name" = "on")
+        ~exact_surname:(gets "exact_surname" = "on")
+        ~exact_alias:(gets "exact_alias" = "on")
     in
 
     let pmatch =
+      auth && civil_match ()
+      &&
       match search_type with
-      | _ when not auth -> false
       | Fields.And ->
-          Lazy.force civil_match
-          && And.match_baptism ~base ~p ~exact_place
-               ~dates:(getd Fields.AND.bapt_date)
-               ~places:(getss Fields.AND.bapt_place)
+          And.match_baptism ~base ~p ~exact_place
+            ~dates:(getd Fields.AND.bapt_date)
+            ~places:(getss Fields.AND.bapt_place)
           && And.match_birth ~base ~p ~exact_place
                ~dates:(getd Fields.AND.birth_date)
                ~places:(getss Fields.AND.birth_place)
@@ -625,19 +624,18 @@ let advanced_search conf base max_answers =
             && and_f ~base ~p ~dates:(getd Fields.OR.date)
                  ~places:(getss Fields.OR.place) ~exact_place
           in
-          Lazy.force civil_match
-          && (getss "place" = []
-              && gets "date2_yyyy" = ""
-              && gets "date1_yyyy" = ""
-             || match_f Or.match_baptism And.match_baptism
-             || match_f Or.match_birth And.match_birth
-             || match_f Or.match_burial And.match_burial
-             || match_f Or.match_death And.match_death
-             || match_marriage ~conf ~base ~p ~exact_place ~default:false
-                  ~places:(getss Fields.OR.place) ~dates:(getd Fields.OR.date))
+          getss "place" = []
+          && gets "date2_yyyy" = ""
+          && gets "date1_yyyy" = ""
+          || match_f Or.match_baptism And.match_baptism
+          || match_f Or.match_birth And.match_birth
+          || match_f Or.match_burial And.match_burial
+          || match_f Or.match_death And.match_death
+          || match_marriage ~conf ~base ~p ~exact_place ~default:false
+               ~places:(getss Fields.OR.place) ~dates:(getd Fields.OR.date)
     in
 
-    if pmatch then (p :: list, len + 1) else acc
+    if pmatch then Some p else None
   in
 
   let list, len =
@@ -647,7 +645,12 @@ let advanced_search conf base max_answers =
           let rec loop p (set, acc) =
             if not (IperSet.mem (get_iper p) set) then
               let set = IperSet.add (get_iper p) set in
-              let acc = match_person acc p search_type in
+              let p_opt = match_person p search_type in
+              let acc =
+                match p_opt with
+                | Some p -> (p :: fst acc, snd acc + 1)
+                | None -> acc
+              in
               match get_parents p with
               | Some ifam ->
                   let fam = foi base ifam in
@@ -693,20 +696,30 @@ let advanced_search conf base max_answers =
               Name.split_fname fn_list
               (gets "exact_first_name" = "on") )
       in
-      let rec loop ((_, len) as acc) = function
-        | [] -> acc
-        | _ when len > max_answers -> acc
-        | ip :: l ->
-            loop
-              (match_person ~skip_fname ~skip_sname acc (pget conf base ip)
-                 search_type)
-              l
+      let rec loop ((_, len) as acc) l =
+        if len > max_answers then acc
+        else
+          match l with
+          | [] -> acc
+          | ip :: l ->
+              let p_opt =
+                match_person ~skip_fname ~skip_sname (pget conf base ip)
+                  search_type
+              in
+              let acc =
+                match p_opt with
+                | Some p -> (p :: fst acc, snd acc + 1)
+                | None -> acc
+              in
+              loop acc l
       in
       loop ([], 0) list
     else
       Gwdb.Collection.fold_until
         (fun (_, len) -> len <= max_answers)
-        (fun acc i -> match_person acc (pget conf base i) search_type)
+        (fun acc i ->
+          let p_opt = match_person (pget conf base i) search_type in
+          match p_opt with Some p -> (p :: fst acc, snd acc + 1) | None -> acc)
         ([], 0) (Gwdb.ipers base)
   in
   (List.rev list, len)
