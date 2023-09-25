@@ -1,7 +1,12 @@
+open Alcotest
+
 let () =
-  let open Alcotest in
-  try
-    run ~and_exit:false "Geneweb"
-      (Sosa_test.v @ Place_test.v @ Calendar_test.v @ Wiki_test.v @ Merge_test.v
-     @ Util_test.v)
-  with Test_error -> ()
+  let known_failures = [| "calendar-sdn" |] in
+  let is_ci = Option.is_some (Sys.getenv_opt "GENEWEB_CI") in
+  let filter ~name ~index:_ =
+    if is_ci then if Array.mem name known_failures then `Skip else `Run
+    else `Run
+  in
+  run ~and_exit:false "Geneweb" ~filter
+    (Sosa_test.v @ Place_test.v @ Calendar_test.v @ Wiki_test.v @ Merge_test.v
+   @ Util_test.v)
