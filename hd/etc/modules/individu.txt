@@ -209,7 +209,7 @@
     %if;(today.julian_day > birth_date.julian_day)
       %expr(today.julian_day - birth_date.julian_day)
     %else;0%end;
-  %end;
+  %else;0%end;
 %in;
 %define;nb_days(xx)
   %apply;nth%with;
