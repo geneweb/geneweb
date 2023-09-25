@@ -133,10 +133,13 @@ let output_name_index_aux cmp get base names_inx names_dat =
   let ht = Dutil.IntHT.create 0 in
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
-    let k = get p in
-    match Dutil.IntHT.find_opt ht k with
-    | Some list -> Dutil.IntHT.replace ht k (p.key_index :: list)
-    | None -> Dutil.IntHT.add ht k [ p.key_index ]
+    let ks = get p in
+    List.iter
+      (fun k ->
+        match Dutil.IntHT.find_opt ht k with
+        | Some list -> Dutil.IntHT.replace ht k (p.key_index :: list)
+        | None -> Dutil.IntHT.add ht k [ p.key_index ])
+      ks
   done;
   let a = Array.make (Dutil.IntHT.length ht) (0, []) in
   ignore
@@ -165,13 +168,13 @@ let output_name_index_aux cmp get base names_inx names_dat =
 let output_surname_index base tmp_snames_inx tmp_snames_dat =
   output_name_index_aux
     (Dutil.compare_snames_i base.data)
-    (fun p -> p.surname)
+    (fun p -> p.surname :: p.surnames_aliases)
     base tmp_snames_inx tmp_snames_dat
 
 let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
   output_name_index_aux
     (Dutil.compare_fnames_i base.data)
-    (fun p -> p.first_name)
+    (fun p -> p.first_name :: p.first_names_aliases)
     base tmp_fnames_inx tmp_fnames_dat
 
 let output_particles_file particles fname =
