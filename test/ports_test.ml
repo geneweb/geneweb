@@ -292,8 +292,11 @@ let v =
         test_case "Abc marriage event" `Quick test_abc_marriage;
         test_case "Abc Degree event" `Quick test_abc_degree_event;
         test_case "Abc title" `Quick test_abc_title;
+      ] );
+    ( "note-br",
+      [
         (* TODO <br> are inserted at gedcom import, removed at gedcom export, but not at gw export *)
-        test_case "Abc <br> in notes" `Quick test_abc_br;
+        test_case "<br> in notes" `Quick test_abc_br;
         test_case "Abc base notes" `Quick test_abc_base_notes;
       ] );
   ]
