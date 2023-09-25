@@ -28,7 +28,6 @@
   %let;sss;%apply;capitalize%with;xxx%end;%in;
   %apply;of%with;%sss;%end;
 %end;
-
 <h3 class="mt-1 ml-2 text-no-wrap">%nn;
   %if;(e.slices="on")
     [*display by slices/slice width/overlap/total width]0
@@ -38,9 +37,10 @@
     %end;
   %elseif;(e.m="A")[*ascendants tree]
   %elseif;(e.m="RLM")[*multi relations graph]
+  %elseif;(e.m="DAG")[*surnames branch][:] %e.sn;
   %else;[*shortest path]
   %end;
-  %if;(e.m!="RLM")
+  %if;(e.m!="RLM" and e.m!="DAG")
     %apply;of%with;%apply;capitalize(e.p)%end; %apply;capitalize(e.n)
     %( !! %a_of_b or %self unavailable on dag !! %)
     %( but the new management of [d'|e ] is ok! %)
