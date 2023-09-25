@@ -642,9 +642,11 @@ let advanced_search conf base max_answers =
     if "on" = gets "sosa_filter" then
       match Util.find_sosa_ref conf base with
       | Some sosa_ref ->
+          (* TODO rm acc here, should be computed from the set at the end *)
           let rec loop p (set, acc) =
-            if not (IperSet.mem (get_iper p) set) then
-              let set = IperSet.add (get_iper p) set in
+            let ip = get_iper p in
+            if not (IperSet.mem ip set) then
+              let set = IperSet.add ip set in
               let p_opt = match_person p search_type in
               let acc =
                 match p_opt with
