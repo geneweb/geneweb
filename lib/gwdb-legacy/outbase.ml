@@ -68,7 +68,7 @@ let make_strings_of_fsname_aux split get base =
         add_name s istr;
         split (fun i j -> add_name (String.sub s i j) istr) s)
     in
-    aux (get p)
+    List.iter aux (get p)
   done;
   Array.map
     (fun set ->
@@ -83,10 +83,12 @@ let make_strings_of_fsname_aux split get base =
     t
 
 let make_strings_of_fname =
-  make_strings_of_fsname_aux Name.split_fname_callback (fun p -> p.first_name)
+  make_strings_of_fsname_aux Name.split_fname_callback (fun p ->
+      p.first_name :: p.first_names_aliases)
 
 let make_strings_of_sname =
-  make_strings_of_fsname_aux Name.split_sname_callback (fun p -> p.surname)
+  make_strings_of_fsname_aux Name.split_sname_callback (fun p ->
+      p.surname :: p.surnames_aliases)
 
 let create_strings_of_sname oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_strings_of_sname base)
