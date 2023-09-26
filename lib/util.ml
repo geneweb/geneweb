@@ -10,25 +10,24 @@ let time_debug conf query_time nb_errors =
     | Some "on" -> ""
     | _ -> {| style="display:none"|}
   in
-  if conf.debug then
-    Output.print_sstring conf
-      (Printf.sprintf
-         {|
-      <span%s>Query treated in <span id="q_time_c">%.3f</span> s. (%d errors)</span>
-      <script>
-        var q_time = document.getElementById('q_time_c').innerHTML;
-        var home_time = document.getElementById('q_time_d');
-        home_time.title = q_time + " s";
-        if (q_time < 3 && nb_errors = 0) {
-          home_time.classList.add("text-success");
-        } else if (q_time < 8 && nb_errors < 5) {
-          home_time.classList.add("text-warning");
-        } else {
-          home_time.classList.add("text-danger");
-        }
-      </script>
-        |}
-         show query_time nb_errors)
+  Output.print_sstring conf
+    (Printf.sprintf
+       {|
+    <span%s>Query treated in <span id="q_time_c">%.3f</span> s. (%d errors)</span>
+    <script>
+      var q_time = document.getElementById('q_time_c').innerHTML;
+      var home_time = document.getElementById('q_time_d');
+      home_time.title = q_time + " s";
+      if (q_time < 3 && nb_errors = 0) {
+        home_time.classList.add("text-success");
+      } else if (q_time < 8 && nb_errors < 5) {
+        home_time.classList.add("text-warning");
+      } else {
+        home_time.classList.add("text-danger");
+      }
+    </script>
+      |}
+       show query_time nb_errors)
 
 let escape_aux count blit str =
   let strlen = String.length str in
