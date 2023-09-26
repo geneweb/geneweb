@@ -19,16 +19,12 @@
 %( TODO include;menubar %index, %foreach;family, do not work in this context %)
 %let;prefix_a;%prefix_base_password&p=%e.p;&n=%e.n;%nn;
   %if;(e.oc!="")&oc=%e.oc;%end;%in; %( %access; does not work %)
-<div class="container%if;(e.m="A" and e.t="T" and e.v>3)-fluid%end;">
+<div class="container-fluid">
 %include;home
 %define;of(xxx)
   [of%s:::xxx]
 %end;
-%define;of_c(xxx)
-  %let;sss;%apply;capitalize%with;xxx%end;%in;
-  %apply;of%with;%sss;%end;
-%end;
-<h3 class="mt-1 ml-2 text-no-wrap">%nn;
+<h3 class="mt-2 ml-3 text-no-wrap">%nn;
   %if;(e.slices="on")
     [*display by slices/slice width/overlap/total width]0
   %elseif;(e.m="D")
@@ -45,7 +41,7 @@
     %( !! %a_of_b or %self unavailable on dag !! %)
     %( but the new management of [d'|e ] is ok! %)
     <small class="text-muted ml-1 user-select-none">(%e.v; [generation/generations]1%if;(e.oi!=""), [partial])%elseif;(e.dag="on"), [dag])%end;
-    %(%apply;togend(e.v) also unavailable %))</small>
+    %(%apply;togend(e.v) also unavailable %)</small>
   %end;
 </h3>
 %if;(not cancel_links)
@@ -152,7 +148,7 @@
     %end;
     </pre>
   %else;
-    <table id="dag" class="mx-auto">
+    <table id="dag" class="mx-3">
     %foreach;dag_line;
       <tr align="left">
       %foreach;dag_cell;
@@ -175,7 +171,7 @@
             %if;(e.m="RLM" or e.dag="on" or e.em="R")
               <a href="%prefix;i=%dag_cell.index;" title="[*open this individual page]"></a>
             %else;
-              <div class="position-relative list-group-item-action">
+              <div class="position-relative>
                 <a href="%prefix_set.pmod;i=%dag_cell.index;&m=D&t=TV&%foreach;env_binding;%nn;
                 %if;(not (env.key="i" or env.key="p" or env.key="n" or env.key="oc" or
                           env.key="m" or env.key="t"))%env.key;=%env.val;&%end;%end;"
@@ -184,7 +180,7 @@
               <div>
             %end;
           %end;
-          <div class="d-flex flex-column justify-content-between%if;(dag_cell.item!="") mx-1%end;">%dag_cell.item;</div>
+          <div class="d-flex-row flex-column justify-content-between%if;(dag_cell.item!="") mx-1%end;">%dag_cell.item;</div>
         %else;
           %( TODO : trouver une condition pour un hr stylisé pour les conjoints %)
           %if;dag_cell.is_hr_left;
