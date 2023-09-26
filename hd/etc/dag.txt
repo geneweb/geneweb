@@ -148,7 +148,7 @@
     %end;
     </pre>
   %else;
-    <table id="dag" class="mx-3">
+    <table id="dag" class="mx-3 pb-6">
     %foreach;dag_line;
       <tr align="left">
       %foreach;dag_cell;
