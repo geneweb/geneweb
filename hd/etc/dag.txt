@@ -40,7 +40,7 @@
     %apply;of%with;%apply;capitalize(e.p)%end; %apply;capitalize(e.n)
     %( !! %a_of_b or %self unavailable on dag !! %)
     %( but the new management of [d'|e ] is ok! %)
-    <small class="text-muted ml-1 user-select-none">(%e.v; [generation/generations]1%if;(e.oi!=""), [partial])%elseif;(e.dag="on"), [dag])%end;
+    <small class="text-muted ml-1 user-select-none">(%e.v; [generation/generations]1%if;(e.oi!=""), [partial]%elseif;(e.dag="on"), [dag]%end;)
     %(%apply;togend(e.v) also unavailable %)</small>
   %end;
 </h3>
@@ -148,7 +148,7 @@
     %end;
     </pre>
   %else;
-    <table id="dag" class="mx-3 pb-6">
+    <table id="dag" class="mx-3">
     %foreach;dag_line;
       <tr align="left">
       %foreach;dag_cell;
