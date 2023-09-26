@@ -1462,8 +1462,6 @@ let get_spouse base iper ifam =
 let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
   let lx = lastx tdal ir in
   let x = if lx + 2 > x0 then lx + 2 else x0 in
-  (*let x1 = x in
-    let xn = x in *)
   let ifaml = List.rev (Array.to_list (get_family p)) in
   let ifam_nbr = List.length ifaml in
   let descendants = ifaml <> [] in
@@ -1476,7 +1474,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
     else ifaml
   in
   let tdal, x, _x1, _xn =
-    if v >= 1 && ifaml <> [] then
+    if v >= 0 && ifaml <> [] then
       let xn = if only_anc = [] then x - List.length ifaml - 1 else x in
       let tdal, x1, xn =
         let rec loop ifaml ifam_nbr only_one first last x1 xn tdal =
@@ -1552,7 +1550,7 @@ let rec p_pos conf base p x0 v ir tdal only_anc sps img marr cgl =
          else
            tdal_add tdal (ir+1)
              ((td_fill lx (x - 1))
-             @ (td_cell 1 CenterA Gwdb.dummy_iper (Adef.safe "|") (Adef.safe "")))
+             @ (td_cell 1 CenterA Gwdb.dummy_iper "|" (Adef.safe "")))
              x
        else tdal
      in
@@ -1575,7 +1573,7 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
       (get_children (foi base ifam))
   in
   let tdal, x, x1, xn =
-    if kids <> [] && continue then
+    if kids <> [] && continue && v > 0 then
       let xn = x - List.length kids - 1 in
       let tdal, x1, xn =
         let rec loop kids first_kid tdal x1 xn =
@@ -1614,23 +1612,21 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
     ^ if only_one && not marr then "" else "<br>"
   in
   let txt = txt ^ if kids <> [] then br_sp else "" in
-  let txt = if sps then m_txt ^ txt else m_txt in
-  let txt = if kids <> [] then txt ^ "<br>|" else txt in
+  let txt = if sps then m_txt ^ txt else if v > 0 then m_txt else "" in
+  let txt = if v > 0 && kids <> [] then txt ^ "<br>|" else txt in
   let flag =
-    string_of_ifam ifam ^ if kids <> [] then "-spouse_no_d" else "-spouse"
+    string_of_ifam ifam
+    ^ if v > 0 && kids <> [] then "-spouse_no_d" else "-spouse"
   in
   let lx = lastx tdal ir2 in
   let lx = if lx > -1 then lx else -1 in
   let tdal =
-    if true then
-      tdal_add tdal ir2
-        (td_fill lx (x - 1)
-        @ td_cell 1 CenterA (get_iper sp) txt (Adef.safe flag))
-        x
-    else tdal
+    tdal_add tdal ir2
+      (td_fill lx (x - 1) @ td_cell 1 CenterA (get_iper sp) txt (Adef.safe flag))
+      x
   in
   (* rox 4: Hbar over kids *)
-  if kids <> [] then
+  if v > 0 && kids <> [] then
     let lx = lastx tdal (ir2 + 1) in
     let lx = if lx > -1 then lx else -1 in
     let tdal =
