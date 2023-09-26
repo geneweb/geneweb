@@ -1,99 +1,63 @@
-<!-- $Id: modules/arbre_hi_tools.txt v7.0 27/06/2018 18:47:46 $ -->
-%( Arbre ascendant vertical %)
-%let;evarv;%if;(e.v!="")%evar.v;%else;5%end;%in;
-%let;evarscl;%if;(e.scale!="")%evar.scale;%else;100%end;%in;
-%let;evarfs;%if;(e.fs!="")%evar.fs;%else;17%end;%in;
+<!-- $Id: modules/arbre_hi_tools.txt v7.0 26/09/2023 04:30:23 $ -->
+%( Boutons pour les arbres ascendats compacts %)
+%let;evarv;%if;(e.v!="")%e.v;%else;5%end;%in;
+%let;evarscl;%if;(e.scale!="")%e.scale;%else;100%end;%in;
+%let;evarfs;%if;(e.fs!="")%e.fs;%else;17%end;%in;
 %let;maxlev;%if;(e.cpl = "on")13%else;12%end;%nn;%in;
-
 %(evarv;, %evarhi;, %evarim;, %evarso;, %evarma;<br>%)
 %(minv %minv; < evarv %evarv; < maxv %maxv; (maxlev %maxlev;)%)
-<div class="d-flex justify-content-between">
+<div class="d-flex ml-2 mb-2">
   %if;not cancel_links;
-    <div class="form-inline">
-      <div class="btn-group mx-2 mb-2">
+    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+      <div class="btn-group mx-2">
         %if;(evarv>=4)
-          <a href="%url_set.v;&v=%expr(evarv-1)"
-            class="btn btn-outline-secondary btn-sm small border-0 px-0"
-            title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0"
-          >&nbsp;−</a>
+          <a href="%url_set.v;&v=%expr(evarv-1)" class="btn btn-outline-primary"
+            title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]1">−</a>
         %end;
-        <span class="btn btn-outline btn-sm  border-0 font-weight-bold text-muted">%evarv; gen</span>
+        <span class="btn btn-outline-primary disabled border-top border-bottom"
+          title="[generation/generations]1">%evarv; gen.</span>
         %if;(evarv<maxlev-1)
-          <a href="%url_set.v;&v=%expr(evarv+1)"
-            class="btn btn-outline-secondary btn-sm small border-0 px-0"
-            title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)"
-          >+&nbsp;</a>
+          <a href="%url_set.v;&v=%expr(evarv+1)" class="btn btn-outline-primary"
+            title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+</a>
         %end;
       </div>
-      <div class="btn-group mx-1 mb-2 ml-2">
+      %(TODO : improve translations, titles and add icons %)
+      <div class="mx-2">
         <a href="%if;(e.hi="H")%url_set.hi.I;%else;%url_set.hi.H;%end;"
-          class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="%if;(evar.hi!="H")[*mode H/mode I]0%else;[*mode H/mode I]1%end;"
-        >&nbsp;%if;(evar.hi!="H")H%else;I%end;&nbsp;
-        </a>
+          class="btn btn-outline-primary">%if;(e.hi!="H")H%else;I%end;-tree</a>
+        <a href="%if;(e.sosa!="on")%url_set.sosa.on;%else;%url_set.sosa;%end;" class="btn btn-outline-primary ml-1"
+          title="[*visualize/show/hide/summary]1 %if;(e.sosa="on")ASCII%else;HTML%end;">
+          %if;(e.sosa!="on")HTML%else;ASCII%end; box drawing</a>
+        <a href="%if;(e.sms!="on")%url_set.sms.on;%else;%url_set.sms;%end;" class="btn btn-outline-primary ml-1"
+          title="%if;(e.sms!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [missing %s:::Sosa]0">·</a>
+        <a href="%if;(e.cpl!="on")%url_set.cpl.on;%else;%url_set.cpl;%end;" class="btn btn-outline-primary ml-1"
+          title="[*visualize/show/hide/summary]1%if;(e.cpl!="on") [couples]%else;[individuals]%end;">
+          %if;(e.cpl!="on")<i class="fa fa-user-plus" aria-hidden="true"></i>%end;<i class="fa fa-user" aria-hidden="true"></i></a>
+        <a href="%if;(e.implx!="on")%url_set.implx.on;%else;%url_set.implx;%end;" class="btn btn-outline-primary ml-1"
+          title="%if;(e.implx!="on")[*implex links]%else;[*do not] [implex links]%end;">
+          <i class="fa fa-random fa-fw"></i></a>
       </div>
-      <div class="btn-group mx-1 mb-2 ml-2">
-        <a href="%if;(e.sosa!="on")%url_set.sosa.on;%else;%url_set.sosa;%end;"
-          class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="%if;(evar.sosa!="on")[*visualize/show/hide/summary]1%nn; 
-            %else;[*visualize/show/hide/summary]2%end; [Sosa]0"
-        >S <i class="fa fa-toggle-%if;(evar.sosa!="on")off%else;on%end; text-muted"></i>
-        </a>
-      </div>
-      <div class="btn-group mx-1 mb-2 ml-2">
-        <a href="%if;(e.sms!="on")%url_set.sms.on;%else;%url_set.sms;%end;"
-          class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="%if;(evar.sms!="on")[*visualize/show/hide/summary]1%nn; 
-            %else;[*visualize/show/hide/summary]2%end; [missing %s:::Sosa]0"
-        >S <i class="fa fa-toggle-%if;(evar.sms!="on")off%else;on%end; text-muted"></i>
-        </a>
-      </div>
-      <div class="btn-group mx-1 mb-2 ml-2">
-        <a href="%if;(e.cpl!="on")%url_set.cpl.on;%else;%url_set.cpl;%end;"
-          class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="%if;(e.cpl!="on")[*visualize/show/hide/summary]1%nn; 
-            %else;[*visualize/show/hide/summary]2%end; [couples]"
-        ><span class="fa fa-user-plus" aria-hidden="true"></span>%nn;
-          <span class="fa fa-user" aria-hidden="true"></span>
-          <i class="fa fa-toggle-%if;(e.cpl!="on")off%else;on%end; text-muted"></i>
-        </a>
-      </div>
-      <div class="btn-group mx-1 mb-2 ml-2">
-        <a href="%if;(e.implx!="on")%url_set.implx.on;%else;%url_set.implx;%end;"
-          class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="%if;(evar.implx!="on")[implex links]%else;[*do not] [*implex links]%end;"
-        ><i class="fa fa-random fa-fw"></i>
-          <i class="fa fa-toggle-%if;(evar.implx!="on")off%else;on%end; text-muted"></i>
-        </a>
-      </div>
-      <div class="btn-group mx-2 mb-2 ml-2">
+      %( TODO : disable if ASCII box drawings ? %)
+      <div class="btn-group mx-2">
         %if;(evarscl>0)
-          <a href="%if;(evar.scale!="on")%url_set2.scale.fs;&scale=%expr(evarscl-20)&fs=%expr(evarfs-1)%end;""
-            class="btn btn-outline-secondary btn-sm border-0 px-0"
-            title="[reduce/increase]0 [size]0 (-20%% )"
-          >&nbsp;−</a>
+          <a href="%if;(e.scale!="on")%url_set2.scale.fs;&scale=%expr(evarscl-20)&fs=%expr(evarfs-1)%end;"
+            class="btn btn-outline-primary" title="[*reduce/increase]0 [size] (-20 %%)">−</a>
         %end;
-        <span class="btn btn-outline btn-sm border-0 font-weight-bold text-muted">Scl: %evarscl;&#37;</span>
+        <span class="btn btn-outline-primary disabled border-top border-bottom">%evarscl; %%</span>
         %if;(evarscl<200)
-          <a href="%if;(evar.scale!="on")%url_set2.scale.fs;&scale=%expr(evarscl+20)&fs=%expr(evarfs+1);%end;"
-            class="btn btn-outline-secondary btn-sm border-0 px-0"
-            title="[reduce/increase]1 [size]0 (+20%% )"
-          >&nbsp;+</a>
+          <a href="%if;(e.scale!="on")%url_set2.scale.fs;&scale=%expr(evarscl+20)&fs=%expr(evarfs+1);%end;"
+            class="btn btn-outline-primary" title="[*reduce/increase]1 [size] (+20 %%)">+</a>
         %end;
       </div>
-      <div class="btn-group mx-2 mb-2 ml-2">
+      <div class="btn-group mx-2">
         %if;(evarfs>5)
-          <a href="%if;(evar.fs!="on")%url_set.fs;&fs=%expr(evarfs-1);%end;"
-            class="btn btn-outline-secondary btn-sm border-0 px-0"
-            title="[reduce/increase]0 [font size]"
-          >&nbsp;−</a>
+          <a href="%if;(e.fs!="on")%url_set.fs;&fs=%expr(evarfs-1)%end;" class="btn btn-outline-primary"
+            title="[reduce/increase]0 [font size]">−</a>
         %end;
-        <span class="btn btn-outline btn-sm border-0 font-weight-bold text-muted">Fs: %evarfs;</span>
+        <span class="btn btn-outline-primary disabled border-top border-bottom">Font %evarfs; px</span>
         %if;(evarfs<20)
-          <a href="%if;(evar.fs!="on")%url_set.fs;&fs=%expr(evarfs+1);%end;"
-            class="btn btn-outline-secondary btn-sm border-0 px-0"
-            title="[reduce/increase]1 [font size]"
-          >&nbsp;+</a>
+          <a href="%if;(e.fs!="on")%url_set.fs;&fs=%expr(evarfs+1)%end;" class="btn btn-outline-primary"
+            title="[reduce/increase]1 [font size]">+</a>
         %end;
       </div>
     </div>

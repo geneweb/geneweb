@@ -1,34 +1,30 @@
   <!-- $Id: modules/arbre_hi.txt v7.1 04/03/2023 09:51:04 $-->
-%let;evarv;%if;(evar.v!="")%evar.v;%else;5%end;%in;
-%let;evart;%if;(evar.t!="")%evar.t;%else;T%end;%in;
-%let;evart1;%if;(evar.t1!="")%evar.t1;%else;CT%end;%in;
-%let;evarhi;%if;(evar.hi!="")%evar.hi;%else;H%end;%in;
-%let;evarim;%if;(evar.image!="" and evar.image!="off")on%end;%in;
-%let;evarix;%if;(evar.implx!="" and evar.implx="on")on%end;%in;
-%let;evarso;%if;(evar.sosa!="" and evar.sosa="on")on%end;%in;
-%let;evarcpl;%if;(evar.cpl!="" and evar.cpl="on")on%end;%in;
-%let;evarsms;%if;(evar.sms!="" and evar.sms="on")on%end;%in;
-%let;evarscl;%if;(evar.scale!="")%evar.scale;%else;100%end;%in;
-%let;evarfs;%if;(evar.fs!="")%evar.fs;%else;17%end;%in;
+%let;evarv;%if;(e.v!="")%e.v;%else;5%end;%in;
+%let;evart;%if;(e.t!="")%e.t;%else;T%end;%in;
+%let;evart1;%if;(e.t1!="")%e.t1;%else;CT%end;%in;
+%let;evarhi;%if;(e.hi!="")%e.hi;%else;H%end;%in;
+%let;evarim;%if;(e.image!="" and e.image!="off")on%end;%in;
+%let;evarix;%if;(e.implx!="" and e.implx="on")on%end;%in;
+%let;evarso;%if;(e.sosa!="" and e.sosa="on")on%end;%in;
+%let;evarcpl;%if;(e.cpl!="" and e.cpl="on")on%end;%in;
+%let;evarsms;%if;(e.sms!="" and e.sms="on")on%end;%in;
+%let;evarscl;%if;(e.scale!="")%e.scale;%else;100%end;%in;
+%let;evarfs;%if;(e.fs!="")%e.fs;%else;17%end;%in;
 %let;fs;%evarfs;%in;
-
 %( dimensions des boites %)
 %let;hbc;13%in; %( mode caractère %)
 %let;wbc;8%in;
-%( bug avec %expr en cgi, evar.scale désactivée temporairement %)
 %let;hbs;%if;cgi;24%else;%expr(24*evarscl/100)%end;%in; %( espacement des boites en mode sosa  dimension + marge %)
 %let;wbs;%if;cgi;40%else;%expr(40*evarscl/100)%end;%in;
 %let;hb1;%if;cgi;22%else;%expr(22*evarscl/100)%end;%in; %( dimensions de la boite sosa %)
 %let;wb1;%if;cgi;38%else;%expr(38*evarscl/100)%end;%in;
-
 <style type="text/css">
 #hi-tree1 {position:relative;left:10px;}
 #hi-tree1 tt{position:absolute;line-height:10pt;font-family:monospace;}
 #hi-tree1 span{position:absolute;line-height:10pt;margin:%if;((evarv<9 and evarcpl!="on") or (evarv<10 and evarcpl="on"))8px 12px%else;0px 4px%end;}
 #hi-tree1 a{position:absolute;line-height:10pt;}
 </style>
-
-<script type="text/javascript">
+<script>
   <!--
   function over1(xx)
   {
@@ -42,52 +38,39 @@
   }
   -->
 </script>
-
-<script type="text/javascript" src="%static_path;js/jquery.min.js"></script>
-<script type="text/javascript" src="%static_path;js/jquery.line.js"></script>
-
 %define;implexc(x0,y0,x1,y1)
-  <span style="top:%top;px;left:%left;px;font-family:monospace;">x
-    <script type="text/javascript">
-      jQuery( document ).ready(function( $ ) {
-        $(function() {
-          $('#hi-tree1').line(x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, zindex:1});
-        });
-      });
-    </script>
-  </span>
-%end;
-
-%define;implexs(x0,y0,x1,y1)
-  <script type="text/javascript">
-    jQuery( document ).ready(function( $ ) {
-      $(function() {
-        $('#hi-tree1').line(x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, zindex:1});
-      });
+  %( TODO : fix ugly hack, originaly it was %top/%left without substractions needed %)
+  %let;ttt;%if;((evarv<9 and evarcpl!="on") or (evarv<10 and evarcpl="on"))%expr(top-wbc)%else;%expr(top-2)%end;%in;
+  %let;lll;%if;((evarv<9 and evarcpl!="on") or (evarv<10 and evarcpl="on"))%expr(left-hbc)%else;%expr(left-4)%end;%in;
+  <span style="top:%ttt;px;left:%lll;px;font-family:monospace;">x</span>
+  <script>
+    $(window).on("load", function() {
+      $('#hi-tree1').line(x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, zindex:1});
     });
   </script>
 %end;
-
-%define;line(x0,y0,x1,y1)
-    <script type="text/javascript">
-      jQuery( document ).ready(function( $ ) {
-      $(function() {
-        $('#hi-tree1').line(x0, y0, x1, y1, {stroke:2, opacity:0.3, zindex:-1});
-        });
-      });
-    </script>
+%define;implexs(x0,y0,x1,y1)
+  <script>
+    $(window).on("load", function() {
+      $('#hi-tree1').line(x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, zindex:1});
+    });
+  </script>
 %end;
-
+%define;line(x0,y0,x1,y1)
+  <script>
+    $(window).on("load", function() {
+      $('#hi-tree1').line(x0, y0, x1, y1, {stroke:2, opacity:0.3, zindex:-1});
+    });
+  </script>
+%end;
 %define;implex1(xx)
   onmouseover="over1('sxx')" onmouseout="out1('sxx')" %nn;
 %end;
-
 %define;bg(xx)
   %apply;nth%with;
     /FFFFFF/FFC8E3/F0CBFE/DDCEFF/FFA8D3/E7A9FE/FF86C2/DD88FD/FF62B0/C4ABFE/C433FE/FFFFFF/
   %and;xx%end;
 %end;
-
 %define;size(xx)
   %apply;nth%with;
     %if;(evarso="on")
@@ -97,153 +80,145 @@
     %end;
   %and;xx%end;
 %end;
-
 %define;wid(xx) %(nb of cells in the width of the total graph %)
   %apply;nth%with;/////7/7/15/15/31/31/63/63/127%and;xx%end;
 %end;
-
 %define;hig(xx) %(nb of cells in the height of the total graph %)
   %apply;nth%with;/////3/7/7/15/15/31/31/63/63/127%and;ll%end;
 %end;
-
 %define;divsr(xx)
   %apply;nth%with;/1/2/4/8/16/32/64/128/256/512%and;xx%end;
 %end;
-
 %include;modules/arbre_hi_indexes
-
-
 %define;prefix_all()
-  %if;(evar.templ!="")templ=%evar.templ;;%end;%nn;
-  %if;(evar.wide!="")wide=%evar.wide;;%end;%nn;
-  %if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%nn;
+  %if;(e.templ!="")templ=%e.templ;;%end;%nn;
+  %if;(e.wide!="")wide=%e.wide;;%end;%nn;
+  %if;(e.p_mod!="")p_mod=%e.p_mod;;%end;%nn;
 %end;
 
 %(a=ancestor, s=sosa, p=has_parents, bg=background, t=top, l=left  %)
 %define;boxsosa(aaa, sss, ppp, bgg, lll, ttt)
-    %let;bg_col;bgg%in;
-    <div id="s%aaaanc_sosa.v;"%nn;
-      style='position:absolute;border:solid 1px;top:tttpx;left:lllpx;%nn;
-      %if;(aaasame="")
-        %if;(evarcpl="on")
-          %if;(not aaahas_parents)border-left: 3px solid;%end;%nn;
-          %if;(not aaaspouse.has_parents)border-right: 3px solid;%end;%nn;
-        %elseif;(not aaahas_parents )
-           border-top:3px solid;%nn;
-        %end;
+  %let;bg_col;bgg%in;
+  <div id="s%aaaanc_sosa.v;"%nn;
+    style="position:absolute;border:solid 1px;top:tttpx;left:lllpx;%nn;
+    %if;(aaasame="")
+      %if;(evarcpl="on")
+        %if;(not aaahas_parents)border-left: 3px solid;%end;%nn;
+        %if;(not aaaspouse.has_parents)border-right: 3px solid;%end;%nn;
+      %elseif;(not aaahas_parents )
+         border-top:3px solid;%nn;
       %end;
-      width:%if;(boxsize=2)%expr(wb1*2)%else;%wb1;%end;px;%nn;
-      height:%if;(boxsize=2)%expr(hb1*2)%else;%hb1;%end;px;%nn;
-      background-color:%if;(bg_col="")#FFFFFF%else;#bgg;%end;;zindex:2'
-    >
-      %let;imsz;%if;(boxsize=2)15%else;8%end;%in;
-      %if;(evar.cgl!="on")
-        %if;(evarcpl!="on")
-          <a class="big_anchor_1 list-group-item-action"
-            href='%prefix;%aaaaccess;'
-            title="%aaafirst_name; %aaasurname; (%aaaocc;)">
-            %if;(aaahas_image)
-              <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
-            %end;
-          </a>
-          <a class="big_anchor_1m list-group-item-action"
-            href="%prefix_set.all;%apply;prefix_all();m=MOD_IND&i=%aaaindex;"
-            title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)">
-          </a>
-        %else;
-          <a class="big_anchor_him list-group-item-action"
-            href='%prefix;%aaaaccess;'
-            title="%aaafirst_name; %aaasurname; (%aaaocc;)">
-            %if;(aaahas_image)
-            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
-            %end;
-          </a>
-          %if;(aaasame="")
-          <a class="big_anchor_her list-group-item-action"
-            href='%prefix;%aaaspouse.access;'
-            title="%aaaspouse;">
-            %if;(aaaspouse.has_image)
-            <img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0">
-            %end;
-          </a>
-          %end;
-          <a class="big_anchor_him_m list-group-item-action"
-            href="%prefix_set.all;%apply;prefix_all();m=MOD_IND&i=%aaaindex;"
-            title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)">
-          </a>
-          %if;(aaasame="")
-          <a class="big_anchor_her_m list-group-item-action"
-            href="%prefix_set.all;%apply;prefix_all();m=MOD_IND&i=%aaaspouse.index;"
-            title="Modifier %aaaspouse;">
-          </a>
-          %end;
-        %end;
-      %else;
-        %let;width;%if;(boxsize=2)%expr(wb1*2)%else;%wb1;%end;%in;
-        %let;imsz;%if;(boxsize=2)15%else;8%end;%in;
-        %let;fs1;%if;(sss>999)%expr(fs-10)%elseif;(boxsize=2)%fs;%else;%expr(fs-5)%end;%in;
-        %let;tm;%if;(boxsize=2)8%else;2%end;%in;
-        %let;dw1;%expr(width-imsz)%in;
-        %let;dw2;%expr(width-2*imsz)%in;
-        %let;dm;%if;(aaahas_image)%imsz;%end;%in;
-        %if;(evarcpl!="on")
-          <div class="d-flex">
+    %end;
+    width:%if;(boxsize=2)%expr(wb1*2)%else;%wb1;%end;px;%nn;
+    height:%if;(boxsize=2)%expr(hb1*2)%else;%hb1;%end;px;%nn;
+    background-color:%if;(bg_col="")#FFFFFF%else;#bgg;%end;;zindex:2">
+    %let;imsz;%if;(boxsize=2)15%else;8%end;%in;
+    %if;(e.cgl!="on")
+      %if;(evarcpl!="on")
+        <a class="big_anchor_1 list-group-item-action"
+          href='%prefix;%aaaaccess;'
+          title="%aaafirst_name; %aaasurname; (%aaaocc;)">
           %if;(aaahas_image)
             <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
           %end;
-          <span style="margin:0 0 2px 0;text-align:center;width:%dw1;px;font-size:%fs1;px;">
-            %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;
-          </span>
-          </div>
-        %else;
-          <div class="d-flex justify-content-between">
-          %if;(aaahas_image)%nn;
-            <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"></div>%nn;
-          %else;
-            <div style="margin:0 0 2px 0;width:%imsz;px"></div>
-          %end;%nn;
-          <div style="margin:0 0 2px 0;text-align:center;width:%dw2;px;font-size:%fs1;px;">%nn;
-            %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;%nn;
-          </div>%nn;
-          %if;(aaaspouse.has_image)%nn;
-            <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0"></div>%nn;
-          %end;%nn;
-          </div>
+        </a>
+        <a class="big_anchor_1m list-group-item-action"
+          href="%prefix_set.all;%apply;prefix_all();m=MOD_IND&i=%aaaindex;"
+          title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)">
+        </a>
+      %else;
+        <a class="big_anchor_him list-group-item-action"
+          href='%prefix;%aaaaccess;'
+          title="%aaafirst_name; %aaasurname; (%aaaocc;)">
+          %if;(aaahas_image)
+            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
+          %end;
+        </a>
+        %if;(aaasame="")
+        <a class="big_anchor_her list-group-item-action"
+          href='%prefix;%aaaspouse.access;'
+          title="%aaaspouse;">
+          %if;(aaaspouse.has_image)
+            <img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0">
+          %end;
+        </a>
+        %end;
+        <a class="big_anchor_him_m list-group-item-action"
+          href="%prefix_set.all;%apply;prefix_all();m=MOD_IND&i=%aaaindex;"
+          title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)">
+        </a>
+        %if;(aaasame="")
+        <a class="big_anchor_her_m list-group-item-action"
+          href="%prefix_set.all;%apply;prefix_all();m=MOD_IND&i=%aaaspouse.index;"
+          title="Modifier %aaaspouse;">
+        </a>
         %end;
       %end;
-      %if;(evar.cgl!="on")
-      <div>
-        <a style="width:100%%;zindex:2;"
-          href="%prefix_base_password;%aaaaccess;;t=T;t1=CT;
-            %foreach;env_binding;%if;(not (env.key="t" or env.key="t1" or env.key="p"
-              or env.key="n" or env.key="oc"))%env.key=%env.val;;%end;%end;"
-          %if;(aaasame!="")%apply;implex1(aaasame.v)%end;%nn;
-          title='[*generation/generations]0 %level; – Sosa %nn;
-            %if;(evarcpl="")%aaaanc_sosa; %if;(aaasame!="")=Sosa %aaasame;%end;
-            %else;%aaaanc_sosa; & %expr(aaaanc_sosa.v+1)%nn;
-            %end;&#010;%nn;
-            %if;(aaais_male) ♂%else; ♀%end; %aaafirst_name; %aaasurname; %if;(aaaocc!="" or aaaocc!=0)(%aaaocc;)%end;&#010;%nn;
-            %if;(aaabirth_date.year!="")° %aaabirth_date.year;%end;%nn;
-            %if;(aaabirth_date.year!="" and aaais_dead) – %end;%nn;
-            %if;(aaabirth_date.year="" and aaadeath_date.year!="")†%else;%aaadeath_date.year;%end;&#010;%nn;
-            %if;(not aaahas_parents) [*missing parents].&#010;%end;%nn;
-            %if;(aaasame=""  and aaahas_families and evarcpl="on")%nn;
-              %if;(aaaspouse.is_male) ♂%else; ♀%end; %aaaspouse; (%aaaspouse.occ;)&#010;%nn;
-              %if;(aaaspouse.birth_date.year!="")° %aaaspouse.birth_date.year;%end;%nn;
-              %if;(aaaspouse.birth_date.year!="" and aaaspouse.is_dead) – %end;%nn;
-              %if;(aaaspouse.birth_date.year="" and aaaspouse.death_date.year!="")†%else;%aaaspouse.death_date.year;%end;&#010;%nn;
-              %if;(not aaaspouse.has_parents) [*missing parents].%end;%nn;
-            %end;'
-        >
-          %let;fs1;%if;(sss>999)%expr(fs-10)%elseif;(boxsize=2)%fs;%else;%expr(fs-5)%end;%in;
-          %let;tm;%if;(boxsize=2)8%else;2%end;%in;
-          <span style="margin:%tm;px 0 2px 0;text-align:center;width:100%%;font-size:%fs1;px;">
-            %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;
-          </span>
-        </a>
-      </div>
+    %else;
+      %let;width;%if;(boxsize=2)%expr(wb1*2)%else;%wb1;%end;%in;
+      %let;imsz;%if;(boxsize=2)15%else;8%end;%in;
+      %let;fs1;%if;(sss>999)%expr(fs-10)%elseif;(boxsize=2)%fs;%else;%expr(fs-5)%end;%in;
+      %let;tm;%if;(boxsize=2)8%else;2%end;%in;
+      %let;dw1;%expr(width-imsz)%in;
+      %let;dw2;%expr(width-2*imsz)%in;
+      %let;dm;%if;(aaahas_image)%imsz;%end;%in;
+      %if;(evarcpl!="on")
+        <div class="d-flex">
+        %if;(aaahas_image)
+          <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
+        %end;
+        <span style="margin:0 0 2px 0;text-align:center;width:%dw1;px;font-size:%fs1;px;">
+          %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;
+        </span>
+        </div>
+      %else;
+        <div class="d-flex justify-content-between">
+        %if;(aaahas_image)%nn;
+          <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"></div>%nn;
+        %else;
+          <div style="margin:0 0 2px 0;width:%imsz;px"></div>
+        %end;%nn;
+        <div style="margin:0 0 2px 0;text-align:center;width:%dw2;px;font-size:%fs1;px;">%nn;
+          %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;%nn;
+        </div>%nn;
+        %if;(aaaspouse.has_image)%nn;
+          <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0"></div>%nn;
+        %end;%nn;
+        </div>
       %end;
+    %end;
+    %if;(e.cgl!="on")
+    <div>
+      <a style="width:100%%;zindex:2;"
+        href="%prefix_base_password;%aaaaccess;;t=T;t1=CT;
+          %foreach;env_binding;%if;(not (env.key="t" or env.key="t1" or env.key="p"
+            or env.key="n" or env.key="oc"))%env.key=%env.val;;%end;%end;"
+        %if;(aaasame!="")%apply;implex1(aaasame.v)%end;%nn;
+        title='[*generation/generations]0 %level; – Sosa %nn;
+          %if;(evarcpl="")%aaaanc_sosa; %if;(aaasame!="")=Sosa %aaasame;%end;
+          %else;%aaaanc_sosa; & %expr(aaaanc_sosa.v+1)%nn;
+          %end;&#010;%nn;
+          %if;(aaais_male) ♂%else; ♀%end; %aaafirst_name; %aaasurname; %if;(aaaocc!="" or aaaocc!=0)(%aaaocc;)%end;&#010;%nn;
+          %if;(aaabirth_date.year!="")° %aaabirth_date.year;%end;%nn;
+          %if;(aaabirth_date.year!="" and aaais_dead) – %end;%nn;
+          %if;(aaabirth_date.year="" and aaadeath_date.year!="")†%else;%aaadeath_date.year;%end;&#010;%nn;
+          %if;(not aaahas_parents) [*missing parents].&#010;%end;%nn;
+          %if;(aaasame=""  and aaahas_families and evarcpl="on")%nn;
+            %if;(aaaspouse.is_male) ♂%else; ♀%end; %aaaspouse; (%aaaspouse.occ;)&#010;%nn;
+            %if;(aaaspouse.birth_date.year!="")° %aaaspouse.birth_date.year;%end;%nn;
+            %if;(aaaspouse.birth_date.year!="" and aaaspouse.is_dead) – %end;%nn;
+            %if;(aaaspouse.birth_date.year="" and aaaspouse.death_date.year!="")†%else;%aaaspouse.death_date.year;%end;&#010;%nn;
+            %if;(not aaaspouse.has_parents) [*missing parents].%end;%nn;
+          %end;'>
+        %let;fs1;%if;(sss>999)%expr(fs-10)%elseif;(boxsize=2)%fs;%else;%expr(fs-5)%end;%in;
+        %let;tm;%if;(boxsize=2)8%else;2%end;%in;
+        <span style="margin:%tm;px 0 2px 0;text-align:center;width:100%%;font-size:%fs1;px;">
+          %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;
+        </span>
+      </a>
     </div>
+    %end;
+  </div>
 %end;
 
 %define;linesosa(ss0, ll, yy, x0, y0)
@@ -308,7 +283,7 @@
         %if;(aaabirth_date.year!="" and aaais_dead) – %end;%nn;
         %if;(aaabirth_date.year="" and aaadeath_date.year!="")†%else;%aaadeath_date.year;%end;&#010;%nn;
         %if;(not aaahas_parents) [*missing parents].&#010;%end;%nn;
-        %if;(aaasame="" and aaahas_families  and evarcpl="on")%nn;
+        %if;(aaasame="" and aaahas_families and evarcpl="on")%nn;
           %if;(aaaspouse.is_male) ♂%else; ♀%end; %aaaspouse; (%aaaspouse.occ;)&#010;%nn;
           %if;(aaaspouse.birth_date.year!="")° %aaaspouse.birth_date.year;%end;%nn;
           %if;(aaaspouse.birth_date.year!="" and aaaspouse.is_dead) – %end;%nn;
@@ -398,7 +373,7 @@
       %foreach;ancestor;
         %if;(ancestor.anc_sosa.v %2=0)
           %let;anc_sosahalf;%expr(ancestor.anc_sosa.v/2)%in;
-          %let;anc_sosasamehalf;%if;(ancestor.same!="")%expr(ancestor.same/2)%else;0%end;%in;
+          %let;anc_sosasamehalf;%if;(ancestor.same.v!="")%expr(ancestor.same.v/2)%else;0%end;%in;
           %let;top;%expr(topxx_yy(anc_sosahalf)*hb)%in; %( top left corner %)
           %let;left;%expr(leftxx_yy(anc_sosahalf)*wb)%in;
           %let;top1;%expr(topxx_yy(anc_sosahalf)*hb+6)%in; %( offset for implex liens %)
@@ -407,22 +382,19 @@
           %let;left2;%expr(leftxx_yy(anc_sosasamehalf)*wb+4)%in;
           %let;bg;%if;(ancestor.same!="")CBFECE;%elseif(evarcpl="on")%apply;bg(level-1)%else;%apply;bg(level)%end;%in;
           %if;(evarso!="on")
-            %if;(ancestor.same!="" and evarix="on")
-              %apply;implexc(left1, top1, left2, top2)
+            %if;(ancestor.same!="" and evarix="on")%apply;implexc(left1, top1, left2, top2)%end;
+            %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
+              %apply;boxchar("ancestor.", "yy", left, top)
             %else;
-              %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
-                %apply;boxchar("ancestor.", "yy", left, top)
-              %else;
-                %apply;boxchar("", "yy", left, top)
-              %end;
+              %apply;boxchar("", "yy", left, top)
             %end;
           %else;
             %if;(ancestor.same!="" and evarix="on")%apply;implexs(left1, top1, left2, top2)%end;
-              %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
-                %apply;boxsosa("ancestor.", ancestor.anc_sosa.v, ancestor.has_parents, bg, left, top)
-              %else;
-                %apply;boxsosa("", ancestor.anc_sosa.v, ancestor.has_parents, bg, left, top)
-              %end;
+            %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
+              %apply;boxsosa("ancestor.", ancestor.anc_sosa.v, ancestor.has_parents, bg, left, top)
+            %else;
+              %apply;boxsosa("", ancestor.anc_sosa.v, ancestor.has_parents, bg, left, top)
+            %end;
             %apply;linesosa(ancestor.anc_sosa.v, xx+1, "yy", left, top)
           %end;
         %end;
@@ -470,7 +442,8 @@
             %end;
           %end;
         %else;
-          %if;(ancestor.same!="" and evarix="on")%apply;implexs(left1, top1, left2, top2)%end;
+          %if;(ancestor.same!="" and evarix="on")
+            %apply;implexc(left1, top1, left2, top2)%end;
             %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
               %apply;boxsosa("ancestor.", ancestor.anc_sosa.v, ancestor.has_parents, bg, left, top)
             %else;
@@ -573,11 +546,10 @@
   %end;
 %end;
 
-%define;my_title(aa, bb, cc)
- [*aa:::bb:cc]
+%define;my_title(aa, bb, tt)
+ [*aa:::bb:tt]
 %end;
-
-%apply;my_title%with;ancestors tree of %%s %%s%and;%first_name;%and;%surname;%end; %dates
+<h2 class="display-5 ml-3">%apply;my_title("ancestors tree of", e.hi, first_name) %surname; %dates (%e.v; [generation/generations]1)</h3>
 %let;boxsize;%if;((evarv<9 and evarcpl!="on") or (evarv<10 and evarcpl="on"))2%else;1%end;%in;
 %if;((evarcpl="on" and evarv < 4) or (evarcpl!="on" and evarv < 3))
   [*compact tree][:] [specify::generation/generations]0 > 3.
