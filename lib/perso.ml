@@ -1617,7 +1617,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | Vfam (_, fam, _, _) ->
           get_fsources fam |> sou base |> Util.safe_html |> safe_val
       | _ -> null_val)
-  | "url" -> (
+  | "url_in_env" -> (
       match get_env "url" env with Vstring x -> str_val x | _ -> str_val "")
   | "incr_count" -> (
       match get_env "count" env with

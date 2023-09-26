@@ -294,7 +294,9 @@ let rec eval_variable conf = function
   (* clear some variables in url *)
   (* set the first variable to a new value if <> "" *)
   | [ "url_set"; evar; str ] -> url_set_aux conf [ evar ] str
-  | [ "url_set"; evar ] -> url_set_aux conf [ evar ] ""
+  | [ "url_set"; evarl ] ->
+      let evarl = String.split_on_char '_' evarl in
+      url_set_aux conf evarl ""
   | [ "url_set2"; evar1; evar2; str ] -> url_set_aux conf [ evar1; evar2 ] str
   | [ "url_set2"; evar1; evar2 ] -> url_set_aux conf [ evar1; evar2 ] ""
   | [ "url_set3"; evar1; evar2; evar3; str ] ->
