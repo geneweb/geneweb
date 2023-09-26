@@ -238,7 +238,7 @@
     %end;
   %end;
   <span title="%if;xx.computable_age;%xx.age;%elseif;xx.computable_death_age;%xx.death_age;%end;"
-    class="text-nowrap">%xx.dates;</span>%if;(xx.title!=""), %xx.title;%end;%xx.dates;%nn;
+    class="text-nowrap">%xx.dates;</span>%if;(xx.title!=""), %xx.title;%end;%nn;
 %end;
 
 %define;short_display_person_tree(xx)
