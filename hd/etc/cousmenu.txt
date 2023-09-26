@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: cousmenu.txt v7.1 19/08/2023 19:51:43 $ -->
+  <!-- $Id: cousmenu.txt v7.1 25/09/2023 14:33:38 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     [*relationship link between]%sp;
@@ -26,7 +26,7 @@
 %message_to_wizard;
 %let;e_v;%if(e.v!="")%e.v;%else;4%end;%in;
 <div class="container%if;(e_v>6)-fluid%end;">
-<div class="d-flex flex-column justify-content-center">
+  <div class="d-flex flex-column justify-content-center">
 %include;perso_utils
 %include;menubar
 %let;min;%if;(not has_children)1%else;0%end;%in;
@@ -35,13 +35,13 @@
   <a role="button" class="btn btn-sm btn-light %if;(e_v=vvv) disabled font-weight-bold text-white bg-dark%else; %end; p-1%if;(vvv<10) px-2%end;" href="%url_set.v.vvv;"%sp;
   title="[*ascending/descending (degree)]0 vvv%if;(vvv=0)[:] [person/persons]0 [and] [descendants]%end;">vvv</a>%nn;
 %end;
-<div class="d-flex flex-column align-self-center order-1">
-  <div class="btn-group py-0" role="group" aria-label="buttons to select max ascending level v">
-    <div class="py-0 btn-group d-flex flex-wrap" role="group" aria-label="button v from 0 to max">
-      %for;i;min;max;%apply;picklvl(i)%end;
+    <div class="d-flex flex-column align-self-center order-1">
+      <div class="btn-group py-0" role="group" aria-label="buttons to select max ascending level v">
+        <div class="py-0 btn-group d-flex flex-wrap" role="group" aria-label="button v from 0 to max">
+          %for;i;min;max;%apply;picklvl(i)%end;
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 %define;cousin_lex_tt(vvv,www)
   %( condition pour garder la tooltip (title="") vide si elle n'est pas définie pour la langue en cours %)
   %if;([cousins.vvv.www tt]!="[cousins.vvv.www tt]")[cousins.vvv.www tt]1%else;%end;
@@ -65,13 +65,6 @@
 %define;cous_paths_max_date(vvv,www)
   %cous_paths_max_date.vvv.www;
 %end;
-%(%define;setvar(nnn,vvv)
-  %set_var.nnn.vvv;
-%end;
-%define;getvar(nnn)
-  %get_var.nnn;
-%end;%)
-
 %empty_sorted_list;%empty_sorted_listb;%empty_sorted_listc;%reset_count3;
 %define;cous_mod(vvv,www)
   %empty_sorted_list;%empty_sorted_listb;
@@ -330,40 +323,40 @@ style="background: linear-gradient(270deg, rgba(245,231,216,0.9) %if;(percent_vv
 %apply;table(e_v+1)
 
 %( page title + counts shown at top of page using flex order %)
-<div class="d-flex justify-content-between order-2 mt-1">%nn;
-  <h3 class="">[*link between]
-    %let;max;%if;(cousins.max_a < e_v)%cousins.max_a;%else;%e_v;%end;%in;
-    %if;(public_name != "")%public_name;%else;%first_name;%end;
-    %if;(qualifier != "") <em>%qualifier;</em>%end; %surname;%sp;
-    %(%if;(alias != "") <em>(%alias;)</em>%end;%)
-    %if;(e.v=0)[and] [a descendant]0%else;[and] [close family] [up to] %max; [generation/generations]1%end;%( montantes [and] %expr(e_v+cousins.max_d) descendantes…%)
-  </h3>
-  <div class="d-flex flex-column justify-content-end text-right">
-    %( quick count ascendants | TODO : filter by index to reduce asc./desc. implexes %)
-    %reset_count;
-    %if;has_parents;
-      %for;i;0;e_v;
-        %let;tt;%apply;cousins_cnt%with;%expr(i+1)%and;0%end;%in;
-        %for;j;0;tt;%incr_count;%end;
-      %end;
-    %end;
-    <span class="text-muted" title="Ancestor/Descendant/Persons/Living">%count;A%nn;
-    %reset_count;
-    %if;has_children;
-      %for;i;1;cousins.max_d;
-        %let;tt;%apply;cousins_cnt%with;0%and;%i%end;%in;
-        %for;j;0;tt;%incr_count;%end;
-      %end;
-    %end;
-    /%count;D
-    %reset_count;%foreach;sorted_listc_item;%if;(item.2=0)%incr_count;%end;%end;%nn;
-    %listc_size;P/%count;L</span>
+    <div class="d-flex justify-content-between order-2 mt-1">%nn;
+      <h3 class="">[*link between]
+        %let;max;%if;(cousins.max_a < e_v)%cousins.max_a;%else;%e_v;%end;%in;
+        %if;(public_name != "")%public_name;%else;%first_name;%end;
+        %if;(qualifier != "") <em>%qualifier;</em>%end; %surname;%sp;
+        %(%if;(alias != "") <em>(%alias;)</em>%end;%)
+        %if;(e.v=0)[and] [a descendant]0%else;[and] [close family] [up to] %max; [generation/generations]1%end;%( montantes [and] %expr(e_v+cousins.max_d) descendantes…%)
+      </h3>
+      <div class="d-flex flex-column justify-content-end text-right">
+        %( quick count ascendants | TODO : filter by index to reduce asc./desc. implexes %)
+        %reset_count;
+        %if;has_parents;
+          %for;i;0;e_v;
+            %let;tt;%apply;cousins_cnt%with;%expr(i+1)%and;0%end;%in;
+            %for;j;0;tt;%incr_count;%end;
+          %end;
+        %end;
+        <span class="text-muted" title="Ancestor/Descendant&#10;Persons/Living">%count;A%nn;
+        %reset_count;
+        %if;has_children;
+          %for;i;1;cousins.max_d;
+            %let;tt;%apply;cousins_cnt%with;0%and;%i%end;%in;
+            %for;j;0;tt;%incr_count;%end;
+          %end;
+        %end;
+        /%count;D
+        %reset_count;%foreach;sorted_listc_item;%if;(item.2=0)%incr_count;%end;%end;%nn;
+        %listc_size;P/%count;L</span>
+      </div>
+    </div>
   </div>
-</div>
-</div> %(<div class="d-flex %)
 %base_trailer;
 %include;copyr
-</div> %(<div class="container %)
+</div>
 %include;js
 <script>
 $(function () {
