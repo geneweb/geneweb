@@ -322,8 +322,8 @@ let max_l1_l2 conf base p =
     | Some t, Some d_t -> (t, d_t)
     | _, _ -> init_cousins_cnt conf base p
   in
-  let max_i = Array.length cousins_cnt in
-  let max_j = Array.length cousins_cnt.(0) in
+  let max_i = Array.length cousins_cnt - 1 in
+  let max_j = Array.length cousins_cnt.(0) - 1 in
   let max_a =
     let rec loop0 i =
       if cousins_cnt.(i).(0) <> [] && i < max_i - 1 then loop0 (i + 1) else i
@@ -333,7 +333,7 @@ let max_l1_l2 conf base p =
   let rec loop i j =
     if cousins_cnt.(i).(j) <> [] then
       if j < max_j then loop i (j + 1) else (max_a, j - i)
-    else if i < max_i - 1 && j < max_j - 1 then loop (i + 1) (j + 1)
+    else if i < max_i && j < max_j then loop (i + 1) (j + 1)
     else (max_a, j - i)
   in
   loop 0 0
