@@ -49,9 +49,9 @@
             %if;has_carrousel;
               %foreach;img_in_carrousel;%incr_count;
                 <div class="carousel-item%if;(not has_portrait and is_first) active%end;">
-                  %if;(url!="")
-                    <a href="%url;" target="_blank" rel="noopener">
-                      url image
+                  %if;(url_in_env!="")
+                    <a href="%url_in_env;" target="_blank" rel="noopener">
+                      url_in_env image
                     </a>
                   %else;
                     <a href="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" target="_blank" rel="noopener">
