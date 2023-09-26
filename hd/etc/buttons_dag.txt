@@ -64,8 +64,8 @@
 %let;prev_sibling_access;%get_var.prevsiblingaccess;%in;
 %let;next_sibling_access;%get_var.nextsiblingaccess;%in;
 %if;(not cancel_links and (e.m="A" or e.m="D"))
-<nav class="navbar fixed-bottom navbar-light bg-light justify-content-center pt-0 pb-1">
-  <div class="btn-toolbar align-items-center%if;(e.m="D" or e.dag="on") mt-2%end;" role="toolbar" arial-label="asc/dsc button group">
+<nav class="navbar fixed-bottom navbar-light bg-light justify-content-center py-0">
+  <div class="btn-toolbar align-items-center%if;(e.m="D" or e.dag="on") mt-1%end;" role="toolbar" arial-label="asc/dsc button group">
     <div class="btn-group border rounded mr-1  " role="group" aria-label="ascendant tree button group">
       <a role="button" href="%prefix_base_password;m=A&t=A%foreach;env_binding;%if;(env.key!="m" and env.key!="t" and env.key!="dag")&%env.key=%env.val;%end;%end;"
         class="btn btn-outline-primary border-%if;(e.t!="A")0%else;2 disabled font-weight-bold%end; px-2 pt-1 h-100"
