@@ -90,7 +90,7 @@
         class="sosa_%if;(pp.sosa.v!=zz)implex_%end;%pp.sosa.v;" role="button">%pp;</a>%nn;
       %else;%pp;%end;%pp.title;%pp.dates;%nn;
     </span>
-    %if;(pp.sosa.v!=zz)
+    %if;(pp.sosa.v!="" and pp.sosa.v!=zz)
       %if;(not cancel_links)
         <a role="button" onclick="implex('%pp.sosa.v;')"
           title="[*implex/implexes]0, [see above] [*Sosa] %pp.sosa;">%end;
@@ -114,7 +114,7 @@
 %else;
   %if;(e.t="L")
     %( by list %)
-    <p>%apply;togena(xx).</p>
+    <p>%apply;togena(lvl).</p>
     %apply;ancestors_by_list("self", lvl)
   %elseif;(e.t="H")
     %( horizontal ascendency %)
@@ -127,10 +127,11 @@
       </div>
     </form>
     <div class="text-monospace anclist_hr mt-2">
+      %let;sosa_v;%if(sosa.v!="")%sosa.v;%else;1%end;%in;
       %if;((e.same="" or e.same=0) and e.p=e.pz and e.n=e.nz)
         %apply;anc_row_hr("self", lvl, 1, "   ", "──╴", "   ")
       %else;
-        %apply;anc_row_hr("self", lvl, sosa.v, "   ", "──╴", "   ")
+        %apply;anc_row_hr("self", lvl, sosa_v, "   ", "──╴", "   ")
       %end;
     </div>
     %if;(implex_cnt>0)
