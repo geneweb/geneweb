@@ -4,7 +4,7 @@ open Config
 open Def
 open Gwdb
 
-let time_debug conf query_time =
+let time_debug conf query_time nb_errors =
   let show =
     match List.assoc_opt "show_query_time" conf.base_env with
     | Some "on" -> ""
@@ -14,21 +14,21 @@ let time_debug conf query_time =
     Output.print_sstring conf
       (Printf.sprintf
          {|
-      <span%s>Query treated in <span id="q_time_c">%.3f</span> s.</span>
+      <span%s>Query treated in <span id="q_time_c">%.3f</span> s. (%d errors)</span>
       <script>
         var q_time = document.getElementById('q_time_c').innerHTML;
         var home_time = document.getElementById('q_time_d');
         home_time.title = q_time + " s";
-        if (q_time < 3) {
+        if (q_time < 3 && nb_errors = 0) {
           home_time.classList.add("text-success");
-        } else if (q_time < 8) {
+        } else if (q_time < 8 && nb_errors < 5) {
           home_time.classList.add("text-warning");
         } else {
           home_time.classList.add("text-danger");
         }
       </script>
         |}
-         show query_time)
+         show query_time nb_errors)
 
 let escape_aux count blit str =
   let strlen = String.length str in

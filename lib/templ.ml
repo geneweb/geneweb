@@ -1,11 +1,17 @@
 open Config
 open TemplAst
 
+let nb_errors = ref 0
+
 exception Exc_located of loc * exn
 
 let raise_with_loc loc = function
-  | Exc_located (_, _) as e -> raise e
-  | e -> raise (Exc_located (loc, e))
+  | Exc_located (_, _) as e ->
+      incr nb_errors;
+      raise e
+  | e ->
+      incr nb_errors;
+      raise (Exc_located (loc, e))
 
 let input_templ conf fname =
   match Util.open_etc_file conf fname with
@@ -428,11 +434,15 @@ let eval_string_var conf eval_var sl =
   try eval_var sl
   with Not_found -> (
     try VVstring (eval_variable conf sl)
-    with Not_found -> VVstring (" %" ^ String.concat "." sl ^ "?"))
+    with Not_found ->
+      incr nb_errors;
+      VVstring (" %" ^ String.concat "." sl ^ "?"))
 
 let eval_var_handled conf sl =
   try eval_variable conf sl
-  with Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl)
+  with Not_found ->
+    incr nb_errors;
+    Printf.sprintf " %%%s?" (String.concat "." sl)
 
 let apply_format conf nth s1 s2 =
   let s1 =
@@ -577,8 +587,6 @@ and eval_transl_lexicon conf upp s c =
   let r = Util.simple_decline conf r in
   let r = Util.translate_eval r in
   if upp then Utf8.capitalize_fst r else r
-
-let nb_errors = ref 0
 
 let loc_of_expr = function
   | Atext (loc, _) -> loc
@@ -964,7 +972,7 @@ let print_copyright conf =
 let include_hed_trl conf name =
   if name = "trl" then (
     let query_time = Unix.gettimeofday () -. conf.query_start in
-    Util.time_debug conf query_time;
+    Util.time_debug conf query_time !nb_errors;
     Util.include_template conf [] name (fun () -> ()))
 
 let rec interp_ast :
@@ -1177,8 +1185,12 @@ and print_var print_ast_list conf ifun env ep loc sl =
                   Util.include_begin conf (Adef.safe fname);
                   print_ast_list env ep astl;
                   Util.include_end conf (Adef.safe fname)
-              | None -> Output.printf conf " %%%s?" (String.concat "." sl))
-          | None -> Output.printf conf " %%%s?" (String.concat "." sl))
+              | None ->
+                  incr nb_errors;
+                  Output.printf conf " %%%s?" (String.concat "." sl))
+          | None ->
+              incr nb_errors;
+              Output.printf conf " %%%s?" (String.concat "." sl))
       | sl -> print_variable conf sl)
   in
   let eval_var = eval_var conf ifun env ep loc in
@@ -1205,7 +1217,9 @@ and print_variable conf sl =
       match sl with
       | [ s ] -> print_simple_variable conf s
       | _ -> raise Not_found
-    with Not_found -> Output.printf conf " %%%s?" (String.concat "." sl))
+    with Not_found ->
+      incr nb_errors;
+      Output.printf conf " %%%s?" (String.concat "." sl))
 
 let copy_from_templ : config -> Adef.encoded_string env -> in_channel -> unit =
  fun conf env ic ->
