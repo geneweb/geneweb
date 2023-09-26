@@ -2,10 +2,7 @@
 %define;display_person(xxx)
   <div class="list-group-item px-0 mx-0 border-0">
   %if;(not cancel_links)
-    <a href="%prefix_set.pmod;%xxx.access;;m=D;t=V;%foreach;env_binding;%nn;
-        %if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="m" or env.key="t"))%nn;
-          %env.key;=%env.val;;%nn;
-        %end;%end;"
+    <a href="%url_set.p_n_oc_i_m_t;&%xxx.access;&m=D&t=V"
       class="big_anchor list-group-item-action" title="[*navigation]">
     </a>
   %end;
@@ -16,9 +13,7 @@
     %end; <span class="text-nowrap">%xxx.surname;</span>
   %else;
     <a class="normal_anchor"
-      href="%prefix_set.pmod;%xxx.access;;%foreach;env_binding;%nn;
-      %if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="m" or env.key="t"))%nn;
-        %env.key;=%env.val;;%end;%end;"
+      href="%url_set.p_n_oc_i_m_t;&%xxx.access;"
       title=" %xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;">
       %if;(xxx.public_name!="")%xxx.public_name;
       %else;%xxx.first_name;
