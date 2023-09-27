@@ -162,16 +162,24 @@ let order =
     "ma";
   ]
 
-let reorder env =
-  let (env1, ok) =
-    List.fold_left (fun (acc1, acc2) k ->
-      if List.mem_assoc k env then ((Format.sprintf "%s=%s" k (List.assoc k env)) :: acc1, k :: acc2)
-      else (acc1, acc2)) ([], []) order
+let reorder conf env =
+  let env1, ok =
+    List.fold_left
+      (fun (acc1, acc2) k ->
+        if
+          List.mem_assoc k env && k <> "lang"
+          && List.assoc k env <> conf.default_lang
+        then (Format.sprintf "%s=%s" k (List.assoc k env) :: acc1, k :: acc2)
+        else (acc1, acc2))
+      ([], []) order
   in
   let env2 =
-    List.fold_left (fun acc (k, v) ->
-      if not (List.mem k ok) then (Format.sprintf "%s=%s" k v) :: acc
-      else acc) [] env
+    List.fold_left
+      (fun acc (k, v) ->
+        if (not (List.mem k ok)) && k <> "lang" && v <> conf.default_lang then
+          Format.sprintf "%s=%s" k v :: acc
+        else acc)
+      [] env
   in
   String.concat "&" (env1 @ env2)
 
@@ -193,33 +201,46 @@ let url_set_aux conf evar_l str =
           (fun acc ev ->
             let ev1 = String.split_on_char '=' ev in
             if List.nth ev1 0 <> "" then
-              (List.nth ev1 0, if List.length ev1 > 1 then List.nth ev1 1 else "") :: acc
+              ( List.nth ev1 0,
+                if List.length ev1 > 1 then List.nth ev1 1 else "" )
+              :: acc
             else acc)
           [] evarl
       in
       let old_env = conf.henv @ conf.senv @ conf.env in
-      let old_env = List.sort_uniq compare old_env in
-      (* acc2 marks evar of new_env taken into account *)
+      let old_env =
+        List.sort_uniq (fun (k1, _) (k2, _) -> compare k1 k2) old_env
+      in
+      (* done_env marks evar of new_env taken into account *)
       let new_env', done_env =
         List.fold_left
           (fun (acc1, acc2) (k, v) ->
             let v = Adef.as_string @@ v in
-            let (k, v) = if (k = "oc" || k = "ocz") && v = "0" then (k, "") else (k, v) in
+            let k, v =
+              if (k = "oc" || k = "ocz") && v = "0" then (k, "") else (k, v)
+            in
+            let k, v =
+              if k = "lang" && v = conf.default_lang then (k, "") else (k, v)
+            in
             match List.assoc_opt k new_env with
             | Some v' ->
                 if v' <> "" then ((k, v') :: acc1, k :: acc2)
                 else (acc1, k :: acc2)
-            | None -> if v <> "" then ((k, v) :: acc1, acc2)
-                else (acc1, k :: acc2))
+            | None -> if v <> "" then ((k, v) :: acc1, acc2) else (acc1, acc2))
           ([], []) old_env
       in
+      (* add to new_env' evars of new_env which have not been taken into account *)
       let new_env' =
         new_env'
-        @ (List.fold_left (fun acc (k, v) ->
-               if List.mem k done_env then acc
-               else if v <> "" then (k, v) :: acc else acc) [] new_env)
+        @ List.fold_left
+            (fun acc (k, v) ->
+              let k, v =
+                if k = "lang" && v = conf.default_lang then (k, "") else (k, v)
+              in
+              if List.mem k done_env || v = "" then acc else (k, v) :: acc)
+            [] new_env
       in
-      Format.sprintf "%s?%s" href (reorder new_env')
+      Format.sprintf "%s?%s" href (reorder conf new_env')
   | evar :: _l ->
       (* rebuild the current url from conf.env, replacing &evar=xxx by &evar=str *)
       (* if evar is not present in conf.env, it will be added at the end *)
@@ -436,6 +457,7 @@ and eval_simple_variable conf = function
        s
         :> string)
   | "lang" -> conf.lang
+  | "default_lang" -> conf.default_lang
   | "left" -> conf.left
   | "nl" -> "\n"
   | "nn" -> ""
