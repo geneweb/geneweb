@@ -998,6 +998,14 @@ let rec eval_var conf base env _xx _loc = function
   (* person_index.1 -> i1=, p1=, n1=, oc1= *)
   (* person_index.2 -> i2=, p2=, n2=, oc2= *)
   (* person_index.e -> ei=, ep=, en=, eoc= *)
+  | [ "person_index"; x; sl ] -> (
+      let find_person =
+        match x with "e" -> find_person_in_env_pref | _ -> find_person_in_env
+      in
+      let s = if x = "x" then "" else x in
+      match find_person conf base s with
+      | Some p -> eval_person_var conf base p sl
+      | None -> raise Not_found)
   | [ "person_index"; x ] -> (
       let find_person =
         match x with "e" -> find_person_in_env_pref | _ -> find_person_in_env
@@ -1016,6 +1024,11 @@ let rec eval_var conf base env _xx _loc = function
   (* TODO set real values *)
   | [ "static_max_anc_level" ] -> VVstring "10"
   | [ "static_max_desc_level" ] -> VVstring "10"
+  | _ -> raise Not_found
+
+and eval_person_var _conf base p = function
+  | "surname" -> VVstring (sou base (get_surname p))
+  | "first_name" -> VVstring (sou base (get_first_name p))
   | _ -> raise Not_found
 
 and eval_dag_var _conf (tmincol, tcol, _colminsz, colsz, _ncol) = function
