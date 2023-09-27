@@ -143,21 +143,85 @@ let url_aux ?(pwd = true) conf =
   if conf.cgi then prefix ^ "?" ^ conf.bname ^ String.concat "&" l
   else prefix ^ String.concat "&" l
 
+let order =
+  [
+    "lang";
+    "templ";
+    "pz";
+    "nz";
+    "ocz";
+    "m";
+    "em";
+    "t";
+    "et";
+    "p";
+    "n";
+    "oc";
+    "im";
+    "sp";
+    "ma";
+  ]
+
+let reorder env =
+  let (env1, ok) =
+    List.fold_left (fun (acc1, acc2) k ->
+      if List.mem_assoc k env then ((Format.sprintf "%s=%s" k (List.assoc k env)) :: acc1, k :: acc2)
+      else (acc1, acc2)) ([], []) order
+  in
+  let env2 =
+    List.fold_left (fun acc (k, v) ->
+      if not (List.mem k ok) then (Format.sprintf "%s=%s" k v) :: acc
+      else acc) [] env
+  in
+  String.concat "&" (env1 @ env2)
+
 (* when str = "" url_set_aux can reset several evar from evar_l in one call *)
 let url_set_aux conf evar_l str =
+  let href =
+    match String.split_on_char '?' (Util.commd conf :> string) with
+    | [] ->
+        !GWPARAM.syslog `LOG_WARNING "Empty Url\n";
+        ""
+    | s :: _l -> s
+  in
   match evar_l with
   | [] ->
-      !GWPARAM.syslog `LOG_WARNING "Empty evar list\n";
-      ""
+      (* nouveau url_set; Le paramètre str contient un squelette de la nouvelle url *)
+      let evarl = String.split_on_char '&' str in
+      let new_env =
+        List.fold_left
+          (fun acc ev ->
+            let ev1 = String.split_on_char '=' ev in
+            if List.nth ev1 0 <> "" then
+              (List.nth ev1 0, if List.length ev1 > 1 then List.nth ev1 1 else "") :: acc
+            else acc)
+          [] evarl
+      in
+      let old_env = conf.henv @ conf.senv @ conf.env in
+      let old_env = List.sort_uniq compare old_env in
+      (* acc2 marks evar of new_env taken into account *)
+      let new_env', done_env =
+        List.fold_left
+          (fun (acc1, acc2) (k, v) ->
+            let v = Adef.as_string @@ v in
+            let (k, v) = if (k = "oc" || k = "ocz") && v = "0" then (k, "") else (k, v) in
+            match List.assoc_opt k new_env with
+            | Some v' ->
+                if v' <> "" then ((k, v') :: acc1, k :: acc2)
+                else (acc1, k :: acc2)
+            | None -> if v <> "" then ((k, v) :: acc1, acc2)
+                else (acc1, k :: acc2))
+          ([], []) old_env
+      in
+      let new_env' =
+        new_env'
+        @ (List.fold_left (fun acc (k, v) ->
+               if List.mem k done_env then acc
+               else if v <> "" then (k, v) :: acc else acc) [] new_env)
+      in
+      Format.sprintf "%s?%s" href (reorder new_env')
   | evar :: _l ->
       (* rebuild the current url from conf.env, replacing &evar=xxx by &evar=str *)
-      let href =
-        match String.split_on_char '?' (Util.commd conf :> string) with
-        | [] ->
-            !GWPARAM.syslog `LOG_WARNING "Empty Url\n";
-            ""
-        | s :: _l -> s
-      in
       (* if evar is not present in conf.env, it will be added at the end *)
       let _fadd_evar =
         match
@@ -293,6 +357,7 @@ let rec eval_variable conf = function
   | "time" :: sl -> eval_time_var conf sl
   (* clear some variables in url *)
   (* set the first variable to a new value if <> "" *)
+  | [ "url_set_new"; url ] -> url_set_aux conf [] url
   | [ "url_set"; evar; str ] -> url_set_aux conf [ evar ] str
   | [ "url_set"; evarl ] ->
       let evarl = String.split_on_char '_' evarl in
