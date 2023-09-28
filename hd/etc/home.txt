@@ -5,24 +5,27 @@
 %if;(not cancel_links)
   <div class="d-flex flex-column fixed_top_btn%if;((e.m="A" or e.m="D") and (e.t="T" or e.t="TV" or e.t=""))_tree%end;
     %if;(evar.wide="on") fixed_top_btn_wide%end;">
-    <a role="button" class="btn btn-sm btn-link p-0  border-0" href="%prefix;" title="[*home]">%nn;
+    <a role="button" class="btn btn-sm btn-link p-0 border-0" href="%prefix;" title="[*home]">%nn;
       <i class="fa fa-home fa-fw fa-sm" aria-hidden="true"></i>%nn;
       <i class="sr-only">[*home]</i>%nn;
     </a>
     %if;(referer!="")
-      <a role="button" class="btn btn-sm btn-link p-0  border-0" href="%referer;" title="[*back]">%nn;
+      <a role="button" class="btn btn-sm btn-link p-0 border-0" href="%referer;" title="[*back]">%nn;
         <i class="fa fa-arrow-left fa-fw fa-sm" aria-hidden="true"></i>%nn;
         <span class="sr-only">[*back]</span>%nn;
       </a>
     %end;
-    <a role="button" class="btn btn-sm btn-link text-primary p-0  border-0" data-toggle="modal" data-target="#searchmodal"
+    <a role="button" class="btn btn-sm btn-link text-primary p-0 border-0" data-toggle="modal" data-target="#searchmodal"
       accesskey="S" title="[*search/case sensitive]0">%nn;
       <i class="fa fa-search fa-fw fa-sm" aria-hidden="true"></i>%nn;
       <span class="sr-only">[*search/case sensitive]0</span>%nn;
     </a>
-    %if;(debug and b.show_query_time!="on")
-      <div class="p-0 border-0" title="" id="q_time_d">
-        <i class="fa fa-hourglass-half fa-fw fa-xs p-0"></i>
+    %if;(b.show_query_time!="on")
+      <div class="p-0 border-0" title="" id="q_time_d">%nn;
+        <i class="fa fa-hourglass-half fa-fw fa-xs p-0"></i>%nn;
+      </div>
+      <div class="p-0 border-0 d-none" title="" id="nb_errors_d">%nn;
+        <i class="fa fa-bug fa-fw fa-xs p-0"></i>%nn;
       </div>
     %end;
   </div>
