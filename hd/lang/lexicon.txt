@@ -2862,9 +2862,9 @@ tr: atalar
 en: %s-tree of the ancestors of %s
 fr: %s-arbre des ancêtres d[e |’]%s
 
-    shortest path between
-en: shortest path between
-fr: chemin le plus court entre
+    path between
+en: path between
+fr: chemin entre
 
     and
 af: en
