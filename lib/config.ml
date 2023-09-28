@@ -106,6 +106,7 @@ type config = {
   forced_plugins : string list;
   plugins : string list;
   notify_change : string option;
+  preferred_countries : string list option;
 }
 
 (**/**)
@@ -172,6 +173,7 @@ let empty =
     forced_plugins = [];
     plugins = [];
     notify_change = None;
+    preferred_countries = None;
   }
 
 (**/**)
