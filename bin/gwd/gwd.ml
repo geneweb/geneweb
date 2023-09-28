@@ -1246,6 +1246,11 @@ let make_conf from_addr request script_name env =
      forced_plugins = !forced_plugins;
      plugins = !plugins;
      notify_change = !notify_change;
+     preferred_countries =
+       let opt = Option.map (String.split_on_char ',')
+           (List.assoc_opt "autocomplete_countries" base_env)
+       in
+       match opt with | Some [] -> None | _ -> opt
     }
   in
   conf, ar
