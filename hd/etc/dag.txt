@@ -34,13 +34,18 @@
   %elseif;(e.m="A")[*ascendants tree]
   %elseif;(e.m="RLM")[*multi relations graph]
   %elseif;(e.m="DAG")[*surnames branch][:] %e.sn;
-  %elseif;(e.em="R")[*shortest path between]
+  %elseif;(e.em="R")[*path between]
       %person_index.e.first_name; %person_index.e.surname;
       %sp;[and]
       %person_index.x.first_name; %person_index.x.surname;
+  %( TODO reorganise evar so that main person is always i= %)
+  %elseif;(e.m="RL")[*path between]
+      %person_index.1.first_name; %person_index.1.surname;
+      %sp;[and]
+      %person_index.2.first_name; %person_index.2.surname;
   %else;[*shortest path]
   %end;
-  %if;(e.m!="RLM" and e.m!="DAG" and e.em!="R")
+  %if;(e.m="A" or e.m="D")
     %apply;of%with;%apply;capitalize(e.p)%end; %apply;capitalize(e.n)
     %( !! %a_of_b or %self unavailable on dag !! %)
     %( but the new management of [d'|e ] is ok! %)

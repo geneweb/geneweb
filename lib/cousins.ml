@@ -242,18 +242,21 @@ let init_cousins_cnt conf base p =
   | Some t, Some d_t -> (t, d_t)
   | _, _ ->
       let t', d_t' =
-        Printf.sprintf "******** Compute %d × %d table ********\n" max_a_l
-          max_d_l
+        Printf.sprintf "******** Compute %d × %d table ********\n" (max_a_l + 3)
+          (max_d_l + max_a_l + 3)
         |> !GWPARAM.syslog `LOG_WARNING;
         if
-          max_a_l + 1 > Sys.max_array_length
-          || max_d_l + 1 > Sys.max_array_length
+          max_a_l + 3 > Sys.max_array_length
+          || max_d_l + max_a_l + 3 > Sys.max_array_length
         then failwith "Cousins table too large for system";
         let () = load_ascends_array base in
         let () = load_couples_array base in
-        let cousins_cnt = Array.make_matrix (max_a_l + 2) (max_d_l + 2) [] in
+        (* +3: there may be more descendants for cousins than my own *)
+        let cousins_cnt =
+          Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
+        in
         let cousins_dates =
-          Array.make_matrix (max_a_l + 3) (max_d_l + 3) (0, 0)
+          Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0)
         in
         cousins_cnt.(0).(0) <-
           [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
