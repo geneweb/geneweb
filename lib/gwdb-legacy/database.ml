@@ -503,6 +503,7 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
   let t = ref None in
   fun s ->
     let i = Dutil.name_index s in
+    (* look in index files *)
     let r =
       let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
       let ai =
@@ -532,6 +533,7 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
       close_in ic_inx;
       ai
     in
+    (* and look in the patch too *)
     Hashtbl.fold
       (fun _ p acc ->
         let istr = get p in
