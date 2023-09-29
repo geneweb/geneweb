@@ -546,6 +546,7 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
         else acc)
       person_patches (Array.to_list r)
 
+(* TODO get aliases here too? *)
 let new_strings_of_sname =
   new_strings_of_fsname_aux 1 0 Name.split_sname (fun p -> p.Dbdisk.surname)
 
