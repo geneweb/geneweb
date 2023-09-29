@@ -147,6 +147,7 @@ let order =
   [
     "lang";
     "templ";
+    "iz";
     "pz";
     "nz";
     "ocz";
@@ -154,6 +155,7 @@ let order =
     "em";
     "t";
     "et";
+    "i";
     "p";
     "n";
     "oc";
@@ -167,8 +169,9 @@ let reorder conf env =
     List.fold_left
       (fun (acc1, acc2) k ->
         if
-          List.mem_assoc k env && k <> "lang"
-          && List.assoc k env <> conf.default_lang
+          List.mem_assoc k env
+          && (k <> "lang"
+             || (k = "lang" && List.assoc k env <> conf.default_lang))
         then (Format.sprintf "%s=%s" k (List.assoc k env) :: acc1, k :: acc2)
         else (acc1, acc2))
       ([], []) order
@@ -181,10 +184,10 @@ let reorder conf env =
         else acc)
       [] env
   in
-  String.concat "&" (env1 @ env2)
+  String.concat "&" (List.rev env1 @ List.rev env2)
 
 (* when str = "" url_set_aux can reset several evar from evar_l in one call *)
-let url_set_aux conf evar_l str =
+let url_set_aux conf evar_l str (iz, pz, nz, ocz) =
   let href =
     match String.split_on_char '?' (Util.commd conf :> string) with
     | [] ->
@@ -274,31 +277,33 @@ let url_set_aux conf evar_l str =
                 if v = conf.default_lang || v = "" then None
                 else (
                   kl := k :: !kl;
-                  Some (Format.sprintf "%s=%s" k v))
+                  Some (k, v))
             | "lang", v ->
                 (* lang in evar list, set it to str unless default_lang *)
                 let v = if str <> "" then str else v in
                 if v = conf.default_lang || v = "" then None
                 else (
                   kl := k :: !kl;
-                  Some (Format.sprintf "%s=%s" k v))
+                  Some (k, v))
             | k, _ when k = evar && str = "" ->
                 (* evar is set to "" -> ignore *)
                 None
             | k, _ when k = evar && str <> "" ->
                 (* set evar to str if not empty *)
                 kl := k :: !kl;
-                Some (Format.sprintf "%s=%s" k str)
+                Some (k, str)
             | _, "" -> None (* empty *)
             | _, _ ->
                 (* others *)
                 kl := k :: !kl;
-                Some (Format.sprintf "%s=%s" k v))
+                Some (k, v))
           conf_l
       in
-      let url = String.concat "&" l in
-      Format.sprintf "%s?%s%s" href url
-        (if str = "" then "" else Printf.sprintf "&%s=%s" evar str)
+      let l = if iz = "" then l else ("iz", iz) :: l in
+      let l = if pz = "" && nz = "" then l else ("pz", pz) :: ("nz", nz) :: l in
+      let l = if ocz = "" || ocz = "0" then l else ("ocz", ocz) :: l in
+      let l = if str = "" then l else (evar, str) :: l in
+      Format.sprintf "%s?%s" href (reorder conf l)
 
 let substr_start_aux n s =
   let len = String.length s in
@@ -347,18 +352,14 @@ let rec eval_variable conf = function
         | None -> if n > 0 then loop (n - 1) else ""
       in
       loop n
-  | [ "prefix_new_iz"; iz ] ->
-      (Util.commd ~excl:[ "iz"; "nz"; "pz"; "ocz" ] conf :> string)
-      ^ "iz=" ^ iz ^ "&"
-  | [ "prefix_new_pz"; pz; nz; ocz ] ->
-      (Util.commd ~excl:[ "iz"; "nz"; "pz"; "ocz" ] conf :> string)
-      ^ "pz=" ^ pz ^ "&nz=" ^ nz
-      ^ (if ocz <> "0" then "&ocz=" ^ ocz else "")
-      ^ "&"
   | [ "prefix_set"; pl ] ->
       let pl_l =
         match pl with
         | "iz" -> [ "iz"; "nz"; "pz"; "ocz" ]
+        | "p" -> [ "i"; "p"; "n"; "oc" ]
+        | "p1" -> [ "i1"; "p1"; "n1"; "oc1" ]
+        | "p2" -> [ "i2"; "p2"; "n2"; "oc2" ]
+        | "pn" -> [ "i1"; "i2"; "p1"; "p2"; "n1"; "n2"; "oc1"; "oc2" ]
         | "all" -> [ "templ"; "p_mod"; "wide" ]
         | _ -> [ pl ]
       in
@@ -386,23 +387,23 @@ let rec eval_variable conf = function
   | "time" :: sl -> eval_time_var conf sl
   (* clear some variables in url *)
   (* set the first variable to a new value if <> "" *)
-  | [ "url_set_new"; url ] -> url_set_aux conf [] url
-  | [ "url_set"; evar; str ] -> url_set_aux conf [ evar ] str
+  | [ "url_set_new"; url ] -> url_set_aux conf [] url ("", "", "", "")
+  | [ "url_set"; evar; str ] -> url_set_aux conf [ evar ] str ("", "", "", "")
   | [ "url_set"; evarl ] ->
       let evarl = String.split_on_char '_' evarl in
-      url_set_aux conf evarl ""
-  | [ "url_set2"; evar1; evar2; str ] -> url_set_aux conf [ evar1; evar2 ] str
-  | [ "url_set2"; evar1; evar2 ] -> url_set_aux conf [ evar1; evar2 ] ""
+      url_set_aux conf evarl "" ("", "", "", "")
+  | [ "url_set2"; evar1; evar2; str ] ->
+      url_set_aux conf [ evar1; evar2 ] str ("", "", "", "")
+  | [ "url_set2"; evar1; evar2 ] ->
+      url_set_aux conf [ evar1; evar2 ] "" ("", "", "", "")
   | [ "url_set3"; evar1; evar2; evar3; str ] ->
-      url_set_aux conf [ evar1; evar2; evar3 ] str
+      url_set_aux conf [ evar1; evar2; evar3 ] str ("", "", "", "")
   | [ "url_set3"; evar1; evar2; evar3 ] ->
-      url_set_aux conf [ evar1; evar2; evar3 ] ""
-  | [ "url_set_p" ] -> url_set_aux conf [ "i"; "p"; "n"; "oc" ] ""
-  | [ "url_set_p1" ] -> url_set_aux conf [ "i1"; "p1"; "n1"; "oc1" ] ""
-  | [ "url_set_p2" ] -> url_set_aux conf [ "i2"; "p2"; "n2"; "oc2" ] ""
-  | [ "url_set_pn" ] ->
-      url_set_aux conf [ "i1"; "i2"; "p1"; "p2"; "n1"; "n2"; "oc1"; "oc2" ] ""
-  | [ "url_set_pz" ] -> url_set_aux conf [ "iz"; "pz"; "nz"; "ocz" ] ""
+      url_set_aux conf [ evar1; evar2; evar3 ] "" ("", "", "", "")
+  | [ "url_set_pz"; iz ] ->
+      url_set_aux conf [ "iz"; "pz"; "nz"; "ocz" ] "" (iz, "", "", "")
+  | [ "url_set_pz"; pz; nz; ocz ] ->
+      url_set_aux conf [ "iz"; "pz"; "nz"; "ocz" ] "" ("", pz, nz, ocz)
   | [ "user"; "ident" ] -> conf.user
   | [ "user"; "name" ] -> conf.username
   | [ "user"; "key" ] -> conf.userkey

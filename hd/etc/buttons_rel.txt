@@ -85,7 +85,7 @@
       <a class="ml-2" href="%url_set2.i.ei;&i=%e.ei;&ei=%e.i;"
         title="[*invert] [person/persons]1"><i class="fa fa-people-arrows fa-fw"></i></a>
     %elseif;(evar.i1!="" and person_index.1!="" and evar.i2!="" and person_index.2!="")
-      <a class="ml-2" href="%url_set_pn;&i1=%person_index.2;&i2=%person_index.1;"
+      <a class="ml-2" href="%url_set.pn;&i1=%person_index.2;&i2=%person_index.1;"
         title="[*invert] [person/persons]1"><i class="fas fa-people-arrows fa-lg fa-fw"></i></a>
     %end;
     <a class="ml-2" href="%if;(e.dag!="on")%url_set.dag.on;%else;%url_set.dag;%end;" target="_blank"><i class="fa fa-random fa-fw" title="[*dag]"></i></a>
