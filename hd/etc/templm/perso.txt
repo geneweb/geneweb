@@ -506,29 +506,27 @@
 %end;
 %define;parents(z1,z2,z3)
   %foreach;ancestor_level(z1)
-    %if;(level = z1)
-      %foreach;ancestor;
-        %if;(ancestor.anc_sosa = z3 or ancestor.anc_sosa = z3 + 1)
-          %let;l_sosa;%ancestor.anc_sosa;%in
-          <span %if;(ancestor.has_sosa)class="color_sosa"%end;>
-            z2
-            %if;(ancestor.has_siblings)♦
-            %elseif;(ancestor.has_parents)◊
-            %elseif;(wizard and not cancel_links)
-              <a id="add_par_%l_sosa;" href="%prefix;m=ADD_PAR;ip=%ancestor.index;"
-                 title="[*add::parents] (L)" %l_on1;><span class="add">–</span></a>
-            %else;–
-            %end;
-          </span>
-          %apply;link_name1%with;
-            ancestor%and;
-            ancestor%and;
-            id="par_%l_sosa;"%sp;
-            onkeypress="javascript:return acc_key(this,event,'sib_1','spo_1','chi_1_1','ancestor_%ancestor.index;','add_par_%l_sosa;','par_%l_sosa;','par_%l_sosa;');"
+    %foreach;ancestor;
+      %if;(ancestor.anc_sosa = z3 or ancestor.anc_sosa = z3 + 1)
+        %let;l_sosa;%ancestor.anc_sosa;%in
+        <span %if;(ancestor.has_sosa)class="color_sosa"%end;>
+          z2
+          %if;(ancestor.has_siblings)♦
+          %elseif;(ancestor.has_parents)◊
+          %elseif;(wizard and not cancel_links)
+            <a id="add_par_%l_sosa;" href="%prefix;m=ADD_PAR;ip=%ancestor.index;"
+               title="[*add::parents] (L)" %l_on1;><span class="add">–</span></a>
+          %else;–
           %end;
-          %apply;link_dates("ancestor")
-          <br>
+        </span>
+        %apply;link_name1%with;
+          ancestor%and;
+          ancestor%and;
+          id="par_%l_sosa;"%sp;
+          onkeypress="javascript:return acc_key(this,event,'sib_1','spo_1','chi_1_1','ancestor_%ancestor.index;','add_par_%l_sosa;','par_%l_sosa;','par_%l_sosa;');"
         %end;
+        %apply;link_dates("ancestor")
+        <br>
       %end;
     %end;
   %end;
@@ -1085,7 +1083,7 @@
     %if;(sosa=1)[*Sosa] 1
     %elseif;(has_sosa and sosa != 1)
       %let;l_sosa_ref;%apply;a_of_b%with;%and;%apply;link_name("sosa_ref")%end;%in;
-      <a href="%prefix;m=A;t=D;image=%evar.image;;i=%sosa_ref.index;;i1=%index;;l=%max_desc_level;" title="%apply;a_of_b%with;[*ancestor/ancestors]1%and;%sosa_ref;%end; [up to] %self;">[*Sosa] %sosa;</a>
+      <a href="%prefix;m=A&t=X&i=%sosa_ref.index;&i1=%index;&l=%max_desc_level;&image=%evar.image;" title="%apply;a_of_b%with;[*ancestor/ancestors]1%and;%sosa_ref;%end; [up to] %self;">[*Sosa] %sosa;</a>
       %l_sosa_ref;
     %end;
     %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)

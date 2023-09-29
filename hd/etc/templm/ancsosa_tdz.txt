@@ -100,7 +100,7 @@
 %define;nb_fam(xx)
   %if;(xx.same = "")
     %if;(not cancel_links)
-      <a href="%prefix;m=A;t=D;i=%index;;i1=%ancestor.index;;l=%level;;image=%evar.image;" title="^^">
+      <a href="%prefix;m=A&t=X&i=%index;&i1=%ancestor.index;&l=%level;&image=%evar.image;" title="^^">
     %end;
       %apply;symbol1("xx")
       %if;(xx.nb_families > 1)
@@ -194,9 +194,9 @@
     %apply;lazy_print%with;
       <tr><th colspan="7" >%nl;[*generation/generations]0 %level;%nl;</th></tr>
     %end;
-    %if;(level <= evar.l + 1)
+    %if;(level <= evar.l)
       %foreach;ancestor;
-        %if;(level != 1 and ancestor.same = "" and (ancestor.is_descendant or ancestor.spouse.is_descendant))
+        %if;(level != 0 and ancestor.same = "" and (ancestor.is_descendant or ancestor.spouse.is_descendant))
           %lazy_force;
           %let;l1;%if;(ancestor.is_descendant)class="is_desc_1%ancestor.sex;"%end;%in;
           %apply;one_line(l1)
