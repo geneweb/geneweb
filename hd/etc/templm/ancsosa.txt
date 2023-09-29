@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: templm/ancsosa.txt v7.0 2016/02/04 21:20:57 $ -->
-
+  %let;l_up;%if;(evar.i1 != "" or evar.p1 != "")1%end;%in;
   <title>%nn;
     %if;(l_up = 1)
       [*ancestor/ancestors]1 … [up to] …%nn;

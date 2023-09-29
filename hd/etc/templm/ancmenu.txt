@@ -85,14 +85,14 @@
     %let;l_mal1;%if;(l_mal0 != 99)([maximum] %l_mal0; [generation/generations]1)%end;%in;
     <legend><input type="submit" value="Ok"%/></legend>
     <label>[*specify::generation/generations]0 %l_mal1; :<br>
-      <select style="text-align:center" name="v" size="%expr(max_anc_level-1)">
+      <select style="text-align:center" name="v" size="%expr(max_anc_level)">
         %foreach;ancestor_level;
-          %if;(level != 1)
+          %if;(level != 0)
             <option value="%level;" %if;(level > l_mal0)disabled style="color:#AAAAAA;background-color:#DDDDDD;"%end;
-              %if;(level = 4) selected="selected"%end;>
-              %if;(level = 2)[*to the parents]
-              %elseif;(level = 3)[*to the grandparents]
-              %elseif;(level = 4)[*to the great-grandparents]
+              %if;(level = 3) selected="selected"%end;>
+              %if;(level = 1)[*to the parents]
+              %elseif;(level = 2)[*to the grandparents]
+              %elseif;(level = 3)[*to the great-grandparents]
               %else;%level;%sp;
               %end;
               (%number_of_ancestors;)
@@ -115,7 +115,7 @@
            %/>[only the generation selected]</label><br>
     <label><input type="checkbox" name="cgl" value="on" %l_on;
            %/>[cancel GeneWeb links]</label><br>
-    <label><input type="radio" id="tZ" name="t" value="Z" %l_on;
+    <label><input type="radio" id="tY" name="t" value="Y" %l_on;
            %/>[table]</label><br>
     <label><input type="radio" name="t" value="H" %l_on;
            %/>[horizontally]</label><br>
