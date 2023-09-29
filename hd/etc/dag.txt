@@ -49,7 +49,9 @@
     %apply;of%with;%apply;capitalize(e.p)%end; %apply;capitalize(e.n)
     %( !! %a_of_b or %self unavailable on dag !! %)
     %( but the new management of [d'|e ] is ok! %)
-    <small class="text-muted ml-1 user-select-none">(%e.v; [generation/generations]1%if;(e.oi!=""), [partial]%elseif;(e.dag="on"), [dag]%end;)
+    <small class="text-muted ml-1 user-select-none">(%e.v; 
+    %if;(e.v=1)[generation/generations]0%else;[generation/generations]1%end;
+    %if;(e.oi!=""), [partial]%elseif;(e.dag="on"), [dag]%end;)
     %(%apply;togend(e.v) also unavailable %)</small>
   %end;
 </h3>
