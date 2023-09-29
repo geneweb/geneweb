@@ -347,6 +347,14 @@ let rec eval_variable conf = function
         | None -> if n > 0 then loop (n - 1) else ""
       in
       loop n
+  | [ "prefix_new_iz"; iz ] ->
+      (Util.commd ~excl:[ "iz"; "nz"; "pz"; "ocz" ] conf :> string)
+      ^ "iz=" ^ iz ^ "&"
+  | [ "prefix_new_pz"; pz; nz; ocz ] ->
+      (Util.commd ~excl:[ "iz"; "nz"; "pz"; "ocz" ] conf :> string)
+      ^ "pz=" ^ pz ^ "&nz=" ^ nz
+      ^ (if ocz <> "0" then "&ocz=" ^ ocz else "")
+      ^ "&"
   | [ "prefix_set"; pl ] ->
       let pl_l =
         match pl with
