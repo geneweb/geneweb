@@ -2090,6 +2090,18 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Vfam (i, f, c, m) ->
           eval_family_field_var conf base env (i, f, c, m) loc sl
       | _ -> raise Not_found)
+  | [ "prefix_new_ix"; ip ] ->
+      let p =
+        poi base (try iper_of_string ip with Failure _ -> raise Not_found)
+      in
+      str_val
+        ((Util.commd ~excl:[ "iz"; "nz"; "pz"; "ocz" ] conf :> string)
+        ^ "pz="
+        ^ sou base (get_first_name p)
+        ^ "&nz="
+        ^ sou base (get_surname p)
+        ^ (if get_occ p <> 0 then "&ocz=" ^ string_of_int (get_occ p) else "")
+        ^ "&")
   | "pvar" :: v :: sl -> (
       match find_person_in_env conf base v with
       | Some p ->
