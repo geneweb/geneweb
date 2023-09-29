@@ -203,8 +203,11 @@ let old_persons_of_first_name_or_surname base_data params =
     let ipera = ref ipera in
     Hashtbl.iter
       (fun i p ->
-        let istr1 = proj p in
-        if istr1 = istr && not (List.mem i !ipera) then ipera := i :: !ipera)
+        let istr1_list = proj p in
+        List.iter
+          (fun istr1 ->
+            if istr1 = istr && not (List.mem i !ipera) then ipera := i :: !ipera)
+          istr1_list)
       person_patches;
     !ipera
   in
@@ -217,9 +220,12 @@ let old_persons_of_first_name_or_surname base_data params =
           let bt = ref (bt ()) in
           Hashtbl.iter
             (fun _i p ->
-              let istr1 = proj p in
-              if not @@ IstrTree.mem istr1 !bt then
-                bt := IstrTree.add istr1 0 !bt)
+              let istr1_list = proj p in
+              List.iter
+                (fun istr1 ->
+                  if not @@ IstrTree.mem istr1 !bt then
+                    bt := IstrTree.add istr1 0 !bt)
+                istr1_list)
             person_patches;
           btr := Some !bt;
           !bt
@@ -294,8 +300,11 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
       (let ht = Dutil.IntHT.create 0 in
        Hashtbl.iter
          (fun _ p ->
-           let k = proj p in
-           if not @@ Dutil.IntHT.mem ht k then Dutil.IntHT.add ht k [])
+           let ks = proj p in
+           List.iter
+             (fun k ->
+               if not @@ Dutil.IntHT.mem ht k then Dutil.IntHT.add ht k [])
+             ks)
          person_patches;
        let a = Array.make (Dutil.IntHT.length ht) (0, []) in
        ignore
@@ -331,11 +340,19 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
       with Not_found -> []
     in
     let patched = Hashtbl.fold (fun i _ acc -> i :: acc) person_patches [] in
-    let ipera = List.filter (fun i -> not @@ List.mem i patched (*TODO not @@ Hashtbl.mem person_patches i *)) ipera in
+    let ipera =
+      List.filter
+        (fun i ->
+          not
+          @@ List.mem i patched (*TODO not @@ Hashtbl.mem person_patches i *))
+        ipera
+    in
     Hashtbl.fold
       (fun i p acc ->
-        let istr1 = proj p in
-        if istr1 = istr then if List.mem i acc then acc else i :: acc else acc)
+        let istr1_list = proj p in
+        if List.mem istr istr1_list then
+          if List.mem i acc then acc else i :: acc
+        else acc)
       person_patches ipera
   in
   let cursor str =
@@ -387,7 +404,11 @@ let new_persons_of_first_name_or_surname cmp_str cmp_istr base_data params =
 let persons_of_first_name :
     base_version ->
     base_data ->
-    ('a -> Dutil.IntHT.key) * (int, person) Hashtbl.t * string * string * string ->
+    ('a -> Dutil.IntHT.key list)
+    * (int, person) Hashtbl.t
+    * string
+    * string
+    * string ->
     Dbdisk.string_person_index = function
   | GnWb0024 ->
       new_persons_of_first_name_or_surname
@@ -401,7 +422,11 @@ let persons_of_first_name :
 let persons_of_surname :
     base_version ->
     base_data ->
-    ('a -> Dutil.IntHT.key) * (int, person) Hashtbl.t * string * string * string ->
+    ('a -> Dutil.IntHT.key list)
+    * (int, person) Hashtbl.t
+    * string
+    * string
+    * string ->
     Dbdisk.string_person_index = function
   | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 ->
       new_persons_of_first_name_or_surname Dutil.compare_snames
@@ -491,8 +516,18 @@ let old_strings_of_fsname bname strings (_, person_patches) =
           then istr :: acc
           else acc
         in
-        let acc = aux Name.split_fname acc p.Dbdisk.first_name in
-        let acc = aux Name.split_sname acc p.Dbdisk.surname in
+        let acc =
+          List.fold_left
+            (fun acc istr -> aux Name.split_fname acc istr)
+            acc
+            (p.Dbdisk.first_name :: p.Dbdisk.first_names_aliases)
+        in
+        let acc =
+          List.fold_left
+            (fun acc istr -> aux Name.split_sname acc istr)
+            acc
+            (p.Dbdisk.surname :: p.Dbdisk.surnames_aliases)
+        in
         acc)
       person_patches (Array.to_list r)
 (**)
@@ -536,24 +571,33 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
     (* and look in the patch too *)
     Hashtbl.fold
       (fun _key p acc ->
-        let istr = get p in
-        if
-          (not (List.mem istr acc))
-          &&
-          let str = strings.get istr in
-          match split str with
-          | [ s ] -> i = Dutil.name_index s
-          | list -> List.exists (fun s -> i = Dutil.name_index s) (str :: list)
-        then istr :: acc
-        else acc)
+        let istr_list = get p in
+        let acc =
+          List.fold_left
+            (fun acc istr ->
+              if
+                (not (List.mem istr acc))
+                &&
+                let str = strings.get istr in
+                match split str with
+                | [ s ] -> i = Dutil.name_index s
+                | list ->
+                    List.exists (fun s -> i = Dutil.name_index s) (str :: list)
+              then istr :: acc
+              else acc)
+            acc istr_list
+        in
+        acc)
       person_patches (Array.to_list r)
 
 (* TODO get aliases here too? *)
 let new_strings_of_sname =
-  new_strings_of_fsname_aux 1 0 Name.split_sname (fun p -> p.Dbdisk.surname)
+  new_strings_of_fsname_aux 1 0 Name.split_sname (fun p ->
+      p.Dbdisk.surname :: p.Dbdisk.surnames_aliases)
 
 let new_strings_of_fname =
-  new_strings_of_fsname_aux 2 1 Name.split_fname (fun p -> p.Dbdisk.first_name)
+  new_strings_of_fsname_aux 2 1 Name.split_fname (fun p ->
+      p.Dbdisk.first_name :: p.Dbdisk.first_names_aliases)
 
 let strings_of_sname = function
   | GnWb0024 | GnWb0023 -> new_strings_of_sname
@@ -1195,14 +1239,14 @@ let opendb bname =
       strings_of_fname = strings_of_fname version bname strings patches.h_person;
       persons_of_surname =
         persons_of_surname version base_data
-          ( (fun p -> p.surname),
+          ( (fun p -> p.surname :: p.surnames_aliases),
             snd patches.h_person,
             "snames.inx",
             "snames.dat",
             bname );
       persons_of_first_name =
         persons_of_first_name version base_data
-          ( (fun p -> p.first_name),
+          ( (fun p -> p.first_name :: p.first_names_aliases),
             snd patches.h_person,
             "fnames.inx",
             "fnames.dat",
