@@ -21,6 +21,8 @@
   %end;
 %end;
 %let;p_mod;%if;(b.p_mod!="" and e.p_mod="")%b.p_mod;%elseif;(e.p_mod!="")%e.p_mod;%end;%in;
+%define;iz(i)%url_set_pz.i;%end;
+%define;pnocz(pp,nn,oo)%url_set_pz.pp.nn.oo;%end;
 %if;(not cancel_links)
     <nav class="navbar sticky-top bg-white justify-content-center navbar-expand-md pt-0%nn;
       %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
@@ -163,12 +165,16 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
             </a>
             <div class="dropdown-menu">
               %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)
-                <a class="dropdown-item" href="%prefix_set.iz;%(iz=%self.index;%)pz=%first_name_key;&nz=%surname_key;%if;(e.oc!="" and e.oc!=0)&ocz=%occ;%end;&%access;" %laS; title="%apply;nav_with_sosa_ref(self)">%nn;
-                  <i class="far fa-dot-circle fa-fw %sexcolor; mr-1"></i> [*modify::Sosa 1]%nn;
-                </a>
-              %else;
-                <a class="dropdown-item" href="%prefix_set.iz;%suffix;" title="%if;(b.default_sosa_ref!="")%nl;[back to default sosa reference] %b.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">%nn;
-                  <i class="far fa-stop-circle fa-fw %sexcolor; mr-1"></i> [*user/password/cancel]2 [navigation] [Sosa]%nn;
+                  <a class="dropdown-item" href="%if;(b.access_by_key="yes")
+                    %apply;pnocz(first_name_key,surname_key,occ)%else;%apply;iz(index)%end;"
+                    title="%apply;nav_with_sosa_ref(self)" %laS;>%nn;
+                    <i class="far fa-dot-circle fa-fw %sexcolor; mr-1"></i> [*modify::Sosa 1]%nn;
+                  </a>
+              %end;
+              %if;(browsing_with_sosa_ref)
+                <a class="dropdown-item" href="%url_set.iz_pz_nz_ocz;"
+                  title="%if;(b.default_sosa_ref!="")%nl;[back to default sosa reference] %b.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">%nn;
+                  <i class="far fa-stop-circle fa-fw text-danger mr-1"></i> [*user/password/cancel]2 [navigation] [Sosa]%nn;
                 </a>
               %end;
               %if;(e.m!="ADD_FAM" and e.m!="MOD_FAM" and e.m!="MOD_IND" and e.m!="R" and e.m!="U")
