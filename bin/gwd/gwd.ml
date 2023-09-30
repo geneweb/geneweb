@@ -2016,6 +2016,7 @@ let main () =
     try Sys.getenv "QUERY_STRING" |> Adef.encoded, true
     with Not_found -> "" |> Adef.encoded, !force_cgi
   in
+  if not !debug then Sys.enable_runtime_warnings false;
   if cgi then
     begin
       Wserver.cgi := true;
