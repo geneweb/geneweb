@@ -91,6 +91,15 @@ module type Driver_S = sig
   val istr_of_string : string -> istr
   (** Convert [istr] from string *)
 
+  val compare_iper : iper -> iper -> int
+  (** Comparison over ipers **)
+
+  val compare_ifam : ifam -> ifam -> int
+  (** Comparison over ifams **)
+
+  val compare_istr : istr -> istr -> int
+  (** Comparison over istrs **)
+
   val open_base : string -> base
   (** Open database associated with (likely situated in) the specified directory. *)
 
