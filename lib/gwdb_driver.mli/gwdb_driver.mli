@@ -27,6 +27,15 @@ val ifam_of_string : string -> ifam
 val istr_of_string : string -> istr
 (** Convert [istr] from string *)
 
+val compare_iper : iper -> iper -> int
+(** Comparison over ipers **)
+
+val compare_ifam : ifam -> ifam -> int
+(** Comparison over ifams **)
+
+val compare_istr : istr -> istr -> int
+(** Comparison over istrs **)
+
 type person
 (** Person data structure *)
 
