@@ -450,6 +450,11 @@ end = struct
         if places = [] then fun ~base:_ ~p:_ ~places:_ ~cmp:_ -> default
         else place_f
       in
+      let date_f =
+        if dates = (None, None) then fun ~base:_ ~p:_ ~default:_ ~dates:_ ->
+          default
+        else date_f
+      in
       date_f ~base ~p ~default ~dates && place_f ~base ~p ~places ~cmp
 
     let match_baptism = match_and match_baptism_date match_baptism_place
@@ -470,6 +475,11 @@ end = struct
       let place_f =
         if places = [] then fun ~base:_ ~p:_ ~places:_ ~cmp:_ -> default
         else place_f
+      in
+      let date_f =
+        if dates = (None, None) then fun ~base:_ ~p:_ ~default:_ ~dates:_ ->
+          default
+        else date_f
       in
       date_f ~base ~p ~default ~dates || place_f ~base ~p ~places ~cmp
 
