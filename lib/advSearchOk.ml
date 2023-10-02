@@ -647,13 +647,19 @@ let advanced_search conf base max_answers =
           getss "place" = []
           && gets "date2_yyyy" = ""
           && gets "date1_yyyy" = ""
-          || match_f Or.match_baptism And.match_baptism
-          || match_f Or.match_birth And.match_birth
-          || match_f Or.match_burial And.match_burial
-          || match_f Or.match_death And.match_death
-          || match_marriage ~conf ~base ~p ~exact_place ~default:false
-               ~places:(getss Fields.OR.place) ~dates:(getd Fields.OR.date)
-          || match_f Or.match_other_events And.match_other_events
+          || is_event_field_on conf.env "bapt"
+             && match_f Or.match_baptism And.match_baptism
+          || is_event_field_on conf.env "birth"
+             && match_f Or.match_birth And.match_birth
+          || is_event_field_on conf.env "burial"
+             && match_f Or.match_burial And.match_burial
+          || is_event_field_on conf.env "death"
+             && match_f Or.match_death And.match_death
+          || is_event_field_on conf.env "marriage"
+             && match_marriage ~conf ~base ~p ~exact_place ~default:false
+                  ~places:(getss Fields.OR.place) ~dates:(getd Fields.OR.date)
+          || is_event_field_on conf.env "other_events"
+             && match_f Or.match_other_events And.match_other_events
     in
 
     if pmatch then Some p else None
