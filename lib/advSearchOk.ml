@@ -825,14 +825,10 @@ let searching_fields conf base =
   let search = string_field "surname" search in
   let search = sosa_field search in
   let build_event_search event_search (s1, s2) =
-    let burial_date_field_name =
-      get_event_field_name gets "date" s1 search_type
-    in
-    let burial_place_field_name =
-      get_event_field_name gets "place" s1 search_type
-    in
-    get_event_field_request burial_place_field_name burial_date_field_name s2
-      event_search search_type
+    let date_field_name = get_event_field_name gets "date" s1 search_type in
+    let place_field_name = get_event_field_name gets "place" s1 search_type in
+    get_event_field_request place_field_name date_field_name s2 event_search
+      search_type
   in
   let events =
     [|
