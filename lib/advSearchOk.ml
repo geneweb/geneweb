@@ -550,7 +550,7 @@ let advanced_search conf base max_answers =
     let y = gets x in
     if y <> "" then [ y ]
     else
-      match Hashtbl.find_opt hss @@ x with
+      match Hashtbl.find_opt hss x with
       | Some v -> v
       | None ->
           let rec loop acc i =
