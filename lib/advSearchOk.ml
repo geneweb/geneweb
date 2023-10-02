@@ -120,11 +120,13 @@ let gets env x =
       in
       loop "" 1
 
+let is_event_field_on env event_name = "on" = gets env ("event_" ^ event_name)
+
 (* Get the field name of an event criteria depending of the search type. *)
 let get_event_field_name env event_criteria event_name search_type =
   match search_type with
   | Fields.And -> event_name ^ "_" ^ event_criteria
-  | Or -> if "on" = gets env ("event_" ^ event_name) then event_criteria else ""
+  | Or -> if is_event_field_on env event_name then event_criteria else ""
 
 module AdvancedSearchMatch : sig
   val match_name :
