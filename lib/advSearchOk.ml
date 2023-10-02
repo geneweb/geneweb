@@ -105,6 +105,27 @@ end = struct
   end
 end
 
+let gets env x =
+  match p_getenv env x with
+  | Some v when v <> "" -> v
+  | _ ->
+      let rec loop acc i =
+        let k = x ^ "_" ^ string_of_int i in
+        match p_getenv env k with
+        | Some v ->
+            loop
+              (if acc = "" then v else if v = "" then acc else acc ^ " / " ^ v)
+              (i + 1)
+        | None -> acc
+      in
+      loop "" 1
+
+(* Get the field name of an event criteria depending of the search type. *)
+let get_event_field_name env event_criteria event_name search_type =
+  match search_type with
+  | Fields.And -> event_name ^ "_" ^ event_criteria
+  | Or -> if "on" = gets env ("event_" ^ event_name) then event_criteria else ""
+
 module AdvancedSearchMatch : sig
   val match_name :
     search_list:string list list -> exact:bool -> string list -> bool
@@ -493,12 +514,6 @@ end = struct
   end
 end
 
-(* Get the field name of an event criteria depending of the search type. *)
-let get_event_field_name gets event_criteria event_name search_type =
-  match search_type with
-  | Fields.And -> event_name ^ "_" ^ event_criteria
-  | Or -> if "on" = gets ("event_" ^ event_name) then event_criteria else ""
-
 (* Search type can be AND or OR. *)
 let get_search_type gets =
   match gets "search_type" with
@@ -732,23 +747,7 @@ let searching_fields conf base =
     reconstitute_date_dmy conf (x ^ "1") <> None
     || reconstitute_date_dmy conf (x ^ "2") <> None
   in
-  let gets x =
-    match p_getenv conf.env x with
-    | Some v when v <> "" -> v
-    | _ ->
-        let rec loop acc i =
-          let k = x ^ "_" ^ string_of_int i in
-          match p_getenv conf.env k with
-          | Some v ->
-              loop
-                (if acc = "" then v
-                else if v = "" then acc
-                else acc ^ " / " ^ v)
-                (i + 1)
-          | None -> acc
-        in
-        loop "" 1
-  in
+  let gets = gets conf.env in
   let test_string x = gets x <> "" in
   let getd x =
     (reconstitute_date_dmy conf (x ^ "1"), reconstitute_date_dmy conf (x ^ "2"))
@@ -825,8 +824,10 @@ let searching_fields conf base =
   let search = string_field "surname" search in
   let search = sosa_field search in
   let build_event_search event_search (s1, s2) =
-    let date_field_name = get_event_field_name gets "date" s1 search_type in
-    let place_field_name = get_event_field_name gets "place" s1 search_type in
+    let date_field_name = get_event_field_name conf.env "date" s1 search_type in
+    let place_field_name =
+      get_event_field_name conf.env "place" s1 search_type
+    in
     get_event_field_request place_field_name date_field_name s2 event_search
       search_type
   in
@@ -859,7 +860,7 @@ let searching_fields conf base =
   in
   let search =
     let marriage_place_field_name =
-      get_event_field_name gets "place" "marriage" search_type
+      get_event_field_name conf.env "place" "marriage" search_type
     in
     if not (test_string marriage_place_field_name || test_date "marriage") then
       let sep = if search <> "" then ", " else "" in
