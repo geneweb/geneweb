@@ -636,6 +636,7 @@ let advanced_search conf base max_answers =
           || match_f Or.match_death And.match_death
           || match_marriage ~conf ~base ~p ~exact_place ~default:false
                ~places:(getss Fields.OR.place) ~dates:(getd Fields.OR.date)
+          || match_f Or.match_other_events And.match_other_events
     in
 
     if pmatch then Some p else None
