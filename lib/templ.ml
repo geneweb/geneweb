@@ -145,12 +145,6 @@ let url_aux ?(pwd = true) conf =
 
 let order =
   [
-    "lang";
-    "templ";
-    "iz";
-    "pz";
-    "nz";
-    "ocz";
     "m";
     "em";
     "t";
@@ -159,9 +153,17 @@ let order =
     "p";
     "n";
     "oc";
+    "iz";
+    "pz";
+    "nz";
+    "ocz";
+    "lang";
+    "templ";
+    "wide";
     "im";
     "sp";
     "ma";
+    "v";
   ]
 
 let reorder conf env =
