@@ -250,23 +250,31 @@ end = struct
     do_compare_places ~places ~cmp ~value:(sou base @@ get_burial_place p)
 
   let match_other_events_place ~base ~p ~places ~cmp =
-    let pevents = Gwdb.get_pevents p in
+    let pevents = List.map Event.event_item_of_pevent @@ Gwdb.get_pevents p in
     let fevents =
-      List.flatten @@ Array.to_list
+      List.map (Event.event_item_of_fevent ~sp:None)
+      @@ List.flatten @@ Array.to_list
       @@ Array.map Gwdb.get_fevents
            (Array.map (Gwdb.foi base) (Gwdb.get_family p))
     in
-    (* wrap value in unit -> string to be lazy ?*)
-    let pevent_places =
-      List.map (fun e () -> sou base @@ Gwdb.get_pevent_place e) pevents
+    let events =
+      List.filter
+        (fun e ->
+          match Event.get_name e with
+          | Pevent Epers_Birth
+          | Pevent Epers_Baptism
+          | Pevent Epers_Death
+          | Pevent Epers_Burial
+          | Fevent Efam_Marriage ->
+              true
+          | _ -> false)
+        (pevents @ fevents)
     in
-    let fevent_places =
-      List.map (fun e () -> sou base @@ Gwdb.get_fevent_place e) fevents
-    in
-    let event_places = pevent_places @ fevent_places in
     List.exists
-      (fun value_f -> do_compare_places ~places ~cmp ~value:(value_f ()))
-      event_places
+      (fun e ->
+        let value = sou base @@ Event.get_place e in
+        do_compare_places ~places ~cmp ~value)
+      events
 
   let match_marriage ~cmp ~conf ~base ~p ~places ~default ~dates =
     let d1, d2 = dates in
