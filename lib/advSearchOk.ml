@@ -216,7 +216,7 @@ end = struct
         match df p with Some d -> Date.compare_dmy d d2 <= 0 | None -> false)
     | None, None -> default
 
-  let do_compare ~places ~value ~cmp =
+  let do_compare_places ~places ~value ~cmp =
     (* value is person/familly baptism/death/... place *)
     (* places are the places we search for *)
     let places = List.map abbrev_lower places in
@@ -237,16 +237,16 @@ end = struct
     f ~cmp
 
   let match_baptism_place ~base ~p ~places ~cmp =
-    do_compare ~places ~cmp ~value:(sou base @@ get_baptism_place p)
+    do_compare_places ~places ~cmp ~value:(sou base @@ get_baptism_place p)
 
   let match_birth_place ~base ~p ~places ~cmp =
-    do_compare ~places ~cmp ~value:(sou base @@ get_birth_place p)
+    do_compare_places ~places ~cmp ~value:(sou base @@ get_birth_place p)
 
   let match_death_place ~base ~p ~places ~cmp =
-    do_compare ~places ~cmp ~value:(sou base @@ get_death_place p)
+    do_compare_places ~places ~cmp ~value:(sou base @@ get_death_place p)
 
   let match_burial_place ~base ~p ~places ~cmp =
-    do_compare ~places ~cmp ~value:(sou base @@ get_burial_place p)
+    do_compare_places ~places ~cmp ~value:(sou base @@ get_burial_place p)
 
   let match_other_events_place ~base ~p ~places ~cmp =
     let pevents = Gwdb.get_pevents p in
@@ -264,7 +264,7 @@ end = struct
     in
     let event_places = pevent_places @ fevent_places in
     List.exists
-      (fun value_f -> do_compare ~places ~cmp ~value:(value_f ()))
+      (fun value_f -> do_compare_places ~places ~cmp ~value:(value_f ()))
       event_places
 
   let match_marriage ~cmp ~conf ~base ~p ~places ~default ~dates =
@@ -277,7 +277,7 @@ end = struct
           if authorized_age conf base sp then
             df fam
             && (places = []
-               || do_compare ~places
+               || do_compare_places ~places
                     ~value:(sou base @@ get_marriage_place fam)
                     ~cmp)
           else false)
