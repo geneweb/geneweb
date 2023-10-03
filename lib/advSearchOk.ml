@@ -219,6 +219,7 @@ end = struct
   let do_compare_places ~places ~value ~cmp =
     (* value is person/familly baptism/death/... place *)
     (* places are the places we search for *)
+    let value = abbrev_lower value in
     let places = List.map abbrev_lower places in
     List.exists (fun place -> cmp place value) places
 
