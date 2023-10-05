@@ -483,6 +483,7 @@ val base_visible_write : base -> unit
 val base_particles : base -> Re.re
 (** Return regular expression that matches all defined in the [base] particles. *)
 
+(* TODO change to other data type than list? *)
 val base_strings_of_first_name : base -> string -> istr list
 (** [base_strings_of_first_name base x]
     Return the list of first names (as [istr]) being equal or to [x]

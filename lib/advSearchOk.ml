@@ -705,9 +705,8 @@ let advanced_search conf base max_answers =
     else if fn_list <> [] || sn_list <> [] then
       let list_aux strings_of persons_of split n_list exact =
         (* NOTE this list length can be more than max_answers
-           so this can do lots of unescessary computation *)
-        (* NOTE TODO use Seq? *)
-        (* NOTE TODO use Set instead of sort_uniq? *)
+           so this can do lots of unescessary computation => use lazy list?*)
+        (* NOTE use Set instead of sort_uniq? *)
         let eq = match_name ~search_list:n_list ~exact in
         let istrs =
           List.fold_left
@@ -733,8 +732,8 @@ let advanced_search conf base max_answers =
           list_aux Gwdb.base_strings_of_first_name Gwdb.persons_of_first_name
             Name.split_fname fn_list
             (gets "exact_first_name" = "on")
-        (* NOTE if sn_list and fn_list not [] maybe we should have
-           l = list_aux sn_list intersec list_aux fn_list
+        (* NOTE if sn_list and fn_list not [] maybe we should use a Set have
+           l = (list_aux sn_list) intersect (list_aux fn_list)
         *)
       in
       let rec loop ((_, len) as acc) l =
