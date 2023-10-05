@@ -707,20 +707,20 @@ let advanced_search conf base max_answers =
         (* NOTE this list length can be more than max_answers
            so this can do lots of unescessary computation *)
         (* NOTE TODO use Seq? *)
-        List.map
-          (List.map (fun x ->
-               let eq = match_name ~search_list:n_list ~exact in
-               let istrs = strings_of base x in
-               List.fold_left
-                 (fun acc istr ->
-                   let str = Mutil.nominative (sou base istr) in
-                   if eq (List.map Name.lower @@ split str) then istr :: acc
-                   else acc)
-                 [] istrs))
-          n_list
-        |> List.flatten |> List.flatten |> List.sort_uniq compare
-        |> List.map (spi_find @@ persons_of base)
-        |> List.flatten |> List.sort_uniq compare
+        (* NOTE TODO use Set instead of sort_uniq? *)
+        let eq = match_name ~search_list:n_list ~exact in
+        let istrs =
+          List.fold_left
+            (fun acc l ->
+              List.fold_left (fun acc x -> strings_of base x @ acc) acc l)
+            [] n_list
+        in
+        List.sort_uniq compare istrs
+        |> List.filter (fun istr ->
+               let str = Mutil.nominative (sou base istr) in
+               eq (List.map Name.lower @@ split str))
+        |> List.fold_left (fun acc x -> spi_find (persons_of base) x @ acc) []
+        |> List.sort_uniq compare
       in
       let l =
         (* TODO how is the logic on skip_fname skip_sname works and is cocrect? *)
@@ -733,9 +733,9 @@ let advanced_search conf base max_answers =
           list_aux Gwdb.base_strings_of_first_name Gwdb.persons_of_first_name
             Name.split_fname fn_list
             (gets "exact_first_name" = "on")
-            (* NOTE if sn_list and fn_list not [] maybe we should have
-               l = list_aux sn_list intersec list_aux fn_list
-            *)
+        (* NOTE if sn_list and fn_list not [] maybe we should have
+           l = list_aux sn_list intersec list_aux fn_list
+        *)
       in
       let rec loop ((_, len) as acc) l =
         if len > max_answers then acc
