@@ -704,6 +704,9 @@ let advanced_search conf base max_answers =
       | None -> ([], 0)
     else if fn_list <> [] || sn_list <> [] then
       let list_aux strings_of persons_of split n_list exact =
+        (* NOTE this list length can be more than max_answers
+           so this can do lots of unescessary computation *)
+        (* NOTE TODO use Seq? *)
         List.map
           (List.map (fun x ->
                let eq = match_name ~search_list:n_list ~exact in
@@ -722,6 +725,7 @@ let advanced_search conf base max_answers =
       let l =
         (* TODO how is the logic on skip_fname skip_sname works and is cocrect? *)
         if sn_list <> [] then
+          (* NOTE if sn_list = [] then list_aux = [] so maybe useless check *)
           list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
             Name.split_sname sn_list
             (gets "exact_surname" = "on")
@@ -729,6 +733,9 @@ let advanced_search conf base max_answers =
           list_aux Gwdb.base_strings_of_first_name Gwdb.persons_of_first_name
             Name.split_fname fn_list
             (gets "exact_first_name" = "on")
+            (* NOTE if sn_list and fn_list not [] maybe we should have
+               l = list_aux sn_list intersec list_aux fn_list
+            *)
       in
       let rec loop ((_, len) as acc) l =
         if len > max_answers then acc
