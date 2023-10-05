@@ -578,6 +578,7 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
           List.fold_left
             (fun acc istr ->
               if
+                (* TODO n^2 *)
                 (not (List.mem istr acc))
                 &&
                 let str = strings.get istr in
