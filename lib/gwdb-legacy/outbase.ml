@@ -90,11 +90,17 @@ let make_strings_of_sname =
   make_strings_of_fsname_aux Name.split_sname_callback (fun p ->
       p.surname :: p.surnames_aliases)
 
+let make_strings_of_aname =
+  make_strings_of_fsname_aux Name.split_sname_callback (fun p -> p.aliases)
+
 let create_strings_of_sname oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_strings_of_sname base)
 
 let create_strings_of_fname oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_strings_of_fname base)
+
+let create_strings_of_alias oc_inx oc_inx_acc base =
+  output_index_aux oc_inx oc_inx_acc (make_strings_of_aname base)
 
 let is_prime a =
   let rec loop b =
@@ -179,6 +185,12 @@ let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
     (fun p -> p.first_name :: p.first_names_aliases)
     base tmp_fnames_inx tmp_fnames_dat
 
+let output_alias_index base tmp_anames_inx tmp_anames_dat =
+  output_name_index_aux
+    (Dutil.compare_snames_i base.data)
+    (fun p -> p.aliases)
+    base tmp_anames_inx tmp_anames_dat
+
 let output_particles_file particles fname =
   let oc = open_out fname in
   List.iter (fun s -> Printf.fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
@@ -198,6 +210,8 @@ let output ?(save_mem = false) base =
   let tmp_snames_dat = Filename.concat bname "1snames.dat" in
   let tmp_fnames_inx = Filename.concat bname "1fnames.inx" in
   let tmp_fnames_dat = Filename.concat bname "1fnames.dat" in
+  let tmp_anames_inx = Filename.concat bname "1anames.inx" in
+  let tmp_anames_dat = Filename.concat bname "1anames.dat" in
   let tmp_strings_inx = Filename.concat bname "1strings.inx" in
   let tmp_notes = Filename.concat bname "1notes" in
   let tmp_notes_d = Filename.concat bname "1notes_d" in
@@ -264,10 +278,10 @@ let output ?(save_mem = false) base =
       let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
       try
         trace "create name index";
+        (* room for sname/fname/aname index *)
         output_binary_int oc_inx 0;
-        (* room for sname index *)
         output_binary_int oc_inx 0;
-        (* room for fname index *)
+        output_binary_int oc_inx 0;
         create_name_index oc_inx oc_inx_acc base;
         base.data.ascends.clear_array ();
         base.data.unions.clear_array ();
@@ -281,14 +295,19 @@ let output ?(save_mem = false) base =
         let first_name_pos = pos_out oc_inx in
         trace "create strings of fname";
         create_strings_of_fname oc_inx oc_inx_acc base;
+        let alias_pos = pos_out oc_inx in
+        trace "create strings of alias";
+        create_strings_of_alias oc_inx oc_inx_acc base;
+        (* write sname/fname/aname position *)
         seek_out oc_inx 0;
-        (* sname index *)
         output_binary_int oc_inx surname_pos;
         seek_out oc_inx 1;
-        (* fname index *)
         output_binary_int oc_inx first_name_pos;
+        seek_out oc_inx 2;
+        output_binary_int oc_inx alias_pos;
         close_out oc_inx;
         close_out oc_inx_acc;
+
         if save_mem then (
           trace "compacting";
           Gc.compact ());
@@ -305,6 +324,11 @@ let output ?(save_mem = false) base =
           Gc.compact ());
         trace "create first name index";
         output_first_name_index base tmp_fnames_inx tmp_fnames_dat;
+        if save_mem then (
+          trace "compacting";
+          Gc.compact ());
+        trace "create first name index";
+        output_alias_index base tmp_anames_inx tmp_anames_dat;
         let s = base.data.bnotes.Def.nread "" Def.RnAll in
         (if s = "" then ()
         else
@@ -373,6 +397,10 @@ let output ?(save_mem = false) base =
   Sys.rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
   Files.rm (Filename.concat bname "fnames.inx");
   Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
+  Files.rm (Filename.concat bname "anames.dat");
+  Sys.rename tmp_anames_dat (Filename.concat bname "anames.dat");
+  Files.rm (Filename.concat bname "anames.inx");
+  Sys.rename tmp_anames_inx (Filename.concat bname "anames.inx");
   Files.rm (Filename.concat bname "strings.inx");
   Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");
   Sys.rename tmp_particles (Filename.concat bname "particles.txt");
