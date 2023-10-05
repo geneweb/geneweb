@@ -1138,9 +1138,18 @@ let person_warnings conf base p =
   let w = ref [] in
 
   let filter_close_children =
-    let is_one p p1 p2 = eq_person p p1 || eq_person p p2 in
+    let is_one_of_children p p1 p2 = eq_person p p1 || eq_person p p2 in
+    let is_one_of_parents p ifam =
+      let fam = Gwdb.foi base ifam in
+      let iper = Gwdb.get_iper p in
+      let ifather = Gwdb.get_father fam in
+      let imother = Gwdb.get_mother fam in
+      eq_iper iper ifather || eq_iper iper imother
+    in
     function
-    | Warning.CloseChildren (_, p1, p2) when not (is_one p p1 p2) -> false
+    | Warning.CloseChildren (ifam, p1, p2)
+      when not (is_one_of_children p p1 p2 || is_one_of_parents p ifam) ->
+        false
     | _ -> true
   in
 
