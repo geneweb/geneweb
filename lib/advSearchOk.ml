@@ -751,13 +751,15 @@ let advanced_search conf base max_answers =
               loop acc l
       in
       loop ([], 0) l
-    else
+    else (
+      !GWPARAM.syslog `LOG_NOTICE
+        "Advanced search: searching without using index";
       Gwdb.Collection.fold_until
         (fun (_, len) -> len <= max_answers)
         (fun acc i ->
           let p_opt = match_person (pget conf base i) search_type in
           match p_opt with Some p -> (p :: fst acc, snd acc + 1) | None -> acc)
-        ([], 0) (Gwdb.ipers base)
+        ([], 0) (Gwdb.ipers base))
   in
   (List.rev list, len)
 
