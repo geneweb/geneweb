@@ -703,9 +703,9 @@ let advanced_search conf base max_answers =
           loop (pget conf base @@ get_iper sosa_ref) (IperSet.empty, ([], 0))
           |> snd
     else
-      match (fn_list, sn_list) with
-      | [], [] ->
-          (* search with no first_name/surname criteria *)
+      match (fn_list, sn_list, alias_list) with
+      | [], [], [] ->
+          (* search with no first_name/surname/alias criteria *)
           !GWPARAM.syslog `LOG_NOTICE
             "Advanced search: searching without using index";
           Gwdb.Collection.fold_until
@@ -716,7 +716,7 @@ let advanced_search conf base max_answers =
               | Some p -> (p :: fst acc, snd acc + 1)
               | None -> acc)
             ([], 0) (Gwdb.ipers base)
-      | fn_list, sn_list ->
+      | fn_list, sn_list, alias_list ->
           (* search with first_name and/or surname criteria: use index of surname or first_name *)
           let list_aux strings_of persons_of split n_list exact =
             (* NOTE this list length can be more than max_answers
@@ -739,19 +739,22 @@ let advanced_search conf base max_answers =
             |> List.sort_uniq compare
           in
           let l =
-            (* TODO how is the logic on skip_fname skip_sname works and is cocrect? *)
-            if sn_list <> [] then
-              (* NOTE if sn_list = [] then list_aux = [] so maybe useless check *)
-              list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
-                Name.split_sname sn_list
-                (gets "exact_surname" = "on")
-            else
-              list_aux Gwdb.base_strings_of_first_name
-                Gwdb.persons_of_first_name Name.split_fname fn_list
-                (gets "exact_first_name" = "on")
-            (* NOTE if sn_list and fn_list not [] maybe we should use a Set have
-               l = (list_aux sn_list) intersect (list_aux fn_list)
-            *)
+            (* NOTE maybe we should use a Set have
+               l = (list_aux sn_list) intersect (list_aux fn_list) intersect (list_aux alias_list) *)
+            match (fn_list, sn_list, alias_list) with
+            | [], [], [] -> assert false
+            | _, _ :: _, _ ->
+                list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
+                  Name.split_sname sn_list
+                  (gets "exact_surname" = "on")
+            | _ :: _, _, _ ->
+                list_aux Gwdb.base_strings_of_first_name
+                  Gwdb.persons_of_first_name Name.split_fname fn_list
+                  (gets "exact_first_name" = "on")
+            | _, _, _ :: _ ->
+                list_aux Gwdb.base_strings_of_alias Gwdb.persons_of_alias
+                  Name.split_sname alias_list
+                  (gets "exact_alias" = "on")
           in
           let rec loop ((_, len) as acc) l =
             if len > max_answers then acc
