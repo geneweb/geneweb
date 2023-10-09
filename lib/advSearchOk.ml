@@ -687,17 +687,17 @@ let advanced_search conf base max_answers =
               let p_opt = match_person p search_type in
               let acc =
                 match p_opt with
-                | Some p -> (p :: fst acc, snd acc + 1)
                 | None -> acc
+                | Some p -> (p :: fst acc, snd acc + 1)
               in
               match get_parents p with
+              | None -> (set, acc)
               | Some ifam ->
                   let fam = foi base ifam in
                   let set, acc =
                     loop (pget conf base @@ get_mother fam) (set, acc)
                   in
                   loop (pget conf base @@ get_father fam) (set, acc)
-              | None -> (set, acc)
             else (set, acc)
           in
           loop (pget conf base @@ get_iper sosa_ref) (IperSet.empty, ([], 0))
