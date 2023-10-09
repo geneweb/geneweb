@@ -182,6 +182,12 @@ and eval_simple_variable conf = function
             else ""
           else ""
       | None -> "")
+  | "dates_format" ->
+    let string_of_dates_format = function
+      | Config.DMY -> "day_month_year"
+      | Config.MDY -> "month_day_year"
+    in
+    string_of_dates_format conf.dates_format
   | "doctype" -> (Util.doctype :> string)
   | "highlight" -> conf.highlight
   | "image_prefix" ->
