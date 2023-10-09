@@ -676,7 +676,9 @@ let advanced_search conf base max_answers =
 
   let list, len =
     if "on" = gets "sosa_filter" then
+      (* search by sosa *)
       match Util.find_sosa_ref conf base with
+      | None -> ([], 0)
       | Some sosa_ref ->
           (* TODO rm acc here, should be computed from the set at the end *)
           let rec loop p (set, acc) =
@@ -701,65 +703,72 @@ let advanced_search conf base max_answers =
           in
           loop (pget conf base @@ get_iper sosa_ref) (IperSet.empty, ([], 0))
           |> snd
-      | None -> ([], 0)
-    else if fn_list <> [] || sn_list <> [] then
-      let list_aux strings_of persons_of split n_list exact =
-        (* NOTE this list length can be more than max_answers
-           so this can do lots of unescessary computation => use lazy list?*)
-        (* NOTE use Set instead of sort_uniq? *)
-        let eq = match_name ~search_list:n_list ~exact in
-        let istrs =
-          List.fold_left
-            (fun acc l ->
-              List.fold_left (fun acc x -> strings_of base x @ acc) acc l)
-            [] n_list
-        in
-        List.sort_uniq compare istrs
-        |> List.filter (fun istr ->
-               let str = Mutil.nominative (sou base istr) in
-               eq (List.map Name.lower @@ split str))
-        |> List.fold_left (fun acc x -> spi_find (persons_of base) x @ acc) []
-        |> List.sort_uniq compare
-      in
-      let l =
-        (* TODO how is the logic on skip_fname skip_sname works and is cocrect? *)
-        if sn_list <> [] then
-          (* NOTE if sn_list = [] then list_aux = [] so maybe useless check *)
-          list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
-            Name.split_sname sn_list
-            (gets "exact_surname" = "on")
-        else
-          list_aux Gwdb.base_strings_of_first_name Gwdb.persons_of_first_name
-            Name.split_fname fn_list
-            (gets "exact_first_name" = "on")
-        (* NOTE if sn_list and fn_list not [] maybe we should use a Set have
-           l = (list_aux sn_list) intersect (list_aux fn_list)
-        *)
-      in
-      let rec loop ((_, len) as acc) l =
-        if len > max_answers then acc
-        else
-          match l with
-          | [] -> acc
-          | ip :: l ->
-              let p_opt = match_person (pget conf base ip) search_type in
-              let acc =
-                match p_opt with
-                | Some p -> (p :: fst acc, snd acc + 1)
-                | None -> acc
-              in
-              loop acc l
-      in
-      loop ([], 0) l
-    else (
-      !GWPARAM.syslog `LOG_NOTICE
-        "Advanced search: searching without using index";
-      Gwdb.Collection.fold_until
-        (fun (_, len) -> len <= max_answers)
-        (fun acc i ->
-          let p_opt = match_person (pget conf base i) search_type in
-          match p_opt with Some p -> (p :: fst acc, snd acc + 1) | None -> acc)
-        ([], 0) (Gwdb.ipers base))
+    else
+      match (fn_list, sn_list) with
+      | [], [] ->
+          (* search with no first_name/surname criteria *)
+          !GWPARAM.syslog `LOG_NOTICE
+            "Advanced search: searching without using index";
+          Gwdb.Collection.fold_until
+            (fun (_, len) -> len <= max_answers)
+            (fun acc i ->
+              let p_opt = match_person (pget conf base i) search_type in
+              match p_opt with
+              | Some p -> (p :: fst acc, snd acc + 1)
+              | None -> acc)
+            ([], 0) (Gwdb.ipers base)
+      | fn_list, sn_list ->
+          (* search with first_name and/or surname criteria: use index of surname or first_name *)
+          let list_aux strings_of persons_of split n_list exact =
+            (* NOTE this list length can be more than max_answers
+               so this can do lots of unescessary computation => use lazy list?*)
+            (* NOTE use Set instead of sort_uniq? *)
+            let eq = match_name ~search_list:n_list ~exact in
+            let istrs =
+              List.fold_left
+                (fun acc l ->
+                  List.fold_left (fun acc x -> strings_of base x @ acc) acc l)
+                [] n_list
+            in
+            List.sort_uniq compare istrs
+            |> List.filter (fun istr ->
+                   let str = Mutil.nominative (sou base istr) in
+                   eq (List.map Name.lower @@ split str))
+            |> List.fold_left
+                 (fun acc x -> spi_find (persons_of base) x @ acc)
+                 []
+            |> List.sort_uniq compare
+          in
+          let l =
+            (* TODO how is the logic on skip_fname skip_sname works and is cocrect? *)
+            if sn_list <> [] then
+              (* NOTE if sn_list = [] then list_aux = [] so maybe useless check *)
+              list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
+                Name.split_sname sn_list
+                (gets "exact_surname" = "on")
+            else
+              list_aux Gwdb.base_strings_of_first_name
+                Gwdb.persons_of_first_name Name.split_fname fn_list
+                (gets "exact_first_name" = "on")
+            (* NOTE if sn_list and fn_list not [] maybe we should use a Set have
+               l = (list_aux sn_list) intersect (list_aux fn_list)
+            *)
+          in
+          let rec loop ((_, len) as acc) l =
+            if len > max_answers then acc
+            else
+              match l with
+              | [] -> acc
+              | ip :: l ->
+                  let p_opt = match_person (pget conf base ip) search_type in
+                  let acc =
+                    match p_opt with
+                    | Some p -> (p :: fst acc, snd acc + 1)
+                    | None -> acc
+                  in
+                  loop acc l
+          in
+          loop ([], 0) l
   in
   (List.rev list, len)
 
