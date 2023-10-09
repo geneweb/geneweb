@@ -680,7 +680,6 @@ let advanced_search conf base max_answers =
       match Util.find_sosa_ref conf base with
       | None -> ([], 0)
       | Some sosa_ref ->
-          (* TODO rm acc here, should be computed from the set at the end *)
           let rec loop p (set, acc) =
             let ip = get_iper p in
             if not (IperSet.mem ip set) then
