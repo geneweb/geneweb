@@ -1041,6 +1041,11 @@ let authorization from_addr request base_env passwd access_type utm base_file
         basic_authorization from_addr request base_env passwd access_type utm
           base_file command
 
+let dates_format_of_string = function
+  | "day_month_year" -> Config.DMY
+  | "month_day_year" -> Config.MDY
+  | _ -> Config.DMY
+
 let make_conf from_addr request script_name env =
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
@@ -1128,6 +1133,11 @@ let make_conf from_addr request script_name env =
     with Not_found -> false
   in
   let wizard_just_friend = if manitou then false else wizard_just_friend in
+  let dates_format =
+    let df_opt = List.assoc_opt "dates_format" base_env in
+    let df_opt = Option.map dates_format_of_string df_opt in
+    Option.value ~default:Config.DMY df_opt
+  in
   let conf =
     {from = from_addr;
      api_mode = false;
@@ -1246,6 +1256,7 @@ let make_conf from_addr request script_name env =
      forced_plugins = !forced_plugins;
      plugins = !plugins;
      notify_change = !notify_change;
+     dates_format;
     }
   in
   conf, ar
