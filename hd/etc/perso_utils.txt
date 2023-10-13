@@ -1,4 +1,4 @@
-<!-- perso_utils v7.00 07/04/2017 03:18:52 -->
+<!-- $Id: perso_utils v7.1 04/03/2023 09:51:04 $ -->
 %let;central_index;%index;%in;
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
 
@@ -48,14 +48,14 @@
 
 %define;image_MF(xx)
   %if;(wizard and not cancel_links)
-    <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">%nn;
+    <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">%nn;
   %end;
   %if;xx.is_male;
-    <i class="fa fa-mars male mr-1"></i>%nn;
+    <i class="fa fa-mars male fa-fw mr-1"></i>%nn;
   %elseif;xx.is_female;
-    <i class="fa fa-venus female mr-2"></i>%nn;
+    <i class="fa fa-venus female fa-fw mr-1"></i>%nn;
   %else;
-    <i class="fa fa-neuter neuter mr-2"></i>%nn;
+    <i class="fa fa-neuter neuter fa-fw mr-1"></i>%nn;
   %end;%nn;
   %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
 %end;
@@ -93,18 +93,18 @@
 %define;type_wedding()
   %if;are_married;
     %if;(nb_children != 0)
-      <img src="%image_prefix;/married.png" alt="[married]" title="[married]"%/>
+      <img src="%image_prefix;/married.png" alt="[married]" title="[married]">
     %else;
-      <img src="%image_prefix;/married_no_descendants.png" alt="[married]" title="[married]"%/>
+      <img src="%image_prefix;/married_no_descendants.png" alt="[married]" title="[married]">
     %end;
   %elseif;are_not_married;
-    <img src="%image_prefix;/not_married.png" alt="[not married]" title="[not married]"%/>
+    <img src="%image_prefix;/not_married.png" alt="[not married]" title="[not married]">
   %elseif;are_engaged;
-    <img src="%image_prefix;/engaged.png" alt="[engaged]" title="[engaged]"%/>
+    <img src="%image_prefix;/engaged.png" alt="[engaged]" title="[engaged]">
   %elseif;is_no_sexes_check;
-    <img src="%image_prefix;/not_married.png" alt="[relationship]" title="[relationship]"%/>
+    <img src="%image_prefix;/not_married.png" alt="[relationship]" title="[relationship]">
   %elseif;is_no_mention;
-    <img src="%image_prefix;/not_married.png" alt="[with]" title="[with]"%/>
+    <img src="%image_prefix;/not_married.png" alt="[with]" title="[with]">
   %end;
 %end;
 
@@ -159,17 +159,16 @@
 %end;
 
 %define;togena(xx)
-  %if;(xx = 1)[specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[to the parents]%nn;
-  %elseif;(xx = 3)[to the grandparents]%nn;
-  %elseif;(xx = 4)[to the great-grandparents]%nn;
+  %if;(xx = 0)[specify::generation/generations]0%nn;
+  %elseif;(xx = 1)[to the parents]%nn;
+  %elseif;(xx = 2)[to the grandparents]%nn;
+  %elseif;(xx = 3)[to the great-grandparents]%nn;
   %else;
     %apply;tothegen%with;
       %apply;nth([nth (generation)], xx)
     %end;
   %end;
 %end;
-
 %define;togend(xx)
   %if;(xx = 0)[specify::generation/generations]0%nn;
   %elseif;(xx = 1)[to the children]%nn;
@@ -221,7 +220,8 @@
 %end;
 
 %define;short_display_person(xx)
-  %apply;image_MF("xx")
+  %( %apply;image_MF("xx") to discuss %)
+  %sp;
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
@@ -229,38 +229,51 @@
         class="%if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;-underline">%xx;</a>
     %end;
   %end;
-  <span class="text-nowrap">%xx.dates;</span>%if;(xx.title!=""), %xx.title;%end;%nn;
+  <span title="%if;xx.computable_age;%xx.age;%elseif;xx.computable_death_age;%xx.death_age;%end;"
+    class="text-nowrap">%xx.dates;</span>%if;(xx.title!=""), %xx.title;%end;%nn;
 %end;
 
 %define;short_display_person_tree(xx)
   %if;(xx.has_sosa)%apply;display_sosa("xx")%end;
-  %if;(cancel_links or xx.is_restricted)<span class="text-nowrap">%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span>
-  %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;;%if;(evar.t!="")t=%evar.t;;%end;%if;(evar.v!="")v=%evar.v;;%end;%if;(evar.image="off")image=off;%end;%if;(evar.marriage="on")marriage=on;%end;"><span class="text-nowrap">%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
+  %if;(cancel_links or xx.is_restricted)<span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span>
+  %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;%if;(evar.t!="")&t=%evar.t;%end;%if;(evar.v!="")&v=%evar.v;%end;%if;(e.im=0)&im=0%end;%if;(evar.marriage="on")&marriage=on%end;"><span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
   %end;
   <br>%nn;
   %if;(wizard and not cancel_links)
-    <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
+    <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
   %end;
-  <span class="text-nowrap font-italic">%nn;
+  <div class="text-nowrap font-italic%nn;
+      %(%if;(e.m="A" and xx.index!=index)
+        %if;(not xx.is_dead) mr-5%nn;
+        %else;%if;(xx.death_date.year="") mr-4%end;
+        %end;
+      %end;%)"
+       title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;&#10;&#10;%end;
+               %if;(xx.computable_age or xx.computable_death_age)
+                 %if;xx.computable_age;%xx.age;%elseif;xx.computable_death_age;%xx.death_age;%end;
+               %end;">%nn;
     %if;(xx.dates!="")%xx.dates;%nn;
     %elseif;(wizard and not cancel_links)-%nn;
-    %elseif;(cancel_links)<br>
+    %elseif;(cancel_links)
     %end;%nn;
-  </span>%nn;
+  </div>%nn;
   %if;(wizard and not cancel_links)</a>%end;
 %end;
 
-%define;short_display_person_noname(xx,yy,zz,uu,ii)
-  %if;("ii"="MF")%apply;image_MF("xx")%end;
+%define;short_display_person_noname(xx)
+  %apply;image_MF("xx")
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%if;(xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</b>%else;
     %if;(cancel_links or xx.is_restricted)%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;%nn;
-    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" title="uu%if;("uu"!=""). %end;%xx;">%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
+    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" title="[*Navigation] [with] %xx;">%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
     %end;
   %end;
-  %if;("yy"="br")<br>%end;%if;(wizard and not cancel_links)
-  <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">%end;<span class="text-nowrap font-italic">%xx.dates;</span>%if;(wizard and not cancel_links)</a>%end;%nn;
-  %if;("zz"="age")<br> <span class="text-nowrap">%xx.age;%xx.death_age;</span>%nn;%end;
+  %if;(wizard and not cancel_links)
+  <a href="%prefix;m=MOD_IND&i=%xx.index;">%end;
+  <span class="text-nowrap font-italic"
+  title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;&#10;&#10;%end;
+        %if;(xx.computable_age);%xx.age;%elseif;xx.computable_death_age;%xx.death_age;%end;"%nn;
+  >%xx.dates;</span>%if;(wizard and not cancel_links)</a>%end;%nn;
 %end;
 
 %define;short_display_person_f(xx)
@@ -512,7 +525,7 @@
 
 %define;married_to_f(UP_lo, m_f, date_place)
   %if;(wizard and not cancel_links)
-    <a href="%prefix;;m=MOD_FAM;i=%family.index;;ip=%index;">%nn;
+    <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;">%nn;
       <i class="fa fa-wrench%sp;
         %if;(m_f=0)male%elseif;(m_f=1)female%else;neuter%end;"%sp;
         title="[*modify::family/families]0 [with]%sp;
@@ -577,14 +590,16 @@
   %foreach;xx.mother.family;
     %if;(spouse.access=xx.father.access)
       %if;(marriage_date.year!="")
-        %if;(wizard and not cancel_links)<a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;" title="[modify::family/families]0">%end;<span class="text-nowrap">%marriage_date.prec;%marriage_date.year;</span>%if;(wizard and not cancel_links)</a>%end;
+        %if;(wizard and not cancel_links)<a href="%prefix&m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">%end;
+        <span class="text-nowrap">%family.date_s;</span>
+        %if;(wizard and not cancel_links)</a>%end;
       %else;&nbsp;%end;
     %end;
   %end;
 %end;
 
 %define;not_married_no_descendants()
-  <img src="%image_prefix;/not_married_no_descendants.png" alt="[not married],&nbsp;[no descendants]" title="[not married],&nbsp;[no descendants]"%/>
+  <img src="%image_prefix;/not_married_no_descendants.png" alt="[not married],&nbsp;[no descendants]" title="[not married],&nbsp;[no descendants]">
 %end;
 
 %define;short_display_siblings()
@@ -595,7 +610,7 @@
 
 %define;short_display_siblings_noname()
   %apply;li_SDC("child")
-    %apply;short_display_person_noname("child","","","","MF")%nn;
+    %apply;short_display_person_noname("child")%nn;
   </li>
 %end;
 
@@ -605,7 +620,7 @@
     %if;child.has_families;
       %foreach;child.family;
         %if;(family_cnt!=1)
-          <br><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="1px"%/>
+          <br><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="1px">
           <em>%child;%child.title;%child.dates;</em>
         %end;
         <span class="ml-1">%apply;long_married_f("child", "lower")</span>
@@ -625,11 +640,11 @@
             %if;(evar.cgl!="on")
               <a href="%child.image_html_url;">
                 <img src="%child.image_url;"%sp;
-                  %child.image_small_size; style="border: none" alt="" title="[image/images]0"%/>
+                  %child.image_small_size; style="border: none" alt="" title="[image/images]0">
               </a>
             %else;
               <img src="%child.image_url;"%sp;
-                %child.image_small_size; style="border: none" alt="" title="[image/images]0"%/>
+                %child.image_small_size; style="border: none" alt="" title="[image/images]0">
             %end;
           </td>
           <td style="vertical-align: middle">
@@ -638,10 +653,10 @@
     %if;child.has_families;
       %foreach;child.family;
         %if;(family_cnt!=1)
-          <br%/><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="" title=""%/>
+          <br><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="" title="">
           <em>%child;%child.title;%child.dates;</em>
         %end;
-        <em>%apply;long_married_f("child", "lower")</em>
+        %sp;<em>%apply;long_married_f("child", "lower")</em>
         %apply;short_display_person_f("spouse")
       %end;
     %end;
@@ -668,11 +683,11 @@
               %if;(evar.cgl!="on")
                 <a href="%spouse.image_html_url;">
                   <img src="%spouse.image_url;"%sp;
-                    %spouse.image_small_size; style="border: none" alt="" title="[image/images]0"%/>
+                    %spouse.image_small_size; style="border: none" alt="" title="[image/images]0">
                 </a>
               %else;
                 <img src="%spouse.image_url;"%sp;
-                  %spouse.image_small_size; style="border: none" alt="" title="[image/images]0"%/>
+                  %spouse.image_small_size; style="border: none" alt="" title="[image/images]0">
               %end;
             </td>
           </tr>

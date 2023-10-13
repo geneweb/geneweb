@@ -26,59 +26,66 @@ let pre_text_size txt =
   normal 0 0
 
 let print_pre_center conf sz txt =
-  for _i = 1 to (sz - pre_text_size txt) / 2 do Output.print_sstring conf " " done;
-  Output.print_string conf txt ;
+  for _i = 1 to (sz - pre_text_size txt) / 2 do
+    Output.print_sstring conf " "
+  done;
+  Output.print_string conf txt;
   Output.print_sstring conf "\n"
 
 let print_pre_left conf sz txt =
   let tsz = pre_text_size txt in
-  if tsz < sz / 2 - 1 then
-    for _i = 2 to (sz / 2 - 1 - tsz) / 2 do Output.print_sstring conf " " done;
-  Output.print_sstring conf " " ;
-  Output.print_string conf txt ;
+  if tsz < (sz / 2) - 1 then
+    for _i = 2 to ((sz / 2) - 1 - tsz) / 2 do
+      Output.print_sstring conf " "
+    done;
+  Output.print_sstring conf " ";
+  Output.print_string conf txt;
   Output.print_sstring conf "\n"
 
 let print_pre_right conf sz txt =
   let tsz = pre_text_size txt in
-  if tsz < sz / 2 - 1 then
-    begin
-      for _i = 1 to sz / 2 do Output.print_sstring conf " " done;
-      for _i = 1 to (sz / 2 - 1 - tsz) / 2 do Output.print_sstring conf " " done;
-      ()
-    end
-  else for _i = 1 to sz - pre_text_size txt - 1 do Output.print_sstring conf " " done;
-  Output.print_sstring conf " " ;
-  Output.print_string conf txt ;
+  if tsz < (sz / 2) - 1 then (
+    for _i = 1 to sz / 2 do
+      Output.print_sstring conf " "
+    done;
+    for _i = 1 to ((sz / 2) - 1 - tsz) / 2 do
+      Output.print_sstring conf " "
+    done;
+    ())
+  else
+    for _i = 1 to sz - pre_text_size txt - 1 do
+      Output.print_sstring conf " "
+    done;
+  Output.print_sstring conf " ";
+  Output.print_string conf txt;
   Output.print_sstring conf "\n"
 
 (* Algorithm *)
 
-type info =
-  { ip : iper
-  ; sp : sex
-  ; ip1 : iper
-  ; ip2 : iper
-  ; b1 : (iper * sex) list
-  ; b2 : (iper * sex) list
-  ; c1 : int
-  ; c2 : int
-  ; pb1 : (iper * sex) list option
-  ; pb2 : (iper * sex) list option
-  ; nb1 : (iper * sex) list option
-  ; nb2 : (iper * sex) list option
-  ; sp1 : person option
-  ; sp2 : person option
-  ; bd : int
-  ; td_prop : Adef.safe_string
-  }
+type info = {
+  ip : iper;
+  sp : sex;
+  ip1 : iper;
+  ip2 : iper;
+  b1 : (iper * sex) list;
+  b2 : (iper * sex) list;
+  c1 : int;
+  c2 : int;
+  pb1 : (iper * sex) list option;
+  pb2 : (iper * sex) list option;
+  nb1 : (iper * sex) list option;
+  nb2 : (iper * sex) list option;
+  sp1 : person option;
+  sp2 : person option;
+  bd : int;
+  td_prop : Adef.safe_string;
+}
 
 type dist = { mutable dmin : int; mutable dmax : int; mark : bool }
 
 let infinity = 1000
-
 let threshold = ref 10
-
-let phony_dist_tab = (fun _ -> 0), (fun _ -> infinity)
+let phony_dist_tab = ((fun _ -> 0), fun _ -> infinity)
 
 let tsort_leq tstab x y =
   if Gwdb.Marker.get tstab x = Gwdb.Marker.get tstab y then x >= y
@@ -88,11 +95,12 @@ let make_dist_tab conf base ia maxlev =
   if maxlev <= !threshold then phony_dist_tab
   else
     let tstab = Util.create_topological_sort conf base in
-    let module Pq =
-      Pqueue.Make
-        (struct type t = iper let leq x y = not (tsort_leq tstab x y) end)
-    in
-    let default = {dmin = infinity; dmax = 0; mark = false} in
+    let module Pq = Pqueue.Make (struct
+      type t = iper
+
+      let leq x y = not (tsort_leq tstab x y)
+    end) in
+    let default = { dmin = infinity; dmax = 0; mark = false } in
     let dist = Gwdb.iper_marker (Gwdb.ipers base) default in
     let q = ref Pq.empty in
     let add_children ip =
@@ -102,33 +110,29 @@ let make_dist_tab conf base ia maxlev =
         for j = 0 to Array.length (get_children des) - 1 do
           let k = (get_children des).(j) in
           let d = Gwdb.Marker.get dist k in
-          if not d.mark then
-            begin
-              Gwdb.Marker.set dist k @@ {dmin = infinity; dmax = 0; mark = true};
-              q := Pq.add k !q
-            end
+          if not d.mark then (
+            Gwdb.Marker.set dist k @@ { dmin = infinity; dmax = 0; mark = true };
+            q := Pq.add k !q)
         done
       done
     in
-    Gwdb.Marker.set dist ia @@ {dmin = 0; dmax = 0; mark = true};
+    Gwdb.Marker.set dist ia @@ { dmin = 0; dmax = 0; mark = true };
     add_children ia;
     while not (Pq.is_empty !q) do
-      begin let (k, nq) = Pq.take !q in
-        q := nq;
-        match get_parents (pget conf base k) with
-          Some ifam ->
-            let cpl = foi base ifam in
-            let dfath = Gwdb.Marker.get dist (get_father cpl) in
-            let dmoth = Gwdb.Marker.get dist (get_mother cpl) in
-            (Gwdb.Marker.get dist k).dmin <- min dfath.dmin dmoth.dmin + 1;
-            (Gwdb.Marker.get dist k).dmax <- max dfath.dmax dmoth.dmax + 1;
-            if (Gwdb.Marker.get dist k).dmin > maxlev then ()
-            else add_children k
-        | None -> ()
-      end
+      let k, nq = Pq.take !q in
+      q := nq;
+      match get_parents (pget conf base k) with
+      | Some ifam ->
+          let cpl = foi base ifam in
+          let dfath = Gwdb.Marker.get dist (get_father cpl) in
+          let dmoth = Gwdb.Marker.get dist (get_mother cpl) in
+          (Gwdb.Marker.get dist k).dmin <- min dfath.dmin dmoth.dmin + 1;
+          (Gwdb.Marker.get dist k).dmax <- max dfath.dmax dmoth.dmax + 1;
+          if (Gwdb.Marker.get dist k).dmin > maxlev then () else add_children k
+      | None -> ()
     done;
-    (fun ip -> (Gwdb.Marker.get dist ip).dmin),
-    (fun ip -> (Gwdb.Marker.get dist ip).dmax)
+    ( (fun ip -> (Gwdb.Marker.get dist ip).dmin),
+      fun ip -> (Gwdb.Marker.get dist ip).dmax )
 
 let find_first_branch conf base (dmin, dmax) ia =
   let rec find br len ip sp =
@@ -137,14 +141,11 @@ let find_first_branch conf base (dmin, dmax) ia =
     else if len < dmin ip || len > dmax ip then None
     else
       match get_parents (pget conf base ip) with
-        Some ifam ->
+      | Some ifam -> (
           let cpl = foi base ifam in
-          begin match
-            find ((ip, sp) :: br) (len - 1) (get_father cpl) Male
-          with
-            Some _ as r -> r
-          | None -> find ((ip, sp) :: br) (len - 1) (get_mother cpl) Female
-          end
+          match find ((ip, sp) :: br) (len - 1) (get_father cpl) Male with
+          | Some _ as r -> r
+          | None -> find ((ip, sp) :: br) (len - 1) (get_mother cpl) Female)
       | None -> None
   in
   find []
@@ -152,35 +153,34 @@ let find_first_branch conf base (dmin, dmax) ia =
 let rec next_branch_same_len conf base dist backward missing ia sa ipl =
   if backward then
     match ipl with
-      [] -> None
-    | (ip, sp) :: ipl1 ->
+    | [] -> None
+    | (ip, sp) :: ipl1 -> (
         match sa with
-          Female ->
+        | Female ->
             next_branch_same_len conf base dist true (missing + 1) ip sp ipl1
-        | Male ->
-            begin match get_parents (pget conf base ip) with
-              Some ifam ->
+        | Male -> (
+            match get_parents (pget conf base ip) with
+            | Some ifam ->
                 let cpl = foi base ifam in
                 next_branch_same_len conf base dist false missing
                   (get_mother cpl) Female ipl
-            | _ -> failwith "next_branch_same_len"
-            end
-        | Neuter -> assert false
+            | _ -> failwith "next_branch_same_len")
+        | Neuter -> assert false)
   else if missing = 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
     next_branch_same_len conf base dist true missing ia sa ipl
   else
     match get_parents (pget conf base ia) with
-      Some ifam ->
+    | Some ifam ->
         let cpl = foi base ifam in
-        next_branch_same_len conf base dist false (missing - 1)
-          (get_father cpl) Male ((ia, sa) :: ipl)
+        next_branch_same_len conf base dist false (missing - 1) (get_father cpl)
+          Male ((ia, sa) :: ipl)
     | None -> next_branch_same_len conf base dist true missing ia sa ipl
 
 let find_next_branch conf base dist ia sa ipl =
   let rec loop ia1 sa1 ipl =
     match next_branch_same_len conf base dist true 0 ia1 sa1 ipl with
-      Some (ia1, sa1, ipl) -> if ia = ia1 then Some ipl else loop ia1 sa1 ipl
+    | Some (ia1, sa1, ipl) -> if ia = ia1 then Some ipl else loop ia1 sa1 ipl
     | _ -> None
   in
   loop ia sa ipl
@@ -188,35 +188,34 @@ let find_next_branch conf base dist ia sa ipl =
 let rec prev_branch_same_len conf base dist backward missing ia sa ipl =
   if backward then
     match ipl with
-      [] -> None
-    | (ip, sp) :: ipl1 ->
+    | [] -> None
+    | (ip, sp) :: ipl1 -> (
         match sa with
-          Male ->
+        | Male ->
             prev_branch_same_len conf base dist true (missing + 1) ip sp ipl1
-        | Female ->
-            begin match get_parents (pget conf base ip) with
-              Some ifam ->
+        | Female -> (
+            match get_parents (pget conf base ip) with
+            | Some ifam ->
                 let cpl = foi base ifam in
                 prev_branch_same_len conf base dist false missing
                   (get_father cpl) Male ipl
-            | _ -> failwith "prev_branch_same_len"
-            end
-        | Neuter -> assert false
+            | _ -> failwith "prev_branch_same_len")
+        | Neuter -> assert false)
   else if missing = 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
     prev_branch_same_len conf base dist true missing ia sa ipl
   else
     match get_parents (pget conf base ia) with
-      Some ifam ->
+    | Some ifam ->
         let cpl = foi base ifam in
-        prev_branch_same_len conf base dist false (missing - 1)
-          (get_mother cpl) Female ((ia, sa) :: ipl)
+        prev_branch_same_len conf base dist false (missing - 1) (get_mother cpl)
+          Female ((ia, sa) :: ipl)
     | None -> prev_branch_same_len conf base dist true missing ia sa ipl
 
 let find_prev_branch conf base dist ia sa ipl =
   let rec loop ia1 sa1 ipl =
     match prev_branch_same_len conf base dist true 0 ia1 sa1 ipl with
-      Some (ia1, sa1, ipl) -> if ia = ia1 then Some ipl else loop ia1 sa1 ipl
+    | Some (ia1, sa1, ipl) -> if ia = ia1 then Some ipl else loop ia1 sa1 ipl
     | _ -> None
   in
   loop ia sa ipl
@@ -229,125 +228,113 @@ let someone_text conf base ip =
   ^^^ DateDisplay.short_dates_text conf base p
 
 let spouse_text conf base end_sp ip ipl =
-  match ipl, (p_getenv conf.env "spouse", p_getenv conf.env "opt") with
-  | (ips, _) :: _, (Some "on", _ | _, Some "spouse") ->
-    let a = pget conf base ips in
-    begin match get_parents a with
-        Some ifam ->
-        let fam = foi base ifam in
-        let sp =
-          if ip = get_father fam then get_mother fam else get_father fam
-        in
-        let d =
-          DateDisplay.short_marriage_date_text conf base fam
-            (pget conf base (get_father fam))
-            (pget conf base (get_mother fam))
-        in
-        someone_text conf base sp, d, Some sp
-      | _ -> Adef.safe "", Adef.safe "", None
-    end
-  | [], _ ->
-    begin match end_sp with
+  match (ipl, (p_getenv conf.env "spouse", p_getenv conf.env "opt")) with
+  | (ips, _) :: _, (Some "on", _ | _, Some "spouse") -> (
+      let a = pget conf base ips in
+      match get_parents a with
+      | Some ifam ->
+          let fam = foi base ifam in
+          let sp =
+            if ip = get_father fam then get_mother fam else get_father fam
+          in
+          let d =
+            DateDisplay.short_marriage_date_text conf base fam
+              (pget conf base (get_father fam))
+              (pget conf base (get_mother fam))
+          in
+          (someone_text conf base sp, d, Some sp)
+      | _ -> (Adef.safe "", Adef.safe "", None))
+  | [], _ -> (
+      match end_sp with
       | Some p ->
-        someone_text conf base (get_iper p), Adef.safe "", Some (get_iper p)
-      | _ -> Adef.safe "", Adef.safe "", None
-    end
-  | _ -> Adef.safe "", Adef.safe "", None
+          (someone_text conf base (get_iper p), Adef.safe "", Some (get_iper p))
+      | _ -> (Adef.safe "", Adef.safe "", None))
+  | _ -> (Adef.safe "", Adef.safe "", None)
 
 let print_someone_and_spouse conf base info in_tab ip n ipl =
-  let (s, d, spo) = spouse_text conf base n ip ipl in
-  if in_tab && (info.bd > 0 || (info.td_prop :> string) <> "") then begin
-    Output.print_sstring conf {|<table style="border:|} ;
-    Output.print_sstring conf (string_of_int info.bd) ;
-    Output.print_sstring conf {|px solid"|} ;
-    Output.print_string conf info.td_prop ;
-    Output.print_sstring conf {|><tr><td align="center">|}
-  end ;
+  let s, d, spo = spouse_text conf base n ip ipl in
+  if in_tab && (info.bd > 0 || (info.td_prop :> string) <> "") then (
+    Output.print_sstring conf {|<table style="border:|};
+    Output.print_sstring conf (string_of_int info.bd);
+    Output.print_sstring conf {|px solid"|};
+    Output.print_string conf info.td_prop;
+    Output.print_sstring conf {|><tr><td align="center">|});
   Output.print_string conf (someone_text conf base ip);
   Output.print_string conf (DagDisplay.image_txt conf base (pget conf base ip));
-  if (s :> string) <> "" then begin
+  if (s :> string) <> "" then (
     Output.print_sstring conf "<br>&amp;";
     Output.print_string conf d;
     Output.print_sstring conf " ";
-    Output.print_string conf s ;
+    Output.print_string conf s;
     match spo with
     | Some ip ->
-      Output.print_string conf (DagDisplay.image_txt conf base (pget conf base ip))
-    | _ -> ()
-  end ;
-  if in_tab && (info.bd > 0 || (info.td_prop :> string) <> "")
-  then Output.print_sstring conf "</td></tr></table>"
+        Output.print_string conf
+          (DagDisplay.image_txt conf base (pget conf base ip))
+    | _ -> ());
+  if in_tab && (info.bd > 0 || (info.td_prop :> string) <> "") then
+    Output.print_sstring conf "</td></tr></table>"
 
 let rec print_both_branches conf base info pl1 pl2 =
   if pl1 = [] && pl2 = [] then ()
   else
-    let (p1, pl1) =
-      match pl1 with
-        (p1, _) :: pl1 -> Some p1, pl1
-      | [] -> None, []
+    let p1, pl1 =
+      match pl1 with (p1, _) :: pl1 -> (Some p1, pl1) | [] -> (None, [])
     in
-    let (p2, pl2) =
-      match pl2 with
-        (p2, _) :: pl2 -> Some p2, pl2
-      | [] -> None, []
+    let p2, pl2 =
+      match pl2 with (p2, _) :: pl2 -> (Some p2, pl2) | [] -> (None, [])
     in
-    Output.print_sstring conf {|<tr align="|} ;
-    Output.print_sstring conf conf.left ;
-    Output.print_sstring conf {|">|} ;
-    Output.print_sstring conf {|<td align="center">|} ;
-    Output.print_sstring conf (if p1 <> None then "|" else "&nbsp;") ;
-    Output.print_sstring conf {|</td><td>&nbsp;</td><td align="center">|} ;
-    Output.print_sstring conf (if p2 <> None then "|" else "&nbsp;") ;
-    Output.print_sstring conf {|</td></tr><tr align="|} ;
-    Output.print_sstring conf conf.left ;
-    Output.print_sstring conf {|"><td valign="top" align="center">|} ;
-    begin match p1 with
-      | Some p1 -> print_someone_and_spouse conf base info true p1 info.sp1 pl1
-      | None -> Output.print_sstring conf "&nbsp;"
-    end ;
-    Output.print_sstring conf {|</td><td>&nbsp;</td><td valign="top" align="center">|} ;
-    begin match p2 with
-      | Some p2 -> print_someone_and_spouse conf base info true p2 info.sp2 pl2
-      | None -> Output.print_sstring conf "&nbsp;"
-    end ;
-    Output.print_sstring conf "</td></tr>" ;
+    Output.print_sstring conf {|<tr align="|};
+    Output.print_sstring conf conf.left;
+    Output.print_sstring conf {|">|};
+    Output.print_sstring conf {|<td align="center">|};
+    Output.print_sstring conf (if p1 <> None then "|" else "&nbsp;");
+    Output.print_sstring conf {|</td><td>&nbsp;</td><td align="center">|};
+    Output.print_sstring conf (if p2 <> None then "|" else "&nbsp;");
+    Output.print_sstring conf {|</td></tr><tr align="|};
+    Output.print_sstring conf conf.left;
+    Output.print_sstring conf {|"><td valign="top" align="center">|};
+    (match p1 with
+    | Some p1 -> print_someone_and_spouse conf base info true p1 info.sp1 pl1
+    | None -> Output.print_sstring conf "&nbsp;");
+    Output.print_sstring conf
+      {|</td><td>&nbsp;</td><td valign="top" align="center">|};
+    (match p2 with
+    | Some p2 -> print_someone_and_spouse conf base info true p2 info.sp2 pl2
+    | None -> Output.print_sstring conf "&nbsp;");
+    Output.print_sstring conf "</td></tr>";
     print_both_branches conf base info pl1 pl2
 
 let rec print_both_branches_pre conf base info sz pl1 pl2 =
   if pl1 = [] && pl2 = [] then ()
   else
-    let (p1, pl1) =
-      match pl1 with
-        (p1, _) :: pl1 -> Some p1, pl1
-      | [] -> None, []
+    let p1, pl1 =
+      match pl1 with (p1, _) :: pl1 -> (Some p1, pl1) | [] -> (None, [])
     in
-    let (p2, pl2) =
-      match pl2 with
-        (p2, _) :: pl2 -> Some p2, pl2
-      | [] -> None, []
+    let p2, pl2 =
+      match pl2 with (p2, _) :: pl2 -> (Some p2, pl2) | [] -> (None, [])
     in
     let s1 = if p1 <> None then "|" else " " in
     let s2 = if p2 <> None then "|" else " " in
     print_pre_center conf sz (Adef.safe @@ s1 ^ String.make (sz / 2) ' ' ^ s2);
-    begin match p1 with
-      Some p1 ->
+    (match p1 with
+    | Some p1 ->
         print_pre_left conf sz (someone_text conf base p1);
-        let (s, d, _) = spouse_text conf base info.sp1 p1 pl1 in
-        if (s : Adef.safe_string :> string) <> "" then print_pre_left conf sz ("&amp;" ^<^ d ^^^ " " ^<^ s)
-    | None -> Output.print_sstring conf "\n"
-    end;
-    begin match p2 with
-      Some p2 ->
+        let s, d, _ = spouse_text conf base info.sp1 p1 pl1 in
+        if (s : Adef.safe_string :> string) <> "" then
+          print_pre_left conf sz ("&amp;" ^<^ d ^^^ " " ^<^ s)
+    | None -> Output.print_sstring conf "\n");
+    (match p2 with
+    | Some p2 ->
         print_pre_right conf sz (someone_text conf base p2);
-        let (s, d, _) = spouse_text conf base info.sp2 p2 pl2 in
-        if (s : Adef.safe_string :> string) <> "" then print_pre_right conf sz ("&amp;" ^<^ d ^^^ " " ^<^ s)
-    | None -> Output.print_sstring conf "\n"
-    end;
+        let s, d, _ = spouse_text conf base info.sp2 p2 pl2 in
+        if (s : Adef.safe_string :> string) <> "" then
+          print_pre_right conf sz ("&amp;" ^<^ d ^^^ " " ^<^ s)
+    | None -> Output.print_sstring conf "\n");
     print_both_branches_pre conf base info sz pl1 pl2
 
 let include_marr conf base (n : Adef.escaped_string) =
   match find_person_in_env conf base (n :> string) with
-    Some p -> "&" ^<^ acces_n conf base n p
+  | Some p -> "&" ^<^ acces_n conf base n p
   | None -> Adef.escaped ""
 
 let sign_text conf base sign info b1 b2 c1 c2 =
@@ -356,75 +343,91 @@ let sign_text conf base sign info b1 b2 c1 c2 =
     ^<^ acces_n conf base (Adef.escaped "1") (pget conf base info.ip1)
     ^^^ "&"
     ^<^ acces_n conf base (Adef.escaped "2") (pget conf base info.ip2)
-    ^^^ "&b1=" ^<^ Sosa.to_string (old_sosa_of_branch conf base ((info.ip, info.sp) :: b1))
-    ^<^ "&b2=" ^<^ Sosa.to_string (old_sosa_of_branch conf base ((info.ip, info.sp) :: b2))
+    ^^^ "&b1="
+    ^<^ Sosa.to_string (old_sosa_of_branch conf base ((info.ip, info.sp) :: b1))
+    ^<^ "&b2="
+    ^<^ Sosa.to_string (old_sosa_of_branch conf base ((info.ip, info.sp) :: b2))
     ^<^ "&c1=" ^<^ string_of_int c1 ^<^ "&c2=" ^<^ string_of_int c2
-    ^<^ Adef.escaped (if p_getenv conf.env "spouse" = Some "on" then "&spouse=on" else "")
-    ^^^ Adef.escaped (if p_getenv conf.env "image" = Some "off" then "&image=off" else "")
-    ^^^
-    (match p_getenv conf.env "bd" with
-     | None | Some ("0" | "") -> Adef.escaped ""
-     | Some x -> "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string))
-    ^^^
-    (match p_getenv conf.env "color" with
-     | None | Some "" -> Adef.escaped ""
-     | Some x -> "&color=" ^<^ (Mutil.encode x :> Adef.escaped_string))
+    ^<^ Adef.escaped
+          (if p_getenv conf.env "spouse" = Some "on" then "&spouse=on" else "")
+    ^^^ Adef.escaped
+          (if p_getenv conf.env "image" = Some "off" then "&image=off" else "")
+    ^^^ (match p_getenv conf.env "bd" with
+        | None | Some ("0" | "") -> Adef.escaped ""
+        | Some x -> "&bd=" ^<^ (Mutil.encode x :> Adef.escaped_string))
+    ^^^ (match p_getenv conf.env "color" with
+        | None | Some "" -> Adef.escaped ""
+        | Some x -> "&color=" ^<^ (Mutil.encode x :> Adef.escaped_string))
     ^^^ include_marr conf base (Adef.escaped "3")
     ^^^ include_marr conf base (Adef.escaped "4")
   in
-  "<a href=\"" ^<^ (href : Adef.escaped_string :> Adef.safe_string) ^^^ "\">" ^<^ (sign : Adef.safe_string) ^>^ "</a>"
+  "<a href=\""
+  ^<^ (href : Adef.escaped_string :> Adef.safe_string)
+  ^^^ "\">"
+  ^<^ (sign : Adef.safe_string)
+  ^>^ "</a>"
 
 let prev_next_1_text conf base info pb nb =
   let s =
     match pb with
     | Some b1 ->
-      sign_text conf base (Adef.safe "&lt;&lt;") info b1 info.b2 (info.c1 - 1) info.c2 ^>^ "\n"
+        sign_text conf base (Adef.safe "&lt;&lt;") info b1 info.b2 (info.c1 - 1)
+          info.c2
+        ^>^ "\n"
     | _ -> Adef.safe ""
   in
   let s =
-    match pb, nb with
+    match (pb, nb) with
     | None, None -> s
     | _ ->
-      s ^>^ "<span style=\"font-size:80%\">" ^ string_of_int info.c1 ^ "</span>"
+        s ^>^ "<span style=\"font-size:80%\">" ^ string_of_int info.c1
+        ^ "</span>"
   in
   match nb with
   | Some b1 ->
-    s ^^^ "\n" ^<^ sign_text conf base (Adef.safe "&gt;&gt;") info b1 info.b2 (info.c1 + 1) info.c2
+      s ^^^ "\n"
+      ^<^ sign_text conf base (Adef.safe "&gt;&gt;") info b1 info.b2
+            (info.c1 + 1) info.c2
   | _ -> s
 
 let prev_next_2_text conf base info pb nb =
   let s =
     match pb with
     | Some b2 ->
-      sign_text conf base (Adef.safe "&lt;&lt;") info info.b1 b2 info.c1 (info.c2 - 1) ^>^ "\n"
+        sign_text conf base (Adef.safe "&lt;&lt;") info info.b1 b2 info.c1
+          (info.c2 - 1)
+        ^>^ "\n"
     | _ -> Adef.safe ""
   in
   let s =
-    match pb, nb with
+    match (pb, nb) with
     | None, None -> s
     | _ ->
-      s ^>^ "<span style=\"font-size:80%\">" ^ string_of_int info.c2 ^ "</span>"
+        s ^>^ "<span style=\"font-size:80%\">" ^ string_of_int info.c2
+        ^ "</span>"
   in
   match nb with
   | Some b2 ->
-    s ^^^ "\n" ^<^ sign_text conf base (Adef.safe "&gt;&gt;") info info.b1 b2 info.c1 (info.c2 + 1)
+      s ^^^ "\n"
+      ^<^ sign_text conf base (Adef.safe "&gt;&gt;") info info.b1 b2 info.c1
+            (info.c2 + 1)
   | _ -> s
 
 let print_prev_next_1 conf base info pb nb =
-  Output.print_string conf (prev_next_1_text conf base info pb nb) ;
+  Output.print_string conf (prev_next_1_text conf base info pb nb);
   Output.print_sstring conf "\n"
 
 let print_prev_next_2 conf base info pb nb =
-  Output.print_string conf (prev_next_2_text conf base info pb nb) ;
+  Output.print_string conf (prev_next_2_text conf base info pb nb);
   Output.print_sstring conf "\n"
 
 let other_parent_text_if_same conf base info =
-  match info.b1, info.b2 with
-    (sib1, _) :: _, (sib2, _) :: _ ->
-      begin match
-        get_parents (pget conf base sib1), get_parents (pget conf base sib2)
+  match (info.b1, info.b2) with
+  | (sib1, _) :: _, (sib2, _) :: _ -> (
+      match
+        (get_parents (pget conf base sib1), get_parents (pget conf base sib2))
       with
-        Some ifam1, Some ifam2 ->
+      | Some ifam1, Some ifam2 -> (
           let cpl1 = foi base ifam1 in
           let cpl2 = foi base ifam2 in
           let other_parent =
@@ -435,44 +438,43 @@ let other_parent_text_if_same conf base info =
               Some (get_father cpl1)
             else None
           in
-          begin match other_parent with
-            Some ip ->
+          match other_parent with
+          | Some ip ->
               let d =
                 DateDisplay.short_marriage_date_text conf base (foi base ifam1)
                   (pget conf base (get_father cpl1))
                   (pget conf base (get_mother cpl1))
               in
               Some ("&amp;" ^<^ d ^^^ " " ^<^ someone_text conf base ip, ip)
-          | _ -> None
-          end
-      | _ -> None
-      end
+          | _ -> None)
+      | _ -> None)
   | _ -> None
 
 let print_someone_and_other_parent_if_same conf base info =
-  if info.bd > 0 || (info.td_prop :> string) <> "" then begin
-    Output.print_sstring conf {|<table style="border:|} ;
-    Output.print_sstring conf (string_of_int info.bd) ;
-    Output.print_sstring conf {|px solid"|} ;
-    Output.print_string conf info.td_prop ;
-    Output.print_sstring conf {|><tr><td align="center">|}
-  end ;
-  Output.print_string conf (someone_text conf base info.ip) ;
-  Output.print_sstring conf "\n" ;
-  Output.print_string conf (DagDisplay.image_txt conf base (pget conf base info.ip));
-  begin match other_parent_text_if_same conf base info with
-    | Some (s, ip) ->
+  if info.bd > 0 || (info.td_prop :> string) <> "" then (
+    Output.print_sstring conf {|<table style="border:|};
+    Output.print_sstring conf (string_of_int info.bd);
+    Output.print_sstring conf {|px solid"|};
+    Output.print_string conf info.td_prop;
+    Output.print_sstring conf {|><tr><td align="center">|});
+  Output.print_string conf (someone_text conf base info.ip);
+  Output.print_sstring conf "\n";
+  Output.print_string conf
+    (DagDisplay.image_txt conf base (pget conf base info.ip));
+  (match other_parent_text_if_same conf base info with
+  | Some (s, ip) ->
       Output.print_sstring conf "<br>";
       Output.print_string conf s;
-      Output.print_string conf (DagDisplay.image_txt conf base (pget conf base ip))
-    | None -> ()
-  end;
+      Output.print_string conf
+        (DagDisplay.image_txt conf base (pget conf base ip))
+  | None -> ());
   if info.bd > 0 || (info.td_prop :> string) <> "" then
     Output.print_sstring conf "</td></tr></table>"
 
-let rec list_iter_hd_tl f =
-  function
-    x :: l -> f x l; list_iter_hd_tl f l
+let rec list_iter_hd_tl f = function
+  | x :: l ->
+      f x l;
+      list_iter_hd_tl f l
   | [] -> ()
 
 let print_one_branch_no_table conf base info =
@@ -483,10 +485,10 @@ let print_one_branch_no_table conf base info =
   Output.print_sstring conf "<br>\n";
   list_iter_hd_tl
     (fun (ip1, _) ipl1 ->
-       Output.print_sstring conf "|";
-       Output.print_sstring conf "<br>\n";
-       print_someone_and_spouse conf base info false ip1 sp ipl1;
-       Output.print_sstring conf "<br>\n")
+      Output.print_sstring conf "|";
+      Output.print_sstring conf "<br>\n";
+      print_someone_and_spouse conf base info false ip1 sp ipl1;
+      Output.print_sstring conf "<br>\n")
     b;
   Output.print_sstring conf "</div>\n"
 
@@ -502,16 +504,16 @@ let print_one_branch_with_table conf base info =
   Output.print_sstring conf "</td>\n";
   list_iter_hd_tl
     (fun (ip1, _) ipl1 ->
-       Output.print_sstring conf "<tr>\n";
-       Output.print_sstring conf "<td align=\"center\">\n";
-       Output.print_sstring conf "|";
-       Output.print_sstring conf "</td>\n";
-       Output.print_sstring conf "</tr>\n";
-       Output.print_sstring conf "<tr>\n";
-       Output.print_sstring conf "<td align=\"center\">\n";
-       print_someone_and_spouse conf base info true ip1 sp ipl1;
-       Output.print_sstring conf "</td>\n";
-       Output.print_sstring conf "</tr>\n")
+      Output.print_sstring conf "<tr>\n";
+      Output.print_sstring conf "<td align=\"center\">\n";
+      Output.print_sstring conf "|";
+      Output.print_sstring conf "</td>\n";
+      Output.print_sstring conf "</tr>\n";
+      Output.print_sstring conf "<tr>\n";
+      Output.print_sstring conf "<td align=\"center\">\n";
+      print_someone_and_spouse conf base info true ip1 sp ipl1;
+      Output.print_sstring conf "</td>\n";
+      Output.print_sstring conf "</tr>\n")
     b;
   Output.print_sstring conf "</tr>\n";
   Output.print_sstring conf "</table>\n"
@@ -520,26 +522,22 @@ let print_two_branches_with_pre conf base info =
   let sz = 79 in
   Output.print_sstring conf "<pre>\n";
   print_pre_center conf sz (someone_text conf base info.ip);
-  begin match other_parent_text_if_same conf base info with
-    Some (s, _) -> print_pre_center conf sz s
-  | None -> ()
-  end;
-  print_pre_center conf sz (Adef.safe "|") ;
+  (match other_parent_text_if_same conf base info with
+  | Some (s, _) -> print_pre_center conf sz s
+  | None -> ());
+  print_pre_center conf sz (Adef.safe "|");
   print_pre_center conf sz (Adef.safe @@ String.make (sz / 2) '_');
   print_both_branches_pre conf base info sz info.b1 info.b2;
-  if info.pb1 <> None || info.nb1 <> None || info.pb2 <> None ||
-     info.nb2 <> None
-  then
-    begin
-      Output.print_sstring conf "\n";
-      if info.pb1 <> None || info.nb1 <> None then
-        begin let s = prev_next_1_text conf base info info.pb1 info.nb1 in
-          print_pre_left conf sz s
-        end;
-      if info.pb2 <> None || info.nb2 <> None then
-        let s = prev_next_2_text conf base info info.pb2 info.nb2 in
-        print_pre_right conf sz s
-    end;
+  if
+    info.pb1 <> None || info.nb1 <> None || info.pb2 <> None || info.nb2 <> None
+  then (
+    Output.print_sstring conf "\n";
+    (if info.pb1 <> None || info.nb1 <> None then
+     let s = prev_next_1_text conf base info info.pb1 info.nb1 in
+     print_pre_left conf sz s);
+    if info.pb2 <> None || info.nb2 <> None then
+      let s = prev_next_2_text conf base info info.pb2 info.nb2 in
+      print_pre_right conf sz s);
   Output.print_sstring conf "</pre>\n"
 
 let print_two_branches_with_table conf base info =
@@ -568,123 +566,107 @@ let print_two_branches_with_table conf base info =
   Output.print_sstring conf "</td>\n";
   Output.print_sstring conf "</tr>\n";
   print_both_branches conf base info info.b1 info.b2;
-  if info.pb1 <> None
-  || info.nb1 <> None
-  || info.pb2 <> None
-  || info.nb2 <> None
-  then begin
-    Output.print_sstring conf {|<tr align="left"><td>|} ;
-    if info.pb1 <> None || info.nb1 <> None then begin
+  if
+    info.pb1 <> None || info.nb1 <> None || info.pb2 <> None || info.nb2 <> None
+  then (
+    Output.print_sstring conf {|<tr align="left"><td>|};
+    if info.pb1 <> None || info.nb1 <> None then (
       Output.print_sstring conf "<br>";
-      print_prev_next_1 conf base info info.pb1 info.nb1
-    end else Output.print_sstring conf "&nbsp;" ;
+      print_prev_next_1 conf base info info.pb1 info.nb1)
+    else Output.print_sstring conf "&nbsp;";
     Output.print_sstring conf "</td><td>&nbsp;</td><td>";
-    if info.pb2 <> None || info.nb2 <> None then begin
+    if info.pb2 <> None || info.nb2 <> None then (
       Output.print_sstring conf "<br>";
-      print_prev_next_2 conf base info info.pb2 info.nb2
-    end else Output.print_sstring conf "&nbsp;";
-    Output.print_sstring conf "</td></tr>"
-  end ;
+      print_prev_next_2 conf base info info.pb2 info.nb2)
+    else Output.print_sstring conf "&nbsp;";
+    Output.print_sstring conf "</td></tr>");
   Output.print_sstring conf "</table>"
 
 let print_relation_path conf base info =
   let with_table =
     match p_getenv conf.env "tab" with
-      Some "on" -> true
+    | Some "on" -> true
     | Some "off" -> false
     | _ -> not (browser_doesnt_have_tables conf)
   in
-  if info.b1 = [] || info.b2 = [] then
-    begin
-      if (info.bd > 0 || (info.td_prop :> string) <> "") && with_table
-      then print_one_branch_with_table conf base info
-      else print_one_branch_no_table conf base info ;
-      if info.pb1 <> None
-      || info.nb1 <> None
-      || info.pb2 <> None
+  if info.b1 = [] || info.b2 = [] then (
+    if (info.bd > 0 || (info.td_prop :> string) <> "") && with_table then
+      print_one_branch_with_table conf base info
+    else print_one_branch_no_table conf base info;
+    if
+      info.pb1 <> None || info.nb1 <> None || info.pb2 <> None
       || info.nb2 <> None
-      then
-        begin
-          Output.print_sstring conf "<p>" ;
-          if info.pb1 <> None || info.nb1 <> None then
-            print_prev_next_1 conf base info info.pb1 info.nb1;
-          if info.pb2 <> None || info.nb2 <> None then
-            print_prev_next_2 conf base info info.pb2 info.nb2;
-          Output.print_sstring conf "</p>"
-        end
-    end
+    then (
+      Output.print_sstring conf "<p>";
+      if info.pb1 <> None || info.nb1 <> None then
+        print_prev_next_1 conf base info info.pb1 info.nb1;
+      if info.pb2 <> None || info.nb2 <> None then
+        print_prev_next_2 conf base info info.pb2 info.nb2;
+      Output.print_sstring conf "</p>"))
   else if with_table then print_two_branches_with_table conf base info
   else print_two_branches_with_pre conf base info
 
 let print_relation_ok conf base info =
   let title _ =
     transl_nth conf "relationship link/relationship links" 0
-    |> Utf8.capitalize_fst
-    |> Output.print_sstring conf ;
-    begin match info.pb1, info.nb1 with
-      | None, None -> ()
-      | _ ->
-        Output.print_sstring conf " " ;
-        Output.print_sstring conf (string_of_int info.c1)
-    end;
-    match info.pb2, info.nb2 with
+    |> Utf8.capitalize_fst |> Output.print_sstring conf;
+    (match (info.pb1, info.nb1) with
     | None, None -> ()
     | _ ->
-      Output.print_sstring conf " " ;
-      Output.print_sstring conf (string_of_int info.c2)
+        Output.print_sstring conf " ";
+        Output.print_sstring conf (string_of_int info.c1));
+    match (info.pb2, info.nb2) with
+    | None, None -> ()
+    | _ ->
+        Output.print_sstring conf " ";
+        Output.print_sstring conf (string_of_int info.c2)
   in
   Hutil.header_no_page_title conf title;
   Hutil.print_link_to_welcome conf true;
   Util.include_template conf conf.env "buttons_rel" (fun () -> ());
-  Output.print_sstring conf {|<p style="clear:both">|} ;
-  print_relation_path conf base info ;
+  Output.print_sstring conf {|<p style="clear:both">|};
+  print_relation_path conf base info;
   Hutil.trailer conf
 
 let print_relation_no_dag conf base po ip1 ip2 =
   let params =
-    match po, p_getint conf.env "l1", p_getint conf.env "l2" with
-      Some p, Some l1, Some l2 ->
+    match (po, p_getint conf.env "l1", p_getint conf.env "l2") with
+    | Some p, Some l1, Some l2 ->
         let ip = get_iper p in
         let dist = make_dist_tab conf base ip (max l1 l2 + 1) in
         let b1 = find_first_branch conf base dist ip l1 ip1 Neuter in
         let b2 = find_first_branch conf base dist ip l2 ip2 Neuter in
         Some (ip, get_sex (pget conf base ip), dist, b1, b2, 1, 1)
-    | _ ->
-        match p_getenv conf.env "b1", p_getenv conf.env "b2" with
-          Some b1str, Some b2str ->
+    | _ -> (
+        match (p_getenv conf.env "b1", p_getenv conf.env "b2") with
+        | Some b1str, Some b2str -> (
             let n1 = Sosa.of_string b1str in
             let n2 = Sosa.of_string b2str in
-            begin match
-              old_branch_of_sosa conf base ip1 n1, old_branch_of_sosa conf base ip2 n2
+            match
+              ( old_branch_of_sosa conf base ip1 n1,
+                old_branch_of_sosa conf base ip2 n2 )
             with
-              Some ((ia1, sa1) :: b1), Some ((ia2, _) :: b2) ->
+            | Some ((ia1, sa1) :: b1), Some ((ia2, _) :: b2) ->
                 if ia1 = ia2 then
                   let c1 =
-                    match p_getint conf.env "c1" with
-                      Some n -> n
-                    | None -> 0
+                    match p_getint conf.env "c1" with Some n -> n | None -> 0
                   in
                   let c2 =
-                    match p_getint conf.env "c2" with
-                      Some n -> n
-                    | None -> 0
+                    match p_getint conf.env "c2" with Some n -> n | None -> 0
                   in
                   let dist =
                     if c1 > 0 || c2 > 0 then
-                      let maxlev =
-                        max (List.length b1) (List.length b2) + 1
-                      in
+                      let maxlev = max (List.length b1) (List.length b2) + 1 in
                       make_dist_tab conf base ia1 maxlev
                     else phony_dist_tab
                   in
                   Some (ia1, sa1, dist, Some b1, Some b2, c1, c2)
                 else None
-            | _ -> None
-            end
-        | _ -> None
+            | _ -> None)
+        | _ -> None)
   in
   match params with
-    Some (ip, sp, dist, Some b1, Some b2, c1, c2) ->
+  | Some (ip, sp, dist, Some b1, Some b2, c1, c2) ->
       let pb1 =
         if c1 <= 1 then None else find_prev_branch conf base dist ip sp b1
       in
@@ -699,18 +681,32 @@ let print_relation_no_dag conf base po ip1 ip2 =
       in
       let sp1 = find_person_in_env conf base "3" in
       let sp2 = find_person_in_env conf base "4" in
-      let bd =
-        match p_getint conf.env "bd" with
-          Some x -> x
-        | None -> 0
-      in
+      let bd = match p_getint conf.env "bd" with Some x -> x | None -> 0 in
       let td_prop =
         match Util.p_getenv conf.env "color" with
         | None | Some "" -> Adef.safe ""
-        | Some x -> (" class=\"" ^<^ Mutil.encode x ^>^ "\"" :> Adef.safe_string)
+        | Some x ->
+            (" class=\"" ^<^ Mutil.encode x ^>^ "\"" :> Adef.safe_string)
       in
       let info =
-        { ip ; sp ; ip1 ; ip2 ; b1 ; b2 ; c1 ; c2 ; pb1 ; pb2 ; nb1 ; nb2 ; sp1 ; sp2 ; bd ; td_prop }
+        {
+          ip;
+          sp;
+          ip1;
+          ip2;
+          b1;
+          b2;
+          c1;
+          c2;
+          pb1;
+          pb2;
+          nb1;
+          nb2;
+          sp1;
+          sp2;
+          bd;
+          td_prop;
+        }
       in
       print_relation_ok conf base info
   | _ -> Hutil.incorrect_request conf
@@ -723,13 +719,12 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
       if n > 100 then raise Exit
       else
         match b with
-          Some b ->
+        | Some b ->
             let set =
               List.fold_left (fun set (ip, _) -> Dag.Pset.add ip set) set b
             in
-            loop set (n + 1)
-              (find_next_branch conf base dist ia (get_sex a) b)
-        | None -> set, n
+            loop set (n + 1) (find_next_branch conf base dist ia (get_sex a) b)
+        | None -> (set, n)
     in
     loop set n b
   in
@@ -737,39 +732,45 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
     let set =
       List.fold_left
         (fun set l1 ->
-           List.fold_left
-             (fun set l2 ->
-                let dist = make_dist_tab conf base ia (max l1 l2 + 1) in
-                let (set, n) = add_branches dist set 0 ip1 l1 in
-                let (set, _) = add_branches dist set n ip2 l2 in set)
-             set l2)
-        (Dag.Pset.add ia Dag.Pset.empty) l1
+          List.fold_left
+            (fun set l2 ->
+              let dist = make_dist_tab conf base ia (max l1 l2 + 1) in
+              let set, n = add_branches dist set 0 ip1 l1 in
+              let set, _ = add_branches dist set n ip2 l2 in
+              set)
+            set l2)
+        (Dag.Pset.add ia Dag.Pset.empty)
+        l1
     in
     let spl =
       List.fold_right
         (fun (ip, s) spl ->
-           match find_person_in_env conf base s with
-             Some sp -> (ip, (get_iper sp, None)) :: spl
-           | None -> spl)
-        [ip1, "3"; ip2, "4"] []
+          match find_person_in_env conf base s with
+          | Some sp -> (ip, (get_iper sp, None)) :: spl
+          | None -> spl)
+        [ (ip1, "3"); (ip2, "4") ]
+        []
     in
     let elem_txt p = DagDisplay.Item (p, Adef.safe "") in
     let vbar_txt _ = Adef.escaped "" in
     let invert =
       match Util.p_getenv conf.env "invert" with
-        Some "on" -> true
+      | Some "on" -> true
       | _ -> false
     in
-    let page_title = Util.transl conf "tree" |> Utf8.capitalize_fst|> Adef.safe in
-    DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set spl page_title (Adef.escaped "")
+    let page_title =
+      Util.transl conf "tree" |> Utf8.capitalize_fst |> Adef.safe
+    in
+    DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set spl
+      page_title (Adef.escaped "")
   with Exit -> Hutil.incorrect_request conf
 
 let int_list s =
   let rec loop i n =
-    if i = String.length s then [n]
+    if i = String.length s then [ n ]
     else
       match s.[i] with
-        '0'..'9' as d -> loop (i + 1) (n * 10 + Char.code d - Char.code '0')
+      | '0' .. '9' as d -> loop (i + 1) ((n * 10) + Char.code d - Char.code '0')
       | _ -> n :: loop (i + 1) 0
   in
   loop 0 0
@@ -778,16 +779,15 @@ let print_relation conf base p1 p2 =
   let l1 = p_getenv conf.env "l1" in
   let l2 = p_getenv conf.env "l2" in
   let po = find_person_in_env conf base "" in
-  match p_getenv conf.env "dag", po, l1, l2 with
-    Some "on", Some p, Some l1, Some l2 ->
-      print_relation_dag conf base p (get_iper p1) (get_iper p2)
-        (int_list l1) (int_list l2)
-  | _ ->
-      print_relation_no_dag conf base po (get_iper p1) (get_iper p2)
+  match (p_getenv conf.env "dag", po, l1, l2) with
+  | Some "on", Some p, Some l1, Some l2 ->
+      print_relation_dag conf base p (get_iper p1) (get_iper p2) (int_list l1)
+        (int_list l2)
+  | _ -> print_relation_no_dag conf base po (get_iper p1) (get_iper p2)
 
 let print conf base =
   match
-    find_person_in_env conf base "1", find_person_in_env conf base "2"
+    (find_person_in_env conf base "1", find_person_in_env conf base "2")
   with
-    Some p1, Some p2 -> print_relation conf base p1 p2
+  | Some p1, Some p2 -> print_relation conf base p1 p2
   | _ -> Hutil.incorrect_request conf

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: calendar.txt,v 5.9 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: calendar.txt v7.1 10/01/2023 20:01:49 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*calendar/calendars]1</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include;css
-%include;hed
 </head>
 <body%body_prop;>
+%include;hed
 %message_to_wizard;
 <div class="container">
 
@@ -155,7 +155,7 @@
   </div>
 </div>
 
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

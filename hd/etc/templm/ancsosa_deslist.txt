@@ -1,4 +1,4 @@
-<!-- $Id: ancsosa_deslist.txt,v 7.00 2015/01/15 21:11:34 mr Exp $ -->
+<!-- $Id: templm/ancsosa_deslist.txt v7.0 2015/01/15 21:11:34 $ -->
 
   %let;ldsp;%if;(evar.hide="on")dsp0%else;dsp1%end;%in;
   <style id="style0" type="text/css">.dsp0{display:none}</style>
@@ -45,7 +45,7 @@
           %foreach;env_binding;
             %if;(env.key = "m")m=A;%elseif;(env.key = "t")t=G;%else;%env.key;=%env.val.decoded;;%end;
           %end;
-        ">[*ancestors]0</a></span>
+        ">[*ancestor/ancestors]1</a></span>
       %end;
       %if;(evar.m = "A" and has_children)
         <span><a %l1; href="%prefix_base_password;%if;(evar.lang != "")lang=%evar.lang;;%end;
@@ -162,7 +162,7 @@
   %if;(not cancel_links)  <a href="javascript:;" onclick="javascript:dsp01('d%count;');this.focus();"> … </a>%end;
   <div id="d%count;" class="%ldsp;">
     %if;(evar.image!="off" and z1.has_image)
-      <img class="image" src="%z1.image_url;" alt="[image/images]0" title="%z1;"%/>%nn;
+      <img class="image" src="%z1.image_url;" alt="[image/images]0" title="%z1;">%nn;
     %end;
   <dl class="inot">
     %foreach;z1.event;
@@ -221,7 +221,7 @@
   %if;(evar.notes = "on")
     %if;(z1.has_notes or z1.has_linked_page.BNOTE or z1.has_linked_page.NOTE)
       <div class="inot"><table><tbody><tr><td>
-        %if;z1.has_linked_page.BNOTE;&gt;&gt; %z1.linked_page.BNOTE;<br%/>%end;
+        %if;z1.has_linked_page.BNOTE;&gt;&gt; %z1.linked_page.BNOTE;<br>%end;
         %if;z1.has_notes;%z1.notes;%end;
         %if;z1.has_linked_page.NOTE;&gt;&gt; %z1.linked_page.NOTE;%end;
       </td></tr></tbody></table></div>
@@ -258,7 +258,7 @@
 %define;somebody_spouse_parent()
   %if;(evar.parents = "on")
     %if;(spouse.has_parents)
-      <br%/><small>[parents] : %apply;link2("spouse.father") [and] %apply;link2("spouse.mother")</small>
+      <br><small>[parents] : %apply;link2("spouse.father") [and] %apply;link2("spouse.mother")</small>
     %elseif;(lupd = "1")
       %sp;<a href="#m%count;" %ltap;
       onclick="window.open('%prefix;m=ADD_PAR;ip=%spouse.index;');"><span class="add">--</span></a>

@@ -1,7 +1,9 @@
 (executable
-  (name plugin_cgl)
-  (libraries geneweb geneweb.gwd_lib geneweb.wserver)
-  (modes (native plugin))
-)
+ (name plugin_cgl)
+ (libraries geneweb geneweb.gwd_lib geneweb.wserver)
+ (modes
+  (native plugin)))
 
-(alias (name plugin) (deps plugin_cgl.cmxs))
+(alias
+ (name plugin)
+ (deps plugin_cgl.cmxs))

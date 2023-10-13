@@ -14,7 +14,7 @@ them when I have some time (and some courage).
 * GeneWeb server or CGI (gwd)
   - [11 Dec 05] In update family form, when creating a new person, if
     conflict, display now at most 50 persons.
-  - [04 Sep 05] Data base forum file can be splited in several files:
+  - [04 Sep 05] Data base forum file can be split in several files:
     forum, forum.1, forum.2, and so on.
   - [27 Aug 05] In marriage relation kind added "no sex check married".
   - [22 Aug 05] Changed behaviour of displaying a surname : grouping
@@ -24,7 +24,7 @@ them when I have some time (and some courage).
   - [08 Aug 05] Fixed bug: in normal access, in personal page,
     some displayed children could have "x x" and not all for
     however visible children. Due to combination of authorized_age
-    in perso.ml and fast_auth_age in util.ml (2nd unuseful and
+    in perso.ml and fast_auth_age in util.ml (2nd useless and
     perturbating).
   - [14 Jul 05] Fixed small bug: URL without index (";opt=no_index")
     displayed "oc=" twice.
@@ -80,7 +80,7 @@ GeneWeb Version 4.10
   - [24 May 04] Display the wizards notes by last modification, and a
     link has been added for alphabetic order.
   - [13 May 04] Added index files snames.inx, snames.dat, fnames.inx
-    and fnames.dat to improve memory use in requests dispaying a surname
+    and fnames.dat to improve memory use in requests displaying a surname
     or a first name.
   - [05 May 04] In URLs referencing somebody with his internal number
     (i=...), added ";oc=n", n being his occurrence number (only if
@@ -895,7 +895,7 @@ GeneWeb Version 2.06
   - [Aug 16, 99] Now "make" does "make opt". To run the older "make"
     do "make out". The installation tells to run "make" (i.e. "make opt").
     The previous installation version told to run "make" and "make opt"
-    but it is unuseful to run both.
+    but it is useless to run both.
 
 * Setup program and GeneWeb daemon
   - [Aug 16, 99] In distribution (make distrib), creates "setup" and "gwd"
@@ -912,7 +912,7 @@ GeneWeb Version 2.06
     for password), because the auth password and the wizard/friend password
     are contradictory.
   - [Aug 17, 99] In display by first name or surname, when several spellings
-    are found, display them in decreasing frequence order.
+    are found, display them in decreasing frequency order.
   - [Aug 14, 99] In srcfile.ml, for start.txt files, added "o" macro
     (print if notes) and ability to decline verb + noun ([verb][noun]
     without space between 1st ] and snd [).
@@ -989,7 +989,7 @@ GeneWeb Version 2.03
     2/ there was a problem with the empty Swedish translation of "on (year)"
     the translation of "dead on 1953" was "död &nbsp;1953" resulting on the
     displaying of two spaces.
-  - [May 23, 99] Deleted supposed unuseful code, particularly in MergeIndOk,
+  - [May 23, 99] Deleted supposed useless code, particularly in MergeIndOk,
     to make code cleaner, hopefully not introducing bugs.
   - [May 23, 99] Added renitialization of field "consang" when modifying
     families to prepare new version of program "consang" (minimalist).
@@ -1001,7 +1001,7 @@ GeneWeb Version 2.03
     several files and the option -odir was not used.
 
 * Compilation
-  - [May 23, 99] Separed consang computation in another file "consangAll.ml".
+  - [May 23, 99] Separated consang computation in another file "consangAll.ml".
   - [May 12,99] Fixed YAAP (yet another accent problem...)
   - [May 8, 99] Added "make opt" case in "setup" to build optimized versions.
 

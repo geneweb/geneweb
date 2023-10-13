@@ -1,30 +1,29 @@
-
 (* Public functions for API (plugin v7_descend) *)
 
-(** Displays only descendants for specified level in unordered lists *)
 val display_descendants_level :
   Config.config -> Gwdb.base -> int -> Gwdb.person -> unit
+(** Displays only descendants for specified level in unordered lists *)
 
-(** Displays descendants with numerated by letter list. Title links to descendats index *)
 val display_descendants_with_numbers :
   Config.config -> Gwdb.base -> int -> Gwdb.person -> unit
+(** Displays descendants with numerated by letter list. Title links to descendats index *)
 
-(** Displays index of descendants *)
 val display_descendant_index :
   Config.config -> Gwdb.base -> int -> Gwdb.person -> unit
+(** Displays index of descendants *)
 
-(** Displays index of descendant's spouses *)
 val display_spouse_index :
   Config.config -> Gwdb.base -> int -> Gwdb.person -> unit
+(** Displays index of descendant's spouses *)
 
-(** Displays descendants in the table where rows are ordered by D'Aboville number. *)
 val display_descendant_with_table :
   Config.config -> Gwdb.base -> int -> Gwdb.person -> unit
+(** Displays descendants in the table where rows are ordered by D'Aboville number. *)
 
+val print_tree : Config.config -> Gwdb.base -> int -> Gwdb.person -> unit
 (** Displays tree of descendants *)
-val print_tree :
-  Config.config -> Gwdb.base -> int -> Gwdb.person -> unit
 
+val print_aboville : Config.config -> Gwdb.base -> int -> Gwdb.person -> unit
 (** Displays descendants as follows :
 
     person
@@ -34,13 +33,11 @@ val print_tree :
     | desc3
 
  *)
-val print_aboville :
-  Config.config -> Gwdb.base -> int -> Gwdb.person -> unit
 
+val desmenu_print : Config.config -> Gwdb.base -> Gwdb.person -> unit
 (** Prints form that allows to customise display of descendants *)
-val desmenu_print :
-  Config.config -> Gwdb.base -> Gwdb.person -> unit
 
+val print : Config.config -> Gwdb.base -> Gwdb.person -> unit
 (** Displays the descendants of the selected in [conv.env] person. Descendants could be displayed by different ways
     depending on variable {i t} in [conv.env] environement:
 
@@ -67,4 +64,3 @@ val desmenu_print :
     customising of display.
 
  *)
-val print : Config.config -> Gwdb.base -> Gwdb.person -> unit

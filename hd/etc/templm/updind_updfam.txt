@@ -1,4 +1,4 @@
-<!-- $Id: updind_updfam.txt,v 7.00 2016/03/21 15:24:07 a2 mr Exp $ -->
+<!-- $Id: templm/updind_updfam.txt v7.0 2016/03/21 15:24:07 $ -->
 %include;js_perso_accesskey
 %(updind and updfam %)
 %let;ak1;[*link] [any individual in the base] [with][:]

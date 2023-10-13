@@ -25,8 +25,7 @@ let print_no_candidate conf base p =
   let title _ =
     transl conf "possible duplications"
     |> transl_decline conf "merge"
-    |> Utf8.capitalize_fst
-    |> Output.print_sstring conf
+    |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
@@ -37,10 +36,11 @@ let print_no_candidate conf base p =
   Hutil.trailer conf
 
 let input_excl string_of_i excl =
-  List.fold_left begin fun (s : Adef.encoded_string) (i1, i2) ->
-    let t = string_of_i i1 ^^^ "," ^<^ string_of_i i2 in
-    if (s :> string) = "" then t else s ^^^ "," ^<^ t
-  end (Adef.encoded "") excl
+  List.fold_left
+    (fun (s : Adef.encoded_string) (i1, i2) ->
+      let t = string_of_i i1 ^^^ "," ^<^ string_of_i i2 in
+      if (s :> string) = "" then t else s ^^^ "," ^<^ t)
+    (Adef.encoded "") excl
 
 let print_input_excl conf string_of_i excl excl_name =
   let s = input_excl string_of_i excl in
@@ -54,7 +54,9 @@ let print_submit conf name value =
   Output.print_sstring conf {|" style="margin-right:4px">|}
 
 let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
-  let title _ = transl conf "merge" |> Utf8.capitalize_fst |> Output.print_sstring conf in
+  let title _ =
+    transl conf "merge" |> Utf8.capitalize_fst |> Output.print_sstring conf
+  in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_sstring conf "<h2>";
   title false;
@@ -65,16 +67,21 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   Output.print_sstring conf "</li><li>";
   print_link conf base (poi base ip2);
   Output.print_sstring conf "</li></ul><p>";
-  transl conf "merge" |> Utf8.capitalize_fst |> Output.print_sstring conf ;
-  Output.print_sstring conf " ?\n" ; (* FIXME: trans *)
-  Output.print_sstring conf {|<form method="post" action="|} ;
+  transl conf "merge" |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Output.print_sstring conf " ?\n";
+  (* FIXME: trans *)
+  Output.print_sstring conf {|<form method="post" action="|};
   Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|">|} ;
+  Output.print_sstring conf {|">|};
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_DUP_IND_Y_N");
   Util.hidden_input conf "ip" (string_of_iper ip |> Mutil.encode);
-  print_input_excl conf (fun x -> string_of_iper x |> Mutil.encode) ((ip1, ip2) :: iexcl) "iexcl";
-  print_input_excl conf (fun x -> string_of_ifam x |> Mutil.encode) fexcl "fexcl";
+  print_input_excl conf
+    (fun x -> string_of_iper x |> Mutil.encode)
+    ((ip1, ip2) :: iexcl) "iexcl";
+  print_input_excl conf
+    (fun x -> string_of_ifam x |> Mutil.encode)
+    fexcl "fexcl";
   Util.hidden_input conf "i" (string_of_iper ip1 |> Mutil.encode);
   Util.hidden_input conf "select" (string_of_iper ip2 |> Mutil.encode);
   print_submit conf "answer_y" 0;
@@ -86,16 +93,16 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
   let title _ =
     transl_nth conf "family/families" 1
     |> transl_decline conf "merge"
-    |> Utf8.capitalize_fst
-    |> Output.print_sstring conf
+    |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_sstring conf "<h2>";
   title false;
   Output.print_sstring conf "</h2>";
   Hutil.print_link_to_welcome conf true;
-  let (ip1, ip2) =
-    let cpl = foi base ifam1 in Gwdb.get_father cpl, Gwdb.get_mother cpl
+  let ip1, ip2 =
+    let cpl = foi base ifam1 in
+    (Gwdb.get_father cpl, Gwdb.get_mother cpl)
   in
   Output.print_sstring conf "<ul><li>";
   print_link conf base (poi base ip1);
@@ -112,12 +119,16 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|">|};
   Util.hidden_env conf;
-  Util.hidden_input conf "m" (Adef.encoded "MRG_DUP_FAM_Y_N") ;
-  Util.hidden_input conf "ip" (string_of_iper ip |> Mutil.encode) ;
-  print_input_excl conf (fun x -> string_of_iper x |> Mutil.encode) iexcl "iexcl";
-  print_input_excl conf (fun x -> string_of_ifam x |> Mutil.encode) ((ifam1, ifam2) :: fexcl) "fexcl";
-  Util.hidden_input conf "i" (string_of_ifam ifam1 |> Mutil.encode) ;
-  Util.hidden_input conf "i2" (string_of_ifam ifam2 |> Mutil.encode) ;
+  Util.hidden_input conf "m" (Adef.encoded "MRG_DUP_FAM_Y_N");
+  Util.hidden_input conf "ip" (string_of_iper ip |> Mutil.encode);
+  print_input_excl conf
+    (fun x -> string_of_iper x |> Mutil.encode)
+    iexcl "iexcl";
+  print_input_excl conf
+    (fun x -> string_of_ifam x |> Mutil.encode)
+    ((ifam1, ifam2) :: fexcl) "fexcl";
+  Util.hidden_input conf "i" (string_of_ifam ifam1 |> Mutil.encode);
+  Util.hidden_input conf "i2" (string_of_ifam ifam2 |> Mutil.encode);
   print_submit conf "answer_y" 0;
   print_submit conf "answer_n" 1;
   Output.print_sstring conf "</form></p>";
@@ -126,19 +137,19 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
 let main_page conf base =
   let ipp =
     match p_getenv conf.env "ip" with
-    | Some i -> let i = iper_of_string i in Some (i, poi base i)
+    | Some i ->
+        let i = iper_of_string i in
+        Some (i, poi base i)
     | None -> None
   in
   let excl = Perso.excluded_possible_duplications conf in
   match ipp with
-    Some (ip, p) ->
-      begin match Perso.first_possible_duplication base ip excl with
-        Perso.DupInd (ip1, ip2) ->
-          print_cand_ind conf base (ip, p) excl ip1 ip2
+  | Some (ip, p) -> (
+      match Perso.first_possible_duplication base ip excl with
+      | Perso.DupInd (ip1, ip2) -> print_cand_ind conf base (ip, p) excl ip1 ip2
       | Perso.DupFam (ifam1, ifam2) ->
           print_cand_fam conf base (ip, p) excl ifam1 ifam2
-      | Perso.NoDup -> print_no_candidate conf base p
-      end
+      | Perso.NoDup -> print_no_candidate conf base p)
   | None -> Hutil.incorrect_request conf
 
 let answ_ind_y_n conf base =

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: anctree.txt,v 5.9 2007-07-25 13:15:19 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: anctree.txt v7.1 10/01/2023 20:01:49 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
@@ -17,15 +17,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include;css
-%include;hed
 </head>
 <body%body_prop;>
+%include;hed
 %message_to_wizard;
 
-<div class="container%if;(evar.wide="on")-fluid%end; clearfix">
+<div class="container-fluid">
+%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
+  </div>
+  <div class="container">
+%end;
 %include;perso_utils
-%include;menubar
-
+%if;not cancel_links;
+  %include;menubar
+%end;
+%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
+  </div>
+  <div class="container-fluid">
+%end;
 %if;(evar.t="T" and evar.t1="7")
   %include;modules/arbre_7gen
 %elseif;(evar.t="T" and evar.t1="h7")
@@ -34,19 +43,24 @@
   %include;modules/arbre_9gen
 %elseif;(evar.t="T" and evar.t1="CT") %(CT for compatibility with templm %)
   %include;modules/arbre_hi_tools
-  %include;tools
+  %include;templm/tools
   %include;modules/arbre_hi_indexes
   %include;modules/arbre_hi
 %elseif;(evar.t="A" or evar.t="C" or evar.t="T")
-  %include;modules/arbre_vertical
+  %include;modules/arbre_vertical 
 %else;
-  bad values for evar.t and evar.t1
+  This should not happen (probably a bad variable in URL: check t=/t1=)
 %end;
-</div>
 
-<div>
-%include;trl
+%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
+  </div>
+  <div class="container">
+%end;
+%base_trailer;
 %include;copyr
+%if;(evar.wide!="on" or (evar.t=T and evar.t1="" and evar.v>3))
+  </div>
+%end;
 </div>
 %include;js
 </body>

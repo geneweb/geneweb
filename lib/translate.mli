@@ -2,11 +2,11 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 val inline : string -> char -> (char -> string) -> string -> string * bool
-    (* [Translate.inline lang macro_char macro str] return the translation
-       and a boolean telling True if it is actually the English version *)
+(* [Translate.inline lang macro_char macro str] return the translation
+   and a boolean telling True if it is actually the English version *)
 
 val language_name : ?sep:char -> string -> string -> string
-    (* [Translate.language_name lang lang_def] *)
+(* [Translate.language_name lang lang_def] *)
 
 val eval : string -> string
 (* [eval str] return a transformation of [str]. The input string may

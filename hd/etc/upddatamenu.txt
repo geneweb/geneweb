@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: upddatamenu.txt,v 0.01 2014-08-22 15:47:06 flh Exp $ -->
-  <!-- Copyright (c) 2006-2017 INRIA -->
+  <!-- $Id: upddatamenu.txt v7.1 10/01/2023 20:01:49 $ -->
+  <!-- Copyright (c) 2006-2007 INRIA -->
   <title>[*lists]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include;css
-  %include;hed
 </head>
 <body%body_prop;>
+%include;hed
 <div class="container">
 
 %define;list_of(xx)
@@ -33,25 +33,25 @@
   <ul>
     %if;(wizard)
       <li>
-        <a href="%prefix;m=MOD_DATA;data=fn">%apply;list_of([first name/first names]1)</a>
+        <a href="%prefix;m=MOD_DATA&data=fn">%apply;list_of([first name/first names]1)</a>
       </li>
       <li>
-        <a href="%prefix;m=MOD_DATA;data=sn">%apply;list_of([surname/surnames]1)</a>
+        <a href="%prefix;m=MOD_DATA&data=sn">%apply;list_of([surname/surnames]1)</a>
       </li>
       <li>
-        <a href="%prefix;m=MOD_DATA;data=place">%apply;list_of([places])</a>
+        <a href="%prefix;m=MOD_DATA&data=place">%apply;list_of([places])</a>
       </li>
       <li>
-        <a href="%prefix;m=MOD_DATA;data=src">%apply;list_of([source/sources]1)</a>
+        <a href="%prefix;m=MOD_DATA&data=src">%apply;list_of([source/sources]1)</a>
       </li>
       <li>
-        <a href="%prefix;m=MOD_DATA;data=occu">%apply;list_of([occupation/occupations]1)</a>
+        <a href="%prefix;m=MOD_DATA&data=occu">%apply;list_of([occupation/occupations]1)</a>
       </li>
     %end;
   </ul>
 </p>
 
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

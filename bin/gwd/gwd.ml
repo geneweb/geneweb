@@ -398,12 +398,14 @@ let unauth_server conf ar =
       (if ar.ar_can_stale then ",stale=true" else "")
   else
     Output.header conf "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
-  let url =
-    conf.bname ^<^ "?" ^<^
+  let env =
     List.fold_left
-      (fun s (k, v) -> if (s : Adef.encoded_string :> string) = "" then k ^<^ "=" ^<^ v else s ^^^ "&" ^<^ k ^<^ "=" ^<^ v)
-      (Adef.encoded "") (conf.henv @ conf.senv @ conf.env)
+      (fun l (k, v) ->
+        if k = "" || (k = "oc" && (int_of_string (Mutil.decode v)) = 0)
+        then l else (k ^ "=" ^ (Mutil.decode v)) :: l)
+      [] (conf.henv @ conf.senv @ conf.env)
   in
+  let env = String.concat "&" env in
   let txt i = transl_nth conf "wizard/wizards/friend/friends/exterior" i in
   let typ = txt (if ar.ar_passwd = "w" then 0 else 2) in
   let title h =
@@ -416,18 +418,20 @@ let unauth_server conf ar =
   title false;
   Output.print_sstring conf "</h1>\n";
   Output.print_sstring conf "<dl>\n";
-  begin let (alt_bind, alt_access) =
-    if ar.ar_passwd = "w" then "&w=f", txt 2 else "&w=w", txt 0
-  in
+  begin
+    let (alt_bind, alt_access) =
+      if ar.ar_passwd = "w" then "w=f", txt 2 else "w=w", txt 0
+    in
     Output.print_sstring conf "<dd>\n";
     Output.print_sstring conf "<ul>\n";
     Output.print_sstring conf "<li>\n";
-    Output.printf conf "%s : <a href=\"%s%s\">%s</a>" (transl conf "access") (url : Adef.encoded_string :> string)
-      alt_bind alt_access;
+    Output.printf conf {|%s : <a href="%s?%s%s%s">%s</a>|}
+      (transl conf "access") conf.bname env
+      (if env = "" then "" else "&") alt_bind alt_access;
     Output.print_sstring conf "</li>\n";
     Output.print_sstring conf "<li>\n";
-    Output.printf conf "%s : <a href=\"%s\">%s</a>" (transl conf "access") (url : Adef.encoded_string :> string)
-      (txt 4);
+    Output.printf conf {|%s : <a href="%s?%s">%s</a>|}
+      (transl conf "access") conf.bname env (txt 4);
     Output.print_sstring conf "</li>\n";
     Output.print_sstring conf "</ul>\n";
     Output.print_sstring conf "</dd>\n"
@@ -447,7 +451,7 @@ let gen_match_auth_file test_user_and_password auth_file =
               try
                 let i = String.index au.au_info ':' in
                 String.sub au.au_info 0 i
-              with Not_found -> ""
+              with Not_found -> au.au_info
             in
             let username =
               try
@@ -483,8 +487,8 @@ let basic_match_auth passwd auth_file uauth =
   else basic_match_auth_file uauth auth_file
 
 type access_type =
-    ATwizard of string
-  | ATfriend of string
+    ATwizard of string * string
+  | ATfriend of string * string
   | ATnormal
   | ATnone
   | ATset
@@ -512,21 +516,28 @@ let get_actlog check_from utm from_addr base_password =
               if k >= String.length line then ""
               else String.sub line k (String.length line - k)
             in
+            let len = String.length user in
+            let user, username =
+              match String.index_opt user ' ' with
+              | Some i ->
+                  String.sub user 0 i, String.sub user (i + 1) (len - i - 1)
+              | None -> user, ""
+            in
             let (list, r, changed) =
               if utm -. tm >= tmout then list, r, true
               else if
                 compatible_tokens check_from (addr, db_pwd)
                   (from_addr, base_password)
               then
-                let r = if c = 'w' then ATwizard user else ATfriend user in
-                ((from_addr, db_pwd), (utm, c, user)) :: list, r, true
-              else ((addr, db_pwd), (tm, c, user)) :: list, r, changed
+                let r = if c = 'w' then ATwizard (user, username) else ATfriend (user, username) in
+                ((from_addr, db_pwd), (utm, c, user, username)) :: list, r, true
+              else ((addr, db_pwd), (tm, c, user, username)) :: list, r, changed
             in
             loop changed r list
         | exception End_of_file ->
             close_in ic;
             let list =
-              List.sort (fun (_, (t1, _, _)) (_, (t2, _, _)) -> compare t2 t1)
+              List.sort (fun (_, (t1, _, _, _)) (_, (t2, _, _, _)) -> compare t2 t1)
                 list
             in
             list, r, changed
@@ -539,9 +550,10 @@ let set_actlog list =
   try
     let oc = Secure.open_out fname in
     List.iter
-      (fun ((from, base_pw), (a, c, d)) ->
-         Printf.fprintf oc "%.0f %s/%s %c%s\n" a from base_pw c
-           (if d = "" then "" else " " ^ d))
+      (fun ((from, base_pw), (a, c, d, e)) ->
+         Printf.fprintf oc "%.0f %s/%s %c%s%s\n" a from base_pw c
+           (if d = "" then "" else " " ^ d)
+           (if e = "" then "" else " " ^ e))
       list;
     close_out oc
   with Sys_error _ -> ()
@@ -568,7 +580,7 @@ let random_self_init () =
   let seed = int_of_float (mod_float (Unix.time ()) (float max_int)) in
   Random.init seed
 
-let set_token utm from_addr base_file acc user =
+let set_token utm from_addr base_file acc user username =
   Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
     ~onerror:(fun () -> "")
     (fun () ->
@@ -591,7 +603,7 @@ let set_token utm from_addr base_file acc user =
          in
          loop 50
        in
-       let list = ((from_addr, xx), (utm, acc, user)) :: list in
+       let list = ((from_addr, xx), (utm, acc, user, username)) :: list in
        set_actlog list; x)
 
 let index_not_name s =
@@ -865,11 +877,11 @@ let basic_authorization from_addr request base_env passwd access_type utm
   let (command, passwd) =
     if access_type = ATset then
       if wizard then
-        let pwd_id = set_token utm from_addr base_file 'w' user in
+        let pwd_id = set_token utm from_addr base_file 'w' user username in
         if !(Wserver.cgi) then command, pwd_id
         else base_file ^ "_" ^ pwd_id, ""
       else if friend then
-        let pwd_id = set_token utm from_addr base_file 'f' user in
+        let pwd_id = set_token utm from_addr base_file 'f' user username in
         if !(Wserver.cgi) then command, pwd_id
         else base_file ^ "_" ^ pwd_id, ""
       else if !(Wserver.cgi) then command, ""
@@ -1004,7 +1016,7 @@ let digest_authorization request base_env passwd utm base_file command =
 let authorization from_addr request base_env passwd access_type utm base_file
     command =
   match access_type with
-    ATwizard user ->
+    ATwizard (user, username) ->
       let (command, passwd) =
         if !(Wserver.cgi) then command, passwd
         else if passwd = "" then base_file, ""
@@ -1012,10 +1024,10 @@ let authorization from_addr request base_env passwd access_type utm base_file
       in
       let auth_scheme = TokenAuth {ts_user = user; ts_pass = passwd} in
       {ar_ok = true; ar_command = command; ar_passwd = passwd;
-       ar_scheme = auth_scheme; ar_user = user; ar_name = "";
+       ar_scheme = auth_scheme; ar_user = user; ar_name = username;
        ar_wizard = true; ar_friend = false; ar_uauth = "";
        ar_can_stale = false}
-  | ATfriend user ->
+  | ATfriend (user, username) ->
       let (command, passwd) =
         if !(Wserver.cgi) then command, passwd
         else if passwd = "" then base_file, ""
@@ -1023,7 +1035,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
       in
       let auth_scheme = TokenAuth {ts_user = user; ts_pass = passwd} in
       {ar_ok = true; ar_command = command; ar_passwd = passwd;
-       ar_scheme = auth_scheme; ar_user = user; ar_name = "";
+       ar_scheme = auth_scheme; ar_user = user; ar_name = username;
        ar_wizard = false; ar_friend = true; ar_uauth = "";
        ar_can_stale = false}
   | ATnormal ->
@@ -1055,6 +1067,8 @@ let make_conf from_addr request script_name env =
       | [ bname ; access ] -> bname, access
       | _ -> assert false
     in
+    let bases = Util.get_bases_list () in
+    let bname = match  bases with [x] -> x | _ -> bname in
     let (passwd, env, access_type) =
       let has_passwd = List.mem_assoc "w" env in
       let (x, env) = extract_assoc "w" env in
@@ -1127,6 +1141,22 @@ let make_conf from_addr request script_name env =
     with Not_found -> false
   in
   let wizard_just_friend = if manitou then false else wizard_just_friend in
+  let private_years = 
+    try int_of_string (List.assoc "private_years" base_env) with
+    Not_found | Failure _ -> 150
+  in
+  let username = ar.ar_name in
+  let username, userkey =
+    let l1 = String.split_on_char '|' username in
+    match List.length l1 with
+    | 1 -> username, ""
+    | 2 -> (List.nth l1 0), (List.nth l1 1)
+    | _ ->
+          begin
+            GwdLog.syslog `LOG_CRIT "Bad .auth key or sosa encoding";
+            username, ""
+          end
+  in
   let conf =
     {from = from_addr;
      api_mode = false;
@@ -1134,9 +1164,13 @@ let make_conf from_addr request script_name env =
      supervisor = supervisor; wizard = ar.ar_wizard && not wizard_just_friend;
      is_printed_by_template = true;
      debug = !debug;
+     query_start = Unix.gettimeofday ();
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
-     user = ar.ar_user; username = ar.ar_name; auth_scheme = ar.ar_scheme;
+     user = ar.ar_user;
+     username = username;
+     userkey = (Name.lower userkey);
+     auth_scheme = ar.ar_scheme;
      command = ar.ar_command;
      indep_command =
        (if !(Wserver.cgi) then ar.ar_command else "geneweb") ^ "?";
@@ -1167,9 +1201,14 @@ let make_conf from_addr request script_name env =
        begin try List.assoc "access_by_key" base_env = "yes" with
          Not_found -> ar.ar_wizard && ar.ar_friend
        end;
-     private_years =
-       begin try int_of_string (List.assoc "private_years" base_env) with
-         Not_found | Failure _ -> 150
+     private_years = private_years;
+     private_years_death =
+       begin try int_of_string (List.assoc "private_years_death" base_env) with
+         Not_found | Failure _ -> private_years
+       end;
+     private_years_marriage =
+       begin try int_of_string (List.assoc "private_years_marriage" base_env) with
+         Not_found | Failure _ -> private_years
        end;
      hide_names =
        if ar.ar_wizard || ar.ar_friend then false
@@ -1230,15 +1269,22 @@ let make_conf from_addr request script_name env =
      image_prefix =
        if !images_url <> "" then !images_url
        else if !(Wserver.cgi) then
-					begin match Sys.getenv_opt "GW_STATIC_PATH" with
-					| Some x -> x ^ "../images"
-					| None -> "../distribution/gw/images/"
-					end
+          begin match Sys.getenv_opt "GW_STATIC_PATH" with
+          | Some x -> String.concat Filename.dir_sep [x; ".."; ".."; "images"]
+              (* Assumes that GW_STATIC_PATH is ../distribution/gw/etc  *)
+          | None -> String.concat Filename.dir_sep
+              [".."; "distribution"; "gw"; "images" ]
+              (* FIXME
+              assumes that distribution has been installed next to cgi-bin
+              this default path may not work if the distribution
+              is accessed through SynLinks and Apache is not properly configured *)
+          end
        else "images";
      static_path =
        begin match Sys.getenv_opt "GW_STATIC_PATH" with
        | Some x -> x
-       | None -> "../distribution/gw/etc/"
+       | None -> String.concat Filename.dir_sep [".."; "distribution"; "gw"; "etc"; "" ]
+         (* FIXME same comment. / at the end! *)
        end;
      cgi;
      output_conf;
@@ -1473,6 +1519,7 @@ type misc_fname =
   | Css of string
   | Eot of string
   | Js of string
+  | Map of string
   | Otf of string
   | Other of string
   | Png of string
@@ -1485,9 +1532,10 @@ let content_misc conf len misc_fname =
   Output.status conf Def.OK;
   let (fname, t) =
     match misc_fname with
-    | Css fname -> fname, "text/css"
+    | Css fname -> fname, "text/css; charset=UTF-8"
     | Eot fname -> fname, "application/font-eot"
-    | Js fname -> fname, "text/javascript"
+    | Js fname -> fname, "text/javascript; charset=UTF-8"
+    | Map fname -> fname, "application/json"
     | Otf fname -> fname, "application/font-otf"
     | Other fname -> fname, "text/plain"
     | Png fname -> fname, "image/png"
@@ -1522,6 +1570,7 @@ let print_misc_file conf misc_fname =
   | Css fname
   | Eot fname
   | Js fname
+  | Map fname
   | Otf fname
   | Png fname
   | Svg fname
@@ -1551,6 +1600,7 @@ let misc_request conf fname =
     let misc_fname =
       if Filename.check_suffix fname ".css" then Css fname
       else if Filename.check_suffix fname ".js" then Js fname
+      else if Filename.check_suffix fname ".map" then Map fname
       else if Filename.check_suffix fname ".otf" then Otf fname
       else if Filename.check_suffix fname ".svg" then Svg fname
       else if Filename.check_suffix fname ".woff" then Woff fname
@@ -1993,6 +2043,8 @@ let () =
                     or launch GeneWeb with another port number (option -p)";
     flush stderr
 #ifdef UNIX
+  | Unix.Unix_error (Unix.ENOTCONN, _, _ ) ->
+    GwdLog.syslog `LOG_WARNING ({|Unix.Unix_error(Unix.ENOTCONN, "shutdown", "")|})
   | Unix.Unix_error (Unix.EACCES, "bind", arg) ->
     Printf.eprintf
       "Error: invalid access to the port %d: users port number less \

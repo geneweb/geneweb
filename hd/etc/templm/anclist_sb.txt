@@ -1,4 +1,4 @@
-<!-- $Id: anclist_sb.txt,v 7.00 2014/11/12 14:41:21 mr Exp $ -->
+<!-- $Id: templm/anclist_sb.txt v7.0 2014/11/12 14:41:21 $ -->
 
   %( surnames branch %)
   %apply;togen()

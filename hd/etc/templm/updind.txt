@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="%lang;">
 <head>
-<!-- $Id: updind.txt,v 7.00 2016/03/21 15:22:41 a2 mr Exp$ -->
+<!-- $Id: templm/updind.txt v7.0 2016/03/21 15:22:41 $ -->
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
       [*merge::person/persons]1 # %index;
@@ -15,7 +15,6 @@
   %include;css
   %include;js_upd
   %include;updind_updfam
-  %include;hed
 </head>
 %(<!-- Begin define -->%)
 %let;l_r_father; placeholder="M" %in;
@@ -84,6 +83,7 @@
 %end;
 %(<!-- End define -->%)
 <body%body_prop; id="upd" %apply;load_focus()>
+%include;hed
 <div class="container-fluid">
 %message_to_wizard;
 <form name="upd" method="post" action="%action;">
@@ -289,7 +289,7 @@
   </table>
 </fieldset>
 </form>
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

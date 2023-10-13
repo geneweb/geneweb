@@ -1,4 +1,4 @@
-<!-- $Id: ancdes_ars.txt,v 7.00 2014/11/24 17:55:26 mr Exp $ -->
+<!-- $Id: templm/ancdes_ars.txt v7.0 2014/11/24 17:55:26 $ -->
 
 %( ars table day month generation %)
 %( rlm link 2     %) %let;rlm2;i2=%index;;t2=0%in;

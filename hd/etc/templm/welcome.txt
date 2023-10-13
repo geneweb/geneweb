@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: welcome.txt,v 7.00 2015/08/14 16:19:14 mr Exp $ -->
+  <!-- $Id: templm/welcome.txt v7.0 2015/08/14 16:19:14 $ -->
   <title>GeneWeb - %apply;capitalize(base.name)</title>
   <meta name="robots" content="none"/>
   <meta charset="utf-8">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include;css
-  %include;hed
 </head>
 
 %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%in;
@@ -112,12 +111,13 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
 %end;
 
 <body%body_prop; id="welcome">
+%include;hed
 <div class="container">
 <div style="float:right;margin-top:1.8em;margin-right:1.8em;">
 %apply;login()
 </div>
 <div style="margin-top:1.7em;margin-left:1.7em">
-  <img src="%image_prefix;/gwlogo.png" width="280" alt="GeneWeb logo"%/>
+  <img src="%image_prefix;/gwlogo.png" width="280" alt="GeneWeb logo">
 </div>
 <div style="margin-left:7.5em">
 %if;(bvar.motd != "")%apply;interp(bvar.motd)%end;
@@ -254,8 +254,8 @@ zh: 网络家谱
         %end;
      </td></tr>
   </table>
-<br/>
-%include;trl
+<br>
+%base_trailer;
 %include;copyr
 </div>
 </div>

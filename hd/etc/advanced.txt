@@ -7,9 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include;css
-%include;hed
 </head>
 <body%body_prop;>
+%include;hed
 <div class="container">
 <div class="d-flex justify-content-between">
 
@@ -183,7 +183,7 @@
     <button type="submit" class="btn btn-outline-primary btn-lg">[*search/case sensitive]0</button>
   </div>
 </form>
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

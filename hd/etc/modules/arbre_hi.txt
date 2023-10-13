@@ -1,4 +1,4 @@
-  <!-- $Id: arbre_hi.txt -->
+  <!-- $Id: modules/arbre_hi.txt v7.1 04/03/2023 09:51:04 $-->
 %let;evarv;%if;(evar.v!="")%evar.v;%else;5%end;%in;
 %let;evart;%if;(evar.t!="")%evar.t;%else;T%end;%in;
 %let;evart1;%if;(evar.t1!="")%evar.t1;%else;CT%end;%in;
@@ -140,11 +140,11 @@
             href='%prefix;%aaaaccess;'
             title="%aaafirst_name; %aaasurname; (%aaaocc;)">
             %if;(aaahas_image)
-              <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"%/>
+              <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
             %end;
           </a>
           <a class="big_anchor_1m list-group-item-action"
-            href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaaindex;;"
+            href="%prefix_set.all;%apply;prefix_all();m=MOD_IND&i=%aaaindex;"
             title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)">
           </a>
         %else;
@@ -152,22 +152,22 @@
             href='%prefix;%aaaaccess;'
             title="%aaafirst_name; %aaasurname; (%aaaocc;)">
             %if;(aaahas_image)
-            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"%/>
+            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
             %end;
           </a>
           <a class="big_anchor_her list-group-item-action"
             href='%prefix;%aaaspouse.access;'
             title="%aaaspouse;">
             %if;(aaaspouse.has_image)
-            <img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0"%/>
+            <img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0">
             %end;
           </a>
           <a class="big_anchor_him_m list-group-item-action"
-            href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaaindex;;"
+            href="%prefix_set.all;%apply;prefix_all();m=MOD_IND&i=%aaaindex;"
             title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)">
           </a>
           <a class="big_anchor_her_m list-group-item-action"
-            href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaaspouse.index;;"
+            href="%prefix_set.all;%apply;prefix_all();m=MOD_IND&i=%aaaspouse.index;"
             title="Modifier %aaaspouse;">
           </a>
         %end;
@@ -182,7 +182,7 @@
         %if;(evarcpl!="on")
           <div class="d-flex">
           %if;(aaahas_image)
-            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"%/>
+            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0">
           %end;
           <span style="margin:0 0 2px 0;text-align:center;width:%dw1;px;font-size:%fs1;px;">
             %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;
@@ -191,7 +191,7 @@
         %else;
           <div class="d-flex justify-content-between">
           %if;(aaahas_image)%nn;
-            <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"%/></div>%nn;
+            <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"></div>%nn;
           %else;
             <div style="margin:0 0 2px 0;width:%imsz;px"></div>
           %end;%nn;
@@ -199,7 +199,7 @@
             %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;%nn;
           </div>%nn;
           %if;(aaaspouse.has_image)%nn;
-            <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0"%/></div>%nn;
+            <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0"></div>%nn;
           %end;%nn;
           </div>
         %end;
@@ -287,7 +287,7 @@
   %let;xxx;%if;(evarcpl="on")%expr(aaaanc_sosa.v/2)%else;%aaaanc_sosa.v;%end;%in;
   <div id="s%aaaanc_sosa.v;" style="font-family:monospace;margin:0">
     <a style="top:tttpx;left:lllpx;"
-      href='%prefix_no_all;%apply;prefix_all();%aaaaccess;;'
+      href='%prefix_set.all;%apply;prefix_all();%aaaaccess;;'
       %if;(aaasame!="")%apply;implex1(aaasame.v)%end;
       title='[*generation/generations]0 %level; – Sosa %nn;
         %if;(evarcpl="")%aaaanc_sosa; %if;(aaasame!="")=Sosa %aaasame;%end;
@@ -371,9 +371,9 @@
   <span style="top:%top_;px;left:%left_;px;font-family:monospace;margin:0">
   %for;i;0;nn;
     %if;(oo=0)
-      %if;("yy"="H")│<br%/>%else;─%if;(evarso="on" and (evarv<9 and evarcpl!="on") or (evarv<8 and evarcpl="on") and nn!=1)───%elseif;(evarso="on" and nn!=1)─%end;%end;
+      %if;("yy"="H")│<br>%else;─%if;(evarso="on" and (evarv<9 and evarcpl!="on") or (evarv<8 and evarcpl="on") and nn!=1)───%elseif;(evarso="on" and nn!=1)─%end;%end;
     %elseif;(oo=1)
-      %if;("yy"="H")─%if;(evarso="on" and (evarv<9 and evarcpl!="on") or (evarv<8 and evarcpl="on") and nn!=1)───%elseif;(evarso="on" and nn!=1)─%end;%else;│<br%/>%end;
+      %if;("yy"="H")─%if;(evarso="on" and (evarv<9 and evarcpl!="on") or (evarv<8 and evarcpl="on") and nn!=1)───%elseif;(evarso="on" and nn!=1)─%end;%else;│<br>%end;
     %end;
   %end;
   </span>
@@ -430,7 +430,7 @@
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top4;px;left:%left4;px;
               width:%wb2;px;height:%hb4;px;">
-            <a href="%prefix_no_all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"
+            <a href="%prefix_set.all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"
               target="_blank"
               title="[missing:::sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#010; %nn;
               [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v;%end; %ancestor; (%left4;-%top4;)"
@@ -482,7 +482,7 @@
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top2;px;left:%left2;px;
               width:%wb2;px;height:%hb4;px;">
-            <a href="%prefix_no_all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"
+            <a href="%prefix_set.all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"
               title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#010;%nn;
               [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v; %ancestor;%end; (%left2;-%top2;)"
             >%if;(evarso="on")•%else;·%end;</a>
@@ -492,7 +492,7 @@
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top3;px;left:%left3;px;
               width:%wb2;px;height:%hb4;px;">
-            <a href="%prefix_no_all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"
+            <a href="%prefix_set.all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"
               target="_blank"
               title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#010;%nn;
               [*add] %apply;a_of_b%with;[the parents]%and;%ancestor; Sosa %ancestor.anc_sosa.v;%end; (%left3;-%top3;)"

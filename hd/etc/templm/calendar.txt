@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: calendar.txt,v 7.00 2015/03/09 11:13:43 mr Exp $ -->
+  <!-- $Id: templm/calendar.txt v7.0 2015/03/09 11:13:43 $ -->
   <title>[*calendar/calendars]1</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -9,9 +9,9 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include;css
-  %include;hed
 </head>
 <body%body_prop;>
+%include;hed
 %message_to_wizard;
 
 <h1>[*calendar/calendars]1</h1>
@@ -287,7 +287,7 @@
 </td>
 </tr>
 </table>
-%include;trl
+%base_trailer;
 %include;copyr
 </body>
 </html>

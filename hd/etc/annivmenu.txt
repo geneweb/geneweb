@@ -1,5 +1,5 @@
-<!-- $Id: annivmenu.txt, v7.00 05/11/2018 02:05:13 flh Exp $ -->
-<!-- Copyright (c) 2006-2018 INRIA -->
+<!-- $Id: annivmenu.txt v7.1 10/01/2023 20:01:49 $ -->
+<!-- Copyright (c) 2006-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
@@ -8,9 +8,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include;css
-  %include;hed
 </head>
 <body%body_prop;>
+%include;hed
 <div class="container">
 <h1>[*anniversaries]</h1>
 
@@ -37,7 +37,7 @@
   </ul>
 </p>
 
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

@@ -1,4 +1,4 @@
-<!-- $Id: ancdes_stat.txt,v 7.00 2014/11/26 19:21:08 mr Exp $ -->
+<!-- $Id: templm/ancdes_stat.txt v7.0 2014/11/26 19:21:08 $ -->
 
 %define;stat1a(z1,z2,z3,z4)
   %reset_count;

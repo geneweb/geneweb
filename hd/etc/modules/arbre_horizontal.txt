@@ -1,5 +1,5 @@
-<!-- $Id: modules/arbre_horizontal v7.00 28/03/2017 20:02:03 Arbre ascendant horizontal jusqu’à 6 générations -->
-
+<!-- $Id: modules/arbre_horizontal.txt v7.1 30/12/2021 18:24:51 $ -->
+%( Arbre ascendant horizontal jusqu’à 6 générations %)
 %define;access_ind(nnn)
   %if;(cancel_links or nnn.is_restricted)
     %nnn;

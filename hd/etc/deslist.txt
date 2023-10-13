@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: deslist.txt,v 5.19 2007-07-25 13:15:19 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: deslist.txt v7.1 29/12/2022 19:48:02 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -17,9 +17,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include;css
-%include;hed
 </head>
 <body%body_prop;>
+%include;hed
 %message_to_wizard;
 <div class="container">
 %include;perso_utils
@@ -183,7 +183,7 @@
                       <p style="margin:0;">
                         %foreach;event_witness;
                           <span>%apply;capitalize(event_witness_kind)[:]</span>
-                          %apply;short_display_person("event_witness")<br/>
+                          %apply;short_display_person("event_witness")<br>
                         %end;
                       </p>
                     %end;
@@ -257,7 +257,7 @@
                           <p style="margin:0;">
                             %foreach;event_witness;
                               <span>%apply;capitalize(event_witness_kind)[:]</span>
-                              %apply;short_display_person("event_witness")<br/>
+                              %apply;short_display_person("event_witness")<br>
                             %end;
                           </p>
                         %end;
@@ -382,7 +382,7 @@
                       <p style="margin:0;">
                         %foreach;event_witness;
                           <span>%apply;capitalize(event_witness_kind)[:]</span>
-                          %apply;short_display_person("event_witness")<br/>
+                          %apply;short_display_person("event_witness")<br>
                         %end;
                       </p>
                     %end;
@@ -447,7 +447,7 @@
                         <p style="margin:0;">
                           %foreach;event_witness;
                             <span>%apply;capitalize(event_witness_kind)[:]</span>
-                            %apply;short_display_person("event_witness")<br/>
+                            %apply;short_display_person("event_witness")<br>
                           %end;
                         </p>
                       %end;
@@ -510,7 +510,7 @@
     [*total][:] %expr(count-1) [[person/persons]1@(c)]%sp;
     ([spouses not included]).
     %if;((evar.notes="on" or evar.src="on") and evar.inline != "on")
-      <p><hr%/></p>
+      <p><hr></p>
       <h3 class="highlight">
         %if;(evar.notes = "on")[*note/notes]1%else;[*source/sources]1%end;
         <a name="ns">&nbsp;</a>
@@ -530,7 +530,7 @@
   %else;%apply;min(evarv, max_desc_level, bvar.max_desc_level)%end;
 %end;
 
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

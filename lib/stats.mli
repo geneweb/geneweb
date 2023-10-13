@@ -1,5 +1,3 @@
-
-(** Statistic about persons in database *)
 type stats = {
   (* Number of men *)
   mutable men : int;
@@ -22,9 +20,10 @@ type stats = {
   (* Oldest person that is still alive with his age *)
   mutable oldest_still_alive : int * Gwdb.person;
 }
+(** Statistic about persons in database *)
 
-(** Compute [stats] from the database's persons *)
 val stat_base : Gwdb.base -> stats
+(** Compute [stats] from the database's persons *)
 
-(** Prints statistic [stats] on stdout *)
 val print_stats : Gwdb.base -> stats -> unit
+(** Prints statistic [stats] on stdout *)

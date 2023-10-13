@@ -1,4 +1,4 @@
-<!-- $Id: toolbar.txt,v 7.00 2014/11/13 10:52:29 mr Exp $ -->
+<!-- $Id: templm/toolbar.txt v7.0 2014/11/13 10:52:29 $ -->
 <!-- How to : Copy this file to bases/etc/ -->
 
 <div style="text-align:%left;">

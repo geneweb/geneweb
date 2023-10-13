@@ -1,4 +1,4 @@
-<!-- $Id: modules/chronologie.txt v 7.00 05/04/2017 03:27:35 -->
+<!-- $Id: modules/chronologie.txt v7.1 04/03/2023 09:51:04 $ -->
 %define;event_tree(z1)
   %reset_count;
   href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
@@ -140,17 +140,17 @@
 %end;
 
 %define;month(mmm)
-  %if;(mmm.month="")%if;(mmm.prec="&gt;")12%else;00%end;
+  %if;(mmm.month="")%if;(mmm.prec="&#62;")12%else;00%end;
   %elseif;(mmm.month<10)0%mmm.month;%else;%mmm.month;%end;
 %end;
 
 %define;day(ddd)
-  %if;(ddd.day="")%if;(ddd.prec="&gt;")32%else;00%end;
+  %if;(ddd.day="")%if;(ddd.prec="&#62;")32%else;00%end;
   %elseif;(ddd.day<10)0%ddd.day;%else;%ddd.day;%end;
 %end;
 
 %define;dprec(ddd)
-  %if;(ddd.prec="&lt;")2%elseif;(ddd.prec="&gt;")2%else;2%end;
+  %if;(ddd.prec="&#60;")2%elseif;(ddd.prec="&#62;")2%else;2%end;
 %end;
 
 %define;one_child(ccc,evm,labl,ddd)
@@ -229,10 +229,10 @@
     <h2 class="my-1" id="c">[*time line]%nn;
       %if;(not cancel_links)
         <a %apply;relations_tree(l_ref)>
-          <img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree"/>
+          <img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree">
         </a>%nn;
       %else;
-        <img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree"/>
+        <img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree">
       %end;%nn;
     </h2>%nn;
     %if;(not cancel_links)
@@ -511,10 +511,10 @@
                   %if;(event.has_witnesses)
                     %if;(not cancel_links)
                       <a class="" %apply;event_tree(index)>%nn;
-                        <img src="%image_prefix;/gui_create.png" class="ml-2 mb-1" height="16" alt="Tree"/>
+                        <img src="%image_prefix;/gui_create.png" class="ml-2 mb-1" height="16" alt="Tree">
                       </a>
                     %else;
-                      <img src="%image_prefix;/gui_create.png" class="ml-2 mb-1" height="16" alt="Tree"/>
+                      <img src="%image_prefix;/gui_create.png" class="ml-2 mb-1" height="16" alt="Tree">
                     %end;
                   %end;
                 %end;

@@ -1,4 +1,4 @@
-<!-- $Id: anclist_fam7_table.txt,v 7.00 2014/11/12 14:33:31 mr Exp $ -->
+<!-- $Id: templm/anclist_fam7_table.txt v7.0 2014/11/12 14:33:31 $ -->
 
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
@@ -70,7 +70,7 @@
       fam7_no_date%nn;
     %end;
   %and;
-    %xx.has_sosa;
+    .%xx.has_sosa;
   %and;
     %if;("lexa" = "him/her")fam7_him_her%end;
   %and;
@@ -111,7 +111,7 @@
   %and;
     %if;are_married;&amp;%else;-%end;%if;are_divorced;)(%elseif;are_separated;|%end;%nn;
   %and;
-    %xx;<br%/> &amp; %spouse;%nn;
+    %xx;<br> &amp; %spouse;%nn;
   %and;
     %if;(cancel_links or xx.is_restricted)
       %lxr;%nn;
@@ -133,7 +133,7 @@
       fam7_no_date%nn;
     %end;
   %and;
-    %xx.has_sosa;
+    .%xx.has_sosa;
   %and;
     %if;("lexa" = "him/her")
       fam7_him_her%nn;

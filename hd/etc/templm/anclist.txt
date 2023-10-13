@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anclist.txt,v 7.00 2015/07/05 13:23:34 mr Exp $ -->
+  <!-- $Id: templm/anclist.txt v7.0 2015/07/05 13:23:34 $ -->
   %let;l_v0;%evar.v;%in;
   %let;l_v;%if;(bvar.max_anc_level = "")%l_v0;%elseif;(bvar.max_anc_level > l_v0)%l_v0;%else;%bvar.max_anc_level;%end;%in;
   <title>%nn;
@@ -13,7 +13,7 @@
     %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [places]
     %elseif;(evar.t = "F" and evar.tf1 = "aad") - [*age at death] ([M/F]0, [M/F]1)
     %elseif;(evar.t = "F" and evar.tf1 = "afm") - [*age] ([father/mother]0, [father/mother]1)
-    %else; - [*ancestors] -
+    %else; - [*ancestor/ancestors]1 -
     %end;
   </title>
   <meta name="robots" content="none"%/>
@@ -27,7 +27,6 @@
       var varZIndex = 1;
     //-->
   </script>
-  %include;hed
 </head>
 %(<!-- Begin define --> %)
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
@@ -71,11 +70,12 @@
 
 %(<!-- End define --> %)
 <body%body_prop; id="anclist">
+%include;hed
 %message_to_wizard;
 <h1>%nn;
   %if;(evar.tf1 != "csv")
     %apply;a_of_b%with;
-      %if;(evar.fam7 = "on")7 [family/families]1%else;[*ancestors]%end;
+      %if;(evar.fam7 = "on")7 [family/families]1%else;[*ancestor/ancestors]1%end;
     %and;
       %if;(not cancel_links)<a href="%prefix;%access;">%end;
         %if;(public_name != "")%public_name;%else;%first_name;%end;
@@ -84,7 +84,7 @@
         %if;(alias != "") <em>(%alias;)</em>%end;
       %if;(not cancel_links)</a>%end;
     %end;
-      %sp;%dates;<br%/>
+      %sp;%dates;<br>
   %end;
   %if;(evar.t = "F" and evar.tf1 = "csv")
     %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [places]
@@ -155,7 +155,7 @@
   %if;not cancel_links;
     %include;tools
     %apply;tools_anclist()
-    %include;trl
+    %base_trailer;
     %include;copyr
   %end;
 %end;

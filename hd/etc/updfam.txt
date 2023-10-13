@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updfam.txt,v 7.00 exp 21/06/2018 23:27:22 $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: updfam.txt v7.1 10/012023 20:01:49 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -19,9 +19,9 @@
     %end;
   </title>
   %include;css
-  %include;hed
 </head>
 <body%body_prop; id="family">
+%include;hed
 %message_to_wizard;
 <div class="container">
 %( do not use %include;perso_header %)
@@ -29,13 +29,13 @@
 
 %define;nav()
   <div class="container fixed-top" role="navigation">
-    <nav class="navbar navbar-light bg-white justify-content-end" id="banner">
+    <nav class="navbar navbar-light bg-white justify-content-center" id="banner">
       <nav class="nav nav-pills nav-fill">
-        <a class="nav-item nav-link" href="#family" title="[*parents]"><i class="fa fa-male fa-fw" aria-hidden="true"></i><i class="fa fa-female" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*parents]</span></a>
-        <a class="nav-item nav-link" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*event/events]1</span></a>
-        <a class="nav-item nav-link" href="#children" title="[*child/children]1"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*child/children]1</span></a>
-        <a class="nav-item nav-link" href="#sources" title="[*source/sources]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*source/sources]1</span></a>
-        <a class="nav-item nav-link" href="#comments" title="[*comment]1"><i class="fa fa-file-alt fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*comment]</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#family" title="[*parents]"><i class="fa fa-male fa-fw" aria-hidden="true"></i><i class="fa fa-female" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*parents]</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*event/events]1</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#children" title="[*child/children]1"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*child/children]1</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#sources" title="[*source/sources]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*source/sources]1</span></a>
+        <a class="nav-item nav-link px-2 py-1" href="#comments" title="[*comment]1"><i class="fa fa-file-alt fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*comment]</span></a>
       </nav>
     </nav>
   </div>
@@ -48,7 +48,7 @@ $(document).ready(function(){
         $("#paxcnt_div").hide();
       else
         $("#paxcnt_div").show();
-      %($("#paxcnt_occupation").prop('readonly', true);%)
+      %($("#paxcnt_occu").prop('readonly', true);%)
    }).change();
 });
 %end;
@@ -69,7 +69,7 @@ $(document).ready(function(){
 %end;
 
 %define;date(xlab,xvar,xdt)
-  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="1" maxlength="2" %readonly;%in;
+  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2" %readonly;%in;
   %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2" %readonly;%in;
   %let;year_input;pattern="[?><~/+-]?\d*/?" size="4" maxlength="8" %readonly;%in;
   <div class="row">
@@ -233,12 +233,12 @@ $(document).ready(function(){
 %end;
 
 %define;small_date(kind,xvar,xx,verbose)
-  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="1" maxlength="2" %readonly;%in;
+  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2" %readonly;%in;
   %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2" %readonly;%in;
   %let;year_input;pattern="[?><~/-+]?\d*/?" size="4" maxlength="8" %readonly;%in;
   <div class="row">
     <span class="col-sm-2 col-form-label">[*kind]</span>
-    <div class="col-sm-3 form-inline">
+    <div class="col-sm-auto form-inline">
       %if;([!dates order]0 = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
         <label for="xvar_dd" class="col-form-label %if;(verbose=true)sr-only%end;">[year/month/day]2</label>
         <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
@@ -277,10 +277,18 @@ $(document).ready(function(){
   %apply;small_date("death","xvard","xx","verbose")
 %end;
 
-%define;parent(xcnt,xx)
+%define;w_birth(xcnt, wcnt,xx,verbose)
+  %apply;small_date("birth","excnt_witnwcnt_b","fwitness","verbose")
+%end;
+
+%define;w_death(xcnt, wcnt,xx,verbose)
+  %apply;small_date("death","excnt_witnwcnt_d","fwitness","verbose")
+%end;
+
+%define;parent(xcnt,xx,psex)
   <div class="row">
-    <label for="paxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0 <span class="font-weight-bold text-uppercase">%if;(bvar.multi_parents!="yes")%parent.himher;%nn;
-      %else;pxcnt%end;</span></label>
+    <label for="paxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0 <span class="font-weight-bold text-uppercase">pxcnt%nn;
+    %sp;%sp;(%apply;nth_c%with;MFN%and;psex%end;)</span></label>
     <div class="col-sm-8">
       <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0" %if;(evar.m="ADD_FAM" and xx.first_name="")autofocus%end;>
     </div>
@@ -305,9 +313,9 @@ $(document).ready(function(){
     %apply;birth("paxcnt","xx","true")
     %apply;death("paxcnt","xx","true")
     <div class="row">
-      <label for="paxcnt_occupation" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
+      <label for="paxcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
       <div class="col-sm">
-        <input class="form-control" name="paxcnt_occupation" id="paxcnt_occupation" maxlength="300" placeholder="[*occupation/occupations]0" value="%xx.create.occupation;">
+        <input class="form-control" name="paxcnt_occu" id="paxcnt_occu" maxlength="300" placeholder="[*occupation/occupations]0" value="%xx.create.occupation;">
       </div>
     </div>
   </div>
@@ -336,6 +344,7 @@ $(document).ready(function(){
   <select class="form-control custom-select font-weight-bold" id="fevent_selectxcnt" onchange="show_fevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
     <option value="">[*custom event]</option>
     <option disabled>──────────</option>
+    <option value=""> - </option>
     <option value="#marr" %if;(event.e_name = "#marr" or event.e_name="") selected %end;>[*marriage event]</option>
     <option value="#nmar" %if;(event.e_name = "#nmar") selected%end;>[*no marriage event]</option>
     <option value="#enga" %if;(event.e_name = "#enga") selected%end;>[*engage event]</option>
@@ -390,23 +399,28 @@ $(document).ready(function(){
 %end;
 
 %define;one_witness(xcnt, wcnt)
+  <hr>
   <div class="row mt-3">
     <h5 class="col-md-2 col-form-label">[*witness/witness/witnesses]0 wcnt</h5>
     <div class="col-md-2">
       <select class="form-control" name="excnt_witnwcnt_p">
-       <option value="link"%if;(fwitness.create = "link") selected%end;>[*link]0</option>
-       <option value="create"%if;(fwitness.create = "create") selected%end;>[*create]0</option>
+        %if;((fwitness.surname="" and fwitness.first_name="") or fwitness.create = "create")
+          <option value="create "%if;(fwitness.create = "create") selected%end;>[*create]0</option>
+        %else;
+          <option value="link" %if;(fwitness.create = "link") selected%end;>[*link]0</option>
+        %end;
      </select>
     </div>
     <div class="col-md-3">
       <select class="form-control" name="excnt_witnwcnt_kind">
-	<option value="" %if;(fwitness_kind = "") selected="selected" %end;>[*witness/witnesses]0</option>
-	<option value="info" %if;(fwitness_kind = "info") selected="selected" %end;>[*informant/informant/informant]2</option>
+        <option value=""> - </option>
+        <option value="" %if;(fwitness_kind = "") selected="selected" %end;>[*witness/witnesses]0</option>
+        <option value="info" %if;(fwitness_kind = "info") selected="selected" %end;>[*informant/informant/informant]2</option>
         <option value="atte" %if;(fwitness_kind = "atte") selected="selected" %end;>[*present/present/present]2</option>
-	<option value="ment" %if;(fwitness_kind = "ment") selected="selected" %end;>[*mentioned/mentioned/mentioned]2</option>
-	<option value="offi" %if;(fwitness_kind = "offi") selected="selected" %end;>[*civil registrar/civil registrar/civil registrar]2</option>
-	<option value="reli" %if;(fwitness_kind = "reli") selected="selected" %end;>[*parrish registrar/parrish registrar/parrish registrar]2</option>
-	<option value="othe" %if;(fwitness_kind = "othe") selected="selected" %end;>[*other/other/other]2</option>
+        <option value="ment" %if;(fwitness_kind = "ment") selected="selected" %end;>[*mentioned/mentioned/mentioned]2</option>
+        <option value="offi" %if;(fwitness_kind = "offi") selected="selected" %end;>[*civil registrar/civil registrar/civil registrar]2</option>
+        <option value="reli" %if;(fwitness_kind = "reli") selected="selected" %end;>[*parrish registrar/parrish registrar/parrish registrar]2</option>
+        <option value="othe" %if;(fwitness_kind = "othe") selected="selected" %end;>[*other/other/other]2</option>
       </select>
     </div>
   </div>
@@ -425,6 +439,8 @@ $(document).ready(function(){
     <div class="col-sm-5">
       <input type="text" class="form-control" name="excnt_witnwcnt_sn" maxlength="200" value="%fwitness.surname;" id="excnt_witnwcnt_sn" placeholder="[*surname/surnames]0">
     </div>
+  %( if new witness %)
+  %if;(fwitness.surname="" and fwitness.first_name="")
     <span class="col-sm-auto col-form-label">[*sex]</span>
     <div class="col-sm-auto mt-2">
       <div class="form-check form-check-inline">
@@ -443,6 +459,22 @@ $(document).ready(function(){
         </label>
       </div>
     </div>
+    <div class="col-sm-auto mt-2">
+      <label class="form-check-label">[*public]</label>
+        <input class="form-check-input col" type="checkbox" name="excnt_witnwcnt_pub">
+    </div>
+  </div>
+  <div class="row">
+    <label for="excnt_witnwcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
+    <div class="col-5">
+       <input class="form-control" type="text" name="excnt_witnwcnt_occu" value="%witness.create.occupation;" id="witnxcnt_occu" placeholder="[*occupation/occupations]0" %readonly;>
+    </div>
+    <div class="col-sm-auto mt-2">
+    <label class="form-check-label">[*of course dead]</label>
+      <input class="form-check-input col" type="checkbox" name="excnt_witnwcnt_od">
+    </div>
+  %end;
+  %(  end if new witness %)
   </div>
 %end;
 
@@ -554,13 +586,15 @@ $(document).ready(function(){
       <div class="row">
         <div class="col-11">
           %foreach;parent;
+            %let;ps;%parent.sex;%in;
+            %let;os;%parent.sexes;%in;
             %if;(cnt!=1 and bvar.multi_parents="yes")<hr class="w-100">%end;
-            %apply;parent(cnt, "parent")
+            %apply;parent(cnt, "parent", ps)
             %if;(bvar.multi_parents="yes")%apply;insert_parent(cnt)%end;
-            %if;(bvar.multi_parents!="yes" and cnt=1)
+            %if;(cnt=2)
               <div class="form-check my-2">
                 <label class="form-check-label">
-                <input type="checkbox" class="form-check-input" name="nsck" value="on"%if;(mrel="nsck" or mrel="nsckm") checked%end;%/>
+                <input type="checkbox" class="form-check-input" name="nsck" value="on"%if;(os=3) checked%end;%/>
                   [*no sexes check]
                 </label>
               </div>
@@ -675,9 +709,9 @@ $(document).ready(function(){
     %apply;birth("chxcnt", "child", "true")
     %apply;death("chxcnt", "child", "true")
     <div class="row">
-      <label for="chxcnt_occupation" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
+      <label for="chxcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
       <div class="col-sm">
-         <input class="form-control" type="text" name="chxcnt_occupation" value="%child.create.occupation;" id="chxcnt_occupation" placeholder="[*occupation/occupations]0" %readonly;>
+         <input class="form-control" type="text" name="chxcnt_occu" value="%child.create.occupation;" id="chxcnt_occu" placeholder="[*occupation/occupations]0" %readonly;>
       </div>
     </div>
   </div>
@@ -752,7 +786,7 @@ $(document).ready(function(){
   </div>
 </form>
 
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

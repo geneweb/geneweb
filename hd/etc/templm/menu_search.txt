@@ -1,4 +1,4 @@
-<!-- $Id: menu_search.txt,v 7.00exp 08/02/2016 05:44:45 A2 Exp $ -->
+<!-- $Id: templm/menu_search.txt v7.0 08/02/2016 05:44:45 $ -->
 %include;js_perso_accesskey
 %define;lang(x)
   %apply;nth%with;
@@ -8,9 +8,9 @@
 %define;link_lang()
   %for;i;1;30;
     %let;l1;%apply;lang(i)%in;
-    <a href="%prefix_base_password;templ=%evar.templ;;lang=%l1;;%suffix;" title="%apply;language_name(l1)" 
+    <a href="%prefix_base_password;templ=%evar.templ;&lang=%l1;&%suffix;" title="%apply;language_name(l1)" 
       style="%if;((bvar.default_lang=l1 and evar.lang="") or evar.lang=l1)background-color:%if;(bvar.css=1)#666;%else;#EEE;%end;%end;">
-       %if;(bvar.show_flag = "yes")<img src="%image_prefix;/flags/l-%l1;.jpg" width="20" height="11" alt="flag" id="i%tt;" style="border:0"%/> %end;
+       %if;(bvar.show_flag = "yes")<img src="%image_prefix;/flags/l-%l1;.jpg" width="20" height="11" alt="flag" id="i%tt;" style="border:0"> %end;
        %l1; %apply;language_name(l1)</a>
   %end;
 %end;
@@ -32,44 +32,44 @@
       <span><input id="acckey" name="acckey" %laZ; %if;(evar.m!="A")autofocus%end; onkeypress="javascript:return acc_key(this,event,'sib_1','spo_1','chi_1_1','mod_ind','add_par','add_fam','mod_fam_1');"/>
         <span class="s_menu">
           %if;(evar.m = "MOD_IND")
-          Alt+%lpc1k; [first name/first names]0<br%/>
-          Alt+%lpc2k; [birth]<br%/>
-          Alt+%lpc3k; [death]<br%/>
-          Alt+%lpc4k; [add] [event/events]0<br%/>
-          Alt+%lpc5k; [note/notes]1<br%/>
-          Alt+%lpc6k; [relation/relations]1<br%/>
-          Alt+%lpc7k; [title/titles]1<br%/>
-          Alt+%lpcPk; [occupation/occupations]0<br%/>
-          Alt+%lpcOk; [invert::event/events]1<br%/><br%/>
+          Alt+%lpc1k; [first name/first names]0<br>
+          Alt+%lpc2k; [birth]<br>
+          Alt+%lpc3k; [death]<br>
+          Alt+%lpc4k; [add] [event/events]0<br>
+          Alt+%lpc5k; [note/notes]1<br>
+          Alt+%lpc6k; [relation/relations]1<br>
+          Alt+%lpc7k; [title/titles]1<br>
+          Alt+%lpcPk; [occupation/occupations]0<br>
+          Alt+%lpcOk; [invert::event/events]1<br><br>
           %elseif;(evar.m ="MOD_FAM" or evar.m ="ADD_FAM")
-          Alt+%lfc1k; [first name/first names]0 [father/mother]0<br%/>
-          Alt+%lfc2k; [add] [child/children]0<br%/>
-          Alt+%lfc3k; [date of marriage]/[relation/relations]0<br%/>
-          Alt+%lfc4k; [add] [event/events]0<br%/>
-          Alt+%lfc5k; [marriage notes]<br%/>
-          Alt+%lfc6k; [source/sources]1<br%/>
-          Alt+%lpcOk; [invert::event/events]1 [family/families]0<br%/><br%/>
+          Alt+%lfc1k; [first name/first names]0 [father/mother]0<br>
+          Alt+%lfc2k; [add] [child/children]0<br>
+          Alt+%lfc3k; [date of marriage]/[relation/relations]0<br>
+          Alt+%lfc4k; [add] [event/events]0<br>
+          Alt+%lfc5k; [marriage notes]<br>
+          Alt+%lfc6k; [source/sources]1<br>
+          Alt+%lpcOk; [invert::event/events]1 [family/families]0<br><br>
           %else;
-          (0) [spouse/spouses]1<br%/>
-          (1) [siblings]<br%/>
-          (2 3 4 5 6 7) [n° Sosa] [ancestors]<br%/>
-          (8) [child/children]1<br%/>
-          (9) [child/children]1 Sosa<br%/>
-          (%laDk;) [difference between the two revisions]<br%/>
-          (%laRk;) [relationship computing]<br%/>
-          (%laSk;) [navigation with %t as Sosa reference:::xx]<br%/>
-          (%laYk;) [tree]<br%/><br%/>
+          (0) [spouse/spouses]1<br>
+          (1) [siblings]<br>
+          (2 3 4 5 6 7) [n° Sosa] [ancestor/ancestors]1<br>
+          (8) [child/children]1<br>
+          (9) [child/children]1 Sosa<br>
+          (%laDk;) [difference between the two revisions]<br>
+          (%laRk;) [relationship computing]<br>
+          (%laSk;) [navigation with %t as Sosa reference:::xx]<br>
+          (%laYk;) [tree]<br><br>
             %if;wizard;
-            (%laAk;) [add::family/families]0<br%/>
-            (%laFk;) [modify::family/families]0 1<br%/>
-            (%laGk;) [modify::family/families]0 2<br%/>
-            (%laHk;) [modify::family/families]0 3<br%/>
-            (%laIk;) [send::image/images]0<br%/>
-            (%laLk;) [add::parents]<br%/>
-            (%laPk;) [modify::person/persons]0<br%/>
+            (%laAk;) [add::family/families]0<br>
+            (%laFk;) [modify::family/families]0 1<br>
+            (%laGk;) [modify::family/families]0 2<br>
+            (%laHk;) [modify::family/families]0 3<br>
+            (%laIk;) [send::image/images]0<br>
+            (%laLk;) [add::parents]<br>
+            (%laPk;) [modify::person/persons]0<br>
             %end;
           %end;
-          (%laWk;) [search/case sensitive]0<br%/>
+          (%laWk;) [search/case sensitive]0<br>
         </span>
       </span>
     </form>
@@ -115,8 +115,8 @@
     title="[*advanced request]0%nl;%nl;[*select]%nl;%if;(evar.templ != "")%evar.templ;%else;templ%end;">%if;(bvar.hide_advanced_request != "yes")🔍%else;templ%end;</a>
     %if;(evar.digest = "")
       <span class="s_menu" id="tpl">
-        <a href="%prefix_no_all;templ=;%suffix;" %apply;bg("")>default</a>
-        %( <a href="%prefix_no_all;templ=templa;%suffix;" %apply;bg("templa")>templa</a> %)
+        <a href="%prefix_set.all;templ=&%suffix;" %apply;bg("")>default</a>
+        %( <a href="%prefix_set.all;templ=templa&%suffix;" %apply;bg("templa")>templa</a> %)
         %if;(wizard or bvar.wizard_passwd = "")
           <small><a href="%prefix;m=H;v=doc_templm">doc templm</a></small>
         %end;

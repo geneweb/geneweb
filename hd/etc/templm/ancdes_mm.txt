@@ -1,4 +1,4 @@
-<!-- $Id: ancdes_mm.txt,v 7.00 2014/12/01 15:09:00 mr Exp $ -->
+<!-- $Id: templm/ancdes_mm.txt v7.0 2014/12/01 15:09:00 $ -->
 
 %( tf1/tl1 = mm %)
 

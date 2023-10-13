@@ -1,6 +1,5 @@
-
-(** Current Geneweb version *)
 val txt : string
+(** Current Geneweb version *)
 
-(** List of all supported by Geneweb languages (abbreviations). *)
 val available_languages : string list
+(** List of all supported by Geneweb languages (abbreviations). *)

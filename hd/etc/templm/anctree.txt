@@ -1,7 +1,7 @@
 ﻿%doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anctree.txt,v 7.00 2015/12/10 21:34:32 mr Exp $ -->
+  <!-- $Id: templm/anctree.txt v7.0 2015/12/10 21:34:32 $ -->
   %let;l_v0;%if;(evar.maxv!="" and evar.v > evar.maxv)%evar.maxv;%else;%evar.v;%end;%in;
   %let;l_v;%if;(bvar.max_anc_tree = "" or evar.t != "T")%l_v0;%elseif;(bvar.max_anc_tree > l_v0)%l_v0;%else;%bvar.max_anc_tree;%end;%in;
   <title>%nn;
@@ -24,7 +24,6 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include;css
-  %include;hed
 </head>
 
 %define;symbol(xx)
@@ -63,13 +62,13 @@
       %end;
       %cell.person.title;%cell.person.dates;
       %if;(evar.image!="off" and cell.person.has_image)
-        <br%/>
+        <br>
         %if;(evar.cgl != "on")
           <a href="%cell.person.image_html_url;"
             ><img src="%cell.person.image_url;"%cell.person.image_small_size; border="0" alt="[image/images]0"
-          %/></a>
+          ></a>
         %else;
-          <img src="%cell.person.image_url;"%cell.person.image_small_size; border="0" alt="[image/images]0"%/>
+          <img src="%cell.person.image_url;"%cell.person.image_small_size; border="0" alt="[image/images]0">
         %end;
       %end;
       %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")
@@ -89,9 +88,9 @@
           %if;(evar.marriage = "on" and cell.family.marriage_date.year != "")
             <i style="font-size:80%%">%nn;
                &amp;%nn;
-              %if;(cell.family.marriage_date.prec = "&lt;")
+              %if;(cell.family.marriage_date.prec = "&#60;")
                 /%cell.family.marriage_date.year;%nn;
-              %elseif;(cell.family.marriage_date.prec = "&gt;")
+              %elseif;(cell.family.marriage_date.prec = "&#62;")
                 %cell.family.marriage_date.year;/%nn;
               %elseif;(cell.family.marriage_date.prec = "|" or cell.family.marriage_date.prec = "..")
                 %cell.family.marriage_date.year;%nn;
@@ -107,7 +106,7 @@
       %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
       %elseif;(evar.cgl = "on")%apply;symbol("cell.person")%nn;
       %else;
-        <a style="text-decoration:none;" title="[*navigation]" href="%prefix_no_iz;%cell.person.access;;%nn;
+        <a style="text-decoration:none;" title="[*navigation]" href="%prefix_set.iz;%cell.person.access;;%nn;
         %foreach;env_binding;
           %if;(env.key = "" or env.key = "p" or env.key = "n" or env.key = "oc" or env.key = "i" or env.key = "templ")
           %else;%env.key;=%env.val.decoded;;%nn;
@@ -121,7 +120,7 @@
     %foreach;cell;
       %if;(not is_first)
         <td colspan="1" align="center">%nn;
-        %if;(cell.is_right)<hr class="full"%/>%nn;
+        %if;(cell.is_right)<hr class="full">%nn;
         %end;
         </td>
       %end;
@@ -130,8 +129,8 @@
          %elseif;cell.is_right;%left;
          %else;center%end;">%nn;
       %if;cell.is_empty;%nn;
-      %elseif;cell.is_left;<hr class="%right;"%/>%nn;
-      %elseif;cell.is_right;<hr class="%left;"%/>%nn;
+      %elseif;cell.is_left;<hr class="%right;">%nn;
+      %elseif;cell.is_right;<hr class="%left;">%nn;
       %end;
       </td>
     %end;
@@ -147,7 +146,7 @@
     <a href="%prefix;%xx.access">%xx;</a>
     %end;
     %xx.title;%xx.dates;
-    %if;("xx" != "self")<br%/>│<br%/>%end;
+    %if;("xx" != "self")<br>│<br>%end;
   %end;%nl;
 %end;
 
@@ -159,7 +158,7 @@
     <a href="%prefix;%xx.access">%xx;</a>
     %end;
     %xx.title;%xx.dates;
-    %if;("xx" != "self")<br%/>│<br%/>%end;
+    %if;("xx" != "self")<br>│<br>%end;
   %end;%nl;
 %end;
 
@@ -196,6 +195,7 @@
 %end;
 
 <body%body_prop; id="anctree">
+%include;hed
 %message_to_wizard;
 
 %if;not cancel_links;
@@ -203,7 +203,7 @@
     <div class="menu">
       %if;has_children;
         <span>
-        <a title="[tree] (Y)" accesskey="Y" href="%prefix_no_iz;%nn;
+        <a title="[tree] (Y)" accesskey="Y" href="%prefix_set.iz;%nn;
           %foreach;env_binding;
             %if;(env.key = "m")m=D;%nn;
             %elseif;(env.key = "templ")
@@ -244,7 +244,7 @@
   %include;tools
   %apply;tools_anctree()
   <div style="clear:both;"></div>
-  %include;trl
+  %base_trailer;
   %include;copyr
 %end;
 </body>

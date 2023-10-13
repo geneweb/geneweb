@@ -1,4 +1,4 @@
-<!-- $Id: modules/sources.txt v 7.00 02/04/2018 08:52:26 hg -->
+<!-- $Id: modules/sources.txt v7.0 28/10/2018 23:10:24 $ -->
 %( op_m=1 Sources  %)
 %( op_m=2 Sources complete (events) %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;

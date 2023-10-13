@@ -8,17 +8,33 @@
 %end;
 
 %define;togen(xx)
-  %if;(xx = 1)[specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[to the parents]%nn;
-  %elseif;(xx = 3)[to the grandparents]%nn;
-  %elseif;(xx = 4)[to the great-grandparents]%nn;
+  %if;(xx = 0)[specify::generation/generations]0%nn;
+  %elseif;(xx = 1)[to the parents]%nn;
+  %elseif;(xx = 2)[to the grandparents]%nn;
+  %elseif;(xx = 3)[to the great-grandparents]%nn;
   %else;
     %apply;tothegen%with;
       %apply;nth([nth (generation)], xx)
     %end;
   %end;
 %end;
-
+%define;thegen(xx)
+  [the %s generation:::xx]%nn;
+%end;
+%define;gena(xx)
+  %if;(xx = 0)[*specify::generation/generations]0%nn;
+  %elseif;(xx = 1)[*the parents]%nn;
+  %elseif;(xx = 2)[*the grandparents]%nn;
+  %elseif;(xx = 3)[*the great-grandparents]%nn;
+  %else;
+    %apply;thegen%with;
+      %apply;nth([nth (generation)], xx)
+    %end;
+  %end;
+%end;
+%define;on_side(xx)
+  [*on %s's side:::xx]
+%end;
 %define;relation_type_txt(xx, sex)
   %if;("xx" = [adoptive father/adoptive mother/adoptive parents]2)
     %apply;capitalize(nth([adoptive father/adoptive mother/adoptive parents], sex))
@@ -120,7 +136,7 @@
 %define;display_union(xx)
   <table class="fp_table" cellspacing="0">
     <tr>
-      <td width="28"><img src="%image_prefix;/marriage.png"%/></td>
+      <td width="28"><img src="%image_prefix;/marriage.png"></td>
       <td>
         <table>
           <tr>
@@ -130,7 +146,7 @@
             </td>
             <td>
               %if;spouse.has_occupation;
-                <span class="fp_grey_italic">[*occupation/occupations]0:</span>
+                <span class="fp_grey_italic">[*occupation/occupations]0[:]</span>
                 %spouse.occupation;
               %end;
             </td>
@@ -140,9 +156,9 @@
               %apply;relation_txt()
               %if;xx.computable_marriage_age;
                 %if;(are_married or are_engaged)
-                  %apply;capitalize(nth([groom/bride], xx.sex)): %xx.marriage_age;%sp;
+                  %apply;capitalize(nth([groom/bride], xx.sex))[:] %xx.marriage_age;%sp;
                 %else;
-                  %apply;capitalize(nth([conjoint/conjointe], xx.sex)): %xx.marriage_age;%sp;
+                  %apply;capitalize(nth([conjoint/conjointe], xx.sex))[:] %xx.marriage_age;%sp;
                 %end;
               %end;
               %if;(xx.computable_marriage_age and spouse.computable_marriage_age)
@@ -150,9 +166,9 @@
               %end;
               %if;spouse.computable_marriage_age;
                 %if;(are_married or are_engaged)
-                  %apply;capitalize(nth([groom/bride], spouse.sex)): %spouse.marriage_age;
+                  %apply;capitalize(nth([groom/bride], spouse.sex))[:] %spouse.marriage_age;
                 %else;
-                  %apply;capitalize(nth([conjoint/conjointe], spouse.sex)): %spouse.marriage_age;
+                  %apply;capitalize(nth([conjoint/conjointe], spouse.sex))[:] %spouse.marriage_age;
                 %end;
               %end;
             </td>
@@ -168,7 +184,7 @@
         </table>
       </td>
     </tr>
-  </table><br/>
+  </table><br>
 
   %if;(evar.children = "on" and has_children)
     <table class="fp_table_children" cellspacing="0">
@@ -180,18 +196,18 @@
       %foreach;child;
         %apply;display_children("child",child_cnt)
       %end;
-    </table><br/>
+    </table><br>
   %end;
 
   %if;(evar.comm = "on" and (has_comment or has_marriage_note))
     <table class="fp_marriage_notes">
       <tr>
         <td>
-          <span class="textcolor">[*marriage notes/marriages notes]0:</span> %comment;
+          <span class="textcolor">[*marriage notes/marriages notes]0[:]</span> %comment;
           %if;has_marriage_note;%marriage_note;%end;
         </td>
       </tr>
-    </table><br/>
+    </table><br>
   %end;
 %end;
 
@@ -202,9 +218,9 @@
 %define;access(num,nnn)
   num_
   %if;("num" = 1)
-    %nnn;%nnn.title;%nnn.dates;<br%/>
+    %nnn;%nnn.title;%nnn.dates;<br>
   %else;
-    %apply;access_ind("nnn")<br%/>
+    %apply;access_ind("nnn")<br>
   %end;
 %end;
 
@@ -249,7 +265,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        /<br%/>
+        /<br>
       %end;
     %end;
   %end;
@@ -280,7 +296,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;/
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;\<br%/>
+        &nbsp;&nbsp;&nbsp;&nbsp;\<br>
       %end;
 
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -306,12 +322,12 @@
       %else
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;/<br%/>
+        &nbsp;&nbsp;/<br>
       %end;
     %else
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      &nbsp;&nbsp;&nbsp;&nbsp;/<br%/>
+      &nbsp;&nbsp;&nbsp;&nbsp;/<br>
     %end;
   %end;
 
@@ -335,7 +351,7 @@
         |
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        \<br%/>
+        \<br>
       %end;
 
       |
@@ -367,13 +383,13 @@
         &nbsp;&nbsp;\
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br%/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
       %end;
     %else
       |
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      &nbsp;&nbsp;\<br%/>
+      &nbsp;&nbsp;\<br>
     %end;
   %end;
 
@@ -404,7 +420,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br%/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br>
       %end;
 
       |
@@ -474,7 +490,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br%/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
       %end;
     %end;
   %end;
@@ -508,7 +524,7 @@
         &nbsp;&nbsp;/
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;\<br%/>
+        &nbsp;&nbsp;&nbsp;&nbsp;\<br>
       %end;
 
       |
@@ -538,7 +554,7 @@
       |
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      &nbsp;/<br%/>
+      &nbsp;/<br>
     %end;
   %end;
 
@@ -560,7 +576,7 @@
       %else
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;\<br%/>
+        &nbsp;&nbsp;\<br>
       %end;
 
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -589,12 +605,12 @@
         &nbsp;&nbsp;&nbsp;&nbsp;\
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br%/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
       %end;
     %else
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      &nbsp;&nbsp;&nbsp;&nbsp;\<br%/>
+      &nbsp;&nbsp;&nbsp;&nbsp;\<br>
     %end;
   %end;
 
@@ -624,7 +640,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        \<br%/>
+        \<br>
       %end;
 
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -666,25 +682,25 @@
         <td align="right">
           %if;(evar.sosa = "on" and xx.has_sosa)
             <span>
-              <img src="%image_prefix;/sosa.png" alt="sosa" title="sosa"/> [*Sosa] %xx.sosa;
+              <img src="%image_prefix;/sosa.png" alt="sosa" title="sosa"> [*Sosa] %xx.sosa;
             </span>
           %end;
         </td>
       </tr>
     </table>
     <div class="fp_person_info">
-      %if;(evar.image!="off" and xx.has_image)
+      %if;(e.im="" and xx.has_image)
         <table width="100%%">
           <tr>
             <td width="30">
-              <img src="%xx.image_url;"%xx.image_size; alt="[image/images]0" border="0"%/>
+              <img src="%xx.image_url;"%xx.image_size; alt="[image/images]0" border="0">
             </td>
             <td valign="top">
       %end;
       <ul class="fp_person_info_ul">
         %if;xx.has_aliases;
           <li>
-            <span class="fp_grey_italic">[*alias]:</span>
+            <span class="fp_grey_italic">[*alias][:]</span>
             %foreach;xx.alias;
               <em>%if;not is_first;,%end;&nbsp;%alias;</em>
             %end;
@@ -692,7 +708,7 @@
         %end;
         %if;xx.has_nobility_titles;
           <li>
-            <span class="fp_grey_italic">[*title/titles]1:</span>
+            <span class="fp_grey_italic">[*title/titles]1[:]</span>
             <em>
               %foreach;xx.nobility_title;
                 %if;not is_first;,%end;
@@ -703,14 +719,14 @@
         %end;
         %if;xx.has_occupation;
           <li>
-            <span class="fp_grey_italic">[*occupation/occupations]0:</span>
+            <span class="fp_grey_italic">[*occupation/occupations]0[:]</span>
             %xx.occupation;
           </li>
         %end;
         %if;((xx.has_aliases or xx.has_nobility_titles or xx.has_occupation) and
              ((xx.has_birth_date or xx.has_birth_place) or (xx.has_baptism_date or xx.has_baptism_place) or
              (xx.has_death_date or xx.has_death_place) or (xx.has_burial_date or xx.has_burial_place)))
-          <li><hr%/></li>
+          <li><hr></li>
         %end;
         %if;(xx.has_birth_date or xx.has_birth_place)
           <li>
@@ -749,7 +765,7 @@
           </li>
         %end;
       </ul>
-      %if;(evar.image!="off" and xx.has_image)
+      %if;(e.im="" and xx.has_image)
         </td></tr></table>
       %end;
     </div>
@@ -760,26 +776,26 @@
       <tr><th colspan="2">[*parents]</th></tr>
       <tr>
         <td>
-          <span class="fp_grey_italic">%apply;capitalize(nth([father/mother],xx.father.sex)):</span>
+          <span class="fp_grey_italic">%apply;capitalize(nth([father/mother],xx.father.sex))[:]</span>
           %xx.father;
           %if;(xx.father_age_at_birth != "")%sp;(%xx.father_age_at_birth;)%end;
         </td>
         <td>
           %if;xx.father.has_occupation;
-            <span class="fp_grey_italic">[*occupation/occupations]0:</span>
+            <span class="fp_grey_italic">[*occupation/occupations]0[:]</span>
             %xx.father.occupation;
           %end;
         </td>
       </tr>
       <tr>
         <td>
-          <span class="fp_grey_italic">%apply;capitalize(nth([father/mother],xx.mother.sex)):</span>
+          <span class="fp_grey_italic">%apply;capitalize(nth([father/mother],xx.mother.sex))[:]</span>
           %xx.mother;
           %if;(xx.mother_age_at_birth != "")%sp;(%xx.mother_age_at_birth;)%end;
         </td>
         <td>
           %if;xx.mother.has_occupation;
-            <span class="fp_grey_italic">[*occupation/occupations]0:</span>
+            <span class="fp_grey_italic">[*occupation/occupations]0[:]</span>
             %xx.mother.occupation;
           %end;
         </td>
@@ -874,7 +890,7 @@
   %if;(evar.rel = "on" and (xx.has_relations or count > 0))
     <div style="page-break-inside:avoid;">
       <table class="fp_table_relations" cellspacing="0">
-        <tr><th colspan="4" class="bgcolor">[*relation/relations]1</th></tr>
+        <tr><th colspan="4" class="background-color">[*relation/relations]1</th></tr>
         <tr class="fp_grey">
           <td class="borderna">[*name]</td>
           <td class="borderna" colspan="3">[*date/dates]1</td>
@@ -966,14 +982,14 @@
       <table class="fp_table_marriage" cellspacing="0">
         <tr>
           <th>
-            [*marriage/marriages]1 %if;(evar.children = "on" and xx.has_children) [and::child/children]1%end;
+            [*marriage/marriages]f %if;(evar.children = "on" and xx.has_children) [and] [child/children]c%end;
           </th>
         </tr>
         <tr>
           <td>
             %foreach;xx.family;
               %apply;display_union("xx")
-              %if;(family_cnt != xx.nb_families)<hr class="fp_family_separator"%/>%end;
+              %if;(family_cnt != xx.nb_families)<hr class="fp_family_separator">%end;
             %end;
           </td>
         </tr>
@@ -1007,13 +1023,13 @@
                     %if;event.has_witnesses;
                       <p style="margin:0;">
                         %foreach;event_witness;
-                          <span>%apply;capitalize(event_witness_kind) :</span>
-                          %apply;short_display_person("event_witness")<br/>
+                          <span>%apply;capitalize(event_witness_kind)[:]</span>
+                          %apply;short_display_person("event_witness")<br>
                         %end;
                       </p>
                     %end;
                     %if;event.has_note;<div>%event.note;</div>%end;
-                      %if;event.has_src;<span><em>[*source/sources]1: %event.src;</em></span>%end;
+                      %if;event.has_src;<span><em>[*source/sources]1[:] %event.src;</em>.</span>%end;
                   </td>
                 </tr>
               %end;
@@ -1041,7 +1057,7 @@
           <td>
             <ul class="fp_source">
               %foreach;xx.source;
-                <li>%source_type;: %source;</li>
+                <li>%source_type;[:] %source;</li>
               %end;
             </ul>
           </td>
@@ -1055,25 +1071,29 @@
   %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
   %if;(evar.v > 1)
     <span width=100%%">
-      <hr%/>
-      %apply;capitalize(nth([summary book ascendants], 3))%sp;
-      %apply;togen(nb_gen).
-      <hr%/>
+      <hr>
+      %apply;capitalize(nth([summary book ascendants], 3))%nn;
+      %if(evar.only="on"). [*only] %apply;gena(nb_gen)%else;%sp;%apply;togen(nb_gen)%end;.
+      <hr>
     </span>
     <ul class="fp_ul_summary">
       %foreach;ancestor_level(nb_gen)
-        %apply;lazy_print%with;
-          <li><b>[*generation/generations]0 %level;</b></li>
+        %if;(level>0)
+          %apply;lazy_print%with;
+            <li><b>[*generation/generations]0 %level;</b></li>
+          %end;
         %end;
-        %foreach;ancestor;
-          %lazy_force;
-          %if;(ancestor.same = "")
-            <li>
-              <a href="#ind_%ancestor.index;" class="see-more">%ancestor;</a>
-              %if;(evar.sosa = "on" and ancestor.has_sosa)
-                ([n° Sosa]&nbsp;:%sp;%ancestor.sosa;)
-              %end;
-            </li>
+        %if;(evar.only!="on" or (evar.only="on" and level=evar.v))
+          %foreach;ancestor;
+            %lazy_force;
+            %if;(ancestor.same = "")
+              <li>
+                <a href="#ind_%ancestor.index;" class="see-more">%ancestor;</a>
+                %if;(evar.sosa = "on" and ancestor.has_sosa)
+                  ([n° Sosa]&nbsp;:%sp;%ancestor.sosa;)
+                %end;
+              </li>
+            %end;
           %end;
         %end;
       %end;
@@ -1082,11 +1102,13 @@
   %end;
 
   %foreach;ancestor_level(nb_gen)
-    %foreach;ancestor;
-      %if;(ancestor.same = "")
-        %apply;print_long_ind("ancestor")
-        %if;(not (is_last and level = nb_gen))
-          <p style="page-break-after:always;">&nbsp;</p>
+    %if;(evar.only!="on" or (evar.only="on" and level=evar.v))
+      %foreach;ancestor;
+        %if;(ancestor.same = "")
+          %apply;print_long_ind("ancestor")
+          %if;(not (is_last and level = nb_gen))
+            <p style="page-break-after:always;">&nbsp;</p>
+          %end;
         %end;
       %end;
     %end;

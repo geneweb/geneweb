@@ -1,6 +1,5 @@
-  <!-- $Id: arbre_h7.txt,v 7.00 2016/05/02 23:28:26 mr Exp $ -->
+  <!-- $Id: modules/arbre_h7.txt v7.1 04/03/2023 10:39:01 $ -->
   <link type="text/css" href="%static_path;modules/arbre_h7%bvar.css;.css" media="all" rel="stylesheet" %/>
-
   %let;l_fs;%if;(evar.fs != "")%evar.fs;%else;9%end;%in;
   %let;l_wi;%if;(evar.wi != "")%evar.wi;%else;980%end;%in;
   %let;l_he;%if;(evar.he != "")%evar.he;%else;600%end;%in;
@@ -43,7 +42,6 @@
    -->
   </script>
 </head>
-
 %if;(not cancel_links)
   <div class="col-12 d-flex justify-content-end">
     %let;evsib;%if;(evar.siblings!="")%evar.siblings;%end;%in;
@@ -97,7 +95,7 @@
 %end;
 
 %define;tools()
-  <hr %/>
+  <hr>
   <form id="tools" name="tools" method="get" action="%action;">
     <fieldset>
       <legend>[*tools]0 <input type="submit" value="Ok"%/></legend>
@@ -139,13 +137,13 @@
     %else;href="%prefix;%access;" class="s%sex; nc%has_children;"
     %end;>
     %if;(evar.image!="off" and has_image)
-      <img src="%image_url;"%/><br%/>
+      <img src="%image_url;"><br>
     %end;
     %if;(evar.sosa = "on" and browsing_with_sosa_ref and has_sosa)
-      &middot; %sosa; &middot;<br%/>
+      &middot; %sosa; &middot;<br>
     %end;
-    %first_name;<br%/>%dates;
-    %if;(evar.bp = "on" and has_birth_place)<br%/>%birth_place;%end;
+    %first_name;<br>%dates;
+    %if;(evar.bp = "on" and has_birth_place)<br>%birth_place;%end;
   </a>
 %end;
 
@@ -155,7 +153,7 @@
       %if;(evar.image!="off" and level > 1 and level < 5)
         %foreach;ancestor;
           %if;ancestor.has_image;
-            <p id="pi%ancestor.anc_sosa.v;"><img src="%ancestor.image_url;"%/></p>
+            <p id="pi%ancestor.anc_sosa.v;"><img src="%ancestor.image_url;"></p>
           %end;
         %end;
       %end;
@@ -182,16 +180,16 @@
           %else;
             >
             %if;(l_sosa_ref = "on")
-              &middot; %ancestor.sosa; &middot;<br%/>
+              &middot; %ancestor.sosa; &middot;<br>
             %elseif;(evar.sosa = "on")
               &middot; %ancestor.anc_sosa;
               %if;(browsing_with_sosa_ref and ancestor.has_sosa) ~ %ancestor.sosa;%end;
-              %sp;&middot;<br%/>
+              %sp;&middot;<br>
             %end;
-            %ancestor;<br%/>
+            %ancestor;<br>
             %ancestor.dates;
             %if;(evar.bp = "on" and ancestor.has_birth_place)
-              <br%/>%ancestor.birth_place;
+              <br>%ancestor.birth_place;
             %end;
             </a>
           %end;

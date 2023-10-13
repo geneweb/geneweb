@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updhist.txt,v 5.12 2007-07-25 13:15:19 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: updhist.txt v7.1 04/03/2023 09:51:04 $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include;css
-%include;hed
 </head>
 <body %body_prop;>
+%include;hed
 %message_to_wizard;
 <div class="container">
 %define;search_form(xxx)
@@ -63,7 +63,7 @@
             <a href="%prefix;%person.access;">%person;</a>, %person.title;
             %person.dates;
             %if;(bvar.show_invisible = "on" and wizard and person.is_invisible)
-              <img src="%image_prefix;/restricted.png"%wid_hei;restricted.png; alt=" (x)"%/>%nn;
+              <img src="%image_prefix;/restricted.png"%wid_hei;restricted.png; alt=" (x)">%nn;
             %end;
           %elseif;is_note;
             - <a href="%prefix;m=NOTES%if;(note.page != "");f=%note.page.v;%end;
@@ -81,7 +81,7 @@
           %if;(user != "")
             <i>
               %if;(wiz = "")
-                <a href="%prefix;m=HIST;k=%kk;;wiz=%user.v;">%user;</a>%nn;
+                <a href="%prefix;m=HIST&k=%kk;&wiz=%user.v;">%user;</a>%nn;
               %else;
                 %user;
               %end;
@@ -92,7 +92,7 @@
         %if;(bvar.history_diff = "yes")
           <td class="text-center">
             %if;(first_name != "" and person.has_history)
-              <a href="%prefix;m=HIST_DIFF;t=SUM;f=%person.history_file;">
+              <a href="%prefix;m=HIST_DIFF&t=SUM&f=%person.history_file;">
                 <i class="fa fa-history fa-fw" aria-hidden="true" title="[*visualize/show/hide/summary]1 [history]"></i>
                 <span class="sr-only">[history]</span></a>
             %else;
@@ -125,7 +125,7 @@
   %elseif;(uu = "co")[modify::occupation/occupations]0%nn;
   %elseif;(uu = "fn")[modify::first name/first names]0%nn;
   %elseif;(uu = "sn")[modify::surname/surnames]0%nn;
-  %else;%appy;interp(uu) %nn;
+  %else;%apply;interp(uu) %nn;
   %end;
 %end;
 
@@ -176,7 +176,7 @@
   </div>
 %end;
 
-%include;trl
+%base_trailer;
 %include;copyr
 </div>
 %include;js

@@ -3,21 +3,20 @@
    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: upddata1.txt,v 7.00 2016/01/31 00:01:16 mr Exp $ -->
+  <!-- $Id: templm/upddata1.txt v7.0 2016/01/31 00:01:16 $ -->
   <title>%title;</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include;css
-  %include;hed
   <script type="text/javascript">
   <!--
 
   function submitupd()
   {
    var x1 = document.getElementById('nx_a');
-   var x2 = "%prefix;m=MOD_DATA_OK;data=%evar.data;;s=%encode.evar.s;;"
+   var x2 = "%prefix;m=MOD_DATA_OK&data=%evar.data;&s=%encode.evar.s;"
    var x3 = x1.title;
    var x4 = "nx_input=";
    var x5 = document.getElementById('nx_input').value;
@@ -133,6 +132,7 @@
 %end;
 
 <body%body_prop;>
+%include;hed
 <div id="nx_span" style="display:none">a</div>
 <div id="nx_a" style="display:none">a</div>
 
@@ -148,7 +148,7 @@
 %else;
   %apply;print_long()
 %end;
-%include;trl
+%base_trailer;
 %include;copyr
 
 </body>

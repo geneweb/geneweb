@@ -1,8 +1,9 @@
-<!-- $Id: modules/fratrie.txt v 7.00 28/03/2017 20:05:48 hg -->
+<!-- $Id: modules/fratrie.txt v7.1 04/03/2023 09:51:04 $ -->
 %( op_m=1 simple: name %)
 %( op_m=2 simple with photo %)
 %( op_m=3 complete: name, marriages %)
 %( op_m=4 complete with photo %)
+%( 2 and 4 should be option of 1 and 3 and should be removed %)
 
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 %let;op_fl;1%in; %( flèche frère suivant %)
@@ -18,28 +19,22 @@
               %if;(evar.cgl!="on")
                 <a href="%child.image_url;" class="align-self-center" target="_blank">
                   <img class="small_image rounded align-self-center" src="%child.image_url;" alt="[image/images]0" 
-                    title="%child; (%if;(child.is_male)[a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;)"%/>
+                    title="%child; (%if;(child.is_male)[a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;)">
               </a>
               %else;
                 <img class="small_image rounded align-self-center"%nn;
                   src="%child.image_url;" alt="[image/images]0"%nn;
-                  title="%child; (%if;(child.is_male)[a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;)"%/>
+                  title="%child; (%if;(child.is_male)[a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;)">
               %end;
             %elseif;(bvar.default_image="yes")
               <img class="small_image rounded align-self-center ml-2"%nn;
                 src="%image_prefix;/img_unknown_%if;(child.is_female)wo%elseif;(child.is_male)%else;u_%end;man.png" alt="[missing image]"%nn;
-                title="%if;(child.is_male)[*a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[*a brother/a sister/a sibling]2%end;"%/>
+                title="%if;(child.is_male)[*a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[*a brother/a sister/a sibling]2%end;">
             %else;
               <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
             %end;
             <div class="media-body ml-2 align-self-center">%nn;
-              %if;(bvar.full_siblings="yes")
-                %apply;short_display_person_tree("child")
-              %else;
-                %apply;short_display_person_noname("child","br","","","")
-              %end;
-              %if;child.computable_age;<br>%sp;%child.age;%end;
-              %if;child.computable_death_age;<br>%sp;%child.death_age;%end;
+              %apply;short_display_person_tree("child")
             </div>
           </div>
         %end;
@@ -67,9 +62,9 @@
         %end;
       %end;
       %if;(count=0)<span class="fa fa-caret-left invisible"></span>%end;
-      <a href="%prefix;i=%father.index;;m=D;t=T;v=1;image=on">%nn;
+      <a href="%prefix;%father.access;&m=D&t=T&v=1">%nn;
       <img class="px-1 mb-1" src="%image_prefix;/gui_create.png" height="20" alt="Tree"
-        title="[*tree] [siblings] ([with] [spouse/spouses]1)"/>%nn;
+        title="[*tree] [siblings] ([with] [spouse/spouses]1)">%nn;
       </a>%nn;
       %foreach;father.child;
         %if;is_sibling_after;
@@ -192,7 +187,7 @@
         %end;
       %end;
     %end;
-<!--  modules/freresoeur_complet (deux listes de demi frères côte à côte) -->
+%( frères et sœurs complet : deux listes de demi-frères côte-à-côte %)
 %elseif;(op_m=3 and has_parents and (half_father != 0 or half_mother != 0))
   <h2>[*half-brothers/half-sisters/half-siblings]2</h2>
   <table style="border:%border;;width:100%">
@@ -253,7 +248,7 @@
         %end;
       </tr>
     </table>
-<!--  Freres et soeurs complet photo (from templf) -->
+%( Freres et soeurs complet photo (from templf) %)
 %elseif;(op_m=4 and has_parents and (half_father != 0 or half_mother != 0))
   <table style="border-width:%border;;width:100%%">
     <tr>

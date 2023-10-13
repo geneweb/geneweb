@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: family.txt v 7.00 exp 30/10/2017 13:28:29 hg -->
+  <!-- $Id: family.txt v7.1 30/10/2017 13:28:29 -->
 <title>%nn;
   %if;has_public_name;
     %if;has_qualifiers;%public_name; %qualifier;
@@ -17,9 +17,9 @@
 <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
 %include;css
-%include;hed
 </head>
 <body%body_prop;>
+%include;hed
 %include;perso_utils
 <a href="#content" class="sr-only sr-only-focusable">Skip navigation menu</a>
 <div class="container%if;(evar.wide="on")-fluid%end;">
@@ -29,7 +29,7 @@
     %include;modules/arbre_famille
   </div>
   %if;(not cancel_links)
-    %include;trl
+    %base_trailer;
     %include;copyr
   %end;
 </div>

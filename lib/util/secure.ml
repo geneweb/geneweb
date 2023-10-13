@@ -26,14 +26,14 @@ let decompose =
 
 (* add asset to the list of allowed to acces assets *)
 let add_assets d =
-  assets_r := d :: !assets_r ;
+  assets_r := d :: !assets_r;
   ok_r := decompose d :: !ok_r
 
 (* set base dir to which acces could be allowed *)
 let set_base_dir d =
   let ok = decompose d in
-  bd_r := d ;
-  ok_r := ok :: (List.filter ((<>) ok)) !ok_r
+  bd_r := d;
+  ok_r := ok :: (List.filter (( <> ) ok)) !ok_r
 
 (* get all assets *)
 let assets () = !assets_r
@@ -42,9 +42,8 @@ let base_dir () = !bd_r
 (* [list_check_prefix d df] returns either [None] if [d] is not a prefix of
    [df], or [Some suffix], where [df = d @ suffix] *)
 let list_check_prefix d df =
-  let rec loop =
-    function
-      x :: xl, y :: yl -> if x = y then loop (xl, yl) else None
+  let rec loop = function
+    | x :: xl, y :: yl -> if x = y then loop (xl, yl) else None
     | [], df -> Some df
     | _, [] -> None
   in
@@ -61,34 +60,43 @@ let check fname =
   else
     let df = decompose fname in
     let rec loop = function
-      | d :: dl ->
-        begin match list_check_prefix d df with
+      | d :: dl -> (
+          match list_check_prefix d df with
           | Some bf when not (List.mem Filename.parent_dir_name bf) -> true
-          | _ -> loop dl
-        end
+          | _ -> loop dl)
       | [] ->
-        if Filename.is_relative fname
-        then not (List.mem Filename.parent_dir_name df)
-        else false
+          if Filename.is_relative fname then
+            not (List.mem Filename.parent_dir_name df)
+          else false
     in
     loop !ok_r
 
 let check_open fname =
-  if not (check fname) then begin
-    if Sys.unix then
-      begin
-        Printf.eprintf "*** secure rejects open %s\n" (String.escaped fname);
-        flush stderr
-      end;
-    raise (Sys_error "invalid access")
-  end
+  if not (check fname) then (
+    if Sys.unix then (
+      Printf.eprintf "*** secure rejects open %s\n" (String.escaped fname);
+      flush stderr);
+    raise (Sys_error "invalid access"))
 
 (* The following functions perform a [check] before opening the file,
    preventing potential attacks on the system.
 *)
-let open_in fname = check_open fname; Stdlib.open_in fname
-let open_in_bin fname = check_open fname; Stdlib.open_in_bin fname
-let open_out fname = check_open fname; Stdlib.open_out fname
-let open_out_bin fname = check_open fname; Stdlib.open_out_bin fname
+let open_in fname =
+  check_open fname;
+  Stdlib.open_in fname
+
+let open_in_bin fname =
+  check_open fname;
+  Stdlib.open_in_bin fname
+
+let open_out fname =
+  check_open fname;
+  Stdlib.open_out fname
+
+let open_out_bin fname =
+  check_open fname;
+  Stdlib.open_out_bin fname
+
 let open_out_gen mode perm fname =
-  check_open fname; Stdlib.open_out_gen mode perm fname
+  check_open fname;
+  Stdlib.open_out_gen mode perm fname

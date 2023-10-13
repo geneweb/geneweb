@@ -1,4 +1,4 @@
-<!-- $Id: css.txt, v7.00 10/01/2020 21:31:20 $ -->
+<!-- $Id: css.txt v7.1 28/03/2023 03:32:53 $ -->
 <style>/* Put here only properties that uses variables */
 li.folder { list-style-type: disc; list-style-image: url('%image_prefix;/folder.png'); }
 li.file { list-style-type: circle; list-style-image: url('%image_prefix;/file.png'); }
@@ -9,13 +9,20 @@ li.female { list-style-type: circle; list-style-image: url('%image_prefix;/femal
 </style>
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css"
-      integrity="sha384-REHJTs1r2ErKBuJB0fCK99gCYsVjwxHrSU0N7I1zl9vZbggVJXRMsv/sLlOAGb4M" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css"
+      integrity="sha512-rt/SrQ4UNIaGfDyEXZtNcyWvQeOq0QLygHluFQcSjaGB04IxWhal71tKuzP6K8eYXYB6vJV4pHkXcmFGGQ1/0w==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="" crossorigin="anonymous" referrerpolicy="no-referrer">
+    %if;(e.m="A" and e.t="")
+      <link rel="stylessheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/css/select2.min.css"
+        integrity="sha512-aD9ophpFQ61nFZP6hXYu4Q/b/USW7rpLCQLX6Bi0WJHXNO7Js/fUENpBQf/+P4NtpzNX0jSgR5zVvPOJp+W2Kg==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    %end;
   %else;
-    <link rel="stylesheet" href="%static_path;css/bootstrap.min.css?version=4.4.1">
-    <link rel="stylesheet" href="%static_path;css/all.min.css?version=5.12.0">
+    <link rel="stylesheet" href="%static_path;css/bootstrap.min.css?version=4.6.2">
+    <link rel="stylesheet" href="%static_path;css/all.min.css?version=6.4.0">
+    %if;(e.m="A" and e.t="")
+      <link rel="stylesheet" href="%static_path;css/select2.min.css?version=4.1.0rc">
+    %end;
   %end;
 %end;
 <link rel="stylesheet" href="%static_path;css/css.css">

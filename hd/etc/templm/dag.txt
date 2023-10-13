@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: dag.txt,v 7.00 2015/04/30 11:14:09 mr Exp $ -->
+  <!-- $Id: templm/dag.txt v7.0 2015/04/30 11:14:09 $ -->
   <title>%head_title;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -9,9 +9,9 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include;css
-  %include;hed
 </head>
 <body%body_prop; id="dag">
+%include;hed
 %message_to_wizard;
 
 %if;(not cancel_links and evar.notab != "on" )
@@ -31,7 +31,7 @@
     %if;(evar.t = "T")
       %if;(evar.m = "A")
         <span>
-          <a title="[*ascendants tree] (Y)" accesskey="Y" href="%prefix_no_iz;%nn;
+          <a title="[*ascendants tree] (Y)" accesskey="Y" href="%prefix_set.iz;%nn;
               %foreach;env_binding;
                 %if;(env.key = "m")m=D;%nn;
                 %elseif;(env.key = "templ")
@@ -41,7 +41,7 @@
         </span>
       %elseif;(evar.m = "D")
         <span>
-          <a title="[tree] (Y)" accesskey="Y" href="%prefix_no_iz;%nn;
+          <a title="[tree] (Y)" accesskey="Y" href="%prefix_set.iz;%nn;
               %foreach;env_binding;
                 %if;(env.key = "m")m=A;%nn;
                 %elseif;(env.key = "dag" or env.key = "templ")
@@ -74,7 +74,7 @@
       <span>
       %if;(pos1 = 0)
       %else;
-        <a href="%prefix_no_iz;
+        <a href="%prefix_set.iz;
           %foreach;env_binding;
             %if;(env.key != "pos1" and env.key != "pos2" and env.key != "templ")
               %env.key=%env.val.decoded;;%nn;
@@ -86,7 +86,7 @@
       %end;
       %if;(pos2 >= dag.ncol)&nbsp;%nn;
       %else;
-        <a href="%prefix_no_iz;
+        <a href="%prefix_set.iz;
           %foreach;env_binding;
             %if;(env.key != "pos1" and env.key != "pos2" and env.key != "templ")
               %env.key=%env.val.decoded;;%nn;
@@ -126,11 +126,11 @@
       %elseif;(dag_cell.text != "")%dag_cell.text;
       %else;
         %if;dag_cell.is_hr_left;
-          <hr class="%left;"%/>%nn;
+          <hr class="%left;">%nn;
         %elseif;dag_cell.is_hr_right;
-          <hr class="%right;"%/>%nn;
+          <hr class="%right;">%nn;
         %else;
-          <hr class="full"%/>%nn;
+          <hr class="full">%nn;
         %end;
       %end;
       </td>
@@ -144,7 +144,7 @@
 %if;not cancel_links;
   %include;tools
   %apply;tools_dag()
-  %include;trl
+  %base_trailer;
   %include;copyr
 %end;
 </body>

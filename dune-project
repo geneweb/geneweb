@@ -2,6 +2,10 @@
 
 (name geneweb)
 
+; ignore formatting of generated dune file
+(formatting
+ (enabled_for ocaml))
+
 (generate_opam_files true)
 (license GPL-2.0-only)
 (authors "Daniel de Rauglaudre")
@@ -17,7 +21,7 @@
   (tags (genealogy))
   (depends
     benchmark
-    calendars
+    (calendars (= "1.0.0"))
     (camlp5 (>= "8.00.01"))
     camlp-streams
     cppo

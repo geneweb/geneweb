@@ -1,4 +1,4 @@
-<!-- $Id: anclist_fam7_img.txt,v 7.00 2015/01/07 11:39:17 mr Exp $ -->
+<!-- $Id: templm/anclist_fam7_img.txt v7.0 2015/01/07 11:39:17 $ -->
 
 %let;ref_index;%index;%in;
 %let;ref_sex;%if(is_male)[him/her]0%elseif;(is_female)[him/her]1%else;0%end;%in;
@@ -213,7 +213,7 @@
   %( images (long display) %)
   %foreach;sorted_list_item;
     <div class="fam71">
-      <img alt="img" src="%item.5;"%/>
+      <img alt="img" src="%item.5;">
       <a style="color:transparent;"
          onfocus="style.color='#000'"
          onblur="style.color='transparent'"
@@ -239,8 +239,8 @@
            onmouseover="style.zIndex=varZIndex++;style.width='200px';style.height='300px';style.fontSize='12px';"
            onmousemove="style.left=event.clientX - 25 + 'px';style.top=event.clientY - 175 + 'px';"
            onmouseup="style.zIndex=varZIndex++;style.width='100px';style.height='150px';style.fontSize='0px';">
-        <img alt="img" src="%item.5;"%/>
-        <br%/>%item.2;<br%/>%item.1;<br%/><span>%item.3;</span>
+        <img alt="img" src="%item.5;">
+        <br>%item.2;<br>%item.1;<br><span>%item.3;</span>
       </div>
     %end;
   </div>

@@ -38,6 +38,7 @@
   )
   (preprocess (action (run %{bin:cppo} %%%CPPO_D%%% %{input-file})))
   (modules
+    base64
     gwd
     gwdPluginDep
     gwdPluginMD5

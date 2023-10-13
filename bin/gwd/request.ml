@@ -112,58 +112,18 @@ let specify conf base n pl =
   Output.print_sstring conf "<ul>\n";
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
-  List.iter begin fun (p, tl) ->
-    Output.print_sstring conf "<li>";
-    SosaCache.print_sosa conf base p true;
-    begin match tl with
-      | [] ->
-        Output.print_sstring conf " " ;
-        Output.print_string conf (referenced_person_title_text conf base p)
-      | t :: _ ->
-        Output.print_sstring conf {|<a href="|} ;
-        Output.print_string conf (commd conf) ;
-        Output.print_string conf (acces conf base p) ;
-        Output.print_sstring conf {|"> |};
-        Output.print_string conf (titled_person_text conf base p t);
-        Output.print_sstring conf "</a> ";
-        List.iter (fun t -> Output.print_string conf (one_title_text base t)) tl
-    end;
-    Output.print_string conf (DateDisplay.short_dates_text conf base p);
-    if authorized_age conf base p
-    then begin match get_first_names_aliases p with
-      | [] -> ()
-      | fnal ->
-        Output.print_sstring conf "\n<em>(" ;
-        Mutil.list_iter_first begin fun first fna ->
-          if not first then Output.print_sstring conf ", ";
-          sou base fna |> Util.escape_html |> Output.print_string conf
-        end fnal ;
-        Output.print_sstring conf ")</em>"
-    end ;
-    let spouses =
-      Array.fold_right begin fun ifam spouses ->
-        let cpl = foi base ifam in
-        let spouse = pget conf base (Gutil.spouse (get_iper p) cpl) in
-        if p_surname base spouse <> "?" then spouse :: spouses
-        else spouses
-      end (get_family p) []
-    in
-    begin match spouses with
-      | [] -> ()
-      | h :: hl ->
-        Output.print_sstring conf ", <em>&amp; " ;
-        List.fold_left
-          (fun s h -> s ^^^ ",\n" ^<^ person_title_text conf base h)
-          (person_title_text conf base h) hl
-        |> Output.print_string conf ;
-        Output.print_sstring conf "</em>"
-    end ;
-    Output.print_sstring conf "</li>"
-  end ptll;
-  Output.print_sstring conf "</ul>" ;
+  List.iter
+    (fun (p, _tl) ->
+       Output.print_sstring conf "<li>\n";
+       SosaCache.print_sosa conf base p true;
+       Update.print_person_parents_and_spouses conf base p;
+       Output.print_sstring conf "</li>\n"
+    ) ptll;
+  Output.print_sstring conf "</ul>\n";
   Hutil.trailer conf
 
-let incorrect_request conf = Hutil.incorrect_request conf
+let incorrect_request ?(comment = "") conf =
+  Hutil.incorrect_request ~comment:comment conf
 
 let person_selected conf base p =
   match p_getenv conf.senv "em" with
@@ -458,14 +418,25 @@ let treat_request =
             end ;
           | None -> ()
         end ;
-        let incorrect_request conf _ = incorrect_request conf in
+        let incorrect_request ?(comment = "") conf _ =
+          incorrect_request ~comment:comment conf
+        in
+        let doc_aux conf base print =
+          match Util.p_getenv conf.env "s" with
+          | Some f ->
+                if Filename.check_suffix f ".txt" then
+                  let f = Filename.chop_suffix f ".txt" in
+                  SrcfileDisplay.print_source conf base f
+                else print conf f
+          | _ -> incorrect_request conf base
+        in
         match m with
         | "" ->
-           let base =
-             match bfile with
-             | None -> None
-             | Some bfile -> try Some (Gwdb.open_base bfile) with _ -> None
-           in
+          let base =
+            match bfile with
+            | None -> None
+            | Some bfile -> try Some (Gwdb.open_base bfile) with _ -> None
+          in
           if base <> None then
             w_base @@
             if only_special_env conf.env then SrcfileDisplay.print_start
@@ -477,7 +448,7 @@ let treat_request =
           else if conf.bname = ""
           then fun conf _ -> include_template conf [] "index" (fun () -> propose_base conf)
           else
-            w_base begin
+            w_base begin (* print_start -> welcome.txt *)
               if only_special_env conf.env then SrcfileDisplay.print_start
               else w_person @@ fun conf base p ->
                 match p_getenv conf.env "ptempl" with
@@ -485,8 +456,15 @@ let treat_request =
                   Perso.interp_templ t conf base p
                 | _ -> person_selected conf base p
             end
+
+
+
+
+
+
+
         | "A" ->
-          Perso.print_ascend |> w_person |> w_base
+          AscendDisplay.print |> w_person |> w_base
         | "ADD_FAM" ->
           w_wizard @@ w_base @@ UpdateFam.print_add
         | "ADD_FAM_OK" ->
@@ -548,17 +526,30 @@ let treat_request =
           w_wizard @@ w_base @@ UpdateFam.print_del
         | "DEL_FAM_OK" ->
           w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_del
+
+        | "DEL_IMAGE" ->
+          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_del
+        | "DEL_IMAGE_OK" ->
+          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_del_ok
+        | "DEL_IMAGE_C_OK" ->
+          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+
         | "DEL_IND" ->
           w_wizard @@ w_base @@ UpdateInd.print_del
         | "DEL_IND_OK" ->
           w_wizard @@ w_lock @@ w_base @@ UpdateIndOk.print_del
+        | "DOC" ->
+          w_base @@ fun conf base -> doc_aux conf base
+            ImageDisplay.print_source
+        | "DOCH" ->
+          w_base @@ fun conf base -> doc_aux conf base
+            (fun conf _base -> ImageDisplay.print_html conf)
         | "F" ->
           w_base @@ w_person @@ Perso.interp_templ "family"
         | "H" ->
-          w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
+          w_base @@ fun conf base -> ( match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print conf base f
-            | None -> incorrect_request conf base
-          end
+            | None -> incorrect_request conf base)
         | "HIST" ->
           w_base @@ History.print
         | "HIST_CLEAN" ->
@@ -569,6 +560,13 @@ let treat_request =
           w_base @@ HistoryDiffDisplay.print
         | "HIST_SEARCH" ->
           w_base @@ History.print_search
+
+        | "IM_C" ->
+          w_base @@ ImageCarrousel.print_c ~saved:false
+        | "IM_C_S" ->
+          w_base @@ ImageCarrousel.print_c ~saved:true
+
+
         | "IM" ->
           w_base @@ ImageDisplay.print
         | "IMH" ->
@@ -579,6 +577,8 @@ let treat_request =
           w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_inv
         | "KILL_ANC" ->
           w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print_kill_ancestors
+        | "L" -> w_base @@ fun conf base -> Perso.interp_templ "list" conf base 
+              (Gwdb.empty_person base Gwdb.dummy_iper) 
         | "LB" when conf.wizard || conf.friend ->
           w_base @@ BirthDeathDisplay.print_birth
         | "LD" when conf.wizard || conf.friend ->
@@ -635,7 +635,7 @@ let treat_request =
           w_wizard @@ w_lock @@ w_base @@ MergeIndOkDisplay.print_mod_merge
         | "N" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some v -> Some.surname_print conf base Some.surname_not_found v
+            | Some v -> Some.search_surname_print conf base Some.surname_not_found v
             | _ -> AllnDisplay.print_surnames conf base
           end
         | "NG" -> w_base @@ begin fun conf base ->
@@ -665,7 +665,7 @@ let treat_request =
                 let (pl, sosa_acc) = find_all conf base n in
                 match pl with
                 | [] ->
-                  Some.surname_print conf base unknown n
+                  Some.search_surname_print conf base unknown n
                 | [p] ->
                   if sosa_acc
                   || Gutil.person_of_string_key base n <> None
@@ -680,9 +680,9 @@ let treat_request =
                   match real_input "fn", real_input "sn" with
                     Some fn, Some sn -> search (fn ^ " " ^ sn)
                   | Some fn, None ->
-                    Some.first_name_print conf base fn
+                    Some.search_first_name_print conf base fn
                   | None, Some sn ->
-                    Some.surname_print conf base unknown sn
+                    Some.search_surname_print conf base unknown sn
                   | None, None -> incorrect_request conf base
               end
             | Some i ->
@@ -697,15 +697,24 @@ let treat_request =
           w_base @@ BirthDeathDisplay.print_oldest_engagements
         | "P" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
-            | Some v -> Some.first_name_print conf base v
+            | Some v -> Some.search_first_name_print conf base v
             | None -> AllnDisplay.print_first_names conf base
           end
+
+
+        | "PERSO" ->
+          w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
+
         | "POP_PYR" when conf.wizard || conf.friend ->
           w_base @@ BirthDeathDisplay.print_population_pyramid
         | "PS" ->
           w_base @@ PlaceDisplay.print_all_places_surnames
+        | "PPS" ->
+          w_base @@ Place_v7.print_all_places_surnames
         | "R" ->
           w_base @@ w_person @@ relation_print
+        | "REFRESH" ->
+          w_base @@ w_person @@ Perso.interp_templ "carrousel"
         | "REQUEST" ->
           w_wizard @@ fun _ _ ->
             Output.status conf Def.OK;
@@ -714,12 +723,25 @@ let treat_request =
               Output.print_sstring conf s ;
               Output.print_sstring conf "\n"
             end conf.Config.request ;
+
+        | "RESET_IMAGE_C_OK" ->
+          w_base @@ ImageCarrousel.print_main_c
+
         | "RL" ->
           w_base @@ RelationLink.print
         | "RLM" ->
           w_base @@ RelationDisplay.print_multi
         | "S" ->
           w_base @@ fun conf base -> SearchName.print conf base specify unknown
+
+        | "SND_IMAGE" -> w_wizard @@w_lock @@ w_base @@ ImageCarrousel.print
+        | "SND_IMAGE_OK" ->
+           w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_send_ok
+        | "SND_IMAGE_C" ->
+          w_base @@ w_person @@ Perso.interp_templ "carrousel"
+        | "SND_IMAGE_C_OK" ->
+          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
+
         | "SRC" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print_source conf base f
@@ -729,6 +751,17 @@ let treat_request =
           w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
         | "CHANGE_WIZ_VIS" ->
           w_wizard @@ w_lock @@ w_base @@ WiznotesDisplay.change_wizard_visibility
+        | "TP" ->
+          w_base @@ fun conf base ->
+            begin match Util.p_getenv conf.env "v" with
+            | Some f ->
+              begin match Util.find_person_in_env conf base "" with
+              | Some p -> Perso.interp_templ ("tp_" ^ f) conf base p
+              | _ -> Perso.interp_templ ("tp0_" ^ f) conf base
+                       (Gwdb.empty_person base Gwdb.dummy_iper)
+              end
+            | None -> incorrect_request conf base
+            end
         | "TT" ->
           w_base @@ TitleDisplay.print
         | "U" ->
@@ -739,9 +772,13 @@ let treat_request =
           w_base @@ WiznotesDisplay.print
         | "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
           w_base @@ WiznotesDisplay.print_search
-        | _ -> incorrect_request
+        | _ ->
+            w_base @@ fun conf base ->
+            let str =
+              (Printf.sprintf "failing plugin or unknown command m=%s" m)
+            in
+            incorrect_request ~comment:str conf base
       end conf bfile ;
-    Output.flush conf ;
   end else begin
     let title _ =
       transl conf "error"
@@ -757,7 +794,49 @@ let treat_request =
     transl conf "reserved to friends or wizards"
     |> Utf8.capitalize_fst
     |> Output.print_sstring conf ;
+    let base_name =
+      if conf.cgi then (Printf.sprintf "b=%s&" conf.bname) else ""
+    in
+    let user = transl_nth conf "user/password/cancel" 0 in
+    let passwd = transl_nth conf "user/password/cancel" 1 in
     Output.print_sstring conf ".</li></ul>" ;
+    let body =
+      if conf.cgi then
+        Printf.sprintf {|
+            <input type="text" class="form-control" name="w"
+              title="%s/%s %s" placeholder="%s:%s"
+              aria-label="password input"
+              aria-describedby="username:password" autofocus>
+            <label for="w" class="sr-only">%s:%s</label>
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div> |}
+            (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
+            (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
+            passwd user passwd user passwd
+      else
+        Printf.sprintf {|
+            <div>
+              %s%s <a href="%s?%sw=f"> %s</a><br>
+              %s%s <a href="%s?%sw=w"> %s</a>
+            </div> |}
+            (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
+            (conf.command :> string) base_name
+            (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
+            (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
+            (conf.command :> string) base_name
+            (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
+    in
+    Output.print_sstring conf 
+      (Printf.sprintf {|
+        <form class="form-inline" method="post" action="%s">
+          <div class="input-group mt-1">
+            <input type="hidden" name="b" value="%s">
+            %s
+          </div>
+        </form>
+      |} (conf.command :> string) (conf.bname) body
+      );
     Hutil.trailer conf
   end
   in

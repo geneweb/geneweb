@@ -1,4 +1,4 @@
-<!-- $Id: upddata.txt,v 7.00 2016/01/12 23:13:52 mr Exp $ -->
+<!-- $Id: templm/upddata.txt v7.0 2016/01/12 23:13:52 $ -->
 
 %define;ldl()
   <option></option>

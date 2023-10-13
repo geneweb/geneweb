@@ -1,4 +1,4 @@
-<!-- $Id: anclist_miss.txt,v 7.00 2016/02/04 21:21:37 mr Exp $ -->
+<!-- $Id: templm/anclist_miss.txt v7.0 2016/02/04 21:21:37 $ -->
 
 %define;link(aa, xx)
   %if;(cancel_links)xx%else;<a href="%prefix;aa">xx</a>%end;

@@ -178,13 +178,16 @@ let nominative s =
     Some _ -> decline 'n' s
   | _ -> s
 
-let mkdir_p ?(perm = 0o755) x =
-  let rec loop x =
-    let y = Filename.dirname x in
-    if y <> x && String.length y < String.length x then loop y;
-    try Unix.mkdir x perm with Unix.Unix_error (_, _, _) -> ()
+let mkdir_p ?(perm = 0o755) d =
+  let rec loop d =
+    let d1 = Filename.dirname d in
+    if d1 <> d && String.length d1 < String.length d then loop d1;
+    if not (Sys.file_exists d) then
+      try Unix.mkdir d perm
+      with Unix.Unix_error (_, _, _) ->
+        Printf.eprintf "Failed mkdir: %s\n" d
   in
-  loop x
+  loop d
 
 let rec remove_dir d =
   begin try
@@ -465,6 +468,7 @@ let input_lexicon lang ht open_fname =
         && aux a b (i - 1) )
   in
   (* find header *)
+  let tmp = Hashtbl.create 0 in
   let rec key () =
     match input_line ic with
     | exception End_of_file -> close_in ic
@@ -494,19 +498,31 @@ let input_lexicon lang ht open_fname =
           Hashtbl.replace ht k v ;
           key ()
         end
+        (* defining alias names for existing entries in the lexicon *)
+        (*     alias_name *)
+        (* ->: real_entry *)
         else if String.length line > 4
              && String.unsafe_get line 0 = '-'
              && String.unsafe_get line 1 = '>'
              && String.unsafe_get line 2 = ':'
              && String.unsafe_get line 3 = ' '
         then
+        begin
           let k2 = String.sub line 4 (String.length line - 4) in
-          Option.iter (Hashtbl.replace ht k) (Hashtbl.find_opt ht k2) ;
+          Hashtbl.replace tmp k k2;
           key ()
+        end
         else trad k
-      | None -> key ()
+      | None -> key () ;
   in
-  key ()
+  key () ;
+  Hashtbl.iter (fun k k2 -> 
+      match Hashtbl.find_opt ht k2 with
+      | Some entry -> Hashtbl.replace ht k entry
+      | None -> 
+        Printf.eprintf "Warning: %s aliased to inexistant %s entry\n" k k2
+    ) tmp
+
 
 let array_to_list_map fn a =
   Array.fold_right (fun x acc -> fn x :: acc) a []
@@ -563,6 +579,17 @@ let rec list_find_map f = function
       | Some _ as result -> result
       | None -> list_find_map f l
     end
+
+let array_find_map f a =
+  let n = Array.length a in
+  let rec loop i =
+    if i = n then None
+    else
+      match f (Array.unsafe_get a i) with
+      | None -> loop (succ i)
+      | Some _ as r -> r
+  in
+  loop 0
 
 let rec list_last = function
   | [ ] -> raise (Failure "list_last")
@@ -935,8 +962,8 @@ let gen_decode strip_spaces (s : Adef.encoded_string) : string =
   let rec need_decode i =
     if i < String.length s then
       match s.[i] with
-      '%' | '+' -> true
-          | _ -> need_decode (succ i)
+      | '%' | '+' -> true
+      | _ -> need_decode (succ i)
     else false
   in
   let rec compute_len i i1 =
@@ -1131,11 +1158,11 @@ let empty_person empty what =
   ; occupation = empty
   ; sex = Neuter
   ; access = IfTitles
-  ; birth = Adef.cdate_None
+  ; birth = Date.cdate_None
   ; birth_place = empty
   ; birth_note = empty
   ; birth_src = empty
-  ; baptism = Adef.cdate_None
+  ; baptism = Date.cdate_None
   ; baptism_place = empty
   ; baptism_note = empty
   ; baptism_src = empty
@@ -1154,7 +1181,7 @@ let empty_person empty what =
   }
 
 let empty_family empty =
-  { Def.marriage = Adef.cdate_None
+  { Def.marriage = Date.cdate_None
   ; marriage_place = empty
   ; marriage_note = empty
   ; marriage_src = empty
@@ -1167,3 +1194,13 @@ let empty_family empty =
   ; fsources = empty
   ; fam_index = ()
   }
+
+let good_name s =
+  let rec loop i =
+    if i = String.length s then true
+    else
+      match s.[i] with
+        'a'..'z' | 'A'..'Z' | '0'..'9' | '-' -> loop (i + 1)
+      | _ -> false
+  in
+  loop 0

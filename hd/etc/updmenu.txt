@@ -1,4 +1,4 @@
-%(<!-- $Id: updmenu.txt,v 7.00 2017/11/11 22:06:07 mr hg Exp $ -->%)
+%(<!-- $Id: updmenu.txt v7.0 28/04/2017 09:34:30 $ -->%)
 %( used for jquery. old updmenu.txt is in updmenu1.txt %)
 %( track modifications made in templm/updmenu.txt  %)
 %define;jq1()

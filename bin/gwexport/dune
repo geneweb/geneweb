@@ -1,7 +1,6 @@
 (library
-  (name gwexport_lib)
-  (public_name geneweb.gwexport_lib)
-  (wrapped false)
-  (libraries geneweb)
-  (modules gwexport)
-)
+ (name gwexport_lib)
+ (public_name geneweb.gwexport_lib)
+ (wrapped false)
+ (libraries geneweb)
+ (modules gwexport))
