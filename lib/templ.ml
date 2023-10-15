@@ -634,26 +634,37 @@ and eval_transl_inline conf s =
   fst @@ Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
 
 and eval_transl_lexicon conf upp s c =
-  let scan_for_transl s c =
-    (* scans for a single bracketed translation [to be translated] *)
+  let c_opt = [ '0'; '1'; '2'; '3'; 'n'; 's'; 'w'; 'f'; 'c'; 'e'; 't' ] in
+  let scan_for_transl s c i =
+    (* scans starting at i for bracketed translation [to be translated] *)
     (* the space after translation can be used to force a choice *)
     (* if no choice, then c is used *)
-    let j = match String.index_opt s '[' with Some j -> j | None -> -1 in
-    let k = match String.index_opt s ']' with Some k -> k | None -> -1 in
+    let j =
+      match String.index_from_opt s i '[' with Some j -> j | None -> -1
+    in
+    let k =
+      match String.index_from_opt s i ']' with Some k -> k | None -> -1
+    in
+    let existing_choice =
+      if k <> -1 && k < String.length s - 2 then List.mem s.[k + 1] c_opt
+      else false
+    in
     let c =
       if String.length s = k then c
-      else if String.length s > k + 1 && s.[k + 1] <> ' ' then
+      else if String.length s > k + 1 && List.mem s.[k + 1] c_opt then
         String.make 1 s.[k + 1]
       else c
     in
-    if j = -1 || k = -1 then s
+    if j = -1 || k = -1 then (-1, s)
     else
-      String.sub s 0 j
-      ^ String.sub s j (k - j + 1)
-      ^ c
-      ^
-      if String.length s = k + 1 || String.length s = k + 2 then ""
-      else String.sub s (k + 2) (String.length s - k - 2)
+      ( k + 1,
+        String.sub s 0 (k + 1)
+        ^ c
+        ^
+        if String.length s = k + 1 || String.length s = k + 2 then ""
+        else if existing_choice then
+          String.sub s (k + 2) (String.length s - k - 2)
+        else String.sub s (k + 1) (String.length s - k - 1) )
   in
   let r =
     let nth = try Some (int_of_string c) with Failure _ -> None in
@@ -678,7 +689,13 @@ and eval_transl_lexicon conf upp s c =
               let s3 =
                 let s = String.sub s2 i (j - i) in
                 (* scan s for potential translates *)
-                let s = scan_for_transl s c in
+                let _k, s =
+                  let rec loop (k, s) =
+                    let k, s = scan_for_transl s c k in
+                    if k = -1 then (k, s) else loop (k, s)
+                  in
+                  loop (0, s)
+                in
                 let astl =
                   Templ_parser.parse_templ conf (Lexing.from_string s)
                 in
