@@ -538,7 +538,6 @@ let print_warning conf base = function
       in
       Output.print_sstring conf
         (Utf8.capitalize_fst (transl conf "changed order of person's events"));
-      Output.print_sstring conf " -&gt; ";
       let before = Array.of_list before in
       let after = Array.of_list after in
       print_order_changed conf print_list before after
