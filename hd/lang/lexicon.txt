@@ -15652,13 +15652,13 @@ ca: els %d noms
 co: i %d nomi
 cs: %d křestních jmen
 da: de %d fornavne
-de: die %d Vornamen
-en: the %d first names
+de: %d Vornamen
+en: %d first names
 eo: la %d unuaj nomoj
 es: los %d nombres
 et: %d eesnime
 fi: %d etunimeä
-fr: les %d prénoms
+fr: %d prénoms
 he: %d שמות הפרטיים
 is: %d fyrstu fornöfnin
 it: i %d nomi
@@ -15749,13 +15749,13 @@ ca: els %d cognoms
 co: e %d casate
 cs: %d příjmení
 da: de %d efternavne
-de: die %d Nachnamen
-en: the %d surnames
+de: %d Nachnamen
+en: %d surnames
 eo: la %d familiaj nomoj
 es: los %d apellidos
 et: %d perekonnanime
 fi: %d sukunimeä
-fr: les %d patronymes
+fr: %d patronymes
 he: %d שמות המשפחה
 is: %d fyrstu eftirnöfnin
 it: i %d cognomi
