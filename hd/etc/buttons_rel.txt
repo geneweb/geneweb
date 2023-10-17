@@ -2,7 +2,7 @@
 %( Boutons de configurations et d’options pour les calculs de relations %)
 %let;e_sp;%if;(e.sp!="")0%else;1%end;%in;
 %let;e_im;%if;(e.im!="")0%else;1%end;%in;
-<div class="btn-toolbar mt-2 mb-3" role="toolbar" arial-label="config buttons toolbar">
+<div class="btn-toolbar my-2 ml-5" role="toolbar" arial-label="config buttons toolbar">
   <div class="d-flex">
     %if;is_printed_by_template;
       %if;(e.em="R" or ((e.i!="" and e.ei!="") or (person_index.1!="" and person_index.2!="")))
@@ -70,7 +70,7 @@
       <span class="invisible"><i class="fa fa-chevron-up fa-fw"></i></span>
     %end;
   </div>
-  <div class="col-3 ml-5">
+  <div class="d-flex col-3 ml-5">
     <a href="%if;(e_im=1)%url_set.im.0;%else;%url_set.im;%end;"
       %if;(e.dag="on") class="disabled"%end;
       title="%if;(e_im=1)[*visualize/show/hide/summary]2%else;
