@@ -20,17 +20,19 @@ let time_debug conf query_time nb_errors =
       var nb_errors = document.getElementById('nb_errors_c').innerHTML;
       var home_time = document.getElementById('q_time_d');
       var home_errors = document.getElementById('nb_errors_d');
-      home_time.title = q_time + " s";
-      home_errors.title = nb_errors + " errors!";
-      if (nb_errors > 0 ) {
-        home_errors.classList.remove("d-none");
+      if (home_time != null) {
+        home_time.title = q_time + " s";
+        if (q_time < 3) {
+          home_time.classList.add("text-success");
+        } else if (q_time < 8) {
+          home_time.classList.add("text-warning");
+         } else {
+           home_time.classList.add("text-danger");
+        }
       }
-      if (q_time < 3) {
-        home_time.classList.add("text-success");
-      } else if (q_time < 8) {
-        home_time.classList.add("text-warning");
-      } else {
-        home_time.classList.add("text-danger");
+      if (home_errors != null && nb_errors > 0) {
+        home_errors.title = nb_errors + " errors!";
+        home_errors.classList.remove("d-none");
       }
     </script>
       |}
