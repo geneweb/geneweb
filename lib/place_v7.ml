@@ -308,7 +308,7 @@ let print_ip_list conf places opt link_to_ind ipl =
   if len > max_rlm_nbr conf && link_to_ind then Output.printf conf "(%d)" len
   else
     let head =
-      Printf.sprintf " (<a href=\"%sm=L%s&k=%s&nb=%d&p0=%s"
+      Printf.sprintf "&nbsp;(<a href=\"%sm=L%s&k=%s&nb=%d&p0=%s"
         (commd conf :> string)
         opt places len places
     in
@@ -331,7 +331,7 @@ let print_ip_list conf places opt link_to_ind ipl =
 
 (** print a call to m=PPS with a new k value *)
 let pps_call conf opt long keep k places =
-  Printf.sprintf "<a href=\"%sm=PPS%s&display=%s&keep=%s&k=%s\">%s</a>\n"
+  Printf.sprintf "<a href=\"%sm=PPS%s&display=%s&keep=%s&k=%s\">%s</a>"
     (commd conf :> string)
     opt
     (if long then "long" else "short")
@@ -443,14 +443,14 @@ let print_html_places_surnames_short conf _base _link_to_ind
       | (pl, ipl) :: l ->
           let str = places_to_string true pl in
           Output.printf conf
-            "<a href=\"%sm=PPS%s&display=%s&keep=%s&k=%s\">%s</a>\n"
+            "<a href=\"%sm=PPS%s&display=%s&keep=%s&k=%s\">%s</a>"
             (commd conf :> string)
             opt
             (if long then "long" else "short")
             (string_of_int (keep + 1))
             str str;
           if len < max_rlm_nbr conf then (
-            Output.printf conf " (<a href=\"%sm=L%s&k=%s&nb=%d"
+            Output.printf conf "&nbsp;(<a href=\"%sm=L%s&k=%s&nb=%d"
               (commd conf :> string)
               opt str len;
             let rec loop1 i = function
@@ -471,14 +471,14 @@ let print_html_places_surnames_short conf _base _link_to_ind
             Output.printf conf "\" title=\"%s\">%d</a>)"
               (Utf8.capitalize (transl conf "summary book ascendants"))
               len)
-          else Output.printf conf " (%d)" len;
+          else Output.printf conf "&nbsp;(%d)" len;
           loop0 l
     in
     loop0 l
   in
   let rec loop first = function
     | l1 :: l ->
-        Output.print_sstring conf (if first then "" else "; ");
+        Output.print_sstring conf (if first then "" else ", ");
         print_one_entry l1;
         loop false l
     | [] -> ()
