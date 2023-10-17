@@ -519,7 +519,7 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
         let str =
           Printf.sprintf
             {|:
-          "<img src="%s/picto_rel_small.png" alt="">
+           <img src="%s/picto_rel_small.png" alt="">
            <a href="%s">%s%s</a></li>|}
             (Image.prefix conf :> string)
             (commd conf ^^^ "m=RL&" ^<^ acces conf base a ^^^ "&l1="
@@ -623,11 +623,9 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
 
 let print_solution conf base long n p1 p2 sol =
   let pp1, pp2, (x1, x2, list), _ = sol in
-  Output.print_sstring conf {|<p><img src="|};
-  Output.print_string conf (Image.prefix conf);
-  Output.print_sstring conf {|/picto_fleche_bleu.png" alt="">|};
+  Output.print_sstring conf {|<div>&#9654;&nbsp;|};
   print_link_name conf base n p1 p2 sol;
-  Output.print_sstring conf "</p>\n";
+  Output.print_sstring conf "</div>\n";
   if x1 = 0 || x2 = 0 then
     print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list
   else print_solution_not_ancestor conf base long p1 p2 sol;
@@ -757,25 +755,20 @@ let print_propose_upto conf base p1 p2 rl =
       let str =
         Printf.sprintf
           {|
-          <p>
-          <img src="%s/picto_fleche_bleu.png" alt="">
-            <span class="smaller">
-            %s %s <img src="%s/picto_rel_asc.png" alt="">
-            <a href="%s%s&m=A&t=D&%s&l=%s">%s</a>
-            </span>
-          </p>
+          <div>
+            <img src="%s/picto_rel_asc.png" alt="">
+            <a href="%s%s&m=A&t=X&%s&l=%s">%s %s</a>.
+          </div>
         |}
-          (Image.prefix conf :> string)
-          (transl_a_of_b conf (transl_nth conf "ancestor/ancestors" 1) s s
-          |> translate_eval |> Utf8.capitalize_fst)
-          ((person_title_text conf base a : Adef.safe_string :> string)
-          |> transl_decline conf "up to")
           (Image.prefix conf :> string)
           (commd conf :> string)
           (acces conf base p :> string)
           (acces_n conf base (Adef.escaped "1") a :> string)
           (string_of_int maxlen)
-          (transl conf "see" |> Utf8.capitalize_fst)
+          (transl_a_of_b conf (transl_nth conf "ancestor/ancestors" 1) s s
+          |> translate_eval |> Utf8.capitalize_fst)
+          ((person_title_text conf base a : Adef.safe_string :> string)
+          |> transl_decline conf "up to")
       in
       Output.print_sstring conf str
   | _ -> ()

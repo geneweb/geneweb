@@ -2415,16 +2415,10 @@ let reduce_list size list =
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                       *)
 let gen_print_tips conf s =
-  Output.print_sstring conf "<div class=\"tips\">\n";
-  Output.print_sstring conf "<table>\n";
-  Output.print_sstring conf "<tr>\n";
-  Output.print_sstring conf "<td>\n";
+  Output.print_sstring conf "<div class=\"tips alert alert-warning\"";
+  Output.print_sstring conf " role=\"alert\">";
   Output.print_string conf s;
-  Output.print_sstring conf "</td>\n";
-  Output.print_sstring conf "</tr>\n";
-  Output.print_sstring conf "</table>\n";
-  Output.print_sstring conf "</div>\n";
-  Output.print_sstring conf "<br>\n"
+  Output.print_sstring conf "</div>"
 
 let print_tips_relationship conf =
   if p_getenv conf.env "em" = Some "R" || p_getenv conf.env "m" = Some "C" then
