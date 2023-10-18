@@ -2,6 +2,7 @@ open Config
 open TemplAst
 
 let nb_errors = ref 0
+let errors_undef = ref []
 
 exception Exc_located of loc * exn
 
@@ -536,13 +537,15 @@ let eval_string_var conf eval_var sl =
     try VVstring (eval_variable conf sl)
     with Not_found ->
       incr nb_errors;
+      errors_undef := (" %" ^ String.concat "." sl ^ "?") :: !errors_undef;
       VVstring (" %" ^ String.concat "." sl ^ "?"))
 
 let eval_var_handled conf sl =
   try eval_variable conf sl
-  with Not_found ->
+  with Not_found -> (
     incr nb_errors;
-    Printf.sprintf " %%%s?" (String.concat "." sl)
+    errors_undef := (Printf.sprintf "%%%s?" (String.concat "." sl)) :: !errors_undef;
+    Printf.sprintf " %%%s?" (String.concat "." sl))
 
 let apply_format conf nth s1 s2 =
   let s1 =
@@ -1108,7 +1111,7 @@ let print_copyright conf =
 let include_hed_trl conf name =
   if name = "trl" then (
     let query_time = Unix.gettimeofday () -. conf.query_start in
-    Util.time_debug conf query_time !nb_errors;
+    Util.time_debug conf query_time !nb_errors !errors_undef;
     Util.include_template conf [] name (fun () -> ()))
 
 let rec interp_ast :
