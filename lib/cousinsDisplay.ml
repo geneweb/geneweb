@@ -10,7 +10,7 @@ let default_max_cnt = Cousins.default_max_cnt
 
 (* there is a mismatch between cousins degree and "v1" parameter
    which is the number of generation we go back to find a common ancestor *)
-let brother_label conf x =
+let _brother_label conf x =
   match x with
   | 1 -> transl conf "siblings"
   | 2 -> transl conf "cousins"
@@ -218,40 +218,19 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
 (* HTML main *)
 
 let print_cousins conf base p lev1 lev2 =
-  let title h =
-    let txt_fun a =
-      let txt = gen_person_text conf base p in
-      transl_a_of_gr_eq_gen_lev conf a
-        (if h then
-         (gen_person_text ~html:false conf base p : Adef.safe_string :> string)
-        else (txt : Adef.safe_string :> string))
-        (txt : Adef.safe_string :> string)
-    in
-    if lev1 = lev2 then
-      let s = txt_fun (brother_label conf lev1) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
-    else if lev1 = 2 && lev2 = 1 then
-      let s = txt_fun (transl_nth conf "an uncle/an aunt" 4) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
-    else if lev1 = 3 && lev2 = 1 then
-      let s = txt_fun (transl_nth conf "a great-uncle/a great-aunt" 4) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
-    else if lev1 = 1 && lev2 = 2 then
-      let s = txt_fun (transl_nth conf "a nephew/a niece" 4) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
-    else if lev1 = 1 && lev2 = 3 then
-      let s = txt_fun (transl_nth conf "a great-nephew/a great-niece" 4) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
-    else (
-      Output.print_sstring conf
-        (Utf8.capitalize_fst (transl_nth conf "ancestor/ancestors" 1));
-      Output.print_sstring conf " ";
-      Output.print_sstring conf (string_of_int lev1);
-      Output.print_sstring conf " / ";
-      Output.print_sstring conf
-        (Utf8.capitalize_fst (transl conf "descendants"));
-      Output.print_sstring conf " ";
-      Output.print_sstring conf (string_of_int lev2))
+  let title _h =
+    let cous12 = Format.sprintf "cousins.%d.%d" lev1 lev2 in
+    let cous_transl = Utf8.capitalize_fst (transl_nth conf cous12 1) in
+    if String.length cous_transl > 0 && cous_transl.[0] <> '[' then 
+      Output.print_sstring conf cous_transl
+    else (Output.printf conf "%s %s / %s %s"
+            (string_of_int lev1)
+            (transl_nth conf "ascending/descending (degree)"
+              (if lev1=1 then 0 else 2))
+            (string_of_int lev2)
+            (transl_nth conf "ascending/descending (degree)"
+              (if lev2=1 then 1 else 3)))
+
   in
   let max_cnt =
     try int_of_string (List.assoc "max_cousins" conf.base_env)
