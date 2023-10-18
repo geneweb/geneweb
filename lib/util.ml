@@ -4,12 +4,14 @@ open Config
 open Def
 open Gwdb
 
-let time_debug conf query_time nb_errors =
+let time_debug conf query_time nb_errors errors_undef =
   let show =
     match List.assoc_opt "show_query_time" conf.base_env with
     | Some "on" -> ""
     | _ -> {| style="display:none"|}
   in
+  let errors_undef = List.sort_uniq compare errors_undef in
+  let err_list = String.concat ", " errors_undef in
   Output.print_sstring conf
     (Printf.sprintf
        {|
@@ -31,12 +33,12 @@ let time_debug conf query_time nb_errors =
         }
       }
       if (home_errors != null && nb_errors > 0) {
-        home_errors.title = nb_errors + " errors!";
+        home_errors.title = nb_errors + " errors! Undound variable:" + %s ;
         home_errors.classList.remove("d-none");
       }
     </script>
       |}
-       show query_time nb_errors)
+       show query_time nb_errors err_list)
 
 let escape_aux count blit str =
   let strlen = String.length str in
