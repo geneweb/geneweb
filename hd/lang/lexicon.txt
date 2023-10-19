@@ -1676,12 +1676,12 @@ co: un arcinipote/un arcinipote/arcinipoti/arcinipoti/arcinipoti
 cs: prasynovec/praneteř
 da: en grandnevø/en grandniece
 de: ein:d:+em Großneffe:d:+n/eine:d:+r Großnichte/Großneffen/Großnichten/Großneffen und Großnichten
-en: a great-nephew/a great-niece/great-nephew/great-niece/great-nephews and great-nieces
+en: a %sgreat-nephew/a %sgreat-niece/great-nephew/great-niece/great-nephews and great-nieces
 eo: pranevo/pranevino
 es: un sobrino nieto/una sobrina nieta
 et: venna- või õelapse poeg:g:--ja/venna- või õelapse tütar:g:--re
 fi: veljen- tai sisarenlapsen poika:g:---jan/veljen- tai sisarenlapsen tytär:g:---tären
-fr: un petit-neveu/une petite-nièce/petits-neveux/petites-nièces/petits-neveux et petites-nièces
+fr: un %spetit-neveu/une %spetite-nièce/petits-neveux/petites-nièces/petits-neveux et petites-nièces
 he:   בן האחיין/ בת האחיין
 is: frændi/frænka
 it: un pronipote/una pronipote
@@ -1700,13 +1700,11 @@ sv: en gammel-nevö/en gammel-niece
 tr: bir büyük yeğen/bir büyük yeğen/büyük yeğen/büyük yeğen/büyük yeğenler ve büyük yeğenler
 
     cousin.1.3
-co: un %sniputinu/una %sniputina/un %sniputinu o una niputina
-en: un %sgrandnephew/a %sgrandniece/a %sgrandnephew
-fr: un %spetit-neveu/une %spetite-nièce/un %spetit-neveu
+->: a great-nephew/a great-niece
 
     cousins.1.3
 co: niputinu/niputini/niputina/niputine
-en: grandnephew/grandnephews/grandniece/grandnieces
+en: great-nephew/great-nephews/great-niece/great-nieces
 fr: petit-neveu/petits-neveux/petite-nièce/petites-nièces
 
     cousins.1.3 tt
@@ -11828,6 +11826,10 @@ sl: število živih oseb
 sv: antal levande personer:
 tr: yaşayan bireylerin sayısı
 
+    number of rows
+en: number of rows
+fr: nombre de lignes
+
     n° d’Aboville
 co: n° d’Aboville
 de: Nr. Aboville
@@ -16475,7 +16477,7 @@ eo: la lastaj %d naskiĝoj
 es: los %d últimos nacimientos
 et: viimased %d sündi
 fi: viimeiset %d syntymää
-fr: %d dernières naissances
+fr: les %d dernières naissances
 he: %d הלידות האחרונות
 is: síðustu %d fæðingar
 it: le ultime %d nascite

@@ -1,3 +1,4 @@
+<!-- $Id: advanced.txt v7.1 19/10/2023 04:14:58 $ -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
@@ -10,20 +11,9 @@
 </head>
 <body%body_prop;>
 %include;hed
+%include;home
 <div class="container">
-<div class="d-flex justify-content-between">
-
-  <h1 class="my-2">[*advanced request]0</h1>
-  %if;not cancel_links;
-    <div class="btn-group mt-4">
-      %if;(referer != "")
-        <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-      %end;
-      <a href="%prefix;"><span class="fa fa-home fa-lg mx-1" title="[*home]"></span></a>
-    </div>
-  %end;
-</div>
-
+<h1 class="mt-2">[*advanced request]0</h1>
 
 %define;date(xx,zz)
   %if;([!dates order]0 = "ddmmyy" or [!dates order]0 = "ddmmyyyy" or [!dates order]0 = "dmyyyy")
@@ -57,7 +47,7 @@
         <h4>[*yy]0</h4>
         %if;("xx"="death")
           </div>
-          <div class="col-4">
+          <div class="mb-2">
             <select class="form-control" name="death">
               <option value="Dead">[*died]2</option>
               <option value="NotDead">[*alive]2</option>
@@ -133,29 +123,23 @@
         <label for="first_name" class="col-form-label col-3">[*first name/first names]0</label>
         <div class="col-9">
           <input type="text" class="form-control" name="first_name" id="first_name" placeholder="[*first name/first names]0">
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-3"></div>
-        <div class="form-check col-9">
-          <input class="form-check-input" type="checkbox" name="exact_first_name" value="on" checked>
-          <label class="form-check-label" for="exact_first_name">[*exact]</label>
+          <div class="ml-4">
+            <input class="form-check-input" type="checkbox" id="exact_first_name" name="exact_first_name" value="on" checked>
+            <label class="form-check-label" for="exact_first_name">[*exact]</label>
+          </div>
         </div>
       </div>
       <div class="row">
         <label for="surname" class="col-form-label col-3">[*surname/surnames]0</label>
         <div class="col-9">
           <input type="text" class="form-control" name="surname" id="surname" placeholder="[*surname/surnames]0">
+          <div class="ml-4">
+            <input class="form-check-input" type="checkbox" id="exact_surname" name="exact_surname" value="on">
+            <label class="form-check-label" for="exact_surname" checked>[*exact]</label>
+          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-3"></div>
-        <div class="form-check col-9">
-          <input class="form-check-input" type="checkbox" name="exact_surname" value="on">
-          <label class="form-check-label" for="exact_surname" checked>[*exact]</label>
-        </div>
-      </div>
-      <div class="row mt-3">
+      <div class="row mt-2">
         <label for="occu" class="col-form-label col-3">[*occupation/occupations]1</label>
         <div class="col-9">
           <input type="text" class="form-control" name="occu" id="occu" placeholder="[*occupation/occupations]1">
@@ -164,11 +148,11 @@
     </div>
     %apply;event("marriage","marriage/marriages")
   </div>
-  <div class="row my-2">
+  <div class="row mt-2">
     %apply;event("birth","birth")
     %apply;event("bapt","baptism")
   </div>
-  <div class="row my-2">
+  <div class="row mt-2">
     %apply;event("death","death")
     %apply;event("burial","burial")
   </div>
@@ -179,7 +163,7 @@
       <span class="ml-2">[person/persons]1</span>
     </div>
   </div>
-  <div class="row justify-content-center my-3">
+  <div class="row justify-content-center mt-3">
     <button type="submit" class="btn btn-outline-primary btn-lg">[*search/case sensitive]0</button>
   </div>
 </form>

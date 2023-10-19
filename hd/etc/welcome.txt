@@ -30,6 +30,7 @@
 %end;
 <body%body_prop;>
 %include;hed
+%include;home
 <div class="container">
   <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-2 mt-lg-4">
     %if;(bvar.auth_file="" and bvar.wizard_passwd!="" or bvar.friend_passwd!="")

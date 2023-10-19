@@ -28,7 +28,6 @@ let print_no_candidate conf base p =
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   transl conf "not found" |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "<ul><li>";
   print_link conf base p;
@@ -61,7 +60,6 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   Output.print_sstring conf "<h2>";
   title false;
   Output.print_sstring conf "</h2>";
-  Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<ul><li>";
   print_link conf base (poi base ip1);
   Output.print_sstring conf "</li><li>";
@@ -99,7 +97,6 @@ let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
   Output.print_sstring conf "<h2>";
   title false;
   Output.print_sstring conf "</h2>";
-  Hutil.print_link_to_welcome conf true;
   let ip1, ip2 =
     let cpl = foi base ifam1 in
     (Gwdb.get_father cpl, Gwdb.get_mother cpl)

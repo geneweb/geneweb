@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: deslist.txt v7.1 29/12/2022 19:48:02 $ -->
+  <!-- $Id: deslist.txt v7.1 19/10/2023 04:36:55 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -20,6 +20,7 @@
 </head>
 <body%body_prop;>
 %include;hed
+%include;home
 %message_to_wizard;
 <div class="container">
 %include;perso_utils
@@ -34,15 +35,6 @@
     %if;(alias != "") <em>(%alias;)</em>%end;
   %end;
 </h1>
-
-%if;not cancel_links;
-  <div class="btn-group float-%right; mt-2">
-    %if;(referer != "")
-      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
-  </div>
-%end;
 
 %define;tothegen(xx)
   [*to the %s generation:::xx]%nn;

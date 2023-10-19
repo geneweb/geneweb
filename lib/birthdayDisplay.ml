@@ -106,7 +106,6 @@ let gen_print conf base mois f_scan dead_people =
      done
    with Not_found -> ());
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   if Array.for_all (( = ) []) tab then (
     Output.print_sstring conf "<p>\n";
     Output.printf conf "%s.\n"
@@ -308,7 +307,6 @@ let print_marriage conf base month =
   in
   let tab = Array.make 31 [] in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   Gwdb.Collection.iter
     (fun ifam ->
       let fam = foi base ifam in
@@ -398,7 +396,6 @@ let gen_print_menu_birth conf base f_scan mode =
       title false;
       Output.print_sstring conf "</h2>"
   | None -> Hutil.header conf title);
-  Hutil.print_link_to_welcome conf true;
   (try
      while true do
        let p, txt_of = f_scan () in
@@ -462,7 +459,6 @@ let gen_print_menu_dead conf base f_scan mode =
   let list_tom = ref [] in
   let list_aft = ref [] in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   (try
      while true do
        let p, txt_of = f_scan () in
@@ -553,7 +549,6 @@ let print_menu_marriage conf base =
   let list_tom = ref [] in
   let list_aft = ref [] in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   Gwdb.Collection.iter
     (fun ifam ->
       let fam = foi base ifam in

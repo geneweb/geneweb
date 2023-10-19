@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updhist.txt v7.1 19/10/2023 03:18:09 $ -->
+  <!-- $Id: updhist.txt v7.1 19/10/2023 05:24:40 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none">
@@ -21,7 +21,7 @@
     <form class="form-inline mb-2" method="get" action="%action;">
       %hidden;
       <input type="hidden" name="m" value="HIST_SEARCH">
-      %if;(e.m = "HIST_SEARCH" and found)
+      %if;(e.m="HIST_SEARCH" and found)
         <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;">
       %end;
       <div class="input-group">
@@ -43,8 +43,8 @@
   %end;
 %end;
 
-%let;kk;%if;(e.k = "")3%else;%e.k%end;%in;
-%let;wiz;%if;(e.wiz != "" and e.n = "")%e.wiz;%end;%in;
+%let;kk;%if;(e.k="")3%else;%e.k%end;%in;
+%let;wiz;%if;(e.wiz!="" and e.n="")%e.wiz;%end;%in;
 %define;table()
   <table class="table table-sm table-hover px-1">
     <thead class="thead-default">
@@ -53,26 +53,26 @@
         <th>[*person/persons]0</th>
         <th>[*wizard/wizards/friend/friends/exterior]0</th>
         <th>[*update]</th>
-        %if;(bvar.history_diff = "yes")<th class="text-center"><i class="fa fa-history fa-fw text-dark" title="[*history]"></i></th>%end
+        %if;(bvar.history_diff="yes")<th class="text-center"><i class="fa fa-history fa-fw text-dark" title="[*history]"></i></th>%end
       </tr>
     </thead>
     %foreach;history_line(kk, e.pos, wiz)
       <tr>
         <td>%time;</td>
         <td>
-          %if;(first_name != "")
+          %if;(first_name!="")
             <!--%first_name;/%occ;/%surname;-->
             <a href="%prefix;%person.access;">%person;</a>, %person.title;
             %person.dates;
-            %if;(bvar.show_invisible = "on" and wizard and person.is_invisible)
+            %if;(b.show_invisible="on" and wizard and person.is_invisible)
               <img src="%image_prefix;/restricted.png"%wid_hei;restricted.png; alt=" (x)">%nn;
             %end;
           %elseif;is_note;
-            - <a href="%prefix;m=NOTES%if;(note.page != "");f=%note.page.v;%end;
-            %if;(note.part != "");v=%note.part;%end;">
-            <i>%if;(note.page = "")[note/notes]1%else;%[%note.page;%]%end;
+            - <a href="%prefix;m=NOTES%if;(note.page!="");f=%note.page.v;%end;
+            %if;(note.part!="");v=%note.part;%end;">
+            <i>%if;(note.page="")[note/notes]1%else;%[%note.page;%]%end;
             </i></a>
-            %if;(note.part != "")- <span style="font-size:50%%">#%note.part;
+            %if;(note.part!="")- <span style="font-size:50%%">#%note.part;
               </span>%nn;
             %end;
           %else;
@@ -80,9 +80,9 @@
           %end;
         </td>
         <td>
-          %if;(user != "")
+          %if;(user!="")
             <i>
-              %if;(wiz = "")
+              %if;(wiz="")
                 <a href="%prefix;m=HIST&k=%kk;&wiz=%user.v;">%user;</a>%nn;
               %else;
                 %user;
@@ -91,9 +91,9 @@
           %end;
         </td>
         <td>%apply;update_text(update.var)</td>
-        %if;(bvar.history_diff = "yes")
+        %if;(b.history_diff="yes")
           <td class="text-center">
-            %if;(first_name != "" and person.has_history)
+            %if;(first_name!="" and person.has_history)
               <a href="%prefix;m=HIST_DIFF&t=SUM&f=%person.history_file;">
                 <i class="fa fa-history fa-fw" aria-hidden="true" title="[*visualize/show/hide/summary]1 [history]"></i>
                 <span class="sr-only">[history]</span></a>

@@ -22,7 +22,6 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
   Hutil.header conf (fun _ ->
       transl conf "merge done" |> Utf8.capitalize_fst
       |> Output.print_sstring conf);
-  Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf " ";
   Output.print_string conf
     (referenced_person_text conf base (poi base p.key_index));

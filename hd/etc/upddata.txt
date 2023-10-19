@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: upddata.txt v7.1 09/08/2023 17:16:02 $ -->
+  <!-- $Id: upddata.txt v7.1 19/10/2023 04:22:24 $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
   <title>%title;</title>
   <meta name="robots" content="none">
@@ -12,6 +12,7 @@
 </head>
 <body%body_prop;>
 %include;hed
+%include;home
 <div class="container">
   <div class="d-flex justify-content-between mt-2">
     <div class="col-1">
@@ -22,14 +23,7 @@
       %end;
     </div>
     <h1 class="text-center mt-3">%title;</h1>
-    %if;not cancel_links;
-      <div class="btn-group col-1">
-        %if;(referer!="")
-          <a href="%referer;"><i class="fa fa-arrow-left fa-fw" title="<<"></i></a>
-        %end;
-        <a href="%prefix;"><i class="fa fa-home fa-fw" title="[*home]"></i></a>
-      </div>
-    %end;
+    <div class="col-1"></div>
   </div>
   %let;length_s;%if;(e.s!="")%e.length.s;%else;0%end;%in;
   %let;nbs;%if;(e.nbs!="" and e.nbs<=length_s)%e.nbs;%else;%length_s;%end;%in;

@@ -1,4 +1,4 @@
-<!-- $Id: annivmenu.txt v7.1 10/01/2023 20:01:49 $ -->
+<!-- $Id: annivmenu.txt v7.1 19/10/2023 02:10:08 $ -->
 <!-- Copyright (c) 2006-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;">
@@ -12,16 +12,9 @@
 <body%body_prop;>
 %include;hed
 <div class="container">
+%( %include;menubar not complete %)
+%include;home
 <h1>[*anniversaries]</h1>
-
-%if;not cancel_links;
-  <div class="btn-group float-%right;">
-    %if;(referer != "")
-      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg pl-1" title="[*home]"></span></a>
-  </div>
-%end;
 
 <p>
   <ul>

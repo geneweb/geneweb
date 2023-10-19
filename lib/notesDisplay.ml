@@ -42,6 +42,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
       if (title :> string) = "" then
         Output.print_string conf (Util.escape_html fnotes)
       else Output.print_string conf title);
+  (* TODO: DO WE NEED ME?
   let what_links_page () =
     if fnotes <> "" then (
       Output.print_sstring conf {|<a href="|};
@@ -51,8 +52,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
       Output.print_sstring conf {|&ref=on" class="mx-2">(|};
       Output.print_sstring conf (transl conf "linked pages");
       Output.print_sstring conf ")</a>\n")
-  in
-  Hutil.gen_print_link_to_welcome what_links_page conf true;
+  in*)
   Output.print_sstring conf {|<div class="d-flex justify-content-between">|};
   if (title :> string) <> "" then (
     let title =
@@ -97,7 +97,6 @@ let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
       if (title :> string) = "" then
         Output.print_string conf (Util.escape_html fnotes)
       else Output.print_string conf title);
-  Hutil.print_link_to_welcome conf true;
   Util.include_template conf [] "summary" (fun () -> ());
   if cnt0 = 0 && (title :> string) <> "" then (
     Output.print_sstring conf "<br><br><h1>";
@@ -241,7 +240,6 @@ let print_what_links conf base fnotes =
   in
   let db = notes_links_db conf base false in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   Option.iter (print_linked_list conf base) (List.assoc_opt fnotes db);
   Hutil.trailer conf
 

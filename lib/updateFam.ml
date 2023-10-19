@@ -517,7 +517,7 @@ let print_del1 conf base ifam =
   | None -> ());
   Util.hidden_input conf "m" (Adef.encoded "DEL_FAM_OK");
   Output.print_sstring conf
-    {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
+    {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
   Output.print_sstring conf
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></p></form>";
@@ -557,7 +557,7 @@ let print_inv1 conf base p ifam1 ifam2 =
   Util.hidden_input conf "f" (string_of_ifam ifam2 |> Adef.encoded);
   Util.hidden_input conf "m" (Adef.encoded "INV_FAM_OK");
   Output.print_sstring conf
-    {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
+    {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
   Output.print_sstring conf
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></p></form>";
@@ -755,7 +755,7 @@ let print_change_order conf base =
       Util.hidden_input conf "n" (Adef.encoded @@ string_of_int n);
       Util.hidden_input conf "m" (Adef.encoded "CHG_FAM_ORD_OK");
       Output.print_sstring conf
-        {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
+        {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
       Output.print_sstring conf
         (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
       Output.print_sstring conf "</button></p></form>";

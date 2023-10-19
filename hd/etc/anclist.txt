@@ -58,7 +58,7 @@
 %if;(has_parents)
   %reset_count;
   %foreach;ancestor_level
-    %if;(level<=e.v)
+    %if;(e.v!="" and level<=e.v)
       %foreach;ancestor
         %if;(ancestor.same != "")%incr_count;%end;
       %end;
@@ -68,11 +68,11 @@
 %let;implex_cnt;%count;%in;
 %define;ancestors_by_list(xx, nnn)
   %if;(xx.has_parents and nnn > 0)
-    <ul>
-      <li class="male"><a href="%prefix;
+    <ul class="fa-ul">
+      <li><span class="fa-li"><i class="fa fa-male male fa-fw mr-1"></i></span><a href="%prefix;
         %xx.father.access;">%xx.father;</a>%xx.father.title;%xx.father.dates;%nl;
         %apply;ancestors_by_list("xx.father", nnn - 1)</li>
-      <li class="female"><a href="%prefix;
+      <li><span class="fa-li"><i class="fa fa-female female fa-fw mr-1"></i></span><a href="%prefix;
         %xx.mother.access;">%xx.mother;</a>%xx.mother.title;%xx.mother.dates;%nl;
         %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
     </ul>

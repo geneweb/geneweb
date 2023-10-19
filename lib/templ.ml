@@ -1110,9 +1110,9 @@ let print_copyright conf =
 
 let include_hed_trl conf name =
   if name = "trl" then (
+    Util.include_template conf [] name (fun () -> ()));
     let query_time = Unix.gettimeofday () -. conf.query_start in
-    Util.time_debug conf query_time !nb_errors !errors_undef;
-    Util.include_template conf [] name (fun () -> ()))
+    Util.time_debug conf query_time !nb_errors !errors_undef
 
 let rec interp_ast :
     config -> ('a, 'b) interp_fun -> 'a env -> 'b -> ast list -> unit =

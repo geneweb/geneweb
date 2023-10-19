@@ -1099,8 +1099,7 @@ let print_title conf fmt _ =
 
 let print_mod_ok conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family modified";
-  Hutil.print_link_to_welcome conf true;
-  (* Si on a supprimÃ© des caractÃ¨res interdits *)
+  (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then (
     Output.print_sstring conf "<h3 class=\"error\">";
     Output.printf conf
@@ -1115,14 +1114,12 @@ let print_mod_ok conf base (wl, ml) cpl des =
 
 let print_change_event_order_ok conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family modified";
-  Hutil.print_link_to_welcome conf true;
   print_family conf base (wl, ml) cpl des;
   Hutil.trailer conf
 
 let print_add_ok conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family added";
-  Hutil.print_link_to_welcome conf true;
-  (* Si on a supprimÃ© des caractÃ¨res interdits *)
+  (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then (
     Output.printf conf "<h2 class=\"error\">%s</h2>\n"
       (Utf8.capitalize_fst (transl conf "forbidden char"));
@@ -1132,7 +1129,6 @@ let print_add_ok conf base (wl, ml) cpl des =
 
 let print_del_ok conf base wl =
   Hutil.header conf @@ print_title conf "family deleted";
-  Hutil.print_link_to_welcome conf true;
   (match p_getenv conf.env "ip" with
   | Some i ->
       let p = poi base (iper_of_string i) in
@@ -1161,7 +1157,6 @@ let print_del conf base =
 
 let print_inv_ok conf base p =
   Hutil.header conf @@ print_title conf "inversion done";
-  Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "\n";
   Output.print_string conf (referenced_person_text conf base p);
   Output.print_sstring conf "\n";
