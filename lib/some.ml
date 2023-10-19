@@ -262,9 +262,8 @@ let first_name_print_list conf base x1 xl liste =
         (StrSet.elements xl)
   in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
-  (* Si on est dans un calcul de parentÃ©, on affiche *)
-  (* l'aide sur la sÃ©lection d'un individu.          *)
+  (* Si on est dans un calcul de parenté, on affiche *)
+  (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
   let list =
     List.map
@@ -555,7 +554,6 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
   in
   let br = p_getint conf.env "br" in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   (* Si on est dans un calcul de parentÃ©, on affiche *)
   (* l'aide sur la sÃ©lection d'un individu.          *)
   Util.print_tips_relationship conf;
@@ -596,7 +594,6 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   let x = match homonymes with x :: _ -> x | _ -> x in
   let title = mk_specify_title conf (transl_nth conf "surname/surnames" 0) fx in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   let list =
     List.map
       (fun sn ->
@@ -688,9 +685,8 @@ let print_family_alphabetic x conf base liste =
           homonymes
       in
       Hutil.header conf title;
-      Hutil.print_link_to_welcome conf true;
-      (* Si on est dans un calcul de parentÃ©, on affiche *)
-      (* l'aide sur la sÃ©lection d'un individu.          *)
+      (* Si on est dans un calcul de parenté, on affiche *)
+      (* l'aide sur la sélection d'un individu.          *)
       Util.print_tips_relationship conf;
       (* Menu afficher par branche/ordre alphabetique *)
       print_alphabetic_to_branch conf x;

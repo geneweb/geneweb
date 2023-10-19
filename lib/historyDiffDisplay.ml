@@ -43,7 +43,7 @@ let print_clean conf =
       in
       loop 0 history;
       Output.print_sstring conf
-        {|</ul><button type="submit" class="btn btn-secondary btn-lg">|};
+        {|</ul><button type="submit" class="btn btn-primary btn-lg">|};
       transl_nth conf "validate/delete" 0
       |> Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf "</button></form>";

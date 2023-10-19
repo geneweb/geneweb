@@ -190,9 +190,7 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
     loop Sosa.one lev1
   in
   let last_sosa = Sosa.twice first_sosa in
-  Output.print_sstring conf "<div>";
   Util.print_tips_relationship conf;
-  Output.print_sstring conf "</div>";
   if lev1 > 1 then Output.print_sstring conf "<ul>";
   let some =
     let rec loop sosa some =

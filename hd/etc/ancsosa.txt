@@ -1,8 +1,8 @@
+<!-- $Id: ancsosa.txt v7.1 25/09/2023 14:34:40 $ -->
+<!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: ancsosa.txt v7.1 25/09/2023 14:34:40 $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
 %define;tothegen(xx)
   [to the %s generation:::xx]%nn;
 %end;
@@ -63,7 +63,7 @@
 %include;hed
 %include;perso_utils
 %message_to_wizard;
-<div class="container-fluid">
+<div class="container-fluid%if;(e.t="Z") ml-2%end;">
 %if;not cancel_links;
   %include;menubar
 %end;
@@ -325,7 +325,7 @@
       onclick="window.open('%prefix;m=MOD_FAM;i=%family.index;;ip=%index;;');">%nn;
   %end;
       <div><span class="sure_dates%ancestor.has_linked_page.MARRIAGEA;%ancestor.spouse.has_linked_page.MARRIAGEA;
-        %if;((marriage_date.prec != "" or on_marriage_date = "" or marriage_place = "") and (are_married or not_are_married)) not_sure_dates%end;"
+        %if;((marriage_date.prec != "" or on_marriage_date = "" or marriage_place = "") and (are_married or are_not_married)) not_sure_dates%end;"
         title="%if;(wizard)([modify::family/families]0)%end;
           %if;(yy=0 and spouse.surname!="?" and spouse.first_name!="?")&#010;
             %if;(are_not_married)([*not married])&#010;%end;
@@ -1432,7 +1432,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 
 %( Main %)
 %if;(e.templ!="templm")
-<h1>%nn;
+<h1 class="ml-2">%nn;
   %apply;a_of_b%with;
     %if;(e.t = "M")
       %if;(e.evt = "on")[*missing events]%else;[*missing ancestors]%end;%nn;
@@ -1890,7 +1890,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 %elseif;(e.t = "X" or e.t = "Y")
   %empty_sorted_list;
   %reset_count;
-  <table class="table table-sm table-bordered text-center short_display_table">
+  <table class="table table-sm table-bordered text-center short_display_table ml-2">
     <colgroup>
       <col width="10"%/>
       <col width="400"%/>

@@ -5,25 +5,19 @@ open Def
 open Gwdb
 
 let time_debug conf query_time nb_errors errors_undef =
-  let show =
-    match List.assoc_opt "show_query_time" conf.base_env with
-    | Some "on" -> ""
-    | _ -> {| style="display:none"|}
-  in
   let errors_undef = List.sort_uniq compare errors_undef in
-  let err_list = String.concat ", " errors_undef in
+  let err_list = String.concat "," errors_undef in
   Output.print_sstring conf
     (Printf.sprintf
        {|
-    <span%s>Query treated in <span id="q_time_c">%.3f</span> s
-      (<span id="nb_errors_c">%d</span> errors).</span>
     <script>
-      var q_time = document.getElementById('q_time_c').innerHTML;
-      var nb_errors = document.getElementById('nb_errors_c').innerHTML;
-      var home_time = document.getElementById('q_time_d');
-      var home_errors = document.getElementById('nb_errors_d');
+      var q_time = %.3f;
+      var nb_errors = %d;
+      var errors_list = "%s";
+      var home_time = document.getElementById('q_time');
+      var home_errors = document.getElementById('nb_errors');
       if (home_time != null) {
-        home_time.title = q_time + " s";
+        home_time.title = "Query treated in " + q_time + " s";
         if (q_time < 3) {
           home_time.classList.add("text-success");
         } else if (q_time < 8) {
@@ -33,12 +27,16 @@ let time_debug conf query_time nb_errors errors_undef =
         }
       }
       if (home_errors != null && nb_errors > 0) {
-        home_errors.title = nb_errors + " errors! Undound variable:" + %s ;
+        home_errors.title = nb_errors +" error(s)!";
         home_errors.classList.remove("d-none");
+      }
+      if (errors_list != "") {
+        home_errors.title = home_errors.title +
+         "\u{000A}Unbound variable(s):" + errors_list + ".";
       }
     </script>
       |}
-       show query_time nb_errors err_list)
+       query_time nb_errors err_list)
 
 let escape_aux count blit str =
   let strlen = String.length str in
@@ -2348,7 +2346,7 @@ let print_in_columns conf ncols len_list list wprint_elem =
                    Output.printf conf "<td width=\"%d\">\n" (100 / ncols)
                  else if !kind <> Elem then Output.print_sstring conf "</ul>\n";
                  if !kind <> Elem then (
-                   Output.printf conf "<h3 class=\"subtitle\">%s%s</h3>\n"
+                   Output.printf conf "<h3 class=\"subtitle mx-3\">%s%s</h3>\n"
                      (if ord = "" then "..." else String.make 1 ord.[0])
                      (if !kind = HeadElem then ""
                      else " (" ^ transl conf "continued" ^ ")");

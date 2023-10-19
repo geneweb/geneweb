@@ -663,7 +663,7 @@ let print_del1 conf base p =
   Output.printf conf "<input type=\"hidden\" name=\"i\" value=\"%s\">\n"
     (string_of_iper (get_iper p));
   Output.print_sstring conf
-    "<button type=\"submit\" class=\"btn btn-secondary btn-lg\">\n";
+    "<button type=\"submit\" class=\"btn btn-primary btn-lg\">\n";
   Output.print_sstring conf
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button>\n";

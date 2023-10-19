@@ -12,19 +12,9 @@
 </head>
 <body%body_prop;>
 %include;hed
+%include;home
 %message_to_wizard;
 <div class="container">
-
-%define;arrows()
-  %if;not cancel_links;
-    <div class="btn-group float-%right;">
-      %if;(referer != "")
-        <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-      %end;
-      <a href="%prefix;"><span class="fa fa-home fa-lg pl-1" title="[*home]"></span></a>
-    </div>
-  %end;
-%end;
 
 %define;fun_day(ccc, nnn)
   <td><button class="btn btn-outline-secondary" type="submit" name="dccc1">&lt;</button></td>
@@ -89,7 +79,6 @@
     <h3 class="mt-4">%apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end;
     %if;(date.julian_day = today.julian_day) - %time;%end;</h3>
   </div>
-    %apply;arrows()
 </div>
 <div class="row mt-3">
   <div class="mx-auto text-center">

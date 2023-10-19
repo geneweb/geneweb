@@ -126,7 +126,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
               ^<^ DateDisplay.string_of_ondate conf d
           | None -> transl conf "divorced" |> Adef.safe));
   Output.print_sstring conf
-    {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
+    {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
   Output.print_sstring conf
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></form>"

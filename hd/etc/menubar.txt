@@ -41,7 +41,7 @@
               <span class="fas fa-address-card fa-fw mr-1" aria-hidden="true"></span>%nn;
               <span class="sr-only">[*module]1</span>%nn;
             </a>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu dropdown-menu-transl">
               <div class="d-inline-flex justify-content-around mx-1">
                <form class="form-group mx-1" name="upd_url" method="get" action="%action;">
                   <div class="invisible" id="img_prfx">%image_prefix;/modules</div>
@@ -163,7 +163,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
               <span class="fa fa-user-cog" aria-hidden="true"></span>%nn;
               <span class="sr-only">[*tools] [person/persons]0</span>%nn;
             </a>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu dropdown-menu-transl">
               %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)
                   <a class="dropdown-item" href="%if;(b.access_by_key="yes")
                     %apply;pnocz(first_name_key,surname_key,occ)%else;%apply;iz(index)%end;"
@@ -224,12 +224,14 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                     title="%apply;copylink([wizard/wizards/friend/friends/exterior]0)">%nn;
                     [wizard/wizards/friend/friends/exterior]0</button>
                 </div>
-                <div class="dropdown-divider"></div>
-                <button class="dropdown-item simple-copy" type="button" title="[*copy link %s:::wiki]"
-                   data-wikilink="%[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]">%nn;<i class="far fa-clipboard fa-fw mr-2"></i>%nn;
-                   %[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]</button>
-                <button class="dropdown-item full-copy" type="button" title="[*copy link %s:::wikitext]"  
-                  data-wikilink="%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]"><i class="far fa-clipboard fa-fw mr-2"></i>%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]</button>
+                %if;(self!="? ?")
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-item simple-copy" type="button" title="[*copy link %s:::wiki]"
+                     data-wikilink="%[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]">%nn;<i class="far fa-clipboard fa-fw mr-2"></i>%nn;
+                     %[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]</button>
+                  <button class="dropdown-item full-copy" type="button" title="[*copy link %s:::wikitext]"
+                    data-wikilink="%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]"><i class="far fa-clipboard fa-fw mr-2"></i>%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]</button>
+                %end;
                 <div class="dropdown-divider"></div>
                 %define;searchgnt(xx)
                   [*search %s on Geneanet:::xx]
@@ -286,7 +288,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                    <span class="fa fa-user-cog" aria-hidden="true"></span>%nn;
                    <span class="sr-only">[*tools] %if;(nb_families>1)[family/families]1%else;[family/families]0%end;</span>%nn;
                  </a>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu dropdown-menu-transl">
                   %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
                   %elseif;(not is_male and not is_female)
                     <a class="dropdown-item" href="%prefix;m=ADD_FAM&ip=%index;&sex=M"><span class="fa fa-plus"></span> [*add::relation/relations]0 ([M/F]0)</a>
@@ -324,27 +326,28 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
           %if;has_parents;
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle text-secondary%if;(e.m="A") active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"><span class="fa fa-code-fork fa-fw" title="[*ancestor/ancestors]1"></span></a>
-              <div class="dropdown-menu">
+              <div class="dropdown-menu dropdown-menu-transl">
                 <a class="dropdown-item" href="%prefix;%access;&m=A"><span class="fa fa-cog fa-fw mr-2"></span>[*ancestor/ancestors]1</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" id="anc_tree" href="%prefix;%access;&m=A&t=T&v=5" %laY;><span class="fa fa-code-fork fa-fw mr-2"></span>[*ascendants tree]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=H&v=5" title="[*horizontal tree]"><span class="fa fa-timeline fa-rotate-90 fa-fw mr-2"></span>[*horizontal tree]</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=A&t=Z&v=7&maxv=%max_anc_level;&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on&gen=1&ns=1&hl=1%if;(e.im=0)&im=0%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [ancestor/ancestors]1</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=Z&v=6&maxv=%max_anc_level;&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on&gen=1&ns=1&hl=1%if;(e.im=0)&im=0%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [ancestor/ancestors]1</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=G&v=3&maxv=%max_anc_level;&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><span class="fa fa-newspaper fa-fw mr-2"></span>[*long display]</a>
+                <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;i=%index;&m=A&t=F&tf1=sb&v=%max_anc_level;&maxv=%max_anc_level;"><span class="fa fa-align-justify fa-fw mr-2"></span>[*surnames branch]</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=5"><span class="fa fa-chart-pie fa-fw mr-2"></span>[*fanchart]</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=CT&hi=H&v=5&scale=100&fs=17&sosa=on" title="[*compact tree] [with] %self;"><span class="fa fa-th fa-fw mr-2"></span>[*compact tree]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=h7&wide=on" title="[Arbre 7 gen]"><span class="fa fa-border-none fa-fw mr-2"></span>7 [generation/generations]1</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=m" title="[Arbre 9 gen]"><span class="fa fa-chess-board fa-fw mr-2"></span>9 [generation/generations]1</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=5"><span class="fa fa-chart-pie fa-fw mr-2"></span>[*fanchart]</a>
               </div>
             </li>
           %end;
           %if;has_children;
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle text-secondary%if;(e.m="D") active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"><span class="fa fa-sitemap fa-fw" title="[*descendants]"></span></a>
-              <div class="dropdown-menu">
+              <div class="dropdown-menu dropdown-menu-transl">
                 <a class="dropdown-item" href="%prefix;%access;&m=D"><span class="fa fa-cog fa-fw mr-2"></span>[*descendants]</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;&m=D&t=V&%if;(e.v!="")v=%e.v;%else;v=3%end;"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*descendants tree]</a>
@@ -359,7 +362,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
           %end;
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle text-secondary%if;(e.m="R" or e.m="F" or (e.m="C" and e.t="AN")) active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false" title="[*relationship]"><span class="fa fa-user-friends"></span></a>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu dropdown-menu-transl">
               <a class="dropdown-item" href="%prefix;%access;&m=R" %laR;><span class="fa fa-cog fa-fw mr-2"></span>[*relationship computing]</a>
               <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;m=C&%access;&v=3"
@@ -395,7 +398,12 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
         </ul>
       </div></div>
     </nav>
-  %include;home
+  %( 2 strange cases to exclude (avoid 2× home btns stacking)
+    * AD/MO|D_|PAR/FAM have a menubar if e.ip!="" but the new ADDFAM don’t!
+    * SND_IMAGE uses interp_notempl_with_menu : TODO 10 appels de ce type ! %)
+  %if;(not ((e.ip!="" and "D_FAM" in e.m or "D_PAR" in e.m) or e.m="SND_IMAGE"))
+    %include;home
+  %end;
   %if;(evar.m="C" and e.v1!="" or e.v2!="" and not cancel_links)
     %include;buttons_cousins
   %end;

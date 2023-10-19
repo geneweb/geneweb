@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: stats.txt v7.1 10/01/2022 20:01:49 $ -->
+  <!-- $Id: stats.txt v7.1 19/10/2023 02:11:54 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*statistics]</title>
   <meta name="robots" content="none">
@@ -14,16 +14,9 @@
 %include;hed
 %message_to_wizard;
 <div class="container">
+%( %include;menubar not complete %)
+%include;home
 <h1>[*statistics]</h1>
-
-%if;not cancel_links;
-  <div class="btn-group float-%right;">
-    %if;(referer != "")
-      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg pl-1" title="[*home]"></span></a>
-  </div>
-%end;
 
 %define;births(nnn)[the latest %d births:::nnn]%end;
 %define;deaths(nnn)[the latest %t deaths:::nnn]%end;

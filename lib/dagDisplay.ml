@@ -806,7 +806,6 @@ let print_slices_menu conf hts =
   in
   let title _ = header 0 in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   if cgl then () else Hutil.interp_no_env conf "buttons_rel";
   Output.print_sstring conf {|<form method="get" action="|};
   Output.print_sstring conf conf.command;
@@ -835,7 +834,7 @@ let print_slices_menu conf hts =
   Output.printf conf "<input name=\"width\" size=\"5\" value=\"%d\">\n" wid;
   Output.print_sstring conf {|</td></tr></table><p>|};
   Output.print_sstring conf
-    {|<p><button type="submit" class="btn btn-secondary btn-lg">|};
+    {|<p><button type="submit" class="btn btn-primary btn-lg">|};
   transl_nth conf "validate/delete" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|</button></p></form>|};
