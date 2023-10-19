@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updhist.txt v7.1 04/03/2023 09:51:04 $ -->
+  <!-- $Id: updhist.txt v7.1 19/10/2023 03:18:09 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none">
@@ -14,35 +14,37 @@
 %include;hed
 %message_to_wizard;
 <div class="container">
-%define;search_form(xxx)
+%include;home
+<h1>[*history of updates]</h1>
+%define;search_form()
   %if;(wizard or friend)
     <form class="form-inline mb-2" method="get" action="%action;">
       %hidden;
-      <input type="hidden" name="m" value="HIST_SEARCH"%/>
-      <input type="hidden" name="k" value="%evar.k;"%/>
-      %if;(evar.m = "HIST_SEARCH" and found)
-        <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;"%/>
+      <input type="hidden" name="m" value="HIST_SEARCH">
+      %if;(e.m = "HIST_SEARCH" and found)
+        <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;">
       %end;
       <div class="input-group">
         <input type="text" class="form-control" placeholder="[*search/case sensitive]0"
-               name="s" size="30" maxlength="40" value="%evar.s.ns;"%/>
+          name="s" size="30" maxlength="40" value="%e.s.ns;">
         <div class="input-group-append">
-          <button type="submit" class="btn btn-outline-secondary" title="[*validate/delete]0">OK</button>
+          <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0">OK</button>
         </div>
       </div>
-      <div class="form-check ml-2">
-        <label class="form-check-label">
-          <input class="form-check-input" type="checkbox" name="c" value="on"%nn;
-            %if;("main" != "true" and evar.c = "on")checked%end;>
-          [search/case sensitive]1
-        </label>
+      <label class="my-1 ml-3 mr-2" for="rows">[*number of rows]</label>
+      <input type="number" class="form-control" id="rows" title="[*number of rows]"
+         name="k" value="%kk;" min="0" max="150" step="10">
+      <div class="custom-control custom-checkbox ml-3">
+        <input type="checkbox" class="custom-control-input" name="c" value="on" id="case"
+          %if;("main"!="true" and e.c="on") checked%end;>
+        <label class="custom-control-label" for="case">[*search/case sensitive]1</label>
       </div>
     </form>
   %end;
 %end;
 
-%let;kk;%if;(evar.k = "")3%else;%evar.k%end;%in;
-%let;wiz;%if;(evar.wiz != "" and evar.n = "")%evar.wiz;%end;%in;
+%let;kk;%if;(e.k = "")3%else;%e.k%end;%in;
+%let;wiz;%if;(e.wiz != "" and e.n = "")%e.wiz;%end;%in;
 %define;table()
   <table class="table table-sm table-hover px-1">
     <thead class="thead-default">
@@ -54,7 +56,7 @@
         %if;(bvar.history_diff = "yes")<th class="text-center"><i class="fa fa-history fa-fw text-dark" title="[*history]"></i></th>%end
       </tr>
     </thead>
-    %foreach;history_line(kk, evar.pos, wiz)
+    %foreach;history_line(kk, e.pos, wiz)
       <tr>
         <td>%time;</td>
         <td>
@@ -135,17 +137,15 @@
 %end;
 
 %define;nav()
-  %if;(pos != "")
+  %if;(pos!="")
    <form class="form-inline" method="get" action="%action;">
      %hidden;
      <input type="hidden" name="m" value="HIST">
+     <input type="hidden" name="k" value="%e.k;">
      <input type="hidden" name="pos" value="%pos;">
      <div class="input-group">
-       <input type="number" class="form-control" name="k" min="10" max="1000" step="10" value="%kk;" title="number of rows">
-       <div class="input-group-append">
-         <button type="submit" class="btn btn-outline-secondary" title="[*validate/delete]0"><i class="fa fa-forward fa-fw"></i></button>
-       </div>
-       %if;(wiz != "")
+       <button type="submit" class="btn btn-outline-primary ml-4" title="[*next]"><i class="fa fa-forward fa-fw"></i></button>
+       %if;(wiz!="")
          <input type="hidden" name="wiz" value="%wiz;">([wizard/wizards/friend/friends/exterior]0[:] %wiz;)
        %end;
      </div>
@@ -153,30 +153,18 @@
   %end;
 %end;
 
-<div class="d-flex justify-content-between">
-  <h1>[*history of updates]</h1>
-  %if;not cancel_links;
-    <div class="btn-group float-right mt-3">
-      %if;(referer != "")
-        <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-      %end;
-      <a href="%prefix;"><span class="fa fa-home fa-lg ml-1" title="[*home]"></span></a>
-    </div>
-  %end;
-</div>
-
-%if;(not cancel_links and (evar.m != "HIST_SEARCH" or not found))
+%if;(not cancel_links and (e.m!="HIST_SEARCH" or not found))
   <div class="d-flex justify-content-between mt-2 px-1">
-    <div class="order-1">%apply;search_form("")</div>
+    <div class="order-1">%apply;search_form()</div>
     <div class="d-none order-3">%apply;table()</div>
     <div class="order-2">%apply;nav()</div>
   </div>
 %end;
 %apply;table()
 
-%if;(evar.m = "HIST_SEARCH" and found)
+%if;(e.m="HIST_SEARCH" and found)
   <div class="d-flex justify-content-between px-1">
-    %apply;search_form("left")
+    %apply;search_form()
     %apply;nav()
   </div>
 %end;
