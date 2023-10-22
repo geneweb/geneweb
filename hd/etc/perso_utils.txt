@@ -50,21 +50,19 @@
   %if;not cancel_links;
     %if;wizard;
       <a href="%prefix;m=MOD_IND&i=%xxx.index;"%sp;
-        title="[*modify::] %xxx.first_name; %xxx.surname;%if;(xxx.occ!="0") (%xxx.occ;)%end;"><i%sp;
-    %elseif;friend;
-      <i%sp;
+        title="[*modify::] %xxx.first_name; %xxx.surname;%if;(xxx.occ!="0") (%xxx.occ;)%end;">
     %end;
+    <i%sp;
   %end;
   %if;xxx.is_male;
-    %if;cancel_links;♂%sp;%elseif;(friend or wizard)class="fa fa-mars male%end;%nn;
+    %if;cancel_links;♂%sp;%else;class="fa fa-mars male%end;%nn;
   %elseif;xxx.is_female;
-    %if;cancel_links;♀%sp;%elseif;(friend or wizard)class="fa fa-venus female%end;%nn;
+    %if;cancel_links;♀%sp;%else;class="fa fa-venus female%end;%nn;
   %else;
-    %if;cancel_links;⚲%sp;%elseif;(friend or wizard)class="fa fa-neuter neuter%end;%nn;
+    %if;cancel_links;⚲%sp;%else;class="fa fa-neuter neuter%end;%nn;
   %end;%nn;
-  %if;not cancel_links; mr-1">%nn;
-    %if;wizard;</i></a>%nn;
-    %elseif;friend;</i>%end;
+  %if;not cancel_links; mr-1"></i>
+    %if;wizard;</a>%end;
   %end;
 %end;
 
