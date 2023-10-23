@@ -105,6 +105,7 @@ type config = {
   cgi : bool;
   forced_plugins : string list;
   plugins : string list;
+  notify_change : string option;
 }
 
 (**/**)
@@ -170,6 +171,7 @@ let empty =
       { status = ignore; header = ignore; body = ignore; flush = ignore };
     forced_plugins = [];
     plugins = [];
+    notify_change = None;
   }
 
 (**/**)

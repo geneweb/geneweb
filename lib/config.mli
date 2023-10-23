@@ -109,6 +109,7 @@ type config = {
   cgi : bool;
   forced_plugins : string list;
   plugins : string list;
+  notify_change : string option
 }
 (** Geneweb configuration data type *)
 

@@ -165,7 +165,11 @@ let diff_person conf base changed =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 let notify_change conf base changed action =
   if Sys.unix then
-    match List.assoc_opt "notify_change" conf.base_env with
+    let notify_change =
+      if Option.is_some conf.notify_change then conf.notify_change
+      else List.assoc_opt "notify_change" conf.base_env
+    in
+    match notify_change with
     | Some comm -> (
         let base_args =
           match changed with

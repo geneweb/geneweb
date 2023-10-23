@@ -50,6 +50,7 @@ let debug = ref false
 let use_auth_digest_scheme = ref false
 let wizard_just_friend = ref false
 let wizard_passwd = ref ""
+let notify_change = ref None
 
 let is_multipart_form =
   let s = "multipart/form-data" in
@@ -1244,6 +1245,7 @@ let make_conf from_addr request script_name env =
      output_conf;
      forced_plugins = !forced_plugins;
      plugins = !plugins;
+     notify_change = !notify_change;
     }
   in
   conf, ar
@@ -1911,6 +1913,7 @@ let main () =
     ; ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock files before writing.")
     ; (arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin." )
     ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
+    ; ("-notify_change", Arg.String (fun x -> notify_change := Some x), "<FILE> Use given path to file as the command to be executed upon changes made in a base")
 #ifdef UNIX
     ; ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
