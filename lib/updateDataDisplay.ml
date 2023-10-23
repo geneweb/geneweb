@@ -104,6 +104,7 @@ let print_mod_ok conf base =
     Output.print_string conf (Mutil.encode data);
     Output.print_sstring conf {|&s=|};
     Output.print_string conf (Mutil.encode ini);
+    Output.print_string conf (Adef.("#entry_anchor_" ^<^ List.assoc "key" conf.env));
     Output.print_sstring conf {|" id="reference">|};
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl conf "new modification"));
@@ -120,6 +121,7 @@ let print_mod_ok conf base =
     Output.print_string conf (Mutil.encode data);
     Output.print_sstring conf {|&s=|};
     Output.print_string conf (Mutil.encode ini);
+    Output.print_string conf (Adef.("#entry_anchor_" ^<^ List.assoc "key" conf.env));
     Output.print_sstring conf {|" id="reference">|};
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl conf "new modification"));
