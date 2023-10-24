@@ -29,6 +29,8 @@ fi
 WEB_ROOT=`echo $TMP | sed -e "s/DocumentRoot//g" \
         | sed "s/^[ \t]*//" | sed -e 's/"//g'`
 
+echo Web-root: $WEB_ROOT
+
 # You might change the distribution name to your liking
 # but this is not recommended.
 # The name "distribution" seems to be hard-coded in some places (gwd.ml)
@@ -53,28 +55,60 @@ echo "Bases: $BASES"
 #  ln -s ../$DISTRIB_NAME $WEB_ROOT
 #fi
 # Apache does not follow SymLinks
-rm -f -R $WEB_ROOT/$DISTRIB_NAME
-cp -f -R ../$DISTRIB_NAME $WEB_ROOT
+#rm -f -R $WEB_ROOT/$DISTRIB_NAME
+#cp -f -R ../$DISTRIB_NAME $WEB_ROOT
 
 cd ./install-cgi
 
 BIN_DIR=$WEB_ROOT/$DISTRIB_NAME/gw
 if [ -d $WEB_ROOT/cgi-bin ]; then
+  echo "Copy some files to Web-root"
   cp gwd.cgi $WEB_ROOT/cgi-bin
   cp test.cgi $WEB_ROOT/cgi-bin
   cp Lenna.jpg $WEB_ROOT
   chmod +x $WEB_ROOT/cgi-bin/gwd.cgi
+  if [ $OS_ENV = "Darwin" ]; then
+    # Apple extended attributes
+    xattr -d com.apple.quarantine $WEB_ROOT/gwd.cgi
+  fi
 else
   echo "missing cgi-bin"
   exit -1
 fi
 
+# To verify that Apache works, execute test.cgi from the cgi-bin folder
+
+# (base) Henri@iMac-H cgi-bin % ./test.cgi 
+# Content-type: text/html
+
+# <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"   
+#   "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">  
+# <html xmlns="http://www.w3.org/1999/xhtml">  
+# <body>
+# This is a test for cgi commands<br>
+# This should display Lenna:<br>
+# <img src="/Lenna.jpg">
+# <br>
+# End of test
+# </body>
+# </html>
+# (base) Henri@iMac-H cgi-bin % 
+
+# next step is to do the same from your browser :
+# http://localhost/~Henri/cgi-bin/test.cgi
+# you should get:
+# This is a test for cgi commands
+# This should display Lenna:
+# <image of Lenna.jpg>
+# End of test 
+
+echo "Make tmp dir"
 LOG_DIR="tmp"
 if ! [ -d $WEB_ROOT/$LOG_DIR ]; then
   mkdir -f $WEB_ROOT/$LOG_DIR
 fi
 
-# Copy test base elements
+echo "Copy test base elements"
 rm -f -R $BASES/test.*
 cp test.gwf $BASES
 if ! [ -d $BASES/src ]; then
@@ -97,7 +131,10 @@ fi
 cp Lenna.jpg $BASES/src/test/images/aatest.jpg
 cp Lenna.jpg $BASES/images/test/tiny.0.mouse.jpg
 
+echo "Create test base"
 $BIN_DIR/gwc -f -o $BASES/test test.gw
+
+echo "Open test base"
 
 open "http://localhost/~$USER/cgi-bin/gwd.cgi?b=test"
 
