@@ -1,8 +1,8 @@
+<!-- $Id: upddata.txt v7.1 25/10/2023 13:49:34 $ -->
+<!-- Copyright (c) 2006-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: upddata.txt v7.1 19/10/2023 04:22:24 $ -->
-  <!-- Copyright (c) 2006-2007 INRIA -->
   <title>%title;</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -14,27 +14,21 @@
 %include;hed
 %include;home
 <div class="container">
-  <div class="d-flex justify-content-between mt-2">
-    <div class="col-1">
-      %if;(e.s!="")
-        <a title="[*help modify data]" class="mt-2" role="alert">
-          <i class="fas fa-hat-wizard fa-fw text-danger"></i>
-        </a>
-      %end;
+  <div class="d-flex flex-column justify-content-center">
+    <div class="alert alert-warning w-auto text-center mt-2" role="alert">
+      <i class="fas fa-hat-wizard fa-fw text-danger"></i> [*help modify data] 
+      <i class="fas fa-hat-wizard fa-fw text-danger"></i>
     </div>
-    <h1 class="text-center mt-3">%title;</h1>
-    <div class="col-1"></div>
+    <h1 class="text-center">%title;</h1>
   </div>
   %let;length_s;%if;(e.s!="")%e.length.s;%else;0%end;%in;
   %let;nbs;%if;(e.nbs!="" and e.nbs<=length_s)%e.nbs;%else;%length_s;%end;%in;
-    %reset_count;
-  %foreach;entry;%foreach;value;%incr_count;%end;%end;
-  %let;value_list_len;%count;%in;
-  %if;(nb_results>1000)<div class="my-2 mx-3">%if;(e.s="")[*select a letter]%else;[*specify]%end;[:]</div>%end;
+  %let;nb_max;%if;(b.book_max_results!="" and b.book_max_results>0)%b.book_max_results;%else;1000%end;%in;
   <div class="col-auto">
     <div class="btn-group" role="toolbar" aria-label="sub-selection">
-      %if;(e.s!="")<a class="mr-3 align-self-center" href="%prefix;m=MOD_DATA&data=%e.data;" title="Index"><i class="fa fa-book fa-2x"></i></a>%end;
-      <div class="btn-group d-flex align-content-around flex-wrap">
+      <a role="button" class="btn btn-link %if;(e.s="") disabled%end;" href="%prefix;m=MOD_DATA&data=%e.data;" title="Index">
+        <i class="fa fa-book fa-2x"></i></a>
+      <div class="d-flex align-content-around flex-wrap ml-3">
         <span class="text-monospace">
           %if;(substr_start_e.1.s!="" and length_s>1)<a href="%prefix;m=MOD_DATA&data=%e.data;&s=%substr_start_e.1.s;">%substr_start_e.1.s;</a> >%end;
           %if;(substr_start_e.2.s!="" and length_s>2) <a href="%prefix;m=MOD_DATA&data=%e.data;&s=%substr_start_e.2.s;">%substr_start_e.2.s;</a> >%end;
@@ -42,135 +36,144 @@
           %if;(length_s-nbs>4 and nbs>0) … >%end;
           %if;(e.s!="")
             %foreach;substr.s;
-              %if;(cnt>2 and cnt+1 >= length_s-nbs )<a href="%prefix;m=MOD_DATA&data=%e.data;&s=%substr;"> %substr;</a> > %end;%nn;
+              %if;(cnt>2 and cnt+1>=length_s-nbs)<a href="%prefix;m=MOD_DATA&data=%e.data;&s=%substr;"> %substr;</a> > %end;%nn;
             %end;<b> %e.s;</b>%nn;
           %end;
-          %if;(value_list_len>1)
+          %if;(nb_results>1)
             %foreach;entry;
-              %if;(e.s!="")%sp;%if;(max>0)<a href="#_%entry_ini;">·</a>%else;·%end;%end;
-              %sp;%if;(max>0)<a href="%prefix;m=MOD_DATA&data=%e.data;&s=%html_encode.entry_ini;#%html_encode.entry_ini;">%entry_ini;</a>%else;%entry_ini;%end;
+              %sp;%if;(e.s!="")%sp;%if;(max>0 and nb_results<nb_max)<a href="#_%entry_ini;" title="#%entry_ini">·</a>%else;·%end;%end;
+               %if;(max>0)<a href="%prefix;m=MOD_DATA&data=%e.data;&s=%html_encode.entry_ini;#%html_encode.entry_ini;">%entry_ini;</a>%else;%entry_ini;%end;
             %end;
           %end;
         </span>
       </div>
     </div>
   </div>
-     <div class="mt-2 ml-3">
-      <form class="form-inline" method="get" action="%action;">
-        %hidden;
-        <input type="hidden" name="m" value="MOD_DATA">
-        <input type="hidden" name="data" value="%e.data;">
-        %if;(e.nbs!="")<input type="hidden" name="nbs" value="%e.nbs;">%end;
-        <div class="form-group">
-          <label for="search_s">[*search/case sensitive]0</label>
-          <input type="search" class="form-control ml-2" name="s" id="search_s" aria-describedby="personnal input">
-          <button type="submit" class="btn btn-primary ml-2">Ok</button>
-        </div>
-      </form>
-    </div>
-  %if;(e.s!="")
+  <div class="my-3 ml-3">
+    <form class="form-inline" method="get" action="%action;">
+      %hidden;
+      <input type="hidden" name="m" value="MOD_DATA">
+      <input type="hidden" name="data" value="%e.data;">
+      %if;(e.nbs!="")<input type="hidden" name="nbs" value="%e.nbs;">%end;
+      <div class="form-group">
+        <label for="search_s">[*search/case sensitive]0</label>
+        <input type="search" class="form-control ml-3" name="s" id="search_s" aria-describedby="personnal input">
+        <button type="submit" class="btn btn-primary ml-2">Ok</button>
+      </div>
+    </form>
+  </div>
   %( liste des entrées et formulaire d'édition %)
-  <ul class="list-group">
-    %foreach;entry;
-      <li class="list-group-item list-group-item-primary py-0 mt-2 justify-content-between">
-        <a class="btn btn-link p-0 ml-1" href="#top" title="Return to top" tabindex="-1"><i class="fa fa-arrow-up fa-fw mx-1"></i></a>%nn;
-        <a class="font-weight-bold text-monospace" id="_%entry_ini;" href="%prefix;m=MOD_DATA&data=%e.data;&s=%html_encode.entry_ini;">%entry_ini;</a>
-      </li>
-      <li class="list-unstyled mt-1">
-        <ul class="list-group">
-          %foreach;value;
-            <li class="list-unstyled ml-4">
-              <table><tr><td>
-                %if;(e.data="place")
-                <a href="https://www.wikidata.org/w/index.php?search=%nn;
-                  %if;(not first and suburb!="")%escape.printable.suburb;%else;%escape.printable.other;%end;"
-                  role="button" class="btn btn-link p-0 ml-1"
-                  title="%if;(not first and suburb!="")%escape.printable.suburb;%else;%escape.printable.other;%end; sur Wikidata"
-                  target="_blank" rel="noreferrer" rel="noopener" tabindex="-1">
-                  <i class="fab fa-wikipedia-w fa-sm%if;(not first and suburb!="") text-danger%end;"></i>
-                </a>
-                %if;(first and suburb!="")<br>
-                <a href="https://www.wikidata.org/w/index.php?search=%escape.printable.suburb;"
-                  role="button" class="btn btn-link p-0 ml-1"
-                  title="%escape.printable.suburb; sur Wikidata"
-                  target="_blank" rel="noreferrer" rel="noopener" tabindex="-1">
-                  <i class="fab fa-wikipedia-w fa-sm text-danger"></i>
-                </a>
-                %end;
-                %end;
-                </td><td>
-              <a role="button" id="%escape.entry_value;" class="btn btn-link d-inline text-wrap ml-%if;is_modified;5 pl-4%else;2%end;%nn;
-                %if;is_modified; disabled" tabindex="-1" aria-disabled="true%end;"
-                href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.e.s;">
-                  %if;(e.data="place" and suburb!="")
-                    %if;is_modified;%escape.entry_value;
-                    %else;
-                      %if;(first)
-                        %escape.other;<br><span class="ml-5">%escape.suburb;</span>
-                      %else;
-                        <span class="ml-4">%escape.suburb;</span>
+  %if;(nb_results<nb_max)
+    <ul class="list-group">
+      %foreach;entry;
+        <li class="list-group-item list-group-item-primary py-0 mt-2 justify-content-between">
+          <a class="btn btn-link p-0 ml-1" href="#top" title="Return to top" tabindex="-1"><i class="fa fa-arrow-up fa-fw mx-1"></i></a>%nn;
+          <a class="font-weight-bold text-monospace" id="_%entry_ini;" href="%prefix;m=MOD_DATA&data=%e.data;&s=%html_encode.entry_ini;">%entry_ini;</a>
+        </li>
+        <li class="list-unstyled mt-1">
+          <ul class="list-group">
+            %foreach;value;
+              <li class="list-unstyled ml-4">
+                <div class="d-flex">
+                  <div class="d-flex flex-column justify-content-center">
+                    %if;(e.data="place")
+                      <a href="https://www.wikidata.org/w/index.php?search=%nn;
+                        %if;(not first and suburb!="")%escape.printable.suburb;%else;%escape.printable.other;%end;"
+                        role="button" class="btn btn-link p-0 ml-1"
+                        title="%if;(not first and suburb!="")%escape.printable.suburb;%else;%escape.printable.other;%end; sur Wikidata"
+                        target="_blank" rel="noreferrer" rel="noopener" tabindex="-1">
+                        <i class="fab fa-wikipedia-w fa-sm%if;(not first and suburb!="") text-danger%end;"></i>
+                      </a>
+                      %if;(first and suburb!="")
+                        <a href="https://www.wikidata.org/w/index.php?search=%escape.printable.suburb;"
+                          role="button" class="btn btn-link p-0 ml-1"
+                          title="%escape.printable.suburb; sur Wikidata"
+                          target="_blank" rel="noreferrer" rel="noopener" tabindex="-1">
+                          <i class="fab fa-wikipedia-w fa-sm text-danger"></i>
+                        </a>
                       %end;
                     %end;
-                  %else;
-                    %escape.entry_value;
-                  %end;
-                %if;is_modified; <b>([modify])</b>%end;</a>
-              %if;is_modified;
-                <form class="form-inline pl-1 ml-5 needs-validation" method="post" action="%action;" novalidate>
-                  %hidden;
-                  <input type="hidden" name="key" value="%entry_key;">
-                  <input type="hidden" name="m" value="MOD_DATA_OK">
-                  <input type="hidden" name="data" value="%e.data;">
-                  <input type="hidden" name="s" value="%e.s;">
-                  <input type="hidden" name="k" value="kkk">
-                  %if;(e.data="fn")
-                    <div class="form-check form-check-inline ml-sm-2 ml-md-5">
-                      <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" id="first_name_aliases" name="first_name_aliases" value="yes" autofocus> [*add the previous name as a first name alias]
-                      </label>
-                    </div>
-                  %end;
-                  %if;(e.data="sn")
-                    <div class="form-check form-check-inline mt-2 ml-5">
-                      <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" id="surname_aliases" name="surname_aliases" value="yes" autofocus> [*add the previous name as a surname alias]
-                      </label>
-                    </div>
-                  %end;
-                  <div class="input-group col-12 px-0 mx-2">
-                    %if;(b.notextarea="yes" or e.data="fn" or e.data="sn" or e.data="place")
-                      <input type="text" class="form-control col-11" id="nx_input" name="nx_input"%nn
-                        maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
-                        value="%escape.printable.entry_value;" placeholder="%escape.printable.entry_value;"
-                        %if;(e.data!="fn" or e.data!="sn") autofocus%end; aria-label="Recipient's username" aria-describedby="button-addon2" required>
-                    %else;
-                      <textarea class="form-control col-11" id="nx_input" name="nx_input" rows="1"
-                        maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
-                        placeholder="%escape.printable.entry_value;"%if;(e.data!="fn" or e.data!="sn") autofocus%end; required>%escape.printable.entry_value;</textarea>
-                    %end;
-                    <div class="valid-feedback">
-                      must be different!
-                    </div>
-                    <button type="submit" class="btn btn-primary ml-2" title="[*modify]">OK</button>
-                    %(%if;(e.data="place" and suburb="")
-                      <div class="custom-control custom-checkbox ml-2">
-                        %( TODO: wip rename all places %)
-                        <input type="checkbox" class="custom-control-input ml-3" name="all" id="all" value="on" checked>
-                        <label class="custom-control-label my-2" title="!! [*apply to same places with suburb] (WIP) !!"
-                          for="all">[*all]</label>
-                      </div>
-                    %end;%)
                   </div>
-                </form>
-              %end;
-              </td></tr></table>
-            </li>
-          %end;
-        </ul>
-      </li>
-    %end;
-  </ul>
-%end;
+                  <div class="d-flex flex-column ml-2%if;is_modified; my-2%end;">
+                     %if;is_modified;
+                       <div class="ml-5 pl-3 text-muted">
+                     %else;
+                       <a role="button" id="%escape.entry_value;" class="ml-2"
+                        href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.e.s;">
+                     %end;
+                          %if;(e.data="place" and suburb!="")
+                            %if;is_modified;%escape.entry_value;
+                            %else;
+                              %if;(first)
+                                %escape.other;<br><span class="ml-4">%escape.suburb;</span>
+                              %else;
+                                <span class="ml-4">%escape.suburb;</span>
+                              %end;
+                            %end;
+                          %else;
+                            %escape.entry_value;
+                          %end;
+                    %if;is_modified; <b>([modify])</b></div>%else;</a>%end;
+                    %if;is_modified;
+                      <form class="form-inline mt-1 ml-5 needs-validation" method="post" action="%action;" novalidate>
+                        %hidden;
+                        <input type="hidden" name="key" value="%entry_key;">
+                        <input type="hidden" name="m" value="MOD_DATA_OK">
+                        <input type="hidden" name="data" value="%e.data;">
+                        <input type="hidden" name="s" value="%e.s;">
+                        <input type="hidden" name="k" value="kkk">
+                        %if;(e.data="fn")
+                          <div class="form-check form-check-inline ml-sm-2 ml-md-5">
+                            <label class="form-check-label">
+                              <input class="form-check-input" type="checkbox" id="first_name_aliases" name="first_name_aliases" value="yes" autofocus> [*add the previous name as a first name alias]
+                            </label>
+                          </div>
+                        %end;
+                        %if;(e.data="sn")
+                          <div class="form-check form-check-inline mt-2 ml-5">
+                            <label class="form-check-label">
+                              <input class="form-check-input" type="checkbox" id="surname_aliases" name="surname_aliases" value="yes" autofocus> [*add the previous name as a surname alias]
+                            </label>
+                          </div>
+                        %end;
+                        <div class="input-group col-12 px-0 mx-2">
+                          %if;(b.notextarea="yes" or e.data="fn" or e.data="sn" or e.data="place")
+                            <input type="text" class="form-control col-11" id="nx_input" name="nx_input"%nn
+                              maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
+                              value="%escape.printable.entry_value;" placeholder="%escape.printable.entry_value;"
+                              %if;(e.data!="fn" or e.data!="sn") autofocus%end; aria-label="Recipient's username" aria-describedby="button-addon2" required>
+                          %else;
+                            <textarea class="form-control col-11" id="nx_input" name="nx_input" rows="1"
+                              maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
+                              placeholder="%escape.printable.entry_value;"%if;(e.data!="fn" or e.data!="sn") autofocus%end; required>%escape.printable.entry_value;</textarea>
+                          %end;
+                          <div class="valid-feedback">
+                            must be different!
+                          </div>
+                          <button type="submit" class="btn btn-primary ml-2" title="[*modify]">OK</button>
+                          %(%if;(e.data="place" and suburb="")
+                            <div class="custom-control custom-checkbox ml-2">
+                              %( TODO: wip rename all places %)
+                              <input type="checkbox" class="custom-control-input ml-3" name="all" id="all" value="on" checked>
+                              <label class="custom-control-label my-2" title="!! [*apply to same places with suburb] (WIP) !!"
+                                for="all">[*all]</label>
+                            </div>
+                          %end;%)
+                        </div>
+                      </form>
+                    %end;
+                </div>
+              </li>
+            %end;
+          </ul>
+        </li>
+      %end;
+    </ul>
+  %else;
+    <div class="alert alert-warning my-3">[*too much results]
+      (> %if;(b.book_max_results!="")book_max_results=%b.book_max_results;%else;%nb_max%end;).
+      %if;(e.s!="")[*specify]%else;[*select a letter]%end;.</div>
+  %end;
 %base_trailer;
 %include;copyr
 </div>

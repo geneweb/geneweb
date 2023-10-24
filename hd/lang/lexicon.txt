@@ -7905,7 +7905,7 @@ tr: eş ve çocuklar bilinmiyor
     help modify data
 co: Fate casu ! E currezzioni fatte in u dizziunariu mudificheghjanu l’inseme di i dati chì currispondenu in a basa.
 de: Klicken Sie auf das zu korrigierende „Listen-Element”: alle Dateien Ihres Baumes werden sofort korrigiert.
-en: Be carefull. Modifications that are made in the “book” update the corresponding element in the entire database.
+en: Be careful! Modifications in the “book” update the corresponding elements in the entire database.
 es: Pulse en "el elemento de la lista" que desee corregir: todas las fichas de su árbol se corregirán instantáneamente.
 fi: Napsauta 'Päivitä' ja koko sukupuusi päivitetään automaattisesti.
 fr: Attention ! Les corrections dans le dictionnaire modifient l’ensemble des données correspondantes dans la base.
@@ -17246,6 +17246,10 @@ pt: ferramentas
 ru: инструменты
 sv: verktyg
 tr: araçlar
+
+    too much results
+en: too much results
+fr: trop de résultats
 
     total
 af: totaal
