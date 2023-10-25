@@ -291,13 +291,17 @@ let descendant_label conf base info x p =
           (transl_nth conf "nth (generation)" n)
       |> Adef.safe
 
+(* transl_nth does a plain translation *)
+(* apply_format handles %s, %d after the nth selection *)
 let brother_label conf x sex : Adef.safe_string =
   let is = index_of_sex sex in
   match x with
-  | 1 -> transl_nth conf "a brother/a sister/a sibling" is |> Adef.safe
-  | 2 -> transl_nth conf "a cousin" is |> Adef.safe
-  | 3 -> transl_nth conf "a 2nd cousin" is |> Adef.safe
-  | 4 -> transl_nth conf "a 3rd cousin" is |> Adef.safe
+  | 1 ->
+      Templ.apply_format conf (Some is) "a brother/a sister/a sibling" ""
+      |> Adef.safe
+  | 2 -> Templ.apply_format conf (Some is) "a cousin" "" |> Adef.safe
+  | 3 -> Templ.apply_format conf (Some is) "a 2nd cousin" "" |> Adef.safe
+  | 4 -> Templ.apply_format conf (Some is) "a 3rd cousin" "" |> Adef.safe
   | n ->
       Printf.sprintf
         (ftransl_nth conf "a %s cousin" is)
