@@ -3,7 +3,6 @@
 open Config
 open Gwdb
 open Util
-open Place
 
 let print_html_places_surnames conf base
     (array : (string list * (string * iper list) list) array) =
@@ -84,9 +83,9 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
     with Not_found -> false
   in
   let array =
-    get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
+    Place.get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
       ~add_marriage "" 0
-      (fold_place_short inverted)
+      (Place.fold_place_short inverted)
       (fun _ -> true)
       (fun prev _ -> match prev with Some n -> n + 1 | None -> 1)
       (fun x -> x)
@@ -137,8 +136,10 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism
     with Not_found -> false
   in
   let array =
-    get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
-      ~add_marriage [] [] (fold_place_long inverted) filter
+    Place.get_all conf base ~add_birth ~add_baptism ~add_death ~add_burial
+      ~add_marriage [] []
+      (Place.fold_place_long_v6 inverted)
+      filter
       (fun prev p ->
         let value = (get_surname p, get_iper p) in
         match prev with Some list -> value :: list | None -> [ value ])
@@ -214,6 +215,6 @@ let print_all_places_surnames conf base =
             in
             print_all_places_surnames_long conf base "" ~add_birth ~add_baptism
               ~add_death ~add_burial ~add_marriage lim
-          with List_too_long ->
+          with Place.List_too_long ->
             print_all_places_surnames_short conf base ~add_birth ~add_baptism
               ~add_death ~add_burial ~add_marriage))

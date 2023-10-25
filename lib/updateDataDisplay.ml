@@ -159,8 +159,9 @@ let string_to_list str =
   loop [] str
 
 let unfold_place_long inverted s =
-  let pl = Place.fold_place_long inverted s in
-  String.concat ", " pl
+  let pl, sub = Place.fold_place_long inverted s in
+  if inverted then String.concat ", " (List.rev (sub :: List.rev pl))
+  else String.concat ", " (sub :: pl)
 
 let get_env v env = try List.assoc v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
