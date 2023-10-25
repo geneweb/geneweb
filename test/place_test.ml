@@ -16,7 +16,16 @@ let split_suburb () =
     ("foo-bar", "boobar (baz)")
     (Place.split_suburb "[foo-bar] - boobar (baz)");
   (check (pair string string))
-    "" ("", "boobar (baz)")
+    "test split suburb emdash - 93"
+    ("foo-bar", "boobar (baz)") 
+    (Place.split_suburb "[foo-bar] – boobar (baz)");
+  (check (pair string string))
+    "test split suburb endash - 94"
+    ("foo-bar", "boobar (baz)") 
+    (Place.split_suburb "[foo-bar] — boobar (baz)");
+  (check (pair string string))
+    ""
+    ("", "boobar (baz)")
     (Place.split_suburb "boobar (baz)");
   ()
 
