@@ -74,11 +74,16 @@ let print conf base p =
         Output.print_sstring conf "<label class=\"custom-control-label\" for=\"";
         Output.print_string conf (get_iper p |> string_of_iper |> Mutil.encode);
         Output.print_sstring conf "\">";
+        let cop = (Util.child_of_parent conf base p :> string) in
+        let cop = if cop = "" then "" else ", " ^ cop in
+        let hbw = (Util.husband_wife conf base p true :> string) in
+        let hbw = if hbw = "" then "" else ", " ^ hbw in
         Output.print_sstring conf
-          (Printf.sprintf "%s.%d %s"
+          (Printf.sprintf "%s.%d %s%s%s"
              (get_first_name p |> sou base)
              (get_occ p)
-             (get_surname p |> sou base));
+             (get_surname p |> sou base)
+             cop hbw);
         Output.print_sstring conf "</label></div>")
       list;
   Output.print_sstring conf
