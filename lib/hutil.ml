@@ -30,7 +30,8 @@ let gen_print_link_to_welcome f conf right_aligned =
 let print_link_to_welcome = gen_print_link_to_welcome (fun () -> ())
 
 (* S: use Util.include_template for "hed"? *)
-let header_without_http conf title =
+
+let header_without_http_nor_home conf title =
   let str1 =
     Printf.sprintf {|<!DOCTYPE html>
 <html lang="%s">
@@ -64,16 +65,19 @@ let header_without_http conf title =
   (match Util.open_etc_file conf "hed" with
   | Some (ic, _) -> Templ.copy_from_templ conf [] ic
   | None -> ());
-  (match Util.open_etc_file conf "home" with
-  | Some (ic, _) -> Templ.copy_from_templ conf [] ic
-  | None -> ());
   Util.message_to_wizard conf
 
 let header_without_page_title conf title =
   Util.html conf;
-  header_without_http conf title;
+  header_without_http_nor_home conf title;
   (* balancing </div> in gen_trailer *)
   Output.printf conf "<div class=\"container\">"
+
+let header_without_http conf title =
+  header_without_http_nor_home conf title;
+  (match Util.open_etc_file conf "home" with
+  | Some (ic, _) -> Templ.copy_from_templ conf [] ic
+  | None -> ())
 
 let header_link_welcome conf title =
   header_without_page_title conf title;

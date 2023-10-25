@@ -398,10 +398,8 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
         </ul>
       </div></div>
     </nav>
-  %( 2 strange cases to exclude (avoid 2× home btns stacking)
-    * AD/MO|D_|PAR/FAM have a menubar if e.ip!="" but the new ADDFAM don’t!
-    * SND_IMAGE uses interp_notempl_with_menu : TODO 10 appels de ce type ! %)
-  %if;(not ((e.ip!="" and "D_FAM" in e.m or "D_PAR" in e.m) or e.m="SND_IMAGE"))
+  %( exclusion because AD/MO|D_|PAR/FAM have a menubar if e.ip!="" but the new ADDFAM don’t! %)
+  %if;(not (e.ip!="" and "D_FAM" in e.m or "D_PAR" in e.m))
     %include;home
   %end;
   %if;(evar.m="C" and e.v1!="" or e.v2!="" and not cancel_links)
