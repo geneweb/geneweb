@@ -75,9 +75,9 @@ let header_without_page_title conf title =
 
 let header_without_http conf title =
   header_without_http_nor_home conf title;
-  (match Util.open_etc_file conf "home" with
+  match Util.open_etc_file conf "home" with
   | Some (ic, _) -> Templ.copy_from_templ conf [] ic
-  | None -> ())
+  | None -> ()
 
 let header_link_welcome conf title =
   header_without_page_title conf title;
