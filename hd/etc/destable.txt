@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="%lang;">
+<html lang="%lang;" id="scrollfix">
 <head>
-  <!-- $Id: destable.txt v7.1 09/09/2023 00:52:07 $ -->
+  <!-- $Id: destable.txt v7.1 26/10/2023 14:59:21 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
 <title>%nn;
   %apply;a_of_b%with;[*descendants]%and;%self;%end;
