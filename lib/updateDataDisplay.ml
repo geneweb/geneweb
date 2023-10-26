@@ -30,11 +30,19 @@ let translate_title conf =
     - unit
       [Rem] : Non exporté en clair hors de ce module.                     *)
 let print_mod_ok conf base =
+  let ini_of_update_data ini new_input =
+    let len = String.length ini in
+    let len = min len (String.length new_input) in
+    let new_ini = String.sub new_input 0 len in
+    new_ini
+  in
   let data = Option.value ~default:"" (p_getenv conf.env "data") in
   let ini = Option.value ~default:"" (p_getenv conf.env "s") in
   let new_input =
     Option.fold ~none:"" ~some:only_printable (p_getenv conf.env "nx_input")
   in
+  let new_istr_s = Gwdb.string_of_istr (Gwdb.insert_string base new_input) in
+  let new_ini = ini_of_update_data ini new_input in
   let list = get_person_from_data conf base in
   let list = List.map (fun (istr, perl) -> (sou base istr, perl)) list in
   let nb_pers =
@@ -103,8 +111,8 @@ let print_mod_ok conf base =
     Output.print_sstring conf {|m=MOD_DATA&data=|};
     Output.print_string conf (Mutil.encode data);
     Output.print_sstring conf {|&s=|};
-    Output.print_string conf (Mutil.encode ini);
-    Output.print_string conf (Adef.("#entry_anchor_" ^<^ List.assoc "key" conf.env));
+    Output.print_string conf (Mutil.encode new_ini);
+    Output.print_sstring conf ("#entry_anchor_" ^ new_istr_s);
     Output.print_sstring conf {|" id="reference">|};
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl conf "new modification"));
@@ -121,7 +129,7 @@ let print_mod_ok conf base =
     Output.print_string conf (Mutil.encode data);
     Output.print_sstring conf {|&s=|};
     Output.print_string conf (Mutil.encode ini);
-    Output.print_string conf (Adef.("#entry_anchor_" ^<^ List.assoc "key" conf.env));
+    Output.print_sstring conf ("#entry_anchor_" ^ new_istr_s);
     Output.print_sstring conf {|" id="reference">|};
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl conf "new modification"));
