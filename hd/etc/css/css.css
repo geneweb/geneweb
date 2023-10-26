@@ -14,8 +14,10 @@ h1, h2, h3, h4, h5, h6 { font-weight: lighter !important; }
 
 html {
   font-size: 1rem;
-  scroll-padding-top: 52px;
-  /* scrollbar appear as an overlay, thus not affecting the width of the page when appering */
+}
+
+/* scrollbar appear as an overlay, thus not affecting the width of the page when appering */
+.book html {
   overflow-y: overlay;
 }
 
@@ -87,6 +89,10 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
 }
 
 /* --- Ascendants/Descendants table --- */
+#scrollfix {
+  scroll-padding-top: 52px;
+}
+
 .ascends_table, .descends_table
 {
  border: 1px solid black;

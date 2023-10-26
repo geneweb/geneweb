@@ -1,7 +1,7 @@
-<!-- $Id: ancsosa.txt v7.1 25/09/2023 14:34:40 $ -->
+<!-- $Id: ancsosa.txt v7.1 26/10/2023 14:59:10 $ -->
 <!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
-<html lang="%lang;">
+<html lang="%lang;"%if;(e.t="Z" or e.t="Y") id="scrollfix"%end;>
 <head>
 %define;tothegen(xx)
   [to the %s generation:::xx]%nn;

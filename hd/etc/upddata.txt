@@ -1,7 +1,7 @@
-<!-- $Id: upddata.txt v7.1 25/10/2023 13:49:34 $ -->
+<!-- $Id: upddata.txt v7.1 26/10/2023 15:02:33 $ -->
 <!-- Copyright (c) 2006-2007 INRIA -->
 <!DOCTYPE html>
-<html lang="%lang;">
+<html lang="%lang;" id="book">
 <head>
   <title>%title;</title>
   <meta name="robots" content="none">
