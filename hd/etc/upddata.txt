@@ -73,7 +73,7 @@
         <li class="list-unstyled mt-1">
           <ul class="list-group">
             %foreach;value;
-              <li class="list-unstyled ml-4">
+              <li class="list-unstyled ml-4" id="k%entry_key;">
                 <div class="d-flex">
                   <div class="d-flex flex-column justify-content-center">
                     %if;(e.data="place")

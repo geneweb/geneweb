@@ -30,11 +30,19 @@ let translate_title conf =
     - unit
       [Rem] : Non exporté en clair hors de ce module.                     *)
 let print_mod_ok conf base =
+  let ini_of_update_data ini new_input =
+    let len = String.length ini in
+    let len = min len (String.length new_input) in
+    let new_ini = String.sub new_input 0 len in
+    new_ini
+  in
   let data = Option.value ~default:"" (p_getenv conf.env "data") in
   let ini = Option.value ~default:"" (p_getenv conf.env "s") in
   let new_input =
     Option.fold ~none:"" ~some:only_printable (p_getenv conf.env "nx_input")
   in
+  let new_istr_s = Gwdb.string_of_istr (Gwdb.insert_string base new_input) in
+  let new_ini = ini_of_update_data ini new_input in
   let list = get_person_from_data conf base in
   let list = List.map (fun (istr, perl) -> (sou base istr, perl)) list in
   let nb_pers =
@@ -48,7 +56,7 @@ let print_mod_ok conf base =
     match List.assoc_opt "max_nb_update" conf.base_env with
     | Some n ->
         let n = int_of_string n in
-        if n > 50000 then 5000 else n
+        if n > 5000 then 5000 else n
     | _ -> 5000
   in
   if nb_pers <> 0 && data_modified then (
@@ -65,8 +73,9 @@ let print_mod_ok conf base =
     Output.print_sstring conf (transl conf ":");
     Output.print_sstring conf " ";
     Output.print_sstring conf (min nb_pers max_updates |> string_of_int);
+    Output.print_sstring conf " ";
     if List.assoc_opt "history" conf.base_env = Some "yes" then (
-      Output.print_sstring conf " <a href=\"";
+      Output.print_sstring conf "<a href=\"";
       Output.print_string conf (commd conf);
       Output.print_sstring conf "m=HIST&k=20\">";
       Output.print_sstring conf
@@ -102,7 +111,8 @@ let print_mod_ok conf base =
     Output.print_sstring conf {|m=MOD_DATA&data=|};
     Output.print_string conf (Mutil.encode data);
     Output.print_sstring conf {|&s=|};
-    Output.print_string conf (Mutil.encode ini);
+    Output.print_string conf (Mutil.encode new_ini);
+    Output.print_sstring conf ("#k" ^ new_istr_s);
     Output.print_sstring conf {|" id="reference">|};
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl conf "new modification"));
@@ -119,6 +129,7 @@ let print_mod_ok conf base =
     Output.print_string conf (Mutil.encode data);
     Output.print_sstring conf {|&s=|};
     Output.print_string conf (Mutil.encode ini);
+    Output.print_sstring conf ("#k" ^ new_istr_s);
     Output.print_sstring conf {|" id="reference">|};
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl conf "new modification"));
