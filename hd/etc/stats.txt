@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: stats.txt v7.1 19/10/2023 02:11:54 $ -->
+  <!-- $Id: stats.txt v7.1 27/10/2023 03:33:17 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*statistics]</title>
   <meta name="robots" content="none">
@@ -42,7 +42,7 @@
 
 %if;(wizard or friend)
   <ul>
-    <li><a href="%prefix;m=POP_PYR&int=5&lim=0">[population pyramid]</a></li>
+    <li><a href="%prefix;m=POP_PYR">[population pyramid]</a></li>
   </ul>
 %end;
 

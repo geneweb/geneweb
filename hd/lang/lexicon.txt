@@ -1033,6 +1033,10 @@ co: s’è una fiura cù u listessu nome esiste dighjà in u cartulare di salvag
 en: if an image with the same name already exists in the saved, it will be deleted.
 fr: si une image du même nom existe déjà dans le sous-répertoire de sauvegarde, elle sera supprimée.
 
+    interval
+en: time interval
+fr: intervalle de temps
+
     image note
 co: aghjunghje una nota per a fiura.
 en: add a note for the image.
@@ -9217,6 +9221,10 @@ sk: mladší ako jeden mesiac
 sl: star manj kot en mesec/stara manj kot en mesec
 sv: mindre än en månad
 tr: bir aydan kısa bir süre eski
+
+    limit
+en: limit
+fr: limite
 
     link
 af: koppel
