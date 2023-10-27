@@ -33,6 +33,7 @@ let print_birth conf base =
     Output.printf conf (fcapitale (ftransl conf "the latest %d births")) len
   in
   Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<ul>\n";
   ignore
   @@ List.fold_left
@@ -71,6 +72,7 @@ let print_death conf base =
     |> Output.print_sstring conf
   in
   Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   if list <> [] then (
     Output.print_sstring conf "<ul>";
     let _, ages_sum, ages_nb =
@@ -208,6 +210,7 @@ let print_oldest_alive conf base =
     |> Output.print_sstring conf
   in
   Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<ul>\n";
   List.iter
     (fun (p, d, cal) ->
@@ -247,6 +250,7 @@ let print_longest_lived conf base =
     |> Output.print_sstring conf
   in
   Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<ul>";
   List.iter
     (fun (p, d, _) ->
@@ -267,6 +271,7 @@ let print_longest_lived conf base =
 
 let print_marr_or_eng conf base title list =
   Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<ul>\n";
   ignore
   @@ List.fold_left
@@ -358,6 +363,7 @@ let old_print_statistics conf =
     with Not_found | Failure _ -> 20
   in
   Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<ul>";
   let aux m label =
     Output.print_sstring conf {|<li><a href="|};
@@ -443,6 +449,7 @@ let print_population_pyramid conf base =
     Output.print_sstring conf "</td>"
   in
   Hutil.header conf title;
+  Hutil.print_link_to_welcome conf true;
   let max_hum =
     let max_men = Array.fold_left max 0 men in
     let max_wom = Array.fold_left max 0 wom in
