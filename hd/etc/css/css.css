@@ -720,11 +720,12 @@ li.desc
 
 
 /* --------------------------- Pyramide des Ã¢ges -------------------------- */
-
-.pyramid_year
+.pyramid_center
 {
-  font-style: italic;
+  padding-left: 6px;
+  padding-right: 6px;
 }
+
 
 .pyramid_nb
 {
