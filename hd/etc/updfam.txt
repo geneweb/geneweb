@@ -260,8 +260,9 @@
 
 %define;parent(xcnt,xx,psex)
   <div class="row%if;(xcnt>1) mt-2%end;">
-    <label for="paxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0 <span class="font-weight-bold text-uppercase">pxcnt
-     (%apply;nth_c%with;[M/F]0[M/F]1N%and;psex%end;)</span></label>
+   <label for="paxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0 <span class="font-weight-bold text-uppercase">
+     (%if;(xx.first_name!="" or xx.surname!="")%apply;nth_c%with;[M/F]0[M/F]1N%and;psex%end;
+      %else;%if;(xcnt=1)[M/F]0%else;[M/F]1%end;%end;)</span></label>
     <div class="col-sm-8">
       <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0"%if;(evar.m="ADD_FAM" and xx.first_name="") autofocus%end;>
     </div>
