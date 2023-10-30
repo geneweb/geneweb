@@ -314,11 +314,11 @@
         <span class="fa-li"><i class="fas fa-cross"></i></span>
         %if;is_buried;[*buried]s
           %if;has_burial_date; %on_burial_date;%end;
-          %if;has_burial_place; - %burial_place;%end;</li>%nl;
+          %if;has_burial_place; - %burial_place;%end;
         %end;
         %if;is_cremated;[*cremated]s
           %if;has_cremation_date; %on_cremation_date;%end;
-          %if;has_cremation_place; - %cremation_place;%end;</li>%nl;
+          %if;has_cremation_place; - %cremation_place;%end;
         %end;
       </li>%nl;
     %end;

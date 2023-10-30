@@ -184,9 +184,9 @@
 %end;
 
 %define;small_date(kind,xvar,xx,verbose)
-  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2" %readonly;%in;
-  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2" %readonly;%in;
-  %let;year_input;pattern="[?><~/-+]?\d*/?" size="4" maxlength="8" %readonly;%in;
+  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2"%in;
+  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2"%in;
+  %let;year_input;pattern="[?><~/-+]?\d*/?" size="4" maxlength="8"%in;
   <div class="row">
     <span class="col-sm-2 col-form-label">[*kind]</span>
     <div class="col-sm-auto form-inline">
@@ -215,7 +215,7 @@
     </div>
     <label for="xvar_pl" class="%if;(verbose=true)sr-only%end; col-sm-1 col-form-label">[place]</label>%nn;
     <div class="col-sm">
-      <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[*place]" %readonly;>
+      <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[*place]">
     </div>
   </div>
 %end;
@@ -313,7 +313,7 @@
     <label for="ins_eventxcnt_n" class="col-2 col-form-label">[*insert]</label>
     <div class="input-group col-10">
       <select class="custom-select col-1 border border-dark" id="ins_eventxcnt_n" name="ins_eventxcnt_n">
-        %for;i;1;11;<option>%i;</option> %end;
+        %for;i;1;11;<option>%i;</option>%nl;%end;
       </select>
       <div class="input-group-append">
         <label class="btn btn-outline-primary mb-0">[event/events]0/[event/events]1
@@ -330,7 +330,7 @@
     <label for="excnt_ins_witnwcnt_n" class="col-2 col-form-label">[*insert]</label>
     <div class="input-group col-10">
       <select class="custom-select border border-dark col-1" id="excnt_ins_witnwcnt_n" name="excnt_ins_witnwcnt_n">
-        %for;i;1;11;<option>%i;</option> %end;
+        %for;i;1;11;<option>%i;</option>%nl;%end;
       </select>
       <div class="input-group-append">
         <label class="btn btn-outline-primary mb-0">[witness/witness/witnesses]0/[witness/witness/witnesses]2
@@ -340,7 +340,7 @@
       </div>
     </div>
   </div>
-%(<table style="border-width:1">
+%(<table style="border-width:1px">
     <tr>
       <td>
         [*insert]&nbsp;
@@ -435,7 +435,7 @@
       <label for="excnt_witnwcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
       <div class="col-6">
         <input class="form-control" type="text" name="excnt_witnwcnt_occu" id="excnt_witnwcnt_occu"
-           value="%witness.create.occupation;" placeholder="[*occupation/occupations]0" %readonly;>
+           value="%witness.create.occupation;" placeholder="[*occupation/occupations]0">
       </div>
       <div class="form-inline col-sm-auto">
         <div class="custom-control  custom-checkbox mr-3">
@@ -553,7 +553,7 @@
         </div>
       </div>
     %end;
-    <table style="border-width:1;display:none;width:700">
+    <table style="border-width:1px;display:none;width:700px">
       <tr>
         <td><label for="e_namexcnt">[*event/events]0</label></td>
         <td>
@@ -647,7 +647,7 @@
       </div>
     </div>
   %end;
-  <table style="border-width:1;display:none;width:700">
+  <table style="border-width:1px;display:none;width:700px">
     <tr>
       <td><label for="e_namexcnt">[*event/events]0</label></td>
       <td>
@@ -941,7 +941,7 @@
     %apply;card_header("birth","birth")
     <div class="card-body">
       <div class="d-none">
-        [*born]2…</td>
+        [*born]2…
         <label for="birth_place">[*place]</label>
         <input type="text" name="birth_place" size="90" maxlength="200" value="%birth_place;" id="birth_place">
         %apply;date([*date/dates]0, "birth", "birth", "")
@@ -985,7 +985,7 @@
     %apply;card_header("death","death")
     <div class="card-body">
       <div class="d-none">
-        <table style="border-width:1;width:700">
+        <table style="border-width:1px;width:700px">
           <tr>
             <td>
               <select name="old_death" id="death_selectxcnt" onchange="change_death('xcnt')">
@@ -1006,7 +1006,7 @@
           </tr>
         </table>
         %apply;date([*date/dates]0, "death", "death", "onfocus='setDead()'")
-        <table style="border-width:1;width:700">
+        <table style="border-width:1px;width:700px">
           <tr>
             <td>
               <label>
@@ -1041,7 +1041,7 @@
     %apply;card_header("burial","burial")
     <div class="card-body">
       <div class="d-none">
-        <table style="border-width:1;width:700">
+        <table style="border-width:1px;width:700px">
           <tr>
             <td>
               <select name="burial">
@@ -1161,7 +1161,7 @@
       <label for="rxcnt_xvar_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
       <div class="col-5">
         <input class="form-control" type="text" name="rxcnt_xvar_occu" id="rxcnt_xvar_occu"
-           value="%relation.xrel.create.occupation;" placeholder="[*occupation/occupations]0" %readonly;>
+           value="%relation.xrel.create.occupation;" placeholder="[*occupation/occupations]0">
       </div>
       <div class="form-inline ml-3">
         <div class="custom-control custom-checkbox">

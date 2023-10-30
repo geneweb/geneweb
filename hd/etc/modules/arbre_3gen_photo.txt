@@ -160,7 +160,7 @@
             <br><br>
           %end;
         %end;
-        %apply;short_display_person_tree("father")</span></td>
+        %apply;short_display_person_tree("father")</td>
       <td colspan="2"></td>
       <td></td>
       <td colspan="2"></td>
@@ -206,12 +206,10 @@
       </td>
       <td colspan="3"></td>
     </tr>
-    <tr>
-      <tr>%( hack to justify the whole table, don't use colspan="9" instead %)
-        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-        <td>│</td>
-        <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-      </tr>
+    <tr>%( hack to justify the whole table, don't use colspan="9" instead %)
+      <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+      <td>│</td>
+      <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
     </tr>
     %if;(not has_siblings)
       <tr>

@@ -26,8 +26,9 @@
   %let;nb_max;%if;(b.book_max_results!="" and b.book_max_results>0)%b.book_max_results;%else;1000%end;%in;
   <div class="col-auto">
     <div class="btn-group" role="toolbar" aria-label="sub-selection">
-      <a role="button" class="btn btn-link %if;(e.s="") disabled%end;" href="%prefix;m=MOD_DATA&data=%e.data;" title="Index">
-        <i class="fa fa-book fa-2x"></i></a>
+      <a role="button" class="btn btn-link" href="%prefix;m=MOD_DATA%if;(e.s!="")&data=%e.data;%end;"
+        title="%if;(e.s!="")[*back to index/books]0%else;[*back to index/books]1%end;">
+        <i class="fa fa-book-%if;(e.s="")bookmark%else;open%end; fa-2x"></i></a>
       <div class="d-flex align-content-around flex-wrap ml-3">
         <span class="text-monospace">
           %if;(substr_start_e.1.s!="" and length_s>1)<a href="%prefix;m=MOD_DATA&data=%e.data;&s=%substr_start_e.1.s;">%substr_start_e.1.s;</a> >%end;
@@ -42,7 +43,7 @@
           %if;(nb_results>1)
             %foreach;entry;
               %sp;%if;(e.s!="")%sp;%if;(max>0 and nb_results<nb_max)<a href="#_%entry_ini;" title="#%entry_ini">·</a>%else;·%end;%end;
-               %if;(max>0)<a href="%prefix;m=MOD_DATA&data=%e.data;&s=%html_encode.entry_ini;#%html_encode.entry_ini;">%entry_ini;</a>%else;%entry_ini;%end;
+               %if;(max>0)<a href="%prefix;m=MOD_DATA&data=%e.data;&s=%html_encode.entry_ini;">%entry_ini;</a>%else;%entry_ini;%end;
             %end;
           %end;
         </span>
@@ -57,7 +58,7 @@
       %if;(e.nbs!="")<input type="hidden" name="nbs" value="%e.nbs;">%end;
       <div class="form-group">
         <label for="search_s">[*search/case sensitive]0</label>
-        <input type="search" class="form-control ml-3" name="s" id="search_s" aria-describedby="personnal input">
+        <input type="search" class="form-control ml-3" name="s" id="search_s">
         <button type="submit" class="btn btn-primary ml-2">Ok</button>
       </div>
     </form>
@@ -76,19 +77,20 @@
               <li class="list-unstyled ml-4" id="k%entry_key;">
                 <div class="d-flex">
                   <div class="d-flex flex-column justify-content-center">
+                    %(TODO: Fix URL encoding for escape.printable.suburb/other ! %)
                     %if;(e.data="place")
                       <a href="https://www.wikidata.org/w/index.php?search=%nn;
-                        %if;(not first and suburb!="")%escape.printable.suburb;%else;%escape.printable.other;%end;"
+                        %if;(not first and suburb!="")%encode.escape.printable.suburb;%else;%encode.other;%end;"
                         role="button" class="btn btn-link p-0 ml-1"
                         title="%if;(not first and suburb!="")%escape.printable.suburb;%else;%escape.printable.other;%end; sur Wikidata"
-                        target="_blank" rel="noreferrer" rel="noopener" tabindex="-1">
+                        target="_blank" rel="noreferrer, noopener" tabindex="-1">
                         <i class="fab fa-wikipedia-w fa-sm%if;(not first and suburb!="") text-danger%end;"></i>
                       </a>
                       %if;(first and suburb!="")
-                        <a href="https://www.wikidata.org/w/index.php?search=%escape.printable.suburb;"
+                        <a href="https://www.wikidata.org/w/index.php?search=%encode.escape.printable.suburb;"
                           role="button" class="btn btn-link p-0 ml-1"
                           title="%escape.printable.suburb; sur Wikidata"
-                          target="_blank" rel="noreferrer" rel="noopener" tabindex="-1">
+                          target="_blank" rel="noreferrer, noopener" tabindex="-1">
                           <i class="fab fa-wikipedia-w fa-sm text-danger"></i>
                         </a>
                       %end;
@@ -98,7 +100,7 @@
                      %if;is_modified;
                        <div class="ml-5 pl-3 text-muted">
                      %else;
-                       <a role="button" id="%escape.entry_value;" class="ml-2"
+                       <a role="button" class="ml-2"
                         href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.e.s;">
                      %end;
                           %if;(e.data="place" and suburb!="")
@@ -138,10 +140,10 @@
                         %end;
                         <div class="input-group col-12 px-0 mx-2">
                           %if;(b.notextarea="yes" or e.data="fn" or e.data="sn" or e.data="place")
-                            <input type="text" class="form-control col-11" id="nx_input" name="nx_input"%nn
+                            <input type="text" class="form-control col-11" id="nx_input" name="nx_input"
                               maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
                               value="%escape.printable.entry_value;" placeholder="%escape.printable.entry_value;"
-                              %if;(e.data!="fn" or e.data!="sn") autofocus%end; aria-label="Recipient's username" aria-describedby="button-addon2" required>
+                              %if;(e.data!="fn" or e.data!="sn") autofocus%end; aria-label="Recipient's username" required>
                           %else;
                             <textarea class="form-control col-11" id="nx_input" name="nx_input" rows="1"
                               maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
@@ -162,6 +164,7 @@
                         </div>
                       </form>
                     %end;
+                  </div>
                 </div>
               </li>
             %end;

@@ -27,7 +27,7 @@
 <h1 class="d-inline-block">%nn;
   %if;(e.v!=0)%apply;a_of_b%with;
     %if;(e.only!="on" and e.v!=0)[*descendants]%else;
-      %apply;capitalize%with%apply;gend("v")%end;
+      %apply;capitalize%with%apply;gend("v")%end;%( TODO: look why gend no more defined ! %)
     %end;%and;
     %self;%end;%else;%self; ([no descendants])%end;
    %if;(cancel_links and e.v!=0) %apply;togend(e.v)%end;
@@ -472,6 +472,7 @@
             %incr_count2;
           %end;
         %end;
+        %( !! le bug unbound %? à débusquer est dans cette boucle appelée l. 673 !! %)
         %if;(count1=0 or count2=0 or e.implx="")
           %apply;table_row("xxx", prfx, fff, family_cnt, "ch_cnt", count, "desc", "xxx", family.index, nb_children, count1+count2)
         %end;
@@ -576,7 +577,7 @@
   %end;
 %end;
 
-%( Parcours de l'arbre ascendant, niveau par niveau %)
+%( Parcours de l'arbre descendant, niveau par niveau %)
 %define;one_person(xxx, lv, max_l, prefx, fam_cnt, ch_cnt)
   %let;npref;prefx%in;
   %let;fam;%if;(fam_cnt>0)%apply;letter(fam_cnt)%end;%in;
@@ -588,8 +589,7 @@
         %let;nfam;%if;(nb_families>1)%family_cnt;%else;0%end;%in;
         %if;(has_children)
           %foreach;child;
-            %let;num;%if;(npref!="").%end;%child_cnt;%in;
-            %let;nnnpref;%nnpref;%num;%in;
+            %let;nnnpref;%nnpref;%if;(npref!="").%end;%child_cnt;%in;
             %apply;one_person("child", lv+1, max_l, nnnpref, nfam, child_cnt)
           %end;
         %end;
@@ -617,7 +617,7 @@
     %apply;families_of_one_p("self", npref)
   %end;
 %end;
-%define;desc_count(vvv,ooo,nnn,ttt,ccc)%( lev,only=1,name=1,total=1,count2 %)
+%define;desc_count(vvv,ooo,nnn,ttt,ccc)%( lev, only=1, name=1, total=1, count2 %)
   %reset_count1;%reset_count2;
   %foreach;descendant_level;
     %if;(level=vvv)
@@ -625,7 +625,7 @@
         %if;(number_of_descendants=1)%incr_count1;%if;(ttt!=1)1%end;
         %else;%number_of_descendants;%nn;
         %end;
-        %if;(number_of_descendants=ccc)incr_count2;%end;
+        %if;(number_of_descendants=ccc)%incr_count2;%end;
       %else;
         %if;(number_of_descendants_at_level=1)%incr_count1;%if;(ttt!=1)1%end;
         %else;%number_of_descendants_at_level;%nn;
@@ -634,7 +634,7 @@
       %end;
     %end;
   %end;
-  %if;(nnn=1)%(show names%)
+  %if;(nnn=1)%( show names %)
     %if;(count1=1)
       %if;(ttt=1)1 [person/persons]0
       %else;
@@ -674,10 +674,10 @@
       %for;lev;0;max;
         %if;(e.gen=1 and lev<max_desc_level)
           <tr>
-            <th class="" scope="row" colspan="%nb_col;">
+            <th scope="row" colspan="%nb_col;">
               <div class="d-flex">
                 <span class="ml-1">[*generation/generations]0 %expr(lev+1)</span>
-                <span class="ml-auto mr-1"> %apply;desc_count(lev+1,1,1,0,0)</span>
+                <span class="ml-auto mr-1">%apply;desc_count(lev+1,1,1,0,0)</span>
               </div>
             </th>
           </tr>

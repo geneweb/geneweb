@@ -1,8 +1,7 @@
-
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-<!-- $Id: welcome.txt v7.1 04/03/2023 09:51:04 $ -->
+<!-- $Id: welcome.txt v7.1 30/10/2023 23:08:30 $ -->
   <title>GeneWeb – %base.name;</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -11,29 +10,24 @@
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
   %include;css
 </head>
-%define;book_of(xx)
-  [book of %s:::xx]%nn;
-%end;
-%define;display_sosa_ref(xx)
-  [*sosa reference: %t:::xx]
-%end;
+<body%body_prop;>
+<div class="container">
+%include;hed
+%define;book_of(xx)[book of %s:::xx]%end;
+%define;display_sosa_ref(xx)[*sosa reference: %t:::xx]%end;
 %define;get_visitor_access_msg(lg)
-  %if;(bvar.visitor_access_msg_lg!="")
-    %bvar.visitor_access_msg_lg;
+  %if;(b.visitor_access_msg_lg!="")
+    %b.visitor_access_msg_lg;
   %else;
-    %if;(bvar.visitor_access_msg_en!="")
-      %bvar.visitor_access_msg_en;
+    %if;(b.visitor_access_msg_en!="")
+      %b.visitor_access_msg_en;
     %else;
       [restricted access]
     %end;
   %end;
 %end;
-<body%body_prop;>
-%include;hed
-%include;home
-<div class="container">
-  <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-2 mt-lg-4">
-    %if;(bvar.auth_file="" and bvar.wizard_passwd!="" or bvar.friend_passwd!="")
+  <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-lg-3">
+    %if;(b.auth_file="" and b.wizard_passwd!="" or b.friend_passwd!="")
       <div class="d-none d-lg-block col-2 order-md-1"></div>
     %end;
     <div class="col-xs-12 col-md-auto order-md-3 ml-md-auto px-0">
@@ -51,9 +45,9 @@
             </div>
           </form>
         %end;
-        %if;(bvar.auth_file = "")
+        %if;(b.auth_file="")
           <div class="btn-group btn-group-xs mt-1" role="group">
-          %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
+          %if;(b.friend_passwd!="" or b.friend_passwd_file!="")
             %if;(not friend)
               %if;(not cgi)
                 <a href="%prefix;w=f" class="btn btn-outline-primary text-nowrap" role="button" title="[*wizard/wizards/friend/friends/exterior]2"><i class="fas fa-user mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]2</a>
@@ -62,7 +56,7 @@
               <a href="#" class="btn btn-primary disabled text-nowrap" role="button"><i class="fas fa-user mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]2</a>
             %end;
           %end;
-          %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
+          %if;(b.wizard_passwd!="" or b.wizard_passwd_file!="")
             %if;(not wizard)
               %if;(not cgi)
                 <a href="%prefix;w=w" class="btn btn-outline-success text-nowrap" role="button"  title="[*wizard/wizards/friend/friends/exterior]0"><i class="fas fa-hat-wizard mr-2" aria-hidden="true"></i>[*wizard/wizards/friend/friends/exterior]0</a>
@@ -73,32 +67,33 @@
           %end;
           </div>
         %end;
-        %if;(user.ident != "")<span class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom" title="%if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %user.ident;">%user.ident;</span>%end;
+        %if;(user.ident!="")<span class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom" title="%if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %user.ident;">%user.ident;</span>%end;
         %if;((wizard or friend) and 
-             ((bvar.wizard_passwd!="" or bvar.friend_passwd!="") or
-             (bvar.wizard_passwd_file!="" or bvar.friend_passwd_file!="")))
+             ((b.wizard_passwd!="" or b.friend_passwd!="") or
+             (b.wizard_passwd_file!="" or b.friend_passwd_file!="")))
           <a class="btn btn-outline-danger mt-1 w-100" href="%prefix;w=" role="button"><i class="fas fa-sign-out-alt mr-1" aria-hidden="true"></i>[*disconnect]</a>
         %end;
       </div>
     </div>
     <div class="bg-white my-0 order-md-2 flex-fill text-lg-center align-self-md-center">
-      %if;(bvar.welcome_logo!="")
-        <img src="%prefix;m=IM;v=%bvar.welcome_logo;"
-           style="%if;(bvar.welcome_logo_style!="")%bvar.welcome_logo_style;%end;"
+      %if;(b.welcome_logo!="")
+        <img src="%prefix;m=IM;v=%b.welcome_logo;"
+           style="%if;(b.welcome_logo_style!="")%b.welcome_logo_style;%end;"
            alt="MyBase" title="MyBase">
       %else;
         %(<img src="%image_prefix;/gwlogo.png" alt="GeneWeb" title="GeneWeb">%)
       %end;
       <h1 class="font-weight-bolder">%apply;capitalize%with;[database]%end; %base.name;</h1>
-      %if;(bvar.visitor_access!="no")<span class="font-weight-light h2">%base.nb_persons; [person/persons]1%end;</span>
-        %if;(bvar.motd != "")
-    <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-2 mt-lg-3 mt-xl-4">
-      <div >
-      <h3 class="display-5 lead font-weight-light">%apply;interp(bvar.motd)</h3>
-      %if;(browsing_with_sosa_ref and bvar.visitor_access!="no")<h4 class="text-center">%apply;display_sosa_ref%with;%sosa_ref;%end;</h4>%end;
-      </div>
-    </div>
-  %end;
+      %if;(b.visitor_access!="no")<span class="font-weight-light h2">%base.nb_persons; [person/persons]1</span>
+        <div class="d-flex flex-column justify-content-lg-center mt-0 mt-lg-2 mt-xl-3">
+          %if;(b.motd!="")
+            <div class="display-5 lead font-weight-light">%apply;interp(b.motd)</div>
+          %end;
+          %if;(browsing_with_sosa_ref and b.visitor_access!="no")
+            <div class="text-center">%apply;display_sosa_ref%with;%sosa_ref;%end;</div>
+          %end;
+        </div>
+      %end;
     </div>
   </div>
   %if;just_friend_wizard;
@@ -118,7 +113,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
     </div>
   %end;
 
-  %if;(bvar.visitor_access!="no" or wizard or friend)
+  %if;(b.visitor_access!="no" or wizard or friend)
     <div class="flex-row justify-content-center">
       %(<div class="col-lg-7 ml-lg-4 ml-xl-5 h4">
         <i class="fa fa-search fa-sm fa-fw mr-1 text-secondary"></i>[*search/case sensitive]0</div>%)
@@ -137,7 +132,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
               <label for="surname" class="sr-only col-form-label col-sm-2">[*surname/surnames]0</label>
               <input type="search" id="surname" class="form-control form-control-lg"
                 name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
-                title="[*search/case sensitive]0 [surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;" autofocus tabindex=1>
+                title="[*search/case sensitive]0 [surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;" autofocus tabindex="1">
             </div>
             <div class="d-flex mt-2">
               <div class="btn-group-vertical mr-2">
@@ -150,29 +145,28 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
               <input type="search" id="firstname"
                 class="form-control form-control-lg border-top-0"
                 name="p" placeholder="[*first name/first names]2"
-                title="[*search/case sensitive]0 [first name/first names]2" tabindex=2>
+                title="[*search/case sensitive]0 [first name/first names]2" tabindex="2">
             </div>
           </div>
           %( TODO grey if inputs empty %)
           <button class="btn btn-outline-primary align-self-center ml-2" type="submit">
-            <i class="fa fa-search fa-fw fa-2x mt-1"></i>
-            <div>[*search/case sensitive]0<br>[person/persons]0</div>
+            <i class="fa fa-search fa-fw fa-2x mt-1"></i><br>
+            [*search/case sensitive]0<br>[person/persons]0
           </button>
         </div>
       </form>
-      %if;(bvar.propose_titles != "no")
+      %if;(b.propose_titles!="no")
         <form class="mt-2 mt-md-3 mt-lg-4" method="get" action="%action;">
           %hidden;
           <input type="hidden" name="m" value="TT">
           <div class="d-flex justify-content-center mx-5">
-            <div class="d-flex flex-column justify-content-center col-xs-9 col-md-7 col-lg-5 w-75"">
+            <div class="d-flex flex-column justify-content-center col-xs-9 col-md-7 col-lg-5 w-75">
               <div class="d-flex">
                 <a class="mr-2 align-self-center" role="button"
                   href="%prefix;m=TT" title="[*all the titles]"><i class="fa fa-list-ul fa-fw"></i></a>
                 <label for="titles" class="sr-only col-form-label col-sm-2">[*title/titles]0</label>
-                <input type="search"
-                  class="form-control border-top-0 border-right-0 border-left-0"
-              name="t" id="titles" placeholder="[*title/titles]0" %(maxlength="200"%) tabindex=3>
+                <input type="search" class="form-control border-top-0 border-right-0 border-left-0"
+                  name="t" id="titles" placeholder="[*title/titles]0" %(maxlength="200"%) tabindex="3">
               </div>
               <div class="d-flex mt-2">
                 <a class="mr-2 align-self-center" role="button"
@@ -181,7 +175,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                 class="sr-only col-form-label col-sm-2" >[*estate]0</label>
             <input type="search"
                 class="form-control border-top-0 border-right-0 border-left-0"
-              name="p" id="estates" placeholder="[*estate]0" %(maxlength="200"%) tabindex=4>
+              name="p" id="estates" placeholder="[*estate]0" %(maxlength="200"%) tabindex="4">
               </div>
             </div>
             <button class="btn btn-outline-primary btn-sm align-self-center ml-2 px-0 py-3" type="submit"
@@ -202,27 +196,27 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         %if;base.has_notes;
           <a role="button" class="btn btn-outline-primary mr-1"
             href="%prefix;m=NOTES">
-            %if;(bvar.base_notes_title="")
+            %if;(b.base_notes_title="")
               <i class="far fa-file-alt fa-fw mr-1" aria-hidden="true"></i>[*base notes]
-            %else;%bvar.base_notes_title;%end;
+            %else;%b.base_notes_title;%end;
           </a>
         %end;
         %if;has_misc_notes;
           <a role="button" class="btn btn-outline-primary mr-1"
             href="%prefix;m=MISC_NOTES"><i class="fas fa-align-justify fa-fw mr-1" aria-hidden="true"></i>[*base index notes]</a>
         %end;
-        %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
+        %if;((b.wizard_passwd_file!="" or b.wizard_descr_file!="")
              and (wizard or wiznotes_dir_exists)
-             and bvar.authorized_wizards_notes = "yes")
+             and b.authorized_wizards_notes="yes")
            <a role="button" class="btn btn-outline-success text-success mr-1"
             href="%prefix;m=WIZNOTES"><i class="far fa-file-alt fa-fw mr-1" aria-hidden%"true"></i>[*base wizard notes]</a>
         %end;
         <a role="button" class="btn btn-outline-primary mr-1"
           href="%prefix;m=STAT"><i class="far fa-chart-bar fa-fw mr-1" aria-hidden="true"></i>[*statistics]</a>
-        <a role="button" class="btn btn-outline-primary%if;(has_history and bvar.history="yes") mr-1%end;"
+        <a role="button" class="btn btn-outline-primary%if;(has_history and b.history="yes") mr-1%end;"
           href="%prefix;m=ANM"><i class="fa fa-birthday-cake fa-fw mr-1" aria-hidden="true"></i>[*anniversaries]</a>
-        %if;(has_history and bvar.history="yes")
-          <a role="button" class="btn btn-outline-primary%if;(bvar.disable_forum!="yes") mr-1%end;"
+        %if;(has_history and b.history="yes")
+          <a role="button" class="btn btn-outline-primary%if;(b.disable_forum!="yes") mr-1%end;"
             href="%prefix;m=HIST&k=20"><i class="fas fa-history fa-fw mr-1" aria-hidden="true"></i>[*history]</a>
         %end;
         %if;(plugin.forum and b.disable_forum!="yes")
@@ -231,17 +225,17 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         %end;
       </div>
       <div class="d-inline-flex justify-content-lg-center mt-1 mt-lg-2">
-        %if;(wizard and bvar.propose_add_family != "no")
+        %if;(wizard and b.propose_add_family!="no")
           <a role="button" class="btn btn-outline-success mr-1"
             href="%prefix;m=ADD_FAM"
             title="[*add::family/families]0 ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-user-plus mr-1" aria-hidden="true"></i>[*add::family/families]0</a>
         %end;
-        %if;(bvar.propose_place_surnames!="no")
+        %if;(b.propose_place_surnames!="no")
           <a role="button" class="btn btn-outline-primary mr-1" 
             href="%prefix;m=PPS&bi=on&ba=on&ma=on&de=on&bu=on">
             <i class="fas fa-globe fa-fw mr-1" aria-hidden="true"></i>[*places]/[surname/surnames]0</a>
         %end;
-        %if;(bvar.hide_advanced_request = "no")
+        %if;(b.hide_advanced_request="no")
           <a role="button" class="btn btn-outline-primary mr-1" 
             href="%prefix;m=H&v=advanced">
             <i class="fa fa-search-plus fa-fw mr-1" aria-hidden="true"></i>[*advanced request]0</a>
@@ -259,32 +253,32 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         <div class="d-inline-flex justify-content-lg-center">
           <a role="button" class="btn btn-outline-success mr-1"
             href="%prefix;m=MOD_DATA&data=fn"
-            title="[*modify] %apply;book_of([first name/first names]1)
+            title="[*modify] %apply;book_of%with;[first name/first names]1%end;%sp;
               ([wizard/wizards/friend/friends/exterior]0)">[*first name/first names]1</a>
           <a role="button" class="btn btn-outline-success mr-1" 
             href="%prefix;m=MOD_DATA&data=sn"
-            title="[*modify] %apply;book_of([surname/surnames]1)
+            title="[*modify] %apply;book_of%with;[surname/surnames]1%end;%sp;
               ([wizard/wizards/friend/friends/exterior]0)">[*surname/surnames]1</a>
           <a role="button" class="btn btn-outline-success mr-1" 
             href="%prefix;m=MOD_DATA&data=place"
-            title="[*modify] %apply;book_of([places])
+            title="[*modify] %apply;book_of%with;[places]%end;%sp;
               ([wizard/wizards/friend/friends/exterior]0)">[*places]</a>
           <a role="button" class="btn btn-outline-success mr-1" 
             href="%prefix;m=MOD_DATA&data=occu"
-            title="[*modify] %apply;book_of([occupation/occupations]1)
+            title="[*modify] %apply;book_of%with;[occupation/occupations]1%end;%sp;
               ([wizard/wizards/friend/friends/exterior]0)">[*occupation/occupations]1</a>
           <a role="button" class="btn btn-outline-success" 
             href="%prefix;m=MOD_DATA&data=src"
-            title="[*modify] %apply;book_of([source/sources]1)
+            title="[*modify] %apply;book_of%with;[source/sources]1%end;%sp;
               ([wizard/wizards/friend/friends/exterior]0)">[*source/sources]1</a>
         </div>
       </div>
     %end;
-    %if;(plugins!="" and bvar.plugins!="")
+    %if;(plugins!="" and b.plugins!="")
       <div class="d-flex flex-column flex-lg-row justify-content-lg-center mt-2 mt-lg-4">
         <div class="h4 align-self-lg-center mr-lg-2">
           <i class="fas fa-book fa-sm fa-fw text-secondary mr-1"></i>[*plugins][:]
-          <span class="small">%bvar.plugins;</span>
+          <span class="small">%b.plugins;</span>
         </div>
       </div>
     %end;
@@ -299,12 +293,12 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
 
   <div class="row mt-2 mt-lg-4">
     <div class="col text-lg-center">
-%if;(bvar.counter != "no")%apply;interp([
+%if;(b.counter!="no")%apply;interp([
 af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle
     aan hierdie blad, sedert %start_date;.
 bg: От %start_date; насам е имало %nb_accesses; посещения, от които
     %nb_accesses_to_welcome; са на настоящата страница.
-br: gweladennoù a zo bet : %nb_accesses;, er bajenn-mañ :%sp;
+br: gweladennoù a zo bet : %nb_accesses;, er bajenn-mañ :
     %nb_accesses_to_welcome;, abaoe an deiz-mañ : %start_date;.
 ca: Hi ha hagut %nb_accesses; consultes, de les quals
     %nb_accesses_to_welcome; en aquesta pàgina, des del %start_date;.
@@ -362,98 +356,11 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
     自从 %start_date;。
 ])
 %end;
-%(<br>(%apply;interp([
-af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
-    om die dokument te herlaai), probeer die volgende <a
-    href="%prefix;escache=0">link</a>.
-bg: Ако Вашият браузър не актуализира автоматично страниците, които
-    са модифицирани (принуждавайки Ви да ги презареждате Вие),
-    опитайте се да тръгнете от <a href="%prefix;escache=0">тази
-    препратка</a>.
-br: Ma ne nevesa ket ho merdeer ent-gefreek ar pajennoù kemmet (ha
-    dre-se emañ ret deoc'h "nevesaat ar bajenn"), klakit merdeiñ gant al
-    liamm-mañ.
-ca: Si el vostre navegador no actualitza automàticament les
-    pàgines modificades (obligant-vos a fer actualitzar manualment
-    la pàgina), proveu de navegar des d'<a href="%prefix;%sq;
-    escache=0">aquest altre lloc</a>.
-co: S’è u vostru navigatore ùn rinfresca micca e pagine mudificate
-    (vi furzendu à attualizà a pagina), pruvate a navigazione cù
-    <a href="%prefix;escache=0">stu liame</a>.
-cs: Pokud Váš prohlížeč neprovádí automaticky obnovu upravených stránek
-    (musíte používat tlačítko "obnovit"), zkuste prohlížení přes <a
-    href="%prefix;escache=0">tento odkaz</a>.
-da: Hvis din browser ikke automatisk opdaterer ændrede sider
-    (nødvendiggør genindlæsning af det aktuelle
-    dokument), prøv da at navigere <a href="%prefix;%sq;
-    escache=0">herfra</a>.
-de: Wenn die geänderten Seiten nicht automatisch aktualisiert werden
-    (man muß ständig im Browser auf "Neu laden" klicken),
-    bitte <a href="%prefix;escache=0">hier</a> klicken.
-en: If your browser does not automatically update the modified pages (forcing
-    you to do "reload current document"), try navigating from <a
-    href="%prefix;escache=0">this link</a>.
-eo: Se via navigisto ne aŭtomate ĝisdatigas la modifigitajn paĝojn
-    (se vi devas fari "reŝarĝi kurantan dokumenton"), provu ekde <a
-    href="%prefix;escache=0">ĉi tiu legilo</a>.
-es: Si las páginas modificadas no serán actualizadas
-    automaticamente, favor de usar esta conexión:
-    <a href="%prefix;escache=0">hier</a>.
-et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt
-    (pead andma käsu "lae käesolev dokument uuesti"), siis  proovi alustada
-    navigeerimist <a href="%prefix;escache=0">sellest viitest</a>.
-fi: Mikäli selaimesi ei automaattisesti päivitä muutettuja
-    sivuja (jolloin sinun täytyy "ladata uudelleen nykyinen
-    dokumentti") kokeile <a href="%prefix;escache=0">tätä
-    linkkiä</a>.
-fr: Si les pages modifiées ne se mettent pas à jour automatiquement,
-    naviguez avec <a href="%prefix;escache=0">ce lien</a>.
-is: Ef vafrinn sem þú notar er í vandræðum með að uppfæra síðuna prófaðu
-    <a href="%prefix;escache=0">þetta</a>.
-it: Se il vostro navigatore non aggiorna automaticamente le pagine modificate
-    (obbligandovi a fare « aggiorna »), provate a partire da
-    <a href="%prefix;escache=0">questo collegamento</a>.
-lt: Jei naršyklė automatiškai neatnaujina pataisyto puslapio
-    (verčia "perkrauti esamą dokumentą"), pamėginkite paspausti
-    <a href="%prefix;escache=0">šią nuorodą</a>.
-lv: Ja Jūsu Interneta caurlūkprogramma automātiski nepārlādē lappuses pēc
-    veiktajām izmaiņām (tādējādi radot Jums nepieciešamību "pārlādēt
-    tekošo dokumentu"), tad pamēģiniet uzklikšķināt <a
-    href="%prefix;escache=0">šeit</a>.
-nl: Indien Uw browser de gewijzigde pagina's niet automatisch toont (maar dit
-    alleen doet na klikken op "Vernieuwen"), probeer het dan eens via
-    <a href="%prefix;escache=0">deze link</a>.
-no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever
-    oppfrisking av den aktuelle siden), prøv da å navigere <a
-    href="%prefix;escache=0">herfra</a>.
-pl: Jeżeli twoja przeglądarka nie odświeża automatycznie zmienionych stron
-    (zmuszając cię do ich ręcznego odświeżania), kliknij <a
-    href="%prefix;escache=0">tutaj</a>.
-pt: Se o seu <i>browser</i> não actualiza automaticamente as
-    páginas modificadas (forçando a fazer
-    "reload current document"), tente navegar desde <a
-    href="%prefix;escache=0">este link</a>.
-pt-br: Se o seu <i>browser</i> não atualiza automaticamente as
-    páginas modificadas (forçando a fazer
-    "reload current document"), tente navegar desde <a
-    href="%prefix;escache=0">este link</a>.
-ro: daca pagina modificata nu este actualizata in mod automat (trebue sa
-    fortezi "reload current document") navigeaza cu acest
-    <a href="%prefix;escache=0">link</a>
-sl: Če vaš brskalnik ne more obnavljati strani avtomatično (morate
-    "reload current document"), kliknite <a
-    href="%prefix;escache=0">tukaj</a>.
-sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
-    (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
-    navigera <a href="%prefix;escache=0">härifrån</a>.
-tr: Tarayıcınız değiştirilen sayfaları otomatik olarak güncellemiyorsa (sizi
-    "geçerli belgeyi yeniden yüklemeye" zorluyorsa), gitmeyi deneyin <a
-    href="%prefix;escache=0">bu bağlantıdan</a>.
-]))%)
     </div>
   </div>
 %base_trailer;
 %include;copyr
+</div>
 %include;js
 </body>
 </html>

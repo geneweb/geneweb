@@ -99,7 +99,7 @@
     </div>
     <div class="col-10 col-lg ml-auto form-inline">
       <label for="xvar_prec" class="sr-only col-form-label">[precision]0</label>
-      <select class="form-control pl-lg-1 pr-lg-0 px-xl-2" name="xvar_prec" id="xvar_prec" xcond>
+      <select class="form-control pl-lg-1 pr-lg-0 px-xl-2" name="xvar_prec" id="xvar_prec">
         %(<option value="-"%if;(xdt.prec="") selected%end;>&nbsp;</option>%)
         <option value="sure"%if;(xdt.prec="sure") selected%end;>[exact]0</option>
         <option value="about"%if;(xdt.prec="about") selected%end;>[about (date)]0</option>
@@ -111,7 +111,7 @@
       </select>
       <label for="xvar_cal" class="sr-only col-form-label">[calendar/calendars]0</label>
       <select class="form-control pl-lg-1 pr-lg-0 px-xl-2 ml-sm-1 ml-md-3" name="xvar_cal" id="xvar_cal" onchange="changeCalendar('xvar_mm_sel','xvar_mm','%xdt.month;',this),%nn;
-                                        changeCalendar('xvar_ormonth_sel','xvar_ormonth','%xdt.ormonth;',this)" xcond>
+                                        changeCalendar('xvar_ormonth_sel','xvar_ormonth','%xdt.ormonth;',this)">
         <option value=""%if;(xdt.calendar="") selected%end;>
           -
         </option>
@@ -182,7 +182,7 @@
     </div>
     <div class="col-10 col-lg">
       <label for="xvar_text" class="col-form-label sr-only"></label>
-      <input type="text" class="form-control" name="xvar_text" maxlength="100" value="%xdt.text;" id="xvar_text" placeholder="…[or] [text]0" xcond>
+      <input type="text" class="form-control" name="xvar_text" maxlength="100" value="%xdt.text;" id="xvar_text" placeholder="…[or] [text]0">
     </div>
   </div>
 %end;
@@ -399,7 +399,7 @@
       <label for="excnt_witnwcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0</label>
       <div class="col-sm-6">
         <input type="text" class="form-control" name="excnt_witnwcnt_fn" id="excnt_witnwcnt_fn" 
-          value="%fwitness.first_name;"placeholder="[*first name/first names]0">
+          value="%fwitness.first_name;" placeholder="[*first name/first names]0">
       </div>
       <label for="excnt_witnwcnt_occ" class="col-sm-auto col-form-label">[*number]0</label>
       <div class="col-sm-2">
@@ -416,9 +416,9 @@
       <div id="excnt_witnwcnt_p_selct_mod" class="col-form-label ml-2">
         %if;(fwitness.index!="-1")
           <a href="%prefix_base_password;m=MOD_IND&i=%fwitness.index;" title="[*modify::person/persons]0
-            %fwitness.first_name;%if;(fwitness.occ!="").%fwitness.occ%end; %fwitness.surname;">
-            <i class="fa fa-user-edit fa-fw %if;(fwitness.sex=1)fe%end;male ml-2 mr-1" aria-hidden="true"
-              aria-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%fwitness.sex;%end;"></i>
+            %fwitness.first_name;%if;(fwitness.occ!="").%fwitness.occ%end; %fwitness.surname;"
+            aria-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%fwitness.sex;%end;">
+            <i class="fa fa-user-edit fa-fw %if;(fwitness.sex=1)fe%end;male ml-2 mr-1" aria-hidden="true"></i>
             [*modify] %apply;nth%with;[nth]%and;%wcnt;%end; [witness/witness/witnesses]0</a>
           </a>
         %end;
@@ -670,9 +670,9 @@
     <div id="chxcnt_p_selct_mod" class="col-form-label ml-2">
       %if;(child.index!="-1")
         <a href="%prefix_base_password;m=MOD_IND&i=%child.index;" title="[*modify::person/persons]0
-          %child.first_name;%if;(child.occ!="").%child.occ%end; %child.surname;">
-          <i class="fa fa-user-edit fa-fw %if;(child.sex=1)fe%end;male ml-2 mr-1" aria-hidden="true"
-            arial-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%child.sex;%end;"></i>
+          %child.first_name;%if;(child.occ!="").%child.occ%end; %child.surname;"
+          aria-hidden="true" arial-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%child.sex;%end;">
+          <i class="fa fa-user-edit fa-fw %if;(child.sex=1)fe%end;male ml-2 mr-1"></i>
           [*modify] %apply;nth%with;[nth]%and;%cnt;%end; [child/children]0</a>
       %end;
     </div>
