@@ -382,7 +382,7 @@
   %if;(cancel_links)
     ==<br>xx
   %else;
-    <a href="%prefix;em=R&ei=%ancestor.index;&m=NG&select=%index;&n=1&t=PN&et=A&spouse=on" title="%ancestor; …[relationship]… %self;">==<br>xx</a>
+    <a href="%prefix;em=R&ei=%ancestor.index;&m=NG&select=%index;&n=1&t=PN&et=A" title="%ancestor; …[relationship]… %self;">==<br>xx</a>
   %end;
 %end;
 
@@ -959,7 +959,7 @@
 %define;implex()
   %if;(e.num!="on")<br>%end;
   %if;(not cancel_links)
-    <a class="text-center" href="%prefix;em=R&ei=%index;&i=%ancestor.index;&et=M&spouse=on"%sp;
+    <a class="text-center" href="%prefix;em=R&ei=%index;&i=%ancestor.index;&et=M"
       title="%ancestor; ([implex/implexes]0)[:] [relationship link between] %self;">%nn;
   %end;==%nn;
   %if;(not cancel_links)</a>%end;
@@ -973,15 +973,15 @@
 %define;date_popup(xxx)
   %let;symb;%if;("xxx"="birth")°%elseif;("xxx"="death" and ancestor.is_dead)†%end;%in;
   %if;(e.xxx="on")
-    <td class="align-middle text-right table_big_cell
+    <td class="align-middle text-right table_big_cell%nn;
       %if;(e.hl=1)
         %if;((not ancestor.has_xxx_date or ancestor.xxx_date.month="" or ancestor.xxx_date.day="" or ancestor.xxx_date.prec!="") 
-            and ("xxx"="birth" or (ancestor.is_dead and "xxx"="death"))) table-warning
-        %elseif;(not ancestor.is_dead and "xxx"="death") table-active%end;
+            and ("xxx"="birth" or (ancestor.is_dead and "xxx"="death"))) table-warning%nn;
+        %elseif;(not ancestor.is_dead and "xxx"="death") table-active%end;%nn;
       %end;"
       %if;(ancestor.nb_families>1 and (e.marr="on" or e.marr_date="on" or e.marr_place="on")) rowspan="%ancestor.nb_families;"%end;>
       %if;(wizard and not cancel_links)
-        <a class="d-block table_big_anchor" href="%prefix;m=MOD_IND&i=%ancestor.index;#xxx"%sp;
+        <a class="d-block table_big_anchor" href="%prefix;m=MOD_IND&i=%ancestor.index;#xxx"
           title="%if;ancestor.has_xxx_date;[*update::xxx]%else;[*add::xxx]%end;&#010;
            %ancestor.first_name; %ancestor.surname; %if;(ancestor.occ!="0")(%ancestor.occ;)%end;&#010;%if;(ancestor.has_xxx_date and ancestor.xxx_date.prec="" or ancestor.xxx_date.prec="?")%symb; %ancestor.xxx_date;%end;">%nn;
         %if;ancestor.has_xxx_date;%ancestor.slash_xxx_date;%else;%symb;%end;%nn;

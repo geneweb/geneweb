@@ -2,7 +2,7 @@
 <html lang="%lang;">
 <head>
   <!-- $Id: perso.txt v7.1 19/08/2023 02:16:52 $ -->
-  <!-- Copyright (c) 1998--2007 INRIA -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;

@@ -3228,6 +3228,11 @@ sl: nazaj
 sv: tillbaka
 tr: geri
 
+    back to index/books
+en: back to alphabetic index/back to the list of books
+fr: retourner à l’index alphabétique/retourner à la liste des dictionnaires
+
+
     baptism
 af: doop
 bg: кръщение
