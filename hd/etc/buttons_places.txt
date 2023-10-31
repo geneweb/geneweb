@@ -4,6 +4,7 @@
 
 <form class="form-group mx-1" name="evt_url" method="get" action="%action;">
   <input type="hidden" name="m" value="PPS">
+  <input type="hidden" name="lang" value="%e.lang;">
   <div class="form-inline">
     <label class="sr-only" for="k">[*place] (k)</label>
     <input type="search" class="form-control col-4 ml-2" name="k"
@@ -125,13 +126,13 @@
     <span class="ml-2 mr-2" title="[*place filter]">[*filter][:]</span>
     <a role="button" class="btn-link ml-auto
       %if;( ekeep="" or ekeep<2) disabled text-muted%end;"
-      href="%url_set.keep;keep=%if;(ekeep!="")%expr(ekeep-1)%else;1%end;"
+      href="%url_set.keep;&keep=%if;(ekeep!="")%expr(ekeep-1)%else;1%end;"
       title="[*place filter]">
       <i class="fas fa-minus fa-lg"></i>
     </a>
     <span title="[*place filter]">%if;(e.keep="")1%else;%e.keep;%end;</span>
     <a role="button" class="ml-auto"
-      href="%url_set.keep;keep=%if;(ekeep!="")%expr(ekeep+1)%else;1%end;"
+      href="%url_set.keep;&keep=%if;(ekeep!="")%expr(ekeep+1)%else;1%end;"
       title="[*place filter]">
       <i class="fas fa-plus fa-lg"></i>
     </a>
