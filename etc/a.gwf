@@ -208,16 +208,17 @@ place_surname_link_to_ind=no
 hide_advanced_request=yes
 
 # Maximum level when displaying ancestors
-max_anc_level=8
+#max_anc_level=13
 
 # Maximum level when displaying ancestors by tree
-max_anc_tree=7
+# if not specified then limited by max_anc_level
+#max_anc_tree=
 
 # Maximum_level when displaying descendants
-max_desc_level=12
+#max_desc_level=12
 
 # Maximum_level when displaying descendants by tree
-max_desc_tree=4
+#max_desc_tree=6
 
 # Maximum number of displayed cousins
 max_cousins=2000
