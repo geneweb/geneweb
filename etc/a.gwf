@@ -1,4 +1,13 @@
 # This is the default GeneWeb base configuration file
+# ================
+# Important notice: 
+# for 'boolean' bvars despite the use of 'on/off' or 'yes/no'
+# it could be misleading because there is not always interpretation of default value.
+# There are a lot of bvars where we only test one condition.
+# [WIP] We should write “shown by default” instead of “default no”
+# that could lead some people to write as it is and won’t understand why it’s not working.
+# I did not rescan all lines below to comply to that restriction.
+# ================
 
 # css_prop
 # The file stylesheet.css must be in the directory "css".
@@ -416,3 +425,20 @@ perso_module_l=ligne
 # Use distant CDN (content delivery network) to load Bootstrap CSS/js files
 # and not the local GWD server.
 #use_cdn=yes
+
+# limit for number of elements in surnames list presented in Place / Surname page.
+#max_rlm_nbr=80
+
+# limits the results of Books (m=MOD_DATA) accessible by wizard.
+#book_max_results=1000
+
+# in case of multiple input gw files,
+# the origin_file name is displayed in individual page, in wizard mode, if evar opt=from.
+# variable below allow to update origin_file name in family update page.
+# (default is to not update)
+#origin_file=on
+
+# by default pages have a small hourglass icon on top left corner
+# that reports the delta time of last query action;
+# if required this icon may be hidden.
+#hide_compilation_time=yes
