@@ -1,4 +1,4 @@
-<!-- $Id: js.txt v7.1 26/09/2023 02:44:26 $ -->
+<!-- $Id: js.txt v7.1 04/11/2023 04:24:52 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
@@ -6,15 +6,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.bundle.min.js" 
       integrity="sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %if;(e.m="A" and e.t="")
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"
-      integrity="sha512-4MvcHwcbqXKUHB6Lx3Zb5CEAVoE9u84qN+ZSMM6s7z8IeJriExrV3ND5zRze9mxNlABJ6k864P/Vl8m0Sd3DtQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"
+        integrity="sha512-4MvcHwcbqXKUHB6Lx3Zb5CEAVoE9u84qN+ZSMM6s7z8IeJriExrV3ND5zRze9mxNlABJ6k864P/Vl8m0Sd3DtQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <script src="https://cdn.jsdelivr.net/npm/maximize-select2-height@1.0/maximize-select2-height.min.js"
+        integrity="sha512-NHHjSaRwEJ7OOPdQlvxa0gYbL9Np67IYbl+yJ3jDCTUxCCGKhCNlX77eacvuKmf4RszZBA8Elh71V26SKmElWA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
   %else;
     <script src="%static_path;js/jquery.min.js?version=3.7.1"></script>
     <script src="%static_path;js/bootstrap.bundle.min.js?version=4.6.1"></script>
     %if;(e.m="A" and e.t="")
       <script src="%static_path;js/select2.min.js?version=4.1.0rc"></script>
-      <script src="%static_path;js/select2-maximize-height.min.js"></script>
+      <script src="%static_path;js/select2-maximize-height.min.js?version=1.0.4"></script>
     %end;
   %end;
   %if;(e.m="A" and e.t="T" and e.t1="CT")
