@@ -499,23 +499,30 @@ let default_safe_html_allowed_tags =
 let safe_html_allowed_tags =
   lazy
     (if !allowed_tags_file = "" then default_safe_html_allowed_tags
-    else
-      let ic = open_in !allowed_tags_file in
-      let rec loop tags =
-        match input_line ic with
-        | tag ->
-            let ns, tag =
-              match String.split_on_char ' ' tag with
-              | [ ns; tag ] -> (ns, tag)
-              | [ tag ] -> ("http://www.w3.org/1999/xhtml", tag)
-              | _ -> assert false
-            in
-            loop ((ns, String.lowercase_ascii tag) :: tags)
-        | exception End_of_file ->
-            close_in ic;
-            tags
-      in
-      loop [])
+     else if Sys.file_exists !allowed_tags_file then
+       let ic = open_in !allowed_tags_file in
+       let rec loop tags =
+         match input_line ic with
+         | tag ->
+             let ns, tag =
+               match String.split_on_char ' ' tag with
+               | [ ns; tag ] -> (ns, tag)
+               | [ tag ] -> ("http://www.w3.org/1999/xhtml", tag)
+               | _ -> assert false
+             in
+             loop ((ns, String.lowercase_ascii tag) :: tags)
+         | exception End_of_file ->
+             close_in ic;
+             tags
+       in
+       loop []
+     else
+       let str =
+         Printf.sprintf "Requested allowed_tags file (%s) absent"
+           !allowed_tags_file
+       in
+       !GWPARAM.syslog `LOG_WARNING str;
+       default_safe_html_allowed_tags)
 
 (* Few notes:
 
