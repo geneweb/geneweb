@@ -114,6 +114,11 @@ rendering of the descending tree view, containing about 50 ASCII box-drawings
 characters. The files are located at /webfonts/dejavusansmono-
 genewebfont.woff/2.
 
+The "static_path" parameter in gwf has been depreciated,
+and is now set from the GW_STATIC_PATH environment variable
+used when starting server in CGI mode.
+(example in git tree: etc/install_cgi/gwd.cgi)
+
 GeneWeb version 7.0.0
 ---------------------
 
