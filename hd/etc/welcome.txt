@@ -27,15 +27,15 @@
   %end;
 %end;
   <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-lg-3">
-    %if;(b.auth_file="" and b.wizard_passwd!="" or b.friend_passwd!="")
-      <div class="d-none d-lg-block col-2 order-md-1"></div>
+    %if;(b.auth_file="" and (b.wizard_passwd!="" or b.friend_passwd!=""))
+      <div class="d-none d-lg-block col-md-3 order-md-1"></div>
     %end;
-    <div class="col-xs-12 col-md-auto order-md-3 ml-md-auto px-0">
+    <div class="col-xs-12 col-md-3 order-md-3 ml-md-2 px-0">
       <div class="d-flex flex-column">
         %if;(cgi and (not wizard or not friend))
           <form class="form-inline" method="post" action="%action;">
             %hidden;
-            <div class="input-group mt-1">
+            <div class="input-group mt-1 w-100">
               %(<label for="w" class="sr-only">[user/password/cancel]0:[user/password/cancel]1</label>%)
               <input type="text" class="form-control" name="w" title="[wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0"
               placeholder="[user/password/cancel]0:[user/password/cancel]1" aria-label="password input" aria-describedby="username:password" autofocus>
@@ -84,15 +84,16 @@
         %(<img src="%image_prefix;/gwlogo.png" alt="GeneWeb" title="GeneWeb">%)
       %end;
       <h1 class="font-weight-bolder">%apply;capitalize%with;[database]%end; %base.name;</h1>
-      %if;(b.visitor_access!="no")<span class="font-weight-light h2">%base.nb_persons; [person/persons]1</span>
-        <div class="d-flex flex-column justify-content-lg-center mt-0 mt-lg-2 mt-xl-3">
-          %if;(b.motd!="")
-            <div class="display-5 lead font-weight-light">%apply;interp(b.motd)</div>
-          %end;
-          %if;(browsing_with_sosa_ref and b.visitor_access!="no")
-            <div class="text-center">%apply;display_sosa_ref%with;%sosa_ref;%end;</div>
-          %end;
-        </div>
+      %if;(b.visitor_access!="no")<span class="font-weight-light h2">%base.nb_persons; [person/persons]1</span>%end;
+    </div>
+  </div>
+  <div class="d-flex justify-content-center mt-1 mt-lg-3">
+    <div class="d-flex flex-column col-8">
+      %if;(b.motd!="")%nn;
+        <div class="display-5 lead font-weight-light text-center">%apply;interp(b.motd)</div>
+      %end;
+      %if;(browsing_with_sosa_ref and b.visitor_access!="no")
+        <div class="text-center">%apply;display_sosa_ref%with;%sosa_ref;%end;</div>
       %end;
     </div>
   </div>
