@@ -1058,6 +1058,14 @@ let explode s =
   exp (String.length s - 1) []
 
 let make_conf from_addr request script_name env =
+  if not (Sys.file_exists !allowed_tags_file) then (
+    let str = 
+     Printf.sprintf
+       "Requested allowed_tags file (%s) absent" !allowed_tags_file
+    in
+    incr Templ.nb_errors;
+    Templ.errors_undef := str :: !Templ.errors_undef;
+    !GWPARAM.syslog `LOG_WARNING str);
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
   let cgi = !Wserver.cgi in
