@@ -274,6 +274,7 @@
     %end;
   </div>
 
+  %let;dummy;%in;
   %(let;dummy;%apply;date_to_sort("self.birth_date")%in;
   birth date : %self.birth_date; : %apply;date_to_sort("self.birth_date"), %dummy;;<br>
   %foreach;event;
