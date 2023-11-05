@@ -20,7 +20,7 @@
       <i class="fa fa-search fa-fw fa-sm" aria-hidden="true"></i>%nn;
       <span class="sr-only">[*search/case sensitive]0</span>%nn;
     </a>
-    %if;(b.show_query_time!="on")
+    %if;(b.hide_querytime_bugs!="yes")
       <div class="p-0 border-0" id="q_time">%nn;
         <i class="fa fa-hourglass-half fa-fw fa-xs p-0"></i>%nn;
       </div>

@@ -7,36 +7,37 @@ open Gwdb
 let time_debug conf query_time nb_errors errors_undef =
   let errors_undef = List.sort_uniq compare errors_undef in
   let err_list = String.concat "," errors_undef in
-  Output.print_sstring conf
-    (Printf.sprintf
-       {|
-    <script>
-      var q_time = %.3f;
-      var nb_errors = %d;
-      var errors_list = "%s";
-      var home_time = document.getElementById('q_time');
-      var home_errors = document.getElementById('nb_errors');
-      if (home_time != null) {
-        home_time.title = "Query treated in " + q_time + " s";
-        if (q_time < 3) {
-          home_time.classList.add("text-success");
-        } else if (q_time < 8) {
-          home_time.classList.add("text-warning");
-         } else {
-           home_time.classList.add("text-danger");
-        }
-      }
-      if (home_errors != null && nb_errors > 0) {
-        home_errors.title = nb_errors +" error(s)!";
-        home_errors.classList.remove("d-none");
-      }
-      if (errors_list != "") {
-        home_errors.title = home_errors.title +
-         "\u{000A}Unbound variable(s):" + errors_list + ".";
-      }
-    </script>
-      |}
-       query_time nb_errors err_list)
+  match List.assoc_opt "hide_querytime_bugs" conf.base_env with
+  | Some "yes" -> ()
+  | _ ->
+      Output.print_sstring conf
+        (Printf.sprintf
+           {|<script>
+  var q_time = %.3f;
+  var nb_errors = %d;
+  var errors_list = "%s";
+  var home_time = document.getElementById('q_time');
+  var home_errors = document.getElementById('nb_errors');
+  if (home_time != null) {
+    home_time.title = "Query treated in " + q_time + " s";
+    if (q_time < 3) {
+      home_time.classList.add("text-success");
+    } else if (q_time < 8) {
+      home_time.classList.add("text-warning");
+     } else {
+       home_time.classList.add("text-danger");
+    }
+  }
+  if (home_errors != null && nb_errors > 0) {
+    home_errors.title = nb_errors +" error(s)!";
+    home_errors.classList.remove("d-none");
+  }
+  if (errors_list != "") {
+    home_errors.title = home_errors.title +
+     "\u{000A}Unbound variable(s):" + errors_list + ".";
+  }
+</script>|}
+           query_time nb_errors err_list)
 
 let escape_aux count blit str =
   let strlen = String.length str in
