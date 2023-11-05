@@ -1,19 +1,14 @@
 open Config
 open TemplAst
 
-let nb_errors = ref 0
-let errors_undef = ref []
-let errors_other = ref []
-let set_vars = ref []
-
 exception Exc_located of loc * exn
 
 let raise_with_loc loc = function
   | Exc_located (_, _) as e ->
-      incr nb_errors;
+      incr GWPARAM.nb_errors;
       raise e
   | e ->
-      incr nb_errors;
+      incr GWPARAM.nb_errors;
       raise (Exc_located (loc, e))
 
 let input_templ conf fname =
@@ -538,14 +533,16 @@ let eval_string_var conf eval_var sl =
   with Not_found -> (
     try VVstring (eval_variable conf sl)
     with Not_found ->
-      errors_undef := (" %" ^ String.concat "." sl ^ "?") :: !errors_undef;
+      GWPARAM.errors_undef :=
+        (" %" ^ String.concat "." sl ^ "?") :: !GWPARAM.errors_undef;
       VVstring (" %" ^ String.concat "." sl ^ "?"))
 
 let eval_var_handled conf sl =
   try eval_variable conf sl
-  with Not_found -> (
-    errors_undef := (Printf.sprintf "%%%s?" (String.concat "." sl)) :: !errors_undef;
-    Printf.sprintf " %%%s?" (String.concat "." sl))
+  with Not_found ->
+    GWPARAM.errors_undef :=
+      Printf.sprintf "%%%s?" (String.concat "." sl) :: !GWPARAM.errors_undef;
+    Printf.sprintf " %%%s?2" (String.concat "." sl)
 
 let apply_format conf nth s1 s2 =
   let s1 =
@@ -861,8 +858,8 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) = function
   | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e))
 
 let print_error ((fname, bp, ep) as pos) exc =
-  incr nb_errors;
-  if !nb_errors <= 10 then (
+  incr GWPARAM.nb_errors;
+  if !GWPARAM.nb_errors <= 10 then (
     if fname = "" then Printf.eprintf "*** <W> template file"
     else Printf.eprintf "File %s" fname;
     let line = if fname = "" then None else Templ_parser.line_of_loc pos in
@@ -1111,8 +1108,8 @@ let print_copyright conf =
 let include_hed_trl conf name =
   if name = "trl" then Util.include_template conf [] name (fun () -> ());
   let query_time = Unix.gettimeofday () -. conf.query_start in
-  Util.time_debug conf query_time !nb_errors !errors_undef !errors_other
-    !set_vars
+  Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
+    !GWPARAM.errors_other !GWPARAM.set_vars
 
 let rec interp_ast :
     config -> ('a, 'b) interp_fun -> 'a env -> 'b -> ast list -> unit =
@@ -1325,10 +1322,14 @@ and print_var print_ast_list conf ifun env ep loc sl =
                   print_ast_list env ep astl;
                   Util.include_end conf (Adef.safe fname)
               | None ->
-                  incr nb_errors;
+                  GWPARAM.errors_other :=
+                    Format.sprintf "%%%s?" (String.concat "." sl)
+                    :: !GWPARAM.errors_other;
                   Output.printf conf " %%%s?" (String.concat "." sl))
           | None ->
-              incr nb_errors;
+              GWPARAM.errors_other :=
+                Format.sprintf "%%%s?" (String.concat "." sl)
+                :: !GWPARAM.errors_other;
               Output.printf conf " %%%s?" (String.concat "." sl))
       | sl -> print_variable conf sl)
   in
@@ -1357,7 +1358,8 @@ and print_variable conf sl =
       | [ s ] -> print_simple_variable conf s
       | _ -> raise Not_found
     with Not_found ->
-      incr nb_errors;
+      GWPARAM.errors_undef :=
+        Format.sprintf "%%%s?" (String.concat "." sl) :: !GWPARAM.errors_undef;
       Output.printf conf " %%%s?" (String.concat "." sl))
 
 let copy_from_templ : config -> Adef.encoded_string env -> in_channel -> unit =

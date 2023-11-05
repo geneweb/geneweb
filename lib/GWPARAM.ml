@@ -4,6 +4,11 @@
     for simple functions if it does not come with a performance cost.
 *)
 
+let nb_errors = ref 0
+let errors_undef = ref []
+let errors_other = ref []
+let set_vars = ref []
+
 type syslog_level =
   [ `LOG_ALERT
   | `LOG_CRIT

@@ -22,7 +22,7 @@ let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
            {|<script>
   var q_time = %.3f;
   var nb_errors = %d;
-  var errors_list = "%s; %s";
+  var errors_list = "\u{000A}%s%s";
   var home_time = document.getElementById('q_time');
   var home_errors = document.getElementById('nb_errors');
   if (home_time != null) {
@@ -39,12 +39,15 @@ let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
     home_errors.title = nb_errors +" error(s)!";
     home_errors.classList.remove("d-none");
   }
-  if (errors_list != "") {
-    home_errors.title = home_errors.title +
-     "\u{000A}Unbound variable(s):" + errors_list + ".";
+  if (home_errors != null && errors_list != "") {
+    home_errors.title = home_errors.title + errors_list + ".";
   }
 </script>|}
-           query_time nb_errors err_list1 err_list2)
+           query_time nb_errors
+           (if errors_undef <> [] then
+              Printf.sprintf "Unbound variable(s): %s. " err_list1
+            else "")
+           err_list2)
 
 let escape_aux count blit str =
   let strlen = String.length str in
