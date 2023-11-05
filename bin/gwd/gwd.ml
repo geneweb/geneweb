@@ -1063,8 +1063,7 @@ let make_conf from_addr request script_name env =
      Printf.sprintf
        "Requested allowed_tags file (%s) absent" !allowed_tags_file
     in
-    incr Templ.nb_errors;
-    Templ.errors_undef := str :: !Templ.errors_undef;
+    Templ.errors_other := str :: !Templ.errors_undef;
     !GWPARAM.syslog `LOG_WARNING str);
   let utm = Unix.time () in
   let tm = Unix.localtime utm in

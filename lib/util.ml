@@ -4,9 +4,16 @@ open Config
 open Def
 open Gwdb
 
-let time_debug conf query_time nb_errors errors_undef =
+let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
   let errors_undef = List.sort_uniq compare errors_undef in
-  let err_list = String.concat "," errors_undef in
+  let errors_undef =
+    List.filter (fun e -> not (List.mem e set_vars)) errors_undef
+  in
+  let nb_errors =
+    nb_errors + List.length errors_undef + List.length errors_other
+  in
+  let err_list1 = String.concat "," errors_undef in
+  let err_list2 = String.concat "," errors_other in
   match List.assoc_opt "hide_querytime_bugs" conf.base_env with
   | Some "yes" -> ()
   | _ ->
@@ -15,7 +22,7 @@ let time_debug conf query_time nb_errors errors_undef =
            {|<script>
   var q_time = %.3f;
   var nb_errors = %d;
-  var errors_list = "%s";
+  var errors_list = "%s; %s";
   var home_time = document.getElementById('q_time');
   var home_errors = document.getElementById('nb_errors');
   if (home_time != null) {
@@ -37,7 +44,7 @@ let time_debug conf query_time nb_errors errors_undef =
      "\u{000A}Unbound variable(s):" + errors_list + ".";
   }
 </script>|}
-           query_time nb_errors err_list)
+           query_time nb_errors err_list1 err_list2)
 
 let escape_aux count blit str =
   let strlen = String.length str in

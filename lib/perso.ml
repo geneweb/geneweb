@@ -2162,6 +2162,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Vvars lv ->
           if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
           lv := (name, value) :: !lv;
+          if not (List.mem name !Templ.set_vars) then
+            Templ.set_vars := name :: !Templ.set_vars;
           VVstring ""
       | _ -> raise Not_found)
   | "svar" :: i :: sl -> (

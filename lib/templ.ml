@@ -3,6 +3,8 @@ open TemplAst
 
 let nb_errors = ref 0
 let errors_undef = ref []
+let errors_other = ref []
+let set_vars = ref []
 
 exception Exc_located of loc * exn
 
@@ -536,14 +538,12 @@ let eval_string_var conf eval_var sl =
   with Not_found -> (
     try VVstring (eval_variable conf sl)
     with Not_found ->
-      incr nb_errors;
       errors_undef := (" %" ^ String.concat "." sl ^ "?") :: !errors_undef;
       VVstring (" %" ^ String.concat "." sl ^ "?"))
 
 let eval_var_handled conf sl =
   try eval_variable conf sl
   with Not_found -> (
-    incr nb_errors;
     errors_undef := (Printf.sprintf "%%%s?" (String.concat "." sl)) :: !errors_undef;
     Printf.sprintf " %%%s?" (String.concat "." sl))
 
@@ -1109,10 +1109,10 @@ let print_copyright conf =
       Output.print_sstring conf "<br>\n")
 
 let include_hed_trl conf name =
-  if name = "trl" then (
-    Util.include_template conf [] name (fun () -> ()));
-    let query_time = Unix.gettimeofday () -. conf.query_start in
-    Util.time_debug conf query_time !nb_errors !errors_undef
+  if name = "trl" then Util.include_template conf [] name (fun () -> ());
+  let query_time = Unix.gettimeofday () -. conf.query_start in
+  Util.time_debug conf query_time !nb_errors !errors_undef !errors_other
+    !set_vars
 
 let rec interp_ast :
     config -> ('a, 'b) interp_fun -> 'a env -> 'b -> ast list -> unit =
