@@ -1,3 +1,8 @@
+val nb_errors : int ref
+val errors_undef : string list ref
+val errors_other : string list ref
+val set_vars : string list ref
+
 type syslog_level =
   [ `LOG_EMERG  (** A panic condition. *)
   | `LOG_ALERT

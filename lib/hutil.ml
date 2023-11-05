@@ -119,8 +119,8 @@ let trailer conf =
   Templ.print_copyright conf;
   Util.include_template conf [] "js" (fun () -> ());
   let query_time = Unix.gettimeofday () -. conf.query_start in
-  Util.time_debug conf query_time !Templ.nb_errors !Templ.errors_undef
-    !Templ.errors_other !Templ.set_vars;
+  Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
+    !GWPARAM.errors_other !GWPARAM.set_vars;
   Output.print_sstring conf "</body>\n</html>\n"
 
 let () =
