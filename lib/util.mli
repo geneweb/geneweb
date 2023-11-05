@@ -4,7 +4,8 @@ open Config
 open Def
 open Gwdb
 
-val time_debug : config -> float -> int -> string list -> unit
+val time_debug :
+  config -> float -> int -> string list -> string list -> string list -> unit
 (** prints the query duration and reports it in the "home" section *)
 
 val cnt_dir : string ref
