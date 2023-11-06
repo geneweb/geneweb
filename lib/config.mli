@@ -110,6 +110,7 @@ type config = {
   forced_plugins : string list;
   plugins : string list;
   notify_change : string option
+  preferred_countries : string list option;
 }
 (** Geneweb configuration data type *)
 
