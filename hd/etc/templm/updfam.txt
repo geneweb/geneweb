@@ -222,7 +222,7 @@
   </table>
 </fieldset>
 <fieldset class="event">
-  <legend>[*event/events]1 %if;(evar.m!="ADD_FAM")<a id="chg_evt_fam" href="%prefix;m=CHG_EVT_FAM_ORD;i=%evar.i;;ip=%evar.ip;" %lpaO; title="[*invert::event/events]1 [family/families]0 (Alt+%lpcOk;)">⇳</a>%end;</legend>
+  <legend>[*event/events]1 %if;(evar.m!="ADD_FAM")<a id="chg_evt_fam" href="%prefix;m=CHG_EVT_FAM_ORD&i=%evar.i;&ip=%evar.ip;" %lpaO; title="[*invert::event/events]1 [family/families]0 (Alt+%lpcOk;)">⇳</a>%end;</legend>
   %if;has_fevents;%foreach;fevent;%apply;one_event(cnt,"","fwitness")%end;%else;%apply;one_event(1,"#marr","fwitness")%end;
   <dl id="new_event"></dl>
   <dl><dt><a href="javascript:addEvent(1,1)" %lfa4;>+ [event/events]0</a> %lfc4; %lt5; %lt2; [place] [note/notes]1 [source/sources]1</dt></dl>

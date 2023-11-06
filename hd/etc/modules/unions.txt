@@ -7,16 +7,16 @@
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 %define;relations_tree(z1)
     %reset_count;
-    href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
+    href="%prefix;spouse=on;m=RLM;image=%evar.image;&%nn;
       %foreach;witness;
-        %incr_count;i%count;=%witness.index;;%nn;
+        %incr_count;i%count;=%witness.index;&%nn;
         t%count;=[marriage event];%nn;
         %incr_count;i%count;=z1;%nn;
       %end;
-      %incr_count;i%count;=%index;;%nn;
+      %incr_count;i%count;=%index;&%nn;
       t%count;=%if;(sex=0)[him/her]0%elseif;(sex=1)[him/her]1%else;0%end;%nn;
       %if;browsing_with_sosa_ref;
-        %incr_count;i%count;=%sosa_ref.index;;t%count;=sosa_1;%nn;
+        %incr_count;i%count;=%sosa_ref.index;&t%count;=sosa_1;%nn;
       %end;
     " title="[*relations tree]"
 %end;

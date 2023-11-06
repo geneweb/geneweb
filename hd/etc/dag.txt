@@ -133,7 +133,7 @@
         %else;
           <a href="%prefix_base_password;%nn;
             %foreach;env_binding;%nn;
-              %if;(env.key != "pos1" and env.key != "pos2")%env.key;=%env.val;;%end;%nn;
+              %if;(env.key != "pos1" and env.key != "pos2")%env.key;=%env.val;&%end;%nn;
             %end;%nn;
             pos1=%expr(pos1+overlap-dpos);%nn;
             pos2=%expr(pos1+overlap);">&lt;&lt;</a>
@@ -142,7 +142,7 @@
         %else;
           <a href="%prefix_base_password;%nn;
             %foreach;env_binding;%nn;
-              %if;(env.key!="pos1" and env.key!="pos2")%env.key;=%env.val;;%end;%nn;
+              %if;(env.key!="pos1" and env.key!="pos2")%env.key;=%env.val;&%end;%nn;
             %end;%nn;
             pos1=%expr(pos2-overlap);%nn;
             pos2=%expr(pos2-overlap+dpos);">&gt;&gt;</a>

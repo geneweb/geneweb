@@ -135,7 +135,7 @@
             %if;(not cancel_links)
               <a href="%prefix;%ancestor.access;">%ancestor;</a>
               %ancestor.title;%ancestor.dates; (==
-              <strong><a href="%prefix;em=R;ei=%index;;i=%ancestor.index;;et=M;spouse=on"
+              <strong><a href="%prefix;em=R&ei=%index;&i=%ancestor.index;&et=M&spouse=on"
                  title="%ancestor; …[relationship]… %self;">%ancestor.same;</a></strong>.)
             %else;
               %ancestor; %ancestor.title;%ancestor.dates; (== <strong>%ancestor.same;</strong>.)

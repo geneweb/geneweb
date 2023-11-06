@@ -54,9 +54,9 @@
       %lxr;%lxyo;%nn;
     %else;
       %if;(browsing_with_sosa_ref)
-        <a href="%prefix;m=RLM;et=S;spouse=on;image=%evar.image;;i1=%l1i;;i2=%xx.index;;t2=%lxr;;i3=%sosa_ref.index;;t3=sosa_1;i4=%l1i;;t4=%l1s;">%lxr;%lxyo;</a>%nn;
+        <a href="%prefix;m=RLM&et=S&spouse=on&image=%evar.image;&i1=%l1i;&i2=%xx.index;&t2=%lxr;&i3=%sosa_ref.index;&t3=sosa_1;i4=%l1i;&t4=%l1s;">%lxr;%lxyo;</a>%nn;
       %else;
-        <a href="%prefix;em=R;ei=%xx.index;;spouse=on;et=S;image=%evar.image;;i=%l1i;">%lxr;%lxyo;</a>%nn;
+        <a href="%prefix;em=R&ei=%xx.index;&spouse=on&et=S&image=%evar.image;&i=%l1i;">%lxr;%lxyo;</a>%nn;
       %end;
     %end;
   %and;
@@ -117,9 +117,9 @@
       %lxr;%nn;
     %else;
       %if;(browsing_with_sosa_ref)
-        <a href="%prefix;m=RLM;et=S;spouse=on;image=%evar.image;;i1=%sosa_ref.index;;i2=%xx.index;;t2=%lxr;;i3=%l1i;;t3=%l1s;;i4=%sosa_ref.index;;t4=sosa_1">%lxr;</a>%nn;
+        <a href="%prefix;m=RLM&et=S&spouse=on&image=%evar.image;&i1=%sosa_ref.index;&i2=%xx.index;&t2=%lxr;&i3=%l1i;&t3=%l1s;&i4=%sosa_ref.index;&t4=sosa_1">%lxr;</a>%nn;
       %else;
-        <a href="%prefix;em=R;ei=%xx.index;;spouse=on;et=S;image=%evar.image;;i=%l1i;">%lxr;</a>%nn;
+        <a href="%prefix;em=R&ei=%xx.index;&spouse=on&et=S&image=%evar.image;&i=%l1i;">%lxr;</a>%nn;
       %end;
     %end;
   %and;

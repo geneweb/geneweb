@@ -41,16 +41,16 @@
     <span><a href="javascript:;" onclick="javascript:dsp()">…</a></span>
     %if;(evar.i1 = "" and evar.p1 = "")
       %if;(evar.m = "D" and has_parents)
-        <span><a %l1; href="%prefix_base_password;%if;(evar.lang != "")lang=%evar.lang;;%end;
+        <span><a %l1; href="%prefix_base_password;%if;(evar.lang != "")lang=%evar.lang;&%end;
           %foreach;env_binding;
-            %if;(env.key = "m")m=A;%elseif;(env.key = "t")t=G;%else;%env.key;=%env.val.decoded;;%end;
+            %if;(env.key = "m")m=A&%elseif;(env.key = "t")t=G&%else;%env.key;=%env.val.decoded;&%end;
           %end;
         ">[*ancestor/ancestors]1</a></span>
       %end;
       %if;(evar.m = "A" and has_children)
-        <span><a %l1; href="%prefix_base_password;%if;(evar.lang != "")lang=%evar.lang;;%end;
+        <span><a %l1; href="%prefix_base_password;%if;(evar.lang != "")lang=%evar.lang;&%end;
           %foreach;env_binding;
-            %if;(env.key = "m")m=D;%elseif;(env.key = "t")t=L;%else;%env.key;=%env.val.decoded;;%end;
+            %if;(env.key = "m")m=D&%elseif;(env.key = "t")t=L&%else;%env.key;=%env.val.decoded;&%end;
           %end;
         ">[*descendants]0</a></span>
       %end;
@@ -269,7 +269,7 @@
 %define;marriage_info()
   %if;(lupd = "1")
     <a id="f%count;i%family.index;" class="date" href="#f%count;i%family.index;" %ltmf;
-      onclick="window.open('%prefix;m=MOD_FAM;i=%family.index;;ip=%index;;');">%nn;
+      onclick="window.open('%prefix;m=MOD_FAM&i=%family.index;&ip=%index;&');">%nn;
       &amp;%marriage_date.prec;%marriage_date.year;</a>
   %else;
     &amp;%if;(marriage_date.prec != "")%marriage_date.prec;%end;%if;(marriage_date.year != "")%marriage_date.year;%end;%sp;

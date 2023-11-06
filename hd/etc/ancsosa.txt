@@ -322,7 +322,7 @@
 %define;link_marriage1(yy)
   %if;(wizard and not cancel_links)
     <a id="mf%family.index;" class="date p_%left;" href="#mf%family.index;"
-      onclick="window.open('%prefix;m=MOD_FAM;i=%family.index;;ip=%index;;');">%nn;
+      onclick="window.open('%prefix;m=MOD_FAM&i=%family.index;&ip=%index;');">%nn;
   %end;
       <div><span class="sure_dates%ancestor.has_linked_page.MARRIAGEA;%ancestor.spouse.has_linked_page.MARRIAGEA;
         %if;((marriage_date.prec != "" or on_marriage_date = "" or marriage_place = "") and (are_married or are_not_married)) not_sure_dates%end;"

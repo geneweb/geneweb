@@ -47,7 +47,7 @@
 %define;link_marriage1(xx)
   %if;(wizard and not cancel_links)
     <a id="mf%family.index;" class="date p_%left;" href="#mf%family.index;" %ltmf;
-      onclick="window.open('%prefix;m=MOD_FAM;i=%family.index;;ip=%index;;');">%nn;
+      onclick="window.open('%prefix;m=MOD_FAM&i=%family.index;&ip=%index;');">%nn;
       <span>&amp;</span>%nn;
         %if;(nb_children > 1)%nb_children;<br>%end;
         %slash_marriage_date; %marriage_place;
@@ -120,7 +120,7 @@
   %if;(cancel_links)
     ==<br>xx
   %else;
-    <a href="%prefix;em=R;ei=%ancestor.index;;m=NG;select=%index;;n=1;t=PN;et=A;spouse=on;image=on;" title="%ancestor; …[relationship]… %self;">==<br>xx</a>
+    <a href="%prefix;em=R&ei=%ancestor.index;&m=NG;select=%index;&n=1&t=PN&et=A&spouse=on&image=on" title="%ancestor; …[relationship]… %self;">==<br>xx</a>
   %end;
 %end;
 
@@ -227,8 +227,8 @@
   <p>[*up to] %pvar.1; %pvar.1.dates;</p>
   %if;(not cancel_links)
     <div class="menu">
-      %if;(has_sosa)<span><a href="%prefix;m=X;t=X;t1=1;i=%evar.i1;;i1=%index;;siblings=on;alias=on;spouse=on;parents=on;rel=on;notes=on;src=on;hide=on;witn=on;v=%evar.l;;maxv=%evar.l;;l=%evar.l;">[*descendants]0</a></span>%end;
-      <span><a href="%prefix;m=A;t=G;i=%index;;i1=%evar.i1;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;l=%evar.l;">[*ancestors]0</a></span>
+      %if;(has_sosa)<span><a href="%prefix;m=X&t=X&t1=1&i=%evar.i1;&i1=%index;&siblings=on&alias=on&spouse=on&parents=on&rel=on&notes=on&src=on&hide=on&witn=on&v=%evar.l;&maxv=%evar.l;&l=%evar.l;">[*descendants]0</a></span>%end;
+      <span><a href="%prefix;m=A&t=G&i=%index;&i1=%evar.i1;&siblings=on&alias=on&spouse=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on&l=%evar.l;">[*ancestors]0</a></span>
     </div>
   %end;
 %end;

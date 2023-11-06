@@ -32,15 +32,15 @@
   %foreach;sorted_list_item;
     %if;(prev_item.1 != item.1)
       %reset_count;%incr_count;
-      <br>%item.1;;%item.2;;<a href="%prefix;spouse=on;i%count;=%item.3;;t%count;=%item.4;;%nn;
+      <br>%item.1;;%item.2;;<a href="%prefix;spouse=on;i%count;=%item.3;&t%count;=%item.4;&%nn;
     %end;
     %if;(prev_item.1 = item.1)
       %incr_count;
-      i%count;=%item.3;;t%count;=%item.4;;%nn;
+      i%count;=%item.3;&t%count;=%item.4;&%nn;
     %end;
     %if;(next_item.1 != item.1)
       %incr_count;
-      i%count;=%index;;t%count;=%item.1;;%if;(count > 10)m=C;list=1;t=%item.1;;i=%index;;%else;m=RLM;%end;">(%expr(count - 1))</a>;%item.2;
+      i%count;=%index;&t%count;=%item.1;&%if;(count > 10)m=C&list=1&t=%item.1;&i=%index;&%else;m=RLM&%end;">(%expr(count - 1))</a>;%item.2;
     %end;
   %end;
   </p>

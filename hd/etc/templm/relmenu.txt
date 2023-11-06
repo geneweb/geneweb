@@ -121,7 +121,7 @@
       %end;
     </li></ul>
     %if;(has_parents or has_children)
-      <ul><li><a href="%prefix;%access;;m=A;t=F;fam7=on;tf1=fam73;v=3;maxv=4">7 [family/families]1</a></li></ul>
+      <ul><li><a href="%prefix;%access;&m=A&t=F&fam7=on&tf1=fam73&v=3&maxv=4">7 [family/families]1</a></li></ul>
     %end;
     %if;(has_parents)
       %if;(has_siblings or father.has_parents or mother.has_parents)
@@ -130,16 +130,16 @@
           %foreach;cousin_level;
             %if;(level <= l)
               %if;(level = 1)
-                %if;has_siblings;<li><a href="%prefix;%access;;m=C;v1=%level;;spouse=on">[*siblings]</a></li>%end;
+                %if;has_siblings;<li><a href="%prefix;%access;&m=C;v1=%level;&spouse=on">[*siblings]</a></li>%end;
                 %if;has_nephews_or_nieces;
-                  <li><a href="%prefix;%access;;m=C;v1=1;v2=2;spouse=on;">[*a nephew/a niece]4</a></li>
+                  <li><a href="%prefix;%access;&m=C&v1=1&v2=2&spouse=on;">[*a nephew/a niece]4</a></li>
                 %end;
               %elseif;(level = 2)
                 %if;(father.has_siblings or mother.has_siblings)
-                  <li><a href="%prefix;%access;;m=C;v1=2;v2=1;spouse=on;">[*uncles and aunts]</a></li>
+                  <li><a href="%prefix;%access;&m=C&v1=2&v2=1&spouse=on;">[*uncles and aunts]</a></li>
                 %end;
                 %if;(father.has_nephews_or_nieces or mother.has_nephews_or_nieces)
-                  <li><a href="%prefix;%access;;m=C;v1=%level;;spouse=on">[*cousins]</a></li>
+                  <li><a href="%prefix;%access;&m=C&v1=%level;&spouse=on">[*cousins]</a></li>
                 %end;
               %elseif;(level = 3)
                 %reset_count;
@@ -150,7 +150,7 @@
                     %end;
                   %end;
                 %end;
-                %if;(count > 0)<li><a href="%prefix;%access;;m=C;v1=%level;;spouse=on">[*2nd cousins]</a></li>%end;
+                %if;(count > 0)<li><a href="%prefix;%access;&m=C&v1=%level;&spouse=on">[*2nd cousins]</a></li>%end;
               %elseif;(level = 4)
                 %reset_count;
                 %foreach;ancestor_level(4)
@@ -160,7 +160,7 @@
                     %end;
                   %end;
                 %end;
-                %if;(count > 0)<li><a href="%prefix;%access;;m=C;v1=%level;;spouse=on">[*3rd cousins]</a></li>%end;
+                %if;(count > 0)<li><a href="%prefix;%access;&m=C&v1=%level;&spouse=on">[*3rd cousins]</a></li>%end;
               %else;
                 %reset_count;
                 %let;l;%level;%in;
@@ -172,7 +172,7 @@
                   %end;
                 %end;
                 %if;(count > 0)
-                  <li><a href="%prefix;%access;;m=C;v1=%level;;spouse=on">
+                  <li><a href="%prefix;%access;&m=C&v1=%level;&spouse=on">
                     %apply;nth_cousins%with;
                       %apply;nth%with;zero/[nth (cousin)]%and;%level;%end;
                     %end;

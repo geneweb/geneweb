@@ -4,7 +4,7 @@
   %let;l_wi;%if;(evar.wi != "")%evar.wi;%else;980%end;%in;
   %let;l_he;%if;(evar.he != "")%evar.he;%else;600%end;%in;
   %let;l_sosa_ref;%if;(evar.sosa = "on" and browsing_with_sosa_ref and has_sosa)on%end;%in;
-  %let;l_prefix;%prefix;t=h7;image=%evar.image;;siblings=%evar.siblings;;sosa=%evar.sosa;;fs=%l_fs;;wi=%l_wi;;he=%l_he;;bp=%evar.bp;;%in;
+  %let;l_prefix;%prefix;t=h7&image=%evar.image;&siblings=%evar.siblings;&sosa=%evar.sosa;&fs=%l_fs;&wi=%l_wi;&he=%l_he;&bp=%evar.bp;&%in;
   <style id="s" type="text/css">
     #htree{font-size:%l_fs;px;width:%l_wi;px;height:%l_he;px}
   </style>
@@ -178,7 +178,7 @@
       <input type="hidden" name="t" value="T" %l_on;
          %if;(evar.t = "T") checked="checked"%end;%/>
       <legend style="font-weight:bold">
-        <a href="%prefix;%access;;m=A">⏎</a>
+        <a href="%prefix;%access;&m=A">⏎</a>
           [*tools]0 [ascendants tree]
             <input type="submit"%nn;
                 title="[*validate/delete]0"%nn;
@@ -204,7 +204,7 @@
         %apply;radio("t1","T",[*full tree],[*ascendants tree])
         %apply;checkbox("├","dag",[dag],"")
          %if;(evar.t = "T")
-                         ├ <a href="%prefix;m=A;t=T;v=%l_v;;%access;;dag=on;notab=on" accesskey="/"
+                         ├ <a href="%prefix;m=A;t=T;v=%l_v;&%access;&dag=on&notab=on" accesskey="/"
                               title="[display by slices/slice width/overlap/total width]0 (/)"
                           >[display by slices/slice width/overlap/total width]0</a>
          %end;<br>
@@ -335,7 +335,7 @@
                   %foreach;env_binding;
                     %if;(env.key = "m")m=U;%nn;
                     %elseif;(env.key = "templ")
-                    %else;%env.key;=%env.val.decoded;;%nn;
+                    %else;%env.key;=%env.val.decoded;&%nn;
                     %end;
                   %end;">[*modify::tree]</a></li>
           %end;

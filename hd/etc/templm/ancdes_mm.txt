@@ -33,17 +33,17 @@
     %end;      
     %if;(prev_item.1 != item.1 or prev_item.2 != item.2 or prev_item.3 != item.3)
       %reset_count;%incr_count;
-      <a href="%prefix;spouse=on;m=RLM;i%count;=%item.4;;t%count;=%count;;%nn;
+      <a href="%prefix;spouse=on&m=RLM&i%count;=%item.4;&t%count;=%count;&%nn;
     %end;
     %if;(prev_item.1 = item.1 and prev_item.2 = item.2 and prev_item.3 = item.3)
       %incr_count;
-      i%count;=%item.4;;t%count;=%count;;%nn;
+      i%count;=%item.4;&t%count;=%count;&%nn;
     %end;
     %if;(next_item.1 != item.1 or next_item.2 != item.2 or next_item.3 != item.3)
       %let;l1;%expr(item.3 + 1)%in;
       %let;l2;%if;(count > l_max_width)%l_max_width;%else;%count;%end;%in;
       %incr_count;
-      i%count;=%index;;t%count;=z1%apply;lex_month(item.1)--z2%apply;lex_month(item.3)%nn;
+      i%count;=%index;&t%count;=z1%apply;lex_month(item.1)--z2%apply;lex_month(item.3)%nn;
       " class="st5%item.2;" style="top:%l1;em;border-width:%l2;px;">%expr(count - 1)</a>
       %if;(next_item.1 != item.1)
         </div>
@@ -101,13 +101,13 @@
 %end;
 
 %define;anc_menu()
-  %let;l_url;%prefix;m=A;t=F;i=%index;;v=%l_v;;only=%evar.only;;maxv=%evar.maxv;%in;
+  %let;l_url;%prefix;m=A;t=F;i=%index;&v=%l_v;&only=%evar.only;&maxv=%evar.maxv;%in;
   <div class="menu">
-    <span><a href="%l_url;;tf1=mm;tf2=">%birth_symbol; = %death_symbol; ?</a></span>
-    <span><a href="%l_url;;tf1=mm;tf2=1">%birth_symbol; = x%birth_symbol; ?</a></span>
-    <span><a href="%l_url;;tf1=mm;tf2=2">%birth_symbol; = x%death_symbol; ?</a></span>
-    <span><a href="%l_url;;tf1=mm;tf2=3">%death_symbol; = x%death_symbol; ?</a></span>
-    <span><a href="%l_url;;tf1=mm;tf2=4">%death_symbol; = x%birth_symbol; ?</a></span>
+    <span><a href="%l_url;&tf1=mm&tf2=">%birth_symbol; = %death_symbol; ?</a></span>
+    <span><a href="%l_url;&tf1=mm&tf2=1">%birth_symbol; = x%birth_symbol; ?</a></span>
+    <span><a href="%l_url;&tf1=mm&tf2=2">%birth_symbol; = x%death_symbol; ?</a></span>
+    <span><a href="%l_url;&tf1=mm&tf2=3">%death_symbol; = x%death_symbol; ?</a></span>
+    <span><a href="%l_url;&tf1=mm&tf2=4">%death_symbol; = x%birth_symbol; ?</a></span>
   </div>
 %end;
 
@@ -180,13 +180,13 @@
 %end;
 
 %define;des_menu()
-  %let;l_url;%prefix;m=D;t=L;i=%index;;v=%l_v;;maxv=%evar.maxv;%in;
+  %let;l_url;%prefix;m=D&t=L&i=%index;&v=%l_v;&maxv=%evar.maxv;%in;
   <div class="menu">
-    <span><a href="%l_url;;tl1=mm;tl2=">%birth_symbol; = %death_symbol; ?</a></span>
-    <span><a href="%l_url;;tl1=mm;tl2=1">%birth_symbol; = x%birth_symbol; ?</a></span>
-    <span><a href="%l_url;;tl1=mm;tl2=2">%birth_symbol; = x%death_symbol; ?</a></span>
-    <span><a href="%l_url;;tl1=mm;tl2=3">%death_symbol; = x%death_symbol; ?</a></span>
-    <span><a href="%l_url;;tl1=mm;tl2=4">%death_symbol; = x%birth_symbol; ?</a></span>
+    <span><a href="%l_url;&tl1=mm&tl2=">%birth_symbol; = %death_symbol; ?</a></span>
+    <span><a href="%l_url;&tl1=mm&tl2=1">%birth_symbol; = x%birth_symbol; ?</a></span>
+    <span><a href="%l_url;&tl1=mm&tl2=2">%birth_symbol; = x%death_symbol; ?</a></span>
+    <span><a href="%l_url;&tl1=mm&tl2=3">%death_symbol; = x%death_symbol; ?</a></span>
+    <span><a href="%l_url;&tl1=mm&tl2=4">%death_symbol; = x%birth_symbol; ?</a></span>
   </div>
 %end;
 

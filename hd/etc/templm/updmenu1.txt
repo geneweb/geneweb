@@ -59,22 +59,22 @@
   <td>
     %foreach;family;
       %if;(family_cnt != 1)
-        <a href="%prefix;m=INV_FAM;i=%index;;f=%family.index;">[*invert::]</a>
+        <a href="%prefix;m=INV_FAM&i=%index;&f=%family.index;">[*invert::]</a>
         <br>
         %if;(family.father.index = prev_family.father.index
          and family.mother.index = prev_family.mother.index)
           <a href=%nn;
-          "%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;;ip=%index;">%nn;
+          "%prefix;m=MRG_FAM&i=%prev_family.index;&i2=%family.index;&ip=%index;">%nn;
           [*merge::]</a>
           <br>
         %end;
       %end;
-      <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;
+      <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;
        " %if;(nb_families = 1) title="[*modify::family/families]0 (F)" accesskey="F"%end;>%nn;
       [*modify::family/families]0%if;(nb_families = 1) (F)%end;</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br>
-      <a href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index">%nn;
+      <a href="%prefix;m=DEL_FAM&i=%family.index;&ip=%index">%nn;
       [*delete::family/families]0</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br>
