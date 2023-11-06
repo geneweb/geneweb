@@ -24,7 +24,7 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-%let;e_v;%if(e.v!="")%e.v;%else;4%end;%in;
+%let;e_v;%if;(e.v!="")%e.v;%else;4%end;%in;
 <div class="container%if;(e_v>6)-fluid%end;">
   <div class="d-flex flex-column justify-content-center">
 %include;perso_utils
@@ -83,7 +83,7 @@
     %( fix gradient for individual who are dead < 1 year old by forcing a 1% white space %)
     %let;death_age;%if;(death_age_!="" and birth_age!= "" and death_age_=birth_age and birth_age>0)%expr(birth_age+1)%else;%death_age_;%end;%in;
     %let;white;%if;(cous_isdead=1)rgba(245,245,235,1)%else;rgba(255,255,255,1)%end;%in;%let;brown;rgba(245,231,216,1)%in;%let;yellow;rgba(255,235,210,1)%in;
-    %if(path_end.surname="?" and path_end.first_name="?")%incr_count3;
+    %if;(path_end.surname="?" and path_end.first_name="?")%incr_count3;
     %else;
       %( store all cous_paths individual list item with their 5 buttons in a sorted_list %)
       %apply;add_in_sorted_list%with;%path_end.dates; %path_end.surname; %path_end.first_name; %path_end.occ;%and;%nn;
@@ -123,7 +123,7 @@
               %if;(path_end.dates!="")%path_end.dates;
               %else;%if;(cous_isdead=1)†%else;°%end;
               %end;
-            %if;wizard;</a>%end
+            %if;wizard;</a>%end;
           </div>
         </div>
        </li>%and;%path_end.cnt;%and;%path_end.index;%end;
@@ -185,7 +185,7 @@
                   </div>
                   <div class="d-inline-flex flex-column ml-2">
                     <div>
-                      <button type="button" class="btn btn-sm py-0 mt-2 btn-light%if;(vvv=e_v and www=0) disabled%end;" data-dismiss="modal" data-toggle="modal" data-target="#modal_%if;(www=0)%expr(vvv+1)_0%else;vvv_%expr(www-1)%end;"><span title="%if(www=0)%expr(vvv+1)/0%else;vvv/%expr(www-1)%end;" data-toggle="tooltip" data-html="true"><i class="fa-solid fa-arrow-up-%if;(www=0)right-dots%else;long%end; fa-fw"></i>vvv</span></button>
+                      <button type="button" class="btn btn-sm py-0 mt-2 btn-light%if;(vvv=e_v and www=0) disabled%end;" data-dismiss="modal" data-toggle="modal" data-target="#modal_%if;(www=0)%expr(vvv+1)_0%else;vvv_%expr(www-1)%end;"><span title="%if;(www=0)%expr(vvv+1)/0%else;vvv/%expr(www-1)%end;" data-toggle="tooltip" data-html="true"><i class="fa-solid fa-arrow-up-%if;(www=0)right-dots%else;long%end; fa-fw"></i>vvv</span></button>
                     </div>
                     <div>
                       <button type="button" class="btn btn-sm py-0 mt-1 btn-light%if;(cousdown=0) disabled%end;" data-dismiss="modal" data-toggle="modal" data-target="#modal_vvv_%expr(www+1)"><span title="vvv/%expr(www+1)" data-toggle="tooltip" data-html="true"><i class="fa-solid fa-arrow-down-long fa-fw"></i>www</span></button>

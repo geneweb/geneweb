@@ -60,7 +60,7 @@
   %apply;pline("zz", pvar.zz.occ, pvar.zz.first_name, pvar.zz.surname, tmp, "")
 %end;
 %define;one_s_line(zz)
-  %if(evar.szz != "")
+  %if;(evar.szz != "")
     %let;tmp;
       %if;svar.zz.has_birth_date;° %svar.zz.slash_birth_date;
       %elseif;svar.zz.has_baptism_date; %svar.zz.slash_baptism_date;
@@ -75,17 +75,17 @@
   %end;
 %end;
 %define;one_svar(zz)
-  %if(evar.izz != "" or evar.pzz != "")
+  %if;(evar.izz != "" or evar.pzz != "")
     %apply;one_p_line("zz")
     %apply;one_s_line("zz")
     %apply;one_svar(zz+1)
-  %elseif(evar.szz != "" and "zz" != "1")
+  %elseif;(evar.szz != "" and "zz" != "1")
     %apply;one_s_line("zz")
     %apply;one_svar(zz+1)
   %end;
 %end;
 %define;my_hidden(xx)
-  %if(evar.xx!="")<input type="hidden" name="xx" value="%evar.xx;">%end;
+  %if;(evar.xx!="")<input type="hidden" name="xx" value="%evar.xx;">%end;
 %end;
 <div class="container-fluid">
 <form id="upd" method="post" action="%action;">
@@ -124,7 +124,7 @@
     </tbody>
   </table>
 </form>
-%if(not cancel_links)
+%if;(not cancel_links)
   %base_trailer;
   %include;copyr
 %end;

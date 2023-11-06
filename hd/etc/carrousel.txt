@@ -7,7 +7,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
-  %include.css;
+  %include;css
 </head>
 <body%body_prop; id="person">
 %include.hed;
@@ -147,7 +147,7 @@
         <div class="d-flex col">
           <h1 class="display-4">
             %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*note/notes]0</h1>
-          <span class="mb-1 px-0 ml-auto align-self-end col-2">%include.toolbar;</span>
+          <span class="mb-1 px-0 ml-auto align-self-end col-2">%include;toolbar</span>
         </div>
         <textarea class="form-control col-12" id="image_note"
           name="note" rows="5" placeholder="[*note/notes]0">
@@ -319,9 +319,9 @@
 %end;
 
 %base_trailer;
-%include.copyr;
+%include;copyr
 </div>
-%include.js;
+%include;js
 %define;input_snd(xxx,yyy)
 $('.xxx').change(function() {
    %(replace input label with file name, then enable send button if input is non empty%)

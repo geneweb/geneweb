@@ -53,7 +53,7 @@
         <th>[*person/persons]0</th>
         <th>[*wizard/wizards/friend/friends/exterior]0</th>
         <th>[*update]</th>
-        %if;(bvar.history_diff="yes")<th class="text-center"><i class="fa fa-history fa-fw text-dark" title="[*history]"></i></th>%end
+        %if;(bvar.history_diff="yes")<th class="text-center"><i class="fa fa-history fa-fw text-dark" title="[*history]"></i></th>%end;
       </tr>
     </thead>
     %foreach;history_line(kk, e.pos, wiz)

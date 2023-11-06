@@ -67,7 +67,7 @@
       %if;(occ != "0")
         <input type="hidden" name="oc" value="%occ;"%/>
       %end;
-    %else
+    %else;
       <input type="hidden" name="i" value="%index;"%/>
     %end;
     <input type="hidden" name="maxv" value="%max_anc_level;"%/>
@@ -213,7 +213,7 @@
         <input type="radio" id="t1CT" name="t1" value="CT" %l_on; %l_on1;%/>
         [*compact tree] (> 5 gen)
       </legend>
-      %(apply;checkbox("├","it","Orientation I (on) [or] H (off)",""%)
+      %(%apply;checkbox("├","it","Orientation I (on) [or] H (off)",""%)
       <label title="">orientation
           <input type="radio" id="itIH" name="it" value="on" %l_on1; %l_on;
             %if;(evar.it = "on") checked="checked"%end;%/> I

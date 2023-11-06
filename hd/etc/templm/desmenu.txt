@@ -53,7 +53,7 @@
       %if;(occ != "0")
         <input type="hidden" name="oc" value="%occ;"%/>
       %end;
-    %else
+    %else;
       <input type="hidden" name="i" value="%index;"%/>
     %end;
     <input type="hidden" name="maxv" value="%max_desc_level;"%/>

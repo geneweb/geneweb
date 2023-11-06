@@ -92,7 +92,7 @@
                 %let;curr_fam_cnt;%family_cnt;%in;
                 <select onchange="$('#marriage_mod_form%family_cnt;').submit();" name="n">
                   %foreach;family;
-                    <option %if(family_cnt = curr_fam_cnt) selected="selected" %end; value="%family_cnt;">
+                    <option %if;(family_cnt = curr_fam_cnt) selected="selected" %end; value="%family_cnt;">
                       %family_cnt;
                     </option>
                   %end;

@@ -4,7 +4,7 @@
   %if;(has_families)
     %foreach;family;
     <li>
-      %if(f_cnt>0)x%f_cnt;&nbsp;%end;
+      %if;(f_cnt>0)x%f_cnt;&nbsp;%end;
       %if;(family_cnt > 1)X%family_cnt; %end;
       %if;(not cancel_links)
         <a href="%prefix;%access;">%first_name;</a>
@@ -26,7 +26,7 @@
       %end;
     %end;
   %else;
-    <li>%if(f_cnt>0)x%f_cnt;&nbsp;%end;
+    <li>%if;(f_cnt>0)x%f_cnt;&nbsp;%end;
     %if;(not cancel_links)
       <a href="%prefix;%access;">%first_name;</a>
     %else;%first_name;
@@ -52,7 +52,7 @@
     <td width=1></td>
     <td width=1 align=center valign=middle><b><small>bull</small></b></td>
   </tr>
-%end
+%end;
 
 %define;one_heading(xx, coln, bull)
   <td colspan=coln align=right valign=middle>
@@ -120,7 +120,7 @@
                %apply;short_display_person("spouse")
              </td>
            </tr>
-             %end
+             %end;
            %end;
            <tr>
              <td style="text-align:center;valign:bottom;width:100%%">

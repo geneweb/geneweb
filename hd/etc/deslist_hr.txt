@@ -160,7 +160,7 @@
         %end;
       %end;
     %in;
-    %let;l231;%if;(is_male)━━%elseif(is_female)──%else;╍%end;%in;
+    %let;l231;%if;(is_male)━━%elseif;(is_female)──%else;╍%end;%in;
     %let;l24;
       %if;(browsing_with_sosa_ref and has_sosa)
         %if;(has_siblings)◀%else;◁%end;
@@ -208,7 +208,7 @@
     %end;
   %in;
   %let;zl2;%sex;%in;
-  %let;l231;%if;(is_male)━%elseif(is_female)─%else;━%end;%in;
+  %let;l231;%if;(is_male)━%elseif;(is_female)─%else;━%end;%in;
   <span data-surname="">
     <span class="tt">z1%l2;</span>
     %( when there is an offset between implex generations, some descendants may be missing %)

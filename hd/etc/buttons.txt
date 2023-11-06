@@ -137,7 +137,7 @@
     %if;(e.m="A" and e.t="Z")
       <span class="sr-only">—</span>
       <a role="button" class="btn btn-link px-0"
-        href="%if(e.csv!=1)%url_set.csv.1;%else;%url_set.csv;%end;"
+        href="%if;(e.csv!=1)%url_set.csv.1;%else;%url_set.csv;%end;"
         title="%if;(e.csv=1)[*visualize/show/hide/summary]2 CSV [and] [visualize/show/hide/summary]1 [table] [ancestor/ancestors]1%else;[*visualize/show/hide/summary]1 CSV%end;">%nn;
           <i class="fa fa-file-csv fa-lg fa-fw %if;(e.csv=1)text-danger%end;" aria-hidden="true"></i>%nn;
       </a>

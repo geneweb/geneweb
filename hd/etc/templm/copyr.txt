@@ -33,7 +33,7 @@
       <td>
         v.&nbsp;%version; - &copy;&nbsp;INRIA&nbsp;1998-2020<br>
         <a href="%url_set.templ;"
-          title="Switch to %if(evar.templ!="templm")template m%else;default template%end;">default</a>
+          title="Switch to %if;(evar.templ!="templm")template m%else;default template%end;">default</a>
         %connections;%sq;
       </td>
       <td style="width:205px">

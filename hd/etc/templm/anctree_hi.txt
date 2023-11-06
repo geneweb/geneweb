@@ -276,7 +276,7 @@
           %end;
         %elseif;(ancestor.anc_sosa.v>63 and ancestor.anc_sosa.v<128)
           %if;(xx=9 or xx=10)      %apply;links(1,yy,1)
-          %elseif(xx=11 or xx=12)  %apply;links(3,yy,1)
+          %elseif;(xx=11 or xx=12)  %apply;links(3,yy,1)
           %end;
         %elseif;(ancestor.anc_sosa.v>127 and ancestor.anc_sosa.v<256)
           %if;(xx=10 or xx=11)     %apply;links(1,yy,0)

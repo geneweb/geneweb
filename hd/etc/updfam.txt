@@ -517,7 +517,7 @@
     %end;
   </div>
   <hr class="w-100">
-%end
+%end;
 
 %define;card_header(xx,yy)
   <h3 class="card-header pt-1 pb-0 text-center" id="xx"><label for="xx">[*yy]1</label></h3>

@@ -108,14 +108,14 @@
   %let;w_cnt;%count;%in;
   %if;(k_cnt>1)
     [*kindx]2[:]
-  %elseif(k_cnt=1)
+  %elseif;(k_cnt=1)
     %foreach;event_witness
       %if;(event_witness_kind=[kindx]0)
         %if;(event_witness.sex=1)<br>[*kindx]1%else;[*kindx]0%end;[:]
       %end;
     %end;
   %end;
-  %reset_count
+  %reset_count;
   %foreach;event_witness;
     %if;(event_witness_kind = [kindx]0)
       %incr_count;
@@ -207,7 +207,7 @@
           %and;%apply;dprec("ccc.marriage_date")%nn;
           %and;%count2;
           %and;%if;(ccc.marriage_date!="")%ccc.marriage_date;%else;([missing date]0)%end;%nn;
-          %and;%apply;a_of_b%with[marriage/marriages]0%and;%ccc.first_name; [with] %apply;short_display_person("ccc.spouse")%end;%nn;
+          %and;%apply;a_of_b%with;[marriage/marriages]0%and;%ccc.first_name; [with] %apply;short_display_person("ccc.spouse")%end;%nn;
           %and;%nn;
           %and;%nn;
           %and;%(debug sort: %ccc.birth_date.year;%apply;month("ccc.birth_date")%apply;day("ccc.birth_date")%apply;dprec("ccc.birth_date"),%)%nn;
@@ -275,7 +275,7 @@
   </div>
 
   %let;dummy;%in;
-  %(let;dummy;%apply;date_to_sort("self.birth_date")%in;
+  %(%let;dummy;%apply;date_to_sort("self.birth_date")%in;
   birth date : %self.birth_date; : %apply;date_to_sort("self.birth_date"), %dummy;;<br>
   %foreach;event;
     %let;dummy;%apply;date_to_sort("event.date")%in;

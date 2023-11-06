@@ -96,7 +96,7 @@
     %elseif;(evar.tf2 = "2" or evar.tf2 = "3")x%death_symbol;
     %else;%death_symbol;
     %end;
-  %in
+  %in;
   %apply;months(l_z1,l_z2)
 %end;
 
@@ -175,7 +175,7 @@
     %elseif;(evar.tl2 = "2" or evar.tl2 = "3")x%death_symbol;
     %else;%death_symbol;
     %end;
-  %in
+  %in;
   %apply;months(l_z1,l_z2)
 %end;
 

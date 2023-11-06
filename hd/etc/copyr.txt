@@ -89,7 +89,7 @@
           %if;(connections.wizards=1)[wizard/wizards/friend/friends/exterior]0
           %else;[wizard/wizards/friend/friends/exterior]1
           %end;
-            <span class="sr-only">switch to %if(e.templ!="templm")templm%else;default template%end;</span>%nn;
+            <span class="sr-only">switch to %if;(e.templ!="templm")templm%else;default template%end;</span>%nn;
           %if;(wizard)</a>%end;
         %end;
         %if;(connections.total>0)<span>%connections.total; %nn;
@@ -103,10 +103,10 @@
       <div class="ml-auto">
         <a role="button" class="mr-1"
           %( button to switch only between default and templm templates %)
-          href="%if(e.templ!="templm")%url_set2.templ.file.templm;%end;"
-          title="%if(e.templ!="templm")templm%else;default template%end;">%nn;
+          href="%if;(e.templ!="templm")%url_set2.templ.file.templm;%end;"
+          title="%if;(e.templ!="templm")templm%else;default template%end;">%nn;
           <i class="fab fa-markdown" aria-hidden="true"></i>%nn;
-          <span class="sr-only">switch to %if(e.templ!="templm")templm%else;default template%end;</span>%nn;
+          <span class="sr-only">switch to %if;(e.templ!="templm")templm%else;default template%end;</span>%nn;
         </a>%include;version
       </div>
       <div class="btn-group">

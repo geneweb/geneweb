@@ -68,7 +68,7 @@ function changeCalendar(e,v,m,c) {
     break;
   case 'F':
     document.getElementById(e).innerHTML = '\
-<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
+<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([!dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
 <option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
 -</option>\
 <option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;

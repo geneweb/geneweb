@@ -68,7 +68,7 @@
   %( Width of the descendnace of one person %)
   %if;has_families;
     %if;(vvv=0)
-      %let;mmm;%if(nb_families>1)%nb_families;%else;1%end;%in;
+      %let;mmm;%if;(nb_families>1)%nb_families;%else;1%end;%in;
       %apply;add_to_count(mmm)
     %else;
       %foreach;family;

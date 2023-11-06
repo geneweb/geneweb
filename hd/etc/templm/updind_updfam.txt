@@ -78,7 +78,7 @@
   %let;l2;%z2.year;%in;
   %let;l3;
     %if;(l_oyy != "")
-      %if;(l1 = "oryear")/%elseif(l1 = "yearint")..%end;
+      %if;(l1 = "oryear")/%elseif;(l1 = "yearint")..%end;
       %if;(ldmy = "dd")%if;(l_odd != "")%l_odd;/%end;%if;(l_omm != "")%l_omm;/%end;%l_oyy;%nn;
       %elseif;(ldmy = "mm")%if;(l_omm != "")%l_omm;/%end;%if;(l_odd != "")%l_odd;/%end;%l_oyy;%nn;
       %else;%l_oyy;%if;(l_omm != "")/%l_omm;%end;%if;(l_odd != "")/%l_odd;%end;%nn;

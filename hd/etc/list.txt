@@ -70,7 +70,7 @@
 %let;nbs;&nbs=%if;(e.nbs!="")%e.nbs;%else;3%end;%in;
 %define;book_of(xx)[*book of %s:::xx]%end;
 %define;evt(vv,tt,ii)
-  %if;("vv"!="bi"), %end;%if;(e.vv!="on")<s>%else<span>%end;tt ii%if;(e.vv!="on")</s>%else</span>%end;%nn;
+  %if;("vv"!="bi"), %end;%if;(e.vv!="on")<s>%else;<span>%end;tt ii%if;(e.vv!="on")</s>%else;</span>%end;%nn;
 %end;
 <div class="mt-2">%if;(e.surn!="")[*surname/surnames]0[:] <span class="text-primary">%e.surn;</span>.%end;
   [*event/events]1[:]
@@ -186,7 +186,7 @@
          and env.key!="k"
          and env.key!="bi" and env.key!="ba" and env.key!="ma" and env.key!="de" and env.key!="bu"
          and env.key!="surn" and env.key!="datesort" and env.key!="i0")&%env.key;=%env.val;%nn;
-        %elseif(env.key="i0")&i%e.nb;=%env.val;%end;%nn;
+        %elseif;(env.key="i0")&i%e.nb;=%env.val;%end;%nn;
         %end;%nn;
         %( TODO: fix 3rd var : get_var("p",i) for “complex” places %)
         %for;i;0;e.nb;

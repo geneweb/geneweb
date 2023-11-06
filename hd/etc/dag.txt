@@ -137,7 +137,7 @@
             %end;%nn;
             pos1=%expr(pos1+overlap-dpos);%nn;
             pos2=%expr(pos1+overlap);">&lt;&lt;</a>
-        %end;%nl
+        %end;%nl;
         %if;(pos2>=dag.ncol)&nbsp;%nn;
         %else;
           <a href="%prefix_base_password;%nn;

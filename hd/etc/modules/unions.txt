@@ -31,7 +31,7 @@
   %if;(k_cnt>0)
     %if;(k_cnt=1)[*kindx]0%else;[*kindx]1%end;[:]%sp;
   %end;
-  %reset_count
+  %reset_count;
   %foreach;event_witness;
     %if;(event_witness_kind = [kindx]0)
       %incr_count;
@@ -116,7 +116,7 @@
     %reset_count2;
     %if;(are_married)
       %incr_count2;
-    %end
+    %end;
   %end;
   <h2 class="mt-2 w-100">
     %if;(op_m!=1)

@@ -638,7 +638,7 @@
 
 %define;display_sibling()
   %apply;li_SDC("child")
-    %(if;(child.has_image and child.index!=central_index%)
+    %(%if;(child.has_image and child.index!=central_index%)
     %if;(child.has_image)
       <table>
         <tr>
@@ -666,7 +666,7 @@
         %apply;short_display_person_f("spouse")
       %end;
     %end;
-    %(if;(child.has_image and child.index!=central_index%)
+    %(%if;(child.has_image and child.index!=central_index%)
     %if;(child.has_image)
           </td>
         </tr>
@@ -718,7 +718,7 @@
 
 %define;detail_wedding()
   %apply;type_wedding()
-  %if(marriage_date.year != "")%marriage_date.year;%end;
+  %if;(marriage_date.year != "")%marriage_date.year;%end;
 %end;
 
 %define;detail_children()
@@ -768,7 +768,7 @@
         </li>
         <li class="list-unstyled">
         %apply;type_wedding()
-        %if(family.marriage_date.year != "")%family.marriage_date.year;%end;
+        %if;(family.marriage_date.year != "")%family.marriage_date.year;%end;
         </li>
         %apply;type_puce_asc("spouse")
         %apply;image_MF("spouse")
@@ -799,7 +799,7 @@
           </li>
           <li class="list-unstyled">
           %apply;type_wedding()
-          %if(family.marriage_date.year != "")%family.marriage_date.year;%end;
+          %if;(family.marriage_date.year != "")%family.marriage_date.year;%end;
           </li>
           %apply;type_puce_asc("spouse")
           %apply;image_MF("spouse")
@@ -866,7 +866,7 @@
 %end;
 
 %define;get_templ(tplnum)
-  %let;templ;modules/%b.perso_module_tplnum;%in
+  %let;templ;modules/%b.perso_module_tplnum;%in;
   %apply;show_templ(templ)
 %end;
 

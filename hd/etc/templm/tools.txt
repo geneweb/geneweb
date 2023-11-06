@@ -130,7 +130,7 @@
 %end;
 
 %define;perso_gen()
-  %if(not cancel_links)
+  %if;(not cancel_links)
     %let;maxvd;%if;(has_children and max_desc_level > 1)%max_desc_level;%else;3%end;%in;
     %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.tools.submit();"%in;
     <form style="display:inline" name="tools" method="get" action="%action;">
@@ -239,7 +239,7 @@
       <fieldset style="border:0">
       %let;l_on1;onchange="valid('t1CT')"%in;
         %apply;radio("t1","CT",[*compact tree],"[itree] [or] [htree]")
-        %(apply;checkbox("├","hi","Orientation I (on) [or] H (off)",""%)
+        %(%apply;checkbox("├","hi","Orientation I (on) [or] H (off)",""%)
         <label title=""> ├ orientation 
             <input type="radio" id="itIH" name="hi" value="I" %_on1; %l_on;
               %if;(evar.hi = "I") checked="checked"%end;%/> I 

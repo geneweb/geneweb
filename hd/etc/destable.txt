@@ -27,7 +27,7 @@
 <h1 class="d-inline-block">%nn;
   %if;(e.v!=0)%apply;a_of_b%with;
     %if;(e.only!="on" and e.v!=0)[*descendants]%else;
-      %apply;capitalize%with%apply;gend("v")%end;%( TODO: look why gend no more defined ! %)
+      %apply;capitalize%with;%apply;gend("v")%end;%( TODO: look why gend no more defined ! %)
     %end;%and;
     %self;%end;%else;%self; ([no descendants])%end;
    %if;(cancel_links and e.v!=0) %apply;togend(e.v)%end;
@@ -529,7 +529,7 @@
   %reset_count;
     %foreach;family;
       %let;fam;%if;(e.num="on" and nb_families>1)%apply;letter(family_cnt)%end;%in;
-      %(if;(nb_children>0)<tr><td id="#labl">one family: #labl</td></tr>%end;%)
+      %(%if;(nb_children>0)<tr><td id="#labl">one family: #labl</td></tr>%end;%)
       %foreach;xxx.child;
         %apply;one_child("xxx", "prefx", "fam", child_cnt)
       %end;

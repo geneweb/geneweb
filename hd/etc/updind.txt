@@ -498,7 +498,7 @@
     %end;
     <hr>
   %end;
-%end
+%end;
 
 %define;one_specific_pevent(xcnt, evt_name)
   %if;(event.e_name = "evt_name")
@@ -667,7 +667,7 @@
   </div>
   %if;("evt_name"="#deat")
     %apply;date([*date/dates]0, "e_datexcnt", "event_date", "onfocus='set_death_focus(xcnt)'")
-  %elseif("evt_name"="buri_or_crem")
+  %elseif;("evt_name"="buri_or_crem")
     %apply;date([*date/dates]0, "e_datexcnt", "event_date", "onfocus='set_buri(xcnt)'")
   %else;
     %apply;date([*date/dates]0, "e_datexcnt", "event_date", "")
@@ -696,7 +696,7 @@
   %end;
   %)
   %apply;insert_witness(xcnt, "0", "evt_name")
-%end
+%end;
 %let;l_on1s;onkeydown="if (event.keyCode == 13) if (!event.shiftKey) javascript:document.upd.submit()"%in;
 <form name="upd" method="post" action="%action;">
   <div class="row">
@@ -1086,10 +1086,10 @@
         %foreach;pevent;
           %apply;one_pevent(cnt)
         %end;
-        %apply;insert_pevent%with%next_pevent;%end;
+        %apply;insert_pevent%with;%next_pevent;%end;
         %incr_next_pevent;
       %else;
-        %apply;insert_pevent%with%next_pevent;%end;
+        %apply;insert_pevent%with;%next_pevent;%end;
         %incr_next_pevent;
       %end;
     </div>
@@ -1248,7 +1248,7 @@
   </div>
   %apply;date([*begin]0, "t_date_startxcnt", "title_date_start", "")
   %apply;date([*end]0, "t_date_endxcnt", "title_date_end", "")
-%end
+%end;
 
   <div class="card">
     %apply;card_header("titles","title/titles")
