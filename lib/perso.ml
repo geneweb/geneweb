@@ -2152,6 +2152,9 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | [ "get_var"; name ] -> (
       match get_env "vars" env with
       | Vvars lv ->
+          let name1 = "%get_var." ^ name ^ "?" in
+          if not (List.mem name1 !GWPARAM.set_vars) then
+            GWPARAM.set_vars := name1 :: !GWPARAM.set_vars;
           let vv =
             try List.assoc name !lv with Not_found -> raise Not_found
           in
