@@ -220,13 +220,13 @@
          onmouseover="style.color='#000'"
          onmouseout="style.color='transparent'"
          %if;(browsing_with_sosa_ref)
-           href="%prefix;m=RLM;et=S;spouse=on;image=%evar.image;;%nn;
-                i1=%ref_index;;
-                i2=%item.4;;t2=%item.3;;%nn;
-                i3=%sosa_ref.index;;t3=sosa_1;%nn;
-                i4=%ref_index;;t4=%ref_sex;"
+           href="%prefix;m=RLM&et=S&spouse=on&image=%evar.image;&%nn;
+                i1=%ref_index;&
+                i2=%item.4;&t2=%item.3;&%nn;
+                i3=%sosa_ref.index;&t3=sosa_1;&%nn;
+                i4=%ref_index;&t4=%ref_sex;"
          %else;
-           href="%prefix;em=R;ei=%item.4;;spouse=on;et=S;image=%evar.image;;i=%ref_index;"
+           href="%prefix;em=R&ei=%item.4;&spouse=on&et=S&image=%evar.image;&i=%ref_index;"
          %end;>%item.2;<span>%item.1;</span></a>
       <strong>%item.3;</strong>
     </div>

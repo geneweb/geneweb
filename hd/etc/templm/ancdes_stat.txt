@@ -5,19 +5,19 @@
   %foreach;sorted_list_item;
     %if;(prev_item.2 != item.2 or prev_item.1 != item.1)
       %reset_count;%incr_count;
-      <a href="%prefix;spouse=on;i%count;=%item.3;;t%count;=%count;;%nn;
+      <a href="%prefix;spouse=on;i%count;=%item.3;&t%count;=%count;&%nn;
     %end;
     %if;(prev_item.2 = item.2 and prev_item.1 = item.1)
       %incr_count;
-      i%count;=%item.3;;t%count;=%count;;%nn;
+      i%count;=%item.3;&t%count;=%count;&%nn;
     %end;
     %if;(next_item.2 != item.2 or next_item.1 != item.1)
       %let;l1;%expr(item.2 + z1)%in;
       %let;l2;%if;(count > l_max_width)%l_max_width;%else;%count;%end;%in;
       %let;l3;%expr(item.2 * 10) ≥ z4 ≤ %expr(item.2 * 10 + 9);%in;
       %incr_count;
-      i%count;=%index;;t%count;=%l3;%nn;
-      %if;(count > 10)m=C;list=1;t=%l3;;i=%index;;%else;m=RLM;%end;"
+      i%count;=%index;&t%count;=%l3;%nn;
+      %if;(count > 10)m=C;list=1;t=%l3;&i=%index;&%else;m=RLM;%end;"
       class="z25%item.1;" style="z3:%l1;em;border-width:%l2;px;">%expr(count - 1)</a>
     %end;
   %end;
@@ -58,7 +58,7 @@
         <span class="lev">%level;</span>
       %end;
       %if;(next_item.1 = "")<span class="date" style="top:%l1;px;">%item.1;</span>%end;
-      <a href="%prefix;i=%item.4;" style="top:%l1;px;left:%l3;px;color:#%if;(item.3 = 0)36C;%else;F6C%end;;">%item.2;</a>
+      <a href="%prefix;i=%item.4;" style="top:%l1;px;left:%l3;px;color:#%if;(item.3 = 0)36C;%else;F6C%end;&">%item.2;</a>
     %end;
   </div>
 %end;

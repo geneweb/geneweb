@@ -76,7 +76,7 @@
   <p>[*select a letter] :</p>
   <p>
     %foreach;initial;
-      <a href="%prefix;m=MOD_DATA;data=%evar.data;;s=%encode.ini;">%html_encode.ini;</a>
+      <a href="%prefix;m=MOD_DATA&data=%evar.data;&s=%encode.ini;">%html_encode.ini;</a>
     %end;
   </p>
 %end;

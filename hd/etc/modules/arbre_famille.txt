@@ -146,7 +146,7 @@
             %if;(ancestor.anc_sosa.v=11 or ancestor.anc_sosa.v=15)border-left-0%end;">%nn;
             %if;(not ancestor.is_restricted)
               <a class="big_anchor list-group-item-action rounded-%if;ancestor.is_male;left%else;right%end;" 
-                href="%ancestor.bname_prefix;%ancestor.access;;m=F"
+                href="%ancestor.bname_prefix;%ancestor.access;&m=F"
                 title="[*navigation] %ancestor;
                        &#010;%apply;a_of_b%with;[*n° Sosa] %ancestor.anc_sosa.v;%and;%if;("vv"="spouse")%spouse;%else;%self;%end;%end;
                        %if;(ancestor.has_sosa and self!=sosa_ref)

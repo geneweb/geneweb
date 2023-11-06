@@ -91,9 +91,9 @@
 %end;
 %include;modules/arbre_hi_indexes
 %define;prefix_all()
-  %if;(e.templ!="")templ=%e.templ;;%end;%nn;
-  %if;(e.wide!="")wide=%e.wide;;%end;%nn;
-  %if;(e.p_mod!="")p_mod=%e.p_mod;;%end;%nn;
+  %if;(e.templ!="")templ=%e.templ;p%end;%nn;
+  %if;(e.wide!="")wide=%e.wide;&%end;%nn;
+  %if;(e.p_mod!="")p_mod=%e.p_mod;&%end;%nn;
 %end;
 
 %(a=ancestor, s=sosa, p=has_parents, bg=background, t=top, l=left  %)
@@ -190,9 +190,9 @@
     %if;(e.cgl!="on")
     <div>
       <a style="width:100%%;zindex:2;"
-        href="%prefix_base_password;%aaaaccess;;t=T;t1=CT;
+        href="%prefix_base_password;%aaaaccess;&t=T&t1=CT&
           %foreach;env_binding;%if;(not (env.key="t" or env.key="t1" or env.key="p"
-            or env.key="n" or env.key="oc"))%env.key=%env.val;;%end;%end;"
+            or env.key="n" or env.key="oc"))%env.key=%env.val;&%end;%end;"
         %if;(aaasame!="")%apply;implex1(aaasame.v)%end;%nn;
         title='[*generation/generations]0 %level; – Sosa %nn;
           %if;(evarcpl="")%aaaanc_sosa; %if;(aaasame!="")=Sosa %aaasame;%end;
@@ -271,7 +271,7 @@
   %let;xxx;%if;(evarcpl="on")%expr(aaaanc_sosa.v/2)%else;%aaaanc_sosa.v;%end;%in;
   <div id="s%aaaanc_sosa.v;" style="font-family:monospace;margin:0">
     <a style="top:tttpx;left:lllpx;"
-      href='%prefix_set.all;%apply;prefix_all();%aaaaccess;;'
+      href='%prefix_set.all;%apply;prefix_all();%aaaaccess;&'
       %if;(aaasame!="")%apply;implex1(aaasame.v)%end;
       title='[*generation/generations]0 %level; – Sosa %nn;
         %if;(evarcpl="")%aaaanc_sosa; %if;(aaasame!="")=Sosa %aaasame;%end;

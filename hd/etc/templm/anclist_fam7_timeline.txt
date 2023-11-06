@@ -1,7 +1,7 @@
 <!-- $Id: templm/anclist_fam7_timeline.txt v7.0 2014/11/12 14:33:31 $ -->
 
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
-%let;lurl;%prefix;m=A;t=F;fam7=on;tf1=fam73;cousins=%evar.cousins;;spouse=%evar.spouse;;maxv=%evar.maxv;;v=%evar.v;;%in;
+%let;lurl;%prefix;m=A&t=F&fam7=on&tf1=fam73&cousins=%evar.cousins;&spouse=%evar.spouse;&maxv=%evar.maxv;&v=%evar.v;&%in;
 %define;fam7_somebody1(xx,yy,lexa,lexb,sss)
   %let;lxr;
     %if;("lexb" != "")
@@ -71,9 +71,9 @@
       %lxr;%nn;
     %else;
       %if;(browsing_with_sosa_ref)
-        <a href="%prefix;m=RLM;et=S;spouse=on;image=%evar.image;;i1=%l1i;;i2=%xx.index;;t2=%lxr;;i3=%sosa_ref.index;;t3=sosa_1;i4=%l1i;;t4=%l1s;">%lxr;</a>%nn;
+        <a href="%prefix;m=RLM&et=S&spouse=on&image=%evar.image;&i1=%l1i;&i2=%xx.index;&t2=%lxr;&i3=%sosa_ref.index;&t3=sosa_1;i4=%l1i;&t4=%l1s;">%lxr;</a>%nn;
       %else;
-        <a href="%prefix;em=R;ei=%xx.index;;spouse=on;et=S;image=%evar.image;;i=%l1i;">%lxr;</a>%nn;
+        <a href="%prefix;em=R&ei=%xx.index;&spouse=on&et=S&image=%evar.image;&i=%l1i;">%lxr;</a>%nn;
       %end;
     %end;
   %and;
@@ -351,13 +351,13 @@
           %foreach;sorted_list_item;
             %if;(item.15 != "")
               %incr_count;
-              i%count;=%item.15;;%nn;
+              i%count;=%item.15;&%nn;
               %incr_count;
-              i%count;=%index;;%nn;
+              i%count;=%index;&%nn;
             %end;
            %end;
            %incr_count;
-           i%count;=%index;;t%count;=*;">[*tree] 7 [family/families]1</a>
+           i%count;=%index;&t%count;=*;">[*tree] 7 [family/families]1</a>
         </span>
       </div>
     %end;

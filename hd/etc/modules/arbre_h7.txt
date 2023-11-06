@@ -4,8 +4,8 @@
   %let;l_wi;%if;(evar.wi != "")%evar.wi;%else;980%end;%in;
   %let;l_he;%if;(evar.he != "")%evar.he;%else;600%end;%in;
   %let;l_sosa_ref;%if;(evar.sosa = "on" and browsing_with_sosa_ref and has_sosa)on%end;%in;
-  %let;l_prefix;%prefix;m=A;t=T;t1=h7;image=%evar.image;;siblings=%evar.siblings;;%nn;
-        sosa=%evar.sosa;;fs=%l_fs;;wi=%l_wi;;he=%l_he;;bp=%evar.bp;;nav=%evar.nav;;%in;
+  %let;l_prefix;%prefix;m=A&t=T&t1=h7&image=%evar.image;&siblings=%evar.siblings;&%nn;
+        sosa=%evar.sosa;&fs=%l_fs;&wi=%l_wi;&he=%l_he;&bp=%evar.bp;&nav=%evar.nav;&%in;
   <style id="s" type="text/css">
     #htree{font-size:%l_fs;px;width:%l_wi;px;height:%l_he;px}
   </style>
@@ -51,7 +51,7 @@
     %( repenser la nav en cliquant sur le fond de cellule !! %)
     <div class="text-right mr-3">
       <a href="%prefix_base_password;%if;(evar.image!="off")image=off;%end;%nn;
-        %foreach;env_binding;%if;(env.key!="image")%env.key=%env.val;;%end;%end;"
+        %foreach;env_binding;%if;(env.key!="image")%env.key=%env.val;&%end;%end;"
         class="btn btn-outline-secondary btn-sm border-0 px-0"
         title="%if;(evar.image="off")[*visualize/show/hide/summary]1%else;%nn;
            [*visualize/show/hide/summary]2%end; [image/images]0"
@@ -59,7 +59,7 @@
         <i class="fa fa-toggle-%if;(evar.image="off")off%else;on%end; text-muted"></i>
       </a>
       <a href="%prefix_base_password;%if;(evar.siblings!="on")siblings=on;%end;%nn;
-        %foreach;env_binding;%if;(env.key!="siblings")%env.key=%env.val;;%end;%end;"
+        %foreach;env_binding;%if;(env.key!="siblings")%env.key=%env.val;&%end;%end;"
         class="btn btn-outline-secondary btn-sm border-0 px-0"
         title="%if;(evar.siblings!="on")[*visualize/show/hide/summary]1%else;%nn;
            [*visualize/show/hide/summary]2%end; [siblings]"
@@ -67,7 +67,7 @@
         <i class="fa fa-toggle-%if;(evar.siblings!="on")off%else;on%end; text-muted"></i>
       </a>
       <a href="%prefix_base_password;%if;(evar.sosa!="on")sosa=on;%end;%nn;
-        %foreach;env_binding;%if;(env.key!="sosa")%env.key=%env.val;;%end;%end;"
+        %foreach;env_binding;%if;(env.key!="sosa")%env.key=%env.val;&%end;%end;"
         class="btn btn-outline-secondary btn-sm border-0 px-0"
         title="%if;(evar.sosa!="on")[*visualize/show/hide/summary]1%else;%nn;
            [*visualize/show/hide/summary]2%end; [Sosa]"
@@ -75,7 +75,7 @@
         <i class="fa fa-toggle-%if;(evar.sosa!="on")off%else;on%end; text-muted"></i>
       </a>
       <a href="%prefix_base_password;%if;(evar.bp!="on")bp=on;%end;%nn;
-        %foreach;env_binding;%if;(env.key!="bp")%env.key=%env.val;;%end;%end;"
+        %foreach;env_binding;%if;(env.key!="bp")%env.key=%env.val;&%end;%end;"
         class="btn btn-outline-secondary btn-sm border-0 px-0"
         title="%if;(evar.bp!="on")[*visualize/show/hide/summary]1%else;%nn;
            [*visualize/show/hide/summary]2%end; [birth place]"
@@ -83,7 +83,7 @@
         <i class="fa fa-toggle-%if;(evar.bp!="on")off%else;on%end; text-muted"></i>
       </a>
       <a href="%prefix_base_password;%if;(evar.nav!="on")nav=on;%end;%nn;
-        %foreach;env_binding;%if;(env.key!="nav")%env.key=%env.val;;%end;%end;"
+        %foreach;env_binding;%if;(env.key!="nav")%env.key=%env.val;&%end;%end;"
         class="btn btn-outline-secondary btn-sm border-0 px-0"
         title="%if;(evar.nav!="on")[*visualize/show/hide/summary]1%else;%nn;
            [*visualize/show/hide/summary]2%end; [navigation]"

@@ -283,8 +283,8 @@
 %( main %)
 %let;l_sosa;%if;(evar.sosa = "on")1%else;0%end;%in;
 %let;l_has_sosa;%has_sosa;%in;
-%let;l_url;%prefix;m=A;t=%evar.t;;%if;(evar.t="H")tl1=hrztl;%elseif;(evar.t="T")t1=HT;%end;v=%l_v;;maxv=%evar.maxv;;marriage2=%evar.marriage2;;sosa=%evar.sosa;;xy=%evar.xy;;siblings=%evar.siblings;;timeline=%evar.timeline;;gen=%evar.gen;;%in;
-%let;l_url1;%prefix;m=D;t=L;tl1=hrztl;v=%evar.v;;marriage2=%evar.marriage2;;sosa=%evar.sosa;;xy=%evar.xy;;siblings=%evar.siblings;;timeline=%evar.timeline;;gen=%evar.gen;;%in;
+%let;l_url;%prefix;m=A&t=%evar.t;&%if;(evar.t="H")tl1=hrztl&%elseif;(evar.t="T")t1=HT&%end;v=%l_v;&maxv=%evar.maxv;&marriage2=%evar.marriage2;&sosa=%evar.sosa;&xy=%evar.xy;&siblings=%evar.siblings;&timeline=%evar.timeline;&gen=%evar.gen;&%in;
+%let;l_url1;%prefix;m=D&t=L&tl1=hrztl&v=%evar.v;&marriage2=%evar.marriage2;&sosa=%evar.sosa;&xy=%evar.xy;&siblings=%evar.siblings;;timeline=%evar.timeline;;gen=%evar.gen;;%in;
 %if;(not cancel_links and has_children)
   <div class="menu">
     <span>

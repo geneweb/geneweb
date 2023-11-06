@@ -226,8 +226,8 @@
       <div class="form-inline">
         <div class="btn-group mx-2">
           %for;i;1;7;
-            <a href="%prefix_base_password;vh=%i;;%nn;
-              %foreach;env_binding;%if;(env.key!="vh")%env.key=%env.val;;%end;%end;"
+            <a href="%prefix_base_password;vh=%i;&%nn;
+              %foreach;env_binding;%if;(env.key!="vh")%env.key=%env.val;&%end;%end;"
               class="btn btn-outline-secondary btn-sm %if;(evarvh=i)disabled font-weight-bold%end;" %nn;
               title="%if;(evarvh!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
               %end;">%i;</a>
@@ -235,7 +235,7 @@
         </div>
         <div class="mx-2">
           <a href="%prefix_base_password;%if;(evar.sosa!="on")sosa=on;%end;%nn;
-            %foreach;env_binding;%if;(env.key!="sosa")%env.key=%env.val;;%end;%end;"
+            %foreach;env_binding;%if;(env.key!="sosa")%env.key=%env.val;&%end;%end;"
             class="btn btn-outline-secondary btn-sm border-0 px-0"
             title="%if;(evar.sosa!="on")[*visualize/show/hide/summary]1%else;%nn;
                [*visualize/show/hide/summary]2%end; [half-brothers/half-sisters/half-siblings]2"
@@ -247,7 +247,7 @@
           <div class="input-group-prepend">
             %if;(evartw>=6)
               <a href="%prefix_base_password;twidth=%expr(evartw-2);%nn;
-                %foreach;env_binding;%if;(env.key!="twidth")%env.key=%env.val;;%end;%end;"
+                %foreach;env_binding;%if;(env.key!="twidth")%env.key=%env.val;&%end;%end;"
                 class="btn btn-outline-secondary"
                 title="- 2 ([width])"
               >&nbsp;-</a>
@@ -256,7 +256,7 @@
           <input class="col-3 text-center" title="[*width]" value="%evartw; ─" disabled></input>
           <div class="input-group-append">
               <a href="%prefix_base_password;twidth=%expr(evartw+2);%nn;
-                %foreach;env_binding;%if;(env.key!="twidth")%env.key=%env.val;;%end;%end;"
+                %foreach;env_binding;%if;(env.key!="twidth")%env.key=%env.val;&%end;%end;"
                 class="btn btn-outline-secondary"
                 title="+ 2 ([width])"
               >&nbsp;+</a>

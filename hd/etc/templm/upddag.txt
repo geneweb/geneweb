@@ -174,7 +174,7 @@
     %incr_count;
     ;s%count;=%item.1;%nn;
   %end;
-  ;bd=%evar.bd;;color=%evar.color;;image=%evar.image;;spouse=%evar.spouse;">[*tree] (Sosa)</a></span></div>
+  ;bd=%evar.bd;&color=%evar.color;&image=%evar.image;&spouse=%evar.spouse;">[*tree] (Sosa)</a></span></div>
 %end;
 
 <div style="height:300px;clear:both;"> </div>

@@ -106,10 +106,10 @@
       %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
       %elseif;(evar.cgl = "on")%apply;symbol("cell.person")%nn;
       %else;
-        <a style="text-decoration:none;" title="[*navigation]" href="%prefix_set.iz;%cell.person.access;;%nn;
+        <a style="text-decoration:none;" title="[*navigation]" href="%prefix_set.iz;%cell.person.access;&%nn;
         %foreach;env_binding;
           %if;(env.key = "" or env.key = "p" or env.key = "n" or env.key = "oc" or env.key = "i" or env.key = "templ")
-          %else;%env.key;=%env.val.decoded;;%nn;
+          %else;%env.key;=%env.val.decoded;&%nn;
           %end;
         %end;">%apply;symbol("cell.person")</a>%nn;
       %end;
@@ -207,15 +207,15 @@
           %foreach;env_binding;
             %if;(env.key = "m")m=D;%nn;
             %elseif;(env.key = "templ")
-            %else;%env.key;=%env.val.decoded;;%nn;
+            %else;%env.key;=%env.val.decoded;&%nn;
             %end;
           %end;">[*descendants tree]</a>
         </span>
       %end;
       <span>
-        <a href="%prefix;m=A;t=H;v=%evar.v;;maxv=%max_anc_level;;i=%index;">[*horizontal tree]</a>%nn;
+        <a href="%prefix;m=A&t=H&v=%evar.v;&maxv=%max_anc_level;&i=%index;">[*horizontal tree]</a>%nn;
       <span>
-        <a href="%prefix;%access;;m=A;t=F;fam7=on;tf1=fam73;v=%if;(evar.v=3 or evar.v=4)%evar.v;%else;3%end;;maxv=4">[*family time line]</a>%nn;
+        <a href="%prefix;%access;&m=A&t=F&fam7=on&tf1=fam73&v=%if;(evar.v=3 or evar.v=4)%evar.v;%else;3%end;&maxv=4">[*family time line]</a>%nn;
       </span>
     </div>
   %end;
