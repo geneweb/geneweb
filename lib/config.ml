@@ -40,6 +40,8 @@ type output_conf = {
 
 type env = (string * Adef.encoded_string) list
 
+type dates_format = DMY | MDY
+
 type config = {
   from : string;
   api_mode : bool;
@@ -106,6 +108,7 @@ type config = {
   forced_plugins : string list;
   plugins : string list;
   notify_change : string option;
+  dates_format : dates_format;
 }
 
 (**/**)
@@ -172,6 +175,7 @@ let empty =
     forced_plugins = [];
     plugins = [];
     notify_change = None;
+    dates_format = DMY;
   }
 
 (**/**)
