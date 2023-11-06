@@ -20,6 +20,23 @@ let sosa_string () =
   (check testable_sosa) {|of_string "1"|} Sosa.one (Sosa.of_string "1");
   (check string) "to_string zero" "0" (Sosa.to_string Sosa.zero);
   (check string) "to_string one" "1" (Sosa.to_string Sosa.one);
+  (check string) "test sosa 1" "1"
+               (Sosa.to_string (Sosa.div (Sosa.of_int 1000) 1000));
+  (check string) "test sosa 2" "2"
+               (Sosa.to_string (Sosa.div (Sosa.of_int 2000) 1000));
+  (check string) "test sosa div" "234"
+               (Sosa.to_string (Sosa.div (Sosa.of_int 234000) 1000));
+             (*   %let;tmp;%expr(xxx-((xxx/1000)*1000))%in;  *)
+  (check string) "test sosa sub/div" "234"
+               (Sosa.to_string
+                  (Sosa.sub (Sosa.of_int 1234)
+                     (Sosa.mul (Sosa.div (Sosa.of_int 1234) 1000) 1000))) );
+  (check string) "test sosa div/10/10/10" "234"
+               (Sosa.to_string
+                  (Sosa.sub (Sosa.of_int 1234)
+                     (Sosa.mul
+                       (Sosa.div (Sosa.div (Sosa.div (Sosa.of_int 1234) 10) 10) 10)
+                         1000))) );
   ()
 
 let sosa_pp () =
