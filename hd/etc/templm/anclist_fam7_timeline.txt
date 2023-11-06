@@ -6,9 +6,9 @@
   %let;lxr;
     %if;("lexb" != "")
       %apply;a_of_b%with;
-        %if(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
+        %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
       %and;
-        %if(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2%end;
+        %if;(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2%end;
       %end;
     %else;
       %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
@@ -289,7 +289,7 @@
 %let;lyo;%if;(lby != 9999 and ldy != 9999)%expr(ldy - lby)%else;0%end;%in;
 %let;lw1;%if;computable_age;%expr(today.year - birth_date.year)%else;%lyo;%end;%in;
 %let;lw2;%if;(lby != 9999)%expr(lby + lw1 + 4)%else;0%end;%in;
-%let;l1s;%if(is_male)[him/her]0%elseif;(is_female)[him/her]1%else;0%end;%in;
+%let;l1s;%if;(is_male)[him/her]0%elseif;(is_female)[him/her]1%else;0%end;%in;
 %let;l1i;%index;%in;
 %let;l2i;%if;(has_parents)%father.index;%end;%in;
 %let;l3i;%if;(has_parents)%mother.index;%end;%in;

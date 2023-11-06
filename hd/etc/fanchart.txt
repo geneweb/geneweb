@@ -9,12 +9,12 @@
 </head>
 
 %define;somebody_fanchart_info(xx,iii)
-"S%xx.anc_sosa.v;":{"fn":"%if(xx.public_name != "")%xx.public_name;%else;%xx.first_name;%end;","fnk":"%xx.first_name_key","sn":"%xx.surname","snk":"%xx.surname_key;","oc":"%xx.occ","dates":'%xx.dates;',"birth_place":"%xx.birth_place;","death_place":"%xx.death_place","death_age":"%xx.death_age","has_parents":%if(xx.has_parents)true%else;false%end;%nn;
-%if(evar.ba = "on" and xx.baptism_place != ""),"baptism_place":"%xx.baptism_place;"%end;
-%if(evar.bu = "on" and xx.burial_place != ""),"burial_place":"%xx.burial_place;"%end;
-  %if(xx.index!=iii and xx.is_male)
+"S%xx.anc_sosa.v;":{"fn":"%if;(xx.public_name != "")%xx.public_name;%else;%xx.first_name;%end;","fnk":"%xx.first_name_key","sn":"%xx.surname","snk":"%xx.surname_key;","oc":"%xx.occ","dates":'%xx.dates;',"birth_place":"%xx.birth_place;","death_place":"%xx.death_place","death_age":"%xx.death_age","has_parents":%if;(xx.has_parents)true%else;false%end;%nn;
+%if;(evar.ba = "on" and xx.baptism_place != ""),"baptism_place":"%xx.baptism_place;"%end;
+%if;(evar.bu = "on" and xx.burial_place != ""),"burial_place":"%xx.burial_place;"%end;
+  %if;(xx.index!=iii and xx.is_male)
     %foreach;xx.family;
-      %if(family.index = xx.family.index)
+      %if;(family.index = xx.family.index)
         ,"marriage_date":"%family.date_s;","marriage_place":"%marriage_place;"
       %end;
     %end;
@@ -22,7 +22,7 @@
 },
 %end;
 %define;somebody_fanchart_same(xx)
-"S%xx.anc_sosa.v;":{"fn":"=","sn":"%xx.same","fnk":"%xx.first_name_key","snk":"%xx.surname_key;","oc":"","dates":"","has_parents":%if(xx.has_parents)true%else;false%end;},
+"S%xx.anc_sosa.v;":{"fn":"=","sn":"%xx.same","fnk":"%xx.first_name_key","snk":"%xx.surname_key;","oc":"","dates":"","has_parents":%if;(xx.has_parents)true%else;false%end;},
 %end;
 
 <body id="body">
@@ -45,8 +45,8 @@
   <span id="b-refresh" class="button" title="Ajuster à la fenêtre"><i class="fa fa-redo fa-fw"></i></span>
   <span id="b-zoom-in" class="button" title="Zoomer"><i class="fa fa-search-plus fa-fw"></i></span>
   <span id="b-zoom-out" class="button" title="Dézoomer"><i class="fa fa-search-minus fa-fw"></i></span>
-  <span id="b-gen-add" class="button%if(evar.v >= 10) disabled%end;" title="Ajouter une génération"><i class="fa fa-plus fa-fw"></i></span>
-  <span id="b-gen-del" class="button%if(evar.v <= 1) disabled%end;" title="Supprimer une génération"><i class="fa fa-minus fa-fw"></i></span>
+  <span id="b-gen-add" class="button%if;(evar.v >= 10) disabled%end;" title="Ajouter une génération"><i class="fa fa-plus fa-fw"></i></span>
+  <span id="b-gen-del" class="button%if;(evar.v <= 1) disabled%end;" title="Supprimer une génération"><i class="fa fa-minus fa-fw"></i></span>
   %if;(evar.implex = "")
   <span id="b-implex" class="button" title="Développer les implexes"><i class="far fa-comment-dots fa-fw"></i></span>
   %else;
@@ -64,13 +64,13 @@
   <span id="b-no-buttons" class="button" title="Désactiver les boutons"><i class="fa fa-file-pdf fa-fw"></i></span>
   </div>
 %end;
-<svg id="fanchart" class="bi ba ma de bu%if(evar.mono = "on") mono%end;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+<svg id="fanchart" class="bi ba ma de bu%if;(evar.mono = "on") mono%end;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
 
 </body>
 
 <script>
 var link_to_person = "%prefix;";
-var link_to_fanchart = "%prefix;m=A&t=FC&%if(evar.mono != "")mono=%evar.mono;&%end;%if(evar.implex != "")implex=%evar.implex;&%end;";
+var link_to_fanchart = "%prefix;m=A&t=FC&%if;(evar.mono != "")mono=%evar.mono;&%end;%if;(evar.implex != "")implex=%evar.implex;&%end;";
 var max_gen = %evar.v;;
 var tool = "%evar.tool;";
 var mono = "%evar.mono;";

@@ -38,7 +38,7 @@
         %if;(occ!="0")
           <input type="hidden" name="eoc" value="%occ;">
         %end;
-      %else
+      %else;
         <input type="hidden" name="ei" value="%index;">
       %end;
       <input type="hidden" name="m" value="NG">
@@ -100,7 +100,7 @@
           %if;(occ!=0)
             <input type="hidden" name="eoc" value="%occ;">
           %end;
-        %else
+        %else;
           <input type="hidden" name="ei" value="%index;">
         %end;
         <input type="hidden" name="m" value="NG">

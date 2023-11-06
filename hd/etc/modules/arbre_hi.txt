@@ -224,7 +224,7 @@
 %define;linesosa(ss0, ll, yy, x0, y0)
   %( ss=sosa, ll=level, yy=orientation I or H, x0, y0=coordinates of top left corner of box %)
   %( x axis to the right, y axis to bottom %)
-  %let;ss;%if(evarcpl="on")%expr(ss0/2)%else;ss0%end;%in;
+  %let;ss;%if;(evarcpl="on")%expr(ss0/2)%else;ss0%end;%in;
   %if;(ss!=1)
     %let;lev;
       %if;(ss>=1 and ss<2)1%nn;
@@ -253,7 +253,7 @@
       %end;%nn;
     %in;
     %let;twid0;%expr(www*wbs)%in;
-    %let;twid;%if("yy"="H")%expr(twid0*2)%else;%expr(twid0)%end;%in;
+    %let;twid;%if;("yy"="H")%expr(twid0*2)%else;%expr(twid0)%end;%in;
     %let;thig;%expr(hhh*hbs)%in;
     %let;len;%if;(or="h")%expr(twid/ddd)%else;%expr(thig/ddd)%end;%in;
     %let;len2;%if;(boxsize=2)%len;%else;%expr(len/2)%end;%in;
@@ -261,8 +261,8 @@
     %let;hb2;%if;(boxsize=2)%hb1;%else;%expr(hb1/2)%end;%in;
     %let;x1;%expr(x0+wb2)%in;
     %let;y1;%expr(y0+hb2)%in;
-    %let;x2;%if(or="h")%if;(ss%2=0)%expr(x1+len2)%else;%expr(x1-len2)%end;%else;%x1;%end;%in;
-    %let;y2;%if(or="v")%if;(ss%2=0)%expr(y1+len2)%else;%expr(y1-len2)%end;%else;%y1;%end;%in;
+    %let;x2;%if;(or="h")%if;(ss%2=0)%expr(x1+len2)%else;%expr(x1-len2)%end;%else;%x1;%end;%in;
+    %let;y2;%if;(or="v")%if;(ss%2=0)%expr(y1+len2)%else;%expr(y1-len2)%end;%else;%y1;%end;%in;
     %apply;line(x1, y1, x2, y2)
   %end;
 %end;
@@ -277,7 +277,7 @@
         %if;(evarcpl="")%aaaanc_sosa; %if;(aaasame!="")=Sosa %aaasame;%end;
         %else;%aaaanc_sosa; & %expr(aaaanc_sosa.v+1)%nn;
         %end;&#010;%nn;
-        %(if;("aaainterval"!="")=Sosa %aaainterval;;%else;%aaaanc_sosa; & %expr(aaaanc_sosa.v+1)%end;&#010;%)%nn;
+        %(%if;("aaainterval"!="")=Sosa %aaainterval;;%else;%aaaanc_sosa; & %expr(aaaanc_sosa.v+1)%end;&#010;%)%nn;
         %if;(aaais_male) ♂%else; ♀%end; %aaafirst_name; %aaasurname; %if;(aaaocc!="" or aaaocc!=0)(%aaaocc;)%end;&#010;%nn;
         %if;(aaabirth_date.year!="")° %aaabirth_date.year;%end;%nn;
         %if;(aaabirth_date.year!="" and aaais_dead) – %end;%nn;
@@ -380,7 +380,7 @@
           %let;left1;%expr(leftxx_yy(anc_sosahalf)*wb+4)%in;
           %let;top2;%expr(topxx_yy(anc_sosasamehalf)*hb+6)%in;
           %let;left2;%expr(leftxx_yy(anc_sosasamehalf)*wb+4)%in;
-          %let;bg;%if;(ancestor.same!="")CBFECE;%elseif(evarcpl="on")%apply;bg(level-1)%else;%apply;bg(level)%end;%in;
+          %let;bg;%if;(ancestor.same!="")CBFECE;%elseif;(evarcpl="on")%apply;bg(level-1)%else;%apply;bg(level)%end;%in;
           %if;(evarso!="on")
             %if;(ancestor.same!="" and evarix="on")%apply;implexc(left1, top1, left2, top2)%end;
             %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
@@ -416,7 +416,7 @@
               [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v;%end; %ancestor;"
             >%if;(evarso="on")•%else;·%end;</a>
           </div>
-        %(apply;linesosa(ancestor.anc_sosa.v*2, xx+1, "yy", left4, top4%)
+        %(%apply;linesosa(ancestor.anc_sosa.v*2, xx+1, "yy", left4, top4%)
         %end;
       %end;
     %end;
@@ -430,7 +430,7 @@
         %let;top2;%if;(ancestor.same!="")%expr(topxx_yy(ancestor.same.v)*hb+6)%end;%in;
         %let;left2;%if;(ancestor.same!="")%expr(leftxx_yy(ancestor.same.v)*wb+4)%end;%in;
         %let;bb;%if;(evarso="on")1%else;0%end;%in;
-        %let;bg;%if;(ancestor.same!="")CBFECE;%elseif(evarcpl="on")%apply;bg(level-1)%else;%apply;bg(level)%end;%in;
+        %let;bg;%if;(ancestor.same!="")CBFECE;%elseif;(evarcpl="on")%apply;bg(level-1)%else;%apply;bg(level)%end;%in;
         %if;(evarso!="on")
           %if;(ancestor.same!="" and evarix="on")
             %apply;implexc(left1, top1, left2, top2)
@@ -527,7 +527,7 @@
           %end;
         %elseif;(ancestor.anc_sosa.v>63 and ancestor.anc_sosa.v<128)
           %if;(xx=9 or xx=10)      %apply;linechar(1,yy,bbb)
-          %elseif(xx=11 or xx=12)  %apply;linechar(3,yy,bbb)
+          %elseif;(xx=11 or xx=12)  %apply;linechar(3,yy,bbb)
           %end;
         %elseif;(ancestor.anc_sosa.v>127 and ancestor.anc_sosa.v<256)
           %if;(xx=10 or xx=11)     %apply;linechar(1,yy,aaa)

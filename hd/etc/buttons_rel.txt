@@ -7,7 +7,7 @@
     %if;is_printed_by_template;
       %if;(e.em="R" or ((e.i!="" and e.ei!="") or (person_index.1!="" and person_index.2!="")))
         <a class="%if;(link_next="") disabled%end;%if;(e.et="S") border rounded%end;"
-          href="%if(link_next!="")%link_next;%nn;
+          href="%if;(link_next!="")%link_next;%nn;
             %else;%nn;
               %prefix;&em=R&et=S%nn;
               %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;

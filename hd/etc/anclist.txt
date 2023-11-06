@@ -4,7 +4,7 @@
   <!-- $Id: anclist.txt v7.1 04/03/2023 09:51:04 $ -->
   <title>%nn;
     %if;(e.t = "F")- [*surnames branch] -%nn;
-    %else
+    %else;
       %apply;a_of_b%with;
         %if;(e.t = "M")[*missing ancestors]%else;[*ancestor/ancestors]1%end;
       %and;
@@ -127,7 +127,7 @@
       </div>
     </form>
     <div class="text-monospace anclist_hr mt-2">
-      %let;sosa_v;%if(sosa.v!="")%sosa.v;%else;1%end;%in;
+      %let;sosa_v;%if;(sosa.v!="")%sosa.v;%else;1%end;%in;
       %if;((e.same="" or e.same=0) and e.p=e.pz and e.n=e.nz)
         %apply;anc_row_hr("self", lvl, 1, "   ", "──╴", "   ")
       %else;
@@ -214,7 +214,7 @@
           <td align="center">
             %if;(item.5 = "&lt;")
               /%item.6;
-            %elseif(item.5 = "&gt;")
+            %elseif;(item.5 = "&gt;")
               %item.6;/
             %elseif;(item.5 = "|" or item.5 = "..")
               %item.6;
@@ -225,7 +225,7 @@
           <td align="center">
             %if;(item.7 = "&lt;")
               /%item.7;
-            %elseif(item.7 = "&gt;")
+            %elseif;(item.7 = "&gt;")
               %item.8;/
             %elseif;(item.7 = "|" or item.7 = "..")
               %item.8;
@@ -328,7 +328,7 @@
           <td>
             %if;(item.7 = "&lt;")
               /%item.8;
-            %elseif(item.7 = "&gt;")
+            %elseif;(item.7 = "&gt;")
               %item.8;/
             %elseif;(item.7 = "|" or item.7 = "..")
               %item.8;
@@ -338,7 +338,7 @@
             -%nn;
             %if;(item.9 = "&lt;")
               /%item.10;
-            %elseif(item.9 = "&gt;")
+            %elseif;(item.9 = "&gt;")
               %item.10;/
             %elseif;(item.9 = "|" or item.9 = "..")
               %item.10;

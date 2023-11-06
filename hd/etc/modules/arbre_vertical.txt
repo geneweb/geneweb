@@ -54,11 +54,11 @@
               %if;cell.person.has_parents;
                 %if;(cell.person.father!="")
                   %if;(cell.person.father.birth_date.year!="" and cell.person.father.birth_date.prec="")%if;(cell.person.father.birth_date.year<today.year-135)1%end;%end;
-                  %if;(cell.person.father.is_dead and cell.person.father.death_date!="" and cell.person.father.death_date.prec="")%if;(cell.person.father.death_date.year<today.year-120)1%end%end;
+                  %if;(cell.person.father.is_dead and cell.person.father.death_date!="" and cell.person.father.death_date.prec="")%if;(cell.person.father.death_date.year<today.year-120)1%end;%end;
                 %end;
                 %if;(cell.person.mother!="")
                   %if;(cell.person.mother.birth_date.year!="" and cell.person.mother.birth_date.prec="")%if;(cell.person.mother.birth_date.year<today.year-135)1%end;%end;
-                  %if;(cell.person.mother.is_dead and cell.person.mother.death_date!="" and cell.person.mother.death_date.prec="")%if;(cell.person.mother.death_date.year<today.year-120)1%end%end;
+                  %if;(cell.person.mother.is_dead and cell.person.mother.death_date!="" and cell.person.mother.death_date.prec="")%if;(cell.person.mother.death_date.year<today.year-120)1%end;%end;
                 %end;
               %end;
             %end;
@@ -241,7 +241,7 @@
   <table class="tree-vert mx-auto my-2">
     %if;(e.t="T" and e.t1="m")
       %include;modules/arbre_9gen
-    %elseif(e.t="A" or e.t="C")
+    %elseif;(e.t="A" or e.t="C")
       <tr><td class="text-center">%apply;line("self",e_v+1)</td></tr>
     %else;
       %foreach;ancestor_tree_line(e_v+1)

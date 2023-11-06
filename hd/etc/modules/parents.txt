@@ -18,7 +18,7 @@
   %if;(op_m=1 or op_m=3)
     %apply;short_display_person("father")%nn;
     %if;(op_m=3 and father.has_occupation), %father.occupation;%nl;%end;
-  %elseif(op_m=4)
+  %elseif;(op_m=4)
     %apply;long_display_person("father")%sp;
   %elseif;(op_m=5)
     %apply;display_horizontal("father")
@@ -48,7 +48,7 @@
     %end;
     %foreach;father.family;
       %if;(spouse.access=mother.access)
-        %if(are_divorced or are_separated)
+        %if;(are_divorced or are_separated)
           <br>
           <em style="font-size: 90%%">%nn;
             %if;are_divorced;[divorced]0%divorce_date;%end;

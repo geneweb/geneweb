@@ -30,7 +30,7 @@
   </tr>
 %end;
 %define;one_pvar(zz)
-  %if(e.izz!="" or e.pzz!="")
+  %if;(e.izz!="" or e.pzz!="")
     %let;tmp;
       %if;pvar.zz.has_birth_date;° %pvar.zz.slash_birth_date;
       %elseif;pvar.zz.has_baptism_date;%pvar.zz.slash_baptism_date;
@@ -46,7 +46,7 @@
   %end;
 %end;
 %define;my_hidden(xx)
-  %if(e.xx!="")<input type="hidden" name="xx" value="%e.xx;">%end;
+  %if;(e.xx!="")<input type="hidden" name="xx" value="%e.xx;">%end;
 %end;
 <div class="container-fluid">
 <form id="upd" method="post" action="%action;">
@@ -72,7 +72,7 @@
     </thead>
     <tbody>
       %apply;one_pvar_line("", "", "", "", "", "", " id='template_line' style='display:none;'")
-      %if(e.i0!="" and e.p0!="")
+      %if;(e.i0!="" and e.p0!="")
         %apply;one_pvar(0)
       %else;
         %apply;one_pvar(1)
@@ -85,7 +85,7 @@
     </tbody>
   </table>
 </form>
-%if(not cancel_links)
+%if;(not cancel_links)
   %base_trailer;
   %include;copyr
 %end;

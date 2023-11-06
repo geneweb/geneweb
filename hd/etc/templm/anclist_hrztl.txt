@@ -124,7 +124,7 @@
                   %if;(child_cnt = nb_children)└%else;├%end;
                   %if;(child_cnt < 10)─%end;
                   %child_cnt;
-                  %if;(is_male)──%elseif(is_female)══%else;◦◦%end;
+                  %if;(is_male)──%elseif;(is_female)══%else;◦◦%end;
                 </tt> %child_name; %child.dates;<br>
               %end;
             %end;
@@ -246,7 +246,7 @@
           %if;(evar.siblings = "on" and xx.has_siblings)
             %let;l10;%if;(xx.mother.has_parents and curlev != 2)│ %else;  %end;%in;
             %foreach;child;
-              %let;l11a;%expr;(l_x0 + l7b + 7)%in;
+              %let;l11a;%expr(l_x0 + l7b + 7)%in;
               %let;l11b;%if;(birth_date.year > l11a)%birth_date.year;%else;%l11a;%end;%in;
               %let;l11c;%if;(l11b > l11a)%apply;line_b(l11b - l11a)%end;%in;
               %let;l11d;%nn;
@@ -266,7 +266,7 @@
               %if;(child_cnt = nb_children) └%else; ├%end;
               %if;(child_cnt < 10)─%end;
               %child_cnt;%nn;
-              %if;(is_male)──%elseif(is_female)══%else;◦◦%end;
+              %if;(is_male)──%elseif;(is_female)══%else;◦◦%end;
               %if;(browsing_with_sosa_ref and has_sosa)● %else;  %end;
               %l11c;%child_name;%child.dates;<br>
             %end;

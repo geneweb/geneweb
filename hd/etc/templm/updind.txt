@@ -158,7 +158,7 @@
     %end;
     &nbsp;&nbsp;<input type="submit" value="Ok"/>
     <span style="float:right"><label><input id="sex1" name="sex1" class="occ%l_s1;" %lt3; size="2" maxlength="8" autocomplete="off" placeholder="%l_s2;" onkeypress="javascript:return oKP1(event)" onblur="oB1()"%/></label>
-    <label><input name="occ" style="text-align:center;" title="[*number] oc" autocomplete="off" size="2" maxlength="8" value="%if(occ="")0%else;%occ;%end;" id="occ"%/></label></span>
+    <label><input name="occ" style="text-align:center;" title="[*number] oc" autocomplete="off" size="2" maxlength="8" value="%if;(occ="")0%else;%occ;%end;" id="occ"%/></label></span>
   </legend>
   <div class="w1">
     %lpc1; <label %lpa1;>[first name/first names]0<input id="first_name" name="first_name" size="30" maxlength="200" value="%first_name;" %l_on3; %l_on8;%/></label>

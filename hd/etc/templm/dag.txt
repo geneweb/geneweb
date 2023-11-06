@@ -50,7 +50,7 @@
               %end;">[*ascendants tree]</a>
         </span>
         <span>
-          <a href="%if;(bvar.access_by_key="no")%l_url1;i=%evar.i;%else;#%end;" title="%if(bvar.access_by_key!="no")Link not working atm if access_by_key=yes, sorry!%end;">[*descendant tree view]0</a>
+          <a href="%if;(bvar.access_by_key="no")%l_url1;i=%evar.i;%else;#%end;" title="%if;(bvar.access_by_key!="no")Link not working atm if access_by_key=yes, sorry!%end;">[*descendant tree view]0</a>
         </span>
       %end;
     %end;
@@ -80,7 +80,7 @@
               %env.key=%env.val.decoded;;%nn;
             %end;
           %end;
-          %let;l_pos1;%expr;(pos1 + overlap - dpos)%in;
+          %let;l_pos1;%expr(pos1 + overlap - dpos)%in;
           pos1=%l_pos1;
           ;pos2=%expr(pos1 + overlap)">&lt;&lt; %l_pos1;</a>%nn;
       %end;
@@ -92,7 +92,7 @@
               %env.key=%env.val.decoded;;%nn;
             %end;
           %end;
-          %let;l_pos1;%expr;(pos2 - overlap)%in;
+          %let;l_pos1;%expr(pos2 - overlap)%in;
           pos1=%l_pos1;
           ;pos2=%expr(pos2 - overlap + dpos)">%l_pos1; &gt;&gt;</a>%nn;
       %end;
@@ -109,7 +109,7 @@
   %end;
   </pre>
 %else;
-  %let;l_arr;%if(evar.m = "A")&uarr;%else;&darr;%end;%in;
+  %let;l_arr;%if;(evar.m = "A")&uarr;%else;&darr;%end;%in;
   %let;l_a;%if;(evar.em = "R")----&gt;8----%else;[tree]%end;%in;
   <table border="%border;" width="100%%"><tr><td align="center">
   <table border="%border;" cellspacing="0" cellpadding="0">

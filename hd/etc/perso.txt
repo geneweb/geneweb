@@ -29,7 +29,7 @@
 <div id="content" tabindex="-1">
 
 %define;init_nb_asc(tplnum)
-  %let;templ;%bvar.perso_module_tplnum;%in
+  %let;templ;%bvar.perso_module_tplnum;%in;
   %if;(templ = "famille" or templ = "arbre_3gen_v" or templ = "arbre_3gen_v_photo")
     %if;(count<3)
       %reset_count;%incr_count;%incr_count;%incr_count;
@@ -49,7 +49,7 @@
   %end;
 %end;
 %define;init_nb_desc(tplnum)
-  %let;templ;%bvar.perso_module_tplnum;%in
+  %let;templ;%bvar.perso_module_tplnum;%in;
   %if;(templ="unions")
     %if;(count<3)
       %reset_count;%incr_count;%incr_count;%incr_count;
@@ -62,7 +62,7 @@
 %end;
 
 %define;init_from_gen_desc(tplnum)
-  %let;templ;%bvar.perso_module_tplnum;%in
+  %let;templ;%bvar.perso_module_tplnum;%in;
   %if;(templ="family")
     %if;(count<3)
       %reset_count;%incr_count;%incr_count;%incr_count;
@@ -111,7 +111,7 @@
       %let;ooi;%apply;oo(i)%in;
       %if;(mmi!="" and ooi!=0)
         %apply;get_mod(mmi, ooi)
-      %end
+      %end;
     %end;
   </div>
 %end;

@@ -232,7 +232,7 @@
               %sp;(%if;(event_witness.sex=1)[officer/officer/officers]1%else;[officer/officer/officers]0%end;)%end;%nn;
           %end;.
         </li>
-      %end
+      %end;
     %end;
   </ul>
   

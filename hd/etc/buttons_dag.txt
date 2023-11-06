@@ -59,8 +59,8 @@
   %end;
 %else;
 %end;
-%let;father_access;%if(dtree=1)%get_var.fatheraccess;%else;%if;has_parents;%father.access;%end;%end;%in;
-%let;mother_access;%if(dtree=1)%get_var.motheraccess;%else;%if;has_parents;%mother.access;%end;%end;%in;
+%let;father_access;%if;(dtree=1)%get_var.fatheraccess;%else;%if;has_parents;%father.access;%end;%end;%in;
+%let;mother_access;%if;(dtree=1)%get_var.motheraccess;%else;%if;has_parents;%mother.access;%end;%end;%in;
 %let;prev_sibling_access;%get_var.prevsiblingaccess;%in;
 %let;next_sibling_access;%get_var.nextsiblingaccess;%in;
 %if;(not cancel_links and (e.m="A" or e.m="D"))

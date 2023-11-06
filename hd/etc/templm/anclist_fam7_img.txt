@@ -1,15 +1,15 @@
 <!-- $Id: templm/anclist_fam7_img.txt v7.0 2015/01/07 11:39:17 $ -->
 
 %let;ref_index;%index;%in;
-%let;ref_sex;%if(is_male)[him/her]0%elseif;(is_female)[him/her]1%else;0%end;%in;
+%let;ref_sex;%if;(is_male)[him/her]0%elseif;(is_female)[him/her]1%else;0%end;%in;
 
 %define;fam7_img_somebody1(xx,lexa,lexb,sss)
   %let;relationship;
     %if;("lexb" != "")
       %apply;a_of_b%with;
-        %if(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
+        %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
       %and;
-        %if(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2%end;
+        %if;(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2%end;
       %end;
     %else;
       %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;

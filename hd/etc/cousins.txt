@@ -36,7 +36,7 @@
 %end;
 %let;my_first_name_key;%first_name_key;%in;
 %let;my_surname_key;%surname_key;%in;
-%let;my_occ;%occ;%in
+%let;my_occ;%occ;%in;
 %define;url(xxx,yyy)
   <a href="%prefix;m=RL%nn;
     %if;("xxx"="ancestor")&p=%xxx.first_name_key;&n=%xxx.surname_key;%if;(xxx.occ!=0)&oc=%xxx.occ;%end;

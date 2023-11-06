@@ -332,8 +332,8 @@
             %if;(ancestor.is_male)[*him/her]0 %if;(are_not_married)[with]%else;[married%t to:::]0%end;
             %elseif;(ancestor.is_female)[*him/her]1 %if;(are_not_married)[with]%else;[married%t to:::]1%end;
             %end; %spouse;&#010;
-            %if;(nb_children>0)%nb_children; %end;%if;(nb_children=0)[*no descendants]%elseif(nb_children>1)[child/children]1%else;[child/children]0%end;%end;"
-        %if;(yy=0) style="color:%if;(ancestor.same!="")#fff069c9;%else;%if;(ancestor.is_male)blue;%elseif(ancestor.is_female)red;%end;font-size:small;%end;"%end;>
+            %if;(nb_children>0)%nb_children; %end;%if;(nb_children=0)[*no descendants]%elseif;(nb_children>1)[child/children]1%else;[child/children]0%end;%end;"
+        %if;(yy=0) style="color:%if;(ancestor.same!="")#fff069c9;%else;%if;(ancestor.is_male)blue;%elseif;(ancestor.is_female)red;%end;font-size:small;%end;"%end;>
         %nb_children;· %slash_marriage_date; %marriage_place; %if;(are_not_married)–%end;</span></div>
   %if;(wizard and not cancel_links)
     </a>
@@ -851,7 +851,7 @@
     ...
     %foreach;ancestor.family;
       %if;(family.index = ancestor.family.index)
-        %apply;married_to%with
+        %apply;married_to%with;
           %ancestor.is_male;
         %and;
           %if;(on_marriage_date != "") %on_marriage_date;%end;
@@ -964,8 +964,8 @@
   %end;==%nn;
   %if;(not cancel_links)</a>%end;
   %if;(e.num="on")<br>%else;%sp;%end;
-  <span%if;(not ancestor.has_parents) class="text-danger"%end;>%if(e.sosab = 16)%ancestor.same.hexa;
-  %elseif(e.sosab = 8)%ancestor.same.octal;
+  <span%if;(not ancestor.has_parents) class="text-danger"%end;>%if;(e.sosab = 16)%ancestor.same.hexa;
+  %elseif;(e.sosab = 8)%ancestor.same.octal;
   %else;%ancestor.same;
   %end;</span>
 %end;
@@ -1368,7 +1368,7 @@
       %foreach;ancestor;
         %if;(level!=0 and ancestor.same="" and (ancestor.is_descendant or ancestor.spouse.is_descendant))
           %lazy_force;
-          %let;l1;%if;(ancestor.is_descendant)class="border border-%if;(ancestor.is_male)info%elseif(ancestor.is_female)danger%end; is_desc_1%ancestor.sex;"%end;%in;
+          %let;l1;%if;(ancestor.is_descendant)class="border border-%if;(ancestor.is_male)info%elseif;(ancestor.is_female)danger%end; is_desc_1%ancestor.sex;"%end;%in;
           %apply;one_line(l1)
         %end;
       %end;
@@ -1512,8 +1512,8 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
           %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
           %apply;link%with;%ancestor.access;%and;
              %if;(ancestor.same != "")%nn;
-               %if(e.sosab = 16)%ancestor.same.hexa;
-               %elseif(e.sosab = 8)%ancestor.same.octal;
+               %if;(e.sosab = 16)%ancestor.same.hexa;
+               %elseif;(e.sosab = 8)%ancestor.same.octal;
                %else;%ancestor.same;
                %end;
              %else;%ancestor;
@@ -1565,7 +1565,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
         %if;(ancestor.first_name != "?" and ancestor.surname != "?" and (not ancestor.has_parents or (ancestor.has_families and (ancestor.spouse.first_name = "?" and ancestor.spouse.surname = "?"))))
           %if;(dates_in_interval(ancestor.var) = "true")
             %incr_count;
-            %apply;add_in_sorted_list%with
+            %apply;add_in_sorted_list%with;
               %ancestor.surname_end;
               %and;%ancestor.first_name;
               %and;%ancestor.surname_begin;

@@ -117,7 +117,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                   title="[Sosa] %sosa_prev.sosa;[:] %sosa_prev;"><span class="fa fa-chevron-left" aria-hidden="true"></span><span class="sr-only">&lt;</span></a>%nn;
               </li>
             %end;
-            %if(sosa_next.index!="")
+            %if;(sosa_next.index!="")
               %if;(sosa_prev.index="")
                 <li class="nav-item" title="Sosa 1[:] %self; ">
                   <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true"><span class="far fa-dot-circle" aria-hidden="true"></span><span class="sr-only">·</span></a>%nn;

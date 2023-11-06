@@ -28,7 +28,7 @@
       </h5>
       <div class="modal-body d-flex justify-content-center">
         <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="5000">
-        %( let;maximg;%if;has_portrait;%expr(carrousel_img_nbr+1)%else;%carrousel_img_nbr;%end;%in;
+        %(%let;maximg;%if;has_portrait;%expr(carrousel_img_nbr+1)%else;%carrousel_img_nbr;%end;%in;
             <ol class="carousel-indicators">
             %for;i;0;maximg;
             <li %if;(i=0)class="active"%end; data-target="#carousel" data-slide-to="%i;"></li>

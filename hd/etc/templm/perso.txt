@@ -2,7 +2,7 @@
 <html lang="%lang;">
 <head>
   <!-- $Id: templm/perso.txt v7.0 29/02/2016 11:08:07 $ -->
-  <title>%apply;capitalize(self.first_name) %apply;capitalize(self.surname)%if(occ!=0) (%occ;)%end; - #%index;</title>
+  <title>%apply;capitalize(self.first_name) %apply;capitalize(self.surname)%if;(occ!=0) (%occ;)%end; - #%index;</title>
   <meta name="robots" content="none"%/>
   <meta charset="utf-8">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
@@ -508,7 +508,7 @@
   %foreach;ancestor_level(z1)
     %foreach;ancestor;
       %if;(ancestor.anc_sosa = z3 or ancestor.anc_sosa = z3 + 1)
-        %let;l_sosa;%ancestor.anc_sosa;%in
+        %let;l_sosa;%ancestor.anc_sosa;%in;
         <span %if;(ancestor.has_sosa)class="color_sosa"%end;>
           z2
           %if;(ancestor.has_siblings)♦
@@ -559,8 +559,8 @@
     %end;
     %if;(count != 0)
       %if;(not cancel_links), <a href="%prefix;m=A;t=N;v=%max_anc_level;;i=%index;;same=%count;" style="float:none;padding:0px;"
-         title="[display smallest sosa number relative to ancestor]">%count; %if;(count=1)[implex/implexes]0%else[implex/implexes]1%end;</a>
-      %else;, %count; %if;(count=1)[implex/implexes]0%else[implex/implexes]1%end;
+         title="[display smallest sosa number relative to ancestor]">%count; %if;(count=1)[implex/implexes]0%else;[implex/implexes]1%end;</a>
+      %else;, %count; %if;(count=1)[implex/implexes]0%else;[implex/implexes]1%end;
       %end;
     %end;
   %end;
@@ -599,7 +599,7 @@
       </span>
     </div>
     <div style="clear:both">
-      %if(evar.asclev=3 or evar.asclev="")
+      %if;(evar.asclev=3 or evar.asclev="")
         %if;father.has_parents;<small>%apply;parents(3,"    ",4)</small>%end;
         %apply;parents(2,"",2)
         %if;mother.has_parents;<small>%apply;parents(3,"    ",6)</small>%end;
@@ -936,7 +936,7 @@
 %let;parents_age;
   %if;has_parents;
       %apply;a_of_b%with;
-        %if(is_male)[*son/daughter/child]0%elseif;(is_female)[*son/daughter/child]1%else;[*son/daughter/child]2%end;
+        %if;(is_male)[*son/daughter/child]0%elseif;(is_female)[*son/daughter/child]1%else;[*son/daughter/child]2%end;
       %and;
         %if;(bvar.event_age!="yes" and evar.age!="on")%nl;%end;
         %father;
@@ -1028,7 +1028,7 @@
 %define;timeline()
     <div class="highlight1">
     %if;has_occupation;
-      %apply;advanced%with;occu%and;%apply;capitalize(occupation)%end%nn;
+      %apply;advanced%with;occu%and;%apply;capitalize(occupation)%end;%nn;
     %end;
     %if;(has_linked_pages and has_linked_page.OCCU)
       %if;has_occupation;, %end;%linked_page.OCCU;
@@ -1199,7 +1199,7 @@
         %foreach;related;%incr_count;%end;
         %foreach;event_witness_relation;%incr_count;%end;
         %let;cnt;%count;%in;
-        <br><span>%if;(not cancel_links and cnt>1)%apply;relations_tree(l_ref)%end[*relation/relations]1%if;(not cancel_links and cnt>1)</a>%end;</span></div>
+        <br><span>%if;(not cancel_links and cnt>1)%apply;relations_tree(l_ref)%end;[*relation/relations]1%if;(not cancel_links and cnt>1)</a>%end;</span></div>
         %foreach;relation;
           <div class="tree" style="clear:both">
             %if;(has_relation_him and has_relation_her)
@@ -1308,7 +1308,7 @@
       <span class="menu" style="position:relative;margin-top:2em;margin-left:20px;"><small>%apply;descmax()</small></span>
       <br>
         <span class="menu" style="position:relative;">
-          %let;lv;%if;(evar.maxlev!="")%evar.maxlev;%elseif(bvar.maxlev!="")%bvar.maxlev;%else;1%end;%in;
+          %let;lv;%if;(evar.maxlev!="")%evar.maxlev;%elseif;(bvar.maxlev!="")%bvar.maxlev;%else;1%end;%in;
           <span>
           <span class="ch2" style="margin-top:-4px;">[*descendants]</span>
           %if;(not cancel_links)

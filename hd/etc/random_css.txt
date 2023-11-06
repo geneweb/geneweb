@@ -60,7 +60,7 @@
   font-variant: %if;(random.5 = 0)small-caps%else;normal%end;;%sp;
   font-transform: %if;(random.10 = 0)uppercase%else;none%end;;%sp;
   font-weight: %if;(random.3 = 0)bold%else;normal%end; }
-#title { color: %apply;dark_col(); font-size: %expr;(80 + random.80)%% }
+#title { color: %apply;dark_col(); font-size: %expr(80 + random.80)%% }
 
 body { margin: 0; background: %bg2;; color: %apply;dark_col() }
 :link { color: %apply;dark_col() } :visited { color: %apply;dark_col() }
