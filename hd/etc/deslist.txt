@@ -123,21 +123,12 @@
   %end;
 %end;
 
-%define;married_to(is_male, date_place)
-  %if;("is_male" = 1)
-    %if;are_married;[married%t to:::date_place]0%nn;
-    %elseif;are_not_married;[relationship%t to:::date_place]0%nn;
-    %elseif;are_engaged;[engaged%t to:::date_place]0%nn;
-    %elseif;is_no_sexes_check;[relationship%t to:::date_place]0%nn;
-    %elseif;is_no_mention;date_place [with]%nn;
-    %end;
-  %else;
-    %if;are_married;[married%t to:::date_place]1%nn;
-    %elseif;are_not_married;[relationship%t to:::date_place]1%nn;
-    %elseif;are_engaged;[engaged%t to:::date_place]1%nn;
-    %elseif;is_no_sexes_check;[relationship%t to:::date_place]1%nn;
-    %elseif;is_no_mention;date_place [with]%nn;
-    %end;
+%define;married_to(date_place)
+  %if;are_married;[married%t to:::date_place]s%nn;
+  %elseif;are_not_married;[relationship%t to:::date_place]s%nn;
+  %elseif;are_engaged;[engaged%t to:::date_place]s%nn;
+  %elseif;is_no_sexes_check;[relationship%t to:::date_place]s%nn;
+  %elseif;is_no_mention;date_place [with]%nn;
   %end;
 %end;
 
@@ -211,8 +202,6 @@
     %lazy_force;
     %apply;capitalize%with;
       %apply;married_to%with;
-        %xx.is_male;
-      %and;
         %if;(on_marriage_date != "") %on_marriage_date;%end;
         %if;(marriage_place != ""), %marriage_place;,%end;
       %end;
@@ -304,7 +293,7 @@
       %elseif;(family.desc_level > famlev)
         <i>, [see above]</i>.
         %apply;lazy_print%with;<br>%nl;%end;
-      %elseif;has_children;<p>... <i>[having as children]</i></p>
+      %elseif;has_children;<p>... <i>[having as children]c</i></p>
           %family.set_infinite_desc_level;
           %if;(curlev = 0)</p>%nl;%end;
           <ul>
