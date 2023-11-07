@@ -13,9 +13,8 @@ let link_to_referer conf =
       :> Adef.safe_string)
   else Adef.safe ""
 
-let gen_print_link_to_welcome f conf right_aligned =
-  Output.print_sstring conf "<div class=\"d-flex flex-column fix_top fix_";
-  Output.print_sstring conf (if right_aligned then "left" else "right");
+let gen_print_link_to_welcome f conf _right_aligned =
+  Output.print_sstring conf "<div class=\"d-flex flex-column fix_top fix_left";
   Output.print_sstring conf "\">\n";
   f ();
   Output.print_sstring conf {|<a href="|};
