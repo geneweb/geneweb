@@ -485,20 +485,22 @@ let print_population_pyramid conf base =
     let aux_img nb img =
       if nb <> 0 then (
         let n = max 1 (band_size nb) in
-        Output.print_sstring conf {|<img src="images/|};
+        Output.print_sstring conf {|<img src="|};
         Output.print_string conf img;
         Output.print_sstring conf {|" width="|};
         Output.print_sstring conf (string_of_int @@ (n * 3));
         Output.print_sstring conf {|" height="22">|})
     in
-    aux_img nb_men (Adef.encoded "pyr_male.png");
+    aux_img nb_men
+      (Adef.encoded (Filename.concat conf.image_prefix "pyr_male.png"));
     Output.print_sstring conf
       {|</td></tr></table></td><td align="center" class="pyramid_center">|};
     if i = nb_intervals then Output.print_sstring conf "&nbsp;"
     else Output.print_sstring conf (string_of_int @@ ((i + 1) * interval));
     Output.print_sstring conf
       {|</td><td align="left"><table cellspacing="0" cellpadding="0"><tr><td>|};
-    aux_img nb_wom (Adef.encoded "pyr_female.png");
+    aux_img nb_wom
+      (Adef.encoded (Filename.concat conf.image_prefix "pyr_female.png"));
     Output.print_sstring conf {|</td><td class="pyramid_nb">&nbsp;|};
     if nb_wom <> 0 then Output.print_sstring conf (string_of_int nb_wom);
     Output.print_sstring conf "</td></tr></table></td><td>&nbsp;</td>\n";
