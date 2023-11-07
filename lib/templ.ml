@@ -534,15 +534,15 @@ let eval_string_var conf eval_var sl =
     try VVstring (eval_variable conf sl)
     with Not_found ->
       GWPARAM.errors_undef :=
-        (" %" ^ String.concat "." sl ^ "?") :: !GWPARAM.errors_undef;
-      VVstring (" %" ^ String.concat "." sl ^ "?"))
+        Printf.sprintf "%%%s?" (String.concat "." sl) :: !GWPARAM.errors_undef;
+      VVstring (Printf.sprintf " %%%s?" (String.concat "." sl)))
 
 let eval_var_handled conf sl =
   try eval_variable conf sl
   with Not_found ->
     GWPARAM.errors_undef :=
       Printf.sprintf "%%%s?" (String.concat "." sl) :: !GWPARAM.errors_undef;
-    Printf.sprintf " %%%s?2" (String.concat "." sl)
+    Printf.sprintf " %%%s?" (String.concat "." sl)
 
 let apply_format conf nth s1 s2 =
   let s1 =
