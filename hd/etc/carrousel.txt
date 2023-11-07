@@ -147,7 +147,9 @@
         <div class="d-flex col">
           <h1 class="display-4">
             %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*note/notes]0</h1>
-          <span class="mb-1 px-0 ml-auto align-self-end col-2">%include;toolbar</span>
+          <span class="mb-1 px-0 ml-auto align-self-end col-2">
+            %include;toolbar
+          </span>
         </div>
         <textarea class="form-control col-12" id="image_note"
           name="note" rows="5" placeholder="[*note/notes]0">
