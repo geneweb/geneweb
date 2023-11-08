@@ -7,6 +7,8 @@ This feature includes an extended table of potential "cousin" relationships
 up to an ascending degree v (v1/v2 represent ascending/descending degrees).
 Note that "self" is now represented as v=v1=0 (previously 1) for consistency.
 Please be aware that some translations for relationships are still pending.
+A new .gwf parameter "cache_cousins_tool=yes" allow the use of a cache file
+to help with loading time on big databases.
 
 When browsing with a Sosa reference and the individual has a relationship with
 the Cujus, the relationship name is now provided along with the names of common
