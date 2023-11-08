@@ -1026,6 +1026,11 @@ let string_of_fevent_name conf base efam_name =
   | Efam_Name n -> (escape_html (sou base n) :> Adef.safe_string)
   | _ -> string_of_fevent_name_without_base conf efam_name
 
+let string_of_fevent_name' conf base efam_name =
+  match efam_name with
+  | Efam_Name n -> ((escape_html n) :> Adef.safe_string)
+  | _ -> string_of_fevent_name_without_base conf efam_name
+
 let string_of_witness_kind conf sex witness_kind =
   let n = if witness_kind = Witness then 0 else index_of_sex sex in
   let s =

@@ -55,7 +55,22 @@ type 'a env =
   | Vint of int
   | Vother of 'a
   | Vbool of bool
+  | Vevents of
+      ( string * string * int * Update.create * string,
+        string )
+        Def.gen_fam_event
+        list
   | Vnone
+
+let bind x v e = (x, v) :: e
+let get_env x e = try List.assoc x e with Not_found -> Vnone
+
+let nth_fevent n e =
+  match get_env "fevents" e with
+  | Vevents events -> List.nth events n
+  | _ -> raise (Failure "nth_fevent")
+
+let get_fevent = function Vevents es -> es | _ -> raise (Failure "get_fevent")
 
 let bool_val = Update_util.bool_val
 let str_val = Update_util.str_val
@@ -82,9 +97,11 @@ let eval_witness_kind = function
   | Witness_Other -> str_val "othe"
   | Witness -> str_val ""
 
-let family_events_opt env fam =
+let family_events_opt env =
   match get_env "cnt" env with
-  | Vint i -> List.nth_opt fam.fevents (i - 1)
+  | Vint i ->
+    (try Some (nth_fevent (i - 1) env)
+     with Failure _ -> None)
   | _ -> None
 
 let witness_person_of_event_opt env e =
@@ -99,7 +116,7 @@ let ( >>= ) x f = ExtOption.bind x f
 
 let rec eval_fwitness env fam sl =
   let fwitness_opt =
-    family_events_opt env fam >>= fun e ->
+    family_events_opt env >>= fun e ->
     witness_person_of_event_opt env e >>= fun p -> eval_key_opt p sl
   in
   match fwitness_opt with Some fw -> fw | None -> raise Not_found
@@ -175,32 +192,32 @@ and eval_witness env fam sl =
   | _ -> raise Not_found
 
 (* TODO : rewrite, looks bad *)
-and eval_event_str conf base env fam =
+and eval_event_str conf base env =
   match get_env "cnt" env with
   | Vint i -> (
       try
-        let fam = foi base fam.fam_index in
-        let e = List.nth (get_fevents fam) (i - 1) in
+        let e = nth_fevent (i - 1) env in
         let name =
-          Util.string_of_fevent_name conf base (get_fevent_name e)
+          Util.string_of_fevent_name' conf base e.efam_name
           |> Adef.safe_fn Utf8.capitalize_fst
         in
         let date =
-          match Date.od_of_cdate (get_fevent_date e) with
+          match Date.od_of_cdate e.efam_date with
           | Some d -> DateDisplay.string_of_date conf d
           | None -> Adef.safe ""
         in
-        let place = Util.string_of_place conf (sou base (get_fevent_place e)) in
-        let note = Util.safe_html (sou base (get_fevent_note e)) in
-        let src = Util.safe_html (sou base (get_fevent_src e)) in
+        let place = Util.string_of_place conf e.efam_place in
+        let note = Util.safe_html e.efam_note in
+        let src = Util.safe_html e.efam_src in
         let wit =
           Array.fold_right
-            (fun (w, _) accu ->
+            (fun ((_, _, iper, _, _), _, _) accu ->
               (transl_nth conf "witness/witnesses" 0
               ^<^ transl conf ":"
-              ^<^ Util.gen_person_text conf base (poi base w))
+              ^<^ Util.gen_person_text conf base
+                (poi base (Gwdb.iper_of_string (string_of_int iper))))
               :: accu)
-            (get_fevent_witnesses e) []
+            e.efam_witnesses []
         in
         let s =
           String.concat ", "
@@ -212,20 +229,20 @@ and eval_event_str conf base env fam =
       with Failure _ -> str_val "")
   | _ -> str_val ""
 
-and eval_has_fwitness env fam =
+and eval_has_fwitness env =
   let has_fwitness_opt =
-    family_events_opt env fam >>= fun e ->
+    family_events_opt env >>= fun e ->
     Some (bool_val (e.efam_witnesses <> [||]))
   in
   try ExtOption.get has_fwitness_opt
   with Invalid_argument _ -> raise Not_found
 
 (* TODO : rewrite, looks bad *)
-and eval_fwitness_kind env fam =
+and eval_fwitness_kind env =
   match get_env "cnt" env with
   | Vint i -> (
       let e =
-        try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None
+        try Some (nth_fevent (i - 1) env) with Failure _ -> None
       in
       match e with
       | Some e -> (
@@ -241,11 +258,11 @@ and eval_fwitness_kind env fam =
       | None -> raise Not_found)
   | _ -> raise Not_found
 
-and eval_fwitness_note env fam =
+and eval_fwitness_note env =
   match get_env "cnt" env with
   | Vint i -> (
       let e =
-        try Some (List.nth fam.fevents (i - 1)) with Failure _ -> None
+        try Some (nth_fevent (i - 1) env) with Failure _ -> None
       in
       match e with
       | Some e -> (
@@ -265,9 +282,9 @@ and eval_fwitness_note env fam =
 (* TODO : rewrite, looks bad + find a better name *)
 and eval_default_var conf s = Update_util.eval_default_var conf s
 
-and eval_event_date env fam s =
+and eval_event_date env s =
   let od =
-    family_events_opt env fam >>= fun e -> Date.od_of_cdate e.efam_date
+    family_events_opt env >>= fun e -> Date.od_of_cdate e.efam_date
   in
   eval_date_var od s
 
@@ -300,14 +317,14 @@ and eval_simple_var conf base env (fam, cpl, des) = function
   | "witness" :: sl -> eval_witness env fam sl
   | [ "has_fevents" ] -> bool_val (fam.fevents <> [])
   | "event" :: sl ->
-      let e = family_events_opt env fam in
+      let e = family_events_opt env in
       eval_event_var e sl
-  | [ "event_date"; s ] -> eval_event_date env fam s
-  | [ "event_str" ] -> eval_event_str conf base env fam
-  | [ "has_fwitness" ] -> eval_has_fwitness env fam
+  | [ "event_date"; s ] -> eval_event_date env s
+  | [ "event_str" ] -> eval_event_str conf base env
+  | [ "has_fwitness" ] -> eval_has_fwitness env
   | "fwitness" :: sl -> eval_fwitness env fam sl
-  | [ "fwitness_kind" ] -> eval_fwitness_kind env fam
-  | [ "fwitness_note" ] -> eval_fwitness_note env fam
+  | [ "fwitness_kind" ] -> eval_fwitness_kind env
+  | [ "fwitness_note" ] -> eval_fwitness_note env
   | [ s ] -> eval_default_var conf s
   | _ -> raise Not_found
 
@@ -521,14 +538,29 @@ and eval_string_env var env =
   | Vstring x -> safe_val (Util.escape_html x :> Adef.safe_string)
   | _ -> str_val ""
 
+let bind_fevents env fam =
+  let events =
+    Event.sort_events
+      (fun e -> Event.Fevent e.efam_name)
+      (fun e -> e.efam_date)
+      fam.fevents
+  in
+  bind "fevents" (Vevents events) env
+
 (* print *)
 
 let print_foreach print_ast _eval_expr =
   let rec print_foreach env ((fam, cpl, des) as fcd) _ s sl _ al =
     match s :: sl with
     | [ "child" ] -> print_foreach_child env fcd al des.children
-    | [ "fevent" ] -> print_foreach_fevent env fcd al fam.fevents
-    | [ "fwitness" ] -> print_foreach_fwitness env fcd al fam.fevents
+    | [ "fevent" ] ->
+      let env = bind_fevents env fam in
+      let fevents = get_fevent (get_env "fevents" env) in
+      print_foreach_fevent env fcd al fevents
+    | [ "fwitness" ] ->
+      let env = bind_fevents env fam in
+      let fevents = get_fevent (get_env "fevents" env) in
+      print_foreach_fwitness env fcd al fevents
     | [ "witness" ] -> print_foreach_witness env fcd al fam.witnesses
     | [ "parent" ] -> print_foreach_parent env fcd al (Gutil.parent_array cpl)
     | _ -> raise Not_found
