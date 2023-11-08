@@ -11,6 +11,10 @@ with a Web interface and can be used off-line or as a Web service.
 - GeneWeb API (generated from source): http://geneweb.github.io/geneweb/
 - GeneWeb overview (realized by OCamlPro): http://geneweb.github.io/
 
+## Quick and easy live Geneweb test
+
+- Test your Geneweb database on current master : https://github.com/geneweb/geneweb/blob/master/geneweb_colab.ipynb
+
 ## Installation (for users)
 
 WARNING: before installing a new version of GeneWeb, it is highly recommended to save
