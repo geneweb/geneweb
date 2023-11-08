@@ -6,7 +6,7 @@ open Util
 
 let default_max_cnt = 2000
 
-let max_cousin_level conf _base _p =
+let max_cousin_level conf =
   let default_max_cousin_lvl = 6 in
   try int_of_string (List.assoc "max_cousins_level" conf.Config.base_env)
   with Not_found | Failure _ -> default_max_cousin_lvl

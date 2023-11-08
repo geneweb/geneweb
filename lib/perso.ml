@@ -4051,7 +4051,7 @@ and string_of_parent_age conf base (p, p_auth) parent : Adef.safe_string =
 and string_of_int_env var env =
   match get_env var env with
   | Vint x -> string_of_int x |> str_val
-  | _ -> str_val "0"
+  | _ -> raise Not_found
 
 let eval_transl conf base env upp s c =
   match c with
@@ -5298,7 +5298,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
                Cousins.mal)
       | None -> Vint 0
     in
-    let mcl () = Vint (Cousins.max_cousin_level conf base p) in
+    let mcl () = Vint (Cousins.max_cousin_level conf) in
     (* Récupère le nombre maximal de niveaux de descendance en prenant en
        compte les liens inter-arbres (limité à 10 générations car
        problématique en terme de perf). *)

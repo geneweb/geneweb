@@ -92,10 +92,10 @@ fi
 # End of test
 # </body>
 # </html>
-# (base) Henri@iMac-H cgi-bin % 
+# $ % 
 
 # next step is to do the same from your browser :
-# http://localhost/~Henri/cgi-bin/test.cgi
+# http://localhost/~Username/cgi-bin/test.cgi
 # you should get:
 # This is a test for cgi commands
 # This should display Lenna:

@@ -7,6 +7,19 @@ open Util
 
 type date_event = DeBirth | DeDeath of death_reason
 
+let print_age conf a_ref a =
+  Output.print_sstring conf " <em>";
+  Output.print_sstring conf (string_of_int a);
+  Output.print_sstring conf "</em>";
+  Output.print_sstring conf ", ";
+  match a_ref - a with
+  | 0 -> Output.print_sstring conf (transl conf "birth")
+  | 1 -> Output.print_sstring conf (transl conf "one year old")
+  | n ->
+      Output.print_sstring conf (string_of_int n);
+      Output.print_sstring conf " ";
+      Output.print_sstring conf (transl conf "years old")
+
 let print_anniversary_day conf base dead_people liste =
   let a_ref = conf.today.year in
   Output.print_sstring conf "<ul>";
@@ -15,18 +28,7 @@ let print_anniversary_day conf base dead_people liste =
       let is = index_of_sex (get_sex p) in
       Output.print_sstring conf "<li>";
       Output.print_string conf (txt_of conf base p);
-      if not dead_people then (
-        Output.print_sstring conf " <em>";
-        Output.print_sstring conf (string_of_int a);
-        Output.print_sstring conf "</em>";
-        Output.print_sstring conf ", ";
-        match a_ref - a with
-        | 0 -> Output.print_sstring conf (transl conf "birth")
-        | 1 -> Output.print_sstring conf (transl conf "one year old")
-        | n ->
-            Output.print_sstring conf (string_of_int n);
-            Output.print_sstring conf " ";
-            Output.print_sstring conf (transl conf "years old"))
+      if not dead_people then print_age conf a_ref a
       else (
         Output.print_sstring conf ", <em>";
         (Output.print_sstring conf
@@ -151,20 +153,7 @@ let print_anniversary_list conf base dead_people dt liste =
       else (
         Output.print_string conf (txt_of conf base p);
         (* TODO year of birth *)
-        match get_death p with
-        | NotDead -> (
-            Output.print_sstring conf " <em>";
-            Output.print_sstring conf (string_of_int a);
-            Output.print_sstring conf "</em>";
-            Output.print_sstring conf ", ";
-            match a_ref - a with
-            | 0 -> Output.print_sstring conf (transl conf "birth")
-            | 1 -> Output.print_sstring conf (transl conf "one year old")
-            | n ->
-                Output.print_sstring conf (string_of_int n);
-                Output.print_sstring conf " ";
-                Output.print_sstring conf (transl conf "years old"))
-        | _ -> ());
+        match get_death p with NotDead -> print_age conf a_ref a | _ -> ());
       Output.print_sstring conf "</li>")
     liste;
   Output.print_sstring conf "</ul>"

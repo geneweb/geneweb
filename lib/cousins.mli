@@ -19,7 +19,7 @@ val mal : int
 val mdl : int
 (** max value of max_descendant_level *)
 
-val max_cousin_level : config -> base -> person -> int
+val max_cousin_level : config -> int
 val max_ancestor_level : config -> base -> iper -> int -> int
 val max_descendant_level : config -> base -> iper -> int -> int
 

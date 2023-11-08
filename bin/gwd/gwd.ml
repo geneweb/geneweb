@@ -1052,7 +1052,7 @@ let authorization from_addr request base_env passwd access_type utm base_file
         basic_authorization from_addr request base_env passwd access_type utm
           base_file command
 
-let explode s =
+let string_to_char_list s =
   let rec exp i l =
     if i < 0 then l else exp (i - 1) (s.[i] :: l) in
   exp (String.length s - 1) []
@@ -1122,10 +1122,11 @@ let make_conf from_addr request script_name env =
     with Not_found -> !default_lang
   in
   let vowels =
-    try List.assoc "vowels" base_env with
-      Not_found -> "aeiouy"
+    match List.assoc_opt "vowels" base_env with
+    | Some l -> l
+    | None -> "aeiouy"
   in
-  let vowels = explode vowels in
+  let vowels = string_to_char_list vowels in
   let lexicon_lang = if lang = "" then default_lang else lang in
   let lexicon = load_lexicon lexicon_lang in
   (* A l'initialisation de la config, il n'y a pas de sosa_ref. *)
