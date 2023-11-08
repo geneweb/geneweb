@@ -193,7 +193,7 @@
 %end;
 %( Calculs d’âge en années/mois/jours et en jours de Mickael Rouesné %)
 %define;remainder(xxx)
-  %let;tmp;%expr(xxx-((xxx/1000)*1000))%in;
+  %let;tmp;%expr(xxx-((xxx/10/10/10)*1000))%in;
   %if;(tmp<10)00%tmp;%nn;
   %elseif;(tmp<100)0%tmp;%nn;
   %else;%tmp;%end;
