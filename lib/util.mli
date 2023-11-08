@@ -338,6 +338,9 @@ val string_of_fevent_name_without_base :
 val string_of_pevent_name :
   config -> base -> istr gen_pers_event_name -> Adef.safe_string
 
+val string_of_pevent_name' :
+  config -> base -> string gen_pers_event_name -> Adef.safe_string
+
 val string_of_fevent_name :
   config -> base -> istr gen_fam_event_name -> Adef.safe_string
 (** [string_of_fevent_name conf base fevent_name]

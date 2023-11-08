@@ -1016,6 +1016,11 @@ let string_of_pevent_name conf base epers_name =
   | Epers_Name n -> (escape_html (sou base n) :> Adef.safe_string)
   | _ -> string_of_pevent_name_without_base conf epers_name
 
+let string_of_pevent_name' conf base epers_name =
+  match epers_name with
+  | Epers_Name n -> (escape_html n :> Adef.safe_string)
+  | _ -> string_of_pevent_name_without_base conf epers_name
+
 let string_of_fevent_name conf base efam_name =
   match efam_name with
   | Efam_Name n -> (escape_html (sou base n) :> Adef.safe_string)

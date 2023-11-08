@@ -19,15 +19,30 @@ let string_person_of base p =
 
 (* Interpretation of template file 'updind.txt' *)
 
-type 'a env =
+type 'a value =
   | Vstring of string
   | Vint of int
   | Vother of 'a
   | Vcnt of int ref
   | Vbool of bool
+  | Vevents of
+      ( string * string * int * Update.create * string,
+        string )
+      Def.gen_pers_event
+      list
   | Vnone
 
-let get_env v env = try List.assoc v env with Not_found -> Vnone
+type 'a env = 'a value list
+
+let bind x v e = (x, v) :: e
+let get_env x e = try List.assoc x e with Not_found -> Vnone
+
+let nth_pevent n e =
+  match get_env "pevents" e with
+  | Vevents events -> List.nth events n
+  | _ -> raise (Failure "nth_pevent")
+
+let get_pevent = function Vevents es -> es | _ -> raise (Failure "get_pevent")
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
 let bool_val = Update_util.bool_val
@@ -98,7 +113,7 @@ and eval_simple_var conf base env p = function
       let e =
         match get_env "cnt" env with
         | Vint i -> (
-            try Some (List.nth p.pevents (i - 1)) with Failure _ -> None)
+            try Some (nth_pevent (i - 1) env) with Failure _ -> None)
         | _ -> None
       in
       eval_event_var e sl
@@ -107,7 +122,7 @@ and eval_simple_var conf base env p = function
         match get_env "cnt" env with
         | Vint i -> (
             try
-              let e = List.nth p.pevents (i - 1) in
+              let e = nth_pevent (i - 1) env in
               Date.od_of_cdate e.epers_date
             with Failure _ -> None)
         | _ -> None
@@ -117,20 +132,17 @@ and eval_simple_var conf base env p = function
       match get_env "cnt" env with
       | Vint i -> (
           try
-            let p = poi base p.key_index in
-            let e = List.nth (get_pevents p) (i - 1) in
+            let e = nth_pevent (i - 1) env in
             let name =
-              Util.string_of_pevent_name conf base (get_pevent_name e)
+              Util.string_of_pevent_name' conf base e.epers_name
               |> Adef.safe_fn Utf8.capitalize_fst
             in
             let date =
-              match Date.od_of_cdate (get_pevent_date e) with
+              match Date.od_of_cdate e.epers_date with
               | Some d -> DateDisplay.string_of_date conf d
               | None -> Adef.safe ""
             in
-            let place =
-              Util.string_of_place conf (sou base (get_pevent_place e))
-            in
+            let place = Util.string_of_place conf e.epers_place in
             ([ name; date; (place :> Adef.safe_string) ]
               : Adef.safe_string list
               :> string list)
@@ -290,9 +302,7 @@ and eval_simple_var conf base env p = function
   | [ "has_witness" ] -> (
       match get_env "cnt" env with
       | Vint i -> (
-          let e =
-            try Some (List.nth p.pevents (i - 1)) with Failure _ -> None
-          in
+          let e = try Some (nth_pevent (i - 1) env) with Failure _ -> None in
           match e with
           | Some e -> bool_val (e.epers_witnesses <> [||])
           | None -> raise Not_found)
@@ -300,9 +310,7 @@ and eval_simple_var conf base env p = function
   | "witness" :: sl -> (
       match get_env "cnt" env with
       | Vint i -> (
-          let e =
-            try Some (List.nth p.pevents (i - 1)) with Failure _ -> None
-          in
+          let e = try Some (nth_pevent (i - 1) env) with Failure _ -> None in
           match e with
           | Some e -> (
               match get_env "wcnt" env with
@@ -324,9 +332,7 @@ and eval_simple_var conf base env p = function
   | [ "witness_note" ] -> (
       match get_env "cnt" env with
       | Vint i -> (
-          let e =
-            try Some (List.nth p.pevents (i - 1)) with Failure _ -> None
-          in
+          let e = try Some (nth_pevent (i - 1) env) with Failure _ -> None in
           match e with
           | Some e -> (
               match get_env "wcnt" env with
@@ -344,9 +350,7 @@ and eval_simple_var conf base env p = function
   | [ "witness_kind" ] -> (
       match get_env "cnt" env with
       | Vint i -> (
-          let e =
-            try Some (List.nth p.pevents (i - 1)) with Failure _ -> None
-          in
+          let e = try Some (nth_pevent (i - 1) env) with Failure _ -> None in
           match e with
           | Some e -> (
               match get_env "wcnt" env with
@@ -557,6 +561,15 @@ and eval_string_env var env =
   | Vstring x -> safe_val (Util.escape_html x :> Adef.safe_string)
   | _ -> str_val ""
 
+let bind_pevents env p =
+  let events =
+    Event.sort_events
+      (fun e -> Event.Pevent e.epers_name)
+      (fun e -> e.epers_date)
+      p.pevents
+  in
+  bind "pevents" (Vevents events) env
+
 (* print *)
 
 let print_foreach print_ast _eval_expr =
@@ -569,8 +582,12 @@ let print_foreach print_ast _eval_expr =
     | [ "surname_alias" ] -> print_foreach_string env p al p.surnames_aliases s
     | [ "relation" ] -> print_foreach_relation env p al p.rparents
     | [ "title" ] -> print_foreach_title env p al p.titles
-    | [ "pevent" ] -> print_foreach_pevent env p al p.pevents
-    | [ "witness" ] -> print_foreach_witness env p al p.pevents
+    | [ "pevent" ] ->
+        let env = bind_pevents env p in
+        print_foreach_pevent env p al
+    | [ "witness" ] ->
+        let env = bind_pevents env p in
+        print_foreach_witness env p al
     | _ -> raise Not_found
   and print_foreach_string env p al list lab =
     let () =
@@ -606,7 +623,7 @@ let print_foreach print_ast _eval_expr =
            1 list
     in
     ()
-  and print_foreach_pevent env p al list =
+  and print_foreach_pevent env p al =
     let rec loop first cnt = function
       | _ :: l ->
           let env =
@@ -618,11 +635,13 @@ let print_foreach print_ast _eval_expr =
           loop false (cnt + 1) l
       | [] -> ()
     in
-    loop true 1 list
-  and print_foreach_witness env p al list =
+    let pevents_value = get_env "pevents" env in
+    let pevents = get_pevent pevents_value in
+    loop true 1 pevents
+  and print_foreach_witness env p al =
     match get_env "cnt" env with
     | Vint i -> (
-        match try Some (List.nth list (i - 1)) with Failure _ -> None with
+        match try Some (nth_pevent (i - 1) env) with Failure _ -> None with
         | Some e ->
             let last = Array.length e.epers_witnesses - 1 in
             Array.iteri
