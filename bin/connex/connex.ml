@@ -188,39 +188,41 @@ let move base basename =
             (sou base origin_file) nb;
           if !detail == nb then List.iter (print_family base basename) ifaml
           else print_family base basename ifam;
-          (if !statistics then
-           try Hashtbl.replace hts nb (Hashtbl.find hts nb + 1)
-           with Not_found -> Hashtbl.add hts nb 1);
-          flush stdout;
-          let check_ask =
-            if !exact then nb = !ask_for_delete else nb <= !ask_for_delete
-          in
-          if !ask_for_delete > 0 && check_ask then (
-            (* if -o file, repeat branch definition to stderr! *)
-            Printf.eprintf "Delete up to %d branches of size %s %d ?\n"
-              !cnt_for_delete
-              (if !exact then "=" else "<=")
-              !ask_for_delete;
-            flush stderr;
-            let r =
-              if !cnt_for_delete > 0 then "y"
-              else (
-                Printf.eprintf "Delete that branch (y/N) ?";
-                flush stderr;
-                input_line stdin)
-            in
-            if r = "y" then (
-              decr cnt_for_delete;
-              List.iter
-                (fun ifam ->
-                  let fam = foi base ifam in
-                  effective_del base (ifam, fam))
-                ifaml;
-              Printf.eprintf "%d families deleted\n" (List.length ifaml);
-              flush stderr)
-            else (
-              Printf.printf "Nothing done.\n";
-              flush stdout))))
+          if !statistics then
+            match Hashtbl.find_opt hts nb with
+            | None -> Hashtbl.add hts nb 1
+            | Some n ->
+                Hashtbl.replace hts nb (n + 1);
+                flush stdout;
+                let check_ask =
+                  if !exact then nb = !ask_for_delete else nb <= !ask_for_delete
+                in
+                if !ask_for_delete > 0 && check_ask then (
+                  (* if -o file, repeat branch definition to stderr! *)
+                  Printf.eprintf "Delete up to %d branches of size %s %d ?\n"
+                    !cnt_for_delete
+                    (if !exact then "=" else "<=")
+                    !ask_for_delete;
+                  flush stderr;
+                  let r =
+                    if !cnt_for_delete > 0 then "y"
+                    else (
+                      Printf.eprintf "Delete that branch (y/N) ?";
+                      flush stderr;
+                      input_line stdin)
+                  in
+                  if r = "y" then (
+                    decr cnt_for_delete;
+                    List.iter
+                      (fun ifam ->
+                        let fam = foi base ifam in
+                        effective_del base (ifam, fam))
+                      ifaml;
+                    Printf.eprintf "%d families deleted\n" (List.length ifaml);
+                    flush stderr)
+                  else (
+                    Printf.printf "Nothing done.\n";
+                    flush stdout))))
     (Gwdb.ifams base);
   if !ask_for_delete > 0 then Gwdb.commit_patches base;
   if !statistics then (

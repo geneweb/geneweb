@@ -401,7 +401,7 @@ let print_anniv conf base p dead_people level =
 let cousmenu_print = Perso.interp_templ "cousmenu"
 
 let print conf base p =
-  let max_lvl = max_cousin_level conf base p in
+  let max_lvl = max_cousin_level conf in
   (* v1 is the number of generation we go up to get a common ancestor,
      v2 is the number of generation we go down from the ancestor.
      e.g.
