@@ -4,6 +4,11 @@ open Def
 open Gwdb
 open Util
 
+type one_cousin =
+  Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int
+
+type cousins_i_j = one_cousin list
+
 let default_max_cnt = 2000
 
 let max_cousin_level conf =
@@ -73,6 +78,7 @@ let sibling_has_desc_lev conf base lev (ip, _) =
 
 (* begin cousins *)
 
+let cousins_table = Array.make_matrix 1 1 []
 let tm = Unix.localtime (Unix.time ())
 let today_year = tm.Unix.tm_year + 1900
 let cousins_t = ref None
@@ -124,7 +130,8 @@ let max_descendant_level conf _base _ip max_lvl =
 let get_min_max_dates base l =
   let rec loop (min, max) = function
     | [] -> (min, max)
-    | (ip, _, _, _) :: l -> (
+    | one_cousin :: l -> (
+        let ip, _, _, _ = one_cousin in
         let not_dead = get_death (poi base ip) = NotDead in
         let birth_date, death_date, _ =
           Gutil.get_birth_death_date (poi base ip)
@@ -172,27 +179,30 @@ let rec ascendants base acc l =
   match l with
   | [] -> acc
   (* TODO type for this tuple?; why list of level? *)
-  | (ip, _, _, lev :: _ll) :: l -> (
+  | (ip, _, _, lev) :: l -> (
       match get_parents (poi base ip) with
       | None -> ascendants base acc l
       | Some ifam ->
           let cpl = foi base ifam in
           let ifath = get_father cpl in
           let imoth = get_mother cpl in
-          let acc = [ (ifath, [], ifath, [ lev + 1 ]) ] @ acc in
-          let acc = [ (imoth, [], imoth, [ lev + 1 ]) ] @ acc in
+          let acc = [ (ifath, [], ifath, lev + 1) ] @ acc in
+          let acc = [ (imoth, [], imoth, lev + 1) ] @ acc in
           ascendants base acc l)
-  | _ :: l ->
-      !GWPARAM.syslog `LOG_WARNING
-        "Unexpected empty level list in ascend computation\n";
-      ascendants base acc l
 
 (* descendants des ip de liste1 sauf ceux présents dans liste2 *)
 let descendants_aux base liste1 liste2 =
-  let liste2 = List.map (fun (ip, _, _, _) -> ip) liste2 in
+  let liste2 =
+    List.map
+      (fun one_cousin ->
+        let ip, _, _, _ = one_cousin in
+        ip)
+      liste2
+  in
   let rec loop0 acc = function
     | [] -> acc
-    | (ip, ifaml, ipar0, lev :: _ll) :: l ->
+    | one_cousin :: l ->
+        let ip, ifaml, ipar0, lev = one_cousin in
         let fams = Array.to_list (get_family (poi base ip)) in
         let chlds =
           (* accumuler tous les enfants de ip *)
@@ -207,7 +217,7 @@ let descendants_aux base liste1 liste2 =
                     | [] -> acc2
                     | ipch :: children ->
                         loop2
-                          ((ipch, ifam :: ifaml, ipar0, [ lev - 1 ]) :: acc2)
+                          ((ipch, ifam :: ifaml, ipar0, lev - 1) :: acc2)
                           children
                   in
                   loop2 [] (Array.to_list (get_children (foi base ifam)))
@@ -218,15 +228,12 @@ let descendants_aux base liste1 liste2 =
         in
         let chlds =
           List.fold_left (* on élimine les enfants présents dans l2 *)
-            (fun acc (ip, ifaml, ipar, lev) ->
-              if List.mem ip liste2 then acc else (ip, ifaml, ipar, lev) :: acc)
+            (fun acc one_cousin ->
+              let ip, _ifaml, _ipar, _lev = one_cousin in
+              if List.mem ip liste2 then acc else one_cousin :: acc)
             [] chlds
         in
         loop0 (chlds @ acc) l
-    | _ :: l ->
-        !GWPARAM.syslog `LOG_INFO
-          "Unexpected empty level list in descend computation\n";
-        loop0 acc l
   in
   loop0 [] liste1
 
@@ -236,60 +243,124 @@ let descendants base cousins_cnt i j =
   descendants_aux base liste1 liste2
 
 let init_cousins_cnt conf base p =
-  let max_a_l = max_ancestor_level conf base (get_iper p) mal in
+  let _max_a_l = max_ancestor_level conf base (get_iper p) mal in
+  let max_a_l =
+    match p_getenv conf.Config.env "v" with
+    | Some v -> int_of_string v
+    | None -> 3
+  in
   let max_d_l = max_descendant_level conf base (get_iper p) mdl in
+
+  let rec loop0 j cousins_cnt cousins_dates =
+    (* initiate lists of direct descendants *)
+    cousins_cnt.(0).(j) <- descendants base cousins_cnt 0 j;
+    cousins_dates.(0).(j) <- get_min_max_dates base cousins_cnt.(0).(j);
+    if j < Array.length cousins_cnt.(0) - 1 && cousins_cnt.(0).(j) <> [] then
+      loop0 (j + 1) cousins_cnt cousins_dates
+    else ()
+  in
+  let rec loop1 i cousins_cnt cousins_dates =
+    (* get ascendants *)
+    cousins_cnt.(i).(0) <- ascendants base [] cousins_cnt.(i - 1).(0);
+    cousins_dates.(i).(0) <- get_min_max_dates base cousins_cnt.(i).(0);
+    let rec loop2 i j cousins_cnt cousins_dates =
+      (* get descendants of c1, except persons of previous level (c2) *)
+      cousins_cnt.(i).(j) <- descendants base cousins_cnt i j;
+      cousins_dates.(i).(j) <- get_min_max_dates base cousins_cnt.(i).(j);
+      if j < Array.length cousins_cnt.(0) - 1 && cousins_cnt.(i).(j) <> [] then
+        loop2 i (j + 1) cousins_cnt cousins_dates
+      else if
+        (* TODO limit construction to l1 *)
+        i < Array.length cousins_cnt - 1 && cousins_cnt.(i).(0) <> []
+      then loop1 (i + 1) cousins_cnt cousins_dates
+      else ()
+    in
+    loop2 i 1 cousins_cnt cousins_dates
+  in
+
+  let expand_tables key v1 max_a_l cousins_cnt cousins_dates =
+    Printf.sprintf "******** Expand tables from %d to %d ********\n" v1 max_a_l
+    |> !GWPARAM.syslog `LOG_WARNING;
+    if
+      max_a_l + 3 > Sys.max_array_length
+      || max_d_l + max_a_l + 3 > Sys.max_array_length
+    then failwith "Cousins table too large for system";
+    let new_cousins_cnt =
+      Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
+    in
+    let new_cousins_dates =
+      Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0)
+    in
+    for i = 0 to v1 do
+      new_cousins_cnt.(i) <- cousins_cnt.(i);
+      new_cousins_dates.(i) <- cousins_dates.(i)
+    done;
+    loop0 (max_d_l + v1) cousins_cnt cousins_dates;
+    loop1 v1 cousins_cnt cousins_dates;
+    (key, max_a_l, cousins_cnt, cousins_dates)
+  in
+
+  let build_tables key =
+    Printf.sprintf "******** Compute %d × %d table ********\n" (max_a_l + 3)
+      (max_d_l + max_a_l + 3)
+    |> !GWPARAM.syslog `LOG_WARNING;
+    if
+      max_a_l + 3 > Sys.max_array_length
+      || max_d_l + max_a_l + 3 > Sys.max_array_length
+    then failwith "Cousins table too large for system";
+    let () = load_ascends_array base in
+    let () = load_couples_array base in
+    (* +3: there may be more descendants for cousins than my own *)
+    let cousins_cnt =
+      Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
+    in
+    let cousins_dates =
+      Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0)
+    in
+    cousins_cnt.(0).(0) <-
+      [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, 0) ];
+    cousins_dates.(0).(0) <- get_min_max_dates base cousins_cnt.(0).(0);
+    loop0 1 cousins_cnt cousins_dates;
+    loop1 1 cousins_cnt cousins_dates;
+    (key, max_a_l, cousins_cnt, cousins_dates)
+  in
+
+  let fn = Name.strip_lower @@ sou base @@ get_surname p in
+  let sn = Name.strip_lower @@ sou base @@ get_first_name p in
+  let occ = get_occ p in
+  let key = Format.sprintf "%s.%d.%s" fn occ sn in
   match (!cousins_t, !cousins_dates_t) with
   | Some t, Some d_t -> (t, d_t)
   | _, _ ->
-      let t', d_t' =
-        Printf.sprintf "******** Compute %d × %d table ********\n" (max_a_l + 3)
-          (max_d_l + max_a_l + 3)
-        |> !GWPARAM.syslog `LOG_WARNING;
-        if
-          max_a_l + 3 > Sys.max_array_length
-          || max_d_l + max_a_l + 3 > Sys.max_array_length
-        then failwith "Cousins table too large for system";
-        let () = load_ascends_array base in
-        let () = load_couples_array base in
-        (* +3: there may be more descendants for cousins than my own *)
-        let cousins_cnt =
-          Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
-        in
-        let cousins_dates =
-          Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0)
-        in
-        cousins_cnt.(0).(0) <-
-          [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
-        cousins_dates.(0).(0) <- get_min_max_dates base cousins_cnt.(0).(0);
-        let rec loop0 j =
-          (* initiate lists of direct descendants *)
-          cousins_cnt.(0).(j) <- descendants base cousins_cnt 0 j;
-          cousins_dates.(0).(j) <- get_min_max_dates base cousins_cnt.(0).(j);
-          if j < Array.length cousins_cnt.(0) - 1 && cousins_cnt.(0).(j) <> []
-          then loop0 (j + 1)
-          else ()
-        in
-        loop0 1;
-        let rec loop1 i =
-          (* get ascendants *)
-          cousins_cnt.(i).(0) <- ascendants base [] cousins_cnt.(i - 1).(0);
-          cousins_dates.(i).(0) <- get_min_max_dates base cousins_cnt.(i).(0);
-          let rec loop2 i j =
-            (* get descendants of c1, except persons of previous level (c2) *)
-            cousins_cnt.(i).(j) <- descendants base cousins_cnt i j;
-            cousins_dates.(i).(j) <- get_min_max_dates base cousins_cnt.(i).(j);
-            if j < Array.length cousins_cnt.(0) - 1 && cousins_cnt.(i).(j) <> []
-            then loop2 i (j + 1)
-            else if
-              i < Array.length cousins_cnt - 1 && cousins_cnt.(i).(0) <> []
-            then loop1 (i + 1)
-            else ()
-          in
-          loop2 i 1
-        in
-        loop1 1;
-        (cousins_cnt, cousins_dates)
+      let _pnoc, _v1, t', d_t' =
+        match List.assoc_opt "cache_cousins_tool" conf.Config.base_env with
+        | Some "yes" -> (
+            Printf.eprintf "Cache_cousins_tool=yes\n";
+            flush stderr;
+            let pnoc, v1, t', d_t' =
+              Mutil.read_or_create_value "cousins_cache" (fun () ->
+                  build_tables key)
+            in
+            match (pnoc, v1) with
+            | pnoc, v1 when pnoc = key && max_a_l <= v1 -> (pnoc, v1, t', d_t')
+            | pnoc, v1 when pnoc = key ->
+                let _pnoc, _v1, t', d_t' =
+                  Mutil.read_or_create_value "cousins_cache" (fun () ->
+                      build_tables key)
+                in
+                Sys.remove "cousins_cache";
+                Mutil.read_or_create_value "cousins_cache" ~magic:key (fun () ->
+                    expand_tables key v1 max_a_l t' d_t')
+            | _ ->
+                Sys.remove "cousins_cache";
+                Mutil.read_or_create_value "cousins_cache" (fun () ->
+                    build_tables key))
+        | _ ->
+            Printf.eprintf "Cache_cousins_tools=no\n";
+            flush stderr;
+            build_tables key
       in
+
       cousins_t := Some t';
       cousins_dates_t := Some d_t';
       flush stderr;
@@ -353,27 +424,29 @@ let cousins_l1_l2_aux conf base l1 l2 p =
   then Some cousins_cnt.(il1).(il2)
   else None
 
-(* create a new l (ip, (ifamll, iancl, cnt), lev) from (ip, ifaml, ianc, lev) *)
+(* create a new list of (ip, (ifamll, iancl, cnt), lev) from one_cousin list *)
 let cousins_fold l =
   let _same_ifaml ifl1 ifl2 =
     List.for_all2 (fun if1 if2 -> if1 = if2) ifl1 ifl2
   in
   let l = List.sort compare l in
   let rec loop first acc (ip0, (ifaml0, iancl0, cnt0), lev0) = function
-    | (ip, ifaml, ianc, lev) :: l when ip = ip0 ->
-        loop false acc
-          ( ip,
-            ( ifaml :: ifaml0,
-              (if List.mem ianc iancl0 then iancl0 else ianc :: iancl0),
-              cnt0 + 1 ),
-            lev @ lev0 )
-          l
-    | (ip, ifaml, ianc, lev) :: l ->
-        loop false
-          (if first || cnt0 = 0 then acc
-          else (ip0, (ifaml0, iancl0, cnt0), lev0) :: acc)
-          (ip, ([ ifaml ], [ ianc ], 1), lev)
-          l
+    | one_cousin :: l ->
+        let ip, ifaml, ianc, lev = one_cousin in
+        if ip = ip0 then
+          loop false acc
+            ( ip,
+              ( ifaml :: ifaml0,
+                (if List.mem ianc iancl0 then iancl0 else ianc :: iancl0),
+                cnt0 + 1 ),
+              lev :: lev0 )
+            l
+        else
+          loop false
+            (if first || cnt0 = 0 then acc
+             else (ip0, (ifaml0, iancl0, cnt0), lev0) :: acc)
+            (ip, ([ ifaml ], [ ianc ], 1), [ lev ])
+            l
     | [] ->
         if first || cnt0 = 0 then acc
         else (ip0, (ifaml0, iancl0, cnt0), lev0) :: acc
@@ -403,7 +476,8 @@ let cousins_implex_cnt conf base l1 l2 p =
                   let rec loop2 cousl_j cnt =
                     match cousl_j with
                     | [] -> cnt
-                    | (ipj, _, _, _) :: cousl_j ->
+                    | one_cousin :: cousl_j ->
+                        let ipj, _, _, _ = one_cousin in
                         if ip = ipj then loop2 cousl_j (cnt + 1)
                         else loop2 cousl_j cnt
                   in
@@ -425,8 +499,7 @@ let init_asc_cnt conf base p =
   | None ->
       let t' =
         let asc_cnt = Array.make (max_a_l + 2) [] in
-        asc_cnt.(0) <-
-          [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
+        asc_cnt.(0) <- [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, 0) ];
         for i = 1 to max_a_l do
           asc_cnt.(i) <- ascendants base [] asc_cnt.(i - 1)
         done;
@@ -444,7 +517,7 @@ let init_desc_cnt conf base p =
       let t' =
         let desc_cnt = Array.make (max_d_l + 2) [] in
         desc_cnt.(0) <-
-          [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, [ 0 ]) ];
+          [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, 0) ];
         for i = 1 to min max_d_l (Array.length desc_cnt - 1) do
           desc_cnt.(i) <- descendants_aux base desc_cnt.(i - 1) []
         done;

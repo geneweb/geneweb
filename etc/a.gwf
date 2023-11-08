@@ -176,6 +176,10 @@ max_cousins=2000
 # Maximum level of displayed cousins.
 max_cousins_level=5
 
+# Use cache file “cache_cousins” for cousins tool (m=C).
+# Usefull when self has a lot of relationships.
+#cache_cousins_tool=yes
+
 # Number of latest events (birth, death) displayed in statistics.
 latest_event=50
 
