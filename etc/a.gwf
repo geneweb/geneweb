@@ -1,47 +1,72 @@
 # This is the default GeneWeb base configuration file
+# ================
+# Important notice:
+# Most parameters are hardcoded in the source code,
+# but are modified via this configuration file.
+# Each bvar to be uncommented as needed.
+# - for a lot of 'boolean' bvars (yes/no or on/off),
+#   non default value is specified as commented line,
+#   and the code only test this non default one.
+# - for string or numerical bvars,
+#   default value (if any) is specified as commented line.
+# - To ease manual sorting of all bvars,
+#   they are specified without space character after comment one.
+#   script example to generate the list:
+#   $cat etc/a.gwf | grep -vE '^$|^\#$|^\#\ ' |sort >/tmp/x2
+# ================
 
 # Default language
-default_lang=
+# Default is "fr" for french.
+#default_lang=fr
 
 # Select a default Sosa reference while navigating with an individual’ key
 # (“first_name.occurrence surname”) for eg.:
 # default_sosa_ref=john.3 smith
-default_sosa_ref=
+#default_sosa_ref=
 
 # Message of the day. If set, display this message in the welcome page.
 # Can contain HTML tags.
 #motd=
 
-# Number of years for private access. Dates of persons whose age < this value
-# are not displayed (except for wizards, friends and public persons).
-private_years=100
+# Specify the number of years for the visibility of personal informations
+# in normal access (except for wizards, friends and public persons).
+# If dates of person whose age < this value, then informations not displayed.
+# Warning: The first-name and surname ARE NOT hidden.
+# For a complete hide of person refer to hide_private_names and use_restrict
+#private_years=150
+
+# TODO need to document why needed in addition to private_years
+# if not set then their default value are private_years.
+#private_years_death=
+#private_years_marriage=
 
 # Access by key, when set to "yes", generates HTML requests with
-# "n=first+name;p=surname;oc=number" instead of (shorter) "i=identifier"
-# in URLs. access_by_key=yes/no.
-access_by_key=yes
+# "p=first+name;n=surname;oc=number"
+# instead of (shorter) "i=identifier" in URLs which is default.
+#access_by_key=yes
 
-# Show consanguinity in personal pages if computed.
-show_consang=yes
+# Show consanguinity in personal pages if computed (default)
+# set to no if needed
+#show_consang=no
 
-# Individuals with titles are public (visitors can see them).
-#public_if_titles=yes/no
-public_if_titles=no
+# Individuals with titles are public if set (visitors can see them).
+#public_if_titles=yes
 
-# Individuals without dates are public except if their access is explicitly
-set to “private”.
-#public_if_no_date=yes/no
-public_if_no_date=no
+# Individuals without dates are public if set,
+# except if their access is explicitly set to “private”.
+#public_if_no_date=yes
 
 # Display the picto Sosa on the template perso.txt (individual page).
+# assuming default_sosa_ref is defined
 #display_sosa=yes
 
 # Display the individual in his ’own’ siblings on the template perso.txt
-# (individual page).
-#full_siblings=yes
+# (individual page), except if set to 'no'
+#full_siblings=no
 
 # Display a default man/woman/neuter image when individual image is missing
-default_image=yes
+# (not implemented on all pages)
+#default_image=yes
 
 # Restrict access to friends and wizards.
 #visitor_access=no
@@ -54,17 +79,24 @@ default_image=yes
 # Notes = individual note or Marriage note.
 #no_note_for_visitor=no
 
+# There are multiple access control parameters as documented in
+# https://geneweb.tuxfamily.org/wiki/access
+#
 # Friends access password.
+# allows global access control for persons potentially still alive.
+# If a value is supplied for this variable, only visitors having entered
+# those as friend_id/password will see data about persons born less than
+# “private_years” years.
 # Form: "friend_id:password" or just "password"
-friend_passwd=
+#friend_passwd=
 
 # Alternative way for friend entry: authorization file.
 # The file must hold lines of the form “user:password”.
-friend_passwd_file=
+#friend_passwd_file=
 
 # Wizards access password.
 # Form: "wizard_id:password" or just "password".
-wizard_passwd=
+#wizard_passwd=
 
 # Alternative way for wizard entry: authorization file.
 # The file must hold lines of the form either:
@@ -79,12 +111,12 @@ wizard_passwd=
 # example, with "Daniel de /Rauglaudre" as "complete name", it is ordered
 # at the letter ‹R› (like “Rauglaudre”) and in the form:
 #    Rauglaudre (Daniel de)
-# but it his wizard page, it is displayed as “Daniel de Rauglaudre” without
+# but in his wizard page, it is displayed as “Daniel de Rauglaudre” without
 # the slash.
-wizard_passwd_file=
+#wizard_passwd_file=
 
 # Alternative to wizard_passwd_file
-# If a global password is provided through wizard_passzd, then this file
+# If a global password is provided through wizard_passwd, then this file
 # Allows description of wizards (wizard notes button)
 #wizard_descr_file=
 
@@ -92,17 +124,22 @@ wizard_passwd_file=
 #wizard_just_friend=yes
 
 # Authorized wizards notes. By default, wizards notes are not allowed.
-#authorized_wizards_notes=yes/no
+#authorized_wizards_notes=yes
 
 # Global authorization file for this database (overriding the value
 # of the option "-auth" of "gwd"). This file must hold lines of the
 # form "user:password". Works only in server (not cgi) mode.
-auth_file=
+#auth_file=
 
-# More restricted system to hide private names; the hidden persons are
-# not clickable, the links to their children, ancestors and spouses are
-# not accessible. use_restrict=yes/no
-use_restrict=no
+# If set, the names of the private persons (less than private_years old)
+# are not displayed: "x x" is displayed instead.
+# To see the real names, one must be "wizard" or "friend".
+#hide_private_names=yes
+
+# More restricted system than hide_private_names.
+# if set the hidden persons are not clickable, and
+# the links to their children, ancestors and spouses are not accessible.
+#use_restrict=yes
 
 # Don’t authorise wizards to send images.
 #can_send_image=no
@@ -114,11 +151,11 @@ use_restrict=no
 # by “send image”). Applies only for images not found in the image/base
 # directory. This value, when set, could typically start with https://…
 # or file://…
-images_path=
+#images_path=
 
-# “Birth/death symbols” in dates (default: christians’ one °/†)
-#birth_symbol=
-#death_symbol=
+# “Birth/death symbols” in dates (default: christians’ one)
+#birth_symbol=°
+#death_symbol=†
 
 # Hide “search by titles” be on the welcome page.
 #propose_titles=no
@@ -127,11 +164,13 @@ images_path=
 # families not connected to the rest on the database).
 #propose_add_family=no
 
-# Hide “place/surname” button on welcome page.
-#propose_place_surname=no
+# Hide “Places/surname” button on welcome page.
+# By default button is accessible.
+#propose_place_surnames=no
 
 # Hide “advanced request” button on welcome page.
-#hide_advanced_request=yes
+# hiden by default since gw version 4.0
+#hide_advanced_request=no
 
 # Hide “counter of visits” on welcome page.
 #counter=no
@@ -139,6 +178,8 @@ images_path=
 # Alternate text for the main “Notes” button on the welcome page.
 #base_notes_title=
 
+# TODO need to understand purpose
+# was initially added by git commit 606f82cc4
 # Provide a list of names for the decomposition of places (comma separated)
 # other = ""; town = ""; township = ""; canton = ""; district = "";
 # county = ""; region = ""; country = "".
@@ -147,14 +188,18 @@ images_path=
 # Tell that in this database the order of places are registered inverted
 # (being more general to less general), e.g. "USA, New York" instead of
 # "New-York, USA". Set it to "yes" if it is the case. Important for display
-# by places/surnames.
-places_inverted=no
+# by Places/surname.
+#places_inverted=yes
 
-# Link in the display place/surname to list of individuals.
-place_surname_link_to_ind=yes
+# In the Places/surname page,
+# the surname string may be a link to list all individuals of that surname,
+# not only those in related place.
+#place_surname_link_to_ind=yes
 
-# Limit for list of individuals list presented in Place/Surname page.
-# If above link to the list is hidden.
+# The max number for relation list is the
+# list size limit for "list of individuals by Place"
+# each list accessible from "Places/surname" page.
+# A list is not generated if number of individuals is greater.
 #max_rlm_nbr=80
 
 # Maximum number of generations when displaying ancestors.
@@ -171,31 +216,34 @@ place_surname_link_to_ind=yes
 #max_desc_tree=6
 
 # Maximum number of displayed cousins.
-max_cousins=2000
+#max_cousins=2000
 
 # Maximum level of displayed cousins.
-max_cousins_level=5
+#max_cousins_level=6
 
 # Use cache file “cache_cousins” for cousins tool (m=C).
 # Usefull when self has a lot of relationships.
 #cache_cousins_tool=yes
 
 # Number of latest events (birth, death) displayed in statistics.
-latest_event=50
+#latest_event=20
 
 # Always display the children surnames even if same than father.
 # Applies in descendants page, in surname displaying page,
 # also in siblings and union modules.
+# default is to not display if same surname.
+# Note for templm: if variable is set in gwf, then user may force the reverse
+# by manually adding always_surname=no in query url.
 #always_surname=yes
 
 # Allow an historic file that log all updates in database in a file named
-“history” in the database directory. This file grows indefinitively.
-history=yes
+# “history” in the database directory. This file grows indefinitively.
+#history=yes
 
-# Allow to see differences between modifications form history.
-# Diff files are stored in a database subdirectory or the specified 
+# Allow to see differences between modifications from history.
+# Diff files are stored in a database subdirectory or the specified
 # “history_path” directory (see below) that grows indefinitively.
-history_diff=yes
+#history_diff=yes
 
 # Path to store all the histories (default "history_d").
 #history_path=
@@ -217,13 +265,13 @@ history_diff=yes
 # distribution.
 #
 # Other templates can be added in the databases directory in a subdirectory
-# also named etc: e.g. etc/foo/perso.txt, etc/bar/perso.txt, # and so on.
+# also named etc: e.g. etc/foo/perso.txt, etc/bar/perso.txt, and so on.
 #
 # The "template" variable tells which templates are allowed for this
 # database and gives the default template. It is a list of directories
 # separated by commas. Empty directory means "the standard template".
 # Star means "any template". The first of the list gives the default
-# template # to be used. Examples:
+# template to be used. Examples:
 #
 # template=*       any template allowed; default = standard one
 # template=foo,*   any template allowed; default = foo
@@ -251,6 +299,7 @@ history_diff=yes
 # Customise the individual page.
 # Full documentation https://geneweb.tuxfamily.org/wiki/templates
 # Each module is defined by a unique letter between a-z.
+# (no prefix # character because mandatory as per source code)
 perso_module_i=individu
 perso_module_p=parents
 perso_module_g=gr_parents
@@ -272,23 +321,27 @@ perso_module_l=ligne
 # and the value of its display option
 # The modules are displayed in the order in which they appear in "p_mod"
 # In the example below, "gr_parents", "individu", parents", "unions"…
-#p_mod=g1i2p1u3
-p_mod=
+# p_mod=g1i2p1u3
+# By default when not set (or 'zz'), the display is a static choice of module.
+#p_mod=
 
-# Limits the results of Books (m=MOD_DATA) accessible by wizard (default 1000)
-#book_max_results=
+# Limits the results of Books (m=MOD_DATA) accessible by wizard
+#book_max_results=1000
 
+# This variable allows to set up the maximum number of updates
+# that can be done at a single time.
 # Default value if not specified is 5000 (which means that it will
 # take at most 5 s to realize a set of modifications (such as the
 # “set of places”, “set of sources”…
-#max_nb_update=2000
+# If specified, the value will be limited to 5000.
+#max_nb_update=5000
 
 # Use a distant CDN (Content Delivery Network) to load CSS/JS files instead
 # of loading them by the GWD server.
 #use_cdn=yes
 
 # Hide the hourglass and bug icons on top left corner that reports the delta
-# time of last query action and potiential errors. 
+# time of last query action and potiential errors.
 #hide_querytime_bugs=yes
 
 # in case of multiple input gw files,
@@ -298,7 +351,9 @@ p_mod=
 #origin_file=on
 
 # Allow the usage of the request m=KILL_ANC (templm)
-#can_kill_ancestors=no
+# This was a [WIP] since version 3.11 because no defined button, links
+# intermediate pages to ask for confirmation, things like that.
+#can_kill_ancestors=yes
 
 # Disable the forum (all the request on the forum are “incorect request”.
 #disable_forum=yes
@@ -341,11 +396,14 @@ p_mod=
 # Customize the default.css stylesheet or create your own one and
 # specify it to geneweb by adding this line in your gwf.
 # More about how to customize here :
-# http://geneweb.tuxfamily.org/wiki/CSS
+# https://geneweb.tuxfamily.org/wiki/CSS
 #css_prop=your/file.css
 
 # Highlight color
-highlight_color=#2f6400
+# used to highlight only a few text strings
+# like the date strings in Anniversaries pages.
+# TODO: what are the other elements ?
+#highlight_color=#2f6400
 
 # Customized variables.
 #
@@ -361,9 +419,9 @@ highlight_color=#2f6400
 # will be:
 #   My name is Bond, James Bond.
 
-# If more that short_place_threshold places, revert to short display mode
-# default 500
-#short_place_threshold=
+# On Places/suname page do not display "Full display" list of places
+# ff more than short_place_threshold places.
+#short_place_threshold=500
 
 # Maximum number to see an identical ancestor in the surname list.
 #max_ancestor_implex=5
@@ -373,7 +431,7 @@ highlight_color=#2f6400
 #long_date=yes
 
 # Fast access to surnames and first names alphabetic order be fast
-# (interesting for very big databases). Drawback: the first page won’t 
+# (interesting for very big databases). Drawback: the first page won’t
 # display the number of surnames or first names.
 #fast_alphabetic=yes
 
@@ -386,7 +444,7 @@ highlight_color=#2f6400
 # Print the title of individual in an advanced way. Default prints only
 # first_name and surname. In the advanced way, search for the title name,
 # estate ... and print something clever.
-print_advanced_title=yes
+#print_advanced_title=yes
 
 # Notify change program (e.g. shell script) to be executed for each
 # database change. First argument is the name of the base, then the
@@ -397,8 +455,8 @@ print_advanced_title=yes
 # (see update_text).
 #notify_change=
 
-# In French, de Amélie should be written an d'Amélie because
-# the string Amélie begins by a vowel
+# In French, de Amélie should be written as d'Amélie
+# because the string Amélie begins by a vowel.
 # The test is performed on a unaccented and lowered copy of the string
 # The vowel parameter provides a list of characters considered as vowels
 # Fancy utf-8 characters such as æ and ø are taken into account
