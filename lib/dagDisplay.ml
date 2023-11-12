@@ -992,7 +992,7 @@ let rec eval_var conf base env _xx _loc = function
   | [ "person_index" ] -> (
       match find_person_in_env conf base "" with
       | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
-      | None -> raise Not_found)
+      | None -> VVstring "")
   (* person_index.x -> i=, p=, n=, oc= *)
   (* person_index.1 -> i1=, p1=, n1=, oc1= *)
   (* person_index.2 -> i2=, p2=, n2=, oc2= *)
@@ -1004,7 +1004,7 @@ let rec eval_var conf base env _xx _loc = function
       let s = if x = "x" then "" else x in
       match find_person conf base s with
       | Some p -> eval_person_var conf base p sl
-      | None -> raise Not_found)
+      | None -> VVstring "")
   | [ "person_index"; x ] -> (
       let find_person =
         match x with "e" -> find_person_in_env_pref | _ -> find_person_in_env
@@ -1012,7 +1012,7 @@ let rec eval_var conf base env _xx _loc = function
       let s = if x = "x" then "" else x in
       match find_person conf base s with
       | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
-      | None -> raise Not_found)
+      | None -> VVstring "")
   | [ "set_var"; name; value ] -> (
       match get_env "vars" env with
       | Vvars lv ->
