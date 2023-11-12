@@ -404,36 +404,46 @@ let update_person_list conf base new_input list nb_pers max_updates =
   let list =
     if nb_pers > max_updates then reduce_cpl_list max_updates list else list
   in
+  let cnt = ref 0 in
   List.iter
     (fun (old, perl) ->
       (* Mise à jour de toutes les personnes concernées. *)
       List.iter
         (fun p ->
-          let o_p = Util.string_gen_person base (gen_person_of_person p) in
-          let np = update_person conf base old new_input p in
-          (if action = "fn" || action = "sn" then
-           let pi = np.key_index in
-           let op = poi base pi in
-           let sp =
-             Futil.map_person_ps (fun ip -> ip) (fun istr -> sou base istr) np
-           in
-           Image.rename_portrait conf base op (sp.first_name, sp.surname, sp.occ));
-          patch_person base np.key_index np;
-          if test_family then
-            Array.iter
-              (fun ifam ->
-                let fam = foi base ifam in
-                let nfam = update_family conf base old new_input fam in
-                patch_family base nfam.fam_index nfam)
-              (get_family p);
-          (* On met aussi à jour l'historique. *)
-          let changed =
-            U_Multi
-              ( o_p,
-                Util.string_gen_person base np,
-                if action = "fn" || action = "sn" then true else false )
-          in
-          History.record conf base changed action)
+          if
+            sou base (get_first_name p) <> "?"
+            || sou base (get_surname p) <> "?"
+          then (
+            incr cnt;
+            let o_p = Util.string_gen_person base (gen_person_of_person p) in
+            let np = update_person conf base old new_input p in
+            (if action = "fn" || action = "sn" then
+               let pi = np.key_index in
+               let op = poi base pi in
+               let sp =
+                 Futil.map_person_ps
+                   (fun ip -> ip)
+                   (fun istr -> sou base istr)
+                   np
+               in
+               Image.rename_portrait conf base op
+                 (sp.first_name, sp.surname, sp.occ));
+            patch_person base np.key_index np;
+            if test_family then
+              Array.iter
+                (fun ifam ->
+                  let fam = foi base ifam in
+                  let nfam = update_family conf base old new_input fam in
+                  patch_family base nfam.fam_index nfam)
+                (get_family p);
+            (* On met aussi à jour l'historique. *)
+            let changed =
+              U_Multi
+                ( o_p,
+                  Util.string_gen_person base np,
+                  if action = "fn" || action = "sn" then true else false )
+            in
+            History.record conf base changed action))
         perl)
     list;
   Util.commit_patches conf base;
@@ -442,7 +452,11 @@ let update_person_list conf base new_input list nb_pers max_updates =
   (* personnes, car si l'administrateur de la base ne modifie pas tous *)
   (* les évènements liés à cette donnée, on ne sera pas mis au courant *)
   (* que la base à été mise à jour.                                    *)
-  History.notify conf base action
+  History.notify conf base action;
+  !cnt
+
+let move_particle base s =
+  Util.surname_without_particle base s ^ Util.surname_particle base s
 
 (** Get all the data and filter them if ["s"] is defined in [conf.env] *)
 let build_list conf base =
@@ -452,12 +466,15 @@ let build_list conf base =
   if ini <> "" then
     Mutil.filter_map
       (fun istr ->
-        let str = sou base istr in
+        let str = sou base istr |> move_particle base in
         if Mutil.start_with_wildcard ini 0 @@ Place.without_suburb str then
           Some (istr, str)
         else None)
       list
-  else List.rev_map (fun istr -> (istr, sou base istr)) list
+  else
+    List.filter_map
+      (fun istr -> Some (istr, sou base istr |> move_particle base))
+      (List.rev list)
 
 let build_list_short conf list =
   let ini = Option.value ~default:"" (p_getenv conf.env "s") in

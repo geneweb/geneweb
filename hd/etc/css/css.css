@@ -17,8 +17,8 @@ html {
 }
 
 /* scrollbar appear as an overlay, thus not affecting the width of the page when appering */
-.book html {
-  overflow-y: overlay;
+.book-anchor {
+  scroll-margin-top: 5rem;
 }
 
 @include media-breakpoint-up(sm) {

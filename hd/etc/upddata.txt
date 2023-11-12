@@ -76,9 +76,9 @@
             %foreach;value;
               <li class="list-unstyled ml-4" id="k%entry_key;">
                 <div class="d-flex">
-                  <div class="d-flex flex-column justify-content-center">
+                  %if;(e.data="place")
                     %(TODO: Fix URL encoding for escape.printable.suburb/other ! %)
-                    %if;(e.data="place")
+                    <div class="d-flex flex-column justify-content-center">
                       <a href="https://www.wikidata.org/w/index.php?search=%nn;
                         %if;(not first and suburb!="")%encode.escape.printable.suburb;%else;%encode.other;%end;"
                         role="button" class="btn btn-link p-0 ml-1"
@@ -94,8 +94,8 @@
                           <i class="fab fa-wikipedia-w fa-sm text-danger"></i>
                         </a>
                       %end;
-                    %end;
-                  </div>
+                    </div>
+                  %end;
                   <div class="d-flex flex-column ml-2%if;is_modified; my-2%end;">
                      %if;is_modified;
                        <div class="ml-5 pl-3 text-muted">
@@ -142,7 +142,7 @@
                           %if;(b.notextarea="yes" or e.data="fn" or e.data="sn" or e.data="place")
                             <input type="text" class="form-control col-11" id="nx_input" name="nx_input"
                               maxlength="%if;(e.data="src" or e.data="occu" or e.data="place")1000%else;200%end;"
-                              value="%escape.printable.entry_value;" placeholder="%escape.printable.entry_value;"
+                              value="%escape.printable.entry_value_unsort;" placeholder="%escape.printable.entry_value_unsort;"
                               %if;(e.data!="fn" or e.data!="sn") autofocus%end; aria-label="Recipient's username" required>
                           %else;
                             <textarea class="form-control col-11" id="nx_input" name="nx_input" rows="1"
@@ -181,5 +181,11 @@
 %include;copyr
 </div>
 %include;js
+<script>
+$(document).ready(function(){
+  var hash = window.location.hash.substring(1);
+  $("#"+hash).removeClass("list-unstyled ml-4").addClass("list-group-item list-group-item-action active bg-white book-anchor");
+});
+</script>
 </body>
 </html>

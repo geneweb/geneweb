@@ -30,11 +30,22 @@ let translate_title conf =
     - unit
       [Rem] : Non exporté en clair hors de ce module.                     *)
 let print_mod_ok conf base =
+  let sn = p_getenv conf.env "data" = Some "sn" in
   let ini_of_update_data ini new_input =
-    let len = String.length ini in
-    let len = min len (String.length new_input) in
-    let new_ini = String.sub new_input 0 len in
-    new_ini
+    (* Utf8. returns the number of "real" characters *)
+    let len = Utf8.length ini in
+    let len = if len = 1 then len + 1 else len in
+    let len = min len (Utf8.length new_input) in
+    let new_input =
+      if sn then Util.surname_without_particle base new_input else new_input
+    in
+    let j =
+      let rec loop i j =
+        if i = len then j else loop (i + 1) (Utf8.next new_input j)
+      in
+      loop 0 0
+    in
+    String.sub new_input 0 j
   in
   let data = Option.value ~default:"" (p_getenv conf.env "data") in
   let ini = Option.value ~default:"" (p_getenv conf.env "s") in
@@ -60,7 +71,9 @@ let print_mod_ok conf base =
     | _ -> 5000
   in
   if nb_pers <> 0 && data_modified then (
-    update_person_list conf base new_input list nb_pers max_updates;
+    let nb_pers_reel =
+      update_person_list conf base new_input list nb_pers max_updates
+    in
     let title _ =
       transl conf "modification successful"
       |> Utf8.capitalize_fst |> Output.print_sstring conf
@@ -72,7 +85,7 @@ let print_mod_ok conf base =
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf (transl conf ":");
     Output.print_sstring conf " ";
-    Output.print_sstring conf (min nb_pers max_updates |> string_of_int);
+    Output.print_sstring conf (min nb_pers_reel max_updates |> string_of_int);
     Output.print_sstring conf " ";
     if List.assoc_opt "history" conf.base_env = Some "yes" then (
       Output.print_sstring conf "<a href=\"";
@@ -80,12 +93,12 @@ let print_mod_ok conf base =
       Output.print_sstring conf "m=HIST&k=20\">";
       Output.print_sstring conf
         (transl_nth conf "modification/modifications"
-           (if nb_pers > 1 then 1 else 0));
+           (if nb_pers_reel > 1 then 1 else 0));
       Output.print_sstring conf ".</a>")
     else (
       Output.print_sstring conf
         (transl_nth conf "modification/modifications"
-           (if nb_pers > 1 then 1 else 0));
+           (if nb_pers_reel > 1 then 1 else 0));
       Output.print_sstring conf ".");
     Output.print_sstring conf "</p>";
     if nb_pers > max_updates then (
@@ -106,7 +119,10 @@ let print_mod_ok conf base =
       Output.print_sstring conf
         (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
       Output.print_sstring conf "</button></p></form>");
-    Output.print_sstring conf {|<p><a href="|};
+
+    Output.print_sstring conf
+      (Utf8.capitalize_fst (transl conf "new modification"));
+    Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf {|m=MOD_DATA&data=|};
     Output.print_string conf (Mutil.encode data);
@@ -114,9 +130,19 @@ let print_mod_ok conf base =
     Output.print_string conf (Mutil.encode new_ini);
     Output.print_sstring conf ("#k" ^ new_istr_s);
     Output.print_sstring conf {|" id="reference">|};
-    Output.print_sstring conf
-      (Utf8.capitalize_fst (transl conf "new modification"));
-    Output.print_sstring conf {|</a></p>|};
+    Output.print_sstring conf (transl conf "at new location");
+    Output.print_sstring conf {|</a>|};
+    if not (Mutil.start_with ini 0 new_ini) then (
+      Output.print_sstring conf {| / <a href="|};
+      Output.print_string conf (commd conf);
+      Output.print_sstring conf {|m=MOD_DATA&data=|};
+      Output.print_string conf (Mutil.encode data);
+      Output.print_sstring conf {|&s=|};
+      Output.print_string conf (Mutil.encode ini);
+      Output.print_sstring conf {|">|};
+      Output.print_sstring conf (transl conf "at old location");
+      Output.print_sstring conf {|</a>.|})
+    else Output.print_sstring conf {|.|};
     Hutil.trailer conf)
   else (
     Hutil.header conf (fun _ ->
@@ -194,6 +220,29 @@ and eval_simple_str_var conf _base env _xx = function
   | "entry_ini" -> eval_string_env "entry_ini" env
   | "entry_value" -> eval_string_env "entry_value" env
   | "entry_value_rev" -> eval_string_env "entry_value_rev" env
+  | "entry_value_unsort" ->
+      let sn = p_getenv conf.env "data" = Some "sn" in
+      let s = eval_string_env "entry_value" env in
+      if sn && s.[String.length s - 1] = ')' then
+        match String.rindex_opt s '(' with
+        | Some i ->
+            let part = String.sub s (i + 1) (String.length s - i - 2) in
+            if Mutil.contains s "OEREN" then
+              Printf.eprintf "Part: %s (%s) %d\n" s part (String.length part);
+            let part =
+              if
+                part.[String.length part - 1] = '\''
+                || String.length part >= 3
+                   && Char.code part.[String.length part - 3] = 0xE2
+                   && Char.code part.[String.length part - 2] = 0x80
+                   && (Char.code part.[String.length part - 1] = 0x98
+                      || Char.code part.[String.length part - 1] = 0x99)
+              then part
+              else part ^ " "
+            in
+            part ^ String.sub s 0 i
+        | _ -> s
+      else s
   | "entry_key" -> eval_string_env "entry_key" env
   | "ini" -> eval_string_env "ini" env
   | "incr_count" -> (
