@@ -11128,7 +11128,7 @@ de: hier klicken um eine neue Korrektion durchzuführen
 en: continue edit
 es: pulse aquí para hacer una nueva corrección
 fi: jatka muokkaamista
-fr: cliquez ici pour effectuer une nouvelle correction
+fr: effectuer une nouvelle correction
 it: clicca qui per una nuova correzione
 nl: hier klikken om een nieuwe correctie uit te voeren
 no: fortsett editering
@@ -12021,6 +12021,14 @@ fr: officiant/officiante/officiants
 pt: oficial/oficial/oficiais
 sv: officer/officer/officerer
 tr: memur/memur/memurlar
+
+    at new location
+en: at new location
+fr: au nouvel emplacement
+
+    at old location
+en: at old location
+fr: à l'ancien emplacement
 
     old name
 co: vechju nome
