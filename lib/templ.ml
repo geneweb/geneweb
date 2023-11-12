@@ -352,6 +352,8 @@ let rec eval_variable conf = function
         | None -> if n > 0 then loop (n - 1) else ""
       in
       loop n
+  | [ "link_next" ] -> ""
+  | [ "person_index"; _x ] -> ""
   | [ "prefix_set"; pl ] ->
       let pl_l =
         match pl with

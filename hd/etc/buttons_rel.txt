@@ -4,13 +4,16 @@
 %let;e_im;%if;(e.im!="")0%else;1%end;%in;
 <div class="btn-toolbar my-2 ml-5" role="toolbar" arial-label="config buttons toolbar">
   <div class="d-flex">
-    %if;is_printed_by_template;
+    %if;is_printed_by_template; %( because of person_index and link_next %)
+      %( TODO after check. Could be simplified with those two functions
+         returning "" rather than %person_index.x? or %link_next? in templ.ml %)
       %if;(e.em="R" or ((e.i!="" and e.ei!="") or (person_index.1!="" and person_index.2!="")))
         <a class="%if;(link_next="") disabled%end;%if;(e.et="S") border rounded%end;"
           href="%if;(link_next!="")%link_next;%nn;
             %else;%nn;
               %prefix;&em=R&et=S%nn;
               %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
+              %elseif;(e.ei!="" and e.select!="")&i=%e.select;&ei=%e.ei;%nn;
               %else;&i=%person_index.1;&ei=%person_index.2;%end;%nn;
             %end;%nn;
             %if;(e_im=0)&im=0%end;%nn;
@@ -27,6 +30,7 @@
         <a class="disabled %if;(e.et="S") border rounded%end;"
           href="%prefix;&em=R&et=S%nn;
                 %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
+                %elseif;(e.ei!="" and e.select!="")&i=%e.select;&ei=%e.ei;%nn;
                 %else;&i=%person_index.1;&ei=%person_index.2;%end;%nn;
             %if;(e_im=0)&im=0%end;%nn;
             %if;(e_sp=0)&sp=0%end;%nn;

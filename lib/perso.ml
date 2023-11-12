@@ -2068,7 +2068,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | [ "person_index" ] -> (
       match find_person_in_env conf base "" with
       | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
-      | None -> raise Not_found)
+      | None -> VVstring "")
   (* person_index.x -> i=, p=, n=, oc= *)
   (* person_index.1 -> i1=, p1=, n1=, oc1= *)
   (* person_index.2 -> i2=, p2=, n2=, oc2= *)
@@ -2080,7 +2080,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       let s = if x = "x" then "" else x in
       match find_person conf base s with
       | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
-      | None -> raise Not_found)
+      | None -> VVstring "")
   | "prev_item" :: sl -> (
       match get_env "prev_item" env with
       | Vslistlm ell -> eval_item_field_var ell sl
