@@ -109,7 +109,7 @@
       %and;
         %if;(sosa_ref.is_restricted)%sosa_ref;
         %else;<a href="%prefix;%sosa_ref.access;" title="[Sosa 1]">%sosa_ref;</a>%end;%nn;
-        %if;(sosa.lvl>9)(%apply;nthgen%with;%sosa.lvl;%end;)%end;
+        %if;(sosa.lvl>9) (%apply;nthgen%with;%sosa.lvl;%end;)%end;
       %end;
     %end;
   </li>
