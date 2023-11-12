@@ -649,7 +649,11 @@ let print_del1 conf base p =
   let title () =
     let s = transl_nth conf "person/persons" 0 in
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl_decline conf "delete" s))
+      (Utf8.capitalize_fst (transl_decline conf "delete" s));
+    Output.print_sstring conf " ";
+    Output.print_string conf (Util.escape_html (p_first_name base p));
+    Output.printf conf ".%d " (get_occ p);
+    Output.print_string conf (Util.escape_html (p_surname base p))
   in
   Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
   Output.print_sstring conf "<h2>\n";
