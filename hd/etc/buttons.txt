@@ -113,22 +113,9 @@
         <i class="fas fa-highlighter fa-lg fa-fw" aria-hidden="true"></i>%nn;
       </a>
     %end;
-    %if;((e.m="D" and (e.t="D" or e.t="I" or e.t="H")) or (e.m="A" and e.t="H" and e.force!="on"))
+    %if;((e.m="D" and (e.t="D" or e.t="I" or e.t="H")) or (e.m="A" and e.t="H" and e.same!=""))
       <a role="button" class="btn btn-link px-0"%sp;
-        href="%prefix_base_password;%nn;
-              %if;(not browsing_with_sosa_ref and (e.m="A" and e.t="H"))
-                &pz=%first_name_key;&nz=%surname_key;%if;(occ!=0)&oc=%occ;%end;
-              %end;
-              %foreach;env_binding;
-                %if;(not (env.key="implx" or env.key="force" or env.key=""))&%env.key=%env.val;%end;
-              %end;
-              %( if (e.m="A" and e.t="H") implex=on means display full implex %)
-              %if;(e.implx!="on")
-                %if;(not browsing_with_sosa_ref and (e.m="A" and e.t="H"))
-                %else;
-                  &implx=on%nn;
-                %end;
-              %end;"
+        href="%if;(e.implx!="")%url_set.implx.on;%else;%url_set.implx;%end;"
          title="%if;(e.implx!="on")[*collapse implex]%else;[*display implex]%end;">%nn;
         <i class="fa fa-random fa-lg fa-fw"></i>%nn;
       </a>
