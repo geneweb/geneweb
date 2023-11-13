@@ -493,10 +493,27 @@ let print_update_fam conf base fcd digest =
   | Some _ | None -> Hutil.incorrect_request conf
 
 let print_del1 conf base ifam =
+  let cpl = foi base ifam in
+  let ifath = get_father cpl in
+  let imoth = get_mother cpl in
   let title () =
     transl_nth conf "family/families" 0
     |> transl_decline conf "delete"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Utf8.capitalize_fst |> Output.print_sstring conf;
+    Output.print_sstring conf " ";
+    Output.print_string conf
+      (Util.escape_html (p_first_name base (poi base ifath)));
+    Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base ifath)));
+    Output.print_string conf
+      (Util.escape_html (p_surname base (poi base ifath)));
+    Output.print_sstring conf " ";
+    Output.print_sstring conf (transl conf "and");
+    Output.print_sstring conf " ";
+    Output.print_string conf
+      (Util.escape_html (p_first_name base (poi base imoth)));
+    Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base imoth)));
+    Output.print_string conf
+      (Util.escape_html (p_surname base (poi base imoth)))
   in
   let p =
     match p_getenv conf.env "ip" with
