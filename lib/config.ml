@@ -39,7 +39,6 @@ type output_conf = {
 }
 
 type env = (string * Adef.encoded_string) list
-
 type dates_format = DMY | MDY
 
 type config = {
