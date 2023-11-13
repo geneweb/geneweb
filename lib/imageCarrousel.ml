@@ -247,7 +247,7 @@ let print_send_image conf base p =
       Output.print_sstring conf (transl conf ":");
       Output.print_sstring conf " ";
       Output.print_string conf (Util.escape_html (p_first_name base p));
-      Output.printf conf ".%d " (get_occ p);
+      Output.print_sstring conf (Format.sprintf ".%d " (get_occ p));
       Output.print_string conf (Util.escape_html (p_surname base p)))
   in
   let digest = Update.digest_person (UpdateInd.string_person_of base p) in
