@@ -43,7 +43,6 @@ type output_conf = {
 (** HTTP printer, that prints and sends requests on the user's socket *)
 
 type env = (string * Adef.encoded_string) list
-
 type dates_format = DMY | MDY
 
 type config = {
