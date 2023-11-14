@@ -1123,10 +1123,15 @@ let make_conf from_addr request script_name env =
   in
   let vowels =
     match List.assoc_opt "vowels" base_env with
-    | Some l -> l
-    | None -> "aeiouy"
+    | Some l ->
+        let rec loop acc i =
+          if i < String.length l then (
+            let s, j = Name.unaccent_utf_8 true l i in
+            loop (s :: acc) j)
+          else acc
+        in loop [] 0
+    | _ -> ["a"; "e"; "i"; "o"; "u"; "y"]
   in
-  let vowels = string_to_char_list vowels in
   let lexicon_lang = if lang = "" then default_lang else lang in
   let lexicon = load_lexicon lexicon_lang in
   (* A l'initialisation de la config, il n'y a pas de sosa_ref. *)

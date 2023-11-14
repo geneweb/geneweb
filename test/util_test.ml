@@ -180,6 +180,20 @@ let datedisplay_string_of_date _ =
   test "d[i |'marzu 1975" Dgregorian (0, 3, 1975);
   test "4 d[i sittembre 1974" Dgregorian (4, 9, 1974)
 
+let start_with_vowel _ =
+  let conf = Config.empty in
+  let conf =
+    { conf with vowels = [ "a"; "e"; "i"; "o"; "u"; "y"; "ae"; "oe" ] }
+  in
+  (check bool) "Start with vowel abc" true (Util.start_with_vowel conf "abc");
+  (check bool) "Start with vowel Abc" true (Util.start_with_vowel conf "Abc");
+  (check bool) "Start with vowel Æbc" true (Util.start_with_vowel conf "Æbc");
+  (check bool) "Start with vowel Ébc" true (Util.start_with_vowel conf "Ébc");
+  (check bool) "Start with vowel Ÿbc" true (Util.start_with_vowel conf "Ÿbc");
+  (check bool) "Start with vowel øbc" true (Util.start_with_vowel conf "øbc");
+  (check bool) "Start with vowel def" false (Util.start_with_vowel conf "def");
+  ()
+
 let v =
   [
     ( "mutil",
@@ -203,6 +217,7 @@ let v =
         test_case "Util.transl_a_of_b" `Quick util_transl_a_of_b;
         test_case "Util.string_with_macros" `Quick util_string_with_macros;
         test_case "Util.escape_html" `Quick util_escape_html;
+        test_case "Util.start_with_vowel" `Quick start_with_vowel;
       ] );
     ( "date-display",
       [

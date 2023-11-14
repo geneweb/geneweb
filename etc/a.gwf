@@ -392,3 +392,11 @@ print_advanced_title=yes
 # You can check the list of possible modifications in the updhist.txt file
 # (see update_text).
 #notify_change=
+
+# In French, de Amélie should be written an d'Amélie because
+# the string Amélie begins by a vowel
+# The test is performed on a unaccented and lowered copy of the string
+# The vowel parameter provides a list of characters considered as vowels
+# Fancy utf-8 characters such as æ and ø are taken into account
+# The default value is aeiouy
+#vowels=aeiouy
