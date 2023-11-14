@@ -1,4 +1,4 @@
-<!-- $Id: menubar.txt v7.1 17/01/2023 14:11:53 $ -->
+<!-- $Id: menubar.txt v7.1 14/11/2023 21:36:50 $ -->
 %let;laA;title="[*add::family/families]0 (A)" accesskey="A"%in;
 %let;laD;title="[*difference between the two revisions] (D)" accesskey="D"%in;
 %let;laI;title="[*add]/[delete::image/images]1 (I)" accesskey="I"%in;
@@ -78,7 +78,7 @@
                     %if;(b.p_mod!="")
                       <button type="submit" class="btn btn-outline-secondary ml-2" id="p_mod_bvar" title="[*reset to] p_mod=%b.p_mod (%base.name;.gwf)" value="%b.p_mod;"><i class="fa fa-plus"></i></button>
                     %end;
-                    <button type="submit" class="btn btn-outline-secondary ml-2 mr-1" id='zz'
+                    <button type="submit" class="btn btn-outline-secondary ml-2 mr-1" id='pm_zz'
                             title="Default template" data-toggle="popover" data-trigger="hover"
                             data-html="true" data-content="<img class='w-100' src='%image_prefix;/modules/zz_1.jpg'>"><i class="fa fa-undo"></i></button>
                   </div>
@@ -338,7 +338,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=5"><span class="fa fa-chart-pie fa-fw mr-2"></span>[*fanchart]</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=CT&hi=H&v=5&scale=100&fs=17&sosa=on" title="[*compact tree] [with] %self;"><span class="fa fa-th fa-fw mr-2"></span>[*compact tree]</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=h7&wide=on" title="[Arbre 7 gen]"><span class="fa fa-border-none fa-fw mr-2"></span>7 [generation/generations]1</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=h6&sosa=1" title="H-tree 6 generation with CSS (127 ind.)"><span class="fa fa-border-none fa-fw mr-2"></span>6 [generation/generations]1</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=m" title="[Arbre 9 gen]"><span class="fa fa-chess-board fa-fw mr-2"></span>9 [generation/generations]1</a>
               </div>
             </li>
