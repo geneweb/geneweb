@@ -508,11 +508,7 @@ and eval_simple_variable conf = function
   | "sp" -> " "
   | "static_path" ->
       (let s =
-         if conf.cgi then
-           match List.assoc_opt "static_path" conf.base_env with
-           | Some x -> Adef.escaped x
-           | None -> Adef.escaped conf.static_path
-         else Adef.escaped ""
+         if conf.cgi then Adef.escaped conf.static_path else Adef.escaped ""
        in
        s
         :> string)
