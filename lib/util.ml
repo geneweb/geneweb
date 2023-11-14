@@ -131,7 +131,7 @@ let search_in_assets = search_in_path Secure.assets
 let start_with_vowel conf s =
   if String.length s > 0 then
     let s, _ = Name.unaccent_utf_8 true s 0 in
-    List.mem s.[0] conf.vowels
+    List.mem s conf.vowels
   else false
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4

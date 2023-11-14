@@ -60,7 +60,7 @@ type config = {
   indep_command : string;
   highlight : string;
   lang : string;
-  vowels : char list;
+  vowels : string list;
   default_lang : string;
   default_sosa_ref : iper * Gwdb.person option;
   multi_parents : bool;
@@ -137,7 +137,7 @@ let empty =
     indep_command = "";
     highlight = "";
     lang = "";
-    vowels = [ 'a'; 'e'; 'i'; 'o'; 'u'; 'y' ];
+    vowels = [ "a"; "e"; "i"; "o"; "u"; "y" ];
     default_lang = "";
     default_sosa_ref = (Gwdb.dummy_iper, None);
     multi_parents = false;
