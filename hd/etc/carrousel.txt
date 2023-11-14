@@ -404,7 +404,7 @@ document.getElementById("image_name").focus();
 </script>
 %( Possible heavier futur script to manage multiple files inputs
    https://github.com/Johann-S/bs-custom-file-input/blob/master/dist/bs-custom-file-input.min.js
-<script src=%if;(cgi)%bvar.static_path;%end;js/bs-custom-file-input.min.js></script>
+<script src=%static_path;js/bs-custom-file-input.min.js></script>
 <script>$(document).ready(function(){bsCustomFileInput.init()})</script> %)
 
 </body>

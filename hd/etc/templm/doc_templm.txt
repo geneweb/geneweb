@@ -164,7 +164,7 @@
   <td>
     En mode CGI :
     <ul>
-      <li>static_path=…/ : chemin statique des fichiers CSS et js</li>
+      <li>remplacé par GW_STATIC_PATH depuis la version  7.1, chemin statique des fichiers CSS et js</li>
     </ul>
   </td>
 </tr>
