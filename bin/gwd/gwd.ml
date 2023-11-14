@@ -1294,7 +1294,7 @@ let make_conf from_addr request script_name env =
        if !images_url <> "" then !images_url
        else if !(Wserver.cgi) then
           begin match Sys.getenv_opt "GW_STATIC_PATH" with
-          | Some x -> String.concat Filename.dir_sep [x; ".."; ".."; "images"]
+          | Some x -> String.concat Filename.dir_sep [x; ".."; "images"]
               (* Assumes that GW_STATIC_PATH is ../distribution/gw/etc  *)
           | None -> String.concat Filename.dir_sep
               [".."; "distribution"; "gw"; "images" ]
@@ -1306,7 +1306,7 @@ let make_conf from_addr request script_name env =
        else "images";
      static_path =
        begin match Sys.getenv_opt "GW_STATIC_PATH" with
-       | Some x -> x
+       | Some x -> String.concat Filename.dir_sep [x; ""]
        | None -> String.concat Filename.dir_sep [".."; "distribution"; "gw"; "etc"; "" ]
          (* FIXME same comment. / at the end! *)
        end;
