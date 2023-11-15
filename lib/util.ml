@@ -39,12 +39,14 @@ let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
        home_time.classList.add("text-danger");
     }
   }
-  if (home_errors != null && nb_errors > 0) {
-    home_errors.title = nb_errors +" error(s)!";
-    home_errors.classList.remove("d-none");
-  }
-  if (home_errors != null && errors_list != "") {
-    home_errors.title = home_errors.title + errors_list + ".";
+  if (home_errors != null) {
+    if (nb_errors > 0) {
+      home_errors.title = nb_errors +" error(s)!";
+      home_errors.classList.remove("d-none");
+    }
+    if (errors_list != "") {
+      home_errors.title = home_errors.title + errors_list + ".";
+    }
   }
 </script>|}
            query_time nb_errors
