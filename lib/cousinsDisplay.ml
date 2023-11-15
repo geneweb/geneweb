@@ -219,17 +219,17 @@ let print_cousins conf base p lev1 lev2 =
   let title _h =
     let cous12 = Format.sprintf "cousins.%d.%d" lev1 lev2 in
     let cous_transl = Utf8.capitalize_fst (transl_nth conf cous12 1) in
-    if String.length cous_transl > 0 && cous_transl.[0] <> '[' then 
+    if String.length cous_transl > 0 && cous_transl.[0] <> '[' then
       Output.print_sstring conf cous_transl
-    else (Output.printf conf "%s %s / %s %s"
-            (string_of_int lev1)
-            (transl_nth conf "ascending/descending (degree)"
-              (if lev1=1 then 0 else 2))
-            (string_of_int lev2)
-            (transl_nth conf "ascending/descending (degree)"
-              (if lev2=1 then 1 else 3)))
-
+    else
+      Output.printf conf "%s %s / %s %s" (string_of_int lev1)
+        (transl_nth conf "ascending/descending (degree)"
+           (if lev1 = 1 then 0 else 2))
+        (string_of_int lev2)
+        (transl_nth conf "ascending/descending (degree)"
+           (if lev2 = 1 then 1 else 3))
   in
+
   let max_cnt =
     try int_of_string (List.assoc "max_cousins" conf.base_env)
     with Not_found | Failure _ -> default_max_cnt

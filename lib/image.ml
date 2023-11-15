@@ -282,12 +282,12 @@ let rename_portrait conf base p (nfn, nsn, noc) =
         String.concat Filename.dir_sep [ portrait_folder conf; "old"; old_s ]
       in
       (if Sys.file_exists (old_s_f ^ old_ext) then
-         try Sys.rename (old_s_f ^ old_ext) (new_s_f ^ old_ext)
-         with Sys_error e ->
-           !GWPARAM.syslog `LOG_ERR
-             (Format.sprintf
-                "Error renaming old portrait: old_path=%s new_path=%s : %s"
-                old_f new_f e));
+       try Sys.rename (old_s_f ^ old_ext) (new_s_f ^ old_ext)
+       with Sys_error e ->
+         !GWPARAM.syslog `LOG_ERR
+           (Format.sprintf
+              "Error renaming old portrait: old_path=%s new_path=%s : %s" old_f
+              new_f e));
       let new_s_f =
         String.concat Filename.dir_sep [ carrousel_folder conf; new_s ]
       in

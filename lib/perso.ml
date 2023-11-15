@@ -2152,21 +2152,28 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | [ "get_var"; name ] -> (
       match get_env "vars" env with
       | Vvars lv ->
-          let name1 = "%get_var." ^ name ^ "?" in
-          if not (List.mem name1 !GWPARAM.set_vars) then
-            GWPARAM.set_vars := name1 :: !GWPARAM.set_vars;
+          (if not (List.mem name !GWPARAM.set_vars) then
+           let name =
+             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+             else name
+           in
+           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           let vv =
             try List.assoc name !lv with Not_found -> raise Not_found
           in
           VVstring vv
-      | _ -> VVstring ("%get_var;" ^ name ^ "?"))
+      | _ -> VVstring "")
   | [ "set_var"; name; value ] -> (
       match get_env "vars" env with
       | Vvars lv ->
           if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
           lv := (name, value) :: !lv;
-          if not (List.mem name !GWPARAM.set_vars) then
-            GWPARAM.set_vars := name :: !GWPARAM.set_vars;
+          (if not (List.mem name !GWPARAM.set_vars) then
+           let name =
+             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+             else name
+           in
+           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           VVstring ""
       | _ -> raise Not_found)
   | "svar" :: i :: sl -> (

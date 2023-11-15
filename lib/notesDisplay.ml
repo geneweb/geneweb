@@ -43,16 +43,16 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
         Output.print_string conf (Util.escape_html fnotes)
       else Output.print_string conf title);
   (* TODO: DO WE NEED ME?
-  let what_links_page () =
-    if fnotes <> "" then (
-      Output.print_sstring conf {|<a href="|};
-      Output.print_string conf (commd conf);
-      Output.print_sstring conf {|m=NOTES&f=|};
-      Output.print_string conf (Mutil.encode fnotes);
-      Output.print_sstring conf {|&ref=on" class="mx-2">(|};
-      Output.print_sstring conf (transl conf "linked pages");
-      Output.print_sstring conf ")</a>\n")
-  in*)
+     let what_links_page () =
+       if fnotes <> "" then (
+         Output.print_sstring conf {|<a href="|};
+         Output.print_string conf (commd conf);
+         Output.print_sstring conf {|m=NOTES&f=|};
+         Output.print_string conf (Mutil.encode fnotes);
+         Output.print_sstring conf {|&ref=on" class="mx-2">(|};
+         Output.print_sstring conf (transl conf "linked pages");
+         Output.print_sstring conf ")</a>\n")
+     in*)
   Output.print_sstring conf {|<div class="d-flex justify-content-between">|};
   if (title :> string) <> "" then (
     let title =
