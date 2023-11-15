@@ -149,7 +149,7 @@
       %end;
       %if;(e.same!="" and (e.izb!="" or (e.pzb!="" and e.nzb!="")))
         <i class="far fa-stop-circle fa-fw text-danger"></i><a role="button" class="mt-3"
-         href="%url_set.iz_pz_nz_ocz_izb_pzb_nzb_oczb_same;%nn;
+         href="%url_setx.iz.pz.nz.ocz.izb.pzb.nzb.oczb.same;%nn;
            %if;(b.access_by_key="yes")&pz=%e.pzb;&nz=%e.nzb;%if;(e.oczb!="")&ocz=%e.oczb;%end;%else;&iz=%e.izb;%end;">
            %apply;definecujus%with;%apply;capitalize(e.pzb) %apply;capitalize(e.nzb)%(TODO get name form e.izb%)%and;1%end;</a>
       %end;

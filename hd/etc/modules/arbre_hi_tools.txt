@@ -40,12 +40,12 @@
       %( TODO : disable if ASCII box drawings ? %)
       <div class="btn-group mx-2">
         %if;(evarscl>0)
-          <a href="%if;(e.scale!="on")%url_set2.scale.fs;&scale=%expr(evarscl-20)&fs=%expr(evarfs-1)%end;"
+          <a href="%if;(e.scale!="on")%url_setx.scale.fs;&scale=%expr(evarscl-20)&fs=%expr(evarfs-1)%end;"
             class="btn btn-outline-primary" title="[*reduce/increase]0 [size] (-20 %%)">−</a>
         %end;
         <span class="btn btn-outline-primary disabled border-top border-bottom">%evarscl; %%</span>
         %if;(evarscl<200)
-          <a href="%if;(e.scale!="on")%url_set2.scale.fs;&scale=%expr(evarscl+20)&fs=%expr(evarfs+1);%end;"
+          <a href="%if;(e.scale!="on")%url_setx.scale.fs;&scale=%expr(evarscl+20)&fs=%expr(evarfs+1);%end;"
             class="btn btn-outline-primary" title="[*reduce/increase]1 [size] (+20 %%)">+</a>
         %end;
       </div>

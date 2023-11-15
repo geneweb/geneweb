@@ -396,16 +396,11 @@ let rec eval_variable conf = function
       url_set_aux conf evarl "" ("", "", "", "")
   | [ "url_set2"; evar1; evar2; str ] ->
       url_set_aux conf [ evar1; evar2 ] str ("", "", "", "")
-  | [ "url_set2"; evar1; evar2 ] ->
-      url_set_aux conf [ evar1; evar2 ] "" ("", "", "", "")
-  | [ "url_set3"; evar1; evar2; evar3; str ] ->
-      url_set_aux conf [ evar1; evar2; evar3 ] str ("", "", "", "")
-  | [ "url_set3"; evar1; evar2; evar3 ] ->
-      url_set_aux conf [ evar1; evar2; evar3 ] "" ("", "", "", "")
   | [ "url_set_pz"; iz ] ->
       url_set_aux conf [ "iz"; "pz"; "nz"; "ocz" ] "" (iz, "", "", "")
   | [ "url_set_pz"; pz; nz; ocz ] ->
       url_set_aux conf [ "iz"; "pz"; "nz"; "ocz" ] "" ("", pz, nz, ocz)
+  | "url_setx" :: evarl -> url_set_aux conf evarl "" ("", "", "", "")
   | [ "user"; "ident" ] -> conf.user
   | [ "user"; "name" ] -> conf.username
   | [ "user"; "key" ] -> conf.userkey
