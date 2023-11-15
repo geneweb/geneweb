@@ -45,8 +45,8 @@ let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
 </script>|}
            query_time nb_errors
            (if errors_undef <> [] then
-              Printf.sprintf "Unbound variable(s): %s. " err_list1
-            else "")
+            Printf.sprintf "Unbound variable(s): %s. " err_list1
+           else "")
            err_list2)
 
 let escape_aux count blit str =
@@ -510,30 +510,30 @@ let default_safe_html_allowed_tags =
 let safe_html_allowed_tags =
   lazy
     (if !allowed_tags_file = "" then default_safe_html_allowed_tags
-     else if Sys.file_exists !allowed_tags_file then
-       let ic = open_in !allowed_tags_file in
-       let rec loop tags =
-         match input_line ic with
-         | tag ->
-             let ns, tag =
-               match String.split_on_char ' ' tag with
-               | [ ns; tag ] -> (ns, tag)
-               | [ tag ] -> ("http://www.w3.org/1999/xhtml", tag)
-               | _ -> assert false
-             in
-             loop ((ns, String.lowercase_ascii tag) :: tags)
-         | exception End_of_file ->
-             close_in ic;
-             tags
-       in
-       loop []
-     else
-       let str =
-         Printf.sprintf "Requested allowed_tags file (%s) absent"
-           !allowed_tags_file
-       in
-       !GWPARAM.syslog `LOG_WARNING str;
-       default_safe_html_allowed_tags)
+    else if Sys.file_exists !allowed_tags_file then
+      let ic = open_in !allowed_tags_file in
+      let rec loop tags =
+        match input_line ic with
+        | tag ->
+            let ns, tag =
+              match String.split_on_char ' ' tag with
+              | [ ns; tag ] -> (ns, tag)
+              | [ tag ] -> ("http://www.w3.org/1999/xhtml", tag)
+              | _ -> assert false
+            in
+            loop ((ns, String.lowercase_ascii tag) :: tags)
+        | exception End_of_file ->
+            close_in ic;
+            tags
+      in
+      loop []
+    else
+      let str =
+        Printf.sprintf "Requested allowed_tags file (%s) absent"
+          !allowed_tags_file
+      in
+      !GWPARAM.syslog `LOG_WARNING str;
+      default_safe_html_allowed_tags)
 
 (* Few notes:
 

@@ -957,26 +957,26 @@ let print_notes_for_person opts base gen p =
     Printf.ksprintf (oc opts) "beg\n";
     if notes <> "" then Printf.ksprintf (oc opts) "%s\n" notes;
     (if put_events_in_notes base p then
-       let rec loop pevents =
-         match pevents with
-         | [] -> ()
-         | evt :: events -> (
-             match evt.epers_name with
-             | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
-             | Epers_Cremation ->
-                 let name = epers_name_to_string evt in
-                 let notes =
-                   if opts.no_notes <> `nnn then sou base evt.epers_note else ""
-                 in
-                 if notes <> "" then
-                   Printf.ksprintf (oc opts) "%s: %s\n" name notes;
-                 print_witness_in_notes evt.epers_witnesses;
-                 loop events
-             | _ ->
-                 print_pevent opts base gen evt;
-                 loop events)
-       in
-       loop (get_pevents p));
+     let rec loop pevents =
+       match pevents with
+       | [] -> ()
+       | evt :: events -> (
+           match evt.epers_name with
+           | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
+           | Epers_Cremation ->
+               let name = epers_name_to_string evt in
+               let notes =
+                 if opts.no_notes <> `nnn then sou base evt.epers_note else ""
+               in
+               if notes <> "" then
+                 Printf.ksprintf (oc opts) "%s: %s\n" name notes;
+               print_witness_in_notes evt.epers_witnesses;
+               loop events
+           | _ ->
+               print_pevent opts base gen evt;
+               loop events)
+     in
+     loop (get_pevents p));
     Printf.ksprintf (oc opts) "end notes\n");
   let f _ =
     Printf.sprintf "person \"%s.%d %s\"" (p_first_name base p) (get_new_occ p)
