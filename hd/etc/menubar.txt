@@ -111,7 +111,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
             %if;(sosa_prev.index!="")
               <li class="nav-item">
                 <a class="nav-link text-secondary"
-                  href="%if;(e.i="")%nn;%url_set3.p.n.oc;&%sosa_prev.access;%else;%url_set.i;&i=%sosa_prev.index;%end;"
+                  href="%if;(e.i="")%nn;%url_setx.p.n.oc;&%sosa_prev.access;%else;%url_setx.i.m;&i=%sosa_prev.index;%end;"
                   title="[Sosa] %sosa_prev.sosa;[:] %sosa_prev;"><span class="fa fa-chevron-left" aria-hidden="true"></span><span class="sr-only">&lt;</span></a>%nn;
               </li>
             %end;
@@ -123,7 +123,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
               %end;
               <li class="nav-item">
                 <a class="nav-link text-secondary"
-                  href="%if;(e.i="")%url_set3.p.n.oc;&%sosa_next.access;%else;%url_set.i;&i=%sosa_next.index;%end;"
+                  href="%if;(e.i="")%url_setx.p.n.oc;&%sosa_next.access;%else;%url_setx.i.m;&i=%sosa_next.index;%end;"
                   title="[Sosa] %sosa_next.sosa;[:] %sosa_next;"><span class="fa fa-chevron-right" aria-hidden="true"></span><span class="sr-only">></span></a>
               </li>
             %end;

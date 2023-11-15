@@ -107,14 +107,14 @@
   </div>
   <div class="ml-4" >
   <a role="button" class="ml-auto"
-    href="%url_set3.a_sort.f_sort.up;%nn;
+    href="%url_setx.a_sort.f_sort.up;%nn;
       &f_sort=on%if;(e.up!="on")&up=on%end;"
       %sp;title="[*sort by/branch/alphabetic order]0 [frequency]">
       <i class="fas fa-sort-%if;(e.up!="on")amount-down%else;amount-up%end;%sp;
         fa-lg"></i>%nn;
   </a>%nn;
   <a role="button" class="ml-auto"
-    href="%url_set3.a_sort.f_sort.up;%nn;
+    href="%url_setx.a_sort.f_sort.up;%nn;
       %if;(e.a_sort!="on")&a_sort=on%end;"
       %sp;title="[*sort by/branch/alphabetic order]0
         [sort by/branch/alphabetic order]2">

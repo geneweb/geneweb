@@ -897,7 +897,7 @@
     title="ttt&#010;&#010; [*remove %s column:::ccc]"></a>%end;
 %end;
 %define;rm2(ccc,ddd,ttt)
-  %if;(e.ccc="on" and e.ddd="on")<a role="button" class="stretched-link" href="%url_set2.ccc.ddd;"
+  %if;(e.ccc="on" and e.ddd="on")<a role="button" class="stretched-link" href="%url_setx.ccc.ddd;"
     title="ttt&#010;&#010; [*remove %s column:::ccc+ddd]"></a>%end;
 %end;
 %define;table_header()
@@ -946,7 +946,7 @@
       <th class="text-center position-relative"
         colspan="%if;(e.marr_date="on" and e.marr_place="on" and e.child="on")3%else;2%end;">%nn;
         [*marriage/marriages]0
-        <a role="button" class="stretched-link" href="%url_set3.marr_date.marr_place.child;"
+        <a role="button" class="stretched-link" href="%url_setx.marr_date.marr_place.child;"
           title="[*remove %s column:::marr_date+marr_place+child]"%(TODO:filter if only 2%)></a></th>
       %if;(e.marr_date="on" and e.marr_place="on" and e.child="on")%incr_count;%end;
       %incr_count;%incr_count;
