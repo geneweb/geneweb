@@ -220,7 +220,7 @@
     %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
     %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
     %sosa_ref.surname_key_strip;
-    %and;%xx.sosa;%end;
+    %and;%xx.sosa.v;%end;
     %if;not cancel_links;</a>%end;%nn;
   %end;
 %end;
