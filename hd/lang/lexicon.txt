@@ -817,6 +817,14 @@ sl: nedelja/ponedeljek/torek/sreda/četrtek/petek/sobota
 sv: söndag/måndag/tisdag/onsdag/torsdag/fredag/lördag
 tr: Pazar/Pazartesi/Salı/Çarşamba/Perşembe/Cuma/Cumartesi
 
+    alert option
+en: Invalid option <strong id="alert-option"></strong> for module <strong id="alert-module"></strong>. Please enter a valid option number.
+fr: Option invalide <strong id="alert-option"></strong> pour le module <strong id="alert-module"></strong>. Veuillez saisir un numéro d’option valide.
+
+    alert module
+en: Invalid module <strong id="alert-module-2"></strong>. Please enter a valid module initial.
+fr: Module invalide <strong id="alert-module-2"></strong>. Veuillez saisir une initiale de module valide.
+
     carrousel
 co: carusellu
 en: carrousel
@@ -842,6 +850,10 @@ co: sceglie un schedariu
 de: wählen
 en: choose file
 fr: sélect. fichier
+
+    select module
+en: Select each module by clicking on the corresponding button (max 15).
+fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
 
     ou
 co: o

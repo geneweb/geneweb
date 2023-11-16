@@ -20,6 +20,7 @@
     <input type="hidden" name="nnn" value="%xxx;">
   %end;
 %end;
+
 %let;p_mod;%if;(b.p_mod!="" and e.p_mod="")%b.p_mod;%elseif;(e.p_mod!="")%e.p_mod;%end;%in;
 %define;iz(i)%url_set_pz.i;%end;
 %define;pnocz(pp,nn,oo)%url_set_pz.pp.nn.oo;%end;
@@ -43,17 +44,16 @@
             </a>
             <div class="dropdown-menu dropdown-menu-transl">
               <div class="d-inline-flex justify-content-around mx-1">
-               <form class="form-group mx-1" name="upd_url" method="get" action="%action;">
-                  <div class="invisible" id="img_prfx">%image_prefix;/modules</div>
-                  <div class="d-flex justify-content-start mx-2">
+                <form class="form-group mx-1" name="upd_url" method="get" action="%action;">
+                  <div class="d-flex justify-content-between mx-2 mt-2 img-prfx" data-prfx="%image_prefix;/modules">
+                    <div class="d-inline-flex">
                     %apply;input_hidden("e.b","b")
                     %apply;input_hidden("e.lang","lang")
                     <div class="input-group">
                       <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"
                         value="%if;(p_mod!="zz" and p_mod!="")%p_mod;%end;"
                         placeholder="%if;(e.p_mod="" and b.p_mod!="")%b.p_mod;
-                        (%base.name;.gwf)%else;[*select p_mod]%end;"
-                        maxlength="30">
+                        (%base.name;.gwf)%else;[*select p_mod]%end;" maxlength="40">
                       <div class="input-group-append">
                         <button type="submit" class="btn btn-outline-success" title="[*validate/delete]0"><i class="fa fa-check fa-lg"></i></button>
                         <button type="button" class="btn btn-outline-danger" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-times fa-lg mx-1"></i></button>
@@ -78,23 +78,21 @@
                     %if;(b.p_mod!="")
                       <button type="submit" class="btn btn-outline-secondary ml-2" id="p_mod_bvar" title="[*reset to] p_mod=%b.p_mod (%base.name;.gwf)" value="%b.p_mod;"><i class="fa fa-plus"></i></button>
                     %end;
-                    <button type="submit" class="btn btn-outline-secondary ml-2 mr-1" id='pm_zz'
+                    <button type="submit" class="btn btn-outline-secondary ml-2 mr-1" id='zz'
                             title="Default template" data-toggle="popover" data-trigger="hover"
                             data-html="true" data-content="<img class='w-100' src='%image_prefix;/modules/zz_1.jpg'>"><i class="fa fa-undo"></i></button>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <div class="mx-2 mt-2">
-                    [
-en: Select each module by clicking on the corresponding button (max 15).
-fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
-                    ]
                     </div>
-                    <a role="button" class="btn btn-outline-%if;(e.wide="on")danger%else;primary%end; my-3"%sp;
-                      href="%if;(e.wide!="on")%url_set.wide.on;"
+                    <a role="button" class="btn btn-outline-%if;(e.wide="on")danger%else;primary%end;"
+                      href="%if;(e.wide!="")%url_set.wide;%else;%url_set.wide.on;%end;"
                       title="%if;(e.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;">%nn;
                       <i class="fa fa-desktop fa-fw" aria-hidden="true"></i>%nn;
                       <span class="sr-only">%if;(e.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span>%nn;
                     </a>
+                  </div>
+                  <div class="mx-2 mt-2">[*select module]</div>
+                  <div class="alert alert-warning alert-dismissible fade show mt-1 mb-2 d-none" role="alert">
+                    <div class="d-none alert-opt">[alert option]</div>
+                    <div class="d-none alert-mod">[alert module]</div>
                   </div>
                   <div id="p_mod_table"></div>
                 </form>
@@ -273,7 +271,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                     title="[*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)"
                     accesskey="%a_k;">%nn;
                     <span class="fa fa-user-edit %sexcolor;" aria-hidden="true"></span><span class="fa fa-user %apply;spousesexcolor(spouse.sex)" aria-hidden="true"></span>%if;(nb_families!=1)<span class="small align-top"><sup>%family_cnt;</sup></span>%end;
-                    <span class="sr-only">%sp;[*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)</span>
+                    <span class="sr-only"> [*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)</span>
                   </a>
                 </li>
               %end;

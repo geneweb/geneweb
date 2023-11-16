@@ -25,7 +25,7 @@
   %if;(e.m!="MOD_DATA")
   <script>
     $('#load_once_p_mod').one('click', function() {
-      $.getScript('%static_path;js/p_mod.js');
+      $.getScript('%static_path;js/p_mod.min.js');
     });
     $('#load_once_copylink').one('click', function() {
       $.getScript('%static_path;js/copylink.js');
