@@ -1,330 +1,196 @@
-/* $Id: p_mod.js, v 7.00 2017/12/05 01:29:45 hg a2 $ */
+// $Id: p_mod.js, v7.1 16/11/2023 19:57:44 $
 
-var modules = [];
-var options = [];
-for (i = 0; i < 13; i++)
-{ options[i] = [];
-}
+// Définitions des modules et options
+const modulesEtOptions = {
+  individu: ["standard", "centered", "two cols"],
+  parents: ["simple", "simple + photos", "evolved", "complete", "complete + photos"],
+  unions: ["simple", "simple + photos", "evolved", "complete", "complete + photos"],
+  fratrie: ["simple", "simple + photos", "complete", "complete + photos"],
+  relations: ["simple", "complete"],
+  chronologie: ["simple", "simple + events"],
+  notes: ["simple", "complete"],
+  sources: ["simple", "complete"],
+  arbres: ["ascendants", "horizontal", "compact", "+3-3 gen.", "famille", "6 gen", "9 gen", "HI", "descendants"],
+  gr_parents: ["standard", "three cols"],
+  ligne: ["standard"],
+  data_3col: ["standard"],
+};
+const imgPrfx = $('.img-prfx').attr('data-prfx');
 
-modules[1] = "individu";
-options[1][1] = "standard";
-options[1][2] = "centered";
-options[1][3] = "two cols";
-modules[2] = "parents";
-options[2][1] = "simple";
-options[2][2] = "simple + photos";
-options[2][3] = "evolved";
-options[2][4] = "complete";
-options[2][5] = "complete + photos";
-modules[3] = "unions";
-options[3][1] = "simple";
-options[3][2] = "simple + photos"
-options[3][3] = "evolved";
-options[3][4] = "complete";
-options[3][5] = "complete + photos";
-modules[4] = "fratrie";
-options[4][1] = "simple";
-options[4][2] = "simple + photos";
-options[4][3] = "complete";
-options[4][4] = "complete + photos";
-modules[5] = "relations";
-options[5][1] = "simple";
-options[5][2] = "complete";
-modules[6] = "chronologie";
-options[6][1] = "simple";
-options[6][2] = "simple + events";
-modules[7] = "notes";
-options[7][1] = "simple";
-options[7][2] = "complete";
-modules[8] = "sources";
-options[8][1] = "simple";
-options[8][2] = "complete";
-modules[9] = "arbres";
-options[9][1] = "ascendants";
-options[9][2] = "horizontal";
-options[9][3] = "compact";
-options[9][4] = "+3-3 gen.";
-options[9][5] = "famille";
-options[9][6] = "6 gen";
-options[9][7] = "9 gen";
-options[9][8] = "HI";
-options[9][9] = "descendants";
-modules[10] = "gr_parents";
-options[10][1] = "standard";
-options[10][2] = "three cols";
-modules[11] = "ligne";
-options[11][1] = "standard";
-modules[12] = "data_3col";
-options[12][1] = "standard";
+// Générer la table HTML pour les modules et options
+let p_mod_table = `
+<table class="table table-sm table-hover mt-2 mb-0">
+  <thead class="thead-default">
+    <tr>
+      <th>Module</th>
+      <th>Options</th>
+    </tr>
+  </thead>
+  <tbody>`;
 
-var img_prfx = $('#img_prfx').text();
-var p_mod_table = '\
-<table class="table table-sm table-hover mt-2 mb-0">\
-  <thead class="thead-default">\
-    <tr>\
-      <th>Module</th>\
-      <th>Options</th>\
-    </tr>\
-  </thead>\
-  <tbody>';
-  for (var i=1; i<=12; i++)
-    { p_mod_table += '\
-      <tr>\
-        <td class="align-middle pmod">'+modules[i]+'\
-        </td>\
-        <td>\
-          <div class="d-inline-flex">';
-          for (var k=1; k<options[i].length; k++)
-            { var image = "<img class='w-100' src='"+img_prfx+"/"+modules[i]+"_"+k+".jpg'>";
-              var button  = '<button class="btn btn-outline-primary btn-sm mr-1" type="button" id="pm_'+modules[i][0]+k+'" title="'+modules[i]+" "+options[i][k]+'"\
-                           data-toggle="popover" data-trigger="hover" data-container="body" data-placement="bottom"\
-                           data-html="true" data-content="'+image+'"><span class="text-nowrap">'+options[i][k]+'</span></button>';
-              p_mod_table += button;
-            }
-          p_mod_table += '\
-          </div>\
-        </td>\
-      </tr>\n'
-    }
-  p_mod_table += '\
-  </tbody>\
-</table>';
+// Parcourir les modules et options pour construire la table
+Object.entries(modulesEtOptions).forEach(([module, options]) => {
+  p_mod_table += `
+    <tr>
+      <td class="align-middle pmod">${module}</td>
+      <td>
+        <div class="d-inline-flex">`;
+  // Générer des boutons et des images pour chaque option
+  options.forEach((option, index) => {
+    const button = `<button class="btn btn-outline-primary btn-sm mr-1 text-nowrap"
+                      type="button" id="pm_${module[0]}${index + 1}" title="${module} ${option}"
+                      data-toggle="popover" data-trigger="hover" data-placement="bottom" data-html="true"
+                      data-content="<img src='${imgPrfx}/${module}_${index + 1}.jpg'>">${option}</button>`;
+    p_mod_table += button;
+  });
+  p_mod_table += `
+        </div>
+      </td>
+    </tr>`;
+});
 
+// Enable dismissal of an alert via JavaScript
+$('.alert').alert()
+
+// Initialiser la structure HTML
 var p_mod_init = '<div id="p_mod_builder">\n</div>\n';
 
+// Remplacer la structure existante par l’initialisation
 $('#p_mod_builder').replaceWith(p_mod_init);
-var p_mod = $('#p_mod').val();
-var p_mod_build = '<div id="p_mod_builder">';
-for(i=0;i<=p_mod.length-2;i=i+2){
-  var mod = "";
-  for(j=1;j<=12;j++){if (p_mod[i] == modules[j][0]){mod = modules[j];}};
-  var opt = p_mod[i+1];
-  if(p_mod[0]=="z"){$('#p_mod_builder').append('<div id="p_mod_builder"><img id="rm" src="'+img_prfx+'/zz_1.jpg">\n');}
-  else if(opt>=1&&opt<=9){$('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/'+mod+'_'+opt+'.jpg">\n');}
-  else{i-=1};
-};
-$('#p_mod_builder').append('</div>');
+
+// Fonction pour construire la vue en fonction de la valeur de #p_mod
+function buildView() {
+  // Obtenir la valeur de #p_mod
+  var p_mod = $('#p_mod').val();
+  // Initialiser la structure de vue
+  var p_mod_builder = '<div id="p_mod_builder">';
+  // Parcourir la valeur de #p_mod pour construire la vue
+  for (var i = 0; i <= p_mod.length - 2; i += 2) {
+    // Initialiser la variable module
+    var mod = "";
+    // Rechercher le module correspondant dans modulesEtOptions
+    for (const [nomModule, optionsModule] of Object.entries(modulesEtOptions)) {
+      if (p_mod[i] == nomModule[0]) {
+        mod = nomModule;
+        break;
+      }
+    }
+    // Obtenir la valeur de l’option
+    var opt = p_mod[i + 1];
+    // Vérifier si le module saisi est valide
+    if (modulesEtOptions.hasOwnProperty(mod)) {
+      // Vérifier si l’option saisie est valide pour le module
+      if (opt >= 1 && opt <= modulesEtOptions[mod].length) {
+        // Déterminer la source de l’image en fonction des conditions
+        var imgSrc = (p_mod[0] == "z") ? 'zz_1.jpg' : mod + '_' + opt + '.jpg';
+        // Ajouter la balise ’'image à la structure de vue
+        p_mod_builder += '<img class="rm" src="' + imgPrfx + '/' + imgSrc + '">\n';
+        // Mettre à jour le bouton du module avec la classe btn-primary
+        var buttonElement = $('#pm_' + mod[0] + (parseInt(opt, 10)));
+        if (buttonElement.hasClass('btn-outline-primary')) {
+          buttonElement.removeClass('btn-outline-primary').addClass('btn-primary');
+        }
+      } else {
+        $('.alert').removeClass('d-none');
+        $('.alert-opt').removeClass('d-none');
+        if (!$('.alert-mod').hasClass('d-none')) {
+          $('.alert-mod').addClass('d-none');
+        }
+        $('#alert-option').text(opt);
+        $('#alert-module').text(mod);
+        $('#p_mod').val($('#p_mod').val().slice(0, -2));
+      }
+    } else {
+      $('.alert').removeClass('d-none');
+      $('.alert-mod').removeClass('d-none');
+      if (!$('.alert-opt').hasClass('d-none')) {
+        $('.alert-opt').addClass('d-none');
+      }
+      $('#alert-module-2').text(p_mod[i]);
+      $('#p_mod').val($('#p_mod').val().slice(0, -2));
+    }
+  }
+  // Fermer la structure de vue
+  p_mod_builder += '</div>';
+  // Remplacer la vue existante par la nouvelle
+  $('#p_mod_builder').replaceWith(p_mod_builder);
+}
+
+// Remplacer la table existante par la nouvelle
 $('#p_mod_table').replaceWith(p_mod_table);
 
+// Masquer toute l’alerte  en cliquant dessus et placer le focus sur p_mod
+$('.alert').on('click', function () {
+  $(this).addClass('d-none');
+  $('#p_mod').focus();
+});
+
+// Activer les popovers Bootstrap
 $('[data-toggle="popover"]').popover();
 
-$('#p_mod').on('keyup', function ()
-{ $('#p_mod_builder').replaceWith(p_mod_init);
-  var p_mod = $('#p_mod').val();
-  for(i=0;i<=p_mod.length-2;i=i+2){
-    var mod = "";
-    for(j=1;j<=12;j++){if (p_mod[i] == modules[j][0]){mod = modules[j];}};
-    var opt = p_mod[i+1];
-    if(p_mod[0]=="z"){$('#p_mod_builder').append('<div id="p_mod_builder"><img id="rm" src="'+img_prfx+'/zz_1.jpg">\n');}
-    else if(opt>=1&&opt<=9){$('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/'+mod+'_'+opt+'.jpg">\n');}
-    else{i-=1};
-  };
+// Gérer les événements dans le champ de saisie pmod
+$('#p_mod').on('input', function () {
+  buildView();
+  const p_mod_value = $('#p_mod').val();
+  const lastModuleId = p_mod_value.slice(-2);
+  // Parcourir tous les boutons de module en sens inverse
+  $('[id^="pm_"]').each(function () {
+    // Obtenir l'identifiant du module à partir de l'ID du bouton
+    const moduleId = this.id.slice(3);
+    // Vérifier si le bouton correspond au dernier module saisi
+    if (moduleId === lastModuleId) {
+      // Mettre à jour la classe du bouton correspondant
+      $(this).removeClass('btn-outline-primary').addClass('btn-primary');
+    } else {
+      return false; // Sortir de la boucle une fois le bouton trouvé
+    }
+  });
 });
 
-$('#p_mod_bvar').on('click', function ()
-{ $('#p_mod').val($('#p_mod_bvar').val())
+// Gérer le bouton de la variable de configuration
+$('#p_mod_bvar').on('click', function () {
+  $('#p_mod').val($('#p_mod_bvar').val())
 });
 
-$('#p_mod_rm').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val().slice(0, -2));
-  $('#rm:last-child').remove();
+// Gérer le bouton de suppression
+$('#p_mod_rm').on('click', function () {
+  // Obtenir la valeur actuelle de #p_mod
+  const p_mod_value = $('#p_mod').val();
+  // Vérifier si la valeur n’est pas vide et a au moins deux caractères
+  if (p_mod_value.length > 1) {
+    // Obtenir les deux derniers caractères représentant le module supprimé
+    const removedModuleId = p_mod_value.slice(-2);
+    // Supprimer les deux derniers caractères de la saisie
+    const new_p_mod_value = p_mod_value.slice(0, -2);
+    $('#p_mod').val(new_p_mod_value);
+    // Supprimer l’élément d'image correspondant
+    $('.rm:last-child').remove();
+    // Restaurer la classe du bouton correspondant si le module n’est plus présent
+    if (!new_p_mod_value.includes(removedModuleId)) {
+      $('#pm_' + removedModuleId).removeClass('btn-primary').addClass('btn-outline-primary');
+    }
+  }
 });
 
-$('#p_mod_clear').on('click', function ()
-{ $('#p_mod').val('');
-  $('#p_mod_builder').replaceWith(p_mod_init);
+// Gérer le bouton de nettoyage
+$('#p_mod_clear').on('click', function () {
+  $('#p_mod').val('');
+  $('#p_mod_builder').replaceWith('<div id="p_mod_builder">\n</div>\n');
+  $('[id^="pm_"]').removeClass('btn-primary').addClass('btn-outline-primary');
 });
 
-$('#pm_zz').on('click', function ()
-{ $('#p_mod').val('zz');
+// Gérer le bouton zz
+$('#zz').on('click', function () {
+  $('#p_mod').val('zz');
 });
 
-$('#pm_i1').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'i1');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/individu_1.jpg">\n');
-});
-
-$('#pm_i2').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'i2');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/individu_2.jpg">\n');
-});
-
-$('#pm_i3').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'i3');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/individu_3.jpg">\n');
-});
-
-$('#pm_p1').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'p1');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/parents_1.jpg">\n');
-});
-
-$('#pm_p2').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'p2');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/parents_2.jpg">\n');
-});
-
-$('#pm_p3').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'p3');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/parents_3.jpg">\n');
-});
-
-$('#pm_p4').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'p4');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/parents_4.jpg">\n');
-});
-
-$('#pm_p5').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'p5');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/parents_5.jpg">\n');
-});
-
-$('#pm_u1').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'u1');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/unions_1.jpg">\n');
-});
-
-$('#pm_u2').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'u2');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/unions_2.jpg">\n');
-});
-
-$('#pm_u3').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'u3');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/unions_3.jpg">\n');
-});
-
-$('#pm_u4').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'u4');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/unions_4.jpg">\n');
-});
-
-$('#pm_u5').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'u5');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/unions_5.jpg">\n');
-});
-
-$('#pm_f1').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'f1');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/fratrie_1.jpg">\n');
-});
-
-$('#pm_f2').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'f2');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/fratrie_2.jpg">\n');
-});
-
-$('#pm_f3').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'f3');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/fratrie_3.jpg">\n');
-});
-
-$('#pm_f4').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'f4');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/fratrie_4.jpg">\n');
-});
-
-$('#pm_r1').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'r1');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/relations_1.jpg">\n');
-});
-
-$('#pm_r2').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'r2');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/relations_2.jpg">\n');
-});
-
-$('#pm_c1').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'c1');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/chronologie_1.jpg">\n');
-});
-
-$('#pm_c2').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'c2');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/chronologie_2.jpg">\n');
-});
-
-$('#pm_n1').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'n1');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/notes_1.jpg">\n');
-});
-
-$('#pm_n2').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'n2');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/notes_2.jpg">\n');
-});
-
-$('#pm_s1').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'s1');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/sources_1.jpg">\n');
-});
-
-$('#pm_s2').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'s2');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/sources_2.jpg">\n');
-});
-
-$('#pm_a1').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'a1');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_1.jpg">\n');
-});
-
-$('#pm_a2').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'a2');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_2.jpg">\n');
-});
-
-$('#pm_a3').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'a3');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_3.jpg">\n');
-});
-
-$('#pm_a4').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'a4');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_4.jpg">\n');
-});
-
-$('#pm_a5').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'a5');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_5.jpg">\n');
-});
-
-$('#pm_a6').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'a6');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_6.jpg">\n');
-});
-
-$('#pm_a7').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'a7');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_7.jpg">\n');
-});
-
-$('#pm_a8').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'a8');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_8.jpg">\n');
-});
-
-$('#pm_a9').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'a9');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_9.jpg">\n');
-});
-
-$('#pm_g1').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'g1');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/gr_parents_1.jpg">\n');
-});
-
-$('#pm_g2').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'g2');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/gr_parents_2.jpg">\n');
-});
-
-$('#pm_l1').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'l1');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/ligne_1.jpg">\n');
-});
-
-$('#pm_d1').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'d1');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/data_3col_1.jpg">\n');
+// Gérer les clics pour mettre à jour la zone d'affichage des images
+$(document).on('click', '[id^="pm_"]', function () {
+  const itemId = this.id.slice(3);
+  const imgData = $(this).attr('data-content');
+  const imgPath = $(imgData).attr('src');
+  $('#p_mod').val($('#p_mod').val() + itemId);
+  $('#p_mod_builder').append(`<img class="rm" src="${imgPath}">\n`);
+  // Mettre à jour le bouton de module correspondant avec la classe btn-primary
+  $('#pm_' + itemId).removeClass('btn-outline-primary').addClass('btn-primary');
 });
