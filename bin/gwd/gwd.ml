@@ -1063,7 +1063,7 @@ let make_conf from_addr request script_name env =
      Printf.sprintf
        "Requested allowed_tags file (%s) absent" !allowed_tags_file
     in
-    GWPARAM.errors_other := str :: !GWPARAM.errors_undef;
+    GWPARAM.errors_other := str :: !GWPARAM.errors_other;
     !GWPARAM.syslog `LOG_WARNING str);
   let utm = Unix.time () in
   let tm = Unix.localtime utm in

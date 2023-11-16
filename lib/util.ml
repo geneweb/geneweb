@@ -5,9 +5,13 @@ open Def
 open Gwdb
 
 let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
+  (*Printf.eprintf "Errors set_vars:\n";
+    List.iter (fun e -> Printf.eprintf "%s\n" e) set_vars;*)
   let errors_undef = List.sort_uniq compare errors_undef in
   let errors_undef =
-    List.filter (fun e -> not (List.mem e set_vars)) errors_undef
+    List.filter
+      (fun e -> not (List.exists (fun s -> Mutil.contains e s) set_vars))
+      errors_undef
   in
   let nb_errors =
     nb_errors + List.length errors_undef + List.length errors_other

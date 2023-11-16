@@ -959,19 +959,11 @@ let rec eval_var conf base env _xx _loc = function
       | _ -> raise Not_found)
   | "dag_cell" :: sl -> (
       match get_env "dag_cell" env with
-      | Vdcell dcell -> eval_dag_cell_var conf base dcell sl
+      | Vdcell dcell -> eval_dag_cell_var conf base env dcell sl
       | _ -> raise Not_found)
   | [ "dag_cell_pre" ] -> (
       match get_env "dag_cell_pre" env with
       | Vdcellp s -> VVstring s
-      | _ -> raise Not_found)
-  | [ "get_var"; name ] -> (
-      match get_env "vars" env with
-      | Vvars lv ->
-          let vv =
-            try List.assoc name !lv with Not_found -> raise Not_found
-          in
-          VVstring vv
       | _ -> raise Not_found)
   | [ "head_title" ] -> (
       match get_env "p_title" env with
@@ -1013,11 +1005,31 @@ let rec eval_var conf base env _xx _loc = function
       match find_person conf base s with
       | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
       | None -> VVstring "")
+  | [ "get_var"; name ] -> (
+      match get_env "vars" env with
+      | Vvars lv ->
+          (if not (List.mem name !GWPARAM.set_vars) then
+           let name =
+             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+             else name
+           in
+           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+          let vv =
+            try List.assoc name !lv with Not_found -> raise Not_found
+          in
+          VVstring vv
+      | _ -> raise Not_found)
   | [ "set_var"; name; value ] -> (
       match get_env "vars" env with
       | Vvars lv ->
           if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
           lv := (name, value) :: !lv;
+          (if not (List.mem name !GWPARAM.set_vars) then
+           let name =
+             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+             else name
+           in
+           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           VVstring ""
       | _ -> raise Not_found)
   (* TODO set real values *)
@@ -1036,7 +1048,7 @@ and eval_dag_var _conf (tmincol, tcol, _colminsz, colsz, _ncol) = function
   | [ "ncol" ] -> VVstring (string_of_int (Array.fold_left ( + ) 0 colsz))
   | _ -> raise Not_found
 
-and eval_dag_cell_var conf base (colspan, align, td) = function
+and eval_dag_cell_var conf base env (colspan, align, td) = function
   | [ "access" ] -> (
       match td with
       | TDtext (ip, _s) ->
@@ -1089,6 +1101,33 @@ and eval_dag_cell_var conf base (colspan, align, td) = function
       match td with
       | TDtext (_ip, s) -> VVstring (s : Adef.safe_string :> string)
       | _ -> VVstring "")
+  | [ "get_var"; name ] -> (
+      match get_env "vars" env with
+      | Vvars lv ->
+          (if not (List.mem name !GWPARAM.set_vars) then
+           let name =
+             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+             else name
+           in
+           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+          let vv =
+            try List.assoc name !lv with Not_found -> raise Not_found
+          in
+          VVstring vv
+      | _ -> VVstring "")
+  | [ "set_var"; name; value ] -> (
+      match get_env "vars" env with
+      | Vvars lv ->
+          if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
+          lv := (name, value) :: !lv;
+          (if not (List.mem name !GWPARAM.set_vars) then
+           let name =
+             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+             else name
+           in
+           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+          VVstring ""
+      | _ -> raise Not_found)
   | _ -> raise Not_found
 
 let rec print_foreach conf hts print_ast _eval_expr env () _loc s sl _el al =
