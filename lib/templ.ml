@@ -186,6 +186,24 @@ let reorder conf env =
   in
   String.concat "&" (List.rev env1 @ List.rev env2)
 
+let find_sosa_ref conf =
+  let env = conf.henv @ conf.senv @ conf.env in
+  let get_env evar env =
+    match List.assoc_opt evar env with Some s -> Adef.as_string s | None -> ""
+  in
+  let pz = get_env "pz" env in
+  let nz = get_env "nz" env in
+  let ocz = get_env "ocz" env in
+  let iz = get_env "iz" env in
+  match (iz, pz, nz, ocz) with
+  | iz, "", "", "" when iz <> "" -> iz
+  | "", pz, nz, ocz when pz <> "" || nz <> "" ->
+      Format.sprintf "%s.%s %s" pz ocz nz
+  | _ -> (
+      match List.assoc_opt "sosa_ref" conf.base_env with
+      | Some s when s <> "" -> s
+      | _ -> "No sosa ref")
+
 (* when str = "" url_set_aux can reset several evar from evar_l in one call *)
 let url_set_aux conf evar_l str (iz, pz, nz, ocz) =
   let href =
@@ -485,6 +503,7 @@ and eval_simple_variable conf = function
       (Util.commd ~excl:[ "templ"; "p_mod"; "wide" ] conf :> string)
   | "referer" -> (Util.get_referer conf :> string)
   | "right" -> conf.right
+  | "sosa_ref" -> find_sosa_ref conf
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
   | "sp" -> " "
   | "static_path" ->
