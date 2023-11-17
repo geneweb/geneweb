@@ -5,7 +5,7 @@
   %and;x%end;
 %end;
 %define;set_lang(l1)
-  %if;(b.default_lang!="l1")%url_set2.lang.file.l1;%else;%url_set2.lang.file;%end;
+  %if;(b.default_lang!="l1")%url_set2.lang.file.l1;%else;%url_setx.lang.file;%end;
 %end;
 %define;language_link()
   %for;i;1;31;
