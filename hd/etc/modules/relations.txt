@@ -1,4 +1,4 @@
-<!-- $Id: modules/relations.txt v7.1 16/08/2023 14:41:19 $ -->
+<!-- $Id: modules/relations.txt v7.1 17/11/2023 10:30:00 $ -->
 %( op_m=1 Relations %)
 %( op_m=2 Relations complete (events) %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
@@ -91,26 +91,26 @@
       <li>%apply;capitalize(relation_type)[:]%nl;
         <ul>
           %apply;li_SDC("relation_him")
-            %apply;very_short_display_person_no_sex("relation_him")
+            %apply;short_display_person("relation_him")
           </li>
           %apply;li_SDC("relation_her")
-            %apply;very_short_display_person_no_sex("relation_her")
+            %apply;short_display_person("relation_her")
           </li>
         </ul>
       </li>
     %elseif;has_relation_him;
       %apply;li_SDC("relation_him")%apply;capitalize(relation_type)[:]%sp;
-        %apply;very_short_display_person_no_sex("relation_him")
+        %apply;short_display_person("relation_him")
       </li>
     %elseif;has_relation_her;
       %apply;li_SDC("relation_her")%apply;capitalize(relation_type)[:]%sp;
-        %apply;very_short_display_person_no_sex("relation_her")
+        %apply;short_display_person("relation_her")
       </li>
     %end;
   %end;
   %foreach;related;
     %apply;li_SDC("related")%apply;capitalize(related_type)[:]%sp;
-      %apply;very_short_display_person_no_sex("related")
+      %apply;short_display_person("related")
     </li>
   %end;
   </ul>
@@ -152,17 +152,17 @@
   %( godparents are displayed in timeline if has_event %)
     %if;(has_relation_him and has_relation_her)
       <li>%apply;capitalize(relation_type)[:]%nl;
-        %apply;very_short_display_person_no_sex("relation_him")
+        %apply;short_display_person("relation_him")
         ,%sp;
-        %apply;very_short_display_person_no_sex("relation_her").
+        %apply;short_display_person("relation_her").
       </li>
     %elseif;(has_relation_him and not has_relation_her)
       %apply;li_SDC("relation_him")%apply;capitalize(relation_type) :%sp;
-      %apply;very_short_display_person_no_sex("relation_him").
+      %apply;short_display_person("relation_him").
       </li>
     %elseif;(has_relation_her and not has_relation_him)
       %apply;li_SDC("relation_her")%apply;capitalize(relation_type) :%sp;
-      %apply;very_short_display_person_no_sex("relation_her").
+      %apply;short_display_person("relation_her").
       </li>
     %end;
   %end;
@@ -173,7 +173,7 @@
        related_type!=[godson/goddaughter/godchild]1 and
        related_type!=[godson/goddaughter/godchild]2)
       %apply;li_SDC("related")%apply;capitalize(related_type)[:]%sp;
-      %apply;very_short_display_person_no_sex("related").
+      %apply;short_display_person("related").
     </li>
     %end;
   %end;
@@ -195,7 +195,7 @@
       %if;(related_type=[godson/goddaughter/godchild]0 or
          related_type=[godson/goddaughter/godchild]1 or
          related_type=[godson/goddaughter/godchild]2)
-        %apply;very_short_display_person_no_sex("related")
+        %apply;short_display_person("related")
         %incr_count;
         %if;(count=g_cnt).
         %else;
@@ -214,7 +214,7 @@
     %end;
   %end;
   %if;(count>0)
-    <h3>[*witnesses to events of] %first_name;</h3>
+    <h3>[*witnesses to events of] %self;</h3>
   %end;
   <ul>
     %foreach;event;%sp;
@@ -227,7 +227,7 @@
           %apply;capitalize(event.name) %if;(event.date.year!="")(%event.date.year;)%end;[:]
           %foreach;event_witness;
             %if;not is_first;, %end;%nn;
-            %apply;very_short_display_person_no_sex("event_witness")%nn;
+            %apply;short_display_person("event_witness")%nn;
             %if;(event_witness_kind=[officer/officer/officers]0)%nn;
               %sp;(%if;(event_witness.sex=1)[officer/officer/officers]1%else;[officer/officer/officers]0%end;)%end;%nn;
           %end;.
@@ -252,10 +252,10 @@
         %apply;capitalize(event_witness_relation.event.name)%sp;
           %if;(event_witness_relation.event.date.year!="")(%event_witness_relation.event.date.year;)%end;[:]
         %if;(event_witness_relation_kind!=[witness/witnesses]0)(%event_witness_relation_kind;)%end;%sp;
-        %apply;very_short_display_person_no_sex("event_witness_relation.person")
+        %apply;short_display_person("event_witness_relation.person")
         %if;(event_witness_relation.event.spouse!="")
         %sp;[and]
-        %apply;very_short_display_person_no_sex("event_witness_relation.event.spouse")
+        %apply;short_display_person("event_witness_relation.event.spouse")
         %end;.
       </li>
     %end;

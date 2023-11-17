@@ -1,4 +1,4 @@
-<!-- $Id: modules/unions.txt v7.1 04/03/2023 09:51:04 $ -->
+<!-- $Id: modules/unions.txt v7.1 17/11/2023 10:30:00 $ -->
 %( op_m=1 simple: name %)
 %( op_m=2 photos: simple with photo %)
 %( op_m=3 evolved: spouse parents and children's spouse %)
@@ -630,17 +630,17 @@
                                   %apply;short_display_person_f("spouse")
                                   %if;are_divorced; [divorced]0 %divorce_date;%end;
                                   %if;are_separated; [separated]0%end;
-                                  %if;has_children; %apply;havingchildren(nb_children)[:]
-                                    <div style="font-size: 90%%">%nn;
-                                      <ul>
-                                      %foreach;child;
-                                        %if;(child_cnt!=1), %end;
-                                          %apply;li_SDC("child")
+                                  %if;has_children;
+                                    <table style="border-width: %border;"><tr>%nn;
+                                      <td style="font-size: 80%%;padding-left: 18px">%nn;
+                                        %apply;havingchildren(nb_children)[:]
+                                        %foreach;child;
+                                          %if;(child_cnt!=1), %end;
                                           %apply;short_display_person_f("child")
-                                          </li>
-                                      %end;
-                                      </ul>
-                                    </div>
+                                          %if;(child_cnt=nb_children).%end;
+                                        %end;
+                                       </td>
+								    </tr></table>
                                   %end;
                                 %end;
                               %end;
