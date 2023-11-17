@@ -1,4 +1,4 @@
-<!-- $Id: modules/sources.txt v7.0 28/10/2018 23:10:24 $ -->
+<!-- $Id: modules/sources.txt v7.1 17/11/2023 10:30:00 $ -->
 %( op_m=1 Sources  %)
 %( op_m=2 Sources complete (events) %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
@@ -20,6 +20,7 @@
   %else;
     <h2>[*source/sources]1</h2>
   %end;
+  <em style="font-size:80%%">
   <ul>
   %foreach;source;
     <li>%apply;capitalize(source_type)[:] %source;.</li>
@@ -49,4 +50,5 @@
     %end;
   %end;
   </ul>
+  </em>
 %end;
