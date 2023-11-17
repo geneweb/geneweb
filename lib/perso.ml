@@ -2127,7 +2127,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       if i >= 0 && i < Gwdb.nb_of_persons base then
         let ip = iper_of_string v in
         let ep = make_ep conf base ip in
-        if is_hidden (fst ep) then raise Not_found
+        if is_hidden (fst ep) then str_val ""
         else eval_person_field_var conf base env ep loc sl
       else raise Not_found
   | "f_of_index" :: v :: sl ->
