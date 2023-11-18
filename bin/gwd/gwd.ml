@@ -31,7 +31,8 @@ let default_lang = ref "fr"
 let friend_passwd = ref ""
 let green_color = "#2f6400"
 let images_dir = ref ""
-let images_url = ref ""
+let image_prefix = ref ""
+let static_path = ref ""
 let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
 let login_timeout = ref 1800
 let max_clients = ref None
@@ -1180,6 +1181,9 @@ let make_conf from_addr request script_name env =
             username, ""
           end
   in
+  
+  List.iter (fun d -> Printf.eprintf "Dir: %s\n" d)( Secure.assets ());
+  
   let conf =
     {from = from_addr;
      api_mode = false;
@@ -1291,21 +1295,11 @@ let make_conf from_addr request script_name env =
      today_wd = tm.Unix.tm_wday;
      time = tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec; ctime = utm;
      image_prefix =
-       if !images_url <> "" then !images_url
-       else (
-          match List.assoc_opt "image_prefix" base_env,
-            Sys.getenv_opt "GW_STATIC_PATH" with
-          | Some x1, Some x2 -> String.concat Filename.dir_sep [ x2; "images" ]
-          | None, Some x2 -> String.concat Filename.dir_sep [ x2; "images" ]
-          | Some x1, None -> String.concat Filename.dir_sep [ x1; "images" ]
-          | _, _ -> "images" );
-     static_path = (
-       match List.assoc_opt "static_path" base_env,
-            Sys.getenv_opt "GW_STATIC_PATH" with
-       | Some x1, Some x2 -> String.concat Filename.dir_sep [ x2; "etc"; "" ]
-       | None, Some x2 -> String.concat Filename.dir_sep [ x2; "etc"; "" ]
-       | Some x1, None -> String.concat Filename.dir_sep [ x1; "etc"; "" ]
-       | _, _ -> String.concat Filename.dir_sep [ "etc"; "" ]);
+       if !image_prefix <> "" then !image_prefix
+       else String.concat Filename.dir_sep [ "gw"; "images"];
+     static_path =
+       if !static_path <> "" then !static_path
+       else String.concat Filename.dir_sep [ "gw"; "etc"; ""];
         (* "" to guarantee / at the end! *)
      cgi;
      output_conf;
@@ -1965,7 +1959,8 @@ let main () =
     ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for socket communication (Windows) and access count.")
     ; ("-cache_langs", Arg.String (fun s -> List.iter (Mutil.list_ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
     ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
-    ; ("-images_url", Arg.String (fun x -> images_url := x), "<URL> URL for GeneWeb images (default: gwd send them).")
+    ; ("-image_prefix", Arg.String (fun x -> image_prefix := x), "<URL> URL for GeneWeb images (default: gwd send them).")
+    ; ("-static_path", Arg.String (fun x -> static_path := x), "<URL> Static path for CGI mode.")
     ; ("-images_dir", Arg.String (fun x -> images_dir := x), "<DIR> Same than previous but directory name relative to current.")
     ; ("-a", Arg.String (fun x -> selected_addr := Some x), "<ADDRESS> Select a specific address (default = any address of this computer).")
     ; ("-p", Arg.Int (fun x -> selected_port := x), "<NUMBER> Select a port number (default = " ^ string_of_int !selected_port ^ ").")
@@ -2031,7 +2026,7 @@ let main () =
       let d = Filename.dirname f in
       if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
     in
-      images_url := "file://" ^ slashify abs_dir
+      image_prefix := "file://" ^ slashify abs_dir
     end;
   if !(Util.cnt_dir) = Filename.current_dir_name then
     Util.cnt_dir := Secure.base_dir ();

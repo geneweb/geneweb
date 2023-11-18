@@ -472,11 +472,8 @@ and eval_simple_variable conf = function
   | "highlight" -> conf.highlight
   | "image_prefix" ->
       (let s =
-         if conf.cgi then
-           match List.assoc_opt "image_prefix" conf.base_env with
-           | Some x -> Adef.escaped x
-           | None -> Image.prefix conf
-         else Image.prefix conf
+         if conf.cgi then Adef.escaped conf.image_prefix
+         else Adef.escaped "images"
        in
        s
         :> string)
