@@ -1296,24 +1296,21 @@ let make_conf from_addr request script_name env =
      time = tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec; ctime = utm;
      image_prefix =
        if !images_url <> "" then !images_url
-       else if !(Wserver.cgi) then
-          begin match Sys.getenv_opt "GW_STATIC_PATH" with
-          | Some x -> String.concat Filename.dir_sep [x; ".."; "images"]
-              (* Assumes that GW_STATIC_PATH is ../distribution/gw/etc  *)
-          | None -> String.concat Filename.dir_sep
-              [".."; "distribution"; "gw"; "images" ]
-              (* FIXME
-              assumes that distribution has been installed next to cgi-bin
-              this default path may not work if the distribution
-              is accessed through SynLinks and Apache is not properly configured *)
-          end
-       else "images";
-     static_path =
-       begin match Sys.getenv_opt "GW_STATIC_PATH" with
-       | Some x -> String.concat Filename.dir_sep [x; ""]
-       | None -> String.concat Filename.dir_sep [".."; "distribution"; "gw"; "etc"; "" ]
-         (* FIXME same comment. / at the end! *)
-       end;
+       else (
+          match List.assoc_opt "image_prefix" base_env,
+            Sys.getenv_opt "GW_STATIC_PATH" with
+          | Some x1, Some x2 -> String.concat Filename.dir_sep [ x2; "images" ]
+          | None, Some x2 -> String.concat Filename.dir_sep [ x2; "images" ]
+          | Some x1, None -> String.concat Filename.dir_sep [ x1; "images" ]
+          | _, _ -> "images" );
+     static_path = (
+       match List.assoc_opt "static_path" base_env,
+            Sys.getenv_opt "GW_STATIC_PATH" with
+       | Some x1, Some x2 -> String.concat Filename.dir_sep [ x2; "etc"; "" ]
+       | None, Some x2 -> String.concat Filename.dir_sep [ x2; "etc"; "" ]
+       | Some x1, None -> String.concat Filename.dir_sep [ x1; "etc"; "" ]
+       | _, _ -> String.concat Filename.dir_sep [ "etc"; "" ]);
+        (* "" to guarantee / at the end! *)
      cgi;
      output_conf;
      forced_plugins = !forced_plugins;
