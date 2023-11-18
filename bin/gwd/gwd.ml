@@ -2023,6 +2023,9 @@ let main () =
   List.iter register_plugin !plugins ;
   !GWPARAM.init () ;
   cache_lexicon () ;
+  if !auth_file <> "" && !force_cgi then
+    Printf.eprintf "-auth option is not compatible with CGI mode.\n \
+      Use instead friend_passwd_file= and wizard_passwd_file= in .cgf file\n";
   if !images_dir <> "" then
     begin let abs_dir =
       let f =
