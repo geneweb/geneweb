@@ -470,13 +470,19 @@ and eval_simple_variable conf = function
       | None -> "")
   | "doctype" -> (Util.doctype :> string)
   | "highlight" -> conf.highlight
+  | "gw_prefix" ->
+      let s =
+        if conf.cgi then Adef.escaped conf.gw_prefix else Adef.escaped ""
+      in
+      let s = (s :> string) in
+      if s = "" then s else s ^ Filename.dir_sep
   | "image_prefix" ->
-      (let s =
-         if conf.cgi then Adef.escaped conf.image_prefix
-         else Adef.escaped "images"
-       in
-       s
-        :> string)
+      let s =
+        if conf.cgi then Adef.escaped conf.image_prefix
+        else Adef.escaped "images"
+      in
+      let s = (s :> string) in
+      if s = "" then s else s ^ Filename.dir_sep
   | "lang" -> conf.lang
   | "default_lang" -> conf.default_lang
   | "left" -> conf.left
@@ -504,11 +510,11 @@ and eval_simple_variable conf = function
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
   | "sp" -> " "
   | "static_path" ->
-      (let s =
-         if conf.cgi then Adef.escaped conf.static_path else Adef.escaped ""
-       in
-       s
-        :> string)
+      let s =
+        if conf.cgi then Adef.escaped conf.static_path else Adef.escaped ""
+      in
+      let s = (s :> string) in
+      if s = "" then s else s ^ Filename.dir_sep
   | "suffix" ->
       (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
       let l =

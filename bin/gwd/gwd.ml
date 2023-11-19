@@ -31,6 +31,7 @@ let default_lang = ref "fr"
 let friend_passwd = ref ""
 let green_color = "#2f6400"
 let images_dir = ref ""
+let gw_prefix = ref ""
 let image_prefix = ref ""
 let static_path = ref ""
 let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
@@ -1294,13 +1295,21 @@ let make_conf from_addr request script_name env =
         year = tm.Unix.tm_year + 1900; prec = Sure; delta = 0};
      today_wd = tm.Unix.tm_wday;
      time = tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec; ctime = utm;
-     image_prefix =
-       if !image_prefix <> "" then !image_prefix
-       else String.concat Filename.dir_sep [ "gw"; "images"];
-     static_path =
-       if !static_path <> "" then !static_path
-       else String.concat Filename.dir_sep [ "gw"; "etc"; ""];
-        (* "" to guarantee / at the end! *)
+     gw_prefix =
+       if !gw_prefix <> "" then !gw_prefix
+       else String.concat Filename.dir_sep [ "gw" ];
+     image_prefix = (
+       match !gw_prefix, !image_prefix with
+       | gw_p, im_p when gw_p <> "" && im_p = "" ->
+           String.concat Filename.dir_sep [ gw_p; "images" ]
+       | _, im_p when im_p <> "" ->  im_p
+       | _, _ -> (Filename.concat "gw" "images"));
+     static_path = (
+       match !gw_prefix, !static_path with
+       | gw_p, st_p when gw_p <> "" && st_p = "" ->
+           String.concat Filename.dir_sep [ gw_p; "etc" ]
+       | _, st_p when st_p <> "" ->  st_p
+       | _, _ -> (Filename.concat "gw" "etc"));
      cgi;
      output_conf;
      forced_plugins = !forced_plugins;
@@ -1959,6 +1968,7 @@ let main () =
     ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for socket communication (Windows) and access count.")
     ; ("-cache_langs", Arg.String (fun s -> List.iter (Mutil.list_ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
     ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
+    ; ("-gw_prefix", Arg.String (fun x -> gw_prefix := x; Secure.add_assets x), "<URL> URL for GeneWeb gw/etc, gw/images.")
     ; ("-image_prefix", Arg.String (fun x -> image_prefix := x), "<URL> URL for GeneWeb images (default: gwd send them).")
     ; ("-static_path", Arg.String (fun x -> static_path := x), "<URL> Static path for CGI mode.")
     ; ("-images_dir", Arg.String (fun x -> images_dir := x), "<DIR> Same than previous but directory name relative to current.")
