@@ -24,7 +24,7 @@ ifeq ($(DUNE_PROFILE),dev)
 endif
 
 %/dune: %/dune.in Makefile.config
-	@echo -n "Generating $@…" \
+	@printf "Generating $@…" \
 	&& cat $< \
 	| cppo -n $(CPPO_D) \
 	| sed \
@@ -34,33 +34,49 @@ endif
 	-e "s/%%%SYSLOG_PKG%%%/$(SYSLOG_PKG)/g" \
 	-e "s/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g" \
 	> $@ \
-	&& echo " Done."
+	&& printf " Done.\n"
 
 bin/gwrepl/.depend:
-	@echo -n "Generating $@…"
+	@printf "Generating $@…"
 	@pwd > $@
 	@dune top bin/gwrepl >> $@
-	@echo " Done."
+	@printf " Done.\n"
 
 dune-workspace: dune-workspace.in Makefile.config
-	cat $< | sed  -e "s/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g" > $@
+	@cat $< | sed  -e "s/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g" > $@
 
-COMMIT := $$(git show -s --date=short --pretty=format:'%h (%cd)')
+COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%h (%cd)')
+COMMIT_ID := $(shell git rev-parse --short HEAD)
+COMMIT_MSG := $(shell git log -1 --pretty="%s%n%n%b")
+VERSION := $(shell awk -F\" '/xt =/ {print $$2}' lib/version.ml)
+SOURCE := $(shell git remote get-url origin | sed -n 's|^.*m/\([^/]\+/[^/]\+\)\.git$$|\1|p')
+OCAMLV := $(shell ocaml --version)
+
+bin/gwd/info.ml:
+	@printf "Building \033[1;37mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n"
+	@printf "Repository/branch \033[1;37m$(SOURCE)\033[0m.\n\n"
+	@printf "Last commit \033[1;37m$(COMMIT_ID)\033[0m with message “\033[1;37m%s\033[0m”.\n" "$(subst \, ,$(COMMIT_MSG))"
+	@printf "let ver = \"$(VERSION)\"" > $@
+	@printf "let src = \"$(SOURCE)\"" >> $@
+	@printf "let id = \"$(COMMIT_ID)\"" >> $@
+	@printf "\n\033[1;37mGenerating configuration files\033[0m\n"
+	@printf "Generating $@… Done.\n"
+.PHONY:bin/gwd/info.ml
+
 hd/etc/version.txt:
-	@echo -n "<a href=\"https://github.com/geneweb/geneweb/commit/" > $@
-	@echo "$$(git show -s --pretty=format:'%h')\"" >> $@
-	@echo -n "  title=\"[*compiled on %s from commit %s:::$$(date '+%Y-%m-%d'):" >> $@
-	@echo -n "$(COMMIT)]\">" >> $@
-	@echo "GeneWeb v. %version;</a>" >> $@
-	@echo "Last commit is $(COMMIT)."
-	@echo "Generating $@… Done."
-
+	@printf "<a href=\"https://github.com/geneweb/geneweb/commit/" > $@
+	@printf "$(COMMIT_ID)\"" >> $@
+	@printf "\n title=\"[*compiled on %%s from commit %%s:::$(shell date '+%Y-%m-%d'):" >> $@
+	@printf "$(COMMIT_DATE)]\">" >> $@
+	@printf "\nGeneWeb v. %%version;</a>\n" >> $@
+	@printf "Generating $@… Done.\n"
 .PHONY:hd/etc/version.txt
 
 # [End] Generated files section
 
 GENERATED_FILES_DEP = \
 	dune-workspace \
+	bin/gwd/info.ml \
 	hd/etc/version.txt \
 	lib/dune \
 	lib/gwdb/dune \
@@ -113,8 +129,10 @@ BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
 
 distrib: ## Build the project and copy what is necessary for distribution
 distrib:
+	@printf "\n\033[1;37mBuilding executables\033[0m\n"
 	$(RM) -r $(DISTRIB_DIR)
 	dune build -p geneweb --profile $(DUNE_PROFILE)
+	@printf "\n\033[1;37mCreating distribution directory\033[0m\n"
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
 	cp CHANGES $(DISTRIB_DIR)/CHANGES.txt
@@ -140,6 +158,7 @@ distrib:
 	mkdir $(DISTRIB_DIR)/gw
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
 	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
+	@printf "\n\033[1;37m└ Copy binaries in $(DISTRIB_DIR)/gw/\033[0m\n"
 	cp $(BUILD_DISTRIB_DIR)connex/connex.exe $(DISTRIB_DIR)/gw/connex$(EXT);
 	cp $(BUILD_DISTRIB_DIR)consang/consang.exe $(DISTRIB_DIR)/gw/consang$(EXT);
 	cp $(BUILD_DISTRIB_DIR)fixbase/gwfixbase.exe $(DISTRIB_DIR)/gw/gwfixbase$(EXT);
@@ -153,6 +172,8 @@ distrib:
 	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT);
 	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT);
 	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT);
+	@printf "\n\033[1;37m└ Copy templates in $(DISTRIB_DIR)/gw/\033[0m\n"
+	cp -R hd/* $(DISTRIB_DIR)/gw/
 	mkdir $(DISTRIB_DIR)/gw/setup
 	cp bin/setup/intro.txt $(DISTRIB_DIR)/gw/setup/
 	mkdir $(DISTRIB_DIR)/gw/setup/lang
@@ -161,7 +182,7 @@ distrib:
 	cp bin/setup/lang/*.htm $(DISTRIB_DIR)/gw/setup/lang/
 	cp bin/setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/
 	cp bin/setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/
-	cp -R hd/* $(DISTRIB_DIR)/gw/
+	@printf "\n\033[1;37m└ Copy plugins in $(DISTRIB_DIR)/gw/plugins\033[0m\n"
 	mkdir $(DISTRIB_DIR)/gw/plugins
 	for P in $(shell ls plugins); do \
 		if [ -f $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs ] ; then \
@@ -175,6 +196,8 @@ distrib:
 			fi; \
 		fi; \
 	done
+	@printf "\033[1;37mBuild complete.\033[0m\n"
+	@printf "You can launch Geneweb with “\033[1;37mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;37mgw/gwd$(EXT)\033[0m”.\n";
 
 .PHONY: install uninstall distrib
 
