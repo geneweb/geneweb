@@ -44,5 +44,6 @@
     gwdPluginMD5
     gwdPluginMETA
     robot
+    info
   )
 )

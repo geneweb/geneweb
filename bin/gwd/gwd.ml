@@ -1951,6 +1951,10 @@ let arg_plugins opt doc =
   , arg_plugin_doc opt doc
   )
 
+let print_version_commit () =
+  Printf.printf "Geneweb version %s\nBuild from %s\nLast commit %s\n" Info.ver Info.src Info.id;
+  exit 0
+
 let main () =
 #ifdef WINDOWS
   Wserver.sock_in := "gwd.sin";
@@ -1963,8 +1967,8 @@ let main () =
   let force_cgi = ref false in
   let speclist =
     [
-      ("-hd", Arg.String Secure.add_assets, "<DIR> Directory where the directory lang is installed.")
-    ; ("-bd", Arg.String Secure.set_base_dir, "<DIR> Directory where the databases are installed.")
+      ("-hd", Arg.String Secure.add_assets, "<DIR> Specify where the “lang” directory is installed (default if empty is “gw”).")
+    ; ("-bd", Arg.String Secure.set_base_dir, "<DIR> Specify where the “bases” directory with databases is installed (default if empty is “bases”).")
     ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for socket communication (Windows) and access count.")
     ; ("-cache_langs", Arg.String (fun s -> List.iter (Mutil.list_ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
     ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
@@ -1997,6 +2001,7 @@ let main () =
     ; ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock files before writing.")
     ; (arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin." )
     ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
+    ; ("-version", Arg.Unit print_version_commit, " Print the Geneweb version, the source repository and last commit id and message.")
 #ifdef UNIX
     ; ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
