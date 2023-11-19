@@ -77,11 +77,11 @@
     </div>
     <div class="bg-white my-0 order-md-2 flex-fill text-lg-center align-self-md-center">
       %if;(b.welcome_logo!="")
-        <img src="%prefix;m=IM;v=%b.welcome_logo;"
+        <img src="%prefix;m=IM;s=%b.welcome_logo;"
            style="%if;(b.welcome_logo_style!="")%b.welcome_logo_style;%end;"
            alt="MyBase" title="MyBase">
       %else;
-        %(<img src="%image_prefix;/gwlogo.png" alt="GeneWeb" title="GeneWeb">%)
+        <img src="%image_prefix;/gwlogo.png" alt="GeneWeb" title="GeneWeb">
       %end;
       <h1 class="font-weight-bolder">%apply;capitalize%with;[database]%end; %base.name;</h1>
       %if;(b.visitor_access!="no")<span class="font-weight-light h2">%base.nb_persons; [person/persons]1</span>%end;
