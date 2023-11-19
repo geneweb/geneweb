@@ -480,3 +480,94 @@ perso_module_l=ligne
 # Warning: complete work never merged in geneweb/master branch,
 #          (TODO need a ref here) so flag not to be set.
 #reorg=on
+
+### templm specific parameters ######################################
+
+# for templm, identify css file to be used, either
+# css.css  display on grey background (default) or
+# css1.css display on black background if variable is set.
+# TODO also present in potentially obsolete file anctree_h7.txt
+#css=1
+
+# for templm, automatic completion in individual or family forms
+# for following fields: firstname, surname, occupation, place, source
+# each variable may take two values, (nothing done if not set)
+# 1: load all the list at ones
+# 2: load filtered list by three first characters
+#datalist_fn=2
+#datalist_sn=2
+#datalist_occu=2
+#datalist_place=2
+#datalist_src=2
+
+# for templm, above automatic completion lists are generated from cache,
+# or from associated base books if variable is set.
+#datalist_book=1
+
+# for templm, on individual page, display parents age at birthday,
+# and individual age for each event. (not the case by default)
+#event_age=yes
+
+# for templm, jquery functions:
+# TODO obsolete description versus current source code.
+# on individual page, display numbers of ascendants, descendants, implexes
+# on individual & family forms, search for places, sources, occupations
+#    and search for witnesses
+# if needed you may disable all of that by variable set to 'no'
+#jquery=no
+
+# for templm,
+# number of descendant generations in person page, only 1 by default
+# (provided value is limited to max_desc_level)
+#maxlev=1
+
+# for templm, for statistics (anclist.txt & deslist.txt)
+# deactivate the shortest path links if more than 200 dates (default value)
+#max_dates=200
+
+# for templm, on individual page, some pulldown menus on top of page
+# may be changed as static menus at page bottom if variable is set.
+#menu=1
+
+# for templm, on individual page, if variable is set then
+# list all identifications of this individual and related wiki text.
+# if not set here, user has a button to togle display.
+#misc=yes
+
+# for templm, In family form, if variable is set
+# if no mariage comment, then union comment is moved to mariage comment.
+#move_comment=yes
+
+# is used in etc/updfam.txt
+# TODO do not understand purpose
+#multi_parents=yes
+
+# for templm, In form pages,
+# if uppercase is set, then able to change the list of particles
+# that will not be converted to uppercase.
+# by default the list is hardcoded in two files
+# etc/templm/css.txt & etc/templm/js_upd.txt
+#particles=
+
+# for templm, on individual page, the gwsetup menu may be disabled
+#setup_link=no
+
+# for templm, default gwsetup server url http://127.0.0.1:2316/
+# may be changed here
+#setup_http=
+
+# for templm, if needed add country flags in list of languages to be selected.
+#show_flag=yes
+
+# for templm, on individual page, if variable is set
+# then add timeline as detailed in etc/templm/timeline.txt
+#timeline=yes
+
+# for templm, In form pages,
+# convert firstname lastname to firstname LASTNAME
+#uppercase=yes
+
+# for templm, display individual page on two columns by default
+# or to only one if variable is set
+# if not set, then togle checkbox accessible on individual page.
+#wide=on
