@@ -108,6 +108,7 @@ type config = {
      the value of argument -images_url if specified, otherwise
      command ^ "?m=IM&v=" in CGI mode
      "images" otherwise *)
+  gw_prefix : string;
   image_prefix : string;
       (* if true, the base name is in the b argument of the query string: ?b=BASE&...
          if false, the base name is the last element of the uri path: .../base?... *)

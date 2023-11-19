@@ -103,6 +103,7 @@ type config = {
      the value of argument -images_url if specified, otherwise
      command ^ "?m=IM&v=" in CGI mode
      "images" otherwise *)
+  gw_prefix : string;
   image_prefix : string;
   static_path : string;
   (* in CGI mode, provides location of etc files to Apache for direct loading *)
@@ -174,6 +175,7 @@ let empty =
     today_wd = 0;
     time = (0, 0, 0);
     ctime = 0.;
+    gw_prefix = "";
     image_prefix = "";
     static_path = "";
     cgi = false;

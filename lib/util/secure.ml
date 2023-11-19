@@ -26,8 +26,9 @@ let decompose =
 
 (* add asset to the list of allowed to acces assets *)
 let add_assets d =
-  assets_r := d :: !assets_r;
-  ok_r := decompose d :: !ok_r
+  if not (List.mem d !assets_r) then (
+    assets_r := List.rev (d :: List.rev !assets_r);
+    ok_r := decompose d :: !ok_r)
 
 (* set base dir to which acces could be allowed *)
 let set_base_dir d =
