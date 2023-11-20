@@ -1517,9 +1517,9 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
       Gwdb.ipers, Gwdb.ifams
   in
   let gen =
-    let mark = Gwdb.iper_marker (ipers base) false in
-    let mark_rel = Gwdb.iper_marker (ipers base) false in
-    let fam_done = Gwdb.ifam_marker (ifams base) false in
+    let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
+    let mark_rel = Gwdb.iper_marker (Gwdb.ipers base) false in
+    let fam_done = Gwdb.ifam_marker (Gwdb.ifams base) false in
     {
       mark;
       mark_rel;
