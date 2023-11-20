@@ -1510,10 +1510,16 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
         Hashtbl.add src_oc_ht fname x;
         x
   in
+  let ipers, ifams =
+    if opts.Gwexport.patch_only then
+      Gwdb.ipers_from_patch, Gwdb.ifams_from_patch
+    else
+      Gwdb.ipers, Gwdb.ifams
+  in
   let gen =
-    let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
-    let mark_rel = Gwdb.iper_marker (Gwdb.ipers base) false in
-    let fam_done = Gwdb.ifam_marker (Gwdb.ifams base) false in
+    let mark = Gwdb.iper_marker (ipers base) false in
+    let mark_rel = Gwdb.iper_marker (ipers base) false in
+    let fam_done = Gwdb.ifam_marker (ifams base) false in
     {
       mark;
       mark_rel;
@@ -1566,7 +1572,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
           print_notes opts base gen ml;
           print_relations opts base gen ml;
           if not !old_gw then print_pevents opts base gen ml))
-    (Gwdb.ifams ~select:gen.fam_sel base);
+    (ifams ~select:gen.fam_sel base);
   (* Ajout des personnes isolée à l'export. On leur ajoute des    *)
   (* parents pour pouvoir utiliser les autres fonctions normales. *)
   (* Export que si c'est toute la base.                           *)
@@ -1614,7 +1620,7 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
                 print_notes_for_person opts base gen p;
                 Gwdb.Marker.set gen.mark i true;
                 print_isolated_relations opts base gen p)
-      (Gwdb.ipers base);
+      (ipers base);
   if !Mutil.verbose then ProgrBar.finish ();
   if opts.base_notes then (
     let s = base_notes_read base "" in

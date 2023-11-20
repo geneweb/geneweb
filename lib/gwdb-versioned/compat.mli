@@ -645,12 +645,18 @@ module type Driver_S = sig
   val ipers : base -> iper Collection.t
   (** Collection of person's ids *)
 
+  val ipers_from_patch : base -> iper Collection.t
+  (** Collection of patched person's ids *)
+  
   val persons : base -> person Collection.t
   (** Collection of persons *)
 
   val ifams : ?select:(ifam -> bool) -> base -> ifam Collection.t
   (** Collection of family's ids *)
 
+  val ifams_from_patch : ?select:(ifam -> bool) -> base -> ifam Collection.t
+  (** Collection of patched family's ids *)
+  
   val families : ?select:(family -> bool) -> base -> family Collection.t
   (** Collection of families *)
 

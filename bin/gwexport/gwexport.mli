@@ -19,6 +19,7 @@ type gwexport_opts = {
       (* If asc, ascdesc and desc are not set & parenting = true, then
          select individuals involved in parentship between pair of keys
          (/!\ assumes the input are pairs of keys) *)
+  patch_only : bool; (* only export patch data *)
   picture_path : bool; (* Unused by this module *)
   source : string option; (* Unused by this module *)
   surnames : string list; (* Used to select persons by their surname *)

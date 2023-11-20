@@ -502,6 +502,15 @@ let persons base =
 let ipers base =
   { Collection.length = nb_of_persons base; get = (fun i -> Some i) }
 
+let ipers_from_patch base =
+  {
+    Collection.length = nb_of_persons base;
+    get = begin fun i ->
+      try let _ = base.data.persons.get_nobase i in Some i
+      with Not_found -> None
+    end;
+  }
+
 let iper_marker c i = Marker.make (fun i -> i) c i
 
 let ifams ?(select = fun _ -> true) base =
@@ -512,6 +521,16 @@ let ifams ?(select = fun _ -> true) base =
         if select i then
           if get_ifam (foi base i) = dummy_ifam then None else Some i
         else None);
+  }
+
+let ifams_from_patch  ?(select = fun _ -> true) base =
+  let _ = select in
+  {
+    Collection.length = nb_of_families base;
+    get = begin fun i ->
+    try let _ = base.data.families.get_nobase i in Some i
+    with Not_found -> None
+  end;
   }
 
 let families ?(select = fun _ -> true) base =

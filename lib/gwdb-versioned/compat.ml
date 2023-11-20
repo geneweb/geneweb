@@ -645,12 +645,18 @@ module type Driver_S = sig
   val ipers : base -> iper Collection.t
   (** Collection of person's ids *)
 
+  val ipers_from_patch : base -> iper Collection.t
+  (** Collection of patched person's ids *)
+  
   val persons : base -> person Collection.t
   (** Collection of persons *)
 
   val ifams : ?select:(ifam -> bool) -> base -> ifam Collection.t
   (** Collection of family's ids *)
 
+  val ifams_from_patch : ?select:(ifam -> bool) -> base -> iper Collection.t
+  (** Collection of patched family's ids *)
+  
   val families : ?select:(family -> bool) -> base -> family Collection.t
   (** Collection of families *)
 
@@ -1442,6 +1448,11 @@ struct
       (fun base -> Collection.Legacy_collection (Legacy.ipers base))
       (fun base -> Collection.Current_collection (Current.ipers base))
 
+  let ipers_from_patch =
+    Util.wrap_base
+      (fun base -> Collection.Legacy_collection (Legacy.ipers_from_patch base))
+      (fun base -> Collection.Current_collection (Current.ipers_from_patch base))
+  
   let persons =
     Util.wrap_base
       (fun base ->
@@ -1462,6 +1473,15 @@ struct
         let coll = Current.ifams ~select base in
         Collection.Current_collection coll)
 
+  let ifams_from_patch ?(select = fun _ -> true) =
+    Util.wrap_base
+      (fun base ->
+        let coll = Legacy.ifams_from_patch ~select base in
+        Collection.Legacy_collection coll)
+      (fun base ->
+        let coll = Current.ifams_from_patch ~select base in
+        Collection.Current_collection coll)
+  
   let families ?(select = fun _ -> true) =
     let lselect f =
       let f = Legacy_family f in

@@ -18,6 +18,7 @@ type gwexport_opts = {
   no_picture : bool;
   oc : string * (string -> unit) * (unit -> unit);
   parentship : bool;
+  patch_only : bool;
   picture_path : bool;
   source : string option;
   surnames : string list;
@@ -40,6 +41,7 @@ let default_opts =
     no_picture = false;
     oc = ("", print_string, fun () -> close_out stdout);
     parentship = false;
+    patch_only = false;
     picture_path = false;
     source = None;
     surnames = [];
@@ -122,6 +124,10 @@ let speclist c =
        keys. Pairs must be defined with -key option, descendant first: e.g. \
        -key \"Descendant.0 SURNAME\" -key \"Ancestor.0 SURNAME\". If multiple \
        pair are provided, union of persons are returned." );
+    ("-patch-only",
+     Arg.Unit (fun () -> c := { !c with patch_only = true }),
+     " export only patched data."
+    );
     ( "-picture-path",
       Arg.Unit (fun () -> c := { !c with picture_path = true }),
       " extract pictures path." );
