@@ -476,7 +476,7 @@ and eval_simple_variable conf = function
       in
       let s = (s :> string) in
       if s = "" then s else s ^ Filename.dir_sep
-  | "images_prefix" ->
+  | "images_prefix" | "image_prefix" ->
       let s =
         if conf.cgi then Adef.escaped conf.images_prefix
         else Adef.escaped "images"
@@ -509,9 +509,9 @@ and eval_simple_variable conf = function
   | "sosa_ref" -> find_sosa_ref conf
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
   | "sp" -> " "
-  | "static_path" ->
+  | "static_path" | "etc_prefix" ->
       let s =
-        if conf.cgi then Adef.escaped conf.static_path else Adef.escaped ""
+        if conf.cgi then Adef.escaped conf.etc_prefix else Adef.escaped ""
       in
       let s = (s :> string) in
       if s = "" then s else s ^ Filename.dir_sep

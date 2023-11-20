@@ -12,23 +12,23 @@
         integrity="sha512-NHHjSaRwEJ7OOPdQlvxa0gYbL9Np67IYbl+yJ3jDCTUxCCGKhCNlX77eacvuKmf4RszZBA8Elh71V26SKmElWA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
   %else;
-    <script src="%static_path;js/jquery.min.js?version=3.7.1"></script>
-    <script src="%static_path;js/bootstrap.bundle.min.js?version=4.6.1"></script>
+    <script src="%etc_prefix;js/jquery.min.js?version=3.7.1"></script>
+    <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=4.6.1"></script>
     %if;(e.m="A" and e.t="")
-      <script src="%static_path;js/select2.min.js?version=4.1.0rc"></script>
-      <script src="%static_path;js/select2-maximize-height.min.js?version=1.0.4"></script>
+      <script src="%etc_prefix;js/select2.min.js?version=4.1.0rc"></script>
+      <script src="%etc_prefix;js/select2-maximize-height.min.js?version=1.0.4"></script>
     %end;
   %end;
   %if;(e.m="A" and e.t="T" and e.t1="CT")
-    <script src="%static_path;js/jquery.line.js"></script>
+    <script src="%etc_prefix;js/jquery.line.js"></script>
   %end;
   %if;(e.m!="MOD_DATA")
   <script>
     $('#load_once_p_mod').one('click', function() {
-      $.getScript('%static_path;js/p_mod.min.js');
+      $.getScript('%etc_prefix;js/p_mod.min.js');
     });
     $('#load_once_copylink').one('click', function() {
-      $.getScript('%static_path;js/copylink.js');
+      $.getScript('%etc_prefix;js/copylink.js');
     });
   </script>
   %end;
@@ -79,7 +79,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js" 
       integrity="sha384-gqYjRLBp7SeF6PCEz2XeqqNyvtxuzI3DuEepcrNHbrO+KG3woVNa/ISn/i8gGtW8" crossorigin="anonymous"></script>
   %else;
-     <script src="%static_path;js/autosize.min.js?version=4.0.2"></script>
+     <script src="%etc_prefix;js/autosize.min.js?version=4.0.2"></script>
    %end;
   <script>autosize(document.querySelectorAll('textarea'));</script>
 %end;

@@ -105,7 +105,7 @@ type config = {
      "images" otherwise *)
   gw_prefix : string;
   images_prefix : string;
-  static_path : string;
+  etc_prefix : string;
   (* in CGI mode, provides location of etc files to Apache for direct loading *)
   (* if true, the base name is in the b argument of the query string: ?b=BASE&...
      if false, the base name is the last element of the uri path: .../base?... *)
@@ -177,7 +177,7 @@ let empty =
     ctime = 0.;
     gw_prefix = "";
     images_prefix = "";
-    static_path = "";
+    etc_prefix = "";
     cgi = false;
     output_conf =
       { status = ignore; header = ignore; body = ignore; flush = ignore };

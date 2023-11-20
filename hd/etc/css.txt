@@ -18,14 +18,14 @@
         integrity="sha512-aD9ophpFQ61nFZP6hXYu4Q/b/USW7rpLCQLX6Bi0WJHXNO7Js/fUENpBQf/+P4NtpzNX0jSgR5zVvPOJp+W2Kg==" crossorigin="anonymous" referrerpolicy="no-referrer">
     %end;
   %else;
-    <link rel="stylesheet" href="%static_path;css/bootstrap.min.css?version=4.6.2">
-    <link rel="stylesheet" href="%static_path;css/all.min.css?version=6.4.0">
+    <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=4.6.2">
+    <link rel="stylesheet" href="%etc_prefix;css/all.min.css?version=6.4.0">
     %if;(e.m="A" and e.t="")
-      <link rel="stylesheet" href="%static_path;css/select2.min.css?version=4.1.0rc">
+      <link rel="stylesheet" href="%etc_prefix;css/select2.min.css?version=4.1.0rc">
     %end;
   %end;
 %end;
-<link rel="stylesheet" href="%static_path;css/css.css">
+<link rel="stylesheet" href="%etc_prefix;css/css.css">
 %if;(bvar.css_prop != "")
-<link rel="stylesheet" href="%static_path;css/%bvar.css_prop;">
+<link rel="stylesheet" href="%etc_prefix;css/%bvar.css_prop;">
 %end;

@@ -112,7 +112,7 @@ type config = {
   images_prefix : string;
       (* if true, the base name is in the b argument of the query string: ?b=BASE&...
          if false, the base name is the last element of the uri path: .../base?... *)
-  static_path : string;
+  etc_prefix : string;
       (* in CGI mode, provides location of etc files to Apache for direct loading *)
   cgi : bool;
   forced_plugins : string list;

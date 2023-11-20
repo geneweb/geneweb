@@ -1,5 +1,5 @@
   <!-- $Id: modules/arbre_h7.txt v7.1 14/11/2023 20:45:45 $ -->
-  <link rel="stylesheet" href="%static_path;modules/arbre_h6%if;(b.css!="")%b.css;%end;.css">
+  <link rel="stylesheet" href="%etc_prefix;modules/arbre_h6%if;(b.css!="")%b.css;%end;.css">
   %let;l_fs;%if;(e.fs!="")%e.fs;%else;9%end;%in;
   %let;l_wi;%if;(e.wi!="")%e.wi;%else;980%end;%in;
   %let;l_he;%if;(e.he!="")%e.he;%else;600%end;%in;
