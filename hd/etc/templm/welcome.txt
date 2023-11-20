@@ -33,7 +33,7 @@
 %end;
 
 %define;counter()
-  %if;(bvar.counter = "yes")
+  %if;(bvar.counter != "no")
     <div>
     %apply;interp([
 af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle
