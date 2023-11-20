@@ -51,7 +51,7 @@
           title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;">%nn;
       %end;
       <img class="small_image align-self-center rounded ml-0" style="height:70%%"
-        src="%image_prefix;/img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png"
+        src="%images_prefix;img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png"
         alt="[missing image]">
       %if;(wizard and not cancel_links)</a>%end;
     %else;

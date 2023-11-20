@@ -2,9 +2,9 @@
 %( Put here only properties that uses variables %)
 %if;(e.m="MISC_NOTES")
 <style>
-  li.folder { list-style-type: disc; list-style-image: url('%image_prefix;/folder.png'); }
-  li.file { list-style-type: circle; list-style-image: url('%image_prefix;/file.png'); }
-  li.parent { list-style-type: disc; list-style-image: url('%image_prefix;/left.png'); }
+  li.folder { list-style-type: disc; list-style-image: url('%images_prefix;folder.png'); }
+  li.file { list-style-type: circle; list-style-image: url('%images_prefix;file.png'); }
+  li.parent { list-style-type: disc; list-style-image: url('%images_prefix;left.png'); }
 </style>
 %end;
 %if;(evar.templ="")

@@ -45,7 +45,7 @@
             <div class="dropdown-menu dropdown-menu-transl">
               <div class="d-inline-flex justify-content-around mx-1">
                 <form class="form-group mx-1" name="upd_url" method="get" action="%action;">
-                  <div class="d-flex justify-content-between mx-2 mt-2 img-prfx" data-prfx="%image_prefix;/modules">
+                  <div class="d-flex justify-content-between mx-2 mt-2 img-prfx" data-prfx="%images_prefix;modules">
                     <div class="d-inline-flex">
                     %apply;input_hidden("e.b","b")
                     %apply;input_hidden("e.lang","lang")
@@ -80,7 +80,7 @@
                     %end;
                     <button type="submit" class="btn btn-outline-secondary ml-2 mr-1" id='zz'
                             title="Default template" data-toggle="popover" data-trigger="hover"
-                            data-html="true" data-content="<img class='w-100' src='%image_prefix;/modules/zz_1.jpg'>"><i class="fa fa-undo"></i></button>
+                            data-html="true" data-content="<img class='w-100' src='%images_prefix;modules/zz_1.jpg'>"><i class="fa fa-undo"></i></button>
                     </div>
                     <a role="button" class="btn btn-outline-%if;(e.wide="on")danger%else;primary%end;"
                       href="%if;(e.wide!="")%url_set.wide;%else;%url_set.wide.on;%end;"
@@ -97,7 +97,7 @@
                   <div id="p_mod_table"></div>
                 </form>
                 <div class="form-group d-none d-md-block mx-1">
-                  <img src="%image_prefix;/modules/menubar_1.jpg" alt="menubar for p_mod_builder" aria-hidden="true">
+                  <img src="%images_prefix;modules/menubar_1.jpg" alt="menubar for p_mod_builder" aria-hidden="true">
                   <div id="p_mod_builder"></div>
                 </div>
               </div>

@@ -24,7 +24,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
   %include;css
 </head>
 

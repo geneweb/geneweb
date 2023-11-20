@@ -56,7 +56,7 @@
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
 %include;css
 </head>
 <body%body_prop; id="ancsosa">
@@ -244,7 +244,7 @@
 %end;
 
 %define;image_sosa(xxx,yyy)
-  <img src="%image_prefix;/sosa.png" style="border: none" alt="sosa" title="[direct ancestor of %s:::xxx], [*Sosa] yyy">%nn;
+  <img src="%images_prefix;sosa.png" style="border: none" alt="sosa" title="[direct ancestor of %s:::xxx], [*Sosa] yyy">%nn;
 %end;
 
 %define;display_sosa(xx)
@@ -1544,14 +1544,14 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     <table class="display_search">
       <tr>
         <td><b>[*sort by/generation/alphabetic order]0</b></td>
-        <td><img src="%image_prefix;/picto_branch.png"></td>
+        <td><img src="%images_prefix;picto_branch.png"></td>
         <td>
           <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;%nn;
             &t=%e.t;&v=%e.v;&birth=%e.birth;&death=%e.death;&spouse=%e.spouse;&al="
           >[sort by/generation/alphabetic order]1
           </a>
         </td>
-        <td><img src="%image_prefix;/picto_alphabetic_order.png"></td>
+        <td><img src="%images_prefix;picto_alphabetic_order.png"></td>
         <td>[sort by/generation/alphabetic order]2</td>
       </tr>
     </table>
@@ -1686,9 +1686,9 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     <table class="display_search">
       <tr>
         <td><b>[*sort by/generation/alphabetic order]0</b></td>
-        <td><img src="%image_prefix;/picto_branch.png"></td>
+        <td><img src="%images_prefix;picto_branch.png"></td>
         <td>[sort by/generation/alphabetic order]1</td>
-        <td><img src="%image_prefix;/picto_alphabetic_order.png"></td>
+        <td><img src="%images_prefix;picto_alphabetic_order.png"></td>
         <td>
           <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&t=%e.t;&v=%e.v;&birth=%e.birth;&death=%e.death;&spouse=%e.spouse;&al=on">
             [sort by/generation/alphabetic order]2

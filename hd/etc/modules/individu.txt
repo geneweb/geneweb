@@ -392,7 +392,7 @@
           <img src="%image_url;"%image_size; class="%if;(op_m=3)align-self-center mx-1%end; rounded" alt="[image/images]0">%nn;
         %end;
       %elseif;(b.default_image="yes")
-        <img class="%if;(op_m=3)d-flex align-self-center mx-1%end; rounded" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png"%image_size; alt="[missing image]">
+        <img class="%if;(op_m=3)d-flex align-self-center mx-1%end; rounded" src="%images_prefix;img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png"%image_size; alt="[missing image]">
       %end;
     </div>
   %end;

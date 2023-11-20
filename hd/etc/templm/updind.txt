@@ -11,7 +11,7 @@
   </title>
   <meta name="robots" content="none"/>
   <meta charset="utf-8">
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"/>
   %include;css
   %include;js_upd
   %include;updind_updfam

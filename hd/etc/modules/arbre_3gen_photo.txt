@@ -19,7 +19,7 @@
                 alt="[image/images]0" title="%father.father; ([a grandfather/a grandmother/a grandparent]0)">
             %end;
           %elseif;(b.default_image="yes")
-            <img  height="75" src="%image_prefix;/img_unknown_man.png" alt="[missing image]">
+            <img  height="75" src="%images_prefix;img_unknown_man.png" alt="[missing image]">
           %end;
           <br>
           %apply;short_display_person_tree("father.father")</td>
@@ -36,7 +36,7 @@
                 alt="[image/images]0" title="%father.mother; ([a grandfather/a grandmother/a grandparent]1)">
             %end;
           %elseif;(b.default_image="yes")
-            <img height="75" src="%image_prefix;/img_unknown_woman.png" alt="[missing image]">
+            <img height="75" src="%images_prefix;img_unknown_woman.png" alt="[missing image]">
           %end;
           <br>
           %apply;short_display_person_tree("father.mother")</td>
@@ -57,7 +57,7 @@
                 alt="[image/images]0" title="%mother.father; ([a grandfather/a grandmother/a grandparent]0)">
             %end;
           %elseif;(b.default_image="yes")
-            <img height="75" src="%image_prefix;/img_unknown_man.png" alt="[missing image]">
+            <img height="75" src="%images_prefix;img_unknown_man.png" alt="[missing image]">
           %end;
           <br>
           %apply;short_display_person_tree("mother.father")</td>
@@ -74,7 +74,7 @@
                 alt="[image/images]0" title="%mother.mother; ([a grandfather/a grandmother/a grandparent]1)">
             %end;
           %elseif;(b.default_image="yes")
-            <img height="75" src="%image_prefix;/img_unknown_woman.png" alt="[missing image]">
+            <img height="75" src="%images_prefix;img_unknown_woman.png" alt="[missing image]">
           %end;
           <br>
           %apply;short_display_person_tree("mother.mother")</td>
@@ -153,7 +153,7 @@
           <br>
         %elseif;(father.has_parents and mother.has_image)
           %if;(b.default_image="yes")
-            <img class="rounded image_small_size" src="%image_prefix;/img_unknown_man.png" alt="[missing image]">
+            <img class="rounded image_small_size" src="%images_prefix;img_unknown_man.png" alt="[missing image]">
             <br>
           %else;
             <span class="image_small_size rounded px-3 pt-1 pb-2 text-muted" %father.image_small_size;>?</span>
@@ -172,7 +172,7 @@
           <br>
         %elseif;(mother.has_parents and father.has_image)
           %if;(b.default_image="yes")
-            <img class="rounded image_small_size" src="%image_prefix;/img_unknown_woman.png" alt="[missing image]">
+            <img class="rounded image_small_size" src="%images_prefix;img_unknown_woman.png" alt="[missing image]">
             <br>
           %else;
             <span class="image_small_size rounded px-3 pt-1 pb-2 text-muted" %father.image_small_size;>?</span>

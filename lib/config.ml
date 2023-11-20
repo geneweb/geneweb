@@ -104,7 +104,7 @@ type config = {
      command ^ "?m=IM&v=" in CGI mode
      "images" otherwise *)
   gw_prefix : string;
-  image_prefix : string;
+  images_prefix : string;
   static_path : string;
   (* in CGI mode, provides location of etc files to Apache for direct loading *)
   (* if true, the base name is in the b argument of the query string: ?b=BASE&...
@@ -176,7 +176,7 @@ let empty =
     time = (0, 0, 0);
     ctime = 0.;
     gw_prefix = "";
-    image_prefix = "";
+    images_prefix = "";
     static_path = "";
     cgi = false;
     output_conf =

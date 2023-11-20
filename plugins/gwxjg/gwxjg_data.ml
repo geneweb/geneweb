@@ -1101,7 +1101,7 @@ let mk_conf conf =
   let henv = lazy_env (fun s -> encoded s) conf.henv in
   let benv = lazy_env (fun s -> Tstr s) conf.base_env in
   let today = mk_dmy conf.today in
-  let image_prefix = Tsafe conf.image_prefix in
+  let images_prefix = Tsafe conf.images_prefix in
   let user = Tstr conf.user in
   let lang = Tstr conf.lang in
   Tpat
@@ -1111,7 +1111,7 @@ let mk_conf conf =
     | "env" -> env
     | "friend" -> friend
     | "henv" -> henv
-    | "image_prefix" -> image_prefix
+    | "images_prefix" -> images_prefix
     | "lang" -> lang
     | "senv" -> senv
     | "today" -> today
