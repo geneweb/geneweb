@@ -33,7 +33,7 @@ let green_color = "#2f6400"
 let images_dir = ref ""
 let gw_prefix = ref ""
 let images_prefix = ref ""
-let static_path = ref ""
+let etc_prefix = ref ""
 let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
 let login_timeout = ref 1800
 let max_clients = ref None
@@ -1304,8 +1304,8 @@ let make_conf from_addr request script_name env =
            String.concat Filename.dir_sep [ gw_p; "images" ]
        | _, im_p when im_p <> "" ->  im_p
        | _, _ -> (Filename.concat "gw" "images"));
-     static_path = (
-       match !gw_prefix, !static_path with
+     etc_prefix = (
+       match !gw_prefix, !etc_prefix with
        | gw_p, st_p when gw_p <> "" && st_p = "" ->
            String.concat Filename.dir_sep [ gw_p; "etc" ]
        | _, st_p when st_p <> "" ->  st_p
@@ -1972,9 +1972,9 @@ let main () =
     ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for socket communication (Windows) and access count.")
     ; ("-cache_langs", Arg.String (fun s -> List.iter (Mutil.list_ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
     ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
-    ; ("-gw_prefix", Arg.String (fun x -> gw_prefix := x; Secure.add_assets x), "<URL> URL for GeneWeb gw/etc, gw/images.")
-    ; ("-image_prefix", Arg.String (fun x -> image_prefix := x), "<URL> URL for GeneWeb images (default: gwd send them).")
-    ; ("-static_path", Arg.String (fun x -> static_path := x), "<URL> Static path for CGI mode.")
+    ; ("-gw_prefix", Arg.String (fun x -> gw_prefix := x; Secure.add_assets x), "<URL> URL for GeneWeb gw.")
+    ; ("-etc_prefix", Arg.String (fun x -> etc_prefix := x; Secure.add_assets x), "<URL> URL for GeneWeb gw/etc.")
+    ; ("-images_prefix", Arg.String (fun x -> images_prefix := x), "<URL> Prefix for gw/images.")
     ; ("-images_dir", Arg.String (fun x -> images_dir := x), "<DIR> Same than previous but directory name relative to current.")
     ; ("-a", Arg.String (fun x -> selected_addr := Some x), "<ADDRESS> Select a specific address (default = any address of this computer).")
     ; ("-p", Arg.Int (fun x -> selected_port := x), "<NUMBER> Select a port number (default = " ^ string_of_int !selected_port ^ ").")

@@ -160,8 +160,9 @@
   </td>
 </tr>
 <tr>
-  <td>static_path=%static_path;</td>
+  <td>etc_prefix=%etc_prefix;</td>
   <td>
+    (anciennement static_path)<br>
     En mode CGI :
     <ul>
       <li>remplacé par GW_STATIC_PATH depuis la version  7.1, chemin statique des fichiers CSS et js</li>
