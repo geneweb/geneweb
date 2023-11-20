@@ -140,7 +140,7 @@
     %end;
     %if;(not cancel_links)
       <span class="ml-2">%nn;
-        <a href="%prefix_base_password;%access;&m=D&t=T&v=1"><img class="mx-1 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="tree desc." title="[*descendants tree] [to the children] ([with] [spouse/spouses]0)"></a>
+        <a href="%prefix_base_password;%access;&m=D&t=T&v=1"><img class="mx-1 mb-1" src="%images_prefix;gui_create.png" height="18" alt="tree desc." title="[*descendants tree] [to the children] ([with] [spouse/spouses]0)"></a>
       </span>
     %end;
   </h2>
@@ -163,10 +163,10 @@
           %end;
           %if;(not cancel_links)
             <a %apply;relations_tree(index)>%nn;
-              <img class="ml-1 mb-1" src="%image_prefix;/gui_create.png" height="16" alt="tree">%nn;
+              <img class="ml-1 mb-1" src="%images_prefix;gui_create.png" height="16" alt="tree">%nn;
             </a>%nn;
           %else;
-            <img class="ml-1 mb-1" src="%image_prefix;/gui_create.png" height="16" alt="tree">%nn;
+            <img class="ml-1 mb-1" src="%images_prefix;gui_create.png" height="16" alt="tree">%nn;
           %end;
         %end;%nn;
         %apply;init_count(prev_count)
@@ -255,7 +255,7 @@
             <img class="big_image fade_image mx-1 rounded align-self-start" src="%spouse.image_url;" alt="[image/images]0" title="%spouse; ([spouse/spouses]0)">%nn;
           %end;
         %elseif;(bvar.default_image="yes")
-          <img class="align-self-start mx-1 my-4" src="%image_prefix;/img_unknown_%if;(spouse.is_female)wo%elseif;(spouse.is_male)%else;u_%end;man.png" alt="[missing image]">%nn;
+          <img class="align-self-start mx-1 my-4" src="%images_prefix;img_unknown_%if;(spouse.is_female)wo%elseif;(spouse.is_male)%else;u_%end;man.png" alt="[missing image]">%nn;
         %else;
           <div class="big_image noimage rounded align-text-center display-1 text-center text-muted px-5 mx-2 pt-1 pb-4">&nbsp;</div>%nn;
         %end;
@@ -281,7 +281,7 @@
                          alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1 %end;" title="%parent; (%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;)">%nn;
                       %end;
                     %elseif;(bvar.default_image="yes")
-                      <img class="small_image rounded align-self-center" src="%image_prefix;/img_unknown_%if;(parent.is_female)wo%elseif;(parent.is_male)%else;u_%end;man.png" alt="[missing image]" title="%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;">%nn;
+                      <img class="small_image rounded align-self-center" src="%images_prefix;img_unknown_%if;(parent.is_female)wo%elseif;(parent.is_male)%else;u_%end;man.png" alt="[missing image]" title="%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;">%nn;
                     %else;
                       <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">&nbsp;</span>%nn;
                     %end;
@@ -308,7 +308,7 @@
                   <img class="small_image rounded align-self-center" src="%witness.image_url;" alt="[image/images]0" title="%witness; ([witness/witnesses]0)">
                 %end;
               %elseif;(bvar.default_image="yes")
-                <img class="small_image rounded align-self-center ml-2" src="%image_prefix;/img_unknown_%if;(witness.is_female)wo%elseif;(witness.is_male)%else;u_%end;man.png" alt="[missing image]" title="[witness/witnesses]0">
+                <img class="small_image rounded align-self-center ml-2" src="%images_prefix;img_unknown_%if;(witness.is_female)wo%elseif;(witness.is_male)%else;u_%end;man.png" alt="[missing image]" title="[witness/witnesses]0">
               %else;
                 <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">&nbsp;</span>
               %end;
@@ -343,7 +343,7 @@
                       title="%count1;. %child; (%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)">%nn;
                   %end;
                 %elseif;(bvar.default_image="yes")
-                  <img class="small_image align-self-center rounded ml-2" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png" alt="[missing image]"
+                  <img class="small_image align-self-center rounded ml-2" src="%images_prefix;img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png" alt="[missing image]"
                     title="%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;">%nn;
                 %else;
                   <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-2 pb-2">&nbsp;</span>
@@ -421,7 +421,7 @@
                 %if;child.has_families;
                   %foreach;child.family;
                     %if;(family_cnt!=1)
-                      <img width="13" height="13"%sp; src="%image_prefix;/1pixel.png" alt="1px">%sp;
+                      <img width="13" height="13"%sp; src="%images_prefix;1pixel.png" alt="1px">%sp;
                       <em>%child;%child.title;%child.dates;</em>
                     %end;%nn;
                     , %apply;loc_long_married("child")%sp;
@@ -479,7 +479,7 @@
                 %if;child.has_families;
                   %foreach;child.family;
                     %if;(family_cnt!=1)
-                      <img width="13" height="13" src="%image_prefix;/1pixel.png" alt="1px">
+                      <img width="13" height="13" src="%images_prefix;1pixel.png" alt="1px">
                       <em>%child;%child.title;%child.dates;</em>%nn;
                     %end;
                     <em>, %apply;loc_long_married("child")</em>
@@ -494,7 +494,7 @@
                               %if;child.has_families;
                                 %foreach;child.family;
                                   %if;(family_cnt!=1)
-                                    <img width="10" height="10" src="%image_prefix;/1pixel.png"  alt="1px">
+                                    <img width="10" height="10" src="%images_prefix;1pixel.png"  alt="1px">
                                     <em>%child;%child.title;%child.dates;</em>%nn;
                                   %end;
                                   <em>&nbsp;%apply;loc_long_married("child")</em>
@@ -607,7 +607,7 @@
                   %foreach;child.family;
                     %if;(family_cnt!=1)
                       <img width="13" height="13"%sp;
-                        src="%image_prefix;/1pixel.png" alt="1px">%sp;
+                        src="%images_prefix;1pixel.png" alt="1px">%sp;
                       <em>%child;%child.title;%child.dates;</em>%end;
                     <em>&nbsp;%apply;long_married_f("child", "lower")</em>
                     %apply;short_display_person_f("spouse")%nn;
@@ -624,7 +624,7 @@
                                 %foreach;child.family;
                                   %if;(family_cnt!=1)
                                     <br><img width="10" height="10"%sp;
-                                            src="%image_prefix;/1pixel.png" alt="1px">
+                                            src="%images_prefix;1pixel.png" alt="1px">
                                     <em>%child;%child.title;%child.dates;</em>%nl;%end;
                                   <em>&nbsp;%apply;long_married_f("child", "lower")</em>
                                   %apply;short_display_person_f("spouse")

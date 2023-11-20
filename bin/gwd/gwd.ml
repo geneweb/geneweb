@@ -32,7 +32,7 @@ let friend_passwd = ref ""
 let green_color = "#2f6400"
 let images_dir = ref ""
 let gw_prefix = ref ""
-let image_prefix = ref ""
+let images_prefix = ref ""
 let static_path = ref ""
 let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
 let login_timeout = ref 1800
@@ -1302,8 +1302,8 @@ let make_conf from_addr request script_name env =
      gw_prefix =
        if !gw_prefix <> "" then !gw_prefix
        else String.concat Filename.dir_sep [ "gw" ];
-     image_prefix = (
-       match !gw_prefix, !image_prefix with
+     images_prefix = (
+       match !gw_prefix, !images_prefix with
        | gw_p, im_p when gw_p <> "" && im_p = "" ->
            String.concat Filename.dir_sep [ gw_p; "images" ]
        | _, im_p when im_p <> "" ->  im_p
@@ -2047,7 +2047,7 @@ let main () =
       let d = Filename.dirname f in
       if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
     in
-      image_prefix := "file://" ^ slashify abs_dir
+      images_prefix := "file://" ^ slashify abs_dir
     end;
   if !(Util.cnt_dir) = Filename.current_dir_name then
     Util.cnt_dir := Secure.base_dir ();

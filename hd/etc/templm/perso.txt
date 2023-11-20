@@ -5,8 +5,8 @@
   <title>%apply;capitalize(self.first_name) %apply;capitalize(self.surname)%if;(occ!=0) (%occ;)%end; - #%index;</title>
   <meta name="robots" content="none"%/>
   <meta charset="utf-8">
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
+  <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png"%/>
   %include;css
   %include;js_perso_accesskey
   <style type="text/css">

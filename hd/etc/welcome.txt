@@ -6,8 +6,8 @@
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="icon" href="%image_prefix;/favicon_gwd.png">
-  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
+  <link rel="icon" href="%images_prefix;favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%images_prefix;favicon_gwd.png">
   %include;css
 </head>
 <body%body_prop;>
@@ -85,7 +85,7 @@
            style="%if;(b.welcome_logo_style!="")%b.welcome_logo_style;%end;"
            alt="MyBase" title="MyBase">
       %else;
-        <img src="%image_prefix;/gwlogo.png" alt="GeneWeb" title="GeneWeb">
+        <img src="%images_prefix;gwlogo.png" alt="GeneWeb" title="GeneWeb">
       %end;
       <h1 class="font-weight-bolder">%apply;capitalize%with;[database]%end; %base.name;</h1>
       %if;(b.visitor_access!="no" or wizard or friend)

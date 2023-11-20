@@ -12,7 +12,7 @@ val source_filename : config -> string -> string
 (** Returns path to the image file with the giving name in directory {i src/}. *)
 
 val prefix : config -> Adef.escaped_string
-(** Returns the image prefix (conf.image_prefix), html escaped  *)
+(** Returns the image prefix (conf.images_prefix), html escaped  *)
 
 (* TODO this should be removed *)
 val default_portrait_filename : base -> person -> string

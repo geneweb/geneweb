@@ -476,9 +476,9 @@ and eval_simple_variable conf = function
       in
       let s = (s :> string) in
       if s = "" then s else s ^ Filename.dir_sep
-  | "image_prefix" ->
+  | "images_prefix" ->
       let s =
-        if conf.cgi then Adef.escaped conf.image_prefix
+        if conf.cgi then Adef.escaped conf.images_prefix
         else Adef.escaped "images"
       in
       let s = (s :> string) in

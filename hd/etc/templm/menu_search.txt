@@ -13,7 +13,7 @@
     %let;l1;%apply;lang(i)%in;
     <a href="%apply;url_set_lang(l1)" title="%apply;language_name(l1)"%sp;
       style="%if;((bvar.default_lang=l1 and e.lang="") or e.lang=l1)background-color:%if;(bvar.css=1)#666;%else;#EEE;%end;%end;">
-       %if;(bvar.show_flag = "yes")<img src="%image_prefix;/flags/l-%l1;.jpg" width="20" height="11" alt="flag" id="i%tt;" style="border:0"> %end;
+       %if;(bvar.show_flag = "yes")<img src="%images_prefix;flags/l-%l1;.jpg" width="20" height="11" alt="flag" id="i%tt;" style="border:0"> %end;
        %l1; %apply;language_name(l1)</a>
   %end;
 %end;

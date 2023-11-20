@@ -1,1 +1,1 @@
-<link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+<link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
