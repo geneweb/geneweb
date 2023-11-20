@@ -28,52 +28,6 @@
 %include;menubar
 <div id="content" tabindex="-1">
 
-%define;init_nb_asc(tplnum)
-  %let;templ;%bvar.perso_module_tplnum;%in;
-  %if;(templ = "famille" or templ = "arbre_3gen_v" or templ = "arbre_3gen_v_photo")
-    %if;(count<3)
-      %reset_count;%incr_count;%incr_count;%incr_count;
-    %end;
-  %elseif;(templ = "arbre_4gen_v")
-    %if;(count<4)
-      %reset_count;%incr_count;%incr_count;%incr_count;%incr_count;
-    %end;
-  %elseif;(templ = "arbre_5gen_h")
-    %if;(count<5)
-      %reset_count;%incr_count;%incr_count;%incr_count;%incr_count;%incr_count;
-    %end;
-  %else;
-    %if;(count<1)
-      %reset_count;%incr_count;
-    %end;
-  %end;
-%end;
-%define;init_nb_desc(tplnum)
-  %let;templ;%bvar.perso_module_tplnum;%in;
-  %if;(templ="unions")
-    %if;(count<3)
-      %reset_count;%incr_count;%incr_count;%incr_count;
-    %end;
-  %else;
-    %if;(count<1)
-      %reset_count;%incr_count;
-    %end;
-  %end;
-%end;
-
-%define;init_from_gen_desc(tplnum)
-  %let;templ;%bvar.perso_module_tplnum;%in;
-  %if;(templ="family")
-    %if;(count<3)
-      %reset_count;%incr_count;%incr_count;%incr_count;
-    %end;
-  %else;
-    %if;(count<1)
-      %reset_count;%incr_count;
-    %end;
-  %end;
-%end;
-
 %define;init_cache(nb_asc, from_gen_desc, nb_desc)
   %init_cache.nb_asc.from_gen_desc.nb_desc;
 %end;

@@ -865,11 +865,6 @@
   %include.tpl
 %end;
 
-%define;get_templ(tplnum)
-  %let;templ;modules/%b.perso_module_tplnum;%in;
-  %apply;show_templ(templ)
-%end;
-
 %define;get_mod(modnum, optx)
   %let;modx;modules/%b.perso_module_modnum;%in;
   %let;op_m;optx%in;
