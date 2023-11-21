@@ -9,7 +9,7 @@
 (generate_opam_files true)
 (license GPL-2.0-only)
 (authors "Daniel de Rauglaudre")
-(maintainers "Elie Canonici-Merle <elie.canonicimerle@geneanet.org>" "Olivier Pierre <olivier.pierre@geneanet.org>")
+(maintainers "Elie Canonici-Merle <elie.canonicimerle@geneanet.org>")
 (source (github geneweb/geneweb))
 (homepage "https://geneweb.org")
 (documentation "https://geneweb.tuxfamily.org/wiki/GeneWeb")

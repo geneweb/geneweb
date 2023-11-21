@@ -3,10 +3,7 @@ opam-version: "2.0"
 synopsis: "Genealogy library and software"
 description:
   "GeneWeb is an open source genealogy software written in OCaml. It comes with a Web interface and can be used off-line or as a Web service."
-maintainer: [
-  "Elie Canonici-Merle <elie.canonicimerle@geneanet.org>"
-  "Olivier Pierre <olivier.pierre@geneanet.org>"
-]
+maintainer: ["Elie Canonici-Merle <elie.canonicimerle@geneanet.org>"]
 authors: ["Daniel de Rauglaudre"]
 license: "GPL-2.0-only"
 tags: ["genealogy"]
