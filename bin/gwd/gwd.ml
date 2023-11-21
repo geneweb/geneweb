@@ -1967,14 +1967,13 @@ let main () =
   let force_cgi = ref false in
   let speclist =
     [
-      ("-hd", Arg.String Secure.add_assets, "<DIR> Specify where the “lang” directory is installed (default if empty is “gw”).")
+      ("-hd", Arg.String (fun x -> gw_prefix := x; Secure.add_assets x), "<DIR> Specify where the “etc”, “images” and “lang” directories are installed (default if empty is “gw”).")
     ; ("-bd", Arg.String Secure.set_base_dir, "<DIR> Specify where the “bases” directory with databases is installed (default if empty is “bases”).")
     ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for socket communication (Windows) and access count.")
     ; ("-cache_langs", Arg.String (fun s -> List.iter (Mutil.list_ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
     ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
-    ; ("-gw_prefix", Arg.String (fun x -> gw_prefix := x; Secure.add_assets x), "<URL> URL for GeneWeb gw.")
-    ; ("-etc_prefix", Arg.String (fun x -> etc_prefix := x; Secure.add_assets x), "<URL> URL for GeneWeb gw/etc.")
-    ; ("-images_prefix", Arg.String (fun x -> images_prefix := x), "<URL> Prefix for gw/images.")
+    ; ("-etc_prefix", Arg.String (fun x -> etc_prefix := x; Secure.add_assets x), "<DIR> Specify where the “etc” directory is installed (default if empty is [-hd value]/etc).")
+    ; ("-images_prefix", Arg.String (fun x -> images_prefix := x), "<DIR> Specify where the “images” directory is installed (default if empty is [-hd value]/images).")
     ; ("-images_dir", Arg.String (fun x -> images_dir := x), "<DIR> Same than previous but directory name relative to current.")
     ; ("-a", Arg.String (fun x -> selected_addr := Some x), "<ADDRESS> Select a specific address (default = any address of this computer).")
     ; ("-p", Arg.Int (fun x -> selected_port := x), "<NUMBER> Select a port number (default = " ^ string_of_int !selected_port ^ ").")
