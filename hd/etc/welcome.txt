@@ -216,9 +216,8 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           <a role="button" class="btn btn-outline-primary mr-1"
             href="%prefix;m=MISC_NOTES"><i class="fas fa-align-justify fa-fw mr-1" aria-hidden="true"></i>[*base index notes]</a>
         %end;
-        %if;((b.wizard_passwd_file!="" or b.wizard_descr_file!="")
-             and (wizard or wiznotes_dir_exists)
-             and b.authorized_wizards_notes="yes")
+        %if;((wizard or friend) and
+            (b.wizard_passwd_file!="" or b.wizard_descr_file!=""))
            <a role="button" class="btn btn-outline-success text-success mr-1"
             href="%prefix;m=WIZNOTES"><i class="far fa-file-alt fa-fw mr-1" aria-hidden%"true"></i>[*base wizard notes]</a>
         %end;
