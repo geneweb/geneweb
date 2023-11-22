@@ -117,9 +117,16 @@ characters. The files are located at /webfonts/dejavusansmono-
 genewebfont.woff/2.
 
 The "static_path" parameter in gwf has been depreciated,
-and is now set from the GW_STATIC_PATH environment variable
-used when starting server in CGI mode.
-(example in git tree: etc/install_cgi/gwd.cgi)
+and is now set at the launch of gwd.
+gwd takes three possible launch parameters:
+-hd designates the location of gw. From this location
+    gw/etc and gw/images can be derived.
+-etc_prefix designates etc if it is not located in gw.
+-images_prefix designates images if it is not located in gw
+In templates, %gw_prefix;, %etc_prefix;, %images_prefix; provide these values.
+These values provide the necessary directory separator when prepended to a file.
+(For retro compatibility purposes, %static_path; = %etc_path; and 
+%ipage_prefix = %images_prefix;)
 
 Remove GWPREFIX not used anymore during Unix install,
 as "man" pages not maintained anymore either since geneweb 7.0.0
