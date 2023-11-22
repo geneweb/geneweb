@@ -543,7 +543,9 @@ let get_actlog check_from utm from_addr base_password =
             list, r, changed
       in
       loop false ATnormal []
-  with Sys_error _ -> [], ATnormal, false
+  with Sys_error e -> (
+      GwdLog.syslog `LOG_WARNING ("Errror opening actlog: " ^ e);
+    [], ATnormal, false)
 
 let set_actlog list =
   let fname = SrcfileDisplay.adm_file "actlog" in
@@ -556,7 +558,9 @@ let set_actlog list =
            (if e = "" then "" else " " ^ e))
       list;
     close_out oc
-  with Sys_error _ -> ()
+  with Sys_error e -> (
+    GwdLog.syslog `LOG_WARNING ("Errror opening actlog: " ^ e);
+    ())
 
 let get_token check_from utm from_addr base_password =
   Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
@@ -2024,8 +2028,10 @@ let main () =
   !GWPARAM.init () ;
   cache_lexicon () ;
   if !auth_file <> "" && !force_cgi then
-    Printf.eprintf "-auth option is not compatible with CGI mode.\n \
+    GwdLog.syslog `LOG_WARNING "-auth option is not compatible with CGI mode.\n \
       Use instead friend_passwd_file= and wizard_passwd_file= in .cgf file\n";
+  if !use_auth_digest_scheme && !force_cgi then
+    GwdLog.syslog `LOG_WARNING "-digest option is not compatible with CGI mode.\n";
   if !images_dir <> "" then
     begin let abs_dir =
       let f =
