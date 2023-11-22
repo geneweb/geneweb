@@ -309,8 +309,9 @@ let brother_label conf x sex : Adef.safe_string =
   Adef.safe str
 
 let half_brother_label conf sex =
-  index_of_sex sex
-  |> transl_nth conf "a half-brother/a half-sister/a half-sibling"
+  let is = index_of_sex sex in
+  Templ.apply_format conf (Some is)
+    "a half-brother/a half-sister/a half-sibling" ""
   |> Adef.safe
 
 let brother_in_law_label conf brother_sex self_sex =
@@ -323,7 +324,7 @@ let uncle_label conf base info x p =
   let is = index_of_sex (get_sex p) in
   match x with
   | 1 ->
-      let txt = transl conf "an uncle/an aunt" in
+      let txt = "an uncle/an aunt" in
       let is =
         if nb_fields txt = 4 then
           let info = (info, fun r -> r.Consang.lens1) in
@@ -333,9 +334,9 @@ let uncle_label conf base info x p =
           | _ -> (* must be a bug *) is
         else is
       in
-      nth_field txt is |> Adef.safe
+      Templ.apply_format conf (Some is) txt "" |> Adef.safe
   | 2 ->
-      let txt = transl conf "a great-uncle/a great-aunt" in
+      let txt = "a great-uncle/a great-aunt" in
       let is =
         if nb_fields txt = 4 then
           let info = (info, fun r -> r.Consang.lens1) in
@@ -345,9 +346,9 @@ let uncle_label conf base info x p =
           | _ -> (* must be a bug *) is
         else is
       in
-      nth_field txt is |> Adef.safe
+      Templ.apply_format conf (Some is) txt "" |> Adef.safe
   | n ->
-      transl_nth conf "an uncle/an aunt" is
+      Templ.apply_format conf (Some is) "an uncle/an aunt" ""
       ^ " "
       ^ Printf.sprintf
           (ftransl conf "of the %s generation")
@@ -357,10 +358,12 @@ let uncle_label conf base info x p =
 let nephew_label conf x p =
   let is = index_of_sex (get_sex p) in
   match x with
-  | 1 -> transl_nth conf "a nephew/a niece" is |> Adef.safe
-  | 2 -> transl_nth conf "a great-nephew/a great-niece" is |> Adef.safe
+  | 1 -> Templ.apply_format conf (Some is) "a nephew/a niece" "" |> Adef.safe
+  | 2 ->
+      Templ.apply_format conf (Some is) "a great-nephew/a great-niece" ""
+      |> Adef.safe
   | n ->
-      transl_nth conf "a nephew/a niece" is
+      Templ.apply_format conf (Some is) "a nephew/a niece" ""
       ^ " "
       ^ Printf.sprintf
           (ftransl conf "of the %s generation")
