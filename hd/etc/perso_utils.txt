@@ -880,10 +880,6 @@
   %for;i;0;26;
     %apply;test_templ%with;%apply;letter(i)%end;
   %end;
-%elseif;(b.module_perso_tplnb!="" and b.module_perso_tplnb>0)
-  %for;i;0;b.module_perso_tplnb;
-    %apply;test_templ(i)
-  %end;
 %end;
 %let;timeline;%if;(count>0)yes%else;no%end;%in;
 

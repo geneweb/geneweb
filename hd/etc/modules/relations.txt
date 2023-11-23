@@ -46,11 +46,15 @@
 %end;
 
 %reset_count;
-%if;(b.module_perso_tplnb!="" and b.module_perso_tplnb>0)
-  %for;i;0;b.module_perso_tplnb;
-    %apply;test_templ(i)
-  %end;
-%elseif;(p_mod!="" and p_mod!="zz")
+%( 
+  TODO do we need change here ?
+  as test_templ call not same as in etc/perso_utils.txt
+  TODO replace tabs by spaces
+  refer to:
+  cid ba46487b7 (Wed Nov 30 23:14:33 2016 +0100)
+  cid 4020a969e (Wed Nov 30 23:12:14 2016 +0100)
+%)
+%if;(p_mod!="" and p_mod!="zz")
 	%for;i;0;26;
 		%apply;test_templ(i)
 	%end;
