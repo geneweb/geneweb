@@ -281,15 +281,27 @@ type person = {
 let cache_per f ({ base; iper; _ } as p) =
   f (cache base.data.persons.get iper (fun p -> p.p) (fun p v -> p.p <- v) p)
 
+let cache_per_baseonly f ({ base; iper; _ } as p) =
+  f (cache base.data.persons.get_baseonly iper (fun p -> p.p) (fun p v -> p.p <- v) p)
+
 let cache_asc f ({ base; iper; _ } as p) =
   f (cache base.data.ascends.get iper (fun p -> p.a) (fun p v -> p.a <- v) p)
+
+let cache_asc_baseonly f ({ base; iper; _ } as p) =
+  f (cache base.data.ascends.get_baseonly iper (fun p -> p.a) (fun p v -> p.a <- v) p)
 
 let cache_uni f ({ base; iper; _ } as p) =
   f (cache base.data.unions.get iper (fun p -> p.u) (fun p v -> p.u <- v) p)
 
+let cache_uni_baseonly f ({ base; iper; _ } as p) =
+  f (cache base.data.unions.get_baseonly iper (fun p -> p.u) (fun p v -> p.u <- v) p)
+
 let gen_person_of_person = cache_per (fun p -> p)
 let gen_ascend_of_person = cache_asc (fun p -> p)
 let gen_union_of_person = cache_uni (fun p -> p)
+let gen_person_of_person_baseonly = cache_per_baseonly (fun p -> p)
+let gen_ascend_of_person_baseonly = cache_asc_baseonly (fun p -> p)
+let gen_union_of_person_baseonly = cache_uni_baseonly (fun p -> p)
 let get_access = cache_per (fun p -> p.Def.access)
 let get_aliases = cache_per (fun p -> p.Def.aliases)
 let get_baptism = cache_per (fun p -> p.Def.baptism)

@@ -330,6 +330,15 @@ module type Driver_S = sig
   val gen_union_of_person : person -> ifam Def.gen_union
   (** Extract [gen_union] from [person]. *)
 
+  val gen_person_of_person_baseonly : person -> (iper, iper, istr) Def.gen_person
+  (** Extract [gen_person] from [person]. *)
+
+  val gen_ascend_of_person_baseonly : person -> ifam Def.gen_ascend
+  (** Extract [gen_ascend] from [person]. *)
+
+  val gen_union_of_person_baseonly : person -> ifam Def.gen_union
+  (** Extract [gen_union] from [person]. *)
+  
   val family_of_gen_family :
     base ->
     (iper, ifam, istr) Def.gen_family
@@ -1046,6 +1055,15 @@ struct
   let gen_union_of_person =
     Util.wrap_person Legacy.gen_union_of_person Current.gen_union_of_person
 
+  let gen_person_of_person_baseonly =
+    Util.wrap_person Legacy.gen_person_of_person_baseonly Current.gen_person_of_person_baseonly
+
+  let gen_ascend_of_person_baseonly =
+    Util.wrap_person Legacy.gen_ascend_of_person_baseonly Current.gen_ascend_of_person_baseonly
+
+  let gen_union_of_person_baseonly =
+    Util.wrap_person Legacy.gen_union_of_person_baseonly Current.gen_union_of_person_baseonly
+  
   let person_of_gen_person base genperson =
     match base with
     | Legacy_base base ->

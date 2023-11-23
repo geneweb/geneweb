@@ -285,6 +285,8 @@ type 'a record_access = {
   get_nopending : int -> 'a;
   (* Same as [get] but doesn't consider loaded arrays and "base" file *)
   get_nobase : int -> 'a;
+  (* Same as [get] but doesn't consider pending patches and comitted patches *)
+  get_baseonly : int -> 'a;
   (* Set the nth element of array *)
   set : int -> 'a -> unit;
   (* Return length of an array that by default takes into account

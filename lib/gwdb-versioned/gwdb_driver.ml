@@ -429,22 +429,26 @@ module Legacy_driver = struct
               f.witness_notes <- Some [||];
               empty_string)
 
-  let gen_person_of_person (p : person) =
-    let gen_pers = gen_person_of_person p.person in
+  let gen_person_of (f : Gwdb_legacy.Gwdb_driver.person -> ('per, 'fam, 'str) legacy_dsk_person) (p : person) =
+    let gen_pers = f p.person in
     let pevents =
       List.mapi
         (fun ie pe ->
-          let pe = Translate.legacy_to_def_pevent empty_string pe in
-          let epers_witnesses =
-            Array.mapi
-              (fun iw (ip, wk, _) -> (ip, wk, get_pers_wit_notes p ie iw))
-              pe.epers_witnesses
-          in
-          { pe with epers_witnesses })
+           let pe = Translate.legacy_to_def_pevent empty_string pe in
+           let epers_witnesses =
+             Array.mapi
+               (fun iw (ip, wk, _) -> (ip, wk, get_pers_wit_notes p ie iw))
+               pe.epers_witnesses
+           in
+           { pe with epers_witnesses })
         gen_pers.pevents
     in
     let gen_pers = Translate.legacy_to_def_person empty_string gen_pers in
     { gen_pers with pevents }
+
+  let gen_person_of_person (p : person) = gen_person_of gen_person_of_person p
+
+  let gen_person_of_person_baseonly (p : person) = gen_person_of gen_person_of_person_baseonly p
 
   let person_of_gen_person base (genpers, gen_ascend, gen_union) =
     let pevents = genpers.Def.pevents in
@@ -769,6 +773,8 @@ module Legacy_driver = struct
   let get_titles p = get_titles p.person
   let gen_ascend_of_person p = gen_ascend_of_person p.person
   let gen_union_of_person p = gen_union_of_person p.person
+  let gen_ascend_of_person_baseonly p = gen_ascend_of_person_baseonly p.person
+  let gen_union_of_person_baseonly p = gen_union_of_person_baseonly p.person
 
   let poi base iper =
     match find_poi iper with
