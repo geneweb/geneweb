@@ -771,25 +771,18 @@ let treat_request =
       end conf bfile ;
   end else begin
     let title _ =
-      transl conf "error"
-      |> Utf8.capitalize_fst
+      Printf.sprintf "%s %s %s"
+      (transl conf "base" |> Utf8.capitalize_fst)
+      conf.bname
+      (transl conf "reserved to friends or wizards")
       |> Output.print_sstring conf
     in
     Hutil.rheader conf title ;
-    Output.print_sstring conf "<ul><li>" ;
-    transl conf "base" |> Utf8.capitalize_fst |> Output.print_sstring conf ;
-    Output.print_sstring conf {| "|} ;
-    Output.print_sstring conf conf.bname ;
-    Output.print_sstring conf {|" |} ;
-    transl conf "reserved to friends or wizards"
-    |> Utf8.capitalize_fst
-    |> Output.print_sstring conf ;
     let base_name =
       if conf.cgi then (Printf.sprintf "b=%s&" conf.bname) else ""
     in
     let user = transl_nth conf "user/password/cancel" 0 in
     let passwd = transl_nth conf "user/password/cancel" 1 in
-    Output.print_sstring conf ".</li></ul>" ;
     let body =
       if conf.cgi then
         Printf.sprintf {|
@@ -800,15 +793,17 @@ let treat_request =
             <label for="w" class="sr-only">%s:%s</label>
             <div class="input-group-append">
               <button type="submit" class="btn btn-primary">OK</button>
-            </div> |}
+            </div>|}
             (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
             (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
             passwd user passwd user passwd
       else
         Printf.sprintf {|
             <div>
-              %s%s <a href="%s?%sw=f"> %s</a><br>
-              %s%s <a href="%s?%sw=w"> %s</a>
+              <ul>
+              <li>%s%s <a href="%s?%sw=f"> %s</a></li>
+              <li>%s%s <a href="%s?%sw=w"> %s</a></li>
+              </ul>
             </div> |}
             (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
             (conf.command :> string) base_name
