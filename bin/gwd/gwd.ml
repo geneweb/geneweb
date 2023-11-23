@@ -1182,9 +1182,7 @@ let make_conf from_addr request script_name env =
             username, ""
           end
   in
-  
-  List.iter (fun d -> Printf.eprintf "Dir: %s\n" d)( Secure.assets ());
-  
+
   let conf =
     {from = from_addr;
      api_mode = false;
