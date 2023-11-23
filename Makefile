@@ -84,6 +84,7 @@ GENERATED_FILES_DEP = \
 	bin/gwd/dune \
 	bin/gwdiff/dune \
 	bin/gwgc/dune \
+	bin/gwpatchdiff/dune \
 	bin/gwrepl/dune \
 	bin/gwrepl/.depend \
 	bin/gwu/dune \
@@ -155,6 +156,7 @@ distrib:
 	cp $(BUILD_DISTRIB_DIR)gwdiff/gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT);
 	if test -f $(BUILD_DISTRIB_DIR)gwrepl/gwrepl.bc ; then cp $(BUILD_DISTRIB_DIR)gwrepl/gwrepl.bc $(DISTRIB_DIR)/gw/gwrepl$(EXT); fi
 	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT);
+	cp $(BUILD_DISTRIB_DIR)gwpatchdiff/gwPatchDiff.exe $(DISTRIB_DIR)/gw/gwPatchDiff$(EXT);
 	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT);
 	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT);
 	mkdir $(DISTRIB_DIR)/gw/setup

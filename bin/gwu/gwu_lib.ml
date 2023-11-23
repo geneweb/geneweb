@@ -1534,8 +1534,10 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
   in
   let nb_fam = nb_of_families base in
   if !Mutil.verbose then ProgrBar.start ();
+  print_endline "IFAMS";
   Gwdb.Collection.iteri
     (fun i ifam ->
+       print_endline (Gwdb.string_of_ifam ifam);
       if !Mutil.verbose then ProgrBar.run i nb_fam;
       if not (Gwdb.Marker.get gen.fam_done ifam) then
         let fam = foi base ifam in
@@ -1577,8 +1579,10 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
   (* parents pour pouvoir utiliser les autres fonctions normales. *)
   (* Export que si c'est toute la base.                           *)
   if isolated && opts.asc = None && opts.desc = None && opts.ascdesc = None then
+    print_endline "IPERS";
     Gwdb.Collection.iter
       (fun i ->
+         print_endline (Gwdb.string_of_iper i);
         if
           (not @@ Gwdb.Marker.get gen.mark i)
           && (not @@ Gwdb.Marker.get gen.mark_rel i)
@@ -1586,8 +1590,8 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
         then
           let p = poi base i in
           match get_parents p with
-          | Some _ -> ()
-          | None ->
+          | Some _ when not opts.Gwexport.patch_only -> ()
+          | _ ->
               if
                 bogus_person base p
                 && not

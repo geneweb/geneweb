@@ -29,6 +29,7 @@ plugins/welcome/dune
 lib/gwdb-legacy/dune
 lib/gwdb-versioned/dune
 lib/system_util/dune
+bin/gwpatchdiff/dune
 test/dune
 
 dune-workspace
