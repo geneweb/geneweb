@@ -92,7 +92,7 @@ let update_min_max (min, max) date =
 let max_ancestor_level conf base ip max_lvl =
   let max_lvl =
     match List.assoc_opt "max_anc_level" conf.Config.base_env with
-    | Some v -> int_of_string v
+    | Some v when v <> "" -> int_of_string v
     | _ -> max_lvl
   in
   let x = ref 0 in
@@ -124,7 +124,7 @@ let max_ancestor_level conf base ip max_lvl =
 let max_descendant_level conf _base _ip max_lvl =
   (* TODO we should compute this value *)
   match List.assoc_opt "max_desc_level" conf.Config.base_env with
-  | Some v -> int_of_string v
+  | Some v when v <> "" -> int_of_string v
   | _ -> max_lvl
 
 let get_min_max_dates base l =
