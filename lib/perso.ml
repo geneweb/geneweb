@@ -299,11 +299,9 @@ let get_cremation_text conf p p_auth =
   cremated ^^^ " " ^<^ on_cremation_date
 
 let limit_desc conf =
-  match
-    Option.map int_of_string @@ List.assoc_opt "max_desc_level" conf.base_env
-  with
-  | Some x -> max 1 x
-  | None -> 12
+  match List.assoc_opt "max_desc_level" conf.base_env with
+  | Some x when x <> "" -> max 1 (int_of_string x)
+  | _ -> 12
 
 let infinite = 10000
 
@@ -865,8 +863,9 @@ let build_surnames_list conf base v p =
   let ht = Hashtbl.create 701 in
   let mark =
     let n =
-      try int_of_string (List.assoc "max_ancestor_implex" conf.base_env)
-      with _ -> 5
+      match List.assoc_opt "max_ancestor_implex" conf.base_env with
+      | Some v when v <> "" -> int_of_string v
+      | _ -> 5
     in
     Gwdb.iper_marker (Gwdb.ipers base) n
   in
