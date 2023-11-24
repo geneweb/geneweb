@@ -12,7 +12,7 @@
   %for;i;0;33;
     %let;l1;%apply;language(i)%in;
     %if;(lang!=l1)
-      <a class="dropdown-item%if;(l1=b.default_lang) bg-warning%end;" id="lang_%l1;" 
+      <a class="dropdown-item%if;(l1=b.default_lang) bg-warning%end;" id="lang_%l1;"%sp;
         href="%apply;set_lang(l1)" title="%if;(l1=b.default_lang)default %end;lang %l1;">%nn;
        <code>%if;(l1!="pt-br")%l1;&nbsp;&nbsp;&nbsp;%else;%l1;%end;%sp;</code>%nn;
        %apply;capitalize%with;%apply;language_name(l1)%end;</a>
@@ -23,7 +23,7 @@
   [*branch %s compiled on %s from commit:::x:y]0%nn;
 %end;
 %if;(not cancel_links)
-  <div class="d-flex ml-auto  justify-content-end m-2" id="copyr">
+  <div class="d-flex ml-auto justify-content-end m-2" id="copyr">
     %if;(e.templ="")
       <div class="btn-group dropup align-self-center">
         <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"

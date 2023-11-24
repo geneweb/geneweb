@@ -217,17 +217,17 @@
         <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
         <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
         <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
-        <label for="xvar=yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
+        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
         <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
       %elseif;([!dates order]0="mmddyyyy")
         <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
         <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
         <label for="xvar_dd" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]2</label>
         <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
-        <label for="xvar=yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
+        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
         <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
       %else;
-        <label for="xvar=yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
+        <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
         <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
         <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
         <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
@@ -520,7 +520,7 @@
 %end;
 
 %define;card_header(xx,yy)
-  <h3 class="card-header pt-1 pb-0 text-center" id="xx"><label for="xx">[*yy]1</label></h3>
+  <h3 class="card-header pt-1 pb-0 text-center" id="xx">[*yy]1</h3>
 %end;
 
 <h1%if;((evar.m="ADD_FAM" or evar.m="ADD_FAM_OK") and evar.ip="") class="mt-5"%end;>%nn;
@@ -671,7 +671,7 @@
       %if;(child.index!="-1")
         <a href="%prefix_base_password;m=MOD_IND&i=%child.index;" title="[*modify::person/persons]0
           %child.first_name;%if;(child.occ!="").%child.occ%end; %child.surname;"
-          aria-hidden="true" arial-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%child.sex;%end;">
+          aria-hidden="true" aria-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%child.sex;%end;">
           <i class="fa fa-user-pen fa-fw %if;(child.sex=1)fe%end;male ml-2 mr-1"></i>
           [*modify] %apply;nth%with;[nth]%and;%cnt;%end; [child/children]0</a>
       %end;
