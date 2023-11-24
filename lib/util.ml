@@ -620,6 +620,8 @@ let clean_html_tags s =
   s
 
 let clean_comment_tags s = Str.global_replace (Str.regexp "<!--.*-->") "" s
+let uri_encode s = Uri.pct_encode ~component:`Query s
+let uri_decode s = try Uri.pct_decode s with _ -> s
 
 let hidden_textarea conf k v =
   Output.print_sstring conf {|<textarea style="display:none;" name="|};
