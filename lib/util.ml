@@ -605,11 +605,19 @@ let safe_html_aux escape_text s =
 let safe_html s =
   Adef.safe (safe_html_aux (fun s -> (escape_html s :> string)) s)
 
-(* Version 1 => moche *)
-let clean_html_tags s l =
-  List.fold_left
-    (fun s html_tag -> Str.global_replace (Str.regexp html_tag) "&nbsp;" s)
-    s l
+(* Clean HTML tags from a string. Block tags are replaced by a space,
+   and inline tags are replaced by an empty string. *)
+let clean_html_tags s =
+  let open Str in
+  let tag_pattern tag = Printf.sprintf "</?%s */?>" tag in
+  let rep_block_tag s tag = global_replace (regexp (tag_pattern tag)) " " s in
+  let rep_inline_tag s tag = global_replace (regexp (tag_pattern tag)) "" s in
+  let block_tags = [ "br"; "div"; "h\\d"; "p"; "pre"; "ol"; "li"; "ul" ] in
+  let inline_tags = [ "a"; "em"; "span"; "strong"; "sub"; "sup" ] in
+  let s = List.fold_left rep_block_tag s block_tags in
+  let s = List.fold_left rep_inline_tag s inline_tags in
+  let s = global_replace (regexp " +") " " s in
+  s
 
 let clean_comment_tags s = Str.global_replace (Str.regexp "<!--.*-->") "" s
 
