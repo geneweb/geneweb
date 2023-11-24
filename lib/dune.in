@@ -17,6 +17,7 @@
             geneweb_sosa_mli
             geneweb_util
             markup
+            uri
             wserver)
  (modules_without_implementation templAst)
 )
