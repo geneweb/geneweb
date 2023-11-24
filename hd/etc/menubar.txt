@@ -232,9 +232,9 @@
                 %define;searchgnt(xx)
                   [*search %s on Geneanet:::xx]
                 %end;
-                <a class="dropdown-item" role="button" title="%apply;searchgnt(self)" 
-                  href="https://www.geneanet.org/fonds/individus/?sourcename=&size=50&sexe=&nom=%surname;&ignore_each_patronyme=&with_variantes_nom=1&prenom=%first_name;&prenom_operateur=or&ignore_each_prenom=&profession=&ignore_each_profession=&nom_conjoint=&ignore_each_patronyme_conjoint=&prenom_conjoint=&prenom_conjoint_operateur=or&ignore_each_prenom_conjoint=&place__0__=%birth_place;&zonegeo__0__=&country__0__=&region__0__=&subregion__0__=&place__1__=&zonegeo__1__=&country__1__=&region__1__=&subregion__1__=&place__2__=&zonegeo__2__=&country__2__=&region__2__=&subregion__2__=&place__3__=&zonegeo__3__=&country__3__=&region__3__=&subregion__3__=&place__4__=&zonegeo__4__=&country__4__=&region__4__=&subregion__4__=&type_periode=between&from=%if;(has_birth_date and birth_date.year!="")%expr(birth_date.year-15)%end;&to=%if;(has_death_date and death_date.year!="")%expr(death_date.year+15)%end;&exact_day=&exact_month=&exact_year=&nom_pere=&ignore_each_patronyme_pere=&prenom_pere=&prenom_pere_operateur=or&ignore_each_prenom_pere=&nom_mere=%if;(has_parents and mother.surname!="?")%mother.surname;%end;&ignore_each_patronyme_mere=&with_variantes_nom_mere=1&prenom_mere=&prenom_mere_operateur=or&ignore_each_prenom_mere=&with_parents=0&go=1" target="_blank" rel="noreferrer, noopener"><i class="fa fa-magnifying-glass fa-fw mr-2"></i>%nn;
-                  [*search %s on Geneanet:::]</a>
+                <a class="dropdown-item" role="button" title="%apply;searchgnt(self)"
+                  href="https://www.geneanet.org/fonds/individus/?sourcename=&size=50&sexe=&nom=%apply;uri_encode(surname)&ignore_each_patronyme=&with_variantes_nom=1&prenom=%apply;uri_encode(first_name)&prenom_operateur=or&ignore_each_prenom=&profession=&ignore_each_profession=&nom_conjoint=&ignore_each_patronyme_conjoint=&prenom_conjoint=&prenom_conjoint_operateur=or&ignore_each_prenom_conjoint=&place__0__=%if;(has_birth_place)%apply;uri_encode(birth_place)&zonegeo__0__=&country__0__=&region__0__=&subregion__0__=&place__1__=&zonegeo__1__=&country__1__=&region__1__=&subregion__1__=&place__2__=&zonegeo__2__=&country__2__=&region__2__=&subregion__2__=&place__3__=&zonegeo__3__=&country__3__=&region__3__=&subregion__3__=&place__4__=&zonegeo__4__=&country__4__=&region__4__=&subregion__4__=&type_periode=between&from=%if;(has_birth_date and birth_date.year!="")%expr(birth_date.year-15)%end;&to=%if;(has_death_date and death_date.year!="")%expr(death_date.year+15)%end;&exact_day=&exact_month=&exact_year=&nom_pere=&ignore_each_patronyme_pere=&prenom_pere=&prenom_pere_operateur=or&ignore_each_prenom_pere=&nom_mere=%if;(has_parents and mother.surname!="?")%apply;uri_encode(mother.surname)%end;&ignore_each_patronyme_mere=&with_variantes_nom_mere=1&prenom_mere=&prenom_mere_operateur=or&ignore_each_prenom_mere=&with_parents=0&go=1%end;" target="_blank" rel="noreferrer, noopener"><i class="fa fa-search fa-fw mr-2"></i>%nn;
+                  [*search %s on Geneanet::]</a>
               </div>
             </li>
           %else;
@@ -275,9 +275,9 @@
                 </li>
               %end;
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle text-secondary 
+                <a class="nav-link dropdown-toggle text-secondary
                    %if;(e.m="ADD_FAM" or e.m="CHG_EVT_FAM_ORD" or e.m="DEL_FAM"
-                   or e.m="MRG_FAM" or e.m="INV_FAM" or e.m="CHG_CHN")active%end;"
+                   or e.m="MRG_FAM" or e.m="INV_FAM" or e.m="CHG_CHN") active%end;"
                    data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"
                    title="[*tools] %if;(nb_families>1)[family/families]1%else;[family/families]0%end;">%nn;
                    <span class="fa fa-user-plus" aria-hidden="true"></span>%nn;
