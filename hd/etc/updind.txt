@@ -44,7 +44,7 @@
 %end;
 
 %define;card_header(xx,yy)
-  <h3 class="card-header pt-2 pb-1 text-center" id="xx"><label for="xx">[*yy]1</label></h3>
+  <h3 class="card-header pt-2 pb-1 text-center" id="xx">[*yy]1</h3>
 %end;
 
 %define;date(xlab,xvar,xdt,xcond)
@@ -398,12 +398,12 @@
           value="%witness.surname;" placeholder="[*surname/surnames]0">
       </div>
       <div id="excnt_witnwcnt_p_selct_mod" class="col-form-label ml-2">%nn;
-        %if;(witness.index!="-1")
+        %if;(witness.index!="-1" and (witness.first_name!="" or witness.surname!=""))
           <a href="%prefix_base_password;m=MOD_IND&i=%witness.index;" title="[*modify::person/persons]0
             %witness.first_name;%if;(witness.occ!="").%witness.occ%end; %witness.surname;">
             <i class="fa fa-user-pen fa-fw %if;(witness.sex=1)fe%end;male ml-2 mr-1" aria-hidden="true"
             aria-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%witness.sex;%end;"></i>
-            [*modify] %apply;nth%with;[nth]%and;%wcnt;%end; [witness/witness/witnesses]0</a>
+            [*modify] %apply;nth%with;[nth]%and;%wcnt;%end; [witness/witness/witnesses]0%nn;
           </a>
         %end;
       </div>
@@ -1148,11 +1148,11 @@
            id="rxcnt_xvar_sn" placeholder="[*surname/surnames]0">
       </div>
       <div id="rxcnt_xvar_p_selct_mod" class="col-form-label ml-2">
-        %if;(relation.xrel.index!="-1")
+        %if;(relation.xrel.index!="-1"  and (relation.xrel.first_name!="" or relation.xrel.surname!=""))
           <a href="%prefix_base_password;m=MOD_IND&i=%relation.xrel.index;" title="[*modify::person/persons]0
             %relation.xrel.first_name;%if;(relation.xrel.occ!="").%relation.xrel.occ%end; %relation.xrel.surname;">
             <i class="fa fa-user-pen fa-fw %if;(relation.xrel.sex=1)fe%end;male ml-2 mr-1" aria-hidden="true"
-              aria-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%relation.xrel.sex;%end;"></i>[*modify]</a>
+              aria-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%relation.xrel.sex;%end;"></i>[*modify]%nn;
           </a>
         %end;
       </div>
