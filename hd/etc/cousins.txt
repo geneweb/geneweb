@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: cousins.txt v7.1 12/10/2021 20:47:51 $ -->
+  <!-- $Id: cousins.txt v7.1 23/11/2023 21:01:47 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
 %define;cousin_lex(vvv,www)
   [*cousins.vvv.www]1
 %end;
 %define;tt()
-  %apply;a_of_b_gr_eq_lev%with;
-    %apply;cousin_lex(evar.v1,evar.v2)%nn;
-  %and;
-    %if;(public_name != "")%public_name;%else;%first_name;%end;
-    %if;(qualifier != "") %qualifier;%end;
-    %sp;%surname;
+  %apply;clean_html_tags%with;
+    %apply;a_of_b_gr_eq_lev%with;
+      %apply;cousin_lex(evar.v1,evar.v2)%nn;
+    %and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+    %end;
   %end;
 %end;
-  <title>%apply;tt()</title>
+%define;tturl()
+  %apply;url_encode%with;%apply;tt()%end;
+%end;
+<title>%apply;tt()</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -154,7 +159,7 @@
 %end;
 
 %if;(count!="" and count>1)
-<a id="RLM" href="%prefix;m=RLM&spouse=on&i1=%index;%foreach;sorted_list_item;%item.1;%end;&tt=%apply;tt()"><span class="d-inline-block fa-flip-vertical"><i class="fa fa-project-diagram fa-rotate-270 mr-1"></i></span> Graphe RLM</a>
+<a id="RLM" href="%prefix;m=RLM&spouse=on&i1=%index;%foreach;sorted_list_item;%item.1;%end;&tt=%apply;tt_url()"><span class="d-inline-block fa-flip-vertical"><i class="fa fa-project-diagram fa-rotate-270 mr-1"></i></span> Graphe RLM</a>
 %if;(evar.v2=0 or evar.v2="")<a id="asc" class="ml-3" href="%prefix;m=A&t=T&%access;&spouse=on&v=%expr(evar.v1+1)"><i class="fa fa-sitemap fa-rotate-180 fa-fw mr-1"></i>Graphe ASC.</a>%end;
 %if;(evar.v1=0 and evar.v2>0)<a id="desc" class="ml-3" href="%prefix;m=D&t=T&%access;&spouse=on&v=%evar.v2;"><i class="fa fa-sitemap fa-fw mr-1"></i>Graphe DESC.</a>%end;
 %end;

@@ -123,7 +123,7 @@
         %end;
       %end;
       </span>
-      <br data-surname="_%surname;"/>
+      <br data-surname="_%surname;">
       %if;(curlev < maxlev)
         %reset_count;
         %foreach;sorted_listb_item;
@@ -209,7 +209,7 @@
   %in;
   %let;zl2;%sex;%in;
   %let;l231;%if;(is_male)━%elseif;(is_female)─%else;━%end;%in;
-  <span data-surname="">
+  <span>
     <span class="tt">z1%l2;</span>
     %( when there is an offset between implex generations, some descendants may be missing %)
     %( case: first occurence at generation n is married to generation n-1 spouse and has children %)
@@ -222,7 +222,7 @@
       <span class="sr-only"> (==)</span></a>
     %end;
   </span>
-  <br data-surname="">
+  <br>
 %end;
 %mark_descendants;
 %empty_sorted_list;%( persons %)
