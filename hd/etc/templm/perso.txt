@@ -11,7 +11,7 @@
   %include;js_perso_accesskey
   <style type="text/css">
     %let;lwide1;%bvar.wide;.%evar.wide;%in;
-    %let;lwide;%if;(lwide1 = "on." or lwide1 = ".on" or lwide1 = "on.on" or lwide1 = "off.on")on%else;off%end;%in;
+    %let;lwide;%if;(lwide1 = "on." or lwide1 = ".on" or lwide1 = "on.on")on%else;off%end;%in;
     %if;(lwide = "on")
       .col1,.col2{width:99%%;}
       .image_sheet{font-size:89%%;}
