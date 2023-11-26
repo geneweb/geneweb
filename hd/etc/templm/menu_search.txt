@@ -2,14 +2,14 @@
 %include;js_perso_accesskey
 %define;lang(x)
   %apply;nth%with;
-    /af/bg/br/ca/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/zh/
+    /af/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/tr/zh/
   %and;x%end;
 %end;
 %define;url_set_lang(l1)
   %url_set.lang.l1;
 %end;
 %define;link_lang()
-  %for;i;1;30;
+  %for;i;1;32;
     %let;l1;%apply;lang(i)%in;
     <a href="%apply;url_set_lang(l1)" title="%apply;language_name(l1)"%sp;
       style="%if;((bvar.default_lang=l1 and e.lang="") or e.lang=l1)background-color:%if;(bvar.css=1)#666;%else;#EEE;%end;%end;">
