@@ -156,12 +156,12 @@
         %if;(cancel_links)<input type="hidden" name="maxlev" value="%env.maxlev"/>%end;
         %apply;checkbox("","cgl",[cancel GeneWeb links],"")
         %apply;image("")
-        %if;(bvar.wide = "yes")
+        %if;(bvar.wide = "on")
           <label> <input type="checkbox" name="wide" value="no" %l_on;
-                 %if;(lwide = "no") checked="checked"%end;%/>[visualize/show/hide/summary]0 &middot;|&middot;</label>
+                 %if;(lwide = "off") checked="checked"%end;%/>[visualize/show/hide/summary]0 &middot;|&middot;</label>
         %else;
           <label> <input type="checkbox" name="wide" value="yes" %l_on;
-                 %if;(lwide = "yes") checked="checked"%end;%/>[visualize/show/hide/summary]0 &divide;</label>
+                 %if;(lwide = "on") checked="checked"%end;%/>[visualize/show/hide/summary]0 &divide;</label>
         %end;
         <label> <input type="checkbox" name="spouse" value="off" %l_on;
                %if;(evar.spouse = "off") checked="checked"%end;%/>[spouses not included]</label>
