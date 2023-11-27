@@ -26,6 +26,10 @@
     %end;
   %end;
 %end;
+%define;get_random(xxx)
+  %random.init;
+  %random.xxx;
+%end;
   <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-lg-3">
     %if;(b.auth_file="" and (b.wizard_passwd!="" or b.friend_passwd!=""))
       <div class="d-none d-lg-block col-md-3 order-md-1"></div>
@@ -84,7 +88,13 @@
         <img src="%image_prefix;/gwlogo.png" alt="GeneWeb" title="GeneWeb">
       %end;
       <h1 class="font-weight-bolder">%apply;capitalize%with;[database]%end; %base.name;</h1>
-      %if;(b.visitor_access!="no")<span class="font-weight-light h2">%base.nb_persons; [person/persons]1</span>%end;
+      %if;(b.visitor_access!="no" or wizard or friend)
+        <div class="d-flex justify-content-center">
+          <span class="h2 font-weight-light">%base.real_nb_persons; [person/persons]1</span>
+          <a class="align-self-center" href="%prefix;i=%apply;get_random(base.nb_persons.v)"
+          title="[*random individual]"><i class="fa-solid fa-dice ml-1 mb-2"></i></a>
+        </div>
+      %end;
     </div>
   </div>
   <div class="d-flex justify-content-center mt-1 mt-lg-3">

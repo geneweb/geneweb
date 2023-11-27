@@ -950,6 +950,10 @@ co: squassà a fiura arregistrata
 en: delete saved image
 fr: supprimer une image sauvegardée
 
+    random individual
+en: display a random individual
+fr: afficher un individu au hasard
+
     restore image saved
 co: risturà una fiura arregistrata
 en: restore saved image
