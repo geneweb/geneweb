@@ -462,3 +462,21 @@ perso_module_l=ligne
 # Fancy utf-8 characters such as æ and ø are taken into account
 # The default value is aeiouy
 #vowels=aeiouy
+
+# Hide qualifier and alias fields proposed by default in person update form
+#propose_qualifier=no
+#propose_alias=no
+
+# for modules/arbre_descendants.txt
+# define a character string to be used in place of missing portrait image.
+# Note that in many other files this is hardcoded to '?' or '&nbsp;'
+# There is no default here.
+#default_image_no=
+
+# for carrousel.txt use a reorg flag (not set by default)
+# to access a specific bases subdirectories organisation:
+# bases/<basename>.gwb/documents/portraits
+# bases/<basename>.gwb/documents/images
+# Warning: complete work never merged in geneweb/master branch,
+#          (TODO need a ref here) so flag not to be set.
+#reorg=on
