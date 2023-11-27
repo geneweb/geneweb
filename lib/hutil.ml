@@ -9,7 +9,7 @@ let link_to_referer conf =
   if (referer :> string) <> "" then
     ({|<a href="|} ^<^ referer
      ^>^ {|" class="btn btn-sm btn-link p-0 border-0" title="|} ^ back
-     ^ {|"><i class="fa fa-arrow-left fa-fw fa-sm"></i></a>|}
+     ^ {|"><i class="fa fa-arrow-left-long fa-fw fa-sm"></i></a>|}
       :> Adef.safe_string)
   else Adef.safe ""
 

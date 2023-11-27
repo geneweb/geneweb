@@ -477,11 +477,15 @@ let set_vother x = Vother x
 let eval_var conf base env () _loc = function
   | [ "base"; "has_notes" ] -> VVbool (not (base_notes_are_empty base ""))
   | [ "base"; "name" ] -> VVstring conf.bname
+  | [ "base"; "nb_persons"; "v" ] ->
+      VVstring (string_of_int (Gwdb.nb_of_persons base))
   | [ "base"; "nb_persons" ] ->
       VVstring
         (Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
            (nb_of_persons base))
+  | [ "base"; "real_nb_persons"; "v" ] ->
+      VVstring (string_of_int (Gwdb.nb_of_real_persons base))
   | [ "base"; "real_nb_persons" ] ->
       VVstring
         (Mutil.string_of_int_sep
