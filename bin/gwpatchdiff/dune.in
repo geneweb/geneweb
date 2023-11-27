@@ -1,6 +1,6 @@
 (executable
   (name gwPatchDiff)
   (public_name geneweb.gwpatchdiff)
-  (modules gwPatchDiff)
+  (modules gwPatchDiff diff_types diff_utils diff_computation)
   (libraries geneweb gwexport_lib gwu_lib str unix %%%GWDB_PKG%%% %%%SOSA_PKG%%%)
 )
