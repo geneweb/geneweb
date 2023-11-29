@@ -121,6 +121,9 @@ and is now set from the GW_STATIC_PATH environment variable
 used when starting server in CGI mode.
 (example in git tree: etc/install_cgi/gwd.cgi)
 
+Remove GWPREFIX not used anymore during Unix install,
+as "man" pages not maintained anymore either since geneweb 7.0.0
+
 GeneWeb version 7.0.0
 ---------------------
 

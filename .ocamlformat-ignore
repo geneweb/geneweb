@@ -5,4 +5,3 @@ bin/gwd/gwdLog.ml
 bin/gwd/request.ml
 bin/setup/setup.ml
 lib/util/mutil.ml
-lib/gwlib.ml

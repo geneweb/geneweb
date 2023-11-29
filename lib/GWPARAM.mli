@@ -62,9 +62,9 @@ val wrap_output :
 
 module Default : sig
   val init : unit -> unit
-  (** Inititialise assets directoris for gwd server:
+  (** Inititialise assets directories for gwd server:
       * current directory
-      * /usr/share/geneweb  *)
+      *)
 
   val base_path : string list -> string -> string
   (** Use concatenation of [Secure.base_dir ()], [pref] and [fname] *)
