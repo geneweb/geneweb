@@ -11,19 +11,11 @@ endif
 -include Makefile.local
 
 # Variables for packagers.
-PREFIX=/usr
 DISTRIB_DIR=distribution
 BUILD_DIR=_build/default
 ODOC_DIR=$(BUILD_DIR)/_doc/_html
 
 # [BEGIN] Generated files section
-
-lib/gwlib.ml:
-	@echo -n "Generating $@…"
-	@echo "let prefix =" > $@
-	@echo "  try Sys.getenv \"GWPREFIX\"" >> $@
-	@echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
-	@echo " Done."
 
 CPPO_D=$(GWDB_D) $(OS_D) $(SYSLOG_D) $(SOSA_D)
 
@@ -73,7 +65,6 @@ GENERATED_FILES_DEP = \
 	lib/dune \
 	lib/gwdb/dune \
 	lib/core/dune \
-	lib/gwlib.ml \
 	lib/util/dune \
 	benchmark/dune \
 	bin/connex/dune \

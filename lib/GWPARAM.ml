@@ -20,10 +20,7 @@ type syslog_level =
   | `LOG_WARNING ]
 
 module Default = struct
-  let init () =
-    List.fold_right Filename.concat [ Gwlib.prefix; "share" ] "geneweb"
-    |> Secure.add_assets;
-    Secure.add_assets Filename.current_dir_name
+  let init () = Secure.add_assets Filename.current_dir_name
 
   let base_path pref bname =
     List.fold_right Filename.concat (Secure.base_dir () :: pref) bname
