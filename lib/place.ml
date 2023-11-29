@@ -368,6 +368,7 @@ let print_ip_list conf places opt link_to_ind ipl =
   let len = List.length ipl in
   if len > max_rlm_nbr conf && link_to_ind then Output.printf conf "(%d)" len
   else
+    let places = (Mutil.encode places :> string) in
     let head =
       Printf.sprintf "&nbsp;(<a href=\"%sm=L%s&k=%s&nb=%d&p0=%s"
         (commd conf :> string)
@@ -397,9 +398,7 @@ let pps_call conf opt long keep k places =
     opt
     (if long then "long" else "short")
     (string_of_int keep) k
-    (List.fold_left
-       (fun acc p -> acc ^ (if acc <> "" then ", " else "") ^ p)
-       "" places)
+    (String.concat ", " places)
 
 (* build ip list for all entries having same first element in places *)
 let get_new_l l =
@@ -503,17 +502,18 @@ let print_html_places_surnames_short conf _base _link_to_ind
       | [] -> ()
       | (pl, ipl) :: l ->
           let str = places_to_string true pl in
+          let str2 = (Mutil.encode str :> string) in
           Output.printf conf
             "<a href=\"%sm=PPS%s&display=%s&keep=%s&k=%s\">%s</a>"
             (commd conf :> string)
             opt
             (if long then "long" else "short")
             (string_of_int (keep + 1))
-            str str;
+            str2 str;
           if len < max_rlm_nbr conf then (
             Output.printf conf "&nbsp;(<a href=\"%sm=L%s&k=%s&nb=%d"
               (commd conf :> string)
-              opt str len;
+              opt str2 len;
             let rec loop1 i = function
               | [] -> ()
               | (pl, ipl) :: l ->
@@ -550,7 +550,10 @@ let print_html_places_surnames_short conf _base _link_to_ind
 let print_html_places_surnames_long conf base link_to_ind
     (arry : ((string list * string) * (string * iper list) list) array) =
   (* (sub_places_list * suburb) * (surname * ip_list) list *)
-  let k = match p_getenv conf.env "k" with Some s -> s | _ -> "" in
+  let k =
+    (Mutil.encode (match p_getenv conf.env "k" with Some s -> s | _ -> "")
+      :> string)
+  in
   let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
   let a_sort = p_getenv conf.env "a_sort" = Some "on" in
   let f_sort = p_getenv conf.env "f_sort" = Some "on" in
@@ -710,7 +713,9 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
       opt
       (if long then "short" else "long")
       (string_of_int keep)
-      (match p_getenv conf.env "k" with Some ini -> "&k=" ^ ini | None -> "")
+      (match p_getenv conf.env "k" with
+      | Some ini -> "&k=" ^ (Mutil.encode ini :> string)
+      | None -> "")
       t
   in
   Output.printf conf "<p>\n<a %s>%s</a>" href
