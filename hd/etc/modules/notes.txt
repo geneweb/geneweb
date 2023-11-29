@@ -1,7 +1,7 @@
 <!-- $Id: modules/notes.txt v7.1 15/12/2022 23:41:44 $ -->
 %( op_m=1 Notes and marriage comments %)
 %( op_m=2 Notes and event notes (+comments for marriages) %)
-%let;op_m;%if;(op_m!="")%op_m;%else;%if;(has_families or bvar.display_timeline="yes")1%end;%else;2%end;%in;
+%let;op_m;%if;(op_m!="")%op_m;%else;%if;(has_families)1%end;%else;2%end;%in;
 
 %reset_count;
 %if;has_linked_page.BNOTE;%incr_count;%end;
