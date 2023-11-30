@@ -1,52 +1,65 @@
 open Diff_types
 
-let make_diff previously now = {previously; now}
+module IperSet =
+  Set.Make (struct
+      type t = Gwdb.iper
+      let compare = Gwdb.compare_iper
+    end)
 
-let diff cmp previously now = 
-  if cmp previously now <> 0 then
-    Some (make_diff (Some previously) (Some now))
-  else None
+module IfamSet =
+  Set.Make (struct
+      type t = Gwdb.ifam
+      let compare = Gwdb.compare_ifam
+    end)
 
-let list_o = function
-  | [] -> None
-  | l -> Some l
+module Utils = struct
+  let make_diff previously now = {previously; now}
 
-let diff_list cmp previously now =
-  let rec aux l1 l2 = match l1, l2 with
-    | x :: xs, y :: ys when cmp x y = 0 -> aux xs ys
-    | [], [] -> true
-    | _ -> false
-  in
-  if aux previously now then None
-  else Some (make_diff (list_o previously) (list_o now))
+  let diff cmp previously now = 
+    if cmp previously now <> 0 then
+      Some (make_diff (Some previously) (Some now))
+    else None
 
-let _diff_string = diff String.compare
-let diff_istr = diff Gwdb.compare_istr
-let diff_int = diff Int.compare
-let diff_istr_list = diff_list Gwdb.compare_istr
-let diff_cdate =
-  let cmp_cdate (d1 : Def.cdate) (d2 : Def.cdate) = if d1 = d2 then 0 else 1 in
-  diff cmp_cdate
+  let list_o = function
+    | [] -> None
+    | l -> Some l
 
+  let diff_list cmp previously now =
+    let rec aux l1 l2 = match l1, l2 with
+      | x :: xs, y :: ys when cmp x y = 0 -> aux xs ys
+      | [], [] -> true
+      | _ -> false
+    in
+    if aux previously now then None
+    else Some (make_diff (list_o previously) (list_o now))
+
+  let _diff_string = diff String.compare
+  let diff_istr = diff Gwdb.compare_istr
+  let diff_int = diff Int.compare
+  let diff_istr_list = diff_list Gwdb.compare_istr
+  let diff_cdate =
+    let cmp_cdate (d1 : Def.cdate) (d2 : Def.cdate) = if d1 = d2 then 0 else 1 in
+    diff cmp_cdate
+end
 
 let diff_first_name p n =
-  diff_istr p.Def.first_name n.Def.first_name
+  Utils.diff_istr p.Def.first_name n.Def.first_name
 let diff_surname p n =
-  diff_istr p.Def.surname n.Def.surname
+  Utils.diff_istr p.Def.surname n.Def.surname
 let diff_occ p n =
-  diff_int p.Def.occ n.Def.occ
+  Utils.diff_int p.Def.occ n.Def.occ
 let diff_public_name p n =
-  diff_istr p.Def.public_name n.Def.public_name
+  Utils.diff_istr p.Def.public_name n.Def.public_name
 let diff_qualifiers p n =
-  diff_istr_list p.Def.qualifiers n.Def.qualifiers
+  Utils.diff_istr_list p.Def.qualifiers n.Def.qualifiers
 let diff_aliases p n =
-  diff_istr_list p.Def.aliases n.Def.aliases
+  Utils.diff_istr_list p.Def.aliases n.Def.aliases
 let diff_fn_aliases p n =
-  diff_istr_list p.Def.first_names_aliases n.Def.first_names_aliases
+  Utils.diff_istr_list p.Def.first_names_aliases n.Def.first_names_aliases
 let diff_sn_aliases p n =
-  diff_istr_list p.Def.surnames_aliases n.Def.surnames_aliases
+  Utils.diff_istr_list p.Def.surnames_aliases n.Def.surnames_aliases
 let diff_occupation p n =
-  diff_istr p.Def.occupation n.Def.occupation
+  Utils.diff_istr p.Def.occupation n.Def.occupation
 let diff_sex p n =
   let int_of_sex = function
     | Def.Male -> 0
@@ -54,33 +67,33 @@ let diff_sex p n =
     | Neuter -> 3
   in
   let cmp_sex s1 s2 = Int.compare (int_of_sex s1) (int_of_sex s2) in
-  diff cmp_sex p.Def.sex n.Def.sex
+  Utils.diff cmp_sex p.Def.sex n.Def.sex
 let diff_birth p n =
-  diff_cdate p.Def.birth n.Def.birth
+  Utils.diff_cdate p.Def.birth n.Def.birth
 let diff_baptism p n =
-  diff_cdate p.Def.baptism n.Def.baptism
+  Utils.diff_cdate p.Def.baptism n.Def.baptism
 let diff_death p n =
   let cmp_death d1 d2 = if d1 = d2 then 0 else 1 in
-  diff cmp_death p.Def.death n.Def.death
+  Utils.diff cmp_death p.Def.death n.Def.death
 let diff_burial p n =
   let cmp_burial b1 b2 = if b1 = b2 then 0 else 1 in
-  diff cmp_burial p.Def.burial n.Def.burial
+  Utils.diff cmp_burial p.Def.burial n.Def.burial
 let diff_birth_place p n =
-  diff_istr p.Def.birth_place n.Def.birth_place
+  Utils.diff_istr p.Def.birth_place n.Def.birth_place
 let diff_burial_place p n =
-  diff_istr p.Def.burial_place n.Def.burial_place
+  Utils.diff_istr p.Def.burial_place n.Def.burial_place
 let diff_baptism_place p n =
-  diff_istr p.Def.baptism_place n.Def.baptism_place
+  Utils.diff_istr p.Def.baptism_place n.Def.baptism_place
 let diff_death_place p n =
-  diff_istr p.Def.death_place n.Def.death_place
+  Utils.diff_istr p.Def.death_place n.Def.death_place
 
-
+(*
 let _diff_o cmp o o' = match o, o' with
   | Some v, Some v' -> diff cmp v v'
   | Some _ , None -> Some (make_diff o None)
   | None, Some _ -> Some (make_diff None o')
   | None, None -> None
-
+*)
 let diff_npoc p n =
   let fn_diff = diff_first_name p n in
   let sn_diff = diff_surname p n in
@@ -126,15 +139,15 @@ let new_ascends base ifam =
   let fath = Gwdb.poi base (Gwdb.get_father fam) in
   let moth = Gwdb.poi base (Gwdb.get_mother fam) in
   let father = Some Diff_types.Npoc_diff.{
-      first_name = Some (make_diff None (Some (Gwdb.get_first_name fath)));
-      surname = Some (make_diff None (Some (Gwdb.get_surname fath)));
-      occ = Some (make_diff None (Some (Gwdb.get_occ fath)));
+      first_name = Some (Utils.make_diff None (Some (Gwdb.get_first_name fath)));
+      surname = Some (Utils.make_diff None (Some (Gwdb.get_surname fath)));
+      occ = Some (Utils.make_diff None (Some (Gwdb.get_occ fath)));
     }
   in
   let mother = Some Diff_types.Npoc_diff.{
-      first_name = Some (make_diff None (Some (Gwdb.get_first_name moth)));
-      surname = Some (make_diff None (Some (Gwdb.get_surname moth)));
-      occ = Some (make_diff None (Some (Gwdb.get_occ moth)));
+      first_name = Some (Utils.make_diff None (Some (Gwdb.get_first_name moth)));
+      surname = Some (Utils.make_diff None (Some (Gwdb.get_surname moth)));
+      occ = Some (Utils.make_diff None (Some (Gwdb.get_occ moth)));
     }
   in
   Some Diff_types.Ascend_diff.{father; mother;}
@@ -150,15 +163,15 @@ let ascends_removed base ifam =
     |> Gwdb.gen_person_of_person_baseonly
   in
   let father = Some Diff_types.Npoc_diff.{
-      first_name = Some (make_diff (Some fath.first_name) None);
-      surname = Some (make_diff (Some fath.surname) None);
-      occ = Some (make_diff (Some fath.occ) None);
+      first_name = Some (Utils.make_diff (Some fath.first_name) None);
+      surname = Some (Utils.make_diff (Some fath.surname) None);
+      occ = Some (Utils.make_diff (Some fath.occ) None);
     }
   in
   let mother = Some Diff_types.Npoc_diff.{
-      first_name = Some (make_diff (Some moth.first_name) None);
-      surname = Some (make_diff (Some moth.surname) None);
-      occ = Some (make_diff (Some moth.occ) None);
+      first_name = Some (Utils.make_diff (Some moth.first_name) None);
+      surname = Some (Utils.make_diff (Some moth.surname) None);
+      occ = Some (Utils.make_diff (Some moth.occ) None);
     }
   in
   Some Diff_types.Ascend_diff.{father; mother;}
@@ -175,12 +188,6 @@ let diff_ascends base iper =
   | None, None -> None
 
 let diff_unions _p _n = None
-
-module IperSet =
-  Set.Make (struct
-      type t = Gwdb.iper
-      let compare = Gwdb.compare_iper
-    end)
 
 
 let diff_children base iper =
@@ -200,7 +207,9 @@ let diff_children base iper =
       ) IperSet.empty children_n
   in
   if IperSet.compare children_p_set children_n_set <> 0 then
-    Some (make_diff (list_o (IperSet.elements children_p_set)) (list_o (IperSet.elements children_n_set)))
+    Some (Utils.make_diff
+            (Utils.list_o (IperSet.elements children_p_set))
+            (Utils.list_o (IperSet.elements children_n_set)))
   else None
   
   
@@ -208,16 +217,6 @@ let diff_children base iper =
 let diff_person ~base ~iper ~previously ~now =
   let p = previously in
   let n = now in
-  let _ = base in
-  (*print_endline @@ "FN: " ^ (Gwdb.string_of_istr p.Def.first_name) ^ " "
-                  ^ (Gwdb.string_of_istr n.Def.first_name);
-  let diff_fn = diff_istr p.Def.first_name n.Def.first_name in
-  let s = diff_to_string (fun istr -> Gwdb.sou base istr) diff_fn in
-  print_endline s;
-  let diff_sn = diff_istr p.Def.surname n.Def.surname in
-  let s = diff_to_string (fun istr -> Gwdb.sou base istr) diff_sn in
-  print_endline s;
-  *)
   let first_name = diff_first_name p n in
   let surname = diff_surname p n in
   let occ = diff_occ p n in
@@ -267,3 +266,162 @@ let diff_person ~base ~iper ~previously ~now =
     ascends;
     children;
   }
+
+let log = print_endline
+
+
+let diff_to_string to_string diff =
+  match diff with
+  | Some diff ->
+    let p = Option.map to_string diff.Diff_types.previously in
+    let n = Option.map to_string diff.now in
+    begin match p, n with
+        Some p, Some n -> "P:" ^ p ^ " N:" ^ n
+      | Some p, _ -> "P:" ^ p
+      | _, Some n -> "N:" ^ n
+      | None, None -> "No diff"
+    end
+  | None -> "No diff"
+
+
+let diff_npoc_to_string diff_npoc = match diff_npoc with
+  | Some diff_npoc ->
+    let fn_s = diff_to_string Gwdb.string_of_istr diff_npoc.Diff_types.Npoc_diff.first_name in
+    let sn_s = diff_to_string Gwdb.string_of_istr diff_npoc.surname in
+    let occ_s = diff_to_string string_of_int diff_npoc.occ in
+    "{\nfirst_name: " ^ fn_s ^ "\n" ^
+    "surname: " ^ sn_s ^ "\n" ^
+    "occ: " ^ occ_s ^ "\n}"
+  | None -> "nodiff"
+
+let diff_ascends_to_string diff_ascend = match diff_ascend with
+  | Some diff_ascend ->
+    let fath = diff_npoc_to_string diff_ascend.Diff_types.Ascend_diff.father in
+    let moth = diff_npoc_to_string diff_ascend.mother in
+    "{\nfather:\n" ^ fath ^ "\n{\nmother:\n" ^ moth
+  | None -> "nodiff"
+
+let diff_descend_to_string diff_descend =
+  diff_to_string (fun l -> String.concat "," (List.map Gwdb.string_of_iper l)) diff_descend
+
+let diff_person_to_string diff_person =
+  let open Diff_types.Person_diff in
+  let fn_s = diff_to_string Gwdb.string_of_istr diff_person.first_name in
+  let sn_s = diff_to_string Gwdb.string_of_istr diff_person.surname in
+  let occ_s = diff_to_string string_of_int diff_person.occ in
+  let public_s = diff_to_string Gwdb.string_of_istr diff_person.public_name in
+  let qualifiers_s = diff_to_string (fun l -> List.map Gwdb.string_of_istr l |> String.concat ";") diff_person.qualifiers in
+  let birth_s = diff_to_string Diff_utils.date_to_string diff_person.birth in
+  let ascends_s = diff_ascends_to_string diff_person.ascends in
+  let descend_s = diff_descend_to_string diff_person.children in
+  "{\nfirst_name: " ^ fn_s ^ "\n" ^
+  "surname: " ^ sn_s ^ "\n" ^
+  "occ: " ^ occ_s ^ "\n" ^
+  "public_name:" ^ public_s ^ "\n" ^
+  "qualifiers:" ^ qualifiers_s ^ "\n" ^
+  "birth:" ^ birth_s ^ "\n" ^
+  "ascends:" ^ ascends_s ^ "\n" ^
+  "descend:" ^ descend_s ^ "\n" ^
+  "}"
+
+
+module Env : sig
+  type t
+  val empty : t
+  val add_iper : Gwdb.base -> t -> Gwdb.iper -> t
+  val add_ifam : Gwdb.base -> t -> Gwdb.ifam -> t
+  val fold : ('a -> Gwdb.iper -> 'a) -> 'a -> t -> 'a
+end = struct
+
+  
+  type t = {
+    persons : IperSet.t;
+    families : IfamSet.t;
+  }
+
+  let empty = {
+    persons = IperSet.empty;
+    families = IfamSet.empty;
+  }
+
+  let all_ipers_from_ifam base ifam =
+    let fam = Gwdb.foi base ifam in
+    let fam' = Gwdb.foi base ifam in
+    let fath = Gwdb.get_father_baseonly fam in
+    let fath' = Gwdb.get_father fam' in
+    let moth = Gwdb.get_mother_baseonly fam in
+    let moth' = Gwdb.get_mother fam' in
+    let children = Gwdb.get_children_baseonly fam in
+    let children' = Gwdb.get_children fam' in
+(*    log "FATH";
+    log @@ Gwdb.string_of_iper fath;
+    log @@ Gwdb.string_of_iper fath';
+    log "MOTH";
+    log @@ Gwdb.string_of_iper moth;
+    log @@ Gwdb.string_of_iper moth';
+    log "CHLD";
+    Array.iter (fun i -> log @@ Gwdb.string_of_iper i) children;
+    log "CHLD'";
+      Array.iter (fun i -> log @@ Gwdb.string_of_iper i) children';*)
+    let iset = IperSet.empty in
+    let iset = IperSet.add fath iset in
+    let iset = IperSet.add moth iset in
+    let iset = Array.fold_left (fun iset i -> IperSet.add i iset) iset children in
+    let iset = IperSet.add fath' iset in
+    let iset = IperSet.add moth' iset in
+    let iset = Array.fold_left (fun iset i -> IperSet.add i iset) iset children' in
+    iset
+  
+  let add_all_ipers_from_ifam base env ifam =
+    let iperset = all_ipers_from_ifam base ifam in
+    {env with persons = IperSet.union env.persons iperset}
+
+  let add_all_related_ipers base env iper =
+    let p = Gwdb.poi base iper in
+    let p' = Gwdb.poi base iper in
+    let fam_p = Gwdb.get_family_baseonly p in
+    let fam_n = Gwdb.get_family p' in
+    let ifamset = Array.fold_left (fun set ifam -> IfamSet.add ifam set) IfamSet.empty fam_p in
+    let ifamset = Array.fold_left (fun set ifam -> IfamSet.add ifam set) ifamset fam_n in
+    
+    let env = IfamSet.fold (fun ifam env -> add_all_ipers_from_ifam base env ifam) ifamset env in
+    env
+  
+  let add_iper base env iper =
+    let env = add_all_related_ipers base env iper in
+    {env with persons = IperSet.add iper env.persons}
+  
+  let add_ifam base env ifam =
+    let env = add_all_ipers_from_ifam base env ifam in
+    {env with families = IfamSet.add ifam env.families}
+
+  let fold f acc env = IperSet.fold (fun iper acc -> f acc iper) env.persons acc
+  
+end
+
+let compute_diff base iper =
+  let p = Gwdb.poi base iper in
+  let p' = Gwdb.poi base iper in
+
+  let genp_base = Gwdb.gen_person_of_person_baseonly p in
+  let genp_patch = Gwdb.gen_person_of_person p' in
+
+  log @@ "DBG" ^ (Gwdb.string_of_iper iper);
+  let fn, sn = genp_base.first_name, genp_base.surname in
+  let fn', sn' = genp_patch.first_name, genp_patch.surname in
+  log (Gwdb.sou base fn ^ " " ^ Gwdb.sou base sn);
+  log (Gwdb.sou base fn' ^ " " ^ Gwdb.sou base sn');
+  let dp = diff_person ~base ~iper ~previously:genp_base ~now:genp_patch in
+  let dp_s = diff_person_to_string dp in
+  log dp_s;
+  dp
+
+let updates_from_patch base =
+  let ipers = Gwdb.ipers_from_patch base in
+  let ifams = Gwdb.ifams_from_patch  base in
+  let env = Env.empty in
+  log "=========================IFAMS==================================";
+  let env = Gwdb.Collection.fold (Env.add_ifam base) env ifams in
+  log "=========================IPERS==================================";
+  let env = Gwdb.Collection.fold (Env.add_iper base) env ipers in
+  Env.fold (fun l iper -> compute_diff base iper :: l) [] env
