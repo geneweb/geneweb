@@ -13,30 +13,54 @@ type title_diff = {
   t_nth : int diff option;
 }
 
-type person_diff = {
-  first_name : Gwdb.istr diff option;
-  surname : Gwdb.istr diff option;
-  occ : int diff option;
-  public_name : Gwdb.istr diff option;
-  qualifiers : Gwdb.istr list diff option;
-  aliases : Gwdb.istr list diff option;
-  first_names_aliases : Gwdb.istr list diff option;
-  surnames_aliases : Gwdb.istr list diff option;
-  titles : title_diff option;
-  (* relations with not native parents *)
-  rparents : (Gwdb.iper, Gwdb.istr) Def.gen_relation list diff option;
-  (* related persons like (father of witnessed family,
-     concerned person of witnessed event, adopted child, etc.) *)
-  occupation : Gwdb.istr diff option;
-  sex : Def.sex diff option;
-  birth : Def.cdate diff option;
-  birth_place : Gwdb.istr diff option;
-  baptism : Def.cdate diff option;
-  baptism_place : Gwdb.istr diff option;
-  death : Def.death diff option;
-  death_place : Gwdb.istr diff option;
-  burial : Def.burial diff option;
-  burial_place : Gwdb.istr diff option; 
-}
+module Npoc_diff : sig
+  type t = {
+    first_name : Gwdb.istr diff option;
+    surname : Gwdb.istr diff option;
+    occ : int diff option;
+  }
+end
 
-val no_diff_person : person_diff
+module Ascend_diff : sig
+  type t = {
+    father : Npoc_diff.t option;
+    mother : Npoc_diff.t option;
+  }
+end
+
+module Descend_diff : sig
+  type t = Gwdb.iper list diff
+end
+
+module Person_diff : sig
+  type t = {
+    first_name : Gwdb.istr diff option;
+    surname : Gwdb.istr diff option;
+    occ : int diff option;
+    public_name : Gwdb.istr diff option;
+    qualifiers : Gwdb.istr list diff option;
+    aliases : Gwdb.istr list diff option;
+    first_names_aliases : Gwdb.istr list diff option;
+    surnames_aliases : Gwdb.istr list diff option;
+    titles : title_diff option;
+    (* relations with not native parents *)
+    rparents : (Gwdb.iper, Gwdb.istr) Def.gen_relation list diff option;
+    (* related persons like (father of witnessed family,
+       concerned person of witnessed event, adopted child, etc.) *)
+    occupation : Gwdb.istr diff option;
+    sex : Def.sex diff option;
+    birth : Def.cdate diff option;
+    birth_place : Gwdb.istr diff option;
+    baptism : Def.cdate diff option;
+    baptism_place : Gwdb.istr diff option;
+    death : Def.death diff option;
+    death_place : Gwdb.istr diff option;
+    burial : Def.burial diff option;
+    burial_place : Gwdb.istr diff option;
+    unions : Gwdb.ifam Def.gen_union diff option;
+    ascends : Ascend_diff.t option;
+    children : Descend_diff.t option;
+  }
+end
+
+val no_diff_person : Person_diff.t

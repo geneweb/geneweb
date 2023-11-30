@@ -333,6 +333,7 @@ let get_death_note = cache_per (fun p -> p.Dbdisk.death_note)
 let get_death_place = cache_per (fun p -> p.Dbdisk.death_place)
 let get_death_src = cache_per (fun p -> p.Dbdisk.death_src)
 let get_family = cache_uni (fun u -> u.Def.family)
+let get_family_baseonly = cache_uni_baseonly (fun u -> u.Def.family)
 let get_first_name = cache_per (fun p -> p.Dbdisk.first_name)
 let get_first_names_aliases = cache_per (fun p -> p.Dbdisk.first_names_aliases)
 let get_image = cache_per (fun p -> p.Dbdisk.image)
@@ -368,17 +369,25 @@ let cache_fam f ({ base; ifam; _ } as fam) =
 let cache_cpl f ({ base; ifam; _ } as fam) =
   f (cache base.data.couples.get ifam (fun f -> f.c) (fun f v -> f.c <- v) fam)
 
+let cache_cpl_baseonly f ({ base; ifam; _ } as fam) =
+  f (cache base.data.couples.get_baseonly ifam (fun f -> f.c) (fun f v -> f.c <- v) fam)
+
 let cache_des f ({ base; ifam; _ } as fam) =
   f (cache base.data.descends.get ifam (fun f -> f.d) (fun f v -> f.d <- v) fam)
+
+let cache_des_baseonly f ({ base; ifam; _ } as fam) =
+  f (cache base.data.descends.get_baseonly ifam (fun f -> f.d) (fun f v -> f.d <- v) fam)
 
 let gen_couple_of_family = cache_cpl (fun c -> c)
 let gen_descend_of_family = cache_des (fun d -> d)
 let gen_family_of_family = cache_fam (fun f -> f)
 let get_children = cache_des (fun d -> d.Def.children)
+let get_children_baseonly = cache_des_baseonly (fun d -> d.Def.children)
 let get_comment = cache_fam (fun f -> f.Dbdisk.comment)
 let get_ifam = cache_fam (fun f -> f.Dbdisk.fam_index)
 let get_divorce = cache_fam (fun f -> f.Dbdisk.divorce)
 let get_father = cache_cpl (fun c -> Adef.father c)
+let get_father_baseonly = cache_cpl_baseonly (fun c -> Adef.father c)
 let get_fevents = cache_fam (fun f -> f.Dbdisk.fevents)
 let get_fsources = cache_fam (fun f -> f.Dbdisk.fsources)
 let get_marriage = cache_fam (fun f -> f.Dbdisk.marriage)
@@ -386,6 +395,7 @@ let get_marriage_note = cache_fam (fun f -> f.Dbdisk.marriage_note)
 let get_marriage_place = cache_fam (fun f -> f.Dbdisk.marriage_place)
 let get_marriage_src = cache_fam (fun f -> f.Dbdisk.marriage_src)
 let get_mother = cache_cpl (fun c -> Adef.mother c)
+let get_mother_baseonly = cache_cpl_baseonly (fun c -> Adef.mother c)
 let get_origin_file = cache_fam (fun f -> f.Dbdisk.origin_file)
 let get_parent_array = cache_cpl (fun c -> Adef.parent_array c)
 let get_relation = cache_fam (fun f -> f.Dbdisk.relation)

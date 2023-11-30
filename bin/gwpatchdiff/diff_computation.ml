@@ -75,7 +75,137 @@ let diff_death_place p n =
   diff_istr p.Def.death_place n.Def.death_place
 
 
-let diff_person ~base ~previously ~now =
+let _diff_o cmp o o' = match o, o' with
+  | Some v, Some v' -> diff cmp v v'
+  | Some _ , None -> Some (make_diff o None)
+  | None, Some _ -> Some (make_diff None o')
+  | None, None -> None
+
+let diff_npoc p n =
+  let fn_diff = diff_first_name p n in
+  let sn_diff = diff_surname p n in
+  let occ_diff = diff_occ p n in
+  match fn_diff, sn_diff, occ_diff with
+  | None, None, None -> None
+  | _ -> Some Npoc_diff.{first_name = fn_diff; surname = sn_diff; occ = occ_diff}
+
+
+let diff_father base fam_p fam_n =
+  let fath_p =
+    Gwdb.poi base (Gwdb.get_father_baseonly fam_p)
+    |> Gwdb.gen_person_of_person_baseonly
+  in
+  let fath_n =
+    Gwdb.poi base (Gwdb.get_father fam_n)
+    |> Gwdb.gen_person_of_person
+  in
+  diff_npoc fath_p fath_n
+
+let diff_mother base fam_p fam_n =
+  let moth_p =
+    Gwdb.poi base (Gwdb.get_mother_baseonly fam_p)
+    |> Gwdb.gen_person_of_person_baseonly
+  in
+  let moth_n =
+    Gwdb.poi base (Gwdb.get_mother fam_n)
+    |> Gwdb.gen_person_of_person
+  in
+  diff_npoc moth_p moth_n
+
+let diff_ascends base ifam_p ifam_n =
+  let fam_p = Gwdb.foi base ifam_p in
+  let fam_n = Gwdb.foi base ifam_n in
+  let father = diff_father base fam_p fam_n in
+  let mother = diff_mother base fam_p fam_n in
+  if Option.is_some father || Option.is_some mother then
+    Some Diff_types.Ascend_diff.{father; mother;}
+  else None
+  
+let new_ascends base ifam =
+  let fam = Gwdb.foi base ifam in
+  let fath = Gwdb.poi base (Gwdb.get_father fam) in
+  let moth = Gwdb.poi base (Gwdb.get_mother fam) in
+  let father = Some Diff_types.Npoc_diff.{
+      first_name = Some (make_diff None (Some (Gwdb.get_first_name fath)));
+      surname = Some (make_diff None (Some (Gwdb.get_surname fath)));
+      occ = Some (make_diff None (Some (Gwdb.get_occ fath)));
+    }
+  in
+  let mother = Some Diff_types.Npoc_diff.{
+      first_name = Some (make_diff None (Some (Gwdb.get_first_name moth)));
+      surname = Some (make_diff None (Some (Gwdb.get_surname moth)));
+      occ = Some (make_diff None (Some (Gwdb.get_occ moth)));
+    }
+  in
+  Some Diff_types.Ascend_diff.{father; mother;}
+  
+let ascends_removed base ifam =
+  let fam = Gwdb.foi base ifam in
+  let fath =
+    Gwdb.poi base (Gwdb.get_father_baseonly fam)
+  |> Gwdb.gen_person_of_person_baseonly
+  in
+  let moth =
+    Gwdb.poi base (Gwdb.get_mother_baseonly fam)
+    |> Gwdb.gen_person_of_person_baseonly
+  in
+  let father = Some Diff_types.Npoc_diff.{
+      first_name = Some (make_diff (Some fath.first_name) None);
+      surname = Some (make_diff (Some fath.surname) None);
+      occ = Some (make_diff (Some fath.occ) None);
+    }
+  in
+  let mother = Some Diff_types.Npoc_diff.{
+      first_name = Some (make_diff (Some moth.first_name) None);
+      surname = Some (make_diff (Some moth.surname) None);
+      occ = Some (make_diff (Some moth.occ) None);
+    }
+  in
+  Some Diff_types.Ascend_diff.{father; mother;}
+  
+let diff_ascends base iper =
+  let p = Gwdb.poi base iper in
+  let n = Gwdb.poi base iper in
+  let asc_p = Gwdb.gen_ascend_of_person_baseonly p in
+  let asc_n = Gwdb.gen_ascend_of_person n in
+  match asc_p.parents, asc_n.parents with
+  | Some ifam_p, Some ifam_n -> diff_ascends base ifam_p ifam_n
+  | None, Some ifam -> new_ascends base ifam
+  | Some ifam, None -> ascends_removed base ifam
+  | None, None -> None
+
+let diff_unions _p _n = None
+
+module IperSet =
+  Set.Make (struct
+      type t = Gwdb.iper
+      let compare = Gwdb.compare_iper
+    end)
+
+
+let diff_children base iper =
+  let p = Gwdb.poi base iper in
+  let p' = Gwdb.poi base iper in
+  let families_p = Array.map (Gwdb.foi base) (Gwdb.get_family_baseonly p) in
+  let families_n = Array.map (Gwdb.foi base) (Gwdb.get_family p') in
+  let children_p = Array.map Gwdb.get_children_baseonly families_p in
+  let children_n = Array.map Gwdb.get_children families_n in
+  let children_p_set = Array.fold_left (fun set arr ->
+      Array.fold_left (fun set iper -> IperSet.add iper set) set arr
+    ) IperSet.empty children_p
+  in
+  let children_n_set =
+    Array.fold_left (fun set arr ->
+        Array.fold_left (fun set iper -> IperSet.add iper set) set arr
+      ) IperSet.empty children_n
+  in
+  if IperSet.compare children_p_set children_n_set <> 0 then
+    Some (make_diff (list_o (IperSet.elements children_p_set)) (list_o (IperSet.elements children_n_set)))
+  else None
+  
+  
+
+let diff_person ~base ~iper ~previously ~now =
   let p = previously in
   let n = now in
   let _ = base in
@@ -109,7 +239,10 @@ let diff_person ~base ~previously ~now =
   let _diffp = no_diff_person in
   let titles = None in
   let rparents = None in
-  {
+  let unions = diff_unions p n in
+  let children = diff_children base iper in
+  let ascends = diff_ascends base iper in
+  Diff_types.Person_diff.{
     first_name;
     surname;
     occ;
@@ -130,4 +263,7 @@ let diff_person ~base ~previously ~now =
     burial_place;
     titles;
     rparents;
+    unions;
+    ascends;
+    children;
   }

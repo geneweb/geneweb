@@ -195,6 +195,9 @@ module type Driver_S = sig
   val get_children : family -> iper array
   (** Get array of family's children ids *)
 
+  val get_children_baseonly : family -> iper array
+  (** Get array of family's children ids *)
+  
   val get_comment : family -> istr
   (** Get family's comment (notes) id *)
 
@@ -219,9 +222,15 @@ module type Driver_S = sig
   val get_family : person -> ifam array
   (** Get array of family's ids to which a person belongs as parent (person's union) *)
 
+  val get_family_baseonly : person -> ifam array
+  (** Get array of family's ids to which a person belongs as parent (person's union) *)
+  
   val get_father : family -> iper
   (** Get family's father id (from the family's couple) *)
 
+  val get_father_baseonly : family -> iper
+  (** Get family's father id (from the family's couple) *)
+  
   val get_fevents : family -> fam_event list
   (** Get family's event list *)
 
@@ -258,6 +267,9 @@ module type Driver_S = sig
   val get_mother : family -> iper
   (** Get family's mother id (from the family's couple) *)
 
+  val get_mother_baseonly : family -> iper
+  (** Get family's mother id (from the family's couple) *)
+  
   val get_notes : person -> istr
   (** Get person's notes id *)
 
@@ -1001,7 +1013,8 @@ struct
   let get_aliases = Util.wrap_person Legacy.get_aliases Current.get_aliases
   let get_consang = Util.wrap_person Legacy.get_consang Current.get_consang
   let get_family = Util.wrap_person Legacy.get_family Current.get_family
-
+  let get_family_baseonly = Util.wrap_person Legacy.get_family_baseonly Current.get_family_baseonly
+  
   let get_first_name =
     Util.wrap_person Legacy.get_first_name Current.get_first_name
 
@@ -1118,10 +1131,13 @@ struct
     Util.wrap_person Legacy.get_death_src Current.get_death_src
 
   let get_children = Util.wrap_family Legacy.get_children Current.get_children
+  let get_children_baseonly = Util.wrap_family Legacy.get_children_baseonly Current.get_children_baseonly
   let get_comment = Util.wrap_family Legacy.get_comment Current.get_comment
   let get_divorce = Util.wrap_family Legacy.get_divorce Current.get_divorce
   let get_father = Util.wrap_family Legacy.get_father Current.get_father
+  let get_father_baseonly = Util.wrap_family Legacy.get_father_baseonly Current.get_father_baseonly
   let get_mother = Util.wrap_family Legacy.get_mother Current.get_mother
+  let get_mother_baseonly = Util.wrap_family Legacy.get_mother_baseonly Current.get_mother_baseonly
 
   let get_fevents =
     Util.wrap_family

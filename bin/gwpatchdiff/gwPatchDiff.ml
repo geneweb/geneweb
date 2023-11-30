@@ -54,26 +54,54 @@ let diff_to_string to_string diff =
   | None -> "No diff"
 
 
+let diff_npoc_to_string diff_npoc = match diff_npoc with
+  | Some diff_npoc ->
+    let fn_s = diff_to_string Gwdb.string_of_istr diff_npoc.Diff_types.Npoc_diff.first_name in
+    let sn_s = diff_to_string Gwdb.string_of_istr diff_npoc.surname in
+    let occ_s = diff_to_string string_of_int diff_npoc.occ in
+    "{\nfirst_name: " ^ fn_s ^ "\n" ^
+    "surname: " ^ sn_s ^ "\n" ^
+    "occ: " ^ occ_s ^ "\n}"
+  | None -> "nodiff"
+
+let diff_ascends_to_string diff_ascend = match diff_ascend with
+  | Some diff_ascend ->
+    let fath = diff_npoc_to_string diff_ascend.Diff_types.Ascend_diff.father in
+    let moth = diff_npoc_to_string diff_ascend.mother in
+    "{\nfather:\n" ^ fath ^ "\n{\nmother:\n" ^ moth
+  | None -> "nodiff"
+
+let diff_descend_to_string diff_descend =
+  diff_to_string (fun l -> String.concat "," (List.map Gwdb.string_of_iper l)) diff_descend
+
 let diff_person_to_string diff_person =
-  let fn_s = diff_to_string Gwdb.string_of_istr diff_person.Diff_types.first_name in
+  let open Diff_types.Person_diff in
+  let fn_s = diff_to_string Gwdb.string_of_istr diff_person.first_name in
   let sn_s = diff_to_string Gwdb.string_of_istr diff_person.surname in
   let occ_s = diff_to_string string_of_int diff_person.occ in
   let public_s = diff_to_string Gwdb.string_of_istr diff_person.public_name in
   let qualifiers_s = diff_to_string (fun l -> List.map Gwdb.string_of_istr l |> String.concat ";") diff_person.qualifiers in
   let birth_s = diff_to_string Diff_utils.date_to_string diff_person.birth in
+  let ascends_s = diff_ascends_to_string diff_person.ascends in
+  let descend_s = diff_descend_to_string diff_person.children in
   "{\nfirst_name: " ^ fn_s ^ "\n" ^
   "surname: " ^ sn_s ^ "\n" ^
   "occ: " ^ occ_s ^ "\n" ^
   "public_name:" ^ public_s ^ "\n" ^
   "qualifiers:" ^ qualifiers_s ^ "\n" ^
   "birth:" ^ birth_s ^ "\n" ^
+  "ascends:" ^ ascends_s ^ "\n" ^
+  "descend:" ^ descend_s ^ "\n" ^
   "}"
+
+let log = print_endline
 
 module Env : sig
   type t
   val empty : t
   val add_iper : Gwdb.base -> t -> Gwdb.iper -> t
   val add_ifam : Gwdb.base -> t -> Gwdb.ifam -> t
+  val fold : ('a -> Gwdb.iper -> 'a) -> 'a -> t -> 'a
 end = struct
 
   
@@ -88,9 +116,10 @@ end = struct
   }
   
 
-  let debug_add_iper base env iper =
+  let debug_add_iper _base env iper =
 
-    let p = Gwdb.poi base iper in
+    log @@ (Gwdb.string_of_iper iper);
+(*    let p = Gwdb.poi base iper in
     let p' = Gwdb.poi base iper in
 
     let genp_base = Gwdb.gen_person_of_person_baseonly p in
@@ -99,52 +128,128 @@ end = struct
     let gena_base = Gwdb.gen_ascend_of_person_baseonly p in
     let gena_patch = Gwdb.gen_ascend_of_person p' in
     
-    print_endline @@ "DBG" ^ (Gwdb.string_of_iper iper);
+    log @@ "DBG" ^ (Gwdb.string_of_iper iper);
     let fn, sn = genp_base.first_name, genp_base.surname in
     let fn', sn' = genp_patch.first_name, genp_patch.surname in
-    print_endline (Gwdb.sou base fn ^ " " ^ Gwdb.sou base sn);
-    print_endline (Gwdb.sou base fn' ^ " " ^ Gwdb.sou base sn');
+    log (Gwdb.sou base fn ^ " " ^ Gwdb.sou base sn);
+    log (Gwdb.sou base fn' ^ " " ^ Gwdb.sou base sn');
 
     begin match gena_base.parents with
-    | Some ifam -> print_endline @@ "PARENTS " ^ Gwdb.string_of_ifam ifam
-    | None -> print_endline "NO PARENTS"
+    | Some ifam -> log @@ "PARENTS " ^ Gwdb.string_of_ifam ifam
+    | None -> log "NO PARENTS"
     end;
     begin match gena_patch.parents with
-    | Some ifam -> print_endline @@ "PARENTS " ^ Gwdb.string_of_ifam ifam
-    | None -> print_endline "NO PARENTS"
-    end;
+    | Some ifam -> log @@ "PARENTS " ^ Gwdb.string_of_ifam ifam
+    | None -> log "NO PARENTS"
+      end;
     
     let dp = Diff_computation.diff_person ~base ~previously:genp_base ~now:genp_patch in
     let dp_s = diff_person_to_string dp in
 
-    print_endline dp_s;
+      log dp_s;*)
     
     env
     
   let debug_add_ifam base env ifam =
     let _ = base in
-    print_endline (Gwdb.string_of_ifam ifam);
+    log (Gwdb.string_of_ifam ifam);
     env
 
-  let add_iper base env iper =
-    let _ = base in
-    let _ = debug_add_iper base env iper in
-    {env with persons = IperSet.add iper env.persons}
+  let all_ipers_from_ifam base ifam =
+    let fam = Gwdb.foi base ifam in
+    let fam' = Gwdb.foi base ifam in
+    let fath = Gwdb.get_father_baseonly fam in
+    let fath' = Gwdb.get_father fam' in
+    let moth = Gwdb.get_mother_baseonly fam in
+    let moth' = Gwdb.get_mother fam' in
+    let children = Gwdb.get_children_baseonly fam in
+    let children' = Gwdb.get_children fam' in
+    log "FATH";
+    log @@ Gwdb.string_of_iper fath;
+    log @@ Gwdb.string_of_iper fath';
+    log "MOTH";
+    log @@ Gwdb.string_of_iper moth;
+    log @@ Gwdb.string_of_iper moth';
+    log "CHLD";
+    Array.iter (fun i -> log @@ Gwdb.string_of_iper i) children;
+    log "CHLD'";
+    Array.iter (fun i -> log @@ Gwdb.string_of_iper i) children';
+    let iset = IperSet.empty in
+    let iset = IperSet.add fath iset in
+    let iset = IperSet.add moth iset in
+    let iset = Array.fold_left (fun iset i -> IperSet.add i iset) iset children in
+    let iset = IperSet.add fath' iset in
+    let iset = IperSet.add moth' iset in
+    let iset = Array.fold_left (fun iset i -> IperSet.add i iset) iset children' in
+    iset
+  
+  let add_all_ipers_from_ifam base env ifam =
+    let iperset = all_ipers_from_ifam base ifam in
+    {env with persons = IperSet.union env.persons iperset}
 
+  let add_all_related_ipers base env iper =
+    let p = Gwdb.poi base iper in
+    let p' = Gwdb.poi base iper in
+    let fam_p = Gwdb.get_family_baseonly p in
+    let fam_n = Gwdb.get_family p' in
+    let ifamset = Array.fold_left (fun set ifam -> IfamSet.add ifam set) IfamSet.empty fam_p in
+    let ifamset = Array.fold_left (fun set ifam -> IfamSet.add ifam set) ifamset fam_n in
+    
+    let env = IfamSet.fold (fun ifam env -> add_all_ipers_from_ifam base env ifam) ifamset env in
+    env
+  
+  let add_iper base env iper =
+    let _ = debug_add_iper base env iper in
+    let env = add_all_related_ipers base env iper in
+    {env with persons = IperSet.add iper env.persons}
+  
   let add_ifam base env ifam =
     let _ = base in
     let _ = debug_add_ifam base env ifam in
+    
+    let env = add_all_ipers_from_ifam base env ifam in
     {env with families = IfamSet.add ifam env.families}
+
+  let fold f acc env = IperSet.fold (fun iper acc -> f acc iper) env.persons acc
+  
 end
+
+let compute_diff base iper =
+  let p = Gwdb.poi base iper in
+  let p' = Gwdb.poi base iper in
+
+  let genp_base = Gwdb.gen_person_of_person_baseonly p in
+  let genp_patch = Gwdb.gen_person_of_person p' in
+
+  log @@ "DBG" ^ (Gwdb.string_of_iper iper);
+  let fn, sn = genp_base.first_name, genp_base.surname in
+  let fn', sn' = genp_patch.first_name, genp_patch.surname in
+  log (Gwdb.sou base fn ^ " " ^ Gwdb.sou base sn);
+  log (Gwdb.sou base fn' ^ " " ^ Gwdb.sou base sn');
+
+  let dp = Diff_computation.diff_person ~base ~iper ~previously:genp_base ~now:genp_patch in
+
+  let dp_s = diff_person_to_string dp in
+
+  log dp_s
+  
 
 let updates_from_patch base =
   let _ = base in
   let ipers = Gwdb.ipers_from_patch base in
   let ifams = Gwdb.ifams_from_patch  base in
   let env = Env.empty in
-  let env = Gwdb.Collection.fold (Env.add_iper base) env ipers in
+
+  log "=========================IFAMS==================================";
   let env = Gwdb.Collection.fold (Env.add_ifam base) env ifams in
+
+  log "=========================IPERS==================================";
+  let env = Gwdb.Collection.fold (Env.add_iper base) env ipers in
+
   let _ = env in
+  
+  let _ = Env.fold (fun _acc iper -> compute_diff base iper) () env in
+  
   ()
 
 let handle_options opts =

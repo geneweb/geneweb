@@ -195,6 +195,9 @@ module type Driver_S = sig
   val get_children : family -> iper array
   (** Get array of family's children ids *)
 
+  val get_children_baseonly : family -> iper array
+  (** Get array of family's children ids *)
+  
   val get_comment : family -> istr
   (** Get family's comment (notes) id *)
 
@@ -219,9 +222,15 @@ module type Driver_S = sig
   val get_family : person -> ifam array
   (** Get array of family's ids to which a person belongs as parent (person's union) *)
 
+  val get_family_baseonly : person -> ifam array
+  (** Get array of family's ids to which a person belongs as parent (person's union) *)
+  
   val get_father : family -> iper
   (** Get family's father id (from the family's couple) *)
 
+  val get_father_baseonly : family -> iper
+  (** Get family's father id (from the family's couple) *)
+  
   val get_fevents : family -> fam_event list
   (** Get family's event list *)
 
@@ -258,6 +267,9 @@ module type Driver_S = sig
   val get_mother : family -> iper
   (** Get family's mother id (from the family's couple) *)
 
+  val get_mother_baseonly : family -> iper
+  (** Get family's mother id (from the family's couple) *)
+  
   val get_notes : person -> istr
   (** Get person's notes id *)
 

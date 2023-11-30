@@ -168,6 +168,9 @@ val get_burial_src : person -> istr
 val get_children : family -> iper array
 (** Get array of family's children ids *)
 
+val get_children_baseonly : family -> iper array
+(** Get array of family's children ids *)
+
 val get_comment : family -> istr
 (** Get family's comment (notes) id *)
 
@@ -192,7 +195,13 @@ val get_divorce : family -> Def.divorce
 val get_family : person -> ifam array
 (** Get array of family's ids to which a person belongs as parent (person's union) *)
 
+val get_family_baseonly : person -> ifam array
+(** Get array of family's ids to which a person belongs as parent (person's union) *)
+
 val get_father : family -> iper
+(** Get family's father id (from the family's couple) *)
+
+val get_father_baseonly : family -> iper
 (** Get family's father id (from the family's couple) *)
 
 val get_fevents : family -> fam_event list
@@ -229,6 +238,9 @@ val get_marriage_src : family -> istr
 (** Get family's marriage source id *)
 
 val get_mother : family -> iper
+(** Get family's mother id (from the family's couple) *)
+
+val get_mother_baseonly : family -> iper
 (** Get family's mother id (from the family's couple) *)
 
 val get_notes : person -> istr

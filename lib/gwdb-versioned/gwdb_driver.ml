@@ -754,6 +754,7 @@ module Legacy_driver = struct
   let get_burial_src p = get_burial_src p.person
   let get_consang p = get_consang p.person
   let get_family p = get_family p.person
+  let get_family_baseonly p = get_family_baseonly p.person
   let get_first_name p = get_first_name p.person
   let get_first_names_aliases p = get_first_names_aliases p.person
   let get_image p = get_image p.person
@@ -852,9 +853,11 @@ module Legacy_driver = struct
     clear_foi ifam
 
   let get_children f = get_children f.family
+  let get_children_baseonly f = get_children_baseonly f.family
   let get_comment f = get_comment f.family
   let get_divorce f = get_divorce f.family
   let get_father f = get_father f.family
+  let get_father_baseonly f = get_father_baseonly f.family
   let get_fsources f = get_fsources f.family
   let get_ifam f = get_ifam f.family
   let get_marriage f = get_marriage f.family
@@ -862,6 +865,7 @@ module Legacy_driver = struct
   let get_marriage_place f = get_marriage_place f.family
   let get_marriage_src f = get_marriage_src f.family
   let get_mother f = get_mother f.family
+  let get_mother_baseonly f = get_mother_baseonly f.family
   let get_origin_file f = get_origin_file f.family
   let get_parent_array f = get_parent_array f.family
   let get_relation f = get_relation f.family

@@ -1,5 +1,6 @@
 
 val diff_person : base:Gwdb.base ->
+  iper:Gwdb.iper ->
   previously:(Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person ->
   now:(Gwdb.iper, Gwdb.iper, Gwdb.istr) Def.gen_person ->
-  Diff_types.person_diff
+  Diff_types.Person_diff.t
