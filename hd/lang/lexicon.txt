@@ -8205,7 +8205,7 @@ eo: ident/email/objekto
 es: nombre/email/asunto
 et: nimi/e-post/teema
 fi: nimi/sähköposti/aihe
-fr: nom/e-mail/sujet
+fr: nom/mail/sujet
 he: ident/email/ נושא
 is: ident/email/um
 it: ident/email/oggetto

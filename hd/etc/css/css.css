@@ -1,3 +1,8 @@
+/* Light grey background color highlight for the toolbar characters.txt */
+  .ch .hl {
+    background-color: #f0f0f0;
+  }
+
 .dropdown-menu-transl { 
   -webkit-transform: translate(-16%, 0) !important;
   -o-transform: translate(-16%, 0) !important;
