@@ -141,7 +141,9 @@ let person_selected_with_redirect conf base p =
 
 let updmenu_print = Perso.interp_templ "updmenu"
 
-let enabled_forum conf = p_getenv conf.env "disable_forum" <> Some "yes"
+let enabled_forum conf =
+  List.assoc_opt "disable_forum" conf.base_env <> Some "yes"
+  
 
 let very_unknown conf _ =
   match p_getenv conf.env "n", p_getenv conf.env "p" with
@@ -787,7 +789,10 @@ let treat_request =
           w_base @@ WiznotesDisplay.print_search
         | _ ->
             w_base @@ fun conf base ->
-            incorrect_request conf base ~comment:"error #10"
+            let str = Format.sprintf "%s: m=%s\n"
+              (transl conf "incorrect request" |> Utf8.capitalize_fst) m
+            in
+            incorrect_request conf base ~comment:str
       end conf bfile ;
   end else begin
     let title _ =
