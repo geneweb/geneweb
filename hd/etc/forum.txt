@@ -32,9 +32,8 @@
 </style>
 </head>
 <body%body_prop;>
-%include;hed
-%message_to_wizard;
 <div class="container">
+%message_to_wizard;
 %include;home
 %include;hed
 %if;(e.m!="FORUM" or e.p!="")
