@@ -1219,6 +1219,10 @@ let make_conf from_addr request script_name env =
        begin try List.assoc "authorized_wizards_notes" base_env = "yes" with
          Not_found -> false
        end;
+     disable_forum =
+       begin try List.assoc "disable_forum" base_env = "yes" with
+         Not_found -> false
+       end;
      public_if_titles =
        begin try List.assoc "public_if_titles" base_env = "yes" with
          Not_found -> false

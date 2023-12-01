@@ -65,6 +65,7 @@ type config = {
   default_sosa_ref : iper * Gwdb.person option;
   multi_parents : bool;
   authorized_wizards_notes : bool;
+  disable_forum : bool;
   public_if_titles : bool;
   public_if_no_date : bool;
   mutable setup_link : bool;
@@ -143,6 +144,7 @@ let empty =
     default_sosa_ref = (Gwdb.dummy_iper, None);
     multi_parents = false;
     authorized_wizards_notes = false;
+    disable_forum = false;
     public_if_titles = false;
     public_if_no_date = false;
     setup_link = false;
