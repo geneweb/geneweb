@@ -24,7 +24,7 @@ val size_from_path : [ `Path of string ] -> (int * int, unit) result
 (** [size_from_path path]
     - Error () if failed to read or parse file
     - Ok (width, height) of the file.
-It works by openning the file and reading magic numbers *)
+It works by opening the file and reading magic numbers *)
 
 val path_of_filename : string -> [> `Path of string ]
 (** [path_of_filename fname] search for image {i images/fname} inside the base and assets directories.

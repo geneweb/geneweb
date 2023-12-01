@@ -1218,7 +1218,7 @@ let open_etc_file conf fname =
   try Some (Secure.open_in fname, fname)
   with Sys_error e ->
     !GWPARAM.syslog `LOG_ERR
-      (Format.sprintf "Error openning file %s in open_etc_file: %s" fname e);
+      (Format.sprintf "Error opening file %s in open_etc_file: %s" fname e);
     None
 
 let include_template conf env fname failure =
