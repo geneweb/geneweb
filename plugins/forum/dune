@@ -1,6 +1,7 @@
 (rule
  (target plugin_forum.ml)
  (deps
+  (source_tree assets)
   (:included
    %{project_root}/plugins/forum/forum.ml
    %{project_root}/plugins/forum/forumDisplay.ml)
