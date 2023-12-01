@@ -544,7 +544,7 @@ let get_actlog check_from utm from_addr base_password =
       in
       loop false ATnormal []
   with Sys_error e -> (
-      GwdLog.syslog `LOG_WARNING ("Errror opening actlog: " ^ e);
+      GwdLog.syslog `LOG_WARNING ("Error opening actlog: " ^ e);
     [], ATnormal, false)
 
 let set_actlog list =
@@ -559,7 +559,7 @@ let set_actlog list =
       list;
     close_out oc
   with Sys_error e -> (
-    GwdLog.syslog `LOG_WARNING ("Errror opening actlog: " ^ e);
+    GwdLog.syslog `LOG_WARNING ("Error opening actlog: " ^ e);
     ())
 
 let get_token check_from utm from_addr base_password =
