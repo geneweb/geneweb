@@ -791,6 +791,9 @@ let treat_request =
     in
     let user = transl_nth conf "user/password/cancel" 0 in
     let passwd = transl_nth conf "user/password/cancel" 1 in
+    let referer = String.split_on_char '?' (get_referer conf :> string) in
+    let referer = if List.length referer > 1 then (List.nth referer 1) else "" in
+    let referer = if referer = "" then referer else "&" ^ referer in
     let body =
       if conf.cgi then
         Printf.sprintf {|
@@ -809,15 +812,15 @@ let treat_request =
         Printf.sprintf {|
             <div>
               <ul>
-              <li>%s%s <a href="%s?%sw=f"> %s</a></li>
-              <li>%s%s <a href="%s?%sw=w"> %s</a></li>
+              <li>%s%s <a href="%s?%sw=f%s"> %s</a></li>
+              <li>%s%s <a href="%s?%sw=w%s"> %s</a></li>
               </ul>
             </div> |}
             (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
-            (conf.command :> string) base_name
+            (conf.command :> string) base_name referer
             (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
             (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
-            (conf.command :> string) base_name
+            (conf.command :> string) base_name referer
             (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
     in
     Output.print_sstring conf 
