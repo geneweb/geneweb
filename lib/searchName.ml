@@ -138,7 +138,7 @@ let search_for_fn_or_pn conf base fn pl =
             let tbl = Hashtbl.create 512 in
             List.iter (fun k -> Hashtbl.add tbl k ()) fn1_l;
             List.iter (fun k -> Hashtbl.add tbl k ()) fn2_l;
-            List.exists (Hashtbl.mem tbl) fn_l
+            List.exists (fun fn -> Hashtbl.mem tbl fn) fn_l
         then p :: pl
         else pl)
     [] pl
@@ -178,6 +178,16 @@ let search conf base an search_order specify unknown =
         in
         let sn =
           match p_getenv conf.env "n" with Some sn -> sn | None -> ""
+        in
+        let fn, sn =
+          if fn = "" then
+            (* we assume fn1 fn2 sn. For other cases, use fn, sn explicitely *)
+            match String.rindex_opt sn ' ' with
+            | Some i ->
+                ( String.sub sn 0 i,
+                  String.sub sn (i + 1) (String.length sn - i - 1) )
+            | _ -> ("", sn)
+          else (fn, sn)
         in
         let conf =
           { conf with env = ("surname", Adef.encoded sn) :: conf.env }
@@ -282,8 +292,9 @@ let print conf base specify unknown =
       let order = [ FirstName ] in
       search conf base fn order specify unknown
   | None, Some sn ->
+      Printf.eprintf "None, Some sn: %s\n" sn;
       let order =
-        [ Sosa; Key; Surname; ApproxKey; PartialKey; DefaultSurname ]
+        [ Sosa; Key; FullName; Surname; ApproxKey; PartialKey; DefaultSurname ]
       in
       search conf base sn order specify unknown
   | None, None ->
