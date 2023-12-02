@@ -264,6 +264,11 @@ div.anchor_upd {
   opacity: 0;
 }
 
+/* Force select2 results padding to 0 */
+.select2-results__option {
+'  padding:0px
+}
+
 /* Capitalization unavailable in note from Ocaml 
 > temporary disactivated: too intrusive for notes in popovers, but needed for note in timeline...
 p::first-letter {
