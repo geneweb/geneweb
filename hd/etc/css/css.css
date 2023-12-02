@@ -1,3 +1,6 @@
+/* Force select2 results padding to 0 */
+.select2-results__option{padding:0px}
+
 .dropdown-menu-transl { 
   -webkit-transform: translate(-16%, 0) !important;
   -o-transform: translate(-16%, 0) !important;
