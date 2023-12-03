@@ -1741,16 +1741,19 @@ tr: not ekle
 
     add filter
 co: aghjunghje un filtru
+de: Filter hinzufügen
 en: add a filter
 fr: ajouter un filtre
 
     add image
 co: aghjunghje una fiura
+de: Bild hinzufügen
 en: add an image
 fr: ajouter une image
 
     add note
 co: aghjunghje una nota
+de: Notiz hinzufügen
 en: add a note
 fr: ajouter une note
 
@@ -1786,11 +1789,13 @@ tr: resim ekle
 
     add portrait
 co: aghjunghje un ritrattu
+de: Porträt hinzufügen
 en: add a portrait
 fr: ajouter un portrait
 
     add source
 co: aghjunghje una fonte
+de: Quelle hinzufügen
 en: add a source
 fr: ajouter une source
 
@@ -2107,11 +2112,13 @@ zh: 享年
 
     alert module
 co: Modulu inaccettevule <strong id="alert-module-2"></strong>. Ci vole à stampittà un’iniziale du modulu accettevule.
+de: Modul ungültig <strong id="alert-module-2"></strong>. Bitte geben Sie einen gültigen Modulanfang an.
 en: Invalid module <strong id="alert-module-2"></strong>. Please enter a valid module initial.
 fr: Module invalide <strong id="alert-module-2"></strong>. Veuillez saisir une initiale de module valide.
 
     alert option
 co: Ozzione inaccettevule <strong id="alert-option"></strong> per u modulu <strong id="alert-module"></strong>. Ci vole à stampittà un numeru d’ozzione accettevule.
+de: Ungültige Option <strong id="alert-option"></strong> für Modul <strong id="alert-module"></strong>. Bitte eine gültige Optionsnummer eingeben.
 en: Invalid option <strong id="alert-option"></strong> for module <strong id="alert-module"></strong>. Please enter a valid option number.
 fr: Option invalide <strong id="alert-option"></strong> pour le module <strong id="alert-module"></strong>. Veuillez saisir un numéro d’option valide.
 
@@ -2182,6 +2189,7 @@ tr: canlı
 
     all
 co: tutti
+de: alle
 en: all
 fr: tous
 
@@ -2219,6 +2227,7 @@ tr: tüm alanlar
 
     all the places
 co: tutti i lochi
+de: alle Orte
 en: all the places
 fr: tous les lieux
 
@@ -2256,6 +2265,7 @@ tr: tüm başlıklar
 
     allowed characters
 co: caratteri permessi
+de: erlaubte Zeichen
 en: allowed characters
 fr: caractères autorisés
 
@@ -2395,7 +2405,7 @@ ca: ascendent/ascendents
 co: antenatu/antenati
 cs: /předkové
 da: /forfædre
-de: Vorfahre/orfahren
+de: Vorfahre/Vorfahren
 en: ancestor/ancestors
 eo: /prapatro
 es: /ascendientes
@@ -2454,6 +2464,7 @@ tr: atalar
 
     ancestors tree of
 co: %s-arburu di l’antenati d[i |’]%s
+de: %s-Baum der Vorfahren von %s
 en: %s-tree of the ancestors of %s
 fr: %s-arbre des ancêtres d[e |’]%s
 
@@ -2654,11 +2665,13 @@ tr: tabandaki herhangi bir kişi
 
     any place
 co: sottulochi
+de: Teilort
 en: sub-places
 fr: sous-lieux
 
     any place title
 co: circà in a lista di i sottulochi
+de: suche in der Liste der Teilorte
 en: search in the list of sub-places
 fr: rechercher dans la liste des sous-lieux
 
@@ -2734,11 +2747,13 @@ fr: degré ascendant/degré descendant/degrés ascendants/degrés descendants
 
     at new location
 co: à u locu novu
+de: am neuen Ort
 en: at new location
 fr: au nouvel emplacement
 
     at old location
 co: à u locu anzianu
+de: am alten Ort
 en: at old location
 fr: à l'ancien emplacement
 
@@ -2845,6 +2860,7 @@ tr: geri
 
     back to index/books
 co: rivene à l’indice alfabeticu/rivene à a lista di i dizziunarii
+de: zurück zum alphabetischen Index/zurück zur Liste der Wörterbücher
 en: back to alphabetic index/back to the list of books
 fr: retourner à l’index alphabétique/retourner à la liste des dictionnaires
 
@@ -3865,16 +3881,19 @@ tr: evli bir kişinin cinsiyetini değiştiremezsin
 
     carrousel
 co: carusellu
+de: Karussell
 en: carrousel
 fr: carrousel
 
     case sensitive
 co: maiuscule è alette
+de: Groß-/Kleinschreibung
 en: case sensitive
 fr: capitales et accents
 
     case sensitive title
 co: tene contu di e maiuscule è alette
+de: Beim Titel muss auf Groß- und Kleinschreibung geachtet werden
 en: dont ignore case and accents
 fr: tenir compte des majuscules et accents
 
@@ -4127,6 +4146,7 @@ tr: bir şecere seçin
 
     choose an ancestor
 co: sceglie un antenatu
+de: einen Vorfahren auswählen
 en: choose an ancestor
 fr: choisir un ancêtre
 
@@ -4171,6 +4191,7 @@ sv: civila register/civila register
 
     clear filters
 co: squassà tutti i filtri
+de: alle Filter löschen
 en: clear every filters
 fr: effacer tous les filtres
 
@@ -4240,6 +4261,7 @@ tr: "%s" i tıklayın
 
     close
 co: chjode
+de: schließen
 en: close
 fr: fermer
 
@@ -4260,6 +4282,7 @@ tr: bir ebeveyn
 
     coefficient of relationship
 co: U <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">cuefficiente di e rilazioni</a> indicheghja u percentuale medianu minimu di geni spartiti trà dui individui.
+de: Der <a href="https://de.wikipedia.org/wiki/Verwandtschaftskoeffizient">Verwandtschaftskoeffizient</a> berechnet den minimalen Prozentsatz der Übereinstimmung der DNA zwischen zwei Personen.
 en: The <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient of relationship</a> gives the minimum average percentage of shared DNA between two individuals.
 fr: Le <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient de parenté</a> indique le pourcentage moyen minimum de gènes partagés entre deux individus.
 
@@ -4623,6 +4646,7 @@ tr: bağlantıyı panoya kopyala
 
     copy permalink
 co: cupià u permaliame
+de: Permalink kopieren
 en: copy the permalink
 fr: copier le permalien
 
@@ -4669,6 +4693,7 @@ tr: çiftler
 
     cousin.0.1
 ->: son/daughter/child
+de: Sohn/Tochter/Kind
 
     cousin.0.10
 en: a eight-times-great-grandson/a eight-times-great-granddaughter/a eight-times-great-grandchild
@@ -4676,60 +4701,76 @@ fr: un huit-fois-arrière-petit-fils/une huit-fois-arrière-petite-fille/un huit
 
     cousin.0.2
 ->: a grandson/a granddaughter/a grandchild
+de: ein Enkel/eine Enkelin/Enkel
 
     cousin.0.3
 ->: a great-grandson/a great-granddaughter/a great-grandchild
+de: ein Urenkel/eine Urenkelin/Urenkel
 
     cousin.0.4
+de: ein Ur-Ur-Enkel/eine Ur-Ur-Enkelin/Ur-Ur-Enkel
 en: a great-great-grandson/a great-great-granddaughter/a great-great-grandchild
 fr: un arrière-arrière-petit-fils/une arrière-arrière-petite-fille/un arrière-arrière-petit-enfant
 
     cousin.0.5
+de: ein Ur-Ur-Ur-Enkel/eine Ur-Ur-Ur-Enkelin/Ur-Ur-Ur-Enkel
 en: a three-times-great-grandson/a three-times-great-granddaughter/a three-times-great-grandchild
 fr: un trois-fois-arrière-petit-fils/une trois-fois-arrière-petite-fille/un trois-fois-arrière-petit-enfant
 
     cousin.0.6
+de: ein vierfacher Ur-Enkel/eine vierfache Ur-Enkelin/vierfacher Ur-Enkel
 en: a four-times-great-grandson/a four-times-great-granddaughter/a four-times-great-grandchild
 fr: un quatre-fois-arrière-petit-fils/une quatre-fois-arrière-petite-fille/un quatre-fois-arrière-petit-enfant
 
     cousin.0.7
+de: ein fünffacher Ur-Enkel/eine fünffache Ur-Enkelin/fünffacher Ur-Enkel
 en: a five-times-great-grandson/a five-times-great-granddaughter/a five-times-great-grandchild
 fr: un cinq-fois-arrière-petit-fils/une cinq-fois-arrière-petite-fille/un cinq-fois-arrière-petit-enfant
 
     cousin.0.8
+de: ein sechsfacher Ur-Enkel/eine sechsfache Ur-Enkelin/sechsfacher Ur-Enkel
 en: a six-times-great-grandson/a six-times-great-granddaughter/a six-times-great-grandchild
 fr: un six-fois-arrière-petit-fils/une six-fois-arrière-petite-fille/un six-fois-arrière-petit-enfant
 
     cousin.0.9
+de: ein siebenfacher Ur-Enkel/eine siebenfache Ur-Enkelin/siebenfacher Ur-Enkel
 en: a seven-times-great-grandson/a seven-times-great-granddaughter/a seven-times-great-grandchild
 fr: un sept-fois-arrière-petit-fils/une sept-fois-arrière-petite-fille/un sept-fois-arrière-petit-enfant
 
     cousin.1.0
 ->: the father/the mother/a parent
+de: der Vater/die Mutter/ein Elternteil
 
     cousin.1.1
 ->: a brother/a sister/a sibling
+de: ein Bruder/eine Schwester/ein Geschwisterteil
 
     cousin.1.10
+de: ein siebenfacher Ur-Großneffe/eine siebenfache Ur-Großnichte/siebenfacher Ur-Großneffe
 en: a %sseven-times-great-grandnephew/a %sseven-times-great-grandniece/a %sseven-times-great-grandnephew
 fr: un %ssept-fois-arrière-petit-neveu/une %ssept-fois-arrière-petite-nièce/un %ssept-fois-arrière-petit-neveu
 
     cousin.1.2
 ->: a nephew/a niece
+de: ein Neffe/eine Nichte
 
     cousin.1.3
 ->: a great-nephew/a great-niece
+de: ein Großneffe/eine Großnichte
 
     cousin.1.4
 co: un %sarciniputinu/una %sarciniputina/%sarciniputini/
+de: ein Ur-Großneffe/eine Ur-Großnichte/Ur-Großneffe
 en: a %sgreat-grandnephew/a %sgreat-grandniece/a %sgreat-grandnephew
 fr: un %sarrière-petit-neveu/une %sarrière-petite-nièce/un %sarrière-petit-neveu
 
     cousin.1.5
+de: ein Ur-Ur-Großneffe/eine Ur-Ur-Großnichte/Ur-Ur-Großneffe
 en: a %sgreat-great-grandnephew/a %sgreat-great-grandniece/a %sgreat-great-grandnephew
 fr: un %sarrière-arrière-petit-neveu/une %sarrière-arrière-petite-nièce/un %sarrière-arrière-petit-neveu
 
     cousin.1.6
+de: ein Ur-Ur-Ur-Großneffe/eine Ur-Ur-Ur-Großnichte/Ur-Ur-Ur-Großneffe
 en: a %sthree-times-great-grandnephew/a %sthree-times-great-grandniece/a %sthree-times-great-grandnephew
 fr: un %strois-fois-arrière-petit-neveu/une %strois-fois-arrière-petite-nièce/un %strois-fois-arrière-petit-neveu
 
@@ -5103,6 +5144,7 @@ fr: sept-fois-arrière-petit-cousin/sept-fois-arrière-petits-cousins
 
     cousins.2.2
 co: cugini
+de: Cousins
 en: cousins 1rd
 fr: cousins
 
@@ -6172,26 +6214,31 @@ tr: sil
 
     delete image
 co: squassà a fiura
+de: Bild löschen
 en: delete image
 fr: supprimer une image
 
     delete image saved
 co: squassà a fiura arregistrata
+de: das gespeicherte Bild löschen
 en: delete saved image
 fr: supprimer une image sauvegardée
 
     delete portrait
 co: squassà u ritrattu
+de: Porträt löschen
 en: delete portrait
 fr: supprimer le portrait
 
     delete portrait saved
 co: squassà u ritrattu arregistratu
+de: das gespeicherte Porträt löschen
 en: delete saved portrait
 fr: supprimer le portrait sauvegardé
 
     deleted
 co: squassatu/squassata
+de: gelöscht
 en: deleted
 fr: supprimé/supprimée
 
@@ -6270,7 +6317,7 @@ tr: adına göre liste
 
     descendants tree
 co: arburu di discendenza
-de: Nachfahren-Baum
+de: Nachkommen-Baum
 en: descendants tree
 fr: arbre de descendance
 pt: árvore de descendentes
@@ -6548,6 +6595,7 @@ tr: /satır/alfabetik sıraya göre görüntüleme
 
     display carrousel
 co: affissà u carusellu di fiure
+de: Bilderkaroussel anzeigen
 en: display the carrousel of images
 fr: afficher le carrousel d’images
 
@@ -6878,6 +6926,7 @@ tr: bağış (LDS)
 
     edit family on spouse
 co: mudificà e famiglie via un cliccu nant’à a data di matrimoniu di a linea d’un cunghjuntu
+de: die Familie bearbeiten durch Klick auf das Hochzeitsdatum einer der beiden Personen
 en: edit the families by clicking on the date of marriage of the row of one spouses
 fr: modifier les familles en cliquant sur la date de mariage sur la ligne d’un conjoint
 
@@ -7224,6 +7273,7 @@ tr: idam
 
     extend
 co: stende à un antenatu vicinu
+de: auf einen nahen Vorfahren erweitern
 en: extend to a near ancestor
 fr: étendre à un ancêtre proche
 
@@ -7458,6 +7508,7 @@ tr: aile bağlantısı (LDS)
 
     fanchart
 co: arburu in banderetta
+de: Fächerbaum
 en: fanchart
 fr: arbre en éventail
 
@@ -7554,11 +7605,13 @@ tr: dosya
 
     filter
 co: filtrà
+de: filtern
 en: filter
 fr: filtrer
 
     filter by
 co: filtrà da
+de: filtern durch
 en: filter by
 fr: filtrer par
 
@@ -7814,6 +7867,7 @@ tr: son değişiklik tarihine göre sıralanmış liste için
 
     for/since
 co: durante/dapoi
+de: während/seit
 en: for/since
 fr: pendant/depuis
 
@@ -7947,6 +8001,7 @@ zh: 访问次数
 
     from carrousel
 co: da u carusellu
+de: vom Karussell
 en: from carrousel
 fr: du carrousel
 
@@ -8297,6 +8352,7 @@ tr: üvey erkek kardeşler/üvey kız kardeşler/üvey kardeşler
 
     half-relationship
 co: mezu/meza/mezi
+de: halb-/halb-/halb-/
 en: half-/half-/half-/ 
 fr: demi-/demi-/demi-/ 
 
@@ -8505,6 +8561,7 @@ tr: portreleri gizle
 
     highlight incomplete data
 co: sopralineà i dati incumpleti
+de: hebe die unvollständigen Daten hervor
 en: highlight incomplete data
 fr: surligner les données incomplètes
 
@@ -8667,6 +8724,7 @@ tr: hastanede yatış
 
     htree
 co: arburu in H
+de: H-Baum
 en: H-Tree
 fr: arbre en H
 pt: árvore em H
@@ -8838,6 +8896,7 @@ tr: resim silindi
 
     image note
 co: aghjunghje una nota per a fiura.
+de: Bildnotiz hinzufügen
 en: add a note for the image.
 fr: ajouter une note pour l’image.
 
@@ -8875,6 +8934,7 @@ tr: resim yüklendi
 
     image source
 co: aghjunghje una fonte per a fiura.
+de: Bildquelle hinzufügen
 en: add a source for the image.
 fr: ajouter une source pour l’image.
 
@@ -9320,6 +9380,7 @@ sv: informatör/informatör
 
     inline chronology
 co: cronolugia simplice/cronolugia detagliata
+de: einfache Chronologie/detaillierte Chronologie
 en: simple chronology/detailed chronology
 fr: chronologie simple/chronologie détaillée
 pt: cronologia simples/cronologia detalhada
@@ -9328,6 +9389,7 @@ tr: basit kronoloji/ayrıntılı kronoloji
 
     input database
 co: Stampittate quì u nome sanu di a basa di dati à impiegà :
+de: Bitte den Namen der Datenbank eintragen, die verwendet werden soll:
 en: Please, enter the name of the database you want to use:
 fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
 pt: Introduza o nome da base de dados que quer utilizar:
@@ -9384,6 +9446,7 @@ tr: %s için geçmiş bulunamadı
 
     intermediate revisions not shown
 co: revisioni intermediarie piattate
+de: Zwischenrevisionen versteckt
 en: intermediate revisions not shown
 fr: révisions intermédiaires masquées
 pt: revisões intermédias ocultas
@@ -9392,6 +9455,7 @@ tr: ara revizyonlar gösterilmiyor
 
     interval
 co: intervallu di tempu
+de: Zeitintervall
 en: time interval
 fr: intervalle de temps
 
@@ -9637,6 +9701,7 @@ tr: aynı kişi!
 
     itree
 co: arburu in I
+de: I-Baum
 en: I-Tree
 fr: arbre en I
 pt: árvore em I
@@ -9721,6 +9786,7 @@ tr: etiket
 
     last diff
 co: ultima revisione
+de: letzte Revision
 en: last revision
 fr: dernière révision
 pt: última revisão
@@ -9729,6 +9795,7 @@ tr: son revizyon
 
     last sosa level not navigable
 co: l’ultimu livellu di Sosa ùn si pò micca navigà. Impiegate a lista di l’antenati.
+de: letzte Sosa-Ebene nicht navigierbar. Vorfahren-Liste benutzen.
 en: last Sosa level not navigable. Use ancestors list.
 fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
 pt: o último nível de sosa não é navegável. Utilize a lista de antepassados.
@@ -9769,6 +9836,7 @@ tr: bir aydan kısa bir süre eski
 
     limit
 co: limita
+de: Limit
 en: limit
 fr: limite
 
@@ -9806,6 +9874,7 @@ tr: bağlantı
 
     link back to parents
 co: liame di ritornu versu i genitori
+de: Link zurück zu den Eltern
 en: link back to parents
 fr: lien retour vers les parents
 no: lenke til foreldre
@@ -9847,6 +9916,7 @@ tr: arasındaki ilişki
 
     link to children
 co: liame ver di i zitelli
+de: Link zu den Kindern
 en: link to children
 fr: lien vers les enfants
 no: lenke til barn
@@ -10419,12 +10489,14 @@ tr: evlilik notları/evlilik notları
 
     marriage of %t after his/her death
 co: matrimoniu di %t dopu a so morte
+de: Heirat von %t nach seinem/ihrem Tod
 en: marriage of %t after his/her death
 fr: mariage de %t après son décès
 lt: santuoka po %t mirties
 
     marriage of %t before his/her birth
 co: matrimoniu di %t nanzu a so nascita
+de: Heirat von %t vor seiner/ihrer Geburt
 en: marriage of %t before his/her birth
 fr: mariage de %t avant sa naissance
 lt: %t susituokė prieš gimdamas 
@@ -10513,6 +10585,7 @@ tr: eş/eşler
 
     marriages with
 co: rilazioni o matrimonii cù
+de: Beziehungen oder Hochzeiten mit
 en: relations or marriages with
 fr: relations ou mariages avec
 
@@ -10615,6 +10688,7 @@ zh: %t配偶是
 
     matching
 co: cuncurdanza
+de: passend
 en: matching
 fr: correspondance
 
@@ -10636,11 +10710,13 @@ tr: annenin ebeveynleri
 
     max nbr
 co: num mas rel
+de: max rel Nr.
 en: max rel nbr
 fr: max rel nbr
 
     max nbr title
 co: numeru massimu per e liste di rilazione
+de: maximale Anahl für die der Verwandtschaftslisten
 en: max number for relation list
 fr: nombre maximum pour les listes de relations
 
@@ -10968,6 +11044,7 @@ tr: çeşitli notlar
 
     missing %s
 co: %s assente
+de: %s fehlt
 en: missing %s
 fr: %s manquant
 pt: %s em falta
@@ -11008,6 +11085,7 @@ tr: bilinmeyen atalar
 
     missing date
 co: senza data
+de: fehlendes Datum
 en: no date
 fr: sans date
 lt: be datos
@@ -11033,6 +11111,7 @@ tr: eksik etkinlikler
 
     missing image
 co: fiura assente
+de: fehlendes Bild
 en: missing image
 fr: image manquante
 no: bilde mangler
@@ -11192,11 +11271,13 @@ tr: %s ailesinin etkinliklerini değiştir
 
     modify note
 co: mudificà a nota
+de: Notiz bearbeiten
 en: modify the note
 fr: modifier la note
 
     modify person event order
 co: intervertisce l’evenimenti individuali
+de: Ereignisreihenfolge der Person ändern
 en: permute personnal events
 fr: permuter les événéments individuels
 pt: permutar os eventos individuais
@@ -11235,21 +11316,25 @@ tr: resmi güncelle
 
     modify portrait
 co: mudificà u ritrattu
+de: Porträt ändern
 en: modify the portrait
 fr: modifier le portrait
 
     modify source
 co: mudificà a fonte
+de: Quelle ändern
 en: modify the source
 fr: modifier la source
 
     modify the size of images to
 co: mudificà a dimensione di e fiure à
+de: Bildgröße ändern auf
 en: modify the size of images to
 fr: modifier la taille des images à
 
     module
 co: modulu/moduli
+de: Modul
 en: module/modules
 fr: module/modules
 no: modul/moduler
@@ -11355,6 +11440,7 @@ tr: %d cevaptan daha fazla
 
     move up/down
 co: ricullà/falà/ricullà u cursore/falà u cursore
+de: nach oben/nach unten/Cursor nach oben/Cursor nach unten
 en: move up/move down/move up cursor/move down cursor
 fr: remonter/descendre/remonter le curseur/descendre le curseur
 pt: subir/descer/subir o cursor/descer o cursor
@@ -11363,7 +11449,7 @@ tr: yukarı taşı/aşağı taşı/imleci yukarı taşı/imleci aşağı taşı
 
     msg error disconnected
 co: per disgrazia, pudete aghjunghje solu famiglie chì sò cunnesse à l’altre.<br />Sta ristrizzione hè stata aghjunta da u pruprietariu di a basa di dati.
-de: sorry, Sie können nur Familien hinzufügen, die mit dem Rest in Verbindung stehen. <br> Diese Einschränkung wurde durch den Eigentümer der Datenbank hinzugefügt.
+de: sorry, Sie können nur Familien hinzufügen, die mit dem Rest in Verbindung stehen. <br /> Diese Einschränkung wurde durch den Eigentümer der Datenbank hinzugefügt.
 en: sorry, you can add only families connected to the rest.<br>This restriction has been added by this database owner.
 fr: désolé, vous ne pouvez ajouter que des familles connectées au reste.<br>Cette restriction a été ajoutée par le propriétaire de cette base de données.
 it: spiacenti, puoi aggiungere solo delle famiglie collegate al resto.<br>Questa restrizione è stata aggiunta dal proprietario del data base
@@ -11376,6 +11462,7 @@ tr: ne yazık ki, sadece diğerlerine bağlı aileleri ekleyebilirsiniz.<br>Bu k
 
     mtree
 co: arburu in H di 9 generazioni
+de: H-Baum 9 Generationen
 en: 9 generations H tree
 fr: arbre en H 9 générations
 pt: árvore em H 9 gerações
@@ -11384,6 +11471,7 @@ tr: 9 kuşak H ağacı
 
     multi relations graph
 co: graficu di rilazioni multiple
+de: Multi-Verwandtschafts-Graph
 en: multi relations graph
 fr: graphe de relations multiples
 pt: gráfico de relações múltiplas
@@ -11391,6 +11479,7 @@ sv: graf med flera relationer
 tr: çoklu ilişkiler grafiği
 
     multiple relations
+de: Im Falle von Implexen haben einige Individuen mehrere Beziehungen (Pfade) mit dem Stammindividuum. Die Beziehung zwischen zwei Individuen hängt von allen Koeffizienten ihrer Beziehungen (Pfade) ab.
 fr: En cas d’implexes, certains individus auront de multiples liens de parenté (chemins) avec l’individu racine. La parenté entre deux individus dépendra de tous les coefficients de leurs liens de parenté (chemins).
 
     murdered
@@ -11522,6 +11611,7 @@ tr: %s adı zaten %tbu kişi%t tarafından kullanılıyor
 
     name changed. update linked pages
 co: U nome, a casata, o un occurrenza di sta persona hà cambiatu. Ci vole à rinfrescà e pagine assuciate à l’anziana chjave inghjò.
+de: Vorname, Name oder Vorkommen dieser Person hat sich geändert. Bitte aktualisieren Sie die unten aufgeführten Seiten, die mit dem alten Schlüssel verknüpft sind.
 en: The first name, name or occurrence of this person has changed. Please update the pages linked to the old key listed below.
 fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les pages liées à l’ancienne clé ci-dessous.
 pt: O primeiro nome, apelido ou ocorrência desta pessoa foi alterada. Por favor actualize as páginas ligadas à chave antiga abaixo.
@@ -11544,6 +11634,7 @@ tr: vatandaşlık
 
     navigate on tree
 co: navigà nant’à l’arburu
+de: Baum navigieren
 en: navigate on the tree
 fr: naviguer sur l’arbre
 pt: navegar na árvore
@@ -11614,6 +11705,7 @@ tr: Sosa referansı olarak %t kullanarak göz atın
 
     navigation with this individual
 co: navigà in l’arburu cù st’individuu
+de: im Baum mit dieser Person navigieren
 en: navigation in tree with this individual
 fr: naviguer dans l'arbre avec cet individu
 
@@ -11715,6 +11807,7 @@ tr: düzenlemeye devam et
 
     new name
 co: nome novu
+de: neuer Name
 en: new name
 fr: nouveau nom
 no: nytt navn
@@ -11724,11 +11817,13 @@ tr: yeni ad
 
     new tree with this individual
 co: arburu novu da st’individuu
+de: Neuer Baum mit dieser Person
 en: new tree with this individual
 fr: nouvel arbre à partir de cet individu
 
     next
 co: seguente
+de: nächster
 en: next
 fr: suivant
 
@@ -11891,6 +11986,7 @@ tr: %s ve %s arasında bilinen bir ilişki bağlantısı yok
 
     no line break in names
 co: affissà e casate senza saltu di linea
+de: kein Zeilenumbruch in Namen
 en: no line break in names
 fr: afficher les noms sans saut de ligne
 
@@ -11992,6 +12088,7 @@ tr: değişiklik yok
 
     no more
 co: micca di più
+de: nicht mehr
 en: no more
 fr: pas d’autres
 
@@ -12431,6 +12528,7 @@ tr: yaşayan bireylerin sayısı
 
     number of rows
 co: numeru di linee
+de: Zeilennummer
 en: number of rows
 fr: nombre de lignes
 
@@ -12531,6 +12629,7 @@ tr: meslek/meslekler
 
     of
 co: di
+de: von
 en: of
 fr: de
 pt: de
@@ -12539,6 +12638,7 @@ tr: /
 
     of (du)
 co: di
+de: von
 en: of
 fr: du
 pt: de
@@ -12611,11 +12711,13 @@ tr: %s kuşağının
 
     of%s
 co: d[i |’]%s
+de: von %s
 en: of %s
 fr: d[e |’]%s
 
     officer/officer/officers
 co: uffiziante/uffiziante/uffizianti
+de: Amtsträger/Amtsträgerin/Amtsträger
 en: officer/officer/officers
 fr: officiant/officiante/officiants
 pt: oficial/oficial/oficiais
@@ -12634,6 +12736,7 @@ tr: eski adı
 
     on %s's siblings side
 co: di u latu di i fratelli o surelle di %s
+de: vonseiten der Geschwister von %s
 en: on %s's siblings side
 fr: du côté des frères et soeurs de %s
 
@@ -12679,8 +12782,8 @@ co: u
 cs: dne
 da: den
 de: am
-en:
 en: on
+en:
 eo: la
 es: el
 et: :i:
@@ -12730,6 +12833,7 @@ tr: ek bir kuşak
 
     one ancestor counted
 co: E relazioni di parentia cunsanguine è uterine per un antenatu cumunu unicu sò incluse ma u so cuefficiente di parentia vale a metà di quellu di a relazione sana equivalente.
+de: Ein gemeinsamer Vorfahre: Blutsverwandte und uterine Halbbeziehungen sind enthalten, aber ihr Elternkoeffizient beträgt die Hälfte der vollständigen äquivalenten Beziehung.
 en: One common ancestor: consanguine and uterine half relationships are included, but their coefficient of parente is half the full equivalent relation.
 fr: Les relations de parenté consanguines et utérines par un seul ancêtre pivot commun sont incluses. Leur coefficient de parenté vaut la moitié de celui de la relation complète équivalente.
 
@@ -12873,11 +12977,13 @@ tr: sadece seçilen nesil
 
     open individual page
 co: apre a pagina individuale
+de: individuelle Seite öffnen
 en: open individual page
 fr: ouvrir la page individuelle
 
     open this individual page
 co: apre a pagina individuale
+de: diese individuelle Seite öffnen
 en: open this individual page
 fr: ouvrir la page individuelle
 
@@ -13013,6 +13119,7 @@ sv: annat/annat/annat
 
     ou
 co: o
+de: oder
 en: or
 fr: ou
 
@@ -13104,6 +13211,7 @@ sv: församlingsregister/församlingsregister
 
     partial
 co: limitatu à l’antenati è i so fratelli è surelle
+de: begrenzt auf Vorfahren und Geschwister
 en: limited to ancestors and siblings
 fr: limité aux ascendants et leurs frères et soeurs
 
@@ -13117,6 +13225,7 @@ tr: katılımcı/katılımcı
 
     passing by
 co: passendu da
+de: im Vorbeigehen
 en: passing by
 fr: en passant par
 
@@ -13138,11 +13247,13 @@ tr: babanın ailesi
 
     path between
 co: chjassu trà
+de: Weg zwischen
 en: path between
 fr: chemin entre
 
     path/paths
 co: chjassu/chjassi
+de: Weg/Wege
 en: path/paths
 fr: chemin/chemins
 
@@ -13373,6 +13484,7 @@ tr: yer
 
     place filter
 co: numeru d’elementi cunservati in a lista di i lochi
+de: Anzahl der Elemente in der Ortsliste
 en: number of elements kept in places list
 fr: nombre d'éléments à conserver dans la liste des places
 
@@ -13395,6 +13507,7 @@ tr: yerler
 
     plugins
 co: moduli d’estensione
+de: Plugins
 en: plugins
 fr: plugins
 
@@ -13594,16 +13707,19 @@ tr: soy ağacının önizlemesi
 
     previous
 co: precedente
+de: vorher
 en: previous
 fr: précédent
 
     previous image
 co: s’è una fiura cù u listessu nome esiste dighjà in u cartulare di salvaguardia, sta fiura serà squassata.
+de: wenn schon ein gespeichertes Bild mit dem gleichen Namen existiert, wird es gelöscht.
 en: if an image with the same name already exists in the saved, it will be deleted.
 fr: si une image du même nom existe déjà dans le sous-répertoire de sauvegarde, elle sera supprimée.
 
     previous portrait
 co: un arregistramentu precedente di u ritrattu, s’ellu esiste, serà squassatu.
+de: wenn schon ein gespeichertes Porträt mit dem gleichen Namen existiert, wird es gelöscht.
 en: a possible previous version of the saved portrait will be deleted.
 fr: une sauvegarde pré-existante du portrait sera supprimée.
 
@@ -14191,6 +14307,7 @@ tr: ile ilişki%t
 
     remove %s column
 co: fà un cliccu nant’à st’intestatura per caccià sta o ste culonna(e) « %s »
+de: klicke auf diesen Header um die Zeile "%s" zu entfernen
 en: click on this header to remove the column(s) “%s”
 fr: cliquer sur cette en-tête pour supprimer la ou les colonne(s) « %s »
 
@@ -14250,31 +14367,37 @@ tr: ikamet%t ile
 
     restore
 co: risturà
+de: wiederherstellen
 en: restore
 fr: restaurer
 
     restore image saved
 co: risturà una fiura arregistrata
+de: das gespeicherte Bild wiederherstellen
 en: restore saved image
 fr: restaurer une image sauvegardée
 
     restore portrait
 co: risturà u ritrattu
+de: das Porträt wiederherstellen
 en: restore portrait
 fr: restaurer le portrait
 
     restore portrait saved
 co: risturà u ritrattu arregistratu
+de: das gespeicherte Porträt wiederherstellen
 en: restore saved portrait
 fr: restaurer le portrait sauvegardé
 
     restored
 co: risturatu/risturata
+de: wiederhergestellt
 en: restored
 fr: restauré/restaurée
 
     restricted access
 co: L’accessu hè riservatu à l’amichi è à i maghi di a basa di dati !
+de: Der Zugriff ist auf Freunde und Meister der Datenbank beschränkt!
 en: Access restricted to friends and wizards of the database!
 fr: Accès réservé aux amis et magiciens de la base de donnée !
 
@@ -14344,26 +14467,31 @@ tr: Sosa ile aynı #
 
     save
 co: arregistrà
+de: speichern
 en: save
 fr: sauvegarder
 
     save image
 co: una fiura cù un nome simile serà dispiazzata in
+de: wenn ein Bild mit demselben Namen existiert, wird es gespeichert nach
 en: an image with a similar name will moved to
 fr: si une image du même nom existe déjà, elle sera sauvegardée dans
 
     save portrait
 co: u ritrattu esistente serà arregistratu in
+de: das existierende Porträt wird gespeichert nach
 en: the existing portrait will be saved to
 fr: le portrait existant sera sauvegardé dans
 
     saved
 co: arregistratu/arregistrata
+de: gespeichert
 en: saved
 fr: sauvegardé/sauvegardée
 
     saved images
 co: fiura arregistrata/fiure arregistrate
+de: gespeichertes Bild/gespeicherte Bilder
 en: saved image/saved images
 fr: image sauvegardée/images sauvegardées
 
@@ -14419,6 +14547,7 @@ tr: mühürlü Eş (LDS)
 
     search %s on Geneanet
 co: ricercà %s nant’à Geneanet
+de: suche %s auf Geneanet
 en: search %s on Geneanet
 fr: rechercher %s sur Geneanet
 
@@ -14691,11 +14820,13 @@ tr: bireysel
 
     see portrait
 co: vede u ritrattu
+de: siehe Porträt
 en: see portrait
 fr: voir le portrait
 
     see portrait saved
 co: vede u ritrattu arregistratu
+de: siehe gespeichertes Porträt
 en: see saved portrait
 fr: voir le portrait sauvegardé
 
@@ -14777,8 +14908,7 @@ br: dibab a c'hellit ur yezh all etre ar re-mañ:
 ca: podeu seleccionar una altre llengua, hi ha disponibles les següents:
 co: affissà in :
 cs: zvolte jazyk pro prohlížení databáze:
-da: du kan vælge fremstilling på et andet sprog blandt de følgende:
-de: Blick auf:
+da: du kan vælge fremstilling på et andet sprog blandt de følgende: Blick auf:
 en: view in:
 eo: vi povas elekti alian lingvon inter la sekvantajn:
 es: ver en:
@@ -14789,16 +14919,15 @@ is: þú getur valið milli eftirfarandi tungumála:
 it: vista in:
 lv: jūs variet apskatīt datu bāzi arī citās sekojošās valodās:
 nl: bekijk in het:
-no: du kan velge sidevisning på et annet språk blant følgende:
-pl: możesz wybrać inny język spośród następujących:
+no: du kan velge sidevisning på et annet språk blant følgenpl: możesz wybrać inny język spośród następujących:
 pt: ver em:
 ro: poti sa alegi una din urmatoarele limbi pentru afisaj
 sl: lahko izberete drug jezik:
-sv: du kan välja ett annat språk bland de följande:
-tr: içinde görüntüle:
+sv: du kan välja ett annat språk bland de följantr: içinde görüntüle:
 
     select module
 co: Selezziunate ogni modulu via un cliccu nant’à u buttone assuciatu (massimu 15).
+de: Wähle die Module durch Klick auf das zugehörige Feld aus (max. 15).
 en: Select each module by clicking on the corresponding button (max 15).
 fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
 
@@ -14877,6 +15006,7 @@ tr: yükle
 
     send image with note and source
 co: mandà a fiura selezziunata cù nota è fonte
+de: sende das gewählte Bild mit Notizen und Quellen
 en: send selected image with note and source
 fr: envoyer l’image selectionée avec note et source
 
@@ -15129,6 +15259,7 @@ tr: erkek olmalı
 
     show first names
 co: affissà tutti i nomi
+de: alle Vornamen anzeigen
 en: show all first names
 fr: afficher tous les prénoms
 
@@ -15609,6 +15740,7 @@ tr: istatistikler ve yıldönümleri
 
     store image
 co: a fiura selezziunata serà piazzata in
+de: das ausgewählte Bild wird kopiert nach
 en: the selected image will be copied to
 fr: l’image sélectionnée sera enregistrée dans
 
@@ -16951,6 +17083,7 @@ tr: bir aileye çocuk eklemek için "%s" kullanın
 
     to carrousel
 co: à u carusellu
+de: zum Karussell
 en: to carrousel
 fr: au carrousel
 
@@ -17374,6 +17507,7 @@ tr: yarın
 
     too much results
 co: troppu risultati
+de: zu viele Ergebnisse
 en: too much results
 fr: trop de résultats
 
@@ -17611,6 +17745,7 @@ tr: %t için cinsiyet tanımlanmamış
 
     unfiltered total
 co: tutale micca filtratu
+de: Summe ungefiltert
 en: unfiltered total
 fr: total non filtré
 
@@ -17762,21 +17897,25 @@ tr: aileyi Düzenle
 
     update image note
 co: mudificà a nota di a fiura
+de: Bildnotiz aktualisieren
 en: update image note
 fr: mettre à jour la note de l’image
 
     update image source
 co: mudificà a fonte di a fiura
+de: Bildquelle aktualisieren
 en: update image source
 fr: mettre à jour la source de l’image
 
     uploaded
 co: incaricatu/incaricata
+de: hochgeladen
 en: uploaded
 fr: envoyé/envoyée
 
     url
 co: indirizzu web
+de: Url
 en: url
 fr: url
 
@@ -17840,46 +17979,55 @@ tr: kullanıcı/şifre/iptal
 
     v7 anywhere
 co: cuncurdanza senza custrizzione
+de: ohne Einschränkung
 en: match anywhere
 fr: correspondance sans contrainte
 
     v7 approxim match
 co: cuncurdanza senza maiuscule nè alette
+de: Match ohne Großbuchstaben oder Akzente
 en: match with no capitale nor accents
 fr: correspondance sans capitales ni accents
 
     v7 exact match
 co: cuncurdanza esatta (maiuscule/minuscule è alette)
+de: exakte Übereinstimmung (groß/klein und Akzente)
 en: exact match (upper/lower and accents)
 fr: correspondance exacte (majuscules/minuscules et accents)
 
     v7 hide others
 co: piattà l’altri nomi
+de: andere Vornamen ausblenden
 en: hide other first mames
 fr: cacher les autres prénoms
 
     v7 list too long
 co: lista troppu longa (pruvate d’aumentà u valore di u filtru)
+de: Liste zu lang (versuche einen genaueren Filter)
 en: list too long (try increasing filter value)
 fr: liste trop longue (augmentez la valeur du filtre)
 
     v7 plugins
 co: moduli d’estensione
+de: Plugins
 en: plugins
 fr: plugins
 
     v7 refresh fnames cache
 co: ricustruisce l’impiatta di i nomi
+de: Vornamen-Cache aktualisieren
 en: refresh fnames cache
 fr: reconstruire le cache des prénoms
 
     v7 show others
 co: affissà l’altri nomi
+de: zeige die anderen Vornamen
 en: show other first names
 fr: afficher les autres prénoms
 
     v7 word boundaries
 co: cuncurdanza di parolle sane
+de: ganze Worte vergleichen
 en: match full words
 fr: correspondance de mots entiers
 
@@ -17938,6 +18086,7 @@ tr: sürüm
 
     very short display
 co: affissera corta corta
+de: sehr kurze Anzeige
 en: very short display
 fr: affichage très court
 
@@ -18003,6 +18152,7 @@ tr: bireysel
 
     warning refresh
 co: attualizà a pagina solu dopu à un cliccu nant’à l’icona principale osinnò si ripiteria u scambiu di e fiure.
+de: Aktualisieren Sie die Seite nicht, ohne vorher auf das Symbol zu klicken, da dies den Bildaustausch wiederholen würde.
 en: refresh the page only after having clicked on the main icon as this would repeat the swap action.
 fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l’icone car cela répéterait l’échange des images.
 
@@ -18088,6 +18238,7 @@ tr: nerede evlendi
 
     widower/widow
 co: veduvu/veduva
+de: Witwer/Witwe
 en: widower/widow
 fr: veuf/veuve
 
@@ -18148,6 +18299,7 @@ tr: ile
 
     with note
 co: cù una nota
+de: mit einer Notiz
 en: with a note
 fr: avec une note
 
@@ -18162,6 +18314,7 @@ tr: kök atası, eşler ve bilinmeyenler ile
 
     without implex display
 co: senza affissà l’implessi
+de: ohne Implex-Anzeige
 en: without implex display
 fr: sans afficher les implexes
 
@@ -18249,6 +18402,7 @@ tr: tanık/tanık/tanıklar
 
     witness/witnesses
 co: testimone/testimoni
+de: Zeuge/Zeugen
 en: witness/witnesses
 fr: témoin/témoins
 lt: liudytojas/liudytoja/liudytojai/liudytojosės
@@ -18314,11 +18468,13 @@ tr: yönetici/yöneticiler/arkadaş/arkadaşlar/dış
 
     word match
 co: parolla sana
+de: ganzes Wort
 en: word match
 fr: mot complet
 
     word match title
 co: paragunà cù u nome sanu d’un locu
+de: den ganzen Ortsnamen vergleichen
 en: match full location name
 fr: comparer avec le nom complet d'un lieu
 
