@@ -289,6 +289,11 @@ let print conf base specify unknown =
       let order = [ Key; FullName ] in
       search conf base (fn ^ " " ^ sn) order specify unknown
   | Some fn, None ->
+      let fn =
+        match String.rindex_opt fn '.' with
+        | Some i -> String.sub fn 0 i
+        | None -> fn
+      in
       let order = [ FirstName ] in
       search conf base fn order specify unknown
   | None, Some sn ->
