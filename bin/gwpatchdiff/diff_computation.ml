@@ -12,6 +12,22 @@ module IfamSet =
       let compare = Gwdb.compare_ifam
     end)
 
+let log = print_endline
+
+let try_with_failure f default x = try f x with Failure _ -> default
+
+let get_family_baseonly =
+  try_with_failure Gwdb.get_family_baseonly [||]
+
+let gen_person_of_person_baseonly base iper =
+  try_with_failure Gwdb.gen_person_of_person_baseonly (Gwdb.empty_person base iper |> Gwdb.gen_person_of_person)
+
+let gen_union_of_person_baseonly =
+  try_with_failure Gwdb.gen_union_of_person_baseonly Def.{family = [||]}
+
+let gen_ascend_of_person_baseonly =
+  try_with_failure Gwdb.gen_ascend_of_person_baseonly Def.{parents = None; consang = Adef.no_consang}  
+
 module Utils = struct
   let make_diff previously now = {previously; now}
 
@@ -104,6 +120,7 @@ let diff_npoc p n =
 
 
 let diff_father base fam_p fam_n =
+  log "diff_fath";  
   let fath_p =
     Gwdb.poi base (Gwdb.get_father_baseonly fam_p)
     |> Gwdb.gen_person_of_person_baseonly
@@ -115,6 +132,7 @@ let diff_father base fam_p fam_n =
   diff_npoc fath_p fath_n
 
 let diff_mother base fam_p fam_n =
+  log "diff_moth";
   let moth_p =
     Gwdb.poi base (Gwdb.get_mother_baseonly fam_p)
     |> Gwdb.gen_person_of_person_baseonly
@@ -177,9 +195,10 @@ let ascends_removed base ifam =
   Some Diff_types.Ascend_diff.{father; mother;}
   
 let diff_ascends base iper =
+  log "diff_ascends";
   let p = Gwdb.poi base iper in
   let n = Gwdb.poi base iper in
-  let asc_p = Gwdb.gen_ascend_of_person_baseonly p in
+  let asc_p = gen_ascend_of_person_baseonly p in
   let asc_n = Gwdb.gen_ascend_of_person n in
   match asc_p.parents, asc_n.parents with
   | Some ifam_p, Some ifam_n -> diff_ascends base ifam_p ifam_n
@@ -188,6 +207,7 @@ let diff_ascends base iper =
   | None, None -> None
 
 let diff_unions base iper =
+  log "diff_unions";
   let other father mother ifam =
     let fam = Gwdb.foi base ifam in
     let fath = father fam in
@@ -198,13 +218,15 @@ let diff_unions base iper =
   let other_n = other Gwdb.get_father Gwdb.get_mother in
   let p = Gwdb.poi base iper in
   let p' = Gwdb.poi base iper in
-  let unions_p = Gwdb.gen_union_of_person_baseonly p in
+  let unions_p = gen_union_of_person_baseonly p in
   let unions_n = Gwdb.gen_union_of_person p' in
   let iperset_p = Array.fold_left (fun set ifam ->
+      log @@ "UNION_P" ^ Gwdb.string_of_iper (other_p ifam);
       IperSet.add (other_p ifam) set)
       IperSet.empty unions_p.family
   in
   let iperset_n = Array.fold_left (fun set ifam ->
+      log @@ "UNION_N" ^ Gwdb.string_of_iper (other_p ifam);
       IperSet.add (other_n ifam) set)
       IperSet.empty unions_n.family
   in
@@ -216,9 +238,10 @@ let diff_unions base iper =
   else None
 
 let diff_children base iper =
+  log "diff_children";
   let p = Gwdb.poi base iper in
   let p' = Gwdb.poi base iper in
-  let families_p = Array.map (Gwdb.foi base) (Gwdb.get_family_baseonly p) in
+  let families_p = Array.map (Gwdb.foi base) (get_family_baseonly p) in
   let families_n = Array.map (Gwdb.foi base) (Gwdb.get_family p') in
   let children_p = Array.map Gwdb.get_children_baseonly families_p in
   let children_n = Array.map Gwdb.get_children families_n in
@@ -292,8 +315,6 @@ let diff_person ~base ~iper ~previously ~now =
     children;
   }
 
-let log = print_endline
-
 
 let diff_to_string to_string diff =
   match diff with
@@ -354,7 +375,6 @@ let diff_person_to_string diff_person =
   "unions:" ^ unions_s ^ "\n" ^
   "}"
 
-
 module Env : sig
   type t
   val empty : t
@@ -405,15 +425,14 @@ end = struct
   let add_all_ipers_from_ifam base env ifam =
     let iperset = all_ipers_from_ifam base ifam in
     {env with persons = IperSet.union env.persons iperset}
-
+  
   let add_all_related_ipers base env iper =
     let p = Gwdb.poi base iper in
     let p' = Gwdb.poi base iper in
-    let fam_p = Gwdb.get_family_baseonly p in
+    let fam_p = get_family_baseonly p in
     let fam_n = Gwdb.get_family p' in
     let ifamset = Array.fold_left (fun set ifam -> IfamSet.add ifam set) IfamSet.empty fam_p in
     let ifamset = Array.fold_left (fun set ifam -> IfamSet.add ifam set) ifamset fam_n in
-    
     let env = IfamSet.fold (fun ifam env -> add_all_ipers_from_ifam base env ifam) ifamset env in
     env
   
@@ -430,10 +449,12 @@ end = struct
 end
 
 let compute_diff base iper =
+
   let p = Gwdb.poi base iper in
   let p' = Gwdb.poi base iper in
 
-  let genp_base = Gwdb.gen_person_of_person_baseonly p in
+  let genp_base = gen_person_of_person_baseonly base iper p in
+  
   let genp_patch = Gwdb.gen_person_of_person p' in
 
   log @@ "DBG" ^ (Gwdb.string_of_iper iper);
