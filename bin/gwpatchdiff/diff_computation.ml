@@ -187,8 +187,33 @@ let diff_ascends base iper =
   | Some ifam, None -> ascends_removed base ifam
   | None, None -> None
 
-let diff_unions _p _n = None
-
+let diff_unions base iper =
+  let other father mother ifam =
+    let fam = Gwdb.foi base ifam in
+    let fath = father fam in
+    let moth = mother fam in
+    if Gwdb.eq_iper fath iper then moth else fath
+  in
+  let other_p = other Gwdb.get_father_baseonly Gwdb.get_mother_baseonly in
+  let other_n = other Gwdb.get_father Gwdb.get_mother in
+  let p = Gwdb.poi base iper in
+  let p' = Gwdb.poi base iper in
+  let unions_p = Gwdb.gen_union_of_person_baseonly p in
+  let unions_n = Gwdb.gen_union_of_person p' in
+  let iperset_p = Array.fold_left (fun set ifam ->
+      IperSet.add (other_p ifam) set)
+      IperSet.empty unions_p.family
+  in
+  let iperset_n = Array.fold_left (fun set ifam ->
+      IperSet.add (other_n ifam) set)
+      IperSet.empty unions_n.family
+  in
+  if IperSet.compare iperset_p iperset_n <> 0 then
+    Some (Utils.make_diff
+            (Utils.list_o (IperSet.elements iperset_p))
+            (Utils.list_o (IperSet.elements iperset_n))
+         )
+  else None
 
 let diff_children base iper =
   let p = Gwdb.poi base iper in
@@ -238,7 +263,7 @@ let diff_person ~base ~iper ~previously ~now =
   let _diffp = no_diff_person in
   let titles = None in
   let rparents = None in
-  let unions = diff_unions p n in
+  let unions = diff_unions base iper in
   let children = diff_children base iper in
   let ascends = diff_ascends base iper in
   Diff_types.Person_diff.{
@@ -304,6 +329,9 @@ let diff_ascends_to_string diff_ascend = match diff_ascend with
 let diff_descend_to_string diff_descend =
   diff_to_string (fun l -> String.concat "," (List.map Gwdb.string_of_iper l)) diff_descend
 
+let diff_unions_to_string diff_unions =
+  diff_to_string (fun l -> String.concat "," (List.map Gwdb.string_of_iper l)) diff_unions 
+
 let diff_person_to_string diff_person =
   let open Diff_types.Person_diff in
   let fn_s = diff_to_string Gwdb.string_of_istr diff_person.first_name in
@@ -314,6 +342,7 @@ let diff_person_to_string diff_person =
   let birth_s = diff_to_string Diff_utils.date_to_string diff_person.birth in
   let ascends_s = diff_ascends_to_string diff_person.ascends in
   let descend_s = diff_descend_to_string diff_person.children in
+  let unions_s = diff_unions_to_string diff_person.unions in
   "{\nfirst_name: " ^ fn_s ^ "\n" ^
   "surname: " ^ sn_s ^ "\n" ^
   "occ: " ^ occ_s ^ "\n" ^
@@ -322,6 +351,7 @@ let diff_person_to_string diff_person =
   "birth:" ^ birth_s ^ "\n" ^
   "ascends:" ^ ascends_s ^ "\n" ^
   "descend:" ^ descend_s ^ "\n" ^
+  "unions:" ^ unions_s ^ "\n" ^
   "}"
 
 

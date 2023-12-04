@@ -32,6 +32,10 @@ module Descend_diff : sig
   type t = Gwdb.iper list diff
 end
 
+module Union_diff : sig
+  type t = Gwdb.iper list diff
+end
+
 module Person_diff : sig
   type t = {
     first_name : Gwdb.istr diff option;
@@ -57,7 +61,7 @@ module Person_diff : sig
     death_place : Gwdb.istr diff option;
     burial : Def.burial diff option;
     burial_place : Gwdb.istr diff option;
-    unions : Gwdb.ifam Def.gen_union diff option;
+    unions : Union_diff.t option;
     ascends : Ascend_diff.t option;
     children : Descend_diff.t option;
   }
