@@ -4,8 +4,6 @@ open Config
 open Gwdb
 open Util
 
-let default_max_answers = 100
-
 (* TODO use function from Util instead? *)
 let empty_sn_or_fn base p =
   is_empty_string (get_surname p)
@@ -134,11 +132,7 @@ let search_for_fn_or_pn conf base fn pl =
         (* TODO manage exact options according to mode *)
         if
           if exact then fn_l = fn1_l || fn_l = fn2_l
-          else
-            let tbl = Hashtbl.create 512 in
-            List.iter (fun k -> Hashtbl.add tbl k ()) fn1_l;
-            List.iter (fun k -> Hashtbl.add tbl k ()) fn2_l;
-            List.exists (fun fn -> Hashtbl.mem tbl fn) fn_l
+          else List.mem fn fn1_l || List.mem fn fn2_l
         then p :: pl
         else pl)
     [] pl
@@ -170,9 +164,6 @@ let search conf base an search_order specify unknown =
         | [] -> loop l
         | _ -> Some.search_first_name_print conf base an)
     | FullName :: l -> (
-        let max_answers =
-          Option.value ~default:default_max_answers (p_getint conf.env "max")
-        in
         let fn =
           match p_getenv conf.env "p" with Some fn -> fn | None -> ""
         in
@@ -193,10 +184,7 @@ let search conf base an search_order specify unknown =
           { conf with env = ("surname", Adef.encoded sn) :: conf.env }
         in
         (* find all bearers of sn using advanced_search *)
-        let list, len = AdvSearchOk.advanced_search conf base max_answers in
-        let list =
-          if len > max_answers then Util.reduce_list max_answers list else list
-        in
+        let list, _len = AdvSearchOk.advanced_search conf base max_int in
         match list with
         | [] -> loop l
         | [ p ] ->
@@ -236,13 +224,8 @@ let search conf base an search_order specify unknown =
             let conf =
               { conf with env = ("surname", Adef.encoded sn) :: conf.env }
             in
-            let p_of_sn_l, len =
-              AdvSearchOk.advanced_search conf base default_max_answers
-            in
-            let p_of_sn_l =
-              if len > default_max_answers then
-                Util.reduce_list default_max_answers p_of_sn_l
-              else p_of_sn_l
+            let p_of_sn_l, _len =
+              AdvSearchOk.advanced_search conf base max_int
             in
             match p_of_sn_l with
             | [] -> loop l
