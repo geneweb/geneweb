@@ -1301,11 +1301,9 @@ let make_conf from_addr request script_name env =
        if !gw_prefix <> "" then !gw_prefix
        else String.concat Filename.dir_sep [ "gw" ];
      images_prefix = (
-       match !gw_prefix, !images_prefix with
-       | gw_p, im_p when gw_p <> "" && im_p = "" ->
-           String.concat Filename.dir_sep [ gw_p; "images" ]
-       | _, im_p when im_p <> "" ->  im_p
-       | _, _ -> (Filename.concat "gw" "images"));
+       match !images_prefix with
+       | im_p when im_p <> "" ->  im_p
+       | _ -> if cgi then (Filename.concat !gw_prefix "images") else "images");
      etc_prefix = (
        match !gw_prefix, !etc_prefix with
        | gw_p, st_p when gw_p <> "" && st_p = "" ->
