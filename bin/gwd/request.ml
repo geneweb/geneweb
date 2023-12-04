@@ -109,6 +109,7 @@ let specify conf base n pl =
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
+  (* TODO set possible limit to number of persons displayed (ptll) *)
   Output.print_sstring conf "<ul>\n";
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
