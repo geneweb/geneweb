@@ -286,7 +286,7 @@ let print conf base specify unknown =
   in
   match (real_input "p", real_input "n") with
   | Some fn, Some sn ->
-      let order = [ FullName ] in
+      let order = [ Key; FullName ] in
       search conf base (fn ^ " " ^ sn) order specify unknown
   | Some fn, None ->
       let order = [ FirstName ] in
