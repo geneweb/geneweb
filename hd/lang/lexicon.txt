@@ -112,6 +112,7 @@ sv: %1 till %2
 tr: %1 / %2
 
     of%s
+co: d[i |’]%s
 en: of %s
 fr: d[e |’]%s
 
@@ -818,10 +819,12 @@ sv: söndag/måndag/tisdag/onsdag/torsdag/fredag/lördag
 tr: Pazar/Pazartesi/Salı/Çarşamba/Perşembe/Cuma/Cumartesi
 
     alert option
+co: Ozzione inaccettevule <strong id="alert-option"></strong> per u modulu <strong id="alert-module"></strong>. Ci vole à stampittà un numeru d’ozzione accettevule.
 en: Invalid option <strong id="alert-option"></strong> for module <strong id="alert-module"></strong>. Please enter a valid option number.
 fr: Option invalide <strong id="alert-option"></strong> pour le module <strong id="alert-module"></strong>. Veuillez saisir un numéro d’option valide.
 
     alert module
+co: Modulu inaccettevule <strong id="alert-module-2"></strong>. Ci vole à stampittà un’iniziale du modulu accettevule.
 en: Invalid module <strong id="alert-module-2"></strong>. Please enter a valid module initial.
 fr: Module invalide <strong id="alert-module-2"></strong>. Veuillez saisir une initiale de module valide.
 
@@ -852,6 +855,7 @@ en: choose file
 fr: sélect. fichier
 
     select module
+co: Selezziunate ogni modulu via un cliccu nant’à u buttone assuciatu (massimu 15).
 en: Select each module by clicking on the corresponding button (max 15).
 fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
 
@@ -878,10 +882,12 @@ en: portrait
 fr: portrait
 
     to carrousel
+co: à u carusellu
 en: to carrousel
 fr: au carrousel
 
     from carrousel
+co: da u carusellu
 en: from carrousel
 fr: du carrousel
 
@@ -951,6 +957,7 @@ en: delete saved image
 fr: supprimer une image sauvegardée
 
     random individual
+co: affissà un individuu à l’azardu
 en: display a random individual
 fr: afficher un individu au hasard
 
@@ -1045,6 +1052,7 @@ en: if an image with the same name already exists in the saved, it will be delet
 fr: si une image du même nom existe déjà dans le sous-répertoire de sauvegarde, elle sera supprimée.
 
     interval
+co: intervallu di tempu
 en: time interval
 fr: intervalle de temps
 
@@ -1397,7 +1405,7 @@ sv: en bror/en syster/ett syskon
 tr: bir erkek kardeş/bir kız kardeş/bir kardeş
 
     a child-in-law/children-in-law
-co: un zitellu appiccicaticciu/zitelli appiccicaticcii
+co: un ghjeneru o una nora/ghjeneri o nore
 de: ein Schwiegerkind/Schwiegerkinder
 en: one child-in-law/children-in-law
 fr: un bel-enfant/beaux-enfants
@@ -1410,7 +1418,7 @@ af: 'n neef/'n niggie
 bg: първи братовчед/първа братовчедка
 br: ur c'henderv/ur geniterv
 ca: un cosí/una cosina
-co: un cuginu/una cugina
+co: un %scuginu/una %scugina/un %scuginu o una %scugina
 cs: bratranec/sestřenice
 da: en fætter/en kusine
 de: ein:d:+em Cousin/eine:d:+r Cousine
@@ -1446,6 +1454,7 @@ en: cousins 1rd
 fr: cousins
 
     cousins.2.2 tt
+co: cugini à u 1<sup>u</sup> gradu<hr>(carnali o micca)
 fr: cousins au 1<sup>er</sup> degré<hr>(germains ou non)
 
     cousin.2.3
@@ -1687,7 +1696,7 @@ af: 'n agterneef/'n agterniggie
 bg: внук на брат или сестра/внучка на брат или сестра
 br: un niz bihan/ur verc'h vihan
 ca: un besnebot/una besneboda
-co: un arcinipote/un arcinipote/arcinipoti/arcinipoti/arcinipoti
+co: un %sniputinu/una %sniputina/niputini/niputine/niputini è niputine
 cs: prasynovec/praneteř
 da: en grandnevø/en grandniece
 de: ein:d:+em Großneffe:d:+n/eine:d:+r Großnichte/Großneffen/Großnichten/Großneffen und Großnichten
@@ -1728,10 +1737,12 @@ en: great-nephews and great-nieces
 fr: arrière-neveux et arrière-nièces (soutenu)<br>enfant d’un neveu ou d’une nièce
 
     cousin.1.4
+co: un %sarciniputinu/una %sarciniputina/%sarciniputini/
 en: a %sgreat-grandnephew/a %sgreat-grandniece/a %sgreat-grandnephew
 fr: un %sarrière-petit-neveu/une %sarrière-petite-nièce/un %sarrière-petit-neveu
 
     cousins.1.4
+co: arciniputinu/arciniputini
 en: great-grandnephew/great-grandnephews
 fr: arrière-petit-neveu/arrière-petits-neveux
 
@@ -1791,7 +1802,7 @@ af: 'n grootoom/'n groottante
 bg: чичо на родител/леля на родител/вуйчо на родител/леля на родител
 br: un eontr-kuñv /ur voereb guñv
 ca: un oncle avi/una tia àvia
-co: un arciziu/una arcizia
+co: un %sarciziu/una %sarcizia
 cs: prastrýc/prateta
 da: en grandonkel/en grandtante
 de: ein:d:+em Großonkel/eine:d:+r Großtante
@@ -2872,10 +2883,12 @@ sv: anor
 tr: atalar
 
     ancestors tree of
+co: %s-arburu di l’antenati d[i |’]%s
 en: %s-tree of the ancestors of %s
 fr: %s-arbre des ancêtres d[e |’]%s
 
     path between
+co: chjassu trà
 en: path between
 fr: chemin entre
 
@@ -3240,9 +3253,9 @@ sv: tillbaka
 tr: geri
 
     back to index/books
+co: rivene à l’indice alfabeticu/rivene à a lista di i dizziunarii
 en: back to alphabetic index/back to the list of books
 fr: retourner à l’index alphabétique/retourner à la liste des dictionnaires
-
 
     baptism
 af: doop
@@ -4857,7 +4870,7 @@ tr: onay (LDS)
 
     connection/connections
 bg: потребителски връзки
-co: cunnessioni
+co: cunnessione/cunnessioni
 cs: spojenia
 da: forbindelser
 de: Verbindungen
@@ -5696,18 +5709,22 @@ sv: träd av ättlingar
 tr: nesil ağacı
 
     compact descendants tree
+co: arburu cumpattu di discendenza
 en: compact descendants tree
 fr: arbre de descendance compact
 
     partial
+co: limitatu à l’antenati è i so fratelli è surelle
 en: limited to ancestors and siblings
 fr: limité aux ascendants et leurs frères et soeurs
 
     open individual page
+co: apre a pagina individuale
 en: open individual page
 fr: ouvrir la page individuelle
 
     new tree with this individual
+co: arburu novu da st’individuu
 en: new tree with this individual
 fr: nouvel arbre à partir de cet individu
 
@@ -9239,6 +9256,7 @@ sv: mindre än en månad
 tr: bir aydan kısa bir süre eski
 
     limit
+co: limita
 en: limit
 fr: limite
 
@@ -9878,7 +9896,7 @@ sv: äktenskapslicens
 tr: evlilik Cüzdanı
 
     marriage notes/marriages notes
-co: note apprupositu di l’unione/note apprupositu di l'unioni
+co: note apprupositu di l’unione/note apprupositu di l’unioni
 de: Notizen zu den Ehen
 en: marriage notes/marriages notes
 es: notas de matrionios
@@ -11018,6 +11036,7 @@ sv: navigering
 tr: navigasyon
 
     navigation with this individual
+co: navigà in l’arburu cù st’individuu
 en: navigation in tree with this individual
 fr: naviguer dans l'arbre avec cet individu
 
@@ -11851,6 +11870,7 @@ sv: antal levande personer:
 tr: yaşayan bireylerin sayısı
 
     number of rows
+co: numeru di linee
 en: number of rows
 fr: nombre de lignes
 
@@ -12039,10 +12059,12 @@ sv: officer/officer/officerer
 tr: memur/memur/memurlar
 
     at new location
+co: à u locu novu
 en: at new location
 fr: au nouvel emplacement
 
     at old location
+co: à u locu anzianu
 en: at old location
 fr: à l'ancien emplacement
 
@@ -13222,6 +13244,7 @@ sv: erkännande far/erkännande mor/erkännande föräldrar
 tr: baba tarafından tanınan/anne tarafından tanınan/tarafından tanınan
 
     define Cujus
+co: definisce %s cum’è Sosa 1 per fighjà o riduce l’implessi/rimette u Sosa 1 precedente %s
 en: define %s as Sosa 1 to see or reduce the implexes/restore previous Sosa 1 %s
 fr: définir %s comme Sosa 1 pour voir ou réduire les implexes/remettre le précédent Sosa 1 %s
 
@@ -15687,7 +15710,7 @@ af: die %d voorname
 bg: %d собствени имена
 br: ar %d raganv
 ca: els %d noms
-co: i %d nomi
+co: %d nomi
 cs: %d křestních jmen
 da: de %d fornavne
 de: %d Vornamen
@@ -15784,7 +15807,7 @@ af: die %d vanne
 bg: %d фамилни имена
 br: ar %d anv-familh
 ca: els %d cognoms
-co: e %d casate
+co: %d casate
 cs: %d příjmení
 da: de %d efternavne
 de: %d Nachnamen
@@ -17284,6 +17307,7 @@ sv: verktyg
 tr: araçlar
 
     too much results
+co: troppu risultati
 en: too much results
 fr: trop de résultats
 
@@ -18548,5 +18572,6 @@ en: very short display
 fr: affichage très court
 
     remove %s column
+co: fà un cliccu nant’à st’intestatura per caccià sta o ste culonna(e) « %s »
 en: click on this header to remove the column(s) “%s”
 fr: cliquer sur cette en-tête pour supprimer la ou les colonne(s) « %s »
