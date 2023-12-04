@@ -1,16 +1,15 @@
 #!/bin/sh
 #   -- gwd.cgi --
 
-# le script s'exécute dans cgi-bin
-cd ..
+# the script exécutes in cgi-bin
 
 # assumes distribution, or a link to distribution has been
 # installed to the web-root, next to cgi-bin
-BIN_DIR="./distribution/gw"
-BASES_DIR="./distribution/bases"
+BIN_DIR="../distribution/gw"
+BASES_DIR="../distribution/bases"
 # you may want to replace BASES_DIR according to your own base location
 # see also install-cgi.sh
-LOGS_DIR="./tmp"
+LOGS_DIR="../tmp"
 
 # assumes that etc has been copied to the web-root
 # if your Apache handles FollowSymLinks, 
@@ -24,6 +23,6 @@ LOGS_DIR="./tmp"
 "$BIN_DIR"/gwd \
   -cgi \
   -bd "$BASES_DIR" \
-  -hd "$BIN_DIR" -hd "$BASES_DIR" \
+  -hd "$BIN_DIR" \
   -plugins -unsafe "$BIN_DIR"/plugins \
   -log_level 7 -log "<stderr>" 2>> "$LOGS_DIR"/gwd.log
