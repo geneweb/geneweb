@@ -49,7 +49,7 @@ COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%h (%cd)')
 COMMIT_ID := $(shell git rev-parse --short HEAD)
 COMMIT_MSG := $(shell git log -1 --pretty="%s%n%n%b")
 VERSION := $(shell awk -F\" '/xt =/ {print $$2}' lib/version.ml)
-SOURCE := $(shell git remote get-url origin | sed -n 's|^.*m/\([^/]\+/[^/]\+\)\.git$$|\1|p')
+SOURCE := $(shell git remote get-url origin | sed -n 's|^.*m/\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
 OCAMLV := $(shell ocaml --version)
 
 bin/gwd/info.ml:
