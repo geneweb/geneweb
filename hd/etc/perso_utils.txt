@@ -48,20 +48,19 @@
 
 %define;image_MF(xxx)
   %if;not cancel_links;
-    %if;wizard;
+    %if;wizard;%nn;
       <a href="%prefix;m=MOD_IND&i=%xxx.index;"%sp;
         title="[*modify::] %xxx.first_name; %xxx.surname;%if;(xxx.occ!="0") (%xxx.occ;)%end;">
-    %end;
-    <i%sp;
+    %end;<i%sp;
   %end;
   %if;xxx.is_male;
-    %if;cancel_links;♂%sp;%else;class="fa fa-mars male%end;%nn;
+    %if;cancel_links;♂%sp;%else;class="fa fa-mars male fa-xs%end;%nn;
   %elseif;xxx.is_female;
-    %if;cancel_links;♀%sp;%else;class="fa fa-venus female%end;%nn;
+    %if;cancel_links;♀%sp;%else;class="fa fa-venus female fa-xs%end;%nn;
   %else;
-    %if;cancel_links;⚲%sp;%else;class="fa fa-neuter neuter%end;%nn;
-  %end;%nn;
-  %if;not cancel_links; mr-1"></i>
+    %if;cancel_links;⚲%sp;%else;class="fa fa-neuter neuter fa-xs%end;%nn;
+  %end; mr-1%nn;
+  %if;not cancel_links;"></i>%nn;
     %if;wizard;</a>%end;
   %end;
 %end;
@@ -501,95 +500,50 @@
   </span>
 %end;
 
-%define;married_to(sexx, date_place)
-  %if;(sexx = 0 or sexx = 2)
-    %if;are_married;[*married%t to:::date_place]0%nn;
-    %elseif;are_not_married;[*relationship%t to:::date_place]0%nn;
-    %elseif;are_engaged;[*engaged%t to:::date_place]0%nn;
-    %elseif;is_no_sexes_check;[*relationship%t to:::date_place]0%nn;
-    %elseif;is_no_mention;[*with]%nn;
-    %elseif;are_marriage_banns;[*marriage banns%t to:::date_place]0%nn;
-    %elseif;are_marriage_contract;[*marriage contract%t with:::date_place]0%nn;
-    %elseif;are_marriage_license;[*married%t to:::date_place]0%nn;
-    %elseif;are_pacs;[*pacsed%t to:::date_place]0%nn;
-    %elseif;are_residence;[*residence%t to:::date_place]0%nn;
+%define;rel_date_place(sexx, date_place)
+  %if;(sexx=1)
+    %if;are_married;[married%t to:::date_place]1%nn;
+    %elseif;are_not_married;[relationship%t to:::date_place]1%nn;
+    %elseif;are_engaged;[engaged%t to:::date_place]1%nn;
+    %elseif;is_no_sexes_check;[relationship%t to:::date_place]1%nn;
+    %elseif;is_no_mention;[no mention] | date_place [with]%nn;
+    %elseif;are_marriage_banns;[marriage banns%t to:::date_place]1%nn;
+    %elseif;are_marriage_contract;[marriage contract%t with:::date_place]1%nn;
+    %elseif;are_marriage_license;[married%t to:::date_place]1%nn;
+    %elseif;are_pacs;[pacsed%t to:::date_place]1%nn;
+    %elseif;are_residence;[residence%t to:::date_place]1%nn;
     %end;
   %else;
-    %if;are_married;[*married%t to:::date_place]1%nn;
-    %elseif;are_not_married;[*relationship%t to:::date_place]1%nn;
-    %elseif;are_engaged;[*engaged%t to:::date_place]1%nn;
-    %elseif;is_no_sexes_check;[*relationship%t to:::date_place]1%nn;
-    %elseif;is_no_mention;[*with]%nn;
-    %elseif;are_marriage_banns;[*marriage banns%t to:::date_place]1%nn;
-    %elseif;are_marriage_contract;[*marriage contract%t with:::date_place]1%nn;
-    %elseif;are_marriage_license;[*married%t to:::date_place]1%nn;
-    %elseif;are_pacs;[*pacsed%t to:::date_place]1%nn;
-    %elseif;are_residence;[*residence%t to:::date_place]1%nn;
+    %if;are_married;[married%t to:::date_place]0%nn;
+    %elseif;are_not_married;[relationship%t to:::date_place]0%nn;
+    %elseif;are_engaged;[engaged%t to:::date_place]0%nn;
+    %elseif;is_no_sexes_check;[relationship%t to:::date_place]0%nn;
+    %elseif;is_no_mention;[no mention] | date_place [with]%nn;
+    %elseif;are_marriage_banns;[marriage banns%t to:::date_place]0%nn;
+    %elseif;are_marriage_contract;[marriage contract%t with:::date_place]0%nn;
+    %elseif;are_marriage_license;[married%t to:::date_place]0%nn;
+    %elseif;are_pacs;[pacsed%t to:::date_place]0%nn;
+    %elseif;are_residence;[residence%t to:::date_place]0%nn;
     %end;
   %end;
 %end;
 
-%define;married_to_f(UP_lo, m_f, date_place)
+%define;married_to(xx, yy)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;">%nn;
-      <i class="fa fa-wrench%sp;
-        %if;(m_f=0)male%elseif;(m_f=1)female%else;neuter%end;"%sp;
+      <i class="fa fa-wrench fa-xs%sp;
+        %if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;"%sp;
         title="[*modify::family/families]0 [with]%sp;
-        %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end;%sp;
+        %spouse.first_name;%if;(spouse.occ!="0").%spouse.occ;%end;%sp;
         %spouse.surname;"></i>%nn;
     </a>%sp;
   %end;
   %let;marr_text;
-    %if;(m_f=1)
-      %if;are_married;[married%t to:::date_place]1%nn;
-      %elseif;are_not_married;[relationship%t to:::date_place]1%nn;
-      %elseif;are_engaged;[engaged%t to:::date_place]1%nn;
-      %elseif;is_no_sexes_check;[relationship%t to:::date_place]1%nn;
-      %elseif;is_no_mention;date_place [with]%nn;
-      %end;
-    %else;
-      %if;are_married;[married%t to:::date_place]0%nn;
-      %elseif;are_not_married;[relationship%t to:::date_place]0%nn;
-      %elseif;are_engaged;[engaged%t to:::date_place]0%nn;
-      %elseif;is_no_sexes_check;[relationship%t to:::date_place]0%nn;
-      %elseif;is_no_mention;date_place [with]%nn;
-      %end;
-    %end;
-  %in;
-  %if;("UP_lo"="UPPER")%apply;capitalize(marr_text)%else;%marr_text;%end;
-%end;
-
-%define;long_married(xx)
-  %apply;married_to%with;%xx.sex%and;
-    %if;(marriage_place = "")
-      %if;(on_marriage_date = "")
-      %else; %on_marriage_date;%nn;
-        %if;wedding_birthday; ([happy birthday to them!])%end;
-      %end;
-    %else;
-      %if;(on_marriage_date = ""), %marriage_place;,
-      %else; %on_marriage_date;
-        %if;wedding_birthday; ([happy birthday to them!])%end;
-        , %marriage_place,
-      %end;
-    %end;
-  %end;
-%end;
-
-%define;long_married_f(xx, UP_lo)
-  %apply;married_to_f%with;UP_lo%and;%xx.sex%and;
-    %if;(marriage_place="")
-      %if;(on_marriage_date="")%nn;
-      %else; <em>%on_marriage_date;
-        %if;wedding_birthday; ([happy birthday to them!])%end;
-        </em>%end;
-    %else;
-      %if;(on_marriage_date="")<em>, %marriage_place;, </em>
-      %else; <em>%on_marriage_date;
-        %if;wedding_birthday; ([happy birthday to them!])%end;
-       , %marriage_place, </em>%end;
-    %end;
-  %end;
+    %apply;rel_date_place%with;%xx.sex;%and;
+      %if;(on_marriage_date!="") %marriage_date;%end;
+      %if;(marriage_place!=""), %marriage_place;%end;%end;%in;
+  %if;(yy=1)%apply;capitalize(marr_text)%else;%marr_text;%end;
+  %if;wedding_birthday; ([happy birthday to them!])%end;
 %end;
 
 %define;display_date_marriage_parent(xx)
