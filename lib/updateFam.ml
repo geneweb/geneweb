@@ -316,6 +316,10 @@ and eval_event_var e = function
       | Some { efam_src = x } ->
           safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val "")
+  | [ "e_w_nbr" ] -> (
+      match e with
+      | Some e -> str_val (string_of_int (Array.length e.efam_witnesses))
+      | _ -> str_val "0")
   | _ -> raise Not_found
 
 and eval_parent' conf base env k = function

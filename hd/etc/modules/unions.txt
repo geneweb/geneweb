@@ -159,7 +159,7 @@
           %sp;([witness/witnesses]w[:]
           %foreach;witness;%(attention witness_kind ne marche pas dans ce contexte !! fwitness non plus %)
             %if;not is_first;, %end;
-            %apply;short_display_person("witness")
+            %apply;short_display_person("witness")%nn;
           %end;
           %if;(not cancel_links)
             <a %apply;relations_tree(index)>%nn;
@@ -167,7 +167,7 @@
             </a>%nn;
           %else;
             <img class="ml-1 mb-1" src="%images_prefix;gui_create.png" height="16" alt="tree">%nn;
-          %end;
+          %end;)%nn;
         %end;%nn;
         %apply;init_count(prev_count)
         %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)
