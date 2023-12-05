@@ -1362,12 +1362,7 @@ let date_aux conf p_auth date =
 
 let get_marriage_witnesses fam =
   let fevents = Gwdb.get_fevents fam in
-  let marriages =
-    List.filter (fun fe -> fe.efam_name = Efam_Marriage) fevents
-  in
-  let witnesses =
-    List.map (fun marriage -> marriage.efam_witnesses) marriages
-  in
+  let witnesses = List.map (fun marriage -> marriage.efam_witnesses) fevents in
   witnesses |> Array.concat
 
 let get_nb_marriage_witnesses_of_kind fam wk =
@@ -4570,19 +4565,15 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
       events_witnesses
   in
-  let print_foreach_witness env al ep witness_kind = function
+  let print_foreach_witness env al ep _witness_kind = function
     | Vfam (_, fam, _, true) ->
         let _ =
           Array.fold_left
-            (fun (i, first) (ip, wk) ->
-              if wk = witness_kind then (
-                let p = pget conf base ip in
-                let env =
-                  ("witness", Vind p) :: ("first", Vbool first) :: env
-                in
-                List.iter (print_ast env ep) al;
-                (i + 1, false))
-              else (i + 1, first))
+            (fun (i, first) (ip, _wk) ->
+              let p = pget conf base ip in
+              let env = ("witness", Vind p) :: ("first", Vbool first) :: env in
+              List.iter (print_ast env ep) al;
+              (i + 1, false))
             (0, true)
             (get_marriage_witnesses fam)
         in
