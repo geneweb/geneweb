@@ -1,7 +1,5 @@
 <!-- $Id: home.txt v7.1 07/09/2023 00:49:55 $ -->
-%define;display_sosa_ref(xx)
-  [*sosa reference: %t:::xx]
-%end;
+%let;rng;%if;("MOD_DATA" in e.m or "FORUM" in e.m or e.m="H")0%else;1%end;%in;
 %define;get_random(xxx)
   %random.init;
   %random.xxx;
@@ -9,6 +7,9 @@
 %define;dice()
   %random.init;
   %apply;nth%with;one/two/three/four/five/six%and;%random.6;%end;
+%end;
+%define;display_sosa_ref(xx)
+  [*sosa reference: %t:::xx]
 %end;
 %if;(not cancel_links)
   <div class="d-flex flex-column fix_top fix_left">
@@ -27,10 +28,12 @@
       <i class="fa fa-search fa-fw fa-xs" aria-hidden="true"></i>%nn;
       <span class="sr-only">[*search/case sensitive]0</span>%nn;
     </a>
-    <a role="button" class="btn btn-sm btn-link p-0 border-0" href="%url_setx.p.n.oc.i;&i=%apply;get_random(base.real_nb_persons.v)"
-      title="[*random individual]"><i class="fa fa-dice-%apply;dice() fa-fw fa-xs" aria-hidden="true"></i>%nn;
-      <span class="sr-only">[*random individual]</span>%nn;
-    </a>
+    %if;(rng=1)
+      <a role="button" class="btn btn-sm btn-link p-0 border-0" href="%url_setx.p.n.oc.i;&i=%apply;get_random(base.real_nb_persons.v)"
+        title="[*random individual]"><i class="fa fa-dice-%apply;dice() fa-fw fa-xs" aria-hidden="true"></i>%nn;
+        <span class="sr-only">[*random individual]</span>%nn;
+      </a>
+    %end;
     %if;(b.hide_querytime_bugs!="yes")
       <div class="btn btn-sm p-0 border-0" id="q_time">%nn;
         <i class="fa fa-hourglass-half fa-fw fa-xs p-0"></i>%nn;
