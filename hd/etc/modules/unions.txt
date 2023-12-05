@@ -152,7 +152,7 @@
     %foreach;family;
       %incr_count;
       %apply;li_SD("spouse")
-        %apply;long_married("self")%sp;
+        %apply;married_to("self", 1)%sp;
         %apply;short_display_person("spouse")
         %let;prev_count;%count;%in;
         %if;(has_witnesses)
@@ -215,7 +215,7 @@
       %if;(child.has_image)%incr_count2;%end;
     %end;
     <ul class="pl-4 py-0">%apply;li_SD("spouse")
-    %apply;long_married("self")%sp;
+    %apply;married_to("self", 1)%sp;
     %apply;short_display_person("spouse")
     %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)
       %if;(not cancel_links)
@@ -385,7 +385,7 @@
     %foreach;family;
       %incr_count;
       %apply;li_SD("spouse")
-        %apply;long_married("self")%sp;
+        %apply;married_to("self", 1)%sp;
         %apply;short_display_person("spouse")
         %if;spouse.has_parents; ([parents][:]
           %apply;short_display_person("spouse.father")%sp;
@@ -445,7 +445,7 @@
     %foreach;family;
       %incr_count;
       %apply;li_SD("spouse")
-        %apply;long_married("self")%sp;
+        %apply;married_to("self", 1)%sp;
         %apply;long_display_person("spouse")
         %if;spouse.has_parents;
           <span style="font-size: 90%%"><em> ([parents][:]
@@ -555,7 +555,7 @@
               </td>
               <td style="vertical-align: middle">
         %end;
-        %apply;long_married_f("self", "UPPER")%sp;
+        %apply;married_to("self", 1)%sp;
         %apply;display_horizontal("spouse")
         <span style="font-size: 90%%">
           %if;spouse.has_parents;<em> ([parents][:]
@@ -609,7 +609,7 @@
                       <img width="13" height="13"%sp;
                         src="%images_prefix;1pixel.png" alt="1px">%sp;
                       <em>%child;%child.title;%child.dates;</em>%end;
-                    <em>&nbsp;%apply;long_married_f("child", "lower")</em>
+                    <em>&nbsp;%apply;married_to("child", 0)</em>
                     %apply;short_display_person_f("spouse")%nn;
                     %if;are_divorced; [divorced]0 %divorce_date;%end;
                     %if;are_separated; [separated]0%end;%nn;
@@ -626,7 +626,7 @@
                                     <br><img width="10" height="10"%sp;
                                             src="%images_prefix;1pixel.png" alt="1px">
                                     <em>%child;%child.title;%child.dates;</em>%nl;%end;
-                                  <em>&nbsp;%apply;long_married_f("child", "lower")</em>
+                                  <em>&nbsp;%apply;married_to("child", 0)</em>
                                   %apply;short_display_person_f("spouse")
                                   %if;are_divorced; [divorced]0 %divorce_date;%end;
                                   %if;are_separated; [separated]0%end;
@@ -639,8 +639,8 @@
                                           %apply;short_display_person_f("child")
                                           %if;(child_cnt=nb_children).%end;
                                         %end;
-                                       </td>
-								    </tr></table>
+                                      </td>
+                                    </tr></table>
                                   %end;
                                 %end;
                               %end;
