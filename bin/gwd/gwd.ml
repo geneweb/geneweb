@@ -2030,6 +2030,16 @@ let main () =
   List.iter register_plugin !plugins ;
   !GWPARAM.init () ;
   cache_lexicon () ;
+  if !debug then begin
+    Printf.eprintf "After GWPARAM.init & cache_lexicon:\n";
+    Printf.eprintf "current_dir_name: %s\n" Filename.current_dir_name;
+    Printf.eprintf "gw_prefix    : %s\n" !gw_prefix;
+    Printf.eprintf "etc_prefix   : %s\n" !etc_prefix;
+    Printf.eprintf "images_prefix: %s\n" !images_prefix;
+    Printf.eprintf "images_dir   : %s\n" !images_dir;
+    List.iter (fun d -> Printf.eprintf "Secure asset : %s\n" d)( Secure.assets ());
+    Printf.eprintf "TODO: how to print contend of conf ?\n";
+  end;
   if !auth_file <> "" && !force_cgi then
     GwdLog.syslog `LOG_WARNING "-auth option is not compatible with CGI mode.\n \
       Use instead friend_passwd_file= and wizard_passwd_file= in .cgf file\n";
