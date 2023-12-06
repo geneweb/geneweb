@@ -11465,14 +11465,14 @@ ru: к сожалению, добавить можно только ветви, 
 sv: du kan bara lägga till familjer som är kopplade till övriga.<br>Denna begränsning är tillagd av databasägaren.
 tr: ne yazık ki, sadece diğerlerine bağlı aileleri ekleyebilirsiniz.<br>Bu kısıtlama, bu veritabanı sahibi tarafından eklenmiştir.
 
-    mtree
-co: arburu in H di 9 generazioni
-de: H-Baum 9 Generationen
-en: 9 generations H tree
-fr: arbre en H 9 générations
-pt: árvore em H 9 gerações
-sv: 9 generationer H-träd
-tr: 9 kuşak H ağacı
+    arbre 8 gen
+co: arburu in H di 8 generazioni
+de: H-Baum 8 Generationen
+en: 8 generations H tree
+fr: arbre en H 8 générations
+pt: árvore em H 8 gerações
+sv: 8 generationer H-träd
+tr: 8 kuşak H ağacı
 
     multi relations graph
 co: graficu di rilazioni multiple
