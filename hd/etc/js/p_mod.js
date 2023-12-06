@@ -10,7 +10,7 @@ const modulesEtOptions = {
   chronologie: ["simple", "simple + events"],
   notes: ["simple", "complete"],
   sources: ["simple", "complete"],
-  arbres: ["ascendants", "horizontal", "compact", "+3-3 gen.", "famille", "6 gen", "9 gen", "HI", "descendants"],
+  arbres: ["ascendants", "horizontal", "compact", "+3-3 gen.", "famille", "6 gen", "8 gen", "HI", "descendants"],
   gr_parents: ["standard", "three cols"],
   ligne: ["standard"],
   data_3col: ["standard"],
@@ -135,7 +135,7 @@ $('#p_mod').on('input', function () {
   const lastModuleId = p_mod_value.slice(-2);
   // Parcourir tous les boutons de module en sens inverse
   $('[id^="pm_"]').each(function () {
-    // Obtenir l'identifiant du module à partir de l'ID du bouton
+    // Obtenir l’identifiant du module à partir de l’ID du bouton
     const moduleId = this.id.slice(3);
     // Vérifier si le bouton correspond au dernier module saisi
     if (moduleId === lastModuleId) {

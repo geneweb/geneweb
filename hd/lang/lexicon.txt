@@ -8731,6 +8731,11 @@ pt: árvore em H
 sv: H-träd
 tr: H-Ağacı
 
+    htree 8 gen
+de: Kompakter H-Baum mit 7 Generationen und Kennzeichnung für die 8
+en: compact H-Tree at 7 generations with marker for the 8th
+fr: arbre compact en H à 7 générations avec indication pour la 8e
+
     husband/wife
 af: man/vrou
 bg: съпруг/съпруга
