@@ -22,7 +22,7 @@ Options
 %elseif;(op_m=6)
   %include;modules/arbre_h6
 %elseif;(op_m=7)
-  %include;modules/arbre_9gen
+  %include;modules/arbre_8gen
 %elseif;(op_m=8)
   %include;modules/arbre_hi_tools
   %include;modules/arbre_hi_indexes

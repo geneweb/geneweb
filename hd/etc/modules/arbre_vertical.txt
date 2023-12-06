@@ -240,7 +240,7 @@
 %if;has_parents;
   <table class="tree-vert mx-auto my-2">
     %if;(e.t="T" and e.t1="m")
-      %include;modules/arbre_9gen
+      %include;modules/arbre_8gen
     %elseif;(e.t="A" or e.t="C")
       <tr><td class="text-center">%apply;line("self",e_v+1)</td></tr>
     %else;
