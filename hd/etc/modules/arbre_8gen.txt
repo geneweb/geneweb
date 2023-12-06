@@ -116,7 +116,7 @@
 
 <div class="d-flex justify-content-between">
 <h2 id="a">
-%if;((evar.t = "T" and evar.t1="m") or p_mod="a7")Arbre 8 générations (256 sosa) et indication de la génération 9 (☐)
+%if;((evar.t = "T" and evar.t1="m") or p_mod="a7")[*htree 8 gen] (☐)
 %end;</h2><br>
 %if;not cancel_links;
   <div class="form-inline">
