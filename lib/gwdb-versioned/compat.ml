@@ -333,6 +333,9 @@ module type Driver_S = sig
   val gen_family_of_family : family -> (iper, ifam, istr) Def.gen_family
   (** Extract [gen_family] from [family]. *)
 
+  val gen_family_of_family_baseonly : family -> (iper, ifam, istr) Def.gen_family
+  (** Extract [gen_family] from [family]. *)
+  
   val gen_person_of_person : person -> (iper, iper, istr) Def.gen_person
   (** Extract [gen_person] from [person]. *)
 
@@ -1167,6 +1170,9 @@ struct
   let gen_family_of_family =
     Util.wrap_family Legacy.gen_family_of_family Current.gen_family_of_family
 
+  let gen_family_of_family_baseonly =
+    Util.wrap_family Legacy.gen_family_of_family_baseonly Current.gen_family_of_family_baseonly
+  
   let family_of_gen_family base genfam =
     match base with
     | Legacy_base base ->

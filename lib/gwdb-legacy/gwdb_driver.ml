@@ -366,6 +366,9 @@ type family = {
 let cache_fam f ({ base; ifam; _ } as fam) =
   f (cache base.data.families.get ifam (fun f -> f.f) (fun f v -> f.f <- v) fam)
 
+let cache_fam_baseonly f ({ base; ifam; _ } as fam) =
+  f (cache base.data.families.get_baseonly ifam (fun f -> f.f) (fun f v -> f.f <- v) fam)
+
 let cache_cpl f ({ base; ifam; _ } as fam) =
   f (cache base.data.couples.get ifam (fun f -> f.c) (fun f v -> f.c <- v) fam)
 
@@ -381,6 +384,7 @@ let cache_des_baseonly f ({ base; ifam; _ } as fam) =
 let gen_couple_of_family = cache_cpl (fun c -> c)
 let gen_descend_of_family = cache_des (fun d -> d)
 let gen_family_of_family = cache_fam (fun f -> f)
+let gen_family_of_family_baseonly = cache_fam_baseonly (fun f -> f)
 let get_children = cache_des (fun d -> d.Def.children)
 let get_children_baseonly = cache_des_baseonly (fun d -> d.Def.children)
 let get_comment = cache_fam (fun f -> f.Dbdisk.comment)

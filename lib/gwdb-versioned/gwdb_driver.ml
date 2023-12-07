@@ -797,8 +797,8 @@ module Legacy_driver = struct
     let f = empty_family base ifam in
     { family = f; base; witness_notes = Some [||] }
 
-  let gen_family_of_family f =
-    let gen_fam = gen_family_of_family f.family in
+  let gen_family_of (fam_f : Gwdb_legacy.Gwdb_driver.family -> ('per, 'fam, 'str) legacy_dsk_family) (f : family) =
+    let gen_fam = fam_f f.family in
     let fevents =
       List.mapi
         (fun ie fe ->
@@ -814,6 +814,11 @@ module Legacy_driver = struct
     let gen_fam = Translate.legacy_to_def_family empty_string gen_fam in
     { gen_fam with fevents }
 
+  let gen_family_of_family = gen_family_of gen_family_of_family
+  
+  let gen_family_of_family_baseonly = gen_family_of gen_family_of_family_baseonly
+  
+  
   let family_of_gen_family base (genfam, gen_couple, gen_descend) =
     let fevents = genfam.Def.fevents in
     let witness_notes =

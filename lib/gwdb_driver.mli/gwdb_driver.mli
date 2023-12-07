@@ -334,6 +334,9 @@ val gen_descend_of_family : family -> iper Def.gen_descend
 val gen_family_of_family : family -> (iper, ifam, istr) Def.gen_family
 (** Extract [gen_family] from [family]. *)
 
+val gen_family_of_family_baseonly : family -> (iper, ifam, istr) Def.gen_family
+(** Extract [gen_family] from [family]. *)
+
 val gen_person_of_person : person -> (iper, iper, istr) Def.gen_person
 (** Extract [gen_person] from [person]. *)
 

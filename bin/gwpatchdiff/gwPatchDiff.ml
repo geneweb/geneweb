@@ -41,7 +41,10 @@ let main () =
   Arg.parse (speclist opts) (anonfun opts) errmsg;
   let _ifile, base = handle_options !opts in
   Gwdb.set_fpoi_cache base false;
-  let _ = Diff_computation.updates_from_patch base in
+  let diffs = Diff_computation.updates_from_patch base in
+  let cmds = List.map (Commands.command_of_person_diff base) diffs in
+  let cmds = List.sort Commands.cmp_command cmds in
+  List.iter (fun c -> Commands.string_of_command c |> print_endline) cmds;
   ()
 
 let _ = Printexc.catch main ()

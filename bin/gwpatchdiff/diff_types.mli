@@ -33,11 +33,12 @@ module Descend_diff : sig
 end
 
 module Union_diff : sig
-  type t = Gwdb.iper list diff
+  type t = (Gwdb.iper * Def.cdate option) list diff
 end
 
 module Person_diff : sig
   type t = {
+    iper : Gwdb.iper;
     first_name : Gwdb.istr diff option;
     surname : Gwdb.istr diff option;
     occ : int diff option;

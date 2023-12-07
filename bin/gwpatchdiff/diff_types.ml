@@ -33,11 +33,12 @@ module Descend_diff = struct
 end
 
 module Union_diff = struct
-  type t = Gwdb.iper list diff
+  type t = (Gwdb.iper * Def.cdate option) list diff
 end
 
 module Person_diff = struct
   type t = {
+    iper : Gwdb.iper;
     first_name : Gwdb.istr diff option;
     surname : Gwdb.istr diff option;
     occ : int diff option;
@@ -84,27 +85,28 @@ end
 
 
 let no_diff_person = Person_diff.{
-  first_name = None;
-  surname = None;
-  occ = None;
-  public_name = None;
-  qualifiers = None;
-  aliases = None;
-  first_names_aliases = None;
-  surnames_aliases = None;
-  titles = None;
-  rparents = None;
-  occupation = None;
-  sex = None;
-  birth = None;
-  birth_place = None;
-  baptism = None;
-  baptism_place = None;
-  death = None;
-  death_place = None;
-  burial = None;
-  burial_place = None;
-  unions = None;
-  ascends = None;
-  children = None;
-}
+    iper = Gwdb.dummy_iper;
+    first_name = None;
+    surname = None;
+    occ = None;
+    public_name = None;
+    qualifiers = None;
+    aliases = None;
+    first_names_aliases = None;
+    surnames_aliases = None;
+    titles = None;
+    rparents = None;
+    occupation = None;
+    sex = None;
+    birth = None;
+    birth_place = None;
+    baptism = None;
+    baptism_place = None;
+    death = None;
+    death_place = None;
+    burial = None;
+    burial_place = None;
+    unions = None;
+    ascends = None;
+    children = None;
+  }
