@@ -1979,6 +1979,10 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       match get_env "event_witness_kind" env with
       | Vstring s -> VVstring s
       | _ -> raise Not_found)
+  | "witness_kind" :: _ -> (
+      match get_env "witness_kind" env with
+      | Vstring s -> VVstring s
+      | _ -> raise Not_found)
   | "family" :: sl -> (
       (* TODO ???
          let mode_local =
@@ -4478,7 +4482,7 @@ let print_foreach conf base print_ast eval_expr =
       | Epers_Death -> "death_witness"
       | Epers_Baptism -> "batism_witness"
       | Epers_Birth -> "birth_witness"
-      | _ -> "" (* TODO: ? *)
+      | _ -> "witness"
     in
     List.iter
       (fun (name, _, _, _, _, wl, _) ->
@@ -4556,15 +4560,26 @@ let print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al)
       events_witnesses
   in
-  let print_foreach_witness env al ep _witness_kind = function
+  let print_foreach_witness env al ep witness_kind = function
     | Vfam (_, fam, _, true) ->
         let _ =
           Array.fold_left
-            (fun (i, first) (ip, _wk) ->
+            (fun (i, first) (ip, wk) ->
               let p = pget conf base ip in
-              let env = ("witness", Vind p) :: ("first", Vbool first) :: env in
-              List.iter (print_ast env ep) al;
-              (i + 1, false))
+              (* TODO if witness_kind = Witness, we might want wk = "" *)
+              let wks =
+                if witness_kind = Witness && wk = Witness then ""
+                else (Util.string_of_witness_kind conf (get_sex p) wk :> string)
+              in
+              let env =
+                ("witness", Vind p) :: ("first", Vbool first)
+                :: ("witness_kind", Vstring wks)
+                :: env
+              in
+              if witness_kind = Witness || witness_kind = wk then (
+                List.iter (print_ast env ep) al;
+                (i + 1, false))
+              else (i, first))
             (0, true)
             (get_marriage_witnesses fam)
         in
@@ -4579,7 +4594,7 @@ let print_foreach conf base print_ast eval_expr =
       List.iter
         (fun ic ->
           let c = pget conf base ic in
-          (* TODOWHY: only on Male? probably bugged on same sex or neuter couples *)
+          (* TODO WHY: only on Male? probably bugged on same sex or neuter couples *)
           if get_sex c = Male then
             Array.iter
               (fun ifam ->
