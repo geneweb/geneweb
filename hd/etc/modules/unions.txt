@@ -157,9 +157,9 @@
         %let;prev_count;%count;%in;
         %if;(has_witnesses)
           %sp;([witness/witnesses]w[:]
-          %foreach;witness;%(attention witness_kind ne marche pas dans ce contexte !! fwitness non plus %)
+          %foreach;witness;
             %if;not is_first;, %end;
-            %apply;short_display_person("witness")%nn;
+            %apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;%nn;
           %end;
           %if;(not cancel_links)
             <a %apply;relations_tree(index)>%nn;
@@ -313,7 +313,7 @@
                 <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">&nbsp;</span>
               %end;
               <div class="ml-2 align-self-center">%nn;
-                %apply;short_display_person_tree("witness")<br>
+                %apply;short_display_person_tree("witness")%if;(witness_kind!="") (%witness_kind;)%end;<br>
                 %if;witness.computable_age;%sp;%witness.age;
                 %elseif;witness.computable_death_age;%sp;%witness.death_age;
                 %else;&#8203;
@@ -395,7 +395,7 @@
           &nbsp;([witness/witnesses]w[:]
           %foreach;witness;
             %if;not is_first;, %end;
-            %apply;short_display_person("witness")
+            %apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
           %end;)%nn;
         %end;
         %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)
@@ -457,7 +457,7 @@
           &nbsp;([witness/witnesses]w[:]
           %foreach;witness;
             %if;not is_first;, %end;
-            %apply;short_display_person("witness")
+            %apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
           %end;)%nn;
         %end;%nn;
         %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)%nn;
@@ -567,7 +567,7 @@
           &nbsp;([witness/witnesses]w[:]
           %foreach;witness;
             %if;not is_first;, %end;
-            %apply;short_display_person("witness")
+            %apply;short_display_person("witness")%if;(witness_kind!="") (%witness_kind;)%end;
           %end;)%nn;
         %end;%nn;
         %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)%nn;
@@ -639,6 +639,7 @@
                                           %apply;short_display_person_f("child")
                                           %if;(child_cnt=nb_children).%end;
                                         %end;
+
                                       </td>
                                     </tr></table>
                                   %end;
