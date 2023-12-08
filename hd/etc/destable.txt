@@ -105,7 +105,7 @@
 %( numéro d'Aboville %)
   %if;(e.num="on" and famx=1)
     %if;("yyy"="desc")
-      <td id="%labl0;" class="text-center align-middle%if;not cancel_links; table_big_cell%end;%if;(implx!=0 and not cancel_links) implex%end;"%rowspan;>
+      <td id="%labl0;" class="text-center align-middle%if;(not cancel_links and labl!=1) table_big_cell%end;%if;(implx!=0 and not cancel_links) implex%end;"%rowspan;>
         %if;(labl!=1 and not cancel_links)
           <a class="table_big_anchor" title="[*navigation] [with] %xxx"
             href="%prefix_base_password;%access;%nn;
@@ -157,8 +157,8 @@
         %apply;add_in_sorted_list(xxx.index)
         %apply;add_in_sorted_listc(xxx.index)
         <div class="d-flex justify-content-between">
-          <div class="align-self-center mr-2">
-            %apply;image_MF("xxx")
+          <div class="align-self-center">%nn;
+            %apply;image_MF("xxx")%nn;
             %apply;link%with;%xxx.access;%and;%if;(e.fn=1)%xxx.first_name; %xxx.surname;%else;%xxx;%end;%and;%xxx.index;%end;
             %if;(e.tt=1 and xxx.title!=""), %xxx.title;%end;
           </div>
@@ -650,7 +650,7 @@
   %end;
 %end;
 %( Main %)
-<table class="table table-hover table-sm descends_table mt-1">
+<table class="table table-hover table-sm ascdesc_table gold_header  mt-1">
   %if;(e.t="A")
     %let;nb_col;1%in;
     %apply;one_person("self", 0, e.v, "", 0, 0)

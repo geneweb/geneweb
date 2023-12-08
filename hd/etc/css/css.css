@@ -121,33 +121,36 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
 }
 
 /* --- Ascendants/Descendants table --- */
-.ascends_table, .descends_table
-{
- border: 1px solid black;
- }
-
-.ascends_table th, .ascends_table td,
-.descends_table th, .descends_table td
-{
-  border: 1px solid black;
-  vertical-align: top;
-  padding: 4px;
-  empty-cells: show;
+.gold_header thead th {
+  background-color: Khaki;
+}
+/* Hover effect for thead and tbody th  */
+.gold_header  thead th:hover {
+  background-color: #e0e0e0;
 }
 
-.ascends_table_header th,
-.descends_table_header th,
+/* Border and background styles for table headers */
+.ascdesc_table,
+.ascdesc_table th,
+.ascdesc_table td,
+.ascdesc_table thead th,
 .missing_ancestors_table_header th,
 .surname_branch_table_header th,
 .list_eclair_table_header th {
-  background-color: Khaki;
+  border: 1px solid black;
+  padding: 4px;
 }
-.table-hover tbody tr:hover {
-  background-color: LightGoldenrodYellow;
+
+.ascdesc_table tbody th:hover {
+  background-color: white;
 }
-.table_big_cell:hover {
-  background-color: ivory;
+/* Specific hover effect for the link inside the table cell */
+.table_big_cell:hover,
+.ascdesc_table a:hover,
+.ascdesc_table a div:hover {
+    background-color: ivory;
 }
+
 .table_big_cell {
   overflow: hidden;
 }
