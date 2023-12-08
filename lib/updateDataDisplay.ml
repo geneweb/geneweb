@@ -200,6 +200,48 @@ let rec eval_var conf base env xx _loc sl =
   with Not_found -> eval_compound_var conf base env xx sl
 
 and eval_simple_var conf base env xx = function
+  | [ "p_list" ] ->
+      let data =
+        match p_getenv conf.env "data" with Some data -> data | _ -> ""
+      in
+      let istr =
+        match get_env "key" env with Vstring istr -> istr | _ -> "0"
+      in
+      let conf =
+        {
+          conf with
+          env =
+            ("key", Adef.encoded istr)
+            :: ("data", Adef.encoded data)
+            :: conf.env;
+        }
+      in
+      let istr, p_list = List.hd (get_person_from_data conf base) in
+      (* same code as in place.ml *)
+      let head =
+        Printf.sprintf "&nbsp;(<a href=\"%sm=L%s&k=%s&nb=%d"
+          (commd conf :> string)
+          "&bi=on&ba=on&ma=on&de=on&bu=on"
+          (Mutil.encode (sou base istr) :> string)
+          (List.length p_list)
+      in
+      let body =
+        let rec loop i acc = function
+          | [] -> acc
+          | p :: pl ->
+              let ip = get_iper p in
+              loop (i + 1)
+                (acc ^ Printf.sprintf "&i%d=%s" i (Gwdb.string_of_iper ip))
+                pl
+        in
+        loop 0 "" p_list
+      in
+      let tail =
+        Printf.sprintf "\" title=\"%s\">%d</a>)"
+          (Utf8.capitalize (transl conf "list of modified persons"))
+          (List.length p_list)
+      in
+      head ^ body ^ tail |> str_val
   | [ s ] -> (
       try bool_val (eval_simple_bool_var conf base env xx s)
       with Not_found -> str_val (eval_simple_str_var conf base env xx s))
