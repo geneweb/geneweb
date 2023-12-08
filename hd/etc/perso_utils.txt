@@ -847,7 +847,7 @@
     title="ttt&#010;&#010; [*remove %s column:::ccc+ddd+eee]"></a>%end;
 %end;
 %define;table_header()
-  <tr class="align-middle descends_table_header">
+  <thead><tr class="align-middle">
     %reset_count;
     %if;(e.num="on")
       <th scope="col" class="text-center align-middle position-relative" rowspan="2">№%nn;
@@ -947,7 +947,7 @@
       %incr_count;
     %end;
     </tr>
-    <tr class="descends_table_header">
+    <tr>
     %if;(e.birth="on" and e.birth_place="on")
       <th class="text-right pr-2 position-relative">[*date/dates]0
         %apply;rm("birth",[*date of birth])</th>
@@ -988,5 +988,5 @@
       <th class="pl-2 position-relative">[*place/places]0
         %apply;rm("burial_place",[*burial place])</th>
     %end;
-  </tr>
+  </tr></thead>
 %end;
