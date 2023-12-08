@@ -260,7 +260,8 @@
 
 %define;parent(xcnt,xx,psex)
   <div class="row%if;(xcnt>1) mt-2%end;">
-   <label for="paxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0 <span class="font-weight-bold text-uppercase">
+   <label for="paxcnt_fn" class="col-sm-2 col-form-label">%nn;
+     [*first name/first names]0 <span class="font-weight-bold text-uppercase">
      (%if;(xx.first_name!="" or xx.surname!="")%apply;nth_c%with;[M/F]0[M/F]1N%and;psex%end;
       %else;%if;(xcnt=1)[M/F]0%else;[M/F]1%end;%end;)</span></label>
     <div class="col-sm-8">
@@ -520,7 +521,7 @@
 %end;
 
 %define;card_header(xx,yy)
-  <h3 class="card-header pt-1 pb-0 text-center" id="xx">[*yy]1</h3>
+  <h3 class="card-header pt-1 pb-0 text-center" id="xx" aria-label="§ [*yy]1">[*yy]1</h3>
 %end;
 
 <h1%if;((evar.m="ADD_FAM" or evar.m="ADD_FAM_OK") and evar.ip="") class="mt-5"%end;>%nn;
