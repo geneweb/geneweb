@@ -88,6 +88,8 @@ let get_all_data conf base =
 let get_person_from_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in
   let istr = Gwdb.istr_of_string @@ (List.assoc "key" conf.env :> string) in
+  Printf.eprintf "get_person_from_data: key= %s, %s\n" (string_of_istr istr)
+    (sou base istr);
   let add acc (istr : istr) p =
     try PersMap.add istr (PersSet.add p @@ PersMap.find istr acc) acc
     with Not_found -> PersMap.add istr (PersSet.add p PersSet.empty) acc

@@ -9986,6 +9986,10 @@ pt: listar por nome, local e data
 sv: index
 tr: ad, yer ve tarihe göre listele
 
+    list of modified persons
+en: list of potential modified persons
+fr: liste des personnes qui seront modifiées
+
     list/list (ancestors)
 af: lys
 bg: списък

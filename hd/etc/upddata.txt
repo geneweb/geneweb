@@ -115,7 +115,7 @@
                           %else;
                             %escape.entry_value;
                           %end;
-                    %if;is_modified; <b>([modify])</b></div>%else;</a>%end;
+                    %if;is_modified; <b>([modify])</b> %p_list;</div>%else;</a>%end;
                     %if;is_modified;
                       <form class="form-inline mt-1 ml-5 needs-validation" method="post" action="%action;" novalidate>
                         %hidden;
