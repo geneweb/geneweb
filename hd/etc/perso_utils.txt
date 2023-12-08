@@ -61,7 +61,7 @@
   %else;
     %if;cancel_links;⚲%sp;%else;class="fa fa-neuter neuter%end;%nn;
   %end;%nn;
-  %if;not cancel_links; mr-1"></i>
+  %if;not cancel_links;"></i>
     %if;wizard;</a>%end;
   %end;
 %end;
@@ -892,7 +892,7 @@
     title="ttt&#010;&#010; [*remove %s column:::ccc+ddd]"></a>%end;
 %end;
 %define;table_header()
-  <tr class="align-middle descends_table_header">
+  <thead><tr class="align-middle">
     %reset_count;
     %if;(e.num="on")
       <th scope="col" class="text-center align-middle position-relative" rowspan="2">№%nn;
@@ -928,7 +928,7 @@
       %incr_count;
     %end;
     %if;(e.marr="on" and (e.m="A" or (e.m="D" and e.t="H")))
-      <th scope="col" class="pl-2 align-middle" rowspan="2">[*spouse/spouses]1
+      <th scope="col" class="pl-2 align-middle position-relative" rowspan="2">[*spouse/spouses]1
         %apply;rm("marr","")</th>
       %incr_count;
     %end;
@@ -992,7 +992,7 @@
       %incr_count;
     %end;
     </tr>
-    <tr class="descends_table_header">
+    <tr>
     %if;(e.birth="on" and e.birth_place="on")
       <th class="text-right pr-2 position-relative">[*date/dates]0
         %apply;rm("birth",[*date of birth])</th>
@@ -1033,5 +1033,5 @@
       <th class="pl-2 position-relative">[*place]
         %apply;rm("burial_place",[*burial place])</th>
     %end;
-  </tr>
+  </tr></thead>
 %end;
