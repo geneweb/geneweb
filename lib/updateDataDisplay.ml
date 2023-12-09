@@ -119,9 +119,6 @@ let print_mod_ok conf base =
       Output.print_sstring conf
         (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
       Output.print_sstring conf "</button></p></form>");
-
-    Output.print_sstring conf
-      (Utf8.capitalize_fst (transl conf "new modification"));
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf {|m=MOD_DATA&data=|};
@@ -130,6 +127,9 @@ let print_mod_ok conf base =
     Output.print_string conf (Mutil.encode new_ini);
     Output.print_sstring conf ("#k" ^ new_istr_s);
     Output.print_sstring conf {|" id="reference">|};
+    Output.print_sstring conf
+      (Utf8.capitalize_fst (transl conf "new modification"));
+    Output.print_sstring conf " ";
     Output.print_sstring conf (transl conf "at new location");
     Output.print_sstring conf {|</a>|};
     if not (Mutil.start_with ini 0 new_ini) then (
@@ -141,8 +141,8 @@ let print_mod_ok conf base =
       Output.print_string conf (Mutil.encode ini);
       Output.print_sstring conf {|">|};
       Output.print_sstring conf (transl conf "at old location");
-      Output.print_sstring conf {|</a>.|})
-    else Output.print_sstring conf {|.|};
+      Output.print_sstring conf {|</a>|});
+    Output.print_sstring conf ".";
     Hutil.trailer conf)
   else (
     Hutil.header conf (fun _ ->
@@ -175,10 +175,10 @@ type 'a env =
 let string_to_list str =
   let rec loop acc = function
     | s ->
-        if String.length s > 0 then
+        if Utf8.length s > 0 then
           let nbc = Utf8.nbc s.[0] in
-          let c = String.sub s 0 nbc in
-          let s1 = String.sub s nbc (String.length s - nbc) in
+          let c = Utf8.sub s 0 nbc in
+          let s1 = Utf8.sub s nbc (Utf8.length s - nbc) in
           loop (c :: acc) s1
         else acc
   in
@@ -219,9 +219,9 @@ and eval_simple_var conf base env xx = function
       let istr, p_list = List.hd (get_person_from_data conf base) in
       (* same code as in place.ml *)
       let head =
-        Printf.sprintf "&nbsp;(<a href=\"%sm=L%s&k=%s&nb=%d"
+        Printf.sprintf "<a href=\"%sm=L%s&k=%s&nb=%d"
           (commd conf :> string)
-          "&bi=on&ba=on&ma=on&de=on&bu=on"
+          "&bi=on&ba=on&ma=on&de=on&bu=on&parents=0"
           (Mutil.encode (sou base istr) :> string)
           (List.length p_list)
       in
@@ -237,8 +237,9 @@ and eval_simple_var conf base env xx = function
         loop 0 "" p_list
       in
       let tail =
-        Printf.sprintf "\" title=\"%s\">%d</a>)"
-          (Utf8.capitalize (transl conf "list of modified persons"))
+        Printf.sprintf
+          "\" title=\"%s\">%d<i class=\"fa fa-user fa-xs ml-1\"></i></a>"
+          (Utf8.capitalize (transl conf "list of linked persons"))
           (List.length p_list)
       in
       head ^ body ^ tail |> str_val
@@ -318,12 +319,17 @@ and eval_simple_str_var conf _base env _xx = function
       let len =
         match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
       in
+      let len2 =
+        Sosa.to_string_sep
+          (transl conf "(thousand separator)")
+          (Sosa.of_int len)
+      in
       let ini = Option.value ~default:"" (p_getenv conf.env "s") in
       let book_of, title = translate_title conf in
       let result =
-        if ini = "" then Printf.sprintf "%d %s" len title
+        if ini = "" then Printf.sprintf "%s %s" len2 title
         else
-          Printf.sprintf (ftransl conf "%d %s starting with %s") len title ini
+          Printf.sprintf (ftransl conf "%s %s starting with %s") len2 title ini
       in
       Utf8.capitalize_fst book_of ^ "<br>" ^ result
   | _ -> raise Not_found
@@ -407,8 +413,7 @@ let print_foreach conf print_ast _eval_expr =
       | [ _s ] -> () (* dont do last element *)
       | s :: l ->
           let tail =
-            if String.length s > 0 then String.sub s (String.length s - 1) 1
-            else ""
+            if Utf8.length s > 0 then Utf8.sub s (Utf8.length s - 1) 1 else ""
           in
           let env =
             ("substr", Vstring s) :: ("tail", Vstring tail)

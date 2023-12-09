@@ -135,8 +135,7 @@ let select_names conf base is_surnames ini limit =
   (list, len)
 
 let ini len k =
-  let ini_k = Utf8.sub ~pad:'_' k 0 len in
-  (* ini_k is "a fresh string": we can use unsafe. *)
+  let ini_k = if Utf8.length k <= len then k else Utf8.sub k 0 len in
   Mutil.unsafe_tr ' ' '_' ini_k
 
 let groupby_ini len list =

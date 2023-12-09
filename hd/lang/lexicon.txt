@@ -101,22 +101,6 @@ sl: %1 od :g:%2
 sv: %1 till %2
 tr: %1 / %2
 
-    %d %s starting with %s
-co: %d %s principiendu da « %s »
-de: %d %s beginnend mit „%s”
-en: %d %s starting with “%s”
-es: %d %s comenzando con "%s"
-fi: %d %s ensimmäisenä "%s"
-fr: %d %s commençant par « %s »
-it: %d %s partendo da «%s»
-nl: %d %s beginnend met "%s"
-no: %d %s som starter med «%s»
-oc: %d %s que comença amb "%s"
-pt: %d %s começados por '%s'
-ru: %d %s начиная с "%s"
-sv: %d %s som börjar med "%s"
-tr: "%s" ile başlayan %d %s
-
     %d years ago
 af: %d jaar gelede
 bg: преди %d години
@@ -132,7 +116,7 @@ es: hace %d años
 et: %d aastat tagasi
 fi: %d vuotta sitten
 fr: il y a %d ans
-he:  לפני %d שנים
+he: לפני %d שנים
 is: fyrir %d árum síðan
 it: ha %d anni
 lt: prieš %d metų
@@ -149,6 +133,40 @@ sl: pred %d leti
 sv: %d år sedan
 tr: %d yıl önce
 
+    %s %s starting with %s
+af: %s %s begin met "%s"
+bg: %s %s започващо с „%s”
+br: %s %s a vevañ gant « %s »
+ca: %s %s començant per « %s »
+co: %s %s principiendu da « %s »
+cs: %s %s začínající s „%s”
+da: %s %s begynder med "%s"
+de: %s %s beginnt mit „%s”
+en: %s %s starting with “%s”
+eo: %s %s ekde « %s »
+es: %s %s comenzando con "%s"
+et: %s %s algab „%s”-st
+fi: %s %s alkaen ”%s”
+fr: %s %s commençant par « %s »
+he: %s %s מתחיל ב-„%s”
+is: %s %s byrjar á „%s”
+it: %s %s partendo da «%s»
+lt: %s %s prasideda nuo „%s”
+lv: %s %s sākas ar „%s”
+nl: %s %s begint met "%s"
+no: %s %s som starter med «%s»
+oc: %s %s que comença amb "%s"
+pl: %s %s rozpoczynający się od „%s”
+pt: %s %s começados por '%s'
+pt-br: %s %s começando por '%s'
+ro: %s %s începând cu „%s”
+ru: %s %s начиная с "%s"
+sk: %s %s začínajúce s „%s”
+sl: %s %s začenši z „%s”
+sv: %s %s som börjar med "%s"
+tr: %s %s, "%s" ile başlayan
+zh: %s %s 以“%s”开头
+
     %s access cancelled for that page
 bg: отменен достъп като %s за тази страница
 co: accessu %s abbandunatu per sta pagina
@@ -160,7 +178,7 @@ es: acceso %s anulado para esta página
 et: %s: ligipääs sellele lehele on keelatud
 fi: %s pääsy sivulle peruttu
 fr: accès %s annulé pour cette page
-he: דף זה חסום בפניך. הגישה מוגבלת %s דפים
+he: גישה %s בדף זה בוטלה
 it: accesso %s annullato per questa pagina
 lv: %s piekļuve šai lapai ir pārtraukta
 nl: %s toegang gewist voor deze pagina
@@ -175,13 +193,29 @@ sv: du har inte längre åtkomst till denna sida %s
 tr: bu sayfa için %s erişimi iptal edildi
 
     %s and %s have several unions
+bg: %s и %s имат няколко обединения
 co: %s è %s anu parechje unioni
+cs: %s a %s mají několik svazků
 de: %s und %s haben mehrere Partnerschaften
 en: %s and %s have several unions
+es: %s y %s tienen varias uniones
+fi: %s:lla ja %s:lla on useita liittoja
 fr: il y a plusieurs unions entre %s et %s
+he: ישנם מספר התאחדויות בין %s ל-%s
+it: %s e %s hanno diverse unioni
+lt: %s ir %s turi kelias sąjungas
+lv: %s un %s ir vairākas savienības
+nl: %s en %s hebben verschillende verenigingen
+no: %s og %s har flere sammenslutninger
+oc: i a pas de unions entre %s e %s
+pl: %s i %s mają kilka związków
 pt: existem várias uniões entre %s e %s
+ro: %s și %s au mai multe uniuni
+ru: %s и %s имеют несколько союзов
+sk: %s a %s majú viacero zväzkov
+sl: %s in %s imata več zvez
 sv: %s och %s har flera partnerskap
-tr: %s ve %s'nin birden fazla birlikteliği var
+tr: %s ve %s'nin birkaç birleşimi var
 
     %s cousins
 af: neefs en niggies %s geslagte verwyder
@@ -8102,6 +8136,40 @@ sl: generacija/generacije
 sv: generation/generationer
 tr: nesil/nesiller
 
+    go to section %s
+af: gaan na die %s seksie
+bg: отиди към раздела %s
+br: mont d'ar rubrik %s
+ca: anar a la secció %s
+co: andà à a sezzione %s
+cs: jít na sekci %s
+da: gå til afsnittet %s
+de: gehe zu Abschnitt %s
+en: go to section %s
+eo: iru al la sekcio %s
+es: ir a la sección %s
+et: mine jaotisse %s
+fi: siirry osioon %s
+fr: aller à la section %s
+he: ללכת לקטע %s
+is: fara í hluta %s
+it: vai alla sezione %s
+lt: eikite į skyrių %s
+lv: doties uz sadaļu %s
+nl: ga naar sectie %s
+no: gå til seksjonen %s
+oc: anar a la seccion %s
+pl: przejdź do sekcji %s
+pt: ir para a seção %s
+pt-br: ir para a seção %s
+ro: mergi la secțiunea %s
+ru: перейти к разделу %s
+sk: ísť do sekcie %s
+sl: pojdi na oddelek %s
+sv: gå till avsnittet %s
+tr: bölüme git %s
+zh: 转到%s部分
+
     godfather/godmother/godparents
 af: peetpa/peetma/peetouers
 bg: кръстник/кръстница/кръстници
@@ -8493,7 +8561,7 @@ de: Klicken Sie auf das zu korrigierende „Listen-Element”: alle Dateien Ihre
 en: Be careful! Modifications in the “book” update the corresponding elements in the entire database.
 es: Pulse en "el elemento de la lista" que desee corregir: todas las fichas de su árbol se corregirán instantáneamente.
 fi: Napsauta 'Päivitä' ja koko sukupuusi päivitetään automaattisesti.
-fr: Attention ! Les corrections dans le dictionnaire modifient l’ensemble des données correspondantes dans la base.
+fr: Toute modification d’une entrée du dictionnaire impacte l'ensemble des données liées.
 it: Clicca su «l’elemento della lista» che vuoi correggere : l'insieme delle schede del tuo albero saranno istantaneamente corrette.
 nl: Kliop op het 'lijstelement" dat gewijzigd moet worden: het geheel van de fichen van uw stamboom zullen onmiddellijk verbeterd worden.
 no: Klikk 'Oppdater' for å editere og hele ditt slektstre vil automatisk bli oppdatert.
@@ -8558,6 +8626,40 @@ fr: ne pas afficher les portraits
 pt: não mostrar os retratos
 sv: dölj personbilder
 tr: portreleri gizle
+
+    hierarchical navigation
+af: kies 'n inskrywing in die hierargiese navigasie
+bg: изберете запис в йерархичната навигация
+br: dibabellit ul levrerezh eus an dresadennoù
+ca: seleccioneu una entrada en la navegació jeràrquica
+co: selezziunà un’entrata in a navigazione ierarchica
+cs: vyberte položku v hierarchické navigaci
+da: vælg en post i den hierarkiske navigation
+de: wähle einen Eintrag in der hierarchischen Navigation
+en: select an entry in the hierarchical navigation
+eo: elektu eniron en la hierarkia navigacio
+es: selecciona una entrada en la navegación jerárquica
+et: valige kirje hierarhilises navigatsioonis
+fi: valitse merkintä hierarkkisessa navigaatiossa
+fr: sélectionnez une entrée dans la navigation hiérarchique
+he: בחר רשומה בניווט היררכי
+is: veldu færslu í stigvöxlunavigatíu
+it: seleziona una voce nella navigazione gerarchica
+lt: pasirinkite įrašą hierarchinėje navigacijoje
+lv: atlasiet ierakstu hierarhiskajā navigācijā
+nl: selecteer een vermelding in de hiërarchische navigatie
+no: velg en oppføring i den hierarkiske navigasjonen
+oc: causissètz una entrada dins la navigacion jerarquica
+pl: wybierz pozycję w hierarchicznej nawigacji
+pt: selecione uma entrada na navegação hierárquica
+pt-br: selecione uma entrada na navegação hierárquica
+ro: selectați o intrare în navigarea ierarhică
+ru: выберите запись в иерархической навигации
+sk: vyberte položku v hierarchickej navigácii
+sl: izberite vnos v hierarhični navigaciji
+sv: välj en post i den hierarkiska navigeringen
+tr: hiyerarşik gezinmede bir giriş seçin
+zh: 在层次导航中选择一个条目
 
     highlight incomplete data
 co: sopralineà i dati incumpleti
@@ -9986,9 +10088,39 @@ pt: listar por nome, local e data
 sv: index
 tr: ad, yer ve tarihe göre listele
 
-    list of modified persons
-en: list of potential modified persons
-fr: liste des personnes qui seront modifiées
+    list of linked persons
+af: lys van gekoppelde persone
+bg: списък на свързаните лица
+br: roll a dudien liammet
+ca: llista de persones enllaçades
+co: lista di e persone ligate
+cs: seznam propojených osob
+da: liste over forbundne personer
+de: Liste der verknüpften Personen
+en: list of linked persons
+eo: listo de ligitaj personoj
+es: lista de personas vinculadas
+et: seotud isikute loetelu
+fi: liitettyjen henkilöiden luettelo
+fr: liste des personnes liées
+he: רשימת אנשים מקושרים
+is: listi yfir tengda einstaklinga
+it: elenco delle persone collegate
+lt: susietų asmenų sąrašas
+lv: saistīto personu saraksts
+nl: lijst van gekoppelde personen
+no: liste over tilknyttede personer
+oc: lista de personas ligadas
+pl: lista powiązanych osób
+pt: lista de pessoas ligadas
+pt-br: lista de pessoas ligadas
+ro: listă de persoane legate
+ru: список связанных лиц
+sk: zoznam prepojených osôb
+sl: seznam povezanih oseb
+sv: lista över länkade personer
+tr: bağlantılı kişiler listesi
+zh: 关联人员名单
 
     list/list (ancestors)
 af: lys
@@ -14426,6 +14558,40 @@ ru: пенсионер
 sv: pensionerad
 tr: emeklilik
 
+    return to top
+af: terug na bo
+bg: върни се нагоре
+br: distro da zerc'he
+ca: torna a dalt
+co: riturnassine insù
+cs: návrat nahoru
+da: tilbage til toppen
+de: nach oben gehen
+en: return to top
+eo: reiri supren
+es: volver arriba
+et: tagasi üles
+fi: palaa alkuun
+fr: retourner en haut
+he: חזור למעלה
+is: farðu upp
+it: torna in alto
+lt: grįžti į viršų
+lv: atgriezties uz augšu
+nl: terug naar boven
+no: gå til toppen
+oc: tornar en naut
+pl: wróć na górę
+pt: voltar para o topo
+pt-br: voltar para o topo
+ro: întoarce-te sus
+ru: вернуться наверх
+sk: vráť sa nahor
+sl: nazaj na vrh
+sv: gå till toppen
+tr: başa dön
+zh: 返回顶部
+
     revision history
 co: cronolugia di e revisioni
 de: Verlauf der Revisionen
@@ -14856,20 +15022,38 @@ sv: välj
 tr: seç
 
     select a letter
-co: sceglie una lettera
-de: wählen Sie ein Zeichen
-en: select a character
-es: elija un carácter
-fi: valitse kirjain
-fr: choisissez un caractère
-it: scegli un carattere
-nl: kies een teken
-no: velg en karakter
-oc: causissètz-vos un caractèr
-pt: selecione um carácter
-ru: выберите букву
-sv: välj en bokstav
-tr: bir karakter seçin
+af: kies 'n inskrywing in die alfabetiese indeks
+bg: изберете запис в азбучния указател
+br: dibabellit ul levrerezh alfabedel
+ca: seleccioneu una entrada a l’índex alfabètic
+co: selezziunà un’entrata in l’indice alfabeticu
+cs: vyberte položku v abecedním rejstříku
+da: vælg en post i det alfabetiske indeks
+de: wähle einen Eintrag im alphabetischen Index
+en: select an entry in the alphabetical index
+eo: elektu eniron en la alfabetika indekso
+es: selecciona una entrada en el índice alfabético
+et: valige kirje tähestikulises indekss
+fi: valitse merkintä aakkosellisesta hakemistosta
+fr: sélectionnez une entrée dans l’index alphabétique
+he: בחר רשומה באינדקס האלפבתי
+is: velja færslu í stafrófsröðinni
+it: seleziona una voce nell'indice alfabetico
+lt: pasirinkite įrašą abėcėlinėje lentelėje
+lv: atlasiet ierakstu alfabētiskajā indeksā
+nl: selecteer een vermelding in het alfabetische index
+no: velg en oppføring i det alfabetiske indekset
+oc: causissètz una entrada dins l'indic alfabetic
+pl: wybierz pozycję w alfabetycznym indeksie
+pt: selecione uma entrada no índice alfabético
+pt-br: selecione uma entrada no índice alfabético
+ro: selectați o intrare în indexul alfabetic
+ru: выберите запись в алфавитном указателе
+sk: vyberte položku v abecednom zozname
+sl: izberite vnos v abecednem indeksu
+sv: välj en post i det alfabetiska indexet
+tr: alfabetik dizinde bir giriş seçin
+zh: 在字母索引中选择一个条目
 
     select a month to see all the anniversaries
 co: selezziunà un mese per fighjà tutti l’anniversarii.
@@ -15367,6 +15551,40 @@ fr: echelle
 pt: escala
 sv: skala
 tr: ölçek
+
+    skip to main content
+af: spring na hoofinhoud
+bg: прескочете към основното съдържание
+br: plij da boud d'an destenn
+ca: salta al contingut principal
+co: andà à u cuntenutu principale
+cs: přeskočit na hlavní obsah
+da: spring til hovedindhold
+de: zum Hauptinhalt springen
+en: skip to main content
+eo: salti al ĉefa enhavo
+es: ir al contenido principal
+et: hüppa peamise sisu juurde
+fi: siirry pääsisältöön
+fr: aller au contenu principal
+he: דלג לתוכן הראשי
+is: sleppa að aðal efni
+it: salta al contenuto principale
+lt: peršokti prie pagrindinio turinio
+lv: izlaist galveno saturu
+nl: naar hoofdinhoud gaan
+no: hopp til hovedinnhold
+oc: salta al contengut principal
+pl: przejdź do treści głównej
+pt: ir para o conteúdo principal
+pt-br: pular para o conteúdo principal
+ro: săriți la conținutul principal
+ru: перейти к основному содержанию
+sk: preskočiť na hlavný obsah
+sl: pojdi na glavno vsebino
+sv: hoppa till huvudinnehållet
+tr: ana içeriğe atla
+zh: 跳到主要内容
 
     son/daughter/child
 af: seun/dogter/kind
@@ -18259,6 +18477,40 @@ fr: largeur
 pt: largura
 sv: bredd
 tr: genişlik
+
+    wikidata
+af: soek %s op die vrye en oop kennisbasis Wikidata
+bg: търсене на %s върху свободната и отворена знание база Wikidata
+br: klask %s war an diazez evit an diazez eus an doare bennak Wikidata
+ca: cerca %s a la base de coneixements lliure i oberta Wikidata
+co: ricercà %s nant’à a basa di cunnuscenza libera è di rigalu Wikidata
+cs: hledat %s na volné a otevřené znalostní bázi Wikidata
+da: søg %s på den frie og åbne vidensbase Wikidata
+de: suche %s in die freie und offene Wissensdatenbank Wikidata
+en: search %s on the free and open knowledge base Wikidata
+eo: serĉi %s sur la libera kaj malfermita scienca datumbazo Wikidata
+es: buscar %s en la base de conocimientos libre y abierta Wikidata
+et: otsi %s vaba ja avatud teadmiste alusel Wikidata
+fi: hae %s vapaasta ja avoimesta tietämyskannasta Wikidata
+fr: rechercher %s sur la base de connaissances libre et gratuite Wikidata
+he: חיפוש %s בבסיס הידע החופשי והפתוח של ויקידאטה
+is: leitaðu að %s á fríu og opið kunnskapsgrundvelli Wikidata
+it: cerca %s sulla base di conoscenze libera e aperta di Wikidata
+lt: ieškokite %s laisvoje ir atviroje žinių bazėje Wikidata
+lv: meklē %s uz brīvo un atvērto zināšanu bāzi Wikidata
+nl: zoek %s op de vrije en open kennisbasis Wikidata
+no: søk %s på den frie og åpne kunnskapsbasen Wikidata
+oc: recèrca %s sus la basa de coneissenças liura e dubèrta Wikidata
+pl: szukaj %s w wolnej i otwartej bazie wiedzy Wikidata
+pt: pesquisar %s na base de conhecimento livre e aberta do Wikidata
+pt-br: pesquisar %s na base de conhecimento livre e aberta do Wikidata
+ro: căutare %s pe baza de cunoștințe liberă și deschisă Wikidata
+ru: поиск %s в свободной и открытой базе знаний Wikidata
+sk: hľadať %s na voľnej a otvorenej znalostnej databáze Wikidata
+sl: iskanje %s na prosti in odprti bazi znanja Wikidata
+sv: sök %s på den fria och öppna kunskapsdatabasen Wikidata
+tr: %s'yi özgür ve açık bilgi tabanında arayın Wikidata
+zh: 在自由和开放的知识库Wikidata上搜索%s
 
     will
 co: testamentu
