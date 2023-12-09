@@ -182,7 +182,7 @@ Person:            Child1     Child2          Child3
               %end;
               <span class="text-nowrap">
                 %if;(e_ma=1 or e_sp=1)
-                  %if;(not cancel_links)
+                  %if;(wizard and not cancel_links)
                     <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
                       title="[*update::family/families]0 of %first_name; %surname; (%occ;)
                         [and] %spouse.first_name; %spouse.surname; (%spouse.occ;)"
