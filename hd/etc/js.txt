@@ -86,7 +86,7 @@
 %end;
 %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
     or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
-    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES" or (e.m="MOD_DATA" and e.data="source"))
+    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES" or (e.m="MOD_DATA" and e.data="src"))
   %if;(b.use_cdn="yes")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js" 
       integrity="sha384-gqYjRLBp7SeF6PCEz2XeqqNyvtxuzI3DuEepcrNHbrO+KG3woVNa/ISn/i8gGtW8" crossorigin="anonymous"></script>

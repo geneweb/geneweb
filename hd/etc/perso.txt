@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: perso.txt v7.1 19/08/2023 02:16:52 $ -->
+  <!-- $Id: perso.txt %version; 08/12/2023 23:04:39 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -22,7 +22,7 @@
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
-<a href="#content" class="sr-only sr-only-focusable">Skip navigation menu</a>
+<a href="#content" class="sr-only sr-only-focusable">[*skip to main content]</a>
 <div class="container%if;(evar.wide="on")-fluid%end;">
 %include;perso_utils
 %include;menubar
