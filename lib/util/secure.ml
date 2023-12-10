@@ -6,7 +6,7 @@
    correct open instead of hoping Secure do it for it *)
 
 let ok_r = ref []
-let assets_r = ref [ "gw" ]
+let assets_r = ref []
 let bd_r = ref (Filename.concat Filename.current_dir_name "bases")
 
 (* [decompose: string -> string list] decompose a path into a list of

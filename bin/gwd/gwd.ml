@@ -1305,11 +1305,9 @@ let make_conf from_addr request script_name env =
        if !gw_prefix <> "" then !gw_prefix
        else String.concat Filename.dir_sep [ "gw" ];
      images_prefix = (
-       match !gw_prefix, !images_prefix with
-       | gw_p, im_p when gw_p <> "" && im_p = "" ->
-           String.concat Filename.dir_sep [ gw_p; "images" ]
-       | _, im_p when im_p <> "" ->  im_p
-       | _, _ -> (Filename.concat "gw" "images"));
+       match !images_prefix with
+       | im_p when im_p <> "" ->  im_p
+       | _ -> if cgi then (Filename.concat !gw_prefix "images") else "images");
      etc_prefix = (
        match !gw_prefix, !etc_prefix with
        | gw_p, st_p when gw_p <> "" && st_p = "" ->
@@ -2031,10 +2029,21 @@ let main () =
 #endif
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
+  Secure.add_assets (Filename.dirname Sys.argv.(0));
   Geneweb.GWPARAM.syslog := GwdLog.syslog;
   List.iter register_plugin !plugins ;
   !GWPARAM.init () ;
   cache_lexicon () ;
+  if !debug then begin
+    Printf.eprintf "After GWPARAM.init & cache_lexicon:\n";
+    Printf.eprintf "current_dir_name: %s\n" Filename.current_dir_name;
+    Printf.eprintf "gw_prefix    : %s\n" !gw_prefix;
+    Printf.eprintf "etc_prefix   : %s\n" !etc_prefix;
+    Printf.eprintf "images_prefix: %s\n" !images_prefix;
+    Printf.eprintf "images_dir   : %s\n" !images_dir;
+    List.iter (fun d -> Printf.eprintf "Secure asset : %s\n" d)( Secure.assets ());
+    Printf.eprintf "TODO: how to print contend of conf ?\n";
+  end;
   if !auth_file <> "" && !force_cgi then
     GwdLog.syslog `LOG_WARNING "-auth option is not compatible with CGI mode.\n \
       Use instead friend_passwd_file= and wizard_passwd_file= in .cgf file\n";
