@@ -1,0 +1,79 @@
+    !dir
+fr:
+
+    cousin.0.1
+fr:
+
+    cousin.0.2
+fr:
+
+    cousin.0.3
+fr:
+
+    cousin.1.0
+fr:
+
+    cousin.1.1
+fr:
+
+    cousin.1.2
+fr:
+
+    cousin.1.3
+fr:
+
+    cousin.2.0
+fr:
+
+    cousin.2.1
+fr:
+
+    cousin.2.2
+fr:
+
+    cousin.3.0
+fr:
+
+    cousin.3.1
+fr:
+
+    cousin.3.3
+fr:
+
+    cousin.4.4
+fr:
+
+    cousins.0.1
+fr:
+
+    cousins.1.0
+fr:
+
+    cousins.1.1
+fr:
+
+    cousins.2.0
+fr:
+
+    cousins.2.1
+fr:
+
+    cousins.3.0
+fr:
+
+    cousins.3.1
+fr:
+
+    cousins.3.3
+fr:
+
+    cousins.4.0
+fr:
+
+    cousins.4.1
+fr:
+
+    cousins.4.4
+fr:
+
+

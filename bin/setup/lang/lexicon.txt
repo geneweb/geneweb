@@ -98,31 +98,37 @@ sv: "Wizards" kan göra modifieringar i databasen.
 
     build names/places cache files
 aa: welcome.htm
+co: I schedarii d’impiatta per i nomi è lochi per l’empiimentu autumaticu.
 en: Name and places cache files for auto completion.
 fr: Les fichiers cache de noms et places pour l'auto-completion.
 
     cache files
 aa: cache_file.htm
+co: Schedarii d’impiatta
 en: Cache files
 fr: Cache files
 
     cache files title
 aa: cache_file.htm
+co: Custruisce i schedarii d’impiatta.
 en: Produce cache files.
 fr: Construire les fichiers cache.
 
     select base
 aa: cache_file.htm
+co: Selezziunate a vostra basa di dati clicchendu nant’à u buttone assuciatu :
 en: Select your database by clicking on the associated button:
 fr: Sélectionnez votre base de données en cliquant sur le bouton associé :
 
     no base provided
 aa: cache_file.htm
+co: ùn ci hè alcuna basa di dati à st’ora
 en: there is no database at present
 fr: il n’y a aucune base de données actuellement
 
     select options
 aa: cache_file.htm
+co: Selezziunate l’ozzioni chì vo vulete :
 de: Wähle die gewünschten Optionen:
 en: Select the options you want:
 es: Seleccione las opciones que Ud. desee:
@@ -133,46 +139,55 @@ sv: Välj de optioner du vill ha:
 
     first_names
 aa: cache_file.htm
+co: Nomi
 en: First names
 fr: Prénoms
 
     surnames
 aa: cache_file.htm
+co: Casate.
 en: Surnames.
 fr: Patronymes.
 
     aliases
 aa: cache_file.htm
+co: Cugnomi.
 en: Aliases.
 fr: Aliases.
 
     qualifiers
 aa: cache_file.htm
+co: Qualificativi.
 en: Qualifiers.
 fr: Qualifiers.
 
     places
 aa: cache_file.htm
+co: Lochi.
 en: Places.
 fr: Lieux.
 
     all
 aa: cache_file.htm
+co: Custruisce tutti i schedarii d’impiatta.
 en: Build all cache files.
 fr: Construire tous les fichiers cache.
 
     fn alias
 aa: cache_file.htm
+co: Aghjunghje i cugnomi di i nomi à a lista di i nomi.
 en: Add first name aliases to the first names list.
 fr: Ajouter les prénoms alias à la liste des prénoms.
 
     progress
 aa: cache_file.htm
+co: Affissà a barra di prugressione.
 en: Show progress bar.
 fr: Afficher la barre de progrès.
 
     ok
 aa: cache_file.htm
+co: È appughjate nant’à « Vai ».
 de: Dann drücke "Ok".
 en: Then click on "Ok".
 es: Finalmente cliquear en "Ok".
@@ -182,6 +197,7 @@ lv: Tad nospiediet "Ok".
 sv: Klicka sedan på "OK".
 
     click on ok
+co: Appughjate nant’à u buttone quaghjò per principià :
 de: Drücke diesen Knopf um zu starten:
 en: Push the button below to start:
 es: Apoyar sobre el botón inferior para comenzar:
@@ -193,11 +209,13 @@ sv: Tryck på knappen nedan för att starta:
 
     cache files compute
 aa: cache_file_ok.htm
+co: Schedarii d’impiatta custruiti.
 en: Cache files computed.
 fr: Fichiers cache construits.
 
     return
 aa: cache_file_ok.htm
+co: Pudete rivene à u <a href="gwsetup?lang=%l;v=welcome.htm">listinu principale</a>.
 de: Zurück zum <a href="gwsetup?lang=%l;v=welcome.htm">Hauptmenü</a>.
 en: You can return to the <a href="gwsetup?lang=%l;v=welcome.htm">main menu</a>.
 es: Si no Ud. puede regresar al <a href="gwsetup?lang=%l;v=welcome.htm">menú principal</a>.
@@ -208,6 +226,7 @@ lv: Vai Jûs varat atgriezties uz <a href="gwsetup?lang=%l;v=welcome.htm">galven
 sv: Eller du kan återvända till <a href="gwsetup?lang=%l;v=welcome.htm">huvudmenyn</a>.
 
     applied operation
+co: L’operazione « %d » hà da esse appiecata nant’à a vostra basa di dati « %a ». Avertimentu : st’operazione pò piglià da qualchì seconda à parechji minuti secondu à u casu. Aspettate per piacè.
 de: Die Funktion "%d" wird nun auf deiner Datenbank "%a" ausgeführt. Warnung: Das kann, abhängig vom Einzelfall, zwischen einigen Sekunden und mehreren Minuten dauern. Bitte habe Geduld.
 en: The operation "%d" will be applied on your database "%a". Warning: it can take some seconds or some minutes, depending on the case. Be patient.
 es: La operación "%d" va a aplicarse a su base "%a". Atención: la operación puede durar algunos segundos o algunos minutos, de acuerdo al caso. Sea paciente.
@@ -218,6 +237,7 @@ lv: Darbîba "%d" tiks lietota datu bâzei "%a". Brîdinâjums: tas var aizòemt
 sv: Operationen "%d" kommer att appliceras på din databas "%a". Varning: det kan ta några sekunder eller några minuter, beroende på fallet. Ha tålamod.
 
     commands
+co: Per a vostra infurmazione, st’operazione currisponde à sta seguita di cumande :
 de: Zu deiner Information: Diese Funktion entspricht der Ausführung der folgenden Kommandos:
 en: For information, this operation corresponds to the following commands:
 es: Por información, esta operación corresponde a los comandos siguientes:
@@ -942,7 +962,7 @@ de: Datenbanken löschen
 en: Deletion of databases
 es: Supresión de bases de datos
 fi: Tietokantojen poistaminen
-fr: Suppression de bases  de données
+fr: Suppression de bases de données
 it: Cancellazione di basi di dati
 lv: Datu bâþu dzçðana
 sv: Radering av databaser
@@ -1173,7 +1193,7 @@ co: Scrivite u nome chì vò vulete dà à u vostru schedariu di fonte %G. U so 
 de: Gib den Namen ein, den du deiner %G-Quelldatei geben möchtest. Er muß mit "<tt>.gw</tt>" enden. Wenn Du nichts eingibst, wird der Dateiname aus dem Namen deiner %G-Datenbank abgeleitet.
 en: Enter the name you want to give to your %G source file. Its name must end with the suffix "<tt>.gw</tt>". If you write nothing, its name will be deducted from the name of the database.
 es: Entre Ud. el nombre que Ud. desee dar a su fichero fuente %G. El debe terminar en "<tt>.gw</tt>".  Si Ud. no mete nada, este será deducido del nombre de la base.
-fr: Entrez le nom que vous voulez donner à votre fichier source %G. Il doit se terminer par "<tt>.gw</tt>".  Si vous ne mettez rien, ce sera déduit du nom de la base.
+fr: Entrez le nom que vous voulez donner à votre fichier source %G. Il doit se terminer par "<tt>.gw</tt>". Si vous ne mettez rien, ce sera déduit du nom de la base.
 it: Digitate il nome che volete attribuire al vostro file sorgente %G. Deve finire con "<tt>.gw</tt>".  Se non mettete niente, il nome verrà dedotto da quello della base.
 lv: Ierakstiet datnes nosaukumu %G datnei. Nosaukumam jâbeidzas ar paplaðinâjumu "<tt>.gw</tt>". Ja Jûs neko neierakstîsiet, datnes vârds tiks izveidots no datu bâzes nosaukuma.
 sv: Skriv in namnet du vill kalla din %G källfil. Om du inte skriver någonting, kommer det att bli samma namn som databasen  avslutad med "<tt>.gw</tt>".
@@ -1306,7 +1326,7 @@ fr: families' parents.
 
     family Trees
 aa: welcome.htm
-co: l'arburi chì esistenu
+co: l’arburi chì esistenu
 de: Stammbaum
 en: family Trees
 es: árbol genealógico
@@ -1332,24 +1352,24 @@ fr: fevents' witnesses.
 
     Files were reconstructed in the designated directory.
 aa: gwu_ok.htm
-co: I schedarii sò stati ricustituiti in u -odir cartulare.
+co: I schedarii sò stati ricustituiti in u cartulare specificatu (-odir).
 de: Dateien wurden wiederhergestellt im -odir Quellverzeichnis .
 en: Files were reconstructed in the designated directory (-odir).
 fr: Les fichiers ont été reconstitués dans le dossier désigné (-odir).
 
     Data created without origin file
 aa: gwu_ok.htm
-co: I novi dati senza schedariu d’origine sò stati inversiati ver di u schedariu "new_data.gw" o ver di comm.log.
+co: I dati novi senza schedariu d’origine sò stati inversiati versu u schedariu « new_data.gw » o versu comm.log.
 de: Erstellte Daten ohne Originaldatei wurden in die Datei "new_data.gw" oder comm.log umgelenkt.
 en: Data created without origin file has been directed to the file "new_data.gw" or to comm.log.
 fr: Les nouvelles données sans fichier d'origine ont été redirigées vers le fichier "new_data.gw" ou vers comm.log.
 
     It is up to you to manage
 aa: gwu_ok.htm
-co: Tocca à voi d’amministrà stu novu schedariu .gw o d’aghjunghje sti dati à i schedarii esistente.
+co: Tocca à voi d’amministrà stu schedariu novu .gw o d’aghjunghje sti dati à i schedarii esistente.
 de: Es liegt an Ihnen die neue Quelldatei zu verwalten, oder sie mit existierenden Dateien zusammenzuführen.
 en: It is up to you to manage this new source file, or to merge this data into existing files.
-fr: Il vous revient la tâche de gérer ce nouveau fichier .gw ou d'ajouter ces  données aux fichiers existants.
+fr: Il vous revient la tâche de gérer ce nouveau fichier .gw ou d'ajouter ces données aux fichiers existants.
 
     First name
 aa: gwb2ged.htm
@@ -1495,7 +1515,7 @@ fr: Marquer les relations comme « Sans mention » (par défaut « Mariés �
 
     from a GEDCOM source file
 aa: welcome.htm
-co: à partesi d'un schedariu di fonte GEDCOM
+co: à partesi d’un schedariu di fonte GEDCOM
 de: aus einer GEDCOM Quelldatei
 en: from a GEDCOM source file
 es: a partir de un fichero fuente GEDCOM
@@ -1507,7 +1527,7 @@ sv: från en GEDCOM källfil
 
     from a GeneWeb source file
 aa: welcome.htm
-co: à partesi d'un schedariu di fonte %G
+co: à partesi d’un schedariu di fonte %G
 de: aus einer GeneWeb Quelldatei
 en: from a GeneWeb source file
 es: a partir de un fichero fuente %G
@@ -1733,7 +1753,7 @@ de: Sofern dies der Fall ist, probiere die unten angegebene Adresse aus. Die ang
 en: If it is, try the address below. The displayed page is called "welcome page" of your database. Bookmark it.
 es: Si tal es el caso, ensaye la dirección indicada a continuación. La página mostrada se llama la "Página de Recepción" de su base de datos.  Agrégela a sus registros favoritos.
 fi: Jos se on tämä, kokeile osoitetta alapuolella. Näytettävää sivua kutsutaan tietokannan "tervetuloa" sivuksi. Lisää kirjainmerkki (bookmark).
-fr: Vous pourrez ensuite accéder à votre généalogie en suivant le lien ce-dessous. Vous pouvez l’ajouter aux signets de votre  navigateur.
+fr: Vous pourrez ensuite accéder à votre généalogie en suivant le lien ce-dessous. Vous pouvez l’ajouter aux signets de votre navigateur.
 it: Se gwd è attivo, provate con l'indirizzo qui sotto. La pagina visualizzata è la "pagina di benvenuto" della vostra base di dati. Mettetela tra i vostri bookmarks.
 lv: Ja tas jau darbojas mçìiniet uzklikðíinât uz saites, kas atrodas zemâk. Parâdîsies jûsu datu bâzes t.s. "sveicinâjuma lapa". Pierakstiet tâs adresi.
 sv: Om den är det, försök med adressen nedan. Den visade sidan kallas "välkomstsidan" för din databas. Lägg till den till dina Favoriter/Bokmärken.
@@ -2182,7 +2202,7 @@ sv: Sammanslagning av databaser
 
     Merging with other databases
 aa: welcome.htm
-co: Fusione cù d'altre base genealogiche
+co: Fusione cù d’altre base genealogiche
 de: Zusammenführen mit anderen Datenbanken
 en: Merging with other databases
 fi: Yhdistyminen muiden tietokantojen kanssa
@@ -2275,6 +2295,7 @@ en: Note
 fr: Note
 
     Note that gwsetup has a -only file launch parameter
+co: Sappiate chì u prugramma gwsetup hà un parametru di lanciu -only schedariu
 en: Note that gwsetup has a -only file launch parameter
 fr: Le programme gwsetup peut être lançé avec le paramètre -only fichier
 
@@ -2456,7 +2477,7 @@ co: Passate da un schedariu GEDCOM. Da regula, st’azzione ùn hè micca ricuma
 de: Mittels GEDCOM-Datei übernehmen. A priori wird dies nicht empfohlen, jedoch solltest du diese Variante versuchen, wenn die normale Übernahme nicht funktioniert.
 en: Pass by a GEDCOM file. A priori, it is not recommended, but if it does not work with the normal procedure, try this option.
 es: Pasar por un fichero GEDCOM. A priori, no es aconsejable, pero si esto no funciona con el procedimiento normal, ensaye con esta opción.
-fr: Passer par un fichier GEDCOM. A priori, c’est déconseillé, mais si ça ne fonctionne pas avec la procédure normale,  essayez cette option.
+fr: Passer par un fichier GEDCOM. A priori, c’est déconseillé, mais si ça ne fonctionne pas avec la procédure normale, essayez cette option.
 it: Passare per un file GEDCOM. A priori è un'operazione sconsigliata ma se non ottenete risultati usando la procedura normale, provate questa opzione.
 lv: Atjaunot caur GEDCOM datni. Vispâr tas nav ieteicams, bet ja parastajâ variantâ atjauninâðana neizdodas, tad izmçìiniet ðo iespçju.
 sv: Gå genom en GEDCOM-fil. Det är inte rekommenderat, men om det inte fungerar med den normala proceduren, försök med detta.
@@ -3280,7 +3301,7 @@ sv: Parametrarna har sparats i textfilen "%a.gwf" i katalogen "%w".
 
     the parameters of a database
 aa: welcome.htm
-co: I parametri d'una basa di dati
+co: I parametri d’una basa di dati
 de: Die Parameter einer Datenbank
 en: The parameters of a database
 es: Los parámetros de una base de datos
@@ -3472,6 +3493,7 @@ fr: Ce fichier se trouve dans le répertoire "%w".
 it: Questo file si trova nella directory "%w".
 
     This file is in the directory
+co: Stu schedariu si trova in u cartulare :
 en: This file is in the directory:
 fr: Ce fichier est dans le dossier :
 
@@ -3489,7 +3511,7 @@ sv: Det har skapats en fil benämnd "%o".
 
     To change that, edit the file named "%y" and change the line holding: "<tt>%o</tt>" into "<tt>%a</tt>".
 aa: err_acc.htm
-co: Per francà st’interdettu, ci vole à mudificà u schedariu « %y » è rimpiazzà a linea cuntenendu <tt>%o</tt>" da "<tt>%a</tt>".
+co: Per cambià què, ci vole à mudificà u schedariu « gw/%y » è rimpiazzà a linea cuntenendu : <tt>%o</tt>" da "<tt>%a</tt>".
 de: Um dies zu ändern, bearbeite die Datei "gw/%y" und ändere die Zeile, in der "<tt>%o</tt>" steht in "<tt>%a</tt>".
 en: To change that, edit the file named "gw/%y" and change the line holding: "<tt>%o</tt>" into "<tt>%a</tt>".
 es: Para sobrepasar esta prohibición, edite Ud el fichero "gw/%y" y remplace la linea que contiene "<tt>%o</tt>" por "<tt>%a</tt>".
@@ -3518,7 +3540,7 @@ de: Um mit der Datenbank zu arbeiten und Änderungen daran vornehmen zu können,
 en: To consult your database, and possibly modify it, the gwd service must have been launched.
 es: Para consultarla y eventualmente modificarla, es necesario que el servicio gwd haya sido  lanzado.
 fi: Lukieksasi tietokantaa ja muokataksesi sitä, gwd palvelun pitää olla päällä.
-fr: Pour la consulter et éventuellement la modifier, assurez-vous que  gwd soit ouvert.
+fr: Pour la consulter et éventuellement la modifier, assurez-vous que gwd soit ouvert.
 it: Per consultarla ed eventualmente modificarla, bisogna che il service gwd sia attivo.
 lv: Lai darbotos ar Jûsu datubâzi, jâpalaiþ gwd serviss.
 sv: För att konsultera din databas och möjligen modifiera den, måste gwd servicen startas.
@@ -3577,7 +3599,6 @@ es: Para lanzar el servicio
 fr: Pour démarrer le service
 it: Per lanciare il service
 lv: Lai palaistu servisu
-lv: Lai palaistu servisu
 sv: För att starta servicen
 
     To stop the service
@@ -3588,7 +3609,6 @@ en: To stop the service
 es: Pora parar el servicio
 fr: Pour arrêter le service
 it: Per fermare il service
-lv: Lai apstâdinâtu servisu
 lv: Lai apstâdinâtu servisu
 sv: För att stoppa servicen
 
@@ -3602,7 +3622,6 @@ fi: Edelliset komennot
 fr: Traces de la dernière commande
 it: Traccia dell'ultimo comando
 lv: Pçdçjâs komandas izpildes pçdas
-lv: Pçdçjâs komandas izpildes pçdas
 sv: Utskriften från det senaste kommandot
 
     Traces of the latest command
@@ -3615,7 +3634,6 @@ fi: Edelliset komennot
 fr: Traces de la dernière commande
 it: Traccia dell'ultimo comando
 lv: Pçdçjâs komandas izpildes pçdas
-lv: Pçdçjâs komandas izpildes pçdas
 sv: Utskriften från det senaste kommandot
 
     Under Linux, if you installed %G as an rpm package, become root and type
@@ -3627,7 +3645,6 @@ es: A partir de Linux con rpm, escriba en el teclado:
 fr: Sous <b>Linux</b>, si vous avez installé %G par un paquetage rpm, devenez root et tapez
 it: Sotto <b>Linux</b>, se avete installato %G a partire da un pacchetto rpm, digitate, come root
 lv: Linux vidç  - ja Jûs esiet uzstâdîjis %G kâ rpm paketi, ieejiet pamatkatalogâ un ievadiet
-lv: Linux vidç  - ja Jûs esiet uzstâdîjis %G kâ rpm paketi, ieejiet pamatkatalogâ un ievadiet
 sv: Under Linux, om du installerade %G som ett rpm paket, logga in som root och skriv
 
     Under Linux, if you installed %G as an rpm package, the service has been automatically launched. If you stopped it and want to restart it, become root and type
@@ -3636,9 +3653,8 @@ co: Sottu <b>Linux</b>, s’è vò avete installatu %G da un pacchettu rpm, u se
 de: Unter <b>Linux</b> wird der Service automatisch gestartet, sofern du %G als RPM-Paket installiert hast. Wenn du den Dienst gestoppt hast und ihn neu starten möchtest, dann gib als root folgendes Kommando ein
 en: Under Linux, if you installed %G as an rpm package, the service has been automatically launched. If you stopped it and want to restart it, become root and type
 es: A partir de Linux con rpm, escriba en el taclado
-fr: Sous <b>Linux</b>, si vous avez installé %G à partir un paquetage rpm, le service a été automatiquement lancé.  Si vous l’avez arrêté et voulez le relancer, devenez root et tapez
+fr: Sous <b>Linux</b>, si vous avez installé %G à partir un paquetage rpm, le service a été automatiquement lancé. Si vous l’avez arrêté et voulez le relancer, devenez root et tapez
 it: Sotto <b>Linux</b>, se avete installato %G partendo da un pacchetto rpm, il service sarà automaticamente lanciato;.  Se lo avete fermato e volete rilanciarlo, digitate, come root
-lv: Linux vidç -  ja Jûs esiet uzstâdîjuði %G kâ rpm paketi, tad serviss tiks automâtiski iedarbinâts. Ja Jûs to esiet apstâdinâjis un vçlaties to atsâkt, tad ieejiet pamatkatalogâ un ievadiet
 lv: Linux vidç -  ja Jûs esiet uzstâdîjuði %G kâ rpm paketi, tad serviss tiks automâtiski iedarbinâts. Ja Jûs to esiet apstâdinâjis un vçlaties to atsâkt, tad ieejiet pamatkatalogâ un ievadiet
 sv: Under Linux, om du installerade %G som ett rpm paket, har servicen startat automatiskt. Om du har stoppat den och vill återstarta den, logga in som root och skriv
 
@@ -3669,7 +3685,6 @@ es: A partir de Unix, lanzar un xterm y ecribir con el teclado los comandos sigu
 fr: Sous <b>Unix</b>, lancez un xterm et tapez les commandes suivantes
 it: Sotto <b>Unix</b>, lanciate un xterm e digitate i seguenti comandi
 lv: Unix vidç - palaidiet xterm un uzrakstiet sekojoðas komandas
-lv: Unix vidç - palaidiet xterm un uzrakstiet sekojoðas komandas
 sv: Under Unix, starta ett xterm och skriv följande kommandon
 
     Under Windows or Unix, type "control C" in the window where it is running.
@@ -3681,7 +3696,6 @@ es: A partir de Windows o Unix, escriba en el teclado "control C", (manteniendo 
 fr: Sous <b>Windows</b> ou <b>Unix</b>, tapez "control C" dans la fenêtre où il tourne.
 it: Sotto <b>Windows</b> o <b>Unix</b>, digitate "control C" nella finestra dove il service è stato lanciato.
 lv: Windows vai Unix vidç - nospiediet "ctrl C" pie aktîva loga, kurâ tas darbojas.
-lv: Windows vai Unix vidç - nospiediet "ctrl C" pie aktîva loga, kurâ tas darbojas.
 sv: Under Windows eller Unix, tryck "control C" i fönstret där den körs.
 
     Under Windows, launch the program "gwd".
@@ -3692,7 +3706,6 @@ en: Under Windows, launch the program "gwd".
 es: A partir de Windows, cliquear dos veces en el icono de "gwd", y luego regrese Ud. aquí.
 fr: Sous <b>Windows</b>, lancez le programme "gwd".
 it: Sotto <b>Windows</b>, lanciate il programma "gwd".
-lv: Windows vidç - dubultklikðíis uz "gwd" ikoniòas un tad atgriezieties ðeit.
 lv: Windows vidç - dubultklikðíis uz "gwd" ikoniòas un tad atgriezieties ðeit.
 sv: Under Windows, dubbelklicka på "gwd" ikonen, gå sedan tillbaka hit.
 
@@ -3885,7 +3898,7 @@ it: Quando si visualizzano gli antenati, limita il numero delle parentele visual
 
     When creating a person, if the GEDCOM first name part holds several names separated by spaces, you can ask that the first of this names becomes the person "first name" and the complete GEDCOM first name part a "first name alias" (-no_efn default.
 aa: ged2gwb.htm
-co: Durante a creazione d’una persona, s’è a catena <i>nome</i> di u schedariu GEDCOM cuntene pareghji nomi staccati da spazii, si pò vulè chì u <i>primu nome</i> di sta lista sia cunsideratu cum’è u « nome » è chì u <i>nome cumpletu</i> di u GEDCOM vochi in u « cugnome di nome » (valore <span style="font-family: monospace">-no_efn</span> predefinitu).
+co: Durante a creazione d’una persona, s’è a catena <i>nome</i> di u schedariu GEDCOM cuntene parechji nomi staccati da spazii, si pò vulè chì u <i>primu nome</i> di sta lista sia cunsideratu cum’è u « nome » è chì u <i>nome cumpletu</i> di u GEDCOM vochi in u « cugnome di nome » (valore <span style="font-family: monospace">-no_efn</span> predefinitu).
 de: Wenn der GEDCOM-Vorname mehrere, durch Kommata getrennte Namen enthält, soll beim Anlegen einer Person der erste dieser Namen der "Vorname" werden, während der vollständige GEDCOM-Vorname als "Vornamen-Alias" eingetragen wird.
 en: When creating a person, if the GEDCOM first name part holds several names separated by spaces, you can ask that the first of this names becomes the person "first name" and the complete GEDCOM first name part a "first name alias" (-no_efn default.
 es: Al crear una persona, si el campo nombre del fichero GEDCOM esta constituido de varios nombres, puede preguntar que el primero de ellos irá en el campo "nombre" y que el nombre completo se transforma en un "alias de nombre".
@@ -3953,7 +3966,7 @@ en: Years
 fr: Années
 
     yes|no
-co: iè|innò
+co: Sì|Nò
 de: Ja|Nein
 en: Yes|No
 es: Si|No

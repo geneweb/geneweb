@@ -33,7 +33,7 @@ let find_all conf base an =
       | _ -> [], false
     else [], false
   | _ ->
-    let acc = SearchName.search_by_key conf base an in
+    let acc = Option.to_list @@ SearchName.search_by_key conf base an in
     if acc <> [] then acc, false
     else
       ( SearchName.search_key_aux begin fun conf base acc an ->
@@ -109,6 +109,7 @@ let specify conf base n pl =
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
+  (* TODO set possible limit to number of persons displayed (ptll) *)
   Output.print_sstring conf "<ul>\n";
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
@@ -570,8 +571,8 @@ let treat_request =
           w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_inv
         | "KILL_ANC" ->
           w_wizard @@ w_lock @@ w_base @@ MergeIndDisplay.print_kill_ancestors
-        | "L" -> w_base @@ fun conf base -> Perso.interp_templ "list" conf base 
-              (Gwdb.empty_person base Gwdb.dummy_iper) 
+        | "L" -> w_base @@ fun conf base -> Perso.interp_templ "list" conf base
+              (Gwdb.empty_person base Gwdb.dummy_iper)
         | "LB" when conf.wizard || conf.friend ->
           w_base @@ BirthDeathDisplay.print_birth
         | "LD" when conf.wizard || conf.friend ->
@@ -783,6 +784,9 @@ let treat_request =
     in
     let user = transl_nth conf "user/password/cancel" 0 in
     let passwd = transl_nth conf "user/password/cancel" 1 in
+    let referer = String.split_on_char '?' (get_referer conf :> string) in
+    let referer = if List.length referer > 1 then (List.nth referer 1) else "" in
+    let referer = if referer = "" then referer else "&" ^ referer in
     let body =
       if conf.cgi then
         Printf.sprintf {|
@@ -801,18 +805,18 @@ let treat_request =
         Printf.sprintf {|
             <div>
               <ul>
-              <li>%s%s <a href="%s?%sw=f"> %s</a></li>
-              <li>%s%s <a href="%s?%sw=w"> %s</a></li>
+              <li>%s%s <a href="%s?%sw=f%s"> %s</a></li>
+              <li>%s%s <a href="%s?%sw=w%s"> %s</a></li>
               </ul>
             </div> |}
             (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
-            (conf.command :> string) base_name
+            (conf.command :> string) base_name referer
             (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
             (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
-            (conf.command :> string) base_name
+            (conf.command :> string) base_name referer
             (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
     in
-    Output.print_sstring conf 
+    Output.print_sstring conf
       (Printf.sprintf {|
         <form class="form-inline" method="post" action="%s">
           <div class="input-group mt-1">

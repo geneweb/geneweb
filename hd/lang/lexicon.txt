@@ -69,16 +69,6 @@ sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/co=korsikanska/cs=tjec
 tr: af=Afrikaans/bg=Bulgarca/br=Bretonca/ca=Katalanca/co=Korsikaca/cs=Çekçe/da=Danca/de=Almanca/en=İngilizce/eo=Esperanto/es=İspanyolca/et=Estonca/fi=Fince/fr=Fransızca/he=İbranice/is=İzlandaca/it=İtalyanca/lv=Letonca/nl=Hollandaca/no=Norveççe/oc=Oksitanca/pl=Lehçe/pt=Portekizce/pt-br=Brezilya Portekizcesi/ro=Romence/ru=Rusça/sk=Slovakça/sl=Slovence/sv=İsveççe/tr=Türkçe/zh=Çince
 zh: af=南非語/bg=保加利亚语/br=布列塔尼语/ca=加泰罗尼亚语/co=科西嘉岛/cs=捷克语/da=丹麦语/de=德语/en=英语/eo=世界语/es=西班牙语/et=爱沙尼亚语/fi=芬兰语/fr=法语/he=希伯来语/is=冰岛语/it=意大利语/lv=拉脱维亚语/nl=荷蘭語/no=挪威语/oc=奥克语/pl=波兰语/pt=葡萄牙語/pt-br= 巴西葡萄牙语/ro=羅馬尼亞語/ru=俄语/sk=斯洛伐克语/sl=斯洛文尼亚语/sv= 瑞典語/tr=土耳其/zh=中文
 
-    continue
-co: cuntinuà
-en: continue
-fr: continuer
-
-    without implex display
-co: senza affissà l’implessi
-en: without implex display
-fr: sans afficher les implexes
-
     %1 of %2
 af: %1 van %2
 bg: %1 на :a:%2
@@ -110,10 +100,6 @@ sk: %1 :g:%2
 sl: %1 od :g:%2
 sv: %1 till %2
 tr: %1 / %2
-
-    of%s
-en: of %s
-fr: d[e |’]%s
 
     %d %s starting with %s
 co: %d %s principiendu da « %s »
@@ -817,277 +803,6 @@ sl: nedelja/ponedeljek/torek/sreda/četrtek/petek/sobota
 sv: söndag/måndag/tisdag/onsdag/torsdag/fredag/lördag
 tr: Pazar/Pazartesi/Salı/Çarşamba/Perşembe/Cuma/Cumartesi
 
-    alert option
-en: Invalid option <strong id="alert-option"></strong> for module <strong id="alert-module"></strong>. Please enter a valid option number.
-fr: Option invalide <strong id="alert-option"></strong> pour le module <strong id="alert-module"></strong>. Veuillez saisir un numéro d’option valide.
-
-    alert module
-en: Invalid module <strong id="alert-module-2"></strong>. Please enter a valid module initial.
-fr: Module invalide <strong id="alert-module-2"></strong>. Veuillez saisir une initiale de module valide.
-
-    carrousel
-co: carusellu
-en: carrousel
-fr: carrousel
-
-    display carrousel
-co: affissà u carusellu di fiure
-en: display the carrousel of images
-fr: afficher le carrousel d’images
-
-    plugins
-co: moduli d’estensione
-en: plugins
-fr: plugins
-
-    warning refresh
-co: attualizà a pagina solu dopu à un cliccu nant’à l’icona principale osinnò si ripiteria u scambiu di e fiure.
-en: refresh the page only after having clicked on the main icon as this would repeat the swap action.
-fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l’icone car cela répéterait l’échange des images.
-
-    select input
-co: sceglie un schedariu
-de: wählen
-en: choose file
-fr: sélect. fichier
-
-    select module
-en: Select each module by clicking on the corresponding button (max 15).
-fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
-
-    ou
-co: o
-en: or
-fr: ou
-
-    url
-co: indirizzu web
-en: url
-fr: url
-
-    browse
-co: navigà
-de: durchsuchen
-en: browse
-fr: parcourir
-
-    portrait
-co: ritrattu
-de: Porträt
-en: portrait
-fr: portrait
-
-    to carrousel
-en: to carrousel
-fr: au carrousel
-
-    from carrousel
-en: from carrousel
-fr: du carrousel
-
-    add portrait
-co: aghjunghje un ritrattu
-en: add a portrait
-fr: ajouter un portrait
-
-    add image
-co: aghjunghje una fiura
-en: add an image
-fr: ajouter une image
-
-    add note
-co: aghjunghje una nota
-en: add a note
-fr: ajouter une note
-
-    add source
-co: aghjunghje una fonte
-en: add a source
-fr: ajouter une source
-
-    modify portrait
-co: mudificà u ritrattu
-en: modify the portrait
-fr: modifier le portrait
-
-    modify note
-co: mudificà a nota
-en: modify the note
-fr: modifier la note
-
-    modify source
-co: mudificà a fonte
-en: modify the source
-fr: modifier la source
-
-    see portrait
-co: vede u ritrattu
-en: see portrait
-fr: voir le portrait
-
-    see portrait saved
-co: vede u ritrattu arregistratu
-en: see saved portrait
-fr: voir le portrait sauvegardé
-
-    delete portrait
-co: squassà u ritrattu
-en: delete portrait
-fr: supprimer le portrait
-
-    delete portrait saved
-co: squassà u ritrattu arregistratu
-en: delete saved portrait
-fr: supprimer le portrait sauvegardé
-
-    delete image
-co: squassà a fiura
-en: delete image
-fr: supprimer une image
-
-    delete image saved
-co: squassà a fiura arregistrata
-en: delete saved image
-fr: supprimer une image sauvegardée
-
-    random individual
-en: display a random individual
-fr: afficher un individu au hasard
-
-    restore image saved
-co: risturà una fiura arregistrata
-en: restore saved image
-fr: restaurer une image sauvegardée
-
-    restore portrait
-co: risturà u ritrattu
-en: restore portrait
-fr: restaurer le portrait
-
-    restore portrait saved
-co: risturà u ritrattu arregistratu
-en: restore saved portrait
-fr: restaurer le portrait sauvegardé
-
-    saved images
-co: fiura arregistrata/fiure arregistrate
-en: saved image/saved images
-fr: image sauvegardée/images sauvegardées
-
-    with note
-co: cù una nota
-en: with a note
-fr: avec une note
-
-    send image with note and source
-co: mandà a fiura selezziunata cù nota è fonte
-en: send selected image with note and source
-fr: envoyer l’image selectionée avec note et source
-
-    uploaded
-co: incaricatu/incaricata
-en: uploaded
-fr: envoyé/envoyée
-
-    save
-co: arregistrà
-en: save
-fr: sauvegarder
-
-    saved
-co: arregistratu/arregistrata
-en: saved
-fr: sauvegardé/sauvegardée
-
-    deleted
-co: squassatu/squassata
-en: deleted
-fr: supprimé/supprimée
-
-    restore
-co: risturà
-en: restore
-fr: restaurer
-
-    restored
-co: risturatu/risturata
-en: restored
-fr: restauré/restaurée
-
-    save portrait
-co: u ritrattu esistente serà arregistratu in
-en: the existing portrait will be saved to
-fr: le portrait existant sera sauvegardé dans
-
-    previous portrait
-co: un arregistramentu precedente di u ritrattu, s’ellu esiste, serà squassatu.
-en: a possible previous version of the saved portrait will be deleted.
-fr: une sauvegarde pré-existante du portrait sera supprimée.
-
-    store image
-co: a fiura selezziunata serà piazzata in
-en: the selected image will be copied to
-fr: l’image sélectionnée sera enregistrée dans
-
-    add image
-co: aghjunghje una fiura
-en: add an image
-fr: ajouter une image
-
-    save image
-co: una fiura cù un nome simile serà dispiazzata in
-en: an image with a similar name will moved to
-fr: si une image du même nom existe déjà, elle sera sauvegardée dans
-
-    previous image
-co: s’è una fiura cù u listessu nome esiste dighjà in u cartulare di salvaguardia, sta fiura serà squassata.
-en: if an image with the same name already exists in the saved, it will be deleted.
-fr: si une image du même nom existe déjà dans le sous-répertoire de sauvegarde, elle sera supprimée.
-
-    interval
-en: time interval
-fr: intervalle de temps
-
-    image note
-co: aghjunghje una nota per a fiura.
-en: add a note for the image.
-fr: ajouter une note pour l’image.
-
-    image source
-co: aghjunghje una fonte per a fiura.
-en: add a source for the image.
-fr: ajouter une source pour l’image.
-
-    update image note
-co: mudificà a nota di a fiura
-en: update image note
-fr: mettre à jour la note de l’image
-
-    update image source
-co: mudificà a fonte di a fiura
-en: update image source
-fr: mettre à jour la source de l’image
-
-    previous
-co: precedente
-en: previous
-fr: précédent
-
-    next
-co: seguente
-en: next
-fr: suivant
-
-    plugins
-co: moduli d’estensione
-en: plugins
-fr: plugins
-
-    restricted access
-co: L’accessu hè riservatu à l’amichi è à i maghi di a basa di dati !
-en: Access restricted to friends and wizards of the database!
-fr: Accès réservé aux amis et magiciens de la base de donnée !
-
     2nd cousins
 af: kleinneef/kleinniggie
 bg: втори братовчеди
@@ -1216,16 +931,6 @@ sk: <em>"Sosa" číslo</em> vo vzťahu k %t
 sl: <em>številka"Sosa"</em>, v odnosu z %t
 sv: <em>annummer</em> med %t som proband (Kekules system)
 tr: <em>Sosa sayısı</em> %t'e göre
-
-    the database name %s contains a forbidden character.
-co: u nome di a basa di dati « %s » cuntene un caratteru difesu.
-en: the database name "%s" contains a forbidden character.
-fr: le nom de la base "%s" contient un caractère interdit.
-
-    allowed characters
-co: caratteri permessi
-en: allowed characters
-fr: caractères autorisés
 
     a %s cousin
 af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
@@ -1397,7 +1102,7 @@ sv: en bror/en syster/ett syskon
 tr: bir erkek kardeş/bir kız kardeş/bir kardeş
 
     a child-in-law/children-in-law
-co: un zitellu appiccicaticciu/zitelli appiccicaticcii
+co: un ghjeneru o una nora/ghjeneri o nore
 de: ein Schwiegerkind/Schwiegerkinder
 en: one child-in-law/children-in-law
 fr: un bel-enfant/beaux-enfants
@@ -1410,7 +1115,7 @@ af: 'n neef/'n niggie
 bg: първи братовчед/първа братовчедка
 br: ur c'henderv/ur geniterv
 ca: un cosí/una cosina
-co: un cuginu/una cugina
+co: un %scuginu/una %scugina/un %scuginu o una %scugina
 cs: bratranec/sestřenice
 da: en fætter/en kusine
 de: ein:d:+em Cousin/eine:d:+r Cousine
@@ -1436,91 +1141,6 @@ sk: bratranec/sesternica
 sl: bratranec/sestrična
 sv: en kusin
 tr: bir kuzeni
-
-    cousin.2.2
-->: a cousin
-
-    cousins.2.2
-co: cugini
-en: cousins 1rd
-fr: cousins
-
-    cousins.2.2 tt
-fr: cousins au 1<sup>er</sup> degré<hr>(germains ou non)
-
-    cousin.2.3
-fr: un %spetit-cousin/une %spetite-cousine
-
-    cousins.2.3
-en: 1st cousins once removed
-fr: petit-cousin/petits-cousins
-
-    cousins.2.3 tt
-fr: petits-cousins au 1<sup>er</sup> degré<br>neveux et nièces à la mode de Bourgogne ou Bretagne<br>neveux et nièces issus de germains<hr>← cousins issus de germains des enfants
-
-    cousin.2.4
-fr: un %sarrière-petit-cousin/une %sarrière-petite-cousine
-
-    cousins.2.4
-fr: arrière-petit-cousin/arrière-petits-cousins
-
-    cousins.2.4 tt
-fr: arrière-petits-cousins au 1<sup>er</sup> degré<hr>fils d’un petit-cousin ou d’une petite cousine
-
-    cousin.2.5
-fr: un %sarrière-arrière-petit-cousin/une %sarrière-arrière-petite-cousine
-
-    cousins.2.5
-fr: arrière-arrière-petit-cousin/arrière-arrière-petits-cousins
-
-    cousins.2.5 tt
-fr: deux-fois-arrière-petits-cousins au 1<sup>er</sup> degré
-
-    cousin.2.6
-fr: un %strois-fois-arrière-petit-cousin/une %strois-fois-arrière-petite-cousine
-
-    cousins.2.6
-fr: trois-fois-arrière-petit-cousin/trois-fois-arrière-petits-cousins
-
-    cousins.2.6 tt
-fr: trois-fois-arrière-petits-cousins au 1<sup>er</sup> degré
-
-    cousin.2.7
-fr: un %squatre-fois-arrière-petit-cousin/une %squatre-fois-arrière-petite-cousine
-
-    cousins.2.7
-fr: quatre-fois-arrière-petit-cousin/quatre-fois-arrière-petits-cousins
-
-    cousins.2.7 tt
-fr: quatre-fois-arrière-petits-cousins au 1<sup>er</sup> degré
-
-    cousin.2.8
-fr: un %scinq-fois-arrière-petit-cousin/une %scinq-fois-arrière-petite-cousine
-
-    cousins.2.8
-fr: cinq-fois-arrière-petit-cousin/cinq-fois-arrière-petits-cousins
-
-    cousins.2.8 tt
-fr: cinq-fois-arrière-petits-cousins au 1<sup>er</sup> degré
-
-    cousin.2.9
-fr: un %ssix-fois-arrière-petit-cousin/une %ssix-fois-arrière-petite-cousine
-
-    cousins.2.9
-fr: six-fois-arrière-petit-cousin/six-fois-arrière-petits-cousins
-
-    cousins.2.9 tt
-fr: six-fois-arrière-petits-cousins au 1<sup>er</sup> degré
-
-    cousin.2.10
-fr: un %ssept-fois-arrière-petit-cousin/une %ssept-fois-arrière-petite-cousine
-
-    cousins.2.10
-fr: sept-fois-arrière-petit-cousin/sept-fois-arrière-petits-cousins
-
-    cousins.2.7 tt
-fr: sept-fois-arrière-petits-cousins au 1<sup>er</sup> degré
-
 
     a descendant
 af: 'n afstammeling
@@ -1687,7 +1307,7 @@ af: 'n agterneef/'n agterniggie
 bg: внук на брат или сестра/внучка на брат или сестра
 br: un niz bihan/ur verc'h vihan
 ca: un besnebot/una besneboda
-co: un arcinipote/un arcinipote/arcinipoti/arcinipoti/arcinipoti
+co: un %sniputinu/una %sniputina/niputini/niputine/niputini è niputine
 cs: prasynovec/praneteř
 da: en grandnevø/en grandniece
 de: ein:d:+em Großneffe:d:+n/eine:d:+r Großnichte/Großneffen/Großnichten/Großneffen und Großnichten
@@ -1714,84 +1334,12 @@ sl: pranečak/pranečakinja
 sv: en gammel-nevö/en gammel-niece
 tr: bir büyük yeğen/bir büyük yeğen/büyük yeğen/büyük yeğen/büyük yeğenler ve büyük yeğenler
 
-    cousin.1.3
-->: a great-nephew/a great-niece
-
-    cousins.1.3
-co: niputinu/niputini/niputina/niputine
-en: great-nephew/great-nephews/great-niece/great-nieces
-fr: petit-neveu/petits-neveux/petite-nièce/petites-nièces
-
-    cousins.1.3 tt
-co: niputini è niputine
-en: great-nephews and great-nieces
-fr: arrière-neveux et arrière-nièces (soutenu)<br>enfant d’un neveu ou d’une nièce
-
-    cousin.1.4
-en: a %sgreat-grandnephew/a %sgreat-grandniece/a %sgreat-grandnephew
-fr: un %sarrière-petit-neveu/une %sarrière-petite-nièce/un %sarrière-petit-neveu
-
-    cousins.1.4
-en: great-grandnephew/great-grandnephews
-fr: arrière-petit-neveu/arrière-petits-neveux
-
-    cousins.1.4 tt
-fr: enfant d’un petit-neveu ou d’une petit-nièce
-
-    cousin.1.5
-en: a %sgreat-great-grandnephew/a %sgreat-great-grandniece/a %sgreat-great-grandnephew
-fr: un %sarrière-arrière-petit-neveu/une %sarrière-arrière-petite-nièce/un %sarrière-arrière-petit-neveu
-
-    cousins.1.5
-en: great-great-grandnephew/great-great-grandnephews
-fr: arrière-arrière-petit-neveu/arrière-arrière-petits-neveux
-
-    cousin.1.6
-en: a %sthree-times-great-grandnephew/a %sthree-times-great-grandniece/a %sthree-times-great-grandnephew
-fr: un %strois-fois-arrière-petit-neveu/une %strois-fois-arrière-petite-nièce/un %strois-fois-arrière-petit-neveu
-
-    cousins.1.6
-en: three-times-great-grandnephew/three-times-great-grandnephews
-fr: trois-fois-arrière-petit-neveu/trois-fois-arrière-petits-neveux
-
-    cousin.1.7
-en: a %sfour-times-great-grandnephew/a %sfour-times-great-grandniece/a %sfour-times-great-grandnephew
-fr: un %squatre-fois-arrière-petit-neveu/une %squatre-fois-arrière-petite-nièce/un %squatre-fois-arrière-petit-neveu
-
-    cousins.1.7
-en: four-times-great-grandnephew/four-times-great-grandnephews
-fr: quatre-fois-arrière-petit-neveu/quatre-fois-arrière-petits-neveux
-
-    cousin.1.8
-en: a %sfive-times-great-grandnephew/a %sfive-times-great-grandniece/a %sfive-times-great-grandnephew
-fr: un %scinq-fois-arrière-petit-neveu/une %scinq-fois-arrière-petite-nièce/un %scinq-fois-arrière-petit-neveu
-
-    cousins.1.8
-en: five-times-great-grandnephew/five-times-great-grandnephews
-fr: cinq-fois-arrière-petit-neveu/cinq-fois-arrière-petits-neveux
-
-    cousin.1.9
-en: a %ssix-times-great-grandnephew/a %ssix-times-great-grandniece/a %ssix-times-great-grandnephew
-fr: un %ssix-fois-arrière-petit-neveu/une %ssix-fois-arrière-petite-nièce/un %ssix-fois-arrière-petit-neveu
-
-    cousins.1.9
-en: six-times-great-grandnephew/six-times-great-grandnephews
-fr: six-fois-arrière-petit-neveu/six-fois-arrière-petits-neveux
-
-    cousin.1.10
-en: a %sseven-times-great-grandnephew/a %sseven-times-great-grandniece/a %sseven-times-great-grandnephew
-fr: un %ssept-fois-arrière-petit-neveu/une %ssept-fois-arrière-petite-nièce/un %ssept-fois-arrière-petit-neveu
-
-    cousins.1.10
-en: seven-times-great-grandnephew/seven-times-great-grandnephews
-fr: sept-fois-arrière-petit-neveu/sept-fois-arrière-petits-neveux
-
     a great-uncle/a great-aunt
 af: 'n grootoom/'n groottante
 bg: чичо на родител/леля на родител/вуйчо на родител/леля на родител
 br: un eontr-kuñv /ur voereb guñv
 ca: un oncle avi/una tia àvia
-co: un arciziu/una arcizia
+co: un %sarciziu/una %sarcizia
 cs: prastrýc/prateta
 da: en grandonkel/en grandtante
 de: ein:d:+em Großonkel/eine:d:+r Großtante
@@ -1899,17 +1447,6 @@ sk: synovec/neter/synovci/netere/synovci a netere
 sl: nečak/nečakinja/nečaki/nečakinje/nečak in nečakinja
 sv: en nevö/en niece/nevöer/niecer/nevöer och niecer
 tr: bir yeğen/bir yeğen/yeğenler/yeğenler/yeğenler ve yeğenler
-
-    cousin.1.2
-->: a nephew/a niece
-
-    cousins.1.2
-co: nipoti è nipote
-en: nephew and nieces
-fr: neveux et nièces
-
-    cousins.1.2 tt
-fr: enfants des frères et sœurs<br>« petits-frères et petites-sœurs »<hr>← cousins germains des enfants
 
     a sibling-in-law/siblings-in-law
 co: un cugnatu o una cugnata/cugnati è cugnate
@@ -2202,6 +1739,24 @@ sl: dodaj zapiski
 sv: lägg till noteringar
 tr: not ekle
 
+    add filter
+co: aghjunghje un filtru
+de: Filter hinzufügen
+en: add a filter
+fr: ajouter un filtre
+
+    add image
+co: aghjunghje una fiura
+de: Bild hinzufügen
+en: add an image
+fr: ajouter une image
+
+    add note
+co: aghjunghje una nota
+de: Notiz hinzufügen
+en: add a note
+fr: ajouter une note
+
     add picture
 af: byvoeg prent
 bg: добавяне на изображение
@@ -2231,6 +1786,18 @@ ru: добавить :a: картинку
 sl: dodaj slika
 sv: lägg till bild
 tr: resim ekle
+
+    add portrait
+co: aghjunghje un ritrattu
+de: Porträt hinzufügen
+en: add a portrait
+fr: ajouter un portrait
+
+    add source
+co: aghjunghje una fonte
+de: Quelle hinzufügen
+en: add a source
+fr: ajouter une source
 
     add the previous name as a first name alias
 co: aghjunghje u nome precedente cum’è cugnome di nome
@@ -2543,6 +2110,18 @@ sv: livslängd:
 tr: ölüm yaşı
 zh: 享年
 
+    alert module
+co: Modulu inaccettevule <strong id="alert-module-2"></strong>. Ci vole à stampittà un’iniziale du modulu accettevule.
+de: Modul ungültig <strong id="alert-module-2"></strong>. Bitte geben Sie einen gültigen Modulanfang an.
+en: Invalid module <strong id="alert-module-2"></strong>. Please enter a valid module initial.
+fr: Module invalide <strong id="alert-module-2"></strong>. Veuillez saisir une initiale de module valide.
+
+    alert option
+co: Ozzione inaccettevule <strong id="alert-option"></strong> per u modulu <strong id="alert-module"></strong>. Ci vole à stampittà un numeru d’ozzione accettevule.
+de: Ungültige Option <strong id="alert-option"></strong> für Modul <strong id="alert-module"></strong>. Bitte eine gültige Optionsnummer eingeben.
+en: Invalid option <strong id="alert-option"></strong> for module <strong id="alert-module"></strong>. Please enter a valid option number.
+fr: Option invalide <strong id="alert-option"></strong> pour le module <strong id="alert-module"></strong>. Veuillez saisir un numéro d’option valide.
+
     alias
 af: alias
 bg: именува се още
@@ -2608,6 +2187,12 @@ sl: živi
 sv: lever
 tr: canlı
 
+    all
+co: tutti
+de: alle
+en: all
+fr: tous
+
     all the estates
 af: alle plase
 bg: всички местоуказания
@@ -2640,6 +2225,12 @@ sl: vsa posestva
 sv: alla orter
 tr: tüm alanlar
 
+    all the places
+co: tutti i lochi
+de: alle Orte
+en: all the places
+fr: tous les lieux
+
     all the titles
 af: al die titels
 bg: всички титли
@@ -2671,6 +2262,12 @@ sk: všetky tituly
 sl: vsi nazivi
 sv: alla titlar
 tr: tüm başlıklar
+
+    allowed characters
+co: caratteri permessi
+de: erlaubte Zeichen
+en: allowed characters
+fr: caractères autorisés
 
     alphabetic order
 af: alfabetiese volgorde
@@ -2800,12 +2397,6 @@ sl: stric/teta
 sv: en farbror/en faster/en morbror/en moster
 tr: bir amca/bir teyze/amcalar/teyzeler/amcalar ve teyzeler
 
-    ascending/descending (degree)
-co: gradu d’ascendenza/gradu di discendenza/gradi d’ascendenza/gradi di discendenza
-de: aufsteigender Grad/absteigender Grad/aufsteigender Grade/absteigender Grade
-en: ascending degree/descending degree/ascending degrees/descending degrees
-fr: degré ascendant/degré descendant/degrés ascendants/degrés descendants
-
     ancestor/ancestors
 af: /voorouers
 bg: /предци
@@ -2814,7 +2405,7 @@ ca: ascendent/ascendents
 co: antenatu/antenati
 cs: /předkové
 da: /forfædre
-de: Vorfahre/orfahren
+de: Vorfahre/Vorfahren
 en: ancestor/ancestors
 eo: /prapatro
 es: /ascendientes
@@ -2872,12 +2463,10 @@ sv: anor
 tr: atalar
 
     ancestors tree of
+co: %s-arburu di l’antenati d[i |’]%s
+de: %s-Baum der Vorfahren von %s
 en: %s-tree of the ancestors of %s
 fr: %s-arbre des ancêtres d[e |’]%s
-
-    path between
-en: path between
-fr: chemin entre
 
     and
 af: en
@@ -3074,6 +2663,18 @@ ru: любой человек в генеалогическом дереве
 sv: en person i ditt träd
 tr: tabandaki herhangi bir kişi
 
+    any place
+co: sottulochi
+de: Teilort
+en: sub-places
+fr: sous-lieux
+
+    any place title
+co: circà in a lista di i sottulochi
+de: suche in der Liste der Teilorte
+en: search in the list of sub-places
+fr: rechercher dans la liste des sous-lieux
+
     are
 af: is
 bg: са
@@ -3137,6 +2738,24 @@ pt: árvore de ascendência
 ru: фамильное дерево
 sv: antavla
 tr: soyağacı
+
+    ascending/descending (degree)
+co: gradu d’ascendenza/gradu di discendenza/gradi d’ascendenza/gradi di discendenza
+de: aufsteigender Grad/absteigender Grad/aufsteigender Grade/absteigender Grade
+en: ascending degree/descending degree/ascending degrees/descending degrees
+fr: degré ascendant/degré descendant/degrés ascendants/degrés descendants
+
+    at new location
+co: à u locu novu
+de: am neuen Ort
+en: at new location
+fr: au nouvel emplacement
+
+    at old location
+co: à u locu anzianu
+de: am alten Ort
+en: at old location
+fr: à l'ancien emplacement
 
     at the same time
 af: ter selfdertyd
@@ -3240,9 +2859,10 @@ sv: tillbaka
 tr: geri
 
     back to index/books
+co: rivene à l’indice alfabeticu/rivene à a lista di i dizziunarii
+de: zurück zum alphabetischen Index/zurück zur Liste der Wörterbücher
 en: back to alphabetic index/back to the list of books
 fr: retourner à l’index alphabétique/retourner à la liste des dictionnaires
-
 
     baptism
 af: doop
@@ -3803,8 +3423,8 @@ co: libri
 de: Wörterbücher
 en: books
 fr: dictionnaires
-oc: diccionaris
 lt: žodynas
+oc: diccionaris
 pt: dicionários
 sv: förteckningar
 tr: kitaplar
@@ -3924,6 +3544,12 @@ fr: frères/sœurs/frères et sœurs
 pt: irmãos/irmãs/irmãos e irmãs
 sv: bröder/systrar/syskon
 tr: erkek kardeşler/kız kardeşler/kardeşler
+
+    browse
+co: navigà
+de: durchsuchen
+en: browse
+fr: parcourir
 
     burial
 af: begrawe
@@ -4253,6 +3879,24 @@ sl: ne da se spremeniti spol poročene osebe
 sv: kan inte ändra kön på en gift person
 tr: evli bir kişinin cinsiyetini değiştiremezsin
 
+    carrousel
+co: carusellu
+de: Karussell
+en: carrousel
+fr: carrousel
+
+    case sensitive
+co: maiuscule è alette
+de: Groß-/Kleinschreibung
+en: case sensitive
+fr: capitales et accents
+
+    case sensitive title
+co: tene contu di e maiuscule è alette
+de: Beim Titel muss auf Groß- und Kleinschreibung geachtet werden
+en: dont ignore case and accents
+fr: tenir compte des majuscules et accents
+
     celebrities
 bg: знаменити хора
 ca: celebritats
@@ -4459,58 +4103,6 @@ sv: barn/barn
 tr: çocuk/çocuklar
 zh: 子女
 
-    son/daughter/child
-af: seun/dogter/kind
-bg: син/дъщеря/деца
-br: mab/merc'h/bugel
-ca: fill/filla/fill(a)
-co: figliolu/figliola/zittellu(a)
-cs: je synem/je dcerou/je dítětem
-da: søn/datter/barn
-de: Sohn/Tochter/Kind
-en: son/daughter/child
-eo: filo/filino/ido
-es: hijo/hija/hijo(a)
-et: poeg/tütar/laps
-fi: poika/tytär/lapsi
-fr: fils/fille/enfant
-he:  בן/ בת
-is: sonur/dóttir/barn
-it: figlio/figlia/figlio(a)
-lt: sūnus/duktė/vaikai
-lv: dēls/meita/bērns
-nl: zoon/dochter/kind
-no: sønn/datter/barn
-oc: filh/filha/enfant
-pl: syn/córka/dziecko
-pt: filho/filha/filho(a)
-ro: fiu/fica/copil
-ru: сын/дочь/дети
-sk: syn/dcéra/dieťa
-sl: sin/hčerka/otrok
-sv: son/dotter/barn
-tr: oğul/kız/çocuk
-
-    sons/daughters/children
-co: figlioli/figliole/zitelli
-de: Söhne/Töchter/Kinder
-en: sons/daughters/children
-fr: fils/filles/enfants
-pt: filhos/filhas/filhos
-sv: söner/döttrar/barn
-tr: oğulları/kızları/çocukları
-
-    cousin.0.1
-->: son/daughter/child
-
-    cousins.0.1
-->: child/children
-
-    cousins.0.1 tt
-co: figlioli è figliole
-en: sons and daughters
-fr: fils et filles, enfants
-
     children's names changed
 af: kinders se name is verander
 bg: името на детето е променено
@@ -4552,6 +4144,12 @@ pt: seleccionar uma genealogia
 sv: välj en släktdatabas
 tr: bir şecere seçin
 
+    choose an ancestor
+co: sceglie un antenatu
+de: einen Vorfahren auswählen
+en: choose an ancestor
+fr: choisir un ancêtre
+
     circumcision
 co: circuncisione
 de: Beschneidung
@@ -4590,6 +4188,12 @@ nl: burgerlijk celebrant/ambtenaar
 no: sivilregistrator/sivile registerførere
 pt: escrivão civil/escrivão civil
 sv: civila register/civila register
+
+    clear filters
+co: squassà tutti i filtri
+de: alle Filter löschen
+en: clear every filters
+fr: effacer tous les filtres
 
     click
 af: druk
@@ -4655,6 +4259,12 @@ sl: kliknite na "%s"
 sv: klicka "%s"
 tr: "%s" i tıklayın
 
+    close
+co: chjode
+de: schließen
+en: close
+fr: fermer
+
     close family
 co: un parente
 de: naher Angehöriger
@@ -4669,6 +4279,12 @@ oc: un tanhent
 pt: familiar próximo
 sv: en släkting
 tr: bir ebeveyn
+
+    coefficient of relationship
+co: U <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">cuefficiente di e rilazioni</a> indicheghja u percentuale medianu minimu di geni spartiti trà dui individui.
+de: Der <a href="https://de.wikipedia.org/wiki/Verwandtschaftskoeffizient">Verwandtschaftskoeffizient</a> berechnet den minimalen Prozentsatz der Übereinstimmung der DNA zwischen zwei Personen.
+en: The <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient of relationship</a> gives the minimum average percentage of shared DNA between two individuals.
+fr: Le <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient de parenté</a> indique le pourcentage moyen minimum de gènes partagés entre deux individus.
 
     collapse implex
 co: ripiegà l’implessi
@@ -4712,6 +4328,11 @@ sl: barva
 sv: färg
 tr: renk
 
+    colored corner
+co: un scornu culuritu indicheghja l’esistenza di nota (turchinu), di fonte (giallu) o di i dui (verde) per un evenimentu. Tandu si pò affissà i dati in un finestrinu via un cliccu nant’à u sfondulu di e cellule.
+en: a colored corner shows the existence of notes (blue), sources (yellow) or both (green) for an event. The data are then displayable in a pop-up by clicking on the background of cells.
+fr: un coin coloré indique l’existence de notes (bleu), sources (jaune) ou des deux (vert) pour un événement. Ces données sont ensuite affichables dans une fenêtre surgissante en cliquant sur le fond des cases.
+
     comment
 af: kommentaar
 bg: коментар
@@ -4743,6 +4364,11 @@ sk: komentár
 sl: komentar
 sv: kommentar
 tr: yorum
+
+    compact descendants tree
+co: arburu cumpattu di discendenza
+en: compact descendants tree
+fr: arbre de descendance compact
 
     compact tree
 co: arburu cumpattu
@@ -4857,7 +4483,7 @@ tr: onay (LDS)
 
     connection/connections
 bg: потребителски връзки
-co: cunnessioni
+co: cunnessione/cunnessioni
 cs: spojenia
 da: forbindelser
 de: Verbindungen
@@ -4914,6 +4540,11 @@ sk: pokrvenstvo
 sl: krvno sorodstvo
 sv: blodsband
 tr: akrabalık
+
+    continue
+co: cuntinuà
+en: continue
+fr: continuer
 
     continue correcting
 af: gaan voort met die samevoeging
@@ -5015,6 +4646,7 @@ tr: bağlantıyı panoya kopyala
 
     copy permalink
 co: cupià u permaliame
+de: Permalink kopieren
 en: copy the permalink
 fr: copier le permalien
 
@@ -5058,6 +4690,240 @@ fr: couples
 pt: casais
 sv: par
 tr: çiftler
+
+    cousin.0.1
+->: son/daughter/child
+de: Sohn/Tochter/Kind
+
+    cousin.0.10
+en: a eight-times-great-grandson/a eight-times-great-granddaughter/a eight-times-great-grandchild
+fr: un huit-fois-arrière-petit-fils/une huit-fois-arrière-petite-fille/un huit-fois-arrière-petit-enfant
+
+    cousin.0.2
+->: a grandson/a granddaughter/a grandchild
+de: ein Enkel/eine Enkelin/Enkel
+
+    cousin.0.3
+->: a great-grandson/a great-granddaughter/a great-grandchild
+de: ein Urenkel/eine Urenkelin/Urenkel
+
+    cousin.0.4
+de: ein Ur-Ur-Enkel/eine Ur-Ur-Enkelin/Ur-Ur-Enkel
+en: a great-great-grandson/a great-great-granddaughter/a great-great-grandchild
+fr: un arrière-arrière-petit-fils/une arrière-arrière-petite-fille/un arrière-arrière-petit-enfant
+
+    cousin.0.5
+de: ein Ur-Ur-Ur-Enkel/eine Ur-Ur-Ur-Enkelin/Ur-Ur-Ur-Enkel
+en: a three-times-great-grandson/a three-times-great-granddaughter/a three-times-great-grandchild
+fr: un trois-fois-arrière-petit-fils/une trois-fois-arrière-petite-fille/un trois-fois-arrière-petit-enfant
+
+    cousin.0.6
+de: ein vierfacher Ur-Enkel/eine vierfache Ur-Enkelin/vierfacher Ur-Enkel
+en: a four-times-great-grandson/a four-times-great-granddaughter/a four-times-great-grandchild
+fr: un quatre-fois-arrière-petit-fils/une quatre-fois-arrière-petite-fille/un quatre-fois-arrière-petit-enfant
+
+    cousin.0.7
+de: ein fünffacher Ur-Enkel/eine fünffache Ur-Enkelin/fünffacher Ur-Enkel
+en: a five-times-great-grandson/a five-times-great-granddaughter/a five-times-great-grandchild
+fr: un cinq-fois-arrière-petit-fils/une cinq-fois-arrière-petite-fille/un cinq-fois-arrière-petit-enfant
+
+    cousin.0.8
+de: ein sechsfacher Ur-Enkel/eine sechsfache Ur-Enkelin/sechsfacher Ur-Enkel
+en: a six-times-great-grandson/a six-times-great-granddaughter/a six-times-great-grandchild
+fr: un six-fois-arrière-petit-fils/une six-fois-arrière-petite-fille/un six-fois-arrière-petit-enfant
+
+    cousin.0.9
+de: ein siebenfacher Ur-Enkel/eine siebenfache Ur-Enkelin/siebenfacher Ur-Enkel
+en: a seven-times-great-grandson/a seven-times-great-granddaughter/a seven-times-great-grandchild
+fr: un sept-fois-arrière-petit-fils/une sept-fois-arrière-petite-fille/un sept-fois-arrière-petit-enfant
+
+    cousin.1.0
+->: the father/the mother/a parent
+de: der Vater/die Mutter/ein Elternteil
+
+    cousin.1.1
+->: a brother/a sister/a sibling
+de: ein Bruder/eine Schwester/ein Geschwisterteil
+
+    cousin.1.10
+de: ein siebenfacher Ur-Großneffe/eine siebenfache Ur-Großnichte/siebenfacher Ur-Großneffe
+en: a %sseven-times-great-grandnephew/a %sseven-times-great-grandniece/a %sseven-times-great-grandnephew
+fr: un %ssept-fois-arrière-petit-neveu/une %ssept-fois-arrière-petite-nièce/un %ssept-fois-arrière-petit-neveu
+
+    cousin.1.2
+->: a nephew/a niece
+de: ein Neffe/eine Nichte
+
+    cousin.1.3
+->: a great-nephew/a great-niece
+de: ein Großneffe/eine Großnichte
+
+    cousin.1.4
+co: un %sarciniputinu/una %sarciniputina/%sarciniputini/
+de: ein Ur-Großneffe/eine Ur-Großnichte/Ur-Großneffe
+en: a %sgreat-grandnephew/a %sgreat-grandniece/a %sgreat-grandnephew
+fr: un %sarrière-petit-neveu/une %sarrière-petite-nièce/un %sarrière-petit-neveu
+
+    cousin.1.5
+de: ein Ur-Ur-Großneffe/eine Ur-Ur-Großnichte/Ur-Ur-Großneffe
+en: a %sgreat-great-grandnephew/a %sgreat-great-grandniece/a %sgreat-great-grandnephew
+fr: un %sarrière-arrière-petit-neveu/une %sarrière-arrière-petite-nièce/un %sarrière-arrière-petit-neveu
+
+    cousin.1.6
+de: ein Ur-Ur-Ur-Großneffe/eine Ur-Ur-Ur-Großnichte/Ur-Ur-Ur-Großneffe
+en: a %sthree-times-great-grandnephew/a %sthree-times-great-grandniece/a %sthree-times-great-grandnephew
+fr: un %strois-fois-arrière-petit-neveu/une %strois-fois-arrière-petite-nièce/un %strois-fois-arrière-petit-neveu
+
+    cousin.1.7
+en: a %sfour-times-great-grandnephew/a %sfour-times-great-grandniece/a %sfour-times-great-grandnephew
+fr: un %squatre-fois-arrière-petit-neveu/une %squatre-fois-arrière-petite-nièce/un %squatre-fois-arrière-petit-neveu
+
+    cousin.1.8
+en: a %sfive-times-great-grandnephew/a %sfive-times-great-grandniece/a %sfive-times-great-grandnephew
+fr: un %scinq-fois-arrière-petit-neveu/une %scinq-fois-arrière-petite-nièce/un %scinq-fois-arrière-petit-neveu
+
+    cousin.1.9
+en: a %ssix-times-great-grandnephew/a %ssix-times-great-grandniece/a %ssix-times-great-grandnephew
+fr: un %ssix-fois-arrière-petit-neveu/une %ssix-fois-arrière-petite-nièce/un %ssix-fois-arrière-petit-neveu
+
+    cousin.10.0
+en: a 8th-great-grandfather/a 8th-great-grandmother
+fr: un 8×-arrière-grand-père/une 8×-arrière-grand-mère
+
+    cousin.10.1
+en: a %sseventh great-granduncle/a %sseventh great-grandaunt
+fr: un %ssept-fois-arrière-grand-oncle/une %ssept-fois-arrière-grande-tante
+
+    cousin.2.0
+->: a grandfather/a grandmother/a grandparent
+
+    cousin.2.1
+->: an uncle/an aunt
+
+    cousin.2.10
+fr: un %ssept-fois-arrière-petit-cousin/une %ssept-fois-arrière-petite-cousine
+
+    cousin.2.2
+->: a cousin
+
+    cousin.2.3
+fr: un %spetit-cousin/une %spetite-cousine
+
+    cousin.2.4
+fr: un %sarrière-petit-cousin/une %sarrière-petite-cousine
+
+    cousin.2.5
+fr: un %sarrière-arrière-petit-cousin/une %sarrière-arrière-petite-cousine
+
+    cousin.2.6
+fr: un %strois-fois-arrière-petit-cousin/une %strois-fois-arrière-petite-cousine
+
+    cousin.2.7
+fr: un %squatre-fois-arrière-petit-cousin/une %squatre-fois-arrière-petite-cousine
+
+    cousin.2.8
+fr: un %scinq-fois-arrière-petit-cousin/une %scinq-fois-arrière-petite-cousine
+
+    cousin.2.9
+fr: un %ssix-fois-arrière-petit-cousin/une %ssix-fois-arrière-petite-cousine
+
+    cousin.3.0
+->: a great-grandfather/a great-grandmother/a great-grandparent
+
+    cousin.3.1
+->: a great-uncle/a great-aunt
+
+    cousin.3.2
+fr: un %soncle à la mode de Bretagne/une %stante à la mode de Bretagne
+
+    cousin.3.3
+->: a 2nd cousin
+
+    cousin.3.4
+fr: un petit-cousin au 2<sup>e</sup> degré/une petite-cousine au 2<sup>e</sup> degré
+
+    cousin.4.0
+co: un arcicaccarone/una arcicaccarona/un arcicaccarone
+en: a great-great-grandfather/a great-great-grandmother/a great-great-grandparent
+fr: un arrière-arrière-grand-père/une arrière-arrière-grand-mère/un arrière-arrière-grand-parent
+
+    cousin.4.1
+en: a %sgreat-granduncle/a %sgreat-grandaunt
+fr: un %sarrière-grand-oncle/une %sarrière-grande-tante
+
+    cousin.4.2
+fr: un %sarrière-grand-cousin/une %sarrière-grande-cousine
+
+    cousin.4.3
+fr: un %sgrand-cousin au 2<sup>e</sup> degré/une %sgrande-cousine au 2<sup>e</sup> degré
+
+    cousin.4.4
+->: a 3rd cousin
+
+    cousin.4.5
+fr: un %spetit-cousin au 3<sup>e</sup> degré/une %spetite-cousine au 3<sup>e</sup> degré
+
+    cousin.5.0
+en: a great-great-great-grandfather/a great-great-great-grandmother
+fr: un 3×-arrière-grand-père/une 3×-arrière-grand-mère
+
+    cousin.5.1
+en: a %sgreat-great-granduncle/a %sgreat-great-grandaunt
+fr: un %sarrière-arrière-grand-oncle/une %sarrière-arrière-grande-tante
+
+    cousin.5.2
+fr: une %sarrière-arrière-grand-cousin/une %sarrière-arrière-grande-cousine
+
+    cousin.5.3
+fr: une %sarrière-grand-cousin 2<sup>e</sup>/une %sarrière-grande-cousine 2<sup>e</sup>
+
+    cousin.5.4
+fr: un %sgrand-cousin au 3<sup>e</sup> degré/une %sgrande-cousine au 3<sup>e</sup> degré
+
+    cousin.5.5
+en: a 4th -cousin/
+fr: un cousin au 4e degré/une cousine au 4e degré
+
+    cousin.6.0
+en: a 4th-great-grandfather/a 4th-great-grandmother
+fr: un 4×-arrière-grand-père/une 4×-arrière-grand-mère
+
+    cousin.6.1
+en: a %sthird great-granduncle/a %sthird great-grandaunt
+fr: un %strois-fois-arrière-grand-oncle/une %strois-fois-arrière-grande-tante
+
+    cousin.6.2
+fr: un %s3×-arrière-grand-cousin/une %s3×-arrière-grande-cousine
+
+    cousin.6.3
+fr: un %sarrière-arrière-grand-cousin au 2<sup>e</sup> degré/une %sarrière-arrière-grande-cousine au 2<sup>e</sup> degré
+
+    cousin.6.4
+fr: un %sarrière-grand-cousin au 3<sup>e</sup> degré/une %sarrière-grande-cousine au 3<sup>e</sup> degré
+
+    cousin.7.0
+en: a 5th-great-grandfather/a 5th-great-grandmother
+fr: un 5×-arrière-grand-père/une 5×-arrière-grand-mère
+
+    cousin.7.1
+en: a %sfourth great-granduncle/a %sfourth great-grandaunt
+fr: un %squatre-fois-arrière-grand-oncle/une %squatre-fois-arrière-grande-tante
+
+    cousin.8.0
+en: a 6th-great-grandfather/a 6th-great-grandmother
+fr: un 6×-arrière-grand-père/une 6×-arrière-grand-mère
+
+    cousin.8.1
+en: a %sfifth great-granduncle/a %sfifth great-grandaunt
+fr: un %scinq-fois-arrière-grand-oncle/une %scinq-fois-arrière-grande-tante
+
+    cousin.9.0
+en: a 7th-great-grandfather/a 7th-great-grandmother
+fr: un 7×-arrière-grand-père/une 7×-arrière-grand-mère
+
+    cousin.9.1
+en: a %ssixth great-granduncle/a %ssixth great-grandaunt
+fr: un %ssix-fois-arrière-grand-oncle/une %ssix-fois-arrière-grande-tante
 
     cousins
 af: neefs/niggies
@@ -5122,6 +4988,734 @@ sk: pokrvní príbuzní
 sl: bratranci/sestrične
 sv: kusiner och flermänningar
 tr: kuzenler
+
+    cousins.0.1
+->: child/children
+
+    cousins.0.1 tt
+co: figlioli è figliole
+en: sons and daughters
+fr: fils et filles, enfants
+
+    cousins.0.10
+en: eight-times-great-grandchild/eight-times-great-grandchildren
+fr: huit-fois-arrière-petit-enfant/huit-fois-arrière-petits-enfants
+
+    cousins.0.2
+co: figliulinu/figliulini
+en: grandchild/grandchildren
+fr: petit-enfant/petits-enfants
+
+    cousins.0.2 tt
+co: zitelli di u so figliolu o di a so figliola
+en: children of one’s son or daughters
+fr: enfants de son fils ou de sa fille
+
+    cousins.0.3
+co: arcifigliulinu/arcifigliulini
+en: great-grandchild/great-grandchildren
+fr: arrière-petit-enfant/arrière-petits-enfants
+
+    cousins.0.3 tt
+co: zitelli di u so figliulinu o di a so figliulina
+en: children of one’s grandson or granddaughter
+fr: enfants de son petit-fils ou de sa petite-fille
+
+    cousins.0.4
+en: great-great-grandchild/great-great-grandchildren
+fr: arrière-arrière-petit-enfant/arrière-arrière-petits-enfants
+
+    cousins.0.4 tt
+en: children of one’s great-grandson or great-granddaughter
+fr: enfants de son arrière-petit-fils ou de son arrière-petite-fille
+
+    cousins.0.5
+en: three-times-great-grandchild/three-times-great-grandchildren
+fr: trois-fois-arrière-petits-enfant/trois-fois-arrière-petits-enfants
+
+    cousins.0.6
+en: four-times-great-grandchild/four-times-great-grandchildren
+fr: quatre-fois-arrière-petit-enfant/quatre-fois-arrière-petits-enfants
+
+    cousins.0.7
+en: five-times-great-grandchild/five-times-great-grandchildren
+fr: cinq-fois-arrière-petit-enfant/cinq-fois-arrière-petits-enfants
+
+    cousins.0.8
+en: six-times-great-grandchild/six-times-great-grandchildren
+fr: six-fois-arrière-petit-enfant/six-fois-arrière-petits-enfants
+
+    cousins.0.9
+en: seven-times-great-grandchild/seven-times-great-grandchildren
+fr: sept-fois-arrière-petit-enfant/sept-fois-arrière-petits-enfants
+
+    cousins.1.0
+->: parents
+
+    cousins.1.0 tt
+co: babbu è mamma
+en: father and mother
+fr: père et mère<br>géniteur et génitrice
+
+    cousins.1.1
+->: siblings
+
+    cousins.1.1 tt
+fr: adelphe·s<br>sibling·s<hr>germains 50 &#37;<br>consanguins ou utérins 25 &#37;
+
+    cousins.1.10
+en: seven-times-great-grandnephew/seven-times-great-grandnephews
+fr: sept-fois-arrière-petit-neveu/sept-fois-arrière-petits-neveux
+
+    cousins.1.2
+co: nipoti è nipote
+en: nephew and nieces
+fr: neveux et nièces
+
+    cousins.1.2 tt
+fr: enfants des frères et sœurs<br>« petits-frères et petites-sœurs »<hr>← cousins germains des enfants
+
+    cousins.1.3
+co: niputinu/niputini/niputina/niputine
+en: great-nephew/great-nephews/great-niece/great-nieces
+fr: petit-neveu/petits-neveux/petite-nièce/petites-nièces
+
+    cousins.1.3 tt
+co: niputini è niputine
+en: great-nephews and great-nieces
+fr: arrière-neveux et arrière-nièces (soutenu)<br>enfant d’un neveu ou d’une nièce
+
+    cousins.1.4
+co: arciniputinu/arciniputini
+en: great-grandnephew/great-grandnephews
+fr: arrière-petit-neveu/arrière-petits-neveux
+
+    cousins.1.4 tt
+fr: enfant d’un petit-neveu ou d’une petit-nièce
+
+    cousins.1.5
+en: great-great-grandnephew/great-great-grandnephews
+fr: arrière-arrière-petit-neveu/arrière-arrière-petits-neveux
+
+    cousins.1.6
+en: three-times-great-grandnephew/three-times-great-grandnephews
+fr: trois-fois-arrière-petit-neveu/trois-fois-arrière-petits-neveux
+
+    cousins.1.7
+en: four-times-great-grandnephew/four-times-great-grandnephews
+fr: quatre-fois-arrière-petit-neveu/quatre-fois-arrière-petits-neveux
+
+    cousins.1.8
+en: five-times-great-grandnephew/five-times-great-grandnephews
+fr: cinq-fois-arrière-petit-neveu/cinq-fois-arrière-petits-neveux
+
+    cousins.1.9
+en: six-times-great-grandnephew/six-times-great-grandnephews
+fr: six-fois-arrière-petit-neveu/six-fois-arrière-petits-neveux
+
+    cousins.10.0
+en: 8th-great-grandparents
+fr: 8×-arrière-grands-parents
+
+    cousins.10.0 tt
+fr: huit-fois-arrière-grands-parents<br>nonaïeuls
+
+    cousins.10.1
+en: seventh great-granduncles
+fr: sept-fois-arrière-grands-oncles
+
+    cousins.10.1 tt
+fr: frères et sœurs des nonaïeuls
+
+    cousins.2.0
+->: grand-parents
+
+    cousins.2.0 tt
+fr: aïeul·e·s<br>parents des parents<br>grands-pères et grands-mères
+
+    cousins.2.1
+->: uncles and aunts
+
+    cousins.2.1 tt
+fr: frères et sœurs des parents
+
+    cousins.2.10
+fr: sept-fois-arrière-petit-cousin/sept-fois-arrière-petits-cousins
+
+    cousins.2.2
+co: cugini
+de: Cousins
+en: cousins 1rd
+fr: cousins
+
+    cousins.2.2 tt
+co: cugini à u 1<sup>u</sup> gradu<hr>(carnali o micca)
+fr: cousins au 1<sup>er</sup> degré<hr>(germains ou non)
+
+    cousins.2.3
+en: 1st cousins once removed
+fr: petit-cousin/petits-cousins
+
+    cousins.2.3 tt
+fr: petits-cousins au 1<sup>er</sup> degré<br>neveux et nièces à la mode de Bourgogne ou Bretagne<br>neveux et nièces issus de germains<hr>← cousins issus de germains des enfants
+
+    cousins.2.4
+fr: arrière-petit-cousin/arrière-petits-cousins
+
+    cousins.2.4 tt
+fr: arrière-petits-cousins au 1<sup>er</sup> degré<hr>fils d’un petit-cousin ou d’une petite cousine
+
+    cousins.2.5
+fr: arrière-arrière-petit-cousin/arrière-arrière-petits-cousins
+
+    cousins.2.5 tt
+fr: deux-fois-arrière-petits-cousins au 1<sup>er</sup> degré
+
+    cousins.2.6
+fr: trois-fois-arrière-petit-cousin/trois-fois-arrière-petits-cousins
+
+    cousins.2.6 tt
+fr: trois-fois-arrière-petits-cousins au 1<sup>er</sup> degré
+
+    cousins.2.7
+fr: quatre-fois-arrière-petit-cousin/quatre-fois-arrière-petits-cousins
+
+    cousins.2.7 tt
+fr: sept-fois-arrière-petits-cousins au 1<sup>er</sup> degré
+
+    cousins.2.8
+fr: cinq-fois-arrière-petit-cousin/cinq-fois-arrière-petits-cousins
+
+    cousins.2.8 tt
+fr: cinq-fois-arrière-petits-cousins au 1<sup>er</sup> degré
+
+    cousins.2.9
+fr: six-fois-arrière-petit-cousin/six-fois-arrière-petits-cousins
+
+    cousins.2.9 tt
+fr: six-fois-arrière-petits-cousins au 1<sup>er</sup> degré
+
+    cousins.3.0
+->: great-grand-parents
+
+    cousins.3.0 tt
+fr: bisaïeul·e·s
+
+    cousins.3.1
+->: siblings of the grandparents
+
+    cousins.3.1 tt
+fr: frères et sœurs des grand-parents
+
+    cousins.3.2
+fr: grands-cousins
+
+    cousins.3.2 tt
+fr: oncles et tantes à la mode de Bourgogne ou Bretagne<br>petits-oncles et petites-tantes (désuets)<hr><- cousins germains des parents, oncles et tantes
+
+    cousins.3.3
+->: 2nd cousins
+
+    cousins.3.3 tt
+fr: cousins au 2<sup>e</sup> degré<br>cousins à la mode de Bourgogne ou Bretagne<br>petits-cousins (désuet)<br>cousins remués de germain (vieilli)
+
+    cousins.3.4
+fr: petits-cousins 2<sup>e</sup>
+
+    cousins.3.4 tt
+fr: petits-cousins au 2<sup>e</sup> degré<br>petits-cousins issus de germains<hr><- cousins issus d’issus de germains des enfants
+
+    cousins.3.5
+fr: arrière-petits-cousins 2<sup>e</sup>
+
+    cousins.3.5 tt
+fr: arrière-petits-cousins au 2<sup>e</sup> degré
+
+    cousins.3.6
+fr: arrière-arrière-petits-cousins 2<sup>e</sup>
+
+    cousins.3.6 tt
+fr: deux-fois-arrière-petits-cousins au deuxième degré
+
+    cousins.3.7
+fr: trois-fois-arrière-petits-cousins 2<sup>e</sup>
+
+    cousins.3.7 tt
+fr: trois-fois-arrière-petits-cousins au deuxième degré
+
+    cousins.3.8
+fr: quatre-fois-arrière-petits-cousins 2<sup>e</sup>
+
+    cousins.3.8 tt
+fr: quatre-fois-arrière-petits-cousins au deuxième degré
+
+    cousins.4.0
+->: great-great-grandparents
+
+    cousins.4.0 tt
+en: 2nd-great-grand-parents
+fr: tri(s)aïeul·e·s<br>aïeul·e·s des aïeul·e·s
+
+    cousins.4.1
+->: siblings of the great-grandparents
+
+    cousins.4.1 tt
+fr: frères et sœurs des arrière-grands-parents
+
+    cousins.4.2
+fr: arrière-grands-cousins
+
+    cousins.4.2 tt
+fr: grands-oncles et grandes-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins germains des grands-parents, grands oncles et grandes-tantes
+
+    cousins.4.3
+fr: grands-cousins 2<sup>e</sup>
+
+    cousins.4.3 tt
+fr: grands-cousins au 2<sup>e</sup> degré<hr><- cousins issus de germains des parents et oncles
+
+    cousins.4.4
+->: 3rd cousins
+
+    cousins.4.4 tt
+fr: cousins au 3<sup>e</sup> degré<br>cousins arrière-issus-de-germains
+
+    cousins.4.5
+fr: petits-cousins 3<sup>e</sup>
+
+    cousins.4.5 tt
+fr: petits-cousins au 3<sup>e</sup> degré<br>petits-cousins issus d’issus de germains
+
+    cousins.4.6
+fr: arrière-petits-cousins 3<sup>e</sup>
+
+    cousins.4.6 tt
+fr: arrière-petits-cousins au troisième degré
+
+    cousins.4.7
+fr: arrière-arrière-petits-cousins 3<sup>e</sup>
+
+    cousins.4.7 tt
+fr: deux-fois-arrière-petits-cousins au troisième degré
+
+    cousins.4.8
+fr: trois-fois-arrière-petits-cousins 3<sup>e</sup>
+
+    cousins.4.8 tt
+fr: trois-fois-arrière-petits-cousins au troisième degré
+
+    cousins.4.9
+fr: quatre-fois-arrière-petits-cousins 3<sup>e</sup>
+
+    cousins.4.9 tt
+fr: quatre-fois-arrière-petits-cousins au troisième degré
+
+    cousins.5.0
+en: great-great-great-grandparent/great-great-great-grandparents
+fr: 3×-arrière-grand-parent/3×-arrière-grands-parents
+
+    cousins.5.0 tt
+en: 3rd-great-grandparents
+fr: trois-fois-arrière-grands-parents<br>arrière-arrière-arrière-grands-parents<br>quadri(s)aïeul·e·s<br>quartaïeul·e·s
+
+    cousins.5.1
+en: great-great-granduncles
+fr: arrière-arrière-grands-oncles
+
+    cousins.5.1 tt
+en: siblings of the great-great-grandparents
+fr: frères et sœurs des trisaïeuls
+
+    cousins.5.10
+fr: quatre-fois-arrière-petits-cousins 4<sup>e</sup>
+
+    cousins.5.10 tt
+fr: quatre-fois-arrière-petits-cousins au quatrième degré
+
+    cousins.5.2
+fr: arrière-arrière-grands-cousins
+
+    cousins.5.2 tt
+fr: arrière-grand-oncles et arrière-grandes-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins des arrière-grands-parents et arrière-grands-oncles
+
+    cousins.5.3
+fr: arrière-grands-cousins 2<sup>e</sup>
+
+    cousins.5.3 tt
+fr: arrière-grands-cousins au deuxième degré<hr><- cousins issus de germains des grands-parents et grands-oncles
+
+    cousins.5.4
+fr: grands-cousins 3<sup>e</sup>
+
+    cousins.5.4 tt
+fr: grands-cousins au troisième degré<hr><- cousins issus d’issus de germains des parents
+
+    cousins.5.5
+en: 4th cousins
+fr: cousins 4<sup>e</sup>
+
+    cousins.5.5 tt
+fr: cousins au quatrième degré<br>cousins issus d’issus d’issus de germains<hr><i>arrière-petits-cousins</i>
+
+    cousins.5.6
+fr: petits-cousins 4<sup>e</sup>
+
+    cousins.5.6 tt
+fr: petits-cousins au quatrième degré
+
+    cousins.5.7
+fr: arrière-petits-cousins 4<sup>e</sup>
+
+    cousins.5.7 tt
+fr: arrière-petits-cousins au quatrième degré
+
+    cousins.5.8
+fr: arrière-arrière-petits-cousins 4<sup>e</sup>
+
+    cousins.5.8 tt
+fr: deux-fois-arrière-petits-cousins au quatrième degré
+
+    cousins.5.9
+fr: trois-fois-arrière-petits-cousins 4<sup>e</sup>
+
+    cousins.5.9 tt
+fr: trois-fois-arrière-petits-cousins au quatrième degré
+
+    cousins.6.0
+en: 4th-great-grandparents
+fr: 4×-arrière-grands-parents
+
+    cousins.6.0 tt
+fr: quatre-fois-arrière-grands-parents<br>quint(is)aïeuls<br>quinquisaïeuls
+
+    cousins.6.1
+en: third great-granduncles
+fr: 3×-arrière-grands-oncles
+
+    cousins.6.1 tt
+fr: trois-fois-arrière-grands-oncles<hr>frères et sœurs des quadrisaïeuls
+
+    cousins.6.10
+fr: 3×-arrière-petits-cousins 5<sup>e</sup>
+
+    cousins.6.10 tt
+fr: trois-fois-arrière-petits-cousins au cinquième degré
+
+    cousins.6.11
+fr: 4×-arrière-petits-cousins 5<sup>e</sup>
+
+    cousins.6.11 tt
+fr: quatre-fois-arrière-petits-cousins au cinquième degré
+
+    cousins.6.2
+fr: 3×-arrière-grands-cousins
+
+    cousins.6.2 tt
+fr: arrière-arrière-arrière-grands-cousins au premier degré
+
+    cousins.6.3
+fr: arrière-arrière-grands-cousins 2<sup>e</sup>
+
+    cousins.6.3 tt
+fr: arrière-arrière-grands-cousins au deuxième degré<br><- cousins issus de germains des arrière-grands-parents et arrière-grands-oncles
+
+    cousins.6.4
+fr: arrière-grands-cousins 3<sup>e</sup>
+
+    cousins.6.4 tt
+fr: arrière-grands-cousins au troisième degré<br><- cousins issus d’issus de germains des grands-parents et grands-oncles
+
+    cousins.6.5
+fr: grands-cousins 4<sup>e</sup>
+
+    cousins.6.5 tt
+fr: grands-cousins au quatrième degré
+
+    cousins.6.6
+en: fifth cousins
+fr: cousins 5<sup>e</sup>
+
+    cousins.6.6 tt
+fr: cousins au cinquième degré
+
+    cousins.6.7
+fr: petits-cousins 5<sup>e</sup>
+
+    cousins.6.7 tt
+fr: petits-cousins au cinquième degré
+
+    cousins.6.8
+fr: arrière-petits-cousins 5<sup>e</sup>
+
+    cousins.6.8 tt
+fr: arrière-petits-cousins au cinquième degré
+
+    cousins.6.9
+fr: arrière-petits-cousins 5<sup>e</sup>
+
+    cousins.6.9 tt
+fr: arrière-arrière-petits-cousins au cinquième degré
+
+    cousins.7.0
+en: 5th-great-grandparents
+fr: 5×-arrière-grands-parents
+
+    cousins.7.0 tt
+fr: cinq-fois-arrière-grands-parents<br>sext(is)aïeuls
+
+    cousins.7.1
+en: fourth great-granduncles
+fr: 4×-arrière-grands-oncles
+
+    cousins.7.1 tt
+fr: quatre-fois-arrière-grands-oncles<br>frères et sœurs des quinquisaïeuls
+
+    cousins.7.10
+fr: arrière-arrière-petits-cousins 6<sup>e</sup>
+
+    cousins.7.10 tt
+fr: arrière-arrière-petits-cousins au sixième degré
+
+    cousins.7.11
+fr: 3×-arrière-petits-cousins 6<sup>e</sup>
+
+    cousins.7.11 tt
+fr: trois-fois-arrière-petits-cousins au sixième degré
+
+    cousins.7.12
+fr: 4×-arrière-petits-cousins 6<sup>e</sup>
+
+    cousins.7.12 tt
+fr: quatre-fois-arrière-petits-cousins au sixième degré
+
+    cousins.7.2
+fr: 4×-arrière-grands-cousins
+
+    cousins.7.2 tt
+fr: quatre-fois-arrière-grands-cousins<br>arrrière-arrière-arrière-arrière-grands-cousins au premier degré
+
+    cousins.7.3
+fr: 3×-arrière-grands-cousins 2<sup>e</sup>
+
+    cousins.7.3 tt
+fr: trois-fois-arrière-grands-cousins au deuxième degré/arrière-arrière-arrière-grands-cousins au deuxième degré
+
+    cousins.7.4
+fr: arrière-arrière-grands-cousins 3<sup>e</sup>
+
+    cousins.7.4 tt
+fr: arrière-arrière-grands-cousins au troisième degré
+
+    cousins.7.5
+fr: arrière-grands-cousins 4<sup>e</sup>
+
+    cousins.7.5 tt
+fr: arrière-grands-cousins au quatrième degré
+
+    cousins.7.6
+fr: grands-cousins 5<sup>e</sup>
+
+    cousins.7.6 tt
+fr: grands-cousins au 5e degré
+
+    cousins.7.7
+en: 6th cousins
+fr: cousins 6<sup>e</sup>
+
+    cousins.7.7 tt
+fr: cousins au sixième degré
+
+    cousins.7.8
+fr: petits-cousins 6<sup>e</sup>
+
+    cousins.7.8 tt
+fr: petits-cousins au sixième degré
+
+    cousins.7.9
+fr: arrière-petits-cousins 6<sup>e</sup>
+
+    cousins.7.9 tt
+fr: arrière-petits-cousins au sixième degré
+
+    cousins.8.0
+en: 6th-great-grandparents
+fr: 6×-arrière-grands-parents
+
+    cousins.8.0 tt
+fr: six-fois-arrière-grands-parents<br>sept(is)aïeuls
+
+    cousins.8.1
+en: fifth great-granduncles
+fr: cinq-fois-arrière-grands-oncles
+
+    cousins.8.1 tt
+fr: frères et sœurs des septisaïeuls
+
+    cousins.8.10
+fr: arrière-petits-cousins 7<sup>e</sup>
+
+    cousins.8.10 tt
+fr: arrière-petits-cousins au septième degré
+
+    cousins.8.11
+fr: arrière-arrière-petits-cousins 7<sup>e</sup>
+
+    cousins.8.11 tt
+fr: arrière-arrière-petits-cousins au septième degré
+
+    cousins.8.12
+fr: trois-fois-arrière-petits-cousins 7<sup>e</sup>
+
+    cousins.8.12 tt
+fr: trois-fois-arrière-petits-cousins au septième degré
+
+    cousins.8.13
+fr: quatre-fois-arrière-petits-cousins 7<sup>e</sup>
+
+    cousins.8.13 tt
+fr: quatre-fois-arrière-petits-cousins au septième degré
+
+    cousins.8.2
+fr: cinq-fois-arrière-grands-cousins
+
+    cousins.8.2 tt
+fr: cinq-fois-arrière-grands-cousins au premier degré
+
+    cousins.8.3
+fr: quatre-fois-arrière-grands-cousins 2<sup>e</sup>
+
+    cousins.8.3 tt
+fr: quatre-fois-arrière-grands-cousins au deuxième degré
+
+    cousins.8.4
+fr: trois-fois-arrière-grands-cousins 3<sup>e</sup>
+
+    cousins.8.4 tt
+fr: trois-fois-arrière-grands-cousins au troisième degré
+
+    cousins.8.5
+fr: arrière-arrière-grands-cousins 4<sup>e</sup>
+
+    cousins.8.5 tt
+fr: arrière-arrière-grands-cousins au quatrième degré
+
+    cousins.8.6
+fr: arrière-grands-cousins 5<sup>e</sup>
+
+    cousins.8.6 tt
+fr: arrière-grands-cousins au cinquième degré
+
+    cousins.8.7
+fr: grands-cousins 6e
+
+    cousins.8.7 tt
+fr: grands-cousins au sixième degré
+
+    cousins.8.8
+en: 7th cousins
+fr: cousins 7<sup>e</sup>
+
+    cousins.8.8 tt
+en: seventh cousins
+fr: cousins au septième degré
+
+    cousins.8.9
+fr: petits-cousins 7<sup>e</sup>
+
+    cousins.8.9 tt
+fr: petits-cousins au septième degré
+
+    cousins.9.0
+en: 7th-great-grandparents
+fr: 7×-arrière-grands-parents
+
+    cousins.9.0 tt
+fr: sept-fois-arrière-grands-parents<br>octaïeuls
+
+    cousins.9.1
+en: sixth great-granduncles
+fr: six-fois-arrière-grands-oncles
+
+    cousins.9.1 tt
+fr: frères et sœurs des octosaïeuls
+
+    cousins.9.10
+fr: petits-cousins 8<sup>e</sup>
+
+    cousins.9.10 tt
+fr: petits-cousins au huitième degré
+
+    cousins.9.11
+fr: arrière-petits-cousins 8<sup>e</sup>
+
+    cousins.9.11 tt
+fr: arrière-petits-cousins au huitième degré
+
+    cousins.9.12
+fr: arrière-arrière-petits-cousins 8<sup>e</sup>
+
+    cousins.9.12 tt
+fr: arrière-arrière-petits-cousins au huitième degré
+
+    cousins.9.13
+fr: trois-fois-arrière-petits-cousins 8<sup>e</sup>
+
+    cousins.9.13 tt
+fr: arrière-arrière-arrière-petits-cousins au huitième degré
+
+    cousins.9.14
+fr: quatre-fois-arrière-petits-cousins 8<sup>e</sup>
+
+    cousins.9.14 tt
+fr: quatre-fois-arrière-petits-cousins au huitième degré
+
+    cousins.9.2
+fr: 6×-arrière-grands-cousins
+
+    cousins.9.2 tt
+fr: six-foix-arrière-grands-cousins au premier degré
+
+    cousins.9.3
+fr: 5×-arrière-grands-cousins 2<sup>e</sup>
+
+    cousins.9.3 tt
+fr: cinq-fois-arrière-grands-cousins au deuxième degré
+
+    cousins.9.4
+fr: 4×-arrière-grands-cousins 3<sup>e</sup>
+
+    cousins.9.4 tt
+fr: quatre-fois-arrière-grands-cousins au troisième degré
+
+    cousins.9.5
+fr: 3×-arrière-grands-cousins 4<sup>e</sup>
+
+    cousins.9.5 tt
+fr: trois-fois-arrière-grands-cousins au quatrième degré
+
+    cousins.9.6
+fr: arrière-arrière-grands-cousins 5<sup>e</sup>
+
+    cousins.9.6 tt
+fr: deux-fois-arrière-grands-cousins au cinquième degré
+
+    cousins.9.7
+fr: arrière-grands-cousins 6<sup>e</sup>
+
+    cousins.9.7 tt
+fr: arrière-grands-cousins au sixième degré
+
+    cousins.9.8
+fr: grands-cousins 7e
+
+    cousins.9.8 tt
+fr: grands-cousins au septième degré
+
+    cousins.9.9
+fr: cousins 8<sup>e</sup>
+
+    cousins.9.9 tt
+fr: cousins au huitième degré
 
     create
 af: skep
@@ -5572,6 +6166,11 @@ ru: награда
 sv: medaljer
 tr: madalya
 
+    define Cujus
+co: definisce %s cum’è Sosa 1 per fighjà o riduce l’implessi/rimette u Sosa 1 precedente %s
+en: define %s as Sosa 1 to see or reduce the implexes/restore previous Sosa 1 %s
+fr: définir %s comme Sosa 1 pour voir ou réduire les implexes/remettre le précédent Sosa 1 %s
+
     degree of kinship
 co: gradu di parentia/gradi di parentia
 de: Grad der Elternschaft
@@ -5612,6 +6211,36 @@ sk: zmazať
 sl: izbriši
 sv: ta bort
 tr: sil
+
+    delete image
+co: squassà a fiura
+de: Bild löschen
+en: delete image
+fr: supprimer une image
+
+    delete image saved
+co: squassà a fiura arregistrata
+de: das gespeicherte Bild löschen
+en: delete saved image
+fr: supprimer une image sauvegardée
+
+    delete portrait
+co: squassà u ritrattu
+de: Porträt löschen
+en: delete portrait
+fr: supprimer le portrait
+
+    delete portrait saved
+co: squassà u ritrattu arregistratu
+de: das gespeicherte Porträt löschen
+en: delete saved portrait
+fr: supprimer le portrait sauvegardé
+
+    deleted
+co: squassatu/squassata
+de: gelöscht
+en: deleted
+fr: supprimé/supprimée
 
     demobilisationMilitaire
 co: smubilizazione
@@ -5688,28 +6317,12 @@ tr: adına göre liste
 
     descendants tree
 co: arburu di discendenza
-de: Nachfahren-Baum
+de: Nachkommen-Baum
 en: descendants tree
 fr: arbre de descendance
 pt: árvore de descendentes
 sv: träd av ättlingar
 tr: nesil ağacı
-
-    compact descendants tree
-en: compact descendants tree
-fr: arbre de descendance compact
-
-    partial
-en: limited to ancestors and siblings
-fr: limité aux ascendants et leurs frères et soeurs
-
-    open individual page
-en: open individual page
-fr: ouvrir la page individuelle
-
-    new tree with this individual
-en: new tree with this individual
-fr: nouvel arbre à partir de cet individu
 
     died
 af: oorlede
@@ -5979,6 +6592,12 @@ pt: exibir por:/ramos/ordem alfabética
 ru: порядок отображения: /по ветвям/алфавитный
 sv: visas efter:/grenar/alfabetisk ordning
 tr: /satır/alfabetik sıraya göre görüntüleme
+
+    display carrousel
+co: affissà u carusellu di fiure
+de: Bilderkaroussel anzeigen
+en: display the carrousel of images
+fr: afficher le carrousel d’images
 
     display empty picture
 co: affissà sempre e fiure
@@ -6304,6 +6923,12 @@ no: stiftelse av legat (LDS)
 pt: dotação LDS
 sv: donation (LDS)
 tr: bağış (LDS)
+
+    edit family on spouse
+co: mudificà e famiglie via un cliccu nant’à a data di matrimoniu di a linea d’un cunghjuntu
+de: die Familie bearbeiten durch Klick auf das Hochzeitsdatum einer der beiden Personen
+en: edit the families by clicking on the date of marriage of the row of one spouses
+fr: modifier les familles en cliquant sur la date de mariage sur la ligne d’un conjoint
 
     edit tree
 co: mudificà u graficu
@@ -6646,6 +7271,12 @@ sl: usmrčen/usmrčena/usmrčen(a)
 sv: avrättad
 tr: idam
 
+    extend
+co: stende à un antenatu vicinu
+de: auf einen nahen Vorfahren erweitern
+en: extend to a near ancestor
+fr: étendre à un ancêtre proche
+
     families with encoding
 af: gekodeerde families
 bg: семейства с кодиране
@@ -6875,6 +7506,12 @@ pt: ligação familiar LDS
 sv: familjeband (RDS)
 tr: aile bağlantısı (LDS)
 
+    fanchart
+co: arburu in banderetta
+de: Fächerbaum
+en: fanchart
+fr: arbre en éventail
+
     father-in-law/mother-in-law
 af: skoonpa/skoonma
 br: tad-kaer/vamm-gaer
@@ -6965,6 +7602,18 @@ sk: súbor
 sl: datoteka
 sv: fil
 tr: dosya
+
+    filter
+co: filtrà
+de: filtern
+en: filter
+fr: filtrer
+
+    filter by
+co: filtrà da
+de: filtern durch
+en: filter by
+fr: filtrer par
 
     first free number
 af: eerste beskikbare nommer
@@ -7216,6 +7865,12 @@ sl: za seznam razvrščen po datumu zadnje spremembe
 sv: för listan över sista ändringsdatum
 tr: son değişiklik tarihine göre sıralanmış liste için
 
+    for/since
+co: durante/dapoi
+de: während/seit
+en: for/since
+fr: pendant/depuis
+
     forum
 af: forum
 bg: форум на базата от данни
@@ -7343,6 +7998,12 @@ sl: pogostosti
 sv: frekvensordning
 tr: frekans
 zh: 访问次数
+
+    from carrousel
+co: da u carusellu
+de: vom Karussell
+en: from carrousel
+fr: du carrousel
 
     full siblings
 af: broers en susters
@@ -7561,15 +8222,6 @@ sl: stari starši
 sv: farföräldrar/morföräldrar
 tr: büyük ebeveynler
 
-    cousin.2.0
-->: a grandfather/a grandmother/a grandparent
-
-    cousins.2.0
-->: grand-parents
-
-    cousins.2.0 tt
-fr: aïeul·e·s<br>parents des parents<br>grands-pères et grands-mères
-
     great-grand-parents
 af: oorgrootouers
 bg: прадядо и прабаба
@@ -7602,100 +8254,12 @@ sl: prastari starši
 sv: gammel-farföräldrar/gammel-morföräldrar
 tr: büyük-büyük-ebeveynler
 
-    cousin.3.0
-->: a great-grandfather/a great-grandmother/a great-grandparent
-
-    cousins.3.0
-->: great-grand-parents
-
-    cousins.3.0 tt
-fr: bisaïeul·e·s
-
     great-great-grandparents
 co: arcicaccaroni
 de: Ururgroßelternteil
 en: great-great-grandparents
 eo: prapraavo
 fr: arrière-arrière-grands-parents
-
-    cousin.4.0
-co: un arcicaccarone/una arcicaccarona/un arcicaccarone
-en: a great-great-grandfather/a great-great-grandmother/a great-great-grandparent
-fr: un arrière-arrière-grand-père/une arrière-arrière-grand-mère/un arrière-arrière-grand-parent
-
-    cousins.4.0
-->: great-great-grandparents
-
-    cousins.4.0 tt
-en: 2nd-great-grand-parents
-fr: tri(s)aïeul·e·s<br>aïeul·e·s des aïeul·e·s
-
-    cousin.5.0
-en: a great-great-great-grandfather/a great-great-great-grandmother
-fr: un 3×-arrière-grand-père/une 3×-arrière-grand-mère
-
-    cousins.5.0
-en: great-great-great-grandparent/great-great-great-grandparents
-fr: 3×-arrière-grand-parent/3×-arrière-grands-parents
-
-    cousins.5.0 tt
-en: 3rd-great-grandparents
-fr: trois-fois-arrière-grands-parents<br>arrière-arrière-arrière-grands-parents<br>quadri(s)aïeul·e·s<br>quartaïeul·e·s
-
-    cousin.6.0
-en: a 4th-great-grandfather/a 4th-great-grandmother
-fr: un 4×-arrière-grand-père/une 4×-arrière-grand-mère
-
-    cousins.6.0
-en: 4th-great-grandparents
-fr: 4×-arrière-grands-parents
-
-    cousins.6.0 tt
-fr: quatre-fois-arrière-grands-parents<br>quint(is)aïeuls<br>quinquisaïeuls
-
-    cousin.7.0
-en: a 5th-great-grandfather/a 5th-great-grandmother
-fr: un 5×-arrière-grand-père/une 5×-arrière-grand-mère
-
-    cousins.7.0
-en: 5th-great-grandparents
-fr: 5×-arrière-grands-parents
-
-    cousins.7.0 tt
-fr: cinq-fois-arrière-grands-parents<br>sext(is)aïeuls
-
-    cousin.8.0
-en: a 6th-great-grandfather/a 6th-great-grandmother
-fr: un 6×-arrière-grand-père/une 6×-arrière-grand-mère
-
-    cousins.8.0
-en: 6th-great-grandparents
-fr: 6×-arrière-grands-parents
-
-    cousins.8.0 tt
-fr: six-fois-arrière-grands-parents<br>sept(is)aïeuls
-
-    cousin.9.0
-en: a 7th-great-grandfather/a 7th-great-grandmother
-fr: un 7×-arrière-grand-père/une 7×-arrière-grand-mère
-
-    cousins.9.0
-en: 7th-great-grandparents
-fr: 7×-arrière-grands-parents
-
-    cousins.9.0 tt
-fr: sept-fois-arrière-grands-parents<br>octaïeuls
-
-    cousin.10.0
-en: a 8th-great-grandfather/a 8th-great-grandmother
-fr: un 8×-arrière-grand-père/une 8×-arrière-grand-mère
-
-    cousins.10.0
-en: 8th-great-grandparents
-fr: 8×-arrière-grands-parents
-
-    cousins.10.0 tt
-fr: huit-fois-arrière-grands-parents<br>nonaïeuls
 
     gregorian/julian/french/hebrew
 af: gregoriaans/juliaans/frans/hebreeus
@@ -7776,8 +8340,8 @@ en: half-brothers/half-sisters/half-siblings
 es: hermanastros&#407;as/hermanastros&#407;as/hermanastros&#407;as
 fi: Puolisisarukset/Puolisisarukset/Puolisisarukset
 fr: demi-frères/demi-sœurs/demi-frères et sœurs
-lt: pusiau broliai/pusseserės/pusbroliai ir seserys
 it: fratellastri/sorellastre/fratellastri e sorellastre
+lt: pusiau broliai/pusseserės/pusbroliai ir seserys
 nl: half broers/half zusters/half broers en zusters
 no: Halvsøsken/Halvsøsken/Halvsøsken
 oc: frairastres/sorrastras/frairastres e sorrastras
@@ -7785,6 +8349,12 @@ pt: meios-irmãos/meias-irmãs/meios-irmãos
 ru: сводные братья/сводные сёстры/сводные братья или сёстры
 sv: halvbröder/halvsystrar/halvsyskon
 tr: üvey erkek kardeşler/üvey kız kardeşler/üvey kardeşler
+
+    half-relationship
+co: mezu/meza/mezi
+de: halb-/halb-/halb-/
+en: half-/half-/half-/ 
+fr: demi-/demi-/demi-/ 
 
     half-siblings
 co: fratellastri è surellastre
@@ -7802,11 +8372,6 @@ pt: meios irmãos e irmãs
 ru: сводные братья или сёстры
 sv: halvsyskon
 tr: üvey kardeşler
-
-    half-relationship
-co: mezu/meza/mezi
-en: half-/half-/half-/ 
-fr: demi-/demi-/demi-/ 
 
     happy birthday to them!
 co: felice nataliziu !
@@ -7994,6 +8559,12 @@ pt: não mostrar os retratos
 sv: dölj personbilder
 tr: portreleri gizle
 
+    highlight incomplete data
+co: sopralineà i dati incumpleti
+de: hebe die unvollständigen Daten hervor
+en: highlight incomplete data
+fr: surligner les données incomplètes
+
     him/her
 af: sy/haar
 bg: мъж/жена
@@ -8153,11 +8724,17 @@ tr: hastanede yatış
 
     htree
 co: arburu in H
+de: H-Baum
 en: H-Tree
 fr: arbre en H
 pt: árvore em H
 sv: H-träd
 tr: H-Ağacı
+
+    htree 8 gen
+de: Kompakter H-Baum mit 7 Generationen und Kennzeichnung für die 8
+en: compact H-Tree at 7 generations with marker for the 8th
+fr: arbre compact en H à 7 générations avec indication pour la 8e
 
     husband/wife
 af: man/vrou
@@ -8322,6 +8899,12 @@ sl: slika izbrisana
 sv: bilden borttagen
 tr: resim silindi
 
+    image note
+co: aghjunghje una nota per a fiura.
+de: Bildnotiz hinzufügen
+en: add a note for the image.
+fr: ajouter une note pour l’image.
+
     image received
 af: prent ontvang
 bg: изображението е получено
@@ -8353,6 +8936,12 @@ sk: obrázok prijatý
 sl: slika sprejeta
 sv: bilden mottagen
 tr: resim yüklendi
+
+    image source
+co: aghjunghje una fonte per a fiura.
+de: Bildquelle hinzufügen
+en: add a source for the image.
+fr: ajouter une source pour l’image.
 
     image/images
 af: prent/prente
@@ -8796,6 +9385,7 @@ sv: informatör/informatör
 
     inline chronology
 co: cronolugia simplice/cronolugia detagliata
+de: einfache Chronologie/detaillierte Chronologie
 en: simple chronology/detailed chronology
 fr: chronologie simple/chronologie détaillée
 pt: cronologia simples/cronologia detalhada
@@ -8804,6 +9394,7 @@ tr: basit kronoloji/ayrıntılı kronoloji
 
     input database
 co: Stampittate quì u nome sanu di a basa di dati à impiegà :
+de: Bitte den Namen der Datenbank eintragen, die verwendet werden soll:
 en: Please, enter the name of the database you want to use:
 fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
 pt: Introduza o nome da base de dados que quer utilizar:
@@ -8860,11 +9451,18 @@ tr: %s için geçmiş bulunamadı
 
     intermediate revisions not shown
 co: revisioni intermediarie piattate
+de: Zwischenrevisionen versteckt
 en: intermediate revisions not shown
 fr: révisions intermédiaires masquées
 pt: revisões intermédias ocultas
 sv: mellanrevisioner visas inte
 tr: ara revizyonlar gösterilmiyor
+
+    interval
+co: intervallu di tempu
+de: Zeitintervall
+en: time interval
+fr: intervalle de temps
 
     inversion done
 af: omgeruil
@@ -9108,6 +9706,7 @@ tr: aynı kişi!
 
     itree
 co: arburu in I
+de: I-Baum
 en: I-Tree
 fr: arbre en I
 pt: árvore em I
@@ -9192,6 +9791,7 @@ tr: etiket
 
     last diff
 co: ultima revisione
+de: letzte Revision
 en: last revision
 fr: dernière révision
 pt: última revisão
@@ -9200,6 +9800,7 @@ tr: son revizyon
 
     last sosa level not navigable
 co: l’ultimu livellu di Sosa ùn si pò micca navigà. Impiegate a lista di l’antenati.
+de: letzte Sosa-Ebene nicht navigierbar. Vorfahren-Liste benutzen.
 en: last Sosa level not navigable. Use ancestors list.
 fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des ancêtres.
 pt: o último nível de sosa não é navegável. Utilize a lista de antepassados.
@@ -9239,6 +9840,8 @@ sv: mindre än en månad
 tr: bir aydan kısa bir süre eski
 
     limit
+co: limita
+de: Limit
 en: limit
 fr: limite
 
@@ -9276,17 +9879,13 @@ tr: bağlantı
 
     link back to parents
 co: liame di ritornu versu i genitori
+de: Link zurück zu den Eltern
 en: link back to parents
 fr: lien retour vers les parents
 no: lenke til foreldre
 pt: link de regresso aos pais
 sv: länk tillbaka till föräldrarna
 tr: ebeveynlere geri bağlantı
-
-    no more
-co: micca di più
-en: no more
-fr: pas d’autres
 
     link between
 af: mense tussen
@@ -9322,6 +9921,7 @@ tr: arasındaki ilişki
 
     link to children
 co: liame ver di i zitelli
+de: Link zu den Kindern
 en: link to children
 fr: lien vers les enfants
 no: lenke til barn
@@ -9878,7 +10478,7 @@ sv: äktenskapslicens
 tr: evlilik Cüzdanı
 
     marriage notes/marriages notes
-co: note apprupositu di l’unione/note apprupositu di l'unioni
+co: note apprupositu di l’unione/note apprupositu di l’unioni
 de: Notizen zu den Ehen
 en: marriage notes/marriages notes
 es: notas de matrionios
@@ -9894,12 +10494,14 @@ tr: evlilik notları/evlilik notları
 
     marriage of %t after his/her death
 co: matrimoniu di %t dopu a so morte
+de: Heirat von %t nach seinem/ihrem Tod
 en: marriage of %t after his/her death
 fr: mariage de %t après son décès
 lt: santuoka po %t mirties
 
     marriage of %t before his/her birth
 co: matrimoniu di %t nanzu a so nascita
+de: Heirat von %t vor seiner/ihrer Geburt
 en: marriage of %t before his/her birth
 fr: mariage de %t avant sa naissance
 lt: %t susituokė prieš gimdamas 
@@ -9988,6 +10590,7 @@ tr: eş/eşler
 
     marriages with
 co: rilazioni o matrimonii cù
+de: Beziehungen oder Hochzeiten mit
 en: relations or marriages with
 fr: relations ou mariages avec
 
@@ -10088,6 +10691,12 @@ sv: gift%t med
 tr: %t ile evlendi
 zh: %t配偶是
 
+    matching
+co: cuncurdanza
+de: passend
+en: matching
+fr: correspondance
+
     maternal grand-parents
 co: caccari materni
 de: Großeltern mütterlicherseits
@@ -10103,6 +10712,18 @@ pt: avós maternos
 ru: бабушка и дедушка по материнской линии
 sv: mormor och morfar
 tr: annenin ebeveynleri
+
+    max nbr
+co: num mas rel
+de: max rel Nr.
+en: max rel nbr
+fr: max rel nbr
+
+    max nbr title
+co: numeru massimu per e liste di rilazione
+de: maximale Anahl für die der Verwandtschaftslisten
+en: max number for relation list
+fr: nombre maximum pour les listes de relations
 
     maximum
 af: maksimum
@@ -10428,6 +11049,7 @@ tr: çeşitli notlar
 
     missing %s
 co: %s assente
+de: %s fehlt
 en: missing %s
 fr: %s manquant
 pt: %s em falta
@@ -10468,6 +11090,7 @@ tr: bilinmeyen atalar
 
     missing date
 co: senza data
+de: fehlendes Datum
 en: no date
 fr: sans date
 lt: be datos
@@ -10493,6 +11116,7 @@ tr: eksik etkinlikler
 
     missing image
 co: fiura assente
+de: fehlendes Bild
 en: missing image
 fr: image manquante
 no: bilde mangler
@@ -10650,8 +11274,15 @@ pt: permutar os eventos da família %s
 sv: ändra ordningen för %s familjehändelser
 tr: %s ailesinin etkinliklerini değiştir
 
+    modify note
+co: mudificà a nota
+de: Notiz bearbeiten
+en: modify the note
+fr: modifier la note
+
     modify person event order
 co: intervertisce l’evenimenti individuali
+de: Ereignisreihenfolge der Person ändern
 en: permute personnal events
 fr: permuter les événéments individuels
 pt: permutar os eventos individuais
@@ -10688,8 +11319,27 @@ sl: spremeni slika
 sv: ändra bild
 tr: resmi güncelle
 
+    modify portrait
+co: mudificà u ritrattu
+de: Porträt ändern
+en: modify the portrait
+fr: modifier le portrait
+
+    modify source
+co: mudificà a fonte
+de: Quelle ändern
+en: modify the source
+fr: modifier la source
+
+    modify the size of images to
+co: mudificà a dimensione di e fiure à
+de: Bildgröße ändern auf
+en: modify the size of images to
+fr: modifier la taille des images à
+
     module
 co: modulu/moduli
+de: Modul
 en: module/modules
 fr: module/modules
 no: modul/moduler
@@ -10795,6 +11445,7 @@ tr: %d cevaptan daha fazla
 
     move up/down
 co: ricullà/falà/ricullà u cursore/falà u cursore
+de: nach oben/nach unten/Cursor nach oben/Cursor nach unten
 en: move up/move down/move up cursor/move down cursor
 fr: remonter/descendre/remonter le curseur/descendre le curseur
 pt: subir/descer/subir o cursor/descer o cursor
@@ -10803,7 +11454,7 @@ tr: yukarı taşı/aşağı taşı/imleci yukarı taşı/imleci aşağı taşı
 
     msg error disconnected
 co: per disgrazia, pudete aghjunghje solu famiglie chì sò cunnesse à l’altre.<br />Sta ristrizzione hè stata aghjunta da u pruprietariu di a basa di dati.
-de: sorry, Sie können nur Familien hinzufügen, die mit dem Rest in Verbindung stehen. <br> Diese Einschränkung wurde durch den Eigentümer der Datenbank hinzugefügt.
+de: sorry, Sie können nur Familien hinzufügen, die mit dem Rest in Verbindung stehen. <br /> Diese Einschränkung wurde durch den Eigentümer der Datenbank hinzugefügt.
 en: sorry, you can add only families connected to the rest.<br>This restriction has been added by this database owner.
 fr: désolé, vous ne pouvez ajouter que des familles connectées au reste.<br>Cette restriction a été ajoutée par le propriétaire de cette base de données.
 it: spiacenti, puoi aggiungere solo delle famiglie collegate al resto.<br>Questa restrizione è stata aggiunta dal proprietario del data base
@@ -10814,21 +11465,27 @@ ru: к сожалению, добавить можно только ветви, 
 sv: du kan bara lägga till familjer som är kopplade till övriga.<br>Denna begränsning är tillagd av databasägaren.
 tr: ne yazık ki, sadece diğerlerine bağlı aileleri ekleyebilirsiniz.<br>Bu kısıtlama, bu veritabanı sahibi tarafından eklenmiştir.
 
-    mtree
-co: arburu in H di 9 generazioni
-en: 9 generations H tree
-fr: arbre en H 9 générations
-pt: árvore em H 9 gerações
-sv: 9 generationer H-träd
-tr: 9 kuşak H ağacı
+    arbre 8 gen
+co: arburu in H di 8 generazioni
+de: H-Baum 8 Generationen
+en: 8 generations H tree
+fr: arbre en H 8 générations
+pt: árvore em H 8 gerações
+sv: 8 generationer H-träd
+tr: 8 kuşak H ağacı
 
     multi relations graph
 co: graficu di rilazioni multiple
+de: Multi-Verwandtschafts-Graph
 en: multi relations graph
 fr: graphe de relations multiples
 pt: gráfico de relações múltiplas
 sv: graf med flera relationer
 tr: çoklu ilişkiler grafiği
+
+    multiple relations
+de: Im Falle von Implexen haben einige Individuen mehrere Beziehungen (Pfade) mit dem Stammindividuum. Die Beziehung zwischen zwei Individuen hängt von allen Koeffizienten ihrer Beziehungen (Pfade) ab.
+fr: En cas d’implexes, certains individus auront de multiples liens de parenté (chemins) avec l’individu racine. La parenté entre deux individus dépendra de tous les coefficients de leurs liens de parenté (chemins).
 
     murdered
 af: vermoor
@@ -10959,6 +11616,7 @@ tr: %s adı zaten %tbu kişi%t tarafından kullanılıyor
 
     name changed. update linked pages
 co: U nome, a casata, o un occurrenza di sta persona hà cambiatu. Ci vole à rinfrescà e pagine assuciate à l’anziana chjave inghjò.
+de: Vorname, Name oder Vorkommen dieser Person hat sich geändert. Bitte aktualisieren Sie die unten aufgeführten Seiten, die mit dem alten Schlüssel verknüpft sind.
 en: The first name, name or occurrence of this person has changed. Please update the pages linked to the old key listed below.
 fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les pages liées à l’ancienne clé ci-dessous.
 pt: O primeiro nome, apelido ou ocorrência desta pessoa foi alterada. Por favor actualize as páginas ligadas à chave antiga abaixo.
@@ -10981,6 +11639,7 @@ tr: vatandaşlık
 
     navigate on tree
 co: navigà nant’à l’arburu
+de: Baum navigieren
 en: navigate on the tree
 fr: naviguer sur l’arbre
 pt: navegar na árvore
@@ -11017,10 +11676,6 @@ sl: pregled
 sv: navigering
 tr: navigasyon
 
-    navigation with this individual
-en: navigation in tree with this individual
-fr: naviguer dans l'arbre avec cet individu
-
     navigation with %t as Sosa reference
 af: stap met %t as Sosa verwysing
 bg: навигация чрез числа на Соса относно %t
@@ -11052,6 +11707,12 @@ sk: prezeranie s %t ako referenciou "Sosa"
 sl: pregled z %t kot Sosa
 sv: navigering med %t som proband (Kekules system)
 tr: Sosa referansı olarak %t kullanarak göz atın
+
+    navigation with this individual
+co: navigà in l’arburu cù st’individuu
+de: im Baum mit dieser Person navigieren
+en: navigation in tree with this individual
+fr: naviguer dans l'arbre avec cet individu
 
     nb branches
 co: num. ghjembe
@@ -11100,11 +11761,6 @@ pt: nº eventos
 ru: события
 sv: antal händelser
 tr: etkinliklerin sayısı
-
-    open this individual page
-co: apre a pagina individuale
-en: open this individual page
-fr: ouvrir la page individuelle
 
     nb individuals
 co: numeru d’individu
@@ -11156,12 +11812,25 @@ tr: düzenlemeye devam et
 
     new name
 co: nome novu
+de: neuer Name
 en: new name
 fr: nouveau nom
 no: nytt navn
 pt: nome novo
 sv: nytt namn
 tr: yeni ad
+
+    new tree with this individual
+co: arburu novu da st’individuu
+de: Neuer Baum mit dieser Person
+en: new tree with this individual
+fr: nouvel arbre à partir de cet individu
+
+    next
+co: seguente
+de: nächster
+en: next
+fr: suivant
 
     next relationship path
 co: chjassu seguente
@@ -11320,6 +11989,12 @@ sl: brez znane zveze med %s in %s
 sv: ingen känd släktskap emellan %s och %s
 tr: %s ve %s arasında bilinen bir ilişki bağlantısı yok
 
+    no line break in names
+co: affissà e casate senza saltu di linea
+de: kein Zeilenumbruch in Namen
+en: no line break in names
+fr: afficher les noms sans saut de ligne
+
     no marriage event
 co: micca maritati
 de: unverheiratet
@@ -11415,6 +12090,12 @@ pt: nenhuma modificação
 ru: изменений нет
 sv: ingen uppdatering
 tr: değişiklik yok
+
+    no more
+co: micca di più
+de: nicht mehr
+en: no more
+fr: pas d’autres
 
     no sexes check
 af: geslag word nie aangedui nie
@@ -11851,6 +12532,8 @@ sv: antal levande personer:
 tr: yaşayan bireylerin sayısı
 
     number of rows
+co: numeru di linee
+de: Zeilennummer
 en: number of rows
 fr: nombre de lignes
 
@@ -11951,6 +12634,7 @@ tr: meslek/meslekler
 
     of
 co: di
+de: von
 en: of
 fr: de
 pt: de
@@ -11959,12 +12643,12 @@ tr: /
 
     of (du)
 co: di
+de: von
 en: of
 fr: du
 pt: de
 sv: av
 tr: /
-
 
     of course dead
 af: oorlede
@@ -12030,21 +12714,20 @@ sl: %s generacije
 sv: av den %s generationen
 tr: %s kuşağının
 
+    of%s
+co: d[i |’]%s
+de: von %s
+en: of %s
+fr: d[e |’]%s
+
     officer/officer/officers
 co: uffiziante/uffiziante/uffizianti
+de: Amtsträger/Amtsträgerin/Amtsträger
 en: officer/officer/officers
 fr: officiant/officiante/officiants
 pt: oficial/oficial/oficiais
 sv: officer/officer/officerer
 tr: memur/memur/memurlar
-
-    at new location
-en: at new location
-fr: au nouvel emplacement
-
-    at old location
-en: at old location
-fr: à l'ancien emplacement
 
     old name
 co: vechju nome
@@ -12055,6 +12738,12 @@ no: gammelt navn
 pt: nome antigo
 sv: tidigare namn
 tr: eski adı
+
+    on %s's siblings side
+co: di u latu di i fratelli o surelle di %s
+de: vonseiten der Geschwister von %s
+en: on %s's siblings side
+fr: du côté des frères et soeurs de %s
 
     on %s's side
 af: aan die kant van %s
@@ -12088,11 +12777,6 @@ sl: po strani %s
 sv: från %ss släktsida
 tr: %s tarafında
 
-    on %s's siblings side
-co: di u latu di i fratelli o surelle di %s
-en: on %s's siblings side
-fr: du côté des frères et soeurs de %s
-
     on (day month year)
 af: op
 ar: يوم
@@ -12104,10 +12788,10 @@ cs: dne
 da: den
 de: am
 en: on
+en:
 eo: la
 es: el
 et: :i:
-en:
 fi: :e:
 fr: le
 he:   ב-
@@ -12151,6 +12835,12 @@ fr: une génération en plus
 pt: uma geração adicional
 sv: en tidigare generation
 tr: ek bir kuşak
+
+    one ancestor counted
+co: E relazioni di parentia cunsanguine è uterine per un antenatu cumunu unicu sò incluse ma u so cuefficiente di parentia vale a metà di quellu di a relazione sana equivalente.
+de: Ein gemeinsamer Vorfahre: Blutsverwandte und uterine Halbbeziehungen sind enthalten, aber ihr Elternkoeffizient beträgt die Hälfte der vollständigen äquivalenten Beziehung.
+en: One common ancestor: consanguine and uterine half relationships are included, but their coefficient of parente is half the full equivalent relation.
+fr: Les relations de parenté consanguines et utérines par un seul ancêtre pivot commun sont incluses. Leur coefficient de parenté vaut la moitié de celui de la relation complète équivalente.
 
     one day old
 af: een dag oud
@@ -12290,6 +12980,18 @@ sl: samo izbrana generacija
 sv: endast den valda generationen
 tr: sadece seçilen nesil
 
+    open individual page
+co: apre a pagina individuale
+de: individuelle Seite öffnen
+en: open individual page
+fr: ouvrir la page individuelle
+
+    open this individual page
+co: apre a pagina individuale
+de: diese individuelle Seite öffnen
+en: open this individual page
+fr: ouvrir la page individuelle
+
     optional
 af: opsioneel
 bg: по желание
@@ -12420,6 +13122,12 @@ no: annen/annen/annen
 pt: outro/outra/outro
 sv: annat/annat/annat
 
+    ou
+co: o
+de: oder
+en: or
+fr: ou
+
     PACS
 co: PACS
 de: verfestigte Lebensgemeinschaft
@@ -12506,6 +13214,12 @@ no: sogneregistrator/menighetsregistratorer
 pt: escrivão paroquial/escrivão paroquial
 sv: församlingsregister/församlingsregister
 
+    partial
+co: limitatu à l’antenati è i so fratelli è surelle
+de: begrenzt auf Vorfahren und Geschwister
+en: limited to ancestors and siblings
+fr: limité aux ascendants et leurs frères et soeurs
+
     participant/participant
 co: participante/participante
 de: Teilnehmer/Teilnehmerin
@@ -12513,6 +13227,12 @@ en: participant/participant
 fr: participant/participante
 sv: deltagare/deltagare
 tr: katılımcı/katılımcı
+
+    passing by
+co: passendu da
+de: im Vorbeigehen
+en: passing by
+fr: en passant par
 
     paternal grand-parents
 co: caccari paterni
@@ -12529,6 +13249,18 @@ pt: avós paternos
 ru: бабушка и дедушка со стороны отца
 sv: farmor och farfar
 tr: babanın ailesi
+
+    path between
+co: chjassu trà
+de: Weg zwischen
+en: path between
+fr: chemin entre
+
+    path/paths
+co: chjassu/chjassi
+de: Weg/Wege
+en: path/paths
+fr: chemin/chemins
 
     person added
 af: persoon bygevoeg
@@ -12755,6 +13487,12 @@ sl: kraj
 sv: plats
 tr: yer
 
+    place filter
+co: numeru d’elementi cunservati in a lista di i lochi
+de: Anzahl der Elemente in der Ortsliste
+en: number of elements kept in places list
+fr: nombre d'éléments à conserver dans la liste des places
+
     places
 co: lochi
 de: Orte
@@ -12771,6 +13509,12 @@ pt: locais
 ru: места
 sv: orter
 tr: yerler
+
+    plugins
+co: moduli d’estensione
+de: Plugins
+en: plugins
+fr: plugins
 
     plus
 co: più
@@ -12815,6 +13559,12 @@ sk: populačná pyramída
 sl: populacijska piramida
 sv: befolkningspyramid
 tr: nüfus piramidi
+
+    portrait
+co: ritrattu
+de: Porträt
+en: portrait
+fr: portrait
 
     possible duplications
 bg: възможни дублирания
@@ -12959,6 +13709,24 @@ pt: ver árvore
 ru: ветвь фамильного дерева
 sv: översikt över
 tr: soy ağacının önizlemesi
+
+    previous
+co: precedente
+de: vorher
+en: previous
+fr: précédent
+
+    previous image
+co: s’è una fiura cù u listessu nome esiste dighjà in u cartulare di salvaguardia, sta fiura serà squassata.
+de: wenn schon ein gespeichertes Bild mit dem gleichen Namen existiert, wird es gelöscht.
+en: if an image with the same name already exists in the saved, it will be deleted.
+fr: si une image du même nom existe déjà dans le sous-répertoire de sauvegarde, elle sera supprimée.
+
+    previous portrait
+co: un arregistramentu precedente di u ritrattu, s’ellu esiste, serà squassatu.
+de: wenn schon ein gespeichertes Porträt mit dem gleichen Namen existiert, wird es gelöscht.
+en: a possible previous version of the saved portrait will be deleted.
+fr: une sauvegarde pré-existante du portrait sera supprimée.
 
     previous sibling
 af: vorige broer/vorige suster/vorige broer of suster
@@ -13143,6 +13911,11 @@ sl: oznaka
 sv: smeknamn
 tr: takma ad
 
+    random individual
+co: affissà un individuu à l’azardu
+en: display a random individual
+fr: afficher un individu au hasard
+
     recensement
 co: censimentu
 de: Volkszählung
@@ -13220,10 +13993,6 @@ sk: uznaný otec/uznaná matka/uznaný rodič
 sl: znani oče/znana mati/znani starši
 sv: erkännande far/erkännande mor/erkännande föräldrar
 tr: baba tarafından tanınan/anne tarafından tanınan/tarafından tanınan
-
-    define Cujus
-en: define %s as Sosa 1 to see or reduce the implexes/restore previous Sosa 1 %s
-fr: définir %s comme Sosa 1 pour voir ou réduire les implexes/remettre le précédent Sosa 1 %s
 
     reduce/increase
 co: riduce/aumentà
@@ -13541,6 +14310,12 @@ sl: zveza z %t
 sv: förhållande%t med
 tr: ile ilişki%t
 
+    remove %s column
+co: fà un cliccu nant’à st’intestatura per caccià sta o ste culonna(e) « %s »
+de: klicke auf diesen Header um die Zeile "%s" zu entfernen
+en: click on this header to remove the column(s) “%s”
+fr: cliquer sur cette en-tête pour supprimer la ou les colonne(s) « %s »
+
     remove last module
 co: caccià l’ultimu modulu aghjuntu
 de: zuletzt hinzugefügtes Modul entfernen
@@ -13594,6 +14369,42 @@ no: bopel%t med
 pt: residência%t com
 sv: sammanboende%t med
 tr: ikamet%t ile
+
+    restore
+co: risturà
+de: wiederherstellen
+en: restore
+fr: restaurer
+
+    restore image saved
+co: risturà una fiura arregistrata
+de: das gespeicherte Bild wiederherstellen
+en: restore saved image
+fr: restaurer une image sauvegardée
+
+    restore portrait
+co: risturà u ritrattu
+de: das Porträt wiederherstellen
+en: restore portrait
+fr: restaurer le portrait
+
+    restore portrait saved
+co: risturà u ritrattu arregistratu
+de: das gespeicherte Porträt wiederherstellen
+en: restore saved portrait
+fr: restaurer le portrait sauvegardé
+
+    restored
+co: risturatu/risturata
+de: wiederhergestellt
+en: restored
+fr: restauré/restaurée
+
+    restricted access
+co: L’accessu hè riservatu à l’amichi è à i maghi di a basa di dati !
+de: Der Zugriff ist auf Freunde und Meister der Datenbank beschränkt!
+en: Access restricted to friends and wizards of the database!
+fr: Accès réservé aux amis et magiciens de la base de donnée !
 
     retired
 co: ritirata
@@ -13659,6 +14470,36 @@ ru: тот же предок, что и у Sosa
 sv: samma ättling som n° Sosa
 tr: Sosa ile aynı #
 
+    save
+co: arregistrà
+de: speichern
+en: save
+fr: sauvegarder
+
+    save image
+co: una fiura cù un nome simile serà dispiazzata in
+de: wenn ein Bild mit demselben Namen existiert, wird es gespeichert nach
+en: an image with a similar name will moved to
+fr: si une image du même nom existe déjà, elle sera sauvegardée dans
+
+    save portrait
+co: u ritrattu esistente serà arregistratu in
+de: das existierende Porträt wird gespeichert nach
+en: the existing portrait will be saved to
+fr: le portrait existant sera sauvegardé dans
+
+    saved
+co: arregistratu/arregistrata
+de: gespeichert
+en: saved
+fr: sauvegardé/sauvegardée
+
+    saved images
+co: fiura arregistrata/fiure arregistrate
+de: gespeichertes Bild/gespeicherte Bilder
+en: saved image/saved images
+fr: image sauvegardée/images sauvegardées
+
     scale
 co: anni à a generazione
 de: Jahre nach Generation
@@ -13708,6 +14549,12 @@ no: besegling med ektefelle (LDS)
 pt: selamento ao cônjuge LDS
 sv: besegling med syskon (LDS)
 tr: mühürlü Eş (LDS)
+
+    search %s on Geneanet
+co: ricercà %s nant’à Geneanet
+de: suche %s auf Geneanet
+en: search %s on Geneanet
+fr: rechercher %s sur Geneanet
 
     search/case sensitive
 bg: търсене/с различаване на главни и малки букви
@@ -13782,11 +14629,6 @@ pt: pesquisar todos os
 ru: поиск
 sv: sök alla
 tr: arama
-
-    search %s on Geneanet
-co: ricercà %s nant’à Geneanet
-en: search %s on Geneanet
-fr: rechercher %s sur Geneanet
 
     see
 af: sien
@@ -13981,6 +14823,18 @@ ru: смотри человека
 sv: individ
 tr: bireysel
 
+    see portrait
+co: vede u ritrattu
+de: siehe Porträt
+en: see portrait
+fr: voir le portrait
+
+    see portrait saved
+co: vede u ritrattu arregistratu
+de: siehe gespeichertes Porträt
+en: see saved portrait
+fr: voir le portrait sauvegardé
+
     select
 co: sceglie
 de: auswählen
@@ -13996,21 +14850,6 @@ pt: selecionar
 ru: выберите:
 sv: välj
 tr: seç
-
-    extend
-co: stende à un antenatu vicinu
-en: extend to a near ancestor
-fr: étendre à un ancêtre proche
-
-    choose an ancestor
-co: sceglie un antenatu
-en: choose an ancestor
-fr: choisir un ancêtre
-
-    close
-co: chjode
-en: close
-fr: fermer
 
     select a letter
 co: sceglie una lettera
@@ -14060,6 +14899,12 @@ ru: выберите супруга/супругу
 sv: välj maka/make
 tr: eş seçin
 
+    select input
+co: sceglie un schedariu
+de: wählen
+en: choose file
+fr: sélect. fichier
+
     select lang
 af: taalvoorkeur/language preference:
 ar: بإمكانك إختيار لغة أخرى من بين اللغات التالية:
@@ -14068,8 +14913,7 @@ br: dibab a c'hellit ur yezh all etre ar re-mañ:
 ca: podeu seleccionar una altre llengua, hi ha disponibles les següents:
 co: affissà in :
 cs: zvolte jazyk pro prohlížení databáze:
-da: du kan vælge fremstilling på et andet sprog blandt de følgende:
-de: Blick auf:
+da: du kan vælge fremstilling på et andet sprog blandt de følgende: Blick auf:
 en: view in:
 eo: vi povas elekti alian lingvon inter la sekvantajn:
 es: ver en:
@@ -14080,13 +14924,17 @@ is: þú getur valið milli eftirfarandi tungumála:
 it: vista in:
 lv: jūs variet apskatīt datu bāzi arī citās sekojošās valodās:
 nl: bekijk in het:
-no: du kan velge sidevisning på et annet språk blant følgende:
-pl: możesz wybrać inny język spośród następujących:
+no: du kan velge sidevisning på et annet språk blant følgenpl: możesz wybrać inny język spośród następujących:
 pt: ver em:
 ro: poti sa alegi una din urmatoarele limbi pentru afisaj
 sl: lahko izberete drug jezik:
-sv: du kan välja ett annat språk bland de följande:
-tr: içinde görüntüle:
+sv: du kan välja ett annat språk bland de följantr: içinde görüntüle:
+
+    select module
+co: Selezziunate ogni modulu via un cliccu nant’à u buttone assuciatu (massimu 15).
+de: Wähle die Module durch Klick auf das zugehörige Feld aus (max. 15).
+en: Select each module by clicking on the corresponding button (max 15).
+fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
 
     select p_mod
 co: selezziunà i muduli persunalizati
@@ -14160,6 +15008,12 @@ sk: pošli
 sl: pošlji
 sv: skicka
 tr: yükle
+
+    send image with note and source
+co: mandà a fiura selezziunata cù nota è fonte
+de: sende das gewählte Bild mit Notizen und Quellen
+en: send selected image with note and source
+fr: envoyer l’image selectionée avec note et source
 
     separate event
 co: staccanza
@@ -14408,6 +15262,12 @@ sl: bi morala biti moški
 sv: borde vara man
 tr: erkek olmalı
 
+    show first names
+co: affissà tutti i nomi
+de: alle Vornamen anzeigen
+en: show all first names
+fr: afficher tous les prénoms
+
     show implex
 co: identificà l’implessi
 de: Implex anzeigen
@@ -14448,15 +15308,6 @@ sl: bratje in sestre
 sv: syskon
 tr: kardeşler
 
-    cousin.1.1
-->: a brother/a sister/a sibling
-
-    cousins.1.1
-->: siblings
-
-    cousins.1.1 tt
-fr: adelphe·s<br>sibling·s<hr>germains 50 &#37;<br>consanguins ou utérins 25 &#37;
-
     siblings of the grandparents
 co: arcizii
 de: Großonkel und Großtanten
@@ -14467,67 +15318,6 @@ pt: tios-avôs e tias-avós
 sv: syskon till far- och morföräldrar
 tr: büyük amcalar ve büyük teyzeler
 
-    cousin.3.1
-->: a great-uncle/a great-aunt
-
-    cousins.3.1
-->: siblings of the grandparents
-
-    cousins.3.1 tt
-fr: frères et sœurs des grand-parents
-
-    cousin.3.2
-fr: un %soncle à la mode de Bretagne/une %stante à la mode de Bretagne
-
-    cousins.3.2
-fr: grands-cousins
-
-    cousins.3.2 tt
-fr: oncles et tantes à la mode de Bourgogne ou Bretagne<br>petits-oncles et petites-tantes (désuets)<hr><- cousins germains des parents, oncles et tantes
-
-    cousin.3.3
-->: a 2nd cousin
-
-    cousins.3.3
-->: 2nd cousins
-
-    cousins.3.3 tt
-fr: cousins au 2<sup>e</sup> degré<br>cousins à la mode de Bourgogne ou Bretagne<br>petits-cousins (désuet)<br>cousins remués de germain (vieilli)
-
-    cousin.3.4
-fr: un petit-cousin au 2<sup>e</sup> degré/une petite-cousine au 2<sup>e</sup> degré
-
-    cousins.3.4
-fr: petits-cousins 2<sup>e</sup>
-
-    cousins.3.4 tt
-fr: petits-cousins au 2<sup>e</sup> degré<br>petits-cousins issus de germains<hr><- cousins issus d’issus de germains des enfants
-
-    cousins.3.5
-fr: arrière-petits-cousins 2<sup>e</sup>
-
-    cousins.3.5 tt
-fr: arrière-petits-cousins au 2<sup>e</sup> degré
-
-    cousins.3.6
-fr: arrière-arrière-petits-cousins 2<sup>e</sup>
-
-    cousins.3.6 tt
-fr: deux-fois-arrière-petits-cousins au deuxième degré
-
-    cousins.3.7
-fr: trois-fois-arrière-petits-cousins 2<sup>e</sup>
-
-    cousins.3.7 tt
-fr: trois-fois-arrière-petits-cousins au deuxième degré
-
-    cousins.3.8
-fr: quatre-fois-arrière-petits-cousins 2<sup>e</sup>
-
-    cousins.3.8 tt
-fr: quatre-fois-arrière-petits-cousins au deuxième degré
-
-
     siblings of the great-grandparents
 co: fratelli è surelle di l’arcicaccari
 de: Geschwister der Urgroßeltern
@@ -14536,513 +15326,6 @@ fr: arrières-grands-oncles
 pt: tios-bisavôs e tias-bisavós
 sv: syskon till föräldrar tre generationer bakåt
 tr: büyük büyük amcalar ve büyük büyük teyzeler
-
-    cousin.4.1
-en: a %sgreat-granduncle/a %sgreat-grandaunt
-fr: un %sarrière-grand-oncle/une %sarrière-grande-tante
-
-    cousins.4.1
-->: siblings of the great-grandparents
-
-    cousins.4.1 tt
-fr: frères et sœurs des arrière-grands-parents
-
-    cousin.4.2
-fr: un %sarrière-grand-cousin/une %sarrière-grande-cousine
-
-    cousins.4.2
-fr: arrière-grands-cousins
-
-    cousins.4.2 tt
-fr: grands-oncles et grandes-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins germains des grands-parents, grands oncles et grandes-tantes
-
-    cousin.4.3
-fr: un %sgrand-cousin au 2<sup>e</sup> degré/une %sgrande-cousine au 2<sup>e</sup> degré
-
-    cousins.4.3
-fr: grands-cousins 2<sup>e</sup>
-
-    cousins.4.3 tt
-fr: grands-cousins au 2<sup>e</sup> degré<hr><- cousins issus de germains des parents et oncles
-
-    cousin.4.4
-->: a 3rd cousin
-
-    cousins.4.4
-->: 3rd cousins
-
-    cousins.4.4 tt
-fr: cousins au 3<sup>e</sup> degré<br>cousins arrière-issus-de-germains
-
-    cousin.4.5
-fr: un %spetit-cousin au 3<sup>e</sup> degré/une %spetite-cousine au 3<sup>e</sup> degré
-
-    cousins.4.5
-fr: petits-cousins 3<sup>e</sup>
-
-    cousins.4.5 tt
-fr: petits-cousins au 3<sup>e</sup> degré<br>petits-cousins issus d’issus de germains
-
-    cousins.4.6
-fr: arrière-petits-cousins 3<sup>e</sup>
-
-    cousins.4.6 tt
-fr: arrière-petits-cousins au troisième degré
-
-    cousins.4.7
-fr: arrière-arrière-petits-cousins 3<sup>e</sup>
-
-    cousins.4.7 tt
-fr: deux-fois-arrière-petits-cousins au troisième degré
-
-    cousins.4.8
-fr: trois-fois-arrière-petits-cousins 3<sup>e</sup>
-
-    cousins.4.8 tt
-fr: trois-fois-arrière-petits-cousins au troisième degré
-
-    cousins.4.9
-fr: quatre-fois-arrière-petits-cousins 3<sup>e</sup>
-
-    cousins.4.9 tt
-fr: quatre-fois-arrière-petits-cousins au troisième degré
-
-    cousin.5.1
-en: a %sgreat-great-granduncle/a %sgreat-great-grandaunt
-fr: un %sarrière-arrière-grand-oncle/une %sarrière-arrière-grande-tante
-
-    cousins.5.1
-en: great-great-granduncles
-fr: arrière-arrière-grands-oncles
-
-    cousins.5.1 tt
-en: siblings of the great-great-grandparents
-fr: frères et sœurs des trisaïeuls
-
-    cousin.5.2
-fr: une %sarrière-arrière-grand-cousin/une %sarrière-arrière-grande-cousine
-
-    cousins.5.2
-fr: arrière-arrière-grands-cousins
-
-    cousins.5.2 tt
-fr: arrière-grand-oncles et arrière-grandes-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins des arrière-grands-parents et arrière-grands-oncles
-
-    cousin.5.3
-fr: une %sarrière-grand-cousin 2<sup>e</sup>/une %sarrière-grande-cousine 2<sup>e</sup>
-
-    cousins.5.3
-fr: arrière-grands-cousins 2<sup>e</sup>
-
-    cousins.5.3 tt
-fr: arrière-grands-cousins au deuxième degré<hr><- cousins issus de germains des grands-parents et grands-oncles
-
-    cousin.5.4
-fr: un %sgrand-cousin au 3<sup>e</sup> degré/une %sgrande-cousine au 3<sup>e</sup> degré
-
-    cousins.5.4
-fr: grands-cousins 3<sup>e</sup>
-
-    cousins.5.4 tt
-fr: grands-cousins au troisième degré<hr><- cousins issus d’issus de germains des parents
-
-    cousin.5.5
-en: a 4th -cousin/
-fr: un cousin au 4e degré/une cousine au 4e degré
-
-    cousins.5.5
-en: 4th cousins
-fr: cousins 4<sup>e</sup>
-
-    cousins.5.5 tt
-fr: cousins au quatrième degré<br>cousins issus d’issus d’issus de germains<hr><i>arrière-petits-cousins</i>
-
-    cousins.5.6
-fr: petits-cousins 4<sup>e</sup>
-
-    cousins.5.6 tt
-fr: petits-cousins au quatrième degré
-
-    cousins.5.7
-fr: arrière-petits-cousins 4<sup>e</sup>
-
-    cousins.5.7 tt
-fr: arrière-petits-cousins au quatrième degré
-
-    cousins.5.8
-fr: arrière-arrière-petits-cousins 4<sup>e</sup>
-
-    cousins.5.8 tt
-fr: deux-fois-arrière-petits-cousins au quatrième degré
-
-    cousins.5.9
-fr: trois-fois-arrière-petits-cousins 4<sup>e</sup>
-
-    cousins.5.9 tt
-fr: trois-fois-arrière-petits-cousins au quatrième degré
-
-    cousins.5.10
-fr: quatre-fois-arrière-petits-cousins 4<sup>e</sup>
-
-    cousins.5.10 tt
-fr: quatre-fois-arrière-petits-cousins au quatrième degré
-
-    cousin.6.1
-en: a %sthird great-granduncle/a %sthird great-grandaunt
-fr: un %strois-fois-arrière-grand-oncle/une %strois-fois-arrière-grande-tante
-
-    cousins.6.1
-en: third great-granduncles
-fr: 3×-arrière-grands-oncles
-
-    cousins.6.1 tt
-fr: trois-fois-arrière-grands-oncles<hr>frères et sœurs des quadrisaïeuls
-
-    cousin.6.2
-fr: un %s3×-arrière-grand-cousin/une %s3×-arrière-grande-cousine
-
-    cousins.6.2
-fr: 3×-arrière-grands-cousins
-
-    cousins.6.2 tt
-fr: arrière-arrière-arrière-grands-cousins au premier degré
-
-    cousin.6.3
-fr: un %sarrière-arrière-grand-cousin au 2<sup>e</sup> degré/une %sarrière-arrière-grande-cousine au 2<sup>e</sup> degré
-
-    cousins.6.3
-fr: arrière-arrière-grands-cousins 2<sup>e</sup>
-
-    cousins.6.3 tt
-fr: arrière-arrière-grands-cousins au deuxième degré<br><- cousins issus de germains des arrière-grands-parents et arrière-grands-oncles
-
-    cousin.6.4
-fr: un %sarrière-grand-cousin au 3<sup>e</sup> degré/une %sarrière-grande-cousine au 3<sup>e</sup> degré
-
-    cousins.6.4
-fr: arrière-grands-cousins 3<sup>e</sup>
-
-    cousins.6.4 tt
-fr: arrière-grands-cousins au troisième degré<br><- cousins issus d’issus de germains des grands-parents et grands-oncles
-
-    cousins.6.5
-fr: grands-cousins 4<sup>e</sup>
-
-    cousins.6.5 tt
-fr: grands-cousins au quatrième degré
-
-    cousins.6.6
-en: fifth cousins
-fr: cousins 5<sup>e</sup>
-
-    cousins.6.6 tt
-fr: cousins au cinquième degré
-
-    cousins.6.7
-fr: petits-cousins 5<sup>e</sup>
-
-    cousins.6.7 tt
-fr: petits-cousins au cinquième degré
-
-    cousins.6.8
-fr: arrière-petits-cousins 5<sup>e</sup>
-
-    cousins.6.8 tt
-fr: arrière-petits-cousins au cinquième degré
-
-    cousins.6.9
-fr: arrière-petits-cousins 5<sup>e</sup>
-
-    cousins.6.9 tt
-fr: arrière-arrière-petits-cousins au cinquième degré
-
-    cousins.6.10
-fr: 3×-arrière-petits-cousins 5<sup>e</sup>
-
-    cousins.6.10 tt
-fr: trois-fois-arrière-petits-cousins au cinquième degré
-
-    cousins.6.11
-fr: 4×-arrière-petits-cousins 5<sup>e</sup>
-
-    cousins.6.11 tt
-fr: quatre-fois-arrière-petits-cousins au cinquième degré
-
-    cousin.7.1
-en: a %sfourth great-granduncle/a %sfourth great-grandaunt
-fr: un %squatre-fois-arrière-grand-oncle/une %squatre-fois-arrière-grande-tante
-
-    cousins.7.1
-en: fourth great-granduncles
-fr: 4×-arrière-grands-oncles
-
-    cousins.7.1 tt
-fr: quatre-fois-arrière-grands-oncles<br>frères et sœurs des quinquisaïeuls
-
-    cousins.7.2
-fr: 4×-arrière-grands-cousins
-
-    cousins.7.2 tt
-fr: quatre-fois-arrière-grands-cousins<br>arrrière-arrière-arrière-arrière-grands-cousins au premier degré
-
-    cousins.7.3
-fr: 3×-arrière-grands-cousins 2<sup>e</sup>
-
-    cousins.7.3 tt
-fr: trois-fois-arrière-grands-cousins au deuxième degré/arrière-arrière-arrière-grands-cousins au deuxième degré
-
-    cousins.7.4
-fr: arrière-arrière-grands-cousins 3<sup>e</sup>
-
-    cousins.7.4 tt
-fr: arrière-arrière-grands-cousins au troisième degré
-
-    cousins.7.5
-fr: arrière-grands-cousins 4<sup>e</sup>
-
-    cousins.7.5 tt
-fr: arrière-grands-cousins au quatrième degré
-
-    cousins.7.6
-fr: grands-cousins 5<sup>e</sup>
-
-    cousins.7.6 tt
-fr: grands-cousins au 5e degré
-
-    cousins.7.7
-en: 6th cousins
-fr: cousins 6<sup>e</sup>
-
-    cousins.7.7 tt
-fr: cousins au sixième degré
-
-    cousins.7.8
-fr: petits-cousins 6<sup>e</sup>
-
-    cousins.7.8 tt
-fr: petits-cousins au sixième degré
-
-    cousins.7.9
-fr: arrière-petits-cousins 6<sup>e</sup>
-
-    cousins.7.9 tt
-fr: arrière-petits-cousins au sixième degré
-
-    cousins.7.10
-fr: arrière-arrière-petits-cousins 6<sup>e</sup>
-
-    cousins.7.10 tt
-fr: arrière-arrière-petits-cousins au sixième degré
-
-    cousins.7.11
-fr: 3×-arrière-petits-cousins 6<sup>e</sup>
-
-    cousins.7.11 tt
-fr: trois-fois-arrière-petits-cousins au sixième degré
-
-    cousins.7.12
-fr: 4×-arrière-petits-cousins 6<sup>e</sup>
-
-    cousins.7.12 tt
-fr: quatre-fois-arrière-petits-cousins au sixième degré
-
-    cousin.8.1
-en: a %sfifth great-granduncle/a %sfifth great-grandaunt
-fr: un %scinq-fois-arrière-grand-oncle/une %scinq-fois-arrière-grande-tante
-
-    cousins.8.1
-en: fifth great-granduncles
-fr: cinq-fois-arrière-grands-oncles
-
-    cousins.8.1 tt
-fr: frères et sœurs des septisaïeuls
-
-    cousins.8.2
-fr: cinq-fois-arrière-grands-cousins
-
-    cousins.8.2 tt
-fr: cinq-fois-arrière-grands-cousins au premier degré
-
-    cousins.8.3
-fr: quatre-fois-arrière-grands-cousins 2<sup>e</sup>
-
-    cousins.8.3 tt
-fr: quatre-fois-arrière-grands-cousins au deuxième degré
-
-    cousins.8.4
-fr: trois-fois-arrière-grands-cousins 3<sup>e</sup>
-
-    cousins.8.4 tt
-fr: trois-fois-arrière-grands-cousins au troisième degré
-
-    cousins.8.5
-fr: arrière-arrière-grands-cousins 4<sup>e</sup>
-
-    cousins.8.5 tt
-fr: arrière-arrière-grands-cousins au quatrième degré
-
-    cousins.8.6
-fr: arrière-grands-cousins 5<sup>e</sup>
-
-    cousins.8.6 tt
-fr: arrière-grands-cousins au cinquième degré
-
-    cousins.8.7
-fr: grands-cousins 6e
-
-    cousins.8.7 tt
-fr: grands-cousins au sixième degré
-
-    cousins.8.8
-en: 7th cousins
-fr: cousins 7<sup>e</sup>
-
-    cousins.8.8 tt
-en: seventh cousins
-fr: cousins au septième degré
-
-    cousins.8.9
-fr: petits-cousins 7<sup>e</sup>
-
-    cousins.8.9 tt
-fr: petits-cousins au septième degré
-
-    cousins.8.10
-fr: arrière-petits-cousins 7<sup>e</sup>
-
-    cousins.8.10 tt
-fr: arrière-petits-cousins au septième degré
-
-    cousins.8.11
-fr: arrière-arrière-petits-cousins 7<sup>e</sup>
-
-    cousins.8.11 tt
-fr: arrière-arrière-petits-cousins au septième degré
-
-    cousins.8.12
-fr: trois-fois-arrière-petits-cousins 7<sup>e</sup>
-
-    cousins.8.12 tt
-fr: trois-fois-arrière-petits-cousins au septième degré
-
-    cousins.8.13
-fr: quatre-fois-arrière-petits-cousins 7<sup>e</sup>
-
-    cousins.8.13 tt
-fr: quatre-fois-arrière-petits-cousins au septième degré
-
-    cousin.9.1
-en: a %ssixth great-granduncle/a %ssixth great-grandaunt
-fr: un %ssix-fois-arrière-grand-oncle/une %ssix-fois-arrière-grande-tante
-
-    cousins.9.1
-en: sixth great-granduncles
-fr: six-fois-arrière-grands-oncles
-
-    cousins.9.1 tt
-fr: frères et sœurs des octosaïeuls
-
-    cousins.9.2
-fr: 6×-arrière-grands-cousins
-
-    cousins.9.2 tt
-fr: six-foix-arrière-grands-cousins au premier degré
-
-    cousins.9.3
-fr: 5×-arrière-grands-cousins 2<sup>e</sup>
-
-    cousins.9.3 tt
-fr: cinq-fois-arrière-grands-cousins au deuxième degré
-
-    cousins.9.4
-fr: 4×-arrière-grands-cousins 3<sup>e</sup>
-
-    cousins.9.4 tt
-fr: quatre-fois-arrière-grands-cousins au troisième degré
-
-    cousins.9.5
-fr: 3×-arrière-grands-cousins 4<sup>e</sup>
-
-    cousins.9.5 tt
-fr: trois-fois-arrière-grands-cousins au quatrième degré
-
-    cousins.9.6
-fr: arrière-arrière-grands-cousins 5<sup>e</sup>
-
-    cousins.9.6 tt
-fr: deux-fois-arrière-grands-cousins au cinquième degré
-
-    cousins.9.7
-fr: arrière-grands-cousins 6<sup>e</sup>
-
-    cousins.9.7 tt
-fr: arrière-grands-cousins au sixième degré
-
-    cousins.9.8
-fr: grands-cousins 7e
-
-    cousins.9.8 tt
-fr: grands-cousins au septième degré
-
-    cousins.9.9
-fr: cousins 8<sup>e</sup>
-
-    cousins.9.9 tt
-fr: cousins au huitième degré
-
-    cousins.9.10
-fr: petits-cousins 8<sup>e</sup>
-
-    cousins.9.10 tt
-fr: petits-cousins au huitième degré
-
-    cousins.9.11
-fr: arrière-petits-cousins 8<sup>e</sup>
-
-    cousins.9.11 tt
-fr: arrière-petits-cousins au huitième degré
-
-    cousins.9.12
-fr: arrière-arrière-petits-cousins 8<sup>e</sup>
-
-    cousins.9.12 tt
-fr: arrière-arrière-petits-cousins au huitième degré
-
-    cousins.9.13
-fr: trois-fois-arrière-petits-cousins 8<sup>e</sup>
-
-    cousins.9.13 tt
-fr: arrière-arrière-arrière-petits-cousins au huitième degré
-
-    cousins.9.14
-fr: quatre-fois-arrière-petits-cousins 8<sup>e</sup>
-
-    cousins.9.14 tt
-fr: quatre-fois-arrière-petits-cousins au huitième degré
-
-    cousin.10.1
-en: a %sseventh great-granduncle/a %sseventh great-grandaunt
-fr: un %ssept-fois-arrière-grand-oncle/une %ssept-fois-arrière-grande-tante
-
-    cousins.10.1
-en: seventh great-granduncles
-fr: sept-fois-arrière-grands-oncles
-
-    cousins.10.1 tt
-fr: frères et sœurs des nonaïeuls
-
-    coefficient of relationship
-co: U <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">cuefficiente di e rilazioni</a> indicheghja u percentuale medianu minimu di geni spartiti trà dui individui.
-en: The <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient of relationship</a> gives the minimum average percentage of shared DNA between two individuals.
-fr: Le <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">coefficient de parenté</a> indique le pourcentage moyen minimum de gènes partagés entre deux individus.
-
-    one ancestor counted
-co: E relazioni di parentia cunsanguine è uterine per un antenatu cumunu unicu sò incluse ma u so cuefficiente di parentia vale a metà di quellu di a relazione sana equivalente.
-en: One common ancestor: consanguine and uterine half relationships are included, but their coefficient of parente is half the full equivalent relation.
-fr: Les relations de parenté consanguines et utérines par un seul ancêtre pivot commun sont incluses. Leur coefficient de parenté vaut la moitié de celui de la relation complète équivalente.
-
-    multiple relations
-fr: En cas d’implexes, certains individus auront de multiples liens de parenté (chemins) avec l’individu racine. La parenté entre deux individus dépendra de tous les coefficients de leurs liens de parenté (chemins).
 
     since the last click
 bg: от последното щракване
@@ -15080,6 +15363,47 @@ fr: echelle
 pt: escala
 sv: skala
 tr: ölçek
+
+    son/daughter/child
+af: seun/dogter/kind
+bg: син/дъщеря/деца
+br: mab/merc'h/bugel
+ca: fill/filla/fill(a)
+co: figliolu/figliola/zittellu(a)
+cs: je synem/je dcerou/je dítětem
+da: søn/datter/barn
+de: Sohn/Tochter/Kind
+en: son/daughter/child
+eo: filo/filino/ido
+es: hijo/hija/hijo(a)
+et: poeg/tütar/laps
+fi: poika/tytär/lapsi
+fr: fils/fille/enfant
+he:  בן/ בת
+is: sonur/dóttir/barn
+it: figlio/figlia/figlio(a)
+lt: sūnus/duktė/vaikai
+lv: dēls/meita/bērns
+nl: zoon/dochter/kind
+no: sønn/datter/barn
+oc: filh/filha/enfant
+pl: syn/córka/dziecko
+pt: filho/filha/filho(a)
+ro: fiu/fica/copil
+ru: сын/дочь/дети
+sk: syn/dcéra/dieťa
+sl: sin/hčerka/otrok
+sv: son/dotter/barn
+tr: oğul/kız/çocuk
+
+    sons/daughters/children
+co: figlioli/figliole/zitelli
+de: Söhne/Töchter/Kinder
+en: sons/daughters/children
+fr: fils/filles/enfants
+pt: filhos/filhas/filhos
+sv: söner/döttrar/barn
+tr: oğulları/kızları/çocukları
 
     sort by/branch/alphabetic order
 co: urganizà da :/ghjemba/ordine alfabeticu
@@ -15419,6 +15743,12 @@ ru: статистика и годовщины
 sv: statistik och årsdagar
 tr: istatistikler ve yıldönümleri
 
+    store image
+co: a fiura selezziunata serà piazzata in
+de: das ausgewählte Bild wird kopiert nach
+en: the selected image will be copied to
+fr: l’image sélectionnée sera enregistrée dans
+
     subdivision
 co: paisolu
 de: Ort
@@ -15687,7 +16017,7 @@ af: die %d voorname
 bg: %d собствени имена
 br: ar %d raganv
 ca: els %d noms
-co: i %d nomi
+co: %d nomi
 cs: %d křestních jmen
 da: de %d fornavne
 de: %d Vornamen
@@ -15784,7 +16114,7 @@ af: die %d vanne
 bg: %d фамилни имена
 br: ar %d anv-familh
 ca: els %d cognoms
-co: e %d casate
+co: %d casate
 cs: %d příjmení
 da: de %d efternavne
 de: %d Nachnamen
@@ -16036,6 +16366,11 @@ sl: otroci
 sv: barnen
 tr: çocuklar
 
+    the database name %s contains a forbidden character.
+co: u nome di a basa di dati « %s » cuntene un caratteru difesu.
+en: the database name "%s" contains a forbidden character.
+fr: le nom de la base "%s" contient un caractère interdit.
+
     the day after tomorrow
 af: oormôre
 bg: вдругиден
@@ -16148,17 +16483,6 @@ sl: oče/mati/starš
 sv: fadern/modern/en förälder
 tr: baba/anne/ebeveyn
 zh: 父/母/a parent
-
-    cousin.1.0
-->: the father/the mother/a parent
-
-    cousins.1.0
-->: parents
-
-    cousins.1.0 tt
-co: babbu è mamma
-en: father and mother
-fr: père et mère<br>géniteur et génitrice
 
     the file is temporarily locked: please try again
 af: die lêer is tydelik gesluit: probeer asseblief later weer
@@ -16316,92 +16640,6 @@ sk: vnúčatá
 sl: vnuki
 sv: barnbarnen
 tr: torunlar
-
-    cousin.0.2
-->: a grandson/a granddaughter/a grandchild
-
-    cousins.0.2
-co: figliulinu/figliulini
-en: grandchild/grandchildren
-fr: petit-enfant/petits-enfants
-
-    cousins.0.2 tt
-co: zitelli di u so figliolu o di a so figliola
-en: children of one’s son or daughters
-fr: enfants de son fils ou de sa fille
-
-    cousin.0.3
-->: a great-grandson/a great-granddaughter/a great-grandchild
-
-    cousins.0.3
-co: arcifigliulinu/arcifigliulini
-en: great-grandchild/great-grandchildren
-fr: arrière-petit-enfant/arrière-petits-enfants
-
-    cousins.0.3 tt
-co: zitelli di u so figliulinu o di a so figliulina
-en: children of one’s grandson or granddaughter
-fr: enfants de son petit-fils ou de sa petite-fille
-
-    cousin.0.4
-en: a great-great-grandson/a great-great-granddaughter/a great-great-grandchild
-fr: un arrière-arrière-petit-fils/une arrière-arrière-petite-fille/un arrière-arrière-petit-enfant
-
-    cousins.0.4
-en: great-great-grandchild/great-great-grandchildren
-fr: arrière-arrière-petit-enfant/arrière-arrière-petits-enfants
-
-    cousins.0.4 tt
-en: children of one’s great-grandson or great-granddaughter
-fr: enfants de son arrière-petit-fils ou de son arrière-petite-fille
-
-    cousin.0.5
-en: a three-times-great-grandson/a three-times-great-granddaughter/a three-times-great-grandchild
-fr: un trois-fois-arrière-petit-fils/une trois-fois-arrière-petite-fille/un trois-fois-arrière-petit-enfant
-
-    cousins.0.5
-en: three-times-great-grandchild/three-times-great-grandchildren
-fr: trois-fois-arrière-petits-enfant/trois-fois-arrière-petits-enfants
-
-    cousin.0.6
-en: a four-times-great-grandson/a four-times-great-granddaughter/a four-times-great-grandchild
-fr: un quatre-fois-arrière-petit-fils/une quatre-fois-arrière-petite-fille/un quatre-fois-arrière-petit-enfant
-
-    cousins.0.6
-en: four-times-great-grandchild/four-times-great-grandchildren
-fr: quatre-fois-arrière-petit-enfant/quatre-fois-arrière-petits-enfants
-
-    cousin.0.7
-en: a five-times-great-grandson/a five-times-great-granddaughter/a five-times-great-grandchild
-fr: un cinq-fois-arrière-petit-fils/une cinq-fois-arrière-petite-fille/un cinq-fois-arrière-petit-enfant
-
-    cousins.0.7
-en: five-times-great-grandchild/five-times-great-grandchildren
-fr: cinq-fois-arrière-petit-enfant/cinq-fois-arrière-petits-enfants
-
-    cousin.0.8
-en: a six-times-great-grandson/a six-times-great-granddaughter/a six-times-great-grandchild
-fr: un six-fois-arrière-petit-fils/une six-fois-arrière-petite-fille/un six-fois-arrière-petit-enfant
-
-    cousins.0.8
-en: six-times-great-grandchild/six-times-great-grandchildren
-fr: six-fois-arrière-petit-enfant/six-fois-arrière-petits-enfants
-
-    cousin.0.9
-en: a seven-times-great-grandson/a seven-times-great-granddaughter/a seven-times-great-grandchild
-fr: un sept-fois-arrière-petit-fils/une sept-fois-arrière-petite-fille/un sept-fois-arrière-petit-enfant
-
-    cousins.0.9
-en: seven-times-great-grandchild/seven-times-great-grandchildren
-fr: sept-fois-arrière-petit-enfant/sept-fois-arrière-petits-enfants
-
-    cousin.0.10
-en: a eight-times-great-grandson/a eight-times-great-granddaughter/a eight-times-great-grandchild
-fr: un huit-fois-arrière-petit-fils/une huit-fois-arrière-petite-fille/un huit-fois-arrière-petit-enfant
-
-    cousins.0.10
-en: eight-times-great-grandchild/eight-times-great-grandchildren
-fr: huit-fois-arrière-petit-enfant/huit-fois-arrière-petits-enfants
 
     the grandparents
 af: die grootouers
@@ -16848,6 +17086,12 @@ sl: da bi dodal otroka k družini, uporabite "%s"
 sv: för att lägga till ett barn i en familj, använd "%s"
 tr: bir aileye çocuk eklemek için "%s" kullanın
 
+    to carrousel
+co: à u carusellu
+de: zum Karussell
+en: to carrousel
+fr: au carrousel
+
     to change
 co: per cambià
 de: zum Wechseln
@@ -17266,6 +17510,12 @@ sl: jutri
 sv: i morgon
 tr: yarın
 
+    too much results
+co: troppu risultati
+de: zu viele Ergebnisse
+en: too much results
+fr: trop de résultats
+
     tools
 co: attrezzi
 de: Hilfsmittel
@@ -17282,10 +17532,6 @@ pt: ferramentas
 ru: инструменты
 sv: verktyg
 tr: araçlar
-
-    too much results
-en: too much results
-fr: trop de résultats
 
     total
 af: totaal
@@ -17470,15 +17716,6 @@ sl: strici in tete
 sv: farbröder-morbröder och fastrar-mostrar
 tr: amcalar ve teyzeler
 
-    cousin.2.1
-->: an uncle/an aunt
-
-    cousins.2.1
-->: uncles and aunts
-
-    cousins.2.1 tt
-fr: frères et sœurs des parents
-
     undefined sex for %t
 af: geslag onbekend vir %t
 bg: не е определен полът на %t
@@ -17510,6 +17747,12 @@ sk: nedefinované pohlavie pre %t
 sl: %t nima določenega spola
 sv: odefinierat kön för %t
 tr: %t için cinsiyet tanımlanmamış
+
+    unfiltered total
+co: tutale micca filtratu
+de: Summe ungefiltert
+en: unfiltered total
+fr: total non filtré
 
     unknown person
 af: onbekende persoon
@@ -17657,6 +17900,30 @@ ru: изменить семью
 sv: redigera familj
 tr: aileyi Düzenle
 
+    update image note
+co: mudificà a nota di a fiura
+de: Bildnotiz aktualisieren
+en: update image note
+fr: mettre à jour la note de l’image
+
+    update image source
+co: mudificà a fonte di a fiura
+de: Bildquelle aktualisieren
+en: update image source
+fr: mettre à jour la source de l’image
+
+    uploaded
+co: incaricatu/incaricata
+de: hochgeladen
+en: uploaded
+fr: envoyé/envoyée
+
+    url
+co: indirizzu web
+de: Url
+en: url
+fr: url
+
     use "link" instead of "create"
 af: gebruik "koppel" eerder as "skep"
 bg: използвайте "да се свърже" вместо "да се създаде"
@@ -17715,6 +17982,60 @@ sl: uporabnik/geslo/prekliči
 sv: användare/lösenord/avbryt
 tr: kullanıcı/şifre/iptal
 
+    v7 anywhere
+co: cuncurdanza senza custrizzione
+de: ohne Einschränkung
+en: match anywhere
+fr: correspondance sans contrainte
+
+    v7 approxim match
+co: cuncurdanza senza maiuscule nè alette
+de: Match ohne Großbuchstaben oder Akzente
+en: match with no capitale nor accents
+fr: correspondance sans capitales ni accents
+
+    v7 exact match
+co: cuncurdanza esatta (maiuscule/minuscule è alette)
+de: exakte Übereinstimmung (groß/klein und Akzente)
+en: exact match (upper/lower and accents)
+fr: correspondance exacte (majuscules/minuscules et accents)
+
+    v7 hide others
+co: piattà l’altri nomi
+de: andere Vornamen ausblenden
+en: hide other first mames
+fr: cacher les autres prénoms
+
+    v7 list too long
+co: lista troppu longa (pruvate d’aumentà u valore di u filtru)
+de: Liste zu lang (versuche einen genaueren Filter)
+en: list too long (try increasing filter value)
+fr: liste trop longue (augmentez la valeur du filtre)
+
+    v7 plugins
+co: moduli d’estensione
+de: Plugins
+en: plugins
+fr: plugins
+
+    v7 refresh fnames cache
+co: ricustruisce l’impiatta di i nomi
+de: Vornamen-Cache aktualisieren
+en: refresh fnames cache
+fr: reconstruire le cache des prénoms
+
+    v7 show others
+co: affissà l’altri nomi
+de: zeige die anderen Vornamen
+en: show other first names
+fr: afficher les autres prénoms
+
+    v7 word boundaries
+co: cuncurdanza di parolle sane
+de: ganze Worte vergleichen
+en: match full words
+fr: correspondance de mots entiers
+
     validate/delete
 bg: да се потвърди/да се изтрие
 ca: validar/eliminar
@@ -17767,6 +18088,12 @@ pt: versão
 ru: версия
 sv: version
 tr: sürüm
+
+    very short display
+co: affissera corta corta
+de: sehr kurze Anzeige
+en: very short display
+fr: affichage très court
 
     view source
 co: fighjà a fonte
@@ -17827,6 +18154,12 @@ pt: pessoa
 ru: личность
 sv: individ
 tr: bireysel
+
+    warning refresh
+co: attualizà a pagina solu dopu à un cliccu nant’à l’icona principale osinnò si ripiteria u scambiu di e fiure.
+de: Aktualisieren Sie die Seite nicht, ohne vorher auf das Symbol zu klicken, da dies den Bildaustausch wiederholen würde.
+en: refresh the page only after having clicked on the main icon as this would repeat the swap action.
+fr: ne pas rafraichir la page sans avoir au préalable cliqué sur l’icone car cela répéterait l’échange des images.
 
     warnings
 af: waarskuwings
@@ -17908,6 +18241,12 @@ ru: были в браке
 sv: vigselort
 tr: nerede evlendi
 
+    widower/widow
+co: veduvu/veduva
+de: Witwer/Witwe
+en: widower/widow
+fr: veuf/veuve
+
     width
 co: larghezza
 de: Breite
@@ -17963,6 +18302,12 @@ sl: z
 sv: med
 tr: ile
 
+    with note
+co: cù una nota
+de: mit einer Notiz
+en: with a note
+fr: avec une note
+
     with root, spouses and unknowns
 co: cù l’antenatu di a radica, i cumpagni è i scunnisciuti
 de: mit Urahn, Ehegatten und Unbekannten
@@ -17971,6 +18316,12 @@ fr: avec l’ancêtre racine, les conjoints et les inconnus
 pt: com o antepassado raiz, cônjuges e desconhecidos 
 sv: med rot, partners och okända
 tr: kök atası, eşler ve bilinmeyenler ile
+
+    without implex display
+co: senza affissà l’implessi
+de: ohne Implex-Anzeige
+en: without implex display
+fr: sans afficher les implexes
 
     witness at %s of
 co: testimone à u %s di
@@ -18056,6 +18407,7 @@ tr: tanık/tanık/tanıklar
 
     witness/witnesses
 co: testimone/testimoni
+de: Zeuge/Zeugen
 en: witness/witnesses
 fr: témoin/témoins
 lt: liudytojas/liudytoja/liudytojai/liudytojosės
@@ -18118,6 +18470,18 @@ sk: wizard/wizards/friend/friends/exterior
 sl: čarovnik/čarovnik/prijatelj/prijatelj/exterior
 sv: administratör/administratörer/vän/vän/extern
 tr: yönetici/yöneticiler/arkadaş/arkadaşlar/dış
+
+    word match
+co: parolla sana
+de: ganzes Wort
+en: word match
+fr: mot complet
+
+    word match title
+co: paragunà cù u nome sanu d’un locu
+de: den ganzen Ortsnamen vergleichen
+en: match full location name
+fr: comparer avec le nom complet d'un lieu
 
     would be his/her own ancestor
 af: sal sy/haar eie voorganger wees
@@ -18357,196 +18721,4 @@ sk: tvoja správa čaká na potvrdenie
 sv: ditt meddelande väntar på godkännande
 tr: mesajınız doğrulama için bekliyor
 
-    add filter
-co: aghjunghje un filtru
-en: add a filter
-fr: ajouter un filtre
 
-    filter by
-co: filtrà da
-en: filter by
-fr: filtrer par
-
-    clear filters
-co: squassà tutti i filtri
-en: clear every filters
-fr: effacer tous les filtres
-
-    unfiltered total
-co: tutale micca filtratu
-en: unfiltered total
-fr: total non filtré
-
-    no line break in names
-co: affissà e casate senza saltu di linea
-en: no line break in names
-fr: afficher les noms sans saut de ligne
-
-    show first names
-co: affissà tutti i nomi
-en: show all first names
-fr: afficher tous les prénoms
-
-    highlight incomplete data
-co: sopralineà i dati incumpleti
-en: highlight incomplete data
-fr: surligner les données incomplètes
-
-    edit family on spouse
-co: mudificà e famiglie via un cliccu nant’à a data di matrimoniu di a linea d’un cunghjuntu
-en: edit the families by clicking on the date of marriage of the row of one spouses
-fr: modifier les familles en cliquant sur la date de mariage sur la ligne d’un conjoint
-
-    colored corner
-co: un scornu culuritu indicheghja l’esistenza di nota (turchinu), di fonte (giallu) o di i dui (verde) per un evenimentu. Tandu si pò affissà i dati in un finestrinu via un cliccu nant’à u sfondulu di e cellule.
-en: a colored corner shows the existence of notes (blue), sources (yellow) or both (green) for an event. The data are then displayable in a pop-up by clicking on the background of cells.
-fr: un coin coloré indique l’existence de notes (bleu), sources (jaune) ou des deux (vert) pour un événement. Ces données sont ensuite affichables dans une fenêtre surgissante en cliquant sur le fond des cases.
-
-    modify the size of images to
-co: mudificà a dimensione di e fiure à
-en: modify the size of images to
-fr: modifier la taille des images à
-
-    passing by
-co: passendu da
-en: passing by
-fr: en passant par
-
-    widower/widow
-co: veduvu/veduva
-en: widower/widow
-fr: veuf/veuve
-
-    for/since
-co: durante/dapoi
-en: for/since
-fr: pendant/depuis
-
-    fanchart
-co: arburu in banderetta
-en: fanchart
-fr: arbre en éventail
-
-    v7 plugins
-co: moduli d’estensione
-en: plugins
-fr: plugins
-
-    all
-co: tutti
-en: all
-fr: tous
-
-    any place
-co: sottulochi
-en: sub-places
-fr: sous-lieux
-
-    any place title
-co: circà in a lista di i sottulochi
-en: search in the list of sub-places
-fr: rechercher dans la liste des sous-lieux
-
-    v7 anywhere
-co: cuncurdanza senza custrizzione
-en: match anywhere
-fr: correspondance sans contrainte
-
-    v7 approxim match
-co: cuncurdanza senza maiuscule nè alette
-en: match with no capitale nor accents
-fr: correspondance sans capitales ni accents
-
-    case sensitive
-co: maiuscule è alette
-en: case sensitive
-fr: capitales et accents
-
-    case sensitive title
-co: tene contu di e maiuscule è alette
-en: dont ignore case and accents
-fr: tenir compte des majuscules et accents
-
-    v7 exact match
-co: cuncurdanza esatta (maiuscule/minuscule è alette)
-en: exact match (upper/lower and accents)
-fr: correspondance exacte (majuscules/minuscules et accents)
-
-    v7 hide others
-co: piattà l’altri nomi
-en: hide other first mames
-fr: cacher les autres prénoms
-
-    matching
-co: cuncurdanza
-en: matching
-fr: correspondance
-
-    filter
-co: filtrà
-en: filter
-fr: filtrer
-
-    place filter
-co: numeru d’elementi cunservati in a lista di i lochi
-en: number of elements kept in places list
-fr: nombre d'éléments à conserver dans la liste des places
-
-    max nbr
-co: num mas rel
-en: max rel nbr
-fr: max rel nbr
-
-    max nbr title
-co: numeru massimu per e liste di rilazione
-en: max number for relation list
-fr: nombre maximum pour les listes de relations
-
-    v7 refresh fnames cache
-co: ricustruisce l’impiatta di i nomi
-en: refresh fnames cache
-fr: reconstruire le cache des prénoms
-
-    v7 show others
-co: affissà l’altri nomi
-en: show other first names
-fr: afficher les autres prénoms
-
-    v7 word boundaries
-co: cuncurdanza di parolle sane
-en: match full words
-fr: correspondance de mots entiers
-
-    word match
-co: parolla sana
-en: word match
-fr: mot complet
-
-    word match title
-co: paragunà cù u nome sanu d’un locu
-en: match full location name
-fr: comparer avec le nom complet d'un lieu
-
-    all the places
-co: tutti i lochi
-en: all the places
-fr: tous les lieux
-
-    v7 list too long
-co: lista troppu longa (pruvate d’aumentà u valore di u filtru)
-en: list too long (try increasing filter value)
-fr: liste trop longue (augmentez la valeur du filtre)
-
-    path/paths
-co: chjassu/chjassi
-en: path/paths
-fr: chemin/chemins
-
-    very short display
-co: affissera corta corta
-en: very short display
-fr: affichage très court
-
-    remove %s column
-en: click on this header to remove the column(s) “%s”
-fr: cliquer sur cette en-tête pour supprimer la ou les colonne(s) « %s »
