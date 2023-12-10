@@ -1606,7 +1606,10 @@ and eval_simple_str_var conf base env (p, p_auth) = function
           l := SortedList.empty;
           null_val
       | _ -> raise Not_found)
-  | "family_cnt" -> string_of_int_env "family_cnt" env
+  | "family_cnt" -> (
+      match get_env "family_cnt" env with
+      | Vint x -> string_of_int x |> str_val
+      | _ -> null_val)
   | "first_name_alias" -> (
       match get_env "first_name_alias" env with
       | Vstring s -> s |> Util.escape_html |> safe_val
