@@ -4727,7 +4727,6 @@ tr: çiftler
 
     cousin.0.1
 ->: son/daughter/child
-de: Sohn/Tochter/Kind
 
     cousin.0.10
 en: a eight-times-great-grandson/a eight-times-great-granddaughter/a eight-times-great-grandchild
@@ -4735,11 +4734,9 @@ fr: un huit-fois-arrière-petit-fils/une huit-fois-arrière-petite-fille/un huit
 
     cousin.0.2
 ->: a grandson/a granddaughter/a grandchild
-de: ein Enkel/eine Enkelin/Enkel
 
     cousin.0.3
 ->: a great-grandson/a great-granddaughter/a great-grandchild
-de: ein Urenkel/eine Urenkelin/Urenkel
 
     cousin.0.4
 de: ein Ur-Ur-Enkel/eine Ur-Ur-Enkelin/Ur-Ur-Enkel
@@ -4773,11 +4770,9 @@ fr: un sept-fois-arrière-petit-fils/une sept-fois-arrière-petite-fille/un sept
 
     cousin.1.0
 ->: the father/the mother/a parent
-de: der Vater/die Mutter/ein Elternteil
 
     cousin.1.1
 ->: a brother/a sister/a sibling
-de: ein Bruder/eine Schwester/ein Geschwisterteil
 
     cousin.1.10
 de: ein siebenfacher Ur-Großneffe/eine siebenfache Ur-Großnichte/siebenfacher Ur-Großneffe
@@ -4786,11 +4781,9 @@ fr: un %ssept-fois-arrière-petit-neveu/une %ssept-fois-arrière-petite-nièce/u
 
     cousin.1.2
 ->: a nephew/a niece
-de: ein Neffe/eine Nichte
 
     cousin.1.3
 ->: a great-nephew/a great-niece
-de: ein Großneffe/eine Großnichte
 
     cousin.1.4
 co: un %sarciniputinu/una %sarciniputina/%sarciniputini/
