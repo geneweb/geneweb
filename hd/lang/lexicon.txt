@@ -1007,7 +1007,7 @@ ca: un cosí segon/una cosina segona/un(a) cosí(na) segon(a)
 co: un cuginu à u %s gradu/una cugina à u %s gradu/un(a) cuginu(a) à u %s gradu
 cs: bratranec z druhého kolena/sestřenice z druhého kolena
 da: en fætter af 2. grad/en kusine af 2. grad
-de: ein:d:+em Cousin 2. Grades/eine:d:+r Cousine 2. Grades
+de: ein:d:+em %sCousin 2. Grades/eine:d:+r %sCousine 2. Grades
 en: a %s2nd cousin
 eo: rekta prakuzo/rekta prakuzino/rekta kuz(in)o
 es: un primo nacido de primos hermanos/una prima nacida de primos hermanos/un(a) primo(a) nacido(a) de primos hermanos
@@ -1039,7 +1039,7 @@ ca: un cosí 3er/una cosina 3a/un(a) cosí(na) 3er(a)
 co: un %scuginu à u terzu gradu/una %scugina à u terzu gradu/un(a) %scuginu(a) à u terzu gradu
 cs: bratranec z třetího kolena/sestřenice z třetího kolena
 da: en fætter af 3. grad/en kusine af 3. grad
-de: ein:d:+em Cousin 3. Grades/eine:d:+r Cousine 3. Grades
+de: ein:d:+em %sCousin 3. Grades/eine:d:+r %sCousine 3. Grades
 en: a %s3rd cousin
 eo: 3a grada kuzo/3a grada kuzino/3a grada kuz(in)o
 es: un primo 3ro/una prima 3ro/un(a) primo(a) 3ro
@@ -1112,7 +1112,7 @@ ca: un germà/una germana/un(a) germà(na)
 co: un %sfratellu/una %surella/un %sfratellu o una surella
 cs: bratr/sestra/sourozenec
 da: en broder/en søster/en broder eller en søster
-de: ein Bruder/eine Schwester/ein Bruder oder eine Schwester
+de: ein %sBruder/eine %sSchwester/ein %sBruder oder eine %sSchwester
 en: a %sbrother/a %ssister/a %ssibling
 eo: frato/fratino/frat(in)o
 es: un hermano/una hermana/un(a) hermano(a)
@@ -1153,7 +1153,7 @@ ca: un cosí/una cosina
 co: un %scuginu/una %scugina/un %scuginu o una %scugina
 cs: bratranec/sestřenice
 da: en fætter/en kusine
-de: ein:d:+em Cousin/eine:d:+r Cousine
+de: ein:d:+em %sCousin/eine:d:+r %sCousine
 en: a %scousin
 eo: kuzo/kuzino
 es: un primo/una prima
@@ -1345,7 +1345,7 @@ ca: un besnebot/una besneboda
 co: un %sniputinu/una %sniputina/niputini/niputine/niputini è niputine
 cs: prasynovec/praneteř
 da: en grandnevø/en grandniece
-de: ein:d:+em Großneffe:d:+n/eine:d:+r Großnichte/Großneffen/Großnichten/Großneffen und Großnichten
+de: ein:d:+em %sGroßneffe:d:+n/eine:d:+r %sGroßnichte/Großneffen/Großnichten/Großneffen und Großnichten
 en: a %sgreat-nephew/a %sgreat-niece/great-nephew/great-niece/great-nephews and great-nieces
 eo: pranevo/pranevino
 es: un sobrino nieto/una sobrina nieta
@@ -1377,7 +1377,7 @@ ca: un oncle avi/una tia àvia
 co: un %sarciziu/una %sarcizia
 cs: prastrýc/prateta
 da: en grandonkel/en grandtante
-de: ein:d:+em Großonkel/eine:d:+r Großtante
+de: ein:d:+em %sGroßonkel/eine:d:+r %sGroßtante
 en: a %sgreat-uncle/a %sgreat-aunt
 eo: praonklo/praonklino
 es: un tio abuelo/una tia abuela
@@ -1459,7 +1459,7 @@ ca: un nebot/una neboda/nebots/nebodes/nebots i nebodes
 co: un %snipote/una %snipote/nipoti/nipote/nipoti è nipote
 cs: synovec/neteř/synovci/neteře/synovci a neteře
 da: en nevø/en niece/nevøer/niecer/nevøer og niecer
-de: ein:d:+em Neffe:d:+n/eine:d:+r Nichte/Neffen/Nichten/Neffen und Nichten
+de: ein:d:+em %sNeffe:d:+n/eine:d:+r %sNichte/Neffen/Nichten/Neffen und Nichten
 en: a %snephew/a %sniece/nephews/nieces/nephews and nieces
 eo: nevo/nevino/nevoj/nevinoj/nevoj kaj nevinoj
 es: un sobrino/a sobrina/sobrinos/sobrinas/sobrinos y sobrinas
@@ -4443,6 +4443,7 @@ tr: renk
 
     colored corner
 co: un scornu culuritu indicheghja l’esistenza di nota (turchinu), di fonte (giallu) o di i dui (verde) per un evenimentu. Tandu si pò affissà i dati in un finestrinu via un cliccu nant’à u sfondulu di e cellule.
+de: Eine farbige Ecke zeigt das Vorhandensein von Notizen (blau), Quellen (gelb) oder beidem (grün) für ein Ereignis an. Die Daten können dann in einem Popup angezeigt werden, indem man auf den Hintergrund der Zellen klickt.
 en: a colored corner shows the existence of notes (blue), sources (yellow) or both (green) for an event. The data are then displayable in a pop-up by clicking on the background of cells.
 fr: un coin coloré indique l’existence de notes (bleu), sources (jaune) ou des deux (vert) pour un événement. Ces données sont ensuite affichables dans une fenêtre surgissante en cliquant sur le fond des cases.
 
@@ -4480,6 +4481,7 @@ tr: yorum
 
     compact descendants tree
 co: arburu cumpattu di discendenza
+de: kompakter Nachkommenbaum
 en: compact descendants tree
 fr: arbre de descendance compact
 
@@ -4717,6 +4719,7 @@ tr: akrabalık
 
     continue
 co: cuntinuà
+de: weiter
 en: continue
 fr: continuer
 
@@ -4869,6 +4872,7 @@ tr: çiftler
 ->: son/daughter/child
 
     cousin.0.10
+de: ein Achtfach-Urenkel/eine Achtfach-Urenkelin/ein Achtfach-Urenkel
 en: a eight-times-great-grandson/a eight-times-great-granddaughter/a eight-times-great-grandchild
 fr: un huit-fois-arrière-petit-fils/une huit-fois-arrière-petite-fille/un huit-fois-arrière-petit-enfant
 
@@ -4915,7 +4919,7 @@ fr: un sept-fois-arrière-petit-fils/une sept-fois-arrière-petite-fille/un sept
 ->: a brother/a sister/a sibling
 
     cousin.1.10
-de: ein siebenfacher Ur-Großneffe/eine siebenfache Ur-Großnichte/siebenfacher Ur-Großneffe
+de: ein %sUr<sup>(x7)</sup>-Großneffe/eine %sUr<sup>(x7)</sup>-Großnichte/ein %sUr<sup>(x7)</sup>-Großneffe
 en: a %sseven-times-great-grandnephew/a %sseven-times-great-grandniece/a %sseven-times-great-grandnephew
 fr: un %ssept-fois-arrière-petit-neveu/une %ssept-fois-arrière-petite-nièce/un %ssept-fois-arrière-petit-neveu
 
@@ -4927,33 +4931,37 @@ fr: un %ssept-fois-arrière-petit-neveu/une %ssept-fois-arrière-petite-nièce/u
 
     cousin.1.4
 co: un %sarciniputinu/una %sarciniputina/%sarciniputini/
-de: ein Ur-Großneffe/eine Ur-Großnichte/Ur-Großneffe
+de: ein %sUr-Großneffe/eine %sUr-Großnichte/ein %sUr-Großneffe
 en: a %sgreat-grandnephew/a %sgreat-grandniece/a %sgreat-grandnephew
 fr: un %sarrière-petit-neveu/une %sarrière-petite-nièce/un %sarrière-petit-neveu
 
     cousin.1.5
-de: ein Ur-Ur-Großneffe/eine Ur-Ur-Großnichte/Ur-Ur-Großneffe
+de: ein %sUr-Ur-Großneffe/eine %sUr-Ur-Großnichte/ein %sUr-Ur-Großneffe
 en: a %sgreat-great-grandnephew/a %sgreat-great-grandniece/a %sgreat-great-grandnephew
 fr: un %sarrière-arrière-petit-neveu/une %sarrière-arrière-petite-nièce/un %sarrière-arrière-petit-neveu
 
     cousin.1.6
-de: ein Ur-Ur-Ur-Großneffe/eine Ur-Ur-Ur-Großnichte/Ur-Ur-Ur-Großneffe
+de: ein %sUr-Ur-Ur-Großneffe/eine %sUr-Ur-Ur-Großnichte/ein %sUr-Ur-Ur-Großneffe
 en: a %sthree-times-great-grandnephew/a %sthree-times-great-grandniece/a %sthree-times-great-grandnephew
 fr: un %strois-fois-arrière-petit-neveu/une %strois-fois-arrière-petite-nièce/un %strois-fois-arrière-petit-neveu
 
     cousin.1.7
+de: ein %sUr<sup>(x4)</sup>-Großneffe/eine %sUr<sup>(x4)</sup>-Großnichte/ein %sUr<sup>(x4)</sup>-Großneffe
 en: a %sfour-times-great-grandnephew/a %sfour-times-great-grandniece/a %sfour-times-great-grandnephew
 fr: un %squatre-fois-arrière-petit-neveu/une %squatre-fois-arrière-petite-nièce/un %squatre-fois-arrière-petit-neveu
 
     cousin.1.8
+de: ein %sUr<sup>(x5)</sup>-Großneffe/eine %sUr<sup>(x5)</sup>-Großnichte/ein %sUr<sup>(x5)</sup>-Großneffe
 en: a %sfive-times-great-grandnephew/a %sfive-times-great-grandniece/a %sfive-times-great-grandnephew
 fr: un %scinq-fois-arrière-petit-neveu/une %scinq-fois-arrière-petite-nièce/un %scinq-fois-arrière-petit-neveu
 
     cousin.1.9
+de: ein %sUr<sup>(x6)</sup>-Großneffe/eine %sUr<sup>(x6)</sup>-Großnichte/ein %sUr<sup>(x6)</sup>-Großneffe
 en: a %ssix-times-great-grandnephew/a %ssix-times-great-grandniece/a %ssix-times-great-grandnephew
 fr: un %ssix-fois-arrière-petit-neveu/une %ssix-fois-arrière-petite-nièce/un %ssix-fois-arrière-petit-neveu
 
     cousin.10.0
+de: ein achtfacher Urgroßvater/eine achtfache Urgroßmutter
 en: a 8th-great-grandfather/a 8th-great-grandmother
 fr: un 8×-arrière-grand-père/une 8×-arrière-grand-mère
 
@@ -4968,30 +4976,38 @@ fr: un %ssept-fois-arrière-grand-oncle/une %ssept-fois-arrière-grande-tante
 ->: an uncle/an aunt
 
     cousin.2.10
+de: ein %sUr<sup>(x6)</sup>-Großneffe 2. Grades/eine Ur<sup>(x6)</sup>-Großnichte 2. Grades
 fr: un %ssept-fois-arrière-petit-cousin/une %ssept-fois-arrière-petite-cousine
 
     cousin.2.2
 ->: a cousin
 
     cousin.2.3
+de: ein %sNeffe 2. Grades/eine %sNichte 2. Grades
 fr: un %spetit-cousin/une %spetite-cousine
 
     cousin.2.4
+de: ein %sGroßneffe 2. Grades/eine %sGroßnichte 2. Grades
 fr: un %sarrière-petit-cousin/une %sarrière-petite-cousine
 
     cousin.2.5
+de: ein %sUr-Großneffe 2. Grades/eine %sUr-Großnichte 2. Grades
 fr: un %sarrière-arrière-petit-cousin/une %sarrière-arrière-petite-cousine
 
     cousin.2.6
+de: ein %sUr-Ur-Großneffe 2. Grades/eine %sUr-Ur-Großnichte 2. Grades
 fr: un %strois-fois-arrière-petit-cousin/une %strois-fois-arrière-petite-cousine
 
     cousin.2.7
+de: ein %sUr-Ur-Ur-Großneffe 2. Grades/eine %sUr-Ur-Ur-Großnichte 2. Grades
 fr: un %squatre-fois-arrière-petit-cousin/une %squatre-fois-arrière-petite-cousine
 
     cousin.2.8
+de: ein %sUr<sup>(x4)</sup>-Großneffe 2. Grades/eine Ur<sup>(x4)</sup>-Großnichte 2. Grades
 fr: un %scinq-fois-arrière-petit-cousin/une %scinq-fois-arrière-petite-cousine
 
     cousin.2.9
+de: ein %sUr<sup>(x5)</sup>-Großneffe 2. Grades/eine Ur<sup>(x5)</sup>-Großnichte 2. Grades
 fr: un %ssix-fois-arrière-petit-cousin/une %ssix-fois-arrière-petite-cousine
 
     cousin.3.0
@@ -5000,96 +5016,153 @@ fr: un %ssix-fois-arrière-petit-cousin/une %ssix-fois-arrière-petite-cousine
     cousin.3.1
 ->: a great-uncle/a great-aunt
 
+    cousin.3.10
+de: ein %sUr<sup>(x5)</sup>-Großneffe 3. Grades/eine %sUr<sup>(x5)</sup>-Großnichte 3. Grades
+
     cousin.3.2
+de: ein %sOnkel 2. Grades/eine %sTante 2. Grades
 fr: un %soncle à la mode de Bretagne/une %stante à la mode de Bretagne
 
     cousin.3.3
 ->: a 2nd cousin
 
     cousin.3.4
+de: ein %sNeffe 3. Grades/eine %sNichte 3. Grades
 fr: un petit-cousin au 2<sup>e</sup> degré/une petite-cousine au 2<sup>e</sup> degré
+
+    cousin.3.5
+de: ein %sGroßneffe 3. Grades/eine %sGroßnichte 3. Grades
+
+    cousin.3.6
+de: ein %sUrgroßneffe 3. Grades/eine %sUrgroßnichte 3. Grades
+
+    cousin.3.7
+de: ein %sUr-Urgroßneffe 3. Grades/eine %sUr-Urgroßnichte 3. Grades
+
+    cousin.3.8
+de: ein %sUr-Ur-Urgroßneffe 3. Grades/eine %sUr-Ur-Urgroßnichte 3. Grades
+
+    cousin.3.9
+de: ein %sUr<sup>(x4)</sup>-Großneffe 3. Grades/eine %sUr<sup>(x4)</sup>-Großnichte 3. Grades
 
     cousin.4.0
 co: un arcicaccarone/una arcicaccarona/un arcicaccarone
+de: ein:d:+em Ur-Urgroßvater/eine:d:+r Ur-Urgroßmutter/ein:d:+em Ur-Urgroßelternteil
 en: a great-great-grandfather/a great-great-grandmother/a great-great-grandparent
 fr: un arrière-arrière-grand-père/une arrière-arrière-grand-mère/un arrière-arrière-grand-parent
 
     cousin.4.1
+de: ein %sUrgroßonkel/eine %sUrgroßtante
 en: a %sgreat-granduncle/a %sgreat-grandaunt
 fr: un %sarrière-grand-oncle/une %sarrière-grande-tante
 
+    cousin.4.10
+de: ein %sUr<sup>(x4)</sup>-Großneffe 4. Grades/eine %sUr<sup>(x4)</sup>-Großnichte 4. Grades
+
     cousin.4.2
+de: ein %sGroßonkel 2. Grades/eine %sGroßtante 2. Grades
 fr: un %sarrière-grand-cousin/une %sarrière-grande-cousine
 
     cousin.4.3
+de: ein %sOnkel 3. Grades/eine %sTante 3. Grades
 fr: un %sgrand-cousin au 2<sup>e</sup> degré/une %sgrande-cousine au 2<sup>e</sup> degré
 
     cousin.4.4
 ->: a 3rd cousin
 
     cousin.4.5
+de: ein %sNeffe 4. Grades/eine %sNichte 4. Grades
 fr: un %spetit-cousin au 3<sup>e</sup> degré/une %spetite-cousine au 3<sup>e</sup> degré
 
+    cousin.4.6
+de: ein %sGroßneffe 4. Grades/eine %sGroßnichte 4. Grades
+
+    cousin.4.7
+de: ein %sUrgroßneffe 4. Grades/eine %sUrgroßnichte 4. Grades
+
+    cousin.4.8
+de: ein %sUr-Urgroßneffe 4. Grades/eine %sUr-Urgroßnichte 4. Grades
+
+    cousin.4.9
+de: ein %sUr-Ur-Urgroßneffe 4. Grades/eine %sUr-Ur-Urgroßnichte 4. Grades
+
     cousin.5.0
+de: ein:d:+em Ur-Ur-Urgroßvater/eine:d:+r Ur-Ur-Urgroßmutter
 en: a great-great-great-grandfather/a great-great-great-grandmother
 fr: un 3×-arrière-grand-père/une 3×-arrière-grand-mère
 
     cousin.5.1
+de: ein %sUr-Ur-Großonkel/eine %sUr-Ur-Großtante
 en: a %sgreat-great-granduncle/a %sgreat-great-grandaunt
 fr: un %sarrière-arrière-grand-oncle/une %sarrière-arrière-grande-tante
 
     cousin.5.2
+de: ein %sUr-Großonkel 2. Grades/eine %sUr-Großtante 2. Grades
 fr: un %sarrière-arrière-grand-cousin/une %sarrière-arrière-grande-cousine
 
     cousin.5.3
+de: ein %sGroßonkel 3. Grades/eine %sGroßtante 3. Grades
 fr: un %sarrière-grand-cousin 2<sup>e</sup>/une %sarrière-grande-cousine 2<sup>e</sup>
 
     cousin.5.4
+de: ein %sOnkel 4. Grades/eine %sTante 4. Grades
 fr: un %sgrand-cousin au 3<sup>e</sup> degré/une %sgrande-cousine au 3<sup>e</sup> degré
 
     cousin.5.5
 co: un cuginu à u 4<sup>u</sup> gradu/una cugina à u 4<sup>u</sup> gradu
+de: ein Cousin 4. Grades/eine Cousine 4. Grades
 en: a 4th -cousin/
 fr: un cousin au 4e degré/une cousine au 4e degré
 
     cousin.6.0
+de: ein Ur<sup>(x4)</sup>-Großvater/eine Ur<sup>(x4)</sup>-Großmutter
 en: a 4th-great-grandfather/a 4th-great-grandmother
 fr: un 4×-arrière-grand-père/une 4×-arrière-grand-mère
 
     cousin.6.1
+de: ein %sUr-Ur-Urgroßonkel/eine %sUr-Ur-Urgroßtante
 en: a %sthird great-granduncle/a %sthird great-grandaunt
 fr: un %strois-fois-arrière-grand-oncle/une %strois-fois-arrière-grande-tante
 
     cousin.6.2
+de: ein %sUr-Ur-Großonkel 2. Grades/eine %sUr-Ur-Großtante 2. Grades
 fr: un %s3×-arrière-grand-cousin/une %s3×-arrière-grande-cousine
 
     cousin.6.3
+de: ein %sUr-Großonkel 3. Grades/eine %sUr-Großtante 3. Grades
 fr: un %sarrière-arrière-grand-cousin au 2<sup>e</sup> degré/une %sarrière-arrière-grande-cousine au 2<sup>e</sup> degré
 
     cousin.6.4
+de: ein %sGroßonkel 4. Grades/eine %sGroßtante 4. Grades
 fr: un %sarrière-grand-cousin au 3<sup>e</sup> degré/une %sarrière-grande-cousine au 3<sup>e</sup> degré
 
     cousin.7.0
+de: ein Ur<sup>(x5)</sup>-Großvater/eine Ur<sup>(x5)</sup>-Großmutter
 en: a 5th-great-grandfather/a 5th-great-grandmother
 fr: un 5×-arrière-grand-père/une 5×-arrière-grand-mère
 
     cousin.7.1
+de: ein Ur<sup>(x4)</sup>-Großonkel/eine Ur<sup>(x5)</sup>-Großtante
 en: a %sfourth great-granduncle/a %sfourth great-grandaunt
 fr: un %squatre-fois-arrière-grand-oncle/une %squatre-fois-arrière-grande-tante
 
     cousin.8.0
+de: ein Ur<sup>(x6)</sup>-Großvater/eine Ur<sup>(x6)</sup>-Großmutter
 en: a 6th-great-grandfather/a 6th-great-grandmother
 fr: un 6×-arrière-grand-père/une 6×-arrière-grand-mère
 
     cousin.8.1
+de: ein Ur<sup>(x5)</sup>-Großonkel/eine Ur<sup>(x5)</sup>-Großtante
 en: a %sfifth great-granduncle/a %sfifth great-grandaunt
 fr: un %scinq-fois-arrière-grand-oncle/une %scinq-fois-arrière-grande-tante
 
     cousin.9.0
+de: ein Ur<sup>(x7)</sup>-Großvater/eine Ur<sup>(x7)</sup>-Großmutter
 en: a 7th-great-grandfather/a 7th-great-grandmother
 fr: un 7×-arrière-grand-père/une 7×-arrière-grand-mère
 
     cousin.9.1
+de: ein Ur<sup>(x6)</sup>-Großonkel/eine Ur<sup>(x6)</sup>-Großtante
 en: a %ssixth great-granduncle/a %ssixth great-grandaunt
 fr: un %ssix-fois-arrière-grand-oncle/une %ssix-fois-arrière-grande-tante
 
@@ -5162,58 +5235,71 @@ tr: kuzenler
 
     cousins.0.1 tt
 co: figlioli è figliole
+de: Söhne und Töchter, Kinder
 en: sons and daughters
 fr: fils et filles, enfants
 
     cousins.0.10
+de: Ur<sup>(x8)</sup>-Enkel
 en: eight-times-great-grandchild/eight-times-great-grandchildren
 fr: huit-fois-arrière-petit-enfant/huit-fois-arrière-petits-enfants
 
     cousins.0.2
 co: figliulinu/figliulini
+de: Enkel
 en: grandchild/grandchildren
 fr: petit-enfant/petits-enfants
 
     cousins.0.2 tt
 co: zitelli di u so figliolu o di a so figliola
+de: Kinder des Sohnes oder der Tochter
 en: children of one’s son or daughters
 fr: enfants de son fils ou de sa fille
 
     cousins.0.3
 co: arcifigliulinu/arcifigliulini
+de: Urenkel
 en: great-grandchild/great-grandchildren
 fr: arrière-petit-enfant/arrière-petits-enfants
 
     cousins.0.3 tt
 co: zitelli di u so figliulinu o di a so figliulina
+de: Kinder des Enkels oder der Enkelin
 en: children of one’s grandson or granddaughter
 fr: enfants de son petit-fils ou de sa petite-fille
 
     cousins.0.4
+de: Ur-Urenkel
 en: great-great-grandchild/great-great-grandchildren
 fr: arrière-arrière-petit-enfant/arrière-arrière-petits-enfants
 
     cousins.0.4 tt
+de: Kinder des Urenkels oder der Urenkelin
 en: children of one’s great-grandson or great-granddaughter
 fr: enfants de son arrière-petit-fils ou de son arrière-petite-fille
 
     cousins.0.5
+de: Ur-Ur-Urenkel
 en: three-times-great-grandchild/three-times-great-grandchildren
 fr: trois-fois-arrière-petits-enfant/trois-fois-arrière-petits-enfants
 
     cousins.0.6
+de: Ur<sup>(x4)</sup>-Enkel
 en: four-times-great-grandchild/four-times-great-grandchildren
 fr: quatre-fois-arrière-petit-enfant/quatre-fois-arrière-petits-enfants
 
     cousins.0.7
+de: Ur<sup>(x5)</sup>-Enkel
 en: five-times-great-grandchild/five-times-great-grandchildren
 fr: cinq-fois-arrière-petit-enfant/cinq-fois-arrière-petits-enfants
 
     cousins.0.8
+de: Ur<sup>(x6)</sup>-Enkel
 en: six-times-great-grandchild/six-times-great-grandchildren
 fr: six-fois-arrière-petit-enfant/six-fois-arrière-petits-enfants
 
     cousins.0.9
+de: Ur<sup>(x7)</sup>-Enkel
 en: seven-times-great-grandchild/seven-times-great-grandchildren
 fr: sept-fois-arrière-petit-enfant/sept-fois-arrière-petits-enfants
 
@@ -5222,6 +5308,7 @@ fr: sept-fois-arrière-petit-enfant/sept-fois-arrière-petits-enfants
 
     cousins.1.0 tt
 co: babbu è mamma
+de: Vater und Mutter
 en: father and mother
 fr: père et mère<br>géniteur et génitrice
 
@@ -5232,82 +5319,155 @@ fr: père et mère<br>géniteur et génitrice
 fr: adelphe·s<br>sibling·s<hr>germains 50 &#37;<br>consanguins ou utérins 25 &#37;
 
     cousins.1.10
+de: Ur<sup>(x7)</sup>-Großneffe/Ur<sup>(x7)</sup>-Großneffen
 en: seven-times-great-grandnephew/seven-times-great-grandnephews
 fr: sept-fois-arrière-petit-neveu/sept-fois-arrière-petits-neveux
 
     cousins.1.2
 co: nipoti è nipote
+de: Neffen und Nichten
 en: nephew and nieces
 fr: neveux et nièces
 
     cousins.1.2 tt
+de: Kinder der Brüder und Schwestern<br>« Kinder der Cousins »<hr>← Leibliche Cousins der Kinder
 fr: enfants des frères et sœurs<br>« petits-frères et petites-sœurs »<hr>← cousins germains des enfants
 
     cousins.1.3
 co: niputinu/niputini/niputina/niputine
+de: Großneffe/Großneffen/Großnichte/Großnichten
 en: great-nephew/great-nephews/great-niece/great-nieces
 fr: petit-neveu/petits-neveux/petite-nièce/petites-nièces
 
     cousins.1.3 tt
-co: niputini è niputine
+de: Großneffen und Großnichten
 en: great-nephews and great-nieces
 fr: arrière-neveux et arrière-nièces (soutenu)<br>enfant d’un neveu ou d’une nièce
 
     cousins.1.4
-co: arciniputinu/arciniputini
+de: Ur-Großneffe/Ur-Großneffen
 en: great-grandnephew/great-grandnephews
 fr: arrière-petit-neveu/arrière-petits-neveux
 
     cousins.1.4 tt
+de: Kind eines Neffen oder einer Nichte
 fr: enfant d’un petit-neveu ou d’une petit-nièce
 
     cousins.1.5
+de: Ur-Ur-Großneffe/Ur-Ur-Großneffen&#47; -nichten
 en: great-great-grandnephew/great-great-grandnephews
 fr: arrière-arrière-petit-neveu/arrière-arrière-petits-neveux
 
     cousins.1.6
+de: Ur-Ur-Ur-Großneffe/Ur-Ur-Ur-Großneffen&#47; -nichten
 en: three-times-great-grandnephew/three-times-great-grandnephews
 fr: trois-fois-arrière-petit-neveu/trois-fois-arrière-petits-neveux
 
     cousins.1.7
+de: Ur<sup>(x4)</sup>-Großneffe/Ur<sup>(x4)</sup>-Großneffen&#47; -nichten
 en: four-times-great-grandnephew/four-times-great-grandnephews
 fr: quatre-fois-arrière-petit-neveu/quatre-fois-arrière-petits-neveux
 
     cousins.1.8
+de: Ur<sup>(x5)</sup>-Großneffe/Ur<sup>(x5)</sup>-Großneffen&#47; -nichten
 en: five-times-great-grandnephew/five-times-great-grandnephews
 fr: cinq-fois-arrière-petit-neveu/cinq-fois-arrière-petits-neveux
 
     cousins.1.9
+de: Ur<sup>(x6)</sup>-Großneffe/Ur<sup>(x6)</sup>-Großneffen&#47; -nichten
 en: six-times-great-grandnephew/six-times-great-grandnephews
 fr: six-fois-arrière-petit-neveu/six-fois-arrière-petits-neveux
 
     cousins.10.0
+de: Ur<sup>(x8)</sup>-Großeltern
 en: 8th-great-grandparents
 fr: 8×-arrière-grands-parents
 
     cousins.10.0 tt
+de: Stammeltern
 fr: huit-fois-arrière-grands-parents<br>nonaïeuls
 
     cousins.10.1
+de: Ur<sup>(x7)</sup>-Großtanten und -onkel
 en: seventh great-granduncles
 fr: sept-fois-arrière-grands-oncles
 
     cousins.10.1 tt
+de: Brüder und Schwestern der Ur<sup>(x7)</sup>-Großeltern
 fr: frères et sœurs des nonaïeuls
+
+    cousins.10.10
+de: Cousins 8. Grades
+fr: cousins 9<sup>e</sup>
+
+    cousins.10.11
+de: Neffen und Nichten 10. Grades
+fr: petits-cousins 9<sup>e</sup>
+
+    cousins.10.12
+de: Großneffen und -nichten 10. Grades
+fr: arrière-petits-cousins 9<sup>e</sup>
+
+    cousins.10.13
+de: Ur-Großneffen&#47; -nichten 10. Grades
+fr: arrière-arrière-petits-cousins 9<sup>e</sup>
+
+    cousins.10.2
+de: Ur<sup>(x6)</sup>-Großtanten&#47; -onkel 2. Grades
+
+    cousins.10.3
+de: Ur<sup>(x5)</sup>-Großtanten&#47; -onkel 3. Grades
+
+    cousins.10.4
+de: Ur<sup>(x4)</sup>-Groß-Cousins 4. Grades
+
+    cousins.10.5
+de: Ur-Ur-Urgroßtanten&#47; -onkel 5. Grades
+
+    cousins.10.6
+de: Ur-Urgroßtanten&#47; -onkel 6. Grades
+
+    cousins.10.7
+de: Ur-Großtanten&#47; -onkel 7. Grades
+
+    cousins.10.8
+de: Großtanten&#47; -onkel 8. Grades
+
+    cousins.10.9
+de: Tanten und Onkel 9. Grades
+
+    cousins.11.0
+de: Ur<sup>(x9)</sup>-Großeltern
+en: 9th-great-grandparents
+fr: 9×-arrière-grands-parents
+
+    cousins.11.0 tt
+de: Stammgroßeltern
+
+    cousins.12.0
+de: Ur<sup>(x10)</sup>-Großeltern
+en: 10th-great-grandparents
+fr: 10×-arrière-grands-parents
+
+    cousins.12.0 tt
+de: Stammurgroßeltern
 
     cousins.2.0
 ->: grand-parents
 
     cousins.2.0 tt
+de: Eltern der Eltern<br>Großeltern und Großmütter
 fr: aïeul·e·s<br>parents des parents<br>grands-pères et grands-mères
 
     cousins.2.1
 ->: uncles and aunts
 
     cousins.2.1 tt
+de: Brüder und Schwestern der Eltern
 fr: frères et sœurs des parents
 
     cousins.2.10
+de: Ur<sup>(x6)</sup>-Großneffen&#47; -nichten 2. Grades
 fr: sept-fois-arrière-petit-cousin/sept-fois-arrière-petits-cousins
 
     cousins.2.2
@@ -5317,56 +5477,71 @@ en: cousins 1rd
 fr: cousins
 
     cousins.2.2 tt
-co: cugini à u 1<sup>u</sup> gradu<hr>(carnali o micca)
+de: Cousins 1. Grades<hr>(Halb- oder Voll)
 fr: cousins au 1<sup>er</sup> degré<hr>(germains ou non)
 
     cousins.2.3
+de: Neffe und Nichte 2. Grades/Neffen und Nichten 2. Grades
 en: 1st cousins once removed
 fr: petit-cousin/petits-cousins
 
     cousins.2.3 tt
+de: Kinder der Cousins 1. Grades<br>Kinder der Neffen und Nichten<br>Neffen und Nichten der Cousins← Cousins der Cousins der Kinder
 fr: petits-cousins au 1<sup>er</sup> degré<br>neveux et nièces à la mode de Bourgogne ou Bretagne<br>neveux et nièces issus de germains<hr>← cousins issus de germains des enfants
 
     cousins.2.4
+de: Großneffe 2. Grades/Großneffen&#47; -nichten 2. Grades
 fr: arrière-petit-cousin/arrière-petits-cousins
 
     cousins.2.4 tt
+de: Kinder von Neffen und Nichten 2. Grades
 fr: arrière-petits-cousins au 1<sup>er</sup> degré<hr>fils d’un petit-cousin ou d’une petite cousine
 
     cousins.2.5
+de: Urgroßneffe&#47; -nichte 2. Grades/Urgroßneffen&#47; -nichten 2. Grades
 fr: arrière-arrière-petit-cousin/arrière-arrière-petits-cousins
 
     cousins.2.5 tt
+de: Kinder von Großneffen&#47; -nichten 2. Grades
 fr: deux-fois-arrière-petits-cousins au 1<sup>er</sup> degré
 
     cousins.2.6
+de: Ur-Urgroßneffe&#47; -nichte 2. Grades/Ur-Urgroßneffen&#47; -nichten 2. Grades
 fr: trois-fois-arrière-petit-cousin/trois-fois-arrière-petits-cousins
 
     cousins.2.6 tt
+de: Kinder von Urgroßneffen&#47; -nichten 2. Grades
 fr: trois-fois-arrière-petits-cousins au 1<sup>er</sup> degré
 
     cousins.2.7
+de: Ur-Ur-Urgroßneffe&#47; -nichte 2. Grades/Ur-Ur-Urgroßneffen&#47; -nichten 2. Grades
 fr: quatre-fois-arrière-petit-cousin/quatre-fois-arrière-petits-cousins
 
     cousins.2.7 tt
+de: Kinder von Ur-Urgroßneffe&#47; -nichte 2. Grades
 fr: sept-fois-arrière-petits-cousins au 1<sup>er</sup> degré
 
     cousins.2.8
+de: Ur<sup>(x4)</sup>-Großneffe&#47; -nichte 2. Grades/Ur<sup>(x4)</sup>-Großneffen&#47; -nichten 2. Grades
 fr: cinq-fois-arrière-petit-cousin/cinq-fois-arrière-petits-cousins
 
     cousins.2.8 tt
+de: Kinder von Ur-Ur-Urgroßneffe&#47; -nichte 2. Grades
 fr: cinq-fois-arrière-petits-cousins au 1<sup>er</sup> degré
 
     cousins.2.9
+de: Ur<sup>(x5)</sup>-Großneffe&#47; -nichte 2. Grades/Ur<sup>(x5)</sup>-Großneffen&#47; -nichten 2. Grades
 fr: six-fois-arrière-petit-cousin/six-fois-arrière-petits-cousins
 
     cousins.2.9 tt
+de: Kinder von Ur<sup>(x4)</sup>-Großneffen&#47; -nichten 2. Grades
 fr: six-fois-arrière-petits-cousins au 1<sup>er</sup> degré
 
     cousins.3.0
 ->: great-grand-parents
 
     cousins.3.0 tt
+de: Eltern der Großeltern
 fr: bisaïeul·e·s
 
     cousins.3.1
@@ -5375,7 +5550,12 @@ fr: bisaïeul·e·s
     cousins.3.1 tt
 fr: frères et sœurs des grand-parents
 
+    cousins.3.10
+de: Ur<sup>(x5)</sup>-Großneffen&#47; -nichten 3. Grades
+fr: six-fois-arrière-petits-cousins 2<sup>e</sup>
+
     cousins.3.2
+de: Tanten+Onkel 2. Grades
 fr: grands-cousins
 
     cousins.3.2 tt
@@ -5388,39 +5568,49 @@ fr: oncles et tantes à la mode de Bourgogne ou Bretagne<br>petits-oncles et pet
 fr: cousins au 2<sup>e</sup> degré<br>cousins à la mode de Bourgogne ou Bretagne<br>petits-cousins (désuet)<br>cousins remués de germain (vieilli)
 
     cousins.3.4
+de: Neffen und Nichten 3. Grades
 fr: petits-cousins 2<sup>e</sup>
 
     cousins.3.4 tt
 fr: petits-cousins au 2<sup>e</sup> degré<br>petits-cousins issus de germains<hr><- cousins issus d’issus de germains des enfants
 
     cousins.3.5
+de: Großneffen&#47; -nichten 3. Grades
 fr: arrière-petits-cousins 2<sup>e</sup>
 
     cousins.3.5 tt
 fr: arrière-petits-cousins au 2<sup>e</sup> degré
 
     cousins.3.6
+de: Urgroßneffen&#47; -nichten 3. Grades
 fr: arrière-arrière-petits-cousins 2<sup>e</sup>
 
     cousins.3.6 tt
 fr: deux-fois-arrière-petits-cousins au deuxième degré
 
     cousins.3.7
+de: Ur-Urgroßneffen&#47; -nichten 3. Grades
 fr: trois-fois-arrière-petits-cousins 2<sup>e</sup>
 
     cousins.3.7 tt
 fr: trois-fois-arrière-petits-cousins au deuxième degré
 
     cousins.3.8
+de: Ur-Ur-Urgroßneffen&#47; -nichten 3. Grades
 fr: quatre-fois-arrière-petits-cousins 2<sup>e</sup>
 
     cousins.3.8 tt
 fr: quatre-fois-arrière-petits-cousins au deuxième degré
 
+    cousins.3.9
+de: Ur<sup>(x4)</sup>-Großneffen&#47; -nichten 3. Grades
+fr: cinq-fois-arrière-petits-cousins 2<sup>e</sup>
+
     cousins.4.0
 ->: great-great-grandparents
 
     cousins.4.0 tt
+de: Alteltern
 en: 2nd-great-grand-parents
 fr: tri(s)aïeul·e·s<br>aïeul·e·s des aïeul·e·s
 
@@ -5430,13 +5620,18 @@ fr: tri(s)aïeul·e·s<br>aïeul·e·s des aïeul·e·s
     cousins.4.1 tt
 fr: frères et sœurs des arrière-grands-parents
 
+    cousins.4.10
+de: Ur<sup>(x4)</sup>-Großneffen&#47; -nichten 4. Grades
+
     cousins.4.2
+de: Großtanten und -onkel 2. Grades
 fr: arrière-grands-cousins
 
     cousins.4.2 tt
 fr: grands-oncles et grandes-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins germains des grands-parents, grands oncles et grandes-tantes
 
     cousins.4.3
+de: Tanten und Onkel 3. Grades
 fr: grands-cousins 2<sup>e</sup>
 
     cousins.4.3 tt
@@ -5449,44 +5644,52 @@ fr: grands-cousins au 2<sup>e</sup> degré<hr><- cousins issus de germains des p
 fr: cousins au 3<sup>e</sup> degré<br>cousins arrière-issus-de-germains
 
     cousins.4.5
+de: Neffen und Nichten 4. Grades
 fr: petits-cousins 3<sup>e</sup>
 
     cousins.4.5 tt
 fr: petits-cousins au 3<sup>e</sup> degré<br>petits-cousins issus d’issus de germains
 
     cousins.4.6
+de: Großneffen&#47; -nichten 4. Grades
 fr: arrière-petits-cousins 3<sup>e</sup>
 
     cousins.4.6 tt
 fr: arrière-petits-cousins au troisième degré
 
     cousins.4.7
+de: Urgroßneffen&#47; -nichten 4. Grades
 fr: arrière-arrière-petits-cousins 3<sup>e</sup>
 
     cousins.4.7 tt
 fr: deux-fois-arrière-petits-cousins au troisième degré
 
     cousins.4.8
+de: Ur-Urgroßneffen&#47; -nichten 4. Grades
 fr: trois-fois-arrière-petits-cousins 3<sup>e</sup>
 
     cousins.4.8 tt
 fr: trois-fois-arrière-petits-cousins au troisième degré
 
     cousins.4.9
+de: Ur-Ur-Urgroßneffen&#47; -nichten 4. Grades
 fr: quatre-fois-arrière-petits-cousins 3<sup>e</sup>
 
     cousins.4.9 tt
 fr: quatre-fois-arrière-petits-cousins au troisième degré
 
     cousins.5.0
+de: Ur-Ur-Urgroßeltern
 en: great-great-great-grandparent/great-great-great-grandparents
 fr: 3×-arrière-grand-parent/3×-arrière-grands-parents
 
     cousins.5.0 tt
+de: Altgroßeltern
 en: 3rd-great-grandparents
 fr: trois-fois-arrière-grands-parents<br>arrière-arrière-arrière-grands-parents<br>quadri(s)aïeul·e·s<br>quartaïeul·e·s
 
     cousins.5.1
+de: Ur-Urgroßtanten und -onkel
 en: great-great-granduncles
 fr: arrière-arrière-grands-oncles
 
@@ -5495,30 +5698,47 @@ en: siblings of the great-great-grandparents
 fr: frères et sœurs des trisaïeuls
 
     cousins.5.10
+de: Ur-Ur-Ur-Großneffen&#47; -nichten 5. Grades
 fr: quatre-fois-arrière-petits-cousins 4<sup>e</sup>
 
     cousins.5.10 tt
 fr: quatre-fois-arrière-petits-cousins au quatrième degré
 
+    cousins.5.11
+de: Ur<sup>(x4)</sup>-Großneffen&#47; -nichten 5. Grades
+fr: cinq-fois-arrière-petits-cousins 4<sup>e</sup>
+
+    cousins.5.12
+de: Ur<sup>(x5)</sup>-Großneffen&#47; -nichten 5. Grades
+fr: six-fois-arrière-petits-cousins 4<sup>e</sup>
+
+    cousins.5.13
+de: Ur<sup>(x6)</sup>-Großneffen&#47; -nichten 5. Grades
+fr: sept-fois-arrière-petits-cousins 4<sup>e</sup>
+
     cousins.5.2
+de: Urgroßtanten&#47; -onkel 2. Grades
 fr: arrière-arrière-grands-cousins
 
     cousins.5.2 tt
 fr: arrière-grand-oncles et arrière-grandes-tantes à la mode de Bourgogne ou Bretagne<hr><- cousins des arrière-grands-parents et arrière-grands-oncles
 
     cousins.5.3
+de: Großtanten und -onkel 3. Grades
 fr: arrière-grands-cousins 2<sup>e</sup>
 
     cousins.5.3 tt
 fr: arrière-grands-cousins au deuxième degré<hr><- cousins issus de germains des grands-parents et grands-oncles
 
     cousins.5.4
+de: Tanten und Onkel 4. Grades
 fr: grands-cousins 3<sup>e</sup>
 
     cousins.5.4 tt
 fr: grands-cousins au troisième degré<hr><- cousins issus d’issus de germains des parents
 
     cousins.5.5
+de: Cousins 4. Grades
 en: 4th cousins
 fr: cousins 4<sup>e</sup>
 
@@ -5526,37 +5746,44 @@ fr: cousins 4<sup>e</sup>
 fr: cousins au quatrième degré<br>cousins issus d’issus d’issus de germains<hr><i>arrière-petits-cousins</i>
 
     cousins.5.6
+de: Neffen und Nichten 5. Grades
 fr: petits-cousins 4<sup>e</sup>
 
     cousins.5.6 tt
 fr: petits-cousins au quatrième degré
 
     cousins.5.7
+de: Großneffen&#47; -nichten 5. Grades
 fr: arrière-petits-cousins 4<sup>e</sup>
 
     cousins.5.7 tt
 fr: arrière-petits-cousins au quatrième degré
 
     cousins.5.8
+de: Urgroßneffen&#47; -nichten 5. Grades
 fr: arrière-arrière-petits-cousins 4<sup>e</sup>
 
     cousins.5.8 tt
 fr: deux-fois-arrière-petits-cousins au quatrième degré
 
     cousins.5.9
+de: Ur-Urgroßneffen&#47; -nichten 5. Grades
 fr: trois-fois-arrière-petits-cousins 4<sup>e</sup>
 
     cousins.5.9 tt
 fr: trois-fois-arrière-petits-cousins au quatrième degré
 
     cousins.6.0
+de: Ur<sup>(x4)</sup>-Großeltern
 en: 4th-great-grandparents
 fr: 4×-arrière-grands-parents
 
     cousins.6.0 tt
+de: Alturgroßeltern
 fr: quatre-fois-arrière-grands-parents<br>quint(is)aïeuls<br>quinquisaïeuls
 
     cousins.6.1
+de: Ur-Ur-Urgroßtanten und -onkel
 en: third great-granduncles
 fr: 3×-arrière-grands-oncles
 
@@ -5564,42 +5791,49 @@ fr: 3×-arrière-grands-oncles
 fr: trois-fois-arrière-grands-oncles<hr>frères et sœurs des quadrisaïeuls
 
     cousins.6.10
+de: Ur-Urgroßneffen&#47; -nichten 6. Grades
 fr: 3×-arrière-petits-cousins 5<sup>e</sup>
 
     cousins.6.10 tt
 fr: trois-fois-arrière-petits-cousins au cinquième degré
 
     cousins.6.11
+de: Ur-Ur-Urgroßneffen&#47; -nichten 6. Grades
 fr: 4×-arrière-petits-cousins 5<sup>e</sup>
 
     cousins.6.11 tt
 fr: quatre-fois-arrière-petits-cousins au cinquième degré
 
     cousins.6.2
+de: Ur-Urgroßtanten&#47; -onkel 2. Grades
 fr: 3×-arrière-grands-cousins
 
     cousins.6.2 tt
 fr: arrière-arrière-arrière-grands-cousins au premier degré
 
     cousins.6.3
+de: Urgroßtanten&#47; -onkel 3. Grades
 fr: arrière-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.6.3 tt
 fr: arrière-arrière-grands-cousins au deuxième degré<br><- cousins issus de germains des arrière-grands-parents et arrière-grands-oncles
 
     cousins.6.4
+de: Großtanten und -onkel 4. Grades
 fr: arrière-grands-cousins 3<sup>e</sup>
 
     cousins.6.4 tt
 fr: arrière-grands-cousins au troisième degré<br><- cousins issus d’issus de germains des grands-parents et grands-oncles
 
     cousins.6.5
+de: Tanten und Onkel 5. Grades
 fr: grands-cousins 4<sup>e</sup>
 
     cousins.6.5 tt
 fr: grands-cousins au quatrième degré
 
     cousins.6.6
+de: Cousins 5. Grades
 en: fifth cousins
 fr: cousins 5<sup>e</sup>
 
@@ -5607,31 +5841,37 @@ fr: cousins 5<sup>e</sup>
 fr: cousins au cinquième degré
 
     cousins.6.7
+de: Neffen und Nichten 6. Grades
 fr: petits-cousins 5<sup>e</sup>
 
     cousins.6.7 tt
 fr: petits-cousins au cinquième degré
 
     cousins.6.8
+de: Großneffen&#47; -nichten 6. Grades
 fr: arrière-petits-cousins 5<sup>e</sup>
 
     cousins.6.8 tt
 fr: arrière-petits-cousins au cinquième degré
 
     cousins.6.9
+de: Urgroßneffen&#47; -nichten 6. Grades
 fr: arrière-petits-cousins 5<sup>e</sup>
 
     cousins.6.9 tt
 fr: arrière-arrière-petits-cousins au cinquième degré
 
     cousins.7.0
+de: Ur<sup>(x5)</sup>-Großeltern
 en: 5th-great-grandparents
 fr: 5×-arrière-grands-parents
 
     cousins.7.0 tt
+de: Obereltern
 fr: cinq-fois-arrière-grands-parents<br>sext(is)aïeuls
 
     cousins.7.1
+de: Ur<sup>(x4)</sup>-Großtanten und -onkel
 en: fourth great-granduncles
 fr: 4×-arrière-grands-oncles
 
@@ -5639,54 +5879,63 @@ fr: 4×-arrière-grands-oncles
 fr: quatre-fois-arrière-grands-oncles<br>frères et sœurs des quinquisaïeuls
 
     cousins.7.10
+de: Urgroßneffen&#47; -nichten 7. Grades
 fr: arrière-arrière-petits-cousins 6<sup>e</sup>
 
     cousins.7.10 tt
 fr: arrière-arrière-petits-cousins au sixième degré
 
     cousins.7.11
+de: Ur-Urgroßneffen&#47; -nichten 7. Grades
 fr: 3×-arrière-petits-cousins 6<sup>e</sup>
 
     cousins.7.11 tt
 fr: trois-fois-arrière-petits-cousins au sixième degré
 
     cousins.7.12
+de: Ur-Ur-Urgroßneffen&#47; -nichten 7. Grades
 fr: 4×-arrière-petits-cousins 6<sup>e</sup>
 
     cousins.7.12 tt
 fr: quatre-fois-arrière-petits-cousins au sixième degré
 
     cousins.7.2
+de: Ur-Ur-Urgroßtanten&#47; -onkel 2. Grades
 fr: 4×-arrière-grands-cousins
 
     cousins.7.2 tt
 fr: quatre-fois-arrière-grands-cousins<br>arrrière-arrière-arrière-arrière-grands-cousins au premier degré
 
     cousins.7.3
+de: Ur-Urgroßtanten&#47; -onkel 3. Grades
 fr: 3×-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.7.3 tt
 fr: trois-fois-arrière-grands-cousins au deuxième degré/arrière-arrière-arrière-grands-cousins au deuxième degré
 
     cousins.7.4
+de: Urgroßtanten&#47; -onkel 4. Grades
 fr: arrière-arrière-grands-cousins 3<sup>e</sup>
 
     cousins.7.4 tt
 fr: arrière-arrière-grands-cousins au troisième degré
 
     cousins.7.5
+de: Großtanten&#47; -onkel 5. Grades
 fr: arrière-grands-cousins 4<sup>e</sup>
 
     cousins.7.5 tt
 fr: arrière-grands-cousins au quatrième degré
 
     cousins.7.6
+de: Tanten und Onkel 6. Grades
 fr: grands-cousins 5<sup>e</sup>
 
     cousins.7.6 tt
 fr: grands-cousins au 5e degré
 
     cousins.7.7
+de: Cousins 6. Grades
 en: 6th cousins
 fr: cousins 6<sup>e</sup>
 
@@ -5694,25 +5943,30 @@ fr: cousins 6<sup>e</sup>
 fr: cousins au sixième degré
 
     cousins.7.8
+de: Neffen und Nichten 7. Grades
 fr: petits-cousins 6<sup>e</sup>
 
     cousins.7.8 tt
 fr: petits-cousins au sixième degré
 
     cousins.7.9
+de: Großneffen und -nichten 7. Grades
 fr: arrière-petits-cousins 6<sup>e</sup>
 
     cousins.7.9 tt
 fr: arrière-petits-cousins au sixième degré
 
     cousins.8.0
+de: Ur<sup>(x6)</sup>-Großeltern
 en: 6th-great-grandparents
 fr: 6×-arrière-grands-parents
 
     cousins.8.0 tt
+de: Obergroßeltern
 fr: six-fois-arrière-grands-parents<br>sept(is)aïeuls
 
     cousins.8.1
+de: Ur<sup>(x5)</sup>-Großtanten und -onkel
 en: fifth great-granduncles
 fr: cinq-fois-arrière-grands-oncles
 
@@ -5720,66 +5974,77 @@ fr: cinq-fois-arrière-grands-oncles
 fr: frères et sœurs des septisaïeuls
 
     cousins.8.10
+de: Großneffen und -nichten 8. Grades
 fr: arrière-petits-cousins 7<sup>e</sup>
 
     cousins.8.10 tt
 fr: arrière-petits-cousins au septième degré
 
     cousins.8.11
+de: Ur-Großneffen&#47; -nichten 8. Grades
 fr: arrière-arrière-petits-cousins 7<sup>e</sup>
 
     cousins.8.11 tt
 fr: arrière-arrière-petits-cousins au septième degré
 
     cousins.8.12
+de: Ur-Ur-Großneffen&#47; -nichten 8. Grades
 fr: trois-fois-arrière-petits-cousins 7<sup>e</sup>
 
     cousins.8.12 tt
 fr: trois-fois-arrière-petits-cousins au septième degré
 
     cousins.8.13
+de: Ur-Ur-Ur-Großneffen&#47; -nichten 8. Grades
 fr: quatre-fois-arrière-petits-cousins 7<sup>e</sup>
 
     cousins.8.13 tt
 fr: quatre-fois-arrière-petits-cousins au septième degré
 
     cousins.8.2
+de: Ur<sup>(x4)</sup>-Großtanten&#47; -onkel 2. Grades
 fr: cinq-fois-arrière-grands-cousins
 
     cousins.8.2 tt
 fr: cinq-fois-arrière-grands-cousins au premier degré
 
     cousins.8.3
+de: Ur-Ur-Urgroßtanten&#47; -onkel 3. Grades
 fr: quatre-fois-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.8.3 tt
 fr: quatre-fois-arrière-grands-cousins au deuxième degré
 
     cousins.8.4
+de: Ur-Urgroßtanten&#47; -onkel 4. Grades
 fr: trois-fois-arrière-grands-cousins 3<sup>e</sup>
 
     cousins.8.4 tt
 fr: trois-fois-arrière-grands-cousins au troisième degré
 
     cousins.8.5
+de: Ur-Großtanten&#47; -onkel 5. Grades
 fr: arrière-arrière-grands-cousins 4<sup>e</sup>
 
     cousins.8.5 tt
 fr: arrière-arrière-grands-cousins au quatrième degré
 
     cousins.8.6
+de: Großtanten&#47; -onkel 6. Grades
 fr: arrière-grands-cousins 5<sup>e</sup>
 
     cousins.8.6 tt
 fr: arrière-grands-cousins au cinquième degré
 
     cousins.8.7
+de: Tanten und Onkel 7. Grades
 fr: grands-cousins 6e
 
     cousins.8.7 tt
 fr: grands-cousins au sixième degré
 
     cousins.8.8
+de: Cousins 7. Grades
 en: 7th cousins
 fr: cousins 7<sup>e</sup>
 
@@ -5788,101 +6053,132 @@ en: seventh cousins
 fr: cousins au septième degré
 
     cousins.8.9
+de: Neffen und Nichten 8. Grades
 fr: petits-cousins 7<sup>e</sup>
 
     cousins.8.9 tt
+de: Cousins siebten Grades
 fr: petits-cousins au septième degré
 
     cousins.9.0
+de: Ur<sup>(x7)</sup>-Großeltern
 en: 7th-great-grandparents
 fr: 7×-arrière-grands-parents
 
     cousins.9.0 tt
+de: Oberurgroßeltern
 fr: sept-fois-arrière-grands-parents<br>octaïeuls
 
     cousins.9.1
+de: Ur<sup>(x6)</sup>-Großtanten und -onkel
 en: sixth great-granduncles
 fr: six-fois-arrière-grands-oncles
 
     cousins.9.1 tt
+de: Brüder und Schwestern der Ur<sup>(x8)</sup>-Großeltern
 fr: frères et sœurs des octosaïeuls
 
     cousins.9.10
+de: Neffen und Nichten 9. Grades
 fr: petits-cousins 8<sup>e</sup>
 
     cousins.9.10 tt
+de: Cousins achten Grades
 fr: petits-cousins au huitième degré
 
     cousins.9.11
+de: Großneffen und -nichten 9. Grades
 fr: arrière-petits-cousins 8<sup>e</sup>
 
     cousins.9.11 tt
+de: Ur-Cousins achten Grades
 fr: arrière-petits-cousins au huitième degré
 
     cousins.9.12
+de: Ur-Großneffen&#47; -nichten 9. Grades
 fr: arrière-arrière-petits-cousins 8<sup>e</sup>
 
     cousins.9.12 tt
+de: Ur-Ur-Cousins achten Grades
 fr: arrière-arrière-petits-cousins au huitième degré
 
     cousins.9.13
+de: Ur-Ur-Großneffen&#47; -nichten 9. Grades
 fr: trois-fois-arrière-petits-cousins 8<sup>e</sup>
 
     cousins.9.13 tt
+de: Ur-Ur-Ur-Cousins achten Grades
 fr: arrière-arrière-arrière-petits-cousins au huitième degré
 
     cousins.9.14
+de: Ur-Ur-Ur-Großneffen&#47; -nichten 9. Grades
 fr: quatre-fois-arrière-petits-cousins 8<sup>e</sup>
 
     cousins.9.14 tt
+de: Ur<sup>(x4)</sup>-Cousins achten Grades
 fr: quatre-fois-arrière-petits-cousins au huitième degré
 
     cousins.9.2
+de: Ur<sup>(x5)</sup>-Großtanten&#47; -onkel 2. Grades
 fr: 6×-arrière-grands-cousins
 
     cousins.9.2 tt
+de: Ur<sup>(x6)</sup>-Groß-Cousins ersten Grades
 fr: six-foix-arrière-grands-cousins au premier degré
 
     cousins.9.3
+de: Ur<sup>(x4)</sup>-Großtanten&#47; -onkel 3. Grades
 fr: 5×-arrière-grands-cousins 2<sup>e</sup>
 
     cousins.9.3 tt
+de: Ur<sup>(x5)</sup>-Groß-Cousins zweiten Grades
 fr: cinq-fois-arrière-grands-cousins au deuxième degré
 
     cousins.9.4
+de: Ur-Ur-Urgroßtanten&#47; -onkel 4. Grades
 fr: 4×-arrière-grands-cousins 3<sup>e</sup>
 
     cousins.9.4 tt
+de: Ur<sup>(x4)</sup>-Groß-Cousins dritten Grades
 fr: quatre-fois-arrière-grands-cousins au troisième degré
 
     cousins.9.5
+de: Ur-Urgroßtanten&#47; -onkel 5. Grades
 fr: 3×-arrière-grands-cousins 4<sup>e</sup>
 
     cousins.9.5 tt
+de: Ur-Ur-Ur-Großcousins 4. Grades
 fr: trois-fois-arrière-grands-cousins au quatrième degré
 
     cousins.9.6
+de: Ur-Großtanten&#47; -onkel 6. Grades
 fr: arrière-arrière-grands-cousins 5<sup>e</sup>
 
     cousins.9.6 tt
 fr: deux-fois-arrière-grands-cousins au cinquième degré
 
     cousins.9.7
+de: Großtanten&#47; -onkel 7. Grades
 fr: arrière-grands-cousins 6<sup>e</sup>
 
     cousins.9.7 tt
+de: Ur-Großcousins sechsten Grades
 fr: arrière-grands-cousins au sixième degré
 
     cousins.9.8
+de: Tanten und Onkel 8. Grades
 fr: grands-cousins 7e
 
     cousins.9.8 tt
+de: Groß-Cousins siebten Grades
 fr: grands-cousins au septième degré
 
     cousins.9.9
+de: Cousins 8. Grades
 fr: cousins 8<sup>e</sup>
 
     cousins.9.9 tt
+de: Cousins achten Grades
 fr: cousins au huitième degré
 
     create
@@ -6336,6 +6632,7 @@ tr: madalya
 
     define Cujus
 co: definisce %s cum’è Sosa 1 per fighjà o riduce l’implessi/rimette u Sosa 1 precedente %s
+de: Definieren Sie %s als Sosa 1, um die Implexe anzuzeigen oder zu reduzieren/vorherige Sosa 1 %s wiederherstellen
 en: define %s as Sosa 1 to see or reduce the implexes/restore previous Sosa 1 %s
 fr: définir %s comme Sosa 1 pour voir ou réduire les implexes/remettre le précédent Sosa 1 %s
 
@@ -7923,7 +8220,7 @@ ca: nom/noms/nom·s
 co: nome/nomi/nome(i)
 cs: křestní jméno/křestní jména
 da: fornavn/fornavne
-de: Vorname/Vornamen
+de: Vorname/Vornamen/Vorname(n)
 en: first name/first names/first name·s
 eo: propra nomo/propraj nomoj
 es: nombre/nombres/nombre·s
@@ -8493,7 +8790,7 @@ tr: büyük-büyük-ebeveynler
 
     great-great-grandparents
 co: arcicaccaroni
-de: Ururgroßelternteil
+de: Ururgroßeltern
 en: great-great-grandparents
 eo: prapraavo
 fr: arrière-arrière-grands-parents
@@ -11609,6 +11906,7 @@ tr: güncelleme
 
     modify family %s event order
 co: intervertisce l’evenimenti di a famiglia %s
+de: vertauschen Sie die Ereignisse der Familie %s
 en: permute the events of family %s
 fr: permuter les événements de la famille %s
 pt: permutar os eventos da família %s
@@ -15695,11 +15993,10 @@ sl: bi morala biti moški
 sv: borde vara man
 tr: erkek olmalı
 
-    show first names
-co: affissà tutti i nomi
-de: alle Vornamen anzeigen
-en: show all first names
-fr: afficher tous les prénoms
+    show all
+de: zeige alle
+en: show all
+fr: afficher tous les
 
     show implex
 co: identificà l’implessi
@@ -15743,7 +16040,7 @@ tr: kardeşler
 
     siblings of the grandparents
 co: arcizii
-de: Großonkel und Großtanten
+de: Großtanten und Großonkel
 en: granduncles
 fr: grands-oncles
 it: prozii e prozie
@@ -15753,7 +16050,7 @@ tr: büyük amcalar ve büyük teyzeler
 
     siblings of the great-grandparents
 co: fratelli è surelle di l’arcicaccari
-de: Geschwister der Urgroßeltern
+de: Urgroßtanten und Urgroßonkel
 en: great-granduncles
 fr: arrières-grands-oncles
 pt: tios-bisavôs e tias-bisavós
@@ -16870,6 +17167,7 @@ tr: çocuklar
 
     the database name %s contains a forbidden character.
 co: u nome di a basa di dati « %s » cuntene un caratteru difesu.
+de: der Datenbankname "%s" enthält ein verbotenes Zeichen.
 en: the database name "%s" contains a forbidden character.
 fr: le nom de la base "%s" contient un caractère interdit.
 
@@ -18287,6 +18585,11 @@ sk: neznáma osoba
 sl: neznana oseba
 sv: okänd person
 tr: bilinmeyen kişi
+
+    unknown spouse
+de: fehlende(r) Ehegatte(n)
+en: unknown spouses
+fr: conjoints manquants
 
     unspecified
 af: nie gemeld nie
