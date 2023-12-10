@@ -1,6 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Geneweb
 open Config
 open Def
 open TemplAst
@@ -405,11 +404,19 @@ let print_add_ok conf base =
       Output.print_sstring conf ".</p>");
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
-    Output.print_sstring conf {|m=FORUM">|};
+    Output.print_sstring conf {|m=FORUM" id="reference">|};
     transl conf "database forum"
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf {|</a> |};
-    Hutil.trailer conf
+    Hutil.trailer conf;
+    Output.print_sstring conf
+      (Printf.sprintf
+         {|<script>
+  if (document.title == "%s") {
+    document.getElementById("reference").focus();
+  }
+</script>|}
+         (transl conf "message added" |> Utf8.capitalize_fst))
 
 let print_add conf base = print conf base
 

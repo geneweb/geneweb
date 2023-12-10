@@ -5255,11 +5255,10 @@ let eval_predefined_apply conf env f vl =
         let m = List.fold_left max (-max_int) sl in
         string_of_int m
       with Failure _ -> raise Not_found)
-  | "clean_html_tags", [ s ] ->
-      (* On supprime surtout les balises qui peuvent casser la mise en page. *)
-      Util.clean_html_tags s
-        [ "<br */?>"; "</?p>"; "</?div>"; "</?span>"; "</?pre>" ]
+  | "clean_html_tags", [ s ] -> Util.clean_html_tags s
   | "clean_comment_tags", [ s ] -> Util.clean_comment_tags s
+  | "uri_encode", [ s ] -> Util.uri_encode s
+  | "uri_decode", [ s ] -> Util.uri_decode s
   | _ -> raise Not_found
 
 let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =

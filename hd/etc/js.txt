@@ -141,3 +141,27 @@
   -->
 </script>
 %end;
+%( Functions for toolbar.txt %)
+%if;("ADD" in e.m or "MOD" in e.m)
+<script>
+  // Attach a click event listener to each anchor element within the character's list container
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('.ch a').forEach(function (element) {
+      element.addEventListener('click', function (event) {
+        event.preventDefault();
+        var textarea = document.querySelector('.insert-character-target');
+        insertCharacter(textarea, this.innerText);
+      });
+    });
+  });
+  // Function to insert a character at the current cursor position in a textarea
+  function insertCharacter(t, v) {
+    var startPos = t.selectionStart;
+    var endPos = t.selectionEnd;
+    t.value = t.value.substring(0, startPos) + v + t.value.substring(endPos, t.value.length);
+    t.selectionStart = startPos + v.length;
+    t.selectionEnd = t.selectionStart;
+    t.focus();
+  }
+</script>
+%end;

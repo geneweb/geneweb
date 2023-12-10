@@ -187,7 +187,7 @@
       <div class="d-flex flex-row">
         <div class="%if;(e.image!="off")d-flex flex-column%else;align-self-center%end;">
           %if;(e.im!=0)%apply;border()%end;
-          <span class="align-self-center %if;(child.marriage_date.year="")mx-4%else;ml-1 mr-2%end;  text-nowrap">&%if;(child.marriage_date.year!="")<a title="&%sp;%slash_marriage_date;%sp;%marriage_place;">%child.marriage_date.year;%end;</a></span>
+          <span class="align-self-center %if;(child.marriage_date.year="")mx-4%else;ml-1 mr-2%end; text-nowrap">&%if;(child.marriage_date.year!="")<a title="&%sp;%slash_marriage_date;%sp;%marriage_place;">%child.marriage_date.year;</a>%end;</span>
           %if;(e.im!=0 and nb_children>0)
             <div class="text-center">
               %if;(not cancel_links)

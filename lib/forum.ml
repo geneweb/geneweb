@@ -1,6 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Geneweb
 open Config
 open Def
 open Util

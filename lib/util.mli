@@ -38,8 +38,10 @@ val update_wf_trace : config -> string -> unit
 val get_referer : config -> Adef.escaped_string
 (** Get referer (the page you came from to the current page) page from HTTP request *)
 
-val clean_html_tags : string -> string list -> string
+val clean_html_tags : string -> string
 val clean_comment_tags : string -> string
+val uri_encode : string -> string
+val uri_decode : string -> string
 
 val html : ?content_type:string -> config -> unit
 (** Prints HTTP response headers with giving content type (default : {i text/html}) on the socket. *)

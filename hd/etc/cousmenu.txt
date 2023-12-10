@@ -86,15 +86,17 @@
     %if;(path_end.surname="?" and path_end.first_name="?")%incr_count3;
     %else;
       %( store all cous_paths individual list item with their 5 buttons in a sorted_list %)
+      %let;name_;%path_end.surname_key;%path_end.first_name_key;%in;
+      %let;date_;%path_end.birth_date.year;%path_end.birth_date.month;%path_end.birth_date.day;%path_end.birth_date.prec;%in;
       %apply;add_in_sorted_list%with;%path_end.dates; %path_end.surname; %path_end.first_name; %path_end.occ;%and;%nn;
       <li class="card text-small nbr_%path_end.nbr; rounded-lg border-top-0 border-bottom-0 mr-2 border-%if;(path_end.sex=0)primary%elseif;(path_end.sex=1)danger%else;dark%end;"
-      style="border-left-width:5px;%nn;
-          %if;(cous_isdead=1)border-right-width:5px;border-right-color:black;%if;((death_age="" and birth_age!="" and birth_age>0) or (birth_age="" and death_age!="" and death_age>0))background:linear-gradient(90deg,%sp;
+        style="border-left-width:5px;%nn;
+          %if;(cous_isdead=1)border-right-width:5px;border-right-color:black;%if;not (death_age="" and birth_age="")%if;((death_age="" and birth_age!="" and birth_age>0) or (birth_age="" and death_age!="" and death_age>0))background:linear-gradient(90deg,%sp;
             %if;(birth_age="" and death_age!="" and death_age>0)%yellow; 0%%%else;%brown; %if;(birth_prec=1)0%else;%birth_age;%end;%%, %white; %birth_age;%%%end;,%nn;
             %if;(death_age="" and birth_age!="" and birth_age>0)%yellow; 100%%%else;%white; %death_age;%%, %brown; %if;(death_prec=1)100%else;%death_age;%end;%%%end;);%nn;
-          %else;background:linear-gradient(90deg, %brown; %birth_age;%%, %white; %birth_age;%%);%end;%end;%nn;
-        %if;(cous_nodesc!=1)border-style:double;%end;" data-surname="%path_end.surname_key; %path_end.first_name_key;%path_end.birth_date.year;" data-birth_year="%path_end.birth_date.year;%path_end.birth_date.month;%path_end.birth_date.day;%path_end.birth_date.prec;%path_end.surname_key;%path_end.first_name_key;"
-        %( TODO toggle between n function in jquery? 
+          %else;background:linear-gradient(90deg, %brown; %birth_age;%%, %white; %birth_age;%%);%end;%end;%end;%if;(cous_nodesc!=1) border-style:double;%end;"
+          data-surname="%name_;%date_;" data-birth_year="%date_;%name_;"
+        %( TODO: toggle between 3 functions in jQuery script to sort by age!
          data-age="%if;((path_end.death_date.year-path_end.birth_date.year<10 and cous_isdead=1) or (today.year-path_end.birth_date.year<10 and cous_isdead=0))0%end;%if;(cous_isdead=1)%expr(path_end.death_date.year-path_end.birth_date.year)%else;%expr(today.year-path_end.birth_date.year)%end;%path_end.surname_key;%path_end.first_name_key;%path_end.birth_date.year;"%)>%nn;
         <div class="d-flex justify-content-between align-items-start ml-n2">
           <div class="d-block pl-n2 pr-2 align-self-center order-1 position-relative">
@@ -164,7 +166,7 @@
               <div class="d-flex flex-column mx-auto text-center align-items-center">
                 <a role="button" class="h2 display-4 stretched-link ml-2"
                   style="font-size:2rem;font-weight:300;" data-toggle="tooltip" data-html="true" 
-                  href="%prefix;m=RLM%foreach;sorted_list_item;&i1=%self.index;&i%expr(item.3+1)=%item.4;%end;%if;(vvv+www!=0)&t1=[cousins.vvv.www]%end;" title="Graphe RLM c(vvv,www)">%nn;
+                  href="%prefix;m=RLM%foreach;sorted_list_item;&i1=%self.index;&i%expr(item.3+1)=%item.4;%end;%if;(vvv+www!=0)&t1=%apply;uri_encode%with;%apply;clean_html_tags([cousins.vvv.www])%end;%end;" title="Graphe RLM c(vvv,www)">%nn;
                   %if;(vvv+www=0)
                     %if;(sex=1)[him/her]0%else;[him*her]1%end;
                   %else;
@@ -228,10 +230,10 @@
   %let;extra_paths_vvv_www;%expr(cous_paths_cnt.vvv.www-cousins_cnt.vvv.www)%in;
   %let;width;%expr((100/(e_v+1))*vvv)%in;
   %let;percent_vvv_www;%expr(100-count*100/cousins_cnt.vvv.www)%in;
-  <button type="button" data-toggle="tooltip" data-html="true" 
+  <button type="button" data-toggle="tooltip" data-html="true"
     class="p-1 mx-1 btn-light position-relative%if;(vvv+www=0) disabled%end; %if;(percent_vvv_www=0)border-0%end;"
     style="height:5rem;%if;(percent_vvv_www=100)background-color: rgba(245,231,216,0.9);%end;"
-    title="%(<span class='h5 pt-2 px-2'>%apply;cousin_lex(i,k)</span><hr class='bg-light text-white my-2 mx-4'>%)
+    title="<span class='h5 pt-2 px-2'>%apply;cousin_lex(i,k)</span><hr class='bg-light text-white my-2 mx-4'>
     <div class='d-flex justify-content-center mt-1'>
       <div class='mr-4 h5'>
         <i class='fa-solid fa-arrow-up-right-dots fa-fw'></i>
@@ -280,7 +282,7 @@
                </td>
                %if;(i>2)<td colspan="%expr(i-2)" class="border-0"></td>%end;
               %end;
-              <td%if;(j=xxx) width="%expr(100/xxx)%%"%end;%if;(i>0 and k=0) colspan="2"%end;%sp;
+              <td%if;(j=xxx) style="width:%expr(100/xxx)%%"%end;%if;(i>0 and k=0) colspan="2"%end;%sp;
                 class="border-0 border-top-0 border-bottom-0 border-right-0">
                 %if;(tot!=0)
                   <div class="d-flex flex-column justify-content-center border-0 py-0">

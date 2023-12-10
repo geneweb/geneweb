@@ -141,6 +141,10 @@ let person_selected_with_redirect conf base p =
 
 let updmenu_print = Perso.interp_templ "updmenu"
 
+let enabled_forum conf =
+  List.assoc_opt "disable_forum" conf.base_env <> Some "yes"
+  
+
 let very_unknown conf _ =
   match p_getenv conf.env "n", p_getenv conf.env "p" with
   | Some sname, Some fname ->
@@ -537,8 +541,26 @@ let treat_request =
         | "DOCH" ->
           w_base @@ fun conf base -> doc_aux conf base
             (fun conf _base -> ImageDisplay.print_html conf)
+            
         | "F" ->
           w_base @@ w_person @@ Perso.interp_templ "family"
+        | "FORUM" when enabled_forum conf ->
+          w_base @@ ForumDisplay.print
+        | "FORUM_ADD" when enabled_forum conf ->
+          w_base @@ ForumDisplay.print_add
+        | "FORUM_ADD_OK" when enabled_forum conf ->
+          w_lock @@ w_base @@ ForumDisplay.print_add_ok
+        | "FORUM_DEL" when enabled_forum conf ->
+          w_lock @@ w_base @@ ForumDisplay.print_del
+        | "FORUM_P_P" when enabled_forum conf ->
+          w_base @@ ForumDisplay.print_access_switch
+        | "FORUM_SEARCH" when enabled_forum conf ->
+          w_base @@ ForumDisplay.print_search
+        | "FORUM_VAL" when enabled_forum conf ->
+           w_lock @@ w_base @@ ForumDisplay.print_valid
+        | "FORUM_VIEW" when enabled_forum conf ->
+          w_base @@ ForumDisplay.print
+
         | "H" ->
           w_base @@ fun conf base -> ( match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print conf base f
@@ -767,7 +789,10 @@ let treat_request =
           w_base @@ WiznotesDisplay.print_search
         | _ ->
             w_base @@ fun conf base ->
-            incorrect_request conf base ~comment:"error #10"
+            let str = Format.sprintf "%s: m=%s\n"
+              (transl conf "incorrect request" |> Utf8.capitalize_fst) m
+            in
+            incorrect_request conf base ~comment:str
       end conf bfile ;
   end else begin
     let title _ =
