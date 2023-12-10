@@ -8782,7 +8782,7 @@ eo: ident/email/objekto
 es: nombre/email/asunto
 et: nimi/e-post/teema
 fi: nimi/sähköposti/aihe
-fr: nom/e-mail/sujet
+fr: nom/mail/sujet
 he: ident/email/ נושא
 is: ident/email/um
 it: ident/email/oggetto
@@ -9222,12 +9222,12 @@ co: richiesta incurretta
 cs: nesprávný požadavek
 da: forkert anmodning
 de: falsche Anfrage
-en: incorrect request
+en: incorrect or unauthorized request
 eo: nekorekta serĉado
 es: consulta incorrecta
 et: vigane päring
 fi: virheellinen pyyntö
-fr: requête incorrecte
+fr: requête incorrecte ou interdite
 he:  בקשה שגויה
 is: beiðni ekki rétt
 it: richiesta incorretta
