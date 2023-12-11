@@ -1,6 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let txt = "7.1-beta"
+let ver = "7.1b exp"
 
 let available_languages =
   [
@@ -13,17 +13,19 @@ let available_languages =
     "da";
     "de";
     "en";
-    "es";
     "eo";
+    "es";
     "et";
     "fi";
     "fr";
     "he";
     "is";
     "it";
+    "lt";
     "lv";
     "nl";
     "no";
+    "oc";
     "pl";
     "pt";
     "pt-br";
@@ -35,3 +37,4 @@ let available_languages =
     "tr";
     "zh";
   ]
+

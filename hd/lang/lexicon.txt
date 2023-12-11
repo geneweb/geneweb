@@ -3538,6 +3538,39 @@ pt: ambos
 sv: både
 tr: her ikisi de
 
+    branch %s compiled on %s from commit
+af: tak %s saamgestel op %s vanaf commit id
+bg: клон %s компилиран на %s от идентификатор на ангажимент
+br: filière %s compilada em %s a partir do id do commit
+ca: branca %s compilada el %s des del commit id
+co: ramu %s compilatu in %s à partesi di u commit
+cs: větev %s zkompilována na %s od commit id
+da: gren %s kompileret på %s fra commit id
+de: Zweig %s kompiliert am %s aus Commit-ID
+en: branch %s compiled on %s from commit
+eo: branĉo %s kompilita je %s de komitatidentigilo
+es: rama %s compilada en %s desde el id de commit
+et: harus %s kompileeritud %s commit id-st
+fi: haara %s käännetty %s sitoumus-id:stä
+fr: branche %s compilée le %s à partir du commit id
+he: ענף %s מהוזף ב- %s מתחייב מזהה
+is: grein %s þýtt á %s frá commit id
+it: branch %s compilato su %s dal commit id
+lv: zara %s kompilēts uz %s no saistības id
+nl: tak %s gecompileerd op %s vanaf commit id
+no: gren %s kompilert på %s fra commit id
+oc: branca %s compilada en %s de commit id
+pl: gałąź %s skompilowana na %s z identyfikatora zobowiązania
+pt: ramo %s compilado em %s a partir do id do commit
+pt-br: ramo %s compilado em %s a partir do id do commit
+ro: ramură %s compilată pe %s de la id-ul angajamentului
+ru: ветка %s скомпилирована на %s от идентификатора коммита
+sk: odbočka %s zkompilovaná na %s od identifikátora záväzku
+sl: veja %s prevedena v %s od zaveze id
+sv: gren %s kompilerad på %s från commit id
+tr: dal %s üzerinde derlenmiş %s kayıt kimliğinden
+zh: 分支 %s 编译于 %s 从提交 ID
+
     branch/branches
 af: tak/takke
 bg: клон/клонове
@@ -4444,15 +4477,6 @@ pt: comparar as revisões selecionadas
 ru: сравнить выбранные варианты
 sv: jämför utvalda revisioner
 tr: revizyon geçmişini görüntüle
-
-    compiled on %s from commit %s
-co: cumpilatu u %s à partesi di u commit %s
-de: kompiliert auf %s aus commit %s
-en: compiled on %s from commit %s
-fr: compilé le %s à partir du commit %s
-pt: compilou os %s a partir da versão %s
-sv: skapad av %s fån commit %s
-tr: %s üzerinde %s kaydetmeden derlendi
 
     compute all marriages
 co: calculà per tutte l’unioni

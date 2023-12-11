@@ -79,7 +79,7 @@ let trailer _conf =
   Output.print_sstring printer_conf {|<a href="https://github.com/geneweb/geneweb/">|} ;
   Output.print_sstring printer_conf {|<img src="images/logo_bas.png" style="border:0"></a>|} ;
   Output.print_sstring printer_conf {| Version |} ;
-  Output.print_sstring printer_conf Version.txt ;
+  Output.print_sstring printer_conf Version.ver ;
   Output.print_sstring printer_conf " Copyright &copy; 1998-2021</em></div></div></body></html>"
 
 let header conf title =
@@ -367,7 +367,7 @@ let macro conf =
   | 'o' -> strip_spaces (s_getenv conf.env "o")
   | 'O' -> Filename.remove_extension (Filename.basename (strip_spaces (s_getenv conf.env "o")))
   | 'p' -> parameters conf.env
-  | 'q' -> Version.txt
+  | 'q' -> Version.ver
   | 'u' -> Filename.dirname (abs_setup_dir ())
   | 'x' -> stringify !bin_dir
   | 'v' -> strip_spaces (s_getenv conf.env "odir")

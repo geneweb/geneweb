@@ -489,7 +489,12 @@ and eval_simple_variable conf = function
       String.concat "&" l
   | "url" -> url_aux ~pwd:true conf
   | "url_no_pwd" -> url_aux ~pwd:false conf
-  | "version" -> Version.txt
+  | "version" -> Version.ver
+  | "commit_id" -> Version.commit_id
+  | "commit_date" -> Version.commit_date
+  | "compil_date" -> Version.compil_date
+  | "branch" -> Version.branch
+  | "source" -> Version.src
   | "/" -> ""
   | _ -> raise Not_found
 
@@ -1071,7 +1076,7 @@ let print_copyright conf =
       Output.print_sstring conf "<div style=\"font-size: 80%\">\n";
       Output.print_sstring conf "<em>";
       Output.print_sstring conf "Copyright (c) 1998-2007 INRIA - GeneWeb ";
-      Output.print_sstring conf Version.txt;
+      Output.print_sstring conf Version.ver;
       Output.print_sstring conf "</em>";
       Output.print_sstring conf "</div>\n";
       Output.print_sstring conf "<br>\n")
