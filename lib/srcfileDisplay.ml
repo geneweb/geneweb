@@ -513,12 +513,6 @@ let eval_var conf base env () _loc = function
           r.welcome_cnt
       in
       VVstring s
-  | [ "random"; "init" ] ->
-      Random.self_init ();
-      VVstring ""
-  | [ "random"; s ] -> (
-      try VVstring (string_of_int (Random.int (int_of_string s)))
-      with Failure _ | Invalid_argument _ -> raise Not_found)
   | [ "sosa_ref" ] -> (
       match get_env "sosa_ref" env with
       | Vsosa_ref v -> (

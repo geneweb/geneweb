@@ -332,6 +332,16 @@ let rec eval_variable conf = function
       let amp = if prefix.[String.length prefix - 1] = '?' then "" else "&" in
       if str = "" then prefix
       else prefix ^ Printf.sprintf "%s%s=%s" amp evar str
+  | [ "random"; "init" ] ->
+      Random.self_init ();
+      ""
+  | [ "random"; "bits" ] -> (
+      try string_of_int (Random.bits ())
+      with Failure _ | Invalid_argument _ -> raise Not_found)
+  | [ "random"; s ] -> (
+      try string_of_int (Random.int (int_of_string s))
+      with Failure _ | Invalid_argument _ -> raise Not_found)
+  | "nb_of_persons" :: sl -> eval_int conf conf.nb_of_persons sl
   | [ "substr_start"; n; v ] -> (
       (* extract the n first characters of string v *)
       match int_of_string_opt n with
@@ -361,6 +371,13 @@ let rec eval_variable conf = function
   | [ "user"; "name" ] -> conf.username
   | [ "user"; "key" ] -> conf.userkey
   | [ s ] -> eval_simple_variable conf s
+  | _ -> raise Not_found
+
+and eval_int conf n = function
+  | [ "hexa" ] -> Printf.sprintf "0x%X" n
+  | [ "octal" ] -> Printf.sprintf "0x%o" n
+  | [ "v" ] -> string_of_int n
+  | [] -> Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") n
   | _ -> raise Not_found
 
 and eval_time_var conf = function

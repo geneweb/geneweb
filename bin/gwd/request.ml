@@ -333,8 +333,10 @@ let w_base ~none fn conf (bfile : string option) =
         let conf = make_henv conf base in
         let conf = make_senv conf base in
         let conf = match Util.default_sosa_ref conf base with
-          | Some p -> { conf with default_sosa_ref = get_iper p, Some p }
-          | None -> conf
+          | Some p -> { conf with default_sosa_ref = get_iper p, Some p;
+              nb_of_persons = Gwdb.nb_of_persons base }
+          | None -> { conf with
+              nb_of_persons = Gwdb.nb_of_persons base }
         in
         fn conf base
 
