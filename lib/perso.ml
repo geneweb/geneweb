@@ -2223,15 +2223,6 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let np_auth = authorized_age conf base np in
           eval_person_field_var conf base env (np, np_auth) loc sl
       | None -> raise Not_found)
-  | [ "random"; "init" ] ->
-      Random.self_init ();
-      VVstring ""
-  | [ "random"; "bits" ] -> (
-      try VVstring (string_of_int (Random.bits ()))
-      with Failure _ | Invalid_argument _ -> raise Not_found)
-  | [ "random"; s ] -> (
-      try VVstring (string_of_int (Random.int (int_of_string s)))
-      with Failure _ | Invalid_argument _ -> raise Not_found)
   | "related" :: sl -> (
       match get_env "rel" env with
       | Vrel ({ r_type = rt }, Some p) ->

@@ -83,6 +83,7 @@ type config = {
   no_image : bool;
   no_note : bool;
   bname : string;
+  nb_of_persons : int;
   cgi_passwd : string;
   env : env;
   mutable senv : env;
