@@ -40,7 +40,7 @@ type t = {
   case_surnames : case;
   extract_first_names : bool;
   extract_public_names : bool;
-  charset_option : charset option;
+  mutable charset_option : charset option;
   alive_years : int;
   dead_years : int;
   try_negative_dates : bool;
@@ -2595,6 +2595,21 @@ let add_fam gen r =
       | _ -> ()
 
 let treat_header2 r =
+  begin match find_field "GEDC" r.rsons with
+  | Some r ->
+     begin match find_field "VERS" r.rsons with
+     | Some r ->
+        let vs = String.split_on_char '.' r.rval in
+        begin match vs with
+        | major::_ ->
+           let is_major_post7 = (try int_of_string major >= 7 with _ -> false) in
+           if is_major_post7 then !state.charset_option <- Some Utf8;
+        | _ -> ();
+        end
+     | None -> ()
+     end;
+  | None -> ()
+  end;
   begin match !state.charset_option with
     Some v -> !state.charset <- v
   | None ->
