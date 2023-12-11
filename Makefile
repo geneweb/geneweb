@@ -45,39 +45,34 @@ bin/gwrepl/.depend:
 dune-workspace: dune-workspace.in Makefile.config
 	@cat $< | sed  -e "s/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g" > $@
 
-COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%h (%cd)')
+COMPIL_DATE := $(shell date +'%Y-%m-%d')
+COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%cd')
 COMMIT_ID := $(shell git rev-parse --short HEAD)
-COMMIT_MSG := $(shell git log -1 --pretty="%s%n%n%b")
-VERSION := $(shell awk -F\" '/xt =/ {print $$2}' lib/version.ml)
+COMMIT_MSG := $(shell git log -1 --pretty="%s%n%n%b" | sed 's/"/\\"/g')
+BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
 SOURCE := $(shell git remote get-url origin | sed -n 's|^.*m/\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
 OCAMLV := $(shell ocaml --version)
 
-bin/gwd/info.ml:
+lib/version.ml:
+	@cp lib/version.txt $@
+	@printf "let branch = \"$(BRANCH)\"\n" >> $@
+	@printf "let src = \"$(SOURCE)\"\n" >> $@
+	@printf "let commit_id = \"$(COMMIT_ID)\"\n" >> $@
+	@printf "let commit_date = \"$(COMMIT_DATE)\"\n" >> $@
+	@printf "let compil_date = \"$(COMPIL_DATE)\"\n" >> $@
+	@printf "Generating $@… Done.\n"
+.PHONY: lib/version.ml
+
+info:
 	@printf "Building \033[1;37mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n"
-	@printf "Repository/branch \033[1;37m$(SOURCE)\033[0m.\n\n"
+	@printf "Repository \033[1;37m$(SOURCE)\033[0m. Branch \033[1;37m$(BRANCH)\033[0m.\n\n"
 	@printf "Last commit \033[1;37m$(COMMIT_ID)\033[0m with message “\033[1;37m%s\033[0m”.\n" "$(subst \, ,$(COMMIT_MSG))"
-	@printf "let ver = \"$(VERSION)\"" > $@
-	@printf "let src = \"$(SOURCE)\"" >> $@
-	@printf "let id = \"$(COMMIT_ID)\"" >> $@
 	@printf "\n\033[1;37mGenerating configuration files\033[0m\n"
-	@printf "Generating $@… Done.\n"
-.PHONY:bin/gwd/info.ml
-
-hd/etc/version.txt:
-	@printf "<a href=\"https://github.com/geneweb/geneweb/commit/" > $@
-	@printf "$(COMMIT_ID)\"" >> $@
-	@printf "\n title=\"[*compiled on %%s from commit %%s:::$(shell date '+%Y-%m-%d'):" >> $@
-	@printf "$(COMMIT_DATE)]\">" >> $@
-	@printf "\nGeneWeb v. %%version;</a>\n" >> $@
-	@printf "Generating $@… Done.\n"
-.PHONY:hd/etc/version.txt
-
-# [End] Generated files section
 
 GENERATED_FILES_DEP = \
 	dune-workspace \
-	bin/gwd/info.ml \
-	hd/etc/version.txt \
+	lib/version.ml \
 	lib/dune \
 	lib/gwdb/dune \
 	lib/core/dune \
@@ -102,7 +97,7 @@ GENERATED_FILES_DEP = \
 
 generated: $(GENERATED_FILES_DEP)
 
-install uninstall build distrib: $(GENERATED_FILES_DEP)
+install uninstall build distrib: info $(GENERATED_FILES_DEP)
 
 fmt:
 	$(RM) -r $(DISTRIB_DIR)
@@ -111,8 +106,9 @@ fmt:
 # [BEGIN] Installation / Distribution section
 
 build: ## Build the geneweb package (libraries and binaries)
-build:
-	-dune build @fmt --auto-promote
+build: 
+#	-dune build @fmt --auto-promote
+	@printf "\n\033[1;37mBuilding executables\033[0m\n"
 	dune build -p geneweb --profile $(DUNE_PROFILE)
 
 install: ## Install geneweb using dune
@@ -127,11 +123,9 @@ uninstall:
 
 BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
 
-distrib: ## Build the project and copy what is necessary for distribution
+distrib: build ## Build the project and copy what is necessary for distribution
 distrib:
-	@printf "\n\033[1;37mBuilding executables\033[0m\n"
 	$(RM) -r $(DISTRIB_DIR)
-	dune build -p geneweb --profile $(DUNE_PROFILE)
 	@printf "\n\033[1;37mCreating distribution directory\033[0m\n"
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases

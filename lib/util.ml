@@ -383,7 +383,7 @@ let string_of_ctime conf =
 
 let html ?(content_type = "text/html") conf =
   let charset = if conf.charset = "" then "utf-8" else conf.charset in
-  if not conf.cgi then Output.header conf "Server: GeneWeb/%s" Version.txt;
+  if not conf.cgi then Output.header conf "Server: GeneWeb/%s" Version.ver;
   Output.header conf "Date: %s" (string_of_ctime conf);
   Output.header conf "Connection: close";
   Output.header conf "Content-type: %s; charset=%s" content_type charset

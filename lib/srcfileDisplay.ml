@@ -215,7 +215,7 @@ let macro conf base = function
       if (conf.wizard || conf.just_friend_wizard) && conf.user <> "" then
         Adef.safe (": " ^ conf.user)
       else Adef.safe ""
-  | 'v' -> Adef.safe Version.txt
+  | 'v' -> Adef.safe Version.ver
   | 'w' ->
       let s = Hutil.link_to_referer conf in
       if (s :> string) = "" then Adef.safe "&nbsp;" else s
