@@ -165,10 +165,14 @@ let search conf base an search_order specify unknown =
         | _ -> Some.search_first_name_print conf base an)
     | FullName :: l -> (
         let fn =
-          match p_getenv conf.env "p" with Some fn -> fn | None -> ""
+          match p_getenv conf.env "p" with
+          | Some fn -> Name.lower fn
+          | None -> ""
         in
         let sn =
-          match p_getenv conf.env "n" with Some sn -> sn | None -> ""
+          match p_getenv conf.env "n" with
+          | Some sn -> Name.lower sn
+          | None -> ""
         in
         let fn, sn =
           if fn = "" then
@@ -264,7 +268,7 @@ let search conf base an search_order specify unknown =
 let print conf base specify unknown =
   let real_input label =
     match p_getenv conf.env label with
-    | Some s -> if s = "" then None else Some s
+    | Some s -> if s = "" then None else Some (Name.lower s)
     | None -> None
   in
   match (real_input "p", real_input "n") with
