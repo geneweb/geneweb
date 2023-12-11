@@ -90,7 +90,7 @@
       %if;(b.visitor_access!="no" or wizard or friend)
         <div class="d-flex justify-content-center">
           <span class="h2 font-weight-light">%base.real_nb_persons; [person/persons]1</span>
-          <a class="align-self-center" href="%prefix;i=%apply;get_random(base.nb_persons.v)"
+          <a class="align-self-center" href="%prefix;i=%apply;get_random(nb_of_persons.v)"
           title="[*random individual]"><i class="fa-solid fa-dice ml-1 mb-2"></i></a>
         </div>
       %end;
