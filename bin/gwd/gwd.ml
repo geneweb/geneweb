@@ -1784,16 +1784,30 @@ let geneweb_server () =
         Some addr -> addr
       | None -> try Unix.gethostname () with _ -> "computer"
     in
-      Printf.eprintf "GeneWeb %s - " Version.txt;
+      Printf.eprintf "GeneWeb %s - " Version.ver;
       if not !daemon then
         begin
           Printf.eprintf "Possible addresses:\n\
-                   http://localhost:%d/base\n\
-                   http://127.0.0.1:%d/base\n\
-                   http://%s:%d/base\n"
+                  http://localhost:%d/base\n\
+                  http://127.0.0.1:%d/base\n\
+                  http://%s:%d/base\n"
             !selected_port !selected_port hostn !selected_port;
           Printf.eprintf "where \"base\" is the name of the database\n\
-                   Type “Ctrl+C” to stop the service\n"
+                   Type “Ctrl+C” to stop the service\n";
+          if !debug then ( (* taken from Michel Normand commit 1874dcbf7 *)
+          Printf.eprintf "gwd parameters (after GWPARAM.init & cache_lexicon):\n";
+          Printf.eprintf "  source: %s\n" Version.src;
+          Printf.eprintf "  branch: %s\n" Version.branch;
+          Printf.eprintf "  commit: %s\n" Version.commit_id;
+          Printf.eprintf "  gwd: %s\n" Sys.argv.(0);
+          Printf.eprintf "  current_dir_name: %s\n" (Sys.getcwd ());
+          Printf.eprintf "  gw_prefix: %s\n" !gw_prefix;
+          Printf.eprintf "  etc_prefix: %s\n" !etc_prefix;
+          Printf.eprintf "  images_prefix: %s\n" !images_prefix;
+          Printf.eprintf "  images_dir: %s\n" !images_dir;
+          List.iter
+            (fun a -> Printf.eprintf "  secure asset: %s\n" a) (Secure.assets ());
+          Printf.eprintf "TODO: how to print content of conf ?\n";)
         end;
       flush stderr;
       if !daemon then
@@ -1962,7 +1976,8 @@ let arg_plugins opt doc =
   )
 
 let print_version_commit () =
-  Printf.printf "Geneweb version %s\nBuild from %s\nLast commit %s\n" Info.ver Info.src Info.id;
+  Printf.printf "Geneweb version %s\nRepository %s\n" Version.ver Version.src;
+  Printf.printf "Branch %s\nLast commit %s\n" Version.branch Version.commit_id;
   exit 0
 
 let main () =

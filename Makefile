@@ -13,6 +13,7 @@ endif
 # Variables for packagers.
 DISTRIB_DIR=distribution
 BUILD_DIR=_build/default
+BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
 ODOC_DIR=$(BUILD_DIR)/_doc/_html
 
 # [BEGIN] Generated files section
@@ -45,39 +46,34 @@ bin/gwrepl/.depend:
 dune-workspace: dune-workspace.in Makefile.config
 	@cat $< | sed  -e "s/%%%DUNE_PROFILE%%%/$(DUNE_PROFILE)/g" > $@
 
-COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%h (%cd)')
+COMPIL_DATE := $(shell date +'%Y-%m-%d')
+COMMIT_DATE := $(shell git show -s --date=short --pretty=format:'%cd')
 COMMIT_ID := $(shell git rev-parse --short HEAD)
-COMMIT_MSG := $(shell git log -1 --pretty="%s%n%n%b")
-VERSION := $(shell awk -F\" '/xt =/ {print $$2}' lib/version.ml)
+COMMIT_MSG := $(shell git log -1 --pretty="%s%n%n%b" | sed 's/"/\\"/g')
+BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
 SOURCE := $(shell git remote get-url origin | sed -n 's|^.*m/\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
 OCAMLV := $(shell ocaml --version)
 
-bin/gwd/info.ml:
+lib/version.ml:
+	@cp lib/version.txt $@
+	@printf "let branch = \"$(BRANCH)\"\n" >> $@
+	@printf "let src = \"$(SOURCE)\"\n" >> $@
+	@printf "let commit_id = \"$(COMMIT_ID)\"\n" >> $@
+	@printf "let commit_date = \"$(COMMIT_DATE)\"\n" >> $@
+	@printf "let compil_date = \"$(COMPIL_DATE)\"\n" >> $@
+	@printf "Generating $@… Done.\n"
+.PHONY: lib/version.ml
+
+info:
 	@printf "Building \033[1;37mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n"
-	@printf "Repository/branch \033[1;37m$(SOURCE)\033[0m.\n\n"
+	@printf "Repository \033[1;37m$(SOURCE)\033[0m. Branch \033[1;37m$(BRANCH)\033[0m.\n\n"
 	@printf "Last commit \033[1;37m$(COMMIT_ID)\033[0m with message “\033[1;37m%s\033[0m”.\n" "$(subst \, ,$(COMMIT_MSG))"
-	@printf "let ver = \"$(VERSION)\"" > $@
-	@printf "let src = \"$(SOURCE)\"" >> $@
-	@printf "let id = \"$(COMMIT_ID)\"" >> $@
 	@printf "\n\033[1;37mGenerating configuration files\033[0m\n"
-	@printf "Generating $@… Done.\n"
-.PHONY:bin/gwd/info.ml
-
-hd/etc/version.txt:
-	@printf "<a href=\"https://github.com/geneweb/geneweb/commit/" > $@
-	@printf "$(COMMIT_ID)\"" >> $@
-	@printf "\n title=\"[*compiled on %%s from commit %%s:::$(shell date '+%Y-%m-%d'):" >> $@
-	@printf "$(COMMIT_DATE)]\">" >> $@
-	@printf "\nGeneWeb v. %%version;</a>\n" >> $@
-	@printf "Generating $@… Done.\n"
-.PHONY:hd/etc/version.txt
-
-# [End] Generated files section
 
 GENERATED_FILES_DEP = \
 	dune-workspace \
-	bin/gwd/info.ml \
-	hd/etc/version.txt \
+	lib/version.ml \
 	lib/dune \
 	lib/gwdb/dune \
 	lib/core/dune \
@@ -102,7 +98,7 @@ GENERATED_FILES_DEP = \
 
 generated: $(GENERATED_FILES_DEP)
 
-install uninstall build distrib: $(GENERATED_FILES_DEP)
+install uninstall build distrib: info $(GENERATED_FILES_DEP)
 
 fmt:
 	$(RM) -r $(DISTRIB_DIR)
@@ -112,7 +108,11 @@ fmt:
 
 build: ## Build the geneweb package (libraries and binaries)
 build:
-	-dune build @fmt --auto-promote
+ifneq ($(OS_TYPE),Win)
+	@printf "\n\033[1;37mOcamlformat\033[0m\n"
+	dune build @fmt --auto-promote
+endif
+	@printf "\n\033[1;37mBuilding executables\033[0m\n"
 	dune build -p geneweb --profile $(DUNE_PROFILE)
 
 install: ## Install geneweb using dune
@@ -125,13 +125,9 @@ uninstall:
 	dune build @install --profile $(DUNE_PROFILE)
 	dune uninstall
 
-BUILD_DISTRIB_DIR=$(BUILD_DIR)/bin/
-
-distrib: ## Build the project and copy what is necessary for distribution
+distrib: build ## Build the project and copy what is necessary for distribution
 distrib:
-	@printf "\n\033[1;37mBuilding executables\033[0m\n"
 	$(RM) -r $(DISTRIB_DIR)
-	dune build -p geneweb --profile $(DUNE_PROFILE)
 	@printf "\n\033[1;37mCreating distribution directory\033[0m\n"
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
@@ -142,36 +138,36 @@ distrib:
 	cp etc/START.htm $(DISTRIB_DIR)/.
 	cp -R etc/install-cgi $(DISTRIB_DIR)
 	cp etc/install-cgi.sh $(DISTRIB_DIR)
-	if test $(OS_TYPE) = "Win"; then \
-	  cp etc/Windows/gwd.bat $(DISTRIB_DIR); \
-	  cp etc/Windows/gwsetup.bat $(DISTRIB_DIR); \
-	  cp -f etc/Windows/README.txt $(DISTRIB_DIR)/README.txt; \
-	  cp -f etc/Windows/LISEZMOI.txt $(DISTRIB_DIR)/LISEZMOI.txt; \
-	elif test $(OS_TYPE) = "Darwin"; then \
-	  cp etc/gwd.sh $(DISTRIB_DIR); \
-	  cp etc/gwsetup.sh $(DISTRIB_DIR); \
-	  cp etc/macOS/geneweb.sh $(DISTRIB_DIR); \
-	else \
-	  cp etc/gwd.sh $(DISTRIB_DIR)/gwd.sh; \
-	  cp etc/gwsetup.sh $(DISTRIB_DIR)/gwsetup.sh; \
-	fi
+ifeq ($(OS_TYPE),Win)
+	cp etc/Windows/gwd.bat $(DISTRIB_DIR)
+	cp etc/Windows/gwsetup.bat $(DISTRIB_DIR)
+	cp -f etc/Windows/README.txt $(DISTRIB_DIR)/README.txt
+	cp -f etc/Windows/LISEZMOI.txt $(DISTRIB_DIR)/LISEZMOI.txt
+else ifeq ($(OS_TYPE),Darwin)
+	cp etc/gwd.sh $(DISTRIB_DIR)
+	cp etc/gwsetup.sh $(DISTRIB_DIR)
+	cp etc/macOS/geneweb.sh $(DISTRIB_DIR)
+else
+	cp etc/gwd.sh $(DISTRIB_DIR)/gwd.sh
+	cp etc/gwsetup.sh $(DISTRIB_DIR)/gwsetup.sh
+endif
 	mkdir $(DISTRIB_DIR)/gw
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
 	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
 	@printf "\n\033[1;37m└ Copy binaries in $(DISTRIB_DIR)/gw/\033[0m\n"
-	cp $(BUILD_DISTRIB_DIR)connex/connex.exe $(DISTRIB_DIR)/gw/connex$(EXT);
-	cp $(BUILD_DISTRIB_DIR)consang/consang.exe $(DISTRIB_DIR)/gw/consang$(EXT);
-	cp $(BUILD_DISTRIB_DIR)fixbase/gwfixbase.exe $(DISTRIB_DIR)/gw/gwfixbase$(EXT);
-	cp $(BUILD_DISTRIB_DIR)ged2gwb/ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXT);
-	cp $(BUILD_DISTRIB_DIR)gwb2ged/gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXT);
-	cp $(BUILD_DISTRIB_DIR)cache_files/cache_files.exe $(DISTRIB_DIR)/gw/cache_files$(EXT);
-	cp $(BUILD_DISTRIB_DIR)gwc/gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXT);
-	cp $(BUILD_DISTRIB_DIR)gwd/gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT);
-	cp $(BUILD_DISTRIB_DIR)gwdiff/gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT);
+	cp $(BUILD_DISTRIB_DIR)connex/connex.exe $(DISTRIB_DIR)/gw/connex$(EXT)
+	cp $(BUILD_DISTRIB_DIR)consang/consang.exe $(DISTRIB_DIR)/gw/consang$(EXT)
+	cp $(BUILD_DISTRIB_DIR)fixbase/gwfixbase.exe $(DISTRIB_DIR)/gw/gwfixbase$(EXT)
+	cp $(BUILD_DISTRIB_DIR)ged2gwb/ged2gwb.exe $(DISTRIB_DIR)/gw/ged2gwb$(EXT)
+	cp $(BUILD_DISTRIB_DIR)gwb2ged/gwb2ged.exe $(DISTRIB_DIR)/gw/gwb2ged$(EXT)
+	cp $(BUILD_DISTRIB_DIR)cache_files/cache_files.exe $(DISTRIB_DIR)/gw/cache_files$(EXT)
+	cp $(BUILD_DISTRIB_DIR)gwc/gwc.exe $(DISTRIB_DIR)/gw/gwc$(EXT)
+	cp $(BUILD_DISTRIB_DIR)gwd/gwd.exe $(DISTRIB_DIR)/gw/gwd$(EXT)
+	cp $(BUILD_DISTRIB_DIR)gwdiff/gwdiff.exe $(DISTRIB_DIR)/gw/gwdiff$(EXT)
 	if test -f $(BUILD_DISTRIB_DIR)gwrepl/gwrepl.bc ; then cp $(BUILD_DISTRIB_DIR)gwrepl/gwrepl.bc $(DISTRIB_DIR)/gw/gwrepl$(EXT); fi
-	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT);
-	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT);
-	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT);
+	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT)
+	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT)
+	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT)
 	@printf "\n\033[1;37m└ Copy templates in $(DISTRIB_DIR)/gw/\033[0m\n"
 	cp -R hd/* $(DISTRIB_DIR)/gw/
 	mkdir $(DISTRIB_DIR)/gw/setup
@@ -197,8 +193,7 @@ distrib:
 		fi; \
 	done
 	@printf "\033[1;37mBuild complete.\033[0m\n"
-	@printf "You can launch Geneweb with “\033[1;37mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;37mgw/gwd$(EXT)\033[0m”.\n";
-
+	@printf "You can launch Geneweb with “\033[1;37mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;37mgw/gwd$(EXT)\033[0m”.\n"
 .PHONY: install uninstall distrib
 
 # [END] Installation / Distribution section

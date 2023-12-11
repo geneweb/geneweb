@@ -1,4 +1,4 @@
-<!-- $Id: copyr.txt v7.1 15/08/2023 17:58:58 $ -->
+<!-- $Id: copyr.txt %version; 15/08/2023 17:58:58 $ -->
 %define;language(x)
   %apply;nth%with;
     /af/bg/br/ca/co/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lt/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/tr/zh/
@@ -18,8 +18,8 @@
     %end;
   %end;
 %end;
-%define;compil(xx,yy)
-  [compiled on %s from commit %s:::xx:yy]
+%define;compilation_info(x,y)
+  [*branch %s compiled on %s from commit:::x:y]0%nn;
 %end;
 %if;(not cancel_links)
   <div class="d-flex ml-auto  justify-content-end m-2" id="copyr">
@@ -106,8 +106,9 @@
           href="%if;(e.templ!="templm")%url_set.templ_file.templm;%end;"
           title="%if;(e.templ!="templm")templm%else;default template%end;">%nn;
           <i class="fab fa-markdown" aria-hidden="true"></i>%nn;
-          <span class="sr-only">switch to %if;(e.templ!="templm")templm%else;default template%end;</span>%nn;
-        </a>%include;version
+          <span class="sr-only">switch to %if;(e.templ!="templm")templm%else;default template%end;</span></a>
+        <a href="https://github.com/%source;/tree/%commit_id;"
+          title="%apply;compilation_info(branch, compil_date) %commit_id; (%commit_date)">GeneWeb v. %version;</a>
       </div>
       <div class="btn-group">
         <span>&copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer, noopener">INRIA</a> 1998-2007</span>

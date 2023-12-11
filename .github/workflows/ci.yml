@@ -15,25 +15,28 @@ jobs:
           - macos-latest
           - ubuntu-latest
           - windows-latest
-        ocaml-version:
-          - 4.14.0
+        ocaml-compiler:
+          - 4.14.x
         include:
           - os: ubuntu-latest
-            ocaml-version: 4.08.0
+            ocaml-compiler: 4.08.x
     runs-on: ${{ matrix.os }}
     steps:
-      - name: checkout
+      - name: Checkout code
         uses: actions/checkout@v3
-      - name: setup-ocaml
+      - name: Use Ocaml ${{ matrix.ocaml-compiler }}
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: ${{ matrix.ocaml-version }}
-      - name: setup
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+      - name: Setup GeneWeb dependencies + ocamlformat
         run: |
-          opam install dune ocamlformat.0.24.1
-          opam exec -- dune build @fmt
           opam pin add . -y --no-action
           opam depext -y geneweb
           opam install -y ./*.opam --deps-only --with-test
-      - name: makeci
+          opam pin ocamlformat 0.24.1
+      - name: Make ocamlformat > build > distrib
+        run: |
+          opam exec -- ocaml ./configure.ml --release
+          opam exec -- make build distrib
+      - name: Make CI tests
         run: opam exec -- make ci
