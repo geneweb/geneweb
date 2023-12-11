@@ -183,7 +183,8 @@
 
 %( RLM commence à i1 et non i0 on décale i(0) en i(nb), à défaut on pourrait aussi tout décaller à i+1 %)
 <div class="ml-2 mt-2">
-  %if;(e.nb!=1 and e.nb<max_rlm_nbr)
+  %if;(e.nb=1)
+  %elseif;(e.nb>1 and e.nb<max_rlm_nbr)
     <a role="button" title="Try RLM graph to link all individuals (probably fails if not same list by surname by place)"
       href="%prefix&m=RLM%nn;
       %foreach;env_binding;%nn;
@@ -200,7 +201,7 @@
       <i class="fa fa-bezier-curve mr-2"></i>[*multi relations graph]
     </a>
   %else;
-    %e.nb; [person/persons]1[:] [too big to draw RLM graph] (max %max_rlm_nbr;)
+    %e.nb; [person/persons]1[:] [RLM graph impracticable] (max %max_rlm_nbr;)
   %end;
 </div>
 %base_trailer;
