@@ -197,7 +197,7 @@ let display_note opts tagn s =
 let ged_header opts base ifile ofile =
   Printf.ksprintf (oc opts) "0 HEAD\n";
   Printf.ksprintf (oc opts) "1 SOUR GeneWeb\n";
-  Printf.ksprintf (oc opts) "2 VERS %s\n" Version.txt;
+  Printf.ksprintf (oc opts) "2 VERS %s\n" Version.ver;
   Printf.ksprintf (oc opts) "2 NAME %s\n" (Filename.basename Sys.argv.(0));
   Printf.ksprintf (oc opts) "2 CORP INRIA\n";
   Printf.ksprintf (oc opts) "3 ADDR http://www.geneweb.org\n";
