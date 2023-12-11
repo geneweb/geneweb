@@ -14624,6 +14624,40 @@ ru: дата изменения
 sv: uppdatering gjord
 tr: revizyon Tarihi
 
+    RLM graph impracticable
+af: RLM-graf onprakties
+bg: RLM график непрактичен
+br: n'eo ket aes grafiñ RLM
+ca: el gràfic RLM és impracticable
+co: graficu RLM micca praticu
+cs: Graf RLM je nepraktický
+da: RLM-graf er uhensigtsmæssig
+de: RLM-Diagramm nicht durchführbar
+en: RLM graph impracticable
+eo: La RLM-grafo neprakteblas
+es: el gráfico RLM es impracticable
+et: RLM-graafik on teostamatu
+fi: RLM-kaavio on mahdoton
+fr: graphe RLM impraticable
+he: גרף RLM בלתי יכול להתבצע
+is: RLM-hornrás óhagkvæm
+it: il grafico RLM è impraticabile
+lt: RLM grafikas neįgyvendinamas
+lv: RLM grafiks nav īstenojams
+nl: RLM-grafiek niet uitvoerbaar
+no: RLM-graf ikke gjennomførbart
+oc: lo graf RLM es impraticable
+pl: Graf RLM jest niemożliwy do zrealizowania
+pt: gráfico RLM impraticável
+pt-br: gráfico RLM impraticável
+ro: graficul RLM este impracticabil
+ru: график RLM невыполним
+sk: RLM graf neuskutočniteľný
+sl: Grafikon RLM ni izvedljiv
+sv: RLM-graf omöjlig
+tr: RLM grafiği uygulanamaz
+zh: RLM图不切实际
+
     same ancestor as n° Sosa
 co: uguale à u n° Sosa
 de: identisch mit Sosa Nr.
