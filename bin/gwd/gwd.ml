@@ -1271,7 +1271,9 @@ let make_conf from_addr request script_name env =
          begin try List.assoc "no_note_for_visitor" base_env = "yes" with
            Not_found -> false
          end;
-     bname = base_file; env = env; senv = [];
+     bname = base_file;
+     nb_of_persons = -1;
+     env = env; senv = [];
      cgi_passwd = ar.ar_passwd;
      henv =
        (if not !(Wserver.cgi) then []
