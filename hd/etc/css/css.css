@@ -380,7 +380,7 @@ a {
 /* Welcome language dropdown scrollable */
 .scrollable-lang {
   height: auto;
-  max-height: 430px;
+  max-height: 460px;
   overflow-x: hidden;
 }
 
