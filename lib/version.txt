@@ -5,6 +5,7 @@ let ver = "7.1b exp"
 let available_languages =
   [
     "af";
+    "ar";
     "bg";
     "br";
     "ca";

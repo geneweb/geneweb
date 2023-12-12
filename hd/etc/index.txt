@@ -31,6 +31,7 @@
 <h3 class="text-center mt-5">[*select lang]</h3>
 <div class="d-flex flex-wrap justify-content-center col-11 mt-2 mx-auto">
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=af%if;(evar.templ!="")&templ=%evar.templ;%end;" title="af">Afrikaans</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=ar%if;(evar.templ!="")&templ=%evar.templ;%end;" title="ar">العربية</a>
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=bg%if;(evar.templ!="")&templ=%evar.templ;%end;" title="bg">български</a>
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=br%if;(evar.templ!="")&templ=%evar.templ;%end;" title="br">brezhoneg</a>
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=ca%if;(evar.templ!="")&templ=%evar.templ;%end;" title="ca">català</a>
@@ -48,6 +49,7 @@
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=is%if;(evar.templ!="")&templ=%evar.templ;%end;" title="is">íslenska</a>
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=it%if;(evar.templ!="")&templ=%evar.templ;%end;" title="it">italiano</a>
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=lv%if;(evar.templ!="")&templ=%evar.templ;%end;" title="lv">Latviešu</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=lv%if;(evar.templ!="")&templ=%evar.templ;%end;" title="lt">Lietuvių</a>
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=nl%if;(evar.templ!="")&templ=%evar.templ;%end;" title="nl">Nederlands</a>
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=no%if;(evar.templ!="")&templ=%evar.templ;%end;" title="no">norsk</a>
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=oc%if;(evar.templ!="")&templ=%evar.templ;%end;" title="oc">occitan</a>
