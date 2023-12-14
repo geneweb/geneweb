@@ -28,7 +28,7 @@
       %end;
     %end;
   %end;
-  <p>[place];[date begin];([nb events]);[date end]
+  <p>[place/places]0;[date begin];([nb events]);[date end]
   %foreach;sorted_list_item;
     %if;(prev_item.1 != item.1)
       %reset_count;%incr_count;

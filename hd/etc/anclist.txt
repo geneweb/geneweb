@@ -190,7 +190,7 @@
             [sort by/date begin/alphabetic order/nb individuals/nb events]2</a>
           <a role="button" href="%url_set.sort.plc;"
             class="btn btn-link%if;(e.sort="plc") disabled" aria-disabled="true%end;">
-            <i class="fa-solid fa-arrow-down-a-z mr-1"></i>[places]</a>
+            <i class="fa-solid fa-arrow-down-a-z mr-1"></i>[place/places]1</a>
           <a role="button" href="%url_set.sort.date;"
             class="btn btn-link%if;(e.sort="date") disabled" aria-disabled="true%end;">
             <i class="fa-regular fa-calendar-days mr-1"></i>
@@ -210,7 +210,7 @@
       <thead>
       <tr class="list_eclair_table_header">
         <th>[*surname/surnames]0</th>
-        <th>[*place]</th>
+        <th>[*place/places]0</th>
         <th class="text-center">[*date begin]</th>
         <th class="text-center">[*date end]</th>
         <th class="text-center" title="[nb individuals]">#[*person/persons]1</th>
@@ -306,7 +306,7 @@
           <tr class="surname_branch_table_header">
             <th width="30%%">[*surname/surnames]0</th>
             <th width="10%%">[*nb branches]</th>
-            <th width="45%%">[*place]</th>
+            <th width="45%%">[*place/places]0</th>
             <th width="15%%">[*date/dates]0</th>
           </tr>
       %end;
@@ -318,7 +318,7 @@
             <tr class="surname_branch_table_header">
               <th width="30%%">[*surname/surnames]0</th>
               <th width="10%%">[*nb branches]</th>
-              <th width="45%%">[*place]</th>
+              <th width="45%%">[*place/places]0</th>
               <th width="15%%">[*date/dates]0</th>
             </tr>
         %end;
@@ -396,7 +396,7 @@
       <tr class="surname_branch_table_header">
         <th>[*surname/surnames]0</th>
         <th>[*nb branches]</th>
-        <th>[*place]</th>
+        <th>[*place/places]0</th>
         <th>[*date/dates]0</th>
       </tr>
       </thead>

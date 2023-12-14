@@ -7,8 +7,8 @@
     %if;(evar.t = "F" and evar.tf1 = "csv") - CSV -
     %elseif;(evar.t = "F" and evar.fam7 = "on") - 7 [*family/families]1 -
     %elseif;(evar.t = "F" and evar.tf1 = "sb") - [*surnames branch] -
-    %elseif;(evar.t = "F" and evar.tf1 = "surn") - [*list eclair]0 - [surname/surnames]1 / [places]
-    %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [places]
+    %elseif;(evar.t = "F" and evar.tf1 = "surn") - [*list eclair]0 - [surname/surnames]1 / [place/places]1
+    %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [place/places]1
     %elseif;(evar.t = "F" and evar.tf1 = "aad") - [*age at death] ([M/F]0, [M/F]1)
     %elseif;(evar.t = "F" and evar.tf1 = "afm") - [*age] ([father/mother]0, [father/mother]1)
     %else; - [*ancestor/ancestors]1 -
@@ -86,8 +86,8 @@
       %sp;%dates;<br>
   %end;
   %if;(evar.t = "F" and evar.tf1 = "csv")
-    %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [places]
-    %elseif;(evar.t = "F" and evar.tf1 = "surn") - [*list eclair]0 - [surname/surnames]1 / [places]
+    %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [place/places]1
+    %elseif;(evar.t = "F" and evar.tf1 = "surn") - [*list eclair]0 - [surname/surnames]1 / [place/places]1
     %elseif;(evar.t = "F" and evar.tf1 = "sb") - [*surnames branch] -
     %else;
   %end;
@@ -135,8 +135,8 @@
     %end;
     <li><a href="%l_url;&fam7=on&tf1=fam70&cousins=%evar.cousins;">7 [family/families]1</a></li>
     <li><a href="%l_url;&tf1=sb">[*surnames branch]</a></li>
-    <li><a href="%l_url;&tf1=surn">[*list eclair]0 - [surname/surnames]1 / [places]</a></li>
-    <li><a href="%l_url;&tf1=place">[*list eclair]0 - [places]</a></li>
+    <li><a href="%l_url;&tf1=surn">[*list eclair]0 - [surname/surnames]1 / [place/places]1</a></li>
+    <li><a href="%l_url;&tf1=place">[*list eclair]0 - [place/places]1</a></li>
     <li><a href="%l_url;&tf1=tag">tag</a></li>
     <li><a href="%l_url;&tf1=cal">[*calendar/calendars]0</a></li>
     <li><a href="%l_url;&tf1=bmdm">[*year/month/day]1</a></li>

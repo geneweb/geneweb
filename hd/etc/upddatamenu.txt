@@ -31,7 +31,7 @@
         <a href="%prefix;m=MOD_DATA&data=sn">%apply;list_of([surname/surnames]1)</a>
       </li>
       <li>
-        <a href="%prefix;m=MOD_DATA&data=place">%apply;list_of([places])</a>
+        <a href="%prefix;m=MOD_DATA&data=place">%apply;list_of([place/places]1)</a>
       </li>
       <li>
         <a href="%prefix;m=MOD_DATA&data=src">%apply;list_of([source/sources]1)</a>

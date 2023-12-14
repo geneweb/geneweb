@@ -107,7 +107,8 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
       | Some d -> DateDisplay.string_of_ondate conf d);
   string_field
     (Util.translate_eval (transl_nth conf "marriage/marriages" 0)
-     ^ " / " ^ transl conf "place"
+     ^ " / "
+     ^ transl_nth conf "place/places" 0
     |> Adef.safe)
     (Adef.encoded "marriage_place")
     (fun fam ->

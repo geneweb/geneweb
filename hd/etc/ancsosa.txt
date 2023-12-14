@@ -1950,11 +1950,11 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       ;[birth]_[year/month/day]2%nn;
       ;[birth]_[year/month/day]1%nn;
       ;[birth]_[year/month/day]0%nn;
-      ;[birth]_[place]%nn;
+      ;[birth]_[place/places]0%nn;
       ;[death]_[year/month/day]2%nn;
       ;[death]_[year/month/day]1%nn;
       ;[death]_[year/month/day]0%nn;
-      ;[death]_[place]%nn;
+      ;[death]_[place/places]0%nn;
       ;[occupation/occupations]1%nn;
       ;[first name/first names]0_[spouse/spouses]0%nn;
       ;[surname/surnames]0_[spouse/spouses]0%nn;
@@ -1962,7 +1962,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       ;[marriage/marriages]0_[year/month/day]2%nn;
       ;[marriage/marriages]0_[year/month/day]1%nn;
       ;[marriage/marriages]0_[year/month/day]0%nn;
-      ;[marriage/marriages]0_[place]%nn;
+      ;[marriage/marriages]0_[place/places]0%nn;
       ;[nb children]%nn;
       ;family_count%nn;
       ;family_index%nn;<br>

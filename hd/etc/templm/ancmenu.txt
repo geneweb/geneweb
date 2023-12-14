@@ -131,9 +131,9 @@
       <label><input type="radio" id="tSB" name="tf1" value="sb" %l_on1; %l_on;
              %/>[surnames branch]</label><br>
       <label><input type="radio" id="tSURN" name="tf1" value="surn" %l_on1; %l_on;
-             %/>[list eclair]0 - [surname/surnames]1 / [places]</label><br>
+             %/>[list eclair]0 - [surname/surnames]1 / [place/places]1</label><br>
       <label><input type="radio" id="tPLACE" name="tf1" value="place" %l_on1; %l_on;
-             %/>[list eclair]0 - [places]</label><br>
+             %/>[list eclair]0 - [place/places]1</label><br>
       <label><input type="radio" id="tTAG" name="tf1" value="tag" %l_on1; %l_on;
              %/>étiquette</label><br>
     </fieldset>

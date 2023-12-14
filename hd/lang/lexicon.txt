@@ -13591,60 +13591,43 @@ ru: фотографии и документы
 sv: arkiv & bilder
 tr: arşiv ve resimler
 
-    place
-af: plek
-bg: място
-br: lec'h
-ca: lloc
-co: locu
-cs: místo
-da: sted
-de: Ort
-en: place
-eo: loko
-es: lugar
-et: koht
-fi: paikka
-fr: lieu
-he:   מקום
-is: staður
-it: luogo
-lt: vieta
-lv: vieta
-nl: plaats
-no: sted
-oc: lòc
-pl: miejsce
-pt: lugar
-ro: localitate
-ru: место
-sk: miesto
-sl: kraj
-sv: plats
-tr: yer
-
     place filter
 co: numeru d’elementi cunservati in a lista di i lochi
 de: Anzahl der Elemente in der Ortsliste
 en: number of elements kept in places list
 fr: nombre d'éléments à conserver dans la liste des places
 
-    places
-co: lochi
-de: Orte
-en: places
-es: lugares
-fi: paikoista
-fr: lieux
-it: luoghi
-lt: patalpose
-nl: plaatsen
-no: steder
-oc: lòcs
-pt: locais
-ru: места
-sv: orter
-tr: yerler
+    place/places
+af: plek
+bg: място
+br: lec'h
+ca: lloc
+co: locu/lochi
+cs: místo
+da: sted
+de: Ort/Orte
+en: place/places
+eo: loko
+es: lugar/lugares
+et: koht
+fi: paikka/paikoista
+fr: lieu/lieux
+he: מקום
+is: staður
+it: luogo/luoghi
+lt: vieta/patalpose
+lv: vieta
+nl: plaats/plaatsen
+no: sted/steder
+oc: lòc/lòcs
+pl: miejsce
+pt: lugar/locais
+ro: localitate
+ru: место/места
+sk: miesto
+sl: kraj
+sv: plats/orter
+tr: yer/yerler
 
     plugins
 co: moduli d’estensione

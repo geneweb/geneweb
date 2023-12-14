@@ -246,7 +246,7 @@
     %if;has_pevents;%foreach;pevent;%apply;one_event(cnt,"","witness")%end;%end;
     %if;(not has_pevent_death)%apply;one_event(next_pevent,"","witness")%incr_next_pevent;%end;
     <dl id="new_event"></dl>
-    <dl><dt><a href="javascript:addEvent(1,1)" title="(+) [*death]" %lpa4;> + [event/events]0</a> %lpc4; <abbr %lt5;>#</abbr> %lt2; [place] [note/notes]1 [source/sources]1</dt></dl>
+    <dl><dt><a href="javascript:addEvent(1,1)" title="(+) [*death]" %lpa4;> + [event/events]0</a> %lpc4; <abbr %lt5;>#</abbr> %lt2; [place/places]0 [note/notes]1 [source/sources]1</dt></dl>
     %incr_next_pevent;
 </fieldset>
 <fieldset class="f2">

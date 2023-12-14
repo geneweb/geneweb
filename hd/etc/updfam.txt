@@ -235,9 +235,9 @@
         <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
       %end;
     </div>
-    <label for="xvar_pl" class="%if;(verbose=true)sr-only%end; col-sm-1 col-form-label">[place]</label>%nn;
+    <label for="xvar_pl" class="%if;(verbose=true)sr-only%end; col-sm-1 col-form-label">[place/places]0</label>%nn;
     <div class="col-sm">
-      <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[*place]">
+      <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[*place/places]0">
     </div>
   </div>
 %end;
@@ -480,9 +480,9 @@
     </div>
   </div>
   <div class="row">
-    <label for="e_placexcnt" class="col-sm-2 col-form-label">[*place]</label>
+    <label for="e_placexcnt" class="col-sm-2 col-form-label">[*place/places]0</label>
     <div class="col-sm-10">
-      <input class="form-control" type="text" name="e_placexcnt" value="%event.e_place;" id="e_placexcnt" placeholder="[*place]">
+      <input class="form-control" type="text" name="e_placexcnt" value="%event.e_place;" id="e_placexcnt" placeholder="[*place/places]0">
     </div>
   </div>
   %apply;date([*date/dates]0, "e_datexcnt", "event_date")

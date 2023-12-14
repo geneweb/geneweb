@@ -950,13 +950,13 @@
     %if;(e.birth="on" and e.birth_place="on")
       <th class="text-right pr-2 position-relative">[*date/dates]0
         %apply;rm("birth",[*date of birth])</th>
-      <th class="pl-2 position-relative">[*place]
+      <th class="pl-2 position-relative">[*place/places]0
         %apply;rm("birth_place",[*birth place])</th>
     %end;
     %if;(e.baptism="on" and e.baptism_place="on")
       <th class="text-right pr-2 position-relative" title="[*date of baptism]">[*date/dates]0
         %apply;rm("baptism",[*date of baptism])</th>
-      <th class="pl-2 position-relative">[*place]
+      <th class="pl-2 position-relative">[*place/places]0
         %apply;rm("baptism_place",[*baptism place])</th>
     %end;
     %if;((e.marr_date="on" and e.marr_place="on") or
@@ -967,7 +967,7 @@
       %end;
       %if;(e.marr_place="on")
         <th class="%if;(e.marr_date!="on")text-center%else;pl-2%end; position-relative">
-          [*place] %apply;rm("marr_place",[*marriage place])</th>
+          [*place/places]0 %apply;rm("marr_place",[*marriage place])</th>
       %end;
       %if;(e.child="on")
         <th class="text-center px-2 position-relative">
@@ -978,13 +978,13 @@
     %if;(e.death="on" and e.death_place="on")
       <th class="text-right pr-2 position-relative">[*date/dates]0
         %apply;rm("death",[*date of death])</th>
-      <th class="pl-2 position-relative">[*place]
+      <th class="pl-2 position-relative">[*place/places]0
         %apply;rm("death_place",[*death place])</th>
     %end;
     %if;(e.burial="on" and e.burial_place="on")
       <th class="text-right pr-2 position-relative">[*date/dates]0
         %apply;rm("burial",[*date of burial])</th>
-      <th class="pl-2 position-relative">[*place]
+      <th class="pl-2 position-relative">[*place/places]0
         %apply;rm("burial_place",[*burial place])</th>
     %end;
   </tr>

@@ -30,7 +30,7 @@
   <dl>
     <dd style="margin-right:3px;">[after] %apply;date("xx1")</dd>
     <dd style="margin-right:3px;">[before] %apply;date("xx2")</dd>
-    <dd>[place]<input id="xx_place" name="xx_place" value="%evar.xx_place;" %ltp; %/></dd>
+    <dd>[place/places]0<input id="xx_place" name="xx_place" value="%evar.xx_place;" %ltp; %/></dd>
   </dl>
 %end;
 
