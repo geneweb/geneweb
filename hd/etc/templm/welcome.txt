@@ -210,7 +210,7 @@ zh: 网络家谱
         %if;(wizard)
           <li><a href="%prefix;m=MOD_DATA;data=fn">%apply;book_of([first name/first names]1)</a></li>
           <li><a href="%prefix;m=MOD_DATA;data=sn">%apply;book_of([surname/surnames]1)</a></li>
-          <li><a href="%prefix;m=MOD_DATA;data=place">%apply;book_of([places])</a></li>
+          <li><a href="%prefix;m=MOD_DATA;data=place">%apply;book_of([place/places]1)</a></li>
           <li><a href="%prefix;m=MOD_DATA;data=src">%apply;book_of([source/sources]1)</a></li>
           <li><a href="%prefix;m=MOD_DATA;data=occu">%apply;book_of([occupation/occupations]1)</a></li>
         %end;
@@ -242,7 +242,7 @@ zh: 网络家谱
         %if;(bvar.propose_place_surnames != "no")%nl;
           <form method="get" action="%prefix;">
             %hidden;
-            [*place] / [event/events]1[:]
+            [*place/places]0 / [event/events]1[:]
             <input type="hidden" name="m" value="PS"%/>
             <label><input type="checkbox" name="bi" value="on" checked="checked" %l_on1;%/>[birth]</label>
             <label><input type="checkbox" name="ma" value="on" checked="checked" %l_on1;%/>[marriage/marriages]0</label>

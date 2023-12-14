@@ -137,7 +137,8 @@ let print_differences conf base branches p1 p2 =
   in
   let place_field trans name get =
     string_field
-      (transl conf trans ^<^ Adef.safe " / " ^>^ transl conf "place")
+      (transl conf trans ^<^ Adef.safe " / "
+      ^>^ transl_nth conf "place/places" 0)
       name
       (fun p -> get p |> sou base |> safe_html)
   in

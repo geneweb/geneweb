@@ -369,7 +369,7 @@
   <tr>
     <th>[years old]</th>
     <th>[date/dates]0</th>
-    <th>[place]</th>
+    <th>[place/places]0</th>
     <th><abbr title="%lt1;">%birth_symbol;&amp;%death_symbol;</abbr></th>
     <th>[person/persons]0</th>
     <th>[relationship]0</th>

@@ -36,11 +36,11 @@
   <option value="birth_date.year"
         %if;("xx"="birth_date.year")selected="selected"%end;>[birth] [year/month/day]0</option>
   <option value="birth_place"
-        %if;("xx"="birth_place")selected="selected"%end;>[birth] [place]</option>
+        %if;("xx"="birth_place")selected="selected"%end;>[birth] [place/places]0</option>
   <option value="death_date.year"
         %if;("xx"="death_date.year")selected="selected"%end;>[death] [year/month/day]0</option>
   <option value="death_place"
-        %if;("xx"="death_place")selected="selected"%end;>[death] [place]</option>
+        %if;("xx"="death_place")selected="selected"%end;>[death] [place/places]0</option>
 %end;
 
 %define;anc_ars(m_bt,m_bf,m_dt,m_df,f_bt,f_bf,f_dt,f_df)

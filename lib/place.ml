@@ -674,7 +674,7 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
   Array.sort (fun (k1, _) (k2, _) -> sort_place_utf8 k1 k2) arry;
   let title _ =
     Output.printf conf "%s / %s"
-      (Utf8.capitalize (transl conf "place"))
+      (Utf8.capitalize (transl_nth conf "place/places" 0))
       (Utf8.capitalize (transl_nth conf "surname/surnames" 0))
   in
   let opt = get_opt conf in

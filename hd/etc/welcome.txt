@@ -242,7 +242,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         %if;(b.propose_place_surnames!="no")
           <a role="button" class="btn btn-outline-primary mr-1" 
             href="%prefix;m=PPS&bi=on&ba=on&ma=on&de=on&bu=on">
-            <i class="fas fa-globe fa-fw mr-1" aria-hidden="true"></i>[*places]/[surname/surnames]0</a>
+            <i class="fas fa-globe fa-fw mr-1" aria-hidden="true"></i>[*place/places]1/[surname/surnames]0</a>
         %end;
         %if;(b.hide_advanced_request="no")
           <a role="button" class="btn btn-outline-primary mr-1" 
@@ -270,8 +270,8 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
               ([wizard/wizards/friend/friends/exterior]0)">[*surname/surnames]1</a>
           <a role="button" class="btn btn-outline-success mr-1" 
             href="%prefix;m=MOD_DATA&data=place"
-            title="[*modify] %apply;book_of%with;[places]%end;%sp;
-              ([wizard/wizards/friend/friends/exterior]0)">[*places]</a>
+            title="[*modify] %apply;book_of%with;[place/places]1%end;%sp;
+              ([wizard/wizards/friend/friends/exterior]0)">[*place/places]1</a>
           <a role="button" class="btn btn-outline-success mr-1" 
             href="%prefix;m=MOD_DATA&data=occu"
             title="[*modify] %apply;book_of%with;[occupation/occupations]1%end;%sp;

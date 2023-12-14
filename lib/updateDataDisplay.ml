@@ -4,14 +4,16 @@ open TemplAst
 open Util
 open UpdateData
 
-let translate_title conf =
+(* TODO remove references to single "place" and "places" *)
+let translate_title conf len =
+  let plural = if len > 1 then 1 else 0 in
   let title =
     match p_getenv conf.env "data" with
-    | Some "occu" -> transl_nth conf "occupation/occupations" 1
-    | Some "place" -> transl conf "places"
-    | Some "src" -> transl_nth conf "source/sources" 1
-    | Some "fn" -> transl_nth conf "first name/first names" 1
-    | Some "sn" -> transl_nth conf "surname/surnames" 1
+    | Some "occu" -> transl_nth conf "occupation/occupations" plural
+    | Some "place" -> transl_nth conf "place/places" plural
+    | Some "src" -> transl_nth conf "source/sources" plural
+    | Some "fn" -> transl_nth conf "first name/first names" plural
+    | Some "sn" -> transl_nth conf "surname/surnames" plural
     | _ -> ""
   in
   (Printf.sprintf (ftransl conf "book of %s") title, title)
@@ -325,7 +327,7 @@ and eval_simple_str_var conf _base env _xx = function
           (Sosa.of_int len)
       in
       let ini = Option.value ~default:"" (p_getenv conf.env "s") in
-      let book_of, title = translate_title conf in
+      let book_of, title = translate_title conf len in
       let result =
         if ini = "" then Printf.sprintf "%s %s" len2 title
         else

@@ -169,7 +169,7 @@ function update_old () {
       %end;
       %if;(before.pevent_place!=after.pevent_place)
         <tr>
-          <th scope="row" class="table-success text-nowrap">[*place]</th>
+          <th scope="row" class="table-success text-nowrap">[*place/places]0</th>
           <td class="odd">%before.pevent_place;</td>
           <td class="odd">%after.pevent_place;</td>
         </tr>
@@ -257,7 +257,7 @@ function update_old () {
         %end;
         %if;(before.fevent_place!=after.fevent_place)
           <tr>
-            <th scope="row" class="table-success text-nowrap">[*place]</th>
+            <th scope="row" class="table-success text-nowrap">[*place/places]0</th>
             <td class="odd">%before.fevent_place;</td>
             <td class="odd">%after.fevent_place;</td>
           </tr>

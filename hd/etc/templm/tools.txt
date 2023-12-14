@@ -404,7 +404,7 @@
       %if;(evar.fam7 = "on")
           <input type="hidden" name="fam7" value="on"%/>
           %apply;radio("tf1","fam73",[time line],"")
-          %let;fam70;[date/dates]0, [place]0%in;
+          %let;fam70;[date/dates]0, [place/places]0%in;
           %apply;radio("tf1","fam70",fam70,"")
           %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
             %let;fam71;[image/images]1 [long display]%in;
@@ -422,9 +422,9 @@
           <legend>[*list/list (ancestors)]0</legend>
           %apply;radio("tf1","sb",[surnames branch],"")
           <label><input type="radio" name="tf1" value="surn" %l_on;
-            %if;(evar.tf1 = "surn") checked="checked"%end;%/>[list eclair]0 - [surname/surnames]1 / [places]</label>
+            %if;(evar.tf1 = "surn") checked="checked"%end;%/>[list eclair]0 - [surname/surnames]1 / [place/places]1</label>
           <label><input type="radio" name="tf1" value="place" %l_on;
-            %if;(evar.tf1 = "place") checked="checked"%end;%/>[list eclair]0 - [places]</label>
+            %if;(evar.tf1 = "place") checked="checked"%end;%/>[list eclair]0 - [place/places]1</label>
         </fieldset>
         <fieldset style="border:0;">
           <legend>[*statistics]</legend>

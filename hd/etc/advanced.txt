@@ -74,9 +74,9 @@
       </div>
     </div>
     <div class="row">
-      <label for="xx_place" class="col-2 col-form-label">[*place]</label>
+      <label for="xx_place" class="col-2 col-form-label">[*place/places]0</label>
       <div class="col-9">
-        <input type="text" class="form-control" name="xx_place" id="xx_place" placeholder="[*place]">
+        <input type="text" class="form-control" name="xx_place" id="xx_place" placeholder="[*place/places]0">
       </div>
     </div>
     <div class="row">
