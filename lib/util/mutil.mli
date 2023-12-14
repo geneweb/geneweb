@@ -67,11 +67,20 @@ val arabian_of_roman : string -> int
 (** Convert roman number (string) to arabic (int). Number should be less or equal
     to MMMCMXCIX (3999). *)
 
+val read_fallback :
+  string -> string -> unit
+(** reads a file lexicon.gwf which defines a possible fallback language for
+    each of the available languages.
+    Most of the lines of this file are commented and can be uncommented by
+    the user who can place the new file in bases/etc/lang *)
+
 val input_lexicon :
   string -> (string, string) Hashtbl.t -> (unit -> in_channel) -> unit
 (** [input_lexicon lang ht open_file] open {i lexicon.txt} file with [open_file ()],
     parse it and fill [ht] where key is the keyword and value is
     a coresponding traduction associated to a [lang] language code.
+    The second parameter defines a set of fallback languages if a translation is not
+    available in a given language.
     If traduction line has a form [->: kw] it associates to the current section name the value
     associated to [kw] section name inside [ht] (keyword alias). *)
 
