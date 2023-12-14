@@ -445,7 +445,38 @@ let compare_after_particle particles s1 s2 =
   in
   loop (String.length p1) (String.length p2)
 
+let hold = ref ""
+let fallback = ref []
+
+let read_fallback lang fname =
+  fallback := [];
+  let rec aux a b i =
+    i = -1
+    || (String.unsafe_get a i = String.unsafe_get b i
+        && aux a b (i - 1) )
+  in
+  let ic = try Some (Secure.open_in fname)
+    with Sys_error _ -> None
+  in
+  match ic with
+  | Some ic ->
+    let rec one_line () =
+      match input_line ic with
+      | exception End_of_file -> close_in ic
+      | line -> (
+          let lang_len = String.length lang in
+          match String.index_opt line ':' with
+          | Some i when line.[0] <> '#' &&
+              (i = lang_len && aux lang line (lang_len - 1) ) -> (
+              let f_lang = String.sub line (i + 1) (String.length line - i - 1) in
+              fallback := (lang, f_lang) :: !fallback;
+              one_line ())
+          | _ -> one_line ())
+    in one_line ()
+  | None -> fallback := [("co", "fr"); ("oc", "fr"); ("br", "fr"); ("bg", "ru"); ]
+
 let input_lexicon lang ht open_fname =
+  read_fallback lang "lexicon.gwf";
   let ic = open_fname () in
   let lang =
     match String.index_opt lang '.' with
@@ -487,33 +518,40 @@ let input_lexicon lang ht open_fname =
     | exception End_of_file -> close_in ic
     | line ->
       match String.index_opt line ':' with
-      | Some i ->
-        if (i = lang_len && aux lang line (lang_len - 1) )
-        || (i = derived_lang_len && aux derived_lang line (derived_lang_len - 1) )
-        then begin
+      | Some i when (i = lang_len && aux lang line (lang_len - 1) )
+        || (i = derived_lang_len && aux derived_lang line (derived_lang_len - 1) ) ->
           let v =
             if i + 1 = String.length line then ""
             else String.sub line (i + 2) (String.length line - i - 2)
           in
-          Hashtbl.replace ht k v ;
-          key ()
-        end
-        (* defining alias names for existing entries in the lexicon *)
-        (*     alias_name *)
-        (* ->: real_entry *)
-        else if String.length line > 4
+          Hashtbl.replace ht k v;
+          trad k
+      | Some i when List.mem_assoc lang !fallback &&
+          (i = (String.length (List.assoc lang !fallback))) &&
+          (aux (List.assoc lang !fallback) line (String.length (List.assoc lang !fallback) - 1 )) ->
+          let v =
+            if i + 1 = String.length line then ""
+            else String.sub line (i + 2) (String.length line - i - 2)
+          in
+          hold := v;
+          trad k
+      | Some _i when String.length line > 4
              && String.unsafe_get line 0 = '-'
              && String.unsafe_get line 1 = '>'
              && String.unsafe_get line 2 = ':'
-             && String.unsafe_get line 3 = ' '
-        then
-        begin
+             && String.unsafe_get line 3 = ' ' ->
+          (* defining alias names for existing entries in the lexicon *)
+          (*     alias_name *)
+          (* ->: real_entry *)
           let k2 = String.sub line 4 (String.length line - 4) in
           Hashtbl.replace tmp k k2;
-          key ()
-        end
-        else trad k
-      | None -> key () ;
+          trad k
+      | Some _i ->
+          trad k
+      | None -> (
+          if (not (Hashtbl.mem ht k)) && !hold <> "" then
+            Hashtbl.add ht k !hold;
+          key ())
   in
   key () ;
   Hashtbl.iter (fun k k2 -> 
