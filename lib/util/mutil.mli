@@ -67,8 +67,7 @@ val arabian_of_roman : string -> int
 (** Convert roman number (string) to arabic (int). Number should be less or equal
     to MMMCMXCIX (3999). *)
 
-val read_fallback :
-  string -> string -> unit
+val read_fallback : string -> string -> unit
 (** reads a file lexicon.gwf which defines a possible fallback language for
     each of the available languages.
     Most of the lines of this file are commented and can be uncommented by

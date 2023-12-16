@@ -1127,6 +1127,10 @@ let make_conf from_addr request script_name env =
       if x = "" then !default_lang else x
     with Not_found -> !default_lang
   in
+  let browser_lang =
+    if !choose_browser_lang then http_preferred_language request
+    else ""
+  in
   let vowels =
     match List.assoc_opt "vowels" base_env with
     | Some l ->
@@ -1210,7 +1214,9 @@ let make_conf from_addr request script_name env =
        end;
      lang = if lang = "" then default_lang else lang;
      vowels=vowels;
-     default_lang = default_lang; default_sosa_ref = default_sosa_ref;
+     default_lang = default_lang;
+     browser_lang = browser_lang;
+     default_sosa_ref = default_sosa_ref;
      multi_parents =
        begin try List.assoc "multi_parents" base_env = "yes" with
          Not_found -> false

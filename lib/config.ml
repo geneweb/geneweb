@@ -62,6 +62,7 @@ type config = {
   lang : string;
   vowels : string list;
   default_lang : string;
+  browser_lang : string;
   default_sosa_ref : iper * Gwdb.person option;
   multi_parents : bool;
   authorized_wizards_notes : bool;
@@ -140,6 +141,7 @@ let empty =
     lang = "";
     vowels = [];
     default_lang = "";
+    browser_lang = "";
     default_sosa_ref = (Gwdb.dummy_iper, None);
     multi_parents = false;
     authorized_wizards_notes = false;
