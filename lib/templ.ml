@@ -165,23 +165,45 @@ let order =
   ]
 
 let reorder conf env =
+  let new_lang =
+    match List.assoc_opt "lang" env with Some l1 -> l1 | None -> ""
+  in
+  let keep_lang =
+    (* same condition in Util.commd and copyr.txt *)
+    (conf.browser_lang <> "" && conf.browser_lang <> new_lang)
+    || conf.default_lang <> new_lang
+  in
+  (* process evars from order *)
   let env1, ok =
     List.fold_left
       (fun (acc1, acc2) k ->
         if
           List.mem_assoc k env
-          && (k <> "lang"
-             || (k = "lang" && List.assoc k env <> conf.default_lang))
+          && ((k = "lang" && keep_lang)
+             || (k = "oc" || k = "ocz")
+                && (match List.assoc_opt k env with
+                   | Some v when v <> "" && v <> "0" -> v
+                   | _ -> "")
+                   <> ""
+             || (match List.assoc_opt k env with
+                | Some v when v <> "" -> v
+                | _ -> "")
+                <> "")
         then (Format.sprintf "%s=%s" k (List.assoc k env) :: acc1, k :: acc2)
         else (acc1, acc2))
       ([], []) order
   in
+  (* process other evars from env *)
   let env2 =
     List.fold_left
       (fun acc (k, v) ->
-        if (not (List.mem k ok)) && k <> "lang" && v <> conf.default_lang then
-          Format.sprintf "%s=%s" k v :: acc
-        else acc)
+        if
+          List.mem k ok
+          || (k = "lang" && not keep_lang)
+          || ((k = "oc" || k = "ocz") && (v = "" || v = "0"))
+          || v = ""
+        then acc
+        else Format.sprintf "%s=%s" k v :: acc)
       [] env
   in
   String.concat "&" (List.rev env1 @ List.rev env2)
@@ -204,8 +226,15 @@ let find_sosa_ref conf =
       | Some s when s <> "" -> s
       | _ -> "No sosa ref")
 
-(* when str = "" url_set_aux can reset several evar from evar_l in one call *)
-let url_set_aux conf evar_l str (iz, pz, nz, ocz) =
+(* url_set_aux can reset several evar from evar_l in one call *)
+let url_set_aux conf evar_l str_l =
+  let evar_l = String.split_on_char '_' evar_l in
+  let str_l = String.split_on_char '_' str_l in
+  let str_l =
+    List.mapi
+      (fun i _evar -> if i < List.length str_l then List.nth str_l i else "")
+      evar_l
+  in
   let href =
     match String.split_on_char '?' (Util.commd conf :> string) with
     | [] ->
@@ -213,115 +242,31 @@ let url_set_aux conf evar_l str (iz, pz, nz, ocz) =
         ""
     | s :: _l -> s
   in
-  match evar_l with
-  | [] ->
-      (* nouveau url_set; Le paramètre str contient un squelette de la nouvelle url *)
-      let evarl = String.split_on_char '&' str in
-      let new_env =
-        List.fold_left
-          (fun acc ev ->
-            let ev1 = String.split_on_char '=' ev in
-            if List.nth ev1 0 <> "" then
-              ( List.nth ev1 0,
-                if List.length ev1 > 1 then List.nth ev1 1 else "" )
-              :: acc
-            else acc)
-          [] evarl
-      in
-      let old_env = conf.henv @ conf.senv @ conf.env in
-      let old_env =
-        List.sort_uniq (fun (k1, _) (k2, _) -> compare k1 k2) old_env
-      in
-      (* done_env marks evar of new_env taken into account *)
-      let new_env', done_env =
-        List.fold_left
-          (fun (acc1, acc2) (k, v) ->
-            let v = Adef.as_string @@ v in
-            let k, v =
-              if (k = "oc" || k = "ocz") && v = "0" then (k, "") else (k, v)
-            in
-            let k, v =
-              if k = "lang" && v = conf.default_lang then (k, "") else (k, v)
-            in
-            match List.assoc_opt k new_env with
-            | Some v' ->
-                if v' <> "" then ((k, v') :: acc1, k :: acc2)
-                else (acc1, k :: acc2)
-            | None -> if v <> "" then ((k, v) :: acc1, acc2) else (acc1, acc2))
-          ([], []) old_env
-      in
-      (* add to new_env' evars of new_env which have not been taken into account *)
-      let new_env' =
-        new_env'
-        @ List.fold_left
-            (fun acc (k, v) ->
-              let k, v =
-                if k = "lang" && v = conf.default_lang then (k, "") else (k, v)
-              in
-              if List.mem k done_env || v = "" then acc else (k, v) :: acc)
-            [] new_env
-      in
-      Format.sprintf "%s?%s" href (reorder conf new_env')
-  | evar :: _l ->
-      (* rebuild the current url from conf.env, replacing &evar=xxx by &evar=str *)
-      (* if evar is not present in conf.env, it will be added at the end *)
-      let _fadd_evar =
-        match
-          List.find_opt
-            (fun (k, _) -> k = evar)
-            (conf.henv @ conf.senv @ conf.env)
-        with
-        | Some (_, _) -> false
-        | None -> true && str <> "" (* only if str <> "" *)
-      in
-      let kl = ref [] in
-      let conf_l = conf.henv @ conf.senv @ conf.env in
-      let conf_l = List.filter (fun (k, _v) -> k <> evar) conf_l in
-      let l =
-        List.filter_map
-          (fun (k, v) ->
-            (* provess all env variables in senv, henv, env *)
-            let v = Adef.as_string @@ v in
-            match (k, v) with
-            | "oc", "0" | "ocz", "0" -> None (* ignore occ null *)
-            | _, _ when List.mem k !kl -> None (* already done *)
-            | k, _ when List.mem k evar_l && k <> evar ->
-                (* there can be 1, 2 or 3 evar in evar_l *)
-                (* evar is the first one, which can be set to a new value *)
-                (* evar 2 and 3 are removed *)
-                None
-            | "lang", v when not (List.mem k evar_l) ->
-                (* lang not in evar list, ignore if default_lang *)
-                if v = conf.default_lang || v = "" then None
-                else (
-                  kl := k :: !kl;
-                  Some (k, v))
-            | "lang", v ->
-                (* lang in evar list, set it to str unless default_lang *)
-                let v = if str <> "" then str else v in
-                if v = conf.default_lang || v = "" then None
-                else (
-                  kl := k :: !kl;
-                  Some (k, v))
-            | k, _ when k = evar && str = "" ->
-                (* evar is set to "" -> ignore *)
-                None
-            | k, _ when k = evar && str <> "" ->
-                (* set evar to str if not empty *)
-                kl := k :: !kl;
-                Some (k, str)
-            | _, "" -> None (* empty *)
-            | _, _ ->
-                (* others *)
-                kl := k :: !kl;
-                Some (k, v))
-          conf_l
-      in
-      let l = if iz = "" then l else ("iz", iz) :: l in
-      let l = if pz = "" && nz = "" then l else ("pz", pz) :: ("nz", nz) :: l in
-      let l = if ocz = "" || ocz = "0" then l else ("ocz", ocz) :: l in
-      let l = if str = "" then l else (evar, str) :: l in
-      Format.sprintf "%s?%s" href (reorder conf l)
+  let conf_l = conf.henv @ conf.senv @ conf.env in
+  (* process evar_l *)
+  let url =
+    let rec loop i acc evar_l =
+      match evar_l with
+      | [] -> acc
+      | evar :: evar_l ->
+          let str = List.nth str_l i in
+          if str <> "" then loop (i + 1) ((evar, str) :: acc) evar_l
+          else loop (i + 1) acc evar_l
+    in
+    loop 0 [] evar_l
+  in
+  (* process the remainder of conf_l *)
+  let url =
+    let rec loop acc conf_l =
+      match conf_l with
+      | [] -> acc
+      | (k, _v) :: conf_l when List.mem k evar_l -> loop acc conf_l
+      | (k, v) :: conf_l -> loop ((k, Adef.as_string v) :: acc) conf_l
+    in
+    loop url conf_l
+  in
+  (* reorder *)
+  Format.sprintf "%s?%s" href (reorder conf url)
 
 let substr_start_aux n s =
   let len = String.length s in
@@ -407,18 +352,10 @@ let rec eval_variable conf = function
   | "time" :: sl -> eval_time_var conf sl
   (* clear some variables in url *)
   (* set the first variable to a new value if <> "" *)
-  | [ "url_set_new"; url ] -> url_set_aux conf [] url ("", "", "", "")
-  | [ "url_set"; evar; str ] -> url_set_aux conf [ evar ] str ("", "", "", "")
-  | [ "url_set"; evarl ] ->
-      let evarl = String.split_on_char '_' evarl in
-      url_set_aux conf evarl "" ("", "", "", "")
-  | [ "url_set2"; evar1; evar2; str ] ->
-      url_set_aux conf [ evar1; evar2 ] str ("", "", "", "")
-  | [ "url_set_pz"; iz ] ->
-      url_set_aux conf [ "iz"; "pz"; "nz"; "ocz" ] "" (iz, "", "", "")
-  | [ "url_set_pz"; pz; nz; ocz ] ->
-      url_set_aux conf [ "iz"; "pz"; "nz"; "ocz" ] "" ("", pz, nz, ocz)
-  | "url_setx" :: evarl -> url_set_aux conf evarl "" ("", "", "", "")
+  | [ "url_set"; evar_l; str_l ] ->
+      url_set_aux conf evar_l str_l
+  | [ "url_set"; evar_l ] ->
+      url_set_aux conf evar_l ""
   | [ "user"; "ident" ] -> conf.user
   | [ "user"; "name" ] -> conf.username
   | [ "user"; "key" ] -> conf.userkey
@@ -485,6 +422,7 @@ and eval_simple_variable conf = function
       if s = "" then s else s ^ Filename.dir_sep
   | "lang" -> conf.lang
   | "default_lang" -> conf.default_lang
+  | "browser_lang" -> conf.browser_lang
   | "left" -> conf.left
   | "nl" -> "\n"
   | "nn" -> ""
