@@ -44,12 +44,12 @@
 %end;
 <h1>[*list/list (ancestors)] [of] [person/persons]1%if;(e.surn!="") [by] [surname/surnames]0%end; [by] [place/places]0</h1>
 <div class="btn-toolbar mt-2 ml-3" role="toolbar" aria-label="Toolbar for list of individuals">
-  <a role="button" href="%if;(e.dates!=0)%url_set.dates.0%else;%url_set.dates;%end;"
+  <a role="button" href="%if;(e.dates!=0)%url_set.dates.0;%else;%url_set.dates;%end;"
     class="btn-link%if;(e.dates!=0) text-muted%end;"
     title="%if;(e.dates!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [date/dates]1">
     <i class="fa fa-calendar-alt fa-fw fa-lg mr-1"></i>[*date/dates]1
   </a>
-  <a role="button" href="%if;(e.parents!=0)%url_set.parents.0%else;%url_set.parents;%end;"
+  <a role="button" href="%if;(e.parents!=0)%url_set.parents.0;%else;%url_set.parents;%end;"
     title="%if;(e.parents!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [parents]"
     class="btn-link ml-3%if;(e.parents!=0) text-muted%end;">
     <i class="fa-solid fa-user-group fa-fa fa-lg mr-1"></i>[*parents]

@@ -22,8 +22,6 @@
 %end;
 
 %let;p_mod;%if;(b.p_mod!="" and e.p_mod="")%b.p_mod;%elseif;(e.p_mod!="")%e.p_mod;%end;%in;
-%define;iz(i)%url_set_pz.i;%end;
-%define;pnocz(pp,nn,oo)%url_set_pz.pp.nn.oo;%end;
 %if;(not cancel_links)
     <nav class="navbar sticky-top bg-white justify-content-center navbar-expand-md pt-0%nn;
       %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
@@ -109,7 +107,7 @@
             %if;(sosa_prev.index!="")
               <li class="nav-item">
                 <a class="nav-link text-secondary"
-                  href="%if;(e.i="")%nn;%url_setx.p.n.oc;&%sosa_prev.access;%else;%url_setx.i.m;&i=%sosa_prev.index;%end;"
+                  href="%if;(e.i="")%apply;url_set%with;p/n/oc%and;%sosa_prev.first_name;/%sosa_prev.surname;/%sosa_prev.occ;%end;%else;%apply;url_set("i", sosa_prev.index)%end;"
                   title="[Sosa] %sosa_prev.sosa;[:] %sosa_prev;"><span class="fa fa-chevron-left" aria-hidden="true"></span><span class="sr-only">&lt;</span></a>%nn;
               </li>
             %end;
@@ -121,7 +119,7 @@
               %end;
               <li class="nav-item">
                 <a class="nav-link text-secondary"
-                  href="%if;(e.i="")%url_setx.p.n.oc;&%sosa_next.access;%else;%url_setx.i.m;&i=%sosa_next.index;%end;"
+                  href="%if;(e.i="")%apply;url_set%with;p/n/oc%and;%sosa_next.first_name;/%sosa_next.surname;/%sosa_next.occ;%end;%else;%apply;url_set("i", sosa_next.index)%end;"
                   title="[Sosa] %sosa_next.sosa;[:] %sosa_next;"><span class="fa fa-chevron-right" aria-hidden="true"></span><span class="sr-only">></span></a>
               </li>
             %end;
@@ -161,8 +159,9 @@
             </a>
             <div class="dropdown-menu dropdown-menu-transl">
               %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)
-                  <a class="dropdown-item" href="%if;(b.access_by_key="yes")
-                    %apply;pnocz(first_name_key,surname_key,occ)%else;%apply;iz(index)%end;"
+                  <a class="dropdown-item"
+                    href="%if;(b.access_by_key="yes")%apply;url_set%with;pz/nz/ocz%and;%first_name_key;/%surname_key;/%if;(occ!=0)%occ;%end;%end;
+                          %else;%url_set.iz.index;%end;"
                     title="%apply;nav_with_sosa_ref(self)" %laS;>%nn;
                     <i class="far fa-dot-circle fa-fw %sexcolor; mr-1"></i> [*modify::Sosa 1]%nn;
                   </a>
@@ -174,7 +173,7 @@
                 </a>
               %end;
               %if;(e.m!="ADD_FAM" and e.m!="MOD_FAM" and e.m!="MOD_IND" and e.m!="R" and e.m!="U")
-                <a class="dropdown-item" href="%url;&cgl=on" target="_blank"><i class="fa fa-unlink fa-fw mr-2" title="[*cancel GeneWeb links]"></i>[*cancel GeneWeb links]</a>%nn;
+                <a class="dropdown-item" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-unlink fa-fw mr-2" title="[*cancel GeneWeb links]"></i>[*cancel GeneWeb links]</a>%nn;
               %end;
           %if;(not (b.wizard_just_friend="yes") and wizard)
                 <div class="dropdown-divider"></div>

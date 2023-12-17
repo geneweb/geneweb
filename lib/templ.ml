@@ -228,8 +228,6 @@ let find_sosa_ref conf =
 
 (* url_set_aux can reset several evar from evar_l in one call *)
 let url_set_aux conf evar_l str_l =
-  let evar_l = String.split_on_char '_' evar_l in
-  let str_l = String.split_on_char '_' str_l in
   let str_l =
     List.mapi
       (fun i _evar -> if i < List.length str_l then List.nth str_l i else "")
@@ -353,9 +351,12 @@ let rec eval_variable conf = function
   (* clear some variables in url *)
   (* set the first variable to a new value if <> "" *)
   | [ "url_set"; evar_l; str_l ] ->
+      let evar_l = String.split_on_char '_' evar_l in
+      let str_l = String.split_on_char '_' str_l in
       url_set_aux conf evar_l str_l
   | [ "url_set"; evar_l ] ->
-      url_set_aux conf evar_l ""
+      let evar_l = String.split_on_char '_' evar_l in
+      url_set_aux conf evar_l []
   | [ "user"; "ident" ] -> conf.user
   | [ "user"; "name" ] -> conf.username
   | [ "user"; "key" ] -> conf.userkey
@@ -1123,6 +1124,13 @@ let rec interp_ast :
             String.concat "" (eval_ast_list env ep astl)
         | "language_name", [ VVstring s ] ->
             Translate.language_name s (Util.transl conf "!languages")
+        | "url_set", [ VVstring s1 ] ->
+            let s1 = String.split_on_char '/' s1 in
+            url_set_aux conf s1 []
+        | "url_set", [ VVstring s1; VVstring s2 ] ->
+            let s1 = String.split_on_char '/' s1 in
+            let s2 = String.split_on_char '/' s2 in
+            url_set_aux conf s1 s2
         | "nth", [ VVstring s1; VVstring s2 ] ->
             let n = try int_of_string s2 with Failure _ -> 0 in
             Util.translate_eval (Util.nth_field s1 n)
