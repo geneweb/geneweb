@@ -65,7 +65,7 @@
     %end;
   %end;
 %end;
-%let;implex_cnt;%count;%in;
+%let;implexcnt;%count;%in;
 %define;ancestors_by_list(xx, nnn)
   %if;(xx.has_parents and nnn > 0)
     <ul class="fa-ul">
@@ -109,8 +109,6 @@
   <label class="sr-only mt-2" for="inputxx">Filtre xx</label>
   <input type="text" id="inputxx" placeholder="[surname/surnames]0xx" title="[filter by::surname/surnames]0xx" class="filter%if;(xx>1) extrafilter%end; form-control-sm mr-1%if;(xx!=1) d-none%end;" disabled>
 %end;
-%define;iz(i)%url_set_pz.i;%end;
-%define;pnocz(pp,nn,oo)%url_set_pz.pp.nn.oo;%end;
 %define;definecujus(pp,nn)
   %if;(nn=0)[*define Cujus:::pp]0%elseif;(nn=1)[*define Cujus:::pp]1%end;
 %end;
@@ -141,15 +139,15 @@
     </div>
     %let;pnocz_old;%if;(e.iz!="")izb=%e.iz;%elseif;(e.pz!="" or e.nz!="")pzb=%e.pz;&nzb=%e.nz;%if;(e.ocz!="" and e.ocz!="0")&oczb=%e.ocz;%end;%end;%in;
     %if;(not cancel_links)
-      %if;(implex_cnt>0 and not (e.iz=index or self=sosa_ref))
+      %if;(implexcnt>0 and not (e.iz=index or self=sosa_ref))
           <i class="far fa-dot-circle fa-fw text-success"></i><a role="button" class="mt-3"
-            href="%if;(b.access_by_key="yes")%apply;pnocz%with;%first_name_key;%and;%surname_key;%and;%if;(occ!=0)%occ;%end;%end;
-                  %else;%apply;iz(index)%end;&%pnocz_old;&same=%implex_cnt;">%nn;
+            href="%if;(b.access_by_key="yes")%apply;url_set%with;pz/nz/ocz%and;%first_name_key;/%surname_key;/%if;(occ!=0)%occ;%end;%end;
+                  %else;%apply;url_set%with;iz/same%and;%index;/%implexcnt;%end;%end;&%pnocz_old;">%nn;
             %apply;definecujus(self,0)</a>
       %end;
       %if;(e.same!="" and (e.izb!="" or (e.pzb!="" and e.nzb!="")))
         <i class="far fa-stop-circle fa-fw text-danger"></i><a role="button" class="mt-3"
-         href="%url_setx.iz.pz.nz.ocz.izb.pzb.nzb.oczb.same;%nn;
+         href="%url_set.iz_pz_nz_ocz_izb_pzb_nzb_oczb_same;%nn;
            %if;(b.access_by_key="yes")&pz=%e.pzb;&nz=%e.nzb;%if;(e.oczb!="")&ocz=%e.oczb;%end;%else;&iz=%e.izb;%end;">
            %apply;definecujus%with;%apply;capitalize(e.pzb) %apply;capitalize(e.nzb)%(TODO get name form e.izb%)%and;1%end;</a>
       %end;

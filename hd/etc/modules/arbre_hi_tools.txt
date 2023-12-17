@@ -11,19 +11,19 @@
     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
       <div class="btn-group mx-2">
         %if;(evarv>=4)
-          <a href="%url_set.v;&v=%expr(evarv-1)" class="btn btn-outline-primary"
+          <a href="%apply;url_set%with;v%and;%expr(evarv-1)%end;" class="btn btn-outline-primary"
             title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]1">−</a>
         %end;
         <span class="btn btn-outline-primary disabled border-top border-bottom"
           title="[generation/generations]1">%evarv; gen.</span>
         %if;(evarv<maxlev-1)
-          <a href="%url_set.v;&v=%expr(evarv+1)" class="btn btn-outline-primary"
+          <a href="%apply;url_set%with;v%and;%expr(evarv+1)%end;" class="btn btn-outline-primary"
             title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+</a>
         %end;
       </div>
       %(TODO : improve translations, titles and add icons %)
       <div class="mx-2">
-        <a href="%if;(e.hi="H")%url_set.hi.I;%else;%url_set.hi.H;%end;"
+        <a href="%apply;url_set%with;hi%and;%if;(e.hi="H")I%else;H%end;%end;"
           class="btn btn-outline-primary">%if;(e.hi!="H")H%else;I%end;-tree</a>
         <a href="%if;(e.sosa!="on")%url_set.sosa.on;%else;%url_set.sosa;%end;" class="btn btn-outline-primary ml-1"
           title="[*visualize/show/hide/summary]1 %if;(e.sosa="on")ASCII%else;HTML%end;">
@@ -40,23 +40,23 @@
       %( TODO : disable if ASCII box drawings ? %)
       <div class="btn-group mx-2">
         %if;(evarscl>0)
-          <a href="%if;(e.scale!="on")%url_setx.scale.fs;&scale=%expr(evarscl-20)&fs=%expr(evarfs-1)%end;"
+          <a href="%apply;url_set%with;scale/fs%and;%expr(evarscl-20)/%expr(evarfs-1)%end;"
             class="btn btn-outline-primary" title="[*reduce/increase]0 [size] (-20 %%)">−</a>
         %end;
         <span class="btn btn-outline-primary disabled border-top border-bottom">%evarscl; %%</span>
         %if;(evarscl<200)
-          <a href="%if;(e.scale!="on")%url_setx.scale.fs;&scale=%expr(evarscl+20)&fs=%expr(evarfs+1);%end;"
+          <a href="%apply;url_set%with;scale/fs%and;%expr(evarscl+20)/%expr(evarfs+1)%end;"
             class="btn btn-outline-primary" title="[*reduce/increase]1 [size] (+20 %%)">+</a>
         %end;
       </div>
       <div class="btn-group mx-2">
         %if;(evarfs>5)
-          <a href="%if;(e.fs!="on")%url_set.fs;&fs=%expr(evarfs-1)%end;" class="btn btn-outline-primary"
+          <a href="%apply;url_set%with;fs%and;%expr(evarfs-1)%end;" class="btn btn-outline-primary"
             title="[reduce/increase]0 [font size]">−</a>
         %end;
         <span class="btn btn-outline-primary disabled border-top border-bottom">Font %evarfs; px</span>
         %if;(evarfs<20)
-          <a href="%if;(e.fs!="on")%url_set.fs;&fs=%expr(evarfs+1)%end;" class="btn btn-outline-primary"
+          <a href="%apply;url_set%with;fs%and;%expr(evarfs+1)%end;" class="btn btn-outline-primary"
             title="[reduce/increase]1 [font size]">+</a>
         %end;
       </div>

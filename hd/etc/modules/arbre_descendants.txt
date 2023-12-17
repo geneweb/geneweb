@@ -2,7 +2,8 @@
 %define;display_person(xxx)
   <div class="list-group-item px-0 mx-0 border-0">
   %if;(not cancel_links)
-    <a href="%url_set.p_n_oc_i_m_t;&%xxx.access;&m=D&t=V"
+    <a href="%if;(e.i="")%apply;url_set%with;p/n/oc/m/t%and;%xxx.first_name;/%xxx.surname;/%if;(xxx.occ!=0)%xxx.occ;%end;/D/V%end;%nn;
+             %else;%apply;url_set%with;i/m/t%and;%xxx.index;/D/V%end;%end;"
       class="big_anchor list-group-item-action" title="[*navigation]">
     </a>
   %end;
@@ -13,7 +14,8 @@
     %end; <span class="text-nowrap">%xxx.surname;</span>
   %else;
     <a class="normal_anchor"
-      href="%url_set.p_n_oc_i_m_t;&%xxx.access;"
+      href="%if;(e.i="")%apply;url_set%with;p/n/oc/m/t%and;%xxx.first_name;/%xxx.surname;/%if;(xxx.occ!=0)%xxx.occ;%end;%end;%nn;
+            %else;%apply;url_set("i/m/t", xxx.index)%end;"
       title=" %xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;">
       %if;(xxx.public_name!="")%xxx.public_name;
       %else;%xxx.first_name;

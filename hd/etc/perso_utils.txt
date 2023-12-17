@@ -838,12 +838,13 @@
 %let;timeline;%if;(count>0)yes%else;no%end;%in;
 
 %define;rm(ccc,ttt)
-  %if;(e.ccc="on")<a role="button" class="stretched-link" href="%url_set.ccc;"
+  %if;(e.ccc="on")<a role="button" class="stretched-link" href="%apply;url_set%with;ccc%end;"
     title="ttt&#010;&#010; [*remove %s column:::ccc]"></a>%end;
 %end;
-%define;rm2(ccc,ddd,ttt)
-  %if;(e.ccc="on" and e.ddd="on")<a role="button" class="stretched-link" href="%url_setx.ccc.ddd;"
-    title="ttt&#010;&#010; [*remove %s column:::ccc+ddd]"></a>%end;
+%define;rm3(ccc,ddd,eee,ttt)
+  %if;(e.ccc="on" and e.ddd="on")<a role="button" class="stretched-link"
+    href="%apply;url_set%with;ccc/ddd%if;("eee"!="")/eee%end;%end;"
+    title="ttt&#010;&#010; [*remove %s column:::ccc+ddd+eee]"></a>%end;
 %end;
 %define;table_header()
   <tr class="align-middle descends_table_header">
@@ -857,7 +858,7 @@
     %incr_count;
     %if;(e.birth="on" and e.birth_place="on")
       <th class="text-center position-relative" colspan="2">[*birth]
-        %apply;rm2("birth","birth_place","")</th>
+        %apply;rm3("birth","birth_place","",[*birth])</th>
       %incr_count;%incr_count;
     %elseif;(e.birth="on" and e.birth_place!="on")
       <th scope="col" class="text-center align-middle position-relative" rowspan="2">[*date of birth]
@@ -870,7 +871,7 @@
     %end;
     %if;(e.baptism="on" and e.baptism_place="on")
       <th class="text-center position-relative" colspan="2">[*baptism]
-        %apply;rm2("baptism","baptism_place","")</th>
+        %apply;rm3("baptism","baptism_place","","")</th>
       %incr_count;%incr_count;
     %elseif;(e.baptism="on" and e.baptism_place!="on")
       <th scope="row" class="text-center align-middle position-relative" rowspan="2">[*date of baptism]
@@ -882,7 +883,7 @@
       %incr_count;
     %end;
     %if;(e.marr="on" and (e.m="A" or (e.m="D" and e.t="H")))
-      <th scope="col" class="pl-2 align-middle" rowspan="2">[*spouse/spouses]1
+      <th scope="col" class="pl-2 align-middle position-relative" rowspan="2">[*spouse/spouses]1
         %apply;rm("marr","")</th>
       %incr_count;
     %end;
@@ -891,8 +892,8 @@
       <th class="text-center position-relative"
         colspan="%if;(e.marr_date="on" and e.marr_place="on" and e.child="on")3%else;2%end;">%nn;
         [*marriage/marriages]0
-        <a role="button" class="stretched-link" href="%url_setx.marr_date.marr_place.child;"
-          title="[*remove %s column:::marr_date+marr_place+child]"%(TODO:filter if only 2%)></a></th>
+        %apply;rm3%with;marr_date%and;marr_place%and;child%and;%end;
+      </th>
       %if;(e.marr_date="on" and e.marr_place="on" and e.child="on")%incr_count;%end;
       %incr_count;%incr_count;
     %elseif;(e.marr_date="on" and e.marr_place!="on" and e.child!="on")
@@ -911,7 +912,7 @@
     %end;
     %if;(e.death="on" and e.death_place="on")
       <th class="text-center position-relative" colspan="2">[*death]
-        %apply;rm2("death","death_place",[*death])</th>
+        %apply;rm3("death","death_place","",[*death])</th>
       %incr_count;%incr_count;
     %elseif;(e.death="on" and e.death_place!="on")
       <th scope="col" class="text-center position-relative" rowspan="2">[*date of death]
@@ -924,7 +925,7 @@
     %end;
     %if;(e.burial="on" and e.burial_place="on")
       <th class="text-center position-relative" colspan="2">[*burial]
-        %apply;rm2("burial","burial_place","")</th>
+        %apply;rm3("burial","burial_place","","")</th>
       %incr_count;%incr_count;
     %elseif;(e.burial="on" and e.burial_place!="on")
       <th scope="col" class="text-center position-relative" rowspan="2">[*date of burial]

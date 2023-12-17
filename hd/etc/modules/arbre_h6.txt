@@ -78,7 +78,8 @@
 %end;
 
 %define;somebody()
-  <a %if;(e.nav="on")href="%url_set.i_p_n_occ;&%access;"
+  <a %if;(e.nav="1")%if;(e.i="")%apply;url_set%with;p/n/oc%and;%first_name;/%surname;/%if;(occ!=0)%occ;%end;%end;%nn;
+             %else;%url_set.i.index;%end;%end;"
     %else;href="%prefix;%access;" class="s%sex; nc%has_children;"
     %end;>
     %if;(e.image!=0 and has_image)
@@ -115,7 +116,8 @@
       %else;
         %foreach;ancestor;
           <a id="p%ancestor.anc_sosa.v;"%sp;
-          %if;(e.nav=1)href="%url_set.i_p_n_occ;&%ancestor.access;"
+          %if;(e.nav=1)href="%if;(e.i="")%apply;url_set%with;p/n/oc%and;%ancestor.first_name;/%ancestor.surname;/%if;(ancestor.occ!=0)%ancestor.occ;%end;%end;%nn;
+             %else;%apply;url_set("i", ancestor.index)%end;"
           %else;href="%prefix;%ancestor.access;"
           %end;
           %if;(ancestor.same!="")

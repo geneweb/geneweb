@@ -27,7 +27,7 @@
       <i class="fa fa-search fa-fw fa-xs" aria-hidden="true"></i>%nn;
       <span class="sr-only">[*search/case sensitive]0</span>%nn;
     </a>
-    <a role="button" class="btn btn-sm btn-link p-0 border-0" href="%url_setx.p.n.oc.i;&i=%apply;get_random(base.real_nb_persons.v)"
+    <a role="button" class="btn btn-sm btn-link p-0 border-0" href="%apply;url_set%with;i/p/n/oc%and;%apply;get_random(base.real_nb_persons.v)%end;"
       title="[*random individual]"><i class="fa fa-dice-%apply;dice() fa-fw fa-xs" aria-hidden="true"></i>%nn;
       <span class="sr-only">[*random individual]</span>%nn;
     </a>
