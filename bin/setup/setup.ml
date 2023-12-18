@@ -914,7 +914,8 @@ let print_default_gwf_file conf =
      "perso_module_f=fratrie"; "perso_module_r=relations";
      "perso_module_c=chronologie"; "perso_module_n=notes";
      "perso_module_s=sources"; "perso_module_a=arbres";
-     "perso_module_d=data_3col"; "perso_module_l=ligne"; "p_mod="]
+     "perso_module_h=htrees"; "perso_module_d=data_3col";
+     "perso_module_l=ligne"; "p_mod="]
   in
   let bname = try List.assoc "o" conf.env with Not_found -> "" in
   let dir = Sys.getcwd () in
