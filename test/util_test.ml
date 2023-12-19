@@ -131,7 +131,13 @@ let util_safe_html _ =
 
 let util_transl_a_of_b _ =
   let conf = Config.empty in
-  let conf = { conf with env = ("lang", Adef.encoded "fr") :: conf.env } in
+  let conf =
+    {
+      conf with
+      env = ("lang", Adef.encoded "fr") :: conf.env;
+      vowels = [ "a"; "e"; "i"; "o"; "u"; "y" ];
+    }
+  in
   Hashtbl.add conf.lexicon "%1 of %2" "%1 d[e |']%2";
   let test aaa (s1, s2, s2_raw) =
     let bbb = Util.transl_a_of_b conf s1 s2 s2_raw in
@@ -156,7 +162,13 @@ let util_escape_html _ =
 let datedisplay_string_of_date _ =
   let open Def in
   let conf = Config.empty in
-  let conf = { conf with env = ("lang", Adef.encoded "co") :: conf.env } in
+  let conf =
+    {
+      conf with
+      env = ("lang", Adef.encoded "co") :: conf.env;
+      vowels = [ "a"; "e"; "i"; "o"; "u"; "y" ];
+    }
+  in
   Hashtbl.add conf.lexicon "(date)"
     "1<sup>u</sup> d[i |']%m %y/%d d[i |']%m %y/d[i |']%m %y/in u %y";
   Hashtbl.add conf.lexicon "(month)"
