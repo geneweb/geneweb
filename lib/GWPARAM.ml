@@ -8,6 +8,7 @@ let nb_errors = ref 0
 let errors_undef = ref []
 let errors_other = ref []
 let set_vars = ref []
+let gwd_cmd = ref ""
 
 type syslog_level =
   [ `LOG_ALERT

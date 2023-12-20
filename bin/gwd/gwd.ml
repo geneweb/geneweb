@@ -2052,6 +2052,12 @@ let main () =
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
   Geneweb.GWPARAM.syslog := GwdLog.syslog;
+  let gwd_cmd =
+    Array.fold_left (fun acc arg ->
+      if arg.[0] = '-' then acc ^ "<br><b>" ^ arg ^ "</b> "
+      else acc ^ arg) "" Sys.argv
+  in
+  Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
   List.iter register_plugin !plugins ;
   !GWPARAM.init () ;
   cache_lexicon () ;

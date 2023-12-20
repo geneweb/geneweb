@@ -235,7 +235,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
       </div>
       <div class="d-inline-flex justify-content-lg-center mt-1 mt-lg-2">
         %if;(wizard and b.propose_add_family!="no")
-          <a role="button" class="btn btn-outline-success mr-1"
+          <a role="button" class="btn btn-outline-success mr-1" 
             href="%prefix;m=ADD_FAM"
             title="[*add::family/families]0 ([wizard/wizards/friend/friends/exterior]0)"><i class="fas fa-user-plus mr-1" aria-hidden="true"></i>[*add::family/families]0</a>
         %end;
@@ -252,6 +252,11 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         <a role="button" class="btn btn-outline-primary mr-1" 
           href="%prefix;m=CAL">
           <i class="far fa-calendar-alt fa-fw mr-1" aria-hidden="true"></i>[*calendar/calendars]1</a>
+        %if;wizard;
+          <a role="button" class="btn btn-outline-success mr-1" 
+            href="%prefix;m=H&v=conf">
+            <i class="fas fa-gear fa-fw mr-1" aria-hidden="true"></i>[*configuration]1</a>
+        %end;
       </div>
     </div>
     %if;wizard;

@@ -285,6 +285,36 @@ let substr_start_aux n s =
   loop 0 n ""
 
 let rec eval_variable conf = function
+  | [ "lang"; "full" ] ->
+      let rec func x lst c =
+        match lst with
+        | [] -> "bad language code"
+        | hd :: tl ->
+            if hd = x then Util.transl_nth conf "!languages" c
+            else func x tl (c + 1)
+      in
+      func conf.lang Version.available_languages 0
+  | [ "bvar"; "list" ] ->
+      let is_duplicate key assoc_list =
+        let rec aux count = function
+          | [] -> count > 1
+          | (k, _) :: tl -> if k = key then aux (count + 1) tl else aux count tl
+        in
+        aux 0 assoc_list
+      in
+      let l =
+        List.sort (fun (k1, _v1) (k2, _v2) -> compare k1 k2) conf.base_env
+      in
+      List.fold_left
+        (fun acc (k, v) ->
+          let duplicate =
+            if is_duplicate k l then {| style="color:red"|} else ""
+          in
+          acc
+          ^ Format.sprintf "<b%s>%s</b>=%s<br>\n" duplicate k
+              (Util.escape_html v :> string))
+        "" l
+  | [ "gwd"; "arglist" ] -> !GWPARAM.gwd_cmd
   | [ "bvar"; v ] | [ "b"; v ] -> (
       try List.assoc v conf.base_env with Not_found -> "")
   | [ "connections"; "wizards" ] -> (
