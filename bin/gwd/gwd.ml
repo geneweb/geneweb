@@ -1131,6 +1131,7 @@ let make_conf from_addr request script_name env =
     if !choose_browser_lang then http_preferred_language request
     else ""
   in
+  let default_lang = if browser_lang = "" then default_lang else browser_lang in
   let vowels =
     match List.assoc_opt "vowels" base_env with
     | Some l ->
