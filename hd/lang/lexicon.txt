@@ -3630,6 +3630,41 @@ de: durchsuchen
 en: browse
 fr: parcourir
 
+    build information
+af: bou-inligting
+ar: معلومات البناء
+bg: информация за компилация
+br: enformasyon bati
+ca: informació de construcció
+co: informazioni sulla compilazione
+cs: informace o sestavení
+da: byggeinformation
+de: Build-Informationen
+en: build information
+eo: konstrua informojn
+es: información de compilación
+et: ehitusinfo
+fi: rakenna tietoja
+fr: informations de compilation
+he: מידע בנייה
+is: byggja upp upplýsingar
+it: informazioni sulla compilazione
+lt: kurti informaciją
+lv: būvēt informāciju
+nl: bouwinformatie
+no: bygg informasjon
+oc: informacion de bastison
+pl: informacje o budowie
+pt: informações de construção
+pt-br: informações de construção
+ro: informații de construcție
+ru: информация о сборке
+sk: informácie o zostavení
+sl: graditi informacije
+sv: bygginformation
+tr: derleme bilgisi
+zh: 构建信息
+
     burial
 af: begrawe
 bg: погребение
@@ -4520,6 +4555,76 @@ pt: ter em conta as datas aproximadas
 ru: включить приблизительные даты
 sv: ta med approxamativa datum
 tr: kesin olmayan tarihleri dahil et
+
+    configuration
+af: konfigurasie
+ar: التكوين
+bg: конфигурация
+br: konfigurasyon
+ca: configuració
+co: configurazione
+cs: konfigurace
+da: konfiguration
+de: Konfiguration
+en: configuration
+eo: agordo
+es: configuración
+et: seadistus
+fi: kokoonpano
+fr: configuration
+he: הגדרה
+is: stillingar
+it: configurazione
+lt: konfigūracija
+lv: konfigurācija
+nl: configuratie
+no: konfigurasjon
+oc: configuracion
+pl: konfiguracja
+pt: configuração
+pt-br: configuração
+ro: configurare
+ru: конфигурация
+sk: konfigurácia
+sl: konfiguracija
+sv: konfiguration
+tr: yapılandırma
+zh: 配置
+
+    configuration parameters
+af: konfigurasieparameters
+ar: معلمات التكوين
+bg: параметри на конфигурацията
+br: paramet gwiriadur
+ca: paràmetres de configuració
+co: parametri di configurazione
+cs: konfigurační parametry
+da: konfigurationsparametre
+de: Konfigurationsparameter
+en: configuration parameters
+eo: agordo parametroj
+es: parámetros de configuración
+et: konfiguratsiooniparameetrid
+fi: kokoonpano-parametrit
+fr: paramètres de configuration
+he: פרמטרי הגדרה
+is: uppsetning breytistær
+it: parametri di configurazione
+lt: konfigūracijos parametrai
+lv: konfigurācijas parametri
+nl: configuratieparameters
+no: konfigurasjonsparametere
+oc: paramètres de configuracion
+pl: parametry konfiguracji
+pt: parâmetros de configuração
+pt-br: parâmetros de configuração
+ro: parametri de configurare
+ru: параметры конфигурации
+sk: konfiguračné parametre
+sl: parametri konfiguracije
+sv: konfigurationsparametrar
+tr: yapılandırma parametreleri
+zh: 配置参数
 
     confirmation
 co: cresima
@@ -8171,6 +8276,41 @@ sl: generacija/generacije
 sv: generation/generationer
 tr: nesil/nesiller
 
+    geneweb parameters
+af: GeneWeb parameters
+ar: معلمات جينيويب
+bg: параметри на GeneWeb
+br: paramèt Geneweb
+ca: paràmetres de GeneWeb
+co: parametri di GeneWeb
+cs: parametry GeneWebu
+da: GeneWeb-parametre
+de: GeneWeb-Parameter
+en: GeneWeb parameters
+eo: GeneWeb-parametroj
+es: parámetros de GeneWeb
+et: GeneWebi parameetrid
+fi: GeneWeb-parametrit
+fr: paramètres GeneWeb
+he: פרמטרי GeneWeb
+is: GeneWeb gildir
+it: parametri di GeneWeb
+lt: GeneWeb parametrai
+lv: GeneWeb parametri
+nl: GeneWeb-parameters
+no: GeneWeb-parametere
+oc: paramètres de GeneWeb
+pl: parametry GeneWeb
+pt: parâmetros do GeneWeb
+pt-br: parâmetros do GeneWeb
+ro: parametri GeneWeb
+ru: параметры GeneWeb
+sk: parametre GeneWebu
+sl: GeneWeb parametri
+sv: GeneWeb-parametrar
+tr: GeneWeb parametreleri
+zh: GeneWeb 参数
+
     go to section %s
 af: gaan na die %s seksie
 bg: отиди към раздела %s
@@ -9943,6 +10083,41 @@ fr: le dernier niveau des Sosa n’est pas navigable. Utilisez la liste des anc�
 pt: o último nível de sosa não é navegável. Utilize a lista de antepassados.
 sv: senaste sosa-nivån kan inte användas. Använd förteckningen över släktingar
 tr: son Sosa seviyesi gezilebilir değil. Atalar listesini kullanın.
+
+    launch arguments of Gwd server
+af: beginargumente van Gwd-bediener
+ar: معطيات بدء تشغيل خادم Gwd
+bg: стартови аргументи на сървъра Gwd
+br: gwenañ arguzennoù ar servijour Gwd
+ca: arguments de llançament del servidor Gwd
+co: argomenti di avviamento del server Gwd
+cs: spuštěcí argumenty serveru Gwd
+da: startargumenter for Gwd-server
+de: Startargumente des Gwd-Servers
+en: launch arguments of Gwd server
+eo: lanĉi argumentojn de Gwd-servilo
+es: argumentos de inicio del servidor Gwd
+et: Gwd-serveri käivitamise argumendid
+fi: Gwd-palvelimen käynnistysargumentit
+fr: arguments de lancement du serveur Gwd
+he: ארגומנטי הפעלת שרת Gwd
+is: starta rökstuðull Gwd þjóns
+it: argomenti di avvio del server Gwd
+lt: Gwd serverio paleidimo argumentai
+lv: Gwd servera starta argumenti
+nl: startargumenten van de Gwd-server
+no: startargumenter for Gwd-serveren
+oc: arguments de lancement del servidor Gwd
+pl: argumenty uruchamiania serwera Gwd
+pt: argumentos de inicialização do servidor Gwd
+pt-br: argumentos de inicialização do servidor Gwd
+ro: argumente de lansare ale serverului Gwd
+ru: аргументы запуска сервера Gwd
+sk: spúšťacie argumenty servera Gwd
+sl: argumenti zagona strežnika Gwd
+sv: startargument för Gwd-servern
+tr: Gwd sunucusunun başlatma argümanları
+zh: Gwd 服务器的启动参数
 
     less than one month old
 af: minder as 'n maand oud
@@ -18284,6 +18459,41 @@ sk: použi "spojenie" namiesto "vytvorenia"
 sl: uporabite "povezava" namesto "ustvari"
 sv: använd "länk" istället för "skapa"
 tr: "oluştur" yerine "bağlantı" kullanın
+
+    user and language variables
+af: gebruiker- en taalveranderlikes
+ar: متغيرات المستخدم واللغة
+bg: потребителски и езикови променливи
+br: itilizatè ak varyab lang
+ca: variables d'usuari i llenguatge
+co: variabili utente e lingua
+cs: uživatelské a jazykové proměnné
+da: bruger- og sprogvariable
+de: Benutzer- und Sprachvariablen
+en: user and language variables
+eo: uzanto kaj lingvo variabloj
+es: variables de usuario y idioma
+et: kasutaja- ja keele muutujad
+fi: käyttäjä- ja kielimuuttujat
+fr: variables utilisateur et langue
+he: משתמש ומשתני שפה
+is: notandi og tungumál breytistær
+it: variabili utente e lingua
+lt: naudotojo ir kalbos kintamieji
+lv: lietotāja un valodas mainīgie
+nl: gebruikers- en taalvariabelen
+no: bruker- og språkvariabler
+oc: variables d'utilizaire e lenga
+pl: zmienne użytkownika i językowe
+pt: variáveis de usuário e idioma
+pt-br: variáveis de usuário e idioma
+ro: variabile de utilizator și limbă
+ru: переменные пользователя и языка
+sk: používateľské a jazykové premenné
+sl: uporabniške in jezikovne spremenljivke
+sv: användar- och språkvariabler
+tr: kullanıcı ve dil değişkenleri
+zh: 用户和语言变量
 
     user/password/cancel
 bg: ползвател/парола/отказване
