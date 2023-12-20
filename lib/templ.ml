@@ -143,6 +143,12 @@ let url_aux ?(pwd = true) conf =
 
 let order =
   [
+    "lang";
+    "templ";
+    "iz";
+    "pz";
+    "nz";
+    "ocz";
     "m";
     "em";
     "t";
@@ -151,12 +157,6 @@ let order =
     "p";
     "n";
     "oc";
-    "iz";
-    "pz";
-    "nz";
-    "ocz";
-    "lang";
-    "templ";
     "wide";
     "im";
     "sp";
@@ -164,9 +164,9 @@ let order =
     "v";
   ]
 
-let reorder conf env =
+let reorder conf url_env =
   let new_lang =
-    match List.assoc_opt "lang" env with Some l1 -> l1 | None -> ""
+    match List.assoc_opt "lang" url_env with Some l1 -> l1 | None -> ""
   in
   let keep_lang =
     (* same condition in Util.commd and copyr.txt *)
@@ -175,23 +175,26 @@ let reorder conf env =
   in
   (* process evars from order *)
   let env1, ok =
-    List.fold_left
-      (fun (acc1, acc2) k ->
-        if
-          List.mem_assoc k env
-          && ((k = "lang" && keep_lang)
-             || (k = "oc" || k = "ocz")
-                && (match List.assoc_opt k env with
-                   | Some v when v <> "" && v <> "0" -> v
-                   | _ -> "")
-                   <> ""
-             || (match List.assoc_opt k env with
-                | Some v when v <> "" -> v
-                | _ -> "")
-                <> "")
-        then (Format.sprintf "%s=%s" k (List.assoc k env) :: acc1, k :: acc2)
-        else (acc1, acc2))
-      ([], []) order
+    let rec loop (acc1, acc2) order =
+      match order with
+      | [] -> (acc1, acc2)
+      | k :: order ->
+          let v =
+            match List.assoc_opt k url_env with Some v -> v | None -> ""
+          in
+          if
+            List.mem_assoc k url_env
+            &&
+            match (k, v) with
+            | "lang", _ when keep_lang -> true
+            | "oc", v when v = "" || v = "0" -> false
+            | "ocz", v when v = "" || v = "0" -> false
+            | _, v when v <> "" -> true
+            | _, _ -> false
+          then loop (Format.sprintf "%s=%s" k v :: acc1, k :: acc2) order
+          else loop (acc1, acc2) order
+    in
+    loop ([], []) order
   in
   (* process other evars from env *)
   let env2 =
@@ -204,7 +207,7 @@ let reorder conf env =
           || v = ""
         then acc
         else Format.sprintf "%s=%s" k v :: acc)
-      [] env
+      [] url_env
   in
   String.concat "&" (List.rev env1 @ List.rev env2)
 
@@ -241,8 +244,11 @@ let url_set_aux conf evar_l str_l =
     | s :: _l -> s
   in
   let conf_l = conf.henv @ conf.senv @ conf.env in
+  let k_l = List.map (fun (k, _v) -> k) conf_l in
+  let k_l = List.sort_uniq compare k_l in
+  let conf_l = List.map (fun k -> (k, List.assoc k conf_l)) k_l |> List.rev in
   (* process evar_l *)
-  let url =
+  let url_env =
     let rec loop i acc evar_l =
       match evar_l with
       | [] -> acc
@@ -254,17 +260,17 @@ let url_set_aux conf evar_l str_l =
     loop 0 [] evar_l
   in
   (* process the remainder of conf_l *)
-  let url =
+  let url_env =
     let rec loop acc conf_l =
       match conf_l with
       | [] -> acc
       | (k, _v) :: conf_l when List.mem k evar_l -> loop acc conf_l
       | (k, v) :: conf_l -> loop ((k, Adef.as_string v) :: acc) conf_l
     in
-    loop url conf_l
+    loop url_env conf_l
   in
   (* reorder *)
-  Format.sprintf "%s?%s" href (reorder conf url)
+  Format.sprintf "%s?%s" href (reorder conf url_env)
 
 let substr_start_aux n s =
   let len = String.length s in
