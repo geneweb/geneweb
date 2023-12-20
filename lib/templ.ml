@@ -445,6 +445,10 @@ and eval_simple_variable conf = function
       let s = (s :> string) in
       if s = "" then s else s ^ Filename.dir_sep
   | "lang" -> conf.lang
+  | "lang_fallback" -> (
+      match List.assoc_opt conf.lang !Mutil.fallback with
+      | Some l -> l
+      | None -> "")
   | "default_lang" -> conf.default_lang
   | "browser_lang" -> conf.browser_lang
   | "left" -> conf.left
