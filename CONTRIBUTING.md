@@ -15,7 +15,7 @@ When proposing a PR:
 - Add some unit tests if relevant.
 - Add some benchmarks if relevant.
 - Add some comments around blocks/functions if relevant.
-- Format your code with ocamlformat (use make fmt).
+- Format your code with ocamlformat (use `make fmt`).
 
 Some reasons why a PR could be refused:
 
