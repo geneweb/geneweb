@@ -92,7 +92,7 @@ file which will launch both servers with appropriate parameters.
 With the configuration provided in this launch command, the bases are located in
 the ```bases``` folder.
 You may reorganize your folder structure (and launch command) as described in the
-documentation at ```https://geneweb.tuxfamily.org/```.
+documentation at https://geneweb.tuxfamily.org/.
 
 ### Linux
 
