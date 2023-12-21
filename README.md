@@ -77,17 +77,17 @@ TODO
 
 ### MacOS
 
-Apple provides a security mechanism preventing users from executing application
+Apple provides a security mechanism preventing users from executing applications
 which are not provided by authenticated developers. Such applications cannot be started
 by double-clicking on their icons.
-Apple provides a two step mechanism circumventing this security:
+Apple provides a two-step mechanism circumventing this security:
 * Right-click on the application icon (```gwd``` and ```gwsetup```). This will pop-up a window
 mentioning the security issue and providing an "open" button. Click on this button to open
 the application. Ignore the resulting messages as no parameters were provided.
 * Once ```gwd``` and ```gwsetup``` have been started in this fashion, they will be white-listed
 on your machine and subsequent opens will succeed.
 
-After white-listing ```gwd``` and ```gwsetup```, double click on the ```geneweb.command```
+After white-listing ```gwd``` and ```gwsetup```, double-click on the ```geneweb.command```
 file which will launch both servers with appropriate parameters.
 With the configuration provided in this launch command, the bases are located in
 the ```bases``` folder.
