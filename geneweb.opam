@@ -11,19 +11,18 @@ homepage: "https://geneweb.org"
 doc: "https://geneweb.tuxfamily.org/wiki/GeneWeb"
 bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
+  "dune" {>= "2.9"}
   "alcotest" {with-test}
   "benchmark"
   "calendars" {= "1.0.0"}
   "camlp5" {>= "8.00.01"}
   "camlp-streams"
   "cppo"
-  "dune" {>= "2.8" & >= "2.9.0"}
   "fmt" {with-test}
   "jingoo"
   "markup"
   "num"
   "ocaml" {>= "4.08"}
-  "odoc"
   "ounit"
   "ppx_blob"
   "ppx_deriving"
@@ -35,6 +34,7 @@ depends: [
   "uunf"
   "uutf"
   "zarith"
+  "odoc" {with-doc}
 ]
 dev-repo: "git+https://github.com/geneweb/geneweb.git"
 build: [
