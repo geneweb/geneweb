@@ -31,7 +31,7 @@ Some reasons why a PR could be refused:
 - PR adds new features or changes the behavior of GeneWeb without
   having be approved by the current project owners first.
 - PR is too big and needs to be split in many smaller ones.
-- PR is not formatted with ocamlformat
+- PR is not formatted with ocamlformat.
 
 If a PR stays in a stale/WIP/POC state for too long, it may be closed
 at any time.
