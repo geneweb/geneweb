@@ -7,9 +7,9 @@ with a Web interface and can be used off-line or as a Web service.
 
 ## Documentation
 
-- Documentation maintained by the community: http://geneweb.tuxfamily.org/
+- Documentation maintained by the community: https://geneweb.tuxfamily.org/
 - GeneWeb API (generated from source): http://geneweb.github.io/geneweb/
-- GeneWeb overview (realized by OCamlPro): http://geneweb.github.io/
+- GeneWeb overview (realized by OCamlPro): https://geneweb.github.io/
 
 ## Quick and easy live Geneweb test
 
@@ -92,7 +92,7 @@ file which will launch both servers with appropriate parameters.
 With the configuration provided in this launch command, the bases are located in
 the ```bases``` folder.
 You may reorganize your folder structure (and launch command) as described in the
-documentation at ```http://geneweb.tuxfamily.org/```.
+documentation at ```https://geneweb.tuxfamily.org/```.
 
 ### Linux
 
