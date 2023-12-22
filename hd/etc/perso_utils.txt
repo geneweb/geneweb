@@ -114,7 +114,7 @@
 %end;
 
 %define;image_sosa(xxx,yyy)
-  <span class="far fa-dot-circle text-success mr-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></span>%nn;
+  <span class="far fa-circle-dot text-success mr-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></span>%nn;
 %end;
 
 %define;nav_with_sosa_ref(xxx)

@@ -35,7 +35,7 @@
           %if;(e.cpl!="on")<i class="fa fa-user-plus" aria-hidden="true"></i>%end;<i class="fa fa-user" aria-hidden="true"></i></a>
         <a href="%if;(e.implx!="on")%url_set.implx.on;%else;%url_set.implx;%end;" class="btn btn-outline-primary ml-1"
           title="%if;(e.implx!="on")[*implex links]%else;[*do not] [implex links]%end;">
-          <i class="fa fa-random fa-fw"></i></a>
+          <i class="fa fa-shuffle fa-fw"></i></a>
       </div>
       %( TODO : disable if ASCII box drawings ? %)
       <div class="btn-group mx-2">

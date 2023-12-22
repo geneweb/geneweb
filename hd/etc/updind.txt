@@ -30,14 +30,14 @@
     <nav class="navbar navbar-light bg-white justify-content-center" id="banner">
       <nav class="nav nav-pills nav-fill">
         <a class="nav-item nav-link px-1 py-1" href="#person" title="[*person/persons]0"><i class="fa fa-user fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*person/persons]0</span></a>
-        <a class="nav-item nav-link px-1 py-1" href="#birth" title="[*birth]"><i class="fa fa-birthday-cake fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
+        <a class="nav-item nav-link px-1 py-1" href="#birth" title="[*birth]"><i class="fa fa-cake-candles fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
         <a class="nav-item nav-link px-1 py-1" href="#baptism" title="[*baptism]"><i class="fa fa-dove fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*baptism]</span></a>
         <a class="nav-item nav-link px-1 py-1" href="#death" title="[*death]"><i class="fa fa-cross fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*death]</span></a>
-        <a class="nav-item nav-link px-1 py-1" href="#burial" title="[*burial]"><i class="fa fa-pray fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*burial]</span></a>
+        <a class="nav-item nav-link px-1 py-1" href="#burial" title="[*burial]"><i class="fa fa-person-praying fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*burial]</span></a>
         <a class="nav-item nav-link px-1 py-1" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*event/events]1</span></a>
         <a class="nav-item nav-link px-1 py-1" href="#relations" title="[*relation/relations]1"><i class="fa fa-users fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*relation/relations]1</span></a>
         <a class="nav-item nav-link px-1 py-1" href="#titles" title="[*title/titles]1"><i class="fa fa-award fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*title/titles]1</span></a>
-        <a class="nav-item nav-link px-1 py-1" href="#notes" title="[*note/notes]1"><i class="fa fa-file-alt fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*note/notes]1</span></a>
+        <a class="nav-item nav-link px-1 py-1" href="#notes" title="[*note/notes]1"><i class="fa fa-file-lines fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*note/notes]1</span></a>
       </nav>
     </nav>
   </div>
@@ -401,7 +401,7 @@
         %if;(witness.index!="-1")
           <a href="%prefix_base_password;m=MOD_IND&i=%witness.index;" title="[*modify::person/persons]0
             %witness.first_name;%if;(witness.occ!="").%witness.occ%end; %witness.surname;">
-            <i class="fa fa-user-edit fa-fw %if;(witness.sex=1)fe%end;male ml-2 mr-1" aria-hidden="true"
+            <i class="fa fa-user-pen fa-fw %if;(witness.sex=1)fe%end;male ml-2 mr-1" aria-hidden="true"
             aria-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%witness.sex;%end;"></i>
             [*modify] %apply;nth%with;[nth]%and;%wcnt;%end; [witness/witness/witnesses]0</a>
           </a>
@@ -1151,7 +1151,7 @@
         %if;(relation.xrel.index!="-1")
           <a href="%prefix_base_password;m=MOD_IND&i=%relation.xrel.index;" title="[*modify::person/persons]0
             %relation.xrel.first_name;%if;(relation.xrel.occ!="").%relation.xrel.occ%end; %relation.xrel.surname;">
-            <i class="fa fa-user-edit fa-fw %if;(relation.xrel.sex=1)fe%end;male ml-2 mr-1" aria-hidden="true"
+            <i class="fa fa-user-pen fa-fw %if;(relation.xrel.sex=1)fe%end;male ml-2 mr-1" aria-hidden="true"
               aria-label="%apply;nth_c%with;[M/F]0[M/F]1N%and;%relation.xrel.sex;%end;"></i>[*modify]</a>
           </a>
         %end;

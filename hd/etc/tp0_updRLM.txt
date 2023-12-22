@@ -19,8 +19,8 @@
      <i class="fa fa-minus row_del"></i>
    </td>
    <td>
-     <i class="fa fa-long-arrow-alt-up row_move_up"></i>
-     <i class="fa fa-long-arrow-alt-down row_move_down"></i>
+     <i class="fa fa-up-long row_move_up"></i>
+     <i class="fa fa-down-long row_move_down"></i>
     </td>
     <td%mid;><input name="oc" class="form-control reset_bd_text" size="5" value="zocz"></td>
     <td%mid;><input name="p" class="form-control reset_bd_text" size="30" value="zfnz"></td>

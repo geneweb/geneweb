@@ -206,7 +206,7 @@ function missing_events_options () {
             %end;
           </select>
           <div class="invalid-feedback ml-1">
-            <i class="fas fa-exclamation-triangle mr-1"></i>[*specify::generation/generations]0
+            <i class="fas fa-triangle-exclamation mr-1"></i>[*specify::generation/generations]0
           </div>
         </div>
         <div class="d-flex justify-content-end mt-2">
@@ -444,15 +444,15 @@ function missing_events_options () {
       </div>
     </div>
         <div class="col-auto order-2 p-0 ml-2">
-       %( <input type="radio" class="custom-control-input" name="t1" value="x" onclick="no_options()"><i class="fa fa-male fa-fw mr-1"></i>[*male line/female line]0
-      <input type="radio" class="custom-control-input" name="t1" value="m" onclick="no_options()"><i class="fa fa-male fa-fw mr-1"></span>[*male line/female line]0 %)
+       %( <input type="radio" class="custom-control-input" name="t1" value="x" onclick="no_options()"><i class="fa fa-person fa-fw mr-1"></i>[*male line/female line]0
+      <input type="radio" class="custom-control-input" name="t1" value="m" onclick="no_options()"><i class="fa fa-person fa-fw mr-1"></span>[*male line/female line]0 %)
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tA" name="t" value="A" onclick="tree_options()">
-        <label class="custom-control-label" for="tA"><i class="fa fa-male fa-fw mr-1"></i>[*male line/female line]0 <span class="text-info">✘</span></label>
+        <label class="custom-control-label" for="tA"><i class="fa fa-person fa-fw mr-1"></i>[*male line/female line]0 <span class="text-info">✘</span></label>
       </div>
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tC" name="t" value="C" onclick="tree_options()">
-        <label class="custom-control-label" for="tC"><i class="fa fa-female fa-fw mr-1"></i>[*male line/female line]1 <span class="text-info">✘</span></label>
+        <label class="custom-control-label" for="tC"><i class="fa fa-person-dress fa-fw mr-1"></i>[*male line/female line]1 <span class="text-info">✘</span></label>
       </div>
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tT" name="t" value="T" onclick="tree_options()">
@@ -473,7 +473,7 @@ function missing_events_options () {
         </div>
         <div class="custom-control custom-checkbox">
           <input type="checkbox" class="custom-control-input" id="tree_dag" name="dag">
-          <label class="custom-control-label" for="tree_dag">[*dag]<i class="fa fa-random fa-fw ml-1"></i></label>
+          <label class="custom-control-label" for="tree_dag">[*dag]<i class="fa fa-shuffle fa-fw ml-1"></i></label>
         </div>
       </div>
       <div class="custom-control custom-radio">
@@ -519,7 +519,7 @@ function missing_events_options () {
       <hr>
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tL" name="t" value="L" onclick="no_options()">
-        <label class="custom-control-label" for="tL"><i class="fa fa-share-alt fa-fw mr-1"></i>[*list/list (ancestors)]1%sp;
+        <label class="custom-control-label" for="tL"><i class="fa fa-share-nodes fa-fw mr-1"></i>[*list/list (ancestors)]1%sp;
           <span class="text-muted">%nn;
             %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
               ([maximum] 8 [generation/generations]1)

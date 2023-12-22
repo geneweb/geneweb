@@ -47,7 +47,7 @@
   <a role="button" href="%if;(e.dates!=0)%url_set.dates.0;%else;%url_set.dates;%end;"
     class="btn-link%if;(e.dates!=0) text-muted%end;"
     title="%if;(e.dates!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [date/dates]1">
-    <i class="fa fa-calendar-alt fa-fw fa-lg mr-1"></i>[*date/dates]1
+    <i class="fa fa-calendar-days fa-fw fa-lg mr-1"></i>[*date/dates]1
   </a>
   <a role="button" href="%if;(e.parents!=0)%url_set.parents.0;%else;%url_set.parents;%end;"
     title="%if;(e.parents!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [parents]"
@@ -56,10 +56,10 @@
     </a>
   %if;(e.nb!=1)
     <a role="button" href="%if;(e.datesort!=1)%url_set.datesort.1;%else;%url_set.datesort;%end;" class="btn-link ml-3">
-      <i class="fa fa-sort-%if;(e.datesort=1)amount%else;numeric%end;-down fa-fw fa-lg mr-1"></i>%nn;
+      <i class="fa fa-arrow-down-%if;(e.datesort=1)1-9%else;a-z%end; fa-fw fa-lg mr-1"></i>%nn;
       [*sort by/branch/alphabetic order]0
       %if;(e.datesort=1)[sort by/date begin/alphabetic order/nb individuals/nb events]2%nn;
-      %else;[date/dates]1%end;%nn
+      %else;[date/dates]1%end;%nn;
     </a>
   %end;
 </div>
@@ -139,7 +139,7 @@
         %if;wizard;
           <a href="%prefix;m=MOD_DATA&%nbs;&data=place&s=%sub;#%item.1;"
             title="%apply;book_of([place/places]1)[:] [modify] “%item.1;”">
-            <i class="fa fa-magic fa-fw ml-1"></i>
+            <i class="fa fa-wand-magic-sparkles fa-fw ml-1"></i>
           </a>
         %end;
         %if;(k!="")<a href="%prefix;m=PPS&k=%item.1;%opt;" title="[place/places]0/[surname/surnames]0">%nn;

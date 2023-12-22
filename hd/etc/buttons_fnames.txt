@@ -26,13 +26,13 @@
     %end;%nn;
     %if;(evar.word!="on")&word=on%end;%nn;"
     title="%if;(evar.word!="on")[*v7 word boundaries]%else;[*v7 anywhere]%end;">%nn;
-    <i class="fa fa-crop%if;(evar.word!="on")-alt%end;"></i>
+    <i class="fas fa-crop%if;(evar.word!="on")-simple%end;"></i>
   </a>
   <a role="button" class="ml-auto mr-2"
     href="%prefix_base_password;
     %foreach;env_binding;%if;(env.val!="" and env.key!="reset")%nn;
       &%env.key=%env.val;%end;%nn;
     %end;&reset=on" %nn;
-    title="[*v7 refresh fnames cache]"><i class="fa fa-sync-alt mr-2 mt-2"></i></i>
+    title="[*v7 refresh fnames cache]"><i class="fa fa-rotate mr-2 mt-2"></i></i>
   </a>
 </div>

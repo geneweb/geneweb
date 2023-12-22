@@ -154,7 +154,7 @@
 %end;
 
 %if;(count!="" and count>1)
-<a id="RLM" href="%prefix;m=RLM&spouse=on&i1=%index;%foreach;sorted_list_item;%item.1;%end;&tt=%apply;tt()"><span class="d-inline-block fa-flip-vertical"><i class="fa fa-project-diagram fa-rotate-270 mr-1"></i></span> Graphe RLM</a>
+<a id="RLM" href="%prefix;m=RLM&spouse=on&i1=%index;%foreach;sorted_list_item;%item.1;%end;&tt=%apply;tt()"><span class="d-inline-block fa-flip-vertical"><i class="fa fa-diagram-project fa-rotate-270 mr-1"></i></span> Graphe RLM</a>
 %if;(evar.v2=0 or evar.v2="")<a id="asc" class="ml-3" href="%prefix;m=A&t=T&%access;&spouse=on&v=%expr(evar.v1+1)"><i class="fa fa-sitemap fa-rotate-180 fa-fw mr-1"></i>Graphe ASC.</a>%end;
 %if;(evar.v1=0 and evar.v2>0)<a id="desc" class="ml-3" href="%prefix;m=D&t=T&%access;&spouse=on&v=%evar.v2;"><i class="fa fa-sitemap fa-fw mr-1"></i>Graphe DESC.</a>%end;
 %end;
