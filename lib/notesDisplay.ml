@@ -130,7 +130,7 @@ let print_linked_list conf base pgl =
             Output.print_sstring conf "&i=";
             Output.print_string conf (Gwdb.string_of_iper ip |> Mutil.encode);
             Output.print_sstring conf
-              {|"><sup><i class="fa fa-cog"></i></sup></a>|});
+              {|"><sup><i class="fa fa-gear"></i></sup></a>|});
           let p = pget conf base ip in
           Output.print_sstring conf "<span class=\"mx-2\">";
           Output.print_string conf
@@ -151,7 +151,7 @@ let print_linked_list conf base pgl =
             Output.print_string conf
               (Gwdb.get_iper fath |> Gwdb.string_of_iper |> Mutil.encode);
             Output.print_sstring conf
-              {|"><sup><i class="fa fa-cog"></i></sup></a>|});
+              {|"><sup><i class="fa fa-gear"></i></sup></a>|});
           Output.print_sstring conf "<span class=\"mx-2\">";
           Output.print_string conf
             (Util.referenced_person_title_text conf base fath);
@@ -168,7 +168,7 @@ let print_linked_list conf base pgl =
             Output.print_sstring conf {|<a class="mx-2" href="|};
             Output.print_string conf (commd conf);
             Output.print_sstring conf
-              {|m=MOD_NOTES"><sup><i class="fa fa-cog"></i></sup></a>|});
+              {|m=MOD_NOTES"><sup><i class="fa fa-gear"></i></sup></a>|});
           Output.print_sstring conf "<a class=\"mx-2\" href=\"";
           Output.print_string conf (commd conf);
           Output.print_sstring conf "m=NOTES\">";
@@ -185,7 +185,7 @@ let print_linked_list conf base pgl =
             Output.print_sstring conf {|m=MOD_NOTES&f=|};
             Output.print_string conf (Mutil.encode fnotes);
             Output.print_sstring conf
-              {|"><sup><i class="fa fa-cog"></i></sup></a>|});
+              {|"><sup><i class="fa fa-gear"></i></sup></a>|});
           Output.print_sstring conf {|<a class="mx-2" href="|};
           Output.print_string conf (commd conf);
           Output.print_sstring conf {|m=NOTES&f=|};
@@ -206,7 +206,7 @@ let print_linked_list conf base pgl =
             Output.print_sstring conf {|m=MOD_WIZNOTES&f=|};
             Output.print_string conf (Mutil.encode wizname);
             Output.print_sstring conf
-              {|"><sup><i class="fa fa-cog"></i></sup></a>|});
+              {|"><sup><i class="fa fa-gear"></i></sup></a>|});
           Output.print_sstring conf {|<a class="mx-2" href="|};
           Output.print_string conf (commd conf);
           Output.print_sstring conf {|m=WIZNOTES&f=|};

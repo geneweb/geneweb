@@ -7,7 +7,7 @@
 %let;istable;%if;((evar.m="D" and (evar.t="H" or evar.t="I")) or (evar.m="A" and (evar.t="Z" or evar.t="Y")))1%end;%in;
 <div class="button-group" role="group" aria-label="nav buttons">
   <a role="button" class="btn btn-link ml-1 mt-0 px-0"%sp;
-    href="%prefix_base_password;%if;(evar.templ!="")&templ=%evar.templ;%end;&%access;&m=%evar.m;"><i class="fa fa-cog fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
+    href="%prefix_base_password;%if;(evar.templ!="")&templ=%evar.templ;%end;&%access;&m=%evar.m;"><i class="fa fa-gear fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
     [*options] %if;(evar.m="D")[descendants]%elseif;(evar.m="A")[ancestor/ancestors]1%end;%nn;
   </a>
   %let;cond;%if;((evar.m="A" and (evar.t="Z" or evar.t="X" or evar.t="Y")) or (evar.m="D" and evar.t="D" or evar.t="T"))1%end;%in;
@@ -88,7 +88,7 @@
       <a role="button" class="btn btn-link px-0%if;(e.ns=1) text-danger%end;%if;(e.t="Y" or e.csv=1) disabled%end;"
         title="%if;(e.ns=1)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [note/notes]1 [and] [source/sources]1%if;(e.ns=""). [*colored corner]%end;"
         href="%if;(e.ns=1)%url_set.ns;%else;%url_set.ns.1;%end;">
-        <i class="far fa-sticky-note fa-flip-vertical fa-lg fa-fw mb-1 mr-1" aria-hidden="true"></i>%nn;
+        <i class="far fa-note-sticky fa-flip-vertical fa-lg fa-fw mb-1 mr-1" aria-hidden="true"></i>%nn;
         <span class="notecolor">[*note/notes]1</span> <span class="notesourcecolor">[and]</span> <span class="sourcecolor">[source/sources]1</span>%nn;
       </a>
       %end;
@@ -101,7 +101,7 @@
                    %elseif;(env.key!="")&%env.key=%env.val;%end;%nn;
                  %end;"
            title="%if;(e.t="H")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [spouses info]">%nn;
-          <i class="fas fa-info fa-lg mr-1" aria-hidden="true"></i><i class="fa fa-male" aria-hidden="true"></i><i class="fa fa-female" aria-hidden="true"></i>
+          <i class="fas fa-info fa-lg mr-1" aria-hidden="true"></i><i class="fa fa-person" aria-hidden="true"></i><i class="fa fa-person-dress" aria-hidden="true"></i>
         </a>
       %end;
       <a role="button" class="btn btn-link px-0%if;(e.csv=1 or e.t="Y") disabled%else;%if;(e.hl=1) text-warning%end;%end;"
@@ -117,7 +117,7 @@
       <a role="button" class="btn btn-link px-0"%sp;
         href="%if;(e.implx!="")%url_set.implx.on;%else;%url_set.implx;%end;"
          title="%if;(e.implx!="on")[*collapse implex]%else;[*display implex]%end;">%nn;
-        <i class="fa fa-random fa-lg fa-fw"></i>%nn;
+        <i class="fa fa-shuffle fa-lg fa-fw"></i>%nn;
       </a>
     %end;
     <span class="sr-only">—</span>
@@ -187,7 +187,7 @@
                      %apply;togen(e.v)
                    %end;
                  %end;">%nn;
-              <i class="fa fa-level-up-alt%if;(e.m="D") fa-flip-vertical%end; fa-fw fa-lg%if;(e.only!="on") text-danger%end;" aria-hidden="true"></i>%nn;
+              <i class="fa fa-turn-up%if;(e.m="D") fa-flip-vertical%end; fa-fw fa-lg%if;(e.only!="on") text-danger%end;" aria-hidden="true"></i>%nn;
               %if;(e.m="D")
                 %if;(e.only!="on")%if;(e.v!=0)[*only] %end;%apply;gend("v")
                 %else;%apply;capitalize%with;%apply;togend%with;%if;(e.v="")0%else;%e.v;%end;%end;%end;

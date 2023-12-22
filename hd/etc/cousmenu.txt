@@ -317,7 +317,7 @@
   <div class="d-flex flex-column justify-items-center order-4 mt-2">
     <span><i class="fa-solid fa-dna fa-sm mr-1"></i>[coefficient of relationship]</span>
     <span><i class="fa-solid fa-user fa-sm mr-1"></i>[one ancestor counted]</span>
-    <span><i class="fa-solid fa-warning fa-sm text-danger mr-1"></i>[multiple relations]</span>
+    <span><i class="fa-solid fa-triangle-exclamation fa-sm text-danger mr-1"></i>[multiple relations]</span>
   </div>
 %end;
 

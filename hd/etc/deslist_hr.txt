@@ -117,9 +117,9 @@
       %end;
       %if;(spouse.is_descendant and evar.implx="")
         %if;(not cancel_links)
-          <a role="button" onclick="implexdesc('%index;')" title="[*implex/implexes]0"><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only"> (==)</span></a>
+          <a role="button" onclick="implexdesc('%index;')" title="[*implex/implexes]0"><i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i><span class="sr-only"> (==)</span></a>
         %else;
-          <i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only"> (==)</span>
+          <i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i><span class="sr-only"> (==)</span>
         %end;
       %end;
       </span>
@@ -215,10 +215,10 @@
     %( case: first occurence at generation n is married to generation n-1 spouse and has children %)
     %( these children will not appear even though asking for desc up to generation n %)
     %if;(not cancel_links)
-      <a role="button" onclick="implexdesc('%index;')" title="[*implex/implexes]0"><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i>%nn;
+      <a role="button" onclick="implexdesc('%index;')" title="[*implex/implexes]0"><i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i>%nn;
         <span class="sr-only"> (==)</span></a>
     %else;
-      <i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i>%nn;
+      <i class="fa fa-shuffle fa-fw ml-1" aria-hidden="true"></i>%nn;
       <span class="sr-only"> (==)</span></a>
     %end;
   </span>
@@ -296,7 +296,7 @@
     <span class="form-control-sm">[*filter by][:]</span>%nn;
     %apply;input(1)%apply;input(2)%apply;input(3)%apply;input(4)%apply;input(5)
     <button id="btnplus" type="button" class="btn btn-primary btn-sm" title="[*add filter] (max 5)"><i class="fa fa-plus fa-fw"></i></button>
-    <button id="btnclear" type="button" class="btn btn-danger btn-sm ml-1" title="[*clear filters]"><i class="fa fa-times fa-fw"></i></button>
+    <button id="btnclear" type="button" class="btn btn-danger btn-sm ml-1" title="[*clear filters]"><i class="fa fa-xmark fa-fw"></i></button>
   </div>
 </form>
 <div class="deslist">

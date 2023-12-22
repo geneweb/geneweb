@@ -143,7 +143,7 @@
           <a role="button" class="btn btn-sm btn-outline-%if;(e.dag="on")primary border-2%elseif;(e.t="C" or e.t="A" or e.t="V" or e.t="TV")dark disabled border-0%else;primary border-0%end;"
         href="%if;(e.dag!="on")%url_set.dag.on;%else;%url_set.dag;%end;"
         title="%if;(e.dag!="on")[*dag on/dag off]0%else;[*dag on/dag off]1%end; ([dag])">
-          <i class="fa fa-random fa-fw fa-lg"></i>Dag</a>
+          <i class="fa fa-shuffle fa-fw fa-lg"></i>Dag</a>
         </div>
         <div class="border rounded mr-1">
           <a role="button" class="btn btn-sm btn-outline-primary border-%if;(e.im!=0)2%else;0%end; h-100"
@@ -169,7 +169,7 @@
         <div class="border rounded mr-1">
           <a role="button" class="btn btn-sm btn-outline-primary mr-2 border-0 w-100 h-100"
             href="%url_set.cgl.on;" target="_blank">
-            <i class="fa fa-unlink fa-sm mr-1" title="[*cancel GeneWeb links]"></i>Cgl</a>
+            <i class="fa fa-link-slash fa-sm mr-1" title="[*cancel GeneWeb links]"></i>Cgl</a>
         </div>
         %(%if;(e.slices!="on" and e.notab!="on" and e.t!="TV")
           <a role="button" class="btn btn-sm"
@@ -185,7 +185,7 @@
   <div class="btn-group ml-auto align-items-center mr-5" role="group" arial-label="RLM button group">
     <a class="btn btn-outline-primary border-0" title="[*edit tree]"
       href="%apply;url_set%with;m/v%and;TP/upd%e.m;%end;">
-      <i class="far fa-edit fa-lg fa-fw"></i> [*modify]</a>
+      <i class="far fa-pen-to-square fa-lg fa-fw"></i> [*modify]</a>
     <a role="button" class="btn btn-outline-%if;(e.im=0)primary%else;danger%end; ml-1 border-0"
       href="%if;(e.im!=0)%url_set.im.0;%else;%url_set.im;%end;"
       title="%if;(e.im!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [image/images]1">
@@ -195,6 +195,6 @@
       title="%if;(e.sp!=0)[*visualize/show/hide/summary]2%else;[*visualize/show/hide/summary]1%end; [spouse/spouses]1">
       <i class="fa fa-user-plus fa-sm mr-1"></i>[*spouse/spouses]1</a>
     <a role="button" class="btn btn-outline-primary ml-1 border-0" href="%url_set.cgl.on;"
-      title="[cancel links]"><i class="fa fa-unlink fa-lg fa-fw"></i> Cgl</a>
+      title="[cancel links]"><i class="fa fa-link-slash fa-lg fa-fw"></i> Cgl</a>
   </div>
 %end;
