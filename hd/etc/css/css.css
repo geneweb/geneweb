@@ -289,7 +289,7 @@ div.anchor_upd {
 
 /* Force select2 results padding to 0 */
 .select2-results__option {
-'  padding:0px
+  padding:0px
 }
 
 /* Capitalization unavailable in note from Ocaml 
