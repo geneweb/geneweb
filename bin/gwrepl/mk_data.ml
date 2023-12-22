@@ -14,15 +14,6 @@ let read_lines p =
   in
   loop ()
 
-let process cmd =
-  let ((stdout, _, stderr) as p) =
-    Unix.open_process_full cmd (Unix.environment ())
-  in
-  let out = read_lines stdout in
-  let err = read_lines stderr in
-  ignore @@ Unix.close_process_full p;
-  (out, err)
-
 module Either = struct
   type ('a, 'b) t = Left of 'a | Right of 'b
 end
