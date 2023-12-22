@@ -52,7 +52,7 @@
           %if;(e.bd!="")&bd=%e.bd;%end;%nn;
           %if;(e.color!="")&color=%e.color;%end;%nn;"
         title="[*relationship link/relationship links]1" accesskey="^">%nn;
-        <i class="fa fa-user-friends fa-fw"></i></a>
+        <i class="fa fa-user-group fa-fw"></i></a>
       <a class="ml-2%if;(e.et="M") border rounded%end;"
         href="%prefix;&em=R&et=M
           %if;(e.i!="" and e.ei!="")&i=%e.i;&ei=%e.ei;%nn;
@@ -92,7 +92,7 @@
       <a class="ml-2" href="%apply;url_set%with;i1/i2/pn%and;%person_index.2;/%person_index.1;%end;"
         title="[*invert] [person/persons]1"><i class="fas fa-people-arrows fa-lg fa-fw"></i></a>
     %end;
-    <a class="ml-2" href="%if;(e.dag!="on")%url_set.dag.on;%else;%url_set.dag;%end;" target="_blank"><i class="fa fa-random fa-fw" title="[*dag]"></i></a>
-    <a class="ml-2" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-unlink fa-fw" title="[*cancel GeneWeb links]"></i></a>
+    <a class="ml-2" href="%if;(e.dag!="on")%url_set.dag.on;%else;%url_set.dag;%end;" target="_blank"><i class="fa fa-shuffle fa-fw" title="[*dag]"></i></a>
+    <a class="ml-2" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-link-slash fa-fw" title="[*cancel GeneWeb links]"></i></a>
   </div>
 </div>

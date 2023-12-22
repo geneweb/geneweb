@@ -105,11 +105,11 @@ function table_spouse_disabled () {
       </div>
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tM" name="t" value="M" onclick="no_options ();long_display_options ()">
-        <label class="custom-control-label" for="tM"><i class="fa fa-male fa-fw mr-1"></i>[*male line/female line]0</label>
+        <label class="custom-control-label" for="tM"><i class="fa fa-person fa-fw mr-1"></i>[*male line/female line]0</label>
       </div>
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tF" name="t" value="F" onclick="no_options ();long_display_options ()">
-        <label class="custom-control-label" for="tF"><i class="fa fa-female fa-fw mr-1"></i>[*male line/female line]1</label>
+        <label class="custom-control-label" for="tF"><i class="fa fa-person-dress fa-fw mr-1"></i>[*male line/female line]1</label>
       </div>
       <div class="ml-4">
         <div class="custom-control custom-checkbox">
@@ -204,11 +204,11 @@ function table_spouse_disabled () {
       </div>
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tC" name="t" value="C" onclick="no_options ()">
-        <label class="custom-control-label" for="tC"><i class="fa fa-sort-alpha-down fa-fw mr-1"></i>[*index of the spouses (non descendants)]</label>
+        <label class="custom-control-label" for="tC"><i class="fa fa-arrow-down-a-z fa-fw mr-1"></i>[*index of the spouses (non descendants)]</label>
       </div>
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tA" name="t" value="A" onclick="no_options ()">
-        <label class="custom-control-label" for="tA"><i class="fa fa-sort-alpha-down fa-fw mr-1"></i>D'Aboville%sp;
+        <label class="custom-control-label" for="tA"><i class="fa fa-arrow-down-a-z fa-fw mr-1"></i>D'Aboville%sp;
           <span class="text-muted">
             %if;(b.max_desc_level="" and max_desc_level>12)
               <br>%sp;([maximum] 12 [generation/generations]1)
@@ -388,7 +388,7 @@ function table_spouse_disabled () {
             %end;
           </select>
           <div class="invalid-feedback">
-            <i class="fas fa-exclamation-triangle mr-1"></i>[*specify::generation/generations]1
+            <i class="fas fa-triangle-exclamation mr-1"></i>[*specify::generation/generations]1
           </div>
         </div>
       </div>

@@ -14,7 +14,7 @@
 %if;(not cancel_links)
   <div class="d-flex flex-column fix_top fix_left">
     <a tabindex="1" role="button" class="btn btn-sm btn-link p-0 border-0" href="%prefix;" title="[*home]">
-      <i class="fa fa-home fa-fw fa-sm" aria-hidden="true"></i>%nn;
+      <i class="fa fa-house fa-fw fa-sm" aria-hidden="true"></i>%nn;
       <i class="sr-only">[*home]</i>%nn;
     </a>
     %if;(referer!="")
@@ -25,7 +25,7 @@
     %end;
     <a tabindex="3" role="button" class="btn btn-sm btn-link p-0 border-0" data-toggle="modal" data-target="#searchmodal"
       accesskey="S" title="[*search/case sensitive]0">%nn;
-      <i class="fa fa-search fa-fw fa-xs" aria-hidden="true"></i>%nn;
+      <i class="fa fa-magnifying-glass fa-fw fa-xs" aria-hidden="true"></i>%nn;
       <span class="sr-only">[*search/case sensitive]0</span>%nn;
     </a>
     %let;rng;%if;((e.i!="" or e.p!="" or e.n!="") and (e.m!="S" or e.m!="L" or e.m!="" or not "_FAM" in e.m))1%end;%in;
@@ -62,7 +62,7 @@
                 <label class="sr-only" for="p">Search firstname</label>
                 <input type="search" id="p" class="form-control form-control-lg mt-2" name="p" placeholder="[*first name/first names]0">
               </div>
-              <button class="btn btn-outline-primary" type="submit" title="[*search/case sensitive]0"><i class="fa fa-search fa-lg mx-2"></i> [*search/case sensitive]0</button>
+              <button class="btn btn-outline-primary" type="submit" title="[*search/case sensitive]0"><i class="fa fa-magnifying-glass fa-lg mx-2"></i> [*search/case sensitive]0</button>
             </div>
           </form>
         </div>

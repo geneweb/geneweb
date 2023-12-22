@@ -69,10 +69,10 @@
 %define;ancestors_by_list(xx, nnn)
   %if;(xx.has_parents and nnn > 0)
     <ul class="fa-ul">
-      <li><span class="fa-li"><i class="fa fa-male male fa-fw mr-1"></i></span><a href="%prefix;
+      <li><span class="fa-li"><i class="fa fa-person male fa-fw mr-1"></i></span><a href="%prefix;
         %xx.father.access;">%xx.father;</a>%xx.father.title;%xx.father.dates;%nl;
         %apply;ancestors_by_list("xx.father", nnn - 1)</li>
-      <li><span class="fa-li"><i class="fa fa-female female fa-fw mr-1"></i></span><a href="%prefix;
+      <li><span class="fa-li"><i class="fa fa-person-dress female fa-fw mr-1"></i></span><a href="%prefix;
         %xx.mother.access;">%xx.mother;</a>%xx.mother.title;%xx.mother.dates;%nl;
         %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
     </ul>
@@ -94,7 +94,7 @@
       %if;(not cancel_links)
         <a role="button" onclick="implex('%pp.sosa.v;')"
           title="[*implex/implexes]0, [see above] [*Sosa] %pp.sosa;">%end;
-          <i class="fa fa-random fa-fw fa-sm mx-1" aria-hidden="true"></i>
+          <i class="fa fa-shuffle fa-fw fa-sm mx-1" aria-hidden="true"></i>
           <span class="sr-only"> (==) </span>
       %if;(not cancel_links)</a>%end;
     %end;
@@ -126,7 +126,7 @@
         <span class="form-control-sm">[*filter by][:]</span>%nn;
         %apply;input(1)%apply;input(2)%apply;input(3)%apply;input(4)%apply;input(5)   
         <button id="btnplus" type="button" class="btn btn-primary btn-sm" title="[*add filter] (max 5)"><i class="fa fa-plus fa-fw"></i></button>
-        <button id="btnclear" type="button" class="btn btn-danger btn-sm ml-1" title="[*clear filters]"><i class="fa fa-times fa-fw"></i></button>
+        <button id="btnclear" type="button" class="btn btn-danger btn-sm ml-1" title="[*clear filters]"><i class="fa fa-xmark fa-fw"></i></button>
       </div>
     </form>
     <div class="text-monospace anclist_hr mt-2">
@@ -140,13 +140,13 @@
     %let;pnocz_old;%if;(e.iz!="")izb=%e.iz;%elseif;(e.pz!="" or e.nz!="")pzb=%e.pz;&nzb=%e.nz;%if;(e.ocz!="" and e.ocz!="0")&oczb=%e.ocz;%end;%end;%in;
     %if;(not cancel_links)
       %if;(implexcnt>0 and not (e.iz=index or self=sosa_ref))
-          <i class="far fa-dot-circle fa-fw text-success"></i><a role="button" class="mt-3"
+          <i class="far fa-circle-dot fa-fw text-success"></i><a role="button" class="mt-3"
             href="%if;(b.access_by_key="yes")%apply;url_set%with;pz/nz/ocz%and;%first_name_key;/%surname_key;/%if;(occ!=0)%occ;%end;%end;
                   %else;%apply;url_set%with;iz/same%and;%index;/%implexcnt;%end;%end;&%pnocz_old;">%nn;
             %apply;definecujus(self,0)</a>
       %end;
       %if;(e.same!="" and (e.izb!="" or (e.pzb!="" and e.nzb!="")))
-        <i class="far fa-stop-circle fa-fw text-danger"></i><a role="button" class="mt-3"
+        <i class="far fa-circle-stop fa-fw text-danger"></i><a role="button" class="mt-3"
          href="%url_set.iz_pz_nz_ocz_izb_pzb_nzb_oczb_same;%nn;
            %if;(b.access_by_key="yes")&pz=%e.pzb;&nz=%e.nzb;%if;(e.oczb!="")&ocz=%e.oczb;%end;%else;&iz=%e.izb;%end;">
            %apply;definecujus%with;%apply;capitalize(e.pzb) %apply;capitalize(e.nzb)%(TODO get name form e.izb%)%and;1%end;</a>

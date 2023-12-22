@@ -82,7 +82,7 @@
     %( *** Col 1 *** %)
     <div class="col-6 border border-bottom-0 border-top-0 border-left-0">
       <h1 class="display-4">
-        %(<i class="fa fa-portrait fa-fw mr-1"></i>%)
+        %(<i class="fa fa-image-portrait fa-fw mr-1"></i>%)
         %if;(has_portrait)[*modify portrait]%else;[*add portrait]%end;</h1>
       <form class="form-row" method="post" action="%action;" enctype="multipart/form-data">
         %if;(cgi)<input type="hidden" name="b" value="%e.b;">%end;
@@ -178,10 +178,10 @@
           %if;has_portrait_url;%carrousel;.url%else;%portrait_name;%end;</samp>
           <a role="button" class="ml-auto col-1"  href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&idigest=%idigest;"
              data-toggle="tooltip" data-html="true" data-placement="left"
-             title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete portrait]</strong><br><span class="small">%portrait;</span>
+             title='<i class="far fa-trash-can text-warning mr-1"></i><strong>[*delete portrait]</strong><br><span class="small">%portrait;</span>
                     <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;"
                     width="185px">'>
-            <i class="far fa-trash-alt text-warning"></i>%nn;</a>
+            <i class="far fa-trash-can text-warning"></i>%nn;</a>
           </div>
         %end;
         %if;has_old_portrait;
@@ -202,10 +202,10 @@
             %if;has_old_portrait_url;%carrousel;.url%else;%portrait_saved_name;%end;</samp>
             <a role="button" class="ml-auto col-1" href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&idigest=%idigest;&delete=on"
               data-toggle="tooltip" data-html="true" data-placement="left"
-               title='<i class="far fa-trash-alt text-danger mr-1"></i><strong>[*delete portrait saved]0</strong><br><span class="small">%portrait_saved;</span>
+               title='<i class="far fa-trash-can text-danger mr-1"></i><strong>[*delete portrait saved]0</strong><br><span class="small">%portrait_saved;</span>
                       <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;"
                       width="185px">'>
-              <i class="far fa-trash-alt text-danger"></i></a>
+              <i class="far fa-trash-can text-danger"></i></a>
           </div>
         %end;
         <table style="line-height:0.8;" class="mt-2"><tr>
@@ -240,25 +240,25 @@
               title='<strong><i class="far fa-file fa-fw mr-1"></i>
                      %if;(carrousel_img_src="")[*add source]%else;[*modify source]%end;</strong>
                      <br><span class="small"><br>%carrousel_img_src;</span>'>
-              <i class="far fa-file-archive fa-fw"></i></a>
+              <i class="far fa-file-zipper fa-fw"></i></a>
             <a role="button" href="#" id="note_%img_cnt;" class="text-%if;(carrousel_img_note="")danger%else;primary%end;"
               onclick='get_note(%img_cnt;, "%carrousel_img;"); return false;' data-note="%carrousel_img_note;"
               data-toggle="tooltip" data-html="true" data-placement="bottom"
               title='<strong><i class="far fa-file fa-fw mr-1"></i>
                      %if;(carrousel_img_note="")[*add note]%else;[*modify note]%end;</strong>
                      <br><span class="small"><br>%carrousel_img_note;</span>'>
-              <i class="far fa-file-alt fa-fw"></i></a>
+              <i class="far fa-file-lines fa-fw"></i></a>
             <samp class="text-truncate ml-1" title="%images_store;%X;%carrousel;%X;%carrousel_img;">%carrousel_img;</samp>
             <div class="ml-auto col-1">
               <a role="button"
                 href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&file_name=%carrousel_img;&mode=others&idigest=%idigest;"
                 data-toggle="tooltip" data-html="true" data-placement="left"
-                title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete image]</strong>
+                title='<i class="far fa-trash-can text-warning mr-1"></i><strong>[*delete image]</strong>
                        <br><span class="small">%carrousel_img;</span>
                        <br><img class="rounded my-1"
                 src=%if;(url_in_env!="")"%url_in_env;"%else;"%prefix;m=IM_C&i=%index;&s=%carrousel_img;"%end;
                 width="185px">'>
-                <i class="far fa-trash-alt text-warning"></i></a>
+                <i class="far fa-trash-can text-warning"></i></a>
             </div>
           </div>
         %end;
@@ -292,12 +292,12 @@
                   &idigest=%idigest;&file_name=%carrousel_img;&mode=others%nn;
                   &delete=on"%sp;
                 data-toggle="tooltip" data-html="true" data-placement="left"
-                title='<i class="far fa-trash-alt text-warning mr-1"></i><strong>[*delete image saved]</strong>
+                title='<i class="far fa-trash-can text-warning mr-1"></i><strong>[*delete image saved]</strong>
                          <br><span class="small">%carrousel_img;</span>
                          <br><img class="rounded my-1"
                 src=%if;(url_in_env!="")"%url_in_env;"%else;"%prefix;m=IM_C_S&i=%index;&s=%carrousel_img;"%end;
                 width="185px">'>
-                <i class="far fa-trash-alt text-danger fa-fw text-primary"></i></a>
+                <i class="far fa-trash-can text-danger fa-fw text-primary"></i></a>
             </div>
           </div>
         %end;
@@ -349,12 +349,12 @@ $('#image_source').bind('input propertychange', function() {
   $('.btn-update-note-source').attr('disabled', false);
   }
 });
-$('.fa-file-alt').click(function() {
+$('.fa-file-lines').click(function() {
   $('.custom-others').attr('disabled', true);
   $('#image_note').attr('disabled', false);
   $('#image_note').focus();4
 });
-$('.fa-file-archive').click(function() {
+$('.fa-file-zipper').click(function() {
   $('.custom-others').attr('disabled', true);
   $('#image_source').attr('disabled', false);
   $('#image_source').focus();1
