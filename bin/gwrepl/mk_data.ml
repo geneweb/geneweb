@@ -46,8 +46,8 @@ let if_sosa_zarith out fn =
   Printf.fprintf out "\n#endif\n"
 
 let () =
-  let opam_swich_prefix = Sys.getenv "OPAM_SWITCH_PREFIX" in
-  let opam_swich_prefix_lib = opam_swich_prefix // "lib" in
+  let opam_switch_prefix = Sys.getenv "OPAM_SWITCH_PREFIX" in
+  let opam_switch_prefix_lib = opam_switch_prefix // "lib" in
 
   let dune_root, root, (directories0, files0) =
     let ic = open_in ".depend" in
@@ -70,7 +70,7 @@ let () =
                (String.length fn - String.length prefix))
         else None
       in
-      match aux opam_swich_prefix_lib with
+      match aux opam_switch_prefix_lib with
       | Some x -> Some (`opam x)
       | None -> ( match aux root with Some x -> Some (`root x) | None -> None)
     in
@@ -106,7 +106,7 @@ let () =
       (fun x (cmas, cmis) ->
         match x with
         | `opam fn ->
-            let aux fn = (opam_swich_prefix_lib // fn, "etc" // "lib" // fn) in
+            let aux fn = (opam_switch_prefix_lib // fn, "etc" // "lib" // fn) in
             let cmas = aux fn :: cmas in
             let ((src, _) as cmi) =
               aux (Filename.remove_extension fn ^ ".cmi")
@@ -141,18 +141,18 @@ let () =
   in
   let cmis =
     let select =
-      let pref = opam_swich_prefix_lib // "ocaml" // "stdlib__" in
+      let pref = opam_switch_prefix_lib // "ocaml" // "stdlib__" in
       let len = String.length pref in
       fun s -> String.length s > len && String.sub s 0 len = pref
     in
     Array.fold_left
       (fun cmis s ->
-        let fname = opam_swich_prefix_lib // "ocaml" // s in
+        let fname = opam_switch_prefix_lib // "ocaml" // s in
         if Filename.check_suffix fname "cmi" && select fname then
           (fname, "etc" // "lib" // "ocaml" // s) :: cmis
         else cmis)
       cmis
-      (Sys.readdir (opam_swich_prefix_lib // "ocaml"))
+      (Sys.readdir (opam_switch_prefix_lib // "ocaml"))
   in
   let data = "data.cppo.ml" in
   let out = open_out_bin data in
@@ -178,7 +178,7 @@ let () =
       Printf.fprintf out
         {blob|Filename.(concat "etc" (concat "lib" {|%s|})),[%%blob {|%s|}];|blob}
         s
-        (opam_swich_prefix_lib // s)
+        (opam_switch_prefix_lib // s)
     in
     List.iter aux
       [
