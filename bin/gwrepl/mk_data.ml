@@ -52,7 +52,6 @@ let () =
   let dune_root, root, (directories0, files0) =
     let ic = open_in ".depend" in
     let lines = read_lines ic in
-    close_in ic;
     let dune_root, out =
       match lines with
       | [] -> assert false
