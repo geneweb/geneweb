@@ -55,7 +55,7 @@ OCAMLV := $(shell ocaml --version)
 bin/gwd/info.ml:
 	@printf "Building \033[1;37mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n"
 	@printf "Repository/branch \033[1;37m$(SOURCE)\033[0m.\n\n"
-	@printf "Last commit \033[1;37m$(COMMIT_ID)\033[0m with message “\033[1;37m%s\033[0m”.\n" "$(subst \, ,$(COMMIT_MSG))"
+	@printf "Last commit \033[1;37m$(COMMIT_ID)\033[0m with message “\033[1;37m%s\033[0m”.\n" '$(subst ','\'',$(COMMIT_MSG))'
 	@printf "let ver = \"$(VERSION)\"" > $@
 	@printf "let src = \"$(SOURCE)\"" >> $@
 	@printf "let id = \"$(COMMIT_ID)\"" >> $@
