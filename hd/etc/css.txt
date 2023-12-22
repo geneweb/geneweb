@@ -29,7 +29,7 @@
     %end;
   %else;
     <link rel="stylesheet" href="%etc_prefix;css/bootstrap.min.css?version=4.6.2">
-    <link rel="stylesheet" href="%etc_prefix;css/all.min.css?version=6.4.0">
+    <link rel="stylesheet" href="%etc_prefix;css/all.min.css?version=6.5.1">
     %if;(e.m="A" and e.t="")
       <link rel="stylesheet" href="%etc_prefix;css/select2.min.css?version=4.1.0rc">
     %end;
