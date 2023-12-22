@@ -39,6 +39,33 @@ let if_sosa_zarith out fn =
 let () =
   let opam_switch_prefix = Sys.getenv "OPAM_SWITCH_PREFIX" in
   let opam_switch_prefix_lib = opam_switch_prefix // "lib" in
+  let ocaml_stdlib_directory =
+    let output_filename, error_filename =
+      let temporary_filename = Filename.temp_file "gwrepl_" "_ocaml_stdlib" in
+      (temporary_filename ^ ".out", temporary_filename ^ ".err")
+    in
+    let command =
+      let double_quote_if_win32 = if Sys.win32 then "\"" else "" in
+      Printf.sprintf "%sopam exec -- ocamlc -where > %s 2> %s%s"
+        double_quote_if_win32
+        (Filename.quote output_filename)
+        (Filename.quote error_filename)
+        double_quote_if_win32
+    in
+    let exit_code = Sys.command command in
+    if exit_code <> 0 then
+      failwith
+      @@ Printf.sprintf "Command '%s' failed:\nexit code: %d\nerror: %s" command
+           exit_code
+           (String.concat "\n" (read_lines @@ open_in error_filename))
+    else
+      match read_lines @@ open_in output_filename with
+      | ([] | _ :: _ :: _) as lines ->
+          failwith
+          @@ Printf.sprintf "Unexpected output of command '%s':\n%s" command
+               (String.concat "\n" lines)
+      | [ line ] -> line
+  in
 
   let dune_root, root, (directories0, files0) =
     let ic = open_in ".depend" in
@@ -91,7 +118,8 @@ let () =
          directories0
   in
   let files0 =
-    `opam (opam_switch_prefix_lib, "ocaml" // "stdlib.cma") :: files0
+    `opam (Filename.dirname ocaml_stdlib_directory, "ocaml" // "stdlib.cma")
+    :: files0
   in
   let cmas, cmis =
     List.fold_right
@@ -133,18 +161,18 @@ let () =
   in
   let cmis =
     let select =
-      let pref = opam_switch_prefix_lib // "ocaml" // "stdlib__" in
+      let pref = ocaml_stdlib_directory // "stdlib__" in
       let len = String.length pref in
       fun s -> String.length s > len && String.sub s 0 len = pref
     in
     Array.fold_left
       (fun cmis s ->
-        let fname = opam_switch_prefix_lib // "ocaml" // s in
+        let fname = ocaml_stdlib_directory // s in
         if Filename.check_suffix fname "cmi" && select fname then
           (fname, "etc" // "lib" // "ocaml" // s) :: cmis
         else cmis)
       cmis
-      (Sys.readdir (opam_switch_prefix_lib // "ocaml"))
+      (Sys.readdir ocaml_stdlib_directory)
   in
   let data = "data.cppo.ml" in
   let out = open_out_bin data in
@@ -173,8 +201,10 @@ let () =
     in
     List.iter aux
       [
-        (opam_switch_prefix_lib, "ocaml" // "stublibs" // "dllcamlstr.so");
-        (opam_switch_prefix_lib, "ocaml" // "stublibs" // "dllunix.so");
+        ( Filename.dirname ocaml_stdlib_directory,
+          "ocaml" // "stublibs" // "dllcamlstr.so" );
+        ( Filename.dirname ocaml_stdlib_directory,
+          "ocaml" // "stublibs" // "dllunix.so" );
       ];
     if_sosa_zarith out (fun () ->
         aux (opam_switch_prefix_lib, "stublibs" // "dllzarith.so")));
