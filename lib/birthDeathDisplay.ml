@@ -513,8 +513,9 @@ let print_population_pyramid conf base =
   Output.print_sstring conf "</div><p>";
   let sum_men = Array.fold_left ( + ) 0 men in
   let sum_wom = Array.fold_left ( + ) 0 wom in
-  transl conf "number of living persons:"
+  transl conf "number of living persons"
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Output.print_sstring conf (transl conf ":");
   Output.print_sstring conf " ";
   Output.print_sstring conf (string_of_nb (sum_men + sum_wom));
   Output.print_sstring conf {|.</p><form method="get" action="|};

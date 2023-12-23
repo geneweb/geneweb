@@ -29,7 +29,7 @@
   <h2>[*update family]</h2>
   <div class="new-form">
     %if;(has_families and nb_families > 1)
-      <p class="rub_expl etiquette">[*select a spouse]</p>
+      <p class="rub_expl etiquette">[*select a spouse][:]</p>
       <select onchange="main($(this).val());" style="margin-right:10px;">
         %foreach;family;
           <option value="%family_cnt;">%spouse;</option>

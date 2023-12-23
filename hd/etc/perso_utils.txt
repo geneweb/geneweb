@@ -348,11 +348,11 @@
     %else;
       %if;xx.has_baptism_place;, %apply;nth([baptized],xx.sex) - %xx.baptism_place;%end;
     %end;
-    %if;xx.computable_age;, [age] : %xx.age;%end;
+    %if;xx.computable_age;, [age][:] %xx.age;%end;
     %if;xx.is_dead;, %xx.died;
       %if;xx.has_death_date; %xx.on_death_date;%end;
       %if;xx.has_death_place; - %xx.death_place;%end;
-      %if;xx.computable_death_age; [age at death:] %xx.death_age;%end;
+      %if;xx.computable_death_age; [aged] %xx.death_age;%end;
     %end;
     %if;xx.is_buried; , %apply;nth([buried],xx.sex)%sp;
       %if;xx.has_burial_date; %xx.on_burial_date;%end;
@@ -427,7 +427,7 @@
         %if;xx.has_death_date; %xx.on_death_date;%end;
         %if;xx.has_death_place; - %xx.death_place;%end;
         %if;(xx.has_linked_page.DEATH and xx.linked_page.DEATH !="") %xx.linked_page.DEATH;%end;
-        %if;xx.computable_death_age;, [age at death:] %xx.death_age;%end;</li>%nl;
+        %if;xx.computable_death_age; [aged] %xx.death_age;%end;</li>%nl;
         %if;xx.is_buried;
           <li>%apply;capitalize(nth([buried],xx.sex))
           %if;xx.has_burial_date; %xx.on_burial_date;%end;
@@ -484,7 +484,7 @@
     %if;xx.is_dead;, %xx.died;
       %if;xx.has_death_date; %xx.on_death_date;%end;
       %if;xx.has_death_place; - %xx.death_place;%end;
-      %if;xx.computable_death_age; [age at death:] %xx.death_age;%end;
+      %if;xx.computable_death_age; [aged] %xx.death_age;%end;
       %if;xx.is_buried; , %apply;nth([buried],xx.sex)%sp;
         %if;xx.has_burial_date; %xx.on_burial_date;%end;
         %if;xx.has_burial_place; - %xx.burial_place;%end;
@@ -583,7 +583,7 @@
           <br><img src="%images_prefix;1pixel.png" width="13" height="13" alt="1px">
           <em>%child;%child.title;%child.dates;</em>
         %end;
-        <span class="ml-1">%apply;long_married_f("child", "lower")</span>
+        <span class="ml-1">%apply;married_to("child", "lower")</span>
         %apply;short_display_person("spouse")
       %end;
     %end;
@@ -616,7 +616,7 @@
           <br><img src="%images_prefix;1pixel.png" width="13" height="13" alt="" title="">
           <em>%child;%child.title;%child.dates;</em>
         %end;
-        %sp;<em>%apply;long_married_f("child", "lower")</em>
+        %sp;<em>%apply;married_to("child", "lower")</em>
         %apply;short_display_person_f("spouse")
       %end;
     %end;

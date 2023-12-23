@@ -42,7 +42,7 @@
         <input type="hidden" name="ei" value="%index;">
       %end;
       <input type="hidden" name="m" value="NG">
-      <span>[*relationship shortcut]</span>
+      <span>[*relationship shortcut][:]</span>
       <div class="mt-1 ml-2">
         %if;(browsing_with_sosa_ref and self.index!=sosa_ref.index)
           <div class="custom-control custom-radio">
@@ -140,7 +140,7 @@
         </div>
       </div>
       <div class="mt-2">
-        <span>[*relationship display options]</span>
+        <span>[*relationship display options][:]</span>
           <div class="ml-2 mt-1">
             <div class="custom-control custom-checkbox">
               <input type=checkbox class="custom-control-input" id="long" name="long">
