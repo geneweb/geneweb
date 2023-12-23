@@ -61,7 +61,7 @@ let () =
         else None
       in
       match aux opam_switch_prefix_lib with
-      | Some x -> Some (`opam x)
+      | Some x -> Some (`opam (opam_switch_prefix_lib, x))
       | None -> ( match aux root with Some x -> Some (`root x) | None -> None)
     in
     ( dune_root,
@@ -84,19 +84,21 @@ let () =
     :: ("etc" // "lib" // "ocaml" // "stublibs")
     :: List.map
          (function
-           | `opam d -> "etc" // "lib" // d
+           | `opam (_, d) -> "etc" // "lib" // d
            | `root d ->
                "etc" // "lib" // "geneweb"
                // (d |> Filename.dirname |> Filename.dirname))
          directories0
   in
-  let files0 = `opam ("ocaml" // "stdlib.cma") :: files0 in
+  let files0 =
+    `opam (opam_switch_prefix_lib, "ocaml" // "stdlib.cma") :: files0
+  in
   let cmas, cmis =
     List.fold_right
       (fun x (cmas, cmis) ->
         match x with
-        | `opam fn ->
-            let aux fn = (opam_switch_prefix_lib // fn, "etc" // "lib" // fn) in
+        | `opam (prefix_directory, fn) ->
+            let aux fn = (prefix_directory // fn, "etc" // "lib" // fn) in
             let cmas = aux fn :: cmas in
             let ((src, _) as cmi) =
               aux (Filename.remove_extension fn ^ ".cmi")
@@ -164,18 +166,18 @@ let () =
   Printf.fprintf out {|let shared=[||};
   if Sys.unix then (
     (* FIXME: what is the windows version? *)
-    let aux s =
+    let aux (prefix_directory, s) =
       Printf.fprintf out
         {blob|Filename.(concat "etc" (concat "lib" {|%s|})),[%%blob {|%s|}];|blob}
-        s
-        (opam_switch_prefix_lib // s)
+        s (prefix_directory // s)
     in
     List.iter aux
       [
-        "ocaml" // "stublibs" // "dllcamlstr.so";
-        "ocaml" // "stublibs" // "dllunix.so";
+        (opam_switch_prefix_lib, "ocaml" // "stublibs" // "dllcamlstr.so");
+        (opam_switch_prefix_lib, "ocaml" // "stublibs" // "dllunix.so");
       ];
-    if_sosa_zarith out (fun () -> aux ("stublibs" // "dllzarith.so")));
+    if_sosa_zarith out (fun () ->
+        aux (opam_switch_prefix_lib, "stublibs" // "dllzarith.so")));
   Printf.fprintf out {||];;|};
   let b = Buffer.create 1024 in
   let aux =
