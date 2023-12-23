@@ -30,7 +30,7 @@
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
           title="%if;(e.lang!="")%apply;capitalize%with;%apply;language_name(e.lang)%end;%end;">%nn;
           <span class="sr-only">lang</span>%nn;
-          <span class="text-uppercase" title="[*select lang] %apply;language_name(lang)">%lang;</span>%nn;
+          <span class="text-uppercase" title="[*select lang][:] %apply;language_name(lang)">%lang;</span>%nn;
           <span class="sr-only">, [select lang]</span>%nn;
         </button>
         %if;(not is_printed_by_template)

@@ -93,7 +93,7 @@
     %if;xx.has_cremation_place;, %xx.cremation_place;%end;%nl;
   %end;
   %if;xx.computable_death_age;%sp;
-    ([age at death:] %xx.death_age;)%nn;
+    ([aged] %xx.death_age;)%nn;
   %end;
   %if;xx.has_occupation;, %xx.occupation;%end;
   %if;(evar.rel = "on" and xx.has_relations)

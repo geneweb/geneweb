@@ -127,7 +127,7 @@
       <td>
         %foreach;father.family;
           %if;(spouse.access=mother.access)
-            %apply;long_married_f("father", "UPPER")
+            %apply;married_to("father", "UPPER")
             %if;are_divorced;<br>[divorced]0%divorce_date;%end;
             %if;are_separated;<br>[separated]0%end;
           %end;

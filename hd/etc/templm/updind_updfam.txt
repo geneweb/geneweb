@@ -14,7 +14,7 @@
            (N) [male/female/neuter]2
 %in;
 %let;ak3;
-         [*tools] [and] [relationship shortcut]
+         [*tools] [and] [relationship shortcut][:]
            (R) [move up/down]0
            (D) [move up/down]1
            (H) [move up/down]2
