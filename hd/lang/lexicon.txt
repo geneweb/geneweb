@@ -2112,27 +2112,27 @@ sv: livslängd
 tr: ölüm yaşı
 zh: 享年
 
-    age at death:
-af: ouderdom by afsterwe:
+    aged
+af: ouderdom by afsterwe
 bg: на възраст
 br: p'edo
 ca: a l'edat de
 co: à l’età di
 cs: věk v době úmrtí
-da: alder ved død:
-de: Alter:
-en: age at death:
+da: alder ved død
+de: Alter
+en: age at death
 eo: mortaĝo
 es: a la edad de
 et: vanus surres
 fi: ikä kuollessa
 fr: à l’âge de
-he:   גיל במותו/מותה
+he: גיל במותו/מותה
 is: dánaraldur
 it: all'età di
-lt: amžius mirties metu:
-lv: miršanas vecums:
-nl: leeftijd bij overlijden:
+lt: amžius mirties metu
+lv: miršanas vecums
+nl: leeftijd bij overlijden
 no: alder
 oc: a l'atge de
 pl: wiek:
@@ -2141,7 +2141,7 @@ ro: etate la deces
 ru: в возрасте
 sk: vek v dobe úmrtia
 sl: živel(a)
-sv: livslängd:
+sv: livslängd
 tr: ölüm yaşı
 zh: 享年
 
@@ -9670,12 +9670,12 @@ sv: förenklad kronologi/detaljerad kronologi
 tr: basit kronoloji/ayrıntılı kronoloji
 
     input database
-co: Stampittate quì u nome sanu di a basa di dati à impiegà :
-de: Bitte den Namen der Datenbank eintragen, die verwendet werden soll:
-en: Please, enter the name of the database you want to use:
-fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser :
-pt: Introduza o nome da base de dados que quer utilizar:
-sv: Skriv namnet på databasen du vill använda:
+co: Stampittate quì u nome sanu di a basa di dati à impiegà
+de: Bitte den Namen der Datenbank eintragen, die verwendet werden soll
+en: Please, enter the name of the database you want to use
+fr: Tapez à l’identique le nom de la généalogie que vous voulez utiliser
+pt: Introduza o nome da base de dados que quer utilizar
+sv: Skriv namnet på databasen du vill använda
 tr: Lütfen kullanmak istediğiniz veritabanının adını girin
 
     insert
@@ -12521,7 +12521,7 @@ lv: nav atrodams
 nl: niet gevonden
 no: ikke funnet
 oc: pas trobat(da)
-pl: nie znaleziono:
+pl: nie znaleziono
 pt: não encontrado
 ro: negasit
 ru: не найден
@@ -12840,32 +12840,32 @@ ru: количество событий
 sv: antal händelser
 tr: etkinliklerin sayısı
 
-    number of living persons:
-bg: брой на живите лица:
-co: numeru di persone vive :
-cs: pocet zijucich osob:
-da: antal nulevende personer:
-de: Anzahl der lebenden Personen:
-en: number of living individuals:
-eo: nombro de la vivantaj personoj:
-es: número de personas vivas:
-et: elavaid inimesi:
-fi: elossa olevien lukumäärä:
-fr: nombre de personnes vivantes :
+    number of living persons
+bg: брой на живите лица
+co: numeru di persone vive
+cs: pocet zijucich osob
+da: antal nulevende personer
+de: Anzahl der lebenden Personen
+en: number of living individuals
+eo: nombro de la vivantaj personoj
+es: número de personas vivas
+et: elavaid inimesi
+fi: elossa olevien lukumäärä
+fr: nombre de personnes vivantes
 he: מספר האנשים שעודם בחיים
-it: numero di persone viventi:
+it: numero di persone viventi
 lt: gyvųjų skaičius
-lv: dzīvo personu skaits:
-nl: aantal personen in leven:
-no: antall personer i live:
-oc: nombre de personas vivas:
-pl: liczba osób żyjących:
-pt: número de pessoas vivas :
-ro: numarul de persoane in viata:
+lv: dzīvo personu skaits
+nl: aantal personen in leven
+no: antall personer i live
+oc: nombre de personas vivas
+pl: liczba osób żyjących
+pt: número de pessoas vivas 
+ro: numarul de persoane in viata
 ru: количество живых персон
 sk: počet žijúcich osôb
 sl: število živih oseb
-sv: antal levande personer:
+sv: antal levande personer
 tr: yaşayan bireylerin sayısı
 
     number of rows
@@ -14547,20 +14547,20 @@ sv: uträkningssätt
 tr: mod
 
     relationship display options
-co: ozzioni per affissà l’arburi di parentia :
-de: Anzeigeoptionen der Verwandtschafts-Bäume:
-en: options:
-es: opciones de edición de los árboles de parentesco:
-fi: näyttötapa:
-fr: options d’affichage des arbres :
-it: opzioni di visualizzazione degli alberi di parentela:
+co: ozzioni per affissà l’arburi di parentia
+de: Anzeigeoptionen der Verwandtschafts-Bäume
+en: relationship display options
+es: opciones de edición de los árboles de parentesco
+fi: näyttötapa
+fr: options d’affichage des arbres
+it: opzioni di visualizzazione degli alberi di parentela
 nl: toonopties van de verwantschapsstambomen
 no: visningsmåte
-oc: opcions d’afichatge dels arbres de parentat:
-pt: opções de edição das árvores de parentesco:
+oc: opcions d’afichatge dels arbres de parentat
+pt: opções de edição das árvores de parentesco
 ru: настройки отображения
 sv: sätt att visa
-tr: seçenekler:
+tr: seçenekler
 
     relationship link between
 co: liame di parentia cù...
@@ -14611,20 +14611,20 @@ sv: anlinje/anlinjer
 tr: ilişki/ilişkiler
 
     relationship shortcut
-co: accurtatoghji :
-de: Verknüpfungen:
-en: shortcuts:
-es: atajos :
-fi: oikotie:
-fr: raccourcis :
-it: scorciatoie :
-nl: binnenweg :
-no: snarvei:
-oc: acorchas:
-pt: atalhos:
-ru: ссылки:
-sv: genväg:
-tr: kısayollar:
+co: accurtatoghji
+de: Verknüpfungen
+en: shortcuts
+es: atajos
+fi: oikotie
+fr: raccourcis
+it: scorciatoie
+nl: binnenweg
+no: snarvei
+oc: acorchas
+pt: atalhos
+ru: ссылки
+sv: genväg
+tr: kısayollar
 
     relationship%t to
 af: verwantskap%t met
@@ -14649,7 +14649,7 @@ lv: %t attiecības ar
 nl: verbonden%t met
 no: familie%t med
 oc: parentat%t avec
-pl: związek%t z:
+pl: związek%t z
 pt: relacionado%t com/relacionada%t com
 pt-br: junto%t com
 ro: relatia%t cu
@@ -15324,12 +15324,12 @@ de: Partner auswählen
 en: select spouse
 es: elija un cónyuge
 fi: valitse puoliso
-fr: choisissez un conjoint :
+fr: choisissez un conjoint
 it: scegli un coniuge
 nl: kies een partner
 no: velg ektefelle
-oc: causissètz-vos un conjunt:
-pt: selecione um cônjuge:
+oc: causissètz-vos un conjunt
+pt: selecione um cônjuge
 ru: выберите супруга/супругу
 sv: välj maka/make
 tr: eş seçin
@@ -15341,29 +15341,32 @@ en: choose file
 fr: sélect. fichier
 
     select lang
-af: taalvoorkeur/language preference:
-ar: بإمكانك إختيار لغة أخرى من بين اللغات التالية:
-bg: можете да изберете друг език за съобщения измежду следните:
-br: dibab a c'hellit ur yezh all etre ar re-mañ:
-ca: podeu seleccionar una altre llengua, hi ha disponibles les següents:
-co: affissà in :
-cs: zvolte jazyk pro prohlížení databáze:
-da: du kan vælge fremstilling på et andet sprog blandt de følgende: Blick auf:
-en: view in:
-eo: vi povas elekti alian lingvon inter la sekvantajn:
-es: ver en:
-et: võid valida ka mõne muu keele järgnevatest:
-fi: mäytä:
-fr: afficher en :
-is: þú getur valið milli eftirfarandi tungumála:
-it: vista in:
-lv: jūs variet apskatīt datu bāzi arī citās sekojošās valodās:
-nl: bekijk in het:
-no: du kan velge sidevisning på et annet språk blant følgenpl: możesz wybrać inny język spośród następujących:
-pt: ver em:
+af: taalvoorkeur
+ar: بإمكانك إختيار لغة أخرى من بين اللغات التالية
+bg: можете да изберете друг език за съобщения измежду следните
+br: dibab a c'hellit ur yezh all etre ar re-mañ
+ca: podeu seleccionar una altre llengua, hi ha disponibles les següents
+co: affissà in
+cs: zvolte jazyk pro prohlížení databáze
+da: du kan vælge fremstilling på et andet sprog blandt de følgende
+de: Blick auf
+en: view in
+eo: vi povas elekti alian lingvon inter la sekvantajn
+es: ver en
+et: võid valida ka mõne muu keele järgnevatest
+fi: mäytä
+fr: afficher en
+is: þú getur valið milli eftirfarandi tungumála
+it: vista in
+lv: jūs variet apskatīt datu bāzi arī citās sekojošās valodās
+nl: bekijk in het
+no: du kan velge sidevisning på et annet språk blant følgende
+pl: możesz wybrać inny język spośród następujących
+pt: ver em
 ro: poti sa alegi una din urmatoarele limbi pentru afisaj
-sl: lahko izberete drug jezik:
-sv: du kan välja ett annat språk bland de följantr: içinde görüntüle:
+sl: lahko izberete drug jezik
+sv: du kan välja ett annat språk bland de följande
+tr: içinde görüntüle
 
     select module
 co: Selezziunate ogni modulu via un cliccu nant’à u buttone assuciatu (massimu 15).

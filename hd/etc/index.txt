@@ -15,7 +15,7 @@
 <h1 class="mt-5">[*choose a genealogy]</h1>
 
 <div class="my-3">
-[*input database]
+<span>[*input database][:]</span>
 
 <form class="form-inline d-flex justify-content-center my-2" method="get" action="%prefix;">
   <input type="hidden" name="lang" value="%evar.lang;">
@@ -28,7 +28,7 @@
 %bases_list;
 </div>
 
-<h3 class="text-center mt-5">[*select lang]</h3>
+<h3 class="text-center mt-5">[*select lang][:]</h3>
 <div class="d-flex flex-wrap justify-content-center col-11 mt-2 mx-auto">
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=af%if;(evar.templ!="")&templ=%evar.templ;%end;" title="af">Afrikaans</a>
   <a class="btn btn-outline-secondary" href="%prefix_base;lang=ar%if;(evar.templ!="")&templ=%evar.templ;%end;" title="ar">العربية</a>

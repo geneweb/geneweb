@@ -746,7 +746,7 @@
           <li>
             <span class="fp_grey_italic">%apply;capitalize(nth([died],xx.sex))</span>
             %xx.on_death_date;
-            %if;xx.computable_death_age;%sp;[age at death:] %xx.death_age;,%end;
+            %if;xx.computable_death_age;%sp;[aged] %xx.death_age;,%end;
             %if;xx.has_death_place;%sp;[in (place)]%sp;%xx.death_place;%end;
           </li>
         %end;
