@@ -2710,6 +2710,15 @@ de: suche in der Liste der Teilorte
 en: search in the list of sub-places
 fr: rechercher dans la liste des sous-lieux
 
+    arbre 8 gen
+co: arburu in H di 8 generazioni
+de: H-Baum 8 Generationen
+en: 8 generations H tree
+fr: arbre en H 8 générations
+pt: árvore em H 8 gerações
+sv: 8 generationer H-träd
+tr: 8 kuşak H ağacı
+
     are
 af: is
 bg: са
@@ -11627,15 +11636,6 @@ ru: к сожалению, добавить можно только ветви, 
 sv: du kan bara lägga till familjer som är kopplade till övriga.<br>Denna begränsning är tillagd av databasägaren.
 tr: ne yazık ki, sadece diğerlerine bağlı aileleri ekleyebilirsiniz.<br>Bu kısıtlama, bu veritabanı sahibi tarafından eklenmiştir.
 
-    arbre 8 gen
-co: arburu in H di 8 generazioni
-de: H-Baum 8 Generationen
-en: 8 generations H tree
-fr: arbre en H 8 générations
-pt: árvore em H 8 gerações
-sv: 8 generationer H-träd
-tr: 8 kuşak H ağacı
-
     multi relations graph
 co: graficu di rilazioni multiple
 de: Multi-Verwandtschafts-Graph
@@ -12943,23 +12943,22 @@ tr: %s tarafında
 af: op
 ar: يوم
 bg: на
-br: d'an
+br: d’an
 ca: el
 co: u
 cs: dne
 da: den
 de: am
 en: on
-en:
 eo: la
 es: el
 et: :i:
 fi: :e:
 fr: le
-he:   ב-
+he: ב-
 is:  
 it: il
-lt:
+lt: 
 lv: datums:
 nl: op
 no: den
@@ -12967,7 +12966,7 @@ oc: lo
 pl: dnia
 pt: a
 ro: la
-ru:
+ru: 
 sk: dňa
 sv: den
 tr: -da,-de
@@ -12981,7 +12980,7 @@ en: on
 et: :i:
 fi: :e:
 fr: le
-lt:
+lt: 
 oc: lo
 pl: w :a:
 pt: em
