@@ -462,6 +462,9 @@ val gen_print_tips : config -> Adef.safe_string -> unit
 val print_tips_relationship : config -> unit
 (** Print a tip that tells to {i Click an individual below to calculate the family link.} *)
 
+val images_prefix : config -> string
+(** get value of images_prefix *)
+
 val get_opt : config -> string -> bool -> bool
 (** get option value for evar "im", "sp", "ma". Default value is defined by third param *)
 

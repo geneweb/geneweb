@@ -527,7 +527,7 @@ let print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
             {|:
            <img src="%s/picto_rel_small.png" alt="">
            <a href="%s">%s%s</a></li>|}
-            (Image.prefix conf :> string)
+            (Util.images_prefix conf :> string)
             (commd conf ^^^ "m=RL&" ^<^ acces conf base a ^^^ "&l1="
              ^<^ string_of_int x1 ^<^ "&"
              ^<^ acces_n conf base (Adef.escaped "1") dp1
@@ -571,7 +571,7 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
         let dp1 = match pp1 with Some p -> p | _ -> p1 in
         let dp2 = match pp2 with Some p -> p | _ -> p2 in
         Output.print_sstring conf {|<img src="|};
-        Output.print_string conf (Image.prefix conf);
+        Output.print_sstring conf (Util.images_prefix conf);
         Output.print_sstring conf {|/picto_rel_small.png" alt="">|};
         let href =
           commd conf ^^^ "m=RL&" ^<^ acces conf base a ^^^ "&l1="
@@ -677,7 +677,7 @@ let print_dag_links conf base p1 p2 rl =
     let rest = ref false in
     if is_anc then (
       Output.print_sstring conf {|<img src="|};
-      Output.print_string conf (Image.prefix conf);
+      Output.print_sstring conf (Util.images_prefix conf);
       Output.print_sstring conf {|/picto_fleche_bleu.png" alt="">|})
     else Output.print_sstring conf "<ul>";
     M.iter
@@ -766,7 +766,7 @@ let print_propose_upto conf base p1 p2 rl =
             <a href="%s%s&m=A&t=X&%s&l=%s">%s %s</a>.
           </div>
         |}
-          (Image.prefix conf :> string)
+          (Util.images_prefix conf :> string)
           (commd conf :> string)
           (acces conf base p :> string)
           (acces_n conf base (Adef.escaped "1") a :> string)

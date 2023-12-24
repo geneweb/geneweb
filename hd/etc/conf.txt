@@ -40,6 +40,8 @@
     lang fallback: %lang_fallback;<br>
     default_lang: %default_lang;<br>
     browser_lang: %browser_lang;<br>
+    prefix: %prefix;<br>
+    images_prefix: %images_prefix;<br>
   </div>
 </section>
 

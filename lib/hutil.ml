@@ -47,8 +47,8 @@ let header_without_http_nor_home conf title =
 <link rel="apple-touch-icon" href="%s/favicon_gwd.png">
 |}
       conf.charset
-      (Image.prefix conf :> string)
-      (Image.prefix conf :> string)
+      (Util.images_prefix conf :> string)
+      (Util.images_prefix conf :> string)
   in
   Output.print_sstring conf str1;
   title true;
