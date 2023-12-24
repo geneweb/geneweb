@@ -4,7 +4,6 @@ open TemplAst
 open Util
 open UpdateData
 
-(* TODO remove references to single "place" and "places" *)
 let translate_title conf len =
   let plural = if len > 1 then 1 else 0 in
   let title =
@@ -467,28 +466,15 @@ let print_foreach conf print_ast _eval_expr =
   print_foreach
 
 let print_mod conf base =
-  match p_getenv conf.env "data" with
-  | Some ("place" | "src" | "occu" | "fn" | "sn") ->
-      let list = build_list conf base in
-      let env = [ ("list", Vlist_data list); ("count", Vcnt (ref 0)) ] in
-      Hutil.interp conf "upddata"
-        {
-          Templ.eval_var = eval_var conf base;
-          Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-          Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-          Templ.get_vother;
-          Templ.set_vother;
-          Templ.print_foreach = print_foreach conf;
-        }
-        env ()
-  | _ ->
-      Hutil.interp conf "upddatamenu"
-        {
-          Templ.eval_var = (fun _ -> raise Not_found);
-          Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
-          Templ.eval_predefined_apply = (fun _ -> raise Not_found);
-          Templ.get_vother;
-          Templ.set_vother;
-          Templ.print_foreach = (fun _ -> raise Not_found);
-        }
-        [] ()
+  let list = build_list conf base in
+  let env = [ ("list", Vlist_data list); ("count", Vcnt (ref 0)) ] in
+  Hutil.interp conf "upddata"
+    {
+      Templ.eval_var = eval_var conf base;
+      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
+      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
+      Templ.get_vother;
+      Templ.set_vother;
+      Templ.print_foreach = print_foreach conf;
+    }
+    env ()
