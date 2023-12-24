@@ -137,7 +137,6 @@ distrib:
 	cp etc/LISEZMOI.txt $(DISTRIB_DIR)/.
 	cp etc/START.htm $(DISTRIB_DIR)/.
 	cp -R etc/install-cgi $(DISTRIB_DIR)
-	cp etc/install-cgi.sh $(DISTRIB_DIR)
 ifeq ($(OS_TYPE),Win)
 	cp etc/Windows/gwd.bat $(DISTRIB_DIR)
 	cp etc/Windows/gwsetup.bat $(DISTRIB_DIR)

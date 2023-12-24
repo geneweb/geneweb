@@ -1,5 +1,5 @@
 
-plugins=carrousel,cgl,fixbase,forum,no_index,v7,v7_im,welcome
+plugins=cgl,fixbase,forum,no_index
 
 access_by_key=yes
 disable_forum=yes

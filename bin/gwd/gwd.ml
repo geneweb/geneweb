@@ -1317,9 +1317,9 @@ let make_conf from_addr request script_name env =
        | _, _ -> (Filename.concat "gw" "images"));
      etc_prefix = (
        match !gw_prefix, !etc_prefix with
-       | gw_p, st_p when gw_p <> "" && st_p = "" ->
-           String.concat Filename.dir_sep [ gw_p; "etc" ]
-       | _, st_p when st_p <> "" ->  st_p
+       | gw_p, etc_p when gw_p <> "" && etc_p = "" ->
+           String.concat Filename.dir_sep [ etc_p; "etc" ]
+       | _, etc_p when etc_p <> "" ->  etc_p
        | _, _ -> (Filename.concat "gw" "etc"));
      cgi;
      output_conf;

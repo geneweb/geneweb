@@ -40,14 +40,17 @@
     lang fallback: %lang_fallback;<br>
     default_lang: %default_lang;<br>
     browser_lang: %browser_lang;<br>
-    prefix: %prefix;<br>
-    images_prefix: %images_prefix;<br>
   </div>
 </section>
 
 <section id="gwd-arguments" class="mt-3 mx-3">
 <h2>[*launch arguments of Gwd server]</h2>
  <div>%gwd.arglist;</div>
+  <p>
+  Mode: %if;(cgi)CGI%else;Server%end;<br>
+  prefix: %prefix;<br>
+  etc_prefix: %etc_prefix;<br>
+  images_prefix: %images_prefix;<br>
 </section>
 
 <section id="bvar-list" class="mt-3 mx-3">
