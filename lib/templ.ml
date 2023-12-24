@@ -468,12 +468,7 @@ and eval_simple_variable conf = function
       let s = (s :> string) in
       if s = "" then s else s ^ Filename.dir_sep
   | "images_prefix" | "image_prefix" ->
-      let s =
-        if conf.cgi then Adef.escaped conf.images_prefix
-        else Adef.escaped "images"
-      in
-      let s = (s :> string) in
-      if s = "" then s else s ^ Filename.dir_sep
+      Util.images_prefix conf ^ Filename.dir_sep
   | "lang" -> conf.lang
   | "lang_fallback" -> (
       match List.assoc_opt conf.lang !Mutil.fallback with

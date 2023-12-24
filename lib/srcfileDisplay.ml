@@ -203,7 +203,7 @@ let macro conf base = function
         (List.assoc "base_notes_title" conf.base_env |> Util.escape_html
           :> Adef.safe_string)
       with Not_found -> Adef.safe "")
-  | 'o' -> (Image.prefix conf :> Adef.safe_string)
+  | 'o' -> Adef.safe (Util.images_prefix conf)
   | 'q' ->
       let r = count conf in
       string_of_int_sep_aux conf (r.welcome_cnt + r.request_cnt)

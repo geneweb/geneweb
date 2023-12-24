@@ -2464,6 +2464,12 @@ let print_tips_relationship conf =
     Utf8.capitalize_fst (transl conf "select person to compute relationship")
     |> Adef.safe |> gen_print_tips conf
 
+let images_prefix conf =
+  let s =
+    if conf.cgi then Adef.escaped conf.images_prefix else Adef.escaped "images"
+  in
+  (s :> string)
+
 (* ********************************************************************** *)
 (*  [Fonc] display_options : config -> string                             *)
 

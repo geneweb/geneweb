@@ -13,8 +13,7 @@ let print_placeholder_gendered_portrait conf p size =
   in
   Output.printf conf
     {|<img src="%s/%s" alt="%s" title="sex" width="%d" height="%d">|}
-    (Image.prefix conf |> Adef.as_string)
-    image alt size size
+    (Util.images_prefix conf) image alt size size
 
 (* ************************************************************************** *)
 (*  [Fonc] content : string -> int -> string -> unit                          *)
