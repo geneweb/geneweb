@@ -1,7 +1,6 @@
 open Config
 open Gwdb
 
-let prefix conf = Util.escape_html conf.images_prefix
 let portrait_folder conf = Util.base_path [ "images" ] conf.bname
 
 let carrousel_folder conf =

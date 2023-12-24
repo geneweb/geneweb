@@ -11,9 +11,6 @@ val scale_to_fit : max_w:int -> max_h:int -> w:int -> h:int -> int * int
 val source_filename : config -> string -> string
 (** Returns path to the image file with the giving name in directory {i src/}. *)
 
-val prefix : config -> Adef.escaped_string
-(** Returns the image prefix (conf.images_prefix), html escaped  *)
-
 (* TODO this should be removed *)
 val default_portrait_filename : base -> person -> string
 (** [default_portrait_filename base p] is the default filename of [p]'s portrait. Without it's file extension.
