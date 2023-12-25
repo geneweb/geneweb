@@ -56,9 +56,9 @@ bin/gwd/info.ml:
 	@printf "Building \033[1;37mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n"
 	@printf "Repository/branch \033[1;37m$(SOURCE)\033[0m.\n\n"
 	@printf "Last commit \033[1;37m$(COMMIT_ID)\033[0m with message “\033[1;37m%s\033[0m”.\n" '$(subst ','\'',$(COMMIT_MSG))'
-	@printf "let ver = \"$(VERSION)\"" > $@
-	@printf "let src = \"$(SOURCE)\"" >> $@
-	@printf "let id = \"$(COMMIT_ID)\"" >> $@
+	@printf "let ver = \"$(VERSION)\"\n" > $@
+	@printf "let src = \"$(SOURCE)\"\n" >> $@
+	@printf "let id = \"$(COMMIT_ID)\"\n" >> $@
 	@printf "\n\033[1;37mGenerating configuration files\033[0m\n"
 	@printf "Generating $@… Done.\n"
 .PHONY:bin/gwd/info.ml
