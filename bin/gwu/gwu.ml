@@ -65,4 +65,4 @@ let main () =
       Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht;
       close ()
 
-let _ = Printexc.catch main ()
+let _ = main ()
