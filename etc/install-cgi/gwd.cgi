@@ -19,5 +19,6 @@ LOGS_DIR="../tmp"
   -bd "$BASES_DIR" \
   -hd "$BIN_DIR" \
   -etc_prefix "../distribution/gw/etc" \
+  -blang \
   -plugins -unsafe "$BIN_DIR"/plugins \
   -log_level 7 -log "<stderr>" 2>> "$LOGS_DIR"/gwd.log

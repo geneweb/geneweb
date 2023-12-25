@@ -4,7 +4,9 @@
 
 <form class="form-group mx-1" name="evt_url" method="get" action="%action;">
   <input type="hidden" name="m" value="PPS">
-  <input type="hidden" name="lang" value="%e.lang;">
+  %if;(e.lang!=default_lang)
+    <input type="hidden" name="lang" value="%e.lang;">
+  %end;
   <div class="form-inline">
     <label class="sr-only" for="k">[*place/places]0 (k)</label>
     <input type="search" class="form-control col-4 ml-2" name="k"

@@ -407,11 +407,7 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
           || (trim && (k = "oc" || k = "ocz") && (v :> string) = "0")
           || (v :> string) = ""
           || k = "b"
-          || k = "lang"
-             && not (* see templ.reorder and copyr.txt for same condition *)
-                  (conf.browser_lang <> ""
-                   && conf.browser_lang <> (v :> string)
-                  || conf.default_lang <> (v :> string))
+          || (k = "lang" && conf.default_lang = (v :> string))
         then c
         else c ^^^ k ^<^ "=" ^<^ (v :> Adef.escaped_string) ^>^ "&")
   in
