@@ -170,8 +170,7 @@ let reorder conf url_env =
   in
   let keep_lang =
     (* same condition in Util.commd and copyr.txt *)
-    (conf.browser_lang <> "" && conf.browser_lang <> new_lang)
-    || conf.default_lang <> new_lang
+    conf.default_lang <> new_lang
   in
   (* process evars from order *)
   let env1, ok =
@@ -186,7 +185,7 @@ let reorder conf url_env =
             List.mem_assoc k url_env
             &&
             match (k, v) with
-            | "lang", _ when keep_lang -> true
+            | "lang", _ -> keep_lang
             | "oc", v when v = "" || v = "0" -> false
             | "ocz", v when v = "" || v = "0" -> false
             | _, v when v <> "" -> true
@@ -209,6 +208,8 @@ let reorder conf url_env =
         else Format.sprintf "%s=%s" k v :: acc)
       [] url_env
   in
+  if List.mem "lang=fr" env1 then Printf.eprintf "Lang in env1\n";
+  if List.mem "lang=fr" env2 then Printf.eprintf "Lang in env2\n";
   String.concat "&" (List.rev env1 @ List.rev env2)
 
 let find_sosa_ref conf =
@@ -483,10 +484,8 @@ and eval_simple_variable conf = function
       let l = List.map Filename.basename conf.plugins in
       String.concat "," l
   | "prefix" -> (Util.commd conf :> string)
-  | "prefix_base" ->
-      (Util.commd ~pwd:false ~henv:false ~senv:false conf :> string)
-  | "prefix_base_password" ->
-      (Util.commd ~henv:false ~senv:false conf :> string)
+  | "prefix_base" -> (Util.commd ~pwd:false conf :> string)
+  | "prefix_base_password" -> (Util.commd conf :> string)
   | "prefix_no_iz" ->
       (Util.commd ~excl:[ "iz"; "nz"; "pz"; "ocz" ] conf :> string)
   | "prefix_no_templ" -> (Util.commd ~excl:[ "templ" ] conf :> string)

@@ -6,7 +6,7 @@
     %and;x%end;
 %end;
 %define;set_lang(l1) %( see same condition in Util.commd and Templ.reorder %)
-  %if;(default_lang!="l1" or (browser_lang != "" and browser_lang!="l1"))%url_set.lang_file.l1;%else;%url_set.lang_file;%end;
+  %if;(default_lang!="l1")%url_set.lang_file.l1;%else;%url_set.lang_file;%end;
 %end;
 %define;language_link()
   %for;i;0;33;

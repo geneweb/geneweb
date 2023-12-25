@@ -46,7 +46,7 @@
                   <div class="d-flex justify-content-between mx-2 mt-2 img-prfx" data-prfx="%images_prefix;modules">
                     <div class="d-inline-flex">
                     %apply;input_hidden("e.b","b")
-                    %apply;input_hidden("e.lang","lang")
+                    %if;(e.lang!=default_lang)%apply;input_hidden("e.lang","lang")%end;
                     <div class="input-group">
                       <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"
                         value="%if;(p_mod!="zz" and p_mod!="")%p_mod;%end;"
