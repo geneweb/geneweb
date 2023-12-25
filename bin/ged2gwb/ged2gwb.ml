@@ -914,7 +914,7 @@ let rec is_a_public_name s i =
     List.mem w public_name_word || is_a_public_name s j))
 
 
-module Buff2 = Buff.Make (struct  end)
+module Buff2 = Buff.Make (struct  end)[@@ocaml.warning "-73"]
 
 let aux fn s =
   (* On initialise le buffer à la valeur de s. *)
