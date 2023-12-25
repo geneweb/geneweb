@@ -1309,7 +1309,7 @@ let witness_kind_of_rval rval = match rval with
   | "Mentioned"          -> Witness_Mentioned
   | "Other"              -> Witness_Other
   | _                    -> Witness
-              
+
 let find_event_witness gen tag ip r =
   let rec find_witnesses =
     function
