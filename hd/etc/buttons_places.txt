@@ -7,6 +7,9 @@
   %if;(e.lang!=default_lang)
     <input type="hidden" name="lang" value="%e.lang;">
   %end;
+  %if;cgi;
+    <input type="hidden" name="b" value="%bname_token;">
+  %end;
   <div class="form-inline">
     <label class="sr-only" for="k">[*place/places]0 (k)</label>
     <input type="search" class="form-control col-4 ml-2" name="k"
