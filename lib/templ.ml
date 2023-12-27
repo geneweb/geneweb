@@ -143,6 +143,7 @@ let url_aux ?(pwd = true) conf =
 
 let order =
   [
+    "b";
     "lang";
     "templ";
     "iz";
@@ -483,6 +484,9 @@ and eval_simple_variable conf = function
   | "plugins" ->
       let l = List.map Filename.basename conf.plugins in
       String.concat "," l
+  | "bname" -> conf.bname
+  | "token" -> conf.cgi_passwd
+  | "bname_token" -> String.concat "_" [ conf.bname; conf.cgi_passwd ]
   | "prefix" -> (Util.commd conf :> string)
   | "prefix_base" -> (Util.commd ~pwd:false conf :> string)
   | "prefix_base_password" -> (Util.commd conf :> string)
