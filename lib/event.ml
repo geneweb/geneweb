@@ -145,8 +145,8 @@ let int_of_fevent_name = function
   | Efam_Engage -> 2
   | Efam_MarriageBann -> 3
   | Efam_MarriageContract -> 4
-  | Efam_Marriage -> 5
-  | Efam_MarriageLicense -> 6
+  | Efam_MarriageLicense -> 5
+  | Efam_Marriage -> 6
   | Efam_Residence -> 7
   | Efam_Separated -> 8
   | Efam_Annulation -> 9
