@@ -139,6 +139,26 @@ let compare_event_name name1 name2 =
   | _, Pevent Epers_Death -> -1
   | _, _ -> 0
 
+let int_of_fevent_name = function
+  | Efam_NoMarriage -> 0
+  | Efam_PACS -> 1
+  | Efam_Engage -> 2
+  | Efam_MarriageBann -> 3
+  | Efam_MarriageContract -> 4
+  | Efam_MarriageLicense -> 5
+  | Efam_Marriage -> 6
+  | Efam_Residence -> 7
+  | Efam_Separated -> 8
+  | Efam_Annulation -> 9
+  | Efam_Divorce -> 10
+  | Efam_NoMention -> 11
+  | Efam_Name s -> 12
+
+let compare_fevent_name name1 name2 =
+  let i1 = int_of_fevent_name name1 in
+  let i2 = int_of_fevent_name name2 in
+  i1 - i2
+
 let better_compare_event_name name1 name2 =
   let c = compare_event_name name1 name2 in
   if c <> 0 then c
@@ -148,7 +168,7 @@ let better_compare_event_name name1 name2 =
     | Fevent _, Pevent _ -> 1
     | Pevent _, Fevent _ -> -1
     (* this is to make event order stable; depends on type definition order! *)
-    | Fevent e1, Fevent e2 -> compare e1 e2
+    | Fevent e1, Fevent e2 -> compare_fevent_name e1 e2
     | Pevent e1, Pevent e2 -> compare e1 e2
 
 (* try to handle the fact that events are not well ordered *)
