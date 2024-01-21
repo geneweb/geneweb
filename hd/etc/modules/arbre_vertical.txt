@@ -181,8 +181,7 @@
       %end;
       <td colspan="%expr(cell.colspan)" class="text-center py-0">%nn;
         %if;cell.is_empty;
-        %elseif;(cancel_links)│%nn;
-        %else;
+        %elseif;(cell.person.has_parents and not cancel_links)
           <a href="%cell.person.bname_prefix;%cell.person.access;%nn;
             &m=%if;(e.m!="")%e.m;%else;A%end;%nn;
             &t=%if;(e.t!="")%e.t;%else;T%end;%nn;
@@ -190,6 +189,7 @@
             %if;(e.im=0)&im=0%end;%nn;
             %if;(e.ma=0)&ma=0%end;"
             title="[*navigation] [with] %cell.person;">│</a>%nn;
+        %else;│%nn;
         %end;
       </td>
     %end;

@@ -58,20 +58,21 @@
 %end;
 %let;father_access;%if;(dtree=1)%get_var.fatheraccess;%else;%if;has_parents;%father.access;%end;%end;%in;
 %let;mother_access;%if;(dtree=1)%get_var.motheraccess;%else;%if;has_parents;%mother.access;%end;%end;%in;
+%let;withparents;%if;(mother_access!="" or father_access!="")1%end;%in;
 %let;prev_sibling_access;%get_var.prevsiblingaccess;%in;
 %let;next_sibling_access;%get_var.nextsiblingaccess;%in;
 %if;(not cancel_links and (e.m="A" or e.m="D"))
 <nav class="navbar fixed-bottom navbar-light bg-light justify-content-center py-0">
   <div class="btn-toolbar align-items-center%if;(e.m="D" or e.dag="on") mt-1%end;" role="toolbar" arial-label="asc/dsc button group">
-    <div class="btn-group border rounded mr-1  " role="group" aria-label="ascendant tree button group">
+    <div class="btn-group border rounded mr-1" role="group" aria-label="ascendant tree button group">
       <a role="button" href="%prefix_base_password;m=A&t=A%foreach;env_binding;%if;(env.key!="m" and env.key!="t" and env.key!="dag")&%env.key=%env.val;%end;%end;"
-        class="btn btn-outline-primary border-%if;(e.t!="A")0%else;2 disabled font-weight-bold%end; px-2 pt-1 h-100"
+        class="btn btn-outline-primary border-%if;(e.t!="A")0%else;2 disabled font-weight-bold%end;%if;(withparents!=1) disabled%end; px-2 pt-1 h-100"
         title="[*male line/female line]0"><i class="fas fa-mars fa-lg"></i><br>Agna.</a>
       <a role="button" href="%prefix_base_password;m=A&t=T%foreach;env_binding;%if;(env.key!="m" and env.key!="t")&%env.key=%env.val;%end;%end;"
-        class="btn btn-outline-primary border-%if;(e.m="A" and e.t="T")2 disabled font-weight-bold%else;0%end; px-3 pt-1 h-100"
+        class="btn btn-outline-primary border-%if;(e.m="A" and e.t="T")2 disabled font-weight-bold%else;0%end;%if;(withparents!=1) disabled%end; px-3 pt-1 h-100"
         title="[*ascendants tree]"><i class="fas fa-code-fork fa-lg"></i><br>Asc.</a>
       <a role="button" href="%prefix_base_password;m=A&t=C%foreach;env_binding;%if;(env.key!="m" and env.key!="t" and env.key!="dag")&%env.key=%env.val;%end;%end;"
-        class="btn btn-outline-primary border-%if;(e.t!="C")0%else;2 disabled font-weight-bold%end; px-2 pt-1 h-100"
+        class="btn btn-outline-primary border-%if;(e.t!="C")0%else;2 disabled font-weight-bold%end;%if;(withparents!=1) disabled%end; px-2 pt-1 h-100"
         title="[*male line/female line]1"><i class="fas fa-venus fa-lg"></i><br>Cogn.</a>
     </div>
     <div class="btn-group border rounded mr-1">
