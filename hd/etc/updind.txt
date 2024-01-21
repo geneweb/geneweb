@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%lang;">
+<html lang="%lang;" id="updform">
 <head>
   <!-- $Id: updind.txt v7.1 31/08/2023 15:28:42 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
@@ -20,7 +20,7 @@
 </head>
 <body%body_prop; id="person">
 %include;hed
-<div class="container pl-lg-0 pr-lg-3 px-xl-3 no_scroll_pad">
+<div class="container pl-lg-0 pr-lg-3 px-xl-3">
 %message_to_wizard;
 %( do not use %include;perso_header %)
 %include_perso_header;
