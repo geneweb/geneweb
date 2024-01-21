@@ -21,6 +21,11 @@ html {
   font-size: 1rem;
 }
 
+/* Upd_ind/fam forms scroll fix */
+#updform html {
+  scroll-padding-top: 52px;
+}
+
 /* Books */
 /* fix small down-arrow position on books navigation entries */
 .bottom-book-arrow {
