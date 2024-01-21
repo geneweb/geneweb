@@ -14056,10 +14056,40 @@ sl: oznaka
 sv: smeknamn
 tr: takma ad
 
-    random individual
+random individual
+af: vertoon 'n lukrake individu
+ar: عرض فرد عشوائي
+bg: показване на произволен индивид
+br: diskouez un den a hasard
+ca: mostrar un individu aleatori
 co: affissà un individuu à l’azardu
+cs: zobrazit náhodnou osobu
+da: vis tilfældig person
+de: zeige eine zufällige Person
 en: display a random individual
+eo: montri hazardan individuon
+es: mostrar un individuo al azar
+et: kuvab juhuslikku isikut
+fi: näytä satunnainen henkilö
 fr: afficher un individu au hasard
+he: הצג אדם אקראי
+is: birta handahófskenndan einstakling
+it: visualizza un individuo casuale
+lt: rodyti atsitiktinį asmenį
+lv: parādīt gadījuma personu
+nl: toon een willekeurig individu
+no: vis tilfeldig person
+oc: afichar un individú al hasard
+pl: wyświetl losową osobę
+pt: mostrar um indivíduo aleatório
+pt-br: mostrar um indivíduo aleatório
+ro: afișează un individ aleatoriu
+ru: показать случайного человека
+sk: zobraziť náhodnú osobu
+sl: prikaži naključnega posameznika
+sv: visa en slumpmässig individ
+tr: rastgele bir bireyi göster
+zh: 显示随机个体
 
     recensement
 co: censimentu
@@ -16007,6 +16037,41 @@ pt: estatísticas e aniversários
 ru: статистика и годовщины
 sv: statistik och årsdagar
 tr: istatistikler ve yıldönümleri
+
+    stay on the current tool
+af: terwyl jy op hierdie instrument bly
+ar: أثناء البقاء على هذه الأداة
+bg: докато сте на този инструмент
+br: paouez amañ war al lojer
+ca: mentre es manté en aquesta eina
+co: mentre rimani in stu strumentu
+cs: při pobytu na tomto nástroji
+da: mens du bliver på dette værktøj
+de: während Sie auf diesem Werkzeug bleiben
+en: while staying on this tool
+eo: dum restado sur tiu ĉi ilo
+es: mientras te quedas en esta herramienta
+et: olles selle tööriista juures
+fi: pysyessäsi tällä työkalulla
+fr: tout en restant sur cet outil
+he: בזמן שאתה נשאר על הכלי הזה
+is: meðan þú heldur þér á þessari tólu
+it: rimanendo su questo strumento
+lt: esant šiame įrankyje
+lv: paliekot pie šī rīka
+nl: terwijl je op dit gereedschap blijft
+no: mens du holder deg på dette verktøyet
+oc: mentre rescontres sus aquesta hera
+pl: przebywając przy tym narzędziu
+pt: enquanto fica nesta ferramenta
+pt-br: enquanto fica nesta ferramenta
+ro: stând pe acest instrument
+ru: находясь на этом инструменте
+sk: počas pobytu na tomto nástroji
+sl: medtem ko ostajaš na tem orodju
+sv: medan du stannar på detta verktyg
+tr: bu araç üzerinde kalırken
+zh: 在此工具上停留时
 
     store image
 co: a fiura selezziunata serà piazzata in
