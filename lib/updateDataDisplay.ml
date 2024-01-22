@@ -321,7 +321,7 @@ and eval_simple_str_var conf _base env _xx = function
         match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
       in
       let book_of, _ = translate_title conf len in
-       Utf8.capitalize_fst book_of
+      Utf8.capitalize_fst book_of
   | "subtitle" ->
       let len =
         match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
@@ -335,8 +335,11 @@ and eval_simple_str_var conf _base env _xx = function
       let result =
         match p_getenv conf.env "s" with
         | Some ini ->
-          if ini = "" then Printf.sprintf "%s %s" len2 title
-          else Printf.sprintf (ftransl conf "%s %s starting with %s") len2 title ini
+            if ini = "" then Printf.sprintf "%s %s" len2 title
+            else
+              Printf.sprintf
+                (ftransl conf "%s %s starting with %s")
+                len2 title ini
         | None -> Printf.sprintf "%s %s" len2 title
       in
       result
