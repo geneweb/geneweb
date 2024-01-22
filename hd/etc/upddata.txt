@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="%lang;" id="book">
 <head>
-  <title>%title;</title>
+  <title>%title; – %subtitle;</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -29,27 +29,25 @@
 %end;
 <div class="container">
 %define;list_of(xx,yy,zz)
-  <div class="btn-group align-self-center">
+  <div class="btn-group align-self-center mt-%if;("xx"="src")3%elseif;("xx"!="fn")2%end;">
     %if;(e.data!="xx")
-      <a href="%prefix;m=MOD_DATA&data=xx" title="[*book of %s:::yy]">
+      <a href="%prefix;m=MOD_DATA&data=xx" class="sub-char" title="[*book of %s:::yy]">
     %end;
-        <span class="fa-stack mb-1">
-          <i class="fa fa-book-open%if;(e.data="xx") text-success%end; fa-stack-2x"></i>
-          <i class="fa fa-zz fa-stack-1x text-%if;(e.data="xx")light%else;white%end; %if;("xx"="sn" or "xx"="src") pl-3%else;pr-3%end;"></i>
-        </span>
-      %if;(e.data="")[*book of %s:::yy]%end;
+    <i class="fa%if;("xx"="src" or "xx"="fn")r%end; fa-zz fa-2x fa-fw text-%if;(e.data="xx")success%else;primary%end;"></i>
+    %if;(e.data="")[*book of %s:::yy]%end;
     %if;(e.data!="xx")</a>%end;
   </div>
 %end;
+
 %define;other_books()
-  %if;(e.data="")<div class="h3">[*books]</div>%end;
+  %if;(e.data="")<div class="h3">[*book/books]1</div>%end;
   <div>
     %if;(wizard)
-      %apply;list_of("fn",[first name/first names]1,"signature")
-      %apply;list_of("sn",[surname/surnames]1,"address-book")
-      %apply;list_of("place",[place/places]1,"location-dot")
-      %apply;list_of("src",[source/sources]1,"align-center")
+      %apply;list_of("fn",[first name/first names]1,"id-badge")
+      %apply;list_of("sn",[surname/surnames]1,"signature")
+      %apply;list_of("place",[place/places]1,"map-location-dot")
       %apply;list_of("occu",[occupation/occupations]1,"user-doctor")
+      %apply;list_of("src",[source/sources]1,"file-lines")
     %end;
   </div>
 %end;
@@ -61,8 +59,8 @@
       %if;(e.s="")[*select a letter]%else;[*hierarchical navigation]%end;
     </h2>
     <div class="btn-group" role="toolbar" aria-label="sub-caracter-selection-heading" id="book-navigation">
-      <div class="d-flex flex-column flex-sm-row list-group list-group-horizontal text-monospace user-select-none font-weight-bold user-select-none ml-2">
-        <div class="d-inline-flex flex-wrap mt-2 mt-sm-0 order-3">
+      <div class="d-flex flex-column flex-sm-row list-group list-group-horizontal user-select-none font-weight-bold user-select-none ml-2">
+        <div class="d-inline-flex flex-wrap align-self-center mt-2 mt-sm-0 order-3 text-monospace">
           %if;(nb_results>=1)
             %reset_count;
             %foreach;entry;
@@ -89,17 +87,22 @@
         <div class="d-flex col-xs-12 order-1">
           <div class="d-flex flex-col align-self-center">
             %if;(e.s="")%apply;other_books()%end;
-            <div class="h4 align-self-center mx-3">%if;(e.data!="" and e.s="")%title;%end;</div>
+            %if;(e.data!="" and e.s="")
+              <div class="align-self-center text-center mx-3">
+                <h1 class="h3 mt-0 ">[*book/books]0</h1>
+                <h2 class="h4 mt-0 text-nowrap">%subtitle;</h2>
+              </div>
+            %end;
           </div>
           %if;(e.s!="")<a tabindex="5" role="button" class="btn-link border-0 align-self-center mt-1 mb-2 sub-char"
-            href="%prefix;m=MOD_DATA&data=%e.data;" title="[*back to index]0">
+            href="%prefix;m=MOD_DATA&data=%e.data;" title="[*back to index and books]">
               <span class="fa-stack mb-1">
                 <i class="fa fa-a fa-stack-2x pr-3"></i>
                 <i class="fa-solid fa-z fa-2x fa-stack-1x text-success pt-2 pl-3"></i>
               </span>
             </a>
           %end;
-          <div class="d-flex flex-grow align-self-sm-center ml-2" id="subinit">
+          <div class="d-flex flex-grow align-self-sm-center%if;(e.s!="") ml-2%end;" id="subinit">
             %if;(e.s!="")
               %for;z;1;6;%apply;subinit(z)%end; %(5 first entries %)
               %if;(len_s>7)<i class="fa-solid fa-ellipsis align-self-center ml-1"></i>
@@ -131,7 +134,8 @@
   </div>
   %if;(e.data!="" and e.s!="")
     <h1 class="text-sm-center mt-0 mt-sm-1 h3">%title;</h1>
-    <div class="d-flex mt-1 mt-sm-2 mx-1 mx-sm-5 px-sm-3">
+    <h2 class="text-sm-center mt-0 h4">%subtitle;</h2>
+    <div class="d-flex mt-2 mt-sm-3 mx-1 mx-sm-3 px-sm-3">
       <form class="form-inline" method="get" action="%action;" aria-labelledby="search_s">
         %hidden;
         <input type="hidden" name="m" value="MOD_DATA">
@@ -151,7 +155,7 @@
       %foreach;entry;
         <li class="list-group-item list-group-action d-flex p-0 mt-1 align-items-center border-0"  id="_%entry_ini;">
           <div class="d-flex align-items-center justify-content-center position-relative top-book-arrow w-10 h-100 border-0 justify-content-center">
-            <a role="button" class="stretched-link w-100 mx-3" href="#top" title="[*return to top]" tabindex="-1" title="^"><i class="fa-solid fa-sort-up ml-2 pl-sm-2 ml-sm-3 mt-1"></i></a>%nn;
+            <a role="button" class="stretched-link w-100 mx-3" href="#top" title="[*return to top]" tabindex="-1" title="^"><i class="fa-solid fa-sort-up ml-sm-1 mt-1"></i></a>%nn;
           </div>
           <div class="list-group-item-%if;(entry_ini=e.s)success%else;info%end; position-relative w-100 border font-weight-bold text-monospace">
             %if;(entry_ini!=e.s)
@@ -162,15 +166,18 @@
         <li class="list-unstyled mt-1 pl-0">
           <ul class="list-group src-list-bg my-1">
             %foreach;value;
-              <li class="list-unstyled ml-3 ml-sm-4 pl-0" id="k%entry_key;">
+              <li class="list-unstyled ml-sm-1 pl-0" id="k%entry_key;">
                 <div class="d-flex%if;(is_modified) my-2 my-sm-0%end; mx-2">
-                  %if;(e.data="place")
+                  %if;(e.data!="src")
                     %(TODO: Fix URL encoding for escape.printable.suburb/other ! %)
                     <div class="d-flex flex-column justify-content-center">
                       <a href="https://www.wikidata.org/w/index.php?search=%nn;
-                        %if;(not first and suburb!="")%encode.escape.printable.suburb;%else;%encode.other;%end;"
+                        %if;(e.data!="place")%encode.escape.entry_value;%nn;
+                        %else;
+                          %if;(not first and suburb!="")%encode.escape.printable.suburb;%else;%encode.other;%end;
+                        %end;"
                         role="button" class="btn btn-link p-0 ml-1"
-                        title="%apply;wikidata%with;%if;(not first and suburb!="")%escape.printable.suburb;%else;%escape.printable.other;%end;%end;"
+                        title="%apply;wikidata%with;%if;(e.data!="place")%escape.entry_value;%else;%if;(not first and suburb!="")%escape.printable.suburb;%else;%escape.printable.other;%end;%end;%end;"
                         target="_blank" rel="noreferrer, noopener" tabindex="-1">
                         <i class="fab fa-wikipedia-w fa-sm"></i>
                       </a>%if;(suburb!="")</span>%end;
@@ -187,7 +194,7 @@
                     <div class="px-3 mx-0 bg-white"> </div>
                   %end;
                   %if;is_modified;
-                    <div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-0%if;(e.data!="place") ml-sm-3%end;">
+                    <div class="d-flex d-sm-inline-flex flex-column flex-sm-row px-0%if;(e.data!="place") ml-sm-1%end;">
                       <div class="d-flex d-sm-inline-flex flex-row flex-sm-column align-self-start align-self-sm-center ml-5 ml-sm-4 mb-0 ">
                         <div class="font-weight-bold">[*modify]</div>
                         <div class="text-nowrap align-self-sm-center ml-2 ml-sm-0">%p_list;</div>
@@ -274,7 +281,7 @@
     </ul>
   %else;
     <div class="alert alert-warning my-3">[*too much results]
-      (> %if;(b.book_max_results!="")book_max_results=%b.book_max_results;%else;%nb_max%end;).
+      (> %if;(b.book_max_results!="")<abbr title="book_max_results">%b.book_max_results;</abbr>%else;%nb_max%end;).
       %if;(e.s!="")[*specify]%else;[*select a letter]%end;.</div>
   %end;
 %base_trailer;
