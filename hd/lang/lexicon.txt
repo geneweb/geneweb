@@ -2902,11 +2902,11 @@ sl: nazaj
 sv: tillbaka
 tr: geri
 
-    back to index/books
-co: rivene à l’indice alfabeticu/rivene à a lista di i dizziunarii
-de: zurück zum alphabetischen Index/zurück zur Liste der Wörterbücher
-en: back to alphabetic index/back to the list of books
-fr: retourner à l’index alphabétique/retourner à la liste des dictionnaires
+    back to index and books
+co: rivene à l’indice alfabeticu è a lista di i dizziunarii
+de: zurück zum alphabetischen Index und zur Liste der Wörterbücher
+en: back to alphabetic index and to the list of books
+fr: retourner à l’index alphabétique et à la liste des dictionnaires
 
     baptism
 af: doop
@@ -3462,16 +3462,16 @@ ru: список предков
 sv: förteckning över förfäder
 tr: soy kitabı
 
-    books
-co: libri
-de: Wörterbücher
-en: books
-fr: dictionnaires
-lt: žodynas
-oc: diccionaris
-pt: dicionários
-sv: förteckningar
-tr: kitaplar
+    book/books
+co: libru/libri
+de: Wörterbuch/Wörterbücher
+en: book/books
+fr: dictionnaire/dictionnaires
+lt: žodynas/žodynai
+oc: diccionari/diccionaris
+pt: dicionário/dicionários
+sv: förteckning/förteckningar
+tr: kitap/kitaplar
 
     border
 af: rand
