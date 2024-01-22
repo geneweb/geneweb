@@ -14230,7 +14230,7 @@ sl: oznaka
 sv: smeknamn
 tr: takma ad
 
-random individual
+    random individual
 af: vertoon 'n lukrake individu
 ar: عرض فرد عشوائي
 bg: показване на произволен индивид
