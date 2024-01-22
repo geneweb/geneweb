@@ -320,19 +320,26 @@ and eval_simple_str_var conf _base env _xx = function
       let len =
         match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
       in
+      let book_of, _ = translate_title conf len in
+       Utf8.capitalize_fst book_of
+  | "subtitle" ->
+      let len =
+        match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
+      in
       let len2 =
         Sosa.to_string_sep
           (transl conf "(thousand separator)")
           (Sosa.of_int len)
       in
-      let ini = Option.value ~default:"" (p_getenv conf.env "s") in
-      let book_of, title = translate_title conf len in
+      let _, title = translate_title conf len in
       let result =
-        if ini = "" then Printf.sprintf "%s %s" len2 title
-        else
-          Printf.sprintf (ftransl conf "%s %s starting with %s") len2 title ini
+        match p_getenv conf.env "s" with
+        | Some ini ->
+          if ini = "" then Printf.sprintf "%s %s" len2 title
+          else Printf.sprintf (ftransl conf "%s %s starting with %s") len2 title ini
+        | None -> Printf.sprintf "%s %s" len2 title
       in
-      Utf8.capitalize_fst book_of ^ "<br>" ^ result
+      result
   | _ -> raise Not_found
 
 and eval_compound_var conf base env xx sl =
