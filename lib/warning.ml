@@ -65,3 +65,26 @@ type ('iper, 'person, 'family, 'descend, 'title, 'pevent, 'fevent) warning =
 
 (** Missing sources warning *)
 type ('person, 'descend, 'title) misc = MissingSources
+
+type ('person, 'family, 'string) size_warning =
+  | ToManyPevents of 'person * int
+  | ToManyFevents of 'family * int
+  | ToManyPWitnesses of 'person * int
+  | ToManyFWitnesses of 'family * int
+  | PWitnessNoteSize of 'string * int * 'person * 'person
+  | FWitnessNoteSize of 'string * int * 'family * 'person
+  | ToManyChildren of 'family * int
+  | ToManyUnions of 'person * int
+  | ToManyRelated of 'person * int
+  | ToManyRparents of 'person * int
+  | ToLongFirstName of 'person * 'string * int
+  | ToLongSurname of 'person * 'string * int
+  | ToLongPublicName of 'person * 'string * int
+  | ToLongFirstNameAlias of 'person * 'string * int
+  | ToManyFirstNameAliases of 'person * int
+  | ToLongSurnameAlias of 'person * 'string * int
+  | ToManySurnameAliases of 'person * int
+  | ToLongPersonNotes of 'person * 'string * int
+  | ToLongPersonSources of 'person * 'string * int
+  | ToLongFamilyNotes of 'family * 'string * int
+  | ToLongFamilySources of 'family * 'string * int

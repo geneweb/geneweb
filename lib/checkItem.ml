@@ -15,6 +15,8 @@ type base_warning =
 
 type base_misc = (person, family, title) Warning.misc
 
+type size_warning = (iper, ifam, istr) Warning.size_warning
+
 (* Constants used for computing the warnings. *)
 let max_age_btw_cpl = 50
 let max_days_btw_sibl = 10
@@ -904,9 +906,165 @@ let changed_fevents_order warning (ifam, fam) =
     let b = List.map gen_fevent_of_fam_event b in
     warning (Warning.ChangedOrderOfFamilyEvents (ifam, b, a))
 
+
+
+let check_str_size base str_size_warning max istr =
+  let str = Gwdb.sou base istr in
+  let len = String.length str in
+  if len > max then str_size_warning istr len
+  
+let check_note_size base note_size_warning note =
+  check_str_size base note_size_warning 800 note
+let check_src_size = check_note_size
+
+let check_person_note_size base size_warning person =
+  check_note_size base (fun istr len ->
+      size_warning (Warning.ToLongPersonNotes (Gwdb.get_iper person, istr, len))
+    ) (Gwdb.get_notes person)
+
+let check_person_source_size base size_warning person =
+  check_note_size base (fun istr len ->
+      size_warning (Warning.ToLongPersonSources (Gwdb.get_iper person, istr, len))
+    ) (Gwdb.get_psources person)
+
+let check_family_note_size base size_warning family =
+  check_note_size base (fun istr len ->
+      size_warning (Warning.ToLongFamilyNotes (Gwdb.get_ifam family, istr, len))
+    ) (Gwdb.get_comment family)
+
+let check_family_source_size base size_warning family =
+  check_note_size base (fun istr len ->
+      size_warning (Warning.ToLongFamilySources (Gwdb.get_ifam family, istr, len))
+    ) (Gwdb.get_fsources family)
+
+let check_name_size' base name_size_warning person name =
+  check_str_size base
+    (fun istr len ->
+       name_size_warning (Gwdb.get_iper person) istr len)
+    50 name
+let check_name_size base name_size_warning person fname =
+  let n = fname person in
+  check_name_size' base name_size_warning person n
+  
+let check_first_name_size base size_warning person =
+   let w = fun iper istr len ->
+     size_warning (Warning.ToLongFirstName (iper, istr, len))
+   in
+  check_name_size base w person Gwdb.get_first_name
+
+let check_surname_size base size_warning person =
+   let w = fun iper istr len ->
+     size_warning (Warning.ToLongSurname (iper, istr, len))
+   in
+  check_name_size base w person Gwdb.get_surname
+
+let check_public_name_size base size_warning person =
+   let w = fun iper istr len ->
+     size_warning (Warning.ToLongPublicName (Gwdb.get_iper person, istr, len))
+   in
+  check_name_size base w person Gwdb.get_public_name
+
+let check_first_names_aliases base size_warning person =
+   let w = fun iper istr len ->
+     size_warning (Warning.ToLongFirstNameAlias (iper, istr, len))
+   in
+   let aliases = Gwdb.get_first_names_aliases person in
+   let len = List.length aliases in
+   if len > 100 then size_warning (Warning.ToManyFirstNameAliases (Gwdb.get_iper person, len));
+   List.iter (check_name_size' base w person) aliases
+
+let check_surnames_aliases base size_warning person =
+   let w = fun iper istr len ->
+     size_warning (Warning.ToLongSurnameAlias (iper, istr, len))
+   in
+   let aliases = Gwdb.get_surnames_aliases person in
+   let len = List.length aliases in
+   if len > 100 then size_warning (Warning.ToManySurnameAliases (Gwdb.get_iper person, len));
+   List.iter (check_name_size' base w person) aliases
+
+let check_pers_event_witness_length base size_warning person pers_event =
+  let witnesses = Gwdb.get_pevent_witnesses_and_notes pers_event in
+  let len = Array.length witnesses in
+  if len > 100 then size_warning (Warning.ToManyPWitnesses (Gwdb.get_iper person, len));
+  Array.iter (fun (wiper, _wk, wnote) ->
+      check_note_size base (fun note len ->
+          let iper = Gwdb.get_iper person in
+          size_warning (Warning.PWitnessNoteSize (note, len, iper, wiper))) wnote
+    ) witnesses
+
+let check_pers_event_length base size_warning person =
+  let pevents = Gwdb.get_pevents person in
+  let len = List.length pevents in
+  if len > 100 then size_warning (Warning.ToManyPevents (Gwdb.get_iper person, len));
+  List.iter (check_pers_event_witness_length base size_warning person) pevents
+
+let check_union_length size_warning person =
+  let families = Gwdb.get_family person in
+  let len = Array.length families in
+  if len > 100 then size_warning (Warning.ToManyUnions(Gwdb.get_iper person, len))
+  
+let check_related_length size_warning person =
+  let related = Gwdb.get_related person in
+  let len = List.length related in
+  if len > 100 then size_warning (Warning.ToManyRelated(Gwdb.get_iper person, len))
+  
+let check_rparent_length size_warning person =
+  let rparents  = Gwdb.get_rparents person in
+  let len = List.length rparents in
+  if len > 100 then size_warning (Warning.ToManyRparents (Gwdb.get_iper person, len))
+  
+let check_person_names_length base size_warning person =
+  check_first_name_size base size_warning person;
+  check_first_names_aliases base size_warning person;
+  check_surnames_aliases base size_warning person;
+  ()
+
+let check_fam_event_witness_length base size_warning family fam_event =
+  let witnesses = Gwdb.get_fevent_witnesses_and_notes fam_event in
+  let len = Array.length witnesses in
+  if len > 100 then size_warning (Warning.ToManyFWitnesses (Gwdb.get_ifam family, len));
+  Array.iter (fun (wiper, _wk, wnote) ->
+      check_note_size base (fun note len ->
+          let ifam = Gwdb.get_ifam family in
+          size_warning (Warning.FWitnessNoteSize (note, len, ifam, wiper))) wnote
+    ) witnesses
+
+let check_fam_event_length base size_warning family =
+  let fevents = Gwdb.get_fevents family in
+  let len = List.length fevents in
+  if len > 100 then size_warning (Warning.ToManyFevents (Gwdb.get_ifam family, len));
+  List.iter (check_fam_event_witness_length base size_warning family) fevents
+
+  
+let check_children_length size_warning family =
+  let children = Gwdb.get_children family in
+  let len = Array.length children in
+  if len > 100 then size_warning (Warning.ToManyChildren (Gwdb.get_ifam family, len))
+
+
+let check_family_length base size_warning family =
+  check_fam_event_length base size_warning family;
+  check_children_length size_warning family;
+  check_family_note_size base size_warning family;
+  check_family_source_size base size_warning family
+
+let check_person_length base size_warning person =
+  check_pers_event_length base size_warning person;
+  check_union_length size_warning person;
+  check_related_length size_warning person;
+  check_rparent_length size_warning person;
+  check_person_note_size base size_warning person;
+  check_person_source_size base size_warning person;
+  check_person_names_length base size_warning person
+
+
 (* main *)
 
-let person ?(onchange = true) base (warning : base_warning -> unit) p =
+let person ?(onchange = true)
+    base
+    ?(size_warning : size_warning -> unit = fun _ -> ())
+    (warning : base_warning -> unit)
+    p =
   (* check personal events *)
   check_pevents base warning p;
   (* check person's age *)
@@ -915,9 +1073,16 @@ let person ?(onchange = true) base (warning : base_warning -> unit) p =
   List.iter (title_dates warning p) (get_titles p);
   (* check order of personal events *)
   if onchange then changed_pevents_order warning p;
+  check_person_length base size_warning p;
   related_sex_is_coherent base warning p
 
-let family ?(onchange = true) base (warning : base_warning -> unit) ifam fam =
+
+let family ?(onchange = true)
+    base
+    ?(size_warning : size_warning -> unit = fun _ -> ())
+    (warning : base_warning -> unit)
+    ifam
+    fam =
   let fath = poi base @@ get_father fam in
   let moth = poi base @@ get_mother fam in
   (* check family's witnesses *)
@@ -926,6 +1091,7 @@ let family ?(onchange = true) base (warning : base_warning -> unit) ifam fam =
   check_parents base warning fam fath moth;
   (* check children *)
   check_children ~onchange base warning (ifam, fam) fath moth;
+  check_family_length base size_warning fam;
   if onchange then (
     changed_fevents_order warning (ifam, fam);
     let father = poi base (get_father fam) in

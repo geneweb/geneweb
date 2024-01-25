@@ -20,6 +20,8 @@ type base_warning =
 (* *)
 type base_misc = (person, family, title) Warning.misc
 
+type size_warning = (iper, ifam, istr) Warning.size_warning
+
 val check_siblings :
   ?onchange:bool ->
   base ->
@@ -34,6 +36,7 @@ val check_siblings :
 val person :
   ?onchange:bool ->
   base ->
+  ?size_warning:(size_warning -> unit) ->
   (base_warning -> unit) ->
   person ->
   (iper * person * Def.sex option * relation list option) list option
@@ -47,7 +50,7 @@ val person :
     Calls [warn] on corresponding [base_warning] when find some inconsistencies. *)
 
 val family :
-  ?onchange:bool -> base -> (base_warning -> unit) -> ifam -> family -> unit
+  ?onchange:bool -> base -> ?size_warning:(size_warning -> unit) -> (base_warning -> unit) -> ifam -> family -> unit
 (** [family onchange base warn f] checks family properties like :
 
     - familial events
