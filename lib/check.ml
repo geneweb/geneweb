@@ -242,7 +242,6 @@ let print_size_warning oc base w =
     designation base p
   in
   Warning.(
-    Printf.fprintf oc "%s" "SIZE WARNING - ";
     match w with
     | ToManyChildren (ifam, i) ->
       Printf.fprintf oc "To many children (%d) for %s\n"
