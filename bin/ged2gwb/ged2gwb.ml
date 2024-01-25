@@ -123,6 +123,34 @@ let speclist =
   ]
   |> List.sort compare |> Arg.align
 
+
+let size_warning = Geneweb.Warning.(function
+    | ToManyChildren (ifam, i) ->
+      let ifam_s = Gwdb.string_of_ifam ifam in
+      print_endline @@ "family " ^ ifam_s ^ " has " ^ string_of_int i
+    | _ -> ()
+(*    | ToManyPevents of 'person * int
+  | ToManyFevents of 'family * int
+  | ToManyPWitnesses of 'person * int
+  | ToManyFWitnesses of 'family * int
+  | PWitnessNoteSize of 'string * int * 'person * 'person
+  | FWitnessNoteSize of 'string * int * 'family * 'person
+  | ToManyChildren of 'family * int
+  | ToManyUnions of 'person * int
+  | ToManyRelated of 'person * int
+  | ToManyRparents of 'person * int
+  | ToLongFirstName of 'person * 'string * int
+  | ToLongSurname of 'person * 'string * int
+  | ToLongPublicName of 'person * 'string * int
+  | ToLongFirstNameAlias of 'person * 'string * int
+  | ToManyFirstNameAliases of 'person * int
+  | ToLongSurnameAlias of 'person * 'string * int
+  | ToManySurnameAliases of 'person * int
+  | ToLongPersonNotes of 'person * 'string * int
+  | ToLongPersonSources of 'person * 'string * int
+  | ToLongFamilyNotes of 'family * 'string * int
+      | ToLongFamilySources of 'family * 'string * int*)
+  )
 let main () =
   Arg.parse speclist anonfun errmsg;
   let state = State.make () in
@@ -139,7 +167,12 @@ let main () =
           Geneweb.Check.print_base_warning !State.log_oc base x;
           Printf.fprintf !State.log_oc "\n"
     in
-    Geneweb.Check.check_base base base_error base_warning ignore;
+    let size_warning x =
+      Geneweb.Check.print_size_warning !State.log_oc base x(*;
+      flush !State.log_oc;
+                                                             assert false)*)
+    in
+    Geneweb.Check.check_base base base_error base_warning size_warning ignore;
     flush !State.log_oc);
   if !State.log_oc != stdout then close_out !State.log_oc
 

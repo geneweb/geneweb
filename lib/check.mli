@@ -10,12 +10,16 @@ val print_base_error : out_channel -> base -> CheckItem.base_error -> unit
 val print_base_warning : out_channel -> base -> CheckItem.base_warning -> unit
 (** Print database specification warning on the giving channel *)
 
+val print_size_warning : out_channel -> base -> CheckItem.size_warning -> unit
+(** Print data size warning on the giving channel *)
+
 val check_base :
   ?verbose:bool ->
   ?mem:bool ->
   base ->
   (CheckItem.base_error -> unit) ->
   (CheckItem.base_warning -> unit) ->
+  (CheckItem.size_warning -> unit) ->
   (iper * person * Def.sex option * relation list option -> unit) ->
   unit
 (** [check_base base onwarning onerror _] makes full database proprety check. Checks every person and family separetely

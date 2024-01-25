@@ -229,6 +229,85 @@ let print_base_warning oc base (w : CheckItem.base_warning) =
   | YoungForMarriage (p, a, _) | OldForMarriage (p, a, _) ->
       Printf.fprintf oc "%s married at age %d\n" (designation base p) a.year
 
+let print_size_warning oc base w =
+  let designation_fam ifam =
+    let f = foi base ifam in
+    let fath = poi base @@ get_father f in
+    let moth = poi base @@ get_mother f in
+    Printf.sprintf "the family of %s and %s\n"
+      (designation base fath) (designation base moth)
+  in
+  let designation_per iper =
+    let p = poi base iper in
+    designation base p
+  in
+  Warning.(
+    Printf.fprintf oc "%s" "SIZE WARNING - ";
+    match w with
+    | ToManyChildren (ifam, i) ->
+      Printf.fprintf oc "To many children (%d) for %s\n"
+        i (designation_fam ifam)
+    | ToManyPevents (iper, i) ->
+      let p = poi base iper in
+      Printf.fprintf oc "To many events (%d) for the person %s\n"
+        i (designation base p);
+    | ToManyFevents (ifam, i) ->
+      Printf.fprintf oc "To many events (%d) for %s\n"
+        i (designation_fam ifam)
+    | ToManyPWitnesses (iper, i) ->
+      Printf.fprintf oc "To many wintesses (%d) in an event for %s\n" i (designation_per iper)
+    | ToManyFWitnesses (ifam, i) ->
+      Printf.fprintf oc "To many wintesses (%d) in an event for %s\n" i (designation_fam ifam)
+    | PWitnessNoteSize (istr, i, iper, iper') ->
+      Printf.fprintf oc "To long note (%d) for wintesss %s in an event for %s\n"
+        i (designation_per iper') (designation_per iper)
+    | FWitnessNoteSize (istr, i, ifam, iper) ->
+      Printf.fprintf oc "To long note (%d) for wintesss %s in an event for %s\n"
+        i (designation_per iper) (designation_fam ifam)
+   | ToManyUnions (iper, i) ->
+      Printf.fprintf oc "To many unions (%d) for %s\n"
+        i (designation_per iper)
+   | ToManyRelated (iper, i) ->
+      Printf.fprintf oc "To many related (%d) for %s\n"
+        i (designation_per iper)
+   | ToManyRparents (iper, i) ->
+     Printf.fprintf oc "To many rparents (%d) for %s\n"
+       i (designation_per iper)
+   | ToLongFirstName (iper, istr, i) ->
+     Printf.fprintf oc "To long first name (%d) for %s\n"
+       i (designation_per iper)
+   | ToLongSurname (iper, istr, i) ->
+     Printf.fprintf oc "To long surname (%d) for %s\n"
+       i (designation_per iper)
+   | ToLongPublicName (iper, istr, i) ->
+     Printf.fprintf oc "To long public name (%d) for %s\n"
+       i (designation_per iper)
+   | ToLongFirstNameAlias (iper, istr, i) ->
+     Printf.fprintf oc "To long first name alias (%d) for %s\n"
+       i (designation_per iper)
+   | ToLongSurnameAlias (iper, istr, i) ->
+     Printf.fprintf oc "To long surname alias (%d) for %s\n"
+       i (designation_per iper)
+  | ToManyFirstNameAliases (iper, i) ->
+    Printf.fprintf oc "To many first name aliases (%d) for %s\n"
+       i (designation_per iper)
+  | ToManySurnameAliases (iper, i) ->
+    Printf.fprintf oc "To many surname aliases (%d) for %s\n"
+       i (designation_per iper)
+  | ToLongPersonNotes (iper, istr, i) ->
+    Printf.fprintf oc "To long person note (%d) for %s\n%s\n"
+       i (designation_per iper) (sou base istr)
+  | ToLongPersonSources (iper, istr, i) ->
+    Printf.fprintf oc "To long person source (%d) for %s\n"
+      i (designation_per iper)
+  | ToLongFamilyNotes (ifam, istr, i) ->
+    Printf.fprintf oc "To long family note (%d) for %s\n"
+       i (designation_fam ifam)
+  | ToLongFamilySources (ifam, istr, i) ->
+    Printf.fprintf oc "To long family source (%d) for %s\n"
+       i (designation_fam ifam)
+  )
+
 type check_date =
   | CheckBefore of int
   | CheckAfter of int
@@ -289,7 +368,7 @@ let rec check_ancestors base warning year year_tab ip ini_p =
         f @@ get_mother fam
     | None -> ())
 
-let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
+let check_base ?(verbose = false) ?(mem = false) base error warning size_warning changed_p =
   if not mem then (
     Gwdb.load_persons_array base;
     Gwdb.load_ascends_array base;
@@ -307,7 +386,7 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
         let p = poi base ip in
         if Gwdb.Marker.get year_tab ip = dummy_date then
           check_ancestors base warning dummy_date year_tab ip p;
-        match CheckItem.person ~onchange:false base warning p with
+        match CheckItem.person ~onchange:false base ~size_warning warning p with
         | Some ippl -> List.iter changed_p ippl
         | None -> ())
       persons;
@@ -318,7 +397,7 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
         let p = poi base ip in
         if Gwdb.Marker.get year_tab ip = dummy_date then
           check_ancestors base warning dummy_date year_tab ip p;
-        match CheckItem.person ~onchange:false base warning p with
+        match CheckItem.person ~onchange:false base ~size_warning warning p with
         | Some ippl -> List.iter changed_p ippl
         | None -> ())
       persons;
@@ -334,13 +413,13 @@ let check_base ?(verbose = false) ?(mem = false) base error warning changed_p =
     Gwdb.Collection.iteri
       (fun i ifam ->
         ProgrBar.run i len;
-        CheckItem.family ~onchange:false base warning ifam @@ foi base ifam)
+        CheckItem.family ~onchange:false base ~size_warning warning ifam @@ foi base ifam)
       families;
     ProgrBar.finish ())
   else
     Gwdb.Collection.iter
       (fun ifam ->
-        CheckItem.family ~onchange:false base warning ifam @@ foi base ifam)
+        CheckItem.family ~onchange:false base ~size_warning warning ifam @@ foi base ifam)
       families;
   if not mem then (
     Gwdb.clear_persons_array base;
