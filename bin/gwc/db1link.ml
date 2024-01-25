@@ -134,6 +134,11 @@ let set_warning base x =
   Printf.printf "Warning: ";
   Check.print_base_warning stdout base x
 
+(** Function that will be called if base's checker will find a size warning *)
+let set_size_warning base x =
+  Printf.printf "Size Warning: ";
+  Check.print_size_warning stdout base x
+
 (** Returns person's entry from [base] at position [i] *)
 let poi base i = base.c_persons.(i)
 
@@ -1761,7 +1766,7 @@ let link ~save_mem state next_family_fun bdir =
   let base = make_base state bdir gen per_index_ic per_ic in
   Hashtbl.clear gen.g_patch_p;
   if state.do_check && gen.g_pcnt > 0 then (
-    Check.check_base base (set_error base gen) (set_warning base) ignore;
+    Check.check_base base (set_error base gen) (set_warning base) (set_size_warning base) ignore;
     if state.pr_stats then Stats.(print_stats base @@ stat_base base));
   if not gen.g_errored then (
     if state.do_consang then ignore @@ ConsangAll.compute base true;

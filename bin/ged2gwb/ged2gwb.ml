@@ -140,7 +140,8 @@ let main () =
           Printf.fprintf !State.log_oc "\n"
     in
     let size_warning x =
-      Geneweb.Check.print_size_warning !State.log_oc base x
+      Geneweb.Check.print_size_warning !State.log_oc base x;
+      Printf.fprintf !State.log_oc "\n"
     in
     Geneweb.Check.check_base base base_error base_warning size_warning ignore;
     flush !State.log_oc);
