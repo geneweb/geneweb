@@ -906,7 +906,7 @@ let changed_fevents_order warning (ifam, fam) =
     let b = List.map gen_fevent_of_fam_event b in
     warning (Warning.ChangedOrderOfFamilyEvents (ifam, b, a))
 
-module IStrCache : sig
+module IStrMarker : sig
   type t
   val empty : t
   val mark : istr -> t -> t
@@ -924,23 +924,51 @@ end = struct
     with Not_found -> false
 end
 
+module IStrCache : sig
+  type t
+  val empty : t
+  val mark_name : istr -> t -> t
+  val mark_src : istr -> t -> t
+  val mark_note : istr -> t -> t
+  val is_name_marked : istr -> t -> bool
+  val is_src_marked : istr -> t -> bool
+  val is_note_marked : istr -> t -> bool
+end = struct
+  type t = {
+    name : IStrMarker.t;
+    note : IStrMarker.t;
+    source : IStrMarker.t;
+  }
+  let empty = {
+    name = IStrMarker.empty;
+    note = IStrMarker.empty;
+    source = IStrMarker.empty
+  }
+  let mark_name istr t = {t with name = IStrMarker.mark istr t.name}
+  let mark_note istr t = {t with name = IStrMarker.mark istr t.note}
+  let mark_src istr t = {t with name = IStrMarker.mark istr t.source}
 
-let check_str_size str_cache base str_size_warning max istr =
-  if not (IStrCache.is_marked istr str_cache) then
+  let is_name_marked istr t = IStrMarker.is_marked istr t.name
+  let is_src_marked istr t = IStrMarker.is_marked istr t.source
+  let is_note_marked istr t = IStrMarker.is_marked istr t.note
+end
+
+let check_str_size is_marked mark str_cache base str_size_warning max istr =
+  if not (is_marked istr str_cache) then
     let str = Gwdb.sou base istr in
     let len = String.length str in
     if len > max then str_size_warning istr len;
-    IStrCache.mark istr str_cache
+    mark istr str_cache
   else str_cache
   
 let check_note_size str_cache base note_size_warning note =
-  check_str_size str_cache base note_size_warning 10000 note
+  check_str_size IStrCache.is_note_marked IStrCache.mark_note str_cache base note_size_warning 10000 note
 
 let check_wnote_size str_cache base note_size_warning note =
-  check_str_size str_cache base note_size_warning 800 note
+  check_str_size IStrCache.is_note_marked IStrCache.mark_note str_cache base note_size_warning 800 note
 
 let check_src_size str_cache base src_size_warning src =
-  check_str_size str_cache base src_size_warning 70 src
+  check_str_size IStrCache.is_src_marked IStrCache.mark_src str_cache base src_size_warning 700 src
 
 let check_person_note_size str_cache base size_warning person =
   check_note_size str_cache base (fun istr len ->
@@ -948,7 +976,7 @@ let check_person_note_size str_cache base size_warning person =
     ) (Gwdb.get_notes person)
 
 let check_person_source_size str_cache base size_warning person =
-  check_note_size str_cache base (fun istr len ->
+  check_src_size str_cache base (fun istr len ->
       size_warning (Warning.ToLongPersonSources (Gwdb.get_iper person, istr, len))
     ) (Gwdb.get_psources person)
 
@@ -958,12 +986,12 @@ let check_family_note_size str_cache base size_warning family =
     ) (Gwdb.get_comment family)
 
 let check_family_source_size str_cache base size_warning family =
-  check_note_size str_cache base (fun istr len ->
+  check_src_size str_cache base (fun istr len ->
       size_warning (Warning.ToLongFamilySources (Gwdb.get_ifam family, istr, len))
     ) (Gwdb.get_fsources family)
 
 let check_name_size' str_cache base name_size_warning person name =
-  check_str_size str_cache base
+  check_str_size IStrCache.is_name_marked IStrCache.mark_name str_cache base
     (fun istr len ->
        name_size_warning (Gwdb.get_iper person) istr len)
     200 name
