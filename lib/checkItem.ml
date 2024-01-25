@@ -906,97 +906,125 @@ let changed_fevents_order warning (ifam, fam) =
     let b = List.map gen_fevent_of_fam_event b in
     warning (Warning.ChangedOrderOfFamilyEvents (ifam, b, a))
 
+module IStrCache : sig
+  type t
+  val empty : t
+  val mark : istr -> t -> t
+  val is_marked : istr -> t -> bool
+end = struct
+  module IStrSet = Set.Make (struct
+      type t = Gwdb.istr
+      let compare s s' = (Obj.magic s : int) - (Obj.magic s' : int)
+    end)
+  type t = IStrSet.t
+  let empty = IStrSet.empty
+  let mark istr s = IStrSet.add istr s
+  let is_marked istr s = try
+      let _ = IStrSet.find istr s in true
+    with Not_found -> false
+end
 
 
-let check_str_size base str_size_warning max istr =
-  let str = Gwdb.sou base istr in
-  let len = String.length str in
-  if len > max then str_size_warning istr len
+let check_str_size str_cache base str_size_warning max istr =
+  if not (IStrCache.is_marked istr str_cache) then
+    let str = Gwdb.sou base istr in
+    let len = String.length str in
+    if len > max then str_size_warning istr len;
+    IStrCache.mark istr str_cache
+  else str_cache
   
-let check_note_size base note_size_warning note =
-  check_str_size base note_size_warning 800 note
-let check_src_size = check_note_size
+let check_note_size str_cache base note_size_warning note =
+  check_str_size str_cache base note_size_warning 10000 note
 
-let check_person_note_size base size_warning person =
-  check_note_size base (fun istr len ->
+let check_wnote_size str_cache base note_size_warning note =
+  check_str_size str_cache base note_size_warning 800 note
+
+let check_src_size str_cache base src_size_warning src =
+  check_str_size str_cache base src_size_warning 70 src
+
+let check_person_note_size str_cache base size_warning person =
+  check_note_size str_cache base (fun istr len ->
       size_warning (Warning.ToLongPersonNotes (Gwdb.get_iper person, istr, len))
     ) (Gwdb.get_notes person)
 
-let check_person_source_size base size_warning person =
-  check_note_size base (fun istr len ->
+let check_person_source_size str_cache base size_warning person =
+  check_note_size str_cache base (fun istr len ->
       size_warning (Warning.ToLongPersonSources (Gwdb.get_iper person, istr, len))
     ) (Gwdb.get_psources person)
 
-let check_family_note_size base size_warning family =
-  check_note_size base (fun istr len ->
+let check_family_note_size str_cache base size_warning family =
+  check_note_size str_cache base (fun istr len ->
       size_warning (Warning.ToLongFamilyNotes (Gwdb.get_ifam family, istr, len))
     ) (Gwdb.get_comment family)
 
-let check_family_source_size base size_warning family =
-  check_note_size base (fun istr len ->
+let check_family_source_size str_cache base size_warning family =
+  check_note_size str_cache base (fun istr len ->
       size_warning (Warning.ToLongFamilySources (Gwdb.get_ifam family, istr, len))
     ) (Gwdb.get_fsources family)
 
-let check_name_size' base name_size_warning person name =
-  check_str_size base
+let check_name_size' str_cache base name_size_warning person name =
+  check_str_size str_cache base
     (fun istr len ->
        name_size_warning (Gwdb.get_iper person) istr len)
-    50 name
-let check_name_size base name_size_warning person fname =
+    200 name
+
+let check_name_size str_cache base name_size_warning person fname =
   let n = fname person in
-  check_name_size' base name_size_warning person n
+  check_name_size' str_cache base name_size_warning person n
   
-let check_first_name_size base size_warning person =
+let check_first_name_size str_cache base size_warning person =
    let w = fun iper istr len ->
      size_warning (Warning.ToLongFirstName (iper, istr, len))
    in
-  check_name_size base w person Gwdb.get_first_name
+  check_name_size str_cache base w person Gwdb.get_first_name
 
-let check_surname_size base size_warning person =
+let check_surname_size str_cache base size_warning person =
    let w = fun iper istr len ->
      size_warning (Warning.ToLongSurname (iper, istr, len))
    in
-  check_name_size base w person Gwdb.get_surname
+  check_name_size str_cache base w person Gwdb.get_surname
 
-let check_public_name_size base size_warning person =
+let check_public_name_size str_cache base size_warning person =
    let w = fun iper istr len ->
      size_warning (Warning.ToLongPublicName (Gwdb.get_iper person, istr, len))
    in
-  check_name_size base w person Gwdb.get_public_name
+  check_name_size str_cache base w person Gwdb.get_public_name
 
-let check_first_names_aliases base size_warning person =
+let check_first_names_aliases str_cache base size_warning person =
    let w = fun iper istr len ->
      size_warning (Warning.ToLongFirstNameAlias (iper, istr, len))
    in
    let aliases = Gwdb.get_first_names_aliases person in
    let len = List.length aliases in
    if len > 100 then size_warning (Warning.ToManyFirstNameAliases (Gwdb.get_iper person, len));
-   List.iter (check_name_size' base w person) aliases
+   List.fold_left (fun str_cache a -> check_name_size' str_cache base w person a) str_cache aliases
 
-let check_surnames_aliases base size_warning person =
+let check_surnames_aliases str_cache base size_warning person =
    let w = fun iper istr len ->
      size_warning (Warning.ToLongSurnameAlias (iper, istr, len))
    in
    let aliases = Gwdb.get_surnames_aliases person in
    let len = List.length aliases in
    if len > 100 then size_warning (Warning.ToManySurnameAliases (Gwdb.get_iper person, len));
-   List.iter (check_name_size' base w person) aliases
+   List.fold_left (fun str_cache a -> check_name_size' str_cache base w person a) str_cache aliases
 
-let check_pers_event_witness_length base size_warning person pers_event =
+let check_pers_event_witness_length str_cache base size_warning person pers_event =
   let witnesses = Gwdb.get_pevent_witnesses_and_notes pers_event in
   let len = Array.length witnesses in
   if len > 100 then size_warning (Warning.ToManyPWitnesses (Gwdb.get_iper person, len));
-  Array.iter (fun (wiper, _wk, wnote) ->
-      check_note_size base (fun note len ->
+  Array.fold_left (fun str_cache (wiper, _wk, wnote) ->
+      check_wnote_size str_cache base (fun note len ->
           let iper = Gwdb.get_iper person in
           size_warning (Warning.PWitnessNoteSize (note, len, iper, wiper))) wnote
-    ) witnesses
+    ) str_cache witnesses
 
-let check_pers_event_length base size_warning person =
+let check_pers_event_length str_cache base size_warning person =
   let pevents = Gwdb.get_pevents person in
   let len = List.length pevents in
   if len > 100 then size_warning (Warning.ToManyPevents (Gwdb.get_iper person, len));
-  List.iter (check_pers_event_witness_length base size_warning person) pevents
+  List.fold_left (fun str_cache e ->
+      check_pers_event_witness_length str_cache base size_warning person e)
+    str_cache pevents
 
 let check_union_length size_warning person =
   let families = Gwdb.get_family person in
@@ -1013,27 +1041,28 @@ let check_rparent_length size_warning person =
   let len = List.length rparents in
   if len > 100 then size_warning (Warning.ToManyRparents (Gwdb.get_iper person, len))
   
-let check_person_names_length base size_warning person =
-  check_first_name_size base size_warning person;
-  check_first_names_aliases base size_warning person;
-  check_surnames_aliases base size_warning person;
-  ()
+let check_person_names_length str_cache base size_warning person =
+  let str_cache = check_first_name_size str_cache base size_warning person in
+  let str_cache = check_first_names_aliases str_cache base size_warning person in
+  check_surnames_aliases str_cache base size_warning person
 
-let check_fam_event_witness_length base size_warning family fam_event =
+let check_fam_event_witness_length str_cache base size_warning family fam_event =
   let witnesses = Gwdb.get_fevent_witnesses_and_notes fam_event in
   let len = Array.length witnesses in
   if len > 100 then size_warning (Warning.ToManyFWitnesses (Gwdb.get_ifam family, len));
-  Array.iter (fun (wiper, _wk, wnote) ->
-      check_note_size base (fun note len ->
+  Array.fold_left (fun str_cache (wiper, _wk, wnote) ->
+      check_wnote_size str_cache base (fun note len ->
           let ifam = Gwdb.get_ifam family in
           size_warning (Warning.FWitnessNoteSize (note, len, ifam, wiper))) wnote
-    ) witnesses
+    ) str_cache witnesses
 
-let check_fam_event_length base size_warning family =
+let check_fam_event_length str_cache base size_warning family =
   let fevents = Gwdb.get_fevents family in
   let len = List.length fevents in
   if len > 100 then size_warning (Warning.ToManyFevents (Gwdb.get_ifam family, len));
-  List.iter (check_fam_event_witness_length base size_warning family) fevents
+  List.fold_left (fun str_cache e ->
+      check_fam_event_witness_length str_cache base size_warning family e)
+    str_cache fevents
 
   
 let check_children_length size_warning family =
@@ -1042,20 +1071,20 @@ let check_children_length size_warning family =
   if len > 100 then size_warning (Warning.ToManyChildren (Gwdb.get_ifam family, len))
 
 
-let check_family_length base size_warning family =
-  check_fam_event_length base size_warning family;
+let check_family_length str_cache base size_warning family =
   check_children_length size_warning family;
-  check_family_note_size base size_warning family;
-  check_family_source_size base size_warning family
+  let str_cache = check_fam_event_length str_cache base size_warning family in
+  let str_cache = check_family_note_size str_cache base size_warning family in
+  check_family_source_size str_cache base size_warning family
 
-let check_person_length base size_warning person =
-  check_pers_event_length base size_warning person;
+let check_person_length str_cache base size_warning person =
+  let str_cache = check_pers_event_length str_cache base size_warning person in
   check_union_length size_warning person;
   check_related_length size_warning person;
   check_rparent_length size_warning person;
-  check_person_note_size base size_warning person;
-  check_person_source_size base size_warning person;
-  check_person_names_length base size_warning person
+  let str_cache = check_person_note_size str_cache base size_warning person in
+  let str_cache = check_person_source_size str_cache base size_warning person in
+  check_person_names_length str_cache base size_warning person
 
 
 (* main *)
@@ -1073,7 +1102,7 @@ let person ?(onchange = true)
   List.iter (title_dates warning p) (get_titles p);
   (* check order of personal events *)
   if onchange then changed_pevents_order warning p;
-  check_person_length base size_warning p;
+  let _ = check_person_length IStrCache.empty base size_warning p in
   related_sex_is_coherent base warning p
 
 
@@ -1091,7 +1120,7 @@ let family ?(onchange = true)
   check_parents base warning fam fath moth;
   (* check children *)
   check_children ~onchange base warning (ifam, fam) fath moth;
-  check_family_length base size_warning fam;
+  let _ = check_family_length IStrCache.empty base size_warning fam in
   if onchange then (
     changed_fevents_order warning (ifam, fam);
     let father = poi base (get_father fam) in
