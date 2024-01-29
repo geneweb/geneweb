@@ -104,7 +104,7 @@ let image_txt conf base p =
             <br>
             <center>
               <table border="0" style="height:%spx">
-                <tr align="left"><td>%s"</td></tr>
+                <tr align="left"><td>%s</td></tr>
               </table>
             </center>|}
           (string_of_int height)
