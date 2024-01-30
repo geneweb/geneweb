@@ -70,6 +70,7 @@ let speclist =
       Arg.Set State.no_negative_dates,
       "Don't interpret a year preceded by a minus sign as a negative year" );
     ("-nc", Arg.Clear State.do_check, "No consistency check");
+    ("-nbc", Arg.Clear State.check_does_not_block, "Non blocking consistency check");
     ("-nopicture", Arg.Set State.no_picture, "Don't extract individual picture.");
     ( "-udi",
       Arg.String
