@@ -250,6 +250,7 @@
     </table>
 %( Freres et soeurs complet photo (from ex-templf) %)
 %elseif;(op_m=4 and has_parents and (half_father!=0 or half_mother!=0))
+  <h2>[*half-brothers/half-sisters/half-siblings]2</h2>
   <table style="border-width:%border;;width:100%%">
     <tr>
       %foreach;parent;
