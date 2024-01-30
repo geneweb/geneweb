@@ -962,13 +962,13 @@ let check_str_size is_marked mark str_cache base str_size_warning max istr =
   else str_cache
   
 let check_note_size str_cache base note_size_warning note =
-  check_str_size IStrCache.is_note_marked IStrCache.mark_note str_cache base note_size_warning 10000 note
+  check_str_size IStrCache.is_note_marked IStrCache.mark_note str_cache base note_size_warning 100000 note
 
 let check_wnote_size str_cache base note_size_warning note =
-  check_str_size IStrCache.is_note_marked IStrCache.mark_note str_cache base note_size_warning 800 note
+  check_str_size IStrCache.is_note_marked IStrCache.mark_note str_cache base note_size_warning 5000 note
 
 let check_src_size str_cache base src_size_warning src =
-  check_str_size IStrCache.is_src_marked IStrCache.mark_src str_cache base src_size_warning 700 src
+  check_str_size IStrCache.is_src_marked IStrCache.mark_src str_cache base src_size_warning 5000 src
 
 let check_person_note_size str_cache base size_warning person =
   check_note_size str_cache base (fun istr len ->
@@ -994,7 +994,7 @@ let check_name_size' str_cache base name_size_warning person name =
   check_str_size IStrCache.is_name_marked IStrCache.mark_name str_cache base
     (fun istr len ->
        name_size_warning (Gwdb.get_iper person) istr len)
-    200 name
+    500 name
 
 let check_name_size str_cache base name_size_warning person fname =
   let n = fname person in
@@ -1039,7 +1039,7 @@ let check_surnames_aliases str_cache base size_warning person =
 let check_pers_event_witness_length str_cache base size_warning person pers_event =
   let witnesses = Gwdb.get_pevent_witnesses_and_notes pers_event in
   let len = Array.length witnesses in
-  if len > 100 then size_warning (Warning.ToManyPWitnesses (Gwdb.get_iper person, len));
+  if len > 1000 then size_warning (Warning.ToManyPWitnesses (Gwdb.get_iper person, len));
   Array.fold_left (fun str_cache (wiper, _wk, wnote) ->
       check_wnote_size str_cache base (fun note len ->
           let iper = Gwdb.get_iper person in
@@ -1049,7 +1049,7 @@ let check_pers_event_witness_length str_cache base size_warning person pers_even
 let check_pers_event_length str_cache base size_warning person =
   let pevents = Gwdb.get_pevents person in
   let len = List.length pevents in
-  if len > 100 then size_warning (Warning.ToManyPevents (Gwdb.get_iper person, len));
+  if len > 1000 then size_warning (Warning.ToManyPevents (Gwdb.get_iper person, len));
   List.fold_left (fun str_cache e ->
       check_pers_event_witness_length str_cache base size_warning person e)
     str_cache pevents
@@ -1062,7 +1062,7 @@ let check_union_length size_warning person =
 let check_related_length size_warning person =
   let related = Gwdb.get_related person in
   let len = List.length related in
-  if len > 100 then size_warning (Warning.ToManyRelated(Gwdb.get_iper person, len))
+  if len > 1000 then size_warning (Warning.ToManyRelated(Gwdb.get_iper person, len))
   
 let check_rparent_length size_warning person =
   let rparents  = Gwdb.get_rparents person in
@@ -1077,7 +1077,7 @@ let check_person_names_length str_cache base size_warning person =
 let check_fam_event_witness_length str_cache base size_warning family fam_event =
   let witnesses = Gwdb.get_fevent_witnesses_and_notes fam_event in
   let len = Array.length witnesses in
-  if len > 100 then size_warning (Warning.ToManyFWitnesses (Gwdb.get_ifam family, len));
+  if len > 1000 then size_warning (Warning.ToManyFWitnesses (Gwdb.get_ifam family, len));
   Array.fold_left (fun str_cache (wiper, _wk, wnote) ->
       check_wnote_size str_cache base (fun note len ->
           let ifam = Gwdb.get_ifam family in
@@ -1087,7 +1087,7 @@ let check_fam_event_witness_length str_cache base size_warning family fam_event 
 let check_fam_event_length str_cache base size_warning family =
   let fevents = Gwdb.get_fevents family in
   let len = List.length fevents in
-  if len > 100 then size_warning (Warning.ToManyFevents (Gwdb.get_ifam family, len));
+  if len > 1000 then size_warning (Warning.ToManyFevents (Gwdb.get_ifam family, len));
   List.fold_left (fun str_cache e ->
       check_fam_event_witness_length str_cache base size_warning family e)
     str_cache fevents
