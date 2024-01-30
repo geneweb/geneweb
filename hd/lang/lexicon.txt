@@ -5046,10 +5046,10 @@ en: a %sgreat-great-granduncle/a %sgreat-great-grandaunt
 fr: un %sarrière-arrière-grand-oncle/une %sarrière-arrière-grande-tante
 
     cousin.5.2
-fr: une %sarrière-arrière-grand-cousin/une %sarrière-arrière-grande-cousine
+fr: un %sarrière-arrière-grand-cousin/une %sarrière-arrière-grande-cousine
 
     cousin.5.3
-fr: une %sarrière-grand-cousin 2<sup>e</sup>/une %sarrière-grande-cousine 2<sup>e</sup>
+fr: un %sarrière-grand-cousin 2<sup>e</sup>/une %sarrière-grande-cousine 2<sup>e</sup>
 
     cousin.5.4
 fr: un %sgrand-cousin au 3<sup>e</sup> degré/une %sgrande-cousine au 3<sup>e</sup> degré
