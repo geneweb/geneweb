@@ -124,11 +124,14 @@ let speclist =
   ]
   |> List.sort compare |> Arg.align
 
+exception ToManyWarnings
+
 let main () =
   Arg.parse speclist anonfun errmsg;
   let state = State.make () in
   let base = make_base state in
   warning_month_number_dates ();
+  let size_ws = ref [] in
   if !State.do_check then (
     let base_error x =
       Geneweb.Check.print_base_error !State.log_oc base x;
@@ -142,11 +145,25 @@ let main () =
     in
     let size_warning x =
       Geneweb.Check.print_size_warning !State.log_oc base x;
+      size_ws := x :: !size_ws;
       Printf.fprintf !State.log_oc "\n"
     in
     Geneweb.Check.check_base base base_error base_warning size_warning ignore;
     flush !State.log_oc);
-  if !State.log_oc != stdout then close_out !State.log_oc
+  if !State.log_oc != stdout then close_out !State.log_oc;
+  let rec check_size_warnings = Geneweb.Warning.(function
+      | ToManyChildren _ :: _
+      | ToManyPevents _ :: _
+      | ToManyFevents _ :: _
+      | ToManyPWitnesses _ :: _
+      | ToManyFWitnesses _ :: _
+      | ToManyRelated _ :: _
+      | ToManyRparents _ :: _
+      | ToManyUnions _ :: _ -> raise ToManyWarnings
+      | _w :: ws -> check_size_warnings ws
+      | _ -> ())
+  in
+  if not !State.check_does_not_block then check_size_warnings !size_ws
 
 let () =
   try main ()
