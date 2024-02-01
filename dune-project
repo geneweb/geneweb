@@ -1,4 +1,4 @@
-(lang dune 2.8)
+(lang dune 2.9)
 
 (name geneweb)
 
@@ -26,13 +26,12 @@
     (camlp5 (>= "8.00.01"))
     camlp-streams
     cppo
-    (dune (>= "2.9.0"))
     (fmt :with-test)
     jingoo
     markup
     num
     (ocaml (>= 4.08))
-    odoc
+    (ocamlformat (and :dev (= 0.24.1)))
     ounit
     ppx_blob
     ppx_deriving

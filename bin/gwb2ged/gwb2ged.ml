@@ -12,4 +12,4 @@ let main () =
   let select = Gwexport.select opts [] in
   Gwb2gedLib.gwb2ged !with_indexes opts select
 
-let _ = Printexc.catch main ()
+let _ = main ()
