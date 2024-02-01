@@ -313,7 +313,7 @@
                 <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">&nbsp;</span>
               %end;
               <div class="ml-2 align-self-center">%nn;
-                %apply;short_display_person_tree("witness")%if;(witness_kind!="") (%witness_kind;)%end;
+                %apply;short_display_person_tree("witness")%if;(witness_kind!="") (%witness_kind;)%end;<br>
               </div>
             </div>
            %end;
