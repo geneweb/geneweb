@@ -124,7 +124,7 @@ let speclist =
   ]
   |> List.sort compare |> Arg.align
 
-exception ToManyWarnings
+exception ToManySizeWarnings
 
 let main () =
   Arg.parse speclist anonfun errmsg;
@@ -159,7 +159,7 @@ let main () =
       | ToManyFWitnesses _ :: _
       | ToManyRelated _ :: _
       | ToManyRparents _ :: _
-      | ToManyUnions _ :: _ -> raise ToManyWarnings
+      | ToManyUnions _ :: _ -> raise ToManySizeWarnings
       | _w :: ws -> check_size_warnings ws
       | _ -> ())
   in
@@ -167,7 +167,15 @@ let main () =
 
 let () =
   try main ()
-  with e ->
+  with
+  | ToManySizeWarnings ->
+    Printf.fprintf !State.log_oc "Uncaught exception: %s\n"
+      (Printexc.to_string ToManySizeWarnings);
+    if !State.log_oc != stdout then close_out !State.log_oc;
+    let state = State.make () in
+    let _ = make_empty_base state in
+    exit 2
+  | e ->
     let e = match e with Ploc.Exc (_, e) -> e | _ -> e in
     Printf.fprintf !State.log_oc "Uncaught exception: %s\n"
       (Printexc.to_string e);

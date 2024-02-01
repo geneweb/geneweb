@@ -3189,3 +3189,16 @@ let make_base state' =
   let arrays = make_subarrays arrays in
   finish_base arrays ;
   Gwdb.make !state.out_file !state.particles arrays
+
+let make_empty_base state' =
+  let empty_base_notes = {
+    nread = (fun _ _ -> "");
+    norigin_file = "";
+    efiles = (fun _ -> []);
+  }
+  in
+  state := state';
+  Secure.set_base_dir (Filename.dirname !state.out_file);
+  let arrays = ([||], [||], [||]), ([||], [||], [||]), [||], empty_base_notes in
+  Gwdb.make !state.out_file !state.particles arrays
+
