@@ -159,7 +159,10 @@ let main () =
       | ToManyFWitnesses _ :: _
       | ToManyRelated _ :: _
       | ToManyRparents _ :: _
-      | ToManyUnions _ :: _ -> raise ToManySizeWarnings
+      | ToManyUnions _ :: _ ->
+        Gwdb.close_base base;
+        let _ = make_empty_base state in
+        raise ToManySizeWarnings
       | _w :: ws -> check_size_warnings ws
       | _ -> ())
   in
@@ -168,13 +171,13 @@ let main () =
 let () =
   try main ()
   with
-  | ToManySizeWarnings ->
+(*  | ToManySizeWarnings ->
     Printf.fprintf !State.log_oc "Uncaught exception: %s\n"
       (Printexc.to_string ToManySizeWarnings);
     if !State.log_oc != stdout then close_out !State.log_oc;
     let state = State.make () in
     let _ = make_empty_base state in
-    exit 2
+    exit 2*)
   | e ->
     let e = match e with Ploc.Exc (_, e) -> e | _ -> e in
     Printf.fprintf !State.log_oc "Uncaught exception: %s\n"
