@@ -19,6 +19,9 @@ let default_source = ref ""
 (** Base consistency check *)
 let do_check = ref true
 
+(** Base size consistency check *)
+let do_check_size = ref true
+
 (** Compute consanguinity *)
 let do_consang = ref false
 
@@ -44,6 +47,7 @@ let make_state () =
       line_cnt = !line_cnt;
       default_source = !default_source;
       do_check = !do_check;
+      do_check_size = !do_check_size;
       do_consang = !do_consang;
       pr_stats = !pr_stats;
       particules_file = !particules_file;
@@ -66,6 +70,7 @@ let speclist =
     ("-f", Arg.Set force, " Remove database if already existing");
     ("-mem", Arg.Set save_mem, " Save memory, but slower");
     ("-nc", Arg.Clear do_check, " No consistency check");
+    ("-nsc", Arg.Clear do_check, " No size check");
     ("-nofail", Arg.Set no_fail, " No failure in case of error");
     ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database");
     ("-nopicture", Arg.Set no_picture, " Do not create associative pictures");

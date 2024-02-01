@@ -1698,6 +1698,32 @@ let output_command_line bdir =
   Printf.fprintf oc "\n";
   close_out oc
 
+exception ToManySizeWarnings
+
+let rec check_size_warnings = Warning.(function
+    | ToManyChildren _ :: _
+    | ToManyPevents _ :: _
+    | ToManyFevents _ :: _
+    | ToManyPWitnesses _ :: _
+    | ToManyFWitnesses _ :: _
+    | ToManyRelated _ :: _
+    | ToManyRparents _ :: _
+    | ToManyUnions _ :: _ ->
+      raise ToManySizeWarnings
+    | _w :: ws -> check_size_warnings ws
+    | _ -> ())
+
+let make_empty_base (state : State.t) =
+  let empty_base_notes = {
+    nread = (fun _ _ -> "");
+    norigin_file = "";
+    efiles = (fun _ -> []);
+  }
+  in
+  Secure.set_base_dir (Filename.dirname state.out_file);
+  let arrays = ([||], [||], [||]), ([||], [||], [||]), [||], empty_base_notes in
+  Gwdb.make state.out_file [] arrays
+
 (** Link .gwo files and create a database. *)
 let link ~save_mem state next_family_fun bdir =
   let tmp_dir = Filename.concat "gw_tmp" bdir in
@@ -1766,8 +1792,20 @@ let link ~save_mem state next_family_fun bdir =
   let base = make_base state bdir gen per_index_ic per_ic in
   Hashtbl.clear gen.g_patch_p;
   if state.do_check && gen.g_pcnt > 0 then (
-    Check.check_base base (set_error base gen) (set_warning base) (set_size_warning base) ignore;
-    if state.pr_stats then Stats.(print_stats base @@ stat_base base));
+    let set_size_warning = if state.do_check_size then
+        set_size_warning base
+      else ignore
+    in
+    Check.check_base base (set_error base gen) (set_warning base) set_size_warning ignore;
+    if state.pr_stats then Stats.(print_stats base @@ stat_base base))
+  else if state.do_check_size then (
+    let warnings = Check.check_size_base base (set_size_warning base) in
+    try check_size_warnings warnings
+    with ToManySizeWarnings ->
+      Gwdb.close_base base;
+      let _ = make_empty_base state in
+      exit 2
+  );
   if not gen.g_errored then (
     if state.do_consang then ignore @@ ConsangAll.compute base true;
     Gwdb.sync ~save_mem base;

@@ -18,6 +18,7 @@ type t = {
   default_source : string;
       (** Default source field for persons and families without source data *)
   do_check : bool;  (** Base consistency check *)
+  do_check_size : bool; (** Base data size check *)
   do_consang : bool;  (** Compute consanguinity *)
   pr_stats : bool;  (** Print base's statistics *)
   particules_file : string;  (** File containing the particles to use *)
@@ -39,6 +40,7 @@ let default =
     line_cnt = 0;
     default_source = "";
     do_check = true;
+    do_check_size = true;
     do_consang = false;
     pr_stats = false;
     particules_file = "";
