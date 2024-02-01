@@ -53,7 +53,7 @@ type t = {
   relation_status : Def.relation_kind;
   no_picture : bool;
   do_check : bool;
-  check_does_not_block : bool;
+  do_size_check : bool;
   particles : string list;
   in_file : string;
   out_file : string;
@@ -85,7 +85,7 @@ let default_source = ref ""
 let relation_status = ref Married
 let no_picture = ref false
 let do_check = ref true
-let check_does_not_block = ref false
+let do_size_check = ref true
 let particles = ref Mutil.default_particles
 let in_file = ref ""
 let out_file = ref "a"
@@ -119,7 +119,7 @@ let make () =
       relation_status = !relation_status;
       no_picture = !no_picture;
       do_check = !do_check;
-      check_does_not_block = !check_does_not_block;
+      do_size_check = !do_size_check;
       particles = !particles;
       in_file = !in_file;
       out_file = !out_file;

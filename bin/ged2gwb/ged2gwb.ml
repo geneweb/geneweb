@@ -70,7 +70,7 @@ let speclist =
       Arg.Set State.no_negative_dates,
       "Don't interpret a year preceded by a minus sign as a negative year" );
     ("-nc", Arg.Clear State.do_check, "No consistency check");
-    ("-nbc", Arg.Set State.check_does_not_block, "Non blocking consistency check");
+    ("-nsc", Arg.Clear State.do_size_check, "No data size check");
     ("-nopicture", Arg.Set State.no_picture, "Don't extract individual picture.");
     ( "-udi",
       Arg.String
@@ -143,10 +143,11 @@ let main () =
           Geneweb.Check.print_base_warning !State.log_oc base x;
           Printf.fprintf !State.log_oc "\n"
     in
-    let size_warning x =
-      Geneweb.Check.print_size_warning !State.log_oc base x;
-      size_ws := x :: !size_ws;
-      Printf.fprintf !State.log_oc "\n"
+    let size_warning = if !State.do_size_check then fun x ->
+        Geneweb.Check.print_size_warning !State.log_oc base x;
+        size_ws := x :: !size_ws;
+        Printf.fprintf !State.log_oc "\n"
+      else ignore
     in
     Geneweb.Check.check_base base base_error base_warning size_warning ignore;
     flush !State.log_oc);
@@ -166,7 +167,16 @@ let main () =
       | _w :: ws -> check_size_warnings ws
       | _ -> ())
   in
-  if not !State.check_does_not_block then check_size_warnings !size_ws
+  if !State.do_size_check then
+    if !State.do_check then
+      check_size_warnings !size_ws
+    else
+      let size_warning x =
+        Geneweb.Check.print_size_warning !State.log_oc base x;
+        Printf.fprintf !State.log_oc "\n"
+      in
+      let ws = Geneweb.Check.check_size_base base size_warning in
+      check_size_warnings ws
 
 let () =
   try main ()

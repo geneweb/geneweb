@@ -1117,6 +1117,14 @@ let check_person_length str_cache base size_warning person =
 
 (* main *)
 
+let person_size base size_warning p =
+  let _ = check_person_length IStrCache.empty base size_warning p in
+  ()
+
+let family_size base size_warning f =
+  let _ = check_family_length IStrCache.empty base size_warning f in
+  ()
+  
 let person ?(onchange = true)
     base
     ?(size_warning : size_warning -> unit = fun _ -> ())
@@ -1130,7 +1138,7 @@ let person ?(onchange = true)
   List.iter (title_dates warning p) (get_titles p);
   (* check order of personal events *)
   if onchange then changed_pevents_order warning p;
-  let _ = check_person_length IStrCache.empty base size_warning p in
+  person_size base size_warning p;
   related_sex_is_coherent base warning p
 
 
@@ -1148,7 +1156,7 @@ let family ?(onchange = true)
   check_parents base warning fam fath moth;
   (* check children *)
   check_children ~onchange base warning (ifam, fam) fath moth;
-  let _ = check_family_length IStrCache.empty base size_warning fam in
+  family_size base size_warning fam;
   if onchange then (
     changed_fevents_order warning (ifam, fam);
     let father = poi base (get_father fam) in

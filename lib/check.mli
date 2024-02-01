@@ -13,6 +13,13 @@ val print_base_warning : out_channel -> base -> CheckItem.base_warning -> unit
 val print_size_warning : out_channel -> base -> CheckItem.size_warning -> unit
 (** Print data size warning on the giving channel *)
 
+val check_size_base :
+  ?verbose:bool ->
+  ?mem:bool ->
+  base ->
+  (CheckItem.size_warning -> unit) ->
+  CheckItem.size_warning list
+  
 val check_base :
   ?verbose:bool ->
   ?mem:bool ->

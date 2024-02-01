@@ -33,6 +33,18 @@ val check_siblings :
     Checks birth date consistency between siblings.
     Also calls [callback] with each child. *)
 
+val person_size :
+  base ->
+  (size_warning -> unit) ->
+  person ->
+  unit
+
+val family_size :
+  base ->
+  (size_warning -> unit) ->
+  family ->
+  unit
+
 val person :
   ?onchange:bool ->
   base ->

@@ -367,6 +367,49 @@ let rec check_ancestors base warning year year_tab ip ini_p =
         f @@ get_mother fam
     | None -> ())
 
+let check_size_base ?(verbose = false) ?(mem = false) base size_warning =
+  if not mem then (
+    Gwdb.load_persons_array base;
+    Gwdb.load_unions_array base;
+    Gwdb.load_couples_array base);
+  let persons = Gwdb.ipers base in
+  let len = Gwdb.Collection.length persons in
+  let warnings = ref [] in
+  let size_warning x =
+    size_warning x;
+    warnings := x :: !warnings
+  in
+  if verbose then (
+    Printf.eprintf "check persons size\n";
+    ProgrBar.start ());
+  Gwdb.Collection.iteri
+    (fun i ip ->
+       if verbose then ProgrBar.run i len;
+       let p = poi base ip in
+       CheckItem.person_size base size_warning p
+    ) persons;
+  if verbose then ProgrBar.finish ();
+  if not mem then (
+    Gwdb.clear_unions_array base;
+    Gwdb.load_families_array base;
+    Gwdb.load_descends_array base);
+  let families = Gwdb.ifams base in
+  let len = Gwdb.Collection.length families in
+  if verbose then (
+    Printf.eprintf "check families\n";
+    ProgrBar.start ());
+  Gwdb.Collection.iteri
+    (fun i ifam ->
+       if verbose then ProgrBar.run i len;
+       let fam = foi base ifam in
+       CheckItem.family_size base size_warning fam)
+    families;
+  if verbose then ProgrBar.finish ();
+  if not mem then (
+    Gwdb.clear_persons_array base;
+    Gwdb.clear_families_array base);
+  !warnings
+
 let check_base ?(verbose = false) ?(mem = false) base error warning size_warning changed_p =
   if not mem then (
     Gwdb.load_persons_array base;
