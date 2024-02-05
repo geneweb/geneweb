@@ -28,7 +28,7 @@ let translate_in_your_tree conf ini nb =
     if ini = "" then
       Printf.sprintf "%d %s" nb iyt
     else
-      let ini = Adef.as_string @@ Mutil.encode ini in
+      let ini = Mutil.decode (Adef.encoded ini) in
       Printf.sprintf (ftransl conf "%d %s starting with %s") nb iyt ini
   in
   Utf8.capitalize_fst result
