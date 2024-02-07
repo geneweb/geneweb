@@ -40,28 +40,30 @@
 </ul>
 </div>
 %if;(e.pdf!="on")
-  <div id="buttons" class="noprint">
-  <span id="b-home" class="button" title="Accueil"><i class="fa fa-house fa-fw"></i></span>
-  <span id="b-refresh" class="button" title="Ajuster à la fenêtre"><i class="fa fa-arrow-rotate-right fa-fw"></i></span>
-  <span id="b-zoom-in" class="button" title="Zoomer"><i class="fa fa-magnifying-glass-plus fa-fw"></i></span>
-  <span id="b-zoom-out" class="button" title="Dézoomer"><i class="fa fa-magnifying-glass-minus fa-fw"></i></span>
-  <span id="b-gen-add" class="button%if;(evar.v >= 10) disabled%end;" title="Ajouter une génération"><i class="fa fa-plus fa-fw"></i></span>
-  <span id="b-gen-del" class="button%if;(evar.v <= 1) disabled%end;" title="Supprimer une génération"><i class="fa fa-minus fa-fw"></i></span>
-  %if;(evar.implex = "")
-  <span id="b-implex" class="button" title="Développer les implexes"><i class="far fa-comment-dots fa-fw"></i></span>
-  %else;
-  <span id="b-implex" class="button" title="Réduire les implexes"><i class="fa fa-comment-slash fa-fw"></i></span>
-  %end;
-  <span id="b-places-hl" class="button" title="Activer la mise en évidence des lieux"><i class="fa fa-earth-americas fa-fw"></i></span>
-  <span id="b-places-colorise" class="button" title="Activer la colorisation globale des lieux"><i class="fa fa-paintbrush fa-fw"></i></span>
-  <input type="checkbox" id="bi" title="N"><label for="bi">N</label>
+  <div id="buttons" class="btn-group" role="group" aria-label="button group">
+  <button id="b-home" class="button btn btn-lg" title="Accueil" tabindex="0"><i class="fa fa-house fa-fw"></i></button>
+  <button id="b-refresh" class="button btn btn-lg" title="Ajuster à la fenêtre" tabindex="1"><i class="fa fa-arrow-rotate-right fa-fw"></i></button>
+  <br>
+  <button id="b-zoom-in" class="button btn btn-lg mt-1" title="Zoomer" tabindex="2"><i class="fa fa-magnifying-glass-plus fa-fw"></i></button>
+  <button id="b-zoom-out" class="button btn btn-lg" title="Dézoomer" tabindex="3"><i class="fa fa-magnifying-glass-minus fa-fw"></i></button>
+  <br>
+  <button id="b-gen-add" class="button btn%if;(evar.v >= 10) disabled%end;" title="Ajouter une génération" tabindex="4"><i class="fa fa-plus fa-fw"></i></button>
+  <button id="b-gen-del" class="button btn%if;(evar.v <= 1) disabled%end;" title="Supprimer une génération" tabindex="5"><i class="fa fa-minus fa-fw"></i></button>
+    <br>
+  <button id="b-implex" class="button btn btn-lg" title="%if;(e.implex="")Développer%else;Réduire%end; les implexes" tabindex="6"><i class="fa fa-comment-%if;(e.implex="")dots%else;slash%end; fa-fw"></i></button>
+  <button id="b-places-hl" class="button btn btn-lg" title="Activer la mise en évidence des lieux" tabindex="7"><i class="fa fa-earth-americas fa-fw"></i></button>
+    <br>
+  <button id="b-places-colorise" class="button btn btn-lg" title="Activer la colorisation globale des lieux" tabindex="8"><i class="fa fa-paintbrush fa-fw"></i></button>
+  <input type="checkbox" id="bi" title="N" tabindex="9"><label for="bi">N</label>
   <input type="checkbox" id="ba" title="B"><label for="ba">B</label>
-  <input type="checkbox" id="ma" title="M"><label for="ma">M</label>
+  <input type="checkbox" id="ma" title="M" tabindex="10"><label for="ma">M</label>
   <input type="checkbox" id="de" title="D"><label for="de">D</label>
-  <input type="checkbox" id="bu" title="S"><label for="bu">S</label>
-  <span id="b-death-age" class="button" title="Activer la colorisation de l'âge de décès"><i class="fa fa-cross fa-fw"></i></span>
-  <span id="b-no-tool" class="button" title="Désactiver les outils"><i class="fa fa-power-off fa-fw"></i></span>
-  <span id="b-no-buttons" class="button" title="Désactiver les boutons"><i class="fa fa-file-pdf fa-fw"></i></span>
+  <input type="checkbox" id="bu" title="S" tabindex="11"><label for="bu">S</label>
+  <br>
+  <button id="b-death-age" class="button btn btn-lg" title="Activer la colorisation de l'âge de décès" tabindex="12"><i class="fa fa-cross fa-fw"></i></button>
+  <button id="b-no-tool" class="button btn btn-lg" title="Désactiver les outils" tabindex="13"><i class="fa fa-power-off fa-fw"></i></button>
+  <br>
+  <button id="b-no-buttons" class="button" title="Masquer tous les boutons" tabindex="14"><i class="fa fa-minus fa-fw"></i></button>
   </div>
 %end;
 <svg id="fanchart" class="bi ba ma de bu%if;(evar.mono = "on") mono%end;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
