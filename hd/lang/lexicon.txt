@@ -16521,38 +16521,38 @@ sl: tekst
 sv: text
 tr: metin
 
-    the %d first names
-af: die %d voorname
-bg: %d собствени имена
-br: ar %d raganv
-ca: els %d noms
-co: %d nomi
-cs: %d křestních jmen
-da: de %d fornavne
-de: %d Vornamen
-en: %d first names
-eo: la %d unuaj nomoj
-es: los %d nombres
-et: %d eesnime
-fi: %d etunimeä
-fr: %d prénoms
-he: %d שמות הפרטיים
-is: %d fyrstu fornöfnin
-it: i %d nomi
-lt: %d vardai
-lv: %d personvārdi
-nl: de %d voornamen
-no: de %d fornavnene
-oc: los %d prenoms
-pl: %d imion
-pt: os %d nomes
-pt-br: os %d prenomes
-ro: %d prenume
-ru: %d имён
-sk: %d mien
-sl: %d lastnih imen
-sv: de %d förnamnen
-tr: %d ilk ad
+    the %s first names
+af: die %s voorname
+bg: %s собствени имена
+br: ar %s raganv
+ca: els %s noms
+co: %s nomi
+cs: %s křestních jmen
+da: de %s fornavne
+de: %s Vornamen
+en: %s first names
+eo: la %s unuaj nomoj
+es: los %s nombres
+et: %s eesnime
+fi: %s etunimeä
+fr: %s prénoms
+he: %s שמות הפרטיים
+is: %s fyrstu fornöfnin
+it: i %s nomi
+lt: %s vardai
+lv: %s personvārdi
+nl: de %s voornamen
+no: de %s fornavnene
+oc: los %s prenoms
+pl: %s imion
+pt: os %s nomes
+pt-br: os %s prenomes
+ro: %s prenume
+ru: %s имён
+sk: %s mien
+sl: %s lastnih imen
+sv: de %s förnamnen
+tr: %s ilk ad
 
     the %d oldest couples perhaps still alive and engaged
 af: die %d oudste pare moontlik nog in lewe en verloof
@@ -16618,38 +16618,38 @@ sl: %d najstarejših, morda še živečih
 sv: de %d äldsta personerna som kanske lever
 tr: %d en yaşlı, belki hala yaşıyor
 
-    the %d surnames
-af: die %d vanne
-bg: %d фамилни имена
-br: ar %d anv-familh
-ca: els %d cognoms
-co: %d casate
-cs: %d příjmení
-da: de %d efternavne
-de: %d Nachnamen
-en: %d surnames
-eo: la %d familiaj nomoj
-es: los %d apellidos
-et: %d perekonnanime
-fi: %d sukunimeä
-fr: %d patronymes
-he: %d שמות המשפחה
-is: %d fyrstu eftirnöfnin
-it: i %d cognomi
-lt: %d pavardės
-lv: %d uzvārdi
-nl: de %d familienamen
-no: de %d etternavnene
-oc: los %d noms de familha
-pl: %d nazwisk
-pt: os %d apelidos
-pt-br: os %d sobrenomes
-ro: %d nume de familie
-ru: %d фамилий
-sk: %d priezvísk
-sl: %d priimkov
-sv: de %d efternamnen
-tr: %d soyadı
+    the %s surnames
+af: die %s vanne
+bg: %s фамилни имена
+br: ar %s anv-familh
+ca: els %s cognoms
+co: %s casate
+cs: %s příjmení
+da: de %s efternavne
+de: %s Nachnamen
+en: %s surnames
+eo: la %s familiaj nomoj
+es: los %s apellidos
+et: %s perekonnanime
+fi: %s sukunimeä
+fr: %s patronymes
+he: %s שמות המשפחה
+is: %s fyrstu eftirnöfnin
+it: i %s cognomi
+lt: %s pavardės
+lv: %s uzvārdi
+nl: de %s familienamen
+no: de %s etternavnene
+oc: los %s noms de familha
+pl: %s nazwisk
+pt: os %s apelidos
+pt-br: os %s sobrenomes
+ro: %s nume de familie
+ru: %s фамилий
+sk: %s priezvísk
+sl: %s priimkov
+sv: de %s efternamnen
+tr: %s soyadı
 
     the %d who lived the longest
 af: die %d wat die langste gelewe het
