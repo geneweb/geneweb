@@ -1138,6 +1138,10 @@ let make_conf from_addr request script_name env =
     let df_opt = Option.map dates_format_of_string df_opt in
     Option.value ~default:Config.DMY df_opt
   in
+  let default_contemporary_private_years =
+    try int_of_string (List.assoc "default_contemporary_private_years" base_env)
+    with _ -> 100
+  in
   let conf =
     {from = from_addr;
      api_mode = false;
@@ -1182,6 +1186,7 @@ let make_conf from_addr request script_name env =
        begin try int_of_string (List.assoc "private_years" base_env) with
          Not_found | Failure _ -> 150
        end;
+     default_contemporary_private_years;
      hide_private_names =
        begin try List.assoc "hide_private_names" base_env = "yes" with
          Not_found -> false

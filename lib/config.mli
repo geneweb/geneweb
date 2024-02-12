@@ -71,6 +71,7 @@ type config = {
   mutable setup_link : bool;
   access_by_key : bool;
   private_years : int;
+  default_contemporary_private_years : int;
   hide_private_names : bool;
   use_restrict : bool;
   no_image : bool;
