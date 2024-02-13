@@ -43,7 +43,7 @@
   
   <div class="d-flex pl-0 pr-0 %if;(e.im!=0)py-0%end; w-100 justify-content-start list-group-item list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; ">
     %if;(not (cancel_links or xxx.is_restricted))
-      <a href="%xxx.bname_prefix;%xxx.access;&m=F%if;(e.sp=0)&sp=0%end;%if;(e.half=0)&half=0%end;%if;(e.im=0)&im=0%end;"
+      <a href="%prefix;%xxx.access;&m=F%if;(e.sp=0)&sp=0%end;%if;(e.half=0)&half=0%end;%if;(e.im=0)&im=0%end;"
         class="big_anchor list-group-item-action" title="[*navigation] %xxx;%personinfo;">
       </a>
     %end;
@@ -58,7 +58,7 @@
         %if;not cancel_links;</a>%end;
       %elseif;(b.default_image="yes")
         %if;(wizard and not cancel_links)
-          <a href="%xxx.bname_prefix;m=SND_IMAGE;i=%xxx.index;"
+          <a href="%prefix;m=SND_IMAGE;i=%xxx.index;"
             class="normal_anchor" target="_blank" %nn;
             title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;%personinfo;">%nn;
         %end;
@@ -146,7 +146,7 @@
             %if;(ancestor.anc_sosa.v=11 or ancestor.anc_sosa.v=15)border-left-0%end;">%nn;
             %if;(not ancestor.is_restricted)
               <a class="big_anchor list-group-item-action rounded-%if;ancestor.is_male;left%else;right%end;" 
-                href="%ancestor.bname_prefix;%ancestor.access;&m=F"
+                href="%prefix;%ancestor.access;&m=F"
                 title="[*navigation] %ancestor;
                        &#010;%apply;a_of_b%with;[*n° Sosa] %ancestor.anc_sosa.v;%and;%if;("vv"="spouse")%spouse;%else;%self;%end;%end;
                        %if;(ancestor.has_sosa and self!=sosa_ref)

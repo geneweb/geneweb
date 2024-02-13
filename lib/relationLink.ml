@@ -715,7 +715,9 @@ let print_relation_no_dag conf base po ip1 ip2 =
         }
       in
       print_relation_ok conf base info
-  | _ -> Hutil.incorrect_request conf
+  | _ ->
+      Hutil.incorrect_request conf
+        ~comment:"relationLink: print_relation_no_dag failed"
 
 let print_relation_dag conf base a ip1 ip2 l1 l2 =
   let ia = get_iper a in
@@ -769,7 +771,9 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
     in
     DagDisplay.make_and_print_dag conf base elem_txt vbar_txt invert set spl
       page_title (Adef.escaped "")
-  with Exit -> Hutil.incorrect_request conf
+  with Exit ->
+    Hutil.incorrect_request conf
+      ~comment:"relationLink: print_relation_dag failed"
 
 let int_list s =
   let rec loop i n =
@@ -796,4 +800,4 @@ let print conf base =
     (find_person_in_env conf base "1", find_person_in_env conf base "2")
   with
   | Some p1, Some p2 -> print_relation conf base p1 p2
-  | _ -> Hutil.incorrect_request conf
+  | _ -> Hutil.incorrect_request conf ~comment:"relationLink: p1, p2 missing"
