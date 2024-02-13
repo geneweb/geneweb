@@ -41,7 +41,7 @@ ar: af=أفريقيا/ar=العربية/bg=بلغاريا/br=بريتانيا/ca
 bg: af=бурски/ar=арабски/bg=български/br=бретонски/ca=каталонски/co=корсикан/cs=чешки/da=датски/de=немски/en=английски/eo=есперанто/es=испански/et=естонски/fi=финландски/fr=френски/he=иврит/is=исландски/it=италиански/lt=литовски/lv=латвийски/nl=холандски/no=норвежки/oc=окситански/pl=полски/pt=португалски/pt-br=бразилско-португалски/ro=румънски/ru=руски/sk=Словашки език/sl=словенски/sv=шведски/tr=турски/zh=китайски
 br: af=afrikaaneg/ar=arabeg/bg=bulgareg/br=brezhoneg/ca=katalaneg/co=korseg/cs=tchekeg/da=daneg/de=alamaneg/en=saozneg/eo=esperanteg/es=spagnoleg/et=estonieg/fi=finneg/fr=galleg/he=hebreeg/is=islandeg/it=italianeg/lt=lituwaneg/lv=letoneg/nl=izelvroeg/no=norvegieg/oc=okitaneg/pl=poloneg/pt=portugaleg/pt-br=portugaleg bro-Vrazil/ro=roumaneg/ru=rusianeg/sk=Slovakeg/sl=sloveneg/sv=svedeg/tr=turc/zh=sinaeg
 ca: af=africà/ar=àrab/bg=búlgar/br=bretó/ca=català/co=cors/cs=xec/da=danès/de=alemany/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lt=lituà/lv=letó/nl=holandès/no=norueg/oc=occità/pl=polac/pt=portuguès/pt-br=brasiler/ro=romanès/ru=rus/sk=Eslovac/sl=eslovè/sv=suec/tr=turc/zh=Xinès
-co: af=africaanu/ar=arabu/bg=bulgaru/br=brittonu/ca=catalanu/co=corsu/cs=ceccu/da=danese/de=tedescu/en=inglese/eo=esperanto/es=spagnolu/et=estone/fi=finlandese/fr=francese/he=ebreu/is=islandese/it=talianu/lt=lituano/lv=lettone/nl=neerlandese/no=nurvegese/oc=uccitanu/pl=pulunese/pt=purtughese/pt-br=purtughese brasilianu/ro=rumenu/ru=russiu/sk=sluvaccu/sl=sluvenu/sv=svedese/tr=turcu/zh=chinese
+co: af=africaanu/ar=arabu/bg=bulgaru/br=brittonu/ca=catalanu/co=corsu/cs=ceccu/da=danese/de=tedescu/en=inglese/eo=esperanto/es=spagnolu/et=estone/fi=finlandese/fr=francese/he=ebreu/is=islandese/it=talianu/lt=lituanu/lv=lettone/nl=neerlandese/no=nurvegese/oc=uccitanu/pl=pulunese/pt=purtughese/pt-br=purtughese brasilianu/ro=rumenu/ru=russiu/sk=sluvaccu/sl=sluvenu/sv=svedese/tr=turcu/zh=chinese
 cs: af=afrikánština/ar=anabština/bg=bulharština/br=bretonština/ca=katalánština/co=korsikánština/cs=čeština/da=dánština/de=němčina/en=angličtina/eo=esperanto/es=španělština/et=estonština/fi=finština/fr=francouzština/he=hebrejština/is=islandština/it=italština/lt=litevština/lv=lotyšština/nl=holandština/no=norština/oc=okcitánština/pl=polština/pt=portugalština/pt-br=brasilština/ro=rumunština/ru=ruština/sk=slovenština/sl=slovinština/sv=švédština/tr=turečtina/zh=čínština
 da: af=afrikaans/ar=arabisk/bg=bulgarsk/br=bretonsk/ca=katalansk/co=korsikansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lt=litauisk/lv=lettisk/nl=hollandsk/no=norsk/oc=occitansk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ro=rumænsk/ru=russisk/sk= Slovakisk/sl=slovensk/sv=svensk/tr=tyrkisk/zh=kinesisk
 de: af=Afrikaans/ar=Arabisch/bg=Bulgarish/br=Bretonisch/ca=Katalanisch/co=Korsisch/cs=Tschechisch/da=Dänisch/de=Deutsch/en=Englisch/eo=Esperanto/es=Spanisch/et=Estnisch/fi=Finnisch/fr=Französisch/he=Hebräisch/is=Isländisch/it=Italienisch/lt=Litauisch/lv=Litauisch/nl=Holländisch/no=Norwegisch/oc=Okzitanisch/pl=Polnisch/pt=Portugiesisch/pt-br=Brasil-Portugiesisch/ro=Rumänisch/ru=Russisch/sk=Slowakisch/sl=Slovenisch/sv=Schwedisch/tr=türkisch/zh=Chinesisch
@@ -1036,7 +1036,7 @@ af: 'n agterkleinneef/'n agterkleinniggie
 bg: трети братовчед/трета братовчедка
 br: ur c'hevniant/ur gevniantez/ur c'h(g)evniant(ez)
 ca: un cosí 3er/una cosina 3a/un(a) cosí(na) 3er(a)
-co: un cuginu à u terzu gradu/una cugina à u terzu gradu/un(a) cuginu(a) à u terzu gradu
+co: un %scuginu à u terzu gradu/una %scugina à u terzu gradu/un(a) %scuginu(a) à u terzu gradu
 cs: bratranec z třetího kolena/sestřenice z třetího kolena
 da: en fætter af 3. grad/en kusine af 3. grad
 de: ein:d:+em Cousin 3. Grades/eine:d:+r Cousine 3. Grades
@@ -2711,7 +2711,7 @@ en: search in the list of sub-places
 fr: rechercher dans la liste des sous-lieux
 
     arbre 8 gen
-co: arburu in H di 8 generazioni
+co: arburu in H d’8 generazioni
 de: H-Baum 8 Generationen
 en: 8 generations H tree
 fr: arbre en H 8 générations
@@ -2903,7 +2903,7 @@ sv: tillbaka
 tr: geri
 
     back to index and books
-co: rivene à l’indice alfabeticu è a lista di i dizziunarii
+co: rivene à l’indice alfabeticu è à a lista di i dizziunarii
 de: zurück zum alphabetischen Index und zur Liste der Wörterbücher
 en: back to alphabetic index and to the list of books
 fr: retourner à l’index alphabétique et à la liste des dictionnaires
@@ -3554,7 +3554,7 @@ ar: فرع %s تم تجميعه في %s من commit %s
 bg: клон %s компилиран на %s от идентификатор на ангажимент
 br: filière %s compilada em %s a partir do id do commit
 ca: branca %s compilada el %s des del commit id
-co: ramu %s compilatu in %s à partesi di u commit
+co: ghjemba %s cumpilata u %s à partesi di u commit
 cs: větev %s zkompilována na %s od commit id
 da: gren %s kompileret på %s fra commit id
 de: Zweig %s kompiliert am %s aus Commit-ID
@@ -3636,7 +3636,7 @@ ar: معلومات البناء
 bg: информация за компилация
 br: enformasyon bati
 ca: informació de construcció
-co: informazioni sulla compilazione
+co: infurmazione di custruzzione
 cs: informace o sestavení
 da: byggeinformation
 de: Build-Informationen
@@ -4562,7 +4562,7 @@ ar: التكوين
 bg: конфигурация
 br: konfigurasyon
 ca: configuració
-co: configurazione
+co: cunfigurazione
 cs: konfigurace
 da: konfiguration
 de: Konfiguration
@@ -4597,7 +4597,7 @@ ar: معلمات التكوين
 bg: параметри на конфигурацията
 br: paramet gwiriadur
 ca: paràmetres de configuració
-co: parametri di configurazione
+co: parametri di cunfigurazione
 cs: konfigurační parametry
 da: konfigurationsparametre
 de: Konfigurationsparameter
@@ -5055,6 +5055,7 @@ fr: un %sarrière-grand-cousin 2<sup>e</sup>/une %sarrière-grande-cousine 2<sup
 fr: un %sgrand-cousin au 3<sup>e</sup> degré/une %sgrande-cousine au 3<sup>e</sup> degré
 
     cousin.5.5
+co: un cuginu à u 4<sup>u</sup> gradu/una cugina à u 4<sup>u</sup> gradu
 en: a 4th -cousin/
 fr: un cousin au 4e degré/une cousine au 4e degré
 
@@ -9009,6 +9010,7 @@ sv: H-träd
 tr: H-Ağacı
 
     htree 8 gen
+co: arburu cumpattu in H di 7 generazioni cù una marca per l’8<sup>a</sup>
 de: Kompakter H-Baum mit 7 Generationen und Kennzeichnung für die 8
 en: compact H-Tree at 7 generations with marker for the 8th
 fr: arbre compact en H à 7 générations avec indication pour la 8e
@@ -10090,7 +10092,7 @@ ar: معطيات بدء تشغيل خادم Gwd
 bg: стартови аргументи на сървъра Gwd
 br: gwenañ arguzennoù ar servijour Gwd
 ca: arguments de llançament del servidor Gwd
-co: argomenti di avviamento del server Gwd
+co: parametri di lanciu di u servitore Gwd
 cs: spuštěcí argumenty serveru Gwd
 da: startargumenter for Gwd-server
 de: Startargumente des Gwd-Servers
@@ -14547,7 +14549,7 @@ sv: uträkningssätt
 tr: mod
 
     relationship display options
-co: ozzioni per affissà l’arburi di parentia
+co: ozzioni d’affissera di l’arburi
 de: Anzeigeoptionen der Verwandtschafts-Bäume
 en: relationship display options
 es: opciones de edición de los árboles de parentesco
@@ -14842,7 +14844,7 @@ af: RLM-graf onprakties
 bg: RLM график непрактичен
 br: n'eo ket aes grafiñ RLM
 ca: el gràfic RLM és impracticable
-co: graficu RLM micca praticu
+co: graficu RLM inaduprevule
 cs: Graf RLM je nepraktický
 da: RLM-graf er uhensigtsmæssig
 de: RLM-Diagramm nicht durchführbar
@@ -16221,7 +16223,7 @@ ar: أثناء البقاء على هذه الأداة
 bg: докато сте на този инструмент
 br: paouez amañ war al lojer
 ca: mentre es manté en aquesta eina
-co: mentre rimani in stu strumentu
+co: bench’è stendu nant’à st’attrezzu
 cs: při pobytu na tomto nástroji
 da: mens du bliver på dette værktøj
 de: während Sie auf diesem Werkzeug bleiben
@@ -18469,7 +18471,7 @@ ar: متغيرات المستخدم واللغة
 bg: потребителски и езикови променливи
 br: itilizatè ak varyab lang
 ca: variables d'usuari i llenguatge
-co: variabili utente e lingua
+co: variabile utilizatore è lingua
 cs: uživatelské a jazykové proměnné
 da: bruger- og sprogvariable
 de: Benutzer- und Sprachvariablen
