@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                      STAGE 1: Build geneweb
 ###############################################################################
-FROM ocaml/opam:debian-11-ocaml-4.14 AS builder
+FROM ocaml/opam:debian-12-ocaml-4.14 AS builder
 ENV OPAMYES=yes
 
 # Install required packages for build
@@ -40,7 +40,7 @@ COPY --from=builder /home/opam/geneweb/distribution /
 #                                              STAGE 3: Assemble Docker image
 ###############################################################################
 
-FROM debian:bullseye-slim AS container
+FROM debian:12-slim AS container
 
 # Install runtime tools and add geneweb user
 # Ignore the apt warning here as apt-get does not allow wildcarding versions
