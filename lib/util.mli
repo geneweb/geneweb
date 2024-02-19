@@ -4,7 +4,8 @@ open Config
 open Def
 open Gwdb
 
-val time_debug : config -> float -> unit
+val time_debug :
+  config -> float -> int -> string list -> string list -> string list -> unit
 (** prints the query duration and reports it in the "home" section *)
 
 val cnt_dir : string ref
@@ -37,8 +38,10 @@ val update_wf_trace : config -> string -> unit
 val get_referer : config -> Adef.escaped_string
 (** Get referer (the page you came from to the current page) page from HTTP request *)
 
-val clean_html_tags : string -> string list -> string
+val clean_html_tags : string -> string
 val clean_comment_tags : string -> string
+val uri_encode : string -> string
+val uri_decode : string -> string
 
 val html : ?content_type:string -> config -> unit
 (** Prints HTTP response headers with giving content type (default : {i text/html}) on the socket. *)
@@ -95,7 +98,7 @@ val authorized_age : config -> base -> person -> bool
 (** Alias to !GWPARAM.p_auth *)
 
 val is_old_person : config -> (iper, iper, istr) gen_person -> bool
-val start_with_vowel : string -> bool
+val start_with_vowel : config -> string -> bool
 
 val acces_n :
   config -> base -> Adef.escaped_string -> person -> Adef.escaped_string
@@ -192,8 +195,6 @@ val person_text_without_title : config -> base -> person -> Adef.safe_string
 val main_title : config -> base -> person -> title option
 (** Returns main person's title. If person doesn't have it, then returns first title
     from the list. *)
-
-val max_ancestor_level : config -> base -> iper -> int -> int
 
 val titled_person_text : config -> base -> person -> title -> Adef.safe_string
 (** Returns person's first name and surname text description depending on
@@ -303,6 +304,7 @@ val transl : config -> string -> string
 val transl_nth : config -> string -> int -> string
 (** [transl_nth conf w n] translate word [w] and returns [n]'th field of its translation (with [nth_field]). *)
 
+val simple_decline : config -> string -> string
 val transl_decline : config -> string -> string -> string
 val ftransl : config -> ('a, 'b) format2 -> ('a, 'b) format2
 val ftransl_nth : config -> ('a, 'b) format2 -> int -> ('a, 'b) format2
@@ -459,6 +461,12 @@ val gen_print_tips : config -> Adef.safe_string -> unit
 
 val print_tips_relationship : config -> unit
 (** Print a tip that tells to {i Click an individual below to calculate the family link.} *)
+
+val images_prefix : config -> string
+(** get value of images_prefix *)
+
+val get_opt : config -> string -> bool -> bool
+(** get option value for evar "im", "sp", "ma". Default value is defined by third param *)
 
 val display_options : config -> Adef.escaped_string
 

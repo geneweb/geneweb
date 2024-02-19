@@ -4,24 +4,56 @@ open Config
 open Def
 open Gwdb
 
-let time_debug conf query_time =
-  let show =
-    match List.assoc_opt "show_query_time" conf.base_env with
-    | Some "on" -> ""
-    | _ -> {|style="display:none"|}
+let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
+  (*Printf.eprintf "Errors set_vars:\n";
+    List.iter (fun e -> Printf.eprintf "%s\n" e) set_vars;*)
+  let errors_undef = List.sort_uniq compare errors_undef in
+  let errors_undef =
+    List.filter
+      (fun e -> not (List.exists (fun s -> Mutil.contains e s) set_vars))
+      errors_undef
   in
-  if conf.debug then
-    Output.print_sstring conf
-      (Printf.sprintf
-         {|
-      <span %s>Query treated in </span><span id="q_time_c" %s>%.3f</span>
-      <span %s> seconds</span>
-      <script>
-      var q_time = document.getElementById("q_time_c").innerHTML;
-      document.getElementById("q_time_d").innerHTML = q_time;
-      </script>
-       |}
-         show show query_time show)
+  let nb_errors =
+    nb_errors + List.length errors_undef + List.length errors_other
+  in
+  let err_list1 = String.concat "," errors_undef in
+  let err_list2 = String.concat "," errors_other in
+  match List.assoc_opt "hide_querytime_bugs" conf.base_env with
+  | Some "yes" -> ()
+  | _ ->
+      Output.print_sstring conf
+        (Printf.sprintf
+           {|<script>
+  var q_time = %.3f;
+  var nb_errors = %d;
+  var errors_list = "\u{000A}%s%s";
+  var home_time = document.getElementById('q_time');
+  var home_errors = document.getElementById('nb_errors');
+  if (home_time != null) {
+    home_time.title = "Query treated in " + q_time + " s";
+    if (q_time < 3) {
+      home_time.classList.add("text-success");
+    } else if (q_time < 8) {
+      home_time.classList.add("text-warning");
+     } else {
+       home_time.classList.add("text-danger");
+    }
+  }
+  if (home_errors != null) {
+    if (nb_errors > 0) {
+      home_errors.title = nb_errors +" error(s)!";
+      home_errors.classList.remove("d-none");
+    }
+    if (errors_list != "") {
+      home_errors.title = home_errors.title + errors_list + ".";
+    }
+  }
+</script>|}
+           query_time nb_errors
+           (if errors_undef <> [] then
+            Printf.sprintf "Unbound variable(s): %s. " err_list1
+           else "")
+           err_list2)
 
 let escape_aux count blit str =
   let strlen = String.length str in
@@ -102,10 +134,10 @@ let search_in_assets = search_in_path Secure.assets
 
 (* Internationalization *)
 
-let start_with_vowel s =
+let start_with_vowel conf s =
   if String.length s > 0 then
     let s, _ = Name.unaccent_utf_8 true s 0 in
-    match s.[0] with 'a' | 'e' | 'i' | 'o' | 'u' -> true | _ -> false
+    List.mem s conf.vowels
   else false
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
@@ -178,7 +210,36 @@ let gen_decline_basic wt s =
 let transl_decline conf w s =
   Translate.eval (gen_decline_basic (transl conf w) s)
 
-let gen_decline wt s1 s2 s2_raw =
+(* in string s, handle xxx[aa|bb]Xcc according to X status (vowel) *)
+let simple_decline conf wt =
+  let len = String.length wt in
+  let rec loop i =
+    if i >= len then ""
+    else
+      let s, i =
+        match wt.[i] with
+        | '[' -> (
+            try
+              let j = String.index_from wt i ']' in
+              let k = String.index_from wt i '|' in
+              if k < j && j + 2 < len then
+                let s2 = String.sub wt (j + 1) 1 in
+                let s =
+                  if start_with_vowel conf s2 then
+                    String.sub wt (k + 1) (j - k - 1)
+                  else String.sub wt (i + 1) (k - i - 1)
+                  (*    [aa|bb]  *)
+                in
+                (s, j)
+              else raise Not_found
+            with Not_found -> (String.sub wt i (len - i), len))
+        | c -> (String.make 1 c, i)
+      in
+      s ^ loop (i + 1)
+  in
+  loop 0
+
+let gen_decline conf wt s1 s2 s2_raw =
   let string_of = function '1' -> Some s1 | '2' -> Some s2 | _ -> None in
   let len = String.length wt in
   let rec loop i =
@@ -203,8 +264,8 @@ let gen_decline wt s1 s2 s2_raw =
                 match string_of wt.[j + 2] with
                 | Some s ->
                     let s =
-                      if start_with_vowel s2_raw then
-                        String.sub wt (k + 1) (j - k - 1) ^ s (* [aa|bb]  *)
+                      if start_with_vowel conf s2_raw then
+                        String.sub wt (k + 1) (j - k - 1) ^ s (*    [aa|bb]  *)
                       else String.sub wt (i + 1) (k - i - 1) ^ s (* i  k  j  *)
                     in
                     (s, j + 2)
@@ -218,10 +279,10 @@ let gen_decline wt s1 s2 s2_raw =
   loop 0
 
 let transl_a_of_b conf x y1 y2 =
-  gen_decline (transl_nth conf "%1 of %2" 0) x y1 y2
+  gen_decline conf (transl_nth conf "%1 of %2" 0) x y1 y2
 
 let transl_a_of_gr_eq_gen_lev conf x y1 y2 =
-  gen_decline (transl_nth conf "%1 of %2" 1) x y1 y2
+  gen_decline conf (transl_nth conf "%1 of %2" 1) x y1 y2
 
 let check_format ini_fmt (r : string) =
   let s = string_of_format ini_fmt in
@@ -322,7 +383,7 @@ let string_of_ctime conf =
 
 let html ?(content_type = "text/html") conf =
   let charset = if conf.charset = "" then "utf-8" else conf.charset in
-  if not conf.cgi then Output.header conf "Server: GeneWeb/%s" Version.txt;
+  if not conf.cgi then Output.header conf "Server: GeneWeb/%s" Version.ver;
   Output.header conf "Date: %s" (string_of_ctime conf);
   Output.header conf "Connection: close";
   Output.header conf "Content-type: %s; charset=%s" content_type charset
@@ -346,6 +407,7 @@ let commd ?(excl = []) ?(trim = true) ?(pwd = true) ?(henv = true)
           || (trim && (k = "oc" || k = "ocz") && (v :> string) = "0")
           || (v :> string) = ""
           || k = "b"
+          || (k = "lang" && conf.default_lang = (v :> string))
         then c
         else c ^^^ k ^<^ "=" ^<^ (v :> Adef.escaped_string) ^>^ "&")
   in
@@ -455,7 +517,7 @@ let default_safe_html_allowed_tags =
 let safe_html_allowed_tags =
   lazy
     (if !allowed_tags_file = "" then default_safe_html_allowed_tags
-    else
+    else if Sys.file_exists !allowed_tags_file then
       let ic = open_in !allowed_tags_file in
       let rec loop tags =
         match input_line ic with
@@ -471,7 +533,14 @@ let safe_html_allowed_tags =
             close_in ic;
             tags
       in
-      loop [])
+      loop []
+    else
+      let str =
+        Printf.sprintf "Requested allowed_tags file (%s) absent"
+          !allowed_tags_file
+      in
+      !GWPARAM.syslog `LOG_WARNING str;
+      default_safe_html_allowed_tags)
 
 (* Few notes:
 
@@ -532,14 +601,23 @@ let safe_html_aux escape_text s =
 let safe_html s =
   Adef.safe (safe_html_aux (fun s -> (escape_html s :> string)) s)
 
-(* Version 1 => moche *)
-let clean_html_tags s l =
-  List.fold_left
-    (fun s html_tag -> Str.global_replace (Str.regexp html_tag) "&nbsp;" s)
-    s l
+(* Clean HTML tags from a string. Block tags are replaced by a space,
+   and inline tags are replaced by an empty string. *)
+let clean_html_tags s =
+  let open Str in
+  let tag_pattern tag = Printf.sprintf "</?%s */?>" tag in
+  let rep_block_tag s tag = global_replace (regexp (tag_pattern tag)) " " s in
+  let rep_inline_tag s tag = global_replace (regexp (tag_pattern tag)) "" s in
+  let block_tags = [ "br"; "div"; "h\\d"; "p"; "pre"; "ol"; "li"; "ul" ] in
+  let inline_tags = [ "a"; "em"; "span"; "strong"; "sub"; "sup" ] in
+  let s = List.fold_left rep_block_tag s block_tags in
+  let s = List.fold_left rep_inline_tag s inline_tags in
+  let s = global_replace (regexp " +") " " s in
+  s
 
-let clean_comment_tags s =
-  Str.global_replace (Str.regexp "<!--.*-->") "&nbsp;" s
+let clean_comment_tags s = Str.global_replace (Str.regexp "<!--.*-->") "" s
+let uri_encode s = Uri.pct_encode ~component:`Query s
+let uri_decode s = try Uri.pct_decode s with _ -> s
 
 let hidden_textarea conf k v =
   Output.print_sstring conf {|<textarea style="display:none;" name="|};
@@ -732,33 +810,6 @@ let gen_person_text ?(escape = true) ?(html = true) ?(sn = true) ?(chk = true)
       match p_surname base p with "" -> beg | sn -> beg ^^^ " " ^<^ esc sn
     else beg
 
-let max_ancestor_level conf base ip max_lvl =
-  let x = ref 0 in
-  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
-  (* Loading ITL cache, up to 10 generations. *)
-  let () = !GWPARAM_ITL.init_cache conf base ip 10 0 0 in
-  let rec loop level ip =
-    (* Ne traite pas l'index s'il a déjà été traité. *)
-    (* Pose surement probleme pour des implexes. *)
-    if not @@ Gwdb.Marker.get mark ip then (
-      (* Met à jour le tableau d'index pour indiquer que l'index est traité. *)
-      Gwdb.Marker.set mark ip true;
-      x := max !x level;
-      if !x <> max_lvl then
-        match get_parents (pget conf base ip) with
-        | Some ifam ->
-            let cpl = foi base ifam in
-            loop (succ level) (get_father cpl);
-            loop (succ level) (get_mother cpl)
-        | _ ->
-            x :=
-              max !x
-                (!GWPARAM_ITL.max_ancestor_level
-                   conf base ip conf.bname max_lvl level))
-  in
-  loop 0 ip;
-  !x
-
 let main_title conf base p =
   let titles = nobtit conf base p in
   match List.find_opt (fun x -> x.t_name = Tmain) titles with
@@ -833,8 +884,12 @@ let wprint_geneweb_link conf href s =
   Output.print_string conf (geneweb_link conf href s)
 
 let reference_flags with_id conf base p (s : Adef.safe_string) =
+  let cgl =
+    match p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
+  in
   let iper = get_iper p in
-  if is_hidden p then s
+  (* let is_hidden = is_empty_string (get_surname p) !! *)
+  if is_hidden p || cgl then s
   else
     "<a href=\""
     ^<^ (commd conf ^^^ acces conf base p :> Adef.safe_string)
@@ -1174,7 +1229,7 @@ let open_etc_file conf fname =
   try Some (Secure.open_in fname, fname)
   with Sys_error e ->
     !GWPARAM.syslog `LOG_ERR
-      (Format.sprintf "Error openning file %s in open_etc_file: %s" fname e);
+      (Format.sprintf "Error opening file %s in open_etc_file: %s" fname e);
     None
 
 let include_template conf env fname failure =
@@ -2071,7 +2126,7 @@ let of_course_died conf p =
   match Date.cdate_to_dmy_opt (get_birth p) with
   | Some d ->
       (* TODO this value should be defined elsewhere *)
-      conf.today.year - d.year > 120
+      conf.today.year - d.year > conf.private_years + 20
   | None -> false
 
 let escache_value base =
@@ -2326,7 +2381,7 @@ let print_in_columns conf ncols len_list list wprint_elem =
                    Output.printf conf "<td width=\"%d\">\n" (100 / ncols)
                  else if !kind <> Elem then Output.print_sstring conf "</ul>\n";
                  if !kind <> Elem then (
-                   Output.printf conf "<h3 class=\"subtitle\">%s%s</h3>\n"
+                   Output.printf conf "<h3 class=\"subtitle mx-3\">%s%s</h3>\n"
                      (if ord = "" then "..." else String.make 1 ord.[0])
                      (if !kind = HeadElem then ""
                      else " (" ^ transl conf "continued" ^ ")");
@@ -2395,26 +2450,42 @@ let reduce_list size list =
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                       *)
 let gen_print_tips conf s =
-  Output.print_sstring conf "<div class=\"tips\">\n";
-  Output.print_sstring conf "<table>\n";
-  Output.print_sstring conf "<tr>\n";
-  Output.print_sstring conf "<td>\n";
+  Output.print_sstring conf "<div class=\"tips alert alert-warning\"";
+  Output.print_sstring conf " role=\"alert\">";
   Output.print_string conf s;
-  Output.print_sstring conf "</td>\n";
-  Output.print_sstring conf "</tr>\n";
-  Output.print_sstring conf "</table>\n";
-  Output.print_sstring conf "</div>\n";
-  Output.print_sstring conf "<br>\n"
+  Output.print_sstring conf "</div>"
 
 let print_tips_relationship conf =
   if p_getenv conf.env "em" = Some "R" || p_getenv conf.env "m" = Some "C" then
     Utf8.capitalize_fst (transl conf "select person to compute relationship")
     |> Adef.safe |> gen_print_tips conf
 
+let images_prefix conf =
+  let s =
+    if conf.cgi then Adef.escaped conf.images_prefix else Adef.escaped "images"
+  in
+  (s :> string)
+
 (* ********************************************************************** *)
 (*  [Fonc] display_options : config -> string                             *)
 
 (* ********************************************************************** *)
+
+let get_opt conf evar default =
+  match evar with
+  | "im" -> (
+      match (p_getenv conf.env "im", p_getenv conf.env "image") with
+      | Some ("off" | "0"), _ | _, Some "off" -> not default
+      | _, _ -> default)
+  | "sp" -> (
+      match (p_getenv conf.env "sp", p_getenv conf.env "spouse") with
+      | Some ("off" | "0"), _ | _, Some "off" -> not default
+      | _, _ -> default)
+  | "ma" -> (
+      match (p_getenv conf.env "ma", p_getenv conf.env "marriage") with
+      | Some ("off" | "0"), _ | _, Some "off" -> not default
+      | _, _ -> default)
+  | _ -> failwith "bad get_opt parameter"
 
 (** [Description] : Recherche dans l'URL les options d'affichage qui sont
                     données et renvoie la concaténation de ces options.
@@ -2423,16 +2494,10 @@ let print_tips_relationship conf =
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                           *)
 let display_options conf =
-  let s =
-    Adef.escaped
-    @@
-    if
-      p_getenv conf.env "im" = Some "off"
-      || p_getenv conf.env "image" = Some "off"
-    then "&im=off"
-    else ""
-  in
-  let s = if p_getenv conf.env "ma" = Some "on" then s ^>^ "&ma=on" else s in
+  let img = get_opt conf "im" true in
+  let mar = get_opt conf "ma" true in
+  let s = Adef.escaped @@ if img then "" else "&im=0" in
+  let s = if mar then s else s ^>^ "&ma=0" in
   let s =
     match p_getenv conf.env "bd" with
     | Some i -> s ^^^ "&bd=" ^<^ (Mutil.encode i :> Adef.escaped_string)

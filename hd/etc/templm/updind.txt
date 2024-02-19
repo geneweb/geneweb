@@ -11,7 +11,7 @@
   </title>
   <meta name="robots" content="none"/>
   <meta charset="utf-8">
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"/>
   %include;css
   %include;js_upd
   %include;updind_updfam
@@ -158,7 +158,7 @@
     %end;
     &nbsp;&nbsp;<input type="submit" value="Ok"/>
     <span style="float:right"><label><input id="sex1" name="sex1" class="occ%l_s1;" %lt3; size="2" maxlength="8" autocomplete="off" placeholder="%l_s2;" onkeypress="javascript:return oKP1(event)" onblur="oB1()"%/></label>
-    <label><input name="occ" style="text-align:center;" title="[*number] oc" autocomplete="off" size="2" maxlength="8" value="%if(occ="")0%else;%occ;%end;" id="occ"%/></label></span>
+    <label><input name="occ" style="text-align:center;" title="[*number] oc" autocomplete="off" size="2" maxlength="8" value="%if;(occ="")0%else;%occ;%end;" id="occ"%/></label></span>
   </legend>
   <div class="w1">
     %lpc1; <label %lpa1;>[first name/first names]0<input id="first_name" name="first_name" size="30" maxlength="200" value="%first_name;" %l_on3; %l_on8;%/></label>
@@ -171,19 +171,19 @@
     %if;has_qualifiers;
       %foreach;qualifier;
         %let;cnt1;%expr(cnt+1)%in;
-        <label>[qualifier]0 %cnt1;<input id="qualifier%cnt;" name="qualifier%cnt;" size="30" value="%qualifier;"%/></label><a href="javascript:addItem('qualifier',%cnt1;,'[qualifier]0')"> + </a>
+        <label>[qualifier]0 %cnt1;<input id="qualifier%cnt;" name="qualifier%cnt;" size="30" value="%qualifier;" list="dlqualifier"%/></label><a href="javascript:addItem('qualifier',%cnt1;,'[qualifier]0')"> + </a>
       %end;
     %elseif;(bvar.propose_qualifier != "no")
-      <label>[qualifier]0 1<input id="qualifier0" name="qualifier0" size="30" value=""%/></label><a href="javascript:addItem('qualifier',1,'[qualifier]0')"> + </a>
+      <label>[qualifier]0 1<input id="qualifier0" name="qualifier0" size="30" value="" list="dlqualifier"%/></label><a href="javascript:addItem('qualifier',1,'[qualifier]0')"> + </a>
     %end;
     <span id="new_qualifier"></span>
     %if;has_aliases;
       %foreach;alias;
         %let;cnt1;%expr(cnt+1)%in;
-        <label>[alias]0 %cnt1;<input id="alias%cnt;" name="alias%cnt;" size="30" value="%alias;"%/></label><a href="javascript:addItem('alias',%cnt1;,'[alias]0')"> + </a>
+        <label>[alias]0 %cnt1;<input id="alias%cnt;" name="alias%cnt;" size="30" value="%alias;" list="dlalias"%/></label><a href="javascript:addItem('alias',%cnt1;,'[alias]0')"> + </a>
       %end;
     %elseif;(bvar.propose_alias != "no")
-      <label>[alias]0 1<input id="alias0" name="alias0" size="30" value=""%/></label><a href="javascript:addItem('alias',1,'[alias]0')"> + </a>
+      <label>[alias]0 1<input id="alias0" name="alias0" size="30" value="" list="dlalias"%/></label><a href="javascript:addItem('alias',1,'[alias]0')"> + </a>
     %end;
     <span id="new_alias"></span>
     %if;has_first_names_aliases;
@@ -246,7 +246,7 @@
     %if;has_pevents;%foreach;pevent;%apply;one_event(cnt,"","witness")%end;%end;
     %if;(not has_pevent_death)%apply;one_event(next_pevent,"","witness")%incr_next_pevent;%end;
     <dl id="new_event"></dl>
-    <dl><dt><a href="javascript:addEvent(1,1)" title="(+) [*death]" %lpa4;> + [event/events]0</a> %lpc4; <abbr %lt5;>#</abbr> %lt2; [place] [note/notes]1 [source/sources]1</dt></dl>
+    <dl><dt><a href="javascript:addEvent(1,1)" title="(+) [*death]" %lpa4;> + [event/events]0</a> %lpc4; <abbr %lt5;>#</abbr> %lt2; [place/places]0 [note/notes]1 [source/sources]1</dt></dl>
     %incr_next_pevent;
 </fieldset>
 <fieldset class="f2">

@@ -60,7 +60,9 @@ type config = {
   indep_command : string;
   highlight : string;
   lang : string;
+  vowels : string list;
   default_lang : string;
+  browser_lang : string;
   default_sosa_ref : iper * Gwdb.person option;
   multi_parents : bool;
   authorized_wizards_notes : bool;
@@ -76,6 +78,7 @@ type config = {
   no_image : bool;
   no_note : bool;
   bname : string;
+  nb_of_persons : int;
   cgi_passwd : string;
   env : env;
   mutable senv : env;
@@ -102,8 +105,9 @@ type config = {
      the value of argument -images_url if specified, otherwise
      command ^ "?m=IM&v=" in CGI mode
      "images" otherwise *)
-  image_prefix : string;
-  static_path : string;
+  gw_prefix : string;
+  images_prefix : string;
+  etc_prefix : string;
   (* in CGI mode, provides location of etc files to Apache for direct loading *)
   (* if true, the base name is in the b argument of the query string: ?b=BASE&...
      if false, the base name is the last element of the uri path: .../base?... *)
@@ -136,7 +140,9 @@ let empty =
     indep_command = "";
     highlight = "";
     lang = "";
+    vowels = [];
     default_lang = "";
+    browser_lang = "";
     default_sosa_ref = (Gwdb.dummy_iper, None);
     multi_parents = false;
     authorized_wizards_notes = false;
@@ -152,6 +158,7 @@ let empty =
     no_image = false;
     no_note = false;
     bname = "";
+    nb_of_persons = -1;
     cgi_passwd = "";
     env = [];
     senv = [];
@@ -172,8 +179,9 @@ let empty =
     today_wd = 0;
     time = (0, 0, 0);
     ctime = 0.;
-    image_prefix = "";
-    static_path = "";
+    gw_prefix = "";
+    images_prefix = "";
+    etc_prefix = "";
     cgi = false;
     output_conf =
       { status = ignore; header = ignore; body = ignore; flush = ignore };

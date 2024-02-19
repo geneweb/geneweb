@@ -1,3 +1,9 @@
+val nb_errors : int ref
+val errors_undef : string list ref
+val errors_other : string list ref
+val set_vars : string list ref
+val gwd_cmd : string ref
+
 type syslog_level =
   [ `LOG_EMERG  (** A panic condition. *)
   | `LOG_ALERT
@@ -57,9 +63,9 @@ val wrap_output :
 
 module Default : sig
   val init : unit -> unit
-  (** Inititialise assets directoris for gwd server:
+  (** Inititialise assets directories for gwd server:
       * current directory
-      * /usr/share/geneweb  *)
+      *)
 
   val base_path : string list -> string -> string
   (** Use concatenation of [Secure.base_dir ()], [pref] and [fname] *)

@@ -223,6 +223,7 @@ let date_of_string s i =
           else if s.[i] = '(' && s.[String.length s - 1] = ')' then
             let txt = String.sub s (i + 1) (String.length s - i - 2) in
             let txt = cut_space txt in
+            let txt = copy_decode txt 0 (String.length txt) in
             Some (Dtext txt, String.length s)
           else failwith ("date_of_string " ^ s)
         else

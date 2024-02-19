@@ -7,49 +7,15 @@
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
   %include;css
 </head>
 <body%body_prop;>
 %include;hed
+%include;home
 <div class="container">
 
-%define;list_of(xx)
-  [*list of %s:::xx]
-%end;
 
-<h1>[*lists]</h1>
-
-%if;not cancel_links;
-  <div class="btn-group float-%right; mt-2">
-    %if;(referer != "")
-      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
-  </div>
-%end;
-
-<p>
-  <ul>
-    %if;(wizard)
-      <li>
-        <a href="%prefix;m=MOD_DATA&data=fn">%apply;list_of([first name/first names]1)</a>
-      </li>
-      <li>
-        <a href="%prefix;m=MOD_DATA&data=sn">%apply;list_of([surname/surnames]1)</a>
-      </li>
-      <li>
-        <a href="%prefix;m=MOD_DATA&data=place">%apply;list_of([places])</a>
-      </li>
-      <li>
-        <a href="%prefix;m=MOD_DATA&data=src">%apply;list_of([source/sources]1)</a>
-      </li>
-      <li>
-        <a href="%prefix;m=MOD_DATA&data=occu">%apply;list_of([occupation/occupations]1)</a>
-      </li>
-    %end;
-  </ul>
-</p>
 
 %base_trailer;
 %include;copyr

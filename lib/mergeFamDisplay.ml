@@ -107,7 +107,8 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
       | Some d -> DateDisplay.string_of_ondate conf d);
   string_field
     (Util.translate_eval (transl_nth conf "marriage/marriages" 0)
-     ^ " / " ^ transl conf "place"
+     ^ " / "
+     ^ transl_nth conf "place/places" 0
     |> Adef.safe)
     (Adef.encoded "marriage_place")
     (fun fam ->
@@ -126,7 +127,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
               ^<^ DateDisplay.string_of_ondate conf d
           | None -> transl conf "divorced" |> Adef.safe));
   Output.print_sstring conf
-    {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
+    {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
   Output.print_sstring conf
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></form>"

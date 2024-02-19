@@ -4,7 +4,7 @@
   %if;(ancestor.same != "")
     <li class="li_%ancestor.sex; li_10">%ancestor.anc_sosa; -
       <a href="%prefix;%ancestor.access;">%ancestor;</a> %ancestor.dates; == 
-      <a href="%prefix;em=R;ei=%index;;i=%ancestor.index;;et=M;spouse=on" title="%ancestor; …[relationship]… %self;">
+      <a href="%prefix;em=R&ei=%index;&i=%ancestor.index;&et=M&spouse=on" title="%ancestor; …[relationship]… %self;">
       %ancestor.same;
     </a>
     </li>
@@ -25,7 +25,7 @@
           <li class="li_%ancestor.sex; li_10">
             %ancestor.anc_sosa; -
             <a href="%prefix;%ancestor.access;">%ancestor;</a> %ancestor.dates; :
-            <a href="%prefix;em=R;ei=%ancestor.mother.index;;m=NG;t=PN;select=%ancestor.father.index;;et=A;spouse=on;image=on"
+            <a href="%prefix;em=R&ei=%ancestor.mother.index;&m=NG&t=PN&select=%ancestor.father.index;&et=A&spouse=on&image=on"
                title="[relationship computing], [parents]">
                %ancestor.consanguinity;
             </a><br>

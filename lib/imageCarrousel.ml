@@ -57,12 +57,7 @@ let raw_get conf key =
 
 let insert_saved fname =
   let l = String.split_on_char Filename.dir_sep.[0] fname |> List.rev in
-  let l =
-    (if List.length l >= 2 then List.hd l :: "old" :: List.tl l
-    else if List.length l = 1 then List.hd l :: [ "old" ]
-    else l)
-    |> List.rev
-  in
+  let l = List.rev @@ match l with h :: t -> h :: "old" :: t | _ -> l in
   String.concat Filename.dir_sep l
 
 let write_file fname content =
@@ -252,7 +247,7 @@ let print_send_image conf base p =
       Output.print_sstring conf (transl conf ":");
       Output.print_sstring conf " ";
       Output.print_string conf (Util.escape_html (p_first_name base p));
-      Output.printf conf ".%d " (get_occ p);
+      Output.print_sstring conf (Format.sprintf ".%d " (get_occ p));
       Output.print_string conf (Util.escape_html (p_surname base p)))
   in
   let digest = Update.digest_person (UpdateInd.string_person_of base p) in

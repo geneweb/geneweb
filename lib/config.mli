@@ -65,7 +65,9 @@ type config = {
   indep_command : string;
   highlight : string;
   lang : string;
+  vowels : string list;
   default_lang : string;
+  browser_lang : string;
   default_sosa_ref : iper * Gwdb.person option;
   multi_parents : bool;
   authorized_wizards_notes : bool;
@@ -81,6 +83,7 @@ type config = {
   no_image : bool;
   no_note : bool;
   bname : string;
+  nb_of_persons : int;
   cgi_passwd : string;
   env : env;
   mutable senv : env;
@@ -107,10 +110,11 @@ type config = {
      the value of argument -images_url if specified, otherwise
      command ^ "?m=IM&v=" in CGI mode
      "images" otherwise *)
-  image_prefix : string;
+  gw_prefix : string;
+  images_prefix : string;
       (* if true, the base name is in the b argument of the query string: ?b=BASE&...
          if false, the base name is the last element of the uri path: .../base?... *)
-  static_path : string;
+  etc_prefix : string;
       (* in CGI mode, provides location of etc files to Apache for direct loading *)
   cgi : bool;
   forced_plugins : string list;

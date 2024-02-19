@@ -1,15 +1,15 @@
 <!-- $Id: templm/anclist_fam7_img.txt v7.0 2015/01/07 11:39:17 $ -->
 
 %let;ref_index;%index;%in;
-%let;ref_sex;%if(is_male)[him/her]0%elseif;(is_female)[him/her]1%else;0%end;%in;
+%let;ref_sex;%if;(is_male)[him/her]0%elseif;(is_female)[him/her]1%else;0%end;%in;
 
 %define;fam7_img_somebody1(xx,lexa,lexb,sss)
   %let;relationship;
     %if;("lexb" != "")
       %apply;a_of_b%with;
-        %if(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
+        %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
       %and;
-        %if(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2%end;
+        %if;(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2%end;
       %end;
     %else;
       %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
@@ -220,13 +220,13 @@
          onmouseover="style.color='#000'"
          onmouseout="style.color='transparent'"
          %if;(browsing_with_sosa_ref)
-           href="%prefix;m=RLM;et=S;spouse=on;image=%evar.image;;%nn;
-                i1=%ref_index;;
-                i2=%item.4;;t2=%item.3;;%nn;
-                i3=%sosa_ref.index;;t3=sosa_1;%nn;
-                i4=%ref_index;;t4=%ref_sex;"
+           href="%prefix;m=RLM&et=S&spouse=on&image=%evar.image;&%nn;
+                i1=%ref_index;&
+                i2=%item.4;&t2=%item.3;&%nn;
+                i3=%sosa_ref.index;&t3=sosa_1;&%nn;
+                i4=%ref_index;&t4=%ref_sex;"
          %else;
-           href="%prefix;em=R;ei=%item.4;;spouse=on;et=S;image=%evar.image;;i=%ref_index;"
+           href="%prefix;em=R&ei=%item.4;&spouse=on&et=S&image=%evar.image;&i=%ref_index;"
          %end;>%item.2;<span>%item.1;</span></a>
       <strong>%item.3;</strong>
     </div>

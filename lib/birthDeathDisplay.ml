@@ -184,7 +184,7 @@ let print_death conf base =
     aux "bd" bd "2";
     Output.print_sstring conf ")";
     Output.print_sstring conf
-      {|<button type="submit" class="btn btn-secondary btn-lg">|};
+      {|<button type="submit" class="btn btn-primary btn-lg">|};
     transl_nth conf "validate/delete" 0
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf "</button></p></form>");
@@ -437,7 +437,7 @@ let print_population_pyramid conf base =
     Output.print_sstring conf "<td>";
     if doit then (
       Output.print_sstring conf {|<img src="|};
-      Output.print_string conf (Image.prefix conf);
+      Output.print_sstring conf (Util.images_prefix conf);
       Output.print_sstring conf "/";
       Output.print_string conf iname;
       Output.print_sstring conf {|" alt="|};
@@ -485,19 +485,23 @@ let print_population_pyramid conf base =
     let aux_img nb img =
       if nb <> 0 then (
         let n = max 1 (band_size nb) in
-        Output.print_sstring conf {|<img src="images/|};
+        Output.print_sstring conf {|<img src="|};
         Output.print_string conf img;
         Output.print_sstring conf {|" width="|};
         Output.print_sstring conf (string_of_int @@ (n * 3));
-        Output.print_sstring conf {|" height="14">|})
+        Output.print_sstring conf {|" height="22">|})
     in
-    aux_img nb_men (Adef.encoded "pyr_male.png");
-    Output.print_sstring conf {|</td></tr></table></td><td align="center">|};
+    aux_img nb_men
+      (Adef.encoded (Filename.concat (Util.images_prefix conf) "pyr_male.png"));
+    Output.print_sstring conf
+      {|</td></tr></table></td><td align="center" class="pyramid_center">|};
     if i = nb_intervals then Output.print_sstring conf "&nbsp;"
     else Output.print_sstring conf (string_of_int @@ ((i + 1) * interval));
     Output.print_sstring conf
       {|</td><td align="left"><table cellspacing="0" cellpadding="0"><tr><td>|};
-    aux_img nb_wom (Adef.encoded "pyr_female.png");
+    aux_img nb_wom
+      (Adef.encoded
+         (Filename.concat (Util.images_prefix conf) "pyr_female.png"));
     Output.print_sstring conf {|</td><td class="pyramid_nb">&nbsp;|};
     if nb_wom <> 0 then Output.print_sstring conf (string_of_int nb_wom);
     Output.print_sstring conf "</td></tr></table></td><td>&nbsp;</td>\n";
@@ -507,24 +511,43 @@ let print_population_pyramid conf base =
     Output.print_sstring conf "</td></tr>"
   done;
   Output.print_sstring conf "</table>";
-  Output.print_sstring conf "</div>";
+  Output.print_sstring conf "</div><p>";
   let sum_men = Array.fold_left ( + ) 0 men in
   let sum_wom = Array.fold_left ( + ) 0 wom in
-  Output.print_sstring conf "<p>";
-  transl conf "number of living persons:"
+  transl conf "number of living persons"
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Output.print_sstring conf (transl conf ":");
   Output.print_sstring conf " ";
   Output.print_sstring conf (string_of_nb (sum_men + sum_wom));
-  Output.print_sstring conf {|</p><p><form method="get" action="|};
+  Output.print_sstring conf {|.</p><form method="get" action="|};
   Output.print_string conf (commd conf);
-  Output.print_sstring conf {|">|};
+  Output.print_sstring conf {|"><div class="form-inline">|};
   hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "POP_PYR");
-  Util.hidden_input conf "int" (Adef.encoded @@ string_of_int interval);
-  Util.hidden_input conf "lim" (Adef.encoded @@ string_of_int limit);
-  Output.print_sstring conf (transl_nth conf "year/month/day" 0);
-  Output.print_sstring conf " ";
-  Output.print_sstring conf {|<input name="y" value="|};
+  Output.print_sstring conf {|<label for="yr">|};
+  transl_nth conf "year/month/day" 0
+  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Output.print_sstring conf "</label>";
+  Output.print_sstring conf {|<input type="number" id="yr" name="y" value="|};
   Output.print_sstring conf (string_of_int at_year);
-  Output.print_sstring conf {|" size="5"></form></p>|};
+  Output.print_sstring conf
+    {|" class="form-control col-1 ml-2" step="1">
+ <label for="int" class="ml-3">|};
+  transl conf "interval" |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Output.print_sstring conf
+    {|</label><input type="number" id="int" name="int" value="|};
+  Output.print_sstring conf (string_of_int interval);
+  Output.print_sstring conf
+    {|" class="form-control col-1 ml-2" step="1" min="0" max="130">
+<label for="lim" class="ml-3">|};
+  transl conf "limit" |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Output.print_sstring conf
+    {|</label><input type="number" id="lim" name="lim" value="|};
+  Output.print_sstring conf (string_of_int limit);
+  Output.print_sstring conf
+    {|" class="form-control col-1 ml-2" step="1" min="0" max="|};
+  Output.print_sstring conf (string_of_nb (sum_men + sum_wom));
+  Output.print_sstring conf
+    {|"><button type="submit" class="btn btn-primary ml-3">OK</button>
+    </div></form>|};
   Hutil.trailer conf

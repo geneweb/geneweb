@@ -7,17 +7,28 @@ open Util
 
 type date_event = DeBirth | DeDeath of death_reason
 
+let print_age conf a_ref a =
+  Output.print_sstring conf " <em>";
+  Output.print_sstring conf (string_of_int a);
+  Output.print_sstring conf "</em>";
+  Output.print_sstring conf ", ";
+  match a_ref - a with
+  | 0 -> Output.print_sstring conf (transl conf "birth")
+  | 1 -> Output.print_sstring conf (transl conf "one year old")
+  | n ->
+      Output.print_sstring conf (string_of_int n);
+      Output.print_sstring conf " ";
+      Output.print_sstring conf (transl conf "years old")
+
 let print_anniversary_day conf base dead_people liste =
+  let a_ref = conf.today.year in
   Output.print_sstring conf "<ul>";
   List.iter
     (fun (p, a, date_event, txt_of) ->
       let is = index_of_sex (get_sex p) in
       Output.print_sstring conf "<li>";
       Output.print_string conf (txt_of conf base p);
-      if not dead_people then (
-        Output.print_sstring conf " <em>";
-        Output.print_sstring conf (string_of_int a);
-        Output.print_sstring conf "</em>")
+      if not dead_people then print_age conf a_ref a
       else (
         Output.print_sstring conf ", <em>";
         (Output.print_sstring conf
@@ -97,7 +108,6 @@ let gen_print conf base mois f_scan dead_people =
      done
    with Not_found -> ());
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   if Array.for_all (( = ) []) tab then (
     Output.print_sstring conf "<p>\n";
     Output.printf conf "%s.\n"
@@ -142,18 +152,8 @@ let print_anniversary_list conf base dead_people dt liste =
         Output.print_sstring conf ")</em>")
       else (
         Output.print_string conf (txt_of conf base p);
-        match get_death p with
-        | NotDead ->
-            Output.print_sstring conf " <em>";
-            (match a_ref - a with
-            | 0 -> Output.print_sstring conf (transl conf "birth")
-            | 1 -> Output.print_sstring conf (transl conf "one year old")
-            | n ->
-                Output.print_sstring conf (string_of_int n);
-                Output.print_sstring conf " ";
-                Output.print_sstring conf (transl conf "years old"));
-            Output.print_sstring conf "</em>"
-        | _ -> ());
+        (* TODO year of birth *)
+        match get_death p with NotDead -> print_age conf a_ref a | _ -> ());
       Output.print_sstring conf "</li>")
     liste;
   Output.print_sstring conf "</ul>"
@@ -224,7 +224,7 @@ let propose_months conf mode =
   done;
   Output.print_sstring conf "</select>";
   Output.print_sstring conf
-    {|<button type="submit" class="btn btn-secondary btn-lg">|};
+    {|<button type="submit" class="btn btn-primary btn-lg ml-2">|};
   transl_nth conf "validate/delete" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf "</button></p></form></td></tr></table>";
@@ -296,7 +296,6 @@ let print_marriage conf base month =
   in
   let tab = Array.make 31 [] in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   Gwdb.Collection.iter
     (fun ifam ->
       let fam = foi base ifam in
@@ -386,7 +385,6 @@ let gen_print_menu_birth conf base f_scan mode =
       title false;
       Output.print_sstring conf "</h2>"
   | None -> Hutil.header conf title);
-  Hutil.print_link_to_welcome conf true;
   (try
      while true do
        let p, txt_of = f_scan () in
@@ -450,7 +448,6 @@ let gen_print_menu_dead conf base f_scan mode =
   let list_tom = ref [] in
   let list_aft = ref [] in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   (try
      while true do
        let p, txt_of = f_scan () in
@@ -541,7 +538,6 @@ let print_menu_marriage conf base =
   let list_tom = ref [] in
   let list_aft = ref [] in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   Gwdb.Collection.iter
     (fun ifam ->
       let fam = foi base ifam in

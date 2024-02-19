@@ -50,13 +50,13 @@ let main () =
         if Filename.check_suffix ifile ".gwb" then ifile else ifile ^ ".gwb"
       in
       let src_oc_ht = Hashtbl.create 1009 in
-      let () = Gwdb.load_ascends_array base in
-      let () = Gwdb.load_strings_array base in
-      (if not opts.Gwexport.mem then
-       let () = Gwdb.load_couples_array base in
-       let () = Gwdb.load_unions_array base in
-       let () = Gwdb.load_descends_array base in
-       ());
+      Gwdb.load_ascends_array base;
+      Gwdb.load_strings_array base;
+      if not opts.Gwexport.mem then (
+        Gwdb.load_couples_array base;
+        Gwdb.load_unions_array base;
+        Gwdb.load_descends_array base;
+        ());
       let _ofile, oc, close = opts.Gwexport.oc in
       if not !GwuLib.raw_output then oc "encoding: utf-8\n";
       if !GwuLib.old_gw then oc "\n" else oc "gwplus\n\n";
@@ -65,4 +65,4 @@ let main () =
       Hashtbl.iter (fun _ (_, _, close) -> close ()) src_oc_ht;
       close ()
 
-let _ = Printexc.catch main ()
+let _ = main ()

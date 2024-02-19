@@ -5,10 +5,10 @@
     <tr>
       %foreach;cell;
         %if;(not is_first)
-          <td class="text-center"><samp>&nbsp;</samp></td>
+          <td></td>
         %end;
         <td colspan="%cell.colspan;" class="text-center py-0 mx-0">%nn;
-          %if;(cell.is_empty or cell.is_top)<samp>&nbsp;</samp>%else;│%end;
+          %if;(cell.is_empty or cell.is_top)%else;│%end;
         </td>
       %end;
     </tr>
@@ -16,10 +16,10 @@
   <tr>
     %foreach;cell;
       %if;(not is_first)
-        <td class="text-center"><samp>&nbsp;</samp></td>
+        <td></td>
       %end;
-      <td colspan="%cell.colspan;" class="text-center align-bottom p-0"%( style="max-width:%expr(1024/(2^e.v))px"%)>%nn;
-        %if;(cell.is_empty)<samp>&nbsp;</samp>%nn;
+      <td colspan="%expr(cell.colspan)" class="text-center align-bottom p-0 fix_size">%nn;
+        %if;(cell.is_empty)%nn;
         %else;
           %if;(e.im="" and cell.person.has_image)
             %if;not cancel_links;<a href="%cell.person.image_html_url;">%end;
@@ -54,11 +54,11 @@
               %if;cell.person.has_parents;
                 %if;(cell.person.father!="")
                   %if;(cell.person.father.birth_date.year!="" and cell.person.father.birth_date.prec="")%if;(cell.person.father.birth_date.year<today.year-135)1%end;%end;
-                  %if;(cell.person.father.is_dead and cell.person.father.death_date!="" and cell.person.father.death_date.prec="")%if;(cell.person.father.death_date.year<today.year-120)1%end%end;
+                  %if;(cell.person.father.is_dead and cell.person.father.death_date!="" and cell.person.father.death_date.prec="")%if;(cell.person.father.death_date.year<today.year-120)1%end;%end;
                 %end;
                 %if;(cell.person.mother!="")
                   %if;(cell.person.mother.birth_date.year!="" and cell.person.mother.birth_date.prec="")%if;(cell.person.mother.birth_date.year<today.year-135)1%end;%end;
-                  %if;(cell.person.mother.is_dead and cell.person.mother.death_date!="" and cell.person.mother.death_date.prec="")%if;(cell.person.mother.death_date.year<today.year-120)1%end%end;
+                  %if;(cell.person.mother.is_dead and cell.person.mother.death_date!="" and cell.person.mother.death_date.prec="")%if;(cell.person.mother.death_date.year<today.year-120)1%end;%end;
                 %end;
               %end;
             %end;
@@ -78,7 +78,7 @@
       %if;(not is_first)
         <td class="text-center py-0">%nn;
         %if;cell.is_right;
-          %if;(e.ma!="0")
+          %if;(e.ma!=0)
             %if;(wizard and not cancel_links)
               <a href="%prefix_base_password;m=MOD_FAM&i=%cell.family.index;&ip=%index;"
             %else;
@@ -112,7 +112,7 @@
                       %if;(cell.family.mother.death_date.year>cell.family.father.death_date.year)0%else;3%end;
                     %elseif;cell.family.mother.is_dead;2%else;5%end;
                   %elseif;(cell.family.mother.death_date.year!="" and cell.family.mother.death_date.prec="")
-                    %if;(cell.family.father.death_date.year!="" and (cell.father.father.death_date.prec="&#62;" or cell.family.father.death_date.prec="?"))
+                    %if;(cell.family.father.death_date.year!="" and (cell.family.father.death_date.prec="&#62;" or cell.family.father.death_date.prec="?"))
                       %if;(cell.family.father.death_date.year>cell.family.mother.death_date.year)3%else;0%end;
                     %elseif;cell.family.father.is_dead;4%else;6%end;
                   %end;
@@ -136,12 +136,14 @@
               %in;
               %if;(fw!="" and (cell.family.date_s=cell.family.marriage_date.year)and cell.family.sep_date_s="")
                  %( DEBUG %fw;|%widow_year;|%widow_period;<br> %)
-                <span class="font-italic">%cell.family.date_s;</span>%nn;
-                <span class="small font-weight-bold
-                  %if;(fw=3)text-secondary%elseif;(fw=0)text-primary%nn;
-                  %elseif;(fw=5 or fw=6)
-                    %if;(widow_period!="" and widow_period>100)text-danger%nn;
-                    %else;text-success%end;
+                <span class="small" style="font-size:8px;">%cell.family.date_s;</span>%nn;
+                <span style="font-size:8px;" class="%nn;
+                  %if;(not cancel_links)small%sp;
+                    %if;(fw=3)text-secondary%elseif;(fw=0)text-primary%nn;
+                    %elseif;(fw=5 or fw=6)
+                      %if;(widow_period!="" and widow_period>100)text-danger%nn;
+                      %else;text-success%end;
+                    %end;
                   %end;"
                  title="%nn;
                  %if;(widow_year!="")
@@ -164,23 +166,22 @@
                      %if;(fw=0 or fw=5)%cell.family.father;%else;%cell.family.mother;%end;
                    %end;
                    %if;(widow_period>100)&#10;Please let both spouses rest in peace!%end;
-                 %end;">%if;(not ("-" in cell.family.date_s))—%end;%if;(fw=2 or fw=4)?%end;%widow_year;</span>
+                 %end;">%if;(not ("-" in cell.family.date_s))-%end;%if;(fw=2 or fw=4)?%end;%widow_year;</span>
               %else;
                 %cell.family.date_s;
                 %end;
             %end;
             %if;(wizard and not cancel_links)</a>%elseif;friend;</span>%end;
-         %else;
-            <samp>&nbsp;</samp>
+          %else;
+            
           %end;
-        %else;<samp>&nbsp;</samp>
+        %else;
         %end;
         </td>
       %end;
-      <td colspan="%cell.colspan;" class="text-center py-0">%nn;
-        %if;cell.is_empty;<samp>&nbsp;</samp>%nn;
-        %elseif;(cancel_links)│%nn;
-        %else;
+      <td colspan="%expr(cell.colspan)" class="text-center py-0">%nn;
+        %if;cell.is_empty;
+        %elseif;(cell.person.has_parents and not cancel_links)
           <a href="%cell.person.bname_prefix;%cell.person.access;%nn;
             &m=%if;(e.m!="")%e.m;%else;A%end;%nn;
             &t=%if;(e.t!="")%e.t;%else;T%end;%nn;
@@ -188,6 +189,7 @@
             %if;(e.im=0)&im=0%end;%nn;
             %if;(e.ma=0)&ma=0%end;"
             title="[*navigation] [with] %cell.person;">│</a>%nn;
+        %else;│%nn;
         %end;
       </td>
     %end;
@@ -195,16 +197,16 @@
     <tr>
       %foreach;cell;
         %if;(not is_first)
-          <td colspan="1" class="text-center px-0 py-0">%nn;
+          <td class="text-center px-0 py-0">%nn;
           %if;(cell.is_right)<hr class="full">%nn;
-          %else;%(<samp>&nbsp;</samp>%)%end;
+          %else;%end;
           </td>
         %end;
         <td colspan="%cell.colspan;" class="px-0 py-0 text-%nn;
            %if;cell.is_left;%right;
            %elseif;cell.is_right;%left;
            %else;center%end;">%nn;
-          %if;cell.is_empty;%(<samp>&nbsp;</samp>%)%nn;
+          %if;cell.is_empty;%nn;
           %elseif;cell.is_left;<hr class="%right;">%nn;
           %elseif;cell.is_right;<hr class="%left;">%nn;
           %else;%(│%)%end;
@@ -213,62 +215,50 @@
     </tr>
   %end;
 %end;
-%define;male_line(xx, yy)
-  %if;(yy>0)
-    %if;(xx.has_parents)%apply;male_line("xx.father", yy - 1)%end;
-    <a href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;(e.im="" and xx.has_image)
-      <br>
-      %if;not cancel_links;<a href="%xx.image_html_url;">%end;
-      <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
-       alt="[image/images]0" title="[image/images]0">
-      %if;not cancel_links;</a>%end;
+%( male/agnatic t=A and female/cognatic t=C lines %)
+%define;line(xx, vv)
+  %if;(vv>0)
+    %if;(xx.has_parents)
+      %apply;line%with;%if;(e.t="A")xx.father%else;xx.mother%end;%and;%expr(vv-1)%end;
     %end;
-    %if;("xx" != "self")<br>│<br>%end;
+    %if;not cancel_links;<a href="%prefix_base_password;%xx.access">%end;%xx;
+    %if;not cancel_links;</a>%end;%xx.title;
+    %if;not cancel_links;<a href="%prefix_base_password;%xx.index">%end;<i>%xx.dates;</i>
+    %if;not cancel_links;</a>%end;
+    %if;(xx.has_image and e.im!=0)
+      <div>
+        %if;not cancel_links;<a href="%xx.image_html_url;">%end;
+        <img class="rounded" src="%xx.image_url;"%xx.image_small_size;
+          alt="[image/images]0 %xx;" title="[image/images]0">%nn;
+        %if;not cancel_links;</a>%end;
+      </div>
+    %end;
+    %if;(xx!=self)<div>|</div>%end;
   %end;%nl;
 %end;
-%define;female_line(xx, yy)
-  %if;(yy>0)
-    %if;(xx.has_parents)%apply;female_line("xx.mother", yy - 1)%end;
-    <a href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;(e.im="" and xx.has_image)
-      <br>
-      %if;not cancel_links;<a href="%xx.image_html_url;">%end;
-      <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
-       alt="[image/images]0" title="[image/images]0">%nn;
-      %if;not cancel_links;</a>%end;
-    %end;
-    %if;("xx" != "self")<br>│<br>%end;
-  %end;%nl;
-%end;
-%let;gen;%if;(e.v!="")%e.v;%else;2%end;%in;
-%if;not cancel_links;
-  <div class="d-flex justify-content-center">
-    %include;buttons_dag
-  </div>
-%end;
+%let;e_v;%if;(e.v!="")%e.v;%else;3%end;%in;
 %if;has_parents;
-  <table class="tree-vert mx-auto my-3" style="border-width:%border;">
+  <table class="tree-vert mx-auto my-2">
     %if;(e.t="T" and e.t1="m")
-      %include;modules/arbre_9gen
-    %elseif(e.t="A" or e.t="C")
-      %if;(e.t="A")
-        <tr>
-          <td class="text-center">
-            %apply;male_line("self", gen+1)
-          </td>
-        </tr>
-      %elseif;(e.t="C")
-        <tr>
-          <td class="text-center">
-            %apply;female_line("self", gen+1)
-          </td>
-        </tr>
-      %end;
+      %include;modules/arbre_8gen
+    %elseif;(e.t="A" or e.t="C")
+      <tr><td class="text-center">%apply;line("self",e_v+1)</td></tr>
     %else;
-      %foreach;ancestor_tree_line(gen+1)
+      %foreach;ancestor_tree_line(e_v+1)
         %apply;a_tree_line()
       %end;
     %end;
   </table>
 %end;
+%include;buttons_dag
+%(<script>
+window.addEventListener('load', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const e_v = urlParams.get('v');
+  const width = window.innerWidth;
+  var size = 2*width/(2^(e_v+1));
+  console.log(size);
+  alert(size);
+  $('.fix_size').css("max-width", size);
+})
+</script>%)

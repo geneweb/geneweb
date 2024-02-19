@@ -128,12 +128,12 @@
 ;[birth]_[year/month/day]0%nn;
 ;[birth]_[year/month/day]1%nn;
 ;[birth]_[year/month/day]2%nn;
-;[birth]_[place]%nn;
+;[birth]_[place/places]0%nn;
 ;[death]_[precision]%nn;
 ;[death]_[year/month/day]0%nn;
 ;[death]_[year/month/day]1%nn;
 ;[death]_[year/month/day]2%nn;
-;[death]_[place]%nn;
+;[death]_[place/places]0%nn;
 ;[father/mother]0_[first name/first names]0%nn;
 ;[father/mother]0_[surname/surnames]0%nn;
 ;[father/mother]0_[age]%nn;
@@ -145,7 +145,7 @@
 ;[marriage/marriages]0_[year/month/day]0%nn;
 ;[marriage/marriages]0_[year/month/day]1%nn;
 ;[marriage/marriages]0_[year/month/day]2%nn;
-;[marriage/marriages]0_[place]%nn;
+;[marriage/marriages]0_[place/places]0%nn;
 ;[marriage/marriages]0_[first name/first names]0%nn;
 ;[marriage/marriages]0_[surname/surnames]0%nn;
 ;[marriage/marriages]0_first_name_key_val%nn;

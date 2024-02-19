@@ -1,19 +1,26 @@
 open Gwdb
 open Config
 
-val cousins_t :
-  (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int list) list
-  array
-  array
-  option
-  ref
+type one_cousin =
+  Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int
 
+type cousins_i_j = one_cousin list
+
+val cousins_table : cousins_i_j array array
 val cousins_dates_t : (int * int) array array option ref
 
 val default_max_cnt : int
 (** Default number of relatives that could be listed at the same page *)
 
-val max_cousin_level : config -> base -> person -> int
+val mal : int
+(** max value of max_ancestor_level *)
+
+val mdl : int
+(** max value of max_descendant_level *)
+
+val max_cousin_level : config -> int
+val max_ancestor_level : config -> base -> iper -> int -> int
+val max_descendant_level : config -> base -> iper -> int -> int
 
 val children_of_fam : base -> ifam -> iper list
 (** Retruns list of children of the giving family *)
@@ -46,14 +53,10 @@ val sibling_has_desc_lev : config -> base -> int -> iper * 'a -> bool
 *)
 
 val init_cousins_cnt :
+  config ->
   base ->
-  int ->
-  (* max ancestors level *)
-  int ->
-  (* max descendants level *)
   person ->
-  (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int list) list
-  array
+  (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int) list array
   array
   * (int * int) array array
 (** initialise
@@ -65,29 +68,28 @@ val init_cousins_cnt :
   - a 2D array of tuples (min, max) for dates of cousins at l1, l2
 *)
 
-val max_l1_l2 : base -> int -> int -> person -> int * int
-(** obtain the (min, max) value for cousins at l1, l2 *)
+val min_max_date :
+  config -> base -> person -> bool -> string -> string -> int option
+(** for cousins_dates.(l1).(l2) determine min or max date *)
+
+val max_l1_l2 : config -> base -> person -> int * int
+(** determine non empty max ancestor level (l1)
+   and non empty max descendant level *)
 
 val cousins_l1_l2_aux :
+  config ->
   base ->
-  int ->
-  (* max ancestors level *)
-  int ->
-  (* max descendants level *)
   string ->
   (* up l1 generations *)
   string ->
   (* down l2 generations *)
   person ->
-  (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int list) list
+  (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int) list
   option
 
 val cousins_implex_cnt :
+  config ->
   base ->
-  int ->
-  (* max ancestors level *)
-  int ->
-  (* max descendants level *)
   string ->
   (* up l1 generations *)
   string ->
@@ -98,7 +100,7 @@ val cousins_implex_cnt :
     cousins_implex computes cousins already seen at levels l < l2. *)
 
 val cousins_fold :
-  (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int list) list ->
+  (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int) list ->
   (Gwdb_driver.iper
   * (Gwdb_driver.ifam list list * Gwdb_driver.iper list * int)
   * int list)
@@ -108,27 +110,25 @@ val cousins_fold :
 *)
 
 val anc_cnt_aux :
+  config ->
   base ->
-  int ->
-  (* max anc level *)
   int ->
   (* level *)
   bool ->
   (* up to ot at *)
   person ->
-  (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int list) list
+  (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int) list
   option
 (** Get the list of ancestors up to or at level *)
 
 val desc_cnt_aux :
+  config ->
   base ->
-  int ->
-  (* max desc level *)
   int ->
   (* level *)
   bool ->
   (* up to ot at *)
   person ->
-  (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int list) list
+  (Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int) list
   option
 (** Get the list of descendants up to or at level *)

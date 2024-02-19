@@ -290,7 +290,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
           Output.print_string conf
             (particle_at_the_end base is_surnames s |> Util.escape_html);
           Output.print_sstring conf "</a>";
-          Output.print_sstring conf " (";
+          Output.print_sstring conf "&nbsp;(";
           Output.print_sstring conf (string_of_int cnt);
           Output.print_sstring conf ")")
         (List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b) l);

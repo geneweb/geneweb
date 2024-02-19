@@ -936,6 +936,15 @@ let print_notes_for_person opts base gen p =
         Printf.ksprintf (oc opts) "\n")
       witnesses
   in
+  let epers_name_to_string evt =
+    match evt.epers_name with
+    | Epers_Birth -> "birth"
+    | Epers_Baptism -> "baptism"
+    | Epers_Death -> "death"
+    | Epers_Burial -> "burial"
+    | Epers_Cremation -> "cremation"
+    | _ -> ""
+  in
   let notes = if opts.no_notes <> `nnn then sou base (get_notes p) else "" in
   let surn = s_correct_string (p_surname base p) in
   let fnam = s_correct_string (p_first_name base p) in
@@ -955,15 +964,7 @@ let print_notes_for_person opts base gen p =
            match evt.epers_name with
            | Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial
            | Epers_Cremation ->
-               let name =
-                 match evt.epers_name with
-                 | Epers_Birth -> "birth"
-                 | Epers_Baptism -> "baptism"
-                 | Epers_Death -> "death"
-                 | Epers_Burial -> "burial"
-                 | Epers_Cremation -> "creamation"
-                 | _ -> ""
-               in
+               let name = epers_name_to_string evt in
                let notes =
                  if opts.no_notes <> `nnn then sou base evt.epers_note else ""
                in

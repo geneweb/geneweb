@@ -6,7 +6,7 @@
   <meta name="robots" content="none"%/>
   <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="content-style-type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
   %include;css
 </head>
 %let;ltd; title="[year/month/day]2" class="d" size="2" maxlength="2" %in;
@@ -30,7 +30,7 @@
   <dl>
     <dd style="margin-right:3px;">[after] %apply;date("xx1")</dd>
     <dd style="margin-right:3px;">[before] %apply;date("xx2")</dd>
-    <dd>[place]<input id="xx_place" name="xx_place" value="%evar.xx_place;" %ltp; %/></dd>
+    <dd>[place/places]0<input id="xx_place" name="xx_place" value="%evar.xx_place;" %ltp; %/></dd>
   </dl>
 %end;
 

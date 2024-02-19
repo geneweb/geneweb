@@ -10,7 +10,7 @@ let default_max_cnt = Cousins.default_max_cnt
 
 (* there is a mismatch between cousins degree and "v1" parameter
    which is the number of generation we go back to find a common ancestor *)
-let brother_label conf x =
+let _brother_label conf x =
   match x with
   | 1 -> transl conf "siblings"
   | 2 -> transl conf "cousins"
@@ -25,61 +25,41 @@ let cnt = ref 0
 let cnt_sp = ref 0
 
 let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
+  let sps = Util.get_opt conf "sp" true in
+  let img = Util.get_opt conf "im" true in
   let reference _ _ p (s : Adef.safe_string) =
     if is_hidden p then s
     else
-      let href =
-        commd conf ^^^ "m=RL&"
-        ^<^ acces_n conf base (Adef.escaped "1") p1
-        ^^^ "&b1="
-        ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b1))
-        ^<^ "&"
-        ^<^ acces_n conf base (Adef.escaped "2") p2
-        ^^^ "&b2="
-        ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2))
-        ^<^ ((if (List.assoc_opt "spouse" conf.env :> string option) = Some "on"
-             then Adef.encoded "&spouse=on"
-             else Adef.encoded "")
-             ^^^ (if
-                  (List.assoc_opt "image" conf.env :> string option)
-                  = Some "off"
-                 then Adef.encoded "&image=off"
-                 else Adef.encoded "")
-             ^^^ "&bd="
-             ^<^ Option.value ~default:(Adef.encoded "0")
-                   (List.assoc_opt "bd" conf.env)
-              :> Adef.escaped_string)
-      in
-      "<a href=\"" ^<^ (href :> Adef.safe_string) ^^^ "\">" ^<^ s ^>^ "</a>"
+      Printf.sprintf {|<a href="%sm=RL&%s&b1=%s&%s&b2=%s%s%s&bd=%s">%s</a>|}
+        (commd conf :> string)
+        (acces_n conf base (Adef.escaped "1") p1 :> string)
+        (Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b1)))
+        (acces_n conf base (Adef.escaped "2") p2 :> string)
+        (Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2)))
+        (if sps then "" else "&sp=0")
+        (if img then "" else "&im=0")
+        (Option.value ~default:(Adef.encoded "0") (List.assoc_opt "bd" conf.env)
+          :> string)
+        (s :> string)
+      |> Adef.safe
   in
-  let reference_sp p3 _ _ p s =
+
+  let reference_sp p3 _ _ p (s : Adef.safe_string) =
     if is_hidden p then s
     else
-      let href =
-        commd conf ^^^ "m=RL&"
-        ^<^ acces_n conf base (Adef.escaped "1") p1
-        ^^^ "&b1="
-        ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b1))
-        ^<^ "&"
-        ^<^ acces_n conf base (Adef.escaped "2") p2
-        ^^^ "&b2="
-        ^<^ Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2))
-        ^<^ "&"
-        ^<^ acces_n conf base (Adef.escaped "4") p3
-        ^^^ ((if (List.assoc_opt "spouse" conf.env :> string option) = Some "on"
-             then Adef.encoded "&spouse=on"
-             else Adef.encoded "")
-             ^^^ (if
-                  (List.assoc_opt "image" conf.env :> string option)
-                  = Some "off"
-                 then Adef.encoded "&image=off"
-                 else Adef.encoded "")
-             ^^^ "&bd="
-             ^<^ Option.value ~default:(Adef.encoded "0")
-                   (List.assoc_opt "bd" conf.env)
-              :> Adef.escaped_string)
-      in
-      "<a href=\"" ^<^ (href :> Adef.safe_string) ^^^ "\">" ^<^ s ^>^ "</a>"
+      Printf.sprintf {|<a href="%sm=RL&%s&b1=%s&%s&b2=%s&%s%s%s&bd=%s">%s</a>|}
+        (commd conf :> string)
+        (acces_n conf base (Adef.escaped "1") p1 :> string)
+        (Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b1)))
+        (acces_n conf base (Adef.escaped "2") p2 :> string)
+        (Sosa.to_string (Util.old_sosa_of_branch conf base (ia_asex :: b2)))
+        (acces_n conf base (Adef.escaped "4") p3 :> string)
+        (if sps then "" else "&sp=0")
+        (if img then "" else "&im=0")
+        (Option.value ~default:(Adef.encoded "0") (List.assoc_opt "bd" conf.env)
+          :> string)
+        (s :> string)
+      |> Adef.safe
   in
   let print_nospouse _ =
     SosaCache.print_sosa conf base p2 true;
@@ -210,9 +190,7 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
     loop Sosa.one lev1
   in
   let last_sosa = Sosa.twice first_sosa in
-  Output.print_sstring conf "<div>";
   Util.print_tips_relationship conf;
-  Output.print_sstring conf "</div>";
   if lev1 > 1 then Output.print_sstring conf "<ul>";
   let some =
     let rec loop sosa some =
@@ -238,41 +216,20 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
 (* HTML main *)
 
 let print_cousins conf base p lev1 lev2 =
-  let title h =
-    let txt_fun a =
-      let txt = gen_person_text conf base p in
-      transl_a_of_gr_eq_gen_lev conf a
-        (if h then
-         (gen_person_text ~html:false conf base p : Adef.safe_string :> string)
-        else (txt : Adef.safe_string :> string))
-        (txt : Adef.safe_string :> string)
-    in
-    if lev1 = lev2 then
-      let s = txt_fun (brother_label conf lev1) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
-    else if lev1 = 2 && lev2 = 1 then
-      let s = txt_fun (transl_nth conf "an uncle/an aunt" 4) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
-    else if lev1 = 3 && lev2 = 1 then
-      let s = txt_fun (transl_nth conf "a great-uncle/a great-aunt" 4) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
-    else if lev1 = 1 && lev2 = 2 then
-      let s = txt_fun (transl_nth conf "a nephew/a niece" 4) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
-    else if lev1 = 1 && lev2 = 3 then
-      let s = txt_fun (transl_nth conf "a great-nephew/a great-niece" 4) in
-      Output.print_sstring conf (Utf8.capitalize_fst (Util.translate_eval s))
-    else (
-      Output.print_sstring conf
-        (Utf8.capitalize_fst (transl_nth conf "ancestor/ancestors" 1));
-      Output.print_sstring conf " ";
-      Output.print_sstring conf (string_of_int lev1);
-      Output.print_sstring conf " / ";
-      Output.print_sstring conf
-        (Utf8.capitalize_fst (transl conf "descendants"));
-      Output.print_sstring conf " ";
-      Output.print_sstring conf (string_of_int lev2))
+  let title _h =
+    let cous12 = Format.sprintf "cousins.%d.%d" lev1 lev2 in
+    let cous_transl = Utf8.capitalize_fst (transl_nth conf cous12 1) in
+    if String.length cous_transl > 0 && cous_transl.[0] <> '[' then
+      Output.print_sstring conf cous_transl
+    else
+      Output.printf conf "%s %s / %s %s" (string_of_int lev1)
+        (transl_nth conf "ascending/descending (degree)"
+           (if lev1 = 1 then 0 else 2))
+        (string_of_int lev2)
+        (transl_nth conf "ascending/descending (degree)"
+           (if lev2 = 1 then 1 else 3))
   in
+
   let max_cnt =
     try int_of_string (List.assoc "max_cousins" conf.base_env)
     with Not_found | Failure _ -> default_max_cnt
@@ -406,23 +363,18 @@ let print_anniv conf base p dead_people level =
       set S.empty
   in
   let txt_of (up_sosa, down_br, spouse) conf base c =
-    let href : Adef.escaped_string =
-      commd conf ^^^ "m=RL&"
-      ^<^ acces_n conf base (Adef.escaped "1") p
-      ^^^ "&b1=" ^<^ string_of_int up_sosa ^<^ "&"
-      ^<^ acces_n conf base (Adef.escaped "2")
-            (Option.fold ~none:c ~some:(pget conf base) spouse)
-      ^^^ "&b2="
-      ^<^ string_of_int (sosa_of_persons conf base down_br)
-      ^<^ (if spouse = None then "&" ^<^ acces_n conf base (Adef.escaped "4") c
-          else Adef.escaped "")
-      ^>^ "&spouse=on"
-    in
-    "<a href=\""
-    ^<^ (href :> Adef.safe_string)
-    ^^^ "\">"
-    ^<^ person_title_text conf base c
-    ^>^ "</a>"
+    Printf.sprintf {|<a href="m=RL&%s&b1=%d&%s&b2=%d%s">%s</a>|}
+      (acces_n conf base (Adef.escaped "1") p :> string)
+      up_sosa
+      (acces_n conf base (Adef.escaped "2")
+         (Option.fold ~none:c ~some:(pget conf base) spouse)
+        :> string)
+      (sosa_of_persons conf base down_br)
+      (if spouse = None then
+       "&" ^ (acces_n conf base (Adef.escaped "4") c :> string)
+      else "")
+      (person_title_text conf base c :> string)
+    |> Adef.safe
   in
   let f_scan =
     let list = ref (S.fold (fun ip b list -> (ip, b) :: list) set []) in
@@ -449,7 +401,7 @@ let print_anniv conf base p dead_people level =
 let cousmenu_print = Perso.interp_templ "cousmenu"
 
 let print conf base p =
-  let max_lvl = max_cousin_level conf base p in
+  let max_lvl = max_cousin_level conf in
   (* v1 is the number of generation we go up to get a common ancestor,
      v2 is the number of generation we go down from the ancestor.
      e.g.

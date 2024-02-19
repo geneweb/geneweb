@@ -15,7 +15,7 @@
   <meta name="format-detection" content="telephone=no"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
   %include;css
 </head>
 
@@ -67,7 +67,7 @@
       %if;(occ != "0")
         <input type="hidden" name="oc" value="%occ;"%/>
       %end;
-    %else
+    %else;
       <input type="hidden" name="i" value="%index;"%/>
     %end;
     <input type="hidden" name="maxv" value="%max_anc_level;"%/>
@@ -85,14 +85,14 @@
     %let;l_mal1;%if;(l_mal0 != 99)([maximum] %l_mal0; [generation/generations]1)%end;%in;
     <legend><input type="submit" value="Ok"%/></legend>
     <label>[*specify::generation/generations]0 %l_mal1; :<br>
-      <select style="text-align:center" name="v" size="%expr(max_anc_level-1)">
+      <select style="text-align:center" name="v" size="%expr(max_anc_level)">
         %foreach;ancestor_level;
-          %if;(level != 1)
+          %if;(level != 0)
             <option value="%level;" %if;(level > l_mal0)disabled style="color:#AAAAAA;background-color:#DDDDDD;"%end;
-              %if;(level = 4) selected="selected"%end;>
-              %if;(level = 2)[*to the parents]
-              %elseif;(level = 3)[*to the grandparents]
-              %elseif;(level = 4)[*to the great-grandparents]
+              %if;(level = 3) selected="selected"%end;>
+              %if;(level = 1)[*to the parents]
+              %elseif;(level = 2)[*to the grandparents]
+              %elseif;(level = 3)[*to the great-grandparents]
               %else;%level;%sp;
               %end;
               (%number_of_ancestors;)
@@ -115,7 +115,7 @@
            %/>[only the generation selected]</label><br>
     <label><input type="checkbox" name="cgl" value="on" %l_on;
            %/>[cancel GeneWeb links]</label><br>
-    <label><input type="radio" id="tZ" name="t" value="Z" %l_on;
+    <label><input type="radio" id="tY" name="t" value="Y" %l_on;
            %/>[table]</label><br>
     <label><input type="radio" name="t" value="H" %l_on;
            %/>[horizontally]</label><br>
@@ -131,9 +131,9 @@
       <label><input type="radio" id="tSB" name="tf1" value="sb" %l_on1; %l_on;
              %/>[surnames branch]</label><br>
       <label><input type="radio" id="tSURN" name="tf1" value="surn" %l_on1; %l_on;
-             %/>[list eclair]0 - [surname/surnames]1 / [places]</label><br>
+             %/>[list eclair]0 - [surname/surnames]1 / [place/places]1</label><br>
       <label><input type="radio" id="tPLACE" name="tf1" value="place" %l_on1; %l_on;
-             %/>[list eclair]0 - [places]</label><br>
+             %/>[list eclair]0 - [place/places]1</label><br>
       <label><input type="radio" id="tTAG" name="tf1" value="tag" %l_on1; %l_on;
              %/>étiquette</label><br>
     </fieldset>
@@ -213,7 +213,7 @@
         <input type="radio" id="t1CT" name="t1" value="CT" %l_on; %l_on1;%/>
         [*compact tree] (> 5 gen)
       </legend>
-      %(apply;checkbox("├","it","Orientation I (on) [or] H (off)",""%)
+      %(%apply;checkbox("├","it","Orientation I (on) [or] H (off)",""%)
       <label title="">orientation
           <input type="radio" id="itIH" name="it" value="on" %l_on1; %l_on;
             %if;(evar.it = "on") checked="checked"%end;%/> I

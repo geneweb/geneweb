@@ -60,39 +60,57 @@ let image_url_txt conf url_p url ~width ~height =
       s
 
 let image_txt conf base p =
+  let img = Util.get_opt conf "im" true in
   Adef.safe
   @@
-  match (p_getenv conf.env "im", p_getenv conf.env "image") with
-  | Some "off", _ | _, Some "off" -> ""
-  | _, _ -> (
-      match Image.get_portrait_with_size conf base p with
-      | None -> ""
-      | Some (`Path s, size_opt) ->
-          let max_w, max_h = (100, 75) in
-          let w, h =
-            match size_opt with
-            | Some (w, h) -> Image.scale_to_fit ~max_w ~max_h ~w ~h
-            | None -> (0, max_h)
-          in
-          {|<br><center><table border="0"><tr align="left"><td>|}
-          ^ (image_normal_txt conf base p s w h |> Adef.as_string)
-          ^ "</td></tr></table></center>"
-      | Some (`Url url, Some (width, height)) ->
-          let url_p = commd conf ^^^ acces conf base p in
-          {|<br><center><table border="0"><tr align="left"><td>|}
-          ^ (image_url_txt conf url_p (Util.escape_html url) ~width:(Some width)
-               ~height
-            |> Adef.as_string)
-          ^ {|</td></tr></table></center>|}
-      | Some (`Url url, None) ->
-          let url_p = commd conf ^^^ acces conf base p in
-          let height = 75 in
-          (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
-          {|<br><center><table border="0" style="height:|}
-          ^ string_of_int height ^ {|px"><tr align="left"><td>|}
-          ^ (image_url_txt conf url_p (Util.escape_html url) ~width:None ~height
-            |> Adef.as_string)
-          ^ "</td></tr></table></center>\n")
+  if img then
+    match Image.get_portrait_with_size conf base p with
+    | None -> ""
+    | Some (`Path s, size_opt) ->
+        let max_w, max_h = (100, 75) in
+        let w, h =
+          match size_opt with
+          | Some (w, h) -> Image.scale_to_fit ~max_w ~max_h ~w ~h
+          | None -> (0, max_h)
+        in
+        Printf.sprintf
+          {|
+            <br>
+            <center>
+              <table border="0">
+                <tr align="left"><td>%s</td></tr>
+              </table>
+            </center>|}
+          (image_normal_txt conf base p s w h |> Adef.as_string)
+    | Some (`Url url, Some (width, height)) ->
+        let url_p = commd conf ^^^ acces conf base p in
+        Printf.sprintf
+          {|
+            <br>
+            <center>
+              <table border="0">
+                <tr align="left"><td>%s</td></tr>
+              </table>
+            </center>|}
+          (image_url_txt conf url_p (Util.escape_html url) ~width:(Some width)
+             ~height
+          |> Adef.as_string)
+    | Some (`Url url, None) ->
+        let url_p = commd conf ^^^ acces conf base p in
+        let height = 75 in
+        (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
+        Printf.sprintf
+          {|
+            <br>
+            <center>
+              <table border="0" style="height:%spx">
+                <tr align="left"><td>%s</td></tr>
+              </table>
+            </center>|}
+          (string_of_int height)
+          (image_url_txt conf url_p (Util.escape_html url) ~width:None ~height
+          |> Adef.as_string)
+  else ""
 
 type item = Item of person * Adef.safe_string
 
@@ -708,7 +726,9 @@ let print_html_table conf hts =
 let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let spouse_on =
-    match Util.p_getenv conf.env "sp" with Some "on" -> true | _ -> false
+    match (Util.p_getenv conf.env "sp", Util.p_getenv conf.env "spouse") with
+    | Some ("off" | "0"), _ | _, Some "off" -> false
+    | _, _ -> true
   in
   let bd = match Util.p_getint conf.env "bd" with Some x -> x | None -> 0 in
   let indi_ip n =
@@ -779,14 +799,14 @@ let make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   else Dag2html.html_table_struct indi_ip indi_txt vbar_txt phony d t
 
 let print_slices_menu conf hts =
+  let cgl = p_getenv conf.env "cgl" = Some "on" in
   let header n =
     transl_nth conf "display by slices/slice width/overlap/total width" n
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   let title _ = header 0 in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
-  Util.include_template conf conf.env "buttons_rel" (fun () -> ());
+  if cgl then () else Hutil.interp_no_env conf "buttons_rel";
   Output.print_sstring conf {|<form method="get" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|"><p>|};
@@ -814,7 +834,7 @@ let print_slices_menu conf hts =
   Output.printf conf "<input name=\"width\" size=\"5\" value=\"%d\">\n" wid;
   Output.print_sstring conf {|</td></tr></table><p>|};
   Output.print_sstring conf
-    {|<p><button type="submit" class="btn btn-secondary btn-lg">|};
+    {|<p><button type="submit" class="btn btn-primary btn-lg">|};
   transl_nth conf "validate/delete" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf {|</button></p></form>|};
@@ -824,8 +844,10 @@ let print_dag_page conf page_title hts next_txt =
   let cgl = p_getenv conf.env "cgl" = Some "on" in
   let title _ = Output.print_string conf page_title in
   Hutil.header_no_page_title conf title;
-  if cgl then ()
-  else Util.include_template conf conf.env "buttons_rel" (fun () -> ());
+  (* title goes into <title> ... </title> *)
+  (* page title is handled by buttons_rel!! *)
+  (* TODO manage page title if cgl on !! *)
+  if cgl then () else Hutil.interp_no_env conf "buttons_rel";
   print_html_table conf hts;
   if (next_txt : Adef.escaped_string :> string) <> "" then
     if cgl then Output.print_sstring conf {|">&gt;&gt;</p>|}
@@ -937,19 +959,11 @@ let rec eval_var conf base env _xx _loc = function
       | _ -> raise Not_found)
   | "dag_cell" :: sl -> (
       match get_env "dag_cell" env with
-      | Vdcell dcell -> eval_dag_cell_var conf base dcell sl
+      | Vdcell dcell -> eval_dag_cell_var conf base env dcell sl
       | _ -> raise Not_found)
   | [ "dag_cell_pre" ] -> (
       match get_env "dag_cell_pre" env with
       | Vdcellp s -> VVstring s
-      | _ -> raise Not_found)
-  | [ "get_var"; name ] -> (
-      match get_env "vars" env with
-      | Vvars lv ->
-          let vv =
-            try List.assoc name !lv with Not_found -> raise Not_found
-          in
-          VVstring vv
       | _ -> raise Not_found)
   | [ "head_title" ] -> (
       match get_env "p_title" env with
@@ -967,16 +981,65 @@ let rec eval_var conf base env _xx _loc = function
       match get_env "next_txt" env with
       | Vestring s -> VVstring (s :> string)
       | _ -> VVstring "")
+  | [ "person_index" ] -> (
+      match find_person_in_env conf base "" with
+      | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
+      | None -> VVstring "")
+  (* person_index.x -> i=, p=, n=, oc= *)
+  (* person_index.1 -> i1=, p1=, n1=, oc1= *)
+  (* person_index.2 -> i2=, p2=, n2=, oc2= *)
+  (* person_index.e -> ei=, ep=, en=, eoc= *)
+  | [ "person_index"; x; sl ] -> (
+      let find_person =
+        match x with "e" -> find_person_in_env_pref | _ -> find_person_in_env
+      in
+      let s = if x = "x" then "" else x in
+      match find_person conf base s with
+      | Some p -> eval_person_var conf base p sl
+      | None -> VVstring "")
+  | [ "person_index"; x ] -> (
+      let find_person =
+        match x with "e" -> find_person_in_env_pref | _ -> find_person_in_env
+      in
+      let s = if x = "x" then "" else x in
+      match find_person conf base s with
+      | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
+      | None -> VVstring "")
+  | [ "get_var"; name ] -> (
+      match get_env "vars" env with
+      | Vvars lv ->
+          (if not (List.mem name !GWPARAM.set_vars) then
+           let name =
+             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+             else name
+           in
+           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+          let vv =
+            try List.assoc name !lv with Not_found -> raise Not_found
+          in
+          VVstring vv
+      | _ -> raise Not_found)
   | [ "set_var"; name; value ] -> (
       match get_env "vars" env with
       | Vvars lv ->
           if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
           lv := (name, value) :: !lv;
+          (if not (List.mem name !GWPARAM.set_vars) then
+           let name =
+             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+             else name
+           in
+           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           VVstring ""
       | _ -> raise Not_found)
   (* TODO set real values *)
   | [ "static_max_anc_level" ] -> VVstring "10"
   | [ "static_max_desc_level" ] -> VVstring "10"
+  | _ -> raise Not_found
+
+and eval_person_var _conf base p = function
+  | "surname" -> VVstring (sou base (get_surname p))
+  | "first_name" -> VVstring (sou base (get_first_name p))
   | _ -> raise Not_found
 
 and eval_dag_var _conf (tmincol, tcol, _colminsz, colsz, _ncol) = function
@@ -985,7 +1048,7 @@ and eval_dag_var _conf (tmincol, tcol, _colminsz, colsz, _ncol) = function
   | [ "ncol" ] -> VVstring (string_of_int (Array.fold_left ( + ) 0 colsz))
   | _ -> raise Not_found
 
-and eval_dag_cell_var conf base (colspan, align, td) = function
+and eval_dag_cell_var conf base env (colspan, align, td) = function
   | [ "access" ] -> (
       match td with
       | TDtext (ip, _s) ->
@@ -1038,6 +1101,33 @@ and eval_dag_cell_var conf base (colspan, align, td) = function
       match td with
       | TDtext (_ip, s) -> VVstring (s : Adef.safe_string :> string)
       | _ -> VVstring "")
+  | [ "get_var"; name ] -> (
+      match get_env "vars" env with
+      | Vvars lv ->
+          (if not (List.mem name !GWPARAM.set_vars) then
+           let name =
+             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+             else name
+           in
+           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+          let vv =
+            try List.assoc name !lv with Not_found -> raise Not_found
+          in
+          VVstring vv
+      | _ -> VVstring "")
+  | [ "set_var"; name; value ] -> (
+      match get_env "vars" env with
+      | Vvars lv ->
+          if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
+          lv := (name, value) :: !lv;
+          (if not (List.mem name !GWPARAM.set_vars) then
+           let name =
+             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+             else name
+           in
+           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
+          VVstring ""
+      | _ -> raise Not_found)
   | _ -> raise Not_found
 
 let rec print_foreach conf hts print_ast _eval_expr env () _loc s sl _el al =
@@ -1250,7 +1340,7 @@ let print_slices_menu_or_dag_page conf base page_title hts next_txt =
         ("vars", Vvars (ref []));
         ("dag", Vlazy (Lazy.from_fun table_pre_dim));
         ("p_title", Vsstring page_title);
-        ("next_text", Vestring next_txt);
+        ("next_txt", Vestring next_txt);
       ]
     in
 

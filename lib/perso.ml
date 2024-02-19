@@ -299,11 +299,9 @@ let get_cremation_text conf p p_auth =
   cremated ^^^ " " ^<^ on_cremation_date
 
 let limit_desc conf =
-  match
-    Option.map int_of_string @@ List.assoc_opt "max_desc_level" conf.base_env
-  with
-  | Some x -> max 1 x
-  | None -> 12
+  match List.assoc_opt "max_desc_level" conf.base_env with
+  | Some x when x <> "" -> max 1 (int_of_string x)
+  | _ -> 12
 
 let infinite = 10000
 
@@ -865,8 +863,9 @@ let build_surnames_list conf base v p =
   let ht = Hashtbl.create 701 in
   let mark =
     let n =
-      try int_of_string (List.assoc "max_ancestor_implex" conf.base_env)
-      with _ -> 5
+      match List.assoc_opt "max_ancestor_implex" conf.base_env with
+      | Some v when v <> "" -> int_of_string v
+      | _ -> 5
     in
     Gwdb.iper_marker (Gwdb.ipers base) n
   in
@@ -1262,8 +1261,6 @@ let warning_use_has_parents_before_parent (fname, bp, ep) var r =
   |> !GWPARAM.syslog `LOG_WARNING;
   r
 
-let max_anc_level_default = 5
-let max_desc_level_default = 5
 let bool_val x = VVbool x
 let str_val x = VVstring x
 let null_val = VVstring ""
@@ -1365,12 +1362,7 @@ let date_aux conf p_auth date =
 
 let get_marriage_witnesses fam =
   let fevents = Gwdb.get_fevents fam in
-  let marriages =
-    List.filter (fun fe -> fe.efam_name = Efam_Marriage) fevents
-  in
-  let witnesses =
-    List.map (fun marriage -> marriage.efam_witnesses) marriages
-  in
+  let witnesses = List.map (fun marriage -> marriage.efam_witnesses) fevents in
   witnesses |> Array.concat
 
 let get_nb_marriage_witnesses_of_kind fam wk =
@@ -1609,7 +1601,10 @@ and eval_simple_str_var conf base env (p, p_auth) = function
           l := SortedList.empty;
           null_val
       | _ -> raise Not_found)
-  | "family_cnt" -> string_of_int_env "family_cnt" env
+  | "family_cnt" -> (
+      match get_env "family_cnt" env with
+      | Vint x -> string_of_int x |> str_val
+      | _ -> null_val)
   | "first_name_alias" -> (
       match get_env "first_name_alias" env with
       | Vstring s -> s |> Util.escape_html |> safe_val
@@ -1619,7 +1614,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | Vfam (_, fam, _, _) ->
           get_fsources fam |> sou base |> Util.safe_html |> safe_val
       | _ -> null_val)
-  | "url" -> (
+  | "url_in_env" -> (
       match get_env "url" env with Vstring x -> str_val x | _ -> str_val "")
   | "incr_count" -> (
       match get_env "count" env with
@@ -1987,6 +1982,10 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       match get_env "event_witness_kind" env with
       | Vstring s -> VVstring s
       | _ -> raise Not_found)
+  | "witness_kind" :: _ -> (
+      match get_env "witness_kind" env with
+      | Vstring s -> VVstring s
+      | _ -> raise Not_found)
   | "family" :: sl -> (
       (* TODO ???
          let mode_local =
@@ -2070,7 +2069,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | [ "person_index" ] -> (
       match find_person_in_env conf base "" with
       | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
-      | None -> raise Not_found)
+      | None -> VVstring "")
   (* person_index.x -> i=, p=, n=, oc= *)
   (* person_index.1 -> i1=, p1=, n1=, oc1= *)
   (* person_index.2 -> i2=, p2=, n2=, oc2= *)
@@ -2082,7 +2081,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       let s = if x = "x" then "" else x in
       match find_person conf base s with
       | Some p -> VVstring (Gwdb.string_of_iper (get_iper p))
-      | None -> raise Not_found)
+      | None -> VVstring "")
   | "prev_item" :: sl -> (
       match get_env "prev_item" env with
       | Vslistlm ell -> eval_item_field_var ell sl
@@ -2092,6 +2091,18 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Vfam (i, f, c, m) ->
           eval_family_field_var conf base env (i, f, c, m) loc sl
       | _ -> raise Not_found)
+  | [ "prefix_new_ix"; ip ] ->
+      let p =
+        poi base (try iper_of_string ip with Failure _ -> raise Not_found)
+      in
+      str_val
+        ((Util.commd ~excl:[ "iz"; "nz"; "pz"; "ocz" ] conf :> string)
+        ^ "pz="
+        ^ sou base (get_first_name p)
+        ^ "&nz="
+        ^ sou base (get_surname p)
+        ^ (if get_occ p <> 0 then "&ocz=" ^ string_of_int (get_occ p) else "")
+        ^ "&")
   | "pvar" :: v :: sl -> (
       match find_person_in_env conf base v with
       | Some p ->
@@ -2117,7 +2128,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       if i >= 0 && i < Gwdb.nb_of_persons base then
         let ip = iper_of_string v in
         let ep = make_ep conf base ip in
-        if is_hidden (fst ep) then raise Not_found
+        if is_hidden (fst ep) then str_val ""
         else eval_person_field_var conf base env ep loc sl
       else raise Not_found
   | "f_of_index" :: v :: sl ->
@@ -2142,16 +2153,28 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
   | [ "get_var"; name ] -> (
       match get_env "vars" env with
       | Vvars lv ->
+          (if not (List.mem name !GWPARAM.set_vars) then
+           let name =
+             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+             else name
+           in
+           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           let vv =
             try List.assoc name !lv with Not_found -> raise Not_found
           in
           VVstring vv
-      | _ -> VVstring ("%get_var;" ^ name ^ "?"))
+      | _ -> VVstring "")
   | [ "set_var"; name; value ] -> (
       match get_env "vars" env with
       | Vvars lv ->
           if List.mem_assoc name !lv then lv := List.remove_assoc name !lv;
           lv := (name, value) :: !lv;
+          (if not (List.mem name !GWPARAM.set_vars) then
+           let name =
+             if name.[0] = ' ' then String.sub name 1 (String.length name - 1)
+             else name
+           in
+           GWPARAM.set_vars := name :: !GWPARAM.set_vars);
           VVstring ""
       | _ -> raise Not_found)
   | "svar" :: i :: sl -> (
@@ -2202,15 +2225,6 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let np_auth = authorized_age conf base np in
           eval_person_field_var conf base env (np, np_auth) loc sl
       | None -> raise Not_found)
-  | [ "random"; "init" ] ->
-      Random.self_init ();
-      VVstring ""
-  | [ "random"; "bits" ] -> (
-      try VVstring (string_of_int (Random.bits ()))
-      with Failure _ | Invalid_argument _ -> raise Not_found)
-  | [ "random"; s ] -> (
-      try VVstring (string_of_int (Random.int (int_of_string s)))
-      with Failure _ | Invalid_argument _ -> raise Not_found)
   | "related" :: sl -> (
       match get_env "rel" env with
       | Vrel ({ r_type = rt }, Some p) ->
@@ -2271,21 +2285,16 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
 and eval_anc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
     _loc = function
   | sl -> (
-      let max_a_l =
-        match get_env "max_anc_level" env with
-        | Vint i -> i
-        | _ -> max_anc_level_default
-      in
       match get_env "level" env with
       | Vint lev -> (
           match path_mode with
           | Paths_cnt_raw -> (
-              let list1 = Cousins.anc_cnt_aux base max_a_l lev at_to p in
+              let list1 = Cousins.anc_cnt_aux conf base lev at_to p in
               match list1 with
               | Some list1 -> VVstring (eval_int conf (List.length list1) sl)
               | None -> raise Not_found)
           | Paths_cnt -> (
-              let list1 = Cousins.anc_cnt_aux base max_a_l lev at_to p in
+              let list1 = Cousins.anc_cnt_aux conf base lev at_to p in
               match list1 with
               | Some list1 ->
                   VVstring
@@ -2294,7 +2303,7 @@ and eval_anc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
                        sl)
               | None -> raise Not_found)
           | Paths -> (
-              let l = Cousins.anc_cnt_aux base max_a_l lev at_to p in
+              let l = Cousins.anc_cnt_aux conf base lev at_to p in
               match l with
               | Some l -> (
                   match get_env "cousins" env with
@@ -2316,26 +2325,21 @@ and eval_desc_paths_cnt conf base env (p, _) path_mode at_to ?(l1_l2 = (0, 0))
   | sl -> (
       match get_env "level" env with
       | Vint lev -> (
-          let max_d_l =
-            match get_env "max_desc_level" env with
-            | Vint i -> i
-            | _ -> max_desc_level_default
-          in
           match path_mode with
           | Paths_cnt_raw -> (
-              let list1 = Cousins.desc_cnt_aux base max_d_l lev at_to p in
+              let list1 = Cousins.desc_cnt_aux conf base lev at_to p in
               match list1 with
               | Some list1 -> VVstring (eval_int conf (List.length list1) sl)
               | None -> raise Not_found)
           | Paths_cnt -> (
-              let list1 = Cousins.desc_cnt_aux base max_d_l lev at_to p in
+              let list1 = Cousins.desc_cnt_aux conf base lev at_to p in
               match list1 with
               | Some l ->
                   VVstring
                     (eval_int conf (List.length (Cousins.cousins_fold l)) sl)
               | None -> raise Not_found)
           | Paths -> (
-              let l = Cousins.desc_cnt_aux base max_d_l lev at_to p in
+              let l = Cousins.desc_cnt_aux conf base lev at_to p in
               match l with
               | Some l -> (
                   match get_env "cousins" env with
@@ -2687,89 +2691,27 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match get_env "cnt" env with
       | Vint cnt -> VVstring (string_of_int cnt)
       | _ -> VVstring "")
-  | [ "cous_paths_min_date"; l1; l2 ] ->
-      let max_a_l =
-        match get_env "max_anc_level" env with
-        | Vint i -> i
-        | _ -> max_anc_level_default
-      in
-      let max_d_l =
-        match get_env "max_desc_level" env with
-        | Vint i -> i
-        | _ -> max_desc_level_default
-      in
-      let _cousins_cnt, cousins_dates =
-        match (!Cousins.cousins_t, !Cousins.cousins_dates_t) with
-        | Some t, Some d_t -> (t, d_t)
-        | _, _ -> Cousins.init_cousins_cnt base max_a_l max_d_l p
-      in
-      let i = try int_of_string l1 with Failure _ -> raise Not_found in
-      let j = try int_of_string l2 with Failure _ -> raise Not_found in
-      let min, _ = cousins_dates.(i).(j) in
-      VVstring (string_of_int min)
-  | [ "cous_paths_max_date"; l1; l2 ] ->
-      let max_a_l =
-        match get_env "max_anc_level" env with
-        | Vint i -> i
-        | _ -> max_anc_level_default
-      in
-      let max_d_l =
-        match get_env "max_desc_level" env with
-        | Vint i -> i
-        | _ -> max_desc_level_default
-      in
-      let _cousins_cnt, cousins_dates =
-        match (!Cousins.cousins_t, !Cousins.cousins_dates_t) with
-        | Some t, Some d_t -> (t, d_t)
-        | _, _ -> Cousins.init_cousins_cnt base max_a_l max_d_l p
-      in
-      let i = try int_of_string l1 with Failure _ -> raise Not_found in
-      let j = try int_of_string l2 with Failure _ -> raise Not_found in
-      let _, max = cousins_dates.(i).(j) in
-      VVstring (string_of_int max)
+  | [ "cous_paths_min_date"; l1; l2 ] -> (
+      match Cousins.min_max_date conf base p true l1 l2 with
+      | Some min -> VVstring (string_of_int min)
+      | None -> raise Not_found)
+  | [ "cous_paths_max_date"; l1; l2 ] -> (
+      match Cousins.min_max_date conf base p false l1 l2 with
+      | Some max -> VVstring (string_of_int max)
+      | None -> raise Not_found)
   | [ "cous_paths_cnt_raw"; l1; l2 ] -> (
-      let max_a_l =
-        match get_env "max_anc_level" env with
-        | Vint i -> i
-        | _ -> max_anc_level_default
-      in
-      let max_d_l =
-        match get_env "max_desc_level" env with
-        | Vint i -> i
-        | _ -> max_desc_level_default
-      in
-      let l = Cousins.cousins_l1_l2_aux base max_a_l max_d_l l1 l2 p in
+      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
       match l with
       | Some l -> VVstring (string_of_int (List.length l))
-      | None -> raise Not_found)
+      | None -> VVstring "-1")
   | [ "cous_paths_cnt"; l1; l2 ] -> (
-      let max_a_l =
-        match get_env "max_anc_level" env with
-        | Vint i -> i
-        | _ -> max_anc_level_default
-      in
-      let max_d_l =
-        match get_env "max_desc_level" env with
-        | Vint i -> i
-        | _ -> max_desc_level_default
-      in
-      let l = Cousins.cousins_l1_l2_aux base max_a_l max_d_l l1 l2 p in
+      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
       match l with
       | Some l ->
           VVstring (string_of_int (List.length (Cousins.cousins_fold l)))
-      | None -> raise Not_found)
+      | None -> VVstring "-1")
   | [ "cous_paths"; l1; l2 ] -> (
-      let max_a_l =
-        match get_env "max_anc_level" env with
-        | Vint i -> i
-        | _ -> max_anc_level_default
-      in
-      let max_d_l =
-        match get_env "max_desc_level" env with
-        | Vint i -> i
-        | _ -> max_desc_level_default
-      in
-      let l = Cousins.cousins_l1_l2_aux base max_a_l max_d_l l1 l2 p in
+      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
       match l with
       | Some l -> (
           match get_env "cousins" env with
@@ -2777,65 +2719,28 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
               cl := Cousins.cousins_fold l;
               null_val
           | _ -> raise Not_found)
-      | None -> raise Not_found)
-  | [ "cous_implx_cnt"; l1; l2 ] ->
-      let max_a_l =
-        match get_env "max_anc_level" env with
-        | Vint i -> i
-        | _ -> max_anc_level_default
-      in
-      let max_d_l =
-        match get_env "max_desc_level" env with
-        | Vint i -> i
-        | _ -> max_desc_level_default
-      in
-      let cnt = Cousins.cousins_implex_cnt base max_a_l max_d_l l1 l2 p in
-      VVstring (string_of_int cnt)
+      | None -> VVstring "-1")
+  | [ "cous_implx_cnt"; l1; l2 ] -> (
+      match p_getenv conf.env "c_implex" with
+      | Some "on" | Some "1" ->
+          let cnt = Cousins.cousins_implex_cnt conf base l1 l2 p in
+          VVstring (string_of_int cnt)
+      | _ -> VVstring "")
   | [ "cousins"; "max_a" ] ->
-      let max_a_l =
-        match get_env "max_anc_level" env with
-        | Vint i -> i
-        | _ -> max_anc_level_default
-      in
-      let max_d_l =
-        match get_env "max_desc_level" env with
-        | Vint i -> i
-        | _ -> max_desc_level_default
-      in
-      let max_a, _ = Cousins.max_l1_l2 base max_a_l max_d_l p in
+      let max_a, _ = Cousins.max_l1_l2 conf base p in
       VVstring (string_of_int max_a)
   | [ "cousins"; "max_d" ] ->
-      let max_a_l =
-        match get_env "max_anc_level" env with
-        | Vint i -> i
-        | _ -> max_anc_level_default
-      in
-      let max_d_l =
-        match get_env "max_desc_level" env with
-        | Vint i -> i
-        | _ -> max_desc_level_default
-      in
-      let _, max_d = Cousins.max_l1_l2 base max_a_l max_d_l p in
+      let _, max_d = Cousins.max_l1_l2 conf base p in
       VVstring (string_of_int max_d)
   | [ "cousins_cnt"; l1; l2 ] -> (
-      let max_a_l =
-        match get_env "max_anc_level" env with
-        | Vint i -> i
-        | _ -> max_anc_level_default
-      in
-      let max_d_l =
-        match get_env "max_desc_level" env with
-        | Vint i -> i
-        | _ -> max_desc_level_default
-      in
-      let l = Cousins.cousins_l1_l2_aux base max_a_l max_d_l l1 l2 p in
+      let l = Cousins.cousins_l1_l2_aux conf base l1 l2 p in
       match l with
       | Some l ->
           let l =
             List.map (fun (ip, _, _, _) -> ip) l |> List.sort_uniq compare
           in
           VVstring (string_of_int (List.length l))
-      | None -> raise Not_found)
+      | None -> VVstring "-1")
   | "cremated_date" :: sl -> (
       match get_burial p with
       | Cremated cod when p_auth -> (
@@ -4580,7 +4485,7 @@ let print_foreach conf base print_ast eval_expr =
       | Epers_Death -> "death_witness"
       | Epers_Baptism -> "batism_witness"
       | Epers_Birth -> "birth_witness"
-      | _ -> "" (* TODO: ? *)
+      | _ -> "witness"
     in
     List.iter
       (fun (name, _, _, _, _, wl, _) ->
@@ -4663,14 +4568,21 @@ let print_foreach conf base print_ast eval_expr =
         let _ =
           Array.fold_left
             (fun (i, first) (ip, wk) ->
-              if wk = witness_kind then (
-                let p = pget conf base ip in
-                let env =
-                  ("witness", Vind p) :: ("first", Vbool first) :: env
-                in
+              let p = pget conf base ip in
+              (* TODO if witness_kind = Witness, we might want wk = "" *)
+              let wks =
+                if witness_kind = Witness && wk = Witness then ""
+                else (Util.string_of_witness_kind conf (get_sex p) wk :> string)
+              in
+              let env =
+                ("witness", Vind p) :: ("first", Vbool first)
+                :: ("witness_kind", Vstring wks)
+                :: env
+              in
+              if witness_kind = Witness || witness_kind = wk then (
                 List.iter (print_ast env ep) al;
                 (i + 1, false))
-              else (i + 1, first))
+              else (i, first))
             (0, true)
             (get_marriage_witnesses fam)
         in
@@ -4685,7 +4597,7 @@ let print_foreach conf base print_ast eval_expr =
       List.iter
         (fun ic ->
           let c = pget conf base ic in
-          (* TODOWHY: only on Male? probably bugged on same sex or neuter couples *)
+          (* TODO WHY: only on Male? probably bugged on same sex or neuter couples *)
           if get_sex c = Male then
             Array.iter
               (fun ifam ->
@@ -4848,19 +4760,9 @@ let print_foreach conf base print_ast eval_expr =
       (level, l1, l2)
     in
     let level, l1, l2 = get_level_info conf env el ep in
-    let max_a_l =
-      match get_env "max_anc_level" env with
-      | Vint i -> i
-      | _ -> max_anc_level_default
-    in
-    let max_d_l =
-      match get_env "max_desc_level" env with
-      | Vint i -> i
-      | _ -> max_desc_level_default
-    in
     let l =
-      Cousins.cousins_l1_l2_aux base max_a_l max_d_l (string_of_int l1)
-        (string_of_int l2) p
+      Cousins.cousins_l1_l2_aux conf base (string_of_int l1) (string_of_int l2)
+        p
     in
     match l with
     | Some l ->
@@ -5353,18 +5255,18 @@ let eval_predefined_apply conf env f vl =
         let m = List.fold_left max (-max_int) sl in
         string_of_int m
       with Failure _ -> raise Not_found)
-  | "clean_html_tags", [ s ] ->
-      (* On supprime surtout les balises qui peuvent casser la mise en page. *)
-      Util.clean_html_tags s
-        [ "<br */?>"; "</?p>"; "</?div>"; "</?span>"; "</?pre>" ]
+  | "clean_html_tags", [ s ] -> Util.clean_html_tags s
   | "clean_comment_tags", [ s ] -> Util.clean_comment_tags s
+  | "uri_encode", [ s ] -> Util.uri_encode s
+  | "uri_decode", [ s ] -> Util.uri_decode s
   | _ -> raise Not_found
 
 let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
   template_file := templ_fname ^ ".txt";
   let ep = (p, authorized_age conf base p) in
-  (* TODO what is this? what are those "120" *)
-  let emal = match p_getint conf.env "v" with Some i -> i | None -> 120 in
+  let emal =
+    match p_getint conf.env "v" with Some i -> i | None -> Cousins.mal
+  in
   let env =
     let sosa_ref = Util.find_sosa_ref conf base in
     if sosa_ref <> None then SosaCache.build_sosa_ht conf base;
@@ -5378,25 +5280,33 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       Lazy.from_fun dlt
     in
     let desc_level_table_m =
-      let dlt () = make_desc_level_table conf base 120 p in
+      let dlt () = make_desc_level_table conf base Cousins.mdl p in
       Lazy.from_fun dlt
     in
     let desc_level_table_l_save =
       let dlt () = make_desc_level_table conf base emal p in
       Lazy.from_fun dlt
     in
-    let mal () = Vint (max_ancestor_level conf base (get_iper p) emal + 1) in
+    let mal () =
+      Vint (Cousins.max_ancestor_level conf base (get_iper p) (emal + 1))
+    in
     (* Static max ancestor level *)
-    let smal () = Vint (max_ancestor_level conf base (get_iper p) 120 + 1) in
+    let smal () =
+      Vint (Cousins.max_ancestor_level conf base (get_iper p) Cousins.mal)
+    in
     (* Sosa_ref max ancestor level *)
     let srmal () =
       match Util.find_sosa_ref conf base with
       | Some sosa_ref ->
-          Vint (max_ancestor_level conf base (get_iper sosa_ref) 120 + 1)
+          Vint
+            (Cousins.max_ancestor_level conf base (get_iper sosa_ref)
+               Cousins.mal)
       | None -> Vint 0
     in
-    let mcl () = Vint (Cousins.max_cousin_level conf base p) in
-    (* Récupère le nombre maximal de niveaux de descendance en prenant en compte les liens inter-arbres (limité à 10 générations car problématique en terme de perf). *)
+    let mcl () = Vint (Cousins.max_cousin_level conf) in
+    (* Récupère le nombre maximal de niveaux de descendance en prenant en
+       compte les liens inter-arbres (limité à 10 générations car
+       problématique en terme de perf). *)
     let mdl () =
       Vint
         (max

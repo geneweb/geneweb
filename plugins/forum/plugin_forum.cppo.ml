@@ -24,6 +24,7 @@ let w_base =
   Gwd_lib.Request.w_base ~none
 
 let () =
+  Secure.add_assets !Gwd_lib.GwdPlugin.assets ;
   Gwd_lib.GwdPlugin.register ~ns
     [ "FORUM", (fun _assets -> w_base @@ wrapper ForumDisplay.print)
     ; "FORUM_ADD", (fun _assets -> w_base @@ wrapper ForumDisplay.print_add)

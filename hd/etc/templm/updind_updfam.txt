@@ -14,7 +14,7 @@
            (N) [male/female/neuter]2
 %in;
 %let;ak3;
-         [*tools] [and] [relationship shortcut]
+         [*tools] [and] [relationship shortcut][:]
            (R) [move up/down]0
            (D) [move up/down]1
            (H) [move up/down]2
@@ -78,7 +78,7 @@
   %let;l2;%z2.year;%in;
   %let;l3;
     %if;(l_oyy != "")
-      %if;(l1 = "oryear")/%elseif(l1 = "yearint")..%end;
+      %if;(l1 = "oryear")/%elseif;(l1 = "yearint")..%end;
       %if;(ldmy = "dd")%if;(l_odd != "")%l_odd;/%end;%if;(l_omm != "")%l_omm;/%end;%l_oyy;%nn;
       %elseif;(ldmy = "mm")%if;(l_omm != "")%l_omm;/%end;%if;(l_odd != "")%l_odd;/%end;%l_oyy;%nn;
       %else;%l_oyy;%if;(l_omm != "")/%l_omm;%end;%if;(l_odd != "")/%l_odd;%end;%nn;
@@ -147,7 +147,7 @@
         %/><input id="e_namez1_dl" name="e_namez1_dl" class="e" size="20" maxlength="200" placeholder="[*event/events]0" value="%l1;" list="dlevent" %l5;
         %sp;autocomplete="off" onkeypress="javascript:return oKP3(event,this)" onblur="oB6('z1')" onkeydown="if(event.keyCode == 13)oB6('z1')"
         %/>%l4;%apply;date("e_datez1","event_date",l2,l3)%sp;
-        <input id="e_placez1" name="e_placez1" class="pl" size="70" placeholder="[*place]" value="%event.e_place;" %l_on5;%/>
+        <input id="e_placez1" name="e_placez1" class="pl" size="70" placeholder="[*place/places]0" value="%event.e_place;" %l_on5;%/>
     </dt>
     <dd><textarea id="e_notez1" name="e_notez1" placeholder="[*comment]" rows="1" class="enote" %l_on1s;>%nn;
       %if;(evar.m = "MOD_FAM" and comment != "" and bvar.move_comment = "yes" and event.e_note = "" and (event.e_name = "#marr" or event.e_name= "#nmar" or event.e_name= "#nmen" or event.e_name ="#enga"))%comment;%end;
@@ -187,5 +187,7 @@
     %apply;g_oku("place","no","")
     %apply;g_oku("occu","no","")
     %apply;g_oku("src","no","")
+    %apply;g_oku("qualifier","no","")
+    %apply;g_oku("alias","no","")
   -->
 </script>

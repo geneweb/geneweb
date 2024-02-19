@@ -1,4 +1,4 @@
-<!-- $Id: modules/arbres.txt v7.0 28/04/2017 09:34:30 $ -->
+<!-- $Id: modules/arbres.txt v7.1 14/11/2023 20:50:05 $ -->
 %(
 Options
 1: arbre vertical
@@ -20,9 +20,9 @@ Options
 %elseif;(op_m=5)
   %include;modules/arbre_famille
 %elseif;(op_m=6)
-  %include;modules/arbre_h7
+  %include;modules/arbre_h6
 %elseif;(op_m=7)
-  %include;modules/arbre_9gen
+  %include;modules/arbre_8gen
 %elseif;(op_m=8)
   %include;modules/arbre_hi_tools
   %include;modules/arbre_hi_indexes

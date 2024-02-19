@@ -6,8 +6,8 @@
    correct open instead of hoping Secure do it for it *)
 
 let ok_r = ref []
-let assets_r = ref []
-let bd_r = ref Filename.current_dir_name
+let assets_r = ref [ "gw" ]
+let bd_r = ref (Filename.concat Filename.current_dir_name "bases")
 
 (* [decompose: string -> string list] decompose a path into a list of
    directory and a basename. "a/b/c" -> [ "a" ; "b"; "c" ] *)
@@ -26,8 +26,9 @@ let decompose =
 
 (* add asset to the list of allowed to acces assets *)
 let add_assets d =
-  assets_r := d :: !assets_r;
-  ok_r := decompose d :: !ok_r
+  if not (List.mem d !assets_r) then (
+    assets_r := List.rev (d :: List.rev !assets_r);
+    ok_r := decompose d :: !ok_r)
 
 (* set base dir to which acces could be allowed *)
 let set_base_dir d =

@@ -74,11 +74,11 @@
 %end;
 %if;(evar.jq1 = "on")
   %apply;jq1()
-%elseif(evar.jq1a = "on")
+%elseif;(evar.jq1a = "on")
   %apply;jq1a("self","")
-%elseif(evar.jq1b = "on")
+%elseif;(evar.jq1b = "on")
   %apply;jq1b()
-%elseif(evar.upddag = "on")
+%elseif;(evar.upddag = "on")
   <div class="container">
     %include;templm/upddag
   </div>

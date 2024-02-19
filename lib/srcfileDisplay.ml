@@ -203,7 +203,7 @@ let macro conf base = function
         (List.assoc "base_notes_title" conf.base_env |> Util.escape_html
           :> Adef.safe_string)
       with Not_found -> Adef.safe "")
-  | 'o' -> (Image.prefix conf :> Adef.safe_string)
+  | 'o' -> Adef.safe (Util.images_prefix conf)
   | 'q' ->
       let r = count conf in
       string_of_int_sep_aux conf (r.welcome_cnt + r.request_cnt)
@@ -215,7 +215,7 @@ let macro conf base = function
       if (conf.wizard || conf.just_friend_wizard) && conf.user <> "" then
         Adef.safe (": " ^ conf.user)
       else Adef.safe ""
-  | 'v' -> Adef.safe Version.txt
+  | 'v' -> Adef.safe Version.ver
   | 'w' ->
       let s = Hutil.link_to_referer conf in
       if (s :> string) = "" then Adef.safe "&nbsp;" else s
@@ -477,11 +477,15 @@ let set_vother x = Vother x
 let eval_var conf base env () _loc = function
   | [ "base"; "has_notes" ] -> VVbool (not (base_notes_are_empty base ""))
   | [ "base"; "name" ] -> VVstring conf.bname
+  | [ "base"; "nb_persons"; "v" ] ->
+      VVstring (string_of_int (Gwdb.nb_of_persons base))
   | [ "base"; "nb_persons" ] ->
       VVstring
         (Mutil.string_of_int_sep
            (Util.transl conf "(thousand separator)")
            (nb_of_persons base))
+  | [ "base"; "real_nb_persons"; "v" ] ->
+      VVstring (string_of_int (Gwdb.nb_of_real_persons base))
   | [ "base"; "real_nb_persons" ] ->
       VVstring
         (Mutil.string_of_int_sep
@@ -509,12 +513,6 @@ let eval_var conf base env () _loc = function
           r.welcome_cnt
       in
       VVstring s
-  | [ "random"; "init" ] ->
-      Random.self_init ();
-      VVstring ""
-  | [ "random"; s ] -> (
-      try VVstring (string_of_int (Random.int (int_of_string s)))
-      with Failure _ | Invalid_argument _ -> raise Not_found)
   | [ "sosa_ref" ] -> (
       match get_env "sosa_ref" env with
       | Vsosa_ref v -> (

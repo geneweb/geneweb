@@ -1,4 +1,4 @@
-<!-- $Id: templm/ancsosa_tdz.txt v7.0 15/04/2015 23:36:21 $ -->
+<!-- $Id: ancsosa_tdz.txt,v 7.00 2015/04/15 23:36:21 mr Exp $ -->
 
 %let;lai;alt="[image/images]0"%in;
 %let;ltap;%if;(wizard and not cancel_links) title="[add::parents]" %end;%in;
@@ -47,7 +47,7 @@
 %define;link_marriage1(xx)
   %if;(wizard and not cancel_links)
     <a id="mf%family.index;" class="date p_%left;" href="#mf%family.index;" %ltmf;
-      onclick="window.open('%prefix;m=MOD_FAM;i=%family.index;;ip=%index;;');">%nn;
+      onclick="window.open('%prefix;m=MOD_FAM&i=%family.index;&ip=%index;');">%nn;
       <span>&amp;</span>%nn;
         %if;(nb_children > 1)%nb_children;<br>%end;
         %slash_marriage_date; %marriage_place;
@@ -75,7 +75,7 @@
 
 %define;imgtdz(xx)
   %if;(evar.image!="off" and xx.has_image)
-    <img class="imgtdz" src="%xx.image_url;" %lai; title="%xx;">%nn;
+    <img class="imgtdz" src="%xx.image_url;" %lai; title="%xx;"%/>%nn;
   %end;
 %end;
 
@@ -100,7 +100,7 @@
 %define;nb_fam(xx)
   %if;(xx.same = "")
     %if;(not cancel_links)
-      <a href="%prefix;m=A;t=D;i=%index;;i1=%ancestor.index;;l=%level;;image=%evar.image;" title="^^">
+      <a href="%prefix;m=A&t=X&i=%index;&i1=%ancestor.index;&l=%level;&image=%evar.image;" title="^^">
     %end;
       %apply;symbol1("xx")
       %if;(xx.nb_families > 1)
@@ -120,7 +120,7 @@
   %if;(cancel_links)
     ==<br>xx
   %else;
-    <a href="%prefix;em=R;ei=%ancestor.index;;m=NG;select=%index;;n=1;t=PN;et=A;spouse=on;image=on;" title="%ancestor; …[relationship]… %self;">==<br>xx</a>
+    <a href="%prefix;em=R&ei=%ancestor.index;&m=NG;select=%index;&n=1&t=PN&et=A&spouse=on&image=on" title="%ancestor; …[relationship]… %self;">==<br>xx</a>
   %end;
 %end;
 
@@ -189,14 +189,14 @@
 
 %define;tX()
   %( ancestors up to somebody %)
-  %p_of_index.1.mark_descendants;
+  %pvar.1.mark_descendants;
   %foreach;ancestor_level;
     %apply;lazy_print%with;
       <tr><th colspan="7" >%nl;[*generation/generations]0 %level;%nl;</th></tr>
     %end;
-    %if;(level <= evar.l + 1)
+    %if;(level <= evar.l)
       %foreach;ancestor;
-        %if;(level != 1 and ancestor.same = "" and (ancestor.is_descendant or ancestor.spouse.is_descendant))
+        %if;(level != 0 and ancestor.same = "" and (ancestor.is_descendant or ancestor.spouse.is_descendant))
           %lazy_force;
           %let;l1;%if;(ancestor.is_descendant)class="is_desc_1%ancestor.sex;"%end;%in;
           %apply;one_line(l1)
@@ -224,11 +224,11 @@
   %apply;togen()
 %end;
 %if;(evar.t = "X")
-  <p>[*up to] %p_of_index.1; %p_of_index.1.dates;</p>
+  <p>[*up to] %pvar.1; %pvar.1.dates;</p>
   %if;(not cancel_links)
     <div class="menu">
-      %if;(has_sosa)<span><a href="%prefix;m=X;t=X;t1=1;i=%evar.i1;;i1=%index;;siblings=on;alias=on;spouse=on;parents=on;rel=on;notes=on;src=on;hide=on;witn=on;v=%evar.l;;maxv=%evar.l;;l=%evar.l;">[*descendants]0</a></span>%end;
-      <span><a href="%prefix;m=A;t=G;i=%index;;i1=%evar.i1;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;l=%evar.l;">[*ancestor/ancestors]1</a></span>
+      %if;(has_sosa)<span><a href="%prefix;m=X&t=X&t1=1&i=%evar.i1;&i1=%index;&siblings=on&alias=on&spouse=on&parents=on&rel=on&notes=on&src=on&hide=on&witn=on&v=%evar.l;&maxv=%evar.l;&l=%evar.l;">[*descendants]0</a></span>%end;
+      <span><a href="%prefix;m=A&t=G&i=%index;&i1=%evar.i1;&siblings=on&alias=on&spouse=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on&l=%evar.l;">[*ancestors]0</a></span>
     </div>
   %end;
 %end;

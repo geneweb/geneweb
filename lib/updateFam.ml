@@ -316,6 +316,10 @@ and eval_event_var e = function
       | Some { efam_src = x } ->
           safe_val (Util.escape_html x :> Adef.safe_string)
       | _ -> str_val "")
+  | [ "e_w_nbr" ] -> (
+      match e with
+      | Some e -> str_val (string_of_int (Array.length e.efam_witnesses))
+      | _ -> str_val "0")
   | _ -> raise Not_found
 
 and eval_parent' conf base env k = function
@@ -341,13 +345,17 @@ and eval_key conf base (fn, sn, oc, create, _) = function
   | [ "create" ] -> str_val (if create <> Update.Link then "create" else "link")
   | [ "create"; s ] -> Update_util.eval_create create s
   | [ "first_name" ] -> safe_val (Util.escape_html fn :> Adef.safe_string)
-  | [ "occ" ] -> str_val (if oc = 0 then "" else string_of_int oc)
+  | [ "occ" ] -> str_val (string_of_int oc)
   | [ "surname" ] -> safe_val (Util.escape_html sn :> Adef.safe_string)
   | [ "sex" ] ->
       if create = Update.Link then
         let sex = get_parent_sex conf base fn sn oc in
         str_val (string_of_int sex)
       else Update_util.eval_create create "sex"
+  | [ "index" ] -> (
+      match person_of_key base fn sn oc with
+      | Some ip -> str_val (string_of_iper ip)
+      | _ -> str_val (string_of_iper Gwdb.dummy_iper))
   | [ "sexes" ] ->
       (* this is somewhat of a hack to determine same sex situations *)
       (* updateFam.ml does not provide adequate mechanisms to test   *)
@@ -489,10 +497,27 @@ let print_update_fam conf base fcd digest =
   | Some _ | None -> Hutil.incorrect_request conf
 
 let print_del1 conf base ifam =
+  let cpl = foi base ifam in
+  let ifath = get_father cpl in
+  let imoth = get_mother cpl in
   let title () =
     transl_nth conf "family/families" 0
     |> transl_decline conf "delete"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf
+    |> Utf8.capitalize_fst |> Output.print_sstring conf;
+    Output.print_sstring conf " ";
+    Output.print_string conf
+      (Util.escape_html (p_first_name base (poi base ifath)));
+    Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base ifath)));
+    Output.print_string conf
+      (Util.escape_html (p_surname base (poi base ifath)));
+    Output.print_sstring conf " ";
+    Output.print_sstring conf (transl conf "and");
+    Output.print_sstring conf " ";
+    Output.print_string conf
+      (Util.escape_html (p_first_name base (poi base imoth)));
+    Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base imoth)));
+    Output.print_string conf
+      (Util.escape_html (p_surname base (poi base imoth)))
   in
   let p =
     match p_getenv conf.env "ip" with
@@ -513,7 +538,7 @@ let print_del1 conf base ifam =
   | None -> ());
   Util.hidden_input conf "m" (Adef.encoded "DEL_FAM_OK");
   Output.print_sstring conf
-    {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
+    {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
   Output.print_sstring conf
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></p></form>";
@@ -553,7 +578,7 @@ let print_inv1 conf base p ifam1 ifam2 =
   Util.hidden_input conf "f" (string_of_ifam ifam2 |> Adef.encoded);
   Util.hidden_input conf "m" (Adef.encoded "INV_FAM_OK");
   Output.print_sstring conf
-    {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
+    {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
   Output.print_sstring conf
     (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
   Output.print_sstring conf "</button></p></form>";
@@ -751,7 +776,7 @@ let print_change_order conf base =
       Util.hidden_input conf "n" (Adef.encoded @@ string_of_int n);
       Util.hidden_input conf "m" (Adef.encoded "CHG_FAM_ORD_OK");
       Output.print_sstring conf
-        {|</p><p><button type="submit" class="btn btn-secondary btn-lg">|};
+        {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
       Output.print_sstring conf
         (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
       Output.print_sstring conf "</button></p></form>";

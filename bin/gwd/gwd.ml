@@ -31,7 +31,9 @@ let default_lang = ref "fr"
 let friend_passwd = ref ""
 let green_color = "#2f6400"
 let images_dir = ref ""
-let images_url = ref ""
+let gw_prefix = ref ""
+let images_prefix = ref ""
+let etc_prefix = ref ""
 let lexicon_list = ref [ Filename.concat "lang" "lexicon.txt" ]
 let login_timeout = ref 1800
 let max_clients = ref None
@@ -543,7 +545,9 @@ let get_actlog check_from utm from_addr base_password =
             list, r, changed
       in
       loop false ATnormal []
-  with Sys_error _ -> [], ATnormal, false
+  with Sys_error e -> (
+      GwdLog.syslog `LOG_WARNING ("Error opening actlog: " ^ e);
+    [], ATnormal, false)
 
 let set_actlog list =
   let fname = SrcfileDisplay.adm_file "actlog" in
@@ -556,7 +560,9 @@ let set_actlog list =
            (if e = "" then "" else " " ^ e))
       list;
     close_out oc
-  with Sys_error _ -> ()
+  with Sys_error e -> (
+    GwdLog.syslog `LOG_WARNING ("Error opening actlog: " ^ e);
+    ())
 
 let get_token check_from utm from_addr base_password =
   Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
@@ -1052,7 +1058,19 @@ let authorization from_addr request base_env passwd access_type utm base_file
         basic_authorization from_addr request base_env passwd access_type utm
           base_file command
 
+let string_to_char_list s =
+  let rec exp i l =
+    if i < 0 then l else exp (i - 1) (s.[i] :: l) in
+  exp (String.length s - 1) []
+
 let make_conf from_addr request script_name env =
+  if !allowed_tags_file <> "" && not (Sys.file_exists !allowed_tags_file) then (
+    let str = 
+     Printf.sprintf
+       "Requested allowed_tags file (%s) absent" !allowed_tags_file
+    in
+    GWPARAM.errors_other := str :: !GWPARAM.errors_other;
+    !GWPARAM.syslog `LOG_WARNING str);
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
   let cgi = !Wserver.cgi in
@@ -1109,6 +1127,22 @@ let make_conf from_addr request script_name env =
       if x = "" then !default_lang else x
     with Not_found -> !default_lang
   in
+  let browser_lang =
+    if !choose_browser_lang then http_preferred_language request
+    else ""
+  in
+  let default_lang = if browser_lang = "" then default_lang else browser_lang in
+  let vowels =
+    match List.assoc_opt "vowels" base_env with
+    | Some l ->
+        let rec loop acc i =
+          if i < String.length l then (
+            let s, j = Name.unaccent_utf_8 true l i in
+            loop (s :: acc) j)
+          else acc
+        in loop [] 0
+    | _ -> ["a"; "e"; "i"; "o"; "u"; "y"]
+  in
   let lexicon_lang = if lang = "" then default_lang else lang in
   let lexicon = load_lexicon lexicon_lang in
   (* A l'initialisation de la config, il n'y a pas de sosa_ref. *)
@@ -1157,6 +1191,7 @@ let make_conf from_addr request script_name env =
             username, ""
           end
   in
+
   let conf =
     {from = from_addr;
      api_mode = false;
@@ -1179,7 +1214,10 @@ let make_conf from_addr request script_name env =
          Not_found -> green_color
        end;
      lang = if lang = "" then default_lang else lang;
-     default_lang = default_lang; default_sosa_ref = default_sosa_ref;
+     vowels=vowels;
+     default_lang = default_lang;
+     browser_lang = browser_lang;
+     default_sosa_ref = default_sosa_ref;
      multi_parents =
        begin try List.assoc "multi_parents" base_env = "yes" with
          Not_found -> false
@@ -1234,7 +1272,9 @@ let make_conf from_addr request script_name env =
          begin try List.assoc "no_note_for_visitor" base_env = "yes" with
            Not_found -> false
          end;
-     bname = base_file; env = env; senv = [];
+     bname = base_file;
+     nb_of_persons = -1;
+     env = env; senv = [];
      cgi_passwd = ar.ar_passwd;
      henv =
        (if not !(Wserver.cgi) then []
@@ -1266,26 +1306,21 @@ let make_conf from_addr request script_name env =
         year = tm.Unix.tm_year + 1900; prec = Sure; delta = 0};
      today_wd = tm.Unix.tm_wday;
      time = tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec; ctime = utm;
-     image_prefix =
-       if !images_url <> "" then !images_url
-       else if !(Wserver.cgi) then
-          begin match Sys.getenv_opt "GW_STATIC_PATH" with
-          | Some x -> String.concat Filename.dir_sep [x; ".."; ".."; "images"]
-              (* Assumes that GW_STATIC_PATH is ../distribution/gw/etc  *)
-          | None -> String.concat Filename.dir_sep
-              [".."; "distribution"; "gw"; "images" ]
-              (* FIXME
-              assumes that distribution has been installed next to cgi-bin
-              this default path may not work if the distribution
-              is accessed through SynLinks and Apache is not properly configured *)
-          end
-       else "images";
-     static_path =
-       begin match Sys.getenv_opt "GW_STATIC_PATH" with
-       | Some x -> x
-       | None -> String.concat Filename.dir_sep [".."; "distribution"; "gw"; "etc"; "" ]
-         (* FIXME same comment. / at the end! *)
-       end;
+     gw_prefix =
+       if !gw_prefix <> "" then !gw_prefix
+       else String.concat Filename.dir_sep [ "gw" ];
+     images_prefix = (
+       match !gw_prefix, !images_prefix with
+       | gw_p, im_p when gw_p <> "" && im_p = "" ->
+           String.concat Filename.dir_sep [ gw_p; "images" ]
+       | _, im_p when im_p <> "" ->  im_p
+       | _, _ -> (Filename.concat "gw" "images"));
+     etc_prefix = (
+       match !gw_prefix, !etc_prefix with
+       | gw_p, etc_p when gw_p <> "" && etc_p = "" ->
+           String.concat Filename.dir_sep [ gw_p; "etc" ]
+       | _, etc_p when etc_p <> "" ->  etc_p
+       | _, _ -> (Filename.concat "gw" "etc"));
      cgi;
      output_conf;
      forced_plugins = !forced_plugins;
@@ -1511,7 +1546,6 @@ let image_request conf script_name env =
         let _ = ImageDisplay.print_image_file conf fname in true
       else false
 
-
 (* Une version un peu à cheval entre avant et maintenant afin de   *)
 (* pouvoir inclure une css, un fichier javascript (etc) facilement *)
 (* et que le cache du navigateur puisse prendre le relais.         *)
@@ -1527,6 +1561,7 @@ type misc_fname =
   | Ttf of string
   | Woff of string
   | Woff2 of string
+  | Cache of string
 
 let content_misc conf len misc_fname =
   Output.status conf Def.OK;
@@ -1543,7 +1578,7 @@ let content_misc conf len misc_fname =
     | Ttf fname -> fname, "application/font-ttf"
     | Woff fname -> fname, "application/font-woff"
     | Woff2 fname -> fname, "application/font-woff2"
-
+    | Cache fname -> fname, "text/plain"
   in
   Output.header conf "Content-type: %s" t;
   Output.header conf "Content-length: %d" len;
@@ -1566,17 +1601,28 @@ let find_misc_file name =
 
 let print_misc_file conf misc_fname =
   match misc_fname with
+    Css fname | Js fname | Otf fname | Svg fname | Woff fname | Eot fname |
+    Ttf fname | Woff2 fname | Cache fname ->
+      begin
+        try
+          let ic = Secure.open_in_bin fname in
+          let buf = Bytes.create 1024 in
+          let len = in_channel_length ic in
+          content_misc conf len misc_fname;
+          let rec loop len =
+            if len = 0 then ()
+            else
+              let olen = min (Bytes.length buf) len in
+              really_input ic buf 0 olen;
+              Wserver.printf "%s" (Bytes.sub_string buf 0 olen);
+              loop (len - olen)
+          in
+          loop len; close_in ic; true
+        with Sys_error _ -> false
+      end
   | Other _ -> false
-  | Css fname
-  | Eot fname
-  | Js fname
   | Map fname
-  | Otf fname
   | Png fname
-  | Svg fname
-  | Ttf fname
-  | Woff fname
-  | Woff2 fname
     ->
     let ic = Secure.open_in_bin fname in
     let buf = Bytes.create 1024 in
@@ -1608,6 +1654,7 @@ let misc_request conf fname =
       else if Filename.check_suffix fname ".ttf" then Ttf fname
       else if Filename.check_suffix fname ".woff2" then Woff2 fname
       else if Filename.check_suffix fname ".png" then Png fname
+      else if Filename.check_suffix fname ".cache" then Cache fname
       else Other fname
     in
     print_misc_file conf misc_fname
@@ -1738,17 +1785,30 @@ let geneweb_server () =
         Some addr -> addr
       | None -> try Unix.gethostname () with _ -> "computer"
     in
-      Printf.eprintf "GeneWeb %s - " Version.txt;
+      Printf.eprintf "GeneWeb %s - " Version.ver;
       if not !daemon then
         begin
           Printf.eprintf "Possible addresses:\n\
-                   http://localhost:%d/base\n\
-                   http://127.0.0.1:%d/base\n\
-                   http://%s:%d/base\n"
+                  http://localhost:%d/base\n\
+                  http://127.0.0.1:%d/base\n\
+                  http://%s:%d/base\n"
             !selected_port !selected_port hostn !selected_port;
           Printf.eprintf "where \"base\" is the name of the database\n\
-                   Type %s to stop the service\n"
-            "control C"
+                   Type “Ctrl+C” to stop the service\n";
+          if !debug then ( (* taken from Michel Normand commit 1874dcbf7 *)
+          Printf.eprintf "gwd parameters (after GWPARAM.init & cache_lexicon):\n";
+          Printf.eprintf "  source: %s\n" Version.src;
+          Printf.eprintf "  branch: %s\n" Version.branch;
+          Printf.eprintf "  commit: %s\n" Version.commit_id;
+          Printf.eprintf "  gwd: %s\n" Sys.argv.(0);
+          Printf.eprintf "  current_dir_name: %s\n" (Sys.getcwd ());
+          Printf.eprintf "  gw_prefix: %s\n" !gw_prefix;
+          Printf.eprintf "  etc_prefix: %s\n" !etc_prefix;
+          Printf.eprintf "  images_prefix: %s\n" !images_prefix;
+          Printf.eprintf "  images_dir: %s\n" !images_dir;
+          List.iter
+            (fun a -> Printf.eprintf "  secure asset: %s\n" a) (Secure.assets ());
+          Printf.eprintf "TODO: how to print content of conf ?\n";)
         end;
       flush stderr;
       if !daemon then
@@ -1916,6 +1976,11 @@ let arg_plugins opt doc =
   , arg_plugin_doc opt doc
   )
 
+let print_version_commit () =
+  Printf.printf "Geneweb version %s\nRepository %s\n" Version.ver Version.src;
+  Printf.printf "Branch %s\nLast commit %s\n" Version.branch Version.commit_id;
+  exit 0
+
 let main () =
 #ifdef WINDOWS
   Wserver.sock_in := "gwd.sin";
@@ -1928,12 +1993,13 @@ let main () =
   let force_cgi = ref false in
   let speclist =
     [
-      ("-hd", Arg.String Secure.add_assets, "<DIR> Directory where the directory lang is installed.")
-    ; ("-bd", Arg.String Secure.set_base_dir, "<DIR> Directory where the databases are installed.")
+      ("-hd", Arg.String (fun x -> gw_prefix := x; Secure.add_assets x), "<DIR> Specify where the “etc”, “images” and “lang” directories are installed (default if empty is “gw”).")
+    ; ("-bd", Arg.String Secure.set_base_dir, "<DIR> Specify where the “bases” directory with databases is installed (default if empty is “bases”).")
     ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for socket communication (Windows) and access count.")
     ; ("-cache_langs", Arg.String (fun s -> List.iter (Mutil.list_ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
     ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
-    ; ("-images_url", Arg.String (fun x -> images_url := x), "<URL> URL for GeneWeb images (default: gwd send them).")
+    ; ("-etc_prefix", Arg.String (fun x -> etc_prefix := x; Secure.add_assets x), "<DIR> Specify where the “etc” directory is installed (default if empty is [-hd value]/etc).")
+    ; ("-images_prefix", Arg.String (fun x -> images_prefix := x), "<DIR> Specify where the “images” directory is installed (default if empty is [-hd value]/images).")
     ; ("-images_dir", Arg.String (fun x -> images_dir := x), "<DIR> Same than previous but directory name relative to current.")
     ; ("-a", Arg.String (fun x -> selected_addr := Some x), "<ADDRESS> Select a specific address (default = any address of this computer).")
     ; ("-p", Arg.Int (fun x -> selected_port := x), "<NUMBER> Select a port number (default = " ^ string_of_int !selected_port ^ ").")
@@ -1960,6 +2026,7 @@ let main () =
     ; ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock files before writing.")
     ; (arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin." )
     ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
+    ; ("-version", Arg.Unit print_version_commit, " Print the Geneweb version, the source repository and last commit id and message.")
 #ifdef UNIX
     ; ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
@@ -1985,9 +2052,20 @@ let main () =
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
   Geneweb.GWPARAM.syslog := GwdLog.syslog;
+  let gwd_cmd =
+    Array.fold_left (fun acc arg ->
+      if arg.[0] = '-' then acc ^ "<br><b>" ^ arg ^ "</b> "
+      else acc ^ arg) "" Sys.argv
+  in
+  Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
   List.iter register_plugin !plugins ;
   !GWPARAM.init () ;
   cache_lexicon () ;
+  if !auth_file <> "" && !force_cgi then
+    GwdLog.syslog `LOG_WARNING "-auth option is not compatible with CGI mode.\n \
+      Use instead friend_passwd_file= and wizard_passwd_file= in .cgf file\n";
+  if !use_auth_digest_scheme && !force_cgi then
+    GwdLog.syslog `LOG_WARNING "-digest option is not compatible with CGI mode.\n";
   if !images_dir <> "" then
     begin let abs_dir =
       let f =
@@ -1996,7 +2074,7 @@ let main () =
       let d = Filename.dirname f in
       if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d else d
     in
-      images_url := "file://" ^ slashify abs_dir
+      images_prefix := "file://" ^ slashify abs_dir
     end;
   if !(Util.cnt_dir) = Filename.current_dir_name then
     Util.cnt_dir := Secure.base_dir ();
@@ -2006,6 +2084,7 @@ let main () =
     try Sys.getenv "QUERY_STRING" |> Adef.encoded, true
     with Not_found -> "" |> Adef.encoded, !force_cgi
   in
+  if not !debug then Sys.enable_runtime_warnings false;
   if cgi then
     begin
       Wserver.cgi := true;

@@ -15,7 +15,7 @@ When proposing a PR:
 - Add some unit tests if relevant.
 - Add some benchmarks if relevant.
 - Add some comments around blocks/functions if relevant.
-- Format your code with ocamlformat (use make fmt).
+- Format your code with ocamlformat (use `make fmt`).
 
 Some reasons why a PR could be refused:
 
@@ -23,15 +23,15 @@ Some reasons why a PR could be refused:
 - PR is not meeting
   [milestones](https://github.com/geneweb/geneweb/milestones) goals.
 - PR is conflicting with another PR, and the latter is being preferred.
-- PR slows down GeneWeb, or it obviously does to many
+- PR slows down GeneWeb, or it obviously does too many
   computations for the task being accomplished. It needs to be
   optimized.
-- PR is using copy-n-paste-programming. It needs to be factorized.
+- PR is using copy-n-paste programming. It needs to be factorized.
 - PR contains commented code: remove it.
 - PR adds new features or changes the behavior of GeneWeb without
-  having be approved by the current project owners first.
-- PR is too big and needs to be split in many smaller ones.
-- PR is not formatted with ocamlformat
+  having been approved by the current project owners first.
+- PR is too big and needs to be split into many smaller ones.
+- PR is not formatted with ocamlformat.
 
 If a PR stays in a stale/WIP/POC state for too long, it may be closed
 at any time.

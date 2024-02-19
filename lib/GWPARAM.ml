@@ -4,6 +4,12 @@
     for simple functions if it does not come with a performance cost.
 *)
 
+let nb_errors = ref 0
+let errors_undef = ref []
+let errors_other = ref []
+let set_vars = ref []
+let gwd_cmd = ref ""
+
 type syslog_level =
   [ `LOG_ALERT
   | `LOG_CRIT
@@ -15,10 +21,7 @@ type syslog_level =
   | `LOG_WARNING ]
 
 module Default = struct
-  let init () =
-    List.fold_right Filename.concat [ Gwlib.prefix; "share" ] "geneweb"
-    |> Secure.add_assets;
-    Secure.add_assets Filename.current_dir_name
+  let init () = Secure.add_assets Filename.current_dir_name
 
   let base_path pref bname =
     List.fold_right Filename.concat (Secure.base_dir () :: pref) bname
@@ -41,6 +44,7 @@ module Default = struct
     fun ?(headers = []) ?(content : Adef.safe_string option) conf code ->
       Output.status conf code;
       List.iter (Output.header conf "%s") headers;
+      Output.print_string conf (Adef.encoded "<h1>Incorrect request</h1>");
       match content with
       | Some content -> Output.print_string conf content
       | None -> (

@@ -6,11 +6,12 @@
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
   %include;css
 </head>
 <body%body_prop;>
 %include;hed
+%include;home
 <div class="container">
 <script><!--
 
@@ -42,14 +43,6 @@ function update_old () {
   %end;
 </h1>
 
-%if;(not cancel_links)
-  <div class="btn-group float-%right; mt-2">
-    %if;(referer != "")
-      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg ml-1" title="[*home]"></span></a>
-  </div>
-%end;
 
 %define;no_diff(xx)
   [*insufficient revision history for %s:::xx]
@@ -62,7 +55,7 @@ function update_old () {
     <input type="hidden" name="t" value="DIFF"%/>
     <input type="hidden" name="f" value="%evar.f;"%/>
     %if;(history_len >= 2)
-      <button type="submit" class="btn btn-outline-secondary mb-2">[*compare selected revisions]</button>
+      <button type="submit" class="btn btn-outline-primary mb-2">[*compare selected revisions]</button>
     %else;
       %apply;no_diff(person)
     %end;
@@ -176,7 +169,7 @@ function update_old () {
       %end;
       %if;(before.pevent_place!=after.pevent_place)
         <tr>
-          <th scope="row" class="table-success text-nowrap">[*place]</th>
+          <th scope="row" class="table-success text-nowrap">[*place/places]0</th>
           <td class="odd">%before.pevent_place;</td>
           <td class="odd">%after.pevent_place;</td>
         </tr>
@@ -264,7 +257,7 @@ function update_old () {
         %end;
         %if;(before.fevent_place!=after.fevent_place)
           <tr>
-            <th scope="row" class="table-success text-nowrap">[*place]</th>
+            <th scope="row" class="table-success text-nowrap">[*place/places]0</th>
             <td class="odd">%before.fevent_place;</td>
             <td class="odd">%after.fevent_place;</td>
           </tr>
@@ -305,10 +298,10 @@ function update_old () {
 %end;
 
 %define;print_diff()
-  <div class="d-flex justify-content-center">
-    <a %if;(evar.old=history_len-1)class="invisible"%end; href="%prefix;m=%evar.m;&t=%evar.t;&f=%evar.f;&new=%evar.old;&old=%expr(evar.old+1)" title="[*previous diff]"><span class="fa fa-arrow-left"></span> [previous/next diff]0</a> |
-    <a href="%prefix;m=%evar.m;&t=SUM&f=%evar.f;">%if;(evar.old-evar.new>1)%expr(evar.old-evar.new-1) [intermediate revisions not shown]%else;[revision history]%end;</a>
-     | %if;(evar.new!=0)<a href="%prefix;m=%evar.m;&t=%evar.t;&f=%evar.f;&new=%expr(evar.new-1)&old=%evar.new;" title="[*next diff]"> [previous/next diff]1 <span class="fa fa-arrow-right"></span></a>%elseif;(evar.new=0)[last diff]%end;
+  <div class="text-center">
+    <a %if;(evar.old=history_len-1)class="invisible"%end; href="%prefix;m=%evar.m;&t=%evar.t;&f=%evar.f;&new=%evar.old;&old=%expr(evar.old+1)" title="[*previous/next diff]0"><span class="fa fa-arrow-left"></span> [previous/next diff]0</a> |
+    <a href="%prefix;m=%evar.m;&t=SUM&f=%evar.f;">%if;(evar.old-evar.new>1)%expr(evar.old-evar.new-1) [intermediate revisions not shown]%else;[revision history]%end;</a>
+    | %if;(evar.new!=0)<a href="%prefix;m=%evar.m;&t=%evar.t;&f=%evar.f;&new=%expr(evar.new-1)&old=%evar.new;" title="[*previous/next diff]1"> [previous/next diff]1 <span class="fa fa-arrow-right"></span></a>%elseif;(evar.new=0)[last diff]%end;
   </div>
   <table class="table mb-0 mt-3">
     <colgroup>

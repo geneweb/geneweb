@@ -1,4 +1,4 @@
-<!-- $Id: menubar.txt v7.1 17/01/2023 14:11:53 $ -->
+<!-- $Id: menubar.txt v7.1 14/11/2023 21:36:50 $ -->
 %let;laA;title="[*add::family/families]0 (A)" accesskey="A"%in;
 %let;laD;title="[*difference between the two revisions] (D)" accesskey="D"%in;
 %let;laI;title="[*add]/[delete::image/images]1 (I)" accesskey="I"%in;
@@ -20,9 +20,10 @@
     <input type="hidden" name="nnn" value="%xxx;">
   %end;
 %end;
+
 %let;p_mod;%if;(b.p_mod!="" and e.p_mod="")%b.p_mod;%elseif;(e.p_mod!="")%e.p_mod;%end;%in;
 %if;(not cancel_links)
-    <nav class="navbar sticky-top navbar-light opacity-0 justify-content-center navbar-expand-md pt-1%nn;
+    <nav class="navbar sticky-top bg-white justify-content-center navbar-expand-md pt-0%nn;
       %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
         or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
         or (e.ip!="" and (e.m="ADD_FAM" or e.m="ADD_FAM_OK" or e.m="ADD_PAR"))) mt-5%end;">
@@ -35,26 +36,25 @@
           %( personnal modules selection menu %)
           <li class="nav-item dropdown">
             <a id="load_once_p_mod" class="nav-link dropdown-toggle text-secondary dropdown-toggle-split" data-toggle="dropdown"
-              href="#" role="button" aria-haspopup="true" aria-expanded="false" title="[*module]1"%( data-offset="10,20"%)>
-              <span class="fas fa-address-card fa-fw" aria-hidden="true"></span>
+              href="#" role="button" aria-haspopup="true" aria-expanded="false" title="[*module]1"%( data-offset="10,20"%)>%nn;
+              <span class="fas fa-address-card fa-fw mr-1" aria-hidden="true"></span>%nn;
               <span class="sr-only">[*module]1</span>%nn;
             </a>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu dropdown-menu-transl">
               <div class="d-inline-flex justify-content-around mx-1">
-               <form class="form-group mx-1" name="upd_url" method="get" action="%action;">
-                  <div class="invisible" id="img_prfx">%image_prefix;/modules</div>
-                  <div class="d-flex justify-content-start mx-2">
+                <form class="form-group mx-1" name="upd_url" method="get" action="%action;">
+                  <div class="d-flex justify-content-between mx-2 mt-2 img-prfx" data-prfx="%images_prefix;modules">
+                    <div class="d-inline-flex">
                     %apply;input_hidden("e.b","b")
-                    %apply;input_hidden("e.lang","lang")
+                    %if;(e.lang!=default_lang)%apply;input_hidden("e.lang","lang")%end;
                     <div class="input-group">
                       <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"
                         value="%if;(p_mod!="zz" and p_mod!="")%p_mod;%end;"
                         placeholder="%if;(e.p_mod="" and b.p_mod!="")%b.p_mod;
-                        (%base.name;.gwf)%else;[*select p_mod]%end;"
-                        maxlength="30">
+                        (%base.name;.gwf)%else;[*select p_mod]%end;" maxlength="40">
                       <div class="input-group-append">
                         <button type="submit" class="btn btn-outline-success" title="[*validate/delete]0"><i class="fa fa-check fa-lg"></i></button>
-                        <button type="button" class="btn btn-outline-danger" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-times fa-lg mx-1"></i></button>
+                        <button type="button" class="btn btn-outline-danger" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-xmark fa-lg mx-1"></i></button>
                       </div>
                     </div>
                     %if;(e.i="")
@@ -78,28 +78,24 @@
                     %end;
                     <button type="submit" class="btn btn-outline-secondary ml-2 mr-1" id='zz'
                             title="Default template" data-toggle="popover" data-trigger="hover"
-                            data-html="true" data-content="<img class='w-100' src='%image_prefix;/modules/zz_1.jpg'>"><i class="fa fa-undo"></i></button>
-                  </div>
-                  <div class="d-flex justify-content-between">
-                    <div class="mx-2 mt-2">
-                    [
-en: Select each module by clicking on the corresponding button (max 15).
-fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
-                    ]
+                            data-html="true" data-content="<img class='w-100' src='%images_prefix;modules/zz_1.jpg'>"><i class="fa fa-arrow-rotate-left"></i></button>
                     </div>
-                    <a role="button" class="btn btn-outline-%if;(e.wide="on")danger%else;primary%end; my-3"%sp;
-                      href="%prefix_base_password;%nn;
-                            %foreach;env_binding;%if;(env.key!="wide")&%env.key=%env.val;%end;%end;%nn;
-                            %if;(e.wide!="on")&wide=on;%end;"%sp;
+                    <a role="button" class="btn btn-outline-%if;(e.wide="on")danger%else;primary%end;"
+                      href="%if;(e.wide!="")%url_set.wide;%else;%url_set.wide.on;%end;"
                       title="%if;(e.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;">%nn;
                       <i class="fa fa-desktop fa-fw" aria-hidden="true"></i>%nn;
                       <span class="sr-only">%if;(e.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span>%nn;
                     </a>
                   </div>
+                  <div class="mx-2 mt-2">[*select module]</div>
+                  <div class="alert alert-warning alert-dismissible fade show mt-1 mb-2 d-none" role="alert">
+                    <div class="d-none alert-opt">[alert option]</div>
+                    <div class="d-none alert-mod">[alert module]</div>
+                  </div>
                   <div id="p_mod_table"></div>
                 </form>
                 <div class="form-group d-none d-md-block mx-1">
-                  <img src="%image_prefix;/modules/menubar_1.jpg" alt="menubar for p_mod_builder" aria-hidden="true">
+                  <img src="%images_prefix;modules/menubar_1.jpg" alt="menubar for p_mod_builder" aria-hidden="true">
                   <div id="p_mod_builder"></div>
                 </div>
               </div>
@@ -110,20 +106,20 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
           %if;has_sosa;
             %if;(sosa_prev.index!="")
               <li class="nav-item">
-                <a class="nav-link text-secondary" href="%prefix_base_password;%if;(b.access_by_key="yes")%sosa_prev.access;%else;i=%sosa_prev.index;%end;%nn;
-                  %foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="i")&%env.key=%env.val;%end;%end;"
+                <a class="nav-link text-secondary"
+                  href="%if;(e.i="")%apply;url_set%with;p/n/oc%and;%sosa_prev.first_name;/%sosa_prev.surname;/%sosa_prev.occ;%end;%else;%apply;url_set("i", sosa_prev.index)%end;"
                   title="[Sosa] %sosa_prev.sosa;[:] %sosa_prev;"><span class="fa fa-chevron-left" aria-hidden="true"></span><span class="sr-only">&lt;</span></a>%nn;
               </li>
             %end;
-            %if(sosa_next.index!="")
+            %if;(sosa_next.index!="")
               %if;(sosa_prev.index="")
                 <li class="nav-item" title="Sosa 1[:] %self; ">
-                  <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true"><span class="far fa-dot-circle" aria-hidden="true"></span><span class="sr-only">·</span></a>%nn;
+                  <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true"><span class="far fa-circle-dot" aria-hidden="true"></span><span class="sr-only">·</span></a>%nn;
                 </li>
               %end;
               <li class="nav-item">
-                <a class="nav-link text-secondary" href="%prefix_base_password;%if;(b.access_by_key="yes")%sosa_next.access;%else;i=%sosa_next.index;%end;%nn;
-                  %foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="i")&%env.key=%env.val;%end;%end;"
+                <a class="nav-link text-secondary"
+                  href="%if;(e.i="")%apply;url_set%with;p/n/oc%and;%sosa_next.first_name;/%sosa_next.surname;/%sosa_next.occ;%end;%else;%apply;url_set("i", sosa_next.index)%end;"
                   title="[Sosa] %sosa_next.sosa;[:] %sosa_next;"><span class="fa fa-chevron-right" aria-hidden="true"></span><span class="sr-only">></span></a>
               </li>
             %end;
@@ -143,14 +139,14 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
           <li class="nav-item">
             <a class="nav-link %if;(e.m="")active%end;" id="self"
               href="%prefix;%access;" title="%first_name;%if;(occ!=0).%occ%end; %surname;">
-              <span class="fa fa-user-alt fa-fw %sexcolor;" aria-hidden="true"></span>
+              <span class="fa fa-user-large fa-fw %sexcolor;" aria-hidden="true"></span>
               <span class="sr-only">%first_name;%if;(occ!=0).%occ%end; %surname;</span>
             </a>
           </li>
           %if;(not (b.wizard_just_friend="yes") and wizard)
             <li class="nav-item">
               <a class="nav-link %if;(e.m="MOD_IND" or e.m="MOD_IND_OK")active%end;" id="mod_ind" href="%prefix;m=MOD_IND&i=%index;" %laP;>%nn;
-                <span class="fa fa-user-edit fa-fw %sexcolor;" aria-hidden="true"></span>%nn;
+                <span class="fa fa-user-pen fa-fw %sexcolor;" aria-hidden="true"></span>%nn;
                 <span class="sr-only">[*modify::person/persons]0 (P)</span>%nn;
               </a>
             </li>
@@ -158,21 +154,26 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
           <li class="nav-item dropdown">
             <a id="load_once_copylink" class="nav-link dropdown-toggle text-secondary %if;(e.m="CHG_EVT_IND_ORD" or e.m="SND_IMAGE" or e.m="MRG" or e.m="DEL_IND")active%end;"
                data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="true" title="[*tools] [person/persons]0">%nn;
-              <span class="fa fa-user-cog" aria-hidden="true"></span>%nn;
+              <span class="fa fa-user-gear" aria-hidden="true"></span>%nn;
               <span class="sr-only">[*tools] [person/persons]0</span>%nn;
             </a>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu dropdown-menu-transl">
               %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)
-                <a class="dropdown-item" href="%prefix_set.iz;%(iz=%self.index;%)pz=%first_name_key;&nz=%surname_key;%if;(e.oc!="" and e.oc!=0)&ocz=%occ;%end;&%access;" %laS; title="%apply;nav_with_sosa_ref(self)">%nn;
-                  <i class="far fa-dot-circle fa-fw %sexcolor; mr-1"></i> [*modify::Sosa 1]%nn;
-                </a>
-              %else;
-                <a class="dropdown-item" href="%prefix_set.iz;%suffix;" title="%if;(b.default_sosa_ref!="")%nl;[back to default sosa reference] %b.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">%nn;
-                  <i class="far fa-stop-circle fa-fw %sexcolor; mr-1"></i> [*user/password/cancel]2 [navigation] [Sosa]%nn;
+                  <a class="dropdown-item"
+                    href="%if;(b.access_by_key="yes")%apply;url_set%with;pz/nz/ocz%and;%first_name_key;/%surname_key;/%if;(occ!=0)%occ;%end;%end;
+                          %else;%url_set.iz.index;%end;"
+                    title="%apply;nav_with_sosa_ref(self)" %laS;>%nn;
+                    <i class="far fa-circle-dot fa-fw %sexcolor; mr-1"></i> [*modify::Sosa 1]%nn;
+                  </a>
+              %end;
+              %if;(browsing_with_sosa_ref)
+                <a class="dropdown-item" href="%url_set.iz_pz_nz_ocz;"
+                  title="%if;(b.default_sosa_ref!="")%nl;[back to default sosa reference] %b.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">%nn;
+                  <i class="far fa-circle-stop fa-fw text-danger mr-1"></i> [*user/password/cancel]2 [navigation] [Sosa]%nn;
                 </a>
               %end;
               %if;(e.m!="ADD_FAM" and e.m!="MOD_FAM" and e.m!="MOD_IND" and e.m!="R" and e.m!="U")
-                <a class="dropdown-item" href="%url;&cgl=on" target="_blank"><i class="fa fa-unlink fa-fw mr-2" title="[*cancel GeneWeb links]"></i>[*cancel GeneWeb links]</a>%nn;
+                <a class="dropdown-item" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-link-slash fa-fw mr-2" title="[*cancel GeneWeb links]"></i>[*cancel GeneWeb links]</a>%nn;
               %end;
           %if;(not (b.wizard_just_friend="yes") and wizard)
                 <div class="dropdown-divider"></div>
@@ -183,14 +184,14 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 %end;
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;m=MRG&i=%index;" title="[*merge] %first_name;.%occ; %surname; [with]…"><span class="fa fa-compress fa-fw text-danger mr-2"></span>[*merge::person/persons]1</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=DEL_IND&i=%index;" title="[*delete] %self;"><span class="fa fa-trash-alt fa-fw text-danger mr-2"></span>[*delete::person/persons]0</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=DEL_IND&i=%index;" title="[*delete] %self;"><span class="fa fa-trash-can fa-fw text-danger mr-2"></span>[*delete::person/persons]0</a>
                 %if;has_possible_duplications;
                   <a class="dropdown-item" href="%prefix;m=MRG_DUP&ip=%index;">[*merge::possible duplications]</a>
                 %end;
                 %if;(b.history_diff="yes" and has_history)
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="%prefix;m=HIST_DIFF&t=SUM&f=%history_file;"><span class="fa fa-archive fa-fw mr-2"></span>[*revision history]</a>
-                  <a class="dropdown-item" href="%prefix;m=HIST_DIFF&t=DIFF&f=%history_file;&new=0&old=1" %laD;><span class="fa fa-history fa-fw mr-2"></span>[*last diff]</a>
+                  <a class="dropdown-item" href="%prefix;m=HIST_DIFF&t=SUM&f=%history_file;"><span class="fa fa-box-archive fa-fw mr-2"></span>[*revision history]</a>
+                  <a class="dropdown-item" href="%prefix;m=HIST_DIFF&t=DIFF&f=%history_file;&new=0&old=1" %laD;><span class="fa fa-clock-rotate-left fa-fw mr-2"></span>[*last diff]</a>
                 %end;
                 %if;has_parents;
                   %foreach;father.child;
@@ -208,7 +209,8 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 <div class="dropdown-divider"></div>
                 <div class="btn-group pr-4" role="group">
                   <button class="dropdown-item permalink-copy mr-1 pr-0" type="button"
-                    title="%apply;copylink([wizard/wizards/friend/friends/exterior]4)" data-wikilink="%base.name;?p=%first_name_key;&n=%surname_key;%if;(occ!="0")&oc=%occ;%end;%foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="i" and env.key!="")&%env.key=%env.val;%end;%end;"><i class="fas fa-link fa-fw mr-2"></i>[*copy permalink] [wizard/wizards/friend/friends/exterior]4</button>
+                    title="%apply;copylink([wizard/wizards/friend/friends/exterior]4)"
+                    data-wikilink="%base.name;?p=%first_name_key;&n=%surname_key;%if;(occ!="0")&oc=%occ;%end;%foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="i" and env.key!="")&%env.key=%env.val;%end;%end;"><i class="fas fa-link fa-fw mr-2"></i>[*copy permalink] [wizard/wizards/friend/friends/exterior]4</button>
                   <button class="disabled dropdown-item mx-0 px-0">/</button>
                   <button class="mx-1 px-0 dropdown-item permalink-friend-copy" type="button"
                     title="%apply;copylink([wizard/wizards/friend/friends/exterior]2)">%nn;
@@ -218,19 +220,21 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                     title="%apply;copylink([wizard/wizards/friend/friends/exterior]0)">%nn;
                     [wizard/wizards/friend/friends/exterior]0</button>
                 </div>
-                <div class="dropdown-divider"></div>
-                <button class="dropdown-item simple-copy" type="button" title="[*copy link %s:::wiki]"
-                   data-wikilink="%[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]">%nn;<i class="far fa-clipboard fa-fw mr-2"></i>%nn;
-                   %[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]</button>
-                <button class="dropdown-item full-copy" type="button" title="[*copy link %s:::wikitext]"  
-                  data-wikilink="%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]"><i class="far fa-clipboard fa-fw mr-2"></i>%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]</button>
+                %if;(self!="? ?")
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-item simple-copy" type="button" title="[*copy link %s:::wiki]"
+                     data-wikilink="%[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]">%nn;<i class="far fa-clipboard fa-fw mr-2"></i>%nn;
+                     %[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]</button>
+                  <button class="dropdown-item full-copy" type="button" title="[*copy link %s:::wikitext]"
+                    data-wikilink="%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]"><i class="far fa-clipboard fa-fw mr-2"></i>%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]</button>
+                %end;
                 <div class="dropdown-divider"></div>
                 %define;searchgnt(xx)
                   [*search %s on Geneanet:::xx]
                 %end;
-                <a class="dropdown-item" role="button" title="%apply;searchgnt(self)" 
-                  href="https://www.geneanet.org/fonds/individus/?sourcename=&size=50&sexe=&nom=%surname;&ignore_each_patronyme=&with_variantes_nom=1&prenom=%first_name;&prenom_operateur=or&ignore_each_prenom=&profession=&ignore_each_profession=&nom_conjoint=&ignore_each_patronyme_conjoint=&prenom_conjoint=&prenom_conjoint_operateur=or&ignore_each_prenom_conjoint=&place__0__=%birth_place;&zonegeo__0__=&country__0__=&region__0__=&subregion__0__=&place__1__=&zonegeo__1__=&country__1__=&region__1__=&subregion__1__=&place__2__=&zonegeo__2__=&country__2__=&region__2__=&subregion__2__=&place__3__=&zonegeo__3__=&country__3__=&region__3__=&subregion__3__=&place__4__=&zonegeo__4__=&country__4__=&region__4__=&subregion__4__=&type_periode=between&from=%if;(has_birth_date and birth_date.year!="")%expr(birth_date.year-15)%end;&to=%if;(has_death_date and death_date.year!="")%expr(death_date.year+15)%end;&exact_day=&exact_month=&exact_year=&nom_pere=&ignore_each_patronyme_pere=&prenom_pere=&prenom_pere_operateur=or&ignore_each_prenom_pere=&nom_mere=%if;(has_parents and mother.surname!="?")%mother.surname;%end;&ignore_each_patronyme_mere=&with_variantes_nom_mere=1&prenom_mere=&prenom_mere_operateur=or&ignore_each_prenom_mere=&with_parents=0&go=1" target="_blank" rel="noreferrer, noopener"><i class="fa fa-search fa-fw mr-2"></i>%nn;
-                  [*search %s on Geneanet:::]</a>
+                <a class="dropdown-item" role="button" title="%apply;searchgnt(self)"
+                  href="https://www.geneanet.org/fonds/individus/?sourcename=&size=50&sexe=&nom=%apply;uri_encode(surname)&ignore_each_patronyme=&with_variantes_nom=1&prenom=%apply;uri_encode(first_name)&prenom_operateur=or&ignore_each_prenom=&profession=&ignore_each_profession=&nom_conjoint=&ignore_each_patronyme_conjoint=&prenom_conjoint=&prenom_conjoint_operateur=or&ignore_each_prenom_conjoint=&place__0__=%if;(has_birth_place)%apply;uri_encode(birth_place)&zonegeo__0__=&country__0__=&region__0__=&subregion__0__=&place__1__=&zonegeo__1__=&country__1__=&region__1__=&subregion__1__=&place__2__=&zonegeo__2__=&country__2__=&region__2__=&subregion__2__=&place__3__=&zonegeo__3__=&country__3__=&region__3__=&subregion__3__=&place__4__=&zonegeo__4__=&country__4__=&region__4__=&subregion__4__=&type_periode=between&from=%if;(has_birth_date and birth_date.year!="")%expr(birth_date.year-15)%end;&to=%if;(has_death_date and death_date.year!="")%expr(death_date.year+15)%end;&exact_day=&exact_month=&exact_year=&nom_pere=&ignore_each_patronyme_pere=&prenom_pere=&prenom_pere_operateur=or&ignore_each_prenom_pere=&nom_mere=%if;(has_parents and mother.surname!="?")%apply;uri_encode(mother.surname)%end;&ignore_each_patronyme_mere=&with_variantes_nom_mere=1&prenom_mere=&prenom_mere_operateur=or&ignore_each_prenom_mere=&with_parents=0&go=1%end;" target="_blank" rel="noreferrer, noopener"><i class="fa fa-search fa-fw mr-2"></i>%nn;
+                  [*search %s on Geneanet::]</a>
               </div>
             </li>
           %else;
@@ -265,22 +269,22 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                   <a class="nav-link %if;((e.m="MOD_FAM" or e.m="MOD_FAM_OK") and e.i=family.index)active%end;" id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
                     title="[*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)"
                     accesskey="%a_k;">%nn;
-                    <span class="fa fa-user-edit %sexcolor;" aria-hidden="true"></span><span class="fa fa-user %apply;spousesexcolor(spouse.sex)" aria-hidden="true"></span>%if;(nb_families!=1)<span class="small align-top"><sup>%family_cnt;</sup></span>%end;
-                    <span class="sr-only">%sp;[*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)</span>
+                    <span class="fa fa-user-pen %sexcolor;" aria-hidden="true"></span><span class="fa fa-user %apply;spousesexcolor(spouse.sex)" aria-hidden="true"></span>%if;(nb_families!=1)<span class="small align-top"><sup>%family_cnt;</sup></span>%end;
+                    <span class="sr-only"> [*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)</span>
                   </a>
                 </li>
               %end;
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle text-secondary 
+                <a class="nav-link dropdown-toggle text-secondary
                    %if;(e.m="ADD_FAM" or e.m="CHG_EVT_FAM_ORD" or e.m="DEL_FAM"
-                   or e.m="MRG_FAM" or e.m="INV_FAM" or e.m="CHG_CHN")active%end;"
+                   or e.m="MRG_FAM" or e.m="INV_FAM" or e.m="CHG_CHN") active%end;"
                    data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"
                    title="[*tools] %if;(nb_families>1)[family/families]1%else;[family/families]0%end;">%nn;
                    <span class="fa fa-user-plus" aria-hidden="true"></span>%nn;
-                   <span class="fa fa-user-cog" aria-hidden="true"></span>%nn;
+                   <span class="fa fa-user-gear" aria-hidden="true"></span>%nn;
                    <span class="sr-only">[*tools] %if;(nb_families>1)[family/families]1%else;[family/families]0%end;</span>%nn;
                  </a>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu dropdown-menu-transl">
                   %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
                   %elseif;(not is_male and not is_female)
                     <a class="dropdown-item" href="%prefix;m=ADD_FAM&ip=%index;&sex=M"><span class="fa fa-plus"></span> [*add::relation/relations]0 ([M/F]0)</a>
@@ -293,7 +297,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                     %if;(family_cnt != 1)
                       <a class="dropdown-item" href="%prefix;m=INV_FAM&i=%index;&f=%family.index;"
                         title="[*invert::family/families]1 %expr(family_cnt-1) [and] %family_cnt;">%nn;
-                        <span class="fa fa-exchange-alt fa-rotate-90 fa-fw mr-1"></span> [*invert::family/families]1%nn;
+                        <span class="fa fa-right-left fa-rotate-90 fa-fw mr-1"></span> [*invert::family/families]1%nn;
                         <span class="sr-only"> %expr(family_cnt-1) [and] %family_cnt;</span>
                       </a>
                       <div class="dropdown-divider"></div>
@@ -303,7 +307,7 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                     <a class="dropdown-item" href="%prefix;m=DEL_FAM&i=%family.index;&ip=%index"><span class="fa fa-trash fa-fw text-danger mr-2"></span>[*delete::family/families]0</a>
                     %if;(family_cnt != 1)
                       %if;(family.father.index = prev_family.father.index and family.mother.index = prev_family.mother.index)
-                        <a class="dropdown-item" href="%prefix;m=MRG_FAM&i=%prev_family.index;&i2=%family.index;&ip=%index;"><span class="fa fa-user-times fa-fw mr-1">[*merge::family/families]1</a>
+                        <a class="dropdown-item" href="%prefix;m=MRG_FAM&i=%prev_family.index;&i2=%family.index;&ip=%index;"><span class="fa fa-user-xmark fa-fw mr-1">[*merge::family/families]1</a>
                       %end;
                     %end;
                   %end;
@@ -317,63 +321,60 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
           %end;
           %if;has_parents;
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-secondary %if;(e.m="A")active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"><span class="fa fa-code-fork fa-fw" title="[*ancestor/ancestors]1"></span></a>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="%prefix;%access;&m=A"><span class="fa fa-cog fa-fw mr-2"></span>[*ancestor/ancestors]1</a>
+              <a class="nav-link dropdown-toggle text-secondary%if;(e.m="A") active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"><span class="fa fa-code-fork fa-fw" title="[*ancestor/ancestors]1"></span></a>
+              <div class="dropdown-menu dropdown-menu-transl">
+                <a class="dropdown-item" href="%prefix;%access;&m=A"><span class="fa fa-gear fa-fw mr-2"></span>[*ancestor/ancestors]1</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" id="anc_tree" href="%prefix;%access;&m=A&t=T&v=5" %laY;><span class="fa fa-code-fork fa-fw mr-2"></span>[*ascendants tree]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=A&t=H&v=5" title="[*horizontal tree]"><span class="fa fa-timeline fa-rotate-90 fa-fw mr-2"></span>[*horizontal tree]</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=A&t=Z&v=7&maxv=%max_anc_level;&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on&gen=1&ns=1&hl=1%if;(e.im=0)&im=0%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [*ancestor/ancestors]1</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=A&t=G&v=3&maxv=%max_anc_level;&siblings=on&alias=on&spouse=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><span class="fa fa-newspaper fa-fw mr-2"></span>[*long display]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=Z&v=6&maxv=%max_anc_level;&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on&gen=1&ns=1&hl=1%if;(e.im=0)&im=0%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [ancestor/ancestors]1</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=G&v=3&maxv=%max_anc_level;&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><span class="fa fa-newspaper fa-fw mr-2"></span>[*long display]</a>
+                <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;i=%index;&m=A&t=F&tf1=sb&v=%max_anc_level;&maxv=%max_anc_level;"><span class="fa fa-align-justify fa-fw mr-2"></span>[*surnames branch]</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=CT&hi=H&v=5&scale=100&fs=17&sosa=on" title="[*compact tree] [with] %self;"><span class="fa fa-th fa-fw mr-2"></span>[*compact tree]</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=h7&wide=on" title="[Arbre 7 gen]"><span class="fa fa-border-none fa-fw mr-2"></span>7 [generation/generations]1</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=m" title="[Arbre 9 gen]"><span class="fa fa-chess-board fa-fw mr-2"></span>9 [generation/generations]1</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=5"><span class="fa fa-chart-pie fa-fw mr-2"></span>[*fanchart]</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=A&t=FC&v=5"><span class="fa fa-chart-pie fa-fw mr-2"></span>[*v7 fanchart]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=CT&hi=H&v=5&scale=100&fs=17&sosa=on" title="[*compact tree] [with] %self;"><span class="fa fa-table-cells fa-fw mr-2"></span>[*compact tree]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=h6&sosa=1" title="H-tree 6 generation with CSS (127 ind.)"><span class="fa fa-border-none fa-fw mr-2"></span>6 [generation/generations]1</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=A&t=T&t1=m" title="[*arbre 8 gen]"><span class="fa fa-chess-board fa-fw mr-2"></span>8 [generation/generations]1</a>
               </div>
             </li>
           %end;
           %if;has_children;
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle text-secondary %if;(e.m="D")active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"><span class="fa fa-sitemap fa-fw" title="[*descendants]"></span></a>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="%prefix;%access;&m=D"><span class="fa fa-cog fa-fw mr-2"></span>[*descendants]</a>
+              <a class="nav-link dropdown-toggle text-secondary%if;(e.m="D") active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false"><span class="fa fa-sitemap fa-fw" title="[*descendants]"></span></a>
+              <div class="dropdown-menu dropdown-menu-transl">
+                <a class="dropdown-item" href="%prefix;%access;&m=D"><span class="fa fa-gear fa-fw mr-2"></span>[*descendants]</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=D&t=T&v=4"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*descendants tree]</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=D&t=D&v=%max_desc_level;"><span class="fa fa-code-branch fa-rotate-90 fa-fw mr-2"></span>[*descendant tree view]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=D&t=V&%if;(e.v!="")v=%e.v;%else;v=3%end;"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*descendants tree]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=D&t=TV&%if;(e.v!="")v=%e.v;%else;v=3%end;"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*compact descendants tree]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=D&t=D&%if;(e.v!="")v=%e.v;%else;v=3%end;"><span class="fa fa-code-branch fa-rotate-90 fa-fw mr-2"></span>[*descendant tree view]</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=D&t=I&v=%max_desc_level;&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&gen=1&ns=1&hl=1%if;(e.im="0")&im=0%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [descendants]</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=D&t=L&v=3&maxv=%max_desc_level;&siblings=on&alias=on&spouse=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><span class="fa fa-newspaper fa-fw mr-2"></span>[*long display]</a>
-                <a class="dropdown-item" href="%prefix;%access;&m=D&t=TV&v=4"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*compact descendants tree]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=D&t=L&v=3&maxv=%max_desc_level;&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"><span class="fa fa-newspaper fa-fw mr-2"></span>[*long display]</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=D&t=V&%if;(e.v!="")v=%e.v;%else;v=3%end;&sp=on&ma=on"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*descendants tree] (new)</a>
                 <a class="dropdown-item" href="%prefix;%access;&m=D&t=A&num=on&v=%max_desc_level;"><span class="fa fa-code-branch fa-flip-vertical fa-fw mr-2"></span>D’Aboville</a>
               </div>
             </li>
           %end;
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-secondary %if;(e.m="R" or e.m="F" or (e.m="C" and e.t="AN"))active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false" title="[*relationship]"><span class="fa fa-user-friends"></span></a>
-            <div class="dropdown-menu">
-              <a class="dropdown-item" href="%prefix;%access;&m=R" %laR;><span class="fa fa-cog fa-fw mr-2"></span>[*relationship computing]</a>
+            <a class="nav-link dropdown-toggle text-secondary%if;(e.m="R" or e.m="F" or (e.m="C" and e.t="AN")) active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false" title="[*relationship]"><span class="fa fa-user-group"></span></a>
+            <div class="dropdown-menu dropdown-menu-transl">
+              <a class="dropdown-item" href="%prefix;%access;&m=R" %laR;><span class="fa fa-gear fa-fw mr-2"></span>[*relationship computing]</a>
               <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=C&v=7"
+                <a class="dropdown-item" href="%prefix;m=C&%access;&v=3"
                   title="[*relationship link/relationship links]0 [with] [close family]"><span class="fa fa-elevator fa-fw mr-2"></span>[*relationship]</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" %nn;
-                href="%prefix;%access;&m=F%nn;
-                  %if;(b.default_fnav_images="off")&image=off;%end;%nn;
-                  %if;(b.default_fnav_semi="on")&semi=on;%end;%nn;
-                  %if;(b.default_fnav_spouse="on")&spouse=on;%end;" title="[*family/families]0">
+                href="%prefix;m=F&%access;%if;(e.im=0)&im=0%end;" title="[*family/families]0">
                 <span class="fa fa-users fa-fw mr-2"></span>[*family/families]0
               </a>
               %if;(died = "" and (wizard or friend))
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;%access;&m=C&t=AN"><span class="fa fa-birthday-cake fa-fw mr-2"></span>[*family birthday]</a>
+                <a class="dropdown-item" href="%prefix;%access;&m=C&t=AN"><span class="fa fa-cake-candles fa-fw mr-2"></span>[*family birthday]</a>
               %end;
             </div>
           </li>
-          %if;(carrousel_img_nbr>0 and is_public)
+          %if;(carrousel_img_nbr>0)
             <li class="nav-item">
               <a class="nav-link text-secondary" data-toggle="modal" data-target="#carousel_modal"
                 title="[*display carrousel]">
@@ -381,22 +382,29 @@ fr: Sélectionnez les modules en cliquant sur le bouton correspondant (max 15).
                 <span class="sr-only">[*image/images]1</span>%nn;
               </a>
             </li>
-          %elseif(wizard)
-          <li class="nav-item">
-            <a class="nav-link text-secondary" href="%prefix;m=SND_IMAGE_C&i=%index;" %laI;>
-              <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
-              <span class="sr-only">[*add]/[delete] [image/images]1</span>%nn;
-            </a>
-          </li>
+          %end;
+          %if;wizard;
+            <li class="nav-item%if;(carrousel_img_nbr>0) d-none%end;">
+              <a class="nav-link text-secondary" href="%prefix;m=SND_IMAGE_C&i=%index;" %laI;>
+                <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
+                <span class="sr-only">[*add]/[delete] [image/images]1</span>%nn;
+              </a>
+            </li>
           %end;
         </ul>
       </div></div>
     </nav>
-  %include;home
+  %( exclusion because AD/MO|D_|PAR/FAM have a menubar if e.ip!="" but the new ADDFAM don’t! %)
+  %if;(not (e.ip!="" and "D_FAM" in e.m or "D_PAR" in e.m))
+    %include;home
+  %end;
   %if;(evar.m="C" and e.v1!="" or e.v2!="" and not cancel_links)
     %include;buttons_cousins
   %end;
 %end;
 %if;(carrousel_img_nbr>0)
 %include;carrousel_display
+%end;
+%if;(e.lexcheck=1)
+  %include;lexcheck
 %end;

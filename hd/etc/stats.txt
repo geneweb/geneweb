@@ -1,29 +1,22 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: stats.txt v7.1 10/01/2022 20:01:49 $ -->
+  <!-- $Id: stats.txt v7.1 27/10/2023 03:33:17 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*statistics]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
 %include;css
 </head>
 <body%body_prop;>
 %include;hed
 %message_to_wizard;
 <div class="container">
+%( %include;menubar not complete %)
+%include;home
 <h1>[*statistics]</h1>
-
-%if;not cancel_links;
-  <div class="btn-group float-%right;">
-    %if;(referer != "")
-      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg pl-1" title="[*home]"></span></a>
-  </div>
-%end;
 
 %define;births(nnn)[the latest %d births:::nnn]%end;
 %define;deaths(nnn)[the latest %t deaths:::nnn]%end;
@@ -49,7 +42,7 @@
 
 %if;(wizard or friend)
   <ul>
-    <li><a href="%prefix;m=POP_PYR&int=5&lim=0">[population pyramid]</a></li>
+    <li><a href="%prefix;m=POP_PYR">[population pyramid]</a></li>
   </ul>
 %end;
 

@@ -28,7 +28,7 @@
       </h5>
       <div class="modal-body d-flex justify-content-center">
         <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="5000">
-        %( let;maximg;%if;has_portrait;%expr(carrousel_img_nbr+1)%else;%carrousel_img_nbr;%end;%in;
+        %(%let;maximg;%if;has_portrait;%expr(carrousel_img_nbr+1)%else;%carrousel_img_nbr;%end;%in;
             <ol class="carousel-indicators">
             %for;i;0;maximg;
             <li %if;(i=0)class="active"%end; data-target="#carousel" data-slide-to="%i;"></li>
@@ -49,9 +49,9 @@
             %if;has_carrousel;
               %foreach;img_in_carrousel;%incr_count;
                 <div class="carousel-item%if;(not has_portrait and is_first) active%end;">
-                  %if;(url!="")
-                    <a href="%url;" target="_blank" rel="noopener">
-                      url image
+                  %if;(url_in_env!="")
+                    <a href="%url_in_env;" target="_blank" rel="noopener">
+                      url_in_env image
                     </a>
                   %else;
                     <a href="%prefix;m=IM_C&i=%index;&s=%carrousel_img;" target="_blank" rel="noopener">

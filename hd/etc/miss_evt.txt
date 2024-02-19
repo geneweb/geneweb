@@ -111,7 +111,7 @@
 %define;display_edit_ind_btn(label)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_IND&i=%ancestor.index;#label">
-      <img class="not_printable" src="%image_prefix;/picto_edit_big.png" title="[edit person]">
+      <img class="not_printable" src="%images_prefix;picto_edit_big.png" title="[edit person]">
     </a>
   %else;
     &nbsp;
@@ -121,7 +121,7 @@
 %define;display_edit_fam_btn()
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%ancestor.index;#marr">
-      <img class="not_printable" src="%image_prefix;/picto_edit_big.png" title="[edit family]">
+      <img class="not_printable" src="%images_prefix;picto_edit_big.png" title="[edit family]">
     </a>
   %else;
     &nbsp;
@@ -166,8 +166,8 @@
       %sp;->
       [same ancestor as n° Sosa]
       <a href="#%xx.index;">
-        %if(evar.sosab = 16)%xx.same.hexa;
-        %elseif(evar.sosab = 8)%xx.same.octal;
+        %if;(evar.sosab = 16)%xx.same.hexa;
+        %elseif;(evar.sosab = 8)%xx.same.octal;
         %else;%xx.same;
         %end;
       </a>
@@ -254,7 +254,7 @@
             %apply;has_missing_marriage_date()
             <td %apply;td_family_missing_style("xx")>
               %slash_marriage_date;
-              %if(count>0)
+              %if;(count>0)
                 &nbsp;
                 %apply;display_edit_fam_btn()
               %end;
@@ -272,7 +272,7 @@
             %apply;has_missing_marriage_date()
             <td %apply;td_family_missing_style("xx")>
               %slash_marriage_date;
-              %if(count>0)
+              %if;(count>0)
                 &nbsp;
                 %apply;display_edit_fam_btn()
               %end;
@@ -292,7 +292,7 @@
             %apply;has_missing_marriage_place()
             <td %apply;td_family_missing_style("xx")>
               %marriage_place;
-              %if(count>0)
+              %if;(count>0)
                 &nbsp;
                 %apply;display_edit_fam_btn()
               %end;
@@ -310,7 +310,7 @@
             %apply;has_missing_marriage_place()
             <td %apply;td_family_missing_style("xx")>
               %marriage_place;
-              %if(count>0)
+              %if;(count>0)
                 &nbsp;
                 %apply;display_edit_fam_btn()
               %end;
@@ -399,7 +399,7 @@
         %apply;has_missing_marriage_date()
         <td %apply;td_family_missing_style2("xx")>
           %slash_marriage_date;
-          %if(count>0)
+          %if;(count>0)
             &nbsp;
             %apply;display_edit_fam_btn()
           %end;
@@ -409,7 +409,7 @@
         %apply;has_missing_marriage_place()
         <td %apply;td_family_missing_style2("xx")>
           %marriage_place;
-          %if(count>0)
+          %if;(count>0)
             &nbsp;
             %apply;display_edit_fam_btn()
           %end;

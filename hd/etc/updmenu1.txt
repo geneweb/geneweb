@@ -7,7 +7,7 @@
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">
   %include;favicon
   %include;css
 </head>
@@ -29,7 +29,7 @@
   <h2>[*update family]</h2>
   <div class="new-form">
     %if;(has_families and nb_families > 1)
-      <p class="rub_expl etiquette">[*select a spouse]</p>
+      <p class="rub_expl etiquette">[*select a spouse][:]</p>
       <select onchange="main($(this).val());" style="margin-right:10px;">
         %foreach;family;
           <option value="%family_cnt;">%spouse;</option>
@@ -92,7 +92,7 @@
                 %let;curr_fam_cnt;%family_cnt;%in;
                 <select onchange="$('#marriage_mod_form%family_cnt;').submit();" name="n">
                   %foreach;family;
-                    <option %if(family_cnt = curr_fam_cnt) selected="selected" %end; value="%family_cnt;">
+                    <option %if;(family_cnt = curr_fam_cnt) selected="selected" %end; value="%family_cnt;">
                       %family_cnt;
                     </option>
                   %end;

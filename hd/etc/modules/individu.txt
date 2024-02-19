@@ -12,18 +12,11 @@
 %define;getvar(nnn)
   %get_var.nnn;
 %end;
-%define;half(xxx,yyy,ccc)
-  %if;(ccc>0)
-    [xxx:::yyy]s
-  %else;
-    [*xxx:::yyy]s
-  %end;
-%end;
-%define;cousin(l1,l2,dd,ccc)
+%define;cousin(l1,l2,dd,cc)
   %if;([cousin.l1.l2]!="[cousin.l1.l2]")
-    %apply;half("cousin.l1.l2","dd",ccc)
+    %if;(cc>0)[cousin.l1.l2:::dd]s%else;[*cousin.l1.l2:::dd]s%end;
   %else;
-    %if;(ccc>0)[close family]0
+    %if;(cc>0)[close family]0
     %else;[*close family]0
     %end; (<small class="text-muted">l1/l2</small>)
   %end;
@@ -103,7 +96,7 @@
 %end;
 %define;sosa(ccc)
   %reset_count;
-  <li class="mt-1"><span class="fa-li"><i class="far fa-dot-circle text-success"></i></span>
+  <li class="mt-1"><span class="fa-li"><i class="far fa-circle-dot text-success"></i></span>
     %if;(sosa=1)[*Sosa 1]
     %else;
       %apply;a_of_b%with;<a href="%prefix;%sosa_link;">[Sosa] %sosa;</a> – %nn;
@@ -116,7 +109,7 @@
       %and;
         %if;(sosa_ref.is_restricted)%sosa_ref;
         %else;<a href="%prefix;%sosa_ref.access;" title="[Sosa 1]">%sosa_ref;</a>%end;%nn;
-        %if;(sosa.lvl>9)(%apply;nthgen%with;%sosa.lvl;%end;)%end;
+        %if;(sosa.lvl>9) (%apply;nthgen%with;%sosa.lvl;%end;)%end;
       %end;
     %end;
   </li>
@@ -126,14 +119,14 @@
   %else;
     <a href="%prefix;bbb"
       title="%apply;a_of_b%with;Sosa sss%and;%self;%end;&#10;
-             %apply;a_of_b%with;Sosa ttt%and%sosa_ref;%end">aaa</a>%nn;
+             %apply;a_of_b%with;Sosa ttt%and;%sosa_ref;%end;">aaa</a>%nn;
   %end;
 %end;
 %define;all_link()
   <a href="%prefix;em=R&et=S&ei=%index;&i=%sosa_ref.index;&dag=on"
 %( autre possibilité %prefix;&m=NG&em=R&et=A&ei=%index;&select=%sosa_ref.index;&spouse=on&long=on" %)
     title="[*link between] %self; [and] %sosa_ref;">
-    <i class="fas fa-%if;(l1=0)child%else;user-friends%end;"></i></a>
+    <i class="fas fa-%if;(l1=0)child%else;user-group%end;"></i></a>
 %end;
 %define;from_sosa(ccc)
   %if;(browsing_with_sosa_ref and has_parents)
@@ -200,7 +193,7 @@
 %end;
 %( Calculs d’âge en années/mois/jours et en jours de Mickael Rouesné %)
 %define;remainder(xxx)
-  %let;tmp;%expr(xxx-((xxx/1000)*1000))%in;
+  %let;tmp;%expr(xxx-((xxx/10/10/10)*1000))%in;
   %if;(tmp<10)00%tmp;%nn;
   %elseif;(tmp<100)0%tmp;%nn;
   %else;%tmp;%end;
@@ -216,7 +209,7 @@
     %if;(today.julian_day > birth_date.julian_day)
       %expr(today.julian_day - birth_date.julian_day)
     %else;0%end;
-  %end;
+  %else;0%end;
 %in;
 %define;nb_days(xx)
   %apply;nth%with;
@@ -240,9 +233,7 @@
     %if;(z3 > 0)z3 %nn;
       %if;(z3 = 1)[year/month/day]2%else;[days old]%end;
     %end;
-  %end;
-  %if;(l_nbd > 999) (%expr(l_nbd/1000)[(thousand separator)]%apply;remainder(l_nbd) [days old])%nn;
-  %elseif;(l_nbd > 31) (%l_nbd; [days old])%end;
+  %end;%if;(lang="en") old%end;
 %end;
 %define;compute_age(z1,z2)
   %( test for z1.year has been done before call %)
@@ -286,9 +277,9 @@
       <li title="[*birth]">
         <span class="fa-li"><i class="fas fa-baby"></i></span>
         %if;has_birth_date;[*born]s %on_birth_date;
-          %if;has_birth_place; - %birth_place;%end;
+          %if;has_birth_place; [in (place)] %birth_place;%end;
         %else;
-          %if;has_birth_place;[*born]s - %birth_place;
+          %if;has_birth_place;[*born]s [in (place)] %birth_place;
           %end;
         %end;
       </li>
@@ -303,9 +294,9 @@
       <li title="[*baptism]">
         <span class="fa-li"><i class="fas fa-dove"></i></span>
         %if;has_baptism_date;[*baptized]s %on_baptism_date;
-            %if;has_baptism_place; - %baptism_place;%end;
+            %if;has_baptism_place; [in (place)] %baptism_place;%end;
         %else;
-          %if;has_baptism_place;[*baptized]s - %baptism_place;
+          %if;has_baptism_place;[*baptized]s [in (place)] %baptism_place;
           %end;
         %end;
       </li>%nl;
@@ -315,7 +306,7 @@
         <span class="fa-li"><i class="fas fa-skull-crossbones"></i></span>
         %apply;capitalize(died)
         %if;has_death_date; %on_death_date;%end;
-        %if;has_death_place; - %death_place;%end;
+        %if;has_death_place; [in (place)] %death_place;%end;
         %if;(has_linked_page.DEATH and linked_page.DEATH!="") (%linked_page.DEATH;)%end;</li>%nl;
     %end;
     %if;(is_buried or is_cremated)
@@ -323,11 +314,11 @@
         <span class="fa-li"><i class="fas fa-cross"></i></span>
         %if;is_buried;[*buried]s
           %if;has_burial_date; %on_burial_date;%end;
-          %if;has_burial_place; - %burial_place;%end;</li>%nl;
+          %if;has_burial_place; [in (place)] %burial_place;%end;
         %end;
         %if;is_cremated;[*cremated]s
           %if;has_cremation_date; %on_cremation_date;%end;
-          %if;has_cremation_place; - %cremation_place;%end;</li>%nl;
+          %if;has_cremation_place; [in (place)] %cremation_place;%end;
         %end;
       </li>%nl;
     %end;
@@ -335,7 +326,11 @@
       <li class="mt-1" title="%nn;
         %if;(is_dead and computable_death_age)[*age at death]
         %elseif;(not is_dead and computable_age)[*age]
-        %end;"><span class="fa-li"><i class="far fa-id-card"></i></span>
+        %end;
+        = %if;(l_nbd > 999)%expr(l_nbd/10/10/10)[(thousand separator)]%apply;remainder(l_nbd) [days old]%nn;
+        %elseif;(l_nbd > 31)%l_nbd; [days old]%nn;
+        %end;%if;(lang="en") old%end;">
+        <span class="fa-li"><i class="far fa-id-card"></i></span>
         %if;(is_dead and computable_death_age)
           %if;(death_date.month!="" and death_date.day!=""
            and birth_date.month!="" and birth_date.day!="")%apply;curr_age()%else;~ %death_age;%end;
@@ -353,7 +348,7 @@
       <li>%apply;capitalize(linked_page.OCCU)</li>%nl;
     %end;
     %if;(has_consanguinity and b.show_consang!="no")
-      <li class="mt-1" title="[*consanguinity]"><span class="fa-li"><i class="fas fa-percentage"></i></span>
+      <li class="mt-1" title="[*consanguinity]"><span class="fa-li"><i class="fas fa-percent"></i></span>
         %if;(cancel_links)
           [*consanguinity][:] %consanguinity;
         %else;
@@ -397,7 +392,7 @@
           <img src="%image_url;"%image_size; class="%if;(op_m=3)align-self-center mx-1%end; rounded" alt="[image/images]0">%nn;
         %end;
       %elseif;(b.default_image="yes")
-        <img class="%if;(op_m=3)d-flex align-self-center mx-1%end; rounded" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png"%image_size; alt="[missing image]">
+        <img class="%if;(op_m=3)d-flex align-self-center mx-1%end; rounded" src="%images_prefix;img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png"%image_size; alt="[missing image]">
       %end;
     </div>
   %end;

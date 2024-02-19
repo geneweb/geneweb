@@ -15,7 +15,7 @@
   <meta name="format-detection" content="telephone=no"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
   %include;css
 </head>
 
@@ -53,7 +53,7 @@
       %if;(occ != "0")
         <input type="hidden" name="oc" value="%occ;"%/>
       %end;
-    %else
+    %else;
       <input type="hidden" name="i" value="%index;"%/>
     %end;
     <input type="hidden" name="maxv" value="%max_desc_level;"%/>
@@ -200,19 +200,19 @@
       <li>[birth]</li>
         <ul>
           <li><label><input type="checkbox" name="birth" value="on" %l_on1; %l_on;%/>[date/dates]0</label>
-            <label><input type="checkbox" name="birth_place" value="on" %l_on1; %l_on;%/>[place]</label></li>
+            <label><input type="checkbox" name="birth_place" value="on" %l_on1; %l_on;%/>[place/places]0</label></li>
         </ul>
       <li>[marriage/marriages]0</li>
         <ul>
           <li><label><input type="checkbox" name="marr" value="on" %l_on1; %l_on;%/>[spouse/spouses]1</label></li>
           <li><label><input type="checkbox" name="marr_date" value="on" %l_on1; %l_on;%/>[date/dates]0</label>
-              <label><input type="checkbox" name="marr_place" value="on" %l_on1; %l_on;%/>[place]</label></li>
+              <label><input type="checkbox" name="marr_place" value="on" %l_on1; %l_on;%/>[place/places]0</label></li>
           <li><label><input type="checkbox" name="child" value="on" %l_on1; %l_on;%/>[number of children]</label></li>
         </ul>
       <li>[death]</li>
         <ul>
           <li><label><input type="checkbox" name="death" value="on" %l_on1; %l_on;%/>[date/dates]0</label>
-              <label><input type="checkbox" name="death_place" value="on" %l_on1; %l_on;%/>[place]</label></li>
+              <label><input type="checkbox" name="death_place" value="on" %l_on1; %l_on;%/>[place/places]0</label></li>
           <li><label><input type="checkbox" name="death_age" value="on" %l_on1; %l_on;%/>[age at death]</label></li>
         </ul>
       <li><label><input type="checkbox" name="occu" value="on" %l_on1; %l_on;%/>[occupation/occupations]1</label></li>

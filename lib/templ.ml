@@ -4,8 +4,12 @@ open TemplAst
 exception Exc_located of loc * exn
 
 let raise_with_loc loc = function
-  | Exc_located (_, _) as e -> raise e
-  | e -> raise (Exc_located (loc, e))
+  | Exc_located (_, _) as e ->
+      incr GWPARAM.nb_errors;
+      raise e
+  | e ->
+      incr GWPARAM.nb_errors;
+      raise (Exc_located (loc, e))
 
 let input_templ conf fname =
   match Util.open_etc_file conf fname with
@@ -137,48 +141,138 @@ let url_aux ?(pwd = true) conf =
   if conf.cgi then prefix ^ "?" ^ conf.bname ^ String.concat "&" l
   else prefix ^ String.concat "&" l
 
-(* when str = "" url_set_aux can reset several evar from evar_l in one call *)
-let url_set_aux conf evar_l str =
-  match evar_l with
-  | [] ->
-      !GWPARAM.syslog `LOG_WARNING "Empty evar list\n";
-      ""
-  | evar :: _l ->
-      (* rebuild the current url from conf.env, replacing &evar=xxx by &evar=str *)
-      let url =
-        match String.split_on_char '?' (Util.commd conf :> string) with
-        | [] ->
-            !GWPARAM.syslog `LOG_WARNING "Empty Url\n";
-            ""
-        | s :: _l -> s ^ "?"
-      in
-      (* if evar is not present in conf.env, it will be added at the end *)
-      let add_evar =
-        match
-          List.find_opt
-            (fun (k, _) -> k = evar)
-            (conf.henv @ conf.senv @ conf.env)
-        with
-        | Some (_, _) -> false
-        | None -> true && str <> "" (* only if str <> "" *)
-      in
-      let l =
-        List.filter_map
-          (fun (k, v) ->
-            let v = Adef.as_string @@ v in
-            if List.mem k evar_l && str <> "" then
-              Some (Format.sprintf "%s=%s" k str)
-            else if
-              v = ""
-              || (k = "oc" && v = "0")
-              || (k = "ocz" && v = "0")
-              || (List.mem k evar_l && str = "")
-            then None
-            else Some (Format.sprintf "%s=%s" k v))
-          (conf.henv @ conf.senv @ conf.env)
-      in
-      let url = url ^ String.concat "&" l in
-      if add_evar then url ^ Format.sprintf "&%s=%s" evar str else url
+let order =
+  [
+    "b";
+    "lang";
+    "templ";
+    "iz";
+    "pz";
+    "nz";
+    "ocz";
+    "m";
+    "em";
+    "t";
+    "et";
+    "i";
+    "p";
+    "n";
+    "oc";
+    "wide";
+    "im";
+    "sp";
+    "ma";
+    "v";
+  ]
+
+let reorder conf url_env =
+  let new_lang =
+    match List.assoc_opt "lang" url_env with Some l1 -> l1 | None -> ""
+  in
+  let keep_lang =
+    (* same condition in Util.commd and copyr.txt *)
+    conf.default_lang <> new_lang
+  in
+  (* process evars from order *)
+  let env1, ok =
+    let rec loop (acc1, acc2) order =
+      match order with
+      | [] -> (acc1, acc2)
+      | k :: order ->
+          let v =
+            match List.assoc_opt k url_env with Some v -> v | None -> ""
+          in
+          if
+            List.mem_assoc k url_env
+            &&
+            match (k, v) with
+            | "lang", _ -> keep_lang
+            | "oc", v when v = "" || v = "0" -> false
+            | "ocz", v when v = "" || v = "0" -> false
+            | _, v when v <> "" -> true
+            | _, _ -> false
+          then loop (Format.sprintf "%s=%s" k v :: acc1, k :: acc2) order
+          else loop (acc1, acc2) order
+    in
+    loop ([], []) order
+  in
+  (* process other evars from env *)
+  let env2 =
+    List.fold_left
+      (fun acc (k, v) ->
+        if
+          List.mem k ok
+          || (k = "lang" && not keep_lang)
+          || ((k = "oc" || k = "ocz") && (v = "" || v = "0"))
+          || v = ""
+        then acc
+        else Format.sprintf "%s=%s" k v :: acc)
+      [] url_env
+  in
+  if List.mem "lang=fr" env1 then Printf.eprintf "Lang in env1\n";
+  if List.mem "lang=fr" env2 then Printf.eprintf "Lang in env2\n";
+  String.concat "&" (List.rev env1 @ List.rev env2)
+
+let find_sosa_ref conf =
+  let env = conf.henv @ conf.senv @ conf.env in
+  let get_env evar env =
+    match List.assoc_opt evar env with Some s -> Adef.as_string s | None -> ""
+  in
+  let pz = get_env "pz" env in
+  let nz = get_env "nz" env in
+  let ocz = get_env "ocz" env in
+  let iz = get_env "iz" env in
+  match (iz, pz, nz, ocz) with
+  | iz, "", "", "" when iz <> "" -> iz
+  | "", pz, nz, ocz when pz <> "" || nz <> "" ->
+      Format.sprintf "%s.%s %s" pz ocz nz
+  | _ -> (
+      match List.assoc_opt "sosa_ref" conf.base_env with
+      | Some s when s <> "" -> s
+      | _ -> "No sosa ref")
+
+(* url_set_aux can reset several evar from evar_l in one call *)
+let url_set_aux conf evar_l str_l =
+  let str_l =
+    List.mapi
+      (fun i _evar -> if i < List.length str_l then List.nth str_l i else "")
+      evar_l
+  in
+  let href =
+    match String.split_on_char '?' (Util.commd conf :> string) with
+    | [] ->
+        !GWPARAM.syslog `LOG_WARNING "Empty Url\n";
+        ""
+    | s :: _l -> s
+  in
+  let conf_l = conf.henv @ conf.senv @ conf.env in
+  let k_l = List.map (fun (k, _v) -> k) conf_l in
+  let k_l = List.sort_uniq compare k_l in
+  let conf_l = List.map (fun k -> (k, List.assoc k conf_l)) k_l |> List.rev in
+  (* process evar_l *)
+  let url_env =
+    let rec loop i acc evar_l =
+      match evar_l with
+      | [] -> acc
+      | evar :: evar_l ->
+          let str = List.nth str_l i in
+          if str <> "" then loop (i + 1) ((evar, str) :: acc) evar_l
+          else loop (i + 1) acc evar_l
+    in
+    loop 0 [] evar_l
+  in
+  (* process the remainder of conf_l *)
+  let url_env =
+    let rec loop acc conf_l =
+      match conf_l with
+      | [] -> acc
+      | (k, _v) :: conf_l when List.mem k evar_l -> loop acc conf_l
+      | (k, v) :: conf_l -> loop ((k, Adef.as_string v) :: acc) conf_l
+    in
+    loop url_env conf_l
+  in
+  (* reorder *)
+  Format.sprintf "%s?%s" href (reorder conf url_env)
 
 let substr_start_aux n s =
   let len = String.length s in
@@ -193,6 +287,36 @@ let substr_start_aux n s =
   loop 0 n ""
 
 let rec eval_variable conf = function
+  | [ "lang"; "full" ] ->
+      let rec func x lst c =
+        match lst with
+        | [] -> "bad language code"
+        | hd :: tl ->
+            if hd = x then Util.transl_nth conf "!languages" c
+            else func x tl (c + 1)
+      in
+      func conf.lang Version.available_languages 0
+  | [ "bvar"; "list" ] ->
+      let is_duplicate key assoc_list =
+        let rec aux count = function
+          | [] -> count > 1
+          | (k, _) :: tl -> if k = key then aux (count + 1) tl else aux count tl
+        in
+        aux 0 assoc_list
+      in
+      let l =
+        List.sort (fun (k1, _v1) (k2, _v2) -> compare k1 k2) conf.base_env
+      in
+      List.fold_left
+        (fun acc (k, v) ->
+          let duplicate =
+            if is_duplicate k l then {| style="color:red"|} else ""
+          in
+          acc
+          ^ Format.sprintf "<b%s>%s</b>=%s<br>\n" duplicate k
+              (Util.escape_html v :> string))
+        "" l
+  | [ "gwd"; "arglist" ] -> !GWPARAM.gwd_cmd
   | [ "bvar"; v ] | [ "b"; v ] -> (
       try List.assoc v conf.base_env with Not_found -> "")
   | [ "connections"; "wizards" ] -> (
@@ -227,10 +351,16 @@ let rec eval_variable conf = function
         | None -> if n > 0 then loop (n - 1) else ""
       in
       loop n
+  | [ "link_next" ] -> ""
+  | [ "person_index"; _x ] -> ""
   | [ "prefix_set"; pl ] ->
       let pl_l =
         match pl with
         | "iz" -> [ "iz"; "nz"; "pz"; "ocz" ]
+        | "p" -> [ "i"; "p"; "n"; "oc" ]
+        | "p1" -> [ "i1"; "p1"; "n1"; "oc1" ]
+        | "p2" -> [ "i2"; "p2"; "n2"; "oc2" ]
+        | "pn" -> [ "i1"; "i2"; "p1"; "p2"; "n1"; "n2"; "oc1"; "oc2" ]
         | "all" -> [ "templ"; "p_mod"; "wide" ]
         | _ -> [ pl ]
       in
@@ -240,6 +370,16 @@ let rec eval_variable conf = function
       let amp = if prefix.[String.length prefix - 1] = '?' then "" else "&" in
       if str = "" then prefix
       else prefix ^ Printf.sprintf "%s%s=%s" amp evar str
+  | [ "random"; "init" ] ->
+      Random.self_init ();
+      ""
+  | [ "random"; "bits" ] -> (
+      try string_of_int (Random.bits ())
+      with Failure _ | Invalid_argument _ -> raise Not_found)
+  | [ "random"; s ] -> (
+      try string_of_int (Random.int (int_of_string s))
+      with Failure _ | Invalid_argument _ -> raise Not_found)
+  | "nb_of_persons" :: sl -> eval_int conf conf.nb_of_persons sl
   | [ "substr_start"; n; v ] -> (
       (* extract the n first characters of string v *)
       match int_of_string_opt n with
@@ -257,21 +397,25 @@ let rec eval_variable conf = function
       | None -> raise Not_found)
   | "time" :: sl -> eval_time_var conf sl
   (* clear some variables in url *)
-  | [ "url_set"; evar ] -> url_set_aux conf [ evar ] ""
-  | [ "url_set2"; evar1; evar2 ] -> url_set_aux conf [ evar1; evar2 ] ""
-  | [ "url_set3"; evar1; evar2; evar3 ] ->
-      url_set_aux conf [ evar1; evar2; evar3 ] ""
-  | [ "url_set_p" ] -> url_set_aux conf [ "i"; "p"; "n"; "oc" ] ""
-  | [ "url_set_p1" ] -> url_set_aux conf [ "i1"; "p1"; "n1"; "oc1" ] ""
-  | [ "url_set_p2" ] -> url_set_aux conf [ "i2"; "p2"; "n2"; "oc2" ] ""
-  | [ "url_set_pn" ] ->
-      url_set_aux conf [ "i1"; "i2"; "p1"; "p2"; "n1"; "n2"; "oc1"; "oc2" ] ""
-  (* when only one variable is involved, set it to a new value *)
-  | [ "url_set"; evar; str ] -> url_set_aux conf [ evar ] str
+  (* set the first variable to a new value if <> "" *)
+  | [ "url_set"; evar_l; str_l ] ->
+      let evar_l = String.split_on_char '_' evar_l in
+      let str_l = String.split_on_char '_' str_l in
+      url_set_aux conf evar_l str_l
+  | [ "url_set"; evar_l ] ->
+      let evar_l = String.split_on_char '_' evar_l in
+      url_set_aux conf evar_l []
   | [ "user"; "ident" ] -> conf.user
   | [ "user"; "name" ] -> conf.username
   | [ "user"; "key" ] -> conf.userkey
   | [ s ] -> eval_simple_variable conf s
+  | _ -> raise Not_found
+
+and eval_int conf n = function
+  | [ "hexa" ] -> Printf.sprintf "0x%X" n
+  | [ "octal" ] -> Printf.sprintf "0x%o" n
+  | [ "v" ] -> string_of_int n
+  | [] -> Mutil.string_of_int_sep (Util.transl conf "(thousand separator)") n
   | _ -> raise Not_found
 
 and eval_time_var conf = function
@@ -319,30 +463,33 @@ and eval_simple_variable conf = function
       | None -> "")
   | "doctype" -> (Util.doctype :> string)
   | "highlight" -> conf.highlight
-  | "image_prefix" ->
-      (let s =
-         if conf.cgi then
-           match List.assoc_opt "image_prefix" conf.base_env with
-           | Some x -> Adef.escaped x
-           | None -> Image.prefix conf
-         else Image.prefix conf
-       in
-       s
-        :> string)
+  | "gw_prefix" ->
+      let s =
+        if conf.cgi then Adef.escaped conf.gw_prefix else Adef.escaped ""
+      in
+      let s = (s :> string) in
+      if s = "" then s else s ^ Filename.dir_sep
+  | "images_prefix" | "image_prefix" ->
+      Util.images_prefix conf ^ Filename.dir_sep
   | "lang" -> conf.lang
+  | "lang_fallback" -> (
+      match List.assoc_opt conf.lang !Mutil.fallback with
+      | Some l -> l
+      | None -> "")
+  | "default_lang" -> conf.default_lang
+  | "browser_lang" -> conf.browser_lang
   | "left" -> conf.left
-  | "link_next" -> (
-      match Util.p_getenv conf.env "link_next" with Some vv -> vv | None -> "")
   | "nl" -> "\n"
   | "nn" -> ""
   | "plugins" ->
       let l = List.map Filename.basename conf.plugins in
       String.concat "," l
+  | "bname" -> conf.bname
+  | "token" -> conf.cgi_passwd
+  | "bname_token" -> String.concat "_" [ conf.bname; conf.cgi_passwd ]
   | "prefix" -> (Util.commd conf :> string)
-  | "prefix_base" ->
-      (Util.commd ~pwd:false ~henv:false ~senv:false conf :> string)
-  | "prefix_base_password" ->
-      (Util.commd ~henv:false ~senv:false conf :> string)
+  | "prefix_base" -> (Util.commd ~pwd:false conf :> string)
+  | "prefix_base_password" -> (Util.commd conf :> string)
   | "prefix_no_iz" ->
       (Util.commd ~excl:[ "iz"; "nz"; "pz"; "ocz" ] conf :> string)
   | "prefix_no_templ" -> (Util.commd ~excl:[ "templ" ] conf :> string)
@@ -353,18 +500,15 @@ and eval_simple_variable conf = function
       (Util.commd ~excl:[ "templ"; "p_mod"; "wide" ] conf :> string)
   | "referer" -> (Util.get_referer conf :> string)
   | "right" -> conf.right
+  | "sosa_ref" -> find_sosa_ref conf
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
   | "sp" -> " "
-  | "static_path" ->
-      (let s =
-         if conf.cgi then
-           match List.assoc_opt "static_path" conf.base_env with
-           | Some x -> Adef.escaped x
-           | None -> Adef.escaped conf.static_path
-         else Adef.escaped ""
-       in
-       s
-        :> string)
+  | "static_path" | "etc_prefix" ->
+      let s =
+        if conf.cgi then Adef.escaped conf.etc_prefix else Adef.escaped ""
+      in
+      let s = (s :> string) in
+      if s = "" then s else s ^ Filename.dir_sep
   | "suffix" ->
       (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
       let l =
@@ -383,7 +527,12 @@ and eval_simple_variable conf = function
       String.concat "&" l
   | "url" -> url_aux ~pwd:true conf
   | "url_no_pwd" -> url_aux ~pwd:false conf
-  | "version" -> Version.txt
+  | "version" -> Version.ver
+  | "commit_id" -> Version.commit_id
+  | "commit_date" -> Version.commit_date
+  | "compil_date" -> Version.compil_date
+  | "branch" -> Version.branch
+  | "source" -> Version.src
   | "/" -> ""
   | _ -> raise Not_found
 
@@ -397,11 +546,17 @@ let eval_string_var conf eval_var sl =
   try eval_var sl
   with Not_found -> (
     try VVstring (eval_variable conf sl)
-    with Not_found -> VVstring (" %" ^ String.concat "." sl ^ "?"))
+    with Not_found ->
+      GWPARAM.errors_undef :=
+        Printf.sprintf "%%%s?" (String.concat "." sl) :: !GWPARAM.errors_undef;
+      VVstring (Printf.sprintf " %%%s?" (String.concat "." sl)))
 
 let eval_var_handled conf sl =
   try eval_variable conf sl
-  with Not_found -> Printf.sprintf " %%%s?" (String.concat "." sl)
+  with Not_found ->
+    GWPARAM.errors_undef :=
+      Printf.sprintf "%%%s?" (String.concat "." sl) :: !GWPARAM.errors_undef;
+    Printf.sprintf " %%%s?" (String.concat "." sl)
 
 let apply_format conf nth s1 s2 =
   let s1 =
@@ -493,36 +648,81 @@ and eval_transl_inline conf s =
   fst @@ Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
 
 and eval_transl_lexicon conf upp s c =
+  let c_opt = [ '0'; '1'; '2'; '3'; 'n'; 's'; 'w'; 'f'; 'c'; 'e'; 't' ] in
+  let scan_for_transl s c i =
+    (* scans starting at i for bracketed translation [to be translated] *)
+    (* the space after translation can be used to force a choice *)
+    (* if no choice, then c is used *)
+    let j =
+      match String.index_from_opt s i '[' with Some j -> j | None -> -1
+    in
+    let k =
+      match String.index_from_opt s i ']' with Some k -> k | None -> -1
+    in
+    let existing_choice =
+      if k <> -1 && k < String.length s - 2 then List.mem s.[k + 1] c_opt
+      else false
+    in
+    let c =
+      if String.length s = k then c
+      else if String.length s > k + 1 && List.mem s.[k + 1] c_opt then
+        String.make 1 s.[k + 1]
+      else c
+    in
+    if j = -1 || k = -1 then (-1, s)
+    else
+      ( k + 1,
+        String.sub s 0 (k + 1)
+        ^ c
+        ^
+        if String.length s = k + 1 || String.length s = k + 2 then ""
+        else if existing_choice then
+          String.sub s (k + 2) (String.length s - k - 2)
+        else String.sub s (k + 1) (String.length s - k - 1) )
+  in
   let r =
     let nth = try Some (int_of_string c) with Failure _ -> None in
     match split_at_coloncolon s with
-    | None ->
-        let s2 =
-          match nth with
-          | Some n -> Util.transl_nth conf s n
-          | None -> Util.transl conf s
-        in
-        if c = "n" then s2 else Mutil.nominative s2
+    | None -> (
+        try apply_format conf nth s ""
+        with Failure _ ->
+          raise Not_found
+          (* TODO check the use of if c = "n" then s else Mutil.nominative s
+             nominative expects a : in the string ! *))
     | Some (s1, s2) -> (
         try
           if String.length s2 > 0 && s2.[0] = '|' then
             let i = 1 in
             let j = String.rindex s2 '|' in
-            let k = skip_spaces_and_newlines s2 (j + 1) in
-            let s3 =
-              let s = String.sub s2 i (j - i) in
-              let astl = Templ_parser.parse_templ conf (Lexing.from_string s) in
-              List.fold_left (fun s a -> s ^ eval_ast conf a) "" astl
-            in
-            let s4 = String.sub s2 k (String.length s2 - k) in
-            let s5 =
-              match nth with
-              | Some n -> Util.transl_nth conf s4 n
-              | None -> Util.transl conf s4
-            in
-            let s2 = s3 ^ s5 in
-            Util.transl_decline conf s1 s2
+            if j = 0 then
+              (* missing second | *)
+              let s2 = String.sub s2 i (String.length s2 - j - 1) in
+              try apply_format conf nth s1 s2
+              with Failure _ -> raise Not_found
+            else
+              let s3 =
+                let s = String.sub s2 i (j - i) in
+                (* scan s for potential translates *)
+                let _k, s =
+                  let rec loop (k, s) =
+                    let k, s = scan_for_transl s c k in
+                    if k = -1 then (k, s) else loop (k, s)
+                  in
+                  loop (0, s)
+                in
+                let astl =
+                  Templ_parser.parse_templ conf (Lexing.from_string s)
+                in
+                (* parse_templ handles only text, evars and translations *)
+                (* more complex parsing (%surname;, %if; ...) not available *)
+                List.fold_left (fun s a -> s ^ eval_ast conf a) "" astl
+              in
+              let s4 = String.sub s2 (j + 1) (String.length s2 - j - 1) in
+              let s2 = s3 ^ s4 in
+              try apply_format conf nth s1 s2
+              with Failure _ -> raise Not_found
           else if String.length s2 > 0 && s2.[0] = ':' then
+            (* this is a third colon *)
             let s2 = String.sub s2 1 (String.length s2 - 1) in
             try apply_format conf nth s1 s2 with Failure _ -> raise Not_found
           else raise Not_found
@@ -534,10 +734,9 @@ and eval_transl_lexicon conf upp s c =
           in
           Util.transl_decline conf s1 s3)
   in
+  let r = Util.simple_decline conf r in
   let r = Util.translate_eval r in
   if upp then Utf8.capitalize_fst r else r
-
-let nb_errors = ref 0
 
 let loc_of_expr = function
   | Atext (loc, _) -> loc
@@ -673,8 +872,8 @@ let rec eval_expr ((conf, eval_var, eval_apply) as ceva) = function
   | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e))
 
 let print_error ((fname, bp, ep) as pos) exc =
-  incr nb_errors;
-  if !nb_errors <= 10 then (
+  incr GWPARAM.nb_errors;
+  if !GWPARAM.nb_errors <= 10 then (
     if fname = "" then Printf.eprintf "*** <W> template file"
     else Printf.eprintf "File %s" fname;
     let line = if fname = "" then None else Templ_parser.line_of_loc pos in
@@ -883,6 +1082,12 @@ let eval_var conf ifun env ep loc sl =
         | _ -> raise Not_found)
     | "today" :: sl ->
         TemplDate.eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
+    | [ "trace"; s ] ->
+        Printf.eprintf "%s; " s;
+        VVstring ""
+    | [ "tracenl"; s ] ->
+        Printf.eprintf "%s\n" s;
+        VVstring ""
     | s :: sl -> (
         match (get_val ifun.get_vother s env, sl) with
         | Some (VVother f), sl -> f sl
@@ -909,16 +1114,16 @@ let print_copyright conf =
       Output.print_sstring conf "<div style=\"font-size: 80%\">\n";
       Output.print_sstring conf "<em>";
       Output.print_sstring conf "Copyright (c) 1998-2007 INRIA - GeneWeb ";
-      Output.print_sstring conf Version.txt;
+      Output.print_sstring conf Version.ver;
       Output.print_sstring conf "</em>";
       Output.print_sstring conf "</div>\n";
       Output.print_sstring conf "<br>\n")
 
 let include_hed_trl conf name =
-  if name = "trl" then (
-    let query_time = Unix.gettimeofday () -. conf.query_start in
-    Util.time_debug conf query_time;
-    Util.include_template conf [] name (fun () -> ()))
+  if name = "trl" then Util.include_template conf [] name (fun () -> ());
+  let query_time = Unix.gettimeofday () -. conf.query_start in
+  Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
+    !GWPARAM.errors_other !GWPARAM.set_vars
 
 let rec interp_ast :
     config -> ('a, 'b) interp_fun -> 'a env -> 'b -> ast list -> unit =
@@ -979,9 +1184,19 @@ let rec interp_ast :
             String.concat "" (eval_ast_list env ep astl)
         | "language_name", [ VVstring s ] ->
             Translate.language_name s (Util.transl conf "!languages")
+        | "url_set", [ VVstring s1 ] ->
+            let s1 = String.split_on_char '/' s1 in
+            url_set_aux conf s1 []
+        | "url_set", [ VVstring s1; VVstring s2 ] ->
+            let s1 = String.split_on_char '/' s1 in
+            let s2 = String.split_on_char '/' s2 in
+            url_set_aux conf s1 s2
         | "nth", [ VVstring s1; VVstring s2 ] ->
             let n = try int_of_string s2 with Failure _ -> 0 in
             Util.translate_eval (Util.nth_field s1 n)
+        | "nth_0", [ VVstring s1; VVstring s2 ] ->
+            let n = try int_of_string s2 with Failure _ -> 0 in
+            if Util.nth_field s1 n = "" then "0" else Util.nth_field s1 n
         | "nth_c", [ VVstring s1; VVstring s2 ] -> (
             let n = try int_of_string s2 with Failure _ -> 0 in
             try Char.escaped (String.get s1 n) with Invalid_argument _ -> "")
@@ -1127,8 +1342,16 @@ and print_var print_ast_list conf ifun env ep loc sl =
                   Util.include_begin conf (Adef.safe fname);
                   print_ast_list env ep astl;
                   Util.include_end conf (Adef.safe fname)
-              | None -> Output.printf conf " %%%s?" (String.concat "." sl))
-          | None -> Output.printf conf " %%%s?" (String.concat "." sl))
+              | None ->
+                  GWPARAM.errors_other :=
+                    Format.sprintf "%%%s?" (String.concat "." sl)
+                    :: !GWPARAM.errors_other;
+                  Output.printf conf " %%%s?" (String.concat "." sl))
+          | None ->
+              GWPARAM.errors_other :=
+                Format.sprintf "%%%s?" (String.concat "." sl)
+                :: !GWPARAM.errors_other;
+              Output.printf conf " %%%s?" (String.concat "." sl))
       | sl -> print_variable conf sl)
   in
   let eval_var = eval_var conf ifun env ep loc in
@@ -1155,7 +1378,10 @@ and print_variable conf sl =
       match sl with
       | [ s ] -> print_simple_variable conf s
       | _ -> raise Not_found
-    with Not_found -> Output.printf conf " %%%s?" (String.concat "." sl))
+    with Not_found ->
+      GWPARAM.errors_undef :=
+        Format.sprintf "%%%s?" (String.concat "." sl) :: !GWPARAM.errors_undef;
+      Output.printf conf " %%%s?" (String.concat "." sl))
 
 let copy_from_templ : config -> Adef.encoded_string env -> in_channel -> unit =
  fun conf env ic ->

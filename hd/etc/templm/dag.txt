@@ -7,7 +7,7 @@
   <meta name="format-detection" content="telephone=no"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
   %include;css
 </head>
 <body%body_prop; id="dag">
@@ -15,16 +15,16 @@
 %message_to_wizard;
 
 %if;(not cancel_links and evar.notab != "on" )
-  %let;l_o;image=%evar.image;;bd=%evar.bd;;color=%evar.color;;invert=%evar.invert;;new=%evar.new;%in;
-  %let;l_url1;%prefix;m=D;t=L;tl1=hrztl;v=%evar.v;;marriage2=%evar.marriage2;;sosa=%evar.sosa;;xy=%evar.xy;;siblings=%evar.siblings;;timeline=%evar.timeline;;gen=%evar.gen;;%in;
+  %let;l_o;image=%evar.image;&bd=%evar.bd;&color=%evar.color;&invert=%evar.invert;&new=%evar.new;%in;
+  %let;l_url1;%prefix;m=D&t=L&tl1=hrztl&v=%evar.v;&marriage2=%evar.marriage2;&sosa=%evar.sosa;&xy=%evar.xy;&siblings=%evar.siblings;&timeline=%evar.timeline;&gen=%evar.gen;&%in;
   <div class="menu">
     %if;(link_next != "")
       <span>
-        <a href="%link_next;;%l_o;" title="[next relationship path] (&gt;)" accesskey=">">[*next relationship path] &gt;&gt;</a>
+        <a href="%link_next;&%l_o;" title="[next relationship path] (&gt;)" accesskey=">">[*next relationship path] &gt;&gt;</a>
         %if;(evar.i != "")
-          %let;l_i;ei=%evar.i;;i=%evar.ei;%in;
-          <a href="%prefix;em=R;et=A;spouse=on;%l_i;;%l_o;">[*relationship link/relationship links]1</a>
-          <a href="%prefix;em=R;et=M;spouse=on;%l_i;;%l_o;">[*relationship by marriage]</a>
+          %let;l_i;ei=%evar.i;&i=%evar.ei;%in;
+          <a href="%prefix;em=R&et=A&spouse=on&%l_i;&%l_o;">[*relationship link/relationship links]1</a>
+          <a href="%prefix;em=R&et=M&spouse=on&%l_i;&%l_o;">[*relationship by marriage]</a>
         %end;
       </span>
     %end;
@@ -35,7 +35,7 @@
               %foreach;env_binding;
                 %if;(env.key = "m")m=D;%nn;
                 %elseif;(env.key = "templ")
-                %else;%env.key;=%env.val.decoded;;%nn;
+                %else;%env.key;=%env.val.decoded;&%nn;
                 %end;
               %end;">[*descendants tree]</a>
         </span>
@@ -45,21 +45,21 @@
               %foreach;env_binding;
                 %if;(env.key = "m")m=A;%nn;
                 %elseif;(env.key = "dag" or env.key = "templ")
-                %else;%env.key;=%env.val.decoded;;%nn;
+                %else;%env.key;=%env.val.decoded;&%nn;
                 %end;
               %end;">[*ascendants tree]</a>
         </span>
         <span>
-          <a href="%if;(bvar.access_by_key="no")%l_url1;i=%evar.i;%else;#%end;" title="%if(bvar.access_by_key!="no")Link not working atm if access_by_key=yes, sorry!%end;">[*descendant tree view]0</a>
+          <a href="%if;(bvar.access_by_key="no")%l_url1;i=%evar.i;%else;#%end;" title="%if;(bvar.access_by_key!="no")Link not working atm if access_by_key=yes, sorry!%end;">[*descendant tree view]0</a>
         </span>
       %end;
     %end;
     %if;(evar.m = "RLM" and evar.i6 = "" and evar.p6 = "" and evar.t1 != "1")
       <span>
-        %let;l_i;i=%evar.i1;;ei=%evar.i2;%in;
-        <a href="%prefix;em=R;et=S;spouse=on;%l_i;;%l_o;">[*shortest path]</a>
-        <a href="%prefix;em=R;et=A;spouse=on;%l_i;;%l_o;">[*relationship link/relationship links]1</a>
-        <a href="%prefix;em=R;et=M;spouse=on;%l_i;;%l_o;">[*relationship by marriage]</a>
+        %let;l_i;i=%evar.i1;&ei=%evar.i2;%in;
+        <a href="%prefix;em=R&et=S&spouse=on&%l_i;&%l_o;">[*shortest path]</a>
+        <a href="%prefix;em=R&et=A&spouse=on&%l_i;&%l_o;">[*relationship link/relationship links]1</a>
+        <a href="%prefix;em=R&et=M&spouse=on&%l_i;&%l_o;">[*relationship by marriage]</a>
       </span>
     %end;
   </div>
@@ -77,10 +77,10 @@
         <a href="%prefix_set.iz;
           %foreach;env_binding;
             %if;(env.key != "pos1" and env.key != "pos2" and env.key != "templ")
-              %env.key=%env.val.decoded;;%nn;
+              %env.key=%env.val.decoded;&%nn;
             %end;
           %end;
-          %let;l_pos1;%expr;(pos1 + overlap - dpos)%in;
+          %let;l_pos1;%expr(pos1 + overlap - dpos)%in;
           pos1=%l_pos1;
           ;pos2=%expr(pos1 + overlap)">&lt;&lt; %l_pos1;</a>%nn;
       %end;
@@ -89,10 +89,10 @@
         <a href="%prefix_set.iz;
           %foreach;env_binding;
             %if;(env.key != "pos1" and env.key != "pos2" and env.key != "templ")
-              %env.key=%env.val.decoded;;%nn;
+              %env.key=%env.val.decoded;&%nn;
             %end;
           %end;
-          %let;l_pos1;%expr;(pos2 - overlap)%in;
+          %let;l_pos1;%expr(pos2 - overlap)%in;
           pos1=%l_pos1;
           ;pos2=%expr(pos2 - overlap + dpos)">%l_pos1; &gt;&gt;</a>%nn;
       %end;
@@ -109,7 +109,7 @@
   %end;
   </pre>
 %else;
-  %let;l_arr;%if(evar.m = "A")&uarr;%else;&darr;%end;%in;
+  %let;l_arr;%if;(evar.m = "A")&uarr;%else;&darr;%end;%in;
   %let;l_a;%if;(evar.em = "R")----&gt;8----%else;[tree]%end;%in;
   <table border="%border;" width="100%%"><tr><td align="center">
   <table border="%border;" cellspacing="0" cellpadding="0">
@@ -120,7 +120,7 @@
       %if;dag_cell.is_nothing;&nbsp;%nn;
       %elseif;dag_cell.is_bar;
         %if;(dag_cell.bar_link != "" and evar.cgl != "on")
-          <a style="text-decoration:none;" href="%dag_cell.bar_link;;image=%evar.image;" title="%l_a;">        │        </a>%nn;
+          <a style="text-decoration:none;" href="%dag_cell.bar_link;&image=%evar.image;" title="%l_a;">        │        </a>%nn;
         %else;│%end;
       %elseif;(dag_cell.item != "")%dag_cell.item;
       %elseif;(dag_cell.text != "")%dag_cell.text;

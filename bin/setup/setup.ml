@@ -79,7 +79,7 @@ let trailer _conf =
   Output.print_sstring printer_conf {|<a href="https://github.com/geneweb/geneweb/">|} ;
   Output.print_sstring printer_conf {|<img src="images/logo_bas.png" style="border:0"></a>|} ;
   Output.print_sstring printer_conf {| Version |} ;
-  Output.print_sstring printer_conf Version.txt ;
+  Output.print_sstring printer_conf Version.ver ;
   Output.print_sstring printer_conf " Copyright &copy; 1998-2021</em></div></div></body></html>"
 
 let header conf title =
@@ -262,6 +262,20 @@ let parameters_2 =
   in
   loop ""
 
+
+let parameters_3 =
+  let rec loop comm =
+    function
+      (k, s) :: env ->
+        let k = strip_spaces (decode k) in
+        if k = "" then loop comm env
+        else if k = "anon" && s <> "" then
+          loop (comm ^ " " ^ stringify s) env
+        else loop (comm ^ " -" ^ stringify k) env
+    | [] -> comm
+  in
+  loop ""
+
 let rec list_replace k v =
   function
     [] -> [k, v]
@@ -353,7 +367,7 @@ let macro conf =
   | 'o' -> strip_spaces (s_getenv conf.env "o")
   | 'O' -> Filename.remove_extension (Filename.basename (strip_spaces (s_getenv conf.env "o")))
   | 'p' -> parameters conf.env
-  | 'q' -> Version.txt
+  | 'q' -> Version.ver
   | 'u' -> Filename.dirname (abs_setup_dir ())
   | 'x' -> stringify !bin_dir
   | 'v' -> strip_spaces (s_getenv conf.env "odir")
@@ -643,6 +657,7 @@ let rec copy_from_stream conf print strm =
                     Some v -> print v
                   | None -> ()
                   end
+              | 'S' -> print (parameters_3 conf.env)
               | _ ->
                 match p_getenv conf.env (String.make 1 c) with
                 | Some v ->
@@ -1025,7 +1040,6 @@ let gwdiff ok_file conf =
     in
     print_file conf ok_file
 
-
 let gwfixbase_check conf =
   print_file conf "bsi_fix.htm"
 
@@ -1039,6 +1053,46 @@ let gwfixbase ok_file conf =
   if rc > 1 then print_file conf "bsi_err.htm"
   else
     print_file conf ok_file
+
+let cache_files_check conf = 
+  let in_base =
+    match p_getenv conf.env "anon" with
+      Some f -> strip_spaces f
+    | None -> ""
+  in
+  if in_base = "" then print_file conf "err_miss.htm";
+  print_file conf "bsi_cache_files.htm"
+
+let cache_files ok_file conf =
+  let ic = Unix.open_process_in "uname" in
+  let uname = input_line ic in
+  let () = close_in ic in
+  let rc =
+    let commnd =
+      "cd " ^ Sys.getcwd () ^ "; tput bel;" ^
+      stringify (Filename.concat !bin_dir "cache_files") ^ " " ^
+      (parameters_3 conf.env)
+    in
+    if uname = "Darwin" then
+      let launch = "tell application \"Terminal\" to do script " in
+      Sys.command ("osascript -e '" ^ launch ^ " \" " ^ commnd ^ " \"' ")
+    else if uname = "Linux" then
+      Sys.command ("xterm -e \" " ^ commnd ^ " \" ")
+    else if Sys.win32 then
+      let commnd =
+        stringify (Filename.concat !bin_dir "cache_files") ^ " " ^
+        (parameters_3 conf.env)
+      in
+      Sys.command commnd
+    else
+      begin
+        Printf.eprintf "%s (%s) %s (%s)\n" "Unknown Os_type" Sys.os_type
+          "or wrong uname response" uname;
+        2
+      end
+  in
+  flush stderr;
+  if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
 
 let connex_check conf =
   print_file conf "bsi_connex.htm"
@@ -1697,6 +1751,11 @@ let setup_comm_ok conf =
   | "gwf_1" -> gwf_1 conf
   | "gwd" -> gwd conf
   | "gwd_1" -> gwd_1 conf
+  | "cache_files" ->
+      begin match p_getenv conf.env "opt" with
+        Some "check" -> cache_files_check conf
+      | _ -> cache_files "cache_files_ok.htm" conf
+      end
   | "connex" ->
        begin match p_getenv conf.env "opt" with
       | Some "check" -> connex_check conf

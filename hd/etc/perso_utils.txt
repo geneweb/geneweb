@@ -1,4 +1,4 @@
-<!-- $Id: perso_utils v7.1 04/03/2023 09:51:04 $ -->
+<!-- $Id: perso_utils v7.1 13/08/2023 16:55:48 $ -->
 %let;central_index;%index;%in;
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
 
@@ -46,18 +46,23 @@
     %if;xx.has_families;%if;(count!=0)square%else;disc%end;%else;circle%end;;">%nn;
 %end;
 
-%define;image_MF(xx)
-  %if;(wizard and not cancel_links)
-    <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">%nn;
+%define;image_MF(xxx)
+  %if;not cancel_links;
+    %if;wizard;%nn;
+      <a href="%prefix;m=MOD_IND&i=%xxx.index;"%sp;
+        title="[*modify::] %xxx.first_name; %xxx.surname;%if;(xxx.occ!="0") (%xxx.occ;)%end;">
+    %end;<i%sp;
   %end;
-  %if;xx.is_male;
-    <i class="fa fa-mars male fa-fw mr-1"></i>%nn;
-  %elseif;xx.is_female;
-    <i class="fa fa-venus female fa-fw mr-1"></i>%nn;
+  %if;xxx.is_male;
+    %if;cancel_links;♂%sp;%else;class="fa fa-mars male fa-xs%end;%nn;
+  %elseif;xxx.is_female;
+    %if;cancel_links;♀%sp;%else;class="fa fa-venus female fa-xs%end;%nn;
   %else;
-    <i class="fa fa-neuter neuter fa-fw mr-1"></i>%nn;
-  %end;%nn;
-  %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
+    %if;cancel_links;⚲%sp;%else;class="fa fa-neuter neuter fa-xs%end;%nn;
+  %end; mr-1%nn;
+  %if;not cancel_links;"></i>%nn;
+    %if;wizard;</a>%end;
+  %end;
 %end;
 
 %(
@@ -80,7 +85,7 @@
 %)
 %define;type_puce_asc(nnn)
   %if;nnn.has_parents;
-    %if;(nnn.father != "? ?" and nnn.mother != "? ?" and nnn.mother != "de l'une de ses épouses")
+    %if;(nnn.father!="? ?" and nnn.mother!="? ?" and nnn.mother!="de l'une de ses épouses")
       <li class="list-unstyled" style="list-style-type:square">
     %else;
       <li class="list-unstyled" style="list-style-type:disc">
@@ -93,23 +98,23 @@
 %define;type_wedding()
   %if;are_married;
     %if;(nb_children != 0)
-      <img src="%image_prefix;/married.png" alt="[married]" title="[married]">
+      <img src="%images_prefix;married.png" alt="[married]" title="[married]">
     %else;
-      <img src="%image_prefix;/married_no_descendants.png" alt="[married]" title="[married]">
+      <img src="%images_prefix;married_no_descendants.png" alt="[married]" title="[married]">
     %end;
   %elseif;are_not_married;
-    <img src="%image_prefix;/not_married.png" alt="[not married]" title="[not married]">
+    <img src="%images_prefix;not_married.png" alt="[not married]" title="[not married]">
   %elseif;are_engaged;
-    <img src="%image_prefix;/engaged.png" alt="[engaged]" title="[engaged]">
+    <img src="%images_prefix;engaged.png" alt="[engaged]" title="[engaged]">
   %elseif;is_no_sexes_check;
-    <img src="%image_prefix;/not_married.png" alt="[relationship]" title="[relationship]">
+    <img src="%images_prefix;not_married.png" alt="[relationship]" title="[relationship]">
   %elseif;is_no_mention;
-    <img src="%image_prefix;/not_married.png" alt="[with]" title="[with]">
+    <img src="%images_prefix;not_married.png" alt="[with]" title="[with]">
   %end;
 %end;
 
 %define;image_sosa(xxx,yyy)
-  <span class="far fa-dot-circle text-success mr-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></span>%nn;
+  <span class="far fa-circle-dot text-success mr-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></span>%nn;
 %end;
 
 %define;nav_with_sosa_ref(xxx)
@@ -182,13 +187,13 @@
 %end;
 
 %define;gend(xx)
-  %if;(evar.xx = 0)[specify::generation/generations]0%nn;
-  %elseif;(evar.xx = 1)[the children]%nn;
-  %elseif;(evar.xx = 2)[the grandchildren]%nn;
-  %elseif;(evar.xx = 3)[the great-grandchildren]%nn;
+  %if;(e.xx = 0)[specify::generation/generations]0%nn;
+  %elseif;(e.xx = 1)[the children]%nn;
+  %elseif;(e.xx = 2)[the grandchildren]%nn;
+  %elseif;(e.xx = 3)[the great-grandchildren]%nn;
   %else;
     %apply;thegen%with;
-      %apply;nth([nth (generation)], evar.xx)
+      %apply;nth([nth (generation)], e.xx)
     %end;
   %end;
 %end;
@@ -210,11 +215,11 @@
 %end;
 
 %define;display_sosa(xx)
-  %if;(xx.has_sosa and bvar.display_sosa="yes")
+  %if;(xx.has_sosa and b.display_sosa="yes")
     %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
     %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
     %sosa_ref.surname_key_strip;
-    %and;%xx.sosa;%end;
+    %and;%xx.sosa.v;%end;
     %if;not cancel_links;</a>%end;%nn;
   %end;
 %end;
@@ -226,7 +231,7 @@
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
     %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" %nn;
-        class="%if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;-underline">%xx;</a>
+        class="%if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;-underline">%xx;</a>%nn;
     %end;
   %end;
   <span title="%if;xx.computable_age;%xx.age;%elseif;xx.computable_death_age;%xx.death_age;%end;"
@@ -235,8 +240,8 @@
 
 %define;short_display_person_tree(xx)
   %if;(xx.has_sosa)%apply;display_sosa("xx")%end;
-  %if;(cancel_links or xx.is_restricted)<span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span>
-  %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;%if;(evar.t!="")&t=%evar.t;%end;%if;(evar.v!="")&v=%evar.v;%end;%if;(e.im=0)&im=0%end;%if;(evar.marriage="on")&marriage=on%end;"><span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
+  %if;(cancel_links or xx.is_restricted or is_self)<span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span>
+  %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;%if;(e.t!="")&t=%e.t;%end;%if;(e.v!="")&v=%e.v;%end;%if;(e.im=0)&im=0%end;%if;(e.marriage="on")&marriage=on%end;"><span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
   %end;
   <br>%nn;
   %if;(wizard and not cancel_links)
@@ -248,9 +253,9 @@
         %else;%if;(xx.death_date.year="") mr-4%end;
         %end;
       %end;%)"
-       title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;&#10;&#10;%end;
+       title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end;
                %if;(xx.computable_age or xx.computable_death_age)
-                 %if;xx.computable_age;%xx.age;%elseif;xx.computable_death_age;%xx.death_age;%end;
+                 %if;xx.computable_age; (%xx.age;)%elseif;xx.computable_death_age; (%xx.death_age;)%end;
                %end;">%nn;
     %if;(xx.dates!="")%xx.dates;%nn;
     %elseif;(wizard and not cancel_links)-%nn;
@@ -264,16 +269,16 @@
   %apply;image_MF("xx")
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%if;(xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</b>%else;
-    %if;(cancel_links or xx.is_restricted)%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;%nn;
-    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" title="[*Navigation] [with] %xx;">%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
+    %if;(cancel_links or xx.is_restricted)%if;(b.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;%nn;
+    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" title="[*visualize/show/hide/summary]1 %xx;">%if;(b.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
     %end;
   %end;
   %if;(wizard and not cancel_links)
   <a href="%prefix;m=MOD_IND&i=%xx.index;">%end;
   <span class="text-nowrap font-italic"
-  title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;&#10;&#10;%end;
-        %if;(xx.computable_age);%xx.age;%elseif;xx.computable_death_age;%xx.death_age;%end;"%nn;
-  >%xx.dates;</span>%if;(wizard and not cancel_links)</a>%end;%nn;
+    title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end;
+           %if;(xx.computable_age) (%xx.age;)%elseif;xx.computable_death_age; (%xx.death_age;)%end;">%nn;
+    %xx.dates;</span>%if;(wizard and not cancel_links)</a>%end;%nn;
 %end;
 
 %define;short_display_person_f(xx)
@@ -343,11 +348,11 @@
     %else;
       %if;xx.has_baptism_place;, %apply;nth([baptized],xx.sex) - %xx.baptism_place;%end;
     %end;
-    %if;xx.computable_age;, [age] : %xx.age;%end;
+    %if;xx.computable_age;, [age][:] %xx.age;%end;
     %if;xx.is_dead;, %xx.died;
       %if;xx.has_death_date; %xx.on_death_date;%end;
       %if;xx.has_death_place; - %xx.death_place;%end;
-      %if;xx.computable_death_age; [age at death:] %xx.death_age;%end;
+      %if;xx.computable_death_age; [aged] %xx.death_age;%end;
     %end;
     %if;xx.is_buried; , %apply;nth([buried],xx.sex)%sp;
       %if;xx.has_burial_date; %xx.on_burial_date;%end;
@@ -358,7 +363,7 @@
       %if;xx.has_cremation_place; - %xx.cremation_place;%end;
     %end;
     %if;xx.has_occupation;, %xx.occupation;%end;
-    %if;(xx.has_consanguinity and bvar.show_consang!="no"),%sp;
+    %if;(xx.has_consanguinity and b.show_consang!="no"),%sp;
       [consanguinity] : %xx.consanguinity;%end;
   </span>%nn;
 %end;
@@ -368,7 +373,7 @@
        xx.has_baptism_date or xx.has_baptism_place or
        xx.is_dead or xx.is_buried or xx.is_cremated or
        xx.has_event or
-      (xx.has_consanguinity and bvar.show_consang!="no") or
+      (xx.has_consanguinity and b.show_consang!="no") or
        xx.has_occupation or (xx.has_linked_page.OCCU and xx.linked_page.OCCU !=""))
     <ul>
       %if;(xx.index!=central_index)
@@ -422,7 +427,7 @@
         %if;xx.has_death_date; %xx.on_death_date;%end;
         %if;xx.has_death_place; - %xx.death_place;%end;
         %if;(xx.has_linked_page.DEATH and xx.linked_page.DEATH !="") %xx.linked_page.DEATH;%end;
-        %if;xx.computable_death_age;, [age at death:] %xx.death_age;%end;</li>%nl;
+        %if;xx.computable_death_age; [aged] %xx.death_age;%end;</li>%nl;
         %if;xx.is_buried;
           <li>%apply;capitalize(nth([buried],xx.sex))
           %if;xx.has_burial_date; %xx.on_burial_date;%end;
@@ -440,7 +445,7 @@
       %if;(xx.has_linked_page.OCCU and xx.linked_page.OCCU!="")
         <li>%apply;capitalize(xx.linked_page.OCCU)</li>%nl;
       %end;
-      %if;(xx.has_consanguinity and bvar.show_consang!="no")
+      %if;(xx.has_consanguinity and b.show_consang!="no")
         <li>[*consanguinity] : %xx.consanguinity;</li>%nl;
       %end;
     </ul>
@@ -479,7 +484,7 @@
     %if;xx.is_dead;, %xx.died;
       %if;xx.has_death_date; %xx.on_death_date;%end;
       %if;xx.has_death_place; - %xx.death_place;%end;
-      %if;xx.computable_death_age; [age at death:] %xx.death_age;%end;
+      %if;xx.computable_death_age; [aged] %xx.death_age;%end;
       %if;xx.is_buried; , %apply;nth([buried],xx.sex)%sp;
         %if;xx.has_burial_date; %xx.on_burial_date;%end;
         %if;xx.has_burial_place; - %xx.burial_place;%end;
@@ -490,108 +495,63 @@
       %end;
     %end;
     %if;xx.has_occupation;, %xx.occupation;%end;
-    %if;(xx.has_consanguinity and bvar.show_consang!="no"),%sp;
+    %if;(xx.has_consanguinity and b.show_consang!="no"),%sp;
       [consanguinity][:] %xx.consanguinity;%end;
   </span>
 %end;
 
-%define;married_to(sexx, date_place)
-  %if;(sexx = 0 or sexx = 2)
-    %if;are_married;[*married%t to:::date_place]0%nn;
-    %elseif;are_not_married;[*relationship%t to:::date_place]0%nn;
-    %elseif;are_engaged;[*engaged%t to:::date_place]0%nn;
-    %elseif;is_no_sexes_check;[*relationship%t to:::date_place]0%nn;
-    %elseif;is_no_mention;[*with]%nn;
-    %elseif;are_marriage_banns;[*marriage banns%t to:::date_place]0%nn;
-    %elseif;are_marriage_contract;[*marriage contract%t with:::date_place]0%nn;
-    %elseif;are_marriage_license;[*married%t to:::date_place]0%nn;
-    %elseif;are_pacs;[*pacsed%t to:::date_place]0%nn;
-    %elseif;are_residence;[*residence%t to:::date_place]0%nn;
+%define;rel_date_place(sexx, date_place)
+  %if;(sexx=1)
+    %if;are_married;[married%t to:::date_place]1%nn;
+    %elseif;are_not_married;[relationship%t to:::date_place]1%nn;
+    %elseif;are_engaged;[engaged%t to:::date_place]1%nn;
+    %elseif;is_no_sexes_check;[relationship%t to:::date_place]1%nn;
+    %elseif;is_no_mention;[no mention] | date_place [with]%nn;
+    %elseif;are_marriage_banns;[marriage banns%t to:::date_place]1%nn;
+    %elseif;are_marriage_contract;[marriage contract%t with:::date_place]1%nn;
+    %elseif;are_marriage_license;[married%t to:::date_place]1%nn;
+    %elseif;are_pacs;[pacsed%t to:::date_place]1%nn;
+    %elseif;are_residence;[residence%t to:::date_place]1%nn;
     %end;
   %else;
-    %if;are_married;[*married%t to:::date_place]1%nn;
-    %elseif;are_not_married;[*relationship%t to:::date_place]1%nn;
-    %elseif;are_engaged;[*engaged%t to:::date_place]1%nn;
-    %elseif;is_no_sexes_check;[*relationship%t to:::date_place]1%nn;
-    %elseif;is_no_mention;[*with]%nn;
-    %elseif;are_marriage_banns;[*marriage banns%t to:::date_place]1%nn;
-    %elseif;are_marriage_contract;[*marriage contract%t with:::date_place]1%nn;
-    %elseif;are_marriage_license;[*married%t to:::date_place]1%nn;
-    %elseif;are_pacs;[*pacsed%t to:::date_place]1%nn;
-    %elseif;are_residence;[*residence%t to:::date_place]1%nn;
+    %if;are_married;[married%t to:::date_place]0%nn;
+    %elseif;are_not_married;[relationship%t to:::date_place]0%nn;
+    %elseif;are_engaged;[engaged%t to:::date_place]0%nn;
+    %elseif;is_no_sexes_check;[relationship%t to:::date_place]0%nn;
+    %elseif;is_no_mention;[no mention] | date_place [with]%nn;
+    %elseif;are_marriage_banns;[marriage banns%t to:::date_place]0%nn;
+    %elseif;are_marriage_contract;[marriage contract%t with:::date_place]0%nn;
+    %elseif;are_marriage_license;[married%t to:::date_place]0%nn;
+    %elseif;are_pacs;[pacsed%t to:::date_place]0%nn;
+    %elseif;are_residence;[residence%t to:::date_place]0%nn;
     %end;
   %end;
 %end;
 
-%define;married_to_f(UP_lo, m_f, date_place)
+%define;married_to(xx, yy)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;">%nn;
-      <i class="fa fa-wrench%sp;
-        %if;(m_f=0)male%elseif;(m_f=1)female%else;neuter%end;"%sp;
+      <i class="fa fa-wrench fa-xs%sp;
+        %if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;"%sp;
         title="[*modify::family/families]0 [with]%sp;
-        %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end;%sp;
+        %spouse.first_name;%if;(spouse.occ!="0").%spouse.occ;%end;%sp;
         %spouse.surname;"></i>%nn;
     </a>%sp;
   %end;
   %let;marr_text;
-    %if;(m_f=1)
-      %if;are_married;[married%t to:::date_place]1%nn;
-      %elseif;are_not_married;[relationship%t to:::date_place]1%nn;
-      %elseif;are_engaged;[engaged%t to:::date_place]1%nn;
-      %elseif;is_no_sexes_check;[relationship%t to:::date_place]1%nn;
-      %elseif;is_no_mention;date_place [with]%nn;
-      %end;
-    %else;
-      %if;are_married;[married%t to:::date_place]0%nn;
-      %elseif;are_not_married;[relationship%t to:::date_place]0%nn;
-      %elseif;are_engaged;[engaged%t to:::date_place]0%nn;
-      %elseif;is_no_sexes_check;[relationship%t to:::date_place]0%nn;
-      %elseif;is_no_mention;date_place [with]%nn;
-      %end;
-    %end;
-  %in;
-  %if;("UP_lo"="UPPER")%apply;capitalize(marr_text)%else;%marr_text;%end;
-%end;
-
-%define;long_married(xx)
-  %apply;married_to%with;%xx.sex%and;
-    %if;(marriage_place = "")
-      %if;(on_marriage_date = "")
-      %else; %on_marriage_date;%nn;
-        %if;wedding_birthday; ([happy birthday to them!])%end;
-      %end;
-    %else;
-      %if;(on_marriage_date = ""), %marriage_place;,
-      %else; %on_marriage_date;
-        %if;wedding_birthday; ([happy birthday to them!])%end;
-        , %marriage_place,
-      %end;
-    %end;
-  %end;
-%end;
-
-%define;long_married_f(xx, UP_lo)
-  %apply;married_to_f%with;UP_lo%and;%xx.sex%and;
-    %if;(marriage_place="")
-      %if;(on_marriage_date="")%nn;
-      %else; <em>%on_marriage_date;
-        %if;wedding_birthday; ([happy birthday to them!])%end;
-        </em>%end;
-    %else;
-      %if;(on_marriage_date="")<em>, %marriage_place;, </em>
-      %else; <em>%on_marriage_date;
-        %if;wedding_birthday; ([happy birthday to them!])%end;
-       , %marriage_place, </em>%end;
-    %end;
-  %end;
+    %apply;rel_date_place%with;%xx.sex;%and;
+      %if;(on_marriage_date!="") %on_marriage_date;%end;
+      %if;(marriage_place!="") [in (place)] %marriage_place;%end;%end;%in;
+  %if;(yy=1)%apply;capitalize(marr_text)%else;%marr_text;%end;
+  %if;wedding_birthday; ([happy birthday to them!])%end;
 %end;
 
 %define;display_date_marriage_parent(xx)
   %foreach;xx.mother.family;
     %if;(spouse.access=xx.father.access)
-      %if;(marriage_date.year!="")
-        %if;(wizard and not cancel_links)<a href="%prefix&m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">%end;
-        <span class="text-nowrap">%family.date_s;</span>
+      %if;((wizard or friend) and marriage_date.year!=""))
+        %if;(wizard and not cancel_links)<a href="%prefix&m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">%end;%nn;
+        %family.date_s;%nn;
         %if;(wizard and not cancel_links)</a>%end;
       %else;&nbsp;%end;
     %end;
@@ -599,7 +559,7 @@
 %end;
 
 %define;not_married_no_descendants()
-  <img src="%image_prefix;/not_married_no_descendants.png" alt="[not married],&nbsp;[no descendants]" title="[not married],&nbsp;[no descendants]">
+  <img src="%images_prefix;not_married_no_descendants.png" alt="[not married],&nbsp;[no descendants]" title="[not married],&nbsp;[no descendants]">
 %end;
 
 %define;short_display_siblings()
@@ -620,10 +580,10 @@
     %if;child.has_families;
       %foreach;child.family;
         %if;(family_cnt!=1)
-          <br><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="1px">
+          <br><img src="%images_prefix;1pixel.png" width="13" height="13" alt="1px">
           <em>%child;%child.title;%child.dates;</em>
         %end;
-        <span class="ml-1">%apply;long_married_f("child", "lower")</span>
+        <span class="ml-1">%apply;married_to("child", "lower")</span>
         %apply;short_display_person("spouse")
       %end;
     %end;
@@ -632,12 +592,12 @@
 
 %define;display_sibling()
   %apply;li_SDC("child")
-    %(if;(child.has_image and child.index!=central_index%)
+    %(%if;(child.has_image and child.index!=central_index%)
     %if;(child.has_image)
       <table>
         <tr>
           <td style="vertical-align: middle">
-            %if;(evar.cgl!="on")
+            %if;(e.cgl!="on")
               <a href="%child.image_html_url;">
                 <img src="%child.image_url;"%sp;
                   %child.image_small_size; style="border: none" alt="" title="[image/images]0">
@@ -653,14 +613,14 @@
     %if;child.has_families;
       %foreach;child.family;
         %if;(family_cnt!=1)
-          <br><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="" title="">
+          <br><img src="%images_prefix;1pixel.png" width="13" height="13" alt="" title="">
           <em>%child;%child.title;%child.dates;</em>
         %end;
-        %sp;<em>%apply;long_married_f("child", "lower")</em>
+        %sp;<em>%apply;married_to("child", "lower")</em>
         %apply;short_display_person_f("spouse")
       %end;
     %end;
-    %(if;(child.has_image and child.index!=central_index%)
+    %(%if;(child.has_image and child.index!=central_index%)
     %if;(child.has_image)
           </td>
         </tr>
@@ -680,7 +640,7 @@
               %apply;short_display_person("spouse")
             </td>
             <td style="vertical-align: middle">
-              %if;(evar.cgl!="on")
+              %if;(e.cgl!="on")
                 <a href="%spouse.image_html_url;">
                   <img src="%spouse.image_url;"%sp;
                     %spouse.image_small_size; style="border: none" alt="" title="[image/images]0">
@@ -711,8 +671,10 @@
    personne d'où l'affichage sans nb d'enfants si la personne n'a qu'un mariage %)
 
 %define;detail_wedding()
-  %apply;type_wedding()
-  %if(marriage_date.year != "")%marriage_date.year;%end;
+  %if;(wizard or friend)
+    %apply;type_wedding()
+    %if;(marriage_date.year != "")%marriage_date.year;%end;
+  %end;
 %end;
 
 %define;detail_children()
@@ -762,7 +724,7 @@
         </li>
         <li class="list-unstyled">
         %apply;type_wedding()
-        %if(family.marriage_date.year != "")%family.marriage_date.year;%end;
+        %if;(family.marriage_date.year != "")%family.marriage_date.year;%end;
         </li>
         %apply;type_puce_asc("spouse")
         %apply;image_MF("spouse")
@@ -793,7 +755,7 @@
           </li>
           <li class="list-unstyled">
           %apply;type_wedding()
-          %if(family.marriage_date.year != "")%family.marriage_date.year;%end;
+          %if;(family.marriage_date.year != "")%family.marriage_date.year;%end;
           </li>
           %apply;type_puce_asc("spouse")
           %apply;image_MF("spouse")
@@ -813,7 +775,7 @@
   %end;
 %end;
 
-%let;p_mod;%if;(bvar.p_mod!="" and evar.p_mod="")%bvar.p_mod;%elseif;(evar.p_mod!="")%evar.p_mod;%end;%in;
+%let;p_mod;%if;(b.p_mod!="" and e.p_mod="")%b.p_mod;%elseif;(e.p_mod!="")%e.p_mod;%end;%in;
 
 %define;mm(i)%mi;%end;
 %define;oo(i)%oi;%end;
@@ -859,19 +821,14 @@
   %include.tpl
 %end;
 
-%define;get_templ(tplnum)
-  %let;templ;modules/%bvar.perso_module_tplnum;%in
-  %apply;show_templ(templ)
-%end;
-
 %define;get_mod(modnum, optx)
-  %let;modx;modules/%bvar.perso_module_modnum;%in;
+  %let;modx;modules/%b.perso_module_modnum;%in;
   %let;op_m;optx%in;
   %apply;show_templ(modx)
 %end;
 
 %define;test_templ(ix)
-  %if;(bvar.module_perso_ix="timeline")%incr_count;%end;
+  %if;(b.module_perso_ix="timeline")%incr_count;%end;
 %end;
 
 %reset_count;
@@ -879,9 +836,159 @@
   %for;i;0;26;
     %apply;test_templ%with;%apply;letter(i)%end;
   %end;
-%elseif;(bvar.module_perso_tplnb!="" and bvar.module_perso_tplnb>0)
-  %for;i;0;bvar.module_perso_tplnb;
-    %apply;test_templ(i)
-  %end;
 %end;
 %let;timeline;%if;(count>0)yes%else;no%end;%in;
+
+%define;rm(ccc,ttt)
+  %if;(e.ccc="on")<a role="button" class="stretched-link" href="%apply;url_set%with;ccc%end;"
+    title="ttt&#010;&#010; [*remove %s column:::ccc]"></a>%end;
+%end;
+%define;rm3(ccc,ddd,eee,ttt)
+  %if;(e.ccc="on" and e.ddd="on")<a role="button" class="stretched-link"
+    href="%apply;url_set%with;ccc/ddd%if;("eee"!="")/eee%end;%end;"
+    title="ttt&#010;&#010; [*remove %s column:::ccc+ddd+eee]"></a>%end;
+%end;
+%define;table_header()
+  <thead><tr class="align-middle">
+    %reset_count;
+    %if;(e.num="on")
+      <th scope="col" class="text-center align-middle position-relative" rowspan="2">№%nn;
+        %apply;rm%with;num%and;%if;(e.m="D")[*d'Aboville]%elseif;(e.m="A")[Sosa number]%end;%end;</th>
+      %incr_count;
+    %end;
+    <th scope="col" class="pl-2 align-middle" rowspan="2">[*person/persons]0</th>
+    %incr_count;
+    %if;(e.birth="on" and e.birth_place="on")
+      <th class="text-center position-relative" colspan="2">[*birth]
+        %apply;rm3("birth","birth_place","",[*birth])</th>
+      %incr_count;%incr_count;
+    %elseif;(e.birth="on" and e.birth_place!="on")
+      <th scope="col" class="text-center align-middle position-relative" rowspan="2">[*date of birth]
+        %apply;rm("birth","")</th>
+      %incr_count;
+    %elseif;(e.birth!="on" and e.birth_place="on")
+      <th scope="col" class="text-center align-middle position-relative" rowspan="2">[*birth place]0
+        %apply;rm("birth_place","")</th>
+      %incr_count;
+    %end;
+    %if;(e.baptism="on" and e.baptism_place="on")
+      <th class="text-center position-relative" colspan="2">[*baptism]
+        %apply;rm3("baptism","baptism_place","","")</th>
+      %incr_count;%incr_count;
+    %elseif;(e.baptism="on" and e.baptism_place!="on")
+      <th scope="row" class="text-center align-middle position-relative" rowspan="2">[*date of baptism]
+        %apply;rm("baptism","")</th>
+      %incr_count;
+    %elseif;(e.baptism!="on" and e.baptism_place="on")
+      <th scope="row" class="text-center align-middle position-relative" rowspan="2">[*baptism place]
+        %apply;rm("baptism_place","")</th>
+      %incr_count;
+    %end;
+    %if;(e.marr="on" and (e.m="A" or (e.m="D" and e.t="H")))
+      <th scope="col" class="pl-2 align-middle position-relative" rowspan="2">[*spouse/spouses]1
+        %apply;rm("marr","")</th>
+      %incr_count;
+    %end;
+    %if;((e.marr_date="on" and e.marr_place="on") or
+         (e.marr_date="on" and e.child="on") or (e.marr_place="on" and e.child="on"))
+      <th class="text-center position-relative"
+        colspan="%if;(e.marr_date="on" and e.marr_place="on" and e.child="on")3%else;2%end;">%nn;
+        [*marriage/marriages]0
+        %apply;rm3%with;marr_date%and;marr_place%and;child%and;%end;
+      </th>
+      %if;(e.marr_date="on" and e.marr_place="on" and e.child="on")%incr_count;%end;
+      %incr_count;%incr_count;
+    %elseif;(e.marr_date="on" and e.marr_place!="on" and e.child!="on")
+      <th scope="col" class="text-center align-middle position-relative" rowspan="2">[*date of marriage]
+        %apply;rm("marr_date","")</th>
+      %incr_count;
+    %elseif;(e.marr_date!="on" and e.marr_place="on" and e.child!="on")
+      <th scope="col" class="text-center align-middle text-middle position-relative" rowspan="2">[*marriage place]
+        %apply;rm("marr_place","")</th>
+      %incr_count;
+    %elseif;(e.marr_date!="on" and e.marr_place!="on" and e.child="on")
+      <th scope="col" class="text-center align-middel position-relative" rowspan="2">
+        <i class="fa fa-child"></i>
+        %apply;rm%with;child%and;[*nb children]/[nb children] [total]%end;</th>
+      %incr_count;
+    %end;
+    %if;(e.death="on" and e.death_place="on")
+      <th class="text-center position-relative" colspan="2">[*death]
+        %apply;rm3("death","death_place","",[*death])</th>
+      %incr_count;%incr_count;
+    %elseif;(e.death="on" and e.death_place!="on")
+      <th scope="col" class="text-center position-relative" rowspan="2">[*date of death]
+        %apply;rm("death","")</th>
+      %incr_count;
+    %elseif;(e.death!="on" and e.death_place="on")
+      <th scope="col" class="text-center position-relative" rowspan="2">[*death place]
+        %apply;rm("death_place","")</th>
+      %incr_count;
+    %end;
+    %if;(e.burial="on" and e.burial_place="on")
+      <th class="text-center position-relative" colspan="2">[*burial]
+        %apply;rm3("burial","burial_place","","")</th>
+      %incr_count;%incr_count;
+    %elseif;(e.burial="on" and e.burial_place!="on")
+      <th scope="col" class="text-center position-relative" rowspan="2">[*date of burial]
+        %apply;rm("burial","")</th>
+      %incr_count;
+    %elseif;(e.burial!="on" and e.burial_place="on")
+      <th scope="col" class="text-center position-relative" rowspan="2">[*burial place]
+        %apply;rm("burial_place","")</th>
+      %incr_count;
+    %end;
+    %if;(e.age="on")
+      <th scope="col" class="align-middle text-center position-relative" rowspan="2">[*age]
+        %apply;rm("age","")</th>
+      %incr_count;
+    %end;
+    %if;(e.occu="on")
+      <th scope="col" class="pl-2 align-middle position-relative" rowspan="2">[*occupation/occupations]1
+        %apply;rm("occu","")</th>
+      %incr_count;
+    %end;
+    </tr>
+    <tr>
+    %if;(e.birth="on" and e.birth_place="on")
+      <th class="text-right pr-2 position-relative">[*date/dates]0
+        %apply;rm("birth",[*date of birth])</th>
+      <th class="pl-2 position-relative">[*place/places]0
+        %apply;rm("birth_place",[*birth place])</th>
+    %end;
+    %if;(e.baptism="on" and e.baptism_place="on")
+      <th class="text-right pr-2 position-relative" title="[*date of baptism]">[*date/dates]0
+        %apply;rm("baptism",[*date of baptism])</th>
+      <th class="pl-2 position-relative">[*place/places]0
+        %apply;rm("baptism_place",[*baptism place])</th>
+    %end;
+    %if;((e.marr_date="on" and e.marr_place="on") or
+         (e.marr_date="on" and e.child="on") or (e.marr_place="on" and e.child="on"))
+      %if;(e.marr_date="on")
+        <th class="%if;(e.marr_place!="on")text-center%else;text-right pr-2%end; position-relative">%nn;
+          [*date/dates]0 %apply;rm("marr_date",[*date of marriage])</th>
+      %end;
+      %if;(e.marr_place="on")
+        <th class="%if;(e.marr_date!="on")text-center%else;pl-2%end; position-relative">
+          [*place/places]0 %apply;rm("marr_place",[*marriage place])</th>
+      %end;
+      %if;(e.child="on")
+        <th class="text-center px-2 position-relative">
+          <i class="fa fa-child"></i>
+          %apply;rm%with;child%and;[*nb children]/[nb children] [total]%end;</th>
+      %end;
+    %end;
+    %if;(e.death="on" and e.death_place="on")
+      <th class="text-right pr-2 position-relative">[*date/dates]0
+        %apply;rm("death",[*date of death])</th>
+      <th class="pl-2 position-relative">[*place/places]0
+        %apply;rm("death_place",[*death place])</th>
+    %end;
+    %if;(e.burial="on" and e.burial_place="on")
+      <th class="text-right pr-2 position-relative">[*date/dates]0
+        %apply;rm("burial",[*date of burial])</th>
+      <th class="pl-2 position-relative">[*place/places]0
+        %apply;rm("burial_place",[*burial place])</th>
+    %end;
+  </tr></thead>
+%end;

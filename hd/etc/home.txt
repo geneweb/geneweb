@@ -1,26 +1,47 @@
-<!-- $Id: home.txt v7.1 04/03/2023 09:31:52 $ -->
+<!-- $Id: home.txt v7.1 07/09/2023 00:49:55 $ -->
 %define;display_sosa_ref(xx)
   [*sosa reference: %t:::xx]
 %end;
+%define;get_random(xxx)
+  %random.init;
+  %random.xxx;
+%end;
+%define;dice()
+  %random.init;
+  %apply;nth%with;one/two/three/four/five/six%and;%random.6;%end;
+%end;
+%let;random_index;%apply;get_random(nb_of_persons.v)%in;
 %if;(not cancel_links)
-  <div class="float-left">
-    <div class="d-flex flex-column mt-2 fixed_top_btn%if;(evar.m!="A")_col %end; %if;(evar.wide="on")fixed_top_btn_wide%end;">
-      <a role="button" class="btn btn-link ml-0 p-0" href="%prefix;">%nn;
-        <i class="fa fa-home fa-fw" title="[*home]" aria-hidden="true"></i>%nn;
-        <i class="sr-only">[*home]</i>%nn;
+  <div class="d-flex flex-column fix_top fix_left">
+    <a tabindex="1" role="button" class="btn btn-sm btn-link p-0 border-0" href="%prefix;" title="[*home]">
+      <i class="fa fa-house fa-fw fa-sm" aria-hidden="true"></i>%nn;
+      <i class="sr-only">[*home]</i>%nn;
+    </a>
+    %if;(referer!="")
+      <a tabindex="2" role="button" class="btn btn-sm btn-link p-0 border-0" href="%referer;" title="[*back]">%nn;
+        <i class="fa fa-arrow-left-long fa-fw fa-xs" aria-hidden="true"></i>%nn;
+        <span class="sr-only">[*back]</span>%nn;
       </a>
-      <a role="button" class="btn btn-link text-primary ml-0 p-0" data-toggle="modal" data-target="#searchmodal" accesskey="S">%nn;
-        <i class="fa fa-search fa-fw" title="[*search/case sensitive]0" aria-hidden="true"></i>%nn;
-        <span class="sr-only">[*search/case sensitive]0</span>%nn;
-      </a>
-      %if;(referer!="")
-        <a role="button" class="btn btn-link ml-0 p-0" href="%referer;" title="Revenir en arrière">%nn;
-          <i class="fa fa-arrow-left fa-fw" title="[*back]" aria-hidden="true"></i>%nn;
-          <span class="sr-only">[*back]</span>%nn;
-        </a>
-      %end;
-      %if;debug;<span id="q_time_d">00.0000</span>%end;
-    </div>
+    %end;
+    <a tabindex="3" role="button" class="btn btn-sm btn-link p-0 border-0" data-toggle="modal" data-target="#searchmodal"
+      accesskey="S" title="[*search/case sensitive]0">%nn;
+      <i class="fa fa-magnifying-glass fa-fw fa-xs" aria-hidden="true"></i>%nn;
+      <span class="sr-only">[*search/case sensitive]0</span>%nn;
+    </a>
+    %let;rng;%if;((e.i!="" or e.p!="" or e.n!="") and e.m!="S" and e.m!="L" and e.m!="" and not ("_FAM" in e.m))1%end;%in;
+    <a role="button" class="btn btn-sm btn-link p-0 border-0"
+      href="%if;(rng=1)%apply;url_set%with;i/p/n/oc%and;%random_index;%end;%else;%prefix;i=%random_index;%end;"
+      title="[*random individual]%if;(rng=1) ([stay on the current tool])%end;"><i class="fa fa-dice-%apply;dice() fa-fw fa-xs" aria-hidden="true"></i>%nn;
+      <span class="sr-only">[*random individual]</span>%nn;
+    </a>
+    %if;(b.hide_querytime_bugs!="yes")
+      <div class="btn btn-sm p-0 border-0" id="q_time">%nn;
+        <i class="fa fa-hourglass-half fa-fw fa-xs p-0"></i>%nn;
+      </div>
+      <div class="btn btn-sm p-0 border-0 d-none" id="nb_errors">%nn;
+        <i class="fa fa-bug fa-fw fa-xs p-0"></i>%nn;
+      </div>
+    %end;
   </div>
   <div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
@@ -41,7 +62,7 @@
                 <label class="sr-only" for="p">Search firstname</label>
                 <input type="search" id="p" class="form-control form-control-lg mt-2" name="p" placeholder="[*first name/first names]0">
               </div>
-              <button class="btn btn-outline-primary" type="submit" title="[*search/case sensitive]0"><i class="fa fa-search fa-lg mx-2"></i> [*search/case sensitive]0</button>
+              <button class="btn btn-outline-primary" type="submit" title="[*search/case sensitive]0"><i class="fa fa-magnifying-glass fa-lg mx-2"></i> [*search/case sensitive]0</button>
             </div>
           </form>
         </div>

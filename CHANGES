@@ -1,58 +1,135 @@
-GeneWeb version 7.01
----------------------
+Changelog for Versions 7.0 and 7.1
 
-This changelog describes in more details changes introduced in 7.0 and 7.1.
+Various minor corrections and updates in template files.
 
-- Various corrections and marginal updates in template files.
+Added a "Relationships" button in the "Relationships" drop-down menu (m=C).
+This feature includes an extended table of potential "cousin" relationships
+up to an ascending degree v (v1/v2 represent ascending/descending degrees).
+Note that "self" is now represented as v=v1=0 (previously 1) for consistency.
+Please be aware that some translations for relationships are still pending.
+A new .gwf parameter "cache_cousins_tool=yes" allow the use of a cache file
+to help with loading time on big databases.
 
-- Addition of a collections of "cousins" template commands. 
-  Using these commands, the "Relationship" item on the last or next to last
-  menubar item on the right will provide a comprehensive table of potential
-  "cousins" relationships, counting v1 generations up and v2 generations down.
+When browsing with a Sosa reference and the individual has a relationship with
+the Cujus, the relationship name is now provided along with the names of common
+ancestor(s) and the shortest path graph between them (m=RL). This feature also
+considers half-relationships with a lone common ancestor.
 
-- Update of the "places by surname" command (available on the welcome page).
-  List of persons related to a given place are now explicitly provided as
-  well as the possibility to construct a multi-relation tree between these
-  persons. A link back into the places dictionary is also provided.
+The "places by surname" tool (m=PPS) on the welcome page has been updated. It
+now explicitly lists persons related to a given place and offers the ability to
+construct a multi-relation tree between these individuals. Additionally, a link
+back to the places dictionary is provided.
 
-- Addition of a "carrousel" mechanism allowing archival of several pictures
-  associated with a person beyond the existing portrait.
+A new "carousel" mechanism (m=SND_IMAGE_C) has been added, allowing for the
+archival of several pictures associated with an individual, beyond the existing
+portrait.
 
-- New command m=DOC (similar to m=SRC) allowing taking into account .pdf and
-  .html files.
-  <a href="%sm=DOC&s=file.pdf">Pdf file</a> will display the content of the 
-  pdf file.
-  Contrary to image files, pdf and html files cannot be included in a
-  <img src="..."> command.
-  Arguments to m=SRC and m=DOC can now be located into sub-folders of the
-  current images/basename and src/basename folders.
+Introducing the new command m=DOC, similar to m=SRC, which now allows loading
+PDF and HTML files. You can display the content of a PDF file using "<a
+href="%sm=DOC&s=file.pdf">pdf file</a>". Unlike image files, PDF and HTML files
+cannot be included in an <img src="..."> command. Arguments for m=SRC and m=DOC
+can now be located in subfolders of the current images/basename and src/basename
+folders.
 
-- In templates, images (portraits) are displayed by default, and spouses
-  are not. Most of the templates provide buttons to change this setting as
-  well as other parameters.
-  When no button is available, manually adding im=off and/or sp=on in the
-  URL should work.
-  
-- In ancestor trees, a new option allows to choose the order of display
-  of father and mother. Default is father to the left.
+Most template pages now feature new buttons to change image/spouse variables.
+Portraits and spouses are now shown by default, but you can hide them by using
+variables im=0 and sp=0 in the URLs.
 
-- A new visitor_access=no parameter in the .gwf file prevents access to the
-  base to anyone but friends and wizards.
+A new bar of buttons for trees is now available at the bottom of pages. Switch
+between tree types: agnatic/ascending/cognatic/descending/v/short. Navigate to
+father/mother/siblings when available. The "<>" button switches the positions
+of spouses (male by default on the left). "V" represents a descending tree in
+template format, similar to the old one. "Short" uses Jean Vaucher's algorithm
+tto reduce the width of trees.
 
-- The lexicon supports an alias mechanism allowing for several names fir
-  the same set of translations.
+In ascending trees, the marriage year is now replaced by a marriage-divorce or
+relation-separation period, with information on widowhoods available in
+tooltips.
 
-- Access to the server without supplying a base name opens index.txt which
-  allows capture of the base name. A list of available bases is provided.
-  Is only one base exists, its welcome page is directly opened.
+A new parameter "visitor_access=no" in the .gwf file prevents access to the base
+for anyone except friends and wizards.
 
-- Homonyms lists are expanded, including parents and spouses names to
-  facilitate identification.
+The lexicon now supports an alias mechanism that allows for multiple names for
+the same set of translations using "->:" (similar to language prefixes).
 
-- In the authentication files for wizards and friends, username can be
-  expanded into username|userkey where userkey is first_name.ocurence.surname
-  of the user in this base.
+Accessing the server without specifying a base name opens the index.txt file.
+This file allows users to capture the base name and now provides a list of all
+available bases. If only one base exists, its welcome page is opened directly.
 
+While searching, lists of homonyms are expanded with parents and spouses' names
+for easier identification. The same details are shown in the merge tool (m=MRG).
+
+If calculable, the individual's age in days is now given on the tooltip of the
+icon (from templm).
+
+In the ascendant table by couples (m=A&m=T), the middle column now displays the
+number of children of the couple before the marriage event. All other spouses'
+children and relations are shown in small text in blue/red (him/her). Relations
+are printed in chronological order. The spouses of those other relations are
+shown in the tooltip of the event, providing a better view of the various
+existing families and a quick count of the total children of both ascendants.
+
+In the Ancestors menu (m=A), the selection of generations is enhanced with
+statistics, including the period of the generation, the number of added
+individuals and implexes by generations, the total number of individuals and
+implexes up to this generation, and the percent of completion of the generation
+in the tooltip. This feature is allowed thanks to select2.min.js jQuery scripts
+and may be resource-intensive for a large number of ancestors and implexes.
+
+Individual and family forms (m=MOD_IND/MOD_FAM) now include three new components
+for witnesses: an "occupation" input and two checkboxes for "maybe dead" and
+"public." The types of witnesses and relationships have been extended. If "link"
+is selected, a hyperlink to the witness' page is displayed.
+
+In the authentication files for wizards and friends, the username can now be
+expanded into username|userkey, where userkey is first_name.ocurence.surname of
+the user in this base. This allows for a quick link to that individual after
+login.
+
+In "Books" (m=MOD_DATA), a new parameter "book_max_results" in gwf limits the
+results of books, with the default set at 1000. Additionally, a new anchor
+after a modification allows for a fallback to the edited entry, and a new
+search input facilitates multiple corrections. Improved breadcrumb trail and
+navigation are also included.
+
+Home buttons are now set on the top right for all pages. Two new icons have
+been added to facilitate debugging: - The hourglass icon indicates the CPU load
+time of the gwd request, with a color indicator (green/yellow/red) based on
+speed. The load time is provided in the tooltip of that icon. - The bug icon
+indicates coding errors on the page, and its tooltip provides information about
+the number of errors found while loading the page, including a list of
+undefined variables. These new buttons can be hidden with the new gwf parameter
+"hide_compilation_time=yes". Please report any issues if you encounter errors
+in gwd logs/console.
+
+The number of connected wizards/friends is now displayed on the right in the
+footer, next to copyrights.
+
+The "default_lang" parameter set in gwf is highlighted in the language select
+menu if the language has been changed.
+
+New inputs have been added in the population pyramid form, including interval
+and limit, which were previously only available by modifying the URL.
+
+A minimized monospace font based on DejaVu Sans Mono is now loaded for a better
+rendering of the descending tree view, containing about 50 ASCII box-drawings
+characters. The files are located at /webfonts/dejavusansmono-
+genewebfont.woff/2.
+
+The "static_path" parameter in gwf has been depreciated,
+and is now set at the launch of gwd.
+gwd takes three possible launch parameters:
+-hd designates the location of gw. From this location
+    gw/etc and gw/images can be derived.
+-etc_prefix designates etc if it is not located in gw.
+-images_prefix designates images if it is not located in gw
+In templates, %gw_prefix;, %etc_prefix;, %images_prefix; provide these values.
+These values provide the necessary directory separator when prepended to a file.
+(For retro compatibility purposes, %static_path; = %etc_path; and 
+%ipage_prefix = %images_prefix;)
+
+Remove GWPREFIX not used anymore during Unix install,
+as "man" pages not maintained anymore either since geneweb 7.0.0
 
 GeneWeb version 7.0.0
 ---------------------

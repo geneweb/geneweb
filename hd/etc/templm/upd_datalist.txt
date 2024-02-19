@@ -2,8 +2,12 @@
 %define;dlist(z1)
   <datalist id="dlz1">
   <option id="oz1">0</option>
-    %if;(bvar.datalist_z1 = 1)
-      <script>$("#dlz1").delay(1000).load("%prefix;m=MOD_DATA;data=z1;datalist=on");</script>
+    %if;(bvar.datalist_z1 = 1 or "z1"="qualifier" or "z1"="alias")
+      %if;(bvar.datalist_book = 1)
+        <script>$("#dlz1").delay(1000).load("%prefix;m=MOD_DATA;data=z1;datalist=on");</script>
+      %else;
+        <script>$("#dlz1").load("cache/a2_z1.cache");</script>
+      %end;
     %end;
   </datalist>
 %end;
@@ -12,6 +16,8 @@
 %apply;dlist("place")
 %apply;dlist("occu")
 %apply;dlist("src")
+%apply;dlist("qualifier")
+%apply;dlist("alias")
 <datalist id="dlmonth">
   <option value=VD label="[(french revolution month)]0 VD">
   <option value=BR label="[(french revolution month)]1 BR">

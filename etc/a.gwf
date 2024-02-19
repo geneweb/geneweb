@@ -1,38 +1,102 @@
 # This is the default GeneWeb base configuration file
+# ================
+# Important notice:
+# Most parameters are hardcoded in the source code,
+# but are modified via this configuration file.
+# Each bvar to be uncommented as needed.
+# - for a lot of 'boolean' bvars (yes/no or on/off),
+#   non default value is specified as commented line,
+#   and the code only test this non default one.
+# - for string or numerical bvars,
+#   default value (if any) is specified as commented line.
+# - To ease manual sorting of all bvars,
+#   they are specified without space character after comment one.
+#   script example to generate the list:
+#   $cat etc/a.gwf | grep -vE '^$|^\#$|^\#\ ' |sort >/tmp/x2
+# ================
 
-# css_prop
-# The file stylesheet.css must be in the directory "css".
-# Customize the default.css stylesheet or create your own one and
-# specify it to geneweb by adding this line in your gwf.
-# More about how to customize here :
-# http://geneweb.tuxfamily.org/wiki/CSS
-#css_prop=your/file.css
+# Default language
+# Default is "fr" for french.
+#default_lang=fr
 
-# Highlight color
-highlight_color=#2f6400
+# Select a default Sosa reference while navigating with an individual’ key
+# (“first_name.occurrence surname”) for eg.:
+# default_sosa_ref=john.3 smith
+#default_sosa_ref=
 
-# Welcome logo. The designated file should be in bases/src/mybase/images
-# Called with <img src="%prefix;m=IM;v=welcome_logo"
-#                  style="welcome_logo_style">
-#welcome_logo=
-#welcome_logo_style=
+# Message of the day. If set, display this message in the welcome page.
+# Can contain HTML tags.
+#motd=
 
-# Alternate text for the main Notes button on the Welcome page
-#base_notes_title=
+# Specify the number of years for the visibility of personal informations
+# in normal access (except for wizards, friends and public persons).
+# If dates of person whose age < this value, then informations not displayed.
+# Warning: The first-name and surname ARE NOT hidden.
+# For a complete hide of person refer to hide_private_names and use_restrict
+#private_years=150
 
-# Friend can see all dates
-# Choose a password or leave it empty
-# Form: "user_id:password" or just "password"
-friend_passwd=
+# TODO need to document why needed in addition to private_years
+# if not set then their default value are private_years.
+#private_years_death=
+#private_years_marriage=
+
+# Access by key, when set to "yes", generates HTML requests with
+# "p=first+name;n=surname;oc=number"
+# instead of (shorter) "i=identifier" in URLs which is default.
+#access_by_key=yes
+
+# Show consanguinity in personal pages if computed (default)
+# set to no if needed
+#show_consang=no
+
+# Individuals with titles are public if set (visitors can see them).
+#public_if_titles=yes
+
+# Individuals without dates are public if set,
+# except if their access is explicitly set to “private”.
+#public_if_no_date=yes
+
+# Display the picto Sosa on the template perso.txt (individual page).
+# assuming default_sosa_ref is defined
+#display_sosa=yes
+
+# Display the individual in his ’own’ siblings on the template perso.txt
+# (individual page), except if set to 'no'
+#full_siblings=no
+
+# Display a default man/woman/neuter image when individual image is missing
+# (not implemented on all pages)
+#default_image=yes
+
+# Restrict access to friends and wizards.
+#visitor_access=no
+
+# Don’t search images if for visitor (can be useful if the images are hosted in
+# a site protected by a password that only wizards and friend know.
+#no_image_for_visitor=yes
+
+# Don’t search notes if normal visitor (i.e. neither "wizard" nor "friend").
+# Notes = individual note or Marriage note.
+#no_note_for_visitor=yes
+
+# There are multiple access control parameters as documented in
+# https://geneweb.tuxfamily.org/wiki/access
+#
+# Friends access password.
+# allows global access control for persons potentially still alive.
+# If a value is supplied for this variable, only visitors having entered
+# those as friend_id/password will see data about persons born less than
+# “private_years” years.
+# Form: "friend_id:password" or just "password"
+#friend_passwd=
 
 # Alternative way for friend entry: authorization file.
 # The file must hold lines of the form “user:password”.
-friend_passwd_file=
+#friend_passwd_file=
 
-# Wizards can see all dates and update the base
-# Choose a password or leave it empty
-# Form: "user_id:password" or just "password"
-wizard_passwd=
+# Wizards access password.
+# Form: "wizard_id:password" or just "password".
+#wizard_passwd=
 
 # Alternative way for wizard entry: authorization file.
 # The file must hold lines of the form either:
@@ -47,242 +111,148 @@ wizard_passwd=
 # example, with "Daniel de /Rauglaudre" as "complete name", it is ordered
 # at the letter ‹R› (like “Rauglaudre”) and in the form:
 #    Rauglaudre (Daniel de)
-# but it his wizard page, it is displayed as “Daniel de Rauglaudre” without
+# but in his wizard page, it is displayed as “Daniel de Rauglaudre” without
 # the slash.
-wizard_passwd_file=
+#wizard_passwd_file=
 
 # Alternative to wizard_passwd_file
-# If a global password is provided through wizard_passzd, then this file
+# If a global password is provided through wizard_passwd, then this file
 # Allows description of wizards (wizard notes button)
 #wizard_descr_file=
 
-# Manitou is a wizard who can:
-# - delete any forum message
-# - edit any wizard's notes
-# - see all connected wizards
-# - always see consanguinities
-# - stay wizard even when wizard_just_friend is set
-# - can apply a request "sleep=xx" to sleep xx seconds after a request
-#   (useful e.g. to have time to look at the memory used)
-#   His changes in database are not recorded in the history.
-#   The variable must contain the wizard's user name:
-# manitou=
+# Remove all wizards’ powers. Wizards become friends.
+#wizard_just_friend=yes
 
-# Wizards moderators file.
-# List of wizards moderating the database forum.
-# If empty or empty file, no moderation.
-# One wizard name by line.
-moderator_file=
-
-# Forum supervisor. The forum is not moderated but controlled afterwards.
-# This supervisor is a wizard who can delete any forum message. He can
-# see the real wizards or friend user names (since they can be hidden in
-# the "ident" area) and the IP address the message comes from.
-supervisor=
-
-# Notify change program (e.g. shell script) to be executed for each
-# database change. First argument is the name of the base, then the
-# individual and finally the action performed.
-# If you want to test a specific change, such as delete an individual,
-# you should test the fourth argument as equal to dp (delete person).
-# You can check the list of possible modifications in the updhist.txt file
-# (see update_text).
-# notify_change=
-
-# Wizard losing his powers, becoming just a "friend"
-# Set it to "yes" or "no"
-wizard_just_friend=no
-
-# Restrict access to friends and wizards
-# Default is yes
-# You may define several messages, each postfixed with the two letters code for a language
-# visitor_access=no
-# visitor_access_msg_en=Access to the base is restricted to wizard and friends.
-
-# Generates pages with DOCTYPE HTML 4.01 (default XHTML 1.1)
-#doctype=html-4.01
-
-# File recording a black list for the database forum.
-#forum_exclude_file=
-
-# Number of years for private access. Dates of persons whose age < this value
-# are not displayed (except for wizards, friends and public persons).
-private_years=150
-
-# Hide the private persons names ("x" is displayed instead of their first
-# name or surname).
-hide_private_names=no
-
-# More restricted system to hide private names; the hidden persons are
-# not clickable, the links to their children, ancestors and spouses are
-# not accessible.
-use_restrict=no
-
-# Default language
-default_lang=fr
-
-# Authorization for wizards to send images (no: cannot; yes: can)
-can_send_image=yes
-
-# Maximum images size in bytes (which can be accepted in "send image").
-# Default: no limit
-#max_images_size=...
-
-# Show consanguinity (if computed) in personal pages
-show_consang=yes
-
-# Death symbol in dates (default: christians' one)
-#death_symbol=†
-
-# Birth symbol in dates (default: christians' one)
-#birth_symbol=°
-
-# Allow the usage of the request m=KILL_ANC
-can_kill_ancestors=no
-
-# Optional path for images defined by the "image" field (i.e. *not* added
-# by "send image"). Applies only for images not found in the image/base
-# directory. This value, when set, could typically start with http://...
-# or file://...
-images_path=
-
-# Don't search images if normal visitor (i.e. neither "wizard" nor "friend").
-# Useful if the images are hosted in a site protected by a password that
-# only wizards and friend know.
-no_image_for_visitor=no
-
-# Don't search notes if normal visitor (i.e. neither "wizard" nor "friend").
-# Notes = individual note or Marriage note.
-no_note_for_visitor=yes/no
+# Authorized wizards notes. By default, wizards notes are not allowed.
+#authorized_wizards_notes=yes
 
 # Global authorization file for this database (overriding the value
 # of the option "-auth" of "gwd"). This file must hold lines of the
 # form "user:password". Works only in server (not cgi) mode.
-auth_file=
+#auth_file=
 
-# Access by key, when set to "yes", generates HTML requests with
-# "n=first+name;p=surname;oc=number" instead of (shorter) "i=identifier"
-# in URLs.
-access_by_key=no
+# If set, the names of the private persons (less than private_years old)
+# are not displayed: "x x" is displayed instead.
+# To see the real names, one must be "wizard" or "friend".
+#hide_private_names=yes
 
-# Set to no if you don't want that the search by (nobility) titles be
-# proposed in the welcome page.
-propose_titles=yes
+# More restricted system than hide_private_names.
+# if set the hidden persons are not clickable, and
+# the links to their children, ancestors and spouses are not accessible.
+#use_restrict=yes
 
-# File for allowed titles/domains (empty => all allowed)
-allowed_titles_file=
+# Don’t authorise wizards to send images.
+#can_send_image=no
 
-# After above, file for denied titles/domains
-denied_titles_file=
+# Set a maximum images size in bytes which can be accepted in “send image”
+#max_images_size=
 
-# Print the title of individual in an advanced way. Default prints only
-# first_name and surname. In the advanced way, search for the title name,
-# estate ... and print something clever.
-print_advanced_title=yes/no
+# Optional path for images defined by the "image" field (i.e. *not* added
+# by “send image”). Applies only for images not found in the image/base
+# directory. This value, when set, could typically start with https://…
+# or file://…
+#images_path=
 
-# Set to no if you don't want the link "add a family" to be added in
-# the welcome page for wizards. In "no", forbid also adding families not
-# connected to the rest.
-propose_add_family=yes
+# “Birth/death symbols” in dates (default: christians’ one)
+#birth_symbol=°
+#death_symbol=†
 
-# Set to no if you don't want the request by place/surname to be
-# proposed in the welcome page.
-propose_place_surname=yes
+# Hide “search by titles” be on the welcome page.
+#propose_titles=no
 
-# provide a list of names for the decomposition of places (comma separated)
+# Hide wizards "add family" button on welcome page (forbid also adding
+# families not connected to the rest on the database).
+#propose_add_family=no
+
+# Hide “Places/surname” button on welcome page.
+# By default button is accessible.
+#propose_place_surnames=no
+
+# Hide “advanced request” button on welcome page.
+# hiden by default since gw version 4.0
+#hide_advanced_request=no
+
+# Hide “counter of visits” on welcome page.
+#counter=no
+
+# Alternate text for the main “Notes” button on the welcome page.
+#base_notes_title=
+
+# TODO need to understand purpose
+# was initially added by git commit 606f82cc4
+# Provide a list of names for the decomposition of places (comma separated)
 # other = ""; town = ""; township = ""; canton = ""; district = "";
-# county = ""; region = ""; country = ""
-#
+# county = ""; region = ""; country = "".
 #place=autre, ville, agglomération, canton, district, conté, région, pays
-
-# Set to yes if you want that the access to surnames and first names by
-# alphabetic order be fast (interesting for very big databases). Drawback:
-# the first page does not display the number of surnames or first names
-fast_alphabetic=no
-
-# Link in the display place/surname point to some individual concerned
-# by the place (yes) or to the whole surname (no)
-place_surname_link_to_ind=no
-
-# Set to no if you want the advanced request link to be displayed
-hide_advanced_request=yes
-
-# Maximum level when displaying ancestors
-max_anc_level=8
-
-# Maximum level when displaying ancestors by tree
-max_anc_tree=7
-
-# Maximum_level when displaying descendants
-max_desc_level=12
-
-# Maximum_level when displaying descendants by tree
-max_desc_tree=4
-
-# Maximum number of displayed cousins
-max_cousins=2000
-
-# Maximum level of displayed cousins
-max_cousins_level=5
-
-# Number of latest events (birth, death) displayed
-latest_event=20
-
-# Always display the children surnames even if same than father.
-# Applies in descendants page, in surname displaying page,
-# also in siblings and union modules.
-#always_surname=yes
-
-# History: set it to yes to save update traces in database (in file named
-# "history" in the database directory "base.gwb"). When such a file exists,
-# a link is displayed in the welcome page.
-# Warning: this text file grows indefinitively... you can edit it to remove
-# the old information if you want (oldest = begin of file) or you can remove
-# it when it is too large, if you prefer.
-history=no
-
-# History: set it to yes to save update traces in database (in a directory
-# named "history_d" in the database directory "base.gwb" or the directory
-# specified by history_path (view below)). It allows you to see the differences
-# between two modifications.
-# Warning: this directory grows indefinitively...
-history_diff=no
-
-# You can define a specific path where to store all the histories. If you
-# don't specify it, it will save the history in your database directory
-# (which is juste fine).
-history_path=
-
-# Consider persons having titles as public, i.e. even not friends can see
-# their dates; "yes" = consider; "no" = don't consider
-public_if_titles=no
-
-# Consider all persons having no date (birth, baptism, death, burial) as
-# public (except if their access is explicitly set to "private");
-# "yes" = consider; "no" = don't consider
-public_if_no_date=no
 
 # Tell that in this database the order of places are registered inverted
 # (being more general to less general), e.g. "USA, New York" instead of
 # "New-York, USA". Set it to "yes" if it is the case. Important for display
-# by places/surnames.
-places_inverted=no
+# by Places/surname.
+#places_inverted=yes
 
-# If more that short_place_threshold places, revert to short display mode
-# default 500
-#short_place_threshold=
+# In the Places/surname page,
+# the surname string may be a link to list all individuals of that surname,
+# not only those in related place.
+#place_surname_link_to_ind=yes
 
-# Uncomment the following definition to specify that the present database has
-# been renamed:
+# The max number for relation list is the
+# list size limit for "list of individuals by Place"
+# each list accessible from "Places/surname" page.
+# A list is not generated if number of individuals is greater.
+#max_rlm_nbr=80
+
+# Maximum number of generations when displaying ancestors.
+#max_anc_level=13
+
+# Maximum number of generations when displaying ancestors by tree
+# if not specified then limited by max_anc_level.
+#max_anc_tree=
+
+# Maximum number of generations when  displaying descendants.
+#max_desc_level=12
+
+# Maximum number of generations when displaying descendants by tree.
+#max_desc_tree=6
+
+# Maximum number of displayed cousins.
+#max_cousins=2000
+
+# Maximum level of displayed cousins.
+#max_cousins_level=6
+
+# Use cache file “cache_cousins” for cousins tool (m=C).
+# Usefull when self has a lot of relationships.
+#cache_cousins_tool=yes
+
+# Number of latest events (birth, death) displayed in statistics.
+#latest_event=20
+
+# Always display the children surnames even if same than father.
+# Applies in descendants page, in surname displaying page,
+# also in siblings and union modules.
+# default is to not display if same surname.
+# Note for templm: if variable is set in gwf, then user may force the reverse
+# by manually adding always_surname=no in query url.
+#always_surname=yes
+
+# Allow an historic file that log all updates in database in a file named
+# “history” in the database directory. This file grows indefinitively.
+#history=yes
+
+# Allow to see differences between modifications from history.
+# Diff files are stored in a database subdirectory or the specified
+# “history_path” directory (see below) that grows indefinitively.
+#history_diff=yes
+
+# Path to store all the histories (default "history_d").
+#history_path=
+
+# Indicate that the present database has been renamed to “newname”.
 #renamed=newname
 
-# Select a default Sosa reference while navigating. This must be the
-# person's key (first-name dot number space surname).
-#default_sosa_ref=john.3 smith
-
-# Uncomment the following definition to specify that the present database has
-# been moved to another site:
-#moved=http://new.address.com/and-so-on/
+# Indicate that the database has been moved to “new.adress” website.
+#moved=https://new.address:2317/…
 
 # Templates.
 #
@@ -295,13 +265,13 @@ places_inverted=no
 # distribution.
 #
 # Other templates can be added in the databases directory in a subdirectory
-# also named etc: e.g. etc/foo/perso.txt, etc/bar/perso.txt, # and so on.
+# also named etc: e.g. etc/foo/perso.txt, etc/bar/perso.txt, and so on.
 #
 # The "template" variable tells which templates are allowed for this
 # database and gives the default template. It is a list of directories
 # separated by commas. Empty directory means "the standard template".
 # Star means "any template". The first of the list gives the default
-# template # to be used. Examples:
+# template to be used. Examples:
 #
 # template=*       any template allowed; default = standard one
 # template=foo,*   any template allowed; default = foo
@@ -316,65 +286,20 @@ places_inverted=no
 #
 #template=a,*
 
-# Keep a trace of authorisations in trace_auth.txt (?? location ?)
-# Not a yes/no, but present/absent!!
-#trace_auth=yes
-
-# Customized variables.
-#
-# You can define any variable here, starting with "var_".
-#
-# They will be replaced in the displayed "notes", "sources", "comments"
-# and in the database forum. If the variable name is "var_something",
-# it replaces all occurrences of "%vsomething;" in these texts.
-#
-# Example. if you define here:
-#   var_who=Bond, James Bond
-# and if the notes is "My name is %vwho;.", the displayed text in the notes
-# will be:
-#   My name is Bond, James Bond.
-
-expand_env=no
 # If yes, expand the (system) environment variables found in the values of
 # the customized variables. You can write ${xxx} to expand the variable
 # xxx. E.g., if HOME is /home/smith and if you define:
 #    var_foo=my home is ${HOME}, guys!
 # the customized variable %vfoo; is expanded into:
 #    my home is /home/smith, guys!
-# The default is "no" because it may be a security hole to allow accommodated
-# databases in a Web site to show the environment variables of the command
-# gwd. Check that before putting "expand_env" to "yes".
-
-# Message of the day. If set, display this message in the welcome page.
-# Can contain HTML tags.
-#motd=
-
-# Display the date with the explicit day in parentheses.
-# Only works if the date is "exact" and *not* enter in "text mode"
-#long_date=yes/no
-
-# If disable_forum is set to yes, then all the request on the forum
-# are considered 'incorect request'. Default behaviour is that the forum
-# is *not* disable
-#disable_forum=yes/no
-
-# If counter is set to no, the counter for visiting geneweb's web pages is
-# *not* incremented. Default behaviour is that the counter is on (set to yes).
-#counter=yes/no
-
-# Default value if not specified is 5000 (which means that it will
-# take at most 5 seconds to realize a set of modifications (such as the
-# "set of places", "set of sources" ...
-#max_nb_update=2000
-
-# Authorized wizards notes. By default, wizards notes are not allowed.
-#authorized_wizards_notes=yes/no
+# It may be a security hole to allow accommodated databases in a Web site to
+# show the environment variables of the command gwd.
+#expand_env=yes
 
 # Customise the individual page.
 # Full documentation https://geneweb.tuxfamily.org/wiki/templates
-#
 # Each module is defined by a unique letter between a-z.
-
+# (no prefix # character because mandatory as per source code)
 perso_module_i=individu
 perso_module_p=parents
 perso_module_g=gr_parents
@@ -396,22 +321,253 @@ perso_module_l=ligne
 # and the value of its display option
 # The modules are displayed in the order in which they appear in "p_mod"
 # In the example below, "gr_parents", "individu", parents", "unions"…
+# p_mod=g1i2p1u3
+# By default when not set (or 'zz'), the display is a static choice of module.
+#p_mod=
 
-#p_mod=g1i2p1u3
+# Limits the results of Books (m=MOD_DATA) accessible by wizard
+#book_max_results=1000
 
-# display the picto Sosa on the template perso.txt (individual page).
-#display_sosa=yes/no
+# This variable allows to set up the maximum number of updates
+# that can be done at a single time.
+# Default value if not specified is 5000 (which means that it will
+# take at most 5 s to realize a set of modifications (such as the
+# “set of places”, “set of sources”…
+# If specified, the value will be limited to 5000.
+#max_nb_update=5000
 
-# display the individual in his 'own' siblings on the template perso.txt
-# (individual page).
-#full_siblings=yes
+# Use a distant CDN (Content Delivery Network) to load CSS/JS files instead
+# of loading them by the GWD server.
+#use_cdn=yes
 
-#display a default man/woman/neuter image when individual image is missing
-#default_image=yes
+# Hide the hourglass and bug icons on top left corner that reports the delta
+# time of last query action and potiential errors.
+#hide_querytime_bugs=yes
+
+# in case of multiple input gw files,
+# the origin_file name is displayed in individual page, in wizard mode, if evar opt=from.
+# variable below allow to update origin_file name in family update page.
+# (default is to not update)
+#origin_file=on
+
+# Allow the usage of the request m=KILL_ANC (templm)
+# This was a [WIP] since version 3.11 because no defined button, links
+# intermediate pages to ask for confirmation, things like that.
+#can_kill_ancestors=yes
+
+# Disable the forum (all the request on the forum are “incorect request”.
+#disable_forum=yes
+
+# Manitou is a wizard who can:
+# - delete any forum message
+# - edit any wizard’s notes
+# - see all connected wizards
+# - always see consanguinities
+# - stay wizard even when wizard_just_friend is set
+# - can apply a request "sleep=xx" to sleep xx seconds after a request
+#   (useful e.g. to have time to look at the memory used)
+#   His changes in database are not recorded in the history.
+#   The variable must contain the wizard’s user name:
+#manitou=
+
+# Wizards moderators file.
+# List of wizards moderating the database forum.
+# If empty or empty file, no moderation.
+# One wizard name by line.
+#moderator_file=
+
+# Forum supervisor. The forum is not moderated but controlled afterwards.
+# This supervisor is a wizard who can delete any forum message. He can
+# see the real wizards or friend user names (since they can be hidden in
+# the "ident" area) and the IP address the message comes from.
+#supervisor=
+
+# File recording a black list for the database forum.
+#forum_exclude_file=
+
+# Welcome logo. The designated file should be in bases/src/mybase/images
+# Called with <img src="%prefix;m=IM;v=welcome_logo"
+#                  style="welcome_logo_style">
+#welcome_logo=
+#welcome_logo_style=
+
+# css_prop
+# The file stylesheet.css must be in the directory "css".
+# Customize the default.css stylesheet or create your own one and
+# specify it to geneweb by adding this line in your gwf.
+# More about how to customize here :
+# https://geneweb.tuxfamily.org/wiki/CSS
+#css_prop=your/file.css
+
+# Highlight color
+# used to highlight only a few text strings
+# like the date strings in Anniversaries pages.
+# TODO: what are the other elements ?
+#highlight_color=#2f6400
+
+# Customized variables.
+#
+# You can define any variable here, starting with "var_".
+#
+# They will be replaced in the displayed "notes", "sources", "comments"
+# and in the database forum. If the variable name is "var_something",
+# it replaces all occurrences of "%vsomething;" in these texts.
+#
+# Example. if you define here:
+#   var_who=Bond, James Bond
+# and if the notes is "My name is %vwho;.", the displayed text in the notes
+# will be:
+#   My name is Bond, James Bond.
+
+# On Places/suname page do not display "Full display" list of places
+# ff more than short_place_threshold places.
+#short_place_threshold=500
 
 # Maximum number to see an identical ancestor in the surname list.
 #max_ancestor_implex=5
 
-# Use distant CDN (content delivery network) to load Bootstrap CSS/js files
-# and not the local GWD server.
-#use_cdn=yes
+# Display the date with the explicit day in parentheses.
+# Only works if the date is “exact” and *not* enter in “text mode”.
+#long_date=yes
+
+# Fast access to surnames and first names alphabetic order be fast
+# (interesting for very big databases). Drawback: the first page won’t
+# display the number of surnames or first names.
+#fast_alphabetic=yes
+
+# File for allowed titles/domains (empty => all allowed)
+#allowed_titles_file=
+
+# After above, file for denied titles/domains
+#denied_titles_file=
+
+# Print the title of individual in an advanced way. Default prints only
+# first_name and surname. In the advanced way, search for the title name,
+# estate ... and print something clever.
+#print_advanced_title=yes
+
+# Notify change program (e.g. shell script) to be executed for each
+# database change. First argument is the name of the base, then the
+# individual and finally the action performed.
+# If you want to test a specific change, such as delete an individual,
+# you should test the fourth argument as equal to dp (delete person).
+# You can check the list of possible modifications in the updhist.txt file
+# (see update_text).
+#notify_change=
+
+# In French, de Amélie should be written as d'Amélie
+# because the string Amélie begins by a vowel.
+# The test is performed on a unaccented and lowered copy of the string
+# The vowel parameter provides a list of characters considered as vowels
+# Fancy utf-8 characters such as æ and ø are taken into account
+# The default value is aeiouy
+#vowels=aeiouy
+
+# Hide qualifier and alias fields proposed by default in person update form
+#propose_qualifier=no
+#propose_alias=no
+
+# for modules/arbre_descendants.txt
+# define a character string to be used in place of missing portrait image.
+# Note that in many other files this is hardcoded to '?' or '&nbsp;'
+# There is no default here.
+#default_image_no=
+
+# for carrousel.txt use a reorg flag (not set by default)
+# to access a specific bases subdirectories organisation:
+# bases/<basename>.gwb/documents/portraits
+# bases/<basename>.gwb/documents/images
+# Warning: complete work never merged in geneweb/master branch,
+#          (TODO need a ref here) so flag not to be set.
+#reorg=on
+
+### templm specific parameters ######################################
+
+# for templm, identify css file to be used, either
+# css.css  display on grey background (default) or
+# css1.css display on black background if variable is set.
+# TODO also present in potentially obsolete file anctree_h7.txt
+#css=1
+
+# for templm, automatic completion in individual or family forms
+# for following fields: firstname, surname, occupation, place, source
+# each variable may take two values, (nothing done if not set)
+# 1: load all the list at ones
+# 2: load filtered list by three first characters
+#datalist_fn=2
+#datalist_sn=2
+#datalist_occu=2
+#datalist_place=2
+#datalist_src=2
+
+# for templm, above automatic completion lists are generated from cache,
+# or from associated base books if variable is set.
+#datalist_book=1
+
+# for templm, on individual page, display parents age at birthday,
+# and individual age for each event. (not the case by default)
+#event_age=yes
+
+# for templm, jquery functions:
+# TODO obsolete description versus current source code.
+# on individual page, display numbers of ascendants, descendants, implexes
+# on individual & family forms, search for places, sources, occupations
+#    and search for witnesses
+# if needed you may disable all of that by variable set to 'no'
+#jquery=no
+
+# for templm,
+# number of descendant generations in person page, only 1 by default
+# (provided value is limited to max_desc_level)
+#maxlev=1
+
+# for templm, for statistics (anclist.txt & deslist.txt)
+# deactivate the shortest path links if more than 200 dates (default value)
+#max_dates=200
+
+# for templm, on individual page, some pulldown menus on top of page
+# may be changed as static menus at page bottom if variable is set.
+#menu=1
+
+# for templm, on individual page, if variable is set then
+# list all identifications of this individual and related wiki text.
+# if not set here, user has a button to togle display.
+#misc=yes
+
+# for templm, In family form, if variable is set
+# if no mariage comment, then union comment is moved to mariage comment.
+#move_comment=yes
+
+# is used in etc/updfam.txt
+# TODO do not understand purpose
+#multi_parents=yes
+
+# for templm, In form pages,
+# if uppercase is set, then able to change the list of particles
+# that will not be converted to uppercase.
+# by default the list is hardcoded in two files
+# etc/templm/css.txt & etc/templm/js_upd.txt
+#particles=
+
+# for templm, on individual page, the gwsetup menu may be disabled
+#setup_link=no
+
+# for templm, default gwsetup server url http://127.0.0.1:2316/
+# may be changed here
+#setup_http=
+
+# for templm, if needed add country flags in list of languages to be selected.
+#show_flag=yes
+
+# for templm, on individual page, if variable is set
+# then add timeline as detailed in etc/templm/timeline.txt
+#timeline=yes
+
+# for templm, In form pages,
+# convert firstname lastname to firstname LASTNAME
+#uppercase=yes
+
+# for templm, display individual page on two columns by default
+# or to only one if variable is set
+# if not set, then togle checkbox accessible on individual page.
+#wide=on

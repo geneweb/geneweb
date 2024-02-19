@@ -128,13 +128,13 @@ let incorrect_request ?(comment = "") conf =
 let person_selected conf base p =
   match p_getenv conf.senv "em" with
     Some "R" -> relation_print conf base p
-  | Some _ -> incorrect_request conf
+  | Some _ -> incorrect_request conf ~comment:"error #9"
   | None -> record_visited conf (get_iper p); Perso.print conf base p
 
 let person_selected_with_redirect conf base p =
   match p_getenv conf.senv "em" with
   | Some "R" -> relation_print conf base p
-  | Some _ -> incorrect_request conf
+  | Some _ -> incorrect_request conf ~comment:"error #8"
   | None ->
     Wserver.http_redirect_temporarily
       (commd conf ^^^ Util.acces conf base p :> string)
@@ -176,7 +176,7 @@ let very_unknown conf _ =
       Hutil.rheader conf title;
       Hutil.print_link_to_welcome conf false;
       Hutil.trailer conf
-    | None -> incorrect_request conf
+    | None -> Hutil.incorrect_request conf ~comment:"error #1"
 
 (* Print Not found page *)
 let unknown conf n =
@@ -245,7 +245,7 @@ let make_henv conf base =
 let special_vars =
   [ "alwsurn"; "cgl"; "dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et";
     "iz"; "long"; "manitou"; "nz"; "ocz";
-    "p_mod"; "pure_xhtml"; "pz"; "size"; "spouse"; "templ"; "wide" ]
+    "p_mod"; "pure_xhtml"; "pz"; "size"; "templ"; "wide" ]
 
 let only_special_env env = List.for_all (fun (x, _) -> List.mem x special_vars) env
 
@@ -258,9 +258,7 @@ let make_senv conf base =
     in
     let conf =
       { conf with senv = ["em", vm; "ei", vi] }
-      |> aux "image" "off"
       |> aux "long" "on"
-      |> aux "spouse" "on"
     in
     let conf =
       match p_getenv conf.env "et" with
@@ -289,7 +287,7 @@ let make_senv conf base =
     let ip =
       match person_of_key base vp vn voc with
       | Some ip -> ip
-      | None -> incorrect_request conf; raise Exit
+      | None -> Hutil.incorrect_request conf ~comment:"error #2"; raise Exit
     in
     let vi = string_of_iper ip in
     set_senv conf (Mutil.encode vm) (Mutil.encode vi)
@@ -335,8 +333,10 @@ let w_base ~none fn conf (bfile : string option) =
         let conf = make_henv conf base in
         let conf = make_senv conf base in
         let conf = match Util.default_sosa_ref conf base with
-          | Some p -> { conf with default_sosa_ref = get_iper p, Some p }
-          | None -> conf
+          | Some p -> { conf with default_sosa_ref = get_iper p, Some p;
+              nb_of_persons = Gwdb.nb_of_persons base }
+          | None -> { conf with
+              nb_of_persons = Gwdb.nb_of_persons base }
         in
         fn conf base
 
@@ -402,7 +402,8 @@ let treat_request =
     let m = Option.value ~default:"" (p_getenv conf.env "m") in
     if not @@ try_plugin plugins conf bfile m
     then begin
-        if List.assoc_opt "counter" conf.base_env <> Some "no"
+        if List.assoc_opt "counter" conf.base_env <> Some "no" &&
+          m <> "IM" && m <> "IM_C" && m <> "SRC" && m <> "DOC"
         then begin
           match
             if only_special_env conf.env
@@ -428,7 +429,7 @@ let treat_request =
                   let f = Filename.chop_suffix f ".txt" in
                   SrcfileDisplay.print_source conf base f
                 else print conf f
-          | _ -> incorrect_request conf base
+          | _ -> incorrect_request conf ~comment:"error #3" base
         in
         match m with
         | "" ->
@@ -456,12 +457,6 @@ let treat_request =
                   Perso.interp_templ t conf base p
                 | _ -> person_selected conf base p
             end
-
-
-
-
-
-
 
         | "A" ->
           AscendDisplay.print |> w_person |> w_base
@@ -547,9 +542,10 @@ let treat_request =
         | "F" ->
           w_base @@ w_person @@ Perso.interp_templ "family"
         | "H" ->
-          w_base @@ fun conf base -> ( match p_getenv conf.env "v" with
+          w_wizard @@ w_base @@ fun conf base ->
+            ( match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print conf base f
-            | None -> incorrect_request conf base)
+            | None -> incorrect_request conf base ~comment:"error #4")
         | "HIST" ->
           w_base @@ History.print
         | "HIST_CLEAN" ->
@@ -683,7 +679,7 @@ let treat_request =
                     Some.search_first_name_print conf base fn
                   | None, Some sn ->
                     Some.search_surname_print conf base unknown sn
-                  | None, None -> incorrect_request conf base
+                  | None, None -> incorrect_request conf base ~comment:"error #5"
               end
             | Some i ->
               relation_print conf base
@@ -710,7 +706,7 @@ let treat_request =
         | "PS" ->
           w_base @@ PlaceDisplay.print_all_places_surnames
         | "PPS" ->
-          w_base @@ Place_v7.print_all_places_surnames
+          w_base @@ Place.print_all_places_surnames
         | "R" ->
           w_base @@ w_person @@ relation_print
         | "REFRESH" ->
@@ -745,7 +741,7 @@ let treat_request =
         | "SRC" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print_source conf base f
-            | _ -> incorrect_request conf base
+            | _ -> incorrect_request conf base ~comment:"error #6"
           end
         | "STAT" ->
           w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
@@ -760,7 +756,7 @@ let treat_request =
               | _ -> Perso.interp_templ ("tp0_" ^ f) conf base
                        (Gwdb.empty_person base Gwdb.dummy_iper)
               end
-            | None -> incorrect_request conf base
+            | None -> incorrect_request conf base ~comment:"error #7"
             end
         | "TT" ->
           w_base @@ TitleDisplay.print
@@ -774,32 +770,22 @@ let treat_request =
           w_base @@ WiznotesDisplay.print_search
         | _ ->
             w_base @@ fun conf base ->
-            let str =
-              (Printf.sprintf "failing plugin or unknown command m=%s" m)
-            in
-            incorrect_request ~comment:str conf base
+            incorrect_request conf base ~comment:"error #10"
       end conf bfile ;
   end else begin
     let title _ =
-      transl conf "error"
-      |> Utf8.capitalize_fst
+      Printf.sprintf "%s %s %s"
+      (transl conf "base" |> Utf8.capitalize_fst)
+      conf.bname
+      (transl conf "reserved to friends or wizards")
       |> Output.print_sstring conf
     in
     Hutil.rheader conf title ;
-    Output.print_sstring conf "<ul><li>" ;
-    transl conf "base" |> Utf8.capitalize_fst |> Output.print_sstring conf ;
-    Output.print_sstring conf {| "|} ;
-    Output.print_sstring conf conf.bname ;
-    Output.print_sstring conf {|" |} ;
-    transl conf "reserved to friends or wizards"
-    |> Utf8.capitalize_fst
-    |> Output.print_sstring conf ;
     let base_name =
       if conf.cgi then (Printf.sprintf "b=%s&" conf.bname) else ""
     in
     let user = transl_nth conf "user/password/cancel" 0 in
     let passwd = transl_nth conf "user/password/cancel" 1 in
-    Output.print_sstring conf ".</li></ul>" ;
     let body =
       if conf.cgi then
         Printf.sprintf {|
@@ -810,15 +796,17 @@ let treat_request =
             <label for="w" class="sr-only">%s:%s</label>
             <div class="input-group-append">
               <button type="submit" class="btn btn-primary">OK</button>
-            </div> |}
+            </div>|}
             (transl_nth conf "wizard/wizards/friend/friends/exterior" 2)
             (transl_nth conf "wizard/wizards/friend/friends/exterior" 0)
             passwd user passwd user passwd
       else
         Printf.sprintf {|
             <div>
-              %s%s <a href="%s?%sw=f"> %s</a><br>
-              %s%s <a href="%s?%sw=w"> %s</a>
+              <ul>
+              <li>%s%s <a href="%s?%sw=f"> %s</a></li>
+              <li>%s%s <a href="%s?%sw=w"> %s</a></li>
+              </ul>
             </div> |}
             (transl conf "access" |> Utf8.capitalize_fst) (transl conf ":")
             (conf.command :> string) base_name

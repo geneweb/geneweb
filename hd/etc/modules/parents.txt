@@ -18,7 +18,7 @@
   %if;(op_m=1 or op_m=3)
     %apply;short_display_person("father")%nn;
     %if;(op_m=3 and father.has_occupation), %father.occupation;%nl;%end;
-  %elseif(op_m=4)
+  %elseif;(op_m=4)
     %apply;long_display_person("father")%sp;
   %elseif;(op_m=5)
     %apply;display_horizontal("father")
@@ -48,7 +48,7 @@
     %end;
     %foreach;father.family;
       %if;(spouse.access=mother.access)
-        %if(are_divorced or are_separated)
+        %if;(are_divorced or are_separated)
           <br>
           <em style="font-size: 90%%">%nn;
             %if;are_divorced;[divorced]0%divorce_date;%end;
@@ -78,7 +78,7 @@
           %end;
         %elseif;(bvar.default_image="yes")
           <img class="small_image rounded align-self-center ml-2"
-            src="%image_prefix;/img_unknown_%if;(father.is_female)wo%elseif;(father.is_male)%else;u_%end;man.png" alt="[missing image]"
+            src="%images_prefix;img_unknown_%if;(father.is_female)wo%elseif;(father.is_male)%else;u_%end;man.png" alt="[missing image]"
             title="%if;(father.is_male)[father/mother]0%else;[father/mother]1%end;">
         %else;
           <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
@@ -113,7 +113,7 @@
           %end;
         %elseif;(bvar.default_image="yes")
           <img class="small_image rounded align-self-center ml-2" 
-            src="%image_prefix;/img_unknown_%if;(mother.is_female)wo%elseif;(mother.is_male)%else;u_%end;man.png" alt="[missing image]" 
+            src="%images_prefix;img_unknown_%if;(mother.is_female)wo%elseif;(mother.is_male)%else;u_%end;man.png" alt="[missing image]" 
             title="%if;(mother.is_male)[father/mother]0%else;[father/mother]1%end;">
         %else;
           <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
@@ -127,7 +127,7 @@
       <td>
         %foreach;father.family;
           %if;(spouse.access=mother.access)
-            %apply;long_married_f("father", "UPPER")
+            %apply;married_to("father", "UPPER")
             %if;are_divorced;<br>[divorced]0%divorce_date;%end;
             %if;are_separated;<br>[separated]0%end;
           %end;
@@ -160,7 +160,7 @@
           %end;
         %elseif;(bvar.default_image="yes")
           <img class="small_image rounded align-self-center ml-2"
-            src="%image_prefix;/img_unknown_%if;(parent.is_female)wo%elseif;(parent.is_male)%else;u_%end;man.png" alt="[missing image]"
+            src="%images_prefix;img_unknown_%if;(parent.is_female)wo%elseif;(parent.is_male)%else;u_%end;man.png" alt="[missing image]"
             title="%if;(parent.is_male)[father/mother]0%else;[father/mother]1%end;">
         %else;
           <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>

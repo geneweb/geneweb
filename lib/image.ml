@@ -1,7 +1,6 @@
 open Config
 open Gwdb
 
-let prefix conf = Util.escape_html conf.image_prefix
 let portrait_folder conf = Util.base_path [ "images" ] conf.bname
 
 let carrousel_folder conf =
@@ -276,20 +275,31 @@ let rename_portrait conf base p (nfn, nsn, noc) =
               "Error renaming portrait: old_path=%s new_path=%s : %s" old_f
               new_f e));
       let new_s_f =
-        String.concat Filename.dir_sep
-          [ portrait_folder conf; "old"; new_s ^ old_ext ]
+        String.concat Filename.dir_sep [ portrait_folder conf; "old"; new_s ]
       in
       let old_s_f =
-        String.concat Filename.dir_sep
-          [ portrait_folder conf; "old"; old_s ^ old_ext ]
+        String.concat Filename.dir_sep [ portrait_folder conf; "old"; old_s ]
+      in
+      (if Sys.file_exists (old_s_f ^ old_ext) then
+       try Sys.rename (old_s_f ^ old_ext) (new_s_f ^ old_ext)
+       with Sys_error e ->
+         !GWPARAM.syslog `LOG_ERR
+           (Format.sprintf
+              "Error renaming old portrait: old_path=%s new_path=%s : %s" old_f
+              new_f e));
+      let new_s_f =
+        String.concat Filename.dir_sep [ carrousel_folder conf; new_s ]
+      in
+      let old_s_f =
+        String.concat Filename.dir_sep [ carrousel_folder conf; old_s ]
       in
       if Sys.file_exists old_s_f then
         try Sys.rename old_s_f new_s_f
         with Sys_error e ->
           !GWPARAM.syslog `LOG_ERR
             (Format.sprintf
-               "Error renaming old portrait: old_path=%s new_path=%s : %s" old_f
-               new_f e))
+               "Error renaming carrousel store: old_path=%s new_path=%s : %s"
+               old_f new_f e))
   | Some (`Url _url) -> () (* old url still applies *)
   | None -> ()
 
@@ -318,7 +328,8 @@ let carrousel_file_path conf base p fname old =
     let dir = default_portrait_filename base p in
     if old then Filename.concat dir "old" else dir
   in
-  String.concat Filename.dir_sep [ carrousel_folder conf; dir; fname ]
+  String.concat Filename.dir_sep
+    ([ carrousel_folder conf; dir ] @ if fname = "" then [] else [ fname ])
 
 let get_carrousel_file_content conf base p fname kind old =
   let fname =

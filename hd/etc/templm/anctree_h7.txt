@@ -1,11 +1,11 @@
   <!-- $Id: templm/anctree_h7.txt v7.0 2016/05/02 23:28:26 $ -->
-  <link type="text/css" href="%static_path;/modules/arbre_h7%bvar.css;.css" media="all" rel="stylesheet" %/>
+  <link type="text/css" href="%etc_prefix;/modules/arbre_h7%bvar.css;.css" media="all" rel="stylesheet" %/>
 
   %let;l_fs;%if;(evar.fs != "")%evar.fs;%else;9%end;%in;
   %let;l_wi;%if;(evar.wi != "")%evar.wi;%else;980%end;%in;
   %let;l_he;%if;(evar.he != "")%evar.he;%else;600%end;%in;
   %let;l_sosa_ref;%if;(evar.sosa = "on" and browsing_with_sosa_ref and has_sosa)on%end;%in;
-  %let;l_prefix;%prefix;t=h7;image=%evar.image;;siblings=%evar.siblings;;sosa=%evar.sosa;;fs=%l_fs;;wi=%l_wi;;he=%l_he;;bp=%evar.bp;;%in;
+  %let;l_prefix;%prefix;t=h7&image=%evar.image;&siblings=%evar.siblings;&sosa=%evar.sosa;&fs=%l_fs;&wi=%l_wi;&he=%l_he;&bp=%evar.bp;&%in;
   <style id="s" type="text/css">
     #htree{font-size:%l_fs;px;width:%l_wi;px;height:%l_he;px}
   </style>

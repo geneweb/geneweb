@@ -2,15 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: templm/anclist.txt v7.0 2015/07/05 13:23:34 $ -->
-  %let;l_v0;%evar.v;%in;
-  %let;l_v;%if;(bvar.max_anc_level = "")%l_v0;%elseif;(bvar.max_anc_level > l_v0)%l_v0;%else;%bvar.max_anc_level;%end;%in;
   <title>%nn;
     %first_name; %surname;
     %if;(evar.t = "F" and evar.tf1 = "csv") - CSV -
     %elseif;(evar.t = "F" and evar.fam7 = "on") - 7 [*family/families]1 -
     %elseif;(evar.t = "F" and evar.tf1 = "sb") - [*surnames branch] -
-    %elseif;(evar.t = "F" and evar.tf1 = "surn") - [*list eclair]0 - [surname/surnames]1 / [places]
-    %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [places]
+    %elseif;(evar.t = "F" and evar.tf1 = "surn") - [*list eclair]0 - [surname/surnames]1 / [place/places]1
+    %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [place/places]1
     %elseif;(evar.t = "F" and evar.tf1 = "aad") - [*age at death] ([M/F]0, [M/F]1)
     %elseif;(evar.t = "F" and evar.tf1 = "afm") - [*age] ([father/mother]0, [father/mother]1)
     %else; - [*ancestor/ancestors]1 -
@@ -20,7 +18,7 @@
   <meta name="format-detection" content="telephone=no"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
   %include;css
   <script type="text/javascript">
     <!--
@@ -31,18 +29,19 @@
 %(<!-- Begin define --> %)
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
+%let;l_v;%apply;min%with;%b.max_anc_level;%and;%static_max_anc_level;%and;%if;(e.v!="")%e.v;%else;3%end;%end;%in;
 %let;l_max_dates;%if;(bvar.max_dates != "")%bvar.max_dates;%else;200%end;%in;
-%define;tothegen(xx)
-  [*to the %s generation:::xx]%nn;
+%define;tothegen(xxx)
+  [*to the %s generation:::xxx]%nn;
 %end;
-%define;togen1(xx)
-  %if;(xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[*to the parents]%nn;
-  %elseif;(xx = 3)[*to the grandparents]%nn;
-  %elseif;(xx = 4)[*to the great-grandparents]%nn;
+%define;togen1(xxx)
+  %if;(xxx = 0)[*specify::generation/generations]0%nn;
+  %elseif;(xxx = 1)[*to the parents]%nn;
+  %elseif;(xxx = 2)[*to the grandparents]%nn;
+  %elseif;(xxx = 3)[*to the great-grandparents]%nn;
   %else;
     %apply;tothegen%with;
-      %apply;nth([nth (generation)], xx)
+      %apply;nth([nth (generation)], xxx)
     %end;
   %end;
 %end;
@@ -87,8 +86,8 @@
       %sp;%dates;<br>
   %end;
   %if;(evar.t = "F" and evar.tf1 = "csv")
-    %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [places]
-    %elseif;(evar.t = "F" and evar.tf1 = "surn") - [*list eclair]0 - [surname/surnames]1 / [places]
+    %elseif;(evar.t = "F" and evar.tf1 = "place") - [*list eclair]0 - [place/places]1
+    %elseif;(evar.t = "F" and evar.tf1 = "surn") - [*list eclair]0 - [surname/surnames]1 / [place/places]1
     %elseif;(evar.t = "F" and evar.tf1 = "sb") - [*surnames branch] -
     %else;
   %end;
@@ -124,25 +123,26 @@
 %elseif;(evar.t ="F" and evar.tf1 = "ars")
   %include;ancdes_ars
 %elseif;(evar.t = "F" and evar.tf1 = "sb")
+
   %include;anclist_sb
 %elseif;(evar.t = "F")
   %( list tf1 = ? %)
-  %let;l_url;%prefix;m=A;t=F;i=%index;;v=%l_v;;only=%evar.only;;maxv=%evar.maxv;%in;
+  %let;l_url;%prefix;m=A&t=F&i=%index;&v=%l_v;&only=%evar.only;&maxv=%evar.maxv;%in;
   <ul>
     %if;(wizard)
-      <li><a href="%l_url;;tf1=csv;;cousins=%evar.cousins;"
+      <li><a href="%l_url;&tf1=csv;&cousins=%evar.cousins;"
           >CSV</a></li>
     %end;
-    <li><a href="%l_url;;fam7=on;tf1=fam70;cousins=%evar.cousins;">7 [family/families]1</a></li>
-    <li><a href="%l_url;;tf1=sb;">[*surnames branch]</a></li>
-    <li><a href="%l_url;;tf1=surn;">[*list eclair]0 - [surname/surnames]1 / [places]</a></li>
-    <li><a href="%l_url;;tf1=place;">[*list eclair]0 - [places]</a></li>
-    <li><a href="%l_url;;tf1=tag;">tag</a></li>
-    <li><a href="%l_url;;tf1=cal;">[*calendar/calendars]0</a></li>
-    <li><a href="%l_url;;tf1=bmdm;">[*year/month/day]1</a></li>
-    <li><a href="%l_url;;tf1=afm;">[*age] ([father/mother]0, [father/mother]1)</a></li>
-    <li><a href="%l_url;;tf1=aad;">[*age at death] ([M/F]0, [M/F]1)</a></li>
-    <li><a href="%l_url;;tf1=mm;">[*year/month/day]1 [birth] = [year/month/day]1 [death] ?</a></li>
+    <li><a href="%l_url;&fam7=on&tf1=fam70&cousins=%evar.cousins;">7 [family/families]1</a></li>
+    <li><a href="%l_url;&tf1=sb">[*surnames branch]</a></li>
+    <li><a href="%l_url;&tf1=surn">[*list eclair]0 - [surname/surnames]1 / [place/places]1</a></li>
+    <li><a href="%l_url;&tf1=place">[*list eclair]0 - [place/places]1</a></li>
+    <li><a href="%l_url;&tf1=tag">tag</a></li>
+    <li><a href="%l_url;&tf1=cal">[*calendar/calendars]0</a></li>
+    <li><a href="%l_url;&tf1=bmdm">[*year/month/day]1</a></li>
+    <li><a href="%l_url;&tf1=afm">[*age] ([father/mother]0, [father/mother]1)</a></li>
+    <li><a href="%l_url;&tf1=aad">[*age at death] ([M/F]0, [M/F]1)</a></li>
+    <li><a href="%l_url;&tf1=mm">[*year/month/day]1 [birth] = [year/month/day]1 [death] ?</a></li>
   </ul>
 %elseif;(evar.t = "L")
   %( by list %)

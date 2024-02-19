@@ -1,34 +1,51 @@
-<!-- $Id: js.txt v7.1 22/12/2022 07:15:46 $ -->
+<!-- $Id: js.txt v7.1 02/12/2023 12:35:50 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
-      integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.bundle.min.js" 
-      integrity="sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=
+                       sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs
+                       sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha256-GRJrh0oydT1CwS36bBeJK/2TggpaUQC6GzTaTQdZm0k=
+                       sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct
+                       sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %if;(e.m="A" and e.t="")
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"
-      integrity="sha512-4MvcHwcbqXKUHB6Lx3Zb5CEAVoE9u84qN+ZSMM6s7z8IeJriExrV3ND5zRze9mxNlABJ6k864P/Vl8m0Sd3DtQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"
+              integrity="sha256-9yRP/2EFlblE92vzCA10469Ctd0jT48HnmmMw5rJZrA=
+                         sha384-d3UHjPdzJkZuk5H3qKYMLRyWLAQBJbby2yr2Q58hXXtAGF8RSNO9jpLDlKKPv5v3
+                         sha512-4MvcHwcbqXKUHB6Lx3Zb5CEAVoE9u84qN+ZSMM6s7z8IeJriExrV3ND5zRze9mxNlABJ6k864P/Vl8m0Sd3DtQ=="
+              crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <script src="https://cdn.jsdelivr.net/npm/maximize-select2-height@1.0/maximize-select2-height.min.js"
+              integrity="sha256-rOpd4voNU/iOOklhdb2rhwe4OaXfo7vIO3f7Tc8xe0o=
+                         sha384-/Pca3vtmH/c7JiUJVMPvoo2SCkKgnjpJyBqTvCPmkDGYhFzSeIBZp/UJ7PZY7/+G
+                         sha512-NHHjSaRwEJ7OOPdQlvxa0gYbL9Np67IYbl+yJ3jDCTUxCCGKhCNlX77eacvuKmf4RszZBA8Elh71V26SKmElWA=="
+              crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     %end;
   %else;
-    <script src="%static_path;js/jquery.min.js?version=3.6.0"></script>
-    <script src="%static_path;js/bootstrap.bundle.min.js?version=4.6.1"></script>
+    <script src="%etc_prefix;js/jquery.min.js?version=3.7.1"></script>
+    <script src="%etc_prefix;js/bootstrap.bundle.min.js?version=4.6.1"></script>
     %if;(e.m="A" and e.t="")
-      <script src="%static_path;js/select2.min.js?version=4.1.0rc"></script>
-      <script src="%static_path;js/select2-maximize-height.min.js"></script>
+      <script src="%etc_prefix;js/select2.min.js?version=4.1.0rc"></script>
+      <script src="%etc_prefix;js/select2-maximize-height.min.js?version=1.0.4"></script>
     %end;
   %end;
-  %if;(evar.m!="MOD_DATA")
+  %if;(e.m="A" and e.t="T" and e.t1="CT")
+    <script src="%etc_prefix;js/jquery.line.js"></script>
+  %end;
+  %if;(e.m!="MOD_DATA")
   <script>
     $('#load_once_p_mod').one('click', function() {
-      $.getScript('%static_path;js/p_mod.js');
+      $.getScript('%etc_prefix;js/p_mod.min.js');
     });
     $('#load_once_copylink').one('click', function() {
-      $.getScript('%static_path;js/copylink.js');
+      $.getScript('%etc_prefix;js/copylink.js');
     });
   </script>
   %end;
   %if;wizard;
-    %if;(evar.m="MOD_DATA_OK" and evar.data!="")
+    %if;(e.m="MOD_DATA_OK" and e.data!="")
       <script>
         var htmlTitle = document.title;
         if (htmlTitle == "[*modification successful]" ||
@@ -37,12 +54,12 @@
         }
       </script>
     %end;
-    %if;(evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"
-       or evar.m="ADD_FAM_OK" or evar.m="DEL_FAM_OK"
-       or evar.m="SND_IMAGE_OK" or evar.m="DEL_IMAGE_OK"
-       or evar.m="CHG_EVT_IND_ORD_OK" or evar.m="CHG_EVT_FAM_ORD_OK"
-       or evar.m="CHG_CHN_OK"
-       or (evar.m="MOD_DATA_OK" and evar.data=""))
+    %if;(e.m="MOD_IND_OK" or e.m="MOD_FAM_OK"
+       or e.m="ADD_FAM_OK" or e.m="DEL_FAM_OK"
+       or e.m="SND_IMAGE_OK" or e.m="DEL_IMAGE_OK"
+       or e.m="CHG_EVT_IND_ORD_OK" or e.m="CHG_EVT_FAM_ORD_OK"
+       or e.m="CHG_CHN_OK"
+       or (e.m="MOD_DATA_OK" and e.data=""))
       <script>
         var htmlTitle = document.title;
         if (htmlTitle == "[*person modified]" ||
@@ -50,43 +67,43 @@
             htmlTitle == "[*image received]"  ||
             htmlTitle == "[*image deleted]"   ||
             htmlTitle == "[*modification successful]") {
-            document.getElementById("i%evar.i;").focus();
+            document.getElementById("i%e.i;").focus();
         }
         else if (htmlTitle == "[*family modified]" ||
                  htmlTitle == "[*family added]"    ||
                  htmlTitle == "[*family deleted]"  ||
                  htmlTitle == "[*children's names changed]") {
-            document.getElementById("i%evar.ip;").focus();
+            document.getElementById("i%e.ip;").focus();
         }
       </script>
     %end;
-    %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"
-    or evar.m="MOD_FAM" or evar.m="MOD_FAM_OK"
-    or evar.m="ADD_FAM" or evar.m="ADD_PAR" or evar.m="ADD_FAM_OK")
+    %if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
+    or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
+    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK")
       <script>$('body').scrollspy({ target: '#banner' })</script>
     %end;
   %end;
 %end;
-%if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"
-    or evar.m="MOD_FAM" or evar.m="MOD_FAM_OK"
-    or evar.m="ADD_FAM" or evar.m="ADD_PAR" or evar.m="ADD_FAM_OK" or evar.m="MOD_NOTES" or (evar.m="MOD_DATA" and evar.data="source"))
-  %if;(bvar.use_cdn="yes")
+%if;(e.m="MOD_IND" or e.m="MOD_IND_OK"
+    or e.m="MOD_FAM" or e.m="MOD_FAM_OK"
+    or e.m="ADD_FAM" or e.m="ADD_PAR" or e.m="ADD_FAM_OK" or e.m="MOD_NOTES" or (e.m="MOD_DATA" and e.data="src"))
+  %if;(b.use_cdn="yes")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js" 
       integrity="sha384-gqYjRLBp7SeF6PCEz2XeqqNyvtxuzI3DuEepcrNHbrO+KG3woVNa/ISn/i8gGtW8" crossorigin="anonymous"></script>
   %else;
-     <script src="%static_path;js/autosize.min.js?version=4.0.2"></script>
+     <script src="%etc_prefix;js/autosize.min.js?version=4.0.2"></script>
    %end;
   <script>autosize(document.querySelectorAll('textarea'));</script>
 %end;
-%if;(evar.templ="")
+%if;(e.templ="")
 <script><!-- focus on found autofocus input in opening BS modal -->
   $('.modal').on('shown.bs.modal', function() {
   $(this).find('[autofocus]').focus();
 });
 </script>
 %end;
-%if;((evar.m="A" and evar.t="H") or (evar.m="D" and evar.t="D"))
-<script%if;(evar.templ!="") type="text/javascript"%end;>
+%if;((e.m="A" and e.t="H") or (e.m="D" and e.t="D"))
+<script%if;(e.templ!="") type="text/javascript"%end;>
  <!--
    $("#btnshowfilter").on("click", function() {
     var nbinput = $('input.filter:text:disabled').length;
@@ -134,5 +151,29 @@
     $('a[data-index="' + xx + '"]').css("background-color","#CCFFFF");
   }
   -->
+</script>
+%end;
+%( Functions for toolbar.txt %)
+%if;("ADD" in e.m or "MOD" in e.m)
+<script>
+  // Attach a click event listener to each anchor element within the character's list container
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('.ch a').forEach(function (element) {
+      element.addEventListener('click', function (event) {
+        event.preventDefault();
+        var textarea = document.querySelector('.insert-character-target');
+        insertCharacter(textarea, this.innerText);
+      });
+    });
+  });
+  // Function to insert a character at the current cursor position in a textarea
+  function insertCharacter(t, v) {
+    var startPos = t.selectionStart;
+    var endPos = t.selectionEnd;
+    t.value = t.value.substring(0, startPos) + v + t.value.substring(endPos, t.value.length);
+    t.selectionStart = startPos + v.length;
+    t.selectionEnd = t.selectionStart;
+    t.focus();
+  }
 </script>
 %end;

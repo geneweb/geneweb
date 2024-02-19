@@ -1,0 +1,41 @@
+(* Copyright (c) 1998-2007 INRIA *)
+
+let ver = "7.1b exp"
+
+let available_languages =
+  [
+    "af";
+    "ar";
+    "bg";
+    "br";
+    "ca";
+    "co";
+    "cs";
+    "da";
+    "de";
+    "en";
+    "eo";
+    "es";
+    "et";
+    "fi";
+    "fr";
+    "he";
+    "is";
+    "it";
+    "lt";
+    "lv";
+    "nl";
+    "no";
+    "oc";
+    "pl";
+    "pt";
+    "pt-br";
+    "ro";
+    "ru";
+    "sk";
+    "sl";
+    "sv";
+    "tr";
+    "zh";
+  ]
+

@@ -23,7 +23,7 @@ jobs:
              opam exec -- ocaml ./configure.ml
              opam exec -- make doc
       - name: deploy
-        uses: JamesIves/github-pages-deploy-action@v4.2.3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: _build/default/_doc/_html # The folder the action should deploy.

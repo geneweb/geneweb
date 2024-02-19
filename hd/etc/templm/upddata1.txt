@@ -8,7 +8,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png"%/>
   %include;css
   <script type="text/javascript">
   <!--
@@ -76,7 +76,7 @@
   <p>[*select a letter] :</p>
   <p>
     %foreach;initial;
-      <a href="%prefix;m=MOD_DATA;data=%evar.data;;s=%encode.ini;">%html_encode.ini;</a>
+      <a href="%prefix;m=MOD_DATA&data=%evar.data;&s=%encode.ini;">%html_encode.ini;</a>
     %end;
   </p>
 %end;

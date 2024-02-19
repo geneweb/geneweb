@@ -137,7 +137,8 @@ let print_differences conf base branches p1 p2 =
   in
   let place_field trans name get =
     string_field
-      (transl conf trans ^<^ Adef.safe " / " ^>^ transl conf "place")
+      (transl conf trans ^<^ Adef.safe " / "
+      ^>^ transl_nth conf "place/places" 0)
       name
       (fun p -> get p |> sou base |> safe_html)
   in
@@ -247,7 +248,6 @@ let error_loop conf base p =
     transl conf "error" |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.rheader conf title;
-  Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<strong>";
   Output.print_string conf (p_first_name base p |> escape_html);
   if get_occ p <> 0 then (
@@ -338,7 +338,6 @@ let print_merged conf base wl p =
     Output.print_sstring conf (Utf8.capitalize_fst (transl conf "merge done"))
   in
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<ul><li>";
   Output.print_string conf (referenced_person_text conf base p);
   Output.print_sstring conf "</li></ul>";

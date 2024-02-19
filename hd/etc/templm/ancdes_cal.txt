@@ -21,7 +21,7 @@
             %apply;add_in_sorted_list(mm_dd,ancestor.birth_date.month,ancestor.birth_date.day,ancestor.index,birth_symbol)
           %end;
           %if;(ancestor.death_date.day != "")
-            %incr_count
+            %incr_count;
             %let;mm_dd;%expr(ancestor.death_date.month+100)_%expr(ancestor.death_date.day+100)%in;
             %apply;add_in_sorted_list(mm_dd,ancestor.death_date.month,ancestor.death_date.day,ancestor.index,death_symbol)
           %end;
@@ -38,7 +38,7 @@
     %apply;add_in_sorted_list(mm_dd,birth_date.month,birth_date.day,index,birth_symbol)
   %end;
   %if;(death_date.day != "")
-    %incr_count
+    %incr_count;
     %let;mm_dd;%expr(death_date.month+100)_%expr(death_date.day+100)%in;
     %apply;add_in_sorted_list(mm_dd,death_date.month,death_date.day,index,death_symbol)
   %end;
@@ -71,18 +71,18 @@
     %foreach;sorted_list_item;
       %if;(prev_item.1 != item.1)
         %reset_count;%incr_count;
-        <a href="%prefix;spouse=on;m=RLM;i%count;=%item.4;;t%count;=%item.5;;%nn;
+        <a href="%prefix;spouse=on&m=RLM&i%count;=%item.4;&t%count;=%item.5;&%nn;
       %end;
       %if;(prev_item.1 = item.1)
         %incr_count;
-        i%count;=%item.4;;t%count;=%item.5;;%nn;
+        i%count;=%item.4;&t%count;=%item.5;&%nn;
       %end;
       %if;(next_item.1 != item.1)
         %let;top;%expr(item.2 * 30 - 30)%in;
         %let;left;%expr(item.3 * 28 - 28)%in;
         %let;colhex;%apply;color(count)%in;
         %incr_count;
-        i%count;=%index;;t%count;=%item.3; %apply;nth([(month)],item.2-1);%nn;
+        i%count;=%index;&t%count;=%item.3; %apply;nth([(month)],item.2-1);%nn;
         " style="border:solid 1px #%colhex;; color:#%colhex;; top:%top;px; left:%left;px;">%expr(count - 1)</a>
       %end;
     %end;
