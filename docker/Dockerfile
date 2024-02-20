@@ -63,5 +63,6 @@ COPY geneweb-launch.sh bin/geneweb-launch.sh
 
 EXPOSE 2316-2317
 VOLUME [ "/usr/local/share/geneweb/share/data", "/usr/local/share/geneweb/etc" ]
+ENV GENEWEB_DATA_PATH=/usr/local/share/geneweb/share/data
 
 CMD [ "bin/geneweb-launch.sh" ]
