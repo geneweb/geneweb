@@ -69,6 +69,44 @@ module Default = struct
                   | Some fn -> output_file conf fn
                   | None -> Output.print_sstring conf "")))
 
+  let is_contemporary' conf base private_years p =
+    let death = Gwdb.get_death p in
+    if death = NotDead then
+      private_years >= 0
+    else
+      let check_date d none =
+        match d with
+        | None -> none ()
+        | Some d ->
+            let a = Date.time_elapsed d conf.Config.today in
+            if a.Date.year > private_years then false
+            else if a.year < private_years then true
+            else a.month = 0 && a.day = 0
+      in
+      check_date (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) @@ fun () ->
+      check_date (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt) @@ fun () ->
+      check_date (Gwdb.get_death p |> Date.dmy_of_death) @@ fun () ->
+      let is_contemporary_marriage ifam =
+        let marr_date_opt =
+          Date.cdate_to_dmy_opt (Gwdb.get_marriage (Gwdb.foi base ifam))
+        in
+        check_date marr_date_opt (fun _ -> false)
+      in
+      let has_contemporary_marriage p =
+        let families = Gwdb.get_family p in
+        Array.exists is_contemporary_marriage families
+      in
+      (Gwdb.get_access p = Def.Private || not conf.public_if_no_date)
+      || has_contemporary_marriage p
+
+
+  let is_contemporary conf base p =
+    let private_years = if conf.Config.private_years < 1 then
+        conf.default_contemporary_private_years
+      else conf.private_years
+    in
+    is_contemporary' conf base private_years p
+  
   (** Calcul les droits de visualisation d'une personne en
       fonction de son age.
       Renvoie (dans l'ordre des tests) :
@@ -92,34 +130,7 @@ module Default = struct
     || conf.public_if_titles
        && Gwdb.get_access p = IfTitles
        && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
-    ||
-    let death = Gwdb.get_death p in
-    if death = NotDead then conf.private_years < 1
-    else
-      let check_date d none =
-        match d with
-        | None -> none ()
-        | Some d ->
-            let a = Date.time_elapsed d conf.today in
-            if a.Date.year > conf.Config.private_years then true
-            else if a.year < conf.private_years then false
-            else a.month > 0 || a.day > 0
-      in
-      check_date (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) @@ fun () ->
-      check_date (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt) @@ fun () ->
-      check_date (Gwdb.get_death p |> Date.dmy_of_death) @@ fun () ->
-      (Gwdb.get_access p <> Def.Private && conf.public_if_no_date)
-      ||
-      let families = Gwdb.get_family p in
-      let len = Array.length families in
-      let rec loop i =
-        i < len
-        && check_date
-             (Array.get families i |> Gwdb.foi base |> Gwdb.get_marriage
-            |> Date.cdate_to_dmy_opt)
-             (fun () -> loop (i + 1))
-      in
-      loop 0
+    || not (is_contemporary' conf base conf.Config.private_years p)
 
   let syslog (level : syslog_level) msg =
     let tm = Unix.(time () |> localtime) in
@@ -159,6 +170,7 @@ let init = ref Default.init
 let base_path = ref Default.base_path
 let bpath = ref Default.bpath
 let output_error = ref Default.output_error
+let is_contemporary = ref Default.is_contemporary
 let p_auth = ref Default.p_auth
 let syslog = ref Default.syslog
 

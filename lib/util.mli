@@ -90,6 +90,7 @@ val strictly_after_private_years : config -> Date.dmy -> bool
 val authorized_age : config -> base -> person -> bool
 (** Alias to !GWPARAM.p_auth *)
 
+(* TODO see if it can be removed from mli; it is used in geneanet's geneweb-plugin-api *)
 val is_old_person : config -> (iper, iper, istr) gen_person -> bool
 val start_with_vowel : string -> bool
 
@@ -121,8 +122,8 @@ val is_restricted : config -> base -> iper -> bool
 (** Tells if person is restrited to acccess. If mode `use_restrict` is
     disabled returns always [false]. *)
 
-val is_hidden : person -> bool
-(** Tells if person is hiden (if his surname is empty) *)
+val is_empty_person : person -> bool
+(** Tells if person is an empty person (a placeholder: his surname is empty) *)
 
 val pget_opt : config -> base -> iper -> person option
 (** Returns person option with giving id from the base.
@@ -601,5 +602,9 @@ val designation : base -> person -> Adef.escaped_string
 (** [designation base p] is [Gutil.designation base p |> escape_html] *)
 
 val has_children : base -> person -> bool
+
+val is_fully_visible_to_visitors : config -> base -> Gwdb.person -> bool
+(** [is_fully_visible_to_visitors conf base p] is true iff [p] is fully visible for a visitor *)
+
 val is_public : config -> base -> Gwdb.person -> bool
 val list_cmp : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool

@@ -65,8 +65,22 @@ let escape_attribute =
           Bytes.unsafe_set buf ibuf c;
           loop (istr + 1) (ibuf + 1))
 
+(* aswer the question "should we show p's names and other private stuffs?";
+   takes into account if you are a wizard or not *)
+(* TODO ??
+   - change conf.hide_names to not take in account wizard|friend;
+   - take into account wizard|friend in this function
+   - and authorized_age
+   - rename to is_hidden
+   ??
+*)
+(* it is always combined with a p_auth or authorized_age
+   TODO : diff between p_auth and authorized_age *)
+(* TODO why not conf.hide_names && not Util.is_public *)
+(* bug: is_hide_names if true if person is Private but with age > private_year *)
 let is_hide_names conf p =
-  if conf.hide_names || get_access p = Private then true else false
+  (conf.hide_private_names && not (conf.wizard || conf.friend))
+  || get_access p = Private
 
 let cnt_dir = ref Filename.current_dir_name
 
@@ -539,8 +553,11 @@ let nobtit conf base p =
 let strictly_after_private_years conf a =
   if a.Date.year > conf.private_years then true
   else if a.year < conf.private_years then false
-  else a.month > 0 || a.day > 0
+  else
+    (* TODO why true if a.year = conf.private_years and unknown day or month? *)
+    a.month > 0 || a.day > 0
 
+(* TODO why do we have both is_old_person and p_auth *)
 let is_old_person conf p =
   match
     ( Date.cdate_to_dmy_opt p.birth,
@@ -559,6 +576,8 @@ let is_old_person conf p =
       let a = Date.time_elapsed d conf.today in
       strictly_after_private_years conf a
   | None, None, DontKnowIfDead, None ->
+      (* TODO is_old_person is supposed to check if p is older than conf.private_years;
+         do not check access here *)
       p.access <> Private && conf.public_if_no_date
   | _ -> false
 
@@ -583,12 +602,20 @@ let string_gen_person base p = Futil.map_person_ps (fun p -> p) (sou base) p
 let string_gen_family base fam =
   Futil.map_family_ps (fun p -> p) (fun f -> f) (sou base) fam
 
-let is_hidden p = is_empty_string (get_surname p)
+(* TODO
+   should it be is_empty_name instead? (deleted person have surname and first_name = "?")
+   I don't think it is possible to have surname = empty_string *)
+let is_empty_person p = is_empty_string (get_surname p)
 
 let is_empty_name p =
   Gwdb.is_quest_string (Gwdb.get_surname p)
   && Gwdb.is_quest_string (Gwdb.get_first_name p)
 
+let is_fully_visible_to_visitors conf base p =
+  let conf = { conf with wizard = false; friend = false } in
+  authorized_age conf base p
+
+(* TODO should probably not exists *)
 let is_public conf base p =
   get_access p = Public
   || conf.public_if_titles
@@ -615,7 +642,7 @@ let is_public conf base p =
     [Rem] : Exporté en clair hors de ce module.                           *)
 let accessible_by_key conf base p fn sn =
   conf.access_by_key
-  && (not (fn = "?" || sn = "?"))
+  && (not ((* should it be is_empty_person here? *) fn = "?" || sn = "?"))
   && ((not (is_hide_names conf p))
      || is_public conf base p || conf.friend || conf.wizard)
 
@@ -675,7 +702,7 @@ let x_x_txt = Adef.safe "x x"
 let gen_person_text ?(escape = true) ?(html = true) ?(sn = true) ?(chk = true)
     ?(p_first_name = p_first_name) ?(p_surname = p_surname) conf base p =
   let esc = if escape then esc else Adef.safe in
-  if is_hidden p then restricted_txt
+  if is_empty_person p then restricted_txt
   else if chk && is_hide_names conf p && not (authorized_age conf base p) then
     x_x_txt
   else
@@ -796,7 +823,7 @@ let wprint_geneweb_link conf href s =
 
 let reference_flags with_id conf base p (s : Adef.safe_string) =
   let iper = get_iper p in
-  if is_hidden p then s
+  if is_empty_person p then s
   else
     "<a href=\""
     ^<^ (commd conf ^^^ acces conf base p :> Adef.safe_string)
@@ -826,7 +853,7 @@ let reference_noid = reference_flags false
                  contenant la boucle, soit vers le menu de mise à jour.
     [Rem] : Exporté en clair hors de ce module.                              *)
 let update_family_loop conf base p s =
-  if is_hidden p then s
+  if is_empty_person p then s
   else
     let iper = get_iper p in
     let list = get_family p in
@@ -1781,7 +1808,7 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
       let i = Gwdb.iper_of_string i in
       if Gwdb.iper_exists base i then
         let p = pget conf base i in
-        if is_hidden p then None else Some p
+        if is_empty_person p then None else Some p
       else None
   | _ -> (
       match (p_getenv conf.env env_p, p_getenv conf.env env_n) with
@@ -1790,7 +1817,7 @@ let find_person_in_env_aux conf base env_i env_p env_n env_occ =
           match person_of_key base p n occ with
           | Some ip ->
               let p = pget conf base ip in
-              if is_hidden p then None
+              if is_empty_person p then None
               else if (not (is_hide_names conf p)) || authorized_age conf base p
               then Some p
               else None
@@ -1821,7 +1848,7 @@ let default_sosa_ref conf base =
         match Gutil.person_ht_find_all base n with
         | [ ip ] ->
             let p = pget conf base ip in
-            if is_hidden p then None else Some p
+            if is_empty_person p then None else Some p
         | _ -> None)
   | None -> None
 
@@ -1979,12 +2006,12 @@ let rchild_type_text conf t sex =
   in
   Adef.safe @@ transl_nth conf s (index_of_sex sex)
 
-exception Ok
-
 let has_nephews_or_nieces conf base p =
+  let exception Ok in
   try
     let a = p in
     match get_parents a with
+    | None -> false
     | Some ifam ->
         let fam = foi base ifam in
         Array.iter
@@ -1998,7 +2025,6 @@ let has_nephews_or_nieces conf base p =
                 (get_family (pget conf base ip)))
           (get_children fam);
         false
-    | _ -> false
   with Ok -> true
 
 let h s = Digest.to_hex (Digest.string s)

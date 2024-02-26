@@ -860,11 +860,11 @@ let build_surnames_list conf base v p =
             && not (eq_istr surn (get_surname moth))
           then add_surname sosa p surn dp;
           let sosa = Sosa.twice sosa in
-          (if not (is_hidden fath) then
+          (if not (is_empty_person fath) then
            let dp1 = merge_date_place conf base surn dp fath in
            loop (lev + 1) sosa fath (get_surname fath) dp1);
           let sosa = Sosa.inc sosa 1 in
-          if not (is_hidden moth) then
+          if not (is_empty_person moth) then
             let dp2 = merge_date_place conf base surn dp moth in
             loop (lev + 1) sosa moth (get_surname moth) dp2
       | None -> add_surname sosa p surn dp)
@@ -982,8 +982,10 @@ let build_list_eclair conf base v p =
           let cpl = foi base ifam in
           let fath = pget conf base (get_father cpl) in
           let moth = pget conf base (get_mother cpl) in
-          if not (is_hidden fath) then loop (lev + 1) fath (get_surname fath);
-          if not (is_hidden moth) then loop (lev + 1) moth (get_surname moth)
+          if not (is_empty_person fath) then
+            loop (lev + 1) fath (get_surname fath);
+          if not (is_empty_person moth) then
+            loop (lev + 1) moth (get_surname moth)
       | None -> ())
   in
   (* Construction de la Hashtbl. *)
@@ -1169,6 +1171,9 @@ type 'a env =
   | Vslist of SortedList.t ref
   | Vslistlm of string list list
   | Vind of person
+  (* TODO Vfam should not have m_auth (last bool parameter)
+     we should only have a Vfam if m_auth is true;
+     this would remove many test and be safer *)
   | Vfam of ifam * family * (iper * iper * iper) * bool
   | Vrel of relation * person option
   | Vbool of bool
@@ -1278,6 +1283,7 @@ let make_ep conf base ip =
   let p_auth = authorized_age conf base p in
   (p, p_auth)
 
+(* TODO this should be a (fam * cpl) option; None if m_auth is false *)
 let make_efam conf base ip ifam =
   let fam = foi base ifam in
   let ifath = get_father fam in
@@ -1910,7 +1916,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       let v0 = iper_of_string v in
       (* if v0 >= 0 && v0 < nb_of_persons base then *)
       let ep = make_ep conf base v0 in
-      if is_hidden (fst ep) then raise Not_found
+      if is_empty_person (fst ep) then raise Not_found
       else eval_person_field_var conf base env ep loc sl
   (* else raise Not_found *)
   | "svar" :: i :: sl -> (
@@ -2949,13 +2955,17 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | Vdmark r -> Gwdb.Marker.get !r (get_iper p)
       | _ -> raise Not_found)
   | "is_female" -> get_sex p = Female
-  | "is_invisible" ->
-      let conf = { conf with wizard = false; friend = false } in
-      not (authorized_age conf base p)
   | "is_male" -> get_sex p = Male
+  | "is_invisible" ->
+      not (is_fully_visible_to_visitors conf base p)
+      (* TODO remove is_private/public ? *)
   | "is_private" -> get_access p = Private
   | "is_public" -> get_access p = Public
-  | "is_restricted" -> is_hidden p
+  | "hide_private_names" -> conf.hide_private_names
+  | "is_restricted" ->
+      (* TODO why is it not Util.is_restricted *)
+      is_empty_person p
+  | "is_contemporary" -> !GWPARAM.is_contemporary conf base p
   | _ -> raise Not_found
 
 and eval_str_person_field conf base env ((p, p_auth) as ep) = function
@@ -3724,10 +3734,10 @@ let print_foreach conf base print_ast eval_expr =
                 let env = ("child", Vind p) :: env in
                 let env = ("child_cnt", Vint (i + 1)) :: env in
                 let env =
-                  if i = n - 1 && not (is_hidden p) then
+                  if i = n - 1 && not (is_empty_person p) then
                     ("pos", Vstring "prev") :: env
                   else if i = n then ("pos", Vstring "self") :: env
-                  else if i = n + 1 && not (is_hidden p) then
+                  else if i = n + 1 && not (is_empty_person p) then
                     ("pos", Vstring "next") :: env
                   else env
                 in
