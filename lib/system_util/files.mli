@@ -6,7 +6,12 @@ val ls_r : string list -> string list
 val rm : string -> unit
 (** [rm fname]
     Remove [fname]. If [fname] does not exists, do nothing.
- *)
+*)
+
+val exists : string -> bool
+(** [exists fname]
+    Returns whether [fname] exists.
+*)
 
 val rm_rf : string -> unit
 (** [rm_rf dir]
