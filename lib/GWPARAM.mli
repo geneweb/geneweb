@@ -58,6 +58,8 @@ val wrap_output :
     Wrap the display of [title] and [content] in a defined template.
 *)
 
+val has_ignored_duplicates : (Config.config -> Gwdb.base -> bool) ref
+
 module Default : sig
   val init : unit -> unit
   (** Inititialise assets directoris for gwd server:

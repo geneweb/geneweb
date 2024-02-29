@@ -2,6 +2,8 @@
 let rm fname =
   if Sys.file_exists fname then Sys.remove fname
 
+let exists = Sys.file_exists
+
 let ls_r dirs =
   let rec loop result = function
     | f :: fs when Sys.is_directory f ->
