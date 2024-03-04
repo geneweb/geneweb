@@ -883,6 +883,20 @@ let geneweb_link conf (href : Adef.escaped_string) (s : Adef.safe_string) =
 let wprint_geneweb_link conf href s =
   Output.print_string conf (geneweb_link conf href s)
 
+let mod_ind_link conf p (s : Adef.safe_string) =
+  let cgl =
+    match p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
+  in
+  if is_hidden p || cgl then s
+  else
+    let href = "?m=MOD_IND&i=" ^ string_of_iper (get_iper p) in
+    let txt =
+      if s = Adef.safe "" then
+        Adef.safe "<i class=\"fa fa-wrench fa-xs ml-1\" alt=\" (edit)\"></i>"
+      else s
+    in
+    "<a href=\"" ^<^ href ^<^ "\">" ^<^ txt ^>^ "</a>"
+
 let reference_flags with_id conf base p (s : Adef.safe_string) =
   let cgl =
     match p_getenv conf.env "cgl" with Some "on" -> true | _ -> false

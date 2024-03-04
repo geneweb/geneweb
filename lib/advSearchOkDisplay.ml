@@ -19,12 +19,13 @@ let print_result conf base max_answers (list, len) =
         SosaCache.print_sosa conf base p true;
         Output.print_sstring conf " ";
         Output.print_string conf (referenced_person_text conf base p);
-        Output.print_string conf (DateDisplay.short_dates_text conf base p);
+        Output.print_string conf
+          (mod_ind_link conf p (DateDisplay.short_dates_text conf base p));
         Output.print_sstring conf "<em>";
         specify_homonymous conf base p false;
         Output.print_sstring conf "</em>")
       list;
-    if len > max_answers then Output.print_sstring conf "<li>...</li>";
+    if len > max_answers then Output.print_sstring conf "<li>&hellip;</li>";
     Output.print_sstring conf "</ul>"
 
 let print conf base =
@@ -38,6 +39,7 @@ let print conf base =
   Hutil.header conf title;
   Output.print_sstring conf "<p>";
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf "searching all"));
+  Output.print_sstring conf (transl conf ":");
   Output.print_sstring conf " ";
   Output.print_string conf (AdvSearchOk.searching_fields conf base);
   Output.print_sstring conf ".</p>";

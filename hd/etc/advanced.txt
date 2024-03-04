@@ -51,6 +51,7 @@
             <select class="form-control" name="death">
               <option value="Dead">[*died]2</option>
               <option value="NotDead">[*alive]2</option>
+              <option value="DontKnowIfDead">[*maybe alive]</option>
               <option value="" selected="selected">-</option>
             </select>
         %end;
@@ -159,7 +160,7 @@
   <div class="row justify-content-center">
     <div class="form-inline">
       <label for="max" class="mr-2">[*maximum]</label>
-      <input type="number" class="form-control" name="max" id="max" min="0" max="5000" value="150" step="50">
+      <input type="number" class="form-control" name="max" id="max" min="0" max="50000" value="150" step="50">
       <span class="ml-2">[person/persons]1</span>
     </div>
   </div>
