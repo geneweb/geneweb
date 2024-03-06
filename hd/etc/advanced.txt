@@ -100,6 +100,19 @@
   <input type="hidden" name="m" value="AS_OK">
   <div class="row">
     <div class="col-6">
+          <span class="form-control-label mr-2">[*search type][:]</span>
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" name="search_type" id="stAND" value="AND" checked>
+            <label class="form-check-label" for="stAND" title="AND">AND</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" name="search_type" id="stOR" value="OR">
+            <label class="form-check-label" for="stOR" title="OR">OR</label>
+          </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6">
       <div class="row">
         <div class="col-3">
           <h4>[*person/persons]0</h4>

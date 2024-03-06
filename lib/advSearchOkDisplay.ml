@@ -41,7 +41,15 @@ let print conf base =
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf "searching all"));
   Output.print_sstring conf (transl conf ":");
   Output.print_sstring conf " ";
-  Output.print_string conf (AdvSearchOk.searching_fields conf base);
+  let search =
+    (AdvSearchOk.searching_fields conf base :> string) |> String.trim
+  in
+  let len = String.length search in
+  let search =
+    if len > 0 && search.[len - 1] = ',' then String.sub search 0 (len - 1)
+    else search
+  in
+  Output.print_sstring conf search;
   Output.print_sstring conf ".</p>";
   let list = AdvSearchOk.advanced_search conf base max_answers in
   print_result conf base max_answers list;

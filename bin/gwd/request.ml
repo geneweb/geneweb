@@ -489,6 +489,9 @@ let treat_request =
             | Some x -> BirthdayDisplay.print_marriage conf base (int_of_string x)
             | _ -> BirthdayDisplay.print_menu_marriage conf base
           end
+        | "AS" ->
+          w_base @@ fun conf base ->
+            SrcfileDisplay.print conf base "advanced"
         | "AS_OK" ->
           w_base @@ AdvSearchOkDisplay.print
         | "C" ->

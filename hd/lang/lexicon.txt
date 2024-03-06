@@ -2190,6 +2190,11 @@ sl: alias
 sv: alias
 tr: takma ad
 
+
+    search type
+en: search type
+fr: mode de recherche
+
     maybe alive
 af: dalkaan lewendig
 ar: ربما حي

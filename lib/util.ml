@@ -887,15 +887,16 @@ let mod_ind_link conf p (s : Adef.safe_string) =
   let cgl =
     match p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
   in
-  if is_hidden p || cgl then s
+  if is_hidden p || cgl || not conf.wizard then s
   else
-    let href = "?m=MOD_IND&i=" ^ string_of_iper (get_iper p) in
+    let s = (s :> string) in
+    let href = "m=MOD_IND&i=" ^ string_of_iper (get_iper p) in
     let txt =
-      if s = Adef.safe "" then
-        Adef.safe "<i class=\"fa fa-wrench fa-xs ml-1\" alt=\" (edit)\"></i>"
+      if s = "" then {|<i class="fa fa-wrench fa-xs ml-1" alt=" (edit)"></i>|}
       else s
     in
-    "<a href=\"" ^<^ href ^<^ "\">" ^<^ txt ^>^ "</a>"
+    Format.sprintf {|<a href="%s%s">%s</a>|} (commd conf :> string) href txt
+    |> Adef.safe
 
 let reference_flags with_id conf base p (s : Adef.safe_string) =
   let cgl =
