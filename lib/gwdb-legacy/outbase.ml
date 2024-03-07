@@ -35,6 +35,7 @@ let make_name_index base =
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
     (* not ? ? *)
+    (* TODO p.surname ? *)
     if p.first_name <> 1 && p.first_name <> 1 then
       List.iter (fun i -> Array.set t i @@ (p.key_index :: Array.get t i))
       @@ Mutil.list_map_sort_uniq Dutil.name_index
@@ -67,7 +68,7 @@ let make_strings_of_fsname_aux split get base =
         add_name s istr;
         split (fun i j -> add_name (String.sub s i j) istr) s)
     in
-    aux (get p)
+    List.iter aux (get p)
   done;
   Array.map
     (fun set ->
@@ -82,16 +83,24 @@ let make_strings_of_fsname_aux split get base =
     t
 
 let make_strings_of_fname =
-  make_strings_of_fsname_aux Name.split_fname_callback (fun p -> p.first_name)
+  make_strings_of_fsname_aux Name.split_fname_callback (fun p ->
+      p.first_name :: p.first_names_aliases)
 
 let make_strings_of_sname =
-  make_strings_of_fsname_aux Name.split_sname_callback (fun p -> p.surname)
+  make_strings_of_fsname_aux Name.split_sname_callback (fun p ->
+      p.surname :: p.surnames_aliases)
+
+let make_strings_of_aname =
+  make_strings_of_fsname_aux Name.split_sname_callback (fun p -> p.aliases)
 
 let create_strings_of_sname oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_strings_of_sname base)
 
 let create_strings_of_fname oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_strings_of_fname base)
+
+let create_strings_of_alias oc_inx oc_inx_acc base =
+  output_index_aux oc_inx oc_inx_acc (make_strings_of_aname base)
 
 let is_prime a =
   let rec loop b =
@@ -127,16 +136,18 @@ let output_strings_hash tmp_strings_inx base =
   close_out oc
 
 (* Associate istr to persons.
-   A person is associated with its first name/surname and aliases
-*)
+   A person is associated with its first name and surname *)
 let output_name_index_aux cmp get base names_inx names_dat =
   let ht = Dutil.IntHT.create 0 in
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
-    let k = get p in
-    match Dutil.IntHT.find_opt ht k with
-    | Some list -> Dutil.IntHT.replace ht k (p.key_index :: list)
-    | None -> Dutil.IntHT.add ht k [ p.key_index ]
+    let ks = get p in
+    List.iter
+      (fun k ->
+        match Dutil.IntHT.find_opt ht k with
+        | Some list -> Dutil.IntHT.replace ht k (p.key_index :: list)
+        | None -> Dutil.IntHT.add ht k [ p.key_index ])
+      ks
   done;
   let a = Array.make (Dutil.IntHT.length ht) (0, []) in
   ignore
@@ -165,14 +176,20 @@ let output_name_index_aux cmp get base names_inx names_dat =
 let output_surname_index base tmp_snames_inx tmp_snames_dat =
   output_name_index_aux
     (Dutil.compare_snames_i base.data)
-    (fun p -> p.surname)
+    (fun p -> p.surname :: p.surnames_aliases)
     base tmp_snames_inx tmp_snames_dat
 
 let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
   output_name_index_aux
     (Dutil.compare_fnames_i base.data)
-    (fun p -> p.first_name)
+    (fun p -> p.first_name :: p.first_names_aliases)
     base tmp_fnames_inx tmp_fnames_dat
+
+let output_alias_index base tmp_anames_inx tmp_anames_dat =
+  output_name_index_aux
+    (Dutil.compare_snames_i base.data)
+    (fun p -> p.aliases)
+    base tmp_anames_inx tmp_anames_dat
 
 let output_particles_file particles fname =
   let oc = open_out fname in
@@ -193,6 +210,8 @@ let output ?(save_mem = false) base =
   let tmp_snames_dat = Filename.concat bname "1snames.dat" in
   let tmp_fnames_inx = Filename.concat bname "1fnames.inx" in
   let tmp_fnames_dat = Filename.concat bname "1fnames.dat" in
+  let tmp_anames_inx = Filename.concat bname "1anames.inx" in
+  let tmp_anames_dat = Filename.concat bname "1anames.dat" in
   let tmp_strings_inx = Filename.concat bname "1strings.inx" in
   let tmp_notes = Filename.concat bname "1notes" in
   let tmp_notes_d = Filename.concat bname "1notes_d" in
@@ -259,10 +278,10 @@ let output ?(save_mem = false) base =
       let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
       try
         trace "create name index";
+        (* room for sname/fname/aname index *)
         output_binary_int oc_inx 0;
-        (* room for sname index *)
         output_binary_int oc_inx 0;
-        (* room for fname index *)
+        output_binary_int oc_inx 0;
         create_name_index oc_inx oc_inx_acc base;
         base.data.ascends.clear_array ();
         base.data.unions.clear_array ();
@@ -276,14 +295,19 @@ let output ?(save_mem = false) base =
         let first_name_pos = pos_out oc_inx in
         trace "create strings of fname";
         create_strings_of_fname oc_inx oc_inx_acc base;
+        let alias_pos = pos_out oc_inx in
+        trace "create strings of alias";
+        create_strings_of_alias oc_inx oc_inx_acc base;
+        (* write sname/fname/aname position *)
         seek_out oc_inx 0;
-        (* sname index *)
         output_binary_int oc_inx surname_pos;
         seek_out oc_inx 1;
-        (* fname index *)
         output_binary_int oc_inx first_name_pos;
+        seek_out oc_inx 2;
+        output_binary_int oc_inx alias_pos;
         close_out oc_inx;
         close_out oc_inx_acc;
+
         if save_mem then (
           trace "compacting";
           Gc.compact ());
@@ -300,6 +324,11 @@ let output ?(save_mem = false) base =
           Gc.compact ());
         trace "create first name index";
         output_first_name_index base tmp_fnames_inx tmp_fnames_dat;
+        if save_mem then (
+          trace "compacting";
+          Gc.compact ());
+        trace "create first name index";
+        output_alias_index base tmp_anames_inx tmp_anames_dat;
         let s = base.data.bnotes.Def.nread "" Def.RnAll in
         (if s = "" then ()
         else
@@ -368,6 +397,10 @@ let output ?(save_mem = false) base =
   Sys.rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
   Files.rm (Filename.concat bname "fnames.inx");
   Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
+  Files.rm (Filename.concat bname "anames.dat");
+  Sys.rename tmp_anames_dat (Filename.concat bname "anames.dat");
+  Files.rm (Filename.concat bname "anames.inx");
+  Sys.rename tmp_anames_inx (Filename.concat bname "anames.inx");
   Files.rm (Filename.concat bname "strings.inx");
   Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");
   Sys.rename tmp_particles (Filename.concat bname "particles.txt");

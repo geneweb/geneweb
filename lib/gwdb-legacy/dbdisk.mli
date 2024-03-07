@@ -358,10 +358,15 @@ type base_func = {
   (* Return list of first names (string ids) that contain giving person's first name or first name's
      substring. Consider also first names of pathed persons. Doesn't consider pending patches *)
   strings_of_fname : string -> int list;
+  (* Return list of aliases (string ids) that contain giving person's alias substring.
+     Consider also aliases of pathed persons. Doesn't consider pending patches *)
+  strings_of_aname : string -> int list;
   (* Search functionalities throughout index by surname *)
   persons_of_surname : string_person_index;
   (* Search functionalities throughout index by first name *)
   persons_of_first_name : string_person_index;
+  (* Search functionalities throughout index by alias *)
+  persons_of_alias : string_person_index;
   (* Insert or modify person with a giving id (add to pending patches). *)
   patch_person : int -> dsk_person -> unit;
   (* Insert or modify ascendants of a person with a giving id (add to pending patches). *)

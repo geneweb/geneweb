@@ -478,6 +478,10 @@ val persons_of_surname : base -> string_person_index
 (** Returns data structure that allows to make optimised search throughout
     index by surname *)
 
+val persons_of_alias : base -> string_person_index
+(** Returns data structure that allows to make optimised search throughout
+    index by alias *)
+
 val spi_first : string_person_index -> string -> istr
 (** Returns first [first/sur]name id starting with that string *)
 
@@ -504,15 +508,19 @@ val base_strings_of_first_name : base -> string -> istr list
 (** [base_strings_of_first_name base x]
     Return the list of first names (as [istr]) being equal or to [x]
     using {!val:Name.crush_lower} comparison. [x] could be also a substring
-    of the matched first name.
-*)
+    of the matched first name. *)
 
 val base_strings_of_surname : base -> string -> istr list
 (** [base_strings_of_surname base x]
     Return the list of surnames (as [istr]) being equal to [x]
     using  {!val:Name.crush_lower} comparison. [x] could be also a substring
-    of the matched surname.
-*)
+    of the matched surname. *)
+
+val base_strings_of_alias : base -> string -> istr list
+(** [base_strings_of_alias base x]
+    Return the list of aliases (as [istr]) being equal to [x]
+    using  {!val:Name.crush_lower} comparison. [x] could be also a substring
+    of the matched alias. *)
 
 val load_ascends_array : base -> unit
 (** Load array of ascendants in the memory and cache it so it could be accessed
