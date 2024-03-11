@@ -645,5 +645,5 @@ let searching_fields conf base =
       else search
     else search
   in
-  let sep = Adef.safe (if (search :> string) <> "" then ", " else "") in
+  let sep = Adef.safe (if test_string "occu" then ", " else "") in
   string_field "occu" (search ^^^ sep)
