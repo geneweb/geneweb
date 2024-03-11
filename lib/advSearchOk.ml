@@ -187,21 +187,22 @@ let advanced_search conf base max_answers =
         | "M" -> get_sex p = Male | "F" -> get_sex p = Female | _ -> true)
       empty_default_value
   in
+
   let match_death p empty_default_value =
-    let dead =
-      match get_death p with
-      | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> "1"
-      | NotDead -> "2"
-      | DontKnowIfDead -> "3"
+    let is_dead p =
+      match Gwdb.get_death p with
+      | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> true
+      | _ -> false
     in
     apply_to_field_value_raw p "death"
       (function
-        | "Dead" -> dead = "1"
-        | "NotDead" -> dead = "2"
-        | "DontKnowIfDead" -> dead = "3"
+        | "Dead" -> is_dead p
+        | "NotDead" -> Gwdb.get_death p = NotDead
+        | "DontKnowIfDead" -> Gwdb.get_death p = DontKnowIfDead
         | _ -> true)
       empty_default_value
   in
+
   let bapt_date_field_name =
     get_event_field_name gets "date" "bapt" search_type
   in
@@ -358,8 +359,7 @@ let advanced_search conf base max_answers =
       ((list, len) as acc) p search_type =
     if search_type <> "OR" then
       if
-        sou base (get_first_name p) <> "?"
-        && sou base (get_surname p) <> "?"
+        (not (Util.is_empty_name p))
         && match_civil_status ~skip_fname ~skip_sname p
         && match_baptism_date p true && match_baptism_place p true
         && match_birth_date p true && match_birth_place p true
@@ -370,8 +370,7 @@ let advanced_search conf base max_answers =
       then (p :: list, len + 1)
       else acc
     else if
-      sou base (get_first_name p) <> "?"
-      && sou base (get_surname p) <> "?"
+      (not (Util.is_empty_name p))
       && match_civil_status ~skip_fname ~skip_sname p
       && (getss "place" = []
           && gets "date2_yyyy" = ""
