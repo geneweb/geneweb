@@ -20,6 +20,18 @@ let default_portrait_filename base p =
   default_portrait_filename_of_key (p_first_name base p) (p_surname base p)
     (get_occ p)
 
+(** [default_family_portrait_filename_of_key fn sn occ] is the default filename
+ of the corresponding person's portrait. WITHOUT its file extenssion.
+ e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
+ *)
+let default_family_portrait_filename_of_key surname =
+  let space_to_unders = Mutil.tr ' ' '_' in
+  let s = space_to_unders (Name.lower surname) in
+  Format.sprintf "family.%s" s
+
+let default_family_portrait_filename base p =
+  default_family_portrait_filename_of_key (p_surname base p)
+
 let authorized_image_file_extension = [| ".jpg"; ".jpeg"; ".png"; ".gif" |]
 
 let find_img_opt f =
@@ -43,6 +55,19 @@ let find_img_opt f =
 let full_portrait_path conf base p =
   (* TODO why is extension not in filename..? *)
   let s = default_portrait_filename base p in
+  let f = Filename.concat (portrait_folder conf) s in
+  match find_img_opt f with
+  | Some (`Path _) as full_path -> full_path
+  | Some (`Url _)
+  (* should not happen, there is only ".url" file in carrousel folder *)
+  | None ->
+      None
+
+(** [full_family_portrait_path conf base p] is [Some path] if [p] has a portrait.
+    [path] is a the full path of the file with file extension. *)
+let full_family_portrait_path conf base p =
+  (* TODO why is extension not in filename..? *)
+  let s = default_family_portrait_filename base p in
   let f = Filename.concat (portrait_folder conf) s in
   match find_img_opt f with
   | Some (`Path _) as full_path -> full_path
@@ -190,6 +215,17 @@ let has_access_to_portrait conf base p =
      && is_not_private_img conf (sou base img)
 (* TODO: privacy settings should be in db not in url *)
 
+(** [has_access_to_family_portrait conf base p] is true iif we can see [p]'s portrait. *)
+let has_access_to_family_portrait conf base p =
+  let img = get_image p in
+  (conf.wizard || conf.friend)
+  || (not conf.no_image)
+     && Util.authorized_age conf base p
+     && ((not (is_empty_string img))
+        || full_family_portrait_path conf base p <> None)
+     && is_not_private_img conf (sou base img)
+(* TODO: privacy settings should be in db not in url *)
+
 (** [has_access_to_carrousel conf base p] is true iif ???. *)
 let has_access_to_carrousel conf base p =
   (conf.wizard || conf.friend)
@@ -245,6 +281,18 @@ let get_portrait conf base p =
     | `Url _s as url -> Some url
     | `Path p as path -> if Sys.file_exists p then Some path else None
     | `Empty -> full_portrait_path conf base p
+  else None
+
+let get_family_portrait conf base p =
+  if has_access_to_family_portrait conf base p then
+    match src_of_string conf (sou base (get_image p)) with
+    | `Src_with_size_info _s as s_info -> (
+        match parse_src_with_size_info conf s_info with
+        | Error _e -> None
+        | Ok (s, _size) -> Some s)
+    | `Url _s as url -> Some url
+    | `Path p as path -> if Sys.file_exists p then Some path else None
+    | `Empty -> full_family_portrait_path conf base p
   else None
 
 (* In images/carrousel we store either

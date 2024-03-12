@@ -17,6 +17,12 @@ val default_portrait_filename : base -> person -> string
  e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
  *)
 
+(* TODO this should be removed *)
+val default_family_portrait_filename : base -> person -> string
+(** [default_family_portrait_filename base p] is the default filename of [p]'s family portrait. Without it's file extension.
+ e.g: default_family_portrait_filename_of_key "DUPOND" is "family.dupond"
+ *)
+
 val size_from_path : [ `Path of string ] -> (int * int, unit) result
 (** [size_from_path path]
     - Error () if failed to read or parse file
@@ -50,6 +56,13 @@ val get_portrait_with_size :
     - [Some (src, size_opt)] with [src] the url or path of [p]'s portrait. [size_opt] is the (width,height) of the portrait if we could recover them *)
 
 val get_portrait :
+  config -> base -> person -> [> `Path of string | `Url of string ] option
+(** [get_portrait conf base p] is
+    - [None] if we don't have access to [p]'s portrait or it doesn't exist.
+    - [Some src] with [src] the url or path of [p]'s portrait.
+*)
+
+val get_family_portrait :
   config -> base -> person -> [> `Path of string | `Url of string ] option
 (** [get_portrait conf base p] is
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.

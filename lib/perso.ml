@@ -3352,6 +3352,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_history" -> has_history conf base p p_auth
   | "has_image" | "has_portrait" ->
       Image.get_portrait conf base p |> Option.is_some
+  | "has_family_image" ->
+      Image.get_family_portrait conf base p |> Option.is_some
   | "has_image_url" | "has_portrait_url" -> (
       match Image.get_portrait conf base p with
       | Some (`Url _url) -> true
@@ -3605,6 +3607,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "image_medium_size" -> string_of_image_medium_size conf base ep |> str_val
   | "image_small_size" -> string_of_image_small_size conf base ep |> str_val
   | "image_url" -> string_of_image_url conf base ep false |> safe_val
+  | "family_image_url" ->
+      string_of_family_image_url conf base ep false |> safe_val
   | "index" -> (
       match get_env "p_link" env with
       | Vbool _ -> null_val
@@ -4021,6 +4025,25 @@ and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
         let b = acces conf base p in
         let k = Image.default_portrait_filename base p in
         Format.sprintf "%sm=IM%s&d=%d&%s&k=/%s"
+          (commd conf :> string)
+          (if html then "H" else "")
+          (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
+          (b :> string)
+          k
+        |> Adef.escaped
+    | Some (`Url url) -> Adef.escaped url (* FIXME *)
+    | None -> Adef.escaped ""
+  else Adef.escaped ""
+
+and string_of_family_image_url conf base (p, p_auth) html : Adef.escaped_string
+    =
+  if p_auth then
+    match Image.get_family_portrait conf base p with
+    | Some (`Path fname) ->
+        let s = Unix.stat fname in
+        let b = acces conf base p in
+        let k = Image.default_family_portrait_filename base p in
+        Format.sprintf "%sm=FIM%s&d=%d&%s&k=/%s"
           (commd conf :> string)
           (if html then "H" else "")
           (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))

@@ -112,6 +112,32 @@ let print_portrait conf base p =
       Output.print_sstring conf "</body></html>"
   | None -> Hutil.incorrect_request conf
 
+(* ********************************************************************************* *)
+(*  [Fonc] print_family_portrait : Config.config -> Gwdb.base -> Gwdb.person -> unit *)
+(* ********************************************************************************* *)
+
+(** [Description] : Affiche l'image de la famille d'une personne en réponse HTTP.
+    [Args] :
+      - conf : configuration de la requête
+      - base : base de donnée sélectionnée
+      - p : personne dans la base dont il faut afficher l'image de la famille
+    [Retour] : aucun
+    [Rem] : Ne pas utiliser en dehors de ce module.                           *)
+let print_family_portrait conf base p =
+  match Image.get_family_portrait conf base p with
+  | Some (`Path path) ->
+      Result.fold ~ok:ignore
+        ~error:(fun _ -> Hutil.incorrect_request conf)
+        (print_image_file conf path)
+  | Some (`Url url) ->
+      Util.html conf;
+      Output.print_sstring conf "<head><title>";
+      Output.print_sstring conf (Util.transl_nth conf "image/images" 0);
+      Output.print_sstring conf "</title></head><body>";
+      Output.print_sstring conf (Printf.sprintf {|<img src=%s>|} url);
+      Output.print_sstring conf "</body></html>"
+  | None -> Hutil.incorrect_request conf
+
 let print_source conf f =
   let fname = if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f in
   let fname = Image.source_filename conf fname in
@@ -127,6 +153,14 @@ let print conf base =
   | None -> (
       match Util.find_person_in_env conf base "" with
       | Some p -> print_portrait conf base p
+      | None -> Hutil.incorrect_request conf)
+
+let print_family conf base =
+  match Util.p_getenv conf.env "s" with
+  | Some f -> print_source conf f
+  | None -> (
+      match Util.find_person_in_env conf base "" with
+      | Some p -> print_family_portrait conf base p
       | None -> Hutil.incorrect_request conf)
 
 let print_html conf =
