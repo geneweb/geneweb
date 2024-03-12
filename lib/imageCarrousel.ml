@@ -284,6 +284,56 @@ let print_send_image conf base p =
   print_link_delete_image conf base p;
   Hutil.trailer conf
 
+let print_send_family_image conf base p =
+  let title h =
+    if Option.is_some @@ Image.get_family_portrait conf base p then
+      transl_nth conf "image/images" 0
+      |> transl_decline conf "modify"
+      |> Utf8.capitalize_fst |> Output.print_sstring conf
+    else
+      transl_nth conf "image/images" 0
+      |> transl_decline conf "add" |> Utf8.capitalize_fst
+      |> Output.print_sstring conf;
+    if not h then (
+      Output.print_sstring conf (transl conf ": ");
+      Output.print_sstring conf (transl_nth conf "family/families" 0);
+      Output.print_sstring conf " ";
+      Output.print_string conf (Util.escape_html (p_surname base p)))
+  in
+  let digest = Update.digest_person (UpdateInd.string_person_of base p) in
+  Perso.interp_notempl_with_menu title "perso_header" conf base p;
+  Output.print_sstring conf "<h2>\n";
+  title false;
+  Output.print_sstring conf "</h2>\n";
+  Output.printf conf
+    "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
+    conf.command;
+  Output.print_sstring conf "<p>\n";
+  Util.hidden_env conf;
+  Util.hidden_input conf "m" (Adef.encoded "SND_FIMAGE_OK");
+  Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);
+  Util.hidden_input conf "digest" (Mutil.encode digest);
+  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "file"));
+  Output.print_sstring conf (Util.transl conf ":");
+  Output.print_sstring conf " ";
+  Output.print_sstring conf
+    {| <input type="file" class="form-control-file" name="file" accept="image/*"></p>|};
+  (match
+     Option.map int_of_string @@ List.assoc_opt "max_images_size" conf.base_env
+   with
+  | Some len ->
+      Output.print_sstring conf "<p>(maximum authorized size = ";
+      Output.print_sstring conf (string_of_int len);
+      Output.print_sstring conf " bytes)</p>"
+  | None -> ());
+  Output.print_sstring conf
+    {|<button type="submit" class="btn btn-primary mt-2">|};
+  transl_nth conf "validate/delete" 0
+  |> Utf8.capitalize_fst |> Output.print_sstring conf;
+  Output.print_sstring conf "</button></form>";
+  print_link_delete_image conf base p;
+  Hutil.trailer conf
+
 let print_sent conf base p =
   let title _ =
     transl conf "image received"
@@ -344,6 +394,55 @@ let effective_send_ok conf base p file =
   History.record conf base changed "si";
   print_sent conf base p
 
+let effective_family_send_ok conf base p file =
+  let mode =
+    try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
+  in
+  let strm = Stream.of_string file in
+  let request, content = Wserver.get_request_and_content strm in
+  let content =
+    let s =
+      let rec loop len (strm__ : _ Stream.t) =
+        match Stream.peek strm__ with
+        | Some x ->
+            Stream.junk strm__;
+            loop (Buff.store len x) strm
+        | _ -> Buff.get len
+      in
+      loop 0 strm
+    in
+    (content :> string) ^ s
+  in
+  let typ, content =
+    match image_type content with
+    | None ->
+        dump_bad_image conf content;
+        Mutil.extract_param "content-type: " '\n' request
+        |> incorrect_content_type conf base p
+    | Some (typ, content) -> (
+        match
+          Option.map int_of_string
+          @@ List.assoc_opt "max_images_size" conf.base_env
+        with
+        | Some len when String.length content > len ->
+            error_too_big_image conf base p (String.length content) len
+        | _ -> (typ, content))
+  in
+  let fname = Image.default_family_portrait_filename base p in
+  let dir = Util.base_path [ "images" ] conf.bname in
+  if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
+  let fname =
+    Filename.concat dir
+      (if mode = "portraits" then fname ^ extension_of_type typ else fname)
+  in
+  let _moved = move_file_to_save fname dir in
+  write_file fname content;
+  let changed =
+    U_Send_image (Util.string_gen_person base (gen_person_of_person p))
+  in
+  History.record conf base changed "si";
+  print_sent conf base p
+
 let print_send_ok conf base =
   let ip =
     try raw_get conf "i" |> Mutil.decode |> iper_of_string
@@ -353,6 +452,18 @@ let print_send_ok conf base =
   let digest = Update.digest_person (UpdateInd.string_person_of base p) in
   if (digest :> string) = Mutil.decode (raw_get conf "digest") then
     raw_get conf "file" |> Adef.as_string |> effective_send_ok conf base p
+  else Update.error_digest conf
+
+let print_family_send_ok conf base =
+  let ip =
+    try raw_get conf "i" |> Mutil.decode |> iper_of_string
+    with Failure _ -> incorrect conf "print family send ok"
+  in
+  let p = poi base ip in
+  let digest = Update.digest_person (UpdateInd.string_person_of base p) in
+  if (digest :> string) = Mutil.decode (raw_get conf "digest") then
+    raw_get conf "file" |> Adef.as_string
+    |> effective_family_send_ok conf base p
   else Update.error_digest conf
 
 (* carrousel *)
@@ -734,6 +845,15 @@ let print conf base =
       let sn = p_surname base p in
       if fn = "?" || sn = "?" then Hutil.incorrect_request conf
       else print_send_image conf base p
+
+let print_family conf base =
+  match p_getenv conf.env "i" with
+  | None -> Hutil.incorrect_request conf
+  | Some ip ->
+      let p = poi base (iper_of_string ip) in
+      let sn = p_surname base p in
+      if sn = "?" then Hutil.incorrect_request conf
+      else print_send_family_image conf base p
 
 (* carrousel *)
 let print_c ?(saved = false) conf base =

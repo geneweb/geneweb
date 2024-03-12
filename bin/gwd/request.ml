@@ -732,6 +732,10 @@ let treat_request =
         | "S" ->
           w_base @@ fun conf base -> SearchName.print conf base specify unknown
 
+        | "SND_FIMAGE" -> w_wizard @@w_lock @@ w_base @@ ImageCarrousel.print_family
+        | "SND_FIMAGE_OK" ->
+          w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_family_send_ok
+
         | "SND_IMAGE" -> w_wizard @@w_lock @@ w_base @@ ImageCarrousel.print
         | "SND_IMAGE_OK" ->
            w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_send_ok

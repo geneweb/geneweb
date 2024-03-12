@@ -1774,6 +1774,10 @@ sl: dodaj zapiski
 sv: lägg till noteringar
 tr: not ekle
 
+    add coat of arms
+en: add coat of arms
+fr: ajouter un blason
+
     add filter
 co: aghjunghje un filtru
 de: Filter hinzufügen
@@ -11611,6 +11615,10 @@ sk: zmeniť :a:
 sl: spremeni
 sv: ändra
 tr: güncelleme
+
+    modify coat of arms
+en: modify coat of arms
+fr: modifier le blason
 
     modify family %s event order
 co: intervertisce l’evenimenti di a famiglia %s
