@@ -43,8 +43,12 @@ let spi_next (spi : string_person_index) istr = spi.next istr
 
 type base = dsk_base
 
-let open_base bname : base = Database.opendb bname
+let open_base ?(keep_in_memory = false) bname : base =
+  ignore keep_in_memory;
+  Database.opendb bname
+
 let close_base base = base.func.cleanup ()
+
 let sou base i = base.data.strings.get i
 let bname base = Filename.(remove_extension @@ basename base.data.bdir)
 let bdir base = base.data.bdir
