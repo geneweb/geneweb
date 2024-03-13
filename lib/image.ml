@@ -369,6 +369,24 @@ let get_portrait_with_size conf base p =
         | Some path -> Some (path, size_from_path path |> Result.to_option))
   else None
 
+let get_family_portrait_with_size conf base p =
+  if has_access_to_family_portrait conf base p then
+    match src_of_string conf (sou base (get_image p)) with
+    | `Src_with_size_info _s as s_info -> (
+        match parse_src_with_size_info conf s_info with
+        | Error _e -> None
+        | Ok (s, size) -> Some (s, Some size))
+    | `Url _s as url -> Some (url, None)
+    | `Path p as path ->
+        if Sys.file_exists p then
+          Some (path, size_from_path path |> Result.to_option)
+        else None
+    | `Empty -> (
+        match full_family_portrait_path conf base p with
+        | None -> None
+        | Some path -> Some (path, size_from_path path |> Result.to_option))
+  else None
+
 (* For carrousel ************************************ *)
 
 let carrousel_file_path conf base p fname old =

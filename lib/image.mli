@@ -55,6 +55,15 @@ val get_portrait_with_size :
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.
     - [Some (src, size_opt)] with [src] the url or path of [p]'s portrait. [size_opt] is the (width,height) of the portrait if we could recover them *)
 
+val get_family_portrait_with_size :
+  config ->
+  base ->
+  person ->
+  ([> `Path of string | `Url of string ] * (int * int) option) option
+(** [get_family_portrait_with_size conf base p] is
+        - [None] if we don't have access to [p]'s family portrait or it doesn't exist.
+        - [Some (src, size_opt)] with [src] the url or path of [p]'s family portrait. [size_opt] is the (width,height) of the family portrait if we could recover them *)
+
 val get_portrait :
   config -> base -> person -> [> `Path of string | `Url of string ] option
 (** [get_portrait conf base p] is

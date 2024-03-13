@@ -1278,7 +1278,18 @@ let gen_string_of_img_sz max_w max_h conf base (p, p_auth) =
     | None -> ""
   else ""
 
+let gen_string_of_fimg_sz max_w max_h conf base (p, p_auth) =
+  if p_auth then
+    match Image.get_family_portrait_with_size conf base p with
+    | Some (_, Some (w, h)) ->
+        let w, h = Image.scale_to_fit ~max_w ~max_h ~w ~h in
+        Format.sprintf " width=\"%d\" height=\"%d\"" w h
+    | Some (_, None) -> Format.sprintf " height=\"%d\"" max_h
+    | None -> ""
+  else ""
+
 let string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid
+let string_of_family_image_size = gen_string_of_fimg_sz max_im_wid max_im_wid
 let string_of_image_medium_size = gen_string_of_img_sz 160 120
 let string_of_image_small_size = gen_string_of_img_sz 100 75
 
@@ -3604,6 +3615,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | None -> null_val)
   | "image_html_url" -> string_of_image_url conf base ep true |> safe_val
   | "image_size" -> string_of_image_size conf base ep |> str_val
+  | "family_image_size" -> string_of_family_image_size conf base ep |> str_val
   | "image_medium_size" -> string_of_image_medium_size conf base ep |> str_val
   | "image_small_size" -> string_of_image_small_size conf base ep |> str_val
   | "image_url" -> string_of_image_url conf base ep false |> safe_val
