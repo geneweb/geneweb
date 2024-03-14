@@ -1,5 +1,3 @@
-open Geneweb
-
 let port = ref 2316
 let gwd_port = ref 2317
 let default_lang = ref "en"
@@ -12,7 +10,7 @@ let bname = ref ""
 let commnd = ref ""
 
 let printer_conf =
-  { Config.empty with output_conf =
+  { Geneweb.Config.empty with output_conf =
                         { status = Wserver.http
                         ; header = Wserver.header
                         ; body = Wserver.print_string
@@ -58,16 +56,16 @@ let charset conf =
   try Hashtbl.find conf.lexicon "!charset" with Not_found -> "utf-8"
 
 let header_no_page_title conf title =
-  Output.status printer_conf Def.OK;
-  Output.header printer_conf "Content-type: text/html; charset=%s" (charset conf);
-  Output.print_sstring printer_conf
+  Geneweb.Output.status printer_conf Def.OK;
+  Geneweb.Output.header printer_conf "Content-type: text/html; charset=%s" (charset conf);
+  Geneweb.Output.print_sstring printer_conf
     "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
      \"http://www.w3.org/TR/REC-html40/loose.dtd\">\
      <head>\
      <meta name=\"robots\" content=\"none\">\
      <title>";
   title true;
-  Output.print_sstring printer_conf "</title></head><body>"
+  Geneweb.Output.print_sstring printer_conf "</title></head><body>"
 
 let abs_setup_dir () =
   if Filename.is_relative !setup_dir then
@@ -75,18 +73,18 @@ let abs_setup_dir () =
   else !setup_dir
 
 let trailer _conf =
-  Output.print_sstring printer_conf {|<br><div id="footer"><hr><div><em>|} ;
-  Output.print_sstring printer_conf {|<a href="https://github.com/geneweb/geneweb/">|} ;
-  Output.print_sstring printer_conf {|<img src="images/logo_bas.png" style="border:0"></a>|} ;
-  Output.print_sstring printer_conf {| Version |} ;
-  Output.print_sstring printer_conf Version.txt ;
-  Output.print_sstring printer_conf " Copyright &copy; 1998-2021</em></div></div></body></html>"
+  Geneweb.Output.print_sstring printer_conf {|<br><div id="footer"><hr><div><em>|} ;
+  Geneweb.Output.print_sstring printer_conf {|<a href="https://github.com/geneweb/geneweb/">|} ;
+  Geneweb.Output.print_sstring printer_conf {|<img src="images/logo_bas.png" style="border:0"></a>|} ;
+  Geneweb.Output.print_sstring printer_conf {| Version |} ;
+  Geneweb.Output.print_sstring printer_conf Geneweb.Version.txt ;
+  Geneweb.Output.print_sstring printer_conf " Copyright &copy; 1998-2021</em></div></div></body></html>"
 
 let header conf title =
   header_no_page_title conf title;
-  Output.print_sstring printer_conf "<h1>";
+  Geneweb.Output.print_sstring printer_conf "<h1>";
   title false;
-  Output.print_sstring printer_conf "</h1>"
+  Geneweb.Output.print_sstring printer_conf "</h1>"
 
 let strip_control_m s =
   let rec loop i len =
@@ -353,7 +351,7 @@ let macro conf =
   | 'o' -> strip_spaces (s_getenv conf.env "o")
   | 'O' -> Filename.remove_extension (Filename.basename (strip_spaces (s_getenv conf.env "o")))
   | 'p' -> parameters conf.env
-  | 'q' -> Version.txt
+  | 'q' -> Geneweb.Version.txt
   | 'u' -> Filename.dirname (abs_setup_dir ())
   | 'x' -> stringify !bin_dir
   | 'w' -> slashify (Sys.getcwd ())
@@ -364,7 +362,7 @@ let macro conf =
   | 'L' ->
       let lang = conf.lang in
       let lang_def = transl conf "!languages" in
-      (Translate.language_name ~sep:'|' lang lang_def)
+      (Geneweb.Translate.language_name ~sep:'|' lang lang_def)
   | 'P' -> string_of_int !gwd_port
   | 'Q' -> parameters_1 conf.env
   | 'R' -> parameters_2 conf.env
@@ -626,7 +624,7 @@ let rec copy_from_stream conf print strm =
               | 'L' ->
                   let lang = get_variable strm in
                   let lang_def = transl conf "!languages" in
-                  print (Translate.language_name ~sep:'|' lang lang_def)
+                  print (Geneweb.Translate.language_name ~sep:'|' lang lang_def)
               | 'O' ->
                   let fname = Filename.remove_extension
                     (Filename.basename (strip_spaces (s_getenv conf.env "o")))
@@ -831,23 +829,23 @@ let print_file conf bname =
   let ic_opt = try Some (open_in fname) with Sys_error _ -> None in
   match ic_opt with
   | Some ic ->
-    Output.status printer_conf Def.OK;
-    Output.header printer_conf "Content-type: text/html; charset=%s" (charset conf);
-    copy_from_stream conf (Output.print_sstring printer_conf) (Stream.of_channel ic);
+    Geneweb.Output.status printer_conf Def.OK;
+    Geneweb.Output.header printer_conf "Content-type: text/html; charset=%s" (charset conf);
+    copy_from_stream conf (Geneweb.Output.print_sstring printer_conf) (Stream.of_channel ic);
     close_in ic;
     trailer conf
   | None ->
-    let title _ = Output.print_sstring printer_conf "Error" in
+    let title _ = Geneweb.Output.print_sstring printer_conf "Error" in
     header conf title;
-    Output.print_sstring printer_conf "<ul><li>\n";
-    Output.printf printer_conf "Cannot access file \"%s\".\n" fname;
-    Output.print_sstring printer_conf "</ul>\n";
+    Geneweb.Output.print_sstring printer_conf "<ul><li>\n";
+    Geneweb.Output.printf printer_conf "Cannot access file \"%s\".\n" fname;
+    Geneweb.Output.print_sstring printer_conf "</ul>\n";
     trailer conf;
     raise Exit
 
 let error conf str =
-  header conf (fun _ -> Output.print_sstring printer_conf "Incorrect request");
-  Output.printf printer_conf "<em>%s</em>\n" (String.capitalize_ascii str);
+  header conf (fun _ -> Geneweb.Output.print_sstring printer_conf "Incorrect request");
+  Geneweb.Output.printf printer_conf "<em>%s</em>\n" (String.capitalize_ascii str);
   trailer conf
 
 let exec_f comm =
@@ -1494,7 +1492,7 @@ let gwf conf =
       (in_base ^ ".trl")
       |> Filename.concat "lang"
       |> file_contents
-      |> Util.escape_html
+      |> Geneweb.Util.escape_html
       |> fun s -> (s :> string)
     in
     let conf = { conf with env = benv @ ("trailer", trailer) :: conf.env } in
@@ -1618,21 +1616,21 @@ let print_typed_file conf typ fname =
   let ic_opt = try Some (open_in_bin fname) with Sys_error _ -> None in
   match ic_opt with
     Some ic ->
-      Output.status printer_conf Def.OK;
-      Output.header printer_conf "Content-type: %s" typ;
-      Output.header printer_conf "Content-length: %d" (in_channel_length ic);
+      Geneweb.Output.status printer_conf Def.OK;
+      Geneweb.Output.header printer_conf "Content-type: %s" typ;
+      Geneweb.Output.header printer_conf "Content-length: %d" (in_channel_length ic);
       begin try
-        while true do let c = input_char ic in Output.printf printer_conf "%c" c done
+        while true do let c = input_char ic in Geneweb.Output.printf printer_conf "%c" c done
       with End_of_file -> ()
       end;
       close_in ic
   | None ->
-      let title _ = Output.print_sstring printer_conf "Error" in
+      let title _ = Geneweb.Output.print_sstring printer_conf "Error" in
       header conf title;
-      Output.print_sstring printer_conf "<ul><li>";
-      Output.print_sstring printer_conf "Cannot access file \"";
-      Output.print_string printer_conf (Util.escape_html fname);
-      Output.print_sstring printer_conf "\".</ul>";
+      Geneweb.Output.print_sstring printer_conf "<ul><li>";
+      Geneweb.Output.print_sstring printer_conf "Cannot access file \"";
+      Geneweb.Output.print_string printer_conf (Geneweb.Util.escape_html fname);
+      Geneweb.Output.print_sstring printer_conf "\".</ul>";
       trailer conf;
       raise Exit
 
@@ -1921,13 +1919,13 @@ let intro () =
   let (default_gwd_lang, default_setup_lang) =
 #ifdef UNIX
     let s = try Sys.getenv "LANG" with Not_found -> "" in
-    if List.mem s Version.available_languages
+    if List.mem s Geneweb.Version.available_languages
     then s, (if List.mem s setup_available_languages then s else "en")
     else
       let s = try Sys.getenv "LC_CTYPE" with Not_found -> "" in
       if String.length s >= 2 then
         let s = String.sub s 0 2 in
-        if List.mem s Version.available_languages
+        if List.mem s Geneweb.Version.available_languages
         then s, (if List.mem s setup_available_languages then s else "en")
         else !default_lang, !default_lang
       else !default_lang, !default_lang
