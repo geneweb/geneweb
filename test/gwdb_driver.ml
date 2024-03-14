@@ -237,3 +237,6 @@ let set_fpoi_cache _ = assert false
 let get_fevent_src _ = assert false
 let get_fevent_witnesses_and_notes _ = assert false
 let fam_event_of_gen_fevent _ = assert false
+let compare_istr _ _ = assert false
+let compare_ifam _ _ = assert false
+let compare_iper _ _ = assert false
