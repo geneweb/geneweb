@@ -3022,17 +3022,17 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "burial_source" ->
       get_burial_src p |> get_note_source conf base ~p p_auth false
   | "child_length" ->
-    let ifams = Gwdb.get_family p in
-    let n = Array.fold_left (fun n ifam ->
-        let n_fam =
-          Gwdb.foi base ifam
-          |> Gwdb.get_children
-          |> Array.length
-        in
-        n + n_fam
-      ) 0 ifams
-    in
-    str_val @@ string_of_int n
+      let ifams = Gwdb.get_family p in
+      let n =
+        Array.fold_left
+          (fun n ifam ->
+            let n_fam =
+              Gwdb.foi base ifam |> Gwdb.get_children |> Array.length
+            in
+            n + n_fam)
+          0 ifams
+      in
+      str_val @@ string_of_int n
   | "child_name" ->
       let force_surname =
         match get_parents p with
