@@ -1055,7 +1055,7 @@ let string_of_fevent_name conf base efam_name =
 
 let string_of_fevent_name' conf base efam_name =
   match efam_name with
-  | Efam_Name n -> (escape_html n :> Adef.safe_string)
+  | Efam_Name n -> ((escape_html n) :> Adef.safe_string)
   | _ -> string_of_fevent_name_without_base conf efam_name
 
 let string_of_witness_kind conf sex witness_kind =

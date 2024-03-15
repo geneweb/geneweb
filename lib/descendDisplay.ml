@@ -12,7 +12,6 @@ let limit_by_tree conf =
   | Some x -> ( try max 1 (int_of_string x) with _ -> 4)
 
 let max_children = 100
-
 let get_children f =
   let arr = Gwdb.get_children f in
   if Array.length arr < max_children then arr else [||]

@@ -71,7 +71,8 @@ module Default = struct
 
   let is_contemporary' conf base private_years p =
     let death = Gwdb.get_death p in
-    if death = NotDead then private_years >= 0
+    if death = NotDead then
+      private_years >= 0
     else
       let check_date d none =
         match d with
@@ -98,14 +99,14 @@ module Default = struct
       (Gwdb.get_access p = Def.Private || not conf.public_if_no_date)
       || has_contemporary_marriage p
 
+
   let is_contemporary conf base p =
-    let private_years =
-      if conf.Config.private_years < 1 then
+    let private_years = if conf.Config.private_years < 1 then
         conf.default_contemporary_private_years
       else conf.private_years
     in
     is_contemporary' conf base private_years p
-
+  
   (** Calcul les droits de visualisation d'une personne en
       fonction de son age.
       Renvoie (dans l'ordre des tests) :
