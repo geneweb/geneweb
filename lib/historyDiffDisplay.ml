@@ -574,9 +574,18 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) :
   | "access" ->
       aux (fun x ->
           match x.gen_p.access with
-          | IfTitles -> transl_nth conf "iftitles/public/private" 0 |> Adef.safe
-          | Public -> transl_nth conf "iftitles/public/private" 1 |> Adef.safe
-          | Private -> transl_nth conf "iftitles/public/private" 2 |> Adef.safe)
+          | IfTitles ->
+              transl_nth conf "iftitles/public/semipublic/private" 0
+              |> Adef.safe
+          | Public ->
+              transl_nth conf "iftitles/public/semipublic/private" 1
+              |> Adef.safe
+          | SemiPublic ->
+              transl_nth conf "iftitles/public/semipublic/private" 2
+              |> Adef.safe
+          | Private ->
+              transl_nth conf "iftitles/public/semipublic/private" 3
+              |> Adef.safe)
   | "birth" -> aux (fun x -> string_of_cdate conf x.gen_p.birth)
   | "birth_place" -> aux (fun x -> Util.escape_html x.gen_p.birth_place)
   | "birth_note" -> aux (fun x -> Util.escape_html x.gen_p.birth_note)
