@@ -575,6 +575,7 @@ let reconstitute_person conf =
     match p_getenv conf.env "access" with
     | Some "Public" -> Public
     | Some "Private" -> Private
+    | Some "Consent" -> Consent
     | Some _ | None -> IfTitles
   in
   let occupation = only_printable (get conf "occu") in
