@@ -125,7 +125,7 @@ val pp_burial : Format.formatter -> burial -> unit
 val show_burial : burial -> string
 (** Convert [burial] to string *)
 
-type access = Def.access = IfTitles | Public | Private
+type access = Def.access = IfTitles | Public | SemiPublic | Private
 
 val pp_access : Format.formatter -> access -> unit
 (** Printer for [access] *)

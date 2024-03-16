@@ -133,9 +133,13 @@ val is_hidden : person -> bool
 
 val is_public : config -> base -> person -> bool
 (** Tells if person is public
-    - access=Public or
+    - access = Public or
     - IfTitle and has titles or
     - is_old_person) *)
+
+val is_semi_public : config -> base -> person -> bool
+(** tells if person is semi_public
+    - access = SemiPublic *)
 
 val pget : config -> base -> iper -> person
 (** Returns person with giving id from the base.
