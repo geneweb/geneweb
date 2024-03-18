@@ -43,12 +43,6 @@ let spi_next (spi : string_person_index) istr = spi.next istr
 
 type base = dsk_base
 
-let open_base ?(keep_in_memory = false) bname : base =
-  ignore keep_in_memory;
-  Database.opendb bname
-
-let close_base base = base.func.cleanup ()
-
 let sou base i = base.data.strings.get i
 let bname base = Filename.(remove_extension @@ basename base.data.bdir)
 let bdir base = base.data.bdir
@@ -83,6 +77,29 @@ let clear_descends_array base = base.data.descends.clear_array ()
 let clear_strings_array base = base.data.strings.clear_array ()
 let clear_persons_array base = base.data.persons.clear_array ()
 let clear_families_array base = base.data.families.clear_array ()
+
+let open_base ?(keep_in_memory = false) bname : base =
+  let base = Database.opendb bname in
+  if keep_in_memory then (
+    load_ascends_array base;
+    load_unions_array base;
+    load_couples_array base;
+    load_descends_array base;
+    load_strings_array base;
+    load_persons_array base;
+    load_families_array base);
+  base
+
+let close_base base =
+  base.func.cleanup ();
+  clear_ascends_array base;
+  clear_unions_array base;
+  clear_couples_array base;
+  clear_descends_array base;
+  clear_strings_array base;
+  clear_persons_array base;
+  clear_families_array base;
+  ()
 
 let date_of_last_change base =
   let s =
