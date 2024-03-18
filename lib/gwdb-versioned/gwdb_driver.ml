@@ -130,8 +130,7 @@ end = struct
     if not (directory_exists base) then create_files base;
     let patchfile = D.patch_file base in
     let patchfile_tmp = D.tmp_file patchfile in
-    if Sys.file_exists patchfile_tmp then
-      failwith "Error while writing patch file : temporary file remained";
+    Files.rm patchfile_tmp;
     let oc = Secure.open_out patchfile_tmp in
     Marshal.to_channel oc tbl [ Marshal.No_sharing ];
     close_out oc
