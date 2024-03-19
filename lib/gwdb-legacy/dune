@@ -2,6 +2,6 @@
  (name gwdb_legacy)
  (public_name geneweb.gwdb-legacy)
  (implements geneweb.gwdb_driver)
- (libraries geneweb.def geneweb.util re unix)
+ (libraries geneweb.def geneweb.util re unix ancient)
  (modules_without_implementation dbdisk)
  (modules btree database dbdisk dutil gwdb_driver gwdb_gc iovalue outbase))

@@ -674,7 +674,7 @@ let make_record_exists patches pending len i =
 
 let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending)
     len name input_array input_item =
-  let tab = ref None in
+  let (tab : _ Ancient.ancient option ref) = ref None in
   let cleared = ref false in
   let gen_get nopending i =
     match if nopending then None else Hashtbl.find_opt pending i with
@@ -684,7 +684,7 @@ let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending)
         | Some v -> v
         | None -> (
             match !tab with
-            | Some x -> x.(i)
+            | Some x -> (Ancient.follow x).(i)
             | None -> (
                 if i < 0 || i >= len then
                   failwith
@@ -706,25 +706,34 @@ let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending)
     | Some x -> x
     | None ->
         seek_in ic array_pos;
-        let t = input_array ic in
+        let t = Ancient.mark (input_array ic) in
+        Gc.compact ();
         tab := Some t;
         t
   in
-  let rec r =
+  let len = max len !plenr in
+  let r =
     {
       load_array = (fun () -> ignore @@ array ());
       get = gen_get false;
       get_nopending = gen_get true;
-      len = max len !plenr;
+      len;
       output_array =
         (fun oc ->
-          let v = array () in
-          let a = apply_patches v patches r.len in
+          let v = Ancient.follow (array ()) in
+          (* Objects from Ancient pointer should not be mutated.
+             We have to pull a fresh copy to work on. *)
+          let v = Array.copy v in
+          let a = apply_patches v patches len in
           Dutil.output_value_no_sharing oc (a : _ array));
       clear_array =
         (fun () ->
           cleared := true;
-          tab := None);
+          match !tab with
+          | None -> ()
+          | Some a ->
+              Ancient.delete a;
+              tab := None);
     }
   in
   r

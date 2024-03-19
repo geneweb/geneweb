@@ -21,6 +21,7 @@
   (tags (genealogy))
   (depends
     (alcotest :with-test)
+    ancient
     benchmark
     (calendars (= "1.0.0"))
     (camlp5 (>= "8.00.01"))

@@ -13,6 +13,7 @@ bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
   "dune" {>= "2.9"}
   "alcotest" {with-test}
+  "ancient"
   "benchmark"
   "calendars" {= "1.0.0"}
   "camlp5" {>= "8.00.01"}
