@@ -1575,7 +1575,9 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
         let ifaml = connected_families base gen.fam_sel ifam fam in
         let oc, first, _close =
           if to_separate ifam then (oc, out_oc_first, close)
-          else origin_file (sou base (get_origin_file fam))
+          else
+            let fname = get_origin_file fam in
+            origin_file (if is_empty_string fname then "" else sou base fname)
         in
         let f, _ooc, c = opts.oc in
         let opts = { opts with oc = (f, oc, c) } in
