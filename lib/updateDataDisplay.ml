@@ -228,7 +228,7 @@ and eval_compound_var conf base env xx sl =
 and eval_string_env s env =
   match get_env s env with Vstring s -> s | _ -> raise Not_found
 
-let print_foreach conf print_ast _eval_expr =
+let print_foreach ~ignore_case conf print_ast _eval_expr =
   let rec print_foreach env xx _loc s sl el al =
     match s :: sl with
     | [ "initial" ] -> print_foreach_initial env xx al
@@ -237,7 +237,7 @@ let print_foreach conf print_ast _eval_expr =
     | _ -> raise Not_found
   and print_foreach_entry env xx _el al =
     let list = match get_env "list" env with Vlist_data l -> l | _ -> [] in
-    let list = UpdateData.build_list_long conf list in
+    let list = UpdateData.build_list_long ~ignore_case conf list in
     let k = Option.value ~default:"" (Util.p_getenv conf.env "key") in
     let rec loop = function
       | (ini_k, (list_v : (Gwdb.istr * string) list)) :: l ->
@@ -294,7 +294,13 @@ let print_foreach conf print_ast _eval_expr =
 let print_mod conf base =
   match Util.p_getenv conf.Config.env "data" with
   | Some ("place" | "src" | "occu" | "fn" | "sn") ->
-      let list = UpdateData.build_list conf base in
+      let ignore_case =
+        Option.value ~default:false
+          (Option.bind
+             (Util.p_getenv conf.Config.env "ignore_case")
+             bool_of_string_opt)
+      in
+      let list = UpdateData.build_list ~ignore_case conf base in
       let env = [ ("list", Vlist_data list) ] in
       Hutil.interp conf "upddata"
         {
@@ -303,7 +309,7 @@ let print_mod conf base =
           Templ.eval_predefined_apply = (fun _ -> raise Not_found);
           Templ.get_vother;
           Templ.set_vother;
-          Templ.print_foreach = print_foreach conf;
+          Templ.print_foreach = print_foreach ~ignore_case conf;
         }
         env ()
   | _ ->
