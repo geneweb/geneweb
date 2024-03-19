@@ -10,9 +10,7 @@ let bench name fn =
         if i < 0 then String.concat "" (if x > 0 then "+" :: acc else acc)
         else
           let acc =
-            if n > 0
-            && n mod 3 = 0
-            && (n <> 1 && String.unsafe_get s 0 <> '-')
+            if n > 0 && n mod 3 = 0 && n <> 1 && String.unsafe_get s 0 <> '-'
             then aux i :: "," :: acc
             else aux i :: acc
           in
@@ -21,62 +19,56 @@ let bench name fn =
       loop (String.length s - 1) 0 []
     in
     Printf.printf
-      "\
-      \tminor_words : %s\n\
-      \tpromoted_words : %s\n\
-      \tmajor_words : %s\n\
-      \tminor_collections : %s\n\
-      \tmajor_collections : %s\n\
-      \theap_words : %s\n\
-      \theap_chunks : %s\n\
-      \tlive_words : %s\n\
-      \tlive_blocks : %s\n\
-      \tfree_words : %s\n\
-      \tfree_blocks : %s\n\
-      \tlargest_free : %s\n\
-      \tfragments : %s\n\
-      \tcompactions : %s\n\
-      \ttop_heap_words : %s\n\
-      \tstack_size : %s\n\
-      "
+      "\tminor_words : %s\n\
+       \tpromoted_words : %s\n\
+       \tmajor_words : %s\n\
+       \tminor_collections : %s\n\
+       \tmajor_collections : %s\n\
+       \theap_words : %s\n\
+       \theap_chunks : %s\n\
+       \tlive_words : %s\n\
+       \tlive_blocks : %s\n\
+       \tfree_words : %s\n\
+       \tfree_blocks : %s\n\
+       \tlargest_free : %s\n\
+       \tfragments : %s\n\
+       \tcompactions : %s\n\
+       \ttop_heap_words : %s\n\
+       \tstack_size : %s\n"
       (gc.minor_words |> truncate |> pint)
       (gc.promoted_words |> truncate |> pint)
       (gc.major_words |> truncate |> pint)
       (gc.minor_collections |> pint)
       (gc.major_collections |> pint)
-      (gc.heap_words |> pint)
-      (gc.heap_chunks |> pint)
-      (gc.live_words |> pint)
-      (gc.live_blocks |> pint)
-      (gc.free_words |> pint)
-      (gc.free_blocks |> pint)
-      (gc.largest_free |> pint)
-      (gc.fragments |> pint)
-      (gc.compactions |> pint)
+      (gc.heap_words |> pint) (gc.heap_chunks |> pint) (gc.live_words |> pint)
+      (gc.live_blocks |> pint) (gc.free_words |> pint) (gc.free_blocks |> pint)
+      (gc.largest_free |> pint) (gc.fragments |> pint) (gc.compactions |> pint)
       (gc.top_heap_words |> pint)
       (gc.stack_size |> pint)
   in
- (* OCaml 4.12 added [forced_major_collections] field. *)
- (* Using [@warning "-23"] and "gc1 with" as a workaround. *)
-  let [@warning "-23"] diff gc1 gc2 =
-    Gc.{ gc1 with
-         minor_words = gc2.minor_words -. gc1.minor_words
-       ; promoted_words = gc2.promoted_words -. gc1.promoted_words
-       ; major_words = gc2.major_words -. gc1.major_words
-       ; minor_collections = gc2.minor_collections - gc1.minor_collections
-       ; major_collections = gc2.major_collections - gc1.major_collections
-       ; heap_words = gc2.heap_words - gc1.heap_words
-       ; heap_chunks = gc2.heap_chunks - gc1.heap_chunks
-       ; live_words = gc2.live_words - gc1.live_words
-       ; live_blocks = gc2.live_blocks - gc1.live_blocks
-       ; free_words = gc2.free_words - gc1.free_words
-       ; free_blocks = gc2.free_blocks - gc1.free_blocks
-       ; largest_free = gc2.largest_free - gc1.largest_free
-       ; fragments = gc2.fragments - gc1.fragments
-       ; compactions = gc2.compactions - gc1.compactions
-       ; top_heap_words = gc2.top_heap_words - gc1.top_heap_words
-       ; stack_size = gc2.stack_size - gc1.stack_size
-       }
+  (* OCaml 4.12 added [forced_major_collections] field. *)
+  (* Using [@warning "-23"] and "gc1 with" as a workaround. *)
+  let[@warning "-23"] diff gc1 gc2 =
+    Gc.
+      {
+        gc1 with
+        minor_words = gc2.minor_words -. gc1.minor_words;
+        promoted_words = gc2.promoted_words -. gc1.promoted_words;
+        major_words = gc2.major_words -. gc1.major_words;
+        minor_collections = gc2.minor_collections - gc1.minor_collections;
+        major_collections = gc2.major_collections - gc1.major_collections;
+        heap_words = gc2.heap_words - gc1.heap_words;
+        heap_chunks = gc2.heap_chunks - gc1.heap_chunks;
+        live_words = gc2.live_words - gc1.live_words;
+        live_blocks = gc2.live_blocks - gc1.live_blocks;
+        free_words = gc2.free_words - gc1.free_words;
+        free_blocks = gc2.free_blocks - gc1.free_blocks;
+        largest_free = gc2.largest_free - gc1.largest_free;
+        fragments = gc2.fragments - gc1.fragments;
+        compactions = gc2.compactions - gc1.compactions;
+        top_heap_words = gc2.top_heap_words - gc1.top_heap_words;
+        stack_size = gc2.stack_size - gc1.stack_size;
+      }
   in
   let gc1 = Gc.stat () in
   let p1 = Sys.time () in
@@ -85,8 +77,8 @@ let bench name fn =
   let t2 = Unix.gettimeofday () in
   let p2 = Sys.time () in
   let gc2 = Gc.stat () in
-  Printf.printf "[%s]: %fs (~%fs CPU)\n" name (t2 -. t1) (p2 -. p1) ;
-  pprint_gc (diff gc1 gc2) ;
+  Printf.printf "[%s]: %fs (~%fs CPU)\n" name (t2 -. t1) (p2 -. p1);
+  pprint_gc (diff gc1 gc2);
   res
 
 let print_callstack ?(max = 5) () =
@@ -96,7 +88,9 @@ let verbose = ref true
 
 let list_iter_first f = function
   | [] -> ()
-  | hd :: tl -> f true hd ; List.iter (f false) tl
+  | hd :: tl ->
+      f true hd;
+      List.iter (f false) tl
 
 (* [decline] has been deprecated since version 5.00
    compatibility code: *)
@@ -104,38 +98,38 @@ let colon_to_at_word s ibeg iend =
   let iendroot =
     let rec loop i =
       if i + 3 >= iend then iend
-      else if s.[i] = ':' && s.[i+2] = ':' then i
+      else if s.[i] = ':' && s.[i + 2] = ':' then i
       else loop (i + 1)
     in
     loop ibeg
   in
   if iendroot = iend then String.sub s ibeg (iend - ibeg)
   else
-    let (listdecl, maxd) =
+    let listdecl, maxd =
       let rec loop list maxd i =
-        if i >= iend then list, maxd
+        if i >= iend then (list, maxd)
         else
           let inext =
             let rec loop i =
               if i + 3 >= iend then iend
-              else if s.[i] = ':' && s.[i+2] = ':' then i
+              else if s.[i] = ':' && s.[i + 2] = ':' then i
               else loop (i + 1)
             in
             loop (i + 3)
           in
-          let (e, d) =
+          let e, d =
             let i = i + 3 in
             let j = inext in
-            if i < j && s.[i] = '+' then String.sub s (i + 1) (j - i - 1), 0
+            if i < j && s.[i] = '+' then (String.sub s (i + 1) (j - i - 1), 0)
             else if i < j && s.[i] = '-' then
               let rec loop n i =
                 if i < j && s.[i] = '-' then loop (n + 1) (i + 1)
-                else String.sub s i (j - i), n
+                else (String.sub s i (j - i), n)
               in
               loop 1 (i + 1)
-            else String.sub s i (j - i), iendroot - ibeg
+            else (String.sub s i (j - i), iendroot - ibeg)
           in
-          loop ((s.[i+1], e) :: list) (max d maxd) inext
+          loop ((s.[i + 1], e) :: list) (max d maxd) inext
       in
       loop [] 0 iendroot
     in
@@ -144,8 +138,9 @@ let colon_to_at_word s ibeg iend =
     let s =
       List.fold_left
         (fun t (c, e) ->
-           Printf.sprintf "%c?%s%s" c e (if t = "" then "" else ":" ^ t))
-        (String.sub s (ibeg + len) (iendroot - ibeg - len)) listdecl
+          Printf.sprintf "%c?%s%s" c e (if t = "" then "" else ":" ^ t))
+        (String.sub s (ibeg + len) (iendroot - ibeg - len))
+        listdecl
     in
     root ^ "@(" ^ s ^ ")"
 
@@ -155,7 +150,7 @@ let colon_to_at s =
       if i = ibeg then "" else colon_to_at_word s ibeg i
     else
       match s.[i] with
-        ' ' | '<' | '/' as sep ->
+      | (' ' | '<' | '/') as sep ->
           colon_to_at_word s ibeg i ^ String.make 1 sep ^ loop (i + 1) (i + 1)
       | '>' -> String.sub s ibeg (i + 1 - ibeg) ^ loop (i + 1) (i + 1)
       | _ -> loop ibeg (i + 1)
@@ -168,17 +163,13 @@ let decline case s =
 (* end compatibility code *)
 
 let nominative s =
-  match String.rindex_opt s ':' with
-    Some _ -> decline 'n' s
-  | _ -> s
+  match String.rindex_opt s ':' with Some _ -> decline 'n' s | _ -> s
 
 let initial n =
   let rec loop i =
     if i = String.length n then 0
     else
-      match n.[i] with
-        'A'..'Z' | '\192'..'\221' -> i
-      | _ -> loop (succ i)
+      match n.[i] with 'A' .. 'Z' | '\192' .. '\221' -> i | _ -> loop (succ i)
   in
   loop 0
 
@@ -192,18 +183,18 @@ let input_particles fname =
       | '\r' -> loop list len
       | c -> loop list (Buff.store len c)
       | exception End_of_file ->
-        close_in ic;
-        List.rev (if len = 0 then list else Buff.get len :: list)
+          close_in ic;
+          List.rev (if len = 0 then list else Buff.get len :: list)
     in
     loop [] 0
   with Sys_error _ -> []
 
-let saints = ["saint"; "sainte"]
+let saints = [ "saint"; "sainte" ]
 
 let surnames_pieces surname =
   let surname = Name.lower surname in
   let flush i0 i1 =
-    if i1 > i0 then [String.sub surname i0 (i1 - i0)] else []
+    if i1 > i0 then [ String.sub surname i0 (i1 - i0) ] else []
   in
   let rec loop i0 iw i =
     if i = String.length surname then
@@ -221,19 +212,19 @@ let surnames_pieces surname =
 let tr c1 c2 s =
   match String.rindex_opt s c1 with
   | Some _ ->
-    String.init
-      (String.length s)
-      (fun i -> let c = String.unsafe_get s i in if c = c1 then c2 else c)
+      String.init (String.length s) (fun i ->
+          let c = String.unsafe_get s i in
+          if c = c1 then c2 else c)
   | None -> s
 
 let unsafe_tr c1 c2 s =
   match String.rindex_opt s c1 with
   | Some _ ->
-    let bytes = Bytes.unsafe_of_string s in
-    for i = 0 to Bytes.length bytes - 1 do
-      if Bytes.unsafe_get bytes i = c1 then Bytes.unsafe_set bytes i c2
-    done ;
-    Bytes.unsafe_to_string bytes
+      let bytes = Bytes.unsafe_of_string s in
+      for i = 0 to Bytes.length bytes - 1 do
+        if Bytes.unsafe_get bytes i = c1 then Bytes.unsafe_set bytes i c2
+      done;
+      Bytes.unsafe_to_string bytes
   | None -> s
 
 let utf_8_of_iso_8859_1 str =
@@ -257,10 +248,10 @@ let iso_8859_1_of_utf_8 s =
     else
       let c = s.[i] in
       match Char.code c with
-        0xC2 when i + 1 < String.length s ->
-          loop (i + 2) (Buff.store len s.[i+1])
+      | 0xC2 when i + 1 < String.length s ->
+          loop (i + 2) (Buff.store len s.[i + 1])
       | 0xC3 when i + 1 < String.length s ->
-          loop (i + 2) (Buff.store len (Char.chr (Char.code s.[i+1] + 0x40)))
+          loop (i + 2) (Buff.store len (Char.chr (Char.code s.[i + 1] + 0x40)))
       | _ -> loop (i + 1) (Buff.store len c)
   in
   loop 0 0
@@ -271,9 +262,7 @@ let strip_all_trailing_spaces s =
     let rec loop i =
       if i < 0 then 0
       else
-        match s.[i] with
-          ' ' | '\t' | '\r' | '\n' -> loop (i - 1)
-        | _ -> i + 1
+        match s.[i] with ' ' | '\t' | '\r' | '\n' -> loop (i - 1) | _ -> i + 1
     in
     loop (String.length s - 1)
   in
@@ -281,25 +270,28 @@ let strip_all_trailing_spaces s =
     if i = len then Buffer.contents b
     else
       match s.[i] with
-        '\r' -> loop (i + 1)
+      | '\r' -> loop (i + 1)
       | ' ' | '\t' ->
           let rec loop0 j =
             if j = len then Buffer.contents b
             else
               match s.[j] with
-                ' ' | '\t' | '\r' -> loop0 (j + 1)
+              | ' ' | '\t' | '\r' -> loop0 (j + 1)
               | '\n' -> loop j
-              | _ -> Buffer.add_char b s.[i]; loop (i + 1)
+              | _ ->
+                  Buffer.add_char b s.[i];
+                  loop (i + 1)
           in
           loop0 (i + 1)
-      | c -> Buffer.add_char b c; loop (i + 1)
+      | c ->
+          Buffer.add_char b c;
+          loop (i + 1)
   in
   loop 0
 
 let roman_of_arabian n =
-  let build one five ten =
-    function
-      0 -> ""
+  let build one five ten = function
+    | 0 -> ""
     | 1 -> one
     | 2 -> one ^ one
     | 3 -> one ^ one ^ one
@@ -310,39 +302,44 @@ let roman_of_arabian n =
     | 8 -> five ^ one ^ one ^ one
     | _ -> one ^ ten
   in
-  build "M" "M" "M" (n / 1000 mod 10) ^ build "C" "D" "M" (n / 100 mod 10) ^
-  build "X" "L" "C" (n / 10 mod 10) ^ build "I" "V" "X" (n mod 10)
+  build "M" "M" "M" (n / 1000 mod 10)
+  ^ build "C" "D" "M" (n / 100 mod 10)
+  ^ build "X" "L" "C" (n / 10 mod 10)
+  ^ build "I" "V" "X" (n mod 10)
 
 let arabian_of_roman s =
   let decode_digit one five ten r =
     let rec loop cnt i =
-      if i >= String.length s then 10 * r + cnt, i
+      if i >= String.length s then ((10 * r) + cnt, i)
       else if s.[i] = one then loop (cnt + 1) (i + 1)
       else if s.[i] = five then
-        if cnt = 0 then loop 5 (i + 1) else 10 * r + 5 - cnt, i + 1
-      else if s.[i] = ten then 10 * r + 10 - cnt, i + 1
-      else 10 * r + cnt, i
+        if cnt = 0 then loop 5 (i + 1) else ((10 * r) + 5 - cnt, i + 1)
+      else if s.[i] = ten then ((10 * r) + 10 - cnt, i + 1)
+      else ((10 * r) + cnt, i)
     in
     loop 0
   in
-  let (r, i) = decode_digit 'M' 'M' 'M' 0 0 in
-  let (r, i) = decode_digit 'C' 'D' 'M' r i in
-  let (r, i) = decode_digit 'X' 'L' 'C' r i in
-  let (r, i) = decode_digit 'I' 'V' 'X' r i in
+  let r, i = decode_digit 'M' 'M' 'M' 0 0 in
+  let r, i = decode_digit 'C' 'D' 'M' r i in
+  let r, i = decode_digit 'X' 'L' 'C' r i in
+  let r, i = decode_digit 'I' 'V' 'X' r i in
   if i = String.length s then r else raise Not_found
 
-module StrSet = Set.Make (struct type t = string let compare = compare end)
+module StrSet = Set.Make (struct
+  type t = string
+
+  let compare = compare
+end)
 
 let start_with ini i s =
   let inilen = String.length ini in
   let strlen = String.length s in
-  if i < 0 || i > strlen then raise (Invalid_argument "start_with") ;
+  if i < 0 || i > strlen then raise (Invalid_argument "start_with");
   let rec loop i1 i2 =
     if i1 = inilen then true
-    else if i2 = strlen
-    then false
-    else if String.unsafe_get s i2 = String.unsafe_get ini i1
-    then loop (i1 + 1) (i2 + 1)
+    else if i2 = strlen then false
+    else if String.unsafe_get s i2 = String.unsafe_get ini i1 then
+      loop (i1 + 1) (i2 + 1)
     else false
   in
   loop 0 i
@@ -350,15 +347,14 @@ let start_with ini i s =
 let start_with_wildcard ini i s =
   let inilen = String.length ini in
   let strlen = String.length s in
-  if i < 0 || i > strlen then raise (Invalid_argument "start_with_wildcard") ;
+  if i < 0 || i > strlen then raise (Invalid_argument "start_with_wildcard");
   let rec loop i1 i2 =
     if i1 = inilen then true
-    else if i2 = strlen
-    then
-      if String.unsafe_get ini i1 = '_'
-      then loop (i1 + 1) i2 else false
-    else if String.unsafe_get s i2 = String.unsafe_get ini i1
-         || (String.unsafe_get s i2 = ' ' && String.unsafe_get ini i1 = '_')
+    else if i2 = strlen then
+      if String.unsafe_get ini i1 = '_' then loop (i1 + 1) i2 else false
+    else if
+      String.unsafe_get s i2 = String.unsafe_get ini i1
+      || (String.unsafe_get s i2 = ' ' && String.unsafe_get ini i1 = '_')
     then loop (i1 + 1) (i2 + 1)
     else false
   in
@@ -370,30 +366,25 @@ let contains str sub =
   let rec aux i1 i2 =
     if i1 = sublen then true
     else if i2 = strlen then false
-    else if String.unsafe_get str i2 = String.unsafe_get sub i1
-    then aux (i1 + 1) (i2 + 1)
+    else if String.unsafe_get str i2 = String.unsafe_get sub i1 then
+      aux (i1 + 1) (i2 + 1)
     else false
   in
   let rec loop i =
-    if i + sublen <= strlen then aux 0 i || loop (i + 1)
-    else false
-  in loop 0
+    if i + sublen <= strlen then aux 0 i || loop (i + 1) else false
+  in
+  loop 0
 
 let compile_particles list =
   let parts =
     list
     |> List.map (fun s -> Re.str (tr '_' ' ' s))
-    |> Re.alt
-    |> Re.longest
-    |> Re.group
+    |> Re.alt |> Re.longest |> Re.group
   in
-  Re.(seq [ bos ; parts ; greedy (rep notnl) ])
-  |> Re.compile
+  Re.(seq [ bos; parts; greedy (rep notnl) ]) |> Re.compile
 
 let get_particle re s =
-  match Re.exec_opt re s with
-  | Some g -> Re.Group.get g 1
-  | None -> ""
+  match Re.exec_opt re s with Some g -> Re.Group.get g 1 | None -> ""
 
 let compare_after_particle particles s1 s2 =
   let p1 = get_particle particles s1 in
@@ -420,119 +411,113 @@ let input_lexicon lang ht open_fname =
   let derived_lang =
     match String.index_opt lang '-' with
     | Some i -> String.sub lang 0 i
-    | None ->
-      match String.index_opt lang '_' with
-      | Some i -> String.sub lang 0 i
-      | None -> ""
+    | None -> (
+        match String.index_opt lang '_' with
+        | Some i -> String.sub lang 0 i
+        | None -> "")
   in
   let derived_lang_len = String.length derived_lang in
   let rec aux a b i =
-    i = -1
-    || (String.unsafe_get a i = String.unsafe_get b i
-        && aux a b (i - 1) )
+    i = -1 || (String.unsafe_get a i = String.unsafe_get b i && aux a b (i - 1))
   in
   (* find header *)
   let rec key () =
     match input_line ic with
     | exception End_of_file -> close_in ic
     | line ->
-      let len = String.length line in
-      if len < 4 then key ()
-      else if String.unsafe_get line 0 = ' '
-           && String.unsafe_get line 1 = ' '
-           && String.unsafe_get line 2 = ' '
-           && String.unsafe_get line 3 = ' '
-      then trad (String.sub line 4 (len - 4))
-      else key ()
+        let len = String.length line in
+        if len < 4 then key ()
+        else if
+          String.unsafe_get line 0 = ' '
+          && String.unsafe_get line 1 = ' '
+          && String.unsafe_get line 2 = ' '
+          && String.unsafe_get line 3 = ' '
+        then trad (String.sub line 4 (len - 4))
+        else key ()
   (* find a line corresponding to a language *)
   and trad k =
     match input_line ic with
     | exception End_of_file -> close_in ic
-    | line ->
-      match String.index_opt line ':' with
-      | Some i ->
-        if (i = lang_len && aux lang line (lang_len - 1) )
-        || (i = derived_lang_len && aux derived_lang line (derived_lang_len - 1) )
-        then begin
-          let v =
-            if i + 1 = String.length line then ""
-            else String.sub line (i + 2) (String.length line - i - 2)
-          in
-          Hashtbl.replace ht k v ;
-          key ()
-        end
-        else if String.length line > 4
-             && String.unsafe_get line 0 = '-'
-             && String.unsafe_get line 1 = '>'
-             && String.unsafe_get line 2 = ':'
-             && String.unsafe_get line 3 = ' '
-        then
-          let k2 = String.sub line 4 (String.length line - 4) in
-          Option.iter (Hashtbl.replace ht k) (Hashtbl.find_opt ht k2) ;
-          key ()
-        else trad k
-      | None -> key ()
+    | line -> (
+        match String.index_opt line ':' with
+        | Some i ->
+            if
+              (i = lang_len && aux lang line (lang_len - 1))
+              || i = derived_lang_len
+                 && aux derived_lang line (derived_lang_len - 1)
+            then (
+              let v =
+                if i + 1 = String.length line then ""
+                else String.sub line (i + 2) (String.length line - i - 2)
+              in
+              Hashtbl.replace ht k v;
+              key ())
+            else if
+              String.length line > 4
+              && String.unsafe_get line 0 = '-'
+              && String.unsafe_get line 1 = '>'
+              && String.unsafe_get line 2 = ':'
+              && String.unsafe_get line 3 = ' '
+            then (
+              let k2 = String.sub line 4 (String.length line - 4) in
+              Option.iter (Hashtbl.replace ht k) (Hashtbl.find_opt ht k2);
+              key ())
+            else trad k
+        | None -> key ())
   in
   key ()
 
-let array_to_list_map fn a =
-  Array.fold_right (fun x acc -> fn x :: acc) a []
-
-let array_to_list_rev_map fn a =
-  Array.fold_left (fun acc x -> fn x :: acc) [] a
+let array_to_list_map fn a = Array.fold_right (fun x acc -> fn x :: acc) a []
+let array_to_list_rev_map fn a = Array.fold_left (fun acc x -> fn x :: acc) [] a
 
 let array_assoc k a =
   let len = Array.length a in
   let rec loop i =
     if i = len then raise Not_found
     else
-      let (k', v) = Array.unsafe_get a i in
-      if k' = k then v
-      else loop (i + 1)
-  in loop 0
+      let k', v = Array.unsafe_get a i in
+      if k' = k then v else loop (i + 1)
+  in
+  loop 0
 
 let string_of_int_sep sep x =
   let digits, len =
     let rec loop (d, l) x =
-      if x = 0 then (d, l) else loop (Char.chr (Char.code '0' + x mod 10) :: d, l + 1) (x / 10)
+      if x = 0 then (d, l)
+      else loop (Char.chr (Char.code '0' + (x mod 10)) :: d, l + 1) (x / 10)
     in
     loop ([], 0) x
   in
-  let digits, len = if digits = [] then ['0'], 1 else digits, len in
+  let digits, len = if digits = [] then ([ '0' ], 1) else (digits, len) in
   let slen = String.length sep in
-  let s = Bytes.create (len + (len - 1) / 3 * slen) in
+  let s = Bytes.create (len + ((len - 1) / 3 * slen)) in
   let _ =
     List.fold_left
       (fun (i, j) c ->
-         Bytes.set s j c ;
-         if i < len - 1 && (len - 1 - i) mod 3 = 0 then
-           begin String.blit sep 0 s (j + 1) slen; i + 1, j + 1 + slen end
-         else i + 1, j + 1)
+        Bytes.set s j c;
+        if i < len - 1 && (len - 1 - i) mod 3 = 0 then (
+          String.blit sep 0 s (j + 1) slen;
+          (i + 1, j + 1 + slen))
+        else (i + 1, j + 1))
       (0, 0) digits
   in
   Bytes.unsafe_to_string s
 
 let rec list_compare cmp l1 l2 =
-  match l1, l2 with
-  | x1 :: l1, x2 :: l2 -> begin
-      match cmp x1 x2 with
-      | 0 -> list_compare cmp l1 l2
-      | x -> x
-    end
+  match (l1, l2) with
+  | x1 :: l1, x2 :: l2 -> (
+      match cmp x1 x2 with 0 -> list_compare cmp l1 l2 | x -> x)
   | [], [] -> 0
   | [], _ -> -1
   | _, [] -> 1
 
 let rec list_find_map f = function
   | [] -> None
-  | x :: l ->
-    begin match f x with
-      | Some _ as result -> result
-      | None -> list_find_map f l
-    end
+  | x :: l -> (
+      match f x with Some _ as result -> result | None -> list_find_map f l)
 
 let rec list_last = function
-  | [ ] -> raise (Failure "list_last")
+  | [] -> raise (Failure "list_last")
   | [ x ] -> x
   | _ :: tl -> list_last tl
 
@@ -544,7 +529,7 @@ let executable_magic =
   | None -> Digest.file Sys.executable_name
 
 let random_magic =
-  Random.self_init () ;
+  Random.self_init ();
   Random.bits () |> string_of_int
 
 let array_except v a =
@@ -559,8 +544,23 @@ let array_except v a =
 
 let default_particles =
   let upper =
-    [ "AF " ; "D'" ; "D’" ; "DAL " ; "DE " ; "DES " ; "DI " ; "DU " ; "OF "
-    ; "VAN " ; "VON UND ZU " ; "VON " ; "Y " ; "ZU " ; "ZUR " ]
+    [
+      "AF ";
+      "D'";
+      "D’";
+      "DAL ";
+      "DE ";
+      "DES ";
+      "DI ";
+      "DU ";
+      "OF ";
+      "VAN ";
+      "VON UND ZU ";
+      "VON ";
+      "Y ";
+      "ZU ";
+      "ZUR ";
+    ]
   in
   List.rev_append (List.rev_map String.lowercase_ascii upper) upper
 
@@ -577,16 +577,12 @@ let array_forall2 f a1 a2 =
 let rec list_replace old_v new_v = function
   | [] -> []
   | hd :: tl ->
-    if hd = old_v
-    then new_v :: tl
-    else hd :: list_replace old_v new_v tl
+      if hd = old_v then new_v :: tl else hd :: list_replace old_v new_v tl
 
 let list_except x =
   let rec loop acc = function
     | [] -> []
-    | hd :: tl ->
-      if hd = x then List.rev_append acc tl
-      else loop (hd :: acc) tl
+    | hd :: tl -> if hd = x then List.rev_append acc tl else loop (hd :: acc) tl
   in
   loop []
 
@@ -594,38 +590,43 @@ let list_index x list =
   let rec loop i = function
     | [] -> raise Not_found
     | hd :: tl -> if hd = x then i else loop (succ i) tl
-  in loop 0 list
+  in
+  loop 0 list
 
 let list_slice a b list =
-  let rec list_slice a b =  function
-  | [] -> []
-  | hd :: tl ->
-    if a <> 0 then list_slice (pred a) b tl
-    else if b <> 0 then hd :: list_slice 0 (pred b) tl
-    else []
-  in list_slice a (b - a) list
+  let rec list_slice a b = function
+    | [] -> []
+    | hd :: tl ->
+        if a <> 0 then list_slice (pred a) b tl
+        else if b <> 0 then hd :: list_slice 0 (pred b) tl
+        else []
+  in
+  list_slice a (b - a) list
 
 let input_file_ic ic =
   let len = in_channel_length ic in
-  if Sys.unix then
+  if Sys.unix then (
     let bytes = Bytes.create len in
-    really_input ic bytes 0 len ;
-    Bytes.unsafe_to_string bytes
+    really_input ic bytes 0 len;
+    Bytes.unsafe_to_string bytes)
+  else if len = 0 then ""
   else
-    if len = 0 then ""
-    else
-      let buffer = Buffer.create len in
-      let rec loop () =
-        match input_line ic with
-        | line ->
-          Buffer.add_string buffer line ;
+    let buffer = Buffer.create len in
+    let rec loop () =
+      match input_line ic with
+      | line ->
+          Buffer.add_string buffer line;
           let pos = pos_in ic in
-          if pos < len
-          || (seek_in ic @@ pos - 1 ; input_char ic) = '\n'
-          then Buffer.add_char buffer '\n' ;
+          if
+            pos < len
+            || (seek_in ic @@ (pos - 1);
+                input_char ic)
+               = '\n'
+          then Buffer.add_char buffer '\n';
           loop ()
-        | exception End_of_file -> Buffer.contents buffer
-      in loop ()
+      | exception End_of_file -> Buffer.contents buffer
+    in
+    loop ()
 
 let read_file_content filename =
   let ic = Secure.open_in filename in
@@ -636,16 +637,19 @@ let read_file_content filename =
 let normalize_utf_8 s =
   let b = Buffer.create (String.length s * 3) in
   let n = Uunf.create `NFC in
-  let rec add v = match Uunf.add n v with
-    | `Uchar u -> Uutf.Buffer.add_utf_8 b u; add `Await
+  let rec add v =
+    match Uunf.add n v with
+    | `Uchar u ->
+        Uutf.Buffer.add_utf_8 b u;
+        add `Await
     | `Await | `End -> ()
   in
   let add_uchar _ _ = function
     | `Malformed _ -> add (`Uchar Uutf.u_rep)
     | `Uchar _ as u -> add u
   in
-  Uutf.String.fold_utf_8 add_uchar () s ;
-  add `End ;
+  Uutf.String.fold_utf_8 add_uchar () s;
+  add `End;
   Buffer.contents b
 
 (* Copied from OCaml's List.sort_uniq and adapted to our needs
@@ -653,137 +657,136 @@ let normalize_utf_8 s =
 let list_map_sort_uniq (fn : 'a -> 'b) l =
   let open List in
   let rec rev_merge l1 l2 accu =
-    match l1, l2 with
+    match (l1, l2) with
     | [], l2 -> rev_append l2 accu
     | l1, [] -> rev_append l1 accu
-    | h1::t1, h2::t2 ->
-      let c = Stdlib.compare h1 h2 in
-      if c = 0 then rev_merge t1 t2 (h1::accu)
-      else if c < 0
-      then rev_merge t1 l2 (h1::accu)
-      else rev_merge l1 t2 (h2::accu)
+    | h1 :: t1, h2 :: t2 ->
+        let c = Stdlib.compare h1 h2 in
+        if c = 0 then rev_merge t1 t2 (h1 :: accu)
+        else if c < 0 then rev_merge t1 l2 (h1 :: accu)
+        else rev_merge l1 t2 (h2 :: accu)
   in
   let rec rev_merge_rev l1 l2 accu =
-    match l1, l2 with
+    match (l1, l2) with
     | [], l2 -> rev_append l2 accu
     | l1, [] -> rev_append l1 accu
-    | h1::t1, h2::t2 ->
-      let c = Stdlib.compare h1 h2 in
-      if c = 0 then rev_merge_rev t1 t2 (h1::accu)
-      else if c > 0
-      then rev_merge_rev t1 l2 (h1::accu)
-      else rev_merge_rev l1 t2 (h2::accu)
+    | h1 :: t1, h2 :: t2 ->
+        let c = Stdlib.compare h1 h2 in
+        if c = 0 then rev_merge_rev t1 t2 (h1 :: accu)
+        else if c > 0 then rev_merge_rev t1 l2 (h1 :: accu)
+        else rev_merge_rev l1 t2 (h2 :: accu)
   in
   let rec sort n l =
-    match n, l with
+    match (n, l) with
     | 2, x1 :: x2 :: tl ->
-      let x1 = fn x1 in
-      let x2 = fn x2 in
-      let s =
-        let c = Stdlib.compare x1 x2 in
-        if c = 0 then [x1] else if c < 0 then [x1; x2] else [x2; x1]
-      in
-      (s, tl)
+        let x1 = fn x1 in
+        let x2 = fn x2 in
+        let s =
+          let c = Stdlib.compare x1 x2 in
+          if c = 0 then [ x1 ] else if c < 0 then [ x1; x2 ] else [ x2; x1 ]
+        in
+        (s, tl)
     | 3, x1 :: x2 :: x3 :: tl ->
-      let x1 = fn x1 in
-      let x2 = fn x2 in
-      let x3 = fn x3 in
-      let s =
-        let c = Stdlib.compare x1 x2 in
-        if c = 0 then
-          let c = Stdlib.compare x2 x3 in
-          if c = 0 then [x2] else if c < 0 then [x2; x3] else [x3; x2]
-        else if c < 0 then
-          let c = Stdlib.compare x2 x3 in
-          if c = 0 then [x1; x2]
-          else if c < 0 then [x1; x2; x3]
+        let x1 = fn x1 in
+        let x2 = fn x2 in
+        let x3 = fn x3 in
+        let s =
+          let c = Stdlib.compare x1 x2 in
+          if c = 0 then
+            let c = Stdlib.compare x2 x3 in
+            if c = 0 then [ x2 ] else if c < 0 then [ x2; x3 ] else [ x3; x2 ]
+          else if c < 0 then
+            let c = Stdlib.compare x2 x3 in
+            if c = 0 then [ x1; x2 ]
+            else if c < 0 then [ x1; x2; x3 ]
+            else
+              let c = Stdlib.compare x1 x3 in
+              if c = 0 then [ x1; x2 ]
+              else if c < 0 then [ x1; x3; x2 ]
+              else [ x3; x1; x2 ]
           else
             let c = Stdlib.compare x1 x3 in
-            if c = 0 then [x1; x2]
-            else if c < 0 then [x1; x3; x2]
-            else [x3; x1; x2]
-        else
-          let c = Stdlib.compare x1 x3 in
-          if c = 0 then [x2; x1]
-          else if c < 0 then [x2; x1; x3]
-          else
-            let c = Stdlib.compare x2 x3 in
-            if c = 0 then [x2; x1]
-            else if c < 0 then [x2; x3; x1]
-            else [x3; x2; x1]
-      in
-      (s, tl)
+            if c = 0 then [ x2; x1 ]
+            else if c < 0 then [ x2; x1; x3 ]
+            else
+              let c = Stdlib.compare x2 x3 in
+              if c = 0 then [ x2; x1 ]
+              else if c < 0 then [ x2; x3; x1 ]
+              else [ x3; x2; x1 ]
+        in
+        (s, tl)
     | n, l ->
-      let n1 = n asr 1 in
-      let n2 = n - n1 in
-      let s1, l2 = rev_sort n1 l in
-      let s2, tl = rev_sort n2 l2 in
-      (rev_merge_rev s1 s2 [], tl)
+        let n1 = n asr 1 in
+        let n2 = n - n1 in
+        let s1, l2 = rev_sort n1 l in
+        let s2, tl = rev_sort n2 l2 in
+        (rev_merge_rev s1 s2 [], tl)
   and rev_sort n l =
-    match n, l with
+    match (n, l) with
     | 2, x1 :: x2 :: tl ->
-      let x1 = fn x1 in
-      let x2 = fn x2 in
-      let s =
-        let c = Stdlib.compare x1 x2 in
-        if c = 0 then [x1] else if c > 0 then [x1; x2] else [x2; x1]
-      in
-      (s, tl)
+        let x1 = fn x1 in
+        let x2 = fn x2 in
+        let s =
+          let c = Stdlib.compare x1 x2 in
+          if c = 0 then [ x1 ] else if c > 0 then [ x1; x2 ] else [ x2; x1 ]
+        in
+        (s, tl)
     | 3, x1 :: x2 :: x3 :: tl ->
-      let x1 = fn x1 in
-      let x2 = fn x2 in
-      let x3 = fn x3 in
-      let s =
-        let c = Stdlib.compare x1 x2 in
-        if c = 0 then
-          let c = Stdlib.compare x2 x3 in
-          if c = 0 then [x2] else if c > 0 then [x2; x3] else [x3; x2]
-        else if c > 0 then
-          let c = Stdlib.compare x2 x3 in
-          if c = 0 then [x1; x2]
-          else if c > 0 then [x1; x2; x3]
+        let x1 = fn x1 in
+        let x2 = fn x2 in
+        let x3 = fn x3 in
+        let s =
+          let c = Stdlib.compare x1 x2 in
+          if c = 0 then
+            let c = Stdlib.compare x2 x3 in
+            if c = 0 then [ x2 ] else if c > 0 then [ x2; x3 ] else [ x3; x2 ]
+          else if c > 0 then
+            let c = Stdlib.compare x2 x3 in
+            if c = 0 then [ x1; x2 ]
+            else if c > 0 then [ x1; x2; x3 ]
+            else
+              let c = Stdlib.compare x1 x3 in
+              if c = 0 then [ x1; x2 ]
+              else if c > 0 then [ x1; x3; x2 ]
+              else [ x3; x1; x2 ]
           else
             let c = Stdlib.compare x1 x3 in
-            if c = 0 then [x1; x2]
-            else if c > 0 then [x1; x3; x2]
-            else [x3; x1; x2]
-        else
-          let c = Stdlib.compare x1 x3 in
-          if c = 0 then [x2; x1]
-          else if c > 0 then [x2; x1; x3]
-          else
-            let c = Stdlib.compare x2 x3 in
-            if c = 0 then [x2; x1]
-            else if c > 0 then [x2; x3; x1]
-            else [x3; x2; x1]
-      in
-      (s, tl)
+            if c = 0 then [ x2; x1 ]
+            else if c > 0 then [ x2; x1; x3 ]
+            else
+              let c = Stdlib.compare x2 x3 in
+              if c = 0 then [ x2; x1 ]
+              else if c > 0 then [ x2; x3; x1 ]
+              else [ x3; x2; x1 ]
+        in
+        (s, tl)
     | n, l ->
-      let n1 = n asr 1 in
-      let n2 = n - n1 in
-      let s1, l2 = sort n1 l in
-      let s2, tl = sort n2 l2 in
-      (rev_merge s1 s2 [], tl)
+        let n1 = n asr 1 in
+        let n2 = n - n1 in
+        let s1, l2 = sort n1 l in
+        let s2, tl = sort n2 l2 in
+        (rev_merge s1 s2 [], tl)
   in
   let len = length l in
   if len < 2 then List.map fn l else fst (sort len l)
 
 let list_rev_map_append f l1 l2 =
-  let rec aux acc = function
-    | [] -> acc
-    | hd :: tl -> aux (f hd :: acc) tl
-  in
+  let rec aux acc = function [] -> acc | hd :: tl -> aux (f hd :: acc) tl in
   aux l2 l1
 
 let rec list_rev_iter f = function
   | [] -> ()
-  | hd :: tl -> list_rev_iter f tl ; f hd
+  | hd :: tl ->
+      list_rev_iter f tl;
+      f hd
 
 let encode s : Adef.encoded_string =
   let special = function
-    | '\000'..'\031' | '\127'..'\255' | '<' | '>' | '"' | '#' | '%' | '{'
-    | '}' | '|' | '\\' | '^' | '~' | '[' | ']' | '`' | ';' | '/' | '?' | ':'
-    | '@' | '=' | '&' | '+' -> true
+    | '\000' .. '\031'
+    | '\127' .. '\255'
+    | '<' | '>' | '"' | '#' | '%' | '{' | '}' | '|' | '\\' | '^' | '~' | '['
+    | ']' | '`' | ';' | '/' | '?' | ':' | '@' | '=' | '&' | '+' ->
+        true
     | _ -> false
   in
   let hexa_digit x =
@@ -793,7 +796,7 @@ let encode s : Adef.encoded_string =
   let rec need_code i =
     if i < String.length s then
       match s.[i] with
-        ' ' -> true
+      | ' ' -> true
       | x -> if special x then true else need_code (succ i)
     else false
   in
@@ -807,16 +810,18 @@ let encode s : Adef.encoded_string =
     if i < String.length s then
       let i1 =
         match s.[i] with
-          ' ' -> Bytes.set s1 i1 '+'; succ i1
+        | ' ' ->
+            Bytes.set s1 i1 '+';
+            succ i1
         | c ->
-            if special c then
-              begin
-                Bytes.set s1 i1 '%';
-                Bytes.set s1 (i1 + 1) (hexa_digit (Char.code c / 16));
-                Bytes.set s1 (i1 + 2) (hexa_digit (Char.code c mod 16));
-                i1 + 3
-              end
-            else begin Bytes.set s1 i1 c; succ i1 end
+            if special c then (
+              Bytes.set s1 i1 '%';
+              Bytes.set s1 (i1 + 1) (hexa_digit (Char.code c / 16));
+              Bytes.set s1 (i1 + 2) (hexa_digit (Char.code c mod 16));
+              i1 + 3)
+            else (
+              Bytes.set s1 i1 c;
+              succ i1)
       in
       copy_code_in s1 (succ i) i1
     else Bytes.unsafe_to_string s1
@@ -830,23 +835,21 @@ let gen_decode strip_spaces (s : Adef.encoded_string) : string =
   let s = (s :> string) in
   let hexa_val conf =
     match conf with
-    | '0'..'9' -> Char.code conf - Char.code '0'
-    | 'a'..'f' -> Char.code conf - Char.code 'a' + 10
-    | 'A'..'F' -> Char.code conf - Char.code 'A' + 10
+    | '0' .. '9' -> Char.code conf - Char.code '0'
+    | 'a' .. 'f' -> Char.code conf - Char.code 'a' + 10
+    | 'A' .. 'F' -> Char.code conf - Char.code 'A' + 10
     | _ -> 0
   in
   let rec need_decode i =
     if i < String.length s then
-      match s.[i] with
-      '%' | '+' -> true
-          | _ -> need_decode (succ i)
+      match s.[i] with '%' | '+' -> true | _ -> need_decode (succ i)
     else false
   in
   let rec compute_len i i1 =
     if i < String.length s then
       let i =
         match s.[i] with
-        '%' when i + 2 < String.length s -> i + 3
+        | '%' when i + 2 < String.length s -> i + 3
         | _ -> succ i
       in
       compute_len i (succ i1)
@@ -856,11 +859,16 @@ let gen_decode strip_spaces (s : Adef.encoded_string) : string =
     if i < String.length s then
       let i =
         match s.[i] with
-        '%' when i + 2 < String.length s ->
-          let v = hexa_val s.[i+1] * 16 + hexa_val s.[i+2] in
-          Bytes.set s1 i1 (Char.chr v); i + 3
-        | '+' -> Bytes.set s1 i1 ' '; succ i
-        | x -> Bytes.set s1 i1 x; succ i
+        | '%' when i + 2 < String.length s ->
+            let v = (hexa_val s.[i + 1] * 16) + hexa_val s.[i + 2] in
+            Bytes.set s1 i1 (Char.chr v);
+            i + 3
+        | '+' ->
+            Bytes.set s1 i1 ' ';
+            succ i
+        | x ->
+            Bytes.set s1 i1 x;
+            succ i
       in
       copy_decode_in s1 i (succ i1)
     else Bytes.unsafe_to_string s1
@@ -868,11 +876,9 @@ let gen_decode strip_spaces (s : Adef.encoded_string) : string =
   let rec strip_heading_and_trailing_spaces s =
     if String.length s > 0 then
       if s.[0] = ' ' then
-        strip_heading_and_trailing_spaces
-          (String.sub s 1 (String.length s - 1))
+        strip_heading_and_trailing_spaces (String.sub s 1 (String.length s - 1))
       else if s.[String.length s - 1] = ' ' then
-        strip_heading_and_trailing_spaces
-          (String.sub s 0 (String.length s - 1))
+        strip_heading_and_trailing_spaces (String.sub s 0 (String.length s - 1))
       else s
     else s
   in
@@ -891,42 +897,39 @@ let rec extract_param name stop_char =
   in
   function
   | x :: l ->
-    if String.length x >= String.length name &&
-       case_unsensitive_eq (String.sub x 0 (String.length name)) name
-    then
-      let i =
-        match String.index_from_opt x (String.length name) stop_char with
-        | Some i -> i
-        | None -> String.length x
-      in
-      String.sub x (String.length name) (i - String.length name)
-    else extract_param name stop_char l
+      if
+        String.length x >= String.length name
+        && case_unsensitive_eq (String.sub x 0 (String.length name)) name
+      then
+        let i =
+          match String.index_from_opt x (String.length name) stop_char with
+          | Some i -> i
+          | None -> String.length x
+        in
+        String.sub x (String.length name) (i - String.length name)
+      else extract_param name stop_char l
   | [] -> ""
 
 let sprintf_date tm =
-  Adef.safe @@
-  Printf.sprintf
-    "%04d-%02d-%02d %02d:%02d:%02d"
-    (1900 + tm.Unix.tm_year)
-    (succ tm.Unix.tm_mon)
-    tm.Unix.tm_mday
-    tm.Unix.tm_hour
-    tm.Unix.tm_min
-    tm.Unix.tm_sec
+  Adef.safe
+  @@ Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
+       (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+       tm.Unix.tm_sec
 
 let rev_input_line ic pos (rbuff, rpos) =
   let rev = Buffer.create 256 in
   let rev_input_char pos =
-    if !rpos = 0 then begin
-      if Bytes.length !rbuff < 65536
-      then rbuff := Bytes.create @@ if Bytes.length !rbuff = 0 then 1024 else 2 * Bytes.length !rbuff ;
+    if !rpos = 0 then (
+      if Bytes.length !rbuff < 65536 then
+        rbuff :=
+          Bytes.create
+          @@ if Bytes.length !rbuff = 0 then 1024 else 2 * Bytes.length !rbuff;
 
       let ppos = max (pos - Bytes.length !rbuff) 0 in
       seek_in ic ppos;
       let len = pos - ppos in
       really_input ic !rbuff 0 len;
-      rpos := len
-    end;
+      rpos := len);
     decr rpos;
     Bytes.unsafe_get !rbuff !rpos
   in
@@ -936,9 +939,9 @@ let rev_input_line ic pos (rbuff, rpos) =
     let n = Bytes.length s in
     for i = 0 to (n - 1) / 2 do
       let c = Bytes.unsafe_get s i in
-      Bytes.unsafe_set s i @@ Bytes.unsafe_get s (n - i - 1) ;
-      Bytes.unsafe_set s (n - i - 1) c;
-    done ;
+      Bytes.unsafe_set s i @@ Bytes.unsafe_get s (n - i - 1);
+      Bytes.unsafe_set s (n - i - 1) c
+    done;
     Bytes.unsafe_to_string s
   in
   let rev_input_line pos =
@@ -946,14 +949,14 @@ let rev_input_line ic pos (rbuff, rpos) =
     if pos <= 0 then raise End_of_file
     else
       let rec loop pos =
-        if pos <= 0 then get_n_reset (), pos
+        if pos <= 0 then (get_n_reset (), pos)
         else
           match rev_input_char pos with
-          | '\n' -> get_n_reset (), pos
-          | '\r' -> get_n_reset (), (pos - 1)
+          | '\n' -> (get_n_reset (), pos)
+          | '\r' -> (get_n_reset (), pos - 1)
           | c ->
-            Buffer.add_char rev c ;
-            loop (pos - 1)
+              Buffer.add_char rev c;
+              loop (pos - 1)
       in
       loop pos
   in
@@ -965,78 +968,81 @@ let eq_key (fn1, sn1, oc1) (fn2, sn2, oc2) =
 
 let rec filter_map fn = function
   | [] -> []
-  | hd :: tl ->
-    match fn hd with
-    | Some x -> x :: filter_map fn tl
-    | None -> filter_map fn tl
+  | hd :: tl -> (
+      match fn hd with
+      | Some x -> x :: filter_map fn tl
+      | None -> filter_map fn tl)
 
 let rec rev_iter fn = function
   | [] -> ()
-  | hd :: tl -> let () = rev_iter fn tl in fn hd
+  | hd :: tl ->
+      let () = rev_iter fn tl in
+      fn hd
 
 let groupby ~key ~value list =
   let h = Hashtbl.create (List.length list) in
   List.iter
     (fun x ->
-       let k = key x in
-       let v = value x in
-       if Hashtbl.mem h k then Hashtbl.replace h k (v :: Hashtbl.find h k)
-       else Hashtbl.add h k [v])
-    list ;
+      let k = key x in
+      let v = value x in
+      if Hashtbl.mem h k then Hashtbl.replace h k (v :: Hashtbl.find h k)
+      else Hashtbl.add h k [ v ])
+    list;
   Hashtbl.fold (fun k v acc -> (k, v) :: acc) h []
 
-let digest s =
-  Digest.string s |> Digest.to_hex
+let digest s = Digest.string s |> Digest.to_hex
 
 let empty_person empty what =
-  { Def.first_name = what
-  ; surname = what
-  ; occ = 0
-  ; public_name = empty
-  ; image = empty
-  ; qualifiers = []
-  ; aliases = []
-  ; first_names_aliases = []
-  ; surnames_aliases = []
-  ; titles = []
-  ; rparents = []
-  ; related = []
-  ; occupation = empty
-  ; sex = Neuter
-  ; access = IfTitles
-  ; birth = Date.cdate_None
-  ; birth_place = empty
-  ; birth_note = empty
-  ; birth_src = empty
-  ; baptism = Date.cdate_None
-  ; baptism_place = empty
-  ; baptism_note = empty
-  ; baptism_src = empty
-  ; death = DontKnowIfDead
-  ; death_place = empty
-  ; death_note = empty
-  ; death_src = empty
-  ; burial = UnknownBurial
-  ; burial_place = empty
-  ; burial_note = empty
-  ; burial_src = empty
-  ; pevents = []
-  ; notes = empty
-  ; psources = empty
-  ; key_index = ()
+  {
+    Def.first_name = what;
+    surname = what;
+    occ = 0;
+    public_name = empty;
+    image = empty;
+    qualifiers = [];
+    aliases = [];
+    first_names_aliases = [];
+    surnames_aliases = [];
+    titles = [];
+    rparents = [];
+    related = [];
+    occupation = empty;
+    sex = Neuter;
+    access = IfTitles;
+    birth = Date.cdate_None;
+    birth_place = empty;
+    birth_note = empty;
+    birth_src = empty;
+    baptism = Date.cdate_None;
+    baptism_place = empty;
+    baptism_note = empty;
+    baptism_src = empty;
+    death = DontKnowIfDead;
+    death_place = empty;
+    death_note = empty;
+    death_src = empty;
+    burial = UnknownBurial;
+    burial_place = empty;
+    burial_note = empty;
+    burial_src = empty;
+    pevents = [];
+    notes = empty;
+    psources = empty;
+    key_index = ();
   }
 
 let empty_family empty =
-  { Def.marriage = Date.cdate_None
-  ; marriage_place = empty
-  ; marriage_note = empty
-  ; marriage_src = empty
-  ; witnesses = [||]
-  ; relation = Def.NoMention
-  ; divorce = Def.NotDivorced
-  ; fevents = []
-  ; comment = empty
-  ; origin_file = empty
-  ; fsources = empty
-  ; fam_index = ()
+  {
+    Def.marriage = Date.cdate_None;
+    marriage_place = empty;
+    marriage_note = empty;
+    marriage_src = empty;
+    witnesses = [||];
+    relation = Def.NoMention;
+    divorce = Def.NotDivorced;
+    fevents = [];
+    comment = empty;
+    origin_file = empty;
+    fsources = empty;
+    fam_index = ();
   }
