@@ -77,29 +77,46 @@ let clear_descends_array base = base.data.descends.clear_array ()
 let clear_strings_array base = base.data.strings.clear_array ()
 let clear_persons_array base = base.data.persons.clear_array ()
 let clear_families_array base = base.data.families.clear_array ()
+let memory_bound_bases = ref []
 
 let open_base ?(keep_in_memory = false) bname : base =
-  let base = Database.opendb bname in
-  if keep_in_memory then (
-    load_ascends_array base;
-    load_unions_array base;
-    load_couples_array base;
-    load_descends_array base;
-    load_strings_array base;
-    load_persons_array base;
-    load_families_array base);
-  base
+  let bname =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  let dname = Filename.basename bname in
+  match List.assoc_opt dname !memory_bound_bases with
+  | Some base -> base
+  | None ->
+      let base = Database.opendb bname in
+      if keep_in_memory then (
+        load_persons_array base;
+        load_ascends_array base;
+        load_unions_array base;
+        load_couples_array base;
+        load_descends_array base;
+        load_families_array base;
+        load_strings_array base;
+        memory_bound_bases := (dname, base) :: !memory_bound_bases);
+      base
 
 let close_base base =
-  base.func.cleanup ();
-  clear_ascends_array base;
-  clear_unions_array base;
-  clear_couples_array base;
-  clear_descends_array base;
-  clear_strings_array base;
-  clear_persons_array base;
-  clear_families_array base;
-  ()
+  match
+    List.find_opt
+      (fun (_, b) -> String.equal base.data.bdir b.data.bdir)
+      !memory_bound_bases
+  with
+  | Some (bname, _) ->
+      Printf.eprintf "Warning: tried to close memory bound base '%s'\n%!" bname
+  | None ->
+      base.func.cleanup ();
+      clear_ascends_array base;
+      clear_unions_array base;
+      clear_couples_array base;
+      clear_descends_array base;
+      clear_strings_array base;
+      clear_persons_array base;
+      clear_families_array base;
+      ()
 
 let date_of_last_change base =
   let s =

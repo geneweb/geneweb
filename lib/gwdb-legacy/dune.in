@@ -11,6 +11,7 @@
 ;;      geneweb.dsk_format
       re
       unix
+      ancient
   )
   (modules_without_implementation dbdisk)
   (modules
