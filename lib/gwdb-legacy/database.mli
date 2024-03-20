@@ -1,8 +1,14 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-val opendb : string -> Dbdisk.dsk_base
+val opendb : ?read_only:bool -> string -> Dbdisk.dsk_base
 (** Initialise [dsk_base] from the database situated in the specified directory.
-    Initialises both data and functionallity part. *)
+    Initialises both data and functionallity part.
+
+    If ~read_only:true, then the database will be loaded in memory,
+    and kept in a cache. All next uses of opendb on the same database
+    will use the memory-loaded database. This constraints operations on the
+    base, and attempt to mutate its values will result in failure.
+*)
 
 val make :
   string ->

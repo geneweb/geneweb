@@ -87,7 +87,7 @@ let open_base ?(keep_in_memory = false) bname : base =
   match List.assoc_opt dname !memory_bound_bases with
   | Some base -> base
   | None ->
-      let base = Database.opendb bname in
+      let base = Database.opendb ~read_only:keep_in_memory bname in
       if keep_in_memory then (
         load_persons_array base;
         load_ascends_array base;
