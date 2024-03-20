@@ -12,3 +12,6 @@ da7c849491f10f9c723b0bf6020a87026ca3f7ec
 
 # `make fmt`
 fcdea260b482aaa317b2d20b488fb8a98c426bcb
+
+# Format `lib/util/mutil.ml`
+c0a9646e13c3a768b5f0b7e4799fb93349fa2ed1
