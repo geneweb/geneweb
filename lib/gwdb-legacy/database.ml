@@ -672,9 +672,13 @@ let make_record_exists patches pending len i =
   || Hashtbl.find_opt patches i <> None
   || (i < len && i >= 0)
 
-let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending)
-    len name input_array input_item =
-  let (tab : _ Ancient.ancient option ref) = ref None in
+type 'a data_array =
+  | ReadOnly of 'a array Ancient.ancient
+  | ReadWrite of 'a array
+
+let make_record_access ~read_only ic ic_acc shift array_pos (plenr, patches)
+    (_, pending) len name input_array input_item =
+  let (tab : _ data_array option ref) = ref None in
   let cleared = ref false in
   let gen_get nopending i =
     match if nopending then None else Hashtbl.find_opt pending i with
@@ -684,7 +688,8 @@ let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending)
         | Some v -> v
         | None -> (
             match !tab with
-            | Some x -> (Ancient.follow x).(i)
+            | Some (ReadWrite x) -> x.(i)
+            | Some (ReadOnly x) -> (Ancient.follow x).(i)
             | None -> (
                 if i < 0 || i >= len then
                   failwith
@@ -706,13 +711,18 @@ let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending)
     | Some x -> x
     | None ->
         seek_in ic array_pos;
-        let t = Ancient.mark (input_array ic) in
-        Gc.compact ();
+        let t =
+          if read_only then (
+            let t = ReadOnly (Ancient.mark (input_array ic)) in
+            Gc.compact ();
+            t)
+          else ReadWrite (input_array ic)
+        in
         tab := Some t;
         t
   in
   let len = max len !plenr in
-  let r =
+  let rec r =
     {
       load_array = (fun () -> ignore @@ array ());
       get = gen_get false;
@@ -720,19 +730,20 @@ let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending)
       len;
       output_array =
         (fun oc ->
-          let v = Ancient.follow (array ()) in
-          (* Objects from Ancient pointer should not be mutated.
-             We have to pull a fresh copy to work on. *)
-          let v = Array.copy v in
-          let a = apply_patches v patches len in
-          Dutil.output_value_no_sharing oc (a : _ array));
+          match array () with
+          | ReadOnly _ -> failwith "cannot modify read-only data"
+          | ReadWrite v ->
+              let a = apply_patches v patches r.len in
+              Dutil.output_value_no_sharing oc (a : _ array));
       clear_array =
         (fun () ->
           cleared := true;
           match !tab with
           | None -> ()
           | Some a ->
-              Ancient.delete a;
+              (match a with
+              | ReadOnly a -> Ancient.delete a
+              | ReadWrite _ -> ());
               tab := None);
     }
   in
@@ -813,7 +824,7 @@ let person_of_key persons strings persons_of_name first_name surname occ =
   in
   find ipl
 
-let opendb bname =
+let opendb ?(read_only = false) bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
@@ -901,50 +912,50 @@ let opendb bname =
       families_len
   in
   let persons =
-    make_record_access ic ic_acc shift persons_array_pos patches.h_person
-      pending.h_person persons_len "persons"
+    make_record_access ~read_only ic ic_acc shift persons_array_pos
+      patches.h_person pending.h_person persons_len "persons"
       (input_value : _ -> person array)
       (Iovalue.input : _ -> person)
   in
   let shift = shift + (persons_len * Iovalue.sizeof_long) in
   let ascends =
-    make_record_access ic ic_acc shift ascends_array_pos patches.h_ascend
-      pending.h_ascend persons_len "ascends"
+    make_record_access ~read_only ic ic_acc shift ascends_array_pos
+      patches.h_ascend pending.h_ascend persons_len "ascends"
       (input_value : _ -> ascend array)
       (Iovalue.input : _ -> ascend)
   in
   let shift = shift + (persons_len * Iovalue.sizeof_long) in
   let unions =
-    make_record_access ic ic_acc shift unions_array_pos patches.h_union
-      pending.h_union persons_len "unions"
+    make_record_access ~read_only ic ic_acc shift unions_array_pos
+      patches.h_union pending.h_union persons_len "unions"
       (input_value : _ -> union array)
       (Iovalue.input : _ -> union)
   in
   let shift = shift + (persons_len * Iovalue.sizeof_long) in
   let families =
-    make_record_access ic ic_acc shift families_array_pos patches.h_family
-      pending.h_family families_len "families"
+    make_record_access ~read_only ic ic_acc shift families_array_pos
+      patches.h_family pending.h_family families_len "families"
       (input_value : _ -> family array)
       (Iovalue.input : _ -> family)
   in
   let shift = shift + (families_len * Iovalue.sizeof_long) in
   let couples =
-    make_record_access ic ic_acc shift couples_array_pos patches.h_couple
-      pending.h_couple families_len "couples"
+    make_record_access ~read_only ic ic_acc shift couples_array_pos
+      patches.h_couple pending.h_couple families_len "couples"
       (input_value : _ -> couple array)
       (Iovalue.input : _ -> couple)
   in
   let shift = shift + (families_len * Iovalue.sizeof_long) in
   let descends =
-    make_record_access ic ic_acc shift descends_array_pos patches.h_descend
-      pending.h_descend families_len "descends"
+    make_record_access ~read_only ic ic_acc shift descends_array_pos
+      patches.h_descend pending.h_descend families_len "descends"
       (input_value : _ -> descend array)
       (Iovalue.input : _ -> descend)
   in
   let shift = shift + (families_len * Iovalue.sizeof_long) in
   let strings =
-    make_record_access ic ic_acc shift strings_array_pos patches.h_string
-      pending.h_string strings_len "strings"
+    make_record_access ~read_only ic ic_acc shift strings_array_pos
+      patches.h_string pending.h_string strings_len "strings"
       (input_value : _ -> string array)
       (Iovalue.input : _ -> string)
   in
