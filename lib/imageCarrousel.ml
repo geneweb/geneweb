@@ -468,7 +468,6 @@ let print_family_send_ok conf base =
 
 (* carrousel *)
 let effective_send_c_ok ?(portrait = true) conf base p file file_name =
-  Printf.printf "--> effective_send_c_ok %s\n\tfile=%s\n\tfile_name=%s\n"
     (if portrait then "true" else "false")
     file file_name;
   let mode =
