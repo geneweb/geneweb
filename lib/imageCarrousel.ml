@@ -468,8 +468,6 @@ let print_family_send_ok conf base =
 
 (* carrousel *)
 let effective_send_c_ok ?(portrait = true) conf base p file file_name =
-    (if portrait then "true" else "false")
-    file file_name;
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
