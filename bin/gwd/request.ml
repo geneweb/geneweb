@@ -558,9 +558,11 @@ let treat_request =
           w_base @@ History.print_search
 
         | "IM_C" ->
-          w_base @@ ImageCarrousel.print_c ~saved:false
+          w_base @@ ImageCarrousel.print_c ~saved:false ~portrait:true
         | "IM_C_S" ->
-          w_base @@ ImageCarrousel.print_c ~saved:true
+          w_base @@ ImageCarrousel.print_c ~saved:true ~portrait:true
+        | "FIM_C" ->
+          w_base @@ ImageCarrousel.print_c ~saved:false ~portrait:false
 
 
         | "IM" ->

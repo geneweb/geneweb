@@ -308,6 +308,19 @@ let get_old_portrait conf base p =
     find_img_opt f
   else None
 
+(* In images/carrousel we store either
+   - the image as the original image.jpg/png/tif image
+   - the url to the image as content of a image.url text file
+*)
+let get_old_family_portrait conf base p =
+  if has_access_to_family_portrait conf base p then
+    let key = default_family_portrait_filename base p in
+    let f =
+      Filename.concat (Filename.concat (portrait_folder conf) "old") key
+    in
+    find_img_opt f
+  else None
+
 let rename_portrait conf base p (nfn, nsn, noc) =
   match get_portrait conf base p with
   | Some (`Path old_f) -> (

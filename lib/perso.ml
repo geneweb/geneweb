@@ -3375,11 +3375,17 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       match Image.get_old_portrait conf base p with
       | Some (`Url _url) -> true
       | _ -> false)
+  | "has_old_family_image_url" -> (
+      match Image.get_old_family_portrait conf base p with
+      | Some (`Url _url) -> true
+      | _ -> false)
   (* carrousel *)
   | "has_carrousel" -> Image.get_carrousel_imgs conf base p <> []
   | "has_old_carrousel" -> Image.get_carrousel_old_imgs conf base p <> []
   | "has_old_image" | "has_old_portrait" ->
       Image.get_old_portrait conf base p |> Option.is_some
+  | "has_old_family_image" | "has_old_family_portrait" ->
+      Image.get_old_family_portrait conf base p |> Option.is_some
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && Util.nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
@@ -3633,6 +3639,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | _ -> get_iper p |> string_of_iper |> Mutil.encode |> safe_val)
   (* carrousel functions *)
   | "carrousel" -> Image.default_portrait_filename base p |> str_val
+  | "family_carrousel" ->
+      Image.default_family_portrait_filename base p |> str_val
   | "carrousel_img_nbr" ->
       string_of_int (List.length (Image.get_carrousel_imgs conf base p))
       |> str_val
@@ -3653,14 +3661,35 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Some (`Path s) -> str_val s
       | Some (`Url u) -> str_val u
       | None -> null_val)
+  | "family_image" -> (
+      (* TODO what do we want here? can we remove this? *)
+      match Image.get_family_portrait conf base p with
+      | Some (`Path s) -> str_val s
+      | Some (`Url u) -> str_val u
+      | None -> null_val)
   | "portrait_name" -> (
       match Image.get_portrait conf base p with
+      | Some (`Path s) -> str_val (Filename.basename s)
+      | Some (`Url u) -> str_val u (* ?? *)
+      | None -> null_val)
+  | "family_image_name" -> (
+      match Image.get_family_portrait conf base p with
       | Some (`Path s) -> str_val (Filename.basename s)
       | Some (`Url u) -> str_val u (* ?? *)
       | None -> null_val)
   | "portrait_saved" -> (
       match Image.get_old_portrait conf base p with
       | Some (`Path s) -> str_val s
+      | Some (`Url u) -> str_val u
+      | None -> null_val)
+  | "family_image_saved" -> (
+      match Image.get_old_family_portrait conf base p with
+      | Some (`Path s) -> str_val s
+      | Some (`Url u) -> str_val u
+      | None -> null_val)
+  | "family_image_saved_name" -> (
+      match Image.get_old_family_portrait conf base p with
+      | Some (`Path s) -> str_val (Filename.basename s)
       | Some (`Url u) -> str_val u
       | None -> null_val)
   | "portrait_saved_name" -> (

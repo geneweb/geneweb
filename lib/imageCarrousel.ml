@@ -671,8 +671,11 @@ let print_del conf base =
 (* removes portrait or other image and saves it into old folder *)
 (* if delete=on permanently deletes the file in old folder *)
 
-let effective_delete_c_ok conf base p =
-  let fname = Image.default_portrait_filename base p in
+let effective_delete_c_ok ?(portrait = true) conf base p =
+  let fname =
+    if portrait then Image.default_portrait_filename base p
+    else Image.default_family_portrait_filename base p
+  in
   let file_name =
     try List.assoc "file_name" conf.env with Not_found -> Adef.encoded ""
   in
@@ -706,11 +709,14 @@ let effective_delete_c_ok conf base p =
 (* carrousel *)
 (* reset portrait or image from old folder to portrait or others *)
 
-let effective_reset_c_ok conf base p =
+let effective_reset_c_ok ?(portrait = true) conf base p =
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
-  let carrousel = Image.default_portrait_filename base p in
+  let carrousel =
+    if portrait then Image.default_portrait_filename base p
+    else Image.default_family_portrait_filename base p
+  in
   let file_name =
     try List.assoc "file_name" conf.env with Not_found -> Adef.encoded ""
   in
@@ -728,14 +734,17 @@ let effective_reset_c_ok conf base p =
   let file_in_new =
     if mode = "portraits" then
       String.concat Filename.dir_sep
-        [ Util.base_path [ "images" ] conf.bname; file_name ^ ext ]
+        [ Util.base_path [ "images" ] conf.bname; file_name ^ old_ext ]
     else
       String.concat Filename.dir_sep
         [ Util.base_path [ "src" ] conf.bname; "images"; carrousel; file_name ]
   in
   (if Sys.file_exists file_in_new then ()
   else
-    match Image.get_portrait conf base p with
+    match
+      if portrait then Image.get_portrait conf base p
+      else Image.get_family_portrait conf base p
+    with
     | Some (`Url url) -> (
         try write_file file_in_new url
         with _ ->
@@ -810,16 +819,28 @@ let print_main_c conf base =
                       try (List.assoc "idigest" conf.env :> string)
                       with Not_found -> ""
                     in
+                    let fdigest =
+                      try (List.assoc "fdigest" conf.env :> string)
+                      with Not_found -> ""
+                    in
                     if digest = idigest then
                       (conf, effective_delete_c_ok conf base p)
+                    else if fdigest != "" then
+                      (conf, effective_delete_c_ok ~portrait:false conf base p)
                     else (conf, "idigest error")
                 | Some "RESET_IMAGE_C_OK" ->
                     let idigest =
                       try (List.assoc "idigest" conf.env :> string)
                       with Not_found -> ""
                     in
+                    let fdigest =
+                      try (List.assoc "fdigest" conf.env :> string)
+                      with Not_found -> ""
+                    in
                     if digest = idigest then
                       (conf, effective_reset_c_ok conf base p)
+                    else if fdigest != "" then
+                      (conf, effective_reset_c_ok ~portrait:false conf base p)
                     else (conf, "idigest error")
                 | Some "IMAGE_C" -> (conf, "image")
                 | _ -> (conf, "incorrect request")
@@ -856,16 +877,21 @@ let print_family conf base =
       else print_send_family_image conf base p
 
 (* carrousel *)
-let print_c ?(saved = false) conf base =
+let print_c ?(saved = false) ?(portrait = true) conf base =
   match (Util.p_getenv conf.env "s", Util.find_person_in_env conf base "") with
   | Some f, Some p ->
-      let k = Image.default_portrait_filename base p in
+      let k =
+        if portrait then Image.default_portrait_filename base p
+        else Image.default_family_portrait_filename base p
+      in
       let f = Filename.concat k f in
       ImageDisplay.print_source conf (if saved then insert_saved f else f)
   | Some f, _ -> ImageDisplay.print_source conf f
   | _, Some p -> (
       match
-        (if saved then Image.get_old_portrait else Image.get_portrait)
+        (if saved then Image.get_old_portrait
+        else if portrait then Image.get_portrait
+        else Image.get_family_portrait)
           conf base p
       with
       | Some (`Path f) ->

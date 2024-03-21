@@ -4398,6 +4398,10 @@ pt: familiar próximo
 sv: en släkting
 tr: bir ebeveyn
 
+    coat of arms
+en: coat of arms
+fr: blason
+
     coefficient of relationship
 co: U <a href="https://en.wikipedia.org/wiki/Coefficient_of_relationship">cuefficiente di e rilazioni</a> indicheghja u percentuale medianu minimu di geni spartiti trà dui individui.
 de: Der <a href="https://de.wikipedia.org/wiki/Verwandtschaftskoeffizient">Verwandtschaftskoeffizient</a> berechnet den minimalen Prozentsatz der Übereinstimmung der DNA zwischen zwei Personen.
@@ -6390,6 +6394,14 @@ sk: zmazať
 sl: izbriši
 sv: ta bort
 tr: sil
+
+    delete coat of arms
+en: delete coat of arms
+fr: supprimer le blason
+
+    delete coat of arms saved
+en: delete saved coat of arms
+fr: supprimer le blason sauvegardé
 
     delete image
 co: squassà a fiura
@@ -14735,6 +14747,10 @@ de: wiederherstellen
 en: restore
 fr: restaurer
 
+    restore coat of arms saved
+en: restore coat of arms
+fr: restaurer le blason
+
     restore image saved
 co: risturà una fiura arregistrata
 de: das gespeicherte Bild wiederherstellen
@@ -15169,6 +15185,10 @@ pt: ver fotos
 ru: смотри изображения предков
 sv: se bilder
 tr: resimleri görüntüle
+
+    see coat of arms
+en: see coat of arms
+fr: voir le blason
 
     see descendants notes/sources
 co: fighjà e note è e fonte

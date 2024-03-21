@@ -85,6 +85,13 @@ val get_old_portrait :
     - [Some src] with [src] the url or path of [p]'s portrait.
 *)
 
+val get_old_family_portrait :
+  config -> base -> person -> [> `Path of string | `Url of string ] option
+(** [get_old_family_portrait conf base p] is
+    - [None] if we don't have access to [p]'s family image or it doesn't exist.
+    - [Some src] with [src] the url or path of [p]'s family image.
+*)
+
 (* -- Carrousel -- *)
 
 val get_carrousel_imgs :
