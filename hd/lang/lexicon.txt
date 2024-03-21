@@ -14057,6 +14057,10 @@ de: vorher
 en: previous
 fr: précédent
 
+    previous coat of arms
+en: a possible previous version of the saved coat of arms will be deleted.
+fr: une sauvegarde pré-existante du blason sera supprimée.
+
     previous image
 co: s’è una fiura cù u listessu nome esiste dighjà in u cartulare di salvaguardia, sta fiura serà squassata.
 de: wenn schon ein gespeichertes Bild mit dem gleichen Namen existiert, wird es gelöscht.

@@ -467,7 +467,10 @@ let print_family_send_ok conf base =
   else Update.error_digest conf
 
 (* carrousel *)
-let effective_send_c_ok conf base p file file_name =
+let effective_send_c_ok ?(portrait = true) conf base p file file_name =
+  Printf.printf "--> effective_send_c_ok %s\n\tfile=%s\n\tfile_name=%s\n"
+    (if portrait then "true" else "false")
+    file file_name;
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
@@ -523,7 +526,10 @@ let effective_send_c_ok conf base p file file_name =
           | _ -> (typ, content))
     else (GIF, content (* we dont care which type, content = "" *))
   in
-  let fname = Image.default_portrait_filename base p in
+  let fname =
+    if portrait then Image.default_portrait_filename base p
+    else Image.default_family_portrait_filename base p
+  in
   let dir =
     if mode = "portraits" then
       String.concat Filename.dir_sep [ Util.base_path [ "images" ] conf.bname ]
@@ -537,12 +543,18 @@ let effective_send_c_ok conf base p file file_name =
       (if mode = "portraits" then fname ^ extension_of_type typ else file_name)
   in
   if mode = "portraits" then
-    match Image.get_portrait conf base p with
+    match
+      if portrait then Image.get_portrait conf base p
+      else Image.get_family_portrait conf base p
+    with
     | Some (`Path portrait) ->
         if move_file_to_save portrait dir = 0 then
           incorrect conf "effective send (portrait)"
     | Some (`Url url) -> (
-        let fname = Image.default_portrait_filename base p in
+        let fname =
+          if portrait then Image.default_portrait_filename base p
+          else Image.default_family_portrait_filename base p
+        in
         let dir = Filename.concat dir "old" in
         if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
         let fname = Filename.concat dir fname ^ ".url" in
@@ -811,8 +823,15 @@ let print_main_c conf base =
                       try (List.assoc "idigest" conf.env :> string)
                       with Not_found -> ""
                     in
+                    let fdigest =
+                      try (List.assoc "fdigest" conf.env :> string)
+                      with Not_found -> ""
+                    in
                     if digest = idigest then
-                      (conf, effective_send_c_ok conf base p file file_name)
+                      ( conf,
+                        effective_send_c_ok
+                          ~portrait:(if idigest = fdigest then false else true)
+                          conf base p file file_name )
                     else (conf, "idigest error")
                 | Some "DEL_IMAGE_C_OK" ->
                     let idigest =
