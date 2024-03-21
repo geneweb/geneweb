@@ -32,6 +32,7 @@
     markup
     num
     (ocaml (>= 4.08))
+    ocaml-option-nnp
     (ocamlformat (and :dev (= 0.24.1)))
     ounit
     ppx_blob
