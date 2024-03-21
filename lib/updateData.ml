@@ -88,8 +88,8 @@ let get_all_data conf base =
 let get_person_from_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in
   let istr = Gwdb.istr_of_string @@ (List.assoc "key" conf.env :> string) in
-  Printf.eprintf "get_person_from_data: key= %s, %s\n" (Gwdb.string_of_istr istr)
-    (Gwdb.sou base istr);
+  Printf.eprintf "get_person_from_data: key= %s, %s\n"
+    (Gwdb.string_of_istr istr) (Gwdb.sou base istr);
   let add acc (istr : Gwdb.istr) p =
     try PersMap.add istr (PersSet.add p @@ PersMap.find istr acc) acc
     with Not_found -> PersMap.add istr (PersSet.add p PersSet.empty) acc
@@ -426,13 +426,18 @@ let update_person_list conf base new_input list nb_pers max_updates =
             || Gwdb.sou base (Gwdb.get_surname p) <> "?"
           then (
             incr cnt;
-            let o_p = Util.string_gen_person base (Gwdb.gen_person_of_person p) in
+            let o_p =
+              Util.string_gen_person base (Gwdb.gen_person_of_person p)
+            in
             let np = update_person conf base old new_input p in
             (if action = "fn" || action = "sn" then
              let pi = np.key_index in
              let op = Gwdb.poi base pi in
              let sp =
-               Futil.map_person_ps (fun ip -> ip) (fun istr -> Gwdb.sou base istr) np
+               Futil.map_person_ps
+                 (fun ip -> ip)
+                 (fun istr -> Gwdb.sou base istr)
+                 np
              in
              Image.rename_portrait conf base op
                (sp.first_name, sp.surname, sp.occ));

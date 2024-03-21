@@ -406,29 +406,31 @@ let fallback = ref []
 let read_fallback lang fname =
   fallback := [];
   let rec aux a b i =
-    i = -1
-    || (String.unsafe_get a i = String.unsafe_get b i
-        && aux a b (i - 1) )
+    i = -1 || (String.unsafe_get a i = String.unsafe_get b i && aux a b (i - 1))
   in
-  let ic = try Some (Secure.open_in fname)
-    with Sys_error _ -> None
-  in
+  let ic = try Some (Secure.open_in fname) with Sys_error _ -> None in
   match ic with
   | Some ic ->
-    let rec one_line () =
-      match input_line ic with
-      | exception End_of_file -> close_in ic
-      | line -> (
-          let lang_len = String.length lang in
-          match String.index_opt line ':' with
-          | Some i when line.[0] <> '#' &&
-              (i = lang_len && aux lang line (lang_len - 1) ) -> (
-              let f_lang = String.sub line (i + 1) (String.length line - i - 1) in
-              fallback := (lang, f_lang) :: !fallback;
-              one_line ())
-          | _ -> one_line ())
-    in one_line ()
-  | None -> fallback := [("co", "fr"); ("oc", "fr"); ("br", "fr"); ("bg", "ru"); ]
+      let rec one_line () =
+        match input_line ic with
+        | exception End_of_file -> close_in ic
+        | line -> (
+            let lang_len = String.length lang in
+            match String.index_opt line ':' with
+            | Some i
+              when line.[0] <> '#'
+                   && i = lang_len
+                   && aux lang line (lang_len - 1) ->
+                let f_lang =
+                  String.sub line (i + 1) (String.length line - i - 1)
+                in
+                fallback := (lang, f_lang) :: !fallback;
+                one_line ()
+            | _ -> one_line ())
+      in
+      one_line ()
+  | None ->
+      fallback := [ ("co", "fr"); ("oc", "fr"); ("br", "fr"); ("bg", "ru") ]
 
 let input_lexicon lang ht open_fname =
   read_fallback lang "lexicon.gwf";
@@ -470,51 +472,57 @@ let input_lexicon lang ht open_fname =
   and trad k =
     match input_line ic with
     | exception End_of_file -> close_in ic
-    | line ->
-      match String.index_opt line ':' with
-      | Some i when (i = lang_len && aux lang line (lang_len - 1) )
-        || (i = derived_lang_len && aux derived_lang line (derived_lang_len - 1) ) ->
-          let v =
-            if i + 1 = String.length line then ""
-            else String.sub line (i + 2) (String.length line - i - 2)
-          in
-          Hashtbl.replace ht k v;
-          trad k
-      | Some i when List.mem_assoc lang !fallback &&
-          (i = (String.length (List.assoc lang !fallback))) &&
-          (aux (List.assoc lang !fallback) line (String.length (List.assoc lang !fallback) - 1 )) ->
-          let v =
-            if i + 1 = String.length line then ""
-            else String.sub line (i + 2) (String.length line - i - 2)
-          in
-          hold := v;
-          trad k
-      | Some _i when String.length line > 4
-             && String.unsafe_get line 0 = '-'
-             && String.unsafe_get line 1 = '>'
-             && String.unsafe_get line 2 = ':'
-             && String.unsafe_get line 3 = ' ' ->
-          (* defining alias names for existing entries in the lexicon *)
-          (*     alias_name *)
-          (* ->: real_entry *)
-          let k2 = String.sub line 4 (String.length line - 4) in
-          Hashtbl.replace tmp k k2;
-          trad k
-      | Some _i ->
-          trad k
-      | None -> (
-          if (not (Hashtbl.mem ht k)) && !hold <> "" then
-            Hashtbl.add ht k !hold;
-          key ())
+    | line -> (
+        match String.index_opt line ':' with
+        | Some i
+          when (i = lang_len && aux lang line (lang_len - 1))
+               || i = derived_lang_len
+                  && aux derived_lang line (derived_lang_len - 1) ->
+            let v =
+              if i + 1 = String.length line then ""
+              else String.sub line (i + 2) (String.length line - i - 2)
+            in
+            Hashtbl.replace ht k v;
+            trad k
+        | Some i
+          when List.mem_assoc lang !fallback
+               && i = String.length (List.assoc lang !fallback)
+               && aux
+                    (List.assoc lang !fallback)
+                    line
+                    (String.length (List.assoc lang !fallback) - 1) ->
+            let v =
+              if i + 1 = String.length line then ""
+              else String.sub line (i + 2) (String.length line - i - 2)
+            in
+            hold := v;
+            trad k
+        | Some _i
+          when String.length line > 4
+               && String.unsafe_get line 0 = '-'
+               && String.unsafe_get line 1 = '>'
+               && String.unsafe_get line 2 = ':'
+               && String.unsafe_get line 3 = ' ' ->
+            (* defining alias names for existing entries in the lexicon *)
+            (*     alias_name *)
+            (* ->: real_entry *)
+            let k2 = String.sub line 4 (String.length line - 4) in
+            Hashtbl.replace tmp k k2;
+            trad k
+        | Some _i -> trad k
+        | None ->
+            if (not (Hashtbl.mem ht k)) && !hold <> "" then
+              Hashtbl.add ht k !hold;
+            key ())
   in
-  key () ;
-  Hashtbl.iter (fun k k2 -> 
+  key ();
+  Hashtbl.iter
+    (fun k k2 ->
       match Hashtbl.find_opt ht k2 with
       | Some entry -> Hashtbl.replace ht k entry
-      | None -> 
-        Printf.eprintf "Warning: %s aliased to inexistant %s entry\n" k k2
-    ) tmp
-
+      | None ->
+          Printf.eprintf "Warning: %s aliased to inexistant %s entry\n" k k2)
+    tmp
 
 let array_to_list_map fn a = Array.fold_right (fun x acc -> fn x :: acc) a []
 let array_to_list_rev_map fn a = Array.fold_left (fun acc x -> fn x :: acc) [] a
@@ -1112,7 +1120,7 @@ let good_name s =
     if i = String.length s then true
     else
       match s.[i] with
-        'a'..'z' | 'A'..'Z' | '0'..'9' | '-' -> loop (i + 1)
+      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' -> loop (i + 1)
       | _ -> false
   in
   loop 0
