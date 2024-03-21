@@ -435,12 +435,12 @@ and mk_fevent conf base sp e =
   let ei =
     match sp with
     | Some sp -> Event.event_item_of_fevent ~sp e
-    | None -> Event.event_item_of_fevent e
+    | None -> Event.event_item_of_fevent ~sp:None e
   in
   mk_event conf base ei
 
 and mk_fevent' conf base e =
-  mk_event conf base (Event.event_item_of_gen_fevent e)
+  mk_event conf base (Event.event_item_of_gen_fevent ~sp:None e)
 
 and mk_pevent' conf base e =
   mk_event conf base (Event.event_item_of_gen_pevent e)

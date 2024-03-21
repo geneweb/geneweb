@@ -8,17 +8,6 @@ type 'a event_name =
 let pevent_name s = Pevent s
 let fevent_name s = Fevent s
 
-(*type 'a event_item = {
-  name :'a event_name;
-  date : cdate;
-  place : istr;
-  note : istr;
-  src : istr;
-  witnesses : (iper * witness_kind) array;
-  witness_notes : istr array option;
-  spouse : iper option
-  }*)
-
 type 'a event_item =
   | PE of Gwdb.pers_event * 'a event_name
   | FE of Gwdb.fam_event * 'a event_name * iper option
@@ -117,11 +106,11 @@ let has_witness_note ei =
 
 let event_item_of_pevent pe = PE (pe, pevent_name (Gwdb.get_pevent_name pe))
 
-let event_item_of_fevent ?sp fe =
+let event_item_of_fevent ~(sp : Gwdb.iper option) fe =
   FE (fe, fevent_name (Gwdb.get_fevent_name fe), sp)
 
 let event_item_of_gen_pevent evt = DPE (evt, pevent_name evt.epers_name)
-let event_item_of_gen_fevent ?sp evt = DFE (evt, fevent_name evt.efam_name, sp)
+let event_item_of_gen_fevent ~sp evt = DFE (evt, fevent_name evt.efam_name, sp)
 
 (*
    On ignore les événements personnalisés.
@@ -148,39 +137,103 @@ let compare_event_name name1 name2 =
   | _, Pevent Epers_Funeral -> -1
   | Pevent Epers_Death, _ -> 1
   | _, Pevent Epers_Death -> -1
-  | _ -> 0
-(*TODO Fevent??*)
+  | _, _ -> 0
 
-let compare get_name get_date e1 e2 =
-  match Date.cdate_to_dmy_opt (get_date e1) with
-  | None -> compare_event_name (get_name e1) (get_name e2)
-  | Some d1 -> (
-      match Date.cdate_to_dmy_opt (get_date e2) with
-      | None -> compare_event_name (get_name e1) (get_name e2)
-      | Some d2 -> (
-          match Date.compare_dmy_opt ~strict:false d1 d2 with
-          | Some 0 | None -> compare_event_name (get_name e1) (get_name e2)
-          | Some x -> x))
+let int_of_fevent_name = function
+  | Efam_NoMarriage -> 0
+  | Efam_PACS -> 1
+  | Efam_Engage -> 2
+  | Efam_MarriageBann -> 3
+  | Efam_MarriageContract -> 4
+  | Efam_MarriageLicense -> 5
+  | Efam_Marriage -> 6
+  | Efam_Residence -> 7
+  | Efam_Separated -> 8
+  | Efam_Annulation -> 9
+  | Efam_Divorce -> 10
+  | Efam_NoMention -> 11
+  | Efam_Name _ -> 12
 
+let compare_fevent_name name1 name2 =
+  let i1 = int_of_fevent_name name1 in
+  let i2 = int_of_fevent_name name2 in
+  i1 - i2
+
+let better_compare_event_name name1 name2 =
+  let c = compare_event_name name1 name2 in
+  if c <> 0 then c
+  else
+    match (name1, name2) with
+    (* put Fevent after Pevent *)
+    | Fevent _, Pevent _ -> 1
+    | Pevent _, Fevent _ -> -1
+    (* this is to make event order stable; depends on type definition order! *)
+    | Fevent e1, Fevent e2 -> compare_fevent_name e1 e2
+    | Pevent e1, Pevent e2 -> compare e1 e2
+
+(* try to handle the fact that events are not well ordered *)
 let sort_events get_name get_date events =
-  List.stable_sort (fun e1 e2 -> compare get_name get_date e1 e2) events
+  let dated, undated =
+    List.fold_left
+      (fun (dated, undated) e ->
+        match Date.cdate_to_dmy_opt (get_date e) with
+        | None -> (dated, e :: undated)
+        | Some _d -> (e :: dated, undated))
+      ([], []) events
+  in
+  (* we need this to keep the input with same date ordered
+     by their creation order *)
+  let dated, undated = (List.rev dated, List.rev undated) in
+
+  (* this do not define a preorder (no transitivity);
+     can not be used to sort a list
+     ex:
+      let a,b,c events with
+        a.date = Some 2022;
+        b.date = None;
+        c.date = Some 2000;
+      we can have a <= b and b <= c because of event name.
+      but we do not have a <= c
+  *)
+  let cmp e1 e2 =
+    let cmp_name e1 e2 =
+      better_compare_event_name (get_name e1) (get_name e2)
+    in
+    match Date.cdate_to_dmy_opt (get_date e1) with
+    | None -> cmp_name e1 e2
+    | Some d1 -> (
+        match Date.cdate_to_dmy_opt (get_date e2) with
+        | None -> cmp_name e1 e2
+        | Some d2 ->
+            let x = Date.compare_dmy d1 d2 in
+            if x = 0 then cmp_name e1 e2 else x)
+  in
+
+  (* sort events with dates separately to make sure
+     that dates are in correct order *)
+  let l1 = List.stable_sort cmp dated in
+  let l2 = List.stable_sort cmp undated in
+  List.merge cmp l1 l2
 
 let events conf base p =
   if not (Util.authorized_age conf base p) then []
   else
     let pevents = List.map event_item_of_pevent (get_pevents p) in
     let events =
+      (* append fevents *)
       Array.fold_right
         (fun ifam events ->
           let fam = foi base ifam in
           let isp = Gutil.spouse (get_iper p) fam in
+          (* filter family event with contemporary spouse *)
           let m_auth =
             Util.authorized_age conf base (Util.pget conf base isp)
           in
           if not m_auth then events
           else
             List.fold_right
-              (fun fe events -> event_item_of_fevent ~sp:isp fe :: events)
+              (fun fe events ->
+                event_item_of_fevent ~sp:(Some isp) fe :: events)
               (get_fevents fam) events)
         (get_family p) pevents
     in
