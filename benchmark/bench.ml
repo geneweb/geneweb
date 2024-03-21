@@ -1,5 +1,3 @@
-open Geneweb
-
 let style = ref Benchmark.Auto
 
 let test_fn =
@@ -54,13 +52,13 @@ let bench () =
         (Mutil.start_with_wildcard "foobarbaz" 0)
         [ "foo"; "bar"; ""; "foobarbaz" ];
       bench "Place.compare_places"
-        (Place.compare_places "[foo-bar] - baz, boobar")
+        (Geneweb.Place.compare_places "[foo-bar] - baz, boobar")
         [
           "[foo-bar] - baz, boobar";
           "[foo-bar] - baz, boobar, barboo";
           "baz, boobar";
         ];
-      bench "Util.name_with_roman_number" Util.name_with_roman_number
+      bench "Util.name_with_roman_number" Geneweb.Util.name_with_roman_number
         [
           "39 39";
           "39 x 39";
@@ -104,7 +102,7 @@ let bench () =
   in
   match Sys.getenv_opt "BENCH_BASE" with
   | Some bname when bname <> "" ->
-      let conf = Config.empty in
+      let conf = Geneweb.Config.empty in
       let bench_w_base ?t ?(load = []) name fn args =
         Secure.set_base_dir (Filename.dirname bname);
         let base = Gwdb.open_base bname in
@@ -114,34 +112,37 @@ let bench () =
         r
       in
       bench_w_base "UpdateData.get_all_data"
-        (fun base conf -> UpdateData.get_all_data conf base)
-        [ { conf with Config.env = [ ("data", Adef.encoded "place") ] } ]
+        (fun base conf -> Geneweb.UpdateData.get_all_data conf base)
+        [
+          { conf with Geneweb.Config.env = [ ("data", Adef.encoded "place") ] };
+        ]
       :: bench_w_base "UpdateData.build_list"
-           (fun base conf -> UpdateData.build_list conf base)
+           (fun base conf -> Geneweb.UpdateData.build_list conf base)
            [
              {
                conf with
-               Config.env = [ ("data", Adef.encoded "src") ];
+               Geneweb.Config.env = [ ("data", Adef.encoded "src") ];
                wizard = true;
              };
              {
                conf with
-               Config.env = [ ("data", Adef.encoded "place") ];
+               Geneweb.Config.env = [ ("data", Adef.encoded "place") ];
                wizard = true;
              };
            ]
       :: bench_w_base "UpdateData.build_list_short"
            (fun base conf ->
-             UpdateData.build_list_short conf @@ UpdateData.build_list conf base)
+             Geneweb.UpdateData.build_list_short conf
+             @@ Geneweb.UpdateData.build_list conf base)
            [
              {
                conf with
-               Config.env = [ ("data", Adef.encoded "src") ];
+               Geneweb.Config.env = [ ("data", Adef.encoded "src") ];
                wizard = true;
              };
              {
                conf with
-               Config.env = [ ("data", Adef.encoded "place") ];
+               Geneweb.Config.env = [ ("data", Adef.encoded "place") ];
                wizard = true;
              };
            ]
@@ -152,7 +153,7 @@ let bench () =
              Gwdb.Collection.iter
                (Sys.opaque_identity (fun p ->
                     Sys.opaque_identity ignore
-                    @@ Util.authorized_age conf base p))
+                    @@ Geneweb.Util.authorized_age conf base p))
                (Gwdb.persons base))
            [
              { conf with wizard = true };
@@ -160,7 +161,7 @@ let bench () =
            ]
       :: bench_w_base "Check.check_base" ~t:10
            (fun base _conf ->
-             Check.check_base base
+             Geneweb.Check.check_base base
                (Sys.opaque_identity ignore)
                (Sys.opaque_identity ignore)
                (Sys.opaque_identity ignore))
@@ -169,13 +170,15 @@ let bench () =
            (fun base _conf ->
              Gwdb.Collection.fold
                (fun acc p ->
-                 Perso.first_possible_duplication base (Gwdb.get_iper p) ([], [])
+                 Geneweb.Perso.first_possible_duplication base (Gwdb.get_iper p)
+                   ([], [])
                  :: acc)
                [] (Gwdb.persons base))
            [ conf ]
       :: bench_w_base "BirthDeath.select_person" ~t:10
            (fun base get ->
-             (Sys.opaque_identity BirthDeath.select_person) conf base get true
+             (Sys.opaque_identity Geneweb.BirthDeath.select_person)
+               conf base get true
              |> Sys.opaque_identity ignore)
            [ (fun p -> Date.od_of_cdate (Gwdb.get_birth p)) ]
       :: suite

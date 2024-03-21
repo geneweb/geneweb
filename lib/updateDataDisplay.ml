@@ -1,21 +1,15 @@
-open Config
-open Gwdb
-open TemplAst
-open Util
-open UpdateData
-
 let translate_title conf len =
   let plural = if len > 1 then 1 else 0 in
   let title =
-    match p_getenv conf.env "data" with
-    | Some "occu" -> transl_nth conf "occupation/occupations" plural
-    | Some "place" -> transl_nth conf "place/places" plural
-    | Some "src" -> transl_nth conf "source/sources" plural
-    | Some "fn" -> transl_nth conf "first name/first names" plural
-    | Some "sn" -> transl_nth conf "surname/surnames" plural
+    match Util.p_getenv conf.Config.env "data" with
+    | Some "occu" -> Util.transl_nth conf "occupation/occupations" plural
+    | Some "place" -> Util.transl_nth conf "place/places" plural
+    | Some "src" -> Util.transl_nth conf "source/sources" plural
+    | Some "fn" -> Util.transl_nth conf "first name/first names" plural
+    | Some "sn" -> Util.transl_nth conf "surname/surnames" plural
     | _ -> ""
   in
-  (Printf.sprintf (ftransl conf "book of %s") title, title)
+  (Printf.sprintf (Util.ftransl conf "book of %s") title, title)
 
 (* ******************************************************************** *)
 (*  [Fonc] print_mod_ok : config -> base -> unit                        *)
@@ -31,7 +25,7 @@ let translate_title conf len =
     - unit
       [Rem] : Non exporté en clair hors de ce module.                     *)
 let print_mod_ok conf base =
-  let sn = p_getenv conf.env "data" = Some "sn" in
+  let sn = Util.p_getenv conf.Config.env "data" = Some "sn" in
   let ini_of_update_data ini new_input =
     (* Utf8. returns the number of "real" characters *)
     let len = Utf8.length ini in
@@ -48,15 +42,16 @@ let print_mod_ok conf base =
     in
     String.sub new_input 0 j
   in
-  let data = Option.value ~default:"" (p_getenv conf.env "data") in
-  let ini = Option.value ~default:"" (p_getenv conf.env "s") in
+  let data = Option.value ~default:"" (Util.p_getenv conf.Config.env "data") in
+  let ini = Option.value ~default:"" (Util.p_getenv conf.env "s") in
   let new_input =
-    Option.fold ~none:"" ~some:only_printable (p_getenv conf.env "nx_input")
+    Option.fold ~none:"" ~some:Util.only_printable
+      (Util.p_getenv conf.env "nx_input")
   in
   let new_istr_s = Gwdb.string_of_istr (Gwdb.insert_string base new_input) in
   let new_ini = ini_of_update_data ini new_input in
-  let list = get_person_from_data conf base in
-  let list = List.map (fun (istr, perl) -> (sou base istr, perl)) list in
+  let list = UpdateData.get_person_from_data conf base in
+  let list = List.map (fun (istr, perl) -> (Gwdb.sou base istr, perl)) list in
   let nb_pers =
     List.fold_left (fun accu (_, perl) -> accu + List.length perl) 0 list
   in
@@ -73,32 +68,32 @@ let print_mod_ok conf base =
   in
   if nb_pers <> 0 && data_modified then (
     let nb_pers_reel =
-      update_person_list conf base new_input list nb_pers max_updates
+      UpdateData.update_person_list conf base new_input list nb_pers max_updates
     in
     let title _ =
-      transl conf "modification successful"
+      Util.transl conf "modification successful"
       |> Utf8.capitalize_fst |> Output.print_sstring conf
     in
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf true;
     Output.print_sstring conf "<p>";
-    transl conf "modification successful"
+    Util.transl conf "modification successful"
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
-    Output.print_sstring conf (transl conf ":");
+    Output.print_sstring conf (Util.transl conf ":");
     Output.print_sstring conf " ";
     Output.print_sstring conf (min nb_pers_reel max_updates |> string_of_int);
     Output.print_sstring conf " ";
     if List.assoc_opt "history" conf.base_env = Some "yes" then (
       Output.print_sstring conf "<a href=\"";
-      Output.print_string conf (commd conf);
+      Output.print_string conf (Util.commd conf);
       Output.print_sstring conf "m=HIST&k=20\">";
       Output.print_sstring conf
-        (transl_nth conf "modification/modifications"
+        (Util.transl_nth conf "modification/modifications"
            (if nb_pers_reel > 1 then 1 else 0));
       Output.print_sstring conf ".</a>")
     else (
       Output.print_sstring conf
-        (transl_nth conf "modification/modifications"
+        (Util.transl_nth conf "modification/modifications"
            (if nb_pers_reel > 1 then 1 else 0));
       Output.print_sstring conf ".");
     Output.print_sstring conf "</p>";
@@ -111,17 +106,18 @@ let print_mod_ok conf base =
       Util.hidden_input conf "s" (Mutil.encode ini);
       Output.print_sstring conf
         {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="|};
-      Output.print_string conf (Util.escape_html (only_printable new_input));
+      Output.print_string conf
+        (Util.escape_html (Util.only_printable new_input));
       Output.print_sstring conf {|" id="data">|};
       Output.print_sstring conf
-        (Utf8.capitalize_fst (transl conf "continue correcting"));
+        (Utf8.capitalize_fst (Util.transl conf "continue correcting"));
       Output.print_sstring conf
         {|<button type="submit" class="btn btn-primary btn-lg">|};
       Output.print_sstring conf
-        (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
+        (Utf8.capitalize_fst (Util.transl_nth conf "validate/delete" 0));
       Output.print_sstring conf "</button></p></form>");
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     Output.print_sstring conf {|m=MOD_DATA&data=|};
     Output.print_string conf (Mutil.encode data);
     Output.print_sstring conf {|&s=|};
@@ -129,29 +125,29 @@ let print_mod_ok conf base =
     Output.print_sstring conf ("#k" ^ new_istr_s);
     Output.print_sstring conf {|" id="reference">|};
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl conf "new modification"));
+      (Utf8.capitalize_fst (Util.transl conf "new modification"));
     Output.print_sstring conf " ";
-    Output.print_sstring conf (transl conf "at new location");
+    Output.print_sstring conf (Util.transl conf "at new location");
     Output.print_sstring conf {|</a>|};
     if not (Mutil.start_with ini 0 new_ini) then (
       Output.print_sstring conf {| / <a href="|};
-      Output.print_string conf (commd conf);
+      Output.print_string conf (Util.commd conf);
       Output.print_sstring conf {|m=MOD_DATA&data=|};
       Output.print_string conf (Mutil.encode data);
       Output.print_sstring conf {|&s=|};
       Output.print_string conf (Mutil.encode ini);
       Output.print_sstring conf {|">|};
-      Output.print_sstring conf (transl conf "at old location");
+      Output.print_sstring conf (Util.transl conf "at old location");
       Output.print_sstring conf {|</a>|});
     Output.print_sstring conf ".";
     Hutil.trailer conf)
   else (
     Hutil.header conf (fun _ ->
-        transl conf "no modification"
+        Util.transl conf "no modification"
         |> Utf8.capitalize_fst |> Output.print_sstring conf);
     Hutil.print_link_to_welcome conf true;
     Output.print_sstring conf {|<p><a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     Output.print_sstring conf {|m=MOD_DATA&data=|};
     Output.print_string conf (Mutil.encode data);
     Output.print_sstring conf {|&s=|};
@@ -159,7 +155,7 @@ let print_mod_ok conf base =
     Output.print_sstring conf ("#k" ^ new_istr_s);
     Output.print_sstring conf {|" id="reference">|};
     Output.print_sstring conf
-      (Utf8.capitalize_fst (transl conf "new modification"));
+      (Utf8.capitalize_fst (Util.transl conf "new modification"));
     Output.print_sstring conf {|</a></p>|};
     Hutil.trailer conf)
 
@@ -167,8 +163,8 @@ type 'a env =
   | Vbool of bool
   | Vcnt of int ref
   | Vint of int
-  | Vlist_data of (istr * string) list
-  | Vlist_value of (istr * string) list
+  | Vlist_data of (Gwdb.istr * string) list
+  | Vlist_value of (Gwdb.istr * string) list
   | Vnone
   | Vother of 'a
   | Vstring of string
@@ -193,8 +189,8 @@ let unfold_place_long inverted s =
 let get_env v env = try List.assoc v env with Not_found -> Vnone
 let get_vother = function Vother x -> Some x | _ -> None
 let set_vother x = Vother x
-let bool_val x = VVbool x
-let str_val x = VVstring x
+let bool_val x = TemplAst.VVbool x
+let str_val x = TemplAst.VVstring x
 
 let rec eval_var conf base env xx _loc sl =
   try eval_simple_var conf base env xx sl
@@ -203,7 +199,9 @@ let rec eval_var conf base env xx _loc sl =
 and eval_simple_var conf base env xx = function
   | [ "p_list" ] ->
       let data =
-        match p_getenv conf.env "data" with Some data -> data | _ -> ""
+        match Util.p_getenv conf.Config.env "data" with
+        | Some data -> data
+        | _ -> ""
       in
       let istr =
         match get_env "key" env with Vstring istr -> istr | _ -> "0"
@@ -217,20 +215,20 @@ and eval_simple_var conf base env xx = function
             :: conf.env;
         }
       in
-      let istr, p_list = List.hd (get_person_from_data conf base) in
+      let istr, p_list = List.hd (UpdateData.get_person_from_data conf base) in
       (* same code as in place.ml *)
       let head =
         Printf.sprintf "<a href=\"%sm=L%s&k=%s&nb=%d"
-          (commd conf :> string)
+          (Util.commd conf :> string)
           "&bi=on&ba=on&ma=on&de=on&bu=on&parents=0"
-          (Mutil.encode (sou base istr) :> string)
+          (Mutil.encode (Gwdb.sou base istr) :> string)
           (List.length p_list)
       in
       let body =
         let rec loop i acc = function
           | [] -> acc
           | p :: pl ->
-              let ip = get_iper p in
+              let ip = Gwdb.get_iper p in
               loop (i + 1)
                 (acc ^ Printf.sprintf "&i%d=%s" i (Gwdb.string_of_iper ip))
                 pl
@@ -240,7 +238,7 @@ and eval_simple_var conf base env xx = function
       let tail =
         Printf.sprintf
           "\" title=\"%s\">%d<i class=\"fa fa-user fa-xs ml-1\"></i></a>"
-          (Utf8.capitalize (transl conf "list of linked persons"))
+          (Utf8.capitalize (Util.transl conf "list of linked persons"))
           (List.length p_list)
       in
       head ^ body ^ tail |> str_val
@@ -265,7 +263,7 @@ and eval_simple_str_var conf _base env _xx = function
   | "entry_value" -> eval_string_env "entry_value" env
   | "entry_value_rev" -> eval_string_env "entry_value_rev" env
   | "entry_value_unsort" ->
-      let sn = p_getenv conf.env "data" = Some "sn" in
+      let sn = Util.p_getenv conf.env "data" = Some "sn" in
       let s = eval_string_env "entry_value" env in
       if sn && s.[String.length s - 1] = ')' then
         match String.rindex_opt s '(' with
@@ -301,7 +299,7 @@ and eval_simple_str_var conf _base env _xx = function
       | Vlist_data l -> string_of_int (List.length l)
       | _ -> "0")
   | "other" -> (
-      match p_getenv conf.env "data" with
+      match Util.p_getenv conf.env "data" with
       | Some "place" -> Place.without_suburb (eval_string_env "entry_value" env)
       | _ -> "")
   | "reset_count" -> (
@@ -311,7 +309,7 @@ and eval_simple_str_var conf _base env _xx = function
           ""
       | _ -> "")
   | "suburb" -> (
-      match p_getenv conf.env "data" with
+      match Util.p_getenv conf.env "data" with
       | Some "place" -> Place.only_suburb (eval_string_env "entry_value" env)
       | _ -> "")
   | "substr" -> eval_string_env "substr" env
@@ -328,17 +326,17 @@ and eval_simple_str_var conf _base env _xx = function
       in
       let len2 =
         Sosa.to_string_sep
-          (transl conf "(thousand separator)")
+          (Util.transl conf "(thousand separator)")
           (Sosa.of_int len)
       in
       let _, title = translate_title conf len in
       let result =
-        match p_getenv conf.env "s" with
+        match Util.p_getenv conf.env "s" with
         | Some ini ->
             if ini = "" then Printf.sprintf "%s %s" len2 title
             else
               Printf.sprintf
-                (ftransl conf "%s %s starting with %s")
+                (Util.ftransl conf "%s %s starting with %s")
                 len2 title ini
         | None -> Printf.sprintf "%s %s" len2 title
       in
@@ -349,17 +347,17 @@ and eval_compound_var conf base env xx sl =
   let rec loop = function
     | [ s ] -> eval_simple_str_var conf base env xx s
     | [ "evar"; "length"; s ] | [ "e"; "length"; s ] -> (
-        match p_getenv conf.env s with
+        match Util.p_getenv conf.env s with
         | Some s -> string_of_int (String.length s)
         | None -> "")
     | [ "evar"; "p"; s ] | [ "e"; "p"; s ] -> (
-        match p_getenv conf.env s with
+        match Util.p_getenv conf.env s with
         | Some s ->
             if String.length s > 1 then String.sub s 0 (String.length s - 1)
             else ""
         | None -> "")
     | [ "evar"; s ] | [ "e"; s ] ->
-        Option.value ~default:"" (p_getenv conf.env s)
+        Option.value ~default:"" (Util.p_getenv conf.env s)
     | "encode" :: sl -> (Mutil.encode (loop sl) :> string) (* FIXME? *)
     | ("escape" | "html_encode") :: sl ->
         (Util.escape_html (loop sl) :> string) (* FIXME? *)
@@ -372,7 +370,7 @@ and eval_compound_var conf base env xx sl =
               !GWPARAM.syslog `LOG_WARNING "String shorter that requested\n";
               s)
         | None -> raise Not_found)
-    | "printable" :: sl -> only_printable (loop sl)
+    | "printable" :: sl -> Util.only_printable (loop sl)
     | _ -> raise Not_found
   in
   str_val (loop sl)
@@ -393,11 +391,11 @@ let print_foreach conf print_ast _eval_expr =
     | _ -> raise Not_found
   and print_foreach_entry env xx _el al =
     let list = match get_env "list" env with Vlist_data l -> l | _ -> [] in
-    let list = build_list_long conf list in
+    let list = UpdateData.build_list_long conf list in
     let max = List.length list in
-    let k = Option.value ~default:"" (p_getenv conf.env "key") in
+    let k = Option.value ~default:"" (Util.p_getenv conf.env "key") in
     List.iteri
-      (fun i (ini_k, (list_v : (istr * string) list)) ->
+      (fun i (ini_k, (list_v : (Gwdb.istr * string) list)) ->
         let env =
           ("cnt", Vint i) :: ("max", Vint max) :: ("key", Vstring k)
           :: ("entry_ini", Vstring ini_k)
@@ -407,7 +405,9 @@ let print_foreach conf print_ast _eval_expr =
         List.iter (print_ast env xx) al)
       list
   and print_foreach_substr env xx _el al evar =
-    let evar = match p_getenv conf.env evar with Some s -> s | None -> "" in
+    let evar =
+      match Util.p_getenv conf.env evar with Some s -> s | None -> ""
+    in
     let list_of_char = string_to_list evar in
     let list_of_sub =
       let rec loop acc = function
@@ -456,7 +456,7 @@ let print_foreach conf print_ast _eval_expr =
           let env =
             ("cnt", Vint i) :: ("max", Vint max) :: ("entry_value", Vstring s)
             :: ("entry_value_rev", Vstring (unfold_place_long false s))
-            :: ("entry_key", Vstring (string_of_istr k))
+            :: ("entry_key", Vstring (Gwdb.string_of_istr k))
             :: ("first", Vbool (Place.without_suburb s <> prev))
             :: env
           in
@@ -466,7 +466,7 @@ let print_foreach conf print_ast _eval_expr =
     loop 0 l ""
   and print_foreach_initial env xx al =
     let l = match get_env "list" env with Vlist_data l -> l | _ -> [] in
-    let ini_l = build_list_short conf l in
+    let ini_l = UpdateData.build_list_short conf l in
     List.iter
       (fun ini ->
         let env = ("ini", Vstring ini) :: env in
@@ -476,7 +476,7 @@ let print_foreach conf print_ast _eval_expr =
   print_foreach
 
 let print_mod conf base =
-  let list = build_list conf base in
+  let list = UpdateData.build_list conf base in
   let env = [ ("list", Vlist_data list); ("count", Vcnt (ref 0)) ] in
   Hutil.interp conf "upddata"
     {
