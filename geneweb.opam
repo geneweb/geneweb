@@ -28,6 +28,8 @@ depends: [
   "num"
   "ocaml" {>= "4.08"}
   "odoc"
+  "ocaml-option-nnp"
+  "ocamlformat" {dev & = "0.24.1"}
   "ounit"
   "ppx_blob"
   "ppx_deriving"
