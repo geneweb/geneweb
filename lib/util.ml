@@ -898,6 +898,9 @@ let mod_ind_link conf p (s : Adef.safe_string) =
     Format.sprintf {|<a href="%s%s">%s</a>|} (commd conf :> string) href txt
     |> Adef.safe
 
+let pnoc base p =
+  (sou base (get_first_name p), sou base (get_surname p), get_occ p)
+
 let reference_flags with_id conf base p (s : Adef.safe_string) =
   let cgl =
     match p_getenv conf.env "cgl" with Some "on" -> true | _ -> false

@@ -7603,6 +7603,50 @@ sl: konec
 sv: slutar
 tr: son
 
+    notes to be updated
+en: notes or pages to be updated
+fr: notes ou pages qui doivent être mises à jour
+
+    wizard page of
+en: wizard page of
+fr: page magicien de
+
+    base note
+en: base note
+fr: note de la base
+
+    notes modified
+af: aantekeninge gewysig
+bg: бележките са променени
+br: notennoù kemmet
+ca: notes modificades
+co: note mudificate
+cs: poznámky změněny
+da: noter ændret
+de: geänderte Notizen
+en: notes modified
+eo: notoj modifitaj
+es: notas modificadas
+et: märkused muudetud
+fi: muistiinpanoja muokattu
+fr: notes modifiées
+he: רשימות עודכנו
+is: athugasemd gerð
+it: note modificate
+lt: tvarkyti užrašai
+lv: pārveidotas piezīmes
+nl: notities veranderd
+no: notater er endret
+oc: nòtas modificadas
+pl: uwagi zmodyfikowane
+pt: notas modificadas
+ro: nota modificata
+ru: заметки изменены
+sk: poznámky zmenené
+sl: zaznamek spremenjen
+sv: noteringar modifierade
+tr: notlar değiştirildi
+
     engage event
 co: spusaticciu
 de: Verlobung

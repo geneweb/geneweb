@@ -942,6 +942,30 @@ let effective_del conf base p =
 let print_title conf fmt _ =
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf fmt))
 
+let print_mod_aux conf base ofn osn oocc nfn nsn nocc pgl =
+  Output.print_sstring conf
+    {|<div class="alert alert-danger mx-auto mt-1" role="alert">|};
+  Output.print_sstring conf (transl conf "name changed. update linked pages");
+  Output.print_sstring conf "</div>\n";
+  let soocc = if oocc <> 0 then Printf.sprintf "/%d" oocc else "" in
+  let snocc = if nocc <> 0 then Printf.sprintf "/%d" nocc else "" in
+  Output.printf conf
+    "<span class=\"unselectable float-left\">%s%s</span>\n\
+     <span class=\"float-left ml-1\">%s/%s%s</span>\n\
+     <br>"
+    (Utf8.capitalize_fst (transl conf "old name"))
+    (transl conf ":") ofn osn soocc;
+  Output.printf conf
+    "<span class=\"unselectable float-left\">%s%s</span>\n\
+     <span class=\"float-left ml-1\">%s/%s%s</span>\n\
+     <br>"
+    (Utf8.capitalize_fst (transl conf "new name"))
+    (transl conf ":") nfn nsn snocc;
+  Output.printf conf "<span>%s%s</span>"
+    (Utf8.capitalize_fst (transl conf "linked pages"))
+    (transl conf ":");
+  NotesDisplay.print_linked_list conf base pgl
+
 let print_mod_ok conf base wl pgl p ofn osn oocc =
   Hutil.header conf @@ print_title conf "person modified";
   Hutil.print_link_to_welcome conf true;
@@ -984,29 +1008,8 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
   let nfn = p_first_name base np in
   let nsn = p_surname base np in
   let nocc = get_occ np in
-  if pgl <> [] && (ofn <> nfn || osn <> nsn || oocc <> nocc) then (
-    Output.print_sstring conf
-      {|<div class="alert alert-danger mx-auto mt-1" role="alert">|};
-    Output.print_sstring conf (transl conf "name changed. update linked pages");
-    Output.print_sstring conf "</div>\n";
-    let soocc = if oocc <> 0 then Printf.sprintf "/%d" oocc else "" in
-    let snocc = if nocc <> 0 then Printf.sprintf "/%d" nocc else "" in
-    Output.printf conf
-      "<span class=\"unselectable float-left\">%s%s</span>\n\
-       <span class=\"float-left ml-1\">%s/%s%s</span>\n\
-       <br>"
-      (Utf8.capitalize_fst (transl conf "old name"))
-      (transl conf ":") ofn osn soocc;
-    Output.printf conf
-      "<span class=\"unselectable float-left\">%s%s</span>\n\
-       <span class=\"float-left ml-1\">%s/%s%s</span>\n\
-       <br>"
-      (Utf8.capitalize_fst (transl conf "new name"))
-      (transl conf ":") nfn nsn snocc;
-    Output.printf conf "<span>%s%s</span>"
-      (Utf8.capitalize_fst (transl conf "linked pages"))
-      (transl conf ":");
-    NotesDisplay.print_linked_list conf base pgl);
+  if pgl <> [] && (ofn <> nfn || osn <> nsn || oocc <> nocc) then
+    print_mod_aux conf base ofn osn oocc nfn nsn nocc pgl;
   Hutil.trailer conf
 
 let relation_sex_is_coherent base warning p =

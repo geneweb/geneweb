@@ -299,6 +299,18 @@ lv: :
 nl: :
 sv: :
 
+    notes to be updated
+en: notes or pages to be updated
+fr: notes ou pages qui doivent être mises à jour
+
+    wizard page of
+en: wizard page of
+fr: page magicien de
+
+    notes of
+en: notes of
+fr: notes de
+
     <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
 aa: bsi_connex.htm
 co: <span style="color:#FF0000;">AVERTIMENTU</span> : a cumanda -del squasseghja certe famiglie di manera irriversibile. Forse seria una bella idea d’avè un archiviu di salvaguardia.
@@ -1401,6 +1413,22 @@ co: Currege una basa è calculeghja torna l’indici
 de: Löse Probleme in einer base
 en: Fixes problems in a base
 fr: Corrige les problèmes d'une base
+
+    Fixes utf8 problems in a base
+en: Fixes utf8 problems in a base (apostrophs, accented characters)
+fr: Corrige les problèmes Utf8 d'une base (apostrophes, caractères accentués)
+
+    checks for possible utf8 related conflicts
+en: Corrects  possible utf8 related conflicts (apostrophs)
+fr: Corrige les conlits Utf8 (apostrophes)
+
+    checks for duplicate keys
+en: Checks for duplicate keys
+fr: Teste les clé dupliquées
+
+    checks for invalid utf8 characters
+en: Checks for invalid utf8 characters
+fr: Recherche les caractères Utf8 invalides
 
     Follow the indications of the GEDCOM header.
 aa: ged2gwb.htm
