@@ -275,7 +275,6 @@ let print_main conf base auth_file =
   let wddir = dir conf base in
   Hutil.header_no_page_title conf title;
   (* mouais... *)
-  Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<h1>";
   title false;
   Output.print_sstring conf "</h1>";
@@ -303,7 +302,7 @@ let print_main conf base auth_file =
     Output.print_string conf (commd conf);
     Output.print_sstring conf {|m=WIZNOTES&o=H">|};
     Output.print_sstring conf (transl conf "here");
-    Output.print_sstring conf "</a>";
+    Output.print_sstring conf "</a> ";
     Output.print_sstring conf
       (transl conf "for the list ordered by the date of the last modification");
     Output.print_sstring conf ".</em></p>";
