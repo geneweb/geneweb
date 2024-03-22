@@ -199,6 +199,7 @@ let main () =
         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
         if Db1link.link next_family_fun bdir then ()
         else (
+          flush stderr;
           Printf.eprintf "*** database not created\n";
           flush stderr;
           exit 2)))
