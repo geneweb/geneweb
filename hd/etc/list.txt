@@ -56,7 +56,7 @@
     </a>
   %if;(e.nb!=1)
     <a role="button" href="%if;(e.datesort!=1)%url_set.datesort.1;%else;%url_set.datesort;%end;" class="btn-link ml-3">
-      <i class="fa fa-arrow-down-%if;(e.datesort=1)1-9%else;a-z%end; fa-fw fa-lg mr-1"></i>%nn;
+      <i class="fa fa-arrow-down-%if;(e.datesort=1)a-z%else;1-9%end; fa-fw fa-lg mr-1"></i>%nn;
       [*sort by/branch/alphabetic order]0
       %if;(e.datesort=1)[sort by/date begin/alphabetic order/nb individuals/nb events]2%nn;
       %else;[date/dates]1%end;%nn;

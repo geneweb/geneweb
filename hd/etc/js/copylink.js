@@ -26,11 +26,11 @@ function copyToClipboard(text) {
     var permacopybtn = document.querySelector(".permalink-copy");
     var permafcopybtn = document.querySelector(".permalink-friend-copy");
     var permawcopybtn = document.querySelector(".permalink-wizard-copy");
-    var permadata = permacopybtn.dataset.wikilink;
-    var cururl = window.location;
-    var permaurl = cururl.origin + "/" + permadata;
-    var permaurlf = permaurl + "&w=f";
-    var permaurlw = permaurl + "&w=w";
+    var search = permacopybtn.dataset.wikilink;
+    var cururl = window.location.origin + window.location.pathname
+    var permaurl = cururl + "?" + search;
+    var permaurlf = cururl + "_f?" + search;
+    var permaurlw = cururl + "_w?" + search;
 
     simplecopybtn.addEventListener("click", function(event) {
     var result = copyToClipboard(simpledata);

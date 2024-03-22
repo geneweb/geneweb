@@ -503,10 +503,10 @@ const a_r = [   50,   50,   50,   50,   80,   70,  100,  150,  130,   90 ];
 const a_m = [ "S1", "C3", "C3", "C3", "R3", "R3", "R2", "R1", "R1", "R1" ];
 
 var ak = Object.keys(ancestor)
-max_gen = 1+Math.trunc(Math.log(Number(ak[ak.length-1].replace( /^S/, "")))/Math.log(2));
+max_gen = Math.trunc(Math.log(Number(ak[ak.length-1].replace( /^S/, "")))/Math.log(2));
 
 var max_r = 0 ;
-for( var i = 0 ; i < max_gen && i < a_r.length ; i++ ) {
+for( var i = 0 ; i < max_gen+1 && i < a_r.length ; i++ ) {
 	max_r += a_r[i];
 }
 
@@ -938,6 +938,9 @@ document.getElementById("b-death-age").onclick = function() {
 document.getElementById("b-no-tool").onclick = function() {
 	document.body.className = "";
 	tool = "";
+};
+document.getElementById("b-no-buttons").onclick = function() {
+	document.getElementById("buttons").style.display = "none";
 };
 
 // Initial state for tools

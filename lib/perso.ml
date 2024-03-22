@@ -3512,7 +3512,6 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match Image.get_portrait_path conf base p with
       | Some (`Path s) -> str_val s
       | None -> null_val)
-  | "bname_prefix" -> Util.commd conf |> safe_val
   | "birth_place" ->
       if p_auth then
         get_birth_place p |> sou base |> Util.string_of_place conf |> safe_val

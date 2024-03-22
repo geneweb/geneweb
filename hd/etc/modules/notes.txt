@@ -22,7 +22,7 @@
 
 %define;link_pages()
   %if;(not cancel_links and has_linked_pages)
-    <div id ="link_pages" class="ml-auto d-flex align-items-center">
+    <div id ="link_pages" class="ml-auto d-flex align-items-center user-select-none">
       (<a href="%prefix;m=LINKED;%access;">[linked pages]</a>)
     </div>
   %end;

@@ -33,7 +33,7 @@
     %if;(e.data!="xx")
       <a href="%prefix;m=MOD_DATA&data=xx" class="sub-char" title="[*book of %s:::yy]">
     %end;
-    <i class="fa%if;("xx"="src" or "xx"="fn")r%end; fa-zz fa-2x fa-fw text-%if;(e.data="xx")success%else;primary%end;"></i>
+    <i class="fa fa-zz fa-2x fa-fw text-%if;(e.data="xx")success%else;primary%end;"></i>
     %if;(e.data="")[*book of %s:::yy]%end;
     %if;(e.data!="xx")</a>%end;
   </div>
@@ -43,11 +43,11 @@
   %if;(e.data="")<div class="h3">[*book/books]1</div>%end;
   <div>
     %if;(wizard)
-      %apply;list_of("fn",[first name/first names]1,"id-badge")
+      %apply;list_of("fn",[first name/first names]1,"child")
       %apply;list_of("sn",[surname/surnames]1,"signature")
       %apply;list_of("place",[place/places]1,"map-location-dot")
       %apply;list_of("occu",[occupation/occupations]1,"user-doctor")
-      %apply;list_of("src",[source/sources]1,"file-lines")
+      %apply;list_of("src",[source/sources]1,"box-archive")
     %end;
   </div>
 %end;

@@ -323,7 +323,7 @@ let print_sosa conf base p link =
                    (Util.transl conf "(thousand separator)")
                    sosa_num)
         in
-        Output.print_sstring conf {|<img src="|};
+        Output.print_sstring conf {|<img class="mb-1" src="|};
         Output.print_sstring conf (Util.images_prefix conf);
         Output.print_sstring conf {|/sosa.png" alt="sosa" title="|};
         Output.print_string conf (title |> Adef.safe);

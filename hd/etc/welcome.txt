@@ -246,7 +246,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         %end;
         %if;(b.hide_advanced_request="no")
           <a role="button" class="btn btn-outline-primary mr-1" 
-            href="%prefix;m=H&v=advanced">
+            href="%prefix;m=AS">
             <i class="fa fa-magnifying-glass-plus fa-fw mr-1" aria-hidden="true"></i>[*advanced request]0</a>
         %end;
         <a role="button" class="btn btn-outline-primary mr-1" 
@@ -284,7 +284,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           <a role="button" class="btn btn-outline-success" 
             href="%prefix;m=MOD_DATA&data=src"
             title="[*modify] %apply;book_of%with;[source/sources]1%end;%sp;
-              ([wizard/wizards/friend/friends/exterior]0)"><i class="fa fa-archive fa-fw mr-1"></i>[*source/sources]1</a>
+              ([wizard/wizards/friend/friends/exterior]0)"><i class="fa fa-box-archive fa-fw mr-1"></i>[*source/sources]1</a>
         </div>
       </div>
     %end;

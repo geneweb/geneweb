@@ -22,7 +22,7 @@ html {
 }
 
 /* Upd_ind/fam forms scroll fix */
-#updform html {
+#updform {
   scroll-padding-top: 52px;
 }
 
