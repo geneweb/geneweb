@@ -51,6 +51,7 @@
             <select class="form-control" name="death">
               <option value="Dead">[*died]2</option>
               <option value="NotDead">[*alive]2</option>
+              <option value="DontKnowIfDead">[*maybe alive]</option>
               <option value="" selected="selected">-</option>
             </select>
         %end;
@@ -97,6 +98,19 @@
 <form class="mx-2 mt-3" method="POST" action="%action;">
   %hidden;
   <input type="hidden" name="m" value="AS_OK">
+  <div class="row">
+    <div class="col-6">
+          <span class="form-control-label mr-2">[*search type][:]</span>
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" name="search_type" id="stAND" value="AND" checked>
+            <label class="form-check-label" for="stAND" title="AND">AND</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" name="search_type" id="stOR" value="OR">
+            <label class="form-check-label" for="stOR" title="OR">OR</label>
+          </div>
+    </div>
+  </div>
   <div class="row">
     <div class="col-6">
       <div class="row">
@@ -159,7 +173,7 @@
   <div class="row justify-content-center">
     <div class="form-inline">
       <label for="max" class="mr-2">[*maximum]</label>
-      <input type="number" class="form-control" name="max" id="max" min="0" max="5000" value="150" step="50">
+      <input type="number" class="form-control" name="max" id="max" min="0" max="50000" value="150" step="50">
       <span class="ml-2">[person/persons]1</span>
     </div>
   </div>

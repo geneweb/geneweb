@@ -2190,6 +2190,46 @@ sl: alias
 sv: alias
 tr: takma ad
 
+
+    search type
+en: search type
+fr: mode de recherche
+
+    maybe alive
+af: dalkaan lewendig
+ar: ربما حي
+bg: може би жив
+br: gwerzhet marteze
+ca: potser viu
+co: forse vivu
+cs: možná živý/á
+da: måske i live
+de: vielleicht lebendig
+en: maybe alive
+eo: eble viva
+es: tal vez vivo
+et: võib-olla elus
+fi: ehkä elossa
+fr: peut-être vivant(e)
+he: אולי חי
+is: kannski lifandi
+it: forse vivo/a
+lt: galbūt gyvas
+lv: iespējams dzīvs
+nl: misschien levend
+no: kanskje levende
+oc: pòt èsser viu
+pl: być może żyje
+pt: talvez vivo
+pt-br: talvez vivo
+ro: poate că în viață
+ru: возможно живой
+sk: možno živý/á
+sl: morda živ
+sv: kanske levande
+tr: belki yaşıyor
+zh: 可能活着
+
     alive
 af: in die lewe
 bg: жив/жива/жив(а)
@@ -15039,7 +15079,7 @@ de: suche alle
 en: search all
 es: buscar todos los
 fi: hae kaikki
-fr: recherche tout
+fr: recherche tous les individus
 it: ricercare tutti i
 nl: zoek alle
 no: søk

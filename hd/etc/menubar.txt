@@ -161,7 +161,7 @@
               %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)
                   <a class="dropdown-item"
                     href="%if;(b.access_by_key="yes")%apply;url_set%with;pz/nz/ocz%and;%first_name_key;/%surname_key;/%if;(occ!=0)%occ;%end;%end;
-                          %else;%url_set.iz.index;%end;"
+                          %else;%apply;url_set("iz",index)%end;"
                     title="%apply;nav_with_sosa_ref(self)" %laS;>%nn;
                     <i class="far fa-circle-dot fa-fw %sexcolor; mr-1"></i> [*modify::Sosa 1]%nn;
                   </a>
