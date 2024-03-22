@@ -3588,6 +3588,76 @@ pt: ambos
 sv: både
 tr: her ikisi de
 
+    compiled on
+af: saamgestel op
+ar: تم تجميعه في
+bg: компилиран на
+br: compilada em
+ca: compilada el
+co: compilatu in
+cs: zkompilována na
+da: kompileret på
+de: kompiliert am
+en: compiled on
+eo: kompilita je
+es: compilada en
+et: kompileeritud
+fi: käännetty
+fr: compilée le
+he: מהוזף ב- 
+is: þýtt á
+it: compilato su
+lt: sukompiliuota
+lv: kompilēts uz
+nl: gecompileerd op
+no: kompilert på
+oc: compilada en
+pl: skompilowana na
+pt: compilado em
+pt-br: compilado em
+ro: compilată pe
+ru: скомпилирована на
+sk: zkompilovaná na
+sl: prevedena v
+sv: kompilerad på
+tr: üzerinde derlenmiş
+zh: 编译于
+
+    from commit
+af: vanaf commit id
+ar: من commit %s
+bg: от идентификатор на ангажимент
+br: a partir do id do commit
+ca: des del commit id
+co: à partesi di u commit
+cs: od commit id
+da: fra commit id
+de: aus Commit-ID
+en: from commit
+eo: de komitatidentigilo
+es: desde el id de commit
+et: commit id-st
+fi: sitoumus-id:stä
+fr: à partir du commit id
+he: מתחייב מזהה
+is: frá commit id
+it: dal commit id
+lt: nuo įsipareigojimo
+lv: no saistības id
+nl: vanaf commit id
+no: fra commit id
+oc: de commit id
+pl: z identyfikatora zobowiązania
+pt: a partir do id do commit
+pt-br: a partir do id do commit
+ro: de la id-ul angajamentului
+ru: от идентификатора коммита
+sk: od identifikátora záväzku
+sl: od zaveze id
+sv: från commit id
+tr: kayıt kimliğinden
+zh: 从提交 ID
+    
     branch %s compiled on %s from commit
 af: tak %s saamgestel op %s vanaf commit id
 ar: فرع %s تم تجميعه في %s من commit %s
