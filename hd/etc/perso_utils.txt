@@ -230,7 +230,7 @@
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" %nn;
+    %else;<a %apply;ext_link("xx") href="%prefix;%xx.access;" %nn;
         class="%if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;-underline">%xx;</a>%nn;
     %end;
   %end;
@@ -241,7 +241,7 @@
 %define;short_display_person_tree(xx)
   %if;(xx.has_sosa)%apply;display_sosa("xx")%end;
   %if;(cancel_links or xx.is_restricted or is_self)<span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span>
-  %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;%if;(e.t!="")&t=%e.t;%end;%if;(e.v!="")&v=%e.v;%end;%if;(e.im=0)&im=0%end;%if;(e.marriage="on")&marriage=on%end;"><span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
+  %else;<a %apply;ext_link("xx") href="%prefix;%xx.access;%if;(e.t!="")&t=%e.t;%end;%if;(e.v!="")&v=%e.v;%end;%if;(e.im=0)&im=0%end;%if;(e.marriage="on")&marriage=on%end;"><span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
   %end;
   <br>%nn;
   %if;(wizard and not cancel_links)
@@ -270,7 +270,7 @@
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%if;(xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</b>%else;
     %if;(cancel_links or xx.is_restricted)%if;(b.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;%nn;
-    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" title="[*visualize/show/hide/summary]1 %xx;">%if;(b.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
+    %else;<a %apply;ext_link("xx") href="%prefix;%xx.access;" title="[*visualize/show/hide/summary]1 %xx;">%if;(b.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
     %end;
   %end;
   %if;(wizard and not cancel_links)
@@ -292,7 +292,7 @@
   %if;(cancel_links or nnn.is_restricted)
     %nnn;
   %else;
-    <a %apply;ext_link("nnn") href="%nnn.bname_prefix;%nnn.access;">%nnn;</a>%nnn.title;
+    <a %apply;ext_link("nnn") href="%prefix;%nnn.access;">%nnn;</a>%nnn.title;
   %end;
   %nnn.dates;%nl;
 %end;
@@ -330,7 +330,7 @@
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;">%xx;</a>%nn;
+    %else;<a %apply;ext_link("xx") href="%prefix;%xx.access;">%xx;</a>%nn;
     %end;
     %if;xx.has_nobility_titles;
       %foreach;xx.nobility_title;, %nobility_title;%end;

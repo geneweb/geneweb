@@ -80,7 +80,7 @@
         %if;cell.is_right;
           %if;(e.ma!=0)
             %if;(wizard and not cancel_links)
-              <a href="%prefix_base_password;m=MOD_FAM&i=%cell.family.index;&ip=%index;"
+              <a href="%prefix;m=MOD_FAM&i=%cell.family.index;&ip=%index;"
             %else;
               <span
             %end;
@@ -182,7 +182,7 @@
       <td colspan="%expr(cell.colspan)" class="text-center py-0">%nn;
         %if;cell.is_empty;
         %elseif;(cell.person.has_parents and not cancel_links)
-          <a href="%cell.person.bname_prefix;%cell.person.access;%nn;
+          <a href="%prefix;%cell.person.access;%nn;
             &m=%if;(e.m!="")%e.m;%else;A%end;%nn;
             &t=%if;(e.t!="")%e.t;%else;T%end;%nn;
             &v=%if;(e.v!="")%e.v;%else;3%end;%nn;
@@ -221,9 +221,9 @@
     %if;(xx.has_parents)
       %apply;line%with;%if;(e.t="A")xx.father%else;xx.mother%end;%and;%expr(vv-1)%end;
     %end;
-    %if;not cancel_links;<a href="%prefix_base_password;%xx.access">%end;%xx;
+    %if;not cancel_links;<a href="%prefix;%xx.access">%end;%xx;
     %if;not cancel_links;</a>%end;%xx.title;
-    %if;not cancel_links;<a href="%prefix_base_password;%xx.index">%end;<i>%xx.dates;</i>
+    %if;not cancel_links;<a href="%prefix;%xx.index">%end;<i>%xx.dates;</i>
     %if;not cancel_links;</a>%end;
     %if;(xx.has_image and e.im!=0)
       <div>
