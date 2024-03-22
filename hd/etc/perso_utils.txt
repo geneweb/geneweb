@@ -549,7 +549,7 @@
 %define;display_date_marriage_parent(xx)
   %foreach;xx.mother.family;
     %if;(spouse.access=xx.father.access)
-      %if;((wizard or friend) and marriage_date.year!=""))
+      %if;((wizard or friend) and marriage_date.year!="")
         %if;(wizard and not cancel_links)<a href="%prefix&m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">%end;%nn;
         %family.date_s;%nn;
         %if;(wizard and not cancel_links)</a>%end;

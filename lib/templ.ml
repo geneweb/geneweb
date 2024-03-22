@@ -1027,13 +1027,23 @@ let rec templ_print_foreach conf print_ast set_vother env ep _loc s sl _el al =
   | _ -> raise Not_found
 
 and print_foreach_env_binding conf print_ast set_vother env ep al =
+  let env_vars =
+    let rec loop acc env_vars =
+      match env_vars with
+      | [] -> acc
+      | (k, v) :: env_vars ->
+          if List.mem_assoc k acc then loop acc env_vars
+          else loop ((k, v) :: acc) env_vars
+    in
+    loop [] (conf.env @ conf.henv @ conf.senv)
+  in
   List.iter
     (fun (k, v) ->
       let print_ast =
         print_ast (("binding", set_vother (Vbind (k, v))) :: env) ep
       in
       List.iter print_ast al)
-    (conf.env @ conf.henv @ conf.senv)
+    env_vars
 
 let float_rgb_of_hsv h s v =
   let h = if h > 1. then 1. else if h < 0. then 0. else h in
