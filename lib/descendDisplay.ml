@@ -1595,9 +1595,10 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
   let txt = get_text conf base sp (kids <> [] && sps) img cgl in
   let has_image = Image.get_portrait conf base p |> Option.is_some in
   let br_sp = if has_image && img then "" else "<br>" in
+  let auth = authorized_age conf base p && authorized_age conf base sp in
   let fam = foi base ifam in
   let marr_d =
-    if marr then DateDisplay.short_family_dates_text conf base true fam
+    if marr && auth then DateDisplay.short_family_dates_text conf base true fam
     else Adef.safe ""
   in
   let m_txt =
@@ -1605,7 +1606,7 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
     let f_nbr = string_of_int ifam_nbr in
     "<span class=\"text-nowrap\">"
     ^ (if last || only_one then "" else "…")
-    ^ (if only_one then " &" else " &<sup>" ^ f_nbr ^ "</sup>")
+    ^ (if only_one then " &amp;" else " &amp;<sup>" ^ f_nbr ^ "</sup>")
     ^ (marr_d :> string)
     ^ (if first || only_one then "" else "…")
     ^ "</span>"

@@ -638,7 +638,7 @@ let short_marriage_date_text conf base fam p1 p2 =
       - family : famille
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                           *)
-let short_family_dates_text conf _base marr_sep fam =
+let short_family_dates_text conf base marr_sep fam =
   let marr_dates_aux =
     match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
     | Some dmy -> Some (prec_year_text conf dmy)
@@ -659,14 +659,18 @@ let short_family_dates_text conf _base marr_sep fam =
         | None -> Some ""
         | Some dmy -> Some (prec_year_text conf dmy))
   in
+  let fa = poi base (get_father fam) in
+  let mo = poi base (get_mother fam) in
   Adef.safe
   @@
-  if marr_sep then
-    match (marr_dates_aux, sep_dates_aux) with
-    | Some m, Some s -> m ^ "-" ^ s
-    | Some m, None -> m
-    | None, _ -> ""
-  else Option.value ~default:"" sep_dates_aux
+  if authorized_age conf base fa && authorized_age conf base mo then
+    if marr_sep then
+      match (marr_dates_aux, sep_dates_aux) with
+      | Some m, Some s -> m ^ "-" ^ s
+      | Some m, None -> m
+      | None, _ -> ""
+    else Option.value ~default:"" sep_dates_aux
+  else ""
 
 (* For public interfce, force [string_of_prec_dmy] args to be safe strings *)
 let string_of_prec_dmy conf s s2 d =
