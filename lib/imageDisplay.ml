@@ -124,7 +124,7 @@ let print_portrait conf base p =
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 let print_family_portrait conf base p =
-  match Image.get_family_portrait conf base p with
+  match Image.get_family_portrait conf base p false with
   | Some (`Path path) ->
       Result.fold ~ok:ignore
         ~error:(fun _ -> Hutil.incorrect_request conf)

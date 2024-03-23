@@ -283,7 +283,8 @@ let get_portrait conf base p =
     | `Empty -> full_portrait_path conf base p
   else None
 
-let get_family_portrait conf base p =
+(* if self = true, then do not loop for fathers *)
+let get_family_portrait conf base p self =
   if has_access_to_family_portrait conf base p then
     let rec loop p =
       match src_of_string conf (full_family_portrait_path conf base p) with
@@ -295,11 +296,11 @@ let get_family_portrait conf base p =
       | `Url u -> Some (`Url u)
       | `Empty -> (
           match get_parents p with
-          | Some ifam ->
+          | Some ifam when not self ->
               let cpl = foi base ifam in
               let fa = poi base (get_father cpl) in
               loop fa
-          | None -> None)
+          | _ -> None)
     in
     loop p
   else None
@@ -387,27 +388,38 @@ let get_portrait_with_size conf base p =
         else None
     | `Empty -> (
         match full_portrait_path conf base p with
-        | None -> None
-        | Some path -> Some (path, size_from_path path |> Result.to_option))
+        | Some path -> Some (path, size_from_path path |> Result.to_option)
+        | None -> None)
   else None
 
-let get_family_portrait_with_size conf base p =
+let get_family_portrait_with_size conf base p self =
   if has_access_to_family_portrait conf base p then
-    match src_of_string conf (full_family_portrait_path conf base p) with
-    | `Src_with_size_info _s as s_info -> (
-        match parse_src_with_size_info conf s_info with
-        | Error _e -> None
-        | Ok (s, size) -> Some (s, Some size))
-    | `Url _s as url -> Some (url, None)
-    | `Path p as path ->
-        if Sys.file_exists p then
-          Some (path, size_from_path path |> Result.to_option)
-        else None
-    | `Empty -> (
-        match full_family_portrait_path conf base p with
-        | "" -> None
-        | path ->
-            Some (`Path path, size_from_path (`Path path) |> Result.to_option))
+    let rec loop p =
+      match src_of_string conf (full_family_portrait_path conf base p) with
+      | `Src_with_size_info _s as s_info -> (
+          match parse_src_with_size_info conf s_info with
+          | Error _e -> None
+          | Ok (s, size) -> Some (s, Some size))
+      | `Url _s as url -> Some (url, None)
+      | `Path p as path ->
+          if Sys.file_exists p then
+            Some (path, size_from_path path |> Result.to_option)
+          else None
+      | `Empty -> (
+          match get_parents p with
+          | Some ifam when not self ->
+              let cpl = foi base ifam in
+              let fa = poi base (get_father cpl) in
+              loop fa
+          | _ -> (
+              match full_family_portrait_path conf base p with
+              | "" -> None
+              | path ->
+                  Some
+                    (`Path path, size_from_path (`Path path) |> Result.to_option)
+              ))
+    in
+    loop p
   else None
 
 (* For carrousel ************************************ *)

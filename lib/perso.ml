@@ -1280,7 +1280,7 @@ let gen_string_of_img_sz max_w max_h conf base (p, p_auth) =
 
 let gen_string_of_fimg_sz max_w max_h conf base (p, p_auth) =
   if p_auth then
-    match Image.get_family_portrait_with_size conf base p with
+    match Image.get_family_portrait_with_size conf base p false with
     | Some (_, Some (w, h)) ->
         let w, h = Image.scale_to_fit ~max_w ~max_h ~w ~h in
         Format.sprintf " width=\"%d\" height=\"%d\"" w h
@@ -3366,7 +3366,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_image" | "has_portrait" ->
       Image.get_portrait conf base p |> Option.is_some
   | "has_family_image" ->
-      Image.get_family_portrait conf base p |> Option.is_some
+      Image.get_family_portrait conf base p false |> Option.is_some
   | "has_image_url" | "has_portrait_url" -> (
       match Image.get_portrait conf base p with
       | Some (`Url _url) -> true
@@ -3662,7 +3662,13 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | None -> null_val)
   | "family_image" -> (
       (* TODO what do we want here? can we remove this? *)
-      match Image.get_family_portrait conf base p with
+      match Image.get_family_portrait conf base p false with
+      | Some (`Path s) -> str_val s
+      | Some (`Url u) -> str_val u
+      | None -> null_val)
+  | "family_image_self" -> (
+      (* TODO what do we want here? can we remove this? *)
+      match Image.get_family_portrait conf base p true with
       | Some (`Path s) -> str_val s
       | Some (`Url u) -> str_val u
       | None -> null_val)
@@ -3672,7 +3678,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Some (`Url u) -> str_val u (* ?? *)
       | None -> null_val)
   | "family_image_name" -> (
-      match Image.get_family_portrait conf base p with
+      match Image.get_family_portrait conf base p false with
+      | Some (`Path s) -> str_val (Filename.basename s)
+      | Some (`Url u) -> str_val u (* ?? *)
+      | None -> null_val)
+  | "family_image_self_name" -> (
+      match Image.get_family_portrait conf base p true with
       | Some (`Path s) -> str_val (Filename.basename s)
       | Some (`Url u) -> str_val u (* ?? *)
       | None -> null_val)
@@ -4084,7 +4095,7 @@ and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
 and string_of_family_image_url conf base (p, p_auth) html : Adef.escaped_string
     =
   if p_auth then
-    match Image.get_family_portrait conf base p with
+    match Image.get_family_portrait conf base p false with
     | Some (`Path fname) ->
         let s = Unix.stat fname in
         let b = acces conf base p in

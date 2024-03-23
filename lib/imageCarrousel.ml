@@ -286,7 +286,7 @@ let print_send_image conf base p =
 
 let print_send_family_image conf base p =
   let title h =
-    if Option.is_some @@ Image.get_family_portrait conf base p then
+    if Option.is_some @@ Image.get_family_portrait conf base p true then
       transl_nth conf "image/images" 0
       |> transl_decline conf "modify"
       |> Utf8.capitalize_fst |> Output.print_sstring conf
@@ -542,7 +542,7 @@ let effective_send_c_ok ?(portrait = true) conf base p file file_name =
   if mode = "portraits" then
     match
       if portrait then Image.get_portrait conf base p
-      else Image.get_family_portrait conf base p
+      else Image.get_family_portrait conf base p true
     with
     | Some (`Path portrait) ->
         if move_file_to_save portrait dir = 0 then
@@ -752,7 +752,7 @@ let effective_reset_c_ok ?(portrait = true) conf base p =
   else
     match
       if portrait then Image.get_portrait conf base p
-      else Image.get_family_portrait conf base p
+      else Image.get_family_portrait conf base p true
     with
     | Some (`Url url) -> (
         try write_file file_in_new url
@@ -905,10 +905,9 @@ let print_c ?(saved = false) ?(portrait = true) conf base =
   | Some f, _ -> ImageDisplay.print_source conf f
   | _, Some p -> (
       match
-        (if saved then Image.get_old_portrait
-        else if portrait then Image.get_portrait
-        else Image.get_family_portrait)
-          conf base p
+        if saved then Image.get_old_portrait conf base p
+        else if portrait then Image.get_portrait conf base p
+        else Image.get_family_portrait conf base p false
       with
       | Some (`Path f) ->
           Result.fold ~ok:ignore
