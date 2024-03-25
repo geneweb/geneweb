@@ -769,8 +769,8 @@ let print_family opts base gen m =
     | NoSexesCheckNotMarried -> print_sexes "#nsck"
     | NoSexesCheckMarried -> print_sexes "#nsckm"
     | NoMention ->
-      if not !old_gw then print_sexes "#noment"
-      else Printf.ksprintf (oc opts) " #noment"
+        if not !old_gw then print_sexes "#noment"
+        else Printf.ksprintf (oc opts) " #noment"
     | MarriageBann -> if not !old_gw then print_sexes "#banns"
     | MarriageContract -> if not !old_gw then print_sexes "#contract"
     | MarriageLicense -> if not !old_gw then print_sexes "#license"
