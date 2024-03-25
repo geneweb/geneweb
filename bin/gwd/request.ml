@@ -486,7 +486,7 @@ let treat_request =
           end
         | "AS" ->
           w_base @@ fun conf base ->
-            SrcfileDisplay.print conf base "advanced"
+            Geneweb.SrcfileDisplay.print conf base "advanced"
         | "AS_OK" ->
           w_base @@ Geneweb.AdvSearchOkDisplay.print
         | "C" ->
