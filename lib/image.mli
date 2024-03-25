@@ -18,9 +18,9 @@ val default_portrait_filename : base -> person -> string
  *)
 
 (* TODO this should be removed *)
-val default_family_portrait_filename : base -> person -> string
-(** [default_family_portrait_filename base p] is the default filename of [p]'s family portrait. Without it's file extension.
- e.g: default_family_portrait_filename_of_key "DUPOND" is "family.dupond"
+val default_blason_filename : base -> person -> string
+(** [default_blason_filename base p] is the default filename of [p]'s family portrait. Without it's file extension.
+ e.g: default_blason_filename_of_key "DUPOND" is "family.dupond"
  *)
 
 val size_from_path : [ `Path of string ] -> (int * int, unit) result
@@ -55,13 +55,13 @@ val get_portrait_with_size :
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.
     - [Some (src, size_opt)] with [src] the url or path of [p]'s portrait. [size_opt] is the (width,height) of the portrait if we could recover them *)
 
-val get_family_portrait_with_size :
+val get_blason_with_size :
   config ->
   base ->
   person ->
   bool ->
   ([> `Path of string | `Url of string ] * (int * int) option) option
-(** [get_family_portrait_with_size conf base p] is
+(** [get_blason_with_size conf base p] is
         - [None] if we don't have access to [p]'s family portrait or it doesn't exist.
         - [Some (src, size_opt)] with [src] the url or path of [p]'s family portrait. [size_opt] is the (width,height) of the family portrait if we could recover them *)
 
@@ -72,7 +72,7 @@ val get_portrait :
     - [Some src] with [src] the url or path of [p]'s portrait.
 *)
 
-val get_family_portrait :
+val get_blason :
   config ->
   base ->
   person ->
@@ -90,9 +90,9 @@ val get_old_portrait :
     - [Some src] with [src] the url or path of [p]'s portrait.
 *)
 
-val get_old_family_portrait :
+val get_old_blason :
   config -> base -> person -> [> `Path of string | `Url of string ] option
-(** [get_old_family_portrait conf base p] is
+(** [get_old_blason conf base p] is
     - [None] if we don't have access to [p]'s family image or it doesn't exist.
     - [Some src] with [src] the url or path of [p]'s family image.
 *)

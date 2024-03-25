@@ -20,19 +20,19 @@ let default_portrait_filename base p =
   default_portrait_filename_of_key (p_first_name base p) (p_surname base p)
     (get_occ p)
 
-(** [default_family_portrait_filename_of_key fn sn occ] is the default filename
+(** [default_blason_filename_of_key fn sn occ] is the default filename
  of the corresponding person's portrait. WITHOUT its file extenssion.
  e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
  *)
-let default_family_portrait_filename_of_key first_name surname occ =
+let default_blason_filename_of_key first_name surname occ =
   let space_to_unders = Mutil.tr ' ' '_' in
   let f = space_to_unders (Name.lower first_name) in
   let s = space_to_unders (Name.lower surname) in
   Format.sprintf "%s.%d.%s.family" f occ s
 
-let default_family_portrait_filename base p =
-  default_family_portrait_filename_of_key (p_first_name base p)
-    (p_surname base p) (get_occ p)
+let default_blason_filename base p =
+  default_blason_filename_of_key (p_first_name base p) (p_surname base p)
+    (get_occ p)
 
 let authorized_image_file_extension = [| ".jpg"; ".jpeg"; ".png"; ".gif" |]
 
@@ -65,11 +65,11 @@ let full_portrait_path conf base p =
   | None ->
       None
 
-(** [full_family_portrait_path conf base p] is [Some path] if [p] has a portrait.
+(** [full_blason_path conf base p] is [Some path] if [p] has a portrait.
     [path] is a the full path of the file with file extension. *)
-let full_family_portrait_path conf base p =
+let full_blason_path conf base p =
   (* TODO why is extension not in filename..? *)
-  let s = default_family_portrait_filename base p in
+  let s = default_blason_filename base p in
   let f = Filename.concat (portrait_folder conf) s in
   match find_img_opt f with
   | Some (`Path p) -> p
@@ -215,14 +215,13 @@ let has_access_to_portrait conf base p =
      && is_not_private_img conf (sou base img)
 (* TODO: privacy settings should be in db not in url *)
 
-(** [has_access_to_family_portrait conf base p] is true iif we can see [p]'s portrait. *)
-let has_access_to_family_portrait conf base p =
+(** [has_access_to_blason conf base p] is true iif we can see [p]'s portrait. *)
+let has_access_to_blason conf base p =
   let img = get_image p in
   (conf.wizard || conf.friend)
   || (not conf.no_image)
      && Util.authorized_age conf base p
-     && ((not (is_empty_string img))
-        || full_family_portrait_path conf base p <> "")
+     && ((not (is_empty_string img)) || full_blason_path conf base p <> "")
      && is_not_private_img conf (sou base img)
 (* TODO: privacy settings should be in db not in url *)
 
@@ -284,10 +283,10 @@ let get_portrait conf base p =
   else None
 
 (* if self = true, then do not loop for fathers *)
-let get_family_portrait conf base p self =
-  if has_access_to_family_portrait conf base p then
+let get_blason conf base p self =
+  if has_access_to_blason conf base p then
     let rec loop p =
-      match src_of_string conf (full_family_portrait_path conf base p) with
+      match src_of_string conf (full_blason_path conf base p) with
       | `Src_with_size_info _s as s_info -> (
           match parse_src_with_size_info conf s_info with
           | Error _e -> None
@@ -322,9 +321,9 @@ let get_old_portrait conf base p =
    - the image as the original image.jpg/png/tif image
    - the url to the image as content of a image.url text file
 *)
-let get_old_family_portrait conf base p =
-  if has_access_to_family_portrait conf base p then
-    let key = default_family_portrait_filename base p in
+let get_old_blason conf base p =
+  if has_access_to_blason conf base p then
+    let key = default_blason_filename base p in
     let f =
       Filename.concat (Filename.concat (portrait_folder conf) "old") key
     in
@@ -392,10 +391,10 @@ let get_portrait_with_size conf base p =
         | None -> None)
   else None
 
-let get_family_portrait_with_size conf base p self =
-  if has_access_to_family_portrait conf base p then
+let get_blason_with_size conf base p self =
+  if has_access_to_blason conf base p then
     let rec loop p =
-      match src_of_string conf (full_family_portrait_path conf base p) with
+      match src_of_string conf (full_blason_path conf base p) with
       | `Src_with_size_info _s as s_info -> (
           match parse_src_with_size_info conf s_info with
           | Error _e -> None
@@ -412,7 +411,7 @@ let get_family_portrait_with_size conf base p self =
               let fa = poi base (get_father cpl) in
               loop fa
           | _ -> (
-              match full_family_portrait_path conf base p with
+              match full_blason_path conf base p with
               | "" -> None
               | path ->
                   Some

@@ -1280,7 +1280,7 @@ let gen_string_of_img_sz max_w max_h conf base (p, p_auth) =
 
 let gen_string_of_fimg_sz max_w max_h conf base (p, p_auth) =
   if p_auth then
-    match Image.get_family_portrait_with_size conf base p false with
+    match Image.get_blason_with_size conf base p false with
     | Some (_, Some (w, h)) ->
         let w, h = Image.scale_to_fit ~max_w ~max_h ~w ~h in
         Format.sprintf " width=\"%d\" height=\"%d\"" w h
@@ -1291,9 +1291,9 @@ let gen_string_of_fimg_sz max_w max_h conf base (p, p_auth) =
 let string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid
 let string_of_image_medium_size = gen_string_of_img_sz 160 120
 let string_of_image_small_size = gen_string_of_img_sz 100 75
-let string_of_family_image_size = gen_string_of_fimg_sz max_im_wid max_im_wid
-let string_of_family_image_medium_size = gen_string_of_fimg_sz 160 120
-let string_of_family_image_small_size = gen_string_of_fimg_sz 100 75
+let string_of_blason_size = gen_string_of_fimg_sz max_im_wid max_im_wid
+let string_of_blason_medium_size = gen_string_of_fimg_sz 160 120
+let string_of_blason_small_size = gen_string_of_fimg_sz 100 75
 
 let get_sosa conf base env r p =
   try List.assoc (get_iper p) !r
@@ -3365,8 +3365,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_history" -> has_history conf base p p_auth
   | "has_image" | "has_portrait" ->
       Image.get_portrait conf base p |> Option.is_some
-  | "has_family_image" ->
-      Image.get_family_portrait conf base p false |> Option.is_some
+  | "has_blason" -> Image.get_blason conf base p false |> Option.is_some
   | "has_image_url" | "has_portrait_url" -> (
       match Image.get_portrait conf base p with
       | Some (`Url _url) -> true
@@ -3375,8 +3374,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       match Image.get_old_portrait conf base p with
       | Some (`Url _url) -> true
       | _ -> false)
-  | "has_old_family_image_url" -> (
-      match Image.get_old_family_portrait conf base p with
+  | "has_old_blason_url" -> (
+      match Image.get_old_blason conf base p with
       | Some (`Url _url) -> true
       | _ -> false)
   (* carrousel *)
@@ -3384,8 +3383,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_old_carrousel" -> Image.get_carrousel_old_imgs conf base p <> []
   | "has_old_image" | "has_old_portrait" ->
       Image.get_old_portrait conf base p |> Option.is_some
-  | "has_old_family_image" | "has_old_family_portrait" ->
-      Image.get_old_family_portrait conf base p |> Option.is_some
+  | "has_old_blason" -> Image.get_old_blason conf base p |> Option.is_some
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && Util.nobtit conf base p <> []
   | "has_notes" | "has_pnotes" ->
@@ -3624,22 +3622,18 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "image_size" -> string_of_image_size conf base ep |> str_val
   | "image_medium_size" -> string_of_image_medium_size conf base ep |> str_val
   | "image_small_size" -> string_of_image_small_size conf base ep |> str_val
-  | "family_image_size" -> string_of_family_image_size conf base ep |> str_val
-  | "family_image_medium_size" ->
-      string_of_family_image_medium_size conf base ep |> str_val
-  | "family_image_small_size" ->
-      string_of_family_image_small_size conf base ep |> str_val
+  | "blason_size" -> string_of_blason_size conf base ep |> str_val
+  | "blason_medium_size" -> string_of_blason_medium_size conf base ep |> str_val
+  | "blason_small_size" -> string_of_blason_small_size conf base ep |> str_val
   | "image_url" -> string_of_image_url conf base ep false |> safe_val
-  | "family_image_url" ->
-      string_of_family_image_url conf base ep false |> safe_val
+  | "blason_url" -> string_of_blason_url conf base ep false |> safe_val
   | "index" -> (
       match get_env "p_link" env with
       | Vbool _ -> null_val
       | _ -> get_iper p |> string_of_iper |> Mutil.encode |> safe_val)
   (* carrousel functions *)
   | "carrousel" -> Image.default_portrait_filename base p |> str_val
-  | "family_carrousel" ->
-      Image.default_family_portrait_filename base p |> str_val
+  | "family_carrousel" -> Image.default_blason_filename base p |> str_val
   | "carrousel_img_nbr" ->
       string_of_int (List.length (Image.get_carrousel_imgs conf base p))
       |> str_val
@@ -3660,15 +3654,15 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Some (`Path s) -> str_val s
       | Some (`Url u) -> str_val u
       | None -> null_val)
-  | "family_image" -> (
+  | "blason" -> (
       (* TODO what do we want here? can we remove this? *)
-      match Image.get_family_portrait conf base p false with
+      match Image.get_blason conf base p false with
       | Some (`Path s) -> str_val s
       | Some (`Url u) -> str_val u
       | None -> null_val)
-  | "family_image_self" -> (
+  | "blason_self" -> (
       (* TODO what do we want here? can we remove this? *)
-      match Image.get_family_portrait conf base p true with
+      match Image.get_blason conf base p true with
       | Some (`Path s) -> str_val s
       | Some (`Url u) -> str_val u
       | None -> null_val)
@@ -3677,13 +3671,13 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Some (`Path s) -> str_val (Filename.basename s)
       | Some (`Url u) -> str_val u (* ?? *)
       | None -> null_val)
-  | "family_image_name" -> (
-      match Image.get_family_portrait conf base p false with
+  | "blason_name" -> (
+      match Image.get_blason conf base p false with
       | Some (`Path s) -> str_val (Filename.basename s)
       | Some (`Url u) -> str_val u (* ?? *)
       | None -> null_val)
-  | "family_image_self_name" -> (
-      match Image.get_family_portrait conf base p true with
+  | "blason_self_name" -> (
+      match Image.get_blason conf base p true with
       | Some (`Path s) -> str_val (Filename.basename s)
       | Some (`Url u) -> str_val u (* ?? *)
       | None -> null_val)
@@ -3692,13 +3686,13 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Some (`Path s) -> str_val s
       | Some (`Url u) -> str_val u
       | None -> null_val)
-  | "family_image_saved" -> (
-      match Image.get_old_family_portrait conf base p with
+  | "blason_saved" -> (
+      match Image.get_old_blason conf base p with
       | Some (`Path s) -> str_val s
       | Some (`Url u) -> str_val u
       | None -> null_val)
-  | "family_image_saved_name" -> (
-      match Image.get_old_family_portrait conf base p with
+  | "blason_saved_name" -> (
+      match Image.get_old_blason conf base p with
       | Some (`Path s) -> str_val (Filename.basename s)
       | Some (`Url u) -> str_val u
       | None -> null_val)
@@ -4092,14 +4086,13 @@ and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
     | None -> Adef.escaped ""
   else Adef.escaped ""
 
-and string_of_family_image_url conf base (p, p_auth) html : Adef.escaped_string
-    =
+and string_of_blason_url conf base (p, p_auth) html : Adef.escaped_string =
   if p_auth then
-    match Image.get_family_portrait conf base p false with
+    match Image.get_blason conf base p false with
     | Some (`Path fname) ->
         let s = Unix.stat fname in
         let b = acces conf base p in
-        let k = Image.default_family_portrait_filename base p in
+        let k = Image.default_blason_filename base p in
         Format.sprintf "%sm=FIM%s&d=%d&%s&k=/%s"
           (commd conf :> string)
           (if html then "H" else "")

@@ -286,7 +286,7 @@ let print_send_image conf base p =
 
 let print_send_family_image conf base p =
   let title h =
-    if Option.is_some @@ Image.get_family_portrait conf base p true then
+    if Option.is_some @@ Image.get_blason conf base p true then
       transl_nth conf "image/images" 0
       |> transl_decline conf "modify"
       |> Utf8.capitalize_fst |> Output.print_sstring conf
@@ -428,7 +428,7 @@ let effective_family_send_ok conf base p file =
             error_too_big_image conf base p (String.length content) len
         | _ -> (typ, content))
   in
-  let fname = Image.default_family_portrait_filename base p in
+  let fname = Image.default_blason_filename base p in
   let dir = Util.base_path [ "images" ] conf.bname in
   if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
   let fname =
@@ -525,7 +525,7 @@ let effective_send_c_ok ?(portrait = true) conf base p file file_name =
   in
   let fname =
     if portrait then Image.default_portrait_filename base p
-    else Image.default_family_portrait_filename base p
+    else Image.default_blason_filename base p
   in
   let dir =
     if mode = "portraits" then
@@ -542,7 +542,7 @@ let effective_send_c_ok ?(portrait = true) conf base p file file_name =
   if mode = "portraits" then
     match
       if portrait then Image.get_portrait conf base p
-      else Image.get_family_portrait conf base p true
+      else Image.get_blason conf base p true
     with
     | Some (`Path portrait) ->
         if move_file_to_save portrait dir = 0 then
@@ -550,7 +550,7 @@ let effective_send_c_ok ?(portrait = true) conf base p file file_name =
     | Some (`Url url) -> (
         let fname =
           if portrait then Image.default_portrait_filename base p
-          else Image.default_family_portrait_filename base p
+          else Image.default_blason_filename base p
         in
         let dir = Filename.concat dir "old" in
         if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
@@ -683,7 +683,7 @@ let print_del conf base =
 let effective_delete_c_ok ?(portrait = true) conf base p =
   let fname =
     if portrait then Image.default_portrait_filename base p
-    else Image.default_family_portrait_filename base p
+    else Image.default_blason_filename base p
   in
   let file_name =
     try List.assoc "file_name" conf.env with Not_found -> Adef.encoded ""
@@ -724,7 +724,7 @@ let effective_reset_c_ok ?(portrait = true) conf base p =
   in
   let carrousel =
     if portrait then Image.default_portrait_filename base p
-    else Image.default_family_portrait_filename base p
+    else Image.default_blason_filename base p
   in
   let file_name =
     try List.assoc "file_name" conf.env with Not_found -> Adef.encoded ""
@@ -752,7 +752,7 @@ let effective_reset_c_ok ?(portrait = true) conf base p =
   else
     match
       if portrait then Image.get_portrait conf base p
-      else Image.get_family_portrait conf base p true
+      else Image.get_blason conf base p true
     with
     | Some (`Url url) -> (
         try write_file file_in_new url
@@ -898,7 +898,7 @@ let print_c ?(saved = false) ?(portrait = true) conf base =
   | Some f, Some p ->
       let k =
         if portrait then Image.default_portrait_filename base p
-        else Image.default_family_portrait_filename base p
+        else Image.default_blason_filename base p
       in
       let f = Filename.concat k f in
       ImageDisplay.print_source conf (if saved then insert_saved f else f)
@@ -907,7 +907,7 @@ let print_c ?(saved = false) ?(portrait = true) conf base =
       match
         if saved then Image.get_old_portrait conf base p
         else if portrait then Image.get_portrait conf base p
-        else Image.get_family_portrait conf base p false
+        else Image.get_blason conf base p false
       with
       | Some (`Path f) ->
           Result.fold ~ok:ignore
