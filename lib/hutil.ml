@@ -31,6 +31,7 @@ let print_link_to_welcome = gen_print_link_to_welcome (fun () -> ())
 (* S: use Util.include_template for "hed"? *)
 
 let header_without_http_nor_home conf title =
+  let robot = List.assoc_opt "robot_index" conf.base_env = Some "yes" in
   let str1 =
     Printf.sprintf {|<!DOCTYPE html>
 <html lang="%s">
@@ -40,12 +41,14 @@ let header_without_http_nor_home conf title =
   let str2 =
     Printf.sprintf
       {|</title>
-<meta name="robots" content="none">
+%s
 <meta charset="%s">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="shortcut icon" href="%s/favicon_gwd.png">
 <link rel="apple-touch-icon" href="%s/favicon_gwd.png">
 |}
+      (if robot then {|<meta name="robots" content="index,follow">|}
+      else {|<meta name="robots" content="none">|})
       conf.charset
       (Util.images_prefix conf :> string)
       (Util.images_prefix conf :> string)
