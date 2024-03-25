@@ -17,7 +17,7 @@
       %message.subject.cut.50;%nn;
     %end;
   </title>
-  <meta name="robots" content="none">
+  %if;(bvar.robot_index_forum="yes")<meta name="robots" content="index,follow">%else;<meta name="robots" content="none">%end;
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%images_prefix;favicon_gwd.png">

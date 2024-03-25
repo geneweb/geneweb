@@ -12,7 +12,7 @@
       %else;%first_name; %surname;%if;(occ!="" and occ!=0) (%occ;)%end;%end;
     %end;
   </title>
-  <meta name="robots" content="none">
+  %if;(bvar.robot_index="yes")<meta name="robots" content="index,follow">%else;<meta name="robots" content="none">%end;
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   %include;css
