@@ -110,9 +110,9 @@ let dag_fam_list_of_ind_list indl =
   List.fold_left
     (fun faml ind ->
       let faml =
-        if List.mem ind.di_famc faml then faml else ind.di_famc :: faml
+        if List.memq ind.di_famc faml then faml else ind.di_famc :: faml
       in
-      if List.mem ind.di_fams faml then faml else ind.di_fams :: faml)
+      if List.memq ind.di_fams faml then faml else ind.di_fams :: faml)
     [] indl
 
 let add_phony_children indl faml =
