@@ -103,6 +103,14 @@ let dmy_of_dmy2 dmy2 =
     delta = dmy2.delta2;
   }
 
+let dmy2_of_dmy dmy =
+  {
+    day2 = dmy.day;
+    month2 = dmy.month;
+    year2 = dmy.year;
+    delta2 = dmy.delta;
+  }
+
 let leap_year a = if a mod 100 = 0 then a / 100 mod 4 = 0 else a mod 4 = 0
 
 let nb_days_in_month m a =

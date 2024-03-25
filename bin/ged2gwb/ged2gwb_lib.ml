@@ -647,13 +647,8 @@ EXTEND
           | Begin (d, cal) -> Dgreg ({d with prec = After}, cal)
           | End (d, cal) -> Dgreg ({d with prec = Before}, cal)
           | BeginEnd ((d1, cal1), (d2, cal2)) ->
-              let dmy2 = Date.convert ~from:Dgregorian ~to_:cal2 d2 in
-              let dmy2 =
-                (* convert to Def.dmy2 *)
-                Date.{day2 = dmy2.day; month2 = dmy2.month;
-                 year2 = dmy2.year; delta2 = 0}
-              in
-              Dgreg ({d1 with prec = YearInt dmy2}, cal1)
+            let dmy2 = {Date.dmy2_of_dmy d2 with delta2 = 0} in
+            Dgreg ({d1 with prec = YearInt dmy2}, cal1)
           end
       | (d, cal) = date -> Dgreg (d, cal)
       | s = TEXT -> Dtext s ] ]
