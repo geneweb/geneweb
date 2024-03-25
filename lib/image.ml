@@ -21,14 +21,15 @@ let default_portrait_filename base p =
     (get_occ p)
 
 (** [default_blason_filename_of_key fn sn occ] is the default filename
- of the corresponding person's portrait. WITHOUT its file extenssion.
- e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
+ of the corresponding person's blason. WITHOUT its file extenssion.
+ e.g: default_blason_filename_of_key "Jean Claude" "DUPOND" 3
+ is "jean_claude.3.dupond.blason"
  *)
 let default_blason_filename_of_key first_name surname occ =
   let space_to_unders = Mutil.tr ' ' '_' in
   let f = space_to_unders (Name.lower first_name) in
   let s = space_to_unders (Name.lower surname) in
-  Format.sprintf "%s.%d.%s.family" f occ s
+  Format.sprintf "%s.%d.%s.blason" f occ s
 
 let default_blason_filename base p =
   default_blason_filename_of_key (p_first_name base p) (p_surname base p)
@@ -48,9 +49,12 @@ let find_img_opt f =
       close_in ic;
       Some (`Url url)
   | None -> (
-      match Mutil.array_find_map exists authorized_image_file_extension with
-      | None -> None
-      | Some f -> Some (`Path f))
+      match exists ".stop" with
+      | Some f -> Some (`Path f)
+      | None -> (
+          match Mutil.array_find_map exists authorized_image_file_extension with
+          | None -> None
+          | Some f -> Some (`Path f)))
 
 (** [full_portrait_path conf base p] is [Some path] if [p] has a portrait.
     [path] is a the full path of the file with file extension. *)
@@ -65,7 +69,7 @@ let full_portrait_path conf base p =
   | None ->
       None
 
-(** [full_blason_path conf base p] is [Some path] if [p] has a portrait.
+(** [full_blason_path conf base p] is [Some path] if [p] has a blason.
     [path] is a the full path of the file with file extension. *)
 let full_blason_path conf base p =
   (* TODO why is extension not in filename..? *)

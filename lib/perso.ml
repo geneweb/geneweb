@@ -3365,13 +3365,28 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_history" -> has_history conf base p p_auth
   | "has_image" | "has_portrait" ->
       Image.get_portrait conf base p |> Option.is_some
-  | "has_blason" -> Image.get_blason conf base p false |> Option.is_some
+  | "has_blason" -> (
+      match Image.get_blason conf base p false with
+      | None -> false
+      | Some (`Path p) when Filename.extension p = ".stop" -> true
+      | Some (`Path _p) -> true
+      | Some (`Url _u) -> true)
+  | "has_blason_self" -> (
+      match Image.get_blason conf base p true with
+      | None -> false
+      | Some (`Path p) when Filename.extension p = ".stop" -> true
+      | Some (`Path _p) -> true
+      | Some (`Url _u) -> true)
   | "has_image_url" | "has_portrait_url" -> (
       match Image.get_portrait conf base p with
       | Some (`Url _url) -> true
       | _ -> false)
   | "has_old_image_url" | "has_old_portrait_url" -> (
       match Image.get_old_portrait conf base p with
+      | Some (`Url _url) -> true
+      | _ -> false)
+  | "has_blason_url" -> (
+      match Image.get_blason conf base p true with
       | Some (`Url _url) -> true
       | _ -> false)
   | "has_old_blason_url" -> (
@@ -3633,7 +3648,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | _ -> get_iper p |> string_of_iper |> Mutil.encode |> safe_val)
   (* carrousel functions *)
   | "carrousel" -> Image.default_portrait_filename base p |> str_val
-  | "family_carrousel" -> Image.default_blason_filename base p |> str_val
+  | "blason_carrousel" -> Image.default_blason_filename base p |> str_val
   | "carrousel_img_nbr" ->
       string_of_int (List.length (Image.get_carrousel_imgs conf base p))
       |> str_val
@@ -3655,15 +3670,15 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Some (`Url u) -> str_val u
       | None -> null_val)
   | "blason" -> (
-      (* TODO what do we want here? can we remove this? *)
       match Image.get_blason conf base p false with
-      | Some (`Path s) -> str_val s
+      | Some (`Path p) when Filename.extension p = ".stop" -> null_val
+      | Some (`Path p) -> str_val p
       | Some (`Url u) -> str_val u
       | None -> null_val)
   | "blason_self" -> (
-      (* TODO what do we want here? can we remove this? *)
       match Image.get_blason conf base p true with
-      | Some (`Path s) -> str_val s
+      | Some (`Path p) when Filename.extension p = ".stop" -> null_val
+      | Some (`Path p) -> str_val p
       | Some (`Url u) -> str_val u
       | None -> null_val)
   | "portrait_name" -> (
@@ -3673,12 +3688,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | None -> null_val)
   | "blason_name" -> (
       match Image.get_blason conf base p false with
-      | Some (`Path s) -> str_val (Filename.basename s)
+      | Some (`Path p) -> str_val (Filename.basename p)
       | Some (`Url u) -> str_val u (* ?? *)
       | None -> null_val)
-  | "blason_self_name" -> (
+  | "blason_name_self" -> (
       match Image.get_blason conf base p true with
-      | Some (`Path s) -> str_val (Filename.basename s)
+      | Some (`Path p) -> str_val (Filename.basename p)
       | Some (`Url u) -> str_val u (* ?? *)
       | None -> null_val)
   | "portrait_saved" -> (
