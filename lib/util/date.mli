@@ -60,8 +60,8 @@ val dmy_of_dmy2 : dmy2 -> dmy
     Convert a [dmy2] to [dmy] using [Sure] as precision. *)
 
 val dmy2_of_dmy : dmy -> dmy2
-(** [dmy_of_dmy2 dmy2]
-    Convert a [dmy] to [dmy2]. *)
+(** [dmy2_of_dmy dmy]
+    Convert a [dmy2] to [dmy]. *)
 
 val compare_dmy : dmy -> dmy -> int
 (** [compare_dmy d1 d2]
