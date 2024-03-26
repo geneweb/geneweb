@@ -1729,38 +1729,34 @@ let husband_wife conf base p all =
     if Array.length (get_family p) > 0 then
       if multiple >= 0 then
         let fam = foi base (get_family p).(0) in
-        let conjoint = Gutil.spouse (get_iper p) fam in
-        let conjoint = pget conf base conjoint in
-        if not @@ is_empty_name conjoint then
-          Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
-          |> translate_eval |> Adef.safe
-        else Adef.safe ""
+        Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
+        |> translate_eval |> Adef.safe
       else transl conf "marriages with" |> Adef.safe
     else Adef.safe ""
   in
   let res =
+    let len = Array.length (get_family p) in
     let rec loop i res =
-      if i < Array.length (get_family p) then
+      if i < len then
         let fam = foi base (get_family p).(i) in
         let conjoint = Gutil.spouse (get_iper p) fam in
         let conjoint = pget conf base conjoint in
-        if not @@ is_empty_name conjoint then
-          let res =
-            res
-            ^>^ translate_eval
-                  (" "
-                   ^<^ gen_person_text conf base conjoint
-                   ^^^ relation_date conf fam
-                    :> string)
-            ^ ","
-          in
-          if all then loop (i + 1) res else res
-        else loop (i + 1) res
+        let res =
+          res
+          ^>^ translate_eval
+                (" "
+                 ^<^ gen_person_text conf base conjoint
+                 ^^^ relation_date conf fam
+                  :> string)
+          ^ if len > 1 && i = len - 2 then " " ^ transl conf "and" else ","
+        in
+        if all then loop (i + 1) res else res
       else res
     in
     loop 0 relation
   in
   let res = (res :> string) in
+  (* suppress last , *)
   let res =
     if String.length res > 1 then String.sub res 0 (String.length res - 1)
     else res
