@@ -19,6 +19,7 @@ type update_error =
   | UERR_missing_surname of Adef.safe_string
   | UERR_missing_first_name of Adef.safe_string
   | UERR_locked_base
+  | UERR_illegal_access_update of Def.access * Def.access
 
 exception ModErr of update_error
 
@@ -114,6 +115,9 @@ val check_missing_witnesses_names :
 
 val check_missing_name :
   base -> (Gwdb.iper, 'b, string) Def.gen_person -> update_error option
+
+val check_illegal_access_update :
+    base -> (Gwdb.iper, 'a, 'b) Def.gen_person -> update_error option
 
 val print_create_conflict : config -> base -> person -> string -> 'exn
 (** [print_create_conflict conf base p var]
