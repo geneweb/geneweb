@@ -3377,6 +3377,12 @@ and eval_bool_person_field conf base env (p, p_auth) = function
       | Some (`Path p) when Filename.extension p = ".stop" -> true
       | Some (`Path _p) -> true
       | Some (`Url _u) -> true)
+  | "has_blason_stop" -> (
+      match Image.get_blason conf base p true with
+      | None -> false
+      | Some (`Path p) when Filename.extension p = ".stop" -> true
+      | Some (`Path _p) -> false
+      | Some (`Url _u) -> false)
   | "has_image_url" | "has_portrait_url" -> (
       match Image.get_portrait conf base p with
       | Some (`Url _url) -> true
