@@ -20,6 +20,7 @@ type update_error =
   | UERR_missing_surname of Adef.safe_string
   | UERR_missing_first_name of Adef.safe_string
   | UERR_locked_base
+  | UERR_illegal_access_update of Def.access * Def.access
 
 exception ModErr of update_error
 
@@ -341,6 +342,12 @@ let string_of_error conf =
   | UERR_locked_base ->
       transl conf "the file is temporarily locked: please try again"
       |> Utf8.capitalize_fst |> Adef.safe
+  | UERR_illegal_access_update (old_access, new_access) ->
+    Utf8.capitalize_fst (transl conf "illegal access update")
+    ^<^ transl conf ":" ^<^ " "
+    ^<^ (Util.string_of_access conf old_access :> string)
+    ^<^ " "
+    ^<^ (Util.string_of_access conf new_access :> Adef.safe_string)
 
 let print_err_unknown conf (f, s, o) =
   let err = UERR_unknow_person (f, s, o) in
@@ -992,6 +999,28 @@ let reconstitute_date_dmy conf var =
                 else bad_date conf d))
   in
   (d, force_f_cal)
+
+let is_illegal_access_update old_access new_access =
+  match old_access, new_access with
+  | IfTitles, Public
+  | IfTitles, Private
+  | Public, Private
+  | Private, Public -> true
+  | _ -> false
+
+let check_illegal_access_update base person =
+  let old_access_opt = try
+      let iper = person.key_index in
+      let old_person = Gwdb.poi base iper in
+      Some (Gwdb.get_access old_person)
+    with _ -> None
+  in
+  match old_access_opt with
+  | Some old_access ->
+    if is_illegal_access_update old_access person.access then
+      Some (UERR_illegal_access_update (old_access, person.access))
+    else None
+  | None -> None
 
 let check_missing_name base p =
   let quest f g =
