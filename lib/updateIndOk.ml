@@ -574,6 +574,7 @@ let reconstitute_person conf =
   let access =
     match p_getenv conf.env "access" with
     | Some "Public" -> Public
+    | Some "SemiPublic" -> SemiPublic
     | Some "Private" -> Private
     | Some _ | None -> IfTitles
   in
