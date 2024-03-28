@@ -356,7 +356,6 @@ val string_of_witness_kind : config -> sex -> witness_kind -> Adef.safe_string
 *)
 
 val string_of_access : Config.config -> Def.access -> Adef.safe_string
-
 val relation_txt : config -> sex -> family -> (('a -> 'b) -> 'b, 'a, 'b) format
 val string_of_decimal_num : config -> float -> string
 val person_exists : config -> base -> string * string * int -> bool
