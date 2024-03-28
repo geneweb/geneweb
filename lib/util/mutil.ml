@@ -344,7 +344,10 @@ let start_with ini i s =
   in
   loop 0 i
 
-let start_with_wildcard ini i s =
+let start_with_wildcard ?(ignore_case = false) ini i s =
+  let normalize = if ignore_case then Utf8.lowercase else Fun.id in
+  let ini = normalize ini in
+  let s = normalize s in
   let inilen = String.length ini in
   let strlen = String.length s in
   if i < 0 || i > strlen then raise (Invalid_argument "start_with_wildcard");

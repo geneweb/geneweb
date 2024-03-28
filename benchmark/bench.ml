@@ -119,7 +119,8 @@ let bench () =
           { conf with Geneweb.Config.env = [ ("data", Adef.encoded "place") ] };
         ]
       :: bench_w_base "UpdateData.build_list"
-           (fun base conf -> Geneweb.UpdateData.build_list conf base)
+           (fun base conf ->
+             Geneweb.UpdateData.build_list ~ignore_case:false conf base)
            [
              {
                conf with
@@ -135,7 +136,7 @@ let bench () =
       :: bench_w_base "UpdateData.build_list_short"
            (fun base conf ->
              Geneweb.UpdateData.build_list_short conf
-             @@ Geneweb.UpdateData.build_list conf base)
+             @@ Geneweb.UpdateData.build_list ~ignore_case:false conf base)
            [
              {
                conf with

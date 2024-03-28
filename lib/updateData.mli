@@ -11,10 +11,14 @@ val update_person_list :
   unit
 
 val build_list_long :
+  ignore_case:bool ->
   Config.config ->
   (Gwdb.istr * string) list ->
   (string * (Gwdb.istr * string) list) list
 
 val build_list_short : Config.config -> (_ * string) list -> string list
-val build_list : Config.config -> Gwdb.base -> (Gwdb.istr * string) list
+
+val build_list :
+  ignore_case:bool -> Config.config -> Gwdb.base -> (Gwdb.istr * string) list
+
 val get_all_data : Config.config -> Gwdb.base -> Gwdb.istr list

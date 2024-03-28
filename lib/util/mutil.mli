@@ -103,9 +103,10 @@ val start_with : string -> int -> string -> bool
     Raise [Invalid_argument] if [off] is not a valid index in [str].
 *)
 
-val start_with_wildcard : string -> int -> string -> bool
-(** [start_with_wildcard prefix off str]
-    Test if [str] starts with [prefix] (at offset [off]).
+val start_with_wildcard : ?ignore_case:bool -> string -> int -> string -> bool
+(** [start_with_wildcard ~ignore_case prefix off str]
+    Test if [str] starts with [prefix] (at offset [off]) ignoring the
+    case according to the value of [ignore_case] (default [false]).
     Occurrences of ['_'] in [prefix] will match both ['_']
     and [' '] in [str] and trailing ['_'] of [prefix]
     is treated as an optional ['_'] [' '].

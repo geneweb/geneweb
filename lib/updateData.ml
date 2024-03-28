@@ -129,10 +129,12 @@ let get_person_from_data conf base =
     (fun istr pset acc -> (istr, PersSet.elements pset) :: acc)
     acc []
 
-let combine_by_ini ini list =
+let combine_by_ini ~ignore_case ini list =
   let len = Utf8.length ini + 1 in
   Mutil.groupby
-    ~key:(fun (_, s) -> Alln.ini len @@ Place.without_suburb s)
+    ~key:(fun (_, s) ->
+      let normalize = if ignore_case then Utf8.capitalize else Fun.id in
+      normalize @@ Alln.ini len @@ Place.without_suburb s)
     ~value:(fun x -> x)
     list
 
@@ -452,7 +454,7 @@ let update_person_list conf base new_input list nb_pers max_updates =
   History.notify conf base action
 
 (** Get all the data and filter them if ["s"] is defined in [conf.env] *)
-let build_list conf base =
+let build_list ~ignore_case conf base =
   (* Paramètre pour savoir par quoi commence la chaine. *)
   let ini = Option.value ~default:"" (Util.p_getenv conf.Config.env "s") in
   let list = get_all_data conf base in
@@ -460,8 +462,10 @@ let build_list conf base =
     Mutil.filter_map
       (fun istr ->
         let str = Gwdb.sou base istr in
-        if Mutil.start_with_wildcard ini 0 @@ Place.without_suburb str then
-          Some (istr, str)
+        if
+          Mutil.start_with_wildcard ~ignore_case ini 0
+          @@ Place.without_suburb str
+        then Some (istr, str)
         else None)
       list
   else List.rev_map (fun istr -> (istr, Gwdb.sou base istr)) list
@@ -499,7 +503,8 @@ let build_list_short conf list =
   in
   build_ini list (String.length ini)
 
-let build_list_long conf list : (string * (Gwdb.istr * string) list) list =
+let build_list_long ~ignore_case conf list :
+    (string * (Gwdb.istr * string) list) list =
   let ini = Option.value ~default:"" (Util.p_getenv conf.Config.env "s") in
-  let list = combine_by_ini ini list in
+  let list = combine_by_ini ~ignore_case ini list in
   List.sort (fun (ini1, _) (ini2, _) -> Gutil.alphabetic_order ini1 ini2) list
