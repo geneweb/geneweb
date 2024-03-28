@@ -1075,11 +1075,7 @@ let string_of_witness_kind conf sex witness_kind =
   Adef.safe @@ transl_nth conf s n
 
 let string_of_access conf access =
-  let n = match access with
-    | IfTitles -> 0
-    | Public -> 1
-    | Private -> 2
-  in
+  let n = match access with IfTitles -> 0 | Public -> 1 | Private -> 2 in
   Adef.safe @@ transl_nth conf "iftitles/public/private" n
 
 let base_path pref bname = !GWPARAM.base_path pref bname

@@ -714,17 +714,14 @@ let reconstitute_person conf =
   in
   (p, ext)
 
-
 let check_person conf base p =
-  let bind_none x f = match x with
-    | Some _ -> x
-    | None -> f x
-  in
+  let bind_none x f = match x with Some _ -> x | None -> f () in
   let ( >>= ) = bind_none in
-  Update.check_missing_name base p >>= fun _ ->
-  Update.check_missing_witnesses_names conf (fun e -> e.epers_witnesses) p.pevents >>= fun _ ->
-  Update.check_illegal_access_update base p >>= fun _ ->
-  None
+  Update.check_missing_name base p >>= fun () ->
+  Update.check_missing_witnesses_names conf
+    (fun e -> e.epers_witnesses)
+    p.pevents
+  >>= fun () -> Update.check_illegal_access_update base p
 
 let error_person conf err =
   if not conf.api_mode then (

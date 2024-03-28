@@ -117,7 +117,7 @@ val check_missing_name :
   base -> (Gwdb.iper, 'b, string) Def.gen_person -> update_error option
 
 val check_illegal_access_update :
-    base -> (Gwdb.iper, 'a, 'b) Def.gen_person -> update_error option
+  base -> (Gwdb.iper, 'a, 'b) Def.gen_person -> update_error option
 
 val print_create_conflict : config -> base -> person -> string -> 'exn
 (** [print_create_conflict conf base p var]
