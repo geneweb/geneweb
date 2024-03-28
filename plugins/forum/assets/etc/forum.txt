@@ -42,7 +42,7 @@
   <div class="d-flex align-items-center mt-1">
     <h1 class="ml-sm-2">[*database forum]</h1>
     %if;can_post;
-      <a href="%url_set.m.FORUM_ADD" class="btn btn-primary ml-auto">
+      <a href="%apply;url_set%with;m%and;FORUM_ADD%end;" class="btn btn-primary ml-auto">
         [*add::message/previous message/previous messages/next message]0</a>
     %end;
   </div>
