@@ -1013,11 +1013,12 @@ let is_illegal_access_update old_access new_access =
 
 let check_illegal_access_update base person =
   let old_access_opt =
-    try
-      let iper = person.key_index in
+    let iper = person.key_index in
+    if Gwdb.iper_exists base iper then
       let old_person = Gwdb.poi base iper in
-      Some (Gwdb.get_access old_person)
-    with Invalid_argument _ -> None
+      if is_empty_person old_person then None
+      else Some (Gwdb.get_access old_person)
+    else None
   in
   match old_access_opt with
   | Some old_access ->
