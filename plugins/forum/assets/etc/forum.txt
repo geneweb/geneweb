@@ -37,7 +37,7 @@
 %include;home
 %include;hed
 %if;(e.m!="FORUM" or e.p!="")
-  <h1 class="ml-sm-2" href="%prefix;m=FORUM" accesskey="F">[*database forum]</h1>
+  <h1 class="ml-sm-2"> <a href="%prefix;m=FORUM" accesskey="F">[*database forum]</a></h1>
 %else;
   <div class="d-flex align-items-center mt-1">
     <h1 class="ml-sm-2">[*database forum]</h1>
@@ -161,17 +161,17 @@
 %elseif;(pos!="")
   %( display a message %)
   <ul class="mt-3">
-    %if;(message.prev_pos!="")
-      <li>
-       <a href="%prefix;m=FORUM&p=%message.prev_pos;" accesskey="P">%nn;
-         [*message/previous message/previous messages/next message]1%nn;
-       </a>%nn;
-      </li>
-    %end;
     %if;(message.next_pos!="")
       <li>
        <a href="%prefix;m=FORUM&p=%message.next_pos;" accesskey="N">%nn;
          [*message/previous message/previous messages/next message]3%nn;
+       </a>%nn;
+      </li>
+    %end;
+    %if;(message.prev_pos!="")
+      <li>
+       <a href="%prefix;m=FORUM&p=%message.prev_pos;" accesskey="P">%nn;
+         [*message/previous message/previous messages/next message]1%nn;
        </a>%nn;
       </li>
     %end;
