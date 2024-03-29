@@ -17,13 +17,13 @@ jobs:
 
         include:
           - os: macos-latest
-            ocaml-version: 4.14.0
+            ocaml-version: 4.14.x
             geneweb-archive: geneweb-macos.zip
           - os: ubuntu-latest
-            ocaml-version: 4.14.0
+            ocaml-version: 4.14.x
             geneweb-archive: geneweb-linux.zip
           - os: windows-latest
-            ocaml-version: 4.14.0
+            ocaml-version: 4.14.x
             geneweb-archive: geneweb-windows.zip
 
     runs-on: ${{ matrix.os }}
