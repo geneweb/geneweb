@@ -1000,8 +1000,8 @@ let reconstitute_date_dmy conf var =
   in
   (d, force_f_cal)
 
-let is_illegal_access_update old_access new_access =
-  match (old_access, new_access) with
+let is_illegal_access_update ~previous_access ~new_access =
+  match (previous_access, new_access) with
   | IfTitles, Public | IfTitles, Private | Public, Private | Private, Public ->
       true
   | Public, IfTitles
@@ -1012,7 +1012,7 @@ let is_illegal_access_update old_access new_access =
       false
 
 let check_illegal_access_update base person =
-  let old_access_opt =
+  let previous_access_opt =
     let iper = person.key_index in
     if Gwdb.iper_exists base iper then
       let old_person = Gwdb.poi base iper in
@@ -1020,10 +1020,10 @@ let check_illegal_access_update base person =
       else Some (Gwdb.get_access old_person)
     else None
   in
-  match old_access_opt with
-  | Some old_access ->
-      if is_illegal_access_update old_access person.access then
-        Some (UERR_illegal_access_update (old_access, person.access))
+  match previous_access_opt with
+  | Some previous_access ->
+      if is_illegal_access_update ~previous_access ~new_access:person.access
+      then Some (UERR_illegal_access_update (previous_access, person.access))
       else None
   | None -> None
 

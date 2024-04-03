@@ -1144,7 +1144,7 @@ let print_del conf base =
       print_del_ok conf
   | None -> Hutil.incorrect_request conf
 
-let print_mod_aux conf base callback =
+let print_mod_aux ?(check_person_f = check_person) conf base callback =
   let p, ext = reconstitute_person conf in
   let redisp = Option.is_some (p_getenv conf.env "return") in
   let ini_ps = UpdateInd.string_person_of base (poi base p.key_index) in
@@ -1153,7 +1153,7 @@ let print_mod_aux conf base callback =
     if ext || redisp then UpdateInd.print_update_ind conf base p digest
     else
       let p = strip_person p in
-      match check_person conf base p with
+      match check_person_f conf base p with
       | Some err -> error_person conf err
       | None -> callback p
   else Update.error_digest conf

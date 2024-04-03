@@ -71,6 +71,29 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
   MergeDisplay.print_possible_continue_merging conf base;
   Hutil.trailer conf
 
+(* we check that the new access post merge is one of the two merged persons. *)
+let check_person_access_before_merge previous_p1 previous_p2 new_p =
+  let illegal1 =
+    Update.is_illegal_access_update ~previous_access:previous_p1.access
+      ~new_access:new_p.access
+  in
+  let illegal2 =
+    Update.is_illegal_access_update ~previous_access:previous_p2.access
+      ~new_access:new_p.access
+  in
+  if not (illegal1 && illegal2) then None
+  else
+    Some (Update.UERR_illegal_access_update (previous_p1.access, new_p.access))
+
+let check_person_before_merge conf base previous_p1 previous_p2 new_p =
+  let bind_none x f = match x with Some _ -> x | None -> f () in
+  let ( >>= ) = bind_none in
+  Update.check_missing_name base new_p >>= fun () ->
+  Update.check_missing_witnesses_names conf
+    (fun e -> e.epers_witnesses)
+    new_p.pevents
+  >>= fun () -> check_person_access_before_merge previous_p1 previous_p2 new_p
+
 let print_mod_merge o_conf base =
   let get_gen_person i =
     match p_getenv o_conf.env i with
@@ -82,5 +105,8 @@ let print_mod_merge o_conf base =
   let o_p1 = get_gen_person "i" in
   let o_p2 = get_gen_person "i2" in
   let conf = Update.update_conf o_conf in
-  UpdateIndOk.print_mod_aux conf base (fun p ->
+  let check_person_f conf base =
+    check_person_before_merge conf base o_p1 o_p2
+  in
+  UpdateIndOk.print_mod_aux ~check_person_f conf base (fun p ->
       effective_mod_merge conf base o_p1 o_p2 p print_mod_merge_ok)
