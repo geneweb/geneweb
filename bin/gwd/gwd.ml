@@ -1356,7 +1356,7 @@ let log_and_robot_check conf auth from request script_name contents =
         end;
         log tm conf from auth request script_name contents
       end
-  
+
 let conf_and_connection =
   let slow_query_threshold =
     match Sys.getenv_opt "GWD_SLOW_QUERY_THRESHOLD" with
