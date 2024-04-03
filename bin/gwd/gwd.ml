@@ -218,7 +218,9 @@ let register_plugin dir =
   let assets = Filename.concat dir "assets" in
   GwdPlugin.assets := assets ;
   begin
-    try Dynlink.loadfile plugin
+    try
+      if Sys.file_exists dir then Secure.add_assets assets ;
+      Dynlink.loadfile plugin
     with Dynlink.Error e -> raise (Register_plugin_failure (plugin, `dynlink_error e))
   end ;
   GwdPlugin.assets := ""
@@ -1530,12 +1532,9 @@ let find_misc_file name =
   && List.exists (fun p -> Mutil.start_with (Filename.concat p "assets") 0 name) !plugins
   then name
   else
-    let name' = Filename.concat (base_path ["etc"] "") name in
+    let name' = search_in_assets @@ Filename.concat "etc" name in
     if Sys.file_exists name' then name'
-    else
-      let name' = Util.search_in_assets @@ Filename.concat "etc" name in
-      if Sys.file_exists name' then name'
-      else ""
+    else ""
 
 let print_misc_file conf misc_fname =
   match misc_fname with

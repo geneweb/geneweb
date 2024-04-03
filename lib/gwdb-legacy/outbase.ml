@@ -168,9 +168,10 @@ let output_surname_index base tmp_snames_inx tmp_snames_dat =
     (fun p -> p.surname)
     base tmp_snames_inx tmp_snames_dat
 
+(* FIXME: switch to Dutil.compare_snames_i *)
 let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
   output_name_index_aux
-    (Dutil.compare_fnames_i base.data)
+    (Dutil.compare_snames_i base.data)
     (fun p -> p.first_name)
     base tmp_fnames_inx tmp_fnames_dat
 
@@ -213,7 +214,8 @@ let output ?(save_mem = false) base =
   in
   (try
      (* output header of "base" *)
-     output_string oc Dutil.magic_GnWb0024;
+     (* FIXME: switch to GnWb0024 *)
+     output_string oc Dutil.magic_GnWb0023;
      output_binary_int oc base.data.persons.len;
      output_binary_int oc base.data.families.len;
      output_binary_int oc base.data.strings.len;

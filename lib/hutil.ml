@@ -15,17 +15,16 @@ let link_to_referer conf =
 
 let gen_print_link_to_welcome f conf right_aligned =
   if right_aligned then
-    Output.printf conf "<div class=\"btn-group float-%s mt-2\">\n" conf.right
+    Output.printf conf "<div style=\"float:%s\">\n" conf.right
   else Output.print_sstring conf "<p>\n";
   f ();
   let str = link_to_referer conf in
   if (str :> string) <> "" then Output.print_string conf str;
   Output.print_sstring conf {|<a href="|};
   Output.print_string conf (Util.commd ~senv:false conf);
-  Output.print_sstring conf
-    {|"><span class="fa fa-home fa-lg ml-1 px-0" title="|};
-  Output.print_sstring conf (Utf8.capitalize (Util.transl conf "home"));
-  Output.print_sstring conf {|"></span></a>|};
+  Output.print_sstring conf {|"><img src="|};
+  Output.print_string conf (Image.prefix conf);
+  Output.print_sstring conf {|/up.png" alt="^^" title="^^"></a>|};
   if right_aligned then Output.print_sstring conf "</div>"
   else Output.print_sstring conf "</p>"
 
@@ -62,9 +61,7 @@ let header_without_http conf title =
 
 let header_without_page_title conf title =
   Util.html conf;
-  header_without_http conf title;
-  (* balancing </div> in gen_trailer *)
-  Output.printf conf "<div class=\"container\">"
+  header_without_http conf title
 
 let header_link_welcome conf title =
   header_without_page_title conf title;
@@ -87,9 +84,7 @@ let header conf title =
 
 let header_fluid conf title =
   header_without_http conf title;
-  (* balancing </div> in gen_trailer *)
-  Output.print_sstring conf "<div class=\"container-fluid\">";
-  Output.print_sstring conf "\n<h1>";
+  Output.print_sstring conf "<h1>";
   title false;
   Output.print_sstring conf "</h1>\n"
 

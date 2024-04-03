@@ -811,7 +811,7 @@ let one_title_text base t : Adef.safe_string =
   let place = sou base t.t_place in
   let s = sou base t.t_ident in
   let s = if place = "" then s else s ^ " " ^ place in
-  " <em>" ^<^ (esc s :> Adef.safe_string) ^>^ "</em>"
+  ", <em>" ^<^ (esc s :> Adef.safe_string) ^>^ "</em>"
 
 let geneweb_link conf (href : Adef.escaped_string) (s : Adef.safe_string) =
   "<a href=\""
@@ -1063,10 +1063,9 @@ let string_of_witness_kind conf sex witness_kind =
   let s =
     match witness_kind with
     | Witness -> "witness/witness/witnesses"
-    | Witness_CivilOfficer -> "civil registrar/civil registrar/civil registrar"
+    | Witness_CivilOfficer -> "other/other/other"
     | Witness_GodParent -> "godfather/godmother/godparents"
-    | Witness_ReligiousOfficer ->
-        "parrish registrar/parrish registrar/parrish registrar"
+    | Witness_ReligiousOfficer -> "other/other/other"
     | Witness_Informant -> "informant/informant/informant"
     | Witness_Attending -> "present/present/present"
     | Witness_Mentioned -> "mentioned/mentioned/mentioned"
@@ -1103,90 +1102,12 @@ let include_begin_end_aux (k : Adef.safe_string) conf (fname : Adef.safe_string)
 let include_begin = include_begin_end_aux (Adef.safe "begin")
 let include_end = include_begin_end_aux (Adef.safe "end")
 
-(* ************************************************************************ *)
-(*  [Fonc] etc_file_name : config -> string -> string                       *)
-
-(* ************************************************************************ *)
-
-(** [Description] : Renvoie le chemin vers le fichier de template passé
-                    en paramètre.
-    [Args] :
-      - conf  : configuration de la base
-      - fname : le fichier de template
-    [Retour] :
-      - string : le chemin vers le fichier de template
-    [Rem] : Exporté en clair hors de ce module.                             *)
-let etc_file_name conf fname =
-  (* On recherche si dans le nom du fichier, on a specifié son *)
-  (* répertoire, i.e. si fname est écrit comme ceci : dir/file *)
-  let fname =
-    List.fold_left Filename.concat "" (String.split_on_char '/' fname)
-  in
-  (* On cherche le fichier dans cet ordre :
-     - dans la base (bases/etc/base_name/name.txt)
-     - dans la base (bases/etc/templx/name.txt)
-     - dans le répertoire des programmes (gw/etc/templx/name.txt) *)
-  let file_exist dir =
-    let fn =
-      Filename.concat conf.bname (fname ^ ".txt")
-      |> Filename.concat "etc" |> bpath
-    in
-    if Sys.file_exists fn then fn
-    else
-      let fn =
-        Filename.concat (Filename.basename dir) (fname ^ ".txt")
-        |> Filename.concat "etc" |> bpath
-      in
-      if Sys.file_exists fn then fn
-      else
-        let fn =
-          Filename.concat dir (fname ^ ".txt")
-          |> Filename.concat "etc" |> search_in_assets
-        in
-        if Sys.file_exists fn then fn else ""
-  in
-  (* Recherche le template par défaut en fonction de la variable gwf *)
-  (* template = templ1,templ2,*                                      *)
-  let rec default_templ config_templ std_fname =
-    match config_templ with
-    | [] | [ "*" ] -> std_fname
-    | x :: l -> (
-        match file_exist x with "" -> default_templ l std_fname | s -> s)
-  in
-  let config_templ =
-    try
-      let s = List.assoc "template" conf.base_env in
-      let rec loop list i len =
-        if i = String.length s then List.rev (Buff.get len :: list)
-        else if s.[i] = ',' then loop (Buff.get len :: list) (i + 1) 0
-        else loop list (i + 1) (Buff.store len s.[i])
-      in
-      loop [] 0 0
-    with Not_found -> [ conf.bname; "*" ]
-  in
-  let dir =
-    match p_getenv conf.env "templ" with
-    | Some x when List.mem "*" config_templ -> x
-    | Some x when List.mem x config_templ -> x
-    | Some _ | None -> (
-        match config_templ with [] | [ "*" ] -> "" | x :: _ -> x)
-  in
-  (* template par défaut *)
-  let std_fname = search_in_assets (Filename.concat "etc" (fname ^ ".txt")) in
-  (* On cherche le template dans l'ordre de file_exist.         *)
-  (* Si on ne trouve rien, alors on cherche le premier template *)
-  (* par défaut tel que défini par la variable template du gwf  *)
-  match file_exist dir with
-  | "" -> default_templ config_templ std_fname
-  | s -> s
+let etc_file_name _conf fname =
+  search_in_assets (Filename.concat "etc" (fname ^ ".txt"))
 
 let open_etc_file conf fname =
   let fname = etc_file_name conf fname in
-  try Some (Secure.open_in fname, fname)
-  with Sys_error e ->
-    !GWPARAM.syslog `LOG_ERR
-      (Format.sprintf "Error openning file %s in open_etc_file: %s" fname e);
-    None
+  try Some (Secure.open_in fname, fname) with Sys_error e -> None
 
 let include_template conf env fname failure =
   match open_etc_file conf fname with

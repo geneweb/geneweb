@@ -183,9 +183,10 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
       children;
     Output.print_sstring conf "</ul>")
 
-let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
+let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 tips =
   let sib = siblings conf base (get_iper a) in
   if List.exists (sibling_has_desc_lev conf base lev2) sib then (
+    if tips then Util.print_tips_relationship conf;
     if lev1 > 1 then (
       Output.print_sstring conf "<li>";
       [
@@ -210,25 +211,22 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
     loop Sosa.one lev1
   in
   let last_sosa = Sosa.twice first_sosa in
-  Output.print_sstring conf "<div>";
-  Util.print_tips_relationship conf;
-  Output.print_sstring conf "</div>";
   if lev1 > 1 then Output.print_sstring conf "<ul>";
   let some =
-    let rec loop sosa some =
+    let rec loop sosa some print_tips =
       if !cnt < max_cnt && Sosa.gt last_sosa sosa then
         let some =
           match Util.old_branch_of_sosa conf base (get_iper p) sosa with
           | Some ((ia, _) :: _ as br) ->
               print_cousins_side_of conf base max_cnt (pget conf base ia) p br
-                lev1 lev2
+                lev1 lev2 print_tips
               || some
           | _ -> some
         in
-        loop (Sosa.inc sosa 1) some
+        loop (Sosa.inc sosa 1) some false
       else some
     in
-    loop first_sosa false
+    loop first_sosa false true
   in
   if not some then (
     Output.print_sstring conf (Utf8.capitalize_fst (transl conf "no match"));
@@ -279,9 +277,9 @@ let print_cousins conf base p lev1 lev2 =
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_sstring conf "<div>";
   (*include_templ conf "cousins_tools";*)
-  Output.print_sstring conf "<h3>";
+  Output.print_sstring conf "<h2>";
   title false;
-  Output.print_sstring conf "</h3>";
+  Output.print_sstring conf "</h2>";
   Output.print_sstring conf "</div>";
   cnt := 0;
   (* Construction de la table des sosa de la base *)
@@ -305,8 +303,7 @@ let print_cousins conf base p lev1 lev2 =
     Output.print_sstring conf " ";
     Output.print_sstring conf
       (Util.translate_eval ("@(c)" ^ transl_nth conf "spouse/spouses" 1));
-    Output.print_sstring conf ". ")
-  else Output.print_sstring conf ". ";
+    Output.print_sstring conf ".");
   Output.print_sstring conf "</p></div>";
   Hutil.trailer conf
 
