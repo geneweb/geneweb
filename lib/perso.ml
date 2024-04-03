@@ -1317,7 +1317,7 @@ let warning_use_has_parents_before_parent (fname, bp, ep) var r =
   Printf.sprintf
     "%s %d-%d: since v5.00, must test \"has_parents\" before using \"%s\"\n"
     fname bp ep var
-  |> !GWPARAM.syslog `LOG_WARNING;
+  |> GWPARAM.syslog `LOG_WARNING;
   r
 
 let bool_val x = TemplAst.VVbool x
@@ -3122,7 +3122,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "is_restricted" ->
       (* TODO why is it not Util.is_restricted *)
       Util.is_empty_person p
-  | "is_contemporary" -> !GWPARAM.is_contemporary conf base p
+  | "is_contemporary" -> GWPARAM.is_contemporary conf base p
   | _ -> raise Not_found
 
 and eval_str_person_field conf base env ((p, p_auth) as ep) = function

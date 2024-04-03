@@ -1425,7 +1425,7 @@ let conf_and_connection =
         with
         | Exit -> ()
         | (Def.HttpExn (code, _)) as e ->
-          !GWPARAM.output_error conf code ;
+          GWPARAM.output_error conf code ;
           printexc e
         | e -> printexc e
 
@@ -1956,9 +1956,9 @@ let main () =
 #endif
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
-  Geneweb.GWPARAM.syslog := GwdLog.syslog;
+  Geneweb.GWPARAM.set_syslog GwdLog.syslog;
   List.iter register_plugin !plugins ;
-  !GWPARAM.init () ;
+  GWPARAM.init () ;
   cache_lexicon () ;
   if !images_dir <> "" then
     begin let abs_dir =

@@ -180,3 +180,24 @@ let syslog = ref Default.syslog
 let wrap_output = ref Default.wrap_output
 
 let has_ignored_duplicates = ref (fun _ _ -> false)
+let set_init f = init := f
+let set_base_path f = base_path := f
+let set_bpath f = bpath := f
+let set_output_error f = output_error := f
+let set_is_contemporary f = is_contemporary := f
+let set_p_auth f = p_auth := f
+let set_syslog f = syslog := f
+let set_wrap_output f = wrap_output := f
+let set_has_ignored_duplicates f = has_ignored_duplicates := f
+let init () = !init ()
+let base_path pref bname = !base_path pref bname
+let bpath bname = !bpath bname
+
+let output_error ?headers ?content conf code =
+  !output_error ?headers ?content conf code
+
+let is_contemporary conf base p = !is_contemporary conf base p
+let p_auth conf base p = !p_auth conf base p
+let syslog syslog_level msg = !syslog syslog_level msg
+let wrap_output conf title content = !wrap_output conf title content
+let has_ignored_duplicates conf base = !has_ignored_duplicates conf base

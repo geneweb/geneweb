@@ -18,47 +18,68 @@ type syslog_level =
 
 (* S: Move it to gwd_lib?  *)
 
-val init : (unit -> unit) ref
+val init : unit -> unit
 (** Function called before gwd starts
     e.g. inititialise assets folders in Secure module. *)
 
-val base_path : (string list -> string -> string) ref
-(** [!base_path pref fname] function that returns a path to a file identified by [pref] [fname]
+val base_path : string list -> string -> string
+(** [base_path pref fname] function that returns a path to a file identified by [pref] [fname]
     related to bases. [pref] is like a category for file [fname].
 
     See {!val:GWPARAM.Default.base_path} for a concrete example.
 *)
 
-val bpath : (string -> string) ref
+val bpath : string -> string
 (** Same as {!val:base_path}, but without the prefix (avoid unecessary empty list). *)
 
 val output_error :
-  (?headers:string list ->
+  ?headers:string list ->
   ?content:Adef.safe_string ->
   Config.config ->
   Def.httpStatus ->
-  unit)
-  ref
-(** [!output_error ?headers ?content conf status] default function that send the http status [status].
+  unit
+
+(** [output_error ?headers ?content conf status] default function that send the http status [status].
     Also send [headers] and use [content] (typically a HTML string describing the error) if provided.
 *)
 
-val is_contemporary : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
+val is_contemporary : Config.config -> Gwdb.base -> Gwdb.person -> bool
 (** Check if a person is contemporary *)
 
-val p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
+val p_auth : Config.config -> Gwdb.base -> Gwdb.person -> bool
 (** Check if a person should be displayed or not *)
 
-val syslog : (syslog_level -> string -> unit) ref
-(** [!syslog level log] log message [log] with gravity level [level] on stderr. *)
+val syslog : syslog_level -> string -> unit
+(** [syslog level log] log message [log] with gravity level [level] on stderr. *)
 
-val wrap_output :
-  (Config.config -> Adef.safe_string -> (unit -> unit) -> unit) ref
+val wrap_output : Config.config -> Adef.safe_string -> (unit -> unit) -> unit
 (** [wrap_output conf title content]
     Wrap the display of [title] and [content] in a defined template.
 *)
 
-val has_ignored_duplicates : (Config.config -> Gwdb.base -> bool) ref
+val has_ignored_duplicates : Config.config -> Gwdb.base -> bool
+val set_init : (unit -> unit) -> unit
+val set_base_path : (string list -> string -> string) -> unit
+val set_bpath : (string -> string) -> unit
+
+val set_output_error :
+  (?headers:string list ->
+  ?content:Adef.safe_string ->
+  Config.config ->
+  Def.httpStatus ->
+  unit) ->
+  unit
+
+val set_is_contemporary :
+  (Config.config -> Gwdb.base -> Gwdb.person -> bool) -> unit
+
+val set_p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) -> unit
+val set_syslog : (syslog_level -> string -> unit) -> unit
+
+val set_wrap_output :
+  (Config.config -> Adef.safe_string -> (unit -> unit) -> unit) -> unit
+
+val set_has_ignored_duplicates : (Config.config -> Gwdb.base -> bool) -> unit
 
 module Default : sig
   val init : unit -> unit

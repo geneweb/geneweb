@@ -581,7 +581,7 @@ let is_old_person conf p =
       p.access <> Private && conf.public_if_no_date
   | _ -> false
 
-let authorized_age conf base p = !GWPARAM.p_auth conf base p
+let authorized_age conf base p = GWPARAM.p_auth conf base p
 
 let is_restricted (conf : config) base (ip : iper) =
   let fct p =
@@ -1077,8 +1077,8 @@ let string_of_access conf access =
   let n = match access with IfTitles -> 0 | Public -> 1 | Private -> 2 in
   Adef.safe @@ transl_nth conf "iftitles/public/private" n
 
-let base_path pref bname = !GWPARAM.base_path pref bname
-let bpath bname = !GWPARAM.bpath bname
+let base_path pref bname = GWPARAM.base_path pref bname
+let bpath bname = GWPARAM.bpath bname
 let copy_from_templ_ref = ref (fun _ _ _ -> assert false)
 let copy_from_templ conf env ic = !copy_from_templ_ref conf env ic
 

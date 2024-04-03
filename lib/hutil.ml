@@ -104,16 +104,15 @@ let trailer conf =
   Output.print_sstring conf "</body>\n</html>\n"
 
 let () =
-  GWPARAM.wrap_output :=
-    fun conf title content ->
+  GWPARAM.set_wrap_output (fun conf title content ->
       header conf (fun _ -> Output.print_string conf title);
       content ();
-      trailer conf
+      trailer conf)
 
-let incorrect_request conf = !GWPARAM.output_error conf Def.Bad_Request
+let incorrect_request conf = GWPARAM.output_error conf Def.Bad_Request
 
 let error_cannot_access conf fname =
-  !GWPARAM.output_error conf Def.Not_Found
+  GWPARAM.output_error conf Def.Not_Found
     ~content:
       ("Cannot access file \""
       ^<^ (Util.escape_html fname : Adef.escaped_string :> Adef.safe_string)

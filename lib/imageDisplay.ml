@@ -83,7 +83,7 @@ let print_image_file conf fname =
         close_in ic;
         Ok ()
       with Sys_error e ->
-        !GWPARAM.syslog `LOG_ERR
+        GWPARAM.syslog `LOG_ERR
           (Format.sprintf "Error printing image file content for %s : %s" fname
              e);
         Error e)
