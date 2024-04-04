@@ -363,7 +363,7 @@ let summary_of_tlsw_lines conf short lines =
 let string_of_modify_link conf cnt empty = function
   | Some (can_edit, mode, sfn) when conf.wizard ->
       (if empty then "<p>"
-      else {|<div class="small float-|} ^ conf.right ^ {|">|})
+      else {|<div style="font-size:80%;float:right;margin-left:3em">|})
       ^ {|(<a href="|}
       ^ (commd conf :> string)
       ^ "m="
@@ -596,7 +596,8 @@ let html_with_summary_of_tlsw conf wi edit_opt s =
          (lines_before_summary @ summary @ lines_after_summary))
   in
   if lines_before_summary <> [] || lines = [] then
-    string_of_modify_link conf 0 (s = "") edit_opt ^ s
+    let s2 = string_of_modify_link conf 0 (s = "") edit_opt in
+    s2 ^ "<p><br></p>" ^ s
   else s
 
 (* v = 0 -> keeps the last lines until a title occurs, discards the rest *)
@@ -639,15 +640,13 @@ let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
     Output.print_sstring conf {|&v=|};
     Output.print_sstring conf (string_of_int @@ (cnt0 - 1));
     Output.print_sstring conf {|">|};
-    Output.print_sstring conf
-      {|<span class="fa fa-arrow-left fa-lg" title="<<"></span></a> |});
+    Output.print_sstring conf {|&lt;&lt;</a> |});
   Output.print_sstring conf {|<a href="|};
   Output.print_string conf (commd conf);
   Output.print_sstring conf {|m=|};
   Output.print_string conf edit_mode;
   Output.print_string conf sfn;
-  Output.print_sstring conf
-    {|"><span class="fa fa-arrow-up fa-lg" title="^^"></span></a>|};
+  Output.print_sstring conf {|">^^</a>|};
   if not is_empty then (
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
@@ -656,8 +655,7 @@ let print_sub_part_links conf edit_mode sfn cnt0 is_empty =
     Output.print_string conf sfn;
     Output.print_sstring conf "&v=";
     Output.print_sstring conf (string_of_int @@ (cnt0 + 1));
-    Output.print_sstring conf
-      {|"><span class="fa fa-arrow-right fa-lg" title=">>"></span></a>|});
+    Output.print_sstring conf {|">&gt;&gt;</a>|});
   Output.print_sstring conf "</p>"
 
 let print_sub_part_text conf wi edit_opt cnt0 lines =
@@ -720,7 +718,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
   Hutil.print_link_to_welcome conf true;
   if can_edit && has_v then
     print_sub_part_links conf (mode_pref ^^^ mode) sfn v is_empty;
-  Output.print_sstring conf {|<form method="POST" action="|};
+  Output.print_sstring conf {|<form name="form_notes" method="POST" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|">|};
   Util.hidden_env conf;

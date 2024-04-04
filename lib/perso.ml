@@ -2484,8 +2484,7 @@ and eval_date_field_var conf d = function
           | _ -> null_val)
       | _ -> null_val)
   | [] ->
-      DateDisplay.string_of_date_aux ~link:false conf
-        ~sep:(Adef.safe "&#010;  ") d
+      DateDisplay.string_of_date_aux ~link:false conf ~sep:(Adef.safe "<br>") d
       |> safe_val
   | _ -> raise Not_found
 
@@ -3063,14 +3062,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         match Gutil.get_birth_death_date p with
         | ( Some (Dgreg (({ prec = Sure | About | Maybe } as d1), _)),
             Some (Dgreg (({ prec = Sure | About | Maybe } as d2), _)),
-            approx )
+            _approx )
           when d1 <> d2 ->
-            let a = Date.time_elapsed d1 d2 in
-            let s =
-              if (not approx) && d1.prec = Sure && d2.prec = Sure then ""
-              else transl_decline conf "possibly (date)" "" ^ " "
-            in
-            s ^<^ DateDisplay.string_of_age conf a |> safe_val
+            DateDisplay.string_of_age conf (Date.time_elapsed d1 d2) |> safe_val
         | _ -> null_val
       else null_val
   | "death_place" ->

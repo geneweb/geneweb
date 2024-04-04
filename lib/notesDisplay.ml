@@ -55,7 +55,6 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
       Output.print_sstring conf ")</a>\n")
   in
   Hutil.gen_print_link_to_welcome what_links_page conf true;
-  Output.print_sstring conf {|<div class="d-flex justify-content-between">|};
   if (title :> string) <> "" then (
     let title =
       match ho with
@@ -64,10 +63,9 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
           |> Adef.safe
       | None -> title
     in
-    Output.print_sstring conf {|<h1 class="my-3">|};
+    Output.print_sstring conf {|<h1>|};
     Output.print_string conf title;
     Output.print_sstring conf {|</h1>|});
-  Output.printf conf "</div>\n";
   Util.include_template conf [] "summary" (fun () -> ());
   let file_path = file_path conf base in
   let s = string_with_macros conf [] s in
@@ -128,7 +126,7 @@ let print_linked_list conf base pgl =
       | Def.NLDB.PgInd ip ->
           Output.print_sstring conf "<tt>";
           if conf.wizard then (
-            Output.print_sstring conf {|<a class="mx-2" href="|};
+            Output.print_sstring conf {|<a href="|};
             Output.print_string conf (commd conf);
             Output.print_sstring conf "&i=";
             Output.print_string conf (Gwdb.string_of_iper ip |> Mutil.encode);
