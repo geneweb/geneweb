@@ -116,6 +116,9 @@ val check_missing_witnesses_names :
 val check_missing_name :
   base -> (Gwdb.iper, 'b, string) Def.gen_person -> update_error option
 
+val is_illegal_access_update :
+  previous_access:Def.access -> new_access:Def.access -> bool
+
 val check_illegal_access_update :
   base -> (Gwdb.iper, 'a, 'b) Def.gen_person -> update_error option
 

@@ -38,7 +38,15 @@ val all_checks_person :
     for example, a birth should happen before the death of a mother. *)
 
 val print_mod_aux :
-  config -> base -> ((iper, Update.key, string) gen_person -> unit) -> unit
+  ?check_person_f:
+    (config ->
+    base ->
+    (iper, Update.key, string) Def.gen_person ->
+    Update.update_error option) ->
+  config ->
+  base ->
+  ((iper, Update.key, string) gen_person -> unit) ->
+  unit
 
 val print_add : config -> base -> unit
 (** Tries to add a person to the base and displays a success HTML page if
