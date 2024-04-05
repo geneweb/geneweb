@@ -5,6 +5,8 @@ open Gwdb
 open Util
 module Logs = Geneweb_logs.Logs
 
+(* le cousin, liste des familles entre lui et l'ancêtre, l'ancêtre, level *)
+(* TODO see if level is the same as List.length ifam list *)
 type one_cousin =
   Gwdb_driver.iper * Gwdb_driver.ifam list * Gwdb_driver.iper * int
 
@@ -90,6 +92,8 @@ let mdl = 12
 let update_min_max (min, max) date =
   ((if date < min then date else min), if date > max then date else max)
 
+(* find the max ancestor level for some individual *)
+(* if max_anc_level in .gwf has no value, use supplied parameter *)
 let max_ancestor_level conf base ip max_lvl =
   let max_lvl =
     match List.assoc_opt "max_anc_level" conf.Config.base_env with
@@ -122,11 +126,37 @@ let max_ancestor_level conf base ip max_lvl =
   loop 0 ip;
   !x
 
-let max_descendant_level conf _base _ip max_lvl =
-  (* TODO we should compute this value *)
-  match List.assoc_opt "max_desc_level" conf.Config.base_env with
-  | Some v when v <> "" -> int_of_string v
-  | _ -> max_lvl
+(* find the max descendant level for some individual *)
+(* if max_desc_level in .gwf has no value, use supplied parameter *)
+let max_descendant_level conf base ip max_lvl =
+  let max_lvl =
+    match List.assoc_opt "max_desc_level" conf.Config.base_env with
+    | Some v when v <> "" -> int_of_string v
+    | _ -> max_lvl
+  in
+  let x = ref 0 in
+  let rec loop0 l lev =
+    match l with
+    | [] -> x := if lev > !x then lev else !x
+    | ip :: l ->
+        let childs_of_ip =
+          let faml = Array.to_list (get_family (poi base ip)) in
+          (* accumuler tous les enfants de ip *)
+          let rec loop2 acc faml =
+            match faml with
+            | [] -> acc
+            | ifam :: faml ->
+                let children = Array.to_list (get_children (foi base ifam)) in
+                loop2 (children @ acc) faml
+          in
+          loop2 [] faml
+        in
+        (* TODO verify < of <= *)
+        if lev < max_lvl then loop0 childs_of_ip (lev + 1);
+        loop0 l lev
+  in
+  loop0 [ ip ] 0;
+  !x
 
 let get_min_max_dates base l =
   let rec loop (min, max) = function
@@ -187,8 +217,8 @@ let rec ascendants base acc l =
           let cpl = foi base ifam in
           let ifath = get_father cpl in
           let imoth = get_mother cpl in
-          let acc = [ (ifath, [], ifath, lev + 1) ] @ acc in
-          let acc = [ (imoth, [], imoth, lev + 1) ] @ acc in
+          let acc = (ifath, [], ifath, lev + 1) :: acc in
+          let acc = (imoth, [], imoth, lev + 1) :: acc in
           ascendants base acc l)
 
 (* descendants des ip de liste1 sauf ceux présents dans liste2 *)
@@ -223,7 +253,8 @@ let descendants_aux base liste1 liste2 =
                   in
                   loop2 [] (Array.to_list (get_children (foi base ifam)))
                 in
-                loop1 (acc @ children) fams
+                (* @ is ok, children is a small list *)
+                loop1 (children @ acc) fams
           in
           loop1 [] fams
         in
@@ -244,14 +275,13 @@ let descendants base cousins_cnt i j =
   descendants_aux base liste1 liste2
 
 let init_cousins_cnt conf base p =
-  let _max_a_l = max_ancestor_level conf base (get_iper p) mal in
+  let max_a_l = max_ancestor_level conf base (get_iper p) mal in
   let max_a_l =
     match p_getenv conf.Config.env "v" with
     | Some v -> int_of_string v
-    | None -> 3
+    | None -> max_a_l
   in
   let max_d_l = max_descendant_level conf base (get_iper p) mdl in
-
   let rec loop0 j cousins_cnt cousins_dates =
     (* initiate lists of direct descendants *)
     cousins_cnt.(0).(j) <- descendants base cousins_cnt 0 j;
@@ -529,28 +559,44 @@ let init_desc_cnt conf base p =
       t'
 
 let anc_cnt_aux conf base lev at_to p =
+  let cous = Hashtbl.create 10000 in
   let asc_cnt =
     match !asc_cnt_t with Some t -> t | None -> init_asc_cnt conf base p
   in
   if at_to then if lev < Array.length asc_cnt then Some asc_cnt.(lev) else None
   else
-    let rec loop acc i =
-      if i > lev || i >= Array.length asc_cnt - 1 then Some acc
-      else loop (asc_cnt.(i) @ acc) (i + 1)
+    let rec loop i =
+      if i > lev || i >= Array.length asc_cnt - 1 then
+        Some (Hashtbl.fold (fun _k v acc -> v :: acc) cous [])
+      else (
+        (* several cousins records with same ip, different faml! *)
+        List.iter
+          (fun (ip, faml, ianc, lvl) ->
+            Hashtbl.add cous ip (ip, faml, ianc, lvl))
+          asc_cnt.(i);
+        loop (i + 1))
     in
-    loop [] 1
+    loop 1
 
 let desc_cnt_aux conf base lev at_to p =
+  let cous = Hashtbl.create 10000 in
   let desc_cnt =
     match !desc_cnt_t with Some t -> t | None -> init_desc_cnt conf base p
   in
   if at_to then
     if lev < Array.length desc_cnt then Some desc_cnt.(lev) else None
   else
-    let rec loop acc i =
-      if i > lev || i > Array.length desc_cnt - 1 then Some acc
-      else loop (desc_cnt.(i) @ acc) (i + 1)
+    let rec loop i =
+      if i > lev || i > Array.length desc_cnt - 1 then
+        Some (Hashtbl.fold (fun _k v acc -> v :: acc) cous [])
+      else (
+        (* several cousins records with same ip, different faml! *)
+        List.iter
+          (fun (ip, faml, ianc, lvl) ->
+            Hashtbl.add cous ip (ip, faml, ianc, lvl))
+          desc_cnt.(i);
+        loop (i + 1))
     in
-    loop [] 0
+    loop 0
 
 (* end cousins *)
