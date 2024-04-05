@@ -269,22 +269,42 @@ let strip_trailing_spaces s =
   String.sub s 0 len
 
 let read_base_env bname =
-  let fname = Util.bpath (bname ^ ".gwf") in
-  try
-    let ic = Secure.open_in fname in
-    let env =
-      let rec loop env =
-        match input_line ic with
-        | s ->
-          let s = strip_trailing_spaces s in
-          if s = "" || s.[0] = '#' then loop env
-          else loop (cut_at_equal 0 s :: env)
-        | exception End_of_file -> env
+  let load_file fname =
+    try
+      Printf.eprintf "read_base_env %S...\n%!" fname;
+      let ic = Secure.open_in fname in
+      let env =
+        let rec loop env =
+          match input_line ic with
+          | s ->
+            let s = strip_trailing_spaces s in
+            if s = "" || s.[0] = '#' then loop env
+            else loop (cut_at_equal 0 s :: env)
+          | exception End_of_file -> env
+        in
+        loop []
       in
-      loop []
-    in
-    close_in ic; env
-  with Sys_error _ -> []
+      close_in ic;
+      env
+    with Sys_error error ->
+        GwdLog.syslog `LOG_WARNING @@
+        Printf.sprintf "Error %s while loading %s, using empty config" error fname;
+      []
+  in
+  let fname1 = Util.bpath (bname ^ ".gwf") in
+    if Sys.file_exists fname1 then
+      load_file fname1
+    else
+      let fname2 = Filename.concat !gw_prefix "etc/a.gwf" in
+      if Sys.file_exists fname2 then begin
+        GwdLog.syslog `LOG_WARNING @@
+        Printf.sprintf "Using configuration from %s" fname2;
+        load_file fname2
+      end else begin
+        GwdLog.syslog `LOG_WARNING @@
+        Printf.sprintf "No config file found in either %s or %s" fname1 fname2;
+        []
+      end
 
 let print_renamed conf new_n =
   let link =
@@ -1065,7 +1085,7 @@ let string_to_char_list s =
 
 let make_conf from_addr request script_name env =
   if !allowed_tags_file <> "" && not (Sys.file_exists !allowed_tags_file) then (
-    let str = 
+    let str =
      Printf.sprintf
        "Requested allowed_tags file (%s) absent" !allowed_tags_file
     in
@@ -1175,7 +1195,7 @@ let make_conf from_addr request script_name env =
     with Not_found -> false
   in
   let wizard_just_friend = if manitou then false else wizard_just_friend in
-  let private_years = 
+  let private_years =
     try int_of_string (List.assoc "private_years" base_env) with
     Not_found | Failure _ -> 150
   in
@@ -1414,7 +1434,7 @@ let log_and_robot_check conf auth from request script_name contents =
         end;
         log tm conf from auth request script_name contents
       end
-  
+
 let conf_and_connection =
   let slow_query_threshold =
     match Sys.getenv_opt "GWD_SLOW_QUERY_THRESHOLD" with
@@ -2015,7 +2035,7 @@ let main () =
     ; ("-no_host_address", Arg.Set no_host_address, " Force no reverse host by address.")
     ; ("-digest", Arg.Set use_auth_digest_scheme, " Use Digest authorization scheme (more secure on passwords)")
     ; ("-add_lexicon", Arg.String (Mutil.list_ref_append lexicon_list), "<FILE> Add file as lexicon.")
-    ; ("-log", Arg.String (fun x -> GwdLog.oc := Some (match x with "-" | "<stdout>" -> stdout | "<stderr>" -> stderr | _ -> open_out x)), {|<FILE> Log trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|})
+    ; ("-log", Arg.String (fun x -> GwdLog.oc := Some (match x with "-" | "<stdout>" -> stdout | "2" | "<stderr>" -> stderr | _ -> open_out x)), {|<FILE> Log trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|})
     ; ("-log_level", Arg.Set_int GwdLog.verbosity, {|<N> Send messages with severity <= <N> to syslog (default: |} ^ string_of_int !GwdLog.verbosity ^ {|).|})
     ; ("-robot_xcl", Arg.String robot_exclude_arg, "<CNT>,<SEC> Exclude connections when more than <CNT> requests in <SEC> seconds.")
     ; ("-min_disp_req", Arg.Int (fun x -> Robot.min_disp_req := x), " Minimum number of requests in robot trace (default: " ^ string_of_int !(Robot.min_disp_req) ^ ").")
@@ -2031,6 +2051,7 @@ let main () =
     ; ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
     ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
     ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
+    ; ("-no-fork", Arg.Set Wserver.no_fork, " Prevent forking processes")
 #endif
     ]
   in
