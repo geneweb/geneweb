@@ -34,6 +34,8 @@ endif
 	-e "s/%%%GWDB_PKG%%%/$(GWDB_PKG)/g" \
 	-e "s/%%%SYSLOG_PKG%%%/$(SYSLOG_PKG)/g" \
 	-e "s/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g" \
+	-e "s/%%%ANCIENT_LIB%%%/$(ANCIENT_LIB)/g" \
+	-e "s/%%%ANCIENT_FILE%%%/$(ANCIENT_FILE)/g" \
 	> $@ \
 	&& printf " Done.\n"
 
@@ -78,6 +80,7 @@ GENERATED_FILES_DEP = \
 	lib/gwdb/dune \
 	lib/core/dune \
 	lib/util/dune \
+	lib/ancient/dune \
 	benchmark/dune \
 	bin/connex/dune \
 	bin/cache_files/dune \

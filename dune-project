@@ -21,7 +21,6 @@
   (tags (genealogy))
   (depends
     (alcotest :with-test)
-    ancient
     benchmark
     (calendars (= "1.0.0"))
     (camlp5 (>= "8.00.01"))
@@ -32,7 +31,6 @@
     markup
     num
     (ocaml (>= 4.08))
-    ocaml-option-nnp
     (ocamlformat (and :dev (= 0.24.1)))
     ounit
     ppx_blob
@@ -46,4 +44,9 @@
     uunf
     uutf
     zarith
-  ))
+  )
+  (depopts
+    ocaml-option-nnp
+    ancient
+  )
+)

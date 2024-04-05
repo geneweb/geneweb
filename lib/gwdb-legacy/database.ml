@@ -673,7 +673,7 @@ let make_record_exists patches pending len i =
   || (i < len && i >= 0)
 
 type 'a data_array =
-  | ReadOnly of 'a array Ancient.ancient
+  | ReadOnly of 'a array Gw_ancient.ancient
   | ReadWrite of 'a array
 
 type 'a immut_record = {
@@ -689,7 +689,7 @@ let make_immut_record_access ~read_only ic ic_acc shift array_pos len name
   let im_get i =
     match !tab with
     | Some (ReadWrite x) -> x.(i)
-    | Some (ReadOnly x) -> (Ancient.follow x).(i)
+    | Some (ReadOnly x) -> (Gw_ancient.follow x).(i)
     | None -> (
         if i < 0 || i >= len then
           failwith ("access " ^ name ^ " out of bounds; i = " ^ string_of_int i)
@@ -712,7 +712,7 @@ let make_immut_record_access ~read_only ic ic_acc shift array_pos len name
         seek_in ic array_pos;
         let t =
           if read_only then (
-            let t = ReadOnly (Ancient.mark (input_array ic)) in
+            let t = ReadOnly (Gw_ancient.mark (input_array ic)) in
             Gc.compact ();
             t)
           else ReadWrite (input_array ic)
@@ -731,7 +731,7 @@ let make_immut_record_access ~read_only ic ic_acc shift array_pos len name
           | None -> ()
           | Some a ->
               (match a with
-              | ReadOnly a -> Ancient.delete a
+              | ReadOnly a -> Gw_ancient.delete a
               | ReadWrite _ -> ());
               tab := None);
     }
