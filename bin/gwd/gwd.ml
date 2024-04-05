@@ -24,6 +24,7 @@ let printer_conf = { Config.empty with output_conf }
 
 let auth_file = ref ""
 let cache_langs = ref []
+let cache_databases = ref []
 let choose_browser_lang = ref false
 let conn_timeout = ref 120
 let daemon = ref false
@@ -1879,8 +1880,7 @@ let main () =
 #endif
     ; ("-cache-in-memory", Arg.String (fun s ->
         if Gw_ancient.is_available then
-          let _db : Gwdb_driver.base = Gwdb.open_base ~keep_in_memory:true s in
-          ()
+          cache_databases := s::!cache_databases
         else
           failwith "-cache-in-memory option unavailable for this build."
       ), "<DATABASE> Preload this database in memory")
@@ -1907,6 +1907,13 @@ let main () =
   List.iter register_plugin !plugins ;
   GWPARAM.init () ;
   cache_lexicon () ;
+  List.iter
+    (fun dbn ->
+       Printf.eprintf "Caching %s... %!" dbn;
+       ignore (Gwdb.open_base ~keep_in_memory:true dbn);
+       Printf.eprintf "Done.\n%!"
+    )
+    !cache_databases;
   if !images_dir <> "" then
     begin let abs_dir =
       let f =
