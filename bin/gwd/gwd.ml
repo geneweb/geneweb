@@ -1878,8 +1878,11 @@ let main () =
     ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
 #endif
     ; ("-cache-in-memory", Arg.String (fun s ->
-        let _db : Gwdb_driver.base = Gwdb.open_base ~keep_in_memory:true s in
-        ()
+        if Gw_ancient.is_available then
+          let _db : Gwdb_driver.base = Gwdb.open_base ~keep_in_memory:true s in
+          ()
+        else
+          failwith "-cache-in-memory option unavailable for this build."
       ), "<DATABASE> Preload this database in memory")
     ]
   in

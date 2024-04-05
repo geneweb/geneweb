@@ -15,7 +15,6 @@ doc: "https://geneweb.tuxfamily.org/wiki/GeneWeb"
 bug-reports: "https://github.com/geneweb/geneweb/issues"
 depends: [
   "alcotest" {with-test}
-  "ancient"
   "benchmark"
   "calendars"
   "camlp5" {>= "8.00.01"}
@@ -28,7 +27,6 @@ depends: [
   "num"
   "ocaml" {>= "4.08"}
   "odoc"
-  "ocaml-option-nnp"
   "ocamlformat" {dev & = "0.24.1"}
   "ounit"
   "ppx_blob"
@@ -42,6 +40,7 @@ depends: [
   "uutf"
   "zarith"
 ]
+depopts: ["ocaml-option-nnp" "ancient"]
 dev-repo: "git+https://github.com/geneweb/geneweb.git"
 build: [
   [ "ocaml" "./configure.ml" "--release" ]
