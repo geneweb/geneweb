@@ -780,12 +780,15 @@ let print_family opts base gen m =
   | Engaged -> Printf.ksprintf (oc opts) " #eng"
   | NoSexesCheckNotMarried -> print_sexes "#nsck"
   | NoSexesCheckMarried -> print_sexes "#nsckm"
-  | NoMention -> print_sexes "#noment"
-  | MarriageBann -> print_sexes "#banns"
-  | MarriageContract -> print_sexes "#contract"
-  | MarriageLicense -> print_sexes "#license"
-  | Pacs -> print_sexes "#pacs"
-  | Residence -> print_sexes "#residence");
+  | NoMention ->
+      if not !old_gw then print_sexes "#noment"
+      else Printf.ksprintf (oc opts) " #noment"
+  (* TODO what should be done with those new options *)
+  | MarriageBann -> if not !old_gw then print_sexes "#banns"
+  | MarriageContract -> if not !old_gw then print_sexes "#contract"
+  | MarriageLicense -> if not !old_gw then print_sexes "#license"
+  | Pacs -> if not !old_gw then print_sexes "#pacs"
+  | Residence -> if not !old_gw then print_sexes "#residence");
   print_if_no_empty opts base "#mp" (get_marriage_place fam);
   if opts.source = None then
     print_if_no_empty opts base "#ms" (get_marriage_src fam);

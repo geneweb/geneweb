@@ -2,11 +2,16 @@ let verbosity = ref 7
 let debug = ref false
 
 let oc : out_channel option ref = ref None
+let warning_printed = ref false
 
 let log fn =
   match !oc with
   | Some oc -> fn oc
-  | None -> ()
+  | None ->
+    if not !warning_printed then begin
+      Printf.eprintf "Warning: logging not enabled. Use '-log 2' to log on stderr\n%!";
+      warning_printed := true
+      end
 
 type level =
   [ `LOG_ALERT
@@ -19,12 +24,9 @@ type level =
   | `LOG_WARNING
   ]
 
-#ifdef SYSLOG
 let syslog (level : level) msg =
-  let flags = if !debug then [`LOG_PERROR] else [] in
-  if !verbosity
-     >=
-     match level with
+  let verbosity_level =
+    match level with
      | `LOG_EMERG -> 0
      | `LOG_ALERT -> 1
      | `LOG_CRIT -> 2
@@ -33,27 +35,19 @@ let syslog (level : level) msg =
      | `LOG_NOTICE -> 5
      | `LOG_INFO -> 6
      | `LOG_DEBUG -> 7
+  in
+#ifdef SYSLOG
+  let flags = if !debug then [`LOG_PERROR] else [] in
+  if !verbosity >= verbosity_level
   then begin
     let log = Syslog.openlog ~flags @@ Filename.basename @@ Sys.executable_name in
     Syslog.syslog log level msg ;
     Syslog.closelog log ;
     if !debug then Printexc.print_backtrace stderr ;
   end
-#endif
-
-#ifndef SYSLOG
-let syslog (level : level) msg =
-  if !verbosity
-     >=
-     match level with
-     | `LOG_EMERG -> 0
-     | `LOG_ALERT -> 1
-     | `LOG_CRIT -> 2
-     | `LOG_ERR -> 3
-     | `LOG_WARNING -> 4
-     | `LOG_NOTICE -> 5
-     | `LOG_INFO -> 6
-     | `LOG_DEBUG -> 7
+#else
+  let () = () in
+  if !verbosity >= verbosity_level
   then begin
     let tm = Unix.(time () |> localtime) in
     let level =
@@ -67,7 +61,8 @@ let syslog (level : level) msg =
       | `LOG_INFO -> "INFO"
       | `LOG_DEBUG -> "DEBUG"
     in
-    let print oc = Printf.fprintf oc "[%s]: %s %s\n" (Mutil.sprintf_date tm :> string) level msg in
+    let print oc = Printf.fprintf oc "[%s]: %s %s\n%!"
+        (Mutil.sprintf_date tm :> string) level msg in
     begin match Sys.getenv_opt "GW_SYSLOG_FILE" with
       | Some fn ->
         let oc = open_out_gen [ Open_wronly ; Open_creat ; Open_append ] 0o644 fn in

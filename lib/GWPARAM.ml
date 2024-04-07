@@ -149,10 +149,13 @@ module Default = struct
 
   let wrap_output (conf : Config.config) (title : Adef.safe_string)
       (content : unit -> unit) =
+    let robot = List.assoc_opt "robot_index" conf.base_env = Some "yes" in
     Output.print_sstring conf {|<!DOCTYPE html><head><title>|};
     Output.print_string conf title;
     Output.print_sstring conf {|</title>|};
-    Output.print_sstring conf {|<meta name="robots" content="none">|};
+    Output.print_sstring conf
+      (if robot then {|<meta name="robots" content="index,follow">|}
+      else {|<meta name="robots" content="none">|});
     Output.print_sstring conf {|<meta charset="|};
     Output.print_sstring conf conf.charset;
     Output.print_sstring conf {|">|};
