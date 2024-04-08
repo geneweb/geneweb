@@ -24,6 +24,7 @@ bin/setup/dune
 bin/update_nldb/dune
 lib/core/dune
 lib/dune
+lib/ancient/dune
 lib/gwdb/dune
 lib/util/dune
 plugins/welcome/dune
