@@ -1711,6 +1711,10 @@ pt: activar/suprimir
 sv: aktivera/undertrycka
 tr: etkinleştir/kaldır
 
+    suppress this path
+en: suppress this path
+fr: supprimer ce chemin
+
     add
 af: byvoeg
 bg: добавяне на
