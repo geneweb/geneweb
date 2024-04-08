@@ -44,4 +44,9 @@
     uunf
     uutf
     zarith
-  ))
+  )
+  (depopts
+    ocaml-option-nnp
+    ancient
+  )
+)

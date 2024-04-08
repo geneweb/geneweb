@@ -24,6 +24,7 @@ let printer_conf = { Config.empty with output_conf }
 
 let auth_file = ref ""
 let cache_langs = ref []
+let cache_databases = ref []
 let choose_browser_lang = ref false
 let conn_timeout = ref 120
 let daemon = ref false
@@ -2053,6 +2054,12 @@ let main () =
     ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
     ; ("-no-fork", Arg.Set Wserver.no_fork, " Prevent forking processes")
 #endif
+    ; ("-cache-in-memory", Arg.String (fun s ->
+        if Gw_ancient.is_available then
+          cache_databases := s::!cache_databases
+        else
+          failwith "-cache-in-memory option unavailable for this build."
+      ), "<DATABASE> Preload this database in memory")
     ]
   in
   let speclist = List.sort compare speclist in
@@ -2082,6 +2089,13 @@ let main () =
   List.iter register_plugin !plugins ;
   !GWPARAM.init () ;
   cache_lexicon () ;
+  List.iter
+    (fun dbn ->
+       Printf.eprintf "Caching %s... %!" dbn;
+       ignore (Gwdb.open_base ~keep_in_memory:true dbn);
+       Printf.eprintf "Done.\n%!"
+    )
+    !cache_databases;
   if !auth_file <> "" && !force_cgi then
     GwdLog.syslog `LOG_WARNING "-auth option is not compatible with CGI mode.\n \
       Use instead friend_passwd_file= and wizard_passwd_file= in .cgf file\n";

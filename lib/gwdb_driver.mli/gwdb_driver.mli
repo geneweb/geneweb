@@ -52,7 +52,7 @@ type string_person_index
 type base
 (** The database representation. *)
 
-val open_base : string -> base
+val open_base : ?keep_in_memory:bool -> string -> base
 (** Open database associated with (likely situated in) the specified directory. *)
 
 val close_base : base -> unit
