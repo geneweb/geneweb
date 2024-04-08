@@ -1734,23 +1734,25 @@ let husband_wife conf base p all =
       else transl conf "marriages with" |> Adef.safe
     else Adef.safe ""
   in
+  let nb_fam = Array.length (get_family p) in
   let res =
-    let len = Array.length (get_family p) in
     let rec loop i res =
-      if i < len then
+      if i < nb_fam then
         let fam = foi base (get_family p).(i) in
         let conjoint = Gutil.spouse (get_iper p) fam in
         let conjoint = pget conf base conjoint in
-        let res =
-          res
-          ^>^ translate_eval
-                (" "
-                 ^<^ gen_person_text conf base conjoint
-                 ^^^ relation_date conf fam
-                  :> string)
-          ^ if len > 1 && i = len - 2 then " " ^ transl conf "and" else ","
-        in
-        if all then loop (i + 1) res else res
+        if not @@ is_empty_name conjoint then
+          let res =
+            res
+            ^>^ translate_eval
+                  ((if nb_fam > 1 then Format.sprintf " &%d " (i + 1) else " ")
+                   ^<^ gen_person_text conf base conjoint
+                   ^^^ relation_date conf fam
+                    :> string)
+            ^ ","
+          in
+          if all then loop (i + 1) res else res
+        else loop (i + 1) res
       else res
     in
     loop 0 relation
