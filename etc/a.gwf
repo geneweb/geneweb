@@ -315,6 +315,7 @@ perso_module_c=chronologie
 perso_module_n=notes
 perso_module_s=sources
 perso_module_a=arbres
+perso_module_h=htrees
 perso_module_d=data_3col
 perso_module_l=ligne
 
