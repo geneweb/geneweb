@@ -717,7 +717,7 @@ type 'a data_array =
 type 'a immut_record = {
   im_array : unit -> 'a data_array;
   im_get : int -> 'a;
-  im_cl_array : unit -> unit;
+  im_clear_array : unit -> unit;
 }
 
 let make_immut_record_access ~read_only ic ic_acc shift array_pos len name
@@ -762,7 +762,7 @@ let make_immut_record_access ~read_only ic ic_acc shift array_pos len name
     {
       im_array;
       im_get;
-      im_cl_array =
+      im_clear_array =
         (fun () ->
           cleared := true;
           match !tab with
@@ -799,7 +799,7 @@ let make_record_access immut_record (plenr, patches) (_, pending) len =
           | ReadWrite v ->
               let a = apply_patches v patches r.len in
               Dutil.output_value_no_sharing oc (a : _ array));
-      clear_array = immut_record.im_cl_array;
+      clear_array = immut_record.im_clear_array;
     }
   in
   r
