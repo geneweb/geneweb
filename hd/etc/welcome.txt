@@ -31,9 +31,7 @@
   %random.xxx;
 %end;
   <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-lg-3">
-    %if;(b.auth_file="" and (b.wizard_passwd!="" or b.friend_passwd!=""))
-      <div class="d-none d-lg-block col-md-3 order-md-1"></div>
-    %end;
+    <div class="d-none d-lg-block col-md-3 order-md-1"></div>
     <div class="col-xs-12 col-md-3 order-md-3 ml-md-2 px-0">
       <div class="d-flex flex-column">
         %if;(cgi and (not wizard or not friend))
