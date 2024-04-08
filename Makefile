@@ -98,20 +98,18 @@ GENERATED_FILES_DEP = \
 
 generated: $(GENERATED_FILES_DEP)
 
-install uninstall build distrib: info $(GENERATED_FILES_DEP)
+install uninstall fmt build distrib: info $(GENERATED_FILES_DEP)
 
-fmt:
-	$(RM) -r $(DISTRIB_DIR)
+fmt: ## Format Ocaml code
+ifneq ($(OS_TYPE),Win)
+	@printf "\n\033[1;37mOcamlformat\033[0m\n"
 	dune build @fmt --auto-promote
+endif
 
 # [BEGIN] Installation / Distribution section
 
 build: ## Build the geneweb package (libraries and binaries)
 build:
-ifneq ($(OS_TYPE),Win)
-	@printf "\n\033[1;37mOcamlformat\033[0m\n"
-	dune build @fmt --auto-promote
-endif
 	@printf "\n\033[1;37mBuilding executables\033[0m\n"
 	dune build -p geneweb --profile $(DUNE_PROFILE)
 
