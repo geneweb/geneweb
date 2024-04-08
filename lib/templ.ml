@@ -1377,6 +1377,12 @@ and print_simple_variable conf = function
         (string_of_int (List.length (Util.get_bases_list ())))
   | "bases_list" ->
       Output.print_sstring conf (String.concat ", " (Util.get_bases_list ()))
+  | "bases_list_links" ->
+      let format_link bname =
+        "<a href=\"" ^ bname ^ "?lang=\" ^ lang ^ \"\">" ^ bname ^ "</a>"
+      in
+      Output.print_sstring conf
+        (String.concat ", " (Util.get_bases_list ~format_fun:format_link ()))
   | "hidden" -> Util.hidden_env conf
   | "message_to_wizard" -> Util.message_to_wizard conf
   | _ -> raise Not_found
