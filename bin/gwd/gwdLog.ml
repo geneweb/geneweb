@@ -2,16 +2,11 @@ let verbosity = ref 7
 let debug = ref false
 
 let oc : out_channel option ref = ref None
-let warning_printed = ref false
 
 let log fn =
   match !oc with
   | Some oc -> fn oc
-  | None ->
-    if not !warning_printed then begin
-      Printf.eprintf "Warning: logging not enabled. Use '-log 2' to log on stderr\n%!";
-      warning_printed := true
-      end
+  | None -> ()
 
 type level =
   [ `LOG_ALERT
