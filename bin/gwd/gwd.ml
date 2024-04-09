@@ -272,7 +272,6 @@ let strip_trailing_spaces s =
 let read_base_env bname =
   let load_file fname =
     try
-      Printf.eprintf "read_base_env %S...\n%!" fname;
       let ic = Secure.open_in fname in
       let env =
         let rec loop env =
@@ -288,24 +287,26 @@ let read_base_env bname =
       close_in ic;
       env
     with Sys_error error ->
-        GwdLog.syslog `LOG_WARNING @@
-        Printf.sprintf "Error %s while loading %s, using empty config" error fname;
+      GwdLog.log (fun oc ->
+          Printf.fprintf oc "Error %s while loading %s, using empty config\n%!"
+            error fname);
       []
   in
   let fname1 = Util.bpath (bname ^ ".gwf") in
-    if Sys.file_exists fname1 then
-      load_file fname1
-    else
-      let fname2 = Filename.concat !gw_prefix "etc/a.gwf" in
-      if Sys.file_exists fname2 then begin
-        GwdLog.syslog `LOG_WARNING @@
-        Printf.sprintf "Using configuration from %s" fname2;
-        load_file fname2
-      end else begin
-        GwdLog.syslog `LOG_WARNING @@
-        Printf.sprintf "No config file found in either %s or %s" fname1 fname2;
-        []
-      end
+  if Sys.file_exists fname1 then
+    load_file fname1
+  else
+    let fname2 = Filename.concat !gw_prefix "etc/a.gwf" in
+    if Sys.file_exists fname2 then begin
+      GwdLog.log (fun oc ->
+          Printf.fprintf oc "Using configuration from %s\n%!" fname2);
+      load_file fname2
+    end else begin
+      GwdLog.log (fun oc ->
+          Printf.fprintf oc "No config file found in either %s or %s\n%!"
+            fname1 fname2);
+      []
+    end
 
 let print_renamed conf new_n =
   let link =
