@@ -744,31 +744,62 @@ let gen_person_text ?(escape = true) ?(html = true) ?(sn = true) ?(chk = true)
     else beg
 
 let max_ancestor_level conf base ip max_lvl =
-  let x = ref 0 in
-  let mark = Gwdb.iper_marker (Gwdb.ipers base) false in
+  let module Person_id_map = Map.Make (struct
+    type t = Gwdb.iper
+
+    let compare = Gwdb.compare_iper
+  end) in
+  let module Node = struct
+    type kind = At_max_level | Internal | Leaf
+    type t = { kind : kind; level : int }
+  end in
   (* Loading ITL cache, up to 10 generations. *)
   let () = !GWPARAM_ITL.init_cache conf base ip 10 0 0 in
-  let rec loop level ip =
-    (* Ne traite pas l'index s'il a déjà été traité. *)
-    (* Pose surement probleme pour des implexes. *)
-    if not @@ Gwdb.Marker.get mark ip then (
-      (* Met à jour le tableau d'index pour indiquer que l'index est traité. *)
-      Gwdb.Marker.set mark ip true;
-      x := max !x level;
-      if !x <> max_lvl then
-        match Gwdb.get_parents (pget conf base ip) with
-        | Some ifam ->
-            let cpl = Gwdb.foi base ifam in
-            loop (succ level) (Gwdb.get_father cpl);
-            loop (succ level) (Gwdb.get_mother cpl)
-        | None ->
-            x :=
-              max !x
-                (!GWPARAM_ITL.max_ancestor_level
-                   conf base ip conf.Config.bname max_lvl level))
+  let rec loop ~visited_nodes level ip =
+    match Person_id_map.find_opt ip visited_nodes with
+    | None -> visit ~visited_nodes level ip
+    | Some node ->
+        if level < node.Node.level then visit ~visited_nodes level ip
+        else visited_nodes
+  and visit ~visited_nodes level ip =
+    if level <> max_lvl then
+      match Gwdb.get_parents (pget conf base ip) with
+      | Some ifam ->
+          let cpl = Gwdb.foi base ifam in
+          let visited_nodes =
+            Person_id_map.add ip
+              { Node.kind = Node.Internal; level }
+              visited_nodes
+          in
+          loop
+            ~visited_nodes:
+              (loop ~visited_nodes (succ level) (Gwdb.get_father cpl))
+            (succ level) (Gwdb.get_mother cpl)
+      | None ->
+          let update_node node =
+            let level =
+              match node with
+              | Some node -> min level node.Node.level
+              | None ->
+                  !GWPARAM_ITL.max_ancestor_level
+                    conf base ip conf.Config.bname max_lvl level
+            in
+            Some { Node.kind = Node.Leaf; level }
+          in
+          Person_id_map.update ip update_node visited_nodes
+    else
+      Person_id_map.add ip
+        { Node.kind = Node.At_max_level; level = max_lvl }
+        visited_nodes
   in
-  loop 0 ip;
-  !x
+  let max_level { Node.kind; level } current_max_level =
+    match kind with
+    | Node.Internal -> current_max_level
+    | Node.Leaf | Node.At_max_level -> max current_max_level level
+  in
+  Person_id_map.fold (Fun.const max_level)
+    (loop ~visited_nodes:Person_id_map.empty 0 ip)
+    0
 
 let main_title conf base p =
   let titles = nobtit conf base p in
