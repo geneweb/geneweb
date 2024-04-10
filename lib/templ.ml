@@ -1379,9 +1379,10 @@ and print_simple_variable conf = function
       Output.print_sstring conf (String.concat ", " (Util.get_bases_list ()))
   | "bases_list_links" ->
       let format_link bname =
-        Format.sprintf {|<a href="%s?%s">%s</a>|}
-          bname
-          (if conf.lang = conf.default_lang then "" else ("lang=" ^conf.lang))
+        Format.sprintf {|<a href="%s%s">%s</a>|}
+          ((if conf.cgi then "?b=" else "") ^ bname)
+          (if conf.lang = conf.default_lang then ""
+          else (if conf.cgi then "&" else "?") ^ "lang=" ^ conf.lang)
           bname
       in
       Output.print_sstring conf
