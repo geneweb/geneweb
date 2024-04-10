@@ -247,7 +247,7 @@ let url_set_aux conf evar_l str_l =
   in
   let conf_l = conf.henv @ conf.senv @ conf.env in
   let k_l = List.map (fun (k, _v) -> k) conf_l in
-  let k_l = List.sort_uniq compare k_l in
+
   let conf_l = List.map (fun k -> (k, List.assoc k conf_l)) k_l |> List.rev in
   (* process evar_l *)
   let url_env =
