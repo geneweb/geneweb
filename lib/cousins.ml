@@ -318,11 +318,11 @@ let init_cousins_cnt conf base p =
     (* +3: there may be more descendants for cousins than my own *)
     let cousins_cnt =
       try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
-      with Failure _ -> failwith "Cousins table too large for system"
+      with Failure _ -> failwith "Cousins table too large for system (1)"
     in
     let cousins_dates =
       try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0)
-      with Failure _ -> failwith "Cousins table too large for system"
+      with Failure _ -> failwith "Cousins table too large for system (2)"
     in
     cousins_cnt.(0).(0) <-
       [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, 0) ];
