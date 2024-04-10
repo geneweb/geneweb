@@ -320,15 +320,18 @@ let init_cousins_cnt conf base p =
       try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
       with Failure _ -> failwith "Cousins table too large for system (1)"
     in
+    Printf.eprintf "cousins_cnt\n";
     let cousins_dates =
       try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0)
       with Failure _ -> failwith "Cousins table too large for system (2)"
     in
+    Printf.eprintf "cousins_dates\n";
     cousins_cnt.(0).(0) <-
       [ (get_iper p, [ Gwdb.dummy_ifam ], Gwdb.dummy_iper, 0) ];
     cousins_dates.(0).(0) <- get_min_max_dates base cousins_cnt.(0).(0);
     loop0 1 cousins_cnt cousins_dates;
     loop1 1 cousins_cnt cousins_dates;
+    Printf.eprintf "cousins_tables ok\n";
     (key, max_a_l, cousins_cnt, cousins_dates)
   in
 
