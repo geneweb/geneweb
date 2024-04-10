@@ -275,11 +275,10 @@ let url_set_aux conf evar_l str_l =
     | s :: _l -> s
   in
   let conf_l = conf.henv @ conf.senv @ conf.env in
-  let conf_l =
-    List.fold_left
-      (fun acc (k, v) -> if List.mem_assoc k acc then acc else (k, v) :: acc)
-      [] conf_l
-  in
+  let k_l = List.map (fun (k, _v) -> k) conf_l in
+
+  let conf_l = List.map (fun k -> (k, List.assoc k conf_l)) k_l |> List.rev in
+
   (* process evar_l *)
   let url_env =
     let rec loop i acc evar_l =
