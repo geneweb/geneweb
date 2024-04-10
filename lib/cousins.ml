@@ -309,26 +309,6 @@ let init_cousins_cnt conf base p =
     loop2 i 1 cousins_cnt cousins_dates
   in
 
-  let expand_tables key v1 max_a_l cousins_cnt cousins_dates =
-    Printf.sprintf "******** Expand tables from %d to %d ********\n" v1 max_a_l
-    |> Logs.syslog `LOG_WARNING;
-    let new_cousins_cnt =
-      try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) []
-      with Failure _ -> failwith "Cousins table too large for system"
-    in
-    let new_cousins_dates =
-      try Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0)
-      with Failure _ -> failwith "Cousins table too large for system"
-    in
-    for i = 0 to v1 do
-      new_cousins_cnt.(i) <- cousins_cnt.(i);
-      new_cousins_dates.(i) <- cousins_dates.(i)
-    done;
-    loop0 (max_d_l + v1) cousins_cnt cousins_dates;
-    loop1 v1 cousins_cnt cousins_dates;
-    (key, max_a_l, cousins_cnt, cousins_dates)
-  in
-
   let build_tables key =
     Printf.sprintf "******** Compute %d × %d table ********\n" (max_a_l + 3)
       (max_d_l + max_a_l + 3)
@@ -350,6 +330,32 @@ let init_cousins_cnt conf base p =
     loop0 1 cousins_cnt cousins_dates;
     loop1 1 cousins_cnt cousins_dates;
     (key, max_a_l, cousins_cnt, cousins_dates)
+  in
+
+  let expand_tables key v1 max_a_l cousins_cnt cousins_dates =
+    Printf.sprintf "******** Expand tables from %d to %d ********\n" v1 max_a_l
+    |> Logs.syslog `LOG_WARNING;
+    let new_cousins_cnt =
+      try Some (Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) [])
+      with Failure _ -> None
+    in
+    let new_cousins_dates =
+      try Some (Array.make_matrix (max_a_l + 3) (max_d_l + max_a_l + 3) (0, 0))
+      with Failure _ -> None
+    in
+    match (new_cousins_cnt, new_cousins_dates) with
+    | Some new_cousins_cnt, Some new_cousins_dates ->
+        for i = 0 to v1 do
+          new_cousins_cnt.(i) <- cousins_cnt.(i);
+          new_cousins_dates.(i) <- cousins_dates.(i)
+        done;
+        loop0 (max_d_l + v1) cousins_cnt cousins_dates;
+        loop1 v1 cousins_cnt cousins_dates;
+        (key, max_a_l, cousins_cnt, cousins_dates)
+    | _, _ ->
+        Printf.sprintf "Can't expand cousins tables"
+        |> Logs.syslog `LOG_WARNING;
+        build_tables key
   in
 
   let fn = Name.strip_lower @@ sou base @@ get_surname p in
