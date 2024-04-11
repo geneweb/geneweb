@@ -116,6 +116,63 @@ let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
   Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines;
   Hutil.trailer conf
 
+let linked_list conf base pgl commd =
+  (* commd is passed as parameter to allow use by setup *)
+  List.fold_left
+    (fun acc pg ->
+      match pg with
+      | Def.NLDB.PgInd ip ->
+          let p = pget conf base ip in
+          let fn, sn, occ = Util.pnoc base p in
+          let str =
+            Printf.sprintf
+              {|%s%s<a class="mx-2" href="%si=%s"> %s.%d %s</a><br>|}
+              (transl conf "notes of") (transl conf ":") commd
+              (Gwdb.string_of_iper ip) fn occ sn
+          in
+          acc ^ str
+      | Def.NLDB.PgFam ifam ->
+          let fam = Gwdb.foi base ifam in
+          let fath = pget conf base (Gwdb.get_father fam) in
+          let moth = pget conf base (Gwdb.get_mother fam) in
+          let ffn, fsn, focc = Util.pnoc base fath in
+          let mfn, msn, mocc = Util.pnoc base moth in
+          let str =
+            Printf.sprintf
+              {|%s%s<a class="mx-2" href="%sm=MOD_FAM&i=%s"> %s.%d %s &amp; %s.%d %s</a><br>|}
+              (transl conf "marriage of")
+              (transl conf ":") commd (Gwdb.string_of_ifam ifam) ffn focc fsn
+              mfn mocc msn
+          in
+          acc ^ str
+      | Def.NLDB.PgNotes ->
+          let str =
+            Printf.sprintf {|<a class="mx-2" href="%sm=NOTES"> %s</a><br>|}
+              commd (transl conf "base note")
+          in
+          acc ^ str
+      | Def.NLDB.PgMisc fnotes ->
+          let str =
+            Printf.sprintf
+              {|%s%s<a class="mx-2" href="%sm=NOTES&f=%s"> %s</a><br>|}
+              (Utf8.capitalize_fst (transl conf "note page"))
+              (transl conf ":") commd
+              (Mutil.encode fnotes :> string)
+              (Util.escape_html fnotes :> string)
+          in
+          acc ^ str
+      | Def.NLDB.PgWizard wizname ->
+          let str =
+            Printf.sprintf
+              {|%s%s<a class="mx-2" href="%sm=WIZNOTES&f=%s"> %s</a><br>|}
+              (Utf8.capitalize_fst (transl conf "wizard page of"))
+              (transl conf ":") commd
+              (Util.escape_html wizname :> string)
+              (Util.escape_html wizname :> string)
+          in
+          acc ^ str)
+    "" pgl
+
 let print_linked_list conf base pgl =
   Output.print_sstring conf "<ul>";
   List.iter

@@ -20,7 +20,7 @@
 </h1>
 </div>
 
-<form method="GET" action="gwfixbase">
+<form method="GET" action="gwfixutf8">
 <input type="hidden" name="opt" value="check">
 <input type="hidden" name="lang" value="%l">
 <input type="hidden" name="server" value="%m">
@@ -79,64 +79,24 @@
 <p>
 <table class="setup">
 <tr align="left">
-<td><input type="checkbox" name="families-parents" value="on">   </td>
-<td>[families' parents.]
+<td><input type="checkbox" name="utf8_key" value="on">   </td>
+<td>[checks for possible utf8 related conflicts]
 </td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
-<td><input type="checkbox" name="families-children" value="on">   </td>
-<td>[families' children.]
+<td><input type="checkbox" name="person_key" value="on">   </td>
+<td>[checks for duplicate keys]
 </td>
 </tr>
 </table>
 <p>
 <table class="setup">
 <tr align="left">
-<td><input type="checkbox" name="persons-NBDS" value="on">   </td>
-<td>[persons' NBDS.]
-</td>
-</tr>
-</table>
-<p>
-<table class="setup">
-<tr align="left">
-<td><input type="checkbox" name="persons-parents" value="on">   </td>
-<td>[persons' parents.]
-</td>
-</tr>
-</table>
-<p>
-<table class="setup">
-<tr align="left">
-<td><input type="checkbox" name="persons-families" value="on">   </td>
-<td>[persons' families.]
-</td>
-</tr>
-</table>
-<p>
-<table class="setup">
-<tr align="left">
-<td><input type="checkbox" name="pevents-witnesses" value="on">   </td>
-<td>[pevents' witnesses.]
-</td>
-</tr>
-</table>
-<p>
-<table class="setup">
-<tr align="left">
-<td><input type="checkbox" name="fevents-witnesses" value=on>   </td>
-<td>[fevents' witnesses.]
-</td>
-</tr>
-</table>
-<p>
-<table class="setup">
-<tr align="left">
-<td><input type="checkbox" name="marriage-divorce" value="on">   </td>
-<td>[marriage divorce.]
+<td><input type="checkbox" name="invalid_utf8" value="on">   </td>
+<td>[checks for invalid utf8 characters]
 </td>
 </tr>
 </table>

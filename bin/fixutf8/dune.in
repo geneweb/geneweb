@@ -1,0 +1,6 @@
+(executable
+  (name gwfixutf8)
+  (public_name geneweb.gwfixutf8)
+  (modules gwfixutf8)
+  (libraries unix str %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb)
+)
