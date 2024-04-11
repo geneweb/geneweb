@@ -761,7 +761,7 @@ let max_ancestor_level conf base ip max_lvl =
             let cpl = Gwdb.foi base ifam in
             loop (succ level) (Gwdb.get_father cpl);
             loop (succ level) (Gwdb.get_mother cpl)
-        | _ ->
+        | None ->
             x :=
               max !x
                 (!GWPARAM_ITL.max_ancestor_level
