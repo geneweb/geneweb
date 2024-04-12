@@ -1,53 +1,66 @@
 (* $Id: perso.mli,v 5.7 2007-03-30 18:57:19 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Gwdb
-open Config
-
 type generation_person =
-  | GP_person of Sosa.t * iper * ifam option
-  | GP_same of Sosa.t * Sosa.t * iper
+  | GP_person of Sosa.t * Gwdb.iper * Gwdb.ifam option
+  | GP_same of Sosa.t * Sosa.t * Gwdb.iper
   | GP_interv of (Sosa.t * Sosa.t * (Sosa.t * Sosa.t) option) option
-  | GP_missing of Sosa.t * iper
+  | GP_missing of Sosa.t * Gwdb.iper
 
-val string_of_marriage_text : config -> base -> family -> Adef.safe_string
+val string_of_marriage_text :
+  Config.config -> Gwdb.base -> Gwdb.family -> Adef.safe_string
 
 val interp_templ :
-  ?no_headers:bool -> string -> config -> base -> person -> unit
+  ?no_headers:bool ->
+  string ->
+  Config.config ->
+  Gwdb.base ->
+  Gwdb.person ->
+  unit
 
 val interp_templ_with_menu :
-  (bool -> unit) -> string -> config -> base -> person -> unit
+  (bool -> unit) -> string -> Config.config -> Gwdb.base -> Gwdb.person -> unit
 
 val interp_notempl_with_menu :
-  (bool -> unit) -> string -> config -> base -> person -> unit
+  (bool -> unit) -> string -> Config.config -> Gwdb.base -> Gwdb.person -> unit
 
-val print : ?no_headers:bool -> config -> base -> person -> unit
+val print :
+  ?no_headers:bool -> Config.config -> Gwdb.base -> Gwdb.person -> unit
 (** Displays the HTML page of a person *)
 
-val print_ascend : config -> base -> person -> unit
+val print_ascend : Config.config -> Gwdb.base -> Gwdb.person -> unit
 (** Displays the ascendants of the selected person *)
 
-val print_what_links : config -> base -> person -> unit
+val print_what_links : Config.config -> Gwdb.base -> Gwdb.person -> unit
 (** Displays links to pages associated to the person *)
 
 val links_to_ind :
   Config.config ->
   Gwdb.base ->
-  ((iper, ifam) Def.NLDB.page * ('a * ((string * string * int) * 'b) list)) list ->
+  ((Gwdb.iper, Gwdb.ifam) Def.NLDB.page
+  * ('a * ((string * string * int) * 'b) list))
+  list ->
   string * string * int ->
-  (iper, ifam) Def.NLDB.page list
+  (Gwdb.iper, Gwdb.ifam) Def.NLDB.page list
 
-val get_linked_page : config -> base -> person -> string -> Adef.safe_string
-val get_birth_text : config -> person -> bool -> Adef.safe_string
-val get_baptism_text : config -> person -> bool -> Adef.safe_string
-val get_death_text : config -> person -> bool -> Adef.safe_string
-val get_burial_text : config -> person -> bool -> Adef.safe_string
-val get_cremation_text : config -> person -> bool -> Adef.safe_string
-val get_marriage_date_text : config -> family -> bool -> Adef.safe_string
-val get_marriage_witnesses : family -> (iper * Def.witness_kind) array
+val get_linked_page :
+  Config.config -> Gwdb.base -> Gwdb.person -> string -> Adef.safe_string
+
+val get_birth_text : Config.config -> Gwdb.person -> bool -> Adef.safe_string
+val get_baptism_text : Config.config -> Gwdb.person -> bool -> Adef.safe_string
+val get_death_text : Config.config -> Gwdb.person -> bool -> Adef.safe_string
+val get_burial_text : Config.config -> Gwdb.person -> bool -> Adef.safe_string
+
+val get_cremation_text :
+  Config.config -> Gwdb.person -> bool -> Adef.safe_string
+
+val get_marriage_date_text :
+  Config.config -> Gwdb.family -> bool -> Adef.safe_string
+
+val get_marriage_witnesses : Gwdb.family -> (Gwdb.iper * Def.witness_kind) array
 
 val get_marriage_witnesses_and_notes :
-  family -> (iper * Def.witness_kind * istr) array
+  Gwdb.family -> (Gwdb.iper * Def.witness_kind * Gwdb.istr) array
 
 val linked_page_text :
   Config.config ->
@@ -56,23 +69,36 @@ val linked_page_text :
   string ->
   'a ->
   Adef.safe_string ->
-  (iper, ifam) Def.NLDB.page * ('b * ('a * Def.NLDB.ind) list) ->
+  (Gwdb.iper, Gwdb.ifam) Def.NLDB.page * ('b * ('a * Def.NLDB.ind) list) ->
   Adef.safe_string
 
-val string_of_died : config -> person -> bool -> Adef.safe_string
+val string_of_died : Config.config -> Gwdb.person -> bool -> Adef.safe_string
 
 val string_of_parent_age :
-  config -> base -> person * bool -> (family -> iper) -> Adef.safe_string
+  Config.config ->
+  Gwdb.base ->
+  Gwdb.person * bool ->
+  (Gwdb.family -> Gwdb.iper) ->
+  Adef.safe_string
 
 val string_of_image_url :
-  config -> base -> person * bool -> bool -> Adef.escaped_string
+  Config.config ->
+  Gwdb.base ->
+  Gwdb.person * bool ->
+  bool ->
+  Adef.escaped_string
 
 val round_2_dec : float -> float
 
 (* TODO put in lib/image.ml *)
-val string_of_image_size : config -> base -> person * bool -> string
-val string_of_image_medium_size : config -> base -> person * bool -> string
-val string_of_image_small_size : config -> base -> person * bool -> string
+val string_of_image_size :
+  Config.config -> Gwdb.base -> Gwdb.person * bool -> string
+
+val string_of_image_medium_size :
+  Config.config -> Gwdb.base -> Gwdb.person * bool -> string
+
+val string_of_image_small_size :
+  Config.config -> Gwdb.base -> Gwdb.person * bool -> string
 
 val get_link :
   generation_person list -> Util.IperSet.elt -> generation_person option
@@ -80,47 +106,53 @@ val get_link :
 (**)
 
 val infinite : int
-val limit_desc : config -> int
+val limit_desc : Config.config -> int
 
 val make_desc_level_table :
-  config ->
-  base ->
+  Config.config ->
+  Gwdb.base ->
   int ->
-  person ->
-  (Util.IperSet.elt, int) Gwdb.Marker.t * (ifam, int) Gwdb.Marker.t
+  Gwdb.person ->
+  (Util.IperSet.elt, int) Gwdb.Marker.t * (Gwdb.ifam, int) Gwdb.Marker.t
 
-type dup = DupFam of ifam * ifam | DupInd of iper * iper | NoDup
-type excl_dup = (iper * iper) list * (ifam * ifam) list
+type dup =
+  | DupFam of Gwdb.ifam * Gwdb.ifam
+  | DupInd of Gwdb.iper * Gwdb.iper
+  | NoDup
 
-val excluded_possible_duplications : config -> excl_dup
-val first_possible_duplication : base -> iper -> excl_dup -> dup
+type excl_dup = (Gwdb.iper * Gwdb.iper) list * (Gwdb.ifam * Gwdb.ifam) list
+
+val excluded_possible_duplications : Config.config -> excl_dup
+val first_possible_duplication : Gwdb.base -> Gwdb.iper -> excl_dup -> dup
 
 (* Ajout pour l'API *)
 val nobility_titles_list :
-  config ->
-  base ->
-  person ->
+  Config.config ->
+  Gwdb.base ->
+  Gwdb.person ->
   (int
-  * istr Def.gen_title_name
-  * istr
-  * istr list
+  * Gwdb.istr Def.gen_title_name
+  * Gwdb.istr
+  * Gwdb.istr list
   * (Date.date option * Date.date option) list)
   list
 
-val has_history : config -> base -> person -> bool -> bool
-val has_possible_duplications : config -> base -> person -> bool
+val has_history : Config.config -> Gwdb.base -> Gwdb.person -> bool -> bool
+
+val has_possible_duplications :
+  Config.config -> Gwdb.base -> Gwdb.person -> bool
 
 val string_of_title :
   ?safe:bool ->
   ?link:bool ->
-  config ->
-  base ->
+  Config.config ->
+  Gwdb.base ->
   Adef.safe_string ->
-  person ->
+  Gwdb.person ->
   int
-  * istr Def.gen_title_name
-  * istr
-  * istr list
+  * Gwdb.istr Def.gen_title_name
+  * Gwdb.istr
+  * Gwdb.istr list
   * (Date.date option * Date.date option) list ->
   Adef.safe_string
 (** Optionnal [link] argument is passed to {!val:DateDisplay.string_of_ondate} *)
