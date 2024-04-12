@@ -762,7 +762,11 @@ let max_ancestor_level conf base ip max_lvl =
         if level < node.Node.level then visit ~visited_nodes level ip
         else visited_nodes
   and visit ~visited_nodes level ip =
-    if level <> max_lvl then
+    if level = max_lvl then
+      Person_id_map.add ip
+        { Node.kind = Node.At_max_level; level = max_lvl }
+        visited_nodes
+    else
       match Gwdb.get_parents (pget conf base ip) with
       | Some ifam ->
           let cpl = Gwdb.foi base ifam in
@@ -787,10 +791,6 @@ let max_ancestor_level conf base ip max_lvl =
             Some { Node.kind = Node.Leaf; level }
           in
           Person_id_map.update ip update_node visited_nodes
-    else
-      Person_id_map.add ip
-        { Node.kind = Node.At_max_level; level = max_lvl }
-        visited_nodes
   in
   let max_level { Node.kind; level } current_max_level =
     match kind with
