@@ -298,11 +298,11 @@ let read_base_env bname =
   else
     let fname2 = Filename.concat !gw_prefix "etc/a.gwf" in
     if Sys.file_exists fname2 then begin
-      GwdLog.log (fun oc ->
+      if !debug then GwdLog.log (fun oc ->
           Printf.fprintf oc "Using configuration from %s\n%!" fname2);
       load_file fname2
     end else begin
-      GwdLog.log (fun oc ->
+      if !debug then GwdLog.log (fun oc ->
           Printf.fprintf oc "No config file found in either %s or %s\n%!"
             fname1 fname2);
       []
@@ -1296,6 +1296,7 @@ let make_conf from_addr request script_name env =
          end;
      bname = base_file;
      nb_of_persons = -1;
+     nb_of_families = -1;
      env = env; senv = [];
      cgi_passwd = ar.ar_passwd;
      henv =

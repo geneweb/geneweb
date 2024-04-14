@@ -1931,6 +1931,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       VVbool (List.mem plugin (List.map Filename.basename conf.plugins))
   | "base" :: "nb_persons" :: sl ->
       VVstring (eval_int conf (nb_of_persons base) sl)
+  | "base" :: "nb_families" :: sl ->
+      VVstring (eval_int conf (nb_of_families base) sl)
   | "base" :: "real_nb_persons" :: sl ->
       VVstring (eval_int conf (Gwdb.nb_of_real_persons base) sl)
   | "cell" :: sl -> (

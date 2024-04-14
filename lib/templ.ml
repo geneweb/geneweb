@@ -209,8 +209,6 @@ let reorder conf url_env =
         else Format.sprintf "%s=%s" k v :: acc)
       [] url_env
   in
-  if List.mem "lang=fr" env1 then Printf.eprintf "Lang in env1\n";
-  if List.mem "lang=fr" env2 then Printf.eprintf "Lang in env2\n";
   String.concat "&" (List.rev env1 @ List.rev env2)
 
 let find_sosa_ref conf =
@@ -379,7 +377,8 @@ let rec eval_variable conf = function
   | [ "random"; s ] -> (
       try string_of_int (Random.int (int_of_string s))
       with Failure _ | Invalid_argument _ -> raise Not_found)
-  | "nb_of_persons" :: sl -> eval_int conf conf.nb_of_persons sl
+  | "nb_persons" :: sl -> eval_int conf conf.nb_of_persons sl
+  | "nb_families" :: sl -> eval_int conf conf.nb_of_families sl
   | [ "substr_start"; n; v ] -> (
       (* extract the n first characters of string v *)
       match int_of_string_opt n with
