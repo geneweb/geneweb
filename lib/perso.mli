@@ -90,16 +90,6 @@ val string_of_image_url :
 
 val round_2_dec : float -> float
 
-(* TODO put in lib/image.ml *)
-val string_of_image_size :
-  Config.config -> Gwdb.base -> Gwdb.person * bool -> string
-
-val string_of_image_medium_size :
-  Config.config -> Gwdb.base -> Gwdb.person * bool -> string
-
-val string_of_image_small_size :
-  Config.config -> Gwdb.base -> Gwdb.person * bool -> string
-
 val get_link :
   generation_person list -> Util.IperSet.elt -> generation_person option
 

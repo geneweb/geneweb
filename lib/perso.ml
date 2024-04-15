@@ -1,6 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let max_im_wid = 240
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
 
 let string_of_marriage_text conf base fam =
@@ -1324,20 +1323,6 @@ let null_val = TemplAst.VVstring ""
 
 let safe_val (x : [< `encoded | `escaped | `safe ] Adef.astring) =
   TemplAst.VVstring ((x :> Adef.safe_string) :> string)
-
-let gen_string_of_img_sz max_w max_h conf base (p, p_auth) =
-  if p_auth then
-    match Image.get_portrait_with_size conf base p with
-    | Some (_, Some (w, h)) ->
-        let w, h = Image.scale_to_fit ~max_w ~max_h ~w ~h in
-        Format.sprintf " width=\"%d\" height=\"%d\"" w h
-    | Some (_, None) -> Format.sprintf " height=\"%d\"" max_h
-    | None -> ""
-  else ""
-
-let string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid
-let string_of_image_medium_size = gen_string_of_img_sz 160 120
-let string_of_image_small_size = gen_string_of_img_sz 100 75
 
 let get_sosa conf base env r p =
   try List.assoc (Gwdb.get_iper p) !r
@@ -3270,9 +3255,11 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Some src -> Image.src_to_string src |> str_val
       | None -> null_val)
   | "image_html_url" -> string_of_image_url conf base ep true |> safe_val
-  | "image_size" -> string_of_image_size conf base ep |> str_val
-  | "image_medium_size" -> string_of_image_medium_size conf base ep |> str_val
-  | "image_small_size" -> string_of_image_small_size conf base ep |> str_val
+  | "image_size" -> Image.string_of_image_size conf base ep |> str_val
+  | "image_medium_size" ->
+      Image.string_of_image_medium_size conf base ep |> str_val
+  | "image_small_size" ->
+      Image.string_of_image_small_size conf base ep |> str_val
   | "image_url" -> string_of_image_url conf base ep false |> safe_val
   | "index" -> (
       match get_env "p_link" env with
