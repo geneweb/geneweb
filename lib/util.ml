@@ -1119,7 +1119,7 @@ let string_of_pevent_name conf base epers_name =
   | Def.Epers_Name n -> (escape_html (Gwdb.sou base n) :> Adef.safe_string)
   | _ -> string_of_pevent_name_without_base conf epers_name
 
-let string_of_pevent_name' conf base epers_name =
+let string_of_pevent_name' conf epers_name =
   match epers_name with
   | Def.Epers_Name n -> (escape_html n :> Adef.safe_string)
   | _ -> string_of_pevent_name_without_base conf epers_name
@@ -1129,7 +1129,7 @@ let string_of_fevent_name conf base efam_name =
   | Def.Efam_Name n -> (escape_html (Gwdb.sou base n) :> Adef.safe_string)
   | _ -> string_of_fevent_name_without_base conf efam_name
 
-let string_of_fevent_name' conf base efam_name =
+let string_of_fevent_name' conf efam_name =
   match efam_name with
   | Def.Efam_Name n -> (escape_html n :> Adef.safe_string)
   | _ -> string_of_fevent_name_without_base conf efam_name
@@ -1185,7 +1185,7 @@ let etc_file_name _conf fname =
 
 let open_etc_file conf fname =
   let fname = etc_file_name conf fname in
-  try Some (Secure.open_in fname, fname) with Sys_error e -> None
+  try Some (Secure.open_in fname, fname) with Sys_error _ -> None
 
 let include_template conf env fname failure =
   match open_etc_file conf fname with
