@@ -1311,8 +1311,6 @@ let extract_var sini s =
     String.sub s len (String.length s - len)
   else ""
 
-let template_file = ref "perso.txt"
-
 let warning_use_has_parents_before_parent (fname, bp, ep) var r =
   Printf.sprintf
     "%s %d-%d: since v5.00, must test \"has_parents\" before using \"%s\"\n"
@@ -4542,7 +4540,6 @@ let eval_predefined_apply conf env f vl =
   | _ -> raise Not_found
 
 let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
-  template_file := templ_fname ^ ".txt";
   let ep = (p, Util.authorized_age conf base p) in
   (* TODO what is this? what are those "120" *)
   let emal =
