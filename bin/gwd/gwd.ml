@@ -1246,10 +1246,10 @@ let make_conf from_addr request script_name env =
      image_prefix =
        if !images_url <> "" then !images_url
        else if !(Wserver.cgi) then
-					begin match Sys.getenv_opt "GW_STATIC_PATH" with
-					| Some x -> x ^ "../images"
-					| None -> "../distribution/gw/images/"
-					end
+                                        begin match Sys.getenv_opt "GW_STATIC_PATH" with
+                                        | Some x -> x ^ "../images"
+                                        | None -> "../distribution/gw/images/"
+                                        end
        else "images";
      static_path =
        begin match Sys.getenv_opt "GW_STATIC_PATH" with
@@ -1356,7 +1356,7 @@ let log_and_robot_check conf auth from request script_name contents =
         end;
         log tm conf from auth request script_name contents
       end
-  
+
 let conf_and_connection =
   let slow_query_threshold =
     match Sys.getenv_opt "GWD_SLOW_QUERY_THRESHOLD" with
@@ -1425,7 +1425,7 @@ let conf_and_connection =
         with
         | Exit -> ()
         | (Def.HttpExn (code, _)) as e ->
-          !GWPARAM.output_error conf code ;
+          GWPARAM.output_error conf code ;
           printexc e
         | e -> printexc e
 
@@ -1956,9 +1956,9 @@ let main () =
 #endif
   arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun usage;
   Arg.parse speclist anonfun usage;
-  Geneweb.GWPARAM.syslog := GwdLog.syslog;
+  Geneweb.GWPARAM.set_syslog GwdLog.syslog;
   List.iter register_plugin !plugins ;
-  !GWPARAM.init () ;
+  GWPARAM.init () ;
   cache_lexicon () ;
   if !images_dir <> "" then
     begin let abs_dir =

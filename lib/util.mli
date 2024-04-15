@@ -8,10 +8,10 @@ val cnt_dir : string ref
 (** The directory where counters (e.g. number page displayed) are stored. *)
 
 val base_path : string list -> string -> string
-(** Alias for !GWPARAM.base_path *)
+(** Alias for GWPARAM.base_path *)
 
 val bpath : string -> string
-(** Alias for !GWPARAM.bpath *)
+(** Alias for GWPARAM.bpath *)
 
 val search_in_assets : string -> string
 (** Checks that the file in argument belong to one of the asserts dir
@@ -88,7 +88,7 @@ val nobtit : config -> base -> person -> title list
 val strictly_after_private_years : config -> Date.dmy -> bool
 
 val authorized_age : config -> base -> person -> bool
-(** Alias to !GWPARAM.p_auth *)
+(** Alias to GWPARAM.p_auth *)
 
 (* TODO see if it can be removed from mli; it is used in geneanet's geneweb-plugin-api *)
 val is_old_person : config -> (iper, iper, istr) gen_person -> bool

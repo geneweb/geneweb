@@ -80,7 +80,7 @@ let missing_password conf =
     args
 
 let wrap conf title fn =
-  !GWPARAM.wrap_output conf title @@ fun () ->
+  GWPARAM.wrap_output conf title @@ fun () ->
   if opt_password = List.assoc_opt arg_password conf.env then fn ()
   else missing_password conf
 
@@ -420,7 +420,7 @@ let fixbase_ok conf base =
     Lock.control
       (Files.lock_file @@ Util.base_path [] (conf.bname ^ ".gwb"))
       false
-      ~onerror:(fun () -> !GWPARAM.output_error conf Def.Service_Unavailable)
+      ~onerror:(fun () -> GWPARAM.output_error conf Def.Service_Unavailable)
       process
 
 let ns = "fixbase"

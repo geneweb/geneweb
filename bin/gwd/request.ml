@@ -382,7 +382,7 @@ let w_person ~none fn conf base =
   | _ -> none conf base
 
 let output_error ?headers ?content conf code =
-  !Geneweb.GWPARAM.output_error ?headers ?content conf code
+  Geneweb.GWPARAM.output_error ?headers ?content conf code
 
 let w_wizard fn conf base =
   if conf.Geneweb.Config.wizard then

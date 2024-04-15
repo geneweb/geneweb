@@ -147,7 +147,7 @@ let rename_portrait conf base p (nfn, nsn, noc) =
       let new_f = f ^ Filename.extension old_f in
       try Sys.rename old_f new_f
       with Sys_error e ->
-        !GWPARAM.syslog `LOG_ERR
+        GWPARAM.syslog `LOG_ERR
           (Format.sprintf
              "Error renaming portrait: old_path=%s new_path=%s : %s" old_f new_f
              e))
@@ -224,7 +224,7 @@ let parse_src_with_size_info conf s =
     let s = String.sub s 0 pos1 in
     Ok (urlorpath_of_string conf s, (w, h))
   with Not_found | Failure _ ->
-    !GWPARAM.syslog `LOG_ERR
+    GWPARAM.syslog `LOG_ERR
       (Format.sprintf "Error parsing portrait source with size info %s" s);
     Error "Failed to parse url with size info"
 
