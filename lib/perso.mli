@@ -7,9 +7,6 @@ type generation_person =
   | GP_interv of (Sosa.t * Sosa.t * (Sosa.t * Sosa.t) option) option
   | GP_missing of Sosa.t * Gwdb.iper
 
-val string_of_marriage_text :
-  Config.config -> Gwdb.base -> Gwdb.family -> Adef.safe_string
-
 val interp_templ :
   ?no_headers:bool ->
   string ->
@@ -72,30 +69,8 @@ val linked_page_text :
   (Gwdb.iper, Gwdb.ifam) Def.NLDB.page * ('b * ('a * Def.NLDB.ind) list) ->
   Adef.safe_string
 
-val string_of_died : Config.config -> Gwdb.person -> bool -> Adef.safe_string
-
-val string_of_parent_age :
-  Config.config ->
-  Gwdb.base ->
-  Gwdb.person * bool ->
-  (Gwdb.family -> Gwdb.iper) ->
-  Adef.safe_string
-
-val string_of_image_url :
-  Config.config ->
-  Gwdb.base ->
-  Gwdb.person * bool ->
-  bool ->
-  Adef.escaped_string
-
-val round_2_dec : float -> float
-
-val get_link :
-  generation_person list -> Util.IperSet.elt -> generation_person option
-
 (**)
 
-val infinite : int
 val limit_desc : Config.config -> int
 
 val make_desc_level_table :

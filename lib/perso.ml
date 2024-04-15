@@ -2,24 +2,6 @@
 
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
 
-let string_of_marriage_text conf base fam =
-  let marriage = Date.od_of_cdate (Gwdb.get_marriage fam) in
-  let marriage_place = Gwdb.sou base (Gwdb.get_marriage_place fam) in
-  let s =
-    match marriage with
-    | Some d ->
-        let open Def in
-        " " ^<^ DateDisplay.string_of_ondate conf d
-    | None -> Adef.safe ""
-  in
-  match marriage_place with
-  | "" -> s
-  | _ ->
-      let open Def in
-      s ^^^ ", "
-      ^<^ Util.safe_html (Util.string_with_macros conf [] marriage_place)
-      ^>^ ","
-
 let string_of_title ?(safe = false) ?(link = true) conf base
     (and_txt : Adef.safe_string) p (nth, name, title, places, dates) =
   let safe_html = if not safe then Util.safe_html else Adef.safe in
