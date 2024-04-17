@@ -5806,8 +5806,8 @@ fr: quatre-fois-arrière-petits-cousins au troisième degré
 
     cousins.5.0
 de: Ur-Ur-Urgroßeltern
-en: great-great-great-grandparent/great-great-great-grandparents
-fr: 3×-arrière-grand-parent/3×-arrière-grands-parents
+en: great-great-great-grandparents
+fr: 3×-arrière-grands-parents
 
     cousins.5.0 tt
 de: Altgroßeltern
