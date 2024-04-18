@@ -1,4 +1,4 @@
-val surname_not_found : Config.config -> string -> unit
+val surname_not_found : Config.config -> Gwdb.base -> string -> unit
 
 val persons_of_fsname :
   Config.config ->
@@ -23,7 +23,7 @@ val search_surname : Config.config -> Gwdb.base -> string -> Gwdb.iper list
 val search_surname_print :
   Config.config ->
   Gwdb.base ->
-  (Config.config -> string -> unit) ->
+  (Config.config -> Gwdb.base -> string -> unit) ->
   string ->
   unit
 

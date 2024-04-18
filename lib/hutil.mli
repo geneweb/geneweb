@@ -17,12 +17,15 @@ val header_without_http : config -> (bool -> unit) -> unit
     - Opening <body> tag with its attributes
     - If user is a wizard or a friend, then includes all messages send to him. *)
 
-val header_without_page_title : config -> (bool -> unit) -> unit
+val header_without_home : config -> (bool -> unit) -> unit
+
+val header_with_title :
+  ?error:bool -> ?fluid:bool -> config -> (bool -> unit) -> unit
 (** Calls for [Util.html] to print HTTP header and for [header_without_http] to print HTML page header.
     Additionaly prints opening container <div> tag on the socket. *)
 
-val header : config -> (bool -> unit) -> unit
-(** [header conf title] calls for [header_without_page_title] to print HTTP header and HTML page header.
+val header : ?error:bool -> ?fluid:bool -> config -> (bool -> unit) -> unit
+(** [header conf title] calls for [header_with_title] to print HTTP header and HTML page header.
     Additionaly prints page title with [title true] (false to print browser tab title). *)
 
 val header_no_page_title : config -> (bool -> unit) -> unit
@@ -56,9 +59,6 @@ val gen_print_link_to_welcome : (unit -> unit) -> config -> bool -> unit
 val print_link_to_welcome : config -> bool -> unit
 (** Calls [gen_print_link_to_welcome] with empty function [f]. *)
 
-val print_link_to_home : config -> unit
-(** Prints the home, referer, search buttons and timing/errors data *)
-
 val incorrect_request : ?comment:string -> config -> unit
 (** Sends [Bad Request] HTTP response (same as [GWPARAM.output_error conf Bad_Request]) *)
 
@@ -71,6 +71,6 @@ val interp_no_header :
 
 val interp_no_env : config -> string -> unit
 
-val print_calendar : config -> unit
+val print_calendar : config -> Gwdb.base -> unit
 (** Displays the calendar; if no key is set, it will use today's date.
     Based on template file calendar.txt *)

@@ -36,7 +36,7 @@ let print conf base =
   let max_answers =
     match p_getint conf.env "max" with Some n -> n | None -> 100
   in
-  Hutil.header conf title;
+  Hutil_2.header conf base title;
   Output.print_sstring conf "<p>";
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf "searching all"));
   Output.print_sstring conf (transl conf ":");

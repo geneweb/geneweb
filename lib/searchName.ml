@@ -130,7 +130,7 @@ type search_type =
 let search conf base an search_order specify unknown =
   let rec loop l =
     match l with
-    | [] -> unknown conf an
+    | [] -> unknown conf base an
     | Sosa :: l -> (
         let pl = search_by_sosa conf base an in
         match pl with
