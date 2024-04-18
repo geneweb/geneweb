@@ -558,7 +558,7 @@ let print_start conf base =
 
 (* code déplacé et modifié pour gérer advanced.txt *)
 let print conf base fname =
-  if Sys.file_exists (Util.etc_file_name conf fname) then
+  if Sys.file_exists (Util.etc_file_name fname) then
     Hutil.interp conf fname
       {
         Templ.eval_var = eval_var conf base;

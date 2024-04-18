@@ -364,23 +364,6 @@ val pp_sex : Format.formatter -> sex -> unit
 val show_sex : sex -> string
 (** Convert [sex] to string *)
 
-type place = Def.place = {
-  other : string;
-  town : string;
-  township : string;
-  canton : string;
-  district : string;
-  county : string;
-  region : string;
-  country : string;
-}
-
-val pp_place : Format.formatter -> place -> unit
-(** Printer for [place] *)
-
-val show_place : place -> string
-(** Convert [place] to string *)
-
 type ('iper, 'person, 'string) gen_person =
       ('iper, 'person, 'string) Def.gen_person = {
   first_name : 'string;

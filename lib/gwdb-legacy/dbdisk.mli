@@ -166,17 +166,6 @@ type ('person, 'string) gen_relation = ('person, 'string) Def.gen_relation = {
 
 type sex = Def.sex = Male | Female | Neuter
 
-type place = Def.place = {
-  other : string;
-  town : string;
-  township : string;
-  canton : string;
-  district : string;
-  county : string;
-  region : string;
-  country : string;
-}
-
 (* person *)
 
 type ('iper, 'person, 'string) gen_person = {

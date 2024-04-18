@@ -10,7 +10,7 @@ let raise_with_loc loc = function
   | e -> raise (Exc_located (loc, e))
 
 let input_templ conf fname =
-  match Util.open_etc_file conf fname with
+  match Util.open_etc_file fname with
   | None -> None
   | Some (ic, fname) ->
       Templ_parser.wrap fname (fun () ->
@@ -913,7 +913,7 @@ and print_var print_ast_list conf ifun env ep loc sl =
     with Not_found -> (
       match sl with
       | [ "include"; templ ] -> (
-          match Util.open_etc_file conf templ with
+          match Util.open_etc_file templ with
           | Some (_, fname) -> (
               match input_templ conf templ with
               | Some astl ->

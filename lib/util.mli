@@ -16,7 +16,7 @@ val search_in_assets : string -> string
 val include_begin : Config.config -> Adef.safe_string -> unit
 val include_end : Config.config -> Adef.safe_string -> unit
 
-val etc_file_name : Config.config -> string -> string
+val etc_file_name : string -> string
 (** Returns the path to the template file in parameter *)
 
 val escache_value : Gwdb.base -> Adef.encoded_string
@@ -281,14 +281,13 @@ val create_env : Adef.encoded_string -> Config.env
     (i.e. a list of key-value separated by `&` or `;`)
 *)
 
-val open_etc_file : Config.config -> string -> (in_channel * string) option
-(** [open_etc_file conf fname] search for template {i etc/fname.txt}
+val open_etc_file : string -> (in_channel * string) option
+(** [open_etc_file fname] search for template {i etc/fname.txt}
     inside the base directory or inside one of assets directories.
     Returns input channel and the path to given template. *)
 
-val string_of_place : Config.config -> string -> Adef.escaped_string
-val raw_string_of_place : Config.config -> string -> string
-val place_of_string : Config.config -> string -> Def.place option
+val string_of_place : string -> Adef.escaped_string
+val raw_string_of_place : string -> string
 val allowed_tags_file : string ref
 
 val body_prop : Config.config -> string
@@ -316,16 +315,10 @@ val specify_homonymous :
   Config.config -> Gwdb.base -> Gwdb.person -> bool -> unit
 
 val get_approx_birth_date_place :
-  Config.config ->
-  Gwdb.base ->
-  Gwdb.person ->
-  Date.date option * Adef.safe_string
+  Gwdb.base -> Gwdb.person -> Date.date option * Adef.safe_string
 
 val get_approx_death_date_place :
-  Config.config ->
-  Gwdb.base ->
-  Gwdb.person ->
-  Date.date option * Adef.safe_string
+  Gwdb.base -> Gwdb.person -> Date.date option * Adef.safe_string
 
 type ('a, 'b) format2 = ('a, unit, string, 'b) format4
 
@@ -551,7 +544,6 @@ val read_visited : Config.config -> cache_visited_t
 val record_visited : Config.config -> Gwdb.iper -> unit
 
 val array_mem_witn :
-  Config.config ->
   Gwdb.base ->
   Gwdb.iper ->
   (Gwdb.iper * Def.witness_kind) array ->

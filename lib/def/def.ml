@@ -192,18 +192,6 @@ type ('person, 'string) gen_relation = {
 (** Sex of person *)
 type sex = Male | Female | Neuter
 
-type place = {
-  other : string;
-  town : string;
-  township : string;
-  canton : string;
-  district : string;
-  county : string;
-  region : string;
-  country : string;
-}
-(** Place information *)
-
 type ('iper, 'person, 'string) gen_person = {
   first_name : 'string;
   surname : 'string;

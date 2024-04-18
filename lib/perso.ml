@@ -988,7 +988,7 @@ let build_list_eclair conf base v p =
   (* d'évènements et le nombre d'iper unique correspond au nombre d'individu. *)
   let add_surname p surn pl d =
     if not (Gwdb.is_empty_string pl) then
-      let pl = Util.string_of_place conf (Gwdb.sou base pl) in
+      let pl = Util.string_of_place (Gwdb.sou base pl) in
       let r =
         try Hashtbl.find ht (surn, pl)
         with Not_found ->
@@ -1657,14 +1657,14 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       | Vfam (_, fam, _, m_auth) when mode_local env ->
           if m_auth then
             Gwdb.get_marriage_place fam
-            |> Gwdb.sou base |> Util.string_of_place conf |> safe_val
+            |> Gwdb.sou base |> Util.string_of_place |> safe_val
           else null_val
       | _ -> (
           match get_env "fam_link" env with
           | Vfam (_, fam, _, m_auth) ->
               if m_auth then
                 Gwdb.get_marriage_place fam
-                |> Gwdb.sou base |> Util.string_of_place conf |> safe_val
+                |> Gwdb.sou base |> Util.string_of_place |> safe_val
               else null_val
           | _ -> raise Not_found))
   | "marriage_note" -> (
@@ -2287,7 +2287,7 @@ and eval_anc_by_surnl_field_var conf base env ep info =
           | Some d -> eval_date_field_var conf d sl
           | None -> null_val)
       | [ "nb_times" ] -> str_val (string_of_int (List.length sosa_list))
-      | [ "place" ] -> safe_val (Util.string_of_place conf place)
+      | [ "place" ] -> safe_val (Util.string_of_place place)
       | [ "sosa_access" ] ->
           let str, _ =
             List.fold_right
@@ -2593,44 +2593,6 @@ and eval_date_field_var conf d = function
       |> safe_val
   | _ -> raise Not_found
 
-and _eval_place_field_var conf place = function
-  | [] ->
-      (* Compatibility before eval_place_field_var *)
-      TemplAst.VVstring place
-  | [ "other" ] -> (
-      match Util.place_of_string conf place with
-      | Some p -> TemplAst.VVstring p.Def.other
-      | None -> null_val)
-  | [ "town" ] -> (
-      match Util.place_of_string conf place with
-      | Some p -> TemplAst.VVstring p.Def.town
-      | None -> null_val)
-  | [ "township" ] -> (
-      match Util.place_of_string conf place with
-      | Some p -> TemplAst.VVstring p.Def.township
-      | None -> null_val)
-  | [ "canton" ] -> (
-      match Util.place_of_string conf place with
-      | Some p -> TemplAst.VVstring p.Def.canton
-      | None -> null_val)
-  | [ "district" ] -> (
-      match Util.place_of_string conf place with
-      | Some p -> TemplAst.VVstring p.Def.district
-      | None -> null_val)
-  | [ "county" ] -> (
-      match Util.place_of_string conf place with
-      | Some p -> TemplAst.VVstring p.Def.county
-      | None -> null_val)
-  | [ "region" ] -> (
-      match Util.place_of_string conf place with
-      | Some p -> TemplAst.VVstring p.Def.region
-      | None -> null_val)
-  | [ "country" ] -> (
-      match Util.place_of_string conf place with
-      | Some p -> TemplAst.VVstring p.Def.country
-      | None -> null_val)
-  | _ -> raise Not_found
-
 and eval_nobility_title_field_var (id, pl) = function
   | [ "ident_key" ] -> safe_val (Mutil.encode id)
   | [ "place_key" ] -> safe_val (Mutil.encode pl)
@@ -2696,7 +2658,7 @@ and eval_str_event_field conf base (p, p_auth) event_item = function
   | "place" ->
       if p_auth then
         Gwdb.sou base (Event.get_place event_item)
-        |> Util.string_of_place conf |> safe_val
+        |> Util.string_of_place |> safe_val
       else null_val
   | "note" ->
       Event.get_note event_item
@@ -2809,15 +2771,13 @@ and eval_bool_person_field conf base env (p, p_auth) = function
           else false
       | _ -> raise Not_found)
   | "has_approx_birth_date" ->
-      p_auth && fst (Util.get_approx_birth_date_place conf base p) <> None
+      p_auth && fst (Util.get_approx_birth_date_place base p) <> None
   | "has_approx_birth_place" ->
-      p_auth
-      && (snd (Util.get_approx_birth_date_place conf base p) :> string) <> ""
+      p_auth && (snd (Util.get_approx_birth_date_place base p) :> string) <> ""
   | "has_approx_death_date" ->
-      p_auth && fst (Util.get_approx_death_date_place conf base p) <> None
+      p_auth && fst (Util.get_approx_death_date_place base p) <> None
   | "has_approx_death_place" ->
-      p_auth
-      && (snd (Util.get_approx_death_date_place conf base p) :> string) <> ""
+      p_auth && (snd (Util.get_approx_death_date_place base p) :> string) <> ""
   | "has_aliases" ->
       if (not p_auth) && Util.is_hide_names conf p then false
       else Gwdb.get_aliases p <> []
@@ -3108,12 +3068,10 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           else Gwdb.sou base nn |> Util.escape_html |> safe_val
       | _ -> null_val)
   | "approx_birth_place" ->
-      if p_auth then
-        Util.get_approx_birth_date_place conf base p |> snd |> safe_val
+      if p_auth then Util.get_approx_birth_date_place base p |> snd |> safe_val
       else null_val
   | "approx_death_place" ->
-      if p_auth then
-        Util.get_approx_death_date_place conf base p |> snd |> safe_val
+      if p_auth then Util.get_approx_death_date_place base p |> snd |> safe_val
       else null_val
   | "auto_image_file_name" -> (
       (* TODO what do we want here? can we remove this? *)
@@ -3123,7 +3081,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "bname_prefix" -> Util.commd conf |> safe_val
   | "birth_place" ->
       if p_auth then
-        Gwdb.get_birth_place p |> Gwdb.sou base |> Util.string_of_place conf
+        Gwdb.get_birth_place p |> Gwdb.sou base |> Util.string_of_place
         |> safe_val
       else null_val
   | "birth_note" ->
@@ -3133,7 +3091,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       Gwdb.get_birth_src p |> get_note_source conf base ~p p_auth false
   | "baptism_place" ->
       if p_auth then
-        Gwdb.get_baptism_place p |> Gwdb.sou base |> Util.string_of_place conf
+        Gwdb.get_baptism_place p |> Gwdb.sou base |> Util.string_of_place
         |> safe_val
       else null_val
   | "baptism_note" ->
@@ -3143,7 +3101,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       Gwdb.get_baptism_src p |> get_note_source conf base ~p p_auth false
   | "burial_place" ->
       if p_auth then
-        Gwdb.get_burial_place p |> Gwdb.sou base |> Util.string_of_place conf
+        Gwdb.get_burial_place p |> Gwdb.sou base |> Util.string_of_place
         |> safe_val
       else null_val
   | "burial_note" ->
@@ -3184,7 +3142,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "cremation_place" ->
       if p_auth then
-        Gwdb.get_burial_place p |> Gwdb.sou base |> Util.string_of_place conf
+        Gwdb.get_burial_place p |> Gwdb.sou base |> Util.string_of_place
         |> safe_val
       else null_val
   | "dates" ->
@@ -3202,7 +3160,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "death_place" ->
       if p_auth then
-        Gwdb.get_death_place p |> Gwdb.sou base |> Util.string_of_place conf
+        Gwdb.get_death_place p |> Gwdb.sou base |> Util.string_of_place
         |> safe_val
       else null_val
   | "death_note" ->
@@ -3370,7 +3328,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "slash_approx_birth_date" ->
       if p_auth then
-        match fst (Util.get_approx_birth_date_place conf base p) with
+        match fst (Util.get_approx_birth_date_place base p) with
         | Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
         | None -> null_val
       else null_val
@@ -3414,7 +3372,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           |> safe_val
       | _ -> null_val)
   | "slash_approx_death_date" -> (
-      match (p_auth, fst (Util.get_approx_death_date_place conf base p)) with
+      match (p_auth, fst (Util.get_approx_death_date_place base p)) with
       | true, Some d -> DateDisplay.string_slash_of_date conf d |> safe_val
       | _ -> null_val)
   | "prev_fam_father" -> (
@@ -4604,7 +4562,7 @@ let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
       env ep
   else if menu then
     let size =
-      match Util.open_etc_file conf templ_fname with
+      match Util.open_etc_file templ_fname with
       | Some (ic, _) ->
           let fd = Unix.descr_of_in_channel ic in
           let stats = Unix.fstat fd in

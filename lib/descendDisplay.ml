@@ -674,7 +674,7 @@ let print_person_table conf base p lab =
       && (p_getenv conf.env "birth" = Some "on"
          || p_getenv conf.env "birth_place" = Some "on")
     then
-      let date, place = Util.get_approx_birth_date_place conf base p in
+      let date, place = Util.get_approx_birth_date_place base p in
       let date =
         match date with
         | Some d -> DateDisplay.string_slash_of_date conf d
@@ -689,7 +689,7 @@ let print_person_table conf base p lab =
       && (p_getenv conf.env "death" = Some "on"
          || p_getenv conf.env "death_place" = Some "on")
     then
-      let date, place = Util.get_approx_death_date_place conf base p in
+      let date, place = Util.get_approx_death_date_place base p in
       let date =
         match date with
         | Some d -> DateDisplay.string_slash_of_date conf d
@@ -770,7 +770,7 @@ let print_person_table conf base p lab =
       Output.print_string conf mdate);
   aux [ "marr_place" ] (fun fam spouse ->
       if authorized_age conf base p && authorized_age conf base spouse then
-        get_marriage_place fam |> sou base |> Util.string_of_place conf
+        get_marriage_place fam |> sou base |> Util.string_of_place
         |> Output.print_string conf;
       Output.print_sstring conf " &nbsp;");
   aux [ "child" ]
@@ -862,7 +862,7 @@ let print_person_table conf base p lab =
         aux i "marr_place" (fun () ->
             if authorized_age conf base p && authorized_age conf base spouse
             then
-              get_marriage_place cpl |> sou base |> Util.string_of_place conf
+              get_marriage_place cpl |> sou base |> Util.string_of_place
               |> Output.print_string conf;
             Output.print_sstring conf " &nbsp;");
         aux

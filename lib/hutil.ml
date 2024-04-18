@@ -47,7 +47,7 @@ let header_without_http conf title =
   Output.print_sstring conf
     {|<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">|};
   Util.include_template conf [] "css" (fun () -> ());
-  (match Util.open_etc_file conf "hed" with
+  (match Util.open_etc_file "hed" with
   | Some (ic, _) -> Templ.copy_from_templ conf [] ic
   | None -> ());
   Output.print_sstring conf "\n</head>\n";
@@ -96,7 +96,7 @@ let rheader conf title =
 
 let trailer conf =
   let conf = { conf with is_printed_by_template = false } in
-  (match Util.open_etc_file conf "trl" with
+  (match Util.open_etc_file "trl" with
   | Some (ic, _) -> Templ.copy_from_templ conf [] ic
   | None -> ());
   Templ.print_copyright conf;
@@ -123,7 +123,7 @@ let gen_interp header conf fname ifun env ep =
       match Templ.input_templ conf fname with
       | Some astl ->
           if header then Util.html conf;
-          let full_name = Util.etc_file_name conf fname in
+          let full_name = Util.etc_file_name fname in
           Templ.interp_ast conf ifun env ep [ Ainclude (full_name, astl) ]
       | None -> error_cannot_access conf fname)
 
