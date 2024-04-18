@@ -770,7 +770,7 @@ let print_person_table conf base p lab =
       Output.print_string conf mdate);
   aux [ "marr_place" ] (fun fam spouse ->
       if authorized_age conf base p && authorized_age conf base spouse then
-        get_marriage_place fam |> sou base |> Util.string_of_place
+        get_marriage_place fam |> sou base |> Util.trimmed_string_of_place
         |> Output.print_string conf;
       Output.print_sstring conf " &nbsp;");
   aux [ "child" ]
@@ -862,7 +862,7 @@ let print_person_table conf base p lab =
         aux i "marr_place" (fun () ->
             if authorized_age conf base p && authorized_age conf base spouse
             then
-              get_marriage_place cpl |> sou base |> Util.string_of_place
+              get_marriage_place cpl |> sou base |> Util.trimmed_string_of_place
               |> Output.print_string conf;
             Output.print_sstring conf " &nbsp;");
         aux
