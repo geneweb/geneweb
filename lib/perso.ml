@@ -3651,6 +3651,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Some (`Url u) -> str_val u (* ?? *)
       | None -> null_val)
   | "X" -> str_val Filename.dir_sep (* end carrousel functions *)
+  | "key" ->
+      if is_hide_names conf p && not p_auth then null_val
+      else
+        Format.sprintf "%s.%d %s"
+          (p_first_name base p |> Name.lower)
+          (get_occ p)
+          (p_surname base p |> Name.lower)
+        |> str_val
   | "mark_descendants" -> (
       match get_env "desc_mark" env with
       | Vdmark r ->

@@ -161,7 +161,7 @@
             </a>
             <div class="dropdown-menu dropdown-menu-transl">
               %( SOSA_REF / CGL buttons %)
-              %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)
+              %if;(not browsing_with_sosa_ref or sosa_ref.key!=key)
                   <a class="dropdown-item"
                     href="%if;(b.access_by_key="yes")%apply;url_set%with;pz/nz/ocz%and;%first_name_key;/%surname_key;/%if;(occ!=0)%occ;%end;%end;
                           %else;%apply;url_set("iz",index)%end;"
@@ -169,14 +169,14 @@
                     <i class="far fa-circle-dot fa-fw %sexcolor; mr-1"></i> [*modify::Sosa 1][:] %self;%nn;
                   </a>
               %end;
-              %( FIXME: how to hide this button ? when default_sosa_ref is set,
-                 ipnocz get that bvar values even if removed from the URL! %)
-              <a class="dropdown-item" href="%url_set.iz_pz_nz_ocz;"
-                title="%if;(b.default_sosa_ref!="")%apply;nav_with_sosa_ref(b.default_sosa_ref)%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">%nn;
-                <i class="far fa-circle-stop fa-fw %if;(browsing_with_sosa_ref and b.default_sosa_ref!="")%sexcolor;%else;text-danger%end; mr-1"></i>%sp;
-                %if;(b.default_sosa_ref!="")%nl;[*restore default_sosa_ref][:] %b.default_sosa_ref;%nn;
-                %else;[*user/password/cancel]2 [navigation] [Sosa]%nn;%end;
-              </a>
+              %if;(b.default_sosa_ref!=sosa_ref.key)
+                <a class="dropdown-item" href="%url_set.iz_pz_nz_ocz;"
+                  title="%if;(b.default_sosa_ref!="")%apply;nav_with_sosa_ref(b.default_sosa_ref)%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">%nn;
+                  <i class="far fa-circle-stop fa-fw %if;(browsing_with_sosa_ref and b.default_sosa_ref!="")%sexcolor;%else;text-danger%end; mr-1"></i>%sp;
+                  %if;(b.default_sosa_ref!="")%nl;[*restore default_sosa_ref][:] %b.default_sosa_ref;%nn;
+                  %else;[*user/password/cancel]2 [navigation] [Sosa]%nn;%end;
+                </a>
+              %end;
               <div class="dropdown-divider"></div>
               %if;(e.m!="ADD_FAM" and e.m!="MOD_FAM" and e.m!="MOD_IND" and e.m!="R" and e.m!="U")
                 <a class="dropdown-item" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-link-slash fa-fw mr-2" title="[*cancel GeneWeb links]"></i>[*cancel GeneWeb links]</a>%nn;
