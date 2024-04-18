@@ -28,6 +28,11 @@ let gen_print_link_to_welcome f conf _right_aligned =
 
 let print_link_to_welcome = gen_print_link_to_welcome (fun () -> ())
 
+let print_link_to_home conf =
+  match Util.open_etc_file conf "home" with
+  | Some (ic, _) -> Templ.copy_from_templ conf [] ic
+  | None -> ()
+
 (* S: use Util.include_template for "hed"? *)
 
 let header_without_http_nor_home conf title =
@@ -72,6 +77,9 @@ let header_without_http_nor_home conf title =
 let header_without_page_title conf title =
   Util.html conf;
   header_without_http_nor_home conf title;
+  (match Util.open_etc_file conf "home" with
+  | Some (ic, _) -> Templ.copy_from_templ conf [] ic
+  | None -> ());
   (* balancing </div> in gen_trailer *)
   Output.printf conf "<div class=\"container\">"
 
