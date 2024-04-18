@@ -10,7 +10,7 @@ let translate_title conf =
   in
   (Printf.sprintf (Util.ftransl conf "book of %s") title, title)
 
-let translate_in_your_tree conf ini nb =
+let translate_in_your_tree conf nb =
   let iyt =
     match Util.p_getenv conf.Config.env "data" with
     | Some "occu" -> Util.transl conf "occupations_in_your_tree"
@@ -205,11 +205,10 @@ and eval_simple_str_var conf _base env _xx = function
       in
       Utf8.capitalize_fst book_of ^ result
   | "results_in_your_tree" ->
-      let ini = Option.value ~default:"" (Util.p_getenv conf.env "s") in
       let nb =
         match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
       in
-      translate_in_your_tree conf ini nb
+      translate_in_your_tree conf nb
   | _ -> raise Not_found
 
 and eval_compound_var conf base env xx sl =

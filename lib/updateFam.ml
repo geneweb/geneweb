@@ -109,7 +109,7 @@ let witness_person_of_event_opt env e =
 
 let ( >>= ) x f = ExtOption.bind x f
 
-let rec eval_fwitness env fam sl =
+let rec eval_fwitness env sl =
   let fwitness_opt =
     family_events_opt env >>= fun e ->
     witness_person_of_event_opt env e >>= fun p -> eval_key_opt p sl
@@ -193,7 +193,7 @@ and eval_event_str conf base env =
       try
         let e = nth_fevent (i - 1) env in
         let name =
-          Util.string_of_fevent_name' conf base e.efam_name
+          Util.string_of_fevent_name' conf e.efam_name
           |> Adef.safe_fn Utf8.capitalize_fst
         in
         let date =
@@ -311,7 +311,7 @@ and eval_simple_var conf base env (fam, cpl, des) = function
   | [ "event_date"; s ] -> eval_event_date env s
   | [ "event_str" ] -> eval_event_str conf base env
   | [ "has_fwitness" ] -> eval_has_fwitness env
-  | "fwitness" :: sl -> eval_fwitness env fam sl
+  | "fwitness" :: sl -> eval_fwitness env sl
   | [ "fwitness_kind" ] -> eval_fwitness_kind env
   | [ "fwitness_note" ] -> eval_fwitness_note env
   | [ s ] -> eval_default_var conf s

@@ -260,3 +260,19 @@ let get_portrait conf base p =
         | None -> None
         | Some path -> Some path)
   else None
+
+let max_im_wid = 240
+
+let gen_string_of_img_sz max_w max_h conf base (p, p_auth) =
+  if p_auth then
+    match get_portrait_with_size conf base p with
+    | Some (_, Some (w, h)) ->
+        let w, h = scale_to_fit ~max_w ~max_h ~w ~h in
+        Format.sprintf " width=\"%d\" height=\"%d\"" w h
+    | Some (_, None) -> Format.sprintf " height=\"%d\"" max_h
+    | None -> ""
+  else ""
+
+let string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid
+let string_of_image_medium_size = gen_string_of_img_sz 160 120
+let string_of_image_small_size = gen_string_of_img_sz 100 75

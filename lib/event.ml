@@ -152,7 +152,7 @@ let int_of_fevent_name = function
   | Efam_Annulation -> 9
   | Efam_Divorce -> 10
   | Efam_NoMention -> 11
-  | Efam_Name s -> 12
+  | Efam_Name _ -> 12
 
 let compare_fevent_name name1 name2 =
   let i1 = int_of_fevent_name name1 in

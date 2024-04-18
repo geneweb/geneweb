@@ -386,10 +386,7 @@ val string_of_pevent_name :
   Adef.safe_string
 
 val string_of_pevent_name' :
-  Config.config ->
-  Gwdb.base ->
-  string Def.gen_pers_event_name ->
-  Adef.safe_string
+  Config.config -> string Def.gen_pers_event_name -> Adef.safe_string
 
 val string_of_fevent_name :
   Config.config ->
@@ -400,10 +397,7 @@ val string_of_fevent_name :
 *)
 
 val string_of_fevent_name' :
-  Config.config ->
-  Gwdb.base ->
-  string Def.gen_fam_event_name ->
-  Adef.safe_string
+  Config.config -> string Def.gen_fam_event_name -> Adef.safe_string
 
 val string_of_witness_kind :
   Config.config -> Def.sex -> Def.witness_kind -> Adef.safe_string

@@ -1,25 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let max_im_wid = 240
 let round_2_dec x = floor ((x *. 100.0) +. 0.5) /. 100.0
-
-let string_of_marriage_text conf base fam =
-  let marriage = Date.od_of_cdate (Gwdb.get_marriage fam) in
-  let marriage_place = Gwdb.sou base (Gwdb.get_marriage_place fam) in
-  let s =
-    match marriage with
-    | Some d ->
-        let open Def in
-        " " ^<^ DateDisplay.string_of_ondate conf d
-    | None -> Adef.safe ""
-  in
-  match marriage_place with
-  | "" -> s
-  | _ ->
-      let open Def in
-      s ^^^ ", "
-      ^<^ Util.safe_html (Util.string_with_macros conf [] marriage_place)
-      ^>^ ","
 
 let string_of_title ?(safe = false) ?(link = true) conf base
     (and_txt : Adef.safe_string) p (nth, name, title, places, dates) =
@@ -1311,8 +1292,6 @@ let extract_var sini s =
     String.sub s len (String.length s - len)
   else ""
 
-let template_file = ref "perso.txt"
-
 let warning_use_has_parents_before_parent (fname, bp, ep) var r =
   Printf.sprintf
     "%s %d-%d: since v5.00, must test \"has_parents\" before using \"%s\"\n"
@@ -1326,20 +1305,6 @@ let null_val = TemplAst.VVstring ""
 
 let safe_val (x : [< `encoded | `escaped | `safe ] Adef.astring) =
   TemplAst.VVstring ((x :> Adef.safe_string) :> string)
-
-let gen_string_of_img_sz max_w max_h conf base (p, p_auth) =
-  if p_auth then
-    match Image.get_portrait_with_size conf base p with
-    | Some (_, Some (w, h)) ->
-        let w, h = Image.scale_to_fit ~max_w ~max_h ~w ~h in
-        Format.sprintf " width=\"%d\" height=\"%d\"" w h
-    | Some (_, None) -> Format.sprintf " height=\"%d\"" max_h
-    | None -> ""
-  else ""
-
-let string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid
-let string_of_image_medium_size = gen_string_of_img_sz 160 120
-let string_of_image_small_size = gen_string_of_img_sz 100 75
 
 let get_sosa conf base env r p =
   try List.assoc (Gwdb.get_iper p) !r
@@ -3272,9 +3237,11 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Some src -> Image.src_to_string src |> str_val
       | None -> null_val)
   | "image_html_url" -> string_of_image_url conf base ep true |> safe_val
-  | "image_size" -> string_of_image_size conf base ep |> str_val
-  | "image_medium_size" -> string_of_image_medium_size conf base ep |> str_val
-  | "image_small_size" -> string_of_image_small_size conf base ep |> str_val
+  | "image_size" -> Image.string_of_image_size conf base ep |> str_val
+  | "image_medium_size" ->
+      Image.string_of_image_medium_size conf base ep |> str_val
+  | "image_small_size" ->
+      Image.string_of_image_small_size conf base ep |> str_val
   | "image_url" -> string_of_image_url conf base ep false |> safe_val
   | "index" -> (
       match get_env "p_link" env with
@@ -4542,7 +4509,6 @@ let eval_predefined_apply conf env f vl =
   | _ -> raise Not_found
 
 let gen_interp_templ ?(no_headers = false) menu title templ_fname conf base p =
-  template_file := templ_fname ^ ".txt";
   let ep = (p, Util.authorized_age conf base p) in
   (* TODO what is this? what are those "120" *)
   let emal =

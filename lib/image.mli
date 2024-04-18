@@ -54,3 +54,12 @@ val get_portrait :
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.
     - [Some src] with [src] the url or path of [p]'s portrait.
 *)
+
+val string_of_image_size :
+  Config.config -> Gwdb.base -> Gwdb.person * bool -> string
+
+val string_of_image_medium_size :
+  Config.config -> Gwdb.base -> Gwdb.person * bool -> string
+
+val string_of_image_small_size :
+  Config.config -> Gwdb.base -> Gwdb.person * bool -> string

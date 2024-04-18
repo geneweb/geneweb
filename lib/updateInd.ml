@@ -32,8 +32,6 @@ type 'a value =
       list
   | Vnone
 
-type 'a env = 'a value list
-
 let bind x v e = (x, v) :: e
 let get_env x e = try List.assoc x e with Not_found -> Vnone
 
@@ -51,9 +49,9 @@ let safe_val = Update_util.safe_val
 
 let rec eval_var conf base env p _loc sl =
   try eval_special_var conf base sl
-  with Not_found -> eval_simple_var conf base env p sl
+  with Not_found -> eval_simple_var conf env p sl
 
-and eval_simple_var conf base env p = function
+and eval_simple_var conf env p = function
   | [ "alias" ] -> eval_string_env "alias" env
   | [ "acc_if_titles" ] -> bool_val (p.access = IfTitles)
   | [ "acc_private" ] -> bool_val (p.access = Private)
@@ -134,7 +132,7 @@ and eval_simple_var conf base env p = function
           try
             let e = nth_pevent (i - 1) env in
             let name =
-              Util.string_of_pevent_name' conf base e.epers_name
+              Util.string_of_pevent_name' conf e.epers_name
               |> Adef.safe_fn Utf8.capitalize_fst
             in
             let date =
