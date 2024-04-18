@@ -514,6 +514,7 @@ let input_lexicon lang ht open_fname =
       else key ()
   (* find a line corresponding to a language *)
   and trad k =
+    hold := "";
     match input_line ic with
     | exception End_of_file -> close_in ic
     | line ->
@@ -557,9 +558,7 @@ let input_lexicon lang ht open_fname =
   Hashtbl.iter (fun k k2 -> 
       match Hashtbl.find_opt ht k2 with
       | Some entry -> Hashtbl.replace ht k entry
-      | None -> 
-        Printf.eprintf "Warning: %s aliased to inexistant %s entry\n" k k2
-    ) tmp
+      | None -> ()) tmp
 
 
 let array_to_list_map fn a =

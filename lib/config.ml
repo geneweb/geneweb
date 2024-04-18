@@ -79,6 +79,7 @@ type config = {
   no_note : bool;
   bname : string;
   nb_of_persons : int;
+  nb_of_families : int;
   cgi_passwd : string;
   env : env;
   mutable senv : env;
@@ -159,6 +160,7 @@ let empty =
     no_note = false;
     bname = "";
     nb_of_persons = -1;
+    nb_of_families = -1;
     cgi_passwd = "";
     env = [];
     senv = [];

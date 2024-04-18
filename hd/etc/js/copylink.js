@@ -23,36 +23,30 @@ function copyToClipboard(text) {
     var simpledata = simplecopybtn.dataset.wikilink;
     var fullcopybtn = document.querySelector(".full-copy");
     var fulldata = fullcopybtn.dataset.wikilink;
-    var permacopybtn = document.querySelector(".permalink-copy");
-    var permafcopybtn = document.querySelector(".permalink-friend-copy");
-    var permawcopybtn = document.querySelector(".permalink-wizard-copy");
-    var search = permacopybtn.dataset.wikilink;
-    var cururl = window.location.origin + window.location.pathname
-    var permaurl = cururl + "?" + search;
-    var permaurlf = cururl + "_f?" + search;
-    var permaurlw = cururl + "_w?" + search;
 
     simplecopybtn.addEventListener("click", function(event) {
     var result = copyToClipboard(simpledata);
-    console.log("copied?", result);
 });
-
     fullcopybtn.addEventListener("click", function(event) {
     var result = copyToClipboard(fulldata);
-    console.log("copied?", result);
 });
+
+    var permacopybtn = document.querySelector(".permalink-copy");
+    var permafcopybtn = document.querySelector(".permalink-friend-copy");
+    var permawcopybtn = document.querySelector(".permalink-wizard-copy");
+    var query = permacopybtn.dataset.query;
+    var bname = permacopybtn.dataset.bname;
+    var origin = window.location.origin;
+    var permaurl = origin + (bname != "" ? "/" + bname : window.location.pathname) + "?" + query;
+    var permaurlf = origin + "/" + bname + "_f?" + query;
+    var permaurlw = origin + "/" + bname + "_w?" + query;
 
     permacopybtn.addEventListener("click", function(event) {
     var result = copyToClipboard(permaurl);
-    console.log("copied?", result);
 });
-
     permafcopybtn.addEventListener("click", function(event) {
     var result = copyToClipboard(permaurlf);
-    console.log("copied?", result);
 });
-
     permawcopybtn.addEventListener("click", function(event) {
     var result = copyToClipboard(permaurlw);
-    console.log("copied?", result);
 });
