@@ -1434,9 +1434,7 @@ and eval_simple_bool_var conf base env =
   | "are_residence" -> check_relation (( = ) Residence)
   | "are_separated" -> fam_check_aux (fun fam -> get_divorce fam = Separated)
   | "browsing_with_sosa_ref" -> (
-      match get_env "sosa_ref" env with
-      | Vsosa_ref v -> v <> None
-      | _ -> raise Not_found)
+      match get_env "sosa_ref" env with Vsosa_ref v -> v <> None | _ -> false)
   | "has_comment" | "has_fnotes" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) when mode_local env ->
@@ -2250,7 +2248,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       | Vsosa_ref (Some p) ->
           let ep = make_ep conf base (get_iper p) in
           eval_person_field_var conf base env ep loc sl
-      | _ -> raise Not_found)
+      | _ -> null_val)
   | "spouse" :: sl -> (
       match get_env "fam" env with
       | Vfam (_, _, (_, _, ip), _) when mode_local env ->
@@ -5415,7 +5413,7 @@ let interp_templ_with_menu = gen_interp_templ true
 
 let interp_notempl_with_menu title templ_fname conf base p =
   (* On envoie le header car on n'est pas dans un template (exple: merge). *)
-  Hutil.header_without_page_title conf title;
+  Hutil.header_with_title conf title;
   gen_interp_templ true title templ_fname conf base p
 
 (* Main *)

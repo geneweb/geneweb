@@ -61,6 +61,7 @@
   </div>
 </section>
 
+%base_trailer;
 %include;copyr
 %include;js
 </div>

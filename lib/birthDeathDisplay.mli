@@ -17,7 +17,7 @@ val print_marriage : Config.config -> Gwdb.base -> unit
 val print_oldest_engagements : Config.config -> Gwdb.base -> unit
 (** Displays the list of the oldest couples that still exist *)
 
-val print_statistics : Config.config -> unit
+val print_statistics : Config.config -> Gwdb.base -> unit
 (** Displays several links for statistics: latest births, death, marriages, the
     oldest couples, persons that are alive and who lived the longest, as well as
     a population pyramid *)

@@ -27,8 +27,7 @@ let incorrect_content_type conf base p s =
   let title _ =
     Output.print_sstring conf (Utf8.capitalize (Util.transl conf "error"))
   in
-  Hutil.rheader conf title;
-  Hutil.print_link_to_welcome conf true;
+  Hutil_2.header conf base title;
   Output.print_sstring conf "<p>\n<em style=\"font-size:smaller\">";
   Output.printf conf "Error: incorrect image content type: %s" s;
   Output.printf conf "</em>\n</p>\n<ul>\n<li>\n%s</li>\n</ul>\n"
@@ -40,8 +39,7 @@ let error_too_big_image conf base p len max_len =
   let title _ =
     Output.print_sstring conf (Utf8.capitalize (Util.transl conf "error"))
   in
-  Hutil.rheader conf title;
-  Hutil.print_link_to_welcome conf true;
+  Hutil_2.header ~error:true conf base title;
   Output.print_sstring conf "<p><em style=\"font-size:smaller\">";
   Output.printf conf "Error: this image is too big: %d bytes<br>\n" len;
   Output.printf conf "Maximum authorized in this database: %d bytes<br>\n"
@@ -251,10 +249,7 @@ let print_send_image conf base p =
       Output.print_string conf (Util.escape_html (p_surname base p)))
   in
   let digest = Update.digest_person (UpdateInd.string_person_of base p) in
-  Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.print_sstring conf "<h2>\n";
-  title false;
-  Output.print_sstring conf "</h2>\n";
+  Hutil_2.header ~templ:"perso_header" conf base title;
   Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
     conf.command;
@@ -289,7 +284,7 @@ let print_sent conf base p =
     transl conf "image received"
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
-  Hutil.header conf title;
+  Hutil_2.header conf base title;
   Output.print_sstring conf "<ul><li>";
   Output.print_string conf (referenced_person_text conf base p);
   Output.print_sstring conf "</li></ul>";
@@ -505,7 +500,7 @@ let print_delete_image conf base p =
       Output.print_sstring conf " ";
       Output.print_string conf (Util.escape_html sn))
   in
-  Hutil.header conf title;
+  Hutil_2.header conf base title;
   Output.printf conf "<form method=\"post\" action=\"%s\">" conf.command;
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "DEL_IMAGE_OK");
@@ -522,7 +517,7 @@ let print_deleted conf base p =
     transl conf "image deleted"
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
-  Hutil.header conf title;
+  Hutil_2.header conf base title;
   Output.print_sstring conf "<ul><li>";
   Output.print_string conf (referenced_person_text conf base p);
   Output.print_sstring conf "</li></ul>";

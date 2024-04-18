@@ -6,7 +6,7 @@ open Gwdb
 open Util
 module StrSet = Mutil.StrSet
 
-let not_found conf txt x =
+let not_found conf base txt x =
   let title _ =
     Output.print_sstring conf (Utf8.capitalize_fst txt);
     Output.print_sstring conf (transl conf ":");
@@ -14,14 +14,14 @@ let not_found conf txt x =
     Output.print_string conf (Util.escape_html x);
     Output.print_sstring conf {|"|}
   in
-  Hutil.rheader conf title;
-  Hutil.print_link_to_welcome conf false;
+  Hutil_2.header ~error:true conf base title;
   Hutil.trailer conf
 
-let first_name_not_found conf =
-  not_found conf (transl conf "first name not found")
+let first_name_not_found conf base =
+  not_found conf base (transl conf "first name not found")
 
-let surname_not_found conf = not_found conf (transl conf "surname not found")
+let surname_not_found conf base =
+  not_found conf base (transl conf "surname not found")
 
 let print_img conf img =
   Output.print_sstring conf {|<img src="|};
@@ -261,9 +261,9 @@ let first_name_print_list conf base x1 xl liste =
           Output.print_sstring conf {|</a>|})
         (StrSet.elements xl)
   in
-  Hutil.header conf title;
-  (* Si on est dans un calcul de parenté, on affiche *)
-  (* l'aide sur la sélection d'un individu.          *)
+  Hutil_2.header conf base title;
+  (* Si on est dans un calcul de parentÃ©, on affiche *)
+  (* l'aide sur la sÃ©lection d'un individu.          *)
   Util.print_tips_relationship conf;
   let list =
     List.map
@@ -291,9 +291,9 @@ let mk_specify_title conf kw n _ =
   Output.print_sstring conf {| |};
   Output.print_sstring conf (transl conf "specify")
 
-let select_first_name conf n list =
-  Hutil.header conf
-  @@ mk_specify_title conf (transl_nth conf "first name/first names" 0) n;
+let select_first_name conf base n list =
+  Hutil_2.header conf base
+    (mk_specify_title conf (transl_nth conf "first name/first names" 0) n);
   Output.print_sstring conf "<ul>";
   List.iter
     (fun (sstr, (strl, _)) ->
@@ -553,7 +553,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
         (StrSet.elements xl)
   in
   let br = p_getint conf.env "br" in
-  Hutil.header conf title;
+  Hutil_2.header conf base title;
   (* Si on est dans un calcul de parentÃ©, on affiche *)
   (* l'aide sur la sÃ©lection d'un individu.          *)
   Util.print_tips_relationship conf;
@@ -593,7 +593,7 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   let fx = x in
   let x = match homonymes with x :: _ -> x | _ -> x in
   let title = mk_specify_title conf (transl_nth conf "surname/surnames" 0) fx in
-  Hutil.header conf title;
+  Hutil_2.header conf base title;
   let list =
     List.map
       (fun sn ->
@@ -666,7 +666,7 @@ let print_family_alphabetic x conf base liste =
       [] l
   in
   match liste with
-  | [] -> surname_not_found conf x
+  | [] -> surname_not_found conf base x
   | _ ->
       let title h =
         let access x =
@@ -684,9 +684,9 @@ let print_family_alphabetic x conf base liste =
             Output.print_string conf (access x))
           homonymes
       in
-      Hutil.header conf title;
-      (* Si on est dans un calcul de parenté, on affiche *)
-      (* l'aide sur la sélection d'un individu.          *)
+      Hutil_2.header conf base title;
+      (* Si on est dans un calcul de parentÃ©, on affiche *)
+      (* l'aide sur la sÃ©lection d'un individu.          *)
       Util.print_tips_relationship conf;
       (* Menu afficher par branche/ordre alphabetique *)
       print_alphabetic_to_branch conf x;
@@ -834,7 +834,7 @@ let search_surname_print conf base not_found_fun x =
           bhl
       in
       match (bhl, list) with
-      | [], _ -> not_found_fun conf x
+      | [], _ -> not_found_fun conf base x
       | _, [ (s, (strl, _)) ] ->
           print_one_surname_by_branch conf base x strl (bhl, s)
       | _ ->
@@ -866,7 +866,7 @@ let search_first_name_print conf base x =
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
   match list with
-  | [] -> first_name_not_found conf x
+  | [] -> first_name_not_found conf base x
   | [ (_, (strl, iperl)) ] ->
       let iperl = List.sort_uniq compare iperl in
       let pl = List.map (pget conf base) iperl in
@@ -879,4 +879,4 @@ let search_first_name_print conf base x =
           pl []
       in
       first_name_print_list conf base x strl pl
-  | _ -> select_first_name conf x list
+  | _ -> select_first_name conf base x list

@@ -683,10 +683,7 @@ let print_all_places_surnames_aux conf base _ini ~add_birth ~add_baptism
   let opt = get_opt conf in
   let long = p_getenv conf.env "display" = Some "long" in
   let keep = match p_getint conf.env "keep" with Some t -> t | None -> 1 in
-  Hutil.header_no_page_title conf title;
-  Output.print_sstring conf "<h1>";
-  title false;
-  Output.print_sstring conf "</h1>";
+  Hutil_2.header conf base title;
   Hutil.interp_no_header conf "buttons_places"
     {
       Templ.eval_var = (fun _ -> raise Not_found);
