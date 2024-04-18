@@ -104,8 +104,8 @@ let specify conf base n pl =
          p, !tl)
       pl
   in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
+
+  Hutil_2.header conf base title;
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
@@ -156,8 +156,8 @@ let very_unknown conf _ =
       Output.print_sstring conf {|"|} ;
     in
     Output.status conf Def.Not_Found;
-    Hutil.rheader conf title;
-    Hutil.print_link_to_welcome conf false;
+    (* can't use Util_2.header here, missing base! *)
+    Hutil.header ~error:true conf title;
     Hutil.trailer conf
   | _ ->
     match p_getenv conf.env "i" with
@@ -173,13 +173,12 @@ let very_unknown conf _ =
         |> Output.print_sstring conf ;
       in
       Output.status conf Def.Not_Found;
-      Hutil.rheader conf title;
-      Hutil.print_link_to_welcome conf false;
+      Hutil.header ~error:true conf title;
       Hutil.trailer conf
     | None -> Hutil.incorrect_request conf ~comment:"error #1"
 
 (* Print Not found page *)
-let unknown conf n =
+let unknown conf base n =
   let title _ =
     transl conf "not found"
     |> Utf8.capitalize_fst
@@ -190,8 +189,7 @@ let unknown conf n =
     Output.print_sstring conf {|"|} ;
   in
   Output.status conf Def.Not_Found;
-  Hutil.rheader conf title;
-  Hutil.print_link_to_welcome conf false;
+  Hutil_2.header ~error:true conf base title;
   Hutil.trailer conf
 
 let make_henv conf base =
@@ -499,7 +497,7 @@ let treat_request =
         | "C" ->
           w_base @@ w_person @@ CousinsDisplay.print
         | "CAL" ->
-          fun conf _ -> Hutil.print_calendar conf
+          w_base @@ Hutil.print_calendar
         | "CHG_CHN" when conf.wizard ->
           w_wizard @@ w_base @@ ChangeChildrenDisplay.print
         | "CHG_CHN_OK" ->
@@ -749,7 +747,7 @@ let treat_request =
             | _ -> incorrect_request conf base ~comment:"error #6"
           end
         | "STAT" ->
-          w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
+          w_base @@ BirthDeathDisplay.print_statistics
         | "CHANGE_WIZ_VIS" ->
           w_wizard @@ w_lock @@ w_base @@ WiznotesDisplay.change_wizard_visibility
         | "TP" ->

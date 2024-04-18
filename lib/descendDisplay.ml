@@ -954,7 +954,7 @@ let display_descendant_with_table conf base max_lev p =
         incr nb_pers;
         loop lev nb_col false refl q
   in
-  Hutil.header_fluid conf (descendants_title conf base p);
+  Hutil.header ~fluid:true conf (descendants_title conf base p);
   Output.print_sstring conf "<p>";
   (text_to conf max_lev : Adef.safe_string :> string)
   |> Utf8.capitalize_fst |> Output.print_sstring conf;

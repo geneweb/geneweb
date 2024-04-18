@@ -273,11 +273,8 @@ let print_main conf base auth_file =
     else list
   in
   let wddir = dir conf base in
-  Hutil.header_no_page_title conf title;
+  Hutil.header_without_home conf title;
   (* mouais... *)
-  Output.print_sstring conf "<h1>";
-  title false;
-  Output.print_sstring conf "</h1>";
   let list =
     List.map
       (fun (wz, wname) ->
@@ -343,11 +340,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
     if title = "" then wizard_page_title conf @@ Util.escape_html wizname
     else wizard_page_title conf @@ Util.escape_html title
   in
-  Hutil.header_no_page_title conf title;
-  Hutil.print_link_to_welcome conf true;
-  Output.print_sstring conf "<h1>";
-  title false;
-  Output.print_sstring conf "</h1>";
+  Hutil.header_without_home conf title;
   Util.include_template conf [] "summary" (fun () -> ());
   Output.print_sstring conf {|<table border="0" width="100%"><tr><td>|};
   let s = string_with_macros conf [] s in
@@ -395,7 +388,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
 
 let print_part_wiznote conf base wz s cnt0 =
   let title = Util.escape_html wz in
-  Hutil.header_no_page_title conf (fun _ -> Output.print_string conf title);
+  Hutil.header_without_home conf (fun _ -> Output.print_string conf title);
   let s = Util.safe_html @@ string_with_macros conf [] s in
   let lines = Wiki.extract_sub_part (s : Adef.safe_string :> string) cnt0 in
   let lines =
@@ -552,8 +545,7 @@ let do_connected_wizards conf base (_, _, _, wl) =
     transl_nth conf "wizard/wizards/friend/friends/exterior" 1
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
-  Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
+  Hutil.header_without_home conf title;
   let wddir = dir conf base in
   let denying = wizard_denying wddir in
   let wl =
