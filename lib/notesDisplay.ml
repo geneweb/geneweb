@@ -38,11 +38,8 @@ let print_search_form conf from_note =
   Output.print_sstring conf "</button>\n</form>\n</div>"
 
 let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
-  Hutil.header_no_page_title conf (fun _ ->
-      if (title :> string) = "" then
-        Output.print_string conf (Util.escape_html fnotes)
-      else Output.print_string conf title);
-  (* TODO: DO WE NEED ME?
+  Hutil.header_with_title conf (fun _ -> ());
+  (* TODO: DOâ€ WEâ€ NEEDâ€ ME?
      let what_links_page () =
        if fnotes <> "" then (
          Output.print_sstring conf {|<a href="|};
@@ -93,7 +90,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   Hutil.trailer conf
 
 let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
-  Hutil.header_no_page_title conf (fun _ ->
+  Hutil.header_with_title conf (fun _ ->
       if (title :> string) = "" then
         Output.print_string conf (Util.escape_html fnotes)
       else Output.print_string conf title);
@@ -239,7 +236,7 @@ let print_what_links conf base fnotes =
       Output.print_sstring conf "</a></span>")
   in
   let db = notes_links_db conf base false in
-  Hutil.header conf title;
+  Hutil.header_with_title conf title;
   Option.iter (print_linked_list conf base) (List.assoc_opt fnotes db);
   Hutil.trailer conf
 
@@ -352,7 +349,7 @@ let print_misc_notes conf base =
         else list)
       db []
   in
-  Hutil.header_link_welcome conf title;
+  Hutil.header_with_title conf title;
   if db <> [] then (
     Output.print_sstring conf "<ul>";
     if d <> "" then (

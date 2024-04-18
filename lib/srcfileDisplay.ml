@@ -453,12 +453,12 @@ let gen_print mode conf base fname =
   match channel with
   | Some ic ->
       let title _ = Output.print_string conf (Util.escape_html fname) in
-      Hutil.header_without_page_title conf title;
+      Hutil.header_with_title conf title;
       copy_from_channel conf base ic mode;
       Hutil.trailer conf
   | _ ->
       let title _ = Output.print_sstring conf "Error" in
-      Hutil.header conf title;
+      Hutil.header ~error:true conf title;
       Output.print_sstring conf "<ul><li>Cannot access file \"";
       Output.print_string conf (Util.escape_html fname);
       Output.print_sstring conf ".txt\"</ul>";
