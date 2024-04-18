@@ -573,9 +573,7 @@ let prec_year_text conf d =
       - p    : person
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                           *)
-let short_dates_text conf base p =
-  Adef.safe
-  @@
+let short_dates_text_notag conf base p =
   if authorized_age conf base p then
     let birth_date, death_date, _ = Gutil.get_birth_death_date p in
     let s =
@@ -595,8 +593,11 @@ let short_dates_text conf base p =
           | Death (_, _) | DeadDontKnowWhen | DeadYoung -> death_symbol conf
           | _ -> "")
     in
-    if s <> "" then " <bdo dir=\"ltr\">" ^ s ^ "</bdo>" else s
+    s
   else ""
+
+let short_dates_text conf base p =
+  Adef.safe @@ " <bdo dir=ltr>" ^ short_dates_text_notag conf base p ^ "</bdo>"
 
 (* ********************************************************************** *)
 (* [Fonc] short_marriage_date_text :

@@ -3550,6 +3550,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "dates" ->
       if p_auth then DateDisplay.short_dates_text conf base p |> safe_val
       else null_val
+  | "dates_notag" ->
+      if p_auth then DateDisplay.short_dates_text_notag conf base p |> str_val
+      else null_val
   | "death_age" ->
       if p_auth then
         match Gutil.get_birth_death_date p with
