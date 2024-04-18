@@ -1,6 +1,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let ver = "7.1b exp"
+let ver = "7.1-beta"
 
 let available_languages =
   [
