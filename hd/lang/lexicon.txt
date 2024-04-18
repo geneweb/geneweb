@@ -18855,6 +18855,10 @@ de: Url
 en: url
 fr: url
 
+    restore default_sosa_ref
+en: restore default Sosa 1
+fr: restorer Sosa 1 par défault
+
     use "link" instead of "create"
 af: gebruik "koppel" eerder as "skep"
 bg: използвайте "да се свърже" вместо "да се създаде"
