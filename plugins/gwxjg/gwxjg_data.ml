@@ -22,7 +22,7 @@ let mk_note_rs conf base env str =
 let mk_person_note_rs conf base p str =
   (Tstr str, safe (Notes.person_note conf base p str))
 
-let mk_place conf str = (Tstr str, escaped (Util.string_of_place conf str))
+let mk_place str = (Tstr str, escaped (Util.string_of_place str))
 
 let rec date_compare_aux date1 date2 =
   let y1 = field date1 "year" in
@@ -482,7 +482,7 @@ and mk_event conf base (evt : 'a Event.event_item) =
                  | s -> unbox_pat (Lazy.force lw).(i) @@ s))
              w)
   in
-  let place_raw, place = mk_place conf (Gwdb.sou base (E.place evt)) in
+  let place_raw, place = mk_place (Gwdb.sou base (E.place evt)) in
   let source_raw, source = mk_source_rs conf base (E.src base evt) in
   let note_raw, note = mk_note_rs conf base [] (E.note conf base evt) in
   Tpat
@@ -500,7 +500,7 @@ and mk_event conf base (evt : 'a Event.event_item) =
     | "witnesses" -> witnesses
     | _ -> raise Not_found)
 
-and mk_title conf base t =
+and mk_title base t =
   let ident = Tstr (Gwdb.sou base t.Def.t_ident) in
   let name =
     match t.t_name with
@@ -508,7 +508,7 @@ and mk_title conf base t =
     | Tname s -> Tstr (Gwdb.sou base s)
     | Tnone -> Tnull
   in
-  let place_raw, place = mk_place conf (Gwdb.sou base t.t_place) in
+  let place_raw, place = mk_place (Gwdb.sou base t.t_place) in
   let date_start = mk_opt mk_date (Date.od_of_cdate t.t_date_start) in
   let date_end = mk_opt mk_date (Date.od_of_cdate t.t_date_end) in
   let nth = Tint t.t_nth in
@@ -744,7 +744,7 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
                     (Adef.safe "") db))
          else Tnull))
   in
-  let titles = lazy_list (mk_title conf base) (Gwdb.get_titles p) in
+  let titles = lazy_list (mk_title base) (Gwdb.get_titles p) in
   let _, note = mk_person_note_rs conf base p (E.note conf base p) in
   let occ = Tint (Gwdb.get_occ p) in
   let occupation_raw, occupation =
@@ -1075,7 +1075,7 @@ and mk_warning conf base =
           [
             Tsafe "TitleDatesError";
             unsafe_mk_person conf base p;
-            mk_title conf base t;
+            mk_title base t;
           ]
     | UndefinedSex p ->
         Tset [ Tsafe "UndefinedSex"; unsafe_mk_person conf base p ]

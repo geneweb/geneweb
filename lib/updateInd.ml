@@ -140,7 +140,7 @@ and eval_simple_var conf env p = function
               | Some d -> DateDisplay.string_of_date conf d
               | None -> Adef.safe ""
             in
-            let place = Util.string_of_place conf e.epers_place in
+            let place = Util.string_of_place e.epers_place in
             ([ name; date; (place :> Adef.safe_string) ]
               : Adef.safe_string list
               :> string list)

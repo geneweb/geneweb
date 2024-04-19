@@ -1180,15 +1180,15 @@ let include_begin_end_aux (k : Adef.safe_string) conf (fname : Adef.safe_string)
 let include_begin = include_begin_end_aux (Adef.safe "begin")
 let include_end = include_begin_end_aux (Adef.safe "end")
 
-let etc_file_name _conf fname =
+let etc_file_name fname =
   search_in_assets (Filename.concat "etc" (fname ^ ".txt"))
 
-let open_etc_file conf fname =
-  let fname = etc_file_name conf fname in
+let open_etc_file fname =
+  let fname = etc_file_name fname in
   try Some (Secure.open_in fname, fname) with Sys_error _ -> None
 
 let include_template conf env fname failure =
-  match open_etc_file conf fname with
+  match open_etc_file fname with
   | Some (ic, fname) ->
       include_begin conf (esc fname);
       copy_from_templ conf env ic;
@@ -1481,60 +1481,10 @@ let string_with_macros conf env s =
   in
   loop Out 0
 
-let place_of_string conf place =
-  match List.assoc_opt "place" conf.Config.base_env with
-  | Some gwf_place ->
-      let list = String.split_on_char ',' gwf_place in
-      let list = List.map String.trim list in
-      let list_p = String.split_on_char ',' place in
-      let list_p = List.map String.trim list_p in
-      let place =
-        {
-          Def.other = "";
-          town = "";
-          township = "";
-          canton = "";
-          district = "";
-          county = "";
-          region = "";
-          country = "";
-        }
-      in
-      let place =
-        let rec loop list list_p place =
-          match list_p with
-          | [] -> place
-          | x :: list_p -> (
-              match list with
-              | [] ->
-                  let other = String.concat ", " (x :: list_p) in
-                  let other = place.Def.other ^ " " ^ other in
-                  { place with other }
-              | t :: list ->
-                  let place =
-                    match t with
-                    | "town" -> { place with town = x }
-                    | "township" -> { place with township = x }
-                    | "canton" -> { place with canton = x }
-                    | "district" -> { place with district = x }
-                    | "county" -> { place with county = x }
-                    | "region" -> { place with region = x }
-                    | "country" -> { place with country = x }
-                    | _ ->
-                        let other = place.other ^ " " ^ x in
-                        { place with other }
-                  in
-                  loop list list_p place)
-        in
-        loop list list_p place
-      in
-      Some place
-  | None -> None
-
-let raw_string_of_place _conf place =
+let raw_string_of_place place =
   List.fold_left (fun s c -> Name.strip_c s c) place [ '['; ']' ]
 
-let string_of_place _conf place = raw_string_of_place _conf place |> escape_html
+let string_of_place place = raw_string_of_place place |> escape_html
 let menu_threshold = 20
 let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
 
@@ -1773,33 +1723,27 @@ let get_approx_date_place d1 (p1 : Adef.safe_string) d2 (p2 : Adef.safe_string)
   | None, _, None, _ -> (None, p1)
   | None, _, Some x, y -> if y = "" then (Some x, p1) else (Some x, p2)
 
-let get_approx_birth_date_place conf base p =
+let get_approx_birth_date_place base p =
   let birth = Date.od_of_cdate (Gwdb.get_birth p) in
-  let birth_place =
-    string_of_place conf (Gwdb.sou base (Gwdb.get_birth_place p))
-  in
+  let birth_place = string_of_place (Gwdb.sou base (Gwdb.get_birth_place p)) in
   let baptism = Date.od_of_cdate (Gwdb.get_baptism p) in
   let baptism_place =
-    string_of_place conf (Gwdb.sou base (Gwdb.get_baptism_place p))
+    string_of_place (Gwdb.sou base (Gwdb.get_baptism_place p))
   in
   get_approx_date_place birth
     (birth_place :> Adef.safe_string)
     baptism
     (baptism_place :> Adef.safe_string)
 
-let get_approx_death_date_place conf base p =
+let get_approx_death_date_place base p =
   let death = Date.date_of_death (Gwdb.get_death p) in
-  let death_place =
-    string_of_place conf (Gwdb.sou base (Gwdb.get_death_place p))
-  in
+  let death_place = string_of_place (Gwdb.sou base (Gwdb.get_death_place p)) in
   let buri =
     match Gwdb.get_burial p with
     | Def.Buried cd | Def.Cremated cd -> Date.od_of_cdate cd
     | Def.UnknownBurial -> None
   in
-  let buri_place =
-    string_of_place conf (Gwdb.sou base (Gwdb.get_burial_place p))
-  in
+  let buri_place = string_of_place (Gwdb.sou base (Gwdb.get_burial_place p)) in
   get_approx_date_place death
     (death_place :> Adef.safe_string)
     buri
@@ -2331,11 +2275,11 @@ let print_in_columns conf ncols len_list list wprint_elem =
   Output.printf conf "<tr align=\"%s\" valign=\"top\">\n" conf.Config.left;
   (let _ =
      List.fold_left
-       (fun (list, _first) len ->
+       (fun list len ->
          let rec loop n list =
            if n = 0 then (
              Output.print_sstring conf "</ul>\n</td>\n";
-             (list, false))
+             list)
            else
              match list with
              | (kind, ord, elem) :: list ->
@@ -2352,10 +2296,10 @@ let print_in_columns conf ncols len_list list wprint_elem =
                  wprint_elem elem;
                  Output.print_sstring conf "</li>\n";
                  loop (n - 1) list
-             | [] -> ([], false)
+             | [] -> []
          in
          loop len list)
-       (list, true) len_list
+       list len_list
    in
    ());
   Output.print_sstring conf "</tr>\n";
@@ -2588,7 +2532,7 @@ let record_visited conf ip =
 (**/**)
 
 (* TODO OCaml 4.13 : use Array.find_opt *)
-let array_mem_witn _conf base ip witnesses wnotes =
+let array_mem_witn base ip witnesses wnotes =
   let get_note i =
     if i < Array.length wnotes then Gwdb.sou base wnotes.(i)
     else Gwdb.sou base Gwdb.empty_string

@@ -59,7 +59,6 @@ type ('person, 'string) gen_relation =
 [@@deriving show { with_path = false }]
 
 type sex = [%import: Def.sex] [@@deriving show { with_path = false }]
-type place = [%import: Def.place] [@@deriving show { with_path = false }]
 
 type ('iper, 'person, 'string) gen_person =
   [%import: ('iper, 'person, 'string) Def.gen_person]

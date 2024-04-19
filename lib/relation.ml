@@ -619,7 +619,7 @@ let get_event_witnessed conf base p =
             in
             if not is_duplicate_fevent then
               match
-                Util.array_mem_witn conf base (get_iper p)
+                Util.array_mem_witn base (get_iper p)
                   (Event.get_witnesses event_item)
                   (Event.get_witness_notes event_item)
               with
