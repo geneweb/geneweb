@@ -221,7 +221,7 @@ let print_confirm_c conf base save_m report =
 (* we need print_link_delete_image in the send function *)
 let print_link_delete_image conf base p =
   if Option.is_some @@ Image.get_portrait conf base p then (
-    Output.print_sstring conf {|<p><a class="btn btn-primary" href="|};
+    Output.print_sstring conf {|<div><a class="btn btn-danger mt-3" href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf "m=DEL_IMAGE&i=";
     Output.print_string conf (get_iper p |> string_of_iper |> Mutil.encode);
@@ -229,7 +229,7 @@ let print_link_delete_image conf base p =
     transl conf "delete" |> Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf {| |};
     transl_nth conf "image/images" 0 |> Output.print_sstring conf;
-    Output.print_sstring conf "</a></p>")
+    Output.print_sstring conf "</a></div>")
 
 let print_send_image conf base p =
   let title h =
@@ -253,7 +253,8 @@ let print_send_image conf base p =
   Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
     conf.command;
-  Output.print_sstring conf "<p>\n";
+  Output.print_sstring conf
+    "<div class=\"d-inline-flex align-items-center mt-2\">\n";
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_OK");
   Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);
@@ -262,7 +263,7 @@ let print_send_image conf base p =
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf " ";
   Output.print_sstring conf
-    {| <input type="file" class="form-control-file" name="file" accept="image/*"></p>|};
+    {|<input type="file" class="form-control-file ml-1" name="file" accept="image/*">|};
   (match
      Option.map int_of_string @@ List.assoc_opt "max_images_size" conf.base_env
    with
@@ -272,10 +273,10 @@ let print_send_image conf base p =
       Output.print_sstring conf " bytes)</p>"
   | None -> ());
   Output.print_sstring conf
-    {|<button type="submit" class="btn btn-primary mt-2">|};
+    {|<span>></span><button type="submit" class="btn btn-primary ml-3">|};
   transl_nth conf "validate/delete" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</button></form>";
+  Output.print_sstring conf "</button></div></form>";
   print_link_delete_image conf base p;
   Hutil.trailer conf
 
@@ -506,10 +507,10 @@ let print_delete_image conf base p =
   Util.hidden_input conf "m" (Adef.encoded "DEL_IMAGE_OK");
   Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);
   Output.print_sstring conf
-    {|<p><button type="submit" class="btn btn-primary">|};
+    {|<div class="mt-3"><button type="submit" class="btn btn-danger">|};
   transl_nth conf "validate/delete" 1
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf {|</button></p></form>|};
+  Output.print_sstring conf {|</button></div></form>|};
   Hutil.trailer conf
 
 let print_deleted conf base p =
