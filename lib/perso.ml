@@ -1602,7 +1602,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
   | "family_cnt" -> (
       match get_env "family_cnt" env with
       | Vint x -> string_of_int x |> str_val
-      | _ -> null_val)
+      | _ -> "0" |> str_val)
   | "first_name_alias" -> (
       match get_env "first_name_alias" env with
       | Vstring s -> s |> Util.escape_html |> safe_val
