@@ -248,7 +248,7 @@ let print_send_image conf base p =
       Output.print_sstring conf (Format.sprintf ".%d " (get_occ p));
       Output.print_string conf (Util.escape_html (p_surname base p)))
   in
-  let digest = Update.digest_person (UpdateInd.string_person_of base p) in
+  let digest = Image.default_portrait_filename base p in
   Hutil_2.header ~templ:"perso_header" conf base title;
   Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
@@ -256,9 +256,9 @@ let print_send_image conf base p =
   Output.print_sstring conf
     "<div class=\"d-inline-flex align-items-center mt-2\">\n";
   Util.hidden_env conf;
-  Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_OK");
+  Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_C_OK");
   Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);
-  Util.hidden_input conf "digest" (Mutil.encode digest);
+  Util.hidden_input conf "idigest" (Mutil.encode digest);
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf "file"));
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf " ";
@@ -346,8 +346,8 @@ let print_send_ok conf base =
     with Failure _ -> incorrect conf "print send ok"
   in
   let p = poi base ip in
-  let digest = Update.digest_person (UpdateInd.string_person_of base p) in
-  if (digest :> string) = Mutil.decode (raw_get conf "digest") then
+  let digest = Image.default_portrait_filename base p in
+  if (digest :> string) = Mutil.decode (raw_get conf "idigest") then
     raw_get conf "file" |> Adef.as_string |> effective_send_ok conf base p
   else Update.error_digest conf
 
