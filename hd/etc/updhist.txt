@@ -127,7 +127,7 @@
   %elseif;(uu = "cn")[change children's names]%nn;
   %elseif;(uu = "aa")[add::parents]%nn;
   %elseif;(uu = "mn")[modify::note/notes]1%nn;
-  %elseif;(uu = "cp")[modify::place]%nn;
+  %elseif;(uu = "cp")[modify::place/places]0%nn;
   %elseif;(uu = "cs")[modify::source/sources]0%nn;
   %elseif;(uu = "co")[modify::occupation/occupations]0%nn;
   %elseif;(uu = "fn")[modify::first name/first names]0%nn;
