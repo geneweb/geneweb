@@ -949,11 +949,9 @@ let opendb ?(read_only = false) bname =
         : ro_data_records =
     let bid =
       let s = Unix.stat bname in
-      s.st_dev, s.st_ino
+      (s.st_dev, s.st_ino)
     in
-    match
-      List.find_opt (fun (n, _) -> bid = n) !cached_records
-    with
+    match List.find_opt (fun (n, _) -> bid = n) !cached_records with
     | Some (_, records) -> records
     | None ->
         let persons =
