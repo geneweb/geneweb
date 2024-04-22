@@ -672,60 +672,96 @@ let make_record_exists patches pending len i =
   || Hashtbl.find_opt patches i <> None
   || (i < len && i >= 0)
 
-let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending)
-    len name input_array input_item =
-  let tab = ref None in
+type 'a data_array =
+  | ReadOnly of 'a array Gw_ancient.ancient
+  | ReadWrite of 'a array
+
+type 'a immut_record = {
+  im_array : unit -> 'a data_array;
+  im_get : int -> 'a;
+  im_clear_array : unit -> unit;
+}
+
+let make_immut_record_access ~read_only ic ic_acc shift array_pos len name
+    input_array input_item =
+  let (tab : _ data_array option ref) = ref None in
   let cleared = ref false in
+  let im_get i =
+    match !tab with
+    | Some (ReadWrite x) -> x.(i)
+    | Some (ReadOnly x) -> (Gw_ancient.follow x).(i)
+    | None -> (
+        if i < 0 || i >= len then
+          failwith ("access " ^ name ^ " out of bounds; i = " ^ string_of_int i)
+        else
+          match ic_acc with
+          | Some ic_acc ->
+              seek_in ic_acc (shift + (Iovalue.sizeof_long * i));
+              let pos = input_binary_int ic_acc in
+              seek_in ic pos;
+              input_item ic
+          | None ->
+              Printf.eprintf "Sorry; I really need base.acc\n";
+              flush stderr;
+              failwith "cannot access database")
+  in
+  let im_array () =
+    match !tab with
+    | Some x -> x
+    | None ->
+        seek_in ic array_pos;
+        let t =
+          if read_only then (
+            let t = ReadOnly (Gw_ancient.mark (input_array ic)) in
+            Gc.compact ();
+            t)
+          else ReadWrite (input_array ic)
+        in
+        tab := Some t;
+        t
+  in
+  let r =
+    {
+      im_array;
+      im_get;
+      im_clear_array =
+        (fun () ->
+          cleared := true;
+          match !tab with
+          | None -> ()
+          | Some a ->
+              (match a with
+              | ReadOnly a -> Gw_ancient.delete a
+              | ReadWrite _ -> ());
+              tab := None);
+    }
+  in
+  r
+
+let make_record_access immut_record (plenr, patches) (_, pending) len =
   let gen_get nopending i =
     match if nopending then None else Hashtbl.find_opt pending i with
     | Some v -> v
     | None -> (
         match Hashtbl.find_opt patches i with
         | Some v -> v
-        | None -> (
-            match !tab with
-            | Some x -> x.(i)
-            | None -> (
-                if i < 0 || i >= len then
-                  failwith
-                    ("access " ^ name ^ " out of bounds; i = " ^ string_of_int i)
-                else
-                  match ic_acc with
-                  | Some ic_acc ->
-                      seek_in ic_acc (shift + (Iovalue.sizeof_long * i));
-                      let pos = input_binary_int ic_acc in
-                      seek_in ic pos;
-                      input_item ic
-                  | None ->
-                      Printf.eprintf "Sorry; I really need base.acc\n";
-                      flush stderr;
-                      failwith "cannot access database")))
+        | None -> immut_record.im_get i)
   in
-  let array () =
-    match !tab with
-    | Some x -> x
-    | None ->
-        seek_in ic array_pos;
-        let t = input_array ic in
-        tab := Some t;
-        t
-  in
+  let len = max len !plenr in
   let rec r =
     {
-      load_array = (fun () -> ignore @@ array ());
+      load_array = (fun () -> ignore @@ immut_record.im_array ());
       get = gen_get false;
       get_nopending = gen_get true;
-      set = (fun i v -> (array ()).(i) <- v);
-      len = max len !plenr;
+      len;
       output_array =
         (fun oc ->
-          let v = array () in
-          let a = apply_patches v patches r.len in
-          Dutil.output_value_no_sharing oc (a : _ array));
-      clear_array =
-        (fun () ->
-          cleared := true;
-          tab := None);
+          match immut_record.im_array () with
+          | ReadOnly _ -> failwith "cannot modify read-only data"
+          | ReadWrite v ->
+              let a = apply_patches v patches r.len in
+              Dutil.output_value_no_sharing oc (a : _ array));
+      clear_array = immut_record.im_clear_array;
     }
   in
   r
@@ -805,7 +841,18 @@ let person_of_key persons strings persons_of_name first_name surname occ =
   in
   find ipl
 
-let opendb bname =
+type ro_data_records =
+  dsk_person immut_record
+  * dsk_ascend immut_record
+  * dsk_union immut_record
+  * dsk_family immut_record
+  * dsk_couple immut_record
+  * dsk_descend immut_record
+  * string immut_record
+
+let cached_records = ref []
+
+let opendb ?(read_only = false) bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
@@ -892,53 +939,96 @@ let opendb bname =
     make_record_exists (snd patches.h_family) (snd pending.h_family)
       families_len
   in
+  let ( im_persons,
+        im_ascends,
+        im_unions,
+        im_families,
+        im_couples,
+        im_descends,
+        im_strings )
+        : ro_data_records =
+    let bfname = Unix.realpath bname in
+    match
+      List.find_opt (fun (n, _) -> String.equal bfname n) !cached_records
+    with
+    | Some (_, records) -> records
+    | None ->
+        let persons =
+          make_immut_record_access ~read_only ic ic_acc shift persons_array_pos
+            persons_len "persons"
+            (input_value : _ -> person array)
+            (Iovalue.input : _ -> person)
+        in
+        let shift = shift + (persons_len * Iovalue.sizeof_long) in
+        let ascends =
+          make_immut_record_access ~read_only ic ic_acc shift ascends_array_pos
+            persons_len "ascends"
+            (input_value : _ -> ascend array)
+            (Iovalue.input : _ -> ascend)
+        in
+        let shift = shift + (persons_len * Iovalue.sizeof_long) in
+        let unions =
+          make_immut_record_access ~read_only ic ic_acc shift unions_array_pos
+            persons_len "unions"
+            (input_value : _ -> union array)
+            (Iovalue.input : _ -> union)
+        in
+        let shift = shift + (persons_len * Iovalue.sizeof_long) in
+        let families =
+          make_immut_record_access ~read_only ic ic_acc shift families_array_pos
+            families_len "families"
+            (input_value : _ -> family array)
+            (Iovalue.input : _ -> family)
+        in
+        let shift = shift + (families_len * Iovalue.sizeof_long) in
+        let couples =
+          make_immut_record_access ~read_only ic ic_acc shift couples_array_pos
+            families_len "couples"
+            (input_value : _ -> couple array)
+            (Iovalue.input : _ -> couple)
+        in
+        let shift = shift + (families_len * Iovalue.sizeof_long) in
+        let descends =
+          make_immut_record_access ~read_only ic ic_acc shift descends_array_pos
+            families_len "descends"
+            (input_value : _ -> descend array)
+            (Iovalue.input : _ -> descend)
+        in
+        let shift = shift + (families_len * Iovalue.sizeof_long) in
+        let strings =
+          make_immut_record_access ~read_only ic ic_acc shift strings_array_pos
+            strings_len "strings"
+            (input_value : _ -> string array)
+            (Iovalue.input : _ -> string)
+        in
+        let dr =
+          (persons, ascends, unions, families, couples, descends, strings)
+        in
+        if read_only then cached_records := (bfname, dr) :: !cached_records;
+        dr
+  in
   let persons =
-    make_record_access ic ic_acc shift persons_array_pos patches.h_person
-      pending.h_person persons_len "persons"
-      (input_value : _ -> person array)
-      (Iovalue.input : _ -> person)
+    make_record_access im_persons patches.h_person pending.h_person persons_len
   in
-  let shift = shift + (persons_len * Iovalue.sizeof_long) in
   let ascends =
-    make_record_access ic ic_acc shift ascends_array_pos patches.h_ascend
-      pending.h_ascend persons_len "ascends"
-      (input_value : _ -> ascend array)
-      (Iovalue.input : _ -> ascend)
+    make_record_access im_ascends patches.h_ascend pending.h_ascend persons_len
   in
-  let shift = shift + (persons_len * Iovalue.sizeof_long) in
   let unions =
-    make_record_access ic ic_acc shift unions_array_pos patches.h_union
-      pending.h_union persons_len "unions"
-      (input_value : _ -> union array)
-      (Iovalue.input : _ -> union)
+    make_record_access im_unions patches.h_union pending.h_union persons_len
   in
-  let shift = shift + (persons_len * Iovalue.sizeof_long) in
   let families =
-    make_record_access ic ic_acc shift families_array_pos patches.h_family
-      pending.h_family families_len "families"
-      (input_value : _ -> family array)
-      (Iovalue.input : _ -> family)
+    make_record_access im_families patches.h_family pending.h_family
+      families_len
   in
-  let shift = shift + (families_len * Iovalue.sizeof_long) in
   let couples =
-    make_record_access ic ic_acc shift couples_array_pos patches.h_couple
-      pending.h_couple families_len "couples"
-      (input_value : _ -> couple array)
-      (Iovalue.input : _ -> couple)
+    make_record_access im_couples patches.h_couple pending.h_couple families_len
   in
-  let shift = shift + (families_len * Iovalue.sizeof_long) in
   let descends =
-    make_record_access ic ic_acc shift descends_array_pos patches.h_descend
-      pending.h_descend families_len "descends"
-      (input_value : _ -> descend array)
-      (Iovalue.input : _ -> descend)
+    make_record_access im_descends patches.h_descend pending.h_descend
+      families_len
   in
-  let shift = shift + (families_len * Iovalue.sizeof_long) in
   let strings =
-    make_record_access ic ic_acc shift strings_array_pos patches.h_string
-      pending.h_string strings_len "strings"
-      (input_value : _ -> string array)
-      (Iovalue.input : _ -> string)
+    make_record_access im_strings patches.h_string pending.h_string strings_len
   in
   let cleanup () =
     close_in ic;
@@ -1218,7 +1308,6 @@ let record_access_of tab =
     Dbdisk.load_array = (fun () -> ());
     get = (fun i -> tab.(i));
     get_nopending = (fun i -> tab.(i));
-    set = (fun i v -> tab.(i) <- v);
     output_array = (fun oc -> Dutil.output_value_no_sharing oc (tab : _ array));
     len = Array.length tab;
     clear_array = (fun () -> ());

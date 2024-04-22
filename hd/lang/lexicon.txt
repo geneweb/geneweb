@@ -1711,6 +1711,10 @@ pt: activar/suprimir
 sv: aktivera/undertrycka
 tr: etkinleştir/kaldır
 
+    suppress this path
+en: suppress this path
+fr: supprimer ce chemin
+
     add
 af: byvoeg
 bg: добавяне на
@@ -5810,8 +5814,8 @@ fr: quatre-fois-arrière-petits-cousins au troisième degré
 
     cousins.5.0
 de: Ur-Ur-Urgroßeltern
-en: great-great-great-grandparent/great-great-great-grandparents
-fr: 3×-arrière-grand-parent/3×-arrière-grands-parents
+en: great-great-great-grandparents
+fr: 3×-arrière-grands-parents
 
     cousins.5.0 tt
 de: Altgroßeltern
@@ -11456,7 +11460,7 @@ lt: vedė %t/ištekėjo %t
 lv: precību %t precējies ar /precību %t precējusies ar
 nl: gehuwd%t met
 no: gift%t med
-oc: maridat amb/maridada amb
+oc: maridat%t amb/maridada%t amb
 pl: żona (ślub: %t):/mąż (ślub: %t):
 pt: casado%t com/casada%t com
 ro: casatorit%t cu
@@ -18886,6 +18890,10 @@ co: indirizzu web
 de: Url
 en: url
 fr: url
+
+    restore default_sosa_ref
+en: restore default Sosa 1
+fr: restorer Sosa 1 par défault
 
     use "link" instead of "create"
 af: gebruik "koppel" eerder as "skep"

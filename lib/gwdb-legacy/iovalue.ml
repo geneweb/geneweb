@@ -160,8 +160,6 @@ let rec output_loop ofuns oc x =
   else if Obj.tag x = Obj.abstract_tag then failwith "Iovalue.output <abstract>"
   else if Obj.tag x = Obj.infix_tag then failwith "Iovalue.output: <infix>"
   else if Obj.tag x = Obj.custom_tag then failwith "Iovalue.output: <custom>"
-  else if Obj.tag x = Obj.out_of_heap_tag then
-    failwith "Iovalue.output: abstract value (outside heap)"
   else (
     gen_output_block_header ofuns oc (Obj.tag x) (Obj.size x);
     (* last case of "for" separated, to make more tail recursive cases

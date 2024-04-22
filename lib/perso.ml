@@ -1944,6 +1944,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
       VVbool (List.mem plugin (List.map Filename.basename conf.plugins))
   | "base" :: "nb_persons" :: sl ->
       VVstring (eval_int conf (nb_of_persons base) sl)
+  | "base" :: "nb_families" :: sl ->
+      VVstring (eval_int conf (nb_of_families base) sl)
   | "base" :: "real_nb_persons" :: sl ->
       VVstring (eval_int conf (Gwdb.nb_of_real_persons base) sl)
   | "cell" :: sl -> (
@@ -3579,6 +3581,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "dates" ->
       if p_auth then DateDisplay.short_dates_text conf base p |> safe_val
       else null_val
+  | "dates_notag" ->
+      if p_auth then DateDisplay.short_dates_text_notag conf base p |> str_val
+      else null_val
   | "death_age" ->
       if p_auth then
         match Gutil.get_birth_death_date p with
@@ -3706,6 +3711,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Some (`Url u) -> str_val u (* ?? *)
       | None -> null_val)
   | "X" -> str_val Filename.dir_sep (* end carrousel functions *)
+  | "key" ->
+      if is_hide_names conf p && not p_auth then null_val
+      else
+        Format.sprintf "%s.%d %s"
+          (p_first_name base p |> Name.lower)
+          (get_occ p)
+          (p_surname base p |> Name.lower)
+        |> str_val
   | "mark_descendants" -> (
       match get_env "desc_mark" env with
       | Vdmark r ->

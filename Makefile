@@ -34,6 +34,8 @@ endif
 	-e "s/%%%GWDB_PKG%%%/$(GWDB_PKG)/g" \
 	-e "s/%%%SYSLOG_PKG%%%/$(SYSLOG_PKG)/g" \
 	-e "s/%%%DUNE_DIRS_EXCLUDE%%%/$(DUNE_DIRS_EXCLUDE)/g" \
+	-e "s/%%%ANCIENT_LIB%%%/$(ANCIENT_LIB)/g" \
+	-e "s/%%%ANCIENT_FILE%%%/$(ANCIENT_FILE)/g" \
 	> $@ \
 	&& printf " Done.\n"
 
@@ -78,6 +80,7 @@ GENERATED_FILES_DEP = \
 	lib/gwdb/dune \
 	lib/core/dune \
 	lib/util/dune \
+	lib/ancient/dune \
 	benchmark/dune \
 	bin/connex/dune \
 	bin/cache_files/dune \
@@ -98,20 +101,18 @@ GENERATED_FILES_DEP = \
 
 generated: $(GENERATED_FILES_DEP)
 
-install uninstall build distrib: info $(GENERATED_FILES_DEP)
+install uninstall fmt build distrib: info $(GENERATED_FILES_DEP)
 
-fmt:
-	$(RM) -r $(DISTRIB_DIR)
+fmt: ## Format Ocaml code
+ifneq ($(OS_TYPE),Win)
+	@printf "\n\033[1;37mOcamlformat\033[0m\n"
 	dune build @fmt --auto-promote
+endif
 
 # [BEGIN] Installation / Distribution section
 
 build: ## Build the geneweb package (libraries and binaries)
 build:
-ifneq ($(OS_TYPE),Win)
-	@printf "\n\033[1;37mOcamlformat\033[0m\n"
-	dune build @fmt --auto-promote
-endif
 	@printf "\n\033[1;37mBuilding executables\033[0m\n"
 	dune build -p geneweb --profile $(DUNE_PROFILE)
 

@@ -1,4 +1,4 @@
-// $Id: p_mod.js, v7.1 16/11/2023 19:57:44 $
+// $Id: p_mod.js, v7.1 18/12/2023 19:57:44 $
 
 // Définitions des modules et options
 const modulesEtOptions = {
@@ -10,7 +10,8 @@ const modulesEtOptions = {
   chronologie: ["simple", "simple + events"],
   notes: ["simple", "complete"],
   sources: ["simple", "complete"],
-  arbres: ["ascendants", "horizontal", "compact", "+3-3 gen.", "famille", "6 gen", "8 gen", "HI", "descendants"],
+  arbres: ["ascendants", "horizontal", "compact", "descendants"],
+  htrees: ["+3-3 gen.", "famille", "6 gen", "8 gen", "HI"],
   gr_parents: ["standard", "three cols"],
   ligne: ["standard"],
   data_3col: ["standard"],

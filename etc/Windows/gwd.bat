@@ -1,2 +1,1 @@
-cd bases
-cmd /c start "gwd - GeneWeb" /min ..\gw\gwd -hd ..\gw
+start "GeneWeb server" /min gw\gwd -blang -log "<stderr>" >> log.txt
