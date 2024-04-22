@@ -16406,28 +16406,28 @@ sl: številka Sosa 1
 sv: annummer 1
 tr: Sosa 1
 
-    sosa reference: %t
-af: Sosa verwysing: %t
-ca: referència de "número Sosa": %t
-co: referenza Sosa : %t
-de: Sosa Referenz: %t
-en: family tree root: %t
-eo: Sosa referenco: %t
-es: referencia Sosa: %t
-et: Sosa viidet: %t
-fi: Sosa-viitteenä: %t
-fr: référence Sosa : %t
-he:  כאזכור Sosa: %t
-it: riferimento Sosa : %t
-lv: Sosa pakāpes: %t
-nl: Sosareferentie : %t
-oc: referéncia de Sosa: %t
-pt: referência Sosa: %t
-ro: referinta Sosa: %t
-ru: ссылка Sosa: %t
-sk: referenciou "Sosa": %t
-sv: annummer: %t
-tr: aile ağacı kökü: %t
+    sosa reference
+af: Sosa verwysing
+ca: referència de "número Sosa"
+co: referenza Sosa
+de: Sosa Referenz
+en: family tree root
+eo: Sosa referenco
+es: referencia Sosa
+et: Sosa viidet
+fi: Sosa-viitteenä
+fr: référence Sosa
+he:  כאזכור Sosa
+it: riferimento Sosa
+lv: Sosa pakāpes
+nl: Sosareferentie
+oc: referéncia de Sosa
+pt: referência Sosa
+ro: referinta Sosa
+ru: ссылка Sosa
+sk: referenciou "Sosa"
+sv: annummer
+tr: aile ağacı kökü
 
     source/sources
 af: bron/bronne
