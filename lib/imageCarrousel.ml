@@ -85,6 +85,44 @@ let move_file_to_save file dir =
     1
   with _ -> 0
 
+let get_dir_name mode bname =
+  match mode with
+  | "portraits" -> Util.base_path [ "images" ] bname
+  | "blasons" -> Util.base_path [ "images" ] bname
+  | _ -> String.concat "" [ Util.base_path [ "src" ] bname; "images" ]
+
+let create_blason_stop conf base p =
+  let blason_dir = get_dir_name "blasons" conf.bname in
+  let blason_stop =
+    String.concat Filename.dir_sep
+      [ blason_dir; Image.default_blason_filename base p ^ ".stop" ]
+  in
+  let oc = open_out blason_stop in
+  close_out oc;
+  blason_stop
+
+let move_blason_file conf base src dst =
+  let blason_dir = get_dir_name "blasons" conf.bname in
+  let blason_src =
+    String.concat Filename.dir_sep
+      [ blason_dir; Image.get_blason_name conf base src true ]
+  in
+  if
+    Image.has_blason conf base src true
+    && Sys.file_exists blason_src
+    && not (Image.has_blason conf base dst true)
+  then (
+    let blason_dst =
+      String.concat Filename.dir_sep
+        [
+          blason_dir;
+          Image.default_blason_filename base dst ^ Filename.extension blason_src;
+        ]
+    in
+    rn blason_src blason_dst;
+    blason_dst)
+  else ""
+
 let normal_image_type s =
   if String.length s > 10 && Char.code s.[0] = 0xff && Char.code s.[1] = 0xd8
   then Some JPEG
@@ -187,6 +225,7 @@ let get_extension conf saved fname =
   else if Sys.file_exists (f ^ ".png") then ".png"
   else if Sys.file_exists (f ^ ".gif") then ".gif"
   else if Sys.file_exists (f ^ ".url") then ".url"
+  else if Sys.file_exists (f ^ ".stop") then ".stop"
   else "."
 
 let print_confirm_c conf base save_m report =
@@ -857,6 +896,20 @@ let print_main_c conf base =
                       (conf, effective_reset_c_ok conf base p)
                     else if fdigest != "" then
                       (conf, effective_reset_c_ok ~portrait:false conf base p)
+                    else (conf, "idigest error")
+                | Some "BLASON_UP_ONE" -> (
+                    let has_blason_self = Image.has_blason conf base p true in
+                    match get_parents p with
+                    | Some ifam when has_blason_self ->
+                        let cpl = foi base ifam in
+                        let fa = poi base (get_father cpl) in
+                        (conf, move_blason_file conf base p fa)
+                    | _ -> (conf, "idigest error"))
+                | Some "BLASON_STOP" ->
+                    let has_blason_self = Image.has_blason conf base p true in
+                    let has_blason = Image.has_blason conf base p false in
+                    if has_blason && not has_blason_self then
+                      (conf, create_blason_stop conf base p)
                     else (conf, "idigest error")
                 | Some "IMAGE_C" -> (conf, "image")
                 | _ -> (conf, "incorrect request")

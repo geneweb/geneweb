@@ -2256,6 +2256,12 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           eval_relation_field_var conf base env (0, rt, ip, true) loc sl
       | _ -> raise Not_found)
   | "self" :: sl -> eval_person_field_var conf base env ep loc sl
+  | "blason_owner" :: sl -> (
+      match Image.get_blason_owner conf base a with
+      | Some fa_iper ->
+          let ep = make_ep conf base fa_iper in
+          eval_person_field_var conf base env ep loc sl
+      | None -> null_val)
   | "sosa_ref" :: sl -> (
       match get_env "sosa_ref" env with
       | Vsosa_ref (Some p) ->
@@ -3365,24 +3371,9 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "has_history" -> has_history conf base p p_auth
   | "has_image" | "has_portrait" ->
       Image.get_portrait conf base p |> Option.is_some
-  | "has_blason" -> (
-      match Image.get_blason conf base p false with
-      | None -> false
-      | Some (`Path p) when Filename.extension p = ".stop" -> true
-      | Some (`Path _p) -> true
-      | Some (`Url _u) -> true)
-  | "has_blason_self" -> (
-      match Image.get_blason conf base p true with
-      | None -> false
-      | Some (`Path p) when Filename.extension p = ".stop" -> true
-      | Some (`Path _p) -> true
-      | Some (`Url _u) -> true)
-  | "has_blason_stop" -> (
-      match Image.get_blason conf base p true with
-      | None -> false
-      | Some (`Path p) when Filename.extension p = ".stop" -> true
-      | Some (`Path _p) -> false
-      | Some (`Url _u) -> false)
+  | "has_blason" -> Image.has_blason conf base p false
+  | "has_blason_self" -> Image.has_blason conf base p true
+  | "has_blason_stop" -> Image.has_blason_stop conf base p
   | "has_image_url" | "has_portrait_url" -> (
       match Image.get_portrait conf base p with
       | Some (`Url _url) -> true
@@ -3692,16 +3683,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Some (`Path s) -> str_val (Filename.basename s)
       | Some (`Url u) -> str_val u (* ?? *)
       | None -> null_val)
-  | "blason_name" -> (
-      match Image.get_blason conf base p false with
-      | Some (`Path p) -> str_val (Filename.basename p)
-      | Some (`Url u) -> str_val u (* ?? *)
-      | None -> null_val)
-  | "blason_name_self" -> (
-      match Image.get_blason conf base p true with
-      | Some (`Path p) -> str_val (Filename.basename p)
-      | Some (`Url u) -> str_val u (* ?? *)
-      | None -> null_val)
+  | "blason_name" -> str_val (Image.get_blason_name conf base p false)
+  | "blason_name_self" -> str_val (Image.get_blason_name conf base p true)
   | "portrait_saved" -> (
       match Image.get_old_portrait conf base p with
       | Some (`Path s) -> str_val s

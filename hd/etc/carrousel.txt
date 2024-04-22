@@ -30,8 +30,10 @@
     %end;
   %else;
     %if;(evar.em="SND_IMAGE_C_OK")%if;(evar.mode="note")[*note] [update]%else;[*portrait] [uploaded]0%end;%nn;
-    %elseif;(evar.em="DEL_IMAGE_C_OK")[*portrait] [deleted]0%if;(evar.delete!="on") [and] [saved]0%end;%nn;
-    %elseif;(evar.em="RESET_IMAGE_C_OK")[*portrait] [restored]0%nn;
+    %elseif;(evar.em="DEL_IMAGE_C_OK" and evar.fdigest!=evar.idigest)[*portrait] [deleted]0%if;(evar.delete!="on") [and] [saved]0%end;%nn;
+    %elseif;(evar.em="DEL_IMAGE_C_OK" and evar.fdigest=evar.idigest)[*coat of arms] [deleted]0%if;(evar.delete!="on") [and] [saved]0%end;%nn;
+    %elseif;(evar.em="RESET_IMAGE_C_OK" and evar.fdigest!=evar.idigest)[*portrait] [restored]0%nn;
+    %elseif;(evar.em="RESET_IMAGE_C_OK" and evar.fdigest=evar.idigest)[*coat of arms] [restored]0%nn;
     %end;%nn;
   %end;
 %end;
@@ -43,12 +45,15 @@
     %if;(evar.notes!="")%evar.file_name_2;.txt%else;%evar.file_name;%end;</samp>
   %else;
     %if;(evar.em="SND_IMAGE_C_OK" or evar.em="RESET_IMAGE_C_OK")
-      <samp>%evar.file_name;</samp> %if;(evar.em="RESET_IMAGE_C_OK")<samp>%portraits_store;%X;old%X;%portrait_saved;</samp>
-      <strong> <</strong>%end;<strong>> </strong><samp>%portraits_store;%X;%portrait;</samp>%nn;
+      <samp>%evar.file_name;</samp> %if;(evar.em="RESET_IMAGE_C_OK")%if;(evar.fdigest!=evar.idigest)<samp>%portraits_store;%X;old%X;%portrait_saved_name;</samp>%else;<samp>%portraits_store;%X;old%X;%blason_saved_name;</samp>%end;
+      <strong> <</strong>%end;<strong>> </strong>%if;(evar.fdigest!=evar.idigest)<samp>%portraits_store;%X;%portrait_saved_name;</samp>%nn;%else;<samp>%portraits_store;%X;%blason_saved_name;</samp>%nn;%end;
       %(%if;(evar.em="DEL IMAGE_C_OK" or evar.em="RESET_IMAGE_C_OK")%portrait;%else;%evar.file_name;%end;</samp>%)
-    %elseif;(evar.em="DEL_IMAGE_C_OK")
-      %if;(evar.delete!="on")<samp>portrait%X;%portrait_saved;</samp> <strong>></strong> <samp>portraits%X;old%X;%portrait_saved;</samp>
-      %else;<samp>portraits%X;saved%X;%carrousel;(.gif/jpg/png)</samp>%end;
+    %elseif;(evar.em="DEL_IMAGE_C_OK" and evar.fdigest!=evar.idigest)
+      %if;(evar.delete!="on")<samp>%portraits_store;%X;%portrait_saved_name;</samp> <strong>></strong> <samp>%saved_portraits_store;%X;%portrait_saved_name;</samp>
+      %else;<samp>portraits%X;saved%X;%family_carrousel;(.gif/jpg/png)</samp>%end;
+    %elseif;(evar.em="DEL_IMAGE_C_OK" and evar.fdigest=evar.idigest)
+       %if;(evar.delete!="on")<samp>%portraits_store;%X;%blason_saved_name;</samp> <strong>></strong> <samp>%saved_portraits_store;%X;%blason_saved_name;</samp>
+       %else;<samp>portraits%X;saved%X;%family_carrousel;(.gif/jpg/png)</samp>%end;
     %end;
   %end;
 %end;
@@ -102,6 +107,29 @@
       </form>
       <div class="small mt-2">%nn;
         %if;(has_portrait and has_old_portrait)[*previous portrait]%end;
+      </div>
+      <h1 class="display-4">
+        %(<i class="fa fa-image-portrait fa-fw mr-1"></i>%)
+        %if;(has_blason)[*modify coat of arms]%else;[*add coat of arms]%end;</h1>
+      <form class="form-row" method="post" action="%action;" enctype="multipart/form-data">
+        %if;(cgi)<input type="hidden" name="b" value="%e.b;">%end;
+        <input type="hidden" name="m" value="SND_IMAGE_C_OK">
+        <input type="hidden" name="i" value="%index;">
+        <input type="hidden" name="notes" value="">
+        <input type="hidden" name="idigest" value=%idigest;>
+        <input type="hidden" name="fdigest" value=%idigest;>
+        <div class="custom-file col">
+          <input type="file" name="file"
+            class="custom-file-input custom-portrait"
+              id="portrait_file" accept="image/*"%if;(not has_blason) autofocus%end;>
+          <label class="custom-file-label text-truncate" data-browse="[*browse]"
+            for="portrait_file">[*select] [image/images]0</label>
+        </div>
+        <button class="btn btn-primary ml-2 col-2 snd-btn-portrait"
+          type="submit" disabled>[*send]</button>
+      </form>
+      <div class="small mt-2">%nn;
+        %if;(has_blason and has_old_blason)[*previous coat of arms]%end;
       </div>
       <h1 class="display-4">
       %(<i class="far fa-file-image fa-fw mr-1"></i>%)[*add image]</h1>
@@ -209,12 +237,95 @@
           </div>
         %end;
         <table style="line-height:0.8;" class="mt-2"><tr>
-        <td style="vertical-align:top"><a class="d_flex mt-1" href="%prefix;&m=REFRESH&i=%index;" title="[*add image]">
+        <td style="vertical-align:top"><a class="d_flex mt-1" href="%prefix;&m=REFRESH&i=%index;" title="[*add image]/[delete image]">
           <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
         </a></td><td>&nbsp;</td>
         <td><small>[*warning refresh]</small>%nn;</td>
         </tr></table>
       %end;
+      <br />
+      %if;(has_blason or has_blason_stop or has_old_blason)
+      <h1 class="display-4">[*coat of arms]0</h1>
+      %if;has_blason_self;
+        <div class="d-flex mt-1">
+          <a role="button" 
+            href=%if;has_blason_url;"%blason;"%else;"%prefix;kch=%random.bits;&m=FIM_C&i=%index;"%end;%sp;
+            target="_blank" rel="noopener"%sp;
+            data-toggle="tooltip" data-html="true" data-placement="left"
+            title='<strong>[*see coat of arms]</strong><br><span class="small">%blason;</span>
+                 <br><img class="rounded my-1"
+            src=%if;has_portrait_url;"%blason;"%else;"%prefix;kch=%random.bits;&m=FIM_C&i=%index;"%end;%sp;
+                 width="185px">'>
+            <i class="far fa-file-image fa-fw text-primary"></i>
+          </a>
+          <span class="invisible"><i class="fas fa-retweet fa-rotate-90 fa-fw text-primary"></i></span>
+          <strong><samp class="text-truncate">%portraits_store;%X;</samp></strong><samp>%nn;%if;has_blason_url;%carrousel;.url%else;%blason_name;%end;</samp>
+          <a role="button" class="ml-auto col-1"  href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&fdigest=%idigest;"
+           data-toggle="tooltip" data-html="true" data-placement="left"
+           title='<i class="far fa-trash-can text-warning mr-1"></i><strong>[*delete coat of arms]</strong><br><span class="small">%blason;</span>
+                  <br><img class="rounded my-1" src="%prefix;m=FIM_C&i=%index;"
+                  width="185px">'>
+          <i class="far fa-trash-can text-warning"></i>%nn;</a> 
+          <a href="%prefix;m=BLASON_UP_ONE&i=%index;">up1</a>
+        </div>
+      %elseif;has_blason_stop;
+      <div class="d-flex mt-1">
+        <span class="invisible"><i class="fas fa-retweet fa-rotate-90 fa-fw text-primary"></i></span>
+        [stops to use coat of arms of]0&nbsp;<a  href="%prefix;%blason_owner.access;" %nn; class="%if;(blason_owner.sex=0)male%elseif;(blason_owner.sex=1)female%else;neuter%end;-underline">%blason_owner;</a>%nn;
+        <a role="button" class="ml-auto col-1"  href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&fdigest=%idigest;"
+           data-toggle="tooltip" data-html="true" data-placement="left">
+          <i class="far fa-trash-can text-warning"></i>%nn;</a> 
+      </div>
+      %elseif;has_blason;
+      <div class="d-flex mt-1">
+        <a role="button" 
+          href=""%if;has_blason_url;"%blason;"%else;"%prefix;kch=%random.bits;&m=FIM_C&i=%index;"%end;%sp;""
+          target="_blank" rel="noopener"%sp;
+          data-toggle="tooltip" data-html="true" data-placement="left"
+          title='<strong>[*see coat of arms]</strong><br><span class="small">%blason;</span>
+               <br><img class="rounded my-1"
+          src=%if;has_portrait_url;"%blason;"%else;"%prefix;kch=%random.bits;&m=FIM_C&i=%index;"%end;%sp;
+               width="185px">'>
+          <i class="far fa-file-image fa-fw text-primary"></i>
+        </a>
+        <span class="invisible"><i class="fas fa-retweet fa-rotate-90 fa-fw text-primary"></i></span>
+        [use coat of arms of]0&nbsp;<a  href="%prefix;%blason_owner.access;" %nn; class="%if;(blason_owner.sex=0)male%elseif;(blason_owner.sex=1)female%else;neuter%end;-underline">%blason_owner;</a>%nn;
+        <a role="button" class="ml-auto col-1"  href="%prefix;m=BLASON_STOP&i=%index;"
+           data-toggle="tooltip" data-html="true" data-placement="left">
+          <i class="far fa-trash-can text-warning"></i>%nn;</a> 
+      </div>
+      %end;
+      %if;has_old_blason;
+        <div class="d-flex mt-1">
+          <a role="button" 
+            href=%if;has_old_blason_url;"%blason;"%else;"%prefix;kch=%random.bits;&m=FIM_C_S&i=%index;"%end;
+            target="_blank" rel="noopener"%sp;
+            data-toggle="tooltip" data-html="true" data-placement="left"
+            title='<strong>[*see coat of arms]</strong><br><span class="small">%blason_saved</span>
+                 <br><img class="rounded my-1"
+            src=%if;has_old_blason_url;"%blason_saved;"%else;"%prefix;kch=%random.bits;&m=FIM_C_S&i=%index;"%end;
+                 width="185px">'>
+            <i class="far fa-file-image fa-fw text-primary"></i></a>
+          <a role="button" href="%prefix;m=RESET_IMAGE_C_OK&i=%index;&mode=portraits&file_name=%portrait;&fdigest=%idigest;"
+             title="[*restore coat of arms saved]">
+            <i class="fa fa-retweet fa-rotate-90 fa-fw text-success"></i>%nn;</a>
+          <strong><samp class="text-truncate">%saved_portraits_store;%X;</samp></strong><samp>
+          %if;has_old_blason_url;%carrousel;.url%else;%blason_saved_name;%end;</samp>
+          <a role="button" class="ml-auto col-1" href="%prefix;m=DEL_IMAGE_C_OK&i=%index;&fdigest=%idigest;&delete=on"
+            data-toggle="tooltip" data-html="true" data-placement="left"
+             title='<i class="far fa-trash-can text-danger mr-1"></i><strong>[*delete coat of arms saved]0</strong><br><span class="small">%blason_saved;</span>
+                    <br><img class="rounded my-1" src="%prefix;m=IM_C_S&i=%index;"
+                    width="185px">'>
+            <i class="far fa-trash-can text-danger"></i></a>
+        </div>
+      %end;
+      <table style="line-height:0.8;" class="mt-2"><tr>
+      <td style="vertical-align:top"><a class="d_flex mt-1" href="%prefix;&m=REFRESH&i=%index;" title="[*add image]/[delete image]">
+        <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
+      </a></td><td>&nbsp;</td>
+      <td><small>[*warning refresh]</small>%nn;</td>
+      </tr></table>
+    %end;
       %if;(has_carrousel)
         <h1 class="display-4">[*image/images]1</h1>
         <div class="d-flex align-items-center">

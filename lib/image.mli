@@ -65,11 +65,27 @@ val get_blason_with_size :
         - [None] if we don't have access to [p]'s family portrait or it doesn't exist.
         - [Some (src, size_opt)] with [src] the url or path of [p]'s family portrait. [size_opt] is the (width,height) of the family portrait if we could recover them *)
 
+val has_blason : config -> base -> person -> bool -> bool
+(** [has_blason conf base p self] is
+      - [true] if [p] has coat of  arms. If Self is true it checks only for its own coat of arms
+      - [false] if [p] has not *)
+
+val has_blason_stop : config -> base -> person -> bool
+(** [has_blason_stop conf base p] is
+              - [true] if [p] stops to use coat of  arms of his ancestors
+              - [false] if [p] did not stop or has no coat of arms *)
+
 val get_portrait :
   config -> base -> person -> [> `Path of string | `Url of string ] option
 (** [get_portrait conf base p] is
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.
     - [Some src] with [src] the url or path of [p]'s portrait.
+*)
+
+val get_blason_owner : config -> base -> person -> iper option
+(** [get_blason_owner conf base p] is
+    - [None] if we do not find blason owner.
+    - [Some fa_iper] with [fa_iper] the owner [p]'s blason.
 *)
 
 val get_blason :
@@ -82,6 +98,8 @@ val get_blason :
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.
     - [Some src] with [src] the url or path of [p]'s portrait.
 *)
+
+val get_blason_name : config -> base -> person -> bool -> string
 
 val get_old_portrait :
   config -> base -> person -> [> `Path of string | `Url of string ] option

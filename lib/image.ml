@@ -308,6 +308,40 @@ let get_blason conf base p self =
     loop p
   else None
 
+let get_blason_name conf base p self =
+  match get_blason conf base p self with
+  | Some (`Path p) -> Filename.basename p
+  | Some (`Url u) -> u
+  | None -> ""
+
+let has_blason conf base p self =
+  match get_blason conf base p self with
+  | None -> false
+  | Some (`Path p) when Filename.extension p = ".stop" -> false
+  | Some (`Path _p) -> true
+  | Some (`Url _u) -> true
+
+let has_blason_stop conf base p =
+  match get_blason conf base p true with
+  | None -> false
+  | Some (`Path p) when Filename.extension p = ".stop" -> true
+  | Some (`Path _p) -> false
+  | Some (`Url _u) -> false
+
+let get_blason_owner conf base p =
+  if has_access_to_blason conf base p then
+    let rec loop p =
+      match get_parents p with
+      | Some ifam ->
+          let cpl = foi base ifam in
+          let fa_iper = get_father cpl in
+          let fa = poi base fa_iper in
+          if get_blason conf base fa true <> None then Some fa_iper else loop fa
+      | _ -> None
+    in
+    loop p
+  else None
+
 (* In images/carrousel we store either
    - the image as the original image.jpg/png/tif image
    - the url to the image as content of a image.url text file

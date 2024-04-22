@@ -16696,6 +16696,10 @@ sv: medan du stannar på detta verktyg
 tr: bu araç üzerinde kalırken
 zh: 在此工具上停留时
 
+    stops to use coat of arms of
+fr: à arrêter d'utiliser le blason de
+en: stops to use coat of arms of
+
     store image
 co: a fiura selezziunata serà piazzata in
 de: das ausgewählte Bild wird kopiert nach
@@ -18914,6 +18918,10 @@ sk: použi "spojenie" namiesto "vytvorenia"
 sl: uporabite "povezava" namesto "ustvari"
 sv: använd "länk" istället för "skapa"
 tr: "oluştur" yerine "bağlantı" kullanın
+
+    use coat of arms of
+fr: utilise le blason de
+en: use coat of arms of
 
     user and language variables
 af: gebruiker- en taalveranderlikes
