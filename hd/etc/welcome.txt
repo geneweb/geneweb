@@ -14,7 +14,10 @@
 <div class="container">
 %include;hed
 %define;book_of(xx)[book of %s:::xx]%end;
-%define;display_sosa_ref(xx)[*sosa reference: %t:::xx]%end;
+%define;display_sosa_ref(xx)
+  [*sosa reference][:]
+  <href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
+%end;
 %define;get_visitor_access_msg(lg)
   %if;(b.visitor_access_msg_lg!="")
     %b.visitor_access_msg_lg;

@@ -1,6 +1,7 @@
 <!-- $Id: home.txt v7.1 07/09/2023 00:49:55 $ -->
 %define;display_sosa_ref(xx)
-  [*sosa reference: %t:::xx]
+  [*sosa reference][:]
+  <a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
 %end;
 %define;get_random(xxx)
   %random.init;
