@@ -63,7 +63,7 @@ let tr c1 s2 s =
 let print_alphabetic_big conf base is_surnames ini list len too_big =
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then Adef.encoded "N" else Adef.encoded "P" in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Output.print_sstring conf {|<p class="search_name">|};
   List.iter
     (fun ini_k ->
@@ -126,7 +126,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
 let print_alphabetic_all conf base is_surnames ini list len =
   let title _ = print_title conf base is_surnames ini len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Output.print_sstring conf {|<p class="search_name">|};
   List.iter
     (fun (ini_k, _) ->
@@ -167,7 +167,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
 let print_alphabetic_small conf base is_surnames ini list len =
   let title _ = print_title conf base is_surnames ini len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   if list <> [] then (
     Output.print_sstring conf "<ul>";
     List.iter
@@ -196,7 +196,7 @@ let print_frequency_any conf base is_surnames list len =
   let title _ = print_title conf base is_surnames "" len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
   let n = ref 0 in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Output.print_sstring conf "<ul>";
   List.iter
     (fun (cnt, l) ->
@@ -263,7 +263,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
   let title _ = print_title conf base is_surnames ini len in
   let mode = Adef.encoded (if is_surnames then "N" else "P") in
   let need_ref = len >= 250 in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   if need_ref then (
     Output.print_sstring conf "<p>";
     List.iter

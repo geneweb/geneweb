@@ -70,8 +70,8 @@ let print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage =
   ^ (if add_burial then "&bu=on" else "")
   ^ if add_marriage then "&ma=on" else ""
 
-let print_aux conf base title fn =
-  Hutil_2.header conf base title;
+let print_aux conf title fn =
+  Hutil.header conf title;
   fn ();
   Hutil.trailer conf
 
@@ -95,7 +95,7 @@ let print_all_places_surnames_short conf base ~add_birth ~add_baptism ~add_death
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl_nth conf "place/places" 0))
   in
-  print_aux conf base title (fun () ->
+  print_aux conf title (fun () ->
       let opt =
         print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial
           ~add_marriage
@@ -174,7 +174,7 @@ let print_all_places_surnames_long conf base ini ~add_birth ~add_baptism
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl_nth conf "surname/surnames" 0))
   in
-  print_aux conf base title (fun () ->
+  print_aux conf title (fun () ->
       if ini = "" then (
         Output.print_sstring conf "<p><a href=\"";
         Output.print_string conf (commd conf);
