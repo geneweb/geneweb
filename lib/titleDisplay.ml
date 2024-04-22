@@ -152,7 +152,7 @@ let print_title_place_list conf base t p t_equiv list =
               (escape_html p)))
         t_equiv
   in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Output.print_sstring conf "<ul>";
   ignore
   @@ List.fold_left
@@ -171,7 +171,7 @@ let print_all_with_place_list conf base p list =
     Output.print_sstring conf "... ";
     Output.print_string conf (escape_html p)
   in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Output.print_sstring conf "<ul>\n";
   List.iter
     (fun ((_, t) as x) ->
@@ -228,7 +228,7 @@ let print_places_list conf base t t_equiv list =
          ^^^ escape_html @@ surname_particle base p
           :> Adef.safe_string))
   in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   wprint_in_columns conf order wprint_elem list;
   Hutil.trailer conf
 
@@ -246,7 +246,7 @@ let print_titles conf base p =
     Output.print_sstring conf "... ";
     Output.print_string conf (escape_html p)
   in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Output.print_sstring conf "<ul>\n";
   List.iter
     (fun t ->
@@ -280,7 +280,7 @@ let print_all_titles conf base =
     give_access_all_titles conf t false;
     Output.printf conf " (%d)" cnt
   in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   wprint_in_columns conf order wprint_elem list;
   Hutil.trailer conf
 
@@ -293,7 +293,7 @@ let print_all_places conf base =
     let l = select_all_places conf base in
     List.sort_uniq my_alphabetic l
   in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Output.print_sstring conf "<ul>\n";
   List.iter
     (fun t ->

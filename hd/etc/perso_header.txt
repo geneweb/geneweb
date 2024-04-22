@@ -17,4 +17,3 @@
 <body%body_prop;>
 %include;hed
 %include;perso_utils
-%include;menubar

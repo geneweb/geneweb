@@ -32,7 +32,7 @@ let print_birth conf base =
   let title _ =
     Output.printf conf (fcapitale (ftransl conf "the latest %d births")) len
   in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Output.print_sstring conf "<ul>\n";
   ignore
   @@ List.fold_left
@@ -70,7 +70,7 @@ let print_death conf base =
       (fun _ -> string_of_int len)
     |> Output.print_sstring conf
   in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   if list <> [] then (
     Output.print_sstring conf "<ul>";
     let _, ages_sum, ages_nb =
@@ -207,7 +207,7 @@ let print_oldest_alive conf base =
       len
     |> Output.print_sstring conf
   in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Output.print_sstring conf "<ul>\n";
   List.iter
     (fun (p, d, cal) ->
@@ -246,7 +246,7 @@ let print_longest_lived conf base =
     Printf.sprintf (fcapitale (ftransl conf "the %d who lived the longest")) len
     |> Output.print_sstring conf
   in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Output.print_sstring conf "<ul>";
   List.iter
     (fun (p, d, _) ->
@@ -266,7 +266,7 @@ let print_longest_lived conf base =
   Hutil.trailer conf
 
 let print_marr_or_eng conf base title list =
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Output.print_sstring conf "<ul>\n";
   ignore
   @@ List.fold_left
@@ -349,7 +349,7 @@ let print_oldest_engagements conf base =
   in
   print_marr_or_eng conf base title list
 
-let old_print_statistics conf base =
+let old_print_statistics conf =
   let title _ =
     transl conf "statistics" |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
@@ -357,7 +357,7 @@ let old_print_statistics conf base =
     try int_of_string (List.assoc "latest_event" conf.base_env)
     with Not_found | Failure _ -> 20
   in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Output.print_sstring conf "<ul>";
   let aux m label =
     Output.print_sstring conf {|<li><a href="|};
@@ -388,8 +388,8 @@ type 'a env = Vother of 'a
 let get_vother = function Vother x -> Some x
 let set_vother x = Vother x
 
-let print_statistics conf base =
-  if p_getenv conf.env "old" = Some "on" then old_print_statistics conf base
+let print_statistics conf =
+  if p_getenv conf.env "old" = Some "on" then old_print_statistics conf
   else
     Hutil.interp conf "stats"
       {
@@ -442,7 +442,7 @@ let print_population_pyramid conf base =
     else Output.print_sstring conf "&nbsp;";
     Output.print_sstring conf "</td>"
   in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   let max_hum =
     let max_men = Array.fold_left max 0 men in
     let max_wom = Array.fold_left max 0 wom in

@@ -107,7 +107,7 @@ let gen_print conf base mois f_scan dead_people =
                            (p, a, DeDeath dr, txt_of) :: tab.(pred j)))
      done
    with Not_found -> ());
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   if Array.for_all (( = ) []) tab then (
     Output.print_sstring conf "<p>\n";
     Output.printf conf "%s.\n"
@@ -289,13 +289,13 @@ let list_aux conf base list cb =
 
 let print_marriage conf base month =
   let title _ =
-    Output.printf conf "%s %s"
-      (transl conf "anniversaries of marriage" |> Utf8.capitalize_fst)
+    let lab = transl conf "anniversaries of marriage" in
+    Output.printf conf "%s %s" (Utf8.capitalize_fst lab)
       (transl_decline conf "in (month year)"
          (transl_nth conf "(month)" (month - 1)))
   in
   let tab = Array.make 31 [] in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Gwdb.Collection.iter
     (fun ifam ->
       let fam = foi base ifam in
@@ -384,7 +384,7 @@ let gen_print_menu_birth conf base f_scan mode =
       Output.print_sstring conf "<h2>";
       title false;
       Output.print_sstring conf "</h2>"
-  | None -> Hutil_2.header conf base title);
+  | None -> Hutil.header conf title);
   (try
      while true do
        let p, txt_of = f_scan () in
@@ -447,7 +447,7 @@ let gen_print_menu_dead conf base f_scan mode =
   let list_tod = ref [] in
   let list_tom = ref [] in
   let list_aft = ref [] in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   (try
      while true do
        let p, txt_of = f_scan () in
@@ -537,7 +537,7 @@ let print_menu_marriage conf base =
   let list_tod = ref [] in
   let list_tom = ref [] in
   let list_aft = ref [] in
-  Hutil_2.header conf base title;
+  Hutil.header conf title;
   Gwdb.Collection.iter
     (fun ifam ->
       let fam = foi base ifam in
