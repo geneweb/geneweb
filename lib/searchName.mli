@@ -33,5 +33,5 @@ val print :
   config ->
   base ->
   (config -> base -> string -> person list -> unit) ->
-  (config -> base -> string -> unit) ->
+  (config -> string -> unit) ->
   unit
