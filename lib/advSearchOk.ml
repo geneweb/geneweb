@@ -8,26 +8,26 @@ let get_number var key env = p_getint env (var ^ "_" ^ key)
 
 let reconstitute_date_dmy conf var =
   match get_number var "yyyy" conf.env with
-  | None -> None
   | Some y -> (
       match get_number var "mm" conf.env with
-      | None ->
-          Some Date.{ day = 0; month = 0; year = y; prec = Sure; delta = 0 }
       | Some m -> (
           match get_number var "dd" conf.env with
           | Some d ->
               if d >= 1 && d <= 31 && m >= 1 && m <= 12 then
-                Some { day = d; month = m; year = y; prec = Sure; delta = 0 }
+                Some
+                  Date.{ day = d; month = m; year = y; prec = Sure; delta = 0 }
               else None
           | None ->
               if m >= 1 && m <= 12 then
                 Some { day = 0; month = m; year = y; prec = Sure; delta = 0 }
-              else None))
+              else None)
+      | None -> Some { day = 0; month = 0; year = y; prec = Sure; delta = 0 })
+  | None -> None
 
 let reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
-  | None -> None
   | Some d -> Some (Date.Dgreg (d, Dgregorian))
+  | None -> None
 
 let rec skip_spaces x i =
   if i = String.length x then i
