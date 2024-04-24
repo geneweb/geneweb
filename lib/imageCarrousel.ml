@@ -85,14 +85,8 @@ let move_file_to_save file dir =
     1
   with _ -> 0
 
-let get_dir_name mode bname =
-  match mode with
-  | "portraits" -> Util.base_path [ "images" ] bname
-  | "blasons" -> Util.base_path [ "images" ] bname
-  | _ -> String.concat "" [ Util.base_path [ "src" ] bname; "images" ]
-
 let create_blason_stop conf base p =
-  let blason_dir = get_dir_name "blasons" conf.bname in
+  let blason_dir = Image.get_dir_name "blasons" conf.bname in
   let blason_stop =
     String.concat Filename.dir_sep
       [ blason_dir; Image.default_blason_filename base p ^ ".stop" ]
@@ -102,7 +96,7 @@ let create_blason_stop conf base p =
   blason_stop
 
 let move_blason_file conf base src dst =
-  let blason_dir = get_dir_name "blasons" conf.bname in
+  let blason_dir = Image.get_dir_name "blasons" conf.bname in
   let blason_src =
     String.concat Filename.dir_sep
       [ blason_dir; Image.get_blason_name conf base src true ]

@@ -1,38 +1,37 @@
 open Config
 open Gwdb
 
-let portrait_folder conf = Util.base_path [ "images" ] conf.bname
 
-let carrousel_folder conf =
-  Filename.concat (Util.base_path [ "src" ] conf.bname) "images"
+let get_dir_name mode bname =
+  match mode with
+  | "portraits" -> Util.base_path [ "images" ] bname
+  | "blasons" -> Util.base_path [ "images" ] bname
+  | _ -> Filename.concat (Util.base_path [ "src" ] bname) "images"
 
-(** [default_portrait_filename_of_key fn sn occ] is the default filename
- of the corresponding person's portrait. WITHOUT its file extenssion.
- e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
+let portrait_folder conf = get_dir_name "portraits" conf.bname
+
+let carrousel_folder conf = get_dir_name "carrousel" conf.bname
+  
+(** [default_image_filename_of_key fmode n sn occ] is the default filename
+ of the corresponding person's portrait or blason. WITHOUT its file extenssion.
+ e.g: default_blason_filename_of_key "Jean Claude" "DUPOND" 3
+ is "jean_claude.3.dupond" or "jean_claude.3.dupond.blason"
  *)
-let default_portrait_filename_of_key first_name surname occ =
+ let default_image_filename_of_key mode first_name surname occ =
   let space_to_unders = Mutil.tr ' ' '_' in
   let f = space_to_unders (Name.lower first_name) in
   let s = space_to_unders (Name.lower surname) in
-  Format.sprintf "%s.%d.%s" f occ s
+  if mode = "blasons" then 
+    Format.sprintf "%s.%d.%s.blason" f occ s
+  else
+    Format.sprintf "%s.%d.%s" f occ s
 
 let default_portrait_filename base p =
-  default_portrait_filename_of_key (p_first_name base p) (p_surname base p)
+  default_image_filename_of_key "portraits" (p_first_name base p) (p_surname base p)
     (get_occ p)
 
-(** [default_blason_filename_of_key fn sn occ] is the default filename
- of the corresponding person's blason. WITHOUT its file extenssion.
- e.g: default_blason_filename_of_key "Jean Claude" "DUPOND" 3
- is "jean_claude.3.dupond.blason"
- *)
-let default_blason_filename_of_key first_name surname occ =
-  let space_to_unders = Mutil.tr ' ' '_' in
-  let f = space_to_unders (Name.lower first_name) in
-  let s = space_to_unders (Name.lower surname) in
-  Format.sprintf "%s.%d.%s.blason" f occ s
-
 let default_blason_filename base p =
-  default_blason_filename_of_key (p_first_name base p) (p_surname base p)
+  default_image_filename_of_key "blasons" (p_first_name base p) (p_surname base p)
     (get_occ p)
 
 let authorized_image_file_extension = [| ".jpg"; ".jpeg"; ".png"; ".gif" |]
@@ -371,7 +370,7 @@ let get_old_blason conf base p =
 let rename_portrait conf base p (nfn, nsn, noc) =
   match get_portrait conf base p with
   | Some (`Path old_f) -> (
-      let new_s = default_portrait_filename_of_key nfn nsn noc in
+      let new_s = default_image_filename_of_key "portraits" nfn nsn noc in
       let old_s = default_portrait_filename base p in
       let f = Filename.concat (portrait_folder conf) new_s in
       let old_ext = Filename.extension old_f in

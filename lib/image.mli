@@ -5,6 +5,8 @@ val portrait_folder : config -> string
 val carrousel_folder : config -> string
 val authorized_image_file_extension : string array
 
+val get_dir_name : string -> string -> string
+
 val scale_to_fit : max_w:int -> max_h:int -> w:int -> h:int -> int * int
 (** [scale_to_fit ~max_w ~max_h ~w ~h] is the {(width, height)} of a proportionally scaled {(w, h)} rectangle so it can fit in a {(max_w, max_h)} rectangle *)
 
