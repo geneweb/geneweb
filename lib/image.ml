@@ -14,7 +14,7 @@ let carrousel_folder conf = get_dir_name "carrousel" conf.bname
   
 (** [default_image_filename_of_key fmode n sn occ] is the default filename
  of the corresponding person's portrait or blason. WITHOUT its file extenssion.
- e.g: default_blason_filename_of_key "Jean Claude" "DUPOND" 3
+ e.g: default_image_filename "blasons"_of_key "Jean Claude" "DUPOND" 3
  is "jean_claude.3.dupond" or "jean_claude.3.dupond.blason"
  *)
  let default_image_filename_of_key mode first_name surname occ =
@@ -26,12 +26,8 @@ let carrousel_folder conf = get_dir_name "carrousel" conf.bname
   else
     Format.sprintf "%s.%d.%s" f occ s
 
-let default_portrait_filename base p =
-  default_image_filename_of_key "portraits" (p_first_name base p) (p_surname base p)
-    (get_occ p)
-
-let default_blason_filename base p =
-  default_image_filename_of_key "blasons" (p_first_name base p) (p_surname base p)
+let default_image_filename mode base p =
+  default_image_filename_of_key mode (p_first_name base p) (p_surname base p)
     (get_occ p)
 
 let authorized_image_file_extension = [| ".jpg"; ".jpeg"; ".png"; ".gif" |]
@@ -59,7 +55,7 @@ let find_img_opt f =
     [path] is a the full path of the file with file extension. *)
 let full_portrait_path conf base p =
   (* TODO why is extension not in filename..? *)
-  let s = default_portrait_filename base p in
+  let s = default_image_filename "portraits" base p in
   let f = Filename.concat (portrait_folder conf) s in
   match find_img_opt f with
   | Some (`Path _) as full_path -> full_path
@@ -72,7 +68,7 @@ let full_portrait_path conf base p =
     [path] is a the full path of the file with file extension. *)
 let full_blason_path conf base p =
   (* TODO why is extension not in filename..? *)
-  let s = default_blason_filename base p in
+  let s = default_image_filename "blasons" base p in
   let f = Filename.concat (portrait_folder conf) s in
   match find_img_opt f with
   | Some (`Path p) -> p
@@ -347,7 +343,7 @@ let get_blason_owner conf base p =
 *)
 let get_old_portrait conf base p =
   if has_access_to_portrait conf base p then
-    let key = default_portrait_filename base p in
+    let key = default_image_filename "portraits" base p in
     let f =
       Filename.concat (Filename.concat (portrait_folder conf) "old") key
     in
@@ -360,7 +356,7 @@ let get_old_portrait conf base p =
 *)
 let get_old_blason conf base p =
   if has_access_to_blason conf base p then
-    let key = default_blason_filename base p in
+    let key = default_image_filename "blasons" base p in
     let f =
       Filename.concat (Filename.concat (portrait_folder conf) "old") key
     in
@@ -371,7 +367,7 @@ let rename_portrait conf base p (nfn, nsn, noc) =
   match get_portrait conf base p with
   | Some (`Path old_f) -> (
       let new_s = default_image_filename_of_key "portraits" nfn nsn noc in
-      let old_s = default_portrait_filename base p in
+      let old_s = default_image_filename "portraits" base p in
       let f = Filename.concat (portrait_folder conf) new_s in
       let old_ext = Filename.extension old_f in
       let new_f = f ^ old_ext in
@@ -462,7 +458,7 @@ let get_blason_with_size conf base p self =
 
 let carrousel_file_path conf base p fname old =
   let dir =
-    let dir = default_portrait_filename base p in
+    let dir = default_image_filename "portraits" base p in
     if old then Filename.concat dir "old" else dir
   in
   String.concat Filename.dir_sep

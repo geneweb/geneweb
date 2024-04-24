@@ -1359,7 +1359,7 @@ let get_note_source conf base ?p auth no_note note_source =
     let env =
       match p with
       | None -> []
-      | Some p -> [ ('i', fun () -> Image.default_portrait_filename base p) ]
+      | Some p -> [ ('i', fun () -> Image.default_image_filename "portraits" base p) ]
     in
     Notes.source_note_with_env conf base env (sou base note_source)
   else Adef.safe ""
@@ -1654,7 +1654,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
           null_val
       | _ -> null_val)
   (* carrousel *)
-  | "idigest" -> Image.default_portrait_filename base p |> str_val
+  | "idigest" -> Image.default_image_filename "portraits" base p |> str_val
   | "img_cnt" -> (
       match get_env "img_cnt" env with
       | Vint cnt -> VVstring (string_of_int cnt)
@@ -3649,8 +3649,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Vbool _ -> null_val
       | _ -> get_iper p |> string_of_iper |> Mutil.encode |> safe_val)
   (* carrousel functions *)
-  | "carrousel" -> Image.default_portrait_filename base p |> str_val
-  | "blason_carrousel" -> Image.default_blason_filename base p |> str_val
+  | "carrousel" -> Image.default_image_filename "portraits" base p |> str_val
+  | "blason_carrousel" -> Image.default_image_filename "blasons" base p |> str_val
   | "carrousel_img_nbr" ->
       string_of_int (List.length (Image.get_carrousel_imgs conf base p))
       |> str_val
@@ -4091,7 +4091,7 @@ and string_of_image_url conf base (p, p_auth) html : Adef.escaped_string =
     | Some (`Path fname) ->
         let s = Unix.stat fname in
         let b = acces conf base p in
-        let k = Image.default_portrait_filename base p in
+        let k = Image.default_image_filename "portraits" base p in
         Format.sprintf "%sm=IM%s&d=%d&%s&k=/%s"
           (commd conf :> string)
           (if html then "H" else "")
@@ -4109,7 +4109,7 @@ and string_of_blason_url conf base (p, p_auth) html : Adef.escaped_string =
     | Some (`Path fname) ->
         let s = Unix.stat fname in
         let b = acces conf base p in
-        let k = Image.default_blason_filename base p in
+        let k = Image.default_image_filename "blasons" base p in
         Format.sprintf "%sm=FIM%s&d=%d&%s&k=/%s"
           (commd conf :> string)
           (if html then "H" else "")

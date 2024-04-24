@@ -14,16 +14,12 @@ val source_filename : config -> string -> string
 (** Returns path to the image file with the giving name in directory {i src/}. *)
 
 (* TODO this should be removed *)
-val default_portrait_filename : base -> person -> string
-(** [default_portrait_filename base p] is the default filename of [p]'s portrait. Without it's file extension.
- e.g: default_portrait_filename_of_key "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond"
+val default_image_filename : string -> base -> person -> string
+(** [default_image_filename mode base p] is the default filename of [p]'s portrait or blason. Without it's file extension.
+ e.g: default_image_filename "Jean Claude" "DUPOND" 3 is "jean_claude.3.dupond" or "jean_claude.3.dupond.blason"
  *)
 
-(* TODO this should be removed *)
-val default_blason_filename : base -> person -> string
-(** [default_blason_filename base p] is the default filename of [p]'s family portrait. Without it's file extension.
- e.g: default_blason_filename_of_key "DUPOND" is "family.dupond"
- *)
+
 
 val size_from_path : [ `Path of string ] -> (int * int, unit) result
 (** [size_from_path path]
