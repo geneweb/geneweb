@@ -198,23 +198,13 @@ let scale_to_fit ~max_w ~max_h ~w ~h =
 let is_not_private_img _conf fname =
   not (Mutil.contains fname ("private" ^ Filename.dir_sep))
 
-(** [has_access_to_portrait conf base p] is true iif we can see [p]'s portrait. *)
-let has_access_to_portrait conf base p =
+(** [has_access_to_image mode conf base p] is true iif we can see [p]'s portrait or blason. *)
+let has_access_to_image mode conf base p =
   let img = get_image p in
   (conf.wizard || conf.friend)
   || (not conf.no_image)
      && Util.authorized_age conf base p
-     && ((not (is_empty_string img)) || full_image_path "portraits" conf base p <> None)
-     && is_not_private_img conf (sou base img)
-(* TODO: privacy settings should be in db not in url *)
-
-(** [has_access_to_blason conf base p] is true iif we can see [p]'s portrait. *)
-let has_access_to_blason conf base p =
-  let img = get_image p in
-  (conf.wizard || conf.friend)
-  || (not conf.no_image)
-     && Util.authorized_age conf base p
-     && ((not (is_empty_string img)) || full_image_path "blasons" conf base p <> None)
+     && ((not (is_empty_string img)) || full_image_path mode conf base p <> None)
      && is_not_private_img conf (sou base img)
 (* TODO: privacy settings should be in db not in url *)
 
@@ -226,7 +216,7 @@ let has_access_to_carrousel conf base p =
      && not (Util.is_hide_names conf p)
 
 let get_portrait_path conf base p =
-  if has_access_to_portrait conf base p then full_image_path "portraits" conf base p
+  if has_access_to_image "portraits" conf base p then full_image_path "portraits" conf base p
   else None
 
 (* parse a string to an `Url or a `Path *)
@@ -264,7 +254,7 @@ let parse_src_with_size_info conf s =
     Error "Failed to parse url with size info"
 
 let get_portrait conf base p =
-  if has_access_to_portrait conf base p then
+  if has_access_to_image "portraits" conf base p then
     match src_of_string conf (sou base (get_image p)) with
     | `Src_with_size_info _s as s_info -> (
         match parse_src_with_size_info conf s_info with
@@ -277,7 +267,7 @@ let get_portrait conf base p =
 
 (* if self = true, then do not loop for fathers *)
 let get_blason conf base p self =
-  if has_access_to_blason conf base p then
+  if has_access_to_image "blasons" conf base p then
     let rec loop p =
       match src_of_string conf (path_str (full_image_path "blasons" conf base p)) with
       | `Src_with_size_info _s as s_info -> (
@@ -318,7 +308,7 @@ let has_blason_stop conf base p =
   | Some (`Url _u) -> false
 
 let get_blason_owner conf base p =
-  if has_access_to_blason conf base p then
+  if has_access_to_image "blasons" conf base p then
     let rec loop p =
       match get_parents p with
       | Some ifam ->
@@ -336,7 +326,7 @@ let get_blason_owner conf base p =
    - the url to the image as content of a image.url text file
 *)
 let get_old_portrait conf base p =
-  if has_access_to_portrait conf base p then
+  if has_access_to_image "portraits" conf base p then
     let key = default_image_filename "portraits" base p in
     let f =
       Filename.concat (Filename.concat (portrait_folder conf) "old") key
@@ -349,7 +339,7 @@ let get_old_portrait conf base p =
    - the url to the image as content of a image.url text file
 *)
 let get_old_blason conf base p =
-  if has_access_to_blason conf base p then
+  if has_access_to_image "blasons" conf base p then
     let key = default_image_filename "blasons" base p in
     let f =
       Filename.concat (Filename.concat (portrait_folder conf) "old") key
@@ -401,7 +391,7 @@ let rename_portrait conf base p (nfn, nsn, noc) =
   | None -> ()
 
 let get_portrait_with_size conf base p =
-  if has_access_to_portrait conf base p then
+  if has_access_to_image "portraits" conf base p then
     match src_of_string conf (sou base (get_image p)) with
     | `Src_with_size_info _s as s_info -> (
         match parse_src_with_size_info conf s_info with
@@ -419,7 +409,7 @@ let get_portrait_with_size conf base p =
   else None
 
 let get_blason_with_size conf base p self =
-  if has_access_to_blason conf base p then
+  if has_access_to_image "blasons" conf base p then
     let rec loop p =
       match src_of_string conf (path_str (full_image_path "blasons" conf base p)) with
       | `Src_with_size_info _s as s_info -> (
