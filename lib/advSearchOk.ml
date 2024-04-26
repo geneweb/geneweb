@@ -96,6 +96,206 @@ module Fields = struct
     get_event_field_name gets "place" "marriage" search_type
 end
 
+module AdvancedSearchMatch = struct
+  (* Return empty_field_value if the field is empty. Apply function cmp to the field value. Also check the authorization. *)
+  let apply_to_field_value_raw ~gets ~conf ~base p x cmp empty_default_value =
+    let y = gets x in
+    if y = "" then empty_default_value
+    else if authorized_age conf base p then cmp y
+    else false
+
+  let apply_to_field_value ~gets ~conf ~base p x get cmp empty_default_value =
+    let y = gets x in
+    if y = "" then empty_default_value
+    else if authorized_age conf base p then
+      cmp (abbrev_lower y) (abbrev_lower @@ sou base @@ get p)
+    else false
+
+  let do_compare p y get cmp =
+    let s = abbrev_lower @@ get p in
+    List.exists (fun s' -> cmp (abbrev_lower s') s) y
+
+  let apply_to_field_values_raw ~getss ~conf ~base p x get cmp
+      empty_default_value =
+    let y = getss x in
+    if y = [] then empty_default_value
+    else if authorized_age conf base p then do_compare p y get cmp
+    else false
+
+  let apply_to_field_values ~getss ~conf ~base p x get cmp empty_default_value =
+    let get p = sou base @@ get p in
+    apply_to_field_values_raw ~getss ~conf ~base p x get cmp empty_default_value
+
+  (* Check if the date matches with the person event. *)
+  let match_date ~getd ~conf ~base p x df empty_default_value =
+    let d1, d2 = getd x in
+    authorized_age conf base p
+    &&
+    match (d1, d2) with
+    | Some (Date.Dgreg (d1, _)), Some (Date.Dgreg (d2, _)) -> (
+        match df () with
+        | Some (Date.Dgreg (d, _)) ->
+            Date.compare_dmy d d1 >= 0 && Date.compare_dmy d d2 <= 0
+        | Some (Dtext _) | None -> false)
+    | Some (Dgreg (d1, _)), _ -> (
+        match df () with
+        | Some (Dgreg (d, _)) -> Date.compare_dmy d d1 >= 0
+        | Some (Dtext _) | None -> false)
+    | _, Some (Dgreg (d2, _)) -> (
+        match df () with
+        | Some (Dgreg (d, _)) -> Date.compare_dmy d d2 <= 0
+        | Some (Dtext _) | None -> false)
+    | _ -> empty_default_value
+
+  let match_sex ~gets ~conf ~base p empty_default_value =
+    apply_to_field_value_raw ~gets ~conf ~base p "sex"
+      (function
+        | "M" -> get_sex p = Male | "F" -> get_sex p = Female | _ -> true)
+      empty_default_value
+
+  let match_baptism_date ~getd ~gets ~search_type ~conf ~base p
+      empty_default_value =
+    match_date ~getd ~conf ~base p
+      (Fields.bapt_date_field_name ~gets ~search_type)
+      (fun () -> Date.od_of_cdate (get_baptism p))
+      empty_default_value
+
+  let match_birth_date ~getd ~gets ~search_type ~conf ~base p
+      empty_default_value =
+    match_date ~getd ~conf ~base p
+      (Fields.birth_date_field_name ~gets ~search_type)
+      (fun () -> Date.od_of_cdate (get_birth p))
+      empty_default_value
+
+  let match_death_date ~getd ~gets ~search_type ~conf ~base p
+      empty_default_value =
+    match_date ~getd ~conf ~base p
+      (Fields.death_date_field_name ~gets ~search_type)
+      (fun () -> Date.date_of_death (get_death p))
+      empty_default_value
+
+  let match_burial_date ~getd ~gets ~search_type ~conf ~base p
+      empty_default_value =
+    match_date ~getd ~conf ~base p
+      (Fields.burial_date_field_name ~gets ~search_type)
+      (fun () ->
+        (* TODO Date.cdate_of_burial *)
+        match get_burial p with
+        | Buried cod | Cremated cod -> Date.od_of_cdate cod
+        | UnknownBurial -> None)
+      empty_default_value
+
+  let cmp_place ~gets = if "on" = gets "exact_place" then ( = ) else string_incl
+
+  let match_baptism_place ~gets ~getss ~search_type ~conf ~base p
+      empty_default_value =
+    apply_to_field_values ~getss ~conf ~base p
+      (Fields.bapt_place_field_name ~gets ~search_type)
+      get_baptism_place (cmp_place ~gets) empty_default_value
+
+  let match_birth_place ~gets ~getss ~search_type ~conf ~base p
+      empty_default_value =
+    apply_to_field_values ~getss ~conf ~base p
+      (Fields.birth_place_field_name ~gets ~search_type)
+      get_birth_place (cmp_place ~gets) empty_default_value
+
+  let match_death_place ~gets ~getss ~search_type ~conf ~base p
+      empty_default_value =
+    apply_to_field_values ~getss ~conf ~base p
+      (Fields.death_place_field_name ~gets ~search_type)
+      get_death_place (cmp_place ~gets) empty_default_value
+
+  let match_burial_place ~gets ~getss ~search_type ~conf ~base p
+      empty_default_value =
+    apply_to_field_values ~getss ~conf ~base p
+      (Fields.burial_place_field_name ~gets ~search_type)
+      get_burial_place (cmp_place ~gets) empty_default_value
+
+  let match_occupation ~gets ~conf ~base p empty_default_value =
+    apply_to_field_value ~gets ~conf ~base p "occu" get_occupation string_incl
+      empty_default_value
+
+  let match_name search_list exact : string list -> bool =
+    let eq : string list -> string list -> bool =
+      if exact then fun x search ->
+        List.sort compare search = List.sort compare x
+      else fun x search -> List.for_all (fun s -> List.mem s x) search
+    in
+    fun x -> List.exists (eq x) search_list
+
+  let match_first_name ~gets ~base ~fn_list =
+    if fn_list = [] then fun _ -> true
+    else
+      let eq = match_name fn_list (gets "exact_first_name" = "on") in
+      fun p ->
+        eq
+          (List.map Name.lower @@ Name.split_fname @@ sou base
+         @@ get_first_name p)
+
+  let match_surname ~gets ~base ~sn_list =
+    if sn_list = [] then fun _ -> true
+    else
+      let eq = match_name sn_list (gets "exact_surname" = "on") in
+      fun p ->
+        eq (List.map Name.lower @@ Name.split_sname @@ sou base @@ get_surname p)
+
+  let match_married ~gets ~conf ~base p empty_default_value =
+    apply_to_field_value_raw ~gets ~conf ~base p "married"
+      (function
+        | "Y" -> get_family p <> [||] | "N" -> get_family p = [||] | _ -> true)
+      empty_default_value
+
+  let match_marriage ~getd ~gets ~getss ~conf ~base p x y empty_default_value =
+    let d1, d2 = getd x in
+    let y = getss y in
+    let test_date_place df =
+      Array.exists
+        (fun ifam ->
+          let fam = foi base ifam in
+          let sp = poi base @@ Gutil.spouse (get_iper p) fam in
+          if authorized_age conf base sp then
+            df fam
+            && (y = []
+               || do_compare fam y
+                    (fun f -> sou base @@ get_marriage_place f)
+                    (cmp_place ~gets))
+          else false)
+        (get_family p)
+    in
+    match (d1, d2) with
+    | Some d1, Some d2 ->
+        test_date_place (fun fam ->
+            match Date.od_of_cdate (get_marriage fam) with
+            | Some (Dgreg (_, _) as d) ->
+                if Date.compare_date d d1 < 0 then false
+                else if Date.compare_date d2 d < 0 then false
+                else true
+            | _ -> false)
+    | Some d1, _ ->
+        test_date_place (fun fam ->
+            match Date.od_of_cdate (get_marriage fam) with
+            | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
+                if Date.compare_date d d1 < 0 then false else true
+            | _ -> false)
+    | _, Some d2 ->
+        test_date_place (fun fam ->
+            match Date.od_of_cdate (get_marriage fam) with
+            | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
+                if Date.compare_date d d2 > 0 then false else true
+            | _ -> false)
+    | _ ->
+        if y = [] then empty_default_value else test_date_place (fun _ -> true)
+
+  (* Check the civil status. The test is the same for an AND or a OR search request. *)
+  let match_civil_status ~gets ~conf ~base ~fn_list ~sn_list ~skip_fname
+      ~skip_sname p =
+    match_sex ~gets ~conf ~base p true
+    && (skip_fname || match_first_name ~gets ~base ~fn_list p)
+    && (skip_sname || match_surname ~gets ~base ~sn_list p)
+    && match_married ~gets ~conf ~base p true
+    && match_occupation ~gets ~conf ~base p true
+end
+
 (*
   Search for other persons in the base matching with the provided infos.
 
@@ -115,6 +315,7 @@ end
    with "Jean Pierre de Vallois de Bourbon" but not with "Jean de Bourbon")
 *)
 let advanced_search conf base max_answers =
+  let open AdvancedSearchMatch in
   let hs = Hashtbl.create 73 in
   let hss = Hashtbl.create 73 in
   let hd = Hashtbl.create 73 in
@@ -163,205 +364,6 @@ let advanced_search conf base max_answers =
   in
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
-  (* Return empty_field_value if the field is empty. Apply function cmp to the field value. Also check the authorization. *)
-  let apply_to_field_value_raw ~gets ~conf ~base p x cmp empty_default_value =
-    let y = gets x in
-    if y = "" then empty_default_value
-    else if authorized_age conf base p then cmp y
-    else false
-  in
-  let apply_to_field_value ~gets ~conf ~base p x get cmp empty_default_value =
-    let y = gets x in
-    if y = "" then empty_default_value
-    else if authorized_age conf base p then
-      cmp (abbrev_lower y) (abbrev_lower @@ sou base @@ get p)
-    else false
-  in
-  let do_compare p y get cmp =
-    let s = abbrev_lower @@ get p in
-    List.exists (fun s' -> cmp (abbrev_lower s') s) y
-  in
-  let apply_to_field_values_raw ~getss ~conf ~base p x get cmp
-      empty_default_value =
-    let y = getss x in
-    if y = [] then empty_default_value
-    else if authorized_age conf base p then do_compare p y get cmp
-    else false
-  in
-  let apply_to_field_values ~getss ~conf ~base p x get cmp empty_default_value =
-    let get p = sou base @@ get p in
-    apply_to_field_values_raw ~getss ~conf ~base p x get cmp empty_default_value
-  in
-  (* Check if the date matches with the person event. *)
-  let match_date ~getd ~conf ~base p x df empty_default_value =
-    let d1, d2 = getd x in
-    authorized_age conf base p
-    &&
-    match (d1, d2) with
-    | Some (Date.Dgreg (d1, _)), Some (Date.Dgreg (d2, _)) -> (
-        match df () with
-        | Some (Date.Dgreg (d, _)) ->
-            Date.compare_dmy d d1 >= 0 && Date.compare_dmy d d2 <= 0
-        | Some (Dtext _) | None -> false)
-    | Some (Dgreg (d1, _)), _ -> (
-        match df () with
-        | Some (Dgreg (d, _)) -> Date.compare_dmy d d1 >= 0
-        | Some (Dtext _) | None -> false)
-    | _, Some (Dgreg (d2, _)) -> (
-        match df () with
-        | Some (Dgreg (d, _)) -> Date.compare_dmy d d2 <= 0
-        | Some (Dtext _) | None -> false)
-    | _ -> empty_default_value
-  in
-  let match_sex ~gets ~conf ~base p empty_default_value =
-    apply_to_field_value_raw ~gets ~conf ~base p "sex"
-      (function
-        | "M" -> get_sex p = Male | "F" -> get_sex p = Female | _ -> true)
-      empty_default_value
-  in
-  let match_baptism_date ~getd ~gets ~search_type ~conf ~base p
-      empty_default_value =
-    match_date ~getd ~conf ~base p
-      (Fields.bapt_date_field_name ~gets ~search_type)
-      (fun () -> Date.od_of_cdate (get_baptism p))
-      empty_default_value
-  in
-  let match_birth_date ~getd ~gets ~search_type ~conf ~base p
-      empty_default_value =
-    match_date ~getd ~conf ~base p
-      (Fields.birth_date_field_name ~gets ~search_type)
-      (fun () -> Date.od_of_cdate (get_birth p))
-      empty_default_value
-  in
-  let match_death_date ~getd ~gets ~search_type ~conf ~base p
-      empty_default_value =
-    match_date ~getd ~conf ~base p
-      (Fields.death_date_field_name ~gets ~search_type)
-      (fun () -> Date.date_of_death (get_death p))
-      empty_default_value
-  in
-  let match_burial_date ~getd ~gets ~search_type ~conf ~base p
-      empty_default_value =
-    match_date ~getd ~conf ~base p
-      (Fields.burial_date_field_name ~gets ~search_type)
-      (fun () ->
-        (* TODO Date.cdate_of_burial *)
-        match get_burial p with
-        | Buried cod | Cremated cod -> Date.od_of_cdate cod
-        | UnknownBurial -> None)
-      empty_default_value
-  in
-  let cmp_place ~gets =
-    if "on" = gets "exact_place" then ( = ) else string_incl
-  in
-  let match_baptism_place ~gets ~getss ~search_type ~conf ~base p
-      empty_default_value =
-    apply_to_field_values ~getss ~conf ~base p
-      (Fields.bapt_place_field_name ~gets ~search_type)
-      get_baptism_place (cmp_place ~gets) empty_default_value
-  in
-  let match_birth_place ~gets ~getss ~search_type ~conf ~base p
-      empty_default_value =
-    apply_to_field_values ~getss ~conf ~base p
-      (Fields.birth_place_field_name ~gets ~search_type)
-      get_birth_place (cmp_place ~gets) empty_default_value
-  in
-  let match_death_place ~gets ~getss ~search_type ~conf ~base p
-      empty_default_value =
-    apply_to_field_values ~getss ~conf ~base p
-      (Fields.death_place_field_name ~gets ~search_type)
-      get_death_place (cmp_place ~gets) empty_default_value
-  in
-  let match_burial_place ~gets ~getss ~search_type ~conf ~base p
-      empty_default_value =
-    apply_to_field_values ~getss ~conf ~base p
-      (Fields.burial_place_field_name ~gets ~search_type)
-      get_burial_place (cmp_place ~gets) empty_default_value
-  in
-  let match_occupation ~gets ~conf ~base p empty_default_value =
-    apply_to_field_value ~gets ~conf ~base p "occu" get_occupation string_incl
-      empty_default_value
-  in
-  let match_name search_list exact : string list -> bool =
-    let eq : string list -> string list -> bool =
-      if exact then fun x search ->
-        List.sort compare search = List.sort compare x
-      else fun x search -> List.for_all (fun s -> List.mem s x) search
-    in
-    fun x -> List.exists (eq x) search_list
-  in
-  let match_first_name ~gets ~base ~fn_list =
-    if fn_list = [] then fun _ -> true
-    else
-      let eq = match_name fn_list (gets "exact_first_name" = "on") in
-      fun p ->
-        eq
-          (List.map Name.lower @@ Name.split_fname @@ sou base
-         @@ get_first_name p)
-  in
-  let match_surname ~gets ~base ~sn_list =
-    if sn_list = [] then fun _ -> true
-    else
-      let eq = match_name sn_list (gets "exact_surname" = "on") in
-      fun p ->
-        eq (List.map Name.lower @@ Name.split_sname @@ sou base @@ get_surname p)
-  in
-  let match_married ~gets ~conf ~base p empty_default_value =
-    apply_to_field_value_raw ~gets ~conf ~base p "married"
-      (function
-        | "Y" -> get_family p <> [||] | "N" -> get_family p = [||] | _ -> true)
-      empty_default_value
-  in
-  let match_marriage ~getd ~gets ~getss ~conf ~base p x y empty_default_value =
-    let d1, d2 = getd x in
-    let y = getss y in
-    let test_date_place df =
-      Array.exists
-        (fun ifam ->
-          let fam = foi base ifam in
-          let sp = poi base @@ Gutil.spouse (get_iper p) fam in
-          if authorized_age conf base sp then
-            df fam
-            && (y = []
-               || do_compare fam y
-                    (fun f -> sou base @@ get_marriage_place f)
-                    (cmp_place ~gets))
-          else false)
-        (get_family p)
-    in
-    match (d1, d2) with
-    | Some d1, Some d2 ->
-        test_date_place (fun fam ->
-            match Date.od_of_cdate (get_marriage fam) with
-            | Some (Dgreg (_, _) as d) ->
-                if Date.compare_date d d1 < 0 then false
-                else if Date.compare_date d2 d < 0 then false
-                else true
-            | _ -> false)
-    | Some d1, _ ->
-        test_date_place (fun fam ->
-            match Date.od_of_cdate (get_marriage fam) with
-            | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-                if Date.compare_date d d1 < 0 then false else true
-            | _ -> false)
-    | _, Some d2 ->
-        test_date_place (fun fam ->
-            match Date.od_of_cdate (get_marriage fam) with
-            | Some (Dgreg (_, _) as d) when authorized_age conf base p ->
-                if Date.compare_date d d2 > 0 then false else true
-            | _ -> false)
-    | _ ->
-        if y = [] then empty_default_value else test_date_place (fun _ -> true)
-  in
-  (* Check the civil status. The test is the same for an AND or a OR search request. *)
-  let match_civil_status ~gets ~conf ~base ~fn_list ~sn_list ~skip_fname
-      ~skip_sname p =
-    match_sex ~gets ~conf ~base p true
-    && (skip_fname || match_first_name ~gets ~base ~fn_list p)
-    && (skip_sname || match_surname ~gets ~base ~sn_list p)
-    && match_married ~gets ~conf ~base p true
-    && match_occupation ~gets ~conf ~base p true
-  in
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) p search_type =
     if search_type <> "OR" then
