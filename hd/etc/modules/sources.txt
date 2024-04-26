@@ -20,7 +20,7 @@
   %else;
     <h2>[*source/sources]1</h2>
   %end;
-  <ul>
+  <ul class="pl-4 pY-0">
   %foreach;source;
     <li>%apply;capitalize(source_type)[:] %source;.</li>
   %end;
