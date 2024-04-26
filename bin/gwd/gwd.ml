@@ -1347,7 +1347,10 @@ let make_conf from_addr request script_name env =
      cgi;
      output_conf;
      forced_plugins = !forced_plugins;
-     plugins = !plugins;
+     plugins = (
+       let pl = try List.assoc "plugins" base_env with Not_found -> "" in
+       let pl = String.split_on_char ',' pl in
+       List.map String.trim pl)
     }
   in
   conf, ar
