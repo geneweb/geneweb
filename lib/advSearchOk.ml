@@ -366,8 +366,8 @@ let advanced_search conf base max_answers =
   let search_type = gets "search_type" in
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) p search_type =
-    if search_type <> "OR" then
-      if
+    let pmatch =
+      if search_type <> "OR" then
         match_civil_status ~gets ~conf ~base ~fn_list ~sn_list ~skip_fname
           ~skip_sname p
         && match_baptism_date ~getd ~gets ~search_type ~conf ~base p true
@@ -382,38 +382,39 @@ let advanced_search conf base max_answers =
              (Fields.marriage_date_field_name ~gets ~search_type)
              (Fields.marriage_place_field_name ~gets ~search_type)
              true
-      then (p :: list, len + 1)
-      else acc
-    else if
-      match_civil_status ~gets ~conf ~base ~fn_list ~sn_list ~skip_fname
-        ~skip_sname p
-      && (getss "place" = []
-          && gets "date2_yyyy" = ""
-          && gets "date1_yyyy" = ""
-         || (match_baptism_date ~getd ~gets ~search_type ~conf ~base p false
-            || match_baptism_place ~gets ~getss ~search_type ~conf ~base p false
-            )
-            && match_baptism_date ~getd ~gets ~search_type ~conf ~base p true
-            && match_baptism_place ~gets ~getss ~search_type ~conf ~base p true
-         || (match_birth_date ~getd ~gets ~search_type ~conf ~base p false
-            || match_birth_place ~gets ~getss ~search_type ~conf ~base p false)
-            && match_birth_date ~getd ~gets ~search_type ~conf ~base p true
-            && match_birth_place ~gets ~getss ~search_type ~conf ~base p true
-         || (match_burial_date ~getd ~gets ~search_type ~conf ~base p false
-            || match_burial_place ~gets ~getss ~search_type ~conf ~base p false
-            )
-            && match_burial_date ~getd ~gets ~search_type ~conf ~base p true
-            && match_burial_place ~gets ~getss ~search_type ~conf ~base p true
-         || (match_death_date ~getd ~gets ~search_type ~conf ~base p false
-            || match_death_place ~gets ~getss ~search_type ~conf ~base p false)
-            && match_death_date ~getd ~gets ~search_type ~conf ~base p true
-            && match_death_place ~gets ~getss ~search_type ~conf ~base p true
-         || match_marriage ~getd ~gets ~getss ~conf ~base p
-              (Fields.marriage_date_field_name ~gets ~search_type)
-              (Fields.marriage_place_field_name ~gets ~search_type)
-              false)
-    then (p :: list, len + 1)
-    else acc
+      else
+        match_civil_status ~gets ~conf ~base ~fn_list ~sn_list ~skip_fname
+          ~skip_sname p
+        && (getss "place" = []
+            && gets "date2_yyyy" = ""
+            && gets "date1_yyyy" = ""
+           || (match_baptism_date ~getd ~gets ~search_type ~conf ~base p false
+              || match_baptism_place ~gets ~getss ~search_type ~conf ~base p
+                   false)
+              && match_baptism_date ~getd ~gets ~search_type ~conf ~base p true
+              && match_baptism_place ~gets ~getss ~search_type ~conf ~base p
+                   true
+           || (match_birth_date ~getd ~gets ~search_type ~conf ~base p false
+              || match_birth_place ~gets ~getss ~search_type ~conf ~base p false
+              )
+              && match_birth_date ~getd ~gets ~search_type ~conf ~base p true
+              && match_birth_place ~gets ~getss ~search_type ~conf ~base p true
+           || (match_burial_date ~getd ~gets ~search_type ~conf ~base p false
+              || match_burial_place ~gets ~getss ~search_type ~conf ~base p
+                   false)
+              && match_burial_date ~getd ~gets ~search_type ~conf ~base p true
+              && match_burial_place ~gets ~getss ~search_type ~conf ~base p true
+           || (match_death_date ~getd ~gets ~search_type ~conf ~base p false
+              || match_death_place ~gets ~getss ~search_type ~conf ~base p false
+              )
+              && match_death_date ~getd ~gets ~search_type ~conf ~base p true
+              && match_death_place ~gets ~getss ~search_type ~conf ~base p true
+           || match_marriage ~getd ~gets ~getss ~conf ~base p
+                (Fields.marriage_date_field_name ~gets ~search_type)
+                (Fields.marriage_place_field_name ~gets ~search_type)
+                false)
+    in
+    if pmatch then (p :: list, len + 1) else acc
   in
   let list, len =
     if "on" = gets "sosa_filter" then
