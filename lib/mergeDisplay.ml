@@ -11,29 +11,28 @@ let print_someone conf base p =
     (p_surname base p)
 
 let print conf base p =
-  let title h =
-    Output.print_sstring conf
-      (Utf8.capitalize_fst (transl_decline conf "merge" ""));
-    if not h then (
-      Output.print_sstring conf " ";
-      print_someone conf base p;
-      Output.print_sstring conf " ";
-      Output.print_sstring conf (transl_decline conf "with" "");
-      Output.print_sstring conf (transl conf ":"))
-  in
   let list = Gutil.find_same_name base p in
   let list =
     List.fold_right
       (fun p1 pl -> if get_iper p1 = get_iper p then pl else p1 :: pl)
       list []
   in
-  Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.print_sstring conf "<h2>";
-  title false;
-  Output.print_sstring conf "</h2>";
-  Output.print_sstring conf {|<form method="get" action="|};
-  Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|"class="mx-3 mb-3">|};
+  let title _ =
+    Output.print_sstring conf 
+      (Utf8.capitalize_fst (transl_decline conf "merge" ""))
+  in
+  Hutil.header conf title;
+  Output.print_sstring conf 
+    (Format.sprintf {|<h2>
+%s%s %s %s%s
+</h2>
+<form method="get" action="%s" class="mx-3 mb-3">|}
+      (p_first_name base p)
+      (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
+      (p_surname base p)
+      (transl_decline conf "with" "")
+      (transl conf ":")
+      (conf.command :> string));
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_IND");
   Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);

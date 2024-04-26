@@ -646,7 +646,7 @@ let print_update_ind conf base p digest =
   | Some _ | None -> Hutil.incorrect_request conf
 
 let print_del1 conf base p =
-  let title () =
+  let title _ =
     let s = transl_nth conf "person/persons" 0 in
     Output.print_sstring conf
       (Utf8.capitalize_fst (transl_decline conf "delete" s));
@@ -655,10 +655,7 @@ let print_del1 conf base p =
     Output.print_sstring conf (Format.sprintf ".%d " (get_occ p));
     Output.print_string conf (Util.escape_html (p_surname base p))
   in
-  Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
-  Output.print_sstring conf "<h2>\n";
-  title ();
-  Output.print_sstring conf "</h2>\n";
+  Hutil.header conf title;
   Output.printf conf "<form method=\"post\" action=\"%s\">\n" conf.command;
   Output.print_sstring conf "<p>\n";
   Util.hidden_env conf;
