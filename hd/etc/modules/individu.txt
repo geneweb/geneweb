@@ -186,7 +186,7 @@
                                %and;%apply;getvar(ancestor2_access)
                                %and;%apply;getvar(ancestor2_anc_sosa)
                                %and;%apply;getvar(ancestor2_sosa_cujus)%end;
-        %end;
+        %end;.
       </li>
     %end;
   %end;
@@ -272,7 +272,7 @@
   %end;
 %end;
 %define;etat_civil()
-  <ul class="fa-ul">
+  <ul class="fa-ul%if;(not (has_image or b.default_image="yes")) pl-0%end;">
     %if;(has_birth_date or has_birth_place)
       <li title="[*birth]">
         <span class="fa-li"><i class="fas fa-baby"></i></span>

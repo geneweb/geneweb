@@ -19,15 +19,13 @@
   %if;has_comment;%incr_count2;%end;
   %if;has_marriage_note;%incr_count2;%end;
 %end;
-
 %define;link_pages()
   %if;(not cancel_links and has_linked_pages)
-    <div id ="link_pages" class="ml-auto d-flex align-items-center user-select-none">
+    <div id ="link_pages" class="ml-auto align-self-center user-select-none">
       (<a href="%prefix;m=LINKED;%access;">[linked pages]</a>)
     </div>
   %end;
 %end;
-
 %if;(op_m=1 and (wizard or friend or bvar.no_note_for_visitor!="yes") and
       (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE or count2>0))
   %if;(count>0 or has_linked_page.BNOTE and linked_page.BNOTE!="")
@@ -36,7 +34,7 @@
       %apply;link_pages()
     </div>
     %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
-      <p>%apply;capitalize(linked_page.BNOTE).</p>
+      <div class="ml-3">%apply;capitalize(linked_page.BNOTE).</div>
     %end;
     <div class="ml-3">
       %notes;
@@ -67,7 +65,7 @@
     %end;
   %end;
   %if;(has_linked_page.NOTE and linked_page.NOTE!="")
-    <p>%apply;capitalize(linked_page.NOTE).</p>
+    <div class="ml-3">%apply;capitalize(linked_page.NOTE).</div>
   %end;
 %elseif;((count>0 or count2>0) and op_m=2)
   <h3 id="notes" class="mt-2">[*note/notes]1</h3>

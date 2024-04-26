@@ -52,25 +52,25 @@
     %end;
     %reset_count;
     %if;(op_fl=1 and e.cgl!="on")
+      <a href="%prefix;%father.access;&m=D&t=T&v=1">%nn;
+        <img class="ml-2 mb-1" src="%images_prefix;gui_create.png" height="18" alt="Tree"
+        title="[*tree] [siblings] ([with] [spouse/spouses]1)">%nn;
+      </a>%nn;
       %foreach;father.child;
         %if;is_sibling_before;
           %incr_count;
-          <a class="ml-2%if;not is_sibling_before; invisible%end;"
+          <a class="ml-4%if;not is_sibling_before; invisible%end;"
             href="%prefix;%child.access;" title="%apply;capitalize(nth([previous sibling],sex))">%nn;
-          <i class="fa fa-caret-left fa-sm text-success"></i>%nn;
+          <i class="fa fa-caret-left fa-xs text-primary"></i>%nn;
           </a>
         %end;
       %end;
       %if;(count=0)<span class="fa fa-caret-left invisible"></span>%end;
-      <a href="%prefix;%father.access;&m=D&t=T&v=1">%nn;
-      <img class="mb-1" src="%images_prefix;gui_create.png" height="20" alt="Tree"
-        title="[*tree] [siblings] ([with] [spouse/spouses]1)">%nn;
-      </a>
       %foreach;father.child;
         %if;is_sibling_after;
           <a%if;not is_sibling_after; class="invisible"%end; href="%prefix;%child.access;" 
             title="%apply;capitalize(nth([next sibling],sex))">%nn;
-          <i class="fa fa-caret-right fa-sm text-success"></i>%nn;
+          <i class="fa fa-caret-right fa-xs text-primary"></i>%nn;
           </a>
         %end;
       %end;
@@ -83,7 +83,7 @@
       %apply;short_display_sibling_photo("father","cur")
     %end;
   %else;
-    <ul>
+    <ul class="pl-4">
       %let;cur;%index;%in;
       %foreach;father.child;
         %if;(b.full_siblings!="no")
@@ -146,11 +146,11 @@
       %if;(father.nb_families>1 and half_father!=0)
         %foreach;father.family;
           %if;(spouse.index!=mother.index and half_father!=0 and spouse.has_children)
-            <ul>
+            <ul class="pl-4">
               %apply;li_SD("spouse")
                 [with] %apply;very_short_display_person("spouse")
                 %if;has_children;
-                  <ul>
+                  <ul class="pl-4">
                     %foreach;child;
                       %if;(b.always_surname="yes")
                         %apply;short_display_siblings()

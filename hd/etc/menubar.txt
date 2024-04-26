@@ -201,65 +201,66 @@
                   <a class="dropdown-item" href="%prefix;m=HIST_DIFF&t=DIFF&f=%history_file;&new=0&old=1" %laD;><span class="fa fa-clock-rotate-left fa-fw mr-2"></span>[*last diff]</a>
                 %end;
               %end;
-                %if;has_parents;
-                  %foreach;father.child;
-                    %if;is_sibling_before;
-                      <a href="%prefix;%child.access;" id="previous_sibling" class="d-none"></a>
-                    %end;
-                    %if;is_sibling_after;
-                      <a href="%prefix;%child.access;" id="next_sibling" class="d-none"></a>
-                    %end;
+              %if;has_parents;
+                %foreach;father.child;
+                  %if;is_sibling_before;
+                    <a href="%prefix;%child.access;" id="previous_sibling" class="d-none"></a>
+                  %end;
+                  %if;is_sibling_after;
+                    <a href="%prefix;%child.access;" id="next_sibling" class="d-none"></a>
                   %end;
                 %end;
-                %( Copy permalink/f/w buttons %)
-                %define;copylink(xx)
-                  [*copy link %s:::xx]
-                %end;
-                <div class="dropdown-divider"></div>
-                <div class="btn-group pr-4" role="group">
-                  <button class="dropdown-item permalink-copy mr-1 pr-0" type="button"
-                    title="%apply;copylink([wizard/wizards/friend/friends/exterior]4)" 
-                    data-bname="%if;not cgi;%base.name;%end;"
-                    data-query="%if;cgi;b=%base.name;&%end;%nn;
-                      p=%first_name_key;&n=%surname_key;%if;(occ!="0")&oc=%occ;%end;
-                      %foreach;env_binding;
-                        %if;(env.key!="i" and env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="b" and env.key!="" and not (env.key="ocz" and env.val="0"))&%env.key=%env.val;%end;
-                      %end;"><i class="fas fa-link fa-fw mr-2"></i>[*copy permalink] [wizard/wizards/friend/friends/exterior]4</button>
-                  %if;not cgi;
-                    %if;(not (friend or iswiz=1))<div class="d-none">%end;
-                      <button class="disabled dropdown-item mx-0 px-0">/</button>
-                      <button class="mx-1 px-0 dropdown-item permalink-friend-copy" type="button"
-                        title="%apply;copylink([wizard/wizards/friend/friends/exterior]2)">%nn;
-                        [wizard/wizards/friend/friends/exterior]2</button>
-                    %if;(not (friend or iswiz=1))</div>%end;
-                    %if;(iswiz!=1)<div class="d-none">%end;
-                      <button class="disabled dropdown-item mx-0 px-0">/</button>
-                      <button class="ml-1 px-0 dropdown-item permalink-wizard-copy" type="button"
-                        title="%apply;copylink([wizard/wizards/friend/friends/exterior]0)">%nn;
-                        [wizard/wizards/friend/friends/exterior]0</button>
-                    %if;(iswiz!=1)</div>%end;
-                  %end;
-                </div>
-                %( WIZARD | Copy wikitext button %)
-                %if;(self!="? ?")
+              %end;
+              %( Copy permalink/f/w buttons %)
+              %define;copylink(xx)
+                [*copy link %s:::xx]
+              %end;
+              <div class="dropdown-divider"></div>
+              %if;(not cgi and wizard or friend)<div class="btn-group pr-4" role="group">%end;
+                <button class="dropdown-item permalink-copy mr-1 pr-0" type="button"
+                  title="%apply;copylink([wizard/wizards/friend/friends/exterior]4)" 
+                  data-bname="%if;not cgi;%base.name;%end;"
+                  data-query="%if;cgi;b=%base.name;&%end;%nn;
+                    p=%first_name_key;&n=%surname_key;%if;(occ!="0")&oc=%occ;%end;
+                    %foreach;env_binding;
+                      %if;(env.key!="i" and env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="b" and env.key!="" and not (env.key="ocz" and env.val="0"))&%env.key=%env.val;%end;
+                    %end;"><i class="fas fa-link fa-fw mr-2"></i>[*copy permalink] [wizard/wizards/friend/friends/exterior]4</button>
+                %if;not cgi;
+                  %if;not (friend or iswiz=1)<div class="d-none">%end;
+                    <button class="disabled dropdown-item mx-0 px-0">/</button>
+                    <button class="mx-1 px-0 dropdown-item permalink-friend-copy" type="button"
+                      title="%apply;copylink([wizard/wizards/friend/friends/exterior]2)">%nn;
+                      [wizard/wizards/friend/friends/exterior]2</button>
+                  %if;not (friend or iswiz=1)</div>%end;
                   %if;(iswiz!=1)<div class="d-none">%end;
-                    <div class="dropdown-divider"></div>
-                    <button class="dropdown-item simple-copy" type="button" title="[*copy link %s:::wiki]"
-                       data-wikilink="%[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]">%nn;<i class="far fa-clipboard fa-fw mr-2"></i>%nn;
-                       %[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]</button>
-                    <button class="dropdown-item full-copy" type="button" title="[*copy link %s:::wikitext]"
-                      data-wikilink="%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]"><i class="far fa-clipboard fa-fw mr-2"></i>%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]</button>
+                    <button class="disabled dropdown-item mx-0 px-0">/</button>
+                    <button class="ml-1 px-0 dropdown-item permalink-wizard-copy" type="button"
+                      title="%apply;copylink([wizard/wizards/friend/friends/exterior]0)">%nn;
+                      [wizard/wizards/friend/friends/exterior]0</button>
                   %if;(iswiz!=1)</div>%end;
                 %end;
-                %( Geneanet search button %)
-                <div class="dropdown-divider"></div>
-                %define;searchgnt(xx)
-                  [*search %s on Geneanet:::xx]
-                %end;
-                <a class="dropdown-item" role="button" title="%apply;searchgnt(self)"
-                  href="https://www.geneanet.org/fonds/individus/?sourcename=&size=50&sexe=&nom=%apply;uri_encode(surname)&ignore_each_patronyme=&with_variantes_nom=1&prenom=%apply;uri_encode(first_name)&prenom_operateur=or&ignore_each_prenom=&profession=&ignore_each_profession=&nom_conjoint=&ignore_each_patronyme_conjoint=&prenom_conjoint=&prenom_conjoint_operateur=or&ignore_each_prenom_conjoint=&place__0__=%if;(has_birth_place)%apply;uri_encode(birth_place)&zonegeo__0__=&country__0__=&region__0__=&subregion__0__=&place__1__=&zonegeo__1__=&country__1__=&region__1__=&subregion__1__=&place__2__=&zonegeo__2__=&country__2__=&region__2__=&subregion__2__=&place__3__=&zonegeo__3__=&country__3__=&region__3__=&subregion__3__=&place__4__=&zonegeo__4__=&country__4__=&region__4__=&subregion__4__=&type_periode=between&from=%if;(has_birth_date and birth_date.year!="")%expr(birth_date.year-15)%end;&to=%if;(has_death_date and death_date.year!="")%expr(death_date.year+15)%end;&exact_day=&exact_month=&exact_year=&nom_pere=&ignore_each_patronyme_pere=&prenom_pere=&prenom_pere_operateur=or&ignore_each_prenom_pere=&nom_mere=%if;(has_parents and mother.surname!="?")%apply;uri_encode(mother.surname)%end;&ignore_each_patronyme_mere=&with_variantes_nom_mere=1&prenom_mere=&prenom_mere_operateur=or&ignore_each_prenom_mere=&with_parents=0&go=1%end;" target="_blank" rel="noreferrer, noopener"><i class="fa fa-magnifying-glass fa-fw mr-2"></i>%nn;
-                  %apply;searchgnt(self)%nn;
-                </a>
+              %if;(not cgi and wizard or friend)</div>%end;
+              
+              %( WIZARD | Copy wikitext button %)
+              %if;(self!="? ?")
+                %if;(iswiz!=1)<div class="d-none">%end;
+                  <div class="dropdown-divider"></div>
+                  <button class="dropdown-item simple-copy" type="button" title="[*copy link %s:::wiki]"
+                     data-wikilink="%[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]">%nn;<i class="far fa-clipboard fa-fw mr-2"></i>%nn;
+                     %[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]</button>
+                  <button class="dropdown-item full-copy" type="button" title="[*copy link %s:::wikitext]"
+                    data-wikilink="%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]"><i class="far fa-clipboard fa-fw mr-2"></i>%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]</button>
+                %if;(iswiz!=1)</div>%end;
+              %end;
+              %( Geneanet search button %)
+              <div class="dropdown-divider"></div>
+              %define;searchgnt(xx)
+                [*search %s on Geneanet:::xx]
+              %end;
+              <a class="dropdown-item" role="button" title="%apply;searchgnt(self)"
+                href="https://www.geneanet.org/fonds/individus/?sourcename=&size=50&sexe=&nom=%apply;uri_encode(surname)&ignore_each_patronyme=&with_variantes_nom=1&prenom=%apply;uri_encode(first_name)&prenom_operateur=or&ignore_each_prenom=&profession=&ignore_each_profession=&nom_conjoint=&ignore_each_patronyme_conjoint=&prenom_conjoint=&prenom_conjoint_operateur=or&ignore_each_prenom_conjoint=&place__0__=%if;(has_birth_place)%apply;uri_encode(birth_place)&zonegeo__0__=&country__0__=&region__0__=&subregion__0__=&place__1__=&zonegeo__1__=&country__1__=&region__1__=&subregion__1__=&place__2__=&zonegeo__2__=&country__2__=&region__2__=&subregion__2__=&place__3__=&zonegeo__3__=&country__3__=&region__3__=&subregion__3__=&place__4__=&zonegeo__4__=&country__4__=&region__4__=&subregion__4__=&type_periode=between&from=%if;(has_birth_date and birth_date.year!="")%expr(birth_date.year-15)%end;&to=%if;(has_death_date and death_date.year!="")%expr(death_date.year+15)%end;&exact_day=&exact_month=&exact_year=&nom_pere=&ignore_each_patronyme_pere=&prenom_pere=&prenom_pere_operateur=or&ignore_each_prenom_pere=&nom_mere=%if;(has_parents and mother.surname!="?")%apply;uri_encode(mother.surname)%end;&ignore_each_patronyme_mere=&with_variantes_nom_mere=1&prenom_mere=&prenom_mere_operateur=or&ignore_each_prenom_mere=&with_parents=0&go=1%end;" target="_blank" rel="noreferrer, noopener"><i class="fa fa-magnifying-glass fa-fw mr-2"></i>%nn;
+                %apply;searchgnt(self)%nn;
+              </a>
             </div>
           </li>
           %( FAM WIZARD ONLY TOOLS %)
