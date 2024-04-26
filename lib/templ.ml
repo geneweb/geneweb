@@ -1205,6 +1205,12 @@ let rec interp_ast :
     | None -> (
         match (f, vl) with
         | "capitalize", [ VVstring s ] -> Utf8.capitalize_fst s
+        | "capitalize_words", [ VVstring s ] ->
+            let wl = String.split_on_char ' ' s in
+            (* TODO handle particles !
+               let w = Util.surname_particle base w not available *)
+            let wl = List.map (fun w -> Utf8.capitalize_fst w) wl in
+            String.concat " " wl
         | "interp", [ VVstring s ] ->
             let astl = Templ_parser.parse_templ conf (Lexing.from_string s) in
             String.concat "" (eval_ast_list env ep astl)
