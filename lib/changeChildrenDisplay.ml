@@ -95,18 +95,15 @@ let print_change conf base p =
   in
   let children = children_of_p base p in
   let digest = digest_children base children in
-  Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.print_sstring conf "<h2>";
-  title false;
-  (let s : Adef.safe_string = gen_person_text conf base p in
-   let r : Adef.safe_string = reference conf base p s in
-   Util.transl_a_of_b conf "" (r :> string) (s :> string)
-   |> Output.print_sstring conf);
-  Output.print_sstring conf " ";
-  Output.print_string conf (DateDisplay.short_dates_text conf base p);
-  Output.print_sstring conf {|</h2><form method="post" action="|};
-  Output.print_sstring conf conf.command;
-  Output.print_sstring conf {|">|};
+  Hutil.header conf title;
+  Output.print_sstring conf
+    (Format.sprintf {|<h2>%s %s</h2>
+<form method="post" action="%s">|}
+    (let s : Adef.safe_string = gen_person_text conf base p in
+      let r : Adef.safe_string = reference conf base p s in
+      Util.transl_a_of_b conf "" (r :> string) (s :> string))
+    (DateDisplay.short_dates_text conf base p :> string)
+    (conf.command :> string));
   Util.hidden_env conf;
   Util.hidden_input_s conf "ip" (string_of_iper (get_iper p));
   Util.hidden_input_s conf "digest" digest;

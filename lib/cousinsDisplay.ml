@@ -234,7 +234,7 @@ let print_cousins conf base p lev1 lev2 =
     try int_of_string (List.assoc "max_cousins" conf.base_env)
     with Not_found | Failure _ -> default_max_cnt
   in
-  Perso.interp_notempl_with_menu title "perso_header" conf base p;
+  Hutil.header conf title;
   Output.print_sstring conf "<div>";
   (*include_templ conf "cousins_tools";*)
   Output.print_sstring conf "<h3>";
