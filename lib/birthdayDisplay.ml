@@ -378,13 +378,7 @@ let gen_print_menu_birth conf base f_scan mode =
   let list_tod = ref [] in
   let list_tom = ref [] in
   let list_aft = ref [] in
-  (match Util.find_person_in_env conf base "" with
-  | Some p ->
-      Perso.interp_notempl_with_menu title "perso_header" conf base p;
-      Output.print_sstring conf "<h2>";
-      title false;
-      Output.print_sstring conf "</h2>"
-  | None -> Hutil.header conf title);
+  Hutil.header conf title;
   (try
      while true do
        let p, txt_of = f_scan () in

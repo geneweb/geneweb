@@ -500,34 +500,26 @@ let print_del1 conf base ifam =
   let cpl = foi base ifam in
   let ifath = get_father cpl in
   let imoth = get_mother cpl in
-  let title () =
+  let title _ =
     transl_nth conf "family/families" 0
     |> transl_decline conf "delete"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf;
-    Output.print_sstring conf " ";
-    Output.print_string conf
-      (Util.escape_html (p_first_name base (poi base ifath)));
-    Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base ifath)));
-    Output.print_string conf
-      (Util.escape_html (p_surname base (poi base ifath)));
-    Output.print_sstring conf " ";
-    Output.print_sstring conf (transl conf "and");
-    Output.print_sstring conf " ";
-    Output.print_string conf
-      (Util.escape_html (p_first_name base (poi base imoth)));
-    Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base imoth)));
-    Output.print_string conf
-      (Util.escape_html (p_surname base (poi base imoth)))
+    |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
-  let p =
-    match p_getenv conf.env "ip" with
-    | Some ip -> poi base (iper_of_string ip)
-    | None -> Gwdb.empty_person base dummy_iper
-  in
-  (* TODO check if first argument really needs to be [bool -> unit] and not [unit -> unit] *)
-  Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
+  Hutil.header conf title;
   Output.print_sstring conf "<h2>\n";
-  title ();
+  Output.print_string conf
+    (Util.escape_html (p_first_name base (poi base ifath)));
+  Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base ifath)));
+  Output.print_string conf
+    (Util.escape_html (p_surname base (poi base ifath)));
+  Output.print_sstring conf " ";
+  Output.print_sstring conf (transl conf "and");
+  Output.print_sstring conf " ";
+  Output.print_string conf
+    (Util.escape_html (p_first_name base (poi base imoth)));
+  Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base imoth)));
+  Output.print_string conf
+    (Util.escape_html (p_surname base (poi base imoth)));
   Output.print_sstring conf {|</h2><form method="post" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|"><p>|};
@@ -545,14 +537,13 @@ let print_del1 conf base ifam =
   Hutil.trailer conf
 
 let print_inv1 conf base p ifam1 ifam2 =
-  let title () =
+  let title _ =
     transl_decline conf "invert" ""
     |> Utf8.capitalize_fst |> Adef.safe |> Output.print_string conf
   in
   let cpl1 = foi base ifam1 in
   let cpl2 = foi base ifam2 in
-  (* TODO check if first argument really needs to be [bool -> unit] and not [unit -> unit] *)
-  Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
+  Hutil.header conf title;
   Output.print_sstring conf
     (Utf8.capitalize_fst
        (transl conf "invert the order of the following families"));
