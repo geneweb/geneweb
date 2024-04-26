@@ -17,3 +17,6 @@
 <body%body_prop;>
 %include;hed
 %include;perso_utils
+%if;(e.m!="CHG_CHN")
+  %include;menubar
+%end;
