@@ -37,7 +37,9 @@
   %elseif;(e.em="R")[*path between]
       %person_index.e.first_name; %person_index.e.surname;
       %sp;[and]
-      %person_index.x.first_name; %person_index.x.surname;
+      %if;(e.select="input" and e.n!="" and e.fn="" and e.sn="")%apply;capitalize_words(e.n)
+      %elseif;(e.select="input" and e.n="" and (e.fn!="" or e.sn!=""))%apply;capitalize_words(e.fn) %apply;capitalize_words(e.sn)
+      %else;%person_index.x.first_name; %person_index.x.surname;%end;
   %( TODO reorganise evar so that main person is always i= %)
   %elseif;(e.m="RL")[*path between]
       %person_index.1.first_name; %person_index.1.surname;
