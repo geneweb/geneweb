@@ -64,6 +64,38 @@ let get_event_field_name gets event_criteria event_name search_type =
   else if "on" = gets ("event_" ^ event_name) then event_criteria
   else ""
 
+module Fields = struct
+  let bapt_date_field_name ~gets ~search_type =
+    get_event_field_name gets "date" "bapt" search_type
+
+  let birth_date_field_name ~gets ~search_type =
+    get_event_field_name gets "date" "birth" search_type
+
+  let death_date_field_name ~gets ~search_type =
+    get_event_field_name gets "date" "death" search_type
+
+  let burial_date_field_name ~gets ~search_type =
+    get_event_field_name gets "date" "burial" search_type
+
+  let marriage_date_field_name ~gets ~search_type =
+    get_event_field_name gets "date" "marriage" search_type
+
+  let bapt_place_field_name ~gets ~search_type =
+    get_event_field_name gets "place" "bapt" search_type
+
+  let birth_place_field_name ~gets ~search_type =
+    get_event_field_name gets "place" "birth" search_type
+
+  let death_place_field_name ~gets ~search_type =
+    get_event_field_name gets "place" "death" search_type
+
+  let burial_place_field_name ~gets ~search_type =
+    get_event_field_name gets "place" "burial" search_type
+
+  let marriage_place_field_name ~gets ~search_type =
+    get_event_field_name gets "place" "marriage" search_type
+end
+
 (*
   Search for other persons in the base matching with the provided infos.
 
@@ -187,61 +219,31 @@ let advanced_search conf base max_answers =
         | "M" -> get_sex p = Male | "F" -> get_sex p = Female | _ -> true)
       empty_default_value
   in
-  let bapt_date_field_name ~gets ~search_type =
-    get_event_field_name gets "date" "bapt" search_type
-  in
-  let birth_date_field_name ~gets ~search_type =
-    get_event_field_name gets "date" "birth" search_type
-  in
-  let death_date_field_name ~gets ~search_type =
-    get_event_field_name gets "date" "death" search_type
-  in
-  let burial_date_field_name ~gets ~search_type =
-    get_event_field_name gets "date" "burial" search_type
-  in
-  let marriage_date_field_name ~gets ~search_type =
-    get_event_field_name gets "date" "marriage" search_type
-  in
-  let bapt_place_field_name ~gets ~search_type =
-    get_event_field_name gets "place" "bapt" search_type
-  in
-  let birth_place_field_name ~gets ~search_type =
-    get_event_field_name gets "place" "birth" search_type
-  in
-  let death_place_field_name ~gets ~search_type =
-    get_event_field_name gets "place" "death" search_type
-  in
-  let burial_place_field_name ~gets ~search_type =
-    get_event_field_name gets "place" "burial" search_type
-  in
-  let marriage_place_field_name ~gets ~search_type =
-    get_event_field_name gets "place" "marriage" search_type
-  in
   let match_baptism_date ~getd ~gets ~search_type ~conf ~base p
       empty_default_value =
     match_date ~getd ~conf ~base p
-      (bapt_date_field_name ~gets ~search_type)
+      (Fields.bapt_date_field_name ~gets ~search_type)
       (fun () -> Date.od_of_cdate (get_baptism p))
       empty_default_value
   in
   let match_birth_date ~getd ~gets ~search_type ~conf ~base p
       empty_default_value =
     match_date ~getd ~conf ~base p
-      (birth_date_field_name ~gets ~search_type)
+      (Fields.birth_date_field_name ~gets ~search_type)
       (fun () -> Date.od_of_cdate (get_birth p))
       empty_default_value
   in
   let match_death_date ~getd ~gets ~search_type ~conf ~base p
       empty_default_value =
     match_date ~getd ~conf ~base p
-      (death_date_field_name ~gets ~search_type)
+      (Fields.death_date_field_name ~gets ~search_type)
       (fun () -> Date.date_of_death (get_death p))
       empty_default_value
   in
   let match_burial_date ~getd ~gets ~search_type ~conf ~base p
       empty_default_value =
     match_date ~getd ~conf ~base p
-      (burial_date_field_name ~gets ~search_type)
+      (Fields.burial_date_field_name ~gets ~search_type)
       (fun () ->
         (* TODO Date.cdate_of_burial *)
         match get_burial p with
@@ -255,25 +257,25 @@ let advanced_search conf base max_answers =
   let match_baptism_place ~gets ~getss ~search_type ~conf ~base p
       empty_default_value =
     apply_to_field_values ~getss ~conf ~base p
-      (bapt_place_field_name ~gets ~search_type)
+      (Fields.bapt_place_field_name ~gets ~search_type)
       get_baptism_place (cmp_place ~gets) empty_default_value
   in
   let match_birth_place ~gets ~getss ~search_type ~conf ~base p
       empty_default_value =
     apply_to_field_values ~getss ~conf ~base p
-      (birth_place_field_name ~gets ~search_type)
+      (Fields.birth_place_field_name ~gets ~search_type)
       get_birth_place (cmp_place ~gets) empty_default_value
   in
   let match_death_place ~gets ~getss ~search_type ~conf ~base p
       empty_default_value =
     apply_to_field_values ~getss ~conf ~base p
-      (death_place_field_name ~gets ~search_type)
+      (Fields.death_place_field_name ~gets ~search_type)
       get_death_place (cmp_place ~gets) empty_default_value
   in
   let match_burial_place ~gets ~getss ~search_type ~conf ~base p
       empty_default_value =
     apply_to_field_values ~getss ~conf ~base p
-      (burial_place_field_name ~gets ~search_type)
+      (Fields.burial_place_field_name ~gets ~search_type)
       get_burial_place (cmp_place ~gets) empty_default_value
   in
   let match_occupation ~gets ~conf ~base p empty_default_value =
@@ -375,8 +377,8 @@ let advanced_search conf base max_answers =
         && match_death_date ~getd ~gets ~search_type ~conf ~base p true
         && match_death_place ~gets ~getss ~search_type ~conf ~base p true
         && match_marriage ~getd ~gets ~getss ~conf ~base p
-             (marriage_date_field_name ~gets ~search_type)
-             (marriage_place_field_name ~gets ~search_type)
+             (Fields.marriage_date_field_name ~gets ~search_type)
+             (Fields.marriage_place_field_name ~gets ~search_type)
              true
       then (p :: list, len + 1)
       else acc
@@ -405,8 +407,8 @@ let advanced_search conf base max_answers =
             && match_death_date ~getd ~gets ~search_type ~conf ~base p true
             && match_death_place ~gets ~getss ~search_type ~conf ~base p true
          || match_marriage ~getd ~gets ~getss ~conf ~base p
-              (marriage_date_field_name ~gets ~search_type)
-              (marriage_place_field_name ~gets ~search_type)
+              (Fields.marriage_date_field_name ~gets ~search_type)
+              (Fields.marriage_place_field_name ~gets ~search_type)
               false)
     then (p :: list, len + 1)
     else acc
