@@ -3,15 +3,6 @@
     background-color: #f0f0f0;
   }
 
-.dropdown-menu {
-  max-height: 650px;
-  overflow: scroll;
-}
-
-.dropdown-menu::-webkit-scrollbar {
-  width: 0; /* This will hide the p_mod right scrollbar */
-}
-
 .dropdown-menu-transl {
   -webkit-transform: translate(-16%, 0) !important;
   -o-transform: translate(-16%, 0) !important;
@@ -22,6 +13,13 @@
   -webkit-transform: translate(-10%, 0) !important;
   -o-transform: translate(-10%, 0) !important;
   transform: translate(-10%, 0) !important;
+  max-height: 620px; /* fixme! */
+  overflow: scroll;
+  scrollbar-width: none;
+}
+
+.dropdown-menu-transl-pmod::-webkit-scrollbar {
+  display: none; /* hide p_mod scrollbar */
 }
 
 .ancmenu-implex {
@@ -100,9 +98,10 @@ html {
     max-width: 100%; 
 }
 #content:focus { outline: none; }
+
 /* Remove overused p anchor top margin*/
 p {
-	margin-top:1rem;
+  margin-top:0rem;
 }
 
 /* Relation menu table */

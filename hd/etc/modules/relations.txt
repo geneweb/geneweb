@@ -89,11 +89,11 @@
       %end;
     %end;
   </h2>
-  <ul>
+  <ul  class="pl-4">
   %foreach;relation;
     %if;(has_relation_him and has_relation_her)
       <li>%apply;capitalize(relation_type)[:]%nl;
-        <ul>
+        <ul  class="pl-4">
           %apply;li_SDC("relation_him")
             %apply;short_display_person("relation_him")
           </li>
@@ -151,7 +151,7 @@
   %if;(count>0)
     <h3>[*relations of] %self;</h3>
   %end;
-  <ul>
+  <ul  class="pl-4">
   %foreach;relation;
   %( godparents are displayed in timeline if has_event %)
     %if;(has_relation_him and has_relation_her)
@@ -220,7 +220,7 @@
   %if;(count>0)
     <h3>[*witnesses to events of] %self;</h3>
   %end;
-  <ul>
+  <ul  class="pl-4">
     %foreach;event;%sp;
       %reset_count;
       %foreach;event_witness;
@@ -250,7 +250,7 @@
   %if;(count>0)
     <h3>%apply;str(self,sex)</h3>
   %end;
-  <ul>
+  <ul  class="pl-4">
     %foreach;event_witness_relation;
       %apply;li_SDC("event_witness_relation.person")
         %apply;capitalize(event_witness_relation.event.name)%sp;

@@ -46,6 +46,17 @@
     %if;xx.has_families;%if;(count!=0)square%else;disc%end;%else;circle%end;;">%nn;
 %end;
 
+%define;marr_wrench_to_bullet(xx)
+  %if;(wizard and not cancel_links)
+    <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"%nn;
+      <i class="fa fa-wrench fa-xs text-success"%sp;
+        title="[*modify::family/families]0 %self; &%sp;
+        %spouse.first_name;%if;(spouse.occ!="0").%spouse.occ;%end;%sp;
+        %spouse.surname; ([wizard/wizards/friend/friends/exterior]0])"></i>%nn;
+    </a>
+  %end;
+%end;
+
 %define;image_MF(xxx)
   %if;not cancel_links;
     %if;wizard;%nn;
@@ -215,7 +226,7 @@
 %end;
 
 %define;display_sosa(xx)
-  %if;(xx.has_sosa and b.display_sosa="yes")
+  %if;(xx.has_sosa and b.display_sosa="yes" and self!=sosa_ref)
     %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
     %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
     %sosa_ref.surname_key_strip;
@@ -234,35 +245,38 @@
         class="%if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;-underline">%xx;</a>%nn;
     %end;
   %end;
-  <span title="%if;xx.computable_age;%xx.age;%elseif;xx.computable_death_age;%xx.death_age;%end;"
-    class="text-nowrap">%xx.dates;</span>%if;(xx.title!=""), %xx.title;%end;%nn;
+  %if;(cancel_links or not wizard)<span%else;<a href="%prefix;m=MOD_IND&i=%xx.index;"%end;
+    title="%if;not (cancel_links or not wizard)[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end; %if;xx.computable_age;(%xx.age;)%elseif;xx.computable_death_age;(%xx.death_age;)%end;" class="text-nowrap font-italic">%if;(xx.dates!="")%xx.dates;%end;
+  %if;(cancel_links or not wizard)</span>%else;</a>%end;
+  %if;(xx.title!=""), %xx.title;%end;%nn;
 %end;
 
 %define;short_display_person_tree(xx)
-  %if;(xx.has_sosa and e.m!="")%apply;display_sosa("xx")%end;
-  %if;(cancel_links or xx.is_restricted or is_self)<span class="mt-2">%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;</span><br><span>%xx.surname;</span>
-  %else;<a %apply;ext_link("xx") href="%prefix;%xx.access;%if;(e.t!="")&t=%e.t;%end;%if;(e.v!="")&v=%e.v;%end;%if;(e.im=0)&im=0%end;%if;(e.marriage="on")&marriage=on%end;"><span%( class="text-nowrap"%)>%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
-  %end;
-  <br>%nn;
-  %if;(wizard and not cancel_links)
-    <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
-  %end;
-  <div class="text-nowrap font-italic%nn;
-      %(%if;(e.m="A" and xx.index!=index)
-        %if;(not xx.is_dead) mr-5%nn;
-        %else;%if;(xx.death_date.year="") mr-4%end;
-        %end;
-      %end;%)"
-       title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end;
-               %if;(xx.computable_age or xx.computable_death_age)
-                 %if;xx.computable_age; (%xx.age;)%elseif;xx.computable_death_age; (%xx.death_age;)%end;
-               %end;">%nn;
-    %if;(xx.dates!="")%xx.dates;%nn;
-    %elseif;(wizard and not cancel_links)-%nn;
-    %elseif;(cancel_links)
-    %end;%nn;
-  </div>%nn;
-  %if;(wizard and not cancel_links)</a>%end;
+  <div>
+    %if;(xx.has_sosa and e.m!="")%apply;display_sosa("xx")%end;
+    %if;(cancel_links or xx.is_restricted or is_self)<span>%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;</span><br><span>%xx.surname;</span>
+    %else;<a %apply;ext_link("xx") href="%prefix;%xx.access;%if;(e.t!="")&t=%e.t;%end;%if;(e.v!="")&v=%e.v;%end;%if;(e.im=0)&im=0%end;%if;(e.marriage="on")&marriage=on%end;"><span>%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;</span><br><span>%xx.surname;</span></a>%nn;
+    %end;
+    %if;(wizard and not cancel_links)
+      <a href="%prefix;m=MOD_IND&i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
+    %end;
+    <div class="text-nowrap font-italic%nn;
+        %(%if;(e.m="A" and xx.index!=index)
+          %if;(not xx.is_dead) mr-5%nn;
+          %else;%if;(xx.death_date.year="") mr-4%end;
+          %end;
+        %end;%)"
+         title="%if;wizard;[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end;
+                 %if;(xx.computable_age or xx.computable_death_age)
+                   %if;xx.computable_age; (%xx.age;)%elseif;xx.computable_death_age; (%xx.death_age;)%end;
+                 %end;">%nn;
+      %if;(xx.dates!="")%xx.dates;%nn;
+      %elseif;(wizard and not cancel_links)-%nn;
+      %elseif;(cancel_links)
+      %end;%nn;
+    </div>%nn;
+    %if;(wizard and not cancel_links)</a>%end;
+  </div>
 %end;
 
 %define;short_display_person_noname(xx)
@@ -529,15 +543,6 @@
 %end;
 
 %define;married_to(xx, yy)
-  %if;(wizard and not cancel_links)
-    <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;">%nn;
-      <i class="fa fa-wrench fa-xs%sp;
-        %if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;"%sp;
-        title="[*modify::family/families]0 [with]%sp;
-        %spouse.first_name;%if;(spouse.occ!="0").%spouse.occ;%end;%sp;
-        %spouse.surname;"></i>%nn;
-    </a>%sp;
-  %end;
   %let;marr_text;
     %apply;rel_date_place%with;%xx.sex;%and;
       %if;(on_marriage_date!="") %on_marriage_date;%end;
@@ -549,7 +554,7 @@
 %define;display_date_marriage_parent(xx)
   %foreach;xx.mother.family;
     %if;(spouse.access=xx.father.access)
-      %if;((wizard or friend) and marriage_date.year!="")
+      %if;(marriage_date.year!="")
         %if;(wizard and not cancel_links)<a href="%prefix&m=MOD_FAM&i=%family.index;&ip=%index;" title="[modify::family/families]0">%end;%nn;
         %family.date_s;%nn;
         %if;(wizard and not cancel_links)</a>%end;
