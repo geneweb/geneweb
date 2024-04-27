@@ -2,6 +2,8 @@
 
 open Config
 
+val header_without_http_nor_home : config -> (bool -> unit) -> unit
+
 val header_without_http : config -> (bool -> unit) -> unit
 (** [header_without_http conf title] prints HTML page header in the body of the current response on the socket.
     HTML page header consists of :
