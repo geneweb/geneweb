@@ -156,7 +156,6 @@ let very_unknown conf _ =
       Output.print_sstring conf {|"|} ;
     in
     Output.status conf Def.Not_Found;
-    (* can't use Util_2.header here, missing base! *)
     Hutil.header ~error:true conf title;
     Hutil.trailer conf
   | _ ->

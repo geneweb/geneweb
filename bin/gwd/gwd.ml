@@ -437,7 +437,7 @@ let unauth_server conf ar =
       (fcapitale (ftransl conf "%s access cancelled for that page"))
       (if not h then "<em>" ^ typ ^ "</em>" else typ)
   in
-  Hutil.header_without_http conf title;
+  Hutil.header_without_http_nor_home conf title;
   Output.print_sstring conf "<h1>\n";
   title false;
   Output.print_sstring conf "</h1>\n";
