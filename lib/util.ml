@@ -1752,7 +1752,7 @@ let husband_wife conf base p all =
             ^ ","
           in
           if all then loop (i + 1) res else res
-        else loop (i + 1) res
+        else loop (i + 1) res ^>^ " ? ?,"
       else res
     in
     loop 0 relation
@@ -1760,7 +1760,8 @@ let husband_wife conf base p all =
   let res = (res :> string) in
   (* suppress last , *)
   let res =
-    if String.length res > 1 then String.sub res 0 (String.length res - 1)
+    if String.length res > 1 && res.[String.length res - 1] = ',' then
+      String.sub res 0 (String.length res - 1)
     else res
   in
   Adef.safe res
