@@ -80,5 +80,10 @@
 </div>
 </div>
 %include;js
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
 </body>
 </html>

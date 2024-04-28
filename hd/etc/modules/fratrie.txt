@@ -56,22 +56,28 @@
         <img class="ml-2 mb-1" src="%images_prefix;gui_create.png" height="18" alt="Tree"
         title="[*tree] [siblings] ([with] [spouse/spouses]1)">%nn;
       </a>%nn;
+      %reset_count2;
       %foreach;father.child;
-        %if;is_sibling_before;
-          %incr_count;
-          <a class="ml-4%if;not is_sibling_before; invisible%end;"
-            href="%prefix;%child.access;" title="%apply;capitalize(nth([previous sibling],sex))">%nn;
-          <i class="fa fa-caret-left fa-xs text-primary"></i>%nn;
-          </a>
-        %end;
+        %incr_count2;
       %end;
-      %if;(count=0)<span class="fa fa-caret-left invisible"></span>%end;
-      %foreach;father.child;
-        %if;is_sibling_after;
-          <a%if;not is_sibling_after; class="invisible"%end; href="%prefix;%child.access;" 
-            title="%apply;capitalize(nth([next sibling],sex))">%nn;
-          <i class="fa fa-caret-right fa-xs text-primary"></i>%nn;
-          </a>
+      %if;(count2>3)
+        %foreach;father.child;
+          %if;is_sibling_before;
+            %incr_count;
+            <a class="ml-4%if;not is_sibling_before; invisible%end;"
+              href="%prefix;%child.access;" title="%apply;capitalize(nth([previous sibling],sex))">%nn;
+            <i class="fa fa-caret-left fa-xs text-primary"></i>%nn;
+            </a>
+          %end;
+        %end;
+        %if;(count=0)<span class="fa fa-caret-left invisible"></span>%end;
+        %foreach;father.child;
+          %if;is_sibling_after;
+            <a%if;not is_sibling_after; class="invisible"%end; href="%prefix;%child.access;"
+              title="%apply;capitalize(nth([next sibling],sex))">%nn;
+            <i class="fa fa-caret-right fa-xs text-primary"></i>%nn;
+            </a>
+          %end;
         %end;
       %end;
     %end;

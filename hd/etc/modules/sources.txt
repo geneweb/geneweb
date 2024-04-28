@@ -15,11 +15,7 @@
   %if;event.has_src;%incr_count;%end;
 %end;
 %if;(count>0)
-  %if;(count=1)
-    <h2>[*source/sources]0</h2>
-  %else;
-    <h2>[*source/sources]1</h2>
-  %end;
+  <h2 class="mt-2">%if;(count=1)[*source/sources]0%else;[*source/sources]1%end;</h2>
   <ul class="pl-4 pY-0">
   %foreach;source;
     <li>%apply;capitalize(source_type)[:] %source;.</li>
