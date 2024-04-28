@@ -140,7 +140,7 @@
     %end;
     %if;(not cancel_links and has_children)
       <span class="ml-2">%nn;
-        <a href="%prefix_base_password;%access;&m=D&t=T&v=1">
+        <a href="%prefix_base_password;%access;&m=D&t=T&v=1">%nn;
           <img class="mx-1 mb-1" src="%images_prefix;gui_create.png" height="18" alt="tree desc."
             title="[*descendants tree] [to the children] ([with] [spouse/spouses]0)"></a>
       </span>
@@ -154,7 +154,7 @@
     %foreach;family;
       %incr_count;
       %apply;li_SD("spouse")
-        %apply;married_to("self", 1)%sp;
+        <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
         %apply;short_display_person("spouse")
         %let;prev_count;%count;%in;
         %if;(has_witnesses)
@@ -216,9 +216,9 @@
     %foreach;child;
       %if;(child.has_image)%incr_count2;%end;
     %end;
-    <ul class="pl-4 py-0%if;(wizard and not cancel_links) fa-ul ml-0%end;">
+    <ul class="pl-4 py-0%if;(wizard and not cancel_links) fa-ul ml-0%end; mb-0">
     %if;not (wizard and not cancel_links)%apply;li_SD("spouse")%else;<li><span class="fa-li">%apply;marr_wrench_to_bullet("spouse")</span>%end;
-    %apply;married_to("self", 1)%sp;
+    <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
     %apply;short_display_person("spouse")
     %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)
       %if;(not cancel_links)
@@ -269,15 +269,15 @@
                     <div class="big_image noimage rounded align-text-center display-1 text-center text-muted px-5 mx-2 pt-1 pb-4">&nbsp;</div>%nn;%)
                   %end;
                 </div>
-              <div class="flex-column">
+              <div class="flex-column align-self-center ml-1">
                 %if;(spouse.has_parents)
                   <div class="d-inline-flex mt-1 align-self-center">
                    <div class="ml-1 mr-2 text-center align-self-center">
                      %apply;a_of_b%with;%if;spouse.is_male;[son/daughter/child]0%nn;
                        %elseif;spouse.is_female;[son/daughter/child]1%nn;%end;%and;%end;
                     </div>
-                    <div class="align-self-center mr-1">/<br><br><br>\</div>
-                    <div class="flex-wrap flex-column ">
+                    <div class="align-self-center mr-1 small">/<br><br><br>\</div>
+                    <div class="flex-wrap flex-column">
                       %foreach;spouse.parent;
                         <div class="d-flex %if;(parent.is_male)mb-3%end; px-1">
                           %if;parent.has_image;
@@ -345,10 +345,10 @@
           %end;
         </div>
         %if;has_witnesses;
-          <div class="d-flex flex-column flex-wrap mt-1 ml-auto mr-3">
-            <span class="align-self-center ml-4">[witness/witnesses]w[:]%( (a_to_b au mariage) distinction pour les officiant·s ?%)</span>
+          <div class="d-flex flex-column flex-wrap mt-1 ml-auto mr-3 small">
+            <span class="ml-1">%apply;a_of_b%with;[*witness/witnesses]w%and;[marriage event]0%end;[:]</span>
             %foreach;witness;
-              <div class="d-inline-flex flex-row ml-1 small">
+              <div class="d-inline-flex flex-row ml-1%if;(not is_first) mt-1%end;">
                 %if;witness.has_image;
                   %if;(not cancel_links)
                     <a href="%witness.image_url;" class="align-self-center" target="_blank">
@@ -394,7 +394,7 @@
     %foreach;family;
       %incr_count;
       %apply;li_SD("spouse")
-        %apply;married_to("self", 1)%sp;
+        <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
         %apply;short_display_person("spouse")
         %if;spouse.has_parents; ([parents][:]
           %apply;short_display_person("spouse.father")%sp;
@@ -454,7 +454,7 @@
     %foreach;family;
       %incr_count;
       %apply;li_SD("spouse")
-        %apply;married_to("self", 1)%sp;
+        <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
         %apply;long_display_person("spouse")
         %if;spouse.has_parents;
           <span style="font-size: 90%%"><em> ([parents][:]
@@ -564,7 +564,7 @@
               </td>
               <td style="vertical-align: middle">
         %end;
-        %apply;married_to("self", 1)%sp;
+        <span %apply;getvar%with;ns[marriage event]%count;%end;>%apply;married_to("self", 1)</span>%sp;
         %apply;display_horizontal("spouse")
         <span style="font-size: 90%%">
           %if;spouse.has_parents;<em> ([parents][:]
