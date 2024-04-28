@@ -1,4 +1,11 @@
 <!-- $Id: perso_utils v7.1 13/08/2023 16:55:48 $ -->
+%define;setvar(nnn,vvv)
+  %set_var.nnn.vvv;
+%end;
+%define;getvar(nnn)
+  %get_var.nnn;
+%end;
+
 %let;central_index;%index;%in;
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
 
@@ -49,10 +56,10 @@
 %define;marr_wrench_to_bullet(xx)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"%nn;
-      <i class="fa fa-wrench fa-xs text-success"%sp;
+      <i class="fa fa-wrench fa-sm text-success"%sp;
         title="[*modify::family/families]0 %self; &%sp;
         %spouse.first_name;%if;(spouse.occ!="0").%spouse.occ;%end;%sp;
-        %spouse.surname; ([wizard/wizards/friend/friends/exterior]0])"></i>%nn;
+        %spouse.surname; ([wizard/wizards/friend/friends/exterior]0)"></i>%nn;
     </a>
   %end;
 %end;
@@ -996,4 +1003,41 @@
         %apply;rm("burial_place",[*burial place])</th>
     %end;
   </tr></thead>
+%end;
+
+%if;(e.m="" and (p_mod="" or p_mod="zz" or "i" in p_mod))
+  %foreach;event;
+    %if;(event.name=[birth] or event.name=[baptism] or event.name=[death] or event.name=[burial] or event.name=[cremation])%nn;
+      %apply;setvar%with;ns%event.name;%and;
+        %if;(b.event_tooltips="no")title="%apply;capitalize(event.name)"%nn;
+        %else;
+          %if;(event.has_note or event.has_src)data-toggle="tooltip" data-html="true"
+            title='<div class="text-wrap text-left">
+              %if;event.has_note;<div><span class="font-weight-bold">%apply;a_of_b%with;[*note/notes]1%and;%event.name;%end;[:]</span> %event.note;.</div>%end;
+              %if;event.has_src;<div%if;event.has_note; class="mt-2"%end;><span class="font-weight-bold">%apply;a_of_b%with;[*source/sources]1%and;%event.name;%end;[:]</span> %event.src;.</div>%end;</div>'
+          %else;title="%apply;capitalize(event.name)"%nn;
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+%if;(e.m="" and (p_mod="" or p_mod="zz" or "u" in p_mod))
+  %reset_count;
+  %foreach;family;
+    %incr_count;
+    %apply;setvar%with;ns[marriage event]%count;%and;
+      %if;(b.event_tooltips="no")title="[marriage event]"%nn;
+      %else;
+        %if;(has_marriage_note or has_marriage_source) data-toggle="tooltip" data-html="true"
+          title='<div class="text-wrap text-left">
+            %if;has_marriage_note;<div><span class="font-weight-bold">
+              %apply;a_of_b%with;[*note/notes]1%and;
+                %if;(count!=1) %apply;nth%with;[nth]%and;%count;%end;%end; [marriage event]%end;[:]</span> %marriage_note;.</div>%end;
+            %if;has_marriage_source;<div%if;has_marriage_note; class="mt-2"%end;><span class="font-weight-bold">%apply;a_of_b%with;[*source/sources]1%and;%if;(count!=1) %apply;nth%with;[nth]%and;%count;%end;%end; [marriage event]%end;[:]</span> %marriage_source;.</div>%end;</div>'
+        %else;title="[marriage event]"%nn;
+        %end;
+      %end;
+    %end;
+  %end;
 %end;

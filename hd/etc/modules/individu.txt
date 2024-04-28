@@ -6,12 +6,6 @@
 3: two columns
 %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
-%define;setvar(nnn,vvv)
-  %set_var.nnn.vvv;
-%end;
-%define;getvar(nnn)
-  %get_var.nnn;
-%end;
 %define;cousin(l1,l2,dd,cc)
   %if;([cousin.l1.l2]!="[cousin.l1.l2]")
     %if;(cc>0)[cousin.l1.l2:::dd]s%else;[*cousin.l1.l2:::dd]s%end;
@@ -272,9 +266,9 @@
   %end;
 %end;
 %define;etat_civil()
-  <ul class="fa-ul%if;(not (has_image or b.default_image="yes")) pl-0%end;">
+  <ul class="fa-ul%if;(not (has_image or b.default_image="yes")) pl-0%end; mb-0">
     %if;(has_birth_date or has_birth_place)
-      <li title="[*birth]">
+      <li %apply;getvar%with;ns[birth]%end;>
         <span class="fa-li"><i class="fas fa-baby"></i></span>
         %if;has_birth_date;[*born]s %on_birth_date;
           %if;has_birth_place; [in (place)] %birth_place;%end;
@@ -291,7 +285,7 @@
       %end;
     %end;
     %if;(has_baptism_date or has_baptism_place)
-      <li title="[*baptism]">
+      <li %apply;getvar%with;ns[baptism]%end;>
         <span class="fa-li"><i class="fas fa-dove"></i></span>
         %if;has_baptism_date;[*baptized]s %on_baptism_date;
             %if;has_baptism_place; [in (place)] %baptism_place;%end;
@@ -302,7 +296,7 @@
       </li>%nl;
     %end;
     %if;is_dead;
-      <li class="mt-1" title="[*death]">
+      <li class="mt-1" %apply;getvar%with;ns[death]%end;>
         <span class="fa-li"><i class="fas fa-skull-crossbones"></i></span>
         %apply;capitalize(died)
         %if;has_death_date; %on_death_date;%end;
@@ -310,7 +304,7 @@
         %if;(has_linked_page.DEATH and linked_page.DEATH!="") (%linked_page.DEATH;)%end;</li>%nl;
     %end;
     %if;(is_buried or is_cremated)
-      <li title="%if;(is_buried)[*burial]%elseif;(is_cremated)[*cremation]%end;">
+      <li %if;(is_buried)%apply;getvar%with;ns[burial]%end;%elseif;(is_cremated)%apply;getvar%with;ns[cremation]%end;%end;>
         <span class="fa-li"><i class="fas fa-cross"></i></span>
         %if;is_buried;[*buried]s
           %if;has_burial_date; %on_burial_date;%end;
