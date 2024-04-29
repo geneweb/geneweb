@@ -1,14 +1,13 @@
-<!-- $Id: modules/arbres.txt v7.1 14/11/2023 20:50:05 $ -->
+<!-- $Id: modules/arbres.txt v7.1 29/04/2024 05:22:08 $ -->
 %(
 Options
-1: arbre vertical
-2: arbre horizontal (jusque 6 gen.)
-3: generation 2 et 3 avec photos
-4: 7 gen : 3 asc et 3 desc.
+1: arbre vertical ascendant
+2: arbre horizontal ascendant (jusque 6 gen.)
+3: mini-arbre parents/gd-parents avec photos
+4: arbre descendant
 %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
-%let;op_ph;%if;(op_m=1 or op_m=2 or op_m=8)1%else;0%end;%in;
-
+%let;op_ph;%if;(op_m=1 or op_m=2)1%else;0%end;%in;
 %if;(op_m=1)
   %include;modules/arbre_vertical
 %elseif;(op_m=2)
@@ -16,18 +15,6 @@ Options
 %elseif;(op_m=3)
   %include;modules/arbre_3gen_photo
 %elseif;(op_m=4)
-  %include;modules/arbre_7gen
-%elseif;(op_m=5)
-  %include;modules/arbre_famille
-%elseif;(op_m=6)
-  %include;modules/arbre_h6
-%elseif;(op_m=7)
-  %include;modules/arbre_8gen
-%elseif;(op_m=8)
-  %include;modules/arbre_hi_tools
-  %include;modules/arbre_hi_indexes
-  %include;modules/arbre_hi
-%elseif;(op_m=9)
   %include;modules/arbre_descendants
 %else;
 %end;
