@@ -12208,6 +12208,10 @@ sl: več kot %d zadetkov
 sv: fler än %d svar
 tr: %d cevaptan daha fazla
 
+    move union comments to notes
+en: transfer the historical “comments of union” input to the adjacent “marriage notes” one.
+fr: transférer le champ historique « commentaires d’union » vers celui des « notes de mariage » ci-contre.
+
     move up/down
 co: ricullà/falà/ricullà u cursore/falà u cursore
 de: nach oben/nach unten/Cursor nach oben/Cursor nach unten
