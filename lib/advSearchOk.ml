@@ -128,13 +128,14 @@ module AdvancedSearchMatch = struct
         | Some (Dtext _) | None -> false)
     | _ -> empty_default_value
 
+  let sex_cmp p = function
+    | "M" -> get_sex p = Male
+    | "F" -> get_sex p = Female
+    | _ -> true
+
   let match_sex p ~sex empty_default_value =
     let y = sex in
-    if y = "" then empty_default_value
-    else
-      (function
-        | "M" -> get_sex p = Male | "F" -> get_sex p = Female | _ -> true)
-        y
+    if y = "" then empty_default_value else sex_cmp p y
 
   let match_baptism_date p empty_default_value ~dates =
     match_date
