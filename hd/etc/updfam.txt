@@ -489,8 +489,13 @@
   %apply;date([*date/dates]0, "e_datexcnt", "event_date")
   <div class="row">
     <label for="e_notexcnt" class="col-sm-2 col-form-label">[*note/notes]1</label>
-    <div class="col-sm-10">
-      <textarea class="form-control" name="e_notexcnt" rows="1" id="e_notexcnt" placeholder="[*note/notes]1">%event.e_note;</textarea>
+    <div class="col-sm-10 d-inline-flex">
+      %if;(event.e_name="#marr" and event.e_note="" and comment!="" and not ("ADD" in e.m))
+        <button type="button" class="btn btn-warning transfer-btn font-weight-bold text-monospace"
+          title="[*move union comments to notes]">┎></button>
+      %end;
+      <textarea class="form-control" name="e_notexcnt" rows="1" id="e_notexcnt"
+        %if;(event.e_name="#marr") data-marr%end; placeholder="[*note/notes]1">%event.e_note;</textarea>
     </div>
   </div>
   <div class="row">
