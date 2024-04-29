@@ -209,13 +209,14 @@ module AdvancedSearchMatch = struct
       fun p ->
         eq (List.map Name.lower @@ Name.split_sname @@ sou base @@ get_surname p)
 
+  let married_cmp p = function
+    | "Y" -> get_family p <> [||]
+    | "N" -> get_family p = [||]
+    | _ -> true
+
   let match_married p ~married empty_default_value =
     let y = married in
-    if y = "" then empty_default_value
-    else
-      (function
-        | "Y" -> get_family p <> [||] | "N" -> get_family p = [||] | _ -> true)
-        y
+    if y = "" then empty_default_value else married_cmp p y
 
   let match_marriage ~exact_place ~conf ~base p y empty_default_value ~dates =
     let d1, d2 = dates in
