@@ -15,6 +15,9 @@ const modulesEtOptions = {
   gr_parents: ["standard", "three cols"],
   ligne: ["standard"],
   data_3col: ["standard"],
+  w: ["personnel"],
+  x: ["personnel"],
+  z: ["personnel"],
 };
 const imgPrfx = $('.img-prfx').attr('data-prfx');
 
