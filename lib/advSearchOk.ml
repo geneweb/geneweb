@@ -113,8 +113,8 @@ module AdvancedSearchMatch = struct
     apply_to_field_values_raw ~getss ~conf ~base p x get cmp empty_default_value
 
   (* Check if the date matches with the person event. *)
-  let match_date ~getd ~conf ~base p x df empty_default_value =
-    let d1, d2 = getd x in
+  let match_date ~conf ~base p df empty_default_value ~dates =
+    let d1, d2 = dates in
     authorized_age conf base p
     &&
     match (d1, d2) with
@@ -144,35 +144,35 @@ module AdvancedSearchMatch = struct
 
   let match_baptism_date ~getd ~gets ~search_type ~conf ~base p
       empty_default_value =
-    match_date ~getd ~conf ~base p
-      (Fields.bapt_date_field_name ~gets ~search_type)
+    match_date ~conf ~base p
       (fun () -> Date.od_of_cdate (get_baptism p))
       empty_default_value
+      ~dates:(getd @@ Fields.bapt_date_field_name ~gets ~search_type)
 
   let match_birth_date ~getd ~gets ~search_type ~conf ~base p
       empty_default_value =
-    match_date ~getd ~conf ~base p
-      (Fields.birth_date_field_name ~gets ~search_type)
+    match_date ~conf ~base p
       (fun () -> Date.od_of_cdate (get_birth p))
       empty_default_value
+      ~dates:(getd @@ Fields.birth_date_field_name ~gets ~search_type)
 
   let match_death_date ~getd ~gets ~search_type ~conf ~base p
       empty_default_value =
-    match_date ~getd ~conf ~base p
-      (Fields.death_date_field_name ~gets ~search_type)
+    match_date ~conf ~base p
       (fun () -> Date.date_of_death (get_death p))
       empty_default_value
+      ~dates:(getd @@ Fields.death_date_field_name ~gets ~search_type)
 
   let match_burial_date ~getd ~gets ~search_type ~conf ~base p
       empty_default_value =
-    match_date ~getd ~conf ~base p
-      (Fields.burial_date_field_name ~gets ~search_type)
+    match_date ~conf ~base p
       (fun () ->
         (* TODO Date.cdate_of_burial *)
         match get_burial p with
         | Buried cod | Cremated cod -> Date.od_of_cdate cod
         | UnknownBurial -> None)
       empty_default_value
+      ~dates:(getd @@ Fields.burial_date_field_name ~gets ~search_type)
 
   let cmp_place ~exact_place = if exact_place then ( = ) else string_incl
 
