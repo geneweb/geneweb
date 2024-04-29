@@ -95,6 +95,20 @@
    %end;
   <script>autosize(document.querySelectorAll('textarea'));</script>
 %end;
+%if;(e.m="MOD_FAM" or e.m="MOD_FAM_OK")
+<script>
+  $(document).ready(function() {
+    $('.transfer-btn').click(function() {
+      var commentContent = $('#notes_comments').val();
+      var mariageEvent = $('[data-marr]').attr('id');
+      $('#' + mariageEvent).val(commentContent);
+      $('#notes_comments').val('');
+      autosize.update($('#' + mariageEvent));
+      $(this).hide();
+    });
+  });
+</script>
+%end;
 %if;(e.templ="")
 <script><!-- focus on found autofocus input in opening BS modal -->
   $('.modal').on('shown.bs.modal', function() {
