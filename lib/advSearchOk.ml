@@ -97,13 +97,6 @@ module Fields = struct
 end
 
 module AdvancedSearchMatch = struct
-  (* Return empty_field_value if the field is empty. Apply function cmp to the field value. Also check the authorization. *)
-  let apply_to_field_value_raw ~gets ~conf ~base p x cmp empty_default_value =
-    let y = gets x in
-    if y = "" then empty_default_value
-    else if authorized_age conf base p then cmp y
-    else false
-
   let do_compare p y get cmp =
     let s = abbrev_lower @@ get p in
     List.exists (fun s' -> cmp (abbrev_lower s') s) y
@@ -141,10 +134,13 @@ module AdvancedSearchMatch = struct
     | _ -> empty_default_value
 
   let match_sex ~gets ~conf ~base p empty_default_value =
-    apply_to_field_value_raw ~gets ~conf ~base p "sex"
+    let y = gets "sex" in
+    if y = "" then empty_default_value
+    else if authorized_age conf base p then
       (function
         | "M" -> get_sex p = Male | "F" -> get_sex p = Female | _ -> true)
-      empty_default_value
+        y
+    else false
 
   let match_baptism_date ~getd ~gets ~search_type ~conf ~base p
       empty_default_value =
@@ -236,10 +232,13 @@ module AdvancedSearchMatch = struct
         eq (List.map Name.lower @@ Name.split_sname @@ sou base @@ get_surname p)
 
   let match_married ~gets ~conf ~base p empty_default_value =
-    apply_to_field_value_raw ~gets ~conf ~base p "married"
+    let y = gets "married" in
+    if y = "" then empty_default_value
+    else if authorized_age conf base p then
       (function
         | "Y" -> get_family p <> [||] | "N" -> get_family p = [||] | _ -> true)
-      empty_default_value
+        y
+    else false
 
   let match_marriage ~getd ~getss ~exact_place ~conf ~base p x y
       empty_default_value =
