@@ -294,6 +294,30 @@ module AdvancedSearchMatch = struct
     && (skip_sname || match_surname ~gets ~base ~sn_list p)
     && match_married ~gets ~conf ~base p true
     && match_occupation ~gets ~conf ~base p true
+
+  module And = struct
+    let match_and date_f place_f ~getd ~gets ~getss ~search_type ~conf
+        ~(base : Gwdb.base) ~p =
+      date_f ~getd ~gets ~search_type ~conf ~base p true
+      && place_f ~gets ~getss ~search_type ~conf ~base p true
+
+    let match_baptism = match_and match_baptism_date match_baptism_place
+    let match_birth = match_and match_birth_date match_birth_place
+    let match_burial = match_and match_burial_date match_burial_place
+    let match_death = match_and match_death_date match_death_place
+  end
+
+  module Or = struct
+    let match_or date_f place_f ~getd ~gets ~getss ~search_type ~conf
+        ~(base : Gwdb.base) ~p =
+      date_f ~getd ~gets ~search_type ~conf ~base p false
+      || place_f ~gets ~getss ~search_type ~conf ~base p false
+
+    let match_baptism = match_or match_baptism_date match_baptism_place
+    let match_birth = match_or match_birth_date match_birth_place
+    let match_burial = match_or match_burial_date match_burial_place
+    let match_death = match_or match_death_date match_death_place
+  end
 end
 
 (*
@@ -373,44 +397,27 @@ let advanced_search conf base max_answers =
     let pmatch =
       if search_type <> "OR" then
         civil_match
-        && match_baptism_date ~getd ~gets ~search_type ~conf ~base p true
-        && match_baptism_place ~gets ~getss ~search_type ~conf ~base p true
-        && match_birth_date ~getd ~gets ~search_type ~conf ~base p true
-        && match_birth_place ~gets ~getss ~search_type ~conf ~base p true
-        && match_burial_date ~getd ~gets ~search_type ~conf ~base p true
-        && match_burial_place ~gets ~getss ~search_type ~conf ~base p true
-        && match_death_date ~getd ~gets ~search_type ~conf ~base p true
-        && match_death_place ~gets ~getss ~search_type ~conf ~base p true
+        && And.match_baptism ~getd ~gets ~getss ~search_type ~conf ~base ~p
+        && And.match_birth ~getd ~gets ~getss ~search_type ~conf ~base ~p
+        && And.match_burial ~getd ~gets ~getss ~search_type ~conf ~base ~p
+        && And.match_death ~getd ~gets ~getss ~search_type ~conf ~base ~p
         && match_marriage ~getd ~gets ~getss ~conf ~base p
              (Fields.marriage_date_field_name ~gets ~search_type)
              (Fields.marriage_place_field_name ~gets ~search_type)
              true
       else
+        let match_f or_f and_f =
+          or_f ~getd ~gets ~getss ~search_type ~conf ~base ~p
+          && and_f ~getd ~gets ~getss ~search_type ~conf ~base ~p
+        in
         civil_match
         && (getss "place" = []
             && gets "date2_yyyy" = ""
             && gets "date1_yyyy" = ""
-           || (match_baptism_date ~getd ~gets ~search_type ~conf ~base p false
-              || match_baptism_place ~gets ~getss ~search_type ~conf ~base p
-                   false)
-              && match_baptism_date ~getd ~gets ~search_type ~conf ~base p true
-              && match_baptism_place ~gets ~getss ~search_type ~conf ~base p
-                   true
-           || (match_birth_date ~getd ~gets ~search_type ~conf ~base p false
-              || match_birth_place ~gets ~getss ~search_type ~conf ~base p false
-              )
-              && match_birth_date ~getd ~gets ~search_type ~conf ~base p true
-              && match_birth_place ~gets ~getss ~search_type ~conf ~base p true
-           || (match_burial_date ~getd ~gets ~search_type ~conf ~base p false
-              || match_burial_place ~gets ~getss ~search_type ~conf ~base p
-                   false)
-              && match_burial_date ~getd ~gets ~search_type ~conf ~base p true
-              && match_burial_place ~gets ~getss ~search_type ~conf ~base p true
-           || (match_death_date ~getd ~gets ~search_type ~conf ~base p false
-              || match_death_place ~gets ~getss ~search_type ~conf ~base p false
-              )
-              && match_death_date ~getd ~gets ~search_type ~conf ~base p true
-              && match_death_place ~gets ~getss ~search_type ~conf ~base p true
+           || match_f Or.match_baptism And.match_baptism
+           || match_f Or.match_birth And.match_birth
+           || match_f Or.match_burial And.match_burial
+           || match_f Or.match_death And.match_death
            || match_marriage ~getd ~gets ~getss ~conf ~base p
                 (Fields.marriage_date_field_name ~gets ~search_type)
                 (Fields.marriage_place_field_name ~gets ~search_type)
