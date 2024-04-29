@@ -102,8 +102,7 @@ module AdvancedSearchMatch = struct
     List.exists (fun s' -> cmp (abbrev_lower s') s) y
 
   let apply_to_field_values_raw p x get cmp empty_default_value =
-    let y = x in
-    if y = [] then empty_default_value else do_compare p y get cmp
+    if x = [] then empty_default_value else do_compare p x get cmp
 
   let apply_to_field_values ~base p x get cmp empty_default_value =
     let get p = sou base @@ get p in
@@ -134,8 +133,7 @@ module AdvancedSearchMatch = struct
     | _ -> true
 
   let match_sex p ~sex empty_default_value =
-    let y = sex in
-    if y = "" then empty_default_value else sex_cmp p y
+    if sex = "" then empty_default_value else sex_cmp p sex
 
   let match_baptism_date p empty_default_value ~dates =
     match_date
@@ -180,10 +178,10 @@ module AdvancedSearchMatch = struct
       (cmp_place ~exact_place) empty_default_value
 
   let match_occupation ~base p ~occupation empty_default_value =
-    let y = occupation in
-    if y = "" then empty_default_value
+    if occupation = "" then empty_default_value
     else
-      string_incl (abbrev_lower y) (abbrev_lower @@ sou base @@ get_occupation p)
+      string_incl (abbrev_lower occupation)
+        (abbrev_lower @@ sou base @@ get_occupation p)
 
   let match_name search_list exact : string list -> bool =
     let eq : string list -> string list -> bool =
@@ -215,8 +213,7 @@ module AdvancedSearchMatch = struct
     | _ -> true
 
   let match_married p ~married empty_default_value =
-    let y = married in
-    if y = "" then empty_default_value else married_cmp p y
+    if married = "" then empty_default_value else married_cmp p married
 
   let match_marriage ~exact_place ~conf ~base p y empty_default_value ~dates =
     let d1, d2 = dates in
