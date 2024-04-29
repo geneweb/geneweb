@@ -493,7 +493,7 @@ and eval_simple_variable conf = function
   | "nn" -> ""
   | "plugins" ->
       let l = List.map Filename.basename conf.plugins in
-      String.concat "," l
+      String.concat ", " l
   | "bname" -> conf.bname
   | "token" -> conf.cgi_passwd
   | "bname_token" -> String.concat "_" [ conf.bname; conf.cgi_passwd ]

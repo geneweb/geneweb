@@ -393,7 +393,7 @@ let treat_request =
     let plugins =
       match List.assoc_opt "plugins" conf.Config.base_env with
       | None -> []
-      | Some list -> String.split_on_char ',' list
+      | Some list -> String.split_on_char ',' list |> List.map String.trim
     in
     if List.mem "*" plugins then
       List.iter (fun (_ , fn) -> fn conf bfile) !GwdPlugin.se
