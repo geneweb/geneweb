@@ -104,13 +104,6 @@ module AdvancedSearchMatch = struct
     else if authorized_age conf base p then cmp y
     else false
 
-  let apply_to_field_value ~gets ~conf ~base p x get cmp empty_default_value =
-    let y = gets x in
-    if y = "" then empty_default_value
-    else if authorized_age conf base p then
-      cmp (abbrev_lower y) (abbrev_lower @@ sou base @@ get p)
-    else false
-
   let do_compare p y get cmp =
     let s = abbrev_lower @@ get p in
     List.exists (fun s' -> cmp (abbrev_lower s') s) y
@@ -212,8 +205,11 @@ module AdvancedSearchMatch = struct
       get_burial_place (cmp_place ~exact_place) empty_default_value
 
   let match_occupation ~gets ~conf ~base p empty_default_value =
-    apply_to_field_value ~gets ~conf ~base p "occu" get_occupation string_incl
-      empty_default_value
+    let y = gets "occu" in
+    if y = "" then empty_default_value
+    else if authorized_age conf base p then
+      string_incl (abbrev_lower y) (abbrev_lower @@ sou base @@ get_occupation p)
+    else false
 
   let match_name search_list exact : string list -> bool =
     let eq : string list -> string list -> bool =
