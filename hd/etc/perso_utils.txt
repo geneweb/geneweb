@@ -822,8 +822,24 @@
 %let;m14;%apply;nth_c%with;%p_mod;%and;%expr(28)%end;%in;
 %let;o14;%apply;nth_c%with;%p_mod;%and;%expr(29)%end;%in;
 
+%let;perso_module_a;arbres%in;
+%let;perso_module_c;chronologie%in;
+%let;perso_module_d;data_3col%in;
+%let;perso_module_f;fratrie%in;
+%let;perso_module_g;gr_parents%in;
+%let;perso_module_h;htrees%in;
+%let;perso_module_i;individu%in;
+%let;perso_module_l;ligne%in;
+%let;perso_module_n;notes%in;
+%let;perso_module_p;parents%in;
+%let;perso_module_r;relations%in;
+%let;perso_module_s;sources%in;
+%let;perso_module_u;unions%in;
+
+%let;abc;acdfghilnprsu%in;
+%( compute nbr of entries in p_mod %)
 %reset_count;
-%for;i;0;15;
+%for;i;0;14;
   %let;mnb;%apply;mm(i)%in;
   %if;(mnb!="")%incr_count;%end;
 %end;
@@ -833,22 +849,25 @@
   %include.tpl
 %end;
 
+%( get include module with option optx %)
 %define;get_mod(modnum, optx)
-  %let;modx;modules/%b.perso_module_modnum;%in;
-  %let;op_m;optx%in;
-  %apply;show_templ(modx)
-%end;
-
-%define;test_templ(ix)
-  %if;(b.module_perso_ix="timeline")%incr_count;%end;
-%end;
-
-%reset_count;
-%if;(p_mod!="" and p_mod!="zz")
-  %for;i;0;26;
-    %apply;test_templ%with;%apply;letter(i)%end;
+  %if;("modnum" in abc)
+    %let;modx;modules/%perso_module_modnum;%in;
+    %let;op_m;optx%in;
+    %apply;show_templ(modx)
+  %else;
+    %let;modx;modules/%b.perso_module_modnum;%in;
+    %let;op_m;1%in;
+    %apply;show_templ(modx)
   %end;
 %end;
+
+%( on veut tester présence de chronologie dans p_mod %)
+%reset_count;
+%if;(p_mod!="")
+  %if;("c" in p_mod)%incr_count;%end;
+%end;
+%if;(p_mod="zz")%incr_count;%end;
 %let;timeline;%if;(count>0)yes%else;no%end;%in;
 
 %define;rm(ccc,ttt)
