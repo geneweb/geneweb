@@ -185,31 +185,31 @@ module AdvancedSearchMatch = struct
         | UnknownBurial -> None)
       empty_default_value
 
-  let cmp_place ~gets = if "on" = gets "exact_place" then ( = ) else string_incl
+  let cmp_place ~exact_place = if exact_place then ( = ) else string_incl
 
-  let match_baptism_place ~gets ~getss ~search_type ~conf ~base p
+  let match_baptism_place ~gets ~getss ~search_type ~conf ~exact_place ~base p
       empty_default_value =
     apply_to_field_values ~getss ~conf ~base p
       (Fields.bapt_place_field_name ~gets ~search_type)
-      get_baptism_place (cmp_place ~gets) empty_default_value
+      get_baptism_place (cmp_place ~exact_place) empty_default_value
 
-  let match_birth_place ~gets ~getss ~search_type ~conf ~base p
+  let match_birth_place ~gets ~getss ~search_type ~conf ~exact_place ~base p
       empty_default_value =
     apply_to_field_values ~getss ~conf ~base p
       (Fields.birth_place_field_name ~gets ~search_type)
-      get_birth_place (cmp_place ~gets) empty_default_value
+      get_birth_place (cmp_place ~exact_place) empty_default_value
 
-  let match_death_place ~gets ~getss ~search_type ~conf ~base p
+  let match_death_place ~gets ~getss ~search_type ~conf ~exact_place ~base p
       empty_default_value =
     apply_to_field_values ~getss ~conf ~base p
       (Fields.death_place_field_name ~gets ~search_type)
-      get_death_place (cmp_place ~gets) empty_default_value
+      get_death_place (cmp_place ~exact_place) empty_default_value
 
-  let match_burial_place ~gets ~getss ~search_type ~conf ~base p
+  let match_burial_place ~gets ~getss ~search_type ~conf ~exact_place ~base p
       empty_default_value =
     apply_to_field_values ~getss ~conf ~base p
       (Fields.burial_place_field_name ~gets ~search_type)
-      get_burial_place (cmp_place ~gets) empty_default_value
+      get_burial_place (cmp_place ~exact_place) empty_default_value
 
   let match_occupation ~gets ~conf ~base p empty_default_value =
     apply_to_field_value ~gets ~conf ~base p "occu" get_occupation string_incl
@@ -245,7 +245,8 @@ module AdvancedSearchMatch = struct
         | "Y" -> get_family p <> [||] | "N" -> get_family p = [||] | _ -> true)
       empty_default_value
 
-  let match_marriage ~getd ~gets ~getss ~conf ~base p x y empty_default_value =
+  let match_marriage ~getd ~getss ~exact_place ~conf ~base p x y
+      empty_default_value =
     let d1, d2 = getd x in
     let y = getss y in
     let test_date_place df =
@@ -258,7 +259,7 @@ module AdvancedSearchMatch = struct
             && (y = []
                || do_compare fam y
                     (fun f -> sou base @@ get_marriage_place f)
-                    (cmp_place ~gets))
+                    (cmp_place ~exact_place))
           else false)
         (get_family p)
     in
@@ -297,9 +298,9 @@ module AdvancedSearchMatch = struct
 
   module And = struct
     let match_and date_f place_f ~getd ~gets ~getss ~search_type ~conf
-        ~(base : Gwdb.base) ~p =
+        ~(base : Gwdb.base) ~p ~(exact_place : bool) =
       date_f ~getd ~gets ~search_type ~conf ~base p true
-      && place_f ~gets ~getss ~search_type ~conf ~base p true
+      && place_f ~gets ~getss ~search_type ~conf ~exact_place ~base p true
 
     let match_baptism = match_and match_baptism_date match_baptism_place
     let match_birth = match_and match_birth_date match_birth_place
@@ -309,9 +310,9 @@ module AdvancedSearchMatch = struct
 
   module Or = struct
     let match_or date_f place_f ~getd ~gets ~getss ~search_type ~conf
-        ~(base : Gwdb.base) ~p =
+        ~(base : Gwdb.base) ~p ~(exact_place : bool) =
       date_f ~getd ~gets ~search_type ~conf ~base p false
-      || place_f ~gets ~getss ~search_type ~conf ~base p false
+      || place_f ~gets ~getss ~search_type ~conf ~exact_place ~base p false
 
     let match_baptism = match_or match_baptism_date match_baptism_place
     let match_birth = match_or match_birth_date match_birth_place
@@ -388,6 +389,9 @@ let advanced_search conf base max_answers =
   in
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
+
+  let exact_place = "on" = gets "exact_place" in
+
   let match_person ?(skip_fname = false) ?(skip_sname = false)
       ((list, len) as acc) p search_type =
     let civil_match =
@@ -398,17 +402,21 @@ let advanced_search conf base max_answers =
       if search_type <> "OR" then
         civil_match
         && And.match_baptism ~getd ~gets ~getss ~search_type ~conf ~base ~p
+             ~exact_place
         && And.match_birth ~getd ~gets ~getss ~search_type ~conf ~base ~p
+             ~exact_place
         && And.match_burial ~getd ~gets ~getss ~search_type ~conf ~base ~p
+             ~exact_place
         && And.match_death ~getd ~gets ~getss ~search_type ~conf ~base ~p
-        && match_marriage ~getd ~gets ~getss ~conf ~base p
+             ~exact_place
+        && match_marriage ~getd ~getss ~conf ~base p ~exact_place
              (Fields.marriage_date_field_name ~gets ~search_type)
              (Fields.marriage_place_field_name ~gets ~search_type)
              true
       else
         let match_f or_f and_f =
-          or_f ~getd ~gets ~getss ~search_type ~conf ~base ~p
-          && and_f ~getd ~gets ~getss ~search_type ~conf ~base ~p
+          or_f ~getd ~gets ~getss ~search_type ~conf ~base ~p ~exact_place
+          && and_f ~getd ~gets ~getss ~search_type ~conf ~base ~p ~exact_place
         in
         civil_match
         && (getss "place" = []
@@ -418,7 +426,7 @@ let advanced_search conf base max_answers =
            || match_f Or.match_birth And.match_birth
            || match_f Or.match_burial And.match_burial
            || match_f Or.match_death And.match_death
-           || match_marriage ~getd ~gets ~getss ~conf ~base p
+           || match_marriage ~getd ~getss ~conf ~base p ~exact_place
                 (Fields.marriage_date_field_name ~gets ~search_type)
                 (Fields.marriage_place_field_name ~gets ~search_type)
                 false)
