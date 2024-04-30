@@ -208,7 +208,7 @@ module AdvancedSearchMatch = struct
   let match_married ~p ~married =
     if married = "" then true else married_cmp p married
 
-  let match_marriage ~exact_place ~conf ~base ~p ~values ~default ~dates =
+  let match_marriage ~cmp ~conf ~base ~p ~values ~default ~dates =
     let d1, d2 = dates in
     let test_date_place df =
       Array.exists
@@ -220,7 +220,7 @@ module AdvancedSearchMatch = struct
             && (values = []
                || do_compare fam values
                     (fun f -> sou base @@ get_marriage_place f)
-                    (cmp_place ~exact_place))
+                    cmp)
           else false)
         (get_family p)
     in
@@ -246,6 +246,8 @@ module AdvancedSearchMatch = struct
                 if Date.compare_date d d2 > 0 then false else true
             | _ -> false)
     | _ -> if values = [] then default else test_date_place (fun _ -> true)
+
+  let match_marriage ~exact_place = match_marriage ~cmp:(cmp_place ~exact_place)
 
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~base ~sex ~married ~occupation ~first_name_list
