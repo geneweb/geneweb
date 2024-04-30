@@ -174,7 +174,7 @@ end = struct
     let dfile = D.data_file base in
     let dfile_tmp = D.tmp_file dfile in
     if Sys.file_exists dfile_tmp then
-      failwith "Error while writing data file : temporary file remained";
+      failwith "Error while writing data file: temporary file remained";
 
     let oc = Secure.open_out dfile_tmp in
 
