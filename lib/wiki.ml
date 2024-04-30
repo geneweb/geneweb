@@ -108,17 +108,20 @@ let str_start_with str i x =
   in
   loop i 0
 
-type wiki_info = {
-  wi_mode : string;
-  wi_file_path : string -> string;
-  wi_person_exists : string * string * int -> bool * string * string;
-  wi_always_show_link : bool;
-}
-
 let escape (s : string) = (Util.escape_html s : Adef.escaped_string :> string)
 let encode (s : string) = (Mutil.encode s : Adef.encoded_string :> string)
 
+type wiki_info = {
+  wi_mode : string;
+  wi_file_path : string -> string;
+  wi_person_exists : string * string * int -> bool;
+  wi_mark_if_not_public : string * string * int -> bool;
+  wi_always_show_link : bool;
+}
+
 let syntax_links conf wi s =
+  let cancel_links = Util.p_getenv conf.env "cgl" = Some "on" in
+
   let slen = String.length s in
   let rec loop quot_lev pos i len =
     let len, quot_lev =
@@ -207,30 +210,41 @@ let syntax_links conf wi s =
               (encode wi.wi_mode) (encode fname) anchor c text
           in
           loop quot_lev pos j (Buff.mstore len t)
-      | NotesLinks.WLperson (j, (fn, sn, oc), name, _text) ->
-          let exists, fn0, sn0 = wi.wi_person_exists (fn, sn, oc) in
+      | NotesLinks.WLperson (j, (fn, sn, oc), name, _) ->
           let name =
-            match name with None -> fn0 ^ " " ^ sn0 | Some name -> name
+            if wi.wi_person_exists (fn, sn, oc) || conf.friend || conf.wizard
+            then Option.value ~default:"?" name
+            else "x x"
           in
+          let color = " style=\"color:red\"" in
+          let color1 =
+            if wi.wi_mark_if_not_public (fn, sn, oc) then "style=\"color:red\""
+            else ""
+          in
+          Printf.eprintf "color: %s, %s;\n" color color1;
           let t =
-            if exists then
-              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\">%s</a>" pos
-                (commd conf :> string)
-                (encode fn) (encode sn)
-                (if oc = 0 then "" else "&oc=" ^ string_of_int oc)
-                name
-            else if wi.wi_always_show_link then
-              let s = " style=\"color:red\"" in
-              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s&n=%s%s\"%s>%s</a>"
+            if cancel_links || name = "x x" then name
+            else if wi.wi_person_exists (fn, sn, oc) then
+              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\" %s>%s</a>"
                 pos
                 (commd conf :> string)
-                (encode fn) (encode sn)
-                (if oc = 0 then "" else "&oc=" ^ string_of_int oc)
-                s name
-            else
-              Printf.sprintf "<a href=\"%s\" style=\"color:red\">%s</a>"
+                (Mutil.encode fn :> string)
+                (Mutil.encode sn :> string)
+                (if oc = 0 then "" else ";oc=" ^ string_of_int oc)
+                color1 name
+            else if wi.wi_always_show_link then
+              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\"%s>%s</a>"
+                pos
                 (commd conf :> string)
-                (if conf.hide_names then "x x" else escape name)
+                (Mutil.encode fn :> string)
+                (Mutil.encode sn :> string)
+                (if oc = 0 then "" else ";oc=" ^ string_of_int oc)
+                color name
+            else
+              Printf.sprintf "<a href=\"%s\" %s>%s</a>"
+                (commd conf :> string)
+                color
+                (if conf.hide_names then "x x" else name)
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLwizard (j, wiz, name) ->

@@ -59,6 +59,9 @@ val output_error :
     Also send [headers] and use [content] (typically a HTML string describing the error) if provided.
 *)
 
+val is_semi_public : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
+(** Check if a person is an asc or desc of conf.userkey *)
+
 val p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
 (** Check if a person should be displayed or not *)
 
@@ -116,18 +119,26 @@ module Legacy : sig
 
   val bpath : string -> string
   (** [Filename.concat (Secure.base_dir ())] *)
+end
 
-  val output_error :
-    ?headers:string list ->
-    ?content:Adef.safe_string ->
-    Config.config ->
-    Def.httpStatus ->
-    unit
-  (** If [?content] is not set, sends page content from [/etc/<status-code>-<lang>.html].
+val output_error :
+  (?headers:string list ->
+  ?content:Adef.safe_string ->
+  Config.config ->
+  Def.httpStatus ->
+  unit)
+  ref
+(** If [?content] is not set, sends page content from [/etc/<status-code>-<lang>.html].
       If the current lang is not available, use `en` *)
 
-  val p_auth : Config.config -> Gwdb.base -> Gwdb.person -> bool
-  (** Calculate the access rights to the person's information in
+val is_semi_public : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
+(** determines if the person is a descendant or an ancestor of conf.userkey
+      conf.userkey is the person visiting the base
+      the search for asc or desc is limited to 4 generations
+  *)
+
+val p_auth : (Config.config -> Gwdb.base -> Gwdb.person -> bool) ref
+(** Calculate the access rights to the person's information in
       according to his age.
       Returns (in the order of the tests) :
       - `true` if requester is wizard or friend or person is public
@@ -146,9 +157,9 @@ module Legacy : sig
       - `false` otherwise
   *)
 
-  val syslog : syslog_level -> string -> unit
-  (** Prints on stderr using `"[date]: level message"` format. *)
+val syslog : (syslog_level -> string -> unit) ref
+(** Prints on stderr using `"[date]: level message"` format. *)
 
-  val wrap_output : Config.config -> Adef.safe_string -> (unit -> unit) -> unit
-  (** Display in a very basic HTML doc, with no CSS or JavaScript. *)
-end
+val wrap_output :
+  (Config.config -> Adef.safe_string -> (unit -> unit) -> unit) ref
+(** Display in a very basic HTML doc, with no CSS or JavaScript. *)

@@ -10,6 +10,13 @@ let magic_gwo = "GnWo000o"
 (* si la clé est incomplète, on l'enregistre tout de même.  *)
 let create_all_keys = ref false
 
+(** Fonctionnement RGPD *)
+let rgpd_files = ref "None"
+
+let rgpd = ref false
+let verbose_friends = ref false
+let semi_pub_cnt = ref 0
+
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
 (** Key to refer a person's definition *)
 
@@ -523,6 +530,45 @@ let get_access l =
   | "#semipub" :: l' -> (SemiPublic, l')
   | _ -> (IfTitles, l)
 
+(* copied from Some *)
+let name_unaccent_lower s =
+  let rec copy i len =
+    if i = String.length s then Buff.get len
+    else
+      let t, j = Name.unaccent_utf_8 true s i in
+      copy j (Buff.mstore len t)
+  in
+  copy 0 0
+
+(** test presence of a file fn.occ.sn.pdf in rgpd_files *)
+let rgpd_access fn sn occ l =
+  let access, l = get_access l in
+  let fns = name_unaccent_lower fn in
+  let sns = name_unaccent_lower sn in
+  let ocs = string_of_int occ in
+  let frs = if access = SemiPublic then "SemiPublic" else "Other" in
+  let access, l =
+    let rgpd_file = Filename.concat !rgpd_files (fns ^ "." ^ ocs ^ "." ^ sns) in
+    let _ =
+      if String.contains sn '%' then
+        Printf.eprintf "Bad encoding for RGPD filename: %s\n" rgpd_file
+      else ()
+    in
+    (* if Public, stay Public *)
+    if access = Public then (Public, l)
+      (* if the files exist, set the Friend or Friend_m value *)
+    else if Sys.file_exists (rgpd_file ^ ".pdf") then (SemiPublic, l)
+      (* if not and person was SemiPublic, then it becomes Private *)
+    else if access = SemiPublic then (Private, l)
+      (* otherwise keep the current value *)
+    else (access, l)
+  in
+  if access = SemiPublic then (
+    incr semi_pub_cnt;
+    if !verbose_friends then
+      Printf.printf "Set to %s %s.%s %s\n" frs fns ocs sns);
+  (access, l)
+
 (** Create [gen_title] from string *)
 let scan_title t =
   let next_field i =
@@ -785,7 +831,7 @@ let set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   let qualifiers, l = get_qualifiers str l in
   let aliases, l = get_aliases str l in
   let titles, l = get_titles str l in
-  let access, l = get_access l in
+  let access, l = if !rgpd then rgpd_access fn sn occ l else get_access l in
   let occupation, l = get_occu l in
   let psources, l = get_sources l in
   let naissance, l = get_optional_birthdate l in
