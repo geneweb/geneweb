@@ -544,6 +544,7 @@ let wiki_aux pp conf base env str =
       Wiki.wi_mode = "NOTES";
       Wiki.wi_file_path = file_path conf base;
       Wiki.wi_person_exists = Util.person_exists conf base;
+      Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
       Wiki.wi_always_show_link = conf.wizard || conf.friend;
     }
   in
