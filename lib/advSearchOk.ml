@@ -109,20 +109,20 @@ module AdvancedSearchMatch = struct
     apply_to_field_values_raw ~p ~values ~get ~cmp ~default
 
   (* Check if the date matches with the person event. *)
-  let match_date ~df ~default ~dates =
+  let match_date ~p ~df ~default ~dates =
     let d1, d2 = dates in
     match (d1, d2) with
     | Some (Date.Dgreg (d1, _)), Some (Date.Dgreg (d2, _)) -> (
-        match df () with
+        match df p with
         | Some (Date.Dgreg (d, _)) ->
             Date.compare_dmy d d1 >= 0 && Date.compare_dmy d d2 <= 0
         | Some (Dtext _) | None -> false)
     | Some (Dgreg (d1, _)), _ -> (
-        match df () with
+        match df p with
         | Some (Dgreg (d, _)) -> Date.compare_dmy d d1 >= 0
         | Some (Dtext _) | None -> false)
     | _, Some (Dgreg (d2, _)) -> (
-        match df () with
+        match df p with
         | Some (Dgreg (d, _)) -> Date.compare_dmy d d2 <= 0
         | Some (Dtext _) | None -> false)
     | _ -> default
@@ -135,17 +135,21 @@ module AdvancedSearchMatch = struct
   let match_sex ~p ~sex = if sex = "" then true else sex_cmp p sex
 
   let match_baptism_date ~p ~default ~dates =
-    match_date ~df:(fun () -> Date.od_of_cdate (get_baptism p)) ~default ~dates
+    match_date ~p
+      ~df:(fun p -> Date.od_of_cdate (get_baptism p))
+      ~default ~dates
 
   let match_birth_date ~p ~default ~dates =
-    match_date ~df:(fun () -> Date.od_of_cdate (get_birth p)) ~default ~dates
+    match_date ~p ~df:(fun p -> Date.od_of_cdate (get_birth p)) ~default ~dates
 
   let match_death_date ~p ~default ~dates =
-    match_date ~df:(fun () -> Date.date_of_death (get_death p)) ~default ~dates
+    match_date ~p
+      ~df:(fun p -> Date.date_of_death (get_death p))
+      ~default ~dates
 
   let match_burial_date ~p ~default ~dates =
-    match_date
-      ~df:(fun () ->
+    match_date ~p
+      ~df:(fun p ->
         (* TODO Date.cdate_of_burial *)
         match get_burial p with
         | Buried cod | Cremated cod -> Date.od_of_cdate cod
