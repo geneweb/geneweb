@@ -101,15 +101,15 @@ module AdvancedSearchMatch = struct
     let s = abbrev_lower @@ get p in
     List.exists (fun s' -> cmp (abbrev_lower s') s) y
 
-  let apply_to_field_values_raw p values get cmp default =
+  let apply_to_field_values_raw ~p ~values ~get ~cmp ~default =
     if values = [] then default else do_compare p values get cmp
 
-  let apply_to_field_values ~base p values get cmp default =
+  let apply_to_field_values ~base ~p ~values ~get ~cmp ~default =
     let get p = sou base @@ get p in
-    apply_to_field_values_raw p values get cmp default
+    apply_to_field_values_raw ~p ~values ~get ~cmp ~default
 
   (* Check if the date matches with the person event. *)
-  let match_date df default ~dates =
+  let match_date ~df ~default ~dates =
     let d1, d2 = dates in
     match (d1, d2) with
     | Some (Date.Dgreg (d1, _)), Some (Date.Dgreg (d2, _)) -> (
@@ -132,52 +132,52 @@ module AdvancedSearchMatch = struct
     | "F" -> get_sex p = Female
     | _ -> true
 
-  let match_sex p ~sex empty_default_value =
+  let match_sex ~p ~sex empty_default_value =
     if sex = "" then empty_default_value else sex_cmp p sex
 
-  let match_baptism_date p default ~dates =
-    match_date (fun () -> Date.od_of_cdate (get_baptism p)) default ~dates
+  let match_baptism_date ~p ~default ~dates =
+    match_date ~df:(fun () -> Date.od_of_cdate (get_baptism p)) ~default ~dates
 
-  let match_birth_date p default ~dates =
-    match_date (fun () -> Date.od_of_cdate (get_birth p)) default ~dates
+  let match_birth_date ~p ~default ~dates =
+    match_date ~df:(fun () -> Date.od_of_cdate (get_birth p)) ~default ~dates
 
-  let match_death_date p default ~dates =
-    match_date (fun () -> Date.date_of_death (get_death p)) default ~dates
+  let match_death_date ~p ~default ~dates =
+    match_date ~df:(fun () -> Date.date_of_death (get_death p)) ~default ~dates
 
-  let match_burial_date p default ~dates =
+  let match_burial_date ~p ~default ~dates =
     match_date
-      (fun () ->
+      ~df:(fun () ->
         (* TODO Date.cdate_of_burial *)
         match get_burial p with
         | Buried cod | Cremated cod -> Date.od_of_cdate cod
         | UnknownBurial -> None)
-      default ~dates
+      ~default ~dates
 
   let cmp_place ~exact_place = if exact_place then ( = ) else string_incl
 
-  let match_baptism_place ~exact_place ~base p ~values default =
-    apply_to_field_values ~base p values get_baptism_place
-      (cmp_place ~exact_place) default
+  let match_baptism_place ~exact_place ~base ~p ~values ~default =
+    apply_to_field_values ~base ~p ~values ~get:get_baptism_place
+      ~cmp:(cmp_place ~exact_place) ~default
 
-  let match_birth_place ~exact_place ~base p ~values default =
-    apply_to_field_values ~base p values get_birth_place
-      (cmp_place ~exact_place) default
+  let match_birth_place ~exact_place ~base ~p ~values ~default =
+    apply_to_field_values ~base ~p ~values ~get:get_birth_place
+      ~cmp:(cmp_place ~exact_place) ~default
 
-  let match_death_place ~exact_place ~base p ~values default =
-    apply_to_field_values ~base p values get_death_place
-      (cmp_place ~exact_place) default
+  let match_death_place ~exact_place ~base ~p ~values ~default =
+    apply_to_field_values ~base ~p ~values ~get:get_death_place
+      ~cmp:(cmp_place ~exact_place) ~default
 
-  let match_burial_place ~exact_place ~base p ~values default =
-    apply_to_field_values ~base p values get_burial_place
-      (cmp_place ~exact_place) default
+  let match_burial_place ~exact_place ~base ~p ~values ~default =
+    apply_to_field_values ~base ~p ~values ~get:get_burial_place
+      ~cmp:(cmp_place ~exact_place) ~default
 
-  let match_occupation ~base p ~occupation empty_default_value =
-    if occupation = "" then empty_default_value
+  let match_occupation ~base ~p ~occupation default =
+    if occupation = "" then default
     else
       string_incl (abbrev_lower occupation)
         (abbrev_lower @@ sou base @@ get_occupation p)
 
-  let match_name search_list exact : string list -> bool =
+  let match_name ~search_list ~exact : string list -> bool =
     let eq : string list -> string list -> bool =
       if exact then fun x search ->
         List.sort compare search = List.sort compare x
@@ -188,7 +188,7 @@ module AdvancedSearchMatch = struct
   let match_first_name ~base ~first_name_list ~exact =
     if first_name_list = [] then fun _ -> true
     else
-      let eq = match_name first_name_list exact in
+      let eq = match_name ~search_list:first_name_list ~exact in
       fun p ->
         eq
           (List.map Name.lower @@ Name.split_fname @@ sou base
@@ -197,7 +197,7 @@ module AdvancedSearchMatch = struct
   let match_surname ~base ~surname_list ~exact =
     if surname_list = [] then fun _ -> true
     else
-      let eq = match_name surname_list exact in
+      let eq = match_name ~search_list:surname_list ~exact in
       fun p ->
         eq (List.map Name.lower @@ Name.split_sname @@ sou base @@ get_surname p)
 
@@ -206,10 +206,10 @@ module AdvancedSearchMatch = struct
     | "N" -> get_family p = [||]
     | _ -> true
 
-  let match_married p ~married empty_default_value =
+  let match_married ~p ~married empty_default_value =
     if married = "" then empty_default_value else married_cmp p married
 
-  let match_marriage ~exact_place ~conf ~base p values default ~dates =
+  let match_marriage ~exact_place ~conf ~base ~p ~values ~default ~dates =
     let d1, d2 = dates in
     let test_date_place df =
       Array.exists
@@ -250,18 +250,20 @@ module AdvancedSearchMatch = struct
 
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~base ~sex ~married ~occupation ~first_name_list
-      ~surname_list ~skip_fname ~skip_sname ~exact_first_name ~exact_surname p =
-    match_sex p ~sex true
+      ~surname_list ~skip_fname ~skip_sname ~exact_first_name ~exact_surname ~p
+      =
+    match_sex ~p ~sex true
     && (skip_fname
        || match_first_name ~base ~first_name_list ~exact:exact_first_name p)
     && (skip_sname || match_surname ~base ~surname_list ~exact:exact_surname p)
-    && match_married p ~married true
-    && match_occupation ~base p ~occupation true
+    && match_married ~p ~married true
+    && match_occupation ~base ~p ~occupation true
 
   module And = struct
     let match_and date_f place_f ~(base : Gwdb.base) ~p ~dates
         ~(places : string list) ~(exact_place : bool) =
-      date_f p true ~dates && place_f ~exact_place ~base p ~values:places true
+      date_f ~p ~default:true ~dates
+      && place_f ~exact_place ~base ~p ~values:places ~default:true
 
     let match_baptism = match_and match_baptism_date match_baptism_place
     let match_birth = match_and match_birth_date match_birth_place
@@ -272,7 +274,8 @@ module AdvancedSearchMatch = struct
   module Or = struct
     let match_or date_f place_f ~(base : Gwdb.base) ~p ~dates
         ~(places : string list) ~(exact_place : bool) =
-      date_f p false ~dates || place_f ~exact_place ~base p ~values:places false
+      date_f ~p ~default:false ~dates
+      || place_f ~exact_place ~base ~p ~values:places ~default:false
 
     let match_baptism = match_or match_baptism_date match_baptism_place
     let match_birth = match_or match_birth_date match_birth_place
@@ -362,7 +365,7 @@ let advanced_search conf base max_answers =
            ~surname_list:sn_list ~skip_fname ~skip_sname
            ~exact_first_name:(gets "exact_first_name" = "on")
            ~exact_surname:(gets "exact_surname" = "on")
-           p)
+           ~p)
     in
     let pmatch =
       if not auth then false
@@ -380,10 +383,11 @@ let advanced_search conf base max_answers =
         && And.match_death ~base ~p ~exact_place
              ~dates:(getd @@ Fields.death_date_field_name ~gets ~search_type)
              ~places:(getss @@ Fields.death_place_field_name ~gets ~search_type)
-        && match_marriage ~conf ~base p ~exact_place
+        && match_marriage ~conf ~base ~p ~exact_place
              ~dates:(getd @@ Fields.marriage_date_field_name ~gets ~search_type)
-             (getss @@ Fields.marriage_place_field_name ~gets ~search_type)
-             true
+             ~values:
+               (getss @@ Fields.marriage_place_field_name ~gets ~search_type)
+             ~default:true
       else
         let match_f ~date_field ~place_field or_f and_f =
           or_f ~base ~p
@@ -411,11 +415,12 @@ let advanced_search conf base max_answers =
            || match_f ~date_field:Fields.death_date_field_name
                 ~place_field:Fields.death_place_field_name Or.match_death
                 And.match_death
-           || match_marriage ~conf ~base p ~exact_place
+           || match_marriage ~conf ~base ~p ~exact_place
                 ~dates:
                   (getd @@ Fields.marriage_date_field_name ~gets ~search_type)
-                (getss @@ Fields.marriage_place_field_name ~gets ~search_type)
-                false)
+                ~values:
+                  (getss @@ Fields.marriage_place_field_name ~gets ~search_type)
+                ~default:false)
     in
     if pmatch then (p :: list, len + 1) else acc
   in
@@ -444,7 +449,7 @@ let advanced_search conf base max_answers =
       let list_aux strings_of persons_of split n_list exact =
         List.map
           (List.map (fun x ->
-               let eq = match_name n_list exact in
+               let eq = match_name ~search_list:n_list ~exact in
                let istrs = strings_of base x in
                List.fold_left
                  (fun acc istr ->
