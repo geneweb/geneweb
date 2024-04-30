@@ -9818,7 +9818,7 @@ sv: om titlar
 tr: eğer başlıklar
 
     iftitles/public/semipublic/private
-co: s’è tituli/publicu/semipublicu/privatu
+co: s’è tituli/publicu/semi-public/privatu
 de: Adelstitel/öffentlich/half-public/privat
 en: if titles/public/half-public/private
 es: si hay títulos/público/half-public/privado
