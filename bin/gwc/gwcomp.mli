@@ -3,6 +3,13 @@
 open Def
 open Gwdb
 
+val rgpd_files : string ref
+(** Fonctionnement RGPD *)
+
+val rgpd : bool ref
+val verbose_friends : bool ref
+val semi_pub_cnt : int ref
+
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int }
 (** Key to refer a person's definition *)
 
