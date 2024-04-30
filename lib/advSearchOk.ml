@@ -152,23 +152,25 @@ module AdvancedSearchMatch = struct
         | UnknownBurial -> None)
       ~default ~dates
 
-  let cmp_place ~exact_place = if exact_place then ( = ) else string_incl
+  let exact_place_wrapper f ~exact_place =
+    let cmp = if exact_place then ( = ) else string_incl in
+    f ~cmp
 
   let match_baptism_place ~exact_place ~base ~p ~values ~default =
-    apply_to_field_values ~base ~p ~values ~get:get_baptism_place
-      ~cmp:(cmp_place ~exact_place) ~default
+    exact_place_wrapper ~exact_place
+    @@ apply_to_field_values ~base ~p ~values ~get:get_baptism_place ~default
 
   let match_birth_place ~exact_place ~base ~p ~values ~default =
-    apply_to_field_values ~base ~p ~values ~get:get_birth_place
-      ~cmp:(cmp_place ~exact_place) ~default
+    exact_place_wrapper ~exact_place
+    @@ apply_to_field_values ~base ~p ~values ~get:get_birth_place ~default
 
   let match_death_place ~exact_place ~base ~p ~values ~default =
-    apply_to_field_values ~base ~p ~values ~get:get_death_place
-      ~cmp:(cmp_place ~exact_place) ~default
+    exact_place_wrapper ~exact_place
+    @@ apply_to_field_values ~base ~p ~values ~get:get_death_place ~default
 
   let match_burial_place ~exact_place ~base ~p ~values ~default =
-    apply_to_field_values ~base ~p ~values ~get:get_burial_place
-      ~cmp:(cmp_place ~exact_place) ~default
+    exact_place_wrapper ~exact_place
+    @@ apply_to_field_values ~base ~p ~values ~get:get_burial_place ~default
 
   let match_occupation ~base ~p ~occupation =
     if occupation = "" then true
@@ -247,7 +249,7 @@ module AdvancedSearchMatch = struct
             | _ -> false)
     | _ -> if values = [] then default else test_date_place (fun _ -> true)
 
-  let match_marriage ~exact_place = match_marriage ~cmp:(cmp_place ~exact_place)
+  let match_marriage = exact_place_wrapper match_marriage
 
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~base ~sex ~married ~occupation ~first_name_list
