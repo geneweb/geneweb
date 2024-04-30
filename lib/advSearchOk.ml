@@ -132,8 +132,7 @@ module AdvancedSearchMatch = struct
     | "F" -> get_sex p = Female
     | _ -> true
 
-  let match_sex ~p ~sex empty_default_value =
-    if sex = "" then empty_default_value else sex_cmp p sex
+  let match_sex ~p ~sex = if sex = "" then true else sex_cmp p sex
 
   let match_baptism_date ~p ~default ~dates =
     match_date ~df:(fun () -> Date.od_of_cdate (get_baptism p)) ~default ~dates
@@ -171,8 +170,8 @@ module AdvancedSearchMatch = struct
     apply_to_field_values ~base ~p ~values ~get:get_burial_place
       ~cmp:(cmp_place ~exact_place) ~default
 
-  let match_occupation ~base ~p ~occupation default =
-    if occupation = "" then default
+  let match_occupation ~base ~p ~occupation =
+    if occupation = "" then true
     else
       string_incl (abbrev_lower occupation)
         (abbrev_lower @@ sou base @@ get_occupation p)
@@ -206,8 +205,8 @@ module AdvancedSearchMatch = struct
     | "N" -> get_family p = [||]
     | _ -> true
 
-  let match_married ~p ~married empty_default_value =
-    if married = "" then empty_default_value else married_cmp p married
+  let match_married ~p ~married =
+    if married = "" then true else married_cmp p married
 
   let match_marriage ~exact_place ~conf ~base ~p ~values ~default ~dates =
     let d1, d2 = dates in
@@ -252,12 +251,12 @@ module AdvancedSearchMatch = struct
   let match_civil_status ~base ~sex ~married ~occupation ~first_name_list
       ~surname_list ~skip_fname ~skip_sname ~exact_first_name ~exact_surname ~p
       =
-    match_sex ~p ~sex true
+    match_sex ~p ~sex
     && (skip_fname
        || match_first_name ~base ~first_name_list ~exact:exact_first_name p)
     && (skip_sname || match_surname ~base ~surname_list ~exact:exact_surname p)
-    && match_married ~p ~married true
-    && match_occupation ~base ~p ~occupation true
+    && match_married ~p ~married
+    && match_occupation ~base ~p ~occupation
 
   module And = struct
     let match_and date_f place_f ~(base : Gwdb.base) ~p ~dates
