@@ -34,6 +34,12 @@ type syslog_level =
   | `LOG_NOTICE
   | `LOG_WARNING ]
 
+module IperSet = Set.Make (struct
+  type t = Gwdb.iper
+
+  let compare = Stdlib.compare
+end)
+
 module Default = struct
   (* Attention, ajuster is_reorg_base en conséquence *)
   let config bname =
@@ -137,145 +143,205 @@ module Legacy = struct
     let bname = Filename.remove_extension bname in
     if bname = "" then Secure.base_dir ()
     else Filename.concat (Secure.base_dir ()) (bname ^ ".gwb")
-
-  (** [output_error ?headers ?content conf code]
-      Send the http status [code], [headers] and
-      [content] if provided, or default content otherwise.
-  *)
-  let output_error =
-    let output_file conf fn =
-      let ic = open_in fn in
-      try
-        in_channel_length ic |> really_input_string ic
-        |> Output.print_sstring conf;
-        close_in ic
-      with _ -> ( try close_in ic with _ -> ())
-    in
-    fun ?(headers = []) ?(content : Adef.safe_string option) conf code ->
-      Output.status conf code;
-      List.iter (Output.header conf "%s") headers;
-      Output.print_string conf (Adef.encoded "<h1>Incorrect request</h1>");
-      match content with
-      | Some content -> Output.print_string conf content
-      | None -> (
-          let code =
-            match code with
-            | Def.Bad_Request -> "400"
-            | Unauthorized -> "401"
-            | Forbidden -> "403"
-            | Not_Found -> "404"
-            | Conflict -> "409"
-            | Internal_Server_Error -> "500"
-            | Service_Unavailable -> "503"
-            | OK | Moved_Temporarily -> assert false
-          in
-          let fname lang =
-            code ^ "-" ^ lang ^ ".html"
-            |> Filename.concat "etc" |> Mutil.search_asset_opt
-          in
-          match fname conf.lang with
-          | Some fn -> output_file conf fn
-          | None -> (
-              match fname "en" with
-              | Some fn -> output_file conf fn
-              | None -> Output.print_sstring conf ""))
-
-  (** Calcul les droits de visualisation d'une personne en
-      fonction de son age.
-      Renvoie (dans l'ordre des tests) :
-      - Vrai si : magicien ou ami ou la personne est public
-      - Vrai si : la personne est en si_titre, si elle a au moins un
-                  titre et que public_if_title = yes dans le fichier gwf
-      - Faux si : la personne n'est pas décédée et private_years > 0
-      - Vrai si : la personne est plus agée (en fonction de la date de
-                  naissance ou de la date de baptème) que privates_years
-      - Faux si : la personne est plus jeune (en fonction de la date de
-                  naissance ou de la date de baptème) que privates_years
-      - Vrai si : la personne est décédée depuis plus de privates_years
-      - Faux si : la personne est décédée depuis moins de privates_years
-      - Vrai si : la personne a entre 80 et 120 ans et qu'elle n'est pas
-                  privée et public_if_no_date = yes
-      - Vrai si : la personne s'est mariée depuis plus de private_years
-      - Faux dans tous les autres cas *)
-  let p_auth conf base p =
-    conf.Config.wizard || conf.friend
-    || Gwdb.get_access p = Public
-    || conf.public_if_titles
-       && Gwdb.get_access p = IfTitles
-       && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
-    ||
-    let death = Gwdb.get_death p in
-    if death = NotDead then conf.private_years < 1
-    else
-      let check_date d lim none =
-        match d with
-        | None -> none ()
-        | Some d ->
-            let a = Date.time_elapsed d conf.today in
-            if a.Def.year > lim then true
-            else if a.year < conf.private_years then false
-            else a.month > 0 || a.day > 0
-      in
-      check_date (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) conf.private_years
-      @@ fun () ->
-      check_date
-        (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt)
-        conf.private_years
-      @@ fun () ->
-      check_date
-        (Gwdb.get_death p |> Date.dmy_of_death)
-        conf.private_years_death
-      @@ fun () ->
-      (Gwdb.get_access p <> Def.Private && conf.public_if_no_date)
-      ||
-      let families = Gwdb.get_family p in
-      let len = Array.length families in
-      let rec loop i =
-        i < len
-        && check_date
-             (Array.get families i |> Gwdb.foi base |> Gwdb.get_marriage
-            |> Date.cdate_to_dmy_opt)
-             conf.private_years_marriage
-             (fun () -> loop (i + 1))
-      in
-      loop 0
-
-  let syslog (level : syslog_level) msg =
-    let tm = Unix.(time () |> localtime) in
-    let level =
-      match level with
-      | `LOG_EMERG -> "EMERGENCY"
-      | `LOG_ALERT -> "ALERT"
-      | `LOG_CRIT -> "CRITICAL"
-      | `LOG_ERR -> "ERROR"
-      | `LOG_WARNING -> "WARNING"
-      | `LOG_NOTICE -> "NOTICE"
-      | `LOG_INFO -> "INFO"
-      | `LOG_DEBUG -> "DEBUG"
-    in
-    Printf.eprintf "[%s]: %s %s\n"
-      (Mutil.sprintf_date tm : Adef.safe_string :> string)
-      level msg
-
-  let wrap_output (conf : Config.config) (title : Adef.safe_string)
-      (content : unit -> unit) =
-    let robot = List.assoc_opt "robot_index" conf.base_env = Some "yes" in
-    Output.print_sstring conf {|<!DOCTYPE html><head><title>|};
-    Output.print_string conf title;
-    Output.print_sstring conf {|</title>|};
-    Output.print_sstring conf
-      (if robot then {|<meta name="robots" content="index,follow">|}
-      else {|<meta name="robots" content="none">|});
-    Output.print_sstring conf {|<meta charset="|};
-    Output.print_sstring conf conf.charset;
-    Output.print_sstring conf {|">|};
-    Output.print_sstring conf
-      {|<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">|};
-    Output.print_sstring conf {|</head>|};
-    Output.print_sstring conf "<body>";
-    content ();
-    Output.print_sstring conf {|</body></html>|}
 end
+
+(** [output_error ?headers ?content conf code]
+    Send the http status [code], [headers] and
+    [content] if provided, or default content otherwise.
+*)
+let output_error =
+  let output_file conf fn =
+    let ic = open_in fn in
+    try
+      in_channel_length ic |> really_input_string ic
+      |> Output.print_sstring conf;
+      close_in ic
+    with _ -> ( try close_in ic with _ -> ())
+  in
+  fun ?(headers = []) ?(content : Adef.safe_string option) conf code ->
+    Output.status conf code;
+    List.iter (Output.header conf "%s") headers;
+    Output.print_string conf (Adef.encoded "<h1>Incorrect request</h1>");
+    match content with
+    | Some content -> Output.print_string conf content
+    | None -> (
+        let code =
+          match code with
+          | Def.Bad_Request -> "400"
+          | Unauthorized -> "401"
+          | Forbidden -> "403"
+          | Not_Found -> "404"
+          | Conflict -> "409"
+          | Internal_Server_Error -> "500"
+          | Service_Unavailable -> "503"
+          | OK | Moved_Temporarily -> assert false
+        in
+        let fname lang =
+          code ^ "-" ^ lang ^ ".html"
+          |> Filename.concat "etc" |> Mutil.search_asset_opt
+        in
+        match fname conf.lang with
+        | Some fn -> output_file conf fn
+        | None -> (
+            match fname "en" with
+            | Some fn -> output_file conf fn
+            | None -> Output.print_sstring conf ""))
+
+(* is p2 an ancestor of p1? *)
+(* code copied from MergeInd.ml *)
+let is_ancestor conf base p1 p2 =
+  let ip1 = Gwdb.get_iper p1 in
+  let ip2 = Gwdb.get_iper p2 in
+  if ip1 = ip2 then true
+  else
+    let rec loop n set tl =
+      if n = 0 then false
+      else
+        match tl with
+        | [] -> false
+        | ip :: tl -> (
+            if IperSet.mem ip set then loop n set tl
+            else if ip = ip1 then true
+            else
+              let set = IperSet.add ip set in
+              match Gwdb.get_parents (Gwdb.poi base ip) with
+              | Some ifam ->
+                  let cpl = Gwdb.foi base ifam in
+                  loop (n - 1) set
+                    (Gwdb.get_father cpl :: Gwdb.get_mother cpl :: tl)
+              | None -> loop n set tl)
+    in
+    let max =
+      try List.assoc "is_semi_public_max" conf.Config.base_env
+      with Not_found -> "4" |> String.trim
+      (* limit search to n generations *)
+    in
+    let max = if max = "" then 4 else int_of_string max in
+    loop max IperSet.empty [ ip2 ]
+
+(* is semi public if the user (identified by conf.userkey is semi public
+   and p is one of its descendant or ancesstor
+*)
+let is_semi_public conf base p =
+  let split_key key =
+    let dot = match String.index_opt key '.' with Some i -> i | _ -> -1 in
+    let space = match String.index_opt key ' ' with Some i -> i | _ -> -1 in
+    if dot <> -1 && space <> -1 then
+      ( String.sub key 0 dot,
+        String.sub key (dot + 1) (space - dot - 1),
+        String.sub key (space + 1) (String.length key - space - 1) )
+    else ("?", "", "?")
+  in
+  (* TODO add ip of userkey in config *)
+  let fn, oc, sn = split_key conf.Config.userkey in
+  match
+    Gwdb.person_of_key base fn sn (if oc = "" then 0 else int_of_string oc)
+  with
+  | Some ip1 ->
+      Gwdb.get_access (Gwdb.poi base ip1)
+      = Public (* will be SemiPublic in due time *)
+      && (Gwdb.get_access p = Public
+         || is_ancestor conf base p (Gwdb.poi base ip1)
+         || is_ancestor conf base (Gwdb.poi base ip1) p)
+  | _ -> false
+
+(** Calcul les droits de visualisation d'une personne en
+    fonction de son age.
+    Renvoie (dans l'ordre des tests) :
+    - Vrai si : magicien ou ami ou la personne est public
+    - Vrai si : la personne est en si_titre, si elle a au moins un
+                titre et que public_if_title = yes dans le fichier gwf
+    - Faux si : la personne n'est pas décédée et private_years > 0
+    - Vrai si : la personne est plus agée (en fonction de la date de
+                naissance ou de la date de baptème) que privates_years
+    - Faux si : la personne est plus jeune (en fonction de la date de
+                naissance ou de la date de baptème) que privates_years
+    - Vrai si : la personne est décédée depuis plus de privates_years
+    - Faux si : la personne est décédée depuis moins de privates_years
+    - Vrai si : la personne a entre 80 et 120 ans et qu'elle n'est pas
+                privée et public_if_no_date = yes
+    - Vrai si : la personne s'est mariée depuis plus de private_years
+    - Faux dans tous les autres cas *)
+(* check that p is parent or descendant of conf.key *)
+
+let p_auth conf base p =
+  conf.Config.wizard || conf.friend || is_semi_public conf base p
+  || conf.public_if_titles
+     && Gwdb.get_access p = IfTitles
+     && Gwdb.nobtitles base conf.allowed_titles conf.denied_titles p <> []
+  ||
+  let death = Gwdb.get_death p in
+  if death = NotDead then conf.private_years < 1
+  else
+    let check_date d lim none =
+      match d with
+      | None -> none ()
+      | Some d ->
+          let a = Date.time_elapsed d conf.today in
+          if a.Def.year > lim then true
+          else if a.year < conf.private_years then false
+          else a.month > 0 || a.day > 0
+    in
+    check_date (Gwdb.get_birth p |> Date.cdate_to_dmy_opt) conf.private_years
+    @@ fun () ->
+    check_date (Gwdb.get_baptism p |> Date.cdate_to_dmy_opt) conf.private_years
+    @@ fun () ->
+    check_date (Gwdb.get_death p |> Date.dmy_of_death) conf.private_years_death
+    @@ fun () ->
+    (Gwdb.get_access p <> Def.Private && conf.public_if_no_date)
+    ||
+    let families = Gwdb.get_family p in
+    let len = Array.length families in
+    let rec loop i =
+      i < len
+      && check_date
+           (Array.get families i |> Gwdb.foi base |> Gwdb.get_marriage
+          |> Date.cdate_to_dmy_opt)
+           conf.private_years_marriage
+           (fun () -> loop (i + 1))
+    in
+    loop 0
+
+let syslog (level : syslog_level) msg =
+  let tm = Unix.(time () |> localtime) in
+  let level =
+    match level with
+    | `LOG_EMERG -> "EMERGENCY"
+    | `LOG_ALERT -> "ALERT"
+    | `LOG_CRIT -> "CRITICAL"
+    | `LOG_ERR -> "ERROR"
+    | `LOG_WARNING -> "WARNING"
+    | `LOG_NOTICE -> "NOTICE"
+    | `LOG_INFO -> "INFO"
+    | `LOG_DEBUG -> "DEBUG"
+  in
+  Printf.eprintf "[%s]: %s %s\n"
+    (Mutil.sprintf_date tm : Adef.safe_string :> string)
+    level msg
+
+(** [wrap_output conf title content]
+  Plugins defining a page content but not a complete UI
+  may want to wrap their page using [wrap_output].
+*)
+
+let wrap_output (conf : Config.config) (title : Adef.safe_string)
+    (content : unit -> unit) =
+  let robot = List.assoc_opt "robot_index" conf.base_env = Some "yes" in
+  Output.print_sstring conf {|<!DOCTYPE html><head><title>|};
+  Output.print_string conf title;
+  Output.print_sstring conf {|</title>|};
+  Output.print_sstring conf
+    (if robot then {|<meta name="robots" content="index,follow">|}
+    else {|<meta name="robots" content="none">|});
+  Output.print_sstring conf {|<meta charset="|};
+  Output.print_sstring conf conf.charset;
+  Output.print_sstring conf {|">|};
+  Output.print_sstring conf
+    {|<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">|};
+  Output.print_sstring conf {|</head>|};
+  Output.print_sstring conf "<body>";
+  content ();
+  Output.print_sstring conf {|</body></html>|}
 
 type my_fun_2 = string -> string
 type my_fun_3 = string -> string -> string
@@ -290,6 +356,11 @@ let lang_d = ref (Legacy.lang_d : my_fun_3)
 let bpath = ref (Legacy.bpath : my_fun_2)
 let portraits_d = ref (Legacy.portraits_d : my_fun_2)
 let images_d = ref (Legacy.images_d : my_fun_2)
+let is_semi_public = ref is_semi_public
+let p_auth = ref p_auth
+let wrap_output = ref wrap_output
+let syslog = ref syslog
+let output_error = ref output_error
 
 (* attention; ne pas utiliser !config! *)
 let is_reorg_base bname =
@@ -297,10 +368,6 @@ let is_reorg_base bname =
   Sys.file_exists
     (String.concat Filename.dir_sep
        [ Secure.base_dir (); bname ^ ".gwb"; "config"; bname ^ ".gwf" ])
-
-let output_error = ref Legacy.output_error
-let p_auth = ref Legacy.p_auth
-let syslog = ref Legacy.syslog
 
 let init bname =
   Secure.add_assets Filename.current_dir_name;
@@ -409,9 +476,3 @@ let test_base bname =
     flush stderr;
     exit 2);
   init_etc bname
-
-(** [wrap_output conf title content]
-    Plugins defining a page content but not a complete UI
-    may want to wrap their page using [wrap_output].
-*)
-let wrap_output = ref Legacy.wrap_output

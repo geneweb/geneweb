@@ -1329,17 +1329,29 @@ let make_efam conf base ip ifam =
 let mode_local env =
   match get_env "fam_link" env with Vfam _ -> false | _ -> true
 
-let get_note_source conf base ?p auth no_note note_source =
-  safe_val
-  @@
+(* for family sources, p is not provided *)
+let get_note_or_source conf base ?(p = Gwdb.empty_person base Gwdb.dummy_iper)
+    auth no_note note_or_source =
+  let note_or_source = sou base note_or_source in
   if auth && not no_note then
-    let env =
-      match p with
-      | None -> []
-      | Some p -> [ ('i', fun () -> Image.default_portrait_filename base p) ]
+    (* TODO investigate the use of i in env *)
+    let env = [ ('i', fun () -> Image.default_portrait_filename base p) ] in
+    let s = string_with_macros conf env note_or_source in
+    let lines = Wiki.html_of_tlsw conf s in
+    let lines =
+      (* remove enclosing <p> .. </p> if any *)
+      if List.length lines > 2 then
+        match lines with
+        | "<p>" :: remain ->
+            if List.hd (List.rev remain) = "</p>" then
+              List.rev (List.tl (List.rev remain))
+            else lines
+        | _ -> lines
+      else lines
     in
-    Notes.source_note_with_env conf base env (sou base note_source)
-  else Adef.safe ""
+    Notes.source_note_with_env conf base env (String.concat " " lines)
+    |> safe_val
+  else null_val
 
 let date_aux conf p_auth date =
   match (p_auth, Date.od_of_cdate date) with
@@ -1508,7 +1520,7 @@ and eval_simple_str_var conf base env (p, p_auth) = function
   | "comment" | "fnotes" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
-          get_comment fam |> get_note_source conf base m_auth conf.no_note
+          get_comment fam |> get_note_or_source conf base m_auth conf.no_note
       | _ -> raise Not_found)
   | "count" -> (
       match get_env "count" env with
@@ -1800,12 +1812,13 @@ and eval_simple_str_var conf base env (p, p_auth) = function
   | "marriage_note" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
-          get_marriage_note fam |> get_note_source conf base m_auth conf.no_note
+          get_marriage_note fam
+          |> get_note_or_source conf base m_auth conf.no_note
       | _ -> raise Not_found)
   | "marriage_source" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) ->
-          get_marriage_src fam |> get_note_source conf base m_auth false
+          get_marriage_src fam |> get_note_or_source conf base m_auth false
       | _ -> raise Not_found)
   | "max_anc_level" -> (
       match get_env "max_anc_level" env with
@@ -3193,8 +3206,8 @@ and eval_str_event_field conf base (p, p_auth)
   | "place" ->
       if p_auth then sou base place |> Util.string_of_place conf |> safe_val
       else null_val
-  | "note" -> note |> get_note_source conf base ~p p_auth conf.no_note
-  | "src" -> src |> get_note_source conf base ~p p_auth false
+  | "note" -> note |> get_note_or_source conf base ~p p_auth conf.no_note
+  | "src" -> src |> get_note_or_source conf base ~p p_auth false
   | _ -> raise Not_found
 
 and eval_event_field_var conf base env (p, p_auth)
@@ -3570,6 +3583,7 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "is_male" -> get_sex p = Male
   | "is_private" -> get_access p = Private
   | "is_public" -> Util.is_public conf base p
+  | "is_semi_public" -> !GWPARAM.is_semi_public conf base p
   | "is_restricted" -> is_hidden p
   | _ -> raise Not_found
 
@@ -3609,9 +3623,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "birth_place_raw" ->
       if p_auth then sou base (get_birth_place p) |> str_val else null_val
   | "birth_note" ->
-      get_birth_note p |> get_note_source conf base ~p p_auth conf.no_note
+      get_birth_note p |> get_note_or_source conf base ~p p_auth conf.no_note
   | "birth_source" ->
-      get_birth_src p |> get_note_source conf base ~p p_auth false
+      get_birth_src p |> get_note_or_source conf base ~p p_auth false
   | "baptism_place" ->
       if p_auth then
         get_baptism_place p |> sou base |> Util.string_of_place conf |> safe_val
@@ -3619,9 +3633,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "baptism_place_raw" ->
       if p_auth then sou base (get_baptism_place p) |> str_val else null_val
   | "baptism_note" ->
-      get_baptism_note p |> get_note_source conf base ~p p_auth conf.no_note
+      get_baptism_note p |> get_note_or_source conf base ~p p_auth conf.no_note
   | "baptism_source" ->
-      get_baptism_src p |> get_note_source conf base ~p p_auth false
+      get_baptism_src p |> get_note_or_source conf base ~p p_auth false
   | "burial_place" ->
       if p_auth then
         get_burial_place p |> sou base |> Util.string_of_place conf |> safe_val
@@ -3629,9 +3643,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "burial_place_raw" ->
       if p_auth then sou base (get_burial_place p) |> str_val else null_val
   | "burial_note" ->
-      get_burial_note p |> get_note_source conf base ~p p_auth conf.no_note
+      get_burial_note p |> get_note_or_source conf base ~p p_auth conf.no_note
   | "burial_source" ->
-      get_burial_src p |> get_note_source conf base ~p p_auth false
+      get_burial_src p |> get_note_or_source conf base ~p p_auth false
   | "child_name" ->
       let force_surname =
         match get_parents p with
@@ -3684,9 +3698,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "death_place_raw" ->
       if p_auth then sou base (get_death_place p) |> str_val else null_val
   | "death_note" ->
-      get_death_note p |> get_note_source conf base ~p p_auth conf.no_note
+      get_death_note p |> get_note_or_source conf base ~p p_auth conf.no_note
   | "death_source" ->
-      get_death_src p |> get_note_source conf base ~p p_auth false
+      get_death_src p |> get_note_or_source conf base ~p p_auth false
   | "died" -> string_of_died conf p p_auth |> safe_val
   | "father_age_at_birth" ->
       string_of_parent_age conf base ep get_father |> safe_val
@@ -3873,12 +3887,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
           |> string_of_int |> str_val
       | _ -> get_family p |> Array.length |> string_of_int |> str_val)
   | "notes" | "pnotes" ->
-      get_notes p |> get_note_source conf base ~p p_auth conf.no_note
+      get_notes p |> get_note_or_source conf base ~p p_auth conf.no_note
   | "occ" ->
       if is_hide_names conf p && not p_auth then null_val
       else get_occ p |> string_of_int |> str_val
   | "occupation" ->
-      get_occupation p |> get_note_source conf base ~p p_auth false
+      get_occupation p |> get_note_or_source conf base ~p p_auth false
   | "on_baptism_date" -> date_aux conf p_auth (get_baptism p)
   | "slash_baptism_date" ->
       if p_auth then
@@ -3903,7 +3917,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       match get_burial p with
       | Buried cod -> date_aux conf p_auth cod
       | Cremated _ | UnknownBurial -> raise Not_found)
-  | "psources" -> get_psources p |> get_note_source conf base ~p p_auth false
+  | "psources" -> get_psources p |> get_note_or_source conf base ~p p_auth false
   | "slash_burial_date" ->
       if p_auth then
         match get_burial p with
@@ -3984,11 +3998,28 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
                 (Sosa.to_string n)
               |> str_val
           | None -> null_val)
-      | _ -> raise Not_found)
+      | _ -> null_val (* silent fail *))
   | "source" -> (
       match get_env "src" env with
-      | Vstring s -> safe_val (Notes.source_note conf base p s)
-      | _ -> raise Not_found)
+      | Vstring s ->
+          let env =
+            [ ('i', fun () -> Image.default_portrait_filename base p) ]
+          in
+          let s =
+            let wi =
+              {
+                Wiki.wi_mode = "NOTES";
+                Wiki.wi_file_path = Notes.file_path conf base;
+                Wiki.wi_person_exists = person_exists conf base;
+                Wiki.wi_mark_if_not_public = mark_if_not_public conf base;
+                Wiki.wi_always_show_link =
+                  conf.wizard || (conf.friend && get_access p = SemiPublic);
+              }
+            in
+            Wiki.syntax_links conf wi s
+          in
+          string_with_macros conf env s |> str_val
+      | _ -> null_val)
   | "surname" ->
       if (not p_auth) && is_hide_names conf p then str_val "x"
       else p_surname base p |> Util.escape_html |> safe_val
