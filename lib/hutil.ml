@@ -119,7 +119,8 @@ let error_cannot_access conf fname =
       ^<^ (Util.escape_html fname : Adef.escaped_string :> Adef.safe_string)
       ^>^ ".txt\".")
 
-let header_with_title ?(error = false) ?(fluid = false) conf title =
+let header_with_title ?(error = false) ?(fluid = false) ?(no_title = false) conf
+    title =
   Util.html conf;
   header_without_http_nor_home conf title;
   Templ_parser.wrap "home" (fun () ->
@@ -142,9 +143,11 @@ let header_with_title ?(error = false) ?(fluid = false) conf title =
   Output.print_sstring conf
     (if fluid then "<div class=\"container-fluid\">"
     else "<div class=\"container\">");
-  Output.print_sstring conf (if error then "<h1 class = \"error\">" else "<h1>");
-  title false;
-  Output.print_sstring conf "</h1>\n"
+  if not no_title then (
+    Output.print_sstring conf
+      (if error then "<h1 class = \"error\">" else "<h1>");
+    title false;
+    Output.print_sstring conf "</h1>\n")
 
 let header_link_welcome conf title = header_with_title conf title
 
