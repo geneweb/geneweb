@@ -766,8 +766,8 @@ let treat_request =
           w_base @@ WiznotesDisplay.print_search
         | _ ->
             w_base @@ fun conf base ->
-            let _str = Format.sprintf "m=%s is not available here" m in
-            incorrect_request conf base ~comment:"m=FORUM is not available here"
+            let str = Format.sprintf "m=%s is not available here" m in
+            incorrect_request conf base ~comment:str
       end conf bfile ;
   end else begin
     let title _ =

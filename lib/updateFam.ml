@@ -630,10 +630,9 @@ let print_add conf base =
   print_update_fam conf base (fam, cpl, des) digest
 
 let print_add_parents conf base =
-  match p_getenv conf.env "ip" with
+  match Util.find_person_in_env conf base "p" with
   | None -> Hutil.incorrect_request conf
-  | Some i ->
-      let p = poi base (iper_of_string i) in
+  | Some p ->
       let fam =
         {
           marriage = Date.cdate_None;
@@ -781,7 +780,7 @@ let print_change_order conf base =
         (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
       Output.print_sstring conf "</button></p></form>";
       Hutil.trailer conf
-  | _ -> Hutil.incorrect_request conf
+  | _ -> Hutil.incorrect_request conf ~comment:"bad params for CHG_FAM_ORD"
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with
