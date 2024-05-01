@@ -713,7 +713,6 @@ let print_mod_view_page conf can_edit mode fname title env s =
     Output.print_sstring conf {|">|};
     Output.print_sstring conf (message_txt conf 0);
     Output.print_sstring conf "</a>)</div>");
-  Hutil.print_link_to_welcome conf true;
   if can_edit && has_v then
     print_sub_part_links conf (mode_pref ^^^ mode) sfn v is_empty;
   Output.print_sstring conf {|<form method="POST" action="|};
