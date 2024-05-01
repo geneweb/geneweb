@@ -2849,7 +2849,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           match Date.od_of_cdate (get_marriage fam) with
           | Some d -> eval_date_field_var conf d sl
           | None -> null_val)
-      | _ -> raise Not_found)
+      | _ -> null_val)
   | "mother" :: sl -> (
       match get_parents p with
       | Some ifam ->
