@@ -236,7 +236,7 @@ let print_what_links conf base fnotes =
       Output.print_sstring conf "</a></span>")
   in
   let db = notes_links_db conf base false in
-  Hutil.header_with_title conf title;
+  Hutil.header conf title;
   Option.iter (print_linked_list conf base) (List.assoc_opt fnotes db);
   Hutil.trailer conf
 
@@ -349,7 +349,7 @@ let print_misc_notes conf base =
         else list)
       db []
   in
-  Hutil.header_with_title conf title;
+  Hutil.header conf title;
   if db <> [] then (
     Output.print_sstring conf "<ul>";
     if d <> "" then (
