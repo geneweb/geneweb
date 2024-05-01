@@ -20,7 +20,12 @@ val header_without_http : config -> (bool -> unit) -> unit
 val header_without_home : config -> (bool -> unit) -> unit
 
 val header_with_title :
-  ?error:bool -> ?fluid:bool -> config -> (bool -> unit) -> unit
+  ?error:bool ->
+  ?fluid:bool ->
+  ?no_title:bool ->
+  config ->
+  (bool -> unit) ->
+  unit
 (** Calls for [Util.html] to print HTTP header and for [header_without_http] to print HTML page header.
     Additionaly prints opening container <div> tag on the socket. *)
 
