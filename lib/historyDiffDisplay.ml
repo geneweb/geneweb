@@ -48,7 +48,7 @@ let print_clean conf =
       |> Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf "</button></form>";
       Hutil.trailer conf
-  | _ -> Hutil.incorrect_request conf
+  | _ -> Hutil.incorrect_request conf ~comment:"no history file provided"
 
 (* ************************************************************************ *)
 (*  [Fonc] print_clean_ok : config -> unit                                  *)
@@ -957,5 +957,5 @@ let print conf base =
               Templ.print_foreach = print_foreach conf base;
             }
             env (before, after, p_auth)
-      | _ -> Hutil.incorrect_request conf)
-  | _ -> Hutil.incorrect_request conf
+      | _ -> Hutil.incorrect_request conf ~comment:"bad f parameter")
+  | _ -> Hutil.incorrect_request conf ~comment:"bad t parameter"
