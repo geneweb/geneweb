@@ -114,6 +114,7 @@
 %end;
 
 %empty_sorted_list
+%if;(e.nb!="")
 %for;i;0;e.nb;
   %let;myindex;%apply;get_ip(i)%in;
   %let;first_name;%apply;get_value(myindex, "first_name")%in;
@@ -129,6 +130,7 @@
     %myindex;%and;
     %i;%and;
   %end;
+%end;
 %end;
 
 <div class="mt-2">
@@ -183,25 +185,27 @@
 
 %( RLM commence à i1 et non i0 on décale i(0) en i(nb), à défaut on pourrait aussi tout décaller à i+1 %)
 <div class="ml-2 mt-2">
-  %if;(e.nb=1)
-  %elseif;(e.nb>1 and e.nb<max_rlm_nbr)
-    <a role="button" title="Try RLM graph to link all individuals (probably fails if not same list by surname by place)"
-      href="%prefix&m=RLM%nn;
-      %foreach;env_binding;%nn;
-        %if;(env.key!="parents" and env.key!="dates" and env.key!="m" and env.key!="nb"
-         and env.key!="k"
-         and env.key!="bi" and env.key!="ba" and env.key!="ma" and env.key!="de" and env.key!="bu"
-         and env.key!="surn" and env.key!="datesort" and env.key!="i0")&%env.key;=%env.val;%nn;
-        %elseif;(env.key="i0")&i%e.nb;=%env.val;%end;%nn;
-        %end;%nn;
-        %( TODO: fix 3rd var : get_var("p",i) for “complex” places %)
-        %for;i;0;e.nb;
-          %if;(i!=0)&t%i=%apply;tags%with;%apply;get_ip(i)%and;%and;%apply;get_var("p",i)%end;
-          %else;&t%expr(e.nb)=%apply;tags%with;%apply;get_ip(0)%and;%and;%apply;get_var("p",i)%end;%end;%end;">
-      <i class="fa fa-bezier-curve mr-2"></i>[*multi relations graph]
-    </a>
-  %else;
-    %e.nb; [person/persons]1[:] [RLM graph impracticable] (max %max_rlm_nbr;)
+  %if;(e.nb!="")
+    %if;(e.nb=1)
+    %elseif;(e.nb>1 and e.nb<max_rlm_nbr)
+      <a role="button" title="Try RLM graph to link all individuals (probably fails if not same list by surname by place)"
+        href="%prefix&m=RLM%nn;
+        %foreach;env_binding;%nn;
+          %if;(env.key!="parents" and env.key!="dates" and env.key!="m" and env.key!="nb"
+           and env.key!="k"
+           and env.key!="bi" and env.key!="ba" and env.key!="ma" and env.key!="de" and env.key!="bu"
+           and env.key!="surn" and env.key!="datesort" and env.key!="i0")&%env.key;=%env.val;%nn;
+          %elseif;(env.key="i0")&i%e.nb;=%env.val;%end;%nn;
+          %end;%nn;
+          %( TODO: fix 3rd var : get_var("p",i) for “complex” places %)
+          %for;i;0;e.nb;
+            %if;(i!=0)&t%i=%apply;tags%with;%apply;get_ip(i)%and;%and;%apply;get_var("p",i)%end;
+            %else;&t%expr(e.nb)=%apply;tags%with;%apply;get_ip(0)%and;%and;%apply;get_var("p",i)%end;%end;%end;">
+        <i class="fa fa-bezier-curve mr-2"></i>[*multi relations graph]
+      </a>
+    %else;
+      %e.nb; [person/persons]1[:] [RLM graph impracticable] (max %max_rlm_nbr;)
+    %end;
   %end;
 </div>
 %base_trailer;
