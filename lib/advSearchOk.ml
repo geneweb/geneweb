@@ -365,25 +365,7 @@ let advanced_search conf base max_answers =
     in
     let pmatch =
       if not auth then false
-      else if search_type <> "OR" then
-        Lazy.force civil_match
-        && And.match_baptism ~base ~p ~exact_place
-             ~dates:(getd @@ Fields.bapt_date_field_name ~gets ~search_type)
-             ~places:(getss @@ Fields.bapt_place_field_name ~gets ~search_type)
-        && And.match_birth ~base ~p ~exact_place
-             ~dates:(getd @@ Fields.birth_date_field_name ~gets ~search_type)
-             ~places:(getss @@ Fields.birth_place_field_name ~gets ~search_type)
-        && And.match_burial ~base ~p ~exact_place
-             ~dates:(getd @@ Fields.burial_date_field_name ~gets ~search_type)
-             ~places:(getss @@ Fields.burial_place_field_name ~gets ~search_type)
-        && And.match_death ~base ~p ~exact_place
-             ~dates:(getd @@ Fields.death_date_field_name ~gets ~search_type)
-             ~places:(getss @@ Fields.death_place_field_name ~gets ~search_type)
-        && match_marriage ~conf ~base ~p ~exact_place ~default:true
-             ~values:
-               (getss @@ Fields.marriage_place_field_name ~gets ~search_type)
-             ~dates:(getd @@ Fields.marriage_date_field_name ~gets ~search_type)
-      else
+      else if search_type = "OR" then
         let match_f ~date_field ~place_field or_f and_f =
           or_f ~base ~p
             ~dates:(getd @@ date_field ~gets ~search_type)
@@ -415,6 +397,24 @@ let advanced_search conf base max_answers =
                   (getss @@ Fields.marriage_place_field_name ~gets ~search_type)
                 ~dates:
                   (getd @@ Fields.marriage_date_field_name ~gets ~search_type))
+      else
+        Lazy.force civil_match
+        && And.match_baptism ~base ~p ~exact_place
+             ~dates:(getd @@ Fields.bapt_date_field_name ~gets ~search_type)
+             ~places:(getss @@ Fields.bapt_place_field_name ~gets ~search_type)
+        && And.match_birth ~base ~p ~exact_place
+             ~dates:(getd @@ Fields.birth_date_field_name ~gets ~search_type)
+             ~places:(getss @@ Fields.birth_place_field_name ~gets ~search_type)
+        && And.match_burial ~base ~p ~exact_place
+             ~dates:(getd @@ Fields.burial_date_field_name ~gets ~search_type)
+             ~places:(getss @@ Fields.burial_place_field_name ~gets ~search_type)
+        && And.match_death ~base ~p ~exact_place
+             ~dates:(getd @@ Fields.death_date_field_name ~gets ~search_type)
+             ~places:(getss @@ Fields.death_place_field_name ~gets ~search_type)
+        && match_marriage ~conf ~base ~p ~exact_place ~default:true
+             ~values:
+               (getss @@ Fields.marriage_place_field_name ~gets ~search_type)
+             ~dates:(getd @@ Fields.marriage_date_field_name ~gets ~search_type)
     in
     if pmatch then (p :: list, len + 1) else acc
   in
