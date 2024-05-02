@@ -124,8 +124,7 @@ module AdvancedSearchMatch = struct
     if values = [] then default else do_compare p values get cmp
 
   let apply_to_field_values ~get ~cmp ~base =
-    let get p = sou base @@ get p in
-    apply_to_field_values_raw ~get ~cmp
+    apply_to_field_values_raw ~get:(fun p -> sou base @@ get p) ~cmp
 
   let sex_cmp p = function
     | "M" -> get_sex p = Male
