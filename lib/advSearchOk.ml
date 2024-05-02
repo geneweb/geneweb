@@ -120,10 +120,10 @@ module AdvancedSearchMatch = struct
     let s = abbrev_lower @@ get p in
     List.exists (fun s' -> cmp (abbrev_lower s') s) y
 
-  let apply_to_field_values_raw ~p ~values ~get ~cmp ~default =
+  let apply_to_field_values_raw ~cmp ~p ~values ~get ~default =
     if values = [] then default else do_compare p values get cmp
 
-  let apply_to_field_values ~base ~p ~values ~get ~cmp ~default =
+  let apply_to_field_values ~get ~cmp ~base ~p ~values ~default =
     let get p = sou base @@ get p in
     apply_to_field_values_raw ~p ~values ~get ~cmp ~default
 
@@ -256,9 +256,8 @@ module AdvancedSearchMatch = struct
         eq (List.map Name.lower @@ Name.split_sname @@ sou base @@ get_surname p)
 
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
-  let match_civil_status ~base ~sex ~married ~occupation ~first_name_list
-      ~surname_list ~skip_fname ~skip_sname ~exact_first_name ~exact_surname ~p
-      =
+  let match_civil_status ~base ~p ~sex ~married ~occupation ~first_name_list
+      ~surname_list ~skip_fname ~skip_sname ~exact_first_name ~exact_surname =
     match_sex ~p ~sex
     && (skip_fname
        || match_first_name ~base ~first_name_list ~exact:exact_first_name p)
