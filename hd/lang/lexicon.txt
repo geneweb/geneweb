@@ -10040,10 +10040,10 @@ tr: eşler dizini (nesil yok)
     individual notes
 co: note individuale
 de: Hinweis zur Person
-en: individual note
+en: individual notes
 es: nota individual
 fi: merkintöjä henkilöstä
-fr: notes individuelles
+fr: notes sur l’individu
 it: nota dell’individuo
 lt: individualūs užrašai
 nl: aantekeningen
@@ -13067,6 +13067,10 @@ pt: sumário de notas diversas
 ru: изменения вкратце
 sv: summering av noteringar
 tr: notlar
+
+    note without title
+en: note without title
+fr: note sans titre
 
     nth
 af: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste

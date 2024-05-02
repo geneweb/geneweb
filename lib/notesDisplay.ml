@@ -113,110 +113,135 @@ let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
   Wiki.print_sub_part conf wi conf.wizard mode fnotes cnt0 lines;
   Hutil.trailer conf
 
+let fmt_fnote_title conf base fnotes =
+  let nenv, _ = read_notes base fnotes in
+  let no_title = Utf8.capitalize_fst (transl conf "note without title") in
+  let no_title = no_title |> Format.sprintf "<i>%s</i>" in
+  try
+    let fnote_title = List.assoc "TITLE" nenv in
+    if String.trim fnote_title = "" then no_title else fnote_title
+  with Not_found -> no_title
+
+let linked_page_rows conf base pg =
+  match pg with
+  | Def.NLDB.PgInd ip ->
+      let p = pget conf base ip in
+      if conf.wizard then
+        Output.print_sstring conf
+          (Format.sprintf
+             {|
+<td class="text-center">
+  <a href="%sm=MOD_IND&i=%s#notes" title="%s">
+    <i class="fa fa-user"></i></a></td>|}
+             (commd conf :> string)
+             (Gwdb.string_of_iper ip)
+             (Utf8.capitalize_fst (transl conf "modify note")));
+      Output.print_sstring conf
+        (Format.sprintf {|
+<td>%s%s</td>
+<td><i>%s</i></td>|}
+           (Util.referenced_person_title_text conf base p :> string)
+           (DateDisplay.short_dates_text conf base p :> string)
+           (Utf8.capitalize_fst (transl conf "individual notes")))
+  | Def.NLDB.PgFam ifam ->
+      let fam = Gwdb.foi base ifam in
+      let fath = pget conf base (Gwdb.get_father fam) in
+      let moth = pget conf base (Gwdb.get_mother fam) in
+      if conf.wizard then
+        Output.print_sstring conf
+          (Format.sprintf
+             {|
+<td class="align-middle">
+  <a href="%sm=MOD_FAM&i=%s&ip=%s#comments" title="%s %s %s">
+    <i class="fa fa-user fa-sm"></i><i class="fa fa-user fa-sm"></i></a></td>|}
+             (commd conf :> string)
+             (Gwdb.string_of_ifam ifam)
+             (Gwdb.get_iper fath |> Gwdb.string_of_iper)
+             (Utf8.capitalize_fst (transl conf "modify"))
+             (transl conf "comment")
+             (transl_nth conf "family/families" 0));
+      Output.print_sstring conf
+        (Format.sprintf
+           {|
+<td>%s%s<br>& %s%s</td>
+<td class="align-middle"><i>%s %s</i></td>|}
+           (Util.referenced_person_title_text conf base fath :> string)
+           (DateDisplay.short_dates_text conf base fath :> string)
+           (Util.referenced_person_title_text conf base moth :> string)
+           (DateDisplay.short_dates_text conf base moth :> string)
+           (Utf8.capitalize_fst (transl conf "comment"))
+           (transl_nth conf "family/families" 0))
+  | Def.NLDB.PgNotes ->
+      let fnote_title = fmt_fnote_title conf base "" in
+      if conf.wizard then
+        Output.print_sstring conf
+          (Format.sprintf
+             {|
+<td class="text-center">
+  <a href="%sm=MOD_NOTES" title="%s">
+    <i class="far fa-file-lines"></i></a></td>|}
+             (commd conf :> string)
+             (Utf8.capitalize_fst (transl conf "modify note")));
+      Output.print_sstring conf
+        (Format.sprintf {|
+<td><a href="%sm=NOTES">%s</a></td>
+<td>%s</td>|}
+           (commd conf :> string)
+           (Utf8.capitalize (transl conf "base notes"))
+           (Util.safe_html fnote_title :> string))
+  | Def.NLDB.PgMisc fnotes ->
+      let fnote_title = fmt_fnote_title conf base fnotes in
+      if conf.wizard then
+        Output.print_sstring conf
+          (Format.sprintf
+             {|
+<td class="text-center">
+  <a href="%sm=MOD_NOTES&f=%s" title="%s">
+    <i class="far fa-file-lines"></i></a></td>|}
+             (commd conf :> string)
+             (Util.uri_encode fnotes)
+             (Utf8.capitalize_fst (transl conf "modify note")));
+      Output.print_sstring conf
+        (Format.sprintf
+           {|
+<td><a href="%sm=NOTES&f=%s">%s</a></td>
+<td>%s</td>|}
+           (commd conf :> string)
+           (Util.uri_encode fnotes)
+           (fnotes :> string)
+           (Util.safe_html fnote_title :> string))
+  | Def.NLDB.PgWizard wizname ->
+      if conf.wizard then
+        Output.print_sstring conf
+          (Format.sprintf
+             {|
+<td class="text-center">
+  <a href="%sm=MOD_WIZNOTES&f=%s" title="%s %s">
+    <i class="fas fa-hat-wizard"></i></a></td>|}
+             (commd conf :> string)
+             (Util.uri_encode wizname)
+             (Utf8.capitalize_fst (transl conf "modify"))
+             (transl conf "base wizard notes"));
+      Output.print_sstring conf
+        (Format.sprintf
+           {|
+<td><a href="%sm=WIZNOTES&f=%s">%s</a></td>
+<td><i>%s</i></td>|}
+           (commd conf :> string)
+           (Util.uri_encode wizname)
+           (wizname :> string)
+           (Utf8.capitalize_fst (transl conf "base wizard notes")))
+
 let print_linked_list conf base pgl =
-  Output.print_sstring conf "<ul>";
+  Output.print_sstring conf
+    "\n<table class=\"table table-borderless table-striped w-auto mt-3\">";
   List.iter
     (fun pg ->
-      Output.print_sstring conf "<li>";
-      (match pg with
-      | Def.NLDB.PgInd ip ->
-          Output.print_sstring conf "<tt>";
-          if conf.wizard then (
-            Output.print_sstring conf {|<a class="mx-2" href="|};
-            Output.print_string conf (commd conf);
-            Output.print_sstring conf "&i=";
-            Output.print_string conf (Gwdb.string_of_iper ip |> Mutil.encode);
-            Output.print_sstring conf
-              {|"><sup><i class="fa fa-gear"></i></sup></a>|});
-          let p = pget conf base ip in
-          Output.print_sstring conf "<span class=\"mx-2\">";
-          Output.print_string conf
-            (Util.referenced_person_title_text conf base p);
-          Output.print_string conf (DateDisplay.short_dates_text conf base p);
-          Output.print_sstring conf "</span></tt>"
-      | Def.NLDB.PgFam ifam ->
-          let fam = Gwdb.foi base ifam in
-          let fath = pget conf base (Gwdb.get_father fam) in
-          let moth = pget conf base (Gwdb.get_mother fam) in
-          Output.print_sstring conf "<tt>";
-          if conf.wizard then (
-            Output.print_sstring conf {|<a class="mx-2" href="|};
-            Output.print_string conf (commd conf);
-            Output.print_sstring conf "m=MOD_FAM&i=";
-            Output.print_string conf (Gwdb.string_of_ifam ifam |> Mutil.encode);
-            Output.print_sstring conf "&ip=";
-            Output.print_string conf
-              (Gwdb.get_iper fath |> Gwdb.string_of_iper |> Mutil.encode);
-            Output.print_sstring conf
-              {|"><sup><i class="fa fa-gear"></i></sup></a>|});
-          Output.print_sstring conf "<span class=\"mx-2\">";
-          Output.print_string conf
-            (Util.referenced_person_title_text conf base fath);
-          Output.print_string conf (DateDisplay.short_dates_text conf base fath);
-          Output.print_sstring conf " &amp; ";
-          Output.print_string conf
-            (Util.referenced_person_title_text conf base moth);
-          Output.print_sstring conf " ";
-          Output.print_string conf (DateDisplay.short_dates_text conf base moth);
-          Output.print_sstring conf "</span></tt>"
-      | Def.NLDB.PgNotes ->
-          Output.print_sstring conf "<tt>";
-          if conf.wizard then (
-            Output.print_sstring conf {|<a class="mx-2" href="|};
-            Output.print_string conf (commd conf);
-            Output.print_sstring conf
-              {|m=MOD_NOTES"><sup><i class="fa fa-gear"></i></sup></a>|});
-          Output.print_sstring conf "<a class=\"mx-2\" href=\"";
-          Output.print_string conf (commd conf);
-          Output.print_sstring conf "m=NOTES\">";
-          Output.print_sstring conf (transl_nth conf "note/notes" 1);
-          Output.print_sstring conf "</a></tt>"
-      | Def.NLDB.PgMisc fnotes ->
-          let nenv, _ = read_notes base fnotes in
-          let title = try List.assoc "TITLE" nenv with Not_found -> "" in
-          let title = Util.safe_html title in
-          Output.print_sstring conf "<tt>";
-          if conf.wizard then (
-            Output.print_sstring conf {|<a class="mx-2" href="|};
-            Output.print_string conf (commd conf);
-            Output.print_sstring conf {|m=MOD_NOTES&f=|};
-            Output.print_string conf (Mutil.encode fnotes);
-            Output.print_sstring conf
-              {|"><sup><i class="fa fa-gear"></i></sup></a>|});
-          Output.print_sstring conf {|<a class="mx-2" href="|};
-          Output.print_string conf (commd conf);
-          Output.print_sstring conf {|m=NOTES&f=|};
-          Output.print_string conf (Mutil.encode fnotes);
-          Output.print_sstring conf {|">|};
-          Output.print_string conf (Util.escape_html fnotes);
-          Output.print_sstring conf "</a>";
-          if (title :> string) <> "" then (
-            Output.print_sstring conf "(";
-            Output.print_string conf title;
-            Output.print_sstring conf ")");
-          Output.print_sstring conf "</tt>"
-      | Def.NLDB.PgWizard wizname ->
-          Output.print_sstring conf "<tt>";
-          if conf.wizard then (
-            Output.print_sstring conf {|<a class="mx-2" href="|};
-            Output.print_string conf (commd conf);
-            Output.print_sstring conf {|m=MOD_WIZNOTES&f=|};
-            Output.print_string conf (Mutil.encode wizname);
-            Output.print_sstring conf
-              {|"><sup><i class="fa fa-gear"></i></sup></a>|});
-          Output.print_sstring conf {|<a class="mx-2" href="|};
-          Output.print_string conf (commd conf);
-          Output.print_sstring conf {|m=WIZNOTES&f=|};
-          Output.print_string conf (Mutil.encode wizname);
-          Output.print_sstring conf {|">|};
-          Output.print_string conf (Util.escape_html wizname);
-          Output.print_sstring conf "</a><i>(";
-          Output.print_sstring conf
-            (transl_nth conf "wizard/wizards/friend/friends/exterior" 0);
-          Output.print_sstring conf ")</i></tt>");
-      Output.print_sstring conf "</li>")
+      Output.print_sstring conf "\n<tr>";
+      linked_page_rows conf base pg;
+      Output.print_sstring conf "</tr>\n")
     pgl;
-  Output.print_sstring conf "</ul>"
+  Output.print_sstring conf "</table>"
 
 let print_what_links conf base fnotes =
   let title h =

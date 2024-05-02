@@ -2810,6 +2810,21 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
           in
           VVbool r
       | _ -> raise Not_found)
+  | [ "linked_pages_nbr" ] -> (
+      match get_env "nldb" env with
+      | Vnldb db ->
+          let r =
+            if p_auth then
+              let key =
+                let fn = Name.lower (sou base (get_first_name p)) in
+                let sn = Name.lower (sou base (get_surname p)) in
+                (fn, sn, get_occ p)
+              in
+              string_of_int (List.length (links_to_ind conf base db key))
+            else "0"
+          in
+          str_val r
+      | _ -> str_val "0")
   | [ "has_sosa" ] -> (
       match get_env "p_link" env with
       | Vbool _ -> VVbool false
@@ -5450,6 +5465,7 @@ let print_what_links conf base p =
       transl conf "linked pages" |> Utf8.capitalize_fst
       |> Output.print_sstring conf;
       Util.transl conf ":" |> Output.print_sstring conf;
+      Output.print_sstring conf " ";
       if h then Output.print_string conf (simple_person_text conf base p true)
       else (
         Output.print_sstring conf {|<a href="|};
@@ -5460,7 +5476,6 @@ let print_what_links conf base p =
         Output.print_sstring conf {|</a>|})
     in
     Hutil.header conf title;
-    Hutil.print_link_to_welcome conf true;
     NotesDisplay.print_linked_list conf base pgl;
     Hutil.trailer conf)
   else Hutil.incorrect_request conf
