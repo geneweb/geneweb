@@ -218,13 +218,13 @@ module AdvancedSearchMatch = struct
     match_date ~p ~df:(fun p -> Date.od_of_cdate (get_birth p)) ~default ~dates
 
   let match_burial_date ~p ~default ~dates =
-    match_date ~p
-      ~df:(fun p ->
-        (* TODO Date.cdate_of_burial *)
-        match get_burial p with
-        | Buried cod | Cremated cod -> Date.od_of_cdate cod
-        | UnknownBurial -> None)
-      ~default ~dates
+    let get_burial p =
+      (* TODO Date.cdate_of_burial *)
+      match get_burial p with
+      | Buried cod | Cremated cod -> Date.od_of_cdate cod
+      | UnknownBurial -> None
+    in
+    match_date ~p ~df:get_burial ~default ~dates
 
   let match_death_date ~p ~default ~dates =
     match_date ~p
