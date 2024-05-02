@@ -357,12 +357,11 @@ let advanced_search conf base max_answers =
     let auth = authorized_age conf base p in
     let civil_match =
       lazy
-        (match_civil_status ~base ~sex:(gets "sex") ~married:(gets "married")
-           ~occupation:(gets "occu") ~first_name_list:fn_list
-           ~surname_list:sn_list ~skip_fname ~skip_sname
+        (match_civil_status ~base ~p ~sex:(gets "sex") ~married:(gets "married")
+           ~occupation:(gets "occu") ~skip_fname ~skip_sname
+           ~first_name_list:fn_list ~surname_list:sn_list
            ~exact_first_name:(gets "exact_first_name" = "on")
-           ~exact_surname:(gets "exact_surname" = "on")
-           ~p)
+           ~exact_surname:(gets "exact_surname" = "on"))
     in
     let pmatch =
       if not auth then false
@@ -380,11 +379,10 @@ let advanced_search conf base max_answers =
         && And.match_death ~base ~p ~exact_place
              ~dates:(getd @@ Fields.death_date_field_name ~gets ~search_type)
              ~places:(getss @@ Fields.death_place_field_name ~gets ~search_type)
-        && match_marriage ~conf ~base ~p ~exact_place
-             ~dates:(getd @@ Fields.marriage_date_field_name ~gets ~search_type)
+        && match_marriage ~conf ~base ~p ~exact_place ~default:true
              ~values:
                (getss @@ Fields.marriage_place_field_name ~gets ~search_type)
-             ~default:true
+             ~dates:(getd @@ Fields.marriage_date_field_name ~gets ~search_type)
       else
         let match_f ~date_field ~place_field or_f and_f =
           or_f ~base ~p
@@ -412,12 +410,11 @@ let advanced_search conf base max_answers =
            || match_f ~date_field:Fields.death_date_field_name
                 ~place_field:Fields.death_place_field_name Or.match_death
                 And.match_death
-           || match_marriage ~conf ~base ~p ~exact_place
-                ~dates:
-                  (getd @@ Fields.marriage_date_field_name ~gets ~search_type)
+           || match_marriage ~conf ~base ~p ~exact_place ~default:false
                 ~values:
                   (getss @@ Fields.marriage_place_field_name ~gets ~search_type)
-                ~default:false)
+                ~dates:
+                  (getd @@ Fields.marriage_date_field_name ~gets ~search_type))
     in
     if pmatch then (p :: list, len + 1) else acc
   in
