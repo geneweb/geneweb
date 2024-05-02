@@ -1,4 +1,4 @@
-<!-- $Id: menubar.txt v7.1 17/04/2024 19:21:12 $ -->
+<!-- $Id: menubar.txt v7.1 02/05/2024 19:03:42 $ -->
 %let;laA;title="[*add::family/families]0 (A)" accesskey="A"%in;
 %let;laD;title="[*difference between the two revisions] (D)" accesskey="D"%in;
 %let;laI;title="[*add]/[delete::image/images]1 (I)" accesskey="I"%in;
@@ -409,16 +409,28 @@
             <li class="nav-item">
               <a class="nav-link text-secondary" data-toggle="modal" data-target="#carousel_modal"
                 title="[*display carrousel]">
-                <span class="far fa-image fa-fw" aria-hidden="true"></span>%nn;
+                <span class="far fa-image fa-fw mr-1" aria-hidden="true"></span>%nn;
+                <sup class="small">%carrousel_img_nbr;</sup>%nn;
                 <span class="sr-only">[*image/images]1</span>%nn;
               </a>
             </li>
           %end;
-          %if;wizard;
-            <li class="nav-item%if;(carrousel_img_nbr>0) d-none%end;">
+          %if;(wizard and carrousel_img_nbr=0)
+            <li class="nav-item">
               <a class="nav-link text-secondary" href="%prefix;m=SND_IMAGE_C&i=%index;" %laI;>
                 <span class="fa fa-image fa-fw" aria-hidden="true"></span>%nn;
-                <span class="sr-only">[*add]/[delete] [image/images]1</span>%nn;
+                <span class="sr-only">icon button</span>%nn;
+              </a>
+            </li>
+          %end;
+          %( Linked notes bouton with count %)
+          %if;has_linked_pages;
+            <li class="nav-item">
+              <a class="nav-link text-secondary" href="%url_set.m.LINKED;"
+                title="%linked_pages_nbr; [linked pages]">
+                <i class="fa fa-file-lines fa-fw mr-1" aria-hidden="true"></i>%nn;
+                <sup class="small">%linked_pages_nbr;</sup>%nn;
+                <span class="sr-only">file-lines icon</span>%nn;
               </a>
             </li>
           %end;
