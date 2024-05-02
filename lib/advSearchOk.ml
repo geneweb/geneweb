@@ -123,9 +123,9 @@ module AdvancedSearchMatch = struct
   let apply_to_field_values_raw ~cmp ~p ~values ~get ~default =
     if values = [] then default else do_compare p values get cmp
 
-  let apply_to_field_values ~get ~cmp ~base ~p ~values ~default =
+  let apply_to_field_values ~get ~cmp ~base =
     let get p = sou base @@ get p in
-    apply_to_field_values_raw ~p ~values ~get ~cmp ~default
+    apply_to_field_values_raw ~get ~cmp
 
   let sex_cmp p = function
     | "M" -> get_sex p = Male
@@ -146,21 +146,17 @@ module AdvancedSearchMatch = struct
     let cmp = if exact_place then ( = ) else string_incl in
     f ~cmp
 
-  let match_baptism_place ~exact_place ~base ~p ~values ~default =
-    exact_place_wrapper ~exact_place
-    @@ apply_to_field_values ~base ~p ~values ~get:get_baptism_place ~default
+  let match_baptism_place =
+    exact_place_wrapper @@ apply_to_field_values ~get:get_baptism_place
 
-  let match_birth_place ~exact_place ~base ~p ~values ~default =
-    exact_place_wrapper ~exact_place
-    @@ apply_to_field_values ~base ~p ~values ~get:get_birth_place ~default
+  let match_birth_place =
+    exact_place_wrapper @@ apply_to_field_values ~get:get_birth_place
 
-  let match_death_place ~exact_place ~base ~p ~values ~default =
-    exact_place_wrapper ~exact_place
-    @@ apply_to_field_values ~base ~p ~values ~get:get_death_place ~default
+  let match_death_place =
+    exact_place_wrapper @@ apply_to_field_values ~get:get_death_place
 
-  let match_burial_place ~exact_place ~base ~p ~values ~default =
-    exact_place_wrapper ~exact_place
-    @@ apply_to_field_values ~base ~p ~values ~get:get_burial_place ~default
+  let match_burial_place =
+    exact_place_wrapper @@ apply_to_field_values ~get:get_burial_place
 
   let match_marriage ~cmp ~conf ~base ~p ~values ~default ~dates =
     let d1, d2 = dates in
@@ -209,27 +205,23 @@ module AdvancedSearchMatch = struct
       string_incl (abbrev_lower occupation)
         (abbrev_lower @@ sou base @@ get_occupation p)
 
-  let match_baptism_date ~p ~default ~dates =
-    match_date ~p
-      ~df:(fun p -> Date.od_of_cdate (get_baptism p))
-      ~default ~dates
+  let match_baptism_date =
+    match_date ~df:(fun p -> Date.od_of_cdate (get_baptism p))
 
-  let match_birth_date ~p ~default ~dates =
-    match_date ~p ~df:(fun p -> Date.od_of_cdate (get_birth p)) ~default ~dates
+  let match_birth_date =
+    match_date ~df:(fun p -> Date.od_of_cdate (get_birth p))
 
-  let match_burial_date ~p ~default ~dates =
+  let match_burial_date =
     let get_burial p =
       (* TODO Date.cdate_of_burial *)
       match get_burial p with
       | Buried cod | Cremated cod -> Date.od_of_cdate cod
       | UnknownBurial -> None
     in
-    match_date ~p ~df:get_burial ~default ~dates
+    match_date ~df:get_burial
 
-  let match_death_date ~p ~default ~dates =
-    match_date ~p
-      ~df:(fun p -> Date.date_of_death (get_death p))
-      ~default ~dates
+  let match_death_date =
+    match_date ~df:(fun p -> Date.date_of_death (get_death p))
 
   let match_name ~search_list ~exact : string list -> bool =
     let eq : string list -> string list -> bool =
