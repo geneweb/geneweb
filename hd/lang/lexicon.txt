@@ -3201,6 +3201,10 @@ ru: бат-мицва
 sv: bat mitzvah
 tr: bat mitzvah
 
+    bce
+en:  bce
+fr:  av. J.‑C.
+
     before
 af: voor
 bg: преди
