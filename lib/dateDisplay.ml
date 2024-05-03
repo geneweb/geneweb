@@ -20,11 +20,15 @@ let get_wday conf = function
 let death_symbol conf =
   try List.assoc "death_symbol" conf.base_env with Not_found -> "†"
 
+let string_of_bce_year conf y =
+  if y >= 0 then string_of_int y
+  else string_of_int (-y) ^ Util.transl conf "bce"
+
 let code_date conf encoding d m y =
   let apply_date_code = function
     | 'd' -> string_of_int d
     | 'm' -> transl_nth conf "(month)" (m - 1)
-    | 'y' -> string_of_int y
+    | 'y' -> string_of_bce_year conf y
     | c -> "%" ^ String.make 1 c
   in
   let rec loop i =
@@ -511,7 +515,7 @@ let prec_text conf d =
 let month_text d = if d.month = 0 then "" else string_of_int d.month
 
 (* ************************************************************************ *)
-(*  [Fonc] year_text : Def.dmy -> string                                    *)
+(*  [Fonc] year_text conf : Def.dmy -> string                                    *)
 
 (* ************************************************************************ *)
 
@@ -520,13 +524,13 @@ let month_text d = if d.month = 0 then "" else string_of_int d.month
       - d : Def.dmy
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
-let year_text d =
+let year_text conf d =
   match d.prec with
   | OrYear d2 when d.year <> d2.year2 ->
-      string_of_int d.year ^ "/" ^ string_of_int d2.year2
+      string_of_bce_year conf d.year ^ "/" ^ string_of_bce_year conf d2.year2
   | YearInt d2 when d.year <> d2.year2 ->
-      string_of_int d.year ^ ".." ^ string_of_int d2.year2
-  | _ -> string_of_int d.year
+      string_of_bce_year conf d.year ^ ".." ^ string_of_bce_year conf d2.year2
+  | _ -> string_of_bce_year conf d.year
 
 (* ************************************************************************ *)
 (*  [Fonc] prec_year_text : config -> Def.dmy -> string                     *)
@@ -550,7 +554,7 @@ let prec_year_text conf d =
     | Before -> "/"
     | _ -> ""
   in
-  let s = s ^ year_text d in
+  let s = s ^ year_text conf d in
   match d.prec with After -> s ^ "/" | _ -> s
 
 (* ********************************************************************** *)
