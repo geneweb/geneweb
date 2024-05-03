@@ -304,7 +304,8 @@ let ged_date_dmy opts dt cal =
   ged_calendar opts cal;
   if dt.day <> 0 then Printf.ksprintf (oc opts) "%02d " dt.day;
   if dt.month <> 0 then Printf.ksprintf (oc opts) "%s " (ged_month cal dt.month);
-  Printf.ksprintf (oc opts) "%d" dt.year;
+  if dt.year >= 0 then Printf.ksprintf (oc opts) "%d" dt.year
+  else Printf.ksprintf (oc opts) "%d BCE" (-dt.year);
   match dt.prec with
   | OrYear dmy2 ->
       Printf.ksprintf (oc opts) " AND ";
