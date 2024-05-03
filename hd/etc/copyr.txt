@@ -60,7 +60,7 @@
             <a class="dropdown-item" href="%url_set.lang_file.oc;">oc</a>
             <a class="dropdown-item" href="%url_set.lang_file.pl;">pl</a>
             <a class="dropdown-item" href="%url_set.lang_file.pt;">pt</a>
-            <a class="dropdown-item" href="%url_set.lang_file.pt-br;">pt-br</a>
+            <a class="dropdown-item" href="%apply;url_set("lang/file","pt-br")">pt-br</a>
             <a class="dropdown-item" href="%url_set.lang_file.ro;">ro</a>
             <a class="dropdown-item" href="%url_set.lang_file.ru;">ru</a>
             <a class="dropdown-item" href="%url_set.lang_file.sk;">sk</a>
