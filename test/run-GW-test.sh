@@ -45,6 +45,7 @@ GWDLOG=./distribution/gw/gwd.log
 GWCGI=gwd.cgi # the cgi script name that call gwd with cgi parameter
 GWDLOGCGI=/tmp/gwd.log # associated error log
 CLEANLOG=1
+SUDOPRFX=   # if required for GWDLOG cleanup
 CRLMAXTIME=5
 FAILING_CONDITIONS='CRITICAL|ERROR|Failed'
 WARNING_CONDITIONS='WARNING'
@@ -102,13 +103,11 @@ test "$input_pwd" && PWD="$input_pwd"
 if test "$cgitest"; then
     urlprfix="http://localhost/cgi-bin/$GWCGI?b=$DBNAME&"
     GWDLOG=$GWDLOGCGI
+    test "$CLEANLOG" && $SUDOPRFX rm -f $GWDLOGCGI
 else
     urlprfix="http://localhost:2317/$DBNAME?"
+    test "$CLEANLOG" && rm -f $GWDLOG
 fi
-
-
-# this assumes a fresh (empty) gwd.log file
-test "$CLEANLOG" && rm -f $GWDLOG
 
 if test "$GWD2START" && test -z "$cgitest"; then
 pgrep gwd >/dev/null && \
@@ -132,7 +131,6 @@ OCAMLRUNPARAM=b "$BIN_DIR"/gwd \
 sleep 1
 fi
 
-test "$DBNAME" || usage
 if test -z "$cgitest"; then
 if pgrep -a gwd
 then
@@ -164,6 +162,12 @@ crl () {
   unset first_request
 }
 
+check_gwf () {
+  local bparm="$1"
+  grep $GREPOPT "^$bparm" $BASES_DIR/$DBNAME.gwf || \
+      { echo "$bparm not set in $BASES_DIR/$DBNAME.gwf"; return 1; }
+}
+
 first_request=1
 crl "" # first call to verify DBNAME access, that will exit here.
 crl "m=S&n=$FN+$SN&p="
@@ -193,7 +197,6 @@ crl "m=CHG_CHN&ip=$FID"
 crl "m=CHG_EVT_FAM_ORD&i=$FID&ip=$ID"
 crl "m=CHG_EVT_IND_ORD&i=$ID"
 crl "m=CHG_FAM_ORD&f=$FID&i=$ID&n=2"
-crl "m=CONN_WIZ"
 crl "m=D&i=$ID"
 crl "m=D&i=$ID&t=V&v=3"
 crl "m=D&i=$ID&t=TV&v=3"
@@ -213,8 +216,12 @@ crl "m=H&v=conf"
 crl "m=H&v=$TXT_SRC"
 crl "m=HIST&k=20"
 crl "m=HIST_CLEAN&i=$ID&f=$FN.$OC.$SN"
+if check_gwf 'history_diff=yes'; then
 crl "m=HIST_DIFF&t=SUM&f=$FN.$OC.$SN"
 crl "m=HIST_DIFF&t=SUM&f=$FN.$OC.$SN&new=0&old=1"
+else
+    echo "three history_diff related commands are not tested."
+fi
 crl "m=HIST_SEARCH&i=$ID"
 crl "m=IM&s=$IMG_SRC"
 crl "m=IMH&s=$IMG_SRC"
@@ -237,7 +244,6 @@ crl "m=MOD_DATA&data=occu"
 crl "m=MOD_DATA&data=src"
 crl "m=MOD_NOTES&f=$NOTE"
 crl "m=MOD_IND&i=$ID"
-crl "m=MOD_WIZNOTES&f=$WIZ"
 crl "m=MRG&i=$ID"
 #crl "m=MRG_DUP"
 #crl "m=MRG_DUP_IND_Y_N"
@@ -265,7 +271,13 @@ crl "m=SRC&v=$TXT_SRC"
 crl "m=STAT"
 crl "m=TT"
 crl "m=TT&p=*"
+if check_gwf 'authorized_wizards_notes=yes'; then
+crl "m=CONN_WIZ"
+crl "m=MOD_WIZNOTES&f=$WIZ"
 crl "m=WIZNOTES"
+else
+    echo "three wizards notes related commands are not tested."
+fi
 
 # ATTENTION, les autres fonctions du carrousel (_OK) ont une action immédiate!!
 
