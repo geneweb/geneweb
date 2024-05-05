@@ -155,8 +155,8 @@ let linked_page_rows conf base pg =
   <a href="%sm=MOD_FAM&i=%s&ip=%s#comments" title="%s %s %s">
     <i class="fa fa-user fa-sm"></i><i class="fa fa-user fa-sm"></i></a></td>|}
              (commd conf :> string)
-             (Gwdb.string_of_ifam ifam :> string)
-             (Gwdb.get_iper fath |> Gwdb.string_of_iper :> string)
+             (Gwdb.string_of_ifam ifam)
+             (Gwdb.get_iper fath |> Gwdb.string_of_iper)
              (Utf8.capitalize_fst (transl conf "modify"))
              (transl conf "comment")
              (transl_nth conf "family/families" 0));
