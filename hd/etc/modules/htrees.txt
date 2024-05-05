@@ -1,8 +1,8 @@
 <!-- $Id: modules/htree.txt v7.1 29/04/2024 05:27:27 $ -->
 %(
 Options
-1: arbre vertical montant 3 gén. + self + descendant 3 gen. (7 gen.)
-2: “arbre” famille
+1: arbre vertical ascendants 3 gen. + self + descendants 3 gen. (7 gen.)
+2: arbre famille
 3: htree 6 generations (MR)
 4: htree 8 generations (HG)
 5: hi-trees with options
