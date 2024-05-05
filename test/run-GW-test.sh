@@ -90,9 +90,6 @@ shift $(($OPTIND - 1))
 input_db=$1 #<database name>
 input_pwd=$2 #[wizard_id:passwd] (some commands require wizard priviledge)
 
-#BASE=$1 #<database name>
-#PWD=$2  #[wizard_id:passwd] (some commands require wizard priviledge)
-
 # overwrite above hardcoded vars by an input file.
 test -f "$setenv_file" && . $setenv_file
 
