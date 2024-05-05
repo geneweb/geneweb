@@ -134,9 +134,9 @@ let linked_page_rows conf base pg =
   <a href="%sm=MOD_IND&i=%s#notes" title="%s">
     <i class="fa fa-user"></i></a></td>|}
              (commd conf :> string)
-             (Gwdb.string_of_iper ip |> Mutil.encode :> string));
-      (Utf8.capitalize_fst (transl conf "modify note"))
-        Output.print_sstring conf
+             (Gwdb.string_of_iper ip)
+             (Utf8.capitalize_fst (transl conf "modify note")));
+      Output.print_sstring conf
         (Format.sprintf {|
 <td>%s%s</td>
 <td><i>%s</i></td>|}
