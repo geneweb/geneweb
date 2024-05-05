@@ -602,7 +602,6 @@ let print_error_disconnected conf =
       (transl conf "msg error disconnected" |> Utf8.capitalize_fst |> Adef.safe)
   in
   Update.prerr conf err @@ fun () ->
-  Hutil.print_link_to_welcome conf true;
   Output.print_string conf (Update.string_of_error conf err)
 
 let family_exclude pfams efam =
