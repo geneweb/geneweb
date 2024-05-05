@@ -22,7 +22,7 @@ let death_symbol conf =
 
 let string_of_bce_year conf y =
   if y >= 0 then string_of_int y
-  else (string_of_int (- y) ^ (Util.transl conf "bce"))
+  else string_of_int (-y) ^ Util.transl conf "bce"
 
 let code_date conf encoding d m y =
   let apply_date_code = function
@@ -527,9 +527,9 @@ let month_text d = if d.month = 0 then "" else string_of_int d.month
 let year_text conf d =
   match d.prec with
   | OrYear d2 when d.year <> d2.year2 ->
-      (string_of_bce_year conf d.year) ^ "/" ^ (string_of_bce_year conf d2.year2)
+      string_of_bce_year conf d.year ^ "/" ^ string_of_bce_year conf d2.year2
   | YearInt d2 when d.year <> d2.year2 ->
-      (string_of_bce_year conf d.year) ^ ".." ^ (string_of_bce_year conf d2.year2)
+      string_of_bce_year conf d.year ^ ".." ^ string_of_bce_year conf d2.year2
   | _ -> string_of_bce_year conf d.year
 
 (* ************************************************************************ *)

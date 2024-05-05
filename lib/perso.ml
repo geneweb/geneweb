@@ -2983,7 +2983,7 @@ and eval_date_field_var conf d = function
       match d with
       | Dgreg (dmy, _) -> VVstring (string_of_int dmy.year)
       | _ -> null_val)
-  | [ "year";"bce" ] -> (
+  | [ "year"; "bce" ] -> (
       match d with
       | Dgreg (dmy, _) -> VVstring (DateDisplay.year_text conf dmy)
       | _ -> null_val)
