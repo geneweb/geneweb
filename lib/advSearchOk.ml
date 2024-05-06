@@ -704,6 +704,7 @@ let searching_fields conf base =
   let sosa_field search =
     if gets "sosa_filter" <> "" then
       match Util.find_sosa_ref conf base with
+      | None -> search
       | Some p ->
           let s =
             Printf.sprintf
@@ -713,7 +714,6 @@ let searching_fields conf base =
           if search = "" then s
           else if s = "" then search
           else search ^ ", " ^ s
-      | None -> search
     else search
   in
   let search_type = get_search_type gets in
