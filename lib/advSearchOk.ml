@@ -94,9 +94,9 @@ end = struct
 
   (* Get the field name of an event criteria depending of the search type. *)
   let get_event_field_name gets event_criteria event_name search_type =
-    if search_type <> Or then event_name ^ "_" ^ event_criteria
-    else if "on" = gets ("event_" ^ event_name) then event_criteria
-    else ""
+    match search_type with
+    | And -> event_name ^ "_" ^ event_criteria
+    | Or -> if "on" = gets ("event_" ^ event_name) then event_criteria else ""
 
   let bapt_date_field_name ~gets ~search_type =
     get_event_field_name gets "date" "bapt" search_type
@@ -687,8 +687,7 @@ let searching_fields conf base =
     (* Separator character depends on search type operator, a comma for AND search, a slash for OR search. *)
     let sep =
       if search = "" then ""
-      else if search_type <> Fields.Or then ", "
-      else " / "
+      else match search_type with Fields.And -> ", " | Or -> " / "
     in
     let search =
       if test_string place_prefix_field_name || test_date date_prefix_field_name
@@ -696,10 +695,11 @@ let searching_fields conf base =
       else search
     in
     (* The place and date have to be shown after each event only for the AND request. *)
-    if search_type <> Fields.Or then
-      get_place_date_request place_prefix_field_name date_prefix_field_name
-        search
-    else search
+    match search_type with
+    | Fields.And ->
+        get_place_date_request place_prefix_field_name date_prefix_field_name
+          search
+    | Or -> search
   in
   let sosa_field search =
     if gets "sosa_filter" <> "" then
@@ -779,13 +779,15 @@ let searching_fields conf base =
   in
   (* Adding the place and date at the end for the OR request. *)
   let search =
-    if
-      search_type = Fields.Or
-      && (gets "place" != ""
-         || gets "date2_yyyy" != ""
-         || gets "date1_yyyy" != "")
-    then get_place_date_request "place" "date" search
-    else search
+    match search_type with
+    | And -> search
+    | Fields.Or ->
+        if
+          gets "place" != ""
+          || gets "date2_yyyy" != ""
+          || gets "date1_yyyy" != ""
+        then get_place_date_request "place" "date" search
+        else search
   in
   let search =
     if not (test_string marriage_place_field_name || test_date "marriage") then
