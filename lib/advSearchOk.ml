@@ -56,41 +56,43 @@ let sex_of_string = function "M" -> Def.Male | "F" -> Female | _ -> Neuter
 
 module Fields : sig
   type search = And | Or
+  type name = string
 
   val get_event_field_name :
-    (string -> string) -> string -> string -> search -> string
+    (string -> string) -> string -> string -> search -> name
 
   val bapt_date_field_name :
-    gets:(string -> string) -> search_type:search -> string
+    gets:(string -> string) -> search_type:search -> name
 
   val birth_date_field_name :
-    gets:(string -> string) -> search_type:search -> string
+    gets:(string -> string) -> search_type:search -> name
 
   val death_date_field_name :
-    gets:(string -> string) -> search_type:search -> string
+    gets:(string -> string) -> search_type:search -> name
 
   val burial_date_field_name :
-    gets:(string -> string) -> search_type:search -> string
+    gets:(string -> string) -> search_type:search -> name
 
   val marriage_date_field_name :
-    gets:(string -> string) -> search_type:search -> string
+    gets:(string -> string) -> search_type:search -> name
 
   val bapt_place_field_name :
-    gets:(string -> string) -> search_type:search -> string
+    gets:(string -> string) -> search_type:search -> name
 
   val birth_place_field_name :
-    gets:(string -> string) -> search_type:search -> string
+    gets:(string -> string) -> search_type:search -> name
 
   val death_place_field_name :
-    gets:(string -> string) -> search_type:search -> string
+    gets:(string -> string) -> search_type:search -> name
 
   val burial_place_field_name :
-    gets:(string -> string) -> search_type:search -> string
+    gets:(string -> string) -> search_type:search -> name
 
   val marriage_place_field_name :
-    gets:(string -> string) -> search_type:search -> string
+    gets:(string -> string) -> search_type:search -> name
 end = struct
   type search = And | Or
+  type name = string
 
   (* Get the field name of an event criteria depending of the search type. *)
   let get_event_field_name gets event_criteria event_name search_type =
