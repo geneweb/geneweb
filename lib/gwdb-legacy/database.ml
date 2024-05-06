@@ -537,10 +537,10 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
     Hashtbl.fold
       (fun _ p acc ->
         let istr = get p in
-        let str = strings.get istr in
         if
           (not (List.mem istr acc))
           &&
+          let str = strings.get istr in
           match split str with
           | [ s ] -> i = Dutil.name_index s
           | list -> List.exists (fun s -> i = Dutil.name_index s) (str :: list)
