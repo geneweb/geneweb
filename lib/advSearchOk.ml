@@ -58,13 +58,13 @@ let string_incl x y =
 
 let abbrev_lower x = Name.abbrev (Name.lower x)
 
-(* Get the field name of an event criteria depending of the search type. *)
-let get_event_field_name gets event_criteria event_name search_type =
-  if search_type <> "OR" then event_name ^ "_" ^ event_criteria
-  else if "on" = gets ("event_" ^ event_name) then event_criteria
-  else ""
-
 module Fields = struct
+  (* Get the field name of an event criteria depending of the search type. *)
+  let get_event_field_name gets event_criteria event_name search_type =
+    if search_type <> "OR" then event_name ^ "_" ^ event_criteria
+    else if "on" = gets ("event_" ^ event_name) then event_criteria
+    else ""
+
   let bapt_date_field_name ~gets ~search_type =
     get_event_field_name gets "date" "bapt" search_type
 
@@ -592,34 +592,34 @@ let searching_fields conf base =
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
   let bapt_date_field_name =
-    get_event_field_name gets "date" "bapt" search_type
+    Fields.get_event_field_name gets "date" "bapt" search_type
   in
   let birth_date_field_name =
-    get_event_field_name gets "date" "birth" search_type
+    Fields.get_event_field_name gets "date" "birth" search_type
   in
   let death_date_field_name =
-    get_event_field_name gets "date" "death" search_type
+    Fields.get_event_field_name gets "date" "death" search_type
   in
   let burial_date_field_name =
-    get_event_field_name gets "date" "burial" search_type
+    Fields.get_event_field_name gets "date" "burial" search_type
   in
   let marriage_date_field_name =
-    get_event_field_name gets "date" "marriage" search_type
+    Fields.get_event_field_name gets "date" "marriage" search_type
   in
   let bapt_place_field_name =
-    get_event_field_name gets "place" "bapt" search_type
+    Fields.get_event_field_name gets "place" "bapt" search_type
   in
   let birth_place_field_name =
-    get_event_field_name gets "place" "birth" search_type
+    Fields.get_event_field_name gets "place" "birth" search_type
   in
   let death_place_field_name =
-    get_event_field_name gets "place" "death" search_type
+    Fields.get_event_field_name gets "place" "death" search_type
   in
   let burial_place_field_name =
-    get_event_field_name gets "place" "burial" search_type
+    Fields.get_event_field_name gets "place" "burial" search_type
   in
   let marriage_place_field_name =
-    get_event_field_name gets "place" "marriage" search_type
+    Fields.get_event_field_name gets "place" "marriage" search_type
   in
   let search = "" in
   let search = string_field "first_name" search in
