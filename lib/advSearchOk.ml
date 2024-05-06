@@ -59,9 +59,11 @@ let string_incl x y =
 let abbrev_lower x = Name.abbrev (Name.lower x)
 
 module Fields = struct
+  type search = And | Or
+
   (* Get the field name of an event criteria depending of the search type. *)
   let get_event_field_name gets event_criteria event_name search_type =
-    if search_type <> "OR" then event_name ^ "_" ^ event_criteria
+    if search_type <> Or then event_name ^ "_" ^ event_criteria
     else if "on" = gets ("event_" ^ event_name) then event_criteria
     else ""
 
@@ -282,7 +284,8 @@ module AdvancedSearchMatch = struct
 end
 
 (* Search type can be AND or OR. *)
-let get_search_type gets = gets "search_type"
+let get_search_type gets =
+  match gets "search_type" with "OR" -> Fields.Or | _ -> Fields.And
 
 (*
   Search for other persons in the base matching with the provided infos.
@@ -368,7 +371,7 @@ let advanced_search conf base max_answers =
     let pmatch =
       match search_type with
       | _ when not auth -> false
-      | "OR" ->
+      | Fields.Or ->
           let match_f ~date_field ~place_field or_f and_f =
             or_f ~base ~p
               ~dates:(getd @@ date_field ~gets ~search_type)
@@ -563,7 +566,8 @@ let searching_fields conf base =
       event_name search search_type =
     (* Separator character depends on search type operator, a comma for AND search, a slash for OR search. *)
     let sep =
-      if search <> "" then if search_type <> "OR" then ", " else " / " else ""
+      if search <> "" then if search_type <> Fields.Or then ", " else " / "
+      else ""
     in
     let search =
       if test_string place_prefix_field_name || test_date date_prefix_field_name
@@ -571,7 +575,7 @@ let searching_fields conf base =
       else search
     in
     (* The place and date have to be shown after each event only for the AND request. *)
-    if search_type <> "OR" then
+    if search_type <> Fields.Or then
       get_place_date_request place_prefix_field_name date_prefix_field_name
         search
     else search
@@ -655,7 +659,7 @@ let searching_fields conf base =
   (* Adding the place and date at the end for the OR request. *)
   let search =
     if
-      search_type = "OR"
+      search_type = Fields.Or
       && (gets "place" != ""
          || gets "date2_yyyy" != ""
          || gets "date1_yyyy" != "")
