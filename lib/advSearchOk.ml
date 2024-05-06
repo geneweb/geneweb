@@ -206,11 +206,11 @@ end = struct
         match df p with
         | Some d -> Date.compare_dmy d d1 >= 0 && Date.compare_dmy d d2 <= 0
         | None -> false)
-    | Some (Dgreg (d1, _)), _ -> (
+    | Some (Dgreg (d1, _)), (Some (Dtext _) | None) -> (
         match df p with Some d -> Date.compare_dmy d d1 >= 0 | None -> false)
-    | _, Some (Dgreg (d2, _)) -> (
+    | (Some (Dtext _) | None), Some (Dgreg (d2, _)) -> (
         match df p with Some d -> Date.compare_dmy d d2 <= 0 | None -> false)
-    | _ -> default
+    | (Some (Dtext _) | None), (Some (Dtext _) | None) -> default
 
   let do_compare ~p ~places ~get ~cmp =
     let s = abbrev_lower @@ get p in
@@ -277,20 +277,21 @@ end = struct
                 if Date.compare_date d d1 < 0 then false
                 else if Date.compare_date d2 d < 0 then false
                 else true
-            | _ -> false)
-    | Some d1, _ ->
+            | Some (Dtext _) | None -> false)
+    | Some d1, None ->
         test_date_place (fun fam ->
             match Date.od_of_cdate (get_marriage fam) with
             | Some (Dgreg (_, _) as d) ->
                 if Date.compare_date d d1 < 0 then false else true
-            | _ -> false)
-    | _, Some d2 ->
+            | Some (Dtext _) | None -> false)
+    | None, Some d2 ->
         test_date_place (fun fam ->
             match Date.od_of_cdate (get_marriage fam) with
             | Some (Dgreg (_, _) as d) ->
                 if Date.compare_date d d2 > 0 then false else true
-            | _ -> false)
-    | _ -> if places = [] then default else test_date_place (fun _ -> true)
+            | Some (Dtext _) | None -> false)
+    | None, None ->
+        if places = [] then default else test_date_place (fun _ -> true)
 
   let match_marriage = exact_place_wrapper match_marriage
 
