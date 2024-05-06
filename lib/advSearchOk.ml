@@ -686,8 +686,9 @@ let searching_fields conf base =
       event_name search search_type =
     (* Separator character depends on search type operator, a comma for AND search, a slash for OR search. *)
     let sep =
-      if search <> "" then if search_type <> Fields.Or then ", " else " / "
-      else ""
+      if search = "" then ""
+      else if search_type <> Fields.Or then ", "
+      else " / "
     in
     let search =
       if test_string place_prefix_field_name || test_date date_prefix_field_name
