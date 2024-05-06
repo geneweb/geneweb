@@ -58,7 +58,42 @@ let string_incl x y =
 
 let abbrev_lower x = Name.abbrev (Name.lower x)
 
-module Fields = struct
+module Fields : sig
+  type search = And | Or
+
+  val get_event_field_name :
+    (string -> string) -> string -> string -> search -> string
+
+  val bapt_date_field_name :
+    gets:(string -> string) -> search_type:search -> string
+
+  val birth_date_field_name :
+    gets:(string -> string) -> search_type:search -> string
+
+  val death_date_field_name :
+    gets:(string -> string) -> search_type:search -> string
+
+  val burial_date_field_name :
+    gets:(string -> string) -> search_type:search -> string
+
+  val marriage_date_field_name :
+    gets:(string -> string) -> search_type:search -> string
+
+  val bapt_place_field_name :
+    gets:(string -> string) -> search_type:search -> string
+
+  val birth_place_field_name :
+    gets:(string -> string) -> search_type:search -> string
+
+  val death_place_field_name :
+    gets:(string -> string) -> search_type:search -> string
+
+  val burial_place_field_name :
+    gets:(string -> string) -> search_type:search -> string
+
+  val marriage_place_field_name :
+    gets:(string -> string) -> search_type:search -> string
+end = struct
   type search = And | Or
 
   (* Get the field name of an event criteria depending of the search type. *)
@@ -98,7 +133,71 @@ module Fields = struct
     get_event_field_name gets "place" "marriage" search_type
 end
 
-module AdvancedSearchMatch = struct
+module AdvancedSearchMatch : sig
+  val match_name :
+    search_list:string list list -> exact:bool -> string list -> bool
+
+  val match_civil_status :
+    base:Gwdb.base ->
+    p:Gwdb.person ->
+    sex:string ->
+    married:string ->
+    occupation:string ->
+    first_name_list:string list list ->
+    surname_list:string list list ->
+    skip_fname:bool ->
+    skip_sname:bool ->
+    exact_first_name:bool ->
+    exact_surname:bool ->
+    bool
+
+  val match_marriage :
+    exact_place:bool ->
+    conf:Config.config ->
+    base:Gwdb.base ->
+    p:Gwdb.person ->
+    values:string list ->
+    default:bool ->
+    dates:Date.date option * Date.date option ->
+    bool
+
+  module type Match = sig
+    val match_baptism :
+      base:Gwdb.base ->
+      p:Gwdb.person ->
+      dates:Date.date option * Date.date option ->
+      places:string list ->
+      exact_place:bool ->
+      bool
+
+    val match_birth :
+      base:Gwdb.base ->
+      p:Gwdb.person ->
+      dates:Date.date option * Date.date option ->
+      places:string list ->
+      exact_place:bool ->
+      bool
+
+    val match_burial :
+      base:Gwdb.base ->
+      p:Gwdb.person ->
+      dates:Date.date option * Date.date option ->
+      places:string list ->
+      exact_place:bool ->
+      bool
+
+    val match_death :
+      base:Gwdb.base ->
+      p:Gwdb.person ->
+      dates:Date.date option * Date.date option ->
+      places:string list ->
+      exact_place:bool ->
+      bool
+  end
+
+  module And : Match
+  module Or : Match
+end = struct
   (* Check if the date matches with the person event. *)
   let match_date ~p ~df ~default ~dates =
     let d1, d2 = dates in
@@ -257,6 +356,40 @@ module AdvancedSearchMatch = struct
     && (skip_sname || match_surname ~base ~surname_list ~exact:exact_surname p)
     && match_married ~p ~married
     && match_occupation ~base ~p ~occupation
+
+  module type Match = sig
+    val match_baptism :
+      base:Gwdb.base ->
+      p:Gwdb.person ->
+      dates:Date.date option * Date.date option ->
+      places:string list ->
+      exact_place:bool ->
+      bool
+
+    val match_birth :
+      base:Gwdb.base ->
+      p:Gwdb.person ->
+      dates:Date.date option * Date.date option ->
+      places:string list ->
+      exact_place:bool ->
+      bool
+
+    val match_burial :
+      base:Gwdb.base ->
+      p:Gwdb.person ->
+      dates:Date.date option * Date.date option ->
+      places:string list ->
+      exact_place:bool ->
+      bool
+
+    val match_death :
+      base:Gwdb.base ->
+      p:Gwdb.person ->
+      dates:Date.date option * Date.date option ->
+      places:string list ->
+      exact_place:bool ->
+      bool
+  end
 
   module And = struct
     let match_and date_f place_f ~(base : Gwdb.base) ~p ~dates
