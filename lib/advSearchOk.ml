@@ -281,6 +281,9 @@ module AdvancedSearchMatch = struct
   end
 end
 
+(* Search type can be AND or OR. *)
+let get_search_type gets = gets "search_type"
+
 (*
   Search for other persons in the base matching with the provided infos.
 
@@ -347,8 +350,7 @@ let advanced_search conf base max_answers =
       (fun s -> List.map Name.lower @@ Name.split_sname s)
       (getss "surname")
   in
-  (* Search type can be AND or OR. *)
-  let search_type = gets "search_type" in
+  let search_type = get_search_type gets in
 
   let exact_place = "on" = gets "exact_place" in
 
@@ -589,8 +591,7 @@ let searching_fields conf base =
       | None -> search
     else search
   in
-  (* Search type can be AND or OR. *)
-  let search_type = gets "search_type" in
+  let search_type = get_search_type gets in
   let bapt_date_field_name =
     Fields.get_event_field_name gets "date" "bapt" search_type
   in
