@@ -790,6 +790,9 @@ let searching_fields conf base =
         else search
   in
   let search =
+    let marriage_place_field_name =
+      Fields.get_event_field_name gets "place" "marriage" search_type
+    in
     if not (test_string marriage_place_field_name || test_date "marriage") then
       let sep = if search <> "" then ", " else "" in
       if gets "married" = "Y" then search ^ sep ^ transl conf "having a family"
