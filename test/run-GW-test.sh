@@ -3,7 +3,7 @@
 usage()
 {
 echo "Usage: $cmd [Options] [<database name>] [wizard_id:passwd]
-Hardcoded crl tests on input geneweb <database name>
+Hardcoded curl tests on input geneweb <database name>
 and ultimately check that no failures in $GWDLOG
 Need to properly set 'hardcoded vars' in script header.
 Options:
@@ -12,7 +12,7 @@ Options:
 -h  To display this help.
 Use Cases:
 $cmd (with no parameters)
-    search $DEFVARS_FILE in current folder,
+    search $setenv_file in current folder,
     if found will be sourced in to overwrite hardcoded vars.
     else will use all default vars.
 $cmd -f <file with my own hardcoded vars>
@@ -46,7 +46,9 @@ GWCGI=gwd.cgi # the cgi script name that call gwd with cgi parameter
 GWDLOGCGI=/tmp/gwd.log # associated error log
 CLEANLOG=1
 CRLMAXTIME=5
-
+FAILING_CONDITIONS='CRITICAL|ERROR|Failed'
+WARNING_CONDITIONS='WARNING'
+GREPOPT='-q'
 
 # this is the data for specific persons
 # for synonym test there should be several occurrences of FN+SN
@@ -147,17 +149,22 @@ crl () {
   curl $curlopt "${urlprfix}w=$PWD&$cmd"
   if [ $? -ne 0 ]; then
     echo "Failed to execute $cmd."
-  fi
+    test -n "$first_request" && exit 1
   # TODO: Is there a need for test in different languages ?
-  if grep "<h1>Incorrect request</h1>" /tmp/tmp.txt; then
-    if grep "<h1>404 Not Found</h1>" /tmp/tmp.txt; then
+  elif grep $GREPOPT "<h1>Incorrect request</h1>" /tmp/tmp.txt; then
+    if grep $GREPOPT "<h1>404 Not Found</h1>" /tmp/tmp.txt; then
       echo "Not found $DBNAME with ${urlprfix}w=$PWD&$cmd"
       exit 1
     fi
     echo "Incorrect request with $cmd."
+  elif grep $GREPOPT "404 Not Found" /tmp/tmp.txt; then
+    echo "Web server unable to access specified cgi script, ${urlprfix}w=$PWD&$cmd"
+    exit 1
   fi
+  unset first_request
 }
 
+first_request=1
 crl "" # first call to verify DBNAME access, that will exit here.
 crl "m=S&n=$FN+$SN&p="
 crl "p=$FN&n=$SN&oc=$OC"
@@ -194,7 +201,7 @@ crl "m=D&i=$ID&t=V&v=3"
 crl "m=D&i=$ID&t=I&v=3&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&gen=1&ns=1&hl=1"
 crl "m=D&i=$ID&t=L&v=3&maxv=3&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"
 crl "m=D&i=$ID&t=A&num=on&v=3"
-crl "m=DEL_FAM&i=$FID&ip=$ID1"
+crl "m=DEL_FAM&i=$FID&ip=$ID"
 crl "m=DEL_IND&i=$ID"
 crl "m=DOC&s=$IMG_SRC"
 crl "m=DOCH&s=$IMG_SRC"
@@ -263,4 +270,5 @@ crl "m=WIZNOTES"
 # ATTENTION, les autres fonctions du carrousel (_OK) ont une action immédiate!!
 
 echo "$GWDLOG reported traces (empty if no failure):"
-grep -E "CRITICAL|ERROR|WARNING|Failed" $GWDLOG
+grep -E "$WARNING_CONDITIONS" $GWDLOG
+grep -E "$FAILING_CONDITIONS" $GWDLOG && exit 1
