@@ -872,12 +872,12 @@
 
 %define;rm(ccc,ttt)
   %if;(e.ccc="on")<a role="button" class="stretched-link" href="%apply;url_set%with;ccc%end;"
-    title="ttt&#010;&#010; [*remove %s column:::ccc]"></a>%end;
+    title="ttt&#010;&#010; [*remove %s column:::ccc]"></a>%end;
 %end;
 %define;rm3(ccc,ddd,eee,ttt)
   %if;(e.ccc="on" and e.ddd="on")<a role="button" class="stretched-link"
     href="%apply;url_set%with;ccc/ddd%if;("eee"!="")/eee%end;%end;"
-    title="ttt&#010;&#010; [*remove %s column:::ccc+ddd+eee]"></a>%end;
+    title="ttt&#010;&#010; [*remove %s column:::ccc+ddd+eee]"></a>%end;
 %end;
 %define;table_header()
   <thead><tr class="align-middle">

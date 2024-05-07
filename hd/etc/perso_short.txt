@@ -176,7 +176,7 @@
           %if;(are_divorced or are_separated)
             <tr>
               <td colspan="2">
-                %if;are_divorced;[*divorced] %divorce_date;. %end;
+                %if;are_divorced;[*divorced] %on_divorce_date;. %end;
                 %if;are_separated;[*separated]. %end;
               </td>
             </tr>
