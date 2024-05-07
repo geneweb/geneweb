@@ -141,6 +141,7 @@ else
 fi
 fi
 
+RC=0
 curlopt="-sS -m $CRLMAXTIME -o /tmp/tmp.txt"
 crl () {
   local cmd=$1
@@ -155,6 +156,7 @@ crl () {
       exit 1
     fi
     echo "Incorrect request with $cmd."
+    RC=$(($RC+1))
   elif grep $GREPOPT "404 Not Found" /tmp/tmp.txt; then
     echo "Web server unable to access specified cgi script, ${urlprfix}w=$PWD&$cmd"
     exit 1
@@ -209,6 +211,7 @@ crl "m=DEL_IND&i=$ID"
 crl "m=DOC&s=$IMG_SRC"
 crl "m=DOCH&s=$IMG_SRC"
 crl "m=F&i=$ID"
+# Warning: Assume forum enabled, because no simple way to check it.
 crl "m=FORUM"
 #crl "m=FORUM&p=939" # too base specific
 crl "m=FORUM_ADD"
@@ -281,6 +284,14 @@ fi
 
 # ATTENTION, les autres fonctions du carrousel (_OK) ont une action immédiate!!
 
+if test -f "$GWDLOG"; then
 echo "$GWDLOG reported traces (empty if no failure):"
 grep -E "$WARNING_CONDITIONS" $GWDLOG
-grep -E "$FAILING_CONDITIONS" $GWDLOG && exit 1
+grep -E "$FAILING_CONDITIONS" $GWDLOG && RC=$(($RC+1))
+fi
+if test "$RC" != 0; then
+    echo "at least $RC detected error(s)."
+    exit 1
+else
+    echo "No detected error."
+fi
