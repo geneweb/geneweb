@@ -523,6 +523,10 @@ _
 #robot_index=yes
 #robot_index_forum=yes
 
+# list of plugins to activate in this base, from previously loaded gwd plugins
+# since version 7.0. Details on https://geneweb.tuxfamily.org/wiki/plugins
+#plugins=
+
 ### templm specific parameters ######################################
 
 # for templm, identify css file to be used, either
