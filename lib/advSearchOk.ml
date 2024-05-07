@@ -61,35 +61,16 @@ module Fields : sig
   val get_event_field_name :
     (string -> string) -> string -> string -> search -> name
 
-  val bapt_date_field_name :
-    gets:(string -> string) -> search_type:search -> name
-
-  val birth_date_field_name :
-    gets:(string -> string) -> search_type:search -> name
-
-  val death_date_field_name :
-    gets:(string -> string) -> search_type:search -> name
-
-  val burial_date_field_name :
-    gets:(string -> string) -> search_type:search -> name
-
-  val marriage_date_field_name :
-    gets:(string -> string) -> search_type:search -> name
-
-  val bapt_place_field_name :
-    gets:(string -> string) -> search_type:search -> name
-
-  val birth_place_field_name :
-    gets:(string -> string) -> search_type:search -> name
-
-  val death_place_field_name :
-    gets:(string -> string) -> search_type:search -> name
-
-  val burial_place_field_name :
-    gets:(string -> string) -> search_type:search -> name
-
-  val marriage_place_field_name :
-    gets:(string -> string) -> search_type:search -> name
+  val bapt_date : gets:(string -> string) -> search_type:search -> name
+  val birth_date : gets:(string -> string) -> search_type:search -> name
+  val death_date : gets:(string -> string) -> search_type:search -> name
+  val burial_date : gets:(string -> string) -> search_type:search -> name
+  val marriage_date : gets:(string -> string) -> search_type:search -> name
+  val bapt_place : gets:(string -> string) -> search_type:search -> name
+  val birth_place : gets:(string -> string) -> search_type:search -> name
+  val death_place : gets:(string -> string) -> search_type:search -> name
+  val burial_place : gets:(string -> string) -> search_type:search -> name
+  val marriage_place : gets:(string -> string) -> search_type:search -> name
 end = struct
   type search = And | Or
   type name = string
@@ -100,34 +81,34 @@ end = struct
     | And -> event_name ^ "_" ^ event_criteria
     | Or -> if "on" = gets ("event_" ^ event_name) then event_criteria else ""
 
-  let bapt_date_field_name ~gets ~search_type =
+  let bapt_date ~gets ~search_type =
     get_event_field_name gets "date" "bapt" search_type
 
-  let birth_date_field_name ~gets ~search_type =
+  let birth_date ~gets ~search_type =
     get_event_field_name gets "date" "birth" search_type
 
-  let death_date_field_name ~gets ~search_type =
+  let death_date ~gets ~search_type =
     get_event_field_name gets "date" "death" search_type
 
-  let burial_date_field_name ~gets ~search_type =
+  let burial_date ~gets ~search_type =
     get_event_field_name gets "date" "burial" search_type
 
-  let marriage_date_field_name ~gets ~search_type =
+  let marriage_date ~gets ~search_type =
     get_event_field_name gets "date" "marriage" search_type
 
-  let bapt_place_field_name ~gets ~search_type =
+  let bapt_place ~gets ~search_type =
     get_event_field_name gets "place" "bapt" search_type
 
-  let birth_place_field_name ~gets ~search_type =
+  let birth_place ~gets ~search_type =
     get_event_field_name gets "place" "birth" search_type
 
-  let death_place_field_name ~gets ~search_type =
+  let death_place ~gets ~search_type =
     get_event_field_name gets "place" "death" search_type
 
-  let burial_place_field_name ~gets ~search_type =
+  let burial_place ~gets ~search_type =
     get_event_field_name gets "place" "burial" search_type
 
-  let marriage_place_field_name ~gets ~search_type =
+  let marriage_place ~gets ~search_type =
     get_event_field_name gets "place" "marriage" search_type
 end
 
@@ -508,47 +489,36 @@ let advanced_search conf base max_answers =
           && (getss "place" = []
               && gets "date2_yyyy" = ""
               && gets "date1_yyyy" = ""
-             || match_f ~date_field:Fields.bapt_date_field_name
-                  ~place_field:Fields.bapt_place_field_name Or.match_baptism
+             || match_f ~date_field:Fields.bapt_date
+                  ~place_field:Fields.bapt_place Or.match_baptism
                   And.match_baptism
-             || match_f ~date_field:Fields.birth_date_field_name
-                  ~place_field:Fields.birth_place_field_name Or.match_birth
-                  And.match_birth
-             || match_f ~date_field:Fields.burial_date_field_name
-                  ~place_field:Fields.burial_place_field_name Or.match_burial
+             || match_f ~date_field:Fields.birth_date
+                  ~place_field:Fields.birth_place Or.match_birth And.match_birth
+             || match_f ~date_field:Fields.burial_date
+                  ~place_field:Fields.burial_place Or.match_burial
                   And.match_burial
-             || match_f ~date_field:Fields.death_date_field_name
-                  ~place_field:Fields.death_place_field_name Or.match_death
-                  And.match_death
+             || match_f ~date_field:Fields.death_date
+                  ~place_field:Fields.death_place Or.match_death And.match_death
              || match_marriage ~conf ~base ~p ~exact_place ~default:false
-                  ~places:
-                    (getss
-                    @@ Fields.marriage_place_field_name ~gets ~search_type)
-                  ~dates:
-                    (getd @@ Fields.marriage_date_field_name ~gets ~search_type)
-             )
+                  ~places:(getss @@ Fields.marriage_place ~gets ~search_type)
+                  ~dates:(getd @@ Fields.marriage_date ~gets ~search_type))
       | _ ->
           Lazy.force civil_match
           && And.match_baptism ~base ~p ~exact_place
-               ~dates:(getd @@ Fields.bapt_date_field_name ~gets ~search_type)
-               ~places:(getss @@ Fields.bapt_place_field_name ~gets ~search_type)
+               ~dates:(getd @@ Fields.bapt_date ~gets ~search_type)
+               ~places:(getss @@ Fields.bapt_place ~gets ~search_type)
           && And.match_birth ~base ~p ~exact_place
-               ~dates:(getd @@ Fields.birth_date_field_name ~gets ~search_type)
-               ~places:
-                 (getss @@ Fields.birth_place_field_name ~gets ~search_type)
+               ~dates:(getd @@ Fields.birth_date ~gets ~search_type)
+               ~places:(getss @@ Fields.birth_place ~gets ~search_type)
           && And.match_burial ~base ~p ~exact_place
-               ~dates:(getd @@ Fields.burial_date_field_name ~gets ~search_type)
-               ~places:
-                 (getss @@ Fields.burial_place_field_name ~gets ~search_type)
+               ~dates:(getd @@ Fields.burial_date ~gets ~search_type)
+               ~places:(getss @@ Fields.burial_place ~gets ~search_type)
           && And.match_death ~base ~p ~exact_place
-               ~dates:(getd @@ Fields.death_date_field_name ~gets ~search_type)
-               ~places:
-                 (getss @@ Fields.death_place_field_name ~gets ~search_type)
+               ~dates:(getd @@ Fields.death_date ~gets ~search_type)
+               ~places:(getss @@ Fields.death_place ~gets ~search_type)
           && match_marriage ~conf ~base ~p ~exact_place ~default:true
-               ~places:
-                 (getss @@ Fields.marriage_place_field_name ~gets ~search_type)
-               ~dates:
-                 (getd @@ Fields.marriage_date_field_name ~gets ~search_type)
+               ~places:(getss @@ Fields.marriage_place ~gets ~search_type)
+               ~dates:(getd @@ Fields.marriage_date ~gets ~search_type)
     in
     if pmatch then (p :: list, len + 1) else acc
   in
