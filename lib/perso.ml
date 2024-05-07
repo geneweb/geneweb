@@ -1543,6 +1543,30 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | Vfam (_, fam, _, m_auth) when mode_local env -> (
           match get_divorce fam with
           | Divorced d -> (
+              let d = Date.od_of_cdate d in
+              match d with
+              | Some d when m_auth ->
+                  DateDisplay.string_of_ondate ~link:false conf d |> safe_val
+              | _ -> null_val)
+          | NotDivorced | Separated -> raise Not_found)
+      | _ -> (
+          match get_env "fam_link" env with
+          | Vfam (_, fam, _, m_auth) -> (
+              match get_divorce fam with
+              | Divorced d -> (
+                  let d = Date.od_of_cdate d in
+                  match d with
+                  | Some d when m_auth ->
+                      DateDisplay.string_of_ondate ~link:false conf d
+                      |> safe_val
+                  | _ -> null_val)
+              | NotDivorced | Separated -> raise Not_found)
+          | _ -> raise Not_found))
+  | "on_divorce_date" -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) when mode_local env -> (
+          match get_divorce fam with
+          | Divorced d -> (
               match date_aux conf m_auth d with
               | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
               | x -> x)

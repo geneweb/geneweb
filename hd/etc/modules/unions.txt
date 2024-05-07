@@ -181,7 +181,7 @@
              <sup>%count;</sup>
           %end;
         %end;
-        %if;are_divorced;, [divorced] %divorce_date;%end;
+        %if;are_divorced;, [divorced] %on_divorce_date;%end;
         %if;are_separated;, [separated]%sp;
           %foreach;event;
             %if;(event.name=[separate event]0)%event.date;%end;
@@ -381,7 +381,7 @@
             %end;
           %end;
         %end;
-        %if;not are_divorced;.%else;%if;are_separated;, [divorced]%else;[*divorced]%end; %divorce_date;.%end;
+        %if;not are_divorced;.%else;%if;are_separated;, [divorced]%else;[*divorced]%end; %on_divorce_date;.%end;
       </div>
     %end;
     </li></ul>
@@ -410,7 +410,7 @@
         %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)
           <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;%nn;
-        %if;are_divorced;, [divorced]0 %divorce_date;%sp;%end;
+        %if;are_divorced;, [divorced]0 %on_divorce_date;%sp;%end;
         %if;are_separated;, [separated]0%sp;
           %foreach;event;
             %if;(event.name=[separate event]0)%event.date;%end;
@@ -472,7 +472,7 @@
         %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)%nn;
           <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;
-        %if;are_divorced;, [divorced]0 %divorce_date;%sp;%end;
+        %if;are_divorced;, [divorced]0 %on_divorce_date;%sp;%end;
         %if;are_separated;, [separated]0%sp;
           %foreach;event;
             %if;(event.name=[separate event]0)%event.date;%end;
@@ -582,7 +582,7 @@
         %if;((wizard or friend or bvar.no_note_for_visitor!="yes") and has_comment)%nn;
           <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;
-        %if;are_divorced;, [divorced]0 %divorce_date;%end;
+        %if;are_divorced;, [divorced]0 %on_divorce_date;%end;
         %if;are_separated;, [separated]0%end;
         %if;spouse.has_image;
               </td>
@@ -620,7 +620,7 @@
                       <em>%child;%child.title;%child.dates;</em>%end;
                     <em>&nbsp;%apply;married_to("child", 0)</em>
                     %apply;short_display_person_f("spouse")%nn;
-                    %if;are_divorced; [divorced]0 %divorce_date;%end;
+                    %if;are_divorced; [divorced]0 %on_divorce_date;%end;
                     %if;are_separated; [separated]0%end;%nn;
                     %if;has_children; %apply;havingchildren(nb_children)
                       %if;(child.has_image and family_cnt=1)</td></tr></table>%end;%nl;
@@ -637,7 +637,7 @@
                                     <em>%child;%child.title;%child.dates;</em>%nl;%end;
                                   <em>&nbsp;%apply;married_to("child", 0)</em>
                                   %apply;short_display_person_f("spouse")
-                                  %if;are_divorced; [divorced]0 %divorce_date;%end;
+                                  %if;are_divorced; [divorced]0 %on_divorce_date;%end;
                                   %if;are_separated; [separated]0%end;
                                   %if;has_children;
                                     <table style="border-width: %border;"><tr>%nn;
