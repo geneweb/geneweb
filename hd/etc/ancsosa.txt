@@ -1442,7 +1442,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     %if;(e.t = "M")
       %if;(e.evt = "on")[*missing events]%else;[*missing ancestors]%end;%nn;
     %else;
-      %if;(e.only="on" and e.v<5)%apply;capitalize%with;%apply;gen("v")%end;
+      %if;(e.only="on")%apply;capitalize%with;%apply;gen("v")%end;
       %else;[*ancestor/ancestors]1%nn;
       %end;
     %end;
@@ -1541,12 +1541,12 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 %elseif;(e.t = "M" and e.al = "on")
   %( missing ancestors alphabetically %)
   %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
-  <p>
+  <div class="ml-2">
     %apply;togena(nb_gen)
     %apply;living_interval_dates(e.after, e.before).
-  </p>
-  <div class="not_printable" style="margin-bottom:25px;">
-    <table class="display_search">
+  </div>
+  <div>
+    <table>
       <tr>
         <td><b>[*sort by/generation/alphabetic order]0</b></td>
         <td><img src="%images_prefix;picto_branch.png"></td>
@@ -1561,7 +1561,6 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       </tr>
     </table>
   </div>
-
   %empty_sorted_list;
   %reset_count;
   %foreach;ancestor_level(nb_gen)
@@ -1614,8 +1613,8 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     %if;(nb_ind <= 100)
       <li>%nn;
       <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
-      <table class="missing_ancestors_table">
-        <tr class="missing_ancestors_table_header">
+      <table class="table table-sm w-auto asc-desc-table">
+        <tr>
           <th width="20%%">[*person/persons]0</th>
           %if;(e.birth = "on")
             <th %if;(e.death = "on")width="30%%"%else;width="60%%"%end;>[*birth date and birth place]</th>
@@ -1631,8 +1630,8 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %if;(initial(prev_item.1) != initial(item.1) and nb_ind > 100)
         <li>%nn;
         <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
-        <table class="missing_ancestors_table">
-          <tr class="missing_ancestors_table_header">
+        <table class="table table-sm w-auto asc-desc-table">
+          <tr>
             <th width="20%%">[*person/persons]0</th>
             %if;(e.birth = "on")
               <th %if;(e.death = "on")width="30%%"%else;width="60%%"%end;>[*birth date and birth place]</th>
@@ -1678,7 +1677,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       </li>
     %end;
   </ul>
-  <p style="clear:both;">[*total][:] %count; [[person/persons]]1@(c)]</p>
+  <p style="clear:both;">[*total][:] %count; [[person/persons]]1@(c)].</p>
 
 %elseif;(e.t = "M")
   %( missing ancestors by generation %)
@@ -1687,25 +1686,24 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
     %apply;togena(nb_gen)
     %apply;living_interval_dates(e.after, e.before)
   </p>
-  <div class="not_printable" style="margin-bottom:25px;">
-    <table class="display_search">
-      <tr>
-        <td><b>[*sort by/generation/alphabetic order]0</b></td>
-        <td><img src="%images_prefix;picto_branch.png"></td>
-        <td>[sort by/generation/alphabetic order]1</td>
-        <td><img src="%images_prefix;picto_alphabetic_order.png"></td>
-        <td>
-          <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&t=%e.t;&v=%e.v;&birth=%e.birth;&death=%e.death;&spouse=%e.spouse;&al=on">
-            [sort by/generation/alphabetic order]2
-          </a>
-        </td>
-      </tr>
-    </table>
-  </div>
+  <table class="display_search">
+    <tr>
+      <td><b>[*sort by/generation/alphabetic order]0</b></td>
+      <td><img src="%images_prefix;picto_branch.png"></td>
+      <td>[sort by/generation/alphabetic order]1</td>
+      <td><img src="%images_prefix;picto_alphabetic_order.png"></td>
+      <td>
+        <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&t=%e.t;&v=%e.v;&birth=%e.birth;&death=%e.death;&spouse=%e.spouse;&al=on">
+          [sort by/generation/alphabetic order]2
+        </a>
+      </td>
+    </tr>
+  </table>
+
 
   %reset_count;
-  <table class="table missing_ancestors_table">
-    <tr class="missing_ancestors_table_header align-middle">
+  <table class="table table-sm w-auto asc-desc-table">
+    <tr class="align-middle">
       <th>[*missing sosa]</th>
       <th>[*missing parents]</th>
       <th>[*missing spouse]</th>
@@ -1791,12 +1789,12 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 %elseif;(e.t = "G" and e.only= "on")
   %( long display; only the selected generation %)
   %if;((e.notes = "on" or e.src = "on") and e.inline != "on")
-    <p class="not_printable">
+    <div>
       [*see]: <a href="#asc">[*ancestor/ancestors]1</a>%sp;%nn;
       %if;((e.notes = "on" or e.src = "on") and e.inline != "on")
         | <a href="#ns">[*note/notes]1</a>
       %end;
-    </p>
+    </div>
   %end;
   %if;(e.v!=0)
     <h3>
@@ -1832,12 +1830,12 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 %elseif;(e.t = "G")
   %( long display %)
   %if;((e.notes = "on" or e.src = "on") and e.inline != "on")
-    <p class="not_printable">
+    <div>
       [*see]: <a href="#asc">[*ancestor/ancestors]1</a>%sp;%nn;
       %if;((e.notes = "on" or e.src = "on") and e.inline != "on")
         | <a href="#ns">[*note/notes]1</a>
       %end;
-    </p>
+    </div>
   %end;
   %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
   <p>

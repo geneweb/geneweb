@@ -161,9 +161,9 @@
 
 %define;gena(xx)
   %if;(xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[*the parents]%nn;
-  %elseif;(xx = 3)[*the grandparents]%nn;
-  %elseif;(xx = 4)[*the great-grandparents]%nn;
+  %elseif;(xx = 2)[the parents]%nn;
+  %elseif;(xx = 3)[the grandparents]%nn;
+  %elseif;(xx = 4)[the great-grandparents]%nn;
   %else;
     %apply;thegen%with;
       %apply;nth([nth (generation)], xx)
@@ -243,8 +243,6 @@
 %end;
 
 %define;short_display_person(xx)
-  %( %apply;image_MF("xx") to discuss %)
-  %sp;
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
@@ -252,7 +250,7 @@
         class="%if;(xx.sex=0)male%elseif;(xx.sex=1)female%else;neuter%end;-underline">%xx;</a>%nn;
     %end;
   %end;
-  %if;(cancel_links or not wizard)<span%else;<a href="%prefix;m=MOD_IND&i=%xx.index;"%end;
+  %if;(cancel_links or not wizard)<span%else;<a href="%prefix;m=MOD_IND&i=%xx.index;"%end;%sp;
     title="%if;not (cancel_links or not wizard)[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;%end; %if;xx.computable_age;(%xx.age;)%elseif;xx.computable_death_age;(%xx.death_age;)%end;" class="text-nowrap font-italic">%if;(xx.dates!="")%xx.dates;%end;
   %if;(cancel_links or not wizard)</span>%else;</a>%end;
   %if;(xx.title!=""), %xx.title;%end;%nn;
