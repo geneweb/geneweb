@@ -1901,7 +1901,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 %elseif;(e.t = "X" or e.t = "Y")
   %empty_sorted_list;
   %reset_count;
-  <table class="table table-hover ascdesc_table ml-2">
+  <table class="table table-hover asc-desc-table ml-2">
     <col width="4%%"%/>
     <col width="18%%"%/>
     <col width="18%%" align="%left;"%/>
@@ -1919,7 +1919,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 %elseif;(e.t = "Z")
   %if;(e.csv!=1)
     %reset_count;
-    <table class="table table-hover ascdesc_table gold_header mt-1" aria-labelledby="[table]-[ancestor]">
+    <table class="table-hover asc-desc-table mt-1" aria-labelledby="[table]-[ancestor]">
       %( table_headed defined in perso_utils for both tables %)
       %apply;table_header()
       <tbody>
