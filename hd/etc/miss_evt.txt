@@ -1,6 +1,4 @@
-%(
-   Missing events table
-%)
+%( Missing events table %)
 
 %define;has_missing_birth_date(xx)
   %if;(xx.has_birth_date or xx.has_baptism_date)
@@ -419,16 +417,12 @@
   %end;
 %end;
 
-
-%(
-   Main
-%)
-
-%let;nb_gena;%apply;min(evar.v, max_anc_level)%in;
-<p>%apply;togena(nb_gena).</p>
-<table class="table table-bordered ascends_table splitForPrint">
+%( Main %)
+%let;nb_gena;%apply;min(e.v, max_anc_level)%in;
+<div class="ml-2">%apply;togena(nb_gena).</div>
+<table class="table table-bordered table-sm asc-desc-table w-auto mx-2">
   <thead>
-    <tr class="ascends_table_header">
+    <tr>
       <th>[*Sosa]</th>
       <th>[*person/persons]0</th>
       <th>[*date of birth]</th>
@@ -442,12 +436,14 @@
   </thead>
   <tbody>
     %foreach;ancestor_level(nb_gena)
-      %if;(evar.gen = "on")
-    <tr>
+      %if;(level!=0 and evar.gen = "on")
+        <tr>
           <th align="left" colspan="9">[*generation/generations]0 %level;</th>
         </tr>
       %end;
       %foreach;ancestor;
+      
+        %if;(ancestor!=self)
         %apply;has_missing_events("ancestor")
         %if;(count > 0 and ancestor != "? ?")
           %if;(ancestor.same = "" or evar.repeat = "on")
@@ -458,7 +454,7 @@
               %apply;table_family_missing_events("ancestor")
             %end;
           %end;
-        %end;
+        %end;%end;
       %end;
     %end;
   <tbody>
