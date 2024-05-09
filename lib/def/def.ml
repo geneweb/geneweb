@@ -69,7 +69,7 @@ type relation_kind =
   | Residence
 
 (** Divorce status *)
-type divorce = NotDivorced | Divorced of cdate | Separated
+type divorce = NotDivorced | Divorced of cdate | Separated of cdate
 
 (** Death reason *)
 type death_reason = Killed | Murdered | Executed | Disappeared | Unspecified

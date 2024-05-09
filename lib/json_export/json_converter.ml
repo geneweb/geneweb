@@ -165,7 +165,7 @@ module Make (D : ConverterDriver) = struct
   let conv_divorce = function
     | NotDivorced -> bool false
     | Divorced date -> conv_cdate date
-    | Separated -> bool true
+    | Separated date -> conv_cdate date
 
   let conv_relation_type x = str @@ Def_show.show_relation_type x
 

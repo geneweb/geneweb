@@ -38,7 +38,10 @@ type relation_kind = Def.relation_kind =
   | Pacs
   | Residence
 
-type divorce = Def.divorce = NotDivorced | Divorced of cdate | Separated
+type divorce = Def.divorce =
+  | NotDivorced
+  | Divorced of cdate
+  | Separated of cdate
 
 type death_reason = Def.death_reason =
   | Killed

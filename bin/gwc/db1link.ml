@@ -704,6 +704,7 @@ let fevent_name_unique_string gen = function
 let update_family_with_fevents _gen fam =
   let found_marriage = ref false in
   let found_divorce = ref false in
+  let found_separation = ref false in
   let nsck_std_fields =
     match fam.relation with
     | NoSexesCheckNotMarried | NoSexesCheckMarried -> true
@@ -757,10 +758,10 @@ let update_family_with_fevents _gen fam =
                   let () = found_divorce := true in
                   loop l fam
             | Efam_Separated ->
-                if !found_divorce then loop l fam
+                if !found_separation then loop l fam
                 else
-                  let fam = { fam with divorce = Separated } in
-                  let () = found_divorce := true in
+                  let fam = { fam with divorce = Separated evt.efam_date } in
+                  let () = found_separation := true in
                   loop l fam
             | _ -> loop l fam))
   in
@@ -814,11 +815,11 @@ let update_fevents_with_family gen fam =
           }
         in
         Some evt
-    | Separated ->
+    | Separated cd ->
         let evt =
           {
             efam_name = Efam_Separated;
-            efam_date = Date.cdate_None;
+            efam_date = cd;
             efam_place = unique_string gen "";
             efam_reason = unique_string gen "";
             efam_note = unique_string gen "";

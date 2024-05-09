@@ -372,7 +372,8 @@ let gen_family_of_family = cache_fam (fun f -> f)
 let get_children = cache_des (fun d -> d.Def.children)
 let get_comment = cache_fam (fun f -> f.Def.comment)
 let get_ifam = cache_fam (fun f -> f.Def.fam_index)
-let get_divorce = cache_fam (fun f -> f.Def.divorce)
+
+(* let get_divorce = cache_fam (fun f -> f.Def.divorce) *)
 let get_father = cache_cpl (fun c -> Adef.father c)
 let get_fevents = cache_fam (fun f -> f.Def.fevents)
 let get_fsources = cache_fam (fun f -> f.Def.fsources)
@@ -580,3 +581,85 @@ let base_visible_get base fct i =
       visible_ref := Some visible;
       status
   | Some b -> b
+
+(*
+type 'a event_name =
+  | Pevent of 'a gen_pers_event_name
+  | Fevent of 'a gen_fam_event_name
+type ('person, 'string) gen_fam_event = {
+  efam_name : 'string gen_fam_event_name;
+  efam_date : cdate;
+  efam_place : 'string;
+  efam_reason : 'string;
+  efam_note : 'string;
+  efam_src : 'string;
+  efam_witnesses : ('person * witness_kind) array;
+}
+
+
+  let fam_fevents =
+    if m_auth then
+      List.fold_right
+        (fun evt fam_fevents ->
+          let name = Fevent evt.efam_name in
+          let date = evt.efam_date in
+          let place = evt.efam_place in
+          let note = evt.efam_note in
+          let src = evt.efam_src in
+          let wl = evt.efam_witnesses in
+          let x = (name, date, place, note, src, wl, Some isp) in
+          x :: fam_fevents)
+        (get_fevents fam) []
+    else []
+  in
+  fam_fevents @ fevents)
+(get_family p) []
+*)
+
+let get_divorce fam =
+  let divorce, separated =
+    List.fold_right
+      (fun evt (divorce, separated) ->
+        let name = evt.efam_name in
+        let date = evt.efam_date in
+        let place = evt.efam_place in
+        let note = evt.efam_note in
+        let src = evt.efam_src in
+        let wl = evt.efam_witnesses in
+        let x = (name, date, place, note, src, wl) in
+        if name = Efam_Divorce then (x :: divorce, separated)
+        else if name = Efam_Separated then (divorce, x :: separated)
+        else (divorce, separated))
+      (get_fevents fam) ([], [])
+  in
+  match (divorce, separated) with
+  | [ (Efam_Divorce, date, _, _, _, _) ], _ -> Divorced date
+  | _, [ (Efam_Separated, date, _, _, _, _) ] -> Separated date
+  | _, _ -> NotDivorced
+
+(*let get_divorce = cache_fam (fun f -> get_divorce_aux)
+*)
+
+let get_separation fam =
+  let divorce, separated =
+    List.fold_right
+      (fun evt (divorce, separated) ->
+        let name = evt.efam_name in
+        let date = evt.efam_date in
+        let place = evt.efam_place in
+        let note = evt.efam_note in
+        let src = evt.efam_src in
+        let wl = evt.efam_witnesses in
+        let x = (name, date, place, note, src, wl) in
+        if name = Efam_Divorce then (x :: divorce, separated)
+        else if name = Efam_Separated then (divorce, x :: separated)
+        else (divorce, separated))
+      (get_fevents fam) ([], [])
+  in
+  match (divorce, separated) with
+  | [ (Efam_Divorce, date, _, _, _, _) ], _ -> Divorced date
+  | _, [ (Efam_Separated, date, _, _, _, _) ] -> Separated date
+  | _, _ -> NotDivorced
+
+(*let get_separation = cache_fam (fun f -> get_separation_aux)
+*)
