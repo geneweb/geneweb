@@ -342,7 +342,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
             mk_div (Divorced evt.efam_date);
             loop l
         | Efam_Separated ->
-            mk_div Separated;
+            mk_div (Separated evt.efam_date);
             loop l
         | Efam_Annulation -> loop l
         | Efam_Name _ -> loop l)

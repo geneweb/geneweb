@@ -779,8 +779,8 @@
           %apply;somebody_spouse_parent("mother")
         %end;
       %end;.
-      %if;are_divorced;[*divorced]0%on_divorce_date;.%nl;
-      %elseif;are_separated;[*separated]0.%nl;
+      %if;are_divorced;[*divorced]%if;(on_divorce_date!="") %on_divorce_date;%end;.%nl;
+      %elseif;are_separated;[*separated]%if;(on_separation_date!="") %on_separation_date%end;.%nl;
       %end;
     %end;
     %if;((e.notes = "on" and (child.has_notes or child.has_event) and e.inline = "on") or (e.src = "on" and child.has_sources and e.inline = "on"))

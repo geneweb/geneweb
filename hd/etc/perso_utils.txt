@@ -870,8 +870,8 @@
 %define;relation_separation_tooltip()
   %if;(are_married)& [married] %elseif;(are_not_married)[no marriage event] %end;
   %if;(marriage_date!="" and marriage_date.prec="" or marriage_date.prec="?")%marriage_date; %end;
+  %if;(are_separated)— [separated] %if;(separation_date!="")%separation_date;%end;%end;
   %if;(are_divorced)– ⅋ [divorced] %if;(divorce_date!="")%divorce_date;%end;%end;
-  %if;(are_separated)— [separated]%end;
 %end;
 %define;rm(ccc,ttt)
   %if;(e.ccc="on")<a role="button" class="stretched-link" href="%apply;url_set%with;ccc%end;"

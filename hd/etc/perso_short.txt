@@ -177,7 +177,7 @@
             <tr>
               <td colspan="2">
                 %if;are_divorced;[*divorced] %on_divorce_date;. %end;
-                %if;are_separated;[*separated]. %end;
+                %if;are_separated;[*separated] %on_separation_date;. %end;
               </td>
             </tr>
           %end;
