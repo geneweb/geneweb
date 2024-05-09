@@ -738,13 +738,17 @@ let get_mar_date str = function
       let place, l = get_field "#mp" l in
       let note, l = get_field "#mn" l in
       let src, l = get_field "#ms" l in
+      (* we should have an event *)
       let divorce, l =
         match l with
         | x :: l' when x.[0] = '-' ->
             if String.length x > 1 then
               (Divorced (Date.cdate_of_od (date_of_string x 1)), l')
             else (Divorced Date.cdate_None, l')
-        | "#sep" :: l' -> (Separated, l')
+        | "#sep" :: l' when x.[0] = '-' ->
+            if String.length x > 1 then
+              (Separated (Date.cdate_of_od (date_of_string x 1)), l')
+            else (Separated Date.cdate_None, l')
         | _ -> (NotDivorced, l)
       in
       (relation, mar, place, note, src, divorce, l)
