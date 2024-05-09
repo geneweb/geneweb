@@ -182,11 +182,7 @@
           %end;
         %end;
         %if;are_divorced;, [divorced] %on_divorce_date;%end;
-        %if;are_separated;, [separated]%sp;
-          %foreach;event;
-            %if;(event.name=[separate event]0)%event.date;%end;
-          %end;
-        %end;%nn;
+        %if;are_separated;, [separated] %on_divorce_date;%end;
         %if;has_children;, %apply;havingchildren(nb_children)[:]
           %( On sauvegarde l'ancienne valeur de count %)
           %let;prev_count;%count;%in;
@@ -374,14 +370,9 @@
     %end;
     %if;(are_divorced or are_separated)
       <div class="mb-1 text-muted">
-        %if;(are_separated)[*separated]%nn;
-          %foreach;event;
-            %if;(event.name=[separate event]0 and event.has_date and spouse=event.spouse)
-              %sp;[in (month year)]0 %event.date;%nn;
-            %end;
-          %end;
+        %if;are_separated;[*separated] %on_separation_date;.
+        %elseif;are_divorced;[*divorced] %on_divorce_date;.
         %end;
-        %if;not are_divorced;.%else;%if;are_separated;, [divorced]%else;[*divorced]%end; %on_divorce_date;.%end;
       </div>
     %end;
     </li></ul>
@@ -411,11 +402,7 @@
           <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;%nn;
         %if;are_divorced;, [divorced]0 %on_divorce_date;%sp;%end;
-        %if;are_separated;, [separated]0%sp;
-          %foreach;event;
-            %if;(event.name=[separate event]0)%event.date;%end;
-          %end;
-        %end;%nn;
+        %if;are_separated;, [separated]0 %on_separation_date;%end;
         %if;has_children;, %apply;havingchildren(nb_children)[:]
           %( On sauvegarde l'ancienne valeur de count %)
           %let;prev_count;%count;%in;
@@ -473,11 +460,7 @@
           <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;
         %if;are_divorced;, [divorced]0 %on_divorce_date;%sp;%end;
-        %if;are_separated;, [separated]0%sp;
-          %foreach;event;
-            %if;(event.name=[separate event]0)%event.date;%end;
-          %end;
-        %end;
+        %if;are_separated;, [separated]0 %on_separation_date;%end;
         %if;has_children;, %apply;havingchildren(nb_children)[:]
           %( On sauvegarde l'ancienne valeur de count %)
           %let;prev_count;%count;%in;
@@ -583,7 +566,7 @@
           <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;
         %if;are_divorced;, [divorced]0 %on_divorce_date;%end;
-        %if;are_separated;, [separated]0%end;
+        %if;are_separated;, [separated]0 %on_separation_date;%end;
         %if;spouse.has_image;
               </td>
             </tr>
@@ -621,7 +604,7 @@
                     <em>&nbsp;%apply;married_to("child", 0)</em>
                     %apply;short_display_person_f("spouse")%nn;
                     %if;are_divorced; [divorced]0 %on_divorce_date;%end;
-                    %if;are_separated; [separated]0%end;%nn;
+                    %if;are_separated; [separated]0 %on_separation_date;%end;%nn;
                     %if;has_children; %apply;havingchildren(nb_children)
                       %if;(child.has_image and family_cnt=1)</td></tr></table>%end;%nl;
                       <div style="font-size: 90%%">
@@ -638,7 +621,7 @@
                                   <em>&nbsp;%apply;married_to("child", 0)</em>
                                   %apply;short_display_person_f("spouse")
                                   %if;are_divorced; [divorced]0 %on_divorce_date;%end;
-                                  %if;are_separated; [separated]0%end;
+                                  %if;are_separated; [separated]0 %on_separation_date;%end;
                                   %if;has_children;
                                     <table style="border-width: %border;"><tr>%nn;
                                       <td style="font-size: 80%%;padding-left: 18px">%nn;
