@@ -123,7 +123,7 @@ jobs:
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          ocaml-option-nnp: true
+          ocaml-variant: nnp
 
       - name: Setup GeneWeb dependencies
         run: |
