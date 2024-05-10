@@ -13,12 +13,6 @@ jobs:
       fail-fast: false
       matrix:
         ocaml-compiler:
-          - 4.02.x
-          - 4.03.x
-          - 4.04.x
-          - 4.05.x
-          - 4.06.x
-          - 4.07.x
           - 4.08.x
           - 4.09.x
           - 4.10.x
@@ -28,7 +22,6 @@ jobs:
           - 4.14.x
           - 5.0.x
           - 5.1.x
-          - 5.2.0~beta3
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -58,7 +51,6 @@ jobs:
           - 4.14.x
           - 5.0.x
           - 5.1.x
-          - 5.2.0~beta3
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -85,12 +77,6 @@ jobs:
       fail-fast: false
       matrix:
         ocaml-compiler:
-          - 4.02.x
-          - 4.03.x
-          - 4.04.x
-          - 4.05.x
-          - 4.06.x
-          - 4.07.x
           - 4.08.x
           - 4.09.x
           - 4.10.x
@@ -115,5 +101,40 @@ jobs:
         run: |
           opam exec -- ocaml ./configure.ml --release
           opam exec -- make fmt distrib
+      - name: Make CI tests
+        run: opam exec -- make ci
+
+  build_nnp:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        ocaml-compiler:
+          - 4.14.x
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use OCaml with NNP
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          ocaml-option-nnp: true
+
+      - name: Setup GeneWeb dependencies
+        run: |
+          opam pin add . -y --no-action
+          opam depext -y geneweb
+          opam install -y ./*.opam --deps-only --with-test
+
+      - name: build/distrib
+        run: |
+          opam exec -- ocaml ./configure.ml --release
+          opam exec -- make distrib
+
       - name: Make CI tests
         run: opam exec -- make ci
