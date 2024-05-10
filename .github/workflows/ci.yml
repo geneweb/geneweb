@@ -24,8 +24,8 @@ jobs:
           - 5.1.x
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Use Ocaml ${{ matrix.ocaml-compiler }}
+        uses: actions/checkout@v4
+      - name: Setup Ocaml ${{ matrix.ocaml-compiler }}
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
@@ -53,8 +53,8 @@ jobs:
           - 5.1.x
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Use Ocaml ${{ matrix.ocaml-compiler }}
+        uses: actions/checkout@v4
+      - name: Setup Ocaml ${{ matrix.ocaml-compiler }}
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
@@ -84,13 +84,17 @@ jobs:
           - 4.12.x
           - 4.13.x
           - 4.14.x
+          - 5.0.x
+          - 5.1.x
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Use Ocaml ${{ matrix.ocaml-compiler }}
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          opam-repositories: |
+            default: https://github.com/ocaml-opam/opam-repository-mingw.git#sunset
       - name: Setup GeneWeb dependencies + ocamlformat
         run: |
           opam pin add . -y --no-action
@@ -114,16 +118,15 @@ jobs:
           - macos-latest
           - windows-latest
         ocaml-compiler:
-          - 4.14.x
+          - ocaml-variants.4.14.2+ocaml-option-nnp
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Use OCaml with NNP
+      - name: Setup OCaml ${{ matrix.ocaml-compiler }} with NNP
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          ocaml-variant: nnp
 
       - name: Setup GeneWeb dependencies
         run: |
