@@ -372,6 +372,7 @@ let gen_family_of_family = cache_fam (fun f -> f)
 let get_children = cache_des (fun d -> d.Def.children)
 let get_comment = cache_fam (fun f -> f.Def.comment)
 let get_ifam = cache_fam (fun f -> f.Def.fam_index)
+
 (* let get_divorce = cache_fam (fun f -> f.Def.divorce) *)
 let get_father = cache_cpl (fun c -> Adef.father c)
 let get_fevents = cache_fam (fun f -> f.Def.fevents)
@@ -581,7 +582,6 @@ let base_visible_get base fct i =
       status
   | Some b -> b
 
-
 (*
 type 'a event_name =
   | Pevent of 'a gen_pers_event_name
@@ -616,9 +616,8 @@ type ('person, 'string) gen_fam_event = {
 (get_family p) []
 *)
 
-
 let get_divorce fam =
-  let (divorce, separated) = 
+  let divorce, separated =
     List.fold_right
       (fun evt (divorce, separated) ->
         let name = evt.efam_name in
@@ -633,16 +632,16 @@ let get_divorce fam =
         else (divorce, separated))
       (get_fevents fam) ([], [])
   in
-  match divorce, separated with
-  | [(Efam_Divorce, date, _, _, _, _)], _ -> Divorced date
-  | _, [(Efam_Separated, date, _, _, _, _)] -> Separated date
+  match (divorce, separated) with
+  | [ (Efam_Divorce, date, _, _, _, _) ], _ -> Divorced date
+  | _, [ (Efam_Separated, date, _, _, _, _) ] -> Separated date
   | _, _ -> NotDivorced
 
 (*let get_divorce = cache_fam (fun f -> get_divorce_aux)
 *)
 
 let get_separation fam =
-  let (divorce, separated) = 
+  let divorce, separated =
     List.fold_right
       (fun evt (divorce, separated) ->
         let name = evt.efam_name in
@@ -657,9 +656,9 @@ let get_separation fam =
         else (divorce, separated))
       (get_fevents fam) ([], [])
   in
-  match divorce, separated with
-  | [(Efam_Divorce, date, _, _, _, _)], _ -> Divorced date
-  | _, [(Efam_Separated, date, _, _, _, _)] -> Separated date
+  match (divorce, separated) with
+  | [ (Efam_Divorce, date, _, _, _, _) ], _ -> Divorced date
+  | _, [ (Efam_Separated, date, _, _, _, _) ] -> Separated date
   | _, _ -> NotDivorced
 
 (*let get_separation = cache_fam (fun f -> get_separation_aux)

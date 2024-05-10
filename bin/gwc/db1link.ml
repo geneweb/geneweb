@@ -760,7 +760,7 @@ let update_family_with_fevents _gen fam =
             | Efam_Separated ->
                 if !found_separation then loop l fam
                 else
-                  let fam = { fam with divorce = Separated evt.efam_date} in
+                  let fam = { fam with divorce = Separated evt.efam_date } in
                   let () = found_separation := true in
                   loop l fam
             | _ -> loop l fam))

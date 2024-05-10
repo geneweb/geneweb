@@ -128,7 +128,7 @@ and eval_divorce' fam s =
   match fam.divorce with
   | Divorced d -> eval_date_var (Date.od_of_cdate d) s
   | Separated d -> eval_date_var (Date.od_of_cdate d) s
-  | NotDivorced  -> eval_date_var None s
+  | NotDivorced -> eval_date_var None s
 
 and eval_is_first env =
   match get_env "first" env with Vbool x -> bool_val x | _ -> raise Not_found

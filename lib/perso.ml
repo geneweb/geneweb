@@ -1547,11 +1547,11 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | Vfam (_, fam, _, m_auth) when mode_local env -> (
           match get_divorce fam with
           | Divorced d -> (
-                  let d = Date.od_of_cdate d in
-                  match d with
-                  | Some d when m_auth ->
-                      DateDisplay.string_of_ondate ~link:false conf d |> safe_val
-                  | _ -> null_val)
+              let d = Date.od_of_cdate d in
+              match d with
+              | Some d when m_auth ->
+                  DateDisplay.string_of_ondate ~link:false conf d |> safe_val
+              | _ -> null_val)
           | NotDivorced | Separated _ -> null_val)
       | _ -> (
           match get_env "fam_link" env with
@@ -1561,7 +1561,8 @@ and eval_simple_str_var conf base env (p, p_auth) = function
                   let d = Date.od_of_cdate d in
                   match d with
                   | Some d when m_auth ->
-                      DateDisplay.string_of_ondate ~link:false conf d |> safe_val
+                      DateDisplay.string_of_ondate ~link:false conf d
+                      |> safe_val
                   | _ -> null_val)
               | NotDivorced | Separated _ -> null_val)
           | _ -> raise Not_found))
@@ -1570,11 +1571,11 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | Vfam (_, fam, _, m_auth) when mode_local env -> (
           match get_separation fam with
           | Separated d -> (
-                  let d = Date.od_of_cdate d in
-                  match d with
-                  | Some d when m_auth ->
-                      DateDisplay.string_of_ondate ~link:false conf d |> safe_val
-                  | _ -> null_val)
+              let d = Date.od_of_cdate d in
+              match d with
+              | Some d when m_auth ->
+                  DateDisplay.string_of_ondate ~link:false conf d |> safe_val
+              | _ -> null_val)
           | NotDivorced | Divorced _ -> null_val)
       | _ -> (
           match get_env "fam_link" env with
@@ -1584,7 +1585,8 @@ and eval_simple_str_var conf base env (p, p_auth) = function
                   let d = Date.od_of_cdate d in
                   match d with
                   | Some d when m_auth ->
-                      DateDisplay.string_of_ondate ~link:false conf d |> safe_val
+                      DateDisplay.string_of_ondate ~link:false conf d
+                      |> safe_val
                   | _ -> null_val)
               | NotDivorced | Divorced _ -> null_val)
           | _ -> raise Not_found))
@@ -1593,9 +1595,9 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | Vfam (_, fam, _, m_auth) when mode_local env -> (
           match get_divorce fam with
           | Divorced d -> (
-                  match date_aux conf m_auth d with
-                  | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
-                  | x -> x)
+              match date_aux conf m_auth d with
+              | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
+              | x -> x)
           | NotDivorced | Separated _ -> null_val)
       | _ -> (
           match get_env "fam_link" env with
@@ -1612,9 +1614,9 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | Vfam (_, fam, _, m_auth) when mode_local env -> (
           match get_separation fam with
           | Separated d -> (
-                  match date_aux conf m_auth d with
-                  | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
-                  | x -> x)
+              match date_aux conf m_auth d with
+              | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
+              | x -> x)
           | NotDivorced | Divorced _ -> null_val)
       | _ -> (
           match get_env "fam_link" env with
@@ -3052,7 +3054,7 @@ and eval_date_field_var conf d = function
       match d with
       | Dgreg (dmy, _) -> VVstring (string_of_int dmy.year)
       | _ -> null_val)
-  | [ "year";"bce" ] -> (
+  | [ "year"; "bce" ] -> (
       match d with
       | Dgreg (dmy, _) -> VVstring (DateDisplay.year_text conf dmy)
       | _ -> null_val)
