@@ -1,37 +1,12 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let rec skip_spaces x i =
-  if i = String.length x then i
-  else if String.unsafe_get x i = ' ' then skip_spaces x (i + 1)
-  else i
-
-let rec skip_no_spaces x i =
-  if i = String.length x then i
-  else if String.unsafe_get x i != ' ' then skip_no_spaces x (i + 1)
-  else i
-
 let string_incl =
   let memo : (string * string, bool) Hashtbl.t = Hashtbl.create 10 in
   fun x y ->
-    let rec loop j_ini =
-      if j_ini = String.length y then false
-      else
-        let rec loop1 i j =
-          if i = String.length x then
-            if j = String.length y then true
-            else
-              String.unsafe_get y j = ' ' || String.unsafe_get y (j - 1) = ' '
-          else if
-            j < String.length y && String.unsafe_get x i = String.unsafe_get y j
-          then loop1 (i + 1) (j + 1)
-          else loop (skip_spaces y (skip_no_spaces y j_ini))
-        in
-        loop1 0 j_ini
-    in
     match Hashtbl.find_opt memo (x, y) with
     | Some b -> b
     | None ->
-        let b = loop 0 in
+        let b = Ext_string.contains_word ~word:x y in
         Hashtbl.replace memo (x, y) b;
         b
 
