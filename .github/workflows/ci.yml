@@ -7,19 +7,21 @@ on:
     branches:
       - master
 jobs:
-  build:
+  build_macos:
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - macos-latest
-          - ubuntu-latest
-          - windows-latest
         ocaml-compiler:
-          - 4.08.x
+          - 4.09.x
+          - 4.10.x
+          - 4.11.x
+          - 4.12.x
+          - 4.13.x
           - 4.14.x
+          - 5.0.x
           - 5.1.x
-    runs-on: ${{ matrix.os }}
+          - 5.2.x
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -39,4 +41,73 @@ jobs:
           opam exec -- make fmt distrib
       - name: Make CI tests
         run: opam exec -- make ci
-        
+
+  build_ubuntu:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ocaml-compiler:
+          - 4.08.x
+          - 4.09.x
+          - 4.10.x
+          - 4.11.x
+          - 4.12.x
+          - 4.13.x
+          - 4.14.x
+          - 5.0.x
+          - 5.1.x
+          - 5.2.x
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Use Ocaml ${{ matrix.ocaml-compiler }}
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+      - name: Setup GeneWeb dependencies + ocamlformat
+        run: |
+          opam pin add . -y --no-action
+          opam depext -y geneweb
+          opam install -y ./*.opam --deps-only --with-test
+          opam pin ocamlformat 0.24.1
+      - name: Make ocamlformat > build/distrib
+        run: |
+          opam exec -- ocaml ./configure.ml --release
+          opam exec -- make fmt distrib
+      - name: Make CI tests
+        run: opam exec -- make ci
+
+  build_windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ocaml-compiler:
+          - 4.08.x
+          - 4.09.x
+          - 4.10.x
+          - 4.11.x
+          - 4.12.x
+          - 4.13.x
+          - 4.14.x
+          - 5.0.x
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Use Ocaml ${{ matrix.ocaml-compiler }}
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+      - name: Setup GeneWeb dependencies + ocamlformat
+        run: |
+          opam pin add . -y --no-action
+          opam depext -y geneweb
+          opam install -y ./*.opam --deps-only --with-test
+          opam pin ocamlformat 0.24.1
+      - name: Make ocamlformat > build/distrib
+        run: |
+          opam exec -- ocaml ./configure.ml --release
+          opam exec -- make fmt distrib
+      - name: Make CI tests
+        run: opam exec -- make ci
