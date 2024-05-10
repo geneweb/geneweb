@@ -84,8 +84,6 @@ jobs:
           - 4.12.x
           - 4.13.x
           - 4.14.x
-          - 5.0.x
-          - 5.1.x
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -118,7 +116,7 @@ jobs:
           - macos-latest
           - windows-latest
         ocaml-compiler:
-          - ocaml-variants.4.14.2+ocaml-option-nnp
+          - ocaml-variants.4.14.2+options,ocaml-option-nnp
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
