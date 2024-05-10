@@ -7,12 +7,19 @@ on:
     branches:
       - master
 jobs:
-  build_macos:
-    runs-on: macos-latest
+  build_ubuntu:
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         ocaml-compiler:
+          - 4.02.x
+          - 4.03.x
+          - 4.04.x
+          - 4.05.x
+          - 4.06.x
+          - 4.07.x
+          - 4.08.x
           - 4.09.x
           - 4.10.x
           - 4.11.x
@@ -21,7 +28,7 @@ jobs:
           - 4.14.x
           - 5.0.x
           - 5.1.x
-          - 5.2.x
+          - 5.2.0~beta3
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -41,23 +48,17 @@ jobs:
           opam exec -- make fmt distrib
       - name: Make CI tests
         run: opam exec -- make ci
-
-  build_ubuntu:
-    runs-on: ubuntu-latest
+        
+  build_macos:
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
         ocaml-compiler:
-          - 4.08.x
-          - 4.09.x
-          - 4.10.x
-          - 4.11.x
-          - 4.12.x
-          - 4.13.x
           - 4.14.x
           - 5.0.x
           - 5.1.x
-          - 5.2.x
+          - 5.2.0~beta3
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -84,6 +85,12 @@ jobs:
       fail-fast: false
       matrix:
         ocaml-compiler:
+          - 4.02.x
+          - 4.03.x
+          - 4.04.x
+          - 4.05.x
+          - 4.06.x
+          - 4.07.x
           - 4.08.x
           - 4.09.x
           - 4.10.x
@@ -91,7 +98,6 @@ jobs:
           - 4.12.x
           - 4.13.x
           - 4.14.x
-          - 5.0.x
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
