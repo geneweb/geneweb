@@ -16,12 +16,9 @@ jobs:
           - ubuntu-latest
           - windows-latest
         ocaml-compiler:
+          - 4.08.x
           - 4.14.x
-        include:
-          - os: ubuntu-latest
-            ocaml-version: 4.08.0
-          - os: ubuntu-latest
-            ocaml-version: 5.1.x
+          - 5.1.x
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
@@ -42,3 +39,4 @@ jobs:
           opam exec -- make fmt distrib
       - name: Make CI tests
         run: opam exec -- make ci
+        
