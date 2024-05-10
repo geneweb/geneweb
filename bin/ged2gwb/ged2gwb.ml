@@ -2366,7 +2366,7 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
             if !found_separation then loop l marr witn div
             else
               let div = Separated evt.efam_date in
-              let () = found_divorce := true in loop l marr witn div
+              let () = found_separation := true in loop l marr witn div
         | _ -> loop l marr witn div
   in
   let (marr, witn, div) = loop (List.rev fevents) marr witn div in
