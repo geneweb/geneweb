@@ -58,9 +58,6 @@ jobs:
           - 4.14.x
           - 5.0.x
           - 5.1.x
-          - 4.14.x
-          - 5.0.x
-          - 5.1.x
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
