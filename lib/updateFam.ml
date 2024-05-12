@@ -118,19 +118,49 @@ and eval_bvar conf v =
   | None -> VVstring ""
 
 and eval_divorce fam =
-  match fam.divorce with
-  | Divorced _ -> str_val "divorced"
-  | Separated _ -> str_val "separated"
-  | NotDivorced -> str_val "not divorced"
-  | NotSeparated -> str_val "not separated"
+  let divorce, separated =
+    List.fold_right
+      (fun evt (divorce, separated) ->
+        let name = evt.efam_name in
+        let date = evt.efam_date in
+        let place = evt.efam_place in
+        let note = evt.efam_note in
+        let src = evt.efam_src in
+        let wl = evt.efam_witnesses in
+        let x = (name, date, place, note, src, wl) in
+        if name = Efam_Divorce then (x :: divorce, separated)
+        else if name = Efam_Separated then (divorce, x :: separated)
+        else (divorce, separated))
+      fam.fevents ([], [])
+  in
+  match (divorce, separated) with
+  | (Efam_Divorce, _, _, _, _, _) :: _, _ -> str_val "divorced"
+  | _, (Efam_Separated, _, _, _, _, _) :: _ -> str_val "separated"
+  | _, _ -> str_val "not divorced nor separated"
 
 (* TODO : rewrite, second case with None passed as an argument looks odd *)
 and eval_divorce' fam s =
-  match fam.divorce with
-  | Divorced d -> eval_date_var (Date.od_of_cdate d) s
-  | Separated d -> eval_date_var (Date.od_of_cdate d) s
-  | NotDivorced -> eval_date_var None s
-  | NotSeparated -> eval_date_var None s
+  let divorce, separated =
+    List.fold_right
+      (fun evt (divorce, separated) ->
+        let name = evt.efam_name in
+        let date = evt.efam_date in
+        let place = evt.efam_place in
+        let note = evt.efam_note in
+        let src = evt.efam_src in
+        let wl = evt.efam_witnesses in
+        let x = (name, date, place, note, src, wl) in
+        if name = Efam_Divorce then (x :: divorce, separated)
+        else if name = Efam_Separated then (divorce, x :: separated)
+        else (divorce, separated))
+      fam.fevents ([], [])
+  in
+  match (divorce, separated) with
+  | (Efam_Divorce, d, _, _, _, _) :: _, _ ->
+      eval_date_var (Date.od_of_cdate d) s
+  | _, (Efam_Separated, d, _, _, _, _) :: _ ->
+      eval_date_var (Date.od_of_cdate d) s
+  | _, _ -> str_val ""
 
 and eval_is_first env =
   match get_env "first" env with Vbool x -> bool_val x | _ -> raise Not_found
