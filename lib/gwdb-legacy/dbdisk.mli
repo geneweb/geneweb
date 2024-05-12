@@ -41,6 +41,7 @@ type relation_kind = Def.relation_kind =
 type divorce = Def.divorce =
   | NotDivorced
   | Divorced of cdate
+  | NotSeparated
   | Separated of cdate
 
 type death_reason = Def.death_reason =

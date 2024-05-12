@@ -535,8 +535,13 @@ let print_menu_marriage conf base =
   Gwdb.Collection.iter
     (fun ifam ->
       let fam = foi base ifam in
-      match (Date.cdate_to_dmy_opt (get_marriage fam), get_divorce fam) with
-      | Some d, NotDivorced when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
+      match
+        ( Date.cdate_to_dmy_opt (get_marriage fam),
+          get_divorce fam,
+          get_separation fam )
+      with
+      | Some d, NotDivorced, NotDivorced
+        when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
           let update_list cpl =
             if match_mar_dates conf base cpl d conf.today then
               list_tod := (cpl, d.year) :: !list_tod

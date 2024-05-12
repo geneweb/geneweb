@@ -795,15 +795,15 @@ let print_family opts base gen m =
   (* divorce and separation are events, but we keep it if old_gw *)
   (if !old_gw then
    match get_divorce fam with
-   | NotDivorced | Separated _ -> ()
-   | Divorced d->
+   | Divorced d ->
        let d = Date.od_of_cdate d in
        Printf.ksprintf (oc opts) " -";
-       print_date_option opts d);
+       print_date_option opts d
+   | _ -> ());
   (if !old_gw then
    match get_separation fam with
-   | NotDivorced | Divorced _ -> ()
-   | Separated _ -> Printf.ksprintf (oc opts) " #sep");
+   | Separated _ -> Printf.ksprintf (oc opts) " #sep"
+   | _ -> ());
   Printf.ksprintf (oc opts) " ";
   print_parent opts base gen m.m_moth;
   Printf.ksprintf (oc opts) "\n";

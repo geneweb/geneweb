@@ -12893,6 +12893,27 @@ sl: ne glede na spol
 sv: enkönig vigsel (ingen könskontroll)
 tr: aynı cinsiyetten çift
 
+    not separated
+ca: no separats
+co: micca staccati
+cs: odloučeni
+da: ikke separeret
+de: nicht getrennt lebend
+en: not separated
+eo: ne apartigitaj
+es: no separados
+fr: non séparés
+is: ekki skilin
+it: non separati
+lv: nav nedzīvo kopā
+nl: niet gescheiden
+no: ikke separert
+oc: pas separats
+pl: nie separacji
+pt: nao separados
+ru: не разделены
+sv: inte separerat
+
     not divorced
 af: nie geskei nie
 bg: неразведени
