@@ -115,6 +115,7 @@ let rec mk_family (conf : Config.config) base
     | Def.Separated _ ->
         find_event conf base (Event.Fevent Def.Efam_Separated) events'
     | NotDivorced -> Tnull
+    | NotSeparated -> Tnull
   in
   let ifam = Tstr (E.ifam fcd) in
   let origin_file = Tstr (E.origin_file conf base fcd) in

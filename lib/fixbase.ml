@@ -317,6 +317,7 @@ let fix_marriage_divorce ?report progress base =
       let marriage_place0 = get_marriage_place fam in
       let marriage_note0 = get_marriage_note fam in
       let marriage_src0 = get_marriage_src fam in
+      (* TODO is divorce treated as fevent! *)
       let divorce0 = get_divorce fam in
       let marr_data0 =
         (relation0, marriage0, marriage_place0, marriage_note0, marriage_src0)

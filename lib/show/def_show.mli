@@ -80,6 +80,7 @@ val show_relation_kind : relation_kind -> string
 type divorce = Def.divorce =
   | NotDivorced
   | Divorced of cdate
+  | NotSeparated
   | Separated of cdate
 
 val pp_divorce : Format.formatter -> divorce -> unit

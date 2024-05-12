@@ -34,15 +34,18 @@ let need_differences_selection conf base fam1 fam2 =
   || need_selection (fun fam -> sou base (get_marriage_place fam))
   || need_selection (fun fam ->
          match get_divorce fam with
-         | NotDivorced -> "not divorced"
+         | Divorced cod -> (
+             match Date.od_of_cdate cod with
+             | Some d -> (DateDisplay.string_of_ondate conf d :> string)
+             | None -> "divorced")
+         | _ -> "not divorced")
+  || need_selection (fun fam ->
+         match get_separation fam with
          | Separated cod -> (
              match Date.od_of_cdate cod with
              | Some d -> (DateDisplay.string_of_ondate conf d :> string)
              | None -> "separated")
-         | Divorced cod -> (
-             match Date.od_of_cdate cod with
-             | Some d -> (DateDisplay.string_of_ondate conf d :> string)
-             | None -> "divorced"))
+         | _ -> "not separated")
 
 let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   let string_field (title : Adef.safe_string) (name : Adef.encoded_string) proj
@@ -121,19 +124,25 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
     (Adef.encoded "divorce")
     (fun fam ->
       match get_divorce fam with
-      | NotDivorced -> transl conf "not divorced" |> Adef.safe
       | Divorced cod -> (
           match Date.od_of_cdate cod with
           | Some d ->
               transl conf "divorced" ^<^ " "
               ^<^ DateDisplay.string_of_ondate conf d
           | None -> transl conf "divorced" |> Adef.safe)
+      | _ -> transl conf "not divorced" |> Adef.safe);
+  string_field
+    (transl conf "separation" |> Adef.safe)
+    (Adef.encoded "separation")
+    (fun fam ->
+      match get_separation fam with
       | Separated cod -> (
           match Date.od_of_cdate cod with
           | Some d ->
               transl conf "separated" ^<^ " "
               ^<^ DateDisplay.string_of_ondate conf d
-          | None -> transl conf "divorced" |> Adef.safe));
+          | None -> transl conf "separated" |> Adef.safe)
+      | _ -> transl conf "not divorced" |> Adef.safe);
   Output.print_sstring conf
     {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
   Output.print_sstring conf

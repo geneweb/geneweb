@@ -815,6 +815,7 @@ let update_fevents_with_family gen fam =
           }
         in
         Some evt
+    | NotSeparated -> None
     | Separated cd ->
         let evt =
           {

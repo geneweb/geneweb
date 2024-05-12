@@ -634,7 +634,6 @@ let get_divorce fam =
   in
   match (divorce, separated) with
   | [ (Efam_Divorce, date, _, _, _, _) ], _ -> Divorced date
-  | _, [ (Efam_Separated, date, _, _, _, _) ] -> Separated date
   | _, _ -> NotDivorced
 
 (*let get_divorce = cache_fam (fun f -> get_divorce_aux)
@@ -657,9 +656,8 @@ let get_separation fam =
       (get_fevents fam) ([], [])
   in
   match (divorce, separated) with
-  | [ (Efam_Divorce, date, _, _, _, _) ], _ -> Divorced date
   | _, [ (Efam_Separated, date, _, _, _, _) ] -> Separated date
-  | _, _ -> NotDivorced
+  | _, _ -> NotSeparated
 
 (*let get_separation = cache_fam (fun f -> get_separation_aux)
 *)
