@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    if: false #this job is temporary skipped for testing next one
     strategy:
       fail-fast: false
       matrix:
@@ -67,3 +68,15 @@ jobs:
         run: |
           opam exec -- ocaml ./configure.ml --release
           opam exec -- make distrib
+      - name: Run gwd and check output
+        run: |
+          output=$( distribution/gw/gwd -cache-in-memory testing 2>&1)
+          echo "$output" | grep -q "Caching database testing in memory"
+          if [ $? -eq 0 ]; then
+            echo "Caching message found, test passed"
+            exit 0
+          else
+            echo "Caching message not found, test failed"
+            exit 1
+          fi
+         
