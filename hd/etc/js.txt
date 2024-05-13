@@ -191,3 +191,19 @@
   }
 </script>
 %end;
+%( Popover functions for anc/destables %)
+%if;((e.m="A" and e.t="Z") or (e.m="D" and (e.t="H" or e.t="I")))
+<script>
+$('[data-toggle="popover"]').popover({
+  html: true,
+  trigger: "focus",
+  delay: { hide: 250 }
+})
+$('.popover-dismiss').popover({
+  trigger: 'focus'
+})
+$.fn.tooltip.Constructor.Default.whiteList['dl'] = [];
+$.fn.tooltip.Constructor.Default.whiteList['dt'] = [];
+$.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
+</script>
+%end;

@@ -13093,6 +13093,14 @@ ru: изменения вкратце
 sv: summering av noteringar
 tr: notlar
 
+    notes sources show help
+en: the background to show the
+fr: sur l’arrière-plan pour afficher les
+
+    notes sources edit on date
+en: on the date on the left to modify this event
+fr: sur la date à gauche pour modifier cet événement
+
     note without title
 en: note without title
 fr: note sans titre

@@ -143,31 +143,33 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
 /* --- Ascendants/Descendants table --- */
 /* Border and background styles for table headers */
 .asc-desc-table th,
-.asc-desc-table thead th,
 .asc-desc-table td {
   border: 1px solid black;
 }
 
-.divorced-side-border { 
-  border-left: 2px dotted #808080 !important;
-  border-right: 2px dotted #808080 !important;
-}
-
-.asc-desc-table thead th {
+.asc-desc-table thead {
   background-color: khaki;
 }
 
-.asc-desc-table thead th:hover {
-  background-color: #e0e0e0;
+#anctable.asc-desc-table thead th:hover:not(.no-hover),
+#destable.asc-desc-table thead th:hover:not(.no-hover) {
+  background-color: #F5F5DC;
+  /* simili-fix FFx pour créer un effet de bordure, mais étend celle droite/basse d'1px */
+  box-shadow: 0 0 0 1px black;
 }
-.ascdesc_table tbody th:hover {
-  background-color: white;
-}
+
 .table-img-max-width {
   max-width: 200px;
 }
 
+.gen-row:hover {
+  background-color: white;
+}
 
+.divorced-side-border {
+  border-left: 2px dotted #808080 !important;
+  border-right: 2px dotted #808080 !important;
+}
 /* Specific hover effect for the link inside the table cell */
 .table_big_cell:hover,
 .ascdesc_table a:hover,
