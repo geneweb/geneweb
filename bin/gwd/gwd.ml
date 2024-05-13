@@ -287,32 +287,6 @@ let read_base_env bname =
     close_in ic; env
   with Sys_error _ -> []
 
-let print_renamed conf new_n =
-  let link =
-    let req = Util.get_request_string conf in
-    let new_req =
-      let len = String.length conf.bname in
-      let rec loop i =
-        if i > String.length req then ""
-        else if i >= len && String.sub req (i - len) len = conf.bname then
-          String.sub req 0 (i - len) ^ new_n ^
-          String.sub req i (String.length req - i)
-        else loop (i + 1)
-      in
-      loop 0
-    in
-    "http://" ^ Util.get_server_string conf ^ new_req
-  in
-  let env = [ "old", Mutil.encode conf.bname
-            ; "new", Mutil.encode new_n
-            ; "link", Mutil.encode link ] in
-  include_template conf env "renamed"
-    (fun () ->
-      let title _ = Output.printf conf "%s -&gt; %s" conf.bname new_n in
-      Hutil.header conf title;
-      Output.printf conf "<ul><li><a href=\"%s\">%s</a></li></ul>" link link ;
-      Hutil.trailer conf)
-
 let log_redirect from request req =
   Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
     ~onerror:(fun () -> ()) begin fun () ->
@@ -596,40 +570,6 @@ let set_token utm from_addr base_file acc user =
        in
        let list = ((from_addr, xx), (utm, acc, user)) :: list in
        set_actlog list; x)
-
-let index_not_name s =
-  let rec loop i =
-    if i = String.length s then i
-    else
-      match s.[i] with
-        'a'..'z' | 'A'..'Z' | '0'..'9' | '-' -> loop (i + 1)
-      | _ -> i
-  in
-  loop 0
-
-let refresh_url conf bname =
-  let url =
-    let serv = "http://" ^ Util.get_server_string conf in
-    let req =
-      if conf.cgi then
-        let str = Util.get_request_string conf in
-        let scriptname = String.sub str 0 (String.index str '?') in
-        scriptname ^ "?b=" ^ bname
-      else "/" ^ bname ^ "?"
-    in
-    serv ^ req
-  in
-  http conf Def.OK;
-  Output.header conf "Content-type: text/html";
-  Output.printf conf "<head>\n\
-                  <meta http-equiv=\"REFRESH\"\n\
-                  content=\"1;URL=%s\">\n\
-                  </head>\n\
-                  <body>\n\
-                  <a href=\"%s\">%s</a>\n\
-                  </body>"
-    url url url;
-  raise Exit
 
 let http_preferred_language request =
   let v = Mutil.extract_param "accept-language: " '\n' request in

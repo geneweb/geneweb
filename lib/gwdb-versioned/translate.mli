@@ -12,10 +12,6 @@ val legacy_to_def_pevent :
   ('iper, 'string) Gwdb_legacy.Gwdb_driver.legacy_dsk_pers_event ->
   ('iper, 'string) Def.gen_pers_event
 
-val as_legacy_pevent :
-  ('iper, 'string) Def.gen_pers_event ->
-  ('iper, 'string) Gwdb_legacy.Gwdb_driver.legacy_dsk_pers_event
-
 val legacy_to_def_family :
   'string ->
   ('iper, 'person, 'string) Gwdb_legacy.Gwdb_driver.legacy_dsk_family ->
@@ -29,7 +25,3 @@ val legacy_to_def_fevent :
   'string ->
   ('iper, 'string) Gwdb_legacy.Gwdb_driver.legacy_dsk_fam_event ->
   ('iper, 'string) Def.gen_fam_event
-
-val as_legacy_fevent :
-  ('iper, 'string) Def.gen_fam_event ->
-  ('iper, 'string) Gwdb_legacy.Gwdb_driver.legacy_dsk_fam_event

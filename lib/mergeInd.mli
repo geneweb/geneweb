@@ -39,9 +39,3 @@ val kill_ancestors :
   int ref ->
   int ref ->
   unit
-
-val is_ancestor : Gwdb.base -> Gwdb.person -> Gwdb.person -> bool
-(** [is_ancestor base p1 p2]
-    Checks if [p1] is an ancestor of [p2].
-    Raises [Same_person] if [p1] and [p2] have the same iper.
- *)

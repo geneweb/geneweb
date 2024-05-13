@@ -1,8 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-val make_senv : Geneweb.Config.config -> Gwdb.base -> Geneweb.Config.config
-val make_henv : Geneweb.Config.config -> Gwdb.base -> Geneweb.Config.config
-
 val w_base :
   none:(Geneweb.Config.config -> 'a) ->
   (Geneweb.Config.config -> Gwdb.base -> 'a) ->
@@ -21,16 +18,6 @@ val w_lock :
   'a
 (** [w_lock ~onerror callback conf base]
     Acquire a write lock on the base and call the callback, or fail with [onerror].
-*)
-
-val w_wizard :
-  (Geneweb.Config.config -> Gwdb.base -> unit) ->
-  Geneweb.Config.config ->
-  Gwdb.base ->
-  unit
-(** [w_wizard callback conf base]
-    Run [callback conf base] if conf has wizard rights or
-    return [Forbidden] or [Unauthorized].
 *)
 
 val w_person :
@@ -54,7 +41,5 @@ val treat_request : Geneweb.Config.config -> unit
 
 (* Used by v7 plugin *)
 val incorrect_request : Geneweb.Config.config -> unit
-val very_unknown : Geneweb.Config.config -> Gwdb.base -> unit
-val only_special_env : (string * _) list -> bool
 
 (**/**)

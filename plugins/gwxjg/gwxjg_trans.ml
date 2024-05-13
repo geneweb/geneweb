@@ -17,15 +17,6 @@ let fast_concat = function
            0 l;
       Bytes.unsafe_to_string b
 
-let args line =
-  List.sort_uniq compare
-  @@ List.fold_left
-       (fun acc list ->
-         List.fold_left
-           (fun acc -> function Lexicon_parser.Arg x -> x :: acc | _ -> acc)
-           acc list)
-       [] line
-
 let import_trad ht keyword line =
   let open Jg_types in
   let open Jg_runtime in

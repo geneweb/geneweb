@@ -7,9 +7,6 @@ val sizeof_long : int
 val input : in_channel -> 'a
 (** Input a value from the giving channel. Identical to [Marshal.from_channel]. *)
 
-val output : out_channel -> 'a -> unit
-(** Output a value to the giving channel. Identical to [Marshal.to_channel] with [No_sharing] flag. *)
-
 val output_array_access : out_channel -> (int -> 'a) -> int -> int -> int
 (** [output_array_acces oc getf arr_get arr_len pos] prints to the channel
     [oc] position for each element (that could be obtained with [arr_get])

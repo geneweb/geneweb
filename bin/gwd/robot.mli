@@ -1,8 +1,6 @@
 (** A module handling robots requests *)
 (* S: This module seems obsolete *)
 
-val magic_robot : string
-
 module W : Map.S with type key = string
 
 type norfriwiz = Normal | Friend of string | Wizard of string
