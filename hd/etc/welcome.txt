@@ -42,7 +42,7 @@
             %hidden;
             <div class="input-group mt-1 w-100">
               %(<label for="w" class="sr-only">[user/password/cancel]0:[user/password/cancel]1</label>%)
-              <input type="text" class="form-control" name="w" title="[wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0"
+              <input type="password" class="form-control" name="w" title="[wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0"
               placeholder="[user/password/cancel]0:[user/password/cancel]1" aria-label="password input" aria-describedby="username:password" autofocus>
               <div class="input-group-append">
                 <button type="submit" class="btn btn-primary">OK</button>
