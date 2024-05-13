@@ -16,6 +16,7 @@
 <body%body_prop;>
 %include;hed
 %include;perso_utils
+%include;table_utils
 %message_to_wizard;
 <div class="container-fluid pl-4">
 %if;not cancel_links;
@@ -38,58 +39,6 @@
 %end;
 %define;link(aaa,xxx,nnn)
   %if;(e.cgl="on")xxx%else;<a id="i_nnn" href="%prefix;aaa">xxx</a>%end;
-%end;
-%define;popover_params(xxx)data-toggle="popover"%if;("xxx"!="") data-placement="xxx"%end;%end;
-%define;date_popup(xxx,yyy)
-  %let;symb;%if;("yyy"="birth")°%elseif;("yyy"="death" and xxx.is_dead)†%end;%in;
-  %if;(e.yyy="on" and famx=1)
-    <td class="align-middle text-right%if;not cancel_links; table_big_cell%end;
-      %if;(e.hl=1)
-        %if;((not xxx.has_yyy_date or xxx.yyy_date.month="" or xxx.yyy_date.day="" or xxx.yyy_date.prec!="") 
-            and ("yyy"="birth" or (xxx.is_dead and "yyy"="death"))) table-warning
-        %elseif;(not xxx.is_dead and "yyy"="death") table-active%end;
-      %end;"%rowspan;>
-      %if;(wizard and not cancel_links)
-        <a class="d-block table_big_anchor" href="%prefix;m=MOD_IND&i=%xxx.index;#yyy"
-          title="%if;(xxx.has_yyy_date)[*update::yyy]%else;[*add::yyy]%end;&#010;
-           %xxx.first_name; %xxx.surname; %if;(xxx.occ!="0")(%xxx.occ;)%end;&#010;%if;(xxx.has_yyy_date and xxx.yyy_date.prec="" or xxx.yyy_date.prec="?")%symb; %xxx.yyy_date;%end;">%nn;
-        %if;(xxx.has_yyy_date)%xxx.slash_yyy_date;%else;%symb;%end;%nn;
-        </a>
-      %else;
-        %if;xxx.has_yyy_date;%xxx.slash_yyy_date;%elseif;(not cancel_links)%symb;%end;
-      %end;
-    </td>
-  %end;
-%end;
-%define;place_popup(xxx,yyy)
-  %if;(e.yyy_place="on" and famx=1)
-    <td %rowspan;
-      class="align-middle%nn;
-        %if;(e.ns=1)
-          %if;(xxx.has_yyy_note and not xxx.has_yyy_source) note%nn;
-          %elseif;(not xxx.has_yyy_note and xxx.has_yyy_source) source%nn;
-          %elseif;(xxx.has_yyy_note and xxx.has_yyy_source) notesource%nn;
-          %end;
-        %end;
-        %if;(e.hl=1)
-          %if;(not xxx.has_yyy_place and ("yyy"="birth" or (xxx.is_dead and "yyy"="death"))) table-warning
-          %elseif;(not xxx.is_dead and "yyy"="death") table-active%end;
-        %end;"%sp;
-        %if;(e.ns=1 and (xxx.has_yyy_source or xxx.has_yyy_note)) tabindex="0" %apply;popover_params("bottom")
-          data-content='%if;xxx.has_yyy_note;%apply;clean_comment_tags%with;%apply;capitalize(xxx.yyy_note)%end;%end;
-                        %if;xxx.has_yyy_source;%if;xxx.has_yyy_note;<hr>%end;%apply;clean_comment_tags%with;%apply;capitalize(xxx.yyy_source)%end;%end;'
-          title="%if;(xxx.has_yyy_note or xxx.has_yyy_source)
-                   %apply;a_of_b%with;
-                     %if;(xxx.has_yyy_note and not xxx.has_yyy_source)[*note/notes]1%nn;
-                     %elseif;(not xxx.has_yyy_note and xxx.has_yyy_source)[*source/sources]1%nn;
-                     %elseif;(xxx.has_yyy_note and xxx.has_yyy_source)[*note/notes]1 [and] [source/sources]1%nn;
-                     %end;
-                   %and;[yyy]%end;
-                 %end;"%nn;
-        %end;>%nn;
-      %if;xxx.has_yyy_place;%xxx.yyy_place;%end;
-    </td>
-  %end;
 %end;
 %(si t=H on active rowspan pour les données de l’individu et du couple
   si t=I on n’affiche pas les données
@@ -133,26 +82,23 @@
       </td>
     %end;
   %end;
-%( Descendant et son conjoint en mode I %)
+%( Descendant (et son conjoint en mode I) %)
   %if;(famx=1)
     %if;("yyy"="desc")
       <td class="align-middle%if;(e.nowrap="on") text-nowrap%end; pl-2%nn;
         %if;(e.ns=1)
-          %if;(has_notes and not has_psources) note%nn;
-          %elseif;(not has_notes and has_psources) source%nn;
-          %elseif;(has_notes and has_psources) notesource%nn;
-          %end;
+          %if;has_notes; note%if;has_psources;source%end;%elseif;has_psources; source%end;
         %end;%if;(e.hl=1 and ("?" is_substr xxx or xxx.first_name="N." or xxx.first_name="Nn"
               or xxx.first_name="Xx" or xxx.first_name="Yy" or xxx.first_name="Xy")) table-warning%end;"%nn;
-        %rowspan;%nn;
-        %if;(e.ns=1 and (has_notes or has_psources)) tabindex="0" %apply;popover_params("right") data-html="true"
-          data-content='%if;(has_notes)%apply;clean_comment_tags(notes)%end;
-                        %if;(has_notes and has_psources)<hr>%end;
-                        %if;(has_psources)%apply;capitalize(psources)%end;'
-          title="%if;(has_notes and not has_psources)[*note/notes]1%nn;
-                %elseif;(not has_notes and has_psources)[*source/sources]1%nn;
-                %elseif;(has_notes and has_psources)[*note/notes]1 [and] [source/sources]1%nn;
-                %end;"%nn;
+        %rowspan;
+        %if;(e.ns=1 and (has_notes or has_psources)) tabindex="0"
+          title="[*click] [notes sources show help]%sp;
+                 %if;has_notes;[note/notes]1%if;has_psources; [and] [source/sources]1%end;
+                 %elseif;has_psources;[source/sources]1%end;."
+          %apply;popover_params("right") data-html="true"
+          data-content='%if;has_notes;%apply;clean_comment_tags(notes)%end;
+                        %if;has_psources;%if;has_notes;sources;<hr>%end;%apply;capitalize(psources)%end;'
+          data-title="%if;has_notes;[*note/notes]1%if;has_psources; [and] [source/sources]1%end;%elseif;has_psources;[*source/sources]1%end;"
         %end;>
         %apply;add_in_sorted_list(xxx.index)
         %apply;add_in_sorted_listc(xxx.index)
@@ -163,7 +109,7 @@
             %if;(e.tt=1 and xxx.title!=""), %xxx.title;%end;
           </div>
           %if;(e.im="" and xxx.has_image)
-            <img src="%xxx.image_url;" class="rounded align-self-center ml-1"
+            <img src="%xxx.image_url;" class="rounded align-self-center ml-1 table-img-max-width"
              height="%if;(e.px!="")%e.px;%else;60%end;" alt="xxx">
           %end;
         </div>
@@ -190,7 +136,7 @@
         %apply;add_in_sorted_listc(xxx.index)
         <div class="d-flex justify-content-between">
           %if;(e.im="" and xxx.has_image)
-            <img src="%xxx.image_url;" class="rounded align-self-center"
+            <img src="%xxx.image_url;" class="rounded align-self-center table-img-max-width"
              height="%if;(e.px!="")%e.px;%else;60%end;" alt="xxx">
           %else;<div></div>
           %end;
@@ -204,13 +150,13 @@
     %end;
   %end;
 %( Date de naissance %)
-  %apply;date_popup%with;xxx%and;birth%end;
+  %apply;date_popup%with;xxx%and;birth%and;%famx;%end;
 %( Lieu de naissance %)
-  %apply;place_popup%with;xxx%and;birth%end;
+  %apply;place_popup%with;xxx%and;birth%and;%famx;%end;
 %( Date de baptême %)
-  %apply;date_popup%with;xxx%and;baptism%end;
+  %apply;date_popup%with;xxx%and;baptism%and;%famx;%end;
 %( Lieu de baptême %)
-  %apply;place_popup%with;xxx%and;baptism%end;
+  %apply;place_popup%with;xxx%and;baptism%and;%famx;%end;
 %( En mode H, conjoints %)
   %if;(e.marr="on" and e.t="H")
     %if;(xxx.nb_families=0)
@@ -220,20 +166,15 @@
         %if;(family_cnt=fam_cnt)
           <td class="align-middle%if;(e.nowrap="on") text-nowrap%end; pl-2%nn;
           %if;(e.ns=1)
-              %if;(spouse.has_notes and not spouse.has_psources) note%nn;
-              %elseif;(not spouse.has_notes and spouse.has_psources) source%nn;
-              %elseif;(spouse.has_notes and spouse.has_psources) notesource%nn;
-              %end;
+            %if;(spouse.has_notes) note%if;(spouse.has_psources)source%end;
+            %elseif;(spouse.has_psources) source%end;
           %end;
           %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn" or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) table-warning%end;"%nn;
           %if;(e.ns=1 and (spouse.has_notes or spouse.has_psources)) tabindex="0" %apply;popover_params("bottom")
             data-content='%if;(spouse.has_notes)%apply;clean_comment_tags(spouse.notes)%end;
-                          %if;(spouse.has_notes and spouse.has_psources)<hr>%end;
-                          %if;(spouse.has_psources)%apply;capitalize(spouse.psources)%end;'
-            title="%if;(spouse.has_notes and not spouse.has_psources)[*note/notes]1%nn;
-                  %elseif;(not spouse.has_notes and spouse.has_psources)[*source/sources]1%nn;
-                  %elseif;(spouse.has_notes and spouse.has_psources)[*note/notes]1 [and] [source/sources]1%nn;
-                  %end;"%nn;
+                          %if;(spouse.has_psources)%if;(spouse.has_notes)<hr>%end;%apply;capitalize(spouse.psources)%end;'
+            title="%if;(spouse.has_notes)[*note/notes]1%if;(spouse.has_psources) [and] [source/sources]1%end;
+                  %elseif;(spouse.has_psources)[*source/sources]1%end;"%nn;
           %end;>%nn;
             %apply;add_in_sorted_list(spouse.index)
             %if;(zzz.nb_families>1)<span class="mr-1">%apply;letter(family_cnt)</span>%end;
@@ -292,23 +233,19 @@
                 (xxx=zzz and family_cnt=fam_cnt and e.t="H"))))
           <td class="align-middle%if;(are_divorced or are_separated) divorced-side-border%end;
             %if;(e.ns=1)
-              %if;(has_marriage_note and not has_marriage_source) note%nn;
-              %elseif;(not has_marriage_note and has_marriage_source) source%nn;
-              %elseif;(has_marriage_note and has_marriage_source) notesource%nn;
-              %end;
+              %if;has_marriage_note; note%if;has_marriage_source;source%end;%elseif;has_marriage_source; source%end;
             %end;
             %if;(e.hl=1 and marriage_place="") table-warning%end;"
-            rowspan="%if;(e.t="I" and zzz.nb_families=1)2%else;1%end;"%nn;
-            %if;(e.ns=1 and (has_marriage_note or has_marriage_source)) tabindex="0" %apply;popover_params("bottom")
-              data-content='%if;(has_marriage_note)%apply;clean_comment_tags(marriage_note)%end;
-                            %if;(has_marriage_note and has_marriage_source)<hr>%end;
-                            %if;(has_marriage_source)%apply;capitalize(marriage_source)%end;'
-              title="%if;(has_marriage_source or has_marriage_note)
-                       %if;(has_marriage_note and not has_marriage_source)[*note/notes]1%nn;
-                       %elseif;(not has_marriage_note and has_marriage_source)[*source/sources]1%nn;
-                       %elseif;(has_marriage_note and has_marriage_source)[*note/notes]1 [and] [source/sources]1%nn;
-                       %end;
-                     %end;"%nn;
+            rowspan="%if;(e.t="I" and zzz.nb_families=1)2%else;1%end;"
+            title="TODO"
+            %if;(e.ns=1 and (has_marriage_note or has_marriage_source))
+              tabindex="0" %apply;popover_params("bottom")
+              data-content='%if;has_marriage_note;%apply;clean_comment_tags(marriage_note)
+                              %if;has_marriage_source;<hr>%end;%end;
+                            %if;has_marriage_source;%apply;capitalize(marriage_source)%end;'
+              data-title="%if;has_marriage_note;[*note/notes]1%if;has_marriage_source; [and] [source/sources]1%end;
+                          %elseif;has_marriage_source;[*source/sources]1%nn;
+                          %end;"%nn;
             %end;>%nn;
           %if;(marriage_place!="")
             %marriage_place;%nn;
@@ -368,22 +305,15 @@
              (xxx=zzz and family_cnt=fam_cnt and e.t="H"))))
           <td class="align-middle text-center%if;(e.nowrap="on") text-nowrap%end; px-1
             %if;(e.ns=1)
-              %if;(has_fnotes and not has_fsources) note%nn;
-              %elseif;(not has_fnotes and has_fsources) source%nn;
-              %elseif;(has_fnotes and has_fsources) notesource%nn;
-              %end;
+              %if;has_fnotes; note%if;has_fsources;source%end;%elseif;has_fsources; source%end;
             %end;"
             rowspan="%if;(e.t="I" and zzz.nb_families=1)2%else;1%end;"%nn;
             %if;(e.ns=1 and (has_fnotes or has_fsources)) tabindex="0" %apply;popover_params("bottom")
-              data-content='%if;(has_fnotes)%apply;clean_comment_tags(fnotes)%end;
-                            %if;(has_fnotes and has_fsources)<hr>%end;
-                            %if;(has_fsources)%apply;capitalize(fsources)%end;'
-              title="%if;(has_fnotes or has_fsources)
-                      %if;(has_fnotes and not has_fsources)[*note/notes]1%nn;
-                      %elseif;(not has_fnotes and has_fsources)[*source/sources]1%nn;
-                      %elseif;(has_fnotes and has_fsources)[*note/notes]1 [and] [*source/sources]1%nn;
-                      %end;
-                     %end;"%nn;
+              data-content='%if;has_fnotes;%apply;clean_comment_tags(fnotes)%end;
+                            %if;has_fsources;%if;has_fnotes;<hr>%end;%apply;capitalize(fsources)%end;'
+              data-title="%if;has_fnotes;[*note/notes]1%if;has_fsources; [and] [source/sources]1%end;
+                      %elseif;has_fsources;[*source/sources]1%nn;
+                      %end;"%nn;
             %end;>%nn;
             %if;(nb_children>0 and not cancel_links)<a href="#%labl0;%if;(nb_families>1)%apply;letter(fam_cnt)%end;.1" title="[*link to children]">%end;
             %if;("yyy"="desc" and e.t="I")
@@ -401,13 +331,13 @@
     %end;
   %end;
 %( Date du décès %)
-  %apply;date_popup%with;xxx%and;death%end;
+  %apply;date_popup%with;xxx%and;death%and;%famx;%end;
 %( Lieu de naissance %)
-  %apply;place_popup%with;xxx%and;death%end;
+  %apply;place_popup%with;xxx%and;death%and;%famx;%end;
 %( Date de la sépulture %)
-  %apply;date_popup%with;xxx%and;burial%end;
+  %apply;date_popup%with;xxx%and;burial%and;%famx;%end;
 %( Lieu de la sépulture %)
-  %apply;place_popup%with;xxx%and;burial%end;
+  %apply;place_popup%with;xxx%and;burial%and;%famx;%end;
 %( Âge %)
   %if;(e.age="on" and famx=1)
     <td class="align-middle text-center"%rowspan;>%nn;
@@ -647,7 +577,7 @@
 %end;
 %( Main %)
 
-<table class="table-hover table-sm w-auto asc-desc-table mt-2">
+<table id="destable" class="table-hover table-sm w-auto asc-desc-table mt-2">
   %if;(e.t="A")
     %let;nb_col;1%in;
     %apply;one_person("self", 0, e.v, "", 0, 0)
@@ -666,7 +596,7 @@
       %for;lev;0;max;
         %if;(e.gen=1 and lev<max_desc_level)
           <tr>
-            <th scope="row" colspan="%nb_col;" class="border-0">
+            <th scope="row" colspan="%nb_col;" class="border-0 gen-row">
               <div class="d-flex">
                 <span>[*generation/generations]0 %expr(lev+1)</span>
                 <span class="ml-auto">%apply;desc_count(lev+1,1,1,0,0)</span>
@@ -696,18 +626,5 @@
 %include;copyr
 </div>
 %include;js
-<script>
-$('[data-toggle="popover"]').popover({
-  html: true,
-  trigger: "focus",
-  delay: { hide: 250 }
-})
-$('.popover-dismiss').popover({
-  trigger: 'focus'
-})
-$.fn.tooltip.Constructor.Default.whiteList['dl'] = [];
-$.fn.tooltip.Constructor.Default.whiteList['dt'] = [];
-$.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
-</script>
 </body>
 </html>
