@@ -1556,12 +1556,21 @@ let relation_txt conf sex fam =
   | Def.Residence -> ftransl_nth conf "residence%t to" is
   | Def.NoMention -> "%t" ^^ ftransl conf "with"
 
-let relation_date conf fam : Adef.safe_string =
+let relation_date_text conf fam =
   Adef.safe
   @@
   match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
   | None -> ""
   | Some dmy -> " " ^ transl conf "in (year)" ^ " " ^ string_of_int dmy.year
+
+let relation_date conf base fam : Adef.safe_string =
+  let ifath = Gwdb.get_father fam in
+  let imoth = Gwdb.get_mother fam in
+  let auth =
+    authorized_age conf base (pget conf base ifath)
+    && authorized_age conf base (pget conf base imoth)
+  in
+  if auth then relation_date_text conf fam else Adef.safe ""
 
 let child_of_parent conf base p =
   (* Si le père a un nom de famille différent de la personne *)
@@ -1635,7 +1644,7 @@ let husband_wife conf base p all =
             ^>^ translate_eval
                   (" "
                    ^<^ gen_person_text conf base conjoint
-                   ^^^ relation_date conf fam
+                   ^^^ relation_date conf base fam
                     :> string)
             ^ ","
           in
