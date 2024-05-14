@@ -947,10 +947,11 @@ let opendb ?(read_only = false) bname =
         im_descends,
         im_strings )
         : ro_data_records =
-    let bfname = Unix.realpath bname in
-    match
-      List.find_opt (fun (n, _) -> String.equal bfname n) !cached_records
-    with
+    let bid =
+      let s = Unix.stat bname in
+      (s.st_dev, s.st_ino)
+    in
+    match List.find_opt (fun (n, _) -> bid = n) !cached_records with
     | Some (_, records) -> records
     | None ->
         let persons =
@@ -1004,7 +1005,7 @@ let opendb ?(read_only = false) bname =
         let dr =
           (persons, ascends, unions, families, couples, descends, strings)
         in
-        if read_only then cached_records := (bfname, dr) :: !cached_records;
+        if read_only then cached_records := (bid, dr) :: !cached_records;
         dr
   in
   let persons =
