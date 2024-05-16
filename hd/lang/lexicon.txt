@@ -9257,6 +9257,14 @@ sv: välj en post i den hierarkiska navigeringen
 tr: hiyerarşik gezinmede bir giriş seçin
 zh: 在层次导航中选择一个条目
 
+    high generation levels
+en: the generation levels higher then 12
+fr: les générations supérieures à 12
+
+    high generation caution
+en: be carefull! Selecting high generation level may take minutes to generate and that can lead to server timeouts.
+fr: attention ! Sélectionner un nombre de génération élevé peut prendre plusieurs minutes à générer et entraîner des délais d'attente dépassé du serveur.
+
     highlight incomplete data
 co: sopralineà i dati incumpleti
 de: hebe die unvollständigen Daten hervor
@@ -9272,12 +9280,12 @@ co: ellu/ella
 cs: on/ona
 da: han/hun
 de: er/sie
-en: him/her
+en: him/her/they
 eo: li/ŝi
 es: él/ella
 et: mees/naine
 fi: mies/nainen
-fr: lui/elle
+fr: lui/elle/iel
 he:   אותו/ אותה
 is: hans/hennar
 it: lui/lei
@@ -13311,7 +13319,7 @@ eo: nombro de la vivantaj personoj
 es: número de personas vivas
 et: elavaid inimesi
 fi: elossa olevien lukumäärä
-fr: nombre de personnes vivantes
+fr: nombre d’individus vivants
 he: מספר האנשים שעודם בחיים
 it: numero di persone viventi
 lt: gyvųjų skaičius

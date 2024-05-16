@@ -1,3 +1,14 @@
+
+/* Hide m=C toggle +/- button outline and shadow */
+.toggle-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+#quickrel tr {
+  height:2rem;
+}
+
 /* Light grey background color highlight for the toolbar characters.txt */
   .ch .hl {
     background-color: #f0f0f0;
