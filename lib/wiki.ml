@@ -834,7 +834,6 @@ let print_ok conf wi edit_mode fname title_is_1st s =
   Output.print_sstring conf {|<div style="text-align:center"> --- |};
   title ();
   Output.print_sstring conf {| --- </div>|};
-  Hutil.print_link_to_welcome conf true;
   let get_v = Util.p_getint conf.env "v" in
   let v = match get_v with Some v -> v | None -> 0 in
   let title, s =
