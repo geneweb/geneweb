@@ -377,17 +377,14 @@ let print_misc_notes conf base =
   Hutil.header conf title;
   if db <> [] then (
     Output.print_sstring conf "<ul>";
-    if d <> "" then (
-      Output.print_sstring conf {|<li class="parent">|};
-      (* Output.printf conf "<a href=\"%sm=MISC_NOTES%s\">" (commd conf) ; *)
-      Output.print_sstring conf {|<a href="|};
-      Output.print_string conf (commd conf);
-      Output.print_sstring conf "m=MISC_NOTES";
-      (match String.rindex_opt d NotesLinks.char_dir_sep with
-      | Some i ->
-          Output.print_string conf @@ "&d=" ^<^ Mutil.encode (String.sub d 0 i)
-      | None -> ());
-      Output.print_sstring conf "<tt>&lt;--</tt></a></li>");
+    if d <> "" then
+      Format.sprintf
+        {|<a href="%sm=MISC_NOTES%s"><i class="fa fa-arrow-left"></i></a>|}
+        (commd conf :> string)
+        (match String.rindex_opt d NotesLinks.char_dir_sep with
+        | Some i -> "&d=" ^ String.sub d 0 i
+        | None -> "")
+      |> Output.print_sstring conf;
     List.iter
       (function
         | r, Some f ->

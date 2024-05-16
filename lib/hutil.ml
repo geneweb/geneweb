@@ -95,9 +95,6 @@ let header_fluid conf title =
 
 let trailer conf =
   let conf = { conf with is_printed_by_template = false } in
-  (match Util.open_etc_file conf "trl" with
-  | Some (ic, _) -> Templ.copy_from_templ conf [] ic
-  | None -> ());
   Templ.include_hed_trl conf "trl";
   Templ.print_copyright conf;
   Util.include_template conf [] "js" (fun () -> ());
