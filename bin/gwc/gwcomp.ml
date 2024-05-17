@@ -745,10 +745,7 @@ let get_mar_date str = function
             if String.length x > 1 then
               (Divorced (Date.cdate_of_od (date_of_string x 1)), l')
             else (Divorced Date.cdate_None, l')
-        | "#sep" :: l' when x.[0] = '-' ->
-            if String.length x > 1 then
-              (Separated (Date.cdate_of_od (date_of_string x 1)), l')
-            else (Separated Date.cdate_None, l')
+        | "#sep" :: l' -> (Separated Date.cdate_None, l')
         | _ -> (NotDivorced, l)
       in
       (relation, mar, place, note, src, divorce, l)
