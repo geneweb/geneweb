@@ -90,12 +90,12 @@ BUILD = dune build -p geneweb --profile $(DUNE_PROFILE)
 UNPATCH = $(MAKE) --no-print-directory unpatch_files
 
 info:
-	@printf "Building \033[1;37mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n"
-	@printf "Repository \033[1;37m$(SOURCE)\033[0m. Branch \033[1;37m$(BRANCH)\033[0m. "
-	@printf "Last commit \033[1;37m$(COMMIT_ID)\033[0m message:\n\n"
-	@printf "\033[1;37m  %s\033[0m\n" '$(subst ','\'',$(COMMIT_TITLE))'
+	@printf "Building \033[1;1mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n"
+	@printf "Repository \033[1;1m$(SOURCE)\033[0m. Branch \033[1;1m$(BRANCH)\033[0m. "
+	@printf "Last commit \033[1;1m$(COMMIT_ID)\033[0m message:\n\n"
+	@printf "\033[1;1m  %s\033[0m\n" '$(subst ','\'',$(COMMIT_TITLE))'
 	@printf "  %s\n" '$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80
-	@printf "\033[1;37mGenerating configuration files\033[0m\n"
+	@printf "\033[1;1mGenerating configuration files\033[0m\n"
 .PHONY: patch_files unpatch_files info
 
 GENERATED_FILES_DEP = \
@@ -131,19 +131,19 @@ fmt build gwd install uninstall: info patch_files generated
 
 fmt: ## Format Ocaml code
 ifneq ($(OS_TYPE),Win)
-	@printf "\n\033[1;37mOcamlformat\033[0m\n"
+	@printf "\n\033[1;1mOcamlformat\033[0m\n"
 	dune build @fmt --auto-promote ; $(UNPATCH)
 endif
 
 # [BEGIN] Installation / Distribution section
 
 build: ## Build the geneweb package (libraries and binaries)
-	@printf "\n\033[1;37mBuilding executables\033[0m\n"
+	@printf "\n\033[1;1mBuilding executables\033[0m\n"
 	@$(BUILD) ; $(UNPATCH)
 	@printf "Done."
 
 gwd: ## Build ondy gwd/gwc executables
-	@printf "\n\033[1;37mBuilding only gwd and gwc executables\033[0m\n"
+	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
 	@dune build bin/gwd bin/gwc --profile $(DUNE_PROFILE) ; $(UNPATCH)
 	@printf "Done."
 
@@ -157,11 +157,11 @@ uninstall: ## Uninstall geneweb using dune
 
 distrib: info ## Build the project and copy what is necessary for distribution
 	@$(MAKE) --no-print-directory patch_files generated
-	@printf "\n\033[1;37mBuilding executables.\n\033[0m"
+	@printf "\n\033[1;1mBuilding executables.\n\033[0m"
 	@$(BUILD) || { $(UNPATCH) && exit 1; }
 	@printf "Done."
 	@$(RM) -r $(DISTRIB_DIR)
-	@printf "\n\033[1;37mCreating distribution directory\033[0m\n"
+	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
 	cp CHANGES $(DISTRIB_DIR)/CHANGES.txt
@@ -185,7 +185,7 @@ endif
 	mkdir $(DISTRIB_DIR)/gw
 	cp etc/a.gwf $(DISTRIB_DIR)/gw/.
 	echo "-setup_link" > $(DISTRIB_DIR)/gw/gwd.arg
-	@printf "\n\033[1;37m└ Copy binaries in $(DISTRIB_DIR)/gw/\033[0m\n"
+	@printf "\n\033[1;1m└ Copy binaries in $(DISTRIB_DIR)/gw/\033[0m\n"
 	cp $(BUILD_DISTRIB_DIR)connex/connex.exe $(DISTRIB_DIR)/gw/connex$(EXT)
 	cp $(BUILD_DISTRIB_DIR)consang/consang.exe $(DISTRIB_DIR)/gw/consang$(EXT)
 	cp $(BUILD_DISTRIB_DIR)fixbase/gwfixbase.exe $(DISTRIB_DIR)/gw/gwfixbase$(EXT)
@@ -202,7 +202,7 @@ endif
 	cp $(BUILD_DISTRIB_DIR)gwu/gwu.exe $(DISTRIB_DIR)/gw/gwu$(EXT)
 	cp $(BUILD_DISTRIB_DIR)setup/setup.exe $(DISTRIB_DIR)/gw/gwsetup$(EXT)
 	cp $(BUILD_DISTRIB_DIR)update_nldb/update_nldb.exe $(DISTRIB_DIR)/gw/update_nldb$(EXT)
-	@printf "\n\033[1;37m└ Copy templates in $(DISTRIB_DIR)/gw/\033[0m\n"
+	@printf "\n\033[1;1m└ Copy templates in $(DISTRIB_DIR)/gw/\033[0m\n"
 	cp -R hd/* $(DISTRIB_DIR)/gw/
 	mkdir $(DISTRIB_DIR)/gw/setup
 	cp bin/setup/intro.txt $(DISTRIB_DIR)/gw/setup/
@@ -212,7 +212,7 @@ endif
 	cp bin/setup/lang/*.htm $(DISTRIB_DIR)/gw/setup/lang/
 	cp bin/setup/lang/lexicon.txt $(DISTRIB_DIR)/gw/setup/lang/
 	cp bin/setup/lang/intro.txt $(DISTRIB_DIR)/gw/setup/lang/
-	@printf "\n\033[1;37m└ Copy plugins in $(DISTRIB_DIR)/gw/plugins\033[0m\n"
+	@printf "\n\033[1;1m└ Copy plugins in $(DISTRIB_DIR)/gw/plugins\033[0m\n"
 	mkdir $(DISTRIB_DIR)/gw/plugins
 	@for P in $(shell ls plugins); do \
 	  if [ -f $(BUILD_DIR)/plugins/$$P/plugin_$$P.cmxs ] ; then \
@@ -229,9 +229,9 @@ endif
 	    fi; \
 	  fi; \
 	done
-	@printf "Done.\n\n\033[1;37mDistribution complete.\033[0m\n"
+	@printf "Done.\n\n\033[1;1mDistribution complete.\033[0m\n"
 	@$(UNPATCH)
-	@printf "You can launch Geneweb with “\033[1;37mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;37mgw/gwd$(EXT)\033[0m”.\n"
+	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mgw/gwd$(EXT)\033[0m”.\n"
 .PHONY: fmt install uninstall distrib
 
 # [END] Installation / Distribution section
