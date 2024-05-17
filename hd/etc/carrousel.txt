@@ -266,7 +266,7 @@
                   <br><img class="rounded my-1" src="%prefix;m=FIM_C&i=%index;"
                   width="185px">'>
           <i class="far fa-trash-can text-warning"></i>%nn;</a> 
-          <a href="%prefix;m=BLASON_UP_ONE&i=%index;">up1</a>
+          <a href="%prefix;m=BLASON_UP_ONE&i=%index;" title='[*move coat of arms to father]'><i class="fa-solid fa-arrow-turn-up text-warning"></i></a>
         </div>
       %elseif;has_blason_stop;
       <div class="d-flex mt-1">
@@ -292,7 +292,7 @@
         [use coat of arms of]0&nbsp;<a  href="%prefix;%blason_owner.access;" %nn; class="%if;(blason_owner.sex=0)male%elseif;(blason_owner.sex=1)female%else;neuter%end;-underline">%blason_owner;</a>%nn;
         <a role="button" class="ml-auto col-1"  href="%prefix;m=BLASON_STOP&i=%index;"
            data-toggle="tooltip" data-html="true" data-placement="left">
-          <i class="far fa-trash-can text-warning"></i>%nn;</a> 
+          <i class="fa-solid fa-xmark text-warning"></i>%nn;</a> 
       </div>
       %end;
       %if;has_old_blason;

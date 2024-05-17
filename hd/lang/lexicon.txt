@@ -12228,6 +12228,10 @@ sl: več kot %d zadetkov
 sv: fler än %d svar
 tr: %d cevaptan daha fazla
 
+    move coat of arms to father
+fr: Déplacer le blason vers le père
+en: move coat of arms to father
+
     move up/down
 co: ricullà/falà/ricullà u cursore/falà u cursore
 de: nach oben/nach unten/Cursor nach oben/Cursor nach unten
