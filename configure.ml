@@ -8,7 +8,11 @@ let rm = ref ""
 let ext = ref ""
 let os_type = ref ""
 let installed pkg = 0 = Sys.command ("ocamlfind query -qo -qe " ^ pkg)
-let nnp_compiler = 1 = Sys.command "$(ocamlc -config-var naked_pointers)"
+
+let nnp_compiler =
+  if not Sys.win32 then 1 = Sys.command "$(ocamlc -config-var naked_pointers)"
+  else false
+
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options]"
 let api = ref false
 let sosa = ref `None
@@ -61,7 +65,7 @@ let speclist =
     ("--syslog", Arg.Unit set_syslog, " Log gwd errors using syslog");
     ( "--gwd-caching",
       Arg.Unit set_caching,
-      " Enable database preloading for gwd" );
+      " Enable database preloading (Unix-only)" );
   ]
   |> List.sort compare |> Arg.align
 
