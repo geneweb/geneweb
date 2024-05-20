@@ -1,7 +1,6 @@
-
-/* Hide m=C toggle +/- button outline and shadow */
+/* cousins relation table m=C */
 .toggle-button:focus {
-  outline: none;
+  outline: none; /* On generation picker, hide the toggle +/- button outline+shadow */
   box-shadow: none;
 }
 
@@ -9,6 +8,47 @@
   height:2rem;
 }
 
+.lh-2 {
+  line-height: 2rem;
+}
+
+.border-double {
+  border-style: double;
+}
+
+.border-left-5 {
+  border-left-width: 5px;
+}
+
+.border-right-5-black {
+  border-right-width: 5px;
+  border-right-color: black;
+}
+
+.overflow-y-scroll {
+  overflow-y: scroll
+}
+
+.bg-linen {
+  background-color: linen
+}
+
+.modal-title-font-size {
+  font-size: 2rem;
+  font-weight: 300;
+}
+
+.h-15p {
+  height: 15px;
+}
+
+.h-5 {
+  height: 5rem;
+}
+
+.z-index1 {
+  z-index:1;
+}
 /* Light grey background color highlight for the toolbar characters.txt */
   .ch .hl {
     background-color: #f0f0f0;
@@ -156,6 +196,11 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
+}
+
+*/ deslist hr alternate couple color */
+.ancestor-couple-color {
+  background-color: #D2691E !important;
 }
 
 /* --- Ascendants/Descendants table --- */
