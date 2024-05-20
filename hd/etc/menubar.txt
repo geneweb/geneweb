@@ -41,51 +41,53 @@
               <span class="sr-only">[*module]1</span>%nn;
             </a>
             <div class="dropdown-menu dropdown-menu-transl-pmod">
-              <div class="d-inline-flex justify-content-around mx-1">
+              <div class="d-flex justify-content-around mx-1">
                 <form class="form-group mx-1" name="upd_url" method="get" action="%action;">
                   <div class="d-flex justify-content-between mx-2 mt-2 img-prfx" data-prfx="%images_prefix;modules">
-                    <div class="d-inline-flex">
-                    %apply;input_hidden("e.b","b")
-                    %if;(e.lang!=default_lang)%apply;input_hidden("e.lang","lang")%end;
-                    <div class="input-group">
-                      <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control"
-                        value="%if;(p_mod!="zz" and p_mod!="")%p_mod;%end;"
-                        placeholder="%if;(e.p_mod="" and b.p_mod!="")%b.p_mod;
-                        (%base.name;.gwf)%else;[*select p_mod]%end;" maxlength="40">
-                      <div class="input-group-append">
-                        <button type="submit" class="btn btn-outline-success" title="[*validate/delete]0"><i class="fa fa-check fa-lg"></i></button>
-                        <button type="button" class="btn btn-outline-danger" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-xmark fa-lg mx-1"></i></button>
+                    <div class="d-flex align-items-center flex-grow-1">
+                      %apply;input_hidden("e.b","b")
+                      %if;(e.lang!=default_lang)%apply;input_hidden("e.lang","lang")%end;
+                      <div class="input-group mr-2">
+                        <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control w-50"
+                          value="%if;(p_mod!="zz" and p_mod!="")%p_mod;%end;"
+                          placeholder="%if;(e.p_mod="" and b.p_mod!="")%b.p_mod;
+                          (%base.name;.gwf)%else;[*select p_mod]%end;" maxlength="40">
+                        <div class="input-group-append">
+                          <button type="submit" class="btn btn-outline-success" title="[*validate/delete]0"><i class="fa fa-check fa-lg"></i></button>
+                          <button type="button" class="btn btn-outline-danger" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-xmark fa-lg mx-1"></i></button>
+                        </div>
                       </div>
-                    </div>
-                    %if;(e.i="")
-                      %apply;input_hidden("first_name_key_val","p")
-                      %apply;input_hidden("surname_key_val","n")
-                      %if;(occ!=0)
-                        %apply;input_hidden("occ","oc")
+                      %if;(e.i="")
+                        %apply;input_hidden("first_name_key_val","p")
+                        %apply;input_hidden("surname_key_val","n")
+                        %if;(occ!=0)
+                          %apply;input_hidden("occ","oc")
+                        %end;
+                      %else;
+                        %apply;input_hidden("e.i","i")
                       %end;
-                    %else;
-                      %apply;input_hidden("e.i","i")
-                    %end;
-                    %apply;input_hidden("e.v","v")
-                    %apply;input_hidden("e.image","image")
-                    %apply;input_hidden("e.marriage","marriage")
-                    %apply;input_hidden("e.mar_sp_ch","mar_sp_ch")
-                    %apply;input_hidden("e.evt_pr_sib","evt_pr_sib")
-                    %apply;input_hidden("e.simple","simple")
-                    <button type="button" class="btn btn-outline-danger ml-2" id="p_mod_rm" title="[*remove last module]" value="%b.p_mod;"><i class="fa fa-backward"></i></button>
-                    %if;(b.p_mod!="")
-                      <button type="submit" class="btn btn-outline-secondary ml-2" id="p_mod_bvar" title="[*reset to] p_mod=%b.p_mod (%base.name;.gwf)" value="%b.p_mod;"><i class="fa fa-plus"></i></button>
-                    %end;
-                    <button type="submit" class="btn btn-outline-secondary ml-2 mr-1" id='zz'
-                            title="Default template" data-toggle="popover" data-trigger="hover"
-                            data-html="true" data-content="<img class='w-100' src='%images_prefix;modules/zz_1.jpg'>"><i class="fa fa-arrow-rotate-left"></i></button>
+                      %apply;input_hidden("e.v","v")
+                      %apply;input_hidden("e.image","image")
+                      %apply;input_hidden("e.marriage","marriage")
+                      %apply;input_hidden("e.mar_sp_ch","mar_sp_ch")
+                      %apply;input_hidden("e.evt_pr_sib","evt_pr_sib")
+                      %apply;input_hidden("e.simple","simple")
                     </div>
-                    <a role="button" class="btn btn-outline-%if;(e.wide="on")danger%else;primary%end;"
-                      href="%if;(e.wide!="")%url_set.wide;%else;%url_set.wide.on;%end;"
-                      title="%if;(e.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;">%nn;
-                      <i class="fa fa-desktop fa-fw" aria-hidden="true"></i>%nn;
-                      <span class="sr-only">%if;(e.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span>%nn;
-                    </a>
+                    <div class="ml-auto">
+                      <button type="button" class="btn btn-outline-danger ml-2" id="p_mod_rm" title="[*remove last module]" value="%b.p_mod;"><i class="fa fa-backward"></i></button>
+                      %if;(b.p_mod!="")
+                        <button type="submit" class="btn btn-outline-secondary ml-2" id="p_mod_bvar" title="[*reset to] p_mod=%b.p_mod (%base.name;.gwf)" value="%b.p_mod;"><i class="fa fa-plus"></i></button>
+                      %end;
+                      <button type="submit" class="btn btn-outline-secondary ml-2 mr-1" id='zz'
+                        title="Default template" data-toggle="popover" data-trigger="hover"
+                        data-html="true" data-content="<img class='w-100' src='%images_prefix;modules/zz_1.jpg'>"><i class="fa fa-arrow-rotate-left"></i></button>
+                      <a role="button" class="btn btn-outline-%if;(e.wide="on")danger%else;primary%end; ml-2"
+                        href="%if;(e.wide!="")%url_set.wide;%else;%url_set.wide.on;%end;"
+                        title="%if;(e.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;">%nn;
+                        <i class="fa fa-desktop fa-fw" aria-hidden="true"></i>%nn;
+                        <span class="sr-only">%if;(e.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span>%nn;
+                      </a>
+                    </div>
                   </div>
                   <div class="mx-2 mt-2">[*select module]</div>
                   <div class="alert alert-warning alert-dismissible fade show mt-1 mb-2 d-none" role="alert">
@@ -391,7 +393,7 @@
             <div class="dropdown-menu dropdown-menu-transl">
               <a class="dropdown-item" href="%prefix;%access;&m=R" %laR;><span class="fa fa-gear fa-fw mr-2"></span>[*relationship computing]</a>
               <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;m=C&%access;&v=3"
+                <a class="dropdown-item" href="%prefix;m=C&%access;&v=5"
                   title="[*relationship link/relationship links]0 [with] [close family]"><span class="fa fa-elevator fa-fw mr-2"></span>[*relationship]</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" %nn;
