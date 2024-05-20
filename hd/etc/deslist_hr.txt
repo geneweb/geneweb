@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: deslist_hr.txt v7.1 09/01/2023 00:02:45 $ -->
+  <!-- $Id: deslist_hr.txt v7.1 19/05/2024 23:50:44 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -33,9 +33,11 @@
 %end;
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
-%let;l_v0;%if;(evar.v > max_desc_level)%max_desc_level;%else;%evar.v;%end;%in;
-%let;l_v;%if;(bvar.max_desc_level = "" or bvar.max_desc_level > l_v0)%l_v0;%else;%bvar.max_desc_level;%end;%in;
+%let;l_v0;%if;(e.v > static_max_desc_level)%static_max_desc_level;%else;%e.v;%end;%in;
+%let;l_v;%if;(b.max_desc_level = "" or b.max_desc_level > l_v0)%l_v0;%else;%b.max_desc_level;%end;%in;
+
 %define;desc1(z1,z2,z3,z4,curlev,maxlev,sp_index)
+  %let;l_v1;%if;(l_v0>=curlev)%expr(l_v0-curlev)%else;%e.v;%end;%in;
   %let;l1;%if;(z3z4 = "00" or z3z4 = "01")  ┊%else;   %end;%in;
   %let;l2;
     %if;(curlev != 0)
@@ -60,7 +62,7 @@
     %let;l21;
       %if;(curlev != 0)
         %if;(not cancel_links)
-          <a href="%prefix;%access;&m=D&t=D&v=%l_v;">%child_cnt;</a>%nn;
+          <a href="%prefix;%access;&m=D&t=D&v=%l_v1;">%child_cnt;</a>%nn;
         %else;
           %child_cnt;%nn;
         %end;
@@ -124,7 +126,7 @@
       %end;
       </span>
       <br data-surname="_%surname;">
-      %if;(curlev < maxlev)
+      %if;(curlev+1 < maxlev)
         %reset_count;
         %foreach;sorted_listb_item;
           %if;("item.1"="ifam")%incr_count;%end;
@@ -154,7 +156,7 @@
     %let;l23;
       %if;(curlev != 0)
         %if;(not cancel_links)
-          <a href="%prefix;%access;&m=D&t=D&v=%l_v;">%child_cnt;</a>%nn;
+          <a href="%prefix;%access;&m=D&t=D&v=%l_v1;">%child_cnt;</a>%nn;
         %else;
           %child_cnt;%nn;
         %end;
@@ -240,6 +242,7 @@
           </button>
         </div>
         <div class="modal-body py-2">
+          %reset_count2;
           %foreach;ancestor_level(maxlvl)
             %if;(level!=0)
               <div class="text-center font-weight-bold mb-2">%nn;
@@ -252,12 +255,14 @@
               %reset_count;
               %foreach;ancestor;
                 %incr_count;
+                %incr_count2;
                 %if;(count%2!=0)
                   <div class="d-flex align-items-center mx-0">
                 %end;
                 <div class="col-6%if;(count%2!=0) pl-1 pr-0 mr-1%else; pl-0 pr-1 ml-1%end; mb-2">
-                  <a role="button" class="btn btn-outline-primary d-block text-center w-100 px-1%nn;
-                    %if;(ancestor.first_name="?" and ancestor.surname="?") d-none border-0%end;"
+                  <a role="button"
+                    class="%if;(ancestor.first_name="?" and ancestor.surname="?") d-none border-0
+                      %else;btn bg-gradient-success btn-outline-%if;(count2%4=1 or count2%4=2)primary%else;success%end; w-100 px-1 text-center%end;"
                     title="[*select] %ancestor" href="%prefix;%ancestor.access;%nn;
                     %foreach;env_binding;
                       %if;(env.key!="p" and env.key!="n" and env.key!="oc"
@@ -286,10 +291,10 @@
     </div>
   </div>
 %end;
-<h3>%nn;
+<h3 class="ml-2">%nn;
   %apply;a_of_b_gr_eq_lev%with;[*descendants]%and;
     %if;(public_name!="")%public_name;%else;%first_name;%end; %surname; %end;
-  <small class="text-muted">%apply;togend(l_v)</small>
+  %if;(l_v!=0)<small class="text-muted">%apply;togend(l_v)</small>%end;
 </h3>
 <form class="form-inline my-2">
   <div id="filterbysurname" class="form-row d-none">

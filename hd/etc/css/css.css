@@ -142,8 +142,15 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
     font-weight: normal;
     font-style: normal;
 }
-.tt {font-family: 'dejavu_sans_mono';}	
-.deslist, .anclist_hr {line-height:1rem;font-size:1rem;}
+
+.tt {
+  font-family: 'dejavu_sans_mono';
+}
+
+.deslist, .anclist_hr {
+  line-height:1.1rem;
+  font-size:1rem;
+}
 
 .unselectable {
   -moz-user-select: none;

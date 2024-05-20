@@ -5,7 +5,7 @@
   %url_set.xx.yy;
 %end;
 %let;istable;%if;((evar.m="D" and (evar.t="H" or evar.t="I")) or (evar.m="A" and (evar.t="Z" or evar.t="Y")))1%end;%in;
-<div class="button-group" role="group" aria-label="nav buttons">
+<div class="button-groug ml-2" role="group" aria-label="nav buttons">
   <a role="button" class="btn btn-link ml-1 mt-0 px-0"%sp;
     href="%prefix_base_password;%if;(evar.templ!="")&templ=%evar.templ;%end;&%access;&m=%evar.m;"><i class="fa fa-gear fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
     [*options] %if;(evar.m="D")[descendants]%elseif;(evar.m="A")[ancestor/ancestors]1%end;%nn;
@@ -46,10 +46,8 @@
           %if;(cond2=1)&m=A&t=H%nn;
           %else;&m=D&t=D%nn;
           %end;&v=%if;(evar.v="")1%else;%if;(cond2=1)%expr(evar.v+1)%else;%expr(evar.v-1);%end;%end;">%nn;
-    <i class="fa fa-list fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
-    %if;(cond2=1)[*horizontal tree]%nn;
-    %else;[*descendant tree view]%nn;
-    %end;%nn;
+    <i class="fa fa-%if;(e.m="D")code-branch fa-flip-vertical%elseif;(e.m="A")code-fork%end; fa-rotate-90 fa-fw mr-1" aria-hidden="true"></i>%nn;
+    %if;(cond2=1)[*horizontal tree]%else;[*descendant tree view]%end;%nn;
   </a>
 </div>
 %define;size_btn(xxx,yyy)
@@ -63,7 +61,7 @@
     </a>
 %end;
 <div class="input-group ml-2">
-  <div class="button-group" role="group" aria-label="nav buttons">
+  <div class="button-group ml-1" role="group" aria-label="nav buttons">
     %if;(istable=1)
       %( TODO allfn sur table/couple %)
       <a role="button" class="btn btn-link mx-0 px-0 mr-1 %if;(e.t="Y" or e.csv=1) disabled%end;"
@@ -169,9 +167,9 @@
       <a role="button" class="btn btn-link mx-0 px-0 mr-1
                               %if;(e.m="D")%if;(e.v>=static_max_desc_level)disabled text-muted%end;
                               %elseif;(e.m="A")%if;(e.v>static_max_anc_level)disabled text-muted%end;%end;"
-        title="[*add] 1 [generation/generations]0"
+        title="[*add] 1 [generation/generations]0%if;(e.v<static_max_desc_level and static_max_desc_level>1) (max %static_max_desc_level; [generation/generations]1)%end;"
         href="%apply;urlset%with;v%and;%expr(e.v+1)%end;">%nn;
-        <i class="fa fa-plus fa-fw fa-lg" aria-hidden="true"></i>%nn;
+        <i class="fa fa-plus fa-fw fa-lg" aria-hidden="true"></i>
         <span class="sr-only">+</span>%nn;
       </a>
       <span class="sr-only"> —</span>
