@@ -631,7 +631,7 @@ let effective_send_c_ok ?(portrait = true) conf base p file file_name =
     U_Send_image (Util.string_gen_person base (gen_person_of_person p))
   in
   History.record conf base changed
-    (if mode = "portraits" then "si"
+    (if mode = "portraits" then (if portrait then "si" else "ca")
     else if file_name <> "" && note <> Adef.safe "" && source <> Adef.safe ""
    then "sb"
     else if file_name <> "" then "so"
@@ -745,7 +745,7 @@ let effective_delete_c_ok ?(portrait = true) conf base p =
   let changed =
     U_Delete_image (Util.string_gen_person base (gen_person_of_person p))
   in
-  History.record conf base changed (if mode = "portraits" then "di" else "do");
+  History.record conf base changed (if mode = "portraits" then (if portrait then "di" else "dc") else "do");
   file_name
 
 (* carrousel *)
@@ -794,6 +794,10 @@ let effective_reset_c_ok ?(portrait = true) conf base p =
             (Printf.sprintf "reset portrait (swap file %s)" file_in_new))
     | _ -> ());
   swap_files file_in_new ext old_ext;
+  let changed =
+    U_Send_image (Util.string_gen_person base (gen_person_of_person p))
+  in
+  History.record conf base changed (if portrait then "ri" else "rc");
   file_name
 
 (* ************************************************************************** *)
@@ -899,6 +903,9 @@ let print_main_c conf base =
                         let fa = poi base (get_father cpl) in
                         (conf, move_blason_file conf base p fa)
                     | _ -> (conf, "idigest error"))
+                (*| Some "PORTRAIT_TO_BLASON" -> (
+                    if Image.has_blason conf base p true then (conf, effective_delete_c_ok ~portrait:false conf base p)
+                )*)
                 | Some "BLASON_STOP" ->
                     let has_blason_self = Image.has_blason conf base p true in
                     let has_blason = Image.has_blason conf base p false in

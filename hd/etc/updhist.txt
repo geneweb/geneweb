@@ -113,11 +113,15 @@
   %elseif;(uu = "dp")[delete::person/persons]0%nn;
   %elseif;(uu = "fp")[merge::person/persons]1%nn;
   %elseif;(uu = "si")[send::portrait]%nn;
+  %elseif;(uu = "ri")[restore::portrait]%nn;
+  %elseif;(uu = "ca")[send::coat of arms]%nn;
   %elseif;(uu = "sb")[send::image/images]0 note and source [to carrousel]%nn;
   %elseif;(uu = "so")[send::image/images]0 [to carrousel]%nn;
   %elseif;(uu = "sc")[send::note/notes]0 [to carrousel]%nn;
   %elseif;(uu = "ss")[send::source/sources]0 [to carrousel]%nn;
   %elseif;(uu = "di")[delete::portrait]0%nn;
+  %elseif;(uu = "dc")[delete::coat of arms]0%nn;
+  %elseif;(uu = "rc")[restore::coat of arms]0%nn;
   %elseif;(uu = "do")[delete::image/images]0 [from carrousel]%nn;
   %elseif;(uu = "af")[add::family/families]0%nn;
   %elseif;(uu = "mf")[modify::family/families]0%nn;
