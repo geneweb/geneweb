@@ -7663,7 +7663,7 @@ bg: сгоден%t с/сгодена%t с
 br: dimezet%t gant
 ca: promès%t amb/promesa%t amb
 co: fidanzatu%t cù/fidanzata%t cù
-cs: zasnoubený s/zasnoubená s
+cs: zasnoubený%t s/zasnoubená%t s
 da: forlovet%t med
 de: verlobt%t mit
 en: engaged%t to
@@ -7685,7 +7685,7 @@ pt: noivo%t de/noiva%t de
 ro: logodit%t cu/logodita%t cu
 ru: %t помолвлен с
 sk: zasnúbený %t s/zasnúbená %t s
-sl: zaročen z %t/zaročena z
+sl: zaročen%t z/zaročena%t z
 sv: förlovad%t med
 tr: nişanlı %t için
 
