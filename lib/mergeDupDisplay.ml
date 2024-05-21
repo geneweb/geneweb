@@ -33,9 +33,12 @@ let print_no_candidate conf base p =
   Hutil.print_link_to_welcome conf true;
   Util.transl conf "duplicate_merge_end_explanation"
   |> Output.printf conf "<p>%s</p>";
-  Output.print_sstring conf "<ul><li>";
-  print_link conf base p;
-  Output.print_sstring conf "</li></ul>";
+  Output.print_sstring conf "<p>";
+  Output.print_sstring conf (Util.transl conf "duplicate_merge_end_go_back");
+  Output.print_sstring conf " ";
+  print_link ~with_occurrence_number:false ~with_life_dates:false
+    ~with_main_title:false conf base p;
+  Output.print_sstring conf "</p>";
   Hutil.trailer conf
 
 let input_excl string_of_i excl =
