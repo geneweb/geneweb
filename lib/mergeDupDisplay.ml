@@ -1,21 +1,26 @@
 (* Copyright (c) 2007 INRIA *)
 
-let print_link conf base p =
+let print_link ?(with_occurrence_number = true) ?(with_life_dates = true)
+    ?(with_main_title = true) conf base p =
   Output.print_sstring conf "<a href=\"";
   Output.print_string conf (Util.commd conf);
   Output.print_string conf (Util.acces conf base p);
   Output.print_sstring conf "\">";
   Output.print_string conf
     (Gwdb.get_first_name p |> Gwdb.sou base |> Util.escape_html);
-  Output.print_sstring conf ".";
-  Output.print_sstring conf (Gwdb.get_occ p |> string_of_int);
+  if with_occurrence_number then (
+    Output.print_sstring conf ".";
+    Output.print_sstring conf (Gwdb.get_occ p |> string_of_int));
   Output.print_sstring conf " ";
   Output.print_string conf
     (Gwdb.get_surname p |> Gwdb.sou base |> Util.escape_html);
   Output.print_sstring conf "</a>";
-  Output.print_string conf (DateDisplay.short_dates_text conf base p);
+  if with_life_dates then
+    Output.print_string conf (DateDisplay.short_dates_text conf base p);
   match Util.main_title conf base p with
-  | Some t -> Output.print_string conf (Util.one_title_text base t)
+  | Some t ->
+      if with_main_title then
+        Output.print_string conf (Util.one_title_text base t)
   | None -> ()
 
 let print_no_candidate conf base p =
