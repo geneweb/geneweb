@@ -1232,6 +1232,10 @@ let rec interp_ast :
         | "nth_c", [ VVstring s1; VVstring s2 ] -> (
             let n = try int_of_string s2 with Failure _ -> 0 in
             try Char.escaped (String.get s1 n) with Invalid_argument _ -> "")
+        | "1000sep", [ VVstring s ] ->
+            let n = try int_of_string s with Failure _ -> 0 in
+            let sep = Util.transl conf "(thousand separator)" in
+            string_of_expr_val (VVstring (Mutil.string_of_int_sep sep n))
         | "red_of_hsv", [ VVstring h; VVstring s; VVstring v ] -> (
             try
               let r, _, _ = rgb_of_str_hsv h s v in
