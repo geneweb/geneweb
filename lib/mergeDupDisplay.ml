@@ -27,7 +27,7 @@ let print_no_candidate conf base p =
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Util.transl conf "duplicate_merge_end_explanation"
-  |> Output.print_sstring conf;
+  |> Output.printf conf "<p>%s</p>";
   Output.print_sstring conf "<ul><li>";
   print_link conf base p;
   Output.print_sstring conf "</li></ul>";
