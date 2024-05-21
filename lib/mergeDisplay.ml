@@ -135,6 +135,7 @@ let print_possible_continue_merging conf base =
             Output.print_sstring conf {|">|};
             Output.print_sstring conf
               (Utf8.capitalize_fst (Util.transl conf "continue merging"));
+            Output.print_sstring conf "</a>";
             Output.print_sstring conf {| (|};
             Output.print_sstring conf
               (Util.transl_a_of_b conf
