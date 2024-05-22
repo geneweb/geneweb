@@ -210,6 +210,7 @@
                     <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;"
                     width="185px">'>
             <i class="far fa-trash-can text-warning"></i>%nn;</a>
+          <a href="%prefix;m=PORTRAIT_TO_BLASON&i=%index;" title='[*move coat of arms to father]'><i class="fa-solid fa-sitemap text-success"></i></a>
           </div>
         %end;
         %if;has_old_portrait;
