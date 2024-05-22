@@ -22,13 +22,6 @@ let first_name_not_found conf =
 
 let surname_not_found conf = not_found conf (transl conf "surname not found")
 
-let print_img conf img =
-  Output.print_sstring conf {|<img src="|};
-  Output.print_sstring conf (Util.images_prefix conf);
-  Output.print_sstring conf {|/|};
-  Output.print_string conf img;
-  Output.print_sstring conf {|" alt="" title="">|}
-
 (* **********************************************************************)
 (*  [Fonc] print_branch_to_alphabetic : conf -> string -> int -> unit   *)
 
@@ -45,20 +38,16 @@ let print_img conf img =
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                     *)
 let print_branch_to_alphabetic conf x nb_branch =
-  Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
+  Output.print_sstring conf "<div class=\"mb-3\">";
   Output.print_sstring conf
     (Utf8.capitalize_fst
        (transl_nth conf "display by/branch/alphabetic order" 0));
-  Output.print_sstring conf {|</b></td><td>|};
-  print_img conf (Adef.encoded "picto_branch.png");
-  Output.print_sstring conf {|</td><td>|};
+  Output.print_sstring conf "<i class=\"fa fa-code-fork ml-3 mr-1\"></i>";
   Output.print_sstring conf
     (transl_nth conf "display by/branch/alphabetic order" 1);
   Output.print_sstring conf " (";
   Output.print_sstring conf (string_of_int nb_branch);
-  Output.print_sstring conf {|)</td><td>|};
-  print_img conf (Adef.encoded "picto_alphabetic_order.png");
-  Output.print_sstring conf {|</td><td>|};
+  Output.print_sstring conf ")<i class=\"fa fa-arrow-down-a-z ml-3 mr-1\"></i>";
   (* Ne pas oublier l'attribut nofollow pour les robots *)
   if p_getenv conf.env "t" = Some "A" then (
     Output.print_sstring conf {|<a href="|};
@@ -79,7 +68,7 @@ let print_branch_to_alphabetic conf x nb_branch =
       (transl_nth conf "display by/branch/alphabetic order" 2);
     Output.print_sstring conf "</a>");
   (* Ne pas oublier l'attribut nofollow pour les robots *)
-  Output.print_sstring conf "</td></tr></table><br>"
+  Output.print_sstring conf "</div>"
 
 (* **********************************************************************)
 (*  [Fonc] print_alphabetic_to_branch : conf -> string -> int -> unit   *)
@@ -95,13 +84,11 @@ let print_branch_to_alphabetic conf x nb_branch =
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                     *)
 let print_alphabetic_to_branch conf x =
-  Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
+  Output.print_sstring conf "<div class=\"mb-3\">";
   Output.print_sstring conf
     (Utf8.capitalize_fst
        (transl_nth conf "display by/branch/alphabetic order" 0));
-  Output.print_sstring conf "</b></td><td>";
-  print_img conf (Adef.encoded "picto_branch.png");
-  Output.print_sstring conf "</td><td>";
+  Output.print_sstring conf "<i class=\"fa fa-code-fork ml-3 mr-1\"></i>";
   if p_getenv conf.env "t" = Some "A" then (
     Output.print_sstring conf {|<a href="|};
     Output.print_string conf (commd conf);
@@ -120,12 +107,10 @@ let print_alphabetic_to_branch conf x =
     Output.print_sstring conf
       (transl_nth conf "display by/branch/alphabetic order" 1);
     Output.print_sstring conf "</a>");
-  Output.print_sstring conf "</td><td>";
-  print_img conf (Adef.encoded "picto_alphabetic_order.png");
-  Output.print_sstring conf "</td><td>";
+  Output.print_sstring conf "<i class=\"fa fa-arrow-down-a-z ml-3 mr-1\"></i>";
   Output.print_sstring conf
     (transl_nth conf "display by/branch/alphabetic order" 2);
-  Output.print_sstring conf "</td></tr></table><br>"
+  Output.print_sstring conf "</div>"
 
 let persons_of_fsname conf base base_strings_of_fsname find proj x =
   (* list of strings index corresponding to the crushed lower first name
