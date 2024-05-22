@@ -28,7 +28,7 @@
       </h5>
       <div class="modal-body d-flex justify-content-center">
         <div id="carousel" class="carousel slide" data-ride="carousel" data-interval="5000">
-        %(%let;maximg;%if;has_portrait;%expr(carrousel_img_nbr+1)%else;%carrousel_img_nbr;%end;%in;
+        %(%let;maximg;%if;has_portrait and has_blason;%expr(carrousel_img_nbr+2)%else;%if;has_portrait or has_blason;%expr(carrousel_img_nbr+1)%else;%carrousel_img_nbr;%end;%end;%in;
             <ol class="carousel-indicators">
             %for;i;0;maximg;
             <li %if;(i=0)class="active"%end; data-target="#carousel" data-slide-to="%i;"></li>
@@ -46,9 +46,19 @@
                 </div>
               </div>
             %end;
+            %if;(has_blason)
+              <div class="carousel-item%if;(not has_portrait)active%end;">
+                <a href="%prefix;m=FIM&i=%index;" target="_blank" rel="noopener">
+                  <img class="img-fluid" src="%prefix;m=FIM&i=%index;" alt="[*coat of arms]">
+                </a>
+                <div class="position-relative d-none d-md-block">
+                  <span>[coat of arms]</span>
+                </div>
+              </div>
+            %end;
             %if;has_carrousel;
               %foreach;img_in_carrousel;%incr_count;
-                <div class="carousel-item%if;(not has_portrait and is_first) active%end;">
+                <div class="carousel-item%if;(not has_portrait and not has_blason and is_first) active%end;">
                   %if;(url_in_env!="")
                     <a href="%url_in_env;" target="_blank" rel="noopener">
                       url_in_env image
