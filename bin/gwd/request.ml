@@ -733,6 +733,7 @@ let treat_request =
           w_base @@ ImageCarrousel.print_main_c
         |"BLASON_UP_ONE" -> w_base @@ ImageCarrousel.print_main_c
         |"BLASON_STOP" -> w_base @@ ImageCarrousel.print_main_c
+        |"PORTRAIT_TO_BLASON" -> w_base @@ ImageCarrousel.print_main_c
         | "RL" ->
           w_base @@ RelationLink.print
         | "RLM" ->

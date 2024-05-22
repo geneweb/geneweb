@@ -3,6 +3,21 @@ open Def
 open Gwdb
 open Util
 
+
+let file_copy input_name output_name =
+  Printf.printf "--> file_copy input=%s output=%s\n" input_name output_name;
+  let fd_in = Unix.openfile input_name [O_RDONLY] 0 in
+  let fd_out = Unix.openfile output_name [O_WRONLY; O_CREAT; O_TRUNC] 0o666 in
+let buffer_size = 8192 in
+let buffer = Bytes.create buffer_size in
+  let rec copy_loop () = match Unix.read fd_in buffer 0 buffer_size with
+    |  0 -> ()
+    | r -> ignore (Unix.write fd_out buffer 0 r); copy_loop ()
+  in
+  copy_loop ();
+  Unix.close fd_in;
+  Unix.close fd_out
+
 let rn fname s =
   try if Sys.file_exists fname then Sys.rename fname s
   with Failure _ ->
@@ -748,6 +763,19 @@ let effective_delete_c_ok ?(portrait = true) conf base p =
   History.record conf base changed (if mode = "portraits" then (if portrait then "di" else "dc") else "do");
   file_name
 
+let effective_copy_portrait_to_blason conf base p =
+  let has_blason_self = Image.has_blason conf base p true in 
+  let deleted = (if has_blason_self then effective_delete_c_ok ~portrait:false conf base p else "OK") <> "" in
+  let dir = Util.base_path [ "images" ] conf.bname in
+  let fname = Image.default_image_filename "portraits" base p in
+  let ext = get_extension conf false fname in
+  let portrait_filename = String.concat Filename.dir_sep [ dir; fname ^ ext] in
+  let blason_filename = String.concat Filename.dir_sep [ dir; (Image.default_image_filename "blasons" base p) ^ ext] in
+  file_copy portrait_filename blason_filename;
+  effective_delete_c_ok ~portrait:true conf base p;
+  History.record conf base (U_Send_image (Util.string_gen_person base (gen_person_of_person p))) "ca";
+  blason_filename
+
 (* carrousel *)
 (* reset portrait or image from old folder to portrait or others *)
 
@@ -903,9 +931,8 @@ let print_main_c conf base =
                         let fa = poi base (get_father cpl) in
                         (conf, move_blason_file conf base p fa)
                     | _ -> (conf, "idigest error"))
-                (*| Some "PORTRAIT_TO_BLASON" -> (
-                    if Image.has_blason conf base p true then (conf, effective_delete_c_ok ~portrait:false conf base p)
-                )*)
+                | Some "PORTRAIT_TO_BLASON" -> 
+                  (conf, effective_copy_portrait_to_blason conf base p)
                 | Some "BLASON_STOP" ->
                     let has_blason_self = Image.has_blason conf base p true in
                     let has_blason = Image.has_blason conf base p false in
