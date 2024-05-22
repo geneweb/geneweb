@@ -189,9 +189,15 @@ let load_lexicon =
               | hd :: tl -> rev_iter fn tl ; fn hd
             in
             rev_iter begin fun fname ->
-              Mutil.input_lexicon lang ht begin fun () ->
-                Secure.open_in (Util.search_in_assets fname)
-              end end !lexicon_list ;
+              let fname = Util.search_in_assets fname in
+              if Sys.file_exists fname then
+                Mutil.input_lexicon lang ht begin fun () ->
+                  Secure.open_in fname
+                end
+              else
+                GwdLog.syslog `LOG_WARNING
+                  (Format.sprintf "File %s unavailable\n" fname)
+            end !lexicon_list ;
             ht
           end
       in
