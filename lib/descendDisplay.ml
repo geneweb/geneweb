@@ -1244,7 +1244,6 @@ let print_aboville conf base max_level p =
   let max_level = min (Perso.limit_desc conf) max_level in
   let num_aboville = p_getenv conf.env "num" = Some "on" in
   Hutil.header conf (descendants_title conf base p);
-  Hutil.print_link_to_welcome conf true;
   (text_to conf max_level : Adef.safe_string :> string)
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf ".<br><p>";
