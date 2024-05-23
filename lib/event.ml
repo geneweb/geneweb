@@ -70,16 +70,6 @@ let get_witnesses_and_notes ei =
 let get_spouse_iper ei =
   match ei with PE _ | DPE _ -> None | FE (_, _, sp) | DFE (_, _, sp) -> sp
 
-(*let get_witnesses_and_notes ei =
-  let get_notes i = match ei.witness_notes with
-    | Some notes when Array.length notes > 0 -> notes.(i)
-    | _ -> empty_string
-  in
-  Array.init (Array.length ei.witnesses) (fun i ->
-      let ip, wk = ei.witnesses.(i) in
-      ip, wk, get_notes i
-    )
-*)
 let has_witnesses ei =
   let nb_witnesses =
     match ei with
