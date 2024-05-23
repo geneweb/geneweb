@@ -17,7 +17,6 @@ let print_clean conf =
         |> Utf8.capitalize_fst |> Output.print_sstring conf
       in
       Hutil.header conf title;
-      Hutil.print_link_to_welcome conf true;
       Util.gen_print_tips conf
         ("select the input you want to erase from the history" |> transl conf
        |> Utf8.capitalize_fst |> Adef.safe);
@@ -78,7 +77,6 @@ let print_clean_ok conf =
         |> Utf8.capitalize_fst |> Output.print_sstring conf
       in
       Hutil.header conf title;
-      Hutil.print_link_to_welcome conf true;
       let history = load_person_history conf f in
       let new_history = clean_history 0 history [] in
       let fname = history_path conf f in
