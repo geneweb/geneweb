@@ -46,3 +46,9 @@ val events :
 val sorted_events :
   Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.istr event_item list
 (** [sorted_events conf base p] is the list of [p]'s events, sorted by Checkitem.sorted_events *)
+
+val other_events :
+  Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.istr event_item list
+(** [other_events conf base p] is the list of [p]'s other events
+    (i.e. all [p]'s events except birth, , baptism, death, burial and
+    marriage).  **)

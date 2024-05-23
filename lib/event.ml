@@ -242,3 +242,38 @@ let events conf base p =
 let sorted_events conf base p =
   let unsorted_events = events conf base p in
   sort_events get_name get_date unsorted_events
+
+let other_events conf base p =
+  let is_other_event e =
+    match get_name e with
+    | Pevent Epers_Birth
+    | Pevent Epers_Baptism
+    | Pevent Epers_Death
+    | Pevent Epers_Burial
+    | Fevent Efam_Marriage ->
+        false
+    | Fevent
+        ( Efam_NoMarriage | Efam_NoMention | Efam_Engage | Efam_Divorce
+        | Efam_Separated | Efam_Annulation | Efam_MarriageBann
+        | Efam_MarriageContract | Efam_MarriageLicense | Efam_PACS
+        | Efam_Residence | Efam_Name _ )
+    | Pevent
+        ( Epers_Cremation | Epers_Accomplishment | Epers_Acquisition
+        | Epers_Adhesion | Epers_BaptismLDS | Epers_BarMitzvah
+        | Epers_BatMitzvah | Epers_Benediction | Epers_ChangeName
+        | Epers_Circumcision | Epers_Confirmation | Epers_ConfirmationLDS
+        | Epers_Decoration | Epers_DemobilisationMilitaire | Epers_Diploma
+        | Epers_Distinction | Epers_Dotation | Epers_DotationLDS
+        | Epers_Education | Epers_Election | Epers_Emigration
+        | Epers_Excommunication | Epers_FamilyLinkLDS | Epers_FirstCommunion
+        | Epers_Funeral | Epers_Graduate | Epers_Hospitalisation | Epers_Illness
+        | Epers_Immigration | Epers_ListePassenger | Epers_MilitaryDistinction
+        | Epers_MilitaryPromotion | Epers_MilitaryService
+        | Epers_MobilisationMilitaire | Epers_Naturalisation | Epers_Occupation
+        | Epers_Ordination | Epers_Property | Epers_Recensement
+        | Epers_Residence | Epers_Retired | Epers_ScellentChildLDS
+        | Epers_ScellentParentLDS | Epers_ScellentSpouseLDS | Epers_VenteBien
+        | Epers_Will | Epers_Name _ ) ->
+        true
+  in
+  p |> events conf base |> List.filter is_other_event
