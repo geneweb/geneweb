@@ -260,7 +260,6 @@ let message_txt conf n =
 
 let print_aux conf pos title =
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   (match pos with
   | Some pos ->
       Output.print_sstring conf {|<a href="|};
@@ -394,7 +393,6 @@ let print_add_ok conf base =
     let mods = moderators conf in
     forum_add conf base (mods <> []) mess;
     Hutil.header conf title;
-    Hutil.print_link_to_welcome conf true;
     if mods <> [] then (
       Output.print_sstring conf "<p>";
       transl conf "this forum is moderated"
