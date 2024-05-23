@@ -66,11 +66,13 @@ module Fields : sig
   val death_date : gets:(string -> string) -> search_type:search -> name
   val burial_date : gets:(string -> string) -> search_type:search -> name
   val marriage_date : gets:(string -> string) -> search_type:search -> name
+  val other_events_date : gets:(string -> string) -> search_type:search -> name
   val bapt_place : gets:(string -> string) -> search_type:search -> name
   val birth_place : gets:(string -> string) -> search_type:search -> name
   val death_place : gets:(string -> string) -> search_type:search -> name
   val burial_place : gets:(string -> string) -> search_type:search -> name
   val marriage_place : gets:(string -> string) -> search_type:search -> name
+  val other_events_place : gets:(string -> string) -> search_type:search -> name
 end = struct
   type search = And | Or
   type name = string
@@ -96,6 +98,9 @@ end = struct
   let marriage_date ~gets ~search_type =
     get_event_field_name gets "date" "marriage" search_type
 
+  let other_events_date ~gets ~search_type =
+    get_event_field_name gets "date" "other_events" search_type
+
   let bapt_place ~gets ~search_type =
     get_event_field_name gets "place" "bapt" search_type
 
@@ -110,6 +115,9 @@ end = struct
 
   let marriage_place ~gets ~search_type =
     get_event_field_name gets "place" "marriage" search_type
+
+  let other_events_place ~gets ~search_type =
+    get_event_field_name gets "place" "other_events" search_type
 end
 
 module AdvancedSearchMatch : sig
@@ -172,6 +180,15 @@ module AdvancedSearchMatch : sig
       places:string list ->
       exact_place:bool ->
       bool
+
+    val match_other_events :
+      conf:Config.config ->
+      base:Gwdb.base ->
+      p:Gwdb.person ->
+      dates:Date.dmy option * Date.dmy option ->
+      places:string list ->
+      exact_place:bool ->
+      bool
   end
 
   module And : Match
@@ -226,6 +243,47 @@ end = struct
 
   let match_burial_place =
     exact_place_wrapper @@ apply_to_field_places ~get:get_burial_place
+
+  let match_other_event_place =
+    exact_place_wrapper @@ apply_to_field_places ~get:Event.get_place
+
+  let match_other_events_place ~exact_place ~conf ~base ~p ~places ~default =
+    let is_other_event e =
+      match Event.get_name e with
+      | Pevent Epers_Birth
+      | Pevent Epers_Baptism
+      | Pevent Epers_Death
+      | Pevent Epers_Burial
+      | Fevent Efam_Marriage ->
+          false
+      | Fevent
+          ( Efam_NoMarriage | Efam_NoMention | Efam_Engage | Efam_Divorce
+          | Efam_Separated | Efam_Annulation | Efam_MarriageBann
+          | Efam_MarriageContract | Efam_MarriageLicense | Efam_PACS
+          | Efam_Residence | Efam_Name _ )
+      | Pevent
+          ( Epers_Cremation | Epers_Accomplishment | Epers_Acquisition
+          | Epers_Adhesion | Epers_BaptismLDS | Epers_BarMitzvah
+          | Epers_BatMitzvah | Epers_Benediction | Epers_ChangeName
+          | Epers_Circumcision | Epers_Confirmation | Epers_ConfirmationLDS
+          | Epers_Decoration | Epers_DemobilisationMilitaire | Epers_Diploma
+          | Epers_Distinction | Epers_Dotation | Epers_DotationLDS
+          | Epers_Education | Epers_Election | Epers_Emigration
+          | Epers_Excommunication | Epers_FamilyLinkLDS | Epers_FirstCommunion
+          | Epers_Funeral | Epers_Graduate | Epers_Hospitalisation
+          | Epers_Illness | Epers_Immigration | Epers_ListePassenger
+          | Epers_MilitaryDistinction | Epers_MilitaryPromotion
+          | Epers_MilitaryService | Epers_MobilisationMilitaire
+          | Epers_Naturalisation | Epers_Occupation | Epers_Ordination
+          | Epers_Property | Epers_Recensement | Epers_Residence | Epers_Retired
+          | Epers_ScellentChildLDS | Epers_ScellentParentLDS
+          | Epers_ScellentSpouseLDS | Epers_VenteBien | Epers_Will
+          | Epers_Name _ ) ->
+          true
+    in
+    p |> Event.events conf base |> List.filter is_other_event
+    |> List.exists (fun e ->
+           match_other_event_place ~exact_place ~base ~places ~default ~p:e)
 
   let match_marriage ~cmp ~conf ~base ~p ~places ~default ~dates =
     let d1, d2 = dates in
@@ -290,6 +348,13 @@ end = struct
 
   let match_death_date =
     match_date ~df:(fun p -> Date.dmy_of_death (get_death p))
+
+  let match_other_events_date ~conf ~base ~p ~default ~dates =
+    p |> Event.events conf base
+    |> List.map (fun e (* wrap value in unit -> dmy to be lazy ?*) () ->
+           Date.cdate_to_dmy_opt @@ Event.get_date e)
+    |> List.exists (fun event_date_f ->
+           match_date ~p ~default ~dates ~df:(fun _ -> event_date_f ()))
 
   let match_name ~search_list ~exact : string list -> bool =
     let eq : string list -> string list -> bool =
@@ -357,6 +422,15 @@ end = struct
       places:string list ->
       exact_place:bool ->
       bool
+
+    val match_other_events :
+      conf:Config.config ->
+      base:Gwdb.base ->
+      p:Gwdb.person ->
+      dates:Date.dmy option * Date.dmy option ->
+      places:string list ->
+      exact_place:bool ->
+      bool
   end
 
   module And = struct
@@ -369,6 +443,11 @@ end = struct
     let match_birth = match_and match_birth_date match_birth_place
     let match_burial = match_and match_burial_date match_burial_place
     let match_death = match_and match_death_date match_death_place
+
+    let match_other_events ~conf ~base =
+      match_and ~base
+        (match_other_events_date ~conf ~base)
+        (match_other_events_place ~conf)
   end
 
   module Or = struct
@@ -381,6 +460,11 @@ end = struct
     let match_birth = match_or match_birth_date match_birth_place
     let match_burial = match_or match_burial_date match_burial_place
     let match_death = match_or match_death_date match_death_place
+
+    let match_other_events ~conf ~base =
+      match_or ~base
+        (match_other_events_date ~conf ~base)
+        (match_other_events_place ~conf)
   end
 end
 
@@ -501,7 +585,11 @@ let advanced_search conf base max_answers =
                   ~place_field:Fields.death_place Or.match_death And.match_death
              || match_marriage ~conf ~base ~p ~exact_place ~default:false
                   ~places:(getss @@ Fields.marriage_place ~gets ~search_type)
-                  ~dates:(getd @@ Fields.marriage_date ~gets ~search_type))
+                  ~dates:(getd @@ Fields.marriage_date ~gets ~search_type)
+             || match_f ~date_field:Fields.other_events_date
+                  ~place_field:Fields.other_events_place
+                  (Or.match_other_events ~conf)
+                  (And.match_other_events ~conf))
       | _ ->
           Lazy.force civil_match
           && And.match_baptism ~base ~p ~exact_place
@@ -519,6 +607,9 @@ let advanced_search conf base max_answers =
           && match_marriage ~conf ~base ~p ~exact_place ~default:true
                ~places:(getss @@ Fields.marriage_place ~gets ~search_type)
                ~dates:(getd @@ Fields.marriage_date ~gets ~search_type)
+          && And.match_other_events ~conf ~base ~p ~exact_place
+               ~dates:(getd @@ Fields.other_events_date ~gets ~search_type)
+               ~places:(getss @@ Fields.other_events_place ~gets ~search_type)
     in
     if pmatch then (p :: list, len + 1) else acc
   in
@@ -710,6 +801,7 @@ let searching_fields conf base =
       ("marriage", "married");
       ("death", "died");
       ("burial", "buried");
+      ("other_events", "other_events");
     |]
   in
   let event_search = Array.fold_left build_event_search "" events in
