@@ -248,10 +248,12 @@ end = struct
     exact_place_wrapper @@ apply_to_field_places ~get:Event.get_place
 
   let match_other_events_place ~exact_place ~conf ~base ~p ~places ~default =
-    List.exists
-      (fun e ->
-        match_other_event_place ~exact_place ~base ~places ~default ~p:e)
-      (Event.other_events conf base p)
+    if places = [] then default
+    else
+      List.exists
+        (fun e ->
+          match_other_event_place ~exact_place ~base ~places ~default:false ~p:e)
+        (Event.other_events conf base p)
 
   let match_marriage ~cmp ~conf ~base ~p ~places ~default ~dates =
     let d1, d2 = dates in
