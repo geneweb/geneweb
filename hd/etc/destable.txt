@@ -32,7 +32,7 @@
     %end;%and;
     %self;%end;%else;%self; ([no descendants])%end;
     %if;(alias != "") <em>(%alias;)</em>%end; %dates;
-   %if;(cancel_links and e.v!=0) %apply;togend(e.v)%end;
+   %if;(cancel_links and e.v!=0 and e.t!="A") %apply;togend(e.v)%end;
 </h1>
 %if;not cancel_links;
     %include;buttons
@@ -460,23 +460,19 @@
 %( d’Aboville %)
 %define;list_row(xxx, prefx, fam_cnt, ch_cnt)
   %let;fam;%if;(fam_cnt>0)%apply;letter(fam_cnt)%end;%in;
-  %if;("prefx"!="")<br>prefx.%end;
+  %if;("prefx"!="")<span class="text-monospace">prefx</span>%end;
   %sp;%apply;image_MF("xxx")
   %apply;link%with;%xxx.access;%and;%xxx.first_name; %xxx.surname;%and;%xxx.index;%end;%nn;
   %if;(xxx.title!=""), %xxx.title;%end;
   %if;(has_families)
     %foreach;family;
-      <span class="text-nowrap"> &%if;(nb_families>1)%apply;letter(family_cnt)%end;
+      <span class="text-nowrap">
         %if;(wizard and not cancel_links)
           <a href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;" title="[*modify::family/families]0 %xxx; [and] %xxx.spouse;">
-          %if;(marriage_date.year!="")<span class="nowrap">%marriage_date.year;</span>%else;<span class="fa fa-venus-mars
-            %if;((xxx.is_male and xxx.spouse.is_female) or
-                (xxx.is_female and xxx.spouse.is_male))venus-mars%nn;
-            %elseif;(xxx.is_male and xxx.spouse.is_male)mars-double%nn;
-            %else;(xxx.is_female and xxx.spouse.is_female)venus-double%nn;
-            %end; fa-rotate-180 small"></span>%end;</a>%nn;
-        %else;
-          %marriage_date.year;%nn;
+        %end;
+            <small>&%if;(nb_families>0)%apply;letter(family_cnt)%end; %if;(marriage_date.year!="")%marriage_date.year;%end;</small>
+        %if;(wizard and not cancel_links)
+          </a>
         %end;
       </span>
       <span>
@@ -500,31 +496,26 @@
 
 %( Parcours de l'arbre descendant, niveau par niveau %)
 %define;one_person(xxx, lv, max_l, prefx, fam_cnt, ch_cnt)
-  %let;npref;prefx%in;
-  %let;fam;%if;(fam_cnt>0)%apply;letter(fam_cnt)%end;%in;
-  %let;nnpref;%npref;%fam;%in;
   %if;(lv<max_l)
-    %apply;list_row("xxx", nnpref, fam_cnt, ch_cnt)
+    <div>
+      %apply;list_row("xxx", "prefx", fam_cnt, ch_cnt)
+    </div>
     %if;xxx.has_families;
       %foreach;family;
-        %let;nfam;%if;(nb_families>1)%family_cnt;%else;0%end;%in;
-        %if;(has_children)
-          %foreach;child;
-            %let;nnnpref;%nnpref;%if;(npref!="").%end;%child_cnt;%nn;%in;
-            %apply;one_person("child", lv+1, max_l, nnnpref, nfam, child_cnt)
-          %end;
+        %let;fam;%if;(nb_families>1)%apply;letter(family_cnt)%end;%in;
+        %foreach;child;
+          %let;npref;prefx%fam;.%child_cnt;%in;
+          %apply;one_person("child", lv+1, max_l, npref, family_cnt, child_cnt)
         %end;
       %end;
     %end;
-  %else;
-    %apply;list_row("xxx", nnpref, fam_cnt, ch_cnt)
   %end;
 %end;
 
 %( Parcours de l'arbre, horizontal, niveau par niveau descendant %)
 %( À chaque niveau, prefx et faml (lettre) définissent le préfixe d'Aboville %)
 %define;one_level(xxx, lv, max_l, prefx, faml, ch_cnt)
-  %let;npref;%if;("prefx"!="")prefxfaml.%end;ch_cnt%nn;%in;
+  %let;npref;%if;("prefx"!="")prefxfaml.%end;ch_cnt%in;
   %if;(lv<max_l)
     %if;xxx.has_families;
       %foreach;family;
@@ -576,12 +567,13 @@
   %end;
 %end;
 %( Main %)
-
-<table id="destable" class="table-hover table-sm w-auto asc-desc-table mt-2">
-  %if;(e.t="A")
-    %let;nb_col;1%in;
-    %apply;one_person("self", 0, e.v, "", 0, 0)
-  %else;
+%if;(e.t="A")
+  <div class="mt-1">
+    <div class="my-1">[*d'Aboville] %apply;togend(e.v)[:]</div>
+    %apply;one_person("self", 0, e.v, 1, nb_families, 0)
+  </div>
+%else;
+  <table id="destable" class="table-hover table-sm w-auto asc-desc-table mt-2">
     %reset_count;
     %( table_header defined in perso_utils for both tables %)
     %apply;table_header()
@@ -613,8 +605,8 @@
         %apply;one_level("self", 0, e.v-1, "", "", 1)
       %end;
     %end;
-  %end;
-</table>
+  </table>
+%end;
 <div class="mt-1">[*total][:]
   %if;(e.only="on")
     %apply;desc_count(e.v,1,1,1,list_size)
