@@ -663,16 +663,16 @@ let map_history conf f =
   match
     try Some (Secure.open_in_bin (file_name conf)) with Sys_error _ -> None
   with
+  | None -> []
   | Some ic ->
       let rec loop res =
         let line = try Some (input_line ic) with End_of_file -> None in
         match Option.map line_fields line with
-        | Some (Some (time, user, action, keyo)) ->
-            loop (f ~time ~user ~action ~keyo :: res)
-        | Some None -> loop res
         | None ->
             close_in_noerr ic;
             res
+        | Some None -> loop res
+        | Some (Some (time, user, action, keyo)) ->
+            loop (f ~time ~user ~action ~keyo :: res)
       in
       List.rev (loop [])
-  | None -> []
