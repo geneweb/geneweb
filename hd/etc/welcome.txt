@@ -31,7 +31,9 @@
   %random.xxx;
 %end;
   <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-lg-3">
-    <div class="d-none d-lg-block col-md-3 order-md-1"></div>
+    %if;(b.auth_file="" and (b.wizard_passwd!="" or b.friend_passwd!=""))
+      <div class="d-none d-lg-block col-md-3 order-md-1"></div>
+    %end;
     <div class="col-xs-12 col-md-3 order-md-3 ml-md-2 px-0">
       <div class="d-flex flex-column">
         %if;(cgi and (not wizard or not friend))
@@ -69,7 +71,13 @@
           %end;
           </div>
         %end;
-        %if;(user.ident!="")<span class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom" title="%if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %user.ident;">%user.ident;</span>%end;
+        %if;(user.ident != "")<span class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom" title="%if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %user.name;">
+          %if;(friend)
+            <a href="%prefix;m=S&n=%user.name;">%user.first;</a>
+          %else;
+            %user.name;
+          %end;
+        </span>%end;
         %if;((wizard and (b.wizard_passwd_file!="" or b.wizard_passwd!=""))
           or (friend and (b.friend_passwd_file!="" or b.friend_passwd!="")))
           <a class="btn btn-outline-danger mt-1 w-100" href="%prefix;w=" role="button"><i class="fas fa-right-from-bracket mr-1" aria-hidden="true"></i>[*disconnect]</a>
@@ -88,7 +96,7 @@
       %if;(b.visitor_access!="no" or wizard or friend)
         <div class="d-flex justify-content-center">
           <span class="h2 font-weight-light">%base.real_nb_persons; [person/persons]1</span>
-          <a class="align-self-center" href="%prefix;i=%apply;get_random(nb_persons.v)"
+          <a class="align-self-center" href="%prefix;i=%apply;get_random(nb_of_persons.v)"
           title="[*random individual]"><i class="fa-solid fa-dice ml-1 mb-2"></i></a>
         </div>
       %end;
@@ -244,7 +252,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         %end;
         %if;(b.hide_advanced_request="no")
           <a role="button" class="btn btn-outline-primary mr-1" 
-            href="%prefix;m=AS">
+            href="%prefix;m=H&v=advanced">
             <i class="fa fa-magnifying-glass-plus fa-fw mr-1" aria-hidden="true"></i>[*advanced request]0</a>
         %end;
         <a role="button" class="btn btn-outline-primary mr-1" 
@@ -282,7 +290,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           <a role="button" class="btn btn-outline-success" 
             href="%prefix;m=MOD_DATA&data=src"
             title="[*modify] %apply;book_of%with;[source/sources]1%end;%sp;
-              ([wizard/wizards/friend/friends/exterior]0)"><i class="fa fa-box-archive fa-fw mr-1"></i>[*source/sources]1</a>
+              ([wizard/wizards/friend/friends/exterior]0)"><i class="fa fa-archive fa-fw mr-1"></i>[*source/sources]1</a>
         </div>
       </div>
     %end;

@@ -246,11 +246,17 @@
     %end;
     %if;(count2>0)
       <div class="d-flex mt-1">
-        %if;spouse.has_image;
+        %if;(spouse.has_image or spouse.has_blason)
           %if;(not cancel_links)
-            <a href="%spouse.image_url;" class="align-self-start" target="_blank">%nn;
-              <img class="big_image fade_image mx-1 rounded" src="%spouse.image_url;" alt="[image/images]0" title="%spouse; ([spouse/spouses]0)">%nn;
-            </a>%nn;
+            %if;spouse.has_image;
+              <a href="%spouse.image_url;" class="align-self-start" target="_blank">%nn;
+                <img class="big_image fade_image mx-1 rounded" src="%spouse.image_url;" alt="[image/images]0" title="%spouse; ([spouse/spouses]0)">%nn;
+              </a>%nn;
+            %else;
+              <a href="%spouse.blason_url;" class="align-self-start" target="_blank">%nn;
+                <img class="big_image fade_image mx-1 rounded" src="%spouse.blason_url;" alt="[image/images]0" title="%spouse; ([spouse/spouses]0)">%nn;
+              </a>%nn;
+            %end;
           %else;
             <img class="big_image fade_image mx-1 rounded align-self-start" src="%spouse.image_url;" alt="[image/images]0" title="%spouse; ([spouse/spouses]0)">%nn;
           %end;
@@ -270,12 +276,19 @@
               <div class="flex-wrap flex-column ">
                 %foreach;spouse.parent;
                   <div class="d-flex %if;(parent.is_male)mb-3%end; px-1">
-                    %if;parent.has_image;
+                    %if;(parent.has_image or parent.has_blason)
                       %if;(not cancel_links)
-                        <a href="%parent.image_url;" class="align-self-center" target="_blank">%nn;
-                          <img class="small_image fade_image rounded align-self-center" src="%parent.image_url;"
-                            alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1 %end;" title="%parent; (%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;)">%nn;
-                        </a>%nn;
+                        %if;parent.has_image;
+                          <a href="%parent.image_url;" class="align-self-center" target="_blank">%nn;
+                            <img class="small_image fade_image rounded align-self-center" src="%parent.image_url;"
+                              alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1 %end;" title="%parent; (%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;)">%nn;
+                          </a>%nn;
+                        %else;
+                          <a href="%parent.blason_url;" class="align-self-center" target="_blank">%nn;
+                            <img class="small_image fade_image rounded align-self-center" src="%parent.blason_url;"
+                              alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1 %end;" title="%parent; (%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;)">%nn;
+                          </a>%nn;
+                        %end;
                       %else;
                         <img class="small_image fade_image rounded align-self-center" src="%parent.image_url;"
                          alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1 %end;" title="%parent; (%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;)">%nn;
@@ -328,12 +341,19 @@
             %foreach;child;
               %incr_count1;
               <div class="d-flex flex-row mt-1">%count1;.
-                %if;child.has_image;
+                %if;(child.has_image or child.has_blason)
                   %if;(not cancel_links)
-                    <a href="%child.image_url;" class="align-self-center" target="_blank">%nn;
-                      <img class="small_image fade_image rounded ml-2" src="%child.image_url;" alt="[image/images]0"
-                        title="%count1;. %child; (%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)">%nn;
-                    </a>%nn;
+                    %if;(child.has_image)
+                      <a href="%child.image_url;" class="align-self-center" target="_blank">%nn;
+                        <img class="small_image fade_image rounded ml-2" src="%child.image_url;" alt="[image/images]0"
+                          title="%count1;. %child; (%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)">%nn;
+                      </a>%nn;
+                    %elseif;(child.has_blason)
+                      <a href="%child.blason_url;" class="align-self-center" target="_blank">%nn;
+                        <img class="small_image fade_image rounded ml-2" src="%child.blason_url;" alt="[image/images]0"
+                          title="%count1;. %child; (%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)">%nn;
+                      </a>%nn;                    
+                    %end;
                   %else;
                     <img class="small_image fade_image rounded ml-2 align-self-center" src="%child.image_url;" alt="[image/images]0"
                       title="%count1;. %child; (%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)">%nn;
