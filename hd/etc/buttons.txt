@@ -197,7 +197,8 @@
               %end;
          </a>
       %elseif;(e.v=0)
-        <span class="btn disabled text-primary pl-0">[*specify::generation/generations]0</span>
+        <span class="btn disabled text-primary pl-0">[*specify::generation/generations]0%sp;
+        %if;(e.m="D" and e.t="D") [or] [extend]%end;</span>
       %end;
     </span>
   </div>
