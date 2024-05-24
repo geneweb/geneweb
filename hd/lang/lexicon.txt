@@ -12484,7 +12484,7 @@ tr: Sosa referansı olarak %t kullanarak göz atın
 co: navigà in l’arburu cù st’individuu
 de: im Baum mit dieser Person navigieren
 en: navigation in tree with this individual
-fr: naviguer dans l'arbre avec cet individu
+fr: naviguer dans l’arbre avec cet individu
 
     nb branches
 co: num. ghjembe
