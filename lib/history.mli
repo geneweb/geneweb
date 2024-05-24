@@ -41,6 +41,5 @@ val line_fields : string -> (string * string * string * string option) option
 
 val map_history :
   config ->
-  base ->
   (time:string -> user:string -> action:string -> keyo:string option -> 'a) ->
   'a list

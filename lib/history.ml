@@ -659,7 +659,7 @@ let print_search conf base =
     | None -> print conf base
   else print conf base
 
-let map_history conf base f =
+let map_history conf f =
   match
     try Some (Secure.open_in_bin (file_name conf)) with Sys_error _ -> None
   with
