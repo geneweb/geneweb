@@ -5,7 +5,6 @@ open Util
 
 
 let file_copy input_name output_name =
-  Printf.printf "--> file_copy input=%s output=%s\n" input_name output_name;
   let fd_in = Unix.openfile input_name [O_RDONLY] 0 in
   let fd_out = Unix.openfile output_name [O_WRONLY; O_CREAT; O_TRUNC] 0o666 in
 let buffer_size = 8192 in

@@ -210,7 +210,7 @@
                     <br><img class="rounded my-1" src="%prefix;m=IM_C&i=%index;"
                     width="185px">'>
             <i class="far fa-trash-can text-warning"></i>%nn;</a>
-          <a href="%prefix;m=PORTRAIT_TO_BLASON&i=%index;" title='[*move coat of arms to father]'><i class="fa-solid fa-sitemap text-success"></i></a>
+          <a href="%prefix;m=PORTRAIT_TO_BLASON&i=%index;" title='[*move coat of arms to father]'><i class="fa-solid fa-user-shield text-success"></i></a>
           </div>
         %end;
         %if;has_old_portrait;
@@ -267,7 +267,9 @@
                   <br><img class="rounded my-1" src="%prefix;m=FIM_C&i=%index;"
                   width="185px">'>
           <i class="far fa-trash-can text-warning"></i>%nn;</a> 
-          <a href="%prefix;m=BLASON_UP_ONE&i=%index;" title='[*move coat of arms to father]'><i class="fa-solid fa-arrow-turn-up text-warning"></i></a>
+          <a href="%prefix;m=BLASON_UP_ONE&i=%index;" title='[*move coat of arms to father]'>
+            <i class="fa-solid fa-shield text-warning"></i><i class="fa-arrow-turn-up text-warning"></i>
+          </a>
         </div>
       %elseif;has_blason_stop;
       <div class="d-flex mt-1">
