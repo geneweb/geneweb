@@ -320,12 +320,14 @@ end = struct
     match_date ~df:(fun p -> Date.dmy_of_death (get_death p))
 
   let match_other_events_date ~conf ~base ~p ~default ~dates =
-    p
-    |> Event.other_events conf base
-    |> List.map (fun e (* wrap value in unit -> dmy to be lazy ?*) () ->
-           Date.cdate_to_dmy_opt @@ Event.get_date e)
-    |> List.exists (fun event_date_f ->
-           match_date ~p ~default ~dates ~df:(fun _ -> event_date_f ()))
+    if dates = (None, None) then default
+    else
+      p
+      |> Event.other_events conf base
+      |> List.map (fun e (* wrap value in unit -> dmy to be lazy ?*) () ->
+             Date.cdate_to_dmy_opt @@ Event.get_date e)
+      |> List.exists (fun event_date_f ->
+             match_date ~p ~default:false ~dates ~df:(fun _ -> event_date_f ()))
 
   let match_name ~search_list ~exact : string list -> bool =
     let eq : string list -> string list -> bool =
