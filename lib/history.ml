@@ -660,19 +660,16 @@ let print_search conf base =
   else print conf base
 
 let map_history conf f =
-  match
-    try Some (Secure.open_in_bin (file_name conf)) with Sys_error _ -> None
-  with
-  | None -> []
-  | Some ic ->
+  match Secure.open_in_bin (file_name conf) with
+  | exception Sys_error _ -> []
+  | ic ->
       let rec loop res =
-        let line = try Some (input_line ic) with End_of_file -> None in
-        match Option.map line_fields line with
-        | None ->
+        match line_fields @@ input_line ic with
+        | exception End_of_file ->
             close_in_noerr ic;
             res
-        | Some None -> loop res
-        | Some (Some (time, user, action, keyo)) ->
+        | None -> loop res
+        | Some (time, user, action, keyo) ->
             loop (f ~time ~user ~action ~keyo :: res)
       in
       List.rev (loop [])
