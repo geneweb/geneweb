@@ -670,7 +670,9 @@ let map_history conf f =
         | Some (Some (time, user, action, keyo)) ->
             loop (f ~time ~user ~action ~keyo :: res)
         | Some None -> loop res
-        | None -> res
+        | None ->
+            close_in_noerr ic;
+            res
       in
       List.rev (loop [])
   | None -> []
