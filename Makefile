@@ -65,13 +65,35 @@ lib/version.ml:
 	@printf "let commit_date = \"$(COMMIT_DATE)\"\n" >> $@
 	@printf "let compil_date = \"$(COMPIL_DATE)\"\n" >> $@
 	@printf "Generating $@… Done.\n"
-.PHONY: lib/version.ml
+
+# Patch/unpatch files for campl5 >= 8.03
+CAMLP5_VERSION := $(shell camlp5 -version 2>/dev/null || echo 0)
+CAMLP5_MAJOR := $(shell echo $(CAMLP5_VERSION) | cut -d '.' -f 1)
+CAMLP5_MINOR := $(shell echo $(CAMLP5_VERSION) | cut -d '.' -f 2)
+
+patch_files:
+	@if [ "$(CAMLP5_VERSION)" != 0 ] && [ $(CAMLP5_MAJOR) -eq 8 ] && [ $(CAMLP5_MINOR) -ge 3 ]; then \
+	  printf "\nPatching bin/ged2gwb/dune.in and ged2gwb.ml for camlp5 version $(CAMLP5_VERSION) (>= 8.03.00)… Done.\n"; \
+	  perl -pi.bak -e 's|\(preprocess \(action \(run camlp5o pr_o.cmo pa_extend.cmo q_MLast.cmo %\{input-file\}\)\)\)|\(preprocess \(action \(run not-ocamlfind preprocess -package camlp5.extend,camlp5.quotations,camlp5.pr_o -syntax camlp5o %\{input-file\}\)\)\)|' bin/ged2gwb/dune.in; \
+	  perl -0777 -pi.bak -e 's/(; Token\.tok_comm = None)(\n  \})/$$1\n  ; Token.kwds = Hashtbl.create 10$$2/' bin/ged2gwb/ged2gwb.ml; \
+	fi
+
+unpatch_files:
+	@if [ -f bin/ged2gwb/dune.in.bak ] && [ -f bin/ged2gwb/ged2gwb.ml.bak ]; then \
+	  printf "Restoring original patched files… Done.\n"; \
+	  mv bin/ged2gwb/dune.in.bak bin/ged2gwb/dune.in; \
+	  mv bin/ged2gwb/ged2gwb.ml.bak bin/ged2gwb/ged2gwb.ml; \
+	fi
+
+BUILD = dune build -p geneweb --profile $(DUNE_PROFILE)
+UNPATCH = $(MAKE) --no-print-directory unpatch_files
 
 info:
 	@printf "Building \033[1;37mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n"
 	@printf "Repository \033[1;37m$(SOURCE)\033[0m. Branch \033[1;37m$(BRANCH)\033[0m.\n\n"
 	@printf "Last commit \033[1;37m$(COMMIT_ID)\033[0m with message “\033[1;37m%s\033[0m”.\n" '$(subst ','\'',$(COMMIT_MSG))'
 	@printf "\n\033[1;37mGenerating configuration files\033[0m\n"
+.PHONY: patch_files unpatch_files info
 
 GENERATED_FILES_DEP = \
 	dune-workspace \
@@ -101,34 +123,33 @@ GENERATED_FILES_DEP = \
 
 generated: $(GENERATED_FILES_DEP)
 
-install uninstall fmt build distrib: info $(GENERATED_FILES_DEP)
+fmt build install uninstall: info patch_files $(GENERATED_FILES_DEP)
 
 fmt: ## Format Ocaml code
 ifneq ($(OS_TYPE),Win)
 	@printf "\n\033[1;37mOcamlformat\033[0m\n"
-	dune build @fmt --auto-promote
+	dune build @fmt --auto-promote ; $(UNPATCH)
 endif
 
 # [BEGIN] Installation / Distribution section
 
 build: ## Build the geneweb package (libraries and binaries)
-build:
 	@printf "\n\033[1;37mBuilding executables\033[0m\n"
-	dune build -p geneweb --profile $(DUNE_PROFILE)
+	@$(BUILD) ; $(UNPATCH)
 
 install: ## Install geneweb using dune
-install:
-	dune build @install --profile $(DUNE_PROFILE)
+	dune build @install --profile $(DUNE_PROFILE) ; $(UNPATCH)
 	dune install
 
 uninstall: ## Uninstall geneweb using dune
-uninstall:
-	dune build @install --profile $(DUNE_PROFILE)
+	dune build @install --profile $(DUNE_PROFILE) ; $(UNPATCH)
 	dune uninstall
 
-distrib: build ## Build the project and copy what is necessary for distribution
-distrib:
-	$(RM) -r $(DISTRIB_DIR)
+distrib: info ## Build the project and copy what is necessary for distribution
+	@$(MAKE) --no-print-directory patch_files generated
+	@printf "\n\033[1;37mBuilding executables.\n\033[0m"
+	@$(BUILD) || { $(UNPATCH) && exit 1; }
+	@$(RM) -r $(DISTRIB_DIR)
 	@printf "\n\033[1;37mCreating distribution directory\033[0m\n"
 	mkdir $(DISTRIB_DIR)
 	mkdir -p $(DISTRIB_DIR)/bases
@@ -192,8 +213,9 @@ endif
 		fi; \
 	done
 	@printf "\033[1;37mBuild complete.\033[0m\n"
+	@$(UNPATCH)
 	@printf "You can launch Geneweb with “\033[1;37mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;37mgw/gwd$(EXT)\033[0m”.\n"
-.PHONY: install uninstall distrib
+.PHONY: fmt install uninstall distrib
 
 # [END] Installation / Distribution section
 
