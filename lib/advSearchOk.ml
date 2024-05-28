@@ -337,21 +337,19 @@ end = struct
     in
     fun x -> List.exists (eq x) search_list
 
-  let match_first_name ~base ~first_name_list ~exact =
-    if first_name_list = [] then fun _ -> true
+  let wrap_match_name ~base ~search_list ~exact ~get ~split =
+    if search_list = [] then fun _ -> true
     else
-      let eq = match_name ~search_list:first_name_list ~exact in
-      fun p ->
-        eq
-          (List.map Name.lower @@ Name.split_fname @@ sou base
-         @@ get_first_name p)
+      let eq = match_name ~search_list ~exact in
+      fun p -> eq (List.map Name.lower @@ split @@ sou base @@ get p)
+
+  let match_first_name ~base ~first_name_list ~exact =
+    wrap_match_name ~base ~search_list:first_name_list ~exact
+      ~get:get_first_name ~split:Name.split_fname
 
   let match_surname ~base ~surname_list ~exact =
-    if surname_list = [] then fun _ -> true
-    else
-      let eq = match_name ~search_list:surname_list ~exact in
-      fun p ->
-        eq (List.map Name.lower @@ Name.split_sname @@ sou base @@ get_surname p)
+    wrap_match_name ~base ~search_list:surname_list ~exact ~get:get_surname
+      ~split:Name.split_sname
 
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~base ~p ~sex ~married ~occupation ~first_name_list
