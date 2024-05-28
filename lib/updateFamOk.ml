@@ -1098,7 +1098,7 @@ let print_title conf fmt _ =
 
 let print_mod_ok conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family modified";
-  (* Si on a supprimé des caractères interdits *)
+  (* Si on a supprimÃ© des caractÃ¨res interdits *)
   if List.length !removed_string > 0 then (
     Output.print_sstring conf "<h3 class=\"error\">";
     Output.printf conf
@@ -1118,7 +1118,7 @@ let print_change_event_order_ok conf base (wl, ml) cpl des =
 
 let print_add_ok conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family added";
-  (* Si on a supprimé des caractères interdits *)
+  (* Si on a supprimÃ© des caractÃ¨res interdits *)
   if List.length !removed_string > 0 then (
     Output.printf conf "<h2 class=\"error\">%s</h2>\n"
       (Utf8.capitalize_fst (transl conf "forbidden char"));
