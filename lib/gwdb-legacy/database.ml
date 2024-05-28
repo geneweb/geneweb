@@ -508,10 +508,12 @@ let old_strings_of_fsname bname strings (_, person_patches) =
           else acc
         in
         let acc =
-          List.fold_left (aux Name.split_fname) acc [ p.Dbdisk.first_name ]
+          List.fold_left (aux Name.split_fname) acc
+            (p.Dbdisk.first_name :: p.Dbdisk.first_names_aliases)
         in
         let acc =
-          List.fold_left (aux Name.split_sname) acc [ p.Dbdisk.surname ]
+          List.fold_left (aux Name.split_sname) acc
+            (p.Dbdisk.surname :: p.Dbdisk.surnames_aliases)
         in
         acc)
       person_patches (Array.to_list r)
@@ -573,11 +575,12 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
       person_patches (Array.to_list r)
 
 let new_strings_of_sname =
-  new_strings_of_fsname_aux 1 0 Name.split_sname (fun p -> [ p.Dbdisk.surname ])
+  new_strings_of_fsname_aux 1 0 Name.split_sname (fun p ->
+      p.Dbdisk.surname :: p.Dbdisk.surnames_aliases)
 
 let new_strings_of_fname =
   new_strings_of_fsname_aux 2 1 Name.split_fname (fun p ->
-      [ p.Dbdisk.first_name ])
+      p.Dbdisk.first_name :: p.Dbdisk.first_names_aliases)
 
 let strings_of_sname = function
   | GnWb0024 | GnWb0023 -> new_strings_of_sname
@@ -1219,14 +1222,14 @@ let opendb bname =
       strings_of_fname = strings_of_fname version bname strings patches.h_person;
       persons_of_surname =
         persons_of_surname version base_data
-          ( (fun p -> [ p.surname ]),
+          ( (fun p -> p.surname :: p.surnames_aliases),
             snd patches.h_person,
             "snames.inx",
             "snames.dat",
             bname );
       persons_of_first_name =
         persons_of_first_name version base_data
-          ( (fun p -> [ p.first_name ]),
+          ( (fun p -> p.first_name :: p.first_names_aliases),
             snd patches.h_person,
             "fnames.inx",
             "fnames.dat",

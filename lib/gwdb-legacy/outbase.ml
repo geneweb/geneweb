@@ -83,10 +83,11 @@ let make_strings_of_fsname_aux split get base =
 
 let make_strings_of_fname =
   make_strings_of_fsname_aux Name.split_fname_callback (fun p ->
-      [ p.first_name ])
+      p.first_name :: p.first_names_aliases)
 
 let make_strings_of_sname =
-  make_strings_of_fsname_aux Name.split_sname_callback (fun p -> [ p.surname ])
+  make_strings_of_fsname_aux Name.split_sname_callback (fun p ->
+      p.surname :: p.surnames_aliases)
 
 let create_strings_of_sname oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_strings_of_sname base)
@@ -169,14 +170,14 @@ let output_name_index_aux cmp get base names_inx names_dat =
 let output_surname_index base tmp_snames_inx tmp_snames_dat =
   output_name_index_aux
     (Dutil.compare_snames_i base.data)
-    (fun p -> [ p.surname ])
+    (fun p -> p.surname :: p.surnames_aliases)
     base tmp_snames_inx tmp_snames_dat
 
 (* FIXME: switch to Dutil.compare_snames_i *)
 let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
   output_name_index_aux
     (Dutil.compare_snames_i base.data)
-    (fun p -> [ p.first_name ])
+    (fun p -> p.first_name :: p.first_names_aliases)
     base tmp_fnames_inx tmp_fnames_dat
 
 let output_particles_file particles fname =

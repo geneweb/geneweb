@@ -351,13 +351,44 @@ end = struct
     wrap_match_name ~base ~search_list:surname_list ~exact ~get:get_surname
       ~split:Name.split_sname
 
+  let match_alias ~base ~alias_list ~exact ~kind p =
+    let gets =
+      let get =
+        match kind with
+        | `First_name -> Gwdb.get_first_names_aliases
+        | `Surname -> Gwdb.get_surnames_aliases
+      in
+      List.map (fun alias _ -> alias) (get p)
+    in
+    let split =
+      match kind with
+      | `Surname -> Name.split_sname
+      | `First_name -> Name.split_fname
+    in
+    List.exists
+      (fun get ->
+        wrap_match_name ~base ~search_list:alias_list ~get ~exact ~split p)
+      gets
+
+  (* We use [first_name_list] as the list of aliases to search for, so
+     searching for a first name will also look at first name aliases. *)
+  let match_first_name_alias ~base ~first_name_list ~exact p =
+    match_alias ~base ~alias_list:first_name_list ~exact ~kind:`First_name p
+
+  let match_surname_alias ~base ~surname_list ~exact p =
+    match_alias ~base ~alias_list:surname_list ~exact ~kind:`Surname p
+
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~base ~p ~sex ~married ~occupation ~first_name_list
       ~surname_list ~skip_fname ~skip_sname ~exact_first_name ~exact_surname =
     match_sex ~p ~sex
     && (skip_fname
-       || match_first_name ~base ~first_name_list ~exact:exact_first_name p)
-    && (skip_sname || match_surname ~base ~surname_list ~exact:exact_surname p)
+       || match_first_name ~base ~first_name_list ~exact:exact_first_name p
+       || match_first_name_alias ~base ~first_name_list ~exact:exact_first_name
+            p)
+    && (skip_sname
+       || match_surname ~base ~surname_list ~exact:exact_surname p
+       || match_surname_alias ~base ~surname_list ~exact:exact_surname p)
     && match_married ~p ~married
     && match_occupation ~base ~p ~occupation
 
