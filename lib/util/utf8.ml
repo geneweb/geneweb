@@ -127,26 +127,28 @@ module C = struct
 
   (* See BatUTF8.look source (from batteries) *)
   let cp s i =
-    Uchar.of_int
-    @@
-    let n = Char.code (String.unsafe_get s i) in
-    if n < 0x80 then n
-    else if n <= 0xdf then
-      ((n - 0xc0) lsl 6) lor (0x7f land Char.code (String.unsafe_get s (i + 1)))
-    else if n <= 0xef then
-      let n' = n - 0xe0 in
-      let m = Char.code (String.unsafe_get s (i + 1)) in
-      let n' = (n' lsl 6) lor (0x7f land m) in
-      let m = Char.code (String.unsafe_get s (i + 2)) in
-      (n' lsl 6) lor (0x7f land m)
-    else
-      let n' = n - 0xf0 in
-      let m = Char.code (String.unsafe_get s (i + 1)) in
-      let n' = (n' lsl 6) lor (0x7f land m) in
-      let m = Char.code (String.unsafe_get s (i + 2)) in
-      let n' = (n' lsl 6) lor (0x7f land m) in
-      let m = Char.code (String.unsafe_get s (i + 3)) in
-      (n' lsl 6) lor (0x7f land m)
+    let code =
+      let n = Char.code (String.unsafe_get s i) in
+      if n < 0x80 then n
+      else if n <= 0xdf then
+        ((n - 0xc0) lsl 6)
+        lor (0x7f land Char.code (String.unsafe_get s (i + 1)))
+      else if n <= 0xef then
+        let n' = n - 0xe0 in
+        let m = Char.code (String.unsafe_get s (i + 1)) in
+        let n' = (n' lsl 6) lor (0x7f land m) in
+        let m = Char.code (String.unsafe_get s (i + 2)) in
+        (n' lsl 6) lor (0x7f land m)
+      else
+        let n' = n - 0xf0 in
+        let m = Char.code (String.unsafe_get s (i + 1)) in
+        let n' = (n' lsl 6) lor (0x7f land m) in
+        let m = Char.code (String.unsafe_get s (i + 2)) in
+        let n' = (n' lsl 6) lor (0x7f land m) in
+        let m = Char.code (String.unsafe_get s (i + 3)) in
+        (n' lsl 6) lor (0x7f land m)
+    in
+    if Uchar.is_valid code then Uchar.of_int code else Uchar.rep
 
   (* compare bytes (UTF-8 charachter) delimited by intevals [i1,j1] and [i2,j2] *)
   let cmp_substring s1 i1 j1 s2 i2 j2 =
