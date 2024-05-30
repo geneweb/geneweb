@@ -68,6 +68,8 @@ val short_dates_text : config -> base -> person -> Adef.safe_string
         * †1780     (unknown birth date - death)
         * †         (unknown birth date - death but don't know when) *)
 
+val short_dates_text_notag : config -> base -> person -> string
+
 val short_marriage_date_text :
   config -> base -> family -> person -> person -> Adef.safe_string
 (** Retruns year of marriage for given spouses with its precision. *)

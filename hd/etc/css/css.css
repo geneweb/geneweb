@@ -3,16 +3,32 @@
     background-color: #f0f0f0;
   }
 
-.dropdown-menu-transl { 
+.dropdown-menu {
+  max-height: 650px;
+  overflow: scroll;
+}
+
+.dropdown-menu::-webkit-scrollbar {
+  width: 0; /* This will hide the p_mod right scrollbar */
+}
+
+.dropdown-menu-transl {
   -webkit-transform: translate(-16%, 0) !important;
   -o-transform: translate(-16%, 0) !important;
-  transform: translate(-16%, 0) !important; }
+  transform: translate(-16%, 0) !important;
+}
+
+.dropdown-menu-transl-pmod {
+  -webkit-transform: translate(-10%, 0) !important;
+  -o-transform: translate(-10%, 0) !important;
+  transform: translate(-10%, 0) !important;
+}
 
 .ancmenu-implex {
-  color: rgb(255,136,46); 
+  color: rgb(255,136,46);
 }
 .ancmenu-implex[aria-selected]{
-  color: rgb(255,255,255); 
+  color: rgb(255,255,255);
 }
 
 h1, h2, h3, h4, h5, h6 { font-weight: lighter !important; }
@@ -317,7 +333,7 @@ img.image-popover {
 }
 
 div.p_mod_builder {
-  width: 300px;
+  width: 3120px;
 }
 
 /* Fixed ancestors image width on modules/arbre_3gen_photo */

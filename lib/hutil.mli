@@ -56,6 +56,9 @@ val gen_print_link_to_welcome : (unit -> unit) -> config -> bool -> unit
 val print_link_to_welcome : config -> bool -> unit
 (** Calls [gen_print_link_to_welcome] with empty function [f]. *)
 
+val print_link_to_home : config -> unit
+(** Prints the home, referer, search buttons and timing/errors data *)
+
 val incorrect_request : ?comment:string -> config -> unit
 (** Sends [Bad Request] HTTP response (same as [GWPARAM.output_error conf Bad_Request]) *)
 

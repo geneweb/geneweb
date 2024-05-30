@@ -59,8 +59,8 @@
     %if;cancel_links;♀%sp;%else;class="fa fa-venus female fa-xs%end;%nn;
   %else;
     %if;cancel_links;⚲%sp;%else;class="fa fa-neuter neuter fa-xs%end;%nn;
-  %end; mr-1%nn;
-  %if;not cancel_links;"></i>%nn;
+  %end;
+  %if;not cancel_links; mr-1"></i>%nn;
     %if;wizard;</a>%end;
   %end;
 %end;

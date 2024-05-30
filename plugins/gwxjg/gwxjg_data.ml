@@ -1177,8 +1177,8 @@ let encode_varenv =
 let mk_base base =
   Tpat
     (function
-    | "nb_of_persons" -> Tint (Gwdb.nb_of_persons base)
-    | "nb_of_families" -> Tint (Gwdb.nb_of_families base)
+    | "nb_persons" -> Tint (Gwdb.nb_of_persons base)
+    | "nb_families" -> Tint (Gwdb.nb_of_families base)
     | "name" -> Tstr (Gwdb.bname base)
     | _ -> raise Not_found)
 

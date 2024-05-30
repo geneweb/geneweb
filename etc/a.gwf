@@ -24,6 +24,11 @@
 # default_sosa_ref=john.3 smith
 #default_sosa_ref=
 
+# set sosa_ref variable in template txt files if sosa reference not
+# previously set from pz,nz,ocz,iz present in query url.
+# TODO: need to document relations between default_sosa_ref & sosa_ref
+#sosa_ref=
+
 # Message of the day. If set, display this message in the welcome page.
 # Can contain HTML tags.
 #motd=
@@ -310,6 +315,7 @@ perso_module_c=chronologie
 perso_module_n=notes
 perso_module_s=sources
 perso_module_a=arbres
+perso_module_h=htrees
 perso_module_d=data_3col
 perso_module_l=ligne
 
@@ -405,6 +411,13 @@ perso_module_l=ligne
 # TODO: what are the other elements ?
 #highlight_color=#2f6400
 
+# despite new css_prop, there is still usage of body_prop as per issue
+# https://github.com/geneweb/geneweb/issues/1696
+# old parameter since version 3.08, defaut is empty.
+# Refer to authorised attributes and those replaced by css in
+# https://developer.mozilla.org/en-US/docs/Web/HTML/Element/body
+#body_prop=
+
 # Customized variables.
 #
 # You can define any variable here, starting with "var_".
@@ -480,6 +493,35 @@ perso_module_l=ligne
 # Warning: complete work never merged in geneweb/master branch,
 #          (TODO need a ref here) so flag not to be set.
 #reorg=on
+_
+# for carrousel.txt
+# dump sent image, if detected as empty type, in a 'bad-image' file
+# old parameter since version 4.02, defaut is to ignore.
+#dump_bad_images=yes
+
+# For chronologie module,
+# By default test for events beyond birth, baptism, mariage, death and burial
+# to generate an events list.
+# Nevertheless the has_events var may force list creation or not
+# may be set to "always" or "never".
+#has_events=
+
+# for wiki syntax since version 5.00, TODO what purpose ?
+# notes alias file is <basename>.gwb/notes.alias by default, or specified here
+#notes_alias_file=
+
+# Display in red color not existing person or do not if var is set to off.
+#red_if_not_exist=off
+
+# in gwd/request.ml use Perso.interp_templ or person_selected if var is set
+# TODO what purpose ?
+#ptempl=yes
+
+# By default generated web pages have robots content="none"
+# except if robot_index=yes defined since PR #1728  in version 7.1
+# There is a similar robot_index_forum for forum pages.
+#robot_index=yes
+#robot_index_forum=yes
 
 ### templm specific parameters ######################################
 
