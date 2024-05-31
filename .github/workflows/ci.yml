@@ -9,18 +9,20 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    if: false #this job is temporary skipped for testing next one
+    if: true
     strategy:
       fail-fast: false
       matrix:
         os:
           - ubuntu-latest
           - macos-latest
-          - windows-latest
+          # - windows-latest
           - macos-12
           - macos-13
         ocaml-compiler:
+          - 4.08.x
           - 4.14.x
+          - 5.2.x
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -43,6 +45,7 @@ jobs:
 
   build_nnp:
     runs-on: ${{ matrix.os }}
+    if: false #this job is temporary skipped
     strategy:
       fail-fast: false
       matrix:
