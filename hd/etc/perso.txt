@@ -50,7 +50,7 @@
       %let;op_m;1%in;%include;modules/notes
       %let;op_m;2%in;%include;modules/sources
     %if;(p_mod="" or p_mod="zz")</div>%end; %( end of <div class="col-8"> from individu.txt %)
-    <div class="col-4 pl-0 ml-0">
+    <div class="col-lg-4">
       %let;op_m;2%in;%include;modules/arbre_3gen_photo
       %let;op_m;1%in;%include;modules/fratrie
       %let;op_m;1%in;%include;modules/relations

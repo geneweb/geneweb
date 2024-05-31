@@ -125,6 +125,12 @@ html {
 
 @include media-breakpoint-up(sm) {
   html {
+    font-size: 1rem;
+  }
+}
+
+@include media-breakpoint-up(sm) {
+  html {
     font-size: 1.2rem;
   }
 }
@@ -357,15 +363,25 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
 /* Fix navigation buttons to top right corner */
 .fix_top {
   position: fixed;
-  top: 0px; !important;
-  transform: translateX(4px);
+  top: 0px;
   z-index: 1030;
 }
+
 .fix_left {
-  left: 0px; !important;
+  left:4px;
 }
+
+@media (max-width: 575px) {
+  .home-xs.fix_left {
+    left:2px;
+  }
+  h1 {
+    font-size: 1.8rem;
+  }
+}
+
 .fix_right {
-  right: 0px; !important;
+  right:0px;
 }
 
 div.anchor_upd {
@@ -373,6 +389,44 @@ div.anchor_upd {
   top:-57px;
 }
 
+
+/* Make hamburger smaller, reduce navbar icons in small viewports */
+@media (max-width: 767px) {
+  .navbar-toggler-icon {
+    transform: scale(0.6);
+  }
+  .navbar-toggler {
+    border: none;
+    position: absolute;
+    top: 2px;
+    right: -30px;
+  }
+  .navbar-nav .fa, .navbar-nav .fas, .navbar-nav .far {
+    transform: scale(0.4);
+  }
+  .navbar-collapse {
+    position: relative;
+    width: 90%;
+  }
+  #searchmodal .modal-dialog {
+    max-width: 90%;
+  }
+  h1 {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 319px) {
+  .navbar-toggler {
+    right: -15px;
+  }
+}
+
+@media (max-width: 991px) {
+  #searchmodal .modal-dialog {
+    max-width: 85%;
+  }
+}
 /* slowly hide placeholder on input focus */
 [placeholder]:focus::-webkit-input-placeholder {
   transition: opacity 0.5s 0.5s ease;

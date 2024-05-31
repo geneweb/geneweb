@@ -398,7 +398,7 @@
 %let;prefx;%if;(e.m="F")%prefix_set.pmod;%else;%prefix;%end;%in;
 %if;(e.m!="MOD_IND")
   <div class="col-12">
-  <h1 class="%if;(op_m=2)text-center%else;text-xs-center text-md-left%end;">
+  <h1 class="%if;(op_m=2)text-center%else;text-xs-center text-md-left%end; ml-1 ml-md-3">
     %if;has_public_name;
       %if;has_qualifiers;%public_name; <em>%qualifier;</em>
       %else;%public_name; %surname;%end;
@@ -436,8 +436,10 @@
     %apply;etat_civil()
   
   %elseif;(op_m=3)
-    <div class="d-flex">
-      %apply;portrait()
+    <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start">
+      <div>
+        %apply;portrait()
+      </div>
       <div>
         <div class="text-center mb-2 mx-2">
           %apply;detailed_names()
