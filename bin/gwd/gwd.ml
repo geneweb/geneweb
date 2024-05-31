@@ -95,6 +95,15 @@ type auth_report =
     ar_uauth : string;
     ar_can_stale : bool }
 
+let split_username username =
+    let l1 = String.split_on_char '|' username in
+    match List.length l1 with
+    | 1 -> username, ""
+    | 2 -> (List.nth l1 0), (List.nth l1 1)
+    | _ -> (
+            GwdLog.syslog `LOG_CRIT "Bad .auth key or sosa encoding";
+            username, "")
+
 let log_passwd_failed ar tm from request base_file =
   GwdLog.log @@ fun oc ->
   let referer = Mutil.extract_param "referer: " '\n' request in
@@ -483,7 +492,7 @@ let gen_match_auth_file test_user_and_password auth_file =
                 String.sub au.au_info 0 i
               with Not_found -> au.au_info
             in
-            let username =
+            let username = (* clean the / needed for sorting *)
               try
                 let i = String.index s '/' in
                 let len = String.length s in
@@ -1207,19 +1216,7 @@ let make_conf from_addr request script_name env =
     try int_of_string (List.assoc "private_years" base_env) with
     Not_found | Failure _ -> 150
   in
-  let username = ar.ar_name in
-  let username, userkey =
-    let l1 = String.split_on_char '|' username in
-    match List.length l1 with
-    | 1 -> username, ""
-    | 2 -> (List.nth l1 0), (List.nth l1 1)
-    | _ ->
-          begin
-            GwdLog.syslog `LOG_CRIT "Bad .auth key or sosa encoding";
-            username, ""
-          end
-  in
-
+  let username, userkey = split_username ar.ar_name in
   let conf =
     {from = from_addr;
      api_mode = false;
