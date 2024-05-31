@@ -31,7 +31,6 @@
     markup
     num
     (ocaml (>= 4.08))
-    (ocamlformat (and :dev (= 0.24.1)))
     ounit
     ppx_blob
     ppx_deriving

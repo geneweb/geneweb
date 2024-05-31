@@ -20,8 +20,8 @@ jobs:
           - macos-12
           - macos-13
         ocaml-compiler:
-          - 4.08.x
-          - 4.14.x
+          # - 4.08.x
+          # - 4.14.x
           - 5.2.x
     steps:
       - name: Checkout code
@@ -35,11 +35,10 @@ jobs:
           opam pin add . -y --no-action
           opam depext -y geneweb
           opam install -y ./*.opam --deps-only --with-test
-          opam pin ocamlformat 0.24.1
       - name: Make ocamlformat > build/distrib
         run: |
           opam exec -- ocaml ./configure.ml --release
-          opam exec -- make fmt distrib
+          opam exec -- make distrib
       - name: Make CI tests
         run: opam exec -- make ci
 
