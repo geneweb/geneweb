@@ -581,7 +581,7 @@
           %foreach;parent;
             %let;os;%parent.sexes;%in;
             %if;(cnt!=1 and bvar.multi_parents="yes")<hr class="w-100">%end;
-            <div class="col-11">
+            <div class="col-12">
               %apply;parent(cnt,"parent",parent.sex)
               %if;(bvar.multi_parents="yes")%apply;insert_parent(cnt)%end;
             </div>

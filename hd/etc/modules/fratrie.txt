@@ -64,7 +64,7 @@
         %foreach;father.child;
           %if;is_sibling_before;
             %incr_count;
-            <a class="ml-4%if;not is_sibling_before; invisible%end;"
+            <a class=" mt-1 ml-3%if;not is_sibling_before; invisible%end;"
               href="%prefix;%child.access;" title="%apply;capitalize(nth([previous sibling],sex))">%nn;
             <i class="fa fa-caret-left fa-xs text-primary"></i>%nn;
             </a>

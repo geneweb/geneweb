@@ -13,14 +13,14 @@
 %end;
 %let;random_index;%apply;get_random(nb_persons.v)%in;
 %if;(not cancel_links)
-  <div class="d-flex flex-column fix_top fix_left">
+  <div class="d-flex flex-column fix_top fix_left home-xs">
     <a tabindex="1" role="button" class="btn btn-sm btn-link p-0 border-0" href="%prefix;" title="[*home]">
-      <i class="fa fa-house fa-fw fa-sm" aria-hidden="true"></i>%nn;
+      <i class="fa fa-house fa-fw fa-xs" aria-hidden="true"></i>%nn;
       <i class="sr-only">[*home]</i>%nn;
     </a>
     %if;(referer!="")
       <a tabindex="2" role="button" class="btn btn-sm btn-link p-0 border-0" href="%referer;" title="[*back]">%nn;
-        <i class="fa fa-arrow-left-long fa-fw fa-xs" aria-hidden="true"></i>%nn;
+        <i class="fa fa-arrow-left-long fa-fw fa-xs fa-icon" aria-hidden="true"></i>%nn;
         <span class="sr-only">[*back]</span>%nn;
       </a>
     %end;
@@ -30,7 +30,7 @@
       <span class="sr-only">[*search/case sensitive]0</span>%nn;
     </a>
     %let;rng;%if;((e.i!="" or e.p!="" or e.n!="") and e.m!="S" and e.m!="L" and e.m!="" and not ("_FAM" in e.m))1%end;%in;
-    <a role="button" class="btn btn-sm btn-link p-0 border-0"
+    <a role="button" class="btn btn-sm btn-link p-0 border-0  fa-icon"
       href="%if;(rng=1)%apply;url_set%with;i/p/n/oc%and;%random_index;%end;%else;%prefix;i=%random_index;%end;"
       title="[*random individual]%if;(rng=1) ([stay on the current tool])%end;"><i class="fa fa-dice-%apply;dice() fa-fw fa-xs" aria-hidden="true"></i>%nn;
       <span class="sr-only">[*random individual]</span>%nn;
@@ -51,11 +51,11 @@
           <form id="collapse_search" method="get" action="%prefix;">
             %hidden;
             <input type="hidden" name="m" value="S">
-            <div class="d-flex justify-content-center">
-              <h5 class="rounded modal-title my-2 text-center w-50 align-self-center" id="searchpopup">[*search/case sensitive]0 [person/persons]0</h5>
-              <div class="col-8">
+            <div class="d-flex flex-column flex-md-row justify-content-center">
+              <h3 class="rounded modal-title my-2 ml-3 ml-md-0 text-md-center w-md-50 align-self-md-center" id="searchpopup">[*search/case sensitive]0 [person/persons]0</h3>
+              <div class="col-12 col-md-8 mt-2 mt-md-0">
                 %if;(browsing_with_sosa_ref)
-                  <h5>%apply;display_sosa_ref%with;%sosa_ref;%end;</h5>
+                  <h5 class="ml-1">%apply;display_sosa_ref%with;%sosa_ref;%end;</h5>
                 %end;
                 <label class="sr-only" for="n">Search public name</label>
                 <input type="search" id="n" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;"
@@ -63,7 +63,7 @@
                 <label class="sr-only" for="p">Search firstname</label>
                 <input type="search" id="p" class="form-control form-control-lg mt-2" name="p" placeholder="[*first name/first names]0">
               </div>
-              <button class="btn btn-outline-primary" type="submit" title="[*search/case sensitive]0"><i class="fa fa-magnifying-glass fa-lg mx-2"></i> [*search/case sensitive]0</button>
+              <button class="btn btn-outline-primary mx-3 mx-md-0 mt-4 my-2 mt-md-0" type="submit" title="[*search/case sensitive]0"><i class="fa fa-magnifying-glass fa-lg mt-2 mt-md-0 mx-4 mx-md-2"></i> [*search/case sensitive]0</button>
             </div>
           </form>
         </div>

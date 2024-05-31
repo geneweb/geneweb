@@ -23,9 +23,10 @@
   [*branch %s compiled on %s from commit:::x:y]0%nn;
 %end;
 %if;(not cancel_links)
-  <div class="d-flex ml-auto justify-content-end m-2" id="copyr">
+  <div class="d-flex flex-column flex-sm-row ml-auto justify-content-center justify-content-lg-end m-2" id="copyr">
+    <div class="d-flex align-self-center justify-content-center">
     %if;(e.templ="")
-      <div class="btn-group dropup align-self-center">
+      <div class="btn-group dropup">
         <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
           title="%if;(e.lang!="")%apply;capitalize%with;%apply;language_name(e.lang)%end;%end;">%nn;
@@ -77,7 +78,7 @@
       </div>
     %end;
     %if;(connections.total!="")
-      <div class="d-flex flex-column align-self-center align-items-center ml-2 small">
+      <div class="d-flex flex-column align-items-center text-center ml-2 small">
         %if;(connections.friends!="" and connections.friends>0)<span>%connections.friends; %nn;
           %if;(connections.friends=1)[wizard/wizards/friend/friends/exterior]2
           %else;[wizard/wizards/friend/friends/exterior]3
@@ -101,7 +102,8 @@
         %end;
       </div>
     %end;
-    <div class="d-inline-flex flex-column justify-content-end align-self-center ml-3">
+    </div>
+    <div class="d-inline-flex flex-column justify-content-md-end align-self-center mt-1 mt-md-0 ml-sm-3">
       <div class="ml-auto">
         <a role="button" class="mr-1"
           %( button to switch only between default and templm templates %)
