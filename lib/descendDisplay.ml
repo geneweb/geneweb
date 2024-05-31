@@ -547,12 +547,14 @@ let display_descendant_index conf base max_level ancestor =
     Gwdb.Collection.fold
       (fun acc i ->
         let p = pget conf base i in
-        if
-          p_first_name base p <> "?"
-          && p_surname base p <> "?"
-          && p_first_name base p <> "x"
-          && ((not (is_hide_names conf p)) || authorized_age conf base p)
-        then get_iper p :: acc
+        if Gwdb.Marker.get paths i <> [] then
+          if
+            p_first_name base p <> "?"
+            && p_surname base p <> "?"
+            && p_first_name base p <> "x"
+            && ((not (is_hide_names conf p)) || authorized_age conf base p)
+          then get_iper p :: acc
+          else acc
         else acc)
       [] (ipers base)
   in
