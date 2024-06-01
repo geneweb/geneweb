@@ -304,20 +304,14 @@
 # Customise the individual page.
 # Full documentation https://geneweb.tuxfamily.org/wiki/templates
 # Each module is defined by a unique letter between a-z.
-# (no prefix # character because mandatory as per source code)
-perso_module_i=individu
-perso_module_p=parents
-perso_module_g=gr_parents
-perso_module_u=unions
-perso_module_f=fratrie
-perso_module_r=relations
-perso_module_c=chronologie
-perso_module_n=notes
-perso_module_s=sources
-perso_module_a=arbres
-perso_module_h=htrees
-perso_module_d=data_3col
-perso_module_l=ligne
+# There is already a bunch of modules already defined in etc/perso_utils.txt
+# You may add three w,x,z modules with file_1/2/3.txt should be in
+# bases/etc/<basename>/modules (base specific),
+# bases/etc/modules (all bases), or
+# gw/etc/modules (the distribution), the search being in that order.
+#perso_module_w=file_1
+#perso_module_x=file_2
+#perso_module_z=file_3
 
 # The display on perso pages will be governed by a vector defining
 # a selection of modules and the order in which they are displayed.
@@ -391,7 +385,7 @@ perso_module_l=ligne
 # File recording a black list for the database forum.
 #forum_exclude_file=
 
-# Welcome logo. The designated file should be in bases/src/mybase/images
+# Welcome logo. The designated file should be in bases/src/<basename>/images
 # Called with <img src="%prefix;m=IM;v=welcome_logo"
 #                  style="welcome_logo_style">
 #welcome_logo=
