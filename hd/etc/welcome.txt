@@ -292,11 +292,11 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         </div>
       </div>
     %end;
-    %if;(plugins!="")
+    %if;(plugins!="" and b.plugins!="")
       <div class="d-flex flex-column flex-lg-row justify-content-lg-center mt-2 mt-lg-4">
         <div class="h4 align-self-lg-center mr-lg-2">
           [*plugins][:]
-          <span class="small">%plugins;</span>
+          <span class="small">%b.plugins;</span>
         </div>
       </div>
     %end;
