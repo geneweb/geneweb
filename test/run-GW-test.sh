@@ -90,15 +90,13 @@ case $Option in
 esac
 done
 shift $(($OPTIND - 1))
-input_db=$1 #<database name>
-input_pwd=$2 #[wizard_id:passwd] (some commands require wizard priviledge)
 
 # overwrite above hardcoded vars by an input file.
 test -f "$setenv_file" && . $setenv_file
 
 # overwrite DBNAME and PWD vars if passed as input vars.
-test "$input_db" && DBNAME="$input_db"
-test "$input_pwd" && PWD="$input_pwd"
+test "$1" && DBNAME="$1" #<database name>
+test "$2" && PWD="$2" #[wizard_id:passwd] (some tests require wizard priviledge)
 
 if test "$cgitest"; then
     urlprfix="http://localhost/cgi-bin/$GWCGI?b=$DBNAME&"
@@ -160,14 +158,58 @@ crl () {
   elif grep $GREPOPT "404 Not Found" /tmp/tmp.txt; then
     echo "Web server unable to access specified cgi script, ${urlprfix}w=$PWD&$cmd"
     exit 1
+  elif grep $GREPOPT "Access refused" /tmp/tmp.txt; then
+    echo "gwd should not be started with robot protection."
+    exit 1
+  elif grep $GREPOPT "var.nb_errors.=" /tmp/tmp.txt; then
+    # analyse potential error reported by time_debug (in lib/util.ml)
+    if ! grep $GREPOPT "var.nb_errors.=.0" /tmp/tmp.txt; then
+      test -n "$tstmsg" && echo "$tstmsg"
+      grep "var.errors_list.=" /tmp/tmp.txt;
+      RC=$(($RC+1))
+    fi
   fi
   unset first_request
 }
 
+gwf_file=$BASES_DIR/$DBNAME.gwf
+if test -h "$gwf_file" || test -f "$gwf_file"; then
+    if test -h "$gwf_file"; then
+        origgwf=$(realpath $gwf_file)
+    else
+        origgwf="$gwf_file"
+    fi
+    gwf_backup="$origgwf.$$"
+    cp -pf $origgwf $gwf_backup
+else
+    signature_str="#to.be.removed.after.test.$$"
+    origgwf="$gwf_file"
+    echo "$signature_str" >$origgwf
+fi
+
+cleanup () {
+    if test -f "$gwf_backup" ; then
+        mv -f $gwf_backup $origgwf
+    elif test -f "$gwf_file" && grep -q "$signature_str" $gwf_file ; then
+        rm -f $gwf_file
+    fi
+}
+trap cleanup 0
+
 check_gwf () {
   local bparm="$1"
-  grep $GREPOPT "^$bparm" $BASES_DIR/$DBNAME.gwf || \
-      { echo "$bparm not set in $BASES_DIR/$DBNAME.gwf"; return 1; }
+  grep $GREPOPT "^$bparm" $gwf_file || \
+      { echo "$bparm not set in $gwf_file"; return 1; }
+}
+
+update_gwf () {
+    local bvar="$1"
+    local value="$2"
+    if grep -q "^$bvar" $origgwf; then
+        sed -i -e "s/$bvar.*/$bvar=$value/" $origgwf
+    else
+        echo "$bvar=$value" >> $origgwf
+    fi
 }
 
 first_request=1
@@ -228,6 +270,8 @@ fi
 crl "m=HIST_SEARCH&i=$ID"
 crl "m=IM&s=$IMG_SRC"
 crl "m=IMH&s=$IMG_SRC"
+# ATTENTION, Test only a subset of carrousel (m=IM_C*)
+# ATTENTION, les autres fonctions du carrousel (_OK) ont une action immédiate!!
 crl "m=IM_C&i=$ID"
 crl "m=IM_C_S&i=$ID"
 crl "m=IM_C&i=$ID&s=$IMG_C"
@@ -282,7 +326,13 @@ else
     echo "three wizards notes related commands are not tested."
 fi
 
-# ATTENTION, les autres fonctions du carrousel (_OK) ont une action immédiate!!
+# verify each etc/modules/* with p_mod
+for xx in $(ls $BIN_DIR/etc/modules/*.txt); do
+    tstmsg="test $xx as p_mod=z1"
+    yy=$(basename $xx); yy=${yy%.txt}
+    update_gwf 'perso_module_z' "$yy"
+    crl "p=$FN&n=$SN&oc=$OC&p_mod=z1"
+done
 
 if test -f "$GWDLOG"; then
 echo "$GWDLOG reported traces (empty if no failure):"
