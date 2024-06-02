@@ -328,7 +328,7 @@ fi
 
 # verify each etc/modules/* with p_mod
 for xx in $(ls $BIN_DIR/etc/modules/*.txt); do
-    tstmsg="test $xx as p_mod=z1"
+    tstmsg="test $xx as p_mod=1"
     yy=$(basename $xx); yy=${yy%.txt}
     update_gwf 'perso_module_z' "$yy"
     crl "p=$FN&n=$SN&oc=$OC&p_mod=z1"
