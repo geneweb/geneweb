@@ -7,6 +7,7 @@ let shift = ref 0
 let files = ref []
 let no_fail = ref false
 let no_picture = ref false
+let no_public = ref false
 let create_all_keys = ref false
 let line_cnt = ref 0
 
@@ -40,6 +41,7 @@ let make_state () =
       files = !files;
       no_fail = !no_fail;
       no_picture = !no_picture;
+      no_public = !no_public;
       create_all_keys = !create_all_keys;
       line_cnt = !line_cnt;
       default_source = !default_source;
@@ -69,6 +71,9 @@ let speclist =
     ("-nofail", Arg.Set no_fail, " No failure in case of error");
     ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock database");
     ("-nopicture", Arg.Set no_picture, " Do not create associative pictures");
+    ( "-nopublic",
+      Arg.Set no_public,
+      " Ignore public access from source file (set to default)" );
     ("-o", Arg.Set_string out_file, "<file> Output database (default: a.gwb)");
     ( "-particles",
       Arg.Set_string particules_file,
