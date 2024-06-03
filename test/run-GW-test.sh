@@ -326,12 +326,30 @@ else
     echo "three wizards notes related commands are not tested."
 fi
 
+
+modules="individu parents unions fratrie relations chronologie notes sources arbres htrees gr_parents ligne"
 # verify each etc/modules/* with p_mod
-for xx in $(ls $BIN_DIR/etc/modules/*.txt); do
-    tstmsg="test $xx as p_mod=1"
-    yy=$(basename $xx); yy=${yy%.txt}
-    update_gwf 'perso_module_z' "$yy"
-    crl "p=$FN&n=$SN&oc=$OC&p_mod=z1"
+for xx in $modules; do
+    cc=$(echo $xx | cut -c 1)
+    case $cc in
+      i)  list="1 2 3";;
+      p)  list="1 2 3 4 5";;
+      u)  list="1 2 3 4 5";;
+      f)  list="1 2 3 4";;
+      r)  list="1 2";;
+      c)  list="1 2";;
+      n)  list="1 2";;
+      s)  list="1 2";;
+      a)  list="1 2 3 4";;
+      h)  list="1 2 3 4 5";;
+      g)  list="1 2";;
+      l)  list="1";;
+      *)  list="0";;
+    esac
+    for ii in $list; do
+      tstmsg="test $xx with p_mod=$cc$ii"
+      crl "p=$FN&n=$SN&oc=$OC&p_mod=$cc$ii"
+    done
 done
 
 if test -f "$GWDLOG"; then
