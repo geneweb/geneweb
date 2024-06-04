@@ -54,7 +54,7 @@ COMMIT_ID := $(shell git rev-parse --short HEAD)
 COMMIT_MSG := $(shell git log -1 --pretty="%s%n%n%b" | sed 's/"/\\"/g')
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 VERSION := $(shell awk -F\" '/er =/ {print $$2}' lib/version.txt)
-SOURCE := $(shell git remote get-url origin | sed -n 's|^.*m/\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
+SOURCE := $(shell git remote get-url origin | sed -n 's|^.*github.com.\([^/]\+/[^/.]\+\)\(.git\)\?|\1|p')
 OCAMLV := $(shell ocaml --version)
 
 lib/version.ml:
