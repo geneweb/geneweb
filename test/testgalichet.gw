@@ -1,0 +1,136 @@
+encoding: utf-8
+gwplus
+
+fam Galichet Jean_Pierre #occu Marchand_de_bois #src déjà_décédés_au_mariage_de_sa_fille_Thérèse_Eugénie 0 <1849 + Loche Marie_Elisabeth #src déjà_décédés_au_mariage_de_sa_fille_Thérèse_Eugénie 0 <1849
+src déjà_décédés_au_mariage_de_sa_fille_Thérèse_Eugénie
+csrc rajout_de_2_enfants_pour_test
+fevt
+#marr 
+note Rajout de notes avec retour à la ligne avec des tag html
+note <br>1880 - Habitent Yzernay naissance d'une fille
+note <br>1886 - Habitent la Verdelière (6 enfants) - Recensement Moulins: - Vue 23
+note <br>1891 - N'habitent plus Moulins, recensés au Temple (79) * Vue 7
+end fevt
+beg
+- h Jean_Charles #occu Négociant #src témoin_au_mariage_de_sa_soeur_Thérèse_Eugénie 1813 #bs 1849-36ans od
+- h Pierre 1814 1/1/1835
+- h Paul 1816 1/1/1886
+- h lolo #src inventé 1818 od
+- f Thérèse_Eugénie #src inscription_des_hypothèques_du_23_février_1874_au_profit_de_dame_thérèse_eugènie_Galichet;_voir_ses_ascendants_dans_la_base_<a_href="https://gw.geneanet.org/mout?lang=fr&p=therese+eugenie&n=galichet">mout</a> 7/9/1830 #bp _[Châlons-sur-Marne]_-_Châlons-en-Champagne,51,Marne,Champagne-Ardenne,France #bs acte_de_mariage od
+end
+
+notes Galichet lolo
+beg
+* je le crée de façon arbitraire, avec deux mariages, le 1er avec divorce.
+end notes
+
+notes Galichet Thérèse_Eugénie
+beg
+almost empty
+end notes
+
+notes Loche Marie_Elisabeth
+beg
+* j'utilise la même image dans les notes du mari et de la femme
+* avec un texte alternatif sans apostrophe pour le mari [[Jean Pierre/Galichet]]
+
+* et un texte alternatif '''avec''' apostrophe pour la femme
+<br><img src="%sm=IM;s=jean_pierre.0.galichet.jpg" width=50% alt="retour d'etat">
+
+* les vues individuelles sont correctes,
+mais la vue sous forme de table des ascendants est incorrecte à cause de cette apostrophe.
+end notes
+
+notes Galichet Jean_Pierre
+beg
+* j'utilise la même image dans les notes du mari et de la femme
+* avec un texte alternatif sans apostrophe pour le mari
+<br><img src="%sm=IM;s=jean_pierre.0.galichet.jpg" width=50% alt="texte alternatif sans apostrophe">
+
+* et un texte alternatif '''avec''' apostrophe pour la femme [[Marie Elisabeth/Loche]]
+
+* les vues individuelles sont correctes, mais la vue sous forme de table des ascendants est incorrecte à cause de cette apostrophe.
+end notes
+
+pevt Galichet Jean_Charles
+#birt 1813 #s 1849-36ans
+#deat 
+end pevt
+
+pevt Galichet Pierre
+#birt 1814
+#deat 1/1/1835
+end pevt
+
+pevt Galichet Paul
+#birt 1816
+#deat 1/1/1886
+end pevt
+
+pevt Galichet lolo
+#birt 1818
+#deat 
+end pevt
+
+pevt Galichet Thérèse_Eugénie
+#birt 7/9/1830 #p _[Châlons-sur-Marne]_-_Châlons-en-Champagne,51,Marne,Champagne-Ardenne,France #s acte_de_mariage
+#deat 
+end pevt
+
+pevt Loche Marie_Elisabeth
+#deat <1849
+end pevt
+
+pevt Galichet Jean_Pierre
+#deat <1849
+end pevt
+
+fam Galichet Paul +3/3/1835 Marty Florence #src archives 1/1/1815 1875
+src archives
+csrc archives
+fevt
+#marr 3/3/1835
+end fevt
+beg
+- h Jean-Paul 2/2/1836 od
+- f Laure 1839 od
+end
+
+pevt Galichet Jean-Paul
+#birt 2/2/1836
+end pevt
+
+pevt Galichet Laure
+#birt 1839
+end pevt
+
+pevt Marty Florence
+#birt 1/1/1815
+#deat 1875
+end pevt
+
+fam Galichet lolo +1840 #ms inventé -1844 femme1 prenom1 #src inventé 1818 od
+fevt
+#marr 1840 #s inventé
+#div 1844 #s inventé
+end fevt
+fam Galichet lolo +1845 #ms inventé femme2 prenom2 #src inventé 1825 od
+fevt
+#marr 1845 #s inventé
+end fevt
+
+pevt femme1 prenom1
+#birt 1818
+end pevt
+
+pevt femme2 prenom2
+#birt 1825
+end pevt
+
+notes-db
+  Ceci est une base de test.
+
+  * initialement créée pour investiguer le pb #1334 (https://github.com/geneweb/geneweb/issues/1334)
+    et valider la correction
+    avec mon script ~/work/geneweb/local/checkgwuodir
+end notes-db
