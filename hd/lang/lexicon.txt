@@ -15105,7 +15105,7 @@ es: parentesco%t con
 et: kooselu%t
 fi: suhde%t ja
 fr: relation%t avec
-he:  קירבה
+he: %t קירבה
 is: sambúð%t með
 it: legame%t con
 lt: susiję su %t
