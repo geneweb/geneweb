@@ -10846,6 +10846,40 @@ ru: использовать ссылку
 sv: länk att använda
 tr: kullanılacak bağlantı
 
+    linked images
+af: gekoppelde beelde
+bg: свързани изображения
+br: skeudennoù liammet
+ca: imatges enllaçades
+co: imagine ligate
+cs: propojené obrázky
+da: tilknyttede billeder
+de: verknüpfte Bilder
+en: linked images
+eo: ligitaj bildoj
+es: imágenes vinculadas
+et: seotud pildid
+fi: linkitetyt kuvat
+fr: images liées
+he: תמונות מקושרות
+is: tengdar myndir
+it: immagini collegate
+lt: susieti vaizdai
+lv: saistītie attēli
+nl: gekoppelde afbeeldingen
+no: tilknyttede bilder
+oc: imatges ligadas
+pl: połączone obrazy
+pt: imagens vinculadas
+pt-br: imagens vinculadas
+ro: imagini asociate
+ru: связанные изображения
+sk: prepojené obrázky
+sl: povezane slike
+sv: länkade bilder
+tr: bağlantılı resimler
+zh: 关联图像
+
     linked pages
 bg: свързани страници
 ca: enllaços
@@ -13953,6 +13987,10 @@ sk: iba zvolená generácia
 sl: samo izbrana generacija
 sv: endast den valda generationen
 tr: sadece seçilen nesil
+
+    on this image
+en: on this image
+fr: sur cette image
 
     open individual page
 co: apre a pagina individuale

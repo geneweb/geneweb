@@ -36,6 +36,7 @@ depends: [
   "uucp"
   "uunf"
   "uutf"
+  "yojson"
   "zarith"
   "odoc" {with-doc}
 ]

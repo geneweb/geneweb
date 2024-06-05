@@ -459,12 +459,22 @@
           %if;has_linked_pages;
             <li class="nav-item">
               <a class="nav-link text-secondary" href="%url_set.m.LINKED;"
-                title="%linked_pages_nbr; [linked pages]">
-                <i class="fa fa-file-lines fa-fw mr-1" aria-hidden="true"></i>%nn;
+                title="[*linked pages]">
+                <i class="fa fa-file-lines fa-fw" aria-hidden="true"></i>%nn;
                 <sup class="small">%linked_pages_nbr;</sup>%nn;
                 <span class="sr-only">file-lines icon</span>%nn;
               </a>
             </li>
+            %if;(nb_linked_pages_type.gallery>0)
+              <li class="nav-item">
+                <a class="nav-link text-secondary" href="%url_set.m_type.LINKED_gallery"
+                  title="[*linked images]">
+                  <i class="fa fa-images fa-fw mr-1" aria-hidden="true"></i>%nn;
+                  <sup class="small">%nb_linked_pages_type.gallery;</sup>
+                  <span class="sr-only">images icon</span>
+                </a>
+              </li>
+            %end;
           %end;
         </ul>
       </div>
