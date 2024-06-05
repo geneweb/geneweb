@@ -8,6 +8,7 @@ and ultimately check that no failures in $GWDLOG
 Need to properly set 'hardcoded vars' in script header.
 Options:
 -c  to test as cgi and not local port.
+-d  print out some debug traces
 -f  file to be sourced in to overwrite hardcoded vars
 -h  To display this help.
 Use Cases:
@@ -77,10 +78,11 @@ NOTE="chantal" # one specific note
 
 #===  main ====================
 cmd=$(basename $0)
-while getopts "cf:h" Option
+while getopts "cdf:h" Option
 do
 case $Option in
     c ) cgitest=1;;
+    d ) debug=1;;
     f ) setenv_file=$OPTARG
         test -f "$setenv_file" || \
             { echo "invalid -f $setenv_file  option file"; exit 1; }
@@ -143,7 +145,12 @@ RC=0
 curlopt="-sS -m $CRLMAXTIME -o /tmp/tmp.txt"
 crl () {
   local cmd=$1
-  curl $curlopt "${urlprfix}w=$PWD&$cmd"
+  curlstr="${urlprfix}w=$PWD&$cmd"
+  if test -n "$debug"; then
+    test -n "$tstmsg" && echo "$tstmsg"
+    echo "curl $curlstr"
+  fi
+  curl $curlopt $curlstr
   if [ $? -ne 0 ]; then
     echo "Failed to execute $cmd."
     test -n "$first_request" && exit 1
@@ -164,12 +171,13 @@ crl () {
   elif grep $GREPOPT "var.nb_errors.=" /tmp/tmp.txt; then
     # analyse potential error reported by time_debug (in lib/util.ml)
     if ! grep $GREPOPT "var.nb_errors.=.0" /tmp/tmp.txt; then
-      test -n "$tstmsg" && echo "$tstmsg"
+      nberr=$(grep "var.nb_errors.=" /tmp/tmp.txt | sed -e 's/.*= \(.*\);.*/\1/')
+      test -n "$tstmsg" && echo "Failed $tstmsg, $nberr detected error(s)"
       grep "var.errors_list.=" /tmp/tmp.txt;
       RC=$(($RC+1))
     fi
   fi
-  unset first_request
+  unset first_request tstmsg
 }
 
 gwf_file=$BASES_DIR/$DBNAME.gwf
@@ -220,8 +228,18 @@ crl "p=$FN1&n=$SN1&oc=$OC1"
 crl "p=$FN2&n=$SN2&oc=$OC2"
 crl "p=xxx&n=yyy"
 
+#--- based on hd/etc/menubar.txt
+#--- based on hd/etc/anctree.txt
 crl "m=A&i=$ID"
 crl "m=A&i=$ID&t=T&v=5"
+crl "m=A&i=$ID&t=A&v=5"
+crl "m=A&i=$ID&t=C&v=5"
+crl "m=A&i=$ID&t=T&t1=7&v=5"
+crl "m=A&i=$ID&t=T&t1=h6&v=5"
+crl "m=A&i=$ID&t=T&t1=m&v=5"
+#rl "m=A&i=$ID&t=T&t1=CT&v=5" # failed if sosa not set
+crl "m=A&i=$ID&t=T&t1=CT&v=5&sosa=on"
+#--- ---
 crl "m=A&i=$ID&t=H&v=5"
 crl "m=A&i=$ID&t=Z&v=6&maxv=19&num=on&birth=on&birth_place=on&marr=on&marr_date=on&marr_place=on&child=on&death=on&death_place=on&age=on&occu=on&repeat=on&gen=1&ns=1&hl=1"
 crl "m=A&i=$ID&t=G&v=3&maxv=19&siblings=on&alias=on&parents=on&rel=on&witn=on&notes=on&src=on&hide=on"
