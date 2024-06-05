@@ -67,7 +67,7 @@ jobs:
 
       - name: Setup GeneWeb dependencies
         run: |
-          opam install -y ancient calendars.1.0.0 camlp-streams camlp5 camlzip cppo dune jingoo markup ocamlformat.0.24.1 oUnit ppx_blob ppx_deriving ppx_import stdlib-shims syslog unidecode.0.2.0 uri uucp uutf uunf
+          opam install -y ancient calendars.1.0.0 camlp-streams camlp5 camlzip cppo dune jingoo markup ocamlformat.0.24.1 oUnit ppx_blob ppx_deriving ppx_import stdlib-shims syslog unidecode.0.2.0 uri uucp uutf uunf yojson
 
       - name: build/distrib
         run: |

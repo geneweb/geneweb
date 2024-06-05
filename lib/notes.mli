@@ -82,3 +82,6 @@ val update_cache_linked_pages :
   Def.NLDB.key ->
   (Def.NLDB.key * Def.NLDB.ind) list ->
   unit
+
+val json_extract_img : Config.config -> string -> string * string
+val safe_gallery : Config.config -> string -> string

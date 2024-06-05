@@ -32,6 +32,7 @@ val links_to_ind :
   Gwdb.base ->
   ((iper, ifam) Def.NLDB.page * ('a * ((string * string * int) * 'b) list)) list ->
   string * string * int ->
+  string option ->
   (iper, ifam) Def.NLDB.page list
 
 val get_linked_page : config -> base -> person -> string -> Adef.safe_string

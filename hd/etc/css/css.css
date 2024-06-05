@@ -1634,6 +1634,22 @@ span.notesourcecolor {
     max-width: 40%;
 }
 
+.in { 
+  background-color: coral;
+}
+
+.list_comma li {
+  display: inline;
+}
+
+.list_comma li:not(:last-child):after { 
+  content: ", ";
+}
+
+.list_comma li:last-child:after {
+  content: ".";
+}
+
 /* surname by branch m=N */
 #surname_by_branch {
     white-space: nowrap;
