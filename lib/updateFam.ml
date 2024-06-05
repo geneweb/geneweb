@@ -201,7 +201,7 @@ and eval_event_str conf base env =
           | Some d -> DateDisplay.string_of_date conf d
           | None -> Adef.safe ""
         in
-        let place = Util.string_of_place e.efam_place in
+        let place = Util.trimmed_string_of_place e.efam_place in
         let note = Util.safe_html e.efam_note in
         let src = Util.safe_html e.efam_src in
         let wit =

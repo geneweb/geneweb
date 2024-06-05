@@ -287,6 +287,7 @@ val open_etc_file : string -> (in_channel * string) option
     Returns input channel and the path to given template. *)
 
 val string_of_place : string -> Adef.escaped_string
+val trimmed_string_of_place : string -> Adef.escaped_string
 val raw_string_of_place : string -> string
 val allowed_tags_file : string ref
 

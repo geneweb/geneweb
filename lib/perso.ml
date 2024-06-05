@@ -988,7 +988,7 @@ let build_list_eclair conf base v p =
   (* d'évènements et le nombre d'iper unique correspond au nombre d'individu. *)
   let add_surname p surn pl d =
     if not (Gwdb.is_empty_string pl) then
-      let pl = Util.string_of_place (Gwdb.sou base pl) in
+      let pl = Util.trimmed_string_of_place (Gwdb.sou base pl) in
       let r =
         try Hashtbl.find ht (surn, pl)
         with Not_found ->
@@ -1657,14 +1657,14 @@ and eval_simple_str_var conf base env (_, p_auth) = function
       | Vfam (_, fam, _, m_auth) when mode_local env ->
           if m_auth then
             Gwdb.get_marriage_place fam
-            |> Gwdb.sou base |> Util.string_of_place |> safe_val
+            |> Gwdb.sou base |> Util.trimmed_string_of_place |> safe_val
           else null_val
       | _ -> (
           match get_env "fam_link" env with
           | Vfam (_, fam, _, m_auth) ->
               if m_auth then
                 Gwdb.get_marriage_place fam
-                |> Gwdb.sou base |> Util.string_of_place |> safe_val
+                |> Gwdb.sou base |> Util.trimmed_string_of_place |> safe_val
               else null_val
           | _ -> raise Not_found))
   | "marriage_note" -> (
@@ -2287,7 +2287,7 @@ and eval_anc_by_surnl_field_var conf base env ep info =
           | Some d -> eval_date_field_var conf d sl
           | None -> null_val)
       | [ "nb_times" ] -> str_val (string_of_int (List.length sosa_list))
-      | [ "place" ] -> safe_val (Util.string_of_place place)
+      | [ "place" ] -> safe_val (Util.trimmed_string_of_place place)
       | [ "sosa_access" ] ->
           let str, _ =
             List.fold_right
@@ -2658,7 +2658,7 @@ and eval_str_event_field conf base (p, p_auth) event_item = function
   | "place" ->
       if p_auth then
         Gwdb.sou base (Event.get_place event_item)
-        |> Util.string_of_place |> safe_val
+        |> Util.trimmed_string_of_place |> safe_val
       else null_val
   | "note" ->
       Event.get_note event_item
@@ -3081,7 +3081,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "bname_prefix" -> Util.commd conf |> safe_val
   | "birth_place" ->
       if p_auth then
-        Gwdb.get_birth_place p |> Gwdb.sou base |> Util.string_of_place
+        Gwdb.get_birth_place p |> Gwdb.sou base |> Util.trimmed_string_of_place
         |> safe_val
       else null_val
   | "birth_note" ->
@@ -3091,8 +3091,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       Gwdb.get_birth_src p |> get_note_source conf base ~p p_auth false
   | "baptism_place" ->
       if p_auth then
-        Gwdb.get_baptism_place p |> Gwdb.sou base |> Util.string_of_place
-        |> safe_val
+        Gwdb.get_baptism_place p |> Gwdb.sou base
+        |> Util.trimmed_string_of_place |> safe_val
       else null_val
   | "baptism_note" ->
       Gwdb.get_baptism_note p
@@ -3101,7 +3101,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       Gwdb.get_baptism_src p |> get_note_source conf base ~p p_auth false
   | "burial_place" ->
       if p_auth then
-        Gwdb.get_burial_place p |> Gwdb.sou base |> Util.string_of_place
+        Gwdb.get_burial_place p |> Gwdb.sou base |> Util.trimmed_string_of_place
         |> safe_val
       else null_val
   | "burial_note" ->
@@ -3142,7 +3142,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "cremation_place" ->
       if p_auth then
-        Gwdb.get_burial_place p |> Gwdb.sou base |> Util.string_of_place
+        Gwdb.get_burial_place p |> Gwdb.sou base |> Util.trimmed_string_of_place
         |> safe_val
       else null_val
   | "dates" ->
@@ -3160,7 +3160,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       else null_val
   | "death_place" ->
       if p_auth then
-        Gwdb.get_death_place p |> Gwdb.sou base |> Util.string_of_place
+        Gwdb.get_death_place p |> Gwdb.sou base |> Util.trimmed_string_of_place
         |> safe_val
       else null_val
   | "death_note" ->

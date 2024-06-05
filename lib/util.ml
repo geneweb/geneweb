@@ -1485,6 +1485,19 @@ let raw_string_of_place place =
   List.fold_left (fun s c -> Name.strip_c s c) place [ '['; ']' ]
 
 let string_of_place place = raw_string_of_place place |> escape_html
+
+let trimmed_string_of_place place =
+  let field_separator = ',' in
+  let trim field =
+    let field = String.trim field in
+    Ext_option.return_if (field <> "") @@ fun () -> field
+  in
+  place |> raw_string_of_place
+  |> String.split_on_char field_separator
+  |> List.filter_map trim
+  |> String.concat (Printf.sprintf "%c " field_separator)
+  |> escape_html
+
 let menu_threshold = 20
 let is_number t = match t.[0] with '1' .. '9' -> true | _ -> false
 
@@ -1731,10 +1744,12 @@ let get_approx_date_place d1 (p1 : Adef.safe_string) d2 (p2 : Adef.safe_string)
 
 let get_approx_birth_date_place base p =
   let birth = Date.od_of_cdate (Gwdb.get_birth p) in
-  let birth_place = string_of_place (Gwdb.sou base (Gwdb.get_birth_place p)) in
+  let birth_place =
+    trimmed_string_of_place (Gwdb.sou base (Gwdb.get_birth_place p))
+  in
   let baptism = Date.od_of_cdate (Gwdb.get_baptism p) in
   let baptism_place =
-    string_of_place (Gwdb.sou base (Gwdb.get_baptism_place p))
+    trimmed_string_of_place (Gwdb.sou base (Gwdb.get_baptism_place p))
   in
   get_approx_date_place birth
     (birth_place :> Adef.safe_string)
@@ -1743,13 +1758,17 @@ let get_approx_birth_date_place base p =
 
 let get_approx_death_date_place base p =
   let death = Date.date_of_death (Gwdb.get_death p) in
-  let death_place = string_of_place (Gwdb.sou base (Gwdb.get_death_place p)) in
+  let death_place =
+    trimmed_string_of_place (Gwdb.sou base (Gwdb.get_death_place p))
+  in
   let buri =
     match Gwdb.get_burial p with
     | Def.Buried cd | Def.Cremated cd -> Date.od_of_cdate cd
     | Def.UnknownBurial -> None
   in
-  let buri_place = string_of_place (Gwdb.sou base (Gwdb.get_burial_place p)) in
+  let buri_place =
+    trimmed_string_of_place (Gwdb.sou base (Gwdb.get_burial_place p))
+  in
   get_approx_date_place death
     (death_place :> Adef.safe_string)
     buri
