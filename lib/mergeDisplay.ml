@@ -18,21 +18,22 @@ let print conf base p =
       list []
   in
   let title _ =
-    Output.print_sstring conf 
+    Output.print_sstring conf
       (Utf8.capitalize_fst (transl_decline conf "merge" ""))
   in
   Hutil.header conf title;
-  Output.print_sstring conf 
-    (Format.sprintf {|<h2>
+  Output.print_sstring conf
+    (Format.sprintf
+       {|<h2>
 %s%s %s %s%s
 </h2>
 <form method="get" action="%s" class="mx-3 mb-3">|}
-      (p_first_name base p)
-      (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
-      (p_surname base p)
-      (transl_decline conf "with" "")
-      (transl conf ":")
-      (conf.command :> string));
+       (p_first_name base p)
+       (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
+       (p_surname base p)
+       (transl_decline conf "with" "")
+       (transl conf ":")
+       (conf.command :> string));
   Util.hidden_env conf;
   Util.hidden_input conf "m" (Adef.encoded "MRG_IND");
   Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);

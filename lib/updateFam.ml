@@ -510,16 +510,14 @@ let print_del1 conf base ifam =
   Output.print_string conf
     (Util.escape_html (p_first_name base (poi base ifath)));
   Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base ifath)));
-  Output.print_string conf
-    (Util.escape_html (p_surname base (poi base ifath)));
+  Output.print_string conf (Util.escape_html (p_surname base (poi base ifath)));
   Output.print_sstring conf " ";
   Output.print_sstring conf (transl conf "and");
   Output.print_sstring conf " ";
   Output.print_string conf
     (Util.escape_html (p_first_name base (poi base imoth)));
   Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base imoth)));
-  Output.print_string conf
-    (Util.escape_html (p_surname base (poi base imoth)));
+  Output.print_string conf (Util.escape_html (p_surname base (poi base imoth)));
   Output.print_sstring conf {|</h2><form method="post" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|"><p>|};
