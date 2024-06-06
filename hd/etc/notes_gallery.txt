@@ -76,6 +76,10 @@ $(document).ready(function() {
       var href = "";
       var txt = get(r.alt);
       if( txt == "") { txt = cnt }
+      
+      if(get(r.group) != 0)
+        { group = " class='group" + get(r.group) + "' data-maphilight='{\"groupBy\":\".group" + get(r.group) + "\"}'"; }
+      else { group = ""; }
 
       if( get(r.t) == "" || r.t == "p" ) {
         var oc = get(r.oc);
@@ -108,7 +112,7 @@ $(document).ready(function() {
         $("#div_legend").removeClass( "d-none" )
       }
       if( href != "" ) { href = " href='"+ href + "'"; }
-      $("#map").append( "<area id='area" + cnt + "' shape='" + get(r.shape) + "' coords='" + get(r.coords) + "' alt='" + txt + "' title='" + txt + "'" + href + ">" );
+      $("#map").append( "<area id='area" + cnt + "' shape='" + get(r.shape) + "' coords='" + get(r.coords) + "' alt='" + txt + "' title='" + txt + "'" + href  + group + ">" );
 
       cnt++;
     });
