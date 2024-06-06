@@ -1,4 +1,4 @@
-<!-- $Id: notes_upd_gallery.txt v7.1 06/06/2024 05:50:55 $ -->
+<!-- $Id: notes_upd_gallery.txt v7.1 06/06/2024 08:50:55 $ -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -81,9 +81,6 @@
       <label for="fname" class="col-form-label col-sm-2">[*file]</label>
       <div class="d-flex col-sm-9 px-0">
         <input id="fname" type="text" class="form-control flex-fill">
-        %if(bvar.face_detection = "on")
-        <button id="face_detection" class="btn btn-primary ml-2 text-nowrap " disabled>Détection visages</button>
-        %end;
       </div>
     </div>
   </div>
@@ -92,6 +89,7 @@
       <map id="map" name="map"></map>
       <img id="image" class="img-fluid" usemap="#map">
       <div id="selection" class="m-0 p-0"></div>
+      <div id="groups" class="m-0 p-0"></div>
     </div>
     <ul id="div_legend" class="list_comma list-unstyled pl-0"></ul>
     <div class="table-responsive-md">
@@ -101,6 +99,7 @@
           <th>[*first name/first names]0</th>
           <th>[*surname/surnames]0</th>
           <th>#</th>
+          <th>[*group/groups]0</th>
           <th>[*note/notes]0</th>
           <th>URL</th>
           <th>[*comment]</th>
@@ -109,14 +108,26 @@
       </table>
     </div>
   </div>
+  <div class="table-responsive-md">
+    <table id="grp_table" class="table table-sm">
+      <thead><tr>
+        <th>[*group/groups]0</th>
+        <th>[*group label]</th>
+        <th><i class="fa fa-trash-alt"></i></th>
+        </tr></thead>
+      </table>
+  </div>
+
   %hidden;
   <input type="hidden" name="m" value="MOD_NOTES_OK">
   <input type="hidden" name="f" value="%e.f;">
+  <input type="hidden" name="skip_ok" value="on">
   <input id="digest" type="hidden" name="digest">
   <input id="notes" type="hidden" name="notes">
   <div class="ml-4">
     <button type="submit" form="form" class="btn btn-primary" title="[*validate/delete]0">OK</button>
     <a class="btn btn-outline-primary" href="%url_set.notmpl.on;">[*modify] [note/notes]0</a>
+    <a class="btn btn-outline-primary" onClick="add_new_group()">[*add new group]</a>
   </div>
 </form>
 
@@ -136,6 +147,7 @@
   <script src="%etc_prefix;js/datatables.min.js?version=2.0.8"></script>
 %end;
 <script src="%etc_prefix;js/jquery.maphilight.js"></script>
+
 <script>
 function get( v ) {
   if( typeof v !== "undefined" ) {
@@ -148,6 +160,7 @@ function get( v ) {
 var doc_path = "%prefix;m=DOC&s=";
 var public_path = "%b.gallery_path;";
 var private_path = "%b.gallery_path_private;";
+var mouseIsNotOverLegend = true;
 
 var table;
 
@@ -166,10 +179,11 @@ $(document).mousedown( function() {
 });
 
 var global_cnt = 0;
+var global_grp = 0;
+
 function add_new_row( x1, y1, x2, y2 ) {
   if( x2-x1 > 5 && y2-y1 > 5 ) {
     var cnt = ++global_cnt;
-
     var coords = "" + x1 + "," + y1 + "," + x2 + "," + y2;
     var new_row = table.row.add( {
       "shape": "rect",
@@ -179,6 +193,25 @@ function add_new_row( x1, y1, x2, y2 ) {
     $("#div_legend").append( "<li class='legend' id='a" + cnt + "'><span>" + cnt + "</span></li>" );
     new_row.node().id = "row" + cnt;
   }
+}
+
+function g_row ( name, label) {
+  var str = "<tr><td>" + 
+    "<input class='form-control update' type='number' value='" + name + 
+    "' min='0' step='1'></td><td>" +
+    "<input class='form-control update' type='text' value='" + label +
+    "'</td><td><i class=\"fa fa-trash-alt\"></i></td></tr>";
+  return str;
+}
+
+function add_new_group() {
+    var grp = ++global_grp;
+    var new_row = table_grp.row.add( {
+      "name": "",
+      "label": ""
+    }).draw(false);
+    //$("#grp_table").append(g_row( "", ""));
+    new_row.node().id = "g_row" + grp;
 }
 
 $(document).ready(function() {
@@ -204,6 +237,63 @@ $(document).ready(function() {
    }
    $("#image").maphilight();
   });
+
+  table_grp = $('#grp_table').DataTable( {
+    "ajax": {
+      "url": "%url;&ajax=on",
+      "dataSrc": "r.groups"
+    },
+    "deferRender": true,
+    "columns": %[
+      {
+        "data": "name",
+        "defaultContent": "",
+        "render": function ( data, type, row, meta ) {
+          var disabled = "";
+          return "<input class='form-control update' type='number' value='" + get(data) + "' min='0' step='1'" + disabled + ">";
+        }
+      },
+      {
+        "data": "label",
+        "defaultContent": "",
+        "render": function ( data, type, row, meta ) {
+          var disabled = "";
+          return "<input class='form-control update' type='text' value='" + get(data) + "'" + disabled + ">";
+        }
+      },
+      { "data": null, "defaultContent": '<a class="fa fa-trash-alt text-danger remove" title="[*delete]"></a>' }
+      %],
+      "rowCallback": function( row, r ) {
+        var grp = row.id.replace(/[a-z]/g, "");
+        var group = get(r.name);
+        var label = get(r.label);
+        $("#g"+grp).html( "<span>" + grp + " : " + label + "</span>" );
+      },
+      "paging": false,
+      "ordering": false,
+      "searching": false,
+      "info": false,
+      "scrollY": "25vh",
+      "scrollCollapse": true,
+      "initComplete": function( settings, json) {
+        json = json.r;
+
+        // Init group legend from JSON
+        json.groups.forEach( function( r ) {
+          var grp = ++global_grp;
+          var name = get(r.name);
+          var labl = get(r.label);
+          //$("#grp_table").append(g_row(name, labl));
+          table_grp.row(grp-1).node().id = "g" + grp;
+        } );
+
+       json.groups.forEach( function( r ) {
+          var grp = get(r.name);
+          var labl = get(r.label);
+          $("#group_labels").append(grp + " : " +labl + "\n");
+       });
+    }
+  } );
 
   table = $('#map_table').DataTable( {
      "ajax": {
@@ -259,6 +349,15 @@ $(document).ready(function() {
            var disabled = "";
            if( get(row.t) != "" && row.t != "p" ) { disabled = " disabled"; }
            return "<input class='form-control update' type='number' value='" + get(data) + "' min='0' max='200' step='1'" + disabled + ">";
+         }
+       },
+       {
+         "data": "group",
+         "defaultContent": "",
+         "render": function ( data, type, row, meta ) {
+           var disabled = "";
+           if( get(row.t) != "" && row.t != "p" ) { disabled = " disabled"; }
+           return "<input class='form-control update' type='number' value='" + get(data) + "' min='0' step='1'" + disabled + ">";
          }
        },
        {
@@ -364,8 +463,11 @@ $(document).ready(function() {
        json.map.forEach( function( r ) {
          var cnt = ++global_cnt;
 
-         $("#map").append( "<area id='area" + cnt + "' shape='" + get(r.shape) + "' coords='" + get(r.coords) +
-            "' alt='" + cnt + "' title='" + cnt + "'>" );
+         if(get(r.group) != 0)
+            { group = " class='group" + get(r.group) + "' data-maphilight='{\"groupBy\":\".group" + get(r.group) + "\"}'"; }
+         else { group = ""; }
+
+         $("#map").append( "<area id='area" + cnt + "' shape='" + get(r.shape) + "' coords='" + get(r.coords) + "' alt='" + cnt + "' title='" + cnt + "'" + group + ">" );
          if( get(r.fn) != "" && get(r.sn) != "" ) {
            var oc = get(r.oc);
            if( oc != "" && oc != 0 ) { oc = "&oc=" + oc; } else { oc = "" ; }
@@ -383,6 +485,16 @@ $(document).ready(function() {
     }
   } );
 
+  $(document).on( "mouseover", "grp_table", function(e) {
+    var n = $(this).attr("id").replace(/[a-z]/g, "");
+    $( "#g" + n ).mouseover();
+    $( "#g" + n ).addClass( "in" );
+  });
+  $(document).on( "mouseout", "grp_table", function(e) {
+    var n = $(this).attr("id").replace(/[a-z]/g, "");
+    $( "#g" + n ).mouseout();
+    $( "#g" + n ).removeClass( "in" );
+  });
   $(document).on( "mouseover", ".legend", function(e) {
     var n = $(this).attr("id").replace(/[a-z]/g, "");
     $( "#area" + n ).mouseover();
@@ -505,7 +617,8 @@ $(document).ready(function() {
       "desc": $("#page_desc").val(),
       "path": $("input[name=path]:checked").val(),
       "img": $("#fname").val(),
-      "map": table.rows().data().toArray()
+      "map": table.rows().data().toArray(),
+      "groups": table_grp.rows().data().toArray()
     };
     // Cleanup data before to save
     for( i=0, ien=res.map.length ; i < ien ; i++ ) {
