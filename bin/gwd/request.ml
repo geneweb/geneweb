@@ -128,13 +128,13 @@ let incorrect_request ?(comment = "") conf =
 let person_selected conf base p =
   match p_getenv conf.senv "em" with
     Some "R" -> relation_print conf base p
-  | Some _ -> incorrect_request conf ~comment:"error #9"
+  | Some _ -> incorrect_request conf ~comment:"incorrect em= value"
   | None -> record_visited conf (get_iper p); Perso.print conf base p
 
 let person_selected_with_redirect conf base p =
   match p_getenv conf.senv "em" with
   | Some "R" -> relation_print conf base p
-  | Some _ -> incorrect_request conf ~comment:"error #8"
+  | Some _ -> incorrect_request conf ~comment:"Incorrect em= value"
   | None ->
     Wserver.http_redirect_temporarily
       (commd conf ^^^ Util.acces conf base p :> string)
@@ -176,7 +176,7 @@ let very_unknown conf _ =
       Hutil.rheader conf title;
       Hutil.print_link_to_welcome conf false;
       Hutil.trailer conf
-    | None -> Hutil.incorrect_request conf ~comment:"error #1"
+    | None -> Hutil.incorrect_request conf ~comment:"Missing p=, n= and i="
 
 (* Print Not found page *)
 let unknown conf n =
@@ -287,7 +287,8 @@ let make_senv conf base =
     let ip =
       match person_of_key base vp vn voc with
       | Some ip -> ip
-      | None -> Hutil.incorrect_request conf ~comment:"error #2"; raise Exit
+      | None -> Hutil.incorrect_request conf
+          ~comment:"Incorrect em=, ei=, ep=, en=, eoc= configuration"; raise Exit
     in
     let vi = string_of_iper ip in
     set_senv conf (Mutil.encode vm) (Mutil.encode vi)
@@ -431,7 +432,7 @@ let treat_request =
                   let f = Filename.chop_suffix f ".txt" in
                   SrcfileDisplay.print_source conf base f
                 else print conf f
-          | _ -> incorrect_request conf ~comment:"error #3" base
+          | _ -> incorrect_request conf ~comment:"Missing s= for m=DOC" base
         in
         match m with
         | "" ->
@@ -459,7 +460,6 @@ let treat_request =
                   Perso.interp_templ t conf base p
                 | _ -> person_selected conf base p
             end
-
         | "A" ->
           AscendDisplay.print |> w_person |> w_base
         | "ADD_FAM" ->
@@ -526,14 +526,12 @@ let treat_request =
           w_wizard @@ w_base @@ UpdateFam.print_del
         | "DEL_FAM_OK" ->
           w_wizard @@ w_lock @@ w_base @@ UpdateFamOk.print_del
-
         | "DEL_IMAGE" ->
           w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_del
         | "DEL_IMAGE_OK" ->
           w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_del_ok
         | "DEL_IMAGE_C_OK" ->
           w_wizard @@ w_lock @@ w_base @@ ImageCarrousel.print_main_c
-
         | "DEL_IND" ->
           w_wizard @@ w_base @@ UpdateInd.print_del
         | "DEL_IND_OK" ->
@@ -550,7 +548,7 @@ let treat_request =
           w_wizard @@ w_base @@ fun conf base ->
             ( match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print conf base f
-            | None -> incorrect_request conf base ~comment:"error #4")
+            | None -> incorrect_request conf base ~comment:"Missing v= for m=H")
         | "HIST" ->
           w_base @@ History.print
         | "HIST_CLEAN" ->
@@ -561,13 +559,10 @@ let treat_request =
           w_base @@ HistoryDiffDisplay.print
         | "HIST_SEARCH" ->
           w_base @@ History.print_search
-
         | "IM_C" ->
           w_base @@ ImageCarrousel.print_c ~saved:false
         | "IM_C_S" ->
           w_base @@ ImageCarrousel.print_c ~saved:true
-
-
         | "IM" ->
           w_base @@ ImageDisplay.print
         | "IMH" ->
@@ -684,7 +679,8 @@ let treat_request =
                     Some.search_first_name_print conf base fn
                   | None, Some sn ->
                     Some.search_surname_print conf base unknown sn
-                  | None, None -> incorrect_request conf base ~comment:"error #5"
+                  | None, None -> incorrect_request conf base
+                    ~comment:"Missing fn= and sn= for m=NG"
               end
             | Some i ->
               relation_print conf base
@@ -701,8 +697,6 @@ let treat_request =
             | Some v -> Some.search_first_name_print conf base v
             | None -> AllnDisplay.print_first_names conf base
           end
-
-
         | "PERSO" ->
           w_base @@ w_person @@ Geneweb.Perso.interp_templ "perso"
 
@@ -746,7 +740,7 @@ let treat_request =
         | "SRC" ->
           w_base @@ fun conf base -> begin match p_getenv conf.env "v" with
             | Some f -> SrcfileDisplay.print_source conf base f
-            | _ -> incorrect_request conf base ~comment:"error #6"
+            | _ -> incorrect_request conf base ~comment:"Missing v= for m=SRC"
           end
         | "STAT" ->
           w_base @@ fun conf _ -> BirthDeathDisplay.print_statistics conf
@@ -761,7 +755,7 @@ let treat_request =
               | _ -> Perso.interp_templ ("tp0_" ^ f) conf base
                        (Gwdb.empty_person base Gwdb.dummy_iper)
               end
-            | None -> incorrect_request conf base ~comment:"error #7"
+            | None -> incorrect_request conf base ~comment:"Missing v= for m=TP"
             end
         | "TT" ->
           w_base @@ TitleDisplay.print
@@ -775,7 +769,8 @@ let treat_request =
           w_base @@ WiznotesDisplay.print_search
         | _ ->
             w_base @@ fun conf base ->
-            incorrect_request conf base ~comment:"error #10"
+            let str = Format.sprintf "m=%s is not available here" m in
+            incorrect_request conf base ~comment:str
       end conf bfile ;
   end else begin
     let title _ =
