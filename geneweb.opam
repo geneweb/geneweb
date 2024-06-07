@@ -23,6 +23,7 @@ depends: [
   "markup"
   "num"
   "ocaml" {>= "4.08"}
+  "ocamlformat" {dev & = "0.24.1"}
   "ounit"
   "ppx_blob"
   "ppx_deriving"
