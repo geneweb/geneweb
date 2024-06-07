@@ -482,7 +482,7 @@ and eval_simple_variable conf = function
   | "nn" -> ""
   | "plugins" ->
       let l = List.map Filename.basename conf.plugins in
-      String.concat "," l
+      String.concat ", " l
   | "bname" -> conf.bname
   | "token" -> conf.cgi_passwd
   | "bname_token" -> String.concat "_" [ conf.bname; conf.cgi_passwd ]
@@ -763,7 +763,13 @@ let templ_eval_var conf = function
   | [ "friend" ] -> VVbool conf.friend
   | [ "manitou" ] -> VVbool conf.manitou
   | [ "plugin"; plugin ] ->
-      VVbool (List.mem plugin (List.map Filename.basename conf.plugins))
+      let plugins =
+        try
+          List.assoc "plugins" conf.base_env
+          |> String.split_on_char ',' |> List.map String.trim
+        with Not_found -> []
+      in
+      VVbool (List.mem plugin plugins)
   | [ "supervisor" ] -> VVbool conf.supervisor
   | [ "true" ] -> VVbool true
   | [ "wizard" ] -> VVbool conf.wizard
