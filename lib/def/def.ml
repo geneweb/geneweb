@@ -72,6 +72,7 @@ type relation_kind =
 type divorce =
   | NotDivorced
   | Divorced of cdate
+  | Separated_old
   | NotSeparated
   | Separated of cdate
 

@@ -262,6 +262,7 @@ let string_of_divorce conf divorce =
   | Divorced cod -> transl conf "divorced" ^<^ " " ^<^ string_of_cdate conf cod
   | Separated cod ->
       transl conf "separated" ^<^ " " ^<^ string_of_cdate conf cod
+  | Separated_old -> transl conf "separated" |> Adef.safe
   | NotDivorced -> "" |> Adef.safe
   | NotSeparated -> "" |> Adef.safe
 

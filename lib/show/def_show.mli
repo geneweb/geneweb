@@ -80,6 +80,7 @@ val show_relation_kind : relation_kind -> string
 type divorce = Def.divorce =
   | NotDivorced
   | Divorced of cdate
+  | Separated_old
   | NotSeparated
   | Separated of cdate
 

@@ -816,6 +816,19 @@ let update_fevents_with_family gen fam =
         in
         Some evt
     | NotSeparated -> None
+    | Separated_old ->
+        let evt =
+          {
+            efam_name = Efam_Separated;
+            efam_date = Date.cdate_None;
+            efam_place = unique_string gen "";
+            efam_reason = unique_string gen "";
+            efam_note = unique_string gen "";
+            efam_src = unique_string gen "";
+            efam_witnesses = [||];
+          }
+        in
+        Some evt
     | Separated cd ->
         let evt =
           {

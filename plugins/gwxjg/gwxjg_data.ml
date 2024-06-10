@@ -114,6 +114,8 @@ let rec mk_family (conf : Config.config) base
         find_event conf base (Event.Fevent Def.Efam_Divorce) events'
     | Def.Separated _ ->
         find_event conf base (Event.Fevent Def.Efam_Separated) events'
+    | Def.Separated_old ->
+        find_event conf base (Event.Fevent Def.Efam_Separated) events'
     | NotDivorced -> Tnull
     | NotSeparated -> Tnull
   in

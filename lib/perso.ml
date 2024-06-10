@@ -1418,7 +1418,9 @@ and eval_simple_bool_var conf base env =
           match get_divorce fam with Divorced _ -> true | _ -> false)
   | "are_separated" ->
       fam_check_aux (fun fam ->
-          match get_separation fam with Separated _ -> true | _ -> false)
+          match get_separation fam with
+          | Separated _ | Separated_old -> true
+          | _ -> false)
   | "are_engaged" -> check_relation (( = ) Engaged)
   | "are_married" ->
       check_relation (function

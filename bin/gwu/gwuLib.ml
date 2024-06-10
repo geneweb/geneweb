@@ -803,6 +803,7 @@ let print_family opts base gen m =
   (if !old_gw then
    match get_separation fam with
    | Separated _ -> Printf.ksprintf (oc opts) " #sep"
+   | Separated_old -> Printf.ksprintf (oc opts) " #sep"
    | _ -> ());
   Printf.ksprintf (oc opts) " ";
   print_parent opts base gen m.m_moth;

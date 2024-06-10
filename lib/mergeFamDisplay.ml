@@ -45,6 +45,7 @@ let need_differences_selection conf base fam1 fam2 =
              match Date.od_of_cdate cod with
              | Some d -> (DateDisplay.string_of_ondate conf d :> string)
              | None -> "separated")
+         | Separated_old -> "separated"
          | _ -> "not separated")
 
 let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
@@ -142,6 +143,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
               transl conf "separated" ^<^ " "
               ^<^ DateDisplay.string_of_ondate conf d
           | None -> transl conf "separated" |> Adef.safe)
+      | Separated_old -> transl conf "separated" |> Adef.safe
       | _ -> transl conf "not divorced" |> Adef.safe);
   Output.print_sstring conf
     {|</p><p><button type="submit" class="btn btn-primary btn-lg">|};
