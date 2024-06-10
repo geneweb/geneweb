@@ -19,9 +19,9 @@ jobs:
           - 4.14.x
         include:
           - os: ubuntu-latest
-            ocaml-version: 4.08.0
+            ocaml-compiler: 4.08.0
           - os: ubuntu-latest
-            ocaml-version: 5.1.x
+            ocaml-compiler: 5.1.x
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
