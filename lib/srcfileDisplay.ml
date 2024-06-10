@@ -452,8 +452,8 @@ let gen_print mode conf base fname =
   in
   match channel with
   | Some ic ->
-      let title _ = Output.print_string conf (Util.escape_html fname) in
-      Hutil.header_with_title ~no_title:true conf title;
+      (* title is supplied in fname.txt file *)
+      Hutil.header_with_title conf (fun _ -> ());
       copy_from_channel conf base ic mode;
       Hutil.trailer conf
   | _ ->

@@ -830,7 +830,7 @@ let print_ok conf wi edit_mode fname title_is_1st s =
     Output.print_sstring conf
       (Utf8.capitalize_fst (Util.transl conf "notes modified"))
   in
-  Hutil.header_no_page_title conf title;
+  Hutil.header conf title;
   Output.print_sstring conf {|<div style="text-align:center"> --- |};
   title ();
   Output.print_sstring conf {| --- </div>|};

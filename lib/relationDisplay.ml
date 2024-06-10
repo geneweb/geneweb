@@ -100,7 +100,7 @@ let print_relation_path conf base ip1 ip2 path ifam excl_faml =
       transl conf "relationship" |> Utf8.capitalize_fst
       |> Output.print_sstring conf
     in
-    Hutil.header_no_page_title conf title;
+    Hutil.header conf title;
     Hutil.trailer conf)
   else
     let next_txt = next_relation_link_txt conf ip1 ip2 (ifam :: excl_faml) in

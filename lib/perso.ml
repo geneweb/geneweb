@@ -5460,7 +5460,6 @@ let print_what_links conf base p =
         Output.print_sstring conf {|</a>|})
     in
     Hutil.header conf title;
-    Hutil.print_link_to_welcome conf true;
     NotesDisplay.print_linked_list conf base pgl;
     Hutil.trailer conf)
   else Hutil.incorrect_request conf
