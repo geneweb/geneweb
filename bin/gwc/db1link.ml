@@ -476,6 +476,10 @@ let insert_undefined state gen key =
       check_error gen);
   (x, ip)
 
+let handle_public_access = function
+  | (Def.Private | Def.IfTitles) as access -> access
+  | Def.Public -> Def.IfTitles
+
 (** Insert person's definition in the base and modifies all coresponding
     fields in [gen] and returns its entry and entry's index in the base.
     In details:
@@ -585,6 +589,9 @@ let insert_person state gen so =
   if not gen.g_errored then (
     let empty_string = unique_string gen "" in
     (* Convert [(_,_,string) gen_person] to [person]. Save all strings in base *)
+    let access =
+      if state.no_public then handle_public_access so.access else so.access
+    in
     let x =
       {
         first_name = empty_string;
@@ -602,7 +609,7 @@ let insert_person state gen so =
         related = [];
         occupation = unique_string gen so.occupation;
         sex = Neuter;
-        access = so.access;
+        access;
         birth = so.birth;
         birth_place = unique_string gen so.birth_place;
         birth_note = unique_string gen so.birth_note;
