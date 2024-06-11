@@ -248,9 +248,11 @@ let print_send_image conf base p =
       Output.print_sstring conf (Format.sprintf ".%d " (get_occ p));
       Output.print_string conf (Util.escape_html (p_surname base p)))
   in
-  let digest = Update.digest_person (UpdateInd.string_person_of base p) in
-  Hutil.header conf title;
-  Output.printf conf
+  let digest = Image.default_portrait_filename base p in
+  Perso.interp_notempl_with_menu title "perso_header" conf base p;
+  Output.print_sstring conf "<h2>\n";
+  title false;
+  Output.print_sstring conf "</h2>\n";  Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
     conf.command;
   Output.print_sstring conf "<p>\n";
