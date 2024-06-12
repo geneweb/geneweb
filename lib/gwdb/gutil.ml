@@ -69,6 +69,9 @@ let person_of_string_key base s =
   in
   loop 0
 
+let split_key s =
+  Option.map (fun (i, fn, occ, sn) -> (fn, occ, sn)) (split_key s 0)
+
 let rsplit_key s =
   let rec loop i =
     if i = 0 then None
