@@ -20,10 +20,12 @@
   (description "GeneWeb is an open source genealogy software written in OCaml. It comes with a Web interface and can be used off-line or as a Web service.")
   (tags (genealogy))
   (depends
+    (alcotest :with-test)
     benchmark
     (camlp5 (= "8.02.01"))
     camlp-streams
     cppo
+    (fmt :with-test)
     jingoo
     markup
     num

@@ -1,5 +1,5 @@
+open Alcotest
 open Geneweb
-open OUnit2
 open Def
 
 let empty_string = 0
@@ -15,7 +15,7 @@ let person i =
 let family i = { (Mutil.empty_family empty_string) with fam_index = i }
 let iper (i : int) : Gwdb.iper = Obj.magic i
 
-let test_is_ancestor =
+let test_is_ancestor () =
   let child = person 0 in
   let father = person 1 in
   let mother = person 2 in
@@ -35,15 +35,21 @@ let test_is_ancestor =
       strings,
       base_notes )
   in
-  let base = Gwdb.make "" [] data in
+  let base = Gwdb.make "is_ancestor_base" [] data in
   let child = Gwdb.poi base (iper 0) in
   let father = Gwdb.poi base (iper 1) in
   let mother = Gwdb.poi base (iper 2) in
-  let test exp p1 p2 _ = assert_equal exp (MergeInd.is_ancestor base p1 p2) in
-  [
-    "is_ancetor child father" >:: test false child father;
-    "is_ancetor father child" >:: test true father child;
-    "is_ancetor mother child" >:: test true mother child;
-  ]
+  (check bool) "is_ancestor child father" false
+    (MergeInd.is_ancestor base child father);
+  (check bool) "is_ancestor father child" true
+    (MergeInd.is_ancestor base father child);
+  (check bool) "is_ancestor mother child" true
+    (MergeInd.is_ancestor base mother child);
+  Gwdb.close_base base;
+  ()
 
-let suite = [ "MergeInd.is_ancestor" >::: test_is_ancestor ]
+let v =
+  [
+    ( "mergeind-ancestor",
+      [ test_case "MergeInd.is_ancestor" `Quick test_is_ancestor ] );
+  ]
