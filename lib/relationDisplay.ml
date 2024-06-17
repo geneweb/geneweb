@@ -1022,14 +1022,15 @@ let print_multi_relation conf base pl lim assoc_txt =
   if path = [] then print_no_relationship conf base pl
   else
     let elem_txt p =
-      DagDisplay.Item
-        ( p,
-          try
-            "<b>("
-            ^<^ (get_iper p |> Hashtbl.find assoc_txt |> Util.escape_html
-                  :> Adef.safe_string)
-            ^>^ ")</b>"
-          with Not_found -> Adef.safe "" )
+      let content =
+        try
+          let txt = Hashtbl.find assoc_txt (get_iper p) in
+          if txt <> "" then
+            "<b>(" ^<^ (Util.escape_html txt :> Adef.safe_string) ^>^ ")</b>"
+          else Adef.safe ""
+        with Not_found -> Adef.safe ""
+      in
+      DagDisplay.Item (p, content)
     in
     let vbar_txt _ = Adef.escaped "" in
     let next_txt = multi_relation_next_txt conf pl2 lim assoc_txt in

@@ -74,7 +74,7 @@
       <span class="invisible"><i class="fa fa-chevron-up fa-fw"></i></span>
     %end;
   </div>
-  <div class="d-flex col-3 ml-5">
+  <div class="d-flex col-5 ml-5">
     <a href="%if;(e_im=1)%url_set.im.0;%else;%url_set.im;%end;"
       %if;(e.dag="on") class="disabled"%end;
       title="%if;(e_im=1)[*visualize/show/hide/summary]2%else;
@@ -94,5 +94,7 @@
     %end;
     <a class="ml-2" href="%if;(e.dag!="on")%url_set.dag.on;%else;%url_set.dag;%end;" target="_blank"><i class="fa fa-shuffle fa-fw" title="[*dag]"></i></a>
     <a class="ml-2" href="%url_set.cgl.on;" target="_blank"><i class="fa fa-link-slash fa-fw" title="[*cancel GeneWeb links]"></i></a>
+    <a class="ml-4" title="[*add/clear/show/edit the graph]3" href="%apply;url_set%with;m/v%and;TP/upd%e.m;%end;">
+      <i class="far fa-pen-to-square fa-lg fa-fw"></i></a>
   </div>
 </div>
