@@ -22,6 +22,7 @@
     <input type="hidden" name="nnn" value="%xxx;">
   %end;
 %end;
+%define;addgraph(xxx)[*add/clear/show/edit the graph:::xxx]0%end;
 %if;(not cancel_links)
   <nav class="navbar sticky-top navbar-light bg-white justify-content-center navbar-expand-md pt-0 px-0%sp;
     %if;("MOD" in e.m or (e.ip!="" and "ADD" in e.m))mt-5%else;mt-1 mt-md-0%end;">
@@ -387,7 +388,7 @@
           %end;
           %( m=R relation dropdown menu %)
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-secondary%if;(e.m="R" or e.m="F" or (e.m="C" and e.t="AN")) active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false" title="[*relationship]"><span class="fa fa-user-group"></span></a>
+            <a id="load_once_rlm_builder" class="nav-link dropdown-toggle text-secondary%if;(e.m="R" or e.m="F" or (e.m="C" and e.t="AN")) active%end;" data-toggle="dropdown" role="button" href="#" aria-haspopup="true" aria-expanded="false" title="[*relationship]"><span class="fa fa-user-group"></span></a>
             <div class="dropdown-menu dropdown-menu-transl">
               <a class="dropdown-item" href="%prefix;%access;&m=R" %laR;><span class="fa fa-gear fa-fw mr-2"></span>[*relationship computing]</a>
               <div class="dropdown-divider"></div>
@@ -402,6 +403,37 @@
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;&m=C&t=AN"><span class="fa fa-cake-candles fa-fw mr-2"></span>[*family birthday]</a>
               %end;
+              <!-- Relationship graph builder -->
+              <div class="dropdown-divider"></div>
+              <span class="dropdown-header pt-0" id="RLM"%if;cgi; data-eb="%e.b;"%end;%if;(b.access_by_key="yes") data-accessbykey="1"%end;
+                data-i="%index;" data-p="%first_name_key;" data-n="%surname_key"%if;(occ!=0) data-oc="%occ;"%end;
+                data-self="%self; %dates_notag;">[*multi relations graph]</span>
+              <div class="form-group px-3 mb-2">
+                <label for="description" class="sr-only">[*description]</label>
+                <input type="text" id="description" class="form-control" placeholder="[*description]" title="&t=…"></input>
+              </div>
+              <div class="btn-group d-flex pr-3" role="group">
+                <button class="dropdown-item flex-grow-1" title="%apply;addgraph%with;%self; %end;" id="saveButton">
+                  <i class="fa fa-plus fa-fw mr-2" aria-hidden="true"></i>
+                  <span>%apply;addgraph("")</span>
+                </button>
+                <button class="dropdown-item col-1 pl-1 d-none" title="[*add/clear/show/edit the graph]1" id="clearGraphButton">
+                  <i class="fa fa-trash-can fa-fw text-danger" aria-hidden="true"></i>
+                  <span class="sr-only">[*add/clear/show/edit the graph]1</span>
+                </button>
+              </div>
+              <div class="d-none" id="graphButtons">
+                <div class="btn-group d-flex pr-3" role="group" aria-label="Relationship graph actions">
+                  <a class="dropdown-item flex-grow-1 align-items-center" id="generateGraphButton">
+                    <i class="fa fa-code-fork fa-rotate-180 fa-fw mr-2" aria-hidden="true"></i>
+                    <span>[*add/clear/show/edit the graph]2</span>
+                  </a>
+                  <a class="dropdown-item col-1 pl-1" title="[*add/clear/show/edit the graph]3" id="editGraphButton">
+                    <i class="far fa-pen-to-square fa-fw" aria-hidden="true"></i>
+                    <span class="sr-only">[*add/clear/show/edit the graph]3"</span>
+                  </a>
+                </div>
+              </div>
             </div>
           </li>
           %( SND_IMAGE_C carrousel button %)
