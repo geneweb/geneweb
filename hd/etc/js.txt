@@ -217,6 +217,14 @@ $.fn.tooltip.Constructor.Default.whiteList['dt'] = [];
 $.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
 </script>
 %end;
+%( RML builder script in menubar %)
+<script>
+  $('#load_once_rlm_builder').one('click', function() {
+    $.getScript('%etc_prefix;js/rlm_builder.js', function() {
+      initializeRLMBuilder();
+    });
+  });
+</script>
 %( Place the cursor at the end an autofocused input %)
 %if;("MOD" in e.m)
 <script>

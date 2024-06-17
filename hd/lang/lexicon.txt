@@ -1857,6 +1857,39 @@ pt: adicionar o nome anterior como apelido alternativo
 sv: lägg till det förra namnet som efternamnsalias
 tr: önceki adı, takma soyadı olarak ekleyin
 
+    add/clear/show/edit the graph
+af: voeg %tby die grafiek/verwyder die grafiek/wys die grafiek/wysig die grafiek
+ar: أضف %tإلى الرسم البياني/مسح الرسم البياني/عرض الرسم البياني/تعديل الرسم البياني
+bg: добави %tкъм графиката/изчисти графиката/покажи графиката/редактирай графиката
+br: ouzhpennañ %td'ar grafik/sileiñ ar grafik/diskouez ar grafik/digentañ ar grafik
+ca: afegir %tal gràfic/esborrar el gràfic/mostrar el gràfic/editar el gràfic
+co: aghjunghje %tau graficu/sbuchjà u graficu/mustrà u graficu/mudificà u graficu
+cs: přidat %tdo grafu/vymazat graf/zobrazit graf/upravit graf
+da: tilføj %ttil grafen/ryd grafen/vis grafen/rediger grafen
+de: hinzufügen %tzum Graphen/den Graphen löschen/den Graphen anzeigen/den Graphen editieren
+en: add %tto the graph/clear the graph/show the graph/edit the graph
+eo: aldoni %tal la grafiko/forigi la grafikon/montri la grafikon/redakti la grafikon
+es: añadir %tal gráfico/borrar el gráfico/mostrar el gráfico/editar el gráfico
+et: lisa %tgraafikusse/kustuta graafik/näita graafikut/muuda graafikut
+fi: lisää %tgraafiin/tyhjennä graafi/näytä graafi/muokkaa graafia
+fr: ajouter %tau graphe/effacer le graphe/afficher le graphe/éditer le graphe
+he: הוסף %tלגרף/נקה את הגרף/הצג את הגרף/ערוך את הגרף
+is: bæta %tvið gröfina/hreinsa gröfina/sýna gröfina/breyta gröfina
+it: aggiungi %tal grafico/pulisci il grafico/mostra il grafico/modifica il grafico
+lt: pridėti %tprie grafiko/išvalyti grafiką/rodyti grafiką/redaguoti grafiką
+lv: pievienot %tgrafikā/iztīrīt grafiku/parādīt grafiku/labot grafiku
+nl: voeg %ttoe aan de grafiek/verwijder de grafiek/laat de grafiek zien/bewerk de grafiek
+no: legg %ttil grafen/tøm grafen/vis grafen/rediger grafen
+oc: apondre %tau grafic/esfaçar lo grafic/afichar lo grafic/editar lo grafic
+pl: dodaj %tdo wykresu/wyczyść wykres/pokaż wykres/edytuj wykres
+pt: adicionar %tao gráfico/limpar o gráfico/mostrar o gráfico/editar o gráfico
+ro: adăuga %tla grafic/șterge graficul/arată graficul/editează graficul
+ru: добавить %tк графику/очистить график/показать график/редактировать график
+sk: pridať %tk grafu/vymazať graf/zobraziť graf/upraviť graf
+sl: dodaj %tv graf/počisti graf/pokaži graf/uredi graf
+sv: lägg till %tpå grafen/rensa grafen/visa grafen/redigera grafen
+tr: grafiğe %tekle/grafiği temizle/grafiği göster/grafiği düzenle
+
     adhesion
 co: adesione
 de: Beitritt
@@ -6925,6 +6958,40 @@ pt: árvore de descendentes
 sv: träd av ättlingar
 tr: nesil ağacı
 
+    description
+af: beskrywing
+ar: وصف
+bg: описание
+br: deskrivadur
+ca: descripció
+co: descrizzione
+cs: popis
+da: beskrivelse
+de: Beschreibung
+en: description
+eo: priskribo
+es: descripción
+et: kirjeldus
+fi: kuvaus
+fr: description
+he: תיאור
+is: lýsing
+it: descrizione
+lt: aprašymas
+lv: apraksts
+nl: beschrijving
+no: beskrivelse
+oc: descripcion
+pl: opis
+pt: descrição
+ro: descriere
+ru: описание
+sk: popis
+sl: opis
+sv: beskrivning
+tr: açıklama
+
+
     died
 af: oorlede
 ar: توفي
@@ -7530,15 +7597,6 @@ co: mudificà e famiglie via un cliccu nant’à a data di matrimoniu di a linea
 de: die Familie bearbeiten durch Klick auf das Hochzeitsdatum einer der beiden Personen
 en: edit the families by clicking on the date of marriage of the row of one spouses
 fr: modifier les familles en cliquant sur la date de mariage sur la ligne d’un conjoint
-
-    edit tree
-co: mudificà u graficu
-de: den Graphen editieren
-en: edit the graph
-fr: éditer le graphe
-pt: editar o gráfico
-sv: redigera trädet
-tr: grafiği düzenle
 
     education
 co: educazione
