@@ -3,9 +3,11 @@ on:
   pull_request:
     branches:
       - master
+      - gnt
   push:
     branches:
       - master
+      - gnt
 jobs:
   build:
     strategy:
