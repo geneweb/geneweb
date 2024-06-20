@@ -192,3 +192,62 @@ let source_note conf base p str =
 
 let source_note_with_env conf base env str =
   wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base env str
+
+(**/**)
+
+let _links_to_ind conf base db key =
+  let l =
+    List.fold_left
+      (fun pgl (pg, (_, il)) ->
+        let record_it =
+          match pg with
+          | Def.NLDB.PgInd ip -> authorized_age conf base (pget conf base ip)
+          | Def.NLDB.PgFam ifam ->
+              authorized_age conf base
+                (pget conf base (get_father @@ foi base ifam))
+          | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ | Def.NLDB.PgWizard _ -> true
+        in
+        if record_it then
+          List.fold_left
+            (fun pgl (k, _) -> if k = key then pg :: pgl else pgl)
+            pgl il
+        else pgl)
+      [] db
+  in
+  List.sort_uniq compare l
+
+type cache_linked_pages_t = (Gwdb.iper, (Def.NLDB.key * Def.NLDB.ind) list) Hashtbl.t
+
+let cache_linked_pages_name = "cache_linked_pages"
+
+let get_linked_pages_fname conf =
+  Filename.concat (base_path [] (conf.bname ^ ".gwb")) cache_linked_pages_name
+
+let read_cache_linked_pages conf =
+  let fname = get_linked_pages_fname conf in
+  match
+    try Some (Secure.open_in_bin fname)
+    with Sys_error _ -> None
+  with
+  | Some ic ->
+      let ht : cache_linked_pages_t = input_value ic in
+      close_in ic;
+      ht
+  | None -> (
+    Printf.eprintf "%s not exist. Run update_nldb\n" fname;
+    let ht : cache_linked_pages_t = Hashtbl.create 10 in
+    ht)
+
+let linked_pages_nbr conf ip =
+  let ht = read_cache_linked_pages conf in
+  let entry = try Some (Hashtbl.find ht ip) with Not_found -> None in
+  match entry with
+  | Some pgl -> List.length pgl
+  | None -> 0
+
+let has_linked_pages conf ip =
+  let ht = read_cache_linked_pages conf in
+  let entry = try Some (Hashtbl.find ht ip) with Not_found -> None in
+  match entry with
+  | Some pgl when List.length pgl <> 0 -> true
+  | _ -> false
