@@ -1,5 +1,3 @@
-(* Copyright (c) 1998-2007 INRIA *)
-
 open Geneweb
 open Def
 open Gwdb
@@ -48,6 +46,14 @@ let read_file_contents fname =
       with End_of_file -> Buff.get !len)
   | None -> ""
 
+type cache_linked_pages_t = (Gwdb.iper, (Def.NLDB.key * Def.NLDB.ind) list) Hashtbl.t
+
+let read_cache_linked_pages conf : cache_linked_pages_t =
+  let ic = open_in_bin conf in
+  let ht : cache_linked_pages_t = input_value ic in
+  close_in ic;
+  ht
+
 let compute base bdir =
   let bdir =
     if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
@@ -55,6 +61,8 @@ let compute base bdir =
   let nb_ind = nb_of_persons base in
   let nb_fam = nb_of_families base in
   let db = ref [] in
+  let cache_linked_pages : cache_linked_pages_t = Hashtbl.create 1024 in
+
   Printf.eprintf "--- database notes\n";
   flush stderr;
   let list = notes_links (base_notes_read base "") in
@@ -145,9 +153,13 @@ let compute base bdir =
           add_string epers_note;
           add_string epers_src)
         (get_pevents p);
+      (* list is: lfname :: list_nt, (key, link) :: list_ind *)
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()
-      | list -> db := NotesLinks.add_in_db !db (NLDB.PgInd (get_iper p)) list)
+      | (_list_nt, list_ind) as list ->
+          db := NotesLinks.add_in_db !db (NLDB.PgInd (get_iper p)) list;
+          let iper = get_iper p in
+          Hashtbl.add cache_linked_pages iper list_ind)
     (Gwdb.persons base);
   ProgrBar.finish ();
   Printf.eprintf "--- families notes\n";
@@ -168,12 +180,19 @@ let compute base bdir =
         (get_fevents fam);
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()
-      | list ->
+      | (_list_nt, _list_ind) as list->
           db := NotesLinks.add_in_db !db (NLDB.PgFam (get_ifam fam)) list;
+          (*
+          let ifam = get_ifam fam in
+          Hashtbl.add cache_linked_pages ifam list_ind; *)
           ProgrBar.run i nb_fam)
     (Gwdb.families base);
   ProgrBar.finish ();
-  write_nldb base !db
+  write_nldb base !db;
+  (* Save the cache_linked_pages to a file *)
+  let oc = open_out_bin (Filename.concat bdir Notes.cache_linked_pages_name) in
+  output_value oc cache_linked_pages;
+  close_out oc
 
 let main () =
   Arg.parse speclist anonfun errmsg;

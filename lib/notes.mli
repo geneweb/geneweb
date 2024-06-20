@@ -59,3 +59,7 @@ val source_note_with_env :
 (** [source_note_with_env conf base env str]
     Interprets wiki syntax in a "source" context with a predefined env.
 *)
+
+val has_linked_pages : Config.config -> Gwdb.iper -> bool
+val linked_pages_nbr : Config.config -> Gwdb.iper -> int
+val cache_linked_pages_name : string
