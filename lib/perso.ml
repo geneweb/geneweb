@@ -2892,18 +2892,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       | _ -> raise Not_found)
   | [ "has_linked_pages" ] -> (
       match get_env "nldb" env with
-      | Vnldb db ->
-          let r =
-            if p_auth then
-              let key =
-                let fn = Name.lower (sou base (get_first_name p)) in
-                let sn = Name.lower (sou base (get_surname p)) in
-                (fn, sn, get_occ p)
-              in
-              links_to_ind conf base db key <> []
-            else false
-          in
-          VVbool r
+      | Vnldb _db ->
+          VVbool (Notes.has_linked_pages conf (get_iper p))
       | _ -> raise Not_found)
   | [ "linked_pages_nbr" ] -> (
       match get_env "nldb" env with
@@ -2942,6 +2932,13 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       match get_env "lev_cnt" env with
       | Vint i -> str_val (string_of_int i)
       | _ -> raise Not_found)
+  | [ "linked_pages_number" ] -> (
+      match get_env "nldb" env with
+      | Vnldb _db ->
+          Notes.linked_pages_nbr conf (get_iper p)
+          |> string_of_int
+          |> str_val
+      | _ -> str_val "0")
   | [ "linked_page"; s ] -> (
       match get_env "nldb" env with
       | Vnldb db ->
