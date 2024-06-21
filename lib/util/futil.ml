@@ -158,8 +158,11 @@ let map_ascend_f ff a =
 let map_union_f ff u = { family = Array.map ff u.family }
 
 let map_divorce fd = function
-  | (NotDivorced | Separated) as x -> x
+  | NotDivorced as x -> x
+  | NotSeparated as x -> x
+  | Separated_old as x -> x
   | Divorced d -> Divorced (map_cdate fd d)
+  | Separated d -> Separated (map_cdate fd d)
 
 let map_family_ps ?(fd = identity) fp ff fs fam =
   {

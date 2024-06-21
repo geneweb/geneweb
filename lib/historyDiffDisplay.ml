@@ -259,9 +259,12 @@ let string_of_marriage conf marriage =
 
 let string_of_divorce conf divorce =
   match divorce with
-  | NotDivorced -> "" |> Adef.safe
   | Divorced cod -> transl conf "divorced" ^<^ " " ^<^ string_of_cdate conf cod
-  | Separated -> transl conf "separated" |> Adef.safe
+  | Separated cod ->
+      transl conf "separated" ^<^ " " ^<^ string_of_cdate conf cod
+  | Separated_old -> transl conf "separated" |> Adef.safe
+  | NotDivorced -> "" |> Adef.safe
+  | NotSeparated -> "" |> Adef.safe
 
 let string_of_event_witness conf base witnesses =
   Array.fold_right

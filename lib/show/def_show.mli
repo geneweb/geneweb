@@ -77,7 +77,12 @@ val pp_relation_kind : Format.formatter -> relation_kind -> unit
 val show_relation_kind : relation_kind -> string
 (** Convert [relation_kind] to string *)
 
-type divorce = Def.divorce = NotDivorced | Divorced of cdate | Separated
+type divorce = Def.divorce =
+  | NotDivorced
+  | Divorced of cdate
+  | Separated_old
+  | NotSeparated
+  | Separated of cdate
 
 val pp_divorce : Format.formatter -> divorce -> unit
 (** Printer for [divorce] *)

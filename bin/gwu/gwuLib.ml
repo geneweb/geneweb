@@ -792,13 +792,19 @@ let print_family opts base gen m =
   print_if_no_empty opts base "#mp" (get_marriage_place fam);
   if opts.source = None then
     print_if_no_empty opts base "#ms" (get_marriage_src fam);
-  (match get_divorce fam with
-  | NotDivorced -> ()
-  | Separated -> Printf.ksprintf (oc opts) " #sep"
-  | Divorced d ->
-      let d = Date.od_of_cdate d in
-      Printf.ksprintf (oc opts) " -";
-      print_date_option opts d);
+  (* divorce and separation are events, but we keep it if old_gw *)
+  (if !old_gw then
+   match get_divorce fam with
+   | Divorced d ->
+       let d = Date.od_of_cdate d in
+       Printf.ksprintf (oc opts) " -";
+       print_date_option opts d
+   | _ -> ());
+  (if !old_gw then
+   match get_separation fam with
+   | Separated _ -> Printf.ksprintf (oc opts) " #sep"
+   | Separated_old -> Printf.ksprintf (oc opts) " #sep"
+   | _ -> ());
   Printf.ksprintf (oc opts) " ";
   print_parent opts base gen m.m_moth;
   Printf.ksprintf (oc opts) "\n";

@@ -2296,6 +2296,7 @@ let treat_fam_fevent gen ifath r =
 let reconstitute_from_fevents gen gay fevents marr witn div =
   let found_marriage = ref false in
   let found_divorce = ref false in
+  let found_separation = ref false in
   (* On veut cette fois ci que ce soit le dernier évènement *)
   (* qui soit mis dans les évènements principaux.           *)
   let rec loop fevents marr witn div =
@@ -2362,10 +2363,10 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
               let div = Divorced evt.efam_date in
               let () = found_divorce := true in loop l marr witn div
         | Efam_Separated ->
-            if !found_divorce then loop l marr witn div
+            if !found_separation then loop l marr witn div
             else
-              let div = Separated in
-              let () = found_divorce := true in loop l marr witn div
+              let div = Separated evt.efam_date in
+              let () = found_separation := true in loop l marr witn div
         | _ -> loop l marr witn div
   in
   let (marr, witn, div) = loop (List.rev fevents) marr witn div in

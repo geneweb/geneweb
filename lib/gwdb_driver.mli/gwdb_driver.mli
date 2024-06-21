@@ -168,6 +168,9 @@ val get_death_src : person -> istr
 val get_divorce : family -> Def.divorce
 (** Get family's divorce status *)
 
+val get_separation : family -> Def.divorce
+(** Get family's separation status *)
+
 val get_family : person -> ifam array
 (** Get array of family's ids to which a person belongs as parent (person's union) *)
 

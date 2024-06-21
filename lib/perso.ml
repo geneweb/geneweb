@@ -1415,9 +1415,12 @@ and eval_simple_bool_var conf base env =
   function
   | "are_divorced" ->
       fam_check_aux (fun fam ->
-          match get_divorce fam with
-          | Divorced _ -> true
-          | NotDivorced | Separated -> false)
+          match get_divorce fam with Divorced _ -> true | _ -> false)
+  | "are_separated" ->
+      fam_check_aux (fun fam ->
+          match get_separation fam with
+          | Separated _ | Separated_old -> true
+          | _ -> false)
   | "are_engaged" -> check_relation (( = ) Engaged)
   | "are_married" ->
       check_relation (function
@@ -1432,7 +1435,6 @@ and eval_simple_bool_var conf base env =
   | "are_marriage_contract" -> check_relation (( = ) MarriageContract)
   | "are_marriage_license" -> check_relation (( = ) MarriageLicense)
   | "are_residence" -> check_relation (( = ) Residence)
-  | "are_separated" -> fam_check_aux (fun fam -> get_divorce fam = Separated)
   | "browsing_with_sosa_ref" -> (
       match get_env "sosa_ref" env with
       | Vsosa_ref v -> v <> None
@@ -1545,10 +1547,58 @@ and eval_simple_str_var conf base env (p, p_auth) = function
       | Vfam (_, fam, _, m_auth) when mode_local env -> (
           match get_divorce fam with
           | Divorced d -> (
+              let d = Date.od_of_cdate d in
+              match d with
+              | Some d when m_auth ->
+                  DateDisplay.string_of_ondate ~link:false conf d |> safe_val
+              | _ -> null_val)
+          | _ -> null_val)
+      | _ -> (
+          match get_env "fam_link" env with
+          | Vfam (_, fam, _, m_auth) -> (
+              match get_divorce fam with
+              | Divorced d -> (
+                  let d = Date.od_of_cdate d in
+                  match d with
+                  | Some d when m_auth ->
+                      DateDisplay.string_of_ondate ~link:false conf d
+                      |> safe_val
+                  | _ -> null_val)
+              | _ -> null_val)
+          | _ -> raise Not_found))
+  | "separation_date" -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) when mode_local env -> (
+          match get_separation fam with
+          | Separated d -> (
+              let d = Date.od_of_cdate d in
+              match d with
+              | Some d when m_auth ->
+                  DateDisplay.string_of_ondate ~link:false conf d |> safe_val
+              | _ -> null_val)
+          | _ -> null_val)
+      | _ -> (
+          match get_env "fam_link" env with
+          | Vfam (_, fam, _, m_auth) -> (
+              match get_separation fam with
+              | Separated d -> (
+                  let d = Date.od_of_cdate d in
+                  match d with
+                  | Some d when m_auth ->
+                      DateDisplay.string_of_ondate ~link:false conf d
+                      |> safe_val
+                  | _ -> null_val)
+              | _ -> null_val)
+          | _ -> raise Not_found))
+  | "on_divorce_date" -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) when mode_local env -> (
+          match get_divorce fam with
+          | Divorced d -> (
               match date_aux conf m_auth d with
               | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
               | x -> x)
-          | NotDivorced | Separated -> raise Not_found)
+          | _ -> null_val)
       | _ -> (
           match get_env "fam_link" env with
           | Vfam (_, fam, _, m_auth) -> (
@@ -1557,7 +1607,26 @@ and eval_simple_str_var conf base env (p, p_auth) = function
                   match date_aux conf m_auth d with
                   | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
                   | x -> x)
-              | NotDivorced | Separated -> raise Not_found)
+              | _ -> null_val)
+          | _ -> raise Not_found))
+  | "on_separation_date" -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) when mode_local env -> (
+          match get_separation fam with
+          | Separated d -> (
+              match date_aux conf m_auth d with
+              | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
+              | x -> x)
+          | _ -> null_val)
+      | _ -> (
+          match get_env "fam_link" env with
+          | Vfam (_, fam, _, m_auth) -> (
+              match get_separation fam with
+              | Separated d -> (
+                  match date_aux conf m_auth d with
+                  | VVstring s when s <> "" -> VVstring ("<em>" ^ s ^ "</em>")
+                  | x -> x)
+              | _ -> null_val)
           | _ -> raise Not_found))
   | "slash_divorce_date" -> (
       match get_env "fam" env with
@@ -1569,7 +1638,19 @@ and eval_simple_str_var conf base env (p, p_auth) = function
               | Some d when m_auth ->
                   DateDisplay.string_slash_of_date conf d |> safe_val
               | _ -> null_val)
-          | NotDivorced | Separated -> raise Not_found)
+          | _ -> null_val)
+      | _ -> raise Not_found)
+  | "slash_separation_date" -> (
+      match get_env "fam" env with
+      | Vfam (_, fam, _, m_auth) -> (
+          match get_separation fam with
+          | Separated d -> (
+              let d = Date.od_of_cdate d in
+              match d with
+              | Some d when m_auth ->
+                  DateDisplay.string_slash_of_date conf d |> safe_val
+              | _ -> null_val)
+          | _ -> null_val)
       | _ -> raise Not_found)
   | "empty_sorted_list" -> (
       match get_env "list" env with
@@ -3141,8 +3222,8 @@ and eval_bool_person_field conf base env (p, p_auth) = function
   | "wedding_birthday" -> (
       match get_env "fam" env with
       | Vfam (_, fam, _, m_auth) -> (
-          match (get_relation fam, get_divorce fam) with
-          | (Married | NoSexesCheckMarried), NotDivorced -> (
+          match (get_relation fam, get_divorce fam, get_separation fam) with
+          | (Married | NoSexesCheckMarried), NotDivorced, NotSeparated -> (
               match (m_auth, Date.cdate_to_dmy_opt (get_marriage fam)) with
               | true, Some d ->
                   let father = pget conf base (get_father fam) in
