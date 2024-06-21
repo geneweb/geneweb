@@ -106,6 +106,10 @@ let dmy_of_dmy2 dmy2 =
 let dmy2_of_dmy dmy =
   { day2 = dmy.day; month2 = dmy.month; year2 = dmy.year; delta2 = dmy.delta }
 
+let year_of_date = function
+  | Dgreg (dmy, _cal) -> Some dmy.year
+  | Dtext _ -> None
+
 let leap_year a = if a mod 100 = 0 then a / 100 mod 4 = 0 else a mod 4 = 0
 
 let nb_days_in_month m a =
@@ -246,8 +250,13 @@ let cdate_of_death = function
   | NotDead | DeadYoung | DeadDontKnowWhen | DontKnowIfDead | OfCourseDead ->
       None
 
+let cdate_of_burial = function
+  | Def.UnknownBurial -> None
+  | Buried cd | Cremated cd -> Some cd
+
 let dmy_of_death death = Option.bind (cdate_of_death death) cdate_to_dmy_opt
 let date_of_death death = Option.bind (cdate_of_death death) od_of_cdate
+let date_of_burial burial = Option.bind (cdate_of_burial burial) od_of_cdate
 
 (* Calendars library wrapper *)
 
