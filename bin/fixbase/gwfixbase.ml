@@ -187,9 +187,10 @@ let speclist =
     ("-person-key", Arg.Set key, " missing doc");
     ( "-index",
       Arg.Set index,
-      " rebuild index. It is automatically enable by any other option." );
+      " rebuild index. It is automatically enabled by any other option." );
     ("-invalid-utf8", Arg.Set invalid_utf8, " missing doc");
   ]
+  |> List.sort compare |> Arg.align
 
 let anonfun i = bname := i
 let usage = "Usage: " ^ Sys.argv.(0) ^ " [OPTION] base"
