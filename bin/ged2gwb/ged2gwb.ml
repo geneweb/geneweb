@@ -3181,7 +3181,7 @@ let out_file = ref "a"
 
 let speclist =
   [ ( "-o", Arg.String (fun s -> out_file := s)
-    , "<file> Output database (default: \"a\")." )
+    , "<file> Output database (default: \"a\"). Alphanumerics and -" )
   ; ( "-f", Arg.Set force
     , " Remove database if already existing" )
   ; ( "-log", Arg.String (fun s -> log_oc := open_out s)
@@ -3280,6 +3280,13 @@ let errmsg = "Usage: ged2gwb [<ged>] [options] where options are:"
 
 let main () =
   Arg.parse speclist anonfun errmsg;
+  if not (Mutil.good_name (Filename.basename !out_file)) then (
+    (* Util.transl conf not available !*)
+    Printf.eprintf "The database name \"%s\" contains a forbidden character.\n"
+      !out_file;
+    Printf.eprintf "Allowed characters: a..z, A..Z, 0..9, -\n";
+    flush stderr;
+    exit 2);
   Secure.set_base_dir (Filename.dirname !out_file);
   let arrays = make_arrays !in_file in
   Gc.compact ();
