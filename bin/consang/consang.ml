@@ -11,12 +11,13 @@ let speclist =
     ("-q", Arg.Unit (fun () -> verbosity := 1), " quiet mode");
     ("-qq", Arg.Unit (fun () -> verbosity := 0), " very quiet mode");
     ("-fast", Arg.Set fast, " faster, but use more memory");
-    ("-scratch", Arg.Set scratch, ": from scratch");
+    ("-scratch", Arg.Set scratch, " from scratch");
     ( "-mem",
       Arg.Set Outbase.save_mem,
-      ": Save memory, but slower when rewritting database" );
-    ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock database.");
+      " Save memory, but slower when rewritting database" );
+    ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.");
   ]
+  |> List.sort compare |> Arg.align
 
 let anonfun s =
   if !fname = "" then fname := s
