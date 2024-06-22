@@ -60,6 +60,25 @@ val source_note_with_env :
     Interprets wiki syntax in a "source" context with a predefined env.
 *)
 
-val has_linked_pages : Config.config -> Gwdb.iper -> bool
-val linked_pages_nbr : Config.config -> Gwdb.iper -> int
+type mode = Delete | Rename | Merge
+
+val links_to_ind :
+  Config.config ->
+  Gwdb.base ->
+  ((Gwdb.iper, Gwdb.ifam) Def.NLDB.page
+  * (string list * (Def.NLDB.key * Def.NLDB.ind) list))
+  list ->
+  Def.NLDB.key ->
+  (Def.NLDB.key * Def.NLDB.ind) list
+
+val has_linked_pages : Config.config -> Gwdb.base -> Gwdb.iper -> bool
+val linked_pages_nbr : Config.config -> Gwdb.base -> Gwdb.iper -> int
 val cache_linked_pages_name : string
+
+val update_cache_linked_pages :
+  Config.config ->
+  mode ->
+  Def.NLDB.key ->
+  Def.NLDB.key ->
+  (Def.NLDB.key * Def.NLDB.ind) list ->
+  unit
