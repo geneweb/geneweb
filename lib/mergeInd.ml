@@ -187,7 +187,19 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
     in
     String.concat " " (List.map (sou base) sl)
   in
-  Notes.update_notes_links_db base (Def.NLDB.PgInd p1.key_index) s
+  Notes.update_notes_links_db base (Def.NLDB.PgInd p1.key_index) s;
+  let key =
+    ( Name.lower (sou base p1.first_name),
+      Name.lower (sou base p1.surname),
+      p1.occ )
+  in
+  let pgl =
+    let db = Gwdb.read_nldb base in
+    let db = Notes.merge_possible_aliases conf db in
+    let pgl = Notes.links_to_ind conf base db key in
+    pgl
+  in
+  Notes.update_cache_linked_pages conf Notes.Merge key key pgl
 
 exception Error_loop of person
 exception Same_person

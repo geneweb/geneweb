@@ -195,7 +195,8 @@ let source_note_with_env conf base env str =
 
 (**/**)
 
-let _links_to_ind conf base db key =
+(* ((Gwdb.iper, Gwdb.ifam) Def.NLDB.page * ('a * (Def.NLDB.key * 'b) list)) list -> *)
+let links_to_ind conf base db key =
   let l =
     List.fold_left
       (fun pgl (pg, (_, il)) ->
@@ -209,14 +210,17 @@ let _links_to_ind conf base db key =
         in
         if record_it then
           List.fold_left
-            (fun pgl (k, _) -> if k = key then pg :: pgl else pgl)
+            (fun pgl (k, l) -> if k = key then (k, l) :: pgl else pgl)
             pgl il
         else pgl)
       [] db
   in
   List.sort_uniq compare l
 
-type cache_linked_pages_t = (Gwdb.iper, (Def.NLDB.key * Def.NLDB.ind) list) Hashtbl.t
+type mode = Delete | Rename | Merge
+
+type cache_linked_pages_t =
+  (Def.NLDB.key, (Def.NLDB.key * Def.NLDB.ind) list) Hashtbl.t
 
 let cache_linked_pages_name = "cache_linked_pages"
 
@@ -225,29 +229,63 @@ let get_linked_pages_fname conf =
 
 let read_cache_linked_pages conf =
   let fname = get_linked_pages_fname conf in
-  match
-    try Some (Secure.open_in_bin fname)
-    with Sys_error _ -> None
-  with
+  match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
   | Some ic ->
       let ht : cache_linked_pages_t = input_value ic in
       close_in ic;
       ht
-  | None -> (
-    Printf.eprintf "%s not exist. Run update_nldb\n" fname;
-    let ht : cache_linked_pages_t = Hashtbl.create 10 in
-    ht)
+  | None ->
+      Printf.eprintf "%s not exist. Run update_nldb\n" fname;
+      let ht : cache_linked_pages_t = Hashtbl.create 10 in
+      ht
 
-let linked_pages_nbr conf ip =
-  let ht = read_cache_linked_pages conf in
-  let entry = try Some (Hashtbl.find ht ip) with Not_found -> None in
-  match entry with
-  | Some pgl -> List.length pgl
-  | None -> 0
+(* sync with update_nldb.ml if this changes *)
+let write_cache_linked_pages conf cache_linked_pages =
+  let fname = get_linked_pages_fname conf in
+  let oc = open_out_bin fname in
+  output_value oc cache_linked_pages;
+  close_out oc
 
-let has_linked_pages conf ip =
+let update_cache_linked_pages conf mode old_key new_key pgl =
   let ht = read_cache_linked_pages conf in
-  let entry = try Some (Hashtbl.find ht ip) with Not_found -> None in
-  match entry with
-  | Some pgl when List.length pgl <> 0 -> true
-  | _ -> false
+  match mode with
+  | Delete -> Hashtbl.remove ht old_key
+  | Merge -> (
+      let entry = try Some (Hashtbl.find ht old_key) with Not_found -> None in
+      match entry with
+      | Some _ -> Hashtbl.remove ht old_key
+      | None ->
+          ();
+          Hashtbl.add ht new_key pgl)
+  | Rename ->
+      (let entry =
+         try Some (Hashtbl.find ht old_key) with Not_found -> None
+       in
+       match entry with
+       | Some pgl ->
+           Hashtbl.remove ht old_key;
+           Hashtbl.add ht new_key pgl
+       | None -> ());
+      write_cache_linked_pages conf ht
+
+let linked_pages_nbr conf base ip =
+  let p = poi base ip in
+  let key =
+    ( sou base (get_first_name p) |> Name.lower,
+      sou base (get_surname p) |> Name.lower,
+      get_occ p )
+  in
+  let ht = read_cache_linked_pages conf in
+  let entry = try Some (Hashtbl.find ht key) with Not_found -> None in
+  match entry with Some pgl -> List.length pgl | None -> 0
+
+let has_linked_pages conf base ip =
+  let p = poi base ip in
+  let key =
+    ( sou base (get_first_name p) |> Name.lower,
+      sou base (get_surname p) |> Name.lower,
+      get_occ p )
+  in
+  let ht = read_cache_linked_pages conf in
+  let entry = try Some (Hashtbl.find ht key) with Not_found -> None in
+  match entry with Some pgl when List.length pgl <> 0 -> true | _ -> false

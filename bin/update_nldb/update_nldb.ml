@@ -46,7 +46,8 @@ let read_file_contents fname =
       with End_of_file -> Buff.get !len)
   | None -> ""
 
-type cache_linked_pages_t = (Gwdb.iper, (Def.NLDB.key * Def.NLDB.ind) list) Hashtbl.t
+type cache_linked_pages_t =
+  (Def.NLDB.key, (Def.NLDB.key * Def.NLDB.ind) list) Hashtbl.t
 
 let read_cache_linked_pages conf : cache_linked_pages_t =
   let ic = open_in_bin conf in
@@ -158,8 +159,12 @@ let compute base bdir =
       | [], [] -> ()
       | (_list_nt, list_ind) as list ->
           db := NotesLinks.add_in_db !db (NLDB.PgInd (get_iper p)) list;
-          let iper = get_iper p in
-          Hashtbl.add cache_linked_pages iper list_ind)
+          let key =
+            ( sou base (get_first_name p) |> Name.lower,
+              sou base (get_surname p) |> Name.lower,
+              get_occ p )
+          in
+          Hashtbl.add cache_linked_pages key list_ind)
     (Gwdb.persons base);
   ProgrBar.finish ();
   Printf.eprintf "--- families notes\n";
@@ -180,10 +185,14 @@ let compute base bdir =
         (get_fevents fam);
       match notes_links (Buffer.contents buffer) with
       | [], [] -> ()
-      | (_list_nt, _list_ind) as list->
+      | (_list_nt, _list_ind) as list ->
           db := NotesLinks.add_in_db !db (NLDB.PgFam (get_ifam fam)) list;
           (*
           let ifam = get_ifam fam in
+          ()
+          let key = (sou base (get_first_name p) |> Name.lower,
+            sou base (get_surname p) |> Name.lower, get_occ p)
+          in
           Hashtbl.add cache_linked_pages ifam list_ind; *)
           ProgrBar.run i nb_fam)
     (Gwdb.families base);
