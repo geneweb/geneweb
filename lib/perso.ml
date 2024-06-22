@@ -2892,8 +2892,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
       | _ -> raise Not_found)
   | [ "has_linked_pages" ] -> (
       match get_env "nldb" env with
-      | Vnldb _db ->
-          VVbool (Notes.has_linked_pages conf (get_iper p))
+      | Vnldb _db -> VVbool (Notes.has_linked_pages conf base (get_iper p))
       | _ -> raise Not_found)
   | [ "linked_pages_nbr" ] -> (
       match get_env "nldb" env with
@@ -2935,9 +2934,8 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
   | [ "linked_pages_number" ] -> (
       match get_env "nldb" env with
       | Vnldb _db ->
-          Notes.linked_pages_nbr conf (get_iper p)
-          |> string_of_int
-          |> str_val
+          Notes.linked_pages_nbr conf base (get_iper p)
+          |> string_of_int |> str_val
       | _ -> str_val "0")
   | [ "linked_page"; s ] -> (
       match get_env "nldb" env with

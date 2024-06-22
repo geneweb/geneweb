@@ -930,6 +930,8 @@ let effective_del_no_commit base op =
 
 let effective_del_commit conf base op =
   Notes.update_notes_links_db base (Def.NLDB.PgInd op.key_index) "";
+  let key = (Name.lower op.first_name, Name.lower op.surname, op.occ) in
+  Notes.update_cache_linked_pages conf Notes.Delete key key [];
   Util.commit_patches conf base;
   let changed = U_Delete_person op in
   History.record conf base changed "dp"
@@ -1137,12 +1139,12 @@ let print_mod ?prerr o_conf base =
   let ofn = o_p.first_name in
   let osn = o_p.surname in
   let oocc = o_p.occ in
-  let key = (Name.lower ofn, Name.lower osn, oocc) in
+  let old_key = (Name.lower ofn, Name.lower osn, oocc) in
   let conf = Update.update_conf o_conf in
   let pgl =
     let db = Gwdb.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in
-    Perso.links_to_ind conf base db key
+    Perso.links_to_ind conf base db old_key
   in
   let callback sp =
     let p = effective_mod ?prerr conf base sp in
@@ -1176,6 +1178,13 @@ let print_mod ?prerr o_conf base =
       String.concat " " (List.map (sou base) sl)
     in
     Notes.update_notes_links_db base (Def.NLDB.PgInd p.key_index) s;
+    let new_key =
+      ( Name.lower (sou base p.first_name),
+        Name.lower (sou base p.surname),
+        p.occ )
+    in
+    if old_key <> new_key then
+      Notes.update_cache_linked_pages conf Notes.Rename old_key new_key [];
     let wl =
       let a = poi base p.key_index in
       let a = { parents = get_parents a; consang = get_consang a } in
