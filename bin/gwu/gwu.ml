@@ -5,7 +5,7 @@ let isolated = ref false
 let speclist opts =
   ( "-odir",
     Arg.String (fun s -> GwuLib.out_dir := s),
-    "<dir>  create files from original name in directory (else on -o file)" )
+    "<dir> create files from original name in directory (else on -o file)" )
   :: ( "-isolated",
        Arg.Set isolated,
        " export isolated persons (work only if export all database)." )
@@ -18,7 +18,7 @@ let speclist opts =
        " raw output (without possible utf-8 conversion)" )
   :: ( "-sep",
        Arg.String (fun s -> GwuLib.separate_list := s :: !GwuLib.separate_list),
-       "<1st_name.num surname> To use together with the option \"-odir\": \
+       " <1st_name.num surname> To use together with the option \"-odir\": \
         separate this person and all his ancestors and descendants sharing the \
         same surname. All the concerned families are displayed on standard \
         output instead of their associated files. This option can be used \
@@ -36,7 +36,7 @@ let speclist opts =
        ^ string_of_int !GwuLib.sep_limit
        ^ ". The present option changes this limit." )
   :: Gwexport.speclist opts
-  |> Arg.align
+  |> List.sort compare |> Arg.align
 
 let main () =
   let opts = ref Gwexport.default_opts in
