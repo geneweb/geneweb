@@ -1,4 +1,4 @@
-<!-- $Id: upddata.txt %version; 24/12/2023 01:38:06 $ -->
+<!-- $Id: upddata.txt %version; 24/06/2024 01:38:06 $ -->
 <!-- Copyright (c) 2006-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;" id="book">
@@ -29,26 +29,31 @@
 %end;
 <div class="container">
 %define;list_of(xx,yy,zz)
-  <div class="btn-group align-self-center mt-%if;("xx"="src")3%elseif;("xx"!="fn")2%end;">
+  <div%if;("xx"!="fn" or e.data!="") class="mt-2"%end;>
     %if;(e.data!="xx")
       <a href="%prefix;m=MOD_DATA&data=xx" class="sub-char" title="[*book of %s:::yy]">
     %end;
-    <i class="fa fa-zz fa-2x fa-fw text-%if;(e.data="xx")success%else;primary%end;"></i>
-    %if;(e.data="")[*book of %s:::yy]%end;
+    %if;(e.data="")<div class="d-inline-flex align-self-center">%end;
+    <i class="fa fa-zz fa-2x fa-fw %if;(e.data="xx")text-success%end;"></i>
+    %if;(e.data="")<span class="h4 d-flex ml-3">[*book of %s:::yy]</span></div>%end;
     %if;(e.data!="xx")</a>%end;
   </div>
 %end;
 
 %define;other_books()
-  %if;(e.data="")<div class="h3">[*book/books]1</div>%end;
-  <div>
-    %if;(wizard)
-      %apply;list_of("fn",[first name/first names]1,"child")
-      %apply;list_of("sn",[surname/surnames]1,"signature")
-      %apply;list_of("place",[place/places]1,"map-location-dot")
-      %apply;list_of("occu",[occupation/occupations]1,"user-doctor")
-      %apply;list_of("src",[source/sources]1,"box-archive")
-    %end;
+  %if;(e.data="")<div class="h3 mb-3">[*book/books]1</div>%end;
+  <div class="d-flex flex-column mr-2">
+    %apply;list_of("fn",[first name/first names]1,"child")
+    %apply;list_of("sn",[surname/surnames]1,"signature")
+    %apply;list_of("pubn",[public name/public names]1,"pen")
+    %apply;list_of("qual",[qualifier/qualifiers]1,"comment")
+    %apply;list_of("alias",[alias/aliases]1,"mask")
+  %if;(e.data!="")</div><div class="d-flex flex-column mr-2">%end;
+    %apply;list_of("occu",[occupation/occupations]1,"user-doctor")
+    %apply;list_of("place",[place/places]1,"map-location-dot")
+    %apply;list_of("src",[source/sources]1,"box-archive")
+    %apply;list_of("title",[title/titles]1,"crown")
+    %apply;list_of("domain",[domain/domains]1,"chess-rook")
   </div>
 %end;
   <a tabindex="4" class="sr-only sr-only-focusable" href="#main-content">[*skip to main content]</a>
@@ -85,7 +90,7 @@
           %end;
         </div>
         <div class="d-flex col-xs-12 order-1">
-          <div class="d-flex flex-col align-self-center">
+          <div class="d-flex flex-row align-self-center">
             %if;(e.s="")%apply;other_books()%end;
             %if;(e.data!="" and e.s="")
               <div class="align-self-center text-center mx-3">
@@ -126,7 +131,7 @@
   </nav>
   <div class="d-flex flex-column justify-content-center mx-2">
     %if;(e.key!="")
-      <div class="alert alert-warning w-auto text-center mt-1 mx-3 mx-lg-5" role="alert">
+      <div class="alert alert-warning w-auto text-center my-2 mx-3 mx-lg-5" role="alert">
         <i class="fas fa-hat-wizard fa-fw text-danger mr-1"></i>[*help modify data]%nn;
         <i class="fas fa-hat-wizard fa-fw text-danger ml-1"></i>
       </div>

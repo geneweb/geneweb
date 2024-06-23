@@ -33,6 +33,14 @@
   %random.init;
   %random.xxx;
 %end;
+%define;book_button(xxx,yyy,zzz)
+  <a role="button" class="btn btn-outline-success mr-1 d-flex align-items-center"
+    href="%prefix;m=MOD_DATA&data=xxx" title="[*modify] %apply;book_of%with;[yyy]1%end;%sp;
+      ([wizard/wizards/friend/friends/exterior]0)">
+    <i class="fa fa-zzz fa-fw mr-1"></i>
+    <span class="text-nowrap">[*yyy]1</span>
+  </a>
+%end;
   <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-lg-3">
     <div class="d-none d-lg-block col-md-3 order-md-1"></div>
     <div class="col-xs-12 col-md-3 order-md-3 ml-md-2 px-0">
@@ -263,32 +271,27 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         %end;
       </div>
     </div>
+
     %if;wizard;
-      <div class="d-flex flex-column flex-lg-row justify-content-lg-center mt-2 mt-lg-4">
+      <div class="d-flex flex-column justify-content-lg-center mt-2 mt-lg-4">
         <div class="h4 align-self-lg-center mr-lg-2">
           <i class="fas fa-book fa-sm fa-fw text-muted mr-1"></i>[*book/books]1%nn;
         </div>
-        <div class="d-inline-flex justify-content-lg-center">
-          <a role="button" class="btn btn-outline-success mr-1"
-            href="%prefix;m=MOD_DATA&data=fn"
-            title="[*modify] %apply;book_of%with;[first name/first names]1%end;%sp;
-              ([wizard/wizards/friend/friends/exterior]0)"><i class="fa fa-child fa-fw mr-1"></i>[*first name/first names]1</a>
-          <a role="button" class="btn btn-outline-success mr-1" 
-            href="%prefix;m=MOD_DATA&data=sn"
-            title="[*modify] %apply;book_of%with;[surname/surnames]1%end;%sp;
-              ([wizard/wizards/friend/friends/exterior]0)"><i class="fa fa-signature fa-fw mr-1"></i>[*surname/surnames]1</a>
-          <a role="button" class="btn btn-outline-success mr-1" 
-            href="%prefix;m=MOD_DATA&data=place"
-            title="[*modify] %apply;book_of%with;[place/places]1%end;%sp;
-              ([wizard/wizards/friend/friends/exterior]0)"><i class="fa fa-map-location-dot fa-fw mr-1"></i>[*place/places]1</a>
-          <a role="button" class="btn btn-outline-success mr-1" 
-            href="%prefix;m=MOD_DATA&data=occu"
-            title="[*modify] %apply;book_of%with;[occupation/occupations]1%end;%sp;
-              ([wizard/wizards/friend/friends/exterior]0)"><i class="fa fa-user-doctor fa-fw mr-1"></i>[*occupation/occupations]1</a>
-          <a role="button" class="btn btn-outline-success" 
-            href="%prefix;m=MOD_DATA&data=src"
-            title="[*modify] %apply;book_of%with;[source/sources]1%end;%sp;
-              ([wizard/wizards/friend/friends/exterior]0)"><i class="fa fa-box-archive fa-fw mr-1"></i>[*source/sources]1</a>
+        <div class="d-flex flex-column">
+          <div class="d-inline-flex justify-content-lg-center">
+            %apply;book_button("fn","first name/first names","child")
+            %apply;book_button("sn","surname/surnames","signature")
+            %apply;book_button("pubn","public name/public names","pen")
+            %apply;book_button("qual","qualifier/qualifiers","comment")
+            %apply;book_button("alias","alias/aliases","mask")
+          </div>
+          <div class="d-inline-flex justify-content-lg-center mt-2">
+            %apply;book_button("occu","occupation/occupations","user-doctor")
+            %apply;book_button("place","place/places","map-location-dot")
+            %apply;book_button("src","source/sources","box-archive")
+            %apply;book_button("title","title/titles","crown")
+            %apply;book_button("domain","domain/domains","chess-rook")
+          </div>
         </div>
       </div>
     %end;

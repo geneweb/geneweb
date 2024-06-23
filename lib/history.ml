@@ -239,7 +239,8 @@ let gen_record conf base changed action =
         | U_Kill_ancestors p
         | U_Change_children_name (p, _)
         | U_Multi (_, p, _) ->
-            p.first_name ^ "." ^ string_of_int p.occ ^ " " ^ p.surname
+            "(" ^ p.first_name ^ "." ^ string_of_int p.occ ^ " " ^ p.surname
+            ^ ")"
         | U_Notes (Some num, file) ->
             let s = string_of_int num in
             if file = "" then s else file ^ "/" ^ s
