@@ -28,41 +28,82 @@ end)
    Later, we should update places values while keeping the suburb value.
 *)
 
+let get_title p = List.map (fun t -> t.t_ident) (get_titles p)
+let get_domain p = List.map (fun t -> t.t_place) (get_titles p)
+let get_occupation_x p = [ get_occupation p ]
+let get_birth_place_x p = [ get_birth_place p ]
+let get_baptism_place_x p = [ get_baptism_place p ]
+let get_death_place_x p = [ get_death_place p ]
+let get_burial_place_x p = [ get_burial_place p ]
+let get_birth_src_x p = [ get_birth_src p ]
+let get_baptism_src_x p = [ get_baptism_src p ]
+let get_death_src_x p = [ get_death_src p ]
+let get_burial_src_x p = [ get_burial_src p ]
+let get_burial__src_x p = [ get_burial_src p ]
+let get_psources_x p = [ get_psources p ]
+let get_first_name_x p = [ get_first_name p ]
+let get_surname_x p = [ get_surname p ]
+let get_public_name_x p = [ get_public_name p ]
+let get_epers_place evt = evt.epers_place
+let get_epers_place_x p = [ get_epers_place p ]
+let get_epers_src evt = evt.epers_src
+let get_epers_src_x p = [ get_epers_src p ]
+let get_marriage_place_x p = [ get_marriage_place p ]
+let get_efam_place evt = evt.efam_place
+let get_efam_place_x p = [ get_efam_place p ]
+let get_marriage_src_x p = [ get_marriage_src p ]
+let get_fsources_x p = [ get_fsources p ]
+let get_efam_src evt = evt.efam_src
+let get_efam_src_x p = [ get_efam_src p ]
+
 let get_data conf =
   match p_getenv conf.env "data" with
-  | Some "occu" -> ([ get_occupation ], [], [], [])
+  | Some "occu" -> ([ get_occupation_x ], [], [], [])
   | Some "place" ->
-      ( [ get_birth_place; get_baptism_place; get_death_place; get_burial_place ],
-        [ (fun evt -> evt.epers_place) ],
-        [ get_marriage_place ],
-        [ (fun evt -> evt.efam_place) ] )
+      ( [
+          get_birth_place_x;
+          get_baptism_place_x;
+          get_death_place_x;
+          get_burial_place_x;
+        ],
+        [ get_epers_place_x ],
+        [ get_marriage_place_x ],
+        [ get_efam_place_x ] )
   | Some "src" ->
       ( [
-          get_birth_src;
-          get_baptism_src;
-          get_death_src;
-          get_burial_src;
-          get_psources;
+          get_birth_src_x;
+          get_baptism_src_x;
+          get_death_src_x;
+          get_burial_src_x;
+          get_psources_x;
         ],
-        [ (fun evt -> evt.epers_src) ],
-        [ get_marriage_src; get_fsources ],
-        [ (fun evt -> evt.efam_src) ] )
-  | Some "fn" -> ([ get_first_name ], [], [], [])
-  | Some "sn" -> ([ get_surname ], [], [], [])
+        [ get_epers_src_x ],
+        [ get_marriage_src_x; get_fsources_x ],
+        [ get_efam_src_x ] )
+  | Some "fn" -> ([ get_first_name_x ], [], [], [])
+  | Some "sn" -> ([ get_surname_x ], [], [], [])
+  | Some "alias" -> ([ get_aliases ], [], [], [])
+  | Some "qual" -> ([ get_qualifiers ], [], [], [])
+  | Some "pubn" -> ([ get_public_name_x ], [], [], [])
+  | Some "title" -> ([ get_title ], [], [], [])
+  | Some "domain" -> ([ get_domain ], [], [], [])
   | _ -> ([], [], [], [])
 
 let get_all_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in
-  let aux : 'a. 'a -> IstrSet.t -> ('a -> istr) -> IstrSet.t =
+  let aux : 'a. 'a -> IstrSet.t -> ('a -> istr list) -> IstrSet.t =
    fun arg acc get ->
-    let istr = get arg in
-    if not (is_empty_string istr) then IstrSet.add istr acc else acc
+    let strings = get arg in
+    List.fold_left
+      (fun acc istr ->
+        if not (is_empty_string istr) then IstrSet.add istr acc else acc)
+      acc strings
   in
   let acc =
     Gwdb.Collection.fold
       (fun acc i ->
         let p = pget conf base i in
-        let acc = List.fold_left (aux p) acc get_p in
+        let acc = List.fold_left (fun acc get -> aux p acc get) acc get_p in
         let pevents = get_pevents p in
         List.fold_left
           (fun acc fn -> List.fold_left (fun acc e -> aux e acc fn) acc pevents)
@@ -75,7 +116,7 @@ let get_all_data conf base =
       Gwdb.Collection.fold
         (fun acc i ->
           let f = foi base i in
-          let acc = List.fold_left (aux f) acc get_f in
+          let acc = List.fold_left (fun acc get -> aux f acc get) acc get_f in
           let fevents = get_fevents f in
           List.fold_left
             (fun acc fn ->
@@ -88,8 +129,6 @@ let get_all_data conf base =
 let get_person_from_data conf base =
   let get_p, get_pe, get_f, get_fe = get_data conf in
   let istr = Gwdb.istr_of_string @@ (List.assoc "key" conf.env :> string) in
-  Printf.eprintf "get_person_from_data: key= %s, %s\n" (string_of_istr istr)
-    (sou base istr);
   let add acc (istr : istr) p =
     try PersMap.add istr (PersSet.add p @@ PersMap.find istr acc) acc
     with Not_found -> PersMap.add istr (PersSet.add p PersSet.empty) acc
@@ -97,7 +136,8 @@ let get_person_from_data conf base =
   let aux (fn : PersSet.t PersMap.t -> istr -> PersSet.t PersMap.t) arg acc get
       =
     let istr' = get arg in
-    if istr = istr' then fn acc istr else acc
+    (* FIXME was istr = istr' ! is this correct *)
+    if List.mem istr istr' then fn acc istr else acc
   in
   let acc =
     Gwdb.Collection.fold
@@ -317,6 +357,52 @@ let update_person conf base old new_input p =
         else surnames_aliases
       in
       { (gen_person_of_person p) with surname; occ; surnames_aliases }
+  | Some "alias" ->
+      let new_istr = Gwdb.insert_string base (only_printable new_input) in
+      let old_aliases = get_aliases p in
+      let aliases =
+        List.fold_left
+          (fun acc a -> if old = sou base a then new_istr :: acc else a :: acc)
+          [] old_aliases
+      in
+      { (gen_person_of_person p) with aliases }
+  | Some "pubn" ->
+      let new_istr = Gwdb.insert_string base (only_printable new_input) in
+      let public_name = new_istr in
+      { (gen_person_of_person p) with public_name }
+  | Some "qual" ->
+      let new_istr = Gwdb.insert_string base (only_printable new_input) in
+      let old_qualifiers = get_qualifiers p in
+      let qualifiers =
+        List.map
+          (fun q -> if old = sou base q then new_istr else q)
+          old_qualifiers
+      in
+      { (gen_person_of_person p) with qualifiers }
+  | Some "title" ->
+      let new_istr = Gwdb.insert_string base (only_printable new_input) in
+      let old_titles = get_titles p in
+      let titles =
+        List.map
+          (fun t ->
+            if old = sou base t.t_ident then { t with t_ident = new_istr }
+              (* FIXME I thought is should be sou base new_istr *)
+            else t)
+          old_titles
+      in
+      { (gen_person_of_person p) with titles }
+  | Some "domain" ->
+      let new_istr = Gwdb.insert_string base (only_printable new_input) in
+      let old_titles = get_titles p in
+      let titles =
+        List.map
+          (fun t ->
+            if old = sou base t.t_place then { t with t_place = new_istr }
+              (* FIXME I thought is should be sou base new_istr *)
+            else t)
+          old_titles
+      in
+      { (gen_person_of_person p) with titles }
   | _ -> gen_person_of_person p
 
 (* ************************************************************************** *)
@@ -396,11 +482,16 @@ let update_person_list conf base new_input list nb_pers max_updates =
   in
   let action =
     match p_getenv conf.env "data" with
-    | Some "occu" -> "co"
-    | Some "place" -> "cp"
-    | Some "src" -> "cs"
+    | Some "occu" -> "mo"
+    | Some "place" -> "mq"
+    | Some "src" -> "ms"
     | Some "fn" -> "fn"
     | Some "sn" -> "sn"
+    | Some "alias" -> "ma"
+    | Some "pubn" -> "mu"
+    | Some "qual" -> "mx"
+    | Some "title" -> "mt"
+    | Some "domain" -> "md"
     | _ -> ""
   in
   let list =
@@ -419,14 +510,6 @@ let update_person_list conf base new_input list nb_pers max_updates =
             incr cnt;
             let o_p = Util.string_gen_person base (gen_person_of_person p) in
             let np = update_person conf base old new_input p in
-            (if action = "fn" || action = "sn" then
-             let pi = np.key_index in
-             let op = poi base pi in
-             let sp =
-               Futil.map_person_ps (fun ip -> ip) (fun istr -> sou base istr) np
-             in
-             Image.rename_portrait conf base op
-               (sp.first_name, sp.surname, sp.occ));
             patch_person base np.key_index np;
             if test_family then
               Array.iter

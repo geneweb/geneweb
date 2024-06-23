@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: updhist.txt v7.1 19/10/2023 05:24:40 $ -->
+  <!-- $Id: updhist.txt v7.1 24/6/2024 05:24:40 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none">
@@ -107,31 +107,49 @@
   </table>
 %end;
 
+%( changes in 2 letters labels may create backward incompatibility with
+   old history files.
+%)
 %define;update_text(uu)
-  %if;(uu = "ap")[add::person/persons]0%nn;
-  %elseif;(uu = "mp")[modify::person/persons]0%nn;
-  %elseif;(uu = "dp")[delete::person/persons]0%nn;
-  %elseif;(uu = "fp")[merge::person/persons]1%nn;
-  %elseif;(uu = "si")[send::portrait]%nn;
-  %elseif;(uu = "sb")[send::image/images]0 note and source [to carrousel]%nn;
-  %elseif;(uu = "so")[send::image/images]0 [to carrousel]%nn;
-  %elseif;(uu = "sc")[send::note/notes]0 [to carrousel]%nn;
-  %elseif;(uu = "ss")[send::source/sources]0 [to carrousel]%nn;
-  %elseif;(uu = "di")[delete::portrait]0%nn;
-  %elseif;(uu = "do")[delete::image/images]0 [from carrousel]%nn;
+  %if;(uu = "aa")[add::parents]%nn;
+  %elseif;(uu = "ap")[add::person/persons]0%nn;
   %elseif;(uu = "af")[add::family/families]0%nn;
-  %elseif;(uu = "mf")[modify::family/families]0%nn;
-  %elseif;(uu = "df")[delete::family/families]0%nn;
-  %elseif;(uu = "if")[invert::family/families]1%nn;
-  %elseif;(uu = "ff")[merge::family/families]1%nn;
+  %elseif;(uu = "cb")[copy portrait to blason]0%nn;
+  %elseif;(uu = "cd")[copy image to blason]0%nn;
   %elseif;(uu = "cn")[change children's names]%nn;
-  %elseif;(uu = "aa")[add::parents]%nn;
-  %elseif;(uu = "mn")[modify::note/notes]1%nn;
-  %elseif;(uu = "cp")[modify::place/places]0%nn;
-  %elseif;(uu = "cs")[modify::source/sources]0%nn;
-  %elseif;(uu = "co")[modify::occupation/occupations]0%nn;
+  %elseif;(uu = "db")[delete::coat of arms]0%nn;
+  %elseif;(uu = "dc")[delete::image/images]0 [from carrousel]%nn;
+  %elseif;(uu = "df")[delete::family/families]0%nn;
+  %elseif;(uu = "dp")[delete::person/persons]0%nn;
+  %elseif;(uu = "dq")[delete::portrait]0%nn;
+  %elseif;(uu = "d?")[delete::unknown]0%nn;
+  %elseif;(uu = "ff")[merge::family/families]1%nn;
   %elseif;(uu = "fn")[modify::first name/first names]0%nn;
+  %elseif;(uu = "fp")[merge::person/persons]1%nn;
+  %elseif;(uu = "if")[invert::family/families]1%nn;
+  %elseif;(uu = "ma")[modify::alias/aliases]0%nn;
+  %elseif;(uu = "md")[modify::domain/domains]0%nn;
+  %elseif;(uu = "mf")[modify::family/families]0%nn;
+  %elseif;(uu = "mn")[modify::note/notes]1%nn;
+  %elseif;(uu = "mo" or uu = "co")[modify::occupation/occupations]0%nn;
+  %elseif;(uu = "mp")[modify::person/persons]0%nn;
+  %elseif;(uu = "mq" or uu = "cp")[modify::place/places]0%nn;
+  %elseif;(uu = "ms" or uu = "cs")[modify::source/sources]0%nn;
+  %elseif;(uu = "mt")[modify::title/titles]0%nn;
+  %elseif;(uu = "mu")[modify::public name]0%nn;
+  %elseif;(uu = "mx")[modify::qualifier/qualifiers]0%nn;
+  %elseif;(uu = "rb")[restore::coat of arms]0%nn;
+  %elseif;(uu = "rc")[restore::carrousel image]%nn;
+  %elseif;(uu = "rp")[restore::portrait]%nn;
+  %elseif;(uu = "sp")[send::portrait]%nn;
+  %elseif;(uu = "sb")[send::coat of arms]%nn;
+  %elseif;(uu = "s3")[send::image/images]0 [note/notes]0 [and] [source/sources]0 [to carrousel]%nn;
+  %elseif;(uu = "sf")[send::image/images]0 [to carrousel]%nn;
   %elseif;(uu = "sn")[modify::surname/surnames]0%nn;
+  %elseif;(uu = "so")[send::note/notes]0 [to carrousel]%nn;
+  %elseif;(uu = "ss")[send::source/sources]0 [to carrousel]%nn;
+  %elseif;(uu = "sx")[send::unknown]0%nn;
+  %elseif;(uu = "s?")[send::unknown]0%nn;
   %else;%apply;interp(uu) %nn;
   %end;
 %end;

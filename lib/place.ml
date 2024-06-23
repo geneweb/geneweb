@@ -370,7 +370,7 @@ let print_ip_list conf places opt link_to_ind ipl =
   else
     let places = (Mutil.encode places :> string) in
     let head =
-      Printf.sprintf "&nbsp;(<a href=\"%sm=L%s&k=%s&nb=%d&p0=%s"
+      Printf.sprintf "&nbsp;(<a href=\"%sm=L&data=place;%s&k=%s&nb=%d&p0=%s"
         (commd conf :> string)
         opt places len places
     in
@@ -511,7 +511,7 @@ let print_html_places_surnames_short conf _base _link_to_ind
             (string_of_int (keep + 1))
             str2 str;
           if len < max_rlm_nbr conf then (
-            Output.printf conf "&nbsp;(<a href=\"%sm=L%s&k=%s&nb=%d"
+            Output.printf conf "&nbsp;(<a href=\"%sm=L&data=place;%s&k=%s&nb=%d"
               (commd conf :> string)
               opt str2 len;
             let rec loop1 i = function
