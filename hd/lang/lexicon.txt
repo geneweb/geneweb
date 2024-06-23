@@ -14637,6 +14637,10 @@ sl: javno
 sv: offentligt
 tr: kamu
 
+    public name/public names
+en: public name/public names
+fr: nom public/noms publics
+
     public name
 af: noemnaam
 bg: официално име
@@ -17999,6 +18003,18 @@ no: kronologi
 pt: cronologia
 sv: kronologi
 tr: zaman çizelgesi
+
+    domain/domains
+en: domain/domains
+fr: domaine/domaines
+
+    alias/aliases
+en: alias/aliases
+fr: alias/alias
+
+    qualifier/qualifiers
+en: qualifier/qualifiers
+fr: sobriquet/sobriquets
 
     title/titles
 af: titel/titels

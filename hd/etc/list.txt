@@ -42,7 +42,11 @@
     %qvar.myindex.param;
   %end;
 %end;
-<h1>[*list/list (ancestors)] [of] [person/persons]1%if;(e.surn!="") [by] [surname/surnames]0%end; [by] [place/places]0</h1>
+%if;(e.data="place")
+  <h1>[*list/list (ancestors)] [of] [person/persons]1%if;(e.surn!="") [by] [surname/surnames]0%end; [by] [place/places]0</h1>
+%else;
+  <h1>[*list/list (ancestors)] [of] [person/persons]1</h1>
+%end;
 <div class="btn-toolbar mt-2 ml-3" role="toolbar" aria-label="Toolbar for list of individuals">
   <a role="button" href="%if;(e.dates!=0)%url_set.dates.0;%else;%url_set.dates;%end;"
     class="btn-link%if;(e.dates!=0) text-muted%end;"
@@ -64,6 +68,7 @@
   %end;
 </div>
 
+%if;(e.data="place")
 %let;opt;%nn;
   %if;(e.bi="on")&bi=on%end;%nn;
   %if;(e.ba="on")&bp=on%end;%nn;
@@ -72,6 +77,7 @@
   %if;(e.bu="on")&bu=on%end;%nn;
   %if;(e.long="on")&long=on%end;%nn;
   %if;(e.f_sort="on")&f_sort=on%end;%in;
+%end;
 %let;k;%if;(e.k!="")%e.k;%end;%in;
 %let;nbs;&nbs=%if;(e.nbs!="")%e.nbs;%else;3%end;%in;
 %define;book_of(xx)[*book of %s:::xx]%end;
@@ -86,7 +92,7 @@
   %apply;evt("de",[death],"D")
   %apply;evt("bu",[burial],"S").
 </div>
-  
+
 %define;nbmds(xx,yy,tt,kk)
   %if;(xx!="" and xx="kk")yy%nn;
   %else;%if;("tt"=1)&nbsp;%end;
@@ -139,12 +145,12 @@
     %if;(item.1!=prev_item.1 or prev_item.1="")
       <div class="mb-2">
         %if;wizard;
-          <a href="%prefix;m=MOD_DATA&%nbs;&data=place&s=%sub;#%item.1;"
-            title="%apply;book_of([place/places]1)[:] [modify] “%item.1;”">
+          <a href="%prefix;m=MOD_DATA%nbs;&data=%e.data;&s=%sub;#%item.1;"
+            title="%apply;book_of(e.data)[:] [modify] “%item.1;”">
             <i class="fa fa-wand-magic-sparkles fa-fw ml-1"></i>
           </a>
         %end;
-        %if;(k!="")<a href="%prefix;m=PPS&k=%item.1;%opt;" title="[place/places]0/[surname/surnames]0">%nn;
+        %if;(k!="" and e.data="place")<a href="%prefix;m=PPS&k=%item.1;%opt;" title="[place/places]0/[surname/surnames]0">%nn;
           %item.1;</a>%end; (%e.nb; %if;(e.nb>1)[person/persons]1%else;[person/persons]0%end;,
           %if;(e.datesort=1)[date/dates]1%else;[sort by/branch/alphabetic order]2%end;)
       </div>
