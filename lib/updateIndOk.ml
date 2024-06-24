@@ -944,7 +944,6 @@ let print_title conf fmt _ =
 
 let print_mod_ok conf base wl pgl p ofn osn oocc =
   Hutil.header conf @@ print_title conf "person modified";
-  Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then (
     Output.print_sstring conf "<h3 class=\"error\">";
@@ -1046,7 +1045,6 @@ let all_checks_person base p a u =
 
 let print_add_ok conf base wl p =
   Hutil.header conf @@ print_title conf "person added";
-  Hutil.print_link_to_welcome conf true;
   (* Si on a supprimé des caractères interdits *)
   if List.length !removed_string > 0 then (
     Output.printf conf "<h2 class=\"error\">%s</h2>\n"
@@ -1069,12 +1067,10 @@ let print_add_ok conf base wl p =
 
 let print_del_ok conf =
   Hutil.header conf @@ print_title conf "person deleted";
-  Hutil.print_link_to_welcome conf false;
   Hutil.trailer conf
 
 let print_change_event_order_ok conf base wl p =
   Hutil.header conf @@ print_title conf "person modified";
-  Hutil.print_link_to_welcome conf true;
   Update.print_warnings conf base wl;
   Output.print_sstring conf "\n";
   Output.print_string conf

@@ -845,11 +845,10 @@ let print_slices_menu conf hts =
 
 let print_dag_page conf page_title hts next_txt =
   let cgl = p_getenv conf.env "cgl" = Some "on" in
-  let title _ = Output.print_string conf page_title in
-  Hutil.header_no_page_title conf title;
+  let title _ = if cgl then Output.print_string conf page_title else () in
+  Hutil.header conf title;
   (* title goes into <title> ... </title> *)
-  (* page title is handled by buttons_rel!! *)
-  (* TODO manage page title if cgl on !! *)
+  (* page <h1> title is handled by buttons_rel!! *)
   if cgl then () else Hutil.interp_no_env conf "buttons_rel";
   print_html_table conf hts;
   if (next_txt : Adef.escaped_string :> string) <> "" then

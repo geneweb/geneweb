@@ -104,8 +104,8 @@ let specify conf base n pl =
          p, !tl)
       pl
   in
+
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   (* Si on est dans un calcul de parenté, on affiche *)
   (* l'aide sur la sélection d'un individu.          *)
   Util.print_tips_relationship conf;
@@ -156,8 +156,7 @@ let very_unknown conf _ =
       Output.print_sstring conf {|"|} ;
     in
     Output.status conf Def.Not_Found;
-    Hutil.rheader conf title;
-    Hutil.print_link_to_welcome conf false;
+    Hutil.header ~error:true conf title;
     Hutil.trailer conf
   | _ ->
     match p_getenv conf.env "i" with
@@ -173,8 +172,7 @@ let very_unknown conf _ =
         |> Output.print_sstring conf ;
       in
       Output.status conf Def.Not_Found;
-      Hutil.rheader conf title;
-      Hutil.print_link_to_welcome conf false;
+      Hutil.header ~error:true conf title;
       Hutil.trailer conf
     | None -> Hutil.incorrect_request conf ~comment:"Missing p=, n= and i="
 
@@ -190,8 +188,7 @@ let unknown conf n =
     Output.print_sstring conf {|"|} ;
   in
   Output.status conf Def.Not_Found;
-  Hutil.rheader conf title;
-  Hutil.print_link_to_welcome conf false;
+  Hutil.header ~error:true conf title;
   Hutil.trailer conf
 
 let make_henv conf base =
@@ -498,8 +495,7 @@ let treat_request =
           w_base @@ AdvSearchOkDisplay.print
         | "C" ->
           w_base @@ w_person @@ CousinsDisplay.print
-        | "CAL" ->
-          fun conf _ -> Hutil.print_calendar conf
+        | "CAL" -> w_base @@ Hutil.print_calendar
         | "CHG_CHN" when conf.wizard ->
           w_wizard @@ w_base @@ ChangeChildrenDisplay.print
         | "CHG_CHN_OK" ->

@@ -14,8 +14,7 @@ let not_found conf txt x =
     Output.print_string conf (Util.escape_html x);
     Output.print_sstring conf {|"|}
   in
-  Hutil.rheader conf title;
-  Hutil.print_link_to_welcome conf false;
+  Hutil.header ~error:true conf title;
   Hutil.trailer conf
 
 let first_name_not_found conf =
@@ -262,8 +261,8 @@ let first_name_print_list conf base x1 xl liste =
         (StrSet.elements xl)
   in
   Hutil.header conf title;
-  (* Si on est dans un calcul de parenté, on affiche *)
-  (* l'aide sur la sélection d'un individu.          *)
+  (* Si on est dans un calcul de parentÃ©, on affiche *)
+  (* l'aide sur la sÃ©lection d'un individu.          *)
   Util.print_tips_relationship conf;
   let list =
     List.map
@@ -293,7 +292,7 @@ let mk_specify_title conf kw n _ =
 
 let select_first_name conf n list =
   Hutil.header conf
-  @@ mk_specify_title conf (transl_nth conf "first name/first names" 0) n;
+    (mk_specify_title conf (transl_nth conf "first name/first names" 0) n);
   Output.print_sstring conf "<ul>";
   List.iter
     (fun (sstr, (strl, _)) ->
@@ -685,8 +684,8 @@ let print_family_alphabetic x conf base liste =
           homonymes
       in
       Hutil.header conf title;
-      (* Si on est dans un calcul de parenté, on affiche *)
-      (* l'aide sur la sélection d'un individu.          *)
+      (* Si on est dans un calcul de parentÃ©, on affiche *)
+      (* l'aide sur la sÃ©lection d'un individu.          *)
       Util.print_tips_relationship conf;
       (* Menu afficher par branche/ordre alphabetique *)
       print_alphabetic_to_branch conf x;

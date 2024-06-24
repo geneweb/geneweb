@@ -849,7 +849,6 @@ let error_locked conf =
 let error_digest conf =
   let err = UERR_digest in
   prerr conf err @@ fun () ->
-  Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<p>";
   Output.print_string conf (string_of_error conf err);
   Output.print_sstring conf "</p>"

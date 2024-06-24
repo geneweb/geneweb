@@ -27,8 +27,7 @@ let incorrect_content_type conf base p s =
   let title _ =
     Output.print_sstring conf (Utf8.capitalize (Util.transl conf "error"))
   in
-  Hutil.rheader conf title;
-  Hutil.print_link_to_welcome conf true;
+  Hutil.header conf title;
   Output.print_sstring conf "<p>\n<em style=\"font-size:smaller\">";
   Output.printf conf "Error: incorrect image content type: %s" s;
   Output.printf conf "</em>\n</p>\n<ul>\n<li>\n%s</li>\n</ul>\n"
@@ -40,8 +39,7 @@ let error_too_big_image conf base p len max_len =
   let title _ =
     Output.print_sstring conf (Utf8.capitalize (Util.transl conf "error"))
   in
-  Hutil.rheader conf title;
-  Hutil.print_link_to_welcome conf true;
+  Hutil.header ~error:true conf title;
   Output.print_sstring conf "<p><em style=\"font-size:smaller\">";
   Output.printf conf "Error: this image is too big: %d bytes<br>\n" len;
   Output.printf conf "Maximum authorized in this database: %d bytes<br>\n"
@@ -254,8 +252,7 @@ let print_send_image conf base p =
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_sstring conf "<h2>\n";
   title false;
-  Output.print_sstring conf "</h2>\n";
-  Output.printf conf
+  Output.print_sstring conf "</h2>\n";  Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
     conf.command;
   Output.print_sstring conf

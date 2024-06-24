@@ -38,11 +38,8 @@ let print_search_form conf from_note =
   Output.print_sstring conf "</button>\n</form>\n</div>"
 
 let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
-  Hutil.header_no_page_title conf (fun _ ->
-      if (title :> string) = "" then
-        Output.print_string conf (Util.escape_html fnotes)
-      else Output.print_string conf title);
-  (* TODO: DO WE NEED ME?
+  Hutil.header_with_title conf (fun _ -> ());
+  (* TODO: DOâ€ WEâ€ NEEDâ€ ME?
      let what_links_page () =
        if fnotes <> "" then (
          Output.print_sstring conf {|<a href="|};
@@ -93,7 +90,7 @@ let print_whole_notes conf base fnotes (title : Adef.safe_string) s ho =
   Hutil.trailer conf
 
 let print_notes_part conf base fnotes (title : Adef.safe_string) s cnt0 =
-  Hutil.header_no_page_title conf (fun _ ->
+  Hutil.header_with_title conf (fun _ ->
       if (title :> string) = "" then
         Output.print_string conf (Util.escape_html fnotes)
       else Output.print_string conf title);
@@ -352,20 +349,17 @@ let print_misc_notes conf base =
         else list)
       db []
   in
-  Hutil.header_link_welcome conf title;
+  Hutil.header conf title;
   if db <> [] then (
     Output.print_sstring conf "<ul>";
-    if d <> "" then (
-      Output.print_sstring conf {|<li class="parent">|};
-      (* Output.printf conf "<a href=\"%sm=MISC_NOTES%s\">" (commd conf) ; *)
-      Output.print_sstring conf {|<a href="|};
-      Output.print_string conf (commd conf);
-      Output.print_sstring conf "m=MISC_NOTES";
-      (match String.rindex_opt d NotesLinks.char_dir_sep with
-      | Some i ->
-          Output.print_string conf @@ "&d=" ^<^ Mutil.encode (String.sub d 0 i)
-      | None -> ());
-      Output.print_sstring conf "<tt>&lt;--</tt></a></li>");
+    if d <> "" then
+      Format.sprintf
+        {|<a href="%sm=MISC_NOTES%s"><i class="fa fa-arrow-left"></i></a>|}
+        (commd conf :> string)
+        (match String.rindex_opt d NotesLinks.char_dir_sep with
+        | Some i -> "&d=" ^ String.sub d 0 i
+        | None -> "")
+      |> Output.print_sstring conf;
     List.iter
       (function
         | r, Some f ->
