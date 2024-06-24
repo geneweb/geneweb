@@ -2760,3 +2760,9 @@ let list_cmp cmp l1 l2 =
     | _ -> false
   in
   aux l1 l2
+
+let is_subset s1 s2 = List.for_all (fun s -> List.mem s s2) s1
+
+let list_elements_cmp l1 =
+  let l1 = List.sort compare l1 in
+  fun l2 -> List.sort compare l2 = l1

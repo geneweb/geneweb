@@ -330,12 +330,10 @@ end = struct
              match_date ~p ~default:false ~dates ~df:(fun _ -> event_date_f ()))
 
   let match_name ~search_list ~exact : string list -> bool =
-    let eq : string list -> string list -> bool =
-      if exact then fun x search ->
-        List.sort compare search = List.sort compare x
-      else fun x search -> List.for_all (fun s -> List.mem s x) search
+    let matching : string list -> string list -> bool =
+      if exact then Util.list_elements_cmp else Util.is_subset
     in
-    fun x -> List.exists (eq x) search_list
+    fun x -> List.exists (fun s -> matching s x) search_list
 
   let wrap_match_name ~base ~search_list ~exact ~get ~split =
     if search_list = [] then fun _ -> true
@@ -838,3 +836,28 @@ let searching_fields conf base =
   in
   let sep = if search <> "" then "," else "" in
   Adef.safe @@ string_field "occu" (search ^ sep)
+
+let filter_alias ~name ~split ~matching =
+  let search_list = List.map Name.lower (split name) in
+  let matching = matching search_list in
+  if search_list = [] then fun ~aliases:_ -> []
+  else fun ~aliases ->
+    List.filter_map
+      (fun alias ->
+        let aliases = List.map Name.lower (split alias) in
+        Ext_option.return_if (matching aliases) (fun () -> alias))
+      aliases
+
+let matching_first_name_aliases ~first_name =
+  filter_alias ~name:first_name ~split:Name.split_fname ~matching:Util.is_subset
+
+let exact_matching_first_name_aliases ~first_name =
+  filter_alias ~name:first_name ~split:Name.split_fname
+    ~matching:Util.list_elements_cmp
+
+let matching_surname_aliases ~surname =
+  filter_alias ~name:surname ~split:Name.split_sname ~matching:Util.is_subset
+
+let exact_matching_surname_aliases ~surname =
+  filter_alias ~name:surname ~split:Name.split_sname
+    ~matching:Util.list_elements_cmp
