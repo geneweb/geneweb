@@ -45,25 +45,13 @@
   %reset_count;
 %end;
 
+%( on veut tester présence de chronologie dans p_mod. from perso_utils.txt %)
 %reset_count;
-%( 
-  TODO do we need change here ?
-  as test_templ call not same as in etc/perso_utils.txt
-  TODO replace tabs by spaces
-  refer to:
-  cid ba46487b7 (Wed Nov 30 23:14:33 2016 +0100)
-  cid 4020a969e (Wed Nov 30 23:12:14 2016 +0100)
-%)
-%if;(p_mod!="" and p_mod!="zz")
-	%for;i;0;26;
-		%apply;test_templ(i)
-	%end;
-%end;
-%let;timeline;%if;(count>0)yes%else;no%end;%in;
-
+%if;(p_mod!="" and ("c" in p_mod or p_mod="zz"))%incr_count;%end;
+%let;timeline;%if;(count=0)0%end;%in;
 %reset_count;
 %( suppress relations and witnesses as they appear in timeline %)
-%if;(timeline="no")
+%if;(timeline=0)
   %if;has_relations;%incr_count;%end;
   %foreach;event;%if;event.has_witnesses;%incr_count;%end;%end;
   %foreach;family;%if;has_witnesses;%incr_count;%end;%end;
@@ -89,11 +77,11 @@
       %end;
     %end;
   </h2>
-  <ul>
+  <ul  class="pl-4">
   %foreach;relation;
     %if;(has_relation_him and has_relation_her)
       <li>%apply;capitalize(relation_type)[:]%nl;
-        <ul>
+        <ul  class="pl-4">
           %apply;li_SDC("relation_him")
             %apply;short_display_person("relation_him")
           </li>
@@ -151,7 +139,7 @@
   %if;(count>0)
     <h3>[*relations of] %self;</h3>
   %end;
-  <ul>
+  <ul  class="pl-4">
   %foreach;relation;
   %( godparents are displayed in timeline if has_event %)
     %if;(has_relation_him and has_relation_her)
@@ -220,7 +208,7 @@
   %if;(count>0)
     <h3>[*witnesses to events of] %self;</h3>
   %end;
-  <ul>
+  <ul  class="pl-4">
     %foreach;event;%sp;
       %reset_count;
       %foreach;event_witness;
@@ -250,7 +238,7 @@
   %if;(count>0)
     <h3>%apply;str(self,sex)</h3>
   %end;
-  <ul>
+  <ul  class="pl-4">
     %foreach;event_witness_relation;
       %apply;li_SDC("event_witness_relation.person")
         %apply;capitalize(event_witness_relation.event.name)%sp;

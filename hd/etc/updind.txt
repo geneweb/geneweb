@@ -1147,8 +1147,11 @@
         <input type="text" class="form-control" name="rxcnt_xvar_sn" value="%relation.xrel.surname;"
            id="rxcnt_xvar_sn" placeholder="[*surname/surnames]0">
       </div>
+      <div class="col-1 col-form-label">
+        (%if;("xvar"="fath")[*him/her]0%else;[*him/her]1%end;)
+      </div>
       <div id="rxcnt_xvar_p_selct_mod" class="col-form-label ml-2">
-        %if;(relation.xrel.index!="-1"  and (relation.xrel.first_name!="" or relation.xrel.surname!=""))
+        %if;(relation.xrel.index!="-1" and (relation.xrel.first_name!="" or relation.xrel.surname!=""))
           <a href="%prefix_base_password;m=MOD_IND&i=%relation.xrel.index;" title="[*modify::person/persons]0
             %relation.xrel.first_name;%if;(relation.xrel.occ!="").%relation.xrel.occ%end; %relation.xrel.surname;">
             <i class="fa fa-user-pen fa-fw %if;(relation.xrel.sex=1)fe%end;male ml-2 mr-1" aria-hidden="true"

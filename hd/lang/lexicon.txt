@@ -7659,7 +7659,7 @@ bg: сгоден%t с/сгодена%t с
 br: dimezet%t gant
 ca: promès%t amb/promesa%t amb
 co: fidanzatu%t cù/fidanzata%t cù
-cs: zasnoubený s/zasnoubená s
+cs: zasnoubený%t s/zasnoubená%t s
 da: forlovet%t med
 de: verlobt%t mit
 en: engaged%t to
@@ -7681,7 +7681,7 @@ pt: noivo%t de/noiva%t de
 ro: logodit%t cu/logodita%t cu
 ru: %t помолвлен с
 sk: zasnúbený %t s/zasnúbená %t s
-sl: zaročen z %t/zaročena z
+sl: zaročen%t z/zaročena%t z
 sv: förlovad%t med
 tr: nişanlı %t için
 
@@ -9253,6 +9253,14 @@ sv: välj en post i den hierarkiska navigeringen
 tr: hiyerarşik gezinmede bir giriş seçin
 zh: 在层次导航中选择一个条目
 
+    high generation levels
+en: the generation levels higher then 12
+fr: les générations supérieures à 12
+
+    high generation caution
+en: be carefull! Selecting high generation level may take minutes to generate and that can lead to server timeouts.
+fr: attention ! Sélectionner un nombre de génération élevé peut prendre plusieurs minutes à générer et entraîner des délais d'attente dépassé du serveur.
+
     highlight incomplete data
 co: sopralineà i dati incumpleti
 de: hebe die unvollständigen Daten hervor
@@ -9268,12 +9276,12 @@ co: ellu/ella
 cs: on/ona
 da: han/hun
 de: er/sie
-en: him/her
+en: him/her/they
 eo: li/ŝi
 es: él/ella
 et: mees/naine
 fi: mies/nainen
-fr: lui/elle
+fr: lui/elle/iel
 he:   אותו/ אותה
 is: hans/hennar
 it: lui/lei
@@ -10040,10 +10048,10 @@ tr: eşler dizini (nesil yok)
     individual notes
 co: note individuale
 de: Hinweis zur Person
-en: individual note
+en: individual notes
 es: nota individual
 fi: merkintöjä henkilöstä
-fr: notes individuelles
+fr: notes sur l’individu
 it: nota dell’individuo
 lt: individualūs užrašai
 nl: aantekeningen
@@ -12208,6 +12216,10 @@ sl: več kot %d zadetkov
 sv: fler än %d svar
 tr: %d cevaptan daha fazla
 
+    move union comments to notes
+en: transfer the historical “comments of union” input to the adjacent “marriage notes” one.
+fr: transférer le champ historique « commentaires d’union » vers celui des « notes de mariage » ci-contre.
+
     move up/down
 co: ricullà/falà/ricullà u cursore/falà u cursore
 de: nach oben/nach unten/Cursor nach oben/Cursor nach unten
@@ -12468,7 +12480,7 @@ tr: Sosa referansı olarak %t kullanarak göz atın
 co: navigà in l’arburu cù st’individuu
 de: im Baum mit dieser Person navigieren
 en: navigation in tree with this individual
-fr: naviguer dans l'arbre avec cet individu
+fr: naviguer dans l’arbre avec cet individu
 
     nb branches
 co: num. ghjembe
@@ -13085,6 +13097,18 @@ ru: изменения вкратце
 sv: summering av noteringar
 tr: notlar
 
+    notes sources show help
+en: the background to show the
+fr: sur l’arrière-plan pour afficher les
+
+    notes sources edit on date
+en: on the date on the left to modify this event
+fr: sur la date à gauche pour modifier cet événement
+
+    note without title
+en: note without title
+fr: note sans titre
+
     nth
 af: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
 bg: n-ти/първи/втори/трети/четвърти/пети/шести/седми/осми/девети/десети/единадесети/дванадесети/тринадесети/четиринадесети/петнадесети/шестнадесети/седемнадесети/осемнадесети/деветнадесети/двадесети/21-и/22-и/23-и/24-и/25-и/26-и/27-и/28-и/29-и/30-и/31-и/32-и/33-и/34-и/35-и/36-и/37-и/38-и/39-и/40-и/41-и/42-и/43-и/44-и/45-и/46-и/47-и/48-и/49-и/50-и/51-и/52-и/53-и/54-и/55-и/56-и/57-и/58-и/59-и/60-и/61-и/62-и/63-и/64-и/65-и/66-и/67-и/68-и/69-и/70-и/71-и/72-и/73-и/74-и/75-и/76-и/77-и/78-и/79-и/80-и/81-и/82-и/83-и/84-и/85-и/86-и/87-и/88-и/89-и/90-и/91-и/92-и/93-и/94-и/95-и/96-и/97-и/98-и/99-и
@@ -13291,7 +13315,7 @@ eo: nombro de la vivantaj personoj
 es: número de personas vivas
 et: elavaid inimesi
 fi: elossa olevien lukumäärä
-fr: nombre de personnes vivantes
+fr: nombre d’individus vivants
 he: מספר האנשים שעודם בחיים
 it: numero di persone viventi
 lt: gyvųjų skaičius
@@ -16427,28 +16451,28 @@ sl: številka Sosa 1
 sv: annummer 1
 tr: Sosa 1
 
-    sosa reference: %t
-af: Sosa verwysing: %t
-ca: referència de "número Sosa": %t
-co: referenza Sosa : %t
-de: Sosa Referenz: %t
-en: family tree root: %t
-eo: Sosa referenco: %t
-es: referencia Sosa: %t
-et: Sosa viidet: %t
-fi: Sosa-viitteenä: %t
-fr: référence Sosa : %t
-he:  כאזכור Sosa: %t
-it: riferimento Sosa : %t
-lv: Sosa pakāpes: %t
-nl: Sosareferentie : %t
-oc: referéncia de Sosa: %t
-pt: referência Sosa: %t
-ro: referinta Sosa: %t
-ru: ссылка Sosa: %t
-sk: referenciou "Sosa": %t
-sv: annummer: %t
-tr: aile ağacı kökü: %t
+    sosa reference
+af: Sosa verwysing
+ca: referència de "número Sosa"
+co: referenza Sosa
+de: Sosa Referenz
+en: family tree root
+eo: Sosa referenco
+es: referencia Sosa
+et: Sosa viidet
+fi: Sosa-viitteenä
+fr: référence Sosa
+he:  כאזכור Sosa
+it: riferimento Sosa
+lv: Sosa pakāpes
+nl: Sosareferentie
+oc: referéncia de Sosa
+pt: referência Sosa
+ro: referinta Sosa
+ru: ссылка Sosa
+sk: referenciou "Sosa"
+sv: annummer
+tr: aile ağacı kökü
 
     source/sources
 af: bron/bronne

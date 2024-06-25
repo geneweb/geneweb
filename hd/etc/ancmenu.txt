@@ -21,7 +21,7 @@
 </head>
 <body%body_prop;>
 %include;hed
-<div class="container ml-xs-auto">
+<div class="container ml-xs-2">
 %message_to_wizard;
 %include;perso_header
 <script><!--
@@ -279,7 +279,7 @@ function missing_events_options () {
             </div>
           </div>
         </div>
-        <div class="mx-1"> 
+        <div class="ml-1">
           <hr>
           <div class="custom-control custom-radio text-nowrap">
             <input type="radio" class="custom-control-input" id="tP" name="t" value="P" onclick="book_of_ascendants_options()">
@@ -328,7 +328,7 @@ function missing_events_options () {
             </div>
           </div>
         </div>
-        <div>
+        <div  class="ml-1">
           <hr>
           <div class="custom-control custom-radio text-nowrap">
             <input type="radio" class="custom-control-input" id="tY" name="t" value="Y" onclick="no_options()">
@@ -351,7 +351,7 @@ function missing_events_options () {
             </div>
             <div class="custom-control custom-checkbox custom-control-inline">
               <input type="checkbox" class="custom-control-input" id="t_fn" name="fn" value="1">
-              <label class="custom-control-label" for="t_fn">[*show first names]1</label>
+              <label class="custom-control-label" for="t_fn">[*visualize/show/hide/summary]1 [first name/first names]1</label>
             </div>
             <div>
               <div class="custom-control custom-checkbox custom-control-inline">
@@ -457,13 +457,13 @@ function missing_events_options () {
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tT" name="t" value="T" onclick="tree_options()">
         <label class="custom-control-label" for="tT"><i class="fa fa-sitemap fa-rotate-180 fa-fw mr-1"></i>[*ascendants tree] <span class="text-info">✘</span>%nn;
-          <span class="text-muted">%nn;
+          <div class="text-muted ml-4">%nn;
             %if;(bvar.max_anc_tree="" and max_anc_level>=7)
-              <br>%sp;([maximum] 7 [generation/generations]1)
+              ([maximum] 7 [generation/generations]1)
             %elseif;(bvar.max_anc_tree!="" and max_anc_level>=bvar.max_anc_tree)
-              <br>%sp;([maximum] %bvar.max_anc_tree; [generation/generations]1)
+              ([maximum] %bvar.max_anc_tree; [generation/generations]1)
             %end;
-          </span>%nn;
+          </div>%nn;
         </label>
       </div>
       <div class="ml-4">
@@ -479,13 +479,13 @@ function missing_events_options () {
       <div class="custom-control custom-radio">
         <input type="radio" class="custom-control-input" id="tH" name="t" value="H" onclick="tree_options()">
         <label class="custom-control-label" for="tH"><i class="fa fa-code-branch  fa-rotate-90 fa-fw mr-1"></i>[*horizontal tree] <span class="text-info">✘</span>%nn;
-          <span class="text-muted">%nn;
+          <div class="text-muted ml-4">%nn;
             %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
               ([maximum] 8 [generation/generations]1)
             %elseif;(bvar.max_anc_level != "" and max_anc_level >= bvar.max_anc_level)
-              ([maximum] %bvar.max_anc_level; [generation/generations]1)
+              <br>([maximum] %bvar.max_anc_level; [generation/generations]1)
             %end;
-          </span>
+          </div>
         </label>
       </div>
      %( <input name="bd" size="1" maxlength="2" value="0"%/>
