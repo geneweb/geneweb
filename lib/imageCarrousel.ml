@@ -252,7 +252,8 @@ let print_send_image conf base p =
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_sstring conf "<h2>\n";
   title false;
-  Output.print_sstring conf "</h2>\n";  Output.printf conf
+  Output.print_sstring conf "</h2>\n";
+  Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
     conf.command;
   Output.print_sstring conf
