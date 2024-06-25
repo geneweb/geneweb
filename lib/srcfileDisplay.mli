@@ -16,4 +16,3 @@ val adm_file : string -> string
 (** Compute administration file path with giving name (search inside {i cnt} directory) *)
 
 val source_file_name : config -> string -> string
-val copy_from_stream : config -> base -> char Stream.t -> src_mode -> unit

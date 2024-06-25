@@ -20,17 +20,6 @@ type base_warning =
 (* *)
 type base_misc = (person, family, title) Warning.misc
 
-val check_siblings :
-  ?onchange:bool ->
-  base ->
-  (base_warning -> unit) ->
-  ifam * family ->
-  (person -> unit) ->
-  unit
-(** [check_siblings ?onchange base warning (ifam, fam) callback]
-    Checks birth date consistency between siblings.
-    Also calls [callback] with each child. *)
-
 val person :
   ?onchange:bool ->
   base ->

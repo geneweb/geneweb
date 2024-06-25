@@ -69,12 +69,6 @@ val http_redirect_temporarily : string -> unit
 val get_request_and_content : char Stream.t -> string list * Adef.encoded_string
 (** Returns the request from a stream read from a socket. *)
 
-val wsocket : unit -> Unix.file_descr
-(** Returns the last used socket *)
-
-val woc : unit -> out_channel
-(** Return the out_channel associated to the socket *)
-
 val sock_in : string ref
 (** Names of the files used in windows implementation to communicate
     http requests and html answers. Default "wserver.sin" and

@@ -9,20 +9,6 @@ let gnwb22 = GnWb22
 let gnwb23 = GnWb23
 let gnwb24 = GnWb24
 let gnwb25 = GnWb25
-let magic_GnWb0020 = "GnWb0020"
-let magic_GnWb0021 = "GnWb0021"
-let magic_GnWb0022 = "GnWb0022"
-let magic_GnWb0023 = "GnWb0023"
-let magic_GnWb0024 = "GnWb0024"
-let magic_GnWb0025 = "GnWb0025"
-
-let string_of_version = function
-  | GnWb20 -> magic_GnWb0020
-  | GnWb21 -> magic_GnWb0021
-  | GnWb22 -> magic_GnWb0022
-  | GnWb23 -> magic_GnWb0023
-  | GnWb24 -> magic_GnWb0024
-  | GnWb25 -> magic_GnWb0025
 
 let check_version = function
   | "GnWb0020" -> Some gnwb20

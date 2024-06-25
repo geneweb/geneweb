@@ -35,8 +35,6 @@ let get_dag_elems conf base =
   in
   loop None Pset.empty 1
 
-type ('a, 'b) sum = ('a, 'b) Def.choice
-
 let make_dag conf base set =
   let list = Pset.elements set in
   let module O = struct

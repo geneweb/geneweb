@@ -30,6 +30,3 @@ type synchro_patch = {
 }
 (** List of commited modifications inside the database. First element is a timestamp of a commit,
     second - changed/added by considered commit person ids, third - changed/added by considered commit families ids. *)
-
-val input_synchro : string -> synchro_patch
-(** Get [synchro_patch] from the giving database directory. *)

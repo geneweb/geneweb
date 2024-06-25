@@ -94,11 +94,6 @@ val string_of_date_aux :
 
 (**/**)
 
-val hebrew_month : config -> int -> string
-(** Returns the translation of the month of French calendar
-    First month is [0]
-*)
-
 val french_month : config -> int -> string
 (** Returns the translation of the month of Hebrew calendar
     First month is [0]

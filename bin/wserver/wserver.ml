@@ -7,9 +7,7 @@ let sock_out = ref "wserver.sou"
 let stop_server = ref "STOP_SERVER"
 let cgi = ref false
 let wserver_sock = ref Unix.stdout
-let wsocket () = !wserver_sock
 let wserver_oc = ref stdout
-let woc () = !wserver_oc
 let wflush () = flush !wserver_oc
 
 let skip_possible_remaining_chars fd =

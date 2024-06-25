@@ -172,10 +172,6 @@ let rec output_loop ofuns oc x =
       done;
       output_loop ofuns oc (Obj.field x (Obj.size x - 1))))
 
-let out_channel_funs =
-  { output_byte; output_binary_int; output = output_substring }
-
-let output oc x = output_loop out_channel_funs oc (Obj.repr x)
 let gen_output ofuns i x = output_loop ofuns i (Obj.repr x)
 
 (* Size *)

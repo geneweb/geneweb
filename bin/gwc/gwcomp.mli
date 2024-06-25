@@ -73,16 +73,8 @@ type gw_syntax =
       First string represents wizard's id.
       Second is note's content. *)
 
-val magic_gwo : string
-(** .gwo file header *)
-
 val check_magic : string -> in_channel -> unit
 (** Checks a .gwo header and prints fails if header is absent or not compatible. *)
 
 val comp_families : State.t -> string -> unit
 (** Compile .gw file and save result to corresponding .gwo *)
-
-(* Ajout pour l'API *)
-
-val date_of_string : string -> int -> Date.date option
-(** Parses [Def.date] from string that starts at pos [i] inside [s] *)
