@@ -38,3 +38,23 @@ val print_search : config -> base -> unit
 
 val line_fields : string -> (string * string * string * string option) option
 (** Parses one line of history file that delimits one modification record. *)
+
+val map_history :
+  config ->
+  (time:string -> user:string -> action:string -> keyo:string option -> 'a) ->
+  'a list
+
+val filter_map_history :
+  conf:config ->
+  skip:int ->
+  n:int ->
+  filter:
+    (time:string -> user:string -> action:string -> keyo:string option -> bool) ->
+  f:(time:string -> user:string -> action:string -> keyo:string option -> 'a) ->
+  'a list
+
+val total_entries :
+  conf:config ->
+  filter:
+    (time:string -> user:string -> action:string -> keyo:string option -> bool) ->
+  int

@@ -24,6 +24,8 @@ and precision =
   (* inteval *)
   | YearInt of dmy2
 
+val year_of_date : date -> int option
+
 val leap_year : int -> bool
 (** Says if the given year is a leap year. *)
 
@@ -49,7 +51,7 @@ val time_elapsed_opt : dmy -> dmy -> dmy option
     if computation is not possible
     (e.g. time_elapsed_opt /1839 /1859). *)
 
-(* TODO add date_of_burial/event?  *)
+val date_of_burial : Def.burial -> date option
 val dmy_of_death : Def.death -> dmy option
 
 val date_of_death : Def.death -> date option

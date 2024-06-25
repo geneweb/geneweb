@@ -83,3 +83,8 @@ val get_birth_death_date : person -> Date.date option * Date.date option * bool
     baptism/burial date is used and [approx] is set to [true] (it is [false]
     if both birth and death dates are found).
 *)
+
+val split_key : string -> (string * int * string) option
+(** [split_key key] returns the tuple (first name, occurence, surname) from a key
+    of the form first name.occurence surname
+*)
