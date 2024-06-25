@@ -160,7 +160,7 @@ uninstall: ## Uninstall geneweb using dune
 distrib: info ## Build the project and copy what is necessary for distribution
 	@$(MAKE) --no-print-directory patch_files generated
 	@printf "\n\033[1;1mBuilding executables.\n\033[0m"
-	@$(BUILD) || { $(UNPATCH) && exit 1; }
+	@$(call unpatch_after, $(BUILD))
 	@printf "Done."
 	@$(RM) -r $(DISTRIB_DIR)
 	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"
