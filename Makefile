@@ -89,6 +89,8 @@ unpatch_files:
 BUILD = dune build -p geneweb --profile $(DUNE_PROFILE)
 UNPATCH = $(MAKE) --no-print-directory unpatch_files
 
+unpatch_after = (($(1) && $(UNPATCH)) || ($(UNPATCH) && false))
+
 info:
 	@printf "Building \033[1;1mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n"
 	@printf "Repository \033[1;1m$(SOURCE)\033[0m. Branch \033[1;1m$(BRANCH)\033[0m. "
@@ -132,27 +134,27 @@ fmt build gwd install uninstall: info patch_files generated
 fmt: ## Format Ocaml code
 ifneq ($(OS_TYPE),Win)
 	@printf "\n\033[1;1mOcamlformat\033[0m\n"
-	dune build @fmt --auto-promote ; $(UNPATCH)
+	$(call unpatch_after, dune build @fmt --auto-promote)
 endif
 
 # [BEGIN] Installation / Distribution section
 
 build: ## Build the geneweb package (libraries and binaries)
 	@printf "\n\033[1;1mBuilding executables\033[0m\n"
-	@$(BUILD) ; $(UNPATCH)
+	@$(call unpatch_after, $(BUILD))
 	@printf "Done."
 
 gwd: ## Build ondy gwd/gwc executables
 	@printf "\n\033[1;1mBuilding only gwd and gwc executables\033[0m\n"
-	@dune build bin/gwd bin/gwc --profile $(DUNE_PROFILE) ; $(UNPATCH)
+	@$(call unpatch_after, dune build bin/gwd bin/gwc --profile $(DUNE_PROFILE))
 	@printf "Done."
 
 install: ## Install geneweb using dune
-	dune build @install --profile $(DUNE_PROFILE) ; $(UNPATCH)
+	$(call unpatch_after, dune build @install --profile $(DUNE_PROFILE))
 	dune install
 
 uninstall: ## Uninstall geneweb using dune
-	dune build @install --profile $(DUNE_PROFILE) ; $(UNPATCH)
+	$(call unpatch_after, dune build @install --profile $(DUNE_PROFILE))
 	dune uninstall
 
 distrib: info ## Build the project and copy what is necessary for distribution
