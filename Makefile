@@ -230,7 +230,6 @@ endif
 	  fi; \
 	done
 	@printf "Done.\n\n\033[1;1mDistribution complete.\033[0m\n"
-	@$(UNPATCH)
 	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mgw/gwd$(EXT)\033[0m”.\n"
 .PHONY: fmt install uninstall distrib
 
