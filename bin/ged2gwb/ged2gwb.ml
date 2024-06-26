@@ -713,7 +713,7 @@ EXTEND
   int:
     [ [ i = INT ->
           (try int_of_string i with Failure _ -> raise Stream.Failure)
-      | "-"; i = INT ->
+      |i = INT; ID "BCE" ->
           (try (- int_of_string i) with  Failure _ -> raise Stream.Failure) ] ]
   ;
 END
