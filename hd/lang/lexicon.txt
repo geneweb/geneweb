@@ -4351,8 +4351,8 @@ eo: ido:a:+n/idoj:a:+n
 es: hijo/hijos
 et: laps:g:+e/lapsed
 fi: lapsi/lapset
-fr: enfant/enfants
-he:   ילד/ ילדים
+fr: enfant/enfants/enfant(s)
+he: ילד/ ילדים
 is: barn/börn
 it: figlio/figli
 lt: vaikas/vaikai
@@ -7822,10 +7822,10 @@ zh: 地点
     event/events
 co: evenimentu/evenimenti
 de: Ereignis/Ereignisse
-en: event/events
+en: event/events/event(s)
 es: evento/eventos
 fi: tapahtuma/tapahtuma
-fr: événement/événements
+fr: événement/événements/événement(s)
 it: evento/evento
 nl: evenement/evenementen
 no: hendelse/hendelse
@@ -15956,6 +15956,10 @@ ru: выберите месяц
 sv: välj en månad för att visa alla födelsedagar.
 tr: tüm yıldönümlerini görmek için bir ay seçin.
 
+    select/delete an event
+en: select an event/delete the event
+fr: choisir un événement/supprimer l’événement
+
     select a spouse
 co: selezziunà un(a) cumpagnu(a)
 de: Partner auswählen
@@ -19621,12 +19625,12 @@ co: testimone/testimone/testimoni
 cs: svědek/svědek/svědkové
 da: vidne/vidne/vidner
 de: Trauzeuge/Trauzeuge/Trauzeugen
-en: witness/witness/witnesses
+en: witness/witness/witnesses/witness(es)
 eo: atestanto:a:+n/atestanto:a:+n/atestantoj
 es: testigo/testigo/testigos
 et: tunnistaja/tunnistaja/tunnistajad
 fi: todistaja/todistaja/todistajat
-fr: témoin/témoin/témoins
+fr: témoin/témoin/témoins/témoin(s)
 he:  אד/ אדים
 is: vitni/vitni
 it: testimone/testimone/testimoni
