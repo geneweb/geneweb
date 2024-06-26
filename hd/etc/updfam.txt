@@ -50,7 +50,7 @@
   %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2"%in;
   %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2"%in;
   %let;year_input;pattern="[?><~/+\-]?\d*/?" size="4" maxlength="8"%in;
-  <div class="row">
+  <div class="row mt-1">
     <div class="col-sm-1 col-md-2 col-form-label">
       xlab
     </div>
@@ -322,10 +322,9 @@
 
 %define;selector_fevent(xcnt)
   <select class="form-control custom-select font-weight-bold" id="fevent_selectxcnt" onchange="show_fevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
-    <option value="">[*custom event]</option>
-    <option disabled>──────────</option>
-    <option value="">-</option>
-    <option value="#marr"%if;(event.e_name="#marr" or event.e_name="") selected%end;>[*marriage event]</option>
+    <option value=""%if;(event.e_name="") selected%end; disabled>[*select/delete an event]0</option>
+    <option disabled>───────────────</option>
+    <option value="#marr"%if;(event.e_name="#marr") selected%end;>[*marriage event]</option>
     <option value="#nmar"%if;(event.e_name="#nmar") selected%end;>[*no marriage event]</option>
     <option value="#enga"%if;(event.e_name="#enga") selected%end;>[*engage event]</option>
     <option value="#nmen"%if;(event.e_name="#nmen") selected%end;>[*no mention]</option>
@@ -337,6 +336,10 @@
     <option value="#sep"%if;(event.e_name="#sep") selected%end;>[*separate event]</option>
     <option value="#anul"%if;(event.e_name="#anul") selected%end;>[*annulation]</option>
     <option value="#resi"%if;(event.e_name="#resi") selected%end;>[*residence]</option>
+    <option disabled>───────────────</option>
+    <option value=""%if;(not ("#" in event.e_name) and event.e_name!="") selected%end; id="customxcnt">[*custom event]</option>
+    <option disabled>───────────────</option>
+    <option value="" id="deletexcnt"> [*select/delete an event]1</option>
   </select>
 %end;
 
@@ -349,7 +352,7 @@
           %for;i;1;11;<option>%i;</option> %end;
         </select>
         <div class="input-group-append">
-          <label class="btn btn-outline-primary"> [event/events]0/[event/events]1
+          <label class="btn btn-outline-primary"> [event/events]2
             <input class="ml-1" type="checkbox" name="ins_eventxcnt" value="on">
           </label>
           <button type="submit" class="btn btn-outline-primary" title="[*insert::event/events]0/[event/events]1">OK</button>
@@ -368,7 +371,7 @@
           %for;i;1;11;<option>%i;</option> %end;
         </select>
         <div class="input-group-append">
-          <label class="btn btn-outline-primary"> [witness/witness/witnesses]0/[witness/witness/witnesses]2
+          <label class="btn btn-outline-primary"> [witness/witness/witnesses]3
             <input class="ml-1" type="checkbox" name="excnt_ins_witnwcnt" value="on">
           </label>
         <button type="submit" class="btn btn-outline-primary" title="[*insert::witness/witness/witnesses]0/[witness/witness/witnesses]2">OK</button>
@@ -492,7 +495,7 @@
     </div>
   </div>
   %apply;date([*date/dates]0, "e_datexcnt", "event_date")
-  <div class="row">
+  <div class="row mt-1">
     <label for="e_notexcnt" class="col-sm-2 col-form-label">[*note/notes]1</label>
     <div class="col-sm-10 d-inline-flex">
       %if;(event.e_name="#marr" and event.e_note="" and comment!="" and not ("ADD" in e.m))
@@ -531,7 +534,7 @@
 %end;
 
 %define;card_header(xx,yy)
-  <h3 class="card-header pt-1 pb-0 text-center" id="xx" aria-label="§ [*yy]1">[*yy]1</h3>
+  <h3 class="card-header py-1 text-center" id="xx" aria-label="§ [*yy]1">[*yy]1</h3>
 %end;
 
 <h1%if;((evar.m="ADD_FAM" or evar.m="ADD_FAM_OK") and evar.ip="") class="mt-5"%end;>%nn;
@@ -547,7 +550,16 @@
   %end;
 </h1>
 %let;l_on1s;onkeydown="if (event.keyCode == 13) if (!event.shiftKey) javascript:document.upd.submit()"%in;
-<form method="post" action="%action;">
+%define;ev(vv,xx)%e.ins_vvxx;%end;
+<form method="post" action="%action;" id="updfam"
+  data-insert="%for;j;1;100;
+                 %let;test_ev;%apply;ev("event",j)%in;
+                 %if;(test_ev="on")%(e_place%)fevent_select%expr(j+1)/%end;
+               %end;
+               %for;j;1;100;
+                 %let;test_ch;%apply;ev("ch",j-1)%in;
+                 %if;(test_ch="on")ch%j;_fn/%end;
+               %end;">
   <div class="row">
     %apply;nav()
   </div>
@@ -630,10 +642,10 @@
         %for;i;1;11;<option>%i;</option>%end;
       </select>
       <div class="input-group-append">
-        <label class="btn btn-outline-primary"> [child/children]0/[child/children]1
+        <label class="btn btn-outline-primary"> [child/children]2
           <input class="ml-1" type="checkbox" name="ins_chxcnt" value="on">
         </label>
-        <button type="submit" class="btn btn-outline-primary" title="[*insert::child/children]0/[child/children]1">OK</button>
+        <button type="submit" class="btn btn-outline-primary" title="[*insert::child/children]2">OK</button>
       </div>
     </div>
   </div>
@@ -803,21 +815,26 @@ function show_fevent_label(xxname, xcnt) {
   var selector = document.getElementById('fevent_select' + xcnt);
   var label = document.getElementById('fevent_label_selector' + xcnt);
   var input = document.getElementById('e_name' + xcnt);
+
   if (selector.value == "") {
-    if (xxname.charAt(0) == "#") {
-      input.value = "";
-    } else {
+    if (xxname.charAt(0) != "#" && xxname != "") {
       input.value = xxname;
+    } else {
+      input.value = "";
     }
   } else {
     input.value = selector.value;
   }
-  if (selector.value == "" || selector.value.charAt(0) != "#") {
+
+  if (selector.options[selector.selectedIndex].id === "custom" + xcnt) {
     label.style.display = 'inline';
+    input.style.display = 'inline';
   } else {
     label.style.display = 'none';
+    input.style.display = 'none';
   }
 }
+
 $(document).ready(function() {
   //show evt perso
   $(".other_evts").each(function() {
@@ -826,6 +843,20 @@ $(document).ready(function() {
       $(this).show();
     }
   });
+});
+</script>
+<script>
+$(document).ready(function() {
+    var targetId = $('#updfam').data('insert').split('/')[0];
+    if (!targetId) {
+        var $inputs = $('#updfam').find('input[type="text"]');
+        targetId = $inputs.filter(function() {
+            return (this.id.startsWith('e_place') || this.id.endsWith('_fn')) && this.value === '';
+        }).first().attr('id');
+    }
+    if (targetId) {
+        $('#' + targetId).focus();
+    }
 });
 </script>
 </body>
