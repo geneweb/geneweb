@@ -34,9 +34,6 @@ val mkdir_p : ?perm:int -> string -> unit
     No error if existing, make parent directories as needed.
 *)
 
-val remove_dir : string -> unit
-(** Remove every file in the directory and then remove the directory itself *)
-
 val lock_file : string -> string
 (** Returns the name of a lock file (with extension .lck). Result is generally used as an
     argument for [Lock.control] function. *)

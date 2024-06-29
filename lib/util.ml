@@ -4,6 +4,89 @@ open Config
 open Def
 open Gwdb
 
+let print_default_gwf_file bname =
+  let gwf =
+    [
+      "access_by_key=yes";
+      "disable_forum=yes";
+      "hide_private_names=no";
+      "use_restrict=no";
+      "show_consang=yes";
+      "display_sosa=yes";
+      "place_surname_link_to_ind=yes";
+      "max_anc_level=8";
+      "max_anc_tree=7";
+      "max_desc_level=12";
+      "max_desc_tree=4";
+      "max_cousins=2000";
+      "max_cousins_level=5";
+      "latest_event=20";
+      "template=*";
+      "long_date=no";
+      "counter=no";
+      "full_siblings=yes";
+      "hide_advanced_request=no";
+      "p_mod=";
+    ]
+  in
+  let config_d = !GWPARAM.config_d bname in
+  let fname = !GWPARAM.config bname in
+  try
+    if not (Sys.file_exists config_d) then Unix.mkdir config_d 0o755;
+    if bname = "" || Sys.file_exists fname then ()
+    else
+      let oc = open_out fname in
+      List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf;
+      close_out oc
+  with Unix.Unix_error (_, _, _) ->
+    !GWPARAM.syslog `LOG_WARNING
+      (Printf.sprintf "Error while creating %s or %s\n" config_d fname)
+
+let rec cut_at_equal i s =
+  if i = String.length s then (s, "")
+  else if s.[i] = '=' then
+    (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
+  else cut_at_equal (succ i) s
+
+let read_base_env bname gw_prefix debug =
+  let load_file fname =
+    try
+      let ic = Secure.open_in fname in
+      let env =
+        let rec loop env =
+          match input_line ic with
+          | s ->
+              let s = Mutil.strip_all_trailing_spaces s in
+              if s = "" || s.[0] = '#' then loop env
+              else loop (cut_at_equal 0 s :: env)
+          | exception End_of_file -> env
+        in
+        loop []
+      in
+      close_in ic;
+      List.rev env
+    with Sys_error error ->
+      !GWPARAM.syslog `LOG_WARNING
+        (Printf.sprintf "Error %s while loading %s, using empty config\n%!"
+           error fname);
+      []
+  in
+  let fname1 = !GWPARAM.config bname in
+  if Sys.file_exists fname1 then load_file fname1
+  else
+    let fname2 = Filename.concat gw_prefix "a.gwf" in
+    if Sys.file_exists fname2 then (
+      if debug then
+        !GWPARAM.syslog `LOG_WARNING
+          (Printf.sprintf "Using configuration from %s\n%!" fname2);
+      load_file fname2)
+    else (
+      if debug then
+        !GWPARAM.syslog `LOG_WARNING
+          (Printf.sprintf "No config file found in either %s or %s\n%!" fname1
+             fname2);
+      [])
+
 let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
   (*Printf.eprintf "Errors set_vars:\n";
     List.iter (fun e -> Printf.eprintf "%s\n" e) set_vars;*)
@@ -118,8 +201,6 @@ let escape_attribute =
 
 let is_hide_names conf p =
   if conf.hide_names || get_access p = Private then true else false
-
-let cnt_dir = ref Filename.current_dir_name
 
 let search_in_path p s =
   let rec loop = function
@@ -1137,7 +1218,6 @@ let string_of_witness_kind conf sex witness_kind =
   in
   Adef.safe @@ transl_nth conf s n
 
-let base_path pref bname = !GWPARAM.base_path pref bname
 let bpath bname = !GWPARAM.bpath bname
 let copy_from_templ_ref = ref (fun _ _ _ -> assert false)
 let copy_from_templ conf env ic = !copy_from_templ_ref conf env ic
@@ -1181,28 +1261,38 @@ let etc_file_name conf fname =
   let fname =
     List.fold_left Filename.concat "" (String.split_on_char '/' fname)
   in
+
   (* On cherche le fichier dans cet ordre :
      - dans la base (bases/etc/base_name/name.txt)
-     - dans la base (bases/etc/templx/name.txt)
-     - dans le répertoire des programmes (gw/etc/templx/name.txt) *)
-  let file_exist dir =
-    let fn =
-      Filename.concat conf.bname (fname ^ ".txt")
-      |> Filename.concat "etc" |> bpath
-    in
-    if Sys.file_exists fn then fn
-    else
-      let fn =
-        Filename.concat (Filename.basename dir) (fname ^ ".txt")
-        |> Filename.concat "etc" |> bpath
-      in
-      if Sys.file_exists fn then fn
+     - dans les base (bases/etc/templx/name.txt)
+     - dans la distribution (gw/etc/templx/name.txt)
+     - dans la distribution (gw/etc/name.txt) *)
+  let file_exist dir pass =
+    if dir <> "*" then
+      let fn = Filename.concat (!GWPARAM.etc_d conf.bname) (fname ^ ".txt") in
+      if pass = 1 && Sys.file_exists fn then fn
       else
         let fn =
-          Filename.concat dir (fname ^ ".txt")
-          |> Filename.concat "etc" |> search_in_assets
+          String.concat Filename.dir_sep
+            (if dir <> "" then [ !GWPARAM.bpath ""; "etc"; dir; fname ^ ".txt" ]
+            else [ !GWPARAM.bpath ""; "etc"; fname ^ ".txt" ])
         in
-        if Sys.file_exists fn then fn else ""
+        if Sys.file_exists fn then fn
+        else
+          let fn =
+            String.concat Filename.dir_sep
+              [ !GWPARAM.bpath ""; "etc"; fname ^ ".txt" ]
+          in
+          if dir <> "" && Sys.file_exists fn then fn
+          else
+            let fn =
+              search_in_assets
+                (String.concat Filename.dir_sep
+                   (if dir <> "" then [ "etc"; dir; fname ^ ".txt" ]
+                   else [ "etc"; fname ^ ".txt" ]))
+            in
+            if Sys.file_exists fn then fn else ""
+    else ""
   in
   (* Recherche le template par défaut en fonction de la variable gwf *)
   (* template = templ1,templ2,*                                      *)
@@ -1210,7 +1300,7 @@ let etc_file_name conf fname =
     match config_templ with
     | [] | [ "*" ] -> std_fname
     | x :: l -> (
-        match file_exist x with "" -> default_templ l std_fname | s -> s)
+        match file_exist x 2 with "" -> default_templ l std_fname | s -> s)
   in
   let config_templ =
     try
@@ -1221,8 +1311,9 @@ let etc_file_name conf fname =
         else loop list (i + 1) (Buff.store len s.[i])
       in
       loop [] 0 0
-    with Not_found -> [ conf.bname; "*" ]
+    with Not_found -> [ "*" ]
   in
+  (* what is the semantic of "*" ? *)
   let dir =
     match p_getenv conf.env "templ" with
     | Some x when List.mem "*" config_templ -> x
@@ -1230,12 +1321,18 @@ let etc_file_name conf fname =
     | Some _ | None -> (
         match config_templ with [] | [ "*" ] -> "" | x :: _ -> x)
   in
+  (* remove dir from config_templ as it will have already been tested for *)
+  let config_templ =
+    List.fold_left
+      (fun acc t -> if t <> dir then t :: acc else acc)
+      [] (List.rev config_templ)
+  in
   (* template par défaut *)
   let std_fname = search_in_assets (Filename.concat "etc" (fname ^ ".txt")) in
   (* On cherche le template dans l'ordre de file_exist.         *)
   (* Si on ne trouve rien, alors on cherche le premier template *)
   (* par défaut tel que défini par la variable template du gwf  *)
-  match file_exist dir with
+  match file_exist dir 1 with
   | "" -> default_templ config_templ std_fname
   | s -> s
 
@@ -1278,7 +1375,9 @@ let get_request_string conf =
 let message_to_wizard conf =
   if conf.wizard || conf.just_friend_wizard then (
     let print_file fname =
-      let fname = base_path [ "etc"; conf.bname ] (fname ^ ".txt") in
+      let fname =
+        Filename.concat (!GWPARAM.etc_d conf.bname) (fname ^ ".txt")
+      in
       try
         let ic = Secure.open_in fname in
         try
@@ -1931,13 +2030,18 @@ let find_sosa_ref conf base =
   | None -> default_sosa_ref conf base
 
 let write_default_sosa conf key =
-  let gwf = List.remove_assoc "default_sosa_ref" conf.base_env in
-  let gwf = List.rev (("default_sosa_ref", key) :: gwf) in
-  let fname = bpath (conf.bname ^ ".gwf") in
+  let gwf =
+    List.fold_left
+      (fun acc (k, v) ->
+        if k = "default_sosa_ref" then ("default_sosa_ref", key) :: acc
+        else (k, v) :: acc)
+      [] (List.rev conf.base_env)
+  in
+  let fname = !GWPARAM.config conf.bname in
   let tmp_fname = fname ^ "2" in
   let oc =
     try Stdlib.open_out tmp_fname
-    with Sys_error _ -> failwith "the gwf database is not writable"
+    with Sys_error _ -> failwith "the gwf file is not writable"
   in
   List.iter (fun (k, v) -> Stdlib.output_string oc (k ^ "=" ^ v ^ "\n")) gwf;
   close_out oc;
@@ -2148,8 +2252,6 @@ let escache_value base =
   let v = int_of_float (mod_float t (float_of_int max_int)) in
   Adef.encoded (string_of_int v)
 
-let adm_file f = List.fold_right Filename.concat [ !cnt_dir; "cnt" ] f
-
 let sprintf_today conf =
   let hh, mm, ss = conf.time in
   let tm =
@@ -2204,7 +2306,24 @@ let update_wf_trace conf fname =
   in
   write_wf_trace fname (List.sort (fun x y -> compare y x) wt)
 
+let test_cnt_d conf =
+  let config_d = !GWPARAM.config_d conf.bname in
+  let cnt_d = !GWPARAM.cnt_d conf.bname in
+  (if not (Sys.file_exists config_d) then
+   try Unix.mkdir config_d 0o755
+   with Unix.Unix_error (_, _, _) ->
+     !GWPARAM.syslog `LOG_WARNING
+       (Printf.sprintf "Failure when creating config_dir (util): %s" config_d));
+  if not (Sys.file_exists cnt_d) then
+    try Unix.mkdir cnt_d 0o755
+    with Unix.Unix_error (_, _, _) ->
+      !GWPARAM.syslog `LOG_WARNING
+        (Printf.sprintf "Failure when creating cnt_dir (util): %s" cnt_d)
+  else ();
+  cnt_d
+
 let commit_patches conf base =
+  let _ = test_cnt_d in
   Gwdb.commit_patches base;
   conf.henv <-
     List.map
@@ -2215,7 +2334,7 @@ let commit_patches conf base =
       try List.assoc "wizard_passwd_file" conf.base_env with Not_found -> ""
     in
     if wpf <> "" then
-      let fname = adm_file (conf.bname ^ "_u.txt") in
+      let fname = !GWPARAM.adm_file (conf.bname ^ "_u.txt") in
       update_wf_trace conf fname
 
 let short_f_month m =
@@ -2239,8 +2358,12 @@ let short_f_month m =
 
 type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
-let read_gen_auth_file fname =
-  let fname = bpath fname in
+let read_gen_auth_file fname base_file =
+  let fname =
+    if GWPARAM.is_reorg_base base_file then
+      Filename.concat (!GWPARAM.config_d base_file) fname
+    else Filename.concat (Secure.base_dir ()) fname
+  in
   try
     let ic = Secure.open_in fname in
     let rec loop data =
@@ -2812,7 +2935,7 @@ let has_children base u =
 
 let get_bases_list ?(format_fun = fun x -> x) () =
   let list = ref [] in
-  let dh = Unix.opendir (!GWPARAM.bpath "") in
+  let dh = Unix.opendir (Secure.base_dir ()) in
   (try
      while true do
        let e = Unix.readdir dh in

@@ -9,6 +9,20 @@ let errors_undef = ref []
 let errors_other = ref []
 let set_vars = ref []
 let gwd_cmd = ref ""
+let reorg = ref false
+let force = ref false
+let cnt_dir = ref ""
+let sock_dir = ref ""
+let bases = ref (Secure.base_dir ())
+
+type init_s = { status : bool; bname : string }
+
+let init_done : init_s ref = ref { status = false; bname = "" }
+
+(** allows testing of reorg config in classic mode *)
+let config_reorg bname =
+  String.concat Filename.dir_sep
+    [ Secure.base_dir (); bname ^ ".gwb"; "config"; bname ^ ".gwf" ]
 
 type syslog_level =
   [ `LOG_ALERT
@@ -20,13 +34,109 @@ type syslog_level =
   | `LOG_NOTICE
   | `LOG_WARNING ]
 
+module Reorg = struct
+  (* Attention, ajuster is_reorg_base en conséquence *)
+  let config bname =
+    let bname = Filename.remove_extension bname in
+    config_reorg bname
+
+  let cnt_d bname =
+    let bname = Filename.remove_extension bname in
+    if !sock_dir = "" then
+      cnt_dir :=
+        if bname <> "" then
+          String.concat Filename.dir_sep
+            [ Secure.base_dir (); bname ^ ".gwb"; "config"; "cnt" ]
+        else String.concat Filename.dir_sep [ Secure.base_dir (); "cnt" ]
+    else cnt_dir := !sock_dir;
+    !cnt_dir
+
+  let adm_file file = Filename.concat !cnt_dir file
+
+  let portraits_d bname =
+    let bname = Filename.remove_extension bname in
+    String.concat Filename.dir_sep
+      [ Secure.base_dir (); bname ^ ".gwb"; "documents"; "portraits" ]
+
+  let src_d bname =
+    let bname = Filename.remove_extension bname in
+    String.concat Filename.dir_sep
+      [ Secure.base_dir (); bname ^ ".gwb"; "documents"; "src" ]
+
+  let etc_d bname =
+    let bname = Filename.remove_extension bname in
+    String.concat Filename.dir_sep [ Secure.base_dir (); bname ^ ".gwb"; "etc" ]
+
+  let config_d bname =
+    let bname = Filename.remove_extension bname in
+    String.concat Filename.dir_sep
+      [ Secure.base_dir (); bname ^ ".gwb"; "config" ]
+
+  let lang_d bname lang =
+    let bname = Filename.remove_extension bname in
+    if lang = "" then
+      String.concat Filename.dir_sep
+        [ Secure.base_dir (); bname ^ ".gwb"; "etc"; "lang" ]
+    else
+      String.concat Filename.dir_sep
+        [ Secure.base_dir (); bname ^ ".gwb"; "etc"; "lang"; lang ]
+
+  let images_d bname =
+    let bname = Filename.remove_extension bname in
+    String.concat Filename.dir_sep
+      [ Secure.base_dir (); bname ^ ".gwb"; "documents"; "images" ]
+
+  let bpath bname =
+    let bname = Filename.remove_extension bname in
+    if bname = "" then Secure.base_dir ()
+    else Filename.concat (Secure.base_dir ()) (bname ^ ".gwb")
+end
+
 module Default = struct
-  let init () = Secure.add_assets Filename.current_dir_name
+  (* Attention, ajuster is_reorg_base en conséquence *)
+  let config bname =
+    let bname = Filename.remove_extension bname in
+    String.concat Filename.dir_sep [ Secure.base_dir (); bname ^ ".gwf" ]
 
-  let base_path pref bname =
-    List.fold_right Filename.concat (Secure.base_dir () :: pref) bname
+  let cnt_d _bname =
+    if !cnt_dir = "" then (
+      let str = String.concat Filename.dir_sep [ Secure.base_dir (); "cnt" ] in
+      cnt_dir := str;
+      str)
+    else !cnt_dir
 
-  let bpath bname = Filename.concat (Secure.base_dir ()) bname
+  let adm_file file = Filename.concat !cnt_dir file
+
+  let portraits_d bname =
+    let bname = Filename.remove_extension bname in
+    String.concat Filename.dir_sep [ Secure.base_dir (); "images"; bname ]
+
+  let src_d bname =
+    let bname = Filename.remove_extension bname in
+    String.concat Filename.dir_sep [ Secure.base_dir (); "src"; bname ]
+
+  let etc_d bname =
+    let bname = Filename.remove_extension bname in
+    String.concat Filename.dir_sep [ Secure.base_dir (); "etc"; bname ]
+
+  let config_d _bname = Secure.base_dir ()
+
+  let lang_d bname lang =
+    let bname = Filename.remove_extension bname in
+    if lang = "" then
+      String.concat Filename.dir_sep [ Secure.base_dir (); "lang"; bname ]
+    else
+      String.concat Filename.dir_sep [ Secure.base_dir (); "lang"; lang; bname ]
+
+  let images_d bname =
+    let bname = Filename.remove_extension bname in
+    String.concat Filename.dir_sep
+      [ Secure.base_dir (); "src"; bname; "images" ]
+
+  let bpath bname =
+    let bname = Filename.remove_extension bname in
+    if bname = "" then Secure.base_dir ()
+    else Filename.concat (Secure.base_dir ()) (bname ^ ".gwb")
 
   (** [output_error ?headers ?content conf code]
       Send the http status [code], [headers] and
@@ -167,12 +277,122 @@ module Default = struct
     Output.print_sstring conf {|</body></html>|}
 end
 
-let init = ref Default.init
-let base_path = ref Default.base_path
-let bpath = ref Default.bpath
+type my_fun_2 = string -> string
+type my_fun_3 = string -> string -> string
+
+let config = ref (Default.config : my_fun_2)
+let cnt_d = ref (Default.cnt_d : my_fun_2)
+let adm_file = ref (Default.adm_file : my_fun_2)
+let src_d = ref (Default.src_d : my_fun_2)
+let etc_d = ref (Default.etc_d : my_fun_2)
+let config_d = ref (Default.config_d : my_fun_2)
+let lang_d = ref (Default.lang_d : my_fun_3)
+let bpath = ref (Default.bpath : my_fun_2)
+let portraits_d = ref (Default.portraits_d : my_fun_2)
+let images_d = ref (Default.images_d : my_fun_2)
+
+(* attention; ne pas utiliser !config! *)
+let is_reorg_base bname =
+  let bname = Filename.remove_extension bname in
+  Sys.file_exists
+    (String.concat Filename.dir_sep
+       [ Secure.base_dir (); bname ^ ".gwb"; "config"; bname ^ ".gwf" ])
+
 let output_error = ref Default.output_error
 let p_auth = ref Default.p_auth
 let syslog = ref Default.syslog
+
+let init bname =
+  Secure.add_assets Filename.current_dir_name;
+
+  reorg := !reorg || is_reorg_base bname;
+  if !reorg then (
+    config := Reorg.config;
+    cnt_d := Reorg.cnt_d;
+    adm_file := Reorg.adm_file;
+    src_d := Reorg.src_d;
+    etc_d := Reorg.etc_d;
+    config_d := Reorg.config_d;
+    lang_d := Reorg.lang_d;
+    bpath := Reorg.bpath;
+    portraits_d := Reorg.portraits_d;
+    images_d := Reorg.images_d)
+  else (
+    config := Default.config;
+    cnt_d := Default.cnt_d;
+    adm_file := Default.adm_file;
+    src_d := Default.src_d;
+    etc_d := Default.etc_d;
+    config_d := Default.config_d;
+    lang_d := Default.lang_d;
+    bpath := Default.bpath;
+    portraits_d := Default.portraits_d;
+    images_d := Default.images_d)
+
+let init_etc bname =
+  if !init_done.status && bname = !init_done.bname then ()
+  else init_done := { status = true; bname };
+  if !reorg then (
+    (if not (Sys.file_exists (!bpath bname)) then
+     try
+       Unix.mkdir (!bpath bname) 0o755;
+       force := true
+     with Unix.Unix_error (_, _, _) ->
+       !syslog `LOG_WARNING
+         (Printf.sprintf "Failure when creating base_dir: %s" (!bpath bname)));
+
+    (if not (Sys.file_exists (!etc_d bname)) then
+     try Unix.mkdir (!etc_d bname) 0o755
+     with Unix.Unix_error (_, _, _) ->
+       !syslog `LOG_WARNING
+         (Printf.sprintf "Failure when creating etc_dir: %s" (!etc_d bname)));
+
+    (if not (Sys.file_exists (!config_d bname)) then
+     try Unix.mkdir (!config_d bname) 0o755
+     with Unix.Unix_error (_, _, _) ->
+       !syslog `LOG_WARNING
+         (Printf.sprintf "Failure when creating config_dir: %s"
+            (!config_d bname)));
+
+    if not (Sys.file_exists (!cnt_d bname)) then
+      try Unix.mkdir (!cnt_d bname) 0o755
+      with Unix.Unix_error (_, _, _) ->
+        !syslog `LOG_WARNING
+          (Printf.sprintf "Failure when creating cnt_dir: %s" (!cnt_d bname)))
+  else (
+    (if not (Sys.file_exists "etc") then
+     try
+       Unix.mkdir "etc" 0o755;
+       force := true
+     with Unix.Unix_error (_, _, _) ->
+       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating etc"));
+
+    (if not (Sys.file_exists "lang") then
+     try
+       Unix.mkdir "lang" 0o755;
+       force := true
+     with Unix.Unix_error (_, _, _) ->
+       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating lang"));
+
+    (if not (Sys.file_exists "cnt") then
+     try
+       Unix.mkdir "etc" 0o755;
+       force := true
+     with Unix.Unix_error (_, _, _) ->
+       !syslog `LOG_WARNING (Printf.sprintf "Failure when creating cnt"));
+
+    if not (Sys.file_exists (!etc_d bname)) then
+      try
+        Unix.mkdir (!etc_d bname) 0o755;
+        force := true
+      with Unix.Unix_error (_, _, _) ->
+        !syslog `LOG_WARNING
+          (Printf.sprintf "Failure when creating etc_dir: %s" (!etc_d bname)))
+
+let test_reorg bname =
+  if !reorg || is_reorg_base bname then (
+    reorg := true;
+    init bname)
 
 (** [wrap_output conf title content]
     Plugins defining a page content but not a complete UI

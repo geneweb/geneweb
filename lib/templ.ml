@@ -306,7 +306,7 @@ let rec eval_variable conf = function
           acc
           ^ Format.sprintf "<b%s>%s</b>=%s<br>\n" duplicate k
               (Util.escape_html v :> string))
-        "" l
+        "" conf.base_env
   | [ "gwd"; "arglist" ] -> !GWPARAM.gwd_cmd
   | [ "bvar"; v ] | [ "b"; v ] -> (
       try List.assoc v conf.base_env with Not_found -> "")
@@ -1100,6 +1100,7 @@ let rgb_of_str_hsv h s v =
 let eval_var conf ifun env ep loc sl =
   try
     match sl with
+    | [ "reorg" ] -> VVbool !GWPARAM.reorg
     | [ "env"; "key" ] -> (
         match ifun.get_vother (List.assoc "binding" env) with
         | Some (Vbind (k, _)) -> VVstring k
@@ -1134,7 +1135,7 @@ let print_foreach conf ifun print_ast eval_expr env ep loc s sl el al =
     templ_print_foreach conf print_ast ifun.set_vother env ep loc s sl el al
 
 let print_wid_hei conf fname =
-  match Image.size_from_path (Image.path_of_filename fname) with
+  match Image.size_from_path (Image.path_of_filename conf fname) with
   | Ok (wid, hei) -> Output.printf conf " width=\"%d\" height=\"%d\"" wid hei
   | Error () -> ()
 
