@@ -175,10 +175,8 @@ let get_extension conf saved fname =
   let f =
     if saved then
       String.concat Filename.dir_sep
-        [ Util.base_path [ "images" ] conf.bname; "old"; fname ]
-    else
-      String.concat Filename.dir_sep
-        [ Util.base_path [ "images" ] conf.bname; fname ]
+        [ !GWPARAM.images_d conf.bname; "old"; fname ]
+    else String.concat Filename.dir_sep [ !GWPARAM.images_d conf.bname; fname ]
   in
   if Sys.file_exists (f ^ ".jpg") then ".jpg"
   else if Sys.file_exists (f ^ ".jpeg") then ".jpeg"
@@ -249,10 +247,7 @@ let print_send_image conf base p =
       Output.print_string conf (Util.escape_html (p_surname base p)))
   in
   let digest = Image.default_portrait_filename base p in
-  Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.print_sstring conf "<h2>\n";
-  title false;
-  Output.print_sstring conf "</h2>\n";
+  Hutil.header conf title;
   Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
     conf.command;
@@ -329,7 +324,7 @@ let effective_send_ok conf base p file =
         | _ -> (typ, content))
   in
   let fname = Image.default_portrait_filename base p in
-  let dir = Util.base_path [ "images" ] conf.bname in
+  let dir = !GWPARAM.images_d conf.bname in
   if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
   let fname =
     Filename.concat dir
@@ -413,11 +408,8 @@ let effective_send_c_ok conf base p file file_name =
   in
   let fname = Image.default_portrait_filename base p in
   let dir =
-    if mode = "portraits" then
-      String.concat Filename.dir_sep [ Util.base_path [ "images" ] conf.bname ]
-    else
-      String.concat Filename.dir_sep
-        [ Util.base_path [ "src" ] conf.bname; "images"; fname ]
+    if mode = "portraits" then !GWPARAM.portraits_d conf.bname
+    else Filename.concat (!GWPARAM.images_d conf.bname) fname
   in
   if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
   let fname =
@@ -530,7 +522,7 @@ let print_deleted conf base p =
 let effective_delete_ok conf base p =
   let fname = Image.default_portrait_filename base p in
   let ext = get_extension conf false fname in
-  let dir = Util.base_path [ "images" ] conf.bname in
+  let dir = !GWPARAM.portraits_d conf.bname in
   if move_file_to_save (fname ^ ext) dir = 0 then
     incorrect conf "effective delete";
   let changed =
@@ -575,10 +567,8 @@ let effective_delete_c_ok conf base p =
   let ext = get_extension conf delete fname in
   let file = if file_name = "" then fname ^ ext else file_name in
   let dir =
-    if mode = "portraits" then Util.base_path [ "images" ] conf.bname
-    else
-      String.concat Filename.dir_sep
-        [ Util.base_path [ "src" ] conf.bname; "images"; fname ]
+    if mode = "portraits" then !GWPARAM.portraits_d conf.bname
+    else Filename.concat (!GWPARAM.images_d conf.bname) fname
   in
   if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
   (* TODO verify we dont destroy a saved image
@@ -598,12 +588,12 @@ let effective_reset_c_ok conf base p =
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
-  let carrousel = Image.default_portrait_filename base p in
+  let keydir = Image.default_portrait_filename base p in
   let file_name =
     try List.assoc "file_name" conf.env with Not_found -> Adef.encoded ""
   in
   let file_name = (Mutil.decode file_name :> string) in
-  let file_name = if mode = "portraits" then carrousel else file_name in
+  let file_name = if mode = "portraits" then keydir else file_name in
   let ext = get_extension conf false file_name in
   let old_ext = get_extension conf true file_name in
   let ext =
@@ -615,11 +605,10 @@ let effective_reset_c_ok conf base p =
   in
   let file_in_new =
     if mode = "portraits" then
-      String.concat Filename.dir_sep
-        [ Util.base_path [ "images" ] conf.bname; file_name ^ ext ]
+      Filename.concat (!GWPARAM.portraits_d conf.bname) (file_name ^ ext)
     else
       String.concat Filename.dir_sep
-        [ Util.base_path [ "src" ] conf.bname; "images"; carrousel; file_name ]
+        [ !GWPARAM.images_d conf.bname; keydir; file_name ]
   in
   (if Sys.file_exists file_in_new then ()
   else

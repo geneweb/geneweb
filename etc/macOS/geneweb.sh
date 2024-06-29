@@ -23,7 +23,7 @@ gws_pid=`ps -ef|grep '/gwsetup'|grep -v grep|awk '{print $2}'`
 kill $gws_pid
 
 if [ -f gwsetup.log ]; then
-  mv gwsetup.log gwseup.log.old
+  mv gwsetup.log gwsetup.log.old
 fi
 
 mkdir -p "$BASE"

@@ -265,64 +265,6 @@ let alias_lang lang =
       close_in ic ; lang
     with Sys_error _ -> lang
 
-let rec cut_at_equal i s =
-  if i = String.length s then s, ""
-  else if s.[i] = '=' then
-    String.sub s 0 i, String.sub s (succ i) (String.length s - succ i)
-  else cut_at_equal (succ i) s
-
-let strip_trailing_spaces s =
-  let len =
-    let rec loop len =
-      if len = 0 then 0
-      else
-        match s.[len-1] with
-          ' ' | '\n' | '\r' | '\t' -> loop (len - 1)
-        | _ -> len
-    in
-    loop (String.length s)
-  in
-  String.sub s 0 len
-
-let read_base_env bname =
-  let load_file fname =
-    try
-      let ic = Secure.open_in fname in
-      let env =
-        let rec loop env =
-          match input_line ic with
-          | s ->
-            let s = strip_trailing_spaces s in
-            if s = "" || s.[0] = '#' then loop env
-            else loop (cut_at_equal 0 s :: env)
-          | exception End_of_file -> env
-        in
-        loop []
-      in
-      close_in ic;
-      env
-    with Sys_error error ->
-      GwdLog.log (fun oc ->
-          Printf.fprintf oc "Error %s while loading %s, using empty config\n%!"
-            error fname);
-      []
-  in
-  let fname1 = Util.bpath (bname ^ ".gwf") in
-  if Sys.file_exists fname1 then
-    load_file fname1
-  else
-    let fname2 = Filename.concat !gw_prefix "etc/a.gwf" in
-    if Sys.file_exists fname2 then begin
-      if !debug then GwdLog.log (fun oc ->
-          Printf.fprintf oc "Using configuration from %s\n%!" fname2);
-      load_file fname2
-    end else begin
-      if !debug then GwdLog.log (fun oc ->
-          Printf.fprintf oc "No config file found in either %s or %s\n%!"
-            fname1 fname2);
-      []
-    end
-
 let print_renamed conf new_n =
   let link =
     let req = Util.get_request_string conf in
@@ -350,7 +292,7 @@ let print_renamed conf new_n =
       Hutil.trailer conf)
 
 let log_redirect from request req =
-  Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
+  Lock.control (!GWPARAM.adm_file "gwd.lck") true
     ~onerror:(fun () -> ()) begin fun () ->
     let referer = Mutil.extract_param "referer: " '\n' request in
     GwdLog.syslog `LOG_NOTICE @@
@@ -373,8 +315,7 @@ let print_redirected conf from request new_addr =
 let nonce_private_key =
   Lazy.from_fun
     (fun () ->
-       let cnt_dir = Filename.concat !(Util.cnt_dir) "cnt" in
-       let fname = Filename.concat cnt_dir "gwd_private.txt" in
+       let fname = Filename.concat !GWPARAM.cnt_dir "gwd_private.txt" in
        let k =
          try
            let ic = open_in fname in
@@ -478,10 +419,10 @@ let unauth_server conf ar =
   Output.print_sstring conf "</dl>\n";
   Hutil.trailer conf
 
-let gen_match_auth_file test_user_and_password auth_file =
+let gen_match_auth_file test_user_and_password auth_file base_file =
   if auth_file = "" then None
   else
-    let aul = read_gen_auth_file auth_file in
+    let aul = read_gen_auth_file auth_file base_file in
     let rec loop =
       function
         au :: aul ->
@@ -505,12 +446,12 @@ let gen_match_auth_file test_user_and_password auth_file =
     in
     loop aul
 
-let basic_match_auth_file uauth =
-  gen_match_auth_file (fun au -> au.au_user ^ ":" ^ au.au_passwd = uauth)
+let basic_match_auth_file uauth base_file =
+  gen_match_auth_file (fun au -> au.au_user ^ ":" ^ au.au_passwd = uauth) base_file
 
-let digest_match_auth_file asch =
+let digest_match_auth_file asch base_file =
   gen_match_auth_file
-    (fun au -> is_that_user_and_password asch au.au_user au.au_passwd)
+    (fun au -> is_that_user_and_password asch au.au_user au.au_passwd) base_file
 
 let match_simple_passwd sauth uauth =
   match String.index_opt sauth ':' with
@@ -521,9 +462,9 @@ let match_simple_passwd sauth uauth =
           sauth = String.sub uauth (i + 1) (String.length uauth - i - 1)
       | None -> sauth = uauth
 
-let basic_match_auth passwd auth_file uauth =
+let basic_match_auth passwd auth_file uauth base_file =
   if passwd <> "" && match_simple_passwd passwd uauth then Some ""
-  else basic_match_auth_file uauth auth_file
+  else basic_match_auth_file uauth auth_file base_file
 
 type access_type =
     ATwizard of string * string
@@ -536,7 +477,10 @@ let compatible_tokens check_from (addr1, base1_pw1) (addr2, base2_pw2) =
   (not check_from || addr1 = addr2) && base1_pw1 = base2_pw2
 
 let get_actlog check_from utm from_addr base_password =
-  let fname = SrcfileDisplay.adm_file "actlog" in
+  let fname = !GWPARAM.adm_file "actlog" in
+  if not (Sys.file_exists fname) then (
+    let oc = Secure.open_out fname in
+    close_out oc);
   try
     let ic = Secure.open_in fname in
       let tmout = float_of_int !login_timeout in
@@ -583,11 +527,11 @@ let get_actlog check_from utm from_addr base_password =
       in
       loop false ATnormal []
   with Sys_error e -> (
-      GwdLog.syslog `LOG_WARNING ("Error opening actlog: " ^ e);
+      GwdLog.syslog `LOG_WARNING ("Error opening (get) actlog: " ^ e);
     [], ATnormal, false)
 
 let set_actlog list =
-  let fname = SrcfileDisplay.adm_file "actlog" in
+  let fname = !GWPARAM.adm_file "actlog" in
   try
     let oc = Secure.open_out fname in
     List.iter
@@ -598,11 +542,11 @@ let set_actlog list =
       list;
     close_out oc
   with Sys_error e -> (
-    GwdLog.syslog `LOG_WARNING ("Error opening actlog: " ^ e);
+    GwdLog.syslog `LOG_WARNING ("Error opening (set) actlog: " ^ e);
     ())
 
 let get_token check_from utm from_addr base_password =
-  Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
+  Lock.control (!GWPARAM.adm_file "gwd.lck") true
     ~onerror:(fun () -> ATnormal)
     (fun () ->
        let (list, r, changed) =
@@ -624,7 +568,7 @@ let random_self_init () =
   Random.init seed
 
 let set_token utm from_addr base_file acc user username =
-  Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
+  Lock.control (!GWPARAM.adm_file "gwd.lck") true
     ~onerror:(fun () -> "")
     (fun () ->
        random_self_init ();
@@ -886,27 +830,27 @@ let basic_authorization from_addr request base_env passwd access_type utm
         if wizard_passwd = "" && wizard_passwd_file = "" then
           true, true, friend_passwd = "", ""
         else
-          match basic_match_auth wizard_passwd wizard_passwd_file uauth with
-            Some username -> true, true, false, username
+          match basic_match_auth wizard_passwd wizard_passwd_file uauth base_file with
+          | Some username -> true, true, false, username
           | None -> false, false, false, ""
       else if passwd = "f" then
         if friend_passwd = "" && friend_passwd_file = "" then
           true, false, true, ""
         else
-          match basic_match_auth friend_passwd friend_passwd_file uauth with
-            Some username -> true, false, true, username
+          match basic_match_auth friend_passwd friend_passwd_file uauth base_file with
+          | Some username -> true, false, true, username
           | None -> false, false, false, ""
       else assert false
     else if wizard_passwd = "" && wizard_passwd_file = "" then
       true, true, friend_passwd = "", ""
     else
-      match basic_match_auth wizard_passwd wizard_passwd_file uauth with
+      match basic_match_auth wizard_passwd wizard_passwd_file uauth base_file with
         Some username -> true, true, false, username
       | _ ->
           if friend_passwd = "" && friend_passwd_file = "" then
             true, false, true, ""
           else
-            match basic_match_auth friend_passwd friend_passwd_file uauth with
+            match basic_match_auth friend_passwd friend_passwd_file uauth base_file with
               Some username -> true, false, true, username
             | None -> true, false, false, ""
   in
@@ -965,7 +909,7 @@ let bad_nonce_report command passwd_char =
    ar_scheme = NoAuth; ar_user = ""; ar_name = ""; ar_wizard = false;
    ar_friend = false; ar_uauth = ""; ar_can_stale = true}
 
-let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz =
+let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz base_file =
   let asch = HttpAuth (Digest ds) in
   if wf_passwd <> "" &&
      is_that_user_and_password asch ds.ds_username wf_passwd
@@ -977,7 +921,7 @@ let test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz =
        ar_name = ""; ar_wizard = wiz; ar_friend = not wiz; ar_uauth = "";
        ar_can_stale = false}
   else
-    match digest_match_auth_file asch wf_passwd_file with
+    match digest_match_auth_file asch wf_passwd_file base_file with
       Some username ->
         if ds.ds_nonce <> nonce then bad_nonce_report command passwd_char
         else
@@ -1041,10 +985,10 @@ let digest_authorization request base_env passwd utm base_file command =
                passwd nonce ds.ds_meth ds.ds_uri)
       in
       if passwd = "w" then
-        test_passwd ds nonce command wizard_passwd wizard_passwd_file "w" true
+        test_passwd ds nonce command wizard_passwd wizard_passwd_file "w" true base_file
       else if passwd = "f" then
-        test_passwd ds nonce command friend_passwd friend_passwd_file "f"
-          false
+        test_passwd ds nonce command friend_passwd friend_passwd_file "f" 
+          false base_file
       else failwith (Printf.sprintf "not impl (2) %s %s" auth meth)
     else
       {ar_ok = false; ar_command = command; ar_passwd = passwd;
@@ -1157,7 +1101,8 @@ let make_conf from_addr request script_name env =
   let (threshold_test, env) = extract_assoc "threshold" env in
   if threshold_test <> ""
   then RelationLink.threshold := int_of_string threshold_test;
-  let base_env = read_base_env base_file in
+  GWPARAM.test_reorg base_file;
+  let base_env = Util.read_base_env base_file !gw_prefix !debug in
   let default_lang =
     try
       let x = List.assoc "default_lang" base_env in
@@ -1297,7 +1242,7 @@ let make_conf from_addr request script_name env =
          begin try List.assoc "no_note_for_visitor" base_env = "yes" with
            Not_found -> false
          end;
-     bname = base_file;
+     bname = Filename.remove_extension base_file;
      nb_of_persons = -1;
      nb_of_families = -1;
      env = env; senv = [];
@@ -1318,7 +1263,7 @@ let make_conf from_addr request script_name env =
      auth_file =
        begin try
          let x = List.assoc "auth_file" base_env in
-         if x = "" then !auth_file else Util.bpath x
+         if x = "" then !auth_file else Filename.concat (!GWPARAM.bpath base_file) x
        with Not_found -> !auth_file
        end;
      border =
@@ -1353,6 +1298,7 @@ let make_conf from_addr request script_name env =
      plugins = !plugins;
     }
   in
+  GWPARAM.cnt_dir := !GWPARAM.cnt_d conf.bname;
   conf, ar
 
 let log tm conf from gauth request script_name contents =
@@ -1381,7 +1327,7 @@ let log tm conf from gauth request script_name contents =
     end
 
 let is_robot from =
-  Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
+  Lock.control (!GWPARAM.adm_file "gwd.lck") true
     ~onerror:(fun () -> false)
     (fun () ->
        let (robxcl, _) = Robot.robot_excl () in
@@ -1428,7 +1374,7 @@ let log_and_robot_check conf auth from request script_name contents =
   if !robot_xcl = None
   then log (Unix.time ()) conf from auth request script_name contents
   else
-    Lock.control (SrcfileDisplay.adm_file "gwd.lck") true ~onerror:ignore
+    Lock.control (!GWPARAM.adm_file "gwd.lck") true ~onerror:ignore
       begin fun () ->
         let tm = Unix.time () in
         begin match !robot_xcl with
@@ -1455,7 +1401,7 @@ let conf_and_connection =
   fun from request script_name (contents: Adef.encoded_string) env ->
   let (conf, passwd_err) = make_conf from request script_name env in
   match !redirected_addr with
-    Some addr -> print_redirected conf from request addr
+  | Some addr -> print_redirected conf from request addr
   | None ->
       let (auth_err, auth) =
         if conf.auth_file = "" then false, ""
@@ -1470,7 +1416,7 @@ let conf_and_connection =
           log_and_robot_check conf auth from request script_name (contents :> string)
         end;
       match !(Wserver.cgi), auth_err, passwd_err with
-        true, true, _ ->
+      | true, true, _ ->
           if is_robot from then Robot.robot_error conf 0 0
           else no_access conf
       | _, true, _ ->
@@ -1487,7 +1433,7 @@ let conf_and_connection =
           if is_robot from then Robot.robot_error conf 0 0
           else
             let tm = Unix.time () in
-            Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
+            Lock.control (!GWPARAM.adm_file "gwd.lck") true
               ~onerror:(fun () -> ())
               (fun () -> log_passwd_failed ar tm from request conf.bname) ;
             unauth_server conf ar
@@ -1552,12 +1498,12 @@ let excluded from =
 
 let image_request conf script_name env =
   match Util.p_getenv env "m", Util.p_getenv env "v" with
-    Some "IM", Some fname ->
+  | Some "IM", Some fname ->
       let fname =
         if fname.[0] = '/' then String.sub fname 1 (String.length fname - 1)
         else fname
       in
-      let `Path fname = Image.path_of_filename fname in
+      let `Path fname = Image.path_of_filename conf fname in
       let _ = ImageDisplay.print_image_file conf fname in true
   | _ ->
       let s = script_name in
@@ -1568,7 +1514,7 @@ let image_request conf script_name env =
         (* empeche d'avoir des images qui se trouvent dans le dossier   *)
         (* image. Si on ne fait pas de basename, alors ça marche.       *)
         (* let fname = Filename.basename fname in *)
-        let `Path fname = Image.path_of_filename fname in
+        let `Path fname = Image.path_of_filename conf fname in
         let _ = ImageDisplay.print_image_file conf fname in true
       else false
 
@@ -1613,12 +1559,12 @@ let content_misc conf len misc_fname =
   Output.header conf "Cache-control: private, max-age=%d" (60 * 60 * 24 * 365);
   Output.flush conf
 
-let find_misc_file name =
+let find_misc_file conf name =
   if Sys.file_exists name
   && List.exists (fun p -> Mutil.start_with (Filename.concat p "assets") 0 name) !plugins
   then name
   else
-    let name' = Filename.concat (base_path ["etc"] "") name in
+    let name' = Filename.concat (!GWPARAM.etc_d conf.bname) name in
     if Sys.file_exists name' then name'
     else
       let name' = Util.search_in_assets @@ Filename.concat "etc" name in
@@ -1667,7 +1613,7 @@ let print_misc_file conf misc_fname =
     true
 
 let misc_request conf fname =
-  let fname = find_misc_file fname in
+  let fname = find_misc_file conf fname in
   if fname <> "" then
     let misc_fname =
       if Filename.check_suffix fname ".css" then Css fname
@@ -1783,16 +1729,18 @@ let connection (addr, request) script_name contents0 =
   if script_name = "robots.txt" then robots_txt printer_conf
   else if excluded from then refuse_log printer_conf from
   else
-    begin let accept =
-      if !only_addresses = [] then true else List.mem from !only_addresses
-    in
+    begin
+      let accept =
+        if !only_addresses = [] then true else List.mem from !only_addresses
+      in
       if not accept then only_log printer_conf from
       else
         try
           let (contents, env) = build_env request contents0 in
           if not (image_request printer_conf script_name env)
           && not (misc_request printer_conf script_name)
-          then conf_and_connection from request script_name contents env
+          then 
+            conf_and_connection from request script_name contents env
         with Exit -> ()
     end
 
@@ -1845,7 +1793,7 @@ let geneweb_server () =
             null_reopen [Unix.O_WRONLY] Unix.stderr
           end
         else exit 0;
-       Mutil.mkdir_p ~perm:0o777 (Filename.concat !Util.cnt_dir "cnt")
+        Mutil.mkdir_p ~perm:0o777 !GWPARAM.cnt_dir 
     end;
   Wserver.f GwdLog.syslog !selected_addr !selected_port !conn_timeout
     (if Sys.unix then !max_clients else None) connection
@@ -1866,7 +1814,7 @@ let manage_cgi_timeout tmout =
 
 let geneweb_cgi addr script_name contents =
   if Sys.unix then manage_cgi_timeout !conn_timeout;
-  begin try Unix.mkdir (Filename.concat !(Util.cnt_dir) "cnt") 0o755 with
+  begin try Unix.mkdir !GWPARAM.cnt_dir 0o755 with
     Unix.Unix_error (_, _, _) -> ()
   end;
   let add k x request =
@@ -1931,7 +1879,7 @@ let slashify s =
   in
   String.init (String.length s) conv_char
 
-let make_cnt_dir x =
+let make_sock_dir x =
   Mutil.mkdir_p x;
   if Sys.unix then ()
   else
@@ -1939,7 +1887,7 @@ let make_cnt_dir x =
       Wserver.sock_in := Filename.concat x "gwd.sin";
       Wserver.sock_out := Filename.concat x "gwd.sou"
     end;
-  Util.cnt_dir := x
+  GWPARAM.sock_dir := x
 
 let arg_plugin_doc opt doc =
   doc ^ " Combine with -force to enable for every base. \
@@ -2019,52 +1967,53 @@ let main () =
   let force_cgi = ref false in
   let speclist =
     [
-      ("-hd", Arg.String (fun x -> gw_prefix := x; Secure.add_assets x), "<DIR> Specify where the “etc”, “images” and “lang” directories are installed (default if empty is “gw”).")
-    ; ("-bd", Arg.String Secure.set_base_dir, "<DIR> Specify where the “bases” directory with databases is installed (default if empty is “bases”).")
-    ; ("-wd", Arg.String make_cnt_dir, "<DIR> Directory for socket communication (Windows) and access count.")
-    ; ("-cache_langs", Arg.String (fun s -> List.iter (Mutil.list_ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
-    ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
-    ; ("-etc_prefix", Arg.String (fun x -> etc_prefix := x; Secure.add_assets x), "<DIR> Specify where the “etc” directory is installed (default if empty is [-hd value]/etc).")
-    ; ("-images_prefix", Arg.String (fun x -> images_prefix := x), "<DIR> Specify where the “images” directory is installed (default if empty is [-hd value]/images).")
-    ; ("-images_dir", Arg.String (fun x -> images_dir := x), "<DIR> Same than previous but directory name relative to current.")
-    ; ("-a", Arg.String (fun x -> selected_addr := Some x), "<ADDRESS> Select a specific address (default = any address of this computer).")
-    ; ("-p", Arg.Int (fun x -> selected_port := x), "<NUMBER> Select a port number (default = " ^ string_of_int !selected_port ^ ").")
-    ; ("-setup_link", Arg.Set setup_link, " Display a link to local gwsetup in bottom of pages.")
-    ; ("-allowed_tags", Arg.String (fun x -> Util.allowed_tags_file := x), "<FILE> HTML tags which are allowed to be displayed. One tag per line in file.")
-    ; ("-wizard", Arg.String (fun x -> wizard_passwd := x), "<PASSWD> Set a wizard password.")
-    ; ("-friend", Arg.String (fun x -> friend_passwd := x), "<PASSWD> Set a friend password.")
-    ; ("-wjf", Arg.Set wizard_just_friend, " Wizard just friend (permanently).")
-    ; ("-lang", Arg.String (fun x -> default_lang := x), "<LANG> Set a default language (default: " ^ !default_lang ^ ").")
-    ; ("-blang", Arg.Set choose_browser_lang, " Select the user browser language if any.")
-    ; ("-only", Arg.String (fun x -> only_addresses := x :: !only_addresses), "<ADDRESS> Only inet address accepted.")
-    ; ("-auth", Arg.String (fun x -> auth_file := x), "<FILE> Authorization file to restrict access. The file must hold lines of the form \"user:password\".")
-    ; ("-no_host_address", Arg.Set no_host_address, " Force no reverse host by address.")
-    ; ("-digest", Arg.Set use_auth_digest_scheme, " Use Digest authorization scheme (more secure on passwords)")
+      ("-a", Arg.String (fun x -> selected_addr := Some x), "<ADDRESS> Select a specific address (default = any address of this computer).")
     ; ("-add_lexicon", Arg.String (Mutil.list_ref_append lexicon_list), "<FILE> Add file as lexicon.")
-    ; ("-log", Arg.String (fun x -> GwdLog.oc := Some (match x with "-" | "<stdout>" -> stdout | "2" | "<stderr>" -> stderr | _ -> open_out x)), {|<FILE> Log trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|})
-    ; ("-log_level", Arg.Set_int GwdLog.verbosity, {|<N> Send messages with severity <= <N> to syslog (default: |} ^ string_of_int !GwdLog.verbosity ^ {|).|})
-    ; ("-robot_xcl", Arg.String robot_exclude_arg, "<CNT>,<SEC> Exclude connections when more than <CNT> requests in <SEC> seconds.")
-    ; ("-min_disp_req", Arg.Int (fun x -> Robot.min_disp_req := x), " Minimum number of requests in robot trace (default: " ^ string_of_int !(Robot.min_disp_req) ^ ").")
-    ; ("-login_tmout", Arg.Int (fun x -> login_timeout := x), "<SEC> Login timeout for entries with passwords in CGI mode (default " ^ string_of_int !login_timeout ^ "s).")
-    ; ("-redirect", Arg.String (fun x -> redirected_addr := Some x), "<ADDR> Send a message to say that this service has been redirected to <ADDR>.")
-    ; ("-trace_failed_passwd", Arg.Set trace_failed_passwd, " Print the failed passwords in log (except if option -digest is set). ")
-    ; ("-debug", Arg.Unit (fun () -> debug := true ; GwdLog.debug := true ; Printexc.record_backtrace true), " Enable debug mode")
-    ; ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock files before writing.")
-    ; (arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin." )
-    ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
-    ; ("-version", Arg.Unit print_version_commit, " Print the Geneweb version, the source repository and last commit id and message.")
-#ifdef UNIX
-    ; ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
-    ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
-    ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
-    ; ("-no-fork", Arg.Set Wserver.no_fork, " Prevent forking processes")
-#endif
+    ; ("-allowed_tags", Arg.String (fun x -> Util.allowed_tags_file := x), "<FILE> HTML tags which are allowed to be displayed. One tag per line in file.")
+    ; ("-auth", Arg.String (fun x -> auth_file := x), "<FILE> Authorization file to restrict access. The file must hold lines of the form \"user:password\".")
+    ; ("-bd", Arg.String Secure.set_base_dir, "<DIR> Specify where the “bases” directory with databases is installed (default if empty is “bases”).")
+    ; ("-blang", Arg.Set choose_browser_lang, " Select the user browser language if any.")
     ; ("-cache-in-memory", Arg.String (fun s ->
         if Gw_ancient.is_available then
           cache_databases := s::!cache_databases
         else
           failwith "-cache-in-memory option unavailable for this build."
       ), "<DATABASE> Preload this database in memory")
+    ; ("-cache_langs", Arg.String (fun s -> List.iter (Mutil.list_ref_append cache_langs) @@ String.split_on_char ',' s), " Lexicon languages to be cached.")
+    ; ("-cgi", Arg.Set force_cgi, " Force CGI mode.")
+    ; ("-debug", Arg.Unit (fun () -> debug := true ; GwdLog.debug := true ; Printexc.record_backtrace true), " Enable debug mode")
+    ; ("-digest", Arg.Set use_auth_digest_scheme, " Use Digest authorization scheme (more secure on passwords)")
+    ; ("-etc_prefix", Arg.String (fun x -> etc_prefix := x; Secure.add_assets x), "<DIR> Specify where the “etc” directory is installed (default if empty is [-hd value]/etc).")
+    ; ("-friend", Arg.String (fun x -> friend_passwd := x), "<PASSWD> Set a friend password.")
+    ; ("-hd", Arg.String (fun x -> gw_prefix := x; Secure.add_assets x), "<DIR> Specify where the “etc”, “images” and “lang” directories are installed (default if empty is “gw”).")
+    ; ("-images_prefix", Arg.String (fun x -> images_prefix := x), "<DIR> Specify where the “images” directory is installed (default if empty is [-hd value]/images).")
+    ; ("-images_dir", Arg.String (fun x -> images_dir := x), "<DIR> Same than previous but directory name relative to current.")
+    ; ("-lang", Arg.String (fun x -> default_lang := x), "<LANG> Set a default language (default: " ^ !default_lang ^ ").")
+    ; ("-log", Arg.String (fun x -> GwdLog.oc := Some (match x with "-" | "<stdout>" -> stdout | "2" | "<stderr>" -> stderr | _ -> open_out x)), {|<FILE> Log trace to this file. Use "-" or "<stdout>" to redirect output to stdout or "<stderr>" to output log to stderr.|})
+    ; ("-log_level", Arg.Set_int GwdLog.verbosity, {|<N> Send messages with severity <= <N> to syslog (default: |} ^ string_of_int !GwdLog.verbosity ^ {|).|})
+    ; ("-login_tmout", Arg.Int (fun x -> login_timeout := x), "<SEC> Login timeout for entries with passwords in CGI mode (default " ^ string_of_int !login_timeout ^ "s).")
+    ; ("-min_disp_req", Arg.Int (fun x -> Robot.min_disp_req := x), " Minimum number of requests in robot trace (default: " ^ string_of_int !(Robot.min_disp_req) ^ ").")
+    ; ("-no_host_address", Arg.Set no_host_address, " Force no reverse host by address.")
+    ; ("-nolock", Arg.Set Lock.no_lock_flag, " Do not lock files before writing.")
+    ; ("-only", Arg.String (fun x -> only_addresses := x :: !only_addresses), "<ADDRESS> Only inet address accepted.")
+    ; ("-p", Arg.Int (fun x -> selected_port := x), "<NUMBER> Select a port number (default = " ^ string_of_int !selected_port ^ ").")
+    ; (arg_plugin "-plugin" "<PLUGIN>.cmxs load a safe plugin." )
+    ; (arg_plugins "-plugins" "<DIR> load all plugins in <DIR>.")
+    ; ("-redirect", Arg.String (fun x -> redirected_addr := Some x), "<ADDR> Send a message to say that this service has been redirected to <ADDR>.")
+    ; ("-reorg", Arg.Set Geneweb.GWPARAM.reorg, " Use new reorg folder structure")
+    ; ("-robot_xcl", Arg.String robot_exclude_arg, "<CNT>,<SEC> Exclude connections when more than <CNT> requests in <SEC> seconds.")
+    ; ("-setup_link", Arg.Set setup_link, " Display a link to local gwsetup in bottom of pages.")
+    ; ("-trace_failed_passwd", Arg.Set trace_failed_passwd, " Print the failed passwords in log (except if option -digest is set). ")
+    ; ("-version", Arg.Unit print_version_commit, " Print the Geneweb version, the source repository and last commit id and message.")
+    ; ("-wd", Arg.String make_sock_dir, "<DIR> Directory for socket communication (Windows) and access count.")
+    ; ("-wizard", Arg.String (fun x -> wizard_passwd := x), "<PASSWD> Set a wizard password.")
+    ; ("-wjf", Arg.Set wizard_just_friend, " Wizard just friend (permanently).")
+#ifdef UNIX
+    ; ("-conn_tmout", Arg.Int (fun x -> conn_timeout := x), "<SEC> Connection timeout (default " ^ string_of_int !conn_timeout ^ "s; 0 means no limit)." )
+    ; ("-daemon", Arg.Set daemon, " Unix daemon mode.")
+    ; ("-max_clients", Arg.Int (fun x -> max_clients := Some x), "<NUM> Max number of clients treated at the same time (default: no limit) (not cgi).")
+    ; ("-no_fork", Arg.Set Wserver.no_fork, " Prevent forking processes")
+#endif
     ]
   in
   let speclist = List.sort compare speclist in
@@ -2092,12 +2041,12 @@ let main () =
   in
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
   List.iter register_plugin !plugins ;
-  !GWPARAM.init () ;
+  GWPARAM.init "" ;
   cache_lexicon () ;
   List.iter
     (fun dbn ->
        Printf.eprintf "Caching database %s in memory… %!" dbn;
-       let dbn = Util.bpath (dbn ^ ".gwb") in
+       let dbn = !GWPARAM.bpath dbn in
        ignore (Gwdb.open_base ~keep_in_memory:true dbn);
        Printf.eprintf "Done.\n%!"
     )
@@ -2117,10 +2066,9 @@ let main () =
     in
       images_prefix := "file://" ^ slashify abs_dir
     end;
-  if !(Util.cnt_dir) = Filename.current_dir_name then
-    Util.cnt_dir := Secure.base_dir ();
+  GWPARAM.cnt_dir := !GWPARAM.cnt_d "";
   Wserver.stop_server :=
-    List.fold_left Filename.concat !(Util.cnt_dir) ["cnt"; "STOP_SERVER"];
+    List.fold_left Filename.concat !GWPARAM.cnt_dir ["STOP_SERVER"];
   let (query, cgi) =
     try Sys.getenv "QUERY_STRING" |> Adef.encoded, true
     with Not_found -> "" |> Adef.encoded, !force_cgi

@@ -12,7 +12,7 @@ let print_try_again () =
   flush stdout
 
 let control ~onerror lname wait f =
-  if !no_lock_flag then f ()
+  if !no_lock_flag || Filename.basename lname = ".lck" then f ()
   else
     try
       let fd = Unix.openfile lname [ Unix.O_RDWR; Unix.O_CREAT ] 0o666 in
