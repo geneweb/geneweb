@@ -6,4 +6,16 @@ val advanced_search :
 
 val searching_fields : Config.config -> Gwdb.base -> Adef.safe_string
 (** Returns a description string for the current advanced search results in the correct language.
-  e.g. "Search all Pierre, born in Paris, died in Paris" *)
+    e.g. "Search all Pierre, born in Paris, died in Paris" *)
+
+val matching_first_name_aliases :
+  first_name:string -> aliases:string list -> string list
+
+val exact_matching_first_name_aliases :
+  first_name:string -> aliases:string list -> string list
+
+val matching_surname_aliases :
+  surname:string -> aliases:string list -> string list
+
+val exact_matching_surname_aliases :
+  surname:string -> aliases:string list -> string list

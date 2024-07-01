@@ -330,36 +330,63 @@ end = struct
              match_date ~p ~default:false ~dates ~df:(fun _ -> event_date_f ()))
 
   let match_name ~search_list ~exact : string list -> bool =
-    let eq : string list -> string list -> bool =
-      if exact then fun x search ->
-        List.sort compare search = List.sort compare x
-      else fun x search -> List.for_all (fun s -> List.mem s x) search
+    let matching : string list -> string list -> bool =
+      if exact then Util.list_elements_cmp else Util.is_subset
     in
-    fun x -> List.exists (eq x) search_list
+    fun x -> List.exists (fun s -> matching s x) search_list
+
+  let wrap_match_name ~base ~search_list ~exact ~get ~split =
+    if search_list = [] then fun _ -> true
+    else
+      let eq = match_name ~search_list ~exact in
+      fun p -> eq (List.map Name.lower @@ split @@ sou base @@ get p)
 
   let match_first_name ~base ~first_name_list ~exact =
-    if first_name_list = [] then fun _ -> true
-    else
-      let eq = match_name ~search_list:first_name_list ~exact in
-      fun p ->
-        eq
-          (List.map Name.lower @@ Name.split_fname @@ sou base
-         @@ get_first_name p)
+    wrap_match_name ~base ~search_list:first_name_list ~exact
+      ~get:get_first_name ~split:Name.split_fname
 
   let match_surname ~base ~surname_list ~exact =
-    if surname_list = [] then fun _ -> true
-    else
-      let eq = match_name ~search_list:surname_list ~exact in
-      fun p ->
-        eq (List.map Name.lower @@ Name.split_sname @@ sou base @@ get_surname p)
+    wrap_match_name ~base ~search_list:surname_list ~exact ~get:get_surname
+      ~split:Name.split_sname
+
+  let match_alias ~base ~alias_list ~exact ~kind p =
+    let gets =
+      let get =
+        match kind with
+        | `First_name -> Gwdb.get_first_names_aliases
+        | `Surname -> Gwdb.get_surnames_aliases
+      in
+      List.map (fun alias _ -> alias) (get p)
+    in
+    let split =
+      match kind with
+      | `Surname -> Name.split_sname
+      | `First_name -> Name.split_fname
+    in
+    List.exists
+      (fun get ->
+        wrap_match_name ~base ~search_list:alias_list ~get ~exact ~split p)
+      gets
+
+  (* We use [first_name_list] as the list of aliases to search for, so
+     searching for a first name will also look at first name aliases. *)
+  let match_first_name_alias ~base ~first_name_list ~exact p =
+    match_alias ~base ~alias_list:first_name_list ~exact ~kind:`First_name p
+
+  let match_surname_alias ~base ~surname_list ~exact p =
+    match_alias ~base ~alias_list:surname_list ~exact ~kind:`Surname p
 
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~base ~p ~sex ~married ~occupation ~first_name_list
       ~surname_list ~skip_fname ~skip_sname ~exact_first_name ~exact_surname =
     match_sex ~p ~sex
     && (skip_fname
-       || match_first_name ~base ~first_name_list ~exact:exact_first_name p)
-    && (skip_sname || match_surname ~base ~surname_list ~exact:exact_surname p)
+       || match_first_name ~base ~first_name_list ~exact:exact_first_name p
+       || match_first_name_alias ~base ~first_name_list ~exact:exact_first_name
+            p)
+    && (skip_sname
+       || match_surname ~base ~surname_list ~exact:exact_surname p
+       || match_surname_alias ~base ~surname_list ~exact:exact_surname p)
     && match_married ~p ~married
     && match_occupation ~base ~p ~occupation
 
@@ -809,3 +836,28 @@ let searching_fields conf base =
   in
   let sep = if search <> "" then "," else "" in
   Adef.safe @@ string_field "occu" (search ^ sep)
+
+let filter_alias ~name ~split ~matching =
+  let search_list = List.map Name.lower (split name) in
+  let matching = matching search_list in
+  if search_list = [] then fun ~aliases:_ -> []
+  else fun ~aliases ->
+    List.filter_map
+      (fun alias ->
+        let aliases = List.map Name.lower (split alias) in
+        Ext_option.return_if (matching aliases) (fun () -> alias))
+      aliases
+
+let matching_first_name_aliases ~first_name =
+  filter_alias ~name:first_name ~split:Name.split_fname ~matching:Util.is_subset
+
+let exact_matching_first_name_aliases ~first_name =
+  filter_alias ~name:first_name ~split:Name.split_fname
+    ~matching:Util.list_elements_cmp
+
+let matching_surname_aliases ~surname =
+  filter_alias ~name:surname ~split:Name.split_sname ~matching:Util.is_subset
+
+let exact_matching_surname_aliases ~surname =
+  filter_alias ~name:surname ~split:Name.split_sname
+    ~matching:Util.list_elements_cmp

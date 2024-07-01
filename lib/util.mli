@@ -690,3 +690,5 @@ val is_fully_visible_to_visitors :
 
 val is_public : Config.config -> Gwdb.base -> Gwdb.person -> bool
 val list_cmp : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool
+val is_subset : 'a list -> 'a list -> bool
+val list_elements_cmp : 'a list -> 'a list -> bool
