@@ -157,21 +157,21 @@ let names_all base bname fname =
 
 let speclist =
   [
-    ("-fn", Arg.Set fnames, "produce first names");
-    ("-sn", Arg.Set snames, "produce surnames");
-    ("-al", Arg.Set alias, "produce aliases");
-    ("-qu", Arg.Set qual, "produce qualifiers");
-    ("-pl", Arg.Set places, "produce places");
-    ("-all", Arg.Set all, "produce all");
-    ("-fna", Arg.Set fname_alias, "add first names aliases");
-    ("-prog", Arg.Set prog, "show progress bar");
+    ("-fn", Arg.Set fnames, " produce first names");
+    ("-sn", Arg.Set snames, " produce surnames");
+    ("-al", Arg.Set alias, " produce aliases");
+    ("-qu", Arg.Set qual, " produce qualifiers");
+    ("-pl", Arg.Set places, " produce places");
+    ("-all", Arg.Set all, " produce all");
+    ("-fna", Arg.Set fname_alias, " add first names aliases");
+    ("-prog", Arg.Set prog, " show progress bar");
   ]
+  |> List.sort compare |> Arg.align
 
 let anonfun i = bname := i
 
 let usage =
-  "Usage: cache_files [-fn] [-sn] [-al] [-qu] [-pl] [-all] [-fna] [-prog] base\n\
-  \ cd bases; before running cache_files."
+  "Usage: cache_files [options] base\n cd bases; before running cache_files."
 
 let main () =
   Arg.parse speclist anonfun usage;

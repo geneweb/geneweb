@@ -106,7 +106,7 @@ let speclist =
   [
     ( "-bnotes",
       Arg.Set_string bnotes,
-      "[drop|erase|first|merge] Behavior for base notes of the next file. \
+      " [drop|erase|first|merge] Behavior for base notes of the next file. \
        [drop]: dropped. [erase]: erase the current content. [first]: dropped \
        if current content is not empty. [merge]: concatenated to the current \
        content. Default: " ^ !bnotes ^ "" );

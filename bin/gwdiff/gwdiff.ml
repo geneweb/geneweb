@@ -540,23 +540,24 @@ let speclist =
         (fun s ->
           p1_fn := s;
           arg_state := ASwaitP1occ),
-      "<fn> <occ> <sn> : (mandatory) defines starting person in base1" );
+      "<fn> <occ> <sn> (mandatory) defines starting person in base1" );
     ( "-2",
       Arg.String
         (fun s ->
           p2_fn := s;
           arg_state := ASwaitP2occ),
-      "<fn> <occ> <sn> : (mandatory) defines starting person in base2" );
-    ("-ad", Arg.Set ad_mode, ": checks descendants of all ascendants ");
-    ("-d", Arg.Set d_mode, ": checks descendants (default)");
+      "<fn> <occ> <sn> (mandatory) defines starting person in base2" );
+    ("-ad", Arg.Set ad_mode, " checks descendants of all ascendants ");
+    ("-d", Arg.Set d_mode, " checks descendants (default)");
     ( "-html",
       Arg.String
         (fun s ->
           html := true;
           root := s),
-      "<root>: HTML format used for report" );
-    ("-mem", Arg.Set mem, ": save memory space, but slower");
+      "<root> HTML format used for report" );
+    ("-mem", Arg.Set mem, " save memory space, but slower");
   ]
+  |> List.sort compare |> Arg.align
 
 let anonfun s =
   match !arg_state with

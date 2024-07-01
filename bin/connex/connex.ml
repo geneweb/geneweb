@@ -240,29 +240,30 @@ let speclist =
   [
     ( "-gwd_p",
       Arg.Int (fun x -> gwd_port := x),
-      "<number>: Specify the port number of gwd (default = "
+      "<number> Specify the port number of gwd (default = "
       ^ string_of_int !gwd_port ^ "); > 1024 for normal users." );
     ( "-server",
       Arg.String (fun x -> server := x),
-      "<string>: Name of the server (default is 127.0.0.1)." );
-    ("-a", Arg.Set all, ": all connex components");
-    ("-s", Arg.Set statistics, ": produce statistics");
-    ("-d", Arg.Int (fun x -> detail := x), "<int> : detail for this length");
+      "<string> Name of the server (default is 127.0.0.1)." );
+    ("-a", Arg.Set all, " all connex components");
+    ("-s", Arg.Set statistics, " produce statistics");
+    ("-d", Arg.Int (fun x -> detail := x), "<int> detail for this length");
     ( "-i",
       Arg.String (fun x -> ignore := x :: !ignore),
-      "<file> : ignore this file" );
-    ("-bf", Arg.Clear ignore_files, ": by origin files");
+      "<file> ignore this file" );
+    ("-bf", Arg.Clear ignore_files, " by origin files");
     ( "-del",
       Arg.Int (fun i -> ask_for_delete := i),
-      "<int> : ask for deleting branches whose size <= that value" );
+      "<int> ask for deleting branches whose size <= that value" );
     ( "-cnt",
       Arg.Int (fun i -> cnt_for_delete := i),
-      "<int> : delete cnt branches whose size <= -del value" );
+      "<int> delete cnt branches whose size <= -del value" );
     ( "-exact",
       Arg.Set exact,
-      ": delete only branches whose size strictly = -del value" );
-    ("-o", Arg.String (fun x -> output := x), "<file> : output to this file");
+      " delete only branches whose size strictly = -del value" );
+    ("-o", Arg.String (fun x -> output := x), "<file> output to this file");
   ]
+  |> List.sort compare |> Arg.align
 
 let main () =
   Arg.parse speclist (fun s -> bname := s) usage;

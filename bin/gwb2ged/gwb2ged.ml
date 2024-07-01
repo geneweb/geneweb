@@ -3,7 +3,7 @@ let with_indexes = ref false
 let speclist opts =
   ("-indexes", Arg.Set with_indexes, " export indexes in gedcom")
   :: Gwexport.speclist opts
-  |> Arg.align
+  |> List.sort compare |> Arg.align
 
 let main () =
   let opts = ref Gwexport.default_opts in

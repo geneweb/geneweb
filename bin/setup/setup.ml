@@ -1943,20 +1943,23 @@ let usage =
   "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] where options are:"
 let speclist =
   [("-bd", Arg.String (fun x -> base_dir := x),
-    "<dir>: Directory where the databases are installed.");
+    "<dir> Directory where the databases are installed.");
    ("-gwd_p", Arg.Int (fun x -> gwd_port := x),
-    "<number>: Specify the port number of gwd (default = " ^
+    "<number> Specify the port number of gwd (default = " ^
       string_of_int !gwd_port ^ "); > 1024 for normal users.");
-   ("-lang", Arg.String (fun x -> lang_param := x), "<string>: default lang");
-   ("-daemon", Arg.Set daemon, ": Unix daemon mode.");
+   ("-lang", Arg.String (fun x -> lang_param := x), "<string> default lang");
+   ("-daemon", Arg.Set daemon, " Unix daemon mode.");
    ("-p", Arg.Int (fun x -> port := x),
-    "<number>: Select a port number (default = " ^ string_of_int !port ^
+    "<number> Select a port number (default = " ^ string_of_int !port ^
     "); > 1024 for normal users.");
    ("-only", Arg.String (fun s -> only_file := s),
-    "<file>: File containing the only authorized address");
-   ("-gd", Arg.String (fun x -> setup_dir := x), "<string>: gwsetup directory");
+    "<file> File containing the only authorized address");
+   ("-gd", Arg.String (fun x -> setup_dir := x), "<string> gwsetup directory");
    ("-bindir", Arg.String (fun x -> bin_dir := x),
-    "<string>: binary directory (default = value of option -gd)")]
+    "<string> binary directory (default = value of option -gd)")
+  ]
+  |> List.sort compare |> Arg.align
+
 let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s))
 
 #ifdef UNIX
