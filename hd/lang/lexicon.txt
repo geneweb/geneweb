@@ -9535,17 +9535,17 @@ sl: če so nazivi
 sv: om titlar
 tr: eğer başlıklar
 
-    iftitles/public/private
-co: s’è tituli/publicu/privatu
-de: Adelstitel/öffentlich/privat
-en: if titles/public/private
-es: si hay títulos/público/privado
-fr: si titres/public/privé
-it: se titoli/pubblico/privato
-oc: si i a de títols/public/privat
-pt: se títulos/público/privado
-sv: om titlar/publik/privat
-tr: başlıklar/herkese Açık/özel ise
+    iftitles/public/semipublic/private
+co: s’è tituli/publicu/semi-public/privatu
+de: Adelstitel/öffentlich/half-public/privat
+en: if titles/public/half-public/private
+es: si hay títulos/público/half-public/privado
+fr: si titres/public/semi-public/privé
+it: se titoli/pubblico/half-public/privato
+oc: si i a de títols/half-public/public/privat
+pt: se títulos/público/half-public/privado
+sv: om titlar/publik/half-public/privat
+tr: başlıklar/herkese Açık/half-public/özel ise
 
     ignore implex
 co: ignurà l’implessi

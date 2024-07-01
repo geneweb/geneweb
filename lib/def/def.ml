@@ -92,7 +92,7 @@ type death =
 type burial = UnknownBurial | Buried of cdate | Cremated of cdate
 
 (** Rights for access to the personal data *)
-type access = IfTitles | Public | Private
+type access = IfTitles | Public | SemiPublic | Private
 
 (** Title name *)
 type 'string gen_title_name = Tmain | Tname of 'string | Tnone

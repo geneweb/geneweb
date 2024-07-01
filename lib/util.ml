@@ -712,6 +712,8 @@ let is_public conf base p =
      && nobtit conf base p <> []
   || is_old_person conf (gen_person_of_person p)
 
+let is_semi_public _conf _base p = get_access p = SemiPublic
+
 (* ********************************************************************** *)
 (* [Fonc] accessible_by_key :
             config -> base -> person -> string -> string -> bool *)
