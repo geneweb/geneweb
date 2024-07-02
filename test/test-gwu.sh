@@ -14,6 +14,7 @@ exit 1
 
 setenv_file="./test-gw-vars.txt"
 
+REFTESTGW='testgalichet' # reference gw file
 #=== hardcoded vars (start) ===
 # assumes we are running in the repo folder
 # ./test/testgwu.sh
@@ -42,12 +43,20 @@ shift $(($OPTIND - 1))
 # overwrite above hardcoded vars by an input file.
 test -f "$setenv_file" && . $setenv_file
 
+if test ! -d $BASES_DIR/ ; then
+    echo "$BASES_DIR/ not accessible, change your default parms."
+    exit 1
+fi
 if test ! -f $BASES_DIR/$TESTGW.gw ; then
     if test -f test/$TESTGW.gw ; then
         cp -f  test/$TESTGW.gw $BASES_DIR/
     else
         echo "$TESTGW.gw not found in $BASES_DIR or test/"
         exit 1
+    fi
+else
+    if test "$TESTGW" = "$REFTESTGW"; then
+        rsync -a test/$TESTGW.gw $BASES_DIR/
     fi
 fi
 
