@@ -1,6 +1,6 @@
 <!-- $Id: modules/arbre_hi_tools.txt v7.0 26/09/2023 04:30:23 $ -->
 %( Boutons pour les arbres ascendats compacts %)
-%let;evarv;%if;(e.v!="")%e.v;%else;5%end;%in;
+%let;evarv;%if;(e.v!="")%e.v;%else;7%end;%in;
 %let;evarscl;%if;(e.scale!="")%e.scale;%else;100%end;%in;
 %let;evarfs;%if;(e.fs!="")%e.fs;%else;17%end;%in;
 %let;maxlev;%if;(e.cpl = "on")13%else;12%end;%nn;%in;
@@ -23,8 +23,8 @@
       </div>
       %(TODO : improve translations, titles and add icons %)
       <div class="mx-2">
-        <a href="%apply;url_set%with;hi%and;%if;(e.hi="H")I%else;H%end;%end;"
-          class="btn btn-outline-primary">%if;(e.hi!="H")H%else;I%end;-tree</a>
+        <a href="%apply;url_set%with;hi%and;%if;(e.hi="H" or e.hi="")I%end;%end;"
+          class="btn btn-outline-primary">%if;(e.hi="H" or e.hi="")I%else;H%end;-tree</a>
         <a href="%if;(e.sosa!="on")%url_set.sosa.on;%else;%url_set.sosa;%end;" class="btn btn-outline-primary ml-1"
           title="[*visualize/show/hide/summary]1 %if;(e.sosa="on")ASCII%else;HTML%end;">
           %if;(e.sosa!="on")HTML%else;ASCII%end; box drawing</a>
@@ -37,29 +37,30 @@
           title="%if;(e.implx!="on")[*implex links]%else;[*do not] [implex links]%end;">
           <i class="fa fa-shuffle fa-fw"></i></a>
       </div>
-      %( TODO : disable if ASCII box drawings ? %)
-      <div class="btn-group mx-2">
-        %if;(evarscl>0)
-          <a href="%apply;url_set%with;scale/fs%and;%expr(evarscl-20)/%expr(evarfs-1)%end;"
-            class="btn btn-outline-primary" title="[*reduce/increase]0 [size] (-20 %%)">−</a>
-        %end;
-        <span class="btn btn-outline-primary disabled border-top border-bottom">%evarscl; %%</span>
-        %if;(evarscl<200)
-          <a href="%apply;url_set%with;scale/fs%and;%expr(evarscl+20)/%expr(evarfs+1)%end;"
-            class="btn btn-outline-primary" title="[*reduce/increase]1 [size] (+20 %%)">+</a>
-        %end;
-      </div>
-      <div class="btn-group mx-2">
-        %if;(evarfs>5)
-          <a href="%apply;url_set%with;fs%and;%expr(evarfs-1)%end;" class="btn btn-outline-primary"
-            title="[reduce/increase]0 [font size]">−</a>
-        %end;
-        <span class="btn btn-outline-primary disabled border-top border-bottom">Font %evarfs; px</span>
-        %if;(evarfs<20)
-          <a href="%apply;url_set%with;fs%and;%expr(evarfs+1)%end;" class="btn btn-outline-primary"
-            title="[reduce/increase]1 [font size]">+</a>
-        %end;
-      </div>
+      %if;(e.sosa="on")
+        <div class="btn-group mx-2">
+          %if;(evarscl>0)
+            <a href="%apply;url_set%with;scale/fs%and;%expr(evarscl-20)/%expr(evarfs-1)%end;"
+              class="btn btn-outline-primary" title="[*reduce/increase]0 [size] (-20 %%)">−</a>
+          %end;
+          <span class="btn btn-outline-primary disabled border-top border-bottom">%evarscl; %%</span>
+          %if;(evarscl<200)
+            <a href="%apply;url_set%with;scale/fs%and;%expr(evarscl+20)/%expr(evarfs+1)%end;"
+              class="btn btn-outline-primary" title="[*reduce/increase]1 [size] (+20 %%)">+</a>
+          %end;
+        </div>
+        <div class="btn-group mx-2">
+          %if;(evarfs>5)
+            <a href="%apply;url_set%with;fs%and;%expr(evarfs-1)%end;" class="btn btn-outline-primary"
+              title="[reduce/increase]0 [font size]">−</a>
+          %end;
+          <span class="btn btn-outline-primary disabled border-top border-bottom">Font %evarfs; px</span>
+          %if;(evarfs<20)
+            <a href="%apply;url_set%with;fs%and;%expr(evarfs+1)%end;" class="btn btn-outline-primary"
+              title="[reduce/increase]1 [font size]">+</a>
+          %end;
+        </div>
+      %end;
     </div>
   %end;
 </div>
