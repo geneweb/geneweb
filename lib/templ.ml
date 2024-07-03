@@ -392,7 +392,6 @@ let rec eval_variable conf = function
         | "p1" -> [ "i1"; "p1"; "n1"; "oc1" ]
         | "p2" -> [ "i2"; "p2"; "n2"; "oc2" ]
         | "pn" -> [ "i1"; "i2"; "p1"; "p2"; "n1"; "n2"; "oc1"; "oc2" ]
-        | "all" -> [ "templ"; "p_mod"; "wide" ]
         | _ -> [ pl ]
       in
       (Util.commd ~excl:pl_l conf :> string)

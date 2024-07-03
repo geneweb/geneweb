@@ -116,7 +116,7 @@
     %if;(e.digest = "")
       <span class="s_menu" id="tpl">
         <a href="%url_set.templ;" %apply;bg("")>default</a>
-        %( <a href="%prefix_set.all;templ=templa&%suffix;" %apply;bg("templa")>templa</a> %)
+        %( <a href="%url_set.templ.templa;" %apply;bg("templa")>templa</a> %)
         %if;(wizard or bvar.wizard_passwd = "")
           <small><a href="%prefix;m=H&v=doc_templm">doc templm</a></small>
         %end;
