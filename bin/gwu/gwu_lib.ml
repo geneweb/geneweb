@@ -648,6 +648,17 @@ let get_persons_with_pevents m list =
     (fun p list -> if get_pevents p = [] then list else p :: list)
     m.m_chil list
 
+let key_of_person base person =
+  let surname = s_correct_string (p_surname base person) in
+  let firstname = s_correct_string (p_first_name base person) in
+  match (surname, firstname) with
+  | "?", _ | _, "?" -> None
+  | _, _ ->
+      let occ = get_new_occ person in
+      let occ_s = if occ = 0 then "" else "." ^ string_of_int occ in
+      let key = Printf.sprintf "%s %s%s" surname firstname occ_s in
+      Some key
+
 let print_pevents_for_person opts base gen p =
   let pevents = get_pevents p in
   let surn = s_correct_string (p_surname base p) in
