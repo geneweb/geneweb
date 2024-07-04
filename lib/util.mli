@@ -688,5 +688,17 @@ val is_fully_visible_to_visitors :
   Config.config -> Gwdb.base -> Gwdb.person -> bool
 (** [is_fully_visible_to_visitors conf base p] is true iff [p] is fully visible for a visitor *)
 
+type visibility =
+  | Visibility_private
+  | Visibility_semi_public
+  | Visibility_public
+
+val get_visibility : Config.config -> Gwdb.base -> Gwdb.person -> visibility
+(** [get_visibility conf base p] returns the visibility of [p] as per the config parameters .
+    - [Visibility_public] if [p] is fully visible for a visitor
+    - [Visibility_semi_public] if [p] is hidden but with some information such as names still visible
+    - [Visibility_private] if [p] is fully hidden to a visitor
+*)
+
 val is_public : Config.config -> Gwdb.base -> Gwdb.person -> bool
 val list_cmp : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool

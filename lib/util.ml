@@ -626,6 +626,17 @@ let is_fully_visible_to_visitors conf base p =
   let conf = { conf with Config.wizard = false; friend = false } in
   authorized_age conf base p
 
+type visibility =
+  | Visibility_private
+  | Visibility_semi_public
+  | Visibility_public
+
+let get_visibility conf base person =
+  if is_fully_visible_to_visitors conf base person then Visibility_public
+  else if conf.Config.hide_private_names || Gwdb.get_access person = Def.Private
+  then Visibility_private
+  else Visibility_semi_public
+
 (* TODO should probably not exists *)
 let is_public conf base p =
   Gwdb.get_access p = Def.Public
