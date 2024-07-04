@@ -250,43 +250,6 @@ let alias_lang lang =
       close_in ic ; lang
     with Sys_error _ -> lang
 
-let rec cut_at_equal i s =
-  if i = String.length s then s, ""
-  else if s.[i] = '=' then
-    String.sub s 0 i, String.sub s (succ i) (String.length s - succ i)
-  else cut_at_equal (succ i) s
-
-let strip_trailing_spaces s =
-  let len =
-    let rec loop len =
-      if len = 0 then 0
-      else
-        match s.[len-1] with
-          ' ' | '\n' | '\r' | '\t' -> loop (len - 1)
-        | _ -> len
-    in
-    loop (String.length s)
-  in
-  String.sub s 0 len
-
-let read_base_env bname =
-  let fname = Util.bpath (bname ^ ".gwf") in
-  try
-    let ic = Secure.open_in fname in
-    let env =
-      let rec loop env =
-        match input_line ic with
-        | s ->
-          let s = strip_trailing_spaces s in
-          if s = "" || s.[0] = '#' then loop env
-          else loop (cut_at_equal 0 s :: env)
-        | exception End_of_file -> env
-      in
-      loop []
-    in
-    close_in ic; env
-  with Sys_error _ -> []
-
 let log_redirect from request req =
   Lock.control (SrcfileDisplay.adm_file "gwd.lck") true
     ~onerror:(fun () -> ()) begin fun () ->
@@ -597,50 +560,6 @@ let http_preferred_language request =
       | [] -> ""
     in
     loop list
-
-let allowed_denied_titles key extra_line env base_env () =
-  if p_getenv env "all_titles" = Some "on" then []
-  else
-    try
-      let fname = List.assoc key base_env in
-      if fname = "" then []
-      else
-        let ic =
-          Secure.open_in (Filename.concat (Secure.base_dir ()) fname)
-        in
-        let rec loop set =
-          let (line, eof) =
-            try input_line ic, false with End_of_file -> "", true
-          in
-          let set =
-            let line = if eof then extra_line |> Mutil.decode else line in
-            if line = "" || line.[0] = ' ' || line.[0] = '#' then set
-            else
-              let line =
-                match String.index_opt line '/' with
-                | Some i ->
-                    let len = String.length line in
-                    let tit = String.sub line 0 i in
-                    let pla = String.sub line (i + 1) (len - i - 1) in
-                    (if tit = "*" then tit else Name.lower tit) ^ "/" ^
-                    (if pla = "*" then pla else Name.lower pla)
-                | None -> Name.lower line
-              in
-              StrSet.add line set
-          in
-          if eof then begin close_in ic; StrSet.elements set end else loop set
-        in
-        loop StrSet.empty
-    with Not_found | Sys_error _ -> []
-
-let allowed_titles env =
-  let extra_line =
-    try List.assoc "extra_title" env
-    with Not_found -> Adef.encoded ""
-  in
-  allowed_denied_titles "allowed_titles_file" extra_line env
-
-let denied_titles = allowed_denied_titles "denied_titles_file" (Adef.encoded "")
 
 let parse_digest s =
   let rec parse_main (strm__ : _ Stream.t) =
@@ -1036,7 +955,7 @@ let make_conf from_addr request script_name env =
   let (threshold_test, env) = extract_assoc "threshold" env in
   if threshold_test <> ""
   then RelationLink.threshold := int_of_string threshold_test;
-  let base_env = read_base_env base_file in
+  let base_env = GwdUtil.read_base_env base_file in
   let default_lang =
     try
       let x = List.assoc "default_lang" base_env in
@@ -1081,8 +1000,7 @@ let make_conf from_addr request script_name env =
     Option.value ~default:Config.DMY df_opt
   in
   let default_contemporary_private_years =
-    try int_of_string (List.assoc "default_contemporary_private_years" base_env)
-    with _ -> 100
+    Gwd_lib.GwdUtil.get_default_contemporary_private_years base_env
   in
   let conf =
     {from = from_addr;
@@ -1111,28 +1029,16 @@ let make_conf from_addr request script_name env =
        begin try List.assoc "authorized_wizards_notes" base_env = "yes" with
          Not_found -> false
        end;
-     public_if_titles =
-       begin try List.assoc "public_if_titles" base_env = "yes" with
-         Not_found -> false
-       end;
-     public_if_no_date =
-       begin try List.assoc "public_if_no_date" base_env = "yes" with
-         Not_found -> false
-       end;
+     public_if_titles = Gwd_lib.GwdUtil.get_public_if_titles base_env;
+     public_if_no_date = Gwd_lib.GwdUtil.get_public_if_no_date base_env;
      setup_link = !setup_link;
      access_by_key =
        begin try List.assoc "access_by_key" base_env = "yes" with
          Not_found -> ar.ar_wizard && ar.ar_friend
        end;
-     private_years =
-       begin try int_of_string (List.assoc "private_years" base_env) with
-         Not_found | Failure _ -> 150
-       end;
+     private_years = GwdUtil.get_private_years base_env;
      default_contemporary_private_years;
-     hide_private_names =
-       begin try List.assoc "hide_private_names" base_env = "yes" with
-         Not_found -> false
-       end;
+     hide_private_names = Gwd_lib.GwdUtil.get_hide_private_names base_env;
      use_restrict =
        if ar.ar_wizard || ar.ar_friend then false
        else
@@ -1160,8 +1066,8 @@ let make_conf from_addr request script_name env =
        (if lang = "" then [] else ["lang", Mutil.encode lang]) @
        (if from = "" then [] else ["opt", Mutil.encode from]);
      base_env = base_env;
-     allowed_titles = Lazy.from_fun (allowed_titles env base_env);
-     denied_titles = Lazy.from_fun (denied_titles env base_env);
+     allowed_titles = Lazy.from_fun (Gwd_lib.GwdUtil.allowed_titles env base_env);
+     denied_titles = Lazy.from_fun (Gwd_lib.GwdUtil.denied_titles env base_env);
      request = request; lexicon = lexicon;
      charset = "UTF-8"; is_rtl = is_rtl;
      left = if is_rtl then "right" else "left";
