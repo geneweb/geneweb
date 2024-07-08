@@ -47,6 +47,10 @@ val filter_map_history :
     (time:string -> user:string -> action:string -> keyo:string option -> bool) ->
   f:(time:string -> user:string -> action:string -> keyo:string option -> 'a) ->
   'a list
+(** [filter_map_history conf skip n filter f] returns [f(h[skip]); ...; f(h[skip+n])]
+    such that h is the history of updates in reverse chronological order filtered by
+    the [filter] function.
+*)
 
 val total_entries :
   conf:config ->
