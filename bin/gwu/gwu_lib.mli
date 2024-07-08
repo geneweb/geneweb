@@ -9,7 +9,11 @@ val prepare_free_occ : ?select:(Gwdb.iper -> bool) -> Gwdb.base -> unit
 (** Initializes the internal hashtables. Person whose identifier is
     not selected (`select p = false`) are ignored. *)
 
-val key_of_person : Gwdb.base -> Gwdb.person -> string option
+val key_of_person :
+  ?format_key:(surname:string -> firstname:string -> occ:int -> string) ->
+  Gwdb.base ->
+  Gwdb.person ->
+  string option
 
 val gwu :
   Gwexport.gwexport_opts ->
