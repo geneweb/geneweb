@@ -658,3 +658,47 @@ let print_search conf base =
     | Some s -> search_text conf base (Mutil.gen_decode false s)
     | None -> print conf base
   else print conf base
+
+let filter_map_history ~conf ~skip ~n ~filter ~f =
+  match Secure.open_in_bin (file_name conf) with
+  | exception Sys_error _ -> []
+  | ic ->
+      let rbuf = ref (Bytes.create 0) in
+      let rpos = ref 0 in
+      let pos = in_channel_length ic in
+      let rec loop skip' n' pos res =
+        if n' = n then res
+        else
+          match Mutil.rev_input_line ic pos (rbuf, rpos) with
+          | line, fpos -> (
+              match line_fields line with
+              | None -> loop skip' n' fpos res
+              | Some (time, user, action, keyo)
+                when not (filter ~time ~user ~action ~keyo) ->
+                  loop skip' n' fpos res
+              | Some (time, user, action, keyo) when skip' < skip ->
+                  loop (succ skip') n' fpos res
+              | Some (time, user, action, keyo) ->
+                  loop skip' (succ n') fpos (f ~time ~user ~action ~keyo :: res)
+              )
+          | exception End_of_file -> res
+      in
+      let res = List.rev (loop 0 0 pos []) in
+      close_in ic;
+      res
+
+let total_entries ~conf ~filter =
+  match Secure.open_in_bin (file_name conf) with
+  | exception Sys_error _ -> 0
+  | ic ->
+      let rec loop n =
+        match line_fields @@ input_line ic with
+        | Some (time, user, action, keyo) when filter ~time ~user ~action ~keyo
+          ->
+            loop (succ n)
+        | Some _ | None -> loop n
+        | exception End_of_file -> n
+      in
+      let res = loop 0 in
+      close_in ic;
+      res
