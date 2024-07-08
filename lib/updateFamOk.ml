@@ -1381,6 +1381,7 @@ let print_mod o_conf base =
       String.concat " " (List.map (sou base) sl)
     in
     Notes.update_notes_links_db base (Def.NLDB.PgFam ifam) s;
+    (* TODO update_cache_linked_pages *)
     let nfs = (Adef.parent_array cpl, des.children) in
     let onfs = Some (ofs, nfs) in
     let wl, ml =
