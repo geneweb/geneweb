@@ -1364,6 +1364,13 @@ let escape =
       | Tsafe s | Tstr s -> Tstr (Jg_utils.escape_html s)
       | x -> Jingoo.Jg_types.failwith_type_error_1 "escape" x)
 
+let comma_separated_of_list =
+  Jingoo.Jg_types.(
+    func_arg1_no_kw @@ fun l ->
+    try box_string (String.concat ", " (List.map unbox_string (unbox_list l)))
+    with Invalid_argument _ ->
+      Jingoo.Jg_types.failwith_type_error_1 "comma_separated_of_list" l)
+
 let default_env_aux conf =
   [
     ("trans", trans conf);
@@ -1377,6 +1384,7 @@ let default_env_aux conf =
     ("conf", mk_conf conf);
     ("LOG", log);
     ("CAST", module_CAST);
+    ("comma_separated_of_list", comma_separated_of_list);
   ]
 
 let default_env_no_base conf =
