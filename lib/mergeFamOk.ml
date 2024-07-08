@@ -259,6 +259,7 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
         String.concat " " (List.map (sou base) sl)
       in
       Notes.update_notes_links_db base (Def.NLDB.PgFam ifam) s;
+      (* TODO update_cache_linked_pages *)
       let changed =
         let gen_p =
           let p =
