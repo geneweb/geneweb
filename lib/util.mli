@@ -499,6 +499,10 @@ val array_mem_witn :
     and returns corresponding [string_of_witness_kind] if so.
 *)
 
+val make_key :
+  Gwdb.base -> (iper, iper, istr) Def.gen_person -> string * string * int
+(** make a tuple (first_name, surname, occ) apply Name.lower *)
+
 val name_key : Gwdb.base -> string -> string
 (** [name_key base name] is [name],
     with particles put at the end of the string instead of the beginning.

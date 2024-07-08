@@ -1007,6 +1007,9 @@ let person_title conf base p =
     | None -> Adef.safe ""
   else Adef.safe ""
 
+let make_key base p =
+  (Name.lower (sou base p.first_name), Name.lower (sou base p.surname), p.occ)
+
 let name_key base s =
   let part = Mutil.get_particle (Gwdb.base_particles base) s in
   if part = "" then s

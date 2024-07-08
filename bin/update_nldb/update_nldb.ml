@@ -55,6 +55,11 @@ let read_cache_linked_pages conf : cache_linked_pages_t =
   close_in ic;
   ht
 
+let save_cache_linked_pages bdir cache_linked_pages =
+  let oc = open_out_bin (Filename.concat bdir Notes.cache_linked_pages_name) in
+  output_value oc cache_linked_pages;
+  close_out oc
+
 let compute base bdir =
   let bdir =
     if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
@@ -66,142 +71,137 @@ let compute base bdir =
 
   Printf.eprintf "--- database notes\n";
   flush stderr;
-  let list = notes_links (base_notes_read base "") in
-  (if list = ([], []) then ()
-  else
-    let pg = NLDB.PgNotes in
-    db := NotesLinks.add_in_db !db pg list);
-  Printf.eprintf "--- wizard notes\n";
-  flush stderr;
-  (try
-     let files = Sys.readdir (Filename.concat bdir (base_wiznotes_dir base)) in
-     for i = 0 to Array.length files - 1 do
-       let file = files.(i) in
-       if Filename.check_suffix file ".txt" then
-         let wizid = Filename.chop_suffix file ".txt" in
-         let wfile =
-           List.fold_left Filename.concat bdir [ base_wiznotes_dir base; file ]
+  match notes_links (base_notes_read base "") with
+  | [], [] -> ()
+  | (_list_nt, _list_ind) as list ->
+      let pg = NLDB.PgNotes in
+      db := NotesLinks.add_in_db !db pg list;
+      Printf.eprintf "--- wizard notes\n";
+      flush stderr;
+      (try
+         let files =
+           Sys.readdir (Filename.concat bdir (base_wiznotes_dir base))
          in
-         let list = notes_links (read_file_contents wfile) in
-         if list = ([], []) then ()
-         else (
-           Printf.eprintf "%s... " wizid;
-           flush stderr;
-           let pg = NLDB.PgWizard wizid in
-           db := NotesLinks.add_in_db !db pg list)
-     done;
-     Printf.eprintf "\n";
-     flush stderr
-   with Sys_error _ -> ());
-  Printf.eprintf "--- misc notes\n";
-  flush stderr;
-  let ndir = Filename.concat bdir (base_notes_dir base) in
-  let rec loop dir name =
-    try
-      let cdir = Filename.concat ndir dir in
-      let files = Sys.readdir cdir in
-      for i = 0 to Array.length files - 1 do
-        let file = files.(i) in
-        if Filename.check_suffix file ".txt" then (
-          let fnotes = Filename.chop_suffix file ".txt" in
-          let file = Filename.concat dir fnotes in
-          let list = notes_links (base_notes_read base file) in
-          if list = ([], []) then ()
-          else
-            let fnotes =
-              if name = "" then fnotes
-              else Printf.sprintf "%s%c%s" name NotesLinks.char_dir_sep fnotes
-            in
-            Printf.eprintf "%s...\n" fnotes;
-            flush stderr;
-            let pg = NLDB.PgMisc fnotes in
-            db := NotesLinks.add_in_db !db pg list)
-        else
-          loop (Filename.concat dir file)
-            (if name = "" then file
-            else Printf.sprintf "%s%c%s" name NotesLinks.char_dir_sep file)
-      done;
-      flush stderr
-    with Sys_error _ -> ()
-  in
-  loop Filename.current_dir_name "";
-  let buffer = Buffer.create 1024 in
-  let add_string istr =
-    Buffer.add_string buffer @@ sou base istr;
-    Buffer.add_char buffer ' '
-  in
-  ProgrBar.full := '*';
-  Printf.eprintf "--- individual notes\n";
-  flush stderr;
-  ProgrBar.start ();
-  Gwdb.Collection.iteri
-    (fun i p ->
-      ProgrBar.run i nb_ind;
-      Buffer.reset buffer;
-      add_string @@ get_notes p;
-      add_string @@ get_occupation p;
-      add_string @@ get_birth_note p;
-      add_string @@ get_birth_src p;
-      add_string @@ get_baptism_note p;
-      add_string @@ get_baptism_src p;
-      add_string @@ get_death_note p;
-      add_string @@ get_death_src p;
-      add_string @@ get_burial_note p;
-      add_string @@ get_burial_src p;
-      add_string @@ get_psources p;
-      List.iter
-        (fun { epers_note; epers_src } ->
-          add_string epers_note;
-          add_string epers_src)
-        (get_pevents p);
-      (* list is: lfname :: list_nt, (key, link) :: list_ind *)
-      match notes_links (Buffer.contents buffer) with
-      | [], [] -> ()
-      | (_list_nt, list_ind) as list ->
-          db := NotesLinks.add_in_db !db (NLDB.PgInd (get_iper p)) list;
-          let key =
-            ( sou base (get_first_name p) |> Name.lower,
-              sou base (get_surname p) |> Name.lower,
-              get_occ p )
-          in
-          Hashtbl.add cache_linked_pages key list_ind)
-    (Gwdb.persons base);
-  ProgrBar.finish ();
-  Printf.eprintf "--- families notes\n";
-  flush stderr;
-  ProgrBar.start ();
-  Gwdb.Collection.iteri
-    (fun i fam ->
-      ProgrBar.run i nb_fam;
-      Buffer.reset buffer;
-      add_string @@ get_comment fam;
-      add_string @@ get_fsources fam;
-      add_string @@ get_marriage_note fam;
-      add_string @@ get_marriage_src fam;
-      List.iter
-        (fun { efam_note; efam_src; _ } ->
-          add_string @@ efam_note;
-          add_string @@ efam_src)
-        (get_fevents fam);
-      match notes_links (Buffer.contents buffer) with
-      | [], [] -> ()
-      | (_list_nt, _list_ind) as list ->
-          db := NotesLinks.add_in_db !db (NLDB.PgFam (get_ifam fam)) list;
-          (*
-          let ifam = get_ifam fam in
-          ()
-          let key = (sou base (get_first_name p) |> Name.lower,
-            sou base (get_surname p) |> Name.lower, get_occ p)
-          in
-          Hashtbl.add cache_linked_pages ifam list_ind; *)
-          ProgrBar.run i nb_fam)
-    (Gwdb.families base);
-  ProgrBar.finish ();
-  write_nldb base !db;
-  (* Save the cache_linked_pages to a file *)
-  let oc = open_out_bin (Filename.concat bdir Notes.cache_linked_pages_name) in
-  output_value oc cache_linked_pages;
-  close_out oc
+         for i = 0 to Array.length files - 1 do
+           let file = files.(i) in
+           if Filename.check_suffix file ".txt" then
+             let wizid = Filename.chop_suffix file ".txt" in
+             let wfile =
+               List.fold_left Filename.concat bdir
+                 [ base_wiznotes_dir base; file ]
+             in
+             match notes_links (read_file_contents wfile) with
+             | [], [] -> ()
+             | (_list_nt, _list_ind) as list ->
+                 Printf.eprintf "%s... " wizid;
+                 flush stderr;
+                 let pg = NLDB.PgWizard wizid in
+                 db := NotesLinks.add_in_db !db pg list
+         done;
+         Printf.eprintf "\n";
+         flush stderr
+       with Sys_error _ ->
+         Printf.eprintf "Warning: error while reading wizardnotes\n");
+      Printf.eprintf "--- misc notes\n";
+      flush stderr;
+      let ndir = Filename.concat bdir (base_notes_dir base) in
+      let rec loop dir name =
+        try
+          let cdir = Filename.concat ndir dir in
+          let files = Sys.readdir cdir in
+          for i = 0 to Array.length files - 1 do
+            let file = files.(i) in
+            if Filename.check_suffix file ".txt" then (
+              let fnotes = Filename.chop_suffix file ".txt" in
+              let file = Filename.concat dir fnotes in
+              match notes_links (base_notes_read base file) with
+              | [], [] -> ()
+              | (_list_nt, _list_ind) as list ->
+                  let fnotes =
+                    if name = "" then fnotes
+                    else
+                      Printf.sprintf "%s%c%s" name NotesLinks.char_dir_sep
+                        fnotes
+                  in
+                  Printf.eprintf "%s...\n" fnotes;
+                  flush stderr;
+                  let pg = NLDB.PgMisc fnotes in
+                  db := NotesLinks.add_in_db !db pg list)
+            else
+              loop (Filename.concat dir file)
+                (if name = "" then file
+                else Printf.sprintf "%s%c%s" name NotesLinks.char_dir_sep file)
+          done;
+          flush stderr
+        with Sys_error _ ->
+          Printf.eprintf "Warning: error while reading misc notes\n"
+      in
+      loop Filename.current_dir_name "";
+      let buffer = Buffer.create 1024 in
+      let add_string istr =
+        Buffer.add_string buffer @@ sou base istr;
+        Buffer.add_char buffer ' '
+      in
+      ProgrBar.full := '*';
+      Printf.eprintf "--- individual notes\n";
+      flush stderr;
+      ProgrBar.start ();
+      Gwdb.Collection.iteri
+        (fun i p ->
+          ProgrBar.run i nb_ind;
+          Buffer.reset buffer;
+          add_string @@ get_notes p;
+          add_string @@ get_occupation p;
+          add_string @@ get_birth_note p;
+          add_string @@ get_birth_src p;
+          add_string @@ get_baptism_note p;
+          add_string @@ get_baptism_src p;
+          add_string @@ get_death_note p;
+          add_string @@ get_death_src p;
+          add_string @@ get_burial_note p;
+          add_string @@ get_burial_src p;
+          add_string @@ get_psources p;
+          List.iter
+            (fun { epers_note; epers_src } ->
+              add_string epers_note;
+              add_string epers_src)
+            (get_pevents p);
+          (* list is: lfname :: list_nt, (key, link) :: list_ind *)
+          match notes_links (Buffer.contents buffer) with
+          | [], [] -> ()
+          | (_list_nt, list_ind) as list ->
+              db := NotesLinks.add_in_db !db (NLDB.PgInd (get_iper p)) list;
+              let p = Gwdb.gen_person_of_person p in
+              let key = Util.make_key base p in
+              Hashtbl.add cache_linked_pages key list_ind)
+        (Gwdb.persons base);
+      ProgrBar.finish ();
+      Printf.eprintf "--- families notes\n";
+      flush stderr;
+      ProgrBar.start ();
+      Gwdb.Collection.iteri
+        (fun i fam ->
+          ProgrBar.run i nb_fam;
+          Buffer.reset buffer;
+          add_string @@ get_comment fam;
+          add_string @@ get_fsources fam;
+          add_string @@ get_marriage_note fam;
+          add_string @@ get_marriage_src fam;
+          List.iter
+            (fun { efam_note; efam_src; _ } ->
+              add_string @@ efam_note;
+              add_string @@ efam_src)
+            (get_fevents fam);
+          match notes_links (Buffer.contents buffer) with
+          | [], [] -> ()
+          | list ->
+              db := NotesLinks.add_in_db !db (NLDB.PgFam (get_ifam fam)) list;
+              ProgrBar.run i nb_fam)
+        (Gwdb.families base);
+      ProgrBar.finish ();
+      write_nldb base !db;
+      (* Save the cache_linked_pages to a file *)
+      save_cache_linked_pages bdir cache_linked_pages
 
 let main () =
   Arg.parse speclist anonfun errmsg;

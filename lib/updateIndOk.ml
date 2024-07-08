@@ -930,7 +930,9 @@ let effective_del_no_commit base op =
 
 let effective_del_commit conf base op =
   Notes.update_notes_links_db base (Def.NLDB.PgInd op.key_index) "";
-  let key = (Name.lower op.first_name, Name.lower op.surname, op.occ) in
+  let key =
+    Util.make_key base (Gwdb.gen_person_of_person (poi base op.key_index))
+  in
   Notes.update_cache_linked_pages conf Notes.Delete key key [];
   Util.commit_patches conf base;
   let changed = U_Delete_person op in
@@ -1139,7 +1141,9 @@ let print_mod ?prerr o_conf base =
   let ofn = o_p.first_name in
   let osn = o_p.surname in
   let oocc = o_p.occ in
-  let old_key = (Name.lower ofn, Name.lower osn, oocc) in
+  let old_key =
+    Util.make_key base (Gwdb.gen_person_of_person (poi base o_p.key_index))
+  in
   let conf = Update.update_conf o_conf in
   let pgl =
     let db = Gwdb.read_nldb base in
@@ -1178,11 +1182,7 @@ let print_mod ?prerr o_conf base =
       String.concat " " (List.map (sou base) sl)
     in
     Notes.update_notes_links_db base (Def.NLDB.PgInd p.key_index) s;
-    let new_key =
-      ( Name.lower (sou base p.first_name),
-        Name.lower (sou base p.surname),
-        p.occ )
-    in
+    let new_key = Util.make_key base p in
     if old_key <> new_key then
       Notes.update_cache_linked_pages conf Notes.Rename old_key new_key [];
     let wl =

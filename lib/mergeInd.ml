@@ -188,11 +188,7 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
     String.concat " " (List.map (sou base) sl)
   in
   Notes.update_notes_links_db base (Def.NLDB.PgInd p1.key_index) s;
-  let key =
-    ( Name.lower (sou base p1.first_name),
-      Name.lower (sou base p1.surname),
-      p1.occ )
-  in
+  let key = Util.make_key base p1 in
   let pgl =
     let db = Gwdb.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in

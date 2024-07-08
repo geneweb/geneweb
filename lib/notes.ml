@@ -269,23 +269,9 @@ let update_cache_linked_pages conf mode old_key new_key pgl =
       write_cache_linked_pages conf ht
 
 let linked_pages_nbr conf base ip =
-  let p = poi base ip in
-  let key =
-    ( sou base (get_first_name p) |> Name.lower,
-      sou base (get_surname p) |> Name.lower,
-      get_occ p )
-  in
+  let key = Util.make_key base (Gwdb.gen_person_of_person (poi base ip)) in
   let ht = read_cache_linked_pages conf in
   let entry = try Some (Hashtbl.find ht key) with Not_found -> None in
   match entry with Some pgl -> List.length pgl | None -> 0
 
-let has_linked_pages conf base ip =
-  let p = poi base ip in
-  let key =
-    ( sou base (get_first_name p) |> Name.lower,
-      sou base (get_surname p) |> Name.lower,
-      get_occ p )
-  in
-  let ht = read_cache_linked_pages conf in
-  let entry = try Some (Hashtbl.find ht key) with Not_found -> None in
-  match entry with Some pgl when List.length pgl <> 0 -> true | _ -> false
+let has_linked_pages conf base ip = linked_pages_nbr conf base ip <> 0

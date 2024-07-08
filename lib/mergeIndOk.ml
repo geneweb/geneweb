@@ -469,6 +469,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
     (U_Merge_person (o_p1, o_p2, Util.string_gen_person base p))
     "fp";
   Notes.update_notes_links_db base (Def.NLDB.PgInd o_p2.key_index) "";
+  (* TODO update_cache_linked_pages *)
   Update.delete_topological_sort conf base;
   let db = Gwdb.read_nldb base in
   let ofn1 = o_p1.first_name in
