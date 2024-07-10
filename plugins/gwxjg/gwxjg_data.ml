@@ -1365,11 +1365,13 @@ let escape =
       | x -> Jingoo.Jg_types.failwith_type_error_1 "escape" x)
 
 let comma_separated_of_list =
-  Jingoo.Jg_types.(
-    func_arg1_no_kw @@ fun l ->
-    try box_string (String.concat ", " (List.map unbox_string (unbox_list l)))
-    with Invalid_argument _ ->
-      Jingoo.Jg_types.failwith_type_error_1 "comma_separated_of_list" l)
+  Jingoo.Jg_types.func_arg1_no_kw @@ fun l ->
+  try
+    Jingoo.Jg_types.box_string
+      (String.concat ", "
+         (List.map Jingoo.Jg_types.unbox_string (Jingoo.Jg_types.unbox_list l)))
+  with Invalid_argument _ ->
+    Jingoo.Jg_types.failwith_type_error_1 "comma_separated_of_list" l
 
 let default_env_aux conf =
   [

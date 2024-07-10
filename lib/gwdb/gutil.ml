@@ -70,7 +70,7 @@ let person_of_string_key base s =
   loop 0
 
 let split_key s =
-  Option.map (fun (i, fn, occ, sn) -> (fn, occ, sn)) (split_key s 0)
+  Option.map (fun (_, fn, occ, sn) -> (fn, occ, sn)) (split_key s 0)
 
 let rsplit_key s =
   let rec loop i =
