@@ -44,12 +44,36 @@
 %include;js
 <script src="%etc_prefix;js/jquery.maphilight.js"></script>
 <script>
+var defaultMapHighlightSettings = {
+    alwaysOn: false,
+    groupBy: true
+};
+
 function get( v ) {
   if( typeof v !== "undefined" ) {
     return v
   } else {
     return ""
   }
+}
+
+function resetGrouping() {
+    $('area').each(function() {
+        $(this).data('maphilight', defaultMapHighlightSettings).trigger('alwaysOn.maphilight');
+    });
+}
+
+function reapplyGrouping() {
+    $('area').each(function() {
+        var $this = $(this);
+        var group = $this.attr('class');
+        if (group && group.startsWith('group')) {
+            var currentData = $this.data('maphilight') || {};
+            currentData.groupBy = '.' + group;
+            $this.data('maphilight', currentData);
+        }
+    });
+    $("#image").maphilight(defaultMapHighlightSettings);
 }
 
 var doc_path="%prefix;m=DOC&s=";
@@ -80,6 +104,9 @@ $(document).ready(function() {
       if(get(r.group) != 0)
         { group = " class='group" + get(r.group) + "' data-maphilight='{\"groupBy\":\".group" + get(r.group) + "\"}'"; }
       else { group = ""; }
+
+      var areaId = "area" + cnt;
+      $("#map").append("<area id='" + areaId + "' shape='" + get(r.shape) + "' coords='" + get(r.coords) + "' alt='" + txt + "' title='" + txt + "'" + href + group + ">");
 
       if( get(r.t) == "" || r.t == "p" ) {
         var oc = get(r.oc);
@@ -117,19 +144,33 @@ $(document).ready(function() {
       cnt++;
     });
 
-    $("#image").maphilight();
+    $("#image").maphilight(defaultMapHighlightSettings);
+    reapplyGrouping();
 
-    $(".legend").mouseover( function(e) {
-      $( "#area" + $(this).attr("id").replace(/[a-z]/g, "") ).mouseover();
-    }).mouseout( function(e) {
-      $( "#area" + $(this).attr("id").replace(/[a-z]/g, "") ).mouseout();
+    $(".legend").mouseover(function(e) {
+        var areaId = $(this).attr("id").replace('a', 'area');
+        $('#' + areaId).data('maphilight', {...defaultMapHighlightSettings, alwaysOn: true, groupBy: false}).trigger('alwaysOn.maphilight');
+    }).mouseout(function(e) {
+        var areaId = $(this).attr("id").replace('a', 'area');
+        $('#' + areaId).data('maphilight', defaultMapHighlightSettings).trigger('alwaysOn.maphilight');
+    });
+    
+    $("area").mouseover(function(e) {
+        var legendId = $(this).attr("id").replace('area', 'a');
+        $('#' + legendId + " span").addClass("in");
+    }).mouseout(function(e) {
+        var legendId = $(this).attr("id").replace('area', 'a');
+        $('#' + legendId + " span").removeClass("in");
+    });
+    
+    $("#legend, #unknown").mouseleave(function() {
+      reapplyGrouping();
     });
 
-    $("area").mouseover( function(e) {
-      $( "#a" + $(this).attr("id").replace(/[a-z]/g, "") + " span" ).addClass( "in" );
-    }).mouseout( function(e) {
-      $( "#a" + $(this).attr("id").replace(/[a-z]/g, "") + " span" ).removeClass( "in" );
+    $("#image").mouseleave(function() {
+      reapplyGrouping();
     });
+    
   })
   .fail( function() {
     $("#h1").text( "Erreur de chargement" );
