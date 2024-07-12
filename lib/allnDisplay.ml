@@ -1,14 +1,10 @@
-open Def
-open Config
-open Gwdb
-open Util
-
 let default_max_cnt = Alln.default_max_cnt
 
 (* tools *)
 
 let particle_at_the_end base is_surnames s =
-  if is_surnames then surname_without_particle base s ^ surname_particle base s
+  if is_surnames then
+    Util.surname_without_particle base s ^ Util.surname_particle base s
   else s
 
 let compare_particle_at_the_end base is_surnames a b =
@@ -21,20 +17,22 @@ let compare_particle_at_the_end base is_surnames a b =
 let print_title conf base is_surnames ini len =
   if len >= 2 then
     if is_surnames then
-      Printf.sprintf (fcapitale (ftransl conf "the %d surnames")) len
+      Printf.sprintf (Util.fcapitale (Util.ftransl conf "the %d surnames")) len
       |> Output.print_sstring conf
     else
-      Printf.sprintf (fcapitale (ftransl conf "the %d first names")) len
+      Printf.sprintf
+        (Util.fcapitale (Util.ftransl conf "the %d first names"))
+        len
       |> Output.print_sstring conf
   else if is_surnames then
-    transl_nth conf "surname/surnames" 0
+    Util.transl_nth conf "surname/surnames" 0
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   else
-    transl_nth conf "first name/first names" 0
+    Util.transl_nth conf "first name/first names" 0
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
   if ini <> "" then (
     Output.print_sstring conf " ";
-    Output.print_sstring conf (transl conf "starting with");
+    Output.print_sstring conf (Util.transl conf "starting with");
     Output.print_sstring conf " ";
     Output.print_string conf (Util.escape_html ini))
   else (
@@ -42,7 +40,7 @@ let print_title conf base is_surnames ini len =
     Output.print_sstring conf (string_of_int @@ Gwdb.nb_of_real_persons base);
     Output.print_sstring conf " ";
     Output.print_sstring conf
-      (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
+      (Util.translate_eval ("@(c)" ^ Util.transl_nth conf "person/persons" 1));
     Output.print_sstring conf ")")
 
 let tr c1 s2 s =
@@ -62,7 +60,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
     (fun ini_k ->
       if ini_k = ini then (
         Output.print_sstring conf {|<a href="|};
-        Output.print_string conf (commd conf);
+        Output.print_string conf (Util.commd conf);
         Output.print_sstring conf "m=";
         Output.print_string conf mode;
         Output.print_sstring conf "&tri=A&v=";
@@ -70,7 +68,7 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
         Output.print_sstring conf {|">|})
       else (
         Output.print_sstring conf {|<a href="|};
-        Output.print_string conf (commd conf);
+        Output.print_string conf (Util.commd conf);
         Output.print_sstring conf "m=";
         Output.print_string conf mode;
         Output.print_sstring conf "&tri=A&k=";
@@ -81,38 +79,38 @@ let print_alphabetic_big conf base is_surnames ini list len too_big =
     list;
   if not too_big then (
     Output.print_sstring conf "</p><p>";
-    transl conf "the whole list"
+    Util.transl conf "the whole list"
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
-    Output.print_sstring conf (transl conf ":");
+    Output.print_sstring conf (Util.transl conf ":");
     Output.print_sstring conf "</p><ul><li>";
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     Output.print_sstring conf "m=";
     Output.print_string conf mode;
     Output.print_sstring conf "&tri=A&o=A&k=";
     Output.print_string conf (Mutil.encode ini);
     Output.print_sstring conf {|">|};
-    Output.print_sstring conf (transl conf "long display");
+    Output.print_sstring conf (Util.transl conf "long display");
     Output.print_sstring conf "</a></li><li>";
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     Output.print_sstring conf "m=";
     Output.print_string conf mode;
     Output.print_sstring conf "&tri=S&o=A&k=";
     Output.print_string conf (Mutil.encode ini);
     Output.print_sstring conf {|">|};
-    Output.print_sstring conf (transl conf "short display");
+    Output.print_sstring conf (Util.transl conf "short display");
     Output.print_sstring conf "</a></li><li>";
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     Output.print_sstring conf "m=";
     Output.print_string conf mode;
     Output.print_sstring conf "&tri=S&o=A&cgl=on&k=";
     Output.print_string conf (Mutil.encode ini);
     Output.print_sstring conf {|">|};
-    Output.print_sstring conf (transl conf "short display");
+    Output.print_sstring conf (Util.transl conf "short display");
     Output.print_sstring conf " + ";
-    Output.print_sstring conf (transl conf "cancel GeneWeb links");
+    Output.print_sstring conf (Util.transl conf "cancel GeneWeb links");
     Output.print_sstring conf "</a></li></ul>");
   Hutil.trailer conf
 
@@ -140,8 +138,11 @@ let print_alphabetic_all conf base is_surnames ini list len =
       List.iter
         (fun (s, cnt) ->
           Output.print_sstring conf "<li>";
-          let href = "m=" ^<^ mode ^^^ "&v=" ^<^ Mutil.encode s ^>^ "&t=A" in
-          wprint_geneweb_link conf
+          let href =
+            let open Def in
+            "m=" ^<^ mode ^^^ "&v=" ^<^ Mutil.encode s ^>^ "&t=A"
+          in
+          Util.wprint_geneweb_link conf
             (href :> Adef.escaped_string)
             (particle_at_the_end base is_surnames s |> Util.escape_html
               :> Adef.safe_string);
@@ -167,7 +168,7 @@ let print_alphabetic_small conf base is_surnames ini list len =
       (fun (_, s, cnt) ->
         Output.print_sstring conf "<li>";
         Output.print_sstring conf "<a href=\"";
-        Output.print_string conf (commd conf);
+        Output.print_string conf (Util.commd conf);
         Output.print_sstring conf "m=";
         Output.print_string conf mode;
         Output.print_sstring conf "&v=";
@@ -200,7 +201,7 @@ let print_frequency_any conf base is_surnames list len =
         List.iter
           (fun s ->
             Output.print_sstring conf "<li><a href=\"";
-            Output.print_string conf (commd conf);
+            Output.print_string conf (Util.commd conf);
             Output.print_sstring conf "m=";
             Output.print_string conf mode;
             Output.print_sstring conf "&v=";
@@ -218,24 +219,30 @@ let print_frequency_any conf base is_surnames list len =
   Hutil.trailer conf
 
 let print_frequency conf base is_surnames =
-  let () = load_strings_array base in
+  let () = Gwdb.load_strings_array base in
   let list, len = Alln.select_names conf base is_surnames "" max_int in
   let list = Alln.groupby_count list in
   print_frequency_any conf base is_surnames list len
 
 let print_alphabetic conf base is_surnames =
-  let ini = match p_getenv conf.env "k" with Some k -> k | _ -> "" in
-  if List.assoc_opt "fast_alphabetic" conf.base_env = Some "yes" && ini = ""
+  let ini =
+    match Util.p_getenv conf.Config.env "k" with Some k -> k | _ -> ""
+  in
+  if
+    List.assoc_opt "fast_alphabetic" conf.Config.base_env = Some "yes"
+    && ini = ""
   then (
-    load_strings_array base;
+    Gwdb.load_strings_array base;
     let list = Alln.first_letters base is_surnames in
     let list = List.sort Gutil.alphabetic_order list in
     print_alphabetic_big conf base is_surnames ini list 1 true)
   else
     let all =
-      match p_getenv conf.env "o" with Some "A" -> true | _ -> false
+      match Util.p_getenv conf.Config.env "o" with
+      | Some "A" -> true
+      | _ -> false
     in
-    if String.length ini < 2 then load_strings_array base;
+    if String.length ini < 2 then Gwdb.load_strings_array base;
     let list, len =
       Alln.select_names conf base is_surnames ini (if all then max_int else 50)
     in
@@ -274,7 +281,8 @@ let print_alphabetic_short conf base is_surnames ini list len =
       Mutil.list_iter_first
         (fun first (s, cnt) ->
           let href =
-            " href=\"" ^<^ commd conf
+            let open Def in
+            " href=\"" ^<^ Util.commd conf
             ^^^ ("m=" ^<^ mode ^^^ "&v=" ^<^ Mutil.encode s ^>^ "&t=A\""
                   :> Adef.escaped_string)
           in
@@ -299,8 +307,10 @@ let print_alphabetic_short conf base is_surnames ini list len =
   Hutil.trailer conf
 
 let print_short conf base is_surnames =
-  let ini = match p_getenv conf.env "k" with Some k -> k | _ -> "" in
-  let _ = if String.length ini < 2 then load_strings_array base in
+  let ini =
+    match Util.p_getenv conf.Config.env "k" with Some k -> k | _ -> ""
+  in
+  let _ = if String.length ini < 2 then Gwdb.load_strings_array base in
   match Alln.select_names conf base is_surnames ini max_int with
   | Alln.Specify _, _ -> Hutil.incorrect_request conf
   | Alln.Result list, len ->
@@ -310,13 +320,13 @@ let print_short conf base is_surnames =
 (* main *)
 
 let print_surnames conf base =
-  match p_getenv conf.env "tri" with
+  match Util.p_getenv conf.Config.env "tri" with
   | Some "F" -> print_frequency conf base true
   | Some "S" -> print_short conf base true
   | _ -> print_alphabetic conf base true
 
 let print_first_names conf base =
-  match p_getenv conf.env "tri" with
+  match Util.p_getenv conf.Config.env "tri" with
   | Some "F" -> print_frequency conf base false
   | Some "S" -> print_short conf base false
   | _ -> print_alphabetic conf base false

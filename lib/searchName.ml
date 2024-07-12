@@ -1,30 +1,26 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Gwdb
-open Util
-
 let empty_sn_or_fn base p =
-  is_empty_string (get_surname p)
-  || is_quest_string (get_surname p)
-  || is_empty_string (get_first_name p)
-  || is_quest_string (get_first_name p)
-  || Name.lower (sou base (get_surname p)) = ""
-  || Name.lower (sou base (get_first_name p)) = ""
+  Gwdb.is_empty_string (Gwdb.get_surname p)
+  || Gwdb.is_quest_string (Gwdb.get_surname p)
+  || Gwdb.is_empty_string (Gwdb.get_first_name p)
+  || Gwdb.is_quest_string (Gwdb.get_first_name p)
+  || Name.lower (Gwdb.sou base (Gwdb.get_surname p)) = ""
+  || Name.lower (Gwdb.sou base (Gwdb.get_first_name p)) = ""
 
 let person_is_misc_name conf base p k =
   let k = Name.strip_lower k in
   if
     List.exists
       (fun n -> Name.strip n = k)
-      (person_misc_names base p (nobtit conf base))
+      (Gwdb.person_misc_names base p (Util.nobtit conf base))
   then true
   else false
 
 let person_is_approx_key base p k =
   let k = Name.strip_lower k in
-  let fn = Name.strip_lower (p_first_name base p) in
-  let sn = Name.strip_lower (p_surname base p) in
+  let fn = Name.strip_lower (Gwdb.p_first_name base p) in
+  let sn = Name.strip_lower (Gwdb.p_surname base p) in
   if k = fn ^ sn && fn <> "" && sn <> "" then true else false
 
 let select_approx_key conf base pl k =
@@ -44,7 +40,8 @@ let search_by_sosa conf base an =
   | Some p, Some n ->
       if n <> Sosa.zero then
         match
-          Util.branch_of_sosa conf base n (pget conf base @@ get_iper p)
+          Util.branch_of_sosa conf base n
+            (Util.pget conf base @@ Gwdb.get_iper p)
         with
         | Some (p :: _) -> [ p ]
         | _ -> []
@@ -62,21 +59,22 @@ let search_by_name conf base n =
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
       let list, _ =
-        Some.persons_of_fsname conf base base_strings_of_surname
-          (spi_find (persons_of_surname base))
-          get_surname sn
+        Some.persons_of_fsname conf base Gwdb.base_strings_of_surname
+          (Gwdb.spi_find (Gwdb.persons_of_surname base))
+          Gwdb.get_surname sn
       in
       List.fold_left
         (fun pl (_, _, ipl) ->
           List.fold_left
             (fun pl ip ->
-              let p = pget conf base ip in
+              let p = Util.pget conf base ip in
               if search_reject_p conf base p then pl
               else
                 let fn1 =
-                  Name.abbrev (Name.lower (sou base (get_first_name p)))
+                  Name.abbrev
+                    (Name.lower (Gwdb.sou base (Gwdb.get_first_name p)))
                 in
-                if List.mem fn (cut_words fn1) then p :: pl else pl)
+                if List.mem fn (Util.cut_words fn1) then p :: pl else pl)
             pl ipl)
         [] list
   | None -> []
@@ -135,7 +133,7 @@ let search conf base an search_order specify unknown =
         let pl = search_by_sosa conf base an in
         match pl with
         | [ p ] ->
-            record_visited conf (get_iper p);
+            Util.record_visited conf (Gwdb.get_iper p);
             Perso.print conf base p
         | _ -> loop l)
     | Key :: l -> (
@@ -143,7 +141,7 @@ let search conf base an search_order specify unknown =
         match pl with
         | [] -> loop l
         | [ p ] ->
-            record_visited conf (get_iper p);
+            Util.record_visited conf (Gwdb.get_iper p);
             Perso.print conf base p
         | pl -> specify conf base an pl)
     | Surname :: l -> (
@@ -161,7 +159,7 @@ let search conf base an search_order specify unknown =
         match pl with
         | [] -> loop l
         | [ p ] ->
-            record_visited conf (get_iper p);
+            Util.record_visited conf (Gwdb.get_iper p);
             Perso.print conf base p
         | pl -> specify conf base an pl)
     | PartialKey :: l -> (
@@ -169,7 +167,7 @@ let search conf base an search_order specify unknown =
         match pl with
         | [] -> loop l
         | [ p ] ->
-            record_visited conf (get_iper p);
+            Util.record_visited conf (Gwdb.get_iper p);
             Perso.print conf base p
         | pl -> specify conf base an pl)
     | DefaultSurname :: _ -> Some.search_surname_print conf base unknown an
@@ -191,7 +189,7 @@ let search conf base an search_order specify unknown =
     [Rem] : Exporté en clair hors de ce module.                             *)
 let print conf base specify unknown =
   let real_input label =
-    match p_getenv conf.env label with
+    match Util.p_getenv conf.Config.env label with
     | Some s -> if s = "" then None else Some s
     | None -> None
   in
