@@ -25,11 +25,6 @@ let print_img conf img =
   Output.print_string conf img;
   Output.print_sstring conf {|" alt="" title="">|}
 
-(* **********************************************************************)
-(*  [Fonc] print_branch_to_alphabetic : conf -> string -> int -> unit   *)
-
-(* ******************************************************************** *)
-
 (** [Description] : A partir de l'affichage par branches, permet
                     d'afficher les liens pour un affichage par ordre
                     alphabétique.
@@ -40,7 +35,8 @@ let print_img conf img =
       - nb_branch : nombre de branches dans le résultat de la recherche
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                     *)
-let print_branch_to_alphabetic conf x nb_branch =
+let print_branch_to_alphabetic (conf : Config.config) (x : string)
+    (nb_branch : int) : unit =
   Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
   Output.print_sstring conf
     (Utf8.capitalize_fst
@@ -77,11 +73,6 @@ let print_branch_to_alphabetic conf x nb_branch =
   (* Ne pas oublier l'attribut nofollow pour les robots *)
   Output.print_sstring conf "</td></tr></table><br>"
 
-(* **********************************************************************)
-(*  [Fonc] print_alphabetic_to_branch : conf -> string -> int -> unit   *)
-
-(* ******************************************************************** *)
-
 (** [Description] : A partir de l'affichage alphabétique, permet
                     d'afficher les liens pour un affichage par branches.
     [Args] :
@@ -90,7 +81,7 @@ let print_branch_to_alphabetic conf x nb_branch =
       - x         : 'nom/prénom/sosa...' recherché
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                     *)
-let print_alphabetic_to_branch conf x =
+let print_alphabetic_to_branch (conf : Config.config) (x : string) : unit =
   Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
   Output.print_sstring conf
     (Utf8.capitalize_fst
