@@ -1,15 +1,11 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config
-open Def
-open Gwdb
-open Util
 module StrSet = Mutil.StrSet
 
 let not_found conf txt x =
   let title _ =
     Output.print_sstring conf (Utf8.capitalize_fst txt);
-    Output.print_sstring conf (transl conf ":");
+    Output.print_sstring conf (Util.transl conf ":");
     Output.print_sstring conf {| "|};
     Output.print_string conf (Util.escape_html x);
     Output.print_sstring conf {|"|}
@@ -19,9 +15,10 @@ let not_found conf txt x =
   Hutil.trailer conf
 
 let first_name_not_found conf =
-  not_found conf (transl conf "first name not found")
+  not_found conf (Util.transl conf "first name not found")
 
-let surname_not_found conf = not_found conf (transl conf "surname not found")
+let surname_not_found conf =
+  not_found conf (Util.transl conf "surname not found")
 
 let print_img conf img =
   Output.print_sstring conf {|<img src="|};
@@ -49,35 +46,35 @@ let print_branch_to_alphabetic conf x nb_branch =
   Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
   Output.print_sstring conf
     (Utf8.capitalize_fst
-       (transl_nth conf "display by/branch/alphabetic order" 0));
+       (Util.transl_nth conf "display by/branch/alphabetic order" 0));
   Output.print_sstring conf {|</b></td><td>|};
   print_img conf (Adef.encoded "picto_branch.png");
   Output.print_sstring conf {|</td><td>|};
   Output.print_sstring conf
-    (transl_nth conf "display by/branch/alphabetic order" 1);
+    (Util.transl_nth conf "display by/branch/alphabetic order" 1);
   Output.print_sstring conf " (";
   Output.print_sstring conf (string_of_int nb_branch);
   Output.print_sstring conf {|)</td><td>|};
   print_img conf (Adef.encoded "picto_alphabetic_order.png");
   Output.print_sstring conf {|</td><td>|};
   (* Ne pas oublier l'attribut nofollow pour les robots *)
-  if p_getenv conf.env "t" = Some "A" then (
+  if Util.p_getenv conf.Config.env "t" = Some "A" then (
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     Output.print_sstring conf "m=N&o=i&t=A&v=";
     Output.print_string conf (Mutil.encode x);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
-      (transl_nth conf "display by/branch/alphabetic order" 2);
+      (Util.transl_nth conf "display by/branch/alphabetic order" 2);
     Output.print_sstring conf "</a>")
   else (
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     Output.print_sstring conf {|m=N&o=i&t=N&v=|};
     Output.print_string conf (Mutil.encode x);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
-      (transl_nth conf "display by/branch/alphabetic order" 2);
+      (Util.transl_nth conf "display by/branch/alphabetic order" 2);
     Output.print_sstring conf "</a>");
   (* Ne pas oublier l'attribut nofollow pour les robots *)
   Output.print_sstring conf "</td></tr></table><br>"
@@ -99,33 +96,33 @@ let print_alphabetic_to_branch conf x =
   Output.print_sstring conf {|<table class="display_search"><tr><td><b>|};
   Output.print_sstring conf
     (Utf8.capitalize_fst
-       (transl_nth conf "display by/branch/alphabetic order" 0));
+       (Util.transl_nth conf "display by/branch/alphabetic order" 0));
   Output.print_sstring conf "</b></td><td>";
   print_img conf (Adef.encoded "picto_branch.png");
   Output.print_sstring conf "</td><td>";
-  if p_getenv conf.env "t" = Some "A" then (
+  if Util.p_getenv conf.Config.env "t" = Some "A" then (
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     Output.print_sstring conf "m=N&t=A&v=";
     Output.print_string conf (Mutil.encode x);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
-      (transl_nth conf "display by/branch/alphabetic order" 1);
+      (Util.transl_nth conf "display by/branch/alphabetic order" 1);
     Output.print_sstring conf "</a>")
   else (
     Output.print_sstring conf {|<a href="|};
-    Output.print_string conf (commd conf);
+    Output.print_string conf (Util.commd conf);
     Output.print_sstring conf "m=NG&sn=";
     Output.print_string conf (Mutil.encode x);
     Output.print_sstring conf {|" rel="nofollow">|};
     Output.print_sstring conf
-      (transl_nth conf "display by/branch/alphabetic order" 1);
+      (Util.transl_nth conf "display by/branch/alphabetic order" 1);
     Output.print_sstring conf "</a>");
   Output.print_sstring conf "</td><td>";
   print_img conf (Adef.encoded "picto_alphabetic_order.png");
   Output.print_sstring conf "</td><td>";
   Output.print_sstring conf
-    (transl_nth conf "display by/branch/alphabetic order" 2);
+    (Util.transl_nth conf "display by/branch/alphabetic order" 2);
   Output.print_sstring conf "</td></tr></table><br>"
 
 let persons_of_fsname conf base base_strings_of_fsname find proj x =
@@ -137,7 +134,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
     let x = Name.crush_lower x in
     List.fold_right
       (fun istr l ->
-        let str = Mutil.nominative (sou base istr) in
+        let str = Mutil.nominative (Gwdb.sou base istr) in
         if
           Name.crush_lower str = x
           || List.mem x (List.map Name.crush_lower (Mutil.surnames_pieces str))
@@ -148,7 +145,8 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
           let iperl =
             List.fold_left
               (fun iperl iper ->
-                if eq_istr (proj (pget conf base iper)) istr then iper :: iperl
+                if Gwdb.eq_istr (proj (Util.pget conf base iper)) istr then
+                  iper :: iperl
                 else iperl)
               [] iperl
           in
@@ -182,25 +180,27 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
 let print_elem conf base is_surname (p, xl) =
   Mutil.list_iter_first
     (fun first x ->
-      let iper = get_iper x in
+      let iper = Gwdb.get_iper x in
       if not first then Output.print_sstring conf "</li><li> ";
       SosaCache.print_sosa conf base x true;
       Output.print_sstring conf {|<a href="|};
-      Output.print_string conf (commd conf);
-      Output.print_string conf (acces conf base x);
+      Output.print_string conf (Util.commd conf);
+      Output.print_string conf (Util.acces conf base x);
       Output.print_sstring conf {|" id="i|};
-      Output.print_sstring conf (string_of_iper iper);
+      Output.print_sstring conf (Gwdb.string_of_iper iper);
       Output.print_sstring conf {|">|};
       if is_surname then (
-        Output.print_string conf (escape_html @@ surname_without_particle base p);
-        Output.print_string conf (escape_html @@ surname_particle base p))
+        Output.print_string conf
+          (Util.escape_html @@ Util.surname_without_particle base p);
+        Output.print_string conf
+          (Util.escape_html @@ Util.surname_particle base p))
       else
         Output.print_string conf
-          (if p = "" then Adef.escaped "?" else escape_html p);
+          (if p = "" then Adef.escaped "?" else Util.escape_html p);
       Output.print_sstring conf "</a>";
       Output.print_string conf (DateDisplay.short_dates_text conf base x);
       Output.print_sstring conf "<em>";
-      specify_homonymous conf base x true;
+      Util.specify_homonymous conf base x true;
       Output.print_sstring conf "</em>")
     xl
 
@@ -225,11 +225,13 @@ let first_name_print_list conf base x1 xl liste =
     let l =
       List.sort
         (fun x1 x2 ->
-          match Gutil.alphabetic (p_surname base x1) (p_surname base x2) with
+          match
+            Gutil.alphabetic (Gwdb.p_surname base x1) (Gwdb.p_surname base x2)
+          with
           | 0 -> (
               match
-                ( Date.od_of_cdate (get_birth x1),
-                  Date.od_of_cdate (get_birth x2) )
+                ( Date.od_of_cdate (Gwdb.get_birth x1),
+                  Date.od_of_cdate (Gwdb.get_birth x2) )
               with
               | Some d1, Some d2 -> Date.compare_date d1 d2
               | Some _, _ -> 1
@@ -239,25 +241,25 @@ let first_name_print_list conf base x1 xl liste =
     in
     List.fold_left
       (fun l x ->
-        let px = p_surname base x in
+        let px = Gwdb.p_surname base x in
         match l with
         | (p, l1) :: l when Gutil.alphabetic px p = 0 -> (p, x :: l1) :: l
         | _ -> (px, [ x ]) :: l)
       [] l
   in
   let title h =
-    if h || p_getenv conf.env "t" = Some "A" then
-      Output.print_string conf (escape_html x1)
+    if h || Util.p_getenv conf.Config.env "t" = Some "A" then
+      Output.print_string conf (Util.escape_html x1)
     else
       Mutil.list_iter_first
         (fun first x ->
           if not first then Output.print_sstring conf ", ";
           Output.print_sstring conf {|<a href="|};
-          Output.print_string conf (commd conf);
+          Output.print_string conf (Util.commd conf);
           Output.print_sstring conf {|m=P&t=A&v=|};
           Output.print_string conf (Mutil.encode x);
           Output.print_sstring conf {|">|};
-          Output.print_string conf (escape_html x);
+          Output.print_string conf (Util.escape_html x);
           Output.print_sstring conf {|</a>|})
         (StrSet.elements xl)
   in
@@ -277,7 +279,7 @@ let first_name_print_list conf base x1 xl liste =
       liste
   in
   let list = List.sort compare list in
-  print_alphab_list conf
+  Util.print_alphab_list conf
     (fun (ord, _, _) -> first_char ord)
     (fun (_, txt, ipl) -> print_elem conf base true (txt, ipl))
     list;
@@ -286,27 +288,27 @@ let first_name_print_list conf base x1 xl liste =
 let mk_specify_title conf kw n _ =
   Output.print_sstring conf (Utf8.capitalize_fst kw);
   Output.print_sstring conf {| "|};
-  Output.print_string conf (escape_html n);
+  Output.print_string conf (Util.escape_html n);
   Output.print_sstring conf {|"|};
-  Output.print_sstring conf (transl conf ":");
+  Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf {| |};
-  Output.print_sstring conf (transl conf "specify")
+  Output.print_sstring conf (Util.transl conf "specify")
 
 let select_first_name conf n list =
   Hutil.header conf
-  @@ mk_specify_title conf (transl_nth conf "first name/first names" 0) n;
+  @@ mk_specify_title conf (Util.transl_nth conf "first name/first names" 0) n;
   Output.print_sstring conf "<ul>";
   List.iter
     (fun (sstr, (strl, _)) ->
       Output.print_sstring conf {|<li><a href="|};
-      Output.print_string conf (commd conf);
+      Output.print_string conf (Util.commd conf);
       Output.print_sstring conf {|m=P&v=|};
       Output.print_string conf (Mutil.encode sstr);
       Output.print_sstring conf {|">|};
       Mutil.list_iter_first
         (fun first str ->
           if not first then Output.print_sstring conf ", ";
-          Output.print_string conf (escape_html str))
+          Output.print_string conf (Util.escape_html str))
         (StrSet.elements strl);
       Output.print_sstring conf "</a>\n")
     list;
@@ -324,16 +326,16 @@ let persons_of_absolute base_strings_of persons_of get_field conf base x =
   let istrl = base_strings_of base x in
   List.fold_right
     (fun istr l ->
-      let str = sou base istr in
+      let str = Gwdb.sou base istr in
       if str = x then
-        let iperl = spi_find (persons_of base) istr in
+        let iperl = Gwdb.spi_find (persons_of base) istr in
         let iperl =
           List.fold_left
             (fun iperl iper ->
-              let p = pget conf base iper in
+              let p = Util.pget conf base iper in
               if
-                eq_istr (get_field p) istr
-                && ((not (is_hide_names conf p))
+                Gwdb.eq_istr (get_field p) istr
+                && ((not (Util.is_hide_names conf p))
                    || Util.authorized_age conf base p)
               then iper :: iperl
               else iperl)
@@ -344,21 +346,22 @@ let persons_of_absolute base_strings_of persons_of get_field conf base x =
     istrl []
 
 let persons_of_absolute_first_name =
-  persons_of_absolute base_strings_of_first_name persons_of_first_name
-    get_first_name
+  persons_of_absolute Gwdb.base_strings_of_first_name Gwdb.persons_of_first_name
+    Gwdb.get_first_name
 
 let persons_of_absolute_surname =
-  persons_of_absolute base_strings_of_surname persons_of_surname get_surname
+  persons_of_absolute Gwdb.base_strings_of_surname Gwdb.persons_of_surname
+    Gwdb.get_surname
 
 let first_name_print conf base x =
   let list, _ =
-    if p_getenv conf.env "t" = Some "A" then
+    if Util.p_getenv conf.Config.env "t" = Some "A" then
       (persons_of_absolute_first_name conf base x, fun _ -> assert false)
     else if x = "" then ([], fun _ -> assert false)
     else
-      persons_of_fsname conf base base_strings_of_first_name
-        (spi_find (persons_of_first_name base))
-        get_first_name x
+      persons_of_fsname conf base Gwdb.base_strings_of_first_name
+        (Gwdb.spi_find (Gwdb.persons_of_first_name base))
+        Gwdb.get_first_name x
   in
   let list =
     List.map
@@ -373,12 +376,14 @@ let first_name_print conf base x =
   | [] -> first_name_not_found conf x
   | [ (_, (strl, iperl)) ] ->
       let iperl = List.sort_uniq compare iperl in
-      let pl = List.map (pget conf base) iperl in
+      let pl = List.map (Util.pget conf base) iperl in
       let pl =
         List.fold_right
           (fun p pl ->
-            if (not (is_hide_names conf p)) || authorized_age conf base p then
-              p :: pl
+            if
+              (not (Util.is_hide_names conf p))
+              || Util.authorized_age conf base p
+            then p :: pl
             else pl)
           pl []
       in
@@ -387,12 +392,12 @@ let first_name_print conf base x =
 
 let has_children_with_that_name conf base des name =
   let compare_name n1 n2 =
-    if p_getenv conf.env "t" = Some "A" then n1 = n2
+    if Util.p_getenv conf.Config.env "t" = Some "A" then n1 = n2
     else Name.lower n1 = Name.lower n2
   in
   List.exists
-    (fun ip -> compare_name (p_surname base (pget conf base ip)) name)
-    (Array.to_list (get_children des))
+    (fun ip -> compare_name (Gwdb.p_surname base (Util.pget conf base ip)) name)
+    (Array.to_list (Gwdb.get_children des))
 
 (* List selection bullets *)
 
@@ -407,22 +412,30 @@ let print_selection_bullet conf = function
           (fun (req : Adef.encoded_string) (k, (v : Adef.encoded_string)) ->
             if (not sel) && k = "u" && v = txt then req
             else
-              let s : Adef.encoded_string = Adef.encoded k ^^^ "=" ^<^ v in
-              if (req :> string) = "" then s else req ^^^ "&" ^<^ s)
-          (Adef.encoded "") conf.env
+              let s : Adef.encoded_string =
+                let open Def in
+                Adef.encoded k ^^^ "=" ^<^ v
+              in
+              if (req :> string) = "" then s
+              else
+                let open Def in
+                req ^^^ "&" ^<^ s)
+          (Adef.encoded "") conf.Config.env
       in
       Output.print_sstring conf {|<a id="if|};
       Output.print_string conf txt;
       Output.print_sstring conf {|" href="|};
-      Output.print_string conf (prefix_base conf);
+      Output.print_string conf (Util.prefix_base conf);
       Output.print_string conf req;
-      if sel then Output.print_string conf ("&u=" ^<^ txt);
-      if sel || List.mem_assoc "u" conf.env then
-        Output.print_string conf ("#if" ^<^ txt);
-      Output.print_sstring conf {|" rel="nofollow">|};
-      Output.print_string conf
-        (if sel then bullet_sel_txt else bullet_unsel_txt);
-      Output.print_sstring conf "</a>\n"
+      if sel then (
+        let open Def in
+        Output.print_string conf ("&u=" ^<^ txt);
+        if sel || List.mem_assoc "u" conf.Config.env then (
+          Output.print_string conf ("#if" ^<^ txt);
+          Output.print_sstring conf {|" rel="nofollow">|};
+          Output.print_string conf
+            (if sel then bullet_sel_txt else bullet_unsel_txt);
+          Output.print_sstring conf "</a>\n"))
   | None ->
       Output.print_string conf bullet_nosel_txt;
       Output.print_sstring conf "\n"
@@ -430,9 +443,9 @@ let print_selection_bullet conf = function
 let unselected_bullets conf =
   List.fold_left
     (fun sl (k, v) ->
-      try if k = "u" then ifam_of_string (Mutil.decode v) :: sl else sl
+      try if k = "u" then Gwdb.ifam_of_string (Mutil.decode v) :: sl else sl
       with Failure _ -> sl)
-    [] conf.env
+    [] conf.Config.env
 
 let alphabetic1 n1 n2 = Gutil.alphabetic_utf_8 n1 n2
 
@@ -441,25 +454,26 @@ type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
 let print_branch conf base psn name =
   let unsel_list = unselected_bullets conf in
   let rec loop p =
-    let u = pget conf base (get_iper p) in
+    let u = Util.pget conf base (Gwdb.get_iper p) in
     let family_list =
       Array.map
         (fun ifam ->
-          let fam = foi base ifam in
-          let c = Gutil.spouse (get_iper p) fam in
-          let c = pget conf base c in
+          let fam = Gwdb.foi base ifam in
+          let c = Gutil.spouse (Gwdb.get_iper p) fam in
+          let c = Util.pget conf base c in
           let down = has_children_with_that_name conf base fam name in
           let down =
-            if get_sex p = Female && p_surname base c = name then false
+            if Gwdb.get_sex p = Def.Female && Gwdb.p_surname base c = name then
+              false
             else down
           in
           let i = ifam in
           let sel = not (List.mem i unsel_list) in
           ( fam,
             c,
-            if down then Some (Mutil.encode @@ string_of_ifam i, sel) else None
-          ))
-        (get_family u)
+            if down then Some (Mutil.encode @@ Gwdb.string_of_ifam i, sel)
+            else None ))
+        (Gwdb.get_family u)
     in
     let first_select =
       if family_list = [||] then None
@@ -476,11 +490,12 @@ let print_branch conf base psn name =
       Output.print_sstring conf @@ if with_link then "<strong>" else "<em>";
       Output.print_string conf
         (render p
-           (if is_hide_names conf p && not (authorized_age conf base p) then
-            Adef.safe "x"
-           else if (not psn) && (not with_sn) && p_surname base p = name then
-             gen_person_text ~sn:false conf base p
-           else gen_person_text conf base p));
+           (if
+            Util.is_hide_names conf p && not (Util.authorized_age conf base p)
+           then Adef.safe "x"
+           else if (not psn) && (not with_sn) && Gwdb.p_surname base p = name
+          then Util.gen_person_text ~sn:false conf base p
+           else Util.gen_person_text conf base p));
       Output.print_sstring conf @@ if with_link then "</strong>" else "</em>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       Output.print_sstring conf "\n"
@@ -488,7 +503,7 @@ let print_branch conf base psn name =
     Output.print_sstring conf "<li>";
     print_selection_bullet conf first_select;
     print_elem p true true false;
-    if Array.length (get_family u) <> 0 then
+    if Array.length (Gwdb.get_family u) <> 0 then
       ignore
       @@ Array.fold_left
            (fun first (fam, sp, select) ->
@@ -501,13 +516,13 @@ let print_branch conf base psn name =
                (DateDisplay.short_marriage_date_text conf base fam p sp);
              Output.print_sstring conf "\n";
              print_elem sp true false true;
-             let children = get_children fam in
+             let children = Gwdb.get_children fam in
              (match select with
              | Some (_, true) ->
                  Output.print_sstring conf "<ul>";
                  Array.iter
                    (fun e ->
-                     loop (pget conf base e);
+                     loop (Util.pget conf base e);
                      Output.print_sstring conf "</li>")
                    children;
                  Output.print_sstring conf "</ul>"
@@ -527,17 +542,18 @@ let print_one_branch conf base bh psn =
   Output.print_sstring conf "<ul>";
   let p = bh.bh_ancestor in
   if bh.bh_well_named_ancestors = [] then
-    let x = sou base (get_surname p) in
+    let x = Gwdb.sou base (Gwdb.get_surname p) in
     print_branch conf base psn x p
   else (
     Output.print_sstring conf "<li>";
-    if is_empty_person p then Output.print_sstring conf "&lt;&lt;"
+    if Util.is_empty_person p then Output.print_sstring conf "&lt;&lt;"
     else
-      wprint_geneweb_link conf (Util.acces conf base p) (Adef.safe "&lt;&lt;");
+      Util.wprint_geneweb_link conf (Util.acces conf base p)
+        (Adef.safe "&lt;&lt;");
     Output.print_sstring conf "<ul>";
     List.iter
       (fun p ->
-        let x = sou base (get_surname p) in
+        let x = Gwdb.sou base (Gwdb.get_surname p) in
         print_branch conf base psn x p)
       bh.bh_well_named_ancestors;
     Output.print_sstring conf "</ul></li>");
@@ -545,11 +561,12 @@ let print_one_branch conf base bh psn =
 
 let print_one_surname_by_branch conf base x xl (bhl, str) =
   let ancestors =
-    match p_getenv conf.env "order" with
+    match Util.p_getenv conf.Config.env "order" with
     | Some "d" ->
         let born_before p1 p2 =
           match
-            (Date.od_of_cdate (get_birth p1), Date.od_of_cdate (get_birth p2))
+            ( Date.od_of_cdate (Gwdb.get_birth p1),
+              Date.od_of_cdate (Gwdb.get_birth p2) )
           with
           | Some d1, Some d2 -> Date.compare_date d1 d2
           | _, None -> -1
@@ -560,35 +577,35 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
         List.sort
           (fun p1 p2 ->
             alphabetic1
-              (p_first_name base p1.bh_ancestor)
-              (p_first_name base p2.bh_ancestor))
+              (Gwdb.p_first_name base p1.bh_ancestor)
+              (Gwdb.p_first_name base p2.bh_ancestor))
           bhl
   in
   let len = List.length ancestors in
   let psn =
-    match p_getenv conf.env "alwsurn" with
+    match Util.p_getenv conf.Config.env "alwsurn" with
     | Some x -> x = "yes"
     | None -> (
-        try List.assoc "always_surname" conf.base_env = "yes"
+        try List.assoc "always_surname" conf.Config.base_env = "yes"
         with Not_found -> false)
   in
   let title h =
-    if h || p_getenv conf.env "t" = Some "A" then
-      Output.print_string conf (escape_html x)
+    if h || Util.p_getenv conf.Config.env "t" = Some "A" then
+      Output.print_string conf (Util.escape_html x)
     else
       Mutil.list_iter_first
         (fun first x ->
           if not first then Output.print_sstring conf ", ";
           Output.print_sstring conf {|<a href="|};
-          Output.print_string conf (commd conf);
+          Output.print_string conf (Util.commd conf);
           Output.print_sstring conf {|m=N&t=A&v=|};
           Output.print_string conf (Mutil.encode x);
           Output.print_sstring conf {|">|};
-          Output.print_string conf (escape_html x);
+          Output.print_string conf (Util.escape_html x);
           Output.print_sstring conf {|</a>|})
         (StrSet.elements xl)
   in
-  let br = p_getint conf.env "br" in
+  let br = Util.p_getint conf.Config.env "br" in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   (* Si on est dans un calcul de parenté, on affiche *)
@@ -603,7 +620,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
     @@ List.fold_left
          (fun n bh ->
            Output.print_sstring conf {|<dt><a href="|};
-           Output.print_string conf (commd conf);
+           Output.print_string conf (Util.commd conf);
            Output.print_sstring conf {|m=N&v=|};
            Output.print_string conf (Mutil.encode str);
            Output.print_sstring conf {|&br=|};
@@ -629,7 +646,9 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
 let print_several_possible_surnames x conf base (_, homonymes) =
   let fx = x in
   let x = match homonymes with x :: _ -> x | _ -> x in
-  let title = mk_specify_title conf (transl_nth conf "surname/surnames" 0) fx in
+  let title =
+    mk_specify_title conf (Util.transl_nth conf "surname/surnames" 0) fx
+  in
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   let list =
@@ -644,9 +663,10 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   in
   let list = List.sort compare list in
   let access txt sn =
-    geneweb_link conf
+    let open Def in
+    Util.geneweb_link conf
       ("m=N&v=" ^<^ Mutil.encode sn ^>^ "&t=N" :> Adef.escaped_string)
-      (escape_html txt :> Adef.safe_string)
+      (Util.escape_html txt :> Adef.safe_string)
   in
   Util.wprint_in_columns conf
     (fun (ord, _, _) -> ord)
@@ -655,17 +675,17 @@ let print_several_possible_surnames x conf base (_, homonymes) =
   Output.print_sstring conf {|<p><em style="font-size:80%">|};
   Output.print_sstring conf {| <a |};
   Output.print_sstring conf {| href="|};
-  Output.print_string conf (commd conf);
+  Output.print_string conf (Util.commd conf);
   Output.print_sstring conf {|m=N&o=i&t=N&v=|};
   Output.print_string conf
     (if List.length homonymes = 1 then Mutil.encode x else Mutil.encode fx);
   Output.print_sstring conf {|">|};
-  Output.print_sstring conf (Utf8.capitalize_fst (transl conf "click"));
+  Output.print_sstring conf (Utf8.capitalize_fst (Util.transl conf "click"));
   Output.print_sstring conf " ";
-  Output.print_sstring conf (transl conf "here");
+  Output.print_sstring conf (Util.transl conf "here");
   Output.print_sstring conf " ";
   Output.print_sstring conf
-    (transl conf "for the first names by alphabetic order");
+    (Util.transl conf "for the first names by alphabetic order");
   Output.print_sstring conf {|</a> |};
   Output.print_sstring conf ".</em></p>";
   Hutil.trailer conf
@@ -675,13 +695,13 @@ let print_family_alphabetic x conf base liste =
     let list =
       List.fold_left
         (fun list p ->
-          if List.exists (eq_istr (get_surname p)) list then list
-          else get_surname p :: list)
+          if List.exists (Gwdb.eq_istr (Gwdb.get_surname p)) list then list
+          else Gwdb.get_surname p :: list)
         [] liste
     in
     let set =
       List.fold_left
-        (fun set istr -> StrSet.add (sou base istr) set)
+        (fun set istr -> StrSet.add (Gwdb.sou base istr) set)
         StrSet.empty list
     in
     List.sort compare (StrSet.elements set)
@@ -690,14 +710,16 @@ let print_family_alphabetic x conf base liste =
     let l =
       List.sort
         (fun x1 x2 ->
-          match alphabetic1 (p_first_name base x2) (p_first_name base x1) with
-          | 0 -> compare (get_occ x1) (get_occ x2)
+          match
+            alphabetic1 (Gwdb.p_first_name base x2) (Gwdb.p_first_name base x1)
+          with
+          | 0 -> compare (Gwdb.get_occ x1) (Gwdb.get_occ x2)
           | n -> n)
         liste
     in
     List.fold_left
       (fun l x ->
-        let px = p_first_name base x in
+        let px = Gwdb.p_first_name base x in
         match l with
         | (p, l1) :: l when alphabetic1 px p = 0 -> (p, x :: l1) :: l
         | _ -> (px, [ x ]) :: l)
@@ -711,10 +733,11 @@ let print_family_alphabetic x conf base liste =
           if h || List.length homonymes = 1 then
             (Util.escape_html x :> Adef.safe_string)
           else
-            geneweb_link conf
+            let open Def in
+            Util.geneweb_link conf
               ("m=N&o=i&v=" ^<^ Mutil.encode x ^>^ "&t=A"
                 :> Adef.escaped_string)
-              (escape_html x :> Adef.safe_string)
+              (Util.escape_html x :> Adef.safe_string)
         in
         Mutil.list_iter_first
           (fun first x ->
@@ -729,7 +752,7 @@ let print_family_alphabetic x conf base liste =
       Util.print_tips_relationship conf;
       (* Menu afficher par branche/ordre alphabetique *)
       print_alphabetic_to_branch conf x;
-      print_alphab_list conf
+      Util.print_alphab_list conf
         (fun (p, _) -> first_char p)
         (print_elem conf base false)
         liste;
@@ -748,19 +771,21 @@ let insert_at_position_in_family children ip ipl =
   loop (Array.to_list children) ipl
 
 let select_ancestors conf base name_inj ipl =
-  let str_inj s = name_inj (sou base s) in
+  let str_inj s = name_inj (Gwdb.sou base s) in
   List.fold_left
     (fun bhl ip ->
-      let p = pget conf base ip in
-      match get_parents p with
+      let p = Util.pget conf base ip in
+      match Gwdb.get_parents p with
       | Some ifam ->
-          let fam = foi base ifam in
-          let ifath = get_father fam in
-          let imoth = get_mother fam in
-          let fath = pget conf base ifath in
-          let moth = pget conf base imoth in
-          let s = str_inj (get_surname p) in
-          if str_inj (get_surname fath) <> s && str_inj (get_surname moth) <> s
+          let fam = Gwdb.foi base ifam in
+          let ifath = Gwdb.get_father fam in
+          let imoth = Gwdb.get_mother fam in
+          let fath = Util.pget conf base ifath in
+          let moth = Util.pget conf base imoth in
+          let s = str_inj (Gwdb.get_surname p) in
+          if
+            str_inj (Gwdb.get_surname fath) <> s
+            && str_inj (Gwdb.get_surname moth) <> s
           then
             let rec loop = function
               | bh :: bhl ->
@@ -769,8 +794,8 @@ let select_ancestors conf base name_inj ipl =
                       {
                         bh with
                         bh_well_named_ancestors =
-                          insert_at_position_in_family (get_children fam) ip
-                            bh.bh_well_named_ancestors;
+                          insert_at_position_in_family (Gwdb.get_children fam)
+                            ip bh.bh_well_named_ancestors;
                       }
                     in
                     bh :: bhl
@@ -786,21 +811,21 @@ let select_ancestors conf base name_inj ipl =
     [] ipl
 
 module PerSet = Set.Make (struct
-  type t = iper
+  type t = Gwdb.iper
 
   let compare = compare
 end)
 
 let surname_print conf base not_found_fun x =
   let list, name_inj =
-    if p_getenv conf.env "t" = Some "A" then
+    if Util.p_getenv conf.Config.env "t" = Some "A" then
       (persons_of_absolute_surname conf base x, fun x -> x)
     else if x = "" then
       ([], fun _ -> raise (Match_failure ("src/some.ml", 825, 29)))
     else
-      persons_of_fsname conf base base_strings_of_surname
-        (spi_find (persons_of_surname base))
-        get_surname x
+      persons_of_fsname conf base Gwdb.base_strings_of_surname
+        (Gwdb.spi_find (Gwdb.persons_of_surname base))
+        Gwdb.get_surname x
   in
   let list =
     List.map
@@ -825,16 +850,18 @@ let surname_print conf base not_found_fun x =
   let iperl = PerSet.elements iperl in
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
-  match p_getenv conf.env "o" with
+  match Util.p_getenv conf.Config.env "o" with
   | Some "i" ->
       let pl =
-        List.fold_right (fun ip ipl -> pget conf base ip :: ipl) iperl []
+        List.fold_right (fun ip ipl -> Util.pget conf base ip :: ipl) iperl []
       in
       let pl =
         List.fold_right
           (fun p pl ->
-            if (not (is_hide_names conf p)) || authorized_age conf base p then
-              p :: pl
+            if
+              (not (Util.is_hide_names conf p))
+              || Util.authorized_age conf base p
+            then p :: pl
             else pl)
           pl []
       in
@@ -845,9 +872,9 @@ let surname_print conf base not_found_fun x =
         List.map
           (fun bh ->
             {
-              bh_ancestor = pget conf base bh.bh_ancestor;
+              bh_ancestor = Util.pget conf base bh.bh_ancestor;
               bh_well_named_ancestors =
-                List.map (pget conf base) bh.bh_well_named_ancestors;
+                List.map (Util.pget conf base) bh.bh_well_named_ancestors;
             })
           bhl
       in
@@ -864,14 +891,14 @@ let surname_print conf base not_found_fun x =
 
 let search_surname conf base x =
   let list, name_inj =
-    if p_getenv conf.env "t" = Some "A" then
+    if Util.p_getenv conf.Config.env "t" = Some "A" then
       (persons_of_absolute_surname conf base x, fun x -> x)
     else if x = "" then
       ([], fun _ -> raise (Match_failure ("src/some.ml", 896, 29)))
     else
-      persons_of_fsname conf base base_strings_of_surname
-        (spi_find (persons_of_surname base))
-        get_surname x
+      persons_of_fsname conf base Gwdb.base_strings_of_surname
+        (Gwdb.spi_find (Gwdb.persons_of_surname base))
+        Gwdb.get_surname x
   in
   let list =
     List.map
@@ -899,9 +926,9 @@ let search_surname conf base x =
     List.map
       (fun bh ->
         {
-          bh_ancestor = pget conf base bh.bh_ancestor;
+          bh_ancestor = Util.pget conf base bh.bh_ancestor;
           bh_well_named_ancestors =
-            List.map (pget conf base) bh.bh_well_named_ancestors;
+            List.map (Util.pget conf base) bh.bh_well_named_ancestors;
         })
       bhl
   in
@@ -912,14 +939,14 @@ let search_surname conf base x =
 
 let search_surname_print conf base not_found_fun x =
   let list, name_inj =
-    if p_getenv conf.env "t" = Some "A" then
+    if Util.p_getenv conf.Config.env "t" = Some "A" then
       (persons_of_absolute_surname conf base x, fun x -> x)
     else if x = "" then
       ([], fun _ -> raise (Match_failure ("src/some.ml", 942, 29)))
     else
-      persons_of_fsname conf base base_strings_of_surname
-        (spi_find (persons_of_surname base))
-        get_surname x
+      persons_of_fsname conf base Gwdb.base_strings_of_surname
+        (Gwdb.spi_find (Gwdb.persons_of_surname base))
+        Gwdb.get_surname x
   in
   let list =
     List.map
@@ -944,16 +971,18 @@ let search_surname_print conf base not_found_fun x =
   let iperl = PerSet.elements iperl in
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
-  match p_getenv conf.env "o" with
+  match Util.p_getenv conf.Config.env "o" with
   | Some "i" ->
       let pl =
-        List.fold_right (fun ip ipl -> pget conf base ip :: ipl) iperl []
+        List.fold_right (fun ip ipl -> Util.pget conf base ip :: ipl) iperl []
       in
       let pl =
         List.fold_right
           (fun p pl ->
-            if (not (is_hide_names conf p)) || authorized_age conf base p then
-              p :: pl
+            if
+              (not (Util.is_hide_names conf p))
+              || Util.authorized_age conf base p
+            then p :: pl
             else pl)
           pl []
       in
@@ -964,9 +993,9 @@ let search_surname_print conf base not_found_fun x =
         List.map
           (fun bh ->
             {
-              bh_ancestor = pget conf base bh.bh_ancestor;
+              bh_ancestor = Util.pget conf base bh.bh_ancestor;
               bh_well_named_ancestors =
-                List.map (pget conf base) bh.bh_well_named_ancestors;
+                List.map (Util.pget conf base) bh.bh_well_named_ancestors;
             })
           bhl
       in
@@ -980,15 +1009,15 @@ let search_surname_print conf base not_found_fun x =
 
 let search_first_name conf base x =
   let list, _ =
-    if p_getenv conf.env "t" = Some "A" then
+    if Util.p_getenv conf.Config.env "t" = Some "A" then
       ( persons_of_absolute_first_name conf base x,
         fun _ -> raise (Match_failure ("src/some.ml", 1007, 51)) )
     else if x = "" then
       ([], fun _ -> raise (Match_failure ("src/some.ml", 1008, 29)))
     else
-      persons_of_fsname conf base base_strings_of_first_name
-        (spi_find (persons_of_first_name base))
-        get_first_name x
+      persons_of_fsname conf base Gwdb.base_strings_of_first_name
+        (Gwdb.spi_find (Gwdb.persons_of_first_name base))
+        Gwdb.get_first_name x
   in
   let list =
     List.map
@@ -1000,15 +1029,15 @@ let search_first_name conf base x =
 
 let search_first_name_print conf base x =
   let list, _ =
-    if p_getenv conf.env "t" = Some "A" then
+    if Util.p_getenv conf.Config.env "t" = Some "A" then
       ( persons_of_absolute_first_name conf base x,
         fun _ -> raise (Match_failure ("src/some.ml", 1025, 51)) )
     else if x = "" then
       ([], fun _ -> raise (Match_failure ("src/some.ml", 1026, 29)))
     else
-      persons_of_fsname conf base base_strings_of_first_name
-        (spi_find (persons_of_first_name base))
-        get_first_name x
+      persons_of_fsname conf base Gwdb.base_strings_of_first_name
+        (Gwdb.spi_find (Gwdb.persons_of_first_name base))
+        Gwdb.get_first_name x
   in
   let list =
     List.map
@@ -1023,12 +1052,14 @@ let search_first_name_print conf base x =
   | [] -> first_name_not_found conf x
   | [ (_, (strl, iperl)) ] ->
       let iperl = List.sort_uniq compare iperl in
-      let pl = List.map (pget conf base) iperl in
+      let pl = List.map (Util.pget conf base) iperl in
       let pl =
         List.fold_right
           (fun p pl ->
-            if (not (is_hide_names conf p)) || authorized_age conf base p then
-              p :: pl
+            if
+              (not (Util.is_hide_names conf p))
+              || Util.authorized_age conf base p
+            then p :: pl
             else pl)
           pl []
       in
