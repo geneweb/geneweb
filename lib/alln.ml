@@ -47,7 +47,17 @@ let select_names conf base is_surnames ini limit =
         if Mutil.start_with_wildcard ini 0 k then
           let list, len =
             if s <> "?" then
-              let ips = spi_find iii istr in
+              let ips =
+                let is_main_name person_id =
+                  let get_main_name =
+                    if is_surnames then Gwdb.get_surname
+                    else Gwdb.get_first_name
+                  in
+                  person_id |> Gwdb.poi base |> get_main_name
+                  |> Gwdb.eq_istr istr
+                in
+                List.filter is_main_name (spi_find iii istr)
+              in
               let cnt =
                 (* Optimization:
                  * In the case of [Specify _]:
