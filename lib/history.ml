@@ -676,8 +676,7 @@ let filter_map_history ~conf ~skip ~n ~filter ~f =
               | Some (time, user, action, keyo)
                 when not (filter ~time ~user ~action ~keyo) ->
                   loop skip' n' fpos res
-              | Some (time, user, action, keyo) when skip' < skip ->
-                  loop (succ skip') n' fpos res
+              | Some _ when skip' < skip -> loop (succ skip') n' fpos res
               | Some (time, user, action, keyo) ->
                   loop skip' (succ n') fpos (f ~time ~user ~action ~keyo :: res)
               )
