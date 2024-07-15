@@ -209,7 +209,7 @@ and eval_event_str conf base env =
             (fun ((_, _, iper, _, _), _, _) accu ->
               (transl_nth conf "witness/witnesses" 0
               ^<^ transl conf ":"
-              ^<^ Util.fullname_html_of_person conf base
+              ^<^ NameDisplay.fullname_html_of_person conf base
                     (poi base (Gwdb.iper_of_string (string_of_int iper))))
               :: accu)
             e.efam_witnesses []

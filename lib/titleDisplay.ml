@@ -63,7 +63,8 @@ let give_access_someone conf base (x, t) list =
       Output.print_string conf (escape_html @@ sou base n);
       Output.print_sstring conf " ";
       Output.print_string conf (escape_html @@ p_surname base x)
-  | _ -> Output.print_string conf (Util.fullname_html_of_person conf base x));
+  | _ ->
+      Output.print_string conf (NameDisplay.fullname_html_of_person conf base x));
   Output.print_sstring conf "\n";
   Output.print_string conf (DateDisplay.short_dates_text conf base x);
   if t.t_nth <> 0 then (

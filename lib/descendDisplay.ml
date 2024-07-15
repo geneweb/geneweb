@@ -46,8 +46,8 @@ let text_level conf = function
       |> Adef.safe
 
 let descendants_title conf base p h =
-  let s1 = Util.fullname_html_of_person conf base p in
-  let s2 = if h then Util.fullname_str_of_person conf base p else s1 in
+  let s1 = NameDisplay.fullname_html_of_person conf base p in
+  let s2 = if h then NameDisplay.fullname_str_of_person conf base p else s1 in
   translate_eval
     (transl_a_of_gr_eq_gen_lev conf
        (transl conf "descendants")
@@ -230,8 +230,10 @@ let print_repeat_child conf base p1 p2 e =
   if
     (get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1))
     || (get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2))
-  then Output.print_string conf (Util.first_name_html_of_person conf base e)
-  else Output.print_string conf (Util.fullname_html_of_person conf base e);
+  then
+    Output.print_string conf (NameDisplay.first_name_html_of_person conf base e)
+  else
+    Output.print_string conf (NameDisplay.fullname_html_of_person conf base e);
   Output.print_sstring conf "</em>"
 
 let display_spouse conf base marks paths fam p c =
@@ -392,7 +394,7 @@ let display_descendants_with_numbers conf base max_level ancestor =
          ^ string_of_iper (get_iper ancestor)
          ^ "&v=" ^ string_of_int max_level ^ "&t=G"
         |> Adef.escaped)
-        (let s = Util.fullname_html_of_person conf base ancestor in
+        (let s = NameDisplay.fullname_html_of_person conf base ancestor in
          transl_a_of_gr_eq_gen_lev conf
            (transl conf "descendants")
            (s : Adef.safe_string :> string)
@@ -454,7 +456,7 @@ let print_elem conf base paths precision (n, pll) =
       Output.print_string conf
         (surname_without_particle base n |> Util.escape_html);
       Output.print_sstring conf " ";
-      Util.first_name_html_of_person conf base p
+      NameDisplay.first_name_html_of_person conf base p
       |> reference conf base p |> Output.print_string conf;
       Output.print_sstring conf " ";
       Output.print_string conf (surname_particle base n |> Util.escape_html);
@@ -1219,7 +1221,7 @@ let make_tree_hts conf base gv p =
 let print_tree conf base v p =
   let gv = min (limit_by_tree conf) v in
   let page_title =
-    let s = Util.fullname_str_of_person conf base p in
+    let s = NameDisplay.fullname_str_of_person conf base p in
     translate_eval
       (transl_a_of_gr_eq_gen_lev conf
          (transl conf "descendants")
