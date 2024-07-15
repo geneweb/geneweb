@@ -3526,7 +3526,7 @@ and eval_str_family_field env (ifam, _, _, _) = function
 
 and simple_person_text conf base p p_auth : Adef.safe_string =
   match Util.main_title conf base p with
-  | Some t when p_auth -> Util.titled_person_text conf base p t
+  | Some t when p_auth -> NameDisplay.title_html_of_person conf base p t
   | Some _ | None -> NameDisplay.fullname_html_of_person conf base p
 
 and string_of_died conf p p_auth =

@@ -327,7 +327,9 @@ let string_of_error conf =
       Printf.sprintf
         (fcapitale (ftransl conf "%t already has parents"))
         (fun _ ->
-          (Util.referenced_person_text conf base p : Adef.safe_string :> string))
+          (NameDisplay.referenced_person_text conf base p
+            : Adef.safe_string
+            :> string))
       |> Adef.safe
   | UERR_missing_first_name s when s = Adef.safe "" ->
       transl conf "first name missing" |> Utf8.capitalize_fst |> Adef.safe
