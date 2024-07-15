@@ -155,27 +155,44 @@ val string_gen_family :
   (Gwdb.iper, Gwdb.ifam, string) Def.gen_family
 (** Remplaces string ids inside family's entry by their actual string value. *)
 
-val gen_person_text :
-  ?escape:bool ->
-  ?html:bool ->
-  ?sn:bool ->
-  ?chk:bool ->
-  ?p_first_name:(Gwdb.base -> Gwdb.person -> string) ->
-  ?p_surname:(Gwdb.base -> Gwdb.person -> string) ->
+val hidden_name_txt : Adef.safe_string
+
+val map_person_name_visibility :
+  ?on_hidden_name:
+    (Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string) ->
+  ?on_restricted_name:
+    (Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string) ->
+  on_visible_name:
+    (Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string) ->
   Config.config ->
   Gwdb.base ->
   Gwdb.person ->
   Adef.safe_string
-(** Returns person's first name and surname HTML description depending on :
-    - his public name
-    - his qualifiers
-  If person is hiden returns ".....". If person's names are hiden
-  or access to them is denied returns "x x"
-  - if [html=false], doesn't encapsulates description in HTML tag <em>.
-  - if [sn=false], doesn't display surname
-  - if [chk=false], returns HTML description even if person's names are hiden
-    or access to them is denied (don't print "x x")
-*)
+
+val map_person_name_visibility' :
+  on_hidden_name:(Config.config -> Gwdb.base -> Gwdb.person -> 'a) ->
+  on_restricted_name:(Config.config -> Gwdb.base -> Gwdb.person -> 'a) ->
+  on_visible_name:(Config.config -> Gwdb.base -> Gwdb.person -> 'a) ->
+  conf:Config.config ->
+  base:Gwdb.base ->
+  person:Gwdb.person ->
+  'a
+
+val map_fullname_data :
+  (surname:string -> first_name:string -> qualifier:string -> 'a) ->
+  Config.config ->
+  Gwdb.base ->
+  Gwdb.person ->
+  'a
+
+val first_name_html_of_person :
+  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
+
+val fullname_html_of_person :
+  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
+
+val fullname_str_of_person :
+  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
 
 val gen_person_title_text :
   (Config.config ->
