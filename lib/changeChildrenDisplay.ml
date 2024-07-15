@@ -80,7 +80,7 @@ let print_children conf base ipl =
       let p = poi base ip in
       Output.print_sstring conf {|<li class="mt-3"><span class="ml-2">|};
       Output.print_string conf
-        (reference conf base p
+        (NameDisplay.reference conf base p
            (NameDisplay.fullname_html_of_person conf base p));
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       Output.print_sstring conf {|</span>|};
@@ -100,7 +100,7 @@ let print_change conf base p =
   Output.print_sstring conf "<h2>";
   title false;
   (let s : Adef.safe_string = NameDisplay.fullname_html_of_person conf base p in
-   let r : Adef.safe_string = reference conf base p s in
+   let r : Adef.safe_string = NameDisplay.reference conf base p s in
    Util.transl_a_of_b conf "" (r :> string) (s :> string)
    |> Output.print_sstring conf);
   Output.print_sstring conf " ";
@@ -140,7 +140,8 @@ let print_children_list conf base u =
           let p = poi base ip in
           Output.print_sstring conf "<li>";
           NameDisplay.fullname_html_of_person conf base p
-          |> reference conf base p |> Output.print_string conf;
+          |> NameDisplay.reference conf base p
+          |> Output.print_string conf;
           Output.print_string conf (DateDisplay.short_dates_text conf base p))
         (get_children des))
     (get_family u);
@@ -153,7 +154,8 @@ let print_change_done conf base p =
   in
   Hutil.header conf title;
   NameDisplay.fullname_html_of_person conf base p
-  |> reference conf base p |> Output.print_string conf;
+  |> NameDisplay.reference conf base p
+  |> Output.print_string conf;
   Output.print_string conf (DateDisplay.short_dates_text conf base p);
   print_children_list conf base p;
   Hutil.trailer conf

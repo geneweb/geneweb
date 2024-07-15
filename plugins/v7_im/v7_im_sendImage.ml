@@ -32,7 +32,8 @@ let incorrect_content_type conf base p s =
   Output.print_sstring conf "</p>\n";
   Output.print_sstring conf "<ul>\n";
   Output.print_sstring conf "<li>\n";
-  Output.print_string conf (referenced_person_title_text conf base p);
+  Output.print_string conf
+    (NameDisplay.referenced_person_title_text conf base p);
   Output.print_sstring conf "</li>\n";
   Output.print_sstring conf "</ul>\n";
   Hutil.trailer conf;
@@ -51,7 +52,8 @@ let error_too_big_image conf base p len max_len =
   Output.print_sstring conf "</em></p>\n";
   Output.print_sstring conf "<ul>\n";
   Output.print_sstring conf "<li>\n";
-  Output.print_string conf (referenced_person_title_text conf base p);
+  Output.print_string conf
+    (NameDisplay.referenced_person_title_text conf base p);
   Output.print_sstring conf "</li>\n";
   Output.print_sstring conf "</ul>\n";
   Hutil.trailer conf;
@@ -188,7 +190,7 @@ let print_sent conf base p =
   in
   Hutil.header conf title;
   Output.print_sstring conf "<ul><li>";
-  Output.print_string conf (referenced_person_text conf base p);
+  Output.print_string conf (NameDisplay.referenced_person_text conf base p);
   Output.print_sstring conf "</li></ul>";
   Hutil.trailer conf
 
@@ -336,7 +338,7 @@ let print_deleted conf base p =
   in
   Hutil.header conf title;
   Output.print_sstring conf "<ul><li>";
-  Output.print_string conf (referenced_person_text conf base p);
+  Output.print_string conf (NameDisplay.referenced_person_text conf base p);
   Output.print_sstring conf "</li></ul>";
   Hutil.trailer conf
 

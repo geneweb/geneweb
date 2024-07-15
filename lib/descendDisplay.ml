@@ -123,7 +123,8 @@ let display_descendants_level conf base max_level ancestor =
         String.sub (p_surname base p) (Ext_string.initial (p_surname base p)) 1)
     (fun (p, c) ->
       Output.print_sstring conf " ";
-      Output.print_string conf (referenced_person_title_text conf base p);
+      Output.print_string conf
+        (NameDisplay.referenced_person_title_text conf base p);
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       if (not (is_empty_person p)) && c > 1 then
         Output.printf conf " <em>(%d)</em>" c;
@@ -218,10 +219,10 @@ let print_child conf base p1 p2 e =
     || (get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2))
   then
     Output.print_string conf
-      (referenced_person_text_without_surname conf base e)
+      (NameDisplay.referenced_person_text_without_surname conf base e)
   else (
     Output.print_sstring conf " ";
-    Output.print_string conf (referenced_person_text conf base e));
+    Output.print_string conf (NameDisplay.referenced_person_text conf base e));
   Output.print_sstring conf "</strong>";
   Output.print_string conf (DateDisplay.short_dates_text conf base e)
 
@@ -241,7 +242,7 @@ let display_spouse conf base marks paths fam p c =
   Output.print_string conf
     (DateDisplay.short_marriage_date_text conf base fam p c);
   Output.print_sstring conf " <strong> ";
-  Output.print_string conf (referenced_person_text conf base c);
+  Output.print_string conf (NameDisplay.referenced_person_text conf base c);
   Output.print_sstring conf "</strong>";
   if Gwdb.Marker.get marks (get_iper c) then (
     Output.print_sstring conf " (<tt><b>";
@@ -321,7 +322,8 @@ let print_family conf base marks paths max_lev lev p =
          let el = get_children fam in
          let c = pget conf base c in
          Output.print_sstring conf "<strong> ";
-         Output.print_string conf (referenced_person_text conf base p);
+         Output.print_string conf
+           (NameDisplay.referenced_person_text conf base p);
          Output.print_sstring conf "</strong>";
          display_spouse conf base marks paths fam p c;
          Output.print_sstring conf {|<ol start="|};
@@ -457,7 +459,8 @@ let print_elem conf base paths precision (n, pll) =
         (surname_without_particle base n |> Util.escape_html);
       Output.print_sstring conf " ";
       NameDisplay.first_name_html_of_person conf base p
-      |> reference conf base p |> Output.print_string conf;
+      |> NameDisplay.reference conf base p
+      |> Output.print_string conf;
       Output.print_sstring conf " ";
       Output.print_string conf (surname_particle base n |> Util.escape_html);
       Output.print_sstring conf "</strong>";
@@ -724,7 +727,8 @@ let print_person_table conf base p lab =
   td (fun () ->
       ImageDisplay.print_placeholder_gendered_portrait conf p 11;
       Output.print_sstring conf " ";
-      Output.print_string conf (referenced_person_title_text conf base p);
+      Output.print_string conf
+        (NameDisplay.referenced_person_title_text conf base p);
       Output.print_sstring conf "&nbsp;");
   if p_getenv conf.env "birth" = Some "on" then
     td (fun () -> Output.print_string conf birth);
@@ -759,7 +763,8 @@ let print_person_table conf base p lab =
   aux [ "marr" ] (fun _fam spouse ->
       ImageDisplay.print_placeholder_gendered_portrait conf spouse 11;
       Output.print_sstring conf " ";
-      Output.print_string conf (referenced_person_text conf base spouse);
+      Output.print_string conf
+        (NameDisplay.referenced_person_text conf base spouse);
       Output.print_sstring conf " &nbsp;");
   aux [ "marr_date" ] (fun fam spouse ->
       let mdate =
@@ -849,7 +854,8 @@ let print_person_table conf base p lab =
         aux i "marr" (fun () ->
             ImageDisplay.print_placeholder_gendered_portrait conf spouse 11;
             Output.print_sstring conf " ";
-            Output.print_string conf (referenced_person_text conf base spouse);
+            Output.print_string conf
+              (NameDisplay.referenced_person_text conf base spouse);
             Output.print_sstring conf "&nbsp;");
         aux i "marr_date" (fun () ->
             if authorized_age conf base p && authorized_age conf base spouse
@@ -1106,7 +1112,10 @@ let make_tree_hts conf base gv p =
           let ncol =
             if v > 1 then nb_column 0 (v - 1) p else Array.length (get_family p)
           in
-          let txt = reference conf base p (person_title_text conf base p) in
+          let txt =
+            NameDisplay.reference conf base p
+              (NameDisplay.person_title_text conf base p)
+          in
           let txt =
             if auth then txt ^^^ DateDisplay.short_dates_text conf base p
             else txt
@@ -1141,7 +1150,8 @@ let make_tree_hts conf base gv p =
               let s =
                 let sp = pget conf base (Gutil.spouse (get_iper p) fam) in
                 let txt =
-                  reference conf base sp (person_title_text conf base sp)
+                  NameDisplay.reference conf base sp
+                    (NameDisplay.person_title_text conf base sp)
                 in
                 let txt =
                   if auth then txt ^^^ DateDisplay.short_dates_text conf base sp
@@ -1246,7 +1256,8 @@ let print_aboville conf base max_level p =
       Output.print_string conf lab;
       Output.print_sstring conf "</tt>")
     else Output.print_string conf lab;
-    Output.print_string conf (referenced_person_title_text conf base p);
+    Output.print_string conf
+      (NameDisplay.referenced_person_title_text conf base p);
     Output.print_string conf (DateDisplay.short_dates_text conf base p);
     let u = p in
     if lev < max_level then
@@ -1263,7 +1274,8 @@ let print_aboville conf base max_level p =
               Output.print_sstring conf "</em></font> "
           | None -> Output.print_sstring conf " "
         else Output.print_sstring conf " ";
-        Output.print_string conf (referenced_person_title_text conf base spouse);
+        Output.print_string conf
+          (NameDisplay.referenced_person_title_text conf base spouse);
         Output.print_string conf (DateDisplay.short_dates_text conf base spouse)
       done;
     Output.print_sstring conf "<br>";

@@ -492,7 +492,7 @@ and eval_person_field_var conf base env p = function
 
 and simple_person_text conf base p =
   match main_title conf base p with
-  | Some t -> titled_person_text conf base p t
+  | Some t -> NameDisplay.title_html_of_person conf base p t
   | None -> NameDisplay.fullname_html_of_person conf base p
 
 let print_foreach conf base print_ast eval_expr =

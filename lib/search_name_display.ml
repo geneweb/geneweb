@@ -470,8 +470,8 @@ let print_branch conf base psn name =
     let print_elem p with_link with_id with_sn =
       let render p =
         if with_link then
-          if with_id then Util.reference conf base p
-          else Util.reference_noid conf base p
+          if with_id then NameDisplay.reference conf base p
+          else NameDisplay.reference_noid conf base p
         else fun s -> s
       in
       SosaCache.print_sosa conf base p with_link;
