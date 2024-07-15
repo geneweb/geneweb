@@ -478,12 +478,13 @@ let print_branch conf base psn name =
       Output.print_sstring conf @@ if with_link then "<strong>" else "<em>";
       Output.print_string conf
         (render p
-           (if
-            Util.is_hide_names conf p && not (Util.authorized_age conf base p)
-           then Adef.safe "x"
-           else if (not psn) && (not with_sn) && Gwdb.p_surname base p = name
-          then Util.gen_person_text ~sn:false conf base p
-           else Util.gen_person_text conf base p));
+           (Util.map_person_name_visibility
+              ~on_hidden_name:(fun _ _ _ -> Util.hidden_name_txt)
+              ~on_visible_name:(fun conf base p ->
+                if (not psn) && (not with_sn) && Gwdb.p_surname base p = name
+                then Util.first_name_html_of_person conf base p
+                else Util.fullname_html_of_person conf base p)
+              conf base p));
       Output.print_sstring conf @@ if with_link then "</strong>" else "</em>";
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       Output.print_sstring conf "\n"

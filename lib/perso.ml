@@ -3130,9 +3130,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
             |> Gwdb.p_surname base
             |> ( <> ) (Gwdb.p_surname base p)
       in
-      if (not p_auth) && Util.is_hide_names conf p then str_val "x x"
-      else if force_surname then Util.gen_person_text conf base p |> safe_val
-      else Util.gen_person_text ~sn:false ~chk:false conf base p |> safe_val
+      if force_surname then Util.fullname_html_of_person conf base p |> safe_val
+      else Util.first_name_html_of_person conf base p |> safe_val
   | "consanguinity" ->
       if p_auth then
         Util.string_of_decimal_num conf
@@ -3525,12 +3524,9 @@ and eval_str_family_field env (ifam, _, _, _) = function
   | _ -> raise Not_found
 
 and simple_person_text conf base p p_auth : Adef.safe_string =
-  if p_auth then
-    match Util.main_title conf base p with
-    | Some t -> Util.titled_person_text conf base p t
-    | None -> Util.gen_person_text conf base p
-  else if Util.is_hide_names conf p then Adef.safe "x x"
-  else Util.gen_person_text conf base p
+  match Util.main_title conf base p with
+  | Some t when p_auth -> Util.titled_person_text conf base p t
+  | Some _ | None -> Util.fullname_html_of_person conf base p
 
 and string_of_died conf p p_auth =
   Adef.safe

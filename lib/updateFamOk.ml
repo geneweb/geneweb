@@ -1204,7 +1204,7 @@ let print_del_ok conf base wl =
       let p = poi base (iper_of_string i) in
       Output.print_sstring conf "<ul><li>";
       Output.print_string conf
-        (reference conf base p (gen_person_text conf base p));
+        (reference conf base p (Util.fullname_html_of_person conf base p));
       Output.print_sstring conf "\n</ul>"
   | None -> ());
   Update.print_warnings conf base wl;

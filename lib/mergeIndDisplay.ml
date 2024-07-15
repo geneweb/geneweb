@@ -357,7 +357,7 @@ let print_merged conf base wl p =
         (Utf8.capitalize_fst (transl conf "continue merging"));
       Output.print_sstring conf "</a>";
       (let p = poi base ip in
-       let s = gen_person_text conf base p in
+       let s = Util.fullname_html_of_person conf base p in
        Output.print_sstring conf "\n(";
        Output.print_sstring conf
          (Util.transl_a_of_b conf
