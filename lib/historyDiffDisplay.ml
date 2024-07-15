@@ -111,10 +111,10 @@ let person_of_gen_p_key base gen_p =
 let person_of_iper conf base ip =
   try
     let person = pget conf base ip in
-    Util.map_person_name_visibility
+    NameDisplay.map_person_name_visibility
       ~on_hidden_name:(fun _ _ _ -> Adef.safe "")
       ~on_restricted_name:(fun _ _ _ -> Adef.safe "")
-      ~on_visible_name:Util.fullname_html_of_person conf base person
+      ~on_visible_name:NameDisplay.fullname_html_of_person conf base person
   with _ -> Adef.safe ""
 
 let person_of_iper_array conf base ipl =
@@ -745,7 +745,7 @@ and eval_simple_str_var conf base env (bef, aft, p_auth) : string -> 'a expr_val
   | "person" ->
       if p_auth then
         person_of_gen_p_key base aft.gen_p
-        |> Util.fullname_html_of_person conf base
+        |> NameDisplay.fullname_html_of_person conf base
         |> safe_val
       else eval_string_env "history_file" env
   | "wizard" -> eval_string_env "wizard" env

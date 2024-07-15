@@ -238,10 +238,12 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
 let print_cousins conf base p lev1 lev2 =
   let title h =
     let txt_fun a =
-      let txt = Util.fullname_html_of_person conf base p in
+      let txt = NameDisplay.fullname_html_of_person conf base p in
       transl_a_of_gr_eq_gen_lev conf a
         (if h then
-         (Util.fullname_str_of_person conf base p : Adef.safe_string :> string)
+         (NameDisplay.fullname_str_of_person conf base p
+           : Adef.safe_string
+           :> string)
         else (txt : Adef.safe_string :> string))
         (txt : Adef.safe_string :> string)
     in
