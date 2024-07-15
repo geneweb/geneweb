@@ -59,7 +59,8 @@ let search_by_name conf base n =
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
       let list, _ =
-        Some.persons_of_fsname conf base Gwdb.base_strings_of_surname
+        Search_name_display.persons_of_fsname conf base
+          Gwdb.base_strings_of_surname
           (Gwdb.spi_find (Gwdb.persons_of_surname base))
           Gwdb.get_surname sn
       in
@@ -145,15 +146,15 @@ let search conf base an search_order specify unknown =
             Perso.print conf base p
         | pl -> specify conf base an pl)
     | Surname :: l -> (
-        let pl = Some.search_surname conf base an in
+        let pl = Search_name_display.search_surname conf base an in
         match pl with
         | [] -> loop l
-        | _ -> Some.search_surname_print conf base unknown an)
+        | _ -> Search_name_display.search_surname_print conf base unknown an)
     | FirstName :: l -> (
-        let pl = Some.search_first_name conf base an in
+        let pl = Search_name_display.search_first_name conf base an in
         match pl with
         | [] -> loop l
-        | _ -> Some.search_first_name_print conf base an)
+        | _ -> Search_name_display.search_first_name_print conf base an)
     | ApproxKey :: l -> (
         let pl = search_approx_key conf base an in
         match pl with
@@ -170,7 +171,8 @@ let search conf base an search_order specify unknown =
             Util.record_visited conf (Gwdb.get_iper p);
             Perso.print conf base p
         | pl -> specify conf base an pl)
-    | DefaultSurname :: _ -> Some.search_surname_print conf base unknown an
+    | DefaultSurname :: _ ->
+        Search_name_display.search_surname_print conf base unknown an
   in
   loop search_order
 
