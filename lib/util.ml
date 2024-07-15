@@ -886,20 +886,6 @@ let geneweb_link conf (href : Adef.escaped_string) (s : Adef.safe_string) =
 let wprint_geneweb_link conf href s =
   Output.print_string conf (geneweb_link conf href s)
 
-let reference_flags with_id conf base p (s : Adef.safe_string) =
-  let iper = Gwdb.get_iper p in
-  if is_empty_person p then s
-  else
-    let open Def in
-    "<a href=\""
-    ^<^ (commd conf ^^^ acces conf base p :> Adef.safe_string)
-    ^^^ (if with_id then "\" id=\"i" else "")
-    ^<^ (if with_id then Gwdb.string_of_iper iper else "")
-    ^<^ "\">" ^<^ s ^>^ "</a>"
-
-let reference = reference_flags true
-let reference_noid = reference_flags false
-
 (* ************************************************************************* *)
 (*  [Fonc] update_family_loop : config -> base -> person -> string -> string *)
 
@@ -950,27 +936,6 @@ let update_family_loop conf base p s =
         ^<^ (commd conf :> Adef.safe_string)
         ^^^ "m=U&i=" ^<^ iper ^<^ "\">" ^<^ s ^>^ "</a>"
     else s
-
-let no_reference _conf _base _p s = s
-
-let gen_person_title_text reference conf base p =
-  if authorized_age conf base p then
-    match main_title conf base p with
-    | Some t ->
-        let open Def in
-        reference conf base p (titled_person_text conf base p t)
-        ^^^ ", " ^<^ one_title_text base t
-    | None -> reference conf base p (gen_person_text conf base p)
-  else reference conf base p (gen_person_text conf base p)
-
-let referenced_person_title_text = gen_person_title_text reference
-let person_title_text = gen_person_title_text no_reference
-
-let referenced_person_text conf base p =
-  reference conf base p (gen_person_text conf base p)
-
-let referenced_person_text_without_surname conf base p =
-  reference conf base p (gen_person_text ~sn:false conf base p)
 
 let person_text_without_title conf base p =
   match main_title conf base p with
