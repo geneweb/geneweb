@@ -83,22 +83,24 @@ let give_access conf base ~cnt_sp ia_asex p1 b1 p2 b2 =
   in
   let print_nospouse _ =
     SosaCache.print_sosa conf base p2 true;
-    Output.print_string conf (gen_person_title_text reference conf base p2);
+    Output.print_string conf
+      (NameDisplay.gen_person_title_text reference conf base p2);
     Output.print_string conf (DateDisplay.short_dates_text conf base p2)
   in
   let print_spouse sp first =
     incr cnt_sp;
     if first then (
       SosaCache.print_sosa conf base p2 true;
-      Output.print_string conf (gen_person_title_text reference conf base p2))
+      Output.print_string conf
+        (NameDisplay.gen_person_title_text reference conf base p2))
     else (
       Output.print_sstring conf "<br>";
-      Output.print_string conf (person_title_text conf base p2));
+      Output.print_string conf (NameDisplay.person_title_text conf base p2));
     Output.print_string conf (DateDisplay.short_dates_text conf base p2);
     Output.print_sstring conf " &amp; ";
     SosaCache.print_sosa conf base sp true;
     Output.print_string conf
-      (gen_person_title_text (reference_sp sp) conf base sp);
+      (NameDisplay.gen_person_title_text (reference_sp sp) conf base sp);
     Output.print_string conf (DateDisplay.short_dates_text conf base sp)
   in
   if p_getenv conf.env "spouse" = Some "on" then
@@ -134,7 +136,7 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
           if Array.length (get_family p) = 1 then
             let sp = get_spouse base ip (get_family p).(0) in
             " " ^<^ Util.transl conf "with" ^<^ " "
-            ^<^ person_title_text conf base sp
+            ^<^ NameDisplay.person_title_text conf base sp
           else Adef.safe ""
         in
         let br = List.rev ((ip, get_sex p) :: rev_br) in
@@ -146,7 +148,9 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
               give_access conf base ~cnt_sp ia_asex ini_p ini_br p br;
               incr cnt)
             else
-              let s : Adef.safe_string = person_title_text conf base p in
+              let s : Adef.safe_string =
+                NameDisplay.person_title_text conf base p
+              in
               transl_a_of_gr_eq_gen_lev conf
                 (transl_nth conf "child/children" 1)
                 (s :> string)
@@ -174,7 +178,8 @@ let rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
               then (
                 Output.print_sstring conf (Util.transl conf "with");
                 Output.print_sstring conf " ";
-                Output.print_string conf (person_title_text conf base sp);
+                Output.print_string conf
+                  (NameDisplay.person_title_text conf base sp);
                 Output.print_sstring conf (Util.transl conf ":"));
               print_descend_upto conf base max_cnt ini_p ini_br (lev - 1)
                 children)
@@ -190,7 +195,7 @@ let print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 tips =
     if lev1 > 1 then (
       Output.print_sstring conf "<li>";
       [
-        (gen_person_title_text no_reference conf base a
+        (NameDisplay.gen_person_title_text NameDisplay.no_reference conf base a
           : Adef.safe_string
           :> string);
       ]
@@ -419,7 +424,7 @@ let print_anniv conf base p dead_people level =
     "<a href=\""
     ^<^ (href :> Adef.safe_string)
     ^^^ "\">"
-    ^<^ person_title_text conf base c
+    ^<^ NameDisplay.person_title_text conf base c
     ^>^ "</a>"
   in
   let f_scan =

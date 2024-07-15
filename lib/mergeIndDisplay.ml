@@ -222,10 +222,12 @@ let propose_merge_ind conf base branches p1 p2 =
         Output.print_sstring conf "<tr align=\"";
         Output.print_sstring conf conf.left;
         Output.print_sstring conf "\"><td>";
-        Output.print_string conf (referenced_person_text conf base p1);
+        Output.print_string conf
+          (NameDisplay.referenced_person_text conf base p1);
         Output.print_string conf (DateDisplay.short_dates_text conf base p1);
         Output.print_sstring conf "</td><td>";
-        Output.print_string conf (referenced_person_text conf base p2);
+        Output.print_string conf
+          (NameDisplay.referenced_person_text conf base p2);
         Output.print_string conf (DateDisplay.short_dates_text conf base p2);
         Output.print_sstring conf "</td></tr>")
       ((get_iper p1, get_iper p2) :: branches);
@@ -330,7 +332,7 @@ let print_merged conf base wl p =
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "<ul><li>";
-  Output.print_string conf (referenced_person_text conf base p);
+  Output.print_string conf (NameDisplay.referenced_person_text conf base p);
   Output.print_sstring conf "</li></ul>";
   (match (p_getenv conf.env "m", p_getenv conf.env "ip") with
   | Some "MRG_DUP_IND_Y_N", Some ip ->
@@ -362,7 +364,7 @@ let print_merged conf base wl p =
        Output.print_sstring conf
          (Util.transl_a_of_b conf
             (transl conf "possible duplications")
-            (reference conf base p s :> string)
+            (NameDisplay.reference conf base p s :> string)
             (s :> string));
        Output.print_sstring conf ")\n");
       Output.print_sstring conf "</p>\n"
@@ -405,7 +407,8 @@ let print conf base =
 let print_killed conf base p nb_ind nb_fam =
   let title _ = Output.print_sstring conf "Ancestors killed" in
   Hutil.header conf title;
-  Output.print_string conf (referenced_person_title_text conf base p);
+  Output.print_string conf
+    (NameDisplay.referenced_person_title_text conf base p);
   Output.print_sstring conf "'s ancestors killed.<br>";
   Output.print_sstring conf (string_of_int nb_ind);
   Output.print_sstring conf " persons and ";
