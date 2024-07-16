@@ -797,12 +797,6 @@ let select_ancestors conf base name_inj ipl =
           bh :: bhl)
     [] ipl
 
-module PerSet = Set.Make (struct
-  type t = Gwdb.iper
-
-  let compare = compare
-end)
-
 let surname_print conf base not_found_fun x =
   let list, name_inj =
     if Util.p_getenv conf.Config.env "t" = Some "A" then
@@ -831,10 +825,10 @@ let surname_print conf base not_found_fun x =
             (str, len + len1) :: List.remove_assoc str strl
           with Not_found -> (str, len) :: strl
         in
-        (List.fold_right PerSet.add iperl1 iperl, strl))
-      list (PerSet.empty, [])
+        (List.fold_right Util.IperSet.add iperl1 iperl, strl))
+      list (Util.IperSet.empty, [])
   in
-  let iperl = PerSet.elements iperl in
+  let iperl = Util.IperSet.elements iperl in
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
   match Util.p_getenv conf.Config.env "o" with
@@ -904,10 +898,10 @@ let search_surname conf base x =
             (str, len + len1) :: List.remove_assoc str strl
           with Not_found -> (str, len) :: strl
         in
-        (List.fold_right PerSet.add iperl1 iperl, strl))
-      list (PerSet.empty, [])
+        (List.fold_right Util.IperSet.add iperl1 iperl, strl))
+      list (Util.IperSet.empty, [])
   in
-  let iperl = PerSet.elements iperl in
+  let iperl = Util.IperSet.elements iperl in
   let bhl = select_ancestors conf base name_inj iperl in
   let bhl =
     List.map
@@ -952,10 +946,10 @@ let search_surname_print conf base not_found_fun x =
             (str, len + len1) :: List.remove_assoc str strl
           with Not_found -> (str, len) :: strl
         in
-        (List.fold_right PerSet.add iperl1 iperl, strl))
-      list (PerSet.empty, [])
+        (List.fold_right Util.IperSet.add iperl1 iperl, strl))
+      list (Util.IperSet.empty, [])
   in
-  let iperl = PerSet.elements iperl in
+  let iperl = Util.IperSet.elements iperl in
   (* Construction de la table des sosa de la base *)
   let () = SosaCache.build_sosa_ht conf base in
   match Util.p_getenv conf.Config.env "o" with
