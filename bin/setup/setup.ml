@@ -271,7 +271,10 @@ let parameters_3 =
         if k = "" then loop comm env
         else if k = "anon" && s <> "" then
           loop (comm ^ " " ^ stringify s) env
-        else loop (comm ^ " -" ^ stringify k) env
+        else if k = "bd" && s <> "" then
+          loop (comm ^ " -" ^ stringify k ^ " " ^ stringify s) env
+        else (
+          loop (comm ^ " -" ^ stringify k) env)
     | [] -> comm
   in
   loop ""
@@ -1065,33 +1068,11 @@ let cache_files_check conf =
   print_file conf "bsi_cache_files.htm"
 
 let cache_files ok_file conf =
-  let ic = Unix.open_process_in "uname" in
-  let uname = input_line ic in
-  let () = close_in ic in
   let rc =
-    let commnd =
-      "cd " ^ Sys.getcwd () ^ "; tput bel;" ^
-      stringify (Filename.concat !bin_dir "cache_files") ^ " " ^
-      (parameters_3 conf.env)
+    let comm =
+      stringify (Filename.concat !bin_dir "cache_files") ^ " " in
+      exec_f (comm ^ (parameters_3 conf.env) ^ " > comm.log")
     in
-    if uname = "Darwin" then
-      let launch = "tell application \"Terminal\" to do script " in
-      Sys.command ("osascript -e '" ^ launch ^ " \" " ^ commnd ^ " \"' ")
-    else if uname = "Linux" then
-      Sys.command ("xterm -e \" " ^ commnd ^ " \" ")
-    else if Sys.win32 then
-      let commnd =
-        stringify (Filename.concat !bin_dir "cache_files") ^ " " ^
-        (parameters_3 conf.env)
-      in
-      Sys.command commnd
-    else
-      begin
-        Printf.eprintf "%s (%s) %s (%s)\n" "Unknown Os_type" Sys.os_type
-          "or wrong uname response" uname;
-        2
-      end
-  in
   flush stderr;
   if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
 
