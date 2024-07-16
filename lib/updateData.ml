@@ -159,7 +159,7 @@ let reduce_cpl_list size list =
       | [] -> reduced_list
       | (a, sl) :: l ->
           if List.length sl >= size - cnt then
-            (a, Util.reduce_list (size - cnt) sl) :: reduced_list
+            (a, Ext_list.take sl (size - cnt)) :: reduced_list
           else loop size (cnt + List.length sl) ((a, sl) :: reduced_list) l
   in
   loop size 0 [] list

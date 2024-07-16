@@ -2346,30 +2346,6 @@ let wprint_in_columns conf order wprint_elem list =
   print_in_columns conf ncols len_list list wprint_elem
 
 (* ********************************************************************** *)
-(*  [Fonc] reduce_list : int -> list 'a -> list 'a                        *)
-
-(* ********************************************************************** *)
-
-(** [Description] : Retourne la sous liste de taille size composée des
-                    éléments 0 à (size - 1)
-    [Args] :
-      - size : la taille de la nouvelle liste
-      - list : la liste originiale
-    [Retour] :
-      - list : la nouvelle liste de taille size
-    [Rem] : Exporté en clair hors de ce module.                           *)
-let reduce_list size list =
-  let rec loop size cnt reduced_list list =
-    if cnt >= size then reduced_list
-    else
-      match list with
-      | [] -> reduced_list
-      | x :: l -> loop size (cnt + 1) (x :: reduced_list) l
-  in
-  let sublist = loop size 0 [] list in
-  List.rev sublist
-
-(* ********************************************************************** *)
 (*  [Fonc] print_reference : config -> string -> int -> string -> unit    *)
 
 (* ********************************************************************** *)
@@ -2548,7 +2524,7 @@ let record_visited conf ip =
               loop [] x l
         in
         let vl = uniq vl in
-        let vl = reduce_list 10 vl in
+        let vl = Ext_list.take vl 10 in
         Hashtbl.replace ht conf.Config.user vl
       with Not_found -> Hashtbl.add ht conf.Config.user [ (ip, time) ]
     in

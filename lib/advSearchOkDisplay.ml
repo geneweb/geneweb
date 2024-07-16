@@ -5,7 +5,7 @@ open Util
 
 let print_result conf base max_answers (list, len) =
   let list =
-    if len > max_answers then Util.reduce_list max_answers list else list
+    if len > max_answers then Ext_list.take list max_answers else list
   in
   if len = 0 then (
     Output.print_sstring conf (Utf8.capitalize_fst (transl conf "no match"));
