@@ -176,11 +176,6 @@ let search conf base an search_order specify unknown =
   in
   loop search_order
 
-(* ************************************************************************ *)
-(*  [Fonc] print : conf -> string -> unit                                   *)
-
-(* ************************************************************************ *)
-
 (** [Description] : Recherche qui n'utilise que 2 inputs. On essai donc de
       trouver la meilleure combinaison de résultat pour afficher la réponse
       la plus probable.
