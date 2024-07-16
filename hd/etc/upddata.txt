@@ -23,7 +23,7 @@
   %let;ini;%if;(z!="")%substr_start_e.z.s;%end;%in;
   %if;(ini!="" and ini!=e.s)
     <a tabindex="%expr(5+z)" href="%prefix;m=MOD_DATA&data=%e.data;&s=%ini;"
-      class="list-group-item list-group-item-action list-group-item-info w-auto sub-char"
+      class="list-group-item list-group-item-action list-group-item-info w-auto sub-char d-flex align-items-center"
       title="[*search/case sensitive]0 “%ini;”">%ini;</a>
   %end;
 %end;
@@ -140,14 +140,13 @@
   %if;(e.data!="" and e.s!="")
     <h1 class="text-sm-center mt-0 mt-sm-1 h3">%title;</h1>
     <h2 class="text-sm-center mt-0 h4">%subtitle;</h2>
-    <div class="d-flex mt-2 mt-sm-3 mx-1 mx-sm-3 px-sm-3">
+    <div class="mt-2 mt-sm-3 mx-1 mx-sm-3 px-sm-3">
       <form class="form-inline" method="get" action="%action;" aria-labelledby="search_s">
         %hidden;
         <input type="hidden" name="m" value="MOD_DATA">
         <input type="hidden" name="data" value="%e.data;">
-        %if;(e.nbs!="")<input type="hidden" name="nbs" value="%e.nbs;">%end;
-        <div class="form-group mr-auto mb-0">
-          <label class="user-select-none mb-0 mb-sm-1 ml-1 ml-sm-3" for="search_s">[*search/case sensitive]0</label>
+        <div class="form-group mb-0">
+          <label class="user-select-none mb-0 mb-sm-1 ml-1 ml-sm-3" for="search_s" title="[*search/case sensitive]0 (R)">[*search/case sensitive]0</label>
           <input type="search" accesskey="R" class="form-control ml-2 ml-sm-3" name="s" id="search_s">
         </div>
         <button type="submit" class="btn btn-primary ml-2 align-self-end" title="[*validate/delete]0" aria-label="[*validate/delete]0 [search/case sensitive]0">Ok</button>
