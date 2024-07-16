@@ -7,7 +7,7 @@ let default_max_cnt = 2000
 type t = Result of (string * string * int) list | Specify of string list
 
 let first_letters base is_surnames =
-  let iii =
+  let name_index =
     if is_surnames then Gwdb.persons_of_surname base
     else Gwdb.persons_of_first_name base
   in
@@ -21,24 +21,24 @@ let first_letters base is_surnames =
         | hd :: _ -> if hd = c then list else c :: list
         | [] -> [ c ]
       in
-      match Gwdb.spi_next iii istr with
+      match Gwdb.spi_next name_index istr with
       | istr -> loop istr list
       | exception Not_found -> list
     in
-    loop (Gwdb.spi_first iii "") []
+    loop (Gwdb.spi_first name_index "") []
   with Not_found -> []
 
 let select_names conf base is_surnames ini limit =
   let inilen = Utf8.length ini + 1 in
   let cut k = Utf8.sub k 0 (min (Utf8.length k) inilen) in
-  let iii =
+  let name_index =
     if is_surnames then Gwdb.persons_of_surname base
     else Gwdb.persons_of_first_name base
   in
   let list, len =
     let start_k = Mutil.tr '_' ' ' ini in
     try
-      let istr = Gwdb.spi_first iii start_k in
+      let istr = Gwdb.spi_first name_index start_k in
       let rec loop istr len list =
         let s = Translate.eval (Mutil.nominative (Gwdb.sou base istr)) in
         let k = Util.name_key base s in
@@ -54,7 +54,7 @@ let select_names conf base is_surnames ini limit =
                   person_id |> Gwdb.poi base |> get_main_name
                   |> Gwdb.eq_istr istr
                 in
-                List.filter is_main_name (Gwdb.spi_find iii istr)
+                List.filter is_main_name (Gwdb.spi_find name_index istr)
               in
               let cnt =
                 (* Optimization:
@@ -126,7 +126,7 @@ let select_names conf base is_surnames ini limit =
                 | Specify [] -> (Specify [ cut k ], 1)
             else (list, len)
           in
-          match Gwdb.spi_next iii istr with
+          match Gwdb.spi_next name_index istr with
           | istr -> loop istr len list
           | exception Not_found -> (list, len)
         else (list, len)
