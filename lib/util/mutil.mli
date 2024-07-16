@@ -310,11 +310,6 @@ val eq_key : string * string * int -> string * string * int -> bool
     Tests if two persons would have the same key
 *)
 
-val filter_map : ('a -> 'b option) -> 'a list -> 'b list
-(** [filter_map fn list] is a combination of map and filter.
-    Not tail-recursive.
-*)
-
 val rev_iter : ('a -> unit) -> 'a list -> unit
 (** [rev_iter fn list] is like [List.iter fn (List.rev list)].
     Not tail-recursive.

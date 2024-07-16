@@ -459,7 +459,7 @@ let build_list ~ignore_case conf base =
   let ini = Option.value ~default:"" (Util.p_getenv conf.Config.env "s") in
   let list = get_all_data conf base in
   if ini <> "" then
-    Mutil.filter_map
+    List.filter_map
       (fun istr ->
         let str = Gwdb.sou base istr in
         if

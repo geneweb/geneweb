@@ -969,13 +969,6 @@ let eq_key (fn1, sn1, oc1) (fn2, sn2, oc2) =
   let s x = x |> nominative |> Name.lower in
   s fn1 = s fn2 && s sn1 = s sn2 && oc1 = oc2
 
-let rec filter_map fn = function
-  | [] -> []
-  | hd :: tl -> (
-      match fn hd with
-      | Some x -> x :: filter_map fn tl
-      | None -> filter_map fn tl)
-
 let rec rev_iter fn = function
   | [] -> ()
   | hd :: tl ->
