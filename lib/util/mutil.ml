@@ -777,12 +777,6 @@ let list_rev_map_append f l1 l2 =
   let rec aux acc = function [] -> acc | hd :: tl -> aux (f hd :: acc) tl in
   aux l2 l1
 
-let rec list_rev_iter f = function
-  | [] -> ()
-  | hd :: tl ->
-      list_rev_iter f tl;
-      f hd
-
 let encode s : Adef.encoded_string =
   let special = function
     | '\000' .. '\031'
