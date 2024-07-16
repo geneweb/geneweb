@@ -131,7 +131,7 @@ let get_person_from_data conf base =
 
 let combine_by_ini ~ignore_case ini list =
   let len = Utf8.length ini + 1 in
-  Mutil.groupby
+  Ext_list.groupby
     ~key:(fun (_, s) ->
       let normalize = if ignore_case then Utf8.capitalize else Fun.id in
       normalize @@ Alln.ini len @@ Place.without_suburb s)

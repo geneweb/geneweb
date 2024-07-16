@@ -122,7 +122,7 @@ let fix_pevents ?report base pp =
             epers_witnesses = e.epers_witnesses;
           }
         in
-        (of_pevent e', Mutil.list_replace e e' pevents)
+        (of_pevent e', Ext_list.replace e e' pevents)
   in
   let (birth, birth_place, birth_note, birth_src), pevents =
     aux Epers_Birth p.birth p.birth_place p.birth_note p.birth_src empty_bi

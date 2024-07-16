@@ -86,12 +86,6 @@ let print_callstack ?(max = 5) () =
 
 let verbose = ref true
 
-let list_iter_first f = function
-  | [] -> ()
-  | hd :: tl ->
-      f true hd;
-      List.iter (f false) tl
-
 (* [decline] has been deprecated since version 5.00
    compatibility code: *)
 let colon_to_at_word s ibeg iend =
@@ -506,26 +500,6 @@ let string_of_int_sep sep x =
   in
   Bytes.unsafe_to_string s
 
-let rec list_compare cmp l1 l2 =
-  match (l1, l2) with
-  | x1 :: l1, x2 :: l2 -> (
-      match cmp x1 x2 with 0 -> list_compare cmp l1 l2 | x -> x)
-  | [], [] -> 0
-  | [], _ -> -1
-  | _, [] -> 1
-
-let rec list_find_map f = function
-  | [] -> None
-  | x :: l -> (
-      match f x with Some _ as result -> result | None -> list_find_map f l)
-
-let rec list_last = function
-  | [] -> raise (Failure "list_last")
-  | [ x ] -> x
-  | _ :: tl -> list_last tl
-
-let list_ref_append tl hd = tl := hd :: !tl
-
 let executable_magic =
   match Sys.getenv_opt "GW_EXECUTABLE_MAGIC" with
   | Some x -> x
@@ -576,35 +550,6 @@ let array_forall2 f a1 a2 =
       else false
     in
     loop 0
-
-let rec list_replace old_v new_v = function
-  | [] -> []
-  | hd :: tl ->
-      if hd = old_v then new_v :: tl else hd :: list_replace old_v new_v tl
-
-let list_except x =
-  let rec loop acc = function
-    | [] -> []
-    | hd :: tl -> if hd = x then List.rev_append acc tl else loop (hd :: acc) tl
-  in
-  loop []
-
-let list_index x list =
-  let rec loop i = function
-    | [] -> raise Not_found
-    | hd :: tl -> if hd = x then i else loop (succ i) tl
-  in
-  loop 0 list
-
-let list_slice a b list =
-  let rec list_slice a b = function
-    | [] -> []
-    | hd :: tl ->
-        if a <> 0 then list_slice (pred a) b tl
-        else if b <> 0 then hd :: list_slice 0 (pred b) tl
-        else []
-  in
-  list_slice a (b - a) list
 
 let input_file_ic ic =
   let len = in_channel_length ic in
@@ -657,125 +602,6 @@ let normalize_utf_8 s =
 
 (* Copied from OCaml's List.sort_uniq and adapted to our needs
    (commit e5ebec7 from Nov 7, 2019) *)
-let list_map_sort_uniq (fn : 'a -> 'b) l =
-  let open List in
-  let rec rev_merge l1 l2 accu =
-    match (l1, l2) with
-    | [], l2 -> rev_append l2 accu
-    | l1, [] -> rev_append l1 accu
-    | h1 :: t1, h2 :: t2 ->
-        let c = Stdlib.compare h1 h2 in
-        if c = 0 then rev_merge t1 t2 (h1 :: accu)
-        else if c < 0 then rev_merge t1 l2 (h1 :: accu)
-        else rev_merge l1 t2 (h2 :: accu)
-  in
-  let rec rev_merge_rev l1 l2 accu =
-    match (l1, l2) with
-    | [], l2 -> rev_append l2 accu
-    | l1, [] -> rev_append l1 accu
-    | h1 :: t1, h2 :: t2 ->
-        let c = Stdlib.compare h1 h2 in
-        if c = 0 then rev_merge_rev t1 t2 (h1 :: accu)
-        else if c > 0 then rev_merge_rev t1 l2 (h1 :: accu)
-        else rev_merge_rev l1 t2 (h2 :: accu)
-  in
-  let rec sort n l =
-    match (n, l) with
-    | 2, x1 :: x2 :: tl ->
-        let x1 = fn x1 in
-        let x2 = fn x2 in
-        let s =
-          let c = Stdlib.compare x1 x2 in
-          if c = 0 then [ x1 ] else if c < 0 then [ x1; x2 ] else [ x2; x1 ]
-        in
-        (s, tl)
-    | 3, x1 :: x2 :: x3 :: tl ->
-        let x1 = fn x1 in
-        let x2 = fn x2 in
-        let x3 = fn x3 in
-        let s =
-          let c = Stdlib.compare x1 x2 in
-          if c = 0 then
-            let c = Stdlib.compare x2 x3 in
-            if c = 0 then [ x2 ] else if c < 0 then [ x2; x3 ] else [ x3; x2 ]
-          else if c < 0 then
-            let c = Stdlib.compare x2 x3 in
-            if c = 0 then [ x1; x2 ]
-            else if c < 0 then [ x1; x2; x3 ]
-            else
-              let c = Stdlib.compare x1 x3 in
-              if c = 0 then [ x1; x2 ]
-              else if c < 0 then [ x1; x3; x2 ]
-              else [ x3; x1; x2 ]
-          else
-            let c = Stdlib.compare x1 x3 in
-            if c = 0 then [ x2; x1 ]
-            else if c < 0 then [ x2; x1; x3 ]
-            else
-              let c = Stdlib.compare x2 x3 in
-              if c = 0 then [ x2; x1 ]
-              else if c < 0 then [ x2; x3; x1 ]
-              else [ x3; x2; x1 ]
-        in
-        (s, tl)
-    | n, l ->
-        let n1 = n asr 1 in
-        let n2 = n - n1 in
-        let s1, l2 = rev_sort n1 l in
-        let s2, tl = rev_sort n2 l2 in
-        (rev_merge_rev s1 s2 [], tl)
-  and rev_sort n l =
-    match (n, l) with
-    | 2, x1 :: x2 :: tl ->
-        let x1 = fn x1 in
-        let x2 = fn x2 in
-        let s =
-          let c = Stdlib.compare x1 x2 in
-          if c = 0 then [ x1 ] else if c > 0 then [ x1; x2 ] else [ x2; x1 ]
-        in
-        (s, tl)
-    | 3, x1 :: x2 :: x3 :: tl ->
-        let x1 = fn x1 in
-        let x2 = fn x2 in
-        let x3 = fn x3 in
-        let s =
-          let c = Stdlib.compare x1 x2 in
-          if c = 0 then
-            let c = Stdlib.compare x2 x3 in
-            if c = 0 then [ x2 ] else if c > 0 then [ x2; x3 ] else [ x3; x2 ]
-          else if c > 0 then
-            let c = Stdlib.compare x2 x3 in
-            if c = 0 then [ x1; x2 ]
-            else if c > 0 then [ x1; x2; x3 ]
-            else
-              let c = Stdlib.compare x1 x3 in
-              if c = 0 then [ x1; x2 ]
-              else if c > 0 then [ x1; x3; x2 ]
-              else [ x3; x1; x2 ]
-          else
-            let c = Stdlib.compare x1 x3 in
-            if c = 0 then [ x2; x1 ]
-            else if c > 0 then [ x2; x1; x3 ]
-            else
-              let c = Stdlib.compare x2 x3 in
-              if c = 0 then [ x2; x1 ]
-              else if c > 0 then [ x2; x3; x1 ]
-              else [ x3; x2; x1 ]
-        in
-        (s, tl)
-    | n, l ->
-        let n1 = n asr 1 in
-        let n2 = n - n1 in
-        let s1, l2 = sort n1 l in
-        let s2, tl = sort n2 l2 in
-        (rev_merge s1 s2 [], tl)
-  in
-  let len = length l in
-  if len < 2 then List.map fn l else fst (sort len l)
-
-let list_rev_map_append f l1 l2 =
-  let rec aux acc = function [] -> acc | hd :: tl -> aux (f hd :: acc) tl in
-  aux l2 l1
 
 let encode s : Adef.encoded_string =
   let special = function
@@ -962,23 +788,6 @@ let rev_input_line ic pos (rbuff, rpos) =
 let eq_key (fn1, sn1, oc1) (fn2, sn2, oc2) =
   let s x = x |> nominative |> Name.lower in
   s fn1 = s fn2 && s sn1 = s sn2 && oc1 = oc2
-
-let rec rev_iter fn = function
-  | [] -> ()
-  | hd :: tl ->
-      let () = rev_iter fn tl in
-      fn hd
-
-let groupby ~key ~value list =
-  let h = Hashtbl.create (List.length list) in
-  List.iter
-    (fun x ->
-      let k = key x in
-      let v = value x in
-      if Hashtbl.mem h k then Hashtbl.replace h k (v :: Hashtbl.find h k)
-      else Hashtbl.add h k [ v ])
-    list;
-  Hashtbl.fold (fun k v acc -> (k, v) :: acc) h []
 
 let digest s = Digest.string s |> Digest.to_hex
 

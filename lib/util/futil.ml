@@ -215,19 +215,19 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
     in
     let s_surnames =
       s_surname
-      :: Mutil.list_rev_map_append sou surnames_aliases
-           (Mutil.list_rev_map_append sou qualifiers
+      :: Ext_list.rev_map_append sou surnames_aliases
+           (Ext_list.rev_map_append sou qualifiers
            @@ Mutil.surnames_pieces s_surname)
     in
     let s_surnames =
       Array.fold_left
         (fun s_list (husband_surname, husband_surnames_aliases) ->
           if husband_surname = quest_string then
-            Mutil.list_rev_map_append sou husband_surnames_aliases s_list
+            Ext_list.rev_map_append sou husband_surnames_aliases s_list
           else
             let s_husband_surname = Mutil.nominative @@ sou husband_surname in
             s_husband_surname
-            :: Mutil.list_rev_map_append sou husband_surnames_aliases
+            :: Ext_list.rev_map_append sou husband_surnames_aliases
                  (List.rev_append
                     (Mutil.surnames_pieces s_husband_surname)
                     s_list))
@@ -278,7 +278,7 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
                 list s_first_names)
           s_list father_titles_places
     in
-    let list = Mutil.list_rev_map_append sou aliases list in
+    let list = Ext_list.rev_map_append sou aliases list in
     list
 
 let rec eq_lists eq l1 l2 =

@@ -36,7 +36,7 @@ let make_name_index base =
     (* not ? ? *)
     if p.first_name <> 1 && p.first_name <> 1 then
       List.iter (fun i -> Array.set t i @@ (p.key_index :: Array.get t i))
-      @@ Mutil.list_map_sort_uniq Dutil.name_index
+      @@ Ext_list.map_sort_uniq Dutil.name_index
       @@ Dutil.dsk_person_misc_names base p (fun p -> p.titles)
   done;
   Array.map Array.of_list t

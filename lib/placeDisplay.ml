@@ -30,7 +30,7 @@ let print_html_places_surnames conf base
       List.sort (fun (sn1, _) (sn2, _) -> Gutil.alphabetic_order sn1 sn2) snl
     in
     Output.print_sstring conf "<li>\n";
-    Mutil.list_iter_first
+    Ext_list.iter_first
       (fun first x ->
         if not first then Output.print_sstring conf ",\n";
         print_sn x)

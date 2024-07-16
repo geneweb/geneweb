@@ -3646,7 +3646,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_alias env al ((p, p_auth) as ep) =
     if (not p_auth) && Util.is_hide_names conf p then ()
     else
-      Mutil.list_iter_first
+      Ext_list.iter_first
         (fun first a ->
           let env = ("alias", Vstring (Gwdb.sou base a)) :: env in
           let env = ("first", Vbool first) :: env in
@@ -3781,7 +3781,7 @@ let print_foreach conf base print_ast eval_expr =
       | Vcelll celll -> celll
       | _ -> raise Not_found
     in
-    Mutil.list_iter_first
+    Ext_list.iter_first
       (fun first cell ->
         let env = ("cell", Vcell cell) :: ("first", Vbool first) :: env in
         List.iter (print_ast env ep) al)
@@ -3874,7 +3874,7 @@ let print_foreach conf base print_ast eval_expr =
     loop 0
   in
   let print_foreach_event env al ((p, _) as ep) =
-    Mutil.list_iter_first
+    Ext_list.iter_first
       (fun first evt ->
         let env = ("event", Vevent (p, evt)) :: env in
         let env = ("first", Vbool first) :: env in
@@ -4048,7 +4048,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_first_name_alias env al ((p, p_auth) as ep) =
     if (not p_auth) && Util.is_hide_names conf p then ()
     else
-      Mutil.list_iter_first
+      Ext_list.iter_first
         (fun first s ->
           let env = ("first_name_alias", Vstring (Gwdb.sou base s)) :: env in
           let env = ("first", Vbool first) :: env in
@@ -4071,7 +4071,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_nobility_title env al ((p, p_auth) as ep) =
     if p_auth then
       let titles = nobility_titles_list conf base p in
-      Mutil.list_iter_first
+      Ext_list.iter_first
         (fun first x ->
           let env = ("nobility_title", Vtitle (p, x)) :: env in
           let env = ("first", Vbool first) :: env in
@@ -4093,7 +4093,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_qualifier env al ((p, p_auth) as ep) =
     if (not p_auth) && Util.is_hide_names conf p then ()
     else
-      Mutil.list_iter_first
+      Ext_list.iter_first
         (fun first nn ->
           let env = ("qualifier", Vstring (Gwdb.sou base nn)) :: env in
           let env = ("first", Vbool first) :: env in
@@ -4105,7 +4105,7 @@ let print_foreach conf base print_ast eval_expr =
        should be merged *)
     (* This is to print relation attached to [p] (Gwdb.get_rparents) *)
     if p_auth then
-      Mutil.list_iter_first
+      Ext_list.iter_first
         (fun first r ->
           let env = ("rel", Vrel (r, None)) :: env in
           let env = ("first", Vbool first) :: env in
@@ -4234,7 +4234,7 @@ let print_foreach conf base print_ast eval_expr =
   let print_foreach_surname_alias env al ((p, p_auth) as ep) =
     if (not p_auth) && Util.is_hide_names conf p then ()
     else
-      Mutil.list_iter_first
+      Ext_list.iter_first
         (fun first s ->
           let env = ("surname_alias", Vstring (Gwdb.sou base s)) :: env in
           let env = ("first", Vbool first) :: env in

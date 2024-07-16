@@ -2727,18 +2727,3 @@ let has_children base u =
       let des = Gwdb.foi base ifam in
       Array.length (Gwdb.get_children des) > 0)
     (Gwdb.get_family u)
-
-let list_cmp cmp l1 l2 =
-  let rec aux l1 l2 =
-    match (l1, l2) with
-    | x :: xs, y :: ys when cmp x y -> aux xs ys
-    | [], [] -> true
-    | _ -> false
-  in
-  aux l1 l2
-
-let is_subset s1 s2 = List.for_all (fun e -> List.mem e s2) s1
-
-let list_elements_cmp l1 =
-  let l1 = List.sort compare l1 in
-  fun l2 -> List.sort compare l2 = l1

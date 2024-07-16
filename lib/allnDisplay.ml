@@ -278,7 +278,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
   List.iter
     (fun (ini_k, l) ->
       Output.print_sstring conf "<p>";
-      Mutil.list_iter_first
+      Ext_list.iter_first
         (fun first (s, cnt) ->
           let href =
             let open Def in
