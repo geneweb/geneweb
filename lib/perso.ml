@@ -2016,7 +2016,6 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let ep = (p, authorized_age conf base p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
-  | [ "base"; "name" ] -> VVstring conf.bname
   | [ "plugin"; plugin ] ->
       VVbool (List.mem plugin (List.map Filename.basename conf.plugins))
   | "base" :: "nb_persons" :: sl ->
