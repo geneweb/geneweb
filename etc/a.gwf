@@ -453,6 +453,22 @@
 # estate ... and print something clever.
 #print_advanced_title=yes
 
+# Load datalists for autocompletion. These options allow to provide
+# suggestions for various inputs in individual and family forms.
+# The lists are populated with values extracted from your Geneweb database
+# using the “cache_files" tool in gwsetup or in command line. They are not
+# automatically updated: regenerate them to ensure that the data is up-to-date.
+#datalist_aliases=1
+#datalist_estates=1
+#datalist_fnames=1
+#datalist_occupations=1
+#datalist_places=1
+#datalist_pub_names=1
+#datalist_qualifiers=1
+#datalist_snames=1
+#datalist_titles=1
+#datalist_sources=1
+
 # Notify change program (e.g. shell script) to be executed for each
 # database change. First argument is the name of the base, then the
 # individual and finally the action performed.

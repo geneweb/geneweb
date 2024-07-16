@@ -1,5 +1,159 @@
+%( Input datalists and function to populate all datalists %)
+%define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%nn;%end;
+%apply;dl("fnames")
+%apply;dl("snames")
+%apply;dl("places")
+%apply;dl("occupations")
+%apply;dl("sources")
+%if;("IND" in e.m)
+  %apply;dl("pub_names")
+  %apply;dl("qualifiers")
+  %apply;dl("aliases")
+  %apply;dl("titles")
+  %apply;dl("estates")
+%end;
 <script>
-%( show/hide some inputs of witnesses/relationsparents/chirdren/fwitnesses depending of create/link value in selects %)
+function populateDatalist(datalistId, cacheFile, book) {
+    const dataList = document.getElementById(datalistId);
+    if (!dataList) {
+        console.log(`Datalist ${datalistId} not found`);
+        return;
+    }
+    fetch(cacheFile)
+        .then(response => {
+            const reader = response.body.pipeThrough(new DecompressionStream('gzip')).getReader();
+            return new ReadableStream({
+                start(controller) {
+                    return pump();
+                    function pump() {
+                        return reader.read().then(({ done, value }) => {
+                            if (done) {
+                                controller.close();
+                                return;
+                            }
+                            controller.enqueue(value);
+                            return pump();
+                        });
+                    }
+                }
+            });
+        })
+        .then(stream => new Response(stream))
+        .then(response => response.text())
+        .then(text => {
+            const lines = text.split("\n");
+            lines.forEach(line => {
+                if (line.trim()) {
+                    const option = document.createElement("option");
+                    option.value = line.trim().replace("<option>", "");
+                    dataList.appendChild(option);
+                }
+            });
+        })
+        .catch(error => console.error(`Error while loading ${cacheFile}:`, error));
+}
+
+var baseName = "%base.name;";
+var path = baseName + "/cache/" + baseName;
+
+var datalists = %[
+%if;(b.datalist_fnames=1)    { id: "datalist_fnames", file: path + "_fnames.cache.gz", book: "fn" },%end;
+%if;(b.datalist_snames=1)    { id: "datalist_snames", file: path + "_snames.cache.gz", book: "sn" },%end;
+%if;(b.datalist_places=1)    { id: "datalist_places", file: path + "_places.cache.gz", book: "place" },%end;
+%if;(b.datalist_occupations=1)    { id: "datalist_occupations", file: path + "_occupations.cache.gz", book: "occu" },%end;
+%if;(b.datalist_sources=1)    { id: "datalist_sources", file: path + "_sources.cache.gz", book: "src" },%end;
+%if;("IND" in e.m)
+  %if;(b.datalist_pub_names=1)  { id: "datalist_pub_names", file: path + "_pub_names.cache.gz", book: "pubn" },%end;
+  %if;(b.datalist_qualifiers=1)  { id: "datalist_qualifiers", file: path + "_qualifiers.cache.gz", book: "qual" },%end;
+  %if;(b.datalist_aliases=1)  { id: "datalist_aliases", file: path + "_aliases.cache.gz", book: "alias" },%end;
+  %if;(b.datalist_titles=1)  { id: "datalist_titles", file: path + "_titles.cache.gz", book: "title" },%end;
+  %if;(b.datalist_estates=1)  { id: "datalist_estates", file: path + "_estates.cache.gz", book: "domain" },%end;
+%end;
+%];
+
+function setupInputClickListeners() {
+    const inputs = document.querySelectorAll('input[list]');
+    inputs.forEach(input => {
+        const datalistId = input.getAttribute('list');
+        const datalistConfig = datalists.find(list => list.id === datalistId);
+        
+        if (datalistConfig && datalistConfig.book) {
+            input.addEventListener('mousedown', function(event) {
+                if (event.ctrlKey && event.button === 0) {
+                    event.preventDefault();
+                    setTimeout(() => openBook(this.value, datalistConfig.book), 0);
+                }
+            });
+        }
+    });
+}
+
+function openBook(value, book) {
+    if (value.trim() === '') {
+        console.log('Input is empty, not opening book.');
+        return;
+    }
+    const encodedValue = encodeURIComponent(value);
+    const url = `?%if;cgi;b=${baseName}&%end;m=MOD_DATA&data=${book}&s=${encodedValue}`;
+    window.open(url, '_blank');
+}
+
+datalists.forEach(list => populateDatalist(list.id, list.file, list.book));
+
+%( add buton %)
+function addClearButtonToInputs() {
+    const elements = document.querySelectorAll('input[type="text"], input[type="search"], input[type="email"], input[type="tel"], input[type="url"], textarea');
+    elements.forEach(element => {
+        // Create wrapper div
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+        wrapper.style.display = 'inline-block';
+        wrapper.style.width = '100%';
+        element.parentNode.insertBefore(wrapper, element);
+        wrapper.appendChild(element);
+
+        // Adjust element styling
+        element.style.paddingRight = '40px'; // Make room for clear button and datalist indicator
+
+        // Create clear button
+        const clearButton = document.createElement('i');
+        clearButton.className = 'fas fa-times';
+        clearButton.style.position = 'absolute';
+        clearButton.style.right = element.tagName.toLowerCase() === 'input' && element.getAttribute('list') ? '10px' : '8px';
+        clearButton.style.top = element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%';
+        clearButton.style.transform = element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)';
+        clearButton.style.cursor = 'pointer';
+        clearButton.style.display = 'none';  // Hidden by default
+        clearButton.style.color = '#999'; // Adjust color as needed
+        clearButton.style.fontSize = '1.0em'; // Adjust size as needed
+        wrapper.appendChild(clearButton);
+
+        // Show/hide clear button based on element content
+        function toggleClearButton() {
+            clearButton.style.display = element.value ? 'block' : 'none';
+        }
+
+        element.addEventListener('input', toggleClearButton);
+        toggleClearButton();  // Initial state
+
+        // Clear element on button click
+        clearButton.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent any form submission
+            element.value = '';
+            toggleClearButton();
+            element.focus();  // Keep focus on the element
+            // Trigger input event to update any listeners
+            element.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    addClearButtonToInputs();
+    setupInputClickListeners();
+});
+
+%( show/hide some inputs of witnesses/relationsparents/children/fwitnesses depending of create/link value in selects %)
 $(document).ready(function() {
   $("[id$=_selct]").on('change', function() {
     var pre = this.id;

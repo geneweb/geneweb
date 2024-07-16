@@ -27,6 +27,11 @@
 %( do not use %include;perso_header %)
 %include_perso_header;
 %include;home
+%let;datalist_fnames;%if;(b.datalist_fnames=1) list="datalist_fnames"%end;%in;
+%let;datalist_places;%if;(b.datalist_places=1) list="datalist_places"%end;%in;
+%let;datalist_snames;%if;(b.datalist_snames=1) list="datalist_snames"%end;%in;
+%let;datalist_occupations;%if;(b.datalist_occupations=1) list="datalist_occupations"%end;%in;
+%let;datalist_sources;%if;(b.datalist_sources=1) list="datalist_sources"%end;%in;
 %define;nav()
   <div class="container fixed-top" role="navigation">
     <nav class="navbar navbar-light bg-white justify-content-center" id="banner">
@@ -44,7 +49,7 @@
 %define;date(xlab,xvar,xdt)
   %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2"%in;
   %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2"%in;
-  %let;year_input;pattern="[?><~/+-]?\d*/?" size="4" maxlength="8"%in;
+  %let;year_input;pattern="[?><~/+\-]?\d*/?" size="4" maxlength="8"%in;
   <div class="row">
     <div class="col-sm-1 col-md-2 col-form-label">
       xlab
@@ -208,7 +213,7 @@
 %define;small_date(kind,xvar,xx,verbose)
   %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2"%in;
   %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2"%in;
-  %let;year_input;pattern="[?><~/-+]?\d*/?" size="4" maxlength="8"%in;
+  %let;year_input;pattern="[?><~/+\-]?\d*/?" size="4" maxlength="8"%in;
   <div class="row">
     <span class="col-sm-2 col-form-label">[*kind]</span>
     <div class="col-sm-auto form-inline">
@@ -237,7 +242,7 @@
     </div>
     <label for="xvar_pl" class="%if;(verbose=true)sr-only%end; col-sm-1 col-form-label">[place/places]0</label>%nn;
     <div class="col-sm">
-      <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[*place/places]0">
+      <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[*place/places]0"%datalist_places;>
     </div>
   </div>
 %end;
@@ -265,7 +270,7 @@
      (%if;(xx.first_name!="" or xx.surname!="")%apply;nth_c%with;[M/F]0[M/F]1N%and;psex%end;
       %else;%if;(xcnt=1)[M/F]0%else;[M/F]1%end;%end;)</span></label>
     <div class="col-sm-8">
-      <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0"%if;(evar.m="ADD_FAM" and xx.first_name="") autofocus%end;>
+      <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0"%if;(evar.m="ADD_FAM" and xx.first_name="") autofocus%end;%datalist_fnames;>
     </div>
     <label for="paxcnt_occ" class="col-auto col-form-label sr-only">[*number]</label>
     <div class="col-sm-2">
@@ -275,7 +280,7 @@
   <div class="row">
     <label for="paxcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
     <div class="col-sm-8">
-      <input class="form-control" type="text" name="paxcnt_sn" value="%xx.surname" id="paxcnt_sn" placeholder="[*surname/surnames]0">
+      <input class="form-control" type="text" name="paxcnt_sn" value="%xx.surname" id="paxcnt_sn" placeholder="[*surname/surnames]0"%datalist_snames;>
     </div>
     <div class="col-sm-2">
       <select class="form-control" id="paxcnt_p_selct" name="paxcnt_p">
@@ -290,7 +295,7 @@
     <div class="row">
       <label for="paxcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
       <div class="col-sm">
-        <input class="form-control" name="paxcnt_occu" id="paxcnt_occu" placeholder="[*occupation/occupations]0" value="%xx.create.occupation;">
+        <input class="form-control" name="paxcnt_occu" id="paxcnt_occu" placeholder="[*occupation/occupations]0" value="%xx.create.occupation;"%datalist_occupations;>
       </div>
     </div>
   </div>
@@ -400,7 +405,7 @@
       <label for="excnt_witnwcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0</label>
       <div class="col-sm-6">
         <input type="text" class="form-control" name="excnt_witnwcnt_fn" id="excnt_witnwcnt_fn" 
-          value="%fwitness.first_name;" placeholder="[*first name/first names]0">
+          value="%fwitness.first_name;" placeholder="[*first name/first names]0"%datalist_fnames;>
       </div>
       <label for="excnt_witnwcnt_occ" class="col-sm-auto col-form-label">[*number]0</label>
       <div class="col-sm-2">
@@ -412,7 +417,7 @@
       <label for="excnt_witnwcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
       <div class="col-sm-6">
         <input type="text" class="form-control" name="excnt_witnwcnt_sn" id="excnt_witnwcnt_sn"
-          value="%fwitness.surname;" placeholder="[*surname/surnames]0">
+          value="%fwitness.surname;" placeholder="[*surname/surnames]0"%datalist_snames;>
       </div>
       <div id="excnt_witnwcnt_p_selct_mod" class="col-form-label ml-2">
         %if;(fwitness.index!="-1")
@@ -452,7 +457,7 @@
       <label for="excnt_witnwcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
       <div class="col-sm-6">
         <input class="form-control" type="text" name="excnt_witnwcnt_occu" id="excnt_witnwcnt_occu"
-           value="%fwitness.create.occupation;" placeholder="[*occupation/occupations]0">
+           value="%fwitness.create.occupation;" placeholder="[*occupation/occupations]0"%datalist_occupations;>
       </div>
       <div class="form-inline col-sm-auto">
         <div class="custom-control custom-checkbox mr-3">
@@ -483,7 +488,7 @@
   <div class="row">
     <label for="e_placexcnt" class="col-sm-2 col-form-label">[*place/places]0</label>
     <div class="col-sm-10">
-      <input class="form-control" type="text" name="e_placexcnt" value="%event.e_place;" id="e_placexcnt" placeholder="[*place/places]0">
+      <input class="form-control" type="text" name="e_placexcnt" value="%event.e_place;" id="e_placexcnt" placeholder="[*place/places]0"%datalist_places;>
     </div>
   </div>
   %apply;date([*date/dates]0, "e_datexcnt", "event_date")
@@ -504,7 +509,7 @@
       %if;(event.e_src!="")
         <textarea class="form-control" name="e_srcxcnt" rows="1" id="e_srcxcnt" placeholder="[*source/sources]0" %l_on1s;>%event.e_src;</textarea>
       %else;
-        <input class="form-control" name="e_srcxcnt" maxlength="1000" id="e_srcxcnt" placeholder="[*source/sources]0" value="%event.e_src;">
+        <input class="form-control" name="e_srcxcnt" maxlength="1000" id="e_srcxcnt" placeholder="[*source/sources]0" value="%event.e_src;"%datalist_sources;>
       %end;
     </div>
   </div>
@@ -661,7 +666,7 @@
   <div class="row">
     <label for="chxcnt_fn" class="col-sm-2 col-form-label">[*first name/first names]0</label>
     <div class="col-sm-6">
-        <input class="form-control" type="text" name="chxcnt_fn" value="%child.first_name;" id="chxcnt_fn" placeholder="[*first name/first names]0">
+        <input class="form-control" type="text" name="chxcnt_fn" value="%child.first_name;" id="chxcnt_fn" placeholder="[*first name/first names]0"%datalist_fnames;>
     </div>
     <label for="chxcnt_occ" class="col-sm-auto col-form-label">[*number]</label>
     <div class="col-sm-2">
@@ -671,7 +676,7 @@
   <div class="row">
     <label for="chxcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
     <div class="col-sm-6">
-      <input class="form-control" type="text" name="chxcnt_sn" value="%child.surname;" id="chxcnt_sn" placeholder="%father.surname;">
+      <input class="form-control" type="text" name="chxcnt_sn" value="%child.surname;" id="chxcnt_sn" placeholder="%father.surname;"%datalist_snames;>
     </div>
     <div id="chxcnt_p_selct_mod" class="col-form-label ml-2">
       %if;(child.index!="-1")
@@ -714,7 +719,7 @@
     <div class="row">
       <label for="chxcnt_occu" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
       <div class="col-sm">
-         <input class="form-control" type="text" name="chxcnt_occu" value="%child.create.occupation;" id="chxcnt_occu" placeholder="[*occupation/occupations]0">
+         <input class="form-control" type="text" name="chxcnt_occu" value="%child.create.occupation;" id="chxcnt_occu" placeholder="[*occupation/occupations]0"%datalist_occupations;>
       </div>
     </div>
   </div>
@@ -745,7 +750,7 @@
       <div class="row">
         <label for="psrc" class="col-sm-2 col-form-label">[[*person/persons]1]</label>
         <div class="col-sm-10">
-          <textarea class="form-control" rows="1" name="psrc" id="psrc" placeholder="[*source/sources]1 [person/persons]1">
+          <textarea class="form-control" rows="1" name="psrc" id="psrc" placeholder="[*source/sources]1 [person/persons]1"datalist_sources;>
             %if;(evar_psrc!="")%evar_psrc;%else;%evar_dsrc;%end;
           </textarea>
         </div>
@@ -756,7 +761,7 @@
           %if;(fsources!="")
             <textarea class="form-control" name="src" rows="1" id="src" placeholder="[*source/sources]1 [family/families]0" %l_on1s;>%fsources;</textarea>
           %else;
-            <input class="form-control" name="src" id="src" placeholder="[*source/sources]1 [family/families]0" value="%fsources;">
+            <input class="form-control" name="src" id="src" placeholder="[*source/sources]1 [family/families]0" value="%fsources;"datalist_sources;>
           %end;
         </div>
         <div class="col-sm-1">
