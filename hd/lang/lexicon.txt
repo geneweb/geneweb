@@ -9256,7 +9256,7 @@ tr: hiyerarşik gezinmede bir giriş seçin
 zh: 在层次导航中选择一个条目
 
     high generation levels
-de: die Generationen höher als 12
+de: der Generationen höher als 12
 en: the generation levels higher then 12
 fr: les générations supérieures à 12
 
