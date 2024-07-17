@@ -93,10 +93,6 @@ val map_descend_p : ('a -> 'b) -> 'a gen_descend -> 'b gen_descend
 (** Convert generic type used to represent children inside [Def.gen_descend] into
     another one.*)
 
-val eq_lists : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool
-(** Says if two lists with different element's type are equal with given comparison
-    function. *)
-
 val eq_titles : ('a -> 'b -> bool) -> 'a gen_title -> 'b gen_title -> bool
 (** Says if two titles with different types are equal with given comparison
     function. *)

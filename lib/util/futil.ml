@@ -281,12 +281,6 @@ let gen_person_misc_names sou empty_string quest_string first_name surname
     let list = Ext_list.rev_map_append sou aliases list in
     list
 
-let rec eq_lists eq l1 l2 =
-  match (l1, l2) with
-  | x1 :: l1, x2 :: l2 -> eq x1 x2 && eq_lists eq l1 l2
-  | [], [] -> true
-  | _ -> false
-
 let eq_title_names eq tn1 tn2 =
   match (tn1, tn2) with
   | Tname i1, Tname i2 -> eq i1 i2
