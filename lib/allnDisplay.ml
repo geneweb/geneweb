@@ -310,7 +310,7 @@ let print_short conf base is_surnames =
   let ini =
     match Util.p_getenv conf.Config.env "k" with Some k -> k | _ -> ""
   in
-  let _ = if String.length ini < 2 then Gwdb.load_strings_array base in
+  let () = if String.length ini < 2 then Gwdb.load_strings_array base in
   match Alln.select_names conf base is_surnames ini max_int with
   | Alln.Specify _, _ -> Hutil.incorrect_request conf
   | Alln.Result list, len ->
