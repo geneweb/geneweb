@@ -187,7 +187,7 @@ let print_elem conf base is_surname (p, xl) =
       Output.print_sstring conf "</a>";
       Output.print_string conf (DateDisplay.short_dates_text conf base x);
       Output.print_sstring conf "<em>";
-      Util.specify_homonymous conf base x true;
+      NameDisplay.specify_homonymous conf base x true;
       Output.print_sstring conf "</em>")
     xl
 

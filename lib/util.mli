@@ -155,10 +155,6 @@ val string_gen_family :
   (Gwdb.iper, Gwdb.ifam, string) Def.gen_family
 (** Remplaces string ids inside family's entry by their actual string value. *)
 
-val person_text_without_title :
-  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
-(** Makes call to [gen_person_text_without_title] with [std_access] *)
-
 val main_title : Config.config -> Gwdb.base -> Gwdb.person -> Gwdb.title option
 (** Returns main person's title. If person doesn't have it, then returns first title
     from the list. *)
@@ -172,9 +168,6 @@ val person_title : Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
 (** Returns HTML representation of person's main title (or first title if
     main doesn't exists). If person doesn't have a title or if access to
     person isn't granted returns empty string *)
-
-val child_of_parent :
-  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
 
 val update_family_loop :
   Config.config ->
@@ -223,9 +216,6 @@ val surname_without_particle : Gwdb.base -> string -> string
 (** [surname_without_particle base sn]
     Remove the particle of [sn] if there is one.
     The list of particles to use is defined in [base]. *)
-
-val specify_homonymous :
-  Config.config -> Gwdb.base -> Gwdb.person -> bool -> unit
 
 val get_approx_birth_date_place :
   Gwdb.base -> Gwdb.person -> Date.date option * Adef.safe_string
@@ -318,9 +308,6 @@ val relation_txt :
 
 val string_of_decimal_num : Config.config -> float -> string
 val person_exists : Config.config -> Gwdb.base -> string * string * int -> bool
-
-val husband_wife :
-  Config.config -> Gwdb.base -> Gwdb.person -> bool -> Adef.safe_string
 
 val find_person_in_env :
   Config.config -> Gwdb.base -> string -> Gwdb.person option

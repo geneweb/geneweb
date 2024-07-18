@@ -171,3 +171,192 @@ let referenced_person_text conf base p =
 
 let referenced_person_text_without_surname conf base p =
   reference conf base p (first_name_html_of_person conf base p)
+
+let person_text_without_title conf base p =
+  match Util.main_title conf base p with
+  | Some t -> (
+      if Gwdb.eq_istr t.Def.t_place (Gwdb.get_surname p) then
+        first_name_html_of_person conf base p
+      else
+        match (t.Def.t_name, Gwdb.get_qualifiers p) with
+        | Def.Tname s, nn :: _ ->
+            let open Def in
+            esc (Gwdb.sou base s)
+            ^^^ " <em>"
+            ^<^ esc (Gwdb.sou base nn)
+            ^>^ "</em>"
+        | Def.Tname s, _ -> esc (Gwdb.sou base s)
+        | _ -> fullname_html_of_person conf base p)
+  | None -> fullname_html_of_person conf base p
+
+let child_of_parent conf base p =
+  (* Si le père a un nom de famille différent de la personne *)
+  (* alors on l'affiche, sinon on n'affiche que le prénom.   *)
+  let print_father fath =
+    if not (Gwdb.eq_istr (Gwdb.get_surname p) (Gwdb.get_surname fath)) then
+      fullname_html_of_person conf base fath
+    else first_name_html_of_person conf base fath
+  in
+  let a = Util.pget conf base (Gwdb.get_iper p) in
+  let ifam =
+    match Gwdb.get_parents a with
+    | Some ifam ->
+        let cpl = Gwdb.foi base ifam in
+        let fath =
+          let fath = Util.pget conf base (Gwdb.get_father cpl) in
+          if Gwdb.p_first_name base fath = "?" then None else Some fath
+        in
+        let moth =
+          let moth = Util.pget conf base (Gwdb.get_mother cpl) in
+          if Gwdb.p_first_name base moth = "?" then None else Some moth
+        in
+        Some (fath, moth)
+    | None -> None
+  in
+  match ifam with
+  | Some (None, None) | None -> Adef.safe ""
+  | Some (fath, moth) ->
+      let s =
+        match (fath, moth) with
+        | Some fath, None -> print_father fath
+        | None, Some moth -> fullname_html_of_person conf base moth
+        | Some fath, Some moth ->
+            let open Def in
+            print_father fath ^^^ " "
+            ^<^ Util.transl_nth conf "and" 0
+            ^<^ " "
+            ^<^ fullname_html_of_person conf base moth
+        | _ -> Adef.safe ""
+      in
+      let is = Util.index_of_sex (Gwdb.get_sex p) in
+      let s = (s :> string) in
+      Util.transl_a_of_gr_eq_gen_lev conf
+        (Util.transl_nth conf "son/daughter/child" is)
+        s s
+      |> Util.translate_eval |> Adef.safe
+
+let relation_date conf base fam : Adef.safe_string =
+  let is_visible family =
+    let is_visible person =
+      Util.authorized_age conf base (Util.pget conf base person)
+    in
+    is_visible (Gwdb.get_father family) && is_visible (Gwdb.get_mother family)
+  in
+  Adef.safe
+  @@
+  if not @@ is_visible fam then ""
+  else
+    match Date.cdate_to_dmy_opt (Gwdb.get_marriage fam) with
+    | None -> ""
+    | Some dmy ->
+        " " ^ Util.transl conf "in (year)" ^ " " ^ string_of_int dmy.year
+
+let husband_wife conf base p all =
+  let relation =
+    let rec loop i =
+      if i < Array.length (Gwdb.get_family p) then
+        let fam = Gwdb.foi base (Gwdb.get_family p).(i) in
+        let conjoint = Gutil.spouse (Gwdb.get_iper p) fam in
+        let conjoint = Util.pget conf base conjoint in
+        if not @@ Util.is_empty_name conjoint then
+          Printf.sprintf
+            (Util.relation_txt conf (Gwdb.get_sex p) fam)
+            (fun () -> "")
+          |> Util.translate_eval |> Adef.safe
+        else loop (i + 1)
+      else Adef.safe ""
+    in
+    loop 0
+  in
+  let res =
+    let rec loop i res =
+      if i < Array.length (Gwdb.get_family p) then
+        let fam = Gwdb.foi base (Gwdb.get_family p).(i) in
+        let conjoint = Gutil.spouse (Gwdb.get_iper p) fam in
+        let conjoint = Util.pget conf base conjoint in
+        if not @@ Util.is_empty_name conjoint then
+          let res =
+            let open Def in
+            res
+            ^>^ Util.translate_eval
+                  (" "
+                   ^<^ fullname_html_of_person conf base conjoint
+                   ^^^ relation_date conf base fam
+                    :> string)
+            ^ ","
+          in
+          if all then loop (i + 1) res else res
+        else loop (i + 1) res
+      else res
+    in
+    loop 0 relation
+  in
+  let res = (res :> string) in
+  let res =
+    if String.length res > 1 then String.sub res 0 (String.length res - 1)
+    else res
+  in
+  Adef.safe res
+
+let first_child conf base p =
+  let is = Util.index_of_sex (Gwdb.get_sex p) in
+  let rec loop i =
+    if i < Array.length (Gwdb.get_family p) then
+      let fam = Gwdb.foi base (Gwdb.get_family p).(i) in
+      let ct = Gwdb.get_children fam in
+      if Array.length ct > 0 then
+        let enfant = Util.pget conf base ct.(0) in
+        let child =
+          if
+            Util.is_hide_names conf enfant
+            && not (Util.authorized_age conf base enfant)
+          then Adef.safe "xx"
+          else if
+            not (Gwdb.eq_istr (Gwdb.get_surname p) (Gwdb.get_surname enfant))
+          then fullname_html_of_person conf base enfant
+          else first_name_html_of_person conf base enfant
+        in
+        let child = (child :> string) in
+        Util.transl_a_of_b conf
+          (Util.transl_nth conf "father/mother" is)
+          child child
+        |> Util.translate_eval |> Adef.safe
+      else loop (i + 1)
+    else Adef.safe ""
+  in
+  loop 0
+
+let specify_homonymous conf base p specify_public_name =
+  match (Gwdb.get_public_name p, Gwdb.get_qualifiers p) with
+  | n, nn :: _ when Gwdb.sou base n <> "" && specify_public_name ->
+      Output.print_sstring conf " ";
+      Output.print_string conf (esc @@ Gwdb.sou base n);
+      Output.print_sstring conf " <em>";
+      Output.print_string conf (esc @@ Gwdb.sou base nn);
+      Output.print_sstring conf "</em>"
+  | _, nn :: _ when specify_public_name ->
+      Output.print_sstring conf " ";
+      Output.print_string conf (esc @@ Gwdb.p_first_name base p);
+      Output.print_sstring conf " <em>";
+      Output.print_string conf (esc @@ Gwdb.sou base nn);
+      Output.print_sstring conf "</em>"
+  | n, [] when Gwdb.sou base n <> "" && specify_public_name ->
+      Output.print_sstring conf " ";
+      Output.print_string conf (esc @@ Gwdb.sou base n)
+  | _, _ ->
+      (* Le nom public et le qualificatif ne permettent pas de distinguer *)
+      (* la personne, donc on affiche les informations sur les parents,   *)
+      (* le mariage et/ou le premier enfant.                              *)
+      let cop = child_of_parent conf base p in
+      if (cop :> string) <> "" then (
+        Output.print_sstring conf ", ";
+        Output.print_string conf cop);
+      let hw = husband_wife conf base p true in
+      if (hw :> string) = "" then (
+        let fc = first_child conf base p in
+        if (fc :> string) <> "" then (
+          Output.print_sstring conf ", ";
+          Output.print_string conf fc))
+      else (
+        Output.print_sstring conf ", ";
+        Output.print_string conf hw)

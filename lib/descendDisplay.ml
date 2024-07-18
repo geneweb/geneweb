@@ -484,7 +484,7 @@ let print_elem conf base paths precision (n, pll) =
               Output.print_sstring conf "</strong>";
               if several && precision then (
                 Output.print_sstring conf "<em>";
-                specify_homonymous conf base p true;
+                NameDisplay.specify_homonymous conf base p true;
                 Output.print_sstring conf "</em>");
               Output.print_string conf
                 (DateDisplay.short_dates_text conf base p);

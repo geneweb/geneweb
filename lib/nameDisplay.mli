@@ -85,3 +85,16 @@ val referenced_person_text :
 val referenced_person_text_without_surname :
   Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
 (** Returns HTML link to the person that contains its first name. *)
+
+val person_text_without_title :
+  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
+(** Makes call to [gen_person_text_without_title] with [std_access] *)
+
+val child_of_parent :
+  Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
+
+val specify_homonymous :
+  Config.config -> Gwdb.base -> Gwdb.person -> bool -> unit
+
+val husband_wife :
+  Config.config -> Gwdb.base -> Gwdb.person -> bool -> Adef.safe_string
