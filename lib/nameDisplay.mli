@@ -18,6 +18,9 @@ val first_name_html_of_person :
 val fullname_html_of_person :
   Config.config -> Gwdb.base -> Gwdb.person -> Adef.safe_string
 
+val first_name_str_of_person :
+  Config.config -> Gwdb.base -> Gwdb.person -> string
+
 val fullname_str_of_person : Config.config -> Gwdb.base -> Gwdb.person -> string
 
 val title_html_of_person :
