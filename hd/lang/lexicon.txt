@@ -1712,6 +1712,7 @@ sv: aktivera/undertrycka
 tr: etkinleştir/kaldır
 
     suppress this path
+de: diesen Pfad verbergen
 en: suppress this path
 fr: supprimer ce chemin
 
@@ -2196,6 +2197,7 @@ tr: takma ad
 
 
     search type
+de: Suchmodus
 en: search type
 fr: mode de recherche
 
@@ -9254,10 +9256,12 @@ tr: hiyerarşik gezinmede bir giriş seçin
 zh: 在层次导航中选择一个条目
 
     high generation levels
+de: der Generationen höher als 12
 en: the generation levels higher then 12
 fr: les générations supérieures à 12
 
     high generation caution
+de: Vorsicht! Bei Auswahl höherer Generationen kann die Erzeugung mehrere Minuten dauern und zu Server-Timeouts führen.
 en: be carefull! Selecting high generation level may take minutes to generate and that can lead to server timeouts.
 fr: attention ! Sélectionner un nombre de génération élevé peut prendre plusieurs minutes à générer et entraîner des délais d'attente dépassé du serveur.
 
@@ -10047,7 +10051,7 @@ tr: eşler dizini (nesil yok)
 
     individual notes
 co: note individuale
-de: Hinweis zur Person
+de: Hinweise zur Person
 en: individual notes
 es: nota individual
 fi: merkintöjä henkilöstä
@@ -13098,14 +13102,17 @@ sv: summering av noteringar
 tr: notlar
 
     notes sources show help
+de: den Hintergrund zum Anzeigen der
 en: the background to show the
 fr: sur l’arrière-plan pour afficher les
 
     notes sources edit on date
+de: auf das Datum links zum Ändern dieses Ereignisses
 en: on the date on the left to modify this event
 fr: sur la date à gauche pour modifier cet événement
 
     note without title
+de: Notiz ohne Titel
 en: note without title
 fr: note sans titre
 
