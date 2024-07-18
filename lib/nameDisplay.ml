@@ -68,7 +68,7 @@ let gen_first_name_str ~first_name ~qualifier =
 let first_name_html conf base person =
   Adef.safe (map_first_name_data gen_first_name_html conf base person)
 
-let first_name_str conf base person =
+let first_name_str_of_person conf base person =
   map_first_name_data gen_first_name_str conf base person
 
 let map_fullname_data f conf base person =
@@ -86,7 +86,8 @@ let fullname_html ~p_surname =
       fn_html ^^^ " " ^<^ esc surname)
 
 let fullname_str_of_person =
-  gen_fullname first_name_str (fun fn_str surname -> fn_str ^ " " ^ surname)
+  gen_fullname first_name_str_of_person (fun fn_str surname ->
+      fn_str ^ " " ^ surname)
 
 let first_name_html_of_person conf base person =
   map_person_name_visibility ~on_visible_name:first_name_html conf base person
