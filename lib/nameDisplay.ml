@@ -1,7 +1,6 @@
 let esc x = (Util.escape_html x :> Adef.safe_string)
-let restricted_txt = Adef.safe "....."
-let x_x_txt = Adef.safe "x x"
-let hidden_name_txt = Adef.safe "x"
+let hidden_first_name_txt = Adef.safe "HIDDEN FN"
+let hidden_surname_txt = Adef.safe "HIDDEN SN"
 let hidden_or_restricted_fullname_string = Adef.safe "SOMETHING TO DEFINE"
 
 module NameVisibilityUtil : sig
@@ -80,8 +79,10 @@ let first_name_html conf base person =
 
 let first_name_str_of_person conf base person =
   map_person_name_visibility'
-    ~on_hidden_name:(fun _ _ _ -> (hidden_or_restricted_fullname_string :> string))
-    ~on_restricted_name:(fun _ _ _ -> (hidden_or_restricted_fullname_string :> string))
+    ~on_hidden_name:(fun _ _ _ ->
+      (hidden_or_restricted_fullname_string :> string))
+    ~on_restricted_name:(fun _ _ _ ->
+      (hidden_or_restricted_fullname_string :> string))
     ~on_visible_name:(map_first_name_data gen_first_name_str)
     ~conf ~base ~person
 
@@ -100,11 +101,14 @@ let fullname_html ~p_surname =
       fn_html ^^^ " " ^<^ esc surname)
 
 let fullname_str_of_person conf base person =
-    map_person_name_visibility'
-    ~on_hidden_name:(fun _ _ _ -> (hidden_or_restricted_fullname_string :> string))
-    ~on_restricted_name:(fun _ _ _ -> (hidden_or_restricted_fullname_string :> string))
-    ~on_visible_name:(gen_fullname first_name_str_of_person (fun fn_str surname ->
-      fn_str ^ " " ^ surname))
+  map_person_name_visibility'
+    ~on_hidden_name:(fun _ _ _ ->
+      (hidden_or_restricted_fullname_string :> string))
+    ~on_restricted_name:(fun _ _ _ ->
+      (hidden_or_restricted_fullname_string :> string))
+    ~on_visible_name:
+      (gen_fullname first_name_str_of_person (fun fn_str surname ->
+           fn_str ^ " " ^ surname))
     ~conf ~base ~person
 
 let first_name_html_of_person conf base person =
