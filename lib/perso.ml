@@ -3186,6 +3186,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "first_name_key_strip" ->
       if Util.is_hide_names conf p && not p_auth then null_val
       else Name.strip_c (Gwdb.p_first_name base p) '"' |> str_val
+  | "hidden_fullname" ->
+      safe_val NameDisplay.hidden_or_restricted_fullname_string
   | "history_file" ->
       if not p_auth then null_val
       else

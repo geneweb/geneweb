@@ -2,6 +2,7 @@ let esc x = (Util.escape_html x :> Adef.safe_string)
 let restricted_txt = Adef.safe "....."
 let x_x_txt = Adef.safe "x x"
 let hidden_name_txt = Adef.safe "x"
+let hidden_or_restricted_fullname_string = Adef.safe "SOMETHING TO DEFINE"
 
 module NameVisibilityUtil : sig
   type t = Gwdb.person
@@ -40,9 +41,10 @@ let map_person_name_visibility' ~on_hidden_name ~on_restricted_name
   | RestrictedName -> on_restricted_name conf base person
   | VisibleName _name_data -> on_visible_name conf base person
 
-let map_person_name_visibility ?(on_hidden_name = fun _ _ _ -> x_x_txt)
-    ?(on_restricted_name = fun _ _ _ -> restricted_txt) ~on_visible_name conf
-    base person =
+let map_person_name_visibility
+    ?(on_hidden_name = fun _ _ _ -> hidden_or_restricted_fullname_string)
+    ?(on_restricted_name = fun _ _ _ -> hidden_or_restricted_fullname_string)
+    ~on_visible_name conf base person =
   map_person_name_visibility' ~on_hidden_name ~on_restricted_name
     ~on_visible_name ~conf ~base ~person
 
