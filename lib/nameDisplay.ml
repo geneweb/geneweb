@@ -25,6 +25,14 @@ end = struct
     else VisibleName person
 end
 
+let is_hidden conf base person =
+  NameVisibilityUtil.(
+    name_visibility_of_person ~conf ~base ~person = HiddenName)
+
+let is_restricted conf base person =
+  NameVisibilityUtil.(
+    name_visibility_of_person ~conf ~base ~person = RestrictedName)
+
 let map_person_name_visibility' ~on_hidden_name ~on_restricted_name
     ~on_visible_name ~conf ~base ~person =
   match NameVisibilityUtil.name_visibility_of_person ~conf ~base ~person with
