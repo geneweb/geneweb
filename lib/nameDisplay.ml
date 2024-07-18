@@ -38,7 +38,14 @@ let map_person_name_visibility ?(on_hidden_name = fun _ _ _ -> x_x_txt)
   map_person_name_visibility' ~on_hidden_name ~on_restricted_name
     ~on_visible_name ~conf ~base ~person
 
-let map_first_name_data f conf base person =
+let map_first_name_data :
+    type a.
+    (first_name:string -> qualifier:string -> a) ->
+    Config.config ->
+    Gwdb.base ->
+    Gwdb.person ->
+    a =
+ fun f conf base person ->
   let first_name =
     match Gwdb.sou base (Gwdb.get_public_name person) with
     | "" -> Gwdb.p_first_name base person
@@ -52,15 +59,17 @@ let map_first_name_data f conf base person =
 
 let gen_first_name_html ~first_name ~qualifier =
   let open Def in
-  if qualifier = "" then esc first_name
-  else esc first_name ^^^ " <em>" ^<^ esc qualifier ^>^ "</em>"
+  if qualifier = "" then Adef.as_string (esc first_name)
+  else Adef.as_string (esc first_name ^^^ " <em>" ^<^ esc qualifier ^>^ "</em>")
 
 let gen_first_name_str ~first_name ~qualifier =
-  if qualifier = "" then Adef.safe first_name
-  else Adef.safe (first_name ^ " " ^ qualifier)
+  if qualifier = "" then first_name else first_name ^ " " ^ qualifier
 
-let first_name_html = map_first_name_data gen_first_name_html
-let first_name_str = map_first_name_data gen_first_name_str
+let first_name_html conf base person =
+  Adef.safe (map_first_name_data gen_first_name_html conf base person)
+
+let first_name_str conf base person =
+  map_first_name_data gen_first_name_str conf base person
 
 let map_fullname_data f conf base person =
   let surname = Gwdb.p_surname base person in
@@ -77,9 +86,7 @@ let fullname_html ~p_surname =
       fn_html ^^^ " " ^<^ esc surname)
 
 let fullname_str_of_person =
-  gen_fullname first_name_str (fun fn_str surname ->
-      let open Def in
-      fn_str ^>^ " " ^ surname)
+  gen_fullname first_name_str (fun fn_str surname -> fn_str ^ " " ^ surname)
 
 let first_name_html_of_person conf base person =
   map_person_name_visibility ~on_visible_name:first_name_html conf base person
