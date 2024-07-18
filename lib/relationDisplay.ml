@@ -130,8 +130,12 @@ let print_shortest_path conf base p1 p2 =
     | Some (path, ifam) ->
         print_relation_path conf base ip1 ip2 path ifam excl_faml
     | None ->
-        let s1 = gen_person_title_text reference conf base p1 in
-        let s2 = gen_person_title_text reference conf base p2 in
+        let s1 =
+          NameDisplay.gen_person_title_text NameDisplay.reference conf base p1
+        in
+        let s2 =
+          NameDisplay.gen_person_title_text NameDisplay.reference conf base p2
+        in
         Hutil.header_no_page_title conf title;
         if excl_faml = [] then (
           Output.print_sstring conf "<h1>";
@@ -361,7 +365,7 @@ let print_link_name conf base n p1 p2 sol =
   let info = (reltab, list) in
   if is_hide_names conf p2 && not (authorized_age conf base p2) then
     Output.print_sstring conf "x x"
-  else Output.print_string conf @@ person_title_text conf base p2;
+  else Output.print_string conf @@ NameDisplay.person_title_text conf base p2;
   Output.print_sstring conf " ";
   Output.print_sstring conf (transl conf "is");
   if n > 1 then (
@@ -457,7 +461,7 @@ let print_link_name conf base n p1 p2 sol =
   let s2 =
     if is_hide_names conf p1 && not (authorized_age conf base p1) then
       Adef.safe "x x"
-    else gen_person_title_text no_reference conf base p1
+    else NameDisplay.gen_person_title_text NameDisplay.no_reference conf base p1
   in
   let s =
     if x2 < x1 then
@@ -547,7 +551,7 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
   List.iter
     (fun (a, n) ->
       Output.print_sstring conf "<li>\n";
-      Output.print_string conf (person_title_text conf base a);
+      Output.print_string conf (NameDisplay.person_title_text conf base a);
       Output.print_sstring conf "\n<em>(";
       Output.print_sstring conf (string_of_int n);
       Output.print_sstring conf " ";
@@ -597,7 +601,9 @@ let print_solution_not_ancestor conf base long p1 p2 sol =
     | _ -> parents_label conf base info x
   in
   let print pp p (alab : Adef.safe_string) =
-    let s = gen_person_title_text no_reference conf base p in
+    let s =
+      NameDisplay.gen_person_title_text NameDisplay.no_reference conf base p
+    in
     let s =
       match pp with
       | None -> transl_a_of_b conf (alab :> string) (s :> string) (s :> string)
@@ -677,7 +683,7 @@ let print_dag_links conf base p1 p2 rl =
           let a = pget conf base ip in
           if not is_anc then (
             Output.print_sstring conf "<li>";
-            Output.print_string conf (person_title_text conf base a);
+            Output.print_string conf (NameDisplay.person_title_text conf base a);
             Output.print_sstring conf (Util.transl conf ":");
             Output.print_sstring conf " ");
           Output.print_sstring conf "<a href=\"";
@@ -750,11 +756,13 @@ let print_propose_upto conf base p1 p2 rl =
       Output.print_string conf (Image.prefix conf);
       Output.print_sstring conf
         {|/picto_fleche_bleu.png" alt=""> <span class="smaller">|};
-      let s = (person_title_text conf base p : Adef.safe_string :> string) in
+      let s =
+        (NameDisplay.person_title_text conf base p : Adef.safe_string :> string)
+      in
       transl_a_of_b conf (transl conf "ancestors") s s
       |> translate_eval |> Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf " ";
-      (person_title_text conf base a : Adef.safe_string :> string)
+      (NameDisplay.person_title_text conf base a : Adef.safe_string :> string)
       |> transl_decline conf "up to"
       |> Output.print_sstring conf;
       Output.print_sstring conf {|&nbsp;<img src="|};
@@ -867,8 +875,8 @@ let print_main_relationship conf base long p1 p2 rel =
         Output.print_sstring conf " ")
       else (
         ([
-           gen_person_title_text reference conf base p1;
-           gen_person_title_text reference conf base p2;
+           NameDisplay.gen_person_title_text NameDisplay.reference conf base p1;
+           NameDisplay.gen_person_title_text NameDisplay.reference conf base p2;
          ]
           : Adef.safe_string list
           :> string list)
@@ -940,7 +948,8 @@ let print_no_relationship conf base pl =
   List.iter
     (fun p ->
       Output.print_sstring conf "<li>";
-      Output.print_string conf (referenced_person_title_text conf base p);
+      Output.print_string conf
+        (NameDisplay.referenced_person_title_text conf base p);
       Output.print_sstring conf "</li>")
     pl;
   Output.print_sstring conf "</ul>";
