@@ -246,8 +246,8 @@ let print_cousins conf base p lev1 lev2 =
       let txt = NameDisplay.fullname_html_of_person conf base p in
       transl_a_of_gr_eq_gen_lev conf a
         (if h then
-         (NameDisplay.fullname_str_of_person conf base p
-           : Adef.safe_string
+         ((Util.escape_html (NameDisplay.fullname_str_of_person conf base p)
+            :> Adef.safe_string)
            :> string)
         else (txt : Adef.safe_string :> string))
         (txt : Adef.safe_string :> string)

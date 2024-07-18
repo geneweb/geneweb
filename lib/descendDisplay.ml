@@ -47,7 +47,12 @@ let text_level conf = function
 
 let descendants_title conf base p h =
   let s1 = NameDisplay.fullname_html_of_person conf base p in
-  let s2 = if h then NameDisplay.fullname_str_of_person conf base p else s1 in
+  let s2 =
+    if h then
+      (Util.escape_html (NameDisplay.fullname_str_of_person conf base p)
+        :> Adef.safe_string)
+    else s1
+  in
   translate_eval
     (transl_a_of_gr_eq_gen_lev conf
        (transl conf "descendants")
@@ -1231,7 +1236,10 @@ let make_tree_hts conf base gv p =
 let print_tree conf base v p =
   let gv = min (limit_by_tree conf) v in
   let page_title =
-    let s = NameDisplay.fullname_str_of_person conf base p in
+    let s =
+      (Util.escape_html (NameDisplay.fullname_str_of_person conf base p)
+        :> Adef.safe_string)
+    in
     translate_eval
       (transl_a_of_gr_eq_gen_lev conf
          (transl conf "descendants")
