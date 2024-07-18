@@ -479,7 +479,8 @@ let print_branch conf base psn name =
       Output.print_string conf
         (render p
            (NameDisplay.map_person_name_visibility
-              ~on_hidden_name:(fun _ _ _ -> NameDisplay.hidden_name_txt)
+              ~on_hidden_name:(fun _ _ _ ->
+                NameDisplay.hidden_or_restricted_fullname_string)
               ~on_visible_name:(fun conf base p ->
                 if (not psn) && (not with_sn) && Gwdb.p_surname base p = name
                 then NameDisplay.first_name_html_of_person conf base p
