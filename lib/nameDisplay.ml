@@ -79,7 +79,11 @@ let first_name_html conf base person =
   Adef.safe (map_first_name_data gen_first_name_html conf base person)
 
 let first_name_str_of_person conf base person =
-  map_first_name_data gen_first_name_str conf base person
+  map_person_name_visibility'
+    ~on_hidden_name:(fun _ _ _ -> (hidden_or_restricted_fullname_string :> string))
+    ~on_restricted_name:(fun _ _ _ -> (hidden_or_restricted_fullname_string :> string))
+    ~on_visible_name:(map_first_name_data gen_first_name_str)
+    ~conf ~base ~person
 
 let map_fullname_data f conf base person =
   let surname = Gwdb.p_surname base person in
@@ -95,9 +99,13 @@ let fullname_html ~p_surname =
       let open Def in
       fn_html ^^^ " " ^<^ esc surname)
 
-let fullname_str_of_person =
-  gen_fullname first_name_str_of_person (fun fn_str surname ->
-      fn_str ^ " " ^ surname)
+let fullname_str_of_person conf base person =
+    map_person_name_visibility'
+    ~on_hidden_name:(fun _ _ _ -> (hidden_or_restricted_fullname_string :> string))
+    ~on_restricted_name:(fun _ _ _ -> (hidden_or_restricted_fullname_string :> string))
+    ~on_visible_name:(gen_fullname first_name_str_of_person (fun fn_str surname ->
+      fn_str ^ " " ^ surname))
+    ~conf ~base ~person
 
 let first_name_html_of_person conf base person =
   map_person_name_visibility ~on_visible_name:first_name_html conf base person
