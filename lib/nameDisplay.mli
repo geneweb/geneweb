@@ -1,4 +1,6 @@
 val hidden_name_txt : Adef.safe_string
+val is_hidden : Config.config -> Gwdb.base -> Gwdb.person -> bool
+val is_restricted : Config.config -> Gwdb.base -> Gwdb.person -> bool
 
 val map_person_name_visibility :
   ?on_hidden_name:
