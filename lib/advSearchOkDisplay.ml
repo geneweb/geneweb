@@ -22,7 +22,7 @@ let print_result conf base max_answers (list, len) =
           (NameDisplay.referenced_person_text conf base p);
         Output.print_string conf (DateDisplay.short_dates_text conf base p);
         Output.print_sstring conf "<em>";
-        specify_homonymous conf base p false;
+        NameDisplay.specify_homonymous conf base p false;
         Output.print_sstring conf "</em>")
       list;
     if len > max_answers then Output.print_sstring conf "<li>...</li>";
