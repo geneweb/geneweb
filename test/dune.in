@@ -7,7 +7,7 @@
 
 (test
   (name test)
-  (libraries %%%SOSA_PKG%%% dummy_gwdb geneweb geneweb_def_show oUnit stdlib-shims)
+  (libraries %%%SOSA_PKG%%% dummy_gwdb geneweb geneweb_def_show oUnit stdlib-shims alcotest)
   (preprocess (pps ppx_deriving.show))
   (modules
     test

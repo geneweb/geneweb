@@ -6,3 +6,8 @@ let _ =
     >::: [] @ Test_calendar.suite @ Test_chronology.suite
          @ Test_place.suite @ Test_sosa.suite @ Test_utils.suite
          @ Test_wiki.suite)
+
+let () =
+  try
+    Alcotest.run ~and_exit:false "Geneweb" []
+  with Alcotest.Test_error -> ()
