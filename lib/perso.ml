@@ -3172,7 +3172,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
   | "father_age_at_birth" ->
       string_of_parent_age conf base ep Gwdb.get_father |> safe_val
   | "first_name" ->
-      if (not p_auth) && Util.is_hide_names conf p then str_val "x"
+      if (not p_auth) && Util.is_hide_names conf p then
+        str_val (NameDisplay.hidden_name_txt :> string)
       else Gwdb.p_first_name base p |> Util.escape_html |> safe_val
   | "first_name_key" ->
       if Util.is_hide_names conf p && not p_auth then null_val
@@ -3426,7 +3427,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
       | Vstring s -> safe_val (Notes.source_note conf base p s)
       | _ -> raise Not_found)
   | "surname" ->
-      if (not p_auth) && Util.is_hide_names conf p then str_val "x"
+      if (not p_auth) && Util.is_hide_names conf p then
+        str_val (NameDisplay.hidden_name_txt :> string)
       else Gwdb.p_surname base p |> Util.escape_html |> safe_val
   | "surname_begin" ->
       if (not p_auth) && Util.is_hide_names conf p then null_val
@@ -3434,7 +3436,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) = function
         Gwdb.p_surname base p |> Util.surname_particle base |> Util.escape_html
         |> safe_val
   | "surname_end" ->
-      if (not p_auth) && Util.is_hide_names conf p then str_val "x"
+      if (not p_auth) && Util.is_hide_names conf p then
+        str_val (NameDisplay.hidden_name_txt :> string)
       else
         Gwdb.p_surname base p
         |> Util.surname_without_particle base
