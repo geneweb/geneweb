@@ -794,15 +794,19 @@
             <div class="col mt-2">
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="access" value="IfTitles" id="IfTitles"%if;acc_if_titles; checked%end;>
-                <label class="form-check-label" for="IfTitles">[*if titles]0</label>
+                <label class="form-check-label" for="IfTitles">[*iftitles/public/semipublic/private]0</label>
               </div>
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="access" value="Public" id="Public"%if;acc_public; checked%end;>
-                <label class="form-check-label" for="Public">[*public]0</label>
+                <label class="form-check-label" for="Public">[*iftitles/public/semipublic/private]1</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="access" value="SemiPublic" id="SemiPublic"%if;acc_semi_public; checked%end;>
+                <label class="form-check-label" for="SemiPublic">[*iftitles/public/semipublic/private]2</label>
               </div>
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="access" value="Private" id="Private"%if;acc_private; checked%end;>
-                <label class="form-check-label" for="Private">[*private]0</label>
+                <label class="form-check-label" for="Private">[*iftitles/public/semipublic/private]3</label>
               </div>
             </div>
           </div>

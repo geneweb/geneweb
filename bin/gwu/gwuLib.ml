@@ -341,7 +341,8 @@ let print_infos opts base is_child csrc cbp p =
   (match get_access p with
   | IfTitles -> ()
   | Public -> Printf.ksprintf (oc opts) " #apubl"
-  | Private -> Printf.ksprintf (oc opts) " #apriv");
+  | Private -> Printf.ksprintf (oc opts) " #apriv"
+  | SemiPublic -> Printf.ksprintf (oc opts) " #semipub");
   print_if_no_empty opts base "#occu" (get_occupation p);
   print_src_if_not_equal_to opts csrc base "#src" (get_psources p);
   (match Date.od_of_cdate (get_birth p) with

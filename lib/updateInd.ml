@@ -42,6 +42,7 @@ and eval_simple_var conf base env p = function
   | [ "alias" ] -> eval_string_env "alias" env
   | [ "acc_if_titles" ] -> bool_val (p.access = IfTitles)
   | [ "acc_private" ] -> bool_val (p.access = Private)
+  | [ "acc_semi_public" ] -> bool_val (p.access = SemiPublic)
   | [ "acc_public" ] -> bool_val (p.access = Public)
   | [ "bapt_place" ] ->
       safe_val (Util.escape_html p.baptism_place :> Adef.safe_string)
