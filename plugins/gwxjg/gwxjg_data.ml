@@ -369,7 +369,10 @@ and ppget conf base p =
       in
       Tpat
         (function
-        | "first_name" | "surname" -> Tsafe "x"
+        | "first_name" -> Tsafe (NameDisplay.hidden_first_name_txt :> string)
+        | "surname" -> Tsafe (NameDisplay.hidden_surname_txt :> string)
+        | "name_is_hidden" -> Tbool true
+        | "name_is_restricted" -> Tbool true
         | "first_name_aliases" | "surname_aliases" -> Tlist []
         | x -> (Lazy.force lazy_p) x)
     else unsafe_mk_semi_public_person conf base p
@@ -624,6 +627,8 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
   let surname = Tstr (E.surname base p) in
   let surname_aliases = mk_str_lst base (Gwdb.get_surnames_aliases p) in
   let events = Tlist [] in
+  let name_is_hidden = Tbool (NameDisplay.is_hidden conf base p) in
+  let name_is_restricted = Tbool (NameDisplay.is_restricted conf base p) in
   Tpat
     (function
     | "access_url" -> access_url
@@ -644,6 +649,8 @@ and unsafe_mk_semi_public_person conf base (p : Gwdb.person) =
     | "spouses" -> spouses
     | "surname" -> surname
     | "surname_aliases" -> surname_aliases
+    | "name_is_hidden" -> name_is_hidden
+    | "name_is_restricted" -> name_is_restricted
     | _ -> raise Not_found)
 
 and get_sosa_person =
@@ -807,6 +814,8 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
           lazy_list (mk_event conf base) (other_marriage_events father),
           lazy_list (mk_event conf base) (other_marriage_events mother) )
   in
+  let name_is_hidden = Tbool (NameDisplay.is_hidden conf base p) in
+  let name_is_restricted = Tbool (NameDisplay.is_restricted conf base p) in
   Tpat
     (function
     | "access_url" -> access_url
@@ -849,6 +858,8 @@ and unsafe_mk_person conf base (p : Gwdb.person) =
     | "parent_marriage" -> parent_marriage
     | "father_re_marriages" -> father_re_marriages
     | "mother_re_marriages" -> mother_re_marriages
+    | "name_is_hidden" -> name_is_hidden
+    | "name_is_restricted" -> name_is_restricted
     | _ -> raise Not_found)
 
 (* take optionnal p parameter for spouse things? *)
