@@ -80,3 +80,6 @@ val set_wrap_output :
   (Config.config -> Adef.safe_string -> (unit -> unit) -> unit) -> unit
 
 val set_has_ignored_duplicates : (Config.config -> Gwdb.base -> bool) -> unit
+
+val compose_process_config : (Config.config -> Config.config) -> unit
+val process_config : Config.config -> Config.config
