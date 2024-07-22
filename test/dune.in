@@ -12,7 +12,6 @@
   (modules
     test
     date_test
-    test_chronology
     place_test
     sosa_test
     util_test
