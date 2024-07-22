@@ -1,5 +1,6 @@
 (library
   (name dummy_gwdb)
+  (public_name geneweb.dummy_gwdb)
   (libraries geneweb.def geneweb.util stdlib-shims)
   (implements geneweb.gwdb_driver)
   (modules gwdb_driver)
@@ -10,18 +11,14 @@
   (libraries
     %%%SOSA_PKG%%%
     %%%GWDB_PKG%%%
-    geneweb
-    geneweb_def_show
     geneweb.ged2gwb_lib
     geneweb.gwb2ged_lib
     geneweb.gwexport_lib
     geneweb.gwu_lib
     geneweb.gwc_lib
-    oUnit
-    stdlib-shims
+    geneweb
     alcotest
     )
-  (preprocess (pps ppx_deriving.show))
   (modules
     test
     date_test
