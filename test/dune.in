@@ -17,7 +17,7 @@
     sosa_test
     test_utils
     test_utils
-    test_wiki
+    wiki_test
     )
 )
 
