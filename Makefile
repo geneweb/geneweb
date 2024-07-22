@@ -67,6 +67,7 @@ GENERATED_FILES_DEP = \
 	dune-workspace \
 	hd/etc/version.txt \
 	lib/dune \
+	test/dune \
 	lib/gwdb/dune \
 	lib/core/dune \
 	lib/gwlib.ml \
@@ -89,7 +90,6 @@ GENERATED_FILES_DEP = \
 	bin/gwu/dune \
 	bin/setup/dune \
 	bin/update_nldb/dune \
-	test/dune \
 
 generated: $(GENERATED_FILES_DEP)
 
@@ -195,6 +195,7 @@ opendoc: doc
 
 test: ## Run tests
 test: | $(GENERATED_FILES_DEP)
+	ocaml ./configure.ml --release
 	dune build @runtest
 .PHONY: test
 
@@ -227,12 +228,9 @@ clean:
 	@echo " Done!"
 .PHONY: clean
 
-ci: ## Run unit tests and benchmark with different configurations
+ci: ## Run unit tests
 ci:
-	@ocaml ./configure.ml && BENCH_NAME=vanilla $(MAKE) -s clean test bench-marshal clean
-	@ocaml ./configure.ml --sosa-num && BENCH_NAME=num $(MAKE) -s clean test bench-marshal clean
-	@ocaml ./configure.ml --sosa-zarith && BENCH_NAME=zarith $(MAKE) -s clean test bench-marshal clean
-	@$(MAKE) -s bench-tabulate
+	@ocaml ./configure.ml --gwdb-test --release && $(MAKE) -s clean build && GENEWEB_CI=on dune runtest
 .PHONY: ci
 
 ocp-indent: ## Run ocp-indent (inplace edition)
