@@ -53,6 +53,7 @@ module Default = struct
             | Conflict -> "409"
             | Internal_Server_Error -> "500"
             | Service_Unavailable -> "503"
+            | Gateway_Timeout -> "504"
             | OK | Moved_Temporarily -> assert false
           in
           let fname lang =

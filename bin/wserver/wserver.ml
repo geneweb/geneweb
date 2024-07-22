@@ -57,6 +57,7 @@ let http status =
       | Def.Conflict -> "409 Conflict"
       | Def.Internal_Server_Error -> "500 Internal Server Error"
       | Def.Service_Unavailable -> "503 Service Unavailable"
+      | Def.Gateway_Timeout -> "504 Gateway Timeout"
     in
     if !cgi then (
       output_string !wserver_oc "Status: ";
@@ -137,6 +138,11 @@ let string_of_sockaddr = function
   | Unix.ADDR_INET (a, _) -> Unix.string_of_inet_addr a
 
 let sockaddr_of_string s = Unix.ADDR_UNIX s
+
+let request_timeout () =
+  if !printing_state = Nothing then http Def.Gateway_Timeout;
+  wflush ();
+  exit 0
 
 let default_timeout tmout =
   if !printing_state = Nothing then http Def.OK;
