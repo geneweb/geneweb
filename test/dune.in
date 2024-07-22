@@ -11,7 +11,7 @@
   (preprocess (pps ppx_deriving.show))
   (modules
     test
-    test_calendar
+    date_test
     test_chronology
     place_test
     test_sosa
