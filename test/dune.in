@@ -13,7 +13,7 @@
     test
     test_calendar
     test_chronology
-    test_place
+    place_test
     test_sosa
     test_utils
     test_utils
