@@ -15,8 +15,7 @@
     test_chronology
     place_test
     sosa_test
-    test_utils
-    test_utils
+    util_test
     wiki_test
     )
 )
