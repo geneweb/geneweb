@@ -1587,7 +1587,7 @@ type misc_fname =
   | Ttf of string
   | Woff of string
   | Woff2 of string
-  | Cache of string
+  | CacheGz of string
 
 let content_misc conf len misc_fname =
   Output.status conf Def.OK;
@@ -1604,7 +1604,7 @@ let content_misc conf len misc_fname =
     | Ttf fname -> fname, "application/font-ttf"
     | Woff fname -> fname, "application/font-woff"
     | Woff2 fname -> fname, "application/font-woff2"
-    | Cache fname -> fname, "text/plain"
+    | CacheGz fname -> fname, "application/gzip"
   in
   Output.header conf "Content-type: %s" t;
   Output.header conf "Content-length: %d" len;
@@ -1628,7 +1628,7 @@ let find_misc_file name =
 let print_misc_file conf misc_fname =
   match misc_fname with
     Css fname | Js fname | Otf fname | Svg fname | Woff fname | Eot fname |
-    Ttf fname | Woff2 fname | Cache fname ->
+    Ttf fname | Woff2 fname | CacheGz fname ->
       begin
         try
           let ic = Secure.open_in_bin fname in
@@ -1680,7 +1680,7 @@ let misc_request conf fname =
       else if Filename.check_suffix fname ".ttf" then Ttf fname
       else if Filename.check_suffix fname ".woff2" then Woff2 fname
       else if Filename.check_suffix fname ".png" then Png fname
-      else if Filename.check_suffix fname ".cache" then Cache fname
+      else if Filename.check_suffix fname ".cache.gz" then CacheGz fname
       else Other fname
     in
     print_misc_file conf misc_fname
