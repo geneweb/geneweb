@@ -7,7 +7,20 @@
 
 (test
   (name test)
-  (libraries %%%SOSA_PKG%%% dummy_gwdb geneweb geneweb_def_show oUnit stdlib-shims alcotest)
+  (libraries
+    %%%SOSA_PKG%%%
+    %%%GWDB_PKG%%%
+    geneweb
+    geneweb_def_show
+    geneweb.ged2gwb_lib
+    geneweb.gwb2ged_lib
+    geneweb.gwexport_lib
+    geneweb.gwu_lib
+    geneweb.gwc_lib
+    oUnit
+    stdlib-shims
+    alcotest
+    )
   (preprocess (pps ppx_deriving.show))
   (modules
     test
@@ -16,12 +29,8 @@
     sosa_test
     util_test
     wiki_test
+    ports_test
     )
-)
-
-(test
-  (name ports)
-  (libraries %%%GWDB_PKG%%% %%%SOSA_PKG%%% geneweb geneweb.ged2gwb_lib geneweb.gwb2ged_lib geneweb.gwexport_lib geneweb.gwu_lib geneweb.gwc_lib)
-  (modules ports)
   (deps assets/royal92.ged assets/abc.ged)
 )
+
