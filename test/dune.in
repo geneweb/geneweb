@@ -14,7 +14,7 @@
     date_test
     test_chronology
     place_test
-    test_sosa
+    sosa_test
     test_utils
     test_utils
     test_wiki
