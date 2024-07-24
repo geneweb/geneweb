@@ -49,10 +49,27 @@
 .z-index1 {
   z-index:1;
 }
+
+/* Highlight invisible caracters */
+.hl-evilunichar {
+  background-color: #ffd54f;
+  border-radius: 2px;
+}
+
+.hl-nbsp {
+  background-color: #ffe2e2;
+  border-radius: 2px;
+}
+
+.editable-div {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
 /* Light grey background color highlight for the toolbar characters.txt */
-  .ch .hl {
-    background-color: #f0f0f0;
-  }
+.ch .hl {
+    background-color: #ffe2e2;
+}
 
 .dropdown-menu-transl {
   -webkit-transform: translate(-16%, 0) !important;
@@ -86,9 +103,20 @@ html {
   font-size: 1rem;
 }
 
+
+/* grey empty inputs with placeholder to better see empty fields in forms */
+input:placeholder-shown {
+  background-color: #f9f9f9;
+}
+
 /* Upd_ind/fam forms scroll fix */
 #updform {
   scroll-padding-top: 52px;
+}
+
+/* Ascendant table by couple anchor fix */
+#scrollfix {
+  scroll-padding-top: 48px;
 }
 
 /* Books */
@@ -100,10 +128,31 @@ html {
   transform: translateX(-5px) translateY(1px);
   z-index: 1000;
 }
+
+/* White overlay for autoSelectLink function when s1 or s2 parameters are present in URL */
+#loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  z-index: 9999;
+}
+
  /* Light green background for odd-numbered items */
 .src-list-bg li:nth-child(even) {
   background-color: #e4f5df;
 }
+
+.greek-char {
+    background-color: #6edf5e54 !important
+}
+
+.cyrillic-char {
+    background-color: #9ef7c5ab !important
+}
+
 #book {
   scroll-padding-top: 4rem;
 }
@@ -210,10 +259,40 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
 }
 
 /* --- Ascendants/Descendants table --- */
-/* Border and background styles for table headers */
-.asc-desc-table th,
+/* Border and background styles for table headers, th and td */
+.asc-desc-table thead, .asc-desc-table th {
+  border: 1px solid #a0a0a0 !important;
+  padding: 0.3rem;
+  font-family: 'Open Sans', Roboto, sans-serif;
+}
+
+.asc-desc-table th.gen-row {
+  border-right-width: 0px !important;
+  border-left-width: 0px !important;
+}
+
+.asc-desc-table tr.even-row:not(:has(th) + tr) {
+  border-top-style: solid !important;
+  border-top-width: 1px !important;
+  border-top-color: #a0a0a0; !important;
+}
+
 .asc-desc-table td {
-  border: 1px solid black;
+  padding: 0.1rem 0.3rem;
+  border: 1px dotted #a0a0a0;
+  font-family: 'Open Sans', Roboto, sans-serif;
+}
+
+.asc-desc-table td.side-border-male {
+  border-right-width: 2px;
+  border-left-width: 2px;
+  border-color: #318CE7;
+}
+
+.asc-desc-table td.side-border-female {
+  border-right-width: 2px;
+  border-left-width: 2px;
+  border-color: #F653A6;
 }
 
 .asc-desc-table thead {
@@ -227,6 +306,14 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
   box-shadow: 0 0 0 1px black;
 }
 
+.bg-lg, .bg-lg>td, .bg-lg>th {
+  background-color: rgb(131 131 131 / 13%)
+}
+
+.bg-ly-incomplete, .bg-ly-incomplete>td, .bg-ly-incomplete>th {
+  background-color: rgb(255 238 186 / 45%);
+}
+
 .table-img-max-width {
   max-width: 200px;
 }
@@ -236,9 +323,10 @@ Unicode Ranges: 0030-0039,0061-007A,00A0,2500-2503,250A,2514,2517,251C,2523,252C
 }
 
 .divorced-side-border {
-  border-left: 2px dotted #808080 !important;
-  border-right: 2px dotted #808080 !important;
+  border-left: 1px dashed #808080 !important;
+  border-right: 1px dashed #808080 !important;
 }
+
 /* Specific hover effect for the link inside the table cell */
 .table_big_cell:hover,
 .ascdesc_table a:hover,

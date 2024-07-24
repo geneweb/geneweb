@@ -24,16 +24,16 @@
 %message_to_wizard;
 %( do not use %include;perso_header %)
 %include_perso_header;
-%let;datalist_aliases;%if;(b.datalist_aliases=1) list="datalist_aliases"%end;%in;
-%let;datalist_estates;%if;(b.datalist_estates=1) list="datalist_estates"%end;%in;
-%let;datalist_fnames;%if;(b.datalist_fnames=1) list="datalist_fnames"%end;%in;
-%let;datalist_occupations;%if;(b.datalist_occupations=1) list="datalist_occupations"%end;%in;
-%let;datalist_places;%if;(b.datalist_places=1) list="datalist_places"%end;%in;
-%let;datalist_pub_names;%if;(b.datalist_pub_names=1) list="datalist_pub_names"%end;%in;
-%let;datalist_qualifiers;%if;(b.datalist_qualifiers=1) list="datalist_qualifiers"%end;%in;
-%let;datalist_snames;%if;(b.datalist_snames=1) list="datalist_snames"%end;%in;
-%let;datalist_titles;%if;(b.datalist_titles=1) list="datalist_titles"%end;%in;
-%let;datalist_sources;%if;(b.datalist_sources=1) list="datalist_sources"%end;%in;
+%let;datalist_aliases; list="datalist_aliases" data-book="alias"%in;
+%let;datalist_estates; list="datalist_estates" data-book="domain"%in;
+%let;datalist_fnames; list="datalist_fnames" data-book="fn"%in;
+%let;datalist_occupations; list="datalist_occupations" data-book="occu"%in;
+%let;datalist_places; list="datalist_places" data-book="place"%in;
+%let;datalist_pub_names; list="datalist_pub_names" data-book="pubn"%in;
+%let;datalist_qualifiers; list="datalist_qualifiers" data-book="qual"%in;
+%let;datalist_snames; list="datalist_snames" data-book="sn"%in;
+%let;datalist_titles; list="datalist_titles" data-book="title"%in;
+%let;datalist_sources; list="datalist_sources" data-book="src"%in;
 %define;nav()
   <div class="container fixed-top" role="navigation">
     <nav class="navbar navbar-light bg-white justify-content-center" id="banner">

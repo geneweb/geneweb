@@ -11,6 +11,7 @@
   %include;css
 </head>
 <body%body_prop;>
+<div id="loading-overlay"></div>
 %include;hed
 %include;home
 %define;subsection(x)
@@ -74,15 +75,13 @@
                 <div class="list-group-item list-group-item-action list-group-item-info w-auto px-3 position-relative sup-char-div" tabindex="%expr(len_s+(2*cnt)+5)">
                   <a class="stretched-link sup-char" href="%prefix;m=MOD_DATA&data=%e.data;&s=%html_encode.entry_ini;"
                       title="[*search/case sensitive]0 “%entry_ini;”" >%entry_ini;</a>
-                    %if;(e.s!="")
-                      %if;(max>0 and nb_results<nb_max)%nn;
-                        <span class="bottom-book-arrow">
-                          <a href="#_%entry_ini;" title="%apply;subsection%with;“%entry_ini;”%end;"
-                            aria-label="%apply;subsection%with;“%entry_ini;”%end;" tabindex="%expr(len_s+(2*cnt)+6)">
-                            <i class="fa-solid fa-sort-down fa-2xs p-0 text-white"></i>
-                          </a>
-                        </span>
-                      %end;
+                    %if;(max>0 and nb_results<nb_max)%nn;
+                      <span class="bottom-book-arrow">
+                        <a href="#_%entry_ini;" title="%apply;subsection%with;“%entry_ini;”%end;"
+                          aria-label="%apply;subsection%with;“%entry_ini;”%end;" tabindex="%expr(len_s+(2*cnt)+6)">
+                          <i class="fa-solid fa-sort-down fa-2xs p-0 text-white"></i>
+                        </a>
+                      </span>
                     %end;
                 </div>
               %end;
@@ -210,7 +209,7 @@
                         <div class="pl-3 pr-sm-3 text-muted">
                       %else;
                         <a role="button" class="ml-2"
-                           href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.e.s;">
+                           href="%prefix;m=MOD_DATA&data=%e.data;&key=%entry_key;&s=%encode.e.s;" data-entry="%escape.printable.entry_value_unsort;">%nn;
                       %end;
                       %if;(e.data="place" and suburb!="")
                         %if;is_modified;%escape.entry_value;
@@ -257,14 +256,14 @@
                             %if;(e.data="fn")
                               <div class="form-check form-check-inline ml-sm-2">
                                 <label class="form-check-label">
-                                  <input class="form-check-input w-auto" type="checkbox" id="first_name_aliases" name="first_name_aliases" value="yes" autofocus> [*add the previous name as a first name alias]
+                                  <input class="form-check-input w-auto" type="checkbox" id="first_name_aliases" name="first_name_aliases" value="yes"> [*add the previous name as a first name alias]
                                 </label>
                               </div>
                             %end;
                             %if;(e.data="sn")
                               <div class="form-check form-check-inline mt-2 mt-sm-0 ml-sm-2">
                                 <label class="form-check-label">
-                                  <input class="form-check-input w-auto" type="checkbox" id="surname_aliases" name="surname_aliases" value="yes" autofocus> [*add the previous name as a surname alias]
+                                  <input class="form-check-input w-auto" type="checkbox" id="surname_aliases" name="surname_aliases" value="yes"> [*add the previous name as a surname alias]
                                 </label>
                               </div>
                             %end;
@@ -338,6 +337,71 @@
       });
     });
   });
+
+// Removing overlay when “key̛” parameter is present
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('key') || (!urlParams.has('s1'))) {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) { overlay.style.display = 'none'; }
+    }
+});
+
+function autoSelectLink() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('key') || (!urlParams.has('s1') && !urlParams.has('s2'))) return;
+    const sParam = urlParams.get('s');
+    const s1Param = urlParams.get('s1');
+    const s2Param = urlParams.get('s2');
+    const value = s1Param !== null && s1Param !== '' ? s1Param : sParam;
+    if (s2Param) { localStorage.setItem('s2Tmp', decodeURIComponent(s2Param)); }
+    if (value) {
+        const link = Array.from(document.getElementsByTagName('a')).find(
+            a => a.getAttribute('data-entry') === decodeURIComponent(value) && a.href.includes('key')
+        );
+        if (link) { link.click(); }
+    }
+}
+
+function updateInputField() {
+    const s2 = localStorage.getItem('s2Tmp');
+    if (s2 && window.location.href.includes('key=')) {
+        const input = document.getElementById('nx_input');
+        if (input) {
+            input.value = s2;
+            localStorage.removeItem('s2Tmp');
+        }
+    }
+}
+
+window.addEventListener('load', autoSelectLink);
+window.addEventListener('DOMContentLoaded', updateInputField);
 </script>
+
+%if;(e.s="")
+<script>
+// Highlight greek and cyrillic initials to avoid confusion with similar latin letters
+const {regex} = Regex;
+const scripts = ['Greek', 'Cyrillic'];
+
+function highlightNonLatinChars() {
+  const divs = document.querySelectorAll('.sup-char-div');
+
+  divs.forEach(div => {
+    const link = div.querySelector('.sup-char');
+    if (!link) return;
+
+    const char = link.textContent.trim();
+
+    scripts.forEach(script => {
+      if (regex`\p{Script=${script}}`.test(char)) {
+        div.classList.add(`${script.toLowerCase()}-char`);
+      }
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded', highlightNonLatinChars);
+</script>
+%end;
 </body>
 </html>
