@@ -11,20 +11,22 @@ type somebody =
   | Undefined of key  (** Reference to person *)
   | Defined of (iper, iper, string) gen_person  (** Person's definition *)
 
+type 'a assumption = Weak of 'a | Strong of 'a
+
 (** Blocks that could appear in .gw file. *)
 type gw_syntax =
   | Family of
       somebody gen_couple
-      * sex
-      * sex
-      * (somebody * sex) list
+      * sex assumption
+      * sex assumption
+      * (somebody * sex assumption) list
       * (string gen_fam_event_name
         * cdate
         * string
         * string
         * string
         * string
-        * (somebody * sex * witness_kind * string) list)
+        * (somebody * sex assumption * witness_kind * string) list)
         list
       * ((iper, iper, string) gen_person, ifam, string) gen_family
       * (iper, iper, string) gen_person gen_descend
@@ -40,7 +42,8 @@ type gw_syntax =
   | Notes of key * string
       (** Block that defines personal notes. First element represents
       reference to person. Second is note's content. *)
-  | Relations of somebody * sex * (somebody, string) gen_relation list
+  | Relations of
+      somebody * sex assumption * (somebody, string) gen_relation list
       (** Block that defines relations of a person with someone outisde of
       family block (like foster parents) (field {i rparents}). Contains:
       - Concerned person definition/reference
@@ -48,14 +51,14 @@ type gw_syntax =
       - List of his relations. *)
   | Pevent of
       somebody
-      * sex
+      * sex assumption
       * (string gen_pers_event_name
         * cdate
         * string
         * string
         * string
         * string
-        * (somebody * sex * witness_kind * string) list)
+        * (somebody * sex assumption * witness_kind * string) list)
         list
       (** Block that defines events of a person. Specific to gwplus format. Contains:
       - Concerned person's definition/reference
@@ -73,6 +76,9 @@ type gw_syntax =
 
 (** {i .gw} file encoding *)
 type encoding = E_utf_8 | E_iso_8859_1
+
+let make_strong_assumption v = Strong v
+let make_weak_assumption v = Weak v
 
 (** .gwo file header *)
 let magic_gwo = "GnWo000o"
@@ -705,20 +711,29 @@ let get_mar_date str = function
         let decode_sex v c l =
           let decode_sex i =
             match c.[i] with
-            | 'm' -> Male
-            | 'f' -> Female
-            | '?' -> Neuter
+            | 'm' -> make_strong_assumption Male
+            | 'f' -> make_strong_assumption Female
+            | '?' -> make_strong_assumption Neuter
             | _ -> failwith __LOC__
           in
           try ((v, decode_sex 0, decode_sex 1), l)
-          with _ -> ((v, Male, Female), c :: l)
+          with _ ->
+            ((v, make_weak_assumption Male, make_weak_assumption Female), c :: l)
         in
         match l with
-        | "#nm" :: l -> ((NotMarried, Male, Female), l)
-        | "#eng" :: l -> ((Engaged, Male, Female), l)
+        | "#nm" :: l ->
+            ( ( NotMarried,
+                make_weak_assumption Male,
+                make_weak_assumption Female ),
+              l )
+        | "#eng" :: l ->
+            ( (Engaged, make_weak_assumption Male, make_weak_assumption Female),
+              l )
         | "#noment" :: c :: l when String.length c = 2 ->
             decode_sex NoMention c l
-        | "#noment" :: l -> ((NoMention, Male, Female), l)
+        | "#noment" :: l ->
+            ( (NoMention, make_weak_assumption Male, make_weak_assumption Female),
+              l )
         | "#nsck" :: c :: l when String.length c = 2 ->
             decode_sex NoSexesCheckNotMarried c l
         | "#nsckm" :: c :: l when String.length c = 2 ->
@@ -732,7 +747,9 @@ let get_mar_date str = function
         | "#pacs" :: c :: l when String.length c = 2 -> decode_sex Pacs c l
         | "#residence" :: c :: l when String.length c = 2 ->
             decode_sex Residence c l
-        | _ -> ((Married, Male, Female), l)
+        | _ ->
+            ( (Married, make_weak_assumption Male, make_weak_assumption Female),
+              l )
       in
       let place, l = get_field "#mp" l in
       let note, l = get_field "#mn" l in
@@ -1019,9 +1036,9 @@ let loop_witn state line ic =
         let sex, l =
           (* TODO factorize sex parsing? *)
           match l with
-          | "m:" :: l -> (Male, l)
-          | "f:" :: l -> (Female, l)
-          | l -> (Neuter, l)
+          | "m:" :: l -> (make_strong_assumption Male, l)
+          | "f:" :: l -> (make_strong_assumption Female, l)
+          | l -> (make_weak_assumption Neuter, l)
         in
         let wkind, l = get_event_witness_kind l in
         let wit, _, l = parse_parent state str l in
@@ -1060,9 +1077,9 @@ let read_family state ic fname = function
           | Some (str, ("wit" | "wit:") :: l) ->
               let sex, l =
                 match l with
-                | "m:" :: l -> (Male, l)
-                | "f:" :: l -> (Female, l)
-                | l -> (Neuter, l)
+                | "m:" :: l -> (make_strong_assumption Male, l)
+                | "f:" :: l -> (make_strong_assumption Female, l)
+                | l -> (make_weak_assumption Neuter, l)
               in
               let wk, _, l = parse_parent state str l in
               if l <> [] then failwith str;
@@ -1251,9 +1268,9 @@ let read_family state ic fname = function
 
       let sex, l =
         match l with
-        | "#h" :: l -> (Male, l)
-        | "#f" :: l -> (Female, l)
-        | l -> (Neuter, l)
+        | "#h" :: l -> (make_strong_assumption Male, l)
+        | "#f" :: l -> (make_strong_assumption Female, l)
+        | l -> (make_weak_assumption Neuter, l)
       in
       if l <> [] then failwith "str"
       else
@@ -1307,7 +1324,8 @@ let read_family state ic fname = function
           loop [] (input_a_line state ic)
         in
         let pevents = List.rev pevents in
-        F_some (Pevent (sb, Neuter, pevents), read_line state ic)
+        F_some
+          (Pevent (sb, make_weak_assumption Neuter, pevents), read_line state ic)
   | Some (str, _) -> failwith str
   (* End of the file *)
   | None -> F_none
@@ -1353,3 +1371,5 @@ let comp_families state x =
      Files.rm out_file;
      raise e);
   close_out oc
+
+let value_of_assumption = function Strong value | Weak value -> value
