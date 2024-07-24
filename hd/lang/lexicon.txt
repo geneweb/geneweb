@@ -4425,6 +4425,10 @@ de: alle Filter löschen
 en: clear every filters
 fr: effacer tous les filtres
 
+    clear input
+en: clean the input
+fr: effacer le champ
+
     click
 af: druk
 bg: щракнете
