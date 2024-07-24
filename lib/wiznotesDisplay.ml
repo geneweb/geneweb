@@ -11,8 +11,8 @@ let dir conf base =
 
 let wzfile wddir wz = Filename.concat wddir (wz ^ ".txt")
 
-let read_auth_file fname =
-  let data = read_gen_auth_file fname in
+let read_auth_file fname bname =
+  let data = read_gen_auth_file fname bname in
   List.map
     (fun au ->
       let wizname =
@@ -264,7 +264,7 @@ let print_main conf base auth_file =
   in
   let by_alphab_order = p_getenv conf.env "o" <> Some "H" in
   let wizdata =
-    let list = read_auth_file auth_file in
+    let list = read_auth_file auth_file conf.bname in
     if by_alphab_order then
       List.sort
         (fun (_, (_, (o1, _))) (_, (_, (o2, _))) ->
@@ -320,7 +320,7 @@ let wizard_page_title conf wizname _ = Output.print_string conf wizname
 
 let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   let wizname =
-    let wizdata = read_auth_file auth_file in
+    let wizdata = read_auth_file auth_file conf.bname in
     try fst (List.assoc wz wizdata) with Not_found -> wz
   in
   let edit_opt =
