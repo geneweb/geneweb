@@ -96,14 +96,19 @@ let next_family_fun_templ gwo_list fi =
 
 let just_comp = ref false
 let out_file = ref (Filename.concat Filename.current_dir_name "a")
-let force = ref false
+let in_file = ref ""
 let separate = ref false
 let bnotes = ref "merge"
 let shift = ref 0
 let files = ref []
+let kill_gwo = ref false
 
 let speclist =
   [
+    ( "-bd",
+      Arg.String Secure.set_base_dir,
+      "<DIR> Specify where the “bases” directory with databases is installed \
+       (default if empty is “.”)." );
     ( "-bnotes",
       Arg.Set_string bnotes,
       " [drop|erase|first|merge] Behavior for base notes of the next file. \
@@ -116,7 +121,8 @@ let speclist =
       Arg.Set_string Db1link.default_source,
       "<str> Set the source field for persons and families without source data"
     );
-    ("-f", Arg.Set force, " Remove database if already existing");
+    ("-f", Arg.Set Geneweb.GWPARAM.force, " Remove database if already existing");
+    ("-gwo", Arg.Set kill_gwo, " Suppress .gwo files after base creation");
     ("-mem", Arg.Set Outbase.save_mem, " Save memory, but slower");
     ("-nc", Arg.Clear Db1link.do_check, " No consistency check");
     ("-nofail", Arg.Set Gwcomp.no_fail, " No failure in case of error");
@@ -126,11 +132,13 @@ let speclist =
       " Do not create associative pictures" );
     ( "-o",
       Arg.Set_string out_file,
-      "<file> Output database (default: a.gwb). Alphanumerics and -" );
+      "<file> Output database (default: <input file name>.gwb, a.gwb if not \
+       available). Alphanumerics and -" );
     ( "-particles",
       Arg.Set_string Db1link.particules_file,
       "<file> Particles file (default = predefined particles)" );
     ("-q", Arg.Clear Mutil.verbose, " Quiet");
+    ("-reorg", Arg.Set Geneweb.GWPARAM.reorg, " Mode reorg");
     ("-sep", Arg.Set separate, " Separate all persons in next file");
     ("-sh", Arg.Set_int shift, "<int> Shift all persons numbers in next files");
     ("-stats", Arg.Set Db1link.pr_stats, " Print statistics");
@@ -141,8 +149,8 @@ let speclist =
 let anonfun x =
   let bn = !bnotes in
   let sep = !separate in
-  if Filename.check_suffix x ".gw" then ()
-  else if Filename.check_suffix x ".gwo" then ()
+  if Filename.check_suffix x ".gw" then in_file := x
+  else if Filename.check_suffix x ".gwo" then in_file := x
   else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\""));
   separate := false;
   bnotes := "merge";
@@ -158,6 +166,16 @@ let errmsg =
 let main () =
   Mutil.verbose := false;
   Arg.parse speclist anonfun errmsg;
+  if not (Array.mem "-bd" Sys.argv) then Secure.set_base_dir ".";
+  in_file :=
+    if !in_file <> "" then
+      Filename.remove_extension (Filename.basename !in_file)
+    else !in_file;
+  if List.length !files > 1 && (not (Array.mem "-o" Sys.argv)) then (
+    Printf.eprintf "The database name must be specified with -o\n";
+    flush stdout;
+    exit 2);
+  if !in_file <> "" && (not (Array.mem "-o" Sys.argv)) then out_file := !in_file;
   if not (Mutil.good_name (Filename.basename !out_file)) then (
     (* Util.transl conf not available !*)
     Printf.eprintf "The database name \"%s\" contains a forbidden character.\n"
@@ -165,7 +183,8 @@ let main () =
     Printf.eprintf "Allowed characters: a..z, A..Z, 0..9, -\n";
     flush stderr;
     exit 2);
-  Secure.set_base_dir (Filename.dirname !out_file);
+  let bname = Filename.remove_extension (Filename.basename !out_file) in
+  Geneweb.GWPARAM.init bname;
   let gwo = ref [] in
   List.iter
     (fun (x, separate, bnotes, shift) ->
@@ -180,27 +199,39 @@ let main () =
       else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\"")))
     (List.rev !files);
   if not !just_comp then (
-    let bdir =
-      if Filename.check_suffix !out_file ".gwb" then !out_file
-      else !out_file ^ ".gwb"
-    in
-    if (not !force) && Sys.file_exists bdir then (
+    let bdir = !Geneweb.GWPARAM.bpath bname in
+    if
+      Sys.file_exists (Geneweb.GWPARAM.config_reorg bname)
+      && !Geneweb.GWPARAM.force
+    then (
+      Geneweb.GWPARAM.reorg := true;
+      Geneweb.GWPARAM.init_done := { status = false; bname };
+      Geneweb.GWPARAM.init bname);
+    Printf.eprintf "Mode: %s, for base %s\n"
+      (if !Geneweb.GWPARAM.reorg then "reorg" else "classic")
+      (Filename.concat (!Geneweb.GWPARAM.bpath "") (bname ^ ".gwb"));
+    if (not !Geneweb.GWPARAM.force) && Sys.file_exists bdir then (
       Printf.eprintf
         "The database \"%s\" already exists. Use option -f to overwrite it."
         !out_file;
       flush stderr;
       exit 2);
-    Lock.control (Mutil.lock_file !out_file)
-      false ~onerror:Lock.print_error_and_exit (fun () ->
-        let bdir =
-          if Filename.check_suffix !out_file ".gwb" then !out_file
-          else !out_file ^ ".gwb"
-        in
+    Geneweb.GWPARAM.init_etc bname;
+    Lock.control (Mutil.lock_file bdir) false ~onerror:Lock.print_error_and_exit
+      (fun () ->
         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
-        if Db1link.link next_family_fun bdir then ()
+        if Db1link.link next_family_fun bdir then (
+          (*Geneweb.Util.print_default_gwf_file bname;*)
+          if !kill_gwo then
+            List.iter
+              (fun (x, _separate, _bnotes, _shift) ->
+                if Sys.file_exists (x ^ "o") then Mutil.rm (x ^ "o"))
+              (List.rev !files))
         else (
           Printf.eprintf "*** database not created\n";
           flush stderr;
-          exit 2)))
+          exit 2));
+    let tmp_file = Filename.concat Filename.current_dir_name "gw_tmp" in
+    Mutil.rm_rf tmp_file)
 
 let _ = main ()

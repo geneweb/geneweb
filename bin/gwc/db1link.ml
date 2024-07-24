@@ -1621,6 +1621,7 @@ let output_wizard_notes bdir wiznotes =
   let wizdir = Filename.concat bdir "wiznotes" in
   if wiznotes <> [] then (
     (* FIXME ad hoc solution. wiznotes should be handled same as notes_d *)
+    (* not necessarily true! notes_d is part of base, wiznotes is not *)
     if not @@ Sys.file_exists wizdir then Unix.mkdir wizdir 0o755;
     List.iter
       (fun (wizid, text) ->
@@ -1682,19 +1683,15 @@ let link next_family_fun bdir =
   let istr_quest = unique_string gen "?" in
   assert (istr_empty = 0);
   assert (istr_quest = 1);
-  if Sys.unix then Sys.remove tmp_per_index;
-  if Sys.unix then Sys.remove tmp_per;
-  if Sys.unix then Sys.remove tmp_fam_index;
-  if Sys.unix then Sys.remove tmp_fam;
   let next_family = next_family_fun fi in
-  (let rec loop () =
-     match next_family () with
-     | Some fam ->
-         insert_syntax fi.f_curr_src_file gen fam;
-         loop ()
-     | None -> ()
-   in
-   loop ());
+  let rec loop () =
+    match next_family () with
+    | Some fam ->
+       insert_syntax fi.f_curr_src_file gen fam;
+       loop ()
+    | None -> ()
+    in
+    loop ();
   close_out gen.g_per_index;
   close_out gen.g_per;
   close_out gen.g_fam_index;
@@ -1702,13 +1699,14 @@ let link next_family_fun bdir =
   Hashtbl.clear gen.g_strings;
   Hashtbl.clear gen.g_names;
   Hashtbl.clear fi.f_local_names;
-  Gc.compact ();
   let base = make_base bdir gen per_index_ic per_ic in
   Hashtbl.clear gen.g_patch_p;
+  Gc.full_major ();
+  close_in per_index_ic;
+  close_in per_ic;
   if !do_check && gen.g_pcnt > 0 then (
     Check.check_base base (set_error base gen) (set_warning base) ignore;
     if !pr_stats then Stats.(print_stats base @@ stat_base base));
-  Mutil.remove_dir tmp_dir;
   if not gen.g_errored then (
     if !do_consang then ignore @@ ConsangAll.compute base true;
     Gwdb.sync base;
@@ -1716,5 +1714,5 @@ let link next_family_fun bdir =
     output_command_line bdir;
     true)
   else (
-    Mutil.remove_dir bdir;
+    Mutil.rm_rf bdir;
     false)
