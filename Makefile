@@ -95,9 +95,9 @@ info:
 	@printf "Building \033[1;1mGeneweb $(VERSION)\033[0m with $(OCAMLV).\n\n"
 	@printf "Repository \033[1;1m$(SOURCE)\033[0m. Branch \033[1;1m$(BRANCH)\033[0m. "
 	@printf "Last commit \033[1;1m$(COMMIT_ID)\033[0m message:\n\n"
-	@printf "\033[1;1m  %s\033[0m\n" '$(subst ','\'',$(COMMIT_TITLE))'
-	@printf "  %s\n" '$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80
-	@printf "\033[1;1mGenerating configuration files\033[0m\n"
+	@printf "  \033[1;1m%s\033[0m\n" '$(subst ','\'',$(COMMIT_TITLE))'
+	@if [ -n "$(COMMIT_COMMENT)" ]; then printf "  %s\n" '$(subst ','\'',$(COMMIT_COMMENT))' | fmt -w 80; fi
+	@printf "\n\033[1;1mGenerating configuration files\033[0m\n"
 .PHONY: patch_files unpatch_files info
 
 GENERATED_FILES_DEP = \
@@ -159,9 +159,9 @@ uninstall: ## Uninstall geneweb using dune
 
 distrib: info ## Build the project and copy what is necessary for distribution
 	@$(MAKE) --no-print-directory patch_files generated
-	@printf "\n\033[1;1mBuilding executables.\n\033[0m"
+	@printf "\n\033[1;1mBuilding executables\n\033[0m"
 	@$(call unpatch_after, $(BUILD))
-	@printf "Done."
+	@printf "Done.\n"
 	@$(RM) -r $(DISTRIB_DIR)
 	@printf "\n\033[1;1mCreating distribution directory\033[0m\n"
 	mkdir $(DISTRIB_DIR)
@@ -231,7 +231,7 @@ endif
 	    fi; \
 	  fi; \
 	done
-	@printf "Done.\n\n\033[1;1mDistribution complete.\033[0m\n"
+	@printf "Done.\n\n\033[1;1mDistribution complete\033[0m\n"
 	@printf "You can launch Geneweb with “\033[1;1mcd $(DISTRIB_DIR)\033[0m” followed by “\033[1;1mgw/gwd$(EXT)\033[0m”.\n"
 .PHONY: fmt install uninstall distrib
 
