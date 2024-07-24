@@ -3,6 +3,30 @@ val errors_undef : string list ref
 val errors_other : string list ref
 val set_vars : string list ref
 val gwd_cmd : string ref
+val cnt_dir : string ref
+val sock_dir : string ref
+val bases : string ref
+val reorg : bool ref
+val force : bool ref
+
+type init_s = { status : bool; bname : string }
+
+val init_done : init_s ref
+val config_reorg : string -> string
+
+type my_fun_2 = string -> string
+type my_fun_3 = string -> string -> string
+
+val config : my_fun_2 ref
+val cnt_d : my_fun_2 ref
+val adm_file : my_fun_2 ref
+val src_d : my_fun_2 ref
+val etc_d : my_fun_2 ref
+val config_d : my_fun_2 ref
+val lang_d : my_fun_3 ref
+val bpath : my_fun_2 ref
+val portraits_d : my_fun_2 ref
+val images_d : my_fun_2 ref
 
 type syslog_level =
   [ `LOG_EMERG  (** A panic condition. *)
@@ -24,19 +48,13 @@ type syslog_level =
 
 (* S: Move it to gwd_lib?  *)
 
-val init : (unit -> unit) ref
+val init : string -> unit
 (** Function called before gwd starts
     e.g. inititialise assets folders in Secure module. *)
 
-val base_path : (string list -> string -> string) ref
-(** [!base_path pref fname] function that returns a path to a file identified by [pref] [fname]
-    related to bases. [pref] is like a category for file [fname].
-
-    See {!val:GWPARAM.Default.base_path} for a concrete example.
-*)
-
-val bpath : (string -> string) ref
-(** Same as {!val:base_path}, but without the prefix (avoid unecessary empty list). *)
+val init_etc : string -> unit
+(** Function called before gwd starts
+    e.g. inititialise etc folders in reorg mode. *)
 
 val output_error :
   (?headers:string list ->
@@ -61,14 +79,34 @@ val wrap_output :
     Wrap the display of [title] and [content] in a defined template.
 *)
 
-module Default : sig
-  val init : unit -> unit
-  (** Inititialise assets directories for gwd server:
-      * current directory
-      *)
+val is_reorg_base : string -> bool
+val test_reorg : string -> unit
 
-  val base_path : string list -> string -> string
-  (** Use concatenation of [Secure.base_dir ()], [pref] and [fname] *)
+module Reorg : sig
+  val config : string -> string
+  val cnt_d : string -> string
+  val adm_file : string -> string
+  val portraits_d : string -> string
+  val src_d : string -> string
+  val etc_d : string -> string
+  val config_d : string -> string
+  val lang_d : string -> string -> string
+  val images_d : string -> string
+
+  val bpath : string -> string
+  (** [Filename.concat (Secure.base_dir ())] *)
+end
+
+module Default : sig
+  val config : string -> string
+  val cnt_d : string -> string
+  val adm_file : string -> string
+  val portraits_d : string -> string
+  val src_d : string -> string
+  val etc_d : string -> string
+  val config_d : string -> string
+  val lang_d : string -> string -> string
+  val images_d : string -> string
 
   val bpath : string -> string
   (** [Filename.concat (Secure.base_dir ())] *)

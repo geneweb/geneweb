@@ -2092,7 +2092,7 @@ let main () =
   in
   Geneweb.GWPARAM.gwd_cmd := gwd_cmd;
   List.iter register_plugin !plugins ;
-  !GWPARAM.init () ;
+  GWPARAM.init "" ;
   cache_lexicon () ;
   List.iter
     (fun dbn ->
