@@ -1,4 +1,3 @@
-open Geneweb
 open Gwdb
 
 let bname = ref ""
@@ -19,7 +18,7 @@ let write_cache_file bname fname list =
   in
   let fname =
     Filename.concat
-      (Util.base_path [] (bname ^ ".gwb"))
+      (!Geneweb.GWPARAM.bpath bname)
       (bname ^ "_" ^ fname ^ "_cache.txt")
   in
   Printf.printf "Write to : %s\n" fname;
