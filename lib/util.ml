@@ -1254,38 +1254,64 @@ let include_end = include_begin_end_aux (Adef.safe "end")
       - fname : le fichier de template
     [Retour] :
       - string : le chemin vers le fichier de template
+
+    On cherche le fichier dans cet ordre :
+    etc_d vaut :
+    - bases/etc/mybase       en mode classique
+    - bases/mybase.gwb/etc/  en mode reorg
+    on cherche dans :
+    - etc_d/templx/name.txt  (base specific)
+    - etc_d/name.txt         (base specific)
+    - gw/etc/templx/name.txt (distribution)
+    - gw/etc/name.txt        (distribution)
+
     [Rem] : Exporté en clair hors de ce module.                             *)
+
 let etc_file_name conf fname =
   (* On recherche si dans le nom du fichier, on a specifié son *)
   (* répertoire, i.e. si fname est écrit comme ceci : dir/file *)
+  (* on le reconstitue avec le bon dir_separateur *)
   let fname =
     List.fold_left Filename.concat "" (String.split_on_char '/' fname)
   in
-  (* On cherche le fichier dans cet ordre :
-     - dans la base (bases/etc/base_name/name.txt)
-     - dans la base (bases/etc/templx/name.txt)
-     - dans le répertoire des programmes (gw/etc/templx/name.txt) *)
   let file_exist dir =
+    (* etc_d/templx/name.txt or etc_d/name.txt *)
     let fn =
-      Filename.concat conf.bname (fname ^ ".txt")
-      |> Filename.concat "etc" |> bpath
+      String.concat Filename.dir_sep
+        (if dir <> "" then [ !GWPARAM.etc_d conf.bname; dir; fname ^ ".txt" ]
+        else [ !GWPARAM.etc_d conf.bname; fname ^ ".txt" ])
     in
     if Sys.file_exists fn then fn
     else
+      (* etc_d/name.txt *)
       let fn =
-        Filename.concat (Filename.basename dir) (fname ^ ".txt")
-        |> Filename.concat "etc" |> bpath
+        String.concat Filename.dir_sep
+          [ !GWPARAM.etc_d conf.bname; fname ^ ".txt" ]
       in
-      if Sys.file_exists fn then fn
+      (* on a déjà testé le cas dir = "" *)
+      if dir <> "" && Sys.file_exists fn then fn
       else
+        (* assets/templx/name.txt or assets/name.txt *)
         let fn =
-          Filename.concat dir (fname ^ ".txt")
-          |> Filename.concat "etc" |> search_in_assets
+          search_in_assets
+            (String.concat Filename.dir_sep
+               (if dir <> "" then [ "etc"; dir; fname ^ ".txt" ]
+               else [ "etc"; fname ^ ".txt" ]))
         in
-        if Sys.file_exists fn then fn else ""
+        if Sys.file_exists fn then fn
+        else
+          (* assets/name.txt *)
+          let fn =
+            search_in_assets
+              (String.concat Filename.dir_sep [ "etc"; fname ^ ".txt" ])
+          in
+          (* on a déjà testé le cas dir = "" *)
+          if dir <> "" && Sys.file_exists fn then fn else ""
   in
-  (* Recherche le template par défaut en fonction de la variable gwf *)
+  (* Recherche le fichier template par défaut dans la liste des      *)
+  (* dossiers template définis par la variable gwf                   *)
   (* template = templ1,templ2,*                                      *)
+  (* la valeur * autorise tous les templates                         *)
   let rec default_templ config_templ std_fname =
     match config_templ with
     | [] | [ "*" ] -> std_fname
@@ -1303,6 +1329,7 @@ let etc_file_name conf fname =
       loop [] 0 0
     with Not_found -> [ conf.bname; "*" ]
   in
+  (* the current template folder *)
   let dir =
     match p_getenv conf.env "templ" with
     | Some x when List.mem "*" config_templ -> x
@@ -1310,11 +1337,12 @@ let etc_file_name conf fname =
     | Some _ | None -> (
         match config_templ with [] | [ "*" ] -> "" | x :: _ -> x)
   in
-  (* template par défaut *)
+  (* default template file (gw/etc/fname.txt) *)
   let std_fname = search_in_assets (Filename.concat "etc" (fname ^ ".txt")) in
-  (* On cherche le template dans l'ordre de file_exist.         *)
-  (* Si on ne trouve rien, alors on cherche le premier template *)
-  (* par défaut tel que défini par la variable template du gwf  *)
+
+  (* On cherche le fichier template dans l'ordre de file_exist.   *)
+  (* Si on ne trouve rien, alors on cherche le premier template   *)
+  (* par défaut tel que défini par la variable template du gwf    *)
   match file_exist dir with
   | "" -> default_templ config_templ std_fname
   | s -> s
