@@ -27,11 +27,11 @@
 %( do not use %include;perso_header %)
 %include_perso_header;
 %include;home
-%let;datalist_fnames;%if;(b.datalist_fnames=1) list="datalist_fnames"%end;%in;
-%let;datalist_places;%if;(b.datalist_places=1) list="datalist_places"%end;%in;
-%let;datalist_snames;%if;(b.datalist_snames=1) list="datalist_snames"%end;%in;
-%let;datalist_occupations;%if;(b.datalist_occupations=1) list="datalist_occupations"%end;%in;
-%let;datalist_sources;%if;(b.datalist_sources=1) list="datalist_sources"%end;%in;
+%let;datalist_fnames; list="datalist_fnames" data-book="fn"%in;
+%let;datalist_snames; list="datalist_snames" data-book="sn"%in;
+%let;datalist_places; list="datalist_places" data-book="place"%in;
+%let;datalist_occupations; list="datalist_occupations" data-book="occu"%in;
+%let;datalist_sources; list="datalist_sources" data-book="src"%in;
 %define;nav()
   <div class="container fixed-top" role="navigation">
     <nav class="navbar navbar-light bg-white justify-content-center" id="banner">
@@ -214,34 +214,34 @@
   %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="2" maxlength="2"%in;
   %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2"%in;
   %let;year_input;pattern="[?><~/+\-]?\d*/?" size="4" maxlength="8"%in;
-  <div class="row">
+  <div class="row align-items-center">
     <span class="col-sm-2 col-form-label">[*kind]</span>
-    <div class="col-sm-auto form-inline">
+    <div class="col-sm-auto d-inline-flex">
       %if;([!dates order]0="ddmmyy" or [!dates order]0="ddmmyyyy" or [!dates order]0="dmyyyy")
         <label for="xvar_dd" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]2</label>
-        <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
+        <input type="text" class="form-control mr-2" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
         <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
-        <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
+        <input type="text" class="form-control mr-2" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
         <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
-        <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
+        <input type="text" class="form-control mr-2" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
       %elseif;([!dates order]0="mmddyyyy")
         <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
-        <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
+        <input type="text" class="form-control mr-2" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
         <label for="xvar_dd" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]2</label>
-        <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
+        <input type="text" class="form-control mr-2" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
         <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
-        <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
+        <input type="text" class="form-control mr-2" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
       %else;
         <label for="xvar_yyyy" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]0</label>
-        <input type="text" class="form-control mr-auto" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
+        <input type="text" class="form-control mr-2" name="xvar_yyyy" id="xvar_yyyy" value="%xx.create.kind_year;" placeholder="[dd/mm/yyyy]2" %year_input;>
         <label for="xvar_mm" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]1</label>
-        <input type="text" class="form-control mr-auto" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
+        <input type="text" class="form-control mr-2" name="xvar_mm" id="xvar_mm" value="%xx.create.kind_month;" placeholder="[dd/mm/yyyy]1" %month_input;>
         <label for="xvar_dd" class="col-form-label%if;(verbose=true) sr-only%end;">[year/month/day]2</label>
-        <input type="text" class="form-control mr-auto" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
+        <input type="text" class="form-control mr-2" name="xvar_dd" id="xvar_dd" value="%xx.create.kind_day;" placeholder="[dd/mm/yyyy]0" %day_input;>
       %end;
     </div>
     <label for="xvar_pl" class="%if;(verbose=true)sr-only%end; col-sm-1 col-form-label">[place/places]0</label>%nn;
-    <div class="col-sm">
+    <div class="col">
       <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[*place/places]0"%datalist_places;>
     </div>
   </div>

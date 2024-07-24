@@ -71,82 +71,44 @@ var datalists = %[
 %end;
 %];
 
+%( Event listeners for input fields to open entry in book with Ctrl+left mouse button %)
 function setupInputClickListeners() {
-    const inputs = document.querySelectorAll('input[list]');
+    const inputs = document.querySelectorAll('input%[list%]');
     inputs.forEach(input => {
         const datalistId = input.getAttribute('list');
-        const datalistConfig = datalists.find(list => list.id === datalistId);
-        
-        if (datalistConfig && datalistConfig.book) {
+        const book = input.getAttribute('data-book');
+        if (book) {
             input.addEventListener('mousedown', function(event) {
                 if (event.ctrlKey && event.button === 0) {
                     event.preventDefault();
-                    setTimeout(() => openBook(this.value, datalistConfig.book), 0);
+                    openBook(this.value, book);
                 }
             });
         }
     });
 }
 
+%( Open a specific book on edited input value %)
 function openBook(value, book) {
-    if (value.trim() === '') {
-        console.log('Input is empty, not opening book.');
-        return;
+    let preVal = value;
+    if (book === "place") {
+        const place = value.split(/\]\s+[-–—]\s+/);
+        preVal = place.length > 1 ? place[1] : value;
     }
-    const encodedValue = encodeURIComponent(value);
-    const url = `?%if;cgi;b=${baseName}&%end;m=MOD_DATA&data=${book}&s=${encodedValue}`;
+    if (preVal.length > 12) {
+        preVal = preVal.substring(0, 12);
+    }
+    preVal = preVal.split(/[, ]+/)[0];
+    const encVal = encodeURIComponent(value);
+    const encPreVal = encodeURIComponent(preVal);
+    let url = `?%if;cgi;b=${baseName}&%end;m=MOD_DATA&data=${book}&s=${encPreVal}&s1=`;
+    if (encPreVal !== encVal) {
+        url += `${encVal}`;
+    }
     window.open(url, '_blank');
 }
 
 datalists.forEach(list => populateDatalist(list.id, list.file, list.book));
-
-%( add buton %)
-function addClearButtonToInputs() {
-    const elements = document.querySelectorAll('input[type="text"], input[type="search"], input[type="email"], input[type="tel"], input[type="url"], textarea');
-    elements.forEach(element => {
-        // Create wrapper div
-        const wrapper = document.createElement('div');
-        wrapper.style.position = 'relative';
-        wrapper.style.display = 'inline-block';
-        wrapper.style.width = '100%';
-        element.parentNode.insertBefore(wrapper, element);
-        wrapper.appendChild(element);
-
-        // Adjust element styling
-        element.style.paddingRight = '40px'; // Make room for clear button and datalist indicator
-
-        // Create clear button
-        const clearButton = document.createElement('i');
-        clearButton.className = 'fas fa-times';
-        clearButton.style.position = 'absolute';
-        clearButton.style.right = element.tagName.toLowerCase() === 'input' && element.getAttribute('list') ? '10px' : '8px';
-        clearButton.style.top = element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%';
-        clearButton.style.transform = element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)';
-        clearButton.style.cursor = 'pointer';
-        clearButton.style.display = 'none';  // Hidden by default
-        clearButton.style.color = '#999'; // Adjust color as needed
-        clearButton.style.fontSize = '1.0em'; // Adjust size as needed
-        wrapper.appendChild(clearButton);
-
-        // Show/hide clear button based on element content
-        function toggleClearButton() {
-            clearButton.style.display = element.value ? 'block' : 'none';
-        }
-
-        element.addEventListener('input', toggleClearButton);
-        toggleClearButton();  // Initial state
-
-        // Clear element on button click
-        clearButton.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevent any form submission
-            element.value = '';
-            toggleClearButton();
-            element.focus();  // Keep focus on the element
-            // Trigger input event to update any listeners
-            element.dispatchEvent(new Event('input', { bubbles: true }));
-        });
-    });
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     addClearButtonToInputs();
