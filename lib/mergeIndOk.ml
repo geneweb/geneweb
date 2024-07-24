@@ -475,12 +475,16 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let osn1 = o_p1.surname in
   let oocc1 = o_p1.occ in
   let pgl1 =
-    Perso.links_to_ind conf base db (Name.lower ofn1, Name.lower osn1, oocc1)
+    Perso.links_to_ind conf base db
+      (Name.lower ofn1, Name.lower osn1, oocc1)
+      None
   in
   let ofn2 = o_p2.first_name in
   let osn2 = o_p2.surname in
   let oocc2 = o_p2.occ in
   let pgl2 =
-    Perso.links_to_ind conf base db (Name.lower ofn2, Name.lower osn2, oocc2)
+    Perso.links_to_ind conf base db
+      (Name.lower ofn2, Name.lower osn2, oocc2)
+      None
   in
   print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2

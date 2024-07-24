@@ -1481,6 +1481,46 @@ span.notesourcecolor {
     max-width: 40%;
 }
 
+/* Imagemap TODO: flex wrap not needed, use BS class */
+.flex_gallery { 
+  display: flex;
+  flex-wrap: wrap;
+}
+.item_gallery {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  margin: 5px;
+}
+.item_gallery img {
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+.in { 
+  background-color: coral;
+}
+
+.list_comma li {
+  display: inline;
+}
+
+.list_comma li:not(:last-child):after { 
+  content: ", ";
+}
+
+.list_comma li:last-child:after {
+  content: ".";
+}
+
 /* surname by branch m=N */
 #surname_by_branch {
     white-space: nowrap;

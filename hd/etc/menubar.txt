@@ -427,10 +427,17 @@
           %if;has_linked_pages;
             <li class="nav-item">
               <a class="nav-link text-secondary" href="%url_set.m.LINKED;"
-                title="%linked_pages_nbr; [linked pages]">
+                title="[*visualize/show/hide/summary]1 [linked pages]">
                 <i class="fa fa-file-lines fa-fw mr-1" aria-hidden="true"></i>%nn;
                 <sup class="small">%linked_pages_nbr;</sup>%nn;
                 <span class="sr-only">file-lines icon</span>%nn;
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-secondary" href="%url_set.m_type.LINKED_gallery"
+                title="[*visualize/show/hide/summary]1 “imagemap” [*linked pages]%( TODO: TRANSLATION %)">
+                <i class="fa fa-images fa-fw mr-1" aria-hidden="true"></i>
+                <sup class="small">%nb_linked_pages_type.gallery;</sup>
               </a>
             </li>
           %end;

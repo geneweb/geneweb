@@ -1142,7 +1142,7 @@ let print_mod ?prerr o_conf base =
   let pgl =
     let db = Gwdb.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in
-    Perso.links_to_ind conf base db key
+    Perso.links_to_ind conf base db key None
   in
   let callback sp =
     let p = effective_mod ?prerr conf base sp in
