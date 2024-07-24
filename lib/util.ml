@@ -1279,8 +1279,8 @@ let get_request_string conf =
 let message_to_wizard conf =
   if conf.wizard || conf.just_friend_wizard then (
     let print_file fname =
-      let fname = base_path [ "etc"; conf.bname ] (fname ^ ".txt") in
-      try
+    let fname = Filename.concat (!GWPARAM.etc_d conf.bname) (fname ^ ".txt") in
+    try
         let ic = Secure.open_in fname in
         try
           while true do
@@ -2149,8 +2149,6 @@ let escache_value base =
   let v = int_of_float (mod_float t (float_of_int max_int)) in
   Adef.encoded (string_of_int v)
 
-let adm_file f = List.fold_right Filename.concat [ !cnt_dir; "cnt" ] f
-
 let sprintf_today conf =
   let hh, mm, ss = conf.time in
   let tm =
@@ -2205,7 +2203,24 @@ let update_wf_trace conf fname =
   in
   write_wf_trace fname (List.sort (fun x y -> compare y x) wt)
 
+let test_cnt_d conf =
+  let config_d = !GWPARAM.config_d conf.bname in
+  let cnt_d = !GWPARAM.cnt_d conf.bname in
+  (if not (Sys.file_exists config_d) then
+   try Unix.mkdir config_d 0o755
+   with Unix.Unix_error (_, _, _) ->
+     !GWPARAM.syslog `LOG_WARNING
+       (Printf.sprintf "Failure when creating config_dir (util): %s" config_d));
+  if not (Sys.file_exists cnt_d) then
+    try Unix.mkdir cnt_d 0o755
+    with Unix.Unix_error (_, _, _) ->
+      !GWPARAM.syslog `LOG_WARNING
+        (Printf.sprintf "Failure when creating cnt_dir (util): %s" cnt_d)
+  else ();
+  cnt_d
+
 let commit_patches conf base =
+  let _ = test_cnt_d in
   Gwdb.commit_patches base;
   conf.henv <-
     List.map
@@ -2216,7 +2231,7 @@ let commit_patches conf base =
       try List.assoc "wizard_passwd_file" conf.base_env with Not_found -> ""
     in
     if wpf <> "" then
-      let fname = adm_file (conf.bname ^ "_u.txt") in
+      let fname = !GWPARAM.adm_file (conf.bname ^ "_u.txt") in
       update_wf_trace conf fname
 
 let short_f_month m =
@@ -2240,8 +2255,12 @@ let short_f_month m =
 
 type auth_user = { au_user : string; au_passwd : string; au_info : string }
 
-let read_gen_auth_file fname =
-  let fname = bpath fname in
+let read_gen_auth_file fname base_file =
+  let fname =
+    if GWPARAM.is_reorg_base base_file then
+      Filename.concat (!GWPARAM.config_d base_file) fname
+    else Filename.concat (Secure.base_dir ()) fname
+  in
   try
     let ic = Secure.open_in fname in
     let rec loop data =
@@ -2813,7 +2832,7 @@ let has_children base u =
 
 let get_bases_list ?(format_fun = fun x -> x) () =
   let list = ref [] in
-  let dh = Unix.opendir (!GWPARAM.bpath "") in
+  let dh = Unix.opendir (Secure.base_dir ()) in
   (try
      while true do
        let e = Unix.readdir dh in
