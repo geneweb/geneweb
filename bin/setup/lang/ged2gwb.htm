@@ -50,10 +50,25 @@ ectly in the url in your navigator.
 </table>
 </span>
 <p>
+
 <li>
-[Enter The name you want to give to your %G database. If omitted, it will be deducted from the name of the GEDCOM file.]
+[Enter the name of the folder holding databases.]
+<p>
+<table class="setup">
+<tr><td>
+<span style="font-family: monospace">
+   -bd          </span>
+<input name="bd" size="30" style="padding-left:4px"
+placeholder=".">
+[If you write nothing, it will be taken as "."]
+</td></tr>
+</table>
+<p>
+
+<li>
+[Enter the name you want to give to your %G database. If omitted, it will be deducted from the name of the GEDCOM file.]
 %(
-Enter The name you want to give to your %G database.
+Enter the name you want to give to your %G database.
 If omitted, it will be deducted from the name of the GEDCOM file.
 %)
 <p>
@@ -70,6 +85,14 @@ placeholder="[name]
 <li>
 [Select the options you want][:]
 
+<p>
+<table class="setup">
+<tr align="left">
+<td><input type="checkbox" name="f" id="f" value="on" />
+<label for="f" style="font-family: monospace">-f            | </label>[Delete database if already existing.]
+</td>
+</tr>
+</table>
 <p>
 <table class="setup">
 <tr align="left">
@@ -203,6 +226,16 @@ e year.
 </td>
 </tr>
 </table>
+
+<p>
+<table class="setup">
+<tr align=left>
+<td><input type="checkbox" name="reorg" id="reorg" value="on">
+<label for="reorg" style="font-family: monospace">-org           | </label>[Reorg mode.]
+</td>
+</tr>
+</table>
+
 <p>
 <table class="setup">
 <tr align=left><td>   
@@ -293,6 +326,7 @@ May 2, 1912" or "February 5, 1912" according to the countries).
 <label for="MSDOS">[The accentuated characters are in MSDOS encoding.]
 </label></td>
 </tr>
+
 </table>
 <p>
 <li>

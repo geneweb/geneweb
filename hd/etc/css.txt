@@ -7,7 +7,7 @@
   li.parent { list-style-type: disc; list-style-image: url('%images_prefix;left.png'); }
 </style>
 %end;
-%if;(evar.templ="")
+%if;(e.templ!="templ")
   %if;(bvar.use_cdn="yes")
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"

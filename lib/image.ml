@@ -1,10 +1,8 @@
 open Config
 open Gwdb
 
-let portrait_folder conf = Util.base_path [ "images" ] conf.bname
-
-let carrousel_folder conf =
-  Filename.concat (Util.base_path [ "src" ] conf.bname) "images"
+let portrait_folder conf = !GWPARAM.portraits_d conf.bname
+let carrousel_folder conf = !GWPARAM.images_d conf.bname
 
 (** [default_portrait_filename_of_key fn sn occ] is the default filename
  of the corresponding person's portrait. WITHOUT its file extenssion.
@@ -42,27 +40,20 @@ let find_img_opt f =
     [path] is a the full path of the file with file extension. *)
 let full_portrait_path conf base p =
   (* TODO why is extension not in filename..? *)
+  let img = get_image p in
   let s = default_portrait_filename base p in
   let f = Filename.concat (portrait_folder conf) s in
   match find_img_opt f with
   | Some (`Path _) as full_path -> full_path
-  | Some (`Url _)
+  | Some (`Url _) as url -> url
   (* should not happen, there is only ".url" file in carrousel folder *)
-  | None ->
-      None
+  | None when not (is_empty_string img) -> Some (`Url (sou base img))
+  | None -> None
 
-let source_filename conf src =
-  let fname1 = Filename.concat (carrousel_folder conf) src in
-  if Sys.file_exists fname1 then fname1
-  else
-    List.fold_right Filename.concat [ Secure.base_dir (); "src"; "images" ] src
-
-let path_of_filename src =
-  let fname1 =
-    List.fold_right Filename.concat [ Secure.base_dir (); "images" ] src
-  in
+let path_of_filename conf fname =
+  let fname1 = Filename.concat (!GWPARAM.images_d conf.bname) fname in
   if Sys.file_exists fname1 then `Path fname1
-  else `Path (Util.search_in_assets (Filename.concat "images" src))
+  else `Path (Util.search_in_assets (Filename.concat "images" fname))
 
 let png_size ic =
   let magic = really_input_string ic 4 in
@@ -255,7 +246,7 @@ let get_old_portrait conf base p =
   if has_access_to_portrait conf base p then
     let key = default_portrait_filename base p in
     let f =
-      Filename.concat (Filename.concat (portrait_folder conf) "old") key
+      Filename.concat (Filename.concat (portrait_folder conf) "saved") key
     in
     find_img_opt f
   else None
@@ -275,10 +266,10 @@ let rename_portrait conf base p (nfn, nsn, noc) =
               "Error renaming portrait: old_path=%s new_path=%s : %s" old_f
               new_f e));
       let new_s_f =
-        String.concat Filename.dir_sep [ portrait_folder conf; "old"; new_s ]
+        String.concat Filename.dir_sep [ portrait_folder conf; "saved"; new_s ]
       in
       let old_s_f =
-        String.concat Filename.dir_sep [ portrait_folder conf; "old"; old_s ]
+        String.concat Filename.dir_sep [ portrait_folder conf; "saved"; old_s ]
       in
       (if Sys.file_exists (old_s_f ^ old_ext) then
        try Sys.rename (old_s_f ^ old_ext) (new_s_f ^ old_ext)
@@ -318,7 +309,9 @@ let get_portrait_with_size conf base p =
     | `Empty -> (
         match full_portrait_path conf base p with
         | None -> None
-        | Some path -> Some (path, size_from_path path |> Result.to_option))
+        | Some (`Url s) -> Some (`Url s, None)
+        | Some (`Path s) ->
+            Some (`Path s, size_from_path (`Path s) |> Result.to_option))
   else None
 
 (* For carrousel ************************************ *)
@@ -326,7 +319,7 @@ let get_portrait_with_size conf base p =
 let carrousel_file_path conf base p fname old =
   let dir =
     let dir = default_portrait_filename base p in
-    if old then Filename.concat dir "old" else dir
+    if old then Filename.concat dir "saved" else dir
   in
   String.concat Filename.dir_sep
     ([ carrousel_folder conf; dir ] @ if fname = "" then [] else [ fname ])

@@ -349,7 +349,7 @@ let output base =
      Mutil.rm tmp_names_inx;
      Mutil.rm tmp_names_acc;
      Mutil.rm tmp_strings_inx;
-     Mutil.remove_dir tmp_notes_d;
+     Mutil.rm_rf tmp_notes_d;
      raise e);
   close_base base;
   Mutil.rm (Filename.concat bname "base");
@@ -376,8 +376,14 @@ let output base =
     Sys.rename tmp_notes (Filename.concat bname "notes");
   if Sys.file_exists tmp_notes_d then (
     let notes_d = Filename.concat bname "notes_d" in
-    Mutil.remove_dir notes_d;
-    Sys.rename tmp_notes_d notes_d);
+    if Sys.file_exists notes_d then Mutil.rm_rf notes_d;
+    try Sys.rename tmp_notes_d notes_d
+    with e ->
+      trace
+        (Printf.sprintf "Error renaming %s to %s: %s. Retrying once."
+           tmp_notes_d notes_d (Printexc.to_string e));
+      Unix.sleepf 0.5;
+      Sys.rename tmp_notes_d notes_d);
   Mutil.rm (Filename.concat bname "patches");
   Mutil.rm (Filename.concat bname "patches~");
   Mutil.rm (Filename.concat bname "synchro_patches");

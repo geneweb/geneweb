@@ -8,9 +8,6 @@ val authorized_image_file_extension : string array
 val scale_to_fit : max_w:int -> max_h:int -> w:int -> h:int -> int * int
 (** [scale_to_fit ~max_w ~max_h ~w ~h] is the [width, height] of a proportionally scaled [w, h] rectangle so it can fit in a [max_w, max_h] rectangle *)
 
-val source_filename : config -> string -> string
-(** Returns path to the image file with the giving name in directory {i src/}. *)
-
 (* TODO this should be removed *)
 val default_portrait_filename : base -> person -> string
 (** [default_portrait_filename base p] is the default filename of [p]'s portrait. Without it's file extension.
@@ -23,7 +20,7 @@ val size_from_path : [ `Path of string ] -> (int * int, unit) result
     - Ok (width, height) of the file.
 It works by opening the file and reading magic numbers *)
 
-val path_of_filename : string -> [> `Path of string ]
+val path_of_filename : config -> string -> [> `Path of string ]
 (** [path_of_filename fname] search for image {i images/fname} inside the base and assets directories.
     Return the path to found file or [fname] if file isn't found.  *)
 
@@ -34,7 +31,8 @@ val src_to_string : [< `Path of string | `Url of string ] -> string
 (** [src_to_string src] is [src] as a string *)
 
 (* TODO this should be removed *)
-val get_portrait_path : config -> base -> person -> [> `Path of string ] option
+val get_portrait_path :
+  config -> base -> person -> [> `Path of string | `Url of string ] option
 (** [get_portrait_path conf base p] is
     - [None] if we don't have access to [p]'s portrait or it doesn't exist.
     - [Some path] with [path] the full path with extension of [p]'s portrait.
