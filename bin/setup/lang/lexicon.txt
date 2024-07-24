@@ -92,6 +92,13 @@ fr: Sources
 en: Cache files computed
 fr: Fichiers cache calculés
 
+    Reorg mode.
+en: Reorg mode
+fr: Mode reorg
+
+    Kill .gwo files after base creation.
+en: Kill .gwo files after base creation.
+fr: Détruire les fichiers .gwo après création de la base
 
     "first names enclosed": the -fne option must be followed by a two characters string "be". When creating a person, if the GEDCOM first name part holds a part between 'b' (any character) and 'e' (any character), it is considered to be the usual first name: e.g. -fne "\\" or -fne "()".
 aa: ged2gwb.htm
@@ -1213,11 +1220,11 @@ it: Digitate il nome che volete dare alla vostra base di dati%G.
 lv: Ierakstiet nosaukumu, kâdâ Jûs  vçlaties nosaukt savu %G datu bâzi.
 sv: Namnet du vill kalla din %G databas.
 
-    Enter The name you want to give to your %G database. If omitted, it will be deducted from the name of the GEDCOM file.
+    Enter the name you want to give to your %G database. If omitted, it will be deducted from the name of the GEDCOM file.
 aa: ged2gwb.htm
 co: Scrivite u nome chì vò vulete dà à a vostra basa di dati %G. S’ellu hè omessu, serà deduttu secondu u nome di u schedariu GEDCOM.
 de: Name, den du deiner %G-Datenbank geben möchtest. Wenn du hier nichts eingibst, wird der Datenbankname aus dem Namen der GEDCOM-Datei abgeleitet.
-en: Enter The name you want to give to your %G database. If omitted, it will be deducted from the name of the GEDCOM file.
+en: Enter the name you want to give to your %G database. If omitted, it will be deducted from the name of the GEDCOM file.
 es: El nombre que Ud. desea dar a su base de datos %G. Si Ud. no mete ningún nombre, él será deducido del nombre del fichero GEDCOM.
 fr: Entrez le nom que vous voulez donner à votre base de données %G. Si vous ne mettez rien, il sera déduit du nom du fichier GEDCOM.
 it: Digitate il nome che volete dare alla vostra base di dati %G. Se non mettete niente il nome sarà dedotto da quello del file GEDCOM.

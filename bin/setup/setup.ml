@@ -481,17 +481,23 @@ let cut_at_equal s =
     (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
   | None -> (s, "")
 
-let read_base_env bname =
-  let fname = bname ^ ".gwf" in
+let loc_read_base_env bname =
+  let fname = !GWPARAM.config bname in
   match try Some (open_in fname) with Sys_error _ -> None with
   | Some ic ->
     let rec loop env =
       match try Some (input_line ic) with End_of_file -> None with
       | None -> close_in ic ; env
       | Some s ->
-        if s = "" || s.[0] = '#'
-        then loop env
-        else loop (cut_at_equal s :: env)
+          let s =
+            if String.length s >= 1 &&
+            (Char.code s.[String.length s - 1] = 13)
+            then String.sub s 0 (String.length s - 1)
+            else s
+          in
+          if s = "" || s.[0] = '#'
+          then loop env
+          else loop (cut_at_equal s :: env)
     in
     loop []
   | None -> []
@@ -569,7 +575,8 @@ let rec copy_from_stream conf print strm =
                     (slashify_linux_dos (!bin_dir ^ "/setup/" ^ in_file))
                 in
                 let in_base = strip_spaces (s_getenv conf.env "anon") in
-                let benv = read_base_env in_base in
+                GWPARAM.test_reorg in_base;
+                let benv = loc_read_base_env in_base in
                 let conf = { conf with env = benv @ conf.env} in
                 (* depending on when %f is called, conf may be sketchy *)
                 (* conf will know bvars from basename.gwf and evars from url *)
@@ -600,7 +607,9 @@ let rec copy_from_stream conf print strm =
           | 't' -> print_if conf print (not Sys.unix) strm
           | 'v' ->
               let out = strip_spaces (s_getenv conf.env "o") in
-              print_if conf print (Sys.file_exists (out ^ ".gwb")) strm
+              let bd = strip_spaces (s_getenv conf.env "bd") in
+              let base = Filename.concat bd out in
+              print_if conf print (Sys.file_exists (base ^ ".gwb")) strm
           | 'y' -> for_all conf print (all_db (s_getenv conf.env "anon")) strm
           | 'z' -> print (string_of_int !port)
           | 'A'..'Z' | '0'..'9' as c ->
@@ -904,30 +913,6 @@ let setup_gen conf =
     Some fname -> print_file conf (basename fname)
   | _ -> error conf "request needs \"v\" parameter"
 
-let print_default_gwf_file conf =
-  let gwf =
-    ["access_by_key=yes"; "disable_forum=yes"; "hide_private_names=no";
-     "use_restrict=no"; "show_consang=yes"; "display_sosa=yes";
-     "place_surname_link_to_ind=yes"; "max_anc_level=8"; "max_anc_tree=7";
-     "max_desc_level=12"; "max_desc_tree=4"; "max_cousins=2000";
-     "max_cousins_level=5"; "latest_event=20"; "template=*"; "long_date=no";
-     "counter=no"; "full_siblings=yes"; "hide_advanced_request=no";
-     "perso_module_i=individu"; "perso_module_p=parents";
-     "perso_module_g=gr_parents"; "perso_module_u=unions";
-     "perso_module_f=fratrie"; "perso_module_r=relations";
-     "perso_module_c=chronologie"; "perso_module_n=notes";
-     "perso_module_s=sources"; "perso_module_a=arbres";
-     "perso_module_h=htrees"; "perso_module_d=data_3col";
-     "perso_module_l=ligne"; "p_mod="]
-  in
-  let bname = try List.assoc "o" conf.env with Not_found -> "" in
-  let dir = Sys.getcwd () in
-  let fname = Filename.concat dir (bname ^ ".gwf") in
-  if Sys.file_exists fname then ()
-  else
-    let oc = open_out fname in
-    List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf; close_out oc
-
 let simple conf =
   let ged =
     match p_getenv conf.env "anon" with
@@ -1025,7 +1010,7 @@ let gwc conf =
   Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then print_file conf "bso_err.htm"
-  else begin print_default_gwf_file conf; print_file conf "bso_ok.htm" end
+  else print_file conf "bso_ok.htm"
 
 let gwdiff_check conf =
   print_file conf "bsi_diff.htm"
@@ -1516,10 +1501,11 @@ let gwf conf =
   in
   if in_base = "" then print_file conf "err_miss.htm"
   else
-    let benv = read_base_env in_base in
+    let benv = loc_read_base_env in_base in
     let trailer =
-      (in_base ^ ".trl")
-      |> Filename.concat "lang"
+      if !GWPARAM.reorg
+        then (Filename.concat (!GWPARAM.lang_d in_base "") (in_base ^ ".trl"))
+        else (Filename.concat "lang" (in_base ^ ".trl"))
       |> file_contents
       |> Util.escape_html
       |> fun s -> (s :> string)
@@ -1533,9 +1519,20 @@ let gwf_1 conf =
       Some f -> strip_spaces f
     | None -> ""
   in
-  let benv = read_base_env in_base in
+  let reorg =
+    match p_getenv conf.env "reorg" with
+    | Some s ->  s
+    | _ -> ""
+  in
+  if reorg = "on" then GWPARAM.reorg := true;
+  GWPARAM.test_reorg in_base;
+  let benv = loc_read_base_env in_base in
   let (vars, _) = variables "gwf_1.htm" in
-  let oc = open_out (in_base ^ ".gwf") in
+  let oc = open_out
+    ( if !GWPARAM.reorg then
+        (Filename.concat (!GWPARAM.bpath in_base) in_base ^ ".gwf")
+      else (in_base ^ ".gwf"))
+  in
   let body_prop =
     match p_getenv conf.env "proposed_body_prop" with
       Some "" | None -> s_getenv conf.env "body_prop"
@@ -1555,8 +1552,11 @@ let gwf_1 conf =
     benv;
   close_out oc;
   let trl = strip_spaces (strip_control_m (s_getenv conf.env "trailer")) in
-  let trl_file = Filename.concat "lang" (in_base ^ ".trl") in
-  (try Unix.mkdir "lang" 0o755 with Unix.Unix_error (_, _, _) -> ());
+  
+  
+  let trl_dir = !GWPARAM.etc_d in_base in
+  let trl_file = Filename.concat trl_dir ("trl.txt") in
+  try Unix.mkdir trl_dir  0o755 with Unix.Unix_error (_, _, _) -> ();
   begin try
     if trl = "" then Sys.remove trl_file
     else
@@ -1605,7 +1605,10 @@ let ged2gwb conf =
   Printf.eprintf "\n";
   flush stderr;
   if rc > 1 then print_file conf "bso_err.htm"
-  else begin print_default_gwf_file conf; print_file conf "bso_ok.htm" end
+  else (
+    let bname = try List.assoc "o" conf.env with Not_found -> "" in
+    Util.print_default_gwf_file bname;
+    print_file conf "bso_ok.htm")
 
 let consang conf ok_file =
   let rc =
@@ -1970,6 +1973,7 @@ let intro () =
     !default_lang, !default_lang
 #endif
   in
+  Secure.set_base_dir ".";
   Arg.parse speclist anonfun usage;
   if !bin_dir = "" then bin_dir := !setup_dir;
   default_lang := default_setup_lang;

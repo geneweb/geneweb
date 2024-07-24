@@ -55,7 +55,7 @@ let raw_get conf key =
 
 let insert_saved fname =
   let l = String.split_on_char Filename.dir_sep.[0] fname |> List.rev in
-  let l = List.rev @@ match l with h :: t -> h :: "old" :: t | _ -> l in
+  let l = List.rev @@ match l with h :: t -> h :: "saved" :: t | _ -> l in
   String.concat Filename.dir_sep l
 
 let write_file fname content =
@@ -67,7 +67,7 @@ let write_file fname content =
 let move_file_to_save file dir =
   (* previous version iterated on file types *)
   try
-    let save_dir = Filename.concat dir "old" in
+    let save_dir = Filename.concat dir "saved" in
     if not (Sys.file_exists save_dir) then Mutil.mkdir_p save_dir;
     let fname = Filename.basename file in
     let orig_file = Filename.concat dir fname in
@@ -138,7 +138,7 @@ let dump_bad_image conf s =
 
 let swap_files_aux dir file ext old_ext =
   let old_file =
-    String.concat Filename.dir_sep [ dir; "old"; Filename.basename file ]
+    String.concat Filename.dir_sep [ dir; "saved"; Filename.basename file ]
   in
   let tmp_file = String.concat Filename.dir_sep [ dir; "tempfile.tmp" ] in
   if ext <> old_ext then (
@@ -175,10 +175,9 @@ let get_extension conf saved fname =
   let f =
     if saved then
       String.concat Filename.dir_sep
-        [ Util.base_path [ "images" ] conf.bname; "old"; fname ]
+        [ !GWPARAM.portraits_d conf.bname; "saved"; fname ]
     else
-      String.concat Filename.dir_sep
-        [ Util.base_path [ "images" ] conf.bname; fname ]
+      String.concat Filename.dir_sep [ !GWPARAM.portraits_d conf.bname; fname ]
   in
   if Sys.file_exists (f ^ ".jpg") then ".jpg"
   else if Sys.file_exists (f ^ ".jpeg") then ".jpeg"
@@ -249,10 +248,7 @@ let print_send_image conf base p =
       Output.print_string conf (Util.escape_html (p_surname base p)))
   in
   let digest = Image.default_portrait_filename base p in
-  Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.print_sstring conf "<h2>\n";
-  title false;
-  Output.print_sstring conf "</h2>\n";
+  Hutil.header conf title;
   Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
     conf.command;
@@ -329,7 +325,7 @@ let effective_send_ok conf base p file =
         | _ -> (typ, content))
   in
   let fname = Image.default_portrait_filename base p in
-  let dir = Util.base_path [ "images" ] conf.bname in
+  let dir = !GWPARAM.images_d conf.bname in
   if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
   let fname =
     Filename.concat dir
@@ -413,11 +409,8 @@ let effective_send_c_ok conf base p file file_name =
   in
   let fname = Image.default_portrait_filename base p in
   let dir =
-    if mode = "portraits" then
-      String.concat Filename.dir_sep [ Util.base_path [ "images" ] conf.bname ]
-    else
-      String.concat Filename.dir_sep
-        [ Util.base_path [ "src" ] conf.bname; "images"; fname ]
+    if mode = "portraits" then !GWPARAM.portraits_d conf.bname
+    else Filename.concat (!GWPARAM.images_d conf.bname) fname
   in
   if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
   let fname =
@@ -431,7 +424,7 @@ let effective_send_c_ok conf base p file file_name =
           incorrect conf "effective send (portrait)"
     | Some (`Url url) -> (
         let fname = Image.default_portrait_filename base p in
-        let dir = Filename.concat dir "old" in
+        let dir = Filename.concat dir "saved" in
         if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
         let fname = Filename.concat dir fname ^ ".url" in
         try write_file fname url
@@ -530,7 +523,7 @@ let print_deleted conf base p =
 let effective_delete_ok conf base p =
   let fname = Image.default_portrait_filename base p in
   let ext = get_extension conf false fname in
-  let dir = Util.base_path [ "images" ] conf.bname in
+  let dir = !GWPARAM.portraits_d conf.bname in
   if move_file_to_save (fname ^ ext) dir = 0 then
     incorrect conf "effective delete";
   let changed =
@@ -575,15 +568,14 @@ let effective_delete_c_ok conf base p =
   let ext = get_extension conf delete fname in
   let file = if file_name = "" then fname ^ ext else file_name in
   let dir =
-    if mode = "portraits" then Util.base_path [ "images" ] conf.bname
-    else
-      String.concat Filename.dir_sep
-        [ Util.base_path [ "src" ] conf.bname; "images"; fname ]
+    if mode = "portraits" then !GWPARAM.portraits_d conf.bname
+    else Filename.concat (!GWPARAM.images_d conf.bname) fname
   in
   if not (Sys.file_exists dir) then Mutil.mkdir_p dir;
   (* TODO verify we dont destroy a saved image
       having the same name as portrait! *)
-  if delete then Mutil.rm (String.concat Filename.dir_sep [ dir; "old"; file ])
+  if delete then
+    Mutil.rm (String.concat Filename.dir_sep [ dir; "saved"; file ])
   else if move_file_to_save file dir = 0 then incorrect conf "effective delete";
   let changed =
     U_Delete_image (Util.string_gen_person base (gen_person_of_person p))
@@ -598,12 +590,12 @@ let effective_reset_c_ok conf base p =
   let mode =
     try (List.assoc "mode" conf.env :> string) with Not_found -> "portraits"
   in
-  let carrousel = Image.default_portrait_filename base p in
+  let keydir = Image.default_portrait_filename base p in
   let file_name =
     try List.assoc "file_name" conf.env with Not_found -> Adef.encoded ""
   in
   let file_name = (Mutil.decode file_name :> string) in
-  let file_name = if mode = "portraits" then carrousel else file_name in
+  let file_name = if mode = "portraits" then keydir else file_name in
   let ext = get_extension conf false file_name in
   let old_ext = get_extension conf true file_name in
   let ext =
@@ -615,11 +607,10 @@ let effective_reset_c_ok conf base p =
   in
   let file_in_new =
     if mode = "portraits" then
-      String.concat Filename.dir_sep
-        [ Util.base_path [ "images" ] conf.bname; file_name ^ ext ]
+      Filename.concat (!GWPARAM.portraits_d conf.bname) (file_name ^ ext)
     else
       String.concat Filename.dir_sep
-        [ Util.base_path [ "src" ] conf.bname; "images"; carrousel; file_name ]
+        [ !GWPARAM.images_d conf.bname; keydir; file_name ]
   in
   (if Sys.file_exists file_in_new then ()
   else

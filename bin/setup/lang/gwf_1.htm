@@ -66,7 +66,8 @@ database.
 %)
 </td>
 </tr>
-<tr align=left><td align=center>
+<tr align=left>
+<td align=left>
 <p>
 <table style="border:1px solid">
 <tr align=left>
@@ -236,7 +237,7 @@ value='style="background-color:#CC0000; text:#FFFFFF; link:#FFFF00; vlink:#00FFF
 </td>
 </tr>
 <tr align=left>
-<td align=center>
+<td align=left>
 <select name=default_lang>
 <option value=""%Edefault_lang=;>-
 <option value="af"%Edefault_lang=af;>%Laf;
@@ -286,7 +287,7 @@ ult, it is 8 generations, but you can indicate a different value here.
 </tr>
 </tr>
 <tr align=left>
-<td align=center><input name=max_anc_level value="%Vmax_anc_level;"
+<td align=left><input name=max_anc_level value="%Vmax_anc_level;"
 size=5></td>
 </tr>
 </table>
@@ -304,7 +305,7 @@ fault, it is 12 generations, but you can indicate a different value here.
 </tr>
 </tr>
 <tr align=left>
-<td align=center><input name=max_desc_level value="%Vmax_desc_level;"
+<td align=left><input name=max_desc_level value="%Vmax_desc_level;"
 size=5></td>
 </tr>
 </table>
@@ -322,7 +323,7 @@ When ancestors are displayed by tree, limit the number of displayed generations.
 </tr>
 </tr>
 <tr align=left>
-<td align=center><input name=max_anc_tree value="%Vmax_anc_tree;"
+<td align=left><input name=max_anc_tree value="%Vmax_anc_tree;"
 size=5></td>
 </tr>
 </table>
@@ -340,7 +341,7 @@ s. By default, it is 4 generations, but you can indicate a different value here.
 </tr>
 </tr>
 <tr align=left>
-<td align=center><input name=max_desc_tree value="%Vmax_desc_tree;"
+<td align=left><input name=max_desc_tree value="%Vmax_desc_tree;"
 size=5></td>
 </tr>
 </table>
@@ -360,7 +361,7 @@ start empty.
 %)
 </tr>
 <tr align=left>
-<td align=center>
+<td align=left>
 <input type=radio name=history value="yes"%Chistory=yes;>[yes|no]0
 <input type=radio name=history value="no"%Chistory=no;>[yes|no]1
 </tr>
@@ -383,7 +384,7 @@ send image" which are installed as a standard name in a standard place.
 %)
 </tr>
 <tr align=left>
-<td align=center><input name=images_path value="%Vimages_path;"
+<td align=left><input name=images_path value="%Vimages_path;"
 size=50></td>
 </tr>
 </table>
@@ -399,7 +400,7 @@ The advanced request allows to make researches in the data base. As it is very i
 ncomplete, it is hidden by default. Select "no" below to set it.
 %)
 <tr align=left>
-<td align=center>
+<td align=left>
 <input type=radio name=hide_advanced_request
 value="yes"%Chide_advanced_request=yes;>[yes|no]0
 <input type=radio name=hide_advanced_request
@@ -429,7 +430,7 @@ If this area is empty, everybody is a "friend". You can leave this area empty if
 </td>
 </tr>
 <tr align=left>
-<td align=center><input name=friend_passwd value="%Vfriend_passwd;"
+<td align=left><input name=friend_passwd value="%Vfriend_passwd;"
 size=30></td>
 </tr>
 </table>
@@ -451,7 +452,7 @@ If this area is empty, everybody is a "wizard". You can leave this area empty if
 </td>
 </tr>
 <tr align=left>
-<td align=center><input name=wizard_passwd value="%Vwizard_passwd;"
+<td align=left><input name=wizard_passwd value="%Vwizard_passwd;"
 size=30></td>
 </tr>
 </table>
@@ -474,7 +475,7 @@ t is accessible to Internet, to avoid that "wizards" make changes which would be
 </td>
 </tr>
 <tr align=left>
-<td align=center>
+<td align=left>
 <input type=radio name=wizard_just_friend
  value="yes"%Cwizard_just_friend=yes;>[yes|no]0
 <input type=radio name=wizard_just_friend
@@ -498,7 +499,7 @@ actly, the persons of less than one century.
 </td>
 </tr>
 <tr align=left>
-<td align=center>
+<td align=left>
 <input type=radio name=hide_private_names
  value="yes"%Chide_private_names=yes;>[yes|no]0
 <input type=radio name=hide_private_names
@@ -525,7 +526,7 @@ ropriate file name.
 </td>
 </tr>
 <tr align=left>
-<td align=center>
+<td align=left>
 <input type=radio name=can_send_image
  value="yes"%Ccan_send_image=yes;>[yes|no]0
 <input type=radio name=can_send_image
@@ -554,7 +555,7 @@ w name to use with the same clickable request.
 </td>
 </tr>
 <tr align=left>
-<td align=center><input name=renamed value="%Vrenamed;" size=30></td>
+<td align=left><input name=renamed value="%Vrenamed;" size=30></td>
 </tr>
 </table>
 <p>
@@ -574,6 +575,20 @@ an use HTML tags.
 </td>
 </tr>
 </table>
+<p>
+<table style="border:1px solid" width="100%%">
+<tr align=left>
+<td>
+[check this box if creating a config file in reorg mode]
+</td>
+</tr>
+<tr align=left>
+<td>
+<input type="checkbox" name="reorg" id="reorg">[Reorg mode]
+</td>
+</tr>
+</table>
+
 </table></dl>
 <p>
 <li>

@@ -1827,6 +1827,10 @@ sl: dodaj slika
 sv: lägg till bild
 tr: resim ekle
 
+    must use MOD_IND
+en: portrait is a url. Use MOD_IND to delete or update.
+fr: le portrait est une Url. Utiliser MOD_IND pour le corriger ou le supprimer.
+
     add portrait
 co: aghjunghje un ritrattu
 de: Porträt hinzufügen
@@ -14678,8 +14682,8 @@ fr: si une image du même nom existe déjà dans le sous-répertoire de sauvegar
     previous portrait
 co: un arregistramentu precedente di u ritrattu, s’ellu esiste, serà squassatu.
 de: wenn schon ein gespeichertes Porträt mit dem gleichen Namen existiert, wird es gelöscht.
-en: a possible previous version of the saved portrait will be deleted.
-fr: une sauvegarde pré-existante du portrait sera supprimée.
+en: a possible previous version of the saved portrait will be deleted. Using MOD_IND does not save the portrait.
+fr: une sauvegarde pré-existante du portrait sera supprimée.<br> Utiliser MOD_IND ne sauvegarde pas le portrait.
 
     previous sibling
 af: vorige broer/vorige suster/vorige broer of suster
