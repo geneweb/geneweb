@@ -221,7 +221,7 @@ let main () =
       (fun () ->
         let next_family_fun = next_family_fun_templ (List.rev !gwo) in
         if Db1link.link next_family_fun bdir then (
-          (*Geneweb.Util.print_default_gwf_file bname;*)
+          Geneweb.Util.print_default_gwf_file bname;
           if !kill_gwo then
             List.iter
               (fun (x, _separate, _bnotes, _shift) ->

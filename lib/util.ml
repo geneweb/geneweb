@@ -4,6 +4,89 @@ open Config
 open Def
 open Gwdb
 
+let print_default_gwf_file bname =
+  let gwf =
+    [
+      "access_by_key=yes";
+      "disable_forum=yes";
+      "hide_private_names=no";
+      "use_restrict=no";
+      "show_consang=yes";
+      "display_sosa=yes";
+      "place_surname_link_to_ind=yes";
+      "max_anc_level=8";
+      "max_anc_tree=7";
+      "max_desc_level=12";
+      "max_desc_tree=4";
+      "max_cousins=2000";
+      "max_cousins_level=5";
+      "latest_event=20";
+      "template=*";
+      "long_date=no";
+      "counter=no";
+      "full_siblings=yes";
+      "hide_advanced_request=no";
+      "p_mod=";
+    ]
+  in
+  let config_d = !GWPARAM.config_d bname in
+  let fname = !GWPARAM.config bname in
+  try
+    if not (Sys.file_exists config_d) then Unix.mkdir config_d 0o755;
+    if bname = "" || Sys.file_exists fname then ()
+    else
+      let oc = open_out fname in
+      List.iter (fun s -> Printf.fprintf oc "%s\n" s) gwf;
+      close_out oc
+  with Unix.Unix_error (_, _, _) ->
+    !GWPARAM.syslog `LOG_WARNING
+      (Printf.sprintf "Error while creating %s or %s\n" config_d fname)
+
+let rec cut_at_equal i s =
+  if i = String.length s then (s, "")
+  else if s.[i] = '=' then
+    (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
+  else cut_at_equal (succ i) s
+
+let read_base_env bname gw_prefix debug =
+  let load_file fname =
+    try
+      let ic = Secure.open_in fname in
+      let env =
+        let rec loop env =
+          match input_line ic with
+          | s ->
+              let s = Mutil.strip_all_trailing_spaces s in
+              if s = "" || s.[0] = '#' then loop env
+              else loop (cut_at_equal 0 s :: env)
+          | exception End_of_file -> env
+        in
+        loop []
+      in
+      close_in ic;
+      List.rev env
+    with Sys_error error ->
+      !GWPARAM.syslog `LOG_WARNING
+        (Printf.sprintf "Error %s while loading %s, using empty config\n%!"
+           error fname);
+      []
+  in
+  let fname1 = !GWPARAM.config bname in
+  if Sys.file_exists fname1 then load_file fname1
+  else
+    let fname2 = Filename.concat gw_prefix "a.gwf" in
+    if Sys.file_exists fname2 then (
+      if debug then
+        !GWPARAM.syslog `LOG_WARNING
+          (Printf.sprintf "Using configuration from %s\n%!" fname2);
+      load_file fname2)
+    else (
+      if debug then
+        !GWPARAM.syslog `LOG_WARNING
+          (Printf.sprintf "No config file found in either %s or %s\n%!" fname1
+             fname2);
+      [])
+
 let time_debug conf query_time nb_errors errors_undef errors_other set_vars =
   (*Printf.eprintf "Errors set_vars:\n";
     List.iter (fun e -> Printf.eprintf "%s\n" e) set_vars;*)
