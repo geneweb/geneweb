@@ -189,24 +189,7 @@ let mkdir_p ?(perm = 0o755) d =
   in
   loop d
 
-let rec remove_dir d =
-  begin try
-    let files = Sys.readdir d in
-    for i = 0 to Array.length files - 1 do
-      remove_dir (Filename.concat d files.(i));
-      rm (Filename.concat d files.(i))
-    done
-  with Sys_error _ -> ()
-  end;
-  try Unix.rmdir d with Unix.Unix_error (_, _, _) -> ()
-
-let lock_file bname =
-  let bname =
-    if Filename.check_suffix bname ".gwb" then
-      Filename.chop_suffix bname ".gwb"
-    else bname
-  in
-  bname ^ ".lck"
+let lock_file bname = (Filename.remove_extension bname) ^ ".lck"
 
 let initial n =
   let rec loop i =
@@ -1136,23 +1119,56 @@ let eq_key (fn1, sn1, oc1) (fn2, sn2, oc2) =
   s fn1 = s fn2 && s sn1 = s sn2 && oc1 = oc2
 
 let ls_r dirs =
-  let rec loop result = function
-    | f :: fs when Sys.is_directory f ->
-      Sys.readdir f
-      |> Array.to_list
-      |> List.rev_map (Filename.concat f)
-      |> List.rev_append fs
-      |> loop (f :: result)
-    | f :: fs -> loop (f :: result) fs
-    | [] -> result
+  let rec loop acc = function
+    | [] -> List.rev acc
+    | dir :: rest ->
+        if Sys.file_exists dir then
+          if Sys.is_directory dir then
+            let contents =
+              try Sys.readdir dir |> Array.to_list |> List.map (Filename.concat dir)
+              with e ->
+                Printf.eprintf "Error reading directory %s: %s\n" dir (Printexc.to_string e);
+                []
+            in
+            loop (dir :: acc) (contents @ rest)
+          else loop (dir :: acc) rest
+        else
+          (Printf.eprintf "Path does not exist: %s\n" dir; loop acc rest)
   in
   loop [] dirs
 
+let check_permissions path =
+  try
+    let stats = Unix.stat path in
+    let perms = stats.Unix.st_perm in
+    if perms land 0o200 = 0 then
+      Printf.eprintf "File is not writable: %s\n" path;
+    (try Unix.access path [Unix.W_OK]
+     with Unix.Unix_error _ ->
+       Printf.eprintf "Current process does not have write permission: %s\n" path)
+  with e ->
+    Printf.eprintf "Error checking permissions for %s: %s\n" path (Printexc.to_string e)
+
 let rm_rf f =
   if Sys.file_exists f then
-    let (directories, files) = ls_r [f] |> List.partition Sys.is_directory in
-    List.iter Unix.unlink files ;
-    List.iter Unix.rmdir directories
+    let all_paths = ls_r [f] in
+    List.iter check_permissions all_paths;
+    let (directories, files) = List.partition Sys.is_directory all_paths in
+    List.iter (fun file ->
+      try
+        let ic = open_in_bin file in
+        close_in ic;
+        Sys.remove file
+      with e ->
+        Printf.eprintf "Error handling file %s: %s\n" file (Printexc.to_string e)
+    ) files;
+    List.iter (fun dir ->
+      try Unix.rmdir dir
+      with e ->
+        Printf.eprintf "Error deleting directory %s: %s\n" dir (Printexc.to_string e)
+    ) (List.rev directories)
+  else
+    Printf.eprintf "Path does not exist: %s\n" f
 
 let rec filter_map fn = function
   | [] -> []

@@ -202,8 +202,6 @@ let escape_attribute =
 let is_hide_names conf p =
   if conf.hide_names || get_access p = Private then true else false
 
-let cnt_dir = ref Filename.current_dir_name
-
 let search_in_path p s =
   let rec loop = function
     | d :: dl ->
@@ -1220,8 +1218,6 @@ let string_of_witness_kind conf sex witness_kind =
   in
   Adef.safe @@ transl_nth conf s n
 
-let base_path pref bname =
-  List.fold_right Filename.concat (Secure.base_dir () :: pref) bname
 let bpath bname = !GWPARAM.bpath bname
 let copy_from_templ_ref = ref (fun _ _ _ -> assert false)
 let copy_from_templ conf env ic = !copy_from_templ_ref conf env ic
@@ -1362,8 +1358,10 @@ let get_request_string conf =
 let message_to_wizard conf =
   if conf.wizard || conf.just_friend_wizard then (
     let print_file fname =
-    let fname = Filename.concat (!GWPARAM.etc_d conf.bname) (fname ^ ".txt") in
-    try
+      let fname =
+        Filename.concat (!GWPARAM.etc_d conf.bname) (fname ^ ".txt")
+      in
+      try
         let ic = Secure.open_in fname in
         try
           while true do
@@ -2015,13 +2013,18 @@ let find_sosa_ref conf base =
   | None -> default_sosa_ref conf base
 
 let write_default_sosa conf key =
-  let gwf = List.remove_assoc "default_sosa_ref" conf.base_env in
-  let gwf = List.rev (("default_sosa_ref", key) :: gwf) in
-  let fname = bpath (conf.bname ^ ".gwf") in
+  let gwf =
+    List.fold_left
+      (fun acc (k, v) ->
+        if k = "default_sosa_ref" then ("default_sosa_ref", key) :: acc
+        else (k, v) :: acc)
+      [] (List.rev conf.base_env)
+  in
+  let fname = !GWPARAM.config conf.bname in
   let tmp_fname = fname ^ "2" in
   let oc =
     try Stdlib.open_out tmp_fname
-    with Sys_error _ -> failwith "the gwf database is not writable"
+    with Sys_error _ -> failwith "the gwf file is not writable"
   in
   List.iter (fun (k, v) -> Stdlib.output_string oc (k ^ "=" ^ v ^ "\n")) gwf;
   close_out oc;

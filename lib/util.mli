@@ -14,13 +14,6 @@ val time_debug :
   config -> float -> int -> string list -> string list -> string list -> unit
 (** prints the query duration and reports it in the "home" section *)
 
-(* REORG *)
-val cnt_dir : string ref
-(** The directory where counters (e.g. number page displayed) are stored. *)
-
-val base_path : string list -> string -> string
-(** Alias for !GWPARAM.base_path *)
-
 val bpath : string -> string
 (** Alias for !GWPARAM.bpath *)
 
