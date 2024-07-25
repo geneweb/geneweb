@@ -5,9 +5,7 @@ open Def
 open Util
 
 let dir conf base =
-  Filename.concat
-    (Util.bpath (conf.bname ^ ".gwb"))
-    (Gwdb.base_wiznotes_dir base)
+  Filename.concat (Util.bpath conf.bname) (Gwdb.base_wiznotes_dir base)
 
 let wzfile wddir wz = Filename.concat wddir (wz ^ ".txt")
 
