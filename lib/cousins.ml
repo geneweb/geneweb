@@ -333,26 +333,29 @@ let init_cousins_cnt conf base p =
   | Some t, Some d_t -> (t, d_t)
   | _, _ ->
       let _pnoc, _v1, t', d_t' =
+        let cous_cache_fname =
+          Filename.concat (!GWPARAM.bpath conf.bname) "cousins_cache"
+        in
         match List.assoc_opt "cache_cousins_tool" conf.Config.base_env with
         | Some "yes" -> (
             flush stderr;
             let pnoc, v1, t', d_t' =
-              Mutil.read_or_create_value "cousins_cache" (fun () ->
+              Mutil.read_or_create_value cous_cache_fname (fun () ->
                   build_tables key)
             in
             match (pnoc, v1) with
             | pnoc, v1 when pnoc = key && max_a_l <= v1 -> (pnoc, v1, t', d_t')
             | pnoc, v1 when pnoc = key ->
                 let _pnoc, _v1, t', d_t' =
-                  Mutil.read_or_create_value "cousins_cache" (fun () ->
+                  Mutil.read_or_create_value cous_cache_fname (fun () ->
                       build_tables key)
                 in
-                Sys.remove "cousins_cache";
-                Mutil.read_or_create_value "cousins_cache" ~magic:key (fun () ->
+                Sys.remove cous_cache_fname;
+                Mutil.read_or_create_value cous_cache_fname ~magic:key (fun () ->
                     expand_tables key v1 max_a_l t' d_t')
             | _ ->
-                Sys.remove "cousins_cache";
-                Mutil.read_or_create_value "cousins_cache" (fun () ->
+                Sys.remove cous_cache_fname;
+                Mutil.read_or_create_value cous_cache_fname (fun () ->
                     build_tables key))
         | _ ->
             flush stderr;
