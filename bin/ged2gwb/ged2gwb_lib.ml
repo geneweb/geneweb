@@ -466,7 +466,23 @@ let parse_name =
   let (f, s) = if invert then (s, f) else (f, s) in
   let f = strip_spaces f in
   let s = strip_spaces s in
-  ((if f = "" then "x" else f), (if s = "" then "?" else s))
+  let f = if f = "" then Option.none else Option.some f in
+  let s = if s = "" then Option.none else Option.some s in
+  f, s
+
+let parse_alias s = match parse_name s with
+  | Some f, Some s -> Some (Printf.sprintf "%s %s" f s)
+  | Some n, None
+  | None, Some n -> Some n
+  | None, None -> None
+
+let string_of_first_name_option = function
+  | Some f -> f
+  | None -> "x"
+
+let string_of_surname_option = function
+  | Some s -> s
+  | None -> "?"
 
 let rec find_field lab =
   function
@@ -1681,6 +1697,8 @@ let add_indi gen r =
     match name_sons with
     | Some n ->
       let (f, s) = parse_name (Stream.of_string n.rval) in
+      let f = string_of_first_name_option f in
+      let s = string_of_surname_option s in
       let pn = "" in
       let fal = if givn = f then [] else [givn] in
       let (f, fal) =
@@ -1778,7 +1796,10 @@ let add_indi gen r =
   in
   let aliases =
     match find_all_fields "NAME" r.rsons with
-      _ :: l -> List.map (fun r -> r.rval) l
+    | _ :: l ->
+      List.filter_map (fun r ->
+          parse_alias (Stream.of_string r.rval)
+        ) l
     | _ -> []
   in
   let sex =
