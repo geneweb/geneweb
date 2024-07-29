@@ -445,6 +445,20 @@ let redirect_added_families base p ip2 p2_family =
     patch_couple base ifam cpl
   done
 
+let sort_families_array_by_date base fam_arr =
+  let cmp_date d1_o d2_o = match d1_o, d2_o with
+    | None, None -> 0
+    | Some d1, Some d2 -> Date.compare_date d1 d2
+    | None, Some _ -> -1
+    | Some _, None -> 1
+  in
+  let cmp_ifam ifam1 ifam2 =
+    let d1 = Gwdb.get_marriage (Gwdb.foi base ifam1) in
+    let d2 = Gwdb.get_marriage (Gwdb.foi base ifam2) in
+    cmp_date (Date.od_of_cdate d1) (Date.od_of_cdate d2)
+  in
+  Array.sort cmp_ifam fam_arr
+
 let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let conf = Update.update_conf o_conf in
   let p_family = get_family (poi base sp.key_index) in
@@ -460,7 +474,9 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   redirect_added_families base p o_p2.key_index p2_family;
   UpdateIndOk.effective_del_no_commit base o_p2;
   patch_person base p.key_index p;
-  let u = { family = Array.append p_family p2_family } in
+  let family = Array.append p_family p2_family in
+  sort_families_array_by_date base family;
+  let u = { family } in
   if p2_family <> [||] then patch_union base p.key_index u;
   Consang.check_noloop_for_person_list base
     (Update.def_error conf base)
