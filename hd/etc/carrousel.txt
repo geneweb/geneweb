@@ -62,17 +62,17 @@
 %end;
 
 %let;portraits_store;
-  %if;(bvar.reorg="on")%base.name;.gwb%X;documents%X;portraits%nn;
+  %if;reorg;%base.name;.gwb%X;documents%X;portraits%nn;
   %else;images%X;%base.name;%nn;
   %end;%nn;
 %in;
 %let;saved_portraits_store;
-  %if;(bvar.reorg="on")%base.name;.gwb%X;documents%X;portraits%nn;
+  %if;reorg;%base.name;.gwb%X;documents%X;portraits%X;old%nn;
   %else;images%X;%base.name;%X;old%nn;
   %end;%nn;
 %in;
 %let;images_store;
-  %if;(bvar.reorg="on")%base.name;.gwb%X;documents%X;images%nn;
+  %if;reorg;%base.name;.gwb%X;documents%X;images%nn;
   %else;src%X;%base.name;%X;images%nn;
   %end;%nn;
 %in;

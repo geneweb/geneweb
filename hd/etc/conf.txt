@@ -56,7 +56,8 @@
 <section id="bvar-list" class="mt-3 mx-3">
   <h2>[*configuration parameters]</h2>
   <div>
-    <tt>%base.name;.gwf</tt><br>
+     Mode: <b>%if;reorg;Reorg%else;Classic%end;</b>[:]%sp;
+    <tt>%if;reorg;%base.name;.gwb%/etc%/%base.name;%else;%base.name;%end;.gwf</tt><br>
     %bvar.list;
   </div>
 </section>

@@ -18,14 +18,12 @@ type counter = {
 let get_date conf =
   Printf.sprintf "%02d/%02d/%d" conf.today.day conf.today.month conf.today.year
 
-let adm_file f = List.fold_right Filename.concat [ !Util.cnt_dir; "cnt" ] f
-let cnt conf ext = adm_file (conf.bname ^ ext)
-
 let input_int ic =
   try int_of_string (input_line ic) with End_of_file | Failure _ -> 0
 
 let count conf =
-  let fname = cnt conf ".txt" in
+  let _ = Util.test_cnt_d conf in
+  let fname = !GWPARAM.adm_file (conf.bname ^ ".txt") in
   try
     let ic = Secure.open_in fname in
     let rd =
@@ -67,7 +65,8 @@ let count conf =
     }
 
 let write_counter conf r =
-  let fname = cnt conf ".txt" in
+  let cnt_d = Util.test_cnt_d conf in
+  let fname = Filename.concat cnt_d (conf.bname ^ ".txt") in
   try
     let oc = Secure.open_out_bin fname in
     output_string oc (string_of_int r.welcome_cnt);
@@ -86,12 +85,13 @@ let write_counter conf r =
   with _ -> ()
 
 let set_wizard_and_friend_traces conf =
+  let _ = Util.test_cnt_d conf in
   if conf.wizard && conf.user <> "" then (
     let wpf =
       try List.assoc "wizard_passwd_file" conf.base_env with Not_found -> ""
     in
     if wpf <> "" then
-      let fname = adm_file (conf.bname ^ "_w.txt") in
+      let fname = !GWPARAM.adm_file (conf.bname ^ "_w.txt") in
       update_wf_trace conf fname)
   else if conf.friend && (not conf.just_friend_wizard) && conf.user <> "" then
     let fpf =
@@ -104,22 +104,25 @@ let set_wizard_and_friend_traces conf =
       fpf <> ""
       && is_that_user_and_password conf.auth_scheme conf.user fp = false
     then
-      let fname = adm_file (conf.bname ^ "_f.txt") in
+      let fname = !GWPARAM.adm_file (conf.bname ^ "_f.txt") in
       update_wf_trace conf fname
 
 let incr_counter f conf =
-  let lname = cnt conf ".lck" in
-  Lock.control lname true
-    ~onerror:(fun () -> None)
-    (fun () ->
-      let r = count conf in
-      f r;
-      if conf.wizard then r.wizard_cnt <- r.wizard_cnt + 1
-      else if conf.friend then r.friend_cnt <- r.friend_cnt + 1
-      else r.normal_cnt <- r.normal_cnt + 1;
-      write_counter conf r;
-      set_wizard_and_friend_traces conf;
-      Some (r.welcome_cnt, r.request_cnt, r.start_date))
+  if conf.bname = "" then None
+  else
+    let _ = Util.test_cnt_d conf in
+    let lname = !GWPARAM.adm_file (conf.bname ^ ".lck") in
+    Lock.control lname true
+      ~onerror:(fun () -> None)
+      (fun () ->
+        let r = count conf in
+        f r;
+        if conf.wizard then r.wizard_cnt <- r.wizard_cnt + 1
+        else if conf.friend then r.friend_cnt <- r.friend_cnt + 1
+        else r.normal_cnt <- r.normal_cnt + 1;
+        write_counter conf r;
+        set_wizard_and_friend_traces conf;
+        Some (r.welcome_cnt, r.request_cnt, r.start_date))
 
 let incr_welcome_counter =
   incr_counter (fun r -> r.welcome_cnt <- r.welcome_cnt + 1)
@@ -129,29 +132,33 @@ let incr_request_counter =
 
 let lang_file_name conf fname =
   let fname1 =
-    Util.base_path [ "lang"; conf.lang ] (Filename.basename fname ^ ".txt")
+    Filename.concat
+      (!GWPARAM.lang_d conf.bname conf.lang)
+      (Filename.basename fname ^ ".txt")
   in
   if Sys.file_exists fname1 then fname1
   else
     search_in_assets
       (Filename.concat conf.lang (Filename.basename fname ^ ".txt"))
 
-let any_lang_file_name fname =
-  let fname1 = Util.base_path [ "lang" ] (Filename.basename fname ^ ".txt") in
+let any_lang_file_name conf fname =
+  let fname1 =
+    Filename.concat
+      (!GWPARAM.lang_d conf.bname "")
+      (Filename.basename fname ^ ".txt")
+  in
   if Sys.file_exists fname1 then fname1
   else
     search_in_assets (Filename.concat "lang" (Filename.basename fname ^ ".txt"))
 
 let source_file_name conf fname =
-  let bname = conf.bname in
-  let lang = conf.lang in
   let fname1 =
     List.fold_right Filename.concat
-      [ Util.base_path [ "src" ] bname; lang ]
+      [ !GWPARAM.src_d conf.bname; conf.lang ]
       (fname ^ ".txt")
   in
   if Sys.file_exists fname1 then fname1
-  else Filename.concat (Util.base_path [ "src" ] bname) (fname ^ ".txt")
+  else Filename.concat (!GWPARAM.src_d conf.bname) (fname ^ ".txt")
 
 let extract_date s =
   try Scanf.sscanf s "%d/%d/%d" (fun d m y -> Some (d, m, y)) with _ -> None
@@ -423,7 +430,7 @@ and src_translate conf base nomin strm echo mode =
 and copy_from_file conf base name mode =
   let fname =
     match mode with
-    | Lang -> any_lang_file_name name
+    | Lang -> any_lang_file_name conf name
     | Source -> source_file_name conf name
   in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
@@ -444,7 +451,7 @@ let gen_print mode conf base fname =
     | Lang -> (
         try Some (Secure.open_in (lang_file_name conf fname))
         with Sys_error _ -> (
-          try Some (Secure.open_in (any_lang_file_name fname))
+          try Some (Secure.open_in (any_lang_file_name conf fname))
           with Sys_error _ -> None))
     | Source -> (
         try Some (Secure.open_in (source_file_name conf fname))
