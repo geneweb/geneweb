@@ -2706,8 +2706,23 @@ let find_lev0 (strm__ : _ Stream.t) =
   in
   bp, r1, r2
 
-let pass1 gen fname =
+let open_in_bin_with_bom_check fname =
+  let in_channel_has_bom ic =
+    try
+      Char.code (input_char ic) = 239
+      && Char.code (input_char ic) = 187
+      && Char.code (input_char ic) = 191
+    with End_of_file -> false
+  in
   let ic = open_in_bin fname in
+  if in_channel_has_bom ic then
+    !state.charset_option <- Some Utf8
+  else
+    seek_in ic 0;
+  ic
+
+let pass1 gen fname =
+  let ic = open_in_bin_with_bom_check fname in
   let strm = Stream.of_channel ic in
   let rec loop () =
     match try Some (find_lev0 strm) with Stream.Failure -> None with
@@ -2736,7 +2751,7 @@ let fill_g_per gen list =
   end list
 
 let pass2 gen fname =
-  let ic = open_in_bin fname in
+  let ic = open_in_bin_with_bom_check fname in
   !state.line_cnt <- 0;
   let strm =
     Stream.from
@@ -2767,7 +2782,7 @@ let pass2 gen fname =
   close_in ic
 
 let pass3 gen fname =
-  let ic = open_in_bin fname in
+  let ic = open_in_bin_with_bom_check fname in
   !state.line_cnt <- 0;
   let strm =
     Stream.from
@@ -2891,7 +2906,7 @@ let make_arrays in_file =
   in
   let gen =
     {g_per = {arr = [| |]; tlen = 0}; g_fam = {arr = [| |]; tlen = 0};
-     g_str = {arr = [| |]; tlen = 0}; g_bnot = ""; g_ic = open_in_bin fname;
+     g_str = {arr = [| |]; tlen = 0}; g_bnot = ""; g_ic = open_in_bin_with_bom_check fname;
      g_not = Hashtbl.create 3001; g_src = Hashtbl.create 3001;
      g_hper = Hashtbl.create 3001; g_hfam = Hashtbl.create 3001;
      g_hstr = Hashtbl.create 3001; g_hnam = Hashtbl.create 3001;
