@@ -460,7 +460,9 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   redirect_added_families base p o_p2.key_index p2_family;
   UpdateIndOk.effective_del_no_commit base o_p2;
   patch_person base p.key_index p;
-  let u = { family = Array.append p_family p2_family } in
+  let family = Array.append p_family p2_family in
+  Update_util.sort_families_array_by_date base family;
+  let u = { family } in
   if p2_family <> [||] then patch_union base p.key_index u;
   Consang.check_noloop_for_person_list base
     (Update.def_error conf base)

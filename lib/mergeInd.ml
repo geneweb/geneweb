@@ -125,7 +125,9 @@ let effective_merge_ind conf base (warning : CheckItem.base_warning -> unit) p1
       in
       patch_couple base ifam cpl
     done;
-    let u1 = { family = Array.append (get_family p1) (get_family u2) } in
+    let family = Array.append (get_family p1) (get_family u2) in
+    Update_util.sort_families_array_by_date base family;
+    let u1 = { family } in
     patch_union base (get_iper p1) u1;
     let u2 = { family = [||] } in
     patch_union base (get_iper p2) u2);
