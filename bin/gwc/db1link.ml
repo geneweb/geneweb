@@ -33,7 +33,7 @@ type ('person, 'string) gen_min_person = {
   mutable m_rparents : ('person, 'string) gen_relation list;
   mutable m_related : int list;
   mutable m_pevents : ('person, 'string) gen_pers_event list;
-  mutable m_sex : sex;
+  mutable m_sex : sex assumption;
   mutable m_notes : 'string;
 }
 (** Restricted to the minimum [Def.gen_person] data type. *)
@@ -228,7 +228,7 @@ let make_person gen p n occ : min_person * ascend * union =
       m_rparents = [];
       m_related = [];
       m_pevents = [];
-      m_sex = Neuter;
+      m_sex = Gwcomp.make_weak_assumption Neuter;
       m_notes = empty_string;
     }
   and a = { parents = None; consang = Adef.fix (-1) }
@@ -676,14 +676,24 @@ let check_parents_not_already_defined gen ix fath moth =
       check_error gen
   | _ -> ()
 
+let display_sex_inconsistency gen p =
+  Printf.printf "\nInconsistency about the sex of\n  %s %s\n"
+    (p_first_name gen.g_base p)
+    (p_surname gen.g_base p)
+
 (** Assign sex to the person's entry if it's unitialised.
     Print message if sexes are different. *)
 let notice_sex gen p s =
-  if p.m_sex = Neuter then p.m_sex <- s
-  else if p.m_sex <> s && s <> Neuter then
-    Printf.printf "\nInconsistency about the sex of\n  %s %s\n"
-      (p_first_name gen.g_base p)
-      (p_surname gen.g_base p)
+  match (p.m_sex, s) with
+  | Strong _, Weak _ -> ()
+  | Weak _, Strong _ -> p.m_sex <- s
+  | Strong sex1, Strong sex2 ->
+      if sex1 <> sex2 then display_sex_inconsistency gen p
+  | Weak sex1, Weak sex2 -> (
+      match (sex1, sex2) with
+      | Neuter, _ -> p.m_sex <- s
+      | _, Neuter -> ()
+      | _ -> if sex1 <> sex2 then display_sex_inconsistency gen p)
 
 (** Convert [string Def.gen_fam_event_name] to [int Def.gen_fam_event_name].
     If event is [Efam_Name] stores event name as a string in the base. *)
@@ -940,8 +950,9 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
         insert_somebody state gen (Adef.mother co) )
     with
     (* Look for inverted WIFE/HUSB *)
-    | (fath, ifath), (moth, imoth) when fath.m_sex = Female && moth.m_sex = Male
-      ->
+    | (fath, ifath), (moth, imoth)
+      when Gwcomp.value_of_assumption fath.m_sex = Female
+           && Gwcomp.value_of_assumption moth.m_sex = Male ->
         (moth, imoth, fath, ifath)
     | (fath, ifath), (moth, imoth) -> (fath, ifath, moth, imoth)
   in
@@ -994,7 +1005,9 @@ let insert_family state gen co fath_sex moth_sex witl fevtl fo deo =
     Array.map
       (fun key ->
         let e, ie = insert_person state gen key in
-        notice_sex gen e key.sex;
+        notice_sex gen e
+          (if key.sex = Neuter then Gwcomp.make_weak_assumption key.sex
+          else Gwcomp.make_strong_assumption key.sex);
         ie)
       deo.children
   in
@@ -1211,7 +1224,7 @@ let map_option f = function Some x -> Some (f x) | None -> None
 let insert_relation_parent state gen ip s k =
   let par, ipar = insert_somebody state gen k in
   par.m_related <- ip :: par.m_related;
-  if par.m_sex = Neuter then par.m_sex <- s;
+  if Gwcomp.value_of_assumption par.m_sex = Neuter then par.m_sex <- s;
   ipar
 
 (** Convert [(Dune__exe.Gwcomp.somebody, string) Def.gen_relation] to
@@ -1220,8 +1233,15 @@ let insert_relation_parent state gen ip s k =
 let insert_relation state gen ip r =
   {
     r_type = r.r_type;
-    r_fath = map_option (insert_relation_parent state gen ip Male) r.r_fath;
-    r_moth = map_option (insert_relation_parent state gen ip Female) r.r_moth;
+    r_fath =
+      map_option
+        (insert_relation_parent state gen ip (Gwcomp.make_weak_assumption Male))
+        r.r_fath;
+    r_moth =
+      map_option
+        (insert_relation_parent state gen ip
+           (Gwcomp.make_weak_assumption Female))
+        r.r_moth;
     r_sources = unique_string gen r.r_sources;
   }
 
@@ -1582,7 +1602,7 @@ let convert_persons per_index_ic per_ic persons =
           rparents = mp.m_rparents;
           related = mp.m_related;
           pevents = mp.m_pevents;
-          sex = mp.m_sex;
+          sex = Gwcomp.value_of_assumption mp.m_sex;
           notes = mp.m_notes;
           key_index = i;
         }

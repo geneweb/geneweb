@@ -12,20 +12,22 @@ type somebody =
   | Undefined of key  (** Reference to person *)
   | Defined of (iper, iper, string) gen_person  (** Person's definition *)
 
+type 'a assumption = Weak of 'a | Strong of 'a
+
 (** Blocks that could appear in .gw file. *)
 type gw_syntax =
   | Family of
       somebody gen_couple
-      * sex
-      * sex
-      * (somebody * sex) list
+      * sex assumption
+      * sex assumption
+      * (somebody * sex assumption) list
       * (string gen_fam_event_name
         * cdate
         * string
         * string
         * string
         * string
-        * (somebody * sex * witness_kind * string) list)
+        * (somebody * sex assumption * witness_kind * string) list)
         list
       * ((iper, iper, string) gen_person, ifam, string) gen_family
       * (iper, iper, string) gen_person gen_descend
@@ -41,7 +43,8 @@ type gw_syntax =
   | Notes of key * string
       (** Block that defines personal notes. First element represents
       reference to person. Second is note's content. *)
-  | Relations of somebody * sex * (somebody, string) gen_relation list
+  | Relations of
+      somebody * sex assumption * (somebody, string) gen_relation list
       (** Block that defines relations of a person with someone outisde of
       family block. Contains:
       - Concerned person definition/reference
@@ -49,14 +52,14 @@ type gw_syntax =
       - List of his relations. *)
   | Pevent of
       somebody
-      * sex
+      * sex assumption
       * (string gen_pers_event_name
         * cdate
         * string
         * string
         * string
         * string
-        * (somebody * sex * witness_kind * string) list)
+        * (somebody * sex assumption * witness_kind * string) list)
         list
       (** Block that defines events of a person. Specific to gwplus format. Contains:
       - Concerned person definition/reference
@@ -78,3 +81,7 @@ val check_magic : string -> in_channel -> unit
 
 val comp_families : State.t -> string -> unit
 (** Compile .gw file and save result to corresponding .gwo *)
+
+val make_strong_assumption : 'a -> 'a assumption
+val make_weak_assumption : 'a -> 'a assumption
+val value_of_assumption : 'a assumption -> 'a
