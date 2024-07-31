@@ -35,3 +35,11 @@ val print :
   (config -> base -> string -> person list -> unit) ->
   (config -> string -> unit) ->
   unit
+
+val persons_starting_with :
+  conf:Config.config ->
+  base:Gwdb.base ->
+  first_name_prefix:string ->
+  surname_prefix:string ->
+  limit:int ->
+  Gwdb.person list

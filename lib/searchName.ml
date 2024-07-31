@@ -4,6 +4,131 @@ open Config
 open Gwdb
 open Util
 
+type spi = {
+  spi : Gwdb.string_person_index;
+  mutable st : [ `First | `Current of istr ];
+}
+
+let spi_of_fn base =
+  let spi = Gwdb.persons_of_first_name base in
+  { spi; st = `First }
+
+let spi_of_sn base =
+  let spi = Gwdb.persons_of_surname base in
+  { spi; st = `First }
+
+let start_with base pfx s =
+  let particles = Gwdb.base_particles base in
+  let p = Mutil.get_particle particles s in
+  let len_particle = String.length p in
+  let s = String.sub s len_particle (String.length s - len_particle) in
+  Mutil.start_with pfx 0 s
+
+let ipers_of_prefix base spi prefix =
+  let istr_o =
+    try
+      match spi.st with
+      | `First -> Some (Gwdb.spi_first spi.spi prefix)
+      | `Current istr ->
+          let istr' = Gwdb.spi_next spi.spi istr in
+          if Gwdb.compare_istr istr istr' <> 0 then Some istr' else None
+    with Not_found -> None
+  in
+  Option.bind istr_o (fun istr ->
+      spi.st <- `Current istr;
+      let s = Gwdb.sou base istr in
+      if start_with base prefix s then Some (Gwdb.spi_find spi.spi istr)
+      else None)
+
+let all_names_of_prefix base spi prefix =
+  try
+    let istr = Gwdb.spi_first spi.spi prefix in
+    let rec aux istr l =
+      let s = Gwdb.sou base istr in
+      if start_with base prefix s then
+        let l = istr :: l in
+        try
+          let istr' = Gwdb.spi_next spi.spi istr in
+          if Gwdb.compare_istr istr istr' <> 0 then aux istr' l else l
+        with Not_found -> l
+      else l
+    in
+    aux istr []
+  with Not_found -> []
+
+let persons_of_prefix conf base spi prefix max =
+  let ipers = ipers_of_prefix base spi prefix in
+  let rec aux n l ipers =
+    match ipers with
+    | _iper :: _ipers when n <= 0 -> l
+    | iper :: ipers ->
+        let p = Gwdb.poi base iper in
+        if Util.authorized_age conf base p then aux (n - 1) (p :: l) ipers
+        else aux n l ipers
+    | _ -> l
+  in
+  match ipers with
+  | Some ipers -> Some (List.rev (aux max [] ipers))
+  | None -> None
+
+let n_persons_of_prefix n conf base spi prefix =
+  let rec aux n l =
+    match persons_of_prefix conf base spi prefix n with
+    | Some persons ->
+        let len = List.length persons in
+        if len > n then
+          let persons = Ext_list.take persons n in
+          l @ persons
+        else aux (n - len) (l @ persons)
+    | None -> l
+  in
+  aux n []
+
+let persons_of_prefixes max conf base fn_pfx sn_pfx =
+  let sn_spi = spi_of_sn base in
+  let all_fn_pfx = all_names_of_prefix base (spi_of_fn base) fn_pfx in
+  let fn_pfx_set = Util.IstrSet.of_list all_fn_pfx in
+  let rec aux n l =
+    let sn_ipers = ipers_of_prefix base sn_spi sn_pfx in
+    let rec aux' n l ipers =
+      if n = 0 then l
+      else
+        match ipers with
+        | iper :: ipers ->
+            let p = Gwdb.poi base iper in
+            let fn = Gwdb.get_first_name p in
+            if IstrSet.mem fn fn_pfx_set && Util.authorized_age conf base p then
+              aux' (n - 1) (p :: l) ipers
+            else aux' n l ipers
+        | _ -> aux n l
+    in
+    match sn_ipers with Some ipers -> aux' n l ipers | None -> l
+  in
+  List.rev (aux max [])
+
+let persons_starting_with ~conf ~base ~first_name_prefix ~surname_prefix ~limit
+    =
+  let l =
+    match (first_name_prefix, surname_prefix) with
+    | "", "" -> []
+    | _, "" ->
+        let spi = spi_of_fn base in
+        n_persons_of_prefix limit conf base spi first_name_prefix
+    | "", _ ->
+        let spi = spi_of_sn base in
+        n_persons_of_prefix limit conf base spi surname_prefix
+    | _, _ ->
+        persons_of_prefixes limit conf base first_name_prefix surname_prefix
+  in
+  let cmp_s proj p1 p2 =
+    Utf8.compare (Gwdb.sou base (proj p1)) (Gwdb.sou base (proj p2))
+  in
+  List.sort
+    (fun p1 p2 ->
+      let sn = cmp_s Gwdb.get_surname p1 p2 in
+      if sn <> 0 then sn else cmp_s Gwdb.get_first_name p1 p2)
+    l
+
 let empty_sn_or_fn base p =
   is_empty_string (get_surname p)
   || is_quest_string (get_surname p)
