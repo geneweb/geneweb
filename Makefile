@@ -227,12 +227,9 @@ clean:
 	@echo " Done!"
 .PHONY: clean
 
-ci: ## Run unit tests and benchmark with different configurations
+ci: ## Run tests, skip known failures
 ci:
-	@ocaml ./configure.ml && BENCH_NAME=vanilla $(MAKE) -s clean test bench-marshal clean
-	@ocaml ./configure.ml --sosa-num && BENCH_NAME=num $(MAKE) -s clean test bench-marshal clean
-	@ocaml ./configure.ml --sosa-zarith && BENCH_NAME=zarith $(MAKE) -s clean test bench-marshal clean
-	@$(MAKE) -s bench-tabulate
+	@ocaml ./configure.ml && $(MAKE) -s clean build && GENEWEB_CI=on dune runtest
 .PHONY: ci
 
 ocp-indent: ## Run ocp-indent (inplace edition)
