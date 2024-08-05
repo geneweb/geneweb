@@ -184,7 +184,7 @@
 </nav>
 %elseif;(not cancel_links and e.m="RLM")
   <div class="btn-group ml-auto align-items-center mr-5" role="group" arial-label="RLM button group">
-    <a class="btn btn-outline-primary border-0" title="[*edit tree]"
+    <a class="btn btn-outline-primary border-0" title="[*add/clear/show/edit the graph]3"
       href="%apply;url_set%with;m/v%and;TP/upd%e.m;%end;">
       <i class="far fa-pen-to-square fa-lg fa-fw"></i> [*modify]</a>
     <a role="button" class="btn btn-outline-%if;(e.im=0)primary%else;danger%end; ml-1 border-0"
