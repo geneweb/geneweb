@@ -21,16 +21,14 @@
   (tags (genealogy))
   (depends
     benchmark
-    calendars
-    (camlp5 (>= "8.00.01"))
+    (camlp5 (= "8.02.01"))
     camlp-streams
     cppo
-    (dune (>= "2.9.0"))
     jingoo
     markup
     num
     (ocaml (>= 4.08))
-    odoc
+    (ocamlformat (= 0.24.1))
     ounit
     ppx_blob
     ppx_deriving
@@ -38,6 +36,7 @@
     stdlib-shims
     syslog
     (unidecode (= "0.2.0"))
+    uri
     uucp
     uunf
     uutf
