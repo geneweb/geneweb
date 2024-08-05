@@ -2586,6 +2586,12 @@ module IfamSet = Set.Make (struct
   let compare = Stdlib.compare
 end)
 
+module IstrSet = Set.Make (struct
+  type t = Gwdb.istr
+
+  let compare = Gwdb.compare_istr
+end)
+
 let select_masc conf base ips =
   let poi =
     if conf.Config.wizard || conf.Config.friend then Gwdb.poi else pget conf

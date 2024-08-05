@@ -596,6 +596,10 @@ module IfamSet : sig
   include Set.S with type elt = Gwdb.ifam
 end
 
+module IstrSet : sig
+  include Set.S with type elt = Gwdb.istr
+end
+
 (**/**)
 
 val copy_from_templ_ref :
