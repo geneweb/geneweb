@@ -64,7 +64,6 @@ let prefix_exists base spi prefix =
   with Not_found -> false
 
 let persons_of_prefix conf base spi prefix max =
-  let ipers = ipers_of_prefix base spi prefix in
   let rec aux n l ipers =
     match ipers with
     | _iper :: _ipers when n <= 0 -> l
@@ -74,9 +73,11 @@ let persons_of_prefix conf base spi prefix max =
         else aux n l ipers
     | _ -> l
   in
-  match ipers with
-  | Some ipers -> Some (List.rev (aux max [] ipers))
-  | None -> None
+  if max <= 0 then None
+  else
+    match ipers_of_prefix base spi prefix with
+    | Some ipers -> Some (List.rev (aux max [] ipers))
+    | None -> None
 
 let n_persons_of_prefix n conf base spi prefix =
   let rec aux n l =
