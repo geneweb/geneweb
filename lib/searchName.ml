@@ -99,16 +99,16 @@ let persons_of_prefixes max conf base fn_pfx sn_pfx =
     || not (prefix_exists base (spi_of_fn base) fn_pfx)
   then []
   else
-    let fn_map = ref IstrMap.empty in
+    let fn_map = Hashtbl.create 100 in
     (*let all_fn_pfx = all_names_of_prefix base (spi_of_fn base) fn_pfx in*)
     (*  let fn_pfx_set = Util.IstrSet.of_list all_fn_pfx in*)
     let match_fn_istr istr =
-      match IstrMap.find_opt istr !fn_map with
+      match Hashtbl.find_opt fn_map istr with
       | Some value -> value
       | None ->
-          let value = start_with base fn_pfx (Gwdb.sou base istr) in
-          fn_map := IstrMap.add istr value !fn_map;
-          value
+        let value = start_with base fn_pfx (Gwdb.sou base istr) in
+        Hashtbl.add fn_map istr value;
+        value
     in
     let rec aux n l =
       let sn_ipers = ipers_of_prefix base sn_spi sn_pfx in
