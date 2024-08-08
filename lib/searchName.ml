@@ -56,6 +56,13 @@ let all_names_of_prefix base spi prefix =
     aux istr []
   with Not_found -> []
 
+let prefix_exists base spi prefix =
+  try
+    let istr = Gwdb.spi_first spi.spi prefix in
+    let s = Gwdb.sou base istr in
+    start_with base prefix s
+  with Not_found -> false
+
 let persons_of_prefix conf base spi prefix max =
   let ipers = ipers_of_prefix base spi prefix in
   let rec aux n l ipers =
@@ -86,34 +93,39 @@ let n_persons_of_prefix n conf base spi prefix =
 
 let persons_of_prefixes max conf base fn_pfx sn_pfx =
   let sn_spi = spi_of_sn base in
-  let fn_map = ref IstrMap.empty in
-  (*let all_fn_pfx = all_names_of_prefix base (spi_of_fn base) fn_pfx in*)
-  (*  let fn_pfx_set = Util.IstrSet.of_list all_fn_pfx in*)
-  let match_fn_istr istr =
-    match IstrMap.find_opt istr !fn_map with
-    | Some value -> value
-    | None ->
-        let value = start_with base fn_pfx (Gwdb.sou base istr) in
-        fn_map := IstrMap.add istr value !fn_map;
-        value
-  in
-  let rec aux n l =
-    let sn_ipers = ipers_of_prefix base sn_spi sn_pfx in
-    let rec aux' n l ipers =
-      if n = 0 then l
-      else
-        match ipers with
-        | iper :: ipers ->
-            let p = Gwdb.poi base iper in
-            let fn = Gwdb.get_first_name p in
-            if match_fn_istr fn && Util.authorized_age conf base p then
-              aux' (n - 1) (p :: l) ipers
-            else aux' n l ipers
-        | _ -> aux n l
+  if
+    (not (prefix_exists base sn_spi sn_pfx))
+    || not (prefix_exists base (spi_of_fn base) fn_pfx)
+  then []
+  else
+    let fn_map = ref IstrMap.empty in
+    (*let all_fn_pfx = all_names_of_prefix base (spi_of_fn base) fn_pfx in*)
+    (*  let fn_pfx_set = Util.IstrSet.of_list all_fn_pfx in*)
+    let match_fn_istr istr =
+      match IstrMap.find_opt istr !fn_map with
+      | Some value -> value
+      | None ->
+          let value = start_with base fn_pfx (Gwdb.sou base istr) in
+          fn_map := IstrMap.add istr value !fn_map;
+          value
     in
-    match sn_ipers with Some ipers -> aux' n l ipers | None -> l
-  in
-  List.rev (aux max [])
+    let rec aux n l =
+      let sn_ipers = ipers_of_prefix base sn_spi sn_pfx in
+      let rec aux' n l ipers =
+        if n = 0 then l
+        else
+          match ipers with
+          | iper :: ipers ->
+              let p = Gwdb.poi base iper in
+              let fn = Gwdb.get_first_name p in
+              if match_fn_istr fn && Util.authorized_age conf base p then
+                aux' (n - 1) (p :: l) ipers
+              else aux' n l ipers
+          | _ -> aux n l
+      in
+      match sn_ipers with Some ipers -> aux' n l ipers | None -> l
+    in
+    List.rev (aux max [])
 
 let persons_starting_with ~conf ~base ~first_name_prefix ~surname_prefix ~limit
     =
