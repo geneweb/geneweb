@@ -600,6 +600,10 @@ module IstrSet : sig
   include Set.S with type elt = Gwdb.istr
 end
 
+module IstrMap : sig
+  include Map.S with type key = Gwdb.istr
+end
+
 (**/**)
 
 val copy_from_templ_ref :

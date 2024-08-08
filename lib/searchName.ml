@@ -86,8 +86,17 @@ let n_persons_of_prefix n conf base spi prefix =
 
 let persons_of_prefixes max conf base fn_pfx sn_pfx =
   let sn_spi = spi_of_sn base in
-  let all_fn_pfx = all_names_of_prefix base (spi_of_fn base) fn_pfx in
-  let fn_pfx_set = Util.IstrSet.of_list all_fn_pfx in
+  let fn_map = ref IstrMap.empty in
+  (*let all_fn_pfx = all_names_of_prefix base (spi_of_fn base) fn_pfx in*)
+  (*  let fn_pfx_set = Util.IstrSet.of_list all_fn_pfx in*)
+  let match_fn_istr istr =
+    match IstrMap.find_opt istr !fn_map with
+    | Some value -> value
+    | None ->
+        let value = start_with base fn_pfx (Gwdb.sou base istr) in
+        fn_map := IstrMap.add istr value !fn_map;
+        value
+  in
   let rec aux n l =
     let sn_ipers = ipers_of_prefix base sn_spi sn_pfx in
     let rec aux' n l ipers =
@@ -97,7 +106,7 @@ let persons_of_prefixes max conf base fn_pfx sn_pfx =
         | iper :: ipers ->
             let p = Gwdb.poi base iper in
             let fn = Gwdb.get_first_name p in
-            if IstrSet.mem fn fn_pfx_set && Util.authorized_age conf base p then
+            if match_fn_istr fn && Util.authorized_age conf base p then
               aux' (n - 1) (p :: l) ipers
             else aux' n l ipers
         | _ -> aux n l
