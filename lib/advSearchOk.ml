@@ -635,6 +635,7 @@ let advanced_search conf base max_answers =
           |> snd
       | None -> ([], 0)
     else if fn_list <> [] || sn_list <> [] then
+      let use_prefix_mode = gets "pfx" = "on" in
       let list_aux strings_of persons_of split n_list exact =
         List.map
           (List.map (fun x ->

@@ -507,11 +507,25 @@ val base_strings_of_first_name : base -> string -> istr list
     of the matched first name.
 *)
 
+val base_strings_of_first_name_prefix : base -> string -> istr list
+(** [base_strings_of_first_name_prefix base x]
+    Return the list of first names (as [istr]) being prefixed by [x]
+    using {!val:Name.crush_lower} comparison. [x] could be also a substring
+    of the matched first name prefix.
+*)
+
 val base_strings_of_surname : base -> string -> istr list
 (** [base_strings_of_surname base x]
     Return the list of surnames (as [istr]) being equal to [x]
     using  {!val:Name.crush_lower} comparison. [x] could be also a substring
     of the matched surname.
+*)
+
+val base_strings_of_surname_prefix : base -> string -> istr list
+(** [base_strings_of_surname_prefix base x]
+    Return the list of surnames (as [istr]) being prefixed by [x]
+    using  {!val:Name.crush_lower} comparison. [x] could be also a substring
+    of the matched surname prefix.
 *)
 
 val load_ascends_array : base -> unit

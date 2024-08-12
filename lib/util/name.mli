@@ -84,3 +84,7 @@ val split_fname : string -> string list
 (** [split_fname s] split the string [s] representing multiple first names
     into this list of firstname.
     e.g. [split_fname base "Foo-Bar Baz"] is [[ "Foo-Bar" ; "Baz"]] *)
+
+val all_prefixes : string -> string list
+(** bmabmabma
+*)

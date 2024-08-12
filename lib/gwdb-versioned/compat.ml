@@ -508,12 +508,26 @@ module type Driver_S = sig
     of the matched first name.
    *)
 
+  val base_strings_of_first_name_prefix : base -> string -> istr list
+  (** [base_strings_of_first_name_prefix base x]
+      Return the list of first names (as [istr]) being prefixed by [x]
+      using {!val:Name.crush_lower} comparison. [x] could be also a substring
+      of the matched first name prefix.
+  *)
+  
   val base_strings_of_surname : base -> string -> istr list
   (** [base_strings_of_surname base x]
     Return the list of surnames (as [istr]) being equal to [x]
     using  {!val:Name.crush_lower} comparison. [x] could be also a substring
     of the matched surname.
    *)
+
+  val base_strings_of_surname_prefix : base -> string -> istr list
+  (** [base_strings_of_surname_prefix base x]
+      Return the list of surnames (as [istr]) being prefixed by [x]
+      using  {!val:Name.crush_lower} comparison. [x] could be also a substring
+      of the matched surname prefix.
+  *)
 
   val load_ascends_array : base -> unit
   (** Load array of ascendants in the memory and cache it so it could be accessed
@@ -1270,10 +1284,18 @@ struct
     Util.wrap_base Legacy.base_strings_of_first_name
       Current.base_strings_of_first_name
 
+  let base_strings_of_first_name_prefix =
+    Util.wrap_base Legacy.base_strings_of_first_name
+      Current.base_strings_of_first_name_prefix
+    
   let base_strings_of_surname =
     Util.wrap_base Legacy.base_strings_of_surname
       Current.base_strings_of_surname
 
+  let base_strings_of_surname_prefix =
+    Util.wrap_base Legacy.base_strings_of_surname_prefix
+      Current.base_strings_of_surname
+  
   let load_ascends_array =
     Util.wrap_base Legacy.load_ascends_array Current.load_ascends_array
 

@@ -348,6 +348,8 @@ type base_func = {
      substring. Consider also first names of pathed persons. Doesn't consider pending patches *)
   strings_of_fname : string -> int list;
   (* Search functionalities throughout index by surname *)
+  strings_of_sname_prefix : string -> int list;
+  strings_of_fname_prefix : string -> int list;
   persons_of_surname : string_person_index;
   (* Search functionalities throughout index by first name *)
   persons_of_first_name : string_person_index;
@@ -395,3 +397,13 @@ type base_version = GnWb0020 | GnWb0021 | GnWb0022 | GnWb0023 | GnWb0024
 
 type dsk_base = { data : base_data; func : base_func; version : base_version }
 (** Database representation: data and basic requests over this data. *)
+
+type prefix_entry = {
+  has_values : bool;
+  (* true iff the names index has an entry for the given index *)
+  next_prefixes : int Array.t;
+  (* the list of subsequent prefixes *)
+  composed_prefixes : int Array.t;
+}
+
+type prefix_table = prefix_entry Array.t

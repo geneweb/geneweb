@@ -590,6 +590,80 @@ let strings_of_fname = function
   | GnWb0024 | GnWb0023 -> new_strings_of_fname
   | _ -> old_strings_of_fsname
 
+
+let strings_of_fsname_prefix_aux ic_inx_acc ic_inx split get strings
+    (_, person_patches) =
+  fun s ->
+    let i = Dutil.name_index s in
+    (* look in index files *)
+    let r =
+      let ai =
+        seek_in ic_inx_acc (Iovalue.sizeof_long * i);
+        let pos = input_binary_int ic_inx_acc in
+        close_in ic_inx_acc;
+        seek_in ic_inx pos;
+        (* FIX MEEEEEEE*)
+        (Iovalue.input ic_inx : Dbdisk.prefix_table)
+      in
+      close_in ic_inx;
+      ai
+    in
+    (* and look in the patch too *)
+    Hashtbl.fold
+      (fun _ p acc ->
+        let istrs = get p in
+        List.fold_left
+          (fun acc istr ->
+            if
+              (not (List.mem istr acc))
+              &&
+              let str = strings.get istr in
+              match split str with
+              | [ s ] -> i = Dutil.name_index s
+              | list ->
+                  List.exists (fun s -> i = Dutil.name_index s) (str :: list)
+            then istr :: acc
+            else acc)
+          acc istrs)
+      person_patches (Array.to_list r)
+
+let strings_of_sname_prefix bname strings patches =
+  let inx_fname = (Filename.concat bname "snames_pfx.inx") in
+  let acc_fname = (Filename.concat bname "snames_pfx.acc") in
+  if Sys.file_exists inx_fname && Sys.file_exists acc_fname then
+    let ic_inx = Secure.open_in_bin inx_fname in
+    let ic_acc = Secure.open_in_bin acc_fname in
+    let strings = strings_of_fsname_prefix_aux ic_acc ic_inx Name.split_sname (fun p ->
+        p.Dbdisk.surname :: p.Dbdisk.surnames_aliases) strings patches in
+    close_in ic_acc;
+    close_in ic_inx;
+    strings
+  else
+    new_strings_of_sname bname strings patches
+
+let strings_of_fname_prefix bname strings patches =
+  let inx_fname = (Filename.concat bname "fnames_pfx.inx") in
+  let acc_fname = (Filename.concat bname "fnames_pfx.acc") in
+  if Sys.file_exists inx_fname && Sys.file_exists acc_fname then
+    let ic_inx = Secure.open_in_bin inx_fname in
+    let ic_acc = Secure.open_in_bin acc_fname in
+    let strings = strings_of_fsname_prefix_aux ic_acc ic_inx Name.split_fname (fun p ->
+        p.Dbdisk.first_name :: p.Dbdisk.first_names_aliases) strings patches in
+    close_in ic_acc;
+    close_in ic_inx;
+    strings
+  else
+    new_strings_of_fname bname strings patches
+
+
+let strings_of_sname_prefix = function
+  | GnWb0024 | GnWb0023 -> strings_of_sname_prefix
+  | _ -> old_strings_of_fsname
+
+let strings_of_fname_prefix = function
+  | GnWb0024 | GnWb0023 -> strings_of_fname_prefix
+  | _ -> old_strings_of_fsname
+
 (* Restrict file *)
 
 type visible_state = VsNone | VsTrue | VsFalse
@@ -1220,6 +1294,8 @@ let opendb bname =
       persons_of_name;
       strings_of_sname = strings_of_sname version bname strings patches.h_person;
       strings_of_fname = strings_of_fname version bname strings patches.h_person;
+      strings_of_sname_prefix = strings_of_sname_prefix version bname strings patches.h_person;
+      strings_of_fname_prefix = strings_of_fname_prefix version bname strings patches.h_person;
       persons_of_surname =
         persons_of_surname version base_data
           ( (fun p -> p.surname :: p.surnames_aliases),
@@ -1296,6 +1372,8 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
       persons_of_name = (fun _ -> assert false);
       strings_of_sname = (fun _ -> assert false);
       strings_of_fname = (fun _ -> assert false);
+      strings_of_sname_prefix = (fun _ -> assert false);
+      strings_of_fname_prefix = (fun _ -> assert false);
       persons_of_surname =
         {
           find = (fun _ -> assert false);

@@ -41,6 +41,83 @@ let make_name_index base =
   done;
   Array.map Array.of_list t
 
+type 'a prefix_list_entry = {
+  has_values_l : bool;
+  (* true iff the names index has an entry for the given index *)
+  next_prefixes_list : 'a list;
+  (* the list of subsequent prefixes *)
+  composed_prefixes_list : 'a list;
+}
+
+type 'a prefix_table = 'a prefix_list_entry Array.t
+
+let empty_prefix_table () = try
+    Array.make Dutil.table_size {has_values_l = false; next_prefixes_list = []; composed_prefixes_list = []}
+  with e ->
+    print_endline "merdeeeee";
+    raise e
+
+let add_prefixes full_name pfx_table pfx_list =
+  let rec aux = function
+    |  pfx :: (pfx' :: _ as pfxs) ->
+      let index = Dutil.name_index pfx in
+      Array.set pfx_table index (
+        let entry = Array.get pfx_table index in
+        let next_prefixes_list = pfx' :: entry.next_prefixes_list in
+        {entry with next_prefixes_list}
+      );
+      aux pfxs
+    | [pfx] ->
+      let index = Dutil.name_index pfx in
+      let entry = Array.get pfx_table index in
+      Array.set pfx_table index {
+        entry with
+        has_values_l = entry.has_values_l || pfx = full_name;
+        composed_prefixes_list =
+          if pfx = full_name then entry.composed_prefixes_list
+          else full_name :: entry.composed_prefixes_list;
+      }
+    | [] -> ()
+  in
+  aux pfx_list
+
+let make_fsname_prefix_index_aux split get base =
+  let t = empty_prefix_table () in
+  print_endline "letsgo";
+  for i = 0 to base.data.persons.len - 1 do
+    let p = base.data.persons.get i in
+    let names = List.map base.data.strings.get (get p) in
+    List.iter (fun name ->
+        let all_names = split name in
+        let crushed_all_names = Mutil.list_map_sort_uniq Name.crush_lower all_names in
+        let all_prefixes = List.map Name.all_prefixes crushed_all_names in
+        let full_name = Name.crush_lower name in
+        List.iter (add_prefixes full_name t) all_prefixes
+      ) names
+  done;
+  print_endline "yes";
+  let t = Array.map (fun entry -> {
+        Dbdisk.has_values = entry.has_values_l;
+        next_prefixes =
+          List.sort_uniq String.compare entry.next_prefixes_list
+          |> List.map Dutil.name_index
+          |> Array.of_list;
+        composed_prefixes =
+          List.sort_uniq String.compare entry.composed_prefixes_list
+          |> List.map Dutil.name_index
+          |> Array.of_list;
+      }) t in
+  print_endline "yes2";
+  t
+
+let make_fname_prefix_index =
+  make_fsname_prefix_index_aux Name.split_fname (fun p ->
+      p.first_name :: p.first_names_aliases)
+
+let make_sname_prefix_index =
+  make_fsname_prefix_index_aux Name.split_sname (fun p ->
+      p.surname :: p.surnames_aliases)
+
 let create_name_index oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_name_index base)
 
@@ -93,6 +170,12 @@ let create_strings_of_sname oc_inx oc_inx_acc base =
 
 let create_strings_of_fname oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_strings_of_fname base)
+
+let create_fname_prefix_index oc_inx oc_inx_acc base =
+  output_index_aux oc_inx oc_inx_acc (make_fname_prefix_index base)
+
+let create_sname_prefix_index oc_inx oc_inx_acc base =
+  output_index_aux oc_inx oc_inx_acc (make_sname_prefix_index base)
 
 let is_prime a =
   let rec loop b =
@@ -194,6 +277,10 @@ let output ?(save_mem = false) base =
   let tmp_base_acc = Filename.concat bname "1base.acc" in
   let tmp_names_inx = Filename.concat bname "1names.inx" in
   let tmp_names_acc = Filename.concat bname "1names.acc" in
+  let tmp_fnames_pfx_inx = Filename.concat bname "1fnames_pfx.inx" in
+  let tmp_fnames_pfx_acc = Filename.concat bname "1fnames_pfx.acc" in
+  let tmp_snames_pfx_inx = Filename.concat bname "1snames_pfx.inx" in
+  let tmp_snames_pfx_acc = Filename.concat bname "1snames_pfx.acc" in
   let tmp_snames_inx = Filename.concat bname "1snames.inx" in
   let tmp_snames_dat = Filename.concat bname "1snames.dat" in
   let tmp_fnames_inx = Filename.concat bname "1fnames.inx" in
@@ -263,6 +350,10 @@ let output ?(save_mem = false) base =
      close_out oc_acc;
      (let oc_inx = Secure.open_out_bin tmp_names_inx in
       let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
+      let oc_fn_pfx_inx = Secure.open_out_bin tmp_fnames_pfx_inx in
+      let oc_fn_pfx_inx_acc = Secure.open_out_bin tmp_fnames_pfx_acc in
+      let oc_sn_pfx_inx = Secure.open_out_bin tmp_snames_pfx_inx in
+      let oc_sn_pfx_inx_acc = Secure.open_out_bin tmp_snames_pfx_acc in
       try
         trace "create name index";
         output_binary_int oc_inx 0;
@@ -294,6 +385,10 @@ let output ?(save_mem = false) base =
           trace "compacting";
           Gc.compact ());
         Gc.compact ();
+        trace "create fname prefix index";
+        create_fname_prefix_index oc_fn_pfx_inx oc_fn_pfx_inx_acc base;
+        trace "create sname prefix index";
+        create_sname_prefix_index oc_sn_pfx_inx oc_sn_pfx_inx_acc base;
         trace "create string index";
         output_strings_hash tmp_strings_inx base;
         if save_mem then (
@@ -325,6 +420,10 @@ let output ?(save_mem = false) base =
       with e ->
         (try close_out oc_inx with _ -> ());
         (try close_out oc_inx_acc with _ -> ());
+        (try close_out oc_fn_pfx_inx with _ -> ());
+        (try close_out oc_fn_pfx_inx_acc with _ -> ());
+        (try close_out oc_sn_pfx_inx with _ -> ());
+        (try close_out oc_sn_pfx_inx_acc with _ -> ());
         raise e);
      trace "ok";
      let nbp =
@@ -354,6 +453,10 @@ let output ?(save_mem = false) base =
      Files.rm tmp_base_acc;
      Files.rm tmp_names_inx;
      Files.rm tmp_names_acc;
+     Files.rm tmp_fnames_pfx_inx;
+     Files.rm tmp_fnames_pfx_acc;
+     Files.rm tmp_snames_pfx_inx;
+     Files.rm tmp_snames_pfx_acc;
      Files.rm tmp_strings_inx;
      Files.remove_dir tmp_notes_d;
      raise e);
@@ -366,6 +469,14 @@ let output ?(save_mem = false) base =
   Sys.rename tmp_names_inx (Filename.concat bname "names.inx");
   Files.rm (Filename.concat bname "names.acc");
   Sys.rename tmp_names_acc (Filename.concat bname "names.acc");
+  Files.rm (Filename.concat bname "fnames_pfx.inx");
+  Sys.rename tmp_fnames_pfx_inx (Filename.concat bname "fnames_pfx.inx");
+  Files.rm (Filename.concat bname "fnames_pfx.acc");
+  Sys.rename tmp_fnames_pfx_acc (Filename.concat bname "fnames_pfx.acc");
+  Files.rm (Filename.concat bname "snames_pfx.inx");
+  Sys.rename tmp_snames_pfx_inx (Filename.concat bname "snames_pfx.inx");
+  Files.rm (Filename.concat bname "snames_pfx.acc");
+  Sys.rename tmp_snames_pfx_acc (Filename.concat bname "snames_pfx.acc");
   Files.rm (Filename.concat bname "snames.dat");
   Sys.rename tmp_snames_dat (Filename.concat bname "snames.dat");
   Files.rm (Filename.concat bname "snames.inx");
