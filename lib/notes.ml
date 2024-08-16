@@ -61,6 +61,27 @@ let merge_possible_aliases conf db =
       (pg, (sl, il)) :: list)
     [] db
 
+let links_to_ind conf base db key =
+  let l =
+    List.fold_left
+      (fun pgl (pg, (_, il)) ->
+        let record_it =
+          match pg with
+          | Def.NLDB.PgInd ip -> authorized_age conf base (pget conf base ip)
+          | Def.NLDB.PgFam ifam ->
+              authorized_age conf base
+                (pget conf base (get_father @@ foi base ifam))
+          | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ | Def.NLDB.PgWizard _ -> true
+        in
+        if record_it then
+          List.fold_left
+            (fun pgl (k, _) -> if k = key then pg :: pgl else pgl)
+            pgl il
+        else pgl)
+      [] db
+  in
+  List.sort_uniq compare l
+
 let notes_links_db conf base eliminate_unlinked =
   let db = Gwdb.read_nldb base in
   let db = merge_possible_aliases conf db in

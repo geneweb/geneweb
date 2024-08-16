@@ -1,6 +1,13 @@
 val path_of_fnotes : string -> string
 val commit_notes : Config.config -> Gwdb.base -> string -> string -> unit
 
+val links_to_ind :
+  Config.config ->
+  Gwdb.base ->
+  (Gwdb.iper, Gwdb.ifam) Def.NLDB.t ->
+  string * string * int ->
+  (Gwdb.iper, Gwdb.ifam) Def.NLDB.page list
+
 val notes_links_db :
   Config.config ->
   Gwdb.base ->
