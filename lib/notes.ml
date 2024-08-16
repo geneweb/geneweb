@@ -251,29 +251,37 @@ let source_note conf base p str =
 let source_note_with_env conf base env str =
   wiki_aux (function [ "<p>"; x; "</p>" ] -> [ x ] | x -> x) conf base env str
 
-(**/**)
+let fold_linked_pages conf base db key type_filter transform =
+  List.fold_left
+    (fun acc (pg, (_, il)) ->
+      let record_it =
+        match pg, type_filter with
+        | Def.NLDB.PgMisc n, Some typ ->
+            let nenv = read_notes base n |> fst in
+            (try List.assoc "TYPE" nenv = typ with Not_found -> false)
+        | Def.NLDB.PgInd ip, None ->
+            authorized_age conf base (pget conf base ip)
+        | Def.NLDB.PgFam ifam, None ->
+            authorized_age conf base
+              (pget conf base (get_father @@ foi base ifam))
+        | _, _ -> true
+      in
+      if record_it then
+        List.fold_left
+          (fun acc (k, ind) ->
+             if k = key then transform pg k ind acc else acc)
+          acc il
+      else acc)
+    [] db
+    |> List.sort_uniq compare
 
-(* ((Gwdb.iper, Gwdb.ifam) Def.NLDB.page * ('a * (Def.NLDB.key * 'b) list)) list -> *)
-let links_to_ind conf base db key =
-  let l =
-    List.fold_left
-      (fun pgl (pg, (_, il)) ->
-        let record_it =
-          match pg with
-          | Def.NLDB.PgInd ip -> authorized_age conf base (pget conf base ip)
-          | Def.NLDB.PgFam ifam ->
-              authorized_age conf base
-                (pget conf base (get_father @@ foi base ifam))
-          | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ | Def.NLDB.PgWizard _ -> true
-        in
-        if record_it then
-          List.fold_left
-            (fun pgl (k, l) -> if k = key then (k, l) :: pgl else pgl)
-            pgl il
-        else pgl)
-      [] db
-  in
-  List.sort_uniq compare l
+let links_to_cache_entries conf base db key =
+  fold_linked_pages conf base db key None 
+    (fun _pg k ind acc -> (k, ind) :: acc)
+
+let links_to_ind conf base db key typ =
+  fold_linked_pages conf base db key typ
+    (fun pg _k _ind acc -> pg :: acc)
 
 type mode = Delete | Rename | Merge
 type cache_linked_pages_t = (Def.NLDB.key, int) Hashtbl.t
