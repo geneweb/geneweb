@@ -1127,27 +1127,6 @@ let linked_page_text conf base p s key (str : Adef.safe_string) (pg, (_, il)) :
     ->
       str
 
-let links_to_ind conf base db key =
-  let l =
-    List.fold_left
-      (fun pgl (pg, (_, il)) ->
-        let record_it =
-          match pg with
-          | Def.NLDB.PgInd ip -> authorized_age conf base (pget conf base ip)
-          | Def.NLDB.PgFam ifam ->
-              authorized_age conf base
-                (pget conf base (get_father @@ foi base ifam))
-          | Def.NLDB.PgNotes | Def.NLDB.PgMisc _ | Def.NLDB.PgWizard _ -> true
-        in
-        if record_it then
-          List.fold_left
-            (fun pgl (k, _) -> if k = key then pg :: pgl else pgl)
-            pgl il
-        else pgl)
-      [] db
-  in
-  List.sort_uniq compare l
-
 (* Interpretation of template file *)
 
 let rec compare_ls sl1 sl2 =
@@ -2886,7 +2865,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
                 let sn = Name.lower (sou base (get_surname p)) in
                 (fn, sn, get_occ p)
               in
-              links_to_ind conf base db key <> []
+              Notes.links_to_ind conf base db key <> []
             else false
           in
           VVbool r
@@ -2901,7 +2880,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc = function
                 let sn = Name.lower (sou base (get_surname p)) in
                 (fn, sn, get_occ p)
               in
-              string_of_int (List.length (links_to_ind conf base db key))
+              string_of_int (List.length (Notes.links_to_ind conf base db key))
             else "0"
           in
           str_val r
@@ -5541,7 +5520,7 @@ let print_what_links conf base p =
     in
     let db = Gwdb.read_nldb base in
     let db = Notes.merge_possible_aliases conf db in
-    let pgl = links_to_ind conf base db key in
+    let pgl = Notes.links_to_ind conf base db key in
     let title h =
       transl conf "linked pages" |> Utf8.capitalize_fst
       |> Output.print_sstring conf;

@@ -27,13 +27,6 @@ val print : ?no_headers:bool -> config -> base -> person -> unit
 val print_what_links : config -> base -> person -> unit
 (** Displays links to pages associated to the person *)
 
-val links_to_ind :
-  Config.config ->
-  Gwdb.base ->
-  ((iper, ifam) Def.NLDB.page * ('a * ((string * string * int) * 'b) list)) list ->
-  string * string * int ->
-  (iper, ifam) Def.NLDB.page list
-
 val get_linked_page : config -> base -> person -> string -> Adef.safe_string
 val get_birth_text : config -> person -> bool -> Adef.safe_string
 val get_baptism_text : config -> person -> bool -> Adef.safe_string
