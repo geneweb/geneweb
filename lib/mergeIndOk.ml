@@ -545,7 +545,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let osn1 = o_p1.surname in
   let oocc1 = o_p1.occ in
   let pgl1 =
-    Perso.links_to_ind conf base db
+    Notes.links_to_ind conf base db
       (Name.lower ofn1, Name.lower osn1, oocc1)
       None
   in
@@ -553,7 +553,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let osn2 = o_p2.surname in
   let oocc2 = o_p2.occ in
   let pgl2 =
-    Perso.links_to_ind conf base db
+    Notes.links_to_ind conf base db
       (Name.lower ofn2, Name.lower osn2, oocc2)
       None
   in
