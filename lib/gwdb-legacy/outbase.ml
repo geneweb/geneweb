@@ -74,7 +74,7 @@ let add_prefixes full_name pfx_table pfx_list =
         entry with
         has_values_l = entry.has_values_l || pfx = full_name;
         composed_prefixes_list =
-          if pfx = full_name then entry.composed_prefixes_list
+          if pfx <> full_name then entry.composed_prefixes_list
           else full_name :: entry.composed_prefixes_list;
       }
     | [] -> ()

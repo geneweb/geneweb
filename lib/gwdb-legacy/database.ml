@@ -591,22 +591,35 @@ let strings_of_fname = function
   | _ -> old_strings_of_fsname
 
 
-let strings_of_fsname_prefix_aux ic_inx_acc ic_inx split get strings
+let all_name_indexes_of_prefix_entry ic_acc ic_inx string =
+  let get_entry i =
+    seek_in ic_acc (Iovalue.sizeof_long * i);
+    let pos = input_binary_int ic_acc in
+    seek_in ic_inx pos;
+    (Iovalue.input ic_inx : Dbdisk.prefix_entry)
+  in
+  let rec aux (acc, composed_acc) i entry =
+    let acc, composed_acc = if entry.Dbdisk.has_values then
+        i :: acc, (entry.composed_prefixes :: composed_acc)
+      else acc, entry.composed_prefixes :: composed_acc
+    in
+    Array.fold_left (fun acc i ->
+        aux acc i (get_entry i)
+      ) (acc, composed_acc) entry.next_prefixes
+  in
+  let i = Dutil.name_index string in
+  let first_entry = get_entry i in
+  aux ([], []) i first_entry
+
+let strings_of_fsname_prefix_aux ic_acc ic_inx split get strings
     (_, person_patches) =
   fun s ->
     let i = Dutil.name_index s in
     (* look in index files *)
-    let r =
-      let ai =
-        seek_in ic_inx_acc (Iovalue.sizeof_long * i);
-        let pos = input_binary_int ic_inx_acc in
-        close_in ic_inx_acc;
-        seek_in ic_inx pos;
-        (* FIX MEEEEEEE*)
-        (Iovalue.input ic_inx : Dbdisk.prefix_table)
-      in
-      close_in ic_inx;
-      ai
+    let r : int list =
+      let names_indexes = all_name_indexes_of_prefix_entry ic_acc ic_inx s in
+      let istrs = assert false in
+      istrs
     in
     (* and look in the patch too *)
     Hashtbl.fold
@@ -625,7 +638,7 @@ let strings_of_fsname_prefix_aux ic_inx_acc ic_inx split get strings
             then istr :: acc
             else acc)
           acc istrs)
-      person_patches (Array.to_list r)
+      person_patches r
 
 let strings_of_sname_prefix bname strings patches =
   let inx_fname = (Filename.concat bname "snames_pfx.inx") in
