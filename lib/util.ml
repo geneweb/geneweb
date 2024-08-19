@@ -2473,7 +2473,7 @@ let rec in_text case_sens s m =
       | NotesLinks.WLperson (j, _, text, _)
       | NotesLinks.WLwizard (j, _, text) ->
           if in_text case_sens s text then true else loop false j
-      | NotesLinks.WLnone -> loop false (i + 1)
+      | NotesLinks.WLnone (j, _) -> loop false j
     else
       match start_equiv_with case_sens s m i with
       | Some _ -> true
