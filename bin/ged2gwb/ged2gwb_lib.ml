@@ -419,39 +419,6 @@ let strip c str =
 let strip_spaces = strip ' '
 let strip_newlines = strip '\n'
 
-let less_greater_escaped s =
-  let rec need_code i =
-    if i < String.length s then
-      match s.[i] with
-        '<' | '>' -> true
-      | _ -> need_code (succ i)
-    else false
-  in
-  let rec compute_len i i1 =
-    if i < String.length s then
-      let i1 =
-        match s.[i] with
-          '<' | '>' -> i1 + 4
-        | _ -> succ i1
-      in
-      compute_len (succ i) i1
-    else i1
-  in
-  let rec copy_code_in s1 i i1 =
-    if i < String.length s then
-      let i1 =
-        match s.[i] with
-          '<' -> String.blit "&lt;" 0 s1 i1 4; i1 + 4
-        | '>' -> String.blit "&gt;" 0 s1 i1 4; i1 + 4
-        | c -> Bytes.set s1 i1 c; succ i1
-      in
-      copy_code_in s1 (succ i) i1
-    else Bytes.unsafe_to_string s1
-  in
-  if need_code 0 then
-    let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
-  else s
-
 let parse_name =
   parser
     [< _ = skip_spaces;
@@ -1146,20 +1113,6 @@ let treat_notes gen rl =
       lines
   in
   strip_newlines (Buffer.contents buf)
-
-let note gen r =
-  match find_field "NOTE" r.rsons with
-    Some r ->
-      if String.length r.rval > 0 && r.rval.[0] = '@' then
-        match find_notes_record gen r.rval with
-          Some v -> strip_spaces v.rcont, v.rsons
-        | None ->
-            print_location r.rpos;
-            Printf.fprintf !state.log_oc "Note %s not found\n" r.rval;
-            flush !state.log_oc;
-            "", []
-      else strip_spaces r.rval, r.rsons
-  | _ -> "", []
 
 let treat_source gen r =
   if String.length r.rval > 0 && r.rval.[0] = '@' then

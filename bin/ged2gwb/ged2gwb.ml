@@ -119,7 +119,7 @@ let speclist =
           Ged2gwb_lib.State.month_number_dates := Ged2gwb_lib.MonthDayDates),
       "Interpret months-numbered dates as month/day/year" );
     ( "-rs_no_mention",
-      Arg.Unit (fun () -> Ged2gwb_lib.State.relation_status := NoMention),
+      Arg.Unit (fun () -> Ged2gwb_lib.State.relation_status := Def.NoMention),
       "Force relation status to NoMention (default is Married)" );
     ( "-charset",
       Arg.String
