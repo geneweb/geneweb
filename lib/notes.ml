@@ -202,7 +202,7 @@ let update_notes_links_db base fnotes s =
             in
             loop list_nt list_ind (pos + 1) j
         | NotesLinks.WLwizard (j, _, _) -> loop list_nt list_ind pos j
-        | NotesLinks.WLnone -> loop list_nt list_ind pos (i + 1)
+        | NotesLinks.WLnone (j, _) -> loop list_nt list_ind pos j
     in
     loop [] [] 1 0
   in

@@ -26,10 +26,22 @@ type wiki_link =
   | WLpage of int * (string list * string) * string * string * string
   | WLperson of int * key * string * string option
   | WLwizard of int * string * string
-  | WLnone
+  | WLnone of int * string
 
 let misc_notes_link s i =
   let slen = String.length s in
+  let cut j = String.sub s i (j - i) in
+  let rec wlnone j =
+    (* assume no link up to [j] and find next link position *)
+    if j < slen then
+      match s.[j] with
+      | '%' -> wlnone (j + 2)
+      | '[' ->
+          if j + 1 < slen && s.[j + 1] = '[' then WLnone (j, cut j)
+          else wlnone (j + 1)
+      | _ -> wlnone (j + 1)
+    else WLnone (slen, cut slen)
+  in
   if i < slen - 2 && s.[i] = '[' && s.[i + 1] = '[' then
     if s.[i + 2] = '[' then
       let j =
@@ -61,8 +73,8 @@ let misc_notes_link s i =
         in
         match check_file_name fname with
         | Some pg_path -> WLpage (j, pg_path, fname, anchor, text)
-        | None -> WLnone
-      else WLnone
+        | None -> wlnone j
+      else wlnone j
     else
       let j =
         let rec loop j =
@@ -128,9 +140,9 @@ let misc_notes_link s i =
             let fn = Name.lower fn in
             let sn = Name.lower sn in
             WLperson (j, (fn, sn, oc), name, text)
-          with Not_found -> WLnone
-      else WLnone
-  else WLnone
+          with Not_found -> wlnone j
+      else wlnone j
+  else wlnone i
 
 let add_in_db db who (list_nt, list_ind) =
   let db = List.remove_assoc who db in
