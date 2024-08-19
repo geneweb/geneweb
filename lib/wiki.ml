@@ -217,7 +217,8 @@ let syntax_links conf wi s =
               (encode wiz) s
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
-      | NotesLinks.WLnone -> loop quot_lev pos (i + 1) (Buff.store len s.[i])
+      | NotesLinks.WLnone (j, none_s) ->
+          loop quot_lev pos j (Buff.mstore len none_s)
   in
   loop 0 1 0 0
 
@@ -305,7 +306,7 @@ let remove_links s =
             in
             (Buff.mstore len text, j)
         | NotesLinks.WLwizard (j, _, text) -> (Buff.mstore len text, j)
-        | NotesLinks.WLnone -> (Buff.store len s.[i], i + 1)
+        | NotesLinks.WLnone (j, none_s) -> (Buff.mstore len none_s, j)
       in
       loop len i
   in
