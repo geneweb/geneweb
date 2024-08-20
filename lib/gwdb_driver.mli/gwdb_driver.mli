@@ -521,6 +521,10 @@ val base_notes_read : base -> string -> string
 (** [base_notes_read base fname] read and return content of [fname] note
     (either database note either extended page). *)
 
+val base_wiznotes_read : base -> string -> string
+(** [base_wiznotes_read base fname] read and return content of [fname] note
+    (either database note either extended page). *)
+
 val base_notes_read_first_line : base -> string -> string
 (** [base_notes_read base fname] read and return first line of [fname] note *)
 
