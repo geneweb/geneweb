@@ -512,6 +512,12 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   let conf = Update.update_conf o_conf in
   let p_family = get_family (poi base sp.key_index) in
   let p2_family = get_family (poi base o_p2.key_index) in
+  let db = Gwdb.read_nldb base in
+  let ofn1 = o_p1.first_name in
+  let osn1 = o_p1.surname in
+  let oocc1 = o_p1.occ in
+  let key1 = (Name.lower ofn1, Name.lower osn1, oocc1) in
+  let pgl1 = Notes.links_to_ind conf base db key1 None in
   let warning _ = () in
   MergeInd.reparent_ind base warning sp.key_index o_p2.key_index;
   let p =
@@ -523,6 +529,8 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   redirect_added_families base p o_p2.key_index p2_family;
   UpdateIndOk.effective_del_no_commit base o_p2;
   patch_person base p.key_index p;
+  let new_key = (sou base p.first_name, sou base p.surname, p.occ) in
+  Notes.update_ind_key base pgl1 key1 new_key;
   let u = { family = Array.append p_family p2_family } in
   if p2_family <> [||] then patch_union base p.key_index u;
   Consang.check_noloop_for_person_list base
@@ -540,15 +548,6 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   Notes.update_notes_links_db base (Def.NLDB.PgInd o_p2.key_index) "";
   (* TODO update_cache_linked_pages *)
   Update.delete_topological_sort conf base;
-  let db = Gwdb.read_nldb base in
-  let ofn1 = o_p1.first_name in
-  let osn1 = o_p1.surname in
-  let oocc1 = o_p1.occ in
-  let pgl1 =
-    Notes.links_to_ind conf base db
-      (Name.lower ofn1, Name.lower osn1, oocc1)
-      None
-  in
   let ofn2 = o_p2.first_name in
   let osn2 = o_p2.surname in
   let oocc2 = o_p2.occ in

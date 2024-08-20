@@ -1156,35 +1156,11 @@ let print_mod ?prerr o_conf base =
     let op = poi base p.key_index in
     let u = { family = get_family op } in
     patch_person base p.key_index p;
-    let s =
-      let sl =
-        [
-          p.notes;
-          p.occupation;
-          p.birth_note;
-          p.birth_src;
-          p.baptism_note;
-          p.baptism_src;
-          p.death_note;
-          p.death_src;
-          p.burial_note;
-          p.burial_src;
-          p.psources;
-        ]
-      in
-      let sl =
-        let rec loop l accu =
-          match l with
-          | [] -> accu
-          | evt :: l -> loop l (evt.epers_note :: evt.epers_src :: accu)
-        in
-        loop p.pevents sl
-      in
-      String.concat " " (List.map (sou base) sl)
-    in
-    Notes.update_notes_links_db base (Def.NLDB.PgInd p.key_index) s;
-    let new_key = Util.make_key base p in
+    let new_key = Util.make_key base p in 
     if old_key <> new_key then
+      Notes.update_cache_linked_pages conf Notes.Rename old_key new_key [];    
+      Notes.update_ind_key base pgl old_key new_key;
+      Notes.update_notes_links_person base p;
       Notes.update_cache_linked_pages conf Notes.Rename old_key new_key 0;
     let wl =
       let a = poi base p.key_index in
