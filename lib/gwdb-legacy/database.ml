@@ -1230,6 +1230,21 @@ let opendb ?(read_only = false) bname =
         output_string oc s;
         close_out oc)
   in
+  let commit_wiznotes =
+    if perm = RDONLY then fun _ _ -> raise (HttpExn (Forbidden, __LOC__))
+    else fun fnotes s ->
+      let fname =
+        (try Unix.mkdir (Filename.concat bname "wiznotes") 0o755 with _ -> ());
+        Filename.concat "wiznotes" (fnotes ^ ".txt")
+      in
+      let fname = Filename.concat bname fname in
+      (try Sys.remove (fname ^ "~") with Sys_error _ -> ());
+      (try Sys.rename fname (fname ^ "~") with _ -> ());
+      if s <> "" then (
+        let oc = Secure.open_out fname in
+        output_string oc s;
+        close_out oc)
+  in
   let ext_files () =
     let top = Filename.concat bname "notes_d" in
     let rec loop list subdir =
@@ -1296,6 +1311,7 @@ let opendb ?(read_only = false) bname =
       insert_string;
       commit_patches;
       commit_notes;
+      commit_wiznotes;
       cleanup;
       nb_of_real_persons = nbp_read;
       iper_exists;
@@ -1369,6 +1385,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
       insert_string = (fun _ -> assert false);
       commit_patches = (fun _ -> assert false);
       commit_notes = (fun _ -> assert false);
+      commit_wiznotes = (fun _ -> assert false);
       cleanup = (fun _ -> ());
       nb_of_real_persons = (fun _ -> assert false);
       iper_exists = (fun _ -> assert false);
