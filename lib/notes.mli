@@ -25,6 +25,7 @@ val merge_possible_aliases :
   (('a, 'b) Def.NLDB.page * (string list * 'c list)) list
 
 val update_ind_key :
+  Config.config ->
   Gwdb.base ->
   (Gwdb.iper, Gwdb.ifam) Def.NLDB.page list ->
   Def.NLDB.key ->
