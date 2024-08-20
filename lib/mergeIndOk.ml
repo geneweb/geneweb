@@ -530,7 +530,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp print_mod_merge_ok =
   UpdateIndOk.effective_del_no_commit base o_p2;
   patch_person base p.key_index p;
   let new_key = (sou base p.first_name, sou base p.surname, p.occ) in
-  Notes.update_ind_key base pgl1 key1 new_key;
+  Notes.update_ind_key conf base pgl1 key1 new_key;
   let u = { family = Array.append p_family p2_family } in
   if p2_family <> [||] then patch_union base p.key_index u;
   Consang.check_noloop_for_person_list base
