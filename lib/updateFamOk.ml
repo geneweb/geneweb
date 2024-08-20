@@ -1366,21 +1366,7 @@ let print_mod o_conf base =
     let ifam, fam, cpl, des = effective_mod conf base nsck sfam scpl sdes in
     let () = patch_parent_with_pevents base cpl in
     let () = patch_children_with_pevents base des in
-    let s =
-      let sl =
-        [ fam.comment; fam.fsources; fam.marriage_note; fam.marriage_src ]
-      in
-      let sl =
-        let rec loop l accu =
-          match l with
-          | [] -> accu
-          | evt :: l -> loop l (evt.efam_note :: evt.efam_src :: accu)
-        in
-        loop fam.fevents sl
-      in
-      String.concat " " (List.map (sou base) sl)
-    in
-    Notes.update_notes_links_db base (Def.NLDB.PgFam ifam) s;
+    Notes.update_notes_links_family base fam;
     (* TODO update_cache_linked_pages *)
     let nfs = (Adef.parent_array cpl, des.children) in
     let onfs = Some (ofs, nfs) in

@@ -10,6 +10,12 @@ val notes_links_db :
 val update_notes_links_db :
   Gwdb.base -> (Gwdb.iper, Gwdb.ifam) Def.NLDB.page -> string -> unit
 
+val update_notes_links_person :
+  Gwdb.base -> (Gwdb.iper, _, Gwdb.istr) Def.gen_person -> unit
+
+val update_notes_links_family :
+  Gwdb.base -> (_, Gwdb.ifam, Gwdb.istr) Def.gen_family -> unit
+
 val file_path : Config.config -> Gwdb.base -> string -> string
 val read_notes : Gwdb.base -> string -> (string * string) list * string
 
@@ -17,6 +23,13 @@ val merge_possible_aliases :
   Config.config ->
   (('a, 'b) Def.NLDB.page * (string list * 'c list)) list ->
   (('a, 'b) Def.NLDB.page * (string list * 'c list)) list
+
+val update_ind_key :
+  Gwdb.base ->
+  (Gwdb.iper, Gwdb.ifam) Def.NLDB.page list ->
+  Def.NLDB.key ->
+  string * string * int ->
+  unit
 
 val source : Config.config -> Gwdb.base -> string -> Adef.safe_string
 (** [source conf base str]
