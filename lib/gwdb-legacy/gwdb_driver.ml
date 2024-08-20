@@ -41,6 +41,7 @@ let insert_string base s =
 
 let commit_patches base = base.func.Dbdisk.commit_patches ()
 let commit_notes base s = base.func.Dbdisk.commit_notes s
+let commit_wiznotes base s = base.func.Dbdisk.commit_wiznotes s
 let person_of_key base = base.func.Dbdisk.person_of_key
 let persons_of_name base = base.func.Dbdisk.persons_of_name
 let persons_of_first_name base = base.func.Dbdisk.persons_of_first_name

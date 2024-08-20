@@ -230,6 +230,19 @@ let commit_notes conf base fnotes s =
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db base pg s
 
+let commit_wiznotes conf base fnotes s =
+  let pg = Def.NLDB.PgWizard fnotes in
+  let fname = path_of_fnotes fnotes in
+  let fpath =
+    List.fold_left Filename.concat
+      (Util.bpath (conf.bname ^ ".gwb"))
+      [ base_wiznotes_dir base; fname ]
+  in
+  Mutil.mkdir_p (Filename.dirname fpath);
+  Gwdb.commit_wiznotes base fname s;
+  History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
+  update_notes_links_db base pg s
+
 let rewrite_key s oldk newk =
   let slen = String.length s in
   let rec rebuild rs i =
@@ -325,25 +338,25 @@ let update_ind_key_pgfam base f oldk newk =
   Gwdb.patch_family base f newf;
   update_notes_links_family base newf
 
-let update_ind_key_pgmisc base f oldk newk =
+let update_ind_key_pgmisc conf base f oldk newk =
   let oldn = base_notes_read base f in
   let newn = rewrite_key oldn oldk newk in
-  Gwdb.commit_notes base f newn
+  commit_notes conf base f newn
 
-let update_ind_key_pgwiz base f oldk newk =
+let update_ind_key_pgwiz conf base f oldk newk =
   let oldn = base_wiznotes_read base f in
   let newn = rewrite_key oldn oldk newk in
-  Gwdb.commit_notes base f newn
+  commit_wiznotes conf base f newn
 
-let update_ind_key base link_pages oldk newk =
+let update_ind_key conf base link_pages oldk newk =
   Printf.eprintf "updating %d note pages...\n%!" (List.length link_pages);
   List.iter
     (function
       | Def.NLDB.PgInd p -> update_ind_key_pgind base p oldk newk
       | PgFam f -> update_ind_key_pgfam base f oldk newk
-      | PgNotes -> update_ind_key_pgmisc base "" oldk newk
-      | PgMisc f -> update_ind_key_pgmisc base f oldk newk
-      | PgWizard f -> update_ind_key_pgwiz base f oldk newk)
+      | PgNotes -> update_ind_key_pgmisc conf base "" oldk newk
+      | PgMisc f -> update_ind_key_pgmisc conf base f oldk newk
+      | PgWizard f -> update_ind_key_pgwiz conf base f oldk newk)
     link_pages
 
 let wiki_aux pp conf base env str =
