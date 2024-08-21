@@ -9,7 +9,7 @@ let pp_wiki_link = function
       ^ [%show: int * (string * string * int) * string * string option]
           (a, Obj.magic b, c, d)
   | WLwizard (a, b, c) -> "WLwizard" ^ [%show: int * string * string] (a, b, c)
-  | WLnone -> "WLnone"
+  | WLnone (a, b)-> "WLnone" ^ [%show: int * string] (a, b)
   *)
 
 open Alcotest
@@ -25,12 +25,7 @@ let f s =
       | (WLpage (j, _, _, _, _) | WLperson (j, _, _, _) | WLwizard (j, _, _)) as
         x ->
           loop (x :: acc) j
-      | WLnone -> (
-          match acc with
-          | [] -> loop (WLnone :: acc) (i + 1)
-          | hd :: _ ->
-              if hd <> WLnone then loop (WLnone :: acc) (i + 1)
-              else loop acc (i + 1))
+      | WLnone (j, _text) as wn -> loop (wn :: acc) j
   in
   loop [] 0
 
@@ -38,24 +33,24 @@ let l =
   [
     ( [
         WLpage (13, ([], "aaa"), "aaa", "", "bbb");
-        WLnone;
+        WLnone (15, ", ");
         WLperson (26, ("ccc", "ddd", 0), "ccc ddd", None);
-        WLnone;
+        WLnone (51, ", http://site.com/eee#fff");
       ],
       "[[[aaa/bbb]]], [[ccc/ddd]], http://site.com/eee#fff" );
     ( [
-        WLnone;
+        WLnone (1, "[");
         WLperson (12, ("aaa", "bbb", 0), "aaa bbb", None);
-        WLnone;
+        WLnone (14, ", ");
         WLperson (25, ("ccc", "ddd", 0), "ccc ddd", None);
-        WLnone;
+        WLnone (50, ", http://site.com/eee#fff");
       ],
       "[[[aaa/bbb]], [[ccc/ddd]], http://site.com/eee#fff" );
-    ([ WLnone ], "[[[aaa/");
-    ([ WLnone ], "[[[]]]");
-    ([ WLnone ], "[[[w");
-    ([ WLnone ], "[[]]");
-    ([ WLnone ], "[[w");
+    ([ WLnone (7, "[[[aaa/") ], "[[[aaa/");
+    ([ WLnone (6, "[[[]]]") ], "[[[]]]");
+    ([ WLnone (4, "[[[w") ], "[[[w");
+    ([ WLnone (4, "[[]]") ], "[[]]");
+    ([ WLnone (3, "[[w") ], "[[w");
     ( [ WLpage (34, ([], "d_azincourt"), "d_azincourt", "", "d&#039;Azincourt") ],
       "[[[d_azincourt/d&#039;Azincourt]]]" );
   ]
