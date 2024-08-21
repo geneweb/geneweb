@@ -2573,19 +2573,16 @@ let treat_header2 r =
      end;
   | None -> ()
   end;
-  begin match !state.charset_option with
-    Some v -> !state.charset <- v
-  | None ->
-      match find_field "CHAR" r.rsons with
-        Some r ->
-          begin match r.rval with
-            "ANSEL" -> !state.charset <- Ansel
-          | "ASCII" | "IBMPC" -> !state.charset <- Ascii
-          | "MACINTOSH" -> !state.charset <- MacIntosh
-          | "UTF-8" -> !state.charset <- Utf8
-          | _ -> !state.charset <- Ascii
-          end
-      | None -> ()
+  begin match find_field "CHAR" r.rsons with
+    None -> Option.iter (fun v -> !state.charset <- v) !state.charset_option
+  | Some r ->
+     begin match r.rval with
+       "ANSEL" -> !state.charset <- Ansel
+     | "ASCII" | "IBMPC" -> !state.charset <- Ascii
+     | "MACINTOSH" -> !state.charset <- MacIntosh
+     | "UTF-8" -> !state.charset <- Utf8
+     | _ -> !state.charset <- Ascii
+     end
   end;
   match find_field "PLAC" r.rsons with
     Some rr ->
