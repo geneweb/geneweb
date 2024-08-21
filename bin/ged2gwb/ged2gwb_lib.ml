@@ -15,9 +15,6 @@ type record =
     rpos : int;
     mutable rused : bool }
 
-type ('a, 'b, 'c, 'd) choice3 =
-    Left3 of 'a
-  | Right3 of 'b * 'c * 'd
 type month_number_dates =
     MonthDayDates
   | DayMonthDates
@@ -770,8 +767,8 @@ let date_of_field d =
 type 'a tab = { mutable arr : 'a array ; mutable tlen : int }
 
 type gen =
-  { g_per : (string, person, ascend, union) choice3 tab
-  ; g_fam : (string, family, couple, descend) choice3 tab
+  { g_per : (string, person * ascend * union) Def.choice tab
+  ; g_fam : (string, family * couple * descend) Def.choice tab
   ; g_str : string tab
   ; mutable g_bnot : string
   ; g_ic : in_channel
@@ -820,8 +817,8 @@ let per_index gen lab =
   try Hashtbl.find gen.g_hper lab
   with Not_found ->
     let i = gen.g_per.tlen in
-    assume_tab gen.g_per (Left3 "");
-    gen.g_per.arr.(i) <- Left3 lab;
+    assume_tab gen.g_per (Def.Left "");
+    gen.g_per.arr.(i) <- Def.Left lab;
     gen.g_per.tlen <- gen.g_per.tlen + 1;
     Hashtbl.add gen.g_hper lab i;
     output_pindex i lab;
@@ -832,8 +829,8 @@ let fam_index gen lab =
   try Hashtbl.find gen.g_hfam lab
   with Not_found ->
     let i = gen.g_fam.tlen in
-    assume_tab gen.g_fam (Left3 "");
-    gen.g_fam.arr.(i) <- Left3 lab;
+    assume_tab gen.g_fam (Def.Left "");
+    gen.g_fam.arr.(i) <- Def.Left lab;
     gen.g_fam.tlen <- gen.g_fam.tlen + 1;
     Hashtbl.add gen.g_hfam lab i;
     i
@@ -851,9 +848,9 @@ let unknown_per i sex =
 let phony_per gen sex =
   let i = gen.g_per.tlen in
   let (person, ascend, union) = unknown_per i sex in
-  assume_tab gen.g_per (Left3 "");
+  assume_tab gen.g_per (Def.Left "");
   gen.g_per.tlen <- gen.g_per.tlen + 1;
-  gen.g_per.arr.(i) <- Right3 (person, ascend, union);
+  gen.g_per.arr.(i) <- Def.Right (person, ascend, union);
   i
 
 let unknown_fam gen i =
@@ -867,9 +864,9 @@ let unknown_fam gen i =
 let phony_fam gen =
   let i = gen.g_fam.tlen in
   let (fam, cpl, des) = unknown_fam gen i in
-  assume_tab gen.g_fam (Left3 "");
+  assume_tab gen.g_fam (Def.Left "");
   gen.g_fam.tlen <- gen.g_fam.tlen + 1;
-  gen.g_fam.arr.(i) <- Right3 (fam, cpl, des);
+  gen.g_fam.arr.(i) <- Def.Right (fam, cpl, des);
   i
 
 let this_year =
@@ -1207,19 +1204,19 @@ let forward_adop gen ip lab which_parent =
 let adop_parent gen ip r =
   let i = per_index gen r.rval in
   match gen.g_per.arr.(i) with
-  | Left3 _ -> None
-  | Right3 (p, a, u) ->
+  | Def.Left _ -> None
+  | Def.Right (p, a, u) ->
     if List.mem ip p.related then ()
     else
       begin let p = { p with related = ip :: p.related } in
-        gen.g_per.arr.(i) <- Right3 (p, a, u)
+        gen.g_per.arr.(i) <- Def.Right (p, a, u)
       end;
     Some p.key_index
 
 let set_adop_fam gen ip which_parent fath moth =
   match gen.g_per.arr.(ip) with
-  | Left3 _ -> ()
-  | Right3 (per, asc, uni) ->
+  | Def.Left _ -> ()
+  | Def.Right (per, asc, uni) ->
       let r_fath =
         match which_parent, fath with
           ("HUSB" | "BOTH"), Some r -> adop_parent gen ip r
@@ -1235,7 +1232,7 @@ let set_adop_fam gen ip which_parent fath moth =
          r_sources = string_empty}
       in
       let per = { per with rparents = r :: per.rparents } in
-      gen.g_per.arr.(ip) <- Right3 (per, asc, uni)
+      gen.g_per.arr.(ip) <- Def.Right (per, asc, uni)
 
 let forward_godp gen ip rval =
   let ipp = per_index gen rval in gen.g_godp <- (ipp, ip) :: gen.g_godp; ipp
@@ -2052,7 +2049,7 @@ let add_indi gen r =
   in
   let ascend = {Def.parents = parents; consang = Adef.fix (-1)} in
   let union = {Def.family = Array.of_list family} in
-  gen.g_per.arr.(ip) <- Right3 (person, ascend, union);
+  gen.g_per.arr.(ip) <- Def.Right (person, ascend, union);
   begin match find_field "ADOP" r.rsons with
     | Some r ->
       begin match find_field "FAMC" r.rsons with
@@ -2358,26 +2355,26 @@ let add_fam_norm gen r adop_list =
       fath, moth, false
   in
   begin match gen.g_per.arr.(fath) with
-    | Left3 _ -> ()
-    | Right3 (p, a, u) ->
+    | Def.Left _ -> ()
+    | Def.Right (p, a, u) ->
       let u =
         if not (Array.mem i u.Def.family)
         then { Def.family = Array.append u.Def.family [| i |] }
         else u
       in
       let p = if p.Def.sex = Neuter then { p with sex = Def.Male } else p in
-      gen.g_per.arr.(fath) <- Right3 (p, a, u)
+      gen.g_per.arr.(fath) <- Def.Right (p, a, u)
   end ;
   begin match gen.g_per.arr.(moth) with
-    | Left3 _ -> ()
-    | Right3 (p, a, u) ->
+    | Def.Left _ -> ()
+    | Def.Right (p, a, u) ->
       let u =
         if not (Array.mem i u.Def.family)
         then { Def.family = Array.append u.Def.family [| i |] }
         else u
       in
       let p = if p.Def.sex = Neuter then { p with sex = Female } else p in
-      gen.g_per.arr.(moth) <- Right3 (p, a, u)
+      gen.g_per.arr.(moth) <- Def.Right (p, a, u)
   end;
   let children =
     let rl = find_all_fields "CHIL" r.rsons in
@@ -2385,12 +2382,12 @@ let add_fam_norm gen r adop_list =
       let ip = per_index gen r.rval in
       if List.mem_assoc ip adop_list then
         match gen.g_per.arr.(ip) with
-        | Right3 (p, a, u) ->
+        | Def.Right (p, a, u) ->
           begin
             match a.Def.parents with
             | Some ifam when ifam = i ->
               let a = { a with Def.parents = None } in
-              gen.g_per.arr.(ip) <- Right3 (p, a, u) ;
+              gen.g_per.arr.(ip) <- Def.Right (p, a, u) ;
               ipl
             | _ -> ip :: ipl
           end
@@ -2502,8 +2499,8 @@ let add_fam_norm gen r adop_list =
   in
   let add_in_person_notes iper =
     match gen.g_per.arr.(iper) with
-    | Left3 _ -> ()
-    | Right3 (p, a, u) ->
+    | Def.Left _ -> ()
+    | Def.Right (p, a, u) ->
       let notes = gen.g_str.arr.(p.notes) in
       let notes =
         if notes = "" then ext_sources ^ ext_notes
@@ -2512,7 +2509,7 @@ let add_fam_norm gen r adop_list =
       in
       let new_notes = add_string gen notes in
       let p = { p with notes = new_notes } in
-      gen.g_per.arr.(iper) <- Right3 (p, a, u)
+      gen.g_per.arr.(iper) <- Def.Right (p, a, u)
   in
   let _ =
     if ext_notes = "" then ()
@@ -2544,7 +2541,7 @@ let add_fam_norm gen r adop_list =
      fam_index = i}
   and cpl = Adef.couple fath moth
   and des = {Def.children = Array.of_list children} in
-  gen.g_fam.arr.(i) <- Right3 (fam, cpl, des)
+  gen.g_fam.arr.(i) <- Def.Right (fam, cpl, des)
 
 let add_fam gen r =
   let list = Hashtbl.find_all gen.g_adop r.rval in
@@ -2694,9 +2691,9 @@ let pass1 gen fname =
 let fill_g_per gen list =
   List.iter begin fun (ipp, ip) ->
     match gen.g_per.arr.(ipp) with
-    | Right3 (p, a, u) when not @@ List.mem ip p.related ->
+    | Def.Right (p, a, u) when not @@ List.mem ip p.related ->
       let p = { p with related = ip :: p.related } in
-      gen.g_per.arr.(ipp) <- Right3 (p, a, u)
+      gen.g_per.arr.(ipp) <- Def.Right (p, a, u)
     | _ -> ()
   end list
 
@@ -2763,20 +2760,20 @@ let pass3 gen fname =
   loop ();
   List.iter begin fun (ifam, ip) ->
     match gen.g_fam.arr.(ifam) with
-    | Right3 (fam, cpl, des) ->
+    | Def.Right (fam, cpl, des) ->
       begin match gen.g_per.arr.(Adef.father cpl), gen.g_per.arr.(ip) with
-        | Right3 _, Right3 (p, a, u) ->
+        | Def.Right _, Def.Right (p, a, u) ->
           if List.mem (Adef.father cpl) p.related then ()
           else begin
             let p = { p with related = Adef.father cpl :: p.related } in
-            gen.g_per.arr.(ip) <- Right3 (p, a, u)
+            gen.g_per.arr.(ip) <- Def.Right (p, a, u)
           end ;
           if Array.mem ip fam.witnesses then ()
           else
             let fam =
               { fam with witnesses = Array.append fam.witnesses [| ip |] }
             in
-            gen.g_fam.arr.(ifam) <- Right3 (fam, cpl, des)
+            gen.g_fam.arr.(ifam) <- Def.Right (fam, cpl, des)
         | _ -> ()
       end
     | _ -> ()
@@ -2787,19 +2784,19 @@ let pass3 gen fname =
 let check_undefined gen =
   for i = 0 to gen.g_per.tlen - 1 do
     match gen.g_per.arr.(i) with
-    | Right3 (_, _, _) -> ()
-    | Left3 lab ->
+    | Def.Right (_, _, _) -> ()
+    | Def.Left lab ->
       let (p, a, u) = unknown_per i Neuter in
       Printf.fprintf !state.log_oc "Warning: undefined person %s\n" lab;
-      gen.g_per.arr.(i) <- Right3 (p, a, u)
+      gen.g_per.arr.(i) <- Def.Right (p, a, u)
   done;
   for i = 0 to gen.g_fam.tlen - 1 do
     match gen.g_fam.arr.(i) with
-    | Right3 (_, _, _) -> ()
-    | Left3 lab ->
+    | Def.Right (_, _, _) -> ()
+    | Def.Left lab ->
       let (f, c, d) = unknown_fam gen i in
       Printf.fprintf !state.log_oc "Warning: undefined family %s\n" lab;
-      gen.g_fam.arr.(i) <- Right3 (f, c, d)
+      gen.g_fam.arr.(i) <- Def.Right (f, c, d)
   done
 
 let add_parents_to_isolated gen =
@@ -2814,16 +2811,16 @@ let add_parents_to_isolated gen =
       if i = gen.g_fam.tlen then ()
       else
         match gen.g_fam.arr.(i) with
-        | Right3 (_, _, des) ->
+        | Def.Right (_, _, des) ->
           Array.iter (fun ip -> Hashtbl.add ht_missing_children ip true) des.children ;
             loop (i + 1)
-        | Left3 _ -> loop (i + 1)
+        | Def.Left _ -> loop (i + 1)
     in
     loop 0
   in
   for i = 0 to gen.g_per.tlen - 1 do
     match gen.g_per.arr.(i) with
-    | Right3 (p, a, u) ->
+    | Def.Right (p, a, u) ->
         if a.Def.parents = None
         && Array.length u.Def.family = 0
         && p.rparents = []
@@ -2838,14 +2835,14 @@ let add_parents_to_isolated gen =
               "Adding parents to isolated person: %s.%d %s\n" fn p.occ sn ;
             let ifam = phony_fam gen in
             match gen.g_fam.arr.(ifam) with
-            | Right3 (fam, cpl, _) ->
+            | Def.Right (fam, cpl, _) ->
               let des = { Def.children = [| p.key_index |] } in
-              gen.g_fam.arr.(ifam) <- Right3 (fam, cpl, des);
+              gen.g_fam.arr.(ifam) <- Def.Right (fam, cpl, des);
               let a = { a with Def.parents = Some ifam } in
-              gen.g_per.arr.(i) <- Right3 (p, a, u)
+              gen.g_per.arr.(i) <- Def.Right (p, a, u)
             | _ -> ()
           end
-    | Left3 _ -> ()
+    | Def.Left _ -> ()
   done
 
 let make_arrays in_file =
@@ -2887,8 +2884,8 @@ let make_subarrays (g_per, g_fam, g_str, g_bnot) =
     let ua = Array.make g_per.tlen (Obj.magic 0) in
     for i = 0 to g_per.tlen - 1 do
       match g_per.arr.(i) with
-      | Right3 (p, a, u) -> pa.(i) <- p; aa.(i) <- a; ua.(i) <- u
-      | Left3 lab -> failwith ("undefined person " ^ lab)
+      | Def.Right (p, a, u) -> pa.(i) <- p; aa.(i) <- a; ua.(i) <- u
+      | Def.Left lab -> failwith ("undefined person " ^ lab)
     done;
     pa, aa, ua
   in
@@ -2898,8 +2895,8 @@ let make_subarrays (g_per, g_fam, g_str, g_bnot) =
     let da = Array.make g_fam.tlen (Obj.magic 0) in
     for i = 0 to g_fam.tlen - 1 do
       match g_fam.arr.(i) with
-        Right3 (f, c, d) -> fa.(i) <- f; ca.(i) <- c; da.(i) <- d
-      | Left3 lab -> failwith ("undefined family " ^ lab)
+        Def.Right (f, c, d) -> fa.(i) <- f; ca.(i) <- c; da.(i) <- d
+      | Def.Left lab -> failwith ("undefined family " ^ lab)
     done;
     fa, ca, da
   in
