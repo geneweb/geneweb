@@ -12700,11 +12700,11 @@ sl: ime %s že uporablja %tta oseba%t
 sv: namn %s används redan av %tdenna person%t
 tr: %s adı zaten %tbu kişi%t tarafından kullanılıyor
 
-    name changed. update linked pages
+    name changed. updated linked pages
 co: U nome, a casata, o un occurrenza di sta persona hà cambiatu. Ci vole à rinfrescà e pagine assuciate à l’anziana chjave inghjò.
 de: Vorname, Name oder Vorkommen dieser Person hat sich geändert. Bitte aktualisieren Sie die unten aufgeführten Seiten, die mit dem alten Schlüssel verknüpft sind.
-en: The first name, name or occurrence of this person has changed. Please update the pages linked to the old key listed below.
-fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les pages liées à l’ancienne clé ci-dessous.
+en: The first name, name or occurrence of this person has changed. The pages linked to the old key listed below have been updated.
+fr: Le prénom, nom ou occurrence de cette personne a changé. Les pages ci-dessous liées à l’ancienne clé ont été mises à jour.
 pt: O primeiro nome, apelido ou ocorrência desta pessoa foi alterada. Por favor actualize as páginas ligadas à chave antiga abaixo.
 sv: Förnamn, efternamn eller förekomst av denna person har ändrats. Uppdatera sidorna som länkar till den gamla nyckeln som visas nedan.
 tr: Bu kişinin ilk adı, adı veya oluşumları değişmiştir. Lütfen aşağıda listelenen eski anahtara bağlı sayfaları güncelleyin.

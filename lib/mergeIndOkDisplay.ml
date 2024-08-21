@@ -39,7 +39,7 @@ let print_mod_merge_ok conf base wl p pgl1 ofn1 osn1 oocc1 pgl2 ofn2 osn2 oocc2
   then (
     Output.print_sstring conf
       {|<div class="alert alert-danger mx-auto mt-1" role="alert">|};
-    Output.printf conf (ftransl conf "name changed. update linked pages");
+    Output.printf conf (ftransl conf "name changed. updated linked pages");
     Output.print_sstring conf "</div>";
     let aux n txt ofn osn oocc =
       Output.print_sstring conf {|<span class="unselectable float-left">|};
