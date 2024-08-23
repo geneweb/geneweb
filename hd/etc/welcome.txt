@@ -102,8 +102,8 @@
       %if;(b.visitor_access!="no" or wizard or friend)
         <div class="d-flex justify-content-center">
           <span class="h2 font-weight-light">%base.real_nb_persons; %nn;
-            %if;(base.real_nb_persons>1)[person/persons]1%else;[person/persons]0%end;</span>
-          %if;(base.real_nb_persons>0)
+            %if;(base.real_nb_persons="0" or base.real_nb_persons="1")[person/persons]0%else;[person/persons]1%end;</span>
+          %if;(base.real_nb_persons!="0")
             <a class="align-self-center" href="%prefix;i=%apply;get_random(nb_persons.v)"
               title="[*random individual]"><i class="fa-solid fa-dice ml-2 mb-2"></i></a>
           %end;
