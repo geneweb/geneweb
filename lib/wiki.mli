@@ -35,7 +35,7 @@ open Config
 type wiki_info = {
   wi_mode : string;
   wi_file_path : string -> string;
-  wi_person_exists : string * string * int -> bool;
+  wi_person_exists : string * string * int -> bool * string * string;
   wi_always_show_link : bool;
 }
 
