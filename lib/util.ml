@@ -1906,12 +1906,18 @@ let find_person_in_env_pref conf base pref =
     (pref ^ "oc")
 
 let person_exists conf base (fn, sn, oc) =
+  let auth, fn, sn =
+    match person_of_key base fn sn oc with
+    | Some ip ->
+        if authorized_age conf base (pget conf base ip) then
+          let p = poi base ip in
+          (true, sou base (get_first_name p), sou base (get_surname p))
+        else (false, "x", "x")
+    | None -> (false, fn, sn)
+  in
   match List.assoc_opt "red_if_not_exist" conf.base_env with
-  | Some "off" -> true
-  | Some _ | None -> (
-      match person_of_key base fn sn oc with
-      | Some ip -> authorized_age conf base (pget conf base ip)
-      | None -> false)
+  | Some "off" -> (true, fn, sn)
+  | Some _ | None -> (auth, fn, sn)
 
 let default_sosa_ref conf base =
   match List.assoc_opt "default_sosa_ref" conf.base_env with
