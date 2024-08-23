@@ -30,7 +30,6 @@ let spi_next (spi : string_person_index) istr = spi.next istr
 
 type base = dsk_base
 
-let open_base bname : base = Database.opendb bname
 let sou base i = base.data.strings.get i
 let bname base = Filename.(remove_extension @@ basename base.data.bdir)
 let nb_of_persons base = base.data.persons.len
@@ -63,6 +62,18 @@ let clear_descends_array base = base.data.descends.clear_array ()
 let clear_strings_array base = base.data.strings.clear_array ()
 let clear_persons_array base = base.data.persons.clear_array ()
 let clear_families_array base = base.data.families.clear_array ()
+
+let open_base ?(keep_in_memory = false) bname : base =
+  let base = Database.opendb ~read_only:keep_in_memory bname in
+  if keep_in_memory then (
+    load_persons_array base;
+    load_ascends_array base;
+    load_unions_array base;
+    load_couples_array base;
+    load_descends_array base;
+    load_families_array base;
+    load_strings_array base);
+  base
 
 let close_base base =
   base.func.cleanup ();
@@ -361,7 +372,8 @@ let gen_family_of_family = cache_fam (fun f -> f)
 let get_children = cache_des (fun d -> d.Def.children)
 let get_comment = cache_fam (fun f -> f.Def.comment)
 let get_ifam = cache_fam (fun f -> f.Def.fam_index)
-let get_divorce = cache_fam (fun f -> f.Def.divorce)
+
+(* let get_divorce = cache_fam (fun f -> f.Def.divorce) *)
 let get_father = cache_cpl (fun c -> Adef.father c)
 let get_fevents = cache_fam (fun f -> f.Def.fevents)
 let get_fsources = cache_fam (fun f -> f.Def.fsources)
@@ -569,3 +581,83 @@ let base_visible_get base fct i =
       visible_ref := Some visible;
       status
   | Some b -> b
+
+(*
+type 'a event_name =
+  | Pevent of 'a gen_pers_event_name
+  | Fevent of 'a gen_fam_event_name
+type ('person, 'string) gen_fam_event = {
+  efam_name : 'string gen_fam_event_name;
+  efam_date : cdate;
+  efam_place : 'string;
+  efam_reason : 'string;
+  efam_note : 'string;
+  efam_src : 'string;
+  efam_witnesses : ('person * witness_kind) array;
+}
+
+
+  let fam_fevents =
+    if m_auth then
+      List.fold_right
+        (fun evt fam_fevents ->
+          let name = Fevent evt.efam_name in
+          let date = evt.efam_date in
+          let place = evt.efam_place in
+          let note = evt.efam_note in
+          let src = evt.efam_src in
+          let wl = evt.efam_witnesses in
+          let x = (name, date, place, note, src, wl, Some isp) in
+          x :: fam_fevents)
+        (get_fevents fam) []
+    else []
+  in
+  fam_fevents @ fevents)
+(get_family p) []
+*)
+
+let get_divorce fam =
+  let divorce, separated =
+    List.fold_right
+      (fun evt (divorce, separated) ->
+        let name = evt.efam_name in
+        let date = evt.efam_date in
+        let place = evt.efam_place in
+        let note = evt.efam_note in
+        let src = evt.efam_src in
+        let wl = evt.efam_witnesses in
+        let x = (name, date, place, note, src, wl) in
+        if name = Efam_Divorce then (x :: divorce, separated)
+        else if name = Efam_Separated then (divorce, x :: separated)
+        else (divorce, separated))
+      (get_fevents fam) ([], [])
+  in
+  match (divorce, separated) with
+  | [ (Efam_Divorce, date, _, _, _, _) ], _ -> Divorced date
+  | _, _ -> NotDivorced
+
+(*let get_divorce = cache_fam (fun f -> get_divorce_aux)
+*)
+
+let get_separation fam =
+  let divorce, separated =
+    List.fold_right
+      (fun evt (divorce, separated) ->
+        let name = evt.efam_name in
+        let date = evt.efam_date in
+        let place = evt.efam_place in
+        let note = evt.efam_note in
+        let src = evt.efam_src in
+        let wl = evt.efam_witnesses in
+        let x = (name, date, place, note, src, wl) in
+        if name = Efam_Divorce then (x :: divorce, separated)
+        else if name = Efam_Separated then (divorce, x :: separated)
+        else (divorce, separated))
+      (get_fevents fam) ([], [])
+  in
+  match (divorce, separated) with
+  | _, [ (Efam_Separated, date, _, _, _, _) ] -> Separated date
+  | _, _ -> NotSeparated
+
+(*let get_separation = cache_fam (fun f -> get_separation_aux)
+*)

@@ -14,7 +14,10 @@
 <div class="container">
 %include;hed
 %define;book_of(xx)[book of %s:::xx]%end;
-%define;display_sosa_ref(xx)[*sosa reference: %t:::xx]%end;
+%define;display_sosa_ref(xx)
+  [*sosa reference][:]
+  <href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
+%end;
 %define;get_visitor_access_msg(lg)
   %if;(b.visitor_access_msg_lg!="")
     %b.visitor_access_msg_lg;
@@ -31,9 +34,7 @@
   %random.xxx;
 %end;
   <div class="d-flex flex-column flex-md-row justify-content-lg-center mt-lg-3">
-    %if;(b.auth_file="" and (b.wizard_passwd!="" or b.friend_passwd!=""))
-      <div class="d-none d-lg-block col-md-3 order-md-1"></div>
-    %end;
+    <div class="d-none d-lg-block col-md-3 order-md-1"></div>
     <div class="col-xs-12 col-md-3 order-md-3 ml-md-2 px-0">
       <div class="d-flex flex-column">
         %if;(cgi and (not wizard or not friend))
@@ -41,7 +42,7 @@
             %hidden;
             <div class="input-group mt-1 w-100">
               %(<label for="w" class="sr-only">[user/password/cancel]0:[user/password/cancel]1</label>%)
-              <input type="text" class="form-control" name="w" title="[wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0"
+              <input type="password" class="form-control" name="w" title="[wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0"
               placeholder="[user/password/cancel]0:[user/password/cancel]1" aria-label="password input" aria-describedby="username:password" autofocus>
               <div class="input-group-append">
                 <button type="submit" class="btn btn-primary">OK</button>
@@ -71,7 +72,10 @@
           %end;
           </div>
         %end;
-        %if;(user.ident!="")<span class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom" title="%if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %user.ident;">%user.ident;</span>%end;
+        %if;(friend or wizard)<span class="border border-%if;friend;primary%elseif;wizard;success%end; text-%if;friend;primary%elseif;wizard;success%end; rounded text-center mt-1 w-100 rounded-bottom" title="%if;wizard;[*wizard/wizards/friend/friends/exterior]0%elseif;friend;[*wizard/wizards/friend/friends/exterior]2%end; %user.name;">
+          <a href="%prefix;m=S&n=%if;(user.key!="")%user.key;%else;%user.name;%end;"
+             class="text-%if;friend;primary%elseif;wizard;success%end; text-center">%user.name;</a>
+        </span>%end;
         %if;((wizard and (b.wizard_passwd_file!="" or b.wizard_passwd!=""))
           or (friend and (b.friend_passwd_file!="" or b.friend_passwd!="")))
           <a class="btn btn-outline-danger mt-1 w-100" href="%prefix;w=" role="button"><i class="fas fa-right-from-bracket mr-1" aria-hidden="true"></i>[*disconnect]</a>
@@ -90,7 +94,7 @@
       %if;(b.visitor_access!="no" or wizard or friend)
         <div class="d-flex justify-content-center">
           <span class="h2 font-weight-light">%base.real_nb_persons; [person/persons]1</span>
-          <a class="align-self-center" href="%prefix;i=%apply;get_random(nb_of_persons.v)"
+          <a class="align-self-center" href="%prefix;i=%apply;get_random(nb_persons.v)"
           title="[*random individual]"><i class="fa-solid fa-dice ml-1 mb-2"></i></a>
         </div>
       %end;
@@ -246,7 +250,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         %end;
         %if;(b.hide_advanced_request="no")
           <a role="button" class="btn btn-outline-primary mr-1" 
-            href="%prefix;m=H&v=advanced">
+            href="%prefix;m=AS">
             <i class="fa fa-magnifying-glass-plus fa-fw mr-1" aria-hidden="true"></i>[*advanced request]0</a>
         %end;
         <a role="button" class="btn btn-outline-primary mr-1" 
@@ -284,14 +288,14 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           <a role="button" class="btn btn-outline-success" 
             href="%prefix;m=MOD_DATA&data=src"
             title="[*modify] %apply;book_of%with;[source/sources]1%end;%sp;
-              ([wizard/wizards/friend/friends/exterior]0)"><i class="fa fa-archive fa-fw mr-1"></i>[*source/sources]1</a>
+              ([wizard/wizards/friend/friends/exterior]0)"><i class="fa fa-box-archive fa-fw mr-1"></i>[*source/sources]1</a>
         </div>
       </div>
     %end;
     %if;(plugins!="" and b.plugins!="")
       <div class="d-flex flex-column flex-lg-row justify-content-lg-center mt-2 mt-lg-4">
         <div class="h4 align-self-lg-center mr-lg-2">
-          <i class="fas fa-book fa-sm fa-fw text-secondary mr-1"></i>[*plugins][:]
+          [*plugins][:]
           <span class="small">%b.plugins;</span>
         </div>
       </div>

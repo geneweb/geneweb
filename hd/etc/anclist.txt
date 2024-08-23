@@ -279,46 +279,44 @@
       </p>
     %end;
 
-    <p>[*help surname branch].</p>
-    <div class="not_printable">
-      %if;(not cancel_links)
-      <table class="display_search">
-        <tr>
-          <td><b>[*sort by/branch/alphabetic order]0</b></td>
-          <td><img src="%images_prefix;picto_branch.png"></td>
-          <td>[sort by/branch/alphabetic order]1</td>
-          <td><img src="%images_prefix;picto_alphabetic_order.png"></td>
-          <td>
-            <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;">
-              [sort by/branch/alphabetic order]2
-            </a>
-          </td>
-        </tr>
-      </table>
-      %end;
-    </div>
+  %if;(not cancel_links)
+    <div class="">[*help surname branch].</div>
+    <table class="display_search border-0">
+      <tr>
+        <td><b>[*sort by/branch/alphabetic order]0</b></td>
+        <td><img src="%images_prefix;picto_branch.png"></td>
+        <td>[sort by/branch/alphabetic order]1</td>
+        <td><i class="fa-solid fa-arrow-down-a-z ml-2"></i></td>
+        <td>
+          <a href="%prefix;m=A&p=%first_name_key;&n=%surname_key;&oc=%e.oc;&sosab=%e.sosab;&t=%e.t;&v=%e.v;">
+            [sort by/branch/alphabetic order]2
+          </a>
+        </td>
+      </tr>
+    </table>
+  %end;
     <ul class="surname_branch_sort">
       %if;(count <= 100)
         <li>%nn;
-        <table class="table table-responsive surname_branch_table">
-          <tr class="surname_branch_table_header">
-            <th width="30%%">[*surname/surnames]0</th>
-            <th width="10%%">[*nb branches]</th>
-            <th width="45%%">[*place/places]0</th>
-            <th width="15%%">[*date/dates]0</th>
-          </tr>
+        <table class="table table-sm w-auto asc-desc-table mt-2">
+          <thead><tr>
+            <th>[*surname/surnames]0</th>
+            <th>[*nb branches]</th>
+            <th>[*place/places]0</th>
+            <th>[*date/dates]0</th>
+          </tr></thead>
       %end;
       %foreach;sorted_list_item;
         %if;(prev_item.2 != item.2 and count > 100)
           <li>%nn;
           <a name="a_%apply;hexa(item.2)">%item.2;</a>
-          <table class="table table-responsive surname_branch_table">
-            <tr class="surname_branch_table_header">
-              <th width="30%%">[*surname/surnames]0</th>
-              <th width="10%%">[*nb branches]</th>
-              <th width="45%%">[*place/places]0</th>
-              <th width="15%%">[*date/dates]0</th>
-            </tr>
+          <table class="table table-sm w-auto asc-desc-table">
+            <thead><tr>
+              <th>[*surname/surnames]0</th>
+              <th>[*nb branches]</th>
+              <th>[*place/places]0</th>
+              <th>[*date/dates]0</th>
+            </tr></thead>
         %end;
         <tr>
           <td>
@@ -371,10 +369,9 @@
   %elseif;(e.t="F")
     %( surnames branch %)
     %let;nb_gen;%apply;min(e.v, max_anc_level)%in;
-    <p>[*help surname branch].</p>
-    <div class="not_printable" style="margin-bottom:25px;">
-      %if;(not cancel_links)
-      <table class="display_search">
+    %if;(not cancel_links)
+      <div>[*help surname branch].</div>
+      <table class="display_search border-0">
         <tr>
           <td><b>[*sort by/branch/alphabetic order]0</b></td>
           <td><img src="%images_prefix;picto_branch.png"></td>
@@ -383,15 +380,14 @@
               [sort by/branch/alphabetic order]1
             </a>
           </td>
-          <td><img src="%images_prefix;picto_alphabetic_order.png"></td>
+          <td><i class="fa-solid fa-arrow-down-a-z ml-2"></i></td>
           <td>[sort by/branch/alphabetic order]2</td>
         </tr>
       </table>
-      %end;
-    </div>
-    <table class="surname_branch_table">
+    %end;
+    <table class="table table-sm w-auto asc-desc-table mt-2">
       <thead>
-      <tr class="surname_branch_table_header">
+      <tr>
         <th>[*surname/surnames]0</th>
         <th>[*nb branches]</th>
         <th>[*place/places]0</th>

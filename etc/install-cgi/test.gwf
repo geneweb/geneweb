@@ -1,5 +1,7 @@
 
 plugins=cgl,fixbase,forum,no_index
+wizard_passwd=wiz:wiz
+friend_passwd=fr:fr
 
 access_by_key=yes
 disable_forum=yes

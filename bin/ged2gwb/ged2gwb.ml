@@ -2296,6 +2296,7 @@ let treat_fam_fevent gen ifath r =
 let reconstitute_from_fevents gen gay fevents marr witn div =
   let found_marriage = ref false in
   let found_divorce = ref false in
+  let found_separation = ref false in
   (* On veut cette fois ci que ce soit le dernier évènement *)
   (* qui soit mis dans les évènements principaux.           *)
   let rec loop fevents marr witn div =
@@ -2362,10 +2363,10 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
               let div = Divorced evt.efam_date in
               let () = found_divorce := true in loop l marr witn div
         | Efam_Separated ->
-            if !found_divorce then loop l marr witn div
+            if !found_separation then loop l marr witn div
             else
-              let div = Separated in
-              let () = found_divorce := true in loop l marr witn div
+              let div = Separated evt.efam_date in
+              let () = found_separation := true in loop l marr witn div
         | _ -> loop l marr witn div
   in
   let (marr, witn, div) = loop (List.rev fevents) marr witn div in
@@ -3180,20 +3181,20 @@ let out_file = ref "a"
 
 let speclist =
   [ ( "-o", Arg.String (fun s -> out_file := s)
-    , "<file> Output database (default: \"a\")." )
+    , "<file> Output database (default: \"a\"). Alphanumerics and -" )
   ; ( "-f", Arg.Set force
-    , "Remove database if already existing" )
+    , " Remove database if already existing" )
   ; ( "-log", Arg.String (fun s -> log_oc := open_out s)
     , "<file> Redirect log trace to this file." )
   ; ( "-lf", Arg.Set lowercase_first_names
-    , "Convert first names to lowercase letters, with initials in uppercase." )
+    , " Convert first names to lowercase letters, with initials in uppercase." )
   ; ( "-trackid", Arg.Set track_ged2gw_id,
-      "Print gedcom id to gw id matches." )
+      " Print gedcom id to gw id matches." )
   ; ( "-ls", Arg.Unit (fun () -> case_surnames := LowerCase)
-    , "Convert surnames to lowercase letters, with initials in uppercase. \
+    , " Convert surnames to lowercase letters, with initials in uppercase. \
        Try to keep lowercase particles." )
   ; ( "-us", Arg.Unit (fun () -> case_surnames := UpperCase)
-    , "Convert surnames to uppercase letters." )
+    , " Convert surnames to uppercase letters." )
   ; ( "-fne"
     , Arg.String begin fun s ->
         if String.length s = 2
@@ -3205,29 +3206,30 @@ let speclist =
        is considered to be the usual first name: e.g. -fne '\"\"' or \
        -fne \"()\"." )
   ; ( "-efn", Arg.Set extract_first_names
-    , "When creating a person, if the GEDCOM first name part holds several \
+    , " When creating a person, if the GEDCOM first name part holds several \
        names, the first of this names becomes the person \"first name\" and \
        the complete GEDCOM first name part a \"first name alias\"." )
   ; ( "-no_efn", Arg.Clear extract_first_names,
-      "Cancels the previous option." )
+      " Cancels the previous option." )
   ; ( "-epn", Arg.Set extract_public_names
-    , "When creating a person, if the GEDCOM first name part looks like a \
-       public name, i.e. holds:\n\
-       * a number or a roman number, supposed to be a number of a nobility title,\n\
-       * one of the words: \"der\", \"den\", \"die\", \"el\", \"le\", \"la\", \"the\", \
+    , " When creating a person, if the GEDCOM first name part looks like a \
+       public name, i.e. holds either \
+       a number or a roman number, supposed to be a number of a nobility title, \
+       or one of the words: \
+       \"der\", \"den\", \"die\", \"el\", \"le\", \"la\", \"the\", \
        supposed to be the beginning of a qualifier, \
        then the GEDCOM first name part becomes the person \"public name\" \
        and its first word his \"first name\"." )
   ; ( "-no_epn", Arg.Clear extract_public_names
-    , "Cancels the previous option." )
+    , " Cancels the previous option." )
   ; ( "-no_pit", Arg.Set no_public_if_titles
-    , "Do not consider persons having titles as public")
+    , " Do not consider persons having titles as public")
   ; ( "-tnd", Arg.Set try_negative_dates
-    , "Set negative dates when inconsistency (e.g. birth after death)" )
+    , " Set negative dates when inconsistency (e.g. birth after death)" )
   ; ( "-no_nd", Arg.Set no_negative_dates
-    , "Don't interpret a year preceded by a minus sign as a negative year" )
-  ; ( "-nc", Arg.Clear do_check, "No consistency check" )
-  ; ( "-nopicture", Arg.Set no_picture, "Don't extract individual picture." )
+    , " Don't interpret a year preceded by a minus sign as a negative year" )
+  ; ( "-nc", Arg.Clear do_check, " No consistency check" )
+  ; ( "-nopicture", Arg.Set no_picture, " Don't extract individual picture." )
   ; ( "-udi"
     , Arg.String begin fun s ->
         match String.index_opt s '-' with
@@ -3240,21 +3242,22 @@ let speclist =
           dead_years := b ;
         | None -> raise (Arg.Bad "bad parameter for -udi")
       end
-    , "x-y Set the interval for persons whose death part is undefined:\n\
-       - if before x years, they are considered as alive\n\
-       - if after y year, they are considered as death\n\
-       - between x and y year, they are considered as \"don't know\"\n\
-       Default x is " ^ string_of_int !alive_years ^ " and y is " ^ string_of_int !dead_years)
+    , "x-y Set the interval for persons whose death part is undefined: \
+       If before x years, they are considered as alive. \
+       If after y year, they are considered as death. \
+       Between x and y year, they are considered as \"don't know\". \
+       Default x is " ^ string_of_int !alive_years ^ " \
+       Default y is " ^ string_of_int !dead_years)
   ; ( "-uin", Arg.Set untreated_in_notes
-    , "Put untreated GEDCOM tags in notes" )
+    , " Put untreated GEDCOM tags in notes" )
   ; ( "-ds", Arg.Set_string default_source
-    , "Set the source field for persons and families without source data" )
+    , " Set the source field for persons and families without source data" )
   ; ( "-dates_dm", Arg.Unit (fun () -> month_number_dates := DayMonthDates)
-    ,"Interpret months-numbered dates as day/month/year" )
+    ," Interpret months-numbered dates as day/month/year" )
   ; ( "-dates_md", Arg.Unit (fun () -> month_number_dates := MonthDayDates)
-    , "Interpret months-numbered dates as month/day/year" )
+    , " Interpret months-numbered dates as month/day/year" )
   ; ( "-rs_no_mention", Arg.Unit (fun () -> relation_status := NoMention)
-    , "Force relation status to NoMention (default is Married)" )
+    , " Force relation status to NoMention (default is Married)" )
   ; ( "-charset"
     , Arg.String begin function
         | "ANSEL" -> charset_option := Some Ansel
@@ -3262,7 +3265,7 @@ let speclist =
         | "MSDOS" -> charset_option := Some Msdos
         | _ -> raise (Arg.Bad "bad -charset value")
       end
-    , "[ANSEL|ASCII|MSDOS] Force given charset decoding, \
+    , " [ANSEL|ASCII|MSDOS] Force given charset decoding, \
        overriding the possible setting in GEDCOM" )
   ; ( "-particles"
     , Arg.String (fun s -> particles := Mutil.input_particles s)
@@ -3277,6 +3280,13 @@ let errmsg = "Usage: ged2gwb [<ged>] [options] where options are:"
 
 let main () =
   Arg.parse speclist anonfun errmsg;
+  if not (Mutil.good_name (Filename.basename !out_file)) then (
+    (* Util.transl conf not available !*)
+    Printf.eprintf "The database name \"%s\" contains a forbidden character.\n"
+      !out_file;
+    Printf.eprintf "Allowed characters: a..z, A..Z, 0..9, -\n";
+    flush stderr;
+    exit 2);
   Secure.set_base_dir (Filename.dirname !out_file);
   let arrays = make_arrays !in_file in
   Gc.compact ();

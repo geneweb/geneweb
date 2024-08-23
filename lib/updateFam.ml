@@ -118,16 +118,49 @@ and eval_bvar conf v =
   | None -> VVstring ""
 
 and eval_divorce fam =
-  match fam.divorce with
-  | Divorced _ -> str_val "divorced"
-  | NotDivorced -> str_val "not_divorced"
-  | Separated -> str_val "separated"
+  let divorce, separated =
+    List.fold_right
+      (fun evt (divorce, separated) ->
+        let name = evt.efam_name in
+        let date = evt.efam_date in
+        let place = evt.efam_place in
+        let note = evt.efam_note in
+        let src = evt.efam_src in
+        let wl = evt.efam_witnesses in
+        let x = (name, date, place, note, src, wl) in
+        if name = Efam_Divorce then (x :: divorce, separated)
+        else if name = Efam_Separated then (divorce, x :: separated)
+        else (divorce, separated))
+      fam.fevents ([], [])
+  in
+  match (divorce, separated) with
+  | (Efam_Divorce, _, _, _, _, _) :: _, _ -> str_val "divorced"
+  | _, (Efam_Separated, _, _, _, _, _) :: _ -> str_val "separated"
+  | _, _ -> str_val "not divorced nor separated"
 
 (* TODO : rewrite, second case with None passed as an argument looks odd *)
 and eval_divorce' fam s =
-  match fam.divorce with
-  | Divorced d -> eval_date_var (Date.od_of_cdate d) s
-  | NotDivorced | Separated -> eval_date_var None s
+  let divorce, separated =
+    List.fold_right
+      (fun evt (divorce, separated) ->
+        let name = evt.efam_name in
+        let date = evt.efam_date in
+        let place = evt.efam_place in
+        let note = evt.efam_note in
+        let src = evt.efam_src in
+        let wl = evt.efam_witnesses in
+        let x = (name, date, place, note, src, wl) in
+        if name = Efam_Divorce then (x :: divorce, separated)
+        else if name = Efam_Separated then (divorce, x :: separated)
+        else (divorce, separated))
+      fam.fevents ([], [])
+  in
+  match (divorce, separated) with
+  | (Efam_Divorce, d, _, _, _, _) :: _, _ ->
+      eval_date_var (Date.od_of_cdate d) s
+  | _, (Efam_Separated, d, _, _, _, _) :: _ ->
+      eval_date_var (Date.od_of_cdate d) s
+  | _, _ -> str_val ""
 
 and eval_is_first env =
   match get_env "first" env with Vbool x -> bool_val x | _ -> raise Not_found
@@ -500,34 +533,24 @@ let print_del1 conf base ifam =
   let cpl = foi base ifam in
   let ifath = get_father cpl in
   let imoth = get_mother cpl in
-  let title () =
+  let title _ =
     transl_nth conf "family/families" 0
     |> transl_decline conf "delete"
-    |> Utf8.capitalize_fst |> Output.print_sstring conf;
-    Output.print_sstring conf " ";
-    Output.print_string conf
-      (Util.escape_html (p_first_name base (poi base ifath)));
-    Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base ifath)));
-    Output.print_string conf
-      (Util.escape_html (p_surname base (poi base ifath)));
-    Output.print_sstring conf " ";
-    Output.print_sstring conf (transl conf "and");
-    Output.print_sstring conf " ";
-    Output.print_string conf
-      (Util.escape_html (p_first_name base (poi base imoth)));
-    Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base imoth)));
-    Output.print_string conf
-      (Util.escape_html (p_surname base (poi base imoth)))
+    |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
-  let p =
-    match p_getenv conf.env "ip" with
-    | Some ip -> poi base (iper_of_string ip)
-    | None -> Gwdb.empty_person base dummy_iper
-  in
-  (* TODO check if first argument really needs to be [bool -> unit] and not [unit -> unit] *)
-  Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
+  Hutil.header conf title;
   Output.print_sstring conf "<h2>\n";
-  title ();
+  Output.print_string conf
+    (Util.escape_html (p_first_name base (poi base ifath)));
+  Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base ifath)));
+  Output.print_string conf (Util.escape_html (p_surname base (poi base ifath)));
+  Output.print_sstring conf " ";
+  Output.print_sstring conf (transl conf "and");
+  Output.print_sstring conf " ";
+  Output.print_string conf
+    (Util.escape_html (p_first_name base (poi base imoth)));
+  Output.print_sstring conf (Format.sprintf ".%d " (get_occ (poi base imoth)));
+  Output.print_string conf (Util.escape_html (p_surname base (poi base imoth)));
   Output.print_sstring conf {|</h2><form method="post" action="|};
   Output.print_sstring conf conf.command;
   Output.print_sstring conf {|"><p>|};
@@ -545,14 +568,13 @@ let print_del1 conf base ifam =
   Hutil.trailer conf
 
 let print_inv1 conf base p ifam1 ifam2 =
-  let title () =
+  let title _ =
     transl_decline conf "invert" ""
     |> Utf8.capitalize_fst |> Adef.safe |> Output.print_string conf
   in
   let cpl1 = foi base ifam1 in
   let cpl2 = foi base ifam2 in
-  (* TODO check if first argument really needs to be [bool -> unit] and not [unit -> unit] *)
-  Perso.interp_notempl_with_menu (fun _b -> title ()) "perso_header" conf base p;
+  Hutil.header conf title;
   Output.print_sstring conf
     (Utf8.capitalize_fst
        (transl conf "invert the order of the following families"));
@@ -630,10 +652,9 @@ let print_add conf base =
   print_update_fam conf base (fam, cpl, des) digest
 
 let print_add_parents conf base =
-  match p_getenv conf.env "ip" with
+  match Util.find_person_in_env conf base "p" with
   | None -> Hutil.incorrect_request conf
-  | Some i ->
-      let p = poi base (iper_of_string i) in
+  | Some p ->
       let fam =
         {
           marriage = Date.cdate_None;
@@ -781,7 +802,7 @@ let print_change_order conf base =
         (Utf8.capitalize_fst (transl_nth conf "validate/delete" 0));
       Output.print_sstring conf "</button></p></form>";
       Hutil.trailer conf
-  | _ -> Hutil.incorrect_request conf
+  | _ -> Hutil.incorrect_request conf ~comment:"bad params for CHG_FAM_ORD"
 
 let print_change_event_order conf base =
   match p_getenv conf.env "i" with

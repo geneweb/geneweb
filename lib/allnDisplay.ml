@@ -16,15 +16,21 @@ let compare_particle_at_the_end base is_surnames a b =
     (particle_at_the_end base is_surnames a)
     (particle_at_the_end base is_surnames b)
 
+let format_with_thousand_sep conf num =
+  Sosa.to_string_sep (transl conf "(thousand separator)") (Sosa.of_int num)
+
 (* print *)
 
 let print_title conf base is_surnames ini len =
+  let formatted_len = format_with_thousand_sep conf len in
   if len >= 2 then
     if is_surnames then
-      Printf.sprintf (fcapitale (ftransl conf "the %d surnames")) len
+      Printf.sprintf (fcapitale (ftransl conf "the %s surnames")) formatted_len
       |> Output.print_sstring conf
     else
-      Printf.sprintf (fcapitale (ftransl conf "the %d first names")) len
+      Printf.sprintf
+        (fcapitale (ftransl conf "the %s first names"))
+        formatted_len
       |> Output.print_sstring conf
   else if is_surnames then
     transl_nth conf "surname/surnames" 0
@@ -39,7 +45,8 @@ let print_title conf base is_surnames ini len =
     Output.print_string conf (Util.escape_html ini))
   else (
     Output.print_sstring conf " (";
-    Output.print_sstring conf (string_of_int @@ Gwdb.nb_of_real_persons base);
+    let num_persons = Gwdb.nb_of_real_persons base in
+    Output.print_sstring conf (format_with_thousand_sep conf num_persons);
     Output.print_sstring conf " ";
     Output.print_sstring conf
       (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
@@ -146,7 +153,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
             (particle_at_the_end base is_surnames s |> Util.escape_html
               :> Adef.safe_string);
           Output.print_sstring conf " (";
-          Output.print_sstring conf (string_of_int cnt);
+          Output.print_sstring conf (format_with_thousand_sep conf cnt);
           Output.print_sstring conf ")</li>")
         (List.sort
            (fun (a, _) (b, _) ->
@@ -176,7 +183,7 @@ let print_alphabetic_small conf base is_surnames ini list len =
         Output.print_string conf
           (particle_at_the_end base is_surnames s |> Util.escape_html);
         Output.print_sstring conf "</a> (";
-        Output.print_sstring conf (string_of_int cnt);
+        Output.print_sstring conf (format_with_thousand_sep conf cnt);
         Output.print_sstring conf ")</li>")
       (List.sort
          (fun (_, a, _) (_, b, _) ->
@@ -195,7 +202,7 @@ let print_frequency_any conf base is_surnames list len =
     (fun (cnt, l) ->
       if !n <= default_max_cnt then (
         Output.print_sstring conf "<li>";
-        Output.print_sstring conf (string_of_int cnt);
+        Output.print_sstring conf (format_with_thousand_sep conf cnt);
         Output.print_sstring conf "<ul>";
         List.iter
           (fun s ->
@@ -291,7 +298,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
             (particle_at_the_end base is_surnames s |> Util.escape_html);
           Output.print_sstring conf "</a>";
           Output.print_sstring conf "&nbsp;(";
-          Output.print_sstring conf (string_of_int cnt);
+          Output.print_sstring conf (format_with_thousand_sep conf cnt);
           Output.print_sstring conf ")")
         (List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b) l);
       Output.print_sstring conf "</p>")

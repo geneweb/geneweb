@@ -378,13 +378,7 @@ let gen_print_menu_birth conf base f_scan mode =
   let list_tod = ref [] in
   let list_tom = ref [] in
   let list_aft = ref [] in
-  (match Util.find_person_in_env conf base "" with
-  | Some p ->
-      Perso.interp_notempl_with_menu title "perso_header" conf base p;
-      Output.print_sstring conf "<h2>";
-      title false;
-      Output.print_sstring conf "</h2>"
-  | None -> Hutil.header conf title);
+  Hutil.header conf title;
   (try
      while true do
        let p, txt_of = f_scan () in
@@ -541,8 +535,13 @@ let print_menu_marriage conf base =
   Gwdb.Collection.iter
     (fun ifam ->
       let fam = foi base ifam in
-      match (Date.cdate_to_dmy_opt (get_marriage fam), get_divorce fam) with
-      | Some d, NotDivorced when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
+      match
+        ( Date.cdate_to_dmy_opt (get_marriage fam),
+          get_divorce fam,
+          get_separation fam )
+      with
+      | Some d, NotDivorced, NotDivorced
+        when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
           let update_list cpl =
             if match_mar_dates conf base cpl d conf.today then
               list_tod := (cpl, d.year) :: !list_tod

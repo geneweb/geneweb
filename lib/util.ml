@@ -883,6 +883,21 @@ let geneweb_link conf (href : Adef.escaped_string) (s : Adef.safe_string) =
 let wprint_geneweb_link conf href s =
   Output.print_string conf (geneweb_link conf href s)
 
+let mod_ind_link conf p (s : Adef.safe_string) =
+  let cgl =
+    match p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
+  in
+  if is_hidden p || cgl || not conf.wizard then s
+  else
+    let s = (s :> string) in
+    let href = "m=MOD_IND&i=" ^ string_of_iper (get_iper p) in
+    let txt =
+      if s = "" then {|<i class="fa fa-wrench fa-xs ml-1" alt=" (edit)"></i>|}
+      else s
+    in
+    Format.sprintf {|<a href="%s%s">%s</a>|} (commd conf :> string) href txt
+    |> Adef.safe
+
 let reference_flags with_id conf base p (s : Adef.safe_string) =
   let cgl =
     match p_getenv conf.env "cgl" with Some "on" -> true | _ -> false
@@ -1714,18 +1729,15 @@ let husband_wife conf base p all =
     if Array.length (get_family p) > 0 then
       if multiple >= 0 then
         let fam = foi base (get_family p).(0) in
-        let conjoint = Gutil.spouse (get_iper p) fam in
-        let conjoint = pget conf base conjoint in
-        if not @@ is_empty_name conjoint then
-          Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
-          |> translate_eval |> Adef.safe
-        else Adef.safe ""
+        Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
+        |> translate_eval |> Adef.safe
       else transl conf "marriages with" |> Adef.safe
     else Adef.safe ""
   in
+  let nb_fam = Array.length (get_family p) in
   let res =
     let rec loop i res =
-      if i < Array.length (get_family p) then
+      if i < nb_fam then
         let fam = foi base (get_family p).(i) in
         let conjoint = Gutil.spouse (get_iper p) fam in
         let conjoint = pget conf base conjoint in
@@ -1733,21 +1745,23 @@ let husband_wife conf base p all =
           let res =
             res
             ^>^ translate_eval
-                  (" "
+                  ((if nb_fam > 1 then Format.sprintf " &%d " (i + 1) else " ")
                    ^<^ gen_person_text conf base conjoint
                    ^^^ relation_date conf fam
                     :> string)
             ^ ","
           in
           if all then loop (i + 1) res else res
-        else loop (i + 1) res
+        else loop (i + 1) res ^>^ " ? ?,"
       else res
     in
     loop 0 relation
   in
   let res = (res :> string) in
+  (* suppress last , *)
   let res =
-    if String.length res > 1 then String.sub res 0 (String.length res - 1)
+    if String.length res > 1 && res.[String.length res - 1] = ',' then
+      String.sub res 0 (String.length res - 1)
     else res
   in
   Adef.safe res
@@ -2796,14 +2810,14 @@ let has_children base u =
       Array.length (get_children des) > 0)
     (get_family u)
 
-let get_bases_list () =
+let get_bases_list ?(format_fun = fun x -> x) () =
   let list = ref [] in
   let dh = Unix.opendir (!GWPARAM.bpath "") in
   (try
      while true do
        let e = Unix.readdir dh in
        if Filename.check_suffix e ".gwb" then
-         list := Filename.chop_suffix e ".gwb" :: !list
+         list := format_fun (Filename.chop_suffix e ".gwb") :: !list
      done
    with End_of_file -> ());
   Unix.closedir dh;

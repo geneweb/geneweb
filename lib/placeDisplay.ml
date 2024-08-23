@@ -72,7 +72,6 @@ let print_aux_opt ~add_birth ~add_baptism ~add_death ~add_burial ~add_marriage =
 
 let print_aux conf title fn =
   Hutil.header conf title;
-  Hutil.print_link_to_welcome conf true;
   fn ();
   Hutil.trailer conf
 

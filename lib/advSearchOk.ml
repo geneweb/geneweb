@@ -180,12 +180,29 @@ let advanced_search conf base max_answers =
         | _ -> false)
     | _ -> empty_default_value
   in
+
   let match_sex p empty_default_value =
     apply_to_field_value_raw p "sex"
       (function
         | "M" -> get_sex p = Male | "F" -> get_sex p = Female | _ -> true)
       empty_default_value
   in
+
+  let match_death p empty_default_value =
+    let is_dead p =
+      match Gwdb.get_death p with
+      | Death _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> true
+      | _ -> false
+    in
+    apply_to_field_value_raw p "death"
+      (function
+        | "Dead" -> is_dead p
+        | "NotDead" -> Gwdb.get_death p = NotDead
+        | "DontKnowIfDead" -> Gwdb.get_death p = DontKnowIfDead
+        | _ -> true)
+      empty_default_value
+  in
+
   let bapt_date_field_name =
     get_event_field_name gets "date" "bapt" search_type
   in
@@ -333,7 +350,7 @@ let advanced_search conf base max_answers =
   in
   (* Check the civil status. The test is the same for an AND or a OR search request. *)
   let match_civil_status ~skip_fname ~skip_sname p =
-    match_sex p true
+    match_sex p true && match_death p true
     && (skip_fname || match_first_name p)
     && (skip_sname || match_surname p)
     && match_married p true && match_occupation p true
@@ -342,7 +359,8 @@ let advanced_search conf base max_answers =
       ((list, len) as acc) p search_type =
     if search_type <> "OR" then
       if
-        match_civil_status ~skip_fname ~skip_sname p
+        (not (Util.is_empty_name p))
+        && match_civil_status ~skip_fname ~skip_sname p
         && match_baptism_date p true && match_baptism_place p true
         && match_birth_date p true && match_birth_place p true
         && match_burial_date p true && match_burial_place p true
@@ -352,7 +370,8 @@ let advanced_search conf base max_answers =
       then (p :: list, len + 1)
       else acc
     else if
-      match_civil_status ~skip_fname ~skip_sname p
+      (not (Util.is_empty_name p))
+      && match_civil_status ~skip_fname ~skip_sname p
       && (getss "place" = []
           && gets "date2_yyyy" = ""
           && gets "date1_yyyy" = ""
@@ -480,6 +499,7 @@ let searching_fields conf base =
       | Some d1, Some d2 ->
           search ^^^ " "
           ^<^ transl conf "between (date)"
+          ^<^ " "
           ^<^ DateDisplay.string_of_date conf d1
           ^^^ " " ^<^ transl conf "and" ^<^ " "
           ^<^ DateDisplay.string_of_date conf d2
@@ -607,6 +627,15 @@ let searching_fields conf base =
     else search
   in
   let search =
+    let sep = if (search :> string) <> "" then ", " else "" in
+    if gets "death" = "Dead" then search ^>^ sep ^ transl_nth conf "died" 2
+    else if gets "death" = "NotDead" then
+      search ^>^ sep ^ transl_nth conf "alive" 0
+    else if gets "death" = "DontKnowIfDead" then
+      search ^>^ sep ^ transl conf "maybe alive"
+    else search
+  in
+  let search =
     if not (test_string marriage_place_field_name || test_date "marriage") then
       let sep = if (search :> string) <> "" then ", " else "" in
       if gets "married" = "Y" then
@@ -616,5 +645,5 @@ let searching_fields conf base =
       else search
     else search
   in
-  let sep = Adef.safe (if (search :> string) <> "" then "," else "") in
+  let sep = Adef.safe (if test_string "occu" then ", " else "") in
   string_field "occu" (search ^^^ sep)

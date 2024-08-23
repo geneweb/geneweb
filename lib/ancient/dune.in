@@ -1,0 +1,8 @@
+(library
+ (public_name geneweb.ancient)
+ (name gw_ancient)
+ (libraries
+  (select gw_ancient.ml from
+    (%%%ANCIENT_LIB%%% -> %%%ANCIENT_FILE%%%)
+   ))
+)

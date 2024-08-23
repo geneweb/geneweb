@@ -106,7 +106,7 @@ let speclist =
   [
     ( "-bnotes",
       Arg.Set_string bnotes,
-      "[drop|erase|first|merge] Behavior for base notes of the next file. \
+      " [drop|erase|first|merge] Behavior for base notes of the next file. \
        [drop]: dropped. [erase]: erase the current content. [first]: dropped \
        if current content is not empty. [merge]: concatenated to the current \
        content. Default: " ^ !bnotes ^ "" );
@@ -160,10 +160,10 @@ let main () =
   Arg.parse speclist anonfun errmsg;
   if not (Mutil.good_name (Filename.basename !out_file)) then (
     (* Util.transl conf not available !*)
-    Printf.eprintf "The database name \"%s\" contains a forbidden character./n"
+    Printf.eprintf "The database name \"%s\" contains a forbidden character.\n"
       !out_file;
-    Printf.eprintf "Allowed characters: a..z, A..Z, 0..9, -";
-    flush stdout;
+    Printf.eprintf "Allowed characters: a..z, A..Z, 0..9, -\n";
+    flush stderr;
     exit 2);
   Secure.set_base_dir (Filename.dirname !out_file);
   let gwo = ref [] in
@@ -188,7 +188,7 @@ let main () =
       Printf.eprintf
         "The database \"%s\" already exists. Use option -f to overwrite it."
         !out_file;
-      flush stdout;
+      flush stderr;
       exit 2);
     Lock.control (Mutil.lock_file !out_file)
       false ~onerror:Lock.print_error_and_exit (fun () ->

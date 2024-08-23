@@ -38,7 +38,12 @@ type relation_kind = Def.relation_kind =
   | Pacs
   | Residence
 
-type divorce = Def.divorce = NotDivorced | Divorced of cdate | Separated
+type divorce = Def.divorce =
+  | NotDivorced
+  | Divorced of cdate
+  | Separated_old
+  | NotSeparated
+  | Separated of cdate
 
 type death_reason = Def.death_reason =
   | Killed
@@ -304,8 +309,6 @@ type 'a record_access = {
   get : int -> 'a;
   (* Same as [get] but doesn't consider pending patches *)
   get_nopending : int -> 'a;
-  (* Set the nth element of array *)
-  set : int -> 'a -> unit;
   (* Return length of an array that by default takes into account
      commited patches *)
   mutable len : int;

@@ -1,14 +1,21 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let connection_closed = ref false
 let eprintf = Printf.eprintf
 let sock_in = ref "wserver.sin"
 let sock_out = ref "wserver.sou"
+
+(* global parameters set by command arguments *)
 let stop_server = ref "STOP_SERVER"
 let cgi = ref false
+let no_fork = ref false
+
+(* state of a connection request *)
+let connection_closed = ref false
 let wserver_sock = ref Unix.stdout
-let wsocket () = !wserver_sock
 let wserver_oc = ref stdout
+
+(* functions to access the connection state *)
+let wsocket () = !wserver_sock
 let woc () = !wserver_oc
 let wflush () = flush !wserver_oc
 
@@ -257,29 +264,36 @@ let accept_connection tmout max_clients callback s =
   check_stopping ();
   Unix.setsockopt t Unix.SO_KEEPALIVE true;
   if Sys.unix then (
-    match try Some (Unix.fork ()) with _ -> None with
-    | Some 0 -> (
-        try
-          if max_clients = None && Unix.fork () <> 0 then exit 0;
-          Unix.close s;
-          wserver_sock := t;
-          wserver_oc := Unix.out_channel_of_descr t;
-          treat_connection tmout callback addr t;
-          close_connection ();
-          exit 0
-        with
-        | Unix.Unix_error (Unix.ECONNRESET, "read", _) -> exit 0
-        | e -> raise e)
-    | Some id ->
-        Unix.close t;
-        if max_clients = None then
-          let _ = Unix.waitpid [] id in
-          ()
-        else pids := id :: !pids
-    | None ->
-        Unix.close t;
-        eprintf "Fork failed\n";
-        flush stderr)
+    if !no_fork then (
+      connection_closed := false;
+      wserver_sock := t;
+      wserver_oc := Unix.out_channel_of_descr t;
+      treat_connection tmout callback addr t;
+      close_connection ())
+    else
+      match try Some (Unix.fork ()) with _ -> None with
+      | Some 0 -> (
+          try
+            if max_clients = None && Unix.fork () <> 0 then exit 0;
+            Unix.close s;
+            wserver_sock := t;
+            wserver_oc := Unix.out_channel_of_descr t;
+            treat_connection tmout callback addr t;
+            close_connection ();
+            exit 0
+          with
+          | Unix.Unix_error (Unix.ECONNRESET, "read", _) -> exit 0
+          | e -> raise e)
+      | Some id ->
+          Unix.close t;
+          if max_clients = None then
+            let _ = Unix.waitpid [] id in
+            ()
+          else pids := id :: !pids
+      | None ->
+          Unix.close t;
+          eprintf "Fork failed\n";
+          flush stderr)
   else
     let oc = open_out_bin !sock_in in
     let cleanup () = try close_out oc with _ -> () in
@@ -367,6 +381,7 @@ let f syslog addr_opt port tmout max_clients g =
         (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
         tm.Unix.tm_hour tm.Unix.tm_min port;
       flush stderr;
+      if !no_fork then ignore @@ Sys.signal Sys.sigpipe Sys.Signal_ignore;
       while true do
         try accept_connection tmout max_clients g s with
         | Unix.Unix_error (Unix.ECONNRESET, "accept", _) as e ->

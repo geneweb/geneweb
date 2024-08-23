@@ -37,7 +37,7 @@
   %if;(e.m!="MOD_DATA")
   <script>
     $('#load_once_p_mod').one('click', function() {
-      $.getScript('%etc_prefix;js/p_mod.min.js');
+      $.getScript('%etc_prefix;js/p_mod.js');
     });
     $('#load_once_copylink').one('click', function() {
       $.getScript('%etc_prefix;js/copylink.js');
@@ -94,6 +94,20 @@
      <script src="%etc_prefix;js/autosize.min.js?version=4.0.2"></script>
    %end;
   <script>autosize(document.querySelectorAll('textarea'));</script>
+%end;
+%if;(e.m="MOD_FAM" or e.m="MOD_FAM_OK")
+<script>
+  $(document).ready(function() {
+    $('.transfer-btn').click(function() {
+      var commentContent = $('#notes_comments').val();
+      var mariageEvent = $('[data-marr]').attr('id');
+      $('#' + mariageEvent).val(commentContent);
+      $('#notes_comments').val('');
+      autosize.update($('#' + mariageEvent));
+      $(this).hide();
+    });
+  });
+</script>
 %end;
 %if;(e.templ="")
 <script><!-- focus on found autofocus input in opening BS modal -->
@@ -175,5 +189,21 @@
     t.selectionEnd = t.selectionStart;
     t.focus();
   }
+</script>
+%end;
+%( Popover functions for anc/destables %)
+%if;((e.m="A" and e.t="Z") or (e.m="D" and (e.t="H" or e.t="I")))
+<script>
+$('[data-toggle="popover"]').popover({
+  html: true,
+  trigger: "focus",
+  delay: { hide: 250 }
+})
+$('.popover-dismiss').popover({
+  trigger: 'focus'
+})
+$.fn.tooltip.Constructor.Default.whiteList['dl'] = [];
+$.fn.tooltip.Constructor.Default.whiteList['dt'] = [];
+$.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
 </script>
 %end;

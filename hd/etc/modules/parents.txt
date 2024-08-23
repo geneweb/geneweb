@@ -51,7 +51,7 @@
         %if;(are_divorced or are_separated)
           <br>
           <em style="font-size: 90%%">%nn;
-            %if;are_divorced;[divorced]0%divorce_date;%end;
+            %if;are_divorced;[divorced]0%on_divorce_date;%end;
             %if;are_separated;[separated]0%end;
           </em>
         %end;
@@ -128,7 +128,7 @@
         %foreach;father.family;
           %if;(spouse.access=mother.access)
             %apply;married_to("father", "UPPER")
-            %if;are_divorced;<br>[divorced]0%divorce_date;%end;
+            %if;are_divorced;<br>[divorced]0%on_divorce_date;%end;
             %if;are_separated;<br>[separated]0%end;
           %end;
         %end;

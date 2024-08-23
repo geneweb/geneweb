@@ -17,7 +17,6 @@ let print_clean conf =
         |> Utf8.capitalize_fst |> Output.print_sstring conf
       in
       Hutil.header conf title;
-      Hutil.print_link_to_welcome conf true;
       Util.gen_print_tips conf
         ("select the input you want to erase from the history" |> transl conf
        |> Utf8.capitalize_fst |> Adef.safe);
@@ -48,7 +47,7 @@ let print_clean conf =
       |> Utf8.capitalize_fst |> Output.print_sstring conf;
       Output.print_sstring conf "</button></form>";
       Hutil.trailer conf
-  | _ -> Hutil.incorrect_request conf
+  | _ -> Hutil.incorrect_request conf ~comment:"no history file provided"
 
 (* ************************************************************************ *)
 (*  [Fonc] print_clean_ok : config -> unit                                  *)
@@ -78,7 +77,6 @@ let print_clean_ok conf =
         |> Utf8.capitalize_fst |> Output.print_sstring conf
       in
       Hutil.header conf title;
-      Hutil.print_link_to_welcome conf true;
       let history = load_person_history conf f in
       let new_history = clean_history 0 history [] in
       let fname = history_path conf f in
@@ -259,9 +257,12 @@ let string_of_marriage conf marriage =
 
 let string_of_divorce conf divorce =
   match divorce with
-  | NotDivorced -> "" |> Adef.safe
   | Divorced cod -> transl conf "divorced" ^<^ " " ^<^ string_of_cdate conf cod
-  | Separated -> transl conf "separated" |> Adef.safe
+  | Separated cod ->
+      transl conf "separated" ^<^ " " ^<^ string_of_cdate conf cod
+  | Separated_old -> transl conf "separated" |> Adef.safe
+  | NotDivorced -> "" |> Adef.safe
+  | NotSeparated -> "" |> Adef.safe
 
 let string_of_event_witness conf base witnesses =
   Array.fold_right
@@ -957,5 +958,5 @@ let print conf base =
               Templ.print_foreach = print_foreach conf base;
             }
             env (before, after, p_auth)
-      | _ -> Hutil.incorrect_request conf)
-  | _ -> Hutil.incorrect_request conf
+      | _ -> Hutil.incorrect_request conf ~comment:"bad f parameter")
+  | _ -> Hutil.incorrect_request conf ~comment:"bad t parameter"

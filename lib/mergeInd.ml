@@ -34,6 +34,7 @@ let compatible_strings s1 s2 =
   eq_istr s1 s2 || is_empty_string s2 || is_empty_string s1
 
 let compatible_divorces d1 d2 = d1 = d2
+let compatible_separations d1 d2 = d1 = d2
 let compatible_relation_kinds rk1 rk2 = rk1 = rk2
 
 let compatible_titles t1 t2 =
@@ -81,7 +82,9 @@ let compatible_fam fam1 fam2 =
   && Array.length (get_witnesses fam2) = 0
   && compatible_fevents (get_fevents fam1) (get_fevents fam2)
   && compatible_relation_kinds (get_relation fam1) (get_relation fam2)
+  (* TODO can we skip get_divorce and get_separation! treated as fevents *)
   && compatible_divorces (get_divorce fam1) (get_divorce fam2)
+  && compatible_separations (get_separation fam1) (get_separation fam2)
   && compatible_strings (get_fsources fam1) (get_fsources fam2)
 
 let reparent_ind base (warning : CheckItem.base_warning -> unit) ip1 ip2 =

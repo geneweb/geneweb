@@ -335,7 +335,6 @@ let init_cousins_cnt conf base p =
       let _pnoc, _v1, t', d_t' =
         match List.assoc_opt "cache_cousins_tool" conf.Config.base_env with
         | Some "yes" -> (
-            Printf.eprintf "Cache_cousins_tool=yes\n";
             flush stderr;
             let pnoc, v1, t', d_t' =
               Mutil.read_or_create_value "cousins_cache" (fun () ->
@@ -356,7 +355,6 @@ let init_cousins_cnt conf base p =
                 Mutil.read_or_create_value "cousins_cache" (fun () ->
                     build_tables key))
         | _ ->
-            Printf.eprintf "Cache_cousins_tools=no\n";
             flush stderr;
             build_tables key
       in

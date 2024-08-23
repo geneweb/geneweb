@@ -1,4 +1,4 @@
-<!-- $Id: modules/individu.txt v7.1 04/03/2023 09:51:04 $ -->
+<!-- $Id: modules/individu.txt v7.1 27/03/2024 07:42:02 $ -->
 %( options
 0: skip
 1: standard
@@ -6,12 +6,6 @@
 3: two columns
 %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
-%define;setvar(nnn,vvv)
-  %set_var.nnn.vvv;
-%end;
-%define;getvar(nnn)
-  %get_var.nnn;
-%end;
 %define;cousin(l1,l2,dd,cc)
   %if;([cousin.l1.l2]!="[cousin.l1.l2]")
     %if;(cc>0)[cousin.l1.l2:::dd]s%else;[*cousin.l1.l2:::dd]s%end;
@@ -29,7 +23,7 @@
   %end; [and]%sp;
 %end;
 %define;link(xxx,zzz)
-  %if;(not cancel_links)<a href="%prefix;m=zzz;v=%sq;
+  %if;(not cancel_links)<a href="%prefix;m=zzz&v=%sq;
     %if;("xxx"=first_name)%first_name_key;%sq;
     %elseif;("xxx"=surname)%surname_key;%sq;
     %( how to get (first/sur)_name_alias_keys? %)
@@ -186,7 +180,7 @@
                                %and;%apply;getvar(ancestor2_access)
                                %and;%apply;getvar(ancestor2_anc_sosa)
                                %and;%apply;getvar(ancestor2_sosa_cujus)%end;
-        %end;
+        %end;.
       </li>
     %end;
   %end;
@@ -272,9 +266,9 @@
   %end;
 %end;
 %define;etat_civil()
-  <ul class="fa-ul">
+  <ul class="fa-ul%if;(not (has_image or b.default_image="yes")) pl-0%end; mb-0">
     %if;(has_birth_date or has_birth_place)
-      <li title="[*birth]">
+      <li %apply;getvar%with;ns[birth]%end;>
         <span class="fa-li"><i class="fas fa-baby"></i></span>
         %if;has_birth_date;[*born]s %on_birth_date;
           %if;has_birth_place; [in (place)] %birth_place;%end;
@@ -291,7 +285,7 @@
       %end;
     %end;
     %if;(has_baptism_date or has_baptism_place)
-      <li title="[*baptism]">
+      <li %apply;getvar%with;ns[baptism]%end;>
         <span class="fa-li"><i class="fas fa-dove"></i></span>
         %if;has_baptism_date;[*baptized]s %on_baptism_date;
             %if;has_baptism_place; [in (place)] %baptism_place;%end;
@@ -302,7 +296,7 @@
       </li>%nl;
     %end;
     %if;is_dead;
-      <li class="mt-1" title="[*death]">
+      <li class="mt-1" %apply;getvar%with;ns[death]%end;>
         <span class="fa-li"><i class="fas fa-skull-crossbones"></i></span>
         %apply;capitalize(died)
         %if;has_death_date; %on_death_date;%end;
@@ -310,7 +304,7 @@
         %if;(has_linked_page.DEATH and linked_page.DEATH!="") (%linked_page.DEATH;)%end;</li>%nl;
     %end;
     %if;(is_buried or is_cremated)
-      <li title="%if;(is_buried)[*burial]%elseif;(is_cremated)[*cremation]%end;">
+      <li %if;(is_buried)%apply;getvar%with;ns[burial]%end;%elseif;(is_cremated)%apply;getvar%with;ns[cremation]%end;%end;>
         <span class="fa-li"><i class="fas fa-cross"></i></span>
         %if;is_buried;[*buried]s
           %if;has_burial_date; %on_burial_date;%end;
@@ -404,7 +398,7 @@
 %let;prefx;%if;(e.m="F")%prefix_set.pmod;%else;%prefix;%end;%in;
 %if;(e.m!="MOD_IND")
   <div class="col-12">
-  <h1 class="%if;(op_m=2)text-center%else;text-xs-center text-md-left%end;">
+  <h1 class="%if;(op_m=2)text-center%else;text-xs-center text-md-left%end; ml-1 ml-md-3">
     %if;has_public_name;
       %if;has_qualifiers;%public_name; <em>%qualifier;</em>
       %else;%public_name; %surname;%end;
@@ -413,8 +407,8 @@
       %else;
         %if;cancel_links;%first_name; %surname;
         %else;
-          <a href="%prefix;m=P;v=%first_name_key;#i%index;">%first_name;</a>
-          <a href="%prefix;m=N;v=%surname_key;#i%index;">%surname;</a>
+          <a href="%prefix;m=P&v=%first_name_key;#i%index;">%first_name;</a>
+          <a href="%prefix;m=N&v=%surname_key;#i%index;">%surname;</a>
         %end;
       %end;
     %end;
@@ -442,8 +436,10 @@
     %apply;etat_civil()
   
   %elseif;(op_m=3)
-    <div class="d-flex">
-      %apply;portrait()
+    <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start">
+      <div>
+        %apply;portrait()
+      </div>
       <div>
         <div class="text-center mb-2 mx-2">
           %apply;detailed_names()

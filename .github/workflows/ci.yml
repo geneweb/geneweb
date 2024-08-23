@@ -19,9 +19,9 @@ jobs:
           - 4.14.x
         include:
           - os: ubuntu-latest
-            ocaml-version: 4.08.0
+            ocaml-compiler: 4.08.0
           - os: ubuntu-latest
-            ocaml-version: 5.1.x
+            ocaml-compiler: 5.1.x
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
@@ -36,9 +36,9 @@ jobs:
           opam depext -y geneweb
           opam install -y ./*.opam --deps-only --with-test
           opam pin ocamlformat 0.24.1
-      - name: Make ocamlformat > build > distrib
+      - name: Make ocamlformat > build/distrib
         run: |
           opam exec -- ocaml ./configure.ml --release
-          opam exec -- make build distrib
+          opam exec -- make fmt distrib
       - name: Make CI tests
         run: opam exec -- make ci

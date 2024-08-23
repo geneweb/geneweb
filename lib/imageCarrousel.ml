@@ -27,8 +27,7 @@ let incorrect_content_type conf base p s =
   let title _ =
     Output.print_sstring conf (Utf8.capitalize (Util.transl conf "error"))
   in
-  Hutil.rheader conf title;
-  Hutil.print_link_to_welcome conf true;
+  Hutil.header conf title;
   Output.print_sstring conf "<p>\n<em style=\"font-size:smaller\">";
   Output.printf conf "Error: incorrect image content type: %s" s;
   Output.printf conf "</em>\n</p>\n<ul>\n<li>\n%s</li>\n</ul>\n"
@@ -40,8 +39,7 @@ let error_too_big_image conf base p len max_len =
   let title _ =
     Output.print_sstring conf (Utf8.capitalize (Util.transl conf "error"))
   in
-  Hutil.rheader conf title;
-  Hutil.print_link_to_welcome conf true;
+  Hutil.header ~error:true conf title;
   Output.print_sstring conf "<p><em style=\"font-size:smaller\">";
   Output.printf conf "Error: this image is too big: %d bytes<br>\n" len;
   Output.printf conf "Maximum authorized in this database: %d bytes<br>\n"
@@ -223,7 +221,7 @@ let print_confirm_c conf base save_m report =
 (* we need print_link_delete_image in the send function *)
 let print_link_delete_image conf base p =
   if Option.is_some @@ Image.get_portrait conf base p then (
-    Output.print_sstring conf {|<p><a class="btn btn-primary" href="|};
+    Output.print_sstring conf {|<div><a class="btn btn-danger mt-3" href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf "m=DEL_IMAGE&i=";
     Output.print_string conf (get_iper p |> string_of_iper |> Mutil.encode);
@@ -231,7 +229,7 @@ let print_link_delete_image conf base p =
     transl conf "delete" |> Utf8.capitalize_fst |> Output.print_sstring conf;
     Output.print_sstring conf {| |};
     transl_nth conf "image/images" 0 |> Output.print_sstring conf;
-    Output.print_sstring conf "</a></p>")
+    Output.print_sstring conf "</a></div>")
 
 let print_send_image conf base p =
   let title h =
@@ -250,7 +248,7 @@ let print_send_image conf base p =
       Output.print_sstring conf (Format.sprintf ".%d " (get_occ p));
       Output.print_string conf (Util.escape_html (p_surname base p)))
   in
-  let digest = Update.digest_person (UpdateInd.string_person_of base p) in
+  let digest = Image.default_portrait_filename base p in
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_sstring conf "<h2>\n";
   title false;
@@ -258,16 +256,17 @@ let print_send_image conf base p =
   Output.printf conf
     "<form method=\"post\" action=\"%s\" enctype=\"multipart/form-data\">\n"
     conf.command;
-  Output.print_sstring conf "<p>\n";
+  Output.print_sstring conf
+    "<div class=\"d-inline-flex align-items-center mt-2\">\n";
   Util.hidden_env conf;
-  Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_OK");
+  Util.hidden_input conf "m" (Adef.encoded "SND_IMAGE_C_OK");
   Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);
-  Util.hidden_input conf "digest" (Mutil.encode digest);
+  Util.hidden_input conf "idigest" (Mutil.encode digest);
   Output.print_sstring conf (Utf8.capitalize_fst (transl conf "file"));
   Output.print_sstring conf (Util.transl conf ":");
   Output.print_sstring conf " ";
   Output.print_sstring conf
-    {| <input type="file" class="form-control-file" name="file" accept="image/*"></p>|};
+    {|<input type="file" class="form-control-file ml-1" name="file" accept="image/*">|};
   (match
      Option.map int_of_string @@ List.assoc_opt "max_images_size" conf.base_env
    with
@@ -277,10 +276,10 @@ let print_send_image conf base p =
       Output.print_sstring conf " bytes)</p>"
   | None -> ());
   Output.print_sstring conf
-    {|<button type="submit" class="btn btn-primary mt-2">|};
+    {|<span>></span><button type="submit" class="btn btn-primary ml-3">|};
   transl_nth conf "validate/delete" 0
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf "</button></form>";
+  Output.print_sstring conf "</button></div></form>";
   print_link_delete_image conf base p;
   Hutil.trailer conf
 
@@ -350,8 +349,8 @@ let print_send_ok conf base =
     with Failure _ -> incorrect conf "print send ok"
   in
   let p = poi base ip in
-  let digest = Update.digest_person (UpdateInd.string_person_of base p) in
-  if (digest :> string) = Mutil.decode (raw_get conf "digest") then
+  let digest = Image.default_portrait_filename base p in
+  if (digest :> string) = Mutil.decode (raw_get conf "idigest") then
     raw_get conf "file" |> Adef.as_string |> effective_send_ok conf base p
   else Update.error_digest conf
 
@@ -511,10 +510,10 @@ let print_delete_image conf base p =
   Util.hidden_input conf "m" (Adef.encoded "DEL_IMAGE_OK");
   Util.hidden_input conf "i" (get_iper p |> string_of_iper |> Mutil.encode);
   Output.print_sstring conf
-    {|<p><button type="submit" class="btn btn-primary">|};
+    {|<div class="mt-3"><button type="submit" class="btn btn-danger">|};
   transl_nth conf "validate/delete" 1
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
-  Output.print_sstring conf {|</button></p></form>|};
+  Output.print_sstring conf {|</button></div></form>|};
   Hutil.trailer conf
 
 let print_deleted conf base p =

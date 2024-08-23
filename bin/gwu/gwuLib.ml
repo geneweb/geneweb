@@ -780,22 +780,31 @@ let print_family opts base gen m =
   | Engaged -> Printf.ksprintf (oc opts) " #eng"
   | NoSexesCheckNotMarried -> print_sexes "#nsck"
   | NoSexesCheckMarried -> print_sexes "#nsckm"
-  | NoMention -> print_sexes "#noment"
-  | MarriageBann -> print_sexes "#banns"
-  | MarriageContract -> print_sexes "#contract"
-  | MarriageLicense -> print_sexes "#license"
-  | Pacs -> print_sexes "#pacs"
-  | Residence -> print_sexes "#residence");
+  | NoMention ->
+      if not !old_gw then print_sexes "#noment"
+      else Printf.ksprintf (oc opts) " #noment"
+  (* TODO what should be done with those new options *)
+  | MarriageBann -> if not !old_gw then print_sexes "#banns"
+  | MarriageContract -> if not !old_gw then print_sexes "#contract"
+  | MarriageLicense -> if not !old_gw then print_sexes "#license"
+  | Pacs -> if not !old_gw then print_sexes "#pacs"
+  | Residence -> if not !old_gw then print_sexes "#residence");
   print_if_no_empty opts base "#mp" (get_marriage_place fam);
   if opts.source = None then
     print_if_no_empty opts base "#ms" (get_marriage_src fam);
-  (match get_divorce fam with
-  | NotDivorced -> ()
-  | Separated -> Printf.ksprintf (oc opts) " #sep"
-  | Divorced d ->
-      let d = Date.od_of_cdate d in
-      Printf.ksprintf (oc opts) " -";
-      print_date_option opts d);
+  (* divorce and separation are events, but we keep it if old_gw *)
+  (if !old_gw then
+   match get_divorce fam with
+   | Divorced d ->
+       let d = Date.od_of_cdate d in
+       Printf.ksprintf (oc opts) " -";
+       print_date_option opts d
+   | _ -> ());
+  (if !old_gw then
+   match get_separation fam with
+   | Separated _ -> Printf.ksprintf (oc opts) " #sep"
+   | Separated_old -> Printf.ksprintf (oc opts) " #sep"
+   | _ -> ());
   Printf.ksprintf (oc opts) " ";
   print_parent opts base gen m.m_moth;
   Printf.ksprintf (oc opts) "\n";
@@ -1575,7 +1584,9 @@ let gwu opts isolated base in_dir out_dir src_oc_ht (per_sel, fam_sel) =
         let ifaml = connected_families base gen.fam_sel ifam fam in
         let oc, first, _close =
           if to_separate ifam then (oc, out_oc_first, close)
-          else origin_file (sou base (get_origin_file fam))
+          else
+            let fname = get_origin_file fam in
+            origin_file (if is_empty_string fname then "" else sou base fname)
         in
         let f, _ooc, c = opts.oc in
         let opts = { opts with oc = (f, oc, c) } in

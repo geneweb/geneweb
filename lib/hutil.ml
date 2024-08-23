@@ -3,131 +3,11 @@
 open Config
 open Def
 
-let link_to_referer conf =
-  let referer = Util.get_referer conf in
-  let back = Utf8.capitalize_fst (Util.transl conf "back") in
-  if (referer :> string) <> "" then
-    ({|<a href="|} ^<^ referer
-     ^>^ {|" class="btn btn-sm btn-link p-0 border-0" title="|} ^ back
-     ^ {|"><i class="fa fa-arrow-left-long fa-fw fa-sm"></i></a>|}
-      :> Adef.safe_string)
-  else Adef.safe ""
+type 'a env = Vint of int | Vother of 'a | Vnone
 
-let gen_print_link_to_welcome f conf _right_aligned =
-  Output.print_sstring conf "<div class=\"d-flex flex-column fix_top fix_left";
-  Output.print_sstring conf "\">\n";
-  f ();
-  Output.print_sstring conf {|<a href="|};
-  Output.print_string conf (Util.commd ~senv:false conf);
-  Output.print_sstring conf {|" title="|};
-  Output.print_sstring conf (Utf8.capitalize (Util.transl conf "home"));
-  Output.print_sstring conf {|"><i class="fa fa-house fa-fw fa-sm"></i></a>|};
-  let str = link_to_referer conf in
-  if (str :> string) <> "" then Output.print_string conf str;
-  Output.print_sstring conf "</div>"
-
-let print_link_to_welcome = gen_print_link_to_welcome (fun () -> ())
-
-(* S: use Util.include_template for "hed"? *)
-
-let header_without_http_nor_home conf title =
-  let str1 =
-    Printf.sprintf {|<!DOCTYPE html>
-<html lang="%s">
-<head>
-<title>|} conf.lang
-  in
-  let str2 =
-    Printf.sprintf
-      {|</title>
-<meta name="robots" content="none">
-<meta charset="%s">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link rel="shortcut icon" href="%s/favicon_gwd.png">
-<link rel="apple-touch-icon" href="%s/favicon_gwd.png">
-|}
-      conf.charset
-      (Util.images_prefix conf :> string)
-      (Util.images_prefix conf :> string)
-  in
-  Output.print_sstring conf str1;
-  title true;
-  Output.print_sstring conf str2;
-  Util.include_template conf [] "css" (fun () -> ());
-  Output.print_sstring conf "</head>\n";
-  let s =
-    try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
-    with Not_found -> ""
-  in
-  let s = s ^ Util.body_prop conf in
-  Output.printf conf "<body%s>\n" s;
-  (match Util.open_etc_file conf "hed" with
-  | Some (ic, _) -> Templ.copy_from_templ conf [] ic
-  | None -> ());
-  Util.message_to_wizard conf
-
-let header_without_page_title conf title =
-  Util.html conf;
-  header_without_http_nor_home conf title;
-  (* balancing </div> in gen_trailer *)
-  Output.printf conf "<div class=\"container\">"
-
-let header_without_http conf title =
-  header_without_http_nor_home conf title;
-  match Util.open_etc_file conf "home" with
-  | Some (ic, _) -> Templ.copy_from_templ conf [] ic
-  | None -> ()
-
-let header_link_welcome conf title =
-  header_without_page_title conf title;
-  Output.print_sstring conf "<h1>";
-  title false;
-  Output.print_sstring conf "</h1>\n"
-
-let header_no_page_title conf title =
-  header_without_page_title conf title;
-  match Util.p_getenv conf.env "title" with
-  | None | Some "" -> ()
-  | Some x -> Output.printf conf "<h1>%s</h1>\n" x
-
-let header conf title =
-  header_without_page_title conf title;
-  Output.print_sstring conf "\n<h1>";
-  title false;
-  Output.print_sstring conf "</h1>\n"
-
-let header_fluid conf title =
-  header_without_http conf title;
-  (* balancing </div> in gen_trailer *)
-  Output.print_sstring conf "<div class=\"container-fluid\">";
-  Output.print_sstring conf "\n<h1>";
-  title false;
-  Output.print_sstring conf "</h1>\n"
-
-let rheader conf title =
-  header_without_page_title conf title;
-  Output.print_sstring conf "<h1 class=\"error\">";
-  title false;
-  Output.print_sstring conf "</h1>\n"
-
-let trailer conf =
-  let conf = { conf with is_printed_by_template = false } in
-  (match Util.open_etc_file conf "trl" with
-  | Some (ic, _) -> Templ.copy_from_templ conf [] ic
-  | None -> ());
-  Templ.print_copyright conf;
-  Util.include_template conf [] "js" (fun () -> ());
-  let query_time = Unix.gettimeofday () -. conf.query_start in
-  Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
-    !GWPARAM.errors_other !GWPARAM.set_vars;
-  Output.print_sstring conf "</body>\n</html>\n"
-
-let () =
-  GWPARAM.wrap_output :=
-    fun conf title content ->
-      header conf (fun _ -> Output.print_string conf title);
-      content ();
-      trailer conf
+let get_env v env = try List.assoc v env with Not_found -> Vnone
+let get_vother = function Vother x -> Some x | _ -> None
+let set_vother x = Vother x
 
 let incorrect_request ?(comment = "") conf =
   !GWPARAM.output_error conf Def.Bad_Request ~content:(Adef.safe comment)
@@ -153,12 +33,6 @@ let interp_no_header conf fname ifun env ep =
 
 let interp conf fname ifun env ep = gen_interp true conf fname ifun env ep
 
-type 'a env = Vint of int | Vother of 'a | Vnone
-
-let get_env v env = try List.assoc v env with Not_found -> Vnone
-let get_vother = function Vother x -> Some x | _ -> None
-let set_vother x = Vother x
-
 let interp_no_env conf fname =
   interp_no_header conf fname
     {
@@ -170,6 +44,126 @@ let interp_no_env conf fname =
       Templ.print_foreach = (fun _ -> raise Not_found);
     }
     [] ()
+
+let include_home_template conf =
+  Templ_parser.wrap "home" (fun () ->
+      match Templ.input_templ conf "home" with
+      | Some astl ->
+          let full_name = Util.etc_file_name conf "home" in
+          Templ.interp_ast conf
+            {
+              Templ.eval_var = (fun _ -> raise Not_found);
+              Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
+              Templ.eval_predefined_apply = (fun _ -> raise Not_found);
+              Templ.get_vother;
+              Templ.set_vother;
+              Templ.print_foreach = (fun _ -> raise Not_found);
+            }
+            [] ()
+            [ Ainclude (full_name, astl) ]
+      | None -> error_cannot_access conf "home")
+
+let link_to_referer conf =
+  let referer = Util.get_referer conf in
+  let back = Utf8.capitalize_fst (Util.transl conf "back") in
+  if (referer :> string) <> "" then
+    ({|<a href="|} ^<^ referer
+     ^>^ {|" class="btn btn-sm btn-link p-0 border-0" title="|} ^ back
+     ^ {|"><i class="fa fa-arrow-left-long fa-fw fa-sm"></i></a>|}
+      :> Adef.safe_string)
+  else Adef.safe ""
+
+(* S: use Util.include_template for "hed"? *)
+
+let header_without_http_nor_home conf title =
+  let robot = List.assoc_opt "robot_index" conf.base_env = Some "yes" in
+  let str1 =
+    Printf.sprintf {|<!DOCTYPE html>
+<html lang="%s">
+<head>
+<title>|} conf.lang
+  in
+  let str2 =
+    Printf.sprintf
+      {|</title>
+%s
+<meta charset="%s">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="shortcut icon" href="%s/favicon_gwd.png">
+<link rel="apple-touch-icon" href="%s/favicon_gwd.png">
+|}
+      (if robot then {|<meta name="robots" content="index,follow">|}
+      else {|<meta name="robots" content="none">|})
+      conf.charset
+      (Util.images_prefix conf :> string)
+      (Util.images_prefix conf :> string)
+  in
+  Output.print_sstring conf str1;
+  title true;
+  Output.print_sstring conf str2;
+  Util.include_template conf [] "css" (fun () -> ());
+  Output.print_sstring conf "</head>\n";
+  let s =
+    try " dir=\"" ^ Hashtbl.find conf.lexicon "!dir" ^ "\""
+    with Not_found -> ""
+  in
+  let s = s ^ Util.body_prop conf in
+  Output.printf conf "<body%s>\n" s;
+  Templ.include_hed_trl conf "hed";
+  Util.message_to_wizard conf
+
+let header_with_title ?(error = false) ?(fluid = false) conf title =
+  Util.html conf;
+  header_without_http_nor_home conf title;
+  include_home_template conf;
+  (* balancing </div> in gen_trailer *)
+  Output.print_sstring conf
+    (if fluid then "<div class=\"container-fluid\">"
+    else "<div class=\"container\">");
+  Output.print_sstring conf (if error then "<h1 class = \"error\">" else "<h1>");
+  title false;
+  Output.print_sstring conf "</h1>\n"
+
+let header_fluid conf title = header_with_title ~fluid:true conf title
+
+(* when the use of home.txt is not available *)
+let header_without_home conf title =
+  Util.html conf;
+  header_without_http_nor_home conf title;
+  (* balancing </div> in gen_trailer *)
+  Output.print_sstring conf "<div class=\"container\">";
+  Output.print_sstring conf "<h1>";
+  title false;
+  Output.print_sstring conf "</h1>\n"
+
+let header_with_conf_title conf _title =
+  (* title is supplied bt conf.env *)
+  let title _ =
+    match Util.p_getenv conf.env "p_title" with
+    | None | Some "" -> ()
+    | Some s -> Output.printf conf "<h1>%s</h1>\n" s
+  in
+  header_with_title conf title
+
+let header ?(error = false) ?(fluid = false) conf title =
+  header_with_title ~error ~fluid conf title
+
+(* TODO replace rheader by header ~error:true *)
+let rheader conf title = header_with_title ~error:true conf title
+
+let trailer conf =
+  let conf = { conf with is_printed_by_template = false } in
+  Templ.include_hed_trl conf "trl";
+  Templ.print_copyright conf;
+  Util.include_template conf [] "js" (fun () -> ());
+  Output.print_sstring conf "</body>\n</html>\n"
+
+let () =
+  GWPARAM.wrap_output :=
+    fun conf title content ->
+      header conf (fun _ -> Output.print_string conf title);
+      content ();
+      trailer conf
 
 (* Calendar request *)
 
@@ -268,7 +262,7 @@ let print_foreach print_ast eval_expr =
   in
   print_foreach
 
-let print_calendar conf =
+let print_calendar conf _base =
   interp conf "calendar"
     {
       Templ.eval_var = eval_var conf;

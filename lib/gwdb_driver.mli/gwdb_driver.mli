@@ -52,7 +52,7 @@ type string_person_index
 type base
 (** The database representation. *)
 
-val open_base : string -> base
+val open_base : ?keep_in_memory:bool -> string -> base
 (** Open database associated with (likely situated in) the specified directory. *)
 
 val close_base : base -> unit
@@ -167,6 +167,9 @@ val get_death_src : person -> istr
 
 val get_divorce : family -> Def.divorce
 (** Get family's divorce status *)
+
+val get_separation : family -> Def.divorce
+(** Get family's separation status *)
 
 val get_family : person -> ifam array
 (** Get array of family's ids to which a person belongs as parent (person's union) *)

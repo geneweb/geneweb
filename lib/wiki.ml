@@ -713,7 +713,6 @@ let print_mod_view_page conf can_edit mode fname title env s =
     Output.print_sstring conf {|">|};
     Output.print_sstring conf (message_txt conf 0);
     Output.print_sstring conf "</a>)</div>");
-  Hutil.print_link_to_welcome conf true;
   if can_edit && has_v then
     print_sub_part_links conf (mode_pref ^^^ mode) sfn v is_empty;
   Output.print_sstring conf {|<form method="POST" action="|};
@@ -831,11 +830,10 @@ let print_ok conf wi edit_mode fname title_is_1st s =
     Output.print_sstring conf
       (Utf8.capitalize_fst (Util.transl conf "notes modified"))
   in
-  Hutil.header_no_page_title conf title;
+  Hutil.header conf title;
   Output.print_sstring conf {|<div style="text-align:center"> --- |};
   title ();
   Output.print_sstring conf {| --- </div>|};
-  Hutil.print_link_to_welcome conf true;
   let get_v = Util.p_getint conf.env "v" in
   let v = match get_v with Some v -> v | None -> 0 in
   let title, s =

@@ -52,14 +52,11 @@ let print_submit conf name value =
   Output.print_sstring conf (transl_nth conf "Y/N" value);
   Output.print_sstring conf {|" style="margin-right:4px">|}
 
-let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
+let print_cand_ind conf base (ip, _p) (iexcl, fexcl) ip1 ip2 =
   let title _ =
     transl conf "merge" |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
-  Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.print_sstring conf "<h2>";
-  title false;
-  Output.print_sstring conf "</h2>";
+  Hutil.header conf title;
   Output.print_sstring conf "<ul><li>";
   print_link conf base (poi base ip1);
   Output.print_sstring conf "</li><li>";
@@ -87,16 +84,13 @@ let print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 =
   Output.print_sstring conf "</form></p>";
   Hutil.trailer conf
 
-let print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 =
+let print_cand_fam conf base (ip, _p) (iexcl, fexcl) ifam1 ifam2 =
   let title _ =
     transl_nth conf "family/families" 1
     |> transl_decline conf "merge"
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
-  Perso.interp_notempl_with_menu title "perso_header" conf base p;
-  Output.print_sstring conf "<h2>";
-  title false;
-  Output.print_sstring conf "</h2>";
+  Hutil.header conf title;
   let ip1, ip2 =
     let cpl = foi base ifam1 in
     (Gwdb.get_father cpl, Gwdb.get_mother cpl)

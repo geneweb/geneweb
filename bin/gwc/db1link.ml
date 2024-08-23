@@ -475,7 +475,7 @@ let insert_undefined gen key =
       sou gen.g_base x.m_first_name <> key.pk_first_name
       || sou gen.g_base x.m_surname <> key.pk_surname
     then (
-      Printf.printf "\nPerson defined with two spellings:\n";
+      Printf.printf "\nError: Person defined with two spellings:\n";
       Printf.printf "  \"%s%s %s\"\n" key.pk_first_name
         (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
         key.pk_surname;
@@ -562,7 +562,7 @@ let insert_person gen so =
   (* if person wad defined before (not just referenced) *)
   if gen.g_def.(ip) then (
     (* print error about person beeing already defined *)
-    Printf.printf "\nPerson already defined: \"%s%s %s\"\n" so.first_name
+    Printf.printf "\nError: Person already defined: \"%s%s %s\"\n" so.first_name
       (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
       so.surname;
     if
@@ -583,7 +583,7 @@ let insert_person gen so =
       || sou gen.g_base x.m_surname <> so.surname
     then (
       (* print error about person defined with two spellings *)
-      Printf.printf "\nPerson defined with two spellings:\n";
+      Printf.printf "\nError: Person defined with two spellings:\n";
       Printf.printf "  \"%s%s %s\"\n" so.first_name
         (match x.m_occ with 0 -> "" | n -> "." ^ string_of_int n)
         so.surname;
@@ -662,7 +662,8 @@ let check_parents_not_already_defined gen ix fath moth =
       let p = Adef.father cpl in
       let m = Adef.mother cpl in
       Printf.printf
-        "I cannot add \"%s\", child of\n\
+        "\n\
+         Error: I cannot add \"%s\", child of\n\
         \    - \"%s\"\n\
         \    - \"%s\",\n\
          because this persons still exists as child of\n\
@@ -703,6 +704,7 @@ let fevent_name_unique_string gen = function
 let update_family_with_fevents _gen fam =
   let found_marriage = ref false in
   let found_divorce = ref false in
+  let found_separation = ref false in
   let nsck_std_fields =
     match fam.relation with
     | NoSexesCheckNotMarried | NoSexesCheckMarried -> true
@@ -756,10 +758,10 @@ let update_family_with_fevents _gen fam =
                   let () = found_divorce := true in
                   loop l fam
             | Efam_Separated ->
-                if !found_divorce then loop l fam
+                if !found_separation then loop l fam
                 else
-                  let fam = { fam with divorce = Separated } in
-                  let () = found_divorce := true in
+                  let fam = { fam with divorce = Separated evt.efam_date } in
+                  let () = found_separation := true in
                   loop l fam
             | _ -> loop l fam))
   in
@@ -813,11 +815,25 @@ let update_fevents_with_family gen fam =
           }
         in
         Some evt
-    | Separated ->
+    | NotSeparated -> None
+    | Separated_old ->
         let evt =
           {
             efam_name = Efam_Separated;
             efam_date = Date.cdate_None;
+            efam_place = unique_string gen "";
+            efam_reason = unique_string gen "";
+            efam_note = unique_string gen "";
+            efam_src = unique_string gen "";
+            efam_witnesses = [||];
+          }
+        in
+        Some evt
+    | Separated cd ->
+        let evt =
+          {
+            efam_name = Efam_Separated;
+            efam_date = cd;
             efam_place = unique_string gen "";
             efam_reason = unique_string gen "";
             efam_note = unique_string gen "";
@@ -1014,8 +1030,8 @@ let insert_pevents fname gen sb pevtl =
   (* insert concered person *)
   let p, ip = insert_somebody gen sb in
   if p.m_pevents <> [] then (
-    Printf.printf "\nFile \"%s\"\n" fname;
-    Printf.printf "Individual events already defined for \"%s%s %s\"\n"
+    Printf.printf "\nFile \"%s\"" fname;
+    Printf.printf "\nError: Individual events already defined for \"%s%s %s\"\n"
       (sou gen.g_base p.m_first_name)
       (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
       (sou gen.g_base p.m_surname);
@@ -1068,8 +1084,8 @@ let insert_notes fname gen key str =
   | Some ip ->
       let p = poi gen.g_base ip in
       if sou gen.g_base p.m_notes <> "" then (
-        Printf.printf "\nFile \"%s\"\n" fname;
-        Printf.printf "Notes already defined for \"%s%s %s\"\n"
+        Printf.printf "\nFile \"%s\"" fname;
+        Printf.printf "\nError: Notes already defined for \"%s%s %s\"\n"
           key.pk_first_name
           (if occ = 0 then "" else "." ^ string_of_int occ)
           key.pk_surname;
@@ -1150,8 +1166,8 @@ let insert_relations fname gen sb sex rl =
   (* insert concerned person *)
   let p, ip = insert_somebody gen sb in
   if p.m_rparents <> [] then (
-    Printf.printf "\nFile \"%s\"\n" fname;
-    Printf.printf "Relations already defined for \"%s%s %s\"\n"
+    Printf.printf "\nFile \"%s\"" fname;
+    Printf.printf "\nError: Relations already defined for \"%s%s %s\"\n"
       (sou gen.g_base p.m_first_name)
       (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
       (sou gen.g_base p.m_surname);
@@ -1692,11 +1708,13 @@ let link next_family_fun bdir =
   if !do_check && gen.g_pcnt > 0 then (
     Check.check_base base (set_error base gen) (set_warning base) ignore;
     if !pr_stats then Stats.(print_stats base @@ stat_base base));
+  Mutil.remove_dir tmp_dir;
   if not gen.g_errored then (
     if !do_consang then ignore @@ ConsangAll.compute base true;
     Gwdb.sync base;
     output_wizard_notes bdir gen.g_wiznotes;
-    Mutil.remove_dir tmp_dir;
     output_command_line bdir;
     true)
-  else false
+  else (
+    Mutil.remove_dir bdir;
+    false)

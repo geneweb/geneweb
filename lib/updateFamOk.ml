@@ -342,7 +342,7 @@ let reconstitute_from_fevents (nsck : bool) (empty_string : 'string)
             mk_div (Divorced evt.efam_date);
             loop l
         | Efam_Separated ->
-            mk_div Separated;
+            mk_div (Separated evt.efam_date);
             loop l
         | Efam_Annulation -> loop l
         | Efam_Name _ -> loop l)
@@ -602,7 +602,6 @@ let print_error_disconnected conf =
       (transl conf "msg error disconnected" |> Utf8.capitalize_fst |> Adef.safe)
   in
   Update.prerr conf err @@ fun () ->
-  Hutil.print_link_to_welcome conf true;
   Output.print_string conf (Update.string_of_error conf err)
 
 let family_exclude pfams efam =
@@ -1099,7 +1098,7 @@ let print_title conf fmt _ =
 
 let print_mod_ok conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family modified";
-  (* Si on a supprimé des caractères interdits *)
+  (* Si on a supprimÃ© des caractÃ¨res interdits *)
   if List.length !removed_string > 0 then (
     Output.print_sstring conf "<h3 class=\"error\">";
     Output.printf conf
@@ -1119,7 +1118,7 @@ let print_change_event_order_ok conf base (wl, ml) cpl des =
 
 let print_add_ok conf base (wl, ml) cpl des =
   Hutil.header conf @@ print_title conf "family added";
-  (* Si on a supprimé des caractères interdits *)
+  (* Si on a supprimÃ© des caractÃ¨res interdits *)
   if List.length !removed_string > 0 then (
     Output.printf conf "<h2 class=\"error\">%s</h2>\n"
       (Utf8.capitalize_fst (transl conf "forbidden char"));

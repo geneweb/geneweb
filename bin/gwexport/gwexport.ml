@@ -66,7 +66,7 @@ let speclist c =
        multiple times. Key format is \"First Name.occ SURNAME\"" );
     ( "-c",
       Arg.Int (fun s -> c := { !c with censor = s }),
-      "<NUM>: when a person is born less than <num> years ago, it is not \
+      "<NUM> when a person is born less than <num> years ago, it is not \
        exported unless it is Public. All the spouses and descendants are also \
        censored." );
     ( "-charset",
@@ -83,7 +83,7 @@ let speclist c =
                 | "UTF-8" -> Utf8
                 | _ -> raise (Arg.Bad "bad -charset value"));
             }),
-      "[ASCII|ANSEL|ANSI|UTF-8] set charset; default is UTF-8" );
+      " [ASCII|ANSEL|ANSI|UTF-8] set charset; default is UTF-8" );
     ( "-d",
       Arg.Int (fun s -> c := { !c with desc = Some s }),
       "<N> maximum generation of the root's descendants." );

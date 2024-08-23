@@ -79,7 +79,7 @@
 
 %define;somebody()
   <a %if;(e.nav="1")%if;(e.i="")%apply;url_set%with;p/n/oc%and;%first_name;/%surname;/%if;(occ!=0)%occ;%end;%end;%nn;
-             %else;%url_set.i.index;%end;%end;"
+             %else;%url_set.i.index;%end;
     %else;href="%prefix;%access;" class="s%sex; nc%has_children;"
     %end;>
     %if;(e.image!=0 and has_image)

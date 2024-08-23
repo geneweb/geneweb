@@ -547,12 +547,14 @@ let display_descendant_index conf base max_level ancestor =
     Gwdb.Collection.fold
       (fun acc i ->
         let p = pget conf base i in
-        if
-          p_first_name base p <> "?"
-          && p_surname base p <> "?"
-          && p_first_name base p <> "x"
-          && ((not (is_hide_names conf p)) || authorized_age conf base p)
-        then get_iper p :: acc
+        if Gwdb.Marker.get paths i <> [] then
+          if
+            p_first_name base p <> "?"
+            && p_surname base p <> "?"
+            && p_first_name base p <> "x"
+            && ((not (is_hide_names conf p)) || authorized_age conf base p)
+          then get_iper p :: acc
+          else acc
         else acc)
       [] (ipers base)
   in
@@ -954,7 +956,7 @@ let display_descendant_with_table conf base max_lev p =
         incr nb_pers;
         loop lev nb_col false refl q
   in
-  Hutil.header_fluid conf (descendants_title conf base p);
+  Hutil.header ~fluid:true conf (descendants_title conf base p);
   Output.print_sstring conf "<p>";
   (text_to conf max_lev : Adef.safe_string :> string)
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -1244,7 +1246,6 @@ let print_aboville conf base max_level p =
   let max_level = min (Perso.limit_desc conf) max_level in
   let num_aboville = p_getenv conf.env "num" = Some "on" in
   Hutil.header conf (descendants_title conf base p);
-  Hutil.print_link_to_welcome conf true;
   (text_to conf max_level : Adef.safe_string :> string)
   |> Utf8.capitalize_fst |> Output.print_sstring conf;
   Output.print_sstring conf ".<br><p>";
@@ -1595,9 +1596,10 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
   let txt = get_text conf base sp (kids <> [] && sps) img cgl in
   let has_image = Image.get_portrait conf base p |> Option.is_some in
   let br_sp = if has_image && img then "" else "<br>" in
+  let auth = authorized_age conf base p && authorized_age conf base sp in
   let fam = foi base ifam in
   let marr_d =
-    if marr then DateDisplay.short_family_dates_text conf base true fam
+    if marr && auth then DateDisplay.short_family_dates_text conf base true fam
     else Adef.safe ""
   in
   let m_txt =
@@ -1605,7 +1607,7 @@ and f_pos conf base ifam ifam_nbr only_one first last p x0 v ir2 tdal only_anc
     let f_nbr = string_of_int ifam_nbr in
     "<span class=\"text-nowrap\">"
     ^ (if last || only_one then "" else "…")
-    ^ (if only_one then " &" else " &<sup>" ^ f_nbr ^ "</sup>")
+    ^ (if only_one then " &amp;" else " &amp;<sup>" ^ f_nbr ^ "</sup>")
     ^ (marr_d :> string)
     ^ (if first || only_one then "" else "…")
     ^ "</span>"

@@ -80,7 +80,6 @@ let print_mod_ok conf base =
       |> Utf8.capitalize_fst |> Output.print_sstring conf
     in
     Hutil.header conf title;
-    Hutil.print_link_to_welcome conf true;
     Output.print_sstring conf "<p>";
     transl conf "modification successful"
     |> Utf8.capitalize_fst |> Output.print_sstring conf;
@@ -149,7 +148,6 @@ let print_mod_ok conf base =
     Hutil.header conf (fun _ ->
         transl conf "no modification"
         |> Utf8.capitalize_fst |> Output.print_sstring conf);
-    Hutil.print_link_to_welcome conf true;
     Output.print_sstring conf {|<p><a href="|};
     Output.print_string conf (commd conf);
     Output.print_sstring conf {|m=MOD_DATA&data=|};

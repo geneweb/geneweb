@@ -101,7 +101,9 @@ let print_portrait conf base p =
   match Image.get_portrait conf base p with
   | Some (`Path path) ->
       Result.fold ~ok:ignore
-        ~error:(fun _ -> Hutil.incorrect_request conf)
+        ~error:(fun _ ->
+          Hutil.incorrect_request conf
+            ~comment:"print_image_file failed (portrait)")
         (print_image_file conf path)
   | Some (`Url url) ->
       Util.html conf;

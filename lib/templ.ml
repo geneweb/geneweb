@@ -209,8 +209,6 @@ let reorder conf url_env =
         else Format.sprintf "%s=%s" k v :: acc)
       [] url_env
   in
-  if List.mem "lang=fr" env1 then Printf.eprintf "Lang in env1\n";
-  if List.mem "lang=fr" env2 then Printf.eprintf "Lang in env2\n";
   String.concat "&" (List.rev env1 @ List.rev env2)
 
 let find_sosa_ref conf =
@@ -222,14 +220,7 @@ let find_sosa_ref conf =
   let nz = get_env "nz" env in
   let ocz = get_env "ocz" env in
   let iz = get_env "iz" env in
-  match (iz, pz, nz, ocz) with
-  | iz, "", "", "" when iz <> "" -> iz
-  | "", pz, nz, ocz when pz <> "" || nz <> "" ->
-      Format.sprintf "%s.%s %s" pz ocz nz
-  | _ -> (
-      match List.assoc_opt "sosa_ref" conf.base_env with
-      | Some s when s <> "" -> s
-      | _ -> "No sosa ref")
+  (iz, pz, nz, ocz)
 
 (* url_set_aux can reset several evar from evar_l in one call *)
 let url_set_aux conf evar_l str_l =
@@ -379,7 +370,9 @@ let rec eval_variable conf = function
   | [ "random"; s ] -> (
       try string_of_int (Random.int (int_of_string s))
       with Failure _ | Invalid_argument _ -> raise Not_found)
-  | "nb_of_persons" :: sl -> eval_int conf conf.nb_of_persons sl
+  | "nb_persons" :: sl -> eval_int conf conf.nb_of_persons sl
+  | "nb_families" :: sl -> eval_int conf conf.nb_of_families sl
+  | "sosa_ref" :: sl -> eval_sosa_ref conf sl
   | [ "substr_start"; n; v ] -> (
       (* extract the n first characters of string v *)
       match int_of_string_opt n with
@@ -410,6 +403,23 @@ let rec eval_variable conf = function
   | [ "user"; "key" ] -> conf.userkey
   | [ s ] -> eval_simple_variable conf s
   | _ -> raise Not_found
+
+and eval_sosa_ref conf sl =
+  let i, fn, sn, occ = find_sosa_ref conf in
+  match sl with
+  | [ "first_name" ] -> fn
+  | [ "surname" ] -> sn
+  | [ "occ" ] -> occ
+  | [ "index" ] -> i
+  | [ "access" ] ->
+      if i <> "" then "i=" ^ i
+      else if fn <> "" || sn <> "" then
+        Format.sprintf "p=%s&n=%s&oc=%s" fn sn occ
+      else ""
+  | [] ->
+      let occ = if occ = "" then "" else "." ^ occ in
+      Format.sprintf "%s%s %s" fn occ sn
+  | _ -> "???1"
 
 and eval_int conf n = function
   | [ "hexa" ] -> Printf.sprintf "0x%X" n
@@ -483,7 +493,7 @@ and eval_simple_variable conf = function
   | "nn" -> ""
   | "plugins" ->
       let l = List.map Filename.basename conf.plugins in
-      String.concat "," l
+      String.concat ", " l
   | "bname" -> conf.bname
   | "token" -> conf.cgi_passwd
   | "bname_token" -> String.concat "_" [ conf.bname; conf.cgi_passwd ]
@@ -500,7 +510,13 @@ and eval_simple_variable conf = function
       (Util.commd ~excl:[ "templ"; "p_mod"; "wide" ] conf :> string)
   | "referer" -> (Util.get_referer conf :> string)
   | "right" -> conf.right
-  | "sosa_ref" -> find_sosa_ref conf
+  | "sosa_ref" -> (
+      match find_sosa_ref conf with
+      | iz, _, _, _ when iz <> "" -> iz
+      | _, fn, sn, occ when fn <> "" || sn <> "" ->
+          let occ = if occ = "" then "" else "." ^ occ in
+          Format.sprintf "%s%s %s" fn occ sn
+      | _ -> "???2")
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
   | "sp" -> " "
   | "static_path" | "etc_prefix" ->
@@ -764,7 +780,13 @@ let templ_eval_var conf = function
   | [ "friend" ] -> VVbool conf.friend
   | [ "manitou" ] -> VVbool conf.manitou
   | [ "plugin"; plugin ] ->
-      VVbool (List.mem plugin (List.map Filename.basename conf.plugins))
+      let plugins =
+        try
+          List.assoc "plugins" conf.base_env
+          |> String.split_on_char ',' |> List.map String.trim
+        with Not_found -> []
+      in
+      VVbool (List.mem plugin plugins)
   | [ "supervisor" ] -> VVbool conf.supervisor
   | [ "true" ] -> VVbool true
   | [ "wizard" ] -> VVbool conf.wizard
@@ -1027,13 +1049,23 @@ let rec templ_print_foreach conf print_ast set_vother env ep _loc s sl _el al =
   | _ -> raise Not_found
 
 and print_foreach_env_binding conf print_ast set_vother env ep al =
+  let env_vars =
+    let rec loop acc env_vars =
+      match env_vars with
+      | [] -> acc
+      | (k, v) :: env_vars ->
+          if List.mem_assoc k acc then loop acc env_vars
+          else loop ((k, v) :: acc) env_vars
+    in
+    loop [] (conf.env @ conf.henv @ conf.senv)
+  in
   List.iter
     (fun (k, v) ->
       let print_ast =
         print_ast (("binding", set_vother (Vbind (k, v))) :: env) ep
       in
       List.iter print_ast al)
-    (conf.env @ conf.henv @ conf.senv)
+    env_vars
 
 let float_rgb_of_hsv h s v =
   let h = if h > 1. then 1. else if h < 0. then 0. else h in
@@ -1120,10 +1152,14 @@ let print_copyright conf =
       Output.print_sstring conf "<br>\n")
 
 let include_hed_trl conf name =
-  if name = "trl" then Util.include_template conf [] name (fun () -> ());
-  let query_time = Unix.gettimeofday () -. conf.query_start in
-  Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
-    !GWPARAM.errors_other !GWPARAM.set_vars
+  match name with
+  | "hed" -> Util.include_template conf [] name (fun () -> ())
+  | "trl" ->
+      Util.include_template conf [] name (fun () -> ());
+      let query_time = Unix.gettimeofday () -. conf.query_start in
+      Util.time_debug conf query_time !GWPARAM.nb_errors !GWPARAM.errors_undef
+        !GWPARAM.errors_other !GWPARAM.set_vars
+  | _ -> ()
 
 let rec interp_ast :
     config -> ('a, 'b) interp_fun -> 'a env -> 'b -> ast list -> unit =
@@ -1179,6 +1215,12 @@ let rec interp_ast :
     | None -> (
         match (f, vl) with
         | "capitalize", [ VVstring s ] -> Utf8.capitalize_fst s
+        | "capitalize_words", [ VVstring s ] ->
+            let wl = String.split_on_char ' ' s in
+            (* TODO handle particles !
+               let w = Util.surname_particle base w not available *)
+            let wl = List.map (fun w -> Utf8.capitalize_fst w) wl in
+            String.concat " " wl
         | "interp", [ VVstring s ] ->
             let astl = Templ_parser.parse_templ conf (Lexing.from_string s) in
             String.concat "" (eval_ast_list env ep astl)
@@ -1200,6 +1242,10 @@ let rec interp_ast :
         | "nth_c", [ VVstring s1; VVstring s2 ] -> (
             let n = try int_of_string s2 with Failure _ -> 0 in
             try Char.escaped (String.get s1 n) with Invalid_argument _ -> "")
+        | "1000sep", [ VVstring s ] ->
+            let n = try int_of_string s with Failure _ -> 0 in
+            let sep = Util.transl conf "(thousand separator)" in
+            string_of_expr_val (VVstring (Mutil.string_of_int_sep sep n))
         | "red_of_hsv", [ VVstring h; VVstring s; VVstring v ] -> (
             try
               let r, _, _ = rgb_of_str_hsv h s v in
@@ -1367,6 +1413,16 @@ and print_simple_variable conf = function
         (string_of_int (List.length (Util.get_bases_list ())))
   | "bases_list" ->
       Output.print_sstring conf (String.concat ", " (Util.get_bases_list ()))
+  | "bases_list_links" ->
+      let format_link bname =
+        Format.sprintf {|<a href="%s%s">%s</a>|}
+          ((if conf.cgi then "?b=" else "") ^ bname)
+          (if conf.lang = conf.default_lang then ""
+          else (if conf.cgi then "&" else "?") ^ "lang=" ^ conf.lang)
+          bname
+      in
+      Output.print_sstring conf
+        (String.concat ", " (Util.get_bases_list ~format_fun:format_link ()))
   | "hidden" -> Util.hidden_env conf
   | "message_to_wizard" -> Util.message_to_wizard conf
   | _ -> raise Not_found

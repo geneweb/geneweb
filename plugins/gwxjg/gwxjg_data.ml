@@ -112,9 +112,12 @@ let rec mk_family (conf : Config.config) base
     match Gwdb.get_divorce fam with
     | Def.Divorced _ ->
         find_event conf base (Event.Fevent Def.Efam_Divorce) events'
-    | Separated ->
+    | Def.Separated _ ->
+        find_event conf base (Event.Fevent Def.Efam_Separated) events'
+    | Def.Separated_old ->
         find_event conf base (Event.Fevent Def.Efam_Separated) events'
     | NotDivorced -> Tnull
+    | NotSeparated -> Tnull
   in
   let ifam = Tstr (E.ifam fcd) in
   let origin_file = Tstr (E.origin_file conf base fcd) in
@@ -1177,8 +1180,8 @@ let encode_varenv =
 let mk_base base =
   Tpat
     (function
-    | "nb_of_persons" -> Tint (Gwdb.nb_of_persons base)
-    | "nb_of_families" -> Tint (Gwdb.nb_of_families base)
+    | "nb_persons" -> Tint (Gwdb.nb_of_persons base)
+    | "nb_families" -> Tint (Gwdb.nb_of_families base)
     | "name" -> Tstr (Gwdb.bname base)
     | _ -> raise Not_found)
 

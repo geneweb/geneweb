@@ -234,7 +234,7 @@ let print_cousins conf base p lev1 lev2 =
     try int_of_string (List.assoc "max_cousins" conf.base_env)
     with Not_found | Failure _ -> default_max_cnt
   in
-  Perso.interp_notempl_with_menu title "perso_header" conf base p;
+  Hutil.header conf title;
   Output.print_sstring conf "<div>";
   (*include_templ conf "cousins_tools";*)
   Output.print_sstring conf "<h3>";
@@ -363,7 +363,8 @@ let print_anniv conf base p dead_people level =
       set S.empty
   in
   let txt_of (up_sosa, down_br, spouse) conf base c =
-    Printf.sprintf {|<a href="m=RL&%s&b1=%d&%s&b2=%d%s">%s</a>|}
+    Printf.sprintf {|<a href="%sm=RL&%s&b1=%d&%s&b2=%d%s">%s</a>|}
+      (commd conf :> string)
       (acces_n conf base (Adef.escaped "1") p :> string)
       up_sosa
       (acces_n conf base (Adef.escaped "2")

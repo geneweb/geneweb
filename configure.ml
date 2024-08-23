@@ -8,11 +8,18 @@ let rm = ref ""
 let ext = ref ""
 let os_type = ref ""
 let installed pkg = 0 = Sys.command ("ocamlfind query -qo -qe " ^ pkg)
+
+let nnp_compiler =
+  if not Sys.win32 then 1 = Sys.command "$(ocamlc -config-var naked_pointers)"
+  else false
+
 let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options]"
 let api = ref false
 let sosa = ref `None
 let gwdb = ref `None
 let syslog = ref false
+let caching = ref false
+let set_caching () = caching := true
 let set_api () = api := true
 let set_syslog () = syslog := true
 
@@ -56,6 +63,9 @@ let speclist =
       Arg.Unit set_sosa_zarith,
       " Use Sosa module implementation based on `zarith` library" );
     ("--syslog", Arg.Unit set_syslog, " Log gwd errors using syslog");
+    ( "--gwd-caching",
+      Arg.Unit set_caching,
+      " Enable database preloading (Unix-only)" );
   ]
   |> List.sort compare |> Arg.align
 
@@ -102,6 +112,23 @@ let () =
         (os_type, " -D UNIX", "", "/bin/rm -f", "strip")
     | _ -> ("Win", " -D WINDOWS", ".exe", "rm -f", "true")
   in
+  let ancient_lib, ancient_file =
+    let no_cache = ("", "gw_ancient.dum.ml") in
+    if nnp_compiler then
+      if installed "ancient" then ("ancient", "gw_ancient.wrapped.ml")
+      else (
+        if !caching then
+          Printf.eprintf
+            "Warning: ocaml-ancient not installed. Cannot enable database \
+             caching.\n";
+        no_cache)
+    else (
+      if !caching then
+        Printf.eprintf
+          "Warning: Compiler not set to no-naked-pointers. Cannot enable \
+           database caching.\n";
+      no_cache)
+  in
   let ch = open_out "Makefile.config" in
   let writeln s = output_string ch @@ s ^ "\n" in
   let var name value = writeln @@ name ^ "=" ^ value in
@@ -119,4 +146,6 @@ let () =
   var "SYSLOG_PKG" syslog_pkg;
   var "DUNE_DIRS_EXCLUDE" !dune_dirs_exclude;
   var "DUNE_PROFILE" dune_profile;
+  var "ANCIENT_LIB" ancient_lib;
+  var "ANCIENT_FILE" ancient_file;
   close_out ch
