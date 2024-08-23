@@ -6,7 +6,7 @@ open UpdateData
 
 let translate_title conf len =
   let plural = if len > 1 then 1 else 0 in
-  let title =
+  let book_name =
     match p_getenv conf.env "data" with
     | Some "occu" -> transl_nth conf "occupation/occupations" plural
     | Some "place" -> transl_nth conf "place/places" plural
@@ -18,9 +18,9 @@ let translate_title conf len =
     | Some "pubn" -> transl_nth conf "public name/public names" plural
     | Some "title" -> transl_nth conf "title/titles" plural
     | Some "domain" -> transl_nth conf "domain/domains" plural
-    | _ -> ""
+    | _ -> "unknown"
   in
-  (Printf.sprintf (ftransl conf "book of %s") title, title)
+  (Printf.sprintf (ftransl conf "book of %s") book_name, book_name)
 
 (* ******************************************************************** *)
 (*  [Fonc] print_mod_ok : config -> base -> unit                        *)
@@ -322,7 +322,7 @@ and eval_simple_str_var conf _base env _xx = function
       let book_of, _ = translate_title conf 2 in
       (* book of is always plural *)
       Utf8.capitalize_fst book_of
-  | "subtitle" ->
+  | "subtitle" -> (
       let len =
         match get_env "list" env with Vlist_data l -> List.length l | _ -> 0
       in
@@ -331,18 +331,15 @@ and eval_simple_str_var conf _base env _xx = function
           (transl conf "(thousand separator)")
           (Sosa.of_int len)
       in
-      let _, title = translate_title conf len in
-      let result =
-        match p_getenv conf.env "s" with
-        | Some ini ->
-            if ini = "" then Printf.sprintf "%s %s" len2 title
-            else
-              Printf.sprintf
-                (ftransl conf "%s %s starting with %s")
-                len2 title ini
-        | None -> Printf.sprintf "%s %s" len2 title
-      in
-      result
+      let _, book_name = translate_title conf len in
+      match p_getenv conf.env "s" with
+      | Some ini ->
+          if ini = "" then Printf.sprintf "%s %s" len2 book_name
+          else
+            Printf.sprintf
+              (ftransl conf "%s %s starting with %s")
+              len2 book_name ini
+      | None -> Printf.sprintf "%s %s" len2 book_name)
   | _ -> raise Not_found
 
 and eval_compound_var conf base env xx sl =
