@@ -1120,7 +1120,10 @@ let make_conf from_addr request script_name env =
       match String.split_on_char '_' base_access with
       | [ bname ] -> bname, ""
       | [ bname ; access ] -> bname, access
-      | _ -> assert false
+      | _ -> (
+        !GWPARAM.syslog
+          `LOG_CRIT (Format.sprintf "bad bname: (%s)\n" base_access);
+        assert false)
     in
     let bases = Util.get_bases_list () in
     let bname = match  bases with [x] -> x | _ -> bname in

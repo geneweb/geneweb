@@ -165,7 +165,11 @@ let rec next_branch_same_len conf base dist backward missing ia sa ipl =
                 next_branch_same_len conf base dist false missing
                   (get_mother cpl) Female ipl
             | _ -> failwith "next_branch_same_len")
-        | Neuter -> assert false)
+        | Neuter ->
+            !GWPARAM.syslog `LOG_CRIT
+              (Format.sprintf "sex of %s is Neuter!\n"
+                 (Gutil.designation base (poi base ia)));
+            assert false)
   else if missing = 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
     next_branch_same_len conf base dist true missing ia sa ipl
