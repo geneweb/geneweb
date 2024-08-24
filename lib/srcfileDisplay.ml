@@ -531,7 +531,16 @@ let eval_var conf base env () _loc = function
   | _ -> raise Not_found
 
 let print_foreach _conf _print_ast _eval_expr = raise Not_found
-let eval_predefined_apply _conf _env _f _vl = raise Not_found
+
+let eval_predefined_apply conf _env f vl =
+  let vl = List.map (function VVstring s -> s | _ -> raise Not_found) vl in
+  match (f, vl) with
+  | "a_of_b", [ s1; s2 ] -> Util.translate_eval (transl_a_of_b conf s1 s2 s2)
+  | "a_of_b2", [ s1; s2; s3 ] ->
+      Util.translate_eval (transl_a_of_b conf s1 s2 s3)
+  | "uri_encode", [ s ] -> Util.uri_encode s
+  | "uri_decode", [ s ] -> Util.uri_decode s
+  | _ -> raise Not_found
 
 let print_start conf base =
   let env =
