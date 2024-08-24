@@ -12873,6 +12873,10 @@ de: nicht mehr
 en: no more
 fr: pas d’autres
 
+    no user key
+en: the link may lead to a homonym or even fail because the user key is not defined in the .auth file
+fr: le lien peut conduire à un homonyme voire échouer car la clé utilisateur n’est pas définie dans le fichier .auth
+
     no sexes check
 af: geslag word nie aangedui nie
 bg: без проверка за пол
