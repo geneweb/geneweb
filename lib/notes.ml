@@ -279,6 +279,15 @@ let commit_wiznotes conf base fnotes s =
   History.record conf base (Def.U_Notes (p_getint conf.env "v", fnotes)) "mn";
   update_notes_links_db base pg s
 
+let replace olds news str =
+  let olds_l = Name.lower olds in
+  let olds_u1 = Utf8.capitalize_fst olds_l in
+  let olds_u2 = Utf8.uppercase olds_l in
+  let regexp =
+    Str.regexp (olds ^ "\\|" ^ olds_l ^ "\\|" ^ olds_u1 ^ "\\|" ^ olds_u2)
+  in
+  Str.global_replace regexp news str
+
 let rewrite_key s oldk newk =
   let slen = String.length s in
   let rec rebuild rs i =
@@ -288,11 +297,21 @@ let rewrite_key s oldk newk =
       | WLpage (j, _, _, _, _) | WLwizard (j, _, _) | WLnone (j, _) ->
           let ss = String.sub s i (j - i) in
           rebuild (rs ^ ss) j
-      | WLperson (j, k, _name, text) ->
+      | WLperson (j, k, name, text) ->
           if Def.NLDB.equal_key k oldk then
             let fn, sn, oc = newk in
+            let ofn, osn, _ooc = oldk in
+            let name =
+              match name with
+              | Some str -> Some (replace ofn fn str |> replace osn sn)
+              | None -> None
+            in
             let ss =
-              Printf.sprintf "[[%s/%s/%d/%s %s%s]]" fn sn oc fn sn
+              Printf.sprintf "[[%s/%s/%d/%s%s]]" fn sn oc
+                (Option.fold
+                   ~none:(Printf.sprintf "%s %s" fn sn)
+                   ~some:(fun txt -> txt)
+                   name)
                 (Option.fold ~none:"" ~some:(fun txt -> ";" ^ txt) text)
             in
             rebuild (rs ^ ss) j
