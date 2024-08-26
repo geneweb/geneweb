@@ -58,16 +58,30 @@ let empty_prefix_table () = try
     raise e
 
 let add_prefixes full_name pfx_table pfx_list =
+  print_endline @@ Printf.sprintf "working on %s" full_name;
   let rec aux = function
     |  pfx :: (pfx' :: _ as pfxs) ->
       let index = Dutil.name_index pfx in
+      print_endline @@ Printf.sprintf "adding follow %s of %s at index %d" pfx' pfx index;
       Array.set pfx_table index (
         let entry = Array.get pfx_table index in
-        let next_prefixes_list = pfx' :: entry.next_prefixes_list in
+        let next_prefixes_list =
+          if Dutil.name_index pfx' = index then entry.next_prefixes_list
+          else pfx' :: entry.next_prefixes_list in
+        (*if List.mem pfx next_prefixes_list then begin
+          print_endline @@ Printf.sprintf "ISSUE IS %s for %s adding %s" pfx full_name pfx';
+          List.iter (fun pfx -> print_endline pfx) pfx_list;
+          print_endline "current";
+          List.iter (fun pfx -> print_endline pfx) entry.next_prefixes_list;
+          assert false
+        end
+          else*)
         {entry with next_prefixes_list}
       );
       aux pfxs
     | [pfx] ->
+      print_endline @@ Printf.sprintf "last entry %s" pfx;
+      List.iter (fun s -> print_endline @@ Printf.sprintf "pfx: %s" s) pfx_list;
       let index = Dutil.name_index pfx in
       let entry = Array.get pfx_table index in
       Array.set pfx_table index {
@@ -157,6 +171,15 @@ let make_strings_of_fsname_aux split get base =
       a)
     t
 
+let output_index_pfx_aux oc_inx oc_acc (array : Dbdisk.prefix_entry Array.t) =
+  seek_out oc_inx 0;
+  seek_out oc_acc 0;
+  Array.iter (fun value ->
+      let pos = pos_out oc_inx in
+      output_binary_int oc_acc pos;
+      Dutil.output_value_no_sharing oc_inx value
+    ) array
+
 let make_strings_of_fname =
   make_strings_of_fsname_aux Name.split_fname_callback (fun p ->
       p.first_name :: p.first_names_aliases)
@@ -172,10 +195,10 @@ let create_strings_of_fname oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_strings_of_fname base)
 
 let create_fname_prefix_index oc_inx oc_inx_acc base =
-  output_index_aux oc_inx oc_inx_acc (make_fname_prefix_index base)
+  output_index_pfx_aux oc_inx oc_inx_acc (make_fname_prefix_index base)
 
 let create_sname_prefix_index oc_inx oc_inx_acc base =
-  output_index_aux oc_inx oc_inx_acc (make_sname_prefix_index base)
+  output_index_pfx_aux oc_inx oc_inx_acc (make_sname_prefix_index base)
 
 let is_prime a =
   let rec loop b =

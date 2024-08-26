@@ -466,7 +466,7 @@ let persons_of_name bname patches =
 let old_strings_of_fsname bname strings (_, person_patches) =
   let t = ref None in
   fun s ->
-    let i = Dutil.name_index s in
+    let i = match s with `Str s -> Dutil.name_index s | `NameIndex i -> i in
     let r =
       let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
       let ai =
@@ -524,7 +524,7 @@ let new_strings_of_fsname_aux offset_acc offset_inx split get bname strings
     (_, person_patches) =
   let t = ref None in
   fun s ->
-    let i = Dutil.name_index s in
+    let i = match s with `Str s -> Dutil.name_index s | `NameIndex i -> i in
     (* look in index files *)
     let r =
       let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
@@ -590,36 +590,62 @@ let strings_of_fname = function
   | GnWb0024 | GnWb0023 -> new_strings_of_fname
   | _ -> old_strings_of_fsname
 
+module IntSet = Set.Make(Int)
 
-let all_name_indexes_of_prefix_entry ic_acc ic_inx string =
+let all_name_indexes_of_prefix_entry ic_acc ic_inx s =
   let get_entry i =
-    seek_in ic_acc (Iovalue.sizeof_long * i);
+(*    print_endline @@ Printf.sprintf "burp :%d %d" i (4 * i);
+      print_endline @@ Printf.sprintf "pos in acc is currently %d" (pos_in ic_acc);*)
+    seek_in ic_acc (4 * i);
+(*    print_endline @@ Printf.sprintf "pos in acc is currently %d" (pos_in ic_acc);
+      print_endline "burp2";*)
     let pos = input_binary_int ic_acc in
+    (*    print_endline @@ Printf.sprintf "pos is %d" pos;*)
     seek_in ic_inx pos;
-    (Iovalue.input ic_inx : Dbdisk.prefix_entry)
+    (*    print_endline "seek inx done";*)
+    let v = (Marshal.from_channel ic_inx : Dbdisk.prefix_entry) in
+    (*    print_endline "read inx";*)
+    v
   in
-  let rec aux (acc, composed_acc) i entry =
-    let acc, composed_acc = if entry.Dbdisk.has_values then
-        i :: acc, (entry.composed_prefixes :: composed_acc)
-      else acc, entry.composed_prefixes :: composed_acc
-    in
-    Array.fold_left (fun acc i ->
-        aux acc i (get_entry i)
-      ) (acc, composed_acc) entry.next_prefixes
+  let rec aux (acc, composed_acc, work_queue, ni_set) = match work_queue with
+    | id :: ids when not (IntSet.mem id ni_set) ->
+      let ni_set = IntSet.add id ni_set in
+      let entry = get_entry id in
+      let acc, composed_acc = if entry.Dbdisk.has_values then
+          id :: acc, (entry.composed_prefixes :: composed_acc)
+        else acc, entry.composed_prefixes :: composed_acc
+      in
+      (*print_endline @@ Printf.sprintf "ID %d\NEXT IDS :" id;*)
+      (*Array.iter (fun id -> print_endline @@ Printf.sprintf "next %d" id) entry.next_prefixes;*)
+      aux (acc, composed_acc, Array.to_list entry.next_prefixes @ ids, ni_set)
+(*      Array.fold_left (fun acc i ->
+          aux acc i (get_entry i)
+        ) (acc, composed_acc, []) entry.next_prefixes*)
+    | _ :: ids  -> aux (acc, composed_acc, ids, ni_set)
+    | [] -> acc, composed_acc, []
   in
-  let i = Dutil.name_index string in
-  let first_entry = get_entry i in
-  aux ([], []) i first_entry
 
-let strings_of_fsname_prefix_aux ic_acc ic_inx split get strings
+  let i = match s with `Str s -> Dutil.name_index s | `NameIndex i -> i in
+  print_endline @@ Printf.sprintf "I : %d" i;
+(*  let first_entry = get_entry i in*)
+  (*  print_endline "we continue";*)
+  let r = aux ([], [], [i], IntSet.empty) in
+  close_in ic_inx; close_in ic_acc;
+  r
+
+let strings_of_fsname_prefix_aux acc_fname inx_fname split get strings
     (_, person_patches) =
   fun s ->
-    let i = Dutil.name_index s in
+    let i = match s with `Str s -> Dutil.name_index s | `NameIndex i -> i in
     (* look in index files *)
     let r : int list =
+      let ic_acc = Secure.open_in_bin acc_fname in
+      let ic_inx = Secure.open_in_bin inx_fname in
       let names_indexes = all_name_indexes_of_prefix_entry ic_acc ic_inx s in
-      let istrs = assert false in
-      istrs
+      close_in ic_inx;
+      close_in ic_acc;
+      let indexes, composed_indexes, _ = names_indexes in
+      indexes @ List.flatten @@ List.map Array.to_list composed_indexes
     in
     (* and look in the patch too *)
     Hashtbl.fold
@@ -644,23 +670,24 @@ let strings_of_sname_prefix bname strings patches =
   let inx_fname = (Filename.concat bname "snames_pfx.inx") in
   let acc_fname = (Filename.concat bname "snames_pfx.acc") in
   if Sys.file_exists inx_fname && Sys.file_exists acc_fname then
-    let ic_inx = Secure.open_in_bin inx_fname in
-    let ic_acc = Secure.open_in_bin acc_fname in
-    let strings = strings_of_fsname_prefix_aux ic_acc ic_inx Name.split_sname (fun p ->
-        p.Dbdisk.surname :: p.Dbdisk.surnames_aliases) strings patches in
-    close_in ic_acc;
-    close_in ic_inx;
-    strings
+    strings_of_fsname_prefix_aux acc_fname inx_fname Name.split_sname (fun p ->
+        p.Dbdisk.surname :: p.Dbdisk.surnames_aliases) strings patches
   else
     new_strings_of_sname bname strings patches
 
 let strings_of_fname_prefix bname strings patches =
   let inx_fname = (Filename.concat bname "fnames_pfx.inx") in
   let acc_fname = (Filename.concat bname "fnames_pfx.acc") in
+  print_endline inx_fname;
+  print_endline acc_fname;
   if Sys.file_exists inx_fname && Sys.file_exists acc_fname then
     let ic_inx = Secure.open_in_bin inx_fname in
     let ic_acc = Secure.open_in_bin acc_fname in
-    let strings = strings_of_fsname_prefix_aux ic_acc ic_inx Name.split_fname (fun p ->
+    (*let truc = input_binary_int ic_acc in
+      print_endline (Printf.sprintf "FOUND %d" truc);*)
+    (*seek_in ic_acc 0;
+    seek_in ic_inx 0;*)
+    let strings = strings_of_fsname_prefix_aux acc_fname inx_fname Name.split_fname (fun p ->
         p.Dbdisk.first_name :: p.Dbdisk.first_names_aliases) strings patches in
     close_in ic_acc;
     close_in ic_inx;
@@ -1305,10 +1332,16 @@ let opendb bname =
     {
       person_of_key = person_of_key persons strings persons_of_name;
       persons_of_name;
-      strings_of_sname = strings_of_sname version bname strings patches.h_person;
-      strings_of_fname = strings_of_fname version bname strings patches.h_person;
-      strings_of_sname_prefix = strings_of_sname_prefix version bname strings patches.h_person;
-      strings_of_fname_prefix = strings_of_fname_prefix version bname strings patches.h_person;
+      strings_of_sname = (fun s -> strings_of_sname version bname strings patches.h_person (`Str s));
+      strings_of_fname = (fun s -> strings_of_fname version bname strings patches.h_person (`Str s));
+      strings_of_sname_prefix = (fun s ->
+          let indexes = strings_of_sname_prefix version bname strings patches.h_person (`Str s) in
+          List.fold_left (fun acc ni -> strings_of_sname version bname strings patches.h_person (`NameIndex ni) :: acc) [] indexes |> List.rev |> List.flatten
+        );
+      strings_of_fname_prefix = (fun s ->
+          let indexes = strings_of_fname_prefix version bname strings patches.h_person (`Str s) in
+          List.fold_left (fun acc ni -> strings_of_fname version bname strings patches.h_person (`NameIndex ni) :: acc) [] indexes |> List.rev |> List.flatten
+        );
       persons_of_surname =
         persons_of_surname version base_data
           ( (fun p -> p.surname :: p.surnames_aliases),

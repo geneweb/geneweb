@@ -726,6 +726,8 @@ let treat_request =
           w_base @@ Geneweb.WiznotesDisplay.print
         | "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
           w_base @@ Geneweb.WiznotesDisplay.print_search
+        | "TEST" ->
+          w_base @@ Geneweb.SearchName.test
         | _ -> incorrect_request
       end conf bfile ;
     Geneweb.Output.flush conf ;

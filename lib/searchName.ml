@@ -355,3 +355,11 @@ let print conf base specify unknown =
       in
       search conf base sn order specify unknown
   | None, None -> Hutil.incorrect_request conf
+
+
+let test conf base =
+  let pfx = try (List.assoc "fn_pfx" conf.env :> string) with Not_found -> "" in
+  let istrs = Gwdb.base_strings_of_first_name_prefix base pfx in
+  print_endline "WE FOUND:";
+  let r = ref 0 in
+  List.iter (fun istr -> incr r; if !r > 100 then exit 1 else print_endline (Gwdb.sou base istr)) istrs

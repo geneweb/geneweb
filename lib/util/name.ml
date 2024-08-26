@@ -258,7 +258,7 @@ let split_fname = split_sname
 let all_prefixes s =
   if s = "" then []
   else
-    let a = Array.init (String.length s - 1) (String.get s) in
+    let a = Array.init (String.length s) (String.get s) in
     Array.fold_left (fun (previous_pfx, pfx_list) chr ->
         let pfx = previous_pfx ^ String.make 1 chr in
         pfx, pfx :: pfx_list
