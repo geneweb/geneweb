@@ -809,7 +809,10 @@ let effective_mod ?prerr ?skip_conflict conf base sp =
   let ofn = p_first_name base op in
   let osn = p_surname base op in
   let oocc = get_occ op in
-  (if ofn <> sp.first_name || osn <> sp.surname || oocc <> sp.occ then
+  (if
+   (not (String.equal ofn sp.first_name && String.equal osn sp.surname))
+   || oocc <> sp.occ
+  then
    match Gwdb.person_of_key base sp.first_name sp.surname sp.occ with
    | Some p' when p' <> pi && Some p' <> skip_conflict ->
        Update.print_create_conflict conf base (poi base p') ""
@@ -988,7 +991,10 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
   let nfn = p_first_name base np in
   let nsn = p_surname base np in
   let nocc = get_occ np in
-  if pgl <> [] && (ofn <> nfn || osn <> nsn || oocc <> nocc) then (
+  if
+    pgl <> []
+    && ((not (String.equal ofn nfn && String.equal osn nsn)) || oocc <> nocc)
+  then (
     Output.print_sstring conf
       {|<div class="alert alert-danger mx-auto mt-1" role="alert">|};
     Output.print_sstring conf (transl conf "name changed. updated linked pages");
