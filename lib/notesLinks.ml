@@ -24,7 +24,7 @@ let check_file_name s =
 
 type wiki_link =
   | WLpage of int * (string list * string) * string * string * string
-  | WLperson of int * key * string * string option
+  | WLperson of int * key * string option * string option
   | WLwizard of int * string * string
   | WLnone of int * string
 
@@ -130,12 +130,10 @@ let misc_notes_link s i =
                 in
                 let oc1 = try int_of_string name with Failure _ -> -1 in
                 let oc = try int_of_string oc with Failure _ -> 0 in
-                if oc1 = -1 then (fn, sn, oc, name)
-                else (fn, sn, oc1, fn ^ " " ^ sn)
+                if oc1 = -1 then (fn, sn, oc, Some name) else (fn, sn, oc1, None)
               with Not_found ->
                 let sn = String.sub b k (String.length b - k) in
-                let name = fn ^ " " ^ sn in
-                (fn, sn, 0, name)
+                (fn, sn, 0, None)
             in
             let fn = Name.lower fn in
             let sn = Name.lower sn in

@@ -6,7 +6,7 @@ let pp_wiki_link = function
           (a, b, c, d, e)
   | WLperson (a, b, c, d) ->
       "WLperson"
-      ^ [%show: int * (string * string * int) * string * string option]
+      ^ [%show: int * (string * string * int) * string option * string option]
           (a, Obj.magic b, c, d)
   | WLwizard (a, b, c) -> "WLwizard" ^ [%show: int * string * string] (a, b, c)
   | WLnone (a, b)-> "WLnone" ^ [%show: int * string] (a, b)
@@ -34,18 +34,18 @@ let l =
     ( [
         WLpage (13, ([], "aaa"), "aaa", "", "bbb");
         WLnone (15, ", ");
-        WLperson (26, ("ccc", "ddd", 0), "ccc ddd", None);
+        WLperson (26, ("ccc", "ddd", 0), None, None);
         WLnone (51, ", http://site.com/eee#fff");
       ],
       "[[[aaa/bbb]]], [[ccc/ddd]], http://site.com/eee#fff" );
     ( [
         WLnone (1, "[");
-        WLperson (12, ("aaa", "bbb", 0), "aaa bbb", None);
+        WLperson (12, ("aaa", "bbb", 0), None, None);
         WLnone (14, ", ");
-        WLperson (25, ("ccc", "ddd", 0), "ccc ddd", None);
+        WLperson (25, ("ccc", "ddd", 0), Some "Ccc Ddd", None);
         WLnone (50, ", http://site.com/eee#fff");
       ],
-      "[[[aaa/bbb]], [[ccc/ddd]], http://site.com/eee#fff" );
+      "[[[aaa/bbb]], [[ccc/ddd/Ccc Ddd]], http://site.com/eee#fff" );
     ([ WLnone (7, "[[[aaa/") ], "[[[aaa/");
     ([ WLnone (6, "[[[]]]") ], "[[[]]]");
     ([ WLnone (4, "[[[w") ], "[[[w");

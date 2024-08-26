@@ -1,6 +1,6 @@
 type wiki_link =
   | WLpage of int * (string list * string) * string * string * string
-  | WLperson of int * Def.NLDB.key * string * string option
+  | WLperson of int * Def.NLDB.key * string option * string option
   | WLwizard of int * string * string
   | WLnone of int * string
 
