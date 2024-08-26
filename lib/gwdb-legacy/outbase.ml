@@ -58,11 +58,11 @@ let empty_prefix_table () = try
     raise e
 
 let add_prefixes fnt full_name pfx_table pfx_list =
-  print_endline @@ Printf.sprintf "working on %s" full_name;
+  (*  print_endline @@ Printf.sprintf "working on %s" full_name;*)
   let rec aux = function
     |  pfx :: (pfx' :: _ as pfxs) ->
       let index = Dutil.name_index pfx in
-      print_endline @@ Printf.sprintf "adding follow %s of %s at index %d" pfx' pfx index;
+      (*      print_endline @@ Printf.sprintf "adding follow %s of %s at index %d" pfx' pfx index;*)
       Array.set pfx_table index (
         let entry = Array.get pfx_table index in
         let next_prefixes_list =
@@ -80,8 +80,8 @@ let add_prefixes fnt full_name pfx_table pfx_list =
       );
       aux pfxs
     | [pfx] ->
-      print_endline @@ Printf.sprintf "last entry %s" pfx;
-      List.iter (fun s -> print_endline @@ Printf.sprintf "pfx: %s" s) pfx_list;
+      (*print_endline @@ Printf.sprintf "last entry %s" pfx;*)
+      (*List.iter (fun s -> print_endline @@ Printf.sprintf "pfx: %s" s) pfx_list;*)
       let index = Dutil.name_index pfx in
       let entry = Array.get pfx_table index in
       Array.set pfx_table index {
@@ -93,12 +93,12 @@ let add_prefixes fnt full_name pfx_table pfx_list =
       }
     | [] -> ()
   in
-  print_endline @@ Printf.sprintf "fullname is %s" fnt;
+  (*  print_endline @@ Printf.sprintf "fullname is %s" fnt;*)
   aux pfx_list
 
 let make_fsname_prefix_index_aux split get base =
   let t = empty_prefix_table () in
-  print_endline "letsgo";
+  (*print_endline "letsgo";*)
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
     let names = List.map base.data.strings.get (get p) in
@@ -111,7 +111,7 @@ let make_fsname_prefix_index_aux split get base =
         List.iter (add_prefixes full_name_test full_name t) all_prefixes
       ) names
   done;
-  print_endline "yes";
+  (*  print_endline "yes";*)
   let t = Array.map (fun entry -> {
         Dbdisk.has_values = entry.has_values_l;
         next_prefixes =
@@ -123,7 +123,7 @@ let make_fsname_prefix_index_aux split get base =
           |> List.map Dutil.name_index
           |> Array.of_list;
       }) t in
-  print_endline "yes2";
+  (* print_endline "yes2";*)
   t
 
 let make_fname_prefix_index =
