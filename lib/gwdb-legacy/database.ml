@@ -410,7 +410,15 @@ let persons_of_first_name :
         Dutil.compare_snames_i
   | GnWb0020 -> old_persons_of_first_name_or_surname
 
-let persons_of_lower_first_name = function
+let persons_of_lower_first_name :
+    base_version ->
+    base_data ->
+    ('a -> Dutil.IntHT.key list)
+    * (int, person) Hashtbl.t
+    * string
+    * string
+    * string ->
+    Dbdisk.string_person_index = function
   | GnWb0024 -> assert false
   | GnWb0023 | GnWb0022 | GnWb0021 ->
     new_persons_of_first_name_or_surname Dutil.compare_snames_lower
@@ -1365,20 +1373,42 @@ let opendb bname =
             "fnames.inx",
             "fnames.dat",
             bname );
-      persons_of_lower_surname =
-        persons_of_surname version base_data
-          ( (fun p -> p.surname :: p.surnames_aliases),
-            snd patches.h_person,
-            "snames_lower.inx",
-            "snames_lower.dat",
-            bname );
-      persons_of_lower_first_name =
-        persons_of_first_name version base_data
-          ( (fun p -> p.first_name :: p.first_names_aliases),
-            snd patches.h_person,
-            "fnames_lower.inx",
-            "fnames_lower.dat",
-            bname );
+      persons_of_lower_surname = begin
+        if Sys.file_exists (Filename.concat bname "snames_lower.inx") &&
+           Sys.file_exists (Filename.concat bname "snames_lower.acc") then
+          persons_of_lower_surname version base_data
+            ( (fun p -> p.surname :: p.surnames_aliases),
+              snd patches.h_person,
+              "snames_lower.inx",
+              "snames_lower.acc",
+              bname )
+        else
+          persons_of_surname version base_data
+            ( (fun p -> p.surname :: p.surnames_aliases),
+              snd patches.h_person,
+              "snames.inx",
+              "snames.dat",
+              bname );
+      end;
+
+      persons_of_lower_first_name = begin
+        if Sys.file_exists (Filename.concat bname "fnames_lower.inx") &&
+           Sys.file_exists (Filename.concat bname "fnames_lower.acc") then
+          persons_of_lower_first_name version base_data
+            ( (fun p -> p.first_name :: p.first_names_aliases),
+              snd patches.h_person,
+              "fnames_lower.inx",
+              "fnames_lower.acc",
+              bname )
+        else
+          persons_of_first_name version base_data
+            ( (fun p -> p.first_name :: p.first_names_aliases),
+              snd patches.h_person,
+              "fnames.inx",
+              "fnames.dat",
+              bname );
+      end;
+
       patch_person;
       patch_ascend;
       patch_union;

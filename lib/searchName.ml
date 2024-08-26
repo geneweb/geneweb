@@ -10,14 +10,15 @@ type spi = {
 }
 
 let spi_of_fn base =
-  let spi = Gwdb.persons_of_first_name base in
+  let spi = Gwdb.persons_of_lower_first_name base in
   { spi; st = `First }
 
 let spi_of_sn base =
-  let spi = Gwdb.persons_of_surname base in
+  let spi = Gwdb.persons_of_lower_surname base in
   { spi; st = `First }
 
 let start_with base pfx s =
+  let s = Name.lower s in
   let particles = Gwdb.base_particles base in
   let p = Mutil.get_particle particles s in
   let len_particle = String.length p in
@@ -135,12 +136,12 @@ let persons_starting_with ~conf ~base ~first_name_prefix ~surname_prefix ~limit
     | "", "" -> []
     | _, "" ->
         let spi = spi_of_fn base in
-        n_persons_of_prefix limit conf base spi first_name_prefix
+        n_persons_of_prefix limit conf base spi (Name.lower first_name_prefix)
     | "", _ ->
         let spi = spi_of_sn base in
-        n_persons_of_prefix limit conf base spi surname_prefix
+        n_persons_of_prefix limit conf base spi (Name.lower surname_prefix)
     | _, _ ->
-        persons_of_prefixes limit conf base first_name_prefix surname_prefix
+        persons_of_prefixes limit conf base (Name.lower first_name_prefix) (Name.lower surname_prefix)
   in
   let cmp_s proj p1 p2 =
     Utf8.compare (Gwdb.sou base (proj p1)) (Gwdb.sou base (proj p2))
@@ -360,6 +361,13 @@ let print conf base specify unknown =
 let test conf base =
   let pfx = try (List.assoc "fn_pfx" conf.env :> string) with Not_found -> "" in
   let istrs = Gwdb.base_strings_of_first_name_prefix base pfx in
+  let istr2 = Gwdb.base_strings_of_first_name base pfx in
   print_endline "WE FOUND:";
   let r = ref 0 in
-  List.iter (fun istr -> incr r; if !r > 100 then exit 1 else print_endline (Gwdb.sou base istr)) istrs
+  let r2 = ref 0 in
+  print_endline "PFX MODE";
+  List.iter (fun istr -> incr r; if !r > 100 then () else
+                print_endline (Printf.sprintf "%s: %s" (Gwdb.string_of_istr istr) (Gwdb.sou base istr))) istrs;
+  print_endline "FULL MODE";
+  List.iter (fun istr -> incr r2; if !r2 > 100 then () else
+                print_endline (Printf.sprintf "%s: %s" (Gwdb.string_of_istr istr) (Gwdb.sou base istr))) istr2
