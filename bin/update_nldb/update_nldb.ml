@@ -26,9 +26,10 @@ let notes_links s =
           let list_ind =
             let text =
               match (name, text) with
-              | name, None -> Some name
-              | name, Some text when name = "" -> Some text
-              | name, Some text -> Some (name ^ ";" ^ text)
+              | Some name, None -> Some name
+              | Some name, Some text when name = "" -> Some text
+              | Some name, Some text -> Some (name ^ ";" ^ text)
+              | _, _ -> None
             in
             let link = { NLDB.lnTxt = text; lnPos = pos } in
             (key, link) :: list_ind

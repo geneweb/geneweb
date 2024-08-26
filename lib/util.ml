@@ -2470,9 +2470,11 @@ let rec in_text case_sens s m =
     else if m.[i] = '[' && i + 1 < String.length m && m.[i + 1] = '[' then
       match NotesLinks.misc_notes_link m i with
       | NotesLinks.WLpage (j, _, _, _, text)
-      | NotesLinks.WLperson (j, _, text, _)
+      | NotesLinks.WLperson (j, _, Some text, _)
       | NotesLinks.WLwizard (j, _, text) ->
           if in_text case_sens s text then true else loop false j
+      | NotesLinks.WLperson (j, (fn, sn, _), None, _) ->
+          if in_text case_sens s (fn ^ " " ^ sn) then true else loop false j
       | NotesLinks.WLnone (j, _) -> loop false j
     else
       match start_equiv_with case_sens s m i with
