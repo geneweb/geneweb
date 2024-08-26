@@ -410,6 +410,15 @@ let persons_of_first_name :
         Dutil.compare_snames_i
   | GnWb0020 -> old_persons_of_first_name_or_surname
 
+let persons_of_lower_first_name = function
+  | GnWb0024 -> assert false
+  | GnWb0023 | GnWb0022 | GnWb0021 ->
+    new_persons_of_first_name_or_surname Dutil.compare_snames_lower
+      Dutil.compare_snames_i_lower
+  | GnWb0020 -> assert false
+
+let persons_of_lower_surname = persons_of_lower_first_name
+
 let persons_of_surname :
     base_version ->
     base_data ->
@@ -1356,6 +1365,20 @@ let opendb bname =
             "fnames.inx",
             "fnames.dat",
             bname );
+      persons_of_lower_surname =
+        persons_of_surname version base_data
+          ( (fun p -> p.surname :: p.surnames_aliases),
+            snd patches.h_person,
+            "snames_lower.inx",
+            "snames_lower.dat",
+            bname );
+      persons_of_lower_first_name =
+        persons_of_first_name version base_data
+          ( (fun p -> p.first_name :: p.first_names_aliases),
+            snd patches.h_person,
+            "fnames_lower.inx",
+            "fnames_lower.dat",
+            bname );
       patch_person;
       patch_ascend;
       patch_union;
@@ -1427,6 +1450,18 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
           next = (fun _ -> assert false);
         };
       persons_of_first_name =
+        {
+          find = (fun _ -> assert false);
+          cursor = (fun _ -> assert false);
+          next = (fun _ -> assert false);
+        };
+      persons_of_lower_surname =
+        {
+          find = (fun _ -> assert false);
+          cursor = (fun _ -> assert false);
+          next = (fun _ -> assert false);
+        };
+      persons_of_lower_first_name =
         {
           find = (fun _ -> assert false);
           cursor = (fun _ -> assert false);

@@ -353,6 +353,9 @@ type base_func = {
   persons_of_surname : string_person_index;
   (* Search functionalities throughout index by first name *)
   persons_of_first_name : string_person_index;
+  persons_of_lower_surname : string_person_index;
+  (* Search functionalities throughout index by first name *)
+  persons_of_lower_first_name : string_person_index;
   (* Insert or modify person with a giving id (add to pending patches). *)
   patch_person : int -> dsk_person -> unit;
   (* Insert or modify ascendants of a person with a giving id (add to pending patches). *)
