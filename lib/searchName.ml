@@ -95,9 +95,14 @@ let n_persons_of_prefix n conf base spi prefix =
 
 let persons_of_prefixes max conf base fn_pfx sn_pfx =
   let sn_spi = spi_of_sn base in
+  let low_pfx = Name.lower fn_pfx in
+  let fn_pfx = if prefix_exists base sn_spi low_pfx then low_pfx else fn_pfx in
+  let fn_spi = spi_of_fn base in
+  let low_pfx = Name.lower sn_pfx in
+  let sn_pfx = if prefix_exists base fn_spi low_pfx then low_pfx else sn_pfx in
   if
     (not (prefix_exists base sn_spi sn_pfx))
-    || not (prefix_exists base (spi_of_fn base) fn_pfx)
+    || not (prefix_exists base (fn_spi) fn_pfx)
   then []
   else
     let fn_map = Hashtbl.create 100 in
@@ -135,13 +140,17 @@ let persons_starting_with ~conf ~base ~first_name_prefix ~surname_prefix ~limit
     match (first_name_prefix, surname_prefix) with
     | "", "" -> []
     | _, "" ->
-        let spi = spi_of_fn base in
-        n_persons_of_prefix limit conf base spi (Name.lower first_name_prefix)
+      let spi = spi_of_fn base in
+      let low_pfx = Name.lower first_name_prefix in
+      let fn_pfx = if prefix_exists base spi low_pfx then low_pfx else first_name_prefix in
+      n_persons_of_prefix limit conf base spi fn_pfx
     | "", _ ->
-        let spi = spi_of_sn base in
-        n_persons_of_prefix limit conf base spi (Name.lower surname_prefix)
+      let spi = spi_of_sn base in
+      let low_pfx = Name.lower surname_prefix in
+      let sn_pfx = if prefix_exists base spi low_pfx then low_pfx else surname_prefix in
+      n_persons_of_prefix limit conf base spi sn_pfx
     | _, _ ->
-        persons_of_prefixes limit conf base (Name.lower first_name_prefix) (Name.lower surname_prefix)
+        persons_of_prefixes limit conf base (first_name_prefix) (surname_prefix)
   in
   let cmp_s proj p1 p2 =
     Utf8.compare (Gwdb.sou base (proj p1)) (Gwdb.sou base (proj p2))
