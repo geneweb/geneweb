@@ -274,6 +274,59 @@ let output_name_index_aux cmp get base names_inx names_dat =
   Dutil.output_value_no_sharing oc_n_inx (bt2 : (int * int) array);
   close_out oc_n_inx
 
+let output_name_index_lower_aux cmp get base names_inx names_dat =
+  let ht = Dutil.IntHT.create 0 in
+  let ht_mem = Dutil.IntHT.create 0 in
+  let particles_re = Mutil.compile_particles base.data.particles_txt in
+  let strip_particle s =
+    let par = Mutil.get_particle particles_re s in
+    let par_len = String.length par in
+    String.sub s par_len (String.length s - par_len)
+  in
+  let gets istr = match Dutil.IntHT.find_opt ht_mem istr with
+      Some istr -> istr
+    | None ->
+      let s = Name.lower (strip_particle (base.data.strings.get istr)) in
+      let istr' = base.func.insert_string s in
+      Dutil.IntHT.add ht_mem istr istr';
+      istr'
+  in
+
+  for i = 0 to base.data.persons.len - 1 do
+    print_endline @@ Printf.sprintf "working with %d" i;
+    let p = base.data.persons.get i in
+    let ks = List.map (fun istr -> gets istr) (get p) in
+    List.iter
+      (fun k ->
+        match Dutil.IntHT.find_opt ht k with
+        | Some list -> Dutil.IntHT.replace ht k (p.key_index :: list)
+        | None -> Dutil.IntHT.add ht k [ p.key_index ])
+      ks
+  done;
+  let a = Array.make (Dutil.IntHT.length ht) (0, []) in
+  ignore
+  @@ Dutil.IntHT.fold
+       (fun k v i ->
+         Array.set a i (k, v);
+         succ i)
+       ht 0;
+  (* sort by name behind the int order *)
+  Array.sort (fun (k, _) (k', _) -> cmp k k') a;
+  let oc_n_dat = Secure.open_out_bin names_dat in
+  let bt2 =
+    Array.map
+      (fun (k, ipl) ->
+        let off = pos_out oc_n_dat in
+        output_binary_int oc_n_dat (List.length ipl);
+        List.iter (output_binary_int oc_n_dat) ipl;
+        (k, off))
+      a
+  in
+  close_out oc_n_dat;
+  let oc_n_inx = Secure.open_out_bin names_inx in
+  Dutil.output_value_no_sharing oc_n_inx (bt2 : (int * int) array);
+  close_out oc_n_inx
+
 let output_surname_index base tmp_snames_inx tmp_snames_dat =
   output_name_index_aux
     (Dutil.compare_snames_i base.data)
@@ -288,14 +341,14 @@ let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
     base tmp_fnames_inx tmp_fnames_dat
 
 let output_surname_lower_index base tmp_snames_inx tmp_snames_dat =
-  output_name_index_aux
+  output_name_index_lower_aux
     (Dutil.compare_snames_i_lower base.data)
     (fun p -> p.surname :: p.surnames_aliases)
     base tmp_snames_inx tmp_snames_dat
 
 (* FIXME: switch to Dutil.compare_snames_i *)
 let output_first_name_lower_index base tmp_fnames_inx tmp_fnames_dat =
-  output_name_index_aux
+  output_name_index_lower_aux
     (Dutil.compare_snames_i_lower base.data)
     (fun p -> p.first_name :: p.first_names_aliases)
     base tmp_fnames_inx tmp_fnames_dat
@@ -334,6 +387,12 @@ let output ?(save_mem = false) base =
   load_unions_array base;
   load_couples_array base;
   load_descends_array base;
+  load_strings_array base;
+  trace "create first name lower index";
+  output_first_name_lower_index base tmp_fnames_lower_inx tmp_fnames_lower_dat;
+  trace "create surname lower index";
+  output_surname_lower_index base tmp_snames_lower_inx tmp_snames_lower_dat;
+  base.func.commit_patches ();
   load_strings_array base;
   let oc = Secure.open_out_bin tmp_base in
   let oc_acc = Secure.open_out_bin tmp_base_acc in
@@ -443,16 +502,6 @@ let output ?(save_mem = false) base =
           Gc.compact ());
         trace "create first name index";
         output_first_name_index base tmp_fnames_inx tmp_fnames_dat;
-        if save_mem then (
-          trace "compacting";
-          Gc.compact ());
-        trace "create first name lower index";
-        output_first_name_lower_index base tmp_fnames_lower_inx tmp_fnames_lower_dat;
-        if save_mem then (
-          trace "compacting";
-          Gc.compact ());
-        trace "create surname lower index";
-        output_surname_index base tmp_snames_lower_inx tmp_snames_lower_dat;
         let s = base.data.bnotes.Def.nread "" Def.RnAll in
         (if s = "" then ()
         else

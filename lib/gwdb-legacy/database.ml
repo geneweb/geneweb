@@ -1375,12 +1375,12 @@ let opendb bname =
             bname );
       persons_of_lower_surname = begin
         if Sys.file_exists (Filename.concat bname "snames_lower.inx") &&
-           Sys.file_exists (Filename.concat bname "snames_lower.acc") then
+           Sys.file_exists (Filename.concat bname "snames_lower.dat") then
           persons_of_lower_surname version base_data
             ( (fun p -> p.surname :: p.surnames_aliases),
               snd patches.h_person,
               "snames_lower.inx",
-              "snames_lower.acc",
+              "snames_lower.dat",
               bname )
         else
           persons_of_surname version base_data
@@ -1393,12 +1393,12 @@ let opendb bname =
 
       persons_of_lower_first_name = begin
         if Sys.file_exists (Filename.concat bname "fnames_lower.inx") &&
-           Sys.file_exists (Filename.concat bname "fnames_lower.acc") then
+           Sys.file_exists (Filename.concat bname "fnames_lower.dat") then
           persons_of_lower_first_name version base_data
             ( (fun p -> p.first_name :: p.first_names_aliases),
               snd patches.h_person,
               "fnames_lower.inx",
-              "fnames_lower.acc",
+              "fnames_lower.dat",
               bname )
         else
           persons_of_first_name version base_data

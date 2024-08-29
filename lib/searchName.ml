@@ -19,6 +19,7 @@ let spi_of_sn base =
 
 let start_with base pfx s =
   let s = Name.lower s in
+  let pfx = Name.lower pfx in
   let particles = Gwdb.base_particles base in
   let p = Mutil.get_particle particles s in
   let len_particle = String.length p in
@@ -29,10 +30,14 @@ let ipers_of_prefix base spi prefix =
   let istr_o =
     try
       match spi.st with
-      | `First -> Some (Gwdb.spi_first spi.spi prefix)
+      | `First ->
+        let istr = Gwdb.spi_first spi.spi prefix in
+        print_endline @@ Printf.sprintf "First %d %s" (Obj.magic istr) (Gwdb.sou base istr);
+        Some istr
       | `Current istr ->
-          let istr' = Gwdb.spi_next spi.spi istr in
-          if Gwdb.compare_istr istr istr' <> 0 then Some istr' else None
+        let istr' = Gwdb.spi_next spi.spi istr in
+        print_endline @@ Printf.sprintf "Current %d %s" (Obj.magic istr') (Gwdb.sou base istr');
+        if Gwdb.compare_istr istr istr' <> 0 then Some istr' else None
     with Not_found -> None
   in
   Option.bind istr_o (fun istr ->
@@ -95,14 +100,14 @@ let n_persons_of_prefix n conf base spi prefix =
 
 let persons_of_prefixes max conf base fn_pfx sn_pfx =
   let sn_spi = spi_of_sn base in
-  let low_pfx = Name.lower fn_pfx in
-  let fn_pfx = if prefix_exists base sn_spi low_pfx then low_pfx else fn_pfx in
+(*  let low_pfx = Name.lower fn_pfx in
+    let fn_pfx = if prefix_exists base sn_spi low_pfx then low_pfx else fn_pfx in*)
   let fn_spi = spi_of_fn base in
-  let low_pfx = Name.lower sn_pfx in
-  let sn_pfx = if prefix_exists base fn_spi low_pfx then low_pfx else sn_pfx in
+(*  let low_pfx = Name.lower sn_pfx in
+    let sn_pfx = if prefix_exists base fn_spi low_pfx then low_pfx else sn_pfx in*)
   if
     (not (prefix_exists base sn_spi sn_pfx))
-    || not (prefix_exists base (fn_spi) fn_pfx)
+    || not (prefix_exists base fn_spi fn_pfx)
   then []
   else
     let fn_map = Hashtbl.create 100 in
@@ -141,14 +146,14 @@ let persons_starting_with ~conf ~base ~first_name_prefix ~surname_prefix ~limit
     | "", "" -> []
     | _, "" ->
       let spi = spi_of_fn base in
-      let low_pfx = Name.lower first_name_prefix in
-      let fn_pfx = if prefix_exists base spi low_pfx then low_pfx else first_name_prefix in
-      n_persons_of_prefix limit conf base spi fn_pfx
+      (*let low_pfx = Name.lower first_name_prefix in
+        let fn_pfx = if prefix_exists base spi low_pfx then low_pfx else first_name_prefix in*)
+      n_persons_of_prefix limit conf base spi first_name_prefix
     | "", _ ->
       let spi = spi_of_sn base in
-      let low_pfx = Name.lower surname_prefix in
-      let sn_pfx = if prefix_exists base spi low_pfx then low_pfx else surname_prefix in
-      n_persons_of_prefix limit conf base spi sn_pfx
+(*      let low_pfx = Name.lower surname_prefix in
+        let sn_pfx = if prefix_exists base spi low_pfx then low_pfx else surname_prefix in*)
+      n_persons_of_prefix limit conf base spi surname_prefix
     | _, _ ->
         persons_of_prefixes limit conf base (first_name_prefix) (surname_prefix)
   in
