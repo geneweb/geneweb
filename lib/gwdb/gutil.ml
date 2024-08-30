@@ -260,21 +260,17 @@ let find_free_occ base f s =
   let ipl = Gwdb.persons_of_name base (f ^ " " ^ s) in
   let first_name = Name.lower f in
   let surname = Name.lower s in
-  let list_occ =
-    let rec loop list = function
-      | ip :: ipl ->
-          let p = Gwdb.poi base ip in
-          if
-            (not (List.mem (Gwdb.get_occ p) list))
-            && first_name = Name.lower (Gwdb.p_first_name base p)
-            && surname = Name.lower (Gwdb.p_surname base p)
-          then loop (Gwdb.get_occ p :: list) ipl
-          else loop list ipl
-      | [] -> list
-    in
-    loop [] ipl
+  let occurrence_numbers =
+    ipl
+    |> List.filter_map (fun ip ->
+           let p = Gwdb.poi base ip in
+           Ext_option.return_if
+             (first_name = Name.lower (Gwdb.p_first_name base p)
+             && surname = Name.lower (Gwdb.p_surname base p))
+             (fun () -> Gwdb.get_occ p))
+    |> Ext_int.Set.of_list
   in
-  let list_occ = List.sort compare list_occ in
+  let list_occ = Ext_int.Set.elements occurrence_numbers in
   let rec loop cnt1 = function
     | cnt2 :: list -> if cnt1 = cnt2 then loop (cnt1 + 1) list else cnt1
     | [] -> cnt1
