@@ -194,12 +194,7 @@ let alphabetic_iso_8859_1 n1 n2 =
   if n1 = n2 then 0 else loop (Mutil.initial n1) (Mutil.initial n2)
 
 (* ??? *)
-let alphabetic n1 n2 =
-  (*
-    if Mutil.utf_8_db.val then alphabetic_utf_8 n1 n2 else alphabetic_iso_8859_1 n1 n2
-  *)
-  alphabetic_iso_8859_1 n1 n2
-
+let alphabetic n1 n2 = alphabetic_iso_8859_1 n1 n2
 let alphabetic_order n1 n2 = alphabetic_utf_8 n1 n2
 
 let arg_list_of_string line =
