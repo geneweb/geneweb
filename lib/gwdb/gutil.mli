@@ -70,6 +70,12 @@ val couple : bool -> 'a -> 'a -> 'a Def.gen_couple
 val parent_array : 'a Def.gen_couple -> 'a array
 (** Same as [Adef.parent_array] *)
 
+val homonyms :
+  base:Gwdb.base -> first_name:string -> surname:string -> Gwdb.iper list
+
+val get_all_occurrence_numbers :
+  base:Gwdb.base -> first_name:string -> surname:string -> Ext_int.Set.t
+
 val find_free_occ : Gwdb.base -> string -> string -> int
 (** Find first free occurence number for the person with specified first name
     and surname. *)
