@@ -256,19 +256,22 @@ let sort_person_list_aux sort base =
 let sort_person_list = sort_person_list_aux List.sort
 let sort_uniq_person_list = sort_person_list_aux List.sort_uniq
 
+let get_all_occurrence_numbers ~base ~first_name ~surname =
+  let ipl = Gwdb.persons_of_name base (first_name ^ " " ^ surname) in
+  let first_name = Name.lower first_name in
+  let surname = Name.lower surname in
+  ipl
+  |> List.filter_map (fun ip ->
+         let p = Gwdb.poi base ip in
+         Ext_option.return_if
+           (first_name = Name.lower (Gwdb.p_first_name base p)
+           && surname = Name.lower (Gwdb.p_surname base p))
+           (fun () -> Gwdb.get_occ p))
+  |> Ext_int.Set.of_list
+
 let find_free_occ base f s =
-  let ipl = Gwdb.persons_of_name base (f ^ " " ^ s) in
-  let first_name = Name.lower f in
-  let surname = Name.lower s in
   let occurrence_numbers =
-    ipl
-    |> List.filter_map (fun ip ->
-           let p = Gwdb.poi base ip in
-           Ext_option.return_if
-             (first_name = Name.lower (Gwdb.p_first_name base p)
-             && surname = Name.lower (Gwdb.p_surname base p))
-             (fun () -> Gwdb.get_occ p))
-    |> Ext_int.Set.of_list
+    get_all_occurrence_numbers ~base ~first_name:f ~surname:s
   in
   let list_occ = Ext_int.Set.elements occurrence_numbers in
   let rec loop cnt1 = function
