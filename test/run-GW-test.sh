@@ -172,6 +172,7 @@ crl () {
   elif grep $GREPOPT "var.nb_errors.=" /tmp/tmp.txt; then
     # analyse potential error reported by time_debug (in lib/util.ml)
     if ! grep $GREPOPT "var.nb_errors.=.0" /tmp/tmp.txt; then
+      echo "error reported for ${urlprfix}w=$PWD&$cmd"
       nberr=$(grep "var.nb_errors.=" /tmp/tmp.txt | sed -e 's/.*= \(.*\);.*/\1/')
       test -n "$tstmsg" && echo "Failed $tstmsg, $nberr detected error(s)"
       grep "var.errors_list.=" /tmp/tmp.txt;
