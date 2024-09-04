@@ -1,6 +1,9 @@
 let smallest_free occurrence_numbers =
-  let rec loop cnt1 = function
-    | cnt2 :: list -> if cnt1 = cnt2 then loop (cnt1 + 1) list else cnt1
-    | [] -> cnt1
+  let rec loop maybe_free_occurrence_number = function
+    | occurrence_number :: occurrence_numbers ->
+        if maybe_free_occurrence_number = occurrence_number then
+          loop (maybe_free_occurrence_number + 1) occurrence_numbers
+        else maybe_free_occurrence_number
+    | [] -> maybe_free_occurrence_number
   in
   loop 0 (Ext_int.Set.elements occurrence_numbers)
