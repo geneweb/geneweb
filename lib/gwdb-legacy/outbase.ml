@@ -158,6 +158,107 @@ let output_name_index_aux cmp get base names_inx names_dat =
   Dutil.output_value_no_sharing oc_n_inx (bt2 : (int * int) array);
   close_out oc_n_inx
 
+module StringData : sig
+  type t
+
+  val of_base : Dbdisk.dsk_base -> t
+  val insert_string : t -> string -> int
+  val swap_strings_array : Dbdisk.dsk_base -> t -> unit
+end = struct
+  type t = (string, int) Hashtbl.t
+
+  (* For every entry in the strings array register it in a Hashtbl to perform reverse lookup (find the id of a given string in the base) *)
+  let strings_ht_of_strings_array base =
+    let len = base.data.strings.len in
+    let ht : (string, int) Hashtbl.t = Hashtbl.create len in
+    for i = 0 to len - 1 do
+      Hashtbl.add ht (base.data.strings.get i) i
+    done;
+    ht
+
+  let of_base = strings_ht_of_strings_array
+
+  let insert_string (ht : (string, int) Hashtbl.t) (s : string) =
+    try Hashtbl.find ht s
+    with Not_found ->
+      let len = Hashtbl.length ht in
+      Hashtbl.add ht s len;
+      len
+
+  (* Set the content of the base strings array to be the provided string data *)
+  let swap_strings_array base ht =
+    let len = Hashtbl.length ht in
+    let arr = Array.make len "" in
+    Hashtbl.iter (fun k v -> arr.(v) <- k) ht;
+    base.data.strings.set_array arr
+end
+
+let output_name_index_lower_aux strings_store cmp get base names_inx names_dat =
+  (* Hashtable associating a string id with the list of correspong persons' ids *)
+  let ht = Dutil.IntHT.create 0 in
+  (* Hashtable associating the id of a strings and the id of its lowered form *)
+  let ht_mem = Dutil.IntHT.create 0 in
+  let particles_re = Mutil.compile_particles base.data.particles_txt in
+  let strip_particle s =
+    let par = Mutil.get_particle particles_re s in
+    let par_len = String.length par in
+    String.sub s par_len (String.length s - par_len)
+  in
+  let get_lowered_string_id istr =
+    match Dutil.IntHT.find_opt ht_mem istr with
+    | Some istr -> istr
+    | None ->
+        (* strip the string particle, lower it and add it to the strings data, return the id of the new string*)
+        let s = Name.lower (strip_particle (base.data.strings.get istr)) in
+        let istr' = StringData.insert_string strings_store s in
+        Dutil.IntHT.add ht_mem istr istr';
+        istr'
+  in
+
+  (* add every person to their corresponding string ids *)
+  for i = 0 to base.data.persons.len - 1 do
+    let p = base.data.persons.get i in
+    let lowered_string_ids =
+      List.map (fun istr -> get_lowered_string_id istr) (get p)
+    in
+    List.iter
+      (fun id ->
+        match Dutil.IntHT.find_opt ht id with
+        | Some list -> Dutil.IntHT.replace ht id (p.key_index :: list)
+        | None -> Dutil.IntHT.add ht id [ p.key_index ])
+      lowered_string_ids
+  done;
+
+  let a = Array.make (Dutil.IntHT.length ht) (0, []) in
+
+  ignore
+  @@ Dutil.IntHT.fold
+       (fun k v i ->
+         Array.set a i (k, v);
+         succ i)
+       ht 0;
+
+  (* Sorting will need the new ids to be in the base strings array *)
+  StringData.swap_strings_array base strings_store;
+
+  (* sort the persons' ids by name *)
+  Array.sort (fun (k, _) (k', _) -> cmp k k') a;
+
+  let oc_n_dat = Secure.open_out_bin names_dat in
+  let bt2 =
+    Array.map
+      (fun (k, ipl) ->
+        let off = pos_out oc_n_dat in
+        output_binary_int oc_n_dat (List.length ipl);
+        List.iter (output_binary_int oc_n_dat) ipl;
+        (k, off))
+      a
+  in
+  close_out oc_n_dat;
+  let oc_n_inx = Secure.open_out_bin names_inx in
+  Dutil.output_value_no_sharing oc_n_inx (bt2 : (int * int) array);
+  close_out oc_n_inx
+
 let output_surname_index base tmp_snames_inx tmp_snames_dat =
   output_name_index_aux
     (Dutil.compare_snames_i base.data)
@@ -168,6 +269,20 @@ let output_surname_index base tmp_snames_inx tmp_snames_dat =
 let output_first_name_index base tmp_fnames_inx tmp_fnames_dat =
   output_name_index_aux
     (Dutil.compare_snames_i base.data)
+    (fun p -> p.first_name :: p.first_names_aliases)
+    base tmp_fnames_inx tmp_fnames_dat
+
+let output_surname_lower_index strings_ht base tmp_snames_inx tmp_snames_dat =
+  output_name_index_lower_aux strings_ht
+    (Dutil.compare_snames_i_lower base.data)
+    (fun p -> p.surname :: p.surnames_aliases)
+    base tmp_snames_inx tmp_snames_dat
+
+(* FIXME: switch to Dutil.compare_snames_i *)
+let output_first_name_lower_index strings_ht base tmp_fnames_inx tmp_fnames_dat
+    =
+  output_name_index_lower_aux strings_ht
+    (Dutil.compare_snames_i_lower base.data)
     (fun p -> p.first_name :: p.first_names_aliases)
     base tmp_fnames_inx tmp_fnames_dat
 
@@ -192,6 +307,10 @@ let output ?(save_mem = false) ?(tasks = []) base =
   let tmp_snames_dat = Filename.concat bname "1snames.dat" in
   let tmp_fnames_inx = Filename.concat bname "1fnames.inx" in
   let tmp_fnames_dat = Filename.concat bname "1fnames.dat" in
+  let tmp_snames_lower_inx = Filename.concat bname "1snames_lower.inx" in
+  let tmp_snames_lower_dat = Filename.concat bname "1snames_lower.dat" in
+  let tmp_fnames_lower_inx = Filename.concat bname "1fnames_lower.inx" in
+  let tmp_fnames_lower_dat = Filename.concat bname "1fnames_lower.dat" in
   let tmp_strings_inx = Filename.concat bname "1strings.inx" in
   let tmp_notes = Filename.concat bname "1notes" in
   let tmp_notes_d = Filename.concat bname "1notes_d" in
@@ -200,6 +319,13 @@ let output ?(save_mem = false) ?(tasks = []) base =
   load_couples_array base;
   load_descends_array base;
   load_strings_array base;
+  let strings_data = StringData.of_base base in
+  trace "create first name lower index";
+  output_first_name_lower_index strings_data base tmp_fnames_lower_inx
+    tmp_fnames_lower_dat;
+  trace "create surname lower index";
+  output_surname_lower_index strings_data base tmp_snames_lower_inx
+    tmp_snames_lower_dat;
   let oc = Secure.open_out_bin tmp_base in
   let oc_acc = Secure.open_out_bin tmp_base_acc in
   let output_array arrname arr =
@@ -367,6 +493,16 @@ let output ?(save_mem = false) ?(tasks = []) base =
   Sys.rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
   Files.rm (Filename.concat bname "fnames.inx");
   Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
+
+  Files.rm (Filename.concat bname "snames_lower.dat");
+  Sys.rename tmp_snames_lower_dat (Filename.concat bname "snames_lower.dat");
+  Files.rm (Filename.concat bname "snames_lower.inx");
+  Sys.rename tmp_snames_lower_inx (Filename.concat bname "snames_lower.inx");
+  Files.rm (Filename.concat bname "fnames_lower.dat");
+  Sys.rename tmp_fnames_lower_dat (Filename.concat bname "fnames_lower.dat");
+  Files.rm (Filename.concat bname "fnames_lower.inx");
+  Sys.rename tmp_fnames_lower_inx (Filename.concat bname "fnames_lower.inx");
+
   Files.rm (Filename.concat bname "strings.inx");
   Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");
   Sys.rename tmp_particles (Filename.concat bname "particles.txt");

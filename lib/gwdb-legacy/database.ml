@@ -763,6 +763,14 @@ let make_record_access ic ic_acc shift array_pos (plenr, patches) (_, pending)
         (fun () ->
           cleared := true;
           tab := None);
+      set_array =
+        (fun arr ->
+          let len = Array.length arr in
+          r.len <- len;
+          Hashtbl.clear patches;
+          Hashtbl.clear pending;
+          plenr := 0;
+          tab := Some arr);
     }
   in
   r
@@ -1258,15 +1266,24 @@ let opendb bname =
   { data = base_data; func = base_func; version }
 
 let record_access_of tab =
-  {
-    Dbdisk.load_array = (fun () -> ());
-    get = (fun i -> tab.(i));
-    get_nopending = (fun i -> tab.(i));
-    set = (fun i v -> tab.(i) <- v);
-    output_array = (fun oc -> Dutil.output_value_no_sharing oc (tab : _ array));
-    len = Array.length tab;
-    clear_array = (fun () -> ());
-  }
+  let tab = ref tab in
+  let rec r =
+    {
+      Dbdisk.load_array = (fun () -> ());
+      get = (fun i -> !tab.(i));
+      get_nopending = (fun i -> !tab.(i));
+      set = (fun i v -> !tab.(i) <- v);
+      output_array =
+        (fun oc -> Dutil.output_value_no_sharing oc (!tab : _ array));
+      len = Array.length !tab;
+      clear_array = (fun () -> ());
+      set_array =
+        (fun arr ->
+          r.len <- Array.length arr;
+          tab := arr);
+    }
+  in
+  r
 
 let make bname particles ((persons, families, strings, bnotes) as _arrays) :
     Dbdisk.dsk_base =

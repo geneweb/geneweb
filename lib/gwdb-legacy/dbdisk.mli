@@ -281,6 +281,8 @@ type 'a record_access = {
   output_array : out_channel -> unit;
   (* Remove array from the memory *)
   clear_array : unit -> unit;
+  (* Change the underlying array and update len accordingly *)
+  set_array : 'a array -> unit;
 }
 (** Type that define the functions to use to access and manipulate with
     database arrays. *)
