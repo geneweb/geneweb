@@ -82,6 +82,7 @@ val stop_server : string ref
     that this file exits. Default "STOP_SERVER". Can have relative
     or absolute path. *)
 
+val request_timeout : unit -> unit
 val set_on_timeout : (int -> unit) -> unit
 
 val cgi : bool ref

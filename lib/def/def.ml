@@ -11,6 +11,7 @@ type httpStatus =
   | Conflict (* 409 *)
   | Internal_Server_Error (* 500 *)
   | Service_Unavailable (* 503 *)
+  | Gateway_Timeout (* 504 *)
 
 exception HttpExn of httpStatus * string
 
