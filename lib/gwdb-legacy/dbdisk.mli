@@ -357,6 +357,10 @@ type base_func = {
   persons_of_surname : string_person_index;
   (* Search functionalities throughout index by first name *)
   persons_of_first_name : string_person_index;
+  (* Search functionalities throughout lower index by surname *)
+  persons_of_lower_surname : string_person_index;
+  (* Search functionalities throughout lower index by first name *)
+  persons_of_lower_first_name : string_person_index;
   (* Insert or modify person with a giving id (add to pending patches). *)
   patch_person : int -> dsk_person -> unit;
   (* Insert or modify ascendants of a person with a giving id (add to pending patches). *)
@@ -393,6 +397,9 @@ type base_func = {
   (* Tells if family with giving id exists in the base.
      Pending patches are also considered. *)
   ifam_exists : int -> bool;
+  (* Stream of iper list matching a given surname/first name prefix, each list corresponds to a different matched surname/first name. *)
+  persons_stream_of_surname_prefix : string -> int list Stream.t;
+  persons_stream_of_first_name_prefix : string -> int list Stream.t;
 }
 (** Functionality part of database. Every modification of the base is stored in {i patches} file.
     Note that, every modification firstly is pendent and should be commited
