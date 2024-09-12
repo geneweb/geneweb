@@ -89,7 +89,10 @@ val check_family :
   Config.config ->
   (string * string * _ * _ * _, _, string) Def.gen_family ->
   (string * string * _ * _ * _) Def.gen_couple ->
-  Update.update_error option * Update.update_error option
+  (string * string * _ * _ * _) Def.gen_descend ->
+  Update.update_error option
+  * Update.update_error option
+  * Update.update_error option
 (** [check_family conf fam cpl]
     Checks that no name is missing.
 *)

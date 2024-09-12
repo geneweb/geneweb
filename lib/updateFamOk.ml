@@ -27,7 +27,7 @@ let reconstitute_parent_or_child conf var default_surname =
   let first_name = only_printable (getn conf var "fn") in
   let surname =
     let surname = only_printable (getn conf var "sn") in
-    if surname = "" then default_surname else surname
+    if surname = "" && first_name <> "" then default_surname else surname
   in
   (* S'il y a des caractères interdits, on les supprime *)
   let first_name, surname = get_purged_fn_sn first_name surname in
@@ -582,15 +582,37 @@ let check_parents conf cpl =
   | Some _ as err -> err
   | None -> check Gutil.mother 1
 
-let check_family conf fam cpl :
-    Update.update_error option * Update.update_error option =
+let check_child conf p =
+  let fn, sn, _, _, _ = p in
+  if fn = "" && sn <> "" then (
+    Some
+      (Update.UERR_missing_first_name
+         (transl_nth conf "child/children" 0 |> Adef.safe)))
+  else None
+
+let check_children conf children =
+  let len = Array.length children in
+  let rec aux i =
+    if i >= len then None
+    else
+      match check_child conf children.(i) with
+      | Some _ as err_o -> err_o
+      | None -> aux (succ i)
+  in
+  aux 0
+
+let check_family conf fam cpl des :
+    Update.update_error option
+    * Update.update_error option
+    * Update.update_error option =
   let err_parents = check_parents conf cpl in
   let err_fevent_witness =
     Update.check_missing_witnesses_names conf
       (fun e -> e.efam_witnesses)
       fam.fevents
   in
-  (err_fevent_witness, err_parents)
+  let err_children = check_children conf des.children in
+  (err_fevent_witness, err_parents, err_children)
 
 let strip_family fam des =
   let fam =
@@ -1246,9 +1268,9 @@ let print_add o_conf base =
   else if forbidden_disconnected conf scpl sdes then
     print_error_disconnected conf
   else
-    match check_family conf sfam scpl with
-    | Some err, _ | _, Some err -> error_family conf err
-    | None, None ->
+    match check_family conf sfam scpl sdes with
+    | Some err, _, _ | _, Some err, _ | _, _, Some err -> error_family conf err
+    | None, None, None ->
         let sfam, sdes = strip_family sfam sdes in
         let nsck = p_getenv conf.env "nsck" = Some "on" in
         let ifam, fam, cpl, des = effective_add conf base nsck sfam scpl sdes in
@@ -1384,9 +1406,10 @@ let print_mod_aux conf base callback =
     if ext || redisp then
       UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
     else
-      match check_family conf sfam scpl with
-      | Some err, _ | _, Some err -> error_family conf err
-      | None, None ->
+      match check_family conf sfam scpl sdes with
+      | Some err, _, _ | _, Some err, _ | _, _, Some err ->
+          error_family conf err
+      | None, None, None ->
           let sfam, sdes = strip_family sfam sdes in
           callback sfam scpl sdes
   else Update.error_digest conf
