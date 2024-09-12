@@ -37,3 +37,13 @@ val print :
 (** [Description] : Recherche qui n'utilise que 2 inputs. On essai donc de
       trouver la meilleure combinaison de résultat pour afficher la réponse
       la plus probable.                                                     *)
+
+val persons_starting_with :
+  conf:Config.config ->
+  base:Gwdb.base ->
+  first_name_prefix:string ->
+  surname_prefix:string ->
+  limit:int ->
+  Gwdb.person list
+
+val test : Config.config -> Gwdb.base -> unit
