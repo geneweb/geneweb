@@ -58,6 +58,16 @@ let compare_snames_i base_data is1 is2 =
       (base_data.strings.get is1)
       (base_data.strings.get is2)
 
+let compare_snames_lower base_data s1 s2 =
+  compare_snames base_data (Name.lower s1) (Name.lower s2)
+
+let compare_snames_i_lower base_data is1 is2 =
+  if is1 = is2 then 0
+  else
+    compare_snames_lower base_data
+      (base_data.Dbdisk.strings.get is1)
+      (base_data.Dbdisk.strings.get is2)
+
 let compare_fnames = String.compare
 
 let compare_fnames_i base_data is1 is2 =
