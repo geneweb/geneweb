@@ -424,6 +424,23 @@ let persons_of_surname :
         Dutil.compare_snames_i
   | GnWb0020 -> old_persons_of_first_name_or_surname
 
+let persons_of_lower_fs_name :
+    base_version ->
+    base_data ->
+    ('a -> Dutil.IntHT.key list)
+    * (int, person) Hashtbl.t
+    * string
+    * string
+    * string ->
+    Dbdisk.string_person_index = function
+  | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 ->
+      new_persons_of_first_name_or_surname Dutil.compare_snames_lower
+        Dutil.compare_snames_i_lower
+  | GnWb0020 ->
+      Printf.eprintf "GnWb0020 does not support lowered names indexes\n";
+      flush stderr;
+      failwith "Unsupported geneweb version"
+
 (* Search index for a given name in file names.inx *)
 
 let persons_of_name bname patches =
@@ -851,6 +868,100 @@ let person_of_key (persons : person record_access) strings persons_of_name
   in
   find ipl
 
+type spi_stream = {
+  spi : Dbdisk.string_person_index;
+  mutable st : [ `First | `Current of int ];
+  predicate_cache : (int, bool) Hashtbl.t;
+}
+
+let spi_stream_of_spi spi =
+  { spi; st = `First; predicate_cache = Hashtbl.create 10 }
+
+let ipers_of_prefix base_data predicate spi prefix =
+  let istr_o =
+    try
+      match spi.st with
+      | `First ->
+          let istr = spi.spi.cursor prefix in
+          Some istr
+      | `Current istr ->
+          let istr' = spi.spi.next istr in
+          if Int.compare istr istr' <> 0 then Some istr' else None
+    with Not_found -> None
+  in
+  Option.bind istr_o (fun istr ->
+      spi.st <- `Current istr;
+      let s = base_data.strings.get istr in
+      if predicate base_data prefix s then Some (spi.spi.find istr) else None)
+
+let prefix_exists base_data predicate spi prefix =
+  try
+    let istr = spi.spi.cursor prefix in
+    let s = base_data.strings.get istr in
+    predicate base_data prefix s
+  with Not_found -> false
+
+let strip_particle base_data =
+  let particles = Mutil.compile_particles base_data.particles_txt in
+  fun s ->
+    let p = Mutil.get_particle particles s in
+    let len_particle = String.length p in
+    String.sub s len_particle (String.length s - len_particle)
+
+let start_with lower base_data pfx s =
+  let s = strip_particle base_data s in
+  let s = if lower then Name.lower s else s in
+  Ext_string.start_with pfx 0 s
+
+let ipers_list_stream_of_prefix base_data predicate spi prefix =
+  if not (prefix_exists base_data predicate spi prefix) then
+    Stream.from (fun _ -> None)
+  else Stream.from (fun _ -> ipers_of_prefix base_data predicate spi prefix)
+
+let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
+    ~dat_fname ~proj ~base_data ~version ~patches ~gen_default_spi prefix =
+  let predicate, prefix, spi =
+    (* check if lowered names indexes files exist *)
+    if
+      Sys.file_exists (Filename.concat base_data.bdir inx_lower_fname)
+      && Sys.file_exists (Filename.concat base_data.bdir dat_lower_fname)
+    then
+      let spi =
+        persons_of_lower_fs_name version base_data
+          ( proj,
+            snd patches.h_person,
+            inx_lower_fname,
+            dat_lower_fname,
+            base_data.bdir )
+      in
+      let predicate = start_with true in
+      let prefix = Name.lower (strip_particle base_data prefix) in
+      (predicate, prefix, spi)
+    else
+      let spi =
+        persons_of_surname version base_data
+          (proj, snd patches.h_person, inx_fname, dat_fname, base_data.bdir)
+      in
+      let predicate = start_with false in
+      let prefix = strip_particle base_data prefix in
+      (predicate, prefix, spi)
+  in
+  ipers_list_stream_of_prefix base_data predicate (spi_stream_of_spi spi) prefix
+
+let persons_stream_of_first_name_prefix =
+  persons_stream_of_prefix ~inx_lower_fname:"fnames_lower.inx"
+    ~dat_lower_fname:"fnames_lower.dat" ~inx_fname:"fnames.inx"
+    ~dat_fname:"fnames.dat"
+    ~proj:(fun p -> p.first_name :: p.first_names_aliases)
+    ~gen_default_spi:persons_of_first_name
+
+let persons_stream_of_surname_prefix =
+  persons_stream_of_prefix ~inx_lower_fname:"snames_lower.inx"
+    ~dat_lower_fname:"snames_lower.dat" ~inx_fname:"snames.inx"
+    ~dat_fname:"snames.dat"
+    ~proj:(fun p -> p.surname :: p.surnames_aliases)
+    ~gen_default_spi:persons_of_surname
+
 let opendb bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
@@ -1246,6 +1357,46 @@ let opendb bname =
             "fnames.inx",
             "fnames.dat",
             bname );
+      persons_of_lower_surname =
+        (if
+         Sys.file_exists (Filename.concat bname "snames_lower.inx")
+         && Sys.file_exists (Filename.concat bname "snames_lower.dat")
+        then
+         persons_of_lower_fs_name version base_data
+           ( (fun p -> p.surname :: p.surnames_aliases),
+             snd patches.h_person,
+             "snames_lower.inx",
+             "snames_lower.dat",
+             bname )
+        else
+          persons_of_surname version base_data
+            ( (fun p -> p.surname :: p.surnames_aliases),
+              snd patches.h_person,
+              "snames.inx",
+              "snames.dat",
+              bname ));
+      persons_of_lower_first_name =
+        (if
+         Sys.file_exists (Filename.concat bname "fnames_lower.inx")
+         && Sys.file_exists (Filename.concat bname "fnames_lower.dat")
+        then
+         persons_of_lower_fs_name version base_data
+           ( (fun p -> p.first_name :: p.first_names_aliases),
+             snd patches.h_person,
+             "fnames_lower.inx",
+             "fnames_lower.dat",
+             bname )
+        else
+          persons_of_first_name version base_data
+            ( (fun p -> p.first_name :: p.first_names_aliases),
+              snd patches.h_person,
+              "fnames.inx",
+              "fnames.dat",
+              bname ));
+      persons_stream_of_first_name_prefix =
+        persons_stream_of_first_name_prefix ~base_data ~version ~patches;
+      persons_stream_of_surname_prefix =
+        persons_stream_of_surname_prefix ~base_data ~version ~patches;
       patch_person;
       patch_ascend;
       patch_union;
@@ -1292,6 +1443,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
   in
   let persons, ascends, unions = persons in
   let families, couples, descends = families in
+  let strings = record_access_of strings in
   let data : Dbdisk.base_data =
     {
       persons = record_access_of persons;
@@ -1304,7 +1456,7 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
         { v_write = (fun _ -> assert false); v_get = (fun _ -> assert false) };
       couples = record_access_of couples;
       descends = record_access_of descends;
-      strings = record_access_of strings;
+      strings;
       particles_txt = particles;
       particles = lazy (Mutil.compile_particles particles);
       bnotes;
@@ -1332,6 +1484,20 @@ let make bname particles ((persons, families, strings, bnotes) as _arrays) :
           cursor = (fun _ -> assert false);
           next = (fun _ -> assert false);
         };
+      persons_of_lower_surname =
+        {
+          find = (fun _ -> assert false);
+          cursor = (fun _ -> assert false);
+          next = (fun _ -> assert false);
+        };
+      persons_of_lower_first_name =
+        {
+          find = (fun _ -> assert false);
+          cursor = (fun _ -> assert false);
+          next = (fun _ -> assert false);
+        };
+      persons_stream_of_first_name_prefix = (fun _ -> assert false);
+      persons_stream_of_surname_prefix = (fun _ -> assert false);
       patch_person = (fun _ -> assert false);
       patch_ascend = (fun _ -> assert false);
       patch_union = (fun _ -> assert false);
