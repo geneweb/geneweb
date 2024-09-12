@@ -468,6 +468,17 @@ module type Driver_S = sig
   (** Returns data structure that allows to make optimised search throughout
     index by surname *)
 
+  val persons_of_lower_first_name : base -> string_person_index
+  (** Returns data structure that allows to make optimised search throughout
+      index by first name *)
+
+  val persons_of_lower_surname : base -> string_person_index
+  (** Returns data structure that allows to make optimised search throughout
+      index by surname *)
+
+  val persons_stream_of_first_name_prefix : base -> string -> iper list Stream.t
+  val persons_stream_of_surname_prefix : base -> string -> iper list Stream.t
+
   val spi_first : string_person_index -> string -> istr
   (** Returns first [first/sur]name id starting with that string *)
 
@@ -1231,6 +1242,30 @@ struct
     | Current_base base ->
         let spi = Current.persons_of_surname base in
         Current_string_person_index spi
+
+  let persons_of_lower_first_name = function
+    | Legacy_base base ->
+        let spi = Legacy.persons_of_lower_first_name base in
+        Legacy_string_person_index spi
+    | Current_base base ->
+        let spi = Current.persons_of_lower_first_name base in
+        Current_string_person_index spi
+
+  let persons_of_lower_surname = function
+    | Legacy_base base ->
+        let spi = Legacy.persons_of_lower_surname base in
+        Legacy_string_person_index spi
+    | Current_base base ->
+        let spi = Current.persons_of_lower_surname base in
+        Current_string_person_index spi
+
+  let persons_stream_of_first_name_prefix =
+    Util.wrap_base Legacy.persons_stream_of_first_name_prefix
+      Current.persons_stream_of_first_name_prefix
+
+  let persons_stream_of_surname_prefix =
+    Util.wrap_base Legacy.persons_stream_of_surname_prefix
+      Current.persons_stream_of_surname_prefix
 
   let spi_first = Util.wrap_spi Legacy.spi_first Current.spi_first
   let spi_next = Util.wrap_spi Legacy.spi_next Current.spi_next
