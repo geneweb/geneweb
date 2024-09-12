@@ -42,5 +42,3 @@ val persons_starting_with :
   surname_prefix:string ->
   limit:int ->
   Gwdb.person list
-
-val test : Config.config -> Gwdb.base -> unit
