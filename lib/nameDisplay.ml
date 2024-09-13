@@ -1,7 +1,9 @@
 let esc x = (Util.escape_html x :> Adef.safe_string)
 let hidden_first_name_txt = Adef.safe "HIDDEN FN"
 let hidden_surname_txt = Adef.safe "HIDDEN SN"
-let hidden_or_restricted_fullname_string = Adef.safe "SOMETHING TO DEFINE"
+
+let hidden_or_restricted_fullname_string conf =
+  Adef.safe (Util.transl conf "masked person")
 
 module NameVisibilityUtil : sig
   type t = Gwdb.person
@@ -41,8 +43,10 @@ let map_person_name_visibility' ~on_hidden_name ~on_restricted_name
   | VisibleName _name_data -> on_visible_name conf base person
 
 let map_person_name_visibility
-    ?(on_hidden_name = fun _ _ _ -> hidden_or_restricted_fullname_string)
-    ?(on_restricted_name = fun _ _ _ -> hidden_or_restricted_fullname_string)
+    ?(on_hidden_name =
+      fun conf _ _ -> hidden_or_restricted_fullname_string conf)
+    ?(on_restricted_name =
+      fun conf _ _ -> hidden_or_restricted_fullname_string conf)
     ~on_visible_name conf base person =
   map_person_name_visibility' ~on_hidden_name ~on_restricted_name
     ~on_visible_name ~conf ~base ~person
@@ -80,9 +84,9 @@ let first_name_html conf base person =
 let first_name_str_of_person conf base person =
   map_person_name_visibility'
     ~on_hidden_name:(fun _ _ _ ->
-      (hidden_or_restricted_fullname_string :> string))
+      (hidden_or_restricted_fullname_string conf :> string))
     ~on_restricted_name:(fun _ _ _ ->
-      (hidden_or_restricted_fullname_string :> string))
+      (hidden_or_restricted_fullname_string conf :> string))
     ~on_visible_name:(map_first_name_data gen_first_name_str)
     ~conf ~base ~person
 
@@ -103,9 +107,9 @@ let fullname_html ~p_surname =
 let fullname_str_of_person conf base person =
   map_person_name_visibility'
     ~on_hidden_name:(fun _ _ _ ->
-      (hidden_or_restricted_fullname_string :> string))
+      (hidden_or_restricted_fullname_string conf :> string))
     ~on_restricted_name:(fun _ _ _ ->
-      (hidden_or_restricted_fullname_string :> string))
+      (hidden_or_restricted_fullname_string conf :> string))
     ~on_visible_name:
       (gen_fullname first_name_str_of_person (fun fn_str surname ->
            fn_str ^ " " ^ surname))
