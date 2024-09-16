@@ -784,7 +784,7 @@ let default_prerr conf base = function
       Update.prerr conf err @@ fun () ->
       Update.print_error conf err;
       Output.print_sstring conf "<ul><li>";
-      Output.print_string conf (Util.referenced_person_text conf base p);
+      Output.print_string conf (NameDisplay.referenced_person_text conf base p);
       Output.print_sstring conf "</li></ul>";
       Update.print_return conf;
       Update.print_continue conf "nsck" (Adef.encoded "on")
@@ -1008,7 +1008,7 @@ let print_mod_ok conf base wl pgl p ofn osn oocc =
       Output.print_sstring conf "</p>\n");
   Output.print_sstring conf "<p>";
   Output.print_string conf
-    (referenced_person_text conf base (poi base p.key_index));
+    (NameDisplay.referenced_person_text conf base (poi base p.key_index));
   Output.print_sstring conf "</p>";
   Update.print_warnings conf base wl;
   let pi = p.key_index in
@@ -1094,7 +1094,7 @@ let print_add_ok conf base wl p =
     !deleted_relation;
   Output.print_sstring conf "\n";
   Output.print_string conf
-    (referenced_person_text conf base (poi base p.key_index));
+    (NameDisplay.referenced_person_text conf base (poi base p.key_index));
   Output.print_sstring conf "\n";
   Update.print_warnings conf base wl;
   Hutil.trailer conf
@@ -1110,7 +1110,7 @@ let print_change_event_order_ok conf base wl p =
   Update.print_warnings conf base wl;
   Output.print_sstring conf "\n";
   Output.print_string conf
-    (referenced_person_text conf base (poi base p.key_index));
+    (NameDisplay.referenced_person_text conf base (poi base p.key_index));
   Output.print_sstring conf "\n";
   Hutil.trailer conf
 

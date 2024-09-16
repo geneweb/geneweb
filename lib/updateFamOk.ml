@@ -584,10 +584,10 @@ let check_parents conf cpl =
 
 let check_child conf p =
   let fn, sn, _, _, _ = p in
-  if fn = "" && sn <> "" then (
+  if fn = "" && sn <> "" then
     Some
       (Update.UERR_missing_first_name
-         (transl_nth conf "child/children" 0 |> Adef.safe)))
+         (transl_nth conf "child/children" 0 |> Adef.safe))
   else None
 
 let check_children conf children =
@@ -1138,12 +1138,12 @@ let print_family conf base (wl, ml) cpl des =
   Output.print_sstring conf "<ul>\n";
   Output.print_sstring conf "<li>";
   Output.print_string conf
-    (referenced_person_text conf base (poi base (Adef.father cpl)));
+    (NameDisplay.referenced_person_text conf base (poi base (Adef.father cpl)));
   Output.print_sstring conf "</li>";
   Output.print_sstring conf "\n";
   Output.print_sstring conf "<li>";
   Output.print_string conf
-    (referenced_person_text conf base (poi base (Adef.mother cpl)));
+    (NameDisplay.referenced_person_text conf base (poi base (Adef.mother cpl)));
   Output.print_sstring conf "</li>";
   Output.print_sstring conf "</ul>\n";
   if des.children <> [||] then (
@@ -1152,7 +1152,7 @@ let print_family conf base (wl, ml) cpl des =
       (fun ip ->
         Output.print_sstring conf "<li>";
         Output.print_string conf
-          (referenced_person_text conf base (poi base ip));
+          (NameDisplay.referenced_person_text conf base (poi base ip));
         Output.print_sstring conf "</li>")
       des.children;
     Output.print_sstring conf "</ul>\n");
@@ -1202,7 +1202,8 @@ let print_del_ok conf base wl =
       let p = poi base (iper_of_string i) in
       Output.print_sstring conf "<ul><li>";
       Output.print_string conf
-        (reference conf base p (gen_person_text conf base p));
+        (NameDisplay.reference conf base p
+           (NameDisplay.fullname_html_of_person conf base p));
       Output.print_sstring conf "\n</ul>"
   | None -> ());
   Update.print_warnings conf base wl;
@@ -1227,7 +1228,7 @@ let print_inv_ok conf base p =
   Hutil.header conf @@ print_title conf "inversion done";
   Hutil.print_link_to_welcome conf true;
   Output.print_sstring conf "\n";
-  Output.print_string conf (referenced_person_text conf base p);
+  Output.print_string conf (NameDisplay.referenced_person_text conf base p);
   Output.print_sstring conf "\n";
   Hutil.trailer conf
 

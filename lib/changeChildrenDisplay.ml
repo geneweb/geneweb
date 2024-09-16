@@ -80,7 +80,8 @@ let print_children conf base ipl =
       let p = poi base ip in
       Output.print_sstring conf {|<li class="mt-3"><span class="ml-2">|};
       Output.print_string conf
-        (reference conf base p (gen_person_text conf base p));
+        (NameDisplay.reference conf base p
+           (NameDisplay.fullname_html_of_person conf base p));
       Output.print_string conf (DateDisplay.short_dates_text conf base p);
       Output.print_sstring conf {|</span>|};
       print_child_person conf base p;
@@ -98,8 +99,8 @@ let print_change conf base p =
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Output.print_sstring conf "<h2>";
   title false;
-  (let s : Adef.safe_string = gen_person_text conf base p in
-   let r : Adef.safe_string = reference conf base p s in
+  (let s : Adef.safe_string = NameDisplay.fullname_html_of_person conf base p in
+   let r : Adef.safe_string = NameDisplay.reference conf base p s in
    Util.transl_a_of_b conf "" (r :> string) (s :> string)
    |> Output.print_sstring conf);
   Output.print_sstring conf " ";
@@ -138,8 +139,9 @@ let print_children_list conf base u =
         (fun ip ->
           let p = poi base ip in
           Output.print_sstring conf "<li>";
-          gen_person_text conf base p
-          |> reference conf base p |> Output.print_string conf;
+          NameDisplay.fullname_html_of_person conf base p
+          |> NameDisplay.reference conf base p
+          |> Output.print_string conf;
           Output.print_string conf (DateDisplay.short_dates_text conf base p))
         (get_children des))
     (get_family u);
@@ -151,8 +153,9 @@ let print_change_done conf base p =
     |> Utf8.capitalize_fst |> Output.print_sstring conf
   in
   Hutil.header conf title;
-  gen_person_text conf base p
-  |> reference conf base p |> Output.print_string conf;
+  NameDisplay.fullname_html_of_person conf base p
+  |> NameDisplay.reference conf base p
+  |> Output.print_string conf;
   Output.print_string conf (DateDisplay.short_dates_text conf base p);
   print_children_list conf base p;
   Hutil.trailer conf
