@@ -727,7 +727,7 @@ let advanced_search conf base max_answers =
           if get_name_search_mode "exact_surname" = `Not_Exact_Prefix then
             let list =
               SearchName.persons_starting_with ~conf ~base ~first_name_prefix:""
-                ~surname_prefix:(gets "surname") ~limit:max_answers
+                ~surname_prefix:(gets "surname") ~limit:Int.max_int
             in
             let ipers = List.map Gwdb.get_iper list in
             (false, true, ipers)
