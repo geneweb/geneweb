@@ -584,10 +584,10 @@ let check_parents conf cpl =
 
 let check_child conf p =
   let fn, sn, _, _, _ = p in
-  if fn = "" && sn <> "" then (
+  if fn = "" && sn <> "" then
     Some
       (Update.UERR_missing_first_name
-         (transl_nth conf "child/children" 0 |> Adef.safe)))
+         (transl_nth conf "child/children" 0 |> Adef.safe))
   else None
 
 let check_children conf children =
