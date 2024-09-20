@@ -32,7 +32,6 @@ let get_gen_person = getp Gwdb_driver.gen_person_of_person
 let get_gen_ascend = getp Gwdb_driver.gen_ascend_of_person
 let get_gen_union = getp Gwdb_driver.gen_union_of_person
 let getf fn b i = fn @@ Gwdb_driver.foi b i
-let get_gen_family = getf Gwdb_driver.gen_family_of_family
 let get_gen_couple = getf Gwdb_driver.gen_couple_of_family
 let get_gen_descend = getf Gwdb_driver.gen_descend_of_family
 
