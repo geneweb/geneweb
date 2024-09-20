@@ -256,7 +256,7 @@ let sort_person_list_aux sort base =
 let sort_person_list = sort_person_list_aux List.sort
 let sort_uniq_person_list = sort_person_list_aux List.sort_uniq
 
-let get_all_occurrence_numbers ~base ~first_name ~surname =
+let homonyms ~base ~first_name ~surname =
   let ipl = Gwdb.persons_of_name base (first_name ^ " " ^ surname) in
   let first_name = Name.lower first_name in
   let surname = Name.lower surname in
@@ -266,7 +266,14 @@ let get_all_occurrence_numbers ~base ~first_name ~surname =
          Ext_option.return_if
            (first_name = Name.lower (Gwdb.p_first_name base p)
            && surname = Name.lower (Gwdb.p_surname base p))
-           (fun () -> Gwdb.get_occ p))
+           (fun () -> ip))
+
+let get_all_occurrence_numbers ~base ~first_name ~surname =
+  let ipl = homonyms ~base ~first_name ~surname in
+  ipl
+  |> List.map (fun ip ->
+         let p = Gwdb.poi base ip in
+         Gwdb.get_occ p)
   |> Ext_int.Set.of_list
 
 let find_free_occ base f s =
