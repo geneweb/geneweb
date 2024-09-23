@@ -712,56 +712,81 @@ let advanced_search conf base max_answers =
         |> List.map (Gwdb.spi_find @@ persons_of base)
         |> List.flatten |> List.sort_uniq compare
       in
-      let skip_fname, skip_sname, list =
-        let use_prefix_mode = gets "pfx" = "on" in
-        if use_prefix_mode then
-          let first_name_prefix = gets "first_name" in
-          let surname_prefix = gets "surname" in
-          let list =
-            SearchName.persons_starting_with ~conf ~base ~first_name_prefix
-              ~surname_prefix ~limit:max_answers
+
+      let use_prefix_mode = gets "pfx" = "on" in
+      if use_prefix_mode then
+        let first_name_prefix = gets "first_name" in
+        let surname_prefix = gets "surname" in
+        let filter p =
+          let r =
+            match_person ~skip_fname:true ~skip_sname:true ([], 0) p search_type
           in
-          let list = List.map Gwdb.get_iper list in
-          (true, true, list)
-        else if sn_list <> [] then
-          if get_name_search_mode "exact_surname" = `Not_Exact_Prefix then
-            let list =
-              SearchName.persons_starting_with ~conf ~base ~first_name_prefix:""
-                ~surname_prefix:(gets "surname") ~limit:Int.max_int
-            in
-            let ipers = List.map Gwdb.get_iper list in
-            (false, true, ipers)
-          else
+          r <> ([], 0)
+        in
+        let list =
+          SearchName.persons_starting_with ~conf ~base ~filter
+            ~first_name_prefix ~surname_prefix ~limit:max_answers
+        in
+        (list, List.length list)
+      else if
+        sn_list <> []
+        && get_name_search_mode "exact_surname" = `Not_Exact_Prefix
+      then
+        let filter p =
+          let r =
+            match_person ~skip_fname:false ~skip_sname:true ([], 0) p
+              search_type
+          in
+          r <> ([], 0)
+        in
+        let list =
+          SearchName.persons_starting_with ~conf ~base ~filter
+            ~first_name_prefix:"" ~surname_prefix:(gets "surname")
+            ~limit:max_answers
+        in
+        (list, List.length list)
+      else if
+        fn_list <> []
+        && get_name_search_mode "exact_first_name" = `Not_Exact_Prefix
+      then
+        let filter p =
+          let r =
+            match_person ~skip_fname:false ~skip_sname:true ([], 0) p
+              search_type
+          in
+          r <> ([], 0)
+        in
+        let list =
+          SearchName.persons_starting_with ~conf ~base ~filter
+            ~first_name_prefix:(gets "first_name") ~surname_prefix:""
+            ~limit:max_answers
+        in
+        (list, List.length list)
+      else
+        let skip_fname, skip_sname, list =
+          if sn_list <> [] then
             ( false,
               true,
               list_aux Gwdb.base_strings_of_surname Gwdb.persons_of_surname
                 sn_list
                 (get_name_search_mode "exact_surname") )
-        else if get_name_search_mode "exact_first_name" = `Not_Exact_Prefix then
-          let list =
-            SearchName.persons_starting_with ~conf ~base
-              ~first_name_prefix:(gets "first_name") ~surname_prefix:""
-              ~limit:max_answers
-          in
-          let ipers = List.map Gwdb.get_iper list in
-          (false, true, ipers)
-        else
-          ( true,
-            false,
-            list_aux Gwdb.base_strings_of_first_name Gwdb.persons_of_first_name
-              fn_list
-              (get_name_search_mode "exact_first_name") )
-      in
-      let rec loop ((_, len) as acc) = function
-        | [] -> acc
-        | _ when len > max_answers -> acc
-        | ip :: l ->
-            loop
-              (match_person ~skip_fname ~skip_sname acc (Util.pget conf base ip)
-                 search_type)
-              l
-      in
-      loop ([], 0) list
+          else
+            ( true,
+              false,
+              list_aux Gwdb.base_strings_of_first_name
+                Gwdb.persons_of_first_name fn_list
+                (get_name_search_mode "exact_first_name") )
+        in
+        let rec loop ((_, len) as acc) = function
+          | [] -> acc
+          | _ when len > max_answers -> acc
+          | ip :: l ->
+              loop
+                (match_person ~skip_fname ~skip_sname acc
+                   (Util.pget conf base ip) search_type)
+                l
+        in
+        loop ([], 0) list
     else (
       Gwdb.load_persons_array base;
       let result =

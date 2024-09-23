@@ -41,6 +41,7 @@ val print :
 val persons_starting_with :
   conf:Config.config ->
   base:Gwdb.base ->
+  filter:(Gwdb.person -> bool) ->
   first_name_prefix:string ->
   surname_prefix:string ->
   limit:int ->
