@@ -24,11 +24,11 @@ let n_persons_of_stream n conf base stream =
         let len = List.length persons in
         if len > n then
           let persons = Ext_list.take persons n in
-          l @ persons
-        else consume (n - len) (l @ persons)
+          List.rev_append persons l
+        else consume (n - len) (List.rev_append persons l)
     | None -> l
   in
-  consume n []
+  List.rev (consume n [])
 
 let strip_particle base s =
   let particles = Gwdb.base_particles base in
