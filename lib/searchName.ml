@@ -1,12 +1,13 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let persons_of_stream conf base stream max =
+let persons_of_stream conf base filter stream max =
   let rec aux n l ipers =
     match ipers with
     | _iper :: _ipers when n <= 0 -> l
     | iper :: ipers ->
         let p = Gwdb.poi base iper in
-        if Person.is_visible conf base p then aux (n - 1) (p :: l) ipers
+        if Person.is_visible conf base p && filter p then
+          aux (n - 1) (p :: l) ipers
         else aux n l ipers
     | _ -> l
   in
@@ -17,9 +18,9 @@ let persons_of_stream conf base stream max =
       Some (List.rev (aux max [] ipers))
     with Stream.Failure -> None
 
-let n_persons_of_stream n conf base stream =
+let n_persons_of_stream n conf base filter stream =
   let rec consume n l =
-    match persons_of_stream conf base stream n with
+    match persons_of_stream conf base filter stream n with
     | Some persons ->
         let len = List.length persons in
         if len > n then
@@ -40,7 +41,7 @@ let start_with base pfx s =
   let s = Name.lower (strip_particle base s) in
   Ext_string.start_with pfx 0 s
 
-let persons_of_prefixes_stream max conf base fn_pfx sn_pfx =
+let persons_of_prefixes_stream max conf base filter fn_pfx sn_pfx =
   let sn_stream = Gwdb.persons_stream_of_surname_prefix base sn_pfx in
   let fn_map = Hashtbl.create 100 in
   let match_fn_istr istr =
@@ -65,8 +66,8 @@ let persons_of_prefixes_stream max conf base fn_pfx sn_pfx =
           | iper :: ipers ->
               let p = Gwdb.poi base iper in
               let fn = Gwdb.get_first_name p in
-              if match_fn_istr fn && Person.is_visible conf base p then
-                aux (n - 1) (p :: results) ipers
+              if match_fn_istr fn && Person.is_visible conf base p && filter p
+              then aux (n - 1) (p :: results) ipers
               else aux n results ipers
           | _ -> consume n results
       in
@@ -75,8 +76,8 @@ let persons_of_prefixes_stream max conf base fn_pfx sn_pfx =
   in
   List.rev (consume max [])
 
-let persons_starting_with ~conf ~base ~first_name_prefix ~surname_prefix ~limit
-    =
+let persons_starting_with ~conf ~base ~filter ~first_name_prefix ~surname_prefix
+    ~limit =
   let l =
     match (first_name_prefix, surname_prefix) with
     | "", "" -> []
@@ -84,14 +85,14 @@ let persons_starting_with ~conf ~base ~first_name_prefix ~surname_prefix ~limit
         let stream =
           Gwdb.persons_stream_of_first_name_prefix base first_name_prefix
         in
-        n_persons_of_stream limit conf base stream
+        n_persons_of_stream limit conf base filter stream
     | "", _ ->
         let stream =
           Gwdb.persons_stream_of_surname_prefix base surname_prefix
         in
-        n_persons_of_stream limit conf base stream
+        n_persons_of_stream limit conf base filter stream
     | _, _ ->
-        persons_of_prefixes_stream limit conf base first_name_prefix
+        persons_of_prefixes_stream limit conf base filter first_name_prefix
           surname_prefix
   in
   let cmp_s proj p1 p2 =
