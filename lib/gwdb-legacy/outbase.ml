@@ -250,9 +250,6 @@ let output_name_index_lower_aux strings_store cmp get split base names_inx
   @@ Dutil.IntHT.fold
        (fun k v i ->
          let v = List.sort_uniq Int.compare v in
-         let len = List.length v in
-         if len > 10000 then
-           print_endline @@ Printf.sprintf "%s %d" (base.data.strings.get k) len;
          Array.set a i (k, v);
          succ i)
        ht 0;
