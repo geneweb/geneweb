@@ -871,13 +871,11 @@ let person_of_key (persons : person record_access) strings persons_of_name
 type spi_stream = {
   spi : Dbdisk.string_person_index;
   mutable st : [ `First | `Current of int ];
-  predicate_cache : (int, bool) Hashtbl.t;
 }
 
-let spi_stream_of_spi spi =
-  { spi; st = `First; predicate_cache = Hashtbl.create 10 }
+let spi_stream_of_spi spi = { spi; st = `First }
 
-let ipers_of_prefix base_data predicate spi prefix =
+let ipers_of_prefix base_data spi prefix =
   let istr_o =
     try
       match spi.st with
@@ -892,35 +890,23 @@ let ipers_of_prefix base_data predicate spi prefix =
   Option.bind istr_o (fun istr ->
       spi.st <- `Current istr;
       let s = base_data.strings.get istr in
-      if predicate base_data prefix s then Some (spi.spi.find istr) else None)
+      if Ext_string.start_with prefix 0 s then Some (spi.spi.find istr)
+      else None)
 
-let prefix_exists base_data predicate spi prefix =
+let prefix_exists base_data spi prefix =
   try
     let istr = spi.spi.cursor prefix in
     let s = base_data.strings.get istr in
-    predicate base_data prefix s
+    Ext_string.start_with prefix 0 s
   with Not_found -> false
 
-let strip_particle base_data =
-  let particles = Mutil.compile_particles base_data.particles_txt in
-  fun s ->
-    let p = Mutil.get_particle particles s in
-    let len_particle = String.length p in
-    String.sub s len_particle (String.length s - len_particle)
-
-let start_with lower base_data pfx s =
-  let s = strip_particle base_data s in
-  let s = if lower then Name.lower s else s in
-  Ext_string.start_with pfx 0 s
-
-let ipers_list_stream_of_prefix base_data predicate spi prefix =
-  if not (prefix_exists base_data predicate spi prefix) then
-    Stream.from (fun _ -> None)
-  else Stream.from (fun _ -> ipers_of_prefix base_data predicate spi prefix)
+let ipers_list_stream_of_prefix base_data spi prefix =
+  if not (prefix_exists base_data spi prefix) then Stream.from (fun _ -> None)
+  else Stream.from (fun _ -> ipers_of_prefix base_data spi prefix)
 
 let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
     ~dat_fname ~proj ~base_data ~version ~patches ~gen_default_spi prefix =
-  let predicate, prefix, spi =
+  let prefix, spi =
     (* check if lowered names indexes files exist *)
     if
       Sys.file_exists (Filename.concat base_data.bdir inx_lower_fname)
@@ -934,19 +920,16 @@ let persons_stream_of_prefix ~inx_lower_fname ~dat_lower_fname ~inx_fname
             dat_lower_fname,
             base_data.bdir )
       in
-      let predicate = start_with true in
-      let prefix = Name.lower (strip_particle base_data prefix) in
-      (predicate, prefix, spi)
+      let prefix = Name.lower prefix in
+      (prefix, spi)
     else
       let spi =
         persons_of_surname version base_data
           (proj, snd patches.h_person, inx_fname, dat_fname, base_data.bdir)
       in
-      let predicate = start_with false in
-      let prefix = strip_particle base_data prefix in
-      (predicate, prefix, spi)
+      (prefix, spi)
   in
-  ipers_list_stream_of_prefix base_data predicate (spi_stream_of_spi spi) prefix
+  ipers_list_stream_of_prefix base_data (spi_stream_of_spi spi) prefix
 
 let persons_stream_of_first_name_prefix =
   persons_stream_of_prefix ~inx_lower_fname:"fnames_lower.inx"
