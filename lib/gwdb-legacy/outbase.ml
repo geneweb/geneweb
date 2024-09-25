@@ -211,9 +211,10 @@ let output_name_index_lower_aux strings_store cmp get split base names_inx
     | None ->
         (* strip the string particle, lower it and add it to the strings data, return the id of the new string*)
         let name = base.data.strings.get istr in
-        let strings = name :: split name in
+        let strings = split name in
         let lowered_strings =
-          List.map (fun s -> Name.lower (strip_particle s)) strings
+          Name.lower name
+          :: List.map (fun s -> Name.lower (strip_particle s)) strings
         in
         let lowered_strings_istrs =
           List.filter_map
@@ -242,6 +243,9 @@ let output_name_index_lower_aux strings_store cmp get split base names_inx
 
   let a = Array.make (Dutil.IntHT.length ht) (0, []) in
 
+  (* Sorting will need the new ids to be in the base strings array *)
+  StringData.swap_strings_array base strings_store;
+
   ignore
   @@ Dutil.IntHT.fold
        (fun k v i ->
@@ -252,9 +256,6 @@ let output_name_index_lower_aux strings_store cmp get split base names_inx
          Array.set a i (k, v);
          succ i)
        ht 0;
-
-  (* Sorting will need the new ids to be in the base strings array *)
-  StringData.swap_strings_array base strings_store;
 
   (* sort the persons' ids by name *)
   Array.sort (fun (k, _) (k', _) -> cmp k k') a;
