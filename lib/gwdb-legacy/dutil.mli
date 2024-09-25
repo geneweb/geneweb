@@ -39,7 +39,7 @@ val compare_snames_i_lower : Dbdisk.base_data -> int -> int -> int
 val compare_snames : Dbdisk.base_data -> string -> string -> int
 (** [compare_snames_i base s1 s2] compare two surnames according to the principe specified by [Mutil.compare_after_particle]. *)
 
-val compare_snames_lower : Dbdisk.base_data -> string -> string -> int
+val compare_snames_lower : string -> string -> int
 (** [compare_snames_i base s1 s2] compare two lowered versions of surnames according to the principe specified by [Mutil.compare_after_particle]. *)
 
 val dsk_person_misc_names :
