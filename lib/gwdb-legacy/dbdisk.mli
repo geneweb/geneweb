@@ -61,7 +61,7 @@ type death = Def.death =
   | OfCourseDead
 
 type burial = Def.burial = UnknownBurial | Buried of cdate | Cremated of cdate
-type access = Def.access = IfTitles | Public | Private
+type access = Def.access = IfTitles | Public | SemiPublic | Private
 
 type 'string gen_title_name = 'string Def.gen_title_name =
   | Tmain

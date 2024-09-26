@@ -519,6 +519,8 @@ let get_access l =
   match l with
   | "#apubl" :: l' -> (Public, l')
   | "#apriv" :: l' -> (Private, l')
+  | "#afriend" :: l' -> (SemiPublic, l') (* for retro compatibility *)
+  | "#semipub" :: l' -> (SemiPublic, l')
   | _ -> (IfTitles, l)
 
 (** Create [gen_title] from string *)
