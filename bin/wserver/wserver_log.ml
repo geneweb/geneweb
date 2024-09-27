@@ -13,15 +13,18 @@ let string_of_status = function
 let json_entry key value =
   Printf.sprintf "\"%s\":\"%s\"" (String.escaped key) (String.escaped value)
 
-let json_of_request_infos tm pid request path query resp_status =
+let json_of_request_infos ~curr_tm ~tm ~pid ~request ~path ~query ~resp_status =
   let utime = Printf.sprintf "\"utime\": %f" tm.Unix.tms_utime in
   let stime = Printf.sprintf "\"stime\": %f" tm.tms_stime in
   let pid = Printf.sprintf "\"pid\": %d" pid in
   let user_agent = Mutil.extract_param "user-agent: " '\n' request in
-  let resp_status = Option.value ~default:"" @@ Option.map string_of_status resp_status in
+  let resp_status =
+    Option.value ~default:"" @@ Option.map string_of_status resp_status
+  in
   "{"
   ^ String.concat ","
       [
+        json_entry "date" curr_tm;
         json_entry "status" resp_status;
         pid;
         utime;
@@ -35,5 +38,8 @@ let json_of_request_infos tm pid request path query resp_status =
 let log_request_infos ~request ~path ~query ~resp_status =
   let tm = Unix.times () in
   let pid = Unix.getpid () in
-  let json = json_of_request_infos tm pid request path query resp_status in
+  let curr_tm = (Mutil.sprintf_date Unix.(time () |> localtime) :> string) in
+  let json =
+    json_of_request_infos ~curr_tm ~tm ~pid ~request ~path ~query ~resp_status
+  in
   Printf.eprintf "GW_REQUEST_INFO : %s" json
