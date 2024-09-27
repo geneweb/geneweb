@@ -42,4 +42,4 @@ let log_request_infos ~request ~path ~query ~resp_status =
   let json =
     json_of_request_infos ~curr_tm ~tm ~pid ~request ~path ~query ~resp_status
   in
-  Printf.eprintf "GW_REQUEST_INFO : %s" json
+  Printf.eprintf "GW_REQUEST_INFO : %s\n" json
