@@ -3,4 +3,5 @@ val log_request_infos :
   path:string ->
   query:Adef.encoded_string ->
   resp_status:Def.httpStatus option ->
+  length:int ->
   unit
