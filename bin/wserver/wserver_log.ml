@@ -10,27 +10,42 @@ let string_of_status = function
   | Def.Service_Unavailable -> "503 Service Unavailable"
   | Def.Gateway_Timeout -> "504 Gateway Timeout"
 
+type json_value = JsonString of string | JsonFloat of float | JsonInt of int
+
 let json_entry key value =
-  Printf.sprintf "\"%s\":\"%s\"" (String.escaped key) (String.escaped value)
+  match value with
+  | JsonString value ->
+      Printf.sprintf "\"%s\":\"%s\"" (String.escaped key) (String.escaped value)
+  | JsonFloat value -> Printf.sprintf "\"%s\":%f" (String.escaped key) value
+  | JsonInt value -> Printf.sprintf "\"%s\":%d" (String.escaped key) value
+
+let json_string_entry key value = json_entry key (JsonString value)
+let json_float_entry key value = json_entry key (JsonFloat value)
+let json_int_entry key value = json_entry key (JsonInt value)
 
 let json_of_request_infos ~curr_tm ~tm ~request ~path ~query ~resp_status
     ~length =
-  let utime = Printf.sprintf "\"utime\":%f" tm.Unix.tms_utime in
-  let stime = Printf.sprintf "\"stime\":%f" tm.tms_stime in
-  let resp_length = Printf.sprintf "\"resp_length\":%d" length in
   let resp_status =
     Option.value ~default:"" @@ Option.map string_of_status resp_status
   in
+  let mode =
+    match Mutil.extract_param "GET /" ' ' request with
+    | "" -> "POST"
+    | _ -> "GET"
+  in
+  let referer = Mutil.extract_param "Referer: " '\n' request in
+  List.iter print_endline request;
   "{"
   ^ String.concat ","
       [
-        json_entry "date" curr_tm;
-        json_entry "status" resp_status;
-        resp_length;
-        utime;
-        stime;
-        json_entry "path" path;
-        json_entry "query" (Adef.as_string query);
+        json_string_entry "date" curr_tm;
+        json_string_entry "referer" referer;
+        json_string_entry "mode" mode;
+        json_string_entry "status" resp_status;
+        json_int_entry "resp_length" length;
+        json_float_entry "utime" tm.Unix.tms_utime;
+        json_float_entry "stime" tm.Unix.tms_stime;
+        json_string_entry "path" path;
       ]
   ^ "}"
 
