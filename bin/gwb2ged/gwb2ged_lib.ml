@@ -238,11 +238,11 @@ let write_base_notes opts base =
 
 let ged_header opts base ifile ofile =
   Printf.ksprintf (oc opts) "0 HEAD\n";
-  Printf.ksprintf (oc opts) "1 SOUR GeneWeb\n";
+  Printf.ksprintf (oc opts) "1 SOUR Geneanet\n";
   Printf.ksprintf (oc opts) "2 VERS %s\n" Geneweb.Version.txt;
-  Printf.ksprintf (oc opts) "2 NAME %s\n" (Filename.basename Sys.argv.(0));
-  Printf.ksprintf (oc opts) "2 CORP INRIA\n";
-  Printf.ksprintf (oc opts) "3 ADDR http://www.geneweb.org\n";
+  Printf.ksprintf (oc opts) "2 NAME GeneWeb\n";
+  Printf.ksprintf (oc opts) "2 CORP Geneanet\n";
+  Printf.ksprintf (oc opts) "3 ADDR https://www.geneanet.org/\n";
   Printf.ksprintf (oc opts) "2 DATA %s\n"
     (let fname = Filename.basename ifile in
      if Filename.check_suffix fname ".gwb" then fname else fname ^ ".gwb");
