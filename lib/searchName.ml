@@ -7,7 +7,7 @@ let persons_of_stream conf base filter iperset stream max =
     | iper :: ipers ->
         let p = Gwdb.poi base iper in
         if Person.is_visible conf base p && filter p then
-          let iperset' = Gwdb.IperSet.add (Gwdb.get_iper p) iperset in
+          let iperset' = Gwdb.IperSet.add iper iperset in
           if iperset' == iperset then aux n iperset ipers
           else aux (n - 1) iperset' ipers
         else aux n iperset ipers
@@ -23,9 +23,8 @@ let persons_of_stream conf base filter iperset stream max =
 let n_persons_of_stream n conf base filter stream =
   let rec consume n iperset =
     match persons_of_stream conf base filter iperset stream n with
-    | Some (len, iperset) ->
-        if len > n then Ext_list.take (Gwdb.IperSet.elements iperset) n
-        else consume (n - len) iperset
+    | Some (n, iperset) ->
+        if n = 0 then Gwdb.IperSet.elements iperset else consume n iperset
     | None -> Gwdb.IperSet.elements iperset
   in
   List.rev (consume n Gwdb.IperSet.empty)
