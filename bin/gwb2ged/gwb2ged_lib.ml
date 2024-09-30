@@ -360,7 +360,7 @@ let ged_date_dmy opts dt cal =
       if dmy2.month2 <> 0 then
         Printf.ksprintf (oc opts) "%s " (ged_month cal dmy2.month2);
       Printf.ksprintf (oc opts) "%d" dmy2.year2
-  | _ -> ()
+  | Sure | About | Maybe | Before | After -> ()
 
 let ged_date opts = function
   | Date.Dgreg (d, Dgregorian) -> ged_date_dmy opts d Dgregorian
@@ -456,7 +456,16 @@ let is_primary_pevents = function
   | Def.Epers_Residence | Def.Epers_Retired | Def.Epers_ScellentChildLDS
   | Def.Epers_ScellentSpouseLDS | Def.Epers_Will ->
       true
-  | _ -> false
+  | Def.Epers_Accomplishment | Def.Epers_Acquisition | Def.Epers_Adhesion
+  | Def.Epers_ChangeName | Def.Epers_Circumcision | Def.Epers_Decoration
+  | Def.Epers_DemobilisationMilitaire | Def.Epers_Diploma
+  | Def.Epers_Distinction | Def.Epers_DotationLDS | Def.Epers_Election
+  | Def.Epers_Excommunication | Def.Epers_FamilyLinkLDS | Def.Epers_Funeral
+  | Def.Epers_Hospitalisation | Def.Epers_Illness | Def.Epers_ListePassenger
+  | Def.Epers_MilitaryDistinction | Def.Epers_MilitaryPromotion
+  | Def.Epers_MilitaryService | Def.Epers_MobilisationMilitaire
+  | Def.Epers_ScellentParentLDS | Def.Epers_VenteBien | Def.Epers_Name _ ->
+      false
 
 let relation_format_of_witness_kind :
     Def.witness_kind -> ('a, unit, string, unit) format4 = function
@@ -504,10 +513,10 @@ let ged_fam_adop opts i (fath, moth, _) =
   Printf.ksprintf (oc opts) "0 @F%d@ FAM\n" i;
   (match fath with
   | Some i -> Printf.ksprintf (oc opts) "1 HUSB @I%d@\n" (int_of_iper i + 1)
-  | _ -> ());
+  | None -> ());
   match moth with
   | Some i -> Printf.ksprintf (oc opts) "1 WIFE @I%d@\n" (int_of_iper i + 1)
-  | _ -> ()
+  | None -> ()
 
 let ged_ind_ev_str opts base per per_sel =
   List.iter (ged_pevent opts base per_sel) (Gwdb.get_pevents per)
@@ -651,7 +660,9 @@ let is_primary_fevents = function
   | Def.Efam_Annulation | Def.Efam_MarriageBann | Def.Efam_MarriageContract
   | Def.Efam_MarriageLicense ->
       true
-  | _ -> false
+  | Def.Efam_NoMarriage | Def.Efam_NoMention | Def.Efam_PACS
+  | Def.Efam_Residence | Def.Efam_Name _ ->
+      false
 
 let ged_fevent opts base per_sel evt =
   let name = Gwdb.get_fevent_name evt in
