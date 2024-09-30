@@ -246,7 +246,7 @@ let output_name_index_lower_aux strings_store cmp get split base names_inx
 
   ignore
   @@ Dutil.IntHT.fold
-       (fun k v i ->
+    (fun k v i ->
          let v = List.sort_uniq Int.compare v in
          Array.set a i (k, v);
          succ i)
