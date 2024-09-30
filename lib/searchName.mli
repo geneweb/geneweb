@@ -41,4 +41,4 @@ val persons_starting_with :
   first_name_prefix:string ->
   surname_prefix:string ->
   limit:int ->
-  Gwdb.person list
+  Gwdb.iper list
