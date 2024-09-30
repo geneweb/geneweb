@@ -199,12 +199,6 @@ let output_name_index_lower_aux strings_store cmp get split base names_inx
   let ht = Dutil.IntHT.create 0 in
   (* Hashtable associating the id of a strings and the id of its lowered form *)
   let ht_mem = Dutil.IntHT.create 0 in
-  let particles_re = Mutil.compile_particles base.data.particles_txt in
-  let strip_particle s =
-    let par = Mutil.get_particle particles_re s in
-    let par_len = String.length par in
-    String.sub s par_len (String.length s - par_len)
-  in
   let get_lowered_string_ids istr : int list =
     match Dutil.IntHT.find_opt ht_mem istr with
     | Some istrs -> istrs
@@ -219,11 +213,7 @@ let output_name_index_lower_aux strings_store cmp get split base names_inx
               (s, s :: strings))
             split_strings ("", [])
         in
-
-        let lowered_strings =
-          (Name.lower name :: List.map Name.lower strings)
-          @ List.map (fun s -> Name.lower (strip_particle s)) split_strings
-        in
+        let lowered_strings = List.map Name.lower strings in
         let lowered_strings_istrs =
           List.filter_map
             (fun s ->
