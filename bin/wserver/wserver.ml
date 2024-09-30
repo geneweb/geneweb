@@ -203,10 +203,10 @@ let treat_connection tmout callback addr fd =
   (timeout_wrapper :=
      fun tmout ->
        !on_timeout tmout;
-       Wserver_log.log_request_infos ~request ~path ~query
-         ~resp_status:!resp_status ~length:(PrintingLen.get_value ()));
+       Wserver_log.log_request_infos ~request ~path ~resp_status:!resp_status
+         ~length:(PrintingLen.get_value ()));
   callback (addr, request) path query;
-  Wserver_log.log_request_infos ~request ~path ~query ~resp_status:!resp_status
+  Wserver_log.log_request_infos ~request ~path ~resp_status:!resp_status
     ~length:(PrintingLen.get_value ())
 
 let buff = Bytes.create 1024

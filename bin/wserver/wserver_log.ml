@@ -23,8 +23,7 @@ let json_string_entry key value = json_entry key (JsonString value)
 let json_float_entry key value = json_entry key (JsonFloat value)
 let json_int_entry key value = json_entry key (JsonInt value)
 
-let json_of_request_infos ~curr_tm ~tm ~request ~path ~query ~resp_status
-    ~length =
+let json_of_request_infos ~curr_tm ~tm ~request ~path ~resp_status ~length =
   let resp_status =
     Option.value ~default:"" @@ Option.map string_of_status resp_status
   in
@@ -34,7 +33,6 @@ let json_of_request_infos ~curr_tm ~tm ~request ~path ~query ~resp_status
     | _ -> "GET"
   in
   let referer = Mutil.extract_param "Referer: " '\n' request in
-  List.iter print_endline request;
   "{"
   ^ String.concat ","
       [
@@ -49,11 +47,10 @@ let json_of_request_infos ~curr_tm ~tm ~request ~path ~query ~resp_status
       ]
   ^ "}"
 
-let log_request_infos ~request ~path ~query ~resp_status ~length =
+let log_request_infos ~request ~path ~resp_status ~length =
   let tm = Unix.times () in
   let curr_tm = (Mutil.sprintf_date Unix.(time () |> localtime) :> string) in
   let json =
-    json_of_request_infos ~curr_tm ~tm ~request ~path ~query ~resp_status
-      ~length
+    json_of_request_infos ~curr_tm ~tm ~request ~path ~resp_status ~length
   in
   Printf.eprintf "GW_REQUEST_INFO : %s\n" json
