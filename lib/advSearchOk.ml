@@ -712,23 +712,7 @@ let advanced_search conf base max_answers =
         |> List.map (Gwdb.spi_find @@ persons_of base)
         |> List.flatten |> List.sort_uniq compare
       in
-
-      let use_prefix_mode = gets "pfx" = "on" in
-      if use_prefix_mode then
-        let first_name_prefix = gets "first_name" in
-        let surname_prefix = gets "surname" in
-        let filter p =
-          let r =
-            match_person ~skip_fname:true ~skip_sname:true ([], 0) p search_type
-          in
-          r <> ([], 0)
-        in
-        let list =
-          SearchName.persons_starting_with ~conf ~base ~filter
-            ~first_name_prefix ~surname_prefix ~limit:max_answers
-        in
-        (list, List.length list)
-      else if
+      if
         sn_list <> []
         && get_name_search_mode "exact_surname" = `Not_Exact_Prefix
       then
@@ -744,7 +728,7 @@ let advanced_search conf base max_answers =
             ~first_name_prefix:"" ~surname_prefix:(gets "surname")
             ~limit:max_answers
         in
-        (list, List.length list)
+        (List.map (Gwdb.poi base) list, List.length list)
       else if
         fn_list <> []
         && get_name_search_mode "exact_first_name" = `Not_Exact_Prefix
@@ -761,7 +745,7 @@ let advanced_search conf base max_answers =
             ~first_name_prefix:(gets "first_name") ~surname_prefix:""
             ~limit:max_answers
         in
-        (list, List.length list)
+        (List.map (Gwdb.poi base) list, List.length list)
       else
         let skip_fname, skip_sname, list =
           if sn_list <> [] then

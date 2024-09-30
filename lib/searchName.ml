@@ -1,35 +1,34 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-let persons_of_stream conf base filter stream max =
-  let rec aux n l ipers =
+let persons_of_stream conf base filter iperset stream max =
+  let rec aux n iperset ipers =
     match ipers with
-    | _iper :: _ipers when n <= 0 -> l
+    | _iper :: _ipers when n <= 0 -> (n, iperset)
     | iper :: ipers ->
         let p = Gwdb.poi base iper in
         if Person.is_visible conf base p && filter p then
-          aux (n - 1) (p :: l) ipers
-        else aux n l ipers
-    | _ -> l
+          let iperset' = Gwdb.IperSet.add (Gwdb.get_iper p) iperset in
+          if iperset' == iperset then aux n iperset ipers
+          else aux (n - 1) iperset' ipers
+        else aux n iperset ipers
+    | _ -> (n, iperset)
   in
   if max <= 0 then None
   else
     try
       let ipers = Stream.next stream in
-      Some (List.rev (aux max [] ipers))
+      Some (aux max iperset ipers)
     with Stream.Failure -> None
 
 let n_persons_of_stream n conf base filter stream =
-  let rec consume n l =
-    match persons_of_stream conf base filter stream n with
-    | Some persons ->
-        let len = List.length persons in
-        if len > n then
-          let persons = Ext_list.take persons n in
-          List.rev_append persons l
-        else consume (n - len) (List.rev_append persons l)
-    | None -> l
+  let rec consume n iperset =
+    match persons_of_stream conf base filter iperset stream n with
+    | Some (len, iperset) ->
+        if len > n then Ext_list.take (Gwdb.IperSet.elements iperset) n
+        else consume (n - len) iperset
+    | None -> Gwdb.IperSet.elements iperset
   in
-  List.rev (consume n [])
+  List.rev (consume n Gwdb.IperSet.empty)
 
 let strip_particle base s =
   let particles = Gwdb.base_particles base in
@@ -59,22 +58,25 @@ let persons_of_prefixes_stream max conf base filter fn_pfx sn_pfx =
   let rec consume n results =
     try
       let sn_ipers = Stream.next sn_stream in
-      let rec aux n results ipers =
-        if n = 0 then results
+      let rec aux n iperset ipers =
+        if n = 0 then iperset
         else
           match ipers with
           | iper :: ipers ->
               let p = Gwdb.poi base iper in
               let fn = Gwdb.get_first_name p in
               if match_fn_istr fn && Person.is_visible conf base p && filter p
-              then aux (n - 1) (p :: results) ipers
-              else aux n results ipers
-          | _ -> consume n results
+              then
+                let iperset' = Gwdb.IperSet.add iper iperset in
+                if iperset' == iperset then aux (n - 1) iperset' ipers
+                else aux n iperset ipers
+              else aux n iperset ipers
+          | _ -> consume n iperset
       in
       aux n results sn_ipers
     with Stream.Failure -> results
   in
-  List.rev (consume max [])
+  Gwdb.IperSet.elements (consume max Gwdb.IperSet.empty)
 
 let persons_starting_with ~conf ~base ~filter ~first_name_prefix ~surname_prefix
     ~limit =
@@ -99,7 +101,9 @@ let persons_starting_with ~conf ~base ~filter ~first_name_prefix ~surname_prefix
     Utf8.compare (Gwdb.sou base (proj p1)) (Gwdb.sou base (proj p2))
   in
   List.sort
-    (fun p1 p2 ->
+    (fun iper1 iper2 ->
+      let p1 = Gwdb.poi base iper1 in
+      let p2 = Gwdb.poi base iper2 in
       let sn = cmp_s Gwdb.get_surname p1 p2 in
       if sn <> 0 then sn else cmp_s Gwdb.get_first_name p1 p2)
     l
