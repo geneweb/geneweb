@@ -106,7 +106,9 @@ let find_br s ini_i =
   in
   loop 0 ini_i
 
-let oc opts = match opts.Gwexport.oc with _, oc, _ -> oc
+let oc opts =
+  let _, oc, _ = opts.Gwexport.oc in
+  oc
 
 (** [display_note_aux opts tagn s len i] outputs text [s] with CONT/CONC
     tag. GEDCOM lines are limited to 255 characters. However, the
