@@ -434,7 +434,8 @@ let persons_of_lower_fs_name :
     * string ->
     Dbdisk.string_person_index = function
   | GnWb0024 | GnWb0023 | GnWb0022 | GnWb0021 ->
-      new_persons_of_first_name_or_surname (fun _ -> Dutil.compare_snames_lower)
+      new_persons_of_first_name_or_surname
+        (fun _ -> Dutil.compare_snames_lower)
         Dutil.compare_snames_i_lower
   | GnWb0020 ->
       Printf.eprintf "GnWb0020 does not support lowered names indexes\n";
