@@ -211,10 +211,18 @@ let output_name_index_lower_aux strings_store cmp get split base names_inx
     | None ->
         (* strip the string particle, lower it and add it to the strings data, return the id of the new string*)
         let name = base.data.strings.get istr in
-        let strings = split name in
+        let split_strings = split name in
+        let _, strings =
+          List.fold_right
+            (fun s (str, strings) ->
+              let s = s ^ " " ^ str in
+              (s, s :: strings))
+            split_strings ("", [])
+        in
+
         let lowered_strings =
-          Name.lower name
-          :: List.map (fun s -> Name.lower (strip_particle s)) strings
+          (Name.lower name :: List.map Name.lower strings)
+          @ List.map (fun s -> Name.lower (strip_particle s)) split_strings
         in
         let lowered_strings_istrs =
           List.filter_map
