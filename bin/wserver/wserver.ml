@@ -36,11 +36,25 @@ let close_connection () =
     close_out !wserver_oc;
     connection_closed := true)
 
+module PrintingLen : sig
+  val get_value : unit -> int
+  val add : int -> unit
+end = struct
+  let printing_length = ref 0
+  let get_value () = !printing_length
+  let add i = printing_length := !printing_length + i
+end
+
+let output_string oc s =
+  PrintingLen.add (String.length s);
+  output_string oc s
+
 let printnl () = output_string !wserver_oc "\013\010"
 
 type printing_state = Nothing | Status | Contents
 
 let printing_state = ref Nothing
+let resp_status = ref None
 
 let http status =
   if !printing_state <> Nothing then failwith "HTTP Status already sent";
@@ -65,6 +79,7 @@ let http status =
     else (
       output_string !wserver_oc "HTTP/1.0 ";
       output_string !wserver_oc answer);
+    resp_status := Some status;
     printnl ())
 
 let header s =
@@ -79,6 +94,7 @@ let printf fmt =
     if !printing_state = Nothing then http Def.OK;
     printnl ();
     printing_state := Contents);
+  PrintingLen.add (String.length (Stdlib.string_of_format fmt));
   Printf.fprintf !wserver_oc fmt
 
 let print_string s =
@@ -140,9 +156,7 @@ let string_of_sockaddr = function
 let sockaddr_of_string s = Unix.ADDR_UNIX s
 
 let request_timeout () =
-  if !printing_state = Nothing then http Def.Gateway_Timeout;
-  wflush ();
-  exit 0
+  if !printing_state = Nothing then http Def.Gateway_Timeout
 
 let default_timeout tmout =
   if !printing_state = Nothing then http Def.OK;
@@ -152,24 +166,21 @@ let default_timeout tmout =
     printnl ();
     printf "<head><title>Time out</title></head>\n";
     printf "<body>");
-  printf "<h1>Time out</h1><p>Computation time > %d second(s)</p></body>" tmout;
-  wflush ();
-  exit 0
+  printf "<h1>Time out</h1><p>Computation time > %d second(s)</p></body>" tmout
 
 let on_timeout = ref default_timeout
-
-let set_on_timeout timeout_f =
-  on_timeout :=
-    fun tmout ->
-      timeout_f tmout;
-      wflush ();
-      exit 0
+let set_on_timeout timeout_f = on_timeout := timeout_f
+let timeout_wrapper = ref (fun tmout -> !on_timeout tmout)
 
 let treat_connection tmout callback addr fd =
   printing_state := Nothing;
   if Sys.unix && tmout > 0 then (
     ignore @@ Sys.signal Sys.sigalrm
-    @@ Sys.Signal_handle (fun _ -> !on_timeout tmout);
+    @@ Sys.Signal_handle
+         (fun _ ->
+           !timeout_wrapper tmout;
+           wflush ();
+           exit 0);
     ignore @@ Unix.alarm tmout);
   let request, path, query =
     let request, query =
@@ -189,7 +200,14 @@ let treat_connection tmout callback addr fd =
     in
     (request, path, query)
   in
-  callback (addr, request) path query
+  (timeout_wrapper :=
+     fun tmout ->
+       !on_timeout tmout;
+       Wserver_log.log_request_infos ~request ~path ~resp_status:!resp_status
+         ~length:(PrintingLen.get_value ()));
+  callback (addr, request) path query;
+  Wserver_log.log_request_infos ~request ~path ~resp_status:!resp_status
+    ~length:(PrintingLen.get_value ())
 
 let buff = Bytes.create 1024
 
