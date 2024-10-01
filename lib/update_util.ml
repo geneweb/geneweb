@@ -57,6 +57,20 @@ let reconstitute_somebody removed_string conf var =
   let create = getn_p conf var sex in
   (first_name, surname, occ, create, var)
 
+let sort_families_array_by_date base fam_arr =
+  let cmp_date d1_o d2_o = match d1_o, d2_o with
+    | None, None -> 0
+    | Some d1, Some d2 -> Date.compare_date d1 d2
+    | None, Some _ -> -1
+    | Some _, None -> 1
+  in
+  let cmp_ifam ifam1 ifam2 =
+    let d1 = Gwdb.get_marriage (Gwdb.foi base ifam1) in
+    let d2 = Gwdb.get_marriage (Gwdb.foi base ifam2) in
+    cmp_date (Date.od_of_cdate d1) (Date.od_of_cdate d2)
+  in
+  Array.sort cmp_ifam fam_arr
+
 (* -- Template stuff -- *)
 
 let bool_val x = TemplAst.VVbool x
