@@ -27,17 +27,16 @@ let json_of_request_infos ~curr_tm ~tm ~request ~path ~resp_status ~length =
   let resp_status =
     Option.value ~default:"" @@ Option.map string_of_status resp_status
   in
-  let mode =
+  let mode, url =
     match Mutil.extract_param "GET /" ' ' request with
-    | "" -> "POST"
-    | _ -> "GET"
+    | "" -> "POST", Mutil.extract_param "Referer: " '\n' request
+    | url -> "GET", url
   in
-  let referer = Mutil.extract_param "Referer: " '\n' request in
   "{"
   ^ String.concat ","
       [
         json_string_entry "date" curr_tm;
-        json_string_entry "referer" referer;
+        json_string_entry "request" url;
         json_string_entry "mode" mode;
         json_string_entry "status" resp_status;
         json_int_entry "resp_length" length;
