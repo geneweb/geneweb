@@ -239,8 +239,8 @@ let write_base_notes opts base =
 let ged_header opts base ifile ofile =
   Printf.ksprintf (oc opts) "0 HEAD\n";
   Printf.ksprintf (oc opts) "1 SOUR Geneanet\n";
-  Printf.ksprintf (oc opts) "2 VERS %s\n" Geneweb.Version.txt;
   Printf.ksprintf (oc opts) "2 NAME GeneWeb\n";
+  Printf.ksprintf (oc opts) "2 VERS %s\n" Geneweb.Version.txt;
   Printf.ksprintf (oc opts) "2 CORP Geneanet\n";
   Printf.ksprintf (oc opts) "3 ADDR https://www.geneanet.org/\n";
   Printf.ksprintf (oc opts) "2 DATA %s\n"
