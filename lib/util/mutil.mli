@@ -38,12 +38,6 @@ val surnames_pieces : string -> string list
     are considered as the particles and are attached to the another word to form a piece.
     If string contains less than two pieces, returns an empty list. *)
 
-val utf_8_of_iso_8859_1 : string -> string
-(** Convert encoded string with ISO 8859-1 to UTF 8 *)
-
-val iso_8859_1_of_utf_8 : string -> string
-(** Convert encoded string with UTF 8 to ISO 8859-1 *)
-
 val roman_of_arabian : int -> string
 (** Convert arabic number (int) to roman (string). Number should be < 4000. *)
 
@@ -96,17 +90,6 @@ val array_assoc : 'k -> ('k * 'v) array -> 'v
 val start_with : string -> int -> string -> bool
 (** [start_with prefix off str]
     Test if [str] starts with [prefix] (at offset [off]).
-
-    Raise [Invalid_argument] if [off] is not a valid index in [str].
-*)
-
-val start_with_wildcard : ?ignore_case:bool -> string -> int -> string -> bool
-(** [start_with_wildcard ~ignore_case prefix off str]
-    Test if [str] starts with [prefix] (at offset [off]) ignoring the
-    case according to the value of [ignore_case] (default [false]).
-    Occurrences of ['_'] in [prefix] will match both ['_']
-    and [' '] in [str] and trailing ['_'] of [prefix]
-    is treated as an optional ['_'] [' '].
 
     Raise [Invalid_argument] if [off] is not a valid index in [str].
 *)
@@ -175,14 +158,6 @@ val input_file_ic : in_channel -> string
 
 val read_file_content : string -> string
 (** [read_file_content filename] Reads the content of the file with full path [filename]. *)
-
-val normalize_utf_8 : string -> string
-(** [normalize_utf_8 s]
-    Return [s] normalized using
-    {{:http://www.unicode.org/glossary/#normalization_form_c}NFC}
-    with all malformed UTF-8 character replaced by
-    {{:http://unicode.org/glossary/#replacement_character}the replacement character}
-*)
 
 val bench : string -> (unit -> 'a) -> 'a
 (** [bench name fn]

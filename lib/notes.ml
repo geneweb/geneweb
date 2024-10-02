@@ -122,7 +122,7 @@ let notes_links_db conf base eliminate_unlinked =
   in
   List.sort
     (fun (s1, _) (s2, _) ->
-      Gutil.alphabetic_order (Name.lower s1) (Name.lower s2))
+      Utf8.alphabetic_order (Name.lower s1) (Name.lower s2))
     db2
 
 let update_notes_links_db base fnotes s =

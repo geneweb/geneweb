@@ -36,9 +36,6 @@ val trim_trailing_spaces : string -> string
 val alphabetic : string -> string -> int
 (** Compare two ISO-8859-1 encoded strings by alphabetic order *)
 
-val alphabetic_order : string -> string -> int
-(** Compare two UTF-8 encoded strings by alphabetic order *)
-
 val arg_list_of_string : string -> string list
 (** Parse line and extract separated arguments ("" and '' are used to indlude spaces
     inside the argument) *)

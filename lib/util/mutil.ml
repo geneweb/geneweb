@@ -221,35 +221,6 @@ let unsafe_tr c1 c2 s =
       Bytes.unsafe_to_string bytes
   | None -> s
 
-let utf_8_of_iso_8859_1 str =
-  let rec loop i len =
-    if i = String.length str then Buff.get len
-    else
-      let c = str.[i] in
-      if Char.code c < 0x80 then loop (i + 1) (Buff.store len c)
-      else if Char.code c < 0xC0 then
-        let len = Buff.store len (Char.chr 0xC2) in
-        loop (i + 1) (Buff.store len c)
-      else
-        let len = Buff.store len (Char.chr 0xC3) in
-        loop (i + 1) (Buff.store len (Char.chr (Char.code c - 0x40)))
-  in
-  loop 0 0
-
-let iso_8859_1_of_utf_8 s =
-  let rec loop i len =
-    if i = String.length s then Buff.get len
-    else
-      let c = s.[i] in
-      match Char.code c with
-      | 0xC2 when i + 1 < String.length s ->
-          loop (i + 2) (Buff.store len s.[i + 1])
-      | 0xC3 when i + 1 < String.length s ->
-          loop (i + 2) (Buff.store len (Char.chr (Char.code s.[i + 1] + 0x40)))
-      | _ -> loop (i + 1) (Buff.store len c)
-  in
-  loop 0 0
-
 let strip_all_trailing_spaces s =
   let b = Buffer.create (String.length s) in
   let len =
@@ -334,25 +305,6 @@ let start_with ini i s =
     else if i2 = strlen then false
     else if String.unsafe_get s i2 = String.unsafe_get ini i1 then
       loop (i1 + 1) (i2 + 1)
-    else false
-  in
-  loop 0 i
-
-let start_with_wildcard ?(ignore_case = false) ini i s =
-  let normalize = if ignore_case then Utf8.lowercase else Fun.id in
-  let ini = normalize ini in
-  let s = normalize s in
-  let inilen = String.length ini in
-  let strlen = String.length s in
-  if i < 0 || i > strlen then raise (Invalid_argument "start_with_wildcard");
-  let rec loop i1 i2 =
-    if i1 = inilen then true
-    else if i2 = strlen then
-      if String.unsafe_get ini i1 = '_' then loop (i1 + 1) i2 else false
-    else if
-      String.unsafe_get s i2 = String.unsafe_get ini i1
-      || (String.unsafe_get s i2 = ' ' && String.unsafe_get ini i1 = '_')
-    then loop (i1 + 1) (i2 + 1)
     else false
   in
   loop 0 i
@@ -581,24 +533,6 @@ let read_file_content filename =
   let s = input_file_ic ic in
   close_in ic;
   s
-
-let normalize_utf_8 s =
-  let b = Buffer.create (String.length s * 3) in
-  let n = Uunf.create `NFC in
-  let rec add v =
-    match Uunf.add n v with
-    | `Uchar u ->
-        Uutf.Buffer.add_utf_8 b u;
-        add `Await
-    | `Await | `End -> ()
-  in
-  let add_uchar _ _ = function
-    | `Malformed _ -> add (`Uchar Uutf.u_rep)
-    | `Uchar _ as u -> add u
-  in
-  Uutf.String.fold_utf_8 add_uchar () s;
-  add `End;
-  Buffer.contents b
 
 let encode s : Adef.encoded_string =
   let special = function

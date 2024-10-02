@@ -3,13 +3,6 @@
 val forbidden_char : char list
 (** List of forbidden to use characters *)
 
-val unaccent_utf_8 : bool -> string -> int -> string * int
-(** [unaccent_utf_8 lower s i] checks UTF-8 characher that starts at position [i] inside [s]
-    and returns couple (cs,np) where [cs] is ASCII representation of this character (characters
-    between 0x00 and 0x7F) and [np] it's a position of next utf8 character inside [s]. If [lower]
-    is true then [cs] will contain only lowercase letters.
-    Example : unaccent_utf_8 "aÈa" 1 -> ("e",3) *)
-
 val next_chars_if_equiv : string -> int -> string -> int -> (int * int) option
 (** [next_chars_if_equiv s1 i1 s2 i2] checks if UTF-8 characters that start at position
     [i1] inside [s1] and at [i2] inside [s2] are equivalent (have the same ASCII representation).

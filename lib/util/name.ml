@@ -5,26 +5,11 @@ let forbidden_char = [ ':'; '@'; '#'; '='; '$' ]
 
 (* Name.lower *)
 
-let unaccent_utf_8 lower s i =
-  let fns =
-    if lower then fun n s -> (String.lowercase_ascii s, n) else fun n s -> (s, n)
-  in
-  let fnc =
-    if lower then fun n c -> (String.make 1 @@ Char.lowercase_ascii c, n)
-    else fun n c -> (String.make 1 c, n)
-  in
-  let s, n =
-    Unidecode.decode fns fnc
-      (fun n -> (String.sub s i (n - i), n))
-      s i (String.length s)
-  in
-  if lower then (String.lowercase_ascii s, n) else (s, n)
-
 let next_chars_if_equiv s i t j =
   if i >= String.length s || j >= String.length t then None
   else
-    let s1, i1 = unaccent_utf_8 true s i in
-    let t1, j1 = unaccent_utf_8 true t j in
+    let s1, i1 = Utf8.unaccent true s i in
+    let t1, j1 = Utf8.unaccent true t j in
     if s1 = t1 then Some (i1, j1) else None
 
 (* Name.lower:
@@ -45,7 +30,7 @@ let lower s =
       | _ -> copy (len <> 0) (i + 1) len
     else
       let len = if special then Buff.store len ' ' else len in
-      let t, j = unaccent_utf_8 true s i in
+      let t, j = Utf8.unaccent true s i in
       copy false j (Buff.mstore len t)
   in
   copy false 0 0

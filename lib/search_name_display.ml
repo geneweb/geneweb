@@ -202,7 +202,7 @@ let name_unaccent s =
   let rec copy i len =
     if i = String.length s then Buff.get len
     else
-      let t, j = Name.unaccent_utf_8 false s i in
+      let t, j = Utf8.unaccent false s i in
       copy j (Buff.mstore len t)
   in
   copy 0 0
@@ -434,7 +434,7 @@ let unselected_bullets conf =
       with Failure _ -> sl)
     [] conf.Config.env
 
-let alphabetic1 n1 n2 = Gutil.alphabetic_order n1 n2
+let alphabetic1 n1 n2 = Utf8.alphabetic_order n1 n2
 
 type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
 

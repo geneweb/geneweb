@@ -3,7 +3,7 @@
 let designation base p =
   let first_name = Gwdb.p_first_name base p in
   let nom = Gwdb.p_surname base p in
-  Mutil.iso_8859_1_of_utf_8
+  Utf8.iso_8859_1_of_utf_8
     (first_name ^ "." ^ string_of_int (Gwdb.get_occ p) ^ " " ^ nom)
 
 let father = Adef.father
@@ -140,23 +140,6 @@ let trim_trailing_spaces s =
   in
   if len' = 0 then "" else if len' = len then s else String.sub s 0 len'
 
-let alphabetic_utf_8 n1 n2 =
-  let rec loop i1 i2 =
-    if i1 >= String.length n1 && i2 >= String.length n2 then i1 - i2
-    else if i1 >= String.length n1 then -1
-    else if i2 >= String.length n2 then 1
-    else
-      let cv1, ii1 = Name.unaccent_utf_8 false n1 i1 in
-      let cv2, ii2 = Name.unaccent_utf_8 false n2 i2 in
-      let c =
-        if cv1 = cv2 then
-          compare (String.sub n1 i1 (ii1 - i1)) (String.sub n2 i2 (ii2 - i2))
-        else compare cv1 cv2
-      in
-      if c = 0 then loop ii1 ii2 else c
-  in
-  if n1 = n2 then 0 else loop 0 0
-
 let alphabetic_value =
   let tab = Array.make 256 0 in
   for i = 0 to 255 do
@@ -194,7 +177,6 @@ let alphabetic_iso_8859_1 n1 n2 =
 
 (* ??? *)
 let alphabetic n1 n2 = alphabetic_iso_8859_1 n1 n2
-let alphabetic_order n1 n2 = alphabetic_utf_8 n1 n2
 
 let arg_list_of_string line =
   let rec loop list i len quote =

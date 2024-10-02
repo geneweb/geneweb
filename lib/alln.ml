@@ -42,7 +42,7 @@ let select_names conf base is_surnames ini limit =
       let rec loop istr len list =
         let s = Translate.eval (Mutil.nominative (Gwdb.sou base istr)) in
         let k = Util.name_key base s in
-        if Mutil.start_with_wildcard ini 0 k then
+        if Utf8.start_with_wildcard ini 0 k then
           let list, len =
             if s <> "?" then
               let ips =
@@ -162,7 +162,7 @@ let groupby_ini len list =
   |> Ext_list.groupby
        ~key:(fun (k, _, _) -> ini len k)
        ~value:(fun (_, s, c) -> (s, c))
-  |> List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b)
+  |> List.sort (fun (a, _) (b, _) -> Utf8.alphabetic_order a b)
 
 let groupby_count = function
   | Specify _ -> assert false

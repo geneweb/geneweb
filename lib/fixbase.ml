@@ -413,7 +413,7 @@ let fix_missing_spouses ?report progress base =
 
 let fix_utf8_sequence ?report progress base =
   let normalize_utf_8_date ifam iper s =
-    let s' = Mutil.normalize_utf_8 s in
+    let s' = Utf8.normalize s in
     (if s <> s' then
      match report with
      | Some fn -> fn (Fix_WrongUTF8Encoding (ifam, iper, None))
@@ -422,7 +422,7 @@ let fix_utf8_sequence ?report progress base =
   in
   let normalize_utf_8 ifam iper i =
     let s = Gwdb.sou base i in
-    let s' = Mutil.normalize_utf_8 s in
+    let s' = Utf8.normalize s in
     let i' = Gwdb.insert_string base s' in
     (if i <> i' then
      match report with

@@ -299,7 +299,7 @@ let input_a_line state (ic, encoding) =
   let line = input_line0 state ic in
   match encoding with
   | E_utf_8 -> line
-  | E_iso_8859_1 -> Mutil.utf_8_of_iso_8859_1 line
+  | E_iso_8859_1 -> Utf8.utf_8_of_iso_8859_1 line
 
 (** Read a line. If line is empty or only contains a comment, then read next line  *)
 let rec input_real_line state ic =

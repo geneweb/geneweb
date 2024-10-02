@@ -8,7 +8,7 @@ let particle_at_the_end base is_surnames s =
   else s
 
 let compare_particle_at_the_end base is_surnames a b =
-  Gutil.alphabetic_order
+  Utf8.alphabetic_order
     (particle_at_the_end base is_surnames a)
     (particle_at_the_end base is_surnames b)
 
@@ -234,7 +234,7 @@ let print_alphabetic conf base is_surnames =
   then (
     Gwdb.load_strings_array base;
     let list = Alln.first_letters base is_surnames in
-    let list = List.sort Gutil.alphabetic_order list in
+    let list = List.sort Utf8.alphabetic_order list in
     print_alphabetic_big conf base is_surnames ini list 1 true)
   else
     let all =
@@ -248,7 +248,7 @@ let print_alphabetic conf base is_surnames =
     in
     match list with
     | Alln.Specify keys ->
-        let keys = List.sort Gutil.alphabetic_order keys in
+        let keys = List.sort Utf8.alphabetic_order keys in
         let too_big = (not all) && List.length keys > Alln.default_max_cnt in
         print_alphabetic_big conf base is_surnames ini keys len too_big
     | Alln.Result list ->
@@ -301,7 +301,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
           Output.print_sstring conf " (";
           Output.print_sstring conf (string_of_int cnt);
           Output.print_sstring conf ")")
-        (List.sort (fun (a, _) (b, _) -> Gutil.alphabetic_order a b) l);
+        (List.sort (fun (a, _) (b, _) -> Utf8.alphabetic_order a b) l);
       Output.print_sstring conf "</p>")
     list;
   Hutil.trailer conf

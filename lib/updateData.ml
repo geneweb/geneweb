@@ -463,7 +463,7 @@ let build_list ~ignore_case conf base =
       (fun istr ->
         let str = Gwdb.sou base istr in
         if
-          Mutil.start_with_wildcard ~ignore_case ini 0
+          Utf8.start_with_wildcard ~ignore_case ini 0
           @@ Place.without_suburb str
         then Some (istr, str)
         else None)
@@ -499,7 +499,7 @@ let build_list_short conf list =
     let inis = remove_dup inis in
     match inis with
     | [ ini ] -> build_ini list (String.length ini)
-    | list -> List.sort Gutil.alphabetic_order list
+    | list -> List.sort Utf8.alphabetic_order list
   in
   build_ini list (String.length ini)
 
@@ -507,4 +507,4 @@ let build_list_long ~ignore_case conf list :
     (string * (Gwdb.istr * string) list) list =
   let ini = Option.value ~default:"" (Util.p_getenv conf.Config.env "s") in
   let list = combine_by_ini ~ignore_case ini list in
-  List.sort (fun (ini1, _) (ini2, _) -> Gutil.alphabetic_order ini1 ini2) list
+  List.sort (fun (ini1, _) (ini2, _) -> Utf8.alphabetic_order ini1 ini2) list

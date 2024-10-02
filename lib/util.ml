@@ -96,7 +96,7 @@ let search_in_assets = search_in_path Secure.assets
 
 let start_with_vowel s =
   if String.length s > 0 then
-    let s, _ = Name.unaccent_utf_8 true s 0 in
+    let s, _ = Utf8.unaccent true s 0 in
     match s.[0] with 'a' | 'e' | 'i' | 'o' | 'u' -> true | _ -> false
   else false
 
