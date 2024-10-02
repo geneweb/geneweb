@@ -434,7 +434,7 @@ let unselected_bullets conf =
       with Failure _ -> sl)
     [] conf.Config.env
 
-let alphabetic1 n1 n2 = Gutil.alphabetic_utf_8 n1 n2
+let alphabetic1 n1 n2 = Gutil.alphabetic_order n1 n2
 
 type 'a branch_head = { bh_ancestor : 'a; bh_well_named_ancestors : 'a list }
 

@@ -33,14 +33,11 @@ val designation : Gwdb.base -> Gwdb.person -> string
 val trim_trailing_spaces : string -> string
 (** Trim at the end of string *)
 
-val alphabetic_utf_8 : string -> string -> int
-(** Compare two UTF-8 encoded strings by alphabetic order *)
-
 val alphabetic : string -> string -> int
 (** Compare two ISO-8859-1 encoded strings by alphabetic order *)
 
 val alphabetic_order : string -> string -> int
-(** Same as [alphabetic_utf_8] *)
+(** Compare two UTF-8 encoded strings by alphabetic order *)
 
 val arg_list_of_string : string -> string list
 (** Parse line and extract separated arguments ("" and '' are used to indlude spaces
