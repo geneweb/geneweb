@@ -622,7 +622,7 @@ let treat_request =
            w_wizard @@ w_lock @@ w_base @@ Geneweb.MergeIndOkDisplay.print_mod_merge
         | "N" ->
           w_base @@ fun conf base -> begin match Geneweb.Util.p_getenv conf.env "v" with
-            | Some v -> Geneweb.Some.surname_print conf base Geneweb.Some.surname_not_found v
+            | Some v -> Geneweb.Search_name_display.surname_print conf base Geneweb.Search_name_display.surname_not_found v
             | _ -> Geneweb.AllnDisplay.print_surnames conf base
           end
         | "NG" -> w_base @@ begin fun conf base ->
@@ -652,7 +652,7 @@ let treat_request =
                 let (pl, sosa_acc) = find_all conf base n in
                 match pl with
                 | [] ->
-                  Geneweb.Some.surname_print conf base unknown n
+                  Geneweb.Search_name_display.surname_print conf base unknown n
                 | [p] ->
                   if sosa_acc
                   || Gutil.person_of_string_key base n <> None
@@ -667,9 +667,9 @@ let treat_request =
                   match real_input "fn", real_input "sn" with
                     Some fn, Some sn -> search (fn ^ " " ^ sn)
                   | Some fn, None ->
-                    Geneweb.Some.first_name_print conf base fn
+                    Geneweb.Search_name_display.first_name_print conf base fn
                   | None, Some sn ->
-                    Geneweb.Some.surname_print conf base unknown sn
+                    Geneweb.Search_name_display.surname_print conf base unknown sn
                   | None, None -> incorrect_request conf base
               end
             | Some i ->
@@ -684,7 +684,7 @@ let treat_request =
           w_base @@ Geneweb.BirthDeathDisplay.print_oldest_engagements
         | "P" ->
           w_base @@ fun conf base -> begin match Geneweb.Util.p_getenv conf.env "v" with
-            | Some v -> Geneweb.Some.first_name_print conf base v
+            | Some v -> Geneweb.Search_name_display.first_name_print conf base v
             | None -> Geneweb.AllnDisplay.print_first_names conf base
           end
         | "POP_PYR" when conf.wizard || conf.friend ->
