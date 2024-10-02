@@ -1,8 +1,5 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Geneweb
-open Def
-
 type person = (int, int, int) Def.gen_person
 type ascend = int Def.gen_ascend
 type union = int Def.gen_union
@@ -18,9 +15,6 @@ type record =
     rpos : int;
     mutable rused : bool }
 
-type ('a, 'b, 'c, 'd) choice3 =
-    Left3 of 'a
-  | Right3 of 'b * 'c * 'd
 type month_number_dates =
     MonthDayDates
   | DayMonthDates
@@ -81,7 +75,7 @@ let first_names_brackets = ref None
 let untreated_in_notes = ref false
 let force = ref false
 let default_source = ref ""
-let relation_status = ref Married
+let relation_status = ref Def.Married
 let no_picture = ref false
 let do_check = ref true
 let particles = ref Mutil.default_particles
@@ -320,7 +314,7 @@ let ascii_of_macintosh s =
 
 let utf8_of_string s =
   match !state.charset with
-  | Ansel -> Mutil.utf_8_of_iso_8859_1 (Ansel.to_iso_8859_1 s)
+  | Ansel -> Mutil.utf_8_of_iso_8859_1 (Geneweb.Ansel.to_iso_8859_1 s)
   | Ansi -> Mutil.utf_8_of_iso_8859_1 s
   | Ascii -> Mutil.utf_8_of_iso_8859_1 s
   | Msdos -> Mutil.utf_8_of_iso_8859_1 (ascii_of_msdos s)
@@ -421,39 +415,6 @@ let strip c str =
 
 let strip_spaces = strip ' '
 let strip_newlines = strip '\n'
-
-let less_greater_escaped s =
-  let rec need_code i =
-    if i < String.length s then
-      match s.[i] with
-        '<' | '>' -> true
-      | _ -> need_code (succ i)
-    else false
-  in
-  let rec compute_len i i1 =
-    if i < String.length s then
-      let i1 =
-        match s.[i] with
-          '<' | '>' -> i1 + 4
-        | _ -> succ i1
-      in
-      compute_len (succ i) i1
-    else i1
-  in
-  let rec copy_code_in s1 i i1 =
-    if i < String.length s then
-      let i1 =
-        match s.[i] with
-          '<' -> String.blit "&lt;" 0 s1 i1 4; i1 + 4
-        | '>' -> String.blit "&gt;" 0 s1 i1 4; i1 + 4
-        | c -> Bytes.set s1 i1 c; succ i1
-      in
-      copy_code_in s1 (succ i) i1
-    else Bytes.unsafe_to_string s1
-  in
-  if need_code 0 then
-    let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
-  else s
 
 let parse_name =
   parser
@@ -592,7 +553,7 @@ let make_date n1 n2 n3 =
     Some d, Some m, Some y ->
       let (d, m) =
         match m with
-          Right m -> d, m
+          Def.Right m -> d, m
         | Left m ->
             match !state.month_number_dates with
               DayMonthDates -> check_month m; d, m
@@ -614,7 +575,7 @@ let make_date n1 n2 n3 =
   | None, Some m, Some y ->
       let m =
         match m with
-          Right m -> m
+          Def.Right m -> m
         | Left m -> m
       in
       {day = 0; month = m; year = y; prec = Sure; delta = 0}
@@ -718,7 +679,7 @@ EXTEND
   ;
   gen_month:
     [ [ i = int -> Left (abs i)
-      | m = month -> Right m ] ]
+      | m = month -> Def.Right m ] ]
   ;
   month:
     [ [ ID "JAN" -> 1
@@ -735,7 +696,7 @@ EXTEND
       | ID "DEC" -> 12 ] ]
   ;
   gen_french:
-    [ [ m = french -> Right m ] ]
+    [ [ m = french -> Def.Right m ] ]
   ;
   french:
     [ [ ID "VEND" -> 1
@@ -758,7 +719,7 @@ EXTEND
       | i = roman_int -> i ] ]
   ;
   gen_hebr:
-    [ [ m = hebr -> Right m ] ]
+    [ [ m = hebr -> Def.Right m ] ]
   ;
   hebr:
     [ [ ID "TSH" -> 1
@@ -806,8 +767,8 @@ let date_of_field d =
 type 'a tab = { mutable arr : 'a array ; mutable tlen : int }
 
 type gen =
-  { g_per : (string, person, ascend, union) choice3 tab
-  ; g_fam : (string, family, couple, descend) choice3 tab
+  { g_per : (string, person * ascend * union) Def.choice tab
+  ; g_fam : (string, family * couple * descend) Def.choice tab
   ; g_str : string tab
   ; mutable g_bnot : string
   ; g_ic : in_channel
@@ -856,8 +817,8 @@ let per_index gen lab =
   try Hashtbl.find gen.g_hper lab
   with Not_found ->
     let i = gen.g_per.tlen in
-    assume_tab gen.g_per (Left3 "");
-    gen.g_per.arr.(i) <- Left3 lab;
+    assume_tab gen.g_per (Def.Left "");
+    gen.g_per.arr.(i) <- Def.Left lab;
     gen.g_per.tlen <- gen.g_per.tlen + 1;
     Hashtbl.add gen.g_hper lab i;
     output_pindex i lab;
@@ -868,8 +829,8 @@ let fam_index gen lab =
   try Hashtbl.find gen.g_hfam lab
   with Not_found ->
     let i = gen.g_fam.tlen in
-    assume_tab gen.g_fam (Left3 "");
-    gen.g_fam.arr.(i) <- Left3 lab;
+    assume_tab gen.g_fam (Def.Left "");
+    gen.g_fam.arr.(i) <- Def.Left lab;
     gen.g_fam.tlen <- gen.g_fam.tlen + 1;
     Hashtbl.add gen.g_hfam lab i;
     i
@@ -880,32 +841,32 @@ let string_x = 2
 
 let unknown_per i sex =
   let p = { (Mutil.empty_person string_empty string_quest) with sex ; occ = i ; key_index = i }
-  and a = {parents = None; consang = Adef.fix (-1)}
-  and u = {family = [| |]} in
+  and a = {Def.parents = None; consang = Adef.fix (-1)}
+  and u = {Def.family = [| |]} in
   p, a, u
 
 let phony_per gen sex =
   let i = gen.g_per.tlen in
   let (person, ascend, union) = unknown_per i sex in
-  assume_tab gen.g_per (Left3 "");
+  assume_tab gen.g_per (Def.Left "");
   gen.g_per.tlen <- gen.g_per.tlen + 1;
-  gen.g_per.arr.(i) <- Right3 (person, ascend, union);
+  gen.g_per.arr.(i) <- Def.Right (person, ascend, union);
   i
 
 let unknown_fam gen i =
-  let father = phony_per gen Male in
+  let father = phony_per gen Def.Male in
   let mother = phony_per gen Female in
-  let f = { (Mutil.empty_family string_empty) with fam_index = i }
+  let f = { (Mutil.empty_family string_empty) with Def.fam_index = i }
   and c = Adef.couple father mother
-  and d = {children = [| |]} in
+  and d = {Def.children = [| |]} in
   f, c, d
 
 let phony_fam gen =
   let i = gen.g_fam.tlen in
   let (fam, cpl, des) = unknown_fam gen i in
-  assume_tab gen.g_fam (Left3 "");
+  assume_tab gen.g_fam (Def.Left "");
   gen.g_fam.tlen <- gen.g_fam.tlen + 1;
-  gen.g_fam.arr.(i) <- Right3 (fam, cpl, des);
+  gen.g_fam.arr.(i) <- Def.Right (fam, cpl, des);
   i
 
 let this_year =
@@ -915,12 +876,12 @@ let infer_death birth bapt =
   match birth, bapt with
   | Some (Date.Dgreg (d, _)), _ ->
     let a = this_year - d.year in
-    if a > !state.dead_years then DeadDontKnowWhen
+    if a > !state.dead_years then Def.DeadDontKnowWhen
     else if a < !state.alive_years then NotDead
     else DontKnowIfDead
   | _, Some (Date.Dgreg (d, _)) ->
     let a = this_year - d.year in
-    if a > !state.dead_years then DeadDontKnowWhen
+    if a > !state.dead_years then Def.DeadDontKnowWhen
     else if a < !state.alive_years then NotDead
     else DontKnowIfDead
   | _ -> DontKnowIfDead
@@ -1150,20 +1111,6 @@ let treat_notes gen rl =
   in
   strip_newlines (Buffer.contents buf)
 
-let note gen r =
-  match find_field "NOTE" r.rsons with
-    Some r ->
-      if String.length r.rval > 0 && r.rval.[0] = '@' then
-        match find_notes_record gen r.rval with
-          Some v -> strip_spaces v.rcont, v.rsons
-        | None ->
-            print_location r.rpos;
-            Printf.fprintf !state.log_oc "Note %s not found\n" r.rval;
-            flush !state.log_oc;
-            "", []
-      else strip_spaces r.rval, r.rsons
-  | _ -> "", []
-
 let treat_source gen r =
   if String.length r.rval > 0 && r.rval.[0] = '@' then
     match find_sources_record gen r.rval with
@@ -1240,12 +1187,12 @@ let treat_indi_title gen public_name r =
   let (name, title, place) =
     match find_field "NOTE" r.rsons with
       Some r ->
-        if title = "" then Tnone, strip_spaces r.rval, ""
+        if title = "" then Def.Tnone, strip_spaces r.rval, ""
         else if r.rval = public_name then Tmain, title, place
         else Tname (add_string gen (strip_spaces r.rval)), title, place
-    | None -> Tnone, title, place
+    | None -> Def.Tnone, title, place
   in
-  {t_name = name; t_ident = add_string gen title;
+  {Def.t_name = name; t_ident = add_string gen title;
    t_place = add_string gen place; t_date_start = Date.cdate_of_od date_start;
    t_date_end = Date.cdate_of_od date_end; t_nth = nth}
 
@@ -1257,19 +1204,19 @@ let forward_adop gen ip lab which_parent =
 let adop_parent gen ip r =
   let i = per_index gen r.rval in
   match gen.g_per.arr.(i) with
-  | Left3 _ -> None
-  | Right3 (p, a, u) ->
+  | Def.Left _ -> None
+  | Def.Right (p, a, u) ->
     if List.mem ip p.related then ()
     else
       begin let p = { p with related = ip :: p.related } in
-        gen.g_per.arr.(i) <- Right3 (p, a, u)
+        gen.g_per.arr.(i) <- Def.Right (p, a, u)
       end;
     Some p.key_index
 
 let set_adop_fam gen ip which_parent fath moth =
   match gen.g_per.arr.(ip) with
-  | Left3 _ -> ()
-  | Right3 (per, asc, uni) ->
+  | Def.Left _ -> ()
+  | Def.Right (per, asc, uni) ->
       let r_fath =
         match which_parent, fath with
           ("HUSB" | "BOTH"), Some r -> adop_parent gen ip r
@@ -1281,11 +1228,11 @@ let set_adop_fam gen ip which_parent fath moth =
         | _ -> None
       in
       let r =
-        {r_type = Adoption; r_fath = r_fath; r_moth = r_moth;
+        {Def.r_type = Adoption; r_fath = r_fath; r_moth = r_moth;
          r_sources = string_empty}
       in
       let per = { per with rparents = r :: per.rparents } in
-      gen.g_per.arr.(ip) <- Right3 (per, asc, uni)
+      gen.g_per.arr.(ip) <- Def.Right (per, asc, uni)
 
 let forward_godp gen ip rval =
   let ipp = per_index gen rval in gen.g_godp <- (ipp, ip) :: gen.g_godp; ipp
@@ -1361,7 +1308,7 @@ let rec find_all_rela nl =
       | None -> find_all_rela nl rl
 
 let witness_kind_of_rval rval = match rval with
-  | "GODP"               -> Witness_GodParent
+  | "GODP"               -> Def.Witness_GodParent
   | "officer"
   | "Civil officer"
   | "Registry officer"   -> Witness_CivilOfficer
@@ -1412,7 +1359,7 @@ let find_fevent_witness gen ifath r =
 
 let find_pevent_name_from_tag gen tag tagv =
   match tag with
-    "BIRT" -> Epers_Birth
+    "BIRT" -> Def.Epers_Birth
   | "BAPM" | "CHR" -> Epers_Baptism
   | "DEAT" -> Epers_Death
   | "BURI" -> Epers_Burial
@@ -1514,7 +1461,7 @@ let treat_indi_pevent gen ip r =
               in
               let witnesses = find_event_witness gen ip r in
               let evt =
-                {epers_name = name; epers_date = Date.cdate_of_od date;
+                {Def.epers_name = name; epers_date = Date.cdate_of_od date;
                  epers_place = add_string gen place;
                  epers_reason = add_string gen reason;
                  epers_note = add_string gen note;
@@ -1582,7 +1529,7 @@ let treat_indi_pevent gen ip r =
                in
                let witnesses = find_event_witness gen ip r in
                let evt =
-                 {epers_name = name; epers_date = Date.cdate_of_od date;
+                 {Def.epers_name = name; epers_date = Date.cdate_of_od date;
                   epers_place = add_string gen place;
                   epers_reason = add_string gen reason;
                   epers_note = add_string gen note;
@@ -1634,8 +1581,8 @@ let reconstitute_from_pevents pevents bi bp de bu =
     match pevents with
       [] -> bi, bp, de, bu
     | evt :: l ->
-        match evt.epers_name with
-          Epers_Birth ->
+        match evt.Def.epers_name with
+          Def.Epers_Birth ->
             if !found_birth then loop l bi bp de bu
             else
               let bi =
@@ -1654,8 +1601,8 @@ let reconstitute_from_pevents pevents bi bp de bu =
             else
               let death =
                 match Date.od_of_cdate evt.epers_date with
-                | Some d -> Death (Unspecified, Date.cdate_of_date d)
-                | None -> DeadDontKnowWhen
+                | Some d -> Def.Death (Unspecified, Date.cdate_of_date d)
+                | None -> Def.DeadDontKnowWhen
               in
               let de =
                 death, evt.epers_place, evt.epers_note, evt.epers_src
@@ -1665,7 +1612,7 @@ let reconstitute_from_pevents pevents bi bp de bu =
             if !found_burial then loop l bi bp de bu
             else
               let bu =
-                Buried evt.epers_date, evt.epers_place, evt.epers_note,
+                Def.Buried evt.epers_date, evt.epers_place, evt.epers_note,
                 evt.epers_src
               in
               let () = found_burial := true in loop l bi bp de bu
@@ -1673,7 +1620,7 @@ let reconstitute_from_pevents pevents bi bp de bu =
             if !found_burial then loop l bi bp de bu
             else
               let bu =
-                Cremated evt.epers_date, evt.epers_place, evt.epers_note,
+                Def.Cremated evt.epers_date, evt.epers_place, evt.epers_note,
                 evt.epers_src
               in
               let () = found_burial := true in loop l bi bp de bu
@@ -1804,7 +1751,7 @@ let add_indi gen r =
   in
   let sex =
     match find_field "SEX" r.rsons with
-      Some {rval = "M"} -> Male
+      Some {rval = "M"} -> Def.Male
     | Some {rval = "F"} -> Female
     | _ -> Neuter
   in
@@ -1883,7 +1830,7 @@ let add_indi gen r =
             r_fath, None, rl
         in
         let r =
-          {r_type = GodParent; r_fath = r_fath; r_moth = r_moth;
+          {Def.r_type = GodParent; r_fath = r_fath; r_moth = r_moth;
            r_sources = string_empty}
         in
         r :: loop rl
@@ -1938,17 +1885,17 @@ let add_indi gen r =
     match find_field "DEAT" r.rsons with
     | Some r ->
       if r.rsons = [] then
-        if r.rval = "Y" then DeadDontKnowWhen, "", ("", []), ("", [])
+        if r.rval = "Y" then Def.DeadDontKnowWhen, "", ("", []), ("", [])
         else infer_death birth bapt, "", ("", []), ("", [])
       else
         let d =
           match find_field "DATE" r.rsons with
             Some r ->
             begin match date_of_field r.rval with
-              | Some d -> Death (Unspecified, Date.cdate_of_date d)
-              | None -> DeadDontKnowWhen
+              | Some d -> Def.Death (Unspecified, Date.cdate_of_date d)
+              | None -> Def.DeadDontKnowWhen
             end
-          | _ -> DeadDontKnowWhen
+          | _ -> Def.DeadDontKnowWhen
         in
         let p =
           match find_field "PLAC" r.rsons with
@@ -1965,7 +1912,7 @@ let add_indi gen r =
         Some r ->
         if r.rsons = [] then
           if r.rval = "Y" then
-            Buried Date.cdate_None, "", ("", []), ("", [])
+            Def.Buried Date.cdate_None, "", ("", []), ("", [])
           else UnknownBurial, "", ("", []), ("", [])
         else
           let d =
@@ -1979,7 +1926,7 @@ let add_indi gen r =
             | _ -> ""
           in
           let note = find_and_treat_notes gen r.rsons in
-          Buried (Date.cdate_of_od d), p, (note, []), source gen r
+          Def.Buried (Date.cdate_of_od d), p, (note, []), source gen r
       | None -> UnknownBurial, "", ("", []), ("", [])
     in
     let (crem, crem_place, (crem_note, _), (crem_src, crem_nt)) =
@@ -1987,7 +1934,7 @@ let add_indi gen r =
         Some r ->
         if r.rsons = [] then
           if r.rval = "Y" then
-            Cremated Date.cdate_None, "", ("", []), ("", [])
+            Def.Cremated Date.cdate_None, "", ("", []), ("", [])
           else UnknownBurial, "", ("", []), ("", [])
         else
           let d =
@@ -2001,11 +1948,11 @@ let add_indi gen r =
             | _ -> ""
           in
           let note = find_and_treat_notes gen r.rsons in
-          Cremated (Date.cdate_of_od d), p, (note, []), source gen r
+          Def.Cremated (Date.cdate_of_od d), p, (note, []), source gen r
       | None -> UnknownBurial, "", ("", []), ("", [])
     in
     match buri, crem with
-      UnknownBurial, Cremated _ ->
+      UnknownBurial, Def.Cremated _ ->
       crem, crem_place, (crem_note, []), (crem_src, crem_nt)
     | _ -> buri, buri_place, (buri_note, []), (buri_src, buri_nt)
   in
@@ -2065,7 +2012,7 @@ let add_indi gen r =
   in
   (* On tri les évènements pour être sûr. *)
   let pevents =
-    Event.sort_events (fun evt -> Event.Pevent evt.epers_name)
+    Geneweb.Event.sort_events (fun evt -> Geneweb.Event.Pevent evt.Def.epers_name)
       (fun evt -> evt.epers_date) pevents
   in
   let (bi, bp, de, bu) =
@@ -2080,7 +2027,7 @@ let add_indi gen r =
   let (death, death_place, death_note, death_src) = de in
   let (burial, burial_place, burial_note, burial_src) = bu in
   let person =
-    {first_name = add_string gen first_name;
+    {Def.first_name = add_string gen first_name;
      surname = add_string gen surname; occ = occ;
      public_name = add_string gen public_name; image = add_string gen image;
      qualifiers =
@@ -2100,9 +2047,9 @@ let add_indi gen r =
      notes = add_string gen (notes ^ ext_notes);
      psources = add_string gen psources; key_index = ip}
   in
-  let ascend = {parents = parents; consang = Adef.fix (-1)} in
-  let union = {family = Array.of_list family} in
-  gen.g_per.arr.(ip) <- Right3 (person, ascend, union);
+  let ascend = {Def.parents = parents; consang = Adef.fix (-1)} in
+  let union = {Def.family = Array.of_list family} in
+  gen.g_per.arr.(ip) <- Def.Right (person, ascend, union);
   begin match find_field "ADOP" r.rsons with
     | Some r ->
       begin match find_field "FAMC" r.rsons with
@@ -2115,8 +2062,8 @@ let add_indi gen r =
 
 let find_fevent_name_from_tag gen tag tagv =
   match tag with
-    "MARR" -> Efam_Marriage
-  | "unmarried" -> Efam_NoMarriage
+    "MARR" -> Def.Efam_Marriage
+  | "unmarried" -> Def.Efam_NoMarriage
   | "nomen" -> Efam_NoMention
   | "ENGA" -> Efam_Engage
   | "DIV" -> Efam_Divorce
@@ -2133,21 +2080,21 @@ let primary_fevents =
   ["ANUL"; "DIV"; "ENGA"; "MARR"; "MARB"; "MARC"; "MARL"; "RESI"; "SEP"]
 
 (* Types d'évènement présents seulement dans les tags de niveau 2 (2 TYPE). *)
-let secondary_fevent_types = [Efam_NoMarriage; Efam_NoMention]
+let secondary_fevent_types = [Def.Efam_NoMarriage; Efam_NoMention]
 
 let treat_fam_fevent gen ifath r =
   let check_place_unmarried efam_name place r =
     match find_all_fields "PLAC" r.rsons with
       r :: rl ->
         if String.uncapitalize_ascii r.rval = "unmarried" then
-          Efam_NoMarriage, ""
+          Def.Efam_NoMarriage, ""
         else
           let place = strip_spaces r.rval in
           let rec loop =
             function
               r :: rl ->
                 if String.uncapitalize_ascii r.rval = "unmarried" then
-                  Efam_NoMarriage, place
+                  Def.Efam_NoMarriage, place
                 else loop rl
             | [] -> efam_name, place
           in
@@ -2199,18 +2146,18 @@ let treat_fam_fevent gen ifath r =
               (* Vérification du mariage. *)
               let (name, place) =
                 match name with
-                  Efam_Marriage ->
+                  Def.Efam_Marriage ->
                     begin match find_field "TYPE" r.rsons with
                       Some r ->
                         if String.uncapitalize_ascii r.rval = "unmarried" then
-                          Efam_NoMarriage, place
+                          Def.Efam_NoMarriage, place
                         else check_place_unmarried name place r
                     | None -> check_place_unmarried name place r
                     end
                 | _ -> name, place
               in
               let evt =
-                {efam_name = name; efam_date = Date.cdate_of_od date;
+                {Def.efam_name = name; efam_date = Date.cdate_of_od date;
                  efam_place = add_string gen place;
                  efam_reason = add_string gen reason;
                  efam_note = add_string gen note;
@@ -2274,7 +2221,7 @@ let treat_fam_fevent gen ifath r =
                in
                let witnesses = find_fevent_witness gen ifath r in
                let evt =
-                 {efam_name = name; efam_date = Date.cdate_of_od date;
+                 {Def.efam_name = name; efam_date = Date.cdate_of_od date;
                   efam_place = add_string gen place;
                   efam_reason = add_string gen reason;
                   efam_note = add_string gen note;
@@ -2309,20 +2256,20 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
     match fevents with
       [] -> marr, witn, div
     | evt :: l ->
-        match evt.efam_name with
+        match evt.Def.efam_name with
           Efam_Engage ->
             if !found_marriage then loop l marr witn div
             else
               let witn = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
               let marr =
-                Engaged, evt.efam_date, evt.efam_place, evt.efam_note,
+                Def.Engaged, evt.efam_date, evt.efam_place, evt.efam_note,
                 evt.efam_src
               in
               let () = found_marriage := true in loop l marr witn div
-        | Efam_Marriage ->
+        | Def.Efam_Marriage ->
             let witn = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
             let marr =
-              Married, evt.efam_date, evt.efam_place, evt.efam_note,
+              Def.Married, evt.efam_date, evt.efam_place, evt.efam_note,
               evt.efam_src
             in
             let () = found_marriage := true in marr, witn, div
@@ -2342,7 +2289,7 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on ne met pas de lieu.            *)
               let place = add_string gen "" in
-              let marr = Married, date, place, evt.efam_note, evt.efam_src in
+              let marr = Def.Married, date, place, evt.efam_note, evt.efam_src in
               let () = found_marriage := true in loop l marr witn div
         | Efam_NoMention | Efam_MarriageBann | Efam_MarriageLicense |
           Efam_Annulation | Efam_PACS ->
@@ -2350,28 +2297,28 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
             else
               let witn = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
               let marr =
-                NoMention, evt.efam_date, evt.efam_place, evt.efam_note,
+                Def.NoMention, evt.efam_date, evt.efam_place, evt.efam_note,
                 evt.efam_src
               in
               let () = found_marriage := true in loop l marr witn div
-        | Efam_NoMarriage ->
+        | Def.Efam_NoMarriage ->
             if !found_marriage then loop l marr witn div
             else
               let witn = Array.map (fun (ip,_,_) -> ip) evt.efam_witnesses in
               let marr =
-                NotMarried, evt.efam_date, evt.efam_place, evt.efam_note,
+                Def.NotMarried, evt.efam_date, evt.efam_place, evt.efam_note,
                 evt.efam_src
               in
               let () = found_marriage := true in loop l marr witn div
         | Efam_Divorce ->
             if !found_divorce then loop l marr witn div
             else
-              let div = Divorced evt.efam_date in
+              let div = Def.Divorced evt.efam_date in
               let () = found_divorce := true in loop l marr witn div
         | Efam_Separated ->
             if !found_divorce then loop l marr witn div
             else
-              let div = Separated in
+              let div = Def.Separated in
               let () = found_divorce := true in loop l marr witn div
         | _ -> loop l marr witn div
   in
@@ -2381,8 +2328,8 @@ let reconstitute_from_fevents gen gay fevents marr witn div =
     let (relation, date, place, note, src) = marr in
     let relation =
       match relation with
-        Married | NoSexesCheckMarried -> NoSexesCheckMarried
-      | _ -> NoSexesCheckNotMarried
+        Def.Married | Def.NoSexesCheckMarried -> Def.NoSexesCheckMarried
+      | _ -> Def.NoSexesCheckNotMarried
     in
     let marr = relation, date, place, note, src in marr, witn, div
   else marr, witn, div
@@ -2398,7 +2345,7 @@ let add_fam_norm gen r adop_list =
       let fath =
         match find_field "HUSB" r.rsons with
           Some r -> per_index gen r.rval
-        | None -> phony_per gen Male
+        | None -> phony_per gen Def.Male
       in
       let moth =
         match find_field "WIFE" r.rsons with
@@ -2408,26 +2355,26 @@ let add_fam_norm gen r adop_list =
       fath, moth, false
   in
   begin match gen.g_per.arr.(fath) with
-    | Left3 _ -> ()
-    | Right3 (p, a, u) ->
+    | Def.Left _ -> ()
+    | Def.Right (p, a, u) ->
       let u =
-        if not (Array.mem i u.family)
-        then { family = Array.append u.family [| i |] }
+        if not (Array.mem i u.Def.family)
+        then { Def.family = Array.append u.Def.family [| i |] }
         else u
       in
-      let p = if p.sex = Neuter then { p with sex = Male } else p in
-      gen.g_per.arr.(fath) <- Right3 (p, a, u)
+      let p = if p.Def.sex = Neuter then { p with sex = Def.Male } else p in
+      gen.g_per.arr.(fath) <- Def.Right (p, a, u)
   end ;
   begin match gen.g_per.arr.(moth) with
-    | Left3 _ -> ()
-    | Right3 (p, a, u) ->
+    | Def.Left _ -> ()
+    | Def.Right (p, a, u) ->
       let u =
-        if not (Array.mem i u.family)
-        then { family = Array.append u.family [| i |] }
+        if not (Array.mem i u.Def.family)
+        then { Def.family = Array.append u.Def.family [| i |] }
         else u
       in
-      let p = if p.sex = Neuter then { p with sex = Female } else p in
-      gen.g_per.arr.(moth) <- Right3 (p, a, u)
+      let p = if p.Def.sex = Neuter then { p with sex = Female } else p in
+      gen.g_per.arr.(moth) <- Def.Right (p, a, u)
   end;
   let children =
     let rl = find_all_fields "CHIL" r.rsons in
@@ -2435,12 +2382,12 @@ let add_fam_norm gen r adop_list =
       let ip = per_index gen r.rval in
       if List.mem_assoc ip adop_list then
         match gen.g_per.arr.(ip) with
-        | Right3 (p, a, u) ->
+        | Def.Right (p, a, u) ->
           begin
-            match a.parents with
+            match a.Def.parents with
             | Some ifam when ifam = i ->
-              let a = { a with parents = None } in
-              gen.g_per.arr.(ip) <- Right3 (p, a, u) ;
+              let a = { a with Def.parents = None } in
+              gen.g_per.arr.(ip) <- Def.Right (p, a, u) ;
               ipl
             | _ -> ip :: ipl
           end
@@ -2451,10 +2398,10 @@ let add_fam_norm gen r adop_list =
   let (relation, marr, marr_place, (marr_note, _), (marr_src, marr_nt), witnesses) =
     let (relation, sons) =
       match find_field "MARR" r.rsons with
-      | Some r -> if gay then NoSexesCheckMarried, Some r else Married, Some r
+      | Some r -> if gay then Def.NoSexesCheckMarried, Some r else Def.Married, Some r
       | None ->
         match find_field "ENGA" r.rsons with
-        | Some r -> Engaged, Some r
+        | Some r -> Def.Engaged, Some r
         | None -> !state.relation_status, None
     in
     match sons with
@@ -2463,14 +2410,14 @@ let add_fam_norm gen r adop_list =
         match find_all_fields "PLAC" r.rsons with
           r :: rl ->
           if String.uncapitalize_ascii r.rval = "unmarried" then
-            NotMarried, ""
+            Def.NotMarried, ""
           else
             let p = strip_spaces r.rval in
             let rec loop =
               function
                 r :: rl ->
                 if String.uncapitalize_ascii r.rval = "unmarried" then
-                  NotMarried, p
+                  Def.NotMarried, p
                 else loop rl
               | [] -> relation, p
             in
@@ -2481,7 +2428,7 @@ let add_fam_norm gen r adop_list =
         match find_field "TYPE" r.rsons with
           Some r ->
           if String.uncapitalize_ascii r.rval = "gay" then
-            NoSexesCheckNotMarried
+            Def.NoSexesCheckNotMarried
           else u
         | None -> u
       in
@@ -2515,12 +2462,12 @@ let add_fam_norm gen r adop_list =
     match find_field "DIV" r.rsons with
       Some r ->
       begin match find_field "DATE" r.rsons with
-          Some d -> Divorced (Date.cdate_of_od (date_of_field d.rval))
+          Some d -> Def.Divorced (Date.cdate_of_od (date_of_field d.rval))
         | _ ->
           match find_field "PLAC" r.rsons with
-            Some _ -> Divorced Date.cdate_None
+            Some _ -> Def.Divorced Date.cdate_None
           | _ ->
-            if r.rval = "Y" then Divorced Date.cdate_None else NotDivorced
+            if r.rval = "Y" then Def.Divorced Date.cdate_None else NotDivorced
       end
     | None -> NotDivorced
   in
@@ -2552,8 +2499,8 @@ let add_fam_norm gen r adop_list =
   in
   let add_in_person_notes iper =
     match gen.g_per.arr.(iper) with
-    | Left3 _ -> ()
-    | Right3 (p, a, u) ->
+    | Def.Left _ -> ()
+    | Def.Right (p, a, u) ->
       let notes = gen.g_str.arr.(p.notes) in
       let notes =
         if notes = "" then ext_sources ^ ext_notes
@@ -2562,7 +2509,7 @@ let add_fam_norm gen r adop_list =
       in
       let new_notes = add_string gen notes in
       let p = { p with notes = new_notes } in
-      gen.g_per.arr.(iper) <- Right3 (p, a, u)
+      gen.g_per.arr.(iper) <- Def.Right (p, a, u)
   in
   let _ =
     if ext_notes = "" then ()
@@ -2575,7 +2522,7 @@ let add_fam_norm gen r adop_list =
   in
   (* On tri les évènements pour être sûr. *)
   let fevents =
-    Event.sort_events (fun evt -> Event.Fevent evt.efam_name)
+    Geneweb.Event.sort_events (fun evt -> Geneweb.Event.Fevent evt.Def.efam_name)
       (fun evt -> evt.efam_date) fevents
   in
   let (marr, witn, div) =
@@ -2586,15 +2533,15 @@ let add_fam_norm gen r adop_list =
   let witnesses = witn in
   let div = div in
   let fam =
-    {marriage = marr; marriage_place = marr_place;
+    {Def.marriage = marr; marriage_place = marr_place;
      marriage_note = marr_note; marriage_src = marr_src;
      witnesses = witnesses; relation = relation; divorce = div;
      fevents = fevents; comment = add_string gen comment;
      origin_file = string_empty; fsources = add_string gen fsources;
      fam_index = i}
   and cpl = Adef.couple fath moth
-  and des = {children = Array.of_list children} in
-  gen.g_fam.arr.(i) <- Right3 (fam, cpl, des)
+  and des = {Def.children = Array.of_list children} in
+  gen.g_fam.arr.(i) <- Def.Right (fam, cpl, des)
 
 let add_fam gen r =
   let list = Hashtbl.find_all gen.g_adop r.rval in
@@ -2744,9 +2691,9 @@ let pass1 gen fname =
 let fill_g_per gen list =
   List.iter begin fun (ipp, ip) ->
     match gen.g_per.arr.(ipp) with
-    | Right3 (p, a, u) when not @@ List.mem ip p.related ->
+    | Def.Right (p, a, u) when not @@ List.mem ip p.related ->
       let p = { p with related = ip :: p.related } in
-      gen.g_per.arr.(ipp) <- Right3 (p, a, u)
+      gen.g_per.arr.(ipp) <- Def.Right (p, a, u)
     | _ -> ()
   end list
 
@@ -2813,20 +2760,20 @@ let pass3 gen fname =
   loop ();
   List.iter begin fun (ifam, ip) ->
     match gen.g_fam.arr.(ifam) with
-    | Right3 (fam, cpl, des) ->
+    | Def.Right (fam, cpl, des) ->
       begin match gen.g_per.arr.(Adef.father cpl), gen.g_per.arr.(ip) with
-        | Right3 _, Right3 (p, a, u) ->
+        | Def.Right _, Def.Right (p, a, u) ->
           if List.mem (Adef.father cpl) p.related then ()
           else begin
             let p = { p with related = Adef.father cpl :: p.related } in
-            gen.g_per.arr.(ip) <- Right3 (p, a, u)
+            gen.g_per.arr.(ip) <- Def.Right (p, a, u)
           end ;
           if Array.mem ip fam.witnesses then ()
           else
             let fam =
               { fam with witnesses = Array.append fam.witnesses [| ip |] }
             in
-            gen.g_fam.arr.(ifam) <- Right3 (fam, cpl, des)
+            gen.g_fam.arr.(ifam) <- Def.Right (fam, cpl, des)
         | _ -> ()
       end
     | _ -> ()
@@ -2837,19 +2784,19 @@ let pass3 gen fname =
 let check_undefined gen =
   for i = 0 to gen.g_per.tlen - 1 do
     match gen.g_per.arr.(i) with
-    | Right3 (_, _, _) -> ()
-    | Left3 lab ->
+    | Def.Right (_, _, _) -> ()
+    | Def.Left lab ->
       let (p, a, u) = unknown_per i Neuter in
       Printf.fprintf !state.log_oc "Warning: undefined person %s\n" lab;
-      gen.g_per.arr.(i) <- Right3 (p, a, u)
+      gen.g_per.arr.(i) <- Def.Right (p, a, u)
   done;
   for i = 0 to gen.g_fam.tlen - 1 do
     match gen.g_fam.arr.(i) with
-    | Right3 (_, _, _) -> ()
-    | Left3 lab ->
+    | Def.Right (_, _, _) -> ()
+    | Def.Left lab ->
       let (f, c, d) = unknown_fam gen i in
       Printf.fprintf !state.log_oc "Warning: undefined family %s\n" lab;
-      gen.g_fam.arr.(i) <- Right3 (f, c, d)
+      gen.g_fam.arr.(i) <- Def.Right (f, c, d)
   done
 
 let add_parents_to_isolated gen =
@@ -2864,23 +2811,23 @@ let add_parents_to_isolated gen =
       if i = gen.g_fam.tlen then ()
       else
         match gen.g_fam.arr.(i) with
-        | Right3 (_, _, des) ->
+        | Def.Right (_, _, des) ->
           Array.iter (fun ip -> Hashtbl.add ht_missing_children ip true) des.children ;
             loop (i + 1)
-        | Left3 _ -> loop (i + 1)
+        | Def.Left _ -> loop (i + 1)
     in
     loop 0
   in
   for i = 0 to gen.g_per.tlen - 1 do
     match gen.g_per.arr.(i) with
-    | Right3 (p, a, u) ->
-        if a.parents = None
-        && Array.length u.family = 0
+    | Def.Right (p, a, u) ->
+        if a.Def.parents = None
+        && Array.length u.Def.family = 0
         && p.rparents = []
         && p.related = []
         && not (Hashtbl.mem ht_missing_children p.key_index)
         then
-          let fn = gen.g_str.arr.(p.first_name) in
+          let fn = gen.g_str.arr.(p.Def.first_name) in
           let sn = gen.g_str.arr.(p.surname) in
           if fn = "?" && sn = "?" then ()
           else begin
@@ -2888,14 +2835,14 @@ let add_parents_to_isolated gen =
               "Adding parents to isolated person: %s.%d %s\n" fn p.occ sn ;
             let ifam = phony_fam gen in
             match gen.g_fam.arr.(ifam) with
-            | Right3 (fam, cpl, _) ->
-              let des = { children = [| p.key_index |] } in
-              gen.g_fam.arr.(ifam) <- Right3 (fam, cpl, des);
-              let a = { a with parents = Some ifam } in
-              gen.g_per.arr.(i) <- Right3 (p, a, u)
+            | Def.Right (fam, cpl, _) ->
+              let des = { Def.children = [| p.key_index |] } in
+              gen.g_fam.arr.(ifam) <- Def.Right (fam, cpl, des);
+              let a = { a with Def.parents = Some ifam } in
+              gen.g_per.arr.(i) <- Def.Right (p, a, u)
             | _ -> ()
           end
-    | Left3 _ -> ()
+    | Def.Left _ -> ()
   done
 
 let make_arrays in_file =
@@ -2937,8 +2884,8 @@ let make_subarrays (g_per, g_fam, g_str, g_bnot) =
     let ua = Array.make g_per.tlen (Obj.magic 0) in
     for i = 0 to g_per.tlen - 1 do
       match g_per.arr.(i) with
-      | Right3 (p, a, u) -> pa.(i) <- p; aa.(i) <- a; ua.(i) <- u
-      | Left3 lab -> failwith ("undefined person " ^ lab)
+      | Def.Right (p, a, u) -> pa.(i) <- p; aa.(i) <- a; ua.(i) <- u
+      | Def.Left lab -> failwith ("undefined person " ^ lab)
     done;
     pa, aa, ua
   in
@@ -2948,20 +2895,20 @@ let make_subarrays (g_per, g_fam, g_str, g_bnot) =
     let da = Array.make g_fam.tlen (Obj.magic 0) in
     for i = 0 to g_fam.tlen - 1 do
       match g_fam.arr.(i) with
-        Right3 (f, c, d) -> fa.(i) <- f; ca.(i) <- c; da.(i) <- d
-      | Left3 lab -> failwith ("undefined family " ^ lab)
+        Def.Right (f, c, d) -> fa.(i) <- f; ca.(i) <- c; da.(i) <- d
+      | Def.Left lab -> failwith ("undefined family " ^ lab)
     done;
     fa, ca, da
   in
   let strings = Array.sub g_str.arr 0 g_str.tlen in
   let bnotes =
-    {nread = (fun s _ -> if s = "" then g_bnot else ""); norigin_file = "";
+    {Def.nread = (fun s _ -> if s = "" then g_bnot else ""); norigin_file = "";
      efiles = fun _ -> []}
   in
   persons, families, strings, bnotes
 
 let designation strings p =
-  let fn = Mutil.nominative strings.(p.first_name) in
+  let fn = Mutil.nominative strings.(p.Def.first_name) in
   let sn = Mutil.nominative strings.(p.surname) in
   fn ^ "." ^ string_of_int p.occ ^ " " ^ sn
 
@@ -2971,15 +2918,15 @@ let check_parents_children persons ascends unions families couples descends stri
   let designation = designation strings in
   for i = 0 to Array.length ascends - 1 do
     let a = ascends.(i) in
-    begin match a.parents with
+    begin match a.Def.parents with
       | Some ifam ->
         let fam = families.(ifam) in
-        if fam.fam_index = -1
-        then ascends.(i) <- { a with parents = None }
+        if fam.Def.fam_index = -1
+        then ascends.(i) <- { a with Def.parents = None }
         else
           let cpl = couples.(ifam) in
           let des = descends.(ifam) in
-          if Array.memq i des.children then ()
+          if Array.memq i des.Def.children then ()
           else
             let p = persons.(i) in
             prints "%s is not the child of his/her parents\n" (designation p) ;
@@ -2988,7 +2935,7 @@ let check_parents_children persons ascends unions families couples descends stri
             print "=> no more parents for him/her\n" ;
             print "\n" ;
             flush !state.log_oc ;
-            ascends.(i) <- { a with parents = None }
+            ascends.(i) <- { a with Def.parents = None }
       | None -> ()
     end;
     let u = unions.(i) in
@@ -3004,18 +2951,18 @@ let check_parents_children persons ascends unions families couples descends stri
             prints "- %s\n" (designation persons.(Adef.mother cpl)) ;
             let fath = persons.(Adef.father cpl) in
             let moth = persons.(Adef.mother cpl) in
-            let ffn = strings.(fath.first_name) in
+            let ffn = strings.(fath.Def.first_name) in
             let fsn = strings.(fath.surname) in
-            let mfn = strings.(moth.first_name) in
+            let mfn = strings.(moth.Def.first_name) in
             let msn = strings.(moth.surname) in
             if ffn = "?" && fsn = "?" && mfn <> "?" && msn <> "?" then begin
               print "However, the husband is unknown, I set him as husband\n" ;
-              unions.(Adef.father cpl) <- {family = [| |]};
+              unions.(Adef.father cpl) <- {Def.family = [| |]};
               couples.(ifam) <- Adef.couple i (Adef.mother cpl) ;
               acc
             end else if mfn = "?" && msn = "?" && ffn <> "?" && fsn <> "?" then begin
               print "However, the wife is unknown, I set her as wife\n" ;
-              unions.(Adef.mother cpl) <- {family = [| |]} ;
+              unions.(Adef.mother cpl) <- {Def.family = [| |]} ;
               couples.(ifam) <- Adef.couple (Adef.father cpl) i ;
               acc
             end else begin
@@ -3027,16 +2974,16 @@ let check_parents_children persons ascends unions families couples descends stri
           flush !state.log_oc ;
           acc
         end else acc
-      end [] u.family
+      end [] u.Def.family
     in
     if fam_to_delete <> [] then
       let list =
         Array.fold_right begin fun x acc ->
           if List.mem x fam_to_delete then acc
           else x :: acc
-        end u.family []
+        end u.Def.family []
       in
-      unions.(i) <- { family = Array.of_list list }
+      unions.(i) <- { Def.family = Array.of_list list }
   done ;
   for i = 0 to Array.length families - 1 do
     let to_delete = ref [] in
@@ -3046,7 +2993,7 @@ let check_parents_children persons ascends unions families couples descends stri
     Array.iter begin fun ip ->
       let a = ascends.(ip) in
       let p = persons.(ip) in
-      match a.parents with
+      match a.Def.parents with
       | Some ifam ->
         if ifam <> i then begin
             prints "Other parents for %s\n" (designation p);
@@ -3064,17 +3011,17 @@ let check_parents_children persons ascends unions families couples descends stri
         print "=> added parents\n" ;
         print "\n" ;
         flush !state.log_oc ;
-        let a = { a with parents = Some fam.fam_index } in
+        let a = { a with Def.parents = Some fam.Def.fam_index } in
         ascends.(ip) <- a
-    end des.children ;
+    end des.Def.children ;
     if !to_delete <> []
     then
       let l =
         Array.fold_right begin fun ip acc ->
           if List.mem ip !to_delete then acc else ip :: acc
-        end des.children []
+        end des.Def.children []
       in
-      descends.(i) <- { children = Array.of_list l }
+      descends.(i) <- { Def.children = Array.of_list l }
   done
 
 let check_parents_sex persons families couples strings =
@@ -3085,25 +3032,25 @@ let check_parents_sex persons families couples strings =
     let imoth = Adef.mother cpl in
     let fath = persons.(ifath) in
     let moth = persons.(imoth) in
-    if fam.relation = NoSexesCheckNotMarried
-    || fam.relation = NoSexesCheckMarried
+    if fam.Def.relation = Def.NoSexesCheckNotMarried
+    || fam.Def.relation = Def.NoSexesCheckMarried
     then ()
-    else if fath.sex = Female || moth.sex = Male then
+    else if fath.Def.sex = Female || moth.Def.sex = Def.Male then
       begin
-        if fath.sex = Female
+        if fath.Def.sex = Female
         then
           Printf.fprintf !state.log_oc "Warning - husband with female sex: %s\n"
             (designation strings fath) ;
-        if moth.sex = Male
+        if moth.Def.sex = Def.Male
         then
           Printf.fprintf !state.log_oc "Warning - wife with male sex: %s\n"
             (designation strings moth) ;
         flush !state.log_oc ;
-        families.(i) <- { fam with relation = NoSexesCheckNotMarried }
+        families.(i) <- { fam with relation = Def.NoSexesCheckNotMarried }
       end
     else
       begin
-        persons.(ifath) <- { fath with sex = Male } ;
+        persons.(ifath) <- { fath with sex = Def.Male } ;
         persons.(imoth) <- { moth with sex = Female }
       end
   done
@@ -3128,30 +3075,30 @@ let rec negative_date_ancestors persons ascends unions families couples i =
   let p = persons.(i) in
   let p =
     { p with
-      birth = begin match Date.od_of_cdate p.birth with
+      Def.birth = begin match Date.od_of_cdate p.Def.birth with
         | Some d1 -> Date.cdate_of_od (Some (neg_year d1))
-        | None -> p.birth
+        | None -> p.Def.birth
       end ;
       death = match p.death with
-        | Death (dr, cd2) -> Death (dr, neg_year_cdate cd2)
+        | Def.Death (dr, cd2) -> Def.Death (dr, neg_year_cdate cd2)
         | _ -> p.death
     }
   in
   persons.(i) <- p;
   let u = unions.(i) in
-  for i = 0 to Array.length u.family - 1 do
-    let j = u.family.(i) in
+  for i = 0 to Array.length u.Def.family - 1 do
+    let j = u.Def.family.(i) in
     let fam = families.(j) in
-    match Date.od_of_cdate fam.marriage with
+    match Date.od_of_cdate fam.Def.marriage with
     | None -> ()
     | Some d ->
       let fam =
-        { fam with marriage = Date.cdate_of_od (Some (neg_year d)) }
+        { fam with Def.marriage = Date.cdate_of_od (Some (neg_year d)) }
       in
       families.(j) <- fam
   done ;
   let a = ascends.(i) in
-  match a.parents with
+  match a.Def.parents with
   | None -> ()
   | Some ifam ->
     let cpl = couples.(ifam) in
@@ -3163,7 +3110,7 @@ let rec negative_date_ancestors persons ascends unions families couples i =
 let negative_dates persons ascends unions families couples =
   for i = 0 to Array.length persons - 1 do
     let p = persons.(i) in
-    match Date.cdate_to_dmy_opt p.birth, Date.dmy_of_death p.death with
+    match Date.cdate_to_dmy_opt p.Def.birth, Date.dmy_of_death p.death with
     | Some d1, Some d2 ->
       if d1.year > 0 && d2.year > 0 && Date.compare_dmy d2 d1 < 0
       then negative_date_ancestors persons ascends unions families couples i
@@ -3175,33 +3122,33 @@ let finish_base (persons, families, strings, _) =
   let (families, couples, descends) = families in
   for i = 0 to Array.length descends - 1 do
     let des = descends.(i) in
-    let children = des.children in
-    sort_by_date (fun i -> Date.od_of_cdate persons.(i).birth) children ;
-    descends.(i) <- { children }
+    let children = des.Def.children in
+    sort_by_date (fun i -> Date.od_of_cdate persons.(i).Def.birth) children ;
+    descends.(i) <- { Def.children }
   done ;
   for i = 0 to Array.length unions - 1 do
     let u = unions.(i) in
-    let family = u.family in
-    sort_by_date (fun i -> Date.od_of_cdate families.(i).marriage) family ;
+    let family = u.Def.family in
+    sort_by_date (fun i -> Date.od_of_cdate families.(i).Def.marriage) family ;
     unions.(i) <- { family }
   done ;
   for i = 0 to Array.length persons - 1 do
     let p = persons.(i) in
     let a = ascends.(i) in
     let u = unions.(i) in
-    if a.parents <> None
-    && Array.length u.family != 0
+    if a.Def.parents <> None
+    && Array.length u.Def.family != 0
  || p.notes <> string_empty
     then
       let (fn, occ) =
-        if strings.(p.first_name) = "?" then string_x, i
-        else p.first_name, p.occ
+        if strings.(p.Def.first_name) = "?" then string_x, i
+        else p.Def.first_name, p.occ
       in
       let (sn, occ) =
         if strings.(p.surname) = "?" then string_x, i
         else p.surname, occ
       in
-      persons.(i) <- { p with first_name = fn; surname = sn; occ }
+      persons.(i) <- { p with Def.first_name = fn; surname = sn; occ }
   done;
   check_parents_sex persons families couples strings ;
   check_parents_children persons ascends unions families couples descends strings ;
