@@ -37,7 +37,7 @@
 %end;
 
 %define;tothegen(xx)
-  [*to the %s generation:::xx]
+  [*upto the %s generation:::xx]
 %end;
 
 %define;one_ancestor(xx, coln, bull)

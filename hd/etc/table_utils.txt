@@ -161,8 +161,8 @@
       class="align-middle text-right%if;not cancel_links; table_big_cell%end;
         %if;(e.hl=1)
           %if;((not xxx.has_yyy_date or xxx.yyy_date.month="" or xxx.yyy_date.day="" or xxx.yyy_date.prec!="") 
-            and ("yyy"="birth" or (xxx.is_dead and "yyy"="death"))) table-warning
-          %elseif;(not xxx.is_dead and "yyy"="death") table-active%end;
+            and ("yyy"="birth" or (xxx.is_dead and "yyy"="death"))) bg-ly-incomplete
+          %elseif;(not xxx.is_dead and "yyy"="death") bg-lg%end;
         %end;">
       %if;(wizard and not cancel_links)
         <a class="d-block table_big_anchor" href="%prefix;m=MOD_IND&i=%xxx.index;#yyy"
@@ -194,18 +194,18 @@
           %if;(xxx.has_yyy_note) note%if;(xxx.has_yyy_source)source%end;%elseif;(xxx.has_yyy_source) source%end;
         %end;
         %if;(e.hl=1)
-          %if;(not xxx.has_yyy_place and ("yyy"="birth" or (xxx.is_dead and "yyy"="death"))) table-warning
-          %elseif;(not xxx.is_dead and "yyy"="death") table-active%end;
+          %if;(not xxx.has_yyy_place and ("yyy"="birth" or (xxx.is_dead and "yyy"="death"))) bg-ly-incomplete
+          %elseif;(not xxx.is_dead and "yyy"="death") bg-lg%end;
         %end;"
         %if;(e.ns=1 or e.yyy="on")title="[*click]%sp;%end;
-               %if;(e.ns=1 and (xxx.has_yyy_source or xxx.has_yyy_note))
+               %if;(e.ns=1 and (xxx.has_yyy_source or xxx.has_yyy_note))%nn;
                  [notes sources show help]%sp;
                  %if;(xxx.has_yyy_note or xxx.has_yyy_source)
                    %apply;place_title("xxx","yyy",0)
                  %end;
-                 %if;(e.yyy="on" and wizard)&#010; [or]%end;
+                 %if;(e.yyy="on" and wizard)&#010;[or] %end;
                %end;
-               %if;(e.yyy="on" and wizard) [notes sources edit on date]%end;
+               %if;(e.yyy="on" and wizard)[notes sources edit on date]%end;
         %if;(e.ns=1 or e.yyy="on")."%end;
         %if;(e.ns=1 and (xxx.has_yyy_note or xxx.has_yyy_source)) tabindex="0"
           %apply;popover_params("bottom")

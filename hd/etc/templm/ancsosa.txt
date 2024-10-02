@@ -36,7 +36,7 @@
   %let;l_up;%if;(evar.i1 != "" or evar.p1 != "")1%end;%in;
 
 %define;tothegen(xx)
-  [*to the %s generation:::xx]%nn;
+  [*upto the %s generation:::xx]%nn;
 %end;
 
 %define;togen1(xx)

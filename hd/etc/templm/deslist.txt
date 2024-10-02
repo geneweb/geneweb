@@ -27,7 +27,7 @@
 %let;l_max_dates;%if;(bvar.max_dates != "")%bvar.max_dates;%else;200%end;%in;
 
 %define;tothegen(xx)
-  [*to the %s generation:::xx]
+  [*upto the %s generation:::xx]
 %end;
 
 %define;togen1(xx)

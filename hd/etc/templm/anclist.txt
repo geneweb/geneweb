@@ -32,7 +32,7 @@
 %let;l_v;%apply;min%with;%b.max_anc_level;%and;%static_max_anc_level;%and;%if;(e.v!="")%e.v;%else;3%end;%end;%in;
 %let;l_max_dates;%if;(bvar.max_dates != "")%bvar.max_dates;%else;200%end;%in;
 %define;tothegen(xxx)
-  [*to the %s generation:::xxx]%nn;
+  [*upto the %s generation:::xxx]%nn;
 %end;
 %define;togen1(xxx)
   %if;(xxx = 0)[*specify::generation/generations]0%nn;

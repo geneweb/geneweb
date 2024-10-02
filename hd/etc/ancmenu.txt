@@ -433,7 +433,7 @@ function missing_events_options () {
             </div>
             <div class="custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" id="t_hl" name="hl" value="1">
-              <label class="custom-control-label" for="t_hl">[*highlight incomplete data]</label>
+              <label class="custom-control-label" for="t_hl">[*highlight gaps/hide highlighting]0</label>
             </div>
             <div class="custom-control custom-checkbox">
               <input type="checkbox" class="custom-control-input" id="t_repeat" name="repeat">

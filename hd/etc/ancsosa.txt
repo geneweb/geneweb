@@ -1,10 +1,10 @@
-<!-- $Id: ancsosa.txt v7.1 26/10/2023 14:59:10 $ -->
+<!-- $Id: ancsosa.txt v7.1 04/10/2024 23:03:26 $ -->
 <!-- Copyright (c) 1998-2007 INRIA -->
 <!DOCTYPE html>
 <html lang="%lang;"%if;(e.t="Z" or e.t="Y") id="scrollfix"%end;>
 <head>
 %define;tothegen(xx)
-  [to the %s generation:::xx]%nn;
+  [upto the %s generation:::xx]%nn;
 %end;
 %define;thegen(xx)
   [the %s generation:::xx]%nn;
@@ -67,11 +67,10 @@
 %if;not cancel_links;
   %include;menubar
 %end;
-%let;l_v0;%if;(e.v != "")%if;(e.v > max_anc_level)%max_anc_level;%else;%e.v;%end;%else;1%end;%in;
-%let;l_v;%if;(bvar.max_anc_level = "")%l_v0;%elseif;(bvar.max_anc_level > l_v0)%l_v0;%else;%bvar.max_anc_level;%end;%in;
-%let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
-%let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
-%let;l_up;%if;(e.i1 != "" or e.p1 != "")1%end;%in;
+%include;buttons
+%let;birth_symbol;%if;(bvar.birth_symbol!="")%bvar.birth_symbol;%else;&deg;%end;%in;
+%let;death_symbol;%if;(bvar.death_symbol!="")%bvar.death_symbol;%else;&dagger;%end;%in;
+%let;l_up;%if;(e.i1!="" or e.p1!="")1%end;%in;
 %define;letter(xx)
   %apply;nth%with;
     /a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z
@@ -326,7 +325,7 @@
   %end;
       <div class="sure_dates%ancestor.has_linked_page.MARRIAGEA;%ancestor.spouse.has_linked_page.MARRIAGEA;
         %if;((marriage_date.prec != "" or on_marriage_date = "" or marriage_place = "") and (are_married or are_not_married)) not_sure_dates%end;"
-        title="%if;(wizard)[*modify::family/families]0%end;
+        title="%if;(wizard and not cancel_links)[*modify::family/families]0%end;
           %if;(yy=0 and spouse.surname!="?" and spouse.first_name!="?")&#010;
             %if;(are_not_married)([*not married])&#010;%end;
             %if;(ancestor.is_male)[*him/her]0 %if;(are_not_married)[with]%else;[married%t to:::]0%end;
@@ -341,16 +340,17 @@
 %end;
 
 %define;link_parents()
-  %if;(e.only != "on" and ancestor.father_sosa != "")
-    <a href="#i%ancestor.father_sosa;"
-       title="[father/mother]0 : %ancestor.father_sosa;"><strong>%ancestor.anc_sosa;</strong></a>%nn;
-  %elseif;(e.cgl != "on" and wizard and not ancestor.has_parents and
-    ancestor.first_name != "?" and ancestor.surname != "?")
-    <a style="color: rgb(255,0,0);" href="#mi%ancestor.index;"
-       onclick="window.open('%prefix;m=ADD_PAR&ip=%ancestor.index;');" %ltap;
-    ><strong>%ancestor.anc_sosa;</strong></a>%nn;
-  %else;
-    <strong>%ancestor.anc_sosa;</strong>%nn;
+  %if;(e.only!="on" and ancestor.father_sosa!="" and level<=l_v)
+    %if;not cancel_links;<a href="#i%ancestor.father_sosa;" title="[father/mother]0 : %apply;1000sep(ancestor.father_sosa)">%end;
+      <strong>%ancestor.anc_sosa;</strong>
+    %if;not cancel_links;</a>%end;
+  %elseif;(wizard and not ancestor.has_parents and
+    ancestor.first_name!="?" and ancestor.surname!="?")
+    %if;not cancel_links;<a class="text-danger" href="#mi%ancestor.index;"
+       onclick="window.open('%prefix;m=ADD_PAR&ip=%ancestor.index;');" %ltap;>%end;
+      <strong>%ancestor.anc_sosa;</strong>
+    %if;not cancel_links;</a>%end;
+  %else;<strong>%ancestor.anc_sosa;</strong>
   %end;
 %end;
 
@@ -362,8 +362,9 @@
 
 %define;info3(xx)
   %if;(xx.has_nobility_titles)
-    <em>%xx.nobility_title;</em><br>
+    <div class="font-italic">%xx.nobility_title;</div>
   %end;
+  <div  class="small">
   %if;(xx.has_occupation)
    <div class="highlight1" aria-label="occupation">%xx.occupation;</div>
   %end;
@@ -376,13 +377,16 @@
   %if;(xx.has_consanguinity and (bvar.show_consang != "no" or manitou))
     <div aria-label="Consanguinity">%xx.consanguinity;</div>
   %end;
+  </div>
 %end;
 
 %define;link_rel(xx)
-  %if;(cancel_links)
-    ==<br>xx
-  %else;
-    <a href="%prefix;em=R&ei=%ancestor.index;&m=NG&select=%index;&n=1&t=PN&et=A" title="%ancestor; …[relationship]… %self;">==<br>xx</a>
+  %if;cancel_links;==
+  %else;<a href="%prefix;em=R&ei=%ancestor.index;&m=NG&select=%index;&n=1&t=PN&et=A" title="%ancestor; …[relationship]… %self;">==</a>
+  %end;
+  <br>
+  %if;cancel_links;%apply;1000sep(xx)%nn;
+  %elseif;(xx<2^(l_v+1) and xx>=2^v0)<a href="#ixx" title="[sosa lower implex]">%apply;1000sep(xx)</a>
   %end;
 %end;
 
@@ -405,21 +409,20 @@
 %end;
 
 %define;nb_fam(xx)
-  %if;(xx.same = "")
-    %if;(not cancel_links)
-      <a href="%prefix;m=A&t=X&i=%index;&i1=%ancestor.index;&l=%level;%if;(e.image!="")&image=%e.image;%end;" title="[*only] [ancestor/ancestors]1 [up to] %ancestor;">
-    %end;
-    <br>%apply;symbol1("xx")
-    %if;(xx.nb_families > 1)
-      <br>%xx.nb_families;&amp;%xx.nb_children;
-    %end;
-    %if;(not cancel_links)
-      </a>
+  %if;(xx.same="")
+    %if;not cancel_links;
+      <a href="%prefix;m=A&t=X&i=%index;&i1=%ancestor.index;&l=%level;&gen=1%if;(e.image!="")&image=%e.image;%end;"
+        title="[*only] [ancestor/ancestors]1 [up to] %ancestor;">%end;
+        <br>%apply;symbol1("xx")
+    %if;not cancel_links;</a>%end;
+    %if;(xx.nb_families>1)
+      <div class="small">
+        <span title="%xx.nb_families; [relation/relations]1">%xx.nb_families; &</span>
+        <span title="[*number of children]">%xx.nb_children;<i class="fa fa-child fa-sm ml-1"></i></span>
+      </div>
     %end;
   %else;
-    <br>%apply;link_rel%with;
-      %xx.same;
-    %end;
+    <br>%apply;link_rel%with;%xx.same;%end;
   %end;
 %end;
 
@@ -988,7 +991,7 @@
                     %end;
                   %end;">%nn;
          %else;
-          <a class="table_big_anchor text-danger%if;(e.hl=1) table-warning%end;" title="%apply;a_of_b%with;[*add::parents]%and;%ancestor;%end;"%sp;
+          <a class="table_big_anchor text-danger%if;(e.hl=1) bg-ly-incomplete%end;" title="%apply;a_of_b%with;[*add::parents]%and;%ancestor;%end;"%sp;
            href="%prefix_base_password;m=ADD_PAR&ip=%ancestor.index;">%nn;
          %end;
       %end;
@@ -1011,7 +1014,7 @@
         %if;(ancestor.has_notes) note%if;(ancestor.has_psources)source%end;%elseif;(ancestor.has_psources) source%end;
     %end;
     %if;(e.hl=1 and ("?" is_substr ancestor or ancestor.first_name="N." or ancestor.first_name="Nn"
-              or ancestor.first_name="Xx" or ancestor.first_name="Yy" or ancestor.first_name="Xy")) table-warning%end;"%sp;
+              or ancestor.first_name="Xx" or ancestor.first_name="Yy" or ancestor.first_name="Xy")) bg-ly-incomplete%end;"%sp;
     %if;(e.ns=1 and (ancestor.has_notes or ancestor.has_psources)) tabindex="0"
       title="[*click] [notes sources show help]%sp;
              %if;(ancestor.has_notes)[note/notes]1%if;(ancestor.has_psources) [and] [source/sources]1%end;
@@ -1049,12 +1052,12 @@
   %apply;place_popup%with;ancestor%and;baptism%and;0%end;
 %( Conjoints %)
   %if;(e.marr="on")
-    %if;(ancestor=self and not ancestor.has_families)<td%if;(e.hl=1) class="table-active"%end;></td>%end;%(self is single%)
+    %if;(ancestor=self and not ancestor.has_families)<td%if;(e.hl=1) class="bg-lg"%end;></td>%end;%(self is single%)
     %foreach;ancestor.family;
       %if;(family_cnt = 1)
         <td class="align-middle
         %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn"
-              or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) table-warning%end;">
+              or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) bg-ly-incomplete%end;">
           %apply;image_MF("spouse")
           %apply;link%with;%spouse.access;%and;%if;(e.fn="on")%spouse.first_name; %spouse.surname;%else;%spouse;%end;%and;%spouse.index;%end;
         </td>
@@ -1063,11 +1066,11 @@
   %end;
 %( Date du mariage %)
   %if;(e.marr_date="on")
-    %if;(ancestor=self and not ancestor.has_families)<td%if;(e.hl=1) class="table-active"%end;></td>%end;%(self is single%)
+    %if;(ancestor=self and not ancestor.has_families)<td%if;(e.hl=1) class="bg-lg"%end;></td>%end;%(self is single%)
     %foreach;ancestor.family;
       %if;(family_cnt = 1)
         <td class="align-middle text-right table_big_cell%if;(are_divorced or are_separated) divorced-side-border%end;
-          %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) table-warning%end;">
+          %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) bg-ly-incomplete%end;">
           %if;(wizard and not cancel_links)
             <a class="d-block table_big_anchor" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
               title="%if;(slash_marriage_date="")[*add::marriage/marriages]0%else;
@@ -1089,14 +1092,14 @@
   %end;
 %( Lieu du mariage %)
   %if;(e.marr_place="on")
-    %if;(ancestor=self and not ancestor.has_families)<td%if;(e.hl=1) class="table-active"%end;></td>%end;%(self is single%)
+    %if;(ancestor=self and not ancestor.has_families)<td%if;(e.hl=1) class="bg-lg"%end;></td>%end;%(self is single%)
     %foreach;ancestor.family;
       %if;(family_cnt = 1)
         <td class="align-middle%if;(are_divorced or are_separated) divorced-side-border%end;
           %if;(e.ns=1)
             %if;has_marriage_note; note%if;has_marriage_source;source%end;%elseif;has_marriage_source; source%end;
           %end;
-          %if;(e.hl=1 and marriage_place="") table-warning%end;"%sp;
+          %if;(e.hl=1 and marriage_place="") bg-ly-incomplete%end;"%sp;
           title="TODO"
           %if;(e.ns=1 and (has_marriage_note or has_marriage_source))
             tabindex="0" %apply;popover_params("bottom")
@@ -1119,7 +1122,7 @@
 %( Nombre d'enfants %)
   %if;(e.child="on")
     %if;(ancestor.nb_families=0)
-      <td%if;(e.hl=1) class="table-active"%end;></td>
+      <td%if;(e.hl=1) class="bg-lg"%end;></td>
     %else;
       %if;(e.marr="on" or e.marr_date="on" or e.marr_place="on")
         %foreach;ancestor.family;
@@ -1184,7 +1187,7 @@
                   %end;
                 %end;
                 %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn"
-              or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) table-warning%end;"
+              or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) bg-ly-incomplete%end;"
               %if;(e.ns=1 and (spouse.has_psources or spouse.has_pnotes)) tabindex="0" %apply;popover_params("bottom")
               data-content='%if;(spouse.has_pnotes)%apply;clean_comment_tags(spouse.pnotes)%end;
                             %if;(spouse.has_psources)
@@ -1204,7 +1207,7 @@
           %end;
           %if;(e.marr_date="on")
             <td class="align-middle text-right table_big_cell%if;(are_divorced or are_separated) divorced-side-border%end;
-              %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) table-warning%end;">
+              %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) bg-ly-incomplete%end;">
               %if;(wizard and not cancel_links)
                 <a class="d-block table_big_anchor" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
                   title="%if;(slash_marriage_date="")[*add::marriage/marriages]0%else;
@@ -1230,7 +1233,7 @@
                 %elseif;(has_marriage_note and has_marriage_source) notesource%nn;
                 %end;
               %end;
-              %if;(e.hl=1 and marriage_place="") table-warning%end;"
+              %if;(e.hl=1 and marriage_place="") bg-ly-incomplete%end;"
               %if;(e.ns=1 and (has_marriage_note or has_marriage_source)) tabindex="0" %apply;popover_params("bottom")
                 data-content='%if;(has_marriage_note)%apply;clean_comment_tags(marriage_note)%end;
                               %if;(has_marriage_source)
@@ -1285,14 +1288,14 @@
   %pvar.1.mark_descendants;
   %foreach;ancestor_level;
     %apply;lazy_print%with;
-      %if;(e.gen=1)>thead><tr><th colspan="7" role="heading" aria-level="%level;">%nl;[*generation/generations]0 %level;%nl;</th></tr></thead>%end;
+      %if;(e.gen=1)<thead class="text-center"><tr><th colspan="7" role="heading" aria-level="%level;">%nl;[*generation/generations]0 %level;%nl;</th></tr></thead>%end;
     %end;
     <tbody>
       %if;(level <= e.l)
         %foreach;ancestor;
           %if;(level!=0 and ancestor.same="" and (ancestor.is_descendant or ancestor.spouse.is_descendant))
             %lazy_force;
-            %let;l1;%if;(ancestor.is_descendant)border border-%if;(ancestor.is_male)info%elseif;(ancestor.is_female)danger%end; is_desc_1%ancestor.sex;%end;%in;
+            %let;l1;%if;(ancestor.is_descendant)is_desc_1%ancestor.sex; side-border-%if;(ancestor.is_female)fe%end;male%end;%in;
             %apply;one_line(l1)
           %end;
         %end;
@@ -1303,7 +1306,7 @@
 
 %define;table_double()
   %foreach;ancestor_level(l_v)
-    %if;(level>0 and (e.only!="on" or level=l_v))
+    %if;(level>=v0 and (only=0 or level=l_v))
       %if;(e.gen=1)<thead><tr><th class="text-center" colspan="7">%nl;[*generation/generations]0 %level;%nl;</th></tr></thead>%end;
       <tbody>
         %foreach;ancestor;
@@ -1315,10 +1318,7 @@
   %end;
   <tfoot>
     <tr>
-      <td colspan="7">[*total] : %count;%nn;
-        %if;(e.only="on")/%expr(2^l_v)
-        %else;/%expr(2^(l_v+1)-2)%end; [[person/persons]1@(c)]%nn;
-      </td>
+      <td colspan="7" align="center">[*total][:] %count;/%expr(2^(l_v+1)-2^v0) [[ancestor/ancestors]1@(c)].</td>
     </tr>
   </tfoot>
 %end;
@@ -1365,31 +1365,27 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 
 %( Main %)
 %if;(e.templ!="templm")
-<h1 class="ml-2">%nn;
+<h1 class="h3 mt-3%if;not cancel_links; ml-2%end;">%nn;
   %apply;a_of_b%with;
     %if;(e.t = "M")
       %if;(e.evt = "on")[*missing events]%else;[*missing ancestors]%end;%nn;
     %else;
-      %if;(e.only="on")%apply;capitalize%with;%apply;gen("v")%end;
-      %else;[*ancestor/ancestors]1%nn;
-      %end;
+      [*ancestor/ancestors]1%nn;
     %end;
   %and;
     %if;(public_name != "")%public_name;%else;%first_name;%end;
     %if;(qualifier != "") <em>%qualifier;</em>%end;
     %sp;%surname;
-    %if;(alias != "") <em>(%alias;)</em>%end; %dates;
-  %end;
-  %if;(e.t = "D") [up to] %p_of_index.1;
-  %else;
-     %if;(cancel_links and e.v > 4) %apply;togena(e.v)%end;
-  %end;
-  %if;(e.t="X")…<br>[only] [up to] %pvar.1; %pvar.1.dates;%end;
+    %(%if;(alias != "") <em>(%alias;)</em>%end;%) %dates;
+  %end;%sp;
+    %if;(v0=1 and only=0)%apply;togena(e.v)
+    %else;
+      %if;(v0>1 and v0<l_v and only=0)%apply;fromthenth(v0)%end;
+      %sp;%apply;tothenthgen(l_v)
+    %end;
+  %if;(e.t = "D") [up to] %p_of_index.1; %if;(e.v > 4) %apply;togena(e.v)%end;%end;
+  %if;(e.t="X")<div class="ml-3">[only] [up to] %pvar.1; %pvar.1.dates;</div>%end;
 </h1>
-%end;
-
-%if;((e.t="Z" or e.t="Y" or e.t="X") and not cancel_links)
-  %include;buttons
 %end;
 
 %if;(e.t = "P")
@@ -1821,7 +1817,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
 %elseif;(e.t = "X" or e.t = "Y")
   %empty_sorted_list;
   %reset_count;
-  <table class="table table-hover asc-desc-table ml-2">
+  <table class="table table-hover asc-desc-table%if;not cancel_links; ml-2%end;">
     <col width="4%%"%/>
     <col width="18%%"%/>
     <col width="18%%" align="%left;"%/>
@@ -1835,18 +1831,18 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %apply;table_double()
     %end;
   </table>
-
 %elseif;(e.t = "Z")
   %if;(e.csv!=1)
     %reset_count;
-    <table id="anctable" class="table-hover table-sm w-auto asc-desc-table mt-2" aria-labelledby="[table]-[ancestor]">
+    <table id="anctable" class="table table-hover table-sm w-auto asc-desc-table mt-2" aria-labelledby="[table]-[ancestor]">
       %( table_headed defined in perso_utils for both tables %)
       %apply;table_header()
       <tbody>
         %let;nb_col;%count;%in;
         %reset_count;
         %foreach;ancestor_level(l_v)
-          %if;(e.only!="on" and e.gen=1 and level!=0)
+          %if;((v0=1 and level=0) or level>=v0)
+            %if;(only=0 and e.gen=1 and level!=0)
             <tr class="no-hover-highlight">
               <th class="text-left border-0 gen-row" scope="row" colspan="%nb_col;">
                 <span class="ml-1">[*generation/generations]0 %level;</span>
@@ -1854,21 +1850,21 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
             </tr>
           %end;
           %foreach;ancestor;
-            %if;(e.only!="on" or level=l_v)
-              <tr>
+              %if;(only=0 or level=l_v)
+              <tr%if;(ancestor.anc_sosa.v %2=0 and level>1) class="even-row"%end;>
                 %apply;table_row()
               </tr>
               %if;(ancestor.nb_families > 1)
                 %apply;table_family()
               %end;
             %end;
+        %end;
           %end;
         %end;
       </tbody>
     </table>
     <div class="mt-1">
-      [*total][:] %if;(e.only!="on")1+%count;/%expr((2^(l_v+1)-2))
-                  %else;%count;/%expr(2^l_v)%end; [[person/persons]1@(c)].
+      [*total][:] 1+%count;/%expr((2^(l_v+1)-2^v0)) [[person/persons]1@(c)].
     </div>
   %else;
     <div class="mt-2">
@@ -1900,7 +1896,7 @@ TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » 
       %reset_count;
       %foreach;ancestor_level(l_v)
         %foreach;ancestor;
-          %if;(level>0 and (e.only!="on" or level=l_v))
+          %if;(level>0 and (only=0 or level=l_v))
             %apply;csv_row("ancestor")
           %end;
         %end;
