@@ -9105,7 +9105,7 @@ tr: eş ve çocuklar biliniyor
 
     having as children
 af: met kind/met %s kinders
-ar: طفلهم / أطفالهم ٪S
+ar: طفلهم / أطفالهم %s
 bg: c дете/c %s деца
 br: o bugel/o %s bugel
 ca: amb fill/amb %s fills
@@ -9119,12 +9119,12 @@ es: con un niño/con %s hijos
 et: nende laps/nende %s last
 fi: heidän lapsensa/heidän %s lastaan
 fr: dont un enfant/dont %s enfants
-he: הילד שלהם / ילדיהם %S
+he: הילד שלהם / ילדיהם %s
 is: með barn/með %s börn
 it: con figlio/con %s figli
 lt: ar vienu bērnu/ar %s bērniem
 lv: su vaikais/su %s vaikais
-nl: hun kind/hun &s kinderen
+nl: hun kind/hun %s kinderen
 no: med barn/med %s barn
 oc: сæ фæллон/сæ %s фæсарæнтæ
 pl: ich dziecko/ich %s dzieci
