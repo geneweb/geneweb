@@ -4444,7 +4444,7 @@ let eval_predefined_apply conf env f vl =
           l := SortedList.add sl !l;
           ""
       | _ -> raise Not_found)
-  | "hexa", [ s ] -> Util.hexa_string s
+  | "hexa", [ s ] -> Ext_string.hexa_string s
   | "initial", [ s ] ->
       if String.length s = 0 then "" else String.sub s 0 (Utf8.next s 0)
   | "lazy_print", [ v ] -> (

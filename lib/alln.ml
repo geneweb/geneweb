@@ -36,7 +36,7 @@ let select_names conf base is_surnames ini limit =
     else Gwdb.persons_of_first_name base
   in
   let list, len =
-    let start_k = Mutil.tr '_' ' ' ini in
+    let start_k = Ext_string.tr '_' ' ' ini in
     try
       let istr = Gwdb.spi_first name_index start_k in
       let rec loop istr len list =
@@ -155,7 +155,7 @@ let select_names conf base is_surnames ini limit =
 let ini len k =
   let ini_k = Utf8.sub ~pad:'_' k 0 len in
   (* ini_k is "a fresh string": we can use unsafe. *)
-  Mutil.unsafe_tr ' ' '_' ini_k
+  Ext_string.unsafe_tr ' ' '_' ini_k
 
 let groupby_ini len list =
   list

@@ -124,7 +124,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
       Output.print_sstring conf "<a href=\"#a";
       Output.print_string conf (Mutil.encode ini_k);
       Output.print_sstring conf "\">";
-      Output.print_string conf (Mutil.tr '_' ' ' ini_k |> Adef.safe);
+      Output.print_string conf (Ext_string.tr '_' ' ' ini_k |> Adef.safe);
       Output.print_sstring conf "</a>\n")
     list;
   Output.print_sstring conf "</p><ul>";
@@ -133,7 +133,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
       Output.print_sstring conf "<li><a id=\"a";
       Output.print_string conf (Mutil.encode ini_k);
       Output.print_sstring conf "\">";
-      Output.print_string conf (Mutil.tr '_' ' ' ini_k |> Adef.safe);
+      Output.print_string conf (Ext_string.tr '_' ' ' ini_k |> Adef.safe);
       Output.print_sstring conf "</a><ul>";
       List.iter
         (fun (s, cnt) ->
@@ -271,7 +271,8 @@ let print_alphabetic_short conf base is_surnames ini list len =
         Output.print_sstring conf "<a href=\"#a";
         Output.print_string conf (Mutil.encode ini_k);
         Output.print_sstring conf "\">";
-        Output.print_string conf (Mutil.tr '_' ' ' ini_k |> Util.escape_html);
+        Output.print_string conf
+          (Ext_string.tr '_' ' ' ini_k |> Util.escape_html);
         Output.print_sstring conf "</a>\n")
       list;
     Output.print_sstring conf "</p>");

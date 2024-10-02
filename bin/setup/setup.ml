@@ -1683,9 +1683,9 @@ let setup_comm_ok conf =
       end
 
   | x ->
-      if Mutil.start_with "doc/" 0 x
-      || Mutil.start_with "images/" 0 x
-      || Mutil.start_with "css/" 0 x
+      if Ext_string.start_with "doc/" 0 x
+      || Ext_string.start_with "images/" 0 x
+      || Ext_string.start_with "css/" 0 x
       then
         raw_file conf x
       else error conf ("bad command: \"" ^ x ^ "\"")

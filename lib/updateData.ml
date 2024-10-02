@@ -183,13 +183,17 @@ let reduce_cpl_list size list =
 let update_person conf base old new_input p =
   match Util.p_getenv conf.Config.env "data" with
   | Some "occu" ->
-      let new_istr = Gwdb.insert_string base (Util.only_printable new_input) in
+      let new_istr =
+        Gwdb.insert_string base (Ext_string.only_printable new_input)
+      in
       let occupation = Gwdb.get_occupation p in
       let s_occupation = Gwdb.sou base occupation in
       let occupation = if old = s_occupation then new_istr else occupation in
       { (Gwdb.gen_person_of_person p) with occupation }
   | Some "place" ->
-      let new_istr = Gwdb.insert_string base (Util.only_printable new_input) in
+      let new_istr =
+        Gwdb.insert_string base (Ext_string.only_printable new_input)
+      in
       let pl_bi = Gwdb.get_birth_place p in
       let s_bi = Gwdb.sou base pl_bi in
       let pl_bp = Gwdb.get_baptism_place p in
@@ -221,7 +225,9 @@ let update_person conf base old new_input p =
         pevents;
       }
   | Some "src" ->
-      let new_istr = Gwdb.insert_string base (Util.only_printable new_input) in
+      let new_istr =
+        Gwdb.insert_string base (Ext_string.only_printable new_input)
+      in
       let src_bi = Gwdb.get_birth_src p in
       let s_bi = Gwdb.sou base src_bi in
       let src_bp = Gwdb.get_baptism_src p in
@@ -256,7 +262,9 @@ let update_person conf base old new_input p =
         pevents;
       }
   | Some "fn" ->
-      let new_istr = Gwdb.insert_string base (Util.only_printable new_input) in
+      let new_istr =
+        Gwdb.insert_string base (Ext_string.only_printable new_input)
+      in
       let first_name = Gwdb.get_first_name p in
       let s_first_name = Gwdb.sou base first_name in
       let s_first_name_lower = Name.lower s_first_name in
@@ -290,7 +298,9 @@ let update_person conf base old new_input p =
         first_names_aliases;
       }
   | Some "sn" ->
-      let new_istr = Gwdb.insert_string base (Util.only_printable new_input) in
+      let new_istr =
+        Gwdb.insert_string base (Ext_string.only_printable new_input)
+      in
       let surname = Gwdb.get_surname p in
       let s_surname = Gwdb.sou base surname in
       let s_surname_lower = Name.lower s_surname in
@@ -340,7 +350,9 @@ let update_person conf base old new_input p =
 let update_family conf base old new_istr fam =
   match Util.p_getenv conf.Config.env "data" with
   | Some "place" ->
-      let new_istr = Gwdb.insert_string base (Util.only_printable new_istr) in
+      let new_istr =
+        Gwdb.insert_string base (Ext_string.only_printable new_istr)
+      in
       let p_ma = Gwdb.get_marriage_place fam in
       let s_ma = Gwdb.sou base p_ma in
       let marriage_place = if old = s_ma then new_istr else p_ma in
@@ -356,7 +368,9 @@ let update_family conf base old new_istr fam =
       in
       { (Gwdb.gen_family_of_family fam) with marriage_place; fevents }
   | Some "src" ->
-      let new_istr = Gwdb.insert_string base (Util.only_printable new_istr) in
+      let new_istr =
+        Gwdb.insert_string base (Ext_string.only_printable new_istr)
+      in
       let src_ma = Gwdb.get_marriage_src fam in
       let s_ma = Gwdb.sou base src_ma in
       let src_f = Gwdb.get_fsources fam in
@@ -495,7 +509,7 @@ let build_list_short conf list =
            StringSet.empty list)
     in
     (* Astuce pour gérer les espaces. *)
-    let inis = List.rev_map (fun p -> Mutil.tr ' ' '_' p) inis in
+    let inis = List.rev_map (fun p -> Ext_string.tr ' ' '_' p) inis in
     let inis = remove_dup inis in
     match inis with
     | [ ini ] -> build_ini list (String.length ini)

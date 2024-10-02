@@ -4,9 +4,6 @@ val verbose : bool ref
 (** Global variable that indicates either
     servers should be in verbose mode. *)
 
-val strip_all_trailing_spaces : string -> string
-(** Remove all trailing spaces in string *)
-
 (* [decline dform dformat] encode name that could be declined (like in the czech language)
    and its declination form in more comprehensible for computer format.
    Declination form [dform] is one of the follows:
@@ -24,9 +21,6 @@ val decline : char -> string -> string
 val nominative : string -> string
 (** Encodes name for nominative declination format.
     @deprecated *)
-
-val initial : string -> int
-(** Returns position of first capital letter in the name (0 if no capitals). *)
 
 val input_particles : string -> string list
 (** [input_particles fname] read file and returns list of lines.
@@ -53,20 +47,6 @@ val input_lexicon :
     If traduction line has a form [->: kw] it associates to the current section name the value
     associated to [kw] section name inside [ht] (keyword alias). *)
 
-module StrSet : Set.S with type elt = string
-(** Set of strings *)
-
-val tr : char -> char -> string -> string
-(** [tr c1 c2 str]
-    Return a new string which is the same as [str] with all occurences of [c1]
-    replaced by [c2]. If [str] does not contain [c1] [str] is returned untouched.
- *)
-
-val unsafe_tr : char -> char -> string -> string
-(** [unsafe_tr c1 c2 str]
-    Update [str] in place. Replace all occurences of [c1] by [c2].
- *)
-
 val array_to_list_map : ('a -> 'b) -> 'a array -> 'b list
 (** [array_to_list_map fn a] is almost like [Array.to_list a |> List.map fn]
     but is more efficient.
@@ -86,17 +66,6 @@ val array_assoc : 'k -> ('k * 'v) array -> 'v
     That is, [array_assoc k [| ... ; (k,v) ; ... |] = v]
     if [(k,v)] is the leftmost binding of a in array [arr].
     Raise [Not_found] if there is no value associated with [k] in [arr]. *)
-
-val start_with : string -> int -> string -> bool
-(** [start_with prefix off str]
-    Test if [str] starts with [prefix] (at offset [off]).
-
-    Raise [Invalid_argument] if [off] is not a valid index in [str].
-*)
-
-val contains : string -> string -> bool
-(** [contains str sub] Test [sub] is contained in [str].
-*)
 
 val compile_particles : string list -> Re.re
 (** [compile_particles list]
@@ -221,11 +190,6 @@ val eq_key : string * string * int -> string * string * int -> bool
 (** [eq_key (fn1, sn1, oc1) (fn2, sn2, oc2)]
     Tests if two persons would have the same key
 *)
-
-val digest : string -> string
-(** [digest s]
-    Returns the (128 bits long, using MD5 algorithm) digest of [s].
-  *)
 
 val empty_person : 'string -> 'string -> (unit, _, 'string) Def.gen_person
 (** [empty_person empty quest] returns a Def.gen_person with

@@ -50,7 +50,7 @@ let print_mod_ok conf base =
   let data = Option.value ~default:"" (Util.p_getenv conf.Config.env "data") in
   let ini = Option.value ~default:"" (Util.p_getenv conf.env "s") in
   let new_input =
-    Option.fold ~none:"" ~some:Util.only_printable
+    Option.fold ~none:"" ~some:Ext_string.only_printable
       (Util.p_getenv conf.env "nx_input")
   in
   let new_istr_s = Gwdb.string_of_istr (Gwdb.insert_string base new_input) in
@@ -110,7 +110,7 @@ let print_mod_ok conf base =
       Output.print_sstring conf
         {|<input type="hidden" name="nx_input" size="80" maxlength="200" value="|};
       Output.print_string conf
-        (Util.escape_html (Util.only_printable new_input));
+        (Util.escape_html (Ext_string.only_printable new_input));
       Output.print_sstring conf {|" id="data">|};
       Output.print_sstring conf
         (Utf8.capitalize_fst (Util.transl conf "continue correcting"));
@@ -219,7 +219,7 @@ and eval_compound_var conf base env xx sl =
     | ("escape" | "html_encode") :: sl ->
         (Util.escape_html (loop sl) :> string) (* FIXME? *)
     | "safe" :: sl -> (Util.safe_html (loop sl) :> string) (* FIXME? *)
-    | "printable" :: sl -> Util.only_printable (loop sl)
+    | "printable" :: sl -> Ext_string.only_printable (loop sl)
     | _ -> raise Not_found
   in
   str_val (loop sl)

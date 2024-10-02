@@ -364,7 +364,7 @@ let print_add_ok conf base =
     let ident = String.trim (get conf "Ident") in
     let email = String.trim (get conf "Email") in
     let subject = String.trim (get conf "Subject") in
-    let text = Gutil.trim_trailing_spaces (get1 conf "Text") in
+    let text = Ext_string.trim_trailing_spaces (get1 conf "Text") in
     {
       m_time = (time :> string);
       m_date = Dtext "";

@@ -726,7 +726,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
   if has_v then Util.hidden_input conf "v" (Adef.encoded @@ string_of_int v);
   if fname <> "" then Util.hidden_input conf "f" (Mutil.encode fname);
   if can_edit then
-    Util.hidden_input conf "digest" (Mutil.digest s |> Mutil.encode);
+    Util.hidden_input conf "digest" (Ext_string.digest s |> Mutil.encode);
   Output.print_sstring conf
     {|<div class="row ml-3"><div class="d-inline col-9 py-1">|};
   Util.include_template conf [ ("name", Adef.encoded "notes") ] "toolbar" ignore;
@@ -864,13 +864,13 @@ let print_mod_ok conf wi edit_mode fname read_string commit string_filter
       in
       let sub_part =
         match Util.p_getenv conf.env "notes" with
-        | Some v -> Mutil.strip_all_trailing_spaces v
+        | Some v -> Ext_string.strip_all_trailing_spaces v
         | None -> failwith "notes unbound"
       in
       let digest =
         match Util.p_getenv conf.env "digest" with Some s -> s | None -> ""
       in
-      if digest <> Mutil.digest old_string then Update.error_digest conf
+      if digest <> Ext_string.digest old_string then Update.error_digest conf
       else
         let s =
           match Util.p_getint conf.env "v" with

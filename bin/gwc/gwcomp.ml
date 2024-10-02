@@ -964,7 +964,7 @@ let read_notes state ic =
       loop (input_a_line state ic)
     with End_of_file -> failwith "end of file"
   in
-  Mutil.strip_all_trailing_spaces notes
+  Ext_string.strip_all_trailing_spaces notes
 
 (* from version 5.00 *)
 
@@ -987,7 +987,7 @@ let read_notes_db state ic end_txt =
       loop (input_a_line state ic)
     with End_of_file -> failwith "end of file"
   in
-  Mutil.strip_all_trailing_spaces notes
+  Ext_string.strip_all_trailing_spaces notes
 
 (** Parsing status of .gw block  *)
 type 'a read_family =
@@ -1013,7 +1013,7 @@ let aux_loop_note state tag line ic =
   let acc, line = loop [] line in
   let note =
     String.concat "\n" (List.rev @@ ("" :: acc))
-    |> Mutil.strip_all_trailing_spaces
+    |> Ext_string.strip_all_trailing_spaces
   in
   (note, line)
 

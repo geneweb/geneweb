@@ -3,7 +3,7 @@
 open Config
 open Gwdb
 open Util
-module StrSet = Mutil.StrSet
+module StrSet = Ext_string.Set
 
 let file_path conf base fname =
   Util.bpath

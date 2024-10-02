@@ -11,7 +11,7 @@ open Util
 
 open Gwd_lib
 
-module StrSet = Mutil.StrSet
+module StrSet = Ext_string.Set
 
 let output_conf =
   { status = Wserver.http
@@ -760,7 +760,7 @@ let basic_authorization from_addr request base_env passwd access_type utm
     if auth = "" then ""
     else
       let s = "Basic " in
-      if Mutil.start_with s 0 auth then
+      if Ext_string.start_with s 0 auth then
         let i = String.length s in
         Base64.decode (String.sub auth i (String.length auth - i))
       else ""
@@ -899,7 +899,7 @@ let digest_authorization request base_env passwd utm base_file command =
      ar_friend = friend_passwd = ""; ar_uauth = ""; ar_can_stale = false}
   else if passwd = "w" || passwd = "f" then
     let auth = Mutil.extract_param "authorization: " '\r' request in
-    if Mutil.start_with "Digest " 0 auth then
+    if Ext_string.start_with "Digest " 0 auth then
       let meth =
         match Mutil.extract_param "GET " ' ' request with
           "" -> "POST"
@@ -1417,7 +1417,7 @@ let image_request conf script_name env =
       let _ = ImageDisplay.print_image_file conf fname in true
   | _ ->
       let s = script_name in
-      if Mutil.start_with "images/" 0 s then
+      if Ext_string.start_with "images/" 0 s then
         let i = String.length "images/" in
         let fname = String.sub s i (String.length s - i) in
         (* Je ne sais pas pourquoi on fait un basename, mais ça empeche *)
@@ -1469,7 +1469,7 @@ let content_misc conf len misc_fname =
 
 let find_misc_file name =
   if Sys.file_exists name
-  && List.exists (fun p -> Mutil.start_with (Filename.concat p "assets") 0 name) !plugins
+  && List.exists (fun p -> Ext_string.start_with (Filename.concat p "assets") 0 name) !plugins
   then name
   else
     let name' = search_in_assets @@ Filename.concat "etc" name in

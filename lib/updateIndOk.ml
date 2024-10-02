@@ -16,7 +16,7 @@ let rec reconstitute_string_list conf var ext cnt =
   match get_nth conf var cnt with
   | None -> ([], ext)
   | Some s -> (
-      let s = only_printable s in
+      let s = Ext_string.only_printable s in
       let sl, ext = reconstitute_string_list conf var ext (cnt + 1) in
       match get_nth conf ("add_" ^ var) cnt with
       | Some "on" -> (s :: "" :: sl, true)
@@ -63,7 +63,7 @@ let rec reconstitute_titles conf ext cnt =
         match (get_nth conf "t_main_title" cnt, t_name) with
         | Some "on", _ -> Tmain
         | _, "" -> Tnone
-        | _, _ -> Tname (only_printable t_name)
+        | _, _ -> Tname (Ext_string.only_printable t_name)
       in
       let t_date_start =
         Update.reconstitute_date conf ("t_date_start" ^ string_of_int cnt)
@@ -79,8 +79,8 @@ let rec reconstitute_titles conf ext cnt =
       let t =
         {
           t_name;
-          t_ident = only_printable t_ident;
-          t_place = only_printable t_place;
+          t_ident = Ext_string.only_printable t_ident;
+          t_place = Ext_string.only_printable t_place;
           t_date_start = Date.cdate_of_od t_date_start;
           t_date_end = Date.cdate_of_od t_date_end;
           t_nth;
@@ -179,25 +179,26 @@ let rec reconstitute_pevents conf ext cnt =
         | "#slgs" -> Epers_ScellentSpouseLDS
         | "#vteb" -> Epers_VenteBien
         | "#will" -> Epers_Will
-        | n -> Epers_Name (only_printable n)
+        | n -> Epers_Name (Ext_string.only_printable n)
       in
       let epers_date =
         Update.reconstitute_date conf ("e_date" ^ string_of_int cnt)
       in
       let epers_place =
         match get_nth conf "e_place" cnt with
-        | Some place -> only_printable place
+        | Some place -> Ext_string.only_printable place
         | None -> ""
       in
       let epers_note =
         match get_nth conf "e_note" cnt with
         | Some note ->
-            only_printable_or_nl (Mutil.strip_all_trailing_spaces note)
+            Ext_string.only_printable_or_nl
+              (Ext_string.strip_all_trailing_spaces note)
         | None -> ""
       in
       let epers_src =
         match get_nth conf "e_src" cnt with
-        | Some src -> only_printable src
+        | Some src -> Ext_string.only_printable src
         | None -> ""
       in
       (* Type du témoin par défaut lors de l'insertion de nouveaux témoins. *)
@@ -327,13 +328,15 @@ let deleted_relation = ref []
 let reconstitute_relation_parent conf var key sex =
   match (getn conf var (key ^ "_fn"), getn conf var (key ^ "_sn")) with
   | ("", _ | _, "" | "?", _ | _, "?") as n ->
-      let p = only_printable (fst n) ^ only_printable (snd n) in
+      let p =
+        Ext_string.only_printable (fst n) ^ Ext_string.only_printable (snd n)
+      in
       if p = "" || p = "??" then ()
       else deleted_relation := p :: !deleted_relation;
       None
   | fn, sn ->
-      let fn = only_printable fn in
-      let sn = only_printable sn in
+      let fn = Ext_string.only_printable fn in
+      let sn = Ext_string.only_printable sn in
       (* S'il y a des caractères interdits, on les supprime *)
       let fn, sn = get_purged_fn_sn fn sn in
       let occ =
@@ -566,21 +569,21 @@ let reconstitute_person conf =
         try iper_of_string (String.trim s) with Failure _ -> dummy_iper)
     | None -> dummy_iper
   in
-  let first_name = only_printable (get conf "first_name") in
-  let surname = only_printable (get conf "surname") in
+  let first_name = Ext_string.only_printable (get conf "first_name") in
+  let surname = Ext_string.only_printable (get conf "surname") in
   (* S'il y a des caractères interdits, on les supprime *)
   let first_name, surname = get_purged_fn_sn first_name surname in
   let occ =
     try int_of_string (String.trim (get conf "occ")) with Failure _ -> 0
   in
-  let image = only_printable (get conf "image") in
+  let image = Ext_string.only_printable (get conf "image") in
   let first_names_aliases, ext =
     reconstitute_string_list conf "first_name_alias" ext 0
   in
   let surnames_aliases, ext =
     reconstitute_string_list conf "surname_alias" ext 0
   in
-  let public_name = only_printable (get conf "public_name") in
+  let public_name = Ext_string.only_printable (get conf "public_name") in
   let qualifiers, ext = reconstitute_string_list conf "qualifier" ext 0 in
   let aliases, ext = reconstitute_string_list conf "alias" ext 0 in
   let titles, ext = reconstitute_titles conf ext 1 in
@@ -593,7 +596,7 @@ let reconstitute_person conf =
     | Some "Private" -> Private
     | Some _ | None -> IfTitles
   in
-  let occupation = only_printable (get conf "occu") in
+  let occupation = Ext_string.only_printable (get conf "occu") in
   let sex =
     match p_getenv conf.env "sex" with
     | Some "M" -> Male
@@ -601,32 +604,32 @@ let reconstitute_person conf =
     | Some _ | None -> Neuter
   in
   let birth = Update.reconstitute_date conf "birth" in
-  let birth_place = only_printable (get conf "birth_place") in
+  let birth_place = Ext_string.only_printable (get conf "birth_place") in
   let birth_note =
-    only_printable_or_nl
-      (Mutil.strip_all_trailing_spaces (get conf "birth_note"))
+    Ext_string.only_printable_or_nl
+      (Ext_string.strip_all_trailing_spaces (get conf "birth_note"))
   in
-  let birth_src = only_printable (get conf "birth_src") in
+  let birth_src = Ext_string.only_printable (get conf "birth_src") in
   let bapt = Update.reconstitute_date conf "bapt" in
-  let bapt_place = only_printable (get conf "bapt_place") in
+  let bapt_place = Ext_string.only_printable (get conf "bapt_place") in
   let bapt_note =
-    only_printable_or_nl
-      (Mutil.strip_all_trailing_spaces (get conf "bapt_note"))
+    Ext_string.only_printable_or_nl
+      (Ext_string.strip_all_trailing_spaces (get conf "bapt_note"))
   in
-  let bapt_src = only_printable (get conf "bapt_src") in
-  let burial_place = only_printable (get conf "burial_place") in
+  let bapt_src = Ext_string.only_printable (get conf "bapt_src") in
+  let burial_place = Ext_string.only_printable (get conf "burial_place") in
   let burial_note =
-    only_printable_or_nl
-      (Mutil.strip_all_trailing_spaces (get conf "burial_note"))
+    Ext_string.only_printable_or_nl
+      (Ext_string.strip_all_trailing_spaces (get conf "burial_note"))
   in
-  let burial_src = only_printable (get conf "burial_src") in
+  let burial_src = Ext_string.only_printable (get conf "burial_src") in
   let burial = reconstitute_burial conf burial_place in
-  let death_place = only_printable (get conf "death_place") in
+  let death_place = Ext_string.only_printable (get conf "death_place") in
   let death_note =
-    only_printable_or_nl
-      (Mutil.strip_all_trailing_spaces (get conf "death_note"))
+    Ext_string.only_printable_or_nl
+      (Ext_string.strip_all_trailing_spaces (get conf "death_note"))
   in
-  let death_src = only_printable (get conf "death_src") in
+  let death_src = Ext_string.only_printable (get conf "death_src") in
   let death =
     reconstitute_death conf birth bapt death_place burial burial_place
   in
@@ -648,9 +651,10 @@ let reconstitute_person conf =
   let notes =
     if first_name = "?" || surname = "?" then ""
     else
-      only_printable_or_nl (Mutil.strip_all_trailing_spaces (get conf "notes"))
+      Ext_string.only_printable_or_nl
+        (Ext_string.strip_all_trailing_spaces (get conf "notes"))
   in
-  let psources = only_printable (get conf "src") in
+  let psources = Ext_string.only_printable (get conf "src") in
   (* Mise à jour des évènements principaux. *)
   let bi, bp, de, bu, pevents =
     reconstitute_from_pevents pevents ext
