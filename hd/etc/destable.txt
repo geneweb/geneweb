@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;" id="scrollfix">
 <head>
-  <!-- $Id: destable.txt v7.1 26/10/2023 14:59:21 $ -->
+  <!-- $Id: destable.txt v7.1 11/10/2024 01:05:21 $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
 <title>%nn;
   %apply;a_of_b%with;[*descendants]%and;%self;%end;
@@ -15,28 +15,36 @@
 </head>
 <body%body_prop;>
 %include;hed
-%include;perso_utils
-%include;table_utils
 %message_to_wizard;
 <div class="container-fluid pl-4">
 %if;not cancel_links;
   %include;menubar
 %end;
-%define;tothegen(xxx)
-  %if;(e.v>0)[to the %s generation:::xxx]%end;
+%include;perso_utils
+%include;table_utils
+%include;buttons
+%define;setvar(nnn,vvv)%set_var.nnn.vvv;%end;
+%define;desc(xx)
+  %if;([cousins.0.xx]!="[cousins.0.xx]")[cousins.0.xx]1%else;0%end;
 %end;
-<h1 class="ml-1">%nn;
-  %if;(e.v!=0)%apply;a_of_b%with;
-    %if;(e.only!="on" and e.v!=0)[*descendants]%else;
-      %apply;capitalize%with;%apply;gend("v")%end;%( TODO: look why gend no more defined ! %)
-    %end;%and;
-    %self;%end;%else;%self; ([no descendants])%end;
-    %if;(alias != "") <em>(%alias;)</em>%end; %dates;
-   %if;(cancel_links and e.v!=0 and e.t!="A") %apply;togend(e.v)%end;
+%apply;setvar%with;descname%and;%apply;desc(l_v)%end;
+%let;desc;%if;("0" in get_var.descname)0%else;%get_var.descname;%end;%in;
+<h1 class="h3 mt-3%if;not cancel_links; ml-1%end;">%nn;
+  %if;(l_v!=0)
+    %apply;a_of_b%with;
+      %if;(only=1 and desc!=0)%apply;capitalize(desc)
+      %else;[*descendants]
+      %end;
+    %and;%self;%end;
+  %else;%self;
+  %end;
+  %dates;
+  %if;(only=0 and v0<=1)%sp;%if;(desc!=0)[up to the (individuals)]0 %desc;%else;%apply;togend(l_v)%end;
+  %elseif;(v0>1)
+    %if;(v0<l_v and only=0)%sp;%apply;fromthenth(v0)%end;
+    %if;(v0<l_v or desc=0)%sp;%apply;tothenthgen(l_v)%end;
+  %end;%if;(static_max_desc_level=4) ([no descendants])%end;
 </h1>
-%if;not cancel_links;
-    %include;buttons
-%end;
 %define;link(aaa,xxx,nnn)
   %if;(e.cgl="on")xxx%else;<a id="i_nnn" href="%prefix;aaa">xxx</a>%end;
 %end;
@@ -89,7 +97,7 @@
         %if;(e.ns=1)
           %if;has_notes; note%if;has_psources;source%end;%elseif;has_psources; source%end;
         %end;%if;(e.hl=1 and ("?" is_substr xxx or xxx.first_name="N." or xxx.first_name="Nn"
-              or xxx.first_name="Xx" or xxx.first_name="Yy" or xxx.first_name="Xy")) table-warning%end;"%nn;
+              or xxx.first_name="Xx" or xxx.first_name="Yy" or xxx.first_name="Xy")) bg-ly-incomplete%end;"%nn;
         %rowspan;
         %if;(e.ns=1 and (has_notes or has_psources)) tabindex="0"
           title="[*click] [notes sources show help]%sp;
@@ -122,7 +130,7 @@
           %elseif;(xxx.has_notes and xxx.has_psources) notesourcespouse%nn;
           %end;
         %end;%if;(e.hl=1 and ("?" is_substr xxx or xxx.first_name="N." or xxx.first_name="Nn"
-              or xxx.first_name="Xx" or xxx.first_name="Yy" or xxx.first_name="Xy")) table-warning%end;"%nn;
+              or xxx.first_name="Xx" or xxx.first_name="Yy" or xxx.first_name="Xy")) bg-ly-incomplete%end;"%nn;
         %if;(e.ns=1 and (xxx.has_notes or xxx.has_psources)) tabindex="0" %apply;popover_params("right")
           data-content='%if;(xxx.has_notes)%apply;clean_comment_tags(xxx.notes)%end;
                         %if;(xxx.has_notes and xxx.has_psources)<hr>%end;
@@ -160,7 +168,7 @@
 %( En mode H, conjoints %)
   %if;(e.marr="on" and e.t="H")
     %if;(xxx.nb_families=0)
-      <td%if;(e.hl=1) class="table-active"%end;></td>
+      <td%if;(e.hl=1) class="bg-lg"%end;></td>
     %else;
       %foreach;xxx.family;
         %if;(family_cnt=fam_cnt)
@@ -169,7 +177,7 @@
             %if;(spouse.has_notes) note%if;(spouse.has_psources)source%end;
             %elseif;(spouse.has_psources) source%end;
           %end;
-          %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn" or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) table-warning%end;"%nn;
+          %if;(e.hl=1 and ("?" is_substr spouse or spouse.first_name="N." or spouse.first_name="Nn" or spouse.first_name="Xx" or spouse.first_name="Yy" or spouse.first_name="Xy")) bg-ly-incomplete%end;"%nn;
           %if;(e.ns=1 and (spouse.has_notes or spouse.has_psources)) tabindex="0" %apply;popover_params("bottom")
             data-content='%if;(spouse.has_notes)%apply;clean_comment_tags(spouse.notes)%end;
                           %if;(spouse.has_psources)%if;(spouse.has_notes)<hr>%end;%apply;capitalize(spouse.psources)%end;'
@@ -189,14 +197,14 @@
 %( Date de mariage %)
   %if;(e.marr_date="on")
     %if;(xxx.nb_families=0)
-      <td%if;(e.hl=1) class="table-active"%end;></td>
+      <td%if;(e.hl=1) class="bg-lg"%end;></td>
     %else;
       %foreach;xxx.family;
         %if;((nb_families=1 and "yyy"="desc") or (nb_families>1 and
             ((xxx.spouse=zzz and (ddd=family.index)) or
              (xxx=zzz and family_cnt=fam_cnt and e.t="H"))))
           <td class="align-middle text-right%if;not cancel_links; table_big_cell%end;%if;(are_divorced or are_separated) divorced-side-border%end;
-            %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) table-warning%end;"
+            %if;(e.hl=1 and (slash_marriage_date="" or marriage_date.prec!="" or marriage_date.day="" or marriage_date.month="")) bg-ly-incomplete%end;"
             rowspan="%if;(e.t="I" and zzz.nb_families=1)2%else;1%end;">
             %if;(wizard and not cancel_links)
               <a class="d-block table_big_anchor" href="%prefix;m=MOD_FAM&i=%family.index;&ip=%index;"
@@ -217,14 +225,14 @@
         %end;
       %end;
       %if;(e.t="I" and nb_families>1 and "yyy"="desc")
-        <td%if;(e.hl=1) class="table-active"%end; title="[*edit family on spouse]"></td>
+        <td%if;(e.hl=1) class="bg-lg"%end; title="[*edit family on spouse]"></td>
       %end;
     %end;
   %end;
 %( Lieu de mariage %)
   %if;(e.marr_place="on")
     %if;(xxx.nb_families=0)
-      <td%if;(e.hl=1) class="table-active"%end;></td>
+      <td%if;(e.hl=1) class="bg-lg"%end;></td>
     %else;
       %foreach;xxx.family;
         %if;((nb_families=1 and "yyy"="desc") or
@@ -235,7 +243,7 @@
             %if;(e.ns=1)
               %if;has_marriage_note; note%if;has_marriage_source;source%end;%elseif;has_marriage_source; source%end;
             %end;
-            %if;(e.hl=1 and marriage_place="") table-warning%end;"
+            %if;(e.hl=1 and marriage_place="") bg-ly-incomplete%end;"
             rowspan="%if;(e.t="I" and zzz.nb_families=1)2%else;1%end;"
             title="TODO"
             %if;(e.ns=1 and (has_marriage_note or has_marriage_source))
@@ -254,7 +262,7 @@
         %end;
       %end;
       %if;(e.t="I" and nb_families>1 and "yyy"="desc")
-        <td%if;(e.hl=1) class="table-active"%end;></td>
+        <td%if;(e.hl=1) class="bg-lg"%end;></td>
       %end;
     %end;
   %end;
@@ -297,7 +305,7 @@
 %( Nombre d'enfants %)
   %if;(e.child="on")
     %if;(xxx.nb_families=0)
-      <td%if;(e.hl=1) class="table-active"%end;></td>
+      <td%if;(e.hl=1) class="bg-lg"%end;></td>
     %else;
       %foreach;xxx.family;
         %if;((nb_families=1 and "yyy"="desc") or (nb_families>1 and
@@ -570,7 +578,7 @@
 %if;(e.t="A")
   <div class="mt-1">
     <div class="my-1">[*d'Aboville] %apply;togend(e.v)[:]</div>
-    %apply;one_person("self", 0, e.v, 1, nb_families, 0)
+    %apply;one_person("self", 0, l_v, 1, nb_families, 0)
   </div>
 %else;
   <table id="destable" class="table-hover table-sm w-auto asc-desc-table mt-2">
@@ -578,15 +586,15 @@
     %( table_header defined in perso_utils for both tables %)
     %apply;table_header()
     %let;nb_col;%expr(count)%in;
-    %let;max;%e.v;%in;
     %reset_count;
     %empty_sorted_list; %( persons %)
     %empty_sorted_listb; %( families %)
     %empty_sorted_listc;
-    %if;(e.only!="on")
-      %apply;one_child("self", "-1", "", 1)
-      %for;lev;0;max;
-        %if;(e.gen=1 and lev<max_desc_level)
+    %if;(only=0)
+      %if;(v0<=1)%apply;one_child("self", "-1", "", 1)%end;
+      %let;min;%if;(v0>0)%expr(v0-1)%else;0%end;%in;
+      %for;lev;min;l_v;
+        %if;(e.gen=1 and lev<l_v)
           <tr>
             <th scope="row" colspan="%nb_col;" class="border-0 gen-row">
               <div class="d-flex">
@@ -599,10 +607,10 @@
         %apply;one_level("self", 0, lev, "", "", 1)
       %end;
     %else;
-      %if;(e.v=0)
+      %if;(l_v=0)
         %apply;one_child("self", "-1", "", 1)
       %else;
-        %apply;one_level("self", 0, e.v-1, "", "", 1)
+        %apply;one_level("self", 0, l_v-1, "", "", 1)
       %end;
     %end;
   </table>

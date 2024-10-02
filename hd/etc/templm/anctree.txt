@@ -191,7 +191,7 @@
   </p>
 %end;
 %define;tothegen(xx)
-  [*to the %s generation:::xx]%nn;
+  [*upto the %s generation:::xx]%nn;
 %end;
 
 <body%body_prop; id="anctree">

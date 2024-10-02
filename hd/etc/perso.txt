@@ -27,7 +27,6 @@
 %include;perso_utils
 %include;menubar
 <div id="content" tabindex="-1">
-
 %define;init_cache(nb_asc, from_gen_desc, nb_desc)
   %init_cache.nb_asc.from_gen_desc.nb_desc;
 %end;

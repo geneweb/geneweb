@@ -74,7 +74,7 @@ function table_spouse_disabled () {
 </h1>
 
 %define;tothegen(xx)
-  [*to the %s generation:::xx]%nn;
+  [*upto the %s generation:::xx]%nn;
 %end;
 
 <form class="needs-validation" novalidate method="get" action="%action;">
@@ -260,7 +260,7 @@ function table_spouse_disabled () {
           </div>
           <div class="custom-control custom-checkbox custom-control-inline">
             <input type="checkbox" class="custom-control-input" id="t_fn" name="fn" value="1">
-            <label class="custom-control-label" for="t_fn">[*show first names]1</label>
+            <label class="custom-control-label" for="t_fn">[*visualize/show/hide/summary]1 [first name/first names]1</label>
           </div>
           <div>
             <div class="custom-control custom-checkbox custom-control-inline">
@@ -343,7 +343,7 @@ function table_spouse_disabled () {
           </div>
           <div class="custom-control custom-checkbox">
             <input type="checkbox" class="custom-control-input" id="t_hl" name="hl" value="1">
-            <label class="custom-control-label" for="t_hl">[*highlight incomplete data]</label>
+            <label class="custom-control-label" for="t_hl">[*highlight gaps/hide highlighting]0</label>
           </div>
         </div>
       </div>

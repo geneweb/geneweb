@@ -21,7 +21,7 @@ let text_to conf = function
   | 3 -> transl conf "to the great-grandchildren" |> Adef.safe
   | i ->
       Printf.sprintf
-        (ftransl conf "to the %s generation")
+        (ftransl conf "upto the %s generation")
         (transl_nth conf "nth (generation)" i)
       |> Adef.safe
 

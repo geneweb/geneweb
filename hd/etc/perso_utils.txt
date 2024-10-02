@@ -177,8 +177,24 @@
   %and;xx%end;
 %end;
 
+%define;fromthe(xx)
+  [from the %s (gen):::xx]%nn;
+%end;
+
+%define;fromthenth(xx)
+  %apply;fromthe%with;%apply;nth([nth (generation)], xx)%end;
+%end;
+
 %define;tothegen(xx)
-  [to the %s generation:::xx]%nn;
+  [to the %s gen:::xx]%nn;
+%end;
+
+%define;tothenthgen(xx)
+  %apply;tothegen%with;%apply;nth([nth (generation)], xx)%end;
+%end;
+
+%define;uptothegen(xx)
+  [upto the %s generation:::xx]%nn;
 %end;
 
 %define;togena(xx)
@@ -187,18 +203,19 @@
   %elseif;(xx = 2)[to the grandparents]%nn;
   %elseif;(xx = 3)[to the great-grandparents]%nn;
   %else;
-    %apply;tothegen%with;
+    %apply;uptothegen%with;
       %apply;nth([nth (generation)], xx)
     %end;
   %end;
 %end;
+
 %define;togend(xx)
-  %if;(xx = 0)[specify::generation/generations]0%nn;
+  %if;(xx = 0 and static_max_desc_level>0)([specify::generation/generations]0)%nn;
   %elseif;(xx = 1)[to the children]%nn;
   %elseif;(xx = 2)[to the grandchildren]%nn;
   %elseif;(xx = 3)[to the great-grandchildren]%nn;
   %else;
-    %apply;tothegen%with;
+    %apply;uptothegen%with;
       %apply;nth([nth (generation)], xx)
     %end;
   %end;

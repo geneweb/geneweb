@@ -36,7 +36,7 @@
 %in;
 
 %define;tothegen(xx)
-  [*to the %s generation:::xx]%nn;
+  [*upto the %s generation:::xx]%nn;
 %end;
 
 %define;navsosa(xx)

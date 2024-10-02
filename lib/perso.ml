@@ -514,7 +514,7 @@ let get_all_generations conf base p =
       else gpll
     else gpll
   in
-  let gpll = get_generations 1 [] [ GP_person (Sosa.one, get_iper p, None) ] in
+  let gpll = get_generations 0 [] [ GP_person (Sosa.one, get_iper p, None) ] in
   let gpll = List.rev gpll in
   List.flatten gpll
 

@@ -3913,8 +3913,8 @@ zh: 根据
     by couple
 co: da coppiu
 de: nach Paar
-en: by couple
-fr: par couple
+en: by couple/classic
+fr: par couple/classique
 pt: por casal
 sv: per par
 tr: çift tarafından
@@ -8606,6 +8606,72 @@ de: vom Karussell
 en: from carrousel
 fr: du carrousel
 
+    from the %s (gen)
+af: van die %s
+ar: من الـ%s
+bg: от %s
+br: eus ar %s
+ca: de la %s
+co: da a %s
+cs: od %s
+da: fra den %s
+de: von der %s
+eo: de la %s
+en: from the %s
+es: de la %s
+et: %s sugupõlvest
+fi: %s sukupolvesta
+fr: de la %s
+he: מהדור ה%s
+is: frá %s
+it: dalla %s
+lt: nuo %s
+lv: no %s.
+nl: van de %s
+no: fra den %s
+oc: de la %s
+pl: od %s
+pt: da %s
+ro: de la %s
+ru: от %s
+sk: od %s
+sl: od %s
+sv: från den %s
+tr: %s kuşağından
+
+    to the %s gen
+af: tot die %s geslag
+ar: إلى الجيل الـ%s
+bg: до %s поколение
+br: betek ar %s rummad-tud
+ca: a la %s generació
+co: à a %s generazione
+cs: do %s generace
+da: til den %s generation
+de: bis zur %s Generation
+eo: ĝis la %s generacio
+en: to the %s generation
+es: a la %s generación
+et: %s sugupõlveni
+fi: %s sukupolveen
+fr: à la %s génération
+he: לדור ה%s
+is: til %s kynslóðar
+it: alla %s generazione
+lt: iki %s kartos
+lv: līdz %s. paaudzei
+nl: tot de %s generatie
+no: til den %s generasjon
+oc: a la %s generacion
+pl: do %s pokolenia
+pt: à %s geração
+ro: la generația %s
+ru: до %s поколения
+sk: do %s generácie
+sl: do %s generacije
+sv: till den %s generationen
+tr: %s kuşağına kadar
+
     full siblings
 af: broers en susters
 bg: братя и сестри
@@ -9273,11 +9339,38 @@ de: Vorsicht! Bei Auswahl höherer Generationen kann die Erzeugung mehrere Minut
 en: be carefull! Selecting high generation level may take minutes to generate and that can lead to server timeouts.
 fr: attention ! Sélectionner un nombre de génération élevé peut prendre plusieurs minutes à générer et entraîner des délais d'attente dépassé du serveur.
 
-    highlight incomplete data
-co: sopralineà i dati incumpleti
-de: hebe die unvollständigen Daten hervor
-en: highlight incomplete data
-fr: surligner les données incomplètes
+    highlight gaps/hide highlighting
+af: beklemtoon leemtes/verwyder beklemtoning
+ar: تسليط الضوء على الثغرات/إخفاء التمييز
+bg: подчертаване на пропуски/скриване на подчертаването
+br: lusk an dalc'hoù/dilemel al lusk
+ca: ressaltar els buits/amagar el ressaltat
+co: sopralineà e lacune/caccià u sopralineamentu
+cs: zvýraznit mezery/skrýt zvýraznění
+da: fremhæv huller/skjul fremhævning
+de: Lücken hervorheben/Hervorhebung entfernen
+eo: reliefigi la mankojn/kaŝi la reliefigon
+en: highlight gaps/hide highlighting
+es: resaltar los vacíos/ocultar el resaltado
+et: esile tõsta lüngad/peida esiletõstmine
+fi: korosta aukot/piilota korostus
+fr: surligner les lacunes/supprimer le surlignage
+he: הדגש פערים/הסתר את ההדגשה
+is: draga fram eyður/fela hápunkt
+it: evidenziare le lacune/nascondere l’evidenziazione
+lt: paryškinti spragas/paslėpti paryškinimą
+lv: izcelt nepilnības/slēpt izcelšanu
+nl: markeer hiaten/markering verbergen
+no: fremhev mangler/skjul fremheving
+oc: soslinhar las lagunas/suprimir lo soslinhat
+pl: podświetl luki/ukryj podświetlenie
+pt: destacar os vazios/ocultar o destaque
+ro: evidențiază golurile/ascunde evidențierea
+ru: выделить пробелы/скрыть выделение
+sk: zvýrazniť medzery/skryť zvýraznenie
+sl: izpostavite vrzeli/skrij izpostavljenost
+sv: markera luckor/dölj markeringen
+tr: boşlukları vurgula/vurgulamayı gizle
 
     him/her
 af: sy/haar
@@ -18196,7 +18289,7 @@ sl: za prikaz prve sorodstvene povezave
 sv: för att se den första
 tr: i̇lkini görmek için
 
-    to the %s generation
+    upto the %s generation
 af: tot die %s geslag
 bg: до %s поколение
 br: betek ar %s rummad-tud
@@ -18860,6 +18953,10 @@ sk: až po :a:
 sl: do
 sv: upp till
 tr: kadar
+
+    up to the (individuals)
+en: up to the
+fr: jusqu’aux
 
     update
 af: bywerk
