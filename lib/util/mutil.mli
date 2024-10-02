@@ -4,9 +4,6 @@ val verbose : bool ref
 (** Global variable that indicates either
     servers should be in verbose mode. *)
 
-val list_iter_first : (bool -> 'a -> unit) -> 'a list -> unit
-(** [list_iter_first f l] iter over first element with [f true] and over others with [f false]. *)
-
 val strip_all_trailing_spaces : string -> string
 (** Remove all trailing spaces in string *)
 
@@ -137,35 +134,6 @@ val string_of_int_sep : string -> int -> string
 (** [string_of_int_sep "," 1000000] is ["1,000,000"]
 *)
 
-val list_compare : ('a -> 'a -> int) -> 'a list -> 'a list -> int
-(** [list_compare cmp l1 l2]
-    Comparison function for lists, using [cmp] to compare each elements
-*)
-
-val list_find_map : ('a -> 'b option) -> 'a list -> 'b option
-(** [list_find_map fn list]
-    OCaml Stdlib's [List.find_map] (introduced in 4.10.0)
-    backported into GeneWeb
-  *)
-
-val list_rev_iter : ('a -> unit) -> 'a list -> unit
-(** [list_rev_iter f l] gives the same result as [List.rev l |> List.iter fn],
-    but without creating intermediate list (not tail-recursive).
-  *)
-
-val list_last : 'a list -> 'a
-(** [list_last list]
-    Return the last element of the list.
-    Raises [Failure] if the list is empty.
-  *)
-
-val list_slice : int -> int -> 'a list -> 'a list
-(** [list_slice from_ to_ list]
-    Extracts elements from [a]-nth (starts with zero, inclusive)
-    to [b]-nth (exclusive). If [list] is not long enough, result
-    will be shorter than requested, but the function will not fail.
-  *)
-
 val executable_magic : string
 (** Magic string are either get from {i GW_EXECUTABLE_MAGIC} environement variable
     either generated from the md5sum of the running executable.
@@ -194,29 +162,6 @@ val array_forall2 : ('a -> 'b -> bool) -> 'a array -> 'b array -> bool
     Raise Invalid_argument if the two lists are determined to have different lengths.
 *)
 
-val list_replace : 'a -> 'a -> 'a list -> 'a list
-(** [list_replace old_v new_v list]
-    Return the same list as [list] were the first occurence of [old_v]
-    has been replaced by [new_v]. If [old_v] is unbound, the list is
-    returned unchanged.
-*)
-
-val list_except : 'a -> 'a list -> 'a list
-(** [list_except x list]
-    Return a list containing all the elements from [list]
-    except the first occurence of [x]. *)
-
-val list_index : 'a -> 'a list -> int
-(** [list_index element list]
-    Finds the index of [element] in list.
-    Raises [Not_found] if it does not exists.
-*)
-
-val list_ref_append : 'a list ref -> 'a -> unit
-(** [list_ref_append tl hd]
-    Add [hd] at the beginning of [tl] ref.
- *)
-
 val input_file_ic : in_channel -> string
 (** Read the content of a file.
     Starts from the position where it is when calling [input_file_ic],
@@ -238,14 +183,6 @@ val normalize_utf_8 : string -> string
     with all malformed UTF-8 character replaced by
     {{:http://unicode.org/glossary/#replacement_character}the replacement character}
 *)
-
-val list_map_sort_uniq : ('a -> 'b) -> 'a list -> 'b list
-(** [list_map_sort_uniq f l] apply [f] to every element and return
-    sorted with Merge Sort algorithm list where every element is unique. *)
-
-val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
-(** [list_rev_map_append f l1 l2] apply [f] to every element in [l1], reverse it and
-    concat with [l2]. *)
 
 val bench : string -> (unit -> 'a) -> 'a
 (** [bench name fn]
@@ -309,23 +246,6 @@ val eq_key : string * string * int -> string * string * int -> bool
 (** [eq_key (fn1, sn1, oc1) (fn2, sn2, oc2)]
     Tests if two persons would have the same key
 *)
-
-val filter_map : ('a -> 'b option) -> 'a list -> 'b list
-(** [filter_map fn list] is a combination of map and filter.
-    Not tail-recursive.
-*)
-
-val rev_iter : ('a -> unit) -> 'a list -> unit
-(** [rev_iter fn list] is like [List.iter fn (List.rev list)].
-    Not tail-recursive.
-*)
-
-val groupby :
-  key:('a -> 'k) -> value:('a -> 'v) -> 'a list -> ('k * 'v list) list
-(** [groupby ~key ~value list]
-    Group the elements returning the same key together.
-    Ordering of elements is unspecified.
- *)
 
 val digest : string -> string
 (** [digest s]

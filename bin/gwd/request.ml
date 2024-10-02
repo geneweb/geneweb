@@ -128,7 +128,7 @@ let specify conf base n pl =
       | [] -> ()
       | fnal ->
         Geneweb.Output.print_sstring conf "\n<em>(" ;
-        Mutil.list_iter_first begin fun first fna ->
+        Ext_list.iter_first begin fun first fna ->
           if not first then Geneweb.Output.print_sstring conf ", ";
           Gwdb.sou base fna |> Geneweb.Util.escape_html |> Geneweb.Output.print_string conf
         end fnal ;

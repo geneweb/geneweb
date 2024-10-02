@@ -131,7 +131,7 @@ let get_person_from_data conf base =
 
 let combine_by_ini ~ignore_case ini list =
   let len = Utf8.length ini + 1 in
-  Mutil.groupby
+  Ext_list.groupby
     ~key:(fun (_, s) ->
       let normalize = if ignore_case then Utf8.capitalize else Fun.id in
       normalize @@ Alln.ini len @@ Place.without_suburb s)
@@ -159,7 +159,7 @@ let reduce_cpl_list size list =
       | [] -> reduced_list
       | (a, sl) :: l ->
           if List.length sl >= size - cnt then
-            (a, Util.reduce_list (size - cnt) sl) :: reduced_list
+            (a, Ext_list.take sl (size - cnt)) :: reduced_list
           else loop size (cnt + List.length sl) ((a, sl) :: reduced_list) l
   in
   loop size 0 [] list
@@ -459,7 +459,7 @@ let build_list ~ignore_case conf base =
   let ini = Option.value ~default:"" (Util.p_getenv conf.Config.env "s") in
   let list = get_all_data conf base in
   if ini <> "" then
-    Mutil.filter_map
+    List.filter_map
       (fun istr ->
         let str = Gwdb.sou base istr in
         if

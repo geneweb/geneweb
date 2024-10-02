@@ -202,7 +202,7 @@ let print_old_wizards conf list =
     Output.print_sstring conf (transl_nth conf "and" 0);
     Output.print_sstring conf "...";
     Output.print_sstring conf "<dl><dd>";
-    Mutil.list_iter_first
+    Ext_list.iter_first
       (fun first wz ->
         if not first then Output.print_sstring conf ", ";
         Output.print_sstring conf {|<a href="|};

@@ -165,7 +165,7 @@ let persons_of_fsname conf base base_strings_of_fsname find proj x =
   (l, name_inj)
 
 let print_elem conf base is_surname (p, xl) =
-  Mutil.list_iter_first
+  Ext_list.iter_first
     (fun first x ->
       let iper = Gwdb.get_iper x in
       if not first then Output.print_sstring conf "</li><li> ";
@@ -238,7 +238,7 @@ let first_name_print_list conf base x1 xl liste =
     if h || Util.p_getenv conf.Config.env "t" = Some "A" then
       Output.print_string conf (Util.escape_html x1)
     else
-      Mutil.list_iter_first
+      Ext_list.iter_first
         (fun first x ->
           if not first then Output.print_sstring conf ", ";
           Output.print_sstring conf {|<a href="|};
@@ -292,7 +292,7 @@ let select_first_name conf n list =
       Output.print_sstring conf {|m=P&v=|};
       Output.print_string conf (Mutil.encode sstr);
       Output.print_sstring conf {|">|};
-      Mutil.list_iter_first
+      Ext_list.iter_first
         (fun first str ->
           if not first then Output.print_sstring conf ", ";
           Output.print_string conf (Util.escape_html str))
@@ -580,7 +580,7 @@ let print_one_surname_by_branch conf base x xl (bhl, str) =
     if h || Util.p_getenv conf.Config.env "t" = Some "A" then
       Output.print_string conf (Util.escape_html x)
     else
-      Mutil.list_iter_first
+      Ext_list.iter_first
         (fun first x ->
           if not first then Output.print_sstring conf ", ";
           Output.print_sstring conf {|<a href="|};
@@ -726,7 +726,7 @@ let print_family_alphabetic x conf base liste =
                 :> Adef.escaped_string)
               (Util.escape_html x :> Adef.safe_string)
         in
-        Mutil.list_iter_first
+        Ext_list.iter_first
           (fun first x ->
             if not first then Output.print_sstring conf ", ";
             Output.print_string conf (access x))

@@ -331,7 +331,7 @@ end = struct
 
   let match_name ~search_list ~exact : string list -> bool =
     let matching : string list -> string list -> bool =
-      if exact then Util.list_elements_cmp else Util.is_subset
+      if exact then Ext_list.elements_cmp else Ext_list.is_subset
     in
     fun x -> List.exists (fun s -> matching s x) search_list
 
@@ -849,15 +849,17 @@ let filter_alias ~name ~split ~matching =
       aliases
 
 let matching_first_name_aliases ~first_name =
-  filter_alias ~name:first_name ~split:Name.split_fname ~matching:Util.is_subset
+  filter_alias ~name:first_name ~split:Name.split_fname
+    ~matching:Ext_list.is_subset
 
 let exact_matching_first_name_aliases ~first_name =
   filter_alias ~name:first_name ~split:Name.split_fname
-    ~matching:Util.list_elements_cmp
+    ~matching:Ext_list.elements_cmp
 
 let matching_surname_aliases ~surname =
-  filter_alias ~name:surname ~split:Name.split_sname ~matching:Util.is_subset
+  filter_alias ~name:surname ~split:Name.split_sname
+    ~matching:Ext_list.is_subset
 
 let exact_matching_surname_aliases ~surname =
   filter_alias ~name:surname ~split:Name.split_sname
-    ~matching:Util.list_elements_cmp
+    ~matching:Ext_list.elements_cmp

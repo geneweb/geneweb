@@ -884,7 +884,7 @@ let changed_pevents_order warning p =
       (fun evt -> get_pevent_date evt)
       a
   in
-  let same = Util.list_cmp eq_pevent a b in
+  let same = Ext_list.cmp eq_pevent a b in
   if not same then
     let a = List.map gen_pevent_of_pers_event a in
     let b = List.map gen_pevent_of_pers_event b in
@@ -898,7 +898,7 @@ let changed_fevents_order warning (ifam, fam) =
       (get_fevents fam)
   in
   let b = get_fevents fam in
-  let same = Util.list_cmp eq_fevent a b in
+  let same = Ext_list.cmp eq_fevent a b in
   if not same then
     let a = List.map gen_fevent_of_fam_event a in
     let b = List.map gen_fevent_of_fam_event b in

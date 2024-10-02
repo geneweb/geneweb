@@ -139,7 +139,7 @@ let print_title_place_list conf base t p t_equiv list =
         Output.print_sstring conf " ";
         Output.print_string conf (escape_html p)))
     else
-      Mutil.list_iter_first
+      Ext_list.iter_first
         (fun first t ->
           if not first then Output.print_sstring conf ", ";
           give_access_title_aux conf
@@ -207,7 +207,7 @@ let print_places_list conf base t t_equiv list =
     if h || List.length t_equiv = 1 then
       Output.print_string conf (escape_html t)
     else
-      Mutil.list_iter_first
+      Ext_list.iter_first
         (fun first t ->
           Output.print_sstring conf (if first then "" else ", ");
           give_access_all_titles conf t true)

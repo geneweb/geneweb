@@ -525,9 +525,6 @@ val wprint_in_columns :
 val is_hide_names : Config.config -> Gwdb.person -> bool
 (** Tells if person's names are hiden (if person's access is [Private] or if mode [conf.hide_names] is enabled). *)
 
-val reduce_list : int -> 'a list -> 'a list
-(** [reduce_list n l] takes [n] first elements from the list [l] *)
-
 val print_reference : Config.config -> string -> int -> string -> unit
 
 val gen_print_tips : Config.config -> Adef.safe_string -> unit
@@ -689,6 +686,3 @@ val is_fully_visible_to_visitors :
 (** [is_fully_visible_to_visitors conf base p] is true iff [p] is fully visible for a visitor *)
 
 val is_public : Config.config -> Gwdb.base -> Gwdb.person -> bool
-val list_cmp : ('a -> 'b -> bool) -> 'a list -> 'b list -> bool
-val is_subset : 'a list -> 'a list -> bool
-val list_elements_cmp : 'a list -> 'a list -> bool
