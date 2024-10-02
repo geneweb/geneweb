@@ -29,8 +29,8 @@ let json_of_request_infos ~curr_tm ~tm ~request ~path ~resp_status ~length =
   in
   let mode, url =
     match Mutil.extract_param "GET /" ' ' request with
-    | "" -> "POST", Mutil.extract_param "Referer: " '\n' request
-    | url -> "GET", url
+    | "" -> ("POST", Mutil.extract_param "Referer: " '\n' request)
+    | url -> ("GET", url)
   in
   "{"
   ^ String.concat ","
