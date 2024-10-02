@@ -44,18 +44,12 @@ let make_name_index base =
 let create_name_index oc_inx oc_inx_acc base =
   output_index_aux oc_inx oc_inx_acc (make_name_index base)
 
-module IntSet = Set.Make (struct
-  type t = int
-
-  let compare = compare
-end)
-
 let make_strings_of_fsname_aux split get base =
-  let t = Array.make Dutil.table_size IntSet.empty in
+  let t = Array.make Dutil.table_size Ext_int.Set.empty in
   let add_name (key : string) (value : int) =
     let key = Dutil.name_index key in
     let set = Array.get t key in
-    let set' = IntSet.add value set in
+    let set' = Ext_int.Set.add value set in
     if set == set' then () else Array.set t key set'
   in
   for i = 0 to base.data.persons.len - 1 do
@@ -70,9 +64,9 @@ let make_strings_of_fsname_aux split get base =
   done;
   Array.map
     (fun set ->
-      let a = Array.make (IntSet.cardinal set) 0 in
+      let a = Array.make (Ext_int.Set.cardinal set) 0 in
       let i = ref 0 in
-      IntSet.iter
+      Ext_int.Set.iter
         (fun e ->
           Array.set a !i e;
           incr i)
