@@ -600,9 +600,6 @@ let normalize_utf_8 s =
   add `End;
   Buffer.contents b
 
-(* Copied from OCaml's List.sort_uniq and adapted to our needs
-   (commit e5ebec7 from Nov 7, 2019) *)
-
 let encode s : Adef.encoded_string =
   let special = function
     | '\000' .. '\031'

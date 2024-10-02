@@ -76,6 +76,8 @@ let slice a b list =
   in
   list_slice a (b - a) list
 
+(* Copied from OCaml's List.sort_uniq and adapted to our needs
+   (commit e5ebec7 from Nov 7, 2019) *)
 let map_sort_uniq (fn : 'a -> 'b) l =
   let open List in
   let rec rev_merge l1 l2 accu =
