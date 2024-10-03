@@ -1,4 +1,4 @@
-<!-- $Id: modules/parents.txt v7.1 04/03/2023 09:51:04 $ -->
+<!-- $Id: modules/parents.txt v7.1 03/10/2024 03:28:35 $ -->
 %( op_m=1 simple: name %)
 %( op_m=3 simple with photo in 2 cols %)
 %( op_m=2 evolved: name, occupation %)
@@ -27,10 +27,10 @@
     <br>
     %foreach;father.family;
       %if;(op_m=4 and spouse.access=mother.access)
-        <em>%apply;long_married("father")</em>
+        <em>%apply;married_to("father", 0)</em>&hellip;
       %end;
       %if;(op_m=5 and spouse.access=mother.access)<em style="font-size: 90%%">%nn;
-        %apply;long_married_f("father", "UPPER")</em>
+        %apply;married_to("father", 0)</em>&hellip;
       %end;
     %end;
   %end;
@@ -64,10 +64,9 @@
   </li>
   </ul>
 %elseif;(op_m=5 and op_ph=1 and has_parents)
-  <div id="parents" style="text-align: center">
-  <table style="border-width:%border;">
+  <table id="parents" class="text-center">
     <tr>
-      <td style="text-align: %right;;vertical-align: middle">
+      <td>
         %if;father.has_image;
           %if;(evar.cgl!="on") 
             <a href="%father.image_html_url;"><img %father.image_medium_size;%sp;
@@ -84,7 +83,7 @@
           <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
         %end;
       </td>
-      <td style="text-align: center;vertical-align: top">
+      <td>
         <h2>[*parents]</h2>
         %if;(has_birth_date and (father.has_birth_date or mother.has_birth_date))
           <table style="border-width:%border;">
@@ -92,16 +91,16 @@
               <td colspan="3" style="text-align: center">%apply;age_at_birth_of(central_person)</td>
             </tr>
             <tr>
-              <td style="text-align: %right;width:50%%">%nn;
-                %if;father.has_birth_date;%father_age_at_birth;&nbsp;%else;&nbsp;%end;</td>
+              <td style="text-align: %right;;width:50%%">%nn;
+                %if;father.has_birth_date;%father_age_at_birth;%end;&nbsp;</td>
               <td style="text-align: center">|</td>
               <td style="text-align: %left;;width:50%%">%nn;
-                %if;mother.has_birth_date;&nbsp;%mother_age_at_birth;%else;&nbsp;%end;</td>
+                &nbsp;%if;mother.has_birth_date;%mother_age_at_birth;%end;</td>
             </tr>
           </table>
         %end;
       </td>
-      <td style="text-align: %left;;vertical-align: middle">
+      <td>
         %if;mother.has_image;
           %if;(evar.cgl!="on") 
             <a href="%mother.image_html_url;"><img %mother.image_medium_size;%sp;
@@ -112,8 +111,8 @@
              src="%mother.image_url;" style="border: none" alt="" title="[image/images]0">
           %end;
         %elseif;(bvar.default_image="yes")
-          <img class="small_image rounded align-self-center ml-2" 
-            src="%images_prefix;img_unknown_%if;(mother.is_female)wo%elseif;(mother.is_male)%else;u_%end;man.png" alt="[missing image]" 
+          <img class="small_image rounded align-self-center ml-2"
+            src="%images_prefix;img_unknown_%if;(mother.is_female)wo%elseif;(mother.is_male)%else;u_%end;man.png" alt="[missing image]"
             title="%if;(mother.is_male)[father/mother]0%else;[father/mother]1%end;">
         %else;
           <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
@@ -121,24 +120,23 @@
       </td>
     </tr>
     <tr>
-      <td style="text-align: %left;;vertical-align: top">
+      <td class="text-left align-top pt-2">
         %apply;display_vertical("father")
       </td>
-      <td>
+      <td class="align-top pt-2">
         %foreach;father.family;
           %if;(spouse.access=mother.access)
-            %apply;married_to("father", "UPPER")
+            %apply;married_to("father", 0)&hellip;
             %if;are_divorced;<br>[divorced]0%on_divorce_date;%end;
             %if;are_separated;<br>[separated]0%end;
           %end;
         %end;
       </td>
-      <td style="text-align: %left;;vertical-align: top">
+      <td class="text-left align-top pt-2">
         %apply;display_vertical("mother")
       </td>
     </tr>
   </table>
-  </div>
 
 %( Parents photo %)
 %elseif;(op_m=2 and has_parents)
