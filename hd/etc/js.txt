@@ -207,3 +207,72 @@ $.fn.tooltip.Constructor.Default.whiteList['dt'] = [];
 $.fn.tooltip.Constructor.Default.whiteList['dd'] = [];
 </script>
 %end;
+%( Place the cursor at the end an autofocused input %)
+%if;("MOD" in e.m)
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const input = document.querySelector('input[autofocus]:not([id="n"])');
+    if (input) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+    }
+});
+</script>
+%end;
+%( Add a X buttons to empty inputs and textareas (except the notes_comment inputs in forms) %)
+%if;(e.m!="")
+<script>
+function addClearButtonToInputs() {
+    const elements = document.querySelectorAll('input[type="text"], input[type="search"]:not([id="n"]):not([id="p"]), textarea:not(#notes_comments)');
+    elements.forEach(element => {
+        // Create wrapper div
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+        wrapper.style.display = 'inline-block';
+        wrapper.style.width = '100%';
+        element.parentNode.insertBefore(wrapper, element);
+        wrapper.appendChild(element);
+
+        // Remove padding-right from input element
+        element.style.paddingRight = '30px';
+
+        const clearButton = document.createElement('i');
+        clearButton.className = 'fas fa-xmark';
+        clearButton.style.position = 'absolute';
+        clearButton.style.right = element.tagName.toLowerCase() === 'input' && element.getAttribute('list') ? '10px' : '10px';
+        clearButton.style.top = element.tagName.toLowerCase() === 'textarea' ? '10px' : '50%';
+        clearButton.style.transform = element.tagName.toLowerCase() === 'textarea' ? 'none' : 'translateY(-50%)';
+        clearButton.style.cursor = 'pointer';
+        clearButton.style.display = 'none';
+        clearButton.style.color = '#667fc9';
+        clearButton.style.fontSize = '1em';
+        clearButton.title = '[*clear input]';
+
+        wrapper.appendChild(clearButton);
+        
+        function toggleClearButton() {
+            clearButton.style.display = element.value ? 'block' : 'none';
+        }
+        
+        element.addEventListener('input', toggleClearButton);
+        toggleClearButton();
+
+        clearButton.addEventListener('mouseenter', () => {
+            clearButton.style.color = '#335599';
+        });
+
+        clearButton.addEventListener('mouseleave', () => {
+            clearButton.style.color = '#667fc9';
+        });
+
+        clearButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            element.value = '';
+            toggleClearButton();
+            element.focus();
+            element.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+    });
+}
+</script>
+%end;

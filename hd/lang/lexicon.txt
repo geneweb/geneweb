@@ -4425,6 +4425,10 @@ de: alle Filter löschen
 en: clear every filters
 fr: effacer tous les filtres
 
+    clear input
+en: clean the input
+fr: effacer le champ
+
     click
 af: druk
 bg: щракнете
@@ -9101,7 +9105,7 @@ tr: eş ve çocuklar biliniyor
 
     having as children
 af: met kind/met %s kinders
-ar: طفلهم / أطفالهم ٪S
+ar: طفلهم / أطفالهم %s
 bg: c дете/c %s деца
 br: o bugel/o %s bugel
 ca: amb fill/amb %s fills
@@ -9115,12 +9119,12 @@ es: con un niño/con %s hijos
 et: nende laps/nende %s last
 fi: heidän lapsensa/heidän %s lastaan
 fr: dont un enfant/dont %s enfants
-he: הילד שלהם / ילדיהם %S
+he: הילד שלהם / ילדיהם %s
 is: með barn/með %s börn
 it: con figlio/con %s figli
 lt: ar vienu bērnu/ar %s bērniem
 lv: su vaikais/su %s vaikais
-nl: hun kind/hun &s kinderen
+nl: hun kind/hun %s kinderen
 no: med barn/med %s barn
 oc: сæ фæллон/сæ %s фæсарæнтæ
 pl: ich dziecko/ich %s dzieci
@@ -12869,6 +12873,10 @@ de: nicht mehr
 en: no more
 fr: pas d’autres
 
+    no user key
+en: the link may lead to a homonym or even fail because the user key is not defined in the .auth file
+fr: le lien peut conduire à un homonyme voire échouer car la clé utilisateur n’est pas définie dans le fichier .auth
+
     no sexes check
 af: geslag word nie aangedui nie
 bg: без проверка за пол
@@ -14636,6 +14644,10 @@ sk: verejné
 sl: javno
 sv: offentligt
 tr: kamu
+
+    public name/public names
+en: public name/public names
+fr: nom public/noms publics
 
     public name
 af: noemnaam
@@ -17999,6 +18011,18 @@ no: kronologi
 pt: cronologia
 sv: kronologi
 tr: zaman çizelgesi
+
+    domain/domains
+en: domain/domains
+fr: domaine/domaines
+
+    alias/aliases
+en: alias/aliases
+fr: alias/alias
+
+    qualifier/qualifiers
+en: qualifier/qualifiers
+fr: sobriquet/sobriquets
 
     title/titles
 af: titel/titels

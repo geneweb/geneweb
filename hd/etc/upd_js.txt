@@ -1,5 +1,120 @@
+%( Input datalists and function to populate all datalists %)
+%define;dl(xx)%if;(b.datalist_xx=1)<datalist id="datalist_xx"></datalist>%end;%nn;%end;
+%apply;dl("fnames")
+%apply;dl("snames")
+%apply;dl("places")
+%apply;dl("occupations")
+%apply;dl("sources")
+%if;("IND" in e.m)
+  %apply;dl("pub_names")
+  %apply;dl("qualifiers")
+  %apply;dl("aliases")
+  %apply;dl("titles")
+  %apply;dl("estates")
+%end;
 <script>
-%( show/hide some inputs of witnesses/relationsparents/chirdren/fwitnesses depending of create/link value in selects %)
+function populateDatalist(datalistId, cacheFile, book) {
+    const dataList = document.getElementById(datalistId);
+    if (!dataList) {
+        console.log(`Datalist ${datalistId} not found`);
+        return;
+    }
+    fetch(cacheFile)
+        .then(response => {
+            const reader = response.body.pipeThrough(new DecompressionStream('gzip')).getReader();
+            return new ReadableStream({
+                start(controller) {
+                    return pump();
+                    function pump() {
+                        return reader.read().then(({ done, value }) => {
+                            if (done) {
+                                controller.close();
+                                return;
+                            }
+                            controller.enqueue(value);
+                            return pump();
+                        });
+                    }
+                }
+            });
+        })
+        .then(stream => new Response(stream))
+        .then(response => response.text())
+        .then(text => {
+            const lines = text.split("\n");
+            lines.forEach(line => {
+                if (line.trim()) {
+                    const option = document.createElement("option");
+                    option.value = line.trim().replace("<option>", "");
+                    dataList.appendChild(option);
+                }
+            });
+        })
+        .catch(error => console.error(`Error while loading ${cacheFile}:`, error));
+}
+
+var baseName = "%base.name;";
+var path = baseName + "/cache/" + baseName;
+
+var datalists = %[
+%if;(b.datalist_fnames=1)    { id: "datalist_fnames", file: path + "_fnames.cache.gz", book: "fn" },%end;
+%if;(b.datalist_snames=1)    { id: "datalist_snames", file: path + "_snames.cache.gz", book: "sn" },%end;
+%if;(b.datalist_places=1)    { id: "datalist_places", file: path + "_places.cache.gz", book: "place" },%end;
+%if;(b.datalist_occupations=1)    { id: "datalist_occupations", file: path + "_occupations.cache.gz", book: "occu" },%end;
+%if;(b.datalist_sources=1)    { id: "datalist_sources", file: path + "_sources.cache.gz", book: "src" },%end;
+%if;("IND" in e.m)
+  %if;(b.datalist_pub_names=1)  { id: "datalist_pub_names", file: path + "_pub_names.cache.gz", book: "pubn" },%end;
+  %if;(b.datalist_qualifiers=1)  { id: "datalist_qualifiers", file: path + "_qualifiers.cache.gz", book: "qual" },%end;
+  %if;(b.datalist_aliases=1)  { id: "datalist_aliases", file: path + "_aliases.cache.gz", book: "alias" },%end;
+  %if;(b.datalist_titles=1)  { id: "datalist_titles", file: path + "_titles.cache.gz", book: "title" },%end;
+  %if;(b.datalist_estates=1)  { id: "datalist_estates", file: path + "_estates.cache.gz", book: "domain" },%end;
+%end;
+%];
+
+function setupInputClickListeners() {
+    const inputs = document.querySelectorAll('input[list]');
+    inputs.forEach(input => {
+        const datalistId = input.getAttribute('list');
+        const datalistConfig = datalists.find(list => list.id === datalistId);
+        
+        if (datalistConfig && datalistConfig.book) {
+            input.addEventListener('mousedown', function(event) {
+                if (event.ctrlKey && event.button === 0) {
+                    event.preventDefault();
+                    setTimeout(() => openBook(this.value, datalistConfig.book), 0);
+                }
+            });
+        }
+    });
+}
+
+function openBook(value, book) {
+    let preVal = value;
+    if (book === "place") {
+        const place = value.split(/\]\s+[-–—]\s+/);
+        preVal = place.length > 1 ? place[1] : value;
+    }
+    if (preVal.length > 12) {
+        preVal = preVal.substring(0, 12);
+    }
+    preVal = preVal.split(/[, ]+/)[0];
+    const encVal = encodeURIComponent(value);
+    const encPreVal = encodeURIComponent(preVal);
+    let url = `?%if;cgi;b=${baseName}&%end;m=MOD_DATA&data=${book}&s=${encPreVal}##`;
+    if (encPreVal !== encVal) {
+        url += `${encVal}`;
+    }
+    window.open(url, '_blank');
+}
+
+datalists.forEach(list => populateDatalist(list.id, list.file, list.book));
+
+document.addEventListener('DOMContentLoaded', () => {
+    addClearButtonToInputs();
+    setupInputClickListeners();
+});
+
+%( show/hide some inputs of witnesses/relationsparents/children/fwitnesses depending of create/link value in selects %)
 $(document).ready(function() {
   $("[id$=_selct]").on('change', function() {
     var pre = this.id;

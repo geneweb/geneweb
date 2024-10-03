@@ -1191,6 +1191,17 @@ type ancestor_surname_info =
       * iper list
       * loc)
 
+(*
+TODO, this is not consistant with Def
+type 'string gen_title = {
+  t_name : 'string gen_title_name;
+  t_ident : 'string;
+  t_place : 'string;
+  t_date_start : cdate;
+  t_date_end : cdate;
+  t_nth : int;
+}
+*)
 type title_item =
   int
   * istr gen_title_name
@@ -2005,7 +2016,6 @@ and eval_compound_var conf base env ((a, _) as ep) loc = function
           let ep = (p, authorized_age conf base p) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found)
-  | [ "base"; "name" ] -> VVstring conf.bname
   | [ "plugin"; plugin ] ->
       VVbool (List.mem plugin (List.map Filename.basename conf.plugins))
   | "base" :: "nb_persons" :: sl ->
