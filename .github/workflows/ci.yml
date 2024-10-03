@@ -1,54 +1,39 @@
-name: CI
-
+name: build
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
-
+      - gnt
+  push:
+    branches:
+      - master
+      - gnt
 jobs:
-
   build:
-
     strategy:
-
-      fail-fast: true
-
+      fail-fast: false
       matrix:
-
-        ocaml-version:
-          - 4.14.0
-          - 4.13.1
-          - 4.12.1
-          - 4.11.2
-          - 4.10.2
-          - 4.09.1
-          - 4.08.1
-
-    runs-on: ubuntu-latest
-
+        os:
+          - ubuntu-latest
+        ocaml-compiler:
+          - 4.14.x
+    runs-on: ${{ matrix.os }}
     steps:
-
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Use OCaml ${{ matrix.ocaml-version }}
-        uses: avsm/setup-ocaml@v1
+        uses: actions/checkout@v3
+      - name: Use Ocaml ${{ matrix.ocaml-compiler }}
+        uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-version: ${{ matrix.ocaml-version }}
-
-      - run: opam install dune ocamlformat
-
-      - run: opam exec -- dune build @fmt
-
-      - run: sudo apt-get update
-
-      - run: opam pin add geneweb.dev . --no-action
-
-      - run: opam depext geneweb --yes
-
-      - run: opam install geneweb --deps-only
-
-      - run: opam exec -- make ci
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+      - name: Setup GeneWeb dependencies + ocamlformat
+        run: |
+          opam pin add . -y --no-action
+          opam depext -y geneweb
+          opam install -y ./*.opam --deps-only --with-test
+          opam pin ocamlformat 0.24.1
+      - name: Make ocamlformat > build/distrib
+        run: |
+          opam exec -- ocaml ./configure.ml --release
+          opam exec -- make fmt distrib
+      - name: Make CI tests
+        run: opam exec -- make ci
