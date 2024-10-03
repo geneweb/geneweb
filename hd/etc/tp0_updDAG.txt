@@ -15,12 +15,12 @@
 %define;pline(znz,zocz,zfnz,zsnz,zbdz,zparamz)
   <tr class="row_p"zparamz>
     <td>
-     <i class="fa fa-plus row_add_before"></i>
-     <i class="fa fa-minus row_del"></i>
-   </td>
-   <td>
-     <i class="fa fa-up-long row_move_up"></i>
-     <i class="fa fa-down-long row_move_down"></i>
+      <i class="fa fa-plus row_add_before"></i>
+      <i class="fa fa-minus row_del"></i>
+    </td>
+    <td>
+      <i class="fa fa-up-long row_move_up"></i>
+      <i class="fa fa-down-long row_move_down"></i>
     </td>
     <td%mid;><input name="oc" class="form-control reset_bd_text" size="5" value="zocz"></td>
     <td%mid;><input name="p" class="form-control reset_bd_text" size="30" value="zfnz"></td>
@@ -32,12 +32,12 @@
 %define;sline(znz,zocz,zfnz,zsnz,zbdz,zsz,zparamz)
   <tr class="row_s"zparamz>
     <td>
-     <i class="fa fa-plus row_add_before"></i>
-     <i class="fa fa-minus row_del"></i>
-   </td>
-   <td>
-     <i class="fa fa-up-long row_move_up"></i>
-     <i class="fa fa-down-long row_move_down"></i>
+      <i class="fa fa-plus row_add_before"></i>
+      <i class="fa fa-minus row_del"></i>
+    </td>
+    <td>
+      <i class="fa fa-up-long row_move_up"></i>
+      <i class="fa fa-down-long row_move_down"></i>
     </td>
     <td class="n_p_oc align-middle">zocz</td>
     <td class="n_p_oc align-middle">zfnz</td>
@@ -90,7 +90,7 @@
 <div class="container-fluid">
 <form id="upd" method="post" action="%action;">
   <div class="d-flex justify-content-end m-2">
-    <div class="h2">[*edit tree]</div>
+    <div class="h2">[*add/clear/show/edit the graph]3</div>
     <input type="submit" class="btn btn-primary ml-auto" value="OK">
   </div>
   %hidden;
